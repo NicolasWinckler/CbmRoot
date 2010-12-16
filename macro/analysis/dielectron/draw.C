@@ -526,9 +526,9 @@ void draw(){
     fh_ptcut_bg_minv->SetLineColor(kMagenta);
     fh_anglecut_bg_minv->SetLineColor(kViolet+10);
     fh_pi0cut_bg_minv->SetLineColor(kPink-6);
-//    fh_ttcut_bg_minv->SetLineColor(kYellow+1);
-    fh_rec_bg_minv->Draw("same");
-    fh_rec_bg_minv->SetMinimum(5*10e-8);
+    fh_ttcut_bg_minv->SetLineColor(kYellow+1);
+    fh_rec_bg_minv->Draw();
+    fh_rec_bg_minv->SetMinimum(1e-8);
     fh_rich_id_bg_minv->Draw("same");
     fh_trd_id_bg_minv->Draw("same");
     fh_tof_id_bg_minv->Draw("same");
@@ -556,8 +556,6 @@ void draw(){
     TCanvas *c7 = new TCanvas("c7-minv", "c7-minv", 1200, 600);
     c7->Divide(2,1);
     c7->cd(1);
-    fh_mc_pi0_minv->Draw();
-    fh_acc_pi0_minv->Draw("same");
     fh_rich_id_pi0_minv->SetLineColor(kRed);
     fh_trd_id_pi0_minv->SetLineColor(kBlue);
     fh_tof_id_pi0_minv->SetLineColor(kGreen);
@@ -566,7 +564,7 @@ void draw(){
     fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
     fh_pi0cut_pi0_minv->SetLineColor(kPink-6);
     fh_ttcut_pi0_minv->SetLineColor(kYellow+1);
-    fh_rec_pi0_minv->Draw("same");
+    fh_rec_pi0_minv->Draw();
     fh_rich_id_pi0_minv->Draw("same");
     fh_trd_id_pi0_minv->Draw("same");
     fh_tof_id_pi0_minv->Draw("same");

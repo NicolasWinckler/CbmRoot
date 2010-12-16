@@ -205,6 +205,7 @@ private:
     TH1D* fh_anglecut_signal_mom;
     TH1D* fh_pi0cut_signal_mom;
     TH1D* fh_ttcut_signal_mom;
+    TH1D* fh_apcut_signal_mom;
 
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
@@ -230,6 +231,8 @@ private:
     TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal   
     TH1D* fh_pi0cut_signal_minv;
     TH1D* fh_ttcut_signal_minv;
+    TH1D* fh_apcut_signal_minv;
+
 //BG minv
     TH1D* fh_rec_bg_minv;
     TH1D* fh_rich_id_bg_minv;
@@ -240,6 +243,7 @@ private:
     TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
     TH1D* fh_pi0cut_bg_minv;
     TH1D* fh_ttcut_bg_minv;
+    TH1D* fh_apcut_bg_minv;
 //pi0 minv
     TH1D* fh_rec_pi0_minv;
     TH1D* fh_rich_id_pi0_minv;
@@ -250,6 +254,7 @@ private:
     TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for BG
     TH1D* fh_pi0cut_pi0_minv;
     TH1D* fh_ttcut_pi0_minv;
+    TH1D* fh_apcut_pi0_minv;
 
 // cuts distribution
     TH1D* fh_pt_signal;
@@ -280,6 +285,7 @@ private:
     TH2D* fh_anglecut_signal_pty;
     TH2D* fh_pi0cut_signal_pty;
     TH2D* fh_ttcut_signal_pty;
+    TH2D* fh_apcut_signal_pty;
 
     //ID cuts distributions
     TH1D* fh_rich_ann_signal;

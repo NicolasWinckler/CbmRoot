@@ -106,6 +106,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_anglecut_signal_mom = new TH1D("fh_anglecut_signal_mom","fh_anglecut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_pi0cut_signal_mom = new TH1D("fh_pi0cut_signal_mom","fh_pi0cut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_ttcut_signal_mom = new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_apcut_signal_mom = new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
@@ -132,6 +133,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_anglecut_signal_minv = new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_pi0cut_signal_minv = new TH1D("fh_pi0cut_signal_minv","fh_pi0cut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_ttcut_signal_minv = new TH1D("fh_ttcut_signal_minv","fh_ttcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_apcut_signal_minv = new TH1D("fh_apcut_signal_minv","fh_apcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 //BG minv
     fh_rec_bg_minv = new TH1D("fh_rec_bg_minv","fh_rec_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
     fh_rich_id_bg_minv = new TH1D("fh_rich_id_bg_minv","fh_rich_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
@@ -142,6 +144,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_anglecut_bg_minv = new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_pi0cut_bg_minv = new TH1D("fh_pi0cut_bg_minv","fh_pi0cut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_ttcut_bg_minv = new TH1D("fh_ttcut_bg_minv","fh_ttcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_apcut_bg_minv = new TH1D("fh_apcut_bg_minv","fh_apcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 //pi0 minv
     fh_rec_pi0_minv = new TH1D("fh_rec_pi0_minv","fh_rec_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
     fh_rich_id_pi0_minv = new TH1D("fh_rich_id_pi0_minv","fh_rich_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
@@ -152,6 +155,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_anglecut_pi0_minv = new TH1D("fh_anglecut_pi0_minv","fh_anglecut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_pi0cut_pi0_minv = new TH1D("fh_pi0cut_pi0_minv","fh_pi0cut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_ttcut_pi0_minv = new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_apcut_pi0_minv = new TH1D("fh_apcut_pi0_minv","fh_apcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
     fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -162,6 +166,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_anglecut_signal_pty = new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_pi0cut_signal_pty = new TH2D("fh_pi0cut_signal_pty","fh_pi0cut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_ttcut_signal_pty = new TH2D("fh_ttcut_signal_pty","fh_ttcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fh_apcut_signal_pty = new TH2D("fh_apcut_signal_pty","fh_apcut_signal_pty;Rapidity;p_{t} [GeV/c]",40, 0., 4., 20, 0., 2.);
 
 // cut distribution
     fh_angle_signal = new TH1D("fh_angle_signal","fh_angle_signal;opening angle [deg];yeild", 360, 0., 180.);
@@ -713,6 +718,16 @@ void CbmAnaDielectronTask::PairsReco()
 													fh_ttcut_signal_minv->Fill(pRec.minv, fWeight);
 													fh_ttcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
 													fh_ttcut_signal_mom->Fill(pMC.momentumMag, fWeight);
+
+													Double_t pt = 0;
+													Double_t alfa = 0;
+													CalculateArmPodParams(&fCandidates[iP], &fCandidates[iM], alfa, pt);
+													if (pt > 0.25) {
+														fh_apcut_signal_minv->Fill(pRec.minv, fWeight);
+														fh_apcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+														fh_apcut_signal_mom->Fill(pMC.momentumMag, fWeight);
+
+													}//ap cut
 												}//tt cut
 											}//pi0 cut
 										}//opening angle cut
@@ -772,6 +787,13 @@ void CbmAnaDielectronTask::BgReco()
 											 if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
 												 fNofTTcutBg++;
 												 fh_ttcut_bg_minv->Fill(pRec.minv);
+
+												Double_t pt = 0;
+												Double_t alfa = 0;
+												CalculateArmPodParams(&fCandidates[iP], &fCandidates[iM], alfa, pt);
+												if (pt > 0.25) {
+													fh_apcut_bg_minv->Fill(pRec.minv);
+												} //ap cut
 											 }// tt cut
 										 } // pi0 cut
 									} //opening angle cut
@@ -822,6 +844,13 @@ void CbmAnaDielectronTask::Pi0Reco()
 											 fh_pi0cut_pi0_minv->Fill(pRec.minv);
 											 if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
 												 fh_ttcut_pi0_minv->Fill(pRec.minv);
+
+												Double_t pt = 0;
+												Double_t alfa = 0;
+												CalculateArmPodParams(&fCandidates[iP], &fCandidates[iM], alfa, pt);
+												if (pt > 0.25) {
+													fh_apcut_pi0_minv->Fill(pRec.minv);
+												}//apcut
 											 }// tt cut
 										 } // pi0 cut
 									}//opening angle cut
@@ -1237,6 +1266,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_signal_mom->Scale(scale);
     fh_pi0cut_signal_mom->Scale(scale);
     fh_ttcut_signal_mom->Scale(scale);
+    fh_apcut_signal_mom->Scale(scale);
 
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
@@ -1263,6 +1293,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_signal_minv->Scale(scale);    
     fh_pi0cut_signal_minv->Scale(scale);
     fh_ttcut_signal_minv->Scale(scale);
+    fh_apcut_signal_minv->Scale(scale);
 //BG minv
     fh_rec_bg_minv->Scale(scale);
     fh_rich_id_bg_minv->Scale(scale);
@@ -1273,6 +1304,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_bg_minv->Scale(scale);
     fh_pi0cut_bg_minv->Scale(scale);
     fh_ttcut_bg_minv->Scale(scale);
+    fh_apcut_bg_minv->Scale(scale);
 //pi0 minv
     fh_rec_pi0_minv->Scale(scale);
     fh_rich_id_pi0_minv->Scale(scale);
@@ -1283,6 +1315,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_pi0_minv->Scale(scale);
     fh_pi0cut_pi0_minv->Scale(scale);
     fh_ttcut_pi0_minv->Scale(scale);
+    fh_apcut_pi0_minv->Scale(scale);
 
     fh_reco_signal_pty->Scale(scale);
     fh_rich_id_signal_pty->Scale(scale); 
@@ -1293,6 +1326,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_signal_pty->Scale(scale);
     fh_pi0cut_signal_pty->Scale(scale);
     fh_ttcut_signal_pty->Scale(scale);
+    fh_apcut_signal_pty->Scale(scale);
 
 // cuts distribution
     fh_angle_signal->Scale(scale);
@@ -1338,6 +1372,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_signal_mom->Write();
     fh_pi0cut_signal_mom->Write();
     fh_ttcut_signal_mom->Write();
+    fh_apcut_signal_mom->Write();
 
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();
@@ -1372,6 +1407,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_bg_minv->Write();
     fh_pi0cut_bg_minv->Write();
     fh_ttcut_bg_minv->Write();
+    fh_apcut_bg_minv->Write();
 //pi0 minv
     fh_rec_pi0_minv->Write();
     fh_rich_id_pi0_minv->Write();
@@ -1382,6 +1418,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_pi0_minv->Write();
     fh_pi0cut_pi0_minv->Write();
     fh_ttcut_pi0_minv->Write();
+    fh_apcut_pi0_minv->Write();
 
 // cuts distribution
     fh_pt_signal->Write();
@@ -1413,6 +1450,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_signal_pty->Write();
     fh_pi0cut_signal_pty->Write();
     fh_ttcut_signal_pty->Write();
+    fh_apcut_signal_pty->Write();
 
     //ID cuts
     fh_rich_ann_signal->Write();

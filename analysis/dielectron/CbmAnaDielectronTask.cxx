@@ -663,59 +663,58 @@ void CbmAnaDielectronTask::PairsReco()
                         fh_rich_id_signal_minv->Fill(pRec.minv, fWeight);
                         fh_rich_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
                         fh_rich_id_signal_mom->Fill(pMC.momentumMag, fWeight);
-                    }
-                    if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron) && 
-                        (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron)) {
-                        fNofTrdIdPairs++;
-                        fh_trd_id_signal_minv->Fill(pRec.minv, fWeight);
-                        fh_trd_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                        fh_trd_id_signal_mom->Fill(pMC.momentumMag, fWeight);
-                    }
 
-                    if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
-                        (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
-                        fNofTofIdPairs++;
-                        fh_tof_id_signal_minv->Fill(pRec.minv, fWeight);
-                        fh_tof_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                        fh_angle_signal->Fill(pRec.angle);
-                        fh_tof_id_signal_mom->Fill(pMC.momentumMag,fWeight);
-                    }
-                    if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
-                        (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
+						if (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron) {
+							fNofTrdIdPairs++;
+							fh_trd_id_signal_minv->Fill(pRec.minv, fWeight);
+							fh_trd_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+							fh_trd_id_signal_mom->Fill(pMC.momentumMag, fWeight);
 
-                        if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){
-                            fNofChiPrimCutPairs++;
-                            fh_chi_prim_signal_minv->Fill(pRec.minv, fWeight);
-                            fh_chi_prim_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                            fh_chi_prim_signal_mom->Fill(pMC.momentumMag, fWeight);
-                            if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
-                                fNofPtcutPairs++;
-                                fh_ptcut_signal_minv->Fill(pRec.minv, fWeight);
-                                fh_ptcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                                fh_ptcut_signal_mom->Fill(pMC.momentumMag, fWeight);
-                                if (pRec.angle >fAngleCut) {
-                                    fh_anglecut_signal_minv->Fill(pRec.minv, fWeight);
-                                    fh_anglecut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                                    fh_anglecut_signal_mom->Fill(pMC.momentumMag, fWeight);
+							if (fCandidates[iP].isTofElectron && fCandidates[iM].isTofElectron) {
+								fNofTofIdPairs++;
+								fh_tof_id_signal_minv->Fill(pRec.minv, fWeight);
+								fh_tof_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+								fh_angle_signal->Fill(pRec.angle);
+								fh_tof_id_signal_mom->Fill(pMC.momentumMag,fWeight);
 
-                                    if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
-                                        fh_pi0cut_signal_minv->Fill(pRec.minv, fWeight);
-                                        fh_pi0cut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                                        fh_pi0cut_signal_mom->Fill(pMC.momentumMag, fWeight);
-                                        if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
-                                            fNofTTcutPairs++;
-                                            fh_ttcut_signal_minv->Fill(pRec.minv, fWeight);
-                                            fh_ttcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
-                                            fh_ttcut_signal_mom->Fill(pMC.momentumMag, fWeight);
-                                        }// tt cut
-                                    } // pi0 cut
-                                } //opening angle cut
-                            }//Pt cut
-                        }// Chi prim cut
-                    }
-                } // if
+								if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){
+									fNofChiPrimCutPairs++;
+									fh_chi_prim_signal_minv->Fill(pRec.minv, fWeight);
+									fh_chi_prim_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+									fh_chi_prim_signal_mom->Fill(pMC.momentumMag, fWeight);
+
+									if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
+										fNofPtcutPairs++;
+										fh_ptcut_signal_minv->Fill(pRec.minv, fWeight);
+										fh_ptcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+										fh_ptcut_signal_mom->Fill(pMC.momentumMag, fWeight);
+
+										if (pRec.angle >fAngleCut) {
+											fh_anglecut_signal_minv->Fill(pRec.minv, fWeight);
+											fh_anglecut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+											fh_anglecut_signal_mom->Fill(pMC.momentumMag, fWeight);
+
+											if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
+												fh_pi0cut_signal_minv->Fill(pRec.minv, fWeight);
+												fh_pi0cut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+												fh_pi0cut_signal_mom->Fill(pMC.momentumMag, fWeight);
+
+												if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
+													fNofTTcutPairs++;
+													fh_ttcut_signal_minv->Fill(pRec.minv, fWeight);
+													fh_ttcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+													fh_ttcut_signal_mom->Fill(pMC.momentumMag, fWeight);
+												}//tt cut
+											}//pi0 cut
+										}//opening angle cut
+									}//Pt cut
+								}// Chi prim cut
+							}//isTofElectron
+						}//isTrdElectron
+                    }//isRichElectron
+                }//isMCSignalElectron
             }//iM
-        }
+        }//isMCSignalElectron
     } //iP
 }
 
@@ -744,38 +743,35 @@ void CbmAnaDielectronTask::BgReco()
         
                 if (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron){
                     fh_rich_id_bg_minv->Fill(pRec.minv);
-                }
-                if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && 
-                    fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron) {
-                    fh_trd_id_bg_minv->Fill(pRec.minv);
-                } 
-                if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron && 
-                    fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron) {
-                    fh_tof_id_bg_minv->Fill(pRec.minv);
-                    fh_angle_bg->Fill(pRec.angle);   
-                }
-                if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
-                   (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
-                    if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){ 
-                        fNofChiPrimCutBg++;                  
-                        fh_chi_prim_bg_minv->Fill(pRec.minv);
-                        if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
-                            fNofPtcutBg++;
-                            fh_ptcut_bg_minv->Fill(pRec.minv);
-                            if (pRec.angle > fAngleCut) {
-                                fh_anglecut_bg_minv->Fill(pRec.minv);
-                                 if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
-                                     fh_pi0cut_bg_minv->Fill(pRec.minv);
-                                     if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
-                                         fNofTTcutBg++;
-                                         fh_ttcut_bg_minv->Fill(pRec.minv, fWeight);
-                                     }// tt cut
-                                 } // pi0 cut
-                            } //opening angle cut
-                        }//Pt cut
-                    }//Chi primary cut
-                }
-            } // if
+
+					if (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron) {
+						fh_trd_id_bg_minv->Fill(pRec.minv);
+
+						if (fCandidates[iP].isTofElectron && fCandidates[iM].isTofElectron) {
+							fh_tof_id_bg_minv->Fill(pRec.minv);
+							fh_angle_bg->Fill(pRec.angle);
+							if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){
+								fNofChiPrimCutBg++;
+								fh_chi_prim_bg_minv->Fill(pRec.minv);
+								if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
+									fNofPtcutBg++;
+									fh_ptcut_bg_minv->Fill(pRec.minv);
+									if (pRec.angle > fAngleCut) {
+										fh_anglecut_bg_minv->Fill(pRec.minv);
+										 if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
+											 fh_pi0cut_bg_minv->Fill(pRec.minv);
+											 if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
+												 fNofTTcutBg++;
+												 fh_ttcut_bg_minv->Fill(pRec.minv);
+											 }// tt cut
+										 } // pi0 cut
+									} //opening angle cut
+								}//Pt cut
+							}//Chi primary cut
+						}//isTofElectron
+					}//isTrdElectron
+                } //isRichElectron
+            } // MCSignalElectron
         } // iM                                   
     } // iP
 }
@@ -800,34 +796,32 @@ void CbmAnaDielectronTask::Pi0Reco()
 
                 if (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron){
                     fh_rich_id_pi0_minv->Fill(pRec.minv);
-                }
-                if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron &&
-                    fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron) {
-                    fh_trd_id_pi0_minv->Fill(pRec.minv);
-                }
-                if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron &&
-                    fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron) {
-                    fh_tof_id_pi0_minv->Fill(pRec.minv);
-                }
-                if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
-                   (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
-                    if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){
-                        fh_chi_prim_pi0_minv->Fill(pRec.minv);
-                        if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
-                            fh_ptcut_pi0_minv->Fill(pRec.minv);
-                            if (pRec.angle > fAngleCut) {
-                                fh_anglecut_pi0_minv->Fill(pRec.minv);
-                                 if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
-                                     fh_pi0cut_pi0_minv->Fill(pRec.minv);
-                                     if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
-                                         fh_ttcut_pi0_minv->Fill(pRec.minv, fWeight);
-                                     }// tt cut
-                                 } // pi0 cut
-                            } //opening angle cut
-                        }//Pt cut
-                    }//Chi primary cut
-                }
-            } // if
+
+					if (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron) {
+						fh_trd_id_pi0_minv->Fill(pRec.minv);
+
+						if (fCandidates[iP].isTofElectron && fCandidates[iM].isTofElectron) {
+							fh_tof_id_pi0_minv->Fill(pRec.minv);
+
+							if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){
+								fh_chi_prim_pi0_minv->Fill(pRec.minv);
+								if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
+									fh_ptcut_pi0_minv->Fill(pRec.minv);
+									if (pRec.angle > fAngleCut) {
+										fh_anglecut_pi0_minv->Fill(pRec.minv);
+										 if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
+											 fh_pi0cut_pi0_minv->Fill(pRec.minv);
+											 if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
+												 fh_ttcut_pi0_minv->Fill(pRec.minv);
+											 }// tt cut
+										 } // pi0 cut
+									} //opening angle cut
+								}//Pt cut
+							}//Chi primary cut
+						}//isTofElectron
+					}//isTrdElectron
+				}//isRichElectron
+            } // isMCPi0Electron
         } // iM
     } // iP
 }

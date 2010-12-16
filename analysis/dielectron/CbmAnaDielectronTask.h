@@ -50,6 +50,7 @@ public:
 	Bool_t isTofElectron;
 	Bool_t isMCSignalElectron;
 	Bool_t isMCPi0Electron;
+	Bool_t isMCGammaElectron;
 
 	Bool_t isPi0;
     Double_t dSts;
@@ -265,6 +266,10 @@ private:
     TH2D* fh_ttcut_bg;
     TH2D* fh_apcut_signal;
     TH2D* fh_apcut_bg;
+    TH2D* fh_ttcut_pi0;
+    TH2D* fh_apcut_pi0;
+    TH2D* fh_ttcut_gamma;
+    TH2D* fh_apcut_gamma;
 
     TH2D* fh_reco_signal_pty;
     TH2D* fh_rich_id_signal_pty;

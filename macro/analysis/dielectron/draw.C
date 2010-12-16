@@ -407,19 +407,30 @@ void draw(){
     fh_sig_mom->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    c4->cd(11); 
-    fh_ttcut_signal->Draw("COLZ");
-    c4->cd(12); 
-    fh_ttcut_bg->Draw("COLZ");
     fh_mom_signal->Scale(scaleSig);
     fh_mom_bg->Scale(scaleBg);
 
-    TCanvas *c4_1 = new TCanvas("c4_1-cuts", "c4_1-cuts", 800, 800);
+    TCanvas *c4_1 = new TCanvas("c4_1-apcut", "c4_1-apcut", 800, 800);
     c4_1->Divide(2,2);
     c4_1->cd(1); 
     fh_apcut_signal->Draw("COLZ");
     c4_1->cd(2); 
     fh_apcut_bg->Draw("COLZ");
+    c4_1->cd(3);
+    fh_apcut_pi0->Draw("COLZ");
+    c4_1->cd(4);
+    fh_apcut_gamma->Draw("COLZ");
+
+    TCanvas *c4_2 = new TCanvas("c4_2-ttcut", "c4_2-ttcut", 800, 800);
+    c4_2->Divide(2,2);
+    c4_2->cd(1);
+    fh_ttcut_signal->Draw("COLZ");
+    c4_2->cd(2);
+    fh_ttcut_bg->Draw("COLZ");
+    c4_2->cd(3);
+    fh_ttcut_pi0->Draw("COLZ");
+    c4_2->cd(4);
+    fh_ttcut_gamma->Draw("COLZ");
 
 //    TCanvas *c5 = new TCanvas("c5","c5", 1200, 400);
 //    c5->Divide(3,1);
@@ -587,6 +598,8 @@ void draw(){
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
+
+
 
     calculateSignalOverBg(fh_rec_signal_minv, fh_rec_bg_minv);
     calculateSignalOverBg(fh_rich_id_signal_minv, fh_rich_id_bg_minv);

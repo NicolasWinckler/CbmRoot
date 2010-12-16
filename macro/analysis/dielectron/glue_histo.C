@@ -86,8 +86,13 @@ void glue_histo ()
     fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;chi2,yeild", 200, 0., 20.);
     fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
     fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-    fh_apcut_signal = new TH2D("fh_apcut_signal", "fh_apcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 100, 0., 2.);
-    fh_apcut_bg = new TH2D("fh_apcut_bg","fh_apcut_bg;#alpha;p_{t} [GeV/c]", 100, -1., 1., 100, 0., 2.);
+    fh_apcut_signal = new TH2D("fh_apcut_signal", "fh_apcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
+    fh_apcut_bg = new TH2D("fh_apcut_bg","fh_apcut_bg;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
+    fh_ttcut_pi0 = new TH2D("fh_ttcut_pi0","fh_ttcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_apcut_pi0 = new TH2D("fh_apcut_pi0","fh_apcut_pi0;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+	fh_ttcut_gamma = new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+
 
  //ID cut distributions
     fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);
@@ -181,6 +186,10 @@ void glue_histo ()
         fh_ttcut_bg->Add((TH1D*) file->Get("fh_ttcut_bg"));
         fh_apcut_signal->Add((TH1D*) file->Get("fh_apcut_signal")); 
         fh_apcut_bg->Add((TH1D*) file->Get("fh_apcut_bg"));
+        fh_ttcut_pi0->Add((TH2D*) file->Get("fh_ttcut_pi0"));
+		fh_apcut_pi0->Add((TH2D*) file->Get("fh_apcut_pi0"));
+		fh_ttcut_gamma->Add((TH2D*) file->Get("fh_ttcut_gamma"));
+		fh_apcut_gamma->Add((TH2D*) file->Get("fh_apcut_gamma"));
 
         fh_reco_signal_pty->Add((TH2D*) file->Get("fh_reco_signal_pty"));
         fh_rich_id_signal_pty->Add((TH2D*) file->Get("fh_rich_id_signal_pty"));
@@ -280,6 +289,10 @@ void glue_histo ()
     fh_ttcut_bg->Scale(scale);
     fh_apcut_signal->Scale(scale);
     fh_apcut_bg->Scale(scale);
+    fh_ttcut_pi0->Scale(scale);
+	fh_apcut_pi0->Scale(scale);
+	fh_ttcut_gamma->Scale(scale);
+	fh_apcut_gamma->Scale(scale);
 
     fh_reco_signal_pty->Scale(scale);
     fh_rich_id_signal_pty->Scale(scale);
@@ -375,6 +388,10 @@ void glue_histo ()
     fh_ttcut_bg->Write();
     fh_apcut_signal->Write();
     fh_apcut_bg->Write();
+    fh_ttcut_pi0->Write();
+  	fh_apcut_pi0->Write();
+  	fh_ttcut_gamma->Write();
+  	fh_apcut_gamma->Write();
 
     fh_reco_signal_pty->Write();
     fh_rich_id_signal_pty->Write();

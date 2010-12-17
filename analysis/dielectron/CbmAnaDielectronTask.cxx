@@ -156,6 +156,18 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_pi0cut_pi0_minv = new TH1D("fh_pi0cut_pi0_minv","fh_pi0cut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_ttcut_pi0_minv = new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_apcut_pi0_minv = new TH1D("fh_apcut_pi0_minv","fh_apcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+//eta minv
+    fh_rec_eta_minv = new TH1D("fh_rec_eta_minv","fh_rec_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_rich_id_eta_minv = new TH1D("fh_rich_id_eta_minv","fh_rich_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_trd_id_eta_minv = new TH1D("fh_trd_id_eta_minv","fh_trd_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_tof_id_eta_minv = new TH1D("fh_tof_id_eta_minv","fh_tof_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_chi_prim_eta_minv = new TH1D("fh_chi_prim_eta_minv","fh_chi_prim_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ptcut_eta_minv = new TH1D("fh_ptcut_eta_minv","fh_ptcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_anglecut_eta_minv = new TH1D("fh_anglecut_eta_minv","fh_anglecut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_pi0cut_eta_minv = new TH1D("fh_pi0cut_eta_minv","fh_pi0cut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ttcut_eta_minv = new TH1D("fh_ttcut_eta_minv","fh_ttcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_apcut_eta_minv = new TH1D("fh_apcut_eta_minv","fh_apcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+
 
     fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -364,6 +376,7 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     PairsReco();
     BgReco();
     Pi0Reco();
+    EtaReco();
 
     cout << "fNofMcEp = " << fNofMcEp << ", per event " << fNofMcEp / (Double_t)fEvents << endl;
     cout << "fNofMcEm = " << fNofMcEm << ", per event " << fNofMcEm / (Double_t)fEvents << endl;
@@ -550,6 +563,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
         cand.isMCSignalElectron = false;
         cand.isMCPi0Electron = false;
         cand.isMCGammaElectron = false;
+        cand.isMCEtaElectron = false;
         cand.MCMotherId = -1;
         cand.isRichElectron = false;
         cand.isTofElectron = false;
@@ -613,6 +627,10 @@ void CbmAnaDielectronTask::FillCandidateArray()
 				}
 				if (mct1 != NULL && mct1->GetPdgCode() == 22 && pdg == 11){
 					cand.isMCGammaElectron = true;
+				}
+				if(mct1 != NULL && mct1->GetPdgCode() == 221 && pdg == 11)
+				{
+					cand.isMCEtaElectron = true;
 				}
 
 			}
@@ -886,6 +904,64 @@ void CbmAnaDielectronTask::Pi0Reco()
         }//iM
     }//iP
 }
+
+void CbmAnaDielectronTask::EtaReco()
+{
+    Int_t ncand = fCandidates.size();
+
+    for (Int_t iP = 0; iP < ncand; iP++){
+        if (fCandidates[iP].charge < 0) continue;
+        for (Int_t iM = 0; iM < ncand; iM++){
+            if (fCandidates[iM].charge > 0) continue;
+            if (iM == iP ) continue;
+
+            KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]);
+
+			// select only electrons from the same pi0
+            if (fCandidates[iP].isMCEtaElectron && fCandidates[iM].isMCEtaElectron
+            		&& fCandidates[iP].MCMotherId == fCandidates[iM].MCMotherId) {
+
+                fh_rec_eta_minv->Fill(pRec.minv);
+
+                if (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron){
+                    fh_rich_id_eta_minv->Fill(pRec.minv);
+
+					if (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron) {
+						fh_trd_id_eta_minv->Fill(pRec.minv);
+
+						if (fCandidates[iP].isTofElectron && fCandidates[iM].isTofElectron) {
+							fh_tof_id_eta_minv->Fill(pRec.minv);
+
+							if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut){
+								fh_chi_prim_eta_minv->Fill(pRec.minv);
+								if (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
+									fh_ptcut_eta_minv->Fill(pRec.minv);
+									if (pRec.angle > fAngleCut) {
+										fh_anglecut_eta_minv->Fill(pRec.minv);
+										 if (!fCandidates[iP].isPi0 && !fCandidates[iM].isPi0){
+											 fh_pi0cut_eta_minv->Fill(pRec.minv);
+											 if (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron){
+												 fh_ttcut_eta_minv->Fill(pRec.minv);
+
+												Double_t pt = 0;
+												Double_t alfa = 0;
+												CalculateArmPodParams(&fCandidates[iP], &fCandidates[iM], alfa, pt);
+												if (pt > 0.25) {
+													fh_apcut_eta_minv->Fill(pRec.minv);
+												}//apcut
+											 }// tt cut
+										 } // pi0 cut
+									}//opening angle cut
+								}//Pt cut
+							}//Chi primary cut
+						}//isTofElectron
+					}//isTrdElectron
+				}//isRichElectron
+            }//isMCPi0Electron
+        }//iM
+    }//iP
+}
+
 
 void CbmAnaDielectronTask::CheckGammaConvAndPi0()
 {
@@ -1340,6 +1416,19 @@ void CbmAnaDielectronTask::Finish()
     fh_ttcut_pi0_minv->Scale(scale);
     fh_apcut_pi0_minv->Scale(scale);
 
+//eta minv
+    fh_rec_eta_minv->Scale(scale);
+	fh_rich_id_eta_minv->Scale(scale);
+	fh_trd_id_eta_minv->Scale(scale);
+	fh_tof_id_eta_minv->Scale(scale);
+	fh_chi_prim_eta_minv->Scale(scale);
+	fh_ptcut_eta_minv->Scale(scale);
+	fh_anglecut_eta_minv->Scale(scale);
+	fh_pi0cut_eta_minv->Scale(scale);
+	fh_ttcut_eta_minv->Scale(scale);
+	fh_apcut_eta_minv->Scale(scale);
+
+
     fh_reco_signal_pty->Scale(scale);
     fh_rich_id_signal_pty->Scale(scale); 
     fh_trd_id_signal_pty->Scale(scale); 
@@ -1444,6 +1533,18 @@ void CbmAnaDielectronTask::Finish()
     fh_pi0cut_pi0_minv->Write();
     fh_ttcut_pi0_minv->Write();
     fh_apcut_pi0_minv->Write();
+
+ //eta minv
+    fh_rec_eta_minv->Write();
+	fh_rich_id_eta_minv->Write();
+	fh_trd_id_eta_minv->Write();
+	fh_tof_id_eta_minv->Write();
+	fh_chi_prim_eta_minv->Write();
+	fh_ptcut_eta_minv->Write();
+	fh_anglecut_eta_minv->Write();
+	fh_pi0cut_eta_minv->Write();
+	fh_ttcut_eta_minv->Write();
+	fh_apcut_eta_minv->Write();
 
 // cuts distribution
     fh_pt_signal->Write();

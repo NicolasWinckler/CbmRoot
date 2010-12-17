@@ -51,6 +51,7 @@ public:
 	Bool_t isMCSignalElectron;
 	Bool_t isMCPi0Electron;
 	Bool_t isMCGammaElectron;
+	Bool_t isMCEtaElectron;
 
 	Bool_t isPi0;
     Double_t dSts;
@@ -95,6 +96,7 @@ public:
     void SetDefaultIdParameters();
     void BgReco();
     void Pi0Reco();
+    void EtaReco();
     void CheckGammaConvAndPi0();
     void FindClosestMvdHit();
     void CheckTrackTopologyCut();
@@ -252,10 +254,22 @@ private:
     TH1D* fh_tof_id_pi0_minv;
     TH1D* fh_chi_prim_pi0_minv; //chi primary cut
     TH1D* fh_ptcut_pi0_minv; //pt cut
-    TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for BG
+    TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for pi0
     TH1D* fh_pi0cut_pi0_minv;
     TH1D* fh_ttcut_pi0_minv;
     TH1D* fh_apcut_pi0_minv;
+
+//eta minv
+    TH1D* fh_rec_eta_minv;
+	TH1D* fh_rich_id_eta_minv;
+	TH1D* fh_trd_id_eta_minv;
+	TH1D* fh_tof_id_eta_minv;
+	TH1D* fh_chi_prim_eta_minv; //chi primary cut
+	TH1D* fh_ptcut_eta_minv; //pt cut
+	TH1D* fh_anglecut_eta_minv; // openning angle after pt cut for eta
+	TH1D* fh_pi0cut_eta_minv;
+	TH1D* fh_ttcut_eta_minv;
+	TH1D* fh_apcut_eta_minv;
 
 // cuts distribution
     TH1D* fh_pt_signal;

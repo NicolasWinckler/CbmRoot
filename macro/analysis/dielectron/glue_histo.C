@@ -213,6 +213,7 @@ void glue_histo ()
         fh_anglecut_signal_pty->Add((TH2D*) file->Get("fh_anglecut_signal_pty"));
         fh_pi0cut_signal_pty->Add((TH2D*) file->Get("fh_pi0cut_signal_pty"));
         fh_ttcut_signal_pty->Add((TH2D*) file->Get("fh_ttcut_signal_pty"));
+        fh_apcut_signal_pty->Add((TH2D*) file->Get("fh_apcut_signal_pty"));
 
  //ID cut distributions
         fh_rich_ann_signal->Add((TH1D*) file->Get("fh_rich_ann_signal"));
@@ -242,7 +243,7 @@ void glue_histo ()
     fh_anglecut_signal_mom->Scale(scale);
     fh_pi0cut_signal_mom->Scale(scale);
     fh_ttcut_signal_mom->Scale(scale);
-    fh_apcut_signal-mom->Scale(scale);
+    fh_apcut_signal_mom->Scale(scale);
 
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
@@ -320,6 +321,7 @@ void glue_histo ()
     fh_anglecut_signal_pty->Scale(scale);
     fh_pi0cut_signal_pty->Scale(scale);
     fh_ttcut_signal_pty->Scale(scale);
+    fh_apcut_signal_pty->Scale(scale);
 
  //ID cuts
     fh_rich_ann_signal->Scale(scale);
@@ -423,6 +425,7 @@ void glue_histo ()
     fh_anglecut_signal_pty->Write();
     fh_pi0cut_signal_pty->Write();
     fh_ttcut_signal_pty->Write();
+    fh_apcut_signal_pty->Write();
 
  //ID cuts
     fh_rich_ann_signal->Write();

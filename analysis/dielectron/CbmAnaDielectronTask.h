@@ -82,6 +82,7 @@ public:
     KinematicParams CalculateKinematicParams(DielectronCandidate* candP, DielectronCandidate* candM);
     void CalculateArmPodParams(DielectronCandidate* candP, DielectronCandidate* candM,
                        Double_t &alpha, Double_t &ptt);
+    void SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM);
 
     void SingleParticleAcceptance();
     void MCPairs();
@@ -275,6 +276,7 @@ private:
     TH2D* fh_apcut_pi0;
     TH2D* fh_ttcut_gamma;
     TH2D* fh_apcut_gamma;
+    TH2D* fh_source_pair;
 
     TH2D* fh_reco_signal_pty;
     TH2D* fh_rich_id_signal_pty;

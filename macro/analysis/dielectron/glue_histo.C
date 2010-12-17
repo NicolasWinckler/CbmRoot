@@ -99,7 +99,7 @@ void glue_histo ()
 	fh_apcut_pi0 = new TH2D("fh_apcut_pi0","fh_apcut_pi0;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
 	fh_ttcut_gamma = new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
 	fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
-
+	fh_source_pair = new TH2D("fh_source_pair","fh_source_pair;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
 
  //ID cut distributions
     fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);
@@ -203,6 +203,7 @@ void glue_histo ()
 		fh_apcut_pi0->Add((TH2D*) file->Get("fh_apcut_pi0"));
 		fh_ttcut_gamma->Add((TH2D*) file->Get("fh_ttcut_gamma"));
 		fh_apcut_gamma->Add((TH2D*) file->Get("fh_apcut_gamma"));
+		fh_source_pair->Add((TH2D) file->Get("fh_source_pair"));
 
         fh_reco_signal_pty->Add((TH2D*) file->Get("fh_reco_signal_pty"));
         fh_rich_id_signal_pty->Add((TH2D*) file->Get("fh_rich_id_signal_pty"));
@@ -311,6 +312,7 @@ void glue_histo ()
 	fh_apcut_pi0->Scale(scale);
 	fh_ttcut_gamma->Scale(scale);
 	fh_apcut_gamma->Scale(scale);
+	fh_source_pair->Scale(scale);
 
     fh_reco_signal_pty->Scale(scale);
     fh_rich_id_signal_pty->Scale(scale);
@@ -415,6 +417,7 @@ void glue_histo ()
   	fh_apcut_pi0->Write();
   	fh_ttcut_gamma->Write();
   	fh_apcut_gamma->Write();
+  	fh_source_pair->Write();
 
     fh_reco_signal_pty->Write();
     fh_rich_id_signal_pty->Write();

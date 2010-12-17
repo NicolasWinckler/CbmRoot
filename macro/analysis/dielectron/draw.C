@@ -427,6 +427,8 @@ void draw(){
     gPad->SetGridy(true);
     fh_mom_signal->Scale(scaleSig);
     fh_mom_bg->Scale(scaleBg);
+    c4->cd(11);
+    fh_source_pair->Draw("COLZ");
 
     TCanvas *c4_1 = new TCanvas("c4_1-apcut", "c4_1-apcut", 800, 800);
     c4_1->Divide(2,2);
@@ -626,8 +628,6 @@ void draw(){
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
 
-
-
     calculateSignalOverBg(fh_rec_signal_minv, fh_rec_bg_minv);
     calculateSignalOverBg(fh_rich_id_signal_minv, fh_rich_id_bg_minv);
     calculateSignalOverBg(fh_trd_id_signal_minv, fh_trd_id_bg_minv);
@@ -638,7 +638,6 @@ void draw(){
     calculateSignalOverBg(fh_pi0cut_signal_minv, fh_pi0cut_bg_minv);
     calculateSignalOverBg(fh_ttcut_signal_minv, fh_ttcut_bg_minv);
     calculateSignalOverBg(fh_apcut_signal_minv, fh_apcut_bg_minv);
-
 }
 
 

@@ -69,6 +69,19 @@ void glue_histo ()
     fh_ttcut_pi0_minv = new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_apcut_pi0_minv = new TH1D("fh_apcut_pi0_minv","fh_apcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
+//eta minv
+    fh_rec_eta_minv = new TH1D("fh_rec_eta_minv","fh_rec_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_rich_id_eta_minv = new TH1D("fh_rich_id_eta_minv","fh_rich_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_trd_id_eta_minv = new TH1D("fh_trd_id_eta_minv","fh_trd_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_tof_id_eta_minv = new TH1D("fh_tof_id_eta_minv","fh_tof_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_chi_prim_eta_minv = new TH1D("fh_chi_prim_eta_minv","fh_chi_prim_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ptcut_eta_minv = new TH1D("fh_ptcut_eta_minv","fh_ptcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_anglecut_eta_minv = new TH1D("fh_anglecut_eta_minv","fh_anglecut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_pi0cut_eta_minv = new TH1D("fh_pi0cut_eta_minv","fh_pi0cut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ttcut_eta_minv = new TH1D("fh_ttcut_eta_minv","fh_ttcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_apcut_eta_minv = new TH1D("fh_apcut_eta_minv","fh_apcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+
+
     fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_trd_id_signal_pty = new TH2D("fh_trd_id_signal_pty","fh_trd_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -183,6 +196,17 @@ void glue_histo ()
         fh_ttcut_pi0_minv->Add((TH1D*) file->Get("fh_ttcut_pi0_minv"));
         fh_apcut_pi0_minv->Add((TH1D*) file->Get("fh_apcut_pi0_minv"));
 
+//eta minv
+        fh_rec_eta_minv->Add((TH1D*) file->Get("fh_rec_eta_minv"));
+		fh_rich_id_eta_minv->Add((TH1D*) file->Get("fh_rich_id_eta_minv"));
+		fh_trd_id_eta_minv->Add((TH1D*) file->Get("fh_trd_id_eta_minv"));
+		fh_tof_id_eta_minv->Add((TH1D*) file->Get("fh_tof_id_eta_minv"));
+		fh_chi_prim_eta_minv->Add((TH1D*) file->Get("fh_chi_prim_eta_minv"));
+		fh_ptcut_eta_minv->Add((TH1D*) file->Get("fh_ptcut_eta_minv"));
+		fh_anglecut_eta_minv->Add((TH1D*) file->Get("fh_anglecut_eta_minv"));
+		fh_pi0cut_eta_minv->Add((TH1D*) file->Get("fh_pi0cut_eta_minv"));
+		fh_ttcut_eta_minv->Add((TH1D*) file->Get("fh_ttcut_eta_minv"));
+		fh_apcut_eta_minv->Add((TH1D*) file->Get("fh_apcut_eta_minv"));
 
 // cuts distribution 
         fh_chi2_prim_signal->Add((TH1D*) file->Get("fh_chi2_prim_signal")); 
@@ -293,6 +317,18 @@ void glue_histo ()
     fh_ttcut_pi0_minv->Scale(scale);
     fh_apcut_pi0_minv->Scale(scale);
 
+    //eta minv
+	fh_rec_eta_minv->Scale(scale);
+	fh_rich_id_eta_minv->Scale(scale);
+	fh_trd_id_eta_minv->Scale(scale);
+	fh_tof_id_eta_minv->Scale(scale);
+	fh_chi_prim_eta_minv->Scale(scale);
+	fh_ptcut_eta_minv->Scale(scale);
+	fh_anglecut_eta_minv->Scale(scale);
+	fh_pi0cut_eta_minv->Scale(scale);
+	fh_ttcut_eta_minv->Scale(scale);
+	fh_apcut_eta_minv->Scale(scale);
+
 //cuts distribution
     fh_chi2_prim_signal->Scale(scale);
     fh_chi2_prim_bg->Scale(scale);
@@ -397,6 +433,18 @@ void glue_histo ()
     fh_pi0cut_pi0_minv->Write();
     fh_ttcut_pi0_minv->Write();
     fh_apcut_pi0_minv->Write();
+
+//eta minv
+	fh_rec_eta_minv->Write();
+	fh_rich_id_eta_minv->Write();
+	fh_trd_id_eta_minv->Write();
+	fh_tof_id_eta_minv->Write();
+	fh_chi_prim_eta_minv->Write();
+	fh_ptcut_eta_minv->Write();
+	fh_anglecut_eta_minv->Write();
+	fh_pi0cut_eta_minv->Write();
+	fh_ttcut_eta_minv->Write();
+	fh_apcut_eta_minv->Write();
 
 //cuts distribution
     fh_pt_signal->Write();

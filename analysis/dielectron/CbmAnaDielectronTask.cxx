@@ -1397,6 +1397,7 @@ void CbmAnaDielectronTask::Finish()
     fh_anglecut_signal_minv->Write();
     fh_pi0cut_signal_minv->Write();
     fh_ttcut_signal_minv->Write();
+    fh_apcut_signal_minv->Write();
 //BG minv
     fh_rec_bg_minv->Write();
     fh_rich_id_bg_minv->Write();

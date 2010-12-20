@@ -107,7 +107,11 @@ void CbmL1MCTrack::CalculateHitCont()
       if( nHitContStations < ncont ) nHitContStations = ncont;
       ncont = 1;
     }
-    L1_assert( ista >= istaold );
+
+    if ( !( ista >= istaold ) ) { // tracks going in backward direction are not reconstructable
+      nHitContStations = 0;
+      return;
+    }
     if (ista == istaold ) continue; // backward direction
     istaold = ista;
   }
@@ -128,7 +132,10 @@ void CbmL1MCTrack::CalculateMaxNStaHits()
       cur_maxNStaHits++;
     }
     else{ // new station
-      L1_assert(sh.iStation > lastSta);
+      if ( !(sh.iStation > lastSta) ) {// tracks going in backward direction are not reconstructable
+        maxNStaHits = 0;
+        return;
+      }
       if (cur_maxNStaHits > maxNStaHits) maxNStaHits = cur_maxNStaHits;
       cur_maxNStaHits = 1;
       lastSta = sh.iStation;

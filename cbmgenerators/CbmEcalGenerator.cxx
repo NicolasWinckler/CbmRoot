@@ -35,7 +35,7 @@ CbmEcalGenerator::CbmEcalGenerator(Int_t pdgid, Int_t mult) :
 }
 
 // ------------------------------------------------------------------------
-void CbmEcalGenerator::Init()
+Bool_t CbmEcalGenerator::Init()
 {
   // Initialize generator
 
@@ -48,6 +48,8 @@ void CbmEcalGenerator::Init()
   TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
   if (! particle) Fatal("Init","PDG code %d not defined.",fPDGType);
   fPDGMass = particle->Mass();
+
+  return kTRUE;
 }
 
 // ------------------------------------------------------------------------

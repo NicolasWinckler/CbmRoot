@@ -43,7 +43,7 @@ CbmPrimaryGenerator::~CbmPrimaryGenerator() {
 
 
 // -----   Public method Init   --------------------------------------------
-void CbmPrimaryGenerator::Init() {
+Bool_t CbmPrimaryGenerator::Init() {
 
 //  cout << "CBMPriamryGenerator::INit" << endl << endl << endl << endl;
 
@@ -52,7 +52,9 @@ void CbmPrimaryGenerator::Init() {
   fEvent = new CbmMCEvent(runId);
   FairRootManager::Instance()->Register("MCEvent", "Event", fEvent, kTRUE);
 
+  return kTRUE;
 }
+
 // -------------------------------------------------------------------------
 
 

@@ -36,7 +36,7 @@ class CbmPrimaryGenerator : public FairPrimaryGenerator
   /** Intialisation
    ** Creates and registeres MC event class
    **/
-  virtual void Init();
+  virtual Bool_t Init();
 
 
   /** Public method GenerateEvent

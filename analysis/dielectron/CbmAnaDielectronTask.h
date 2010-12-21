@@ -83,12 +83,13 @@ public:
     KinematicParams CalculateKinematicParams(DielectronCandidate* candP, DielectronCandidate* candM);
     void CalculateArmPodParams(DielectronCandidate* candP, DielectronCandidate* candM,
                        Double_t &alpha, Double_t &ptt);
-    void SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM);
+    void SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM, TH2D* h_source_pair);
 
     void SingleParticleAcceptance();
     void MCPairs();
     void MCPairsBg();
     void PairAcceptance();
+    void FillSegmentCandidatesArray();
     void FillCandidateArray();
     void DifferenceSignalAndBg();
     void RecoQa();
@@ -100,6 +101,7 @@ public:
     void CheckGammaConvAndPi0();
     void FindClosestMvdHit();
     void CheckTrackTopologyCut();
+    Bool_t CheckArmPod(Double_t alfa, Double_t pt);
 
     virtual void Finish();
 
@@ -142,6 +144,7 @@ private:
     void IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum, DielectronCandidate* cand);
 
     vector<DielectronCandidate> fCandidates;
+    vector<DielectronCandidate> fSegmentCandidates;
 
     Double_t fWeight; //Multiplicity*BR
 
@@ -290,7 +293,17 @@ private:
     TH2D* fh_apcut_pi0;
     TH2D* fh_ttcut_gamma;
     TH2D* fh_apcut_gamma;
-    TH2D* fh_source_pair;
+  
+    TH2D*  fh_source_pair_reco;
+    TH2D*  fh_source_pair_rich_id;
+    TH2D* fh_source_pair_trd_id;
+    TH2D*  fh_source_pair_tof_id;
+    TH2D*  fh_source_pair_chi_prim;
+    TH2D*  fh_source_pair_ptcut;
+    TH2D*  fh_source_pair_anglecut;
+    TH2D*  fh_source_pair_pi0cut;
+    TH2D*  fh_source_pair_ttcut;
+    TH2D*  fh_source_pair_apcut;
 
     TH2D* fh_reco_signal_pty;
     TH2D* fh_rich_id_signal_pty;

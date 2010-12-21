@@ -112,7 +112,18 @@ void glue_histo ()
 	fh_apcut_pi0 = new TH2D("fh_apcut_pi0","fh_apcut_pi0;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
 	fh_ttcut_gamma = new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
 	fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
-	fh_source_pair = new TH2D("fh_source_pair","fh_source_pair;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+
+	
+    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_pi0cut = new TH2D("fh_source_pair_pi0cut","fh_source_pair_pi0cut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
 
  //ID cut distributions
     fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);
@@ -227,7 +238,17 @@ void glue_histo ()
 		fh_apcut_pi0->Add((TH2D*) file->Get("fh_apcut_pi0"));
 		fh_ttcut_gamma->Add((TH2D*) file->Get("fh_ttcut_gamma"));
 		fh_apcut_gamma->Add((TH2D*) file->Get("fh_apcut_gamma"));
-		fh_source_pair->Add((TH2D) file->Get("fh_source_pair"));
+		
+        fh_source_pair_reco->Add((TH2D*) file->Get("fh_source_pair_reco"));
+        fh_source_pair_rich_id->Add((TH2D*) file->Get("fh_source_pair_rich_id"));
+        fh_source_pair_trd_id->Add((TH2D*) file->Get("fh_source_pair_trd_id"));
+        fh_source_pair_tof_id->Add((TH2D*) file->Get("fh_source_pair_tof_id"));
+        fh_source_pair_chi_prim->Add((TH2D*) file->Get("fh_source_pair_chi_prim"));
+        fh_source_pair_ptcut->Add((TH2D*) file->Get("fh_source_pair_ptcut"));
+        fh_source_pair_anglecut->Add((TH2D*) file->Get("fh_source_pair_anglecut"));
+        fh_source_pair_pi0cut->Add((TH2D*) file->Get("fh_source_pair_pi0cut"));
+        fh_source_pair_ttcut->Add((TH2D*) file->Get("fh_source_pair_ttcut"));
+        fh_source_pair_apcut->Add((TH2D*) file->Get("fh_source_pair_apcut"));
 
         fh_reco_signal_pty->Add((TH2D*) file->Get("fh_reco_signal_pty"));
         fh_rich_id_signal_pty->Add((TH2D*) file->Get("fh_rich_id_signal_pty"));
@@ -348,7 +369,17 @@ void glue_histo ()
 	fh_apcut_pi0->Scale(scale);
 	fh_ttcut_gamma->Scale(scale);
 	fh_apcut_gamma->Scale(scale);
-	fh_source_pair->Scale(scale);
+	
+    fh_source_pair_reco->Scale(scale);
+    fh_source_pair_rich_id->Scale(scale);
+    fh_source_pair_trd_id->Scale(scale);
+    fh_source_pair_tof_id->Scale(scale);
+    fh_source_pair_chi_prim->Scale(scale);
+    fh_source_pair_ptcut->Scale(scale);
+    fh_source_pair_anglecut->Scale(scale);
+    fh_source_pair_pi0cut->Scale(scale);
+    fh_source_pair_ttcut->Scale(scale);
+    fh_source_pair_apcut->Scale(scale);
 
     fh_reco_signal_pty->Scale(scale);
     fh_rich_id_signal_pty->Scale(scale);
@@ -465,7 +496,17 @@ void glue_histo ()
   	fh_apcut_pi0->Write();
   	fh_ttcut_gamma->Write();
   	fh_apcut_gamma->Write();
-  	fh_source_pair->Write();
+  	
+    fh_source_pair_reco->Write();
+    fh_source_pair_rich_id->Write();
+    fh_source_pair_trd_id->Write();
+    fh_source_pair_tof_id->Write();
+    fh_source_pair_chi_prim->Write();
+    fh_source_pair_ptcut->Write();
+    fh_source_pair_anglecut->Write();
+    fh_source_pair_pi0cut->Write();
+    fh_source_pair_ttcut->Write();
+    fh_source_pair_apcut->Write();
 
     fh_reco_signal_pty->Write();
     fh_rich_id_signal_pty->Write();

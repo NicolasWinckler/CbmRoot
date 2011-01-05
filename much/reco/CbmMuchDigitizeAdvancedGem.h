@@ -142,6 +142,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     TStopwatch         fTimer;         // Timer
     Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
+    Double_t           fDeadTime;      // Channel dead time
     
     /** Map of active channels to index of MuchDigi. **/
     std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;

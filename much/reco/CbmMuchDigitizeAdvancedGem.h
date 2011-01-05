@@ -28,6 +28,8 @@
 
 class CbmMuchSector;
 class CbmMuchPoint;
+class CbmMCEpoch;
+class TChain;
 
 enum DetectorType {kGEM, kMICROMEGAS};
 
@@ -114,7 +116,8 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     static Double_t MPV_n_e(Double_t Tkin, Double_t mass);
     
     void SetEpoch(Bool_t epoch) {fEpoch=epoch;}
-
+    void SetMcChain(TChain* mcChain) {fMcChain=mcChain;}
+    
   private:
 
     CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
@@ -123,6 +126,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     TClonesArray*      fMCTracks;      // Input array of MCTrack
     TClonesArray*      fDigis;         // Output array of CbmMuchDigi
     TClonesArray*      fDigiMatches;   // Output array of CbmMuchDigiMatches
+    CbmMCEpoch*        fMcEpoch;      // Output array of CbmMuchDigiMatches
     Int_t              fNFailed;       // Total number of points which digitization has failed
     Int_t              fNOutside;      // Total number of points which was found outside a detector
     Int_t              fNMulti;        // Total number of channels that was hitby several points
@@ -137,6 +141,8 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Double_t           fDeadPadsFrac;  // Probability to find a dead pad
     TStopwatch         fTimer;         // Timer
     Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
+    TChain*            fMcChain;       // Chain of McFiles with McTrack info    
+    
     /** Map of active channels to index of MuchDigi. **/
     std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;
 

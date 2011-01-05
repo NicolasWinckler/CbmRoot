@@ -20,12 +20,14 @@
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
 #include "FairMCPoint.h"
+#include "CbmMCEpoch.h"
 
 // Includes from ROOT
 #include "TObjArray.h"
 #include "TDatabasePDG.h"
 #include "TFile.h"
 #include "TRandom.h"
+#include "TChain.h"
 
 #include <iostream>
 #include <iomanip>
@@ -163,10 +165,16 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   if (trackID < 0) {
     return kFALSE;
   }
-  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
-  if (!mcTrack) {
-    return kFALSE;
+  CbmMCTrack* mcTrack;
+  if (!fEpoch) {
+    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
+  } else {
+    Int_t eventId = point->GetEventID();
+    fMcChain->GetEntry(eventId);
+    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
   }
+  if (!mcTrack) return kFALSE;
+  
   Int_t pdgCode = mcTrack->GetPdgCode();
   // Debug
   Bool_t isSignalMuon = TMath::Abs(pdgCode) == 13 && mcTrack->GetMotherId() < 0;
@@ -318,19 +326,25 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
     cout << "----------------------------------------------" << endl;
   }
 
-  // Check for input arrays
-  if (!fMCTracks) {
+  // Check for input arrays (Event-by-event approach)
+  if (!fEpoch && !fMCTracks) {
     cout << "-W- " << fName << "::Exec: No input array (MCTrack)" << endl;
     cout << "- " << fName << endl;
     return;
   }
-  if (!fPoints) {
+  if (!fEpoch && !fPoints) {
     cerr << "-W- " << fName << "::Exec: No input array (MuchPoint) "
     << endl;
     cout << "- " << fName << endl;
     return;
   }
 
+  // Check for input arrays (Epoch approach)
+  if (fEpoch) {
+    fPoints = fMcEpoch->GetPoints(kMUCH);
+  }
+  
+  
   Int_t notUsable = 0; // DEBUG: counter for not usable points
 
   // Loop over all MuchPoints
@@ -409,6 +423,27 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
   // Get input array of MC tracks
   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
 
+  if (fEpoch) {
+    fMcEpoch = (CbmMCEpoch*) ioman->GetObject("MCEpoch.");
+    if (!fMcEpoch) {
+      Fatal("Init","No MC epoch branch found in file");
+      return kFATAL;
+    }
+    // Check for the chain of MC files
+    if (!fMcChain) {
+      Fatal("Init","MC chain pointer is NULL"); 
+      return kFATAL;
+    }
+    
+    if (!fMcChain->GetEntries()) {
+      Fatal("Init","No entries in the MC chain");
+      return kFATAL;
+    }
+    
+    fMCTracks = new TClonesArray("CbmMCTrack");
+    fMcChain->SetBranchAddress("MCTrack",&fMCTracks);
+  }
+  
   // Register output array MuchDigi
   fDigis = new TClonesArray("CbmMuchDigi", 1000);
   ioman->Register("MuchDigi", "Digital response in MUCH", fDigis, kTRUE);

@@ -46,9 +46,8 @@ public:
   inline void SetDistributionY  (Double_t y0=1.98604, Double_t sigma=0.617173) {fY0=y0;fSigma=sigma;};
   inline void SetRangePt        (Double_t ptMin=0, Double_t ptMax=3) {fPtMin=ptMin;fPtMax=ptMax;};
 
-
   /** Initializer */
-  void Init();
+  Bool_t Init();
 
   /** Creates an event with given type and multiplicity.
    **@param primGen  pointer to the CbmPrimaryGenerator

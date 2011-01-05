@@ -28,7 +28,7 @@ CbmAnaHypYPtGenerator::CbmAnaHypYPtGenerator(Int_t pdgid, Int_t mult):FairGenera
   SetRangePt();
 }
 // ------------------------------------------------------------------------
-void CbmAnaHypYPtGenerator::Init(){
+Bool_t CbmAnaHypYPtGenerator::Init(){
   // Initialize generator
   // Check for particle type
   TDatabasePDG* pdgBase = TDatabasePDG::Instance();
@@ -39,6 +39,7 @@ void CbmAnaHypYPtGenerator::Init(){
   fDistPt = new TF1("distPt","x*exp(-sqrt(x*x+[1]*[1])/[0])",fPtMin,fPtMax);
   fDistPt->SetParameters(fT,fPDGMass,fY0,fSigma);
   Info("Init","pdg=%i y0=%4.2f sigma_y=%4.2f T_pt=%6.4f",fPDGType,fY0,fSigma,fT);
+  return 0; 
 }
 
 // ------------------------------------------------------------------------

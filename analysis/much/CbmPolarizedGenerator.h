@@ -88,7 +88,7 @@ public:
   inline void SetBox(Bool_t box)                          {fBox = box;}
   
   /** Initializer */
-  void Init();
+  Bool_t Init();
 
   /** Creates an event with given type and multiplicity.
    * @param primGen  pointer to the CbmPrimaryGenerator

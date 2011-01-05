@@ -48,7 +48,7 @@ CbmPolarizedGenerator::CbmPolarizedGenerator(Int_t pdgid, Int_t mult)
 
 
 // ------------------------------------------------------------------------
-void CbmPolarizedGenerator::Init(){
+Bool_t CbmPolarizedGenerator::Init(){
   // Initialize generator
   // Check for particle type
   TDatabasePDG* pdgBase = TDatabasePDG::Instance();
@@ -62,6 +62,7 @@ void CbmPolarizedGenerator::Init(){
   fPol = new TF1("dsigdcostheta","1.+[0]*x*x",-1.,1.);
   fPol->SetParameter(0,fAlpha);
   Info("Init","pdg=%i y0=%4.2f sigma_y=%4.2f T_pt=%6.4f",fPDGType,fY0,fSigma,fT);
+  return 0;
 }
 // ------------------------------------------------------------------------
 

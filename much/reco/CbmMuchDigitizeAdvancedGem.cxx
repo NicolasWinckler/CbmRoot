@@ -90,7 +90,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
 // -----   Constructor with name   -----------------------------------------
 CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose) :
   FairTask(name, iVerbose),
-  fDigiFile(""),
+  fDigiFile(digiFileName),
   fPoints(NULL),
   fDigis(NULL),
   fDigiMatches(NULL),

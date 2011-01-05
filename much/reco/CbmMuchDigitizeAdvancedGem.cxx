@@ -45,64 +45,66 @@ using std::pair;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
-  FairTask("MuchDigitize", 1) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = "";
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 3;
-  fNADCChannels = 256;
-  fQMax = 440000;
-  SetQThreshold(3);
-  fMeanNoise = 0; //1500;
-  SetSpotRadius();
-  fMeanGasGain = 1e4;
-  fDeadPadsFrac = 0;
-
-  Reset();
+  FairTask("MuchDigitize", 1),
+  fDigiFile(""),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fDTime(3),
+  fNADCChannels(256),
+  fQMax(440000),
+  fMeanNoise(0),//(1500),
+  fMeanGasGain(1e4),
+  fDeadPadsFrac(0),
+  fGeoScheme(CbmMuchGeoScheme::Instance()),
+  fEpoch(0)
+{
+    SetQThreshold(3);
+    SetSpotRadius();
+    Reset();
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
-  FairTask("MuchDigitize", iVerbose) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = "";
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 3;
-  fNADCChannels = 256;
-  fQMax = 440000;
-  SetQThreshold(3);
-  fMeanNoise = 0;//1500;
-  SetSpotRadius();
-  fMeanGasGain = 1e4;
-  fDeadPadsFrac = 0;
-
-  Reset();
+  FairTask("MuchDigitize", iVerbose),
+  fDigiFile(""),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fDTime(3),
+  fNADCChannels(256),
+  fQMax(440000),
+  fMeanNoise(0),//(1500),
+  fMeanGasGain(1e4),
+  fDeadPadsFrac(0),
+  fGeoScheme(CbmMuchGeoScheme::Instance()),
+  fEpoch(0)
+{
+    SetQThreshold(3);
+    SetSpotRadius();
+    Reset();
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName,
-    Int_t iVerbose) :
-      FairTask(name, iVerbose) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = digiFileName;
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 3;
-  fNADCChannels = 256;
-  fQMax = 440000;
-  SetQThreshold(3);
-  fMeanNoise = 0;//1500;
-  SetSpotRadius();
-  fMeanGasGain = 1e4;
-  fDeadPadsFrac = 0;
-
+CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose) :
+  FairTask(name, iVerbose),
+  fDigiFile(""),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fDTime(3),
+  fNADCChannels(256),
+  fQMax(440000),
+  fMeanNoise(0),//(1500),
+  fMeanGasGain(1e4),
+  fDeadPadsFrac(0),
+  fGeoScheme(CbmMuchGeoScheme::Instance()),
+  fEpoch(0)
+{
+  SetQThreshold(3),
+  SetSpotRadius(),
   Reset();
 }
 // -------------------------------------------------------------------------

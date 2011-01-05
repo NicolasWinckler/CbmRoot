@@ -112,6 +112,8 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      *@param mass Mass of the particle [MeV/c^2].
      **/
     static Double_t MPV_n_e(Double_t Tkin, Double_t mass);
+    
+    void SetEpoch(Bool_t epoch) {fEpoch=epoch;}
 
   private:
 
@@ -134,7 +136,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Int_t              fEvent;         // Event counter
     Double_t           fDeadPadsFrac;  // Probability to find a dead pad
     TStopwatch         fTimer;         // Timer
-
+    Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
     /** Map of active channels to index of MuchDigi. **/
     std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;
 

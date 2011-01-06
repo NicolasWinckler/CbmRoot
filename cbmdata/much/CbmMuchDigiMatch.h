@@ -17,6 +17,7 @@
 
 #include "TObject.h"
 #include "TArrayI.h"
+class TClonesArray;
 
 
 class CbmMuchDigiMatch : public TObject
@@ -69,7 +70,7 @@ class CbmMuchDigiMatch : public TObject
    */
   UInt_t GetCharge(Int_t i) const;
   UInt_t GetTotalCharge() const;
-
+  void SortPointsInTime(TClonesArray* points);
 
  private:
 

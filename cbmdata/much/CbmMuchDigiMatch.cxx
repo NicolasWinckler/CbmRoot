@@ -12,13 +12,18 @@
 
 
 #include "CbmMuchDigiMatch.h"
+#include "CbmMuchPoint.h"
+#include "TClonesArray.h"
 
 #include <iostream>
 #include <limits>
 #include <cassert>
+#include <map>
 using std::cout;
 using std::endl;
 using std::numeric_limits;
+using std::map;
+using std::pair;
 
 // -----   Default  constructor   ------------------------------------------
 CbmMuchDigiMatch::CbmMuchDigiMatch() {
@@ -107,5 +112,27 @@ UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
   return totCharge;
 }
 // -------------------------------------------------------------------------
+
+void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
+  map<Double_t,Int_t> time_vs_index;
+  map<Double_t,Int_t> time_vs_charge;
+  assert(points);
+  for (Int_t i=0;i<fRefIndex.GetSize();i++){
+    assert(fRefIndex[i]<points->GetEntriesFast());
+    CbmMuchPoint* point = (CbmMuchPoint*) points->At(fRefIndex[i]);
+    assert(point);
+    Double_t time = point->GetTime(); 
+    time_vs_index.insert(pair<Double_t,Int_t>(time,fRefIndex[i]));
+    time_vs_charge.insert(pair<Double_t,Int_t>(time,fCharge[i]));
+  }
+  map<Double_t,Int_t>::iterator it1 = time_vs_index.begin();
+  map<Double_t,Int_t>::iterator it2 = time_vs_charge.begin();
+  for (ULong_t i=0;i<fRefIndex.GetSize();i++,it1++,it2++){ 
+    fRefIndex[i] = it1->second;
+    fCharge[i] = it2->second;
+  }
+  time_vs_index.clear();
+  time_vs_charge.clear();
+}
 
 ClassImp(CbmMuchDigiMatch)

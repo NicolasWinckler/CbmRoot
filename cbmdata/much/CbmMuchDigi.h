@@ -31,7 +31,7 @@ class CbmMuchDigi : public TObject
    **@param time         time since event start [ns]
    **@param dTime        time resolution [ns]
    **/
-  CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime);
+  CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime, Double_t deadTime=0);
 
   /** Constructor from a given digi object.
    *@param digi  Digi object
@@ -49,6 +49,8 @@ class CbmMuchDigi : public TObject
   Double_t  GetTime() const {return fTime;}
   /** Gets time resolution [ns] */
   Double_t  GetDTime() const { return fDTime; }
+  /** Gets channel dead time [ns] */
+  Double_t GetDeadTime() const {return fDeadTime; }
   /** Gets charge in ADC channels collected by the channel. **/
   UInt_t GetADCCharge() const  {return fADCCharge; }
   /** Sets charge in ADC channels collected by the channel. **/
@@ -57,6 +59,8 @@ class CbmMuchDigi : public TObject
   void SetTime(Double_t time) {fTime = time;}
   /** Set time uncertainty**/
   void SetDTime(Double_t dtime) {fDTime = dtime;}
+  /** Set channel dead time**/
+  void SetDeadTime(Double_t time) {fDeadTime = time;}
 
 
  private:
@@ -66,8 +70,9 @@ class CbmMuchDigi : public TObject
   UInt_t   fADCCharge;       // Charge for the digi in ADC channels
   Double_t fTime;            // Time since event start [ns]
   Double_t fDTime;           // Time resolution [ns]
-
-  ClassDef(CbmMuchDigi,1);
+  Double_t fDeadTime;        // Channel dead time
+  
+  ClassDef(CbmMuchDigi,2);
 
 };
 

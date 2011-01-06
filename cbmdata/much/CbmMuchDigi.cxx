@@ -22,12 +22,13 @@ CbmMuchDigi::CbmMuchDigi() {
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime) {
+CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime, Double_t deadTime) {
   fDetectorId = detectorId;
   fChannelId = channelId;
   fADCCharge = 0;
   fDTime = dTime;
   fTime = time;
+  fDeadTime = deadTime;
 }
 // -------------------------------------------------------------------------
 
@@ -38,6 +39,7 @@ CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi){
   fADCCharge  = digi->GetADCCharge();
   fDTime      = digi->GetDTime();
   fTime       = digi->GetTime();
+  fDeadTime   = digi->GetDeadTime();
 }
 // -------------------------------------------------------------------------
 

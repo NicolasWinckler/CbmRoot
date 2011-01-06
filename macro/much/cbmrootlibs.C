@@ -5,6 +5,7 @@ void cbmrootlibs(){
    gSystem->Load("libCbmBase");
    gSystem->Load("libCbmData");
    gSystem->Load("libCbmGenerators");
+   gSystem->Load("libRun");
    gSystem->Load("libField");
    gSystem->Load("libGen");
    gSystem->Load("libPassive");

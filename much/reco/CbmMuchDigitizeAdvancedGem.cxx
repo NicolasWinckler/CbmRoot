@@ -59,7 +59,9 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fMeanGasGain(1e4),
   fDeadPadsFrac(0),
   fGeoScheme(CbmMuchGeoScheme::Instance()),
-  fEpoch(0)
+  fEpoch(0),
+  fMcChain(NULL),
+  fDeadTime(3.e+5)
 {
     SetQThreshold(3);
     SetSpotRadius();
@@ -81,7 +83,9 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
   fMeanGasGain(1e4),
   fDeadPadsFrac(0),
   fGeoScheme(CbmMuchGeoScheme::Instance()),
-  fEpoch(0)
+  fEpoch(0),
+  fMcChain(NULL),
+  fDeadTime(3.e+5)
 {
     SetQThreshold(3);
     SetSpotRadius();
@@ -103,7 +107,9 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fMeanGasGain(1e4),
   fDeadPadsFrac(0),
   fGeoScheme(CbmMuchGeoScheme::Instance()),
-  fEpoch(0)
+  fEpoch(0),
+  fMcChain(NULL),
+  fDeadTime(3.e+5)
 {
   SetQThreshold(3),
   SetSpotRadius(),
@@ -480,32 +486,69 @@ void CbmMuchDigitizeAdvancedGem::Reset() {
 
 // -----   Private method FirePads   ---------------------------------------
 void CbmMuchDigitizeAdvancedGem::FirePads() {
-  // Add electronics noise
-  if (fMeanNoise)
-    AddNoise();
+  // Add electronics noise // TODO Add noise in time
+  if (fMeanNoise && !fEpoch) AddNoise(); 
 
-  // Apply threshold
+  vector<CbmMuchDigi*> vdigi;
+  vector<CbmMuchDigiMatch*> vmatch;
+  
   for (map<pair<Int_t, Long64_t> , CbmMuchDigi*>::iterator it =
     fChargedPads.begin(); it != fChargedPads.end(); it++) {
-    pair<Int_t, Long64_t> uniqueId = (*it).first;
-    CbmMuchDigi* digi = (*it).second;
-    CbmMuchDigiMatch* match = fChargedMatches[uniqueId];
-    Double_t rnd = gRandom->Rndm();
-    if (match->GetTotalCharge() > fQThreshold &&
-        rnd > fDeadPadsFrac) {
-      Int_t iDigi = -1;
-      if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
-        iDigi = fDigis->GetEntriesFast();
-        Int_t adcChannel = match->GetTotalCharge() * fNADCChannels/ fQMax;
-        digi->SetADCCharge(adcChannel > fNADCChannels ? fNADCChannels-1 : adcChannel);
-        new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
-        new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch(match);
-        fChannelMap[uniqueId] = iDigi;
-      }
+    // Randomly kill the pads
+    if (gRandom->Rndm() < fDeadPadsFrac) continue;
+    
+    CbmMuchDigi* digi = it->second;
+    CbmMuchDigiMatch* match = fChargedMatches[it->first];
+    
+    if (!fEpoch){
+      vdigi.push_back(digi);
+      vmatch.push_back(match);
+      continue;
     }
+    
+    match->SortPointsInTime(fPoints);
+    Double_t last_time=-1.e+10;
+    CbmMuchDigi* new_digi = 0;
+    CbmMuchDigiMatch* new_match = 0;
+    for (Int_t i=0;i<match->GetNPoints();i++){
+      Int_t index  = match->GetRefIndex(i);
+      Int_t charge = match->GetCharge(i);
+      // Get point time
+      assert(fPoints);
+      CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(index);
+      assert(point);
+      Double_t time = point->GetTime();
+      // Create new digi if time interval between points is larger than dead time
+      if (time-last_time>fDeadTime) {
+        new_digi  = new CbmMuchDigi(digi);
+        new_match = new CbmMuchDigiMatch();
+        new_digi->SetTime(time);
+        vdigi.push_back(new_digi);
+        vmatch.push_back(new_match);
+      }
+      assert(new_digi);
+      assert(new_match);
+      new_digi->SetDeadTime(new_digi->GetTime()-time+fDeadTime);
+      new_match->AddPoint(index);
+      new_match->AddCharge(charge);
+    }
+  }
+  
+  // Apply threshold
+  
+  for (UInt_t i=0,iDigi=0;i<vdigi.size();i++){
+    CbmMuchDigi* digi = vdigi[i];
+    CbmMuchDigiMatch* match = vmatch[i];
+    if (match->GetTotalCharge() < fQThreshold) continue;
+    Int_t adcChannel = match->GetTotalCharge() * fNADCChannels/ fQMax;
+    digi->SetADCCharge(adcChannel > fNADCChannels ? fNADCChannels-1 : adcChannel);
+    new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
+    new ((*fDigiMatches)[iDigi++]) CbmMuchDigiMatch(match);
     delete digi;
     delete match;
   }
+  vdigi.clear();
+  vmatch.clear();
 }
 // -------------------------------------------------------------------------
 
@@ -534,7 +577,7 @@ void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
   if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
     if (iCharge <= fQThreshold) return;
     fChargedPads[uniqueId] = new CbmMuchDigi(pad->GetDetectorId(),
-        channelId, 0, 0); // No time and Dtime info
+        channelId, 0, 0); // No time and Dtime info   // TODO Add noise in time
     fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
   }
   fChargedMatches[uniqueId]->AddPoint(-1);

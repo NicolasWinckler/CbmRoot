@@ -117,7 +117,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     
     void SetEpoch(Bool_t epoch) {fEpoch=epoch;}
     void SetMcChain(TChain* mcChain) {fMcChain=mcChain;}
-    
+    void SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; } 
   private:
 
     CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
@@ -142,7 +142,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     TStopwatch         fTimer;         // Timer
     Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
-    Double_t           fDeadTime;      // Channel dead time
+    Double_t           fDeadTime;      // Channel dead time [ns]
     
     /** Map of active channels to index of MuchDigi. **/
     std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;

@@ -116,6 +116,7 @@ UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
 void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
   map<Double_t,Int_t> time_vs_index;
   map<Double_t,Int_t> time_vs_charge;
+  map<Double_t,Int_t>::iterator it;
   assert(points);
   for (Int_t i=0;i<fRefIndex.GetSize();i++){
     assert(fRefIndex[i]<points->GetEntriesFast());
@@ -125,12 +126,10 @@ void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
     time_vs_index.insert(pair<Double_t,Int_t>(time,fRefIndex[i]));
     time_vs_charge.insert(pair<Double_t,Int_t>(time,fCharge[i]));
   }
-  map<Double_t,Int_t>::iterator it1 = time_vs_index.begin();
-  map<Double_t,Int_t>::iterator it2 = time_vs_charge.begin();
-  for (ULong_t i=0;i<fRefIndex.GetSize();i++,it1++,it2++){ 
-    fRefIndex[i] = it1->second;
-    fCharge[i] = it2->second;
-  }
+  Int_t i=0;
+  for (it=time_vs_index.begin();it!=time_vs_index.end();++it) fRefIndex[i++] = it->second;
+  i=0;
+  for (it=time_vs_charge.begin();it!=time_vs_charge.end();++it) fCharge[i++] = it->second;
   time_vs_index.clear();
   time_vs_charge.clear();
 }

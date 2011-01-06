@@ -61,7 +61,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(3.e+5)
+  fDeadTime(200)
 {
     SetQThreshold(3);
     SetSpotRadius();
@@ -85,7 +85,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(3.e+5)
+  fDeadTime(200)
 {
     SetQThreshold(3);
     SetSpotRadius();
@@ -109,7 +109,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(3.e+5)
+  fDeadTime(200)
 {
   SetQThreshold(3),
   SetSpotRadius(),
@@ -525,10 +525,11 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
         new_digi->SetTime(time);
         vdigi.push_back(new_digi);
         vmatch.push_back(new_match);
+        last_time = time;
       }
       assert(new_digi);
       assert(new_match);
-      new_digi->SetDeadTime(new_digi->GetTime()-time+fDeadTime);
+      new_digi->SetDeadTime(time-new_digi->GetTime()+fDeadTime);
       new_match->AddPoint(index);
       new_match->AddCharge(charge);
     }

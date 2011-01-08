@@ -36,6 +36,8 @@ private:
   CbmMCEpoch*   fMcEpoch;           //!
   TH3D* fhPointXYT; //!
   TH3D* fhSectorPointXYT; //!
+  TH3D* fhDigiXYT; //!
+  TH3D* fhSectorDigiXYT; //!
   ClassDef(CbmAnaTimingMuchDigitizer,1);
 };
 

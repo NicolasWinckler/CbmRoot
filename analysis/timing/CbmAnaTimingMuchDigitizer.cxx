@@ -79,6 +79,9 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   fhPointXYT = new TH3D("hPointXYT","", 128,pos.x()-size.x()/2.,pos.x()+size.x()/2.,
                                         128,pos.y()-size.y()/2.,pos.y()+size.y()/2.,
                                        1000,                  0,10000);
+  fhDigiXYT = new TH3D("hDigiXYT","", 128,pos.x()-size.x()/2.,pos.x()+size.x()/2.,
+                                        128,pos.y()-size.y()/2.,pos.y()+size.y()/2.,
+                                       1000,                  0,10000);
   CbmMuchSector* sector = module->GetSector(38); 
   TVector3 l = sector->GetSize();
   TVector3 p = sector->GetPosition();
@@ -86,6 +89,9 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   fhSectorPointXYT = new TH3D("hSectorPointXYT","", 8,p[0]-l[0]/2,p[0]+l[0]/2.,
                                                    16,p[1]-l[1]/2,p[1]+l[1]/2,
                                                    1000,0,10000);
+  fhSectorDigiXYT = new TH3D("hSectorDigiXYT","", 8,p[0]-l[0]/2,p[0]+l[0]/2.,
+                                                  16,p[1]-l[1]/2,p[1]+l[1]/2,
+                                                  1000,0,10000);
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -117,7 +123,15 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
     TVector3 p = sector->GetPosition();
     if (x>p[0]-l[0]/2 && x <p[0]+l[0]/2 && y>p[1]-l[1]/2 && y<p[1]+l[1]/2)  fhSectorPointXYT->Fill(x,y,t);
   }
-  
+
+  for (Int_t i=0;i<nMuchDigis;i++) {
+    CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(i);
+    Int_t    detId     = digi->GetDetectorId();
+    Long64_t channelId = digi->GetChannelId();
+    Double_t time      = digi->GetTime();
+    Double_t dead_time = digi->GetDeadTime();
+    fGeoScheme->
+  }
 }
 // -------------------------------------------------------------------------
 

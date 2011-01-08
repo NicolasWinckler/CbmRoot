@@ -26,6 +26,7 @@
 
 #pragma link C++ class CbmAnaTimingAnalysis+;
 #pragma link C++ class CbmAnaEpochTest+;
+#pragma link C++ class CbmAnaTimingMuchDigitizer+;
 
 #pragma link C++ class CbmAnaDielectronTask+;
 #endif

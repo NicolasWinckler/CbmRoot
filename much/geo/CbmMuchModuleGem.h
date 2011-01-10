@@ -26,8 +26,11 @@
 #include "TPave.h"
 
 #include <vector>
+#include <map>
 
 using std::vector;
+using std::map;
+using std::pair;
 
 // Length of the index of the corresponding volume
 #define WL_SECTOR 2147483647LL //2047
@@ -123,6 +126,10 @@ class CbmMuchModuleGem : public CbmMuchModule
     Int_t GetNSectorChannels() const { return fNSectorChannels; }
     void SetNSectorChannels(Int_t nSectorChannels) { fNSectorChannels = nSectorChannels; }
 
+    void ClearDigis() { fDigis.clear(); }
+    void AddDigi(Double_t time,Int_t id) { fDigis.insert(pair<Double_t,Int_t>(time,id)); }
+    map<Double_t,Int_t> GetDigis() { return fDigis; } 
+    
   private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
     TObjArray              fSectors;               // Array of sectors within this module
@@ -131,6 +138,7 @@ class CbmMuchModuleGem : public CbmMuchModule
     Int_t                  fGridRows;              // Number of rows in the grid
     vector<vector<Int_t> > fGridIndices;           // 2D-vector of sector numbers
     TClonesArray*          fClusters;              //!
+    map<Double_t,Int_t>    fDigis;                 //!
     Int_t                  fNSectorChannels;       // Number of channels per "complete" sector
 
     Double_t GetGridCellY(Int_t iRow);

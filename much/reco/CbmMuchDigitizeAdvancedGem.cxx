@@ -507,28 +507,20 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
     }
     
     match->SortPointsInTime(fPoints);
-    Double_t last_time=-1.e+10;
     CbmMuchDigi* new_digi = 0;
     CbmMuchDigiMatch* new_match = 0;
     for (Int_t i=0;i<match->GetNPoints();i++){
       Int_t index  = match->GetRefIndex(i);
       Int_t charge = match->GetCharge(i);
-      // Get point time
-      assert(fPoints);
       CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(index);
-      assert(point);
       Double_t time = point->GetTime();
-      // Create new digi if time interval between points is larger than dead time
-      if (time-last_time>fDeadTime) {
+      if (!new_digi ? 1 : time > new_digi->GetTime()+new_digi->GetDeadTime()){ 
         new_digi  = new CbmMuchDigi(digi);
         new_match = new CbmMuchDigiMatch();
         new_digi->SetTime(time);
         vdigi.push_back(new_digi);
         vmatch.push_back(new_match);
-        last_time = time;
       }
-      assert(new_digi);
-      assert(new_match);
       new_digi->SetDeadTime(time-new_digi->GetTime()+fDeadTime);
       new_match->AddPoint(index);
       new_match->AddCharge(charge);

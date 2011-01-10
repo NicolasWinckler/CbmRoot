@@ -14,7 +14,8 @@
 #include "CbmMuchSector.h"
 #include "CbmMuchPad.h"
 #include "CbmMCEpoch.h"
-
+#include "CbmMuchDigi.h"
+#include "CbmMuchDigiMatch.h"
 #include "TClonesArray.h"
 #include "TH3D.h"
 #include "TH1D.h"
@@ -85,13 +86,24 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   CbmMuchSector* sector = module->GetSector(38); 
   TVector3 l = sector->GetSize();
   TVector3 p = sector->GetPosition();
-
+  for (Int_t i=0;i<sector->GetNChannels();i++){
+    CbmMuchPad* pad = sector->GetPad(i);
+    printf("pad %i %f %f\n",i,pad->GetX0(),pad->GetY0());
+  }
+  
   fhSectorPointXYT = new TH3D("hSectorPointXYT","", 8,p[0]-l[0]/2,p[0]+l[0]/2.,
                                                    16,p[1]-l[1]/2,p[1]+l[1]/2,
                                                    1000,0,10000);
   fhSectorDigiXYT = new TH3D("hSectorDigiXYT","", 8,p[0]-l[0]/2,p[0]+l[0]/2.,
                                                   16,p[1]-l[1]/2,p[1]+l[1]/2,
                                                   1000,0,10000);
+  
+  fhChannelHits    = new TH1D("hChannelHits","",128,0,128);
+  fhChannelHitDist = new TH1D("hChannelHitDist","",20,0,20);
+  
+  fhChannelT = new TH1D("hChannelT","",10000,0,10000);
+  fhPointT   = new TH1D("hPointT","",10000,0,10000);
+  fhModuleT = new TH1D("hModuleT","",10000,0,10000);
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -108,19 +120,20 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
   if (fVerbose>0) printf(" nMuchDigis: %4i",nMuchDigis);
   if (fVerbose>-1) printf("\n");
    
+  CbmMuchSector* sector = ((CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4))->GetSector(38);     
+  TVector3 l = sector->GetSize();
+  TVector3 p = sector->GetPosition();
+
   for (Int_t i=0;i<nMuchPoints;i++){
     FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(i);
-    if (fVerbose>2) printf("  Much point: %i time=%f",i,point->GetTime());
-    if (fVerbose>2) printf("Detector Id: %i",point->GetDetectorID());
-    if (fVerbose>2) printf("\n");
+//    if (fVerbose>2) printf("  Much point: %i time=%f",i,point->GetTime());
+//    if (fVerbose>2) printf("Detector Id: %i",point->GetDetectorID());
+//    if (fVerbose>2) printf("\n");
     Double_t x = point->GetX();
     Double_t y = point->GetY();
     Double_t t = point->GetTime();
     if (fGeoScheme->GetModuleIndex(point->GetDetectorID())!=4) continue;
     fhPointXYT->Fill(x,y,t);
-    CbmMuchSector* sector = ((CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4))->GetSector(38); 
-    TVector3 l = sector->GetSize();
-    TVector3 p = sector->GetPosition();
     if (x>p[0]-l[0]/2 && x <p[0]+l[0]/2 && y>p[1]-l[1]/2 && y<p[1]+l[1]/2)  fhSectorPointXYT->Fill(x,y,t);
   }
 
@@ -130,7 +143,36 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
     Long64_t channelId = digi->GetChannelId();
     Double_t time      = digi->GetTime();
     Double_t dead_time = digi->GetDeadTime();
-    fGeoScheme->
+    UInt_t   adcCharge = digi->GetADCCharge(); 
+    if (fGeoScheme->GetStationIndex(detId)!=0) continue;
+    if (fGeoScheme->GetLayerIndex(detId)!=0) continue;
+    if (fGeoScheme->GetLayerSideIndex(detId)!=0) continue;
+    if (fGeoScheme->GetModuleIndex(detId)!=4) continue;
+    fhModuleT->Fill(time);
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detId);
+    Int_t iSector  = module->GetSectorIndex(channelId);
+    Int_t iChannel = module->GetChannelIndex(channelId);
+    CbmMuchPad* pad = module->GetPad(channelId);
+    Double_t x = pad->GetX0();
+    Double_t y = pad->GetY0();
+    fhDigiXYT->Fill(x,y,time,digi->GetADCCharge());
+    if (iSector!=38) continue;
+    fhSectorDigiXYT->Fill(x,y,time,digi->GetADCCharge());
+    fhChannelHits->Fill(iChannel);
+    if (iChannel!=21) continue;
+    printf("time=%f dead_time=%f\n",time,dead_time);
+    for (Double_t t=time;t<time+dead_time;t++){
+      fhChannelT->Fill(t);
+    }
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
+    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
+      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
+      Double_t point_time   = point->GetTime();
+      Double_t point_charge = match->GetCharge(ipoint);
+//      fhPointT->Fill(point_time,point_charge);
+      fhPointT->Fill(point_time);
+    }
+    
   }
 }
 // -------------------------------------------------------------------------
@@ -196,6 +238,44 @@ void CbmAnaTimingMuchDigitizer::Finish(){
   fhSectorPointXYT->SetFillColor(kBlue);
   fhSectorPointXYT->SetLineColor(kRed);
   fhSectorPointXYT->Draw("BOX");
+
+  TCanvas* c4 = new TCanvas("c4","c4",1000,1000);
+  fhDigiXYT->SetFillColor(kBlue);
+  fhDigiXYT->SetLineColor(kRed);
+  fhDigiXYT->Draw("BOX");
+  
+  TCanvas* c5 = new TCanvas("c5","c5",1000,1000);
+  fhSectorDigiXYT->SetFillColor(kBlue);
+  fhSectorDigiXYT->SetLineColor(kRed);
+  fhSectorDigiXYT->Draw("BOX");
+
+  TCanvas* c6 = new TCanvas("c6","c6",1600,1000);
+  c6->Divide(1,3);
+  c6->cd(1);
+  fhChannelT->SetFillColor(kBlue);
+  fhChannelT->SetLineColor(kRed);
+  fhChannelT->Draw();
+  c6->cd(2);
+  fhPointT->SetLineColor(kRed);
+  fhPointT->Draw();
+  c6->cd(3);
+  fhModuleT->SetLineColor(kBlue);
+  fhModuleT->Draw();
+  
+  TCanvas* c7 = new TCanvas("c7","c7",1600,400);
+  fhChannelHits->SetFillColor(kBlue);
+  fhChannelHits->SetLineColor(kRed);
+  fhChannelHits->Draw();
+  
+  for (Int_t i=0;i<128;i++){
+    fhChannelHitDist->Fill(fhChannelHits->GetBinContent(i)); 
+  }
+
+  TCanvas* c8 = new TCanvas("c8","c8",800,400);
+  fhChannelHitDist->SetStats(kTRUE);
+  fhChannelHitDist->SetFillColor(kBlue);
+  fhChannelHitDist->SetLineColor(kRed);
+  fhChannelHitDist->Draw();
 }
 // -------------------------------------------------------------------------
 

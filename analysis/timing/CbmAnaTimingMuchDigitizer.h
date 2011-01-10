@@ -34,10 +34,15 @@ private:
   TClonesArray* fMuchDigis;         //!
   TClonesArray* fMuchDigiMatches;   //!
   CbmMCEpoch*   fMcEpoch;           //!
-  TH3D* fhPointXYT; //!
-  TH3D* fhSectorPointXYT; //!
-  TH3D* fhDigiXYT; //!
-  TH3D* fhSectorDigiXYT; //!
+  TH3D* fhPointXYT;        //!
+  TH3D* fhSectorPointXYT;  //!
+  TH3D* fhDigiXYT;         //!
+  TH3D* fhSectorDigiXYT;   //!
+  TH1D* fhChannelT;        //!
+  TH1D* fhChannelHits;     //!
+  TH1D* fhChannelHitDist;  //!
+  TH1D* fhPointT;          //!
+  TH1D* fhModuleT;         //!
   ClassDef(CbmAnaTimingMuchDigitizer,1);
 };
 

@@ -70,6 +70,10 @@ class CbmMCEpoch : public TNamed
   Int_t GetNofPoints(DetectorId det) const;
 
 
+  /** Get array of MC points for a given detector */
+  TClonesArray* GetPoints(DetectorId det) { return fPoints[det]; } 
+     
+     
   /**   Get an MCPoint for a given detector
    **@param det    Detector system identifier
    **@param index  Index of point in array

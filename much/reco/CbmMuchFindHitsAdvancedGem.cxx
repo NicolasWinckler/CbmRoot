@@ -59,6 +59,8 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
   fAlgorithm = 0;
 
   fEvent = 0;
+  fEpoch = 0;
+  fClusterSeparationTime = 2.; // ns
 }
 // -------------------------------------------------------------------------
 
@@ -74,6 +76,8 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
   fAlgorithm = 0;
 
   fEvent = 0;
+  fEpoch = 0;
+  fClusterSeparationTime = 2.; // ns
 }
 // -------------------------------------------------------------------------
 
@@ -90,6 +94,8 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name,
   fAlgorithm = 0;
 
   fEvent = 0;
+  fEpoch = 0;
+  fClusterSeparationTime = 2.; // ns
 }
 // -------------------------------------------------------------------------
 
@@ -519,24 +525,70 @@ void CbmMuchFindHitsAdvancedGem::FillChannelDigiMap() {
 
 // -----   Private method FindClusters  ------------------------------------
 void CbmMuchFindHitsAdvancedGem::FindClusters() {
-  FillChannelDigiMap();
-
-  fSelectedDigis.clear();
   Int_t nClusters = 0;
-  Int_t nDigis = fDigis->GetEntriesFast();
-  Int_t dummyCharge = 0;
-  for (Int_t iDigi = 0; iDigi < nDigis; iDigi++) {
-    // Selection
-    if (fSelectedDigis.find(iDigi) != fSelectedDigis.end()) continue;
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
 
-    vector<Int_t> digiIndices;
-    UInt_t qMax = 0;
-    UInt_t sumCharge = 0;
-    CreateCluster(iDigi, digiIndices, sumCharge, qMax);
-    new ((*fClusters)[nClusters]) CbmMuchCluster(digiIndices, sumCharge, qMax);
-    // Match digis to the parent cluster
-    nClusters++;
+  // Clear array of digis in the modules
+  for (UInt_t i=0;i<modules.size();i++){
+    if (modules[i]->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) modules[i];
+    module->ClearDigis();
   }
+
+  // Fill array of digis in the modules. Digis are automatically sorted in time
+  for (Int_t iDigi = 0; iDigi < fDigis->GetEntriesFast(); iDigi++) {
+    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+    Double_t time = digi->GetTime();
+    Int_t detId = digi->GetDetectorId();
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detId);
+    module->AddDigi(time,iDigi);  
+  }
+  
+  // Find clusters module-by-module
+  for (UInt_t m=0;m<modules.size();m++){
+    if (modules[m]->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) modules[m];
+    map<Double_t,Int_t> digis = module->GetDigis();
+    map<Double_t,Int_t>::iterator it = digis.begin();
+    vector<Int_t> time_slice;
+    Double_t last_time = -1.e+10;
+    while (it!=digis.end() || time_slice.size()>0){
+      // This condition is true only at the end of digi loop or in case time slice is separated in the epoch approach
+      if (it==digis.end() ? 1 : !fEpoch ? 0 : last_time>0 ? it->first-last_time > fClusterSeparationTime : 0){
+        if (!time_slice.size()) continue;
+        // create clusters in the time slice
+
+        // Fill channel-to-digi-map
+        fChannelDigiMap.clear();
+        for (Int_t i=0; i<time_slice.size();i++) {
+          Int_t iDigi = time_slice[i];
+          CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+          pair<Int_t, Long64_t> uniqueId(digi->GetDetectorId(), digi->GetChannelId());
+          fChannelDigiMap[uniqueId] = iDigi;
+        }
+
+        // Create clusters
+        fSelectedDigis.clear();
+        for (Int_t i=0; i<time_slice.size();i++) {
+          Int_t iDigi = time_slice[i];
+          if (fSelectedDigis.find(iDigi) != fSelectedDigis.end()) continue;
+          vector<Int_t> digiIndices;
+          UInt_t qMax = 0;
+          UInt_t sumCharge = 0;
+          CreateCluster(iDigi, digiIndices, sumCharge, qMax);
+          new ((*fClusters)[nClusters++]) CbmMuchCluster(digiIndices, sumCharge, qMax);
+        }
+        
+        // Clear time_slice
+        time_slice.clear();
+      }
+      if (it==digis.end()) continue;
+      last_time = it->first;
+      time_slice.push_back(it->second);
+      it++;
+    }
+  }
+
 }
 // -------------------------------------------------------------------------
 

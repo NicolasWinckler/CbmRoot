@@ -86,6 +86,8 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     }
 
     void SetEpoch(Bool_t epoch) { fEpoch=epoch; }
+    void SetClusterSeparationTime(Double_t time) { fClusterSeparationTime = time; }
+    
     
     /** Execution. */
     virtual void Exec(Option_t* opt);
@@ -112,6 +114,7 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     Int_t fAlgorithm;                                   // Defines which algorithm to use
     TStopwatch fTimer;                                  // Timer
     Bool_t fEpoch;                                      // Epoch
+    Double_t fClusterSeparationTime;                    // Minimum required time between two clusters
     
     // Analysis variables
     vector<Double_t> fFakes; // Fakes fraction

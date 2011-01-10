@@ -85,6 +85,8 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
       fAlgorithm = iAlgorithm;
     }
 
+    void SetEpoch(Bool_t epoch) { fEpoch=epoch; }
+    
     /** Execution. */
     virtual void Exec(Option_t* opt);
 
@@ -109,7 +111,8 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     vector<Double_t> fThresholdRatios;                  // Charge thresholds for each station
     Int_t fAlgorithm;                                   // Defines which algorithm to use
     TStopwatch fTimer;                                  // Timer
-
+    Bool_t fEpoch;                                      // Epoch
+    
     // Analysis variables
     vector<Double_t> fFakes; // Fakes fraction
     vector<Double_t> fLosts; // Losts fraction

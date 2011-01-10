@@ -284,10 +284,12 @@ void CbmMuchFindHitsAdvancedGem::StatInfo() {
         for (Int_t k = 0; k < match->GetNPoints(); ++k) {
           Int_t iPoint = match->GetRefIndex(k); // Point index
 
-          // Debug
-          CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
-          assert(iStation == fGeoScheme->GetStationIndex(point->GetDetectorId()));
-
+          if (!fEpoch) {
+            // Debug
+            CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
+            assert(iStation == fGeoScheme->GetStationIndex(point->GetDetectorId()));
+          }
+          
           if (pointIndices.find(iPoint) == pointIndices.end()) pointIndices.insert(
               iPoint);
         }
@@ -390,6 +392,7 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster,
     time += digi->GetTime();
     dtime += TMath::Power(digi->GetDTime(), 2);
 
+    if (fEpoch) continue;
     // Find signal muons
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
     for (Int_t k = 0; k < match->GetNPoints(); ++k) {
@@ -464,9 +467,12 @@ InitStatus CbmMuchFindHitsAdvancedGem::Init() {
   if (!ioman) Fatal("CbmMuchFindHitsAdvancedGem::Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
-  fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
-  fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-
+  
+  if (!fEpoch){
+    fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+  }
+  
   // Initialize GeoScheme
   TFile* oldfile = gFile;
   TFile* file = new TFile(fDigiFile);

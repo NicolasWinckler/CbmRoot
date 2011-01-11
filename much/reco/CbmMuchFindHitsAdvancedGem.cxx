@@ -45,6 +45,7 @@ using std::left;
 using std::fixed;
 using std::cout;
 using std::right;
+using std::multimap;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
@@ -548,8 +549,8 @@ void CbmMuchFindHitsAdvancedGem::FindClusters() {
   for (UInt_t m=0;m<modules.size();m++){
     if (modules[m]->GetDetectorType()!=1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) modules[m];
-    map<Double_t,Int_t> digis = module->GetDigis();
-    map<Double_t,Int_t>::iterator it = digis.begin();
+    multimap<Double_t,Int_t> digis = module->GetDigis();
+    multimap<Double_t,Int_t>::iterator it = digis.begin();
     vector<Int_t> time_slice;
     Double_t last_time = -1.e+10;
     while (it!=digis.end() || time_slice.size()>0){

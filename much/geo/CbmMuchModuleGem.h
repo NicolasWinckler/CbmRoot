@@ -29,7 +29,7 @@
 #include <map>
 
 using std::vector;
-using std::map;
+using std::multimap;
 using std::pair;
 
 // Length of the index of the corresponding volume
@@ -128,7 +128,7 @@ class CbmMuchModuleGem : public CbmMuchModule
 
     void ClearDigis() { fDigis.clear(); }
     void AddDigi(Double_t time,Int_t id) { fDigis.insert(pair<Double_t,Int_t>(time,id)); }
-    map<Double_t,Int_t> GetDigis() { return fDigis; } 
+    multimap<Double_t,Int_t> GetDigis() { return fDigis; } 
     
   private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
@@ -138,7 +138,7 @@ class CbmMuchModuleGem : public CbmMuchModule
     Int_t                  fGridRows;              // Number of rows in the grid
     vector<vector<Int_t> > fGridIndices;           // 2D-vector of sector numbers
     TClonesArray*          fClusters;              //!
-    map<Double_t,Int_t>    fDigis;                 //!
+    multimap<Double_t,Int_t>  fDigis;                 //!
     Int_t                  fNSectorChannels;       // Number of channels per "complete" sector
 
     Double_t GetGridCellY(Int_t iRow);

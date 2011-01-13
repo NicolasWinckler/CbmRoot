@@ -62,6 +62,10 @@ class CbmStsTrackFitter : public TObject
   virtual void Extrapolate( CbmStsTrack* track, Double_t z, 
 			    FairTrackParam *param ) = 0;
 
+ private:
+ 
+  CbmStsTrackFitter(const CbmStsTrackFitter&);
+      
 
   ClassDef(CbmStsTrackFitter,1);
 

@@ -47,7 +47,7 @@ void QAsim_rectangular_segmented_trd(Int_t nEvents = 2)
   // ========================================================================
 
 
-
+  gRandom->SetSeed(100);
 
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;

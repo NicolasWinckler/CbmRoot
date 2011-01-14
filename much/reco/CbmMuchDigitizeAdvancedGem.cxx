@@ -513,7 +513,10 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
       Int_t index  = match->GetRefIndex(i);
       Int_t charge = match->GetCharge(i);
       CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(index);
-      Double_t time = point->GetTime();
+//      Double_t time = point->GetTime();
+      Double_t time = -1;
+      while(time < 0) time = point->GetTime()  + gRandom->Gaus(0, fDTime);
+
       if (!new_digi ? 1 : time > new_digi->GetTime()+new_digi->GetDeadTime()){ 
         new_digi  = new CbmMuchDigi(digi);
         new_match = new CbmMuchDigiMatch();

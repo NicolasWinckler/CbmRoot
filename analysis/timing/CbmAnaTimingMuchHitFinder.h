@@ -6,6 +6,7 @@
 
 #ifndef CbmAnaTimingMuchHitFinder_H_
 #define CbmAnaTimingMuchHitFinder_H_ 1
+#define NSLICES 50
 
 #include "FairTask.h"
 #include "TString.h"
@@ -14,6 +15,7 @@ class TH1D;
 class CbmMuchGeoScheme;
 class TClonesArray;
 class CbmMCEpoch;
+class CbmMuchModuleGem;
 
 class CbmAnaTimingMuchHitFinder : public FairTask{
 public:
@@ -35,6 +37,9 @@ private:
   TClonesArray* fMuchDigis;         //!
   TClonesArray* fMuchDigiMatches;   //!
   CbmMCEpoch*   fMcEpoch;           //!
+  
+  CbmMuchModuleGem* fModules[NSLICES];
+
   ClassDef(CbmAnaTimingMuchHitFinder,1);
 };
 

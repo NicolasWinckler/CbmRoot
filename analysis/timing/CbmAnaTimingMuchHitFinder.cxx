@@ -22,6 +22,13 @@
 #include "TVector3.h"
 #include "TCanvas.h"
 #include "TArc.h"
+#include "CbmMuchCluster.h"
+#include "TLatex.h"
+
+#include <map>
+#include <vector>
+using std::vector;
+using std::multimap;
 
 // -----   Default constructor   -------------------------------------------
 CbmAnaTimingMuchHitFinder::CbmAnaTimingMuchHitFinder():
@@ -70,12 +77,146 @@ InitStatus CbmAnaTimingMuchHitFinder::Init(){
   fMuchDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fMuchClusters    = (TClonesArray*) fManager->GetObject("MuchCluster");
   fMcEpoch         = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
+  
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
+  vector<CbmMuchPad*> pads = module->GetPads();
+  for (UInt_t i=0;i<pads.size();i++) pads[i]->SetFillColor(kYellow);
+  
+  for (Int_t i=0;i<NSLICES;i++){
+    fModules[i] = new CbmMuchModuleGem(*module);
+  }
+  
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingMuchHitFinder::Exec(Option_t* opt){
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
+  module->ClearDigis();
+  for (Int_t iDigi = 0; iDigi < fMuchDigis->GetEntriesFast(); iDigi++) {
+    CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
+    if (digi->GetDetectorId()!=module->GetDetectorId()) continue;
+    Double_t time = digi->GetTime();
+    module->AddDigi(time,iDigi);  
+  }
+
+  Double_t r    = module->GetCutRadius();
+  TVector3 size = module->GetSize();
+  TVector3 pos  = module->GetPosition();
+//  printf("module:");
+//  printf(" r=%.1f",r);
+//  printf(" size=(%.1f,%.1f,%.1f)",size.x(),size.y(),size.z());
+//  printf(" pos=(%.1f,%.1f,%.1f)",pos.x(),pos.y(),pos.z());
+//  printf("\n");
+
+  for (Int_t nSlice=0;nSlice<NSLICES;nSlice++){
+    
+    multimap<Double_t,Int_t> digis = module->GetDigis();
+    multimap<Double_t,Int_t>::iterator it = digis.begin();
+    multimap<Int_t,Double_t> time_slice;
+    time_slice.clear();
+//    Int_t nSlice=3;
+    Int_t iSlice=0;
+    
+    Double_t last_time = -1.e+10;
+    while (it!=digis.end()){
+      if (last_time>0 && it->first - last_time > 2) {
+        if (iSlice==nSlice) break;
+        iSlice++;
+        time_slice.clear();
+      }
+      last_time = it->first;
+      time_slice.insert(pair<Int_t,Double_t>(it->second,it->first));
+      it++;
+    }
+    Double_t slice_start = time_slice.begin()->second;
+    Double_t slice_stop = (--time_slice.end())->second;
+    
+    printf("time slice: %05i",time_slice.size());
+    printf(" start: %6.1f",slice_start);
+    printf(" finish: %6.1f",slice_stop);
+    printf("\n");
+
+
+    
+    TCanvas* c1 = new TCanvas(Form("c%i",NSLICES-nSlice),Form("c%i",nSlice),1000,1000);
+//    TCanvas* c1 = new TCanvas(Form("c%i",NSLICES-nSlice),Form("c%i",nSlice),2*670,2*670);
+    gPad->Range(pos.x()-size.x()/2.,pos.y()-size.y()/2.,pos.x()+size.x()/2.,pos.y()+size.y()/2.);
+
+    module->SetFillColor(kYellow);
+    module->SetFillStyle(3001);
+    module->Draw("f");
+    module->DrawModule(kYellow);
+
+    for (Int_t i=0;i<module->GetNSectors();i++){
+      CbmMuchSector* sector = module->GetSector(i);
+      for (Int_t p=0;p<sector->GetNChannels();p++){
+        CbmMuchPad* pad = sector->GetPad(p);
+        pad->SetFillColor(kYellow);
+      }
+    }
+
+    for (Int_t iDigi=0;iDigi<fMuchDigis->GetEntriesFast();iDigi++){
+      CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
+      if (digi->GetDetectorId()!=module->GetDetectorId()) continue;
+      Double_t pad_start_time = digi->GetTime();
+      Double_t pad_stop_time = digi->GetTime()+digi->GetDeadTime();
+      Long64_t channelId = digi->GetChannelId();
+      UInt_t ADCcharge = digi->GetADCCharge();
+      CbmMuchPad* pad = module->GetPad(channelId);
+      if (pad_start_time<slice_start && pad_stop_time>slice_start) pad->SetFillColor(kBlack);
+    }
+    
+    for (Int_t i=0;i<module->GetNSectors();i++){
+      CbmMuchSector* sector = module->GetSector(i);
+      for (Int_t p=0;p<sector->GetNChannels();p++){
+        CbmMuchPad* pad = sector->GetPad(p);
+        pad->DrawClone("f");
+        pad->Draw();
+      }
+      sector->SetLineWidth(1);
+      sector->SetLineColor(kGreen+4);
+      sector->Draw();
+    }
+    
+    for (Int_t iCluster=0;iCluster<fMuchClusters->GetEntriesFast();iCluster++){
+      CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCluster);
+  //    Int_t iDigi = cluster->GetDigiIndex(0);
+      for (Int_t i=0;i<cluster->GetNDigis();i++){
+        Int_t iDigi = cluster->GetDigiIndex(i);
+        CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
+        if (digi->GetDetectorId()!=module->GetDetectorId()) continue;
+        if (time_slice.find(iDigi)==time_slice.end()) continue;
+
+        Long64_t channelId = digi->GetChannelId();
+        UInt_t ADCcharge = digi->GetADCCharge();
+        CbmMuchPad* pad = module->GetPad(channelId);
+        pad->SetFired(iDigi,ADCcharge);
+        pad->Draw("f");
+        pad->Draw();
+      }
+    }
+    
+    TArc* cMin = new TArc(0,0,r,0,360);
+    cMin->SetFillColor(10);
+    cMin->Draw("f");
+    TLatex* l = new TLatex(2,2,Form("Time: %.0f ns",slice_start));
+    l->SetTextAlign(0);
+    l->SetTextSize(0.04);
+    l->Draw();
+    c1->Print(".png");
+    
+  }
+//  for (Int_t iDigi=0;iDigi<fMuchDigis->GetEntriesFast();iDigi++){
+//    CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
+//    if (digi->GetDetectorId()!=module->GetDetectorId()) continue;
+//    Long64_t channelId = digi->GetChannelId();
+//    UInt_t ADCcharge = digi->GetADCCharge();
+//    CbmMuchPad* pad = module->GetPad(channelId);
+//    pad->SetFired(iDigi,ADCcharge);
+//  }
+
 }
 // -------------------------------------------------------------------------
 
@@ -85,47 +226,14 @@ void CbmAnaTimingMuchHitFinder::Finish(){
   TFile* f = new TFile(fHistoName.Data(),"RECREATE");
 //  fDetEventTime->Write();
   f->Close();
-
-  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
-  Double_t r    = module->GetCutRadius();
-  TVector3 size = module->GetSize();
-  TVector3 pos  = module->GetPosition();
-  printf("module:");
-  printf(" r=%.1f",r);
-  printf(" size=(%.1f,%.1f,%.1f)",size.x(),size.y(),size.z());
-  printf(" pos=(%.1f,%.1f,%.1f)",pos.x(),pos.y(),pos.z());
-  printf("\n");
   
-  TCanvas* c1 = new TCanvas("c1","c1",1000,1000);
-  gPad->Range(pos.x()-size.x()/2.,pos.y()-size.y()/2.,pos.x()+size.x()/2.,pos.y()+size.y()/2.);
 
-  module->SetFillColor(kYellow);
-  module->SetFillStyle(3001);
-  module->Draw("f");
-  module->DrawModule(kYellow);
-  for (Int_t i=0;i<module->GetNSectors();i++){
-    CbmMuchSector* sector = module->GetSector(i);
-    printf("Sector:%i %f %f\n",i,sector->GetPosition().x(),sector->GetPosition().y());
-//    sector->Draw("f");
-//    sector->Draw();
-    for (Int_t p=0;p<sector->GetNChannels();p++){
-      CbmMuchPad* pad = sector->GetPad(p);
-      pad->Draw("f");
-      if (i==38) pad->SetLineColor(kRed);
-      pad->Draw();
-    }
-    sector->SetLineWidth(2);
-    sector->SetLineColor(kGreen+3);
-    if (i==38) {
-      sector->SetLineColor(kRed);
-      sector->SetLineWidth(4);
-    }
-    sector->Draw();
-  }
+//  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
+//  Double_t r    = module->GetCutRadius();
+//  TArc* cMin = new TArc(0,0,r,0,360);
+//  cMin->SetFillColor(10);
+//  cMin->Draw("f");
 
-  TArc* cMin = new TArc(0,0,r,0,360);
-  cMin->SetFillColor(10);
-  cMin->Draw("f");
 }
 // -------------------------------------------------------------------------
 

@@ -77,13 +77,13 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   Double_t r    = module->GetCutRadius();
   TVector3 size = module->GetSize();
   TVector3 pos  = module->GetPosition();
-  fhPointXYT = new TH3D("hPointXYT","", 128,pos.x()-size.x()/2.,pos.x()+size.x()/2.,
-                                        128,pos.y()-size.y()/2.,pos.y()+size.y()/2.,
+  fhPointXYT = new TH3D("hPointXYT","", 64,pos.x()-size.x()/2.,pos.x()+size.x()/2.,
+                                        64,pos.y()-size.y()/2.,pos.y()+size.y()/2.,
                                        1000,                  0,10000);
-  fhDigiXYT = new TH3D("hDigiXYT","", 128,pos.x()-size.x()/2.,pos.x()+size.x()/2.,
-                                        128,pos.y()-size.y()/2.,pos.y()+size.y()/2.,
+  fhDigiXYT = new TH3D("hDigiXYT","", 64,pos.x()-size.x()/2.,pos.x()+size.x()/2.,
+                                        64,pos.y()-size.y()/2.,pos.y()+size.y()/2.,
                                        1000,                  0,10000);
-  CbmMuchSector* sector = module->GetSector(38); 
+  CbmMuchSector* sector = module->GetSector(56); 
   TVector3 l = sector->GetSize();
   TVector3 p = sector->GetPosition();
   for (Int_t i=0;i<sector->GetNChannels();i++){
@@ -92,13 +92,13 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   }
   
   fhSectorPointXYT = new TH3D("hSectorPointXYT","", 8,p[0]-l[0]/2,p[0]+l[0]/2.,
-                                                   16,p[1]-l[1]/2,p[1]+l[1]/2,
+                                                   8,p[1]-l[1]/2,p[1]+l[1]/2,
                                                    1000,0,10000);
   fhSectorDigiXYT = new TH3D("hSectorDigiXYT","", 8,p[0]-l[0]/2,p[0]+l[0]/2.,
-                                                  16,p[1]-l[1]/2,p[1]+l[1]/2,
+                                                  8,p[1]-l[1]/2,p[1]+l[1]/2,
                                                   1000,0,10000);
   
-  fhChannelHits    = new TH1D("hChannelHits","",128,0,128);
+  fhChannelHits    = new TH1D("hChannelHits","",64,0,64);
   fhChannelHitDist = new TH1D("hChannelHitDist","",20,0,20);
   
   fhChannelT = new TH1D("hChannelT","",10000,0,10000);
@@ -120,7 +120,7 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
   if (fVerbose>0) printf(" nMuchDigis: %4i",nMuchDigis);
   if (fVerbose>-1) printf("\n");
    
-  CbmMuchSector* sector = ((CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4))->GetSector(38);     
+  CbmMuchSector* sector = ((CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4))->GetSector(56);     
   TVector3 l = sector->GetSize();
   TVector3 p = sector->GetPosition();
 
@@ -156,7 +156,7 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
     Double_t x = pad->GetX0();
     Double_t y = pad->GetY0();
     fhDigiXYT->Fill(x,y,time,digi->GetADCCharge());
-    if (iSector!=38) continue;
+    if (iSector!=56) continue;
     fhSectorDigiXYT->Fill(x,y,time,digi->GetADCCharge());
     fhChannelHits->Fill(iChannel);
     if (iChannel!=21) continue;
@@ -209,12 +209,12 @@ void CbmAnaTimingMuchDigitizer::Finish(){
     for (Int_t p=0;p<sector->GetNChannels();p++){
       CbmMuchPad* pad = sector->GetPad(p);
       pad->Draw("f");
-      if (i==38) pad->SetLineColor(kRed);
+      if (i==56) pad->SetLineColor(kRed);
       pad->Draw();
     }
     sector->SetLineWidth(2);
     sector->SetLineColor(kGreen+3);
-    if (i==38) {
+    if (i==56) {
       sector->SetLineColor(kRed);
       sector->SetLineWidth(4);
     }
@@ -267,7 +267,7 @@ void CbmAnaTimingMuchDigitizer::Finish(){
   fhChannelHits->SetLineColor(kRed);
   fhChannelHits->Draw();
   
-  for (Int_t i=0;i<128;i++){
+  for (Int_t i=0;i<64;i++){
     fhChannelHitDist->Fill(fhChannelHits->GetBinContent(i)); 
   }
 

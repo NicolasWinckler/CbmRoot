@@ -47,7 +47,11 @@ private:
   TH1D* fhPointT;          //!
   TH1D* fhModuleT;         //!
   TH1D* fhhChannelT[64];   //!
-  
+  TH1D* fhhPointT[64];   //!
+  TH1D* fhStationTotalR[5]; //!
+  TH1D* fhStationFoundR[5]; //!
+  TH1D* fhStationEffR[5]; //!
+
   Int_t fChannelId;
   Int_t fSectorId;
   Int_t fModuleId;

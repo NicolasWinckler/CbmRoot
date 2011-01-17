@@ -16,12 +16,14 @@
 #include "CbmMCEpoch.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
+#include "CbmMuchStation.h"
 #include "TClonesArray.h"
 #include "TH3D.h"
 #include "TH1D.h"
 #include "TVector3.h"
 #include "TCanvas.h"
 #include "TArc.h"
+#include "TLatex.h"
 
 // -----   Default constructor   -------------------------------------------
 CbmAnaTimingMuchDigitizer::CbmAnaTimingMuchDigitizer():
@@ -99,14 +101,25 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
                                                   1000,0,10000);
   
   fhChannelHits    = new TH1D("hChannelHits","",64,0,64);
-  fhChannelHitDist = new TH1D("hChannelHitDist","",20,0,20);
+  fhChannelHitDist = new TH1D("hChannelHitDist","",6,-0.5,5.5);
   
   fhChannelT = new TH1D("hChannelT","",10000,0,10000);
   fhPointT   = new TH1D("hPointT","",10000,0,10000);
   fhModuleT = new TH1D("hModuleT","",10000,0,10000);
   
-  for (Int_t i=0;i<64;i++)
+  for (Int_t i=0;i<64;i++) {
     fhhChannelT[i] = new TH1D(Form("hhChannelT%0i",i),"",10000,0,10000);
+    fhhPointT[i] = new TH1D(Form("hhPointT%0i",i),"",10000,0,10000);
+  }
+  
+
+  for (Int_t i=0;i<5;i++){
+    CbmMuchStation* station = (CbmMuchStation*) fGeoScheme->GetStation(i);
+    fhStationTotalR[i] = new TH1D(Form("hStationTotalR%i",i),"",100,0,station->GetRmax()); 
+    fhStationFoundR[i] = new TH1D(Form("hStationFoundR%i",i),"",100,0,station->GetRmax());
+    fhStationEffR[i]   = new TH1D(Form("hStationEffR%i",i),"",100,0,station->GetRmax());
+  }
+  
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -162,15 +175,17 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
     if (iSector!=fSectorId) continue;
     fhSectorDigiXYT->Fill(x,y,time,digi->GetADCCharge());
     if (time>0 && time<10000) fhChannelHits->Fill(iChannel);
-//    fhhChannelT[iChannel]->Fill(time);
+    for (Double_t t=time;t<time+dead_time;t++){
+      fhhChannelT[iChannel]->Fill(t,0.2);
+//      fhChannelT->Fill(t,0.2);
+    }
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
     for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
       FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
       Double_t point_time   = point->GetTime();
       Double_t point_charge = match->GetCharge(ipoint);
 //      fhPointT->Fill(point_time,point_charge);
-//      fhPointT->Fill(point_time);
-      fhhChannelT[iChannel]->Fill(point_time);
+      fhhPointT[iChannel]->Fill(point_time);
     }
 
     
@@ -179,7 +194,7 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
     printf("time=%f dead_time=%f\n",time,dead_time);
 //    fhChannelT->Fill(time);
     for (Double_t t=time;t<time+dead_time;t++){
-      fhChannelT->Fill(t);
+      fhChannelT->Fill(t,0.2);
     }
 //    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
     for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
@@ -191,6 +206,20 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
     }
     
   }
+
+  for (Int_t i=0;i<nMuchDigis;i++) {
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
+    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
+      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
+      Double_t x = point->GetX();
+      Double_t y = point->GetY();
+      Double_t r = sqrt(x*x+y*y);
+      Int_t stationId = fGeoScheme->GetStationIndex(point->GetDetectorID()); 
+      fhStationTotalR[stationId]->Fill(r);
+      if (ipoint!=0) continue;
+      fhStationFoundR[stationId]->Fill(r);
+    }
+  }
 }
 // -------------------------------------------------------------------------
 
@@ -201,106 +230,159 @@ void CbmAnaTimingMuchDigitizer::Finish(){
 //  fDetEventTime->Write();
   f->Close();
 
-  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,fModuleId);
-  Double_t r    = module->GetCutRadius();
-  TVector3 size = module->GetSize();
-  TVector3 pos  = module->GetPosition();
-  printf("module:");
-  printf(" r=%.1f",r);
-  printf(" size=(%.1f,%.1f,%.1f)",size.x(),size.y(),size.z());
-  printf(" pos=(%.1f,%.1f,%.1f)",pos.x(),pos.y(),pos.z());
-  printf("\n");
-  
-  TCanvas* c1 = new TCanvas("c1","c1",1000,1000);
-  gPad->Range(pos.x()-size.x()/2.,pos.y()-size.y()/2.,pos.x()+size.x()/2.,pos.y()+size.y()/2.);
-
-  module->SetFillColor(kYellow);
-  module->SetFillStyle(3001);
-  module->Draw("f");
-  module->DrawModule(kYellow);
-  for (Int_t i=0;i<module->GetNSectors();i++){
-    CbmMuchSector* sector = module->GetSector(i);
-    printf("Sector:%i %f %f\n",i,sector->GetPosition().x(),sector->GetPosition().y());
-//    sector->Draw("f");
+//  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,fModuleId);
+//  Double_t r    = module->GetCutRadius();
+//  TVector3 size = module->GetSize();
+//  TVector3 pos  = module->GetPosition();
+//  printf("module:");
+//  printf(" r=%.1f",r);
+//  printf(" size=(%.1f,%.1f,%.1f)",size.x(),size.y(),size.z());
+//  printf(" pos=(%.1f,%.1f,%.1f)",pos.x(),pos.y(),pos.z());
+//  printf("\n");
+//  
+//  TCanvas* c1 = new TCanvas("c1","c1",1000,1000);
+//  gPad->Range(pos.x()-size.x()/2.,pos.y()-size.y()/2.,pos.x()+size.x()/2.,pos.y()+size.y()/2.);
+//
+//  module->SetFillColor(kYellow);
+//  module->SetFillStyle(3001);
+//  module->Draw("f");
+//  module->DrawModule(kYellow);
+//  for (Int_t i=0;i<module->GetNSectors();i++){
+//    CbmMuchSector* sector = module->GetSector(i);
+//    printf("Sector:%i %f %f\n",i,sector->GetPosition().x(),sector->GetPosition().y());
+////    sector->Draw("f");
+////    sector->Draw();
+//    for (Int_t p=0;p<sector->GetNChannels();p++){
+//      CbmMuchPad* pad = sector->GetPad(p);
+//      pad->Draw("f");
+//      if (i==fChannelId) pad->SetLineColor(kRed);
+//      pad->Draw();
+//    }
+//    sector->SetLineWidth(2);
+//    sector->SetLineColor(kGreen+3);
 //    sector->Draw();
-    for (Int_t p=0;p<sector->GetNChannels();p++){
-      CbmMuchPad* pad = sector->GetPad(p);
-      pad->Draw("f");
-      if (i==fChannelId) pad->SetLineColor(kRed);
-      pad->Draw();
-    }
-    sector->SetLineWidth(2);
-    sector->SetLineColor(kGreen+3);
-    sector->Draw();
+//  }
+//
+//  
+//  
+//  
+//  
+//  TArc* cMin = new TArc(0,0,r,0,360);
+//  cMin->SetFillColor(10);
+//  cMin->Draw("f");
+//
+//  TCanvas* c2 = new TCanvas("c2","c2",1000,1000);
+//  fhPointXYT->SetFillColor(kBlue);
+//  fhPointXYT->SetLineColor(kRed);
+//  fhPointXYT->Draw("BOX");
+//
+//  TCanvas* c3 = new TCanvas("c3","c3",1000,1000);
+//  fhSectorPointXYT->SetFillColor(kBlue);
+//  fhSectorPointXYT->SetLineColor(kRed);
+//  fhSectorPointXYT->Draw("BOX");
+//
+//  TCanvas* c4 = new TCanvas("c4","c4",1000,1000);
+//  fhDigiXYT->SetFillColor(kBlue);
+//  fhDigiXYT->SetLineColor(kRed);
+//  fhDigiXYT->Draw("BOX");
+//  
+//  TCanvas* c5 = new TCanvas("c5","c5",1000,1000);
+//  fhSectorDigiXYT->SetFillColor(kBlue);
+//  fhSectorDigiXYT->SetLineColor(kRed);
+//  fhSectorDigiXYT->Draw("BOX");
+//
+//  TCanvas* c6 = new TCanvas("c6","c6",1600,1000);
+//  c6->Divide(1,3);
+//  c6->cd(1);
+//  fhChannelT->SetFillColor(kBlue);
+////  fhChannelT->SetLineColor(kRed);
+//  fhChannelT->Draw();
+//  c6->cd(2);
+//  fhPointT->SetLineColor(kRed);
+//  fhPointT->Draw();
+//  c6->cd(3);
+//  fhModuleT->SetLineColor(kBlue);
+//  fhModuleT->Draw();
+//  
+//  TCanvas* c6_1 = new TCanvas("c6_1","c6_1",1600,500);
+//  gPad->SetLeftMargin(0.02);
+//  gPad->SetRightMargin(0.02);
+//  gPad->SetTopMargin(0.10);
+//  gPad->SetGridx(0);
+//  gPad->SetGridy(0);
+//  fhChannelT->SetFillColor(kBlue);
+//  fhChannelT->SetLineColor(kBlue);
+//  fhChannelT->Draw();
+//  fhChannelT->SetMaximum(1.2);
+//  fhChannelT->SetTitle("; time [ns];");
+//  fhPointT->SetLineWidth(3);
+//  fhPointT->SetLineColor(kRed);
+//  fhPointT->Draw("same");
+//  
+//  TCanvas* c7 = new TCanvas("c7","c7",1600,400);
+//  fhChannelHits->SetFillColor(kBlue);
+//  fhChannelHits->SetLineColor(kRed);
+//  fhChannelHits->Draw();
+//  
+//  for (Int_t i=1;i<=64;i++){
+//    gPad->SetGridx(0);
+//    gPad->SetGridy(0);
+//    fhChannelHitDist->Fill(fhChannelHits->GetBinContent(i)); 
+//  }
+//
+//  TCanvas* c8 = new TCanvas("c8","c8",800,400);
+//  gPad->SetGridx(0);
+//  gPad->SetGridy(0);
+//  fhChannelHitDist->SetStats(kTRUE);
+//  fhChannelHitDist->SetFillColor(kBlue);
+////  fhChannelHitDist->SetLineColor(kRed);
+//  fhChannelHitDist->SetTitle(";No of times each channel was fired in 10 us;Counts");
+//  fhChannelHitDist->Draw("bar");
+//  
+//  TCanvas* c9 = new TCanvas("c9","c9",1900,1000);
+//  c9->Divide(8,8,0.001,0.001);
+//  for (Int_t i=0;i<64;i++){
+//    c9->cd(i+1);
+//    gPad->SetGridx(0);
+//    gPad->SetGridy(0);
+//    gPad->SetTopMargin(0.20);
+//    gPad->SetBottomMargin(0.1);
+//    fhhChannelT[i]->SetFillColor(kBlue);
+//    fhhChannelT[i]->SetLineColor(kBlue);
+//    fhhPointT[i]->SetLineWidth(2);
+//    fhhPointT[i]->SetLineColor(kRed);
+////    fhhPointT[i]->SetTitle(Form("Channel %i",i));
+//    fhhPointT[i]->Draw();
+//    fhhChannelT[i]->Draw("same");
+//    TLatex* l = new TLatex(100,1.1,Form("Channel %i",i));
+//    l->SetTextAlign(0);
+//    l->SetTextSize(0.15);
+//    l->Draw();
+//  }
+//  c9->cd();
+  
+  TCanvas* c10 = new TCanvas("c10","c10",1900,1000);
+  c10->Divide(5,3);
+  
+
+  for (Int_t i=0;i<5;i++){
+    fhStationTotalR[i]->Sumw2();
+    fhStationFoundR[i]->Sumw2();
+    fhStationEffR[i]->Divide(fhStationFoundR[i],fhStationTotalR[i]);
+    c10->cd(i+1);
+    gPad->SetGridx(0);
+    gPad->SetGridy(0);
+    fhStationTotalR[i]->Draw();   
+    c10->cd(i+6);
+    gPad->SetGridx(0);
+    gPad->SetGridy(0);
+    fhStationFoundR[i]->Draw();   
+    c10->cd(i+11);
+    gPad->SetGridx(0);
+    gPad->SetGridy(0);
+    fhStationEffR[i]->Draw();
   }
-
-  
-  
-  
-  
-  TArc* cMin = new TArc(0,0,r,0,360);
-  cMin->SetFillColor(10);
-  cMin->Draw("f");
-
-  TCanvas* c2 = new TCanvas("c2","c2",1000,1000);
-  fhPointXYT->SetFillColor(kBlue);
-  fhPointXYT->SetLineColor(kRed);
-  fhPointXYT->Draw("BOX");
-
-  TCanvas* c3 = new TCanvas("c3","c3",1000,1000);
-  fhSectorPointXYT->SetFillColor(kBlue);
-  fhSectorPointXYT->SetLineColor(kRed);
-  fhSectorPointXYT->Draw("BOX");
-
-  TCanvas* c4 = new TCanvas("c4","c4",1000,1000);
-  fhDigiXYT->SetFillColor(kBlue);
-  fhDigiXYT->SetLineColor(kRed);
-  fhDigiXYT->Draw("BOX");
-  
-  TCanvas* c5 = new TCanvas("c5","c5",1000,1000);
-  fhSectorDigiXYT->SetFillColor(kBlue);
-  fhSectorDigiXYT->SetLineColor(kRed);
-  fhSectorDigiXYT->Draw("BOX");
-
-  TCanvas* c6 = new TCanvas("c6","c6",1600,1000);
-  c6->Divide(1,3);
-  c6->cd(1);
-  fhChannelT->SetFillColor(kBlue);
-  fhChannelT->SetLineColor(kRed);
-  fhChannelT->Draw();
-  c6->cd(2);
-  fhPointT->SetLineColor(kRed);
-  fhPointT->Draw();
-  c6->cd(3);
-  fhModuleT->SetLineColor(kBlue);
-  fhModuleT->Draw();
-  
-  TCanvas* c7 = new TCanvas("c7","c7",1600,400);
-  fhChannelHits->SetFillColor(kBlue);
-  fhChannelHits->SetLineColor(kRed);
-  fhChannelHits->Draw();
-  
-  for (Int_t i=1;i<=64;i++){
-    fhChannelHitDist->Fill(fhChannelHits->GetBinContent(i)); 
-  }
-
-  TCanvas* c8 = new TCanvas("c8","c8",800,400);
-  fhChannelHitDist->SetStats(kTRUE);
-  fhChannelHitDist->SetFillColor(kBlue);
-  fhChannelHitDist->SetLineColor(kRed);
-  fhChannelHitDist->Draw();
-  
-  TCanvas* c9 = new TCanvas("c9","c9",1900,1000);
-  c9->Divide(8,8,0.001,0.001);
-  for (Int_t i=0;i<64;i++){
-    c9->cd(i+1);
-    gPad->SetTopMargin(0.01);
-    gPad->SetBottomMargin(0.05);
-    fhhChannelT[i]->SetFillColor(kBlue);
-    fhhChannelT[i]->SetLineColor(kRed);
-    fhhChannelT[i]->Draw();
-  }
-  c9->cd();
+  c10->cd();
 }
 // -------------------------------------------------------------------------
 

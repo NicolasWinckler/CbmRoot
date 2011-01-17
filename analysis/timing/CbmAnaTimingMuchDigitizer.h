@@ -24,7 +24,10 @@ public:
   virtual void Exec(Option_t* opt);
   virtual void Finish();
   virtual void SetParContainers();
-
+  void SetChannelId(Int_t id) { fChannelId = id; }
+  void SetSectorId(Int_t id) {fSectorId = id; }
+  void SetModuleId(Int_t id) {fModuleId = id; }
+  
 private:
   Int_t         fEvent;             //!
   CbmMuchGeoScheme* fGeoScheme;     //!
@@ -43,7 +46,12 @@ private:
   TH1D* fhChannelHitDist;  //!
   TH1D* fhPointT;          //!
   TH1D* fhModuleT;         //!
-  ClassDef(CbmAnaTimingMuchDigitizer,1);
+  TH1D* fhhChannelT[64];   //!
+  
+  Int_t fChannelId;
+  Int_t fSectorId;
+  Int_t fModuleId;
+  ClassDef(CbmAnaTimingMuchDigitizer,1)
 };
 
 #endif

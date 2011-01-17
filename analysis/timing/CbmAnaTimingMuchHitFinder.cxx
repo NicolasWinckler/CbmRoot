@@ -140,7 +140,7 @@ void CbmAnaTimingMuchHitFinder::Exec(Option_t* opt){
 
 
     
-    TCanvas* c1 = new TCanvas(Form("c%i",NSLICES-nSlice),Form("c%i",nSlice),1000,1000);
+    TCanvas* c1 = new TCanvas(Form("c%04.0f",slice_start),Form("c%i",nSlice),1000,1000);
 //    TCanvas* c1 = new TCanvas(Form("c%i",NSLICES-nSlice),Form("c%i",nSlice),2*670,2*670);
     gPad->Range(pos.x()-size.x()/2.,pos.y()-size.y()/2.,pos.x()+size.x()/2.,pos.y()+size.y()/2.);
 

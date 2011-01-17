@@ -524,7 +524,8 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
         vdigi.push_back(new_digi);
         vmatch.push_back(new_match);
       }
-      new_digi->SetDeadTime(time-new_digi->GetTime()+fDeadTime);
+//      new_digi->SetDeadTime(time-new_digi->GetTime()+fDeadTime);
+      new_digi->SetDeadTime(fDeadTime);
       new_match->AddPoint(index);
       new_match->AddCharge(charge);
     }

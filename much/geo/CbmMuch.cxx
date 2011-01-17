@@ -292,6 +292,7 @@ void CbmMuch::ConstructGeometry() {
     TGeoCone* shAbs = (TGeoCone*) absorbers->At(iAbsorber);
     TString absorberName = Form("muchabsorber%02i",iAbsorber+1);
     TGeoVolume* voAbs = new TGeoVolume(absorberName,shAbs,mat);
+    voAbs->SetLineColor(kRed);
     gGeoManager->Node(absorberName,0,"much",0.,0.,z0,0,kTRUE,buf,0);
   }
 
@@ -365,6 +366,8 @@ void CbmMuch::ConstructGeometry() {
       TString  supportName2  = Form("muchstation%02ilayer%isupport2",iStation+1,iLayer+1);
       TGeoVolume* voSupport1 = new TGeoVolume(supportName1,shSupport,supportMat);
       TGeoVolume* voSupport2 = new TGeoVolume(supportName2,shSupport,supportMat);
+      voSupport1->SetLineColor(kYellow);
+      voSupport2->SetLineColor(kYellow);
       if(TMath::Abs(supportDz) > 1e-5) { // Do not create support if it does not exist
         gGeoManager->Node(supportName1,0,layerName,+supportDx/2.,0.,0.,    0,kTRUE,buf,0);
         gGeoManager->Node(supportName2,0,layerName,-supportDx/2.,0.,0.,krotZ,kTRUE,buf,0);
@@ -419,6 +422,8 @@ void CbmMuch::ConstructGeometry() {
           TString spacerName = Form("muchstation%02ilayer%i%cspacer%03i",iStation+1,iLayer+1,cside,iModule+1);
           TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
           TGeoVolume* voSpacer = new TGeoVolume(spacerName,shSpacer,noryl);
+          voActive->SetLineColor(kCyan);
+          voSpacer->SetLineColor(kMagenta);
           gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
           gGeoManager->Node(spacerName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
           AddSensitiveVolume(voActive);

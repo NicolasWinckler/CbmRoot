@@ -53,9 +53,10 @@ public:
 	Bool_t isMCGammaElectron;
 	Bool_t isMCEtaElectron;
 
-	Bool_t isPi0;
+	Bool_t isGamma;
     Double_t dSts;
     Bool_t isTTCutElectron;
+    Bool_t isSTCutElectron;
     Double_t richAnn;
     Double_t trdAnn;
     Double_t mass2;
@@ -101,6 +102,7 @@ public:
     void CheckGammaConvAndPi0();
     void FindClosestMvdHit();
     void CheckTrackTopologyCut();
+    void CheckTrackTopologyRecoCut();
     Bool_t CheckArmPod(Double_t alfa, Double_t pt);
 
     virtual void Finish();
@@ -164,17 +166,26 @@ private:
     Int_t fNofTrdIdPairs; //number of trd id signal pairs
     Int_t fNofTofIdPairs; //number of tof id signal pairs
     Int_t fNofChiPrimCutPairs;//number of signal pairs after chi primary cut
-    Int_t fNofPtcutPairs;
+    Int_t fNofGammaCutPairs;
     Int_t fNofTTcutPairs;
+    Int_t fNofSTcutPairs;
+    Int_t fNofAngleCutPairs;
+    Int_t fNofAPcutPairs;
+    Int_t fNofPtcutPairs;
+    
 
     Int_t fNofRecBg;
     Int_t fNofRichIdBg;
     Int_t fNofTrdIdBg;
     Int_t fNofTofIdBg;
     Int_t fNofChiPrimCutBg;
-    Int_t fNofPtcutBg;
+    Int_t fNofGammaCutBg;
     Int_t fNofTTcutBg;
-
+    Int_t fNofSTcutBg;
+    Int_t fNofAngleCutBg;
+    Int_t fNofAPcutBg;
+    Int_t fNofPtcutBg;
+    
 
 // ID cuts
     Double_t fTrdAnnCut;
@@ -189,7 +200,7 @@ private:
     Double_t fChiPrimCut;
     Double_t fPtCut;
     Double_t fAngleCut;
-    Double_t fPi0Cut;
+    Double_t fGammaCut;
 
     CbmRichElectronIdAnn * fElIdAnn;
     Bool_t fUseRichAnn;
@@ -209,8 +220,9 @@ private:
     TH1D* fh_chi_prim_signal_mom; 
     TH1D* fh_ptcut_signal_mom;
     TH1D* fh_anglecut_signal_mom;
-    TH1D* fh_pi0cut_signal_mom;
+    TH1D* fh_gammacut_signal_mom;
     TH1D* fh_ttcut_signal_mom;
+    TH1D* fh_stcut_signal_mom;
     TH1D* fh_apcut_signal_mom;
 
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
@@ -235,8 +247,9 @@ private:
     TH1D* fh_chi_prim_signal_minv; //chi primary cut after identification for signal
     TH1D* fh_ptcut_signal_minv; //pt cut 
     TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal   
-    TH1D* fh_pi0cut_signal_minv;
+    TH1D* fh_gammacut_signal_minv;
     TH1D* fh_ttcut_signal_minv;
+    TH1D* fh_stcut_signal_minv;
     TH1D* fh_apcut_signal_minv;
 
 //BG minv
@@ -247,8 +260,9 @@ private:
     TH1D* fh_chi_prim_bg_minv; //chi primary cut 
     TH1D* fh_ptcut_bg_minv; //pt cut 
     TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
-    TH1D* fh_pi0cut_bg_minv;
+    TH1D* fh_gammacut_bg_minv;
     TH1D* fh_ttcut_bg_minv;
+    TH1D* fh_stcut_bg_minv;
     TH1D* fh_apcut_bg_minv;
 //pi0 minv
     TH1D* fh_rec_pi0_minv;
@@ -258,8 +272,9 @@ private:
     TH1D* fh_chi_prim_pi0_minv; //chi primary cut
     TH1D* fh_ptcut_pi0_minv; //pt cut
     TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for pi0
-    TH1D* fh_pi0cut_pi0_minv;
+    TH1D* fh_gammacut_pi0_minv;
     TH1D* fh_ttcut_pi0_minv;
+    TH1D* fh_stcut_pi0_minv;
     TH1D* fh_apcut_pi0_minv;
 
 //eta minv
@@ -270,8 +285,9 @@ private:
 	TH1D* fh_chi_prim_eta_minv; //chi primary cut
 	TH1D* fh_ptcut_eta_minv; //pt cut
 	TH1D* fh_anglecut_eta_minv; // openning angle after pt cut for eta
-	TH1D* fh_pi0cut_eta_minv;
+	TH1D* fh_gammacut_eta_minv;
 	TH1D* fh_ttcut_eta_minv;
+    TH1D* fh_stcut_eta_minv;
 	TH1D* fh_apcut_eta_minv;
 
 // cuts distribution
@@ -286,12 +302,16 @@ private:
     TH1D* fh_angle_signal;
     TH1D* fh_angle_bg;
     TH2D* fh_ttcut_signal;
+    TH2D* fh_stcut_signal;
     TH2D* fh_ttcut_bg;
+    TH2D* fh_stcut_bg;
     TH2D* fh_apcut_signal;
     TH2D* fh_apcut_bg;
     TH2D* fh_ttcut_pi0;
+    TH2D* fh_stcut_pi0;
     TH2D* fh_apcut_pi0;
     TH2D* fh_ttcut_gamma;
+    TH2D* fh_stcut_gamma;
     TH2D* fh_apcut_gamma;
   
     TH2D*  fh_source_pair_reco;
@@ -301,8 +321,9 @@ private:
     TH2D*  fh_source_pair_chi_prim;
     TH2D*  fh_source_pair_ptcut;
     TH2D*  fh_source_pair_anglecut;
-    TH2D*  fh_source_pair_pi0cut;
+    TH2D*  fh_source_pair_gammacut;
     TH2D*  fh_source_pair_ttcut;
+    TH2D*  fh_source_pair_stcut;
     TH2D*  fh_source_pair_apcut;
 
     TH2D* fh_reco_signal_pty;
@@ -312,8 +333,9 @@ private:
     TH2D* fh_chi_prim_signal_pty; 
     TH2D* fh_ptcut_signal_pty; 
     TH2D* fh_anglecut_signal_pty;
-    TH2D* fh_pi0cut_signal_pty;
+    TH2D* fh_gammacut_signal_pty;
     TH2D* fh_ttcut_signal_pty;
+    TH2D* fh_stcut_signal_pty;
     TH2D* fh_apcut_signal_pty;
 
     //ID cuts distributions

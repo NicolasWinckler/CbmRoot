@@ -125,6 +125,7 @@ add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial1/src)
 #add_subdirectory (tutorials/Tutorial2/src)
 add_subdirectory (cbmgenerators)
+add_subdirectory (run)
 
 set(BUILD_ROCLIB FALSE CACHE BOOL "Build DABC and RocLib which are needed
     to read testbeam data.")

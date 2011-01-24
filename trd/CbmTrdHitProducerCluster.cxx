@@ -351,8 +351,14 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       shortPR->Fit("fit","Q");
       shortSigma = fit->GetParameter(2);
       printf("  %6.3f mm position resolution for short pad size direction (including x and y)\n",shortSigma);
+   TLegend* shortL = new TLegend(0.55,0.55,0.85,0.85);
+      shortL ->AddEntry( shortPR,"Residuals for short pad size direction","l");
+      Char_t LegendTitle[70];
+      sprintf(LegendTitle,"Position Resolution = %6.3f mm",shortSigma);
+      shortL ->AddEntry(fit,LegendTitle,"l");
+      shortL ->Draw("same");
       cPR->cd(2)->SetTickx(1);
-      cPR->cd(2)->SetTicky(1);
+      cPR->cd(2)->SetTicky(1);   
       Float_t integral = longPR[0]->Integral(); 
       //longPR[0]->Scale(1/integral); 
       //longPR[0]->Reset();  

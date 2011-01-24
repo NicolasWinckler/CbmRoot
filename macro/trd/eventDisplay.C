@@ -56,11 +56,16 @@ eventDisplay()
   // get the required information from the gGeomanager and the eventdisplay. With the
   // geomanager it is possible to get the volume the digi/hit/point is in. From the
   // eventdisplay one can get hopefully the information if a volume is visible.
-
+  /*
   TrdDigis->SetLayerStation1(kTRUE,kFALSE,kFALSE,kFALSE);
   TrdDigis->SetLayerStation2(kTRUE,kFALSE,kFALSE,kFALSE);
   TrdDigis->SetLayerStation3(kTRUE,kFALSE,kFALSE,kFALSE);
-                                                               
+  */    
+    
+  TrdDigis->SetLayerStation1(kTRUE,kTRUE,kTRUE,kTRUE);
+  TrdDigis->SetLayerStation2(kTRUE,kTRUE,kTRUE,kTRUE);
+  TrdDigis->SetLayerStation3(kTRUE,kTRUE,kTRUE,kTRUE);
+                                                     
   fMan->AddTask(Track);
   
   fMan->AddTask(TrdPoints);

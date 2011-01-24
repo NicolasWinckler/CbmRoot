@@ -76,7 +76,7 @@ class CbmTrdHitRateTest : public FairTask {
 
   void DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1);
 
-  void AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge);
+  void DrawDigi();
 
  
   Int_t Digicounter;

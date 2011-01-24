@@ -845,7 +845,7 @@ float CbmTrdHitRateTest::CalcHitRate(Float_t StartX, Float_t StopX, Float_t Star
   // ------AddDigi--------------------------------------------------------------
 
   //void CbmTrdHitRateTest::AddDigi() 
-  void CbmTrdHitRateTest::AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge) 
+  void CbmTrdHitRateTest::DrawDigi() 
   {
  
   }

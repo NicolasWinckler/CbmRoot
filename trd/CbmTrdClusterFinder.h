@@ -76,7 +76,7 @@ class CbmTrdClusterFinder : public FairTask
   
   CbmTrdDetectorId fTrdId; //!
 
-  static const Float_t ChargeTH = 1e-02;
+  static const Float_t ChargeTH = 0;// 5e-03;
 
   std::map<Int_t, std::set<Int_t> >::iterator mapIt;
   std::set<Int_t>::iterator it;
@@ -88,9 +88,11 @@ class CbmTrdClusterFinder : public FairTask
   
   std::set<Int_t> fNeighbours;
   std::map<Int_t, std::set<Int_t> > fModDigiMap;//std::map<Int_t ModuleID, std::vector<Int_t DigiID> >
+ 
   std::map<Int_t, Int_t> fDigiRow;
   std::map<Int_t, Int_t> fDigiCol;
   std::map<Int_t, Double_t> fDigiCharge;
+  
   std::vector< std::set<Int_t> > fClusterBuffer;
   std::map< Int_t, std::vector< std::set<Int_t> > > fModClusterDigiMap;
 

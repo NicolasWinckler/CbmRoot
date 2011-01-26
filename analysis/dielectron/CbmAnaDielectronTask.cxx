@@ -120,8 +120,11 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
 ///////
     fh_sts_reco_signal_mom  = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_richID_signal_mom = new TH1D("fh_richID_signal_mom", "fh_richID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_trd_reco_signal_mom = new TH1D("fh_trd_reco_signal_mom","fh_trd_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trdID_signal_mom = new TH1D("fh_trdID_signal_mom", "fh_trdID_signal_mom;momentum [GeV/c];yeild",100, 0., 15.);
     fh_tof_reco_signal_mom = new TH1D("fh_tof_reco_signal_mom","fh_tof_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tofID_signal_mom = new TH1D("fh_tofID_signal_mom", "fh_tofID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
 
 //////
     
@@ -748,6 +751,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 	    }
         fh_rich_reco_signal_mom->Fill(cand.momentum.Mag());
         IsRichElectron(richRing, cand.momentum.Mag(), &cand);
+        if (cand.isRichElectron = true) fh_richID_signal_mom->Fill(cand.momentum.Mag());
         
 
 // TRD
@@ -764,6 +768,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
         fh_trd_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTrdElectron(trdTrack, &cand);
+        if (cand.isTrdElectron = true) fh_trdID_signal_mom->Fill(cand.momentum.Mag());
         
   
 // ToF
@@ -782,6 +787,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
         fh_tof_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTofElectron(gTrack, cand.momentum.Mag(), &cand);
+        if (cand.isTofElectron = true) fh_tofID_signal_mom->Fill(cand.momentum.Mag());
 
         
 
@@ -1643,6 +1649,9 @@ void CbmAnaDielectronTask::Finish()
     fh_rich_reco_signal_mom->Scale(scale);
     fh_trd_reco_signal_mom->Scale(scale);
     fh_tof_reco_signal_mom->Scale(scale);
+    fh_richID_signal_mom->Scale(scale);
+    fh_trdID_signal_mom->Scale(scale);
+    fh_tofID_signal_mom->Scale(scale);
 ////
 
     fh_mc_signal_minv->Scale(scale);
@@ -1790,6 +1799,9 @@ void CbmAnaDielectronTask::Finish()
     fh_rich_reco_signal_mom ->Write();
     fh_trd_reco_signal_mom->Write();
     fh_tof_reco_signal_mom->Write();
+    fh_richID_signal_mom->Write();
+    fh_trdID_signal_mom->Write();
+    fh_tofID_signal_mom->Write();
 /////
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();

@@ -1,7 +1,7 @@
 void glue_histo ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis";//.0000.root";
-    TString outFileName = filePath +".all.new1.root";
+    TString outFileName = filePath +".all.new.reco-sts.root";
     Int_t nEvents = 200;   // number of files to be added
 
     fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -20,7 +20,12 @@ void glue_histo ()
     fh_ttcut_signal_mom = new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_stcut_signal_mom = new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_apcut_signal_mom = new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-
+///////////////////////
+    fh_sts_reco_signal_mom  = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_signal_mom = new TH1D("fh_trd_reco_signal_mom","fh_trd_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tof_reco_signal_mom = new TH1D("fh_tof_reco_signal_mom","fh_tof_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+//////////////////////
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
@@ -171,7 +176,12 @@ void glue_histo ()
         fh_ttcut_signal_mom->Add((TH1D*) file->Get("fh_ttcut_signal_mom"));
         fh_stcut_signal_mom->Add((TH1D*) file->Get("fh_stcut_signal_mom"));
         fh_apcut_signal_mom->Add((TH1D*) file->Get("fh_apcut_signal_mom"));
-
+///////////////////////////
+        fh_sts_reco_signal_mom->Add((TH1D*) file->Get("fh_sts_reco_signal_mom"));
+        fh_rich_reco_signal_mom->Add((TH1D*) file->Get("fh_rich_reco_signal_mom"));
+        fh_trd_reco_signal_mom->Add((TH1D*) file->Get("fh_trd_reco_signal_mom"));
+        fh_tof_reco_signal_mom->Add((TH1D*) file->Get("fh_tof_reco_signal_mom"));
+///////////////////////////
         fh_mc_signal_minv->Add((TH1D*) file->Get("fh_mc_signal_minv"));
         fh_acc_signal_minv->Add((TH1D*) file->Get("fh_acc_signal_minv")); 
 
@@ -314,7 +324,12 @@ void glue_histo ()
     fh_ttcut_signal_mom->Scale(scale);
     fh_stcut_signal_mom->Scale(scale);
     fh_apcut_signal_mom->Scale(scale);
-
+////////////////////
+    fh_sts_reco_signal_mom->Scale(scale);
+    fh_rich_reco_signal_mom->Scale(scale);
+    fh_trd_reco_signal_mom->Scale(scale);
+    fh_tof_reco_signal_mom->Scale(scale);
+///////////////////
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
 
@@ -452,7 +467,12 @@ void glue_histo ()
     fh_ttcut_signal_mom->Write();
     fh_stcut_signal_mom->Write();
     fh_apcut_signal_mom->Write();
-
+//////////////////
+    fh_sts_reco_signal_mom->Write();
+    fh_rich_reco_signal_mom->Write();
+    fh_trd_reco_signal_mom->Write();
+    fh_tof_reco_signal_mom->Write();
+/////////////////
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();
 

@@ -109,8 +109,9 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 }
 
 
+
 void draw(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.new1.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.new.reco-sts.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -118,8 +119,8 @@ void draw(){
     gStyle->SetPalette(1,0);
 
 // pty distribution of signal
-    TCanvas *c1 = new TCanvas("c1-pty","c1-pty",1000,750);
-    c1->Divide(4,3);
+    TCanvas *c1 = new TCanvas("c1-pty","c1-pty",1000,1000);
+    c1->Divide(4,4);
     c1->cd(1);
     fh_mc_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_mc_signal_pty, fh_mc_signal_pty);
@@ -145,15 +146,18 @@ void draw(){
     fh_gammacut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_gammacut_signal_pty, fh_mc_signal_pty);
     c1->cd(9);
+    fh_stcut_signal_pty->Draw("COLZ");
+    draw_eff_pty(fh_stcut_signal_pty, fh_mc_signal_pty);
+    c1->cd(10);
     fh_ttcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ttcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(10);
+    c1->cd(11);
     fh_apcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_apcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(11);
+    c1->cd(12);
     fh_ptcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(12);
+    c1->cd(13);
     fh_anglecut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_mc_signal_pty);
 
@@ -161,46 +165,61 @@ void draw(){
 //pty efficiency of signal
     TCanvas *c1_1 = new TCanvas("c1_1-pty eff","c1_1-pty eff",1000,750);
     c1_1->Divide(4,3);
-    c1_1->cd(2);
+    c1_1->cd(1);
     TH2D* fh_acc_signal_pty_eff = divideHisto2D(fh_acc_signal_pty, fh_mc_signal_pty);
     fh_acc_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_acc_signal_pty, fh_mc_signal_pty);
-    c1_1->cd(3);
+
+    c1_1->cd(2);
     TH2D* fh_reco_signal_pty_eff = divideHisto2D(fh_reco_signal_pty, fh_acc_signal_pty);
     fh_reco_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_reco_signal_pty, fh_acc_signal_pty);
-    c1_1->cd(4);
+
+    c1_1->cd(3);
     TH2D* fh_rich_id_signal_pty_eff = divideHisto2D(fh_rich_id_signal_pty, fh_reco_signal_pty);
     fh_rich_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_rich_id_signal_pty, fh_reco_signal_pty);
-    c1_1->cd(5);
+
+    c1_1->cd(4);
     TH2D* fh_trd_id_signal_pty_eff = divideHisto2D(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
     fh_trd_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
-    c1_1->cd(6);
+
+    c1_1->cd(5);
     TH2D* fh_tof_id_signal_pty_eff = divideHisto2D(fh_tof_id_signal_pty, fh_trd_id_signal_pty);
     fh_tof_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_tof_id_signal_pty, fh_trd_id_signal_pty);
-    c1_1->cd(7);
+
+    c1_1->cd(6);
     TH2D* fh_chi_prim_signal_pty_eff = divideHisto2D(fh_chi_prim_signal_pty, fh_tof_id_signal_pty);
     fh_chi_prim_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_chi_prim_signal_pty, fh_tof_id_signal_pty);
-    c1_1->cd(8);
+
+    c1_1->cd(7);
     TH2D* fh_gammacut_signal_pty_eff = divideHisto2D(fh_gammacut_signal_pty, fh_tof_id_signal_pty);
     fh_gammacut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_gammacut_signal_pty, fh_tof_id_signal_pty);
+
+    c1_1->cd(8);
+    TH2D* fh_stcut_signal_pty_eff = divideHisto2D(fh_stcut_signal_pty, fh_gammacut_signal_pty);
+    fh_stcut_signal_pty_eff->Draw("COLZ");
+    draw_eff_pty(fh_stcut_signal_pty, fh_gammacut_signal_pty);
+
     c1_1->cd(9);
-    TH2D* fh_ttcut_signal_pty_eff = divideHisto2D(fh_ttcut_signal_pty, fh_gammacut_signal_pty);
+    TH2D* fh_ttcut_signal_pty_eff = divideHisto2D(fh_ttcut_signal_pty, fh_stcut_signal_pty);
     fh_ttcut_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_ttcut_signal_pty, fh_gammacut_signal_pty);
+    draw_eff_pty(fh_ttcut_signal_pty, fh_stcut_signal_pty);
+
     c1_1->cd(10);
     TH2D* fh_apcut_signal_pty_eff = divideHisto2D(fh_apcut_signal_pty, fh_ttcut_signal_pty);
     fh_apcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_apcut_signal_pty, fh_ttcut_signal_pty);
+
     c1_1->cd(11);
     TH2D* fh_ptcut_signal_pty_eff = divideHisto2D(fh_ptcut_signal_pty, fh_apcut_signal_pty);
     fh_ptcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_apcut_signal_pty);
+
     c1_1->cd(12);
     TH2D* fh_anglecut_signal_pty_eff = divideHisto2D(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
     fh_anglecut_signal_pty_eff->Draw("COLZ");
@@ -219,7 +238,8 @@ void draw(){
     fh_ptcut_signal_mom->SetLineColor(kPink);
     fh_anglecut_signal_mom->SetLineColor(kYellow);
     fh_gammacut_signal_mom->SetLineColor(kGreen+3);
-    fh_ttcut_signal_mom->SetLineColor(kOrange+7);
+    fh_stcut_signal_mom->SetLineColor(kOrange-3);
+    fh_ttcut_signal_mom->SetLineColor(kYellow+7);
     fh_apcut_signal_mom->SetLineColor(kCyan+2);
     fh_mc_signal_mom->Draw();
     fh_acc_signal_mom->Draw("same");
@@ -229,6 +249,7 @@ void draw(){
     fh_tof_id_signal_mom->Draw("same");
     fh_chi_prim_signal_mom->Draw("same");
     fh_gammacut_signal_mom->Draw("same");
+    fh_stcut_signal_mom->Draw("same");
     fh_ttcut_signal_mom->Draw("same");
     fh_anglecut_signal_mom->Draw("same");
     fh_apcut_signal_mom->Draw("same");
@@ -243,6 +264,7 @@ void draw(){
     leg3->AddEntry(fh_tof_id_signal_mom, "tof id", "l");
     leg3->AddEntry(fh_chi_prim_signal_mom, "chi prim", "l");
     leg3->AddEntry(fh_gammacut_signal_mom, "gamma cut", "l");
+    leg3->AddEntry(fh_stcut_signal_mom, "st cut", "l");
     leg3->AddEntry(fh_ttcut_signal_mom, "tt cut", "l");
     leg3->AddEntry(fh_apcut_signal_mom, "ap cut", "l");
     leg3->AddEntry(fh_ptcut_signal_mom, "pt cut", "l");
@@ -325,14 +347,22 @@ void draw(){
     //gPad->SetLogy(true);
 
     c2_1->cd(8);
-    TH1D* fh_ttcut_signal_mom_eff = divideHisto1D(fh_ttcut_signal_mom,fh_gammacut_signal_mom);
-    fh_ttcut_signal_mom_eff->Draw();
-    draw_eff_mom(fh_ttcut_signal_mom,fh_gammacut_signal_mom);
+    TH1D* fh_stcut_signal_mom_eff = divideHisto1D(fh_stcut_signal_mom,fh_gammacut_signal_mom);
+    fh_stcut_signal_mom_eff->Draw();
+    draw_eff_mom(fh_stcut_signal_mom,fh_gammacut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     //gPad->SetLogy(true);
 
     c2_1->cd(9);
+    TH1D* fh_ttcut_signal_mom_eff = divideHisto1D(fh_ttcut_signal_mom,fh_stcut_signal_mom);
+    fh_ttcut_signal_mom_eff->Draw();
+    draw_eff_mom(fh_ttcut_signal_mom,fh_stcut_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    //gPad->SetLogy(true);
+
+    c2_1->cd(10);
     TH1D* fh_apcut_signal_mom_eff = divideHisto1D(fh_apcut_signal_mom,fh_ttcut_signal_mom);
     fh_apcut_signal_mom_eff->Draw();
     draw_eff_mom(fh_apcut_signal_mom,fh_ttcut_signal_mom);
@@ -340,20 +370,21 @@ void draw(){
     gPad->SetGridy(true);
     //gPad->SetLogy(true);
    
-    c2_1->cd(10);
+    c2_1->cd(11);
     TH1D* fh_ptcut_signal_mom_eff = divideHisto1D(fh_ptcut_signal_mom,fh_apcut_signal_mom);
     fh_ptcut_signal_mom_eff->Draw();
     draw_eff_mom(fh_ptcut_signal_mom,fh_apcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     //gPad->SetLogy(true);
-    c2_1->cd(11);
+
+    c2_1->cd(12);
     TH1D* fh_anglecut_signal_mom_eff = divideHisto1D(fh_anglecut_signal_mom,fh_ptcut_signal_mom);
     fh_anglecut_signal_mom_eff->Draw();
     draw_eff_mom(fh_anglecut_signal_mom,fh_ptcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-   // gPad->SetLogy(true);
+   //gPad->SetLogy(true);
     
 
 //mother PDG
@@ -470,6 +501,7 @@ void draw(){
     Double_t sumofbins8 =0;
     Double_t sumofbins9 =0;
     Double_t sumofbins10 =0;
+    Double_t sumofbins11 =0;
     for (int x = 1; x <= 3; x++){
         for (int y =1;y<=3; y++) {
           sumofbins1 += fh_source_pair_reco->GetBinContent(x,y);
@@ -482,6 +514,7 @@ void draw(){
           sumofbins8 += fh_source_pair_gammacut->GetBinContent(x,y);
           sumofbins9 += fh_source_pair_ttcut->GetBinContent(x,y);
           sumofbins10 += fh_source_pair_apcut->GetBinContent(x,y);
+          sumofbins11 += fh_source_pair_stcut->GetBinContent(x,y);
         }
     }
     if (sumofbins1 != 0) fh_source_pair_reco->Scale(100. * 1./sumofbins1);
@@ -494,6 +527,7 @@ void draw(){
     if (sumofbins8 != 0) fh_source_pair_gammacut->Scale(100. * 1./sumofbins8);
     if (sumofbins9 != 0) fh_source_pair_ttcut->Scale(100. * 1./sumofbins9);
     if (sumofbins10 != 0) fh_source_pair_apcut->Scale(100. * 1./sumofbins10);
+    if (sumofbins11 != 0) fh_source_pair_stcut->Scale(100. * 1./sumofbins11);
     TCanvas *c10 = new TCanvas("c10", "c10", 1000, 750);
     c10->Divide(4,3);
     c10->cd(1);
@@ -509,12 +543,14 @@ void draw(){
     c10->cd(6);
     fh_source_pair_gammacut->Draw("COLZ");
     c10->cd(7);
-    fh_source_pair_ttcut->Draw("COLZ");
+    fh_source_pair_stcut->Draw("COLZ");
     c10->cd(8);
+    fh_source_pair_ttcut->Draw("COLZ");
+    c10->cd(9);
     fh_source_pair_apcut->Draw("COLZ");
     c10->cd(10);
     fh_source_pair_ptcut->Draw("COLZ");
-    c10->cd(9);
+    c10->cd(11);
     fh_source_pair_anglecut->Draw("COLZ");
      
 //AP cut distribution
@@ -537,16 +573,28 @@ void draw(){
     c4_1->cd(4);
     fh_apcut_gamma->Draw("COLZ");
 
-//track topology cut distribution
-    TCanvas *c4_2 = new TCanvas("c4_2-ttcut", "c4_2-ttcut", 800, 800);
+//track topology cut distribution for segment tracks
+    TCanvas *c4_2 = new TCanvas("c4_2-stcut", "c4_2-stcut", 800, 800);
     c4_2->Divide(2,2);
     c4_2->cd(1);
-    fh_ttcut_signal->Draw("COLZ");
+    fh_stcut_signal->Draw("COLZ");
     c4_2->cd(2);
-    fh_ttcut_bg->Draw("COLZ");
+    fh_stcut_bg->Draw("COLZ");
     c4_2->cd(3);
-    fh_ttcut_pi0->Draw("COLZ");
+    fh_stcut_pi0->Draw("COLZ");
     c4_2->cd(4);
+    fh_stcut_gamma->Draw("COLZ");
+
+//track topology cut distribution for full reco tracks
+    TCanvas *c4_3 = new TCanvas("c4_3-ttcut", "c4_3-ttcut", 800, 800);
+    c4_3->Divide(2,2);
+    c4_3->cd(1);
+    fh_ttcut_signal->Draw("COLZ");
+    c4_3->cd(2);
+    fh_ttcut_bg->Draw("COLZ");
+    c4_3->cd(3);
+    fh_ttcut_pi0->Draw("COLZ");
+    c4_3->cd(4);
     fh_ttcut_gamma->Draw("COLZ");
 
 //    TCanvas *c5 = new TCanvas("c5","c5", 1200, 400);
@@ -621,6 +669,7 @@ void draw(){
     fh_ptcut_signal_minv->SetLineColor(kMagenta);
     fh_anglecut_signal_minv->SetLineColor(kViolet+10);
     fh_gammacut_signal_minv->SetLineColor(kPink-6);
+    fh_stcut_signal_minv->SetLineColor(kOrange-3);
     fh_ttcut_signal_minv->SetLineColor(kYellow+1);
     fh_apcut_signal_minv->SetLineColor(kPink+8);
     fh_rec_signal_minv->Draw("same");
@@ -629,6 +678,7 @@ void draw(){
     fh_tof_id_signal_minv->Draw("same");
     fh_chi_prim_signal_minv->Draw("same");
     fh_gammacut_signal_minv->Draw("same");
+    fh_stcut_signal_minv->Draw("same");
     fh_ttcut_signal_minv->Draw("same");
     fh_anglecut_signal_minv->Draw("same");
     fh_apcut_signal_minv->Draw("same");
@@ -643,6 +693,7 @@ void draw(){
     leg3->AddEntry(fh_tof_id_signal_minv, "tof id", "l");
     leg3->AddEntry(fh_chi_prim_signal_minv, "chi prim", "l");
     leg3->AddEntry(fh_gammacut_signal_minv, "gamma cut", "l");
+    leg3->AddEntry(fh_stcut_signal_minv, "st cut", "l");
     leg3->AddEntry(fh_ttcut_signal_minv, "tt cut", "l");
     leg3->AddEntry(fh_apcut_signal_minv, "ap cut", "l");
     leg3->AddEntry(fh_ptcut_signal_minv, "pt cut", "l");
@@ -662,6 +713,7 @@ void draw(){
     fh_anglecut_bg_minv->SetLineColor(kViolet+10);
     fh_gammacut_bg_minv->SetLineColor(kPink-6);
     fh_ttcut_bg_minv->SetLineColor(kYellow+1);
+    fh_stcut_bg_minv->SetLineColor(kOrange-3);
     fh_apcut_bg_minv->SetLineColor(kPink+8);
     fh_rec_bg_minv->Draw();
     fh_rec_bg_minv->SetMinimum(1e-8);
@@ -672,7 +724,8 @@ void draw(){
     fh_ptcut_bg_minv->Draw("same");
     fh_anglecut_bg_minv->Draw("same");
     fh_gammacut_bg_minv->Draw("same");
-  //  fh_ttcut_bg_minv->Draw("same");
+    fh_stcut_bg_minv->Draw("same");
+    fh_ttcut_bg_minv->Draw("same");
     fh_apcut_bg_minv->Draw("same");
 
     TLegend* leg = new TLegend(0.65,0.6,1., 1.);
@@ -682,6 +735,7 @@ void draw(){
     leg->AddEntry(fh_tof_id_bg_minv, "tof id", "l");
     leg->AddEntry(fh_chi_prim_bg_minv, "chi prim", "l");
     leg->AddEntry(fh_gammacut_bg_minv, "gamma cut", "l");
+    leg->AddEntry(fh_stcut_bg_minv, "st cut", "l");
     leg->AddEntry(fh_ttcut_bg_minv, "tt cut", "l");
     leg->AddEntry(fh_apcut_bg_minv, "ap cut", "l");
     leg->AddEntry(fh_ptcut_bg_minv, "pt cut", "l");
@@ -704,6 +758,7 @@ void draw(){
     fh_ptcut_pi0_minv->SetLineColor(kMagenta);
     fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
     fh_gammacut_pi0_minv->SetLineColor(kPink-6);
+    fh_stcut_pi0_minv->SetLineColor(kOrange-3);
     fh_ttcut_pi0_minv->SetLineColor(kYellow+1);
     fh_apcut_pi0_minv->SetLineColor(kPink+8);
     fh_rec_pi0_minv->Draw();
@@ -714,6 +769,7 @@ void draw(){
     fh_ptcut_pi0_minv->Draw("same");
     fh_anglecut_pi0_minv->Draw("same");
     fh_gammacut_pi0_minv->Draw("same");
+    fh_stcut_pi0_minv->Draw("same");
     fh_ttcut_pi0_minv->Draw("same");
     fh_apcut_pi0_minv->Draw("same");
     TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
@@ -723,6 +779,7 @@ void draw(){
 	leg3->AddEntry(fh_tof_id_pi0_minv, "tof id", "l");
 	leg3->AddEntry(fh_chi_prim_pi0_minv, "chi prim", "l");
     leg3->AddEntry(fh_gammacut_pi0_minv, "gamma cut", "l");
+    leg3->AddEntry(fh_stcut_pi0_minv, "st cut", "l");
     leg3->AddEntry(fh_ttcut_pi0_minv, "tt cut", "l");
     leg3->AddEntry(fh_apcut_pi0_minv, "ap cut", "l");
 	leg3->AddEntry(fh_ptcut_pi0_minv, "pt cut", "l");
@@ -740,6 +797,7 @@ void draw(){
 	fh_ptcut_eta_minv->SetLineColor(kMagenta);
 	fh_anglecut_eta_minv->SetLineColor(kViolet+10);
 	fh_gammacut_eta_minv->SetLineColor(kPink-6);
+    fh_stcut_eta_minv->SetLineColor(kOrange-3);
 	fh_ttcut_eta_minv->SetLineColor(kYellow+1);
 	fh_apcut_eta_minv->SetLineColor(kPink+8);
 	fh_rec_eta_minv->Draw();
@@ -750,6 +808,7 @@ void draw(){
 	fh_ptcut_eta_minv->Draw("same");
 	fh_anglecut_eta_minv->Draw("same");
 	fh_gammacut_eta_minv->Draw("same");
+    fh_stcut_eta_minv->Draw("same");
 	fh_ttcut_eta_minv->Draw("same");
 	fh_apcut_eta_minv->Draw("same");
 	TLegend* leg4 = new TLegend(0.65,0.6,1., 1.);
@@ -759,6 +818,7 @@ void draw(){
 	leg4->AddEntry(fh_tof_id_eta_minv, "tof id", "l");
 	leg4->AddEntry(fh_chi_prim_eta_minv, "chi prim", "l");
     leg4->AddEntry(fh_gammacut_eta_minv, "gamma cut", "l");
+    leg4->AddEntry(fh_stcut_eta_minv, "st cut", "l");
     leg4->AddEntry(fh_ttcut_eta_minv, "tt cut", "l");
     leg4->AddEntry(fh_apcut_eta_minv, "ap cut", "l");
 	leg4->AddEntry(fh_ptcut_eta_minv, "pt cut", "l");
@@ -774,11 +834,467 @@ void draw(){
     calculateSignalOverBg(fh_tof_id_signal_minv, fh_tof_id_bg_minv);
     calculateSignalOverBg(fh_chi_prim_signal_minv, fh_chi_prim_bg_minv);
     calculateSignalOverBg(fh_gammacut_signal_minv, fh_gammacut_bg_minv);
+    calculateSignalOverBg(fh_stcut_signal_minv, fh_stcut_bg_minv);
     calculateSignalOverBg(fh_ttcut_signal_minv, fh_ttcut_bg_minv);
     calculateSignalOverBg(fh_apcut_signal_minv, fh_apcut_bg_minv);
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
+
+    TCanvas *c11 = new TCanvas("c11", "c11", 1200, 1200);
+    c11->Divide(2,2);
+    c11->cd(1);
+    fh_sts_reco_signal_mom->Draw();
+    c11->cd(2);
+    fh_rich_reco_signal_mom->Draw();
+    c11->cd(3);
+    fh_trd_reco_signal_mom->Draw();
+    c11->cd(4);
+    fh_tof_reco_signal_mom->Draw();
     
 }
 
 
+
+
+
+
+void cut_eff() {
+
+TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.new.reco-sts.root");
+   //TString signalSt = "rho0"; //rho0, phi, omega
+    gStyle->SetHistLineWidth(3);
+    //SetStyles();
+    gROOT->SetStyle("Plain");
+    gStyle->SetPalette(1,0);
+
+Int_t Nbins = fh_tof_id_signal_minv->GetNbinsX();
+
+Double_t sum1_signal_tof = 0;
+Double_t sum1_signal_chi_prim  = 0;
+Double_t sum1_signal_gamma  = 0;
+Double_t sum1_signal_stcut  = 0;
+Double_t sum1_signal_ttcut  = 0;
+Double_t sum1_signal_apcut  = 0;
+Double_t sum1_signal_pt  = 0;
+Double_t sum1_signal_angle  = 0;
+
+Double_t sum1_bg_tof = 0;
+Double_t sum1_bg_chi_prim  = 0;
+Double_t sum1_bg_gamma  = 0;
+Double_t sum1_bg_stcut  = 0;
+Double_t sum1_bg_ttcut  = 0;
+Double_t sum1_bg_apcut  = 0;
+Double_t sum1_bg_pt  = 0;
+Double_t sum1_bg_angle  = 0;
+
+Double_t sum1_pi0_tof = 0;
+Double_t sum1_pi0_chi_prim  = 0;
+Double_t sum1_pi0_gamma  = 0;
+Double_t sum1_pi0_stcut  = 0;
+Double_t sum1_pi0_ttcut  = 0;
+Double_t sum1_pi0_apcut  = 0;
+Double_t sum1_pi0_pt  = 0;
+Double_t sum1_pi0_angle  = 0;
+
+Double_t sum1_eta_tof = 0;
+Double_t sum1_eta_chi_prim  = 0;
+Double_t sum1_eta_gamma  = 0;
+Double_t sum1_eta_stcut  = 0;
+Double_t sum1_eta_ttcut  = 0;
+Double_t sum1_eta_apcut  = 0;
+Double_t sum1_eta_pt  = 0;
+Double_t sum1_eta_angle  = 0;
+
+///// 0.2 - 1.
+
+Double_t sum2_signal_tof = 0;
+Double_t sum2_signal_chi_prim  = 0;
+Double_t sum2_signal_gamma  = 0;
+Double_t sum2_signal_stcut  = 0;
+Double_t sum2_signal_ttcut  = 0;
+Double_t sum2_signal_apcut  = 0;
+Double_t sum2_signal_pt  = 0;
+Double_t sum2_signal_angle  = 0;
+
+Double_t sum2_bg_tof = 0;
+Double_t sum2_bg_chi_prim  = 0;
+Double_t sum2_bg_gamma  = 0;
+Double_t sum2_bg_stcut  = 0;
+Double_t sum2_bg_ttcut  = 0;
+Double_t sum2_bg_apcut  = 0;
+Double_t sum2_bg_pt  = 0;
+Double_t sum2_bg_angle  = 0;
+
+Double_t sum2_pi0_tof = 0;
+Double_t sum2_pi0_chi_prim  = 0;
+Double_t sum2_pi0_gamma  = 0;
+Double_t sum2_pi0_stcut  = 0;
+Double_t sum2_pi0_ttcut  = 0;
+Double_t sum2_pi0_apcut  = 0;
+Double_t sum2_pi0_pt  = 0;
+Double_t sum2_pi0_angle  = 0;
+
+Double_t sum2_eta_tof = 0;
+Double_t sum2_eta_chi_prim  = 0;
+Double_t sum2_eta_gamma  = 0;
+Double_t sum2_eta_stcut  = 0;
+Double_t sum2_eta_ttcut  = 0;
+Double_t sum2_eta_apcut  = 0;
+Double_t sum2_eta_pt  = 0;
+Double_t sum2_eta_angle  = 0;
+
+/////// 1. - 2.
+Double_t sum3_signal_tof = 0;
+Double_t sum3_signal_chi_prim  = 0;
+Double_t sum3_signal_gamma  = 0;
+Double_t sum3_signal_stcut  = 0;
+Double_t sum3_signal_ttcut  = 0;
+Double_t sum3_signal_apcut  = 0;
+Double_t sum3_signal_pt  = 0;
+Double_t sum3_signal_angle  = 0;
+
+Double_t sum3_bg_tof = 0;
+Double_t sum3_bg_chi_prim  = 0;
+Double_t sum3_bg_gamma  = 0;
+Double_t sum3_bg_stcut  = 0;
+Double_t sum3_bg_ttcut  = 0;
+Double_t sum3_bg_apcut  = 0;
+Double_t sum3_bg_pt  = 0;
+Double_t sum3_bg_angle  = 0;
+
+Double_t sum3_pi0_tof = 0;
+Double_t sum3_pi0_chi_prim  = 0;
+Double_t sum3_pi0_gamma  = 0;
+Double_t sum3_pi0_stcut  = 0;
+Double_t sum3_pi0_ttcut  = 0;
+Double_t sum3_pi0_apcut  = 0;
+Double_t sum3_pi0_pt  = 0;
+Double_t sum3_pi0_angle  = 0;
+
+Double_t sum3_eta_tof = 0;
+Double_t sum3_eta_chi_prim  = 0;
+Double_t sum3_eta_gamma  = 0;
+Double_t sum3_eta_stcut  = 0;
+Double_t sum3_eta_ttcut  = 0;
+Double_t sum3_eta_apcut  = 0;
+Double_t sum3_eta_pt  = 0;
+Double_t sum3_eta_angle  = 0;
+
+for (Int_t i = 0; i < Nbins; i++){
+
+    Double_t binCenter = fh_tof_id_signal_minv->GetBinCenter(i);
+    if (binCenter > 0.0 && binCenter <= 0.2  ) continue;
+        {
+         sum1_signal_tof += (fh_tof_id_signal_minv->GetBinWidth(i)) * (fh_tof_id_signal_minv->GetBinContent(i));
+         sum1_signal_chi_prim += (fh_chi_prim_signal_minv->GetBinWidth(i)) * (fh_chi_prim_signal_minv->GetBinContent(i));
+         sum1_signal_gamma += (fh_gammacut_signal_minv->GetBinWidth(i)) * (fh_gammacut_signal_minv->GetBinContent(i)); 
+         sum1_signal_stcut += (fh_stcut_signal_minv->GetBinWidth(i)) * (fh_stcut_signal_minv->GetBinContent(i));
+         sum1_signal_ttcut += (fh_ttcut_signal_minv->GetBinWidth(i)) * (fh_ttcut_signal_minv->GetBinContent(i));
+         sum1_signal_apcut += (fh_apcut_signal_minv->GetBinWidth(i)) * (fh_apcut_signal_minv->GetBinContent(i));
+         sum1_signal_pt += (fh_ptcut_signal_minv->GetBinWidth(i)) * (fh_ptcut_signal_minv->GetBinContent(i));
+         sum1_signal_angle += (fh_anglecut_signal_minv->GetBinWidth(i)) * (fh_anglecut_signal_minv->GetBinContent(i));
+
+        //// BG
+        sum1_bg_tof += (fh_tof_id_bg_minv->GetBinWidth(i)) * (fh_tof_id_bg_minv->GetBinContent(i));
+        sum1_bg_chi_prim += (fh_chi_prim_bg_minv->GetBinWidth(i)) * (fh_chi_prim_bg_minv->GetBinContent(i));
+        sum1_bg_gamma += (fh_gammacut_bg_minv->GetBinWidth(i)) * (fh_gammacut_bg_minv->GetBinContent(i));
+        sum1_bg_stcut += (fh_stcut_bg_minv->GetBinWidth(i)) * (fh_stcut_bg_minv->GetBinContent(i));
+        sum1_bg_ttcut += (fh_ttcut_bg_minv->GetBinWidth(i)) * (fh_ttcut_bg_minv->GetBinContent(i));
+        sum1_bg_apcut += (fh_apcut_bg_minv->GetBinWidth(i)) * (fh_apcut_bg_minv->GetBinContent(i));
+        sum1_bg_pt += (fh_ptcut_bg_minv->GetBinWidth(i)) * (fh_ptcut_bg_minv->GetBinContent(i));
+        sum1_bg_angle += (fh_anglecut_bg_minv->GetBinWidth(i)) * (fh_anglecut_bg_minv->GetBinContent(i))
+
+        ////pi0
+        sum1_pi0_tof += (fh_tof_id_pi0_minv->GetBinWidth(i)) * (fh_tof_id_pi0_minv->GetBinContent(i));
+        sum1_pi0_chi_prim += (fh_chi_prim_pi0_minv->GetBinWidth(i)) * (fh_chi_prim_pi0_minv->GetBinContent(i));
+        sum1_pi0_gamma += (fh_gammacut_pi0_minv->GetBinWidth(i)) * (fh_gammacut_pi0_minv->GetBinContent(i));
+        sum1_pi0_stcut += (fh_stcut_pi0_minv->GetBinWidth(i)) * (fh_stcut_pi0_minv->GetBinContent(i));
+        sum1_pi0_ttcut += (fh_ttcut_pi0_minv->GetBinWidth(i)) * (fh_ttcut_pi0_minv->GetBinContent(i));
+        sum1_pi0_apcut += (fh_apcut_pi0_minv->GetBinWidth(i)) * (fh_apcut_pi0_minv->GetBinContent(i));
+        sum1_pi0_pt += (fh_ptcut_pi0_minv->GetBinWidth(i)) * (fh_ptcut_pi0_minv->GetBinContent(i));
+        sum1_pi0_angle += (fh_anglecut_pi0_minv->GetBinWidth(i)) * (fh_anglecut_pi0_minv->GetBinContent(i));
+
+        ////eta
+        sum1_eta_tof += (fh_tof_id_eta_minv->GetBinWidth(i)) * (fh_tof_id_eta_minv->GetBinContent(i));
+        sum1_eta_chi_prim += (fh_chi_prim_eta_minv->GetBinWidth(i)) * (fh_chi_prim_eta_minv->GetBinContent(i));
+        sum1_eta_gamma += (fh_gammacut_eta_minv->GetBinWidth(i)) * (fh_gammacut_eta_minv->GetBinContent(i));
+        sum1_eta_stcut += (fh_stcut_eta_minv->GetBinWidth(i)) * (fh_stcut_eta_minv->GetBinContent(i));
+        sum1_eta_ttcut += (fh_ttcut_eta_minv->GetBinWidth(i)) * (fh_ttcut_eta_minv->GetBinContent(i));
+        sum1_eta_apcut += (fh_apcut_eta_minv->GetBinWidth(i)) * (fh_apcut_eta_minv->GetBinContent(i));
+        sum1_eta_pt += (fh_ptcut_eta_minv->GetBinWidth(i)) * (fh_ptcut_eta_minv->GetBinContent(i));
+        sum1_eta_angle += (fh_anglecut_eta_minv->GetBinWidth(i)) * (fh_anglecut_eta_minv->GetBinContent(i));
+    }//if
+
+    if (binCenter <= 0.2 || binCenter > 1.) continue;
+    {
+         sum2_signal_tof += (fh_tof_id_signal_minv->GetBinWidth(i)) * (fh_tof_id_signal_minv->GetBinContent(i));
+         sum2_signal_chi_prim += (fh_chi_prim_signal_minv->GetBinWidth(i)) * (fh_chi_prim_signal_minv->GetBinContent(i));
+         sum2_signal_gamma += (fh_gammacut_signal_minv->GetBinWidth(i)) * (fh_gammacut_signal_minv->GetBinContent(i)); 
+         sum2_signal_stcut += (fh_stcut_signal_minv->GetBinWidth(i)) * (fh_stcut_signal_minv->GetBinContent(i));
+         sum2_signal_ttcut += (fh_ttcut_signal_minv->GetBinWidth(i)) * (fh_ttcut_signal_minv->GetBinContent(i));
+         sum2_signal_apcut += (fh_apcut_signal_minv->GetBinWidth(i)) * (fh_apcut_signal_minv->GetBinContent(i));
+         sum2_signal_pt += (fh_ptcut_signal_minv->GetBinWidth(i)) * (fh_ptcut_signal_minv->GetBinContent(i));
+         sum2_signal_angle += (fh_anglecut_signal_minv->GetBinWidth(i)) * (fh_anglecut_signal_minv->GetBinContent(i));
+
+        //// BG
+        sum2_bg_tof += (fh_tof_id_bg_minv->GetBinWidth(i)) * (fh_tof_id_bg_minv->GetBinContent(i));
+        sum2_bg_chi_prim += (fh_chi_prim_bg_minv->GetBinWidth(i)) * (fh_chi_prim_bg_minv->GetBinContent(i));
+        sum2_bg_gamma += (fh_gammacut_bg_minv->GetBinWidth(i)) * (fh_gammacut_bg_minv->GetBinContent(i));
+        sum2_bg_stcut += (fh_stcut_bg_minv->GetBinWidth(i)) * (fh_stcut_bg_minv->GetBinContent(i));
+        sum2_bg_ttcut += (fh_ttcut_bg_minv->GetBinWidth(i)) * (fh_ttcut_bg_minv->GetBinContent(i));
+        sum2_bg_apcut += (fh_apcut_bg_minv->GetBinWidth(i)) * (fh_apcut_bg_minv->GetBinContent(i));
+        sum2_bg_pt += (fh_ptcut_bg_minv->GetBinWidth(i)) * (fh_ptcut_bg_minv->GetBinContent(i));
+        sum2_bg_angle += (fh_anglecut_bg_minv->GetBinWidth(i)) * (fh_anglecut_bg_minv->GetBinContent(i))
+
+        ////pi0
+        sum2_pi0_tof += (fh_tof_id_pi0_minv->GetBinWidth(i)) * (fh_tof_id_pi0_minv->GetBinContent(i));
+        sum2_pi0_chi_prim += (fh_chi_prim_pi0_minv->GetBinWidth(i)) * (fh_chi_prim_pi0_minv->GetBinContent(i));
+        sum2_pi0_gamma += (fh_gammacut_pi0_minv->GetBinWidth(i)) * (fh_gammacut_pi0_minv->GetBinContent(i));
+        sum2_pi0_stcut += (fh_stcut_pi0_minv->GetBinWidth(i)) * (fh_stcut_pi0_minv->GetBinContent(i));
+        sum2_pi0_ttcut += (fh_ttcut_pi0_minv->GetBinWidth(i)) * (fh_ttcut_pi0_minv->GetBinContent(i));
+        sum2_pi0_apcut += (fh_apcut_pi0_minv->GetBinWidth(i)) * (fh_apcut_pi0_minv->GetBinContent(i));
+        sum2_pi0_pt += (fh_ptcut_pi0_minv->GetBinWidth(i)) * (fh_ptcut_pi0_minv->GetBinContent(i));
+        sum2_pi0_angle += (fh_anglecut_pi0_minv->GetBinWidth(i)) * (fh_anglecut_pi0_minv->GetBinContent(i));
+
+        ////eta
+        sum2_eta_tof += (fh_tof_id_eta_minv->GetBinWidth(i)) * (fh_tof_id_eta_minv->GetBinContent(i));
+        sum2_eta_chi_prim += (fh_chi_prim_eta_minv->GetBinWidth(i)) * (fh_chi_prim_eta_minv->GetBinContent(i));
+        sum2_eta_gamma += (fh_gammacut_eta_minv->GetBinWidth(i)) * (fh_gammacut_eta_minv->GetBinContent(i));
+        sum2_eta_stcut += (fh_stcut_eta_minv->GetBinWidth(i)) * (fh_stcut_eta_minv->GetBinContent(i));
+        sum2_eta_ttcut += (fh_ttcut_eta_minv->GetBinWidth(i)) * (fh_ttcut_eta_minv->GetBinContent(i));
+        sum2_eta_apcut += (fh_apcut_eta_minv->GetBinWidth(i)) * (fh_apcut_eta_minv->GetBinContent(i));
+        sum2_eta_pt += (fh_ptcut_eta_minv->GetBinWidth(i)) * (fh_ptcut_eta_minv->GetBinContent(i));
+        sum2_eta_angle += (fh_anglecut_eta_minv->GetBinWidth(i)) * (fh_anglecut_eta_minv->GetBinContent(i));
+
+
+    }//if
+
+    if (binCenter <= 1. || binCenter > 2.) continue;
+    {
+         sum3_signal_tof += (fh_tof_id_signal_minv->GetBinWidth(i)) * (fh_tof_id_signal_minv->GetBinContent(i));
+         sum3_signal_chi_prim += (fh_chi_prim_signal_minv->GetBinWidth(i)) * (fh_chi_prim_signal_minv->GetBinContent(i));
+         sum3_signal_gamma += (fh_gammacut_signal_minv->GetBinWidth(i)) * (fh_gammacut_signal_minv->GetBinContent(i)); 
+         sum3_signal_stcut += (fh_stcut_signal_minv->GetBinWidth(i)) * (fh_stcut_signal_minv->GetBinContent(i));
+         sum3_signal_ttcut += (fh_ttcut_signal_minv->GetBinWidth(i)) * (fh_ttcut_signal_minv->GetBinContent(i));
+         sum3_signal_apcut += (fh_apcut_signal_minv->GetBinWidth(i)) * (fh_apcut_signal_minv->GetBinContent(i));
+         sum3_signal_pt += (fh_ptcut_signal_minv->GetBinWidth(i)) * (fh_ptcut_signal_minv->GetBinContent(i));
+         sum3_signal_angle += (fh_anglecut_signal_minv->GetBinWidth(i)) * (fh_anglecut_signal_minv->GetBinContent(i));
+
+        //// BG
+        sum3_bg_tof += (fh_tof_id_bg_minv->GetBinWidth(i)) * (fh_tof_id_bg_minv->GetBinContent(i));
+        sum3_bg_chi_prim += (fh_chi_prim_bg_minv->GetBinWidth(i)) * (fh_chi_prim_bg_minv->GetBinContent(i));
+        sum3_bg_gamma += (fh_gammacut_bg_minv->GetBinWidth(i)) * (fh_gammacut_bg_minv->GetBinContent(i));
+        sum3_bg_stcut += (fh_stcut_bg_minv->GetBinWidth(i)) * (fh_stcut_bg_minv->GetBinContent(i));
+        sum3_bg_ttcut += (fh_ttcut_bg_minv->GetBinWidth(i)) * (fh_ttcut_bg_minv->GetBinContent(i));
+        sum3_bg_apcut += (fh_apcut_bg_minv->GetBinWidth(i)) * (fh_apcut_bg_minv->GetBinContent(i));
+        sum3_bg_pt += (fh_ptcut_bg_minv->GetBinWidth(i)) * (fh_ptcut_bg_minv->GetBinContent(i));
+        sum3_bg_angle += (fh_anglecut_bg_minv->GetBinWidth(i)) * (fh_anglecut_bg_minv->GetBinContent(i))
+
+        ////pi0
+        sum3_pi0_tof += (fh_tof_id_pi0_minv->GetBinWidth(i)) * (fh_tof_id_pi0_minv->GetBinContent(i));
+        sum3_pi0_chi_prim += (fh_chi_prim_pi0_minv->GetBinWidth(i)) * (fh_chi_prim_pi0_minv->GetBinContent(i));
+        sum3_pi0_gamma += (fh_gammacut_pi0_minv->GetBinWidth(i)) * (fh_gammacut_pi0_minv->GetBinContent(i));
+        sum3_pi0_stcut += (fh_stcut_pi0_minv->GetBinWidth(i)) * (fh_stcut_pi0_minv->GetBinContent(i));
+        sum3_pi0_ttcut += (fh_ttcut_pi0_minv->GetBinWidth(i)) * (fh_ttcut_pi0_minv->GetBinContent(i));
+        sum3_pi0_apcut += (fh_apcut_pi0_minv->GetBinWidth(i)) * (fh_apcut_pi0_minv->GetBinContent(i));
+        sum3_pi0_pt += (fh_ptcut_pi0_minv->GetBinWidth(i)) * (fh_ptcut_pi0_minv->GetBinContent(i));
+        sum3_pi0_angle += (fh_anglecut_pi0_minv->GetBinWidth(i)) * (fh_anglecut_pi0_minv->GetBinContent(i));
+
+        ////eta
+        sum3_eta_tof += (fh_tof_id_eta_minv->GetBinWidth(i)) * (fh_tof_id_eta_minv->GetBinContent(i));
+        sum3_eta_chi_prim += (fh_chi_prim_eta_minv->GetBinWidth(i)) * (fh_chi_prim_eta_minv->GetBinContent(i));
+        sum3_eta_gamma += (fh_gammacut_eta_minv->GetBinWidth(i)) * (fh_gammacut_eta_minv->GetBinContent(i));
+        sum3_eta_stcut += (fh_stcut_eta_minv->GetBinWidth(i)) * (fh_stcut_eta_minv->GetBinContent(i));
+        sum3_eta_ttcut += (fh_ttcut_eta_minv->GetBinWidth(i)) * (fh_ttcut_eta_minv->GetBinContent(i));
+        sum3_eta_apcut += (fh_apcut_eta_minv->GetBinWidth(i)) * (fh_apcut_eta_minv->GetBinContent(i));
+        sum3_eta_pt += (fh_ptcut_eta_minv->GetBinWidth(i)) * (fh_ptcut_eta_minv->GetBinContent(i));
+        sum3_eta_angle += (fh_anglecut_eta_minv->GetBinWidth(i)) * (fh_anglecut_eta_minv->GetBinContent(i));
+    
+    } // if
+
+    }//for
+    //////////signal
+    Double_t sum1 = sum1_signal_tof + sum1_pi0_tof + sum1_eta_tof;
+
+    Double_t eff1_tof = sum1 / sum1;
+    Double_t eff1_chi = (sum1_signal_chi_prim + sum1_pi0_chi_prim + sum1_eta_chi_prim) / sum1;
+cout << "chi1 signal = " << sum1_signal_chi_prim << "; pi0 = " << sum1_pi0_chi_prim << "; eta = "<< sum1_eta_chi_prim << endl;
+    Double_t eff1_gamma = (sum1_signal_gamma + sum1_pi0_gamma + sum1_eta_gamma) / sum1;
+    Double_t eff1_stcut = (sum1_signal_stcut + sum1_pi0_stcut + sum1_eta_stcut) / sum1;
+    Double_t eff1_ttcut = (sum1_signal_ttcut + sum1_pi0_ttcut + sum1_eta_ttcut) / sum1;
+    Double_t eff1_apcut = (sum1_signal_apcut + sum1_pi0_apcut + sum1_eta_apcut) / sum1;
+    Double_t eff1_pt = (sum1_signal_pt + sum1_pi0_pt + sum1_eta_pt) / sum1;
+    Double_t eff1_angle = (sum1_signal_angle + sum1_pi0_angle + sum1_eta_angle) / sum1;
+
+    Double_t sum2 = sum2_signal_tof + sum2_pi0_tof + sum2_eta_tof;
+    Double_t eff2_tof = sum2 / sum2;
+    Double_t eff2_chi = (sum2_signal_chi_prim + sum2_pi0_chi_prim + sum2_eta_chi_prim) / sum2;
+cout << "chi2 signal = " << sum2_signal_chi_prim << "; pi0 = " << sum2_pi0_chi_prim << "; eta = "<< sum2_eta_chi_prim << endl;
+    Double_t eff2_gamma = (sum2_signal_gamma + sum2_pi0_gamma + sum2_eta_gamma) / sum2;
+    Double_t eff2_stcut = (sum2_signal_stcut + sum2_pi0_stcut + sum2_eta_stcut) / sum2;
+    Double_t eff2_ttcut = (sum2_signal_ttcut + sum2_pi0_ttcut + sum2_eta_ttcut) / sum2;
+    Double_t eff2_apcut = (sum2_signal_apcut + sum2_pi0_apcut + sum2_eta_apcut) / sum2;
+    Double_t eff2_pt = (sum2_signal_pt + sum2_pi0_pt + sum2_eta_pt) / sum2;
+    Double_t eff2_angle = (sum2_signal_angle + sum2_pi0_angle + sum2_eta_angle) / sum2;
+
+    Double_t sum3 = sum3_signal_tof + sum3_pi0_tof + sum3_eta_tof;
+    Double_t eff3_tof = sum3 / sum3;
+    Double_t eff3_chi = (sum3_signal_chi_prim + sum3_pi0_chi_prim + sum3_eta_chi_prim) / sum3;
+cout << "chi3  signal = " << sum3_signal_chi_prim << "; pi0 = " << sum3_pi0_chi_prim << "; eta = "<< sum3_eta_chi_prim << endl;
+    Double_t eff3_gamma = (sum3_signal_gamma + sum3_pi0_gamma + sum3_eta_gamma) / sum3;
+    Double_t eff3_stcut = (sum3_signal_stcut + sum3_pi0_stcut + sum3_eta_stcut) / sum3;
+    Double_t eff3_ttcut = (sum3_signal_ttcut + sum3_pi0_ttcut + sum3_eta_ttcut) / sum3;
+    Double_t eff3_apcut = (sum3_signal_apcut + sum3_pi0_apcut + sum3_eta_apcut) / sum3;
+    Double_t eff3_pt = (sum3_signal_pt + sum3_pi0_pt + sum3_eta_pt) / sum3;
+    Double_t eff3_angle = (sum3_signal_angle + sum3_pi0_angle + sum3_eta_angle) / sum3;
+    
+
+    /////////BG
+    Double_t eff1_bg_tof = sum1_bg_tof /  sum1_bg_tof;
+    Double_t eff1_bg_chi = sum1_bg_chi_prim / sum1_bg_tof;
+    Double_t eff1_bg_gamma = sum1_bg_gamma / sum1_bg_tof;
+    Double_t eff1_bg_stcut = sum1_bg_stcut / sum1_bg_tof;
+    Double_t eff1_bg_ttcut = sum1_bg_ttcut / sum1_bg_tof;
+    Double_t eff1_bg_apcut = sum1_bg_apcut / sum1_bg_tof;
+    Double_t eff1_bg_pt = sum1_bg_pt / sum1_bg_tof;
+    Double_t eff1_bg_angle = sum1_bg_angle / sum1_bg_tof;
+    
+    Double_t eff2_bg_tof = sum2_bg_tof /  sum2_bg_tof;
+    Double_t eff2_bg_chi = sum2_bg_chi_prim / sum2_bg_tof;
+    Double_t eff2_bg_gamma = sum2_bg_gamma / sum2_bg_tof;
+    Double_t eff2_bg_stcut = sum2_bg_stcut / sum2_bg_tof;
+    Double_t eff2_bg_ttcut = sum2_bg_ttcut / sum2_bg_tof;
+    Double_t eff2_bg_apcut = sum2_bg_apcut / sum2_bg_tof;
+    Double_t eff2_bg_pt = sum2_bg_pt / sum2_bg_tof;
+    Double_t eff2_bg_angle = sum2_bg_angle / sum2_bg_tof;
+
+    Double_t eff3_bg_tof = sum3_bg_tof /  sum3_bg_tof;
+    Double_t eff3_bg_chi = sum3_bg_chi_prim / sum3_bg_tof;
+    Double_t eff3_bg_gamma = sum3_bg_gamma / sum3_bg_tof;
+    Double_t eff3_bg_stcut = sum3_bg_stcut / sum3_bg_tof;
+    Double_t eff3_bg_ttcut = sum3_bg_ttcut / sum3_bg_tof;
+    Double_t eff3_bg_apcut = sum3_bg_apcut / sum3_bg_tof;
+    Double_t eff3_bg_pt = sum3_bg_pt / sum3_bg_tof;
+    Double_t eff3_bg_angle = sum3_bg_angle / sum3_bg_tof;
+
+//////// 0.0 - 0.2 
+    Float_t Yaxis1[8];
+    Yaxis1[0] = eff1_tof;
+    Yaxis1[1] = eff1_chi;
+    Yaxis1[2] = eff1_gamma;
+    Yaxis1[3] = eff1_stcut;
+    Yaxis1[4] = eff1_ttcut;
+    Yaxis1[5] = eff1_apcut;
+    Yaxis1[6] = eff1_pt;
+    Yaxis1[7] = eff1_angle;
+
+    Float_t yaxis1[8];
+    yaxis1[0] = eff1_bg_tof;
+    yaxis1[1] = eff1_bg_chi;
+    yaxis1[2] = eff1_bg_gamma;
+    yaxis1[3] = eff1_bg_stcut;
+    yaxis1[4] = eff1_bg_ttcut;
+    yaxis1[5] = eff1_bg_apcut;
+    yaxis1[6] = eff1_bg_pt;
+    yaxis1[7] = eff1_bg_angle;
+
+/////// 0.2 -1.
+    Float_t Yaxis2[8];
+    Yaxis2[0] = eff2_tof;
+    Yaxis2[1] = eff2_chi;
+    Yaxis2[2] = eff2_gamma;
+    Yaxis2[3] = eff2_stcut;
+    Yaxis2[4] = eff2_ttcut;
+    Yaxis2[5] = eff2_apcut;
+    Yaxis2[6] = eff2_pt;
+    Yaxis2[7] = eff2_angle;
+
+    Float_t yaxis2[8];
+    yaxis2[0] = eff2_bg_tof;
+    yaxis2[1] = eff2_bg_chi;
+    yaxis2[2] = eff2_bg_gamma;
+    yaxis2[3] = eff2_bg_stcut;
+    yaxis2[4] = eff2_bg_ttcut;
+    yaxis2[5] = eff2_bg_apcut;
+    yaxis2[6] = eff2_bg_pt;
+    yaxis2[7] = eff2_bg_angle;
+//////// 1. - 2.
+    Float_t Yaxis3[8];
+    Yaxis3[0] = eff3_tof;
+    Yaxis3[1] = eff3_chi;
+    Yaxis3[2] = eff3_gamma;
+    Yaxis3[3] = eff3_stcut;
+    Yaxis3[4] = eff3_ttcut;
+    Yaxis3[5] = eff3_apcut;
+    Yaxis3[6] = eff3_pt;
+    Yaxis3[7] = eff3_angle;
+
+    Float_t yaxis3[8];
+    yaxis3[0] = eff3_bg_tof;
+    yaxis3[1] = eff3_bg_chi;
+    yaxis3[2] = eff3_bg_gamma;
+    yaxis3[3] = eff3_bg_stcut;
+    yaxis3[4] = eff3_bg_ttcut;
+    yaxis3[5] = eff3_bg_apcut;
+    yaxis3[6] = eff3_bg_pt;
+    yaxis3[7] = eff3_bg_angle;
+/////////
+
+
+    Float_t x[8] = {0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5};
+    Int_t n = 8;
+
+    TCanvas* can = new TCanvas ("can", "", 158,28,900,918);
+    TGraph* gr1_signal = new TGraph(n, x, Yaxis1);
+    TGraph* gr1_bg = new TGraph(n, x, yaxis1);
+    gr1_signal->SetLineColor(kRed);
+    gr1_bg->SetLineColor(kBlue);
+    gr1_signal->SetMarkerStyle(29);
+    gr1_bg->SetMarkerStyle(29);
+    gr1_signal->SetMarkerColor(kRed);
+    gr1_bg->SetMarkerColor(kBlue);
+    gr1_signal->Draw("APL");
+    gr1_bg->Draw("PL");
+
+    TLegend* leg = new TLegend(0.65,0.6,1., 1.);
+    leg->AddEntry(gr1_signal, "signal", "l");
+    leg->AddEntry(gr1_bg, "BG", "l");
+    leg->Draw();
+    
+/////canvas 2
+    TCanvas* can1 = new TCanvas ("can1", "", 158,28,900,918);
+    TGraph* gr2_signal = new TGraph(n, x, Yaxis2);
+    TGraph* gr2_bg = new TGraph(n, x, yaxis2);
+    gr2_signal->SetLineColor(kRed);
+    gr2_bg->SetLineColor(kBlue);
+    gr2_signal->SetMarkerStyle(29);
+    gr2_bg->SetMarkerStyle(29);
+    gr2_signal->SetMarkerColor(kRed);
+    gr2_bg->SetMarkerColor(kBlue);
+    gr2_signal->Draw("APL");
+    gr2_bg->Draw("PL");
+
+    TLegend* leg2 = new TLegend(0.65,0.6,1., 1.);
+    leg2->AddEntry(gr2_signal, "signal", "l");
+    leg2->AddEntry(gr2_bg, "BG", "l");
+    leg2->Draw();
+
+/////canvas 3
+    TCanvas* can2 = new TCanvas ("can2", "", 158,28,900,918);
+    TGraph* gr3_signal = new TGraph(n, x, Yaxis3);
+    TGraph* gr3_bg = new TGraph(n, x, yaxis3);
+    gr3_signal->SetLineColor(kRed);
+    gr3_bg->SetLineColor(kBlue);
+    gr3_signal->SetMarkerStyle(29);
+    gr3_bg->SetMarkerStyle(29);
+    gr3_signal->SetMarkerColor(kRed);
+    gr3_bg->SetMarkerColor(kBlue);
+    gr3_signal->Draw("APL");
+    gr3_bg->Draw("PL");
+
+    TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
+    leg3->AddEntry(gr3_signal, "signal", "l");
+    leg3->AddEntry(gr3_bg, "BG", "l");
+    leg3->Draw();
+
+}

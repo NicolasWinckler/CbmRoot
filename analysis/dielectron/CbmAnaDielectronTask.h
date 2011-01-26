@@ -225,6 +225,12 @@ private:
     TH1D* fh_stcut_signal_mom;
     TH1D* fh_apcut_signal_mom;
 
+//////////
+   TH1D*  fh_sts_reco_signal_mom;
+   TH1D*  fh_rich_reco_signal_mom; 
+   TH1D*  fh_trd_reco_signal_mom;
+   TH1D*  fh_tof_reco_signal_mom;
+//////////
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+

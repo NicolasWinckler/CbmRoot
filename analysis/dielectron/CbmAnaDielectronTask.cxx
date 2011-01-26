@@ -116,6 +116,14 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_ttcut_signal_mom = new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_stcut_signal_mom = new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_apcut_signal_mom = new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+///////
+    fh_sts_reco_signal_mom  = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_signal_mom = new TH1D("fh_trd_reco_signal_mom","fh_trd_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tof_reco_signal_mom = new TH1D("fh_tof_reco_signal_mom","fh_tof_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+//////
     
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
@@ -697,7 +705,12 @@ void CbmAnaDielectronTask::FillCandidateArray()
         cand.energy   = sqrt(cand.momentum.Mag2() + cand.mass * cand.mass);
         cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) /
                     (cand.energy - cand.momentum.Z()));
-       
+
+        Int_t pdg = TMath::Abs( mcTrack1->GetPdgCode() );
+        Int_t motherId = mcTrack1->GetMotherId();
+        cand.MCMotherId = motherId;
+        if (pdg == 11 && motherId == -1) fh_sts_reco_signal_mom->Fill(cand.momentum.Mag());
+
 
 // RICH
 	    cand.richInd = gTrack->GetRichRingIndex();
@@ -733,8 +746,9 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
 			}
 	    }
-
+        fh_rich_reco_signal_mom->Fill(cand.momentum.Mag());
         IsRichElectron(richRing, cand.momentum.Mag(), &cand);
+        
 
 // TRD
         cand.trdInd = gTrack->GetTrdTrackIndex();
@@ -748,7 +762,9 @@ void CbmAnaDielectronTask::FillCandidateArray()
         CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMCTrackId);
         if (mcTrack3 == NULL) continue;
 
+        fh_trd_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTrdElectron(trdTrack, &cand);
+        
   
 // ToF
         cand.tofInd = gTrack->GetTofHitIndex();
@@ -764,7 +780,10 @@ void CbmAnaDielectronTask::FillCandidateArray()
         CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMCTrackId);
         if (mcTrack4 == NULL) continue;
 
-        IsTofElectron(gTrack, cand.momentum.Mag(), &cand);  
+        fh_tof_reco_signal_mom->Fill(cand.momentum.Mag());
+        IsTofElectron(gTrack, cand.momentum.Mag(), &cand);
+
+        
 
         fCandidates.push_back(cand);
 
@@ -1619,6 +1638,12 @@ void CbmAnaDielectronTask::Finish()
     fh_ttcut_signal_mom->Scale(scale);
     fh_stcut_signal_mom->Scale(scale);
     fh_apcut_signal_mom->Scale(scale);
+////
+    fh_sts_reco_signal_mom->Scale(scale);
+    fh_rich_reco_signal_mom->Scale(scale);
+    fh_trd_reco_signal_mom->Scale(scale);
+    fh_tof_reco_signal_mom->Scale(scale);
+////
 
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
@@ -1760,6 +1785,12 @@ void CbmAnaDielectronTask::Finish()
     fh_stcut_signal_mom->Write();
     fh_apcut_signal_mom->Write();
 
+/////
+    fh_sts_reco_signal_mom->Write();
+    fh_rich_reco_signal_mom ->Write();
+    fh_trd_reco_signal_mom->Write();
+    fh_tof_reco_signal_mom->Write();
+/////
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();
 

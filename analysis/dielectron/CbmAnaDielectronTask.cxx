@@ -751,7 +751,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 	    }
         fh_rich_reco_signal_mom->Fill(cand.momentum.Mag());
         IsRichElectron(richRing, cand.momentum.Mag(), &cand);
-        if (cand.isRichElectron = true) fh_richID_signal_mom->Fill(cand.momentum.Mag());
+	if (cand.isRichElectron = true) {fh_richID_signal_mom->Fill(cand.momentum.Mag()); }
         
 
 // TRD
@@ -768,7 +768,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
         fh_trd_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTrdElectron(trdTrack, &cand);
-        if (cand.isTrdElectron = true) fh_trdID_signal_mom->Fill(cand.momentum.Mag());
+	if (cand.isTrdElectron = true) {fh_trdID_signal_mom->Fill(cand.momentum.Mag());}
         
   
 // ToF
@@ -787,7 +787,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
         fh_tof_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTofElectron(gTrack, cand.momentum.Mag(), &cand);
-        if (cand.isTofElectron = true) fh_tofID_signal_mom->Fill(cand.momentum.Mag());
+	if (cand.isTofElectron = true) {fh_tofID_signal_mom->Fill(cand.momentum.Mag());}
 
         
 

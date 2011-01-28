@@ -1,5 +1,5 @@
 void runEpochTestDraw(){
-  TString histoFileName = "data/histo_epoch.root";
+  TString histoFileName = "data/histo_epoch.1MHz.root";
   TFile* histoFile = TFile::Open(histoFileName);
   TH1D* hStsTimeFull     = (TH1D*) histoFile->Get("hStsTimeFull");
   TH1D* hStsTimeCentral  = (TH1D*) histoFile->Get("hStsTimeCentral");

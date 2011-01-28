@@ -28,14 +28,14 @@
 // -----   Default constructor   -------------------------------------------
 CbmAnaTimingMuchDigitizer::CbmAnaTimingMuchDigitizer():
   fEvent(0),fDigiFile("much_digi.root"),fHistoName("histo.root"),
-  fGeoScheme(CbmMuchGeoScheme::Instance()),fModuleId(0),fSectorId(0),fChannelId(0)
+  fGeoScheme(CbmMuchGeoScheme::Instance()),fModuleId(0),fSectorId(0),fChannelId(0),fEpoch(1)
 {}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmAnaTimingMuchDigitizer::CbmAnaTimingMuchDigitizer(const char* name, TString digiFile, TString histoName):
   FairTask(name),fEvent(0),fDigiFile(digiFile),fHistoName(histoName),
-  fGeoScheme(CbmMuchGeoScheme::Instance()),fModuleId(0),fSectorId(0),fChannelId(0)
+  fGeoScheme(CbmMuchGeoScheme::Instance()),fModuleId(0),fSectorId(0),fChannelId(0),fEpoch(1)
 {}
 // -------------------------------------------------------------------------
 
@@ -70,7 +70,10 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   
   fMuchDigis       = (TClonesArray*) fManager->GetObject("MuchDigi");
   fMuchDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
-  fMcEpoch         = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
+  if (fEpoch)
+    fMcEpoch         = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
+  else 
+    fMuchPoints   = (TClonesArray*) fManager->GetObject("MuchPoint");
   
 //  fMCTracks = new TClonesArray("CbmMCTrack");
 //  fMcChain->SetBranchAddress("MCTrack",&fMCTracks);
@@ -127,7 +130,7 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
-  fMuchPoints = fMcEpoch->GetPoints(kMUCH);
+  if (fEpoch) fMuchPoints = fMcEpoch->GetPoints(kMUCH);
   
   Int_t nMuchPoints = fMuchPoints ? fMuchPoints->GetEntriesFast() : 0;
   Int_t nMuchDigis  = fMuchDigis  ? fMuchDigis->GetEntriesFast() : 0;
@@ -226,9 +229,6 @@ void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
 
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaTimingMuchDigitizer::Finish(){
-  TFile* f = new TFile(fHistoName.Data(),"RECREATE");
-//  fDetEventTime->Write();
-  f->Close();
 
 //  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,fModuleId);
 //  Double_t r    = module->GetCutRadius();
@@ -365,6 +365,7 @@ void CbmAnaTimingMuchDigitizer::Finish(){
   c10->Divide(5,3);
   
 
+  TFile* f = new TFile(fHistoName.Data(),"RECREATE");
   for (Int_t i=0;i<5;i++){
     fhStationTotalR[i]->Sumw2();
     fhStationFoundR[i]->Sumw2();
@@ -381,8 +382,19 @@ void CbmAnaTimingMuchDigitizer::Finish(){
     gPad->SetGridx(0);
     gPad->SetGridy(0);
     fhStationEffR[i]->Draw();
+    fhStationTotalR[i]->Write();
+    fhStationFoundR[i]->Write();   
+    fhStationEffR[i]->Write();
+    
   }
   c10->cd();
+  fhChannelT->Write();
+  fhPointT->Write();
+  fhModuleT->Write();
+
+//  fDetEventTime->Write();
+  f->Close();
+
 }
 // -------------------------------------------------------------------------
 

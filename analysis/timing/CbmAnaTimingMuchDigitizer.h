@@ -27,6 +27,7 @@ public:
   void SetChannelId(Int_t id) { fChannelId = id; }
   void SetSectorId(Int_t id) {fSectorId = id; }
   void SetModuleId(Int_t id) {fModuleId = id; }
+  void SetEpoch(Bool_t epoch) {fEpoch = epoch; }
   
 private:
   Int_t         fEvent;             //!
@@ -55,6 +56,7 @@ private:
   Int_t fChannelId;
   Int_t fSectorId;
   Int_t fModuleId;
+  Bool_t fEpoch;
   ClassDef(CbmAnaTimingMuchDigitizer,1)
 };
 

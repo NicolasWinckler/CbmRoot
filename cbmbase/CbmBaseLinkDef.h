@@ -7,12 +7,7 @@
 #pragma link C++ class CbmDetectorList+;
 
 #pragma link C++ class CbmDigiManager+;
-//#pragma link C++ class CbmMCTrack+;
-#pragma link C++ class CbmPrimaryGenerator+;
 #pragma link C++ class CbmPropagator+;
-//#pragma link C++ class CbmStack+;
-//#pragma link C++ class CbmTrack+;
-//#pragma link C++ class CbmTrkHit+;
 #pragma link C++ class CbmTrdTrackFitter+;
 #pragma link C++ class CbmTrdTrackFinder+;
 

@@ -30,7 +30,6 @@ set(CBMBASE_SRCS
 CbmDetectorList.cxx
 
 CbmDigiManager.cxx
-CbmPrimaryGenerator.cxx
 CbmPropagator.cxx
 
 CbmTrdTrackFinder.cxx  

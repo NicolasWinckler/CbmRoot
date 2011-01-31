@@ -28,7 +28,7 @@ CbmTrack.cxx
 CbmTrackMatch.cxx
 
 CbmMCEpoch.cxx
-CbmMCEvent.cxx
+CbmMCEventHeader.cxx
 CbmMCTrack.cxx
 
 mvd/CbmMvdCluster.cxx 

@@ -5,6 +5,7 @@
 #include "FairVolume.h"
 #include "FairTask.h"
 #include "CbmStsPoint.h"
+#include "CbmMCTrack.h"
 #include "CbmStsJointTrack.h"
 #include "CbmStsHit.h"
 #include "TParticle.h"
@@ -222,13 +223,15 @@ void CbmStsCandidTracker::CheckTracks() {
     tr_pdg = gtrack->GetPdgCode();
     track->SetPid(tr_pdg);
 
-    parent = gtrack->GetMotherID();
+    parent = gtrack->GetMotherId();
     if(parent == -1) track->ComesFromMainVertex(kTRUE);
 
-    TVector3 vertex = gtrack->GetStartVertex();
+    TVector3 vertex;
+    gtrack->GetStartVertex(vertex);
     track->SetVertex(vertex.X(), vertex.Y(), vertex.Z());
 
-    TVector3 moment = gtrack->GetMomentum();
+    TVector3 moment;
+    gtrack->GetMomentum(moment);
     track->SetPx(moment.X());
     track->SetPy(moment.Y());
     track->SetPz(moment.Z());

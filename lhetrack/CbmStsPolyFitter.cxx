@@ -16,11 +16,15 @@
 #include "CbmStsPolyFitter.h"
 #include "CbmStsTrack.h"
 #include "CbmStsJointTrack.h"
-#include "CbmField.h"
+#include "FairField.h"
 #include "FairMCApplication.h"
 #include "CbmStsMassHypothesis.h"
 #include "FairRunAna.h"
 
+#include <iostream>
+#include <cmath>
+using std::cout;
+using std::endl;
 
 Double_t M[4] = {0.511, 139.57, 493.68, 938.27};
 
@@ -77,11 +81,11 @@ InitStatus CbmStsPolyFitter::Init() {
   
   FairRunAna *fRun=FairRunAna::Instance();
   fField = 0x0;
-      //(CbmField*) fRun->GetField();
+      //(FairField*) fRun->GetField();
 
 
   //  Now reconstruct the field in Memory:
-  //  CbmField *fMap = dynamic_cast< CbmField *> (fField);
+  //  FairField *fMap = dynamic_cast< FairField *> (fField);
 //  fMap->Init();
 
   zPlane[0] = 5.0;  
@@ -244,12 +248,14 @@ void CbmStsPolyFitter::Output(CbmStsJointTrack *track) {
 
   for (Int_t k = TrHits->GetEntries(); --k >= 0.; ) {
     hit = (CbmStsHit *)TrHits->At(k);      
-    if(hit->GetStation() < 4){
-      out->AddMapsHit(hit->GetHitNumber(),(CbmStsMapsHit *) hit);
-    }
-    else {
-      out->AddStripHit(hit->GetHitNumber(), (CbmStsStripHit *) hit);
-    }
+//    if(hit->GetStation() < 4){
+//      out->AddMapsHit(hit->GetHitNumber(),(CbmStsMapsHit *) hit);
+      out->AddStsHit(hit->GetHitNumber(),(FairHit *) hit);
+//    }
+//    else {
+//      out->AddStripHit(hit->GetHitNumber(), (CbmStsStripHit *) hit);
+//      out->AddStsHit(hit->GetHitNumber(), (CbmStsStripHit *) hit);
+//    }
   }
 
   if(fOption.Contains("fit")) {

@@ -82,7 +82,7 @@ InitStatus CbmStsCMTrackFinder::Init() {
 
   fCMTracks = new TObjArray(2000);
 
-  fNumOfStation = 7;                   // The number of stations
+  fNumOfStation = 8;                   // The number of stations
   fMaxSTStation = fNumOfStation;
   fMergedSplits = 0;
   fExtendedTracks = 0;

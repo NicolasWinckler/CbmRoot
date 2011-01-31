@@ -18,7 +18,7 @@
 #pragma link C++ class  CbmStsPolyFitter+;
 #pragma link C++ class  CbmStsTrackletCuts+;
 #pragma link C++ class  CbmStsTrackCuts+;
-#pragma link C++ class  CbmStsMapsStripTracker+;
+//#pragma link C++ class  CbmStsMapsStripTracker+;
 #pragma link C++ class  CbmStsCMTrackFinder+;
 
 #endif

@@ -7,6 +7,7 @@
 
 #include "CbmStsHit.h"
 #include "CbmStsCMPoint.h"
+#include "TMath.h"
 #include <Riostream.h>
 
 ClassImp(CbmStsCMPoint)

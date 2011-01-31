@@ -83,6 +83,7 @@ void  CbmStsSegments::FillSegments(TObjArray *fCMHits) {
     h->Setup(fVertex);
     h->SetUsage(kFALSE);
     Int_t iseg = GetSegm(GetStationSegm(h), GetBetaSegm(h), GetAlphaSegm(h));
+    cout<<"Hit: "<<i<<endl;
     ((TObjArray *)fSegments->At(iseg))->AddLast(h);
 
   }

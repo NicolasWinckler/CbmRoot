@@ -3,7 +3,7 @@
 
 #include "FairTask.h"
 #include "CbmStsJointTrack.h"
-#include "CbmField.h"
+#include "FairField.h"
 #include "TRefArray.h"
 
 //#include "fstream.h"
@@ -17,7 +17,7 @@ protected:
                             //  = 1 -> fit into 1-st hit
                             //  =<0 -> not fitted
 
-  CbmField *fField;   //  
+  FairField *fField;   //  
 
   TClonesArray *fHits;      //  array of hits on the track
   TClonesArray *fTracks;    //

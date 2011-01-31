@@ -95,6 +95,7 @@ public:
     void DifferenceSignalAndBg();
     void RecoQa();
     void PairsReco();
+    void SingleReco();
     void SetDefaultIdParameters();
     void BgReco();
     void Pi0Reco();
@@ -173,6 +174,17 @@ private:
     Int_t fNofAPcutPairs;
     Int_t fNofPtcutPairs;
     
+    Int_t fNofPi0;
+    Int_t fNofPiPlus;
+    Int_t fNofPiMinus;
+    Int_t fNofK0L;
+    Int_t fNofKPlus;
+    Int_t fNofKMinus;
+    Int_t fNofK0S;
+    Int_t fNofEta;
+    Int_t fNofGamma;
+
+
 
     Int_t fNofRecBg;
     Int_t fNofRichIdBg;

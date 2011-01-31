@@ -5,7 +5,7 @@
 
 #include "CbmUrqmdGenerator.h"
 
-#include "CbmPrimaryGenerator.h"
+#include "FairPrimaryGenerator.h"
 #include "CbmMCEvent.h"
 
 #include "TLorentzVector.h"
@@ -146,7 +146,7 @@ Bool_t CbmUrqmdGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
        << ", phi: " << phi << endl;
 
   // Set event id and impact parameter in MCEvent if not yet done
-  CbmMCEvent* event = ((CbmPrimaryGenerator*)primGen)->GetEvent();
+  CbmMCEvent* event = ((FairPrimaryGenerator*)primGen)->GetEvent();
   if ( event && (! event->IsSet()) ) {
     event->SetEventID(evnr);
     event->SetB(b);

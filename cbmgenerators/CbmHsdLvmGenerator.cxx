@@ -5,7 +5,6 @@
 #include "CbmHsdLvmGenerator.h"
 
 #include "CbmMCEvent.h"
-#include "CbmPrimaryGenerator.h"
 
 #include "FairPrimaryGenerator.h"
 
@@ -97,7 +96,7 @@ CbmHsdLvmGenerator::~CbmHsdLvmGenerator() {
 Bool_t CbmHsdLvmGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
   // --> Convert to CbmPrimaryrGenerator
-  CbmPrimaryGenerator* cbmGen = (CbmPrimaryGenerator*) primGen;
+//  CbmPrimaryGenerator* cbmGen = (CbmPrimaryGenerator*) primGen;
 
 
   // ---> Check for input file  
@@ -168,12 +167,12 @@ Bool_t CbmHsdLvmGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
 
   // Pass tracks to the stack (via FairPrimaryGenerator)
-  cbmGen->AddTrack(fPid1, p1.X(), p1.Y(), p1.Z(), 0., 0., 0.);
-  cbmGen->AddTrack(fPid2, p2.X(), p2.Y(), p2.Z(), 0., 0., 0.);
+  primGen->AddTrack(fPid1, p1.X(), p1.Y(), p1.Z(), 0., 0., 0.);
+  primGen->AddTrack(fPid2, p2.X(), p2.Y(), p2.Z(), 0., 0., 0.);
 
 
   // Set event information
-  CbmMCEvent* event = cbmGen->GetEvent();
+  CbmMCEvent* event = primGen->GetEvent();
   if ( ! event->IsSet() ) {
     event->SetEventID(++fCurrentEvent);
     event->SetB(b);

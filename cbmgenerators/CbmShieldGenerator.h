@@ -30,7 +30,6 @@
 
 class TDatabasePDG;
 class FairPrimaryGenerator;
-class CbmPrimaryGenerator;
 class FairIon;
 
 class CbmShieldGenerator : public FairGenerator  

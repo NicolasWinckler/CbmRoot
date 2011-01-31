@@ -4,7 +4,7 @@
 // -------------------------------------------------------------------------
 #include "CbmShieldGenerator.h"
 
-#include "CbmPrimaryGenerator.h"
+#include "FairPrimaryGenerator.h"
 #include "CbmMCEvent.h"
 
 #include "FairIon.h"
@@ -102,7 +102,7 @@ Bool_t CbmShieldGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
 
   // Set event id and impact parameter in MCEvent if not yet done
-  CbmMCEvent* event = ((CbmPrimaryGenerator*)primGen)->GetEvent();
+  CbmMCEvent* event = ((FairPrimaryGenerator*)primGen)->GetEvent();
   if ( event && (! event->IsSet()) ) {
     event->SetEventID(eventId);
     event->SetB(bb.Mod());

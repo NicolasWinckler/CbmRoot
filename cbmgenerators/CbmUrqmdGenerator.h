@@ -26,7 +26,7 @@
 #include <map>
  
 class TVirtualMCStack;
-class CbmPrimaryGenerator;
+class FairPrimaryGenerator;
 
 
 class CbmUrqmdGenerator : public FairGenerator

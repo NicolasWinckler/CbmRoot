@@ -4,7 +4,7 @@
  **/
 #include "CbmHsdLvmGenerator.h"
 
-#include "CbmMCEvent.h"
+#include "CbmMCEventHeader.h"
 
 #include "FairPrimaryGenerator.h"
 
@@ -172,7 +172,7 @@ Bool_t CbmHsdLvmGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
 
   // Set event information
-  CbmMCEvent* event = primGen->GetEvent();
+  CbmMCEventHeader* event = dynamic_cast<CbmMCEventHeader*>(primGen->GetEvent());
   if ( ! event->IsSet() ) {
     event->SetEventID(++fCurrentEvent);
     event->SetB(b);

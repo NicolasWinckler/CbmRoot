@@ -729,7 +729,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
         cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) /
                     (cand.energy - cand.momentum.Z()));
 
-        
+        fh_sts_reco_signal_mom->Fill(cand.momentum.Mag());
 
 
 // RICH
@@ -793,7 +793,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
 			}
 	    }
-        
+        fh_rich_reco_signal_mom->Fill(cand.momentum.Mag());
         IsRichElectron(richRing, cand.momentum.Mag(), &cand);
 	
         
@@ -810,7 +810,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
         CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMCTrackId);
         if (mcTrack3 == NULL) continue;
 
-        
+        fh_trd_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTrdElectron(trdTrack, &cand);
 	
         
@@ -829,7 +829,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
         CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMCTrackId);
         if (mcTrack4 == NULL) continue;
 
-        
+        fh_tof_reco_signal_mom->Fill(cand.momentum.Mag());
         IsTofElectron(gTrack, cand.momentum.Mag(), &cand);
 	
 
@@ -845,24 +845,24 @@ void CbmAnaDielectronTask::SingleReco()
 {
     Int_t ncand = fCandidates.size();
     for (Int_t i = 0; i < ncand; i++) {
-        CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMCTrackId);
+     /*   CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMCTrackId);
     
         Int_t pdg = TMath::Abs(mctrack->GetPdgCode());
         Int_t motherId = mctrack->GetMotherId();
         fCandidates[i].MCMotherId = motherId;
         if (pdg == 11 && motherId == -1) { 
-            fh_sts_reco_signal_mom->Fill(fCandidates[i].momentum.Mag());
+            
         } //if
         if (fCandidates[i].isMCSignalElectron) {
-            fh_rich_reco_signal_mom->Fill(fCandidates[i].momentum.Mag());
+            
         }//if
         if (fCandidates[i].trdMCTrackId) {
-            fh_trd_reco_signal_mom->Fill(fCandidates[i].momentum.Mag());
+            
         }
         if (fCandidates[i].tofMCTrackId) {
-            fh_tof_reco_signal_mom->Fill(fCandidates[i].momentum.Mag());
+            
         }
-        
+        */
         if (fCandidates[i].isRichElectron = true) {
             fh_richID_signal_mom->Fill(fCandidates[i].momentum.Mag()); 
         }

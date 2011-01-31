@@ -729,7 +729,14 @@ void CbmAnaDielectronTask::FillCandidateArray()
         cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) /
                     (cand.energy - cand.momentum.Z()));
 
-        fh_sts_reco_signal_mom->Fill(cand.momentum.Mag());
+
+        Int_t pdg = TMath::Abs(mcTrack1->GetPdgCode());
+        Int_t motherId = mcTrack1->GetMotherId();
+        cand.MCMotherId = motherId;
+        if (pdg == 11 && motherId == -1) { 
+            fh_sts_reco_signal_mom->Fill(cand.momentum.Mag());
+        } //if
+        
 
 
 // RICH
@@ -793,7 +800,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
 			}
 	    }
-        fh_rich_reco_signal_mom->Fill(cand.momentum.Mag());
+        if (cand.isMCSignalElectron) {fh_rich_reco_signal_mom->Fill(cand.momentum.Mag()); }
         IsRichElectron(richRing, cand.momentum.Mag(), &cand);
 	
         
@@ -810,7 +817,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
         CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMCTrackId);
         if (mcTrack3 == NULL) continue;
 
-        fh_trd_reco_signal_mom->Fill(cand.momentum.Mag());
+        if (cand.isMCSignalElectron) {fh_trd_reco_signal_mom->Fill(cand.momentum.Mag());}
         IsTrdElectron(trdTrack, &cand);
 	
         
@@ -829,7 +836,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
         CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMCTrackId);
         if (mcTrack4 == NULL) continue;
 
-        fh_tof_reco_signal_mom->Fill(cand.momentum.Mag());
+        if (cand.isMCSignalElectron) {fh_tof_reco_signal_mom->Fill(cand.momentum.Mag());}
         IsTofElectron(gTrack, cand.momentum.Mag(), &cand);
 	
 

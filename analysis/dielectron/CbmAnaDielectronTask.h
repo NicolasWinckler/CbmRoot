@@ -87,6 +87,7 @@ public:
     void SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM, TH2D* h_source_pair);
 
     void SingleParticleAcceptance();
+    void MC();
     void MCPairs();
     void MCPairsBg();
     void PairAcceptance();
@@ -245,6 +246,29 @@ private:
    TH1D* fh_richID_signal_mom;
    TH1D* fh_trdID_signal_mom;
    TH1D* fh_tofID_signal_mom;
+
+    TH1D* fh_mc_mom;
+    TH1D* fh_mc_gamma_mom;
+    TH1D* fh_mc_pi0_mom;
+    TH1D* fh_mc_eta_mom;
+
+    TH1D* fh_acc_mom;
+    TH1D* fh_acc_gamma_mom;
+    TH1D* fh_acc_pi0_mom;
+    TH1D* fh_acc_eta_mom;
+
+    TH1D* fh_sts_reco_pi0_mom;
+    TH1D* fh_sts_reco_eta_mom;
+    TH1D* fh_sts_reco_gamma_mom;
+    TH1D* fh_rich_reco_pi0_mom;
+    TH1D* fh_rich_reco_eta_mom;
+    TH1D* fh_rich_reco_gamma_mom;
+    TH1D* fh_trd_reco_pi0_mom;
+    TH1D* fh_trd_reco_eta_mom;
+    TH1D* fh_trd_reco_gamma_mom;
+    TH1D* fh_tof_reco_pi0_mom;
+    TH1D* fh_tof_reco_gamma_mom;
+    TH1D* fh_tof_reco_eta_mom;
 //////////
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
@@ -362,6 +386,8 @@ private:
     //ID cuts distributions
     TH1D* fh_rich_ann_signal;
     TH1D* fh_rich_ann_bg;
+    TH2D* fh_rich_trd_ann_signal;
+    TH2D* fh_rich_trd_ann_bg;
     TH1D* fh_trd_ann_signal;
     TH1D* fh_trd_ann_bg;
     TH2D* fh_tof_m2_signal;

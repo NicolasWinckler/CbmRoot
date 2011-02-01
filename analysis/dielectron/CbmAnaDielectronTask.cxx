@@ -461,6 +461,7 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     CheckGammaConvAndPi0();
     CheckTrackTopologyCut();
     CheckTrackTopologyRecoCut();
+    SingleReco();
     PairsReco();
     BgReco();
     Pi0Reco();
@@ -978,10 +979,15 @@ void CbmAnaDielectronTask::SingleReco()
         if (fCandidates[i].isMCSignalElectron && fCandidates[i].isRichElectron) {
             fh_richID_signal_mom->Fill(fCandidates[i].momentum.Mag()); 
         }
-        if (fCandidates[i].richInd && fCandidates[i].isTrdElectron) {
+        if (fCandidates[i].isMCSignalElectron && 
+            fCandidates[i].richInd && 
+            fCandidates[i].isTrdElectron) {
             fh_trdID_signal_mom->Fill(fCandidates[i].momentum.Mag());
         }
-        if (fCandidates[i].richInd && fCandidates[i].trdInd && fCandidates[i].isTofElectron) {
+        if (fCandidates[i].isMCSignalElectron && 
+            fCandidates[i].richInd && 
+            fCandidates[i].trdInd && 
+            fCandidates[i].isTofElectron) {
             fh_tofID_signal_mom->Fill(fCandidates[i].momentum.Mag());
         }
    } 

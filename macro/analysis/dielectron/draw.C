@@ -111,7 +111,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 void draw(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.new.reco-sts.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.rec.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -552,18 +552,20 @@ void draw(){
     fh_source_pair_ptcut->Draw("COLZ");
     c10->cd(11);
     fh_source_pair_anglecut->Draw("COLZ");
-     
+ */    
 //AP cut distribution
     TCanvas *c4_1 = new TCanvas("c4_1-apcut", "c4_1-apcut", 800, 800);
     c4_1->Divide(2,2);
     c4_1->cd(1); 
     fh_apcut_signal->Draw("COLZ");
+
     TEllipse el1(0.5,0.5,0.2,0.3);
     el1.SetFillStyle(0);
     el1.SetLineWidth(3);
     el1.DrawEllipse(0.,0.,1.,0.45,0.,180.,0.);
     c4_1->cd(2); 
     fh_apcut_bg->Draw("COLZ");
+    fh_apcut_signal->Draw("sameCOLZ");
     TEllipse el2(0.5,0.5,0.2,0.3);
     el2.SetFillStyle(0);
     el2.SetLineWidth(3);
@@ -840,8 +842,8 @@ void draw(){
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
 
-    TCanvas *c11 = new TCanvas("c11", "c11", 1200, 1200);
-    c11->Divide(2,2);
+    TCanvas *c11 = new TCanvas("c11", "c11-mom-single-track", 1200, 1200);
+    c11->Divide(4,2);
     c11->cd(1);
     fh_sts_reco_signal_mom->Draw();
     c11->cd(2);
@@ -850,6 +852,12 @@ void draw(){
     fh_trd_reco_signal_mom->Draw();
     c11->cd(4);
     fh_tof_reco_signal_mom->Draw();
+    c11->cd(5);
+    fh_richID_signal_mom->Draw();
+    c11->cd(6);
+    fh_trdID_signal_mom->Draw();
+    c11->cd(7);
+    fh_tofID_signal_mom->Draw();
     
 }
 

@@ -1,7 +1,7 @@
 void glue_histo ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis";//.0000.root";
-    TString outFileName = filePath +".all.new.reco-sts.root";
+    TString outFileName = filePath +".all.rec.root";
     Int_t nEvents = 200;   // number of files to be added
 
     fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -25,6 +25,33 @@ void glue_histo ()
     fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_trd_reco_signal_mom = new TH1D("fh_trd_reco_signal_mom","fh_trd_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_tof_reco_signal_mom = new TH1D("fh_tof_reco_signal_mom","fh_tof_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_richID_signal_mom = new TH1D("fh_richID_signal_mom", "fh_richID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trdID_signal_mom = new TH1D("fh_trdID_signal_mom", "fh_trdID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tofID_signal_mom = new TH1D("fh_tofID_signal_mom", "fh_tofID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+    fh_mc_mom = new TH1D("fh_mc_mom","fh_mc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_mc_gamma_mom = new TH1D("fh_mc_gamma_mom","fh_mc_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_mc_pi0_mom = new TH1D("fh_mc_pi0_mom","fh_mc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_mc_eta_mom = new TH1D("fh_mc_eta_mom","fh_mc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+    fh_acc_mom = new TH1D("fh_acc_mom","fh_acc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_acc_gamma_mom = new TH1D("fh_acc_gamma_mom","fh_acc_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_acc_pi0_mom = new TH1D("fh_acc_pi0_mom","fh_acc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_acc_eta_mom = new TH1D("fh_acc_eta_mom","fh_acc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+
+    fh_sts_reco_pi0_mom = new TH1D("fh_sts_reco_pi0_mom","fh_sts_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_sts_reco_eta_mom = new TH1D("fh_sts_reco_eta_mom","fh_sts_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_sts_reco_gamma_mom = new TH1D("fh_sts_reco_gamma_mom","fh_sts_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_pi0_mom = new TH1D("fh_rich_reco_pi0_mom","fh_rich_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_eta_mom = new TH1D("fh_rich_reco_eta_mom","fh_rich_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_gamma_mom = new TH1D("fh_rich_reco_gamma_mom","fh_rich_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_pi0_mom = new TH1D("fh_trd_reco_pi0_mom","fh_trd_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_eta_mom = new TH1D("fh_trd_reco_eta_mom","fh_trd_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_gamma_mom = new TH1D("fh_trd_reco_gamma_mom","fh_trd_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tof_reco_pi0_mom = new TH1D("fh_tof_reco_pi0_mom","fh_tof_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tof_reco_gamma_mom = new TH1D("fh_tof_reco_gamma_mom","fh_tof_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tof_reco_eta_mom = new TH1D("fh_tof_reco_eta_mom","fh_tof_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
 //////////////////////
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
@@ -149,7 +176,8 @@ void glue_histo ()
     fh_trd_ann_bg = new TH1D("fh_trd_ann_bg", "fh_trd_ann_bg;ann output;yeild", 100, -1.1, 1.1);
     fh_tof_m2_signal = new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
     fh_tof_m2_bg = new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
-
+    fh_rich_trd_ann_signal = new TH2D("fh_rich_trd_ann_signal","fh_rich_trd_ann_signal;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
+    fh_rich_trd_ann_bg = new TH2D("fh_rich_trd_ann_bg","fh_rich_trd_ann_bg;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
 
     Int_t nofGoodFiles = 0;
     for(Int_t i = 0; i < nEvents; i++) {
@@ -181,6 +209,33 @@ void glue_histo ()
         fh_rich_reco_signal_mom->Add((TH1D*) file->Get("fh_rich_reco_signal_mom"));
         fh_trd_reco_signal_mom->Add((TH1D*) file->Get("fh_trd_reco_signal_mom"));
         fh_tof_reco_signal_mom->Add((TH1D*) file->Get("fh_tof_reco_signal_mom"));
+        fh_richID_signal_mom->Add((TH1D*) file->Get("fh_richID_signal_mom"));
+        fh_trdID_signal_mom->Add((TH1D*) file->Get("fh_trdID_signal_mom"));
+        fh_tofID_signal_mom->Add((TH1D*) file->Get("fh_tofID_signal_mom"));
+///
+        fh_mc_mom->Add((TH1D*) file->Get("fh_mc_mom"));
+        fh_mc_gamma_mom->Add((TH1D*) file->Get("fh_mc_gamma_mom"));
+        fh_mc_pi0_mom->Add((TH1D*) file->Get("fh_mc_pi0_mom"));
+        fh_mc_eta_mom->Add((TH1D*) file->Get("fh_mc_eta_mom"));
+    
+        fh_acc_mom->Add((TH1D*) file->Get("fh_acc_mom"));
+        fh_acc_gamma_mom->Add((TH1D*) file->Get("fh_acc_gamma_mom"));
+        fh_acc_pi0_mom->Add((TH1D*) file->Get("fh_acc_pi0_mom"));
+        fh_acc_eta_mom->Add((TH1D*) file->Get("fh_acc_eta_mom"));
+
+        fh_sts_reco_pi0_mom->Add((TH1D*) file->Get("fh_sts_reco_pi0_mom"));
+        fh_sts_reco_eta_mom->Add((TH1D*) file->Get("fh_sts_reco_eta_mom"));
+        fh_sts_reco_gamma_mom->Add((TH1D*) file->Get("fh_sts_reco_gamma_mom"));
+        fh_rich_reco_pi0_mom->Add((TH1D*) file->Get("fh_rich_reco_pi0_mom"));
+        fh_rich_reco_eta_mom->Add((TH1D*) file->Get("fh_rich_reco_eta_mom"));
+        fh_rich_reco_gamma_mom->Add((TH1D*) file->Get("fh_rich_reco_gamma_mom"));
+        fh_trd_reco_pi0_mom->Add((TH1D*) file->Get("fh_trd_reco_pi0_mom"));
+        fh_trd_reco_eta_mom->Add((TH1D*) file->Get("fh_trd_reco_eta_mom"));
+        fh_trd_reco_gamma_mom->Add((TH1D*) file->Get("fh_trd_reco_gamma_mom"));
+        fh_tof_reco_pi0_mom->Add((TH1D*) file->Get("fh_tof_reco_pi0_mom"));
+        fh_tof_reco_gamma_mom->Add((TH1D*) file->Get("fh_tof_reco_gamma_mom"));
+        fh_tof_reco_eta_mom->Add((TH1D*) file->Get("fh_tof_reco_eta_mom"));
+
 ///////////////////////////
         fh_mc_signal_minv->Add((TH1D*) file->Get("fh_mc_signal_minv"));
         fh_acc_signal_minv->Add((TH1D*) file->Get("fh_acc_signal_minv")); 
@@ -301,6 +356,8 @@ void glue_histo ()
         fh_trd_ann_bg->Add((TH1D*) file->Get("fh_trd_ann_bg"));
         fh_tof_m2_signal->Add((TH2D*) file->Get("fh_tof_m2_signal"));
         fh_tof_m2_bg->Add((TH2D*) file->Get("fh_tof_m2_bg"));
+        fh_rich_trd_ann_signal->Add((TH2D*) file->Get("fh_rich_trd_ann_signal"));
+        fh_rich_trd_ann_bg->Add((TH2D*) file->Get("fh_rich_trd_ann_bg"));
 
         nofGoodFiles++;
         file->Close();
@@ -329,6 +386,32 @@ void glue_histo ()
     fh_rich_reco_signal_mom->Scale(scale);
     fh_trd_reco_signal_mom->Scale(scale);
     fh_tof_reco_signal_mom->Scale(scale);
+    fh_richID_signal_mom->Scale(scale);
+    fh_trdID_signal_mom->Scale(scale);
+    fh_tofID_signal_mom->Scale(scale);
+
+    fh_mc_mom->Scale(scale);
+    fh_mc_gamma_mom->Scale(scale);
+    fh_mc_pi0_mom->Scale(scale);
+    fh_mc_eta_mom->Scale(scale);
+
+    fh_acc_mom->Scale(scale);
+    fh_acc_gamma_mom->Scale(scale);
+    fh_acc_pi0_mom->Scale(scale);
+    fh_acc_eta_mom->Scale(scale);
+
+    fh_sts_reco_pi0_mom->Scale(scale);
+    fh_sts_reco_eta_mom->Scale(scale);
+    fh_sts_reco_gamma_mom->Scale(scale);
+    fh_rich_reco_pi0_mom->Scale(scale);
+    fh_rich_reco_eta_mom->Scale(scale);
+    fh_rich_reco_gamma_mom->Scale(scale);
+    fh_trd_reco_pi0_mom->Scale(scale);
+    fh_trd_reco_eta_mom->Scale(scale);
+    fh_trd_reco_gamma_mom->Scale(scale);
+    fh_tof_reco_pi0_mom->Scale(scale);
+    fh_tof_reco_gamma_mom->Scale(scale);
+    fh_tof_reco_eta_mom->Scale(scale);
 ///////////////////
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
@@ -448,6 +531,8 @@ void glue_histo ()
     fh_trd_ann_bg->Scale(scale);
     fh_tof_m2_signal->Scale(scale);
     fh_tof_m2_bg->Scale(scale);
+    fh_rich_trd_ann_signal->Scale(scale);
+    fh_rich_trd_ann_bg->Scale(scale);
 
 ///WRITE HISTOGRAMMS TO OUTPUT FILE
     TFile* outFile = new TFile(outFileName, "RECREATE");
@@ -472,6 +557,32 @@ void glue_histo ()
     fh_rich_reco_signal_mom->Write();
     fh_trd_reco_signal_mom->Write();
     fh_tof_reco_signal_mom->Write();
+    fh_richID_signal_mom->Write();
+    fh_trdID_signal_mom->Write();
+    fh_tofID_signal_mom->Write();
+
+    fh_mc_mom->Write();
+    fh_mc_gamma_mom->Write();
+    fh_mc_pi0_mom->Write();
+    fh_mc_eta_mom->Write();
+
+    fh_acc_mom->Write();
+    fh_acc_gamma_mom->Write();
+    fh_acc_pi0_mom->Write();
+    fh_acc_eta_mom->Write();
+
+    fh_sts_reco_pi0_mom->Write();
+    fh_sts_reco_eta_mom->Write();
+    fh_sts_reco_gamma_mom->Write();
+    fh_rich_reco_pi0_mom->Write();
+    fh_rich_reco_eta_mom->Write();
+    fh_rich_reco_gamma_mom->Write();
+    fh_trd_reco_pi0_mom->Write();
+    fh_trd_reco_eta_mom->Write();
+    fh_trd_reco_gamma_mom->Write();
+    fh_tof_reco_pi0_mom->Write();
+    fh_tof_reco_gamma_mom->Write();
+    fh_tof_reco_eta_mom->Write();
 /////////////////
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();
@@ -591,6 +702,8 @@ void glue_histo ()
     fh_trd_ann_bg->Write();
     fh_tof_m2_signal->Write();
     fh_tof_m2_bg->Write();
+    fh_rich_trd_ann_signal->Write();
+    fh_rich_trd_ann_bg->Write();
 
 
     cout <<"nofGoodFiles = " << nofGoodFiles << endl;

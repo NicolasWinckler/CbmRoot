@@ -111,7 +111,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 void draw(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.rec.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.01_02_2011.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -552,66 +552,65 @@ void draw(){
     fh_source_pair_ptcut->Draw("COLZ");
     c10->cd(11);
     fh_source_pair_anglecut->Draw("COLZ");
- */    
+     
 //AP cut distribution
-    TCanvas *c4_1 = new TCanvas("c4_1-apcut", "c4_1-apcut", 800, 800);
-    c4_1->Divide(2,2);
-    c4_1->cd(1); 
+    TCanvas *c5 = new TCanvas("c5-apcut", "c5-apcut", 800, 800);
+    c5->Divide(2,2);
+    c5->cd(1); 
     fh_apcut_signal->Draw("COLZ");
-
     TEllipse el1(0.5,0.5,0.2,0.3);
     el1.SetFillStyle(0);
     el1.SetLineWidth(3);
     el1.DrawEllipse(0.,0.,1.,0.45,0.,180.,0.);
-    c4_1->cd(2); 
+    c5->cd(2); 
     fh_apcut_bg->Draw("COLZ");
     fh_apcut_signal->Draw("sameCOLZ");
     TEllipse el2(0.5,0.5,0.2,0.3);
     el2.SetFillStyle(0);
     el2.SetLineWidth(3);
     el2.DrawEllipse(0.,0.,1.,0.45,0.,180.,0.);
-    c4_1->cd(3);
+    c5->cd(3);
     fh_apcut_pi0->Draw("COLZ");
-    c4_1->cd(4);
+    c5->cd(4);
     fh_apcut_gamma->Draw("COLZ");
 
 //track topology cut distribution for segment tracks
-    TCanvas *c4_2 = new TCanvas("c4_2-stcut", "c4_2-stcut", 800, 800);
-    c4_2->Divide(2,2);
-    c4_2->cd(1);
+    TCanvas *c6 = new TCanvas("c6-stcut", "c6-stcut", 800, 800);
+    c6->Divide(2,2);
+    c6->cd(1);
     fh_stcut_signal->Draw("COLZ");
-    c4_2->cd(2);
+    c6->cd(2);
     fh_stcut_bg->Draw("COLZ");
-    c4_2->cd(3);
+    c6->cd(3);
     fh_stcut_pi0->Draw("COLZ");
-    c4_2->cd(4);
+    c6->cd(4);
     fh_stcut_gamma->Draw("COLZ");
 
 //track topology cut distribution for full reco tracks
-    TCanvas *c4_3 = new TCanvas("c4_3-ttcut", "c4_3-ttcut", 800, 800);
-    c4_3->Divide(2,2);
-    c4_3->cd(1);
+    TCanvas *c7 = new TCanvas("c7-ttcut", "c7-ttcut", 800, 800);
+    c7->Divide(2,2);
+    c7->cd(1);
     fh_ttcut_signal->Draw("COLZ");
-    c4_3->cd(2);
+    c7->cd(2);
     fh_ttcut_bg->Draw("COLZ");
-    c4_3->cd(3);
+    c7->cd(3);
     fh_ttcut_pi0->Draw("COLZ");
-    c4_3->cd(4);
+    c7->cd(4);
     fh_ttcut_gamma->Draw("COLZ");
 
-//    TCanvas *c5 = new TCanvas("c5","c5", 1200, 400);
-//    c5->Divide(3,1);
-//    c5->cd(1);
+//    TCanvas *c8 = new TCanvas("c8","c8", 1200, 400);
+//    c8->Divide(3,1);
+//    c8->cd(1);
 //    fh_mc_vertex_gamma_xz->Draw("COLZ");
-//    c5->cd(2);
+//    c8->cd(2);
 //    fh_mc_vertex_gamma_yz->Draw("COLZ");
-//    c5->cd(3);
+//    c8->cd(3);
 //    fh_mc_vertex_gamma_xy->Draw("COLZ");
 
 //ID cuts distribution
-    TCanvas *c5_1 = new TCanvas("c5_1-id cuts","c5_1-id cuts",900, 600);
-    c5_1->Divide(3,2);
-    c5_1->cd(1);
+    TCanvas *c9 = new TCanvas("c9-id-cuts","c9-id-cuts",1200, 600);
+    c9->Divide(4,2);
+    c9->cd(1);
     Double_t scaleSig = 1./fh_rich_ann_signal->Integral();
     Double_t scaleBg = 1./fh_rich_ann_bg->Integral();
     fh_rich_ann_signal->SetLineColor(kRed);
@@ -621,7 +620,7 @@ void draw(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c5_1->cd(2);
+    c9->cd(2);
     TH1D* fh_sig_rich_ann = CalculateSignificance(fh_rich_ann_signal, fh_rich_ann_bg, 
         "rich_ann_significance", "significance", "back");
     fh_sig_rich_ann->Draw();
@@ -630,7 +629,7 @@ void draw(){
     fh_rich_ann_signal->Scale(scaleSig);
     fh_rich_ann_bg->Scale(scaleBg);
     
-    c5_1->cd(3);
+    c9->cd(3);
     Double_t scaleSig = 1./fh_trd_ann_signal->Integral();
     Double_t scaleBg = 1./fh_trd_ann_bg->Integral();
     fh_trd_ann_signal->SetLineColor(kRed);
@@ -640,7 +639,7 @@ void draw(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c5_1->cd(4);
+    c9->cd(4);
     TH1D* fh_sig_trd_ann = CalculateSignificance(fh_trd_ann_signal, fh_trd_ann_bg, 
         "trd_ann_significance", "significance", "back");
     fh_sig_trd_ann->Draw();
@@ -649,17 +648,28 @@ void draw(){
     fh_trd_ann_signal->Scale(scaleSig);
     fh_trd_ann_bg->Scale(scaleBg);
 
-    c5_1->cd(5);
+    c9->cd(5);
+    fh_rich_trd_ann_signal->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c9->cd(6);
+    fh_rich_trd_ann_bg->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c9->cd(7);
     fh_tof_m2_signal->Draw("COLZ");
     gPad->SetLogz(true);
-    c5_1->cd(6);
+
+    c9->cd(8);
     fh_tof_m2_bg->Draw("COLZ");
     gPad->SetLogz(true);
 
 //invariant mass distribution
-    TCanvas *c6 = new TCanvas("c6-minv", "c6-minv", 1200, 600);
-    c6->Divide(2,1);
-    c6->cd(1); 
+    TCanvas *c10 = new TCanvas("c10-minv", "c10-minv", 1200, 600);
+    c10->Divide(2,1);
+    c10->cd(1); 
     fh_mc_signal_minv->SetLineColor(kGreen+3);
     fh_acc_signal_minv->SetLineColor(kOrange+3);
     fh_mc_signal_minv->Draw();
@@ -706,7 +716,7 @@ void draw(){
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
-    c6->cd(2);
+    c10->cd(2);
     fh_rich_id_bg_minv->SetLineColor(kRed);
     fh_trd_id_bg_minv->SetLineColor(kBlue);
     fh_tof_id_bg_minv->SetLineColor(kGreen);
@@ -750,9 +760,9 @@ void draw(){
 
 
 //invariant mass distribution for Pi0 and eta
-    TCanvas *c7 = new TCanvas("c7-minv-pi0-eta", "c7-minv-pi0-eta", 1200, 600);
-    c7->Divide(2,1);
-    c7->cd(1);
+    TCanvas *c11 = new TCanvas("c11-minv-pi0-eta", "c11-minv-pi0-eta", 1200, 600);
+    c11->Divide(2,1);
+    c11->cd(1);
     fh_rich_id_pi0_minv->SetLineColor(kRed);
     fh_trd_id_pi0_minv->SetLineColor(kBlue);
     fh_tof_id_pi0_minv->SetLineColor(kGreen);
@@ -791,7 +801,7 @@ void draw(){
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
 
-	c7->cd(2);
+	c11->cd(2);
 	fh_rich_id_eta_minv->SetLineColor(kRed);
 	fh_trd_id_eta_minv->SetLineColor(kBlue);
 	fh_tof_id_eta_minv->SetLineColor(kGreen);
@@ -842,22 +852,195 @@ void draw(){
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
 
-    TCanvas *c11 = new TCanvas("c11", "c11-mom-single-track", 1200, 1200);
-    c11->Divide(4,2);
-    c11->cd(1);
+    TCanvas *c12 = new TCanvas("c12-mom-single-track", "c12-mom-single-track", 1200, 1200);
+    c12->Divide(4,2);
+    c12->cd(1);
+    fh_mc_mom->Draw();
+    c12->cd(2);
+    fh_acc_mom->Draw();
+    c12->cd(3);
     fh_sts_reco_signal_mom->Draw();
-    c11->cd(2);
+    c12->cd(4);
     fh_rich_reco_signal_mom->Draw();
-    c11->cd(3);
+    c12->cd(5);
     fh_trd_reco_signal_mom->Draw();
-    c11->cd(4);
+    c12->cd(6);
     fh_tof_reco_signal_mom->Draw();
-    c11->cd(5);
+    c12->cd(7);
     fh_richID_signal_mom->Draw();
-    c11->cd(6);
-    fh_trdID_signal_mom->Draw();
-    c11->cd(7);
-    fh_tofID_signal_mom->Draw();
+
+    TCanvas *c13 = new TCanvas("c13-mom_efficiency-single-track", "c13-mom_efficiency-single-track",1200,600);
+    c13->Divide(4,2);
+    c13->cd(1);
+    TH1D* fh_acc_mom_eff = divideHisto1D(fh_acc_mom,fh_mc_mom);
+    fh_acc_mom_eff->Draw();
+    draw_eff_mom(fh_acc_mom,fh_mc_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c13->cd(2);
+    TH1D* fh_sts_mom_eff = divideHisto1D(fh_sts_reco_signal_mom, fh_acc_mom);
+    fh_sts_mom_eff->Draw();
+    draw_eff_mom(fh_sts_reco_signal_mom, fh_acc_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c13->cd(3);
+    TH1D* fh_rich_mom_eff = divideHisto1D(fh_rich_reco_signal_mom, fh_sts_reco_signal_mom);
+    fh_rich_mom_eff->Draw();
+    draw_eff_mom(fh_rich_reco_signal_mom, fh_sts_reco_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c13->cd(4);
+    TH1D* fh_trd_mom_eff = divideHisto1D(fh_trd_reco_signal_mom, fh_rich_reco_signal_mom);
+    fh_trd_mom_eff->Draw();
+    draw_eff_mom(fh_trd_reco_signal_mom, fh_rich_reco_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c13->cd(5);
+    TH1D* fh_tof_mom_eff = divideHisto1D(fh_tof_reco_signal_mom, fh_trd_reco_signal_mom);
+    fh_tof_mom_eff->Draw();
+    draw_eff_mom(fh_tof_reco_signal_mom, fh_trd_reco_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c13->cd(6);
+    TH1D* fh_richID_mom_eff = divideHisto1D(fh_richID_signal_mom, fh_tof_reco_signal_mom);
+    fh_richID_mom_eff->Draw();
+    draw_eff_mom(fh_richID_signal_mom, fh_tof_reco_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c13->cd(7);
+    TH1D* fh_trdID_mom_eff = divideHisto1D(fh_trdID_signal_mom, fh_richID_signal_mom);
+    fh_trdID_mom_eff->Draw();
+    draw_eff_mom(fh_trdID_signal_mom, fh_richID_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    
+    c13->cd(8);
+    TH1D* fh_tofID_mom_eff = divideHisto1D(fh_tofID_signal_mom, fh_trdID_signal_mom);
+    fh_tofID_mom_eff->Draw();
+    draw_eff_mom(fh_tofID_signal_mom, fh_trdID_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+///pi0
+    TCanvas *c14 = new TCanvas("c14-mom_efficiency-single-track_pi0", "c14-mom_efficiency-single-track_pi0",900,600);
+    c14->Divide(3,2);
+    c14->cd(1);
+    TH1D* fh_acc_pi0_mom_eff = divideHisto1D(fh_acc_pi0_mom, fh_mc_pi0_mom);
+    fh_acc_pi0_mom_eff->Draw();
+    draw_eff_mom(fh_acc_pi0_mom, fh_mc_pi0_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c14->cd(2);
+    TH1D* fh_sts_pi0_mom_eff = divideHisto1D(fh_sts_reco_pi0_mom, fh_acc_pi0_mom);
+    fh_sts_pi0_mom_eff->Draw();
+    draw_eff_mom(fh_sts_reco_pi0_mom, fh_acc_pi0_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c14->cd(3);
+    TH1D* fh_rich_pi0_mom_eff = divideHisto1D(fh_rich_reco_pi0_mom, fh_sts_reco_pi0_mom);
+    fh_rich_pi0_mom_eff->Draw();
+    draw_eff_mom(fh_rich_reco_pi0_mom, fh_sts_reco_pi0_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c14->cd(4);
+    TH1D* fh_trd_pi0_mom_eff = divideHisto1D(fh_trd_reco_pi0_mom, fh_rich_reco_pi0_mom);
+    fh_trd_pi0_mom_eff->Draw();
+    draw_eff_mom(fh_trd_reco_pi0_mom, fh_rich_reco_pi0_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c14->cd(5);
+    TH1D* fh_tof_pi0_mom_eff = divideHisto1D(fh_tof_reco_pi0_mom, fh_trd_reco_pi0_mom);
+    fh_tof_pi0_mom_eff->Draw();
+    draw_eff_mom(fh_tof_reco_pi0_mom, fh_trd_reco_pi0_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+
+/// gamma
+    TCanvas *c15 = new TCanvas("c15-mom_efficiency-single-track_gamma", "c15-mom_efficiency-single-track_gamma",900,600);
+    c15->Divide(3,2);
+    c15->cd(1);
+    TH1D* fh_acc_gamma_mom_eff = divideHisto1D(fh_acc_gamma_mom, fh_mc_gamma_mom);
+    fh_acc_gamma_mom_eff->Draw();
+    draw_eff_mom(fh_acc_gamma_mom, fh_mc_gamma_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c15->cd(2);
+    TH1D* fh_sts_gamma_mom_eff = divideHisto1D(fh_sts_reco_gamma_mom, fh_acc_gamma_mom);
+    fh_sts_gamma_mom_eff->Draw();
+    draw_eff_mom(fh_sts_reco_gamma_mom, fh_acc_gamma_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c15->cd(3);
+    TH1D* fh_rich_gamma_mom_eff = divideHisto1D(fh_rich_reco_gamma_mom, fh_sts_reco_gamma_mom);
+    fh_rich_gamma_mom_eff->Draw();
+    draw_eff_mom(fh_rich_reco_gamma_mom, fh_sts_reco_gamma_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c15->cd(4);
+    TH1D* fh_trd_gamma_mom_eff = divideHisto1D(fh_trd_reco_gamma_mom, fh_rich_reco_gamma_mom);
+    fh_trd_gamma_mom_eff->Draw();
+    draw_eff_mom(fh_trd_reco_gamma_mom, fh_rich_reco_gamma_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c15->cd(5);
+    TH1D* fh_tof_gamma_mom_eff = divideHisto1D(fh_tof_reco_gamma_mom, fh_trd_reco_gamma_mom);
+    fh_tof_gamma_mom_eff->Draw();
+    draw_eff_mom(fh_tof_reco_gamma_mom, fh_trd_reco_gamma_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+///eta
+    TCanvas *c16 = new TCanvas("c16-mom_efficiency-single-track_eta", "c16-mom_efficiency-single-track_eta",900,600);
+    c16->Divide(3,2);
+    c16->cd(1);
+    TH1D* fh_acc_eta_mom_eff = divideHisto1D(fh_acc_eta_mom, fh_mc_eta_mom);
+    fh_acc_eta_mom_eff->Draw();
+    draw_eff_mom(fh_acc_eta_mom, fh_mc_eta_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c16->cd(2);
+    TH1D* fh_sts_eta_mom_eff = divideHisto1D(fh_sts_reco_eta_mom, fh_acc_eta_mom);
+    fh_sts_eta_mom_eff->Draw();
+    draw_eff_mom(fh_sts_reco_eta_mom, fh_acc_eta_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c16->cd(3);
+    TH1D* fh_rich_eta_mom_eff = divideHisto1D(fh_rich_reco_eta_mom, fh_sts_reco_eta_mom);
+    fh_rich_eta_mom_eff->Draw();
+    draw_eff_mom(fh_rich_reco_eta_mom, fh_sts_reco_eta_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c16->cd(4);
+    TH1D* fh_trd_eta_mom_eff = divideHisto1D(fh_trd_reco_eta_mom, fh_rich_reco_eta_mom);
+    fh_trd_eta_mom_eff->Draw();
+    draw_eff_mom(fh_trd_reco_eta_mom, fh_rich_reco_eta_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+    c16->cd(5);
+    TH1D* fh_tof_eta_mom_eff = divideHisto1D(fh_tof_reco_eta_mom, fh_trd_reco_eta_mom);
+    fh_tof_eta_mom_eff->Draw();
+    draw_eff_mom(fh_tof_reco_eta_mom, fh_trd_reco_eta_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
     
 }
 

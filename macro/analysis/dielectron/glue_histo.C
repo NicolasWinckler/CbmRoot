@@ -1,7 +1,7 @@
 void glue_histo ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis";//.0000.root";
-    TString outFileName = filePath +".all.rec.root";
+    TString outFileName = filePath +".all.01_02_2011.root";
     Int_t nEvents = 200;   // number of files to be added
 
     fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -157,17 +157,17 @@ void glue_histo ()
 	fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
 
 	
-    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
-    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
-    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
 
  //ID cut distributions
     fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);

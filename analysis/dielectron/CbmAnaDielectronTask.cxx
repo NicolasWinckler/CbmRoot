@@ -129,37 +129,43 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_apcut_signal_mom = new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
 
 ///////
+///histogramms for single tracks
+
+    fh_mc_mom = new TH1D("fh_mc_mom","fh_mc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_acc_mom = new TH1D("fh_acc_mom","fh_acc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_sts_reco_signal_mom  = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_richID_signal_mom = new TH1D("fh_richID_signal_mom", "fh_richID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_trd_reco_signal_mom = new TH1D("fh_trd_reco_signal_mom","fh_trd_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trdID_signal_mom = new TH1D("fh_trdID_signal_mom", "fh_trdID_signal_mom;momentum [GeV/c];yeild",100, 0., 15.);
     fh_tof_reco_signal_mom = new TH1D("fh_tof_reco_signal_mom","fh_tof_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_richID_signal_mom = new TH1D("fh_richID_signal_mom", "fh_richID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trdID_signal_mom = new TH1D("fh_trdID_signal_mom", "fh_trdID_signal_mom;momentum [GeV/c];yeild",100, 0., 15.);
     fh_tofID_signal_mom = new TH1D("fh_tofID_signal_mom", "fh_tofID_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-//////
-    fh_mc_mom = new TH1D("fh_mc_mom","fh_mc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+    ///gamma
     fh_mc_gamma_mom = new TH1D("fh_mc_gamma_mom","fh_mc_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_mc_pi0_mom = new TH1D("fh_mc_pi0_mom","fh_mc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_mc_eta_mom = new TH1D("fh_mc_eta_mom","fh_mc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-
-    fh_acc_mom = new TH1D("fh_acc_mom","fh_acc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_acc_gamma_mom = new TH1D("fh_acc_gamma_mom","fh_acc_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_acc_pi0_mom = new TH1D("fh_acc_pi0_mom","fh_acc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_acc_eta_mom = new TH1D("fh_acc_eta_mom","fh_acc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-
-    fh_sts_reco_pi0_mom = new TH1D("fh_sts_reco_pi0_mom","fh_sts_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_sts_reco_eta_mom = new TH1D("fh_sts_reco_eta_mom","fh_sts_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_sts_reco_gamma_mom = new TH1D("fh_sts_reco_gamma_mom","fh_sts_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_pi0_mom = new TH1D("fh_rich_reco_pi0_mom","fh_rich_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_eta_mom = new TH1D("fh_rich_reco_eta_mom","fh_rich_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_rich_reco_gamma_mom = new TH1D("fh_rich_reco_gamma_mom","fh_rich_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_reco_pi0_mom = new TH1D("fh_trd_reco_pi0_mom","fh_trd_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_reco_eta_mom = new TH1D("fh_trd_reco_eta_mom","fh_trd_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_trd_reco_gamma_mom = new TH1D("fh_trd_reco_gamma_mom","fh_trd_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tof_reco_pi0_mom = new TH1D("fh_tof_reco_pi0_mom","fh_tof_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_tof_reco_gamma_mom = new TH1D("fh_tof_reco_gamma_mom","fh_tof_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+
+    ///pi0
+    fh_mc_pi0_mom = new TH1D("fh_mc_pi0_mom","fh_mc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_acc_pi0_mom = new TH1D("fh_acc_pi0_mom","fh_acc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_sts_reco_pi0_mom = new TH1D("fh_sts_reco_pi0_mom","fh_sts_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_pi0_mom = new TH1D("fh_rich_reco_pi0_mom","fh_rich_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_pi0_mom = new TH1D("fh_trd_reco_pi0_mom","fh_trd_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_tof_reco_pi0_mom = new TH1D("fh_tof_reco_pi0_mom","fh_tof_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    
+    ///eta
+    fh_mc_eta_mom = new TH1D("fh_mc_eta_mom","fh_mc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_acc_eta_mom = new TH1D("fh_acc_eta_mom","fh_acc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_sts_reco_eta_mom = new TH1D("fh_sts_reco_eta_mom","fh_sts_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_rich_reco_eta_mom = new TH1D("fh_rich_reco_eta_mom","fh_rich_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fh_trd_reco_eta_mom = new TH1D("fh_trd_reco_eta_mom","fh_trd_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
     fh_tof_reco_eta_mom = new TH1D("fh_tof_reco_eta_mom","fh_tof_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
 
+///
 /////////////
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
@@ -264,17 +270,17 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_stcut_gamma = new TH2D("fh_stcut_gamma","fh_stcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
 
     fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
-    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
-    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
-    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
-    fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
 
 
 
@@ -309,7 +315,7 @@ void CbmAnaDielectronTask::SetDefaultIdParameters()
     fDistCut = -1.;
     fPtCut = 0.2;
     fAngleCut = 1.;
-    fChiPrimCut = 3.;
+    fChiPrimCut = 2.;
     fGammaCut = 0.025;
 }
 
@@ -815,13 +821,13 @@ void CbmAnaDielectronTask::FillCandidateArray()
             fh_sts_reco_signal_mom->Fill(cand.momentum.Mag());
         } //if
         CbmMCTrack* mct = (CbmMCTrack*) fMCTracks->At(cand.MCMotherId);
-        if (mct != NULL && mcTrack1->GetPdgCode() == 111 && Pdg == 11) {
+        if (mct != NULL && mct->GetPdgCode() == 111 && Pdg == 11) {
             fh_sts_reco_pi0_mom->Fill(cand.momentum.Mag());
         }
-        if (mct != NULL && mcTrack1->GetPdgCode() == 221 && Pdg == 11) {
+        if (mct != NULL && mct->GetPdgCode() == 221 && Pdg == 11) {
             fh_sts_reco_eta_mom->Fill(cand.momentum.Mag());
         }
-        if (mct != NULL && mcTrack1->GetPdgCode() == 22 && Pdg == 11) {
+        if (mct != NULL && mct->GetPdgCode() == 22 && Pdg == 11) {
             fh_sts_reco_gamma_mom->Fill(cand.momentum.Mag());
         }
         
@@ -969,13 +975,13 @@ void CbmAnaDielectronTask::SingleReco()
             
         }
         */
-        if (fCandidates[i].isRichElectron = true) {
+        if (fCandidates[i].isRichElectron) {
             fh_richID_signal_mom->Fill(fCandidates[i].momentum.Mag()); 
         }
-        if (fCandidates[i].isTrdElectron = true) {
+        if (fCandidates[i].isTrdElectron) {
             fh_trdID_signal_mom->Fill(fCandidates[i].momentum.Mag());
         }
-        if (fCandidates[i].isTofElectron = true) {
+        if (fCandidates[i].isTofElectron) {
             fh_tofID_signal_mom->Fill(fCandidates[i].momentum.Mag());
         }
    } 
@@ -1595,9 +1601,10 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
     for (Int_t i = 0; i < nCand; i++){
         if (fCandidates[i].isMCSignalElectron){
             fh_rich_ann_signal->Fill(fCandidates[i].richAnn, fWeight);
-            fh_rich_trd_ann_signal->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn);
+            fh_rich_trd_ann_signal->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn, fWeight);
             if (fCandidates[i].isRichElectron) {
                 fh_trd_ann_signal->Fill(fCandidates[i].trdAnn, fWeight); 
+                
             }
             if (fCandidates[i].isTrdElectron){
                 fh_tof_m2_signal->Fill(fCandidates[i].momentum.Mag(), fCandidates[i].mass2, fWeight);
@@ -1607,6 +1614,7 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
             fh_rich_trd_ann_bg->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn);
             if (fCandidates[i].isRichElectron){
                 fh_trd_ann_bg->Fill(fCandidates[i].trdAnn);}
+                
             if (fCandidates[i].isTrdElectron){
                 fh_tof_m2_bg->Fill(fCandidates[i].momentum.Mag(), fCandidates[i].mass2);
             }

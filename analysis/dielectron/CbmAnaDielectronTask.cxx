@@ -975,13 +975,13 @@ void CbmAnaDielectronTask::SingleReco()
             
         }
         */
-        if (fCandidates[i].isRichElectron) {
+        if (fCandidates[i].isMCSignalElectron && fCandidates[i].isRichElectron) {
             fh_richID_signal_mom->Fill(fCandidates[i].momentum.Mag()); 
         }
-        if (fCandidates[i].isTrdElectron) {
+        if (fCandidates[i].richInd && fCandidates[i].isTrdElectron) {
             fh_trdID_signal_mom->Fill(fCandidates[i].momentum.Mag());
         }
-        if (fCandidates[i].isTofElectron) {
+        if (fCandidates[i].richInd && fCandidates[i].trdInd && fCandidates[i].isTofElectron) {
             fh_tofID_signal_mom->Fill(fCandidates[i].momentum.Mag());
         }
    } 

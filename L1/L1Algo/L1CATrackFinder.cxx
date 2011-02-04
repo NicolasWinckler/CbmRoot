@@ -2046,8 +2046,8 @@ void L1Algo::CATrackFinder()
 
       for( int istaF = 0; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
 
-        if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
-            ( istaF >= 4 ) ) break; // ghost supression !!!
+        // if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
+        //     ( istaF >= NStations-6) ) break; // ghost supression !!!  too strong for Lambda. According to I.Vassiliev NStations-4 is good
 
         int trip_first = TripStartIndex[istaF];
         int trip_end   = TripStopIndex[istaF];

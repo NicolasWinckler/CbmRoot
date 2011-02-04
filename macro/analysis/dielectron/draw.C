@@ -502,8 +502,8 @@ void draw(){
     Double_t sumofbins9 =0;
     Double_t sumofbins10 =0;
     Double_t sumofbins11 =0;
-    for (int x = 1; x <= 3; x++){
-        for (int y =1;y<=3; y++) {
+    for (int x = 1; x <= 4; x++){
+        for (int y =1;y<=4; y++) {
           sumofbins1 += fh_source_pair_reco->GetBinContent(x,y);
           sumofbins2 += fh_source_pair_rich_id->GetBinContent(x,y);
           sumofbins3 += fh_source_pair_trd_id->GetBinContent(x,y);
@@ -564,7 +564,7 @@ void draw(){
     el1.DrawEllipse(0.,0.,1.,0.45,0.,180.,0.);
     c5->cd(2); 
     fh_apcut_bg->Draw("COLZ");
-    fh_apcut_signal->Draw("sameCOLZ");
+  //  fh_apcut_signal->Draw("sameCOLZ");
     TEllipse el2(0.5,0.5,0.2,0.3);
     el2.SetFillStyle(0);
     el2.SetLineWidth(3);
@@ -649,12 +649,12 @@ void draw(){
     fh_trd_ann_bg->Scale(scaleBg);
 
     c9->cd(5);
-    fh_rich_trd_ann_signal->Draw();
+    fh_rich_trd_ann_signal->Draw("COLZ");
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
     c9->cd(6);
-    fh_rich_trd_ann_bg->Draw();
+    fh_rich_trd_ann_bg->Draw("COLZ");
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
@@ -852,22 +852,147 @@ void draw(){
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
 
-    TCanvas *c12 = new TCanvas("c12-mom-single-track", "c12-mom-single-track", 1200, 1200);
-    c12->Divide(4,2);
+    TCanvas *c12 = new TCanvas("c12-mom-single-track", "c12-mom-single-track", 1200, 600);
+    c12->Divide(4,1);
+///signal
     c12->cd(1);
+    fh_mc_mom->SetLineColor(kBlue);
+    fh_acc_mom->SetLineColor(kGreen);
+    fh_sts_reco_signal_mom->SetLineColor(kRed);
+    fh_rich_reco_signal_mom->SetLineColor(kOrange+7);
+    fh_trd_reco_signal_mom->SetLineColor(kPink-6);
+    fh_tof_reco_signal_mom->SetLineColor(kMagenta);
+    fh_richID_signal_mom->SetLineColor(kViolet+10);
+    fh_trdID_signal_mom->SetLineColor(kPink+8);
+    fh_tofID_signal_mom->SetLineColor(kYellow+1);
     fh_mc_mom->Draw();
+    fh_acc_mom->Draw("same");
+    fh_sts_reco_signal_mom->Draw("same");
+    fh_rich_reco_signal_mom->Draw("same");
+    fh_trd_reco_signal_mom->Draw("same");
+    fh_tof_reco_signal_mom->Draw("same");
+    fh_richID_signal_mom->Draw("same");
+    fh_trdID_signal_mom->Draw("same");
+    fh_tofID_signal_mom->Draw("same");
+    TLegend* leg5 = new TLegend(0.65,0.6,1., 1.);
+    leg5->AddEntry(fh_mc_mom, "mc", "l");
+    leg5->AddEntry(fh_acc_mom, "acc", "l");
+    leg5->AddEntry(fh_sts_reco_signal_mom, "sts reco", "l");
+    leg5->AddEntry(fh_rich_reco_signal_mom, "rich reco", "l");
+    leg5->AddEntry(fh_trd_reco_signal_mom, "trd reco", "l");
+    leg5->AddEntry(fh_tof_reco_signal_mom, "tof reco", "l");
+    leg5->AddEntry(fh_richID_signal_mom, "rich ID", "l");
+    leg5->AddEntry(fh_trdID_signal_mom, "trd ID", "l");
+    leg5->AddEntry(fh_tofID_signal_mom, "tof ID", "l");
+    leg5->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+  
+///gamma  
     c12->cd(2);
-    fh_acc_mom->Draw();
+    fh_mc_gamma_mom->SetLineColor(kBlue);
+    fh_acc_gamma_mom->SetLineColor(kGreen);
+    fh_sts_reco_gamma_mom->SetLineColor(kYellow+1);
+    fh_rich_reco_gamma_mom->SetLineColor(kOrange+7);
+    fh_trd_reco_gamma_mom->SetLineColor(kPink-6);
+    fh_tof_reco_gamma_mom->SetLineColor(kRed);
+ //   fh_richID_gamma_mom->SetLineColor(kViolet+10);
+ //   fh_trdID_gamma_mom->SetLineColor(kAzure+10);
+ //   fh_tofID_gamma_mom->SetLineColor(kYellow-7);
+    fh_mc_gamma_mom->Draw();
+    fh_acc_gamma_mom->Draw("same");
+    fh_sts_reco_gamma_mom->Draw("same");
+    fh_rich_reco_gamma_mom->Draw("same");
+    fh_trd_reco_gamma_mom->Draw("same");
+    fh_tof_reco_gamma_mom->Draw("same");
+  //  fh_richID_gamma_mom->Draw("same");
+ //   fh_trdID_gamma_mom->Draw("same");
+ //   fh_tofID_gamma_mom->Draw("same");
+    TLegend* leg6 = new TLegend(0.65,0.6,1., 1.);
+    leg6->AddEntry(fh_mc_gamma_mom, "mc", "l");
+    leg6->AddEntry(fh_acc_gamma_mom, "acc", "l");
+    leg6->AddEntry(fh_sts_reco_gamma_mom, "sts reco", "l");
+    leg6->AddEntry(fh_rich_reco_gamma_mom, "rich reco", "l");
+    leg6->AddEntry(fh_trd_reco_gamma_mom, "trd reco", "l");
+    leg6->AddEntry(fh_tof_reco_gamma_mom, "tof reco", "l");
+ //   leg5->AddEntry(fh_richID_signal_mom, "rich ID", "l");
+ //   leg5->AddEntry(fh_trdID_signal_mom, "trd ID", "l");
+ //   leg5->AddEntry(fh_tofID_signal_mom, "tof ID", "l");
+    leg6->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+
     c12->cd(3);
-    fh_sts_reco_signal_mom->Draw();
+///pi0
+    fh_mc_pi0_mom->SetLineColor(kBlue);
+    fh_acc_pi0_mom->SetLineColor(kGreen);
+    fh_sts_reco_pi0_mom->SetLineColor(kYellow+1);
+    fh_rich_reco_pi0_mom->SetLineColor(kOrange+7);
+    fh_trd_reco_pi0_mom->SetLineColor(kPink-6);
+    fh_tof_reco_pi0_mom->SetLineColor(kRed);
+ //   fh_richID_pi0_mom->SetLineColor(kViolet+10);
+ //   fh_trdID_pi0_mom->SetLineColor(kAzure+10);
+ //   fh_tofID_pi0_mom->SetLineColor(kYellow-7);
+    fh_mc_pi0_mom->Draw();
+    fh_acc_pi0_mom->Draw("same");
+    fh_sts_reco_pi0_mom->Draw("same");
+    fh_rich_reco_pi0_mom->Draw("same");
+    fh_trd_reco_pi0_mom->Draw("same");
+    fh_tof_reco_pi0_mom->Draw("same");
+  //  fh_richID_pi0_mom->Draw("same");
+ //   fh_trdID_pi0_mom->Draw("same");
+ //   fh_tofID_pi0_mom->Draw("same");
+    TLegend* leg7 = new TLegend(0.65,0.6,1., 1.);
+    leg7->AddEntry(fh_mc_pi0_mom, "mc", "l");
+    leg7->AddEntry(fh_acc_pi0_mom, "acc", "l");
+    leg7->AddEntry(fh_sts_reco_pi0_mom, "sts reco", "l");
+    leg7->AddEntry(fh_rich_reco_pi0_mom, "rich reco", "l");
+    leg7->AddEntry(fh_trd_reco_pi0_mom, "trd reco", "l");
+    leg7->AddEntry(fh_tof_reco_pi0_mom, "tof reco", "l");
+ //   leg6->AddEntry(fh_richID_pi0_mom, "rich ID", "l");
+ //   leg6->AddEntry(fh_trdID_pi0_mom, "trd ID", "l");
+ //   leg6->AddEntry(fh_tofID_pi0_mom, "tof ID", "l");
+    leg7->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+///eta
     c12->cd(4);
-    fh_rich_reco_signal_mom->Draw();
-    c12->cd(5);
-    fh_trd_reco_signal_mom->Draw();
-    c12->cd(6);
-    fh_tof_reco_signal_mom->Draw();
-    c12->cd(7);
-    fh_richID_signal_mom->Draw();
+    fh_mc_eta_mom->SetLineColor(kBlue);
+    fh_acc_eta_mom->SetLineColor(kGreen);
+    fh_sts_reco_eta_mom->SetLineColor(kYellow+1);
+    fh_rich_reco_eta_mom->SetLineColor(kOrange+7);
+    fh_trd_reco_eta_mom->SetLineColor(kPink-6);
+    fh_tof_reco_eta_mom->SetLineColor(kRed);
+ //   fh_richID_eta_mom->SetLineColor(kViolet+10);
+ //   fh_trdID_eta_mom->SetLineColor(kAzure+10);
+ //   fh_tofID_eta_mom->SetLineColor(kYellow-7);
+    fh_mc_eta_mom->Draw();
+    fh_acc_eta_mom->Draw("same");
+    fh_sts_reco_eta_mom->Draw("same");
+    fh_rich_reco_eta_mom->Draw("same");
+    fh_trd_reco_eta_mom->Draw("same");
+    fh_tof_reco_eta_mom->Draw("same");
+  //  fh_richID_eta_mom->Draw("same");
+ //   fh_trdID_eta_mom->Draw("same");
+ //   fh_tofID_eta_mom->Draw("same");
+    TLegend* leg8 = new TLegend(0.65,0.6,1., 1.);
+    leg8->AddEntry(fh_mc_eta_mom, "mc", "l");
+    leg8->AddEntry(fh_acc_eta_mom, "acc", "l");
+    leg8->AddEntry(fh_sts_reco_eta_mom, "sts reco", "l");
+    leg8->AddEntry(fh_rich_reco_eta_mom, "rich reco", "l");
+    leg8->AddEntry(fh_trd_reco_eta_mom, "trd reco", "l");
+    leg8->AddEntry(fh_tof_reco_eta_mom, "tof reco", "l");
+ //   leg7->AddEntry(fh_richID_eta_mom, "rich ID", "l");
+ //   leg7->AddEntry(fh_trdID_eta_mom, "trd ID", "l");
+ //   leg7->AddEntry(fh_tofID_eta_mom, "tof ID", "l");
+    leg8->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    
 
     TCanvas *c13 = new TCanvas("c13-mom_efficiency-single-track", "c13-mom_efficiency-single-track",1200,600);
     c13->Divide(4,2);
@@ -1051,7 +1176,7 @@ void draw(){
 
 void cut_eff() {
 
-TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.new.reco-sts.root");
+TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.01_02_2011.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
     //SetStyles();
@@ -1174,7 +1299,7 @@ Double_t sum3_eta_angle  = 0;
 for (Int_t i = 0; i < Nbins; i++){
 
     Double_t binCenter = fh_tof_id_signal_minv->GetBinCenter(i);
-    if (binCenter > 0.0 && binCenter <= 0.2  ) continue;
+    if (binCenter > 0.0 && binCenter <= 0.2  )
         {
          sum1_signal_tof += (fh_tof_id_signal_minv->GetBinWidth(i)) * (fh_tof_id_signal_minv->GetBinContent(i));
          sum1_signal_chi_prim += (fh_chi_prim_signal_minv->GetBinWidth(i)) * (fh_chi_prim_signal_minv->GetBinContent(i));
@@ -1216,7 +1341,7 @@ for (Int_t i = 0; i < Nbins; i++){
         sum1_eta_angle += (fh_anglecut_eta_minv->GetBinWidth(i)) * (fh_anglecut_eta_minv->GetBinContent(i));
     }//if
 
-    if (binCenter <= 0.2 || binCenter > 1.) continue;
+    if (binCenter <= 0.2 || binCenter > 1.)
     {
          sum2_signal_tof += (fh_tof_id_signal_minv->GetBinWidth(i)) * (fh_tof_id_signal_minv->GetBinContent(i));
          sum2_signal_chi_prim += (fh_chi_prim_signal_minv->GetBinWidth(i)) * (fh_chi_prim_signal_minv->GetBinContent(i));
@@ -1260,7 +1385,7 @@ for (Int_t i = 0; i < Nbins; i++){
 
     }//if
 
-    if (binCenter <= 1. || binCenter > 2.) continue;
+     else if (binCenter <= 1. || binCenter > 2.) 
     {
          sum3_signal_tof += (fh_tof_id_signal_minv->GetBinWidth(i)) * (fh_tof_id_signal_minv->GetBinContent(i));
          sum3_signal_chi_prim += (fh_chi_prim_signal_minv->GetBinWidth(i)) * (fh_chi_prim_signal_minv->GetBinContent(i));

@@ -286,11 +286,11 @@ CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t stationNr,
 Bool_t CbmMvd::CheckIfSensitive(std::string name)
 {
   TString tsname = name; 
-  if (tsname.Contains("aktiv")){
+  if (tsname.Contains("MimosaActive")){
     cout<<"*** Register "<<tsname<<" as active volume."<<endl;
     return kTRUE;
   }
-  return false;
+  return kFALSE;
 }
 
 

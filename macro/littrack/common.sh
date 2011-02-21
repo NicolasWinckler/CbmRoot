@@ -6,10 +6,10 @@ function default_init() {
     export SCRIPT=yes
     
     #Prefix for output directory
-    export DIRPREFIX=/d/cbm02/andrey
+    export DIRPREFIX=/d/cbm02/andrey/test
     
     #Prefix for output directory
-    export IMAGEDIRPREFIX=./test
+    export IMAGEDIRPREFIX=/d/cbm02/andrey/test
     
     #Prefix for input UrQMD file
     export INFILEPREFIX=/d/cbm03/urqmd
@@ -163,7 +163,7 @@ function set_default_electron_geometry() {
 function create_output_dirs()
 {
     export DIR=$DIRPREFIX/$1
-    export IMAGEDIR=$IMAGEDIRPREFIX/$1
+    export IMAGEDIR=$IMAGEDIRPREFIX/$1/results/
     rm -r $DIR
     mkdir $DIR
     rm -r $IMAGEDIR

@@ -1,3 +1,11 @@
+/** prop_ana.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2010
+ * @version 1.0
+ *
+ * Macro runs propagation analysis task.
+ **/
+
 void prop_ana(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));

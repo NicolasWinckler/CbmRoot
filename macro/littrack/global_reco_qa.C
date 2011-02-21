@@ -1,8 +1,8 @@
 /** global_reco_qa.C
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 3.0
- * Macro draws histograms produced by CbmLitReconstructionQa class.
+ * @since 2009
+ * @version 1.0
+ * Macro runs CbmLitReconstructionQa class.
  **/
 
 void global_reco_qa(Int_t nEvents = 10)

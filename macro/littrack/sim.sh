@@ -15,7 +15,7 @@ export TRACKINGTYPE=$3
 if [ "$1" = "muon" ] ; then
     create_output_dirs test_muons_reco_$TRACKINGTYPE/
     export DETECTORSETUP=muon
-#                             NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E  PI PLUTO
+#         NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E  PI PLUTO
     pars=(5    5    5   5   5    5    10     yes   yes no no no)
     set_simulation_parameters $pars
     set_default_muon_geometry
@@ -24,7 +24,7 @@ else
 if [ "$1" = "electron" ] ; then
     create_output_dirs test_electrons_reco_$TRACKINGTYPE/
     export DETECTORSETUP=electron
-#                             NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI PLUTO
+#         NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI PLUTO
     pars=(5    5    5   5   5    5    10     yes   no yes no no)
     set_simulation_parameters $pars    
     set_default_electron_geometry
@@ -70,4 +70,3 @@ export SCRIPT=no
 #	root -b -q "./global_reco_ideal.C($NEVENTS)"
 #	root -b -q "./prop_ana.C($NEVENTS)"
 #done
-

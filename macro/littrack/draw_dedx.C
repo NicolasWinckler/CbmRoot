@@ -1,3 +1,10 @@
+/** draw_dedx.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ *
+ * Macro draws energy losses.
+ **/
 
 void draw_dedx() {
 	gSystem->Load("/home/soft/tbb/libtbb");

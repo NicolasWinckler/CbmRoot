@@ -3,6 +3,7 @@
  * @since 2009
  * @version 1.0
  *
+ * Macro draws field map and checks field map approximation.
  **/
 
 void check_field(Int_t nEvents = 1)
@@ -16,7 +17,7 @@ void check_field(Int_t nEvents = 1)
 	mcFile = dir + "mc.0000.root";
 	// Parameter file
 	parFile = dir + "param.0000.root";
-
+	// Dummy output file
 	emptyFile = dir + "empty.root";
 
 	Int_t iVerbose = 1;

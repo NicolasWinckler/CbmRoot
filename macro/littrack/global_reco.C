@@ -124,20 +124,28 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	}
 
 	if (opt == "all" || opt == "hits") {
+
+		if (IsMvd(parFile)) {
+			// ----- MVD reconstruction    --------------------------------------------
+			CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
+			run->AddTask(mvdDigi);
+
+			CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
+			run->AddTask(mvdHitFinder);
+			// -------------------------------------------------------------------------
+		}
+
 		// ----- STS reconstruction   ---------------------------------------------
-		FairTask* stsDigitize =
-				new CbmStsIdealDigitize("STSDigitize", iVerbose);
+		FairTask* stsDigitize =	new CbmStsIdealDigitize("STSDigitize", iVerbose);
 		run->AddTask(stsDigitize);
 
-		//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
-		//  run->AddTask(stsClusterFinder);
+		FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+		run->AddTask(stsClusterFinder);
 
-		FairTask* stsFindHits =
-				new CbmStsIdealFindHits("STSFindHits", iVerbose);
+		FairTask* stsFindHits =	new CbmStsIdealFindHits("STSFindHits", iVerbose);
 		run->AddTask(stsFindHits);
 
-		FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits",
-				iVerbose);
+		FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
 		run->AddTask(stsMatchHits);
 
 		FairTask* kalman = new CbmKF();
@@ -149,13 +157,11 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
 		run->AddTask(findTracks);
 
-		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks",
-				iVerbose);
+		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
 		run->AddTask(stsMatchTracks);
 
 		CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter",
-				trackFitter, iVerbose);
+		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
 		run->AddTask(fitTracks);
 
 		//	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
@@ -166,7 +172,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// ------------------------------------------------------------------------
 
 		if (IsMuch(parFile)) {
-			// ----- MUCH hits----------   --------------------------------------------
+			// ----- MUCH reconstruction ---------------------------------------
 			CbmMuchDigitizeSimpleGem* muchDigitize =
 					new CbmMuchDigitizeSimpleGem("MuchDigitize",
 							muchDigiFile.Data(), iVerbose);
@@ -182,11 +188,11 @@ void global_reco(Int_t nEvents = 1000, // number of events
 			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
 					"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawFindHits);
-			// ------------------------------------------------------------------------
+			// -----------------------------------------------------------------
 		}
 
 		if (IsTrd(parFile)) {
-			// ----- TRD hits ---------------------------------------------------------
+			// ----- TRD reconstruction-----------------------------------------
 			// Update of the values for the radiator F.U. 17.08.07
 			Int_t trdNFoils = 130; // number of polyetylene foils
 			Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
@@ -282,6 +288,14 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		reconstructionQa->SetNofBinsMom(momBins);
 		reconstructionQa->SetOutputDir(std::string(imageDir));
 		run->AddTask(reconstructionQa);
+		// ------------------------------------------------------------------------
+	}
+
+	if (opt == "all") {
+		// -----   Primary vertex finding   ---------------------------------------
+		CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
+		CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
+		run->AddTask(findVertex);
 		// ------------------------------------------------------------------------
 	}
 

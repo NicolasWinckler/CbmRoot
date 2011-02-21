@@ -1,3 +1,12 @@
+/** global_reco_ideal.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ *
+ * Macro runs ideal or partially ideal reconstruction
+ * of the CBM event.
+ **/
+
 void global_reco_ideal(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -45,16 +54,26 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	cbmrootlibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
-	FairRunAna *run= new FairRunAna();
+	FairRunAna *run = new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalTracksFile);
+
+	if (IsMvd(parFile)) {
+		// ----- MVD reconstruction    --------------------------------------------
+		CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
+		run->AddTask(mvdDigi);
+
+		CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
+		run->AddTask(mvdHitFinder);
+		// -------------------------------------------------------------------------
+	}
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
 	run->AddTask(stsDigitize);
 
-//        FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
-//        run->AddTask(stsClusterFinder);
+    FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+    run->AddTask(stsClusterFinder);
 
 	FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
 	run->AddTask(stsFindHits);
@@ -153,6 +172,12 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	// ------ Ideal global tracking -------------------------------------------
 	CbmLitFindGlobalTracksIdeal* findGlobal = new CbmLitFindGlobalTracksIdeal();
 	run->AddTask(findGlobal);
+	// ------------------------------------------------------------------------
+
+	// -----   Primary vertex finding   ---------------------------------------
+	CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
+	CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
+	run->AddTask(findVertex);
 	// ------------------------------------------------------------------------
 
 	// ------- Track finding QA check   ---------------------------------------

@@ -1,3 +1,11 @@
+/** simple_geo.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ *
+ * Macro checks the creation of the simplified geometry.
+ **/
+
 void simple_geo(Int_t nEvents = 1)
 {
 	TString dir = "/d/cbm02/andrey/test_electrons_fit_muon/";

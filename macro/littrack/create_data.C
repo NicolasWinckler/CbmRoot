@@ -1,27 +1,25 @@
-/** global_reco_qa.C
+/** create_data.C
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 3.0
- * Macro draws histograms produced by CbmLitReconstructionQa class.
+ * @since 2010
+ * @version 1.0
+ *
+ * Macro creates text files with data produced by CBMROOT
+ * simulations which can be later used to run
+ * the standalone tracking package.
  **/
 
 void create_data(Int_t nEvents = 100)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
-
-   	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
-
    	// Output directory
-	dir  = "/d/cbm02/andrey/test_muons/";
+	TString dir = "/d/cbm02/andrey/test_muons/";
 	// MC transport file
-	mcFile = dir + "mc.0000.root";
+	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
-	parFile = dir + "param.0000.root";
+	TString parFile = dir + "param.0000.root";
 	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-	globalRecoFile = dir + "global.reco.0000.root";
-	// Output file with histograms
-    dummyFile = dir + "dummy.root";
-
+	TString globalRecoFile = dir + "global.reco.0000.root";
+	// Dummy output file
+    TString dummyFile = dir + "dummy.root";
 
 	TStopwatch timer;
 	timer.Start();
@@ -34,7 +32,6 @@ void create_data(Int_t nEvents = 100)
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
-
 
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
@@ -72,7 +69,4 @@ void create_data(Int_t nEvents = 100)
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
-
 }
-
-

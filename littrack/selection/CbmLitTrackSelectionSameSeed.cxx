@@ -1,33 +1,31 @@
-#include "CbmLitTrackSelectionB.h"
+#include "CbmLitTrackSelectionSameSeed.h"
 
 #include "CbmLitTrack.h"
 #include "CbmLitComparators.h"
-//#include "CbmLitTrackSelectionC.h"
 
 #include <algorithm>
 
-CbmLitTrackSelectionB::CbmLitTrackSelectionB()
-{
-//	Properties().AddProperty("fNofSharedHits", 0);
-//	fSelection = new CbmLitTrackSelectionC();
-//	fSelection->Initialize();
-}
-
-CbmLitTrackSelectionB::~CbmLitTrackSelectionB()
+CbmLitTrackSelectionSameSeed::CbmLitTrackSelectionSameSeed()
 {
 
 }
-LitStatus CbmLitTrackSelectionB::Initialize()
+
+CbmLitTrackSelectionSameSeed::~CbmLitTrackSelectionSameSeed()
 {
-	return kLITSUCCESS;
+
 }
 
-LitStatus CbmLitTrackSelectionB::Finalize()
+LitStatus CbmLitTrackSelectionSameSeed::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackSelectionB::DoSelect(
+LitStatus CbmLitTrackSelectionSameSeed::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackSelectionSameSeed::DoSelect(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
@@ -66,13 +64,13 @@ LitStatus CbmLitTrackSelectionB::DoSelect(
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackSelectionB::DoSelect(
+LitStatus CbmLitTrackSelectionSameSeed::DoSelect(
 		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
 
-void CbmLitTrackSelectionB::SortLastPlaneId(
+void CbmLitTrackSelectionSameSeed::SortLastPlaneId(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {

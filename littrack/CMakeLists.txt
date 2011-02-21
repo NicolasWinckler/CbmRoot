@@ -132,7 +132,7 @@ weight/CbmLitWeightCalculatorGauss.cxx
 weight/CbmLitWeightCalculatorTukey.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx 
-selection/CbmLitTrackSelectionB.cxx
+selection/CbmLitTrackSelectionSameSeed.cxx
 selection/CbmLitTrackSelectionC.cxx 
 selection/CbmLitTrackSelectionD.cxx
 selection/CbmLitTrackSelectionMomentum.cxx

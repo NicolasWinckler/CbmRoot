@@ -2,8 +2,8 @@
 
 #include "CbmLitTrack.h"
 #include "CbmLitComparators.h"
-#include "CbmLitTrackSelectionA.h"
-#include "CbmLitTrackSelectionB.h"
+//#include "CbmLitTrackSelectionA.h"
+//#include "CbmLitTrackSelectionB.h"
 #include "CbmLitTrackSelectionC.h"
 #include "CbmLitTrackSelectionD.h"
 
@@ -15,10 +15,10 @@ CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
 	fMinNofHits(0),
 	fMinLastPlaneId(0)
 {
-	fSelectionA = TrackSelectionPtr(new CbmLitTrackSelectionA());
-	fSelectionA->Initialize();
-	fSelectionB = TrackSelectionPtr(new CbmLitTrackSelectionB());
-	fSelectionB->Initialize();
+//	fSelectionA = TrackSelectionPtr(new CbmLitTrackSelectionA());
+//	fSelectionA->Initialize();
+//	fSelectionB = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
+//	fSelectionB->Initialize();
 	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionC());
 	fSelectionC->Initialize();
 	fSelectionD = TrackSelectionPtr(new CbmLitTrackSelectionD());

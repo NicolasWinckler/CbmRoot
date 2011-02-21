@@ -3,7 +3,7 @@
 #include "CbmLitToolFactory.h"
 #include "CbmLitTrackSelectionA.h"
 #include "CbmLitTrackSelectionD.h"
-#include "CbmLitTrackSelectionC.h"
+#include "CbmLitTrackSelectionSharedHits.h"
 #include "CbmLitTrackSelectionChiSq.h"
 #include "CbmLitTrack.h"
 

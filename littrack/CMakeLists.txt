@@ -133,13 +133,14 @@ weight/CbmLitWeightCalculatorTukey.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx 
 selection/CbmLitTrackSelectionSameSeed.cxx
-selection/CbmLitTrackSelectionC.cxx 
+selection/CbmLitTrackSelectionSharedHits.cxx 
 selection/CbmLitTrackSelectionD.cxx
 selection/CbmLitTrackSelectionMomentum.cxx
 selection/CbmLitTrackSelectionTrd.cxx
 selection/CbmLitTrackSelectionMuch.cxx
 selection/CbmLitTrackSelectionMuchRobust.cxx
 selection/CbmLitTrackSelectionChiSq.cxx 
+selection/CbmLitQualitySort.cxx
 ##utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx 
 utils/CbmLitMatrixMath.cxx 

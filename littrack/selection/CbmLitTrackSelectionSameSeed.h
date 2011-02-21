@@ -11,8 +11,10 @@
 #define CBMLITTRACKSELECTIONSAMESEED_H_
 
 #include "CbmLitTrackSelection.h"
+#include "CbmLitQualitySort.h"
 
-class CbmLitTrackSelectionSameSeed : public CbmLitTrackSelection
+class CbmLitTrackSelectionSameSeed : public CbmLitTrackSelection,
+                                     public CbmLitQualitySort
 {
 public:
 	CbmLitTrackSelectionSameSeed();
@@ -27,13 +29,15 @@ public:
 
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
-
-private:
-//	CbmLitTrackSelection* fSelection;
-
-	void SortLastPlaneId(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+//
+//private:
+//	void SortQuality(
+//			TrackPtrIterator itBegin,
+//			TrackPtrIterator itEnd);
+//
+//	void SortLastPlaneId(
+//			TrackPtrIterator itBegin,
+//			TrackPtrIterator itEnd);
 };
 
 #endif /*CBMLITTRACKSELECTIONSAMESEED_H_*/

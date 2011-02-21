@@ -4,7 +4,7 @@
 #include "CbmLitComparators.h"
 //#include "CbmLitTrackSelectionA.h"
 //#include "CbmLitTrackSelectionB.h"
-#include "CbmLitTrackSelectionC.h"
+#include "CbmLitTrackSelectionSharedHits.h"
 #include "CbmLitTrackSelectionD.h"
 
 #include <set>
@@ -19,7 +19,7 @@ CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
 //	fSelectionA->Initialize();
 //	fSelectionB = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
 //	fSelectionB->Initialize();
-	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionC());
+	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
 	fSelectionC->Initialize();
 	fSelectionD = TrackSelectionPtr(new CbmLitTrackSelectionD());
 	fSelectionD->Initialize();
@@ -46,7 +46,7 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 
 	if (itBegin == itEnd) return kLITSUCCESS;
 
-	((CbmLitTrackSelectionC*)fSelectionC.get())->SetNofSharedHits(fNofSharedHits);
+	((CbmLitTrackSelectionSharedHits*)fSelectionC.get())->SetNofSharedHits(fNofSharedHits);
 	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinNofHits(fMinNofHits);
 	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinLastPlaneId(fMinLastPlaneId);
 

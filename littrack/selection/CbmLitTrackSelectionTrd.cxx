@@ -1,7 +1,7 @@
 #include "CbmLitTrackSelectionTrd.h"
 
 #include "CbmLitTrack.h"
-#include "CbmLitTrackSelectionC.h"
+#include "CbmLitTrackSelectionSharedHits.h"
 #include "CbmLitTrackSelectionD.h"
 
 #include <set>
@@ -13,7 +13,7 @@ CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd():
 	fMinNofHits(0),
 	fMinLastPlaneId(0)
 {
-	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionC());
+	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
 	fSelectionC->Initialize();
 	fSelectionD = TrackSelectionPtr(new CbmLitTrackSelectionD());
 	fSelectionD->Initialize();
@@ -39,7 +39,7 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 
-	((CbmLitTrackSelectionC*)fSelectionC.get())->SetNofSharedHits(fNofSharedHits);
+	((CbmLitTrackSelectionSharedHits*)fSelectionC.get())->SetNofSharedHits(fNofSharedHits);
 	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinNofHits(fMinNofHits);
 	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinLastPlaneId(fMinLastPlaneId);
 

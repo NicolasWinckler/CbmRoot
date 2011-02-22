@@ -5,10 +5,8 @@
  */
 
 #include "CbmLitTrackSelectionSameSeed.h"
-
 #include "CbmLitTrack.h"
 #include "CbmLitComparators.h"
-
 #include <algorithm>
 
 CbmLitTrackSelectionSameSeed::CbmLitTrackSelectionSameSeed()

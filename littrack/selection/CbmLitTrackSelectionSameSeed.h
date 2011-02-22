@@ -17,27 +17,26 @@ class CbmLitTrackSelectionSameSeed : public CbmLitTrackSelection,
                                      public CbmLitQualitySort
 {
 public:
+	/* Constructor */
 	CbmLitTrackSelectionSameSeed();
+
+	/* Destructor */
 	virtual ~CbmLitTrackSelectionSameSeed();
 
+	/* Derived from CbmLitTool */
 	virtual LitStatus Initialize();
+
+	/* Derived from CbmLitTool */
 	virtual LitStatus Finalize();
 
+	/* Derived from CbmLitTrackSelection */
 	virtual LitStatus DoSelect(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
 
+	/* Derived from CbmLitTrackSelection */
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
-//
-//private:
-//	void SortQuality(
-//			TrackPtrIterator itBegin,
-//			TrackPtrIterator itEnd);
-//
-//	void SortLastPlaneId(
-//			TrackPtrIterator itBegin,
-//			TrackPtrIterator itEnd);
 };
 
 #endif /*CBMLITTRACKSELECTIONSAMESEED_H_*/

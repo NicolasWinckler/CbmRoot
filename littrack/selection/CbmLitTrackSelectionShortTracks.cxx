@@ -1,30 +1,34 @@
-#include "CbmLitTrackSelectionA.h"
+/* CbmLitTrackSelectionShortTracks.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ */
 
+#include "CbmLitTrackSelectionShortTracks.h"
 #include "CbmLitComparators.h"
-
 #include <algorithm>
 
-CbmLitTrackSelectionA::CbmLitTrackSelectionA()
+CbmLitTrackSelectionShortTracks::CbmLitTrackSelectionShortTracks()
 {
 
 }
 
-CbmLitTrackSelectionA::~CbmLitTrackSelectionA()
+CbmLitTrackSelectionShortTracks::~CbmLitTrackSelectionShortTracks()
 {
 
 }
 
-LitStatus CbmLitTrackSelectionA::Initialize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionA::Finalize()
+LitStatus CbmLitTrackSelectionShortTracks::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackSelectionA::DoSelect(
+LitStatus CbmLitTrackSelectionShortTracks::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackSelectionShortTracks::DoSelect(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
@@ -36,22 +40,22 @@ LitStatus CbmLitTrackSelectionA::DoSelect(
 		int nofHits0 = (*iTrack0)->GetNofHits();
 		if ((*iTrack0)->GetQuality() == kLITBAD) continue;
 		for (TrackPtrIterator iTrack1 = iTrack0 + 1; iTrack1 != itEnd; iTrack1++){
-				int nofHits1 = (*iTrack1)->GetNofHits();
-				if (nofHits0 == nofHits1) continue;
-				if (IsHitSharing(*iTrack0, *iTrack1)) (*iTrack0)->SetQuality(kLITBAD);
+			int nofHits1 = (*iTrack1)->GetNofHits();
+			if (nofHits0 == nofHits1) continue;
+			if (IsHitSharing(*iTrack0, *iTrack1)) (*iTrack0)->SetQuality(kLITBAD);
 		}
 	}
 
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackSelectionA::DoSelect(
+LitStatus CbmLitTrackSelectionShortTracks::DoSelect(
 		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
 
-bool CbmLitTrackSelectionA::IsHitSharing(
+bool CbmLitTrackSelectionShortTracks::IsHitSharing(
 		const CbmLitTrack* track0,
 		const CbmLitTrack* track1)
 {

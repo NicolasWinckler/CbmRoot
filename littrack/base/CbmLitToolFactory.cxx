@@ -205,8 +205,6 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	if(name == "trd_station") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
-		trdSelection->SetMinNofHits(2);
-		trdSelection->SetMinLastPlaneId(0);
 		trdSelection->Initialize();
 		TrackSelectionPtr selection(trdSelection);
 		return selection;
@@ -214,8 +212,6 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	if(name == "trd_final") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(3);
-		trdSelection->SetMinNofHits(6);
-		trdSelection->SetMinLastPlaneId(0);
 		trdSelection->Initialize();
 		TrackSelectionPtr selection(trdSelection);
 		return selection;

@@ -1,7 +1,7 @@
 #include "CbmLitTrackSelectionMuchRobust.h"
 
 #include "CbmLitToolFactory.h"
-#include "CbmLitTrackSelectionA.h"
+#include "CbmLitTrackSelectionShortTracks.h"
 #include "CbmLitTrackSelectionD.h"
 #include "CbmLitTrackSelectionSharedHits.h"
 #include "CbmLitTrackSelectionChiSq.h"

@@ -1,26 +1,22 @@
-#include "CbmLitTrackSelectionMuch.h"
+/* CbmLitTrackSelectionMuch.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ */
 
+#include "CbmLitTrackSelectionMuch.h"
 #include "CbmLitTrack.h"
 #include "CbmLitComparators.h"
-//#include "CbmLitTrackSelectionA.h"
-//#include "CbmLitTrackSelectionB.h"
 #include "CbmLitTrackSelectionSharedHits.h"
 #include "CbmLitTrackSelectionD.h"
-
-#include <set>
-#include <iostream>
 
 CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
 	fNofSharedHits(0),
 	fMinNofHits(0),
 	fMinLastPlaneId(0)
 {
-//	fSelectionA = TrackSelectionPtr(new CbmLitTrackSelectionA());
-//	fSelectionA->Initialize();
-//	fSelectionB = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
-//	fSelectionB->Initialize();
-	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
-	fSelectionC->Initialize();
+	fSelectionSharedHits = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
+	fSelectionSharedHits->Initialize();
 	fSelectionD = TrackSelectionPtr(new CbmLitTrackSelectionD());
 	fSelectionD->Initialize();
 }
@@ -43,19 +39,16 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
-
 	if (itBegin == itEnd) return kLITSUCCESS;
 
-	((CbmLitTrackSelectionSharedHits*)fSelectionC.get())->SetNofSharedHits(fNofSharedHits);
+	((CbmLitTrackSelectionSharedHits*)fSelectionSharedHits.get())->SetNofSharedHits(fNofSharedHits);
 	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinNofHits(fMinNofHits);
 	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinLastPlaneId(fMinLastPlaneId);
 
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++)
 		(*iTrack)->SetQuality(kLITGOOD);
 
-	//fSelectionA->DoSelect(itBegin, itEnd);
-	//fSelectionB->DoSelect(itBegin, itEnd);
-	fSelectionC->DoSelect(itBegin, itEnd);
+	fSelectionSharedHits->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);
 
 	return kLITSUCCESS;

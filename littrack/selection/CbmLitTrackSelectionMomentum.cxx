@@ -1,9 +1,12 @@
+/* CbmLitTrackSelectionMomentum.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ */
+
 #include "CbmLitTrackSelectionMomentum.h"
-
 #include "CbmLitTrack.h"
-
 #include <cmath>
-#include <iostream>
 
 CbmLitTrackSelectionMomentum::CbmLitTrackSelectionMomentum():
 	fMinMomentum(0.)

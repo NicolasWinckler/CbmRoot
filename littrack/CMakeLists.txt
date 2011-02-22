@@ -131,7 +131,7 @@ weight/CbmLitWeightCalculatorGauss.cxx
 #weight/CbmLitWeightCalculatorOptimal.cxx
 weight/CbmLitWeightCalculatorTukey.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
-selection/CbmLitTrackSelectionA.cxx 
+selection/CbmLitTrackSelectionShortTracks.cxx 
 selection/CbmLitTrackSelectionSameSeed.cxx
 selection/CbmLitTrackSelectionSharedHits.cxx 
 selection/CbmLitTrackSelectionD.cxx

@@ -3,7 +3,7 @@
  * @since 2011
  * @version 1.0
  *
- * Performs sort of the track array by the quality criterion.
+ * Sorts a track array by the quality criterion.
  */
 
 #ifndef CBMLITQUALITYSORT_H_

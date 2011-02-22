@@ -3,6 +3,7 @@
  * @since 2011
  * @version 1.0
  */
+
 #include "CbmLitQualitySort.h"
 #include "CbmLitComparators.h"
 #include <algorithm>

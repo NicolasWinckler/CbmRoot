@@ -1,3 +1,9 @@
+/* CbmLitTrackSelectionEmpty.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ */
+
 #include "CbmLitTrackSelectionEmpty.h"
 
 CbmLitTrackSelectionEmpty::CbmLitTrackSelectionEmpty()

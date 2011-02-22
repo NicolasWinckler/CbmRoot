@@ -14,7 +14,6 @@
 #include <vector>
 
 class CbmLitTrackParam;
-class TGeoManager;
 
 class CbmLitTGeoNavigator : public CbmLitGeoNavigator
 {
@@ -58,8 +57,6 @@ private:
 	 */
 	myf CalcLength(
 			myf zOut) const;
-
-	TGeoManager* fGeo; // pointer to the TGeoManager
 };
 
 #endif /*CBMLITTGEONAVIGATOR_H_*/

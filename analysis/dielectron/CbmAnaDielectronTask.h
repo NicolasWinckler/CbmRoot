@@ -96,6 +96,7 @@ public:
     void DifferenceSignalAndBg();
     void RecoQa();
     void PairsReco();
+    void Reco();
     void SingleReco();
     void SetDefaultIdParameters();
     void BgReco();
@@ -163,6 +164,10 @@ private:
     Int_t fNofAccEmBg; //number of accepted e- from BG 
     Int_t fNofAccPairs; //number of accepted pairs of e-/e+
 
+    Int_t fNofMCTracks;
+    Int_t fNofStsRecoTracks;
+    Int_t fNofStsMCTracks;
+    Int_t fNofStsRecoElTracks; 
     Int_t fNofRecPairs;
     Int_t fNofRichIdPairs; //number of rich id signal pairs
     Int_t fNofTrdIdPairs; //number of trd id signal pairs
@@ -226,7 +231,8 @@ private:
     TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
     TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
     TH1D* fh_reco_signal_mom;
-    
+    TH1D* fh_sts_reco_signal_mom;
+    TH1D* fh_rich_reco_signal_mom;
     TH1D* fh_rich_id_signal_mom;
     TH1D* fh_trd_id_signal_mom;
     TH1D* fh_tof_id_signal_mom;
@@ -239,13 +245,13 @@ private:
     TH1D* fh_apcut_signal_mom;
 
 //////////
-   TH1D* fh_sts_reco_signal_mom;
-   TH1D* fh_rich_reco_signal_mom; 
-   TH1D* fh_trd_reco_signal_mom;
-   TH1D* fh_tof_reco_signal_mom;
-   TH1D* fh_richID_signal_mom;
-   TH1D* fh_trdID_signal_mom;
-   TH1D* fh_tofID_signal_mom;
+   TH1D* fh_sts_reco_mom;
+   TH1D* fh_rich_reco_mom; 
+   TH1D* fh_trd_reco_mom;
+   TH1D* fh_tof_reco_mom;
+   TH1D* fh_richID_mom;
+   TH1D* fh_trdID_mom;
+   TH1D* fh_tofID_mom;
 
     TH1D* fh_mc_mom;
     TH1D* fh_mc_gamma_mom;

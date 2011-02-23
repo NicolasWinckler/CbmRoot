@@ -164,10 +164,6 @@ private:
     Int_t fNofAccEmBg; //number of accepted e- from BG 
     Int_t fNofAccPairs; //number of accepted pairs of e-/e+
 
-    Int_t fNofMCTracks;
-    Int_t fNofStsRecoTracks;
-    Int_t fNofStsMCTracks;
-    Int_t fNofStsRecoElTracks; 
     Int_t fNofRecPairs;
     Int_t fNofRichIdPairs; //number of rich id signal pairs
     Int_t fNofTrdIdPairs; //number of trd id signal pairs
@@ -179,18 +175,6 @@ private:
     Int_t fNofAngleCutPairs;
     Int_t fNofAPcutPairs;
     Int_t fNofPtcutPairs;
-    
-    Int_t fNofPi0;
-    Int_t fNofPiPlus;
-    Int_t fNofPiMinus;
-    Int_t fNofK0L;
-    Int_t fNofKPlus;
-    Int_t fNofKMinus;
-    Int_t fNofK0S;
-    Int_t fNofEta;
-    Int_t fNofGamma;
-
-
 
     Int_t fNofRecBg;
     Int_t fNofRichIdBg;
@@ -203,7 +187,6 @@ private:
     Int_t fNofAngleCutBg;
     Int_t fNofAPcutBg;
     Int_t fNofPtcutBg;
-    
 
 // ID cuts
     Double_t fTrdAnnCut;
@@ -222,9 +205,7 @@ private:
 
     CbmRichElectronIdAnn * fElIdAnn;
     Bool_t fUseRichAnn;
-    
-    Int_t fNofGlobalTracks; // number of global tracks
-    
+
     TH2D* fh_mc_signal_pty; // pt/y distribution for signal mc
     TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
 
@@ -266,12 +247,15 @@ private:
     TH1D* fh_sts_reco_pi0_mom;
     TH1D* fh_sts_reco_eta_mom;
     TH1D* fh_sts_reco_gamma_mom;
+
     TH1D* fh_rich_reco_pi0_mom;
     TH1D* fh_rich_reco_eta_mom;
     TH1D* fh_rich_reco_gamma_mom;
+
     TH1D* fh_trd_reco_pi0_mom;
     TH1D* fh_trd_reco_eta_mom;
     TH1D* fh_trd_reco_gamma_mom;
+
     TH1D* fh_tof_reco_pi0_mom;
     TH1D* fh_tof_reco_gamma_mom;
     TH1D* fh_tof_reco_eta_mom;

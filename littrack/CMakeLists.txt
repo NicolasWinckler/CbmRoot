@@ -134,13 +134,14 @@ selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionShortTracks.cxx 
 selection/CbmLitTrackSelectionSameSeed.cxx
 selection/CbmLitTrackSelectionSharedHits.cxx 
-selection/CbmLitTrackSelectionD.cxx
-selection/CbmLitTrackSelectionMomentum.cxx
+#selection/CbmLitTrackSelectionD.cxx
+#selection/CbmLitTrackSelectionMomentum.cxx
 selection/CbmLitTrackSelectionTrd.cxx
 selection/CbmLitTrackSelectionMuch.cxx
 selection/CbmLitTrackSelectionMuchRobust.cxx
-selection/CbmLitTrackSelectionChiSq.cxx 
+#selection/CbmLitTrackSelectionChiSq.cxx 
 selection/CbmLitQualitySort.cxx
+selection/CbmLitTrackSelectionCuts.cxx
 ##utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx 
 utils/CbmLitMatrixMath.cxx 

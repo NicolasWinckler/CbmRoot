@@ -1,24 +1,27 @@
-/* CbmLitTrackSelectionD.h
+/* CbmLitTrackSelectionCuts.h
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
+ * @since 2011
  * @version 1.0
  *
- * Cuts tracks on number of hits and last reached plane
+ * Removes tracks based on the cuts.
  */
-
-#ifndef CBMLITTRACKSELECTIOND_H_
-#define CBMLITTRACKSELECTIOND_H_
+#ifndef CBMLITTRACKSELECTIONCUTS_H_
+#define CBMLITTRACKSELECTIONCUTS_H_
 
 #include "CbmLitTrackSelection.h"
 
-class CbmLitTrackSelectionD : public CbmLitTrackSelection
+class CbmLitTrackSelectionCuts : public CbmLitTrackSelection
 {
 public:
 	/* Constructor */
-	CbmLitTrackSelectionD();
+	CbmLitTrackSelectionCuts();
+
+	/* Constructor */
+	CbmLitTrackSelectionCuts(
+			myf maxChiSq, int minLastPlaneId, int minNofHits, myf minMomentum);
 
 	/* Destructor */
-	virtual ~CbmLitTrackSelectionD();
+	virtual ~CbmLitTrackSelectionCuts();
 
 	/* Derived from CbmLitTool */
 	virtual LitStatus Initialize();
@@ -35,11 +38,20 @@ public:
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
+	/* Return chi square cut */
+	myf GetMaxChiSq() const {return fMaxChiSq;}
+
 	/* Returns last plane index cut */
 	int GetMinLastPlaneId() const {return fMinLastPlaneId;}
 
 	/* Returns number of hits cut */
 	int GetMinNofHits() const {return fMinNofHits;}
+
+	/* Returns momentum cut */
+	myf GetMinMomentum() const {return fMinMomentum;}
+
+	/* Sets chi square cut */
+	void SetMaxChiSq(myf maxChiSq) {fMaxChiSq = maxChiSq;}
 
 	/* Sets last plane index cut */
 	void SetMinLastPlaneId(int minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
@@ -47,11 +59,18 @@ public:
 	/* Sets number of hits cut */
 	void SetMinNofHits(int minNofHits) {fMinNofHits = minNofHits;}
 
+	/* Sets momentum cut */
+	void SetMinMomentum(myf minMomentum) {fMinMomentum = minMomentum;}
+
 private:
+	/* Chi square cut */
+	myf fMaxChiSq;
 	/* Last plane index cut */
 	int fMinLastPlaneId;
 	/* Number of hits cut */
 	int fMinNofHits;
+	/* Momentum cut in [GeV/c] */
+	myf fMinMomentum;
 };
 
-#endif /*CBMLITTRACKSELECTIOND_H_*/
+#endif /* CBMLITTRACKSELECTIONCUTS_H_ */

@@ -7,12 +7,10 @@
 #include "CbmLitMyTrackPropagator.h"
 #include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitTrackSelectionEmpty.h"
-#include "CbmLitTrackSelectionChiSq.h"
+#include "CbmLitTrackSelectionCuts.h"
 #include "CbmLitTrackSelectionMuch.h"
 #include "CbmLitTrackSelectionTrd.h"
-#include "CbmLitTrackSelectionMomentum.h"
 #include "CbmLitTrackSelectionMuchRobust.h"
-#include "CbmLitTrackSelectionD.h"
 #include "CbmLitKalmanFilter.h"
 #include "CbmLitKalmanSmoother.h"
 #include "CbmLitTrackFitterImp.h"
@@ -173,26 +171,26 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "momentum") {
 		//TrackSelectionPtr selection(new CbmLitTrackSelectionMomentum());
-		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
+		CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
 		momSelection->SetMinMomentum(0.1);
 		momSelection->Initialize();
 		TrackSelectionPtr selection(momSelection);
 		return selection;
 	} else
 	if(name == "momentum_seed") {
-		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
+		CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
 		momSelection->SetMinMomentum(1.0);
 		momSelection->Initialize();
 		TrackSelectionPtr selection(momSelection);
 		return selection;
 	} else
 	if(name == "chi_square") {
-		CbmLitTrackSelectionChiSq* chiSqSelection = new CbmLitTrackSelectionChiSq();
-		chiSqSelection->SetMaxChiSq(30);
+		CbmLitTrackSelectionCuts* chiSqSelection = new CbmLitTrackSelectionCuts();
+		chiSqSelection->SetMaxChiSq(30.);
 		chiSqSelection->Initialize();
 		TrackSelectionPtr selection(chiSqSelection);
 		return selection;
-	}
+	} else
 	if(name == "much_final") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(3);

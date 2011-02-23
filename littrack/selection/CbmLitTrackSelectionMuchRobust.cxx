@@ -2,9 +2,9 @@
 
 #include "CbmLitToolFactory.h"
 #include "CbmLitTrackSelectionShortTracks.h"
-#include "CbmLitTrackSelectionD.h"
+#include "CbmLitTrackSelectionCuts.h"
 #include "CbmLitTrackSelectionSharedHits.h"
-#include "CbmLitTrackSelectionChiSq.h"
+//#include "CbmLitTrackSelectionChiSq.h"
 #include "CbmLitTrack.h"
 
 CbmLitTrackSelectionMuchRobust::CbmLitTrackSelectionMuchRobust()

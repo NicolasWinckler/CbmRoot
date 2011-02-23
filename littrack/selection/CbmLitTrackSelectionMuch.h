@@ -58,7 +58,7 @@ private:
 	/* Shared hits track selection tool */
 	TrackSelectionPtr fSelectionSharedHits;
 	/* Track selection tool that cuts on number of hits and last plane index */
-	TrackSelectionPtr fSelectionD;
+	TrackSelectionPtr fSelectionCuts;
 
 	/* Maximum number of shared hits */
 	int fNofSharedHits;

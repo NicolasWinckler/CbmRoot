@@ -119,13 +119,22 @@ add_subdirectory (dilept)
 add_subdirectory (stt)
 add_subdirectory (geane)
 add_subdirectory (trackbase)
-add_subdirectory (eventdisplay)
-add_subdirectory (cbmdisplay)
 add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial1/src)
 #add_subdirectory (tutorials/Tutorial2/src)
 add_subdirectory (cbmgenerators)
 add_subdirectory (run)
+
+FIND_PATH(TEvePath NAMES TEveEventManager.h PATHS
+  ${SIMPATH}/tools/root/include
+  NO_DEFAULT_PATH
+)
+ 
+If(TEvePath)
+  Message("Found TEveEventManager.h")
+  add_subdirectory (eventdisplay)
+  add_subdirectory (cbmdisplay)
+EndIf(TEvePath)
 
 set(BUILD_ROCLIB FALSE CACHE BOOL "Build DABC and RocLib which are needed
     to read testbeam data.")

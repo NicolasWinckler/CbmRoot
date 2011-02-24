@@ -42,6 +42,7 @@
 #pragma link C++ class  CbmEcalRecoSimple;
 #pragma link C++ class  CbmEcalRecoSlow;
 #pragma link C++ class  CbmEcalClusterV1+;
+#pragma link C++ class	CbmEcalQualityCheck;
 #pragma link C++ class  CbmEcalClusterFinderV1;
 #pragma link C++ class  CbmEcalClusterFinderV2;
 #pragma link C++ class  CbmEcalTrackImport;
@@ -66,8 +67,5 @@
 #pragma link C++ class  CbmEcalMaximumLocator;
 #pragma link C++ class  CbmEcalAnalysisSShape;
 
-  #ifdef WITH_TASIMAGE
-    #pragma link C++ class      CbmEcalQualityCheck;
-  #endif
-        
 #endif
+

@@ -9,7 +9,8 @@
 // D. Emschermann - 26.05.2010 - fix TRD geo input file
 // --------------------------------------------------------------------------
 
-void create_geometry_file(TString geomFile="trd_squared_modules.geo")
+//void create_geometry_file(TString geomFile="trd_squared_modules.geo")
+void create_geometry_file(TString geomFile="trd_standard.geo")
 {
 
   // ========================================================================
@@ -35,7 +36,8 @@ void create_geometry_file(TString geomFile="trd_squared_modules.geo")
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString trdGeom = "../macro/trd/" + geomFile;
+  //  TString trdGeom = "../macro/trd/" + geomFile;
+  TString trdGeom = geomFile;
   TString trdGeomOut = "geofile_" + fileName + ".root";
 
   // In general, the following parts need not be touched

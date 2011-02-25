@@ -1,7 +1,7 @@
 #ifndef CBMLITKALMANSMOOTHER_H_
 #define CBMLITKALMANSMOOTHER_H_
 
-#include "CbmLitTrackFitter.h"
+#include "interface/CbmLitTrackFitter.h"
 
 #include <vector>
 

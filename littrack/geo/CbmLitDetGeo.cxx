@@ -1,4 +1,5 @@
-#include "CbmLitDetGeo.h"
+#include "geo/CbmLitDetGeo.h"
+
 #include "FairGeoNode.h"
 
 ClassImp(CbmLitDetGeo)

@@ -3,15 +3,15 @@
  * @since 2009
  * @version 1.0
  */
-#include "CbmLitTrackFitSpeedTest.h"
+#include "qa/CbmLitTrackFitSpeedTest.h"
 
-#include "CbmLitTrack.h"
-#include "CbmLitToolFactory.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitConverter.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitStripHit.h"
+#include "base/CbmLitToolFactory.h"
+#include "base/CbmLitEnvironment.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitStripHit.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitConverter.h"
 #include "parallel/LitConverter.h"
 #include "parallel/LitTrack.h"
 #include "parallel/muon/LitTrackFitterMuon.h"

@@ -3,11 +3,11 @@
  *@since 2007
  **/
 
-#include "CbmLitEnvironment.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitComparators.h"
-#include "CbmLitFieldFitter.h"
-#include "CbmLitSimpleGeometryConstructor.h"
+#include "base/CbmLitFieldFitter.h"
+#include "base/CbmLitSimpleGeometryConstructor.h"
+#include "base/CbmLitEnvironment.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitComparators.h"
 
 #include "FairField.h"
 #include "FairRunAna.h"

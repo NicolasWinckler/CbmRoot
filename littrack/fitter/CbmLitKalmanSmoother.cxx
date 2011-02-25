@@ -1,8 +1,8 @@
-#include "CbmLitKalmanSmoother.h"
+#include "fitter/CbmLitKalmanSmoother.h"
 
-#include "CbmLitTrack.h"
-#include "CbmLitMath.h"
-#include "CbmLitMatrixMath.h"
+#include "data/CbmLitTrack.h"
+#include "utils/CbmLitMath.h"
+#include "utils/CbmLitMatrixMath.h"
 
 #include <iostream>
 

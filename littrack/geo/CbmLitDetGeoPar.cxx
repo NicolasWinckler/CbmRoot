@@ -1,4 +1,4 @@
-#include "CbmLitDetGeoPar.h"
+#include "geo/CbmLitDetGeoPar.h"
 
 #include "FairParamList.h"
 

@@ -8,7 +8,8 @@
 #ifndef CBMLITSUBSTATION_H_
 #define CBMLITSUBSTATION_H_
 
-#include "CbmLitFloat.h"
+#include "base/CbmLitFloat.h"
+
 #include <string>
 #include <sstream>
 

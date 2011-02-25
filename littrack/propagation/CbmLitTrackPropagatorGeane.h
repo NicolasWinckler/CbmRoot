@@ -9,7 +9,7 @@
 #ifndef CBMLITTRACKPROPAGATORGEANE_H
 #define CBMLITTRACKPROPAGATORGEANE_H
 
-#include "CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackPropagator.h"
 
 #include <vector>
 

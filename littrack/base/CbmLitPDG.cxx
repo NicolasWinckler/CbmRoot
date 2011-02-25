@@ -4,7 +4,7 @@
  * @version 1.0
  **/
 
-#include "CbmLitPDG.h"
+#include "base/CbmLitPDG.h"
 
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"

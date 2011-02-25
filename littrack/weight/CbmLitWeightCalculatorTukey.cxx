@@ -5,14 +5,13 @@
  **
  **/
 
-#include "CbmLitWeightCalculatorTukey.h"
+#include "weight/CbmLitWeightCalculatorTukey.h"
 
-#include "CbmLitHit.h"
+#include "data/CbmLitHit.h"
 //#include "CbmLitStripHit.h"
 //#include "CbmLitPixelHit.h"
-#include "CbmLitMath.h"
+#include "utils/CbmLitMath.h"
 
-//#include <iostream>
 #include <cmath>
 
 CbmLitWeightCalculatorTukey::CbmLitWeightCalculatorTukey()

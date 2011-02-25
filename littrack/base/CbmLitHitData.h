@@ -9,7 +9,7 @@
 #ifndef CBMLITHITDATA_H_
 #define CBMLITHITDATA_H_
 
-#include "CbmLitTypes.h"
+#include "base/CbmLitTypes.h"
 
 #include <vector>
 #include <string>

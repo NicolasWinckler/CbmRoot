@@ -6,8 +6,8 @@
 #ifndef CBMLITPARALLELTRACKFITTERTEST_H_
 #define CBMLITPARALLELTRACKFITTERTEST_H_
 
-#include "CbmLitTrackFitter.h"
-#include "CbmLitPixelHit.h"
+#include "interface/CbmLitTrackFitter.h"
+#include "data/CbmLitPixelHit.h"
 #include "parallel/muon/LitDetectorGeometryMuon.h"
 #include "parallel/LitHit.h"
 

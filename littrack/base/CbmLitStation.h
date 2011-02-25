@@ -8,8 +8,8 @@
 #ifndef CBMLITSTATION_H_
 #define CBMLITSTATION_H_
 
-#include "CbmLitEnums.h"
-#include "CbmLitSubstation.h"
+#include "base/CbmLitEnums.h"
+#include "base/CbmLitSubstation.h"
 
 #include <string>
 #include <vector>

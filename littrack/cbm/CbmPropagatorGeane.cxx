@@ -1,4 +1,4 @@
-#include "CbmPropagatorGeane.h"
+#include "cbm/CbmPropagatorGeane.h"
 
 #include "FairTrackParam.h"
 #include "FairTrackParP.h"

@@ -1,6 +1,6 @@
-#include "CbmLitDetContFact.h"
+#include "geo/CbmLitDetContFact.h"
 
-#include "CbmLitDetGeoPar.h"
+#include "geo/CbmLitDetGeoPar.h"
 
 #include "FairRuntimeDb.h"
 

@@ -1,11 +1,11 @@
-#include "CbmLitTrackFinderNNParallel.h"
+#include "finder/CbmLitTrackFinderNNParallel.h"
 
-#include "CbmLitEnvironment.h"
-#include "CbmLitHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitTrack.h"
-#include "CbmLitMemoryManagment.h"
+#include "base/CbmLitEnvironment.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitTrack.h"
+#include "utils/CbmLitMemoryManagment.h"
 
 #include "parallel/LitTypes.h"
 #include "parallel/LitHit.h"

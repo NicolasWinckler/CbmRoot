@@ -1,10 +1,11 @@
-#include "CbmLitMuchTrackFinderNN.h"
-#include "CbmLitToolFactory.h"
-#include "CbmLitConverter.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitTrack.h"
-#include "CbmLitHit.h"
+#include "finder_cbm/CbmLitMuchTrackFinderNN.h"
+
+#include "base/CbmLitEnvironment.h"
+#include "base/CbmLitToolFactory.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitHit.h"
+#include "utils/CbmLitConverter.h"
+#include "utils/CbmLitMemoryManagment.h"
 
 #include "TClonesArray.h"
 

@@ -1,7 +1,7 @@
 #ifndef CBMLITMTQA_H_
 #define CBMLITMTQA_H_
 
-#include "CbmLitTask.h"
+#include "base/CbmLitTask.h"
 
 #include <vector>
 

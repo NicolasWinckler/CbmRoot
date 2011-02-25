@@ -8,7 +8,7 @@
 #ifndef CBMLITLINETRACKEXTRAPOLATOR_H_
 #define CBMLITLINETRACKEXTRAPOLATOR_H_
 
-#include "CbmLitTrackExtrapolator.h"
+#include "interface/CbmLitTrackExtrapolator.h"
 
 class CbmLitTrackParam;
 

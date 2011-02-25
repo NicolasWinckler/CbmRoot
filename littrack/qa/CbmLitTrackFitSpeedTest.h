@@ -7,9 +7,9 @@
 #ifndef CBMLITTRACKFITSPEEDTEST_H_
 #define CBMLITTRACKFITSPEEDTEST_H_
 
-#include "CbmLitPtrTypes.h"
-#include "CbmLitTypes.h"
-#include "CbmLitTask.h"
+#include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitTask.h"
 
 class CbmGlobalTrack;
 class CbmLitTrack;

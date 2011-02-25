@@ -1,23 +1,22 @@
-#include "CbmLitMuchTrackFinderBranch.h"
+#include "finder_cbm/CbmLitMuchTrackFinderBranch.h"
 
-#include "CbmLitTrack.h"
-#include "CbmLitHit.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitTrackFitter.h"
-#include "CbmLitTrackSelection.h"
-#include "CbmLitToolFactory.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitConverter.h"
-#include "CbmLitEnvironment.h"
+#include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitEnvironment.h"
+#include "base/CbmLitToolFactory.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitHit.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "interface/CbmLitTrackFitter.h"
+#include "interface/CbmLitTrackSelection.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitConverter.h"
 
 #include "TClonesArray.h"
 
 #include <vector>
 #include <iostream>
 #include <algorithm>
-
-#include "CbmLitPtrTypes.h"
 
 CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
 {

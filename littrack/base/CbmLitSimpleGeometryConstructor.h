@@ -9,7 +9,7 @@
 #ifndef CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
 #define CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
 
-#include "CbmLitMaterialInfo.h"
+#include "propagation/CbmLitMaterialInfo.h"
 
 #include <string>
 #include <map>

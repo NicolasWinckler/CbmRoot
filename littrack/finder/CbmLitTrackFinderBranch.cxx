@@ -3,19 +3,19 @@
  * @since 2007
  **/
 
-#include "CbmLitTrackFinderBranch.h"
+#include "finder/CbmLitTrackFinderBranch.h"
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitTrackFitter.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitMath.h"
-#include "CbmLitTrack.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitHit.h"
-#include "CbmLitComparators.h"
-#include "CbmLitHitChiSq.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitHitChiSq.h"
+#include "interface//CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "interface/CbmLitTrackFitter.h"
+#include "utils/CbmLitComparators.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitMath.h"
 
 #include <iostream>
 #include <algorithm>

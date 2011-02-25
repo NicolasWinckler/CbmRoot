@@ -3,8 +3,8 @@
  * @since 2010
  * @version 1.0.
  */
-#include "CbmLitTask.h"
-#include "CbmLitEnvironment.h"
+#include "base/CbmLitTask.h"
+#include "base/CbmLitEnvironment.h"
 
 #include <iostream>
 

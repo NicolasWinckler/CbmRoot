@@ -1,8 +1,8 @@
-#include "CbmLitDet.h"
+#include "geo/CbmLitDet.h"
 
-#include "CbmLitDetPoint.h"
-#include "CbmLitDetGeo.h"
-#include "CbmLitDetGeoPar.h"
+#include "geo/CbmLitDetPoint.h"
+#include "geo/CbmLitDetGeo.h"
+#include "geo/CbmLitDetGeoPar.h"
 
 #include "FairVolume.h"
 #include "FairGeoVolume.h"

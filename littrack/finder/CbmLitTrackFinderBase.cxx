@@ -1,13 +1,13 @@
-#include "CbmLitTrackFinderBase.h"
+#include "finder/CbmLitTrackFinderBase.h"
 
-#include "CbmLitHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitTrack.h"
-#include "CbmLitComparators.h"
-#include "CbmLitMath.h"
-#include "CbmLitTrackSelection.h"
-#include "CbmLitTrackPropagator.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitTrack.h"
+#include "interface//CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "utils/CbmLitComparators.h"
+#include "utils/CbmLitMath.h"
 
 #include <iostream>
 #include <cmath>

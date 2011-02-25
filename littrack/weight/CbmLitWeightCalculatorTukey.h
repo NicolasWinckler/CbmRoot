@@ -8,7 +8,7 @@
 #ifndef CBMLITWEIGHTCALCULATORTUKEY_H_
 #define CBMLITWEIGHTCALCULATORTUKEY_H_
 
-#include "CbmLitWeightCalculator.h"
+#include "interface/CbmLitWeightCalculator.h"
 
 
 class CbmLitWeightCalculatorTukey : public CbmLitWeightCalculator {

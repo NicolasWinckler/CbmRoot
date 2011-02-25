@@ -1,12 +1,12 @@
 #ifndef CBMLITROBUSTFITTERANALYSIS_H_
 #define CBMLITROBUSTFITTERANALYSIS_H_
 
-#include "CbmLitDetectorLayout.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitPtrTypes.h"
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
-#include "CbmLitTypes.h"
-#include "CbmLitPtrTypes.h"
 
 class CbmLitTrack;
 class CbmTrackMatch;

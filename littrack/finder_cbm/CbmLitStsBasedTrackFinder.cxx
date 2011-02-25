@@ -1,12 +1,13 @@
-#include "CbmLitStsBasedTrackFinder.h"
-#include "CbmLitTypes.h"
-#include "CbmLitToolFactory.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitConverter.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitTrack.h"
-#include "CbmLitDetectorLayout.h"
+#include "finder_cbm/CbmLitStsBasedTrackFinder.h"
+
+#include "base/CbmLitDetectorLayout.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitToolFactory.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitTrack.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitConverter.h"
 
 #include "FairRootManager.h"
 

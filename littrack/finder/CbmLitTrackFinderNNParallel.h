@@ -8,7 +8,7 @@
 #ifndef CBMLITTRACKFINDERNNPARALLEL_H_
 #define CBMLITTRACKFINDERNNPARALLEL_H_
 
-#include "CbmLitTrackFinder.h"
+#include "interface/CbmLitTrackFinder.h"
 
 class LitTrackFinderNNVecMuon;
 class LitTrackFinderNNScalarElectron;

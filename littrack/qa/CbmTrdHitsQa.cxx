@@ -4,9 +4,9 @@
  * @version 1.0
  **/
 
-#include "CbmTrdHitsQa.h"
-#include "CbmLitUtils.h"
-#include "CbmLitDrawHist.h"
+#include "qa/CbmTrdHitsQa.h"
+#include "utils/CbmLitUtils.h"
+#include "utils/CbmLitDrawHist.h"
 
 #include "FairRootManager.h"
 #include "CbmTrdHit.h"

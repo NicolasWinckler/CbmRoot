@@ -4,12 +4,12 @@
  * @version 1.0
  **/
 
-#include "CbmLitHitData.h"
+#include "base/CbmLitHitData.h"
 
-#include "CbmLitDetectorLayout.h"
-#include "CbmLitHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitPixelHit.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitPixelHit.h"
 
 #include <sstream>
 #include <iostream>

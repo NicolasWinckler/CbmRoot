@@ -1,9 +1,10 @@
 #ifndef CBMLITMUCHTRACKFINDERNN_H_
 #define CBMLITMUCHTRACKFINDERNN_H_
 
-#include "CbmLitTrackFinderNN.h"
+#include "finder/CbmLitTrackFinderNN.h"
+#include "finder_cbm/CbmLitStsBasedTrackFinder.h"
+
 #include "CbmMuchTrackFinder.h"
-#include "CbmLitStsBasedTrackFinder.h"
 
 class TClonesArray;
 

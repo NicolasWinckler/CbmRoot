@@ -1,7 +1,7 @@
 #ifndef CBMLITSTRIPHIT_H_
 #define CBMLITSTRIPHIT_H_
 
-#include "CbmLitHit.h"
+#include "data/CbmLitHit.h"
 
 #include <sstream>
 

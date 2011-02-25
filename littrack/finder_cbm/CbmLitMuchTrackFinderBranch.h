@@ -1,11 +1,12 @@
 #ifndef CBMLITMUCHTRACKFINDERBRANCH_H_
 #define CBMLITMUCHTRACKFINDERBRANCH_H_
 
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "finder/CbmLitTrackFinderBranch.h"
+#include "finder_cbm/CbmLitStsBasedTrackFinder.h"
+
 #include "CbmMuchTrackFinder.h"
-#include "CbmLitTrackFinderBranch.h"
-#include "CbmLitTypes.h"
-#include "CbmLitDetectorLayout.h"
-#include "CbmLitStsBasedTrackFinder.h"
 
 #include <vector>
 

@@ -1,7 +1,7 @@
-#include "CbmLitSimpleGeometryConstructor.h"
+#include "base/CbmLitSimpleGeometryConstructor.h"
 
-#include "CbmLitComparators.h"
-#include "CbmLitEnvironment.h"
+#include "base/CbmLitEnvironment.h"
+#include "utils/CbmLitComparators.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"

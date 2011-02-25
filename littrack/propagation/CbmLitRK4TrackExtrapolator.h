@@ -12,9 +12,9 @@
 #ifndef CBMLITRK4TRACKEXTRAPOLATOR_H_
 #define CBMLITRK4TRACKEXTRAPOLATOR_H_
 
-#include "CbmLitTrackExtrapolator.h"
+#include "interface/CbmLitTrackExtrapolator.h"
 
-#include "CbmLitTrackParam.h"
+#include "data/CbmLitTrackParam.h"
 
 #include <vector>
 

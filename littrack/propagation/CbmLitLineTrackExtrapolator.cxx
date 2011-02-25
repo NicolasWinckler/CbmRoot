@@ -4,8 +4,9 @@
  **
  **/
 
-#include "CbmLitLineTrackExtrapolator.h"
-#include "CbmLitTrackParam.h"
+#include "propagation/CbmLitLineTrackExtrapolator.h"
+
+#include "data/CbmLitTrackParam.h"
 
 CbmLitLineTrackExtrapolator::CbmLitLineTrackExtrapolator():
    CbmLitTrackExtrapolator("CbmLitLineTrackExtrapolator")

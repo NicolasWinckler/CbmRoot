@@ -1,11 +1,10 @@
-#include "CbmLitTrack.h"
+#include "data/CbmLitTrack.h"
 
-#include "CbmLitHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitStripHit.h"
-
-#include "CbmLitComparators.h"
-#include "CbmLitMemoryManagment.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitStripHit.h"
+#include "utils/CbmLitComparators.h"
+#include "utils/CbmLitMemoryManagment.h"
 
 #include <algorithm>
 #include <sstream>

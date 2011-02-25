@@ -3,8 +3,9 @@
  *@since 2007
  **/
 
-#include "CbmLitRK4TrackExtrapolator.h"
-#include "CbmLitField.h"
+#include "propagation/CbmLitRK4TrackExtrapolator.h"
+
+#include "interface/CbmLitField.h"
 
 #include <cmath>
 

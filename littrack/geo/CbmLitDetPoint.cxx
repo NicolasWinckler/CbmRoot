@@ -1,4 +1,4 @@
-#include "CbmLitDetPoint.h"
+#include "geo/CbmLitDetPoint.h"
 
 #include <iostream>
 using std::cout;

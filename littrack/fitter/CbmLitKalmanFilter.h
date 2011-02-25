@@ -8,7 +8,7 @@
 #ifndef CBMLITKALMANFILTER_H_
 #define CBMLITKALMANFILTER_H_
 
-#include "CbmLitTrackUpdate.h"
+#include "interface/CbmLitTrackUpdate.h"
 
 class CbmLitHit;
 class CbmLitStripHit;

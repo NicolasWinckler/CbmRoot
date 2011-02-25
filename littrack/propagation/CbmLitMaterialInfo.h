@@ -10,6 +10,7 @@
 #define CBMLITMATERIALINFO_H_
 
 #include "base/CbmLitFloat.h"
+
 #include <string>
 #include <sstream>
 

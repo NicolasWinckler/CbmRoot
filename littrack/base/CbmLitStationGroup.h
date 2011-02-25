@@ -8,7 +8,7 @@
 #ifndef CBMLITSTATIONGROUP_H_
 #define CBMLITSTATIONGROUP_H_
 
-#include "CbmLitStation.h"
+#include "base/CbmLitStation.h"
 
 #include <vector>
 #include <string>

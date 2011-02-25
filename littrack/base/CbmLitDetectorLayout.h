@@ -12,10 +12,10 @@
 #ifndef CBMLITDETECTORLAYOUT_H_
 #define CBMLITDETECTORLAYOUT_H_
 
-#include "CbmLitStationGroup.h"
-#include "CbmLitStation.h"
-#include "CbmLitSubstation.h"
-#include "CbmLitEnums.h"
+#include "base/CbmLitStationGroup.h"
+#include "base/CbmLitStation.h"
+#include "base/CbmLitSubstation.h"
+#include "base/CbmLitEnums.h"
 
 #include <vector>
 #include <string>

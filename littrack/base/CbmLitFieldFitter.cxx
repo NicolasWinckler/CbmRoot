@@ -4,10 +4,11 @@
  * @version 1.0
  *
  **/
-#include "CbmLitFieldFitter.h"
-#include "CbmLitEnvironment.h"
+
+#include "base/CbmLitFieldFitter.h"
+#include "base/CbmLitEnvironment.h"
+
 #include "FairField.h"
-#include "CbmLitEnvironment.h"
 
 #include "TFitterMinuit.h"
 #include "TMatrixD.h"

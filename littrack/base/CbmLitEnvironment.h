@@ -11,7 +11,7 @@
 #ifndef CBMLITENVIRONMENT_H_
 #define CBMLITENVIRONMENT_H_
 
-#include "CbmLitDetectorLayout.h"
+#include "base/CbmLitDetectorLayout.h"
 #include "parallel/muon/LitDetectorGeometryMuon.h"
 #include "parallel/electron/LitDetectorGeometryElectron.h"
 

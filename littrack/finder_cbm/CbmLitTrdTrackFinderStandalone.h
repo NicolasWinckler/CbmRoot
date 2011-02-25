@@ -1,10 +1,11 @@
 #ifndef CBMLITTRDTRACKFINDERSTANDALONE_H_
 #define CBMLITTRDTRACKFINDERSTANDALONE_H_
 
+#include "base/CbmLitFloat.h"
+#include "base/CbmLitTypes.h"
+#include "finder/CbmLitTrackFinderBranch.h"
+
 #include "CbmTrdTrackFinder.h"
-#include "CbmLitFloat.h"
-#include "CbmLitTypes.h"
-#include "CbmLitTrackFinderBranch.h"
 
 #include <vector>
 

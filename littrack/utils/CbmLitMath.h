@@ -2,6 +2,7 @@
 #define CBMLITMATH_H_
 
 #include "data/CbmLitTrackParam.h"
+
 class CbmLitHit;
 class CbmLitStripHit;
 class CbmLitPixelHit;

@@ -1,7 +1,7 @@
 #ifndef CBMLITPIXELHIT_H_
 #define CBMLITPIXELHIT_H_
 
-#include "CbmLitHit.h"
+#include "data/CbmLitHit.h"
 
 #include <string>
 #include <sstream>

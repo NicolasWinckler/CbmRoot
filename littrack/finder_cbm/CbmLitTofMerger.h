@@ -1,11 +1,12 @@
 #ifndef CBMLITTOFMERGER_H_
 #define CBMLITTOFMERGER_H_
 
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "base/CbmLitHitData.h"
+#include "finder/CbmLitNearestHitToTrackMerger.h"
+
 #include "CbmTofMerger.h"
-#include "CbmLitNearestHitToTrackMerger.h"
-#include "CbmLitTypes.h"
-#include "CbmLitDetectorLayout.h"
-#include "CbmLitHitData.h"
 
 class TClonesArray;
 

@@ -1,7 +1,7 @@
-#include "CbmLitTrackFitterIter.h"
+#include "fitter/CbmLitTrackFitterIter.h"
 
-#include "CbmLitTrack.h"
-#include "CbmLitFitNode.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitFitNode.h"
 
 #include <iostream>
 

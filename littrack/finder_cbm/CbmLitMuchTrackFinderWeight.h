@@ -1,9 +1,10 @@
 #ifndef CBMLITMUCHTRACKFINDERWEIGHT_H_
 #define CBMLITMUCHTRACKFINDERWEIGHT_H_
 
+#include "finder/CbmLitTrackFinderWeight.h"
+#include "finder_cbm/CbmLitStsBasedTrackFinder.h"
+
 #include "CbmMuchTrackFinder.h"
-#include "CbmLitTrackFinderWeight.h"
-#include "CbmLitStsBasedTrackFinder.h"
 
 class TClonesArray;
 

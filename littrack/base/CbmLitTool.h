@@ -9,7 +9,7 @@
 #ifndef CBMLITTOOL_H_
 #define CBMLITTOOL_H_
 
-#include "CbmLitEnums.h"
+#include "base/CbmLitEnums.h"
 
 #include <string>
 

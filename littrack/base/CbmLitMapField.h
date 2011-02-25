@@ -9,7 +9,8 @@
 #ifndef CBMLITMAPFIELD_H_
 #define CBMLITMAPFIELD_H_
 
-#include "CbmLitField.h"
+#include "interface/CbmLitField.h"
+
 #include "FairField.h"
 
 class CbmLitMapField :public CbmLitField {

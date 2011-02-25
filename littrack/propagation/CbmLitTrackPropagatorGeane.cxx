@@ -2,12 +2,12 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2007
  **/
-#include "CbmLitTrackPropagatorGeane.h"
+#include "propagation/CbmLitTrackPropagatorGeane.h"
 
-#include "CbmLitTrackParam.h"
-#include "CbmLitConverter.h"
+#include "data/CbmLitTrackParam.h"
+#include "utils/CbmLitConverter.h"
+#include "cbm/CbmPropagatorGeane.h"
 
-#include "CbmPropagatorGeane.h"
 #include "FairTrackParam.h"
 #include "FairTrackParP.h"
 

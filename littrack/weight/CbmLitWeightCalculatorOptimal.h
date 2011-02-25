@@ -8,7 +8,7 @@
 #ifndef CBMLITWEIGHTCALCULATOROPTIMAL_H_
 #define CBMLITWEIGHTCALCULATOROPTIMAL_H_
 
-#include "CbmLitWeightCalculator.h"
+#include "weight/CbmLitWeightCalculator.h"
 
 
 class CbmLitWeightCalculatorOptimal : public CbmLitWeightCalculator {

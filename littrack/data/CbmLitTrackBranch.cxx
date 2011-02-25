@@ -1,7 +1,7 @@
-#include "CbmLitTrackBranch.h"
+#include "data/CbmLitTrackBranch.h"
 
-#include "CbmLitHit.h"
-#include "CbmLitComparators.h"
+#include "data/CbmLitHit.h"
+#include "utils/CbmLitComparators.h"
 
 #include <sstream>
 #include <algorithm>

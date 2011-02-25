@@ -9,7 +9,7 @@
 #ifndef CBMLITTOOLFACTORY_H_
 #define CBMLITTOOLFACTORY_H_
 
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
 
 #include <string>
 #include <iostream>

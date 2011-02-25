@@ -8,17 +8,6 @@ ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
 ${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
-${CBMROOT_SOURCE_DIR}/littrack/cbm
-${CBMROOT_SOURCE_DIR}/littrack/data
-${CBMROOT_SOURCE_DIR}/littrack/finder
-${CBMROOT_SOURCE_DIR}/littrack/fitter
-${CBMROOT_SOURCE_DIR}/littrack/interface
-${CBMROOT_SOURCE_DIR}/littrack/propagation
-${CBMROOT_SOURCE_DIR}/littrack/qa
-${CBMROOT_SOURCE_DIR}/littrack/weight
-${CBMROOT_SOURCE_DIR}/littrack/selection
-${CBMROOT_SOURCE_DIR}/littrack/utils
-${CBMROOT_SOURCE_DIR}/littrack/geo
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base

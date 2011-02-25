@@ -5,12 +5,12 @@
  **
  **/
 
-#include "CbmLitWeightCalculatorOptimal.h"
+#include "weight/CbmLitWeightCalculatorOptimal.h"
 
-#include "CbmLitHit.h"
+#include "data/CbmLitHit.h"
 //#include "CbmLitStripHit.h"
 //#include "CbmLitPixelHit.h"
-#include "CbmLitMath.h"
+#include "utils/CbmLitMath.h"
 
 //#include <iostream>
 #include <cmath>

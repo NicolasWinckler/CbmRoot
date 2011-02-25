@@ -11,8 +11,8 @@
 #ifndef CBMLITTRACKFINDERBASEBRANCH_H_
 #define CBMLITTRACKFINDERBASEBRANCH_H_
 
-#include "CbmLitTrackFinderBase.h"
-#include "CbmLitHitChiSq.h"
+#include "data/CbmLitHitChiSq.h"
+#include "finder/CbmLitTrackFinderBase.h"
 
 class CbmLitTrackSelection;
 class CbmLitTrackUpdate;

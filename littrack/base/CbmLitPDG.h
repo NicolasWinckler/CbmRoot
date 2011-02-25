@@ -9,7 +9,7 @@
 #ifndef CBMLITPDG_H_
 #define CBMLITPDG_H_
 
-#include "CbmLitFloat.h"
+#include "base/CbmLitFloat.h"
 
 class CbmLitPDG
 {

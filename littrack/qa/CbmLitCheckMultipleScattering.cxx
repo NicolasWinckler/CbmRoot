@@ -1,12 +1,12 @@
 #include "qa/CbmLitCheckMultipleScattering.h"
 
+#include "geo/CbmLitDetPoint.h"
 #include "utils/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
 #include "FairMCPoint.h"
-#include "CbmLitDetPoint.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"

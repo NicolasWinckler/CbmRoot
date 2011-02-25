@@ -1,8 +1,8 @@
-#include "CbmLitKalmanFilter.h"
+#include "fitter/CbmLitKalmanFilter.h"
 
-#include "CbmLitStripHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitTrackParam.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitTrackParam.h"
 
 #include <iostream>
 #include <cmath>

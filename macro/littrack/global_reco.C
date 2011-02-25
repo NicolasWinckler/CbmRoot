@@ -5,22 +5,19 @@
  *
  * Macro runs STS hit and track reconstruction and TRD, MUCH and TOF digitizers
  * and hit finders and finally Littrack global tracking.
- * Instead of this macro one may also run macro/littrack/global_hits.C
- * and macro/littrack/global_tracking.C consequently, to run Littrack
- * global tracking independently.
+ * Macro has 3 options "all", "hits" and "tracking".
  **/
 
 void global_reco(Int_t nEvents = 1000, // number of events
-		TString opt = "tracking") // if opt == "all" STS + hit producers + global tracking are executed
+		TString opt = "hits")
+// if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString(
-			"/parameters");
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, imageDir, mcFile, parFile, globalRecoFile, muchDigiFile,
-			trackingType;
+	TString dir, imageDir, mcFile, parFile, globalRecoFile, muchDigiFile, trackingType;
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	Int_t normStsPoints, normTrdPoints, normMuchPoints, normTofPoints;
@@ -31,7 +28,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	if (script != "yes") {
 		// Output directory
 //		dir = "/d/cbm02/andrey/std13_10mu_urqmd/";
-		dir = "/d/cbm02/andrey/test_electrons_fit_muon/";
+		dir = "/d/cbm02/andrey/muon/std_10mu_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -44,7 +41,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		globalTracksFile = dir + "global.tracks.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
-		muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
+		muchDigiFile = parDir + "/much/much_standard.digi.root";
 		// Digi scheme for STS
 		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
 		parFileList->Add(&stsDigiFile);
@@ -54,7 +51,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// Directory for output images
 		TString imageDir = "./test/";
 		// Tracking type
-		trackingType = "nn_scalar";
+		trackingType = "branch";
 		// Normalization for efficiency
 		normStsPoints = 4;
 		normTrdPoints = 10;
@@ -65,8 +62,8 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		normTofHits = 1;
 		//
 		momMin = 0.;
-		momMax = 25.;
-		momBins = 25.;
+		momMax = 12.;
+		momBins = 12.;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));

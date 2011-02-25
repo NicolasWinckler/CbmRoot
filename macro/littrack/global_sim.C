@@ -12,8 +12,8 @@ void global_sim(Int_t nEvents = 1000)
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	// Specify "electron" or "muon" setup of CBM
-//	TString setup = "muon";
-	TString setup = "electron";
+	TString setup = "muon";
+//	TString setup = "electron";
 
 	// Event parameters
 	Int_t NMUONSPLUS = 5; // number of embedded muons
@@ -23,15 +23,15 @@ void global_sim(Int_t nEvents = 1000)
 	Int_t NPIONSPLUS = 5; // number of embedded pions
 	Int_t NPIONSMINUS = 5; // number of embedded pions
 	Int_t NPLUTO = 10; // number of embedded particles from pluto
-	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
-	TString muons = "no"; // If "yes" than primary muons will be generated
+	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
+	TString muons = "yes"; // If "yes" than primary muons will be generated
 	TString electrons = "no"; // If "yes" than primary electrons will be generated
-	TString pions = "yes"; // If "yes" than primary pions will be generated
+	TString pions = "no"; // If "yes" than primary pions will be generated
 	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
 
 	// Files
-	TString inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir  = "/d/cbm02/andrey/test_electrons_fit_norich/"; //directory for output simulation files
+	TString inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
+	TString dir = "/d/cbm02/andrey/muon/std_10mu_urqmd/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -59,20 +59,20 @@ void global_sim(Int_t nEvents = 1000)
 		pipeGeom   = "pipe_much.geo";
 		shieldGeom = "shield_standard.geo";
 		stsGeom    = "sts_standard.geo";
-		muchGeom   = "much_standard_2layers.geo";
+		muchGeom   = "much_standard.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
-		tofGeom    = "";//"tof_standard.geo";
+		tofGeom    = "tof_standard.geo";
 		fieldMap   = "field_muon_standard";
 		magnetGeom = "magnet_muon_standard.geo";
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
-		mvdGeom    = "";//"mvd_standard.geo";
+		mvdGeom    = "mvd_standard.geo";
 		stsGeom    = "sts_standard.geo";
-		richGeom   = "";//"rich_standard.geo";
+		richGeom   = "rich_standard.geo";
 		trdGeom    = "trd_standard.geo";//"trd_simple.geo";
-		tofGeom    = "";//"tof_standard.geo";
+		tofGeom    = "tof_standard.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_electron_standard";
 		magnetGeom = "magnet_electron_standard.geo";

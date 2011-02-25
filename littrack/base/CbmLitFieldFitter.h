@@ -3,8 +3,9 @@
  * @since 2009
  * @version 1.0
  **
- ** The class performs fit of the magnetic field with the 0-9 degree polynom.
- ** MINUIT is used for minimization.
+ ** Class performs fit of the magnetic field using
+ ** 0-9 degree polynom. MINUIT is used for minimization.
+ ** Also my LSM fit is implemented.
  **/
 
 #ifndef CBMLITFIELDFITTER_H_
@@ -14,15 +15,17 @@
 
 class FairField;
 
-
+/* Class represents polynom. */
 class CbmLitPolynom
 {
 public:
+	/* Returns calculated value. */
 	virtual double Calculate(
 			double x,
 			double y,
 			double c[]) const = 0;
 
+	/* Returns number of coefficients. */
 	virtual unsigned int GetNofCoefficients() const = 0;
 };
 
@@ -70,12 +73,22 @@ public:
 			std::vector<double>& parBy,
 			std::vector<double>& parBz);
 
+	/* Sets acceptance angle for X. */
 	void SetXangle(double xangle) {fXangle = xangle;}
+
+	/* Sets acceptance angle for Y. */
 	void SetYangle(double yangle) {fYangle = yangle;}
+
+	/* Sets number of bins for X. */
 	void SetNofBinsX(int nofBinsX) {fNofBinsX = nofBinsX;}
+
+	/* Sets number of bins for Y. */
 	void SetNofBinsY(int nofBinsY) {fNofBinsY = nofBinsY;}
+
+	/* Sets Ellipse shape for acceptance. */
 	void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
 
+	/* Returns polynom. */
 	const CbmLitPolynom* GetPolynom() const {return fPolynom;}
 
 private:

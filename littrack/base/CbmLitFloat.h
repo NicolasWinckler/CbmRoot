@@ -3,9 +3,9 @@
  * @since 2009
  * @version 1.0
  **
- ** The header defines the type "myf" that will be used in the
- ** littrack. The type is either float or double. This helps easily switch
- ** between different floating types.
+ ** Header defines type "myf" that is used in the
+ ** littrack. This type is either float or double.
+ ** This helps easily switch between different floating types.
  **/
 
 #ifndef CBMLITFLOAT_H_

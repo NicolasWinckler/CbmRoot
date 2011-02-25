@@ -1,3 +1,9 @@
+/** CbmLitPDG.css
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "CbmLitPDG.h"
 
 #include "TDatabasePDG.h"

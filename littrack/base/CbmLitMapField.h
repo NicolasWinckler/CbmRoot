@@ -2,8 +2,8 @@
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
- **
- **Interface to CBM field map.
+ *
+ * Interface to CBM field map.
  **/
 
 #ifndef CBMLITMAPFIELD_H_
@@ -38,7 +38,7 @@ public:
 	}
 
 private:
-	FairField* fField;
+	FairField* fField; // Pointer to field map
 };
 
 #endif /* CBMLITMAPFIELD_H_ */

@@ -1,3 +1,8 @@
+/** CbmLitToolFactory.cxx
+ *@author A.Lebedev <andrey.lebedev@gsi.de>
+ *@since 2008
+ **/
+
 #include "CbmLitToolFactory.h"
 
 #include "CbmLitRK4TrackExtrapolator.h"

@@ -1,3 +1,11 @@
+/** CbmLitTypes.h
+ *@author A.Lebedev <andrey.lebedev@gsi.de>
+ *@since 2008
+ *
+ * Header defines data types used in the track reconstruction.
+ **/
+
+
 #ifndef CBMLITTYPES_H_
 #define CBMLITTYPES_H_
 

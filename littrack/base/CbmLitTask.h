@@ -3,9 +3,8 @@
  * @since 2010
  * @version 1.0
  *
- * Base task class for Littrack tasks.
- * Add some common functionality to FairTask,
- * which is used in the Littrack tasks.
+ * Base task class for Littrack tasks which
+ * implements common functionality to Littrack.
  */
 
 #ifndef CBMLITTASK_H_

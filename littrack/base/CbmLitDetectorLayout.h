@@ -98,7 +98,7 @@ public:
 		return nofPlanes;
 	}
 
-	/*Returns total number of substations (detector planes) in the station group
+	/* Returns total number of substations (detector planes) in the station group
 	 *@param stationGroup Index of the station group
 	 */
 	int GetNofPlanes(int stationGroup) const {

@@ -1,3 +1,11 @@
+/** CbmLitPtrTypes.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ *
+ * Typedefs for tools.
+ **/
+
 #ifndef CBMLITPTRTYPES_H_
 #define CBMLITPTRTYPES_H_
 

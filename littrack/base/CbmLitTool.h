@@ -1,9 +1,9 @@
 /** CbmLitTool.h
- *@author A.Lebedev <alebedev@jinr.ru>
+ *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2007
- **
- ** Base class for tools. Each tool has to have a unique name and
- ** to implement 2 functions Initialize() and Finalize().
+ *
+ * Base class for tools. Each tool has to have a unique name and
+ * to implement 2 functions Initialize() and Finalize().
  **/
 
 #ifndef CBMLITTOOL_H_

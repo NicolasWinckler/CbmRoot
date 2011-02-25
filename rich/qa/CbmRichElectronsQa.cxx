@@ -12,8 +12,8 @@
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 
-#include "../../littrack/utils/CbmLitUtils.cxx"
-#include "../utils/CbmRichDrawElectronsQa.cxx"
+//#include "../../littrack/utils/CbmLitUtils.cxx"
+//#include "../utils/CbmRichDrawElectronsQa.cxx"
 
 #include "TString.h"
 #include "TSystem.h"
@@ -44,8 +44,6 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fNofTrueFoundRings = 0;
     fNofTrueMatchRings = 0;
 	fNofTrueElIdRings = 0;
-    fNofFakeRings = 0;
-    fNofCloneRings = 0;
 
 	fhMCRings = new TH1D("fhMCRings", "MC RICH e+ and e- rings;momentum, GeV/c;Entries", 30,0,15);
 	fhAccRings = new TH1D("fhAccRings", "Accepted RICH e+ and e- rings;momentum, GeV/c;Entries", 30,0,15);;
@@ -387,8 +385,6 @@ void CbmRichElectronsQa::Exec(Option_t* option)
 		", pion supression = " << (Double_t) fNofAccPi / fNofPiasElRichTrdTof <<endl;
 
 	fEventNum++;
-   //fNofFakeRings;
-   // fNofCloneRings;
 }
 
 void CbmRichElectronsQa::AccTracks()
@@ -538,8 +534,6 @@ void CbmRichElectronsQa::FoundRichRings()
 
         Int_t recFlag = ring->GetRecFlag();
 
-        if (recFlag ==2) fNofCloneRings++;
-        if (recFlag == 1) fNofFakeRings++;
         if (recFlag == 3){
         	fNofTrueFoundRings++;
         	fhTrueFoundRings->Fill(momentum);
@@ -761,7 +755,7 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
         	fhTrueIdRichTrd->Fill(momentum);
 		}
 
-		/// pions supression
+		/// pions suppression
 		if ( pdg == 211 &&  mcIdRich != -1 && IsRichElectron(richRing, momentum) &&
 				IsTrdElectron(trdTrack)){
         	fNofPiasElRichTrd++;
@@ -837,7 +831,6 @@ Bool_t CbmRichElectronsQa::IsTrdElectron(CbmTrdTrack* trdTrk)
 
 Bool_t CbmRichElectronsQa::IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum)
 {
-	// Get the tracklength
 	Double_t trackLength = gTrack->GetLength() / 100.;
 
 	// Calculate time of flight from TOF hit
@@ -848,8 +841,7 @@ Bool_t CbmRichElectronsQa::IsTofElectron(CbmGlobalTrack* gTrack, Double_t moment
 	Double_t time = 0.2998 * tofHit->GetTime(); // time in ns -> transfrom to ct in m
 
 	// Calculate mass squared
-	Double_t mass2 = TMath::Power(momentum, 2.) * (TMath::Power(time
-			/ trackLength, 2) - 1);
+	Double_t mass2 = TMath::Power(momentum, 2.) * (TMath::Power(time/trackLength, 2) - 1);
 	if (momentum >= 1.) {
 		if (mass2 < (0.01 + (momentum - 1.) * 0.09))
 			return true;
@@ -968,19 +960,19 @@ void CbmRichElectronsQa::DiffElandPi()
 
 void CbmRichElectronsQa::SaveToImage()
 {
-//	if (fImageOutDir !="") return;
-	TCanvas* c = DrawAcc(fhMCRings, fhAccRings, fhAccRichTrdGlobal, fhAccRichTrdTofGlobal);
-	SaveCanvasAsImage(c, fImageOutDir);
-	c = DrawMatchingEff(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
-			fhTrueMatchStsRichTrdGlobal,fhTrueMatchStsRichTrdTofGlobal);
-	SaveCanvasAsImage(c, fImageOutDir);
-	c = DrawMatchingEff2(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
-			fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichTrdTofGlobal);
-	SaveCanvasAsImage(c, fImageOutDir);
-	c = DrawElidEff(fhAccRings, fhTrueFoundRings, fhTrueIdRich,
-			fhTrueIdRichTrd, fhTrueIdRichTrdTof,
-			fhAccPi, fhPiasElRich, fhPiasElRichTrd, fhPiasElRichTrdTof);
-	SaveCanvasAsImage(c, fImageOutDir);
+////	if (fImageOutDir !="") return;
+//	TCanvas* c = DrawAcc(fhMCRings, fhAccRings, fhAccRichTrdGlobal, fhAccRichTrdTofGlobal);
+//	SaveCanvasAsImage(c, fImageOutDir);
+//	c = DrawMatchingEff(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
+//			fhTrueMatchStsRichTrdGlobal,fhTrueMatchStsRichTrdTofGlobal);
+//	SaveCanvasAsImage(c, fImageOutDir);
+//	c = DrawMatchingEff2(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
+//			fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichTrdTofGlobal);
+//	SaveCanvasAsImage(c, fImageOutDir);
+//	c = DrawElidEff(fhAccRings, fhTrueFoundRings, fhTrueIdRich,
+//			fhTrueIdRichTrd, fhTrueIdRichTrdTof,
+//			fhAccPi, fhPiasElRich, fhPiasElRichTrd, fhPiasElRichTrdTof);
+//	SaveCanvasAsImage(c, fImageOutDir);
 
 }
 
@@ -1060,8 +1052,6 @@ void CbmRichElectronsQa::FinishTask()
 	fhTrdAnnEl->Write();;
 	fhTrdAnnPi->Write();;
 }
-
-// -------------------------------------------------------------------------
 
 ClassImp(CbmRichElectronsQa)
 

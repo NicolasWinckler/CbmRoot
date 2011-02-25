@@ -13,8 +13,8 @@
 #include "TLine.h"
 using std::cout;
 using std::endl;
-#include "../littrack/utils/CbmLitDrawHist.cxx"
-#include "../littrack/utils/CbmLitUtils.cxx"
+//#include "../littrack/utils/CbmLitDrawHist.cxx"
+//#include "../littrack/utils/CbmLitUtils.cxx"
 CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn()
 {
 	Init();
@@ -834,7 +834,7 @@ void CbmTrdElectronsTrainAnn::FillProbabilityHistos(Bool_t isEl)
 
 void CbmTrdElectronsTrainAnn::DrawHistos()
 {
-    SetStyles();
+    //SetStyles();
 
 	TCanvas* c1_1 = new TCanvas("classifier output","classifier output", 500,500);
 	fhAnnOutputEl->SetLineStyle(2);

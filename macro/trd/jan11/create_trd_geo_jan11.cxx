@@ -435,8 +435,10 @@ int main(void)
  //-----------Files------------------------------------------------
   string path = "./";
   //  string geoname  = path + "trd_segmented.geo" ;
-  string geoname  = path + "trd_squared_modules_jan11.geo" ;
-  string infoname = path + "trd_segmented.info";
+  //  string geoname  = path + "trd_squared_modules_jan11.geo" ;
+  //  string infoname = path + "trd_segmented.info";
+  string geoname  = path + "trd.v11a.geo" ;
+  string infoname = path + "trd.v11a.geo.info";
   string parametername  = path + "trd_segmented.txt";
 
   geofile = fopen(geoname.c_str(),  "w+");
@@ -456,13 +458,17 @@ int main(void)
   float Inner_radius[3];     // Inner acceptance in mm
   float Outer_radius[3];     // Outer acceptance in mm
 
-  //--------- Initialization of parameters -------------------------------------  
+//--------- Initialization of parameters -------------------------------------  
+// moving closer to RICH and MUCH
+  Distance[0]          = 4500;
+  Distance[1]          = 6750;
+  Distance[2]          = 9000;
 //  Distance[0]          = 4000;
 //  Distance[1]          = 6750;
 //  Distance[2]          = 9500;
-  Distance[0]          = 5000;
-  Distance[1]          = 7250;
-  Distance[2]          = 9500;
+//  Distance[0]          = 5000;
+//  Distance[1]          = 7250;
+//  Distance[2]          = 9500;
   Station_number       = 3;
   Layer_number         = 4;
   Layer_thickness      = 60;
@@ -553,14 +559,14 @@ int main(void)
 
 
   // squared detectors
-  Detector_size_x[0] =  600;
-  Detector_size_y[0] =  600;
+  Detector_size_x[0] = 570;   //  600;
+  Detector_size_y[0] = 570;   //  600;
 
-  Detector_size_x[1] =  600;
-  Detector_size_y[1] =  600;
+  Detector_size_x[1] = 570;   //  600;
+  Detector_size_y[1] = 570;   //  600;
 
-  Detector_size_x[2] = 1000;
-  Detector_size_y[2] = 1000;
+  Detector_size_x[2] = 950;   // 1000;
+  Detector_size_y[2] = 950;   // 1000;
 
   //------------------------------------------------------------------
   //------------------------------------------------------------------

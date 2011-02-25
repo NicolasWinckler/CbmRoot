@@ -1,7 +1,7 @@
 #ifndef CBMLITMATRIXMATH_H_
 #define CBMLITMATRIXMATH_H_
 
-#include "CbmLitFloat.h"
+#include "base/CbmLitFloat.h"
 
 #include <vector>
 

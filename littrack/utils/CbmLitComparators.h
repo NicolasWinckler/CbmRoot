@@ -1,13 +1,13 @@
 #ifndef CBMLITCOMPARATORS_H_
 #define CBMLITCOMPARATORS_H_
 
-#include "CbmLitHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitTrack.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitDetectorLayout.h"
-#include "CbmLitMaterialInfo.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitTrackParam.h"
+#include "propagation/CbmLitMaterialInfo.h"
 
 #include <functional>
 #include <iostream>

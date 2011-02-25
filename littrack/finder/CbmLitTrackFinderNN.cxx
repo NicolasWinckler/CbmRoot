@@ -4,15 +4,17 @@
  * @version 1.0
  **/
 
-#include "CbmLitTrackFinderNN.h"
-#include "CbmLitTrackSelection.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitTrack.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitMath.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitHit.h"
+
+#include "finder/CbmLitTrackFinderNN.h"
+
+#include "data/CbmLitHit.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitTrackParam.h"
+#include "interface/CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitMath.h"
 
 #include <algorithm>
 #include <iostream>

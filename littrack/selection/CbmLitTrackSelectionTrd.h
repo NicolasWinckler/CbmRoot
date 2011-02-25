@@ -9,8 +9,8 @@
 #ifndef CBMLITTRACKSELECTIONTRD_H_
 #define CBMLITTRACKSELECTIONTRD_H_
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionTrd : public CbmLitTrackSelection
 {

@@ -1,9 +1,8 @@
 #ifndef CBMLITWEIGHTCALCULATORSIMPLE_H_
 #define CBMLITWEIGHTCALCULATORSIMPLE_H_
 
-#include "CbmLitWeightCalculator.h"
-
-#include "CbmLitTypes.h"
+#include "base/CbmLitTypes.h"
+#include "interface/CbmLitWeightCalculator.h"
 
 class CbmLitWeightCalculatorSimple : public CbmLitWeightCalculator
 {

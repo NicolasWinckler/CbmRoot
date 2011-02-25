@@ -1,9 +1,10 @@
-#include "CbmLitCheckField.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitFloat.h"
-#include "CbmLitFieldFitter.h"
-#include "CbmLitUtils.h"
-#include "CbmLitDrawHist.h"
+#include "qa/CbmLitCheckField.h"
+
+#include "base/CbmLitEnvironment.h"
+#include "base/CbmLitFloat.h"
+#include "base/CbmLitFieldFitter.h"
+#include "utils/CbmLitUtils.h"
+#include "utils/CbmLitDrawHist.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"

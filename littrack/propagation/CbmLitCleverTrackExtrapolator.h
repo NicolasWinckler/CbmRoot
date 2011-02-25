@@ -11,8 +11,8 @@
 #ifndef CBMLITCLEVERTRACKEXTRAPOLATOR_H_
 #define CBMLITCLEVERTRACKEXTRAPOLATOR_H_
 
-#include "CbmLitTrackExtrapolator.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackExtrapolator.h"
 
 class CbmLitTrackParam;
 

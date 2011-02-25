@@ -1,7 +1,8 @@
 #ifndef CBMLITCHECKENERGYLOSSMUONS_H_
 #define CBMLITCHECKENERGYLOSSMUONS_H_
 
-#include "CbmLitTask.h"
+#include "base/CbmLitTask.h"
+
 #include <string>
 class TGraph;
 

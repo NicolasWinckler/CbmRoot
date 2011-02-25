@@ -3,13 +3,14 @@
  * @since 2010
  * @version 1.0
  **/
-#include "CbmLitParallelTrackFitterTestElectron.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitTrack.h"
-#include "CbmLitFitNode.h"
-#include "CbmLitHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitTrackParam.h"
+#include "qa/CbmLitParallelTrackFitterTestElectron.h"
+
+#include "base/CbmLitEnvironment.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitFitNode.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitTrackParam.h"
 #include "parallel/LitExtrapolation.h"
 #include "parallel/LitFiltration.h"
 #include "parallel/LitAddMaterial.h"

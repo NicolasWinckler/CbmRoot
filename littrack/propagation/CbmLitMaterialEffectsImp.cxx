@@ -2,14 +2,14 @@
  *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2008
  **/
-#include "CbmLitMaterialEffectsImp.h"
+#include "propagation/CbmLitMaterialEffectsImp.h"
 
-#include "CbmLitTrackParam.h"
-#include "CbmLitMaterialInfo.h"
-#include "CbmLitPDG.h"
-#include "CbmLitDefaultSettings.h"
+#include "base/CbmLitPDG.h"
+#include "base/CbmLitDefaultSettings.h"
+#include "data/CbmLitTrackParam.h"
+#include "propagation/CbmLitMaterialInfo.h"
 
-#include "parallel/LitAddMaterial.h"
+//#include "parallel/LitAddMaterial.h"
 
 #include <iostream>
 #include <cmath>

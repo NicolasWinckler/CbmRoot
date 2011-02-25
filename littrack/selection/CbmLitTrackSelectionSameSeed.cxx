@@ -4,9 +4,11 @@
  * @version 2.0
  */
 
-#include "CbmLitTrackSelectionSameSeed.h"
-#include "CbmLitTrack.h"
-#include "CbmLitComparators.h"
+#include "selection/CbmLitTrackSelectionSameSeed.h"
+
+#include "data/CbmLitTrack.h"
+#include "utils/CbmLitComparators.h"
+
 #include <algorithm>
 
 CbmLitTrackSelectionSameSeed::CbmLitTrackSelectionSameSeed()

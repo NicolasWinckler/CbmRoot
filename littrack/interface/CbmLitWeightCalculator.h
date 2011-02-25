@@ -1,8 +1,8 @@
 #ifndef CBMLITWEIGHTCALCULATOR_H_
 #define CBMLITWEIGHTCALCULATOR_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitTypes.h"
 
 class CbmLitTrackParam;
 

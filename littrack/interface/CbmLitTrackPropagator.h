@@ -10,8 +10,8 @@
 #ifndef CBMLITTRACKPROPAGATOR_H_
 #define CBMLITTRACKPROPAGATOR_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitFloat.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitFloat.h"
 
 #include <vector>
 

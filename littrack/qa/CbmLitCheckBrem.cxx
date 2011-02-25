@@ -1,7 +1,8 @@
-#include "CbmLitCheckBrem.h"
-#include "CbmLitMaterialInfo.h"
-#include "CbmLitMaterialEffectsImp.h"
-#include "CbmLitTrackParam.h"
+#include "qa/CbmLitCheckBrem.h"
+
+#include "data/CbmLitTrackParam.h"
+#include "propagation/CbmLitMaterialInfo.h"
+#include "propagation/CbmLitMaterialEffectsImp.h"
 
 #include "TGraph.h"
 #include "TMultiGraph.h"

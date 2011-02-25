@@ -3,10 +3,10 @@
  *@since 2008
  **/
 
-#include "CbmLitTGeoNavigator.h"
+#include "propagation/CbmLitTGeoNavigator.h"
 
-#include "CbmLitTrackParam.h"
-#include "CbmLitDefaultSettings.h"
+#include "base/CbmLitDefaultSettings.h"
+#include "data/CbmLitTrackParam.h"
 
 #include "TGeoManager.h"
 #include "TGeoNode.h"

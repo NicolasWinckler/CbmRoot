@@ -1,14 +1,15 @@
 #ifndef CBMLITWEIGHTCALCULATORGAUSS_H_
 #define CBMLITWEIGHTCALCULATORGAUSS_H_
 
-#include "CbmLitWeightCalculator.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTypes.h"
+#include "interface/CbmLitWeightCalculator.h"
 
 class CbmLitHit;
 class CbmLitStripHit;
-#include "CbmLitPixelHit.h"
+#include "data/CbmLitPixelHit.h"
 
-class CbmLitWeightCalculatorGauss : public CbmLitWeightCalculator{
+class CbmLitWeightCalculatorGauss : public CbmLitWeightCalculator
+{
 public:
 	CbmLitWeightCalculatorGauss();
 	virtual ~CbmLitWeightCalculatorGauss();

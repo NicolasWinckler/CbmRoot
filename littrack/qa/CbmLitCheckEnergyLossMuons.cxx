@@ -1,9 +1,10 @@
-#include "CbmLitCheckEnergyLossMuons.h"
-#include "CbmLitMaterialInfo.h"
-#include "CbmLitMaterialEffectsImp.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitUtils.h"
-#include "CbmLitDrawHist.h"
+#include "qa/CbmLitCheckEnergyLossMuons.h"
+
+#include "data/CbmLitTrackParam.h"
+#include "propagation/CbmLitMaterialInfo.h"
+#include "propagation/CbmLitMaterialEffectsImp.h"
+#include "utils/CbmLitUtils.h"
+#include "utils/CbmLitDrawHist.h"
 
 #include "TCanvas.h"
 

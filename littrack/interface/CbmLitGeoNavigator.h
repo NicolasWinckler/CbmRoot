@@ -8,9 +8,9 @@
 #ifndef CBMLITGEONAVIGATOR_H_
 #define CBMLITGEONAVIGATOR_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitFloat.h"
-#include "CbmLitMaterialInfo.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitFloat.h"
+#include "propagation/CbmLitMaterialInfo.h"
 
 
 #include <vector>

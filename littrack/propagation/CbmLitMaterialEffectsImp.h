@@ -9,8 +9,8 @@
 #ifndef CBMLITMATERIALEFFECTSIMP_H_
 #define CBMLITMATERIALEFFECTSIMP_H_
 
-#include "CbmLitMaterialEffects.h"
-#include "CbmLitFloat.h"
+#include "base/CbmLitFloat.h"
+#include "interface/CbmLitMaterialEffects.h"
 
 class CbmLitTrackParam;
 class CbmLitMaterialInfo;

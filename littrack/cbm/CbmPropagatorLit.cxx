@@ -1,8 +1,8 @@
 #include "CbmPropagatorLit.h"
 
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitToolFactory.h"
-#include "CbmLitConverter.h"
+#include "base/CbmLitToolFactory.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "utils/CbmLitConverter.h"
 
 #include "FairTrackParam.h"
 

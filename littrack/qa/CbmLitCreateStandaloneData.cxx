@@ -1,5 +1,6 @@
-#include "CbmLitCreateStandaloneData.h"
-#include "CbmLitEnvironment.h"
+#include "qa/CbmLitCreateStandaloneData.h"
+
+#include "base/CbmLitEnvironment.h"
 
 #include "CbmStsTrack.h"
 #include "CbmMuchPixelHit.h"

@@ -4,15 +4,16 @@
  * @version 1.0
  **/
 
-#include "CbmLitFindGlobalTracks.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitConverter.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitTrack.h"
-#include "CbmLitToolFactory.h"
+#include "finder_cbm/CbmLitFindGlobalTracks.h"
+
+#include "base/CbmLitToolFactory.h"
+#include "base/CbmLitEnvironment.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitTrack.h"
+#include "utils/CbmLitConverter.h"
+#include "utils/CbmLitMemoryManagment.h"
 
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"

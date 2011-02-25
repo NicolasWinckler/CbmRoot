@@ -4,8 +4,10 @@
  * @version 1.0
  */
 
-#include "CbmLitQualitySort.h"
-#include "CbmLitComparators.h"
+#include "selection/CbmLitQualitySort.h"
+
+#include "utils/CbmLitComparators.h"
+
 #include <algorithm>
 
 CbmLitQualitySort::CbmLitQualitySort()

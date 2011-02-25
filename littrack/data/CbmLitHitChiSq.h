@@ -1,8 +1,8 @@
 #ifndef CBMLITHITCHISQ_H_
 #define CBMLITHITCHISQ_H_
 
-#include "CbmLitFloat.h"
-#include "CbmLitTrackParam.h"
+#include "base/CbmLitFloat.h"
+#include "data/CbmLitTrackParam.h"
 
 class CbmLitHit;
 

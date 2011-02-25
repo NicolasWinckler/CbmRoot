@@ -10,8 +10,8 @@
 #ifndef CBMLITTGEOTRACKPROPAGATOR_H_
 #define CBMLITTGEOTRACKPROPAGATOR_H_
 
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackPropagator.h"
 
 #include <vector>
 

@@ -10,8 +10,8 @@
 #ifndef CBMLITTRACKEXTRAPOLATOR_H_
 #define CBMLITTRACKEXTRAPOLATOR_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitFloat.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitFloat.h"
 
 #include <vector>
 

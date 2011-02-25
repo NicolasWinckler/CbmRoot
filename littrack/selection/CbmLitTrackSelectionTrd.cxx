@@ -5,10 +5,12 @@
  */
 
 
-#include "CbmLitTrackSelectionTrd.h"
-#include "CbmLitTrack.h"
-#include "CbmLitTrackSelectionSharedHits.h"
-#include "CbmLitTrackSelectionSameSeed.h"
+#include "selection/CbmLitTrackSelectionTrd.h"
+
+#include "data/CbmLitTrack.h"
+#include "selection/CbmLitTrackSelectionSharedHits.h"
+#include "selection/CbmLitTrackSelectionSameSeed.h"
+
 #include <set>
 #include <functional>
 

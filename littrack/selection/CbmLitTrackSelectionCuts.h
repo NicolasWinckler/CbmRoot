@@ -8,7 +8,7 @@
 #ifndef CBMLITTRACKSELECTIONCUTS_H_
 #define CBMLITTRACKSELECTIONCUTS_H_
 
-#include "CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionCuts : public CbmLitTrackSelection
 {

@@ -10,8 +10,8 @@
 #ifndef CBMLITTRACKSELECTIONSAMESEED_H_
 #define CBMLITTRACKSELECTIONSAMESEED_H_
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitQualitySort.h"
+#include "interface/CbmLitTrackSelection.h"
+#include "selection/CbmLitQualitySort.h"
 
 class CbmLitTrackSelectionSameSeed : public CbmLitTrackSelection,
                                      public CbmLitQualitySort

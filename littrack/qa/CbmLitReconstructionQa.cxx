@@ -4,10 +4,11 @@
  * @version 2.0
  **/
 
-#include "CbmLitReconstructionQa.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitDrawHist.h"
-#include "CbmLitUtils.h"
+#include "qa/CbmLitReconstructionQa.h"
+
+#include "base/CbmLitEnvironment.h"
+#include "utils/CbmLitDrawHist.h"
+#include "utils/CbmLitUtils.h"
 
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"

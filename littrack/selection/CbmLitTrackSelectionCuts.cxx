@@ -3,8 +3,10 @@
  * @since 2011
  * @version 1.0
  */
-#include "CbmLitTrackSelectionCuts.h"
-#include "CbmLitTrack.h"
+#include "selection/CbmLitTrackSelectionCuts.h"
+
+#include "data/CbmLitTrack.h"
+
 #include <cmath>
 #include <limits>
 

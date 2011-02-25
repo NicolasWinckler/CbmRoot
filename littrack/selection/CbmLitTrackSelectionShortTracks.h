@@ -10,7 +10,7 @@
 #ifndef CBMLITTRACKSELECTIONSHORTTRACKS_H_
 #define CBMLITTRACKSELECTIONSHORTTRACKS_H_
 
-#include "CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionShortTracks : public CbmLitTrackSelection
 {

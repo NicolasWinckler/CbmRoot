@@ -9,10 +9,10 @@
 #ifndef CBMLITPROPAGATIONANALYSIS_H_
 #define CBMLITPROPAGATIONANALYSIS_H_ 1
 
-#include "FairTask.h"
-#include "CbmLitTypes.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitPtrTypes.h"
 
+#include "FairTask.h"
 #include "TStopwatch.h"
 
 #include <vector>

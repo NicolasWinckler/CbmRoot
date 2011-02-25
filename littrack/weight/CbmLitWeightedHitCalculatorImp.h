@@ -1,8 +1,9 @@
 #ifndef CBMLITWEIGHTEDHITCALCULATORIMP_H_
 #define CBMLITWEIGHTEDHITCALCULATORIMP_H_
 
-#include "CbmLitWeightedHitCalculator.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTypes.h"
+#include "interface/CbmLitWeightedHitCalculator.h"
+
 class CbmLitHit;
 class CbmLitStripHit;
 class CbmLitPixelHit;

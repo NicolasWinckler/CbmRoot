@@ -9,8 +9,8 @@
 #ifndef CBMLITQUALITYSORT_H_
 #define CBMLITQUALITYSORT_H_
 
-#include "CbmLitEnums.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
+#include "base/CbmLitTypes.h"
 
 class CbmLitQualitySort {
 public:

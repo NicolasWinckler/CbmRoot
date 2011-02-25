@@ -1,7 +1,7 @@
-#include "CbmLitCheckMultipleScattering.h"
+#include "qa/CbmLitCheckMultipleScattering.h"
 
-#include "CbmLitDrawHist.h"
-#include "CbmLitUtils.h"
+#include "utils/CbmLitDrawHist.h"
+#include "utils/CbmLitUtils.h"
 
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"

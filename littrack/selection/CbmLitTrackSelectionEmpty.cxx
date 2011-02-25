@@ -4,7 +4,7 @@
  * @version 1.0
  */
 
-#include "CbmLitTrackSelectionEmpty.h"
+#include "selection/CbmLitTrackSelectionEmpty.h"
 
 CbmLitTrackSelectionEmpty::CbmLitTrackSelectionEmpty()
 {

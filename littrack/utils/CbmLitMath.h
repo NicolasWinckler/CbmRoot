@@ -1,7 +1,7 @@
 #ifndef CBMLITMATH_H_
 #define CBMLITMATH_H_
 
-#include "CbmLitTrackParam.h"
+#include "data/CbmLitTrackParam.h"
 class CbmLitHit;
 class CbmLitStripHit;
 class CbmLitPixelHit;

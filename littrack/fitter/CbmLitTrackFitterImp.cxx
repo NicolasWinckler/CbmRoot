@@ -1,12 +1,12 @@
-#include "CbmLitTrackFitterImp.h"
+#include "fitter/CbmLitTrackFitterImp.h"
 
-#include "CbmLitTrackParam.h"
-#include "CbmLitTrack.h"
-#include "CbmLitHit.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitMath.h"
-#include "CbmLitStripHit.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitStripHit.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "utils/CbmLitMath.h"
 
 #include <iostream>
 

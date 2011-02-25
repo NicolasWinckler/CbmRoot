@@ -4,10 +4,10 @@
  * @version 1.0
  */
 
-#include "CbmLitTrackSelectionSharedHits.h"
+#include "selection/CbmLitTrackSelectionSharedHits.h"
 
-#include "CbmLitTrack.h"
-#include "CbmLitComparators.h"
+#include "data/CbmLitTrack.h"
+#include "utils/CbmLitComparators.h"
 
 #include <set>
 #include <algorithm>

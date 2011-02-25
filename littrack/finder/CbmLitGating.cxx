@@ -1,10 +1,11 @@
-#include "CbmLitGating.h"
-#include "CbmLitMath.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitHit.h"
-#include "CbmLitStation.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitComparators.h"
+#include "finder/CbmLitGating.h"
+
+#include "base/CbmLitStation.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "utils/CbmLitMath.h"
+#include "utils/CbmLitComparators.h"
 
 #include <algorithm>
 #include <cmath>

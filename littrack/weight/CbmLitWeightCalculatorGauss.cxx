@@ -1,8 +1,8 @@
-#include "CbmLitWeightCalculatorGauss.h"
+#include "weight/CbmLitWeightCalculatorGauss.h"
 
-#include "CbmLitHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitPixelHit.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitPixelHit.h"
 
 #include <iostream>
 #include <cmath>

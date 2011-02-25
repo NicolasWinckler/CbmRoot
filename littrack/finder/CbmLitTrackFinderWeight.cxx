@@ -1,13 +1,13 @@
-#include "CbmLitTrackFinderWeight.h"
+#include "finder/CbmLitTrackFinderWeight.h"
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackFitter.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitComparators.h"
-#include "CbmLitMemoryManagment.h"
-#include "CbmLitHitChiSq.h"
-#include "CbmLitMath.h"
+#include "data/CbmLitHitChiSq.h"
+#include "interface/CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackFitter.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "utils/CbmLitComparators.h"
+#include "utils/CbmLitMemoryManagment.h"
+#include "utils/CbmLitMath.h"
 
 #include <iostream>
 #include <algorithm>

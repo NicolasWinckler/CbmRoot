@@ -1,6 +1,6 @@
-#include "CbmLitCheckSimpleGeo.h"
+#include "qa/CbmLitCheckSimpleGeo.h"
 
-#include "CbmLitSimpleGeometryConstructor.h"
+#include "base/CbmLitSimpleGeometryConstructor.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"

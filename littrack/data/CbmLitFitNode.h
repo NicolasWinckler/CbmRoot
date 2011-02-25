@@ -10,8 +10,8 @@
 #ifndef CBMLITFITNODE_H_
 #define CBMLITFITNODE_H_
 
-#include "CbmLitFloat.h"
-#include "CbmLitTrackParam.h"
+#include "base/CbmLitFloat.h"
+#include "data/CbmLitTrackParam.h"
 
 class CbmLitFitNode
 {

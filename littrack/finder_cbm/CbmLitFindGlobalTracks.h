@@ -19,8 +19,8 @@
 
 #include "FairTask.h"
 
-#include "CbmLitTypes.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitPtrTypes.h"
 
 #include "TStopwatch.h"
 

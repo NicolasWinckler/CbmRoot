@@ -8,8 +8,8 @@
 #ifndef CBMLITTRACKFITTER_H_
 #define CBMLITTRACKFITTER_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitFloat.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitFloat.h"
 
 class CbmLitTrack;
 

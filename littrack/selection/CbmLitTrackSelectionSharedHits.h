@@ -10,9 +10,9 @@
 #ifndef CBMLITTRACKSELECTIONSHAREDHITS_H_
 #define CBMLITTRACKSELECTIONSHAREDHITS_H_
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitQualitySort.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTypes.h"
+#include "interface/CbmLitTrackSelection.h"
+#include "selection/CbmLitQualitySort.h"
 
 class CbmLitTrackSelectionSharedHits : public CbmLitTrackSelection,
                                        public CbmLitQualitySort

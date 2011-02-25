@@ -1,10 +1,10 @@
-#include "CbmLitMath.h"
+#include "utils/CbmLitMath.h"
 
-#include "CbmLitTrackParam.h"
-#include "CbmLitHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitTrack.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitTrack.h"
 
 #include <iostream>
 #include <cmath>

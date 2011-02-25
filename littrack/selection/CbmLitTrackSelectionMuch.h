@@ -9,8 +9,8 @@
 #ifndef CBMLITTRACKSELECTIONMUCH_H_
 #define CBMLITTRACKSELECTIONMUCH_H_
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionMuch : public CbmLitTrackSelection
 {

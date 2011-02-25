@@ -1,6 +1,7 @@
-#include "CbmLitMTQa.h"
-#include "CbmLitConverter.h"
-#include "CbmLitEnvironment.h"
+#include "qa/CbmLitMTQa.h"
+
+#include "utils/CbmLitConverter.h"
+#include "base/CbmLitEnvironment.h"
 #include "parallel/LitTrackFinderNNParallel.h"
 #include "parallel/LitConverter.h"
 

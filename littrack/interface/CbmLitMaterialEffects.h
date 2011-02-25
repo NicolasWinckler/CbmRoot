@@ -8,7 +8,7 @@
 #ifndef CBMLITMATERIALEFFECTS_H_
 #define CBMLITMATERIALEFFECTS_H_
 
-#include "CbmLitTool.h"
+#include "base/CbmLitTool.h"
 
 class CbmLitTrackParam;
 class CbmLitMaterialInfo;

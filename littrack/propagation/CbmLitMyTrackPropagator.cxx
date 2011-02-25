@@ -4,12 +4,13 @@
  **
  **/
 
-#include "CbmLitMyTrackPropagator.h"
-#include "CbmLitMyGeoNavigator.h"
-#include "CbmLitMaterialEffectsImp.h"
-#include "CbmLitMath.h"
-#include "CbmLitMatrixMath.h"
-#include "CbmLitDefaultSettings.h"
+#include "propagation/CbmLitMyTrackPropagator.h"
+
+#include "base/CbmLitDefaultSettings.h"
+#include "propagation/CbmLitMyGeoNavigator.h"
+#include "propagation/CbmLitMaterialEffectsImp.h"
+#include "utils/CbmLitMath.h"
+#include "utils/CbmLitMatrixMath.h"
 
 #include <cmath>
 #include <iostream>

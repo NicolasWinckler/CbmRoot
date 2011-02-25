@@ -1,7 +1,7 @@
 #ifndef CBMLITCHECKMULTIPLESCATTERING_H_
 #define CBMLITCHECKMULTIPLESCATTERING_H_
 
-#include "CbmLitMaterialInfo.h"
+#include "propagation/CbmLitMaterialInfo.h"
 
 #include "FairTask.h"
 

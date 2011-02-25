@@ -4,15 +4,16 @@
  * @version 1.0
  **/
 
-#include "CbmLitTGeoTrackPropagator.h"
-#include "CbmLitTrackExtrapolator.h"
-#include "CbmLitTGeoNavigator.h"
-#include "CbmLitMaterialEffectsImp.h"
-#include "CbmLitMaterialInfo.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitMath.h"
-#include "CbmLitMatrixMath.h"
-#include "CbmLitDefaultSettings.h"
+#include "propagation/CbmLitTGeoTrackPropagator.h"
+
+#include "base/CbmLitDefaultSettings.h"
+#include "data/CbmLitTrackParam.h"
+#include "interface/CbmLitTrackExtrapolator.h"
+#include "propagation/CbmLitTGeoNavigator.h"
+#include "propagation/CbmLitMaterialEffectsImp.h"
+#include "propagation/CbmLitMaterialInfo.h"
+#include "utils/CbmLitMath.h"
+#include "utils/CbmLitMatrixMath.h"
 
 #include <vector>
 #include <cmath>

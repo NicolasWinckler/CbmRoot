@@ -9,7 +9,7 @@
 #ifndef CBMLITTRACKSELECTIONEMPTY_H_
 #define CBMLITTRACKSELECTIONEMPTY_H_
 
-#include "CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionEmpty : public CbmLitTrackSelection
 {

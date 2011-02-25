@@ -1,5 +1,6 @@
-#include "CbmLitWeightCalculatorSimple.h"
-#include "CbmLitHit.h"
+#include "weight/CbmLitWeightCalculatorSimple.h"
+
+#include "data/CbmLitHit.h"
 
 CbmLitWeightCalculatorSimple::CbmLitWeightCalculatorSimple()
 {

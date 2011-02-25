@@ -6,9 +6,9 @@
 #ifndef CBMLITPARALLELTRACKFITTERTESTELECTRON_H_
 #define CBMLITPARALLELTRACKFITTERTESTELECTRON_H_
 
-#include "CbmLitTrackFitter.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "data/CbmLitPixelHit.h"
+#include "interface/CbmLitTrackFitter.h"
 #include "parallel/electron/LitDetectorGeometryElectron.h"
 #include "parallel/LitHit.h"
 

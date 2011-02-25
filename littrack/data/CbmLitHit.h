@@ -9,8 +9,8 @@
 #ifndef CBMLITHIT_H_
 #define CBMLITHIT_H_
 
-#include "CbmLitFloat.h"
-#include "CbmLitEnums.h"
+#include "base/CbmLitFloat.h"
+#include "base/CbmLitEnums.h"
 
 #include <string>
 

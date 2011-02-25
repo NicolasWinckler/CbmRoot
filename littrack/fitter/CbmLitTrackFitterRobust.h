@@ -7,9 +7,9 @@
 #ifndef CBMLITTRACKFITTERROBUST_H_
 #define CBMLITTRACKFITTERROBUST_H_
 
-#include "CbmLitTrackFitter.h"
-#include "CbmLitTypes.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackFitter.h"
 
 class CbmLitTrackParam;
 class CbmLitStripHit;

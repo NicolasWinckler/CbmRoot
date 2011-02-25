@@ -1,8 +1,8 @@
 #ifndef CBMLITTRACKSELECTIONMUCHROBUST_H_
 #define CBMLITTRACKSELECTIONMUCHROBUST_H_
 
-#include "CbmLitTrackSelection.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionMuchRobust : public CbmLitTrackSelection
 {

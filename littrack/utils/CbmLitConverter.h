@@ -1,7 +1,7 @@
 #ifndef CBMLITCONVERTER_H_
 #define CBMLITCONVERTER_H_
 
-#include "CbmLitTypes.h"
+#include "base/CbmLitTypes.h"
 
 class CbmLitPixelHit;
 class CbmLitStripHit;

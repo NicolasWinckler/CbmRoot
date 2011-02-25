@@ -4,8 +4,9 @@
  * @version 1.0
  **/
 
-#include "CbmLitFindGlobalTracksIdeal.h"
-#include "CbmLitEnvironment.h"
+#include "qa/CbmLitFindGlobalTracksIdeal.h"
+
+#include "base/CbmLitEnvironment.h"
 
 #include "CbmTrackMatch.h"
 #include "CbmTofHit.h"

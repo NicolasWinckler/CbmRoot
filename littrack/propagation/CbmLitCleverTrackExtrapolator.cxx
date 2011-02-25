@@ -5,14 +5,15 @@
  **
  **/
 
-#include "CbmLitCleverTrackExtrapolator.h"
-#include "CbmLitTrackExtrapolator.h"
-#include "CbmLitToolFactory.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitEnums.h"
-#include "CbmLitMath.h"
-#include "CbmLitMatrixMath.h"
-#include "CbmLitDefaultSettings.h"
+#include "propagation/CbmLitCleverTrackExtrapolator.h"
+
+#include "base/CbmLitEnums.h"
+#include "base/CbmLitDefaultSettings.h"
+#include "base/CbmLitToolFactory.h"
+#include "data/CbmLitTrackParam.h"
+#include "interface/CbmLitTrackExtrapolator.h"
+#include "utils/CbmLitMath.h"
+#include "utils/CbmLitMatrixMath.h"
 
 CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator(
 		const std::string& type)

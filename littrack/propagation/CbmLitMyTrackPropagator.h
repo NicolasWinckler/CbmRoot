@@ -8,8 +8,8 @@
 #ifndef CBMLITMYTRACKPROPAGATOR_H_
 #define CBMLITMYTRACKPROPAGATOR_H_
 
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackPropagator.h"
 
 class CbmLitMyTrackPropagator : public CbmLitTrackPropagator
 {

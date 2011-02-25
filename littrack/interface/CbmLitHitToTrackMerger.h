@@ -1,8 +1,8 @@
 #ifndef CBMLITHITTOTRACKMERGER_H_
 #define CBMLITHITTOTRACKMERGER_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitTypes.h"
 
 class CbmLitHitData;
 class CbmLitDetectorLayout;

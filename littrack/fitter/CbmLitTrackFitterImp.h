@@ -1,8 +1,8 @@
 #ifndef CBMLITTRACKFITTERIMP_H_
 #define CBMLITTRACKFITTERIMP_H_
 
-#include "CbmLitTrackFitter.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackFitter.h"
 
 class CbmLitTrack;
 

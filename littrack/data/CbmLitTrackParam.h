@@ -1,7 +1,7 @@
 #ifndef CBMLITTRACKPARAM_H_
 #define CBMLITTRACKPARAM_H_
 
-#include "CbmLitFloat.h"
+#include "base/CbmLitFloat.h"
 
 #include <vector>
 #include <string>

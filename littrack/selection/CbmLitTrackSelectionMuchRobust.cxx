@@ -1,11 +1,10 @@
-#include "CbmLitTrackSelectionMuchRobust.h"
+#include "selection/CbmLitTrackSelectionMuchRobust.h"
 
-#include "CbmLitToolFactory.h"
-#include "CbmLitTrackSelectionShortTracks.h"
-#include "CbmLitTrackSelectionCuts.h"
-#include "CbmLitTrackSelectionSharedHits.h"
-//#include "CbmLitTrackSelectionChiSq.h"
-#include "CbmLitTrack.h"
+#include "base/CbmLitToolFactory.h"
+#include "data/CbmLitTrack.h"
+#include "selection/CbmLitTrackSelectionShortTracks.h"
+#include "selection/CbmLitTrackSelectionCuts.h"
+#include "selection/CbmLitTrackSelectionSharedHits.h"
 
 CbmLitTrackSelectionMuchRobust::CbmLitTrackSelectionMuchRobust()
 {

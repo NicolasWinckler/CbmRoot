@@ -1,14 +1,15 @@
-#include "CbmLitNearestHitToTrackMerger.h"
-#include "CbmLitHit.h"
-#include "CbmLitTrack.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitStation.h"
-#include "CbmLitSubstation.h"
-#include "CbmLitDetectorLayout.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitTypes.h"
-#include "CbmLitMath.h"
+#include "finder/CbmLitNearestHitToTrackMerger.h"
+
+#include "base/CbmLitStation.h"
+#include "base/CbmLitSubstation.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "base/CbmLitTypes.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitTrackParam.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "utils/CbmLitMath.h"
 
 #include <iostream>
 

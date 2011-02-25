@@ -8,8 +8,8 @@
 #ifndef CBMLITTGEONAVIGATOR_H_
 #define CBMLITTGEONAVIGATOR_H_
 
-#include "CbmLitGeoNavigator.h"
-#include "CbmLitMaterialInfo.h"
+#include "interface/CbmLitGeoNavigator.h"
+#include "propagation/CbmLitMaterialInfo.h"
 
 #include <vector>
 

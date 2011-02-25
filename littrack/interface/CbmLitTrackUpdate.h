@@ -8,7 +8,7 @@
 #ifndef CBMLITTRACKUPDATE_H_
 #define CBMLITTRACKUPDATE_H_
 
-#include "CbmLitTool.h"
+#include "base/CbmLitTool.h"
 
 class CbmLitHit;
 class CbmLitTrackParam;

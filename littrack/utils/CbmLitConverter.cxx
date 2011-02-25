@@ -1,10 +1,11 @@
-#include "CbmLitConverter.h"
+#include "utils/CbmLitConverter.h"
 
-#include "CbmLitHit.h"
-#include "CbmLitPixelHit.h"
-#include "CbmLitStripHit.h"
-#include "CbmLitTrack.h"
-#include "CbmLitTrackParam.h"
+#include "base/CbmLitEnvironment.h"
+#include "data/CbmLitHit.h"
+#include "data/CbmLitPixelHit.h"
+#include "data/CbmLitStripHit.h"
+#include "data/CbmLitTrack.h"
+#include "data/CbmLitTrackParam.h"
 
 #include "CbmTrack.h"
 #include "CbmBaseHit.h"
@@ -14,7 +15,7 @@
 #include "CbmStsTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrdTrack.h"
-#include "CbmLitEnvironment.h"
+
 #include "CbmGlobalTrack.h"
 
 #include "TClonesArray.h"

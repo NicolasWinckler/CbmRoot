@@ -4,11 +4,12 @@
  * @version 1.0
  */
 
-#include "CbmLitTrackSelectionMuch.h"
-#include "CbmLitTrack.h"
-#include "CbmLitComparators.h"
-#include "CbmLitTrackSelectionSharedHits.h"
-#include "CbmLitTrackSelectionCuts.h"
+#include "selection/CbmLitTrackSelectionMuch.h"
+
+#include "data/CbmLitTrack.h"
+#include "selection/CbmLitTrackSelectionSharedHits.h"
+#include "selection/CbmLitTrackSelectionCuts.h"
+#include "utils/CbmLitComparators.h"
 
 CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
 	fNofSharedHits(0),

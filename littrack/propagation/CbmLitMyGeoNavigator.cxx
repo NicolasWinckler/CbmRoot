@@ -3,12 +3,12 @@
  *@since 2009
  **/
 
-#include "CbmLitMyGeoNavigator.h"
+#include "propagation/CbmLitMyGeoNavigator.h"
 
-#include "CbmLitSimpleGeometryConstructor.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitMaterialInfo.h"
-#include "CbmLitComparators.h"
+#include "base/CbmLitSimpleGeometryConstructor.h"
+#include "data/CbmLitTrackParam.h"
+#include "propagation/CbmLitMaterialInfo.h"
+#include "utils/CbmLitComparators.h"
 
 #include <algorithm>
 

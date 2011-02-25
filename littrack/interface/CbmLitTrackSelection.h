@@ -1,8 +1,8 @@
 #ifndef CBMLITTRACKSELECTION_H_
 #define CBMLITTRACKSELECTION_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitTypes.h"
 
 class CbmLitTrackSelection : public CbmLitTool
 {

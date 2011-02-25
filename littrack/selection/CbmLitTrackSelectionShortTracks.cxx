@@ -4,8 +4,10 @@
  * @version 1.0
  */
 
-#include "CbmLitTrackSelectionShortTracks.h"
-#include "CbmLitComparators.h"
+#include "selection/CbmLitTrackSelectionShortTracks.h"
+
+#include "utils/CbmLitComparators.h"
+
 #include <algorithm>
 
 CbmLitTrackSelectionShortTracks::CbmLitTrackSelectionShortTracks()

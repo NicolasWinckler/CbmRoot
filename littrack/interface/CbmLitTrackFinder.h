@@ -1,8 +1,8 @@
 #ifndef CBMLITTRACKFINDER_H_
 #define CBMLITTRACKFINDER_H_
 
-#include "CbmLitTool.h"
-#include "CbmLitTypes.h"
+#include "base/CbmLitTool.h"
+#include "base/CbmLitTypes.h"
 
 class CbmLitTrackFinder : public CbmLitTool
 {

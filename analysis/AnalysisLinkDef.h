@@ -24,12 +24,13 @@
 #pragma link C++ class CbmAnaDimuonHisto+;
 #pragma link C++ class CbmAnaAngularAcceptance+;
 
-#pragma link C++ class CbmAnaTimingAnalysis+;
-#pragma link C++ class CbmAnaEpochTest+;
+//#pragma link C++ class CbmAnaTimingAnalysis+;
+//#pragma link C++ class CbmAnaEpochTest+;
 #pragma link C++ class CbmAnaTimingMuchDigitizer+;
 #pragma link C++ class CbmAnaTimingMuchHitFinder+;
 
 #pragma link C++ class CbmAnaDielectronTask+;
+#pragma link C++ class CbmAnaElectronsQa+;
 #endif
 
 

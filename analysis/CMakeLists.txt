@@ -59,12 +59,13 @@ much/CbmAnaDimuonAnalysis.cxx
 much/CbmAnaDimuonHisto.cxx
 much/CbmAnaAngularAcceptance.cxx
 
-timing/CbmAnaTimingAnalysis.cxx
-timing/CbmAnaEpochTest.cxx
+#timing/CbmAnaTimingAnalysis.cxx 
+#timing/CbmAnaEpochTest.cxx
 timing/CbmAnaTimingMuchDigitizer.cxx
 timing/CbmAnaTimingMuchHitFinder.cxx
 
 dielectron/CbmAnaDielectronTask.cxx
+dielectron/CbmAnaElectronsQa.cxx
 )
 
 

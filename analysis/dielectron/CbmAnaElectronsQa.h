@@ -12,7 +12,7 @@
 #include "CbmRichHit.h"
 
 #include <map>
-#include <fstream>
+//#include <fstream>
 #include <string>
 
 using std::map;
@@ -22,7 +22,7 @@ class CbmAnaElectronsQa : public FairTask{
 
 public:
 
-	CbmAnaElectronsQa(const char *name, const char *title, Int_t verbose);
+	CbmAnaElectronsQa(const char *name, const char *title);
 
 	virtual ~CbmAnaElectronsQa();
 	virtual InitStatus Init();
@@ -30,7 +30,6 @@ public:
 	virtual void FinishTask();
 	void SetDefaultParameters();
 	Bool_t SetParameters();
-	void SetGeoType(TString richGeo){fRichGeoType = richGeo;}
     void SetTrdAnnCut(Double_t annCut){fTrdAnnCut = annCut;}
     void SetRichAnnCut(Double_t richAnnCut){fRichAnnCut = richAnnCut;}
     void SetMeanA(Double_t meanA){fMeanA = meanA;}
@@ -40,8 +39,6 @@ public:
     void SetRmsCoeff(Double_t rmsCoeff){fRmsCoeff = rmsCoeff;}
     void SetDistCut(Double_t dist){fDistCut = dist;}
     void SetUseRichAnn(Bool_t useRichAnn){fUseRichAnn = useRichAnn;}
-    // set to "", if you don't want to save images
-    void SetImageOutDir(string s){fImageOutDir = s;}
 
 private:
 	Int_t fEventNum;
@@ -60,9 +57,12 @@ private:
 	TClonesArray* fTofPoints;
 	TClonesArray* fTofHits;
 
-    Int_t fMinNofHitsInRichRing;
-    Int_t fMinNofTrdHits;
-    TString fRichGeoType;
+//acceptance cuts
+    Int_t fMinNofStsPoints;
+    Int_t fMinNofRichRingHits;
+    Int_t fMinNofTrdPoints;
+
+//electron identification cuts
     Double_t fTrdAnnCut;
     Double_t fRichAnnCut;
     Double_t fMeanA;
@@ -72,95 +72,46 @@ private:
     Double_t fRmsCoeff;
     Double_t fDistCut;
     Bool_t fUseRichAnn;
-    string fImageOutDir;
 
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);
     Bool_t IsTrdElectron(CbmTrdTrack* trdTrk);
     Bool_t IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum);
-    void AccTracks();
-    void FoundRichRings();
-    void RingTrackMatch();
-    void GlobalTracksMatchEff();
-    void GlobalTracksElIdEff();
-    void DiffElandPi();
-    void SaveToImage();
 
-    std::ofstream  fOutElandPi;
+    void SignalElectronAcceptance();
+    void SignalElectronMatching();
+    void ElectronIdentificationEff();
+    void TestDistributions();
+
     CbmRichElectronIdAnn * fElIdAnn;
 
-//RICH histograms and counters
-	Int_t fNofMCRings;
-    Int_t fNofAccRings;
-    Int_t fNofTrueFoundRings;
-	Int_t fNofTrueMatchRings;
-	Int_t fNofTrueElIdRings;
+//signal electron acceptance
+	TH1D* fh_mc_el;
+	TH1D* fh_acc_sts_el;
+	TH1D* fh_acc_rich_el;
+	TH1D* fh_acc_trd_el;
+	TH1D* fh_acc_tof_el;
 
-	TH1D* fhMCRings;
-	TH1D* fhAccRings;
-	TH1D* fhTrueFoundRings;
-	TH1D* fhTrueMatchRings;
-	TH1D* fhTrueElIdRings;
+//signal electron matching
+	TH1D* fh_match_rich;
+	TH1D* fh_match_trd;
+	TH1D* fh_match_tof;
 
-//GLOBAL histograms and counters
-	Int_t fNofAccRichTrdGlobal;
-	Int_t fNofAccRichTrdTofGlobal;
+//ELECTRON IDENTIFICATION AND PION SUPPRESSION
+	TH1D* fh_elid_rich;
+	TH1D* fh_elid_trd;
+	TH1D* fh_elid_tof;
 
-	Int_t fNofTrueMatchStsRichGlobal;
-	Int_t fNofTrueMatchStsRichTrdGlobal;
-	Int_t fNofTrueMatchStsRichTrdTofGlobal;
+	TH1D* fh_acc_pi;
+	TH1D* fh_pi_as_el_rich;
+	TH1D* fh_pi_as_el_trd;
+	TH1D* fh_pi_as_el_tof;
 
-	TH1D* fhAccRichTrdGlobal;
-	TH1D* fhAccRichTrdTofGlobal;
-
-	TH1D* fhTrueMatchStsRichGlobal;
-	TH1D* fhTrueMatchStsRichTrdGlobal;
-	TH1D* fhTrueMatchStsRichTrdTofGlobal;
-
-//ELECTRON IDENTIFICATION
-	Int_t fNofTrueIdRich;
-	TH1D* fhTrueIdRich;
-	Int_t fNofAccPi;
-	TH1D* fhAccPi;
-	Int_t fNofPiasElRich;
-	TH1D* fhPiasElRich;
-
-	Int_t fNofTrueIdRichTrd;
-	TH1D* fhTrueIdRichTrd;
-	Int_t fNofPiasElRichTrd;
-	TH1D* fhPiasElRichTrd;
-
-	Int_t fNofTrueIdRichTrdTof;
-	TH1D* fhTrueIdRichTrdTof;
-	Int_t fNofPiasElRichTrdTof;
-	TH1D* fhPiasElRichTrdTof;
-
-// difference between electrons and pions
-	TH1D* fhAaxisEl;
-	TH1D* fhAaxisPi;
-	TH1D* fhBAxisEl;
-	TH1D* fhBAxisPi;
-	TH1D* fhAaxisCorEl;
-	TH1D* fhAaxisCorPi;
-	TH1D* fhBAxisCorEl;
-	TH1D* fhBAxisCorPi;
-	TH1D* fhDistEl;
-	TH1D* fhDistPi;
-	TH1D* fhNofHitsEl;
-	TH1D* fhNofHitsPi;
-	TH1D* fhChi2El;
-	TH1D* fhChi2Pi;
-	TH1D* fhRadPosEl;
-	TH1D* fhRadPosPi;
-	TH2D* fhAaxisVsMomEl;
-	TH2D* fhAaxisVsMomPi;
-	TH2D* fhBAxisVsMomEl;
-	TH2D* fhBAxisVsMomPi;
-	TH2D* fhPhiVsRadAngEl;
-	TH2D* fhPhiVsRadAngPi;
-
-	TH1D* fhTrdAnnEl;
-	TH1D* fhTrdAnnPi;
+//test distributions
+	TH1D* fh_nof_global;
+	TH1D* fh_nof_sts_tracks;
+	TH1D* fh_nof_rich_rings;
+	TH1D* fh_nof_trd_tracks;
 
 	ClassDef(CbmAnaElectronsQa,1)
 };

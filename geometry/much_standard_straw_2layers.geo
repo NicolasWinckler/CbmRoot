@@ -47,5 +47,5 @@ Spacer ly [cm]              :       5
 Overlap along y axis [cm]   :       2
 
 # Straw module specification (type 2)
-Straw thickness [cm]        :     0.4
+Straw thickness [cm]        :     0.6
       

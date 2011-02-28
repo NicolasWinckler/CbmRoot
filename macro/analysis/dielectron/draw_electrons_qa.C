@@ -4,14 +4,15 @@
     Author : Semen Lebedev
     E-mail : S.Lebedev@gsi.de
 */
+
 #include "../../../littrack/utils/CbmLitDrawHist.cxx"
-#include "../../../littrack/utils/CbmLitUtils.cxx"
+//#include "../../../littrack/utils/CbmLitUtils.cxx"
 
 void draw_electrons_qa()
 {
 	SetStyles();
 
-	TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/test_electrons/elid.qa.0000.root");
+	TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.0000.root");
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
    // gStyle->SetOptStat(0000);
@@ -67,14 +68,14 @@ void draw_electrons_qa()
 	TCanvas *c2 = new TCanvas("match_eff","match_eff",500,500);
 	TH1D* match_rich_eff = Divide1DHists(fh_match_rich, fh_acc_rich_el, "match_rich_eff",
 		"Matching","momentum, GeV/c", "efficiency");
-	ringFindEff->SetMinimum(0.);
+	match_rich_eff->SetMinimum(0.);
 	TH1D* match_trd_eff = Divide1DHists(fh_match_trd, fh_acc_rich_el,"match_trd_eff","","", "");
 	TH1D* match_tof_eff = Divide1DHists(fh_match_tof, fh_acc_rich_el,"match_tof_eff","","", "");
 
 	std::string hname1, hname2, hname3;
-	hname1 = "STS-RICH (" +CalcEfficiency(fhTrueFoundRings,fhAccRings)+")";
-	hname2 = "TRD (" +CalcEfficiency(fhTrueMatchStsRichGlobal,fhAccRings)+")";
-	hname3 = "TOF ("+CalcEfficiency(fhTrueMatchStsRichTrdGlobal,fhAccRings)+")";
+	hname1 = "STS-RICH (" +CalcEfficiency(fh_match_rich,fh_acc_rich_el)+")";
+	hname2 = "TRD (" +CalcEfficiency(fh_match_trd,fh_acc_rich_el)+")";
+	hname3 = "TOF ("+CalcEfficiency(fh_match_tof,fh_acc_rich_el)+")";
 	DrawHist1D(match_rich_eff, match_trd_eff, match_tof_eff, NULL,
 		"", "momentum, GeV/c", "efficiency",
 		hname1, hname2, hname3, "",	false, false, true, 0.3,0.15, 0.99, 0.35);
@@ -128,7 +129,7 @@ void draw_electrons_qa()
 	c4->cd(1);
 	TH1D* eff1 = Divide1DHists(fh_elid_rich, fh_acc_rich_el, "eff1", "Electron Identification",
 		"momentum, GeV/c", "efficiency");
-	ringFindEff->SetMinimum(0.);
+	eff1->SetMinimum(0.);
 	TH1D* eff2 = Divide1DHists(fh_elid_trd, fh_acc_rich_el,	"eff2","",	"", "");
 	TH1D* eff3 = Divide1DHists(fh_elid_tof, fh_acc_rich_el, "eff3","","", "");
 
@@ -171,26 +172,26 @@ void draw_electrons_qa()
 	{
 	std::string hname1;
 	TCanvas *c5 = new TCanvas("test_distr","test_distr",800,800);
-	c3->Divide(2,2);
-	c3->cd(1);
+	c5->Divide(2,2);
+	c5->cd(1);
 	DrawHist1D(fh_nof_global, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
 		"", "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 
-	c3->cd(2);
+	c5->cd(2);
 	DrawHist1D(fh_nof_sts_tracks, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
 		"", "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 
-	c3->cd(3);
+	c5->cd(3);
 	DrawHist1D(fh_nof_rich_rings, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
 		hname1, "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 
-	c3->cd(4);
+	c5->cd(4);
 	DrawHist1D(fh_nof_trd_tracks, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
 		hname1, "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);

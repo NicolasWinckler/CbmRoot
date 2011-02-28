@@ -33,6 +33,7 @@ void run_electrons_qa(Int_t nEvents = 700)
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
 	cbmlibs();
+	 gSystem->Load("libAnalysis");
 
 	FairRunAna *run = new FairRunAna();
 	if (inFile1 != "") run->SetInputFile(inFile1);

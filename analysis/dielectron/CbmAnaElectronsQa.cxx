@@ -290,6 +290,7 @@ void CbmAnaElectronsQa::SignalElectronAcceptance()
 		FairMCPoint* point = (FairMCPoint*) fRichPoints->At(iPoint);
 		if ( !point) continue;
 		Int_t iMCTrack = point->GetTrackID();
+        if (iMCTrack < 0) continue;
 		CbmMCTrack* track = (CbmMCTrack*)fMCTracks->At(iMCTrack);
 		if ( !track) continue;
 		Int_t iMother = track->GetMotherId();
@@ -301,6 +302,7 @@ void CbmAnaElectronsQa::SignalElectronAcceptance()
 	//Loop for all MC rings and
     //fill RICH, TRD and TOF acceptance histograms
 	for (it=ringMap.begin(); it!=ringMap.end(); it++) {
+        if (it->first < 0) continue; 
 		CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(it->first);
 		if (!track) continue;
 
@@ -347,7 +349,7 @@ Bool_t CbmAnaElectronsQa::DoesRingHaveProjection(Int_t trackId)
 		if (!proj)continue;
 
 		CbmGlobalTrack* gtrack = (CbmGlobalTrack*)fGlobalTracks->At(iProj);
-		if (gtrack->GetStsTrackIndex() == -1) continue;
+		if (gtrack->GetStsTrackIndex() < 0) continue;
 		CbmTrackMatch* trackMatch = (CbmTrackMatch*)fStsTrackMatches->At(gtrack->GetStsTrackIndex());
 		if (!trackMatch) continue;
 		if (trackMatch->GetMCTrackId() == trackId && proj->GetX()!= 0 &&  proj->GetY()!= 0){
@@ -366,7 +368,7 @@ void CbmAnaElectronsQa::SignalElectronMatching()
 		CbmGlobalTrack* gTrack = (CbmGlobalTrack*)fGlobalTracks->At(iTrack);
 //STS
 		Int_t stsIndex = gTrack->GetStsTrackIndex();
-		if (stsIndex == -1)continue;
+		if (stsIndex == -1) continue;
 		CbmStsTrack* stsTrack = (CbmStsTrack*)fStsTracks->At(stsIndex);
 		if (!stsTrack) continue;
 		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
@@ -374,6 +376,7 @@ void CbmAnaElectronsQa::SignalElectronMatching()
 		Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
 
 //MC track
+        if (mcIdSts < 0) continue;
 		CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(mcIdSts);
         if (!track) continue;
         Int_t pdg = TMath::Abs(track->GetPdgCode());
@@ -439,6 +442,7 @@ void CbmAnaElectronsQa::ElectronIdentificationEff()
 		Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
 
 //MC Track
+        if (mcIdSts < 0) continue;
 		CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(mcIdSts);
         if (!track) continue;
         Int_t pdg = TMath::Abs(track->GetPdgCode());

@@ -56,9 +56,11 @@ public:
 
 private:
 	/* Shared hits track selection tool */
-	TrackSelectionPtr fSelectionSharedHits;
+	TrackSelectionPtr fSharedHitsSelection;
 	/* Track selection tool that cuts on number of hits and last plane index */
-	TrackSelectionPtr fSelectionCuts;
+	TrackSelectionPtr fCutsSelection;
+	/* Same seed track selection tool */
+	TrackSelectionPtr fSameSeedSelection;
 
 	/* Maximum number of shared hits */
 	int fNofSharedHits;

@@ -18,7 +18,10 @@ public:
 
 	/* Constructor */
 	CbmLitTrackSelectionCuts(
-			myf maxChiSq, int minLastPlaneId, int minNofHits, myf minMomentum);
+			myf maxChiSq,
+			int minLastPlaneId,
+			int minNofHits,
+			myf minMomentum);
 
 	/* Destructor */
 	virtual ~CbmLitTrackSelectionCuts();

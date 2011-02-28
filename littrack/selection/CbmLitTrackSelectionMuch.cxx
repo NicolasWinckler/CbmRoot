@@ -9,6 +9,7 @@
 #include "data/CbmLitTrack.h"
 #include "selection/CbmLitTrackSelectionSharedHits.h"
 #include "selection/CbmLitTrackSelectionCuts.h"
+#include "selection/CbmLitTrackSelectionSameSeed.h"
 #include "utils/CbmLitComparators.h"
 
 CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
@@ -16,10 +17,12 @@ CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
 	fMinNofHits(0),
 	fMinLastPlaneId(0)
 {
-	fSelectionSharedHits = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
-	fSelectionSharedHits->Initialize();
-	fSelectionCuts = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
-	fSelectionCuts->Initialize();
+	fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
+	fSharedHitsSelection->Initialize();
+	fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
+	fCutsSelection->Initialize();
+	fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
+	fSameSeedSelection->Initialize();
 }
 
 CbmLitTrackSelectionMuch::~CbmLitTrackSelectionMuch()
@@ -42,15 +45,16 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 
-	((CbmLitTrackSelectionSharedHits*)fSelectionSharedHits.get())->SetNofSharedHits(fNofSharedHits);
-	((CbmLitTrackSelectionCuts*)fSelectionCuts.get())->SetMinNofHits(fMinNofHits);
-	((CbmLitTrackSelectionCuts*)fSelectionCuts.get())->SetMinLastPlaneId(fMinLastPlaneId);
+	((CbmLitTrackSelectionSharedHits*)fSharedHitsSelection.get())->SetNofSharedHits(fNofSharedHits);
+	((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinNofHits(fMinNofHits);
+	((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinLastPlaneId(fMinLastPlaneId);
 
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++)
 		(*iTrack)->SetQuality(kLITGOOD);
 
-	fSelectionSharedHits->DoSelect(itBegin, itEnd);
-	fSelectionCuts->DoSelect(itBegin, itEnd);
+	fSharedHitsSelection->DoSelect(itBegin, itEnd);
+	fSameSeedSelection->DoSelect(itBegin, itEnd);
+	fCutsSelection->DoSelect(itBegin, itEnd);
 
 	return kLITSUCCESS;
 }

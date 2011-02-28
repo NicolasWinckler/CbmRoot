@@ -5,6 +5,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchLayerSide.h"
+#include "CbmMuchModule.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchStrawHit.h"
 #include "FairRootManager.h"
@@ -12,6 +13,7 @@
 #include "TRandom.h" 
 #include "TVector3.h" 
 #include <iomanip>
+#include <cassert>
 
 using std::cout;
 using std::endl;
@@ -30,7 +32,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws()
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   //SetPhis(0., 90., 45.);
-  SetPhis(-10., 0., 10.);
+  SetPhis(0., 10., -10.);
 }
 // -------------------------------------------------------------------------
 
@@ -43,7 +45,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   //SetPhis(0., 90., 45.);
-  SetPhis(-10., 0., 10.);
+  SetPhis(0., 10., -10.);
 }
 // -------------------------------------------------------------------------
 
@@ -56,7 +58,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiF
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   //SetPhis(0., 90., 45.);
-  SetPhis(-10., 0, 10.);
+  SetPhis(0., 10, -10.);
 }
 // -------------------------------------------------------------------------
 
@@ -118,7 +120,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 
   static Int_t first = 1;
   static Double_t radIn[6];
-  Double_t diam[6] = {0.42, 0.42, 0.42, 0.42, 0.42, 0.42}; // tube diameters
+  Double_t diam[6] = {0.62, 0.62, 0.62, 0.62, 0.62, 0.62}; // tube diameters
   Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
 
   Double_t phi[3] = {fPhis[0] * TMath::DegToRad(), fPhis[1] * TMath::DegToRad(), fPhis[2] * TMath::DegToRad()}; // rotation angles of views (doublets)
@@ -132,7 +134,9 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     for (Int_t i = 0; i < nSt; ++i) {
       CbmMuchStation *st = fGeoScheme->GetStation(i);
       radIn[i] = st->GetRmin();
-      cout << i << " " << radIn[i] << endl;
+      CbmMuchModule *mod = fGeoScheme->GetModule(i,0,0,0);
+      cout << i << " " << radIn[i] << " " << mod->GetSize().X() << " " << mod->GetSize().Y() << " " << mod->GetSize().Z() << " " << mod->GetDetectorType() << endl;
+      //if (mod->GetDetectorType() == 2) assert (TMath::Abs(mod->GetSize().Z()-diam[i]) < 0.1); // tube diameter
     }
   }
 
@@ -266,12 +270,18 @@ void CbmMuchFindHitsStraws::Merge()
       //cout << jhit << " " << hit1->GetRefId() << endl;
       if (drift < drift1) {
 	fHits->RemoveAt(jhit);
-	hit->SetFlag(hit->GetFlag()+(1<<1)); // increase overlap multiplicity
-	digiM->AddPoint(digiM1->GetRefIndex()); // add point
+        Int_t nPoints = digiM1->GetNPoints();
+        for (Int_t j = 0; j < nPoints; ++j) {
+	  hit->SetFlag(hit->GetFlag()+(1<<1)); // increase overlap multiplicity
+	  digiM->AddPoint(digiM1->GetRefIndex()); // add point
+	}
       } else {
 	fHits->RemoveAt(ihit);
-	hit1->SetFlag(hit1->GetFlag()+(1<<1)); 
-	digiM1->AddPoint(digiM->GetRefIndex());  
+        Int_t nPoints = digiM->GetNPoints();
+        for (Int_t j = 0; j < nPoints; ++j) {
+	  hit1->SetFlag(hit1->GetFlag()+(1<<1)); 
+	  digiM1->AddPoint(digiM->GetRefIndex());  
+	}
 	break;
       }
     }

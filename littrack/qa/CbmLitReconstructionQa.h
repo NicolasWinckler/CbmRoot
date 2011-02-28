@@ -202,7 +202,12 @@ private:
      */
 	void IncreaseCounters();
 
-    /**
+	/**
+	 * Returns std::string of the detector used in the global reconstruction.
+	 */
+	std::string RecDetector();
+
+	/**
      * Prints event-by-event statistics.
      */
 	void PrintEventStatistics();

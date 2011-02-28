@@ -687,6 +687,15 @@ void CbmLitReconstructionQa::IncreaseCounters()
 	if (fIsTof) fNofTofHits += fTofHits->GetEntriesFast();
 }
 
+std::string CbmLitReconstructionQa::RecDetector()
+{
+	std::string recDet = "";
+	if (fIsTrd && !fIsMuch) recDet = "TRD     ";
+	else if (fIsMuch && !fIsTrd) recDet = "MUCH    ";
+	else if (fIsMuch && fIsTrd) recDet = "MUCH+TRD";
+	return recDet;
+}
+
 void CbmLitReconstructionQa::PrintEventStatistics()
 {
 	std::cout << "Number of rec tracks: global=" << fGlobalTracks->GetEntriesFast();
@@ -696,11 +705,13 @@ void CbmLitReconstructionQa::PrintEventStatistics()
 	if (fIsTof) std::cout << ", TOF=" << fTofHits->GetEntriesFast();
 	std::cout << std::endl;
 
-	std::cout << "Efficiency STS:               " << EventEfficiencyStatisticsToString(fhStsMom, "event");
-	std::cout << "Efficiency STS+TRD(MUCH):     " << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "event");
-	std::cout << "Efficiency STS+TRD(MUCH)+TOF: " << EventEfficiencyStatisticsToString(fhGlobalMom, "event");
-	std::cout << "Efficiency TRD(MUCH):         " << EventEfficiencyStatisticsToString(fhRecMom, "event");
-	std::cout << "Efficiency TOF matching:      " << EventEfficiencyStatisticsToString(fhTofMom, "event");
+	std::string det = RecDetector();
+
+	std::cout << "Efficiency STS:              " << EventEfficiencyStatisticsToString(fhStsMom, "event");
+	std::cout << "Efficiency STS+" << det << ":     " << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "event");
+	std::cout << "Efficiency STS+" << det << "+TOF: " << EventEfficiencyStatisticsToString(fhGlobalMom, "event");
+	std::cout << "Efficiency " << det << ":         " << EventEfficiencyStatisticsToString(fhRecMom, "event");
+	std::cout << "Efficiency TOF matching:     " << EventEfficiencyStatisticsToString(fhTofMom, "event");
 }
 
 void CbmLitReconstructionQa::PrintFinalStatistics(
@@ -714,10 +725,12 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
 	if (fIsMuch) out << "  MUCH=(" << (Double_t)fNofMuchTracks/(Double_t)fEventNo << "/" << fNofMuchTracks << ")" << std::endl;
 	if (fIsTof) out << "  TOF=(" << (Double_t)fNofTofHits/(Double_t)fEventNo << "/" << fNofTofHits << ")" << std::endl;
 
+	std::string det = RecDetector();
+
 	out << "Efficiency STS:" << std::endl << EventEfficiencyStatisticsToString(fhStsMom, "final");
-	out << "Efficiency STS+TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "final");
-	out << "Efficiency STS+TRD(MUCH)+TOF: " << std::endl << EventEfficiencyStatisticsToString(fhGlobalMom, "final");
-	out << "Efficiency TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhRecMom, "final");
+	out << "Efficiency STS+" << det << ":" << std::endl << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "final");
+	out << "Efficiency STS+" << det << "+TOF: " << std::endl << EventEfficiencyStatisticsToString(fhGlobalMom, "final");
+	out << "Efficiency " << det << ":" << std::endl << EventEfficiencyStatisticsToString(fhRecMom, "final");
 	out << "Efficiency TOF matching:" << std::endl << EventEfficiencyStatisticsToString(fhTofMom, "final");
 
 	Double_t stsGhosts, recGhosts;
@@ -726,11 +739,11 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
 	if (fIsSts)
 		out << "Ghosts STS (per event/total): " << stsGhosts/fEventNo << "/" << stsGhosts << std::endl;
 	if (fIsMuch || fIsTrd)
-		out << "Ghosts TRD(MUCH) (per event/total): " << recGhosts/fEventNo << "/" << recGhosts << std::endl;
+		out << "Ghosts " << det << " (per event/total): " << recGhosts/fEventNo << "/" << recGhosts << std::endl;
 	out << "Polar angle efficiency:" << std::endl;
 	out << "STS:" << std::endl;
 	out << PolarAngleEfficiency(fhStsAngle);
-	out << "TRD(MUCH):" << std::endl;
+	out << det << ":" << std::endl;
         out << PolarAngleEfficiency(fhRecAngle);
 	out << "-------------------------------------------------------------" << std::endl;
 }
@@ -797,11 +810,11 @@ std::string CbmLitReconstructionQa::PolarAngleEfficiency(
     Double_t allAcc[fNofBinsAngle], refAcc[fNofBinsAngle];
     for(Int_t i = 0; i < fNofBinsAngle; i++) {
         allRec[i] = hist[ALL][REC]->GetBinContent(i+1);
-	allAcc[i] = hist[ALL][ACC]->GetBinContent(i+1);
-	if (allAcc[i] != 0.) allEff[i] = allRec[i] / allAcc[i];
-	refRec[i] = hist[REF][REC]->GetBinContent(i+1);
-	refAcc[i] = hist[REF][ACC]->GetBinContent(i+1);
-	if (refAcc[i] != 0.) refEff[i] = refRec[i] / refAcc[i];
+		allAcc[i] = hist[ALL][ACC]->GetBinContent(i+1);
+		if (allAcc[i] != 0.) allEff[i] = allRec[i] / allAcc[i];
+		refRec[i] = hist[REF][REC]->GetBinContent(i+1);
+		refAcc[i] = hist[REF][ACC]->GetBinContent(i+1);
+		if (refAcc[i] != 0.) refEff[i] = refRec[i] / refAcc[i];
     }
 
     std::stringstream ss;

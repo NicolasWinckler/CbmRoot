@@ -313,15 +313,17 @@ void CbmAnaElectronsQa::SignalElectronAcceptance()
 		Int_t motherId = track->GetMotherId();
 
 		if (gcode == 11 && motherId == -1){//signal electrons
-		    if (isProj && it->second >= fMinNofRichRingHits) {//RICH acceptance
-		    	fh_acc_rich_el->Fill(momentum);
-				if (track->GetNPoints(kTRD) >= fMinNofTrdPoints){//TRD acceptance
-					fh_acc_trd_el->Fill(momentum);
-					if (track->GetNPoints(kTOF) >= 1){//TOF acceptance
-						fh_acc_tof_el->Fill(momentum);
-					}//TOF
-				}//TRD
-			}//RICH
+			if (track->GetNPoints(kMVD)+ mcTrack->GetNPoints(kSTS) >= fMinNofStsPoints){
+				if (isProj && it->second >= fMinNofRichRingHits) {//RICH acceptance
+					fh_acc_rich_el->Fill(momentum);
+					if (track->GetNPoints(kTRD) >= fMinNofTrdPoints){//TRD acceptance
+						fh_acc_trd_el->Fill(momentum);
+						if (track->GetNPoints(kTOF) >= 1){//TOF acceptance
+							fh_acc_tof_el->Fill(momentum);
+						}//TOF
+					}//TRD
+				}//RICH
+			}//STS
 		}//signal electrons
 	}//Loop for all MC rings
 

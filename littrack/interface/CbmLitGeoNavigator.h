@@ -2,7 +2,7 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2008
  **
- ** Base class for LIT geometry navigation algorithms.
+ ** Interface for geometry navigation algorithms.
  **/
 
 #ifndef CBMLITGEONAVIGATOR_H_
@@ -30,6 +30,7 @@ public:
 	 * @param par Input track parameters. Defines initial direction and Z position.
 	 * @param zOut Output Z position [cm].
 	 * @param inter Output vector with crossed material information.
+	 * @return Status code.
 	 */
 	virtual LitStatus FindIntersections(
 			const CbmLitTrackParam* par,

@@ -1,3 +1,9 @@
+/** CbmLitGating.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "finder/CbmLitGating.h"
 
 #include "base/CbmLitStation.h"
@@ -21,16 +27,6 @@ CbmLitGating::CbmLitGating():
 
 CbmLitGating::~CbmLitGating()
 {
-}
-
-LitStatus CbmLitGating::Initialize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitGating::Finalize()
-{
-	return kLITSUCCESS;
 }
 
 bool CbmLitGating::IsHitInValidationGate(

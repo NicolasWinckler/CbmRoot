@@ -1,8 +1,8 @@
 /** CbmLitTrackUpdate.h
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2008
- **
- ** Base class for all track update algorithms
+ *
+ * Interface for track update algorithms
  **/
 
 #ifndef CBMLITTRACKUPDATE_H_
@@ -16,17 +16,31 @@ class CbmLitTrackParam;
 class CbmLitTrackUpdate : public CbmLitTool
 {
 public:
+	/* Constructor */
    CbmLitTrackUpdate(){};
+
+   /* Constructor with name
+    * @param name Name of the tool */
    CbmLitTrackUpdate(
 		   const std::string& name):CbmLitTool(name){};
 
+   /* Destructor */
    virtual ~CbmLitTrackUpdate(){};
 
+   /* Main function to be implemented for the concrete track update algorithm
+    * @param pParamIn Pointer to input track parameter
+    * @param pParamOut Pointer to output track parameter
+    * @parma pHit Pointer to hit
+    * @return Status code */
    virtual LitStatus Update(
 		   const CbmLitTrackParam *pParamIn,
            CbmLitTrackParam *pParamOut,
            const CbmLitHit *pHit) = 0;
 
+   /* Main function to be implemented for the concrete track update algorithm
+    * @param pParam Pointer to input/output track parameter
+    * @parma pHit Pointer to hit
+    * @return Status code */
    virtual LitStatus Update(
 		   CbmLitTrackParam *pParam,
 		   const CbmLitHit *pHit) = 0;

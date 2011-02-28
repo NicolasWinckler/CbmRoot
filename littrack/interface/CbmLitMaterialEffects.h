@@ -2,7 +2,8 @@
  *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2008
  **
- ** Base class for LIT material effects calculation (multiple scattering and energy loss) algorithms.
+ ** Interface for material effects calculation
+ ** (multiple scattering and energy loss) algorithms.
  **/
 
 #ifndef CBMLITMATERIALEFFECTS_H_
@@ -22,13 +23,12 @@ public:
 	/* Destructor */
 	virtual ~CbmLitMaterialEffects() {};
 
-	/* Updates track parameters with material effects.
+	/* Main function to be implemented for concrete material effects calculation algorithms.
 	 * @param par Input/Output track parameters.
 	 * @param mat Material information.
 	 * @param pdg PDG code
 	 * @param downstream Propagation direction. If true than downstream from the target, else upstream from the target.
-	 * @return Update status.
-	 */
+	 * @return Status code. */
 	virtual LitStatus Update(
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat,

@@ -30,7 +30,7 @@ public:
 			myf x, myf y, myf z,
 			myf &Bx, myf &By, myf &Bz) const = 0;
 
-	/* Returns std::string representation of this class */
+	/* @return std::string representation of this class */
 	virtual std::string ToString() const {
 		return "CbmLitField::ToString";
 	}

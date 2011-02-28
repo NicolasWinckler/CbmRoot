@@ -1,10 +1,10 @@
 /** CbmLitTrackPropagator.h
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2008
- **
- ** Base class for LIT track propagation algorithms.
- ** Propagation algorithm has to take into account material and
- ** may use CbmLitTrackExtrapolation to extrapolate tracks between material layers.
+ *
+ * Interface for track propagation algorithms.
+ * Propagation algorithm has to take into account material and
+ * can use CbmLitTrackExtrapolation to extrapolate tracks between material layers.
  **/
 
 #ifndef CBMLITTRACKPROPAGATOR_H_
@@ -23,8 +23,7 @@ public:
 	CbmLitTrackPropagator(){};
 
 	/* Constructor with tool name
-	 * @param name Name of the tool
-	 */
+	 * @param name Name of the tool */
 	CbmLitTrackPropagator(const std::string& name):CbmLitTool(name){};
 
 	/* Destructor */
@@ -36,8 +35,7 @@ public:
 	 * @param zOut Z position to propagate to [cm].
 	 * @param pdg PDG code of the particle.
 	 * @param F Output transport matrix. If F == NULL than transport matrix is not calculated.
-	 * @return Propagation status.
-	 */
+	 * @return Propagation status. */
 	virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
 		   CbmLitTrackParam *parOut,
@@ -50,8 +48,7 @@ public:
 	 * @param zOut Z position to propagate to [cm].
 	 * @param pdg PDG code of the particle.
 	 * @param F Output transport matrix. If F == NULL than transport matrix is not calculated.
-	 * @return Propagation status.
-	 */
+	 * @return Propagation status. */
 	virtual LitStatus Propagate(
 		   CbmLitTrackParam *par,
 		   myf zOut,

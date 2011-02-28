@@ -1,8 +1,8 @@
 /** CbmLitTrackFitter.h
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2008
- **
- ** Base class for all LIT track fitter algorithms
+ *
+ * Interface for track fitter algorithms
  **/
 
 #ifndef CBMLITTRACKFITTER_H_
@@ -16,12 +16,16 @@ class CbmLitTrack;
 class CbmLitTrackFitter : public CbmLitTool
 {
 public:
+	/* Constructor */
    CbmLitTrackFitter(){};
-   CbmLitTrackFitter(
-		   const std::string& name):CbmLitTool(name) {};
 
+   /* Destructor */
    virtual ~CbmLitTrackFitter() {};
 
+   /* Main function to be implemented for the concrete track fitter algorithm
+    * @param track Pointer to the track to be fitted
+    * @param downstream Track fit direction
+    * @return Status code */
    virtual LitStatus Fit(
 		   CbmLitTrack *track,
 		   bool downstream = true) = 0;

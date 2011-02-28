@@ -66,7 +66,7 @@ cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
 data/CbmLitTrackParam.cxx
 data/CbmLitTrack.cxx
-data/CbmLitTrackBranch.cxx
+#data/CbmLitTrackBranch.cxx
 finder/CbmLitTrackFinderWeight.cxx
 finder/CbmLitTrackFinderBase.cxx
 finder/CbmLitTrackFinderBranch.cxx

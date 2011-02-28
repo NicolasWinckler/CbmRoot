@@ -1,3 +1,9 @@
+/** CbmLitTrackParam.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "data/CbmLitTrackParam.h"
 
 #include "TVector3.h"

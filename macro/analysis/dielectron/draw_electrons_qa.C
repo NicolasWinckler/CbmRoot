@@ -6,11 +6,11 @@
 */
 
 #include "../../../littrack/utils/CbmLitDrawHist.cxx"
-//#include "../../../littrack/utils/CbmLitUtils.cxx"
+#include "../../../littrack/utils/CbmLitUtils.h"
 
 void draw_electrons_qa()
 {
-	SetStyles();
+	//SetStyles();
 
 	TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.0000.root");
    // gROOT->SetStyle("Plain");
@@ -52,10 +52,10 @@ void draw_electrons_qa()
 	TH1D* accEff4 = Divide1DHists(fh_acc_tof_el, fh_mc_el, "fh_acc_tof_el_eff", "", "", "");
 
 	std::string hname1, hname2, hname3, hname4;
-	hname1 = "STS" + CalcEfficiency(fh_acc_sts_el, fh_mc_el)+")";
-	hname2 = "RICH"+ CalcEfficiency(fh_acc_rich_el, fh_mc_el)+")";
-	hname3 = "TRD"+ CalcEfficiency(fh_acc_trd_el, fh_mc_el)+")";
-	hname4 = "TOF"+ CalcEfficiency(fh_acc_tof_el, fh_mc_el)+")";
+	hname1 = "STS (" + CalcEfficiency(fh_acc_sts_el, fh_mc_el)+")";
+	hname2 = "RICH ("+ CalcEfficiency(fh_acc_rich_el, fh_mc_el)+")";
+	hname3 = "TRD ("+ CalcEfficiency(fh_acc_trd_el, fh_mc_el)+")";
+	hname4 = "TOF ("+ CalcEfficiency(fh_acc_tof_el, fh_mc_el)+")";
 	DrawHist1D(accEff1, accEff2, accEff3, accEff4, "", "momentum, GeV/c", "efficiency",
 		hname1, hname2, hname3, hname4,	false, false, true, 0.3,0.15, 0.99, 0.3);
 
@@ -171,29 +171,36 @@ void draw_electrons_qa()
 //test distributions
 	{
 	std::string hname1;
+    std::stringstream ss;
+    ss.precision(3);
+
 	TCanvas *c5 = new TCanvas("test_distr","test_distr",800,800);
 	c5->Divide(2,2);
 	c5->cd(1);
-	DrawHist1D(fh_nof_global, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
-		"", "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
+    hname1 = "Mean=" + ToString<float>(fh_nof_global->GetMean());
+	DrawHist1D(fh_nof_global, NULL, NULL, NULL, "", "momentum, GeV/c", "Entries",
+		hname1, "", "", "",	false, false, true, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 
 	c5->cd(2);
-	DrawHist1D(fh_nof_sts_tracks, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
-		"", "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
+    hname1 = "Mean=" + ToString<float>(fh_nof_sts_tracks->GetMean());
+	DrawHist1D(fh_nof_sts_tracks, NULL, NULL, NULL, "", "momentum, GeV/c", "Entries",
+		hname1, "", "", "",	false, false, true, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 
 	c5->cd(3);
-	DrawHist1D(fh_nof_rich_rings, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
-		hname1, "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
+    hname1 = "Mean=" + ToString<float>(fh_nof_rich_rings->GetMean());
+	DrawHist1D(fh_nof_rich_rings, NULL, NULL, NULL, "", "momentum, GeV/c", "Entries",
+		hname1, "", "", "",	false, false, true, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 
 	c5->cd(4);
-	DrawHist1D(fh_nof_trd_tracks, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
-		hname1, "", "", "",	false, false, false, 0.3,0.15, 0.99, 0.3);
+    hname1 = "Mean=" + ToString<float>(fh_nof_trd_tracks->GetMean());
+	DrawHist1D(fh_nof_trd_tracks, NULL, NULL, NULL, "", "momentum, GeV/c", "Entries",
+		hname1, "", "", "",	false, false, true, 0.3,0.15, 0.99, 0.3);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	}

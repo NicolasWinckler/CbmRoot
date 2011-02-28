@@ -1,3 +1,11 @@
+/** CbmLitTrack.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **
+ ** Base data class for track.
+ **/
+
 #ifndef CBMLITTRACK_H_
 #define CBMLITTRACK_H_
 

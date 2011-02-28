@@ -1,3 +1,9 @@
+/** CbmLitTrack.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "data/CbmLitTrack.h"
 
 #include "data/CbmLitHit.h"

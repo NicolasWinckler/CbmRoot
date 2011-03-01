@@ -254,6 +254,7 @@ void CbmAnaElectronsQa::Exec(Option_t* option)
 	SignalElectronMatching();
 	ElectronIdentificationEff();
 	TestDistributions();
+    StsQa();
 
     Double_t eventNum = (Double_t) fEventNum;
 

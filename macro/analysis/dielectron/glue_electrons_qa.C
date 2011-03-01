@@ -1,9 +1,14 @@
+#include "../../../rich/utils/hadd.C"
+
 void glue_electrons_qa ()
 {
-    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis";//.0000.root";
-    TString outFileName = filePath +".all.25_02_2011.root";
+    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa";//.0000.root";
+    TString outFileName = filePath +"elid.qa.all.root";
     Int_t nEvents = 200;   // number of files to be added
 
+    TList *fileList = new TList();
+    TFile *target;
+    target = TFile::Open( outFileName, "RECREATE" );
 
     Int_t nofGoodFiles = 0;
     for(Int_t i = 0; i < nEvents; i++) {
@@ -13,12 +18,18 @@ void glue_electrons_qa ()
         cout << "-I- " + fileName << endl;
         TFile* file = new TFile(fileName);
         if (file->IsZombie()) continue;
+        file->Close();
 
+        fileList->Add( TFile::Open(fileName) );
 
         nofGoodFiles++;
-        file->Close();
     }
 
+    MergeRootfile( target, fileList );
+
+
+
+    /*
     Double_t scale = 1./(Double_t) nofGoodFiles;
 
     fh_mc_signal_pty->Scale(scale);
@@ -26,7 +37,7 @@ void glue_electrons_qa ()
 ///WRITE HISTOGRAMMS TO OUTPUT FILE
     TFile* outFile = new TFile(outFileName, "RECREATE");
     fh_mc_signal_pty->Write();
-
+*/
     cout <<"nofGoodFiles = " << nofGoodFiles << endl;
 
 } 

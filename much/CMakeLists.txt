@@ -1,6 +1,7 @@
 # Create a library called "libBase" which includes the source files given in
 # the array .
-# The extension is already found.  Any number of sources could be listed here.
+# The extension is already found.  Any number of sources could be listed
+# here.
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
@@ -24,7 +25,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(MUCH_SRCS
+set(MUCHRULECHECKER_SRCS
 geo/CbmGeoMuch.cxx  
 geo/CbmGeoMuchPar.cxx 
 geo/CbmMuch.cxx
@@ -33,7 +34,7 @@ geo/CbmMuchGeoScheme.cxx
 geo/CbmMuchLayer.cxx
 geo/CbmMuchLayerSide.cxx
 geo/CbmMuchModule.cxx
-geo/CbmMuchModuleGem.cxx
+#geo/CbmMuchModuleGem.cxx
 geo/CbmMuchModuleStraws.cxx
 geo/CbmMuchPad.cxx
 geo/CbmMuchSector.cxx
@@ -57,9 +58,13 @@ tracking/CbmMuchFindTracks.cxx
 tracking/CbmMuchMatchTracks.cxx 
 tracking/CbmMuchTrackFinderIdeal.cxx
 )
+set(MUCH_SRCS
+    ${MUCHRULECHECKER_SRCS}
+    geo/CbmMuchModuleGem.cxx
+   )
 
 if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${MUCH_SRCS}" "${INCLUDE_DIRECTORIES}" MUCH_RULES)
+  CHECK_RULES("${MUCHRULECHECKER_SRCS}" "${INCLUDE_DIRECTORIES}" MUCH_RULES)
 endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files

@@ -26,7 +26,7 @@ using std::setprecision;
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws() 
   : FairTask("MuchFindHits", 1),
-    fEffic(0),fMerge(0),fMirror(0)
+    fEffic(0),fMerge(0),fMirror(0),fBinary(0)
 {
   fDigiFile    = "";
   fDigis   = fDigiMatches = NULL;
@@ -39,7 +39,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws()
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
   : FairTask("MuchFindHits", iVerbose), 
-    fEffic(0),fMerge(0),fMirror(0)
+    fEffic(0),fMerge(0),fMirror(0),fBinary(0)
 {
   fDigiFile    = "";
   fDigis   = fDigiMatches = NULL;
@@ -52,7 +52,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiFileName, Int_t iVerbose)
   : FairTask(name, iVerbose),
-    fEffic(0),fMerge(0),fMirror(0)
+    fEffic(0),fMerge(0),fMirror(0),fBinary(0)
 {
   fDigiFile    = digiFileName;
   fDigis   = fDigiMatches = NULL;
@@ -122,6 +122,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
   static Double_t radIn[6];
   Double_t diam[6] = {0.62, 0.62, 0.62, 0.62, 0.62, 0.62}; // tube diameters
   Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
+  const Double_t sigmaBin = diam[0] / TMath::Sqrt(12.);
 
   Double_t phi[3] = {fPhis[0] * TMath::DegToRad(), fPhis[1] * TMath::DegToRad(), fPhis[2] * TMath::DegToRad()}; // rotation angles of views (doublets)
 
@@ -202,6 +203,11 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     array[2] = array[1] + errU; // drift distance with error
     hit->SetDouble(3, array);
     hit->SetInt(2, iarray);
+    hit->SetFlag(0);
+    if (fBinary) {
+      hit->SetU (array[0]);
+      hit->SetDu (sigmaBin);
+    }
   }
   //*/
 

@@ -204,5 +204,31 @@ void draw_electrons_qa()
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	}
+
+	{
+	TCanvas *c6 = new TCanvas("stsQa","stsQa",1200,800);
+	c6->Divide(3,2);
+	c6->cd(1);
+	fh_rec_mc_mom_signal->Draw();
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
+	gPad->SetLogy(true);
+	c2->cd(2);
+	fh_mom_res_vs_mom_signal->Draw("COLZ");
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
+	c2->cd(3);
+	fh_mean_mom_vs_mom_signal->Draw();
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
+	c2->cd(4);
+	fh_chiprim_signal->Draw();
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
+	c2->cd(5);
+	fh_chiprim_signal2->Draw();
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
+	}
 }
 

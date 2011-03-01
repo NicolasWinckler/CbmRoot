@@ -34,6 +34,14 @@ void glue_histo ()
 	histList->Add( new TH1D("fh_nof_rich_rings", "fh_nof_rich_rings;nof RICH rings/event;Entries", nofBinsMom,0,100) );
 	histList->Add( new TH1D("fh_nof_trd_tracks", "fh_nof_trd_tracks;nof TRD tracks/event;Entries", nofBinsMom,0,1000) );
 
+//STS Qa
+	histList->Add( new TH1D("fh_rec_mc_mom_signal","fh_rec_mc_mom_signal;#Delta p/p [%];yeild",100, -10., 10.) );
+	histList->Add( new TH2D("fh_mom_res_vs_mom_signal", "fh_mom_res_vs_mom_signal;p [GeV/c];#Delta p/p [%]",100, 0., 15., 100, -10., 10.) );
+	histList->Add( new TH1D("fh_mean_mom_vs_mom_signal","fh_mean_mom_vs_mom_signal",100, 0., 15.) );
+	histList->Add( new TH1D("fh_count_mom_vs_mom_signal","fh_count_mom_vs_mom_signal", 100, 0., 15.) );
+	histList->Add( new TH1D("fh_chiprim_signal", "fh_chiprim_signal;chi2,yeild", 200, 0., 20.) );
+	histList->Add( new TH1D("fh_chiprim_signal2", "fh_chiprim_signal2;chi2,yeild", 200, 0., 20.) );
+
     Int_t nofGoodFiles = 0;
     for(Int_t i = 0; i < nEvents; i++) {
         char str[4];

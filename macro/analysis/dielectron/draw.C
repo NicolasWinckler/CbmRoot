@@ -226,9 +226,7 @@ void draw(){
     draw_eff_pty(fh_anglecut_signal_pty, fh_tof_id_signal_pty);
     
 
-    TCanvas *c2 = new TCanvas("c2-mom", "c2-mom", 600, 600);
-    c2->Divide(2,2);
-    c2->cd(1);
+    TCanvas *c2 = new TCanvas("c2-mom", "c2-mom", 400, 400);
     fh_mc_signal_mom->SetLineColor(kRed);
     fh_reco_signal_mom->SetLineColor(kBlue);
     fh_rich_id_signal_mom->SetLineColor(kGreen);
@@ -274,19 +272,6 @@ void draw(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c2->cd(2);
-    fh_rec_mc_mom_signal->Draw();
-    gPad->SetGridx(true);
-    gPad->SetGridy(true);
-    gPad->SetLogy(true);
-    c2->cd(3);
-    fh_mom_res_vs_mom_signal->Draw("COLZ");
-    gPad->SetGridx(true);
-    gPad->SetGridy(true);
-    c2->cd(4);
-    fh_mean_mom_vs_mom_signal->Draw();
-    gPad->SetGridx(true);
-    gPad->SetGridy(true);
 
     TCanvas *c2_1 = new TCanvas("c2_1-mom eff","c2_1-mom eff", 1000, 750);
     c2_1->Divide(4,3);

@@ -64,6 +64,14 @@ CbmAnaElectronsQa::CbmAnaElectronsQa(const char *name, const char *title)
 	fh_nof_rich_rings = new TH1D("fh_nof_rich_rings", "fh_nof_rich_rings;nof RICH rings/event;Entries", nofBinsMom,0,100);
 	fh_nof_trd_tracks = new TH1D("fh_nof_trd_tracks", "fh_nof_trd_tracks;nof TRD tracks/event;Entries", nofBinsMom,0,1000);
 
+//STS Qa
+    fh_rec_mc_mom_signal = new TH1D("fh_rec_mc_mom_signal","fh_rec_mc_mom_signal;#Delta p/p [%];yield",100, -10., 10.);
+    fh_mom_res_vs_mom_signal = new TH2D("fh_mom_res_vs_mom_signal", "fh_mom_res_vs_mom_signal;p [GeV/c];#Delta p/p [%]",100, 0., 15., 100, -10., 10.);
+    fh_mean_mom_vs_mom_signal = new TH1D("fh_mean_mom_vs_mom_signal","fh_mean_mom_vs_mom_signal",100, 0., 15.);
+    fh_count_mom_vs_mom_signal = new TH1D("fh_count_mom_vs_mom_signal","fh_count_mom_vs_mom_signal", 100, 0., 15.);
+    fh_chiprim_signal = new TH1D("fh_chiprim_signal", "fh_chiprim_signal;chi2,yield", 200, 0., 20.);
+    fh_chiprim_signal2 = new TH1D("fh_chiprim_signal2", "fh_chiprim_signal2;chi2,yield", 200, 0., 20.);
+
 	SetDefaultParameters();
 }
 
@@ -224,6 +232,14 @@ InitStatus CbmAnaElectronsQa::Init()
 		cout << "-W- CbmAnaElectronsQa::Init: No TOFHit array!" << endl;
 		return kERROR;
 	}
+
+    fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
+    if (! fPrimVertex) {
+		cout << "-E- CbmAnaElectronsQa::Init: No Primary Vertex!" << endl;
+		return kERROR;
+    }
+
+    fKFFitter.Init();
 
 	Bool_t isSetOk = SetParameters();
 
@@ -573,9 +589,53 @@ void CbmAnaElectronsQa::TestDistributions()
 	fh_nof_trd_tracks->Fill(fTrdTracks->GetEntriesFast());
 }
 
+void CbmAnaElectronsQa::StsQa()
+{
+    Int_t nSts = fStsTracks->GetEntriesFast();
+    for (Int_t i = 0; i < nSts; i++){
+		CbmStsTrack* stsTrack = (CbmStsTrack*)fStsTracks->At(i);
+		if (!stsTrack) continue;
+		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(i);
+		if (!stsTrackMatch) continue;
+		Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
+        CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdSts);
+
+        Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
+        Int_t motherId = mcTrack->GetMotherId();
+		//select only signal electrons
+        if (pdg != 11 || motherId != -1) continue;
+
+		TVector3 momMC;
+		mcTrack->GetMomentum(momMC);
+
+        Double_t chiPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
+        fh_chiprim_signal->Fill(chiPrimary);
+        Double_t chiPrimary2 = fKFFitter.GetChiToVertex(stsTrack);
+        fh_chiprim_signal2->Fill(chiPrimary2);
+
+        // Fit tracks to the primary vertex
+        FairTrackParam vtxTrack;
+        fKFFitter.FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
+		TVector3 momRec;
+        vtxTrack.Momentum(momRec);
+
+		Double_t dpp = 100.*(momMC.Mag()-momRec.Mag()) / momMC.Mag();
+		fh_rec_mc_mom_signal->Fill(dpp);
+		fh_mom_res_vs_mom_signal->Fill(momMC.Mag(),dpp);
+		fh_count_mom_vs_mom_signal->Fill(momMC.Mag());
+		fh_mean_mom_vs_mom_signal->Fill(momMC.Mag(),dpp);
+    }
+}//StsQa
+
 // -----   Finish Task   ---------------------------------------------------
 void CbmAnaElectronsQa::FinishTask()
 {
+    fh_rec_mc_mom_signal->Scale(1./fh_rec_mc_mom_signal->Integral());
+    fh_mom_res_vs_mom_signal->Scale(1./fh_mom_res_vs_mom_signal->Integral());
+    //fh_mean_mom_vs_mom_signal->Sumw2();
+    //fh_count_mom_vs_mom_signal->Sumw2();
+    fh_mean_mom_vs_mom_signal->Divide(fh_count_mom_vs_mom_signal);
+
 //signal electron acceptance
 	fh_mc_el->Write();
 	fh_acc_sts_el->Write();
@@ -603,6 +663,14 @@ void CbmAnaElectronsQa::FinishTask()
 	fh_nof_sts_tracks->Write();
 	fh_nof_rich_rings->Write();
 	fh_nof_trd_tracks->Write();
+
+//STS Qa
+    fh_rec_mc_mom_signal->Write();
+    fh_mom_res_vs_mom_signal->Write();
+    fh_mean_mom_vs_mom_signal->Write();
+    fh_count_mom_vs_mom_signal->Write();
+    fh_chiprim_signal->Write();
+    fh_chiprim_signal2->Write();
 }
 
 ClassImp(CbmAnaElectronsQa)

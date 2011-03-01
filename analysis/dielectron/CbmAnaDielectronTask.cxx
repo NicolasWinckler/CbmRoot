@@ -124,11 +124,6 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_mc_vertex_gamma_yz = new TH2D("fh_mc_vertex_gamma_yz", "fh_mc_vertex_gamma_yz;Z [cm];Y [cm]", 200, -10., 110., 200, -100., 100.);
     fh_mc_vertex_gamma_xy = new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.); 
 
-    fh_rec_mc_mom_signal = new TH1D("fh_rec_mc_mom_signal","fh_rec_mc_mom_signal;#Delta p/p [%];yeild",100, -10., 10.);
-    fh_mom_res_vs_mom_signal = new TH2D("fh_mom_res_vs_mom_signal", "fh_mom_res_vs_mom_signal;p [GeV/c];#Delta p/p [%]",100, 0., 15., 100, -10., 10.);
-    fh_mean_mom_vs_mom_signal = new TH1D("fh_mean_mom_vs_mom_signal","fh_mean_mom_vs_mom_signal",100, 0., 15.);
-    fh_count_mom_vs_mom_signal = new TH1D("fh_count_mom_vs_mom_signal","fh_count_mom_vs_mom_signal", 100, 0., 15.);
-
 //signal minv
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
@@ -407,7 +402,6 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     FillSegmentCandidatesArray();
     FillCandidateArray();
     DifferenceSignalAndBg();
-    RecoQa();
     CheckGammaConvAndPi0();
     CheckTrackTopologyCut();
     CheckTrackTopologyRecoCut();
@@ -1631,23 +1625,6 @@ void CbmAnaDielectronTask::FindClosestMvdHit()
     } // iTrack
 } // FindClosestMvdHit
 
-void CbmAnaDielectronTask::RecoQa()
-{
-    Int_t ncand = fCandidates.size();
-    for (Int_t i = 0; i < ncand; i++){
-        if (fCandidates[i].isMCSignalElectron == true){
-            CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMCTrackId);
-            TVector3 momMC;
-            mcTrack1->GetMomentum(momMC);
-            Double_t dpp = 100.*(momMC.Mag()-fCandidates[i].momentum.Mag()) / momMC.Mag();
-            fh_rec_mc_mom_signal->Fill(dpp);
-            fh_mom_res_vs_mom_signal->Fill(momMC.Mag(),dpp);
-            fh_count_mom_vs_mom_signal->Fill(momMC.Mag());
-            fh_mean_mom_vs_mom_signal->Fill(momMC.Mag(),dpp);
-        }
-    }
-}
-
 void CbmAnaDielectronTask::Finish()
 {
     Double_t scale = 1./(Double_t)fEvents;
@@ -1675,12 +1652,6 @@ void CbmAnaDielectronTask::Finish()
     fh_mc_vertex_gamma_xz->Scale(scale);
     fh_mc_vertex_gamma_yz->Scale(scale);
     fh_mc_vertex_gamma_xy->Scale(scale);
-
-    fh_rec_mc_mom_signal->Scale(1./fh_rec_mc_mom_signal->Integral());
-    fh_mom_res_vs_mom_signal->Scale(1./fh_mom_res_vs_mom_signal->Integral());
-    //fh_mean_mom_vs_mom_signal->Sumw2();
-    //fh_count_mom_vs_mom_signal->Sumw2();
-    fh_mean_mom_vs_mom_signal->Divide(fh_count_mom_vs_mom_signal);
 
 //invariant mass distribution for signal
     fh_mc_signal_minv->Scale(scale);
@@ -1821,10 +1792,6 @@ void CbmAnaDielectronTask::Finish()
     fh_mc_vertex_gamma_xz->Write();
     fh_mc_vertex_gamma_yz->Write();
     fh_mc_vertex_gamma_xy->Write();
-
-    fh_rec_mc_mom_signal->Write();
-    fh_mom_res_vs_mom_signal->Write();
-    fh_mean_mom_vs_mom_signal->Write();
 
 // invariant mass distribution for signal
     fh_mc_signal_minv->Write();

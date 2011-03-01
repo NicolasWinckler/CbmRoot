@@ -93,7 +93,6 @@ public:
     void FillSegmentCandidatesArray();
     void FillCandidateArray();
     void DifferenceSignalAndBg();
-    void RecoQa();
     void PairsReco();
     void Reco();
     void SetDefaultIdParameters();
@@ -224,11 +223,6 @@ private:
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
 
-    TH1D* fh_rec_mc_mom_signal;
-    TH2D* fh_mom_res_vs_mom_signal;
-    TH1D* fh_mean_mom_vs_mom_signal;
-    TH1D* fh_count_mom_vs_mom_signal;
-    
     TH2D* fh_mc_vertex_gamma_xz;
     TH2D* fh_mc_vertex_gamma_yz;
     TH2D* fh_mc_vertex_gamma_xy;

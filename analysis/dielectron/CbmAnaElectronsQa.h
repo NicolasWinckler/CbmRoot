@@ -10,6 +10,8 @@
 #include "TH2D.h"
 #include "TClonesArray.h"
 #include "CbmRichHit.h"
+#include "CbmVertex.h"
+#include "CbmStsKFTrackFitter.h"
 
 #include <map>
 //#include <fstream>
@@ -57,6 +59,10 @@ private:
 	TClonesArray* fTofPoints;
 	TClonesArray* fTofHits;
 
+
+    CbmVertex *fPrimVertex;
+    CbmStsKFTrackFitter fKFFitter;
+
 //acceptance cuts
     Int_t fMinNofStsPoints;
     Int_t fMinNofRichRingHits;
@@ -82,6 +88,7 @@ private:
     void SignalElectronMatching();
     void ElectronIdentificationEff();
     void TestDistributions();
+    void StsQa();
 
     CbmRichElectronIdAnn * fElIdAnn;
 
@@ -112,6 +119,14 @@ private:
 	TH1D* fh_nof_sts_tracks;
 	TH1D* fh_nof_rich_rings;
 	TH1D* fh_nof_trd_tracks;
+
+//STS Qa
+    TH1D* fh_rec_mc_mom_signal;
+    TH2D* fh_mom_res_vs_mom_signal;
+    TH1D* fh_mean_mom_vs_mom_signal;
+    TH1D* fh_count_mom_vs_mom_signal;
+    TH1D* fh_chiprim_signal;
+    TH1D* fh_chiprim_signal2;
 
 	ClassDef(CbmAnaElectronsQa,1)
 };

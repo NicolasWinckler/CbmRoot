@@ -1,10 +1,10 @@
 void glue_histo ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis";//.0000.root";
-    TString outFileName = filePath +".all.25_02_2011.root";
+    TString outFileName = filePath +".all.root";
     Int_t nEvents = 200;   // number of files to be added
 
-    TList* histList = new List();
+    TList* histList = new TList();
 
 //signal momentum distribution
     histList->Add( new TH1D("fh_mc_signal_mom", "fh_mc_signal_mom;momentum [GeV/c];yeild",100, 0., 15.) );
@@ -171,7 +171,7 @@ void glue_histo ()
     }
 
     Double_t scale = 1./(Double_t) nofGoodFiles;
-
+    TFile* outFile = new TFile(outFileName, "RECREATE");
     for (Int_t iH = 0; iH < histList->GetEntries(); iH++){
     	TH1* h = (TH1*)histList->At(iH);
         h->Scale(scale);

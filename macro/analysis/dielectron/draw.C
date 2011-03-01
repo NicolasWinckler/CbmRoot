@@ -1,5 +1,5 @@
 #include "../../../littrack/utils/CbmLitDrawHist.cxx"
-#include "../../../littrack/utils/CbmLitUtils.cxx"
+//#include "../../../littrack/utils/CbmLitUtils.cxx"
 
 void draw_eff_pty(TH2D* h1, TH2D* h2){
     char effTxt[60];
@@ -111,7 +111,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 void draw(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.25_02_2011.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();

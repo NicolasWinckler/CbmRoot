@@ -4,111 +4,79 @@ void glue_histo ()
     TString outFileName = filePath +".all.25_02_2011.root";
     Int_t nEvents = 200;   // number of files to be added
 
-    fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_acc_signal_pty = new TH2D("fh_acc_signal_pty","fh_acc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+//signal momentum distribution
+	fh_mc_signal_mom = new TH1D("fh_mc_signal_mom", "fh_mc_signal_mom;momentum [GeV/c];yeild",100, 0., 15.);
+	fh_acc_signal_mom = new TH1D("fh_acc_signal_mom","fh_acc_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_sts_reco_signal_mom = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_reco_signal_mom = new TH1D("fh_reco_signal_mom","fh_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_rich_id_signal_mom = new TH1D("fh_rich_id_signal_mom","fh_rich_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_trd_id_signal_mom = new TH1D("fh_trd_id_signal_mom","fh_trd_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_tof_id_signal_mom = new TH1D("fh_tof_id_signal_mom","fh_tof_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_chi_prim_signal_mom = new TH1D("fh_chi_prim_signal_mom","fh_chi_prim_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_ptcut_signal_mom = new TH1D("fh_ptcut_signal_mom","fh_ptcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_anglecut_signal_mom = new TH1D("fh_anglecut_signal_mom","fh_anglecut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_gammacut_signal_mom = new TH1D("fh_gammacut_signal_mom","fh_gammacut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_ttcut_signal_mom = new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_stcut_signal_mom = new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_apcut_signal_mom = new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
 
-    fh_mc_signal_mom = new TH1D("fh_mc_signal_mom", "fh_mc_signal_mom;momentum [GeV/c];yeild",100, 0., 15.);
-    fh_acc_signal_mom = new TH1D("fh_acc_signal_mom","fh_acc_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_reco_signal_mom = new TH1D("fh_reco_signal_mom","fh_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_sts_reco_signal_mom = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_id_signal_mom = new TH1D("fh_rich_id_signal_mom","fh_rich_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_id_signal_mom = new TH1D("fh_trd_id_signal_mom","fh_trd_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tof_id_signal_mom = new TH1D("fh_tof_id_signal_mom","fh_tof_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_chi_prim_signal_mom = new TH1D("fh_chi_prim_signal_mom","fh_chi_prim_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_ptcut_signal_mom = new TH1D("fh_ptcut_signal_mom","fh_ptcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_anglecut_signal_mom = new TH1D("fh_anglecut_signal_mom","fh_anglecut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_gammacut_signal_mom = new TH1D("fh_gammacut_signal_mom","fh_gammacut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_ttcut_signal_mom = new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_stcut_signal_mom = new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_apcut_signal_mom = new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-///////////////////////
-    fh_sts_reco_mom  = new TH1D("fh_sts_reco_mom","fh_sts_reco_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_mom = new TH1D("fh_rich_reco_mom","fh_rich_reco_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_reco_mom = new TH1D("fh_trd_reco_mom","fh_trd_reco_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tof_reco_mom = new TH1D("fh_tof_reco_mom","fh_tof_reco_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_richID_mom = new TH1D("fh_richID_mom", "fh_richID_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trdID_mom = new TH1D("fh_trdID_mom", "fh_trdID_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tofID_mom = new TH1D("fh_tofID_mom", "fh_tofID_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+///////
+	fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
+	fh_acc_mother_pdg = new TH1D("fh_acc_mother_pdg","fh_acc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
 
-    fh_mc_mom = new TH1D("fh_mc_mom","fh_mc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_mc_gamma_mom = new TH1D("fh_mc_gamma_mom","fh_mc_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_mc_pi0_mom = new TH1D("fh_mc_pi0_mom","fh_mc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_mc_eta_mom = new TH1D("fh_mc_eta_mom","fh_mc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_mc_vertex_gamma_xz = new TH2D("fh_mc_vertex_gamma_xz","fh_mc_vertex_gamma_xz;Z [cm];X [cm]",200, -10., 110., 200, -100.,100.);
+	fh_mc_vertex_gamma_yz = new TH2D("fh_mc_vertex_gamma_yz", "fh_mc_vertex_gamma_yz;Z [cm];Y [cm]", 200, -10., 110., 200, -100., 100.);
+	fh_mc_vertex_gamma_xy = new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.);
 
-    fh_acc_mom = new TH1D("fh_acc_mom","fh_acc_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_acc_gamma_mom = new TH1D("fh_acc_gamma_mom","fh_acc_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_acc_pi0_mom = new TH1D("fh_acc_pi0_mom","fh_acc_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_acc_eta_mom = new TH1D("fh_acc_eta_mom","fh_acc_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+	fh_rec_mc_mom_signal = new TH1D("fh_rec_mc_mom_signal","fh_rec_mc_mom_signal;#Delta p/p [%];yeild",100, -10., 10.);
+	fh_mom_res_vs_mom_signal = new TH2D("fh_mom_res_vs_mom_signal", "fh_mom_res_vs_mom_signal;p [GeV/c];#Delta p/p [%]",100, 0., 15., 100, -10., 10.);
+	fh_mean_mom_vs_mom_signal = new TH1D("fh_mean_mom_vs_mom_signal","fh_mean_mom_vs_mom_signal",100, 0., 15.);
+	fh_count_mom_vs_mom_signal = new TH1D("fh_count_mom_vs_mom_signal","fh_count_mom_vs_mom_signal", 100, 0., 15.);
 
-
-    fh_sts_reco_pi0_mom = new TH1D("fh_sts_reco_pi0_mom","fh_sts_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_sts_reco_eta_mom = new TH1D("fh_sts_reco_eta_mom","fh_sts_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_sts_reco_gamma_mom = new TH1D("fh_sts_reco_gamma_mom","fh_sts_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_pi0_mom = new TH1D("fh_rich_reco_pi0_mom","fh_rich_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_eta_mom = new TH1D("fh_rich_reco_eta_mom","fh_rich_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_rich_reco_gamma_mom = new TH1D("fh_rich_reco_gamma_mom","fh_rich_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_reco_pi0_mom = new TH1D("fh_trd_reco_pi0_mom","fh_trd_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_reco_eta_mom = new TH1D("fh_trd_reco_eta_mom","fh_trd_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_trd_reco_gamma_mom = new TH1D("fh_trd_reco_gamma_mom","fh_trd_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tof_reco_pi0_mom = new TH1D("fh_tof_reco_pi0_mom","fh_tof_reco_pi0_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tof_reco_gamma_mom = new TH1D("fh_tof_reco_gamma_mom","fh_tof_reco_gamma_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_tof_reco_eta_mom = new TH1D("fh_tof_reco_eta_mom","fh_tof_reco_eta_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-//////////////////////
-    fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-
-    fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
-    fh_acc_mother_pdg = new TH1D("fh_acc_mother_pdg","fh_acc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
-    
-    fh_mc_vertex_gamma_xz = new TH2D("fh_mc_vertex_gamma_xz","fh_mc_vertex_gamma_xz;Z [cm];X [cm]",200, -10., 110., 200, -100.,100.);
-    fh_mc_vertex_gamma_yz = new TH2D("fh_mc_vertex_gamma_yz", "fh_mc_vertex_gamma_yz;Z [cm];Y [cm]", 200, -10., 110., 200, -100., 100.);
-    fh_mc_vertex_gamma_xy = new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.); 
-
-    fh_rec_mc_mom_signal = new TH1D("fh_rec_mc_mom_signal","fh_rec_mc_mom_signal;#Delta p/p [%];yeild",100, -10., 10.);
-    fh_mom_res_vs_mom_signal = new TH2D("fh_mom_res_vs_mom_signal", "fh_mom_res_vs_mom_signal;p [GeV/c];#Delta p/p [%]",100, 0., 15., 100, -10., 10.);
-    fh_mean_mom_vs_mom_signal = new TH1D("fh_mean_mom_vs_mom_signal","fh_mean_mom_vs_mom_signal",100, 0., 15.);
 //signal minv
-    fh_rec_signal_minv = new TH1D("fh_rec_signal_minv","fh_rec_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_rich_id_signal_minv = new TH1D("fh_rich_id_signal_minv","fh_rich_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_trd_id_signal_minv = new TH1D("fh_trd_id_signal_minv", "fh_trd_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_tof_id_signal_minv = new TH1D("fh_tof_id_signal_minv","fh_tof_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_chi_prim_signal_minv = new TH1D("fh_chi_prim_signal_minv","fh_chi_prim_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);    
-    fh_ptcut_signal_minv = new TH1D("fh_ptcut_signal_minv","fh_ptcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_anglecut_signal_minv = new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_gammacut_signal_minv = new TH1D("fh_gammacut_signal_minv","fh_gammacut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_ttcut_signal_minv = new TH1D("fh_ttcut_signal_minv","fh_ttcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_stcut_signal_minv = new TH1D("fh_stcut_signal_minv","fh_stcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_apcut_signal_minv = new TH1D("fh_apcut_signal_minv","fh_apcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_rec_signal_minv = new TH1D("fh_rec_signal_minv","fh_rec_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_rich_id_signal_minv = new TH1D("fh_rich_id_signal_minv","fh_rich_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_trd_id_signal_minv = new TH1D("fh_trd_id_signal_minv", "fh_trd_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_tof_id_signal_minv = new TH1D("fh_tof_id_signal_minv","fh_tof_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_chi_prim_signal_minv = new TH1D("fh_chi_prim_signal_minv","fh_chi_prim_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ptcut_signal_minv = new TH1D("fh_ptcut_signal_minv","fh_ptcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_anglecut_signal_minv = new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_gammacut_signal_minv = new TH1D("fh_gammacut_signal_minv","fh_gammacut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ttcut_signal_minv = new TH1D("fh_ttcut_signal_minv","fh_ttcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_stcut_signal_minv = new TH1D("fh_stcut_signal_minv","fh_stcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_apcut_signal_minv = new TH1D("fh_apcut_signal_minv","fh_apcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
 //BG minv
-    fh_rec_bg_minv = new TH1D("fh_rec_bg_minv","fh_rec_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_rich_id_bg_minv = new TH1D("fh_rich_id_bg_minv","fh_rich_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_trd_id_bg_minv = new TH1D("fh_trd_id_bg_minv","fh_trd_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_tof_id_bg_minv = new TH1D("fh_tof_id_bg_minv","fh_tof_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_chi_prim_bg_minv = new TH1D("fh_chi_prim_bg_minv","fh_chi_prim_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);    
-    fh_ptcut_bg_minv = new TH1D("fh_ptcut_bg_minv","fh_ptcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_anglecut_bg_minv = new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_gammacut_bg_minv = new TH1D("fh_gammacut_bg_minv","fh_gammacut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_ttcut_bg_minv = new TH1D("fh_ttcut_bg_minv","fh_ttcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_stcut_bg_minv = new TH1D("fh_stcut_bg_minv","fh_stcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_apcut_bg_minv = new TH1D("fh_apcut_bg_minv","fh_apcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_rec_bg_minv = new TH1D("fh_rec_bg_minv","fh_rec_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_rich_id_bg_minv = new TH1D("fh_rich_id_bg_minv","fh_rich_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_trd_id_bg_minv = new TH1D("fh_trd_id_bg_minv","fh_trd_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_tof_id_bg_minv = new TH1D("fh_tof_id_bg_minv","fh_tof_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_chi_prim_bg_minv = new TH1D("fh_chi_prim_bg_minv","fh_chi_prim_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ptcut_bg_minv = new TH1D("fh_ptcut_bg_minv","fh_ptcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_anglecut_bg_minv = new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_gammacut_bg_minv = new TH1D("fh_gammacut_bg_minv","fh_gammacut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ttcut_bg_minv = new TH1D("fh_ttcut_bg_minv","fh_ttcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_stcut_bg_minv = new TH1D("fh_stcut_bg_minv","fh_stcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_apcut_bg_minv = new TH1D("fh_apcut_bg_minv","fh_apcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
 //pi0 minv
-    fh_rec_pi0_minv = new TH1D("fh_rec_pi0_minv","fh_rec_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_rich_id_pi0_minv = new TH1D("fh_rich_id_pi0_minv","fh_rich_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_trd_id_pi0_minv = new TH1D("fh_trd_id_pi0_minv","fh_trd_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_tof_id_pi0_minv = new TH1D("fh_tof_id_pi0_minv","fh_tof_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
-    fh_chi_prim_pi0_minv = new TH1D("fh_chi_prim_pi0_minv","fh_chi_prim_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_ptcut_pi0_minv = new TH1D("fh_ptcut_pi0_minv","fh_ptcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_anglecut_pi0_minv = new TH1D("fh_anglecut_pi0_minv","fh_anglecut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_gammacut_pi0_minv = new TH1D("fh_gammacut_pi0_minv","fh_gammacut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_ttcut_pi0_minv = new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_stcut_pi0_minv = new TH1D("fh_stcut_pi0_minv","fh_stcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_apcut_pi0_minv = new TH1D("fh_apcut_pi0_minv","fh_apcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_rec_pi0_minv = new TH1D("fh_rec_pi0_minv","fh_rec_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_rich_id_pi0_minv = new TH1D("fh_rich_id_pi0_minv","fh_rich_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_trd_id_pi0_minv = new TH1D("fh_trd_id_pi0_minv","fh_trd_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_tof_id_pi0_minv = new TH1D("fh_tof_id_pi0_minv","fh_tof_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_chi_prim_pi0_minv = new TH1D("fh_chi_prim_pi0_minv","fh_chi_prim_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ptcut_pi0_minv = new TH1D("fh_ptcut_pi0_minv","fh_ptcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_anglecut_pi0_minv = new TH1D("fh_anglecut_pi0_minv","fh_anglecut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_gammacut_pi0_minv = new TH1D("fh_gammacut_pi0_minv","fh_gammacut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_ttcut_pi0_minv = new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_stcut_pi0_minv = new TH1D("fh_stcut_pi0_minv","fh_stcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_apcut_pi0_minv = new TH1D("fh_apcut_pi0_minv","fh_apcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
 //eta minv
-    fh_rec_eta_minv = new TH1D("fh_rec_eta_minv","fh_rec_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
+	fh_rec_eta_minv = new TH1D("fh_rec_eta_minv","fh_rec_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
 	fh_rich_id_eta_minv = new TH1D("fh_rich_id_eta_minv","fh_rich_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
 	fh_trd_id_eta_minv = new TH1D("fh_trd_id_eta_minv","fh_trd_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
 	fh_tof_id_eta_minv = new TH1D("fh_tof_id_eta_minv","fh_tof_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", 200, 0., 2.);
@@ -117,69 +85,70 @@ void glue_histo ()
 	fh_anglecut_eta_minv = new TH1D("fh_anglecut_eta_minv","fh_anglecut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 	fh_gammacut_eta_minv = new TH1D("fh_gammacut_eta_minv","fh_gammacut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 	fh_ttcut_eta_minv = new TH1D("fh_ttcut_eta_minv","fh_ttcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
-    fh_stcut_eta_minv = new TH1D("fh_stcut_eta_minv","fh_stcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+	fh_stcut_eta_minv = new TH1D("fh_stcut_eta_minv","fh_stcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 	fh_apcut_eta_minv = new TH1D("fh_apcut_eta_minv","fh_apcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
-
-    fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_trd_id_signal_pty = new TH2D("fh_trd_id_signal_pty","fh_trd_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_tof_id_signal_pty = new TH2D("fh_tof_id_signal_pty","fh_tof_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_chi_prim_signal_pty = new TH2D("fh_chi_prim_signal_pty","fh_chi_prim_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);    
-    fh_ptcut_signal_pty = new TH2D("fh_ptcut_signal_pty","fh_ptcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_anglecut_signal_pty = new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_gammacut_signal_pty = new TH2D("fh_gammacut_signal_pty","fh_gammacut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_ttcut_signal_pty = new TH2D("fh_ttcut_signal_pty","fh_ttcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_stcut_signal_pty = new TH2D("fh_stcut_signal_pty","fh_stcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_apcut_signal_pty = new TH2D("fh_apcut_signal_pty","fh_apcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+//pty distribution of the signal
+	fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_acc_signal_pty = new TH2D("fh_acc_signal_pty","fh_acc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_trd_id_signal_pty = new TH2D("fh_trd_id_signal_pty","fh_trd_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_tof_id_signal_pty = new TH2D("fh_tof_id_signal_pty","fh_tof_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_chi_prim_signal_pty = new TH2D("fh_chi_prim_signal_pty","fh_chi_prim_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_ptcut_signal_pty = new TH2D("fh_ptcut_signal_pty","fh_ptcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_anglecut_signal_pty = new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_gammacut_signal_pty = new TH2D("fh_gammacut_signal_pty","fh_gammacut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_ttcut_signal_pty = new TH2D("fh_ttcut_signal_pty","fh_ttcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_stcut_signal_pty = new TH2D("fh_stcut_signal_pty","fh_stcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+	fh_apcut_signal_pty = new TH2D("fh_apcut_signal_pty","fh_apcut_signal_pty;Rapidity;p_{t} [GeV/c]",40, 0., 4., 20, 0., 2.);
 
 // cut distribution
-    fh_angle_signal = new TH1D("fh_angle_signal","fh_angle_signal;opening angle [deg];yeild", 360, 0., 180.);
-    fh_angle_bg = new TH1D("fh_angle_bg","fh_angle_bg;opening angle [deg];yeild", 360, 0., 180.); 
-    fh_position_signal = new TH1D("fh_position_signal","fh_position_signal", 100, 0., 0.02);
-    fh_position_bg = new TH1D("fh_position_bg","fh_position_bg",100, 0., 0.02);
-    fh_pt_signal = new TH1D("fh_pt_signal","fh_pt_signal;p_{t} [GeV/c];yeild",200, 0., 2.);
-    fh_pt_bg = new TH1D("fh_pt_bg","fh_pt_bg;p_{t} [GeV/c];yeild",200, 0., 2.);
-    fh_mom_signal = new TH1D("fh_mom_signal","fh_mom_signal;p [GeV/c];yeild",200, 0., 10.);
-    fh_mom_bg = new TH1D("fh_mom_bg","fh_mom_bg;p [GeV/c];yeild",200, 0., 10.);
-    fh_chi2_prim_signal = new TH1D("fh_chi2_prim_signal", "fh_chi2_prim_signal;chi2,yeild", 200, 0., 20.);
-    fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;chi2,yeild", 200, 0., 20.);
-    fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-    fh_stcut_signal = new TH2D("fh_stcut_signal", "fh_stcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-    fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-    fh_stcut_bg = new TH2D("fh_stcut_bg","fh_stcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-
-    fh_apcut_signal = new TH2D("fh_apcut_signal", "fh_apcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
-    fh_apcut_bg = new TH2D("fh_apcut_bg","fh_apcut_bg;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
-    fh_ttcut_pi0 = new TH2D("fh_ttcut_pi0","fh_ttcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-    fh_stcut_pi0 = new TH2D("fh_stcut_pi0","fh_stcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_angle_signal = new TH1D("fh_angle_signal","fh_angle_signal;opening angle [deg];yeild", 360, 0., 180.);
+	fh_angle_bg = new TH1D("fh_angle_bg","fh_angle_bg;opening angle [deg];yeild", 360, 0., 180.);
+	fh_position_signal = new TH1D("fh_position_signal","fh_position_signal", 100, 0., 0.02);
+	fh_position_bg = new TH1D("fh_position_bg","fh_position_bg",100, 0., 0.02);
+	fh_pt_signal = new TH1D("fh_pt_signal","fh_pt_signal;p_{t} [GeV/c];yeild",200, 0., 2.);
+	fh_pt_bg = new TH1D("fh_pt_bg","fh_pt_bg;p_{t} [GeV/c];yeild",200, 0., 2.);
+	fh_mom_signal = new TH1D("fh_mom_signal","fh_mom_signal;p [GeV/c];yeild",200, 0., 10.);
+	fh_mom_bg = new TH1D("fh_mom_bg","fh_mom_bg;p [GeV/c];yeild",200, 0., 10.);
+	fh_chi2_prim_signal = new TH1D("fh_chi2_prim_signal", "fh_chi2_prim_signal;chi2,yeild", 200, 0., 20.);
+	fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;chi2,yeild", 200, 0., 20.);
+	fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_stcut_signal = new TH2D("fh_stcut_signal", "fh_stcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_stcut_bg = new TH2D("fh_stcut_bg","fh_stcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_apcut_signal = new TH2D("fh_apcut_signal", "fh_apcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
+	fh_apcut_bg = new TH2D("fh_apcut_bg","fh_apcut_bg;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+	fh_ttcut_pi0 = new TH2D("fh_ttcut_pi0","fh_ttcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_stcut_pi0 = new TH2D("fh_stcut_pi0","fh_stcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
 	fh_apcut_pi0 = new TH2D("fh_apcut_pi0","fh_apcut_pi0;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
 	fh_ttcut_gamma = new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
-    fh_stcut_gamma = new TH2D("fh_stcut_gamma","fh_stcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+	fh_stcut_gamma = new TH2D("fh_stcut_gamma","fh_stcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
 	fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
 
-	
-    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
-    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
-    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+//source of BG pairs
+	fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
+	fh_source_pair_apcut = new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
 
- //ID cut distributions
-    fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);
-    fh_rich_ann_bg = new TH1D("fh_rich_ann_bg", "fh_rich_ann_bg;ann output;yeild", 100, -1.1, 1.1);
-    fh_trd_ann_signal = new TH1D("fh_trd_ann_signal", "fh_trd_ann_signal;ann output;yeild", 100, -1.1, 1.1);
-    fh_trd_ann_bg = new TH1D("fh_trd_ann_bg", "fh_trd_ann_bg;ann output;yeild", 100, -1.1, 1.1);
-    fh_tof_m2_signal = new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
-    fh_tof_m2_bg = new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
-    fh_rich_trd_ann_signal = new TH2D("fh_rich_trd_ann_signal","fh_rich_trd_ann_signal;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
-    fh_rich_trd_ann_bg = new TH2D("fh_rich_trd_ann_bg","fh_rich_trd_ann_bg;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
+//ID cut distributions
+	fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);
+	fh_rich_trd_ann_signal = new TH2D("fh_rich_trd_ann_signal","fh_rich_trd_ann_signal;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
+	fh_rich_trd_ann_bg = new TH2D("fh_rich_trd_ann_bg","fh_rich_trd_ann_bg;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
+	fh_rich_ann_bg = new TH1D("fh_rich_ann_bg", "fh_rich_ann_bg;ann output;yeild", 100, -1.1, 1.1);
+	fh_trd_ann_signal = new TH1D("fh_trd_ann_signal", "fh_trd_ann_signal;ann output;yeild", 100, -1.1, 1.1);
+	fh_trd_ann_bg = new TH1D("fh_trd_ann_bg", "fh_trd_ann_bg;ann output;yeild", 100, -1.1, 1.1);
+	fh_tof_m2_signal = new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
+	fh_tof_m2_bg = new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
 
     Int_t nofGoodFiles = 0;
     for(Int_t i = 0; i < nEvents; i++) {
@@ -208,37 +177,6 @@ void glue_histo ()
         fh_ttcut_signal_mom->Add((TH1D*) file->Get("fh_ttcut_signal_mom"));
         fh_stcut_signal_mom->Add((TH1D*) file->Get("fh_stcut_signal_mom"));
         fh_apcut_signal_mom->Add((TH1D*) file->Get("fh_apcut_signal_mom"));
-///////////////////////////
-        fh_sts_reco_mom->Add((TH1D*) file->Get("fh_sts_reco_mom"));
-        fh_rich_reco_mom->Add((TH1D*) file->Get("fh_rich_reco_mom"));
-        fh_trd_reco_mom->Add((TH1D*) file->Get("fh_trd_reco_mom"));
-        fh_tof_reco_mom->Add((TH1D*) file->Get("fh_tof_reco_mom"));
-        fh_richID_mom->Add((TH1D*) file->Get("fh_richID_mom"));
-        fh_trdID_mom->Add((TH1D*) file->Get("fh_trdID_mom"));
-        fh_tofID_mom->Add((TH1D*) file->Get("fh_tofID_mom"));
-///
-        fh_mc_mom->Add((TH1D*) file->Get("fh_mc_mom"));
-        fh_mc_gamma_mom->Add((TH1D*) file->Get("fh_mc_gamma_mom"));
-        fh_mc_pi0_mom->Add((TH1D*) file->Get("fh_mc_pi0_mom"));
-        fh_mc_eta_mom->Add((TH1D*) file->Get("fh_mc_eta_mom"));
-    
-        fh_acc_mom->Add((TH1D*) file->Get("fh_acc_mom"));
-        fh_acc_gamma_mom->Add((TH1D*) file->Get("fh_acc_gamma_mom"));
-        fh_acc_pi0_mom->Add((TH1D*) file->Get("fh_acc_pi0_mom"));
-        fh_acc_eta_mom->Add((TH1D*) file->Get("fh_acc_eta_mom"));
-
-        fh_sts_reco_pi0_mom->Add((TH1D*) file->Get("fh_sts_reco_pi0_mom"));
-        fh_sts_reco_eta_mom->Add((TH1D*) file->Get("fh_sts_reco_eta_mom"));
-        fh_sts_reco_gamma_mom->Add((TH1D*) file->Get("fh_sts_reco_gamma_mom"));
-        fh_rich_reco_pi0_mom->Add((TH1D*) file->Get("fh_rich_reco_pi0_mom"));
-        fh_rich_reco_eta_mom->Add((TH1D*) file->Get("fh_rich_reco_eta_mom"));
-        fh_rich_reco_gamma_mom->Add((TH1D*) file->Get("fh_rich_reco_gamma_mom"));
-        fh_trd_reco_pi0_mom->Add((TH1D*) file->Get("fh_trd_reco_pi0_mom"));
-        fh_trd_reco_eta_mom->Add((TH1D*) file->Get("fh_trd_reco_eta_mom"));
-        fh_trd_reco_gamma_mom->Add((TH1D*) file->Get("fh_trd_reco_gamma_mom"));
-        fh_tof_reco_pi0_mom->Add((TH1D*) file->Get("fh_tof_reco_pi0_mom"));
-        fh_tof_reco_gamma_mom->Add((TH1D*) file->Get("fh_tof_reco_gamma_mom"));
-        fh_tof_reco_eta_mom->Add((TH1D*) file->Get("fh_tof_reco_eta_mom"));
 
 ///////////////////////////
         fh_mc_signal_minv->Add((TH1D*) file->Get("fh_mc_signal_minv"));
@@ -387,37 +325,7 @@ void glue_histo ()
     fh_ttcut_signal_mom->Scale(scale);
     fh_stcut_signal_mom->Scale(scale);
     fh_apcut_signal_mom->Scale(scale);
-////////////////////
-    fh_sts_reco_mom->Scale(scale);
-    fh_rich_reco_mom->Scale(scale);
-    fh_trd_reco_mom->Scale(scale);
-    fh_tof_reco_mom->Scale(scale);
-    fh_richID_mom->Scale(scale);
-    fh_trdID_mom->Scale(scale);
-    fh_tofID_mom->Scale(scale);
 
-    fh_mc_mom->Scale(scale);
-    fh_mc_gamma_mom->Scale(scale);
-    fh_mc_pi0_mom->Scale(scale);
-    fh_mc_eta_mom->Scale(scale);
-
-    fh_acc_mom->Scale(scale);
-    fh_acc_gamma_mom->Scale(scale);
-    fh_acc_pi0_mom->Scale(scale);
-    fh_acc_eta_mom->Scale(scale);
-
-    fh_sts_reco_pi0_mom->Scale(scale);
-    fh_sts_reco_eta_mom->Scale(scale);
-    fh_sts_reco_gamma_mom->Scale(scale);
-    fh_rich_reco_pi0_mom->Scale(scale);
-    fh_rich_reco_eta_mom->Scale(scale);
-    fh_rich_reco_gamma_mom->Scale(scale);
-    fh_trd_reco_pi0_mom->Scale(scale);
-    fh_trd_reco_eta_mom->Scale(scale);
-    fh_trd_reco_gamma_mom->Scale(scale);
-    fh_tof_reco_pi0_mom->Scale(scale);
-    fh_tof_reco_gamma_mom->Scale(scale);
-    fh_tof_reco_eta_mom->Scale(scale);
 ///////////////////
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
@@ -561,37 +469,7 @@ void glue_histo ()
     fh_stcut_signal_mom->Write();
     fh_apcut_signal_mom->Write();
 //////////////////
-    fh_sts_reco_mom->Write();
-    fh_rich_reco_mom->Write();
-    fh_trd_reco_mom->Write();
-    fh_tof_reco_mom->Write();
-    fh_richID_mom->Write();
-    fh_trdID_mom->Write();
-    fh_tofID_mom->Write();
 
-    fh_mc_mom->Write();
-    fh_mc_gamma_mom->Write();
-    fh_mc_pi0_mom->Write();
-    fh_mc_eta_mom->Write();
-
-    fh_acc_mom->Write();
-    fh_acc_gamma_mom->Write();
-    fh_acc_pi0_mom->Write();
-    fh_acc_eta_mom->Write();
-
-    fh_sts_reco_pi0_mom->Write();
-    fh_sts_reco_eta_mom->Write();
-    fh_sts_reco_gamma_mom->Write();
-    fh_rich_reco_pi0_mom->Write();
-    fh_rich_reco_eta_mom->Write();
-    fh_rich_reco_gamma_mom->Write();
-    fh_trd_reco_pi0_mom->Write();
-    fh_trd_reco_eta_mom->Write();
-    fh_trd_reco_gamma_mom->Write();
-    fh_tof_reco_pi0_mom->Write();
-    fh_tof_reco_gamma_mom->Write();
-    fh_tof_reco_eta_mom->Write();
-/////////////////
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();
 

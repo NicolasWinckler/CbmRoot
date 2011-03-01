@@ -87,7 +87,6 @@ public:
     void SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM, TH2D* h_source_pair);
 
     void SingleParticleAcceptance();
-    void MC();
     void MCPairs();
     void MCPairsBg();
     void PairAcceptance();
@@ -97,7 +96,6 @@ public:
     void RecoQa();
     void PairsReco();
     void Reco();
-    void SingleReco();
     void SetDefaultIdParameters();
     void BgReco();
     void Pi0Reco();
@@ -206,11 +204,9 @@ private:
     CbmRichElectronIdAnn * fElIdAnn;
     Bool_t fUseRichAnn;
 
-    TH2D* fh_mc_signal_pty; // pt/y distribution for signal mc
-    TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
-
-    TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
-    TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
+//signal momentum distribution
+    TH1D* fh_mc_signal_mom;
+    TH1D* fh_acc_signal_mom;
     TH1D* fh_reco_signal_mom;
     TH1D* fh_sts_reco_signal_mom;
     TH1D* fh_rich_reco_signal_mom;
@@ -225,43 +221,6 @@ private:
     TH1D* fh_stcut_signal_mom;
     TH1D* fh_apcut_signal_mom;
 
-//////////
-   TH1D* fh_sts_reco_mom;
-   TH1D* fh_rich_reco_mom; 
-   TH1D* fh_trd_reco_mom;
-   TH1D* fh_tof_reco_mom;
-   TH1D* fh_richID_mom;
-   TH1D* fh_trdID_mom;
-   TH1D* fh_tofID_mom;
-
-    TH1D* fh_mc_mom;
-    TH1D* fh_mc_gamma_mom;
-    TH1D* fh_mc_pi0_mom;
-    TH1D* fh_mc_eta_mom;
-
-    TH1D* fh_acc_mom;
-    TH1D* fh_acc_gamma_mom;
-    TH1D* fh_acc_pi0_mom;
-    TH1D* fh_acc_eta_mom;
-
-    TH1D* fh_sts_reco_pi0_mom;
-    TH1D* fh_sts_reco_eta_mom;
-    TH1D* fh_sts_reco_gamma_mom;
-
-    TH1D* fh_rich_reco_pi0_mom;
-    TH1D* fh_rich_reco_eta_mom;
-    TH1D* fh_rich_reco_gamma_mom;
-
-    TH1D* fh_trd_reco_pi0_mom;
-    TH1D* fh_trd_reco_eta_mom;
-    TH1D* fh_trd_reco_gamma_mom;
-
-    TH1D* fh_tof_reco_pi0_mom;
-    TH1D* fh_tof_reco_gamma_mom;
-    TH1D* fh_tof_reco_eta_mom;
-//////////
-    TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
-    TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
 
@@ -274,8 +233,10 @@ private:
     TH2D* fh_mc_vertex_gamma_yz;
     TH2D* fh_mc_vertex_gamma_xy;
 
-//signal minv
-    TH1D* fh_rec_signal_minv; //invariant mass distribution of reconstructed signal (ideal ID)
+// invariant mass distribution for signal
+    TH1D* fh_mc_signal_minv;
+    TH1D* fh_acc_signal_minv;
+    TH1D* fh_rec_signal_minv; //minv of reconstructed signal (ideal ID)
     TH1D* fh_rich_id_signal_minv;
     TH1D* fh_trd_id_signal_minv;
     TH1D* fh_tof_id_signal_minv;
@@ -348,7 +309,8 @@ private:
     TH2D* fh_ttcut_gamma;
     TH2D* fh_stcut_gamma;
     TH2D* fh_apcut_gamma;
-  
+
+//source of BG pairs
     TH2D*  fh_source_pair_reco;
     TH2D*  fh_source_pair_rich_id;
     TH2D* fh_source_pair_trd_id;
@@ -361,6 +323,9 @@ private:
     TH2D*  fh_source_pair_stcut;
     TH2D*  fh_source_pair_apcut;
 
+//pt/y distribution for signal
+    TH2D* fh_mc_signal_pty;
+    TH2D* fh_acc_signal_pty;
     TH2D* fh_reco_signal_pty;
     TH2D* fh_rich_id_signal_pty;
     TH2D* fh_trd_id_signal_pty;
@@ -373,7 +338,7 @@ private:
     TH2D* fh_stcut_signal_pty;
     TH2D* fh_apcut_signal_pty;
 
-    //ID cuts distributions
+//ID cuts distributions
     TH1D* fh_rich_ann_signal;
     TH1D* fh_rich_ann_bg;
     TH2D* fh_rich_trd_ann_signal;

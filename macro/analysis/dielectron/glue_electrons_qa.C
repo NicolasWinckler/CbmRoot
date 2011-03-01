@@ -1,4 +1,4 @@
-void glue_histo ()
+void glue_electrons_qa ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa";
     TString outFileName = filePath +".all.root";
@@ -6,6 +6,7 @@ void glue_histo ()
 
     TList* histList = new TList();
 
+    Int_t nofBinsMom = 100;
 //signal electron acceptance
 	histList->Add( new TH1D("fh_mc_el", "fh_mc_el;momentum, GeV/c;Entries", nofBinsMom,0,15) );
 	histList->Add( new TH1D("fh_acc_sts_el", "fh_acc_sts_el;momentum, GeV/c;Entries", nofBinsMom,0,15) );

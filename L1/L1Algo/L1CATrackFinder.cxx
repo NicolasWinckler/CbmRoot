@@ -2057,7 +2057,7 @@ void L1Algo::CATrackFinder()
 #ifndef FIND_GAPED_TRACKS
           if( /*(isec == kFastPrimIter) ||*/ (isec == kAllPrimIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #else
-          if( (isec == kFastPrimIter) /*|| (isec == kFastPrimJumpIter)*/ || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
+          if( (isec == kFastPrimIter) || (isec == kFastPrimJumpIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #endif
             if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
             if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either
@@ -2464,12 +2464,15 @@ void L1Algo::CAFindTrack(int ista,
     if( curr_chi2 > TRACK_CHI2_CUT * (curr_L*2-5) ) return;
 
       // try to find more hits
+#define EXTEND_TRACKS
+#ifdef EXTEND_TRACKS
     if (curr_L >= 3){
         // curr_chi2 =  // good for ghosts, refSec, but bad for time
       BranchExtender(curr_tr);
       curr_L = curr_tr.StsHits.size();
         // if( curr_chi2 > TRACK_CHI2_CUT * (curr_L*2-5) ) return;
     }
+#endif // EXTEND_TRACKS
     
       // -- select the best
     if ( (curr_L > best_L ) || ( (curr_L == best_L) && (curr_chi2 < best_chi2) ) ){

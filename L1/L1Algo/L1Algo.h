@@ -342,11 +342,11 @@ class L1Algo{
 #ifdef FIND_GAPED_TRACKS
   enum { fNFindIterations = 5 }; // TODO investigate kAllPrimJumpIter & kAllSecJumpIter
   enum { kFastPrimIter = 0, // primary fast tracks
-         kFastPrimJumpIter,  // primary fast tracks with gaps
+         kFastPrimJumpIter, // primary fast tracks with jumped triplets
          kAllPrimIter,      // primary all tracks
-         kAllPrimJumpIter,  // primary tracks with gaps
+         kAllPrimJumpIter,  // primary tracks with jumped triplets
          kAllSecIter,       // secondary all tracks
-         kAllSecJumpIter   // primary tracks with gaps
+         kAllSecJumpIter    // secondary tracks with jumped triplets
   };
 #else
   enum { fNFindIterations = 3 };

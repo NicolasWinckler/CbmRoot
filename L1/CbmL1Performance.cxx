@@ -241,8 +241,8 @@ void CbmL1::EfficienciesPerformance()
 
   for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
     CbmL1MCTrack &mtra = *(mtraIt);
-    // No Sts hits?
     
+//    if( !( mtra.pdg == -11 && mtra.mother_ID == -1 ) ) continue; // electrons only
     if( ! mtra.IsReconstructable() ) continue;
 
       // -- find used constans --
@@ -590,6 +590,8 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   int mc_total = 0; // total amount of reconstructable mcTracks
   for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
     CbmL1MCTrack &mtra = *(mtraIt);
+//    if( !( mtra.pdg == -11 && mtra.mother_ID == -1 ) ) continue; // electrons only
+    
     // No Sts hits? 
     int nmchits = mtra.StsHits.size();
     if (nmchits == 0) continue;
@@ -841,6 +843,7 @@ void CbmL1::TrackFitPerformance()
       int iMC = vHitMCRef[it->StsHits.front()]; // TODO2: adapt to linking
       if (iMC < 0) continue;
       CbmL1MCPoint &mc = vMCPoints[iMC];
+//      if( !( mc.pdg == -11 && mc.mother_ID == -1 ) ) continue; // electrons only
       h_fit[0]->Fill( (mc.x-it->T[0]) *1.e4);
       h_fit[1]->Fill( (mc.y-it->T[1]) *1.e4);
       h_fit[2]->Fill((mc.px/mc.pz-it->T[2])*1.e3);

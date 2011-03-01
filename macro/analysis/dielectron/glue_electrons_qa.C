@@ -3,7 +3,7 @@
 void glue_electrons_qa ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa";//.0000.root";
-    TString outFileName = filePath +"elid.qa.all.root";
+    TString outFileName = filePath +".all.root";
     Int_t nEvents = 200;   // number of files to be added
 
     TList *fileList = new TList();
@@ -20,7 +20,7 @@ void glue_electrons_qa ()
         if (file->IsZombie()) continue;
         file->Close();
 
-        fileList->Add( TFile::Open(fileName) );
+        fileList->Add( file);//TFile::Open(fileName) );
 
         nofGoodFiles++;
     }

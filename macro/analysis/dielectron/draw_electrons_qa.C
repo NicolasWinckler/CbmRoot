@@ -12,7 +12,7 @@ void draw_electrons_qa()
 {
 	//SetStyles();
 
-	TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.0000.root");
+	TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.all.root");
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
    // gStyle->SetOptStat(0000);

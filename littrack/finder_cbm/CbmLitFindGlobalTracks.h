@@ -128,6 +128,12 @@ private:
      */
 	void PrintStopwatchStatistics();
 
+	/**
+	 * Selects tracks for further merging with TOF.
+	 * Track has to have at least one hit in the last station group.
+	 */
+	void SelectTracksForTofMerging();
+
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
 	Bool_t fIsTrd; // If TRD detected than true
 	Bool_t fIsMuch; // If MUCH detected than true

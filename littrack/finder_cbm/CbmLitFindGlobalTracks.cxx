@@ -326,8 +326,6 @@ void CbmLitFindGlobalTracks::CalculateLength()
 			length += std::sqrt(dX*dX + dY*dY + dZ*dZ);
 		}
 		globalTrack->SetLength(length);
-//		std::cout << "stsId=" << stsId << " muchId=" << muchId << " trdId="
-//		   << trdId << " tofId=" << tofId << " length=" << length << std::endl;
 	}
 }
 
@@ -346,27 +344,56 @@ void CbmLitFindGlobalTracks::ClearArrays()
 
 void CbmLitFindGlobalTracks::RunTrackReconstruction()
 {
+	// Track finding in TRD or MUCH
 	if (fIsMuch || fIsTrd) {
 		fTrackingWatch.Start(kFALSE);
 		fFinder->DoFind(fLitHits, fLitStsTracks, fLitOutputTracks);
 		fTrackingWatch.Stop();
 	}
+	// Merging of TOF hits to global tracks
 	if (fIsTof){
+		// If there are no TRD or MUCH than merge STS tracks with TOF
 		if (!(fIsMuch || fIsTrd)) {
 			for(TrackPtrIterator it = fLitStsTracks.begin(); it != fLitStsTracks.end(); it++) {
 				CbmLitTrack* track = new CbmLitTrack(*(*it));
 				fLitOutputTracks.push_back(track);
 			}
 		}
+
+		// Selection of tracks to be merged with TOF
+		if (fIsMuch || fIsTrd) SelectTracksForTofMerging();
+
 		fMergerWatch.Start(kFALSE);
 		fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
 		fMergerWatch.Stop();
 	}
 
-	//Refit found tracks
+	// Refit found tracks
 	for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++){
 		CbmLitTrack* track = *it;
 		fFitter->Fit(track);
+	}
+}
+
+void CbmLitFindGlobalTracks::SelectTracksForTofMerging()
+{
+	// The aim of this procedure is to select only those tracks
+	// which have at least one hit in the last detector group.
+
+	const CbmLitDetectorLayout& layout = CbmLitEnvironment::Instance()->GetLayout();
+	int nofStationGroups = layout.GetNofStationGroups();
+	int nofPlanes = layout.GetNofPlanes();
+	int nofPlanesLast = layout.GetNofPlanes(nofStationGroups - 1);
+	int planeCut = nofPlanes - nofPlanesLast;
+
+	for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++){
+		CbmLitTrack* track = *it;
+		if (track->GetQuality() == kLITBAD) continue;
+		const CbmLitHit* hit = track->GetHit(track->GetNofHits() - 1);
+		if (hit->GetPlaneId() >= planeCut) {
+			// OK select this track for further merging with TOF
+			track->SetQuality(kLITGOODMERGE);
+		}
 	}
 }
 

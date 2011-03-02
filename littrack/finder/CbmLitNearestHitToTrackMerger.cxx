@@ -1,3 +1,9 @@
+/** CbmLitNearestHitToTrackMerger.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "finder/CbmLitNearestHitToTrackMerger.h"
 
 #include "base/CbmLitStation.h"
@@ -38,6 +44,7 @@ LitStatus CbmLitNearestHitToTrackMerger::DoMerge(
 	//loop over tracks
 	for (TrackPtrIterator it = tracks.begin(); it != tracks.end(); it++) {
 		CbmLitTrack* track = *it;
+		if (track->GetQuality() != kLITGOODMERGE) continue;
 		CbmLitTrackParam par(*track->GetParamLast());
 		bool hitAdded = false;
 		for (int substation = 0; substation < fStation.GetNofSubstations(); substation++) {

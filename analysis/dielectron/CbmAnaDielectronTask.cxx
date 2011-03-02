@@ -261,7 +261,7 @@ void CbmAnaDielectronTask::SetDefaultIdParameters()
     fDistCut = -1.;
     fPtCut = 0.2;
     fAngleCut = 1.;
-    fChiPrimCut = 2.;
+    fChiPrimCut = 12.;
     fGammaCut = 0.025;
 }
 

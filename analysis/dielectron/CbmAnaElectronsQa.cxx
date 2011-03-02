@@ -599,6 +599,7 @@ void CbmAnaElectronsQa::StsQa()
 		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(i);
 		if (!stsTrackMatch) continue;
 		Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
+        if (mcIdSts < 0 ) continue;
         CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdSts);
 
         Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
@@ -608,7 +609,6 @@ void CbmAnaElectronsQa::StsQa()
 
 		TVector3 momMC;
 		mcTrack->GetMomentum(momMC);
-
         Double_t chiPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
         fh_chiprim_signal->Fill(chiPrimary);
         Double_t chiPrimary2 = fKFFitter.GetChiToVertex(stsTrack);

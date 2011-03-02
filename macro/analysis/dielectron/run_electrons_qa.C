@@ -41,6 +41,10 @@ void run_electrons_qa(Int_t nEvents = 700)
 
 	run->SetOutputFile(outFile);
 
+    //CbmKF is needed for Extrapolation
+    CbmKF* kf = new CbmKF();
+    run->AddTask(kf);
+
 	CbmAnaElectronsQa* electronsQa = new CbmAnaElectronsQa("CbmAnaElectronsQa", "CbmAnaElectronsQa");
 	electronsQa->SetRichAnnCut(-0.5);
 	electronsQa->SetUseRichAnn(true);

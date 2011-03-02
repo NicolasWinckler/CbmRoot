@@ -143,7 +143,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 {
   TStopwatch timer;
   timer.Start();
-  Bool_t drawing = true;
+  Bool_t drawing = false;
   Bool_t pr = true;
   Bool_t combinatoric = true;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
@@ -456,63 +456,87 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 
   // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*& PRF)
-  {
-    ModulePara* mPara = new ModulePara;
-    //MyHit* hit = new MyHit;
+{
+  ModulePara* mPara = new ModulePara;
+  //MyHit* hit = new MyHit;
  
-    CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);  
-    Int_t moduleId = digi->GetDetId();
-    fModuleInfo = fDigiPar->GetModule(moduleId);
-    Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
+  CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);  
+  Int_t moduleId = digi->GetDetId();
+  fModuleInfo = fDigiPar->GetModule(moduleId);
+  Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
   
-    mPara -> Station = detInfo[1];
-    mPara -> Layer = detInfo[2];
-    mPara -> moduleId = moduleId;
-    //cout << detInfo[1] << "  " << detInfo[2] << endl;
-    //-----------rotated----------------------
+  mPara -> Station = detInfo[1];
+  mPara -> Layer = detInfo[2];
+  mPara -> moduleId = moduleId;
+  //cout << detInfo[1] << "  " << detInfo[2] << endl;
+  //-----------rotated----------------------
 
-    hit -> rowId = digi->GetRow();
-    hit -> colId = digi->GetCol();
-    hit -> digiId = qMaxIndex;
-    hit -> moduleId = moduleId;
+  hit -> rowId = digi->GetRow();
+  hit -> colId = digi->GetCol();
+  hit -> digiId = qMaxIndex;
+  hit -> moduleId = moduleId;
 
-    mPara -> xPos = (Int_t)(10 * fModuleInfo->GetX());
-    mPara -> yPos = (Int_t)(10 * fModuleInfo->GetY());
-    mPara -> zPos = (Int_t)(10 * fModuleInfo->GetZ());
-    mPara -> nCol = fModuleInfo->GetnCol();
-    mPara -> nRow = fModuleInfo->GetnRow();
-    mPara -> NoSectors = fModuleInfo->GetNoSectors();
+  mPara -> xPos = (Int_t)(10 * fModuleInfo->GetX());
+  mPara -> yPos = (Int_t)(10 * fModuleInfo->GetY());
+  mPara -> zPos = (Int_t)(10 * fModuleInfo->GetZ());
+  mPara -> nCol = fModuleInfo->GetnCol();
+  mPara -> nRow = fModuleInfo->GetnRow();
+  mPara -> NoSectors = fModuleInfo->GetNoSectors();
 
-    const Int_t NoSectors = fModuleInfo->GetNoSectors();
-    mPara -> SectorSizeX.resize(NoSectors);
-    mPara -> SectorSizeY.resize(NoSectors);
-    mPara -> PadSizeX.resize(NoSectors);
-    mPara -> PadSizeY.resize(NoSectors);
-    mPara -> SecRow.resize(NoSectors);
-    mPara -> SecCol.resize(NoSectors);      
+  const Int_t NoSectors = fModuleInfo->GetNoSectors();
+  mPara -> SectorSizeX.resize(NoSectors);
+  mPara -> SectorSizeY.resize(NoSectors);
+  mPara -> PadSizeX.resize(NoSectors);
+  mPara -> PadSizeY.resize(NoSectors);
+  mPara -> SecRow.resize(NoSectors);
+  mPara -> SecCol.resize(NoSectors);      
 
-    for (Int_t i = 0; i < NoSectors; i++)
-      {
-	mPara -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
-	mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);
-	mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
-	mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
-	mPara -> SecRow[i]      = Int_t(mPara->SectorSizeY[i] / mPara->PadSizeY[i]);
-	mPara -> SecCol[i]      = Int_t(mPara->SectorSizeX[i] / mPara->PadSizeX[i]);
+  for (Int_t i = 0; i < NoSectors; i++)
+    {
+      mPara -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
+      mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);
+      mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
+      mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
+      mPara -> SecRow[i]      = Int_t(mPara->SectorSizeY[i] / mPara->PadSizeY[i]);
+      mPara -> SecCol[i]      = Int_t(mPara->SectorSizeX[i] / mPara->PadSizeX[i]);
      
-	//printf("M(%.1f,%.1f) SS(%.1f,%.1f) N(%d,%d) S(%d,%d) PS(%.1f,%.1f)\n",ModuleSizeX,ModuleSizeY,SectorSizeX[i],SectorSizeY[i],nCol,nRow,SecCol[i],SecRow[i],PadSizeX[i],PadSizeY[i]);
-      }
+      //printf("M(%.1f,%.1f) SS(%.1f,%.1f) N(%d,%d) S(%d,%d) PS(%.1f,%.1f)\n",ModuleSizeX,ModuleSizeY,SectorSizeX[i],SectorSizeY[i],nCol,nRow,SecCol[i],SecRow[i],PadSizeX[i],PadSizeY[i]);
+    }
 
-    hit -> xPos = (mPara->xPos - 10 * fModuleInfo-> GetSizex());
-    hit -> yPos = (mPara->yPos - 10 * fModuleInfo-> GetSizey());
-    hit -> zPos = mPara->zPos;
-    hit -> secIdX = GetSector(true,  digi->GetCol(), mPara);
-    hit -> secIdY = GetSector(false, digi->GetRow(), mPara);
+  hit -> xPos = (mPara->xPos - 10 * fModuleInfo-> GetSizex());
+  hit -> yPos = (mPara->yPos - 10 * fModuleInfo-> GetSizey());
+
+  /*
+    Row and Columns are counted across sectors. At this point this absolute row and column ID has to be converted to sector row and column IDs within sectors.
+  */
+  Int_t rs = 0;
+  Int_t RowOfSec = hit -> rowId;
+  while (RowOfSec > mPara -> SecRow[rs]) {   
+    RowOfSec -= mPara -> SecRow[rs];
+    rs++;
+  }
+  Int_t cs = 0; 
+  Int_t ColOfSec = hit -> colId;
+  while (ColOfSec > mPara -> SecCol[cs]) {    
+    ColOfSec -= mPara -> SecCol[cs];
+    cs++;
+  }
  
-    Int_t neighbourIds[4] = {-1, -1, -1, -1};
-    SearchNeighbours(qMaxIndex, neighbourIds, mPara, moduleDigiMap[mPara->moduleId], hit, PRF);
-    delete mPara;
-  }// --------------------------------------------------------------------
+  Int_t Sector;
+  if (cs > rs) Sector = cs;
+  else Sector = rs;
+
+  TVector3 posHit;
+  TVector3 padSize;
+  fModuleInfo->GetPosition(ColOfSec, RowOfSec, moduleId, Sector, posHit, padSize);
+  hit -> zPos = posHit[2]*10;//mPara->zPos;
+  hit -> secIdX = GetSector(true,  digi->GetCol(), mPara);
+  hit -> secIdY = GetSector(false, digi->GetRow(), mPara);
+ 
+  Int_t neighbourIds[4] = {-1, -1, -1, -1};
+  SearchNeighbours(qMaxIndex, neighbourIds, mPara, moduleDigiMap[mPara->moduleId], hit, PRF);
+  delete mPara;
+}// --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds, ModulePara* mPara, MyDigiList *neighbours, MyHit* hit, TH2F*& PRF)
   {
     //cout << "SearchNeighbours" << endl;

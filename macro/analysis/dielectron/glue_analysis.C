@@ -1,4 +1,4 @@
-void glue_histo ()
+void glue_analysis ()
 {
     TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis";//.0000.root";
     TString outFileName = filePath +".all.root";

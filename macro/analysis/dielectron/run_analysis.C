@@ -1,5 +1,5 @@
 
-void dilep_run_analysis(Int_t nEvents = 700)
+void run_analysis(Int_t nEvents = 700)
 {
     Int_t iVerbose = 0;
 

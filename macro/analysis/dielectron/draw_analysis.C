@@ -110,7 +110,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 
-void draw(){
+void draw_analysis(){
     TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);

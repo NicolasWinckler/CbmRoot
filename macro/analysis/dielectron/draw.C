@@ -475,6 +475,24 @@ void draw(){
     fh_mom_signal->Scale(scaleSig);
     fh_mom_bg->Scale(scaleBg);
 
+    c4->cd(11);
+    Double_t scaleSig = 1./fh_chi2sts_signal->Integral();
+    Double_t scaleBg = 1./fh_chi2sts_bg->Integral();
+    fh_chi2sts_signal->SetLineColor(kRed);
+    fh_chi2sts_bg->SetLineColor(kBlue);
+    fh_chi2sts_signal->Draw();
+    fh_chi2sts_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    c4->cd(12);
+    TH1D* fh_sig_chi2sts = CalculateSignificance(fh_chi2sts_signal,fh_chi2sts_bg, "chi2sts_significance", "significance", "forward");
+    fh_sig_mom->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    fh_chi2sts_signal->Scale(scaleSig);
+    fh_chi2sts_bg->Scale(scaleBg);
+
 //source of BG candidates
     Double_t sumofbins1 =0;
     Double_t sumofbins2 =0;

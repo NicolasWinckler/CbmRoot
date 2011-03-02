@@ -164,10 +164,6 @@ void draw_electrons_qa()
 	gPad->SetLogy(true);
 	}
 
-	TH1D* fh_nof_global;
-	TH1D* fh_nof_sts_tracks;
-	TH1D* fh_nof_rich_rings;
-	TH1D* fh_nof_trd_tracks;
 //test distributions
 	{
 	std::string hname1;
@@ -205,6 +201,7 @@ void draw_electrons_qa()
 	gPad->SetGridy(true);
 	}
 
+//StsQa
 	{
 	TCanvas *c6 = new TCanvas("stsQa","stsQa",1200,800);
 	c6->Divide(3,2);

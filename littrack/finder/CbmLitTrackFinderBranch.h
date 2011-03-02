@@ -14,6 +14,8 @@
 #include "data/CbmLitHitChiSq.h"
 #include "finder/CbmLitTrackFinderBase.h"
 
+#include <map>
+
 class CbmLitTrackSelection;
 class CbmLitTrackUpdate;
 class CbmLitTrackFitter;
@@ -133,15 +135,25 @@ private:
 	TrackPropagatorPtr fPropagator;
 	TrackUpdatePtr fFilter;
 
-	int fMaxNofHitsInValidationGate; // maximum number of hits in the validations
-	                                 // gate for which a separate branch is created
-	int fMaxNofBranches; // maximum number of branches for one input track seed
-	                     // which can be created in a station group
-	bool fIsAlwaysCreateMissingHit; // if true than branch for a missing hit is always created
-	                                // if false than it is created only if there are no hits in the validation gate
-	bool fIsProcessSubstationsTogether; // if true than hits from all substations are gethered together and
-	                                    // hit selection is done over all this hits at a time
-	int fNofBranches; // counter for number of branches
+	/* Maximum number of hits in the validation
+	   gate for which a separate branch is created */
+	int fMaxNofHitsInValidationGate;
+	/* Maximum number of branches for one input track seed
+	   which can be created in a station group */
+	int fMaxNofBranchesStationGroup;
+	/* If true than a separate branch for a missing hit is always created
+	   if false than it is created only if there are no hits in the validation gate */
+	bool fIsAlwaysCreateMissingHit;
+	/* If true than hits from all substations are gathered together and
+	   hit selection is done over all this hits at a time */
+	bool fIsProcessSubstationsTogether;
+	/* Counter for number of branches */
+	int fNofBranchesStationGroup;
+	/* Maximum number of branches for one input track seed */
+	int fMaxNofBranches;
+	/* Map for monitoring of number of branches for each input track seed
+	   map<previousTrackId, nofBranches> */
+	std::map<int, int> fNofBranches;
 };
 
 #endif /*CBMLITTRACKFINDERBASEBRANCH_H_*/

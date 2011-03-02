@@ -9,7 +9,7 @@
 #include "data/CbmLitTrackParam.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitHitChiSq.h"
-#include "interface//CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackSelection.h"
 #include "interface/CbmLitTrackPropagator.h"
 #include "interface/CbmLitTrackUpdate.h"
 #include "interface/CbmLitTrackFitter.h"
@@ -22,8 +22,10 @@
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch():
 	fMaxNofHitsInValidationGate(3),
-	fMaxNofBranches(27),
-	fIsProcessSubstationsTogether(true)
+	fMaxNofBranchesStationGroup(27),
+	fIsProcessSubstationsTogether(true),
+	fMaxNofBranches(2048),
+	fNofBranches()
 {
 }
 
@@ -65,6 +67,7 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
 		for_each(fTracksCopy.begin(), fTracksCopy.end(), DeleteObject());
 		fTracksCopy.clear();
 		fHitData.Clear();
+		fNofBranches.clear();
 	}
 	std::cout << "-I- CbmLitTrackFinderBranch: " << fEventNo++	<< " events processed" << std::endl;
 	return kLITSUCCESS;
@@ -102,9 +105,7 @@ void CbmLitTrackFinderBranch::FollowTracks()
 		fTracks.clear();
 
 		if (fVerbose > 1)
-			std::cout << "-I- CbmLitTrackFinderBranch:"
-				<< fFoundTracks.size() << " followed in the "
-				<< stationGroup << " station group" << std::endl;
+			std::cout << "-I- CbmLitTrackFinderBranch:"	<< fFoundTracks.size() << " followed in the " << stationGroup << " station group" << std::endl;
 
 		fStationGroupSelection->DoSelect(fFoundTracks.begin(), fFoundTracks.end());
 		if (fVerbose > 1)
@@ -125,9 +126,14 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
 		const CbmLitTrack* track,
 		int stationGroup)
 {
+	// Check if number of branches for this seed is acceptable
+	if (fNofBranches[track->GetPreviousTrackId()] > fMaxNofBranches) return;
+	// TODO: If number of branches is too big than start nearest
+	// neighbor tracking for that seed. Not just return.
+
    int nofStations = fLayout.GetNofStations(stationGroup);
    std::vector<TrackPtrVector> tracks(nofStations);
-   fNofBranches = 0;
+   fNofBranchesStationGroup = 0;
 
    if (ProcessStation(track, stationGroup, 0, tracks[0])){ //0
 	   for (TrackPtrIterator trk0 = tracks[0].begin(); trk0 != tracks[0].end(); trk0++) { //1
@@ -159,6 +165,11 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
 	   tracks[i].clear();
    }
    tracks.clear();
+
+   fNofBranches[track->GetPreviousTrackId()] += fNofBranchesStationGroup;
+
+//   std::cout << "(" << track->GetPreviousTrackId() << " " << fNofBranchesStationGroup << " "
+//		   << fNofBranches[track->GetPreviousTrackId()] << ") ";
 }
 
 bool CbmLitTrackFinderBranch::ProcessStation(
@@ -306,8 +317,8 @@ bool CbmLitTrackFinderBranch::AddTrackCandidate(
 		int stationGroup)
 {
 	for (TrackPtrIterator it = tracks.begin(); it != tracks.end(); it++) {
-		fNofBranches++;
-		if (fNofBranches > fMaxNofBranches) return false;
+		fNofBranchesStationGroup++;
+		if (fNofBranchesStationGroup > fMaxNofBranchesStationGroup) return false;
 		CbmLitTrack* newTrack = new CbmLitTrack(**it);
 		newTrack->SetLastPlaneId(stationGroup);
 		newTrack->SetNDF(NDF(newTrack));

@@ -36,6 +36,7 @@ public:
 	Double_t mass, energy, rapidity;
     Int_t charge;
 	Double_t chiPrimary;
+	Double_t chi2sts;
 	Int_t MCMotherId;
 	Int_t stsMCTrackId;
 	Int_t richMCTrackId;
@@ -291,6 +292,8 @@ private:
     TH1D* fh_mom_bg; // bg momentum
     TH1D* fh_angle_signal;
     TH1D* fh_angle_bg;
+    TH1D* fh_chi2sts_signal;
+    TH1D* fh_chi2sts_bg;
     TH2D* fh_ttcut_signal;
     TH2D* fh_stcut_signal;
     TH2D* fh_ttcut_bg;
@@ -303,6 +306,7 @@ private:
     TH2D* fh_ttcut_gamma;
     TH2D* fh_stcut_gamma;
     TH2D* fh_apcut_gamma;
+
 
 //source of BG pairs
     TH2D*  fh_source_pair_reco;

@@ -204,6 +204,9 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_mom_bg = new TH1D("fh_mom_bg","fh_mom_bg;p [GeV/c];yeild",200, 0., 10.);
     fh_chi2_prim_signal = new TH1D("fh_chi2_prim_signal", "fh_chi2_prim_signal;chi2,yeild", 200, 0., 20.);
     fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;chi2,yeild", 200, 0., 20.);
+    fh_chi2sts_signal = new TH1D("fh_chi2sts_signal", "fh_chi2sts_signal;chi2,yeild", 200, 0., 20.);
+    fh_chi2sts_bg = new TH1D("fh_chi2sts_bg","fh_chi2sts_bg;chi2,yeild", 200, 0., 20.);
+
     fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
     fh_stcut_signal = new TH2D("fh_stcut_signal", "fh_stcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
     fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
@@ -670,6 +673,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 	    CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMCTrackId);
 	    if (mcTrack1 == NULL) continue;
 
+	    cand.chi2sts = stsTrack->GetChi2() / stsTrack->GetNDF();
 	    cand.chiPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
         // Fit tracks to the primary vertex
         FairTrackParam vtxTrack;
@@ -1399,6 +1403,7 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
         if (fCandidates[i].isMCSignalElectron){
             fh_rich_ann_signal->Fill(fCandidates[i].richAnn, fWeight);
             fh_rich_trd_ann_signal->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn, fWeight);
+            fh_chi2sts_signal->Fill(fCandidates[i].chi2sts);
             if (fCandidates[i].isRichElectron) {
                 fh_trd_ann_signal->Fill(fCandidates[i].trdAnn, fWeight);
             }
@@ -1408,6 +1413,7 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
         } else {
             fh_rich_ann_bg->Fill(fCandidates[i].richAnn);
             fh_rich_trd_ann_bg->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn);
+            fh_chi2sts_bg->Fill(fCandidates[i].chi2sts);
             if (fCandidates[i].isRichElectron){
                 fh_trd_ann_bg->Fill(fCandidates[i].trdAnn);
             }
@@ -1731,6 +1737,9 @@ void CbmAnaDielectronTask::Finish()
     fh_pt_bg->Scale(scale);
     fh_chi2_prim_signal->Scale(scale);
     fh_chi2_prim_bg->Scale(scale);
+    fh_chi2sts_signal->Scale(scale);
+    fh_chi2sts_bg->Scale(scale);
+
     fh_ttcut_signal->Scale(scale);
     fh_stcut_signal->Scale(scale);
     fh_ttcut_bg->Scale(scale);
@@ -1856,6 +1865,9 @@ void CbmAnaDielectronTask::Finish()
     fh_angle_bg->Write();
     fh_mom_signal->Write();
     fh_mom_bg->Write();
+    fh_chi2sts_signal->Write();
+    fh_chi2sts_bg->Write();
+
     fh_ttcut_signal->Write();
     fh_stcut_signal->Write();
     fh_ttcut_bg->Write();

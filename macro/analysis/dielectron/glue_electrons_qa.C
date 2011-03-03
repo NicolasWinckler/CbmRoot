@@ -66,6 +66,7 @@ void glue_electrons_qa ()
     for (Int_t iH = 0; iH < histList->GetEntries(); iH++){
     	TH1* h = (TH1*)histList->At(iH);
         h->Scale(scale);
+       // h->Reset("E");
         h->Write();
     }
 

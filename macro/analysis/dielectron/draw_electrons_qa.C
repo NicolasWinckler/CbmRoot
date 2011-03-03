@@ -12,7 +12,8 @@ void draw_electrons_qa()
 {
 	//SetStyles();
 
-	TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.all.root");
+	TFile *file = new TFile
+        ("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.all.root");
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
    // gStyle->SetOptStat(0000);
@@ -210,19 +211,19 @@ void draw_electrons_qa()
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
-	c2->cd(2);
+	c6->cd(2);
 	fh_mom_res_vs_mom_signal->Draw("COLZ");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
-	c2->cd(3);
+	c6->cd(3);
 	fh_mean_mom_vs_mom_signal->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
-	c2->cd(4);
+	c6->cd(4);
 	fh_chiprim_signal->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
-	c2->cd(5);
+	c6->cd(5);
 	fh_chiprim_signal2->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);

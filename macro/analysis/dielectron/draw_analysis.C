@@ -111,7 +111,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 void draw_analysis(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -486,7 +486,7 @@ void draw_analysis(){
     gPad->SetLogy(true);
     c4->cd(12);
     TH1D* fh_sig_chi2sts = CalculateSignificance(fh_chi2sts_signal,fh_chi2sts_bg, "chi2sts_significance", "significance", "forward");
-    fh_sig_mom->Draw();
+    fh_sig_chi2sts->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     fh_chi2sts_signal->Scale(scaleSig);

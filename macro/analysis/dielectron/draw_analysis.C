@@ -111,7 +111,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 void draw_analysis(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -161,7 +161,6 @@ void draw_analysis(){
     fh_anglecut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_mc_signal_pty);
 
-    
 //pty efficiency of signal
     TCanvas *c1_1 = new TCanvas("c1_1-pty eff","c1_1-pty eff",1000,750);
     c1_1->Divide(4,3);
@@ -181,7 +180,7 @@ void draw_analysis(){
     draw_eff_pty(fh_rich_id_signal_pty, fh_reco_signal_pty);
 
     c1_1->cd(4);
-    TH2D* fh_trd_id_signal_pty_eff = divideHisto2D(fh_trd_id_signal_pty, fh_reco_signal_pty);
+    TH2D* fh_trd_id_signal_pty_eff = divideHisto2D(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
     fh_trd_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_trd_id_signal_pty, fh_reco_signal_pty);
 

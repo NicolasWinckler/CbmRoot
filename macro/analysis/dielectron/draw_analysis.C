@@ -111,7 +111,7 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
 
 
 void draw_analysis(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -195,19 +195,19 @@ void draw_analysis(){
     draw_eff_pty(fh_chi_prim_signal_pty, fh_tof_id_signal_pty);
 
     c1_1->cd(7);
-    TH2D* fh_gammacut_signal_pty_eff = divideHisto2D(fh_gammacut_signal_pty, fh_tof_id_signal_pty);
+    TH2D* fh_gammacut_signal_pty_eff = divideHisto2D(fh_gammacut_signal_pty, fh_chi_prim_signal_pty);
     fh_gammacut_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_gammacut_signal_pty, fh_tof_id_signal_pty);
+    draw_eff_pty(fh_gammacut_signal_pty, fh_chi_prim_signal_pty);
 
     c1_1->cd(8);
-    TH2D* fh_stcut_signal_pty_eff = divideHisto2D(fh_stcut_signal_pty, fh_tof_id_signal_pty);
+    TH2D* fh_stcut_signal_pty_eff = divideHisto2D(fh_stcut_signal_pty, fh_gammacut_signal_pty);
     fh_stcut_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_stcut_signal_pty, fh_tof_id_signal_pty);
+    draw_eff_pty(fh_stcut_signal_pty, fh_gammacut_signal_pty);
 
     c1_1->cd(9);
-    TH2D* fh_ttcut_signal_pty_eff = divideHisto2D(fh_ttcut_signal_pty, fh_tof_id_signal_pty);
+    TH2D* fh_ttcut_signal_pty_eff = divideHisto2D(fh_ttcut_signal_pty, fh_stcut_signal_pty);
     fh_ttcut_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_ttcut_signal_pty, fh_tof_id_signal_pty);
+    draw_eff_pty(fh_ttcut_signal_pty, fh_stcut_signal_pty);
 
     c1_1->cd(10);
   //  TH2D* fh_apcut_signal_pty_eff = divideHisto2D(fh_apcut_signal_pty, fh_tof_id_signal_pty);
@@ -215,14 +215,14 @@ void draw_analysis(){
   //  draw_eff_pty(fh_apcut_signal_pty, fh_tof_id_signal_pty);
 
     c1_1->cd(11);
-    TH2D* fh_ptcut_signal_pty_eff = divideHisto2D(fh_ptcut_signal_pty, fh_tof_id_signal_pty);
+    TH2D* fh_ptcut_signal_pty_eff = divideHisto2D(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
     fh_ptcut_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_ptcut_signal_pty, fh_tof_id_signal_pty);
+    draw_eff_pty(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
 
     c1_1->cd(12);
-    TH2D* fh_anglecut_signal_pty_eff = divideHisto2D(fh_anglecut_signal_pty, fh_tof_id_signal_pty);
+    TH2D* fh_anglecut_signal_pty_eff = divideHisto2D(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
     fh_anglecut_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_anglecut_signal_pty, fh_tof_id_signal_pty);
+    draw_eff_pty(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
     
 
     TCanvas *c2 = new TCanvas("c2-mom", "c2-mom", 400, 400);

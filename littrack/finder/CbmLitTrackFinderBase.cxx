@@ -1,3 +1,8 @@
+/** CbmLitTrackFinderBase.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ **/
+
 #include "finder/CbmLitTrackFinderBase.h"
 
 #include "data/CbmLitHit.h"
@@ -55,14 +60,14 @@ void CbmLitTrackFinderBase::ArrangeHits(
 //    					std::cout << (*it)->ToString();
     			}
     		} else {
-//    			for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++){
-//					HitPtrIteratorPair hits = fHitData.GetHits(i, j, k);
-////					std::sort(hits.first, hits.second, CompareHitPtrXULess());
+    			for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++){
+					HitPtrIteratorPair hits = fHitData.GetHits(i, j, k);
+					std::sort(hits.first, hits.second, CompareHitPtrXULess());
 //					std::cout << "station group " << i << " station " << j
 //						<< " substation " << k << std::endl;
 //					for(HitPtrIterator it = hits.first; it != hits.second; it++)
 //						std::cout << (*it)->ToString();
-//				}
+				}
     		}
     	}
     }

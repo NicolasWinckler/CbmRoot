@@ -185,9 +185,9 @@ void draw_analysis(){
     draw_eff_pty(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
 
     c1_1->cd(5);
-    TH2D* fh_tof_id_signal_pty_eff = divideHisto2D(fh_tof_id_signal_pty, fh_reco_signal_pty);
+    TH2D* fh_tof_id_signal_pty_eff = divideHisto2D(fh_tof_id_signal_pty, fh_trd_id_signal_pty);
     fh_tof_id_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_tof_id_signal_pty, fh_reco_signal_pty);
+    draw_eff_pty(fh_tof_id_signal_pty, fh_trd_id_signal_pty);
 
     c1_1->cd(6);
     TH2D* fh_chi_prim_signal_pty_eff = divideHisto2D(fh_chi_prim_signal_pty, fh_tof_id_signal_pty);
@@ -693,10 +693,10 @@ void draw_analysis(){
     fh_gammacut_signal_minv->Draw("same");
     fh_stcut_signal_minv->Draw("same");
     fh_ttcut_signal_minv->Draw("same");
-    fh_anglecut_signal_minv->Draw("same");
  //   fh_apcut_signal_minv->Draw("same");
     fh_ptcut_signal_minv->Draw("same");
-     
+    fh_anglecut_signal_minv->Draw("same");
+
     TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
     leg3->AddEntry(fh_mc_signal_minv, "mc", "l");
     leg3->AddEntry(fh_acc_signal_minv, "acc", "l");
@@ -721,7 +721,7 @@ void draw_analysis(){
     fh_rich_id_bg_minv->SetLineColor(kRed);
     fh_trd_id_bg_minv->SetLineColor(kBlue);
     fh_tof_id_bg_minv->SetLineColor(kGreen);
-    fh_chi_prim_bg_minv->SetLineColor(kOrange+7);   
+    fh_chi_prim_bg_minv->SetLineColor(kOrange+7);
     fh_ptcut_bg_minv->SetLineColor(kMagenta);
     fh_anglecut_bg_minv->SetLineColor(kViolet+10);
     fh_gammacut_bg_minv->SetLineColor(kPink-6);

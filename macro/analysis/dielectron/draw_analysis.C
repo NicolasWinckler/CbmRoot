@@ -124,6 +124,9 @@ void draw_minv(TH1* s1, TH1* bg1)
 	sbg->Draw();
 	bg->Draw("same");
 	s->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
 }
 
 void draw_analysis(){
@@ -592,8 +595,8 @@ void draw_analysis(){
     fh_apcut_gamma->Draw("COLZ");
 
 //track topology cut distribution for segment tracks
-    TCanvas *c6 = new TCanvas("c6-stcut", "c6-stcut", 800, 800);
-    c6->Divide(2,2);
+    TCanvas *c6 = new TCanvas("c6-stcut", "c6-stcut", 1200, 600);
+    c6->Divide(4,2);
     c6->cd(1);
     fh_stcut_signal->Draw("COLZ");
     c6->cd(2);
@@ -602,10 +605,52 @@ void draw_analysis(){
     fh_stcut_pi0->Draw("COLZ");
     c6->cd(4);
     fh_stcut_gamma->Draw("COLZ");
+    c6->cd(5);
+    TH1D* stcut_px_s = fh_stcut_signal->ProjectionX();
+    TH1D* stcut_px_bg = fh_stcut_bg->ProjectionX();
+    Double_t scaleSig = 1./stcut_px_s->Integral();
+    Double_t scaleBg = 1./stcut_px_bg->Integral();
+    stcut_px_s->SetLineColor(kRed);
+    stcut_px_bg->SetLineColor(kBlue);
+    stcut_px_s->Draw();
+    stcut_px_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    c6->cd(6);
+    TH1D* fh_sig_stcut_px = CalculateSignificance(stcut_px_s, stcut_px_bg, 
+        "stcut_px_significance", "significance", "back");
+    fh_sig_stcut_px->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    stcut_px_s->Scale(scaleSig);
+    stcut_px_bg->Scale(scaleBg);
+
+    c6->cd(7);
+    TH1D* stcut_py_s = fh_stcut_signal->ProjectionY();
+    TH1D* stcut_py_bg = fh_stcut_bg->ProjectionY();
+    Double_t scaleSig = 1./stcut_py_s->Integral();
+    Double_t scaleBg = 1./stcut_py_bg->Integral();
+    stcut_py_s->SetLineColor(kRed);
+    stcut_py_bg->SetLineColor(kBlue);
+    stcut_py_s->Draw();
+    stcut_py_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    stcut_py_s->Scale(scaleSig);
+    stcut_py_bg->Scale(scaleBg);
+
+    c6->cd(8);
+    TH1D* fh_sig_stcut_py = CalculateSignificance(stcut_py_s, stcut_py_bg, 
+        "stcut_py_significance", "significance", "back");
+    fh_sig_stcut_py->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
 
 //track topology cut distribution for full reco tracks
-    TCanvas *c7 = new TCanvas("c7-ttcut", "c7-ttcut", 800, 800);
-    c7->Divide(2,2);
+    TCanvas *c7 = new TCanvas("c7-ttcut", "c7-ttcut", 1200, 600);
+    c7->Divide(4,2);
     c7->cd(1);
     fh_ttcut_signal->Draw("COLZ");
     c7->cd(2);
@@ -614,6 +659,49 @@ void draw_analysis(){
     fh_ttcut_pi0->Draw("COLZ");
     c7->cd(4);
     fh_ttcut_gamma->Draw("COLZ");
+    c7->cd(5);
+    TH1D* ttcut_px_s = fh_ttcut_signal->ProjectionX();
+    TH1D* ttcut_px_bg = fh_ttcut_bg->ProjectionX();
+    Double_t scaleSig = 1./ttcut_px_s->Integral();
+    Double_t scaleBg = 1./ttcut_px_bg->Integral();
+    ttcut_px_s->SetLineColor(kRed);
+    ttcut_px_bg->SetLineColor(kBlue);
+    ttcut_px_s->Draw();
+    ttcut_px_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    c7->cd(6);
+    TH1D* fh_sig_ttcut_px = CalculateSignificance(ttcut_px_s, ttcut_px_bg, 
+        "ttcut_px_significance", "significance", "back");
+    fh_sig_ttcut_px->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    ttcut_px_s->Scale(scaleSig);
+    ttcut_px_bg->Scale(scaleBg);
+
+    c7->cd(7);
+    TH1D* ttcut_py_s = fh_ttcut_signal->ProjectionY();
+    TH1D* ttcut_py_bg = fh_ttcut_bg->ProjectionY();
+    Double_t scaleSig = 1./ttcut_py_s->Integral();
+    Double_t scaleBg = 1./ttcut_py_bg->Integral();
+    ttcut_py_s->SetLineColor(kRed);
+    ttcut_py_bg->SetLineColor(kBlue);
+    ttcut_py_s->Draw();
+    ttcut_py_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    ttcut_py_s->Scale(scaleSig);
+    ttcut_py_bg->Scale(scaleBg);
+
+    c7->cd(8);
+    TH1D* fh_sig_ttcut_py = CalculateSignificance(ttcut_py_s, ttcut_py_bg, 
+        "ttcut_py_significance", "significance", "back");
+    fh_sig_ttcut_py->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
 
 //    TCanvas *c8 = new TCanvas("c8","c8", 1200, 400);
 //    c8->Divide(3,1);

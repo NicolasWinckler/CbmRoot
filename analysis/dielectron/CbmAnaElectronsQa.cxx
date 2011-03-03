@@ -2,6 +2,7 @@
 
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
+#include "CbmStsTrack.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
@@ -606,12 +607,17 @@ void CbmAnaElectronsQa::StsQa()
         Int_t motherId = mcTrack->GetMotherId();
 		//select only signal electrons
         if (pdg != 11 || motherId != -1) continue;
-
+        //if (motherId != -1) continue;
 		TVector3 momMC;
 		mcTrack->GetMomentum(momMC);
         Double_t chiPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
         fh_chiprim_signal->Fill(chiPrimary);
-        Double_t chiPrimary2 = fKFFitter.GetChiToVertex(stsTrack);
+        //cout <<  << endl;
+        //cout << "sts chi2 = " <<  << endl;
+        cout << chiPrimary<< " " << stsTrack->GetNMvdHits() 
+            << " " << stsTrack->GetNStsHits() << endl;
+
+        Double_t chiPrimary2 = stsTrack->GetChi2()/stsTrack->GetNDF();
         fh_chiprim_signal2->Fill(chiPrimary2);
 
         // Fit tracks to the primary vertex

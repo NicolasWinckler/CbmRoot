@@ -254,7 +254,7 @@ CbmAnaDielectronTask::~CbmAnaDielectronTask()
 void CbmAnaDielectronTask::SetDefaultIdParameters()
 {
     fTrdAnnCut = 0.85;
-    fRichAnnCut = 0.1;
+    fRichAnnCut = 0.0;
     fUseRichAnn = true;
     fMeanA = -1.;
     fMeanB = -1.;
@@ -264,7 +264,7 @@ void CbmAnaDielectronTask::SetDefaultIdParameters()
     fDistCut = -1.;
     fPtCut = 0.2;
     fAngleCut = 1.;
-    fChiPrimCut = 12.;
+    fChiPrimCut = 2.;
     fGammaCut = 0.025;
 }
 

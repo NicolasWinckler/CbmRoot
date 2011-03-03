@@ -167,9 +167,6 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
    tracks.clear();
 
    fNofBranches[track->GetPreviousTrackId()] += fNofBranchesStationGroup;
-
-//   std::cout << "(" << track->GetPreviousTrackId() << " " << fNofBranchesStationGroup << " "
-//		   << fNofBranches[track->GetPreviousTrackId()] << ") ";
 }
 
 bool CbmLitTrackFinderBranch::ProcessStation(
@@ -224,14 +221,14 @@ bool CbmLitTrackFinderBranch::ProcessStation1(
 
 	if (hits.empty()) return false;
 	int nofHits = hits.size();
-	// if too many hits in the validation gate,
-	// sort hits in the validation gate by the chi-square
+	// If too many hits in the validation gate than
+	// sort hits in the validation gate by chi-square
 	if (nofHits > fMaxNofHitsInValidationGate){
 		std::sort(hits.begin(), hits.end(), CompareHitChiSqLess());
 	}
 
-	//Select the best hits to be attached
-	//Create track branches
+	// Select the best hits (lowest chi-square) to be attached to track.
+	// Create track branches for each of such hits.
 	int N = (nofHits > fMaxNofHitsInValidationGate) ? fMaxNofHitsInValidationGate : nofHits;
 	for (int iHit = 0; iHit < N; iHit++) {
 		CbmLitTrack* newTrack = new CbmLitTrack(*track);
@@ -252,7 +249,7 @@ bool CbmLitTrackFinderBranch::ProcessStation2(
 			int station,
 			TrackPtrVector& tracksOut)
 {
-	// if fIsProcessSubstationsTogether == true
+	// if fIsProcessSubstationsTogether == false
 	bool result = false;
 	CbmLitTrackParam par(*track->GetParamLast());
 	int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
@@ -268,14 +265,14 @@ bool CbmLitTrackFinderBranch::ProcessStation2(
 
 		if (hits.empty()) continue; //return false;
 		int nofHits = hits.size();
-		// if too many hits in the validation gate,
-		// sort hits in the validation gate by the chi-square
+		// If too many hits in the validation gate than
+		// sort hits in the validation gate by chi-square
 		if (nofHits > fMaxNofHitsInValidationGate){
 			std::sort(hits.begin(), hits.end(), CompareHitChiSqLess());
 		}
 
-		//Select the best hits to be attached
-		//Create track branches
+		// Select the best hits (lowest chi-square) to be attached to track.
+		// Create track branches for each of such hits.
 		int N = (nofHits > fMaxNofHitsInValidationGate) ? fMaxNofHitsInValidationGate : nofHits;
 		for (int iHit = 0; iHit < N; iHit++) {
 			CbmLitTrack* newTrack = new CbmLitTrack(*track);
@@ -296,6 +293,9 @@ void CbmLitTrackFinderBranch::ProcessSubstation(
 		HitPtrIteratorPair bounds,
 		std::vector<CbmLitHitChiSq>& hits)
 {
+	// Calculate validation gate for input range of hits.
+	// Store hits which are in validation gate.
+
 	CbmLitTrackParam uPar;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		CbmLitHit* hit = *iHit;
@@ -316,6 +316,9 @@ bool CbmLitTrackFinderBranch::AddTrackCandidate(
 		TrackPtrVector& tracks,
 		int stationGroup)
 {
+	// Add track candidates to the global track candidate array.
+	// If number of created branches is too big than do not add tracks.
+
 	for (TrackPtrIterator it = tracks.begin(); it != tracks.end(); it++) {
 		fNofBranchesStationGroup++;
 		if (fNofBranchesStationGroup > fMaxNofBranchesStationGroup) return false;
@@ -329,6 +332,8 @@ bool CbmLitTrackFinderBranch::AddTrackCandidate(
 
 void CbmLitTrackFinderBranch::CopyToOutputArray()
 {
+	// Copy tracks to local output array for later final track selection
+
 	for (TrackPtrIterator iTrack = fFoundTracks.begin(); iTrack != fFoundTracks.end(); iTrack++) {
 		if ((*iTrack)->GetQuality() == kLITBAD) {
 			delete (*iTrack);

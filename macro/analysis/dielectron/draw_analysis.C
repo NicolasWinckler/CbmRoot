@@ -182,7 +182,7 @@ void draw_analysis(){
     c1_1->cd(4);
     TH2D* fh_trd_id_signal_pty_eff = divideHisto2D(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
     fh_trd_id_signal_pty_eff->Draw("COLZ");
-    draw_eff_pty(fh_trd_id_signal_pty, fh_reco_signal_pty);
+    draw_eff_pty(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
 
     c1_1->cd(5);
     TH2D* fh_tof_id_signal_pty_eff = divideHisto2D(fh_tof_id_signal_pty, fh_reco_signal_pty);

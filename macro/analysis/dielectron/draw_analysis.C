@@ -108,7 +108,17 @@ TH1D* CalculateSignificance(TH1D* signal, TH1D* bg, TString name, TString title,
     return hsig;
 }
 
-
+void draw_minv(TH1* s, TH1* bg)
+{
+	s->SetFillColor(kRed);
+	bg->SetFillColor(kWhite);
+	TH1D* sbg = bg->Clone()->Add(s);
+	sbg->SetFillColor(kBlue);
+	sbg->SetMinimum(1e-8);
+	sbg->Draw();
+	bg->Draw("same");
+	s->Draw("same");
+}
 
 void draw_analysis(){
     TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
@@ -759,6 +769,29 @@ void draw_analysis(){
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
+//invariant mass distribution
+	TCanvas *c10_1 = new TCanvas("c10_1-minv", "c10_1-minv", 1200, 900);
+	c10->Divide(4,3);
+	c10->cd(1);
+	draw_minv(fh_rec_signal_minv,fh_rec_bg_minv);
+	c10->cd(2);
+	draw_minv(fh_rich_id_signal_minv,fh_rich_id_bg_minv);
+	c10->cd(3);
+	draw_minv(fh_trd_id_signal_minv,fh_trd_id_bg_minv);
+	c10->cd(4);
+	draw_minv(fh_tof_id_signal_minv,fh_tof_id_bg_minv);
+	c10->cd(5);
+	draw_minv(fh_chi_prim_signal_minv,fh_chi_prim_bg_minv);
+	c10->cd(6);
+	draw_minv(fh_gammacut_signal_minv,fh_gammacut_bg_minv);
+	c10->cd(7);
+	draw_minv(fh_stcut_signal_minv,fh_stcut_bg_minv);
+	c10->cd(8);
+	draw_minv(fh_ttcut_signal_minv,fh_ttcut_bg_minv);
+	c10->cd(9);
+	draw_minv(fh_ptcut_signal_minv,fh_ptcut_bg_minv);
+	c10->cd(10);
+	draw_minv(fh_anglecut_signal_minv,fh_anglecut_bg_minv);
 
 //invariant mass distribution for Pi0 and eta
     TCanvas *c11 = new TCanvas("c11-minv-pi0-eta", "c11-minv-pi0-eta", 1200, 600);

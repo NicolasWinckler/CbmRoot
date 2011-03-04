@@ -130,7 +130,7 @@ void draw_minv(TH1* s1, TH1* bg1)
 }
 
 void draw_analysis(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -171,14 +171,14 @@ void draw_analysis(){
     fh_ttcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ttcut_signal_pty, fh_mc_signal_pty);
     c1->cd(11);
- //   fh_apcut_signal_pty->Draw("COLZ");
- //   draw_eff_pty(fh_apcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(12);
     fh_ptcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(13);
+    c1->cd(12);
     fh_anglecut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_mc_signal_pty);
+    c1->cd(13);
+    fh_apmcut_signal_pty->Draw("COLZ");
+    draw_eff_pty(fh_apmcut_signal_pty, fh_mc_signal_pty);
 
 //pty efficiency of signal
     TCanvas *c1_1 = new TCanvas("c1_1-pty eff","c1_1-pty eff",1000,750);
@@ -229,20 +229,19 @@ void draw_analysis(){
     draw_eff_pty(fh_ttcut_signal_pty, fh_stcut_signal_pty);
 
     c1_1->cd(10);
-  //  TH2D* fh_apcut_signal_pty_eff = divideHisto2D(fh_apcut_signal_pty, fh_tof_id_signal_pty);
-  //  fh_apcut_signal_pty_eff->Draw("COLZ");
-  //  draw_eff_pty(fh_apcut_signal_pty, fh_tof_id_signal_pty);
-
-    c1_1->cd(11);
     TH2D* fh_ptcut_signal_pty_eff = divideHisto2D(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
     fh_ptcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
 
-    c1_1->cd(12);
+    c1_1->cd(11);
     TH2D* fh_anglecut_signal_pty_eff = divideHisto2D(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
     fh_anglecut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
-    
+
+    c1_1->cd(12);
+    TH2D* fh_apmcut_signal_pty_eff = divideHisto2D(fh_apmcut_signal_pty, fh_anglecut_signal_pty);
+    fh_apmcut_signal_pty_eff->Draw("COLZ");
+    draw_eff_pty(fh_apmcut_signal_pty, fh_anglecut_signal_pty);
 
     TCanvas *c2 = new TCanvas("c2-mom", "c2-mom", 400, 400);
     fh_mc_signal_mom->SetLineColor(kRed);
@@ -251,12 +250,12 @@ void draw_analysis(){
     fh_trd_id_signal_mom->SetLineColor(kOrange);
     fh_tof_id_signal_mom->SetLineColor(kMagenta);
     fh_chi_prim_signal_mom->SetLineColor(kViolet);
-    fh_ptcut_signal_mom->SetLineColor(kPink);
-    fh_anglecut_signal_mom->SetLineColor(kYellow);
     fh_gammacut_signal_mom->SetLineColor(kGreen+3);
     fh_stcut_signal_mom->SetLineColor(kOrange-3);
     fh_ttcut_signal_mom->SetLineColor(kYellow+7);
- //  fh_apcut_signal_mom->SetLineColor(kCyan+2);
+    fh_ptcut_signal_mom->SetLineColor(kPink);
+    fh_anglecut_signal_mom->SetLineColor(kYellow);
+    fh_apmcut_signal_mom->SetLineColor(kCyan+2);
     fh_mc_signal_mom->Draw();
     fh_acc_signal_mom->Draw("same");
     fh_reco_signal_mom->Draw("same");
@@ -267,10 +266,10 @@ void draw_analysis(){
     fh_gammacut_signal_mom->Draw("same");
     fh_stcut_signal_mom->Draw("same");
     fh_ttcut_signal_mom->Draw("same");
-    fh_anglecut_signal_mom->Draw("same");
-//    fh_apcut_signal_mom->Draw("same");
     fh_ptcut_signal_mom->Draw("same");
-    
+    fh_anglecut_signal_mom->Draw("same");
+    fh_apmcut_signal_mom->Draw("same");
+
     TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
     leg3->AddEntry(fh_mc_signal_mom, "mc", "l");
     leg3->AddEntry(fh_acc_signal_mom, "acc", "l");
@@ -282,15 +281,16 @@ void draw_analysis(){
     leg3->AddEntry(fh_gammacut_signal_mom, "gamma cut", "l");
     leg3->AddEntry(fh_stcut_signal_mom, "st cut", "l");
     leg3->AddEntry(fh_ttcut_signal_mom, "tt cut", "l");
- //   leg3->AddEntry(fh_apcut_signal_mom, "ap cut", "l");
     leg3->AddEntry(fh_ptcut_signal_mom, "pt cut", "l");
     leg3->AddEntry(fh_anglecut_signal_mom, "angle cut", "l"); 
+    leg3->AddEntry(fh_apmcut_signal_mom, "apm cut", "l");
 
     leg3->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
+//MOMENTUM EFFICIENCY
     TCanvas *c2_1 = new TCanvas("c2_1-mom eff","c2_1-mom eff", 1000, 750);
     c2_1->Divide(4,3);
     c2_1->cd(1);
@@ -299,7 +299,6 @@ void draw_analysis(){
     draw_eff_mom(fh_acc_signal_mom,fh_mc_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(2);
     TH1D* fh_reco_signal_mom_eff = divideHisto1D(fh_reco_signal_mom,fh_acc_signal_mom);
@@ -307,7 +306,6 @@ void draw_analysis(){
     draw_eff_mom(fh_reco_signal_mom,fh_acc_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(3);
     TH1D* fh_rich_id_signal_mom_eff = divideHisto1D(fh_rich_id_signal_mom,fh_reco_signal_mom);
@@ -315,7 +313,6 @@ void draw_analysis(){
     draw_eff_mom(fh_rich_id_signal_mom,fh_reco_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(4);
     TH1D* fh_trd_id_signal_mom_eff = divideHisto1D(fh_trd_id_signal_mom,fh_rich_id_signal_mom);
@@ -323,7 +320,6 @@ void draw_analysis(){
     draw_eff_mom(fh_trd_id_signal_mom,fh_rich_id_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(5);
     TH1D* fh_tof_id_signal_mom_eff = divideHisto1D(fh_tof_id_signal_mom,fh_trd_id_signal_mom);
@@ -331,7 +327,6 @@ void draw_analysis(){
     draw_eff_mom(fh_tof_id_signal_mom,fh_trd_id_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(6);
     TH1D* fh_chi_prim_signal_mom_eff = divideHisto1D(fh_chi_prim_signal_mom,fh_tof_id_signal_mom);
@@ -339,7 +334,6 @@ void draw_analysis(){
     draw_eff_mom(fh_chi_prim_signal_mom,fh_tof_id_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(7);
     TH1D* fh_gammacut_signal_mom_eff = divideHisto1D(fh_gammacut_signal_mom,fh_chi_prim_signal_mom);
@@ -347,7 +341,6 @@ void draw_analysis(){
     draw_eff_mom(fh_gammacut_signal_mom,fh_chi_prim_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(8);
     TH1D* fh_stcut_signal_mom_eff = divideHisto1D(fh_stcut_signal_mom,fh_gammacut_signal_mom);
@@ -355,7 +348,6 @@ void draw_analysis(){
     draw_eff_mom(fh_stcut_signal_mom,fh_gammacut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(9);
     TH1D* fh_ttcut_signal_mom_eff = divideHisto1D(fh_ttcut_signal_mom,fh_stcut_signal_mom);
@@ -363,34 +355,31 @@ void draw_analysis(){
     draw_eff_mom(fh_ttcut_signal_mom,fh_stcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
     c2_1->cd(10);
-//    TH1D* fh_apcut_signal_mom_eff = divideHisto1D(fh_apcut_signal_mom,fh_ttcut_signal_mom);
-//    fh_apcut_signal_mom_eff->Draw();
-//    draw_eff_mom(fh_apcut_signal_mom,fh_ttcut_signal_mom);
-//    gPad->SetGridx(true);
-//    gPad->SetGridy(true);
-    //gPad->SetLogy(true);
-   
-    c2_1->cd(11);
     TH1D* fh_ptcut_signal_mom_eff = divideHisto1D(fh_ptcut_signal_mom,fh_ttcut_signal_mom);
     fh_ptcut_signal_mom_eff->Draw();
     draw_eff_mom(fh_ptcut_signal_mom,fh_ttcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-    //gPad->SetLogy(true);
 
-    c2_1->cd(12);
+    c2_1->cd(11);
     TH1D* fh_anglecut_signal_mom_eff = divideHisto1D(fh_anglecut_signal_mom,fh_ptcut_signal_mom);
     fh_anglecut_signal_mom_eff->Draw();
     draw_eff_mom(fh_anglecut_signal_mom,fh_ptcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
-   //gPad->SetLogy(true);
-    
 
-//mother PDG
+    c2_1->cd(12);
+    TH1D* fh_apmcut_signal_mom_eff = divideHisto1D(fh_apmcut_signal_mom,fh_anglecut_signal_mom);
+    fh_apmcut_signal_mom_eff->Draw();
+    draw_eff_mom(fh_apmcut_signal_mom,fh_anglecut_signal_mom);
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+
+
+//MOTHER PDG
     TCanvas *c3 = new TCanvas("c3-mother pdg", "c3-mother pdg", 500, 500);
     fh_mc_mother_pdg->Draw();
     fh_acc_mother_pdg->SetLineColor(kRed);
@@ -399,7 +388,7 @@ void draw_analysis(){
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
-// analysis cuts
+//ANALYSIS CUTS
     TCanvas *c4 = new TCanvas("c4-cuts", "c4-cuts", 1200, 800);
     c4->Divide(4,3);
     c4->cd(1);
@@ -417,7 +406,7 @@ void draw_analysis(){
         "chi2_prim_significance", "significance", "forward");
     fh_sig_chi2_prim->Draw();
     gPad->SetGridx(true);
-    gPad->SetGridy(true);  
+    gPad->SetGridy(true);
     fh_chi2_prim_signal->Scale(scaleSig);
     fh_chi2_prim_bg->Scale(scaleBg);
 
@@ -475,7 +464,7 @@ void draw_analysis(){
     fh_angle_signal->Scale(scaleSig);
     fh_angle_bg->Scale(scaleBg);
 
-    c4->cd(9); 
+    c4->cd(9);
     Double_t scaleSig = 1./fh_mom_signal->Integral();
     Double_t scaleBg = 1./fh_mom_bg->Integral();
     fh_mom_signal->SetLineColor(kRed);
@@ -511,7 +500,7 @@ void draw_analysis(){
     fh_chi2sts_signal->Scale(scaleSig);
     fh_chi2sts_bg->Scale(scaleBg);
 
-//source of BG candidates
+//SOURCE OF BG CANDIDATES
     Double_t sumofbins1 =0;
     Double_t sumofbins2 =0;
     Double_t sumofbins3 =0;
@@ -534,7 +523,7 @@ void draw_analysis(){
           sumofbins7 += fh_source_pair_anglecut->GetBinContent(x,y);
           sumofbins8 += fh_source_pair_gammacut->GetBinContent(x,y);
           sumofbins9 += fh_source_pair_ttcut->GetBinContent(x,y);
-   //       sumofbins10 += fh_source_pair_apcut->GetBinContent(x,y);
+          sumofbins10 += fh_source_pair_apmcut->GetBinContent(x,y);
           sumofbins11 += fh_source_pair_stcut->GetBinContent(x,y);
         }
     }
@@ -547,7 +536,7 @@ void draw_analysis(){
     if (sumofbins7 != 0) fh_source_pair_anglecut->Scale(100. * 1./sumofbins7);
     if (sumofbins8 != 0) fh_source_pair_gammacut->Scale(100. * 1./sumofbins8);
     if (sumofbins9 != 0) fh_source_pair_ttcut->Scale(100. * 1./sumofbins9);
-//    if (sumofbins10 != 0) fh_source_pair_apcut->Scale(100. * 1./sumofbins10);
+    if (sumofbins10 != 0) fh_source_pair_apmcut->Scale(100. * 1./sumofbins10);
     if (sumofbins11 != 0) fh_source_pair_stcut->Scale(100. * 1./sumofbins11);
     TCanvas *c10 = new TCanvas("c10", "c10", 1000, 750);
     c10->Divide(4,3);
@@ -568,13 +557,14 @@ void draw_analysis(){
     c10->cd(8);
     fh_source_pair_ttcut->Draw("COLZ");
     c10->cd(9);
- //   fh_source_pair_apcut->Draw("COLZ");
-    c10->cd(10);
     fh_source_pair_ptcut->Draw("COLZ");
-    c10->cd(11);
+    c10->cd(10);
     fh_source_pair_anglecut->Draw("COLZ");
-     
-//AP cut distribution
+    c10->cd(11);
+    fh_source_pair_apmcut->Draw("COLZ");
+
+
+//AP CUT DISTRIBUTION
     TCanvas *c5 = new TCanvas("c5-apcut", "c5-apcut", 800, 800);
     c5->Divide(2,2);
     c5->cd(1); 
@@ -594,15 +584,37 @@ void draw_analysis(){
     c5->cd(4);
     fh_apcut_gamma->Draw("COLZ");
 
-//APM cut distribution
-    TCanvas *c5_1 = new TCanvas("c5-apmcut", "c5-apmcut", 600, 300);
-    c5->Divide(2,1);
-    c5->cd(1);
-    fh_apmcut_signal->Draw("COLZ");
-    c5->cd(2); 
-    fh_apmcut_bg->Draw("COLZ");
 
-//track topology cut distribution for segment tracks
+//APM CUT DISTRIBUTION
+    TCanvas *c5_1 = new TCanvas("c5-apmcut", "c5-apmcut", 800, 800);
+    c5_1->Divide(2,2);
+    c5_1->cd(1);
+    fh_apmcut_signal->Draw("COLZ");
+    c5_1->cd(2); 
+    fh_apmcut_bg->Draw("COLZ");
+    c5_1->cd(3);
+    TH1D* apmcut_py_s = fh_apmcut_signal->ProjectionY();
+    TH1D* apmcut_py_bg = fh_apmcut_bg->ProjectionY();
+    Double_t scaleSig = 1./apmcut_py_s->Integral();
+    Double_t scaleBg = 1./apmcut_py_bg->Integral();
+    apmcut_py_s->SetLineColor(kRed);
+    apmcut_py_bg->SetLineColor(kBlue);
+    apmcut_py_s->Draw();
+    apmcut_py_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    c5_1->cd(4);
+    TH1D* fh_sig_apmcut_py = CalculateSignificance(apmcut_py_s, apmcut_py_bg, 
+        "apmcut_py_significance", "significance", "back");
+    fh_sig_apmcut_py->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    apmcut_py_s->Scale(scaleSig);
+    apmcut_py_bg->Scale(scaleBg);
+
+
+//TRACK TOPOLOGY CUT DISTRIBUTION FOR SEGMENT TRACKS
     TCanvas *c6 = new TCanvas("c6-stcut", "c6-stcut", 1200, 600);
     c6->Divide(4,2);
     c6->cd(1);
@@ -656,7 +668,8 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-//track topology cut distribution for full reco tracks
+
+//TRACK TOPOLOGY CUT DISTRIBUTION FOR FUL RECO TRACKS
     TCanvas *c7 = new TCanvas("c7-ttcut", "c7-ttcut", 1200, 600);
     c7->Divide(4,2);
     c7->cd(1);
@@ -720,7 +733,8 @@ void draw_analysis(){
 //    c8->cd(3);
 //    fh_mc_vertex_gamma_xy->Draw("COLZ");
 
-//ID cuts distribution
+
+//ID CUTS DISTRIBUTION
     TCanvas *c9 = new TCanvas("c9-id-cuts","c9-id-cuts",1200, 600);
     c9->Divide(4,2);
     c9->cd(1);
@@ -741,7 +755,7 @@ void draw_analysis(){
     gPad->SetGridy(true);
     fh_rich_ann_signal->Scale(scaleSig);
     fh_rich_ann_bg->Scale(scaleBg);
-    
+
     c9->cd(3);
     Double_t scaleSig = 1./fh_trd_ann_signal->Integral();
     Double_t scaleBg = 1./fh_trd_ann_bg->Integral();
@@ -779,24 +793,26 @@ void draw_analysis(){
     fh_tof_m2_bg->Draw("COLZ");
     gPad->SetLogz(true);
 
-//invariant mass distribution
+
+//INVARIANT MASS DISTRIBUTION
     TCanvas *c10 = new TCanvas("c10-minv", "c10-minv", 1200, 600);
     c10->Divide(2,1);
     c10->cd(1); 
     fh_mc_signal_minv->SetLineColor(kGreen+3);
     fh_acc_signal_minv->SetLineColor(kOrange+3);
-    fh_mc_signal_minv->Draw();
-    fh_acc_signal_minv->Draw("same");
     fh_rich_id_signal_minv->SetLineColor(kRed);
     fh_trd_id_signal_minv->SetLineColor(kBlue);
     fh_tof_id_signal_minv->SetLineColor(kGreen);
-    fh_chi_prim_signal_minv->SetLineColor(kOrange+7);    
-    fh_ptcut_signal_minv->SetLineColor(kMagenta);
-    fh_anglecut_signal_minv->SetLineColor(kViolet+10);
+    fh_chi_prim_signal_minv->SetLineColor(kOrange+7);
     fh_gammacut_signal_minv->SetLineColor(kPink-6);
     fh_stcut_signal_minv->SetLineColor(kOrange-3);
     fh_ttcut_signal_minv->SetLineColor(kYellow+1);
- //   fh_apcut_signal_minv->SetLineColor(kPink+8);
+    fh_ptcut_signal_minv->SetLineColor(kMagenta);
+    fh_anglecut_signal_minv->SetLineColor(kViolet+10);
+    fh_apmcut_signal_minv->SetLineColor(kPink+8);
+
+    fh_mc_signal_minv->Draw();
+    fh_acc_signal_minv->Draw("same");
     fh_rec_signal_minv->Draw("same");
     fh_rich_id_signal_minv->Draw("same");
     fh_trd_id_signal_minv->Draw("same");
@@ -805,9 +821,9 @@ void draw_analysis(){
     fh_gammacut_signal_minv->Draw("same");
     fh_stcut_signal_minv->Draw("same");
     fh_ttcut_signal_minv->Draw("same");
- //   fh_apcut_signal_minv->Draw("same");
     fh_ptcut_signal_minv->Draw("same");
     fh_anglecut_signal_minv->Draw("same");
+    fh_apmcut_signal_minv->Draw("same");
 
     TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
     leg3->AddEntry(fh_mc_signal_minv, "mc", "l");
@@ -820,10 +836,10 @@ void draw_analysis(){
     leg3->AddEntry(fh_gammacut_signal_minv, "gamma cut", "l");
     leg3->AddEntry(fh_stcut_signal_minv, "st cut", "l");
     leg3->AddEntry(fh_ttcut_signal_minv, "tt cut", "l");
-//    leg3->AddEntry(fh_apcut_signal_minv, "ap cut", "l");
     leg3->AddEntry(fh_ptcut_signal_minv, "pt cut", "l");
     leg3->AddEntry(fh_anglecut_signal_minv, "angle cut", "l");
-     
+    leg3->AddEntry(fh_apmcut_signal_minv, "apm cut", "l");
+
     leg3->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
@@ -834,24 +850,25 @@ void draw_analysis(){
     fh_trd_id_bg_minv->SetLineColor(kBlue);
     fh_tof_id_bg_minv->SetLineColor(kGreen);
     fh_chi_prim_bg_minv->SetLineColor(kOrange+7);
+    fh_gammacut_bg_minv->SetLineColor(kPink-6);
+    fh_stcut_bg_minv->SetLineColor(kOrange-3);
+    fh_ttcut_bg_minv->SetLineColor(kYellow+1);
     fh_ptcut_bg_minv->SetLineColor(kMagenta);
     fh_anglecut_bg_minv->SetLineColor(kViolet+10);
-    fh_gammacut_bg_minv->SetLineColor(kPink-6);
-    fh_ttcut_bg_minv->SetLineColor(kYellow+1);
-    fh_stcut_bg_minv->SetLineColor(kOrange-3);
-//    fh_apcut_bg_minv->SetLineColor(kPink+8);
+    fh_apmcut_bg_minv->SetLineColor(kPink+8);
+
     fh_rec_bg_minv->Draw();
     fh_rec_bg_minv->SetMinimum(1e-8);
     fh_rich_id_bg_minv->Draw("same");
     fh_trd_id_bg_minv->Draw("same");
     fh_tof_id_bg_minv->Draw("same");
     fh_chi_prim_bg_minv->Draw("same");
-    fh_ptcut_bg_minv->Draw("same");
-    fh_anglecut_bg_minv->Draw("same");
     fh_gammacut_bg_minv->Draw("same");
     fh_stcut_bg_minv->Draw("same");
     fh_ttcut_bg_minv->Draw("same");
-//    fh_apcut_bg_minv->Draw("same");
+    fh_ptcut_bg_minv->Draw("same");
+    fh_anglecut_bg_minv->Draw("same");
+    fh_apmcut_bg_minv->Draw("same");
 
     TLegend* leg = new TLegend(0.65,0.6,1., 1.);
     leg->AddEntry(fh_rec_bg_minv, "rec", "l");
@@ -862,16 +879,16 @@ void draw_analysis(){
     leg->AddEntry(fh_gammacut_bg_minv, "gamma cut", "l");
     leg->AddEntry(fh_stcut_bg_minv, "st cut", "l");
     leg->AddEntry(fh_ttcut_bg_minv, "tt cut", "l");
- //   leg->AddEntry(fh_apcut_bg_minv, "ap cut", "l");
     leg->AddEntry(fh_ptcut_bg_minv, "pt cut", "l");
     leg->AddEntry(fh_anglecut_bg_minv, "angle cut", "l");
-     
+    leg->AddEntry(fh_apmcut_bg_minv, "apm cut", "l");
+
     leg->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
-//invariant mass distribution
+//INVARIANT MASS DISTRIBUTION
 	TCanvas *c10_1 = new TCanvas("c10_1-minv", "c10_1-minv", 1200, 900);
 	c10_1->Divide(4,3);
 	c10_1->cd(1);
@@ -894,8 +911,10 @@ void draw_analysis(){
 	draw_minv(fh_ptcut_signal_minv,fh_ptcut_bg_minv);
 	c10_1->cd(10);
 	draw_minv(fh_anglecut_signal_minv,fh_anglecut_bg_minv);
+    c10_1->cd(11);
+    draw_minv(fh_apmcut_signal_minv,fh_apmcut_bg_minv);
 
-//invariant mass distribution for Pi0 and eta
+//INVARIANT MASS DISTRIBUTION FOR PI0 AND ETA
     TCanvas *c11 = new TCanvas("c11-minv-pi0-eta", "c11-minv-pi0-eta", 1200, 600);
     c11->Divide(2,1);
     c11->cd(1);
@@ -903,23 +922,25 @@ void draw_analysis(){
     fh_trd_id_pi0_minv->SetLineColor(kBlue);
     fh_tof_id_pi0_minv->SetLineColor(kGreen);
     fh_chi_prim_pi0_minv->SetLineColor(kOrange+7);
-    fh_ptcut_pi0_minv->SetLineColor(kMagenta);
-    fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
     fh_gammacut_pi0_minv->SetLineColor(kPink-6);
     fh_stcut_pi0_minv->SetLineColor(kOrange-3);
     fh_ttcut_pi0_minv->SetLineColor(kYellow+1);
- //   fh_apcut_pi0_minv->SetLineColor(kPink+8);
+    fh_ptcut_pi0_minv->SetLineColor(kMagenta);
+    fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
+    fh_apmcut_pi0_minv->SetLineColor(kPink+8);
+
     fh_rec_pi0_minv->Draw();
     fh_rich_id_pi0_minv->Draw("same");
     fh_trd_id_pi0_minv->Draw("same");
     fh_tof_id_pi0_minv->Draw("same");
     fh_chi_prim_pi0_minv->Draw("same");
-    fh_ptcut_pi0_minv->Draw("same");
-    fh_anglecut_pi0_minv->Draw("same");
     fh_gammacut_pi0_minv->Draw("same");
     fh_stcut_pi0_minv->Draw("same");
     fh_ttcut_pi0_minv->Draw("same");
-//   fh_apcut_pi0_minv->Draw("same");
+    fh_ptcut_pi0_minv->Draw("same");
+    fh_anglecut_pi0_minv->Draw("same");
+    fh_apmcut_pi0_minv->Draw("same");
+
     TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
     leg3->AddEntry(fh_rec_pi0_minv, "rec", "l");
 	leg3->AddEntry(fh_rich_id_pi0_minv, "rich id", "l");
@@ -929,9 +950,9 @@ void draw_analysis(){
     leg3->AddEntry(fh_gammacut_pi0_minv, "gamma cut", "l");
     leg3->AddEntry(fh_stcut_pi0_minv, "st cut", "l");
     leg3->AddEntry(fh_ttcut_pi0_minv, "tt cut", "l");
- //   leg3->AddEntry(fh_apcut_pi0_minv, "ap cut", "l");
 	leg3->AddEntry(fh_ptcut_pi0_minv, "pt cut", "l");
     leg3->AddEntry(fh_anglecut_pi0_minv, "angle cut", "l");
+    leg3->AddEntry(fh_apmcut_pi0_minv, "apm cut", "l");
 	leg3->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
@@ -942,23 +963,25 @@ void draw_analysis(){
 	fh_trd_id_eta_minv->SetLineColor(kBlue);
 	fh_tof_id_eta_minv->SetLineColor(kGreen);
 	fh_chi_prim_eta_minv->SetLineColor(kOrange+7);
-	fh_ptcut_eta_minv->SetLineColor(kMagenta);
-	fh_anglecut_eta_minv->SetLineColor(kViolet+10);
 	fh_gammacut_eta_minv->SetLineColor(kPink-6);
     fh_stcut_eta_minv->SetLineColor(kOrange-3);
-	fh_ttcut_eta_minv->SetLineColor(kYellow+1);
-//	fh_apcut_eta_minv->SetLineColor(kPink+8);
+	fh_ttcut_eta_minv->SetLineColor(kYellow+1); 
+    fh_ptcut_eta_minv->SetLineColor(kMagenta);
+    fh_anglecut_eta_minv->SetLineColor(kViolet+10);
+	fh_apmcut_eta_minv->SetLineColor(kPink+8);
+
 	fh_rec_eta_minv->Draw();
 	fh_rich_id_eta_minv->Draw("same");
 	fh_trd_id_eta_minv->Draw("same");
 	fh_tof_id_eta_minv->Draw("same");
 	fh_chi_prim_eta_minv->Draw("same");
-	fh_ptcut_eta_minv->Draw("same");
-	fh_anglecut_eta_minv->Draw("same");
 	fh_gammacut_eta_minv->Draw("same");
     fh_stcut_eta_minv->Draw("same");
 	fh_ttcut_eta_minv->Draw("same");
-//	fh_apcut_eta_minv->Draw("same");
+    fh_ptcut_eta_minv->Draw("same");
+    fh_anglecut_eta_minv->Draw("same");
+	fh_apmcut_eta_minv->Draw("same");
+
 	TLegend* leg4 = new TLegend(0.65,0.6,1., 1.);
 	leg4->AddEntry(fh_rec_eta_minv, "rec", "l");
 	leg4->AddEntry(fh_rich_id_eta_minv, "rich id", "l");
@@ -968,9 +991,9 @@ void draw_analysis(){
     leg4->AddEntry(fh_gammacut_eta_minv, "gamma cut", "l");
     leg4->AddEntry(fh_stcut_eta_minv, "st cut", "l");
     leg4->AddEntry(fh_ttcut_eta_minv, "tt cut", "l");
-//    leg4->AddEntry(fh_apcut_eta_minv, "ap cut", "l");
 	leg4->AddEntry(fh_ptcut_eta_minv, "pt cut", "l");
     leg4->AddEntry(fh_anglecut_eta_minv, "angle cut", "l");
+    leg4->AddEntry(fh_apmcut_eta_minv, "apm cut", "l");
 	leg4->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
@@ -984,9 +1007,9 @@ void draw_analysis(){
     calculateSignalOverBg(fh_gammacut_signal_minv, fh_gammacut_bg_minv);
     calculateSignalOverBg(fh_stcut_signal_minv, fh_stcut_bg_minv);
     calculateSignalOverBg(fh_ttcut_signal_minv, fh_ttcut_bg_minv);
- //   calculateSignalOverBg(fh_apcut_signal_minv, fh_apcut_bg_minv);
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
+    calculateSignalOverBg(fh_apmcut_signal_minv, fh_apmcut_bg_minv);
 
 }
 
@@ -1011,24 +1034,25 @@ void calc_cut_eff(Double_t min, Double_t max)
 	Double_t sTtcut  = fh_ttcut_signal_minv->Integral(x1bin, x2bin, "width") +
 			fh_ttcut_pi0_minv->Integral(x1bin, x2bin, "width") +
 			fh_ttcut_eta_minv->Integral(x3bin, x4bin, "width");
-	//Double_t sApcut  = fh_apcut_signal_minv->Integral(x1bin, x2bin, "width") +
-	//fh_apcut_pi0_minv->Integral(x1bin, x2bin, "width") +
-	//fh_apcut_eta_minv->Integral(x3bin, x4bin, "width");;
 	Double_t sPt = fh_ptcut_signal_minv->Integral(x1bin, x2bin, "width") +
 			fh_ptcut_pi0_minv->Integral(x1bin, x2bin, "width") +
 			fh_ptcut_eta_minv->Integral(x3bin, x4bin, "width");
 	Double_t sAngle = fh_anglecut_signal_minv->Integral(x1bin, x2bin, "width") +
 			fh_anglecut_pi0_minv->Integral(x1bin, x2bin, "width") +
 			fh_anglecut_eta_minv->Integral(x3bin, x4bin, "width");
+    Double_t sApcut  = fh_apmcut_signal_minv->Integral(x1bin, x2bin, "width") +
+            fh_apmcut_pi0_minv->Integral(x1bin, x2bin, "width") +
+            fh_apmcut_eta_minv->Integral(x3bin, x4bin, "width");;
+
 // BG
     Double_t bgTof = fh_tof_id_bg_minv->Integral(x1bin, x2bin, "width");
     Double_t bgChiprim = fh_chi_prim_bg_minv->Integral(x1bin, x2bin, "width");
     Double_t bgGamma = fh_gammacut_bg_minv->Integral(x1bin, x2bin, "width");
     Double_t bgStcut = fh_stcut_bg_minv->Integral(x1bin, x2bin, "width");
     Double_t bgTtcut = fh_ttcut_bg_minv->Integral(x1bin, x2bin, "width");
-    //Double_t bgApcut = fh_apcut_bg_minv->Integral(x1bin, x2bin, "width");
     Double_t bgPt = fh_ptcut_bg_minv->Integral(x1bin, x2bin, "width");
     Double_t bgAngle = fh_anglecut_bg_minv->Integral(x1bin, x2bin, "width");
+    Double_t bgApcut = fh_apmcut_bg_minv->Integral(x1bin, x2bin, "width");
 
     Double_t x[7] = {0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5};
     Int_t n = 7;
@@ -1037,9 +1061,9 @@ void calc_cut_eff(Double_t min, Double_t max)
 					  100. *(sGamma / sTof),
 					  100. *(sStcut / sTof),
 					  100. *(sTtcut / sTof),
-					  //100. *(sApcut / sTof),
 					  100. *(sPt / sTof),
-					  100. *(sAngle / sTof)
+					  100. *(sAngle / sTof),
+                      100. *(sApcut / sTof)
     };
 
     Double_t y2[7] = {100. *(bgTof / bgTof),
@@ -1047,9 +1071,9 @@ void calc_cut_eff(Double_t min, Double_t max)
 					  100 * (bgGamma / bgTof),
 					  100 * (bgStcut / bgTof),
 					  100 * (bgTtcut / bgTof),
-					  //100 * (bgApcut / bgTof),
 					  100 * (bgPt / bgTof),
-					  100 * (bgAngle / bgTof)
+					  100 * (bgAngle / bgTof),
+                      100 * (bgApcut / bgTof)
     };
 
     TCanvas* can = new TCanvas ("can", "", 158,28,900,918);

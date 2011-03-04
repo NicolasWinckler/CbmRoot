@@ -1,6 +1,6 @@
 void glue_analysis ()
 {
-    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/mytask.analysis";//.0000.root";
+    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis";//.0000.root";
     TString outFileName = filePath +".all.root";
     Int_t nEvents = 200;   // number of files to be added
 
@@ -16,12 +16,12 @@ void glue_analysis ()
     histList->Add( new TH1D("fh_trd_id_signal_mom","fh_trd_id_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
     histList->Add( new TH1D("fh_tof_id_signal_mom","fh_tof_id_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
     histList->Add( new TH1D("fh_chi_prim_signal_mom","fh_chi_prim_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
+    histList->Add( new TH1D("fh_gammacut_signal_mom","fh_gammacut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
+    histList->Add( new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
+    histList->Add( new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
     histList->Add( new TH1D("fh_ptcut_signal_mom","fh_ptcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
     histList->Add( new TH1D("fh_anglecut_signal_mom","fh_anglecut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
-    histList->Add( new TH1D("fh_gammacut_signal_mom","fh_gammacut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
-    histList->Add( new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
-    histList->Add( new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
-    histList->Add( new TH1D("fh_apcut_signal_mom","fh_apcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
+    histList->Add( new TH1D("fh_apmcut_signal_mom","fh_apmcut_signal_mom;momentum [GeV/c];yield", 100, 0., 15.) );
 
 ///////
     histList->Add( new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.) );
@@ -39,12 +39,12 @@ void glue_analysis ()
 	histList->Add( new TH1D("fh_trd_id_signal_minv", "fh_trd_id_signal_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_tof_id_signal_minv","fh_tof_id_signal_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_chi_prim_signal_minv","fh_chi_prim_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_ptcut_signal_minv","fh_ptcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_gammacut_signal_minv","fh_gammacut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_stcut_signal_minv","fh_stcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_ttcut_signal_minv","fh_ttcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_stcut_signal_minv","fh_stcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_apcut_signal_minv","fh_apcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_ptcut_signal_minv","fh_ptcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+	histList->Add( new TH1D("fh_apmcut_signal_minv","fh_apmcut_signal_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 
 //BG minv
 	histList->Add( new TH1D("fh_rec_bg_minv","fh_rec_bg_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
@@ -52,12 +52,12 @@ void glue_analysis ()
 	histList->Add( new TH1D("fh_trd_id_bg_minv","fh_trd_id_bg_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_tof_id_bg_minv","fh_tof_id_bg_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_chi_prim_bg_minv","fh_chi_prim_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_ptcut_bg_minv","fh_ptcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_gammacut_bg_minv","fh_gammacut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_stcut_bg_minv","fh_stcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_ttcut_bg_minv","fh_ttcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_stcut_bg_minv","fh_stcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_apcut_bg_minv","fh_apcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_ptcut_bg_minv","fh_ptcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+	histList->Add( new TH1D("fh_apmcut_bg_minv","fh_apmcut_bg_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 
 //pi0 minv
 	histList->Add( new TH1D("fh_rec_pi0_minv","fh_rec_pi0_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
@@ -65,12 +65,12 @@ void glue_analysis ()
 	histList->Add( new TH1D("fh_trd_id_pi0_minv","fh_trd_id_pi0_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_tof_id_pi0_minv","fh_tof_id_pi0_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_chi_prim_pi0_minv","fh_chi_prim_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_ptcut_pi0_minv","fh_ptcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_anglecut_pi0_minv","fh_anglecut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_gammacut_pi0_minv","fh_gammacut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_stcut_pi0_minv","fh_stcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_stcut_pi0_minv","fh_stcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_apcut_pi0_minv","fh_apcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_ptcut_pi0_minv","fh_ptcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_anglecut_pi0_minv","fh_anglecut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+	histList->Add( new TH1D("fh_apmcut_pi0_minv","fh_apmcut_pi0_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 
 //eta minv
 	histList->Add( new TH1D("fh_rec_eta_minv","fh_rec_eta_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
@@ -78,12 +78,12 @@ void glue_analysis ()
 	histList->Add( new TH1D("fh_trd_id_eta_minv","fh_trd_id_eta_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_tof_id_eta_minv","fh_tof_id_eta_minv;M_{ee} [GeV/c^{2}];yield", 200, 0., 2.) );
 	histList->Add( new TH1D("fh_chi_prim_eta_minv","fh_chi_prim_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_ptcut_eta_minv","fh_ptcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_anglecut_eta_minv","fh_anglecut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_gammacut_eta_minv","fh_gammacut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_stcut_eta_minv","fh_stcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 	histList->Add( new TH1D("fh_ttcut_eta_minv","fh_ttcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_stcut_eta_minv","fh_stcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
-	histList->Add( new TH1D("fh_apcut_eta_minv","fh_apcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_ptcut_eta_minv","fh_ptcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+    histList->Add( new TH1D("fh_anglecut_eta_minv","fh_anglecut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
+	histList->Add( new TH1D("fh_apmcut_eta_minv","fh_apmcut_eta_minv;M_{ee} [GeV/c^{2}];yield",200, 0., 2.) );
 
 //pty distribution of the signal
 	histList->Add( new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
@@ -93,12 +93,12 @@ void glue_analysis ()
 	histList->Add( new TH2D("fh_trd_id_signal_pty","fh_trd_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
 	histList->Add( new TH2D("fh_tof_id_signal_pty","fh_tof_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
 	histList->Add( new TH2D("fh_chi_prim_signal_pty","fh_chi_prim_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
-	histList->Add( new TH2D("fh_ptcut_signal_pty","fh_ptcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
-	histList->Add( new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
 	histList->Add( new TH2D("fh_gammacut_signal_pty","fh_gammacut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
+    histList->Add( new TH2D("fh_stcut_signal_pty","fh_stcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
 	histList->Add( new TH2D("fh_ttcut_signal_pty","fh_ttcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
-	histList->Add( new TH2D("fh_stcut_signal_pty","fh_stcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
-	histList->Add( new TH2D("fh_apcut_signal_pty","fh_apcut_signal_pty;Rapidity;p_{t} [GeV/c]",40, 0., 4., 20, 0., 2.) );
+    histList->Add( new TH2D("fh_ptcut_signal_pty","fh_ptcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
+    histList->Add( new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.) );
+	histList->Add( new TH2D("fh_apmcut_signal_pty","fh_apmcut_signal_pty;Rapidity;p_{t} [GeV/c]",40, 0., 4., 20, 0., 2.) );
 
 // cut distribution
 	histList->Add( new TH1D("fh_angle_signal","fh_angle_signal;opening angle [deg];yield", 360, 0., 180.) );
@@ -135,12 +135,12 @@ void glue_analysis ()
 	histList->Add( new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
 	histList->Add( new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
 	histList->Add( new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
 	histList->Add( new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
+    histList->Add( new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
 	histList->Add( new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_apcut","fh_source_pair_apcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
+    histList->Add( new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
+    histList->Add( new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
+	histList->Add( new TH2D("fh_source_pair_apmcut","fh_source_pair_apmcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
 
 //ID cut distributions
 	histList->Add( new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yield", 100, -1.1, 1.1) );

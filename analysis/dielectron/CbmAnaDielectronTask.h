@@ -306,7 +306,8 @@ private:
     TH2D* fh_ttcut_gamma;
     TH2D* fh_stcut_gamma;
     TH2D* fh_apcut_gamma;
-
+    TH2D* fh_apmcut_signal;
+    TH2D* fh_apmcut_bg;
 
 //source of BG pairs
     TH2D*  fh_source_pair_reco;

@@ -219,6 +219,8 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_ttcut_gamma = new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
     fh_stcut_gamma = new TH2D("fh_stcut_gamma","fh_stcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
     fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+    fh_apmcut_signal = new TH2D("fh_apmcut_signal", "fh_apmcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
+    fh_apmcut_bg = new TH2D("fh_apmcut_bg","fh_apmcut_bg;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
 
 //source of BG pairs
     fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
@@ -1274,11 +1276,10 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut() //cut only for full reco 
             }//if electron
         //}// charge >0
     } //iP
-
 }
 
 void CbmAnaDielectronTask::IsRichElectron(CbmRichRing * ring, Double_t momentum, DielectronCandidate* cand)
-{   
+{
     if (fUseRichAnn == false){
         Double_t axisA = ring->GetAaxis();
         Double_t axisB = ring->GetBaxis();
@@ -1479,19 +1480,23 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
 
 //track topology cut 2
 //cut for full RECO tracks!
-    vector<Float_t> angles1, mom1;
+//APM distributions
+    vector<Float_t> angles1, mom1, candInd;
     angles1.reserve(50);
     mom1.reserve(50);
+    candInd.reserve(50);
     for (Int_t iP = 0; iP < nCand; iP++){
 		if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron){
 			angles1.clear();
 			mom1.clear();
+            candInd.clear();
 			for (Int_t iM = 0; iM < nCand; iM++){
 				// different charges, charge Im != charge iP
 				if (fCandidates[iM].charge != fCandidates[iP].charge){
 					KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]);
 					angles1.push_back(pRec.angle);
 					mom1.push_back(fCandidates[iM].momentum.Mag());
+                    candInd.push_back(iM);
 				} // if
 			}// iM
 			//find min opening angle
@@ -1504,8 +1509,19 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
 				}
 			}
 			Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom1[minInd]);
-			if (fCandidates[iP].isMCSignalElectron) fh_ttcut_signal->Fill(sqrt_mom, minAng, fWeight);
-			else fh_ttcut_bg->Fill(sqrt_mom, minAng);
+
+            //APM
+            Double_t alfa = 0.;
+            Double_t ptt = 0.;
+            CalculateArmPodParams(&fCandidates[iP], &fCandidates[candInd[minInd]], alfa, ptt);
+ 
+			if (fCandidates[iP].isMCSignalElectron){
+                fh_ttcut_signal->Fill(sqrt_mom, minAng, fWeight);
+                fh_apmcut_signal->Fill(alfa, ptt, fWeight);
+            }else { 
+                fh_ttcut_bg->Fill(sqrt_mom, minAng);
+                fh_apmcut_bg->Fill(alfa, ptt, fWeight);
+            }
 			if (fCandidates[iP].isMCPi0Electron) fh_ttcut_pi0->Fill(sqrt_mom, minAng);
 			if (fCandidates[iP].isMCGammaElectron) fh_ttcut_gamma->Fill(sqrt_mom, minAng);
 		}//if electron
@@ -1752,6 +1768,8 @@ void CbmAnaDielectronTask::Finish()
     fh_ttcut_gamma->Scale(scale);
     fh_stcut_gamma->Scale(scale);
     fh_apcut_gamma->Scale(scale);
+    fh_apmcut_signal->Scale(scale);
+    fh_apmcut_bg->Scale(scale);
 
 //source of BG pairs
     fh_source_pair_reco->Scale(scale);
@@ -1880,6 +1898,8 @@ void CbmAnaDielectronTask::Finish()
     fh_ttcut_gamma->Write();
     fh_stcut_gamma->Write();
     fh_apcut_gamma->Write();
+    fh_apmcut_signal->Write();
+    fh_apmcut_bg->Write();
 
 //source of BG pairs
     fh_source_pair_reco->Write();

@@ -58,6 +58,7 @@ public:
     Double_t dSts;
     Bool_t isTTCutElectron;
     Bool_t isSTCutElectron;
+    Bool_t isAPMCutElectron;
     Double_t richAnn;
     Double_t trdAnn;
     Double_t mass2;
@@ -105,6 +106,7 @@ public:
     void CheckTrackTopologyCut();
     void CheckTrackTopologyRecoCut();
     Bool_t CheckArmPod(Double_t alfa, Double_t pt);
+    void CheckArmPodModified();
 
     virtual void Finish();
 
@@ -219,7 +221,7 @@ private:
     TH1D* fh_gammacut_signal_mom;
     TH1D* fh_ttcut_signal_mom;
     TH1D* fh_stcut_signal_mom;
-    TH1D* fh_apcut_signal_mom;
+    TH1D* fh_apmcut_signal_mom;
 
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
@@ -241,7 +243,7 @@ private:
     TH1D* fh_gammacut_signal_minv;
     TH1D* fh_ttcut_signal_minv;
     TH1D* fh_stcut_signal_minv;
-    TH1D* fh_apcut_signal_minv;
+    TH1D* fh_apmcut_signal_minv;
 
 //BG minv
     TH1D* fh_rec_bg_minv;
@@ -254,7 +256,7 @@ private:
     TH1D* fh_gammacut_bg_minv;
     TH1D* fh_ttcut_bg_minv;
     TH1D* fh_stcut_bg_minv;
-    TH1D* fh_apcut_bg_minv;
+    TH1D* fh_apmcut_bg_minv;
 //pi0 minv
     TH1D* fh_rec_pi0_minv;
     TH1D* fh_rich_id_pi0_minv;
@@ -266,7 +268,7 @@ private:
     TH1D* fh_gammacut_pi0_minv;
     TH1D* fh_ttcut_pi0_minv;
     TH1D* fh_stcut_pi0_minv;
-    TH1D* fh_apcut_pi0_minv;
+    TH1D* fh_apmcut_pi0_minv;
 
 //eta minv
     TH1D* fh_rec_eta_minv;
@@ -279,7 +281,7 @@ private:
 	TH1D* fh_gammacut_eta_minv;
 	TH1D* fh_ttcut_eta_minv;
     TH1D* fh_stcut_eta_minv;
-	TH1D* fh_apcut_eta_minv;
+	TH1D* fh_apmcut_eta_minv;
 
 // cuts distribution
     TH1D* fh_pt_signal;
@@ -320,7 +322,7 @@ private:
     TH2D*  fh_source_pair_gammacut;
     TH2D*  fh_source_pair_ttcut;
     TH2D*  fh_source_pair_stcut;
-    TH2D*  fh_source_pair_apcut;
+    TH2D*  fh_source_pair_apmcut;
 
 //pt/y distribution for signal
     TH2D* fh_mc_signal_pty;
@@ -335,7 +337,7 @@ private:
     TH2D* fh_gammacut_signal_pty;
     TH2D* fh_ttcut_signal_pty;
     TH2D* fh_stcut_signal_pty;
-    TH2D* fh_apcut_signal_pty;
+    TH2D* fh_apmcut_signal_pty;
 
 //ID cuts distributions
     TH1D* fh_rich_ann_signal;

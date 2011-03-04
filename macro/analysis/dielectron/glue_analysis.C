@@ -1,6 +1,6 @@
 void glue_analysis ()
 {
-    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis";//.0000.root";
+    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/mytask.analysis";//.0000.root";
     TString outFileName = filePath +".all.root";
     Int_t nEvents = 200;   // number of files to be added
 
@@ -126,6 +126,8 @@ void glue_analysis ()
 	histList->Add( new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.) );
 	histList->Add( new TH2D("fh_stcut_gamma","fh_stcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.) );
 	histList->Add( new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.) );
+    histList->Add( new TH2D("fh_apmcut_signal", "fh_apmcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.) );
+    histList->Add( new TH2D("fh_apmcut_bg","fh_apmcut_bg;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.) );
 
 //source of BG pairs
 	histList->Add( new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );

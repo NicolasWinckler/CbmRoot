@@ -130,7 +130,7 @@ void draw_minv(TH1* s1, TH1* bg1)
 }
 
 void draw_analysis(){
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.root");
    //TString signalSt = "rho0"; //rho0, phi, omega
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
@@ -593,6 +593,14 @@ void draw_analysis(){
     fh_apcut_pi0->Draw("COLZ");
     c5->cd(4);
     fh_apcut_gamma->Draw("COLZ");
+
+//APM cut distribution
+    TCanvas *c5_1 = new TCanvas("c5-apmcut", "c5-apmcut", 600, 300);
+    c5->Divide(2,1);
+    c5->cd(1);
+    fh_apmcut_signal->Draw("COLZ");
+    c5->cd(2); 
+    fh_apmcut_bg->Draw("COLZ");
 
 //track topology cut distribution for segment tracks
     TCanvas *c6 = new TCanvas("c6-stcut", "c6-stcut", 1200, 600);

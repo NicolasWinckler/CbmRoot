@@ -3,6 +3,7 @@
 #include "data/CbmLitStripHit.h"
 #include "data/CbmLitPixelHit.h"
 #include "data/CbmLitTrackParam.h"
+#include "utils/CbmLitMatrixMath.h"
 
 #include <iostream>
 #include <cmath>
@@ -125,6 +126,56 @@ LitStatus CbmLitKalmanFilter::Update(
 	par->SetCovMatrix(cOut);
 	return kLITSUCCESS;
 
+}
+
+
+LitStatus CbmLitKalmanFilter::UpdateWMF(
+		CbmLitTrackParam *par,
+        const CbmLitPixelHit *hit)
+{
+    std::vector<myf> cIn = par->GetCovMatrix();
+    std::vector<myf> cInInv = par->GetCovMatrix();
+
+	myf dxx = hit->GetDx() * hit->GetDx();
+	myf dxy = hit->GetDxy();
+	myf dyy = hit->GetDy() * hit->GetDy();
+
+	// Inverse predicted cov matrix
+	InvSym15(cInInv);
+	// Calculate C1
+	std::vector<myf> C1 = cInInv;
+	myf det = dxx * dyy - dxy * dxy;
+	C1[0] += dyy / det;
+	C1[1] += -dxy / det;
+	C1[5] += dxx / det;
+	// Inverse C1 -> output updated covariance matrix
+	InvSym15(C1);
+
+	std::vector<myf> t(5);
+	t[0] = cInInv[0]*par->GetX() + cInInv[1]*par->GetY() + cInInv[2]*par->GetTx()
+			+ cInInv[3]*par->GetTy() + cInInv[4]*par->GetQp()
+			+ dyy * hit->GetX() / det - dxy * hit->GetY() / det;
+	t[1] = cInInv[1]*par->GetX() + cInInv[5]*par->GetY() + cInInv[6]*par->GetTx()
+			+ cInInv[7]*par->GetTy() + cInInv[8]*par->GetQp()
+			- dxy * hit->GetX() / det + dxx * hit->GetY() / det;
+	t[2] = cInInv[2]*par->GetX() + cInInv[6]*par->GetY() + cInInv[9]*par->GetTx()
+			+ cInInv[10]*par->GetTy() + cInInv[11]*par->GetQp();
+	t[3] = cInInv[3]*par->GetX() + cInInv[7]*par->GetY() + cInInv[10]*par->GetTx()
+			+ cInInv[12]*par->GetTy() + cInInv[13]*par->GetQp();
+	t[4] = cInInv[4]*par->GetX() + cInInv[8]*par->GetY() + cInInv[11]*par->GetTx()
+			+ cInInv[13]*par->GetTy() + cInInv[14]*par->GetQp();
+
+	std::vector<myf> xOut(5);
+	Mult15On5(C1, t, xOut);
+
+	// Copy filtered state to output
+	par->SetX(xOut[0]);
+	par->SetY(xOut[1]);
+	par->SetTx(xOut[2]);
+	par->SetTy(xOut[3]);
+	par->SetQp(xOut[4]);
+	par->SetCovMatrix(C1);
+	return kLITSUCCESS;
 }
 
 //LitStatus CbmLitKalmanFilter::Update(
@@ -287,4 +338,50 @@ LitStatus CbmLitKalmanFilter::Update(
 		return kLITSUCCESS;
 }
 
+LitStatus CbmLitKalmanFilter::UpdateWMF(
+		CbmLitTrackParam *par,
+        const CbmLitStripHit *hit)
+{
+	 std::vector<myf> cIn = par->GetCovMatrix();
+	 std::vector<myf> cInInv = par->GetCovMatrix();
 
+	 myf duu = hit->GetDu() * hit->GetDu();
+	 myf phiCos = hit->GetCosPhi();
+	 myf phiSin = hit->GetSinPhi();
+
+	// Inverse predicted cov matrix
+	InvSym15(cInInv);
+	// Calculate C1
+	std::vector<myf> C1 = cInInv;
+	C1[0] += phiCos*phiCos / duu;
+	C1[1] += phiCos*phiSin / duu;
+	C1[5] += phiSin*phiSin / duu;
+	// Inverse C1 -> output updated covariance matrix
+	InvSym15(C1);
+
+	std::vector<myf> t(5);
+	t[0] = cInInv[0]*par->GetX() + cInInv[1]*par->GetY() + cInInv[2]*par->GetTx()
+			+ cInInv[3]*par->GetTy() + cInInv[4]*par->GetQp()
+			+ phiCos*hit->GetU()/duu;
+	t[1] = cInInv[1]*par->GetX() + cInInv[5]*par->GetY() + cInInv[6]*par->GetTx()
+			+ cInInv[7]*par->GetTy() + cInInv[8]*par->GetQp()
+			+ phiSin*hit->GetU()/duu;
+	t[2] = cInInv[2]*par->GetX() + cInInv[6]*par->GetY() + cInInv[9]*par->GetTx()
+			+ cInInv[10]*par->GetTy() + cInInv[11]*par->GetQp();
+	t[3] = cInInv[3]*par->GetX() + cInInv[7]*par->GetY() + cInInv[10]*par->GetTx()
+			+ cInInv[12]*par->GetTy() + cInInv[13]*par->GetQp();
+	t[4] = cInInv[4]*par->GetX() + cInInv[8]*par->GetY() + cInInv[11]*par->GetTx()
+			+ cInInv[13]*par->GetTy() + cInInv[14]*par->GetQp();
+
+	std::vector<myf> xOut(5);
+	Mult15On5(C1, t, xOut);
+
+	// Copy filtered state to output
+	par->SetX(xOut[0]);
+	par->SetY(xOut[1]);
+	par->SetTx(xOut[2]);
+	par->SetTy(xOut[3]);
+	par->SetQp(xOut[4]);
+	par->SetCovMatrix(C1);
+	return kLITSUCCESS;
+}

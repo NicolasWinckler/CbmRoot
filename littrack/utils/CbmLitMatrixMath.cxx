@@ -273,7 +273,22 @@ bool Mult25On5(
 	return true;
 }
 
-
+bool Mult15On5(
+		const std::vector<myf>& a,
+		const std::vector<myf>& b,
+		std::vector<myf>& c)
+{
+	if (a.size() != 15 || b.size() != 5 || c.size() != 5){
+		std::cout << "-E- Mult15On5: size is not correct" << std::endl;
+		return false;
+	}
+	c[0] = a[0] * b[0] + a[1] * b[1] + a[2]  * b[2] + a[3]  * b[3] + a[4]  * b[4];
+	c[1] = a[1] * b[0] + a[5] * b[1] + a[6]  * b[2] + a[7]  * b[3] + a[8]  * b[4];
+	c[2] = a[2] * b[0] + a[6] * b[1] + a[9]  * b[2] + a[10] * b[3] + a[11] * b[4];
+	c[3] = a[3] * b[0] + a[7] * b[1] + a[10] * b[2] + a[12] * b[3] + a[13] * b[4];
+	c[4] = a[4] * b[0] + a[8] * b[1] + a[11] * b[2] + a[13] * b[3] + a[14] * b[4];
+	return true;
+}
 
 bool Subtract(
 		const std::vector<myf>& a,

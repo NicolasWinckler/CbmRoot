@@ -17,8 +17,14 @@ bool Mult25(
 		const std::vector<myf>& b,
 		std::vector<myf>& c);
 
-/* Multiplication of 5x5 matrix and 5x1 vector*/
+/* Multiplication of 5x5 matrix and 5x1 vector */
 bool Mult25On5(
+		const std::vector<myf>& a,
+		const std::vector<myf>& b,
+		std::vector<myf>& c);
+
+/* Multiplication of 5x5 matrix and 5x1 vector */
+bool Mult15On5(
 		const std::vector<myf>& a,
 		const std::vector<myf>& b,
 		std::vector<myf>& c);

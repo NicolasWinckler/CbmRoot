@@ -41,9 +41,17 @@ private:
 		   CbmLitTrackParam *par,
 		   const CbmLitPixelHit *hit);
 
+	LitStatus UpdateWMF(
+			CbmLitTrackParam *par,
+	        const CbmLitPixelHit *hit);
+
 	LitStatus Update(
 		   CbmLitTrackParam *par,
 		   const CbmLitStripHit *hit);
+
+	LitStatus UpdateWMF(
+			CbmLitTrackParam *par,
+	        const CbmLitStripHit *hit);
 };
 
 #endif //CbmLitKalmanFilter

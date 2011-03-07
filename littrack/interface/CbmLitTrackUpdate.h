@@ -31,19 +31,23 @@ public:
     * @param pParamIn Pointer to input track parameter
     * @param pParamOut Pointer to output track parameter
     * @parma pHit Pointer to hit
+    * @param chiSq Output value of the contribution to the chi-square
     * @return Status code */
    virtual LitStatus Update(
 		   const CbmLitTrackParam *pParamIn,
            CbmLitTrackParam *pParamOut,
-           const CbmLitHit *pHit) = 0;
+           const CbmLitHit *pHit,
+           myf &chiSq) = 0;
 
    /* Main function to be implemented for the concrete track update algorithm
     * @param pParam Pointer to input/output track parameter
     * @parma pHit Pointer to hit
+    * @param chiSq Output value of the contribution to the chi-square
     * @return Status code */
    virtual LitStatus Update(
 		   CbmLitTrackParam *pParam,
-		   const CbmLitHit *pHit) = 0;
+		   const CbmLitHit *pHit,
+		   myf &chiSq) = 0;
 };
 
 #endif /* CBMLITTRACKUPDATE_H_ */

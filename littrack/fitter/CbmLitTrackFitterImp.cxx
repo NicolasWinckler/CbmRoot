@@ -61,13 +61,13 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	    }
 	    nodes[i].SetPredictedParam(&par);
 	    nodes[i].SetF(F);
-	    if (fUpdate->Update(&par, hit) == kLITERROR) {
+	    myf chi2Hit = 0.;
+	    if (fUpdate->Update(&par, hit, chi2Hit) == kLITERROR) {
 	    	//std::cout << "-E- CbmLitTrackFitterImp::Fit: track update failed" << std::endl;
 	    	track->SetQuality(kLITBAD);
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetUpdatedParam(&par);
-	    myf chi2Hit = ChiSq(&par, hit);
 	    nodes[i].SetChiSqFiltered(chi2Hit);
 	    track->SetChi2(track->GetChi2() + chi2Hit);
 	}

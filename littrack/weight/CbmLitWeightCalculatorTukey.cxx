@@ -60,7 +60,8 @@ LitStatus CbmLitWeightCalculatorTukey::TukeyWeight(
 		CbmLitHit* hit,
 		myf T) const
 {
-	myf chiSq = ChiSq(par, hit);
+	// FIXME:
+	myf chiSq = 0.;//ChiSq(par, hit);
 	if (chiSq < T){
 		myf t = 1 - (chiSq / T);
 		hit->SetW(t * t);

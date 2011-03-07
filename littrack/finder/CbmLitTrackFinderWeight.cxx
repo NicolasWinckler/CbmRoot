@@ -160,9 +160,9 @@ bool CbmLitTrackFinderWeight::AddHits(
 	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast()), uPar;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
-		fFilter->Update(&par, &uPar, *iHit);
-		if (IsHitInValidationGate(&uPar, *iHit)) {
-			myf chi = ChiSq(&uPar, *iHit);
+		myf chi = 0.;
+		fFilter->Update(&par, &uPar, *iHit, chi);
+		if (IsHitInValidationGate(*iHit, chi)) {
 			CbmLitHitChiSq h;
 			h.SetHit(*iHit);
 			h.SetParam(&uPar);

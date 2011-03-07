@@ -299,11 +299,10 @@ void CbmLitTrackFinderBranch::ProcessSubstation(
 	CbmLitTrackParam uPar;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		CbmLitHit* hit = *iHit;
-		fFilter->Update(par, &uPar, hit);
-		if (IsHitInValidationGate(&uPar, hit)) {
-			myf chi = ChiSq(&uPar, hit);
+		myf chi = 0.;
+		fFilter->Update(par, &uPar, hit, chi);
+		if (IsHitInValidationGate(hit, chi)) {
 			CbmLitHitChiSq h;
-
 			h.SetHit(hit);
 			h.SetParam(&uPar);
 			h.SetChiSq(chi);

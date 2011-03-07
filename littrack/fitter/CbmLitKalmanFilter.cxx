@@ -30,27 +30,30 @@ LitStatus CbmLitKalmanFilter::Finalize()
 LitStatus CbmLitKalmanFilter::Update(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        const CbmLitHit *hit)
+        const CbmLitHit *hit,
+        myf &chiSq)
 {
    *parOut = *parIn;
-   return Update(parOut, hit);
+   return Update(parOut, hit, chiSq);
 }
 
 LitStatus CbmLitKalmanFilter::Update(
 		CbmLitTrackParam *par,
-        const CbmLitHit *hit)
+        const CbmLitHit *hit,
+        myf &chiSq)
 {
 	LitStatus result = kLITSUCCESS;
 	if (hit->GetType() == kLITSTRIPHIT)
-		result = Update(par, static_cast<const CbmLitStripHit*>(hit));
+		result = Update(par, static_cast<const CbmLitStripHit*>(hit), chiSq);
 	else if (hit->GetType() == kLITPIXELHIT)
-		result = Update(par, static_cast<const CbmLitPixelHit*>(hit));
+		result = Update(par, static_cast<const CbmLitPixelHit*>(hit), chiSq);
 	return result;
 }
 
 LitStatus CbmLitKalmanFilter::Update(
 		CbmLitTrackParam *par,
-        const CbmLitPixelHit *hit)
+        const CbmLitPixelHit *hit,
+        myf &chiSq)
 {
     std::vector<myf> cIn = par->GetCovMatrix();
 
@@ -92,9 +95,6 @@ LitStatus CbmLitKalmanFilter::Update(
 	xOut[4] += K40 * dx + K41 * dy;
 
 	// Calculate filtered covariance matrix
-//    myf cIn[15] = {par.C0,  par.C1,  par.C2,  par.C3,  par.C4,
-//		           par.C5,  par.C6,  par.C7,  par.C8,  par.C9,
-//		           par.C10, par.C11, par.C12, par.C13, par.C14};
 	std::vector<myf> cOut = cIn;
 
 	cOut[0]  += -K00 * cIn[0] - K01 * cIn[1];
@@ -124,6 +124,19 @@ LitStatus CbmLitKalmanFilter::Update(
 	par->SetTy(xOut[3]);
 	par->SetQp(xOut[4]);
 	par->SetCovMatrix(cOut);
+
+	// Calculate chi-square
+	myf C0 = par->GetCovariance(0);
+	myf C5 = par->GetCovariance(5);
+	myf C1 = par->GetCovariance(1);
+	dx = hit->GetX() - par->GetX();
+	dy = hit->GetY() - par->GetY();
+
+	myf norm = -dxx * dyy + dxx * C5 + dyy * C0 - C0 * C5 + dxy * dxy - 2 * dxy * C1 + C1 * C1;
+	if (norm == 0.) norm = 1e-10;
+
+	chiSq = (-dx * dx * (dyy - C5) - dy * dy * (dxx - C0) + 2 * dx * dy * (dxy - C1)) / norm;
+
 	return kLITSUCCESS;
 
 }
@@ -131,8 +144,11 @@ LitStatus CbmLitKalmanFilter::Update(
 
 LitStatus CbmLitKalmanFilter::UpdateWMF(
 		CbmLitTrackParam *par,
-        const CbmLitPixelHit *hit)
+        const CbmLitPixelHit *hit,
+        myf &chiSq)
 {
+	myf xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
+
     std::vector<myf> cIn = par->GetCovMatrix();
     std::vector<myf> cInInv = par->GetCovMatrix();
 
@@ -175,6 +191,22 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 	par->SetTy(xOut[3]);
 	par->SetQp(xOut[4]);
 	par->SetCovMatrix(C1);
+
+	// Calculate chi square
+	myf dx0 = xOut[0] - xIn[0];
+	myf dx1 = xOut[1] - xIn[1];
+	myf dx2 = xOut[2] - xIn[2];
+	myf dx3 = xOut[3] - xIn[3];
+	myf dx4 = xOut[4] - xIn[4];
+
+	chiSq = (((hit->GetX() - par->GetX()) * dyy - (hit->GetY() - par->GetY()) * dxy) * (hit->GetX() - par->GetX())
+		+ ((hit->GetX() - par->GetX()) * dxy - (hit->GetY() - par->GetY()) * dxx) * (hit->GetX() - par->GetX())) / det
+		+ (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
+		+ (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1
+		+ (dx0 * cInInv[2] + dx1 * cInInv[6] + dx2 * cInInv[9 ] + dx3 * cInInv[10] + dx4 * cInInv[11]) * dx2
+		+ (dx0 * cInInv[3] + dx1 * cInInv[7] + dx2 * cInInv[10] + dx3 * cInInv[12] + dx4 * cInInv[13]) * dx3
+		+ (dx0 * cInInv[4] + dx1 * cInInv[8] + dx2 * cInInv[11] + dx3 * cInInv[13] + dx4 * cInInv[14]) * dx4;
+
 	return kLITSUCCESS;
 }
 
@@ -260,7 +292,8 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 
 LitStatus CbmLitKalmanFilter::Update(
 		CbmLitTrackParam *par,
-        const CbmLitStripHit *hit)
+        const CbmLitStripHit *hit,
+        myf &chiSq)
 {
 	 myf xIn[5] = { par->GetX(), par->GetY(),
 			 			par->GetTx(), par->GetTy(),
@@ -271,11 +304,9 @@ LitStatus CbmLitKalmanFilter::Update(
 	 myf duu = hit->GetDu() * hit->GetDu();
 	 myf phiCos = hit->GetCosPhi();
 	 myf phiSin = hit->GetSinPhi();
-//	 myf phiCosSq = phiCos * phiCos;
-//	 myf phiSinSq = phiSin * phiSin;
-//	 myf phi2SinCos = 2 * phiCos * phiSin;
-
-//	  const myf ZERO = 0.0, ONE = 1.;
+	 myf phiCosSq = phiCos * phiCos;
+	 myf phiSinSq = phiSin * phiSin;
+	 myf phi2SinCos = 2 * phiCos * phiSin;
 
 	  myf wi, zeta, zetawi, HCH;
 	  myf F0, F1, F2, F3, F4;
@@ -335,13 +366,27 @@ LitStatus CbmLitKalmanFilter::Update(
 		par->SetQp(xIn[4]);
 		par->SetCovMatrix(cIn);
 
+		// Calculate chi-square
+		myf C0 = par->GetCovariance(0);
+		myf C5 = par->GetCovariance(5);
+		myf C1 = par->GetCovariance(1);
+		myf r = u - par->GetX() * phiCos - par->GetY() * phiSin;
+		myf rr = r * r;
+		myf norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
+	//	myf norm = duu + C0 * phiCos + C5 * phiSin;
+
+		chiSq = rr / norm;
+
 		return kLITSUCCESS;
 }
 
 LitStatus CbmLitKalmanFilter::UpdateWMF(
 		CbmLitTrackParam *par,
-        const CbmLitStripHit *hit)
+        const CbmLitStripHit *hit,
+        myf &chiSq)
 {
+	myf xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
+
 	 std::vector<myf> cIn = par->GetCovMatrix();
 	 std::vector<myf> cInInv = par->GetCovMatrix();
 
@@ -383,5 +428,22 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 	par->SetTy(xOut[3]);
 	par->SetQp(xOut[4]);
 	par->SetCovMatrix(C1);
+
+	// Calculate chi square
+	myf zeta = hit->GetU() - phiCos*xIn[0] - phiSin*xIn[1];
+
+	myf dx0 = xOut[0] - xIn[0];
+	myf dx1 = xOut[1] - xIn[1];
+	myf dx2 = xOut[2] - xIn[2];
+	myf dx3 = xOut[3] - xIn[3];
+	myf dx4 = xOut[4] - xIn[4];
+
+	chiSq = zeta * zeta / duu
+		+ (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
+		+ (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1
+		+ (dx0 * cInInv[2] + dx1 * cInInv[6] + dx2 * cInInv[9 ] + dx3 * cInInv[10] + dx4 * cInInv[11]) * dx2
+		+ (dx0 * cInInv[3] + dx1 * cInInv[7] + dx2 * cInInv[10] + dx3 * cInInv[12] + dx4 * cInInv[13]) * dx3
+		+ (dx0 * cInInv[4] + dx1 * cInInv[8] + dx2 * cInInv[11] + dx3 * cInInv[13] + dx4 * cInInv[14]) * dx4;
+
 	return kLITSUCCESS;
 }

@@ -41,7 +41,8 @@ LitStatus CbmLitKalmanSmoother::Fit(
 	// Calculate the chi2 of the track
 	track->SetChi2(0.);
 	for (int i = 0; i < n; i++) {
-		myf chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
+		// FIXME:
+		myf chi2Hit = 0.;//ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
 		nodes[i].SetChiSqSmoothed(chi2Hit);
 		track->SetChi2(track->GetChi2() + chi2Hit);
 	}

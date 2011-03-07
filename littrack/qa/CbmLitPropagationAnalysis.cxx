@@ -572,7 +572,7 @@ void CbmLitPropagationAnalysis::FillHistosPropagation(
 	 for (Int_t i = 0; i < 11; i++){
 		 fPropagationHistos[plane][i]->Fill(r[i]);
 	 }
-	 fPropagationHistos[plane][11]->Fill(ChiSq(par, hit));
+	 fPropagationHistos[plane][11]->Fill(0.);//ChiSq(par, hit));
 }
 
 void CbmLitPropagationAnalysis::FillHistosFilter(

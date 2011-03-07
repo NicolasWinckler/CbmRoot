@@ -30,10 +30,9 @@ CbmLitGating::~CbmLitGating()
 }
 
 bool CbmLitGating::IsHitInValidationGate(
-		const CbmLitTrackParam* par,
-		const CbmLitHit* hit) const
+		const CbmLitHit* hit,
+		myf chiSq) const
 {
-	myf chiSq = ChiSq(par, hit);
 	if (hit->GetType() == kLITSTRIPHIT) return chiSq < fChiSqStripHitCut;
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;
 	return false;
@@ -47,35 +46,35 @@ HitPtrIteratorPair CbmLitGating::MinMaxIndex(
 {
 	HitPtrIteratorPair bounds;
 	if (station.GetType() == kLITSTRIPHIT) {
-//		bounds = HitPtrIteratorPair(hits.first, hits.second);
+		bounds = HitPtrIteratorPair(hits.first, hits.second);
 
 		// FIXME : check this for straw tubes
 
-		if (hits.first == hits.second) return bounds;
-
-		const CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(*(hits.first));
-		CbmLitStripHit hit;
-		myf C0 = par->GetCovariance(0);
-		myf C5 = par->GetCovariance(5);
-		if(C0 > fMaxCovSq || C0 < 0. || C5 > fMaxCovSq || C5 < 0.) return bounds;
-		myf devX = fSigmaCoef * std::sqrt(C0);
-		myf devY = fSigmaCoef * std::sqrt(C5);
-		myf X = par->GetX();
-		myf Y = par->GetY();
-		myf cos = h->GetCosPhi();
-		myf sin = h->GetSinPhi();
-		myf umin = (X - devX) * cos + (Y - devY) * sin - h->GetDu();
-		myf umax = (X + devX) * cos + (Y + devY) * sin + h->GetDu();
-
-		if (umin > umax) {
-			return bounds;
-			std::cout << "-E- umin>umax:" << umin << ">" << umax << std::endl;
-		}
-
-		hit.SetU(umin);
-		bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
-		hit.SetU(umax);
-		bounds.second =	std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
+//		if (hits.first == hits.second) return bounds;
+//
+//		const CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(*(hits.first));
+//		CbmLitStripHit hit;
+//		myf C0 = par->GetCovariance(0);
+//		myf C5 = par->GetCovariance(5);
+//		if(C0 > fMaxCovSq || C0 < 0. || C5 > fMaxCovSq || C5 < 0.) return bounds;
+//		myf devX = fSigmaCoef * std::sqrt(C0);
+//		myf devY = fSigmaCoef * std::sqrt(C5);
+//		myf X = par->GetX();
+//		myf Y = par->GetY();
+//		myf cos = h->GetCosPhi();
+//		myf sin = h->GetSinPhi();
+//		myf umin = (X - devX) * cos + (Y - devY) * sin - h->GetDu();
+//		myf umax = (X + devX) * cos + (Y + devY) * sin + h->GetDu();
+//
+//		if (umin > umax) {
+//			return bounds;
+//			std::cout << "-E- umin>umax:" << umin << ">" << umax << std::endl;
+//		}
+//
+//		hit.SetU(umin);
+//		bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
+//		hit.SetU(umax);
+//		bounds.second =	std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
 
 	} else if (station.GetType() == kLITMIXHIT || !fUseFastSearch) {
 		bounds = HitPtrIteratorPair(hits.first, hits.second);

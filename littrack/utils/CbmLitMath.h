@@ -8,17 +8,21 @@ class CbmLitStripHit;
 class CbmLitPixelHit;
 class CbmLitTrack;
 
-myf ChiSq(
-		const CbmLitTrackParam* par,
-		const CbmLitHit* hit);
-
-myf ChiSq(
-		const CbmLitTrackParam* par,
-		const CbmLitStripHit* hit);
-
-myf ChiSq(
-		const CbmLitTrackParam* par,
-		const CbmLitPixelHit* hit);
+//myf ChiSq(
+//		const CbmLitTrackParam* par,
+//		const CbmLitHit* hit);
+//
+//myf ChiSq(
+//		const CbmLitTrackParam* par,
+//		const CbmLitStripHit* hit);
+//
+//myf ChiSqWMF(
+//		const CbmLitTrackParam* par,
+//		const CbmLitStripHit* hit);
+//
+//myf ChiSq(
+//		const CbmLitTrackParam* par,
+//		const CbmLitPixelHit* hit);
 
 int NDF(
 		const CbmLitTrack* track);

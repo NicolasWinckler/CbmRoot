@@ -44,7 +44,7 @@ LitStatus CbmLitKalmanFilter::Update(
 {
 	LitStatus result = kLITSUCCESS;
 	if (hit->GetType() == kLITSTRIPHIT)
-		result = Update(par, static_cast<const CbmLitStripHit*>(hit), chiSq);
+		result = UpdateWMF(par, static_cast<const CbmLitStripHit*>(hit), chiSq);
 	else if (hit->GetType() == kLITPIXELHIT)
 		result = Update(par, static_cast<const CbmLitPixelHit*>(hit), chiSq);
 	return result;
@@ -170,10 +170,10 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 	std::vector<myf> t(5);
 	t[0] = cInInv[0]*par->GetX() + cInInv[1]*par->GetY() + cInInv[2]*par->GetTx()
 			+ cInInv[3]*par->GetTy() + cInInv[4]*par->GetQp()
-			+ dyy * hit->GetX() / det - dxy * hit->GetY() / det;
+			+ (dyy * hit->GetX() - dxy * hit->GetY()) / det;
 	t[1] = cInInv[1]*par->GetX() + cInInv[5]*par->GetY() + cInInv[6]*par->GetTx()
 			+ cInInv[7]*par->GetTy() + cInInv[8]*par->GetQp()
-			- dxy * hit->GetX() / det + dxx * hit->GetY() / det;
+			+ (- dxy * hit->GetX() + dxx * hit->GetY()) / det;
 	t[2] = cInInv[2]*par->GetX() + cInInv[6]*par->GetY() + cInInv[9]*par->GetTx()
 			+ cInInv[10]*par->GetTy() + cInInv[11]*par->GetQp();
 	t[3] = cInInv[3]*par->GetX() + cInInv[7]*par->GetY() + cInInv[10]*par->GetTx()
@@ -200,12 +200,23 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 	myf dx4 = xOut[4] - xIn[4];
 
 	chiSq = (((hit->GetX() - par->GetX()) * dyy - (hit->GetY() - par->GetY()) * dxy) * (hit->GetX() - par->GetX())
-		+ ((hit->GetX() - par->GetX()) * dxy - (hit->GetY() - par->GetY()) * dxx) * (hit->GetX() - par->GetX())) / det
+		+ (-(hit->GetX() - par->GetX()) * dxy + (hit->GetY() - par->GetY()) * dxx) * (hit->GetX() - par->GetX())) / det
 		+ (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
 		+ (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1
 		+ (dx0 * cInInv[2] + dx1 * cInInv[6] + dx2 * cInInv[9 ] + dx3 * cInInv[10] + dx4 * cInInv[11]) * dx2
 		+ (dx0 * cInInv[3] + dx1 * cInInv[7] + dx2 * cInInv[10] + dx3 * cInInv[12] + dx4 * cInInv[13]) * dx3
 		+ (dx0 * cInInv[4] + dx1 * cInInv[8] + dx2 * cInInv[11] + dx3 * cInInv[13] + dx4 * cInInv[14]) * dx4;
+
+
+//	// Calculate chi-square
+//	myf C_0 = par->GetCovariance(0);
+//	myf C_5 = par->GetCovariance(5);
+//	myf C_1 = par->GetCovariance(1);
+//	myf dx = hit->GetX() - par->GetX();
+//	myf dy = hit->GetY() - par->GetY();
+//	myf norm = -dxx * dyy + dxx * C_5 + dyy * C_0 - C_0 * C_5 + dxy * dxy - 2 * dxy * C_1 + C_1 * C_1;
+//	if (norm == 0.) norm = 1e-10;
+//	chiSq = (-dx * dx * (dyy - C_5) - dy * dy * (dxx - C_0) + 2 * dx * dy * (dxy - C_1)) / norm;
 
 	return kLITSUCCESS;
 }
@@ -430,7 +441,7 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 	par->SetCovMatrix(C1);
 
 	// Calculate chi square
-	myf zeta = hit->GetU() - phiCos*xIn[0] - phiSin*xIn[1];
+	myf zeta = hit->GetU() - phiCos*xOut[0] - phiSin*xOut[1];
 
 	myf dx0 = xOut[0] - xIn[0];
 	myf dx1 = xOut[1] - xIn[1];
@@ -444,6 +455,21 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 		+ (dx0 * cInInv[2] + dx1 * cInInv[6] + dx2 * cInInv[9 ] + dx3 * cInInv[10] + dx4 * cInInv[11]) * dx2
 		+ (dx0 * cInInv[3] + dx1 * cInInv[7] + dx2 * cInInv[10] + dx3 * cInInv[12] + dx4 * cInInv[13]) * dx3
 		+ (dx0 * cInInv[4] + dx1 * cInInv[8] + dx2 * cInInv[11] + dx3 * cInInv[13] + dx4 * cInInv[14]) * dx4;
+
+//	// Calculate chi-square
+//	 myf phiCosSq = phiCos * phiCos;
+//	 myf phiSinSq = phiSin * phiSin;
+//	 myf phi2SinCos = 2 * phiCos * phiSin;
+//
+//	myf C_0 = par->GetCovariance(0);
+//	myf C_5 = par->GetCovariance(5);
+//	myf C_1 = par->GetCovariance(1);
+//	myf r = hit->GetU() - par->GetX() * phiCos - par->GetY() * phiSin;
+//	myf rr = r * r;
+//	myf norm = duu + C_0 * phiCosSq + phi2SinCos * C_1 + C_5 * phiSinSq;
+////	myf norm = duu + C0 * phiCos + C5 * phiSin;
+//	chiSq = rr / norm;
+
 
 	return kLITSUCCESS;
 }

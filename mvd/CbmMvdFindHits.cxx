@@ -64,9 +64,9 @@ CbmMvdFindHits::CbmMvdFindHits()
     fMode       = 0;
     fNEvent     = 0;
     fCounter    = 0;
-    fAdcDynamic = 4096;
+    fAdcDynamic = 150;
     fAdcOffset  = 0;
-    fAdcBits    = 12;
+    fAdcBits    = 1;
     fHits       = new TClonesArray("CbmMvdHit");
     fClusters   = new TClonesArray("CbmMvdCluster");
     fMatches    = new TClonesArray("CbmMvdHitMatch"); //testing purposes
@@ -76,8 +76,8 @@ CbmMvdFindHits::CbmMvdFindHits()
 
     //Cluster Finding parameters
     fSigmaNoise     = 15; //sigma of the gauss distribution of noise (in electrons)
-    fSeedThreshold  = 75;
-    fNeighThreshold = 0;
+    fSeedThreshold  = 1;
+    fNeighThreshold = 1;
     fGausArrayLimit=500000;
 
     //Hit Position
@@ -101,9 +101,9 @@ CbmMvdFindHits::CbmMvdFindHits(const char* name, Int_t iMode,
 {
     fMode       = iMode;
     fNEvent     = 0;
-    fAdcDynamic = 4096;
+    fAdcDynamic = 150;
     fAdcOffset  = 0;
-    fAdcBits    = 12;
+    fAdcBits    = 1;
     fHits       = new TClonesArray("CbmMvdHit");
     fClusters   = new TClonesArray("CbmMvdCluster");
     fMatches    = new TClonesArray("CbmMvdHitMatch"); //testing purposes
@@ -114,7 +114,7 @@ CbmMvdFindHits::CbmMvdFindHits(const char* name, Int_t iMode,
     //Cluster Finding parameters
     fSigmaNoise     = 15; // sigma of the gauss distribution of noise (in electrons)
     fSeedThreshold  = 1;
-    fNeighThreshold = 0;
+    fNeighThreshold = 1;
 
 
     //Hit Position
@@ -415,7 +415,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 		cout << "-I- " << "CbmMvdFindHits: Checking for seed pixels..." << endl;
 	    }
 
-	    if( ( GetAdcCharge(digi->GetCharge())>fSeedThreshold ) && ( pixelUsed->At(iDigi)==kFALSE ) ){
+	    if( ( GetAdcCharge(digi->GetCharge())>=fSeedThreshold ) && ( pixelUsed->At(iDigi)==kFALSE ) ){
 
 		clusterArray->clear();
 		clusterArray->push_back(digi);
@@ -455,7 +455,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
      //------------- End of Detector Loops ----------------------------------------------
     //----------------------------------------------------------------------------------
 
-    cout << "-I-  End of task " << GetName() << ": Event Nr: " << fNEvent << ", nDIGIS: "<<nDigis<<endl;
+    cout << "-I-  End of task " << GetName() << ": Event Nr: " << fNEvent << ", nDIGIS: "<<nDigis << ", nHits:"<<fHits->GetEntriesFast()<<endl;
 
     delete pixelUsed;
     delete clusterArray;
@@ -778,9 +778,10 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
     Int_t xSeed;
     Int_t ySeed;
     Bool_t digiFound;
+    
     Short_t chargeArray[49], dominatorArray[49];
     //    long long orderArray[49];
-    Int_t orderArray[49];
+   
     Float_t xPos[5],yPos[5];
     Short_t contributors=-2;
 
@@ -926,18 +927,34 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
 	    fResolutionHistoMergedY->Fill(fHitPosY-yCentralTrack);
 	};
 	
-	TMath::Sort(49,chargeArray,orderArray,kTRUE);
+	//Prepare selection of crowns for charge bow histograms
+	
+	const Int_t arrayMembers=25;
+	//25 and 49 allowed. 
+	Float_t tempArray[arrayMembers];
+	Int_t orderArray[arrayMembers];
+	Int_t pixelsOfInterest[arrayMembers]={8,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30,31,32,33,36,37,38,39,40};
+		
+	for(Int_t i=0;i<arrayMembers;i++){
+	  if (arrayMembers==25){tempArray[i]=chargeArray[pixelsOfInterest[i]];}
+	  else {tempArray[i]=chargeArray[i];};
+	};
+	
+	TMath::Sort(arrayMembers,tempArray,orderArray,kTRUE);
+	
+	
+	
 	Float_t qSort=0;
-	for (Int_t i=0; i<9; i++){ qSort+=chargeArray[orderArray[i]]; };
+	for (Int_t i=0; i<9; i++){ qSort+=tempArray[orderArray[i]]; };
     	((TH1F*) fPixelChargeHistos->At(53))->Fill(qSort);
 
-	for (Int_t i=9; i<25; i++) { qSort+=chargeArray[orderArray[i]]; };
+	for (Int_t i=9; i<25; i++) { qSort+=tempArray[orderArray[i]]; };
 	((TH1F*) fPixelChargeHistos->At(54))->Fill(qSort);
 		
 	TH1F* histoTotalCharge;
     	qSort=0;
-    	for (Int_t i=0; i<49; i++){
-		qSort+=chargeArray[orderArray[i]];
+    	for (Int_t i=0; i<arrayMembers; i++){
+		qSort+=tempArray[orderArray[i]];
 		((TH1F*) fPixelChargeHistos->At(55))->Fill(i+1,qSort);
 		histoTotalCharge =(TH1F*) fTotalChargeInNpixelsArray->At(i) ;
 	    	histoTotalCharge->Fill(qSort);
@@ -966,7 +983,7 @@ void CbmMvdFindHits::Register() {
 //--------------------------------------------------------------------------
 void CbmMvdFindHits::Finish() {
     cout << "\n============================================================" << endl;
-    cout << "-I- " << GetName() << "::Exec: Total events skipped: " << fCounter << endl;
+    cout << "-I- " << GetName() << "::Finish: Total events skipped: " << fCounter << endl;
     cout << "============================================================" << endl;
     if(fShowDebugHistos){
 	TCanvas* canvas=new TCanvas("HitFinderCanvas","HitFinderCanvas");

@@ -1183,6 +1183,12 @@ InitStatus CbmMvdDigitizeL::Init() {
 	}
 	fPileupManager = new CbmMvdPileupManager(fBgFileName,
 						 fBranchName, fBgBufferSize);
+	if(fPileupManager->GetNEvents()< 2* fNPileup) {
+	  cout <<"-E- "<< GetName() << ": The size of your BG-File is insufficient to perform the requested pileup" << endl;
+	  cout <<"    You need at least events > 2* fNPileup." << endl;
+	  cout <<"    Detected: fPileUp = " << fNPileup << ", events in file " << fPileupManager->GetNEvents() << endl; 
+	  Fatal("","");  
+	  return kERROR;}
     }
 
     // **********   Create delta electron manager if required
@@ -1194,6 +1200,13 @@ InitStatus CbmMvdDigitizeL::Init() {
 	}
 	fDeltaManager = new CbmMvdPileupManager(fDeltaFileName,
 						fBranchName, fDeltaBufferSize);
+	if(fDeltaManager->GetNEvents()< 2* fNDeltaElect ) {
+	  cout <<"-E- "<< GetName() << ": The size of your Delta-File is insufficient to perform the requested pileup" << endl;
+	  cout <<"    You need at least events > 2* fNDeltaElect." << endl;
+	  cout <<"    Detected: fNDeltaElect = " << fNDeltaElect << ", events in file " << fDeltaManager->GetNEvents() << endl; 
+	  Fatal("","");
+	  return kERROR;}
+	   
     }
 
     // Screen output
@@ -1229,7 +1242,7 @@ InitStatus CbmMvdDigitizeL::ReInit() {
 
 // -----   Virtual method Finish   -----------------------------------------
 void CbmMvdDigitizeL::Finish() {
-    cout.setf(ios_base::fixed, ios_base::floatfield);
+/*    cout.setf(ios_base::fixed, ios_base::floatfield);
     cout << endl << "---------------------------------------------" << endl;
     cout << "CbmMvdDigitizeL:: Parameters used for digitisation: " << endl;
     cout << "Pixel Size X               : " << setw(8) << setprecision(2)
@@ -1252,6 +1265,10 @@ void CbmMvdDigitizeL::Finish() {
 	<< fChargeThreshold  <<  endl;
     cout << "YOU USED THE LORENTZ DIGITIZER!!! " <<  endl;
     cout << "---------------------------------------------" << endl;
+*/
+
+    PrintParameters();
+
 
     if (fShowDebugHistos){
 	TCanvas* c=new TCanvas("DigiCanvas","DigiCanvas", 150,10,800,600);
@@ -1311,7 +1328,13 @@ void CbmMvdDigitizeL::Reset() {
 
 // -----   Private method PrintParameters   --------------------------------
 void CbmMvdDigitizeL::PrintParameters() {
+    
     cout.setf(ios_base::fixed, ios_base::floatfield);
+    cout << "============================================================" << endl;
+    cout << "============== Parameters of the Lorentz - Digitizer =======" << endl;
+    cout << "============================================================" << endl;
+    
+    
     cout << "Pixel Size X               : " << setw(8) << setprecision(2)
 	<< fPixelSizeX * 10000. << " mum" << endl;
     cout << "Pixel Size Y               : " << setw(8) << setprecision(2)
@@ -1330,6 +1353,9 @@ void CbmMvdDigitizeL::PrintParameters() {
 	<< fCutOnDeltaRays  << " MeV " <<  endl;
     cout << "ChargeThreshold            : " << setw(8) << setprecision(2)
 	<< fChargeThreshold  <<  endl;
+    cout << "Pileup: " << fNPileup << endl;
+    cout << "Delta - Pileup: " << fNDeltaElect << endl;
+    cout << "=============== End Parameters Digitizer ===================" << endl;
  
 }
 // -------------------------------------------------------------------------  

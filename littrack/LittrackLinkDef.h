@@ -106,6 +106,7 @@
 //#pragma link C++ class CbmLitTrackFitSpeedTest+;
 #pragma link C++ class CbmTrdHitsQa+;
 #pragma link C++ class CbmLitCreateStandaloneData+;
+#pragma link C++ class CbmLitTestMatrixMath+;
 
 // robust
 //#pragma link C++ class CbmLitWeightedHitCalculatorImp+;

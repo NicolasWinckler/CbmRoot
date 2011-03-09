@@ -113,6 +113,7 @@ qa/CbmLitCheckEnergyLossMuons.cxx
 qa/CbmLitCheckBrem.cxx 
 qa/CbmTrdHitsQa.cxx
 qa/CbmLitCreateStandaloneData.cxx
+qa/CbmLitTestMatrixMath.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
@@ -181,6 +182,7 @@ qa/CbmLitCheckMultipleScattering.h
 qa/CbmLitCheckBrem.h 
 qa/CbmTrdHitsQa.h
 qa/CbmLitCreateStandaloneData.h
+qa/CbmLitTestMatrixMath.h
 #cuda/CudaTest.h
 )
 

@@ -46,7 +46,7 @@ LitStatus CbmLitKalmanFilter::Update(
 	if (hit->GetType() == kLITSTRIPHIT)
 		result = UpdateWMF(par, static_cast<const CbmLitStripHit*>(hit), chiSq);
 	else if (hit->GetType() == kLITPIXELHIT)
-		result = Update(par, static_cast<const CbmLitPixelHit*>(hit), chiSq);
+		result = UpdateWMF(par, static_cast<const CbmLitPixelHit*>(hit), chiSq);
 	return result;
 }
 

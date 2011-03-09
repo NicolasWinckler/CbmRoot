@@ -167,7 +167,7 @@ bool CbmLitTrackFinderNN::AddNearestHit1(
 			//First update track parameters with KF, than check whether the hit is in the validation gate.
 			myf chi = 0.;
 			fFilter->Update(&par[iSubstation], &uPar, *iHit, chi);
-			if (IsHitInValidationGate(*iHit, chi)) {
+			if (IsHitInValidationGate(*iHit, chi, &uPar)) {
 				// Check if current hit is closer by statistical distance than the previous ones
 				if (chi < chiSq) {
 					chiSq = chi;
@@ -204,7 +204,7 @@ bool CbmLitTrackFinderNN::AddNearestHit2(
 			//First update track parameters with KF, than check whether the hit is in the validation gate.
 			myf chi = 0.;
 			fFilter->Update(&par[iSubstation], &uPar, *iHit, chi);
-			if (IsHitInValidationGate(*iHit, chi)) {
+			if (IsHitInValidationGate(*iHit, chi, &uPar)) {
 				// Check if current hit is closer by statistical distance than the previous ones
 				if (chi < chiSq) {
 					chiSq = chi;

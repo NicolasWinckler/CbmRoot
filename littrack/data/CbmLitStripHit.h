@@ -22,7 +22,8 @@ public:
 		fDu(0.),
 		fPhi(0.),
 		fCosPhi(0.),
-		fSinPhi(0.)	{
+		fSinPhi(0.),
+		fSegment(0) {
 		SetHitType(kLITSTRIPHIT);
 	}
 
@@ -44,6 +45,9 @@ public:
 	/* Returns sine of the strip rotation angle */
 	myf GetSinPhi() const { return fSinPhi; }
 
+	/* Returns straw tube segment */
+	myf GetSegment() const { return fSegment; }
+
 	/* Sets U measurement of the hit */
 	void SetU(myf u) { fU = u; }
 
@@ -58,6 +62,9 @@ public:
 
 	/* Sets sine of strip rotation angle */
 	void SetSinPhi(myf sinPhi) { fSinPhi = sinPhi; }
+
+	/* Sets straw tube segment */
+	void SetSegment(int segment) { fSegment = segment; }
 
 	/* Returns string representation of the class */
 	virtual std::string ToString() const {
@@ -84,6 +91,8 @@ protected:
 	myf fCosPhi;
 	/* Sine of the strip rotation angle */
 	myf fSinPhi;
+	/* Up or down segment of the straw tube */
+	int fSegment;
 };
 
 #endif /*CBMLITSTRIPHIT_H_*/

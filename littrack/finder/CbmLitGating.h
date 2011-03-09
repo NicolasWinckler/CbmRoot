@@ -29,7 +29,8 @@ public:
 	/* Returns true if hit is in validation gate */
 	bool IsHitInValidationGate(
 			const CbmLitHit* hit,
-			myf chiSq) const;
+			myf chiSq,
+			const CbmLitTrackParam* par) const;
 
 	/* Returns pair of hit iterators which define maximum and
 	 * minimum possible size of the validation gate.

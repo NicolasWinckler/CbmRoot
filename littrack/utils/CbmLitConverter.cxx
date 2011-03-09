@@ -15,6 +15,7 @@
 #include "CbmStsTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrdTrack.h"
+#include "CbmMuchStrawHit.h"
 
 #include "CbmGlobalTrack.h"
 
@@ -89,17 +90,17 @@ void CbmLitConverter::StripHitToLitStripHit(
 		CbmLitStripHit* litHit)
 {
 	litHit->SetU(hit->GetU());
-//	litHit->SetU(std::abs(hit->GetU()));
 	litHit->SetDu(hit->GetDu());
 	litHit->SetZ(hit->GetZ());
 	litHit->SetDz(hit->GetDz());
 	litHit->SetPhi(hit->GetPhi());
-//	if (hit->GetU() > 0.) litHit->SetPhi(hit->GetPhi() + 3.14159265/2.);
-//	else litHit->SetPhi(hit->GetPhi() + 1.5 * 3.14159265);
 	litHit->SetCosPhi(std::cos(litHit->GetPhi()));
 	litHit->SetSinPhi(std::sin(litHit->GetPhi()));
 	litHit->SetPlaneId(hit->GetPlaneId() - 1);
 	litHit->SetRefId(index);
+	if (hit->GetType() == kMUCHSTRAWHIT) {
+		litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
+	}
 //	hit->Print();
 //	std::cout << litHit->ToString();
 }

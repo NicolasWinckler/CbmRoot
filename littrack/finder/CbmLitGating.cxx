@@ -17,7 +17,7 @@
 #include <cmath>
 
 CbmLitGating::CbmLitGating():
-	fChiSqStripHitCut(4.),
+	fChiSqStripHitCut(9.),
 	fChiSqPixelHitCut(15.),
 	fUseFastSearch(true),
 	fSigmaCoef(3.5),
@@ -31,9 +31,22 @@ CbmLitGating::~CbmLitGating()
 
 bool CbmLitGating::IsHitInValidationGate(
 		const CbmLitHit* hit,
-		myf chiSq) const
+		myf chiSq,
+		const CbmLitTrackParam* par) const
 {
-	if (hit->GetType() == kLITSTRIPHIT) return chiSq < fChiSqStripHitCut;
+	if (hit->GetType() == kLITSTRIPHIT) {
+//		// Determine straw tube segment
+//		const CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(hit);
+//		myf devX = fSigmaCoef * std::sqrt(par->GetCovariance(0));
+//		myf devY = fSigmaCoef * std::sqrt(par->GetCovariance(5));
+//		myf vmin = -(par->GetX() - devX) * h->GetSinPhi() + (par->GetY() - devY) * h->GetCosPhi();
+//		myf vmax = -(par->GetX() + devX) * h->GetSinPhi() + (par->GetY() + devY) * h->GetCosPhi();
+//
+//		if (copysign(1.0, vmin) != copysign(1.0, vmax)) return chiSq < fChiSqStripHitCut;
+//		else return (chiSq < fChiSqStripHitCut
+//				&& copysign(1.0, vmin) == h->GetSegment());
+		return chiSq < fChiSqStripHitCut;
+	}
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;
 	return false;
 }

@@ -198,25 +198,14 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 	myf dx2 = xOut[2] - xIn[2];
 	myf dx3 = xOut[3] - xIn[3];
 	myf dx4 = xOut[4] - xIn[4];
-
-	chiSq = (((hit->GetX() - par->GetX()) * dyy - (hit->GetY() - par->GetY()) * dxy) * (hit->GetX() - par->GetX())
-		+ (-(hit->GetX() - par->GetX()) * dxy + (hit->GetY() - par->GetY()) * dxx) * (hit->GetX() - par->GetX())) / det
+	myf xmx = hit->GetX() - par->GetX();
+	myf ymy = hit->GetY() - par->GetY();
+	chiSq = ((xmx * dyy - ymy * dxy) * xmx + (-xmx * dxy + ymy * dxx) * ymy) / det
 		+ (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
 		+ (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1
 		+ (dx0 * cInInv[2] + dx1 * cInInv[6] + dx2 * cInInv[9 ] + dx3 * cInInv[10] + dx4 * cInInv[11]) * dx2
 		+ (dx0 * cInInv[3] + dx1 * cInInv[7] + dx2 * cInInv[10] + dx3 * cInInv[12] + dx4 * cInInv[13]) * dx3
 		+ (dx0 * cInInv[4] + dx1 * cInInv[8] + dx2 * cInInv[11] + dx3 * cInInv[13] + dx4 * cInInv[14]) * dx4;
-
-
-//	// Calculate chi-square
-//	myf C_0 = par->GetCovariance(0);
-//	myf C_5 = par->GetCovariance(5);
-//	myf C_1 = par->GetCovariance(1);
-//	myf dx = hit->GetX() - par->GetX();
-//	myf dy = hit->GetY() - par->GetY();
-//	myf norm = -dxx * dyy + dxx * C_5 + dyy * C_0 - C_0 * C_5 + dxy * dxy - 2 * dxy * C_1 + C_1 * C_1;
-//	if (norm == 0.) norm = 1e-10;
-//	chiSq = (-dx * dx * (dyy - C_5) - dy * dy * (dxx - C_0) + 2 * dx * dy * (dxy - C_1)) / norm;
 
 	return kLITSUCCESS;
 }
@@ -442,34 +431,17 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 
 	// Calculate chi square
 	myf zeta = hit->GetU() - phiCos*xOut[0] - phiSin*xOut[1];
-
 	myf dx0 = xOut[0] - xIn[0];
 	myf dx1 = xOut[1] - xIn[1];
 	myf dx2 = xOut[2] - xIn[2];
 	myf dx3 = xOut[3] - xIn[3];
 	myf dx4 = xOut[4] - xIn[4];
-
 	chiSq = zeta * zeta / duu
 		+ (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
 		+ (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1
 		+ (dx0 * cInInv[2] + dx1 * cInInv[6] + dx2 * cInInv[9 ] + dx3 * cInInv[10] + dx4 * cInInv[11]) * dx2
 		+ (dx0 * cInInv[3] + dx1 * cInInv[7] + dx2 * cInInv[10] + dx3 * cInInv[12] + dx4 * cInInv[13]) * dx3
 		+ (dx0 * cInInv[4] + dx1 * cInInv[8] + dx2 * cInInv[11] + dx3 * cInInv[13] + dx4 * cInInv[14]) * dx4;
-
-//	// Calculate chi-square
-//	 myf phiCosSq = phiCos * phiCos;
-//	 myf phiSinSq = phiSin * phiSin;
-//	 myf phi2SinCos = 2 * phiCos * phiSin;
-//
-//	myf C_0 = par->GetCovariance(0);
-//	myf C_5 = par->GetCovariance(5);
-//	myf C_1 = par->GetCovariance(1);
-//	myf r = hit->GetU() - par->GetX() * phiCos - par->GetY() * phiSin;
-//	myf rr = r * r;
-//	myf norm = duu + C_0 * phiCosSq + phi2SinCos * C_1 + C_5 * phiSinSq;
-////	myf norm = duu + C0 * phiCos + C5 * phiSin;
-//	chiSq = rr / norm;
-
 
 	return kLITSUCCESS;
 }

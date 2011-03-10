@@ -45,10 +45,6 @@ bool CbmLitGating::IsHitInValidationGate(
 
 		if (lit::Sign<myf>(vmin) != lit::Sign<myf>(vmax)) return chiSq < fChiSqStripHitCut;
 		else return (chiSq < fChiSqStripHitCut && lit::Sign<myf>(vmin) == h->GetSegment());
-
-//		if (copysign(1.0, vmin) != copysign(1.0, vmax)) return chiSq < fChiSqStripHitCut;
-//		else return (chiSq < fChiSqStripHitCut
-//				&& copysign(1.0, vmin) == h->GetSegment());
 //		return chiSq < fChiSqStripHitCut;
 	}
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;

@@ -335,7 +335,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetPDG(13);
 		muchFinderBranch->IsProcessSubstationsTogether(true);
-		muchFinderBranch->SetMaxNofMissingHits(2);
+		muchFinderBranch->SetMaxNofMissingHits(3);
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
 		muchFinderBranch->SetChiSqPixelHitCut(15.);//13.86);

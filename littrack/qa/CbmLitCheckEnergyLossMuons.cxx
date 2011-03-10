@@ -114,7 +114,7 @@ void CbmLitCheckEnergyLossMuons::DrawGraphs()
 //	l1->AddEntry(fCalc[3],"pair production (calculation)","lp");
 //	l1->Draw();
 
-	SaveCanvasAsImage(c1, fOutputDir);
+	lit::SaveCanvasAsImage(c1, fOutputDir);
 }
 
 void CbmLitCheckEnergyLossMuons::CalcEloss()

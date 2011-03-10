@@ -157,17 +157,17 @@ void CbmLitCheckMultipleScattering::Draw()
 	text.DrawLatex(0.0003, 400, "#sigma _{calc}=0.000116");
 //	text.DrawTextNDC(0.8, 0.7, oss2.str().c_str());
 
-	SaveCanvasAsImage(canvas1, fOutputDir);
+	lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
 	TCanvas* canvas2 = new TCanvas("energy_loss", "energy_loss", 700, 500);
 	canvas2->cd(1);
-	std::string eloss_mc = "MC(" + ToString<Double_t>(fh_eloss_mc->GetMean()) + ")";
-	std::string eloss_rec = "Reco(" + ToString<Double_t>(fh_eloss_rec->GetMean()) + ")";
+	std::string eloss_mc = "MC(" + lit::ToString<Double_t>(fh_eloss_mc->GetMean()) + ")";
+	std::string eloss_rec = "Reco(" + lit::ToString<Double_t>(fh_eloss_rec->GetMean()) + ")";
 	DrawHist1D(fh_eloss_mc, fh_eloss_rec, NULL, NULL,
 			"Energy loss", "energy loss [GeV/c]", "counter",
 			eloss_mc, eloss_rec, "","", true, true, true, 0.6, 0.6, 0.9, 0.9);
 
-	SaveCanvasAsImage(canvas2, fOutputDir);
+	lit::SaveCanvasAsImage(canvas2, fOutputDir);
 }
 
 ClassImp(CbmLitCheckMultipleScattering)

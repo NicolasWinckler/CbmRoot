@@ -42,7 +42,7 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
+		std::string str = lit::ToString<T>(Z) + "\n" + material.ToStringShort();
 		str += fieldSlice.ToStringShort();
 		return str;
 	}
@@ -85,10 +85,10 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = type + " " + ToString<int>(GetNofSubstations()) + "\n";
+		std::string str = type + " " + lit::ToString<int>(GetNofSubstations()) + "\n";
 		for (unsigned char i = 0; i < GetNofSubstations(); i++) {
 //			str += "substation\n";
-			str += ToString<int>(i) + "\n" + substations[i].ToStringShort();
+			str += lit::ToString<int>(i) + "\n" + substations[i].ToStringShort();
 		}
 		return str;
 	}
@@ -125,7 +125,7 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
+		std::string str = lit::ToString<T>(Z) + "\n" + material.ToStringShort();
 		str += fieldSliceFront.ToStringShort();
 		str += fieldSliceBack.ToStringShort();
 		return str;
@@ -173,10 +173,10 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<int>(GetNofStations()) + "\n";
+		std::string str = lit::ToString<int>(GetNofStations()) + "\n";
 		for (unsigned char i = 0; i < GetNofStations(); i++) {
 //			str += "station\n";
-			str += ToString<int>(i) + "\n" + stations[i].ToStringShort();
+			str += lit::ToString<int>(i) + "\n" + stations[i].ToStringShort();
 		}
 //		str += "absorber\n";
 		str += absorber.ToStringShort();
@@ -240,10 +240,10 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<int>(GetNofStationGroups()) + "\n";
+		std::string str = lit::ToString<int>(GetNofStationGroups()) + "\n";
 		for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
 //			str += "station group\n";
-			str += ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
+			str += lit::ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
 		}
 		return str;
 	}

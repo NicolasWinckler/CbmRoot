@@ -93,48 +93,48 @@ void CbmTrdHitsQa::CreateHistos()
 
 
 	for (Int_t i = 0; i < fNofPlanes; i++) {
-		std::string histName = "hX" + ToString<Int_t>(i);
-		std::string histTitle = "X distribution on " + ToString<Int_t>(i) + " plane";
+		std::string histName = "hX" + lit::ToString<Int_t>(i);
+		std::string histTitle = "X distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhX[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhX[i]);
 
-		histName = "hY" + ToString<Int_t>(i);
-		histTitle = "Y distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hY" + lit::ToString<Int_t>(i);
+		histTitle = "Y distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhY[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhY[i]);
 
-		histName = "hDx" + ToString<Int_t>(i);
-		histTitle = "Dx distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hDx" + lit::ToString<Int_t>(i);
+		histTitle = "Dx distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhDx[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhDx[i]);
 
-		histName = "hDy" + ToString<Int_t>(i);
-		histTitle = "Dy distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hDy" + lit::ToString<Int_t>(i);
+		histTitle = "Dy distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhDy[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhDy[i]);
 
-		histName = "hXY" + ToString<Int_t>(i);
-		histTitle = "XY distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hXY" + lit::ToString<Int_t>(i);
+		histTitle = "XY distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhXY[i] = new TH2F(histName.c_str(), histTitle.c_str(), nBins, -500, 500, nBins, -500, 500);
 		fHistoList->Add(fhXY[i]);
 
-		histName = "hResX" + ToString<Int_t>(i);
-		histTitle = "Residual X distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hResX" + lit::ToString<Int_t>(i);
+		histTitle = "Residual X distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhResX[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhResX[i]);
 
-		histName = "hResY" + ToString<Int_t>(i);
-		histTitle = "Residual Y distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hResY" + lit::ToString<Int_t>(i);
+		histTitle = "Residual Y distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhResY[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhResY[i]);
 
-		histName = "hPullX" + ToString<Int_t>(i);
-		histTitle = "Pull X distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hPullX" + lit::ToString<Int_t>(i);
+		histTitle = "Pull X distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhPullX[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhPullX[i]);
 
-		histName = "hPullY" + ToString<Int_t>(i);
-		histTitle = "Pull Y distribution on " + ToString<Int_t>(i) + " plane";
+		histName = "hPullY" + lit::ToString<Int_t>(i);
+		histTitle = "Pull Y distribution on " + lit::ToString<Int_t>(i) + " plane";
 		fhPullY[i] = new TH1F(histName.c_str(), histTitle.c_str(), nBins, min, max);
 		fHistoList->Add(fhPullY[i]);
 	}
@@ -208,29 +208,29 @@ void CbmTrdHitsQa::Draw()
 		DrawHist1D(fhX[i], "X [cm]", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			   		LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chX, fOutputDir);
+		lit::SaveCanvasAsImage(chX, fOutputDir);
 
 		chY->cd(i + 1);
 		DrawHist1D(fhY[i], "Y [cm]", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 					LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chY, fOutputDir);
+		lit::SaveCanvasAsImage(chY, fOutputDir);
 
 		chDx->cd(i + 1);
 		DrawHist1D(fhDx[i], "Dx [cm]", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			   		LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chDx, fOutputDir);
+		lit::SaveCanvasAsImage(chDx, fOutputDir);
 
 		chDy->cd(i + 1);
 		DrawHist1D(fhDy[i], "Dy [cm]", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 					LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chDy, fOutputDir);
+		lit::SaveCanvasAsImage(chDy, fOutputDir);
 
 		chXY->cd(i + 1);
 		DrawHist2D(fhXY[i], "X [cm]", "Y [cm]", "Counter", false, false, true, "colz");
-		SaveCanvasAsImage(chXY, fOutputDir);
+		lit::SaveCanvasAsImage(chXY, fOutputDir);
 
 
 
@@ -239,19 +239,19 @@ void CbmTrdHitsQa::Draw()
 		DrawHist1D(fhResX[i], "Residual X [cm]", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			   		LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chResX, fOutputDir);
+		lit::SaveCanvasAsImage(chResX, fOutputDir);
 
 		chResY->cd(i + 1);
 		DrawHist1D(fhResY[i], "Residual Y [cm]", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 					LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chResY, fOutputDir);
+		lit::SaveCanvasAsImage(chResY, fOutputDir);
 
 		chPullX->cd(i + 1);
 		DrawHist1D(fhPullX[i], "Pull X", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			   		LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chPullX, fOutputDir);
+		lit::SaveCanvasAsImage(chPullX, fOutputDir);
 
 		TH1F* hist = fhPullX[i];
 		hist->Fit("gaus");
@@ -267,7 +267,7 @@ void CbmTrdHitsQa::Draw()
 		DrawHist1D(fhPullY[i], "Pull Y", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 					LIT_MARKER_STYLE1, false, true, "");
-		SaveCanvasAsImage(chPullY, fOutputDir);
+		lit::SaveCanvasAsImage(chPullY, fOutputDir);
 		hist = fhPullY[i];
 		hist->Fit("gaus");
 		fit = hist->GetFunction("gaus");

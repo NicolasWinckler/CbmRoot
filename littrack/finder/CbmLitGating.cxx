@@ -12,6 +12,7 @@
 #include "data/CbmLitPixelHit.h"
 #include "utils/CbmLitMath.h"
 #include "utils/CbmLitComparators.h"
+#include "utils/CbmLitUtils.h"
 
 #include <algorithm>
 #include <cmath>
@@ -42,9 +43,12 @@ bool CbmLitGating::IsHitInValidationGate(
 		myf vmin = -(par->GetX() - devX) * h->GetSinPhi() + (par->GetY() - devY) * h->GetCosPhi();
 		myf vmax = -(par->GetX() + devX) * h->GetSinPhi() + (par->GetY() + devY) * h->GetCosPhi();
 
-		if (copysign(1.0, vmin) != copysign(1.0, vmax)) return chiSq < fChiSqStripHitCut;
-		else return (chiSq < fChiSqStripHitCut
-				&& copysign(1.0, vmin) == h->GetSegment());
+		if (lit::Sign<myf>(vmin) != lit::Sign<myf>(vmax)) return chiSq < fChiSqStripHitCut;
+		else return (chiSq < fChiSqStripHitCut && lit::Sign<myf>(vmin) == h->GetSegment());
+
+//		if (copysign(1.0, vmin) != copysign(1.0, vmax)) return chiSq < fChiSqStripHitCut;
+//		else return (chiSq < fChiSqStripHitCut
+//				&& copysign(1.0, vmin) == h->GetSegment());
 //		return chiSq < fChiSqStripHitCut;
 	}
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;

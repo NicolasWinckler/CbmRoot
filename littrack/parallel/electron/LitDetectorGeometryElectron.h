@@ -65,11 +65,11 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<T>(Z) + "\n";
-		str += ToString<T>(GetNofMaterialsBefore) + "\n";
+		std::string str = lit::ToString<T>(Z) + "\n";
+		str += lit::ToString<T>(GetNofMaterialsBefore) + "\n";
 		for (unsigned char i = 0; i < GetNofMaterialsBefore(); i++)
 			str += materialsBefore[i].ToStringShort() + "\n";
-		str += ToString<T>(GetNofMaterialsAfter) + "\n";
+		str += lit::ToString<T>(GetNofMaterialsAfter) + "\n";
 		for (unsigned char i = 0; i < GetNofMaterialsAfter(); i++)
 			str += materialsAfter[i].ToStringShort() + "\n";
 		return str;
@@ -112,7 +112,7 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
+		std::string str = lit::ToString<T>(Z) + "\n" + material.ToStringShort();
 		str += fieldSlice.ToStringShort();
 		str += fieldSliceMid.ToStringShort();
 		return str;
@@ -154,10 +154,10 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<int>(GetNofStations()) + "\n";
+		std::string str = lit::ToString<int>(GetNofStations()) + "\n";
 		for (unsigned char i = 0; i < GetNofStations(); i++) {
 //			str += "station\n";
-			str += ToString<int>(i) + "\n" + stations[i].ToStringShort();
+			str += lit::ToString<int>(i) + "\n" + stations[i].ToStringShort();
 		}
 		return str;
 	}
@@ -234,15 +234,15 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<int>(GetNofVirtualPlanes()) + "\n";
+		std::string str = lit::ToString<int>(GetNofVirtualPlanes()) + "\n";
 		for (unsigned char i = 0; i < GetNofVirtualPlanes(); i++) {
 		//	str += "virtual planes\n";
-			str += ToString<int>(i) + "\n" + virtualPlanes[i].ToStringShort();
+			str += lit::ToString<int>(i) + "\n" + virtualPlanes[i].ToStringShort();
 		}
-		str = ToString<int>(GetNofStationGroups()) + "\n";
+		str = lit::ToString<int>(GetNofStationGroups()) + "\n";
 		for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
 //			str += "station group\n";
-			str += ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
+			str += lit::ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
 		}
 		return str;
 	}

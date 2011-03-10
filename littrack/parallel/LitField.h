@@ -401,12 +401,12 @@ public:
 	}
 
 	std::string ToStringShort() {
-		std::string str = ToString<T>(Z) + "\n";
-		for(unsigned int i = 0; i < N; i++) str += ToString<T>(cx[i]) + " ";
+		std::string str = lit::ToString<T>(Z) + "\n";
+		for(unsigned int i = 0; i < N; i++) str += lit::ToString<T>(cx[i]) + " ";
 		str += "\n";
-		for(unsigned int i = 0; i < N; i++) str += ToString<T>(cy[i]) + " ";
+		for(unsigned int i = 0; i < N; i++) str += lit::ToString<T>(cy[i]) + " ";
 		str += "\n";
-		for(unsigned int i = 0; i < N; i++) str += ToString<T>(cz[i]) + " ";
+		for(unsigned int i = 0; i < N; i++) str += lit::ToString<T>(cz[i]) + " ";
 		str += "\n";
 		return str;
 	}

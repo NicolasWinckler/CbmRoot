@@ -560,7 +560,7 @@ void CbmLitCheckField::DrawSlices(
 		DrawHist2D(hist5, "X [cm]", "Y [cm]", std::string(title + " relative error [%]"),
 						false, false, false, "colz");
 
-		SaveCanvasAsImage(canvas[i], fOutputDir);
+		lit::SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
@@ -622,7 +622,7 @@ void CbmLitCheckField::DrawPoly(
 		canvas[i]->cd(1);
 		l1->Draw();
 
-		SaveCanvasAsImage(canvas[i], fOutputDir);
+		lit::SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
@@ -653,7 +653,7 @@ void CbmLitCheckField::DrawPhd(
 		DrawHist2D(hist3, "X [cm]", "Y [cm]", title,
 						false, false, false, "colz");
 
-		SaveCanvasAsImage(canvas[i], fOutputDir);
+		lit::SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
@@ -661,7 +661,7 @@ void CbmLitCheckField::DrawField()
 {
 	TCanvas* canvas[fNofSlices];
 	for (Int_t s = 0; s < fNofSlices; s++) {
-		std::string ss = "field_map_at_z_" +ToString<Double_t>(fZpos[s]);
+		std::string ss = "field_map_at_z_" + lit::ToString<Double_t>(fZpos[s]);
 		canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 1200,400);
 		canvas[s]->Divide(2, 2);
 	}
@@ -687,7 +687,7 @@ void CbmLitCheckField::DrawField()
 		DrawGraph2D(graphMod, "X [cm]", "Y [cm]", "|B| [kGauss]",
 					false, false, false, "TRI1");
 
-		SaveCanvasAsImage(canvas[i], fOutputDir);
+		lit::SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
@@ -703,11 +703,11 @@ void CbmLitCheckField::DrawFieldAlongZ()
 		TGraph* graphBz = fhBAlongZGraph[BZ][i];
 
 		DrawGraph(graphBx, graphBy, graphBz,
-				std::string(ToString<double>(fAlongZAngles[i]) + "#circ"),
+				std::string(lit::ToString<double>(fAlongZAngles[i]) + "#circ"),
 				"Z [cm]", "B [kGauss]",
 				"B_{x}", "B_{y}", "B_{z}", false, false, true,
 				0.7, 0.5, 0.9, 0.3);
 	}
-	SaveCanvasAsImage(canvas, fOutputDir);
+	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 ClassImp(CbmLitCheckField);

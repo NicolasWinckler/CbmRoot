@@ -866,9 +866,9 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	if (fIsMuch) signal = "muons"; else signal = "electrons";
 
 	std::string hname1(sname), hname2(hgname), hname3(gname);
-	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhStsMom[ALL][REC], fhStsMom[ALL][ACC])) + ")";
-	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[ALL][REC], fhHalfGlobalMom[ALL][ACC])) + ")";
-	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[ALL][REC], fhGlobalMom[ALL][ACC])) + ")";
+	hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhStsMom[ALL][REC], fhStsMom[ALL][ACC])) + ")";
+	hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[ALL][REC], fhHalfGlobalMom[ALL][ACC])) + ")";
+	hname3 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhGlobalMom[ALL][REC], fhGlobalMom[ALL][ACC])) + ")";
 	c1->cd();
 	fhStsMom[ALL][EFF]->SetMinimum(0.);
 	fhStsMom[ALL][EFF]->SetMaximum(1.);
@@ -881,16 +881,16 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
 			false, false, true, 0.3,0.3,0.85,0.6);
 	}
-	SaveCanvasAsImage(c1, fOutputDir);
+	lit::SaveCanvasAsImage(c1, fOutputDir);
 
 	Int_t cat;
 	if (fIsMuch) cat = MU; else cat = EL;
 	hname1 = sname;
 	hname2 = hgname;
 	hname3 = gname;
-	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhStsMom[cat][REC], fhStsMom[cat][ACC])) + ")";
-	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[cat][REC], fhHalfGlobalMom[cat][ACC])) + ")";
-	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[cat][REC], fhGlobalMom[cat][ACC])) + ")";
+	hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhStsMom[cat][REC], fhStsMom[cat][ACC])) + ")";
+	hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[cat][REC], fhHalfGlobalMom[cat][ACC])) + ")";
+	hname3 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhGlobalMom[cat][REC], fhGlobalMom[cat][ACC])) + ")";
 	c2->cd();
 	fhStsMom[cat][EFF]->SetMinimum(0.);
 	fhStsMom[cat][EFF]->SetMaximum(1.);
@@ -903,32 +903,32 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 				"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
 				false, false, true, 0.3,0.3,0.85,0.6);
 	}
-	SaveCanvasAsImage(c2, fOutputDir);
+	lit::SaveCanvasAsImage(c2, fOutputDir);
 
 
 	hname1 = rname + ": all";
 	hname2 = rname + ": " + signal;
 	c3->cd();
-	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhRecMom[ALL][REC], fhRecMom[ALL][ACC]))+ ")";
-	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhRecMom[cat][REC], fhRecMom[cat][ACC])) + ")";
+	hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhRecMom[ALL][REC], fhRecMom[ALL][ACC]))+ ")";
+	hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhRecMom[cat][REC], fhRecMom[cat][ACC])) + ")";
 	fhRecMom[ALL][EFF]->SetMinimum(0.);
 	fhRecMom[ALL][EFF]->SetMaximum(1.);
 	DrawHist1D(fhRecMom[ALL][EFF], fhRecMom[cat][EFF], NULL, NULL,
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
 			false, false, true, 0.3,0.3,0.85,0.6);
-	SaveCanvasAsImage(c3, fOutputDir);
+	lit::SaveCanvasAsImage(c3, fOutputDir);
 
 	hname1 = "TOF: all";
 	hname2 = "TOF: " + signal;
-	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhTofMom[ALL][REC], fhTofMom[ALL][ACC])) + ")";
-	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhTofMom[cat][REC], fhTofMom[cat][ACC])) + ")";
+	hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhTofMom[ALL][REC], fhTofMom[ALL][ACC])) + ")";
+	hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhTofMom[cat][REC], fhTofMom[cat][ACC])) + ")";
 	c4->cd();
 	fhTofMom[ALL][EFF]->SetMinimum(0.);
 	fhTofMom[ALL][EFF]->SetMaximum(1.);
 	DrawHist1D(fhTofMom[ALL][EFF], fhTofMom[cat][EFF], NULL, NULL,
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
 			false, false, true, 0.3,0.3,0.85,0.6);
-	SaveCanvasAsImage(c4, fOutputDir);
+	lit::SaveCanvasAsImage(c4, fOutputDir);
 }
 
 Double_t CbmLitReconstructionQa::CalcEfficiency(
@@ -967,20 +967,20 @@ void CbmLitReconstructionQa::DrawHitsHistos(
 	c->cd(1);
 	DrawHist1D(histos[0], histos[1], histos[2], NULL,
 				"Number of hits", "Number of hits", "Counter",
-				"all: " + ToString<Double_t>(histos[0]->GetMean()),
-				"true: " + ToString<Double_t>(histos[1]->GetMean()),
-				"fake: " + ToString<Double_t>(histos[2]->GetMean()),  "",
+				"all: " + lit::ToString<Double_t>(histos[0]->GetMean()),
+				"true: " + lit::ToString<Double_t>(histos[1]->GetMean()),
+				"fake: " + lit::ToString<Double_t>(histos[2]->GetMean()),  "",
 				false, true, true, 0.25,0.99,0.55,0.75);
 
 	c->cd(2);
 	DrawHist1D(histos[3], histos[4], NULL, NULL,
 				"Ratio", "Ratio", "Counter",
-				"true/all: " + ToString<Double_t>(histos[3]->GetMean()),
-				"fake/all: " + ToString<Double_t>(histos[4]->GetMean()),
+				"true/all: " + lit::ToString<Double_t>(histos[3]->GetMean()),
+				"fake/all: " + lit::ToString<Double_t>(histos[4]->GetMean()),
 				"", "",
 				false, true, true, 0.25,0.99,0.55,0.75);
 
-	SaveCanvasAsImage(c, fOutputDir);
+	lit::SaveCanvasAsImage(c, fOutputDir);
 }
 
 void CbmLitReconstructionQa::DrawHitsStationHistos()
@@ -990,7 +990,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   DrawHist1D(fhTrdNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 	   			LIT_MARKER_STYLE1, false, false, "");
-	   SaveCanvasAsImage(cTrdHits, fOutputDir);
+	   lit::SaveCanvasAsImage(cTrdHits, fOutputDir);
    }
 
    if (fIsMuch){
@@ -998,7 +998,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   DrawHist1D(fhMuchNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 	   			LIT_MARKER_STYLE1, false, false, "");
-	   SaveCanvasAsImage(cMuchHits, fOutputDir);
+	   lit::SaveCanvasAsImage(cMuchHits, fOutputDir);
    }
 
    if (fIsTof){
@@ -1006,7 +1006,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   DrawHist1D(fhTofNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 	   			LIT_MARKER_STYLE1, false, false, "");
-	   SaveCanvasAsImage(cTofHits, fOutputDir);
+	   lit::SaveCanvasAsImage(cTofHits, fOutputDir);
    }
 }
 

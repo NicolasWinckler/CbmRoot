@@ -723,7 +723,7 @@ void CbmLitPropagationAnalysis::Draw()
 		if (c == 1 && !fIsDrawFilter) continue;
 		if (c == 2 && !fIsDrawSmoother) continue;
 		for (int i = 0; i < fNofPlanes; i++) {
-			std::string name = cnames[c] + ToString<int>(i);
+			std::string name = cnames[c] + lit::ToString<int>(i);
 			canvas[c][i] = new TCanvas(name.c_str(),name.c_str(),1200,800);
 			canvas[c][i]->Divide(4, 3);
 		}
@@ -796,7 +796,7 @@ void CbmLitPropagationAnalysis::DrawHistos(
 			}
 			DrawHistSigmaRMS(i, sigma, rms);
 		}
-		SaveCanvasAsImage(c[plane], fOutputDir);
+		lit::SaveCanvasAsImage(c[plane], fOutputDir);
 		if (fIsCloseCanvas) c[plane]->Close();
 	}
 }
@@ -810,7 +810,7 @@ void CbmLitPropagationAnalysis::DrawForPhd()
 		if (c == 0 && !fIsDrawPropagation) continue;
 		if (c == 1 && !fIsDrawFilter) continue;
 		if (c == 2 && !fIsDrawSmoother) continue;
-		std::string name = cnames[c] + ToString<int>(fPlaneNoPhd);
+		std::string name = cnames[c] + lit::ToString<int>(fPlaneNoPhd);
 		canvas[c] = new TCanvas(name.c_str(),name.c_str(),1600,450);
 		canvas[c]->Divide(nofHist, 1);
 	}
@@ -844,7 +844,7 @@ void CbmLitPropagationAnalysis::DrawForPhd(
 		Double_t rms = hist->GetRMS();
 		DrawHistSigmaRMS(j, sigma, rms);
 	}
-	SaveCanvasAsImage(canvas, fOutputDir);
+	lit::SaveCanvasAsImage(canvas, fOutputDir);
 	if (fIsCloseCanvas) canvas->Close();
 }
 

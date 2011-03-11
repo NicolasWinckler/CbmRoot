@@ -1,3 +1,8 @@
+/** CbmLitTrackFitterImp.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
+
 #include "fitter/CbmLitTrackFitterImp.h"
 
 #include "data/CbmLitTrackParam.h"

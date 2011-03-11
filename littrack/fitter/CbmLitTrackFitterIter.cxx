@@ -1,3 +1,8 @@
+/** CbmLitTrackFitterIter.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
+
 #include "fitter/CbmLitTrackFitterIter.h"
 
 #include "data/CbmLitTrack.h"
@@ -7,13 +12,13 @@
 
 CbmLitTrackFitterIter::CbmLitTrackFitterIter(
 		TrackFitterPtr fitter,
-		TrackFitterPtr smoother)
+		TrackFitterPtr smoother):
+		fFitter(fitter),
+		fSmoother(smoother),
+		fNofIterations(2),
+		fChiSqCut(15.),
+		fMinNofHits(3)
 {
-	fFitter = fitter;
-	fSmoother = smoother;
-	fNofIterations = 1;
-	fChiSqCut = 10.;
-	fMinNofHits = 2;
 }
 
 CbmLitTrackFitterIter::~CbmLitTrackFitterIter()

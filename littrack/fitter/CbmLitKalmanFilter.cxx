@@ -1,3 +1,8 @@
+/** CbmLitKalmanFilter.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
+
 #include "fitter/CbmLitKalmanFilter.h"
 
 #include "data/CbmLitStripHit.h"

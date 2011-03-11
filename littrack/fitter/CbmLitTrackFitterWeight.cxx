@@ -1,4 +1,9 @@
-#include "fitter/CbmLitTrackFitterRobust.h"
+/** CbmLitTrackFitterWeight.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2008
+ **/
+
+#include "fitter/CbmLitTrackFitterWeight.h"
 
 #include "base/CbmLitEnums.h"
 #include "data/CbmLitHit.h"

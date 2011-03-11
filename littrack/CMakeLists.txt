@@ -85,7 +85,7 @@ finder/CbmLitGating.cxx
 ##finder_cbm/CbmLitFindGlobalTracks.cxx 
 fitter/CbmLitTrackFitterImp.cxx 
 fitter/CbmLitKalmanFilter.cxx
-fitter/CbmLitTrackFitterRobust.cxx 
+fitter/CbmLitTrackFitterWeight.cxx 
 fitter/CbmLitKalmanSmoother.cxx
 fitter/CbmLitTrackFitterIter.cxx 
 geo/CbmLitDet.cxx

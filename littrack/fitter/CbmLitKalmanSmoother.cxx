@@ -1,3 +1,8 @@
+/** CbmLitKalmanSmoother.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
+
 #include "fitter/CbmLitKalmanSmoother.h"
 
 #include "data/CbmLitTrack.h"

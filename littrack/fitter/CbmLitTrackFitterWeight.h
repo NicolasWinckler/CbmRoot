@@ -1,9 +1,11 @@
 /** CbmLitTrackFitterWeight.h
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2008
- **
- **
+ *
+ * Class implements iterative Kalman filter track fit
+ * with calculation of weights and simulated annealing procedure.
  **/
+
 #ifndef CBMLITTRACKFITTERROBUST_H_
 #define CBMLITTRACKFITTERROBUST_H_
 
@@ -20,15 +22,23 @@ class CbmLitTrack;
 class CbmLitTrackFitterWeight : public CbmLitTrackFitter
 {
 public:
+	/* Constructor
+	 *@param propagator Track propagation tool
+	 *@param update Track update tool */
 	CbmLitTrackFitterWeight(
 			TrackFitterPtr fitter,
 			TrackFitterPtr smoother);
 
+	/* Destructor */
 	virtual ~CbmLitTrackFitterWeight();
 
+	/* Inherited from CbmLitTool */
 	virtual LitStatus Initialize();
+
+	/* Inherited from CbmLitTool */
 	virtual LitStatus Finalize();
 
+	/* inherited from CbmLitTrackFitter */
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
 			bool downstream = true);

@@ -16,7 +16,7 @@
 #include "fitter/CbmLitKalmanFilter.h"
 #include "fitter/CbmLitKalmanSmoother.h"
 #include "fitter/CbmLitTrackFitterImp.h"
-#include "fitter/CbmLitTrackFitterRobust.h"
+#include "fitter/CbmLitTrackFitterWeight.h"
 #include "fitter/CbmLitTrackFitterIter.h"
 #include "interface/CbmLitField.h"
 #include "propagation/CbmLitRK4TrackExtrapolator.h"

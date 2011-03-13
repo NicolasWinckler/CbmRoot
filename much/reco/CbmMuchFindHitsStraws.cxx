@@ -122,6 +122,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
   static Double_t radIn[6];
   Double_t diam[6] = {0.62, 0.62, 0.62, 0.62, 0.62, 0.62}; // tube diameters
   Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
+  //Double_t sigmaX = 0.5, sigmaY = 0.5; // 5mm
   const Double_t sigmaBin = diam[0] / TMath::Sqrt(12.);
 
   Double_t phi[3] = {fPhis[0] * TMath::DegToRad(), fPhis[1] * TMath::DegToRad(), fPhis[2] * TMath::DegToRad()}; // rotation angles of views (doublets)
@@ -137,7 +138,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
       radIn[i] = st->GetRmin();
       CbmMuchModule *mod = fGeoScheme->GetModule(i,0,0,0);
       cout << i << " " << radIn[i] << " " << mod->GetSize().X() << " " << mod->GetSize().Y() << " " << mod->GetSize().Z() << " " << mod->GetDetectorType() << endl;
-      //if (mod->GetDetectorType() == 2) assert (TMath::Abs(mod->GetSize().Z()-diam[i]) < 0.1); // tube diameter
+      if (mod->GetDetectorType() == 2) assert (TMath::Abs(mod->GetSize().Z()-diam[i]) < 0.1); // tube diameter
     }
   }
 

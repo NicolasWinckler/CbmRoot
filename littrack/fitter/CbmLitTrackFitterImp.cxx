@@ -80,7 +80,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	else track->SetParamFirst(&par);
 
 	track->SetFitNodes(nodes);
-	track->SetNDF(NDF(track));
+	track->SetNDF(lit::NDF(track));
 
 	return kLITSUCCESS;
 }

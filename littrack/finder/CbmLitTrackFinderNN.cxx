@@ -182,7 +182,7 @@ bool CbmLitTrackFinderNN::AddNearestHit1(
 		track->AddHit(*hit);
 		track->SetParamLast(&param);
 		track->SetChi2(track->GetChi2() + chiSq);
-		track->SetNDF(NDF(track));
+		track->SetNDF(lit::NDF(track));
 		hitAdded = true;
 	}
 	return hitAdded;
@@ -218,7 +218,7 @@ bool CbmLitTrackFinderNN::AddNearestHit2(
 			track->AddHit(*hit);
 			track->SetParamLast(&param);
 			track->SetChi2(track->GetChi2() + chiSq);
-			track->SetNDF(NDF(track));
+			track->SetNDF(lit::NDF(track));
 			hitAdded = true;
 		}
 	}

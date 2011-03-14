@@ -46,15 +46,14 @@ LitStatus CbmLitKalmanSmoother::Fit(
 	// Calculate the chi2 of the track
 	track->SetChi2(0.);
 	for (int i = 0; i < n; i++) {
-		// FIXME:
-		myf chi2Hit = 0.;//ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
+		myf chi2Hit = lit::ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
 		nodes[i].SetChiSqSmoothed(chi2Hit);
 		track->SetChi2(track->GetChi2() + chi2Hit);
 	}
 
 	track->SetParamFirst(nodes[0].GetSmoothedParam());
 	track->SetFitNodes(nodes);
-	track->SetNDF(NDF(track));
+	track->SetNDF(lit::NDF(track));
 
 	return kLITSUCCESS;
 }

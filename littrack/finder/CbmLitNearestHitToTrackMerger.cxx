@@ -88,7 +88,7 @@ bool CbmLitNearestHitToTrackMerger::AddNearestHit(
 		track->AddHit(*hit);
 		track->SetParamLast(&param);
 		track->SetChi2(track->GetChi2() + chiSq);
-		track->SetNDF(NDF(track));
+		track->SetNDF(lit::NDF(track));
 		hitAdded = true;
 	}
 	return hitAdded;

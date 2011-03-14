@@ -323,7 +323,7 @@ bool CbmLitTrackFinderBranch::AddTrackCandidate(
 		if (fNofBranchesStationGroup > fMaxNofBranchesStationGroup) return false;
 		CbmLitTrack* newTrack = new CbmLitTrack(**it);
 		newTrack->SetLastPlaneId(stationGroup);
-		newTrack->SetNDF(NDF(newTrack));
+		newTrack->SetNDF(lit::NDF(newTrack));
 		fFoundTracks.push_back(newTrack);
 	}
 	return true;

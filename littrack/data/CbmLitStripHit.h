@@ -46,7 +46,7 @@ public:
 	myf GetSinPhi() const { return fSinPhi; }
 
 	/* Returns straw tube segment */
-	myf GetSegment() const { return fSegment; }
+	int GetSegment() const { return fSegment; }
 
 	/* Sets U measurement of the hit */
 	void SetU(myf u) { fU = u; }

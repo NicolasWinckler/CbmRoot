@@ -2,7 +2,7 @@
  *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2007
  **
- ** The class performs line track extrapolation of the track parameters.
+ ** Class performs line track extrapolation of track parameters.
  **/
 
 #ifndef CBMLITLINETRACKEXTRAPOLATOR_H_

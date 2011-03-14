@@ -1,8 +1,6 @@
 /** CbmLitCleverTrackExtrapolator.cxx
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2009
- **
- **
  **/
 
 #include "propagation/CbmLitCleverTrackExtrapolator.h"

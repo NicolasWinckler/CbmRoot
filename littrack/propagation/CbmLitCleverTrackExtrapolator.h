@@ -2,10 +2,10 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2009
  **
- ** The class for track extrapolation. It uses either line track extrapolation
+ ** Class performs track extrapolation. It uses either line track extrapolation
  ** in the field free regions or Runge-Kutta of the 4th order in the magnetic field.
- ** The start Z position for the line track extrapolation is defined by LINE_EXTRAPOLATION_START_Z
- ** in the CbmLitDefaultSettings.h
+ ** The start Z position for the line track extrapolation is defined by
+ ** lit::LINE_EXTRAPOLATION_START_Z in the littrack/base/CbmLitDefaultSettings.h
  **/
 
 #ifndef CBMLITCLEVERTRACKEXTRAPOLATOR_H_

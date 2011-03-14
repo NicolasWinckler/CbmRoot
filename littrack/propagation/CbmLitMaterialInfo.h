@@ -3,7 +3,7 @@
  * @since 2008
  * @version 1.0
  **
- ** Data class to store information about detector materials.
+ ** Data class to store information about detector material.
  **/
 
 #ifndef CBMLITMATERIALINFO_H_
@@ -60,10 +60,10 @@ public:
 	/*@return Density */
 	myf GetRho() const { return fRho;}
 
-	/*@return */
+	/*@return Atomic number */
 	myf GetZ() const { return fZ;}
 
-	/*@return  */
+	/*@return  Atomic mass */
 	myf GetA() const { return fA;}
 
 	/*@return Z position of the material */
@@ -78,10 +78,10 @@ public:
 	/* Sets density */
 	void SetRho(myf rho) {fRho = rho;}
 
-	/* Sets Z */
+	/* Sets atomic number */
 	void SetZ(myf Z) {fZ = Z;}
 
-	/* Sets A */
+	/* Sets atomic mass */
 	void SetA(myf A) {fA = A;}
 
 	/* Sets Z position of the material */
@@ -100,8 +100,8 @@ private:
 	myf fLength; // Length of the material [cm]
 	myf fRL; // Radiation length [cm]
 	myf fRho; // Density [g/cm^3]
-	myf fZ; //
-	myf fA; //
+	myf fZ; // Atomic number
+	myf fA; // Atomic mass
 	myf fZpos; // Z position of the material
 };
 

@@ -2,8 +2,8 @@
  *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2008
  **
- ** The class performs calculation of the material effects, such as multiple
- ** scattering and energy loss, on the track parameters.
+ ** Class performs calculation of the material effects (multiple
+ ** scattering and energy loss).
  **/
 
 #ifndef CBMLITMATERIALEFFECTSIMP_H_
@@ -18,13 +18,19 @@ class CbmLitMaterialInfo;
 class CbmLitMaterialEffectsImp : public CbmLitMaterialEffects
 {
 public:
+	/* Constructor */
 	CbmLitMaterialEffectsImp();
+
+	/* Destructor */
 	virtual ~CbmLitMaterialEffectsImp();
 
-	// derived from CbmTool
+	/* Inherited from CbmLitTool */
 	virtual LitStatus Initialize();
+
+	/* Inherited from CbmLitTool */
 	virtual LitStatus Finalize();
 
+	/* Inherited from CbmLitMaterialEffects */
 	LitStatus Update(
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat,
@@ -98,9 +104,13 @@ public:
 	myf CalcI(
 			myf Z) const;
 private:
+	/* Propagation direction */
 	bool fDownstream;
+	/* Hypothesis on particle mass */
 	myf fMass;
+	/* True if particle is an electron or positron */
 	bool fIsElectron;
+	/* True if particle is muon */
 	bool fIsMuon;
 };
 

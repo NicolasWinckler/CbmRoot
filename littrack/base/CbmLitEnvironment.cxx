@@ -781,12 +781,23 @@ bool CbmLitEnvironment::CheckDetectorPresence(
 		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
 		if (TString(node->GetName()).Contains(name.c_str())) return true;
 	}
+
+	if (name == "mvd") {
+		TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+		if (node1 && node1->GetVolume()->FindNode("mvdstation01_0")) return true;
+	}
+
 	return false;
 }
 
 bool CbmLitEnvironment::IsElectronSetup() const
 {
 	return CheckDetectorPresence("rich");// || CheckDetectorPresence("trd");
+}
+
+bool CbmLitEnvironment::IsMvd() const
+{
+	return CheckDetectorPresence("mvd");
 }
 
 bool CbmLitEnvironment::IsSts() const

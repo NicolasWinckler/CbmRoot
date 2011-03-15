@@ -5,6 +5,8 @@
  * Macro determines detector presence in the CBM setup.
  **/
 
+
+
 /* Determines detector presence in the TGeo by its name.
  * @param parFile Name of the parameter file with TGeo.
  * @param name Detector name.
@@ -14,23 +16,28 @@ Bool_t CheckDetectorPresence(
 		const TString& parFile,
 		const char* name)
 {
-
-       TFile *currentfile = gFile;
-       TFile* f = new TFile(parFile);
-       f->Get("FairBaseParSet");
+	TFile *currentfile = gFile;
+	TFile* f = new TFile(parFile);
+	f->Get("FairBaseParSet");
        
-//	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
-
 	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
-//	std::cout << "Number of nodes:" << nodes->GetEntriesFast() << std::endl;
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-//		std::cout << "  node " << iNode;
 		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-//		std::cout << " " << node->GetName() << std::endl;
 		if (TString(node->GetName()).Contains(name)) {
 			f->Close();
 			delete f;
             gFile=currentfile;
+			return true;
+		}
+	}
+	if (std::string(name) == "mvd") {
+		TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+		TGeoNode* node2 = NULL;
+		if (node1) node2 = node1->GetVolume()->FindNode("mvdstation01_0");
+		if (node2) {
+			f->Close();
+			delete f;
+			gFile=currentfile;
 			return true;
 		}
 	}
@@ -79,7 +86,6 @@ Bool_t IsRich(
 {
 	return CheckDetectorPresence(parFile, "rich");
 }
-
 
 /* Determines MVD detector presence in the TGeo.
  * @param parFile Name of the parameter file with TGeo.

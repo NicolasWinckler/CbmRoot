@@ -369,7 +369,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		mvdFinderNN->SetFinalSelection(CreateTrackSelection("empty"));
 		mvdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		mvdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMvdLayout());
-		mvdFinderNN->SetVerbose(3);
+		mvdFinderNN->SetVerbose(1);
 		mvdFinderNN->SetNofIter(1);
 		mvdFinderNN->IsUseFastSearch(true);
 		mvdFinderNN->SetMaxNofMissingHits(1);

@@ -140,7 +140,7 @@ void CbmLitFindMvdTracks::ConvertOutputData()
 			FairHit* hit = static_cast<FairHit*>(fMvdHits->At(refId));
 			track->AddMvdHit(refId, hit);
 		}
-		std::cout << "Track converted: " << litTrack->ToString();
+		track->SortMvdHits();
 	}
 }
 

@@ -61,6 +61,9 @@ public:
 	/* Template function that returns reference to the TRD detector layout. */
 	template<class T> void GetTrdLayout(LitDetectorLayoutElectron<T>& layout);
 
+	/* Returns reference to the MVD detector layout. */
+	const CbmLitDetectorLayout& GetMvdLayout();
+
 	/* Returns index of the material needed for the construction of the
 	 * simplified layout for the parallel tracking. */
 	int MaterialId(
@@ -84,6 +87,9 @@ public:
 
 	/* Returns true if electron setup is used. */
 	bool IsElectronSetup() const;
+
+	/* Returns true if MVD detector exists in TGeo. */
+	bool IsMvd() const;
 
 	/* Returns true if STS detector exists in TGeo. */
 	bool IsSts() const;
@@ -117,6 +123,9 @@ protected:
 	/* Constructs simple TRD layout. */
 	void TrdLayoutSimple();
 
+	/* Constructs MVD layout */
+	void MvdLayout();
+
 private:
 	/* Creates detector layout out of an array stations. */
 	void DetermineLayout(
@@ -145,6 +154,7 @@ private:
 	CbmLitDetectorLayout fTrdLayout; // TRD detector layout
 	CbmLitDetectorLayout fTofLayout; // TOF detector layout
 	CbmLitStation fTofStation; // TOF station
+	CbmLitDetectorLayout fMvdLayout; // MVD detector layout
 
 	FairField *fField; // pointer to the magnetic field
 };

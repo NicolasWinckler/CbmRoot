@@ -31,6 +31,7 @@
 #include "TGeoBBox.h"
 #include "TGeoCone.h"
 #include "TGeoMatrix.h"
+#include "TGeoTube.h"
 
 #include <set>
 #include <functional>
@@ -110,6 +111,20 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 	         << "Finish getting layout" << std::endl;
 
 	return fLayout;
+}
+
+const CbmLitDetectorLayout& CbmLitEnvironment::GetMvdLayout()
+{
+	std::cout << "-I- CbmLitEnvironment::GetMvdLayout : "
+	         << "Getting layout... " << std::endl;
+
+	static Bool_t layoutCreated = false;
+	if (!layoutCreated) {
+		MvdLayout();
+		std::cout << fMvdLayout.ToString();
+		layoutCreated = true;
+	}
+	return fMvdLayout;
 }
 
 void CbmLitEnvironment::MuchLayout()
@@ -368,6 +383,40 @@ const CbmLitStation& CbmLitEnvironment::GetTofStation()
 		layoutCreated = true;
 	}
 	return fTofStation;
+}
+
+void CbmLitEnvironment::MvdLayout()
+{
+	static Bool_t layoutCreated = false;
+
+	if (!layoutCreated) {
+
+		std::set<CbmLitStation, CompareStationZLess> stationSet;
+		TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+		TObjArray* nodes = node1->GetNodes();
+		for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+			TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+			if (TString(node->GetName()).Contains("mvdstation")) {
+				TGeoNode* station = node;
+				const Double_t* stationPos = station->GetMatrix()->GetTranslation();
+				//TGeoTubeSeg* shape = (TGeoTubeSeg*) station->GetVolume()->GetShape();
+
+				CbmLitStation sta;
+				CbmLitSubstation substation;
+				substation.SetZ(stationPos[2]);
+				sta.SetType(kLITPIXELHIT);
+				sta.AddSubstation(substation);
+				stationSet.insert(sta);
+			}
+		}
+		CbmLitStationGroup sg;
+		for (std::set<CbmLitStation, CompareStationZLess>::reverse_iterator i = stationSet.rbegin(); i != stationSet.rend(); i++) {
+			sg.AddStation(*i);
+		}
+		fMvdLayout.AddStationGroup(sg);
+//		std::cout << fMvdLayout.ToString();
+		layoutCreated = true;
+	}
 }
 
 void CbmLitEnvironment::GetMuchLayoutVec(

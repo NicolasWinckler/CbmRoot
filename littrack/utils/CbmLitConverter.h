@@ -11,6 +11,7 @@ class CbmTrack;
 class CbmBaseHit;
 class CbmPixelHit;
 class CbmStripHit;
+class CbmHit;
 class FairTrackParam;
 class CbmStsTrack;
 class CbmGlobalTrack;
@@ -39,6 +40,11 @@ public:
 			const CbmStripHit* hit,
 			int index,
 			CbmLitStripHit* litHit);
+
+	static void CbmHitToLitPixelHit(
+			const CbmHit* hit,
+			int index,
+			CbmLitPixelHit* litHit);
 
 	static void StsTrackToLitTrack(
 			const CbmStsTrack* stsTrack,
@@ -72,6 +78,10 @@ public:
 			TClonesArray* muchTracks);
 
 	static void HitArrayToHitVector(
+			const TClonesArray* hits,
+			HitPtrVector& litHits);
+
+	static void MvdHitArrayToHitVector(
 			const TClonesArray* hits,
 			HitPtrVector& litHits);
 

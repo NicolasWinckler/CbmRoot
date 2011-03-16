@@ -58,13 +58,13 @@ LitStatus CbmLitTrackFinderNN::DoFind(
 		RemoveHits(fTracks.begin(), fTracks.end());
 		CopyToOutput(fTracks.begin(), fTracks.end(), tracks);
 
-//		for (int i = 0; i < tracks.size(); i++) {
-//			std::cout << "TRACK: " << tracks[i]->ToString();
-//			for (int j = 0; j < tracks[i]->GetNofHits(); j++){
-//				std::cout << " " << tracks[i]->GetHit(j)->GetRefId();
-//			}
-//			std::cout << std::endl;
-//		}
+		for (int i = 0; i < tracks.size(); i++) {
+			std::cout << "TRACK: " << tracks[i]->ToString();
+			for (int j = 0; j < tracks[i]->GetNofHits(); j++){
+				std::cout << " " << tracks[i]->GetHit(j)->GetRefId();
+			}
+			std::cout << std::endl;
+		}
 
 		for_each(fTracks.begin(), fTracks.end(), DeleteObject());
 		fTracks.clear();

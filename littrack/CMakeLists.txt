@@ -83,6 +83,7 @@ finder/CbmLitGating.cxx
 #finder_cbm/CbmLitMuchTrackFinderWeight.cxx
 #finder_cbm/CbmLitStsBasedTrackFinder.cxx
 ##finder_cbm/CbmLitFindGlobalTracks.cxx 
+finder_cbm/CbmLitFindMvdTracks.cxx
 fitter/CbmLitTrackFitterImp.cxx 
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterWeight.cxx 
@@ -166,6 +167,7 @@ cbm/CbmPropagatorLit.h
 #finder_cbm/CbmLitStsBasedTrackFinder.h
 finder_cbm/CbmLitFindGlobalTracks.h
 #finder_cbm/CbmLitCudaTest.h 
+finder_cbm/CbmLitFindMvdTracks.h
 geo/CbmLitDet.h 
 geo/CbmLitDetContFact.h
 geo/CbmLitDetGeo.h 

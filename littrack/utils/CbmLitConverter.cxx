@@ -11,6 +11,7 @@
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
 #include "CbmStripHit.h"
+#include "CbmHit.h"
 #include "FairTrackParam.h"
 #include "CbmStsTrack.h"
 #include "CbmMuchTrack.h"
@@ -101,8 +102,22 @@ void CbmLitConverter::StripHitToLitStripHit(
 	if (hit->GetType() == kMUCHSTRAWHIT) {
 		litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
 	}
-//	hit->Print();
-//	std::cout << litHit->ToString();
+}
+
+void CbmLitConverter::CbmHitToLitPixelHit(
+		const CbmHit* hit,
+		int index,
+		CbmLitPixelHit* litHit)
+{
+	litHit->SetX(hit->GetX());
+	litHit->SetY(hit->GetY());
+	litHit->SetZ(hit->GetZ());
+	litHit->SetDx(hit->GetDx());
+	litHit->SetDy(hit->GetDy());
+	litHit->SetDz(hit->GetDz());
+	litHit->SetDxy(hit->GetCovXY());
+	litHit->SetPlaneId(hit->GetStationNr()-1);
+	litHit->SetRefId(index);
 }
 
 void CbmLitConverter::StsTrackToLitTrack(
@@ -404,6 +419,21 @@ void CbmLitConverter::HitArrayToHitVector(
 	    	if (hit->GetType() == kTOFHIT) litHit->SetDetectorId(kLITTOF);
 	    	litHits.push_back(litHit);
 	    }
+	}
+}
+
+void CbmLitConverter::MvdHitArrayToHitVector(
+		const TClonesArray* hits,
+		HitPtrVector& litHits)
+{
+	Int_t nofHits = hits->GetEntriesFast();
+	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
+		CbmHit* hit = static_cast<CbmHit*>(hits->At(iHit));
+	    if(NULL == hit) continue;
+		CbmLitPixelHit* litHit = new CbmLitPixelHit();
+		CbmHitToLitPixelHit(hit, iHit, litHit);
+		litHit->SetDetectorId(kLITMVD);
+		litHits.push_back(litHit);
 	}
 }
 

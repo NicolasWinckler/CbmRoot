@@ -80,6 +80,10 @@
 //#pragma link C++ class CbmLitWeightedHitCalculator+;
 //#pragma link C++ class CbmLitHitToTrackMerger+;
 
+
+// mvd
+#pragma link C++ class CbmLitFindMvdTracks+;
+
 // propagation
 //#pragma link C++ class CbmLitTGeoTrackPropagator+;
 //#pragma link C++ class CbmLitRK4TrackExtrapolator+;

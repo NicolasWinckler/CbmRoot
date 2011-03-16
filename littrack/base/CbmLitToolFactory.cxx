@@ -361,6 +361,26 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderWeight->SetPDG(13);
 		TrackFinderPtr finder(muchFinderWeight);
 		return finder;
+	} else
+	if(name == "mvd_nn") {
+		CbmLitTrackFinderNN* mvdFinderNN = new CbmLitTrackFinderNN();
+		mvdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+		mvdFinderNN->SetSeedSelection(CreateTrackSelection("empty"));
+		mvdFinderNN->SetFinalSelection(CreateTrackSelection("empty"));
+		mvdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+		mvdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMvdLayout());
+		mvdFinderNN->SetVerbose(3);
+		mvdFinderNN->SetNofIter(1);
+		mvdFinderNN->IsUseFastSearch(true);
+		mvdFinderNN->SetMaxNofMissingHits(1);
+		mvdFinderNN->SetSigmaCoef(3.5);
+		mvdFinderNN->SetChiSqPixelHitCut(15.);//13.86);
+		mvdFinderNN->SetChiSqStripHitCut(9.);
+		mvdFinderNN->SetPDG(13);
+		mvdFinderNN->IsProcessSubstationsTogether(true);
+		mvdFinderNN->Initialize();
+		TrackFinderPtr finder(mvdFinderNN);
+		return finder;
 	}
 }
 

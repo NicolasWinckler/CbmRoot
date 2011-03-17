@@ -25,6 +25,9 @@ public:
 	void SetFilter(TrackUpdatePtr filter) { fFilter = filter;}
 
 protected:
+	void SetIterationParameters(
+			int iter);
+
     void InitTrackSeeds(
     		TrackPtrIterator itBegin,
     		TrackPtrIterator itEnd);

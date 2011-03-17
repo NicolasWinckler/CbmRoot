@@ -15,6 +15,7 @@
 #include "base/CbmLitDetectorLayout.h"
 #include "base/CbmLitHitData.h"
 #include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitTrackFinderSettings.h"
 
 #include <set>
 
@@ -31,7 +32,14 @@ public:
 	/* Sets detector layout */
 	void SetLayout(CbmLitDetectorLayout layout) {fLayout = layout;}
 
-	/* Sets number of iterations for tracking */
+	/* Sets settings for tracking */
+	void SetSettings(const CbmLitTrackFinderSettings& settings) { fSettings = settings; }
+
+	/* Sets verbosity level */
+    void SetVerbose(int verbose) {fVerbose = verbose;}
+
+protected:
+    /* Sets number of iterations for tracking */
 	void SetNofIter(int nofIter) { fNofIter = nofIter; }
 
 	/* Sets maximum acceptable number of missing hits */
@@ -40,14 +48,11 @@ public:
 	/* Sets particle hypothesis for tracking */
 	void SetPDG(int pdg) { fPDG = pdg; }
 
-	/* Sets verbosity level */
-    void SetVerbose(int verbose) {fVerbose = verbose;}
-
 protected:
-    /* Parameters for each tracking iteration has tobe set in this function
+    /* Parameters for each tracking iteration has to be set in this function
      * @param iter Iteration number */
     virtual void SetIterationParameters(
-    		int iter){;}
+    		int iter){}
 
     /* Arranges hits by stations
      * @param itBegin Iterator of the first hit
@@ -81,6 +86,8 @@ protected:
     std::set<int> fUsedHitsSet;
     /* Set with track seeds that have been used */
     std::set<int> fUsedSeedsSet;
+    /* Settings for the track finder */
+    CbmLitTrackFinderSettings fSettings;
     /* Number of iterations for tracking */
 	int fNofIter;
 	/* Maximum number of acceptable missing hits */

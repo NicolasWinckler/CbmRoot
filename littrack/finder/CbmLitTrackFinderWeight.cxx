@@ -47,6 +47,7 @@ LitStatus CbmLitTrackFinderWeight::DoFind(
 	fUsedHitsSet.clear();
 	fHitData.SetDetectorLayout(fLayout);
 
+	fNofIter = fSettings.GetNofIter();
 	for (int iIter = 0; iIter < fNofIter; iIter++) {
 		SetIterationParameters(iIter);
 		ArrangeHits(hits.begin(), hits.end());
@@ -65,6 +66,22 @@ LitStatus CbmLitTrackFinderWeight::DoFind(
 	std::cout << "-I- CbmLitTrackFinderRobust: " << fEventNo++ << " events processed" << std::endl;
 
 	return kLITSUCCESS;
+}
+
+void CbmLitTrackFinderWeight::SetIterationParameters(
+		int iter)
+{
+	SetPropagator(fSettings.GetPropagator(iter));
+	SetSeedSelection(fSettings.GetSeedSelection(iter));
+	SetFinalSelection(fSettings.GetFinalSelection(iter));
+	SetFilter(fSettings.GetFilter(iter));
+	SetFitter(fSettings.GetFitter(iter));
+	IsUseFastSearch(fSettings.GetIsUseFastSearch(iter));
+	SetPDG(fSettings.GetPDG(iter));
+	SetMaxNofMissingHits(fSettings.GetMaxNofMissingHits(iter));
+	SetSigmaCoef(fSettings.GetSigmaCoef(iter));
+	SetChiSqPixelHitCut(fSettings.GetChiSqPixelHitCut(iter));
+	SetChiSqStripHitCut(fSettings.GetChiSqStripHitCut(iter));
 }
 
 void CbmLitTrackFinderWeight::InitTrackSeeds(

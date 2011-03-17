@@ -76,6 +76,11 @@ public:
 	}
 
 protected:
+
+	/* Inherited from CbmLitTrackFinderBase */
+	void SetIterationParameters(
+			int iter);
+
 	/* Initialize the track seeds, i.e. selects with the track selection tool
 	 * proper ones and copies to local array.
 	 * @param itBegin Iterator to the first track seed.

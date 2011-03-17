@@ -65,7 +65,7 @@ public:
     /* Set use fast hit search */
     bool IsUseFastSearch() const { return fUseFastSearch;}
 
-private:
+protected:
     /* Chi-square cut for strip hits */
 	myf fChiSqStripHitCut;
 	/* Chi-square cut for pixel hits */

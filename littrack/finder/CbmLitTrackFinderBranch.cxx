@@ -55,6 +55,7 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
 
 	fHitData.SetDetectorLayout(fLayout);
 
+	fNofIter = fSettings.GetNofIter();
 	for (int iIter = 0; iIter < fNofIter; iIter++) {
 		SetIterationParameters(iIter);
 		ArrangeHits(hits.begin(), hits.end());
@@ -73,11 +74,32 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
 	return kLITSUCCESS;
 }
 
+void CbmLitTrackFinderBranch::SetIterationParameters(
+		int iter)
+{
+	SetPropagator(fSettings.GetPropagator(iter));
+	SetSeedSelection(fSettings.GetSeedSelection(iter));
+	SetStationGroupSelection(fSettings.GetStationGroupSelection(iter));
+	SetFinalSelection(fSettings.GetFinalSelection(iter));
+	SetFilter(fSettings.GetFilter(iter));
+	IsUseFastSearch(fSettings.GetIsUseFastSearch(iter));
+	SetPDG(fSettings.GetPDG(iter));
+	IsProcessSubstationsTogether(fSettings.GetIsProcessSubstationsTogether(iter));
+	SetMaxNofMissingHits(fSettings.GetMaxNofMissingHits(iter));
+	IsAlwaysCreateMissingHit(fSettings.GetIsAlwaysCreateMissingHit(iter));
+	SetSigmaCoef(fSettings.GetSigmaCoef(iter));
+	SetChiSqPixelHitCut(fSettings.GetChiSqPixelHitCut(iter));
+	SetChiSqStripHitCut(fSettings.GetChiSqStripHitCut(iter));
+}
+
 void CbmLitTrackFinderBranch::InitTrackSeeds(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
-	//TODO if more than one iteration, restore the state of the seeds
+	for (TrackPtrIterator it = itBegin; it != itEnd; it++) {
+		(*it)->SetQuality(kLITGOOD);
+	}
+
 	fSeedSelection->DoSelect(itBegin, itEnd);
 
 	for (TrackPtrIterator it = itBegin; it != itEnd; it++) {

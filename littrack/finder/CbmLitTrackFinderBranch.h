@@ -70,6 +70,11 @@ public:
 	}
 
 protected:
+
+	/* Inherited from CbmLitTrackFinderBase */
+    virtual void SetIterationParameters(
+    		int iter);
+
 	/* Initializes track seeds
 	 * @param itBegin Iterator to the first track seed.
 	 * @param itEnd Iterator to the last track seed. */

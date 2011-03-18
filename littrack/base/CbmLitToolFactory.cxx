@@ -208,6 +208,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	if(name == "trd_station") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
+		trdSelection->SetMinNofHits(0);
 		trdSelection->Initialize();
 		TrackSelectionPtr selection(trdSelection);
 		return selection;
@@ -215,6 +216,15 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	if(name == "trd_final") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(3);
+		trdSelection->SetMinNofHits(0);
+		trdSelection->Initialize();
+		TrackSelectionPtr selection(trdSelection);
+		return selection;
+	} else
+	if(name == "trd_final_iter_1") {
+		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
+		trdSelection->SetNofSharedHits(3);
+		trdSelection->SetMinNofHits(8);
 		trdSelection->Initialize();
 		TrackSelectionPtr selection(trdSelection);
 		return selection;
@@ -228,17 +238,20 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	if(name == "e_nn") {
 		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
 		CbmLitTrackFinderSettings settings;
-		settings.SetNofIter(1);
+		settings.SetNofIter(2);
 		settings.SetPropagator(CreateTrackPropagator("lit"));
 		settings.SetSeedSelection(CreateTrackSelection("momentum"));
-		settings.SetFinalSelection(CreateTrackSelection("trd_final"));
+		settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
+		settings.SetFinalSelection(1, CreateTrackSelection("trd_final"));
 		settings.SetFilter(CreateTrackUpdate("kalman"));
 		settings.IsUseFastSearch(true);
 		settings.SetMaxNofMissingHits(4);
 		settings.SetSigmaCoef(5.);
-		settings.SetChiSqPixelHitCut(25.);
+		settings.SetChiSqPixelHitCut(0, 15.);
+		settings.SetChiSqPixelHitCut(1, 25.);
 		settings.SetChiSqStripHitCut(9.);
-		settings.SetPDG(11);
+		settings.SetPDG(0, 211);
+		settings.SetPDG(1, 11);
 		settings.IsProcessSubstationsTogether(true);
 		trdFinderNN->SetSettings(settings);
 		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
@@ -250,19 +263,22 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	if(name == "e_branch") {
 		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
 		CbmLitTrackFinderSettings settings;
-		settings.SetNofIter(1);
+		settings.SetNofIter(2);
 		settings.SetPropagator(CreateTrackPropagator("lit"));
 		settings.SetSeedSelection(CreateTrackSelection("momentum"));
 		settings.SetStationGroupSelection(CreateTrackSelection("trd_station"));
-		settings.SetFinalSelection(CreateTrackSelection("trd_final"));
+		settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
+		settings.SetFinalSelection(1, CreateTrackSelection("trd_final"));
 		settings.SetFilter(CreateTrackUpdate("kalman"));
 		settings.IsUseFastSearch(true);
-		settings.SetPDG(11);
+		settings.SetPDG(0, 211);
+		settings.SetPDG(1, 11);
 		settings.IsProcessSubstationsTogether(true);
 		settings.SetMaxNofMissingHits(4);
 		settings.IsAlwaysCreateMissingHit(false);
 		settings.SetSigmaCoef(5.);
-		settings.SetChiSqPixelHitCut(25.);
+		settings.SetChiSqPixelHitCut(0, 15.);
+		settings.SetChiSqPixelHitCut(1, 25.);
 		settings.SetChiSqStripHitCut(9.);
 		trdFinderBranch->SetSettings(settings);
 		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
@@ -414,7 +430,7 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
         nhMerger->IsUseFastSearch(true);
 		nhMerger->SetSigmaCoef(5.);
 		nhMerger->SetChiSqPixelHitCut(50.);//13.86);
-		nhMerger->SetChiSqStripHitCut(4.);
+		nhMerger->SetChiSqStripHitCut(9.);
 		nhMerger->SetStation(CbmLitEnvironment::Instance()->GetTofStation());
 		nhMerger->Initialize();
 		HitToTrackMergerPtr merger(nhMerger);

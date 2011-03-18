@@ -42,14 +42,24 @@ public:
 	/* Sets maximum number of shared hits */
 	void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
 
+	/* Returns minimum number of hits cut */
+	int GetMinNofHits() const {return fMinNofHits;}
+
+	/* Sets minimum number of hits cut */
+	void SetMinNofHits(int nofHits) {fMinNofHits = nofHits;}
+
 private:
 	/* Shared hits track selection tool */
 	TrackSelectionPtr fSharedHitsSelection;
 	/* Same seed track selection tool */
 	TrackSelectionPtr fSameSeedSelection;
+	/* Track selection based on cuts */
+	TrackSelectionPtr fCutsSelection;
 
 	/* Maximum number of shared hits */
 	int fNofSharedHits;
+	/* Minimum number of hits cut */
+	int fMinNofHits;
 };
 
 #endif /*CBMLITTRACKSELECTIONTRD_H_*/

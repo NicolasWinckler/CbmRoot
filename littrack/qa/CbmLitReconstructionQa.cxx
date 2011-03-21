@@ -17,6 +17,10 @@
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
 #include "CbmDetectorList.h"
+#include "CbmHit.h"
+#include "CbmStsTrack.h"
+#include "CbmMvdPoint.h"
+#include "CbmMvdHitMatch.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -112,6 +116,7 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 	fhMuchNofHitsInStation(NULL),
 	fhTofNofHitsInStation(NULL),
 
+	fhMvdTrackHits(),
 	fhStsTrackHits(),
 	fhTrdTrackHits(),
 	fhMuchTrackHits(),
@@ -167,17 +172,21 @@ void CbmLitReconstructionQa::DetermineSetup()
 {
     CbmLitEnvironment* env = CbmLitEnvironment::Instance();
     fIsElectronSetup = env->IsElectronSetup();
-	fIsSts = true;
+	fIsMvd = env->IsMvd();
+    fIsSts = env->IsSts();
     fIsTrd = env->IsTrd();
     fIsMuch = env->IsMuch();
     fIsTof = env->IsTof();
 
     if (fIsElectronSetup) std::cout << "-I- CBM electron setup detected" << std::endl;
     else std::cout << "-I- CBM muon setup detected" << std::endl;
-    std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
-    if (fIsTrd) std::cout << "TRD" << std::endl;
-    if (fIsMuch) std::cout << "MUCH" << std::endl;
-    if (fIsTof) std::cout << "TOF" << std::endl;
+    std::cout << "-I- The following detectors were found in the CBM setup: ";
+    if (fIsMvd) std::cout << "MVD ";
+    if (fIsSts) std::cout << "STS ";
+    if (fIsMuch) std::cout << "MUCH ";
+    if (fIsTrd) std::cout << "TRD ";
+    if (fIsTof) std::cout << "TOF ";
+    std::cout << std::endl;
 }
 
 void CbmLitReconstructionQa::ReadDataBranches()
@@ -191,8 +200,21 @@ void CbmLitReconstructionQa::ReadDataBranches()
     fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
     if (NULL == fGlobalTracks) Fatal("Init","No GlobalTrack array!");
 
-    fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
-    if (NULL == fStsMatches) Fatal("Init",": No StsTrackMatch array!");
+    if (fIsMvd) {
+    	fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
+    	if (NULL == fMvdHits) Fatal("Init",": No MvdHit array!");
+    	fMvdPoints = (TClonesArray*) ioman->GetObject("MvdPoint");
+    	if (NULL == fMvdPoints) Fatal("Init",": No MvdPoint array!");
+    	fMvdHitMatches = (TClonesArray*) ioman->GetObject("MvdHitMatch");
+    	if (NULL == fMvdHitMatches) Fatal("Init",": No MvdHitMatch array!");
+    }
+
+    if (fIsSts) {
+    	fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
+    	if (NULL == fStsTracks) Fatal("Init",": No StsTrack array!");
+    	fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
+    	if (NULL == fStsMatches) Fatal("Init",": No StsTrackMatch array!");
+    }
 
     if (fIsMuch) {
 		fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
@@ -219,25 +241,31 @@ void CbmLitReconstructionQa::ReadDataBranches()
 
 void CbmLitReconstructionQa::ProcessHits()
 {
+	if (fIsMvd) {
+		for (Int_t i = 0; i < fMvdHits->GetEntriesFast(); i++) {
+			CbmHit* hit = static_cast<CbmHit*>(fMvdHits->At(i));
+			fhMvdNofHitsInStation->Fill(hit->GetStationNr());
+		}
+	}
 	if (fIsTrd) {
 		for (Int_t i = 0; i < fTrdHits->GetEntriesFast(); i++) {
-			CbmBaseHit* hit = (CbmBaseHit*) fTrdHits->At(i);
+			CbmBaseHit* hit = static_cast<CbmBaseHit*>(fTrdHits->At(i));
 			fhTrdNofHitsInStation->Fill(hit->GetPlaneId());
 		}
 	}
 	if (fIsMuch) {
 		for (Int_t i = 0; i < fMuchPixelHits->GetEntriesFast(); i++) {
-			CbmBaseHit* hit = (CbmBaseHit*) fMuchPixelHits->At(i);
+			CbmBaseHit* hit = static_cast<CbmBaseHit*>(fMuchPixelHits->At(i));
 			fhMuchNofHitsInStation->Fill(hit->GetPlaneId());
 		}
 		for (Int_t i = 0; i < fMuchStrawHits->GetEntriesFast(); i++) {
-			CbmBaseHit* hit = (CbmBaseHit*) fMuchStrawHits->At(i);
+			CbmBaseHit* hit = static_cast<CbmBaseHit*>(fMuchStrawHits->At(i));
 			fhMuchNofHitsInStation->Fill(hit->GetPlaneId());
 		}
 	}
 	if (fIsTof) {
 		for (Int_t i = 0; i < fTofHits->GetEntriesFast(); i++) {
-			CbmBaseHit* hit = (CbmBaseHit*) fTofHits->At(i);
+			CbmBaseHit* hit = static_cast<CbmBaseHit*>(fTofHits->At(i));
 			fhTofNofHitsInStation->Fill(hit->GetPlaneId());
 		}
 	}
@@ -273,6 +301,8 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 			if (!isStsOk) { // ghost track
 				Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
 				fhStsGhostNh->Fill(nofHits);
+			} else {
+				ProcessMvd(stsId);
 			}
 		}
 		CbmTrackMatch* trdTrackMatch;
@@ -350,6 +380,37 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 				}
 			}
 		}
+	}
+}
+
+void CbmLitReconstructionQa::ProcessMvd(
+		Int_t stsId)
+{
+	CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(stsId));
+	Int_t nofHits = track->GetNMvdHits();
+	fhMvdTrackHits[ALLHITS]->Fill(nofHits);
+
+	CbmTrackMatch* stsTrackMatch = static_cast<CbmTrackMatch*>(fStsMatches->At(stsId));
+	Int_t stsMcTrackId = stsTrackMatch->GetMCTrackId();
+
+	Int_t nofTrueHits = 0, nofFakeHits = 0;
+	for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+		Int_t hitId = track->GetMvdHitIndex(iHit);
+		CbmMvdHitMatch* hitMatch = static_cast<CbmMvdHitMatch*>(fMvdHitMatches->At(hitId));
+		Int_t pointId = hitMatch->GetPointId();
+		CbmMvdPoint* point = static_cast<CbmMvdPoint*>(fMvdPoints->At(pointId));
+		Int_t mcTrackId = point->GetTrackID();
+		if (mcTrackId == stsMcTrackId) { // true hit
+			nofTrueHits++;
+		} else { // fake hit
+			nofFakeHits++;
+		}
+	}
+	fhMvdTrackHits[TRUEHITS]->Fill(nofTrueHits);
+	fhMvdTrackHits[FAKEHITS]->Fill(nofFakeHits);
+	if (nofHits != 0) {
+		fhMvdTrackHits[TRUEALL]->Fill(Float_t(nofTrueHits) / Float_t(nofHits));
+		fhMvdTrackHits[FAKEALL]->Fill(Float_t(nofFakeHits) / Float_t(nofHits));
 	}
 }
 
@@ -610,6 +671,8 @@ void CbmLitReconstructionQa::CreateHistos()
 	fHistoList->Add(fhRecGhostNh);
 
 	const UInt_t maxNofStations = 30;
+	fhMvdNofHitsInStation = new TH1F("hMvdNofHitsInStation", "MVD: number of hits", maxNofStations, 0, maxNofStations);
+	fHistoList->Add(fhMvdNofHitsInStation);
 	fhTrdNofHitsInStation = new TH1F("hTrdNofHitsInStation", "TRD: number of hits", maxNofStations, 0, maxNofStations);
 	fHistoList->Add(fhTrdNofHitsInStation);
 	fhMuchNofHitsInStation = new TH1F("hMuchNofHitsInStation", "MUCH: number of hits", maxNofStations, 0, maxNofStations);
@@ -622,12 +685,18 @@ void CbmLitReconstructionQa::CreateHistos()
 	Double_t hitmin[] = {0, 0, 0, -0.1, -0.1};
 	Double_t hitmax[] = {20, 20, 20, 1.1, 1.1};
 	Int_t hitbins[] = {20, 20, 20, 12, 12};
+	fhMvdTrackHits.resize(nofHitsHistos);
 	fhStsTrackHits.resize(nofHitsHistos);
 	fhTrdTrackHits.resize(nofHitsHistos);
 	fhMuchTrackHits.resize(nofHitsHistos);
 	for(UInt_t i = 0; i < nofHitsHistos; i++){
-		std::string histName = "hStsTrackHits" + hittype[i];
-		std::string histTitle = "STS hits in track: " + hittype[i];
+		std::string histName = "hMvdTrackHits" + hittype[i];
+		std::string histTitle = "MVD hits in track: " + hittype[i];
+		fhMvdTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		fHistoList->Add(fhMvdTrackHits[i]);
+
+		histName = "hStsTrackHits" + hittype[i];
+		histTitle = "STS hits in track: " + hittype[i];
 		fhStsTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
 		fHistoList->Add(fhStsTrackHits[i]);
 
@@ -667,6 +736,7 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
 		DivideHistos(fhRecAngle[i][REC], fhRecAngle[i][ACC], fhRecAngle[i][EFF]);
 		DivideHistos(fhTofMom[i][REC], fhTofMom[i][ACC], fhTofMom[i][EFF]);
 	}
+	fhMvdNofHitsInStation->Scale(1./fEventNo);
 	fhTrdNofHitsInStation->Scale(1./fEventNo);
 	fhMuchNofHitsInStation->Scale(1./fEventNo);
 	fhTofNofHitsInStation->Scale(1./fEventNo);
@@ -690,8 +760,8 @@ void CbmLitReconstructionQa::IncreaseCounters()
 std::string CbmLitReconstructionQa::RecDetector()
 {
 	std::string recDet = "";
-	if (fIsTrd && !fIsMuch) recDet = "TRD     ";
-	else if (fIsMuch && !fIsTrd) recDet = "MUCH    ";
+	if (fIsTrd && !fIsMuch) recDet = "TRD";
+	else if (fIsMuch && !fIsTrd) recDet = "MUCH";
 	else if (fIsMuch && fIsTrd) recDet = "MUCH+TRD";
 	return recDet;
 }
@@ -941,6 +1011,11 @@ Double_t CbmLitReconstructionQa::CalcEfficiency(
 
 void CbmLitReconstructionQa::DrawHitsHistos()
 {
+	if (fIsMvd){
+		TCanvas* cMvdHits = new TCanvas("rec_qa_mvd_hits","rec_qa_mvd_hits", 1200, 600);
+		DrawHitsHistos(cMvdHits, fhMvdTrackHits);
+	}
+
 	if (fIsSts){
 		TCanvas* cStsHits = new TCanvas("rec_qa_sts_hits","rec_qa_sts_hits", 1200, 600);
 		DrawHitsHistos(cStsHits, fhStsTrackHits);
@@ -985,11 +1060,18 @@ void CbmLitReconstructionQa::DrawHitsHistos(
 
 void CbmLitReconstructionQa::DrawHitsStationHistos()
 {
+	if (fIsMvd){
+	   TCanvas* cMvdHits = new TCanvas("rec_qa_mvd_hits_station","rec_qa_mvd_hits_station", 1200, 600);
+	   DrawHist1D(fhMvdNofHitsInStation, "Station number", "Number of hits",
+				LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+				LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
+	   lit::SaveCanvasAsImage(cMvdHits, fOutputDir);
+   }
 	if (fIsTrd){
 	   TCanvas* cTrdHits = new TCanvas("rec_qa_trd_hits_station","rec_qa_trd_hits_station", 1200, 600);
 	   DrawHist1D(fhTrdNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-	   			LIT_MARKER_STYLE1, false, false, "");
+	   			LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
 	   lit::SaveCanvasAsImage(cTrdHits, fOutputDir);
    }
 
@@ -997,7 +1079,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   TCanvas* cMuchHits = new TCanvas("rec_qa_much_hits_station","rec_qa_much_hits_station", 1200, 600);
 	   DrawHist1D(fhMuchNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-	   			LIT_MARKER_STYLE1, false, false, "");
+	   			LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
 	   lit::SaveCanvasAsImage(cMuchHits, fOutputDir);
    }
 
@@ -1005,7 +1087,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   TCanvas* cTofHits = new TCanvas("rec_qa_tof_hits_station","rec_qa_tof_hits_station", 1200, 600);
 	   DrawHist1D(fhTofNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-	   			LIT_MARKER_STYLE1, false, false, "");
+	   			LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
 	   lit::SaveCanvasAsImage(cTofHits, fOutputDir);
    }
 }

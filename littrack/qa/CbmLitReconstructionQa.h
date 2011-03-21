@@ -28,142 +28,104 @@ class TCanvas;
 class CbmLitReconstructionQa : public FairTask
 {
 public:
-    /** Default constructor */
+    /* Constructor */
 	CbmLitReconstructionQa();
 
-    /** Destructor */
+    /* Destructor */
 	virtual ~CbmLitReconstructionQa();
 
-    /**
-     * Derived from FairTask. Executed before starting event-by-event execution.
-     */
+    /* Derived from FairTask. Executed before starting event-by-event execution. */
 	virtual InitStatus Init();
 
-	/**
-     * Derived from FairTask. Executed on each event.
-     * @param opt Options
-     */
+	/* Derived from FairTask. Executed on each event.
+     * @param opt Options */
 	virtual void Exec(
 			Option_t* opt);
 
-    /**
-     * Sets the minimum number of MC points in STS.
-     * @param minNofPointsSts Minimum number of MC points in STS.
-     */
+    /* Sets the minimum number of MC points in STS.
+     * @param minNofPointsSts Minimum number of MC points in STS. */
 	void SetMinNofPointsSts(Int_t minNofPointsSts) {fMinNofPointsSts = minNofPointsSts; }
 
-	/**
-     * Sets the minimum number of MC points in TRD.
-     * @param minNofPointsTrd Minimum number of MC points in TRD.
-     */
+	/* Sets the minimum number of MC points in TRD.
+     * @param minNofPointsTrd Minimum number of MC points in TRD. */
 	void SetMinNofPointsTrd(Int_t minNofPointsTrd) { fMinNofPointsTrd = minNofPointsTrd;}
 
-    /**
-     * Sets the minimum number of MC points in MUCH.
-     * @param minNofPointsMuch Minimum number of MC points in MUCH.
-     */
+    /* Sets the minimum number of MC points in MUCH.
+     * @param minNofPointsMuch Minimum number of MC points in MUCH. */
 	void SetMinNofPointsMuch(Int_t minNofPointsMuch) { fMinNofPointsMuch = minNofPointsMuch;}
 
-    /**
-     * Sets the minimum number of MC points in TOF.
-     * @param minNofPointsTof Minimum number of MC points in TOF.
-     */
+    /* Sets the minimum number of MC points in TOF.
+     * @param minNofPointsTof Minimum number of MC points in TOF. */
 	void SetMinNofPointsTof(Int_t minNofPointsTof) { fMinNofPointsTof = minNofPointsTof;}
 
-    /**
-     * Sets the quota value, which is true/all hits for track to be considered correctly reconstructed.
-     * @param quota Quota value.
-     */
+    /* Sets the quota value, which is true/all hits for track to be considered correctly reconstructed.
+     * @param quota Quota value. */
 	void SetQuota(Double_t quota) { fQuota = quota;}
 
-	/**
-     * Sets the minimum number of hits in TRD track.
-     * @param minNofPointsTrd Minimum number of MC points in TRD.
-     */
+	/* Sets the minimum number of hits in TRD track.
+     * @param minNofPointsTrd Minimum number of MC points in TRD. */
 	void SetMinNofHitsTrd(Int_t minNofHitsTrd) { fMinNofHitsTrd = minNofHitsTrd;}
 
-    /**
-     * Sets the minimum number of hits in MUCH track.
-     * @param minNofHitsMuch Minimum number of hits in MUCH track.
-     */
+    /* Sets the minimum number of hits in MUCH track.
+     * @param minNofHitsMuch Minimum number of hits in MUCH track. */
 	void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch;}
 
-    /**
-     * Sets the verbose level for printout.
-     * @param verbose Verbose value.
-     */
+    /* Sets the verbose level for printout.
+     * @param verbose Verbose value. */
 	void SetVerbose(Int_t verbose) { fVerbose = verbose;}
 
-    /**
-     * Sets the output directory for images.
-     * @param dir Directory name.
-     */
+    /* Sets the output directory for images.
+     * @param dir Directory name. */
 	void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
-	/**
-	 * Sets momentum range for efficiency calculation
-	 */
+	/* Sets momentum range for efficiency calculation */
 	void SetMomentumRange(Double_t minMom, Double_t maxMom) {
 		fMinMom = minMom;
 		fMaxMom = maxMom;
 	}
 
-	/**
-	 * Set number of bins for efficiency v. momentum histograms
-	 */
+	/* Set number of bins for efficiency v. momentum histograms */
 	void SetNofBinsMom(Int_t nofBins) {
 		fNofBinsMom = nofBins;
 	}
 
 private:
-    /**
-     * Derived from FairTask. Executed after all events are processed.
-     */
+    /* Derived from FairTask. Executed after all events are processed. */
 	virtual void Finish();
 
-    /**
-     * Determines the CBM detector setup, based on TGeoManager stored in the input MC file.
-     */
+    /* Determines the CBM detector setup, based on TGeoManager stored in the input MC file. */
 	void DetermineSetup();
 
-    /**
-     * Reads necessary data branches from the input data files.
-     */
+    /* Reads necessary data branches from the input data files. */
 	void ReadDataBranches();
 
-	/**
-	  * Fills hit related histograms
-	  */
+	/* Fills hit related histograms */
 	void ProcessHits();
 
-    /**
-     * Loops over the reconstructed global tracks. Checks if the track is correct
-     * than fills the multimaps <MC track index, reconstructed track index>.
-     */
+    /* Loops over the reconstructed global tracks. Checks if the track is correct
+     * than fills the multimaps <MC track index, reconstructed track index>. */
 	void ProcessGlobalTracks();
 
-	/**
-     * Checks track quality based on fQuota value.
-     * @param trackMatch  Track match
-     */
+	/* Checks correctness of MVD attached hits*/
+	void ProcessMvd(
+			Int_t stsId);
+
+	/* Checks track quality based on fQuota value.
+     * @param trackMatch Track match */
 	Bool_t CheckTrackQuality(
 			CbmTrackMatch* trackMatch,
 			DetectorId detId);
 
-	/**
-     * Loops over the MC tracks. Checks the track acceptance for different cases.
-     * Fills the histograms of the accepted and reconstructed tracks.
-     */
+	/* Loops over the MC tracks. Checks the track acceptance for different cases.
+     * Fills the histograms of the accepted and reconstructed tracks. */
 	void ProcessMcTracks();
 
-    /**
-     * Fills the histograms of the accepted and reconstructed tracks.
+    /* Fills the histograms of the accepted and reconstructed tracks.
      * @param mcTrack MC track pointer
      * @param mcId MC track index in the array
      * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
      * @param hist vector with histograms to be filled
-     * @param par value that will be added in the histos (momentum or number of points)
-     */
+     * @param par value that will be added in the histos (momentum or number of points) */
 	void FillGlobalReconstructionHistos(
 			const CbmMCTrack* mcTrack,
 			Int_t mcId,
@@ -171,105 +133,74 @@ private:
 			std::vector<std::vector<TH1F*> >& hist,
 			Double_t par);
 
-    /**
-     * Creates the histograms.
-     */
+    /* Creates the histograms. */
 	void CreateHistos();
 
-    /**
-     * Divides two histograms.
+    /* Divides two histograms.
      * @param histo1 numerator
      * @param histo2 denominator
-     * @param histo3 output histogram
-     */
+     * @param histo3 output histogram */
 	void DivideHistos(
 		  TH1* histo1,
 		  TH1* histo2,
 		  TH1* histo3);
 
-    /**
-     * Calculates efficiency histograms.
-     */
+    /* Calculates efficiency histograms. */
 	void CalculateEfficiencyHistos();
 
-    /**
-     * Writes the histograms to output file.
-     */
+    /* Writes the histograms to output file. */
 	void WriteToFile();
 
-    /**
-     * Increase number of tracks counters.
-     */
+    /* Increase number of tracks counters. */
 	void IncreaseCounters();
 
-	/**
-	 * Returns std::string of the detector used in the global reconstruction.
-	 */
+	/* Returns std::string of the detector used in the global reconstruction. */
 	std::string RecDetector();
 
-	/**
-     * Prints event-by-event statistics.
-     */
+	/* Prints event-by-event statistics. */
 	void PrintEventStatistics();
 
-    /**
-     * Prints final statistics.
-     * @param out Output stream
-     */
+    /* Prints final statistics.
+     * @param out Output stream */
 	void PrintFinalStatistics(
 			std::ostream& out);
 
-    /**
-     * Calculates integrated efficiencies and forms string with statistic information.
+    /* Calculates integrated efficiencies and forms string with statistic information.
      * @param hist vector with histograms
-     * @param opt if 'event' than forms string for event statistics, if 'final' than forms the string with final statistics.
-     */
+     * @param opt if 'event' than forms string for event statistics, if 'final' than forms the string with final statistics. */
 	std::string EventEfficiencyStatisticsToString(
 			const std::vector<std::vector<TH1F*> >& hist,
 			const std::string& opt);
 
 
-	/** Calculates integrated efficiencies for different polar angles
-         * and returns a string with statistics.
-	 * @param hist Vector with histograms
-         **/
-        std::string PolarAngleEfficiency(
-                        const std::vector<std::vector<TH1F*> >& hist);
+	/* Calculates integrated efficiencies for different polar angles
+     * and returns a string with statistics.
+	 * @param hist Vector with histograms */
+	std::string PolarAngleEfficiency(
+			const std::vector<std::vector<TH1F*> >& hist);
 
-	/**
-	 * Draws histograms.
-	 */
+	/* Draws histograms. */
 	void Draw();
 
-	/**
-	 * Draws efficiency histograms.
-	 */
+	/* Draws efficiency histograms. */
 	void DrawEfficiencyHistos();
 
-	/**
-	 * Calculate efficiency for two histograms
-	 */
+	/* Calculate efficiency for two histograms */
 	Double_t CalcEfficiency(
 			TH1* histRec,
 			TH1* histAcc);
 
-	/**
-	 * Draws histograms for hits
-	 */
+	/* Draws histograms for hits */
 	void DrawHitsHistos();
 
-	/**
-	 * Draws histograms for hits
+	/* Draws histograms for hits
 	 * @param c Pointer to canvas.
-	 * @param histos Vector with hits histograms.
-	 */
+	 * @param histos Vector with hits histograms. */
 	void DrawHitsHistos(
 			TCanvas* c,
 			std::vector<TH1F*>& histos);
 
-	/**
-	 * Draws histograms of number of hits in station
-	 */
+	/* Draws histograms of number of hits in station */
 	void DrawHitsStationHistos();
 
 	Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
@@ -290,6 +221,7 @@ private:
 	Int_t fMinNofHitsMuch; // for MUCH track
 
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
+	Bool_t fIsMvd; // If MVD detected than true
 	Bool_t fIsSts; // If STS detected than true
 	Bool_t fIsTrd; // If TRD detected than true
 	Bool_t fIsMuch; // If MUCH detected than true
@@ -301,7 +233,7 @@ private:
 	Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
 	Double_t fMinAngle; // Minimum polar angle [grad]
 	Double_t fMaxAngle; // Maximum polar angle [grad]
-        Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
+	Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
 
 
 	// Maps for reconstructed tracks
@@ -313,6 +245,10 @@ private:
 	// Pointers to data arrays
 	TClonesArray* fMCTracks; // CbmMCTrack array
 	TClonesArray* fGlobalTracks; // CbmGlobalTrack array
+	TClonesArray* fMvdHits; // CbmMvdHit array
+	TClonesArray* fMvdPoints; // CbmMvdPoint array
+	TClonesArray* fMvdHitMatches; // CbmMvdHitMatch array
+	TClonesArray* fStsTracks; // CbmStsTrack array
 	TClonesArray* fStsMatches; // CbmStsTrackMatch array
 	TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
 	TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
@@ -346,12 +282,14 @@ private:
 	// TRD(MUCH): ghost tracks (number of hits dependence)
 	TH1F *fhRecGhostNh;
 
+	TH1F *fhMvdNofHitsInStation; // mean number of hits in station in MVD
 	TH1F *fhTrdNofHitsInStation; // mean number of hits in station in TRD
 	TH1F *fhMuchNofHitsInStation; // mean number of hits in station in MUCH
 	TH1F *fhTofNofHitsInStation; // mean number of hits in station in TOF
 
 	// histograms of number of hits in track
 	// all, true, fake, true/all, fake/all
+	std::vector<TH1F*> fhMvdTrackHits;
 	std::vector<TH1F*> fhStsTrackHits;
 	std::vector<TH1F*> fhTrdTrackHits;
 	std::vector<TH1F*> fhMuchTrackHits;

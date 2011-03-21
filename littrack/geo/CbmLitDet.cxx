@@ -23,19 +23,22 @@ using std::cout;
 using std::endl;
 
 CbmLitDet::CbmLitDet() :
-   FairDetector("LitDet", kTRUE, kTutDet) {
+   FairDetector("LitDet", kTRUE, kTutDet)
+{
    /** create your collection for data points */
    fCbmLitDetPointCollection = new TClonesArray("CbmLitDetPoint");
 
 }
 
 CbmLitDet::CbmLitDet(const char* name, Bool_t active)
-   : FairDetector(name, active, kTutDet) {
+   : FairDetector(name, active, kTutDet)
+{
    fCbmLitDetPointCollection = new TClonesArray("CbmLitDetPoint");
 
 }
 
-CbmLitDet::~CbmLitDet() {
+CbmLitDet::~CbmLitDet()
+{
    if (fCbmLitDetPointCollection) {
       fCbmLitDetPointCollection->Delete();
       delete fCbmLitDetPointCollection;
@@ -45,7 +48,7 @@ CbmLitDet::~CbmLitDet() {
 void CbmLitDet::Initialize()
 {
    FairDetector::Initialize();
-   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+   FairRuntimeDb* rtdb= FairRun::Instance()->GetRuntimeDb();
    CbmLitDetGeoPar* par=(CbmLitDetGeoPar*)(rtdb->getContainer("CbmLitDetGeoPar"));
 }
 
@@ -75,8 +78,8 @@ Bool_t  CbmLitDet::ProcessHits(FairVolume* vol)
       gMC->TrackMomentum(fMomOut);
 //    if (fELoss == 0. ) return kFALSE;
 //    AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
-//	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
-//	   fELoss);
+//    TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
+//    fELoss);
       AddHit(fTrackID, 1,
              TVector3(fPos.X(),   fPos.Y(),   fPos.Z()),
              TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
@@ -92,7 +95,8 @@ Bool_t  CbmLitDet::ProcessHits(FairVolume* vol)
    return kTRUE;
 }
 
-void CbmLitDet::EndOfEvent() {
+void CbmLitDet::EndOfEvent()
+{
 
    fCbmLitDetPointCollection->Clear();
 
@@ -100,7 +104,8 @@ void CbmLitDet::EndOfEvent() {
 
 
 
-void CbmLitDet::Register() {
+void CbmLitDet::Register()
+{
 
    /** This will create a branch in the output tree called
        CbmLitDetPoint, setting the last parameter to kFALSE means:
@@ -114,16 +119,19 @@ void CbmLitDet::Register() {
 }
 
 
-TClonesArray* CbmLitDet::GetCollection(Int_t iColl) const {
-   if (iColl == 0) return fCbmLitDetPointCollection;
-   else return NULL;
+TClonesArray* CbmLitDet::GetCollection(Int_t iColl) const
+{
+   if (iColl == 0) { return fCbmLitDetPointCollection; }
+   else { return NULL; }
 }
 
-void CbmLitDet::Reset() {
+void CbmLitDet::Reset()
+{
    fCbmLitDetPointCollection->Clear();
 }
 
-void CbmLitDet::ConstructGeometry() {
+void CbmLitDet::ConstructGeometry()
+{
    /** If you are using the standard ASCII input for the geometry
        just copy this and use it for your detector, otherwise you can
        implement here you own way of constructing the geometry. */
@@ -135,19 +143,19 @@ void CbmLitDet::ConstructGeometry() {
    geoFace->addGeoModule(Geo);
 
    Bool_t rc = geoFace->readSet(Geo);
-   if (rc) Geo->create(geoLoad->getGeoBuilder());
+   if (rc) { Geo->create(geoLoad->getGeoBuilder()); }
    TList* volList = Geo->getListOfVolumes();
 
    // store geo parameter
-   FairRun *fRun = FairRun::Instance();
-   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+   FairRun* fRun = FairRun::Instance();
+   FairRuntimeDb* rtdb= FairRun::Instance()->GetRuntimeDb();
    CbmLitDetGeoPar* par=(CbmLitDetGeoPar*)(rtdb->getContainer("CbmLitDetGeoPar"));
-   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
+   TObjArray* fSensNodes = par->GetGeoSensitiveNodes();
+   TObjArray* fPassNodes = par->GetGeoPassiveNodes();
 
    TListIter iter(volList);
    FairGeoNode* node   = NULL;
-   FairGeoVolume *aVol=NULL;
+   FairGeoVolume* aVol=NULL;
 
    while( (node = (FairGeoNode*)iter.Next()) ) {
       aVol = dynamic_cast<FairGeoVolume*> ( node );
@@ -164,19 +172,20 @@ void CbmLitDet::ConstructGeometry() {
 }
 
 //CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID,
-//					    TVector3 pos, TVector3 mom,
-//					    Double_t time, Double_t length,
-//					    Double_t eLoss) {
+//                 TVector3 pos, TVector3 mom,
+//                 Double_t time, Double_t length,
+//                 Double_t eLoss) {
 CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
                                   TVector3 posOut, TVector3 momIn,
                                   TVector3 momOut, Double_t time,
-                                  Double_t length, Double_t eLoss) {
+                                  Double_t length, Double_t eLoss)
+{
    TClonesArray& clref = *fCbmLitDetPointCollection;
    Int_t size = clref.GetEntriesFast();
    return new(clref[size]) CbmLitDetPoint(trackID, detID, posIn, posOut,
                                           momIn, momOut, time, length, eLoss);
 //  return new(clref[size]) CbmLitDetPoint(trackID, detID, pos, mom,
-//					      time, length, eLoss);
+//                   time, length, eLoss);
 }
 
 ClassImp(CbmLitDet)

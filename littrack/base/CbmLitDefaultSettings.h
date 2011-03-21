@@ -9,7 +9,8 @@
 #ifndef CBMLITDEFAULTSETTINGS_H_
 #define CBMLITDEFAULTSETTINGS_H_
 
-namespace lit {
+namespace lit
+{
 
 // Track propagation settings
 const myf LINE_EXTRAPOLATION_START_Z = 450.; // z coordinate [cm] after which linear track extrapolation starts

@@ -49,17 +49,17 @@ void SetStyles();
  * @param drawOpt Other drawing options (see ROOT documentation for details).
  */
 void DrawHist1D(
-		TH1* hist,
-		const std::string& titleX,
-		const std::string& titleY,
-		Int_t color,
-		Int_t lineWidth,
-		Int_t lineStyle,
-		Int_t markerSize,
-		Int_t markerStyle,
-		Bool_t logx,
-		Bool_t logy,
-		const std::string& drawOpt);
+   TH1* hist,
+   const std::string& titleX,
+   const std::string& titleY,
+   Int_t color,
+   Int_t lineWidth,
+   Int_t lineStyle,
+   Int_t markerSize,
+   Int_t markerStyle,
+   Bool_t logx,
+   Bool_t logy,
+   const std::string& drawOpt);
 
 
 
@@ -74,14 +74,14 @@ void DrawHist1D(
  * @param drawOpt Other drawing options (see ROOT documentation for details).
  */
 void DrawHist2D(
-		TH2* hist,
-		const std::string& titleX,
-		const std::string& titleY,
-		const std::string& titleZ,
-		Bool_t logx,
-		Bool_t logy,
-		Bool_t logz,
-		const std::string& drawOpt);
+   TH2* hist,
+   const std::string& titleX,
+   const std::string& titleY,
+   const std::string& titleZ,
+   Bool_t logx,
+   Bool_t logy,
+   Bool_t logz,
+   const std::string& drawOpt);
 
 
 
@@ -106,24 +106,24 @@ void DrawHist2D(
  * @param y2 coordinates of the Legend in the current pad
  */
 void DrawHist1D(
-		TH1* hist1,
-		TH1* hist2,
-		TH1* hist3,
-                TH1* hist4,
-		const std::string& legendLabel,
-		const std::string& xAxisLabel,
-		const std::string& yAxisLabel,
-		const std::string& hist1label,
-		const std::string& hist2label,
-		const std::string& hist3label,
-		const std::string& hist4label,
-		Bool_t logx,
-		Bool_t logy,
-		Bool_t drawLegend,
-		Double_t x1,
-		Double_t y1,
-		Double_t x2,
-		Double_t y2);
+   TH1* hist1,
+   TH1* hist2,
+   TH1* hist3,
+   TH1* hist4,
+   const std::string& legendLabel,
+   const std::string& xAxisLabel,
+   const std::string& yAxisLabel,
+   const std::string& hist1label,
+   const std::string& hist2label,
+   const std::string& hist3label,
+   const std::string& hist4label,
+   Bool_t logx,
+   Bool_t logy,
+   Bool_t drawLegend,
+   Double_t x1,
+   Double_t y1,
+   Double_t x2,
+   Double_t y2);
 
 
 
@@ -133,9 +133,9 @@ void DrawHist1D(
  * @param rms RMS value
  */
 void DrawHistSigmaRMS(
-		Int_t index,
-		Double_t sigma,
-		Double_t rms);
+   Int_t index,
+   Double_t sigma,
+   Double_t rms);
 
 /* Draws graph.
  * @param graph Pointer to the TGraph.
@@ -151,17 +151,17 @@ void DrawHistSigmaRMS(
  * @param drawOpt Other drawing options (see ROOT documentation for details).
  */
 void DrawGraph(
-		TGraph* graph,
-		const std::string& titleX,
-		const std::string& titleY,
-		Int_t color,
-		Int_t lineWidth,
-		Int_t lineStyle,
-		Int_t markerSize,
-		Int_t markerStyle,
-		Bool_t logx,
-		Bool_t logy,
-		const std::string& drawOpt);
+   TGraph* graph,
+   const std::string& titleX,
+   const std::string& titleY,
+   Int_t color,
+   Int_t lineWidth,
+   Int_t lineStyle,
+   Int_t markerSize,
+   Int_t markerStyle,
+   Bool_t logx,
+   Bool_t logy,
+   const std::string& drawOpt);
 
 
 /* Draws up to TGraphs. If graph == NULL than graph will not be drawn.
@@ -183,22 +183,22 @@ void DrawGraph(
  * @param y2 coordinates of the Legend in the current pad
  */
 void DrawGraph(
-		TGraph* graph1,
-		TGraph* graph2,
-		TGraph* graph3,
-		const std::string& legendLabel,
-		const std::string& xAxisLabel,
-		const std::string& yAxisLabel,
-		const std::string& hist1label,
-		const std::string& hist2label,
-		const std::string& hist3label,
-		Bool_t logx,
-		Bool_t logy,
-		Bool_t drawLegend,
-		Double_t x1,
-		Double_t y1,
-		Double_t x2,
-		Double_t y2);
+   TGraph* graph1,
+   TGraph* graph2,
+   TGraph* graph3,
+   const std::string& legendLabel,
+   const std::string& xAxisLabel,
+   const std::string& yAxisLabel,
+   const std::string& hist1label,
+   const std::string& hist2label,
+   const std::string& hist3label,
+   Bool_t logx,
+   Bool_t logy,
+   Bool_t drawLegend,
+   Double_t x1,
+   Double_t y1,
+   Double_t x2,
+   Double_t y2);
 
 /* Draws 2D graph.
  * @param graph Pointer to the TGraph2D.
@@ -211,14 +211,14 @@ void DrawGraph(
  * @param drawOpt Other drawing options (see ROOT documentation for details).
  */
 void DrawGraph2D(
-		TGraph2D* graph,
-		const std::string& titleX,
-		const std::string& titleY,
-		const std::string& titleZ,
-		Bool_t logx,
-		Bool_t logy,
-		Bool_t logz,
-		const std::string& drawOpt);
+   TGraph2D* graph,
+   const std::string& titleX,
+   const std::string& titleY,
+   const std::string& titleZ,
+   Bool_t logx,
+   Bool_t logy,
+   Bool_t logz,
+   const std::string& drawOpt);
 
 /* Divide two histograms.
  * @param h1 Pointer to the first histogram.
@@ -229,17 +229,17 @@ void DrawGraph2D(
  * @param axisY Y axis title.
  */
 TH1D* Divide1DHists(
-		TH1D* h1,
-		TH1D* h2,
-		const std::string& name,
-		const std::string& title,
-		const std::string& axisX,
-		const std::string& axisY);
+   TH1D* h1,
+   TH1D* h2,
+   const std::string& name,
+   const std::string& title,
+   const std::string& axisX,
+   const std::string& axisY);
 
 
 std::string CalcEfficiency(
-		TH1* histRec,
-		TH1* histAcc);
+   TH1* histRec,
+   TH1* histAcc);
 
 
 #endif

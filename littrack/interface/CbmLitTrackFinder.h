@@ -14,21 +14,21 @@
 class CbmLitTrackFinder : public CbmLitTool
 {
 public:
-	/* Constructor */
-	CbmLitTrackFinder() {};
+   /* Constructor */
+   CbmLitTrackFinder() {};
 
-	/* Destructor */
-	virtual ~CbmLitTrackFinder() {};
+   /* Destructor */
+   virtual ~CbmLitTrackFinder() {};
 
-	/* Main function to be implemented for the concrete track finder algorithm
-	 * @param hits Input vector of hits
-	 * @param trackSeeds Input vector of track seeds
-	 * @param tracks Output vector of found tracks
-	 * @return Status code */
-	virtual LitStatus DoFind(
-			HitPtrVector& hits,
-			TrackPtrVector& trackSeeds,
-			TrackPtrVector& tracks) = 0;
+   /* Main function to be implemented for the concrete track finder algorithm
+    * @param hits Input vector of hits
+    * @param trackSeeds Input vector of track seeds
+    * @param tracks Output vector of found tracks
+    * @return Status code */
+   virtual LitStatus DoFind(
+      HitPtrVector& hits,
+      TrackPtrVector& trackSeeds,
+      TrackPtrVector& tracks) = 0;
 };
 
 #endif /*CBMLITTRACKFINDER_H_*/

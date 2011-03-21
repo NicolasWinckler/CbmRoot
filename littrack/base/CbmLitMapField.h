@@ -13,33 +13,34 @@
 
 #include "FairField.h"
 
-class CbmLitMapField :public CbmLitField {
+class CbmLitMapField :public CbmLitField
+{
 public:
-	/* Constructor */
-	CbmLitMapField(FairField* field):fField(field) {}
+   /* Constructor */
+   CbmLitMapField(FairField* field):fField(field) {}
 
-	/* Destructor */
-	virtual ~CbmLitMapField(){};
+   /* Destructor */
+   virtual ~CbmLitMapField() {};
 
-	/* Inherited from CbmLitField */
-	void GetFieldValue(
-					myf x, myf y, myf z,
-					myf &Bx, myf &By, myf &Bz) const {
-		double pos[3] = {x, y, z};
-		double B[3];
-		fField->GetFieldValue(pos, B);
-		Bx = B[0];
-		By = B[1];
-		Bz = B[2];
-	}
+   /* Inherited from CbmLitField */
+   void GetFieldValue(
+      myf x, myf y, myf z,
+      myf& Bx, myf& By, myf& Bz) const {
+      double pos[3] = {x, y, z};
+      double B[3];
+      fField->GetFieldValue(pos, B);
+      Bx = B[0];
+      By = B[1];
+      Bz = B[2];
+   }
 
-	/* Inherited from CbmLitField */
-	virtual std::string ToString() const {
-		return "CbmLitMapField::ToString";
-	}
+   /* Inherited from CbmLitField */
+   virtual std::string ToString() const {
+      return "CbmLitMapField::ToString";
+   }
 
 private:
-	FairField* fField; // Pointer to field map
+   FairField* fField; // Pointer to field map
 };
 
 #endif /* CBMLITMAPFIELD_H_ */

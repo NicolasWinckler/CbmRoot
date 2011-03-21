@@ -16,18 +16,19 @@
 
 class CbmLitTrackParam;
 
-class CbmLitTrackExtrapolator : public CbmLitTool {
+class CbmLitTrackExtrapolator : public CbmLitTool
+{
 public:
-	/* Constructor */
-	CbmLitTrackExtrapolator() {};
+   /* Constructor */
+   CbmLitTrackExtrapolator() {};
 
-	/* Constructor with name.
-	 * @param name Name of the tool. */
-	CbmLitTrackExtrapolator(
-		   const std::string& name):CbmLitTool(name){};
+   /* Constructor with name.
+    * @param name Name of the tool. */
+   CbmLitTrackExtrapolator(
+      const std::string& name):CbmLitTool(name) {};
 
-	/* Destructor */
-	virtual ~CbmLitTrackExtrapolator(){};
+   /* Destructor */
+   virtual ~CbmLitTrackExtrapolator() {};
 
    /* Pure virtual function for track parameters extrapolation with calculation of transport matrix.
     * @param parIn Pointer to the initial track parameters.
@@ -36,10 +37,10 @@ public:
     * @param F Output transport matrix. If F == NULL than transport matrix is not calculated.
     * @return Extrapolation status. */
    virtual LitStatus Extrapolate(
-		   const CbmLitTrackParam *parIn,
-           CbmLitTrackParam *parOut,
-           myf zOut,
-           std::vector<myf>* F = NULL) = 0;
+      const CbmLitTrackParam* parIn,
+      CbmLitTrackParam* parOut,
+      myf zOut,
+      std::vector<myf>* F = NULL) = 0;
 
    /* Pure virtual function for track parameters extrapolation with calculation of transport matrix.
     * @param par Pointer to the initial and output track parameters.
@@ -47,9 +48,9 @@ public:
     * @param F Output transport matrix. If F == NULL than transport matrix is not calculated.
     * @return Extrapolation status. */
    virtual LitStatus Extrapolate(
-		   CbmLitTrackParam *par,
-           myf zOut,
-           std::vector<myf>* F = NULL) = 0;
+      CbmLitTrackParam* par,
+      myf zOut,
+      std::vector<myf>* F = NULL) = 0;
 };
 
 #endif

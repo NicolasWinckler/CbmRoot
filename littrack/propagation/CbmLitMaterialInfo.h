@@ -17,92 +17,92 @@
 class CbmLitMaterialInfo
 {
 public:
-	/* Constructor */
-	CbmLitMaterialInfo():
-		fLength(0.),
-		fRL(0.),
-		fRho(0.),
-		fZ(0.),
-		fA(0.),
-		fZpos(0.) {}
+   /* Constructor */
+   CbmLitMaterialInfo():
+      fLength(0.),
+      fRL(0.),
+      fRho(0.),
+      fZ(0.),
+      fA(0.),
+      fZpos(0.) {}
 
-	/* Constructor with assignment
-	 * @param length Length of the material [cm]
-	 * @param rl Radiation length [cm]
-	 * @param rho Density [g/cm^3]
-	 * @param Z
-	 * @param A
-	 * @param zpos Z position of the material
-	 */
-	CbmLitMaterialInfo(
-			myf length,
-			myf rl,
-			myf rho,
-			myf Z,
-			myf A,
-			myf zpos):
-		fLength(length),
-		fRL(rl),
-		fRho(rho),
-		fZ(Z),
-		fA(A),
-		fZpos(zpos){}
+   /* Constructor with assignment
+    * @param length Length of the material [cm]
+    * @param rl Radiation length [cm]
+    * @param rho Density [g/cm^3]
+    * @param Z
+    * @param A
+    * @param zpos Z position of the material
+    */
+   CbmLitMaterialInfo(
+      myf length,
+      myf rl,
+      myf rho,
+      myf Z,
+      myf A,
+      myf zpos):
+      fLength(length),
+      fRL(rl),
+      fRho(rho),
+      fZ(Z),
+      fA(A),
+      fZpos(zpos) {}
 
-	/* Destructor */
-	virtual ~CbmLitMaterialInfo() {};
+   /* Destructor */
+   virtual ~CbmLitMaterialInfo() {};
 
-	/*@return Length of the material */
-	myf GetLength() const { return fLength;}
+   /*@return Length of the material */
+   myf GetLength() const { return fLength;}
 
-	/*@return Radiation length */
-	myf GetRL() const { return fRL;}
+   /*@return Radiation length */
+   myf GetRL() const { return fRL;}
 
-	/*@return Density */
-	myf GetRho() const { return fRho;}
+   /*@return Density */
+   myf GetRho() const { return fRho;}
 
-	/*@return Atomic number */
-	myf GetZ() const { return fZ;}
+   /*@return Atomic number */
+   myf GetZ() const { return fZ;}
 
-	/*@return  Atomic mass */
-	myf GetA() const { return fA;}
+   /*@return  Atomic mass */
+   myf GetA() const { return fA;}
 
-	/*@return Z position of the material */
-	myf GetZpos() const { return fZpos;}
+   /*@return Z position of the material */
+   myf GetZpos() const { return fZpos;}
 
-	/* Sets length of the material */
-	void SetLength(myf length) {fLength = length;}
+   /* Sets length of the material */
+   void SetLength(myf length) {fLength = length;}
 
-	/* Sets radiation length of the material */
-	void SetRL(myf rl) {fRL = rl;}
+   /* Sets radiation length of the material */
+   void SetRL(myf rl) {fRL = rl;}
 
-	/* Sets density */
-	void SetRho(myf rho) {fRho = rho;}
+   /* Sets density */
+   void SetRho(myf rho) {fRho = rho;}
 
-	/* Sets atomic number */
-	void SetZ(myf Z) {fZ = Z;}
+   /* Sets atomic number */
+   void SetZ(myf Z) {fZ = Z;}
 
-	/* Sets atomic mass */
-	void SetA(myf A) {fA = A;}
+   /* Sets atomic mass */
+   void SetA(myf A) {fA = A;}
 
-	/* Sets Z position of the material */
-	void SetZpos(myf zpos) {fZpos = zpos;}
+   /* Sets Z position of the material */
+   void SetZpos(myf zpos) {fZpos = zpos;}
 
-	/* @return String representation of the class */
-	virtual std::string ToString() const {
-		std::stringstream ss;
-		ss << "MaterialInfo: length=" << fLength << " rl=" << fRL
-			<< " rho=" << fRho << " Z=" << fZ << " A=" << fA << " zpos=" << fZpos
-			<< std::endl;
-		return ss.str();
-	}
+   /* @return String representation of the class */
+   virtual std::string ToString() const {
+      std::stringstream ss;
+      ss << "MaterialInfo: length=" << fLength << " rl=" << fRL
+         << " rho=" << fRho << " Z=" << fZ << " A=" << fA << " zpos=" << fZpos
+         << std::endl;
+      return ss.str();
+   }
 
 private:
-	myf fLength; // Length of the material [cm]
-	myf fRL; // Radiation length [cm]
-	myf fRho; // Density [g/cm^3]
-	myf fZ; // Atomic number
-	myf fA; // Atomic mass
-	myf fZpos; // Z position of the material
+   myf fLength; // Length of the material [cm]
+   myf fRL; // Radiation length [cm]
+   myf fRho; // Density [g/cm^3]
+   myf fZ; // Atomic number
+   myf fA; // Atomic mass
+   myf fZpos; // Z position of the material
 };
 
 #endif /*CBMLITMATERIALINFO_H_*/

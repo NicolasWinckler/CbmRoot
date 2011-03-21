@@ -11,34 +11,35 @@
 #include "weight/CbmLitWeightCalculator.h"
 
 
-class CbmLitWeightCalculatorOptimal : public CbmLitWeightCalculator {
+class CbmLitWeightCalculatorOptimal : public CbmLitWeightCalculator
+{
 public:
-	CbmLitWeightCalculatorOptimal();
-	virtual ~CbmLitWeightCalculatorOptimal();
+   CbmLitWeightCalculatorOptimal();
+   virtual ~CbmLitWeightCalculatorOptimal();
 
-	virtual LitStatus Initialize();
-	virtual LitStatus Finalize();
+   virtual LitStatus Initialize();
+   virtual LitStatus Finalize();
 
-	virtual LitStatus DoCalculate(
-			const CbmLitTrackParam* par,
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd,
-			myf T);
+   virtual LitStatus DoCalculate(
+      const CbmLitTrackParam* par,
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd,
+      myf T);
 
-	virtual LitStatus DoCalculate(
-			const CbmLitTrackParam* par,
-			HitPtrVector& hits,
-			myf T);
+   virtual LitStatus DoCalculate(
+      const CbmLitTrackParam* par,
+      HitPtrVector& hits,
+      myf T);
 
 private:
-	LitStatus OptimalWeight(
-			const CbmLitTrackParam* par,
-			CbmLitHit* hit,
-			myf T) const;
+   LitStatus OptimalWeight(
+      const CbmLitTrackParam* par,
+      CbmLitHit* hit,
+      myf T) const;
 
-	LitStatus Normalize(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd) const;
+   LitStatus Normalize(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd) const;
 };
 
 #endif /* CBMLITWEIGHTCALCULATOROPTIMAL_H_ */

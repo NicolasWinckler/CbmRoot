@@ -14,26 +14,26 @@
 class CbmLitTrackSelectionEmpty : public CbmLitTrackSelection
 {
 public:
-    /* Constructor */
-	CbmLitTrackSelectionEmpty();
+   /* Constructor */
+   CbmLitTrackSelectionEmpty();
 
-	/* Destructor */
-	virtual ~CbmLitTrackSelectionEmpty();
+   /* Destructor */
+   virtual ~CbmLitTrackSelectionEmpty();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrVector& tracks);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrVector& tracks);
 };
 
 #endif /*CBMLITTRACKSELECTIONEMPTY_H_*/

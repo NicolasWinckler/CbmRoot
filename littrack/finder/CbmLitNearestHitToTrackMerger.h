@@ -19,53 +19,53 @@ class CbmLitTrackPropagator;
 class CbmLitTrackUpdate;
 
 class CbmLitNearestHitToTrackMerger : public CbmLitHitToTrackMerger,
-                                      public CbmLitGating
+   public CbmLitGating
 {
 public:
-	/* Constructor */
-	CbmLitNearestHitToTrackMerger();
+   /* Constructor */
+   CbmLitNearestHitToTrackMerger();
 
-	/* Destructor */
-	virtual ~CbmLitNearestHitToTrackMerger();
+   /* Destructor */
+   virtual ~CbmLitNearestHitToTrackMerger();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitHitToTrackMerger */
-	virtual LitStatus DoMerge(
-			HitPtrVector& hits, //TODO: add const here
-			TrackPtrVector& tracks);
+   /* Inherited from CbmLitHitToTrackMerger */
+   virtual LitStatus DoMerge(
+      HitPtrVector& hits, //TODO: add const here
+      TrackPtrVector& tracks);
 
-	/* Sets station to merge at */
-	void SetStation(const CbmLitStation& station) {fStation = station;}
+   /* Sets station to merge at */
+   void SetStation(const CbmLitStation& station) {fStation = station;}
 
-	/* Sets track propagation tool */
-	void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
+   /* Sets track propagation tool */
+   void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
 
-	/* Sets track update tool */
-	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
+   /* Sets track update tool */
+   void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
 
-	/* Sets PDG hypothesis */
-	void SetPDG(int pdg) {fPDG = pdg;}
-
-private:
-	/* Attaches nearest hit to track */
-	bool AddNearestHit(
-			CbmLitTrack* track,
-			HitPtrIteratorPair bounds) const;
+   /* Sets PDG hypothesis */
+   void SetPDG(int pdg) {fPDG = pdg;}
 
 private:
-	/* Track propagation tool */
-	TrackPropagatorPtr fPropagator;
-	/* Track update tool */
-	TrackUpdatePtr fFilter;
-	/* station to merge at */
-	CbmLitStation fStation;
-	/* PDG hypothesis */
-	int fPDG;
+   /* Attaches nearest hit to track */
+   bool AddNearestHit(
+      CbmLitTrack* track,
+      HitPtrIteratorPair bounds) const;
+
+private:
+   /* Track propagation tool */
+   TrackPropagatorPtr fPropagator;
+   /* Track update tool */
+   TrackUpdatePtr fFilter;
+   /* station to merge at */
+   CbmLitStation fStation;
+   /* PDG hypothesis */
+   int fPDG;
 };
 
 #endif /* CBMLITNEARESTHITTOTRACKMERGER_H_ */

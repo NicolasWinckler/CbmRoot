@@ -19,49 +19,49 @@ class LitScalTrack;
 class CbmLitTrackFinderNNParallel : public CbmLitTrackFinder
 {
 public:
-	/* Constructor */
-	CbmLitTrackFinderNNParallel(const std::string& trackingType);
+   /* Constructor */
+   CbmLitTrackFinderNNParallel(const std::string& trackingType);
 
-	/* Destructor */
-	virtual ~CbmLitTrackFinderNNParallel();
+   /* Destructor */
+   virtual ~CbmLitTrackFinderNNParallel();
 
-	/* Inherited from CbmLitTrackFinder */
-	virtual LitStatus DoFind(
-			HitPtrVector& hits,
-			TrackPtrVector& trackSeeds,
-			TrackPtrVector& tracks);
+   /* Inherited from CbmLitTrackFinder */
+   virtual LitStatus DoFind(
+      HitPtrVector& hits,
+      TrackPtrVector& trackSeeds,
+      TrackPtrVector& tracks);
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
 private:
-	void ConvertHits(
-			HitPtrVector& hits,
-			LitScalPixelHit* lhits[]);
+   void ConvertHits(
+      HitPtrVector& hits,
+      LitScalPixelHit* lhits[]);
 
-	void ConvertSeeds(
-			TrackPtrVector& seeds,
-			LitScalTrack* lseeds[]);
+   void ConvertSeeds(
+      TrackPtrVector& seeds,
+      LitScalTrack* lseeds[]);
 
-	void ConvertTracks(
-			LitScalTrack* ltracks[],
-			unsigned int nofTracks,
-			TrackPtrVector& tracks);
+   void ConvertTracks(
+      LitScalTrack* ltracks[],
+      unsigned int nofTracks,
+      TrackPtrVector& tracks);
 
-	LitTrackFinderNNVecMuon* fTFParallelMuon;
+   LitTrackFinderNNVecMuon* fTFParallelMuon;
 
-	LitTrackFinderNNScalarElectron* fTFScalElectron;
+   LitTrackFinderNNScalarElectron* fTFScalElectron;
 
-	LitTrackFinderNNVecElectron* fTFVecElectron;
+   LitTrackFinderNNVecElectron* fTFVecElectron;
 
-	double fTime;
+   double fTime;
 
-	int fEventNo;
+   int fEventNo;
 
-	std::string fTrackingType;
+   std::string fTrackingType;
 };
 
 #endif /* CBMLITTRACKFINDERNNPARALLEL_H_ */

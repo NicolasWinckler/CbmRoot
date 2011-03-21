@@ -12,32 +12,33 @@
 
 class CbmLitTrackParam;
 
-class CbmLitLineTrackExtrapolator: public CbmLitTrackExtrapolator {
+class CbmLitLineTrackExtrapolator: public CbmLitTrackExtrapolator
+{
 public:
-	/* Constructor */
-	CbmLitLineTrackExtrapolator();
+   /* Constructor */
+   CbmLitLineTrackExtrapolator();
 
-	/* Destructor */
-	virtual ~CbmLitLineTrackExtrapolator();
+   /* Destructor */
+   virtual ~CbmLitLineTrackExtrapolator();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitTrackExtrapolator */
-	virtual LitStatus Extrapolate(
-		   const CbmLitTrackParam *parIn,
-		   CbmLitTrackParam *parOut,
-		   myf zOut,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackExtrapolator */
+   virtual LitStatus Extrapolate(
+      const CbmLitTrackParam* parIn,
+      CbmLitTrackParam* parOut,
+      myf zOut,
+      std::vector<myf>* F);
 
-	/* Inherited from CbmLitTrackExtrapolator */
-	virtual LitStatus Extrapolate(
-		   CbmLitTrackParam *par,
-		   myf zOut,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackExtrapolator */
+   virtual LitStatus Extrapolate(
+      CbmLitTrackParam* par,
+      myf zOut,
+      std::vector<myf>* F);
 };
 
 #endif //CbmLitLineTrackExtrapolator

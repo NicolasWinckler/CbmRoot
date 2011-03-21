@@ -16,8 +16,8 @@ class CbmLitTrack;
 class CbmLitTrackFitter : public CbmLitTool
 {
 public:
-	/* Constructor */
-   CbmLitTrackFitter(){};
+   /* Constructor */
+   CbmLitTrackFitter() {};
 
    /* Destructor */
    virtual ~CbmLitTrackFitter() {};
@@ -27,8 +27,8 @@ public:
     * @param downstream Track fit direction
     * @return Status code */
    virtual LitStatus Fit(
-		   CbmLitTrack *track,
-		   bool downstream = true) = 0;
+      CbmLitTrack* track,
+      bool downstream = true) = 0;
 };
 
 #endif

@@ -23,43 +23,44 @@ CbmLitTrackSelectionSameSeed::~CbmLitTrackSelectionSameSeed()
 
 LitStatus CbmLitTrackSelectionSameSeed::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionSameSeed::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionSameSeed::DoSelect(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	if (itBegin == itEnd) return kLITSUCCESS;
+   if (itBegin == itEnd) { return kLITSUCCESS; }
 
-	std::sort(itBegin, itEnd, CompareTrackPtrPrevTrackIdLess());
+   std::sort(itBegin, itEnd, CompareTrackPtrPrevTrackIdLess());
 
-	int minId = (*itBegin)->GetPreviousTrackId();
-	int maxId = (*(itEnd-1))->GetPreviousTrackId();
+   int minId = (*itBegin)->GetPreviousTrackId();
+   int maxId = (*(itEnd-1))->GetPreviousTrackId();
 
-	for (int iId = minId; iId <= maxId; iId++) {
-		CbmLitTrack value;
-		value.SetPreviousTrackId(iId);
-		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
-		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrPrevTrackIdLess());
-		if(bounds.first == bounds.second) continue;
+   for (int iId = minId; iId <= maxId; iId++) {
+      CbmLitTrack value;
+      value.SetPreviousTrackId(iId);
+      std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
+      bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrPrevTrackIdLess());
+      if(bounds.first == bounds.second) { continue; }
 
-		CbmLitQualitySort::DoSort(bounds.first, bounds.second);
+      CbmLitQualitySort::DoSort(bounds.first, bounds.second);
 
-		for (TrackPtrIterator i = bounds.first + 1; i != bounds.second; i++)
-			(*i)->SetQuality(kLITBAD);
-	}
+      for (TrackPtrIterator i = bounds.first + 1; i != bounds.second; i++) {
+         (*i)->SetQuality(kLITBAD);
+      }
+   }
 
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionSameSeed::DoSelect(
-		TrackPtrVector& tracks)
+   TrackPtrVector& tracks)
 {
-	return DoSelect(tracks.begin(), tracks.end());
+   return DoSelect(tracks.begin(), tracks.end());
 }

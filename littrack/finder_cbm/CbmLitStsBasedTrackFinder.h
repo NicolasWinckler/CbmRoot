@@ -13,30 +13,30 @@ class TClonesArray;
 class CbmLitStsBasedTrackFinder
 {
 public:
-	CbmLitStsBasedTrackFinder();
-	virtual ~CbmLitStsBasedTrackFinder();
+   CbmLitStsBasedTrackFinder();
+   virtual ~CbmLitStsBasedTrackFinder();
 
-	void DefaultInit();
+   void DefaultInit();
 
-    int DefaultDoFind(
-    		TClonesArray* hitArray,
-            TClonesArray* trackArray);
+   int DefaultDoFind(
+      TClonesArray* hitArray,
+      TClonesArray* trackArray);
 
-    void DefaultCreateTrackSeeds(
-    		TClonesArray* trackArray,
-    		TrackPtrVector& trackSeeds,
-    		const CbmLitDetectorLayout& layout,
-    		int pdg);
+   void DefaultCreateTrackSeeds(
+      TClonesArray* trackArray,
+      TrackPtrVector& trackSeeds,
+      const CbmLitDetectorLayout& layout,
+      int pdg);
 
-    void SetPropagatorToDet(TrackPropagatorPtr propagatorToDet) { fPropagatorToDet = propagatorToDet;}
+   void SetPropagatorToDet(TrackPropagatorPtr propagatorToDet) { fPropagatorToDet = propagatorToDet;}
 
 protected:
-	TClonesArray* fTrackSeedsArray;
+   TClonesArray* fTrackSeedsArray;
 
 private:
-	TrackPropagatorPtr fPropagatorToDet;
+   TrackPropagatorPtr fPropagatorToDet;
 
-	ClassDef(CbmLitStsBasedTrackFinder, 1);
+   ClassDef(CbmLitStsBasedTrackFinder, 1);
 };
 
 #endif /* CBMLITSTSBASEDTRACKFINDER_H_ */

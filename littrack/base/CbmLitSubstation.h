@@ -16,27 +16,27 @@
 class CbmLitSubstation
 {
 public:
-	/* Constructor */
-	CbmLitSubstation(): fZ(0.) {};
+   /* Constructor */
+   CbmLitSubstation(): fZ(0.) {};
 
-	/* Destructor */
-	virtual ~CbmLitSubstation() {};
+   /* Destructor */
+   virtual ~CbmLitSubstation() {};
 
-	/* Sets z position of substation */
-	void SetZ(myf z) {fZ = z;}
+   /* Sets z position of substation */
+   void SetZ(myf z) {fZ = z;}
 
-	/* Returns Z position of substation */
-	myf GetZ() const {return fZ;}
+   /* Returns Z position of substation */
+   myf GetZ() const {return fZ;}
 
-	/* Returns std::string representation of the class. */
-	virtual std::string ToString() const {
-		std::stringstream ss;
-		ss << "Substation: z=" << GetZ() << std::endl;
-		return ss.str();;
-	}
+   /* Returns std::string representation of the class. */
+   virtual std::string ToString() const {
+      std::stringstream ss;
+      ss << "Substation: z=" << GetZ() << std::endl;
+      return ss.str();;
+   }
 
 private:
-	myf fZ; // Z position of substation
+   myf fZ; // Z position of substation
 };
 
 #endif /*CBMLITSUBSTATION_H_*/

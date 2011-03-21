@@ -16,29 +16,29 @@ class CbmLitHit;
 class CbmLitWeightedHitCalculator : public CbmLitTool
 {
 public:
-	/* Constructor */
-	CbmLitWeightedHitCalculator(){};
+   /* Constructor */
+   CbmLitWeightedHitCalculator() {};
 
-	/* Destructor */
-	virtual ~CbmLitWeightedHitCalculator(){};
+   /* Destructor */
+   virtual ~CbmLitWeightedHitCalculator() {};
 
-	/* Main function to be implemented for the concrete weighted hit calculation algorithms
-	 * @param itBegin Iterator of the first hit
-	 * @param itEnd Iterator of the last hit
-	 * @param hit Pointer to the output hit
-	 * @return Status code */
-	virtual void DoCalculate(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd,
-			CbmLitHit* hit) = 0;
+   /* Main function to be implemented for the concrete weighted hit calculation algorithms
+    * @param itBegin Iterator of the first hit
+    * @param itEnd Iterator of the last hit
+    * @param hit Pointer to the output hit
+    * @return Status code */
+   virtual void DoCalculate(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd,
+      CbmLitHit* hit) = 0;
 
-	/* Main function to be implemented for the concrete weighted hit calculation algorithms
-	 * @param hits Array of hits
-	 * @param hit Pointer to the output hit
-	 * @return Status code */
-	virtual void DoCalculate(
-			HitPtrVector& hits,
-			CbmLitHit* hit) = 0;
+   /* Main function to be implemented for the concrete weighted hit calculation algorithms
+    * @param hits Array of hits
+    * @param hit Pointer to the output hit
+    * @return Status code */
+   virtual void DoCalculate(
+      HitPtrVector& hits,
+      CbmLitHit* hit) = 0;
 };
 
 #endif /*CBMLITWEIGHTEDHITCALCULATOR_H_*/

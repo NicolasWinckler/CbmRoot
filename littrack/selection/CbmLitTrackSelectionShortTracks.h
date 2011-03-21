@@ -15,32 +15,32 @@
 class CbmLitTrackSelectionShortTracks : public CbmLitTrackSelection
 {
 public:
-	/* Constructor */
-	CbmLitTrackSelectionShortTracks();
+   /* Constructor */
+   CbmLitTrackSelectionShortTracks();
 
-	/* Destructor */
-	virtual ~CbmLitTrackSelectionShortTracks();
+   /* Destructor */
+   virtual ~CbmLitTrackSelectionShortTracks();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrVector& tracks);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrVector& tracks);
 
 private:
-	/* Returns true if two tracks share same set of hits */
-	bool IsHitSharing(
-			const CbmLitTrack* track0,
-			const CbmLitTrack* track1);
+   /* Returns true if two tracks share same set of hits */
+   bool IsHitSharing(
+      const CbmLitTrack* track0,
+      const CbmLitTrack* track1);
 };
 
 #endif /*CBMLITTRACKSELECTIONSHORTTRACKS_H_*/

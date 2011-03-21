@@ -14,27 +14,27 @@
 class CbmLitPDG
 {
 public:
-	/* Constructor */
-	CbmLitPDG();
+   /* Constructor */
+   CbmLitPDG();
 
-	/* Destructor */
-	virtual ~CbmLitPDG();
+   /* Destructor */
+   virtual ~CbmLitPDG();
 
-	/* Returns mass of the particle in [GeV/c]. */
-	static myf GetMass(
-			int pdg);
+   /* Returns mass of the particle in [GeV/c]. */
+   static myf GetMass(
+      int pdg);
 
-	/* Returns true if particle is electron. */
-	static bool IsElectron(
-			int pdg);
+   /* Returns true if particle is electron. */
+   static bool IsElectron(
+      int pdg);
 
-	/* Returns true if particle is muon. */
-	static bool IsMuon(
-			int pdg);
+   /* Returns true if particle is muon. */
+   static bool IsMuon(
+      int pdg);
 
-	/* Returns true is particle is pion. */
-	static bool IsPion(
-				int pdg);
+   /* Returns true is particle is pion. */
+   static bool IsPion(
+      int pdg);
 };
 
 #endif /*CBMLITPDG_H_*/

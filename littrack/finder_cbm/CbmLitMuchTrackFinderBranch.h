@@ -16,19 +16,19 @@ class CbmLitPixelHit;
 class TClonesArray;
 
 class CbmLitMuchTrackFinderBranch : public CbmMuchTrackFinder,
-									private CbmLitTrackFinderBranch,
-									private CbmLitStsBasedTrackFinder
+   private CbmLitTrackFinderBranch,
+   private CbmLitStsBasedTrackFinder
 {
 public:
-	CbmLitMuchTrackFinderBranch();
-	virtual ~CbmLitMuchTrackFinderBranch();
+   CbmLitMuchTrackFinderBranch();
+   virtual ~CbmLitMuchTrackFinderBranch();
 
-    virtual void Init();
+   virtual void Init();
 
-    virtual Int_t DoFind(
-            TClonesArray* trackArray);
+   virtual Int_t DoFind(
+      TClonesArray* trackArray);
 
-    ClassDef(CbmLitMuchTrackFinderBranch, 1);
+   ClassDef(CbmLitMuchTrackFinderBranch, 1);
 };
 
 #endif /*CBMLITMUCHTRACKFINDERBRANCH_H_*/

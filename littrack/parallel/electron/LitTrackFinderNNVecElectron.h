@@ -26,78 +26,78 @@
 const unsigned int MAX_NOF_TRACKS = 1500;
 
 class LitTrackFinderNNVecElectron : public LitTrackFinderNNBaseElectronVec,
-									public LitTrackFinderNNBase,
-                                    public LitTrackFinder
+   public LitTrackFinderNNBase,
+   public LitTrackFinder
 {
 public:
-	/* Constructor */
-	LitTrackFinderNNVecElectron();
+   /* Constructor */
+   LitTrackFinderNNVecElectron();
 
-	/* Destructor */
-	virtual ~LitTrackFinderNNVecElectron();
+   /* Destructor */
+   virtual ~LitTrackFinderNNVecElectron();
 
-	/* Inherited from LitTrackFinder */
-	virtual void DoFind(
-			LitScalPixelHit* hits[],
-			unsigned int nofHits,
-			LitScalTrack* trackSeeds[],
-			unsigned int nofTrackSeeds,
-			LitScalTrack* tracks[],
-			unsigned int &nofTracks);
+   /* Inherited from LitTrackFinder */
+   virtual void DoFind(
+      LitScalPixelHit* hits[],
+      unsigned int nofHits,
+      LitScalTrack* trackSeeds[],
+      unsigned int nofTrackSeeds,
+      LitScalTrack* tracks[],
+      unsigned int& nofTracks);
 
-	void SetDetectorLayout(LitDetectorLayoutElectron<fvec>& layout) {
-		fLayout = layout;
-		fHitData.SetDetectorLayout(layout);
-	}
+   void SetDetectorLayout(LitDetectorLayoutElectron<fvec>& layout) {
+      fLayout = layout;
+      fHitData.SetDetectorLayout(layout);
+   }
 
 public:
-	/* Follows tracks through the detector
-	 * @param itBegin Iterator to the first track.
-	 * @param itEnd Iterator to the last track.
-	 */
-	void FollowTracks();
+   /* Follows tracks through the detector
+    * @param itBegin Iterator to the first track.
+    * @param itEnd Iterator to the last track.
+    */
+   void FollowTracks();
 
-	/* TODO: Add comments
-	 *
-	 */
-	void PropagateToFirstStation(
-			LitScalTrack* tracks[]);
+   /* TODO: Add comments
+    *
+    */
+   void PropagateToFirstStation(
+      LitScalTrack* tracks[]);
 
-	/*
-	 * TODO Add comments
-	 */
-	void CollectHits(
-			LitTrackParamScal* par,
-			LitScalTrack* track,
-			unsigned char stationGroup,
-			unsigned char station);
+   /*
+    * TODO Add comments
+    */
+   void CollectHits(
+      LitTrackParamScal* par,
+      LitScalTrack* track,
+      unsigned char stationGroup,
+      unsigned char station);
 
-	/* TODO: Add comment
-	 *
-	 */
-	inline void ProcessStation(
-			LitScalTrack* tracks[],
-			unsigned char stationGroup,
-			unsigned char station);
+   /* TODO: Add comment
+    *
+    */
+   inline void ProcessStation(
+      LitScalTrack* tracks[],
+      unsigned char stationGroup,
+      unsigned char station);
 
-	/*
-	 *
-	 */
-	bool AddNearestHit(
-			LitScalTrack* track,
-			const std::pair<unsigned int, unsigned int>& hits,
-			unsigned int nofHits,
-			int stationGroup,
-			int station);
+   /*
+    *
+    */
+   bool AddNearestHit(
+      LitScalTrack* track,
+      const std::pair<unsigned int, unsigned int>& hits,
+      unsigned int nofHits,
+      int stationGroup,
+      int station);
 
 //private:
-//	LitScalTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
-//	unsigned int fNofTracks;
+// LitScalTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
+// unsigned int fNofTracks;
 //
-//	LitDetectorLayoutElectron<fvec> fLayout; // detector geometry
-//	LitHitDataElectron<fvec> fHitData; // arranged hits
+// LitDetectorLayoutElectron<fvec> fLayout; // detector geometry
+// LitHitDataElectron<fvec> fHitData; // arranged hits
 //
-//	unsigned char fMaxNofMissingHits;
+// unsigned char fMaxNofMissingHits;
 };
 
 //#undef cnst

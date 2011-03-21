@@ -13,7 +13,7 @@
 #include <algorithm>
 
 CbmLitTrackSelectionSharedHits::CbmLitTrackSelectionSharedHits():
-	fNofSharedHits(0)
+   fNofSharedHits(0)
 {
 }
 
@@ -23,73 +23,73 @@ CbmLitTrackSelectionSharedHits::~CbmLitTrackSelectionSharedHits()
 
 LitStatus CbmLitTrackSelectionSharedHits::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionSharedHits::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionSharedHits::DoSelect(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	if (itBegin == itEnd) return kLITSUCCESS;
+   if (itBegin == itEnd) { return kLITSUCCESS; }
 
-	CbmLitQualitySort::DoSort(itBegin, itEnd);
-	CheckSharedHits(itBegin, itEnd);
+   CbmLitQualitySort::DoSort(itBegin, itEnd);
+   CheckSharedHits(itBegin, itEnd);
 
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionSharedHits::DoSelect(
-		TrackPtrVector& tracks)
+   TrackPtrVector& tracks)
 {
-	return DoSelect(tracks.begin(), tracks.end());
+   return DoSelect(tracks.begin(), tracks.end());
 }
 
 void CbmLitTrackSelectionSharedHits::CheckSharedHits(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	std::set<int> hitsId;
-	const int STRIPSTART = 100000;
-	const int TRDSTART = 1000000;
+   std::set<int> hitsId;
+   const int STRIPSTART = 100000;
+   const int TRDSTART = 1000000;
 
-	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
-		CbmLitTrack* track = *iTrack;
+   for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+      CbmLitTrack* track = *iTrack;
 
-		if (track->GetQuality() == kLITBAD) continue;
+      if (track->GetQuality() == kLITBAD) { continue; }
 
-	    int nofSharedHits = 0;
-	    int nofHits = track->GetNofHits();
+      int nofSharedHits = 0;
+      int nofHits = track->GetNofHits();
 
-	    for(int iHit = 0; iHit < nofHits; iHit++) {
-	    	int hitId = track->GetHit(iHit)->GetRefId();
-	    	LitHitType type = track->GetHit(iHit)->GetType();
-	    	LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
-	    	if (type == kLITSTRIPHIT) hitId += STRIPSTART;
-	    	if (detId == kLITTRD) hitId += TRDSTART;
-	    	if(hitsId.find(hitId) != hitsId.end()) {
-	            nofSharedHits++;
-	            if (nofSharedHits > fNofSharedHits) {
-	               track->SetQuality(kLITBAD);
-	               break;
-	            }
-	        }
-	    }
+      for(int iHit = 0; iHit < nofHits; iHit++) {
+         int hitId = track->GetHit(iHit)->GetRefId();
+         LitHitType type = track->GetHit(iHit)->GetType();
+         LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
+         if (type == kLITSTRIPHIT) { hitId += STRIPSTART; }
+         if (detId == kLITTRD) { hitId += TRDSTART; }
+         if(hitsId.find(hitId) != hitsId.end()) {
+            nofSharedHits++;
+            if (nofSharedHits > fNofSharedHits) {
+               track->SetQuality(kLITBAD);
+               break;
+            }
+         }
+      }
 
-	    if (track->GetQuality() == kLITBAD) continue;
+      if (track->GetQuality() == kLITBAD) { continue; }
 
-	    for(int iHit = 0; iHit < nofHits; iHit++) {
-	    	int hitId = track->GetHit(iHit)->GetRefId();
-	    	LitHitType type = track->GetHit(iHit)->GetType();
-	    	LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
-	    	if (type == kLITSTRIPHIT) hitId += STRIPSTART;
-	    	if (detId == kLITTRD) hitId += TRDSTART;
-	        hitsId.insert(hitId);
-	    }
-	}
-	hitsId.clear();
+      for(int iHit = 0; iHit < nofHits; iHit++) {
+         int hitId = track->GetHit(iHit)->GetRefId();
+         LitHitType type = track->GetHit(iHit)->GetType();
+         LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
+         if (type == kLITSTRIPHIT) { hitId += STRIPSTART; }
+         if (detId == kLITTRD) { hitId += TRDSTART; }
+         hitsId.insert(hitId);
+      }
+   }
+   hitsId.clear();
 }

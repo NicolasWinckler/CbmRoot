@@ -17,23 +17,23 @@ class CbmLitMaterialInfo;
 class CbmLitMaterialEffects : public CbmLitTool
 {
 public:
-	/* Constructor */
-	CbmLitMaterialEffects() {};
+   /* Constructor */
+   CbmLitMaterialEffects() {};
 
-	/* Destructor */
-	virtual ~CbmLitMaterialEffects() {};
+   /* Destructor */
+   virtual ~CbmLitMaterialEffects() {};
 
-	/* Main function to be implemented for concrete material effects calculation algorithms.
-	 * @param par Input/Output track parameters.
-	 * @param mat Material information.
-	 * @param pdg PDG code
-	 * @param downstream Propagation direction. If true than downstream from the target, else upstream from the target.
-	 * @return Status code. */
-	virtual LitStatus Update(
-			CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat,
-	        int pdg,
-	        bool downstream) = 0;
+   /* Main function to be implemented for concrete material effects calculation algorithms.
+    * @param par Input/Output track parameters.
+    * @param mat Material information.
+    * @param pdg PDG code
+    * @param downstream Propagation direction. If true than downstream from the target, else upstream from the target.
+    * @return Status code. */
+   virtual LitStatus Update(
+      CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat,
+      int pdg,
+      bool downstream) = 0;
 };
 
 #endif /*CBMLITMATERIALEFFECTS_H_*/

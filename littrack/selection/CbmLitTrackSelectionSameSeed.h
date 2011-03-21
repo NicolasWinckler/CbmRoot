@@ -14,29 +14,29 @@
 #include "selection/CbmLitQualitySort.h"
 
 class CbmLitTrackSelectionSameSeed : public CbmLitTrackSelection,
-                                     public CbmLitQualitySort
+   public CbmLitQualitySort
 {
 public:
-	/* Constructor */
-	CbmLitTrackSelectionSameSeed();
+   /* Constructor */
+   CbmLitTrackSelectionSameSeed();
 
-	/* Destructor */
-	virtual ~CbmLitTrackSelectionSameSeed();
+   /* Destructor */
+   virtual ~CbmLitTrackSelectionSameSeed();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrVector& tracks);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrVector& tracks);
 };
 
 #endif /*CBMLITTRACKSELECTIONSAMESEED_H_*/

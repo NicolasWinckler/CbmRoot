@@ -18,23 +18,23 @@ CbmLitTrackSelectionEmpty::~CbmLitTrackSelectionEmpty()
 
 LitStatus CbmLitTrackSelectionEmpty::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionEmpty::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionEmpty::DoSelect(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionEmpty::DoSelect(
-		TrackPtrVector& tracks)
+   TrackPtrVector& tracks)
 {
-	return DoSelect(tracks.begin(), tracks.end());
+   return DoSelect(tracks.begin(), tracks.end());
 }

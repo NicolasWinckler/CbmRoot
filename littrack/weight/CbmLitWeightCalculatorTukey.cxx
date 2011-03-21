@@ -24,68 +24,68 @@ CbmLitWeightCalculatorTukey::~CbmLitWeightCalculatorTukey()
 
 LitStatus CbmLitWeightCalculatorTukey::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitWeightCalculatorTukey::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
-		const CbmLitTrackParam* par,
-		HitPtrIterator itBegin,
-		HitPtrIterator itEnd,
-		myf T)
+   const CbmLitTrackParam* par,
+   HitPtrIterator itBegin,
+   HitPtrIterator itEnd,
+   myf T)
 {
-	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
-		if ((*it)->IsOutlier()) continue;
-		if (TukeyWeight(par, *it, T) == kLITERROR) return kLITERROR;
-	}
-	if (Normalize(itBegin, itEnd) == kLITERROR) return kLITERROR;
+   for(HitPtrIterator it = itBegin; it != itEnd; it++) {
+      if ((*it)->IsOutlier()) { continue; }
+      if (TukeyWeight(par, *it, T) == kLITERROR) { return kLITERROR; }
+   }
+   if (Normalize(itBegin, itEnd) == kLITERROR) { return kLITERROR; }
 
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
-		const CbmLitTrackParam* par,
-		HitPtrVector& hits,
-		myf T)
+   const CbmLitTrackParam* par,
+   HitPtrVector& hits,
+   myf T)
 {
-	return DoCalculate(par, hits.begin(), hits.end(), T);
+   return DoCalculate(par, hits.begin(), hits.end(), T);
 }
 
 LitStatus CbmLitWeightCalculatorTukey::TukeyWeight(
-		const CbmLitTrackParam* par,
-		CbmLitHit* hit,
-		myf T) const
+   const CbmLitTrackParam* par,
+   CbmLitHit* hit,
+   myf T) const
 {
-	// FIXME:
-	myf chiSq = 0.;//ChiSq(par, hit);
-	if (chiSq < T){
-		myf t = 1 - (chiSq / T);
-		hit->SetW(t * t);
-	} else hit->SetW(0.);
-    return kLITSUCCESS;
+   // FIXME:
+   myf chiSq = 0.;//ChiSq(par, hit);
+   if (chiSq < T) {
+      myf t = 1 - (chiSq / T);
+      hit->SetW(t * t);
+   } else { hit->SetW(0.); }
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitWeightCalculatorTukey::Normalize(
-		HitPtrIterator itBegin,
-		HitPtrIterator itEnd) const
+   HitPtrIterator itBegin,
+   HitPtrIterator itEnd) const
 {
-	myf sumW = 0.;
-	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
-		if ((*it)->IsOutlier()) continue;
-		sumW += (*it)->GetW();
-	}
+   myf sumW = 0.;
+   for(HitPtrIterator it = itBegin; it != itEnd; it++) {
+      if ((*it)->IsOutlier()) { continue; }
+      sumW += (*it)->GetW();
+   }
 
-	if (sumW == 0.) {
-		return kLITERROR;
-	} else {
-		for(HitPtrIterator it = itBegin; it != itEnd; it++) {
-			if ((*it)->IsOutlier()) continue;
-			(*it)->SetW((*it)->GetW() / sumW);
-		}
-	}
-	return kLITSUCCESS;
+   if (sumW == 0.) {
+      return kLITERROR;
+   } else {
+      for(HitPtrIterator it = itBegin; it != itEnd; it++) {
+         if ((*it)->IsOutlier()) { continue; }
+         (*it)->SetW((*it)->GetW() / sumW);
+      }
+   }
+   return kLITSUCCESS;
 }

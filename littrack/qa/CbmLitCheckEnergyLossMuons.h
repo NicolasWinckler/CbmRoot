@@ -9,29 +9,29 @@ class TGraph;
 class CbmLitCheckEnergyLossMuons : public CbmLitTask
 {
 public:
-	CbmLitCheckEnergyLossMuons();
-	virtual ~CbmLitCheckEnergyLossMuons();
+   CbmLitCheckEnergyLossMuons();
+   virtual ~CbmLitCheckEnergyLossMuons();
 
-	virtual void Check();
+   virtual void Check();
 
-	void FillTableIron();
-	void FillTableTungsten();
-	void FillTableCarbon();
-	void CreateGraphs();
-	void CalcEloss();
-	void DrawGraphs();
+   void FillTableIron();
+   void FillTableTungsten();
+   void FillTableCarbon();
+   void CreateGraphs();
+   void CalcEloss();
+   void DrawGraphs();
 
-	void SetMaterial(const std::string& material) {
-		fMat = material;
-	}
+   void SetMaterial(const std::string& material) {
+      fMat = material;
+   }
 
 private:
-	Double_t fMom[26];
-	TGraph* fTable[4];
-	TGraph* fCalc[4];
-	std::string fMat;
+   Double_t fMom[26];
+   TGraph* fTable[4];
+   TGraph* fCalc[4];
+   std::string fMat;
 
-	ClassDef(CbmLitCheckEnergyLossMuons, 1);
+   ClassDef(CbmLitCheckEnergyLossMuons, 1);
 };
 
 #endif /* CBMLITCHECKENERGYLOSSMUONS_H_ */

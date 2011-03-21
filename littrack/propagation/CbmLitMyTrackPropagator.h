@@ -14,49 +14,49 @@
 class CbmLitMyTrackPropagator : public CbmLitTrackPropagator
 {
 public:
-	/* Constructor with track extrapolation tool.
-	 * @param extrapolator Pointer to the track extrapolation tool.
-	 */
-	CbmLitMyTrackPropagator(
-			TrackExtrapolatorPtr extrapolator);
+   /* Constructor with track extrapolation tool.
+    * @param extrapolator Pointer to the track extrapolation tool.
+    */
+   CbmLitMyTrackPropagator(
+      TrackExtrapolatorPtr extrapolator);
 
-	/* Destructor */
-	virtual ~CbmLitMyTrackPropagator();
+   /* Destructor */
+   virtual ~CbmLitMyTrackPropagator();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitTrackPropagator */
-	virtual LitStatus Propagate(
-		   const CbmLitTrackParam *parIn,
-		   CbmLitTrackParam *parOut,
-		   myf zOut,
-		   int pdg,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackPropagator */
+   virtual LitStatus Propagate(
+      const CbmLitTrackParam* parIn,
+      CbmLitTrackParam* parOut,
+      myf zOut,
+      int pdg,
+      std::vector<myf>* F);
 
-	/* Inherited from CbmLitTrackPropagator */
-	virtual LitStatus Propagate(
-		   CbmLitTrackParam *par,
-		   myf zOut,
-		   int pdg,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackPropagator */
+   virtual LitStatus Propagate(
+      CbmLitTrackParam* par,
+      myf zOut,
+      int pdg,
+      std::vector<myf>* F);
 
-	/* Calculates updated transport matrix after each track extrapolation,
-	 * using formula F = newF * F.
-	 * @param F Input/Output current transport matrix.
-	 * @param newF addition to the transport matrix.
-	 */
-	void UpdateF(
-			std::vector<myf>& F,
-			const std::vector<myf>& newF);
+   /* Calculates updated transport matrix after each track extrapolation,
+    * using formula F = newF * F.
+    * @param F Input/Output current transport matrix.
+    * @param newF addition to the transport matrix.
+    */
+   void UpdateF(
+      std::vector<myf>& F,
+      const std::vector<myf>& newF);
 
 private:
-	GeoNavigatorPtr fNavigator; // Geometry navigation tool
-	TrackExtrapolatorPtr fExtrapolator; // Track extrapolator tool
-	MaterialEffectsPtr fMaterial; // Material Effects tool
+   GeoNavigatorPtr fNavigator; // Geometry navigation tool
+   TrackExtrapolatorPtr fExtrapolator; // Track extrapolator tool
+   MaterialEffectsPtr fMaterial; // Material Effects tool
 };
 
 #endif /* CBMLITMYTRACKPROPAGATOR_H_ */

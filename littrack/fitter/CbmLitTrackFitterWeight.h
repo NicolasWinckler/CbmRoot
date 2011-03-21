@@ -22,71 +22,71 @@ class CbmLitTrack;
 class CbmLitTrackFitterWeight : public CbmLitTrackFitter
 {
 public:
-	/* Constructor
-	 *@param propagator Track propagation tool
-	 *@param update Track update tool */
-	CbmLitTrackFitterWeight(
-			TrackFitterPtr fitter,
-			TrackFitterPtr smoother);
+   /* Constructor
+    *@param propagator Track propagation tool
+    *@param update Track update tool */
+   CbmLitTrackFitterWeight(
+      TrackFitterPtr fitter,
+      TrackFitterPtr smoother);
 
-	/* Destructor */
-	virtual ~CbmLitTrackFitterWeight();
+   /* Destructor */
+   virtual ~CbmLitTrackFitterWeight();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* inherited from CbmLitTrackFitter */
-	virtual LitStatus Fit(
-			CbmLitTrack *track,
-			bool downstream = true);
+   /* inherited from CbmLitTrackFitter */
+   virtual LitStatus Fit(
+      CbmLitTrack* track,
+      bool downstream = true);
 
 private:
-	LitStatus CreateEffectiveTrack(
-			CbmLitTrack* track,
-			int iter,
-			CbmLitTrack* etrack) const;
+   LitStatus CreateEffectiveTrack(
+      CbmLitTrack* track,
+      int iter,
+      CbmLitTrack* etrack) const;
 
-	LitStatus CreateEffectiveHit(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd,
-			const CbmLitTrackParam* par,
-			int iter,
-			CbmLitHit* hit) const;
+   LitStatus CreateEffectiveHit(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd,
+      const CbmLitTrackParam* par,
+      int iter,
+      CbmLitHit* hit) const;
 
-	LitStatus CalculateWeights(
-			const CbmLitTrackParam* par,
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd,
-			int iter) const;
+   LitStatus CalculateWeights(
+      const CbmLitTrackParam* par,
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd,
+      int iter) const;
 
-	bool AreAllOutliers(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd) const;
+   bool AreAllOutliers(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd) const;
 
-	bool MarkOutliers(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd) const;
+   bool MarkOutliers(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd) const;
 
-	LitStatus CheckEffectiveTrack(
-			const CbmLitTrack* track) const;
+   LitStatus CheckEffectiveTrack(
+      const CbmLitTrack* track) const;
 
-	LitStatus CreateOutputTrack(
-			CbmLitTrack* track);
+   LitStatus CreateOutputTrack(
+      CbmLitTrack* track);
 
-	TrackFitterPtr fFitter;
-	TrackFitterPtr fSmoother;
+   TrackFitterPtr fFitter;
+   TrackFitterPtr fSmoother;
 
-	WeightedHitCalculatorPtr fWeightedHitCalculator;
-	WeightCalculatorPtr fSimpleWeightCalculator;
-//	WeightCalculatorPtr fGaussWeightCalculator;
-	WeightCalculatorPtr fTukeyWeightCalculator;
+   WeightedHitCalculatorPtr fWeightedHitCalculator;
+   WeightCalculatorPtr fSimpleWeightCalculator;
+// WeightCalculatorPtr fGaussWeightCalculator;
+   WeightCalculatorPtr fTukeyWeightCalculator;
 
-	int fNofIterations;
-	std::vector<myf> fAnnealing;
-	myf fOutlierCut;
+   int fNofIterations;
+   std::vector<myf> fAnnealing;
+   myf fOutlierCut;
 };
 
 #endif /*CBMLITTRACKFITTERROBUST_H_*/

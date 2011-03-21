@@ -12,36 +12,37 @@
 #include "base/CbmLitEnums.h"
 #include "base/CbmLitTypes.h"
 
-class CbmLitQualitySort {
+class CbmLitQualitySort
+{
 public:
-	/* Constructor */
-	CbmLitQualitySort();
+   /* Constructor */
+   CbmLitQualitySort();
 
-	/* Destructor */
-	virtual ~CbmLitQualitySort();
+   /* Destructor */
+   virtual ~CbmLitQualitySort();
 
-	/* Sorts track array by quality */
-	virtual LitStatus DoSort(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Sorts track array by quality */
+   virtual LitStatus DoSort(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-	/* Sorts track array by quality */
-	virtual LitStatus DoSort(
-			TrackPtrVector& tracks);
+   /* Sorts track array by quality */
+   virtual LitStatus DoSort(
+      TrackPtrVector& tracks);
 
 private:
 
-	/* Sorts track array by quality
-	 * using number of hits and chi2 */
-	void SortNofHits(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Sorts track array by quality
+    * using number of hits and chi2 */
+   void SortNofHits(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-	/* Sorts track array by quality
-	 * using last plane id and chi2 */
-	void SortLastPlaneId(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Sorts track array by quality
+    * using last plane id and chi2 */
+   void SortLastPlaneId(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 };
 
 #endif /* CBMLITQUALITYSORT_H_ */

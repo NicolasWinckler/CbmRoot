@@ -15,44 +15,44 @@
 #include "selection/CbmLitQualitySort.h"
 
 class CbmLitTrackSelectionSharedHits : public CbmLitTrackSelection,
-                                       public CbmLitQualitySort
+   public CbmLitQualitySort
 {
 public:
-	/* Constructor */
-	CbmLitTrackSelectionSharedHits();
+   /* Constructor */
+   CbmLitTrackSelectionSharedHits();
 
-	/* Destructor */
-	virtual ~CbmLitTrackSelectionSharedHits();
+   /* Destructor */
+   virtual ~CbmLitTrackSelectionSharedHits();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Derived from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Derived from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-	/* Derived from CbmLitTrackSelection */
-	virtual LitStatus DoSelect(
-			TrackPtrVector& tracks);
+   /* Derived from CbmLitTrackSelection */
+   virtual LitStatus DoSelect(
+      TrackPtrVector& tracks);
 
-	/* Returns number of shared hits */
-	int GetNofSharedHits() const {return fNofSharedHits;}
+   /* Returns number of shared hits */
+   int GetNofSharedHits() const {return fNofSharedHits;}
 
-	/* Sets number of shared hits */
-	void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
+   /* Sets number of shared hits */
+   void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
 
 private:
-    /* Number of shared hits */
-	int fNofSharedHits;
+   /* Number of shared hits */
+   int fNofSharedHits;
 
-	/* Checks shared hits in the track array sorted by quality */
-	void CheckSharedHits(
-			TrackPtrIterator itBegin,
-			TrackPtrIterator itEnd);
+   /* Checks shared hits in the track array sorted by quality */
+   void CheckSharedHits(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 };
 
 #endif /*CBMLITTRACKSELECTIONSHAREDHITS_H_*/

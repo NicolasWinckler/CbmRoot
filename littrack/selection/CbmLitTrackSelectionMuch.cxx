@@ -13,16 +13,16 @@
 #include "utils/CbmLitComparators.h"
 
 CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
-	fNofSharedHits(0),
-	fMinNofHits(0),
-	fMinLastPlaneId(0)
+   fNofSharedHits(0),
+   fMinNofHits(0),
+   fMinLastPlaneId(0)
 {
-	fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
-	fSharedHitsSelection->Initialize();
-	fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
-	fCutsSelection->Initialize();
-	fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
-	fSameSeedSelection->Initialize();
+   fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
+   fSharedHitsSelection->Initialize();
+   fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
+   fCutsSelection->Initialize();
+   fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
+   fSameSeedSelection->Initialize();
 }
 
 CbmLitTrackSelectionMuch::~CbmLitTrackSelectionMuch()
@@ -31,36 +31,37 @@ CbmLitTrackSelectionMuch::~CbmLitTrackSelectionMuch()
 
 LitStatus CbmLitTrackSelectionMuch::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionMuch::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionMuch::DoSelect(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	if (itBegin == itEnd) return kLITSUCCESS;
+   if (itBegin == itEnd) { return kLITSUCCESS; }
 
-	((CbmLitTrackSelectionSharedHits*)fSharedHitsSelection.get())->SetNofSharedHits(fNofSharedHits);
-	((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinNofHits(fMinNofHits);
-	((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinLastPlaneId(fMinLastPlaneId);
+   ((CbmLitTrackSelectionSharedHits*)fSharedHitsSelection.get())->SetNofSharedHits(fNofSharedHits);
+   ((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinNofHits(fMinNofHits);
+   ((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinLastPlaneId(fMinLastPlaneId);
 
-	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++)
-		(*iTrack)->SetQuality(kLITGOOD);
+   for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+      (*iTrack)->SetQuality(kLITGOOD);
+   }
 
-	fSharedHitsSelection->DoSelect(itBegin, itEnd);
-	fSameSeedSelection->DoSelect(itBegin, itEnd);
-	fCutsSelection->DoSelect(itBegin, itEnd);
+   fSharedHitsSelection->DoSelect(itBegin, itEnd);
+   fSameSeedSelection->DoSelect(itBegin, itEnd);
+   fCutsSelection->DoSelect(itBegin, itEnd);
 
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionMuch::DoSelect(
-		TrackPtrVector& tracks)
+   TrackPtrVector& tracks)
 {
-	return DoSelect(tracks.begin(), tracks.end());
+   return DoSelect(tracks.begin(), tracks.end());
 }

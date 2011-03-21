@@ -20,22 +20,22 @@ class CbmLitTrackParam;
 class CbmLitGeoNavigator : public CbmLitTool
 {
 public:
-	/* Constructor */
-	CbmLitGeoNavigator() {};
+   /* Constructor */
+   CbmLitGeoNavigator() {};
 
-	/* Destructor */
-	virtual ~CbmLitGeoNavigator() {};
+   /* Destructor */
+   virtual ~CbmLitGeoNavigator() {};
 
-	/* Finds intersection points with detector materials on a certain interval.
-	 * @param par Input track parameters. Defines initial direction and Z position.
-	 * @param zOut Output Z position [cm].
-	 * @param inter Output vector with crossed material information.
-	 * @return Status code.
-	 */
-	virtual LitStatus FindIntersections(
-			const CbmLitTrackParam* par,
-			myf zOut,
-			std::vector<CbmLitMaterialInfo>& inter) = 0;
+   /* Finds intersection points with detector materials on a certain interval.
+    * @param par Input track parameters. Defines initial direction and Z position.
+    * @param zOut Output Z position [cm].
+    * @param inter Output vector with crossed material information.
+    * @return Status code.
+    */
+   virtual LitStatus FindIntersections(
+      const CbmLitTrackParam* par,
+      myf zOut,
+      std::vector<CbmLitMaterialInfo>& inter) = 0;
 };
 
 #endif /*CBMLITGEONAVIGATOR_H_*/

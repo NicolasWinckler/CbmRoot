@@ -9,18 +9,19 @@
 #ifndef LITTRACKFINDER_H_
 #define LITTRACKFINDER_H_
 
-class LitTrackFinder {
+class LitTrackFinder
+{
 public:
-	LitTrackFinder() {};
-	virtual ~LitTrackFinder() {};
+   LitTrackFinder() {};
+   virtual ~LitTrackFinder() {};
 
-	virtual void DoFind(
-		LitScalPixelHit* hits[],
-		unsigned int nofHits,
-		LitScalTrack* trackSeeds[],
-		unsigned int nofTrackSeeds,
-		LitScalTrack* tracks[],
-		unsigned int &nofTracks) = 0;
+   virtual void DoFind(
+      LitScalPixelHit* hits[],
+      unsigned int nofHits,
+      LitScalTrack* trackSeeds[],
+      unsigned int nofTrackSeeds,
+      LitScalTrack* tracks[],
+      unsigned int& nofTracks) = 0;
 };
 
 

@@ -9,21 +9,21 @@
 class TClonesArray;
 
 class CbmLitTrdTrackFinderBranch: public CbmTrdTrackFinder,
-							   private CbmLitTrackFinderBranch,
-							   private CbmLitStsBasedTrackFinder
+   private CbmLitTrackFinderBranch,
+   private CbmLitStsBasedTrackFinder
 {
 public:
-	CbmLitTrdTrackFinderBranch();
-	virtual ~CbmLitTrdTrackFinderBranch();
+   CbmLitTrdTrackFinderBranch();
+   virtual ~CbmLitTrdTrackFinderBranch();
 
-    virtual void Init();
+   virtual void Init();
 
-    virtual Int_t DoFind(
-    		TClonesArray* hitArray,
-            TClonesArray* trackArray);
+   virtual Int_t DoFind(
+      TClonesArray* hitArray,
+      TClonesArray* trackArray);
 private:
 
-    ClassDef(CbmLitTrdTrackFinderBranch, 1);
+   ClassDef(CbmLitTrdTrackFinderBranch, 1);
 };
 
 #endif /*CBMLITTRDTRACKFINDERBRANCH_H_*/

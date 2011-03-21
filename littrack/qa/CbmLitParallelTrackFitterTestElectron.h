@@ -16,40 +16,41 @@
 class CbmLitTrack;
 class CbmLitTrackParam;
 
-class CbmLitParallelTrackFitterTestElectron : public CbmLitTrackFitter {
+class CbmLitParallelTrackFitterTestElectron : public CbmLitTrackFitter
+{
 public:
-	CbmLitParallelTrackFitterTestElectron();
-	virtual ~CbmLitParallelTrackFitterTestElectron();
+   CbmLitParallelTrackFitterTestElectron();
+   virtual ~CbmLitParallelTrackFitterTestElectron();
 
-	virtual LitStatus Initialize();
-	virtual LitStatus Finalize();
+   virtual LitStatus Initialize();
+   virtual LitStatus Finalize();
 
-	virtual LitStatus Fit(
-			CbmLitTrack *track,
-			bool downstream = true);
+   virtual LitStatus Fit(
+      CbmLitTrack* track,
+      bool downstream = true);
 
 private:
 
-	unsigned char PlaneId(
-			unsigned char stationGroup,
-			unsigned char station,
-			LitDetectorLayoutElectronScal& layout) const;
+   unsigned char PlaneId(
+      unsigned char stationGroup,
+      unsigned char station,
+      LitDetectorLayoutElectronScal& layout) const;
 
-	bool CheckHit(
-			unsigned char stationGroup,
-			unsigned char station,
-			LitDetectorLayoutElectron<fscal>& layout,
-			CbmLitTrack* track);
+   bool CheckHit(
+      unsigned char stationGroup,
+      unsigned char station,
+      LitDetectorLayoutElectron<fscal>& layout,
+      CbmLitTrack* track);
 
-	void SerialHitToParallel(
-			const CbmLitPixelHit& hit,
-			LitPixelHit<fscal>& lhit);
+   void SerialHitToParallel(
+      const CbmLitPixelHit& hit,
+      LitPixelHit<fscal>& lhit);
 
-	LitDetectorLayoutElectronScal fLayout;
+   LitDetectorLayoutElectronScal fLayout;
 
-//	TrackExtrapolatorPtr fExtrapolator;
-//	TrackPropagatorPtr fPropagator;
-//	CbmLitField* fField;
+// TrackExtrapolatorPtr fExtrapolator;
+// TrackPropagatorPtr fPropagator;
+// CbmLitField* fField;
 };
 
 #endif /* CBMLITPARALLELTRACKFITTERTESTELECTRON_H_ */

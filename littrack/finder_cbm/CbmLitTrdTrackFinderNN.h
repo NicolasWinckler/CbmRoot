@@ -7,20 +7,20 @@
 #include "CbmTrdTrackFinder.h"
 
 class CbmLitTrdTrackFinderNN : public CbmTrdTrackFinder,
-							   private CbmLitTrackFinderNN,
-							   private CbmLitStsBasedTrackFinder
+   private CbmLitTrackFinderNN,
+   private CbmLitStsBasedTrackFinder
 {
 public:
-	CbmLitTrdTrackFinderNN();
-	virtual ~CbmLitTrdTrackFinderNN();
+   CbmLitTrdTrackFinderNN();
+   virtual ~CbmLitTrdTrackFinderNN();
 
-	virtual void Init();
+   virtual void Init();
 
-    virtual Int_t DoFind(
-    		TClonesArray* hitArray,
-            TClonesArray* trackArray);
+   virtual Int_t DoFind(
+      TClonesArray* hitArray,
+      TClonesArray* trackArray);
 
-    ClassDef(CbmLitTrdTrackFinderNN, 1);
+   ClassDef(CbmLitTrdTrackFinderNN, 1);
 };
 
 #endif /* CBMLITTRDTRACKFINDERNN_H_ */

@@ -16,16 +16,16 @@ class CbmLitTrackParam;
 class CbmLitTrackUpdate : public CbmLitTool
 {
 public:
-	/* Constructor */
-   CbmLitTrackUpdate(){};
+   /* Constructor */
+   CbmLitTrackUpdate() {};
 
    /* Constructor with name
     * @param name Name of the tool */
    CbmLitTrackUpdate(
-		   const std::string& name):CbmLitTool(name){};
+      const std::string& name):CbmLitTool(name) {};
 
    /* Destructor */
-   virtual ~CbmLitTrackUpdate(){};
+   virtual ~CbmLitTrackUpdate() {};
 
    /* Main function to be implemented for the concrete track update algorithm
     * @param pParamIn Pointer to input track parameter
@@ -34,10 +34,10 @@ public:
     * @param chiSq Output value of the contribution to the chi-square
     * @return Status code */
    virtual LitStatus Update(
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
-           const CbmLitHit *pHit,
-           myf &chiSq) = 0;
+      const CbmLitTrackParam* pParamIn,
+      CbmLitTrackParam* pParamOut,
+      const CbmLitHit* pHit,
+      myf& chiSq) = 0;
 
    /* Main function to be implemented for the concrete track update algorithm
     * @param pParam Pointer to input/output track parameter
@@ -45,9 +45,9 @@ public:
     * @param chiSq Output value of the contribution to the chi-square
     * @return Status code */
    virtual LitStatus Update(
-		   CbmLitTrackParam *pParam,
-		   const CbmLitHit *pHit,
-		   myf &chiSq) = 0;
+      CbmLitTrackParam* pParam,
+      const CbmLitHit* pHit,
+      myf& chiSq) = 0;
 };
 
 #endif /* CBMLITTRACKUPDATE_H_ */

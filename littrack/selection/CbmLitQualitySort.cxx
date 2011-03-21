@@ -21,63 +21,63 @@ CbmLitQualitySort::~CbmLitQualitySort()
 }
 
 LitStatus CbmLitQualitySort::DoSort(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	if (itBegin == itEnd) return kLITSUCCESS;
+   if (itBegin == itEnd) { return kLITSUCCESS; }
 
-	SortNofHits(itBegin, itEnd);
-	//SortLastPlaneId(itBegin, itEnd);
+   SortNofHits(itBegin, itEnd);
+   //SortLastPlaneId(itBegin, itEnd);
 
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitQualitySort::DoSort(
-		TrackPtrVector& tracks)
+   TrackPtrVector& tracks)
 {
-	return DoSort(tracks.begin(), tracks.end());
+   return DoSort(tracks.begin(), tracks.end());
 }
 
 void CbmLitQualitySort::SortNofHits(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	std::sort(itBegin, itEnd, CompareTrackPtrNofHitsMore());
+   std::sort(itBegin, itEnd, CompareTrackPtrNofHitsMore());
 
-	int maxNofHits = (*itBegin)->GetNofHits();
-	int minNofHits = (*(itEnd-1))->GetNofHits();
+   int maxNofHits = (*itBegin)->GetNofHits();
+   int minNofHits = (*(itEnd-1))->GetNofHits();
 
-	for (int iNofHits = minNofHits; iNofHits <= maxNofHits; iNofHits++) {
-		CbmLitTrack value;
-		value.SetNofHits(iNofHits);
+   for (int iNofHits = minNofHits; iNofHits <= maxNofHits; iNofHits++) {
+      CbmLitTrack value;
+      value.SetNofHits(iNofHits);
 
-		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
-		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrNofHitsMore());
+      std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
+      bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrNofHitsMore());
 
-		if(bounds.first == bounds.second) continue;
+      if(bounds.first == bounds.second) { continue; }
 
-		std::sort(bounds.first, bounds.second, CompareTrackPtrChi2OverNdfLess());
-	}
+      std::sort(bounds.first, bounds.second, CompareTrackPtrChi2OverNdfLess());
+   }
 }
 
 void CbmLitQualitySort::SortLastPlaneId(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	std::sort(itBegin, itEnd, CompareTrackPtrLastPlaneIdMore());
+   std::sort(itBegin, itEnd, CompareTrackPtrLastPlaneIdMore());
 
-	int maxPlaneId = (*itBegin)->GetLastPlaneId();
-	int minPlaneId = (*(itEnd-1))->GetLastPlaneId();
+   int maxPlaneId = (*itBegin)->GetLastPlaneId();
+   int minPlaneId = (*(itEnd-1))->GetLastPlaneId();
 
-	for (int iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
-		CbmLitTrack value;
-		value.SetLastPlaneId(iPlaneId);
+   for (int iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
+      CbmLitTrack value;
+      value.SetLastPlaneId(iPlaneId);
 
-		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
-		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrLastPlaneIdMore());
+      std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
+      bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrLastPlaneIdMore());
 
-		if(bounds.first == bounds.second) continue;
+      if(bounds.first == bounds.second) { continue; }
 
-		std::sort(bounds.first, bounds.second, CompareTrackPtrChi2OverNdfLess());
-	}
+      std::sort(bounds.first, bounds.second, CompareTrackPtrChi2OverNdfLess());
+   }
 }

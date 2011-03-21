@@ -16,38 +16,38 @@ class TClonesArray;
 class CbmLitCheckMultipleScattering : public FairTask
 {
 public:
-	CbmLitCheckMultipleScattering();
-	virtual ~CbmLitCheckMultipleScattering();
+   CbmLitCheckMultipleScattering();
+   virtual ~CbmLitCheckMultipleScattering();
 
-    virtual InitStatus Init();
+   virtual InitStatus Init();
 
-    virtual void Exec(Option_t* opt);
+   virtual void Exec(Option_t* opt);
 
-    virtual void Finish();
+   virtual void Finish();
 
-    virtual void SetParContainers();
+   virtual void SetParContainers();
 
-	void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
+   void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
 private:
-	Double_t CalcTheta(
-	          const CbmLitTrackParam* par,
-	          const CbmLitMaterialInfo* mat) const;
+   Double_t CalcTheta(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	void Draw();
+   void Draw();
 
-    TClonesArray* fMCTrackArray;
-    TClonesArray* fMCPointArray;
+   TClonesArray* fMCTrackArray;
+   TClonesArray* fMCPointArray;
 
-    TH1F* fh_theta_mc;
-    TH1F* fh_eloss_mc;
-    TH1F* fh_eloss_rec;
-    TH1F* fh_dep_energy;
+   TH1F* fh_theta_mc;
+   TH1F* fh_eloss_mc;
+   TH1F* fh_eloss_rec;
+   TH1F* fh_dep_energy;
 
-    Int_t fNEvents;
+   Int_t fNEvents;
 
-    std::string fOutputDir;
+   std::string fOutputDir;
 
-    ClassDef(CbmLitCheckMultipleScattering, 1)
+   ClassDef(CbmLitCheckMultipleScattering, 1)
 };
 
 #endif /*CBMLITCHECKMULTIPLESCATTERING_H_*/

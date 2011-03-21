@@ -21,80 +21,80 @@ class TList;
 class CbmTrdHitsQa : public FairTask
 {
 public:
-	/* Constructor */
-	CbmTrdHitsQa();
+   /* Constructor */
+   CbmTrdHitsQa();
 
-	/* Destructor */
-	virtual ~CbmTrdHitsQa();
+   /* Destructor */
+   virtual ~CbmTrdHitsQa();
 
-	/* Inherited from FairTask */
-	virtual InitStatus Init();
+   /* Inherited from FairTask */
+   virtual InitStatus Init();
 
-	/* Inherited from FairTask */
-	virtual void Exec(
-			Option_t* opt);
+   /* Inherited from FairTask */
+   virtual void Exec(
+      Option_t* opt);
 
-	/* Inherited from FairTask */
-	virtual void Finish();
+   /* Inherited from FairTask */
+   virtual void Finish();
 
-	/* Inherited from FairTask */
-	virtual void SetParContainers();
+   /* Inherited from FairTask */
+   virtual void SetParContainers();
 
-	/* Sets output directory for images
-	 * @param dir Directory name
-	 */
-	void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
+   /* Sets output directory for images
+    * @param dir Directory name
+    */
+   void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
 
 private:
-    /**
-     * Reads necessary data branches from the input data files.
-     */
-	void ReadDataBranches();
+   /**
+    * Reads necessary data branches from the input data files.
+    */
+   void ReadDataBranches();
 
-    /**
-     * Creates the histograms.
-     */
-	void CreateHistos();
+   /**
+    * Creates the histograms.
+    */
+   void CreateHistos();
 
-	/**
-	 * Fills histograms for hits
-	 */
-	void ProcessHits();
+   /**
+    * Fills histograms for hits
+    */
+   void ProcessHits();
 
-	/**
-	 * Write histograms to the output file
-	 */
-	void WriteToFile();
+   /**
+    * Write histograms to the output file
+    */
+   void WriteToFile();
 
-	/*
-	 * Draws histograms
-	 */
-	void Draw();
+   /*
+    * Draws histograms
+    */
+   void Draw();
 
-	TClonesArray* fTrdHits; // CbmTrdHit array
-	TClonesArray* fTrdPoints; // CbmTrdPoint array
+   TClonesArray* fTrdHits; // CbmTrdHit array
+   TClonesArray* fTrdPoints; // CbmTrdPoint array
 
-	Int_t fNofPlanes; // Number of planes in TRD
+   Int_t fNofPlanes; // Number of planes in TRD
 
-	// Histograms
-	std::vector<TH1F*> fhX; // X coordinate distribution
-	std::vector<TH1F*> fhY; // Y coordinate distribution
-	std::vector<TH1F*> fhDx; // X error distribution
-	std::vector<TH1F*> fhDy; // Y error distribution
-	std::vector<TH2F*> fhXY; // XY coordinates distribution
+   // Histograms
+   std::vector<TH1F*> fhX; // X coordinate distribution
+   std::vector<TH1F*> fhY; // Y coordinate distribution
+   std::vector<TH1F*> fhDx; // X error distribution
+   std::vector<TH1F*> fhDy; // Y error distribution
+   std::vector<TH2F*> fhXY; // XY coordinates distribution
 
-	std::vector<TH1F*> fhResX; // residual for X coordinate
-	std::vector<TH1F*> fhResY; // residual for Y coordinate
-	std::vector<TH1F*> fhPullX; // pull for X coordinate
-	std::vector<TH1F*> fhPullY; // pull for Y coordinate
+   std::vector<TH1F*> fhResX; // residual for X coordinate
+   std::vector<TH1F*> fhResY; // residual for Y coordinate
+   std::vector<TH1F*> fhPullX; // pull for X coordinate
+   std::vector<TH1F*> fhPullY; // pull for Y coordinate
 
-	TList* fHistoList; // List of histograms
+   TList* fHistoList; // List of histograms
 
-	std::string fOutputDir; // Output directory for images
+   std::string fOutputDir; // Output directory for images
 
-	Int_t fEventNo;
+   Int_t fEventNo;
 
-	ClassDef(CbmTrdHitsQa, 1);
+   ClassDef(CbmTrdHitsQa, 1);
 };
 
 #endif /* CBMTRDHITSQA_H_ */

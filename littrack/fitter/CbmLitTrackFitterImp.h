@@ -16,31 +16,31 @@ class CbmLitTrack;
 class CbmLitTrackFitterImp : public CbmLitTrackFitter
 {
 public:
-	/* Constructor
-	 *@param propagator Track propagation tool
-	 *@param update Track update tool */
-	CbmLitTrackFitterImp(
-			TrackPropagatorPtr propagator,
-			TrackUpdatePtr update);
+   /* Constructor
+    *@param propagator Track propagation tool
+    *@param update Track update tool */
+   CbmLitTrackFitterImp(
+      TrackPropagatorPtr propagator,
+      TrackUpdatePtr update);
 
-	/* Destructor */
-	virtual ~CbmLitTrackFitterImp();
+   /* Destructor */
+   virtual ~CbmLitTrackFitterImp();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitTrackFitter */
-	virtual LitStatus Fit(
-			CbmLitTrack *track,
-			bool downstream = true);
+   /* Inherited from CbmLitTrackFitter */
+   virtual LitStatus Fit(
+      CbmLitTrack* track,
+      bool downstream = true);
 private:
-	/* Track propagation tool */
-	TrackPropagatorPtr fPropagator;
-	/* Track update tool */
-	TrackUpdatePtr fUpdate;
+   /* Track propagation tool */
+   TrackPropagatorPtr fPropagator;
+   /* Track update tool */
+   TrackUpdatePtr fUpdate;
 };
 
 #endif /*CBMLITTRACKFITTERIMP_H_*/

@@ -12,35 +12,36 @@
 
 #include "FairTask.h"
 
-class CbmLitTask : public FairTask {
+class CbmLitTask : public FairTask
+{
 public:
-	/* Constructor */
-	CbmLitTask();
+   /* Constructor */
+   CbmLitTask();
 
-	/* Destructor */
-	virtual ~CbmLitTask();
+   /* Destructor */
+   virtual ~CbmLitTask();
 
-	/* Sets the output directory for images.
+   /* Sets the output directory for images.
      * @param dir Directory name.
      */
-	void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
+   void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
 protected:
-	/* Determines current CBM setup. */
-	void DetermineSetup();
+   /* Determines current CBM setup. */
+   void DetermineSetup();
 
-	Bool_t fIsElectronSetup; // If "electron" setup detected than true
-	Bool_t fIsSts; // If STS detected than true
-	Bool_t fIsTrd; // If TRD detected than true
-	Bool_t fIsMuch; // If MUCH detected than true
-	Bool_t fIsTof; // If TOF detected than truer
+   Bool_t fIsElectronSetup; // If "electron" setup detected than true
+   Bool_t fIsSts; // If STS detected than true
+   Bool_t fIsTrd; // If TRD detected than true
+   Bool_t fIsMuch; // If MUCH detected than true
+   Bool_t fIsTof; // If TOF detected than truer
 
-	Int_t fEventNo; // Event counter
-	Int_t fVerbose; // Verbose level
+   Int_t fEventNo; // Event counter
+   Int_t fVerbose; // Verbose level
 
-	std::string fOutputDir; // output directory for images
+   std::string fOutputDir; // output directory for images
 
-	ClassDef(CbmLitTask, 1);
+   ClassDef(CbmLitTask, 1);
 };
 
 #endif /* CBMLITTASK_H_ */

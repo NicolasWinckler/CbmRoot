@@ -2,12 +2,13 @@
 #define CBMLITMEMORYMANAGMENT_H_
 
 
-class DeleteObject {
-public: 
-	template<typename T>
-	void operator()(const T* ptr) const {
-		delete ptr;
-	}	
+class DeleteObject
+{
+public:
+   template<typename T>
+   void operator()(const T* ptr) const {
+      delete ptr;
+   }
 };
 
 

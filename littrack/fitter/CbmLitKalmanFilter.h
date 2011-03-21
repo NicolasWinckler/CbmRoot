@@ -19,7 +19,7 @@ class CbmLitTrackParam;
 class CbmLitKalmanFilter: public CbmLitTrackUpdate
 {
 public:
-	/* Constructor */
+   /* Constructor */
    CbmLitKalmanFilter();
 
    /* Destructor */
@@ -33,16 +33,16 @@ public:
 
    /* Inherited from CbmLitTrackUpdate */
    virtual LitStatus Update(
-		   const CbmLitTrackParam *parIn,
-           CbmLitTrackParam *parOut,
-           const CbmLitHit *hit,
-           myf &chiSq);
+      const CbmLitTrackParam* parIn,
+      CbmLitTrackParam* parOut,
+      const CbmLitHit* hit,
+      myf& chiSq);
 
    /* Inherited from CbmLitTrackUpdate */
    virtual LitStatus Update(
-		   CbmLitTrackParam *par,
-		   const CbmLitHit *hit,
-           myf &chiSq);
+      CbmLitTrackParam* par,
+      const CbmLitHit* hit,
+      myf& chiSq);
 
 private:
    /* Implements KF update step for pixel hits using gain matrix formalism
@@ -50,40 +50,40 @@ private:
     *@param hit Pointer to the hit
     *@param chiSq Output calculated chi square value
     *@return Status code */
-	LitStatus Update(
-		   CbmLitTrackParam *par,
-		   const CbmLitPixelHit *hit,
-           myf &chiSq);
+   LitStatus Update(
+      CbmLitTrackParam* par,
+      const CbmLitPixelHit* hit,
+      myf& chiSq);
 
-	/* Implements KF update step for pixel hits using weighted means formalism
-	 *@param par Input/Output track parameter
-	 *@param hit Pointer to the hit
-	 *@param chiSq Output calculated chi square value
-	 *@return Status code */
-	LitStatus UpdateWMF(
-			CbmLitTrackParam *par,
-	        const CbmLitPixelHit *hit,
-	        myf &chiSq);
+   /* Implements KF update step for pixel hits using weighted means formalism
+    *@param par Input/Output track parameter
+    *@param hit Pointer to the hit
+    *@param chiSq Output calculated chi square value
+    *@return Status code */
+   LitStatus UpdateWMF(
+      CbmLitTrackParam* par,
+      const CbmLitPixelHit* hit,
+      myf& chiSq);
 
-	/* Implements KF update step for strip hits using gain matrix formalism
-	 *@param par Input/Output track parameter
-	 *@param hit Pointer to the hit
-	 *@param chiSq Output calculated chi square value
-	 *@return Status code */
-	LitStatus Update(
-		   CbmLitTrackParam *par,
-		   const CbmLitStripHit *hit,
-           myf &chiSq);
+   /* Implements KF update step for strip hits using gain matrix formalism
+    *@param par Input/Output track parameter
+    *@param hit Pointer to the hit
+    *@param chiSq Output calculated chi square value
+    *@return Status code */
+   LitStatus Update(
+      CbmLitTrackParam* par,
+      const CbmLitStripHit* hit,
+      myf& chiSq);
 
-	/* Implements KF update step for strip hits using weighted means formalism
-	 *@param par Input/Output track parameter
-	 *@param hit Pointer to the hit
-	 *@param chiSq Output calculated chi square value
-	 *@return Status code */
-	LitStatus UpdateWMF(
-			CbmLitTrackParam *par,
-	        const CbmLitStripHit *hit,
-	        myf &chiSq);
+   /* Implements KF update step for strip hits using weighted means formalism
+    *@param par Input/Output track parameter
+    *@param hit Pointer to the hit
+    *@param chiSq Output calculated chi square value
+    *@return Status code */
+   LitStatus UpdateWMF(
+      CbmLitTrackParam* par,
+      const CbmLitStripHit* hit,
+      myf& chiSq);
 };
 
 #endif //CbmLitKalmanFilter

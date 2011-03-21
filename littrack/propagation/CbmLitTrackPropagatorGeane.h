@@ -15,37 +15,38 @@
 
 class CbmPropagator;
 
-class CbmLitTrackPropagatorGeane: public CbmLitTrackPropagator {
+class CbmLitTrackPropagatorGeane: public CbmLitTrackPropagator
+{
 public:
-	/* Constructor */
-	CbmLitTrackPropagatorGeane();
+   /* Constructor */
+   CbmLitTrackPropagatorGeane();
 
-	/* Destructor */
-	virtual ~CbmLitTrackPropagatorGeane();
+   /* Destructor */
+   virtual ~CbmLitTrackPropagatorGeane();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-    /* Inherited from CbmLitTrackPropagator */
-	virtual LitStatus Propagate(
-		   const CbmLitTrackParam *parIn,
-		   CbmLitTrackParam *parOut,
-		   myf zOut,
-		   int pdg,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackPropagator */
+   virtual LitStatus Propagate(
+      const CbmLitTrackParam* parIn,
+      CbmLitTrackParam* parOut,
+      myf zOut,
+      int pdg,
+      std::vector<myf>* F);
 
-	/* Inherited from CbmLitTrackPropagator */
-	virtual LitStatus Propagate(
-		   CbmLitTrackParam *pParam,
-		   myf zOut,
-		   int pdg,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackPropagator */
+   virtual LitStatus Propagate(
+      CbmLitTrackParam* pParam,
+      myf zOut,
+      int pdg,
+      std::vector<myf>* F);
 
 private:
-	CbmPropagator *fPropagator; // FairRoot interface to GEANE
+   CbmPropagator* fPropagator; // FairRoot interface to GEANE
 };
 
 #endif //CbmLitTrackPropagatorGeane

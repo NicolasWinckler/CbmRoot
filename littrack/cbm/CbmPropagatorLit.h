@@ -10,31 +10,31 @@ class CbmLitTrackPropagator;
 class CbmPropagatorLit : public CbmPropagator
 {
 public:
-	// type = "line" - uses line track extrapolation
-	// type = "rk4" - uses Runge-Kutta 4th order track extrapolation
-	CbmPropagatorLit(
-			const std::string& type);
-	virtual ~CbmPropagatorLit();
+   // type = "line" - uses line track extrapolation
+   // type = "rk4" - uses Runge-Kutta 4th order track extrapolation
+   CbmPropagatorLit(
+      const std::string& type);
+   virtual ~CbmPropagatorLit();
 
-    virtual StatusCode Propagate(
-		   const FairTrackParam *parIn,
-           FairTrackParam *parOut,
-           Double_t zOut,
-           Int_t pdg);
+   virtual StatusCode Propagate(
+      const FairTrackParam* parIn,
+      FairTrackParam* parOut,
+      Double_t zOut,
+      Int_t pdg);
 
-    virtual StatusCode Propagate(
-		   FairTrackParam *par,
-           Double_t zOut,
-           Int_t pdg);
+   virtual StatusCode Propagate(
+      FairTrackParam* par,
+      Double_t zOut,
+      Int_t pdg);
 
-    virtual void TransportMatrix(
-		   std::vector<Double_t>& F);
+   virtual void TransportMatrix(
+      std::vector<Double_t>& F);
 
-    virtual void TransportMatrix(
-		   TMatrixD& F);
+   virtual void TransportMatrix(
+      TMatrixD& F);
 
 private:
-    TrackPropagatorPtr fPropagator;
+   TrackPropagatorPtr fPropagator;
 };
 
 #endif /*CBMPROPAGATORLIT_H_*/

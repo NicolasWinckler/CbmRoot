@@ -19,38 +19,38 @@ class CbmLitTrackParam;
 class CbmLitCleverTrackExtrapolator : public CbmLitTrackExtrapolator
 {
 public:
-	/* Constructor
-	 * @param type Type of the field extrapolator. If type == "myfield" than
-	 * fitted magnetic field is used in the RK4.
-	 */
-	CbmLitCleverTrackExtrapolator(
-			const std::string& type);
+   /* Constructor
+    * @param type Type of the field extrapolator. If type == "myfield" than
+    * fitted magnetic field is used in the RK4.
+    */
+   CbmLitCleverTrackExtrapolator(
+      const std::string& type);
 
-	/* Destructor */
-	virtual ~CbmLitCleverTrackExtrapolator();
+   /* Destructor */
+   virtual ~CbmLitCleverTrackExtrapolator();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitTrackExtrapolator */
-	virtual LitStatus Extrapolate(
-		   const CbmLitTrackParam *parIn,
-		   CbmLitTrackParam *parOut,
-		   myf zOut,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackExtrapolator */
+   virtual LitStatus Extrapolate(
+      const CbmLitTrackParam* parIn,
+      CbmLitTrackParam* parOut,
+      myf zOut,
+      std::vector<myf>* F);
 
-	/* Inherited from CbmLitTrackExtrapolator */
-	virtual LitStatus Extrapolate(
-		   CbmLitTrackParam *par,
-		   myf zOut,
-		   std::vector<myf>* F);
+   /* Inherited from CbmLitTrackExtrapolator */
+   virtual LitStatus Extrapolate(
+      CbmLitTrackParam* par,
+      myf zOut,
+      std::vector<myf>* F);
 
 private:
-	TrackExtrapolatorPtr fLineExtrapolator; // line track extrapolation tool
-	TrackExtrapolatorPtr fRK4Extrapolator; // RK4 track extrapolation tool
+   TrackExtrapolatorPtr fLineExtrapolator; // line track extrapolation tool
+   TrackExtrapolatorPtr fRK4Extrapolator; // RK4 track extrapolation tool
 };
 
 #endif /* CBMLITCLEVERTRACKEXTRAPOLATOR_H_ */

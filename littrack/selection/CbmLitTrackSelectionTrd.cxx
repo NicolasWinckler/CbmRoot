@@ -15,15 +15,15 @@
 #include <functional>
 
 CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd():
-	fNofSharedHits(0),
-	fMinNofHits(0)
+   fNofSharedHits(0),
+   fMinNofHits(0)
 {
-	fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
-	fSharedHitsSelection->Initialize();
-	fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
-	fSameSeedSelection->Initialize();
-	fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
-	fCutsSelection->Initialize();
+   fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
+   fSharedHitsSelection->Initialize();
+   fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
+   fSameSeedSelection->Initialize();
+   fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
+   fCutsSelection->Initialize();
 }
 
 CbmLitTrackSelectionTrd::~CbmLitTrackSelectionTrd()
@@ -32,35 +32,36 @@ CbmLitTrackSelectionTrd::~CbmLitTrackSelectionTrd()
 
 LitStatus CbmLitTrackSelectionTrd::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionTrd::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionTrd::DoSelect(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-	if (itBegin == itEnd) return kLITSUCCESS;
+   if (itBegin == itEnd) { return kLITSUCCESS; }
 
-	((CbmLitTrackSelectionSharedHits*)fSharedHitsSelection.get())->SetNofSharedHits(fNofSharedHits);
-	((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinNofHits(fMinNofHits);
+   ((CbmLitTrackSelectionSharedHits*)fSharedHitsSelection.get())->SetNofSharedHits(fNofSharedHits);
+   ((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinNofHits(fMinNofHits);
 
-	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++)
-		(*iTrack)->SetQuality(kLITGOOD);
+   for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+      (*iTrack)->SetQuality(kLITGOOD);
+   }
 
-	fSharedHitsSelection->DoSelect(itBegin, itEnd);
-	fSameSeedSelection->DoSelect(itBegin, itEnd);
-	fCutsSelection->DoSelect(itBegin, itEnd);
+   fSharedHitsSelection->DoSelect(itBegin, itEnd);
+   fSameSeedSelection->DoSelect(itBegin, itEnd);
+   fCutsSelection->DoSelect(itBegin, itEnd);
 
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionTrd::DoSelect(
-		TrackPtrVector& tracks)
+   TrackPtrVector& tracks)
 {
-	return DoSelect(tracks.begin(), tracks.end());
+   return DoSelect(tracks.begin(), tracks.end());
 }

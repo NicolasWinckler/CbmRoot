@@ -1,14 +1,15 @@
 #ifndef LITCUDATEST_H_
 #define LITCUDATEST_H_
 
-class LitCudaTest {
+class LitCudaTest
+{
 public:
-	LitCudaTest();
-	virtual ~LitCudaTest();
+   LitCudaTest();
+   virtual ~LitCudaTest();
 
-	void MyDeviceInfo() const;
+   void MyDeviceInfo() const;
 
-	void MyAddVec() const;
+   void MyAddVec() const;
 };
 
 #endif /* LITCUDATEST_H_ */

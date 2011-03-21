@@ -15,31 +15,32 @@
 #include "LitTrack.h"
 
 //template<class T>
-class LitTrackFinderNNBase {
+class LitTrackFinderNNBase
+{
 public:
-	LitTrackFinderNNBase();
-	virtual ~LitTrackFinderNNBase();
+   LitTrackFinderNNBase();
+   virtual ~LitTrackFinderNNBase();
 
-	void SetSigmaCoef(fscal sigmaCoef) {
-		fSigmaCoef = sigmaCoef;
-	}
+   void SetSigmaCoef(fscal sigmaCoef) {
+      fSigmaCoef = sigmaCoef;
+   }
 
-	void SetMaxCovSq(fscal maxCovSq) {
-		fMaxCovSq = maxCovSq;
-	}
+   void SetMaxCovSq(fscal maxCovSq) {
+      fMaxCovSq = maxCovSq;
+   }
 
 protected:
-	void MinMaxIndex(
-		const LitTrackParamScal* par,
-		LitScalPixelHit** hits,
-		unsigned int nofHits,
-		fscal maxErr,
-		unsigned int &first,
-		unsigned int &last);
+   void MinMaxIndex(
+      const LitTrackParamScal* par,
+      LitScalPixelHit** hits,
+      unsigned int nofHits,
+      fscal maxErr,
+      unsigned int& first,
+      unsigned int& last);
 
 private:
-	fscal fSigmaCoef;
-	fscal fMaxCovSq;
+   fscal fSigmaCoef;
+   fscal fMaxCovSq;
 };
 
 //typedef LitTrackFinderNNBase<fscal> LitTrackFinderNNBaseScal;

@@ -8,19 +8,19 @@ class CbmLitSimpleGeometryConstructor;
 class CbmLitCheckSimpleGeo : public FairTask
 {
 public:
-	CbmLitCheckSimpleGeo();
-	virtual ~CbmLitCheckSimpleGeo();
+   CbmLitCheckSimpleGeo();
+   virtual ~CbmLitCheckSimpleGeo();
 
-	virtual InitStatus Init();
-	virtual void Exec(
-			Option_t* opt);
-	virtual void Finish();
-	virtual void SetParContainers();
+   virtual InitStatus Init();
+   virtual void Exec(
+      Option_t* opt);
+   virtual void Finish();
+   virtual void SetParContainers();
 
 private:
-	CbmLitSimpleGeometryConstructor* fGeoConstructor;
+   CbmLitSimpleGeometryConstructor* fGeoConstructor;
 
-	ClassDef(CbmLitCheckSimpleGeo, 1);
+   ClassDef(CbmLitCheckSimpleGeo, 1);
 };
 
 #endif /* CBMLITCHECKSIMPLEGEO_H_ */

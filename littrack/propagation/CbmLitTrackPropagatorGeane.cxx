@@ -23,50 +23,50 @@ CbmLitTrackPropagatorGeane::CbmLitTrackPropagatorGeane():
 
 CbmLitTrackPropagatorGeane::~CbmLitTrackPropagatorGeane()
 {
-	if (fPropagator) delete fPropagator;
+   if (fPropagator) { delete fPropagator; }
 }
 
 LitStatus CbmLitTrackPropagatorGeane::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackPropagatorGeane::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
-		const CbmLitTrackParam *parIn,
-        CbmLitTrackParam *parOut,
-        myf zOut,
-        int pdg,
-        std::vector<myf>* F)
+   const CbmLitTrackParam* parIn,
+   CbmLitTrackParam* parOut,
+   myf zOut,
+   int pdg,
+   std::vector<myf>* F)
 {
    *parOut = *parIn;
    return Propagate(parOut, zOut, pdg, F);
 }
 
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
-		CbmLitTrackParam *par,
-        myf zOut,
-        int pdg,
-        std::vector<myf>* F)
+   CbmLitTrackParam* par,
+   myf zOut,
+   int pdg,
+   std::vector<myf>* F)
 {
-	FairTrackParam param;
-	StatusCode result;
+   FairTrackParam param;
+   StatusCode result;
 
-	CbmLitConverter::LitTrackParamToTrackParam(par, &param);
+   CbmLitConverter::LitTrackParamToTrackParam(par, &param);
 
-	if (std::abs(pdg) == 13) pdg = (par->GetQp() < 0) ? 13 : -13;
-	if (std::abs(pdg) == 11) pdg = (par->GetQp() < 0) ? 11 : -11;
+   if (std::abs(pdg) == 13) { pdg = (par->GetQp() < 0) ? 13 : -13; }
+   if (std::abs(pdg) == 11) { pdg = (par->GetQp() < 0) ? 11 : -11; }
 
-	result = fPropagator->Propagate(&param, zOut, pdg);
+   result = fPropagator->Propagate(&param, zOut, pdg);
 
-	if (result == kCBMSUCCESS) {
-		CbmLitConverter::TrackParamToLitTrackParam(&param, par);
-		return kLITSUCCESS;
-	} else {
-		return kLITERROR;
-	}
+   if (result == kCBMSUCCESS) {
+      CbmLitConverter::TrackParamToLitTrackParam(&param, par);
+      return kLITSUCCESS;
+   } else {
+      return kLITERROR;
+   }
 }

@@ -10,30 +10,31 @@
 
 #include "base/CbmLitTypes.h"
 
-class CbmLitField {
+class CbmLitField
+{
 public:
-	/* Constructor */
-	CbmLitField(){};
+   /* Constructor */
+   CbmLitField() {};
 
-	/* Destructor */
-	virtual ~CbmLitField(){};
+   /* Destructor */
+   virtual ~CbmLitField() {};
 
-	/* Returns field value at (x,y,z) position
-	 * @param x X coordinate [cm].
-	 * @param y Y coordinate [cm].
-	 * @param z Z coordinate [cm].
-	 * @param Bx Output Bx field value [kGauss].
-	 * @param By Output By field value [kGauss]
-	 * @param Bz Output Bz field value [kGauss]
-	 */
-	virtual void GetFieldValue(
-			myf x, myf y, myf z,
-			myf &Bx, myf &By, myf &Bz) const = 0;
+   /* Returns field value at (x,y,z) position
+    * @param x X coordinate [cm].
+    * @param y Y coordinate [cm].
+    * @param z Z coordinate [cm].
+    * @param Bx Output Bx field value [kGauss].
+    * @param By Output By field value [kGauss]
+    * @param Bz Output Bz field value [kGauss]
+    */
+   virtual void GetFieldValue(
+      myf x, myf y, myf z,
+      myf& Bx, myf& By, myf& Bz) const = 0;
 
-	/* @return std::string representation of this class */
-	virtual std::string ToString() const {
-		return "CbmLitField::ToString";
-	}
+   /* @return std::string representation of this class */
+   virtual std::string ToString() const {
+      return "CbmLitField::ToString";
+   }
 };
 
 #endif /* CBMLITFIELD_H_ */

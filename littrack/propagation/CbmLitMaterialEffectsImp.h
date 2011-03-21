@@ -18,100 +18,100 @@ class CbmLitMaterialInfo;
 class CbmLitMaterialEffectsImp : public CbmLitMaterialEffects
 {
 public:
-	/* Constructor */
-	CbmLitMaterialEffectsImp();
+   /* Constructor */
+   CbmLitMaterialEffectsImp();
 
-	/* Destructor */
-	virtual ~CbmLitMaterialEffectsImp();
+   /* Destructor */
+   virtual ~CbmLitMaterialEffectsImp();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitMaterialEffects */
-	LitStatus Update(
-			CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat,
-	        int pdg,
-	        bool downstream);
+   /* Inherited from CbmLitMaterialEffects */
+   LitStatus Update(
+      CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat,
+      int pdg,
+      bool downstream);
 
-//	LitStatus Update2(
-//			CbmLitTrackParam* par,
-//	        const CbmLitMaterialInfo* mat);
+// LitStatus Update2(
+//       CbmLitTrackParam* par,
+//         const CbmLitMaterialInfo* mat);
 public:
 
-	void AddThinScatter(
-			CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   void AddThinScatter(
+      CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	void AddThickScatter(
-			CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   void AddThickScatter(
+      CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	void AddEnergyLoss(
-			CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   void AddEnergyLoss(
+      CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf CalcThetaSq(
-			const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf CalcThetaSq(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf BetheBlochSimple(
-	        const CbmLitMaterialInfo* mat) const;
+   myf BetheBlochSimple(
+      const CbmLitMaterialInfo* mat) const;
 
-	myf BetheBloch(
-			const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf BetheBloch(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf BetheBlochElectron(
-			const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf BetheBlochElectron(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf EnergyLoss(
-			const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf EnergyLoss(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf dEdx(
-			const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf dEdx(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf CalcQpAfterEloss(
-			myf qp,
-	        myf eloss) const;
+   myf CalcQpAfterEloss(
+      myf qp,
+      myf eloss) const;
 
-	myf CalcSigmaSqQp(
-			   const CbmLitTrackParam* par,
-	           const CbmLitMaterialInfo* mat) const;
+   myf CalcSigmaSqQp(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf CalcSigmaSqQpElectron(
-	          const CbmLitTrackParam* par,
-	          const CbmLitMaterialInfo* mat) const;
+   myf CalcSigmaSqQpElectron(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf MPVEnergyLoss(
-	        const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf MPVEnergyLoss(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf BetheHeitler(
-	        const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf BetheHeitler(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf PairProduction(
-	        const CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
+   myf PairProduction(
+      const CbmLitTrackParam* par,
+      const CbmLitMaterialInfo* mat) const;
 
-	myf CalcI(
-			myf Z) const;
+   myf CalcI(
+      myf Z) const;
 private:
-	/* Propagation direction */
-	bool fDownstream;
-	/* Hypothesis on particle mass */
-	myf fMass;
-	/* True if particle is an electron or positron */
-	bool fIsElectron;
-	/* True if particle is muon */
-	bool fIsMuon;
+   /* Propagation direction */
+   bool fDownstream;
+   /* Hypothesis on particle mass */
+   myf fMass;
+   /* True if particle is an electron or positron */
+   bool fIsElectron;
+   /* True if particle is muon */
+   bool fIsMuon;
 };
 
 #endif /*CBMLITMATERIALEFFECTSIMP_H_*/

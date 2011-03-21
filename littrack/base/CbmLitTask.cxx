@@ -9,14 +9,14 @@
 #include <iostream>
 
 CbmLitTask::CbmLitTask():
-	fIsElectronSetup(false),
-	fIsSts(false),
-	fIsTrd(false),
-	fIsMuch(false),
-	fIsTof(false),
-	fEventNo(0),
-	fVerbose(0),
-	fOutputDir("")
+   fIsElectronSetup(false),
+   fIsSts(false),
+   fIsTrd(false),
+   fIsMuch(false),
+   fIsTof(false),
+   fEventNo(0),
+   fVerbose(0),
+   fOutputDir("")
 {
 }
 
@@ -27,20 +27,20 @@ CbmLitTask::~CbmLitTask()
 
 void CbmLitTask::DetermineSetup()
 {
-    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-    fIsElectronSetup = env->IsElectronSetup();
-	fIsSts = env->IsSts();
-    fIsTrd = env->IsTrd();
-    fIsMuch = env->IsMuch();
-    fIsTof = env->IsTof();
+   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+   fIsElectronSetup = env->IsElectronSetup();
+   fIsSts = env->IsSts();
+   fIsTrd = env->IsTrd();
+   fIsMuch = env->IsMuch();
+   fIsTof = env->IsTof();
 
-    if (fIsElectronSetup) std::cout << "-I- CBM electron setup detected" << std::endl;
-    else std::cout << "-I- CBM muon setup detected" << std::endl;
-    std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
-    if (fIsSts) std::cout << "STS" << std::endl;
-    if (fIsTrd) std::cout << "TRD" << std::endl;
-    if (fIsMuch) std::cout << "MUCH" << std::endl;
-    if (fIsTof) std::cout << "TOF" << std::endl;
+   if (fIsElectronSetup) { std::cout << "-I- CBM electron setup detected" << std::endl; }
+   else { std::cout << "-I- CBM muon setup detected" << std::endl; }
+   std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
+   if (fIsSts) { std::cout << "STS" << std::endl; }
+   if (fIsTrd) { std::cout << "TRD" << std::endl; }
+   if (fIsMuch) { std::cout << "MUCH" << std::endl; }
+   if (fIsTof) { std::cout << "TOF" << std::endl; }
 }
 
 ClassImp(CbmLitTask);

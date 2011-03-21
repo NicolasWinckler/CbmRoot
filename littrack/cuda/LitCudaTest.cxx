@@ -19,10 +19,10 @@ LitCudaTest::~LitCudaTest()
 
 void LitCudaTest::MyDeviceInfo() const
 {
-	DeviceInfo();
+   DeviceInfo();
 }
 
 void LitCudaTest::MyAddVec() const
 {
-	AddVec();
+   AddVec();
 }

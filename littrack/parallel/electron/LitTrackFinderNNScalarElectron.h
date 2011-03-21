@@ -27,61 +27,61 @@
 //class CbmLitField;
 
 class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBaseElectronScal,
-	                                   public LitTrackFinderNNBase,
-                                       public LitTrackFinder
+   public LitTrackFinderNNBase,
+   public LitTrackFinder
 {
 public:
-	/* Constructor */
-	LitTrackFinderNNScalarElectron();
+   /* Constructor */
+   LitTrackFinderNNScalarElectron();
 
-	/* Destructor */
-	virtual ~LitTrackFinderNNScalarElectron();
+   /* Destructor */
+   virtual ~LitTrackFinderNNScalarElectron();
 
-	/* Inherited from LitTrackFinder */
-	virtual void DoFind(
-			LitScalPixelHit* hits[],
-			unsigned int nofHits,
-			LitScalTrack* trackSeeds[],
-			unsigned int nofTrackSeeds,
-			LitScalTrack* tracks[],
-			unsigned int &nofTracks);
+   /* Inherited from LitTrackFinder */
+   virtual void DoFind(
+      LitScalPixelHit* hits[],
+      unsigned int nofHits,
+      LitScalTrack* trackSeeds[],
+      unsigned int nofTrackSeeds,
+      LitScalTrack* tracks[],
+      unsigned int& nofTracks);
 
-	void SetDetectorLayout(
-			LitDetectorLayoutElectronScal& layout) {
-		fLayout = layout;
-		fHitData.SetDetectorLayout(layout);
-	}
+   void SetDetectorLayout(
+      LitDetectorLayoutElectronScal& layout) {
+      fLayout = layout;
+      fHitData.SetDetectorLayout(layout);
+   }
 
 public:
-	void FollowTracks();
+   void FollowTracks();
 
-	void PropagateToFirstStation(
-			LitScalTrack* track);
+   void PropagateToFirstStation(
+      LitScalTrack* track);
 
-	void FollowTrack(
-			LitScalTrack *track);
+   void FollowTrack(
+      LitScalTrack* track);
 
-	bool ProcessStationGroup(
-			LitScalTrack *track,
-			int stationGroup);
+   bool ProcessStationGroup(
+      LitScalTrack* track,
+      int stationGroup);
 
-	bool ProcessStation(
-			LitScalTrack *track,
-			int stationGroup,
-			int station);
+   bool ProcessStation(
+      LitScalTrack* track,
+      int stationGroup,
+      int station);
 
-	bool AddNearestHit(
-			LitScalTrack* track,
-			const std::pair<unsigned int, unsigned int>& hits,
-			LitTrackParamScal* par,
-			int stationGroup,
-			int station);
+   bool AddNearestHit(
+      LitScalTrack* track,
+      const std::pair<unsigned int, unsigned int>& hits,
+      LitTrackParamScal* par,
+      int stationGroup,
+      int station);
 
 //private:
-//	TrackExtrapolatorPtr fExtrapolator;
-//	TrackPropagatorPtr fPropagator;
-//	TrackUpdatePtr fFilter;
-//	CbmLitField* fField;
+// TrackExtrapolatorPtr fExtrapolator;
+// TrackPropagatorPtr fPropagator;
+// TrackUpdatePtr fFilter;
+// CbmLitField* fField;
 };
 
 

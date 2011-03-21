@@ -70,79 +70,78 @@ void CbmLitTrdTrackFinderStandalone::Init()
 }
 
 void CbmLitTrdTrackFinderStandalone::SetIterationParameters(
-		int iter)
+   int iter)
 {
-	if (iter == 0) {
-		fMaxNofMissingHits = 1;
-//		fSigmaCoef = 3.5;
-	} else
-	if (iter == 1) {
-		fMaxNofMissingHits = 2;
-//		fSigmaCoef = 5.;
-	}
+   if (iter == 0) {
+      fMaxNofMissingHits = 1;
+//    fSigmaCoef = 3.5;
+   } else if (iter == 1) {
+      fMaxNofMissingHits = 2;
+//    fSigmaCoef = 5.;
+   }
 }
 
 
 Int_t CbmLitTrdTrackFinderStandalone::DoFind(
-		TClonesArray* hitArray,
-        TClonesArray* trackArray)
+   TClonesArray* hitArray,
+   TClonesArray* trackArray)
 {
-	HitPtrVector hits;
-	TrackPtrVector trackSeeds;
-	TrackPtrVector foundTracks;
+   HitPtrVector hits;
+   TrackPtrVector trackSeeds;
+   TrackPtrVector foundTracks;
 
-	CreateHits(hitArray, hits);
-	CreateTrackSeeds(hits, trackSeeds);
+   CreateHits(hitArray, hits);
+   CreateTrackSeeds(hits, trackSeeds);
 
-	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
+   CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
 
-	CopyToOutput(foundTracks, trackArray);
+   CopyToOutput(foundTracks, trackArray);
 
-	for_each(hits.begin(), hits.end(), DeleteObject());
-	for_each(trackSeeds.begin(), trackSeeds.end(), DeleteObject());
-	hits.clear();
-	trackSeeds.clear();
+   for_each(hits.begin(), hits.end(), DeleteObject());
+   for_each(trackSeeds.begin(), trackSeeds.end(), DeleteObject());
+   hits.clear();
+   trackSeeds.clear();
 
-	return trackArray->GetEntriesFast();
+   return trackArray->GetEntriesFast();
 }
 
 void CbmLitTrdTrackFinderStandalone::CreateTrackSeeds(
-		const HitPtrVector& hits,
-		TrackPtrVector& trackSeeds)
+   const HitPtrVector& hits,
+   TrackPtrVector& trackSeeds)
 {
 
 }
 
 void CbmLitTrdTrackFinderStandalone::CreateHits(
-		TClonesArray* hitArray,
-		HitPtrVector& hits)
+   TClonesArray* hitArray,
+   HitPtrVector& hits)
 {
 
-	Int_t nofHits = hitArray->GetEntriesFast();
+   Int_t nofHits = hitArray->GetEntriesFast();
 
-	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
+   for(Int_t iHit = 0; iHit < nofHits; iHit++) {
 
-		CbmPixelHit* hit = (CbmPixelHit*) hitArray->At(iHit);
-	    if(NULL == hit) continue;
+      CbmPixelHit* hit = (CbmPixelHit*) hitArray->At(iHit);
+      if(NULL == hit) { continue; }
 
-	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
-	    CbmLitConverter::PixelHitToLitPixelHit(hit, iHit, litHit);
-	    hits.push_back(litHit);
-	}
+      CbmLitPixelHit* litHit = new CbmLitPixelHit;
+      CbmLitConverter::PixelHitToLitPixelHit(hit, iHit, litHit);
+      hits.push_back(litHit);
+   }
 }
 
 void CbmLitTrdTrackFinderStandalone::CopyToOutput(
-		TrackPtrVector& tracks,
-		TClonesArray* trackArray)
+   TrackPtrVector& tracks,
+   TClonesArray* trackArray)
 {
-	Int_t trackNo = trackArray->GetEntriesFast();
-	for(TrackPtrIterator iTrack = tracks.begin();iTrack != tracks.end(); iTrack++) {
-	   CbmTrdTrack track;
-	   CbmLitConverter::LitTrackToTrack(*iTrack, &track);
-       new ((*trackArray)[trackNo++]) CbmTrdTrack(track);
-       delete (*iTrack);
-	}
-	tracks.clear();
+   Int_t trackNo = trackArray->GetEntriesFast();
+   for(TrackPtrIterator iTrack = tracks.begin(); iTrack != tracks.end(); iTrack++) {
+      CbmTrdTrack track;
+      CbmLitConverter::LitTrackToTrack(*iTrack, &track);
+      new ((*trackArray)[trackNo++]) CbmTrdTrack(track);
+      delete (*iTrack);
+   }
+   tracks.clear();
 }
 
 
@@ -245,7 +244,7 @@ void CbmLitTrdTrackFinderStandalone::CreateTrdTracks()
 
             for (Int_t iHit3 = IndMin[3]; iHit3 < IndMin[3] + HitCnt[3]; iHit3++){ //4
 
-	            if ( !IsHitInValidationWindow(Ypred[3], fHits[3][iHit3], 3) ) continue;
+               if ( !IsHitInValidationWindow(Ypred[3], fHits[3][iHit3], 3) ) continue;
 
                pHits[3] = fHits[3][iHit3];
 
@@ -263,51 +262,51 @@ void CbmLitTrdTrackFinderStandalone::CreateTrdTracks()
 //
 //   for (int iHit0 = 0; iHit0 < fHits[0].size(); iHit0++) {
 //
-//   	CbmTrdHit* TrdHit = fHits[0][iHit0];
+//    CbmTrdHit* TrdHit = fHits[0][iHit0];
 //
-//	if(!TrdHit) {
-//	  cout << "-W- CbmLitTrdTrackFinderStandalone::CreateTrdTracks:"
-//	       << " Wrong TRD Hit!!!!" << endl;
-//	}
+// if(!TrdHit) {
+//   cout << "-W- CbmLitTrdTrackFinderStandalone::CreateTrdTracks:"
+//        << " Wrong TRD Hit!!!!" << endl;
+// }
 //
-//	int refId =  TrdHit->GetRefIndex();
-//	CbmTrdPoint* TrdPoint = (CbmTrdPoint*) fArrayTrdPoint->At(refId);
-//	if(!TrdPoint) {
-//	  cout << "-W- CbmLitTrdTrackFinderStandalone::CreateTrdTracks:"
-//	       << " Wrong TRD Point!!!!" << endl;
-//	}
+// int refId =  TrdHit->GetRefIndex();
+// CbmTrdPoint* TrdPoint = (CbmTrdPoint*) fArrayTrdPoint->At(refId);
+// if(!TrdPoint) {
+//   cout << "-W- CbmLitTrdTrackFinderStandalone::CreateTrdTracks:"
+//        << " Wrong TRD Point!!!!" << endl;
+// }
 //
-//	CbmTrackParam* par = new CbmTrackParam();
+// CbmTrackParam* par = new CbmTrackParam();
 //
 //
-//	par->SetX(TrdPoint->GetX());
-//	par->SetY(TrdPoint->GetY());
-//	par->SetTx(TrdPoint->GetPx() / TrdPoint->GetPz());
-//	par->SetTy(TrdPoint->GetPy() / TrdPoint->GetPz());
-//   	Double p = TMath::Sqrt(TrdPoint->GetPx() * TrdPoint->GetPx() +
-//			       TrdPoint->GetPy() * TrdPoint->GetPy() +
-//			       TrdPoint->GetPz() * TrdPoint->GetPz());
+// par->SetX(TrdPoint->GetX());
+// par->SetY(TrdPoint->GetY());
+// par->SetTx(TrdPoint->GetPx() / TrdPoint->GetPz());
+// par->SetTy(TrdPoint->GetPy() / TrdPoint->GetPz());
+//    Double p = TMath::Sqrt(TrdPoint->GetPx() * TrdPoint->GetPx() +
+//              TrdPoint->GetPy() * TrdPoint->GetPy() +
+//              TrdPoint->GetPz() * TrdPoint->GetPz());
 //
-//	if (p < .25) continue ;
+// if (p < .25) continue ;
 //
-//	par->SetQp(1. / p);
+// par->SetQp(1. / p);
 //
-//	par->SetZ(TrdPoint->GetZ());//503.
+// par->SetZ(TrdPoint->GetZ());//503.
 //
-//	par->SetCovariance(0, 0, fHits[0][iHit0]->GetDx() *
-//				 fHits[0][iHit0]->GetDx() * 1e-8);
-//	par->SetCovariance(1, 1, fHits[0][iHit0]->GetDy() *
-//			         fHits[0][iHit0]->GetDy() * 1e-8);
+// par->SetCovariance(0, 0, fHits[0][iHit0]->GetDx() *
+//           fHits[0][iHit0]->GetDx() * 1e-8);
+// par->SetCovariance(1, 1, fHits[0][iHit0]->GetDy() *
+//                fHits[0][iHit0]->GetDy() * 1e-8);
 //
-//	CbmTrdTrack *TrdTrack = new CbmTrdTrack();
+// CbmTrdTrack *TrdTrack = new CbmTrdTrack();
 //
-//	TrdTrack->SetParamFirst(*par);
-//	TrdTrack->SetParamLast(*par);
-//	TrdTrack->SetChi2(0.0);
+// TrdTrack->SetParamFirst(*par);
+// TrdTrack->SetParamLast(*par);
+// TrdTrack->SetChi2(0.0);
 //
-//	fTrdTracks.push_back(TrdTrack);
+// fTrdTracks.push_back(TrdTrack);
 //
-//	delete par;
+// delete par;
 //   }
 
 

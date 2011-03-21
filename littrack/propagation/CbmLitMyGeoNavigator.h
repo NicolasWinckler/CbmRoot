@@ -16,26 +16,26 @@
 class CbmLitMyGeoNavigator : public CbmLitGeoNavigator
 {
 public:
-	/* Constructor */
-	CbmLitMyGeoNavigator();
+   /* Constructor */
+   CbmLitMyGeoNavigator();
 
-	/* Destructor */
-	virtual ~CbmLitMyGeoNavigator();
+   /* Destructor */
+   virtual ~CbmLitMyGeoNavigator();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitGeoNavigator */
-	LitStatus FindIntersections(
-			const CbmLitTrackParam* par,
-			myf zOut,
-			std::vector<CbmLitMaterialInfo>& inter);
+   /* Inherited from CbmLitGeoNavigator */
+   LitStatus FindIntersections(
+      const CbmLitTrackParam* par,
+      myf zOut,
+      std::vector<CbmLitMaterialInfo>& inter);
 private:
-    // vector with nodes of the simplified geometry
-	std::vector<CbmLitMaterialInfo> fMyGeoNodes;
+   // vector with nodes of the simplified geometry
+   std::vector<CbmLitMaterialInfo> fMyGeoNodes;
 };
 
 #endif /* CBMLITMYGEONAVIGATOR_H_ */

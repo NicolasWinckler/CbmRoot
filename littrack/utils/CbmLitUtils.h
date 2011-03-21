@@ -6,30 +6,31 @@ class TCanvas;
 #include <string>
 #include <sstream>
 
-namespace lit {
+namespace lit
+{
 
 template <class T>
 std::string ToString(
-		const T& value)
+   const T& value)
 {
-	std::stringstream ss;
-	ss.precision(5);
-	ss << value;
-	return ss.str();
+   std::stringstream ss;
+   ss.precision(5);
+   ss << value;
+   return ss.str();
 }
 
 /* Returns -1 if x<0, +1 if x>0, 0 if x==0 */
 template <class T>
 int Sign(
-		const T& x)
+   const T& x)
 {
-	static const T ZERO = 0;
-	return (x > ZERO) ? 1 : ((x < ZERO) ? -1 : 0);
+   static const T ZERO = 0;
+   return (x > ZERO) ? 1 : ((x < ZERO) ? -1 : 0);
 }
 
 void SaveCanvasAsImage(
-		TCanvas* c,
-		const std::string& dir);
+   TCanvas* c,
+   const std::string& dir);
 
 }
 

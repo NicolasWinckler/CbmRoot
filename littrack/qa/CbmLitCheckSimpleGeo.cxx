@@ -15,22 +15,22 @@ CbmLitCheckSimpleGeo::~CbmLitCheckSimpleGeo()
 
 InitStatus CbmLitCheckSimpleGeo::Init()
 {
-	fGeoConstructor = CbmLitSimpleGeometryConstructor::Instance();
-	fGeoConstructor->Draw();
-	return kSUCCESS;
+   fGeoConstructor = CbmLitSimpleGeometryConstructor::Instance();
+   fGeoConstructor->Draw();
+   return kSUCCESS;
 }
 
 void CbmLitCheckSimpleGeo::SetParContainers()
 {
-    FairRunAna* ana = FairRunAna::Instance();
-    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-    rtdb->getContainer("CbmGeoMuchPar");
-    rtdb->getContainer("CbmStsDigiPar");
-    rtdb->getContainer("CbmGeoStsPar");
+   FairRunAna* ana = FairRunAna::Instance();
+   FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+   rtdb->getContainer("CbmGeoMuchPar");
+   rtdb->getContainer("CbmStsDigiPar");
+   rtdb->getContainer("CbmGeoStsPar");
 }
 
 void CbmLitCheckSimpleGeo::Exec(
-		Option_t* opt)
+   Option_t* opt)
 {
 
 }

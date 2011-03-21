@@ -17,29 +17,29 @@ class CbmLitFitNode;
 class CbmLitKalmanSmoother : public CbmLitTrackFitter
 {
 public:
-	/* Constructor */
-	CbmLitKalmanSmoother();
+   /* Constructor */
+   CbmLitKalmanSmoother();
 
-	/* Destructor */
-	virtual ~CbmLitKalmanSmoother();
+   /* Destructor */
+   virtual ~CbmLitKalmanSmoother();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Initialize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Initialize();
 
-	/* Inherited from CbmLitTool */
-	virtual LitStatus Finalize();
+   /* Inherited from CbmLitTool */
+   virtual LitStatus Finalize();
 
-	/* Inherited from CbmLitTrackFitter */
-	virtual LitStatus Fit(
-			CbmLitTrack *track,
-			bool downstream = false);
+   /* Inherited from CbmLitTrackFitter */
+   virtual LitStatus Fit(
+      CbmLitTrack* track,
+      bool downstream = false);
 private:
-	/* Smoothes one fit node
-	 *@param thisNode Current fit node to be smoothed
-	 *@param prevNode Previous fit node */
-	void Smooth(
-			CbmLitFitNode* thisNode,
-			const CbmLitFitNode* prevNode);
+   /* Smoothes one fit node
+    *@param thisNode Current fit node to be smoothed
+    *@param prevNode Previous fit node */
+   void Smooth(
+      CbmLitFitNode* thisNode,
+      const CbmLitFitNode* prevNode);
 };
 
 #endif /*CBMLITKALMANSMOOTHER_H_*/

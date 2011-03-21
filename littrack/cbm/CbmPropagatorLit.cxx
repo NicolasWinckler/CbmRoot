@@ -7,31 +7,31 @@
 #include "FairTrackParam.h"
 
 CbmPropagatorLit::CbmPropagatorLit(
-		const std::string& type)
+   const std::string& type)
 {
-	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator(type);
+   CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+   fPropagator = factory->CreateTrackPropagator(type);
 }
 
 CbmPropagatorLit::~CbmPropagatorLit()
 {
-//	if (fPropagator) delete fPropagator;
+// if (fPropagator) delete fPropagator;
 }
 
 StatusCode CbmPropagatorLit::Propagate(
-		const FairTrackParam *parIn,
-        FairTrackParam *parOut,
-        Double_t zOut,
-        Int_t pdg)
+   const FairTrackParam* parIn,
+   FairTrackParam* parOut,
+   Double_t zOut,
+   Int_t pdg)
 {
    *parOut = *parIn;
    return Propagate(parOut, zOut, pdg);
 }
 
 StatusCode CbmPropagatorLit::Propagate(
-		FairTrackParam *par,
-        Double_t zOut,
-        Int_t pdg)
+   FairTrackParam* par,
+   Double_t zOut,
+   Int_t pdg)
 {
    CbmLitTrackParam param;
    LitStatus result;
@@ -41,21 +41,21 @@ StatusCode CbmPropagatorLit::Propagate(
    result = fPropagator->Propagate(&param, zOut, pdg);
 
    if (result == kLITSUCCESS) {
-	   CbmLitConverter::LitTrackParamToTrackParam(&param, par);
-	   return kCBMSUCCESS;
+      CbmLitConverter::LitTrackParamToTrackParam(&param, par);
+      return kCBMSUCCESS;
    } else {
-	   return kCBMERROR;
+      return kCBMERROR;
    }
 }
 
 void CbmPropagatorLit::TransportMatrix(
-		   std::vector<Double_t>& F)
+   std::vector<Double_t>& F)
 {
-//	fPropagator->TransportMatrix(F);
+// fPropagator->TransportMatrix(F);
 }
 
 void CbmPropagatorLit::TransportMatrix(
-		   TMatrixD& F)
+   TMatrixD& F)
 {
-//	fPropagator->TransportMatrix(F);
+// fPropagator->TransportMatrix(F);
 }

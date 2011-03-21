@@ -16,83 +16,83 @@
 class CbmLitStripHit : public CbmLitHit
 {
 public:
-	/* Constructor */
-	CbmLitStripHit():
-		fU(0.),
-		fDu(0.),
-		fPhi(0.),
-		fCosPhi(0.),
-		fSinPhi(0.),
-		fSegment(0) {
-		SetHitType(kLITSTRIPHIT);
-	}
+   /* Constructor */
+   CbmLitStripHit():
+      fU(0.),
+      fDu(0.),
+      fPhi(0.),
+      fCosPhi(0.),
+      fSinPhi(0.),
+      fSegment(0) {
+      SetHitType(kLITSTRIPHIT);
+   }
 
-	/* Destructor */
-	virtual ~CbmLitStripHit() {};
+   /* Destructor */
+   virtual ~CbmLitStripHit() {};
 
-	/* Returns U measurement of hit */
-	myf GetU() const { return fU; }
+   /* Returns U measurement of hit */
+   myf GetU() const { return fU; }
 
-	/* Returns U measurement error */
-	myf GetDu() const { return fDu; }
+   /* Returns U measurement error */
+   myf GetDu() const { return fDu; }
 
-	/* Returns rotation angle of the strip */
-	myf GetPhi() const { return fPhi; }
+   /* Returns rotation angle of the strip */
+   myf GetPhi() const { return fPhi; }
 
-	/* Returns cosine of the strip rotation angle */
-	myf GetCosPhi() const { return fCosPhi; }
+   /* Returns cosine of the strip rotation angle */
+   myf GetCosPhi() const { return fCosPhi; }
 
-	/* Returns sine of the strip rotation angle */
-	myf GetSinPhi() const { return fSinPhi; }
+   /* Returns sine of the strip rotation angle */
+   myf GetSinPhi() const { return fSinPhi; }
 
-	/* Returns straw tube segment */
-	int GetSegment() const { return fSegment; }
+   /* Returns straw tube segment */
+   int GetSegment() const { return fSegment; }
 
-	/* Sets U measurement of the hit */
-	void SetU(myf u) { fU = u; }
+   /* Sets U measurement of the hit */
+   void SetU(myf u) { fU = u; }
 
-	/* Sets U measurement error */
-	void SetDu(myf du) { fDu = du; }
+   /* Sets U measurement error */
+   void SetDu(myf du) { fDu = du; }
 
-	/* Sets rotation angle of the strip */
-	void SetPhi(myf phi) { fPhi = phi; }
+   /* Sets rotation angle of the strip */
+   void SetPhi(myf phi) { fPhi = phi; }
 
-	/* Sets cosine of strip rotation angle */
-	void SetCosPhi(myf cosPhi) { fCosPhi = cosPhi; }
+   /* Sets cosine of strip rotation angle */
+   void SetCosPhi(myf cosPhi) { fCosPhi = cosPhi; }
 
-	/* Sets sine of strip rotation angle */
-	void SetSinPhi(myf sinPhi) { fSinPhi = sinPhi; }
+   /* Sets sine of strip rotation angle */
+   void SetSinPhi(myf sinPhi) { fSinPhi = sinPhi; }
 
-	/* Sets straw tube segment */
-	void SetSegment(int segment) { fSegment = segment; }
+   /* Sets straw tube segment */
+   void SetSegment(int segment) { fSegment = segment; }
 
-	/* Returns string representation of the class */
-	virtual std::string ToString() const {
-		std::stringstream ss;
-		ss << "StripHit: pos=(" << GetU() << "," << GetZ()
-		          << ") err=(" << GetDu() << "," << GetDz() << ") "
-		          << " phi=" << GetPhi()
-		          << " cosPhi=" << GetCosPhi() << " sinPhi=" << GetSinPhi()
-		          << " planeId=" << GetPlaneId()
-		          << " refId=" << GetRefId() << " w=" << GetW()
-		          << " isOutlier=" << IsOutlier()
-		          << " hitType=" << GetType() << std::endl;
-		return ss.str();;
-	}
+   /* Returns string representation of the class */
+   virtual std::string ToString() const {
+      std::stringstream ss;
+      ss << "StripHit: pos=(" << GetU() << "," << GetZ()
+         << ") err=(" << GetDu() << "," << GetDz() << ") "
+         << " phi=" << GetPhi()
+         << " cosPhi=" << GetCosPhi() << " sinPhi=" << GetSinPhi()
+         << " planeId=" << GetPlaneId()
+         << " refId=" << GetRefId() << " w=" << GetW()
+         << " isOutlier=" << IsOutlier()
+         << " hitType=" << GetType() << std::endl;
+      return ss.str();;
+   }
 
 protected:
-	/* U measurement of the hit in [cm] */
-	myf fU;
-	/* U measurement error in [cm] */
-	myf fDu;
-	/* Strip rotation angle in [rad] */
-	myf fPhi;
-	/* Cosine of the strip rotation angle */
-	myf fCosPhi;
-	/* Sine of the strip rotation angle */
-	myf fSinPhi;
-	/* Up or down segment of the straw tube */
-	int fSegment;
+   /* U measurement of the hit in [cm] */
+   myf fU;
+   /* U measurement error in [cm] */
+   myf fDu;
+   /* Strip rotation angle in [rad] */
+   myf fPhi;
+   /* Cosine of the strip rotation angle */
+   myf fCosPhi;
+   /* Sine of the strip rotation angle */
+   myf fSinPhi;
+   /* Up or down segment of the straw tube */
+   int fSegment;
 };
 
 #endif /*CBMLITSTRIPHIT_H_*/

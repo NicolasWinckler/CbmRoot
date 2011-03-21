@@ -10,7 +10,7 @@
 #include <cmath>
 
 CbmLitRK4TrackExtrapolator::CbmLitRK4TrackExtrapolator(
-		CbmLitField* field):
+   CbmLitField* field):
    CbmLitTrackExtrapolator("CbmLitRK4TrackExtrapolator"),
    fField(field)
 {
@@ -22,28 +22,28 @@ CbmLitRK4TrackExtrapolator::~CbmLitRK4TrackExtrapolator()
 
 LitStatus CbmLitRK4TrackExtrapolator::Initialize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitRK4TrackExtrapolator::Finalize()
 {
-	return kLITSUCCESS;
+   return kLITSUCCESS;
 }
 
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
-		const CbmLitTrackParam *parIn,
-        CbmLitTrackParam *parOut,
-        myf zOut,
-        std::vector<myf>* F)
+   const CbmLitTrackParam* parIn,
+   CbmLitTrackParam* parOut,
+   myf zOut,
+   std::vector<myf>* F)
 {
    *parOut = *parIn;
    return Extrapolate(parOut, zOut, F);
 }
 
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
-		CbmLitTrackParam *par,
-        myf zOut,
-        std::vector<myf>* F)
+   CbmLitTrackParam* par,
+   myf zOut,
+   std::vector<myf>* F)
 {
    myf zIn = par->GetZ();
 
@@ -61,17 +61,17 @@ LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
    par->SetCovMatrix(cOut);
    par->SetZ(zOut);
 
-   if (F != NULL) F->assign(F1.begin(), F1.end());
+   if (F != NULL) { F->assign(F1.begin(), F1.end()); }
 
    return kLITSUCCESS;
 }
 
 void CbmLitRK4TrackExtrapolator::RK4Order(
-		const std::vector<myf>& xIn,
-		myf zIn,
-		std::vector<myf>& xOut,
-        myf zOut,
-        std::vector<myf>& derivs) const
+   const std::vector<myf>& xIn,
+   myf zIn,
+   std::vector<myf>& xOut,
+   myf zOut,
+   std::vector<myf>& derivs) const
 {
    const myf fC = 0.000299792458;
 
@@ -90,7 +90,7 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
 
    for (unsigned int iStep = 0; iStep < 4; iStep++) { // 1
       if (iStep > 0) {
-    	 for(unsigned int i = 0; i < 4; i++) {
+         for(unsigned int i = 0; i < 4; i++) {
             x[i] = xIn[i] + coef[iStep] * k[i][iStep - 1];
          }
       }
@@ -122,7 +122,7 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
 
    } // 1
 
-   for (unsigned int i = 0; i < 4; i++) xOut[i] = CalcOut(xIn[i], k[i]);
+   for (unsigned int i = 0; i < 4; i++) { xOut[i] = CalcOut(xIn[i], k[i]); }
    xOut[4] = xIn[4];
 
    // Calculation of the derivatives
@@ -211,9 +211,9 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
       k[0][iStep] = x[2] * h;
       k[1][iStep] = x[3] * h;
       k[2][iStep] = Ax[iStep] * hC +
-                     hCqp * (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]);
+                    hCqp * (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]);
       k[3][iStep] = Ay[iStep] * hC +
-                     hCqp * (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]);
+                    hCqp * (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]);
    }  // 4
 
    derivs[4] = CalcOut(x0[0], k[0]);
@@ -227,49 +227,49 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
 }
 
 myf CbmLitRK4TrackExtrapolator::CalcOut(
-		myf in,
-		const myf k[4]) const
+   myf in,
+   const myf k[4]) const
 {
-	return in + k[0]/6. + k[1]/3. + k[2]/3. + k[3]/6.;
+   return in + k[0]/6. + k[1]/3. + k[2]/3. + k[3]/6.;
 }
 
 void CbmLitRK4TrackExtrapolator::TransportC(
-		const std::vector<myf>& cIn,
-		const std::vector<myf>& F,
-		std::vector<myf>& cOut) const
+   const std::vector<myf>& cIn,
+   const std::vector<myf>& F,
+   std::vector<myf>& cOut) const
 {
-	// F*C*Ft
-	myf A = cIn[2] + F[2] * cIn[9] + F[3] * cIn[10] + F[4] * cIn[11];
-	myf B = cIn[3] + F[2] * cIn[10] + F[3] * cIn[12] + F[4] * cIn[13];
-	myf C = cIn[4] + F[2] * cIn[11] + F[3] * cIn[13] + F[4] * cIn[14];
+   // F*C*Ft
+   myf A = cIn[2] + F[2] * cIn[9] + F[3] * cIn[10] + F[4] * cIn[11];
+   myf B = cIn[3] + F[2] * cIn[10] + F[3] * cIn[12] + F[4] * cIn[13];
+   myf C = cIn[4] + F[2] * cIn[11] + F[3] * cIn[13] + F[4] * cIn[14];
 
-	myf D = cIn[6] + F[7] * cIn[9] + F[8] * cIn[10] + F[9] * cIn[11];
-	myf E = cIn[7] + F[7] * cIn[10] + F[8] * cIn[12] + F[9] * cIn[13];
-	myf G = cIn[8] + F[7] * cIn[11] + F[8] * cIn[13] + F[9] * cIn[14];
+   myf D = cIn[6] + F[7] * cIn[9] + F[8] * cIn[10] + F[9] * cIn[11];
+   myf E = cIn[7] + F[7] * cIn[10] + F[8] * cIn[12] + F[9] * cIn[13];
+   myf G = cIn[8] + F[7] * cIn[11] + F[8] * cIn[13] + F[9] * cIn[14];
 
-	myf H = cIn[9] + F[13] * cIn[10] + F[14] * cIn[11];
-	myf I = cIn[10] + F[13] * cIn[12] + F[14] * cIn[13];
-	myf J = cIn[11] + F[13] * cIn[13] + F[14] * cIn[14];
+   myf H = cIn[9] + F[13] * cIn[10] + F[14] * cIn[11];
+   myf I = cIn[10] + F[13] * cIn[12] + F[14] * cIn[13];
+   myf J = cIn[11] + F[13] * cIn[13] + F[14] * cIn[14];
 
-	myf K = cIn[13] + F[17] * cIn[11] + F[19] * cIn[14];
+   myf K = cIn[13] + F[17] * cIn[11] + F[19] * cIn[14];
 
-	cOut[0] = cIn[0] + F[2] * cIn[2] + F[3] * cIn[3] + F[4] * cIn[4] + A * F[2] + B * F[3] + C * F[4];
-	cOut[1] = cIn[1] + F[2] * cIn[6] + F[3] * cIn[7] + F[4] * cIn[8] + A * F[7] + B * F[8] + C * F[9];
-	cOut[2] = A + B * F[13] + C * F[14];
-	cOut[3] = B + A * F[17] + C * F[19];
-	cOut[4] = C;
+   cOut[0] = cIn[0] + F[2] * cIn[2] + F[3] * cIn[3] + F[4] * cIn[4] + A * F[2] + B * F[3] + C * F[4];
+   cOut[1] = cIn[1] + F[2] * cIn[6] + F[3] * cIn[7] + F[4] * cIn[8] + A * F[7] + B * F[8] + C * F[9];
+   cOut[2] = A + B * F[13] + C * F[14];
+   cOut[3] = B + A * F[17] + C * F[19];
+   cOut[4] = C;
 
-	cOut[5] = cIn[5] + F[7] * cIn[6] + F[8] * cIn[7] + F[9] * cIn[8] + D * F[7] + E * F[8] + G * F[9];
-	cOut[6] = D + E * F[13] + G * F[14];
-	cOut[7] = E + D * F[17] + G * F[19];
-	cOut[8] = G;
+   cOut[5] = cIn[5] + F[7] * cIn[6] + F[8] * cIn[7] + F[9] * cIn[8] + D * F[7] + E * F[8] + G * F[9];
+   cOut[6] = D + E * F[13] + G * F[14];
+   cOut[7] = E + D * F[17] + G * F[19];
+   cOut[8] = G;
 
-	cOut[9] = H + I * F[13] + J * F[14];
-	cOut[10] = I + H * F[17] + J * F[19];
-	cOut[11] = J;
+   cOut[9] = H + I * F[13] + J * F[14];
+   cOut[10] = I + H * F[17] + J * F[19];
+   cOut[11] = J;
 
-	cOut[12] = cIn[12] + F[17] * cIn[10] + F[19] * cIn[13] + (F[17] * cIn[9] + cIn[10] + F[19] * cIn[11]) * F[17] + K * F[19];
-	cOut[13] = K;
+   cOut[12] = cIn[12] + F[17] * cIn[10] + F[19] * cIn[13] + (F[17] * cIn[9] + cIn[10] + F[19] * cIn[11]) * F[17] + K * F[19];
+   cOut[13] = K;
 
-	cOut[14] = cIn[14];
+   cOut[14] = cIn[14];
 }

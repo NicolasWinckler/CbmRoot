@@ -7,35 +7,36 @@
 #include <vector>
 
 
-class CbmLitTestMatrixMath {
+class CbmLitTestMatrixMath
+{
 public:
-	CbmLitTestMatrixMath();
-	virtual ~CbmLitTestMatrixMath();
+   CbmLitTestMatrixMath();
+   virtual ~CbmLitTestMatrixMath();
 
-	void RunTest();
+   void RunTest();
 
 private:
-	void TestInvSym15(
-			int testId);
+   void TestInvSym15(
+      int testId);
 
-	void TestMult15On5(
-			int testId);
+   void TestMult15On5(
+      int testId);
 
-	void Convert15To25(
-			const myf* a15,
-			myf* a25);
+   void Convert15To25(
+      const myf* a15,
+      myf* a25);
 
-	void Convert25To15(
-			const myf* a25,
-			myf* a15);
+   void Convert25To15(
+      const myf* a25,
+      myf* a15);
 
-	std::string VectorToString(
-			const std::vector<myf>& a);
+   std::string VectorToString(
+      const std::vector<myf>& a);
 
-	std::string ArrayToString(
-			const myf* a, int n);
+   std::string ArrayToString(
+      const myf* a, int n);
 
-	myf fEpsilon;
+   myf fEpsilon;
 };
 
 #endif /* CBMLITTESTMATRIXMATH_H_ */

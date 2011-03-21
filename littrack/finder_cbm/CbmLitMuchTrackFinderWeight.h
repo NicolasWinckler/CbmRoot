@@ -9,19 +9,19 @@
 class TClonesArray;
 
 class CbmLitMuchTrackFinderWeight : public CbmMuchTrackFinder,
-									private CbmLitTrackFinderWeight,
-									private CbmLitStsBasedTrackFinder
+   private CbmLitTrackFinderWeight,
+   private CbmLitStsBasedTrackFinder
 {
 public:
-	CbmLitMuchTrackFinderWeight();
-	virtual ~CbmLitMuchTrackFinderWeight();
+   CbmLitMuchTrackFinderWeight();
+   virtual ~CbmLitMuchTrackFinderWeight();
 
-    virtual void Init();
+   virtual void Init();
 
-    virtual Int_t DoFind(
-            TClonesArray* trackArray);
+   virtual Int_t DoFind(
+      TClonesArray* trackArray);
 
-    ClassDef(CbmLitMuchTrackFinderWeight, 1);
+   ClassDef(CbmLitMuchTrackFinderWeight, 1);
 };
 
 #endif /*CBMLITMUCHTRACKFINDERWEIGHT_H_*/

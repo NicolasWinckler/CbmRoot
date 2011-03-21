@@ -11,43 +11,43 @@
 class TClonesArray;
 
 class CbmLitTofMerger : public CbmTofMerger,
-                        private CbmLitNearestHitToTrackMerger
+   private CbmLitNearestHitToTrackMerger
 {
 public:
-	CbmLitTofMerger();
-	virtual ~CbmLitTofMerger();
+   CbmLitTofMerger();
+   virtual ~CbmLitTofMerger();
 
-	virtual void Init();
+   virtual void Init();
 
-    virtual Int_t DoMerge(
-    		TClonesArray* glbTracks,
-    		TClonesArray* tofHits);
+   virtual Int_t DoMerge(
+      TClonesArray* glbTracks,
+      TClonesArray* tofHits);
 private:
 
-	void ArrangeHits(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd,
-			CbmLitHitData& hitData);
+   void ArrangeHits(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd,
+      CbmLitHitData& hitData);
 
-	void GlobalTrackArrayToTrackVector(
-			const TClonesArray* trdTracks,
-			TrackPtrVector& litTracks,
-			TClonesArray* trdHits,
-			TClonesArray* globalTracks);
+   void GlobalTrackArrayToTrackVector(
+      const TClonesArray* trdTracks,
+      TrackPtrVector& litTracks,
+      TClonesArray* trdHits,
+      TClonesArray* globalTracks);
 
-	void AddTofHitToGlobalTrack(
-			const TrackPtrVector& litTracks,
-			TClonesArray* globalTracks);
+   void AddTofHitToGlobalTrack(
+      const TrackPtrVector& litTracks,
+      TClonesArray* globalTracks);
 
-	TClonesArray* fTrdTracks;
-	TClonesArray* fTrdHits;
-	HitPtrVector fLitHits;
-	TrackPtrVector fLitTracks;
+   TClonesArray* fTrdTracks;
+   TClonesArray* fTrdHits;
+   HitPtrVector fLitHits;
+   TrackPtrVector fLitTracks;
 
-	CbmLitDetectorLayout fLayout;
-	CbmLitHitData fHitData;
+   CbmLitDetectorLayout fLayout;
+   CbmLitHitData fHitData;
 
-	ClassDef(CbmLitTofMerger, 1);
+   ClassDef(CbmLitTofMerger, 1);
 };
 
 #endif /* CBMLITTOFMERGER_H_ */

@@ -16,33 +16,33 @@ class CbmLitTrackParam;
 class CbmLitWeightCalculator : public CbmLitTool
 {
 public:
-	/* Constructor */
-	CbmLitWeightCalculator(){};
+   /* Constructor */
+   CbmLitWeightCalculator() {};
 
-	/* Destructor */
-	virtual ~CbmLitWeightCalculator(){};
+   /* Destructor */
+   virtual ~CbmLitWeightCalculator() {};
 
-	/* Main function to be implemented for the concrete weight calculation algorithm
-	 * @param par Pointer to the track parameter
-	 * @param itBegin First hit iterator
-	 * @param itEnd Last hit iterator
-	 * @param T Temperature parameter
-	 * @return Status code */
-	virtual LitStatus DoCalculate(
-			const CbmLitTrackParam* par,
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd,
-			myf T) = 0;
+   /* Main function to be implemented for the concrete weight calculation algorithm
+    * @param par Pointer to the track parameter
+    * @param itBegin First hit iterator
+    * @param itEnd Last hit iterator
+    * @param T Temperature parameter
+    * @return Status code */
+   virtual LitStatus DoCalculate(
+      const CbmLitTrackParam* par,
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd,
+      myf T) = 0;
 
-	/* Main function to be implemented for the concrete weight calculation algorithm
-	 * @param par Pointer to the track parameter
-	 * @param hits Array of hits
-	 * @param T Temperature parameter
-	 * @return Status code */
-	virtual LitStatus DoCalculate(
-			const CbmLitTrackParam* par,
-			HitPtrVector& hits,
-			myf T) = 0;
+   /* Main function to be implemented for the concrete weight calculation algorithm
+    * @param par Pointer to the track parameter
+    * @param hits Array of hits
+    * @param T Temperature parameter
+    * @return Status code */
+   virtual LitStatus DoCalculate(
+      const CbmLitTrackParam* par,
+      HitPtrVector& hits,
+      myf T) = 0;
 };
 
 #endif /*CBMLITWEIGHTCALCULATOR_H_*/

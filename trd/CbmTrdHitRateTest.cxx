@@ -167,7 +167,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 
   Int_t ModuleID[10];
   Int_t Sector = 0;
-  Char_t trddigiparpath[100] = "trd_squared_modules.digi.par";//"trd.digi.par";
+  Char_t trddigiparpath[100] = "trd.digi.par";
 
   //// do not ask for the filename   
   //  printf("Which ...digi.par?\n");
@@ -860,6 +860,10 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
   Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
   Float_t r = 0;
   Float_t alpha = 0;
+  Float_t cosbetha = (GeoPara->vX[0] * 1 + GeoPara->vX[1] * 0 + GeoPara->vX[2] * 0) / sqrt(pow(GeoPara->vX[0],2) + pow(GeoPara->vX[1],2) + pow(GeoPara->vX[2],2));
+  //cout << "x" << cosbetha << endl;
+  Float_t cosgamma = (GeoPara->vY[0] * 0 + GeoPara->vY[1] * 1 + GeoPara->vY[2] * 0) / sqrt(pow(GeoPara->vY[0],2) + pow(GeoPara->vY[1],2) + pow(GeoPara->vY[2],2));
+  //cout << "y" << cosgamma << endl;
   Int_t counter = 0;
   Float_t a[3] = { 7.66582e+00,  6.97712e+00,  6.53780e+00};
   Float_t b[3] = {-2.72375e-03, -1.85168e-03, -1.42673e-03};
@@ -880,7 +884,7 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
 	  counter++;
 	  Double_t z = (GeoPara->lambda - (stepX * GeoPara->vN[0] + stepY * GeoPara->vN[1])) / GeoPara->vN[2];
 	  //cout << z << endl;
-	  r = sqrt( pow((stepX + 0.5), 2) + pow((stepY + 0.5) ,2));
+	  r = sqrt( pow((stepX + 0.5) * cosbetha, 2) + pow((stepY + 0.5) * cosgamma,2));
 	  alpha = atan(r/z)*1000.;
 	  HitRate += 
 	    exp(4.54156e00 + -8.47377e-03 * alpha) + 

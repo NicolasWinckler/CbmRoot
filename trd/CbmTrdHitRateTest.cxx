@@ -149,8 +149,29 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 
   TH1F* HitPad = NULL;
   TH2F* Layer = NULL;
+  TH2F* Topview = NULL;
   TCanvas* c1 = NULL;
   TCanvas* c2 = NULL;
+  TCanvas* c0 = new TCanvas("c0","c0",1000,900);	
+  c0->Divide(1,1);
+  Topview = new TH2F("TopView","TopView",int(18000/mm2bin),-9000,9000,int(18000/mm2bin),0,18000);
+  Topview->SetContour(99);
+  Topview->SetXTitle("x-Coordinate [mm]");
+  Topview->SetYTitle("z-Coordinate [mm]");
+  Topview->SetZTitle("#");
+  Topview->SetStats(kFALSE);
+  Topview->GetXaxis()->SetLabelSize(0.02);
+  Topview->GetYaxis()->SetLabelSize(0.02);
+  Topview->GetZaxis()->SetLabelSize(0.02);
+  Topview->GetXaxis()->SetTitleSize(0.02);
+  Topview->GetXaxis()->SetTitleOffset(1.5);
+  Topview->GetYaxis()->SetTitleSize(0.02);
+  Topview->GetYaxis()->SetTitleOffset(2);
+  Topview->GetZaxis()->SetTitleSize(0.02);
+  Topview->GetZaxis()->SetTitleOffset(-2);
+  //Topview->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
+  c0->cd(1);
+  Topview->Draw("colz");
 
   vector<int> L1S1;
   vector<int> L2S1;
@@ -170,9 +191,9 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Char_t trddigiparpath[100] = "trd.digi.par";
 
   //// do not ask for the filename   
-  //  printf("Which ...digi.par?\n");
-  //  cin >> trddigiparpath;         
-  //  cout << trddigiparpath << endl;
+  printf("Which ...digi.par?\n");
+  cin >> trddigiparpath;         
+  cout << trddigiparpath << endl;
 
   std::ifstream digifile;
   digifile.open(trddigiparpath);
@@ -264,22 +285,22 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       Lines = false;
       for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
 	{
-	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
+	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
 	}
       c1->cd(1)->SetLogz(1);
       Layer->Draw("colz");
       Lines = true;
       for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
 	{
-	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
+	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
 	}
       
       Outimage1 = TImage::Create();
       Outimage1->FromPad(c1);
       Outimage1->WriteImage(Canfile1);
       /*
-      sprintf(Canfile1,"Pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
-      c1->cd(1)->Print(Canfile1);
+	sprintf(Canfile1,"Pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+	c1->cd(1)->Print(Canfile1);
       */
       delete Layer;
       delete c1;
@@ -291,8 +312,8 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       Outimage2->FromPad(c2);
       Outimage2->WriteImage(Canfile2);
       /*
-      sprintf(Canfile2,"Pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
-      c2->cd(1)->Print(Canfile2);
+	sprintf(Canfile2,"Pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+	c2->cd(1)->Print(Canfile2);
       */
       delete HitPad;
       delete c2;  
@@ -306,8 +327,10 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       else
 	{
 	  fLayer++;
-	}      
+	}  
+      c0->Update();
     }
+  c0->Update();
 }
 void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
 {
@@ -425,7 +448,7 @@ void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin)
+void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview, TCanvas* c0, Double_t mm2bin)
 {
   // fPos is >0 for x and y and not rotated
   // origin of the local coordinate system in 
@@ -544,11 +567,11 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
       //cout << nRow << " " << nCol << endl;
       if(Lines)
 	{
-	  DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1);
+	  DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1, Topview, c0);
 	}
       else
 	{
-	  Histo(GeoPara, Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2, mm2bin);
+	  Histo(GeoPara, Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
 	}
     }
   else
@@ -622,7 +645,7 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 	}
     }
 }
-void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
+void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview, TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
 {
   /*
  //----------------------Pad--------------------------------------
@@ -755,7 +778,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
  
   
 }
-void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin)
+void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview, TCanvas* c0, Double_t mm2bin)
 {
   //cout << Mpos[2] << endl;
   const Int_t nR = nRow;
@@ -781,7 +804,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 	    {
 	      if (Mpos[0] > -1 && Mpos[1] > -1)
 		{
-		  HiteRate = CalcHitRate(GeoPara, StartX, StopX, StartY, StopY, Mpos);
+		  HiteRate = CalcHitRate(GeoPara, StartX, StopX, StartY, StopY, Mpos, Topview, c0);
 		  HitPad->Fill(HiteRate);
 		  HitPad->Fill(HiteRate);
 		  HitPad->Fill(HiteRate);
@@ -790,7 +813,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 	    }
 	  else
 	    {
-	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, StartY, StopY, Mpos);
+	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, StartY, StopY, Mpos, Topview, c0);
 	      HitPad->Fill(HiteRate);
 	    }
 	  
@@ -845,6 +868,9 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   
   c1->cd(1);
   Layer->Draw("colz");
+  c0->cd(1);
+  Topview->Draw("colz");
+  //c0->Update();
   /*
   c2->cd(1);
   HitPad->Draw();
@@ -855,7 +881,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 
 }
 
-float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos)
+float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos, TH2F* Topview, TCanvas* c0)
 {
   Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
   Float_t r = 0;
@@ -884,7 +910,9 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
 	  counter++;
 	  Double_t z = (GeoPara->lambda - (stepX * GeoPara->vN[0] + stepY * GeoPara->vN[1])) / GeoPara->vN[2];
 	  //cout << z << endl;
-	  r = sqrt( pow((stepX + 0.5) * cosbetha, 2) + pow((stepY + 0.5) * cosgamma,2));
+	  Topview->Fill((stepX + 0.5) * cosbetha,z);
+	  Topview->Fill(-1 * (stepX + 0.5) * cosbetha,z);
+	  r = sqrt( pow((stepX + 0.5) /** cosbetha*/, 2) + pow((stepY + 0.5) /** cosgamma*/,2));
 	  alpha = atan(r/z)*1000.;
 	  HitRate += 
 	    exp(4.54156e00 + -8.47377e-03 * alpha) + 

@@ -908,7 +908,7 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
       for (Int_t stepX = int(StartX); stepX < int(StopX); stepX++) // step width 1 mm
 	{
 	  counter++;
-	  Double_t z = (GeoPara->lambda - (stepX * GeoPara->vN[0] + stepY * GeoPara->vN[1])) / GeoPara->vN[2];
+	  Double_t z = (GeoPara->lambda - ((stepX + 0.5) * cosbetha * GeoPara->vN[0] + (stepY + 0.5) * cosgamma * GeoPara->vN[1])) / GeoPara->vN[2];
 	  //cout << z << endl;
 	  Topview->Fill((stepX + 0.5) * cosbetha,z);
 	  Topview->Fill(-1 * (stepX + 0.5) * cosbetha,z);

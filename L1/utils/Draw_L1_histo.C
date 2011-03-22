@@ -48,7 +48,7 @@ void makeUpProfile(TProfile* prof, TString titleX, TString titleY)
   }
 }
 
-void Draw_L1_histo(TString filePrefix = "L1_histo") {
+void Draw_L1_histo() {
 
     // ============================ Set Styles ============================
   TStyle *histoStyle = new TStyle("histoStyle","Plain Style(no colors/fill areas)");
@@ -92,10 +92,7 @@ void Draw_L1_histo(TString filePrefix = "L1_histo") {
 
   histoStyle->SetStatFont(textFont);
 
-//  histoStyle->SetGridStyle(5);
-  histoStyle->SetGridColor(10);
-//  histoStyle->SetGridWidth(0);
-  
+
   
   TStyle *profStyle = new TStyle("profStyle","Plain Style(no colors/fill areas)");
 //   TStyle *profStyle = gStyle;
@@ -109,16 +106,12 @@ void Draw_L1_histo(TString filePrefix = "L1_histo") {
   profStyle->SetOptTitle(0); // without main up title
   profStyle->SetOptStat(0);
   profStyle->SetOptFit(0);
-  
-  profStyle->SetGridStyle(3);
-  
-
+  profStyle->SetGridStyle(2);
 
     // ============================ Open file ============================
 
+  const TString fileName = "L1_histo.root";
 
-  TString fileName = filePrefix+".root";
-  cout << "Read histo from file " << fileName << endl;
   TFile *fileIn = new TFile(fileName.Data(),"read");
 
   FILE *ress, *pulls;
@@ -187,7 +180,7 @@ void Draw_L1_histo(TString filePrefix = "L1_histo") {
 
   cout.setf(std::ios::scientific,std::ios::floatfield);
   cout.precision(2);
-  cout << endl << " Name  " << "   \t" << " Sigma   " << "\t" << " RMS " << endl;
+  cout << endl << "Name   " << "   \t" << " Sigma   " << "\t" << " RMS " << endl;
   for (int i = 0; i < nHisto; i++){
     cout << histoData[i].name << "   \t" << charat[i][0] << "\t" << charat[i][1] << endl;
   }
@@ -252,9 +245,8 @@ void Draw_L1_histo(TString filePrefix = "L1_histo") {
 
 //   c1->SaveAs("histo.png");
 
-  const TString command = "mkdir " + filePrefix + " -p";
-  system( command.Data() );
-  chdir( filePrefix.Data() );
+  system("mkdir L1_histo -p");
+  chdir( "L1_histo" );
   const int nParts = 2;
   int iPart = 1;
   histoStyle->cd();
@@ -262,9 +254,6 @@ void Draw_L1_histo(TString filePrefix = "L1_histo") {
   if (!divide) c2 = new TCanvas("c2","c2",0,0,900,600);
           else c2 = new TCanvas("c2","c2",0,0,900*nParts,600*nParts);
   if (divide) c2->Divide(nParts, nParts);
-  
-  c2->SetGridx(1);
-  c2->SetGridy(1);
   
   histoStyle->cd();
   c2->cd();
@@ -285,6 +274,8 @@ void Draw_L1_histo(TString filePrefix = "L1_histo") {
   profStyle->cd();
   for (int i = 0; i < nProf; i++){
     if (divide) c2->cd(iPart++);
+    c2->SetGridx();
+    c2->SetGridy();
     profile[i]->Draw();
     TString name = TString(profData[i].name)+".pdf";
     if (!divide) c2->SaveAs(name);

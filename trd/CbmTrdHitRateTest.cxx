@@ -136,7 +136,7 @@ InitStatus CbmTrdHitRateTest::Init()
 void CbmTrdHitRateTest::Exec(Option_t * option)
 {
   printf("Introduction:\n");
-  
+  HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
   //Bool_t Fast = false;
   Bool_t Fast = true;
@@ -167,7 +167,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 
   Int_t ModuleID[10];
   Int_t Sector = 0;
-  Char_t trddigiparpath[100] = "trd.digi.par";
+  Char_t trddigiparpath[100] = "trd_squared_modules.digi.par";//"trd.digi.par";
 
   //// do not ask for the filename   
   //  printf("Which ...digi.par?\n");
@@ -264,14 +264,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       Lines = false;
       for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
 	{
-	  GetModuleInformationFromDigiPar(Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
+	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
 	}
       c1->cd(1)->SetLogz(1);
       Layer->Draw("colz");
       Lines = true;
       for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
 	{
-	  GetModuleInformationFromDigiPar(Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
+	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
 	}
       
       Outimage1 = TImage::Create();
@@ -425,7 +425,7 @@ void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin)
+void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin)
 {
   // fPos is >0 for x and y and not rotated
   // origin of the local coordinate system in 
@@ -496,7 +496,49 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Line
 	      tempY  = int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); 
 	    }
 	}
-      
+
+      TVector3 padPos;
+      TVector3 padSize;
+      fModuleInfo->GetPosition(0, 0, VolumeID, 0, padPos, padSize);
+      GeoPara->moduleId = VolumeID;
+      for (Int_t i = 0; i < 3; i++) {
+	GeoPara->mPos[i]  = Mpos[i];
+	GeoPara->mSize[i] = Msize[i];
+	GeoPara->pSize[i] = Psize[i];
+      }
+      GeoPara->vOrigin[0] = padPos[0] * 10/*Mpos[0]-Msize[0]+0.5*padSize[0]*/;
+      GeoPara->vOrigin[1] = padPos[1] * 10/*Mpos[1]-Msize[1]+0.5*padSize[1]*/; 
+      GeoPara->vOrigin[2] = padPos[2] * 10;
+
+      fModuleInfo->GetPosition(1, 0, VolumeID, 0, padPos, padSize);
+
+      GeoPara->vX[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]/*Mpos[0]-Msize[0]+padSize[0]*/; 
+      GeoPara->vX[1]      = padPos[1] * 10 - GeoPara->vOrigin[1]/*Mpos[1]-Msize[1]+padSize[1]*/;			   
+      GeoPara->vX[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
+
+      fModuleInfo->GetPosition(0, 1, VolumeID, 0, padPos, padSize);
+
+      GeoPara->vY[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]/*Mpos[0]-Msize[0]+padSize[0]*/; 
+      GeoPara->vY[1]      = padPos[1] * 10 - GeoPara->vOrigin[1]/*Mpos[1]-Msize[1]+padSize[1]*/; 
+      GeoPara->vY[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
+
+      GeoPara->vN[0]      = GeoPara->vX[1]*GeoPara->vY[2] - GeoPara->vX[2]*GeoPara->vY[1];
+      GeoPara->vN[1]      = GeoPara->vX[2]*GeoPara->vY[0] - GeoPara->vX[0]*GeoPara->vY[2];
+      GeoPara->vN[2]      = GeoPara->vX[0]*GeoPara->vY[1] - GeoPara->vX[1]*GeoPara->vY[0];
+
+      GeoPara->lambda = (GeoPara->vOrigin[0] * GeoPara->vN[0] +
+			 GeoPara->vOrigin[1] * GeoPara->vN[1] +
+			 GeoPara->vOrigin[2] * GeoPara->vN[2]);
+      /*
+      cout << "GetModuleInformationFromDigiPar" << endl;
+      for (Int_t i = 0; i < 3; i++) {
+	cout << "vOrig " << GeoPara->vOrigin[i] << endl;
+	cout << "vX    " << GeoPara->vX[i] << endl;
+	cout << "vY    " << GeoPara->vY[i] << endl;
+	cout << "vN    " << GeoPara->vN[i] << endl;
+      }
+      cout << "lambda" << GeoPara->lambda << endl << endl;
+      */
       nRow = tempY;
       nCol = tempX;
       //cout << nRow << " " << nCol << endl;
@@ -506,7 +548,7 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Line
 	}
       else
 	{
-	  Histo(Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2, mm2bin);
+	  Histo(GeoPara, Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2, mm2bin);
 	}
     }
   else
@@ -713,7 +755,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
  
   
 }
-void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin)
+void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin)
 {
   //cout << Mpos[2] << endl;
   const Int_t nR = nRow;
@@ -739,7 +781,7 @@ void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Doubl
 	    {
 	      if (Mpos[0] > -1 && Mpos[1] > -1)
 		{
-		  HiteRate = CalcHitRate(StartX, StopX, StartY, StopY, Mpos);
+		  HiteRate = CalcHitRate(GeoPara, StartX, StopX, StartY, StopY, Mpos);
 		  HitPad->Fill(HiteRate);
 		  HitPad->Fill(HiteRate);
 		  HitPad->Fill(HiteRate);
@@ -748,7 +790,7 @@ void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Doubl
 	    }
 	  else
 	    {
-	      HiteRate = CalcHitRate(StartX, StopX, StartY, StopY, Mpos);
+	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, StartY, StopY, Mpos);
 	      HitPad->Fill(HiteRate);
 	    }
 	  
@@ -813,7 +855,7 @@ void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Doubl
 
 }
 
-float CbmTrdHitRateTest::CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos)
+float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos)
 {
   Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
   Float_t r = 0;
@@ -821,19 +863,29 @@ float CbmTrdHitRateTest::CalcHitRate(Float_t StartX, Float_t StopX, Float_t Star
   Int_t counter = 0;
   Float_t a[3] = { 7.66582e+00,  6.97712e+00,  6.53780e+00};
   Float_t b[3] = {-2.72375e-03, -1.85168e-03, -1.42673e-03};
-
-  for (Int_t stepY = int(StartY); stepY < int(StopY); stepY++)
+  /*
+  cout << "CalcHitRate" << endl;
+      for (Int_t i = 0; i < 3; i++) {
+	cout << "vOrig " << GeoPara->vOrigin[i] << endl;
+	cout << "vX    " << GeoPara->vX[i] << endl;
+	cout << "vY    " << GeoPara->vY[i] << endl;
+	cout << "vN    " << GeoPara->vN[i] << endl;
+      }
+      cout << "lambda" << GeoPara->lambda << endl << endl;
+  */
+  for (Int_t stepY = int(StartY); stepY < int(StopY); stepY++) // step width 1 mm
     {
-      for (Int_t stepX = int(StartX); stepX < int(StopX); stepX++)
+      for (Int_t stepX = int(StartX); stepX < int(StopX); stepX++) // step width 1 mm
 	{
 	  counter++;
+	  Double_t z = (GeoPara->lambda - (stepX * GeoPara->vN[0] + stepY * GeoPara->vN[1])) / GeoPara->vN[2];
+	  //cout << z << endl;
 	  r = sqrt( pow((stepX + 0.5), 2) + pow((stepY + 0.5) ,2));
-	  alpha = atan(r/Mpos[2])*1000.;
-	  //HitRate += exp(a[fStation-1] + b[fStation-1] * r);
+	  alpha = atan(r/z)*1000.;
 	  HitRate += 
 	    exp(4.54156e00 + -8.47377e-03 * alpha) + 
 	    exp(2.40005e01 + -1.19541e-02 * alpha) /
-	    (Mpos[2] * Mpos[2])
+	    (z * z)
 	    ;
 	}
     }

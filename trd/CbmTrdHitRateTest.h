@@ -19,6 +19,19 @@ class TCanvas;
 class TH1F;
 class TH2F;
 
+typedef struct HitRateGeoPara
+{
+  Int_t moduleId;
+  Double_t mPos[3];
+  Double_t mSize[3];
+  Double_t pSize[3];
+  Double_t vOrigin[3];
+  Double_t vX[3];
+  Double_t vY[3];
+  Double_t vN[3];
+  Double_t lambda;
+} HitRateGeoPara;
+
 class CbmTrdHitRateTest : public FairTask {
 
  public:
@@ -59,7 +72,7 @@ class CbmTrdHitRateTest : public FairTask {
 
   void HistoInit(TCanvas*& c1, TCanvas*& c2, TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin);
 
-  void GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin);
+  void GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin);
 
   void GetModuleInformationSL( Int_t VolumeID);
 
@@ -70,9 +83,9 @@ class CbmTrdHitRateTest : public FairTask {
 
   void GetModuleInformation();
 
-  void Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin);
+  void Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, Double_t mm2bin);
  
-  float CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos);
+  float CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos);
 
   void DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1);
 

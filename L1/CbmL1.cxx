@@ -252,7 +252,7 @@ InitStatus CbmL1::Init()
     geo[ind++] = B[2];
   }
       
-  NMvdStations = CbmKF::Instance()->vMvdMaterial.size();
+  NMvdStations = ( fUseMVD ) ? CbmKF::Instance()->vMvdMaterial.size() : 0;
   NStsStations = StsDigi.GetNStations();
   NStation = NMvdStations + NStsStations;
   geo[ind++] = NStation;

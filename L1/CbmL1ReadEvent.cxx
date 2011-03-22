@@ -239,7 +239,7 @@ void CbmL1::ReadEvent()
   if (fVerbose >= 10) cout << "ReadEvent: sts hits are gotten." << endl;
 
   //add MC points, which has not been added yet
-  if(listMvdPts)
+  if(listMvdHits && listMvdPts)
   {
     int nMC = listMvdPts->GetEntriesFast();
     for(int iMC=0; iMC<nMC; iMC++){
@@ -253,7 +253,7 @@ void CbmL1::ReadEvent()
       }
     }
   }
-  if(listStsPts)
+  if(listStsHits && listStsPts)
   {
     int nMC = listStsPts->GetEntriesFast();
     for(int iMC=0; iMC<nMC; iMC++){

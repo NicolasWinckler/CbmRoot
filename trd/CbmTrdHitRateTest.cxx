@@ -552,6 +552,12 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
       GeoPara->lambda = (GeoPara->vOrigin[0] * GeoPara->vN[0] +
 			 GeoPara->vOrigin[1] * GeoPara->vN[1] +
 			 GeoPara->vOrigin[2] * GeoPara->vN[2]);
+      topview->Fill(Mpos[0],Mpos[2]);
+      //topview->Fill(Mpos[0]-Msize[0],Mpos[2]);
+      topview->Fill(GeoPara->vOrigin[0],GeoPara->vOrigin[2]);
+      topview->Fill(GeoPara->vX[0],GeoPara->vX[2]);
+      topview->Fill(GeoPara->vY[0],GeoPara->vY[2]);
+
       /*
       cout << "GetModuleInformationFromDigiPar" << endl;
       for (Int_t i = 0; i < 3; i++) {

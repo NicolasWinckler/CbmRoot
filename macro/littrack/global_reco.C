@@ -8,7 +8,7 @@
  * Macro has 3 options "all", "hits" and "tracking".
  **/
 
-void global_reco(Int_t nEvents = 1000, // number of events
+void global_reco(Int_t nEvents = 10, // number of events
 		TString opt = "hits")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -27,8 +27,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
-//		dir = "/d/cbm02/andrey/std13_10mu_urqmd/";
-		dir = "/d/cbm02/andrey/muon/std_10mu_urqmd/";
+		dir = "/d/cbm02/andrey/electron/std_10e_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -36,17 +35,17 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// Output file with reconstructed tracks and hits
 		globalRecoFile = dir + "global.reco.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.0000.root";
+		globalHitsFile = dir + "global.hits.clustering.0000.root";
 		// Output file with global tracks
 		globalTracksFile = dir + "global.tracks.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
-		muchDigiFile = parDir + "/much/much_standard.digi.root";
+		muchDigiFile = parDir + "/much/much_standard_straw_trd.digi.root";
 		// Digi scheme for STS
 		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
 		parFileList->Add(&stsDigiFile);
 		// Digi scheme for TRD
-		TObjString trdDigiFile = parDir + "/trd/trd_standard.digi.par";
+		TObjString trdDigiFile = parDir + "/trd/trd_standard_dec10.digi.par";
 		parFileList->Add(&trdDigiFile);
 		// Directory for output images
 		TString imageDir = "./test/";
@@ -54,10 +53,10 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		trackingType = "branch";
 		// Normalization for efficiency
 		normStsPoints = 4;
-		normTrdPoints = 10;
+		normTrdPoints = 8;
 		normMuchPoints = 12;
 		normTofPoints = 1;
-		normTrdHits = 9;
+		normTrdHits = 8;
 		normMuchHits = 11;
 		normTofHits = 1;
 		//
@@ -184,6 +183,9 @@ void global_reco(Int_t nEvents = 1000, // number of events
 			run->AddTask(muchFindHits);
 			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
 					"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
+			strawFindHits->SetMerge(1);
+//			strawFindHits->SetMirror(1);
+//			strawFindHits->SetBinary();
 			run->AddTask(strawFindHits);
 			// -----------------------------------------------------------------
 		}
@@ -194,11 +196,11 @@ void global_reco(Int_t nEvents = 1000, // number of events
 			Int_t trdNFoils = 130; // number of polyetylene foils
 			Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
 			Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
-			Bool_t simpleTR = kTRUE; // use fast and simple version for TR
-			// production
+			Bool_t simpleTR = kTRUE; // use fast and simple version for TR production
 
 			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
+			// ----- TRD hit smearing -----
 			Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
 			// Resolutions in y - station and angle dependent [mum]
 			Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
@@ -215,11 +217,12 @@ void global_reco(Int_t nEvents = 1000, // number of events
 					new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 			// CbmTrdHitProducerSmearing* trdHitProd =
 			// new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
-
 			trdHitProd->SetSigmaX(trdSigmaX);
 			trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
 			run->AddTask(trdHitProd);
+			// ----- End TRD hit smearing -----
 
+			// ----- TRD Digitizer -----
 //			CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(
 //					"TRD Digitizer", "TRD task", radiator);
 //			run->AddTask(trdDigitizer);
@@ -227,6 +230,18 @@ void global_reco(Int_t nEvents = 1000, // number of events
 //			CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi(
 //					"TRD Hit Producer", "TRD task");
 //			run->AddTask(trdHitProd);
+			// ----- End TRD Digitizer -----
+
+			// ----- TRD clustering -----
+//			CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
+//			run->AddTask(trdClustering);
+//
+//			CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
+//			run->AddTask(trdClusterfindingfast);
+//
+//			CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
+//			run->AddTask(trdClusterHitProducer);
+			// ----- End TRD Clustering -----
 			// ------------------------------------------------------------------------
 		}
 

@@ -351,7 +351,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       shortPR->Fit("fit","Q");
       shortSigma = fit->GetParameter(2);
       printf("  %6.3f mm position resolution for short pad size direction (including x and y)\n",shortSigma);
-   TLegend* shortL = new TLegend(0.55,0.55,0.85,0.85);
+      TLegend* shortL = new TLegend(0.55,0.55,0.85,0.85);
       shortL ->AddEntry( shortPR,"Residuals for short pad size direction","l");
       Char_t LegendTitle[70];
       sprintf(LegendTitle,"Position Resolution = %6.3f mm",shortSigma);
@@ -442,6 +442,16 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     c2->cd(2)->SetTicky(1);
     PRF->Draw("colz");
     Mathieson->Draw("same");
+
+    delete Mathieson;
+    delete c2;
+  }
+  delete PRF;
+  if (pr) {
+    delete shortPR;
+    for (Int_t l = 0; l < 20; l++) {
+      delete longPR[l];
+    }
   }
   timer.Stop();
   Double_t rtime = timer.RealTime();

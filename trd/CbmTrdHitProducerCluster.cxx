@@ -502,10 +502,10 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*&
      
       //printf("M(%.1f,%.1f) SS(%.1f,%.1f) N(%d,%d) S(%d,%d) PS(%.1f,%.1f)\n",ModuleSizeX,ModuleSizeY,SectorSizeX[i],SectorSizeY[i],nCol,nRow,SecCol[i],SecRow[i],PadSizeX[i],PadSizeY[i]);
     }
-
-  hit -> xPos = (mPara->xPos - 10 * fModuleInfo-> GetSizex());
-  hit -> yPos = (mPara->yPos - 10 * fModuleInfo-> GetSizey());
-
+  /*
+    hit -> xPos = (mPara->xPos - 10 * fModuleInfo-> GetSizex());
+    hit -> yPos = (mPara->yPos - 10 * fModuleInfo-> GetSizey());
+  */
   /*
     Row and Columns are counted across sectors. At this point this absolute row and column ID has to be converted to sector row and column IDs within sectors.
   */
@@ -529,6 +529,10 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*&
   TVector3 posHit;
   TVector3 padSize;
   fModuleInfo->GetPosition(ColOfSec, RowOfSec, moduleId, Sector, posHit, padSize);
+  
+  hit -> xPos = posHit[0]*10;
+  hit -> yPos = posHit[1]*10;
+  
   hit -> zPos = posHit[2]*10;//mPara->zPos;
   hit -> secIdX = GetSector(true,  digi->GetCol(), mPara);
   hit -> secIdY = GetSector(false, digi->GetRow(), mPara);
@@ -740,12 +744,13 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModuleP
     //cout << "SimpleReco" << endl;
     Int_t DigiCol = hit-> colId;
     Int_t iSec = 0;
+    hit->dxPos = 0.5 * mPara->PadSizeX[iSec];
     if (DigiCol == 0)
       {
-	hit->xPos += 0.5 * mPara->PadSizeX[iSec];
+	//hit->xPos += 0.5 * mPara->PadSizeX[iSec];
 	hit->dxPos = 0.5 * mPara->PadSizeX[iSec];
       }
-
+    /*
     while (DigiCol > 0)
       {
 	if (mPara->SecCol[iSec] < mPara->nCol)
@@ -771,15 +776,16 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModuleP
 	  }
 	//cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
       }
-
+    */
     iSec = 0;
     Int_t DigiRow = hit-> rowId;
+	hit->dyPos = 0.5 * mPara->PadSizeY[iSec];
     if (DigiRow == 0)
       {
-	hit->yPos += 0.5 * mPara->PadSizeY[iSec];
+	//hit->yPos += 0.5 * mPara->PadSizeY[iSec];
 	hit->dyPos = 0.5 * mPara->PadSizeY[iSec];
       }
- 
+    /*
     while (DigiRow > 0)
       {
 	if (mPara->SecRow[iSec] < mPara->nRow)
@@ -805,7 +811,7 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModuleP
 	  }    
 	//cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
       }
-  
+    */
     PrfReco(qMaxIndex, qMax, mPara, neighbourIds, hit, PRF);
   
     //cout << "layer " << Layer << "  col " << nCol << "  row " << nRow << endl;

@@ -703,6 +703,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   Float_t HiteRate = 0;
   Int_t iSecX = 0;
   Int_t iSecY = 0;
+  // normalized vX and vY to determine iteration direction
   Float_t StartX = Mpos[0]-Msize[0];
   StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[0];
   if (GeoPara->layerId%2 == 0) 

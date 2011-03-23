@@ -14,6 +14,7 @@
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
+#include "FairLogger.h"
 
 #include "TObjArray.h"
 #include "TClonesArray.h"
@@ -91,7 +92,24 @@ void CbmTrd::Initialize()
 {
   FairDetector::Initialize();
   
-  
+  FairLogger *logger = FairLogger::GetLogger();
+  const char* bla = "DEBUG";
+  int number =1;
+
+  logger->Debug4(MESSAGE_ORIGIN, "Dies ist ein %s Test", bla);
+  logger->Debug3(MESSAGE_ORIGIN, "Dies ist ein DEBUG3 Test");
+  logger->Debug2(MESSAGE_ORIGIN, "Dies ist ein DEBUG2 Test");
+  logger->Debug1(MESSAGE_ORIGIN, "Dies ist ein DEBUG1 Test");
+  logger->Debug(MESSAGE_ORIGIN, "Dies ist ein DEBUG Test");
+  logger->Info(MESSAGE_ORIGIN, "Dies ist ein INFO Test");
+  logger->Warning(MESSAGE_ORIGIN, "Dies ist ein WARNING Test");
+  logger->Error(MESSAGE_ORIGIN, "Dies ist ein '%d' Test", 1);
+  logger->Error(MESSAGE_ORIGIN, "Dies ist ein '%d' Test", number);
+  logger->Error(MESSAGE_ORIGIN, "Dies ist ein %s Test\n", bla);
+  logger->Error(MESSAGE_ORIGIN,"\033[5m\033[31m invalid time function, Event time is not SET \033[0m");
+
+  //  logger->Fatal(MESSAGE_ORIGIN, "Dies ist ein FATAL Test");
+
   // Extract geometry information from gGeoManager instead of
   // CbmGeoTrdPar. All such geometry handling is done now in the
   //separate utility class CbmTrdGeoHandler

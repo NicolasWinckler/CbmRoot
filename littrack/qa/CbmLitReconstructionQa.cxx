@@ -100,9 +100,12 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fNofTypes(3),
 
    fhStsMom(),
+   fhStsMomNormHalfGlobal(),
+   fhStsMomNormGlobal(),
    fhStsNp(),
    fhStsAngle(),
    fhHalfGlobalMom(),
+   fhHalfGlobalMomNormGlobal(),
    fhGlobalMom(),
    fhRecMom(),
    fhRecNp(),
@@ -278,7 +281,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
    fMcGlobalMap.clear();
    Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
    for(Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
-      CbmGlobalTrack* globalTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
+      CbmGlobalTrack* globalTrack = static_cast<CbmGlobalTrack*>(fGlobalTracks->At(iTrack));
       if (globalTrack == NULL) { continue; }
 
       // get track segments indices
@@ -296,7 +299,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       // check the quality of track segments
       CbmTrackMatch* stsTrackMatch;
       if (isStsOk) {
-         stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(stsId);
+         stsTrackMatch = static_cast<CbmTrackMatch*>(fStsMatches->At(stsId));
          isStsOk = CheckTrackQuality(stsTrackMatch, kSTS);
          if (!isStsOk) { // ghost track
             Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
@@ -307,7 +310,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       }
       CbmTrackMatch* trdTrackMatch;
       if (isTrdOk) {
-         trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(trdId);
+         trdTrackMatch = static_cast<CbmTrackMatch*>(fTrdMatches->At(trdId));
          Int_t nofHits = trdTrackMatch->GetNofTrueHits() + trdTrackMatch->GetNofWrongHits() + trdTrackMatch->GetNofFakeHits();
          if (nofHits >= fMinNofHitsTrd) {
             isTrdOk = CheckTrackQuality(trdTrackMatch, kTRD);
@@ -320,7 +323,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       }
       CbmTrackMatch* muchTrackMatch;
       if (isMuchOk) {
-         muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(muchId);
+         muchTrackMatch = static_cast<CbmTrackMatch*>(fMuchMatches->At(muchId));
          Int_t nofHits = muchTrackMatch->GetNofTrueHits() + muchTrackMatch->GetNofWrongHits() + muchTrackMatch->GetNofFakeHits();
          if (nofHits >= fMinNofHitsMuch) {
             isMuchOk = CheckTrackQuality(muchTrackMatch, kMUCH);
@@ -338,8 +341,8 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       if (isTrdOk) { trdMCId = trdTrackMatch->GetMCTrackId(); }
       if (isMuchOk) { muchMCId = muchTrackMatch->GetMCTrackId(); }
       if (isTofOk) {
-         CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);
-         CbmTofPoint* tofPoint = (CbmTofPoint*) fTofPoints->At(tofHit->GetRefId());
+         CbmTofHit* tofHit = static_cast<CbmTofHit*>(fTofHits->At(tofId));
+         CbmTofPoint* tofPoint = static_cast<CbmTofPoint*>(fTofPoints->At(tofHit->GetRefId()));
          tofMCId = tofPoint->GetTrackID();
       }
 
@@ -494,11 +497,19 @@ void CbmLitReconstructionQa::ProcessMcTracks()
       // acceptance: STS+TRD(MUCH)
       if (isStsOk && isRecOk) {
          // momentum dependence histograms
+    	 // STS normalized to STS+TRD(MUCH)
+         FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMomNormHalfGlobal, mcTrack->GetP());
+    	 // STS+TRD(MUCH)
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhHalfGlobalMom, mcTrack->GetP());
       }
       // acceptance: STS+TRD(MUCH)+TOF
       if (isStsOk && isRecOk && isTofOk) {
          // momentum dependence histograms
+    	 // STS normalized to STS+TRD(MUCH)+TOF
+         FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMomNormGlobal, mcTrack->GetP());
+         // STS+TRD(MUCH) normalized to STS+TRD(MUCH)+TOF
+         FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhHalfGlobalMomNormGlobal, mcTrack->GetP());
+    	 // STS+TRD(MUCH)+TOF
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhGlobalMom, mcTrack->GetP());
       }
 
@@ -569,9 +580,12 @@ void CbmLitReconstructionQa::CreateHistos()
 
    // resize histogram vectors
    fhStsMom.resize(fNofCategories);
+   fhStsMomNormHalfGlobal.resize(fNofCategories);
+   fhStsMomNormGlobal.resize(fNofCategories);
    fhStsNp.resize(fNofCategories);
    fhStsAngle.resize(fNofCategories);
    fhHalfGlobalMom.resize(fNofCategories);
+   fhHalfGlobalMomNormGlobal.resize(fNofCategories);
    fhGlobalMom.resize(fNofCategories);
    fhRecMom.resize(fNofCategories);
    fhRecNp.resize(fNofCategories);
@@ -579,9 +593,12 @@ void CbmLitReconstructionQa::CreateHistos()
    fhTofMom.resize(fNofCategories);
    for (Int_t i = 0; i < fNofCategories; i++) {
       fhStsMom[i].resize(fNofTypes);
+      fhStsMomNormHalfGlobal[i].resize(fNofTypes);
+      fhStsMomNormGlobal[i].resize(fNofTypes);
       fhStsNp[i].resize(fNofTypes);
       fhStsAngle[i].resize(fNofTypes);
       fhHalfGlobalMom[i].resize(fNofTypes);
+      fhHalfGlobalMomNormGlobal[i].resize(fNofTypes);
       fhGlobalMom[i].resize(fNofTypes);
       fhRecMom[i].resize(fNofTypes);
       fhRecNp[i].resize(fNofTypes);
@@ -614,6 +631,18 @@ void CbmLitReconstructionQa::CreateHistos()
          fhStsMom[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
          fHistoList->Add(fhStsMom[i][j]);
 
+         // STS momentum dependence histograms normalized to STS+TRD(MUCH)
+         histName = "hStsMom" + type[j] + cat[i] + "NormHalfGlobal";
+         histTitle = "STS: " + type[j] + cat[i] + " " + " tracks";
+         fhStsMomNormHalfGlobal[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
+         fHistoList->Add(fhStsMomNormHalfGlobal[i][j]);
+
+         // STS momentum dependence histograms normalized to STS+TRD(MUCH)+TOF
+         histName = "hStsMom" + type[j] + cat[i] + "NormGlobal";
+         histTitle = "STS: " + type[j] + cat[i] + " " + " tracks";
+         fhStsMomNormGlobal[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
+         fHistoList->Add(fhStsMomNormGlobal[i][j]);
+
          // STS number of points dependence histograms
          histName = "hStsNp" + type[j] + cat[i];
          histTitle = "STS: " + type[j] + cat[i] + " " + " tracks";
@@ -631,6 +660,12 @@ void CbmLitReconstructionQa::CreateHistos()
          histTitle = "STS+TRD(MUCH): " + type[j] + cat[i] + " " + " tracks";
          fhHalfGlobalMom[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
          fHistoList->Add(fhHalfGlobalMom[i][j]);
+
+         // STS+TRD(MUCH) momentum dependence histograms normalized to STS+TRD(MUCH)+TOF
+         histName = "hHalfGlobalMom" + type[j] + cat[i] + "NormGlobal";
+         histTitle = "STS+TRD(MUCH): " + type[j] + cat[i] + " " + " tracks";
+         fhHalfGlobalMomNormGlobal[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
+         fHistoList->Add(fhHalfGlobalMomNormGlobal[i][j]);
 
          // STS+TRD(MUCH)+TOF momentum dependence histograms
          histName = "hGlobalMom" + type[j] + cat[i];
@@ -727,9 +762,12 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
    // Divide histograms for efficiency calculation
    for (Int_t i = 0; i < fNofCategories; i++) {
       DivideHistos(fhStsMom[i][REC], fhStsMom[i][ACC], fhStsMom[i][EFF]);
+      DivideHistos(fhStsMomNormHalfGlobal[i][REC], fhStsMomNormHalfGlobal[i][ACC], fhStsMomNormHalfGlobal[i][EFF]);
+      DivideHistos(fhStsMomNormGlobal[i][REC], fhStsMomNormGlobal[i][ACC], fhStsMomNormGlobal[i][EFF]);
       DivideHistos(fhStsNp[i][REC], fhStsNp[i][ACC], fhStsNp[i][EFF]);
       DivideHistos(fhStsAngle[i][REC], fhStsAngle[i][ACC], fhStsAngle[i][EFF]);
       DivideHistos(fhHalfGlobalMom[i][REC], fhHalfGlobalMom[i][ACC], fhHalfGlobalMom[i][EFF]);
+      DivideHistos(fhHalfGlobalMomNormGlobal[i][REC], fhHalfGlobalMomNormGlobal[i][ACC], fhHalfGlobalMomNormGlobal[i][EFF]);
       DivideHistos(fhGlobalMom[i][REC], fhGlobalMom[i][ACC], fhGlobalMom[i][EFF]);
       DivideHistos(fhRecMom[i][REC], fhRecMom[i][ACC], fhRecMom[i][EFF]);
       DivideHistos(fhRecNp[i][REC], fhRecNp[i][ACC], fhRecNp[i][EFF]);
@@ -914,17 +952,26 @@ void CbmLitReconstructionQa::Draw()
 
 void CbmLitReconstructionQa::DrawEfficiencyHistos()
 {
-   TCanvas* c1 = new TCanvas("rec_qa_global_tracking_efficiency_all","rec_qa_global_tracking_efficiency_all", 600, 500);
+   TCanvas* c1 = new TCanvas("rec_qa_global_efficiency_all","rec_qa_global_efficiency_all", 600, 500);
    c1->SetGrid();
 
-   TCanvas* c2 = new TCanvas("rec_qa_global_tracking_efficiency_signal","rec_qa_global_tracking_efficiency_signal", 600, 500);
+   TCanvas* c2 = new TCanvas("rec_qa_global_efficiency_signal","rec_qa_global_efficiency_signal", 600, 500);
    c2->SetGrid();
 
-   TCanvas* c3 = new TCanvas("rec_qa_global_tracking_efficiency_rec","rec_qa_global_tracking_efficiency_rec", 600, 500);
+   TCanvas* c3 = new TCanvas("rec_qa_half_global_efficiency_all","rec_qa_half_global_efficiency_all", 600, 500);
    c3->SetGrid();
 
-   TCanvas* c4 = new TCanvas("rec_qa_global_tracking_efficiency_tof","rec_qa_global_tracking_efficiency_tof", 600, 500);
+   TCanvas* c4 = new TCanvas("rec_qa_half_global_efficiency_signal","rec_qa_half_global_efficiency_signal", 600, 500);
    c4->SetGrid();
+
+   TCanvas* c5 = new TCanvas("rec_qa_sts_efficiency","rec_qa_sts_efficiency", 600, 500);
+   c5->SetGrid();
+
+   TCanvas* c6 = new TCanvas("rec_qa_rec_efficiency","rec_qa_rec_efficiency", 600, 500);
+   c6->SetGrid();
+
+   TCanvas* c7 = new TCanvas("rec_qa_tof_efficiency","rec_qa_tof_efficiency", 600, 500);
+   c7->SetGrid();
 
    std::string sname("STS");
    std::string rname;
@@ -934,75 +981,75 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
    std::string hgname(sname + "+" + rname);
    std::string gname = hgname + "+TOF";
 
-   std::string signal;
-   if (fIsMuch) { signal = "muons"; }
-   else { signal = "electrons"; }
+   std::string signal = fIsMuch ? "muons" : "electrons";
+   Int_t cat = fIsMuch ? MU : EL;
 
-   std::string hname1(sname), hname2(hgname), hname3(gname);
-   hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhStsMom[ALL][REC], fhStsMom[ALL][ACC])) + ")";
-   hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[ALL][REC], fhHalfGlobalMom[ALL][ACC])) + ")";
-   hname3 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhGlobalMom[ALL][REC], fhGlobalMom[ALL][ACC])) + ")";
-   c1->cd();
-   fhStsMom[ALL][EFF]->SetMinimum(0.);
-   fhStsMom[ALL][EFF]->SetMaximum(1.);
-   if (fIsTof) {
-      DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], fhGlobalMom[ALL][EFF], NULL,
-                 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
-                 false, false, true, 0.3,0.3,0.85,0.6);
-   } else {
-      DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], NULL, NULL,
-                 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
-                 false, false, true, 0.3,0.3,0.85,0.6);
-   }
-   lit::SaveCanvasAsImage(c1, fOutputDir);
+   // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
+   DrawGlobalEfficiency(c1, fhStsMomNormGlobal, fhHalfGlobalMomNormGlobal, fhGlobalMom, sname, hgname, gname, ALL);
+   // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
+   DrawGlobalEfficiency(c2, fhStsMomNormGlobal, fhHalfGlobalMomNormGlobal, fhGlobalMom, sname, hgname, gname, cat);
 
-   Int_t cat;
-   if (fIsMuch) { cat = MU; }
-   else { cat = EL; }
-   hname1 = sname;
-   hname2 = hgname;
-   hname3 = gname;
-   hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhStsMom[cat][REC], fhStsMom[cat][ACC])) + ")";
-   hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[cat][REC], fhHalfGlobalMom[cat][ACC])) + ")";
-   hname3 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhGlobalMom[cat][REC], fhGlobalMom[cat][ACC])) + ")";
-   c2->cd();
-   fhStsMom[cat][EFF]->SetMinimum(0.);
-   fhStsMom[cat][EFF]->SetMaximum(1.);
-   if (fIsTof) {
-      DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], fhGlobalMom[cat][EFF], NULL,
-                 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
-                 false, false, true, 0.3,0.3,0.85,0.6);
-   } else {
-      DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], NULL, NULL,
-                 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
-                 false, false, true, 0.3,0.3,0.85,0.6);
-   }
-   lit::SaveCanvasAsImage(c2, fOutputDir);
+   // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
+   DrawGlobalEfficiency(c3, fhStsMomNormHalfGlobal, fhHalfGlobalMom, fhGlobalMom, sname, hgname, "", ALL);
+   // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
+   DrawGlobalEfficiency(c4, fhStsMomNormHalfGlobal, fhHalfGlobalMom, fhGlobalMom, sname, hgname, "", cat);
 
+   // Draw efficiency for STS
+   DrawSegmentEfficiency(c5, fhStsMom, "STS", signal, cat);
 
-   hname1 = rname + ": all";
-   hname2 = rname + ": " + signal;
-   c3->cd();
-   hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhRecMom[ALL][REC], fhRecMom[ALL][ACC]))+ ")";
-   hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhRecMom[cat][REC], fhRecMom[cat][ACC])) + ")";
-   fhRecMom[ALL][EFF]->SetMinimum(0.);
-   fhRecMom[ALL][EFF]->SetMaximum(1.);
-   DrawHist1D(fhRecMom[ALL][EFF], fhRecMom[cat][EFF], NULL, NULL,
-              "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
-              false, false, true, 0.3,0.3,0.85,0.6);
-   lit::SaveCanvasAsImage(c3, fOutputDir);
+   // Draw efficiency for TRD(MUCH)
+   DrawSegmentEfficiency(c6, fhRecMom, rname, signal, cat);
 
-   hname1 = "TOF: all";
-   hname2 = "TOF: " + signal;
-   hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhTofMom[ALL][REC], fhTofMom[ALL][ACC])) + ")";
-   hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(fhTofMom[cat][REC], fhTofMom[cat][ACC])) + ")";
-   c4->cd();
-   fhTofMom[ALL][EFF]->SetMinimum(0.);
-   fhTofMom[ALL][EFF]->SetMaximum(1.);
-   DrawHist1D(fhTofMom[ALL][EFF], fhTofMom[cat][EFF], NULL, NULL,
-              "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
-              false, false, true, 0.3,0.3,0.85,0.6);
-   lit::SaveCanvasAsImage(c4, fOutputDir);
+   // Draw efficiency for TOF
+   DrawSegmentEfficiency(c7, fhTofMom, "TOF", signal, cat);
+}
+
+void CbmLitReconstructionQa::DrawGlobalEfficiency(
+		TCanvas* canvas,
+		const std::vector<std::vector<TH1F*> >& hist1,
+		const std::vector<std::vector<TH1F*> >& hist2,
+		const std::vector<std::vector<TH1F*> >& hist3,
+		const std::string& name1,
+		const std::string& name2,
+		const std::string& name3,
+		Int_t category)
+{
+	canvas->cd();
+	std::string hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist1[category][REC], hist1[category][ACC])) + ")";;
+	std::string hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist2[category][REC], hist2[category][ACC])) + ")";;
+	std::string hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist3[category][REC], hist3[category][ACC])) + ")";;
+	hist1[category][EFF]->SetMinimum(0.);
+	hist1[category][EFF]->SetMaximum(1.);
+	if (fIsTof && name3 != "") {
+	  DrawHist1D(hist1[category][EFF], hist2[category][EFF], hist3[category][EFF], NULL,
+				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
+				 false, false, true, 0.3,0.3,0.85,0.6);
+	} else {
+	  DrawHist1D(hist1[category][EFF], hist2[category][EFF], NULL, NULL,
+				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
+				 false, false, true, 0.3,0.3,0.85,0.6);
+	}
+	lit::SaveCanvasAsImage(canvas, fOutputDir);
+}
+
+void CbmLitReconstructionQa::DrawSegmentEfficiency(
+		TCanvas* canvas,
+		const std::vector<std::vector<TH1F*> >& hist,
+		const std::string& detName,
+		const std::string& signal,
+		Int_t category)
+{
+	canvas->cd();
+	std::string hname1 = detName + ": all";
+	std::string hname2 = detName + ": " + signal;
+	hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(hist[ALL][REC], hist[ALL][ACC]))+ ")";
+	hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(hist[category][REC], hist[category][ACC])) + ")";
+	hist[ALL][EFF]->SetMinimum(0.);
+	hist[ALL][EFF]->SetMaximum(1.);
+	DrawHist1D(hist[ALL][EFF], hist[category][EFF], NULL, NULL,
+			  "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
+			  false, false, true, 0.3,0.3,0.85,0.6);
+	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 Double_t CbmLitReconstructionQa::CalcEfficiency(

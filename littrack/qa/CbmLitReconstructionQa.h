@@ -63,7 +63,7 @@ public:
    void SetQuota(Double_t quota) { fQuota = quota;}
 
    /* Sets the minimum number of hits in TRD track.
-     * @param minNofPointsTrd Minimum number of MC points in TRD. */
+     * @param minNofPointsTrd Minimum number of hits in TRD. */
    void SetMinNofHitsTrd(Int_t minNofHitsTrd) { fMinNofHitsTrd = minNofHitsTrd;}
 
    /* Sets the minimum number of hits in MUCH track.
@@ -185,6 +185,25 @@ private:
    /* Draws efficiency histograms. */
    void DrawEfficiencyHistos();
 
+   /* Draws Global tracking efficiency */
+   void DrawGlobalEfficiency(
+   		TCanvas* canvas,
+   		const std::vector<std::vector<TH1F*> >& hist1,
+   		const std::vector<std::vector<TH1F*> >& hist2,
+   		const std::vector<std::vector<TH1F*> >& hist3,
+   		const std::string& name1,
+   		const std::string& name2,
+   		const std::string& name3,
+   		Int_t category);
+
+   /* Draw efficiency for global track segments STS, TRD, MUCH, TOF */
+   void DrawSegmentEfficiency(
+   		TCanvas* canvas,
+   		const std::vector<std::vector<TH1F*> >& hist,
+   		const std::string& detName,
+   		const std::string& signal,
+   		Int_t category);
+
    /* Calculate efficiency for two histograms */
    Double_t CalcEfficiency(
       TH1* histRec,
@@ -268,9 +287,12 @@ private:
    // track category (all, ref, prim, sec, muon, electron)
    // histogram type (acc, rec, eff)
    std::vector<std::vector<TH1F*> > fhStsMom; // STS: momentum dependence
+   std::vector<std::vector<TH1F*> > fhStsMomNormHalfGlobal; // STS: momentum dependence, normalized to STS+TRD(MUCH)
+   std::vector<std::vector<TH1F*> > fhStsMomNormGlobal; // STS: momentum dependence, normalized to STS+TRD(MUCH)+TOF
    std::vector<std::vector<TH1F*> > fhStsNp; // STS: number of points dependence
    std::vector<std::vector<TH1F*> > fhStsAngle; // STS: polar angle dependence
    std::vector<std::vector<TH1F*> > fhHalfGlobalMom; // STS+TRD(MUCH): momentum dependence
+   std::vector<std::vector<TH1F*> > fhHalfGlobalMomNormGlobal; // STS+TRD(MUCH): momentum dependence, normalized to STS+TRD(MUCH)+TOF
    std::vector<std::vector<TH1F*> > fhGlobalMom; // STS+TRD(MUCH)+TOF: momentum dependence
    std::vector<std::vector<TH1F*> > fhRecMom; // TRD(MUCH): momentum dependence
    std::vector<std::vector<TH1F*> > fhRecNp; // TRD(MUCH): number of points dependence

@@ -25,8 +25,13 @@ typedef struct HitRateGeoPara
   Int_t layerId;
   Int_t stationId;
   Double_t mPos[3];
-  Double_t mSize[3];
-  Double_t pSize[3];
+  Double_t mSize[3];// [dimensions]
+  Double_t sSize[3][3];
+  Double_t pSize[3][3]; // [sectors][dimensions]
+  Int_t nCol;
+  Int_t nRow;
+  Int_t sCol[3];
+  Int_t sRow[3];
   Double_t vOrigin[3];
   Double_t vX[3];
   Double_t vY[3];
@@ -34,6 +39,7 @@ typedef struct HitRateGeoPara
   Double_t lambda;
   Double_t cosX;
   Double_t cosY;
+  Int_t stepDirection[3];
 } HitRateGeoPara;
 
 class CbmTrdHitRateTest : public FairTask {

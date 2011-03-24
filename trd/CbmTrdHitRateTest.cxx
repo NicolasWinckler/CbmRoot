@@ -197,63 +197,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   vector<int> L3S3;
   vector<int> L4S3;
 
-  Int_t ModuleID[10];
+  Int_t ModuleID;
   Int_t Sector = 0;
-  Char_t trddigiparpath[100] = "trd.digi.par";
-  /*
-//// do not ask for the filename   
-printf("Which ...digi.par?\n");
-cin >> trddigiparpath;         
-cout << trddigiparpath << endl;
-  */
-  std::ifstream digifile;
-  digifile.open(trddigiparpath);
-  if(!digifile.good()) 
-    {
-      printf("ERROR      trd.digi.par was not found at ../%s\n",trddigiparpath);
-      while (!digifile.good())
-	{
-	  printf("Next try. Which ...digi.par?\n");
-	  cin >> trddigiparpath;
-	  cout << trddigiparpath << endl;
-	  //std::ifstream digifile;
-	  digifile.open(trddigiparpath);
-	}
-    } 
-  Int_t counter = 0;
-  do {
-  
-    for (Int_t i = 0; i < 10; i++)
-      {
-	ModuleID[i] = -1000;
-      }
-
-    digifile >> skipws >> ModuleID[0] >> ModuleID[1] >> ModuleID[2] >> ModuleID[3] >> ModuleID[4] >> ModuleID[5] >> ModuleID[6] >> ModuleID[7] >> ModuleID[8] >> ModuleID[9];
-
-    if (ModuleID[0] == 0)
-      {
-	break;
-      }
-    for (Int_t i = 0; i < 10; i++)
-      {
-	if (ModuleID[i] > -1000)
-	  {
-
-	    GetModuleInformationSL(ModuleID[i]);
-	    
-	    FillVector(ModuleID[i], L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3);
-
-	  }
-      }
-    //cout << endl;
-    if (!digifile.good() && !digifile.eof())
-      {
-	digifile.clear();
-      }
-    digifile.ignore(1000,'\n');
-  
-  } while (digifile.good());
-
+  Int_t NofModules = fDigiPar->GetNrOfModules();
+  for (Int_t i = 0; i < NofModules; i++) {
+    ModuleID = fDigiPar->GetModuleId(i);
+    GetModuleInformationSL(ModuleID);
+    FillVector(ModuleID, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3);
+    //cout << i << " " << ModuleID << endl;
+  }
   vector< vector<int> > LiSi;
   LiSi.push_back(L1S1);
   LiSi.push_back(L2S1);
@@ -286,16 +238,15 @@ cout << trddigiparpath << endl;
   fLayer = 1;
   for (vector< vector<int> >::size_type j = 0; j < LiSi.size(); j++)
     {
-
-      sprintf(Canfile1,"Pics/%s_S%d_L%d.png",trddigiparpath,fStation,fLayer);
-      sprintf(Canfile2,"Pics/%s_HitPerPad_S%d_L%d.png",trddigiparpath,fStation,fLayer);
+      sprintf(Canfile1,"Pics/S%d_L%d.png",fStation,fLayer);
+      sprintf(Canfile2,"Pics/HitPerPad_S%d_L%d.png",fStation,fLayer);
 
       HistoInit(c1, c2,  Layer, HitPad, Canfile1, Canfile2, ZRangeL, ZRangeU, mm2bin);
 
       border->Draw("same");
       Lines = false;
       for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
-	{
+	{	 
 	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
 	}
       c1->cd(1)->SetLogz(1);
@@ -484,7 +435,7 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
       Double_t Msize[3];
       Msize[0] = fModuleInfo->GetSizex() * 10;
       Msize[1] = fModuleInfo->GetSizey() * 10;
-      Msize[3] = 0; 
+      Msize[2] = 0; 
 
       const Int_t NoSectors = fModuleInfo->GetNoSectors();
       Int_t nSec = NoSectors;
@@ -536,14 +487,42 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
 
       TVector3 padPos;
       TVector3 padSize;
-      fModuleInfo->GetPosition(0, 0, VolumeID, 0, padPos, padSize);
       
+      for (Int_t s = 0; s < fNoSectors; s++) {
+	GeoPara->sCol[s] = 0;
+	GeoPara->sRow[s] = 0;
+      }
       for (Int_t i = 0; i < 3; i++) {
 	GeoPara->mPos[i]  = Mpos[i];
 	GeoPara->mSize[i] = Msize[i];
-	GeoPara->pSize[i] = padSize[i];
+	for (Int_t s = 0; s < fNoSectors; s++){
+	  fModuleInfo->GetPosition(0, 0, VolumeID, s, padPos, padSize);
+	  GeoPara->pSize[s][i] = padSize[i] * 10;
+	  if (i == 0) {
+	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizex(s) * 10;
+	    if (GeoPara->sSize[s][i] < 2 * GeoPara->mSize[i]) {
+	      GeoPara->sCol[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
+	    }
+	    else {
+	      if (s == 0) GeoPara->sCol[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
+	      else        GeoPara->sCol[s] = 0;
+	    }
+	    GeoPara->nCol += GeoPara->sCol[s];
+	  }
+	  if (i == 1) {
+	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizey(s) * 10;
+	    if (GeoPara->sSize[s][i] < 2 * GeoPara->mSize[i]) {
+	      GeoPara->sRow[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
+	    }
+	    else {
+	      if (s == 0) GeoPara->sRow[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
+	      else        GeoPara->sRow[s] = 0;
+	    }
+	    GeoPara->nRow += GeoPara->sRow[s];	    
+	  }
+	}
       }
-
+      fModuleInfo->GetPosition(0, 0, VolumeID, 0, padPos, padSize);
       GeoPara->vOrigin[0] = padPos[0] * 10;
       GeoPara->vOrigin[1] = padPos[1] * 10; 
       GeoPara->vOrigin[2] = padPos[2] * 10;
@@ -572,10 +551,14 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
       GeoPara->cosX = (GeoPara->vX[0] * 1 + GeoPara->vX[1] * 0 + GeoPara->vX[2] * 0) / sqrt(pow(GeoPara->vX[0],2) + pow(GeoPara->vX[1],2) + pow(GeoPara->vX[2],2));
       /*y-direction*/
       GeoPara->cosY = (GeoPara->vY[0] * 0 + GeoPara->vY[1] * 1 + GeoPara->vY[2] * 0) / sqrt(pow(GeoPara->vY[0],2) + pow(GeoPara->vY[1],2) + pow(GeoPara->vY[2],2));
+      
+      GeoPara->stepDirection[0] = GeoPara->vX[0] / fabs(GeoPara->vX[0]); // is the next pad (1,0,0) on the left or right side?
+      GeoPara->stepDirection[1] = GeoPara->vY[1] / fabs(GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
+
       /*
-	Topview[0]->Fill(Mpos[0],Mpos[2]);
-	Topview[1]->Fill(Mpos[0],Mpos[1]);
-	Topview[2]->Fill(Mpos[2],Mpos[1]);
+	Topview[0]->Fill(GeoPara->mPos[0],GeoPara->mPos[2]);
+	Topview[1]->Fill(GeoPara->mPos[0],GeoPara->mPos[1]);
+	Topview[2]->Fill(GeoPara->mPos[2],GeoPara->mPos[1]);
       */
       //Topview->Fill(Mpos[0]-Msize[0],Mpos[2]);
       /*
@@ -597,14 +580,13 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
 	Topview->Fill(-1*(GeoPara->vY[0]+GeoPara->vOrigin[0]),GeoPara->vY[2]+GeoPara->vOrigin[2]);
       */
       /*
-	cout << "GetModuleInformationFromDigiPar" << endl;
-	for (Int_t i = 0; i < 3; i++) {
-	cout << "vOrig " << GeoPara->vOrigin[i] << endl;
-	cout << "vX    " << GeoPara->vX[i] << endl;
-	cout << "vY    " << GeoPara->vY[i] << endl;
-	cout << "vN    " << GeoPara->vN[i] << endl;
-	}
-	cout << "lambda" << GeoPara->lambda << endl << endl;
+      cout << GeoPara->moduleId << " S" << GeoPara->stationId << " L" << GeoPara->layerId << endl;
+      for (Int_t i = 0; i < 3; i++) {
+	cout << " vOrig " << GeoPara->vOrigin[i] <<  " vX    " << GeoPara->vX[i] << " vY    " << GeoPara->vY[i] << " vN    " << GeoPara->vN[i] << endl;
+      }
+      cout << "lambda" << GeoPara->lambda << endl;
+      cout << "cosX" << GeoPara->cosX << endl;
+      cout << "cosY" << GeoPara->cosY << endl << endl;
       */
       nRow = tempY;
       nCol = tempX;
@@ -631,31 +613,19 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
   Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
   Float_t r = 0;
   Float_t alpha = 0;
-  /*x-direction*/
-  Float_t cosbetha = GeoPara->cosX;
-  /*y-direction*/
-  Float_t cosgamma = GeoPara->cosY;
   Int_t counter = 0;
   Float_t a[3] = { 7.66582e+00,  6.97712e+00,  6.53780e+00};
   Float_t b[3] = {-2.72375e-03, -1.85168e-03, -1.42673e-03};
-  Double_t xOrig = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[0];
-  if (GeoPara->layerId%2 == 0) 
-    xOrig = GeoPara->vOrigin[0] + 0.5 * GeoPara->pSize[0];
-  Double_t yOrig = GeoPara->vOrigin[1] - 0.5 * GeoPara->pSize[1];
-  Double_t zOrig = (GeoPara->lambda - (StartX * GeoPara->vN[0] + StartY * GeoPara->vN[1])) / GeoPara->vN[2];//(GeoPara->lambda - (xOrig * GeoPara->vN[0] + yOrig * GeoPara->vN[1])) / GeoPara->vN[2];
+
   Double_t xStepWidth = GeoPara->cosX;
-  if (GeoPara->layerId%2 == 0)
-    xStepWidth *= -1;
   Double_t yStepWidth = GeoPara->cosY;
-  Double_t zStepWidth = zOrig - ((GeoPara->lambda - ((xOrig + xStepWidth) * GeoPara->vN[0] + (yOrig + yStepWidth) * GeoPara->vN[1])) / GeoPara->vN[2]);
-  Double_t z = zOrig;
-  Double_t y = StartY;//yOrig + 0.5;
+  Double_t x = StartX + 0.5 * GeoPara->cosX; // don't start on the pad border line
+  Double_t y = StartY + 0.5 * GeoPara->cosY;
+  Double_t z = (GeoPara->lambda - (x * GeoPara->vN[0] + y * GeoPara->vN[1])) / GeoPara->vN[2];
   for (Int_t yStep = 0; yStep < ySteps; yStep++) {
-    Double_t x = StartX;//xOrig + 0.5;
-    z = zOrig;
+    x = StartX + 0.5 * GeoPara->cosX;
     for (Int_t xStep = 0; xStep < xSteps; xStep++) {
-      //z = (GeoPara->lambda - (x * GeoPara->vN[0] + y * GeoPara->vN[1])) / GeoPara->vN[2];
-      z += zStepWidth;
+      z = (GeoPara->lambda - (x * GeoPara->vN[0] + y * GeoPara->vN[1])) / GeoPara->vN[2];
       r = sqrt( pow(x, 2) + pow(y,2));
       alpha = atan(r/z)*1000.;
       
@@ -664,34 +634,15 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
 	exp(2.40005e01 + -1.19541e-02 * alpha) /
 	(z * z)
 	;
+      
       Topview[0]->Fill(x,z);
       Topview[1]->Fill(x,y);
       Topview[2]->Fill(z,y);
+      
       x += xStepWidth;
     }
     y += yStepWidth;
   }
-
-  /*
-    for (Int_t stepY = int(StartY); stepY < int(StopY); stepY++) // step width 1 mm
-    {
-    for (Int_t stepX = int(StartX); stepX < int(StopX); stepX++) // step width 1 mm
-    {
-    counter++;
-    Double_t z = (GeoPara->lambda - ((stepX + 0.5) * cosbetha * GeoPara->vN[0] + (stepY + 0.5) * cosgamma * GeoPara->vN[1])) / GeoPara->vN[2];
-    //cout << z << endl;
-    //Topview->Fill((stepX + 0.5) * cosbetha,z);
-    //Topview->Fill(-1 * (stepX + 0.5) * cosbetha,z);
-    //r = sqrt( pow((stepX + 0.5) * cosbetha, 2) + pow((stepY + 0.5) * cosgamma,2));
-    alpha = atan(r/z)*1000.;
-    HitRate += 
-    exp(4.54156e00 + -8.47377e-03 * alpha) + 
-    exp(2.40005e01 + -1.19541e-02 * alpha) /
-    (z * z)
-    ;
-    }
-    }
-  */
   return (HitRate/*/(counter/100.)*/);/*Convertes Hits/Pad -> Hits/cm² on each Pad*/
 }
 void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
@@ -703,101 +654,93 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   Float_t HiteRate = 0;
   Int_t iSecX = 0;
   Int_t iSecY = 0;
-  // normalized vX and vY to determine iteration direction
-  Float_t StartX = Mpos[0]-Msize[0];
-  StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[0];
-  if (GeoPara->layerId%2 == 0) 
-    StartX = GeoPara->vOrigin[0] + 0.5 * GeoPara->pSize[0] - 2 * GeoPara->mSize[0];
-  Float_t StartY = Mpos[1]-Msize[1];
-  StartY = GeoPara->vOrigin[1] - 0.5 * GeoPara->pSize[1];
-  Float_t StopX = StartX + Psize[0+iSecX*nSec] * GeoPara->cosX;
-  Float_t StopY = StartY + Psize[1+iSecY*nSec] * GeoPara->cosY;
-  Int_t SecRow = int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
-  Int_t SecCol = int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
+  Double_t planeStartX = Mpos[0]-Msize[0];
+  Double_t planeStartY = Mpos[1]-Msize[1];
+  Double_t planeStopX = planeStartX + GeoPara->pSize[iSecX][0];
+  Double_t planeStopY = planeStartY + GeoPara->pSize[iSecX][1];
+  Float_t StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX;// vOrigin points to the center of pad (0,0,0)
+  Float_t StartY = GeoPara->vOrigin[1] - 0.5 * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
+  Float_t StopX = StartX + GeoPara->pSize[iSecX][0] * GeoPara->cosX;
+  Float_t StopY = StartY + GeoPara->pSize[iSecY][1] * GeoPara->cosY;
   Int_t xSteps = 0;
   Int_t ySteps = 0;
-  Int_t stepDirection = 1;
-  if (GeoPara->layerId%2 == 0) 
-    stepDirection = -1;
-
+  //Int_t xStepDirection = GeoPara->vX[0] / fabs(GeoPara->vX[0]); // is the next pad (1,0,0) on the left or right side?
+  //Int_t yStepDirection = GeoPara->vY[1] / fabs(GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
   for (Int_t iR = 0; iR < nR; iR++)
     {
-      StartX = Mpos[0]-Msize[0];
-      StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[0];
-      if (GeoPara->layerId%2 == 0) 
-	StartX = GeoPara->vOrigin[0] + 0.5 * GeoPara->pSize[0] - 2 * GeoPara->mSize[0];
-      StopX  = StartX + Psize[0+iSecX*nSec] * GeoPara->cosX;
-      if (GeoPara->layerId%2 == 0) 
+      StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX; 
+      StopX  = StartX + GeoPara->pSize[iSecX][0] * GeoPara->cosX;
+      planeStartX = GeoPara->mPos[0] - GeoPara->mSize[0];
+      planeStopX  = planeStartX + GeoPara->pSize[iSecX][0];
+      for (Int_t iC = 0; iC < nC; iC++)
+	{
+	  xSteps = GeoPara->pSize[iSecX][0] - 1; // 1 Step / mm
+	  ySteps = GeoPara->pSize[iSecY][1] - 1;
 
-	for (Int_t iC = 0; iC < nC; iC++)
-	  {
-	    xSteps = Psize[1+iSecY*nSec];
-	    ySteps = Psize[0+iSecX*nSec];
-	    if (Fast)
-	      {
-		if (Mpos[0] > -1 && Mpos[1] > -1)
-		  {
-
-		    HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
-		    HitPad->Fill(HiteRate);
-		    HitPad->Fill(HiteRate);
-		    HitPad->Fill(HiteRate);
-		    HitPad->Fill(HiteRate);
-		  }
-	      }
-	    else
-	      {
-		HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
-		HitPad->Fill(HiteRate);
-	      }
-	  
-	    for (Int_t stepY = int(StartY/mm2bin); stepY < int(StopY/mm2bin); stepY++)
-	      {
-		for (Int_t stepX = int(StartX/mm2bin); stepX < int(StopX/mm2bin); stepX++)
-		  {
-		    if (Fast)
-		      {
-			if (Mpos[0] > -1 && Mpos[1] > -1)
-			  {
+	  if (Fast)
+	    {
+	      if (Mpos[0] > -1 && Mpos[1] > -1)
+		{
+		  HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
+		  HitPad->Fill(HiteRate);
+		  HitPad->Fill(HiteRate);
+		  HitPad->Fill(HiteRate);
+		  HitPad->Fill(HiteRate);
+		}
+	    }
+	  else
+	    {
+	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
+	      HitPad->Fill(HiteRate);
+	    }
+	  for (Int_t stepY = int(planeStartY/mm2bin); stepY < int(planeStopY/mm2bin); stepY++)
+	    {
+	      for (Int_t stepX = int(planeStartX/mm2bin); stepX < int(planeStopX/mm2bin); stepX++)
+		{
+		  if (Fast)
+		    {
+		      if (GeoPara->mPos[0]/*Mpos[0]*/ > -1 && GeoPara->mPos[1]/*Mpos[1]*/ > -1)
+			{
+			  /*
+			  Layer->Fill(     stepX*mm2bin,     stepY*mm2bin,HiteRate);
+			  Layer->Fill(-1 * stepX*mm2bin,     stepY*mm2bin,HiteRate);
+			  Layer->Fill(     stepX*mm2bin,-1 * stepY*mm2bin,HiteRate);
+			  Layer->Fill(-1 * stepX*mm2bin,-1 * stepY*mm2bin,HiteRate);
+			  */
 			  
 			    Layer->SetBinContent(     stepX+int(9000/mm2bin),      stepY+int(9000/mm2bin), HiteRate);
 			    Layer->SetBinContent(-1 * stepX+int(9000/mm2bin),      stepY+int(9000/mm2bin), HiteRate);
 			    Layer->SetBinContent(     stepX+int(9000/mm2bin), -1 * stepY+int(9000/mm2bin), HiteRate);
 			    Layer->SetBinContent(-1 * stepX+int(9000/mm2bin), -1 * stepY+int(9000/mm2bin), HiteRate);
 			  
-			    /*
-			      Layer->Fill(     int(stepX*mm2bin),      int(stepY*mm2bin), HiteRate);
-			      Layer->Fill(-1 * int(stepX*mm2bin),      int(stepY*mm2bin), HiteRate);
-			      Layer->Fill(     int(stepX*mm2bin), -1 * int(stepY*mm2bin), HiteRate);
-			      Layer->Fill(-1 * int(stepX*mm2bin), -1 * int(stepY*mm2bin), HiteRate);
-			    */
-			  }
-		      }
-		    else
-		      {
-			Layer->SetBinContent(stepX+int(9000/mm2bin), stepY+int(9000/mm2bin), HiteRate);
-		      }
-		  }
-	      }
-	    //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)             Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
+			}
+		    }
+		  else
+		    {
+		      //Layer->Fill(     stepX*mm2bin,     stepY*mm2bin,HiteRate);
+		      Layer->SetBinContent(stepX+int(9000/mm2bin), stepY+int(9000/mm2bin), HiteRate);
+		    }
+		}
+	    }
+	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)             Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
 
-	    if (iC == SecCol-1)
-	      {
-		iSecX++;
-		SecCol += int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
-	      }
-	    StartX += Psize[0+iSecX*nSec] * GeoPara->cosX;
-	    StopX  += Psize[0+iSecX*nSec] * GeoPara->cosX;
-	  }
+	  if (iC == GeoPara->sCol[iSecX]-1)	   
+	      iSecX++;
+	    
+	  StartX += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0] * GeoPara->cosX;
+	  StopX  += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0] * GeoPara->cosX;
+	  planeStartX += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0];
+	  planeStopX  += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0];
+	}
       iSecX = 0;
    
-      if (iR == SecRow-1)
-	{          
+      if (iR == GeoPara->sRow[iSecY]-1)       
 	  iSecY++;
-	  SecRow += int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
-	}
-      StartY += Psize[1+iSecY*nSec] * GeoPara->cosY;
-      StopY  += Psize[1+iSecY*nSec] * GeoPara->cosY;
+
+      StartY += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
+      StopY  += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
+      planeStartY += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1];
+      planeStopY  += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1];
     }
   
   c1->cd(1);

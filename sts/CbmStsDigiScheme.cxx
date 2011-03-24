@@ -214,6 +214,7 @@ void CbmStsDigiScheme::Clear() {
   fStations->Delete();
   fStationMap.clear();
   fDetIdByName.clear();
+  fSensorByName.clear();
   fNSectors = fNSensors = fNChannels = 0;
 }
 // -------------------------------------------------------------------------

@@ -323,6 +323,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       if (pr) {
 	CalcPR(combinatoric, qMaxIndex, shortPR, longPR, legend, PRF, hit);
       }
+      delete hit;
     }
 
   std::map<Int_t, MyHitList* >::iterator it;
@@ -382,7 +383,10 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	  longSigma = fit->GetParameter(2);
 	  printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_%d'\n",longSigma,l);
 	}
-      }        
+      }    
+      
+      delete cPR;
+      delete shortL;    
     }
     else {
       shortPR->Fit("fit","0Q");
@@ -398,6 +402,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	}
       }     
     }
+    delete fit;
     /*
       cout << "  " << shortSigma << " mm position resolution for short pad size direction (including x and y)" << endl;
       cout << "   " << longSigma  << " mm position resolution for long pad size direction  ('')"  << endl << endl;
@@ -448,6 +453,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   }
   delete PRF;
   if (pr) {
+   
     delete shortPR;
     for (Int_t l = 0; l < 20; l++) {
       delete longPR[l];

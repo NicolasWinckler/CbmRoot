@@ -10,6 +10,13 @@
 void run_sim(Int_t nEvents = 2)
 {
 
+  ifstream whichTrdGeo;
+  whichTrdGeo.open("whichTrdGeo",ios::in);
+  TString digipar;
+  if (whichTrdGeo) whichTrdGeo >> digipar;
+  cout << digipar << endl;
+    whichTrdGeo.close();
+  if (digipar.Length() == 0) digipar = "trd_standard";
   // ========================================================================
   //          Adjust this part according to your requirements
 
@@ -30,7 +37,8 @@ void run_sim(Int_t nEvents = 2)
   TString richGeom   = "rich_standard.geo";
 //  TString trdGeom    = "trd_squared_modules_jun10.geo";
 //  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
-  TString trdGeom    = "trd_standard.geo";
+  //TString trdGeom    = "trd_standard.geo";
+  TString trdGeom    = digipar + ".geo";
   TString tofGeom    = "tof_standard.geo";
   TString ecalGeom   = "ecal_FastMC.geo";
   

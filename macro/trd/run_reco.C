@@ -10,6 +10,13 @@
 
 void run_reco(Int_t nEvents = 2)
 {
+  ifstream whichTrdGeo;
+  whichTrdGeo.open("whichTrdGeo",ios::in);
+  TString digipar;
+  if (whichTrdGeo) whichTrdGeo >> digipar;
+  cout << digipar << endl;
+    whichTrdGeo.close();
+  if (digipar.Length() == 0) digipar = "trd_standard";
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -32,15 +39,15 @@ void run_reco(Int_t nEvents = 2)
   TList *parFileList = new TList();
 
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
-  paramDir += "/parameters/sts/";
+  paramDir += "/parameters";
 
-  TObjString stsDigiFile = paramDir + "sts_standard.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_standard.digi.par";
   parFileList->Add(&stsDigiFile);
 
   // STS digitisation file
   //  TString stsDigiFile = "sts_standard.digi.par";
 
-  TObjString trdDigiFile = "./trd.digi.par";
+  TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";//"./trd.digi.par";
   parFileList->Add(&trdDigiFile);
 
   // In general, the following parts need not be touched

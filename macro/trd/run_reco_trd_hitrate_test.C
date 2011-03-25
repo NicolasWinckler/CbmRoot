@@ -18,9 +18,16 @@
 // --------------------------------------------------------------------------
 
 
-void run_reco_trd_hitrate_test(Int_t nEvents = 1)
+void run_reco_trd_hitrate_test()
 {
-
+  ifstream whichTrdGeo;
+  whichTrdGeo.open("whichTrdGeo",ios::in);
+  TString digipar;
+  if (whichTrdGeo) whichTrdGeo >> digipar;
+  cout << digipar << endl;
+    whichTrdGeo.close();
+  if (digipar.Length() == 0) digipar = "trd_standard";
+  Int_t nEvents = 1;
   // ========================================================================
   //          Adjust this part according to your requirements
 
@@ -46,7 +53,8 @@ void run_reco_trd_hitrate_test(Int_t nEvents = 1)
   parFileList->Add(&stsDigiFile);
 
   //TObjString trdDigiFile = "./trd.digi.par";
- TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
+  //TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
+TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
   parFileList->Add(&trdDigiFile);
 
   // Output file

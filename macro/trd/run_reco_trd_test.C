@@ -20,7 +20,13 @@
 
 void run_reco_trd_test(Int_t nEvents = 1)
 {
-
+  ifstream whichTrdGeo;
+  whichTrdGeo.open("whichTrdGeo",ios::in);
+  TString digipar;
+  if (whichTrdGeo) whichTrdGeo >> digipar;
+  cout << digipar << endl;
+    whichTrdGeo.close();
+  if (digipar.Length() == 0) digipar = "trd_standard";
   // ========================================================================
   //          Adjust this part according to your requirements
 
@@ -48,7 +54,8 @@ void run_reco_trd_test(Int_t nEvents = 1)
     TString trdDigiDir = gSystem->Getenv("VMCWORKDIR");
     trdDigiDir += "/macro/run/";
   */
-  TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
+TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
+// TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
   parFileList->Add(&trdDigiFile);
 
 

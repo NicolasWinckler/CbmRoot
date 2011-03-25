@@ -202,6 +202,8 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Int_t NofModules = fDigiPar->GetNrOfModules();
   for (Int_t i = 0; i < NofModules; i++) {
     ModuleID = fDigiPar->GetModuleId(i);
+    fModuleInfo = fDigiPar->GetModule(ModuleID);
+    //printf("%d:\n  %.1f %.1f %.1f\n",ModuleID,fModuleInfo->GetX(), fModuleInfo->GetY(),fModuleInfo->GetZ());
     GetModuleInformationSL(ModuleID);
     FillVector(ModuleID, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3);
     //cout << i << " " << ModuleID << endl;
@@ -238,8 +240,12 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   fLayer = 1;
   for (vector< vector<int> >::size_type j = 0; j < LiSi.size(); j++)
     {
-      sprintf(Canfile1,"Pics/S%d_L%d.png",fStation,fLayer);
-      sprintf(Canfile2,"Pics/HitPerPad_S%d_L%d.png",fStation,fLayer);
+      Topview[0]->Reset();
+      Topview[1]->Reset();
+      Topview[2]->Reset();
+
+      sprintf(Canfile1,"Pics/HitPerPadFrontView_S%d_L%d.png",fStation,fLayer);
+      sprintf(Canfile2,"Pics/HitPerPadSpectra_S%d_L%d.png",fStation,fLayer);
 
       HistoInit(c1, c2,  Layer, HitPad, Canfile1, Canfile2, ZRangeL, ZRangeU, mm2bin);
 
@@ -555,39 +561,12 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
       GeoPara->stepDirection[0] = GeoPara->vX[0] / fabs(GeoPara->vX[0]); // is the next pad (1,0,0) on the left or right side?
       GeoPara->stepDirection[1] = GeoPara->vY[1] / fabs(GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
 
-      /*
-	Topview[0]->Fill(GeoPara->mPos[0],GeoPara->mPos[2]);
-	Topview[1]->Fill(GeoPara->mPos[0],GeoPara->mPos[1]);
-	Topview[2]->Fill(GeoPara->mPos[2],GeoPara->mPos[1]);
-      */
-      //Topview->Fill(Mpos[0]-Msize[0],Mpos[2]);
-      /*
-	for (Int_t i = 0; i < 1; i++) {
-	for (Int_t j = 0; j < 1; j++) {
-	fModuleInfo->GetPosition(i, i, VolumeID, j, padPos, padSize);
-	Topview[0]->Fill(padPos[0]*10,padPos[2]*10);
-	Topview[1]->Fill(padPos[0]*10,padPos[1]*10);
-	Topview[2]->Fill(padPos[2]*10,padPos[1]*10);
-	}
-	}
-      */
-      /*
-	Topview->Fill(GeoPara->vOrigin[0],GeoPara->vOrigin[2]);
-	Topview->Fill(GeoPara->vX[0]+GeoPara->vOrigin[0],GeoPara->vX[2]+GeoPara->vOrigin[2]);
-	Topview->Fill(GeoPara->vY[0]+GeoPara->vOrigin[0],GeoPara->vY[2]+GeoPara->vOrigin[2]);
-	Topview->Fill(-1*GeoPara->vOrigin[0],GeoPara->vOrigin[2]);
-	Topview->Fill(-1*(GeoPara->vX[0]+GeoPara->vOrigin[0]),GeoPara->vX[2]+GeoPara->vOrigin[2]);
-	Topview->Fill(-1*(GeoPara->vY[0]+GeoPara->vOrigin[0]),GeoPara->vY[2]+GeoPara->vOrigin[2]);
-      */
-      /*
-      cout << GeoPara->moduleId << " S" << GeoPara->stationId << " L" << GeoPara->layerId << endl;
-      for (Int_t i = 0; i < 3; i++) {
-	cout << " vOrig " << GeoPara->vOrigin[i] <<  " vX    " << GeoPara->vX[i] << " vY    " << GeoPara->vY[i] << " vN    " << GeoPara->vN[i] << endl;
-      }
-      cout << "lambda" << GeoPara->lambda << endl;
-      cout << "cosX" << GeoPara->cosX << endl;
-      cout << "cosY" << GeoPara->cosY << endl << endl;
-      */
+      
+      
+      Topview[0]->Fill(GeoPara->mPos[0],GeoPara->mPos[2]);
+      Topview[1]->Fill(GeoPara->mPos[0],GeoPara->mPos[1]);
+      Topview[2]->Fill(GeoPara->mPos[2],GeoPara->mPos[1]);
+      
       nRow = tempY;
       nCol = tempX;
       //cout << nRow << " " << nCol << endl;

@@ -40,12 +40,13 @@ void run_reco_trd_hitrate_test(Int_t nEvents = 1)
   TList *parFileList = new TList();
 
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
-  paramDir += "/parameters/sts/";
+  paramDir += "/parameters";
 
-  TObjString stsDigiFile = paramDir + "sts_standard.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_standard.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  TObjString trdDigiFile = "./trd.digi.par";
+  //TObjString trdDigiFile = "./trd.digi.par";
+ TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
   parFileList->Add(&trdDigiFile);
 
   // Output file

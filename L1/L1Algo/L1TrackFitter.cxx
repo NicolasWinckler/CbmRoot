@@ -374,9 +374,6 @@ void L1Algo::L1KFTrackFitter()
         ista = vSFlag[hit.f]/4;
         w[ista][iVec] = 1.;
 
-        fvec x0,y0;
-
-        
         u[ista][iVec]  = vStsStrips[hit.f] ;
         v[ista][iVec]  = vStsStripsB[hit.b];
         StripsToCoor(u[ista], v[ista], x_temp, y_temp, sta[ista]);

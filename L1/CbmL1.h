@@ -68,6 +68,9 @@ using std::vector;
 
 class L1Algo;
 class L1FieldSlice;
+class CbmL1Track;
+class CbmL1MCTrack;
+class CbmL1ParticlesFinder;
 
 class CbmL1HitStore{
  public:
@@ -118,6 +121,7 @@ class CbmL1 : public FairTask
   friend class L1AlgoPulls;
   template<int NHits>  friend class L1AlgoEfficiencyPerformance;
   friend class CbmL1MCTrack;
+  friend class CbmL1PFFitter;
  private:
    void IdealTrackFinder(); // just copy all reconstructable MCTracks into RecoTracks.
 
@@ -133,6 +137,7 @@ class CbmL1 : public FairTask
     /// Reconstruction Performance
    void TrackMatch();              // Procedure for match Reconstructed and MC Tracks. Should be called before Performances
    void EfficienciesPerformance(); // calculate efficiencies
+   void PartEffPerformance(CbmL1ParticlesFinder &PF); // calculate efficiencies
    void TrackFitPerformance();     // pulls & residuals. Can be called only after Performance()
    void HistoPerformance();        // fill some histograms and calculate efficiencies
 

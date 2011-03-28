@@ -31,11 +31,15 @@
 #include "CbmStsFindTracks.h"
 #include "CbmKF.h"
 
+#include "CbmL1ParticlesFinder.h"
+
 #include "TVector3.h"
 #include "TVectorD.h"
 #include "TMatrixD.h"
 #include "TROOT.h"
 
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -525,13 +529,20 @@ void CbmL1::Exec(Option_t * option)
     vRTracks.push_back(t);
   }
 
+  //Find Primary vertex, Ks, Lambdas,...
+//  static CbmL1ParticlesFinder PF;
+
     // output performance
   if (fPerformance){
     if( fVerbose>1 ) cout<<"Performance..."<<endl;
     TrackMatch();
+  }
+//  PF.FindParticles(vRTracks,listMCTracks);
+  if (fPerformance){
     EfficienciesPerformance();
     HistoPerformance();
     TrackFitPerformance();
+//    PartEffPerformance(PF);
   }
   if( fVerbose>1 ) cout<<"End of L1"<<endl;
 

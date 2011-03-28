@@ -31,6 +31,7 @@
 #include "CbmStsStation.h" // for field FieldCheck.
 
 #include "CbmL1Counters.h"
+#include "CbmL1ParticlesFinder.h"
 
 #include <iostream>
 #include <vector>
@@ -304,7 +305,6 @@ void CbmL1::EfficienciesPerformance()
 
   } // for mcTracks
 
-  
   L1_CATIME += algo->CATime;
   L1_NEVENTS++;
 
@@ -331,6 +331,100 @@ void CbmL1::EfficienciesPerformance()
     cout<<"CA Track Finder: " << L1_CATIME/L1_NEVENTS << " s/ev" << endl << endl;
   }
 } // void CbmL1::Performance()
+
+void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
+{
+  static int NKs = 0;
+  static int NKsReco = 0;
+  static int NKsReconstructable = 0;
+  static int NKsRecRec = 0;
+  static int NKsMC = 0;
+  static int NKsGhost = 0;
+  static int NKsBackground = 0;
+
+  vector <CbmL1PFMCParticle> KsMC;
+
+  for(int i=0; i< listMCTracks->GetEntriesFast(); i++)
+  {
+    CbmMCTrack &mtra = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(i)));
+    if(mtra.GetPdgCode() == 310) 
+    {
+      CbmL1PFMCParticle temp_part;
+      KsMC.push_back(temp_part);
+      KsMC.back().SetMCTrackID(i);
+      KsMC.back().SetPDG(mtra.GetPdgCode());
+      NKsMC++;
+    }
+  }
+/*  for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
+    CbmL1MCTrack &mtra = *(mtraIt);
+    if(mtra.pdg == 310) 
+    {
+      CbmL1PFMCParticle temp_part;
+      KsMC.push_back(temp_part);
+      KsMC.back().SetMCTrackID(mtra.ID);
+      KsMC.back().SetPDG(mtra.pdg);
+      NKsMC++;
+    }
+  }*/
+  for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
+    CbmL1MCTrack &mtra = *(mtraIt);
+    for(unsigned int iV = 0; iV < KsMC.size(); iV++)
+      if(mtra.mother_ID == KsMC[iV].GetMCTrackID()) KsMC[iV].AddDaughter(&mtra);
+  }
+  for(unsigned int iV = 0; iV < KsMC.size(); iV++)
+  {
+    KsMC[iV].CalculateIsRecRec(2);
+    if(KsMC[iV].IsReconstructable() && KsMC[iV].GetPDG() == 310) NKsReconstructable++;
+    if(KsMC[iV].IsRecRec() && KsMC[iV].GetPDG() == 310)          NKsRecRec++;
+  }
+
+  for(unsigned int iKs=0; iKs<PF.GetKsMC().size(); iKs++)
+  {
+    PF.GetKsMC()[iKs].FindCommonMC();
+    if(PF.GetKsMC()[iKs].GetMCTrackID() == -1) NKsGhost++;
+    else
+    {
+      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PF.GetKsMC()[iKs].GetMCTrackID()))) -> GetPdgCode();
+      if(PDG == 310) NKsReco++;
+      else NKsBackground++;
+    }
+  }
+
+  NKs += PF.GetKsMC().size();
+
+//  cout.width (16);
+  cout << "Particle   "<<"Efficiency,%	| "
+                       <<"RecRecEff,%	| "
+                       <<"Rec Eff,%	| "
+                       <<"Backgr,%	| "
+                       <<"Ghosts,%	| "
+                       <<"NReco	| "
+                       <<"NRecRec	| "
+                       <<"NMCRec	| "
+                       <<"NMC	| "
+                       <<"NBkg"<<endl;
+  float effKs = -1.f;
+  float receffKs = -1.f;
+  float recreceffKs = -1.f;
+  float bkgKs = -1.f;
+  float ghostKs = -1.f;
+  if(NKsMC > 0) effKs = static_cast<double>(NKsReco)/static_cast<double>(NKsMC)*100.;
+  if(NKsRecRec > 0) recreceffKs = static_cast<double>(NKsReco)/static_cast<double>(NKsRecRec)*100.;
+  if(NKsReconstructable > 0) receffKs = static_cast<double>(NKsReco)/static_cast<double>(NKsReconstructable)*100.;
+  if(NKs > 0) bkgKs = static_cast<double>(NKsBackground)/static_cast<double>(NKs)*100.;
+  if(NKs > 0) ghostKs = static_cast<double>(NKsGhost)/static_cast<double>(NKs)*100.;
+  cout << "Ks         "<<effKs<<"	| "
+                       <<recreceffKs<<"	| "
+                       <<receffKs<<"	| "
+                       <<bkgKs<<"	| "
+                       <<ghostKs<<"	| "
+                       <<NKsReco<<"	| "
+                       <<NKsRecRec<<"		| "
+                       <<NKsReconstructable<<"		| "
+                       <<NKsMC<<"	| "
+                       <<NKsBackground<<endl;
+} // void CbmL1::ParticlesEfficienciesPerformance()
 
 void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef on match data in CbmL1**Track classes
 {

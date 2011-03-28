@@ -23,6 +23,7 @@ ${CBMROOT_SOURCE_DIR}/rich/fitter
 
 ${CBMROOT_SOURCE_DIR}/L1
 ${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
+${CBMROOT_SOURCE_DIR}/L1/ParticleFinder
 ${CBMROOT_SOURCE_DIR}/sts
 ${CBMROOT_SOURCE_DIR}/trd 
 ${CBMROOT_SOURCE_DIR}/KF
@@ -74,6 +75,10 @@ CbmL1Performance.cxx
 CbmL1ReadEvent.cxx
 
 CbmL1MCTrack.cxx
+
+CbmL1ParticlesFinder.cxx
+ParticleFinder/CbmL1PFFitter.cxx
+ParticleFinder/CbmL1PFMCParticle.cxx
 )
 
 if(RULE_CHECKER_FOUND)

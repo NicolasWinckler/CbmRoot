@@ -64,6 +64,10 @@ Interface/CbmStsKFSecondaryVertexFinder.cxx
 Interface/CbmTrdTrackFitterKF.cxx 
 Interface/CbmGlobalTrackFitterKF.cxx
 CbmKFParticle.cxx
+CbmKFParticle_simd.cxx
+CbmKFParticleInterface.cxx
+KFQA/CbmKFTrErrMCPoints.cxx
+KFQA/CbmKFTrackFitQA.cxx
 )
 
 if(RULE_CHECKER_FOUND)
@@ -73,7 +77,34 @@ endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h KF_HEADERS "${KF_SRCS}")
+#CHANGE_FILE_EXTENSION(*.cxx *.h KF_HEADERS "${KF_SRCS}")
+set(KF_HEADERS
+CbmKF.h 
+CbmKFFieldMath.h
+CbmKFHit.h
+CbmKFMaterial.h
+CbmKFMath.h
+CbmKFPixelMeasurement.h
+CbmKFPrimaryVertexFinder.h
+CbmKFSecondaryVertexFinder.h
+CbmKFTrackInterface.h
+CbmKFUMeasurement.h 
+CbmKFVertexInterface.h
+Interface/CbmEcalTrackExtrapolationKF.h
+Interface/CbmKFStsHit.h
+Interface/CbmKFTrack.h 
+Interface/CbmKFTrdHit.h 
+Interface/CbmPVFinderKF.h
+Interface/CbmRichTrackExtrapolationKF.h
+Interface/CbmStsFitPerformanceTask.h
+Interface/CbmStsKFTrackFitter.h
+Interface/CbmStsKFSecondaryVertexFinder.h
+Interface/CbmTrdTrackFitterKF.h
+Interface/CbmGlobalTrackFitterKF.h
+CbmKFParticle.h
+KFQA/CbmKFTrErrMCPoints.h
+KFQA/CbmKFTrackFitQA.h
+)
 
 SET_SOURCE_FILES_PROPERTIES(${KF_SRCS} PROPERTIES COMPILE_FLAGS "-O3")
 

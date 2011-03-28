@@ -32,6 +32,9 @@
 #pragma link C++ class  CbmTrdTrackFitterKF+;
 #pragma link C++ class  CbmGlobalTrackFitterKF+;
 #pragma link C++ class  CbmKFParticle+;
+//KFQA
+#pragma link C++ class  CbmKFTrErrMCPoints+;
+#pragma link C++ class  CbmKFTrackFitQA+;
 
 #endif
 

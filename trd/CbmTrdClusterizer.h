@@ -215,6 +215,8 @@ class CbmTrdClusterizer : public FairTask {
 
   std::map<Int_t, ModulePara*> fModuleParaMap;
 
+  TH1F* fIntegralTest;
+
   ClassDef(CbmTrdClusterizer,1)
 
     };

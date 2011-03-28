@@ -161,6 +161,9 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   Bool_t approx = false;  
 
   cout << "================CbmTrdClusterizer=====================" << endl;
+
+  fIntegralTest = new TH1F("IntegrationTest","IntegrationTest",200000,0,20000);
+
   Digicounter = 0;
   CbmTrdPoint *pt=NULL;
   MyPoint* point = new MyPoint;
@@ -455,6 +458,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   printf("\n\n******************** Reading Test  **********************\n");
   printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
   printf("*********************************************************\n\n");
+
+  //fIntegralTest->Draw();
 }
    // --------------------------------------------------------------------
 
@@ -850,10 +855,10 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 Double_t CbmTrdClusterizer::ApproxMathieson(Double_t x, Double_t W)
 {
   Float_t K3 = 0.525; 
-  Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
-  Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
+  //Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
+  //Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
   //Float_t W = 5;
-  Float_t par = 1;
+  //Float_t par = 1;
   Float_t h = 3;
   /*
     Char_t formula[500];
@@ -992,12 +997,23 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
     }
     deltaH += H[iPadRow];
   }
+
+  Double_t totalCharge = 0;
+  Double_t normalizationFactor = 0;
   for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
     for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      normalizationFactor += fPadCharge[iPRow][iPCol];
+    }
+  }
+  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      fPadCharge[iPRow][iPCol] /= normalizationFactor/16000;
+      totalCharge += fPadCharge[iPRow][iPCol];
       fPadCharge[iPRow][iPCol] *= SliceELoss;
       //Test2->Fill(iPCol,iPRow,fPadCharge[iPRow][iPCol]);
     }
   }
+  fIntegralTest->Fill(totalCharge);
   /*
   c->cd(1);
   Test->Draw("colz");
@@ -1123,12 +1139,22 @@ void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
       }   
     }
   }
-
+  Double_t totalCharge = 0;
+  Double_t normalizationFactor = 0;
   for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
     for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      normalizationFactor += fPadCharge[iPRow][iPCol];
+    }
+  }
+  //normalizationFactor = 1;
+  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {   
+      fPadCharge[iPRow][iPCol] /= normalizationFactor/16000;
+      totalCharge += fPadCharge[iPRow][iPCol];
       fPadCharge[iPRow][iPCol] *= SliceELoss;
     }
   }
+  fIntegralTest->Fill(totalCharge);
 }
     // --------------------------------------------------------------------
 Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset) 

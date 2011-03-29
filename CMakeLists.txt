@@ -71,6 +71,7 @@ else(CBMROOT_MINIMAL)
   find_package(CLHEP)
   find_package(RuleChecker)
   find_package(TBB)
+  find_package(SSE)
 endif(CBMROOT_MINIMAL)
 
 

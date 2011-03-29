@@ -207,35 +207,16 @@ endif(RULE_CHECKER_FOUND)
 # by exchanging the file extension
 #CHANGE_FILE_EXTENSION(*.cxx *.h LITTRACK_HEADERS "${LITTRACK_SRCS}")
 
-
-
-# Check if SSE instructions are available on the machine where 
-# the project is compiled.
-
-IF(CMAKE_SYSTEM_NAME MATCHES Linux)
-  EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
-  STRING(REGEX REPLACE "^.*(sse).*$" "\\1" SSE_THERE ${CPUINFO})
-  STRING(COMPARE EQUAL "sse" "${SSE_THERE}" SSE_TRUE)
-ELSE(CMAKE_SYSTEM_NAME MATCHES Linux)
-  IF(CMAKE_SYSTEM_NAME MATCHES Darwin)
-    EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
-    STRING(REGEX REPLACE "^.*(SSE).*$" "\\1" SSE_THERE ${CPUINFO})
-    STRING(COMPARE EQUAL "SSE" "${SSE_THERE}" SSE_TRUE)
-  ENDIF(CMAKE_SYSTEM_NAME MATCHES Darwin)
-ENDIF(CMAKE_SYSTEM_NAME MATCHES Linux)
-
-IF (SSE_TRUE)
-  MESSAGE(STATUS "SSE extensions available")
+IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
   "-msse -O3 ")
-ELSE (SSE_TRUE)
-  MESSAGE (STATUS "*********************************************************************************")
-  MESSAGE(STATUS "NO SSE extensions available.")
-  MESSAGE (STATUS "*********************************************************************************")
+  Message(STATUS "LitTrack will be compiled with SSE support")
+ELSE (SSE_FOUND)
+  Message(STATUS "LitTrack will be compiled without SSE support")
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
   "-O3 ")
-ENDIF (SSE_TRUE)
+ENDIF (SSE_FOUND)
 
 
 set(LITTRACK_LINKDEF  LittrackLinkDef.h)

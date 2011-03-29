@@ -106,7 +106,33 @@ KFQA/CbmKFTrErrMCPoints.h
 KFQA/CbmKFTrackFitQA.h
 )
 
-SET_SOURCE_FILES_PROPERTIES(${KF_SRCS} PROPERTIES COMPILE_FLAGS "-O3")
+# Check if SSE instructions are available on the machine where 
+# the project is compiled.
+
+IF(CMAKE_SYSTEM_NAME MATCHES Linux)
+  EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
+  STRING(REGEX REPLACE "^.*(sse).*$" "\\1" SSE_THERE ${CPUINFO})
+  STRING(COMPARE EQUAL "sse" "${SSE_THERE}" SSE_TRUE)
+ELSE(CMAKE_SYSTEM_NAME MATCHES Linux)
+  IF(CMAKE_SYSTEM_NAME MATCHES Darwin)
+    EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
+    STRING(REGEX REPLACE "^.*(SSE).*$" "\\1" SSE_THERE ${CPUINFO})
+    STRING(COMPARE EQUAL "SSE" "${SSE_THERE}" SSE_TRUE)
+  ENDIF(CMAKE_SYSTEM_NAME MATCHES Darwin)
+ENDIF(CMAKE_SYSTEM_NAME MATCHES Linux)
+
+IF (SSE_TRUE)
+  MESSAGE(STATUS "SSE extensions available")
+  ADD_DEFINITIONS(-DHAVE_SSE)
+  SET_SOURCE_FILES_PROPERTIES(${KF_SRCS} PROPERTIES COMPILE_FLAGS 
+  "-msse -O3")
+ELSE (SSE_TRUE)
+  MESSAGE (STATUS "*********************************************************************************")
+  MESSAGE(STATUS "NO SSE extensions available. The L1 tracking will be compiled in the slow version")
+  MESSAGE (STATUS "*********************************************************************************")
+  SET_SOURCE_FILES_PROPERTIES(${KF_SRCS} PROPERTIES COMPILE_FLAGS 
+  "-O3")
+ENDIF (SSE_TRUE)
 
 set(KF_LINKDEF KFLinkDef.h)
 set(KF_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/KFDict.cxx) 

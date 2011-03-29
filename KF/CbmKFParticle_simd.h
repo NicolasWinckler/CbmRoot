@@ -15,7 +15,12 @@
 
 //#include "../L1/L1Algo/vectors/PSEUDO_F32vec1.h"
 //#include "../L1/L1Algo/vectors/PSEUDO_F32vec4.h"
-#include "../L1/vectors/P4_F32vec4.h"
+#ifdef HAVE_SSE
+  #include "../L1/vectors/P4_F32vec4.h"
+#else
+  #include "../L1/vectors/PSEUDO_F32vec4.h"
+  #error NoSseFound
+#endif // HAVE_SSE
 
 //#include "SimdTest.h"
 

@@ -73,6 +73,8 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
 
   fKs.clear();
   fKsMC.clear();
+  fLambda.clear();
+  fLambdaMC.clear();
 
   fitter.Fit(vRTracks);
   

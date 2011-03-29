@@ -39,6 +39,7 @@ class CbmL1ParticlesFinder
 
   void FindParticles(vector<CbmL1Track> &vRTracks,TClonesArray *listMCTracks);
   vector<CbmL1PFMCParticle> & GetKsMC() {return fKsMC;}
+  vector<CbmL1PFMCParticle> & GetLambdaMC() {return fLambdaMC;}
 
  private:
 

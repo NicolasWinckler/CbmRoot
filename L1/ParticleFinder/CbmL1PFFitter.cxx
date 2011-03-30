@@ -186,10 +186,12 @@ void CbmL1PFFitter::Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec &u , f
   T.C44-= K4*F4;
 }
 
-void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass2)
+void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
 {
 //  cout << " Start L1 Track Fitter " << endl;
 //  int start_hit = 0; // for interation in vRecoHits[]
+
+  fvec mass2 = mass*mass;
 
   static L1FieldValue fB0, fB1, fB2 _fvecalignment;
   static L1FieldRegion fld _fvecalignment;
@@ -214,6 +216,11 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass2)
   L1FieldValue fB[nHits], fB_temp _fvecalignment;
 
   unsigned short N_vTracks = Tracks.size();
+
+  for(unsigned short itrack = 0; itrack < N_vTracks; itrack++)
+  {
+    Tracks[itrack].mass = mass[0];
+  }
 
   for(unsigned short itrack = 0; itrack < N_vTracks; itrack+=fvecLen)
   {

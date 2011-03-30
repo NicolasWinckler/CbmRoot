@@ -38,6 +38,6 @@ class CbmL1PFFitter
   void FilterLast ( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
   void Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec &u , fvec &w);
 
-  void Fit(vector<CbmL1Track> &Tracks, fvec mass2 = 0.1395679f*0.1395679f);
+  void Fit(vector<CbmL1Track> &Tracks, fvec mass = 0.1395679f);
 };
 #endif

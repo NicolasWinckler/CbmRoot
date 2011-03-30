@@ -38,8 +38,12 @@ class CbmL1ParticlesFinder
   ~CbmL1ParticlesFinder();
 
   void FindParticles(vector<CbmL1Track> &vRTracks,TClonesArray *listMCTracks);
-  vector<CbmL1PFMCParticle> & GetKsMC() {return fKsMC;}
-  vector<CbmL1PFMCParticle> & GetLambdaMC() {return fLambdaMC;}
+
+  const vector<CbmL1PFMCParticle> & GetKsMC() const {return fKsMC;}
+  const vector<CbmL1PFMCParticle> & GetLambdaMC() const {return fLambdaMC;}
+
+  const vector<CbmKFParticle> & GetKs() const {return fKs;}
+  const vector<CbmKFParticle> & GetLambda() const {return fLambda;}
 
  private:
 

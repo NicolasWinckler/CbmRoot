@@ -150,15 +150,15 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
       vDaughters[1].Create(vPos,NTracks);
       CbmKFParticleInterface Temp;
       Temp.Construct(vDaughters, 2, 0);
-      CbmKFParticleInterface Temp_topo;
-      Temp_topo.Construct(vDaughters, 2, pvIntrface);
+//      CbmKFParticleInterface Temp_topo;
+//      Temp_topo.Construct(vDaughters, 2, pvIntrface);
 
       for(int iv=0; iv<4; iv++)
       {
         if(!finite(Temp.GetChi2()[iv]) || !(Temp.GetChi2()[iv] > 0.0f) || !(Temp.GetChi2()[iv]==Temp.GetChi2()[iv])) continue;
-        if(!finite(Temp_topo.GetChi2()[iv]) || !(Temp_topo.GetChi2()[iv] > 0.0f) || !(Temp_topo.GetChi2()[iv]==Temp_topo.GetChi2()[iv])) continue;
+//        if(!finite(Temp_topo.GetChi2()[iv]) || !(Temp_topo.GetChi2()[iv] > 0.0f) || !(Temp_topo.GetChi2()[iv]==Temp_topo.GetChi2()[iv])) continue;
 
-        if(Temp.GetChi2()[iv]/Temp.GetNDF()[iv] < 3. && Temp_topo.GetChi2()[iv]/Temp_topo.GetNDF()[iv] < 3. && Temp.GetZ()[iv] > 3. && iTrP+iv < NPositive)
+        if(Temp.GetChi2()[iv]/Temp.GetNDF()[iv] < 3. /*&& Temp_topo.GetChi2()[iv]/Temp_topo.GetNDF()[iv] < 3. && Temp.GetZ()[iv] > 3.*/ && iTrP+iv < NPositive)
         {
           IsSelectedPos[iTrP+iv] = 1;
           IsSelectedNeg[iTrN] = 1;
@@ -171,11 +171,11 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
   for(unsigned short iTrN=0; iTrN < Neg.size(); iTrN++)
     if(IsSelectedNeg[iTrN]) fPionMinus.push_back(Neg[iTrN]);
 
-  fvec mass2P = 0.938272f*0.938272f;
+  fvec massP = 0.938272f;
   fPPlus  = fPionPlus;
   fPMinus = fPionMinus;
-  fitter.Fit(fPPlus, mass2P);
-  fitter.Fit(fPMinus, mass2P);
+  fitter.Fit(fPPlus, massP);
+  fitter.Fit(fPMinus, massP);
 //  std::cout << " Pos2 " << fPionPlus.size() << " Neg2 " << fPionMinus.size() << std::endl;
 }
 
@@ -197,17 +197,17 @@ void CbmL1ParticlesFinder::FindKs(TClonesArray *listMCTracks)
       vDaughters[1].Create(vPos,NTracks);
       CbmKFParticleInterface Ks;
       Ks.Construct(vDaughters, 2, 0);
-      CbmKFParticleInterface Ks_topo;
-      Ks_topo.Construct(vDaughters, 2, pvIntrface);
+//      CbmKFParticleInterface Ks_topo;
+//      Ks_topo.Construct(vDaughters, 2, pvIntrface);
 
       for(int iv=0; iv<NTracks; iv++)
       {
         if(!finite(Ks.GetChi2()[iv])) continue;
         if(!(Ks.GetChi2()[iv] > 0.0f)) continue;
         if(!(Ks.GetChi2()[iv]==Ks.GetChi2()[iv])) continue;
-        if(!finite(Ks_topo.GetChi2()[iv]) || !(Ks_topo.GetChi2()[iv] > 0.0f) || !(Ks_topo.GetChi2()[iv]==Ks_topo.GetChi2()[iv])) continue;
+//        if(!finite(Ks_topo.GetChi2()[iv]) || !(Ks_topo.GetChi2()[iv] > 0.0f) || !(Ks_topo.GetChi2()[iv]==Ks_topo.GetChi2()[iv])) continue;
 
-        if( Ks.GetChi2()[iv]/Ks.GetNDF()[iv] < 3. && Ks_topo.GetChi2()[iv]/Ks_topo.GetNDF()[iv] < 3. && Ks.GetZ()[iv] > 3. && iTrP+iv < NPositive)
+        if( Ks.GetChi2()[iv]/Ks.GetNDF()[iv] < 3. /*&& Ks_topo.GetChi2()[iv]/Ks_topo.GetNDF()[iv] < 3. && Ks.GetZ()[iv] > 3.*/ && iTrP+iv < NPositive)
         {
           CbmKFParticle Ks_temp;
           Ks.GetKFParticle(Ks_temp, iv);
@@ -306,17 +306,17 @@ void CbmL1ParticlesFinder::FindLambda()
       vDaughters[1].Create(vPos,NTracks);
       CbmKFParticleInterface Lambda;
       Lambda.Construct(vDaughters, 2, 0);
-      CbmKFParticleInterface Lambda_topo;
-      Lambda_topo.Construct(vDaughters, 2, pvIntrface);
+//      CbmKFParticleInterface Lambda_topo;
+//      Lambda_topo.Construct(vDaughters, 2, pvIntrface);
 
       for(int iv=0; iv<NTracks; iv++)
       {
         if(!finite(Lambda.GetChi2()[iv])) continue;
         if(!(Lambda.GetChi2()[iv] > 0.0f)) continue;
         if(!(Lambda.GetChi2()[iv]==Lambda.GetChi2()[iv])) continue;
-        if(!finite(Lambda_topo.GetChi2()[iv]) || !(Lambda_topo.GetChi2()[iv] > 0.0f) || !(Lambda_topo.GetChi2()[iv]==Lambda_topo.GetChi2()[iv])) continue;
+//        if(!finite(Lambda_topo.GetChi2()[iv]) || !(Lambda_topo.GetChi2()[iv] > 0.0f) || !(Lambda_topo.GetChi2()[iv]==Lambda_topo.GetChi2()[iv])) continue;
 
-        if( Lambda.GetChi2()[iv]/Lambda.GetNDF()[iv] < 3. && Lambda_topo.GetChi2()[iv]/Lambda_topo.GetNDF()[iv] < 3. && Lambda.GetZ()[iv] > 3. && iTrP+iv < NPositive)
+        if( Lambda.GetChi2()[iv]/Lambda.GetNDF()[iv] < 3. /*&& Lambda_topo.GetChi2()[iv]/Lambda_topo.GetNDF()[iv] < 3. && Lambda.GetZ()[iv] > 3.*/ && iTrP+iv < NPositive)
         {
           CbmKFParticle Lambda_temp;
           Lambda.GetKFParticle(Lambda_temp, iv);

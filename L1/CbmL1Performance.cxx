@@ -379,19 +379,21 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     if(KsMC[iV].IsRecRec() && KsMC[iV].GetPDG() == 310)          NKsRecRec++;
   }
 
-  for(unsigned int iKs=0; iKs<PF.GetKsMC().size(); iKs++)
+  vector<CbmL1PFMCParticle> PFKsMC = PF.GetKsMC();
+
+  for(unsigned int iKs=0; iKs<PFKsMC.size(); iKs++)
   {
-    PF.GetKsMC()[iKs].FindCommonMC();
-    if(PF.GetKsMC()[iKs].GetMCTrackID() == -1) NKsGhost++;
+    PFKsMC[iKs].FindCommonMC();
+    if(PFKsMC[iKs].GetMCTrackID() == -1) NKsGhost++;
     else
     {
-      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PF.GetKsMC()[iKs].GetMCTrackID()))) -> GetPdgCode();
+      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PFKsMC[iKs].GetMCTrackID()))) -> GetPdgCode();
       if(PDG == 310) NKsReco++;
       else NKsBackground++;
     }
   }
 
-  NKs += PF.GetKsMC().size();
+  NKs += PF.GetKs().size();
 
 //  cout.width (16);
   cout << "Particle   "<<"Efficiency,%	| "
@@ -470,19 +472,21 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     if(LambdaMC[iV].IsRecRec() && LambdaMC[iV].GetPDG() == 3122)          NLambdaRecRec++;
   }
 
-  for(unsigned int iLambda=0; iLambda<PF.GetLambdaMC().size(); iLambda++)
+  vector<CbmL1PFMCParticle> PFLambdaMC = PF.GetLambdaMC();
+
+  for(unsigned int iLambda=0; iLambda<PFLambdaMC.size(); iLambda++)
   {
-    PF.GetLambdaMC()[iLambda].FindCommonMC();
-    if(PF.GetLambdaMC()[iLambda].GetMCTrackID() == -1) NLambdaGhost++;
+    PFLambdaMC[iLambda].FindCommonMC();
+    if(PFLambdaMC[iLambda].GetMCTrackID() == -1) NLambdaGhost++;
     else
     {
-      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PF.GetLambdaMC()[iLambda].GetMCTrackID()))) -> GetPdgCode();
+      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PFLambdaMC[iLambda].GetMCTrackID()))) -> GetPdgCode();
       if(PDG == 3122) NLambdaReco++;
       else NLambdaBackground++;
     }
   }
 
-  NLambda += PF.GetLambdaMC().size();
+  NLambda += PF.GetLambda().size();
 
 //  cout.width (16);
   float effLambda = -1.f;
@@ -505,6 +509,53 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
                        <<NLambdaReconstructable<<"		| "
                        <<NLambdaMC<<"	| "
                        <<NLambdaBackground<<endl;
+
+  static const int NParticles = 2; //Ks, Lambda
+  static TH1F *h_part_mass[NParticles];
+
+  static bool first_call = 1;
+
+  if ( first_call )
+  {
+    first_call = 0;
+
+    histodir->cd();
+    histodir->mkdir("Particles");
+
+    gDirectory->cd("Particles");
+    {
+      struct {
+        string name;
+        string title;
+        Int_t n;
+        Double_t l,r;
+      } Table[NParticles]=
+      {
+        {"Ks",     "Ks Mass, GeV",     1000, 0.3f, 1.3f},
+        {"Lambda", "Lambda Mass, GeV", 1000, 1.0f, 2.0f},
+      };
+      for( int iPart=0; iPart<NParticles; iPart++ ){
+        h_part_mass[iPart] = new TH1F(Table[iPart].name.data(),Table[iPart].title.data(), Table[iPart].n, Table[iPart].l, Table[iPart].r);
+      }
+    }
+    gDirectory->cd("..");
+  }
+
+  for(unsigned int iKs=0; iKs<PF.GetKs().size(); iKs++)
+  {
+    Double_t M, ErrM;
+    CbmKFParticle TempPart = PF.GetKs()[iKs];
+    TempPart.GetMass(M,ErrM);
+    h_part_mass[0]->Fill(M);
+  }
+
+  for(unsigned int iLambda=0; iLambda<PF.GetLambda().size(); iLambda++)
+  {
+    Double_t M, ErrM;
+    CbmKFParticle TempPart = PF.GetLambda()[iLambda];
+    TempPart.GetMass(M,ErrM);
+    h_part_mass[1]->Fill(M);
+  }
 } // void CbmL1::ParticlesEfficienciesPerformance()
 
 void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef on match data in CbmL1**Track classes

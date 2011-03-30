@@ -407,6 +407,10 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       cout << "  " << shortSigma << " mm position resolution for short pad size direction (including x and y)" << endl;
       cout << "   " << longSigma  << " mm position resolution for long pad size direction  ('')"  << endl << endl;
     */
+
+    // temp fix of nClusters
+    fClusters->Clear("C");
+
   }
 
 

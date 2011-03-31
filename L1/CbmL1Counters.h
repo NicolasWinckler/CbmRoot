@@ -2,9 +2,11 @@
 #define CbmL1Counters_H
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <map>
 using std::ios;
+using std::setw;
 using std::vector;
 using std::map;
 

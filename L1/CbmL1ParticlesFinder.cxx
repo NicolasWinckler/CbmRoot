@@ -71,6 +71,10 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
   fElectron.clear();
   fPozitron.clear();
 
+  fPionPlusP.clear();
+  fPionMinusP.clear();
+  fPPlusP.clear();
+  fPMinusP.clear();
   fKs.clear();
   fKsMC.clear();
   fLambda.clear();
@@ -95,6 +99,7 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
               && (vRTracks[iTr].GetCovMatrix()[5] < 1. && vRTracks[iTr].GetCovMatrix()[5] > 0.)
               && (vRTracks[iTr].GetCovMatrix()[9] < 1. && vRTracks[iTr].GetCovMatrix()[9] > 0.)
               && (vRTracks[iTr].GetCovMatrix()[14] < 1. && vRTracks[iTr].GetCovMatrix()[14] > 0.);
+      ok = ok && vRTracks[iTr].chi2 < 10*vRTracks[iTr].NDF;
     if(!ok) continue;
 
     if( GetChiToVertex( vRTracks[iTr] ) < 3. ) continue;
@@ -150,15 +155,16 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
       vDaughters[1].Create(vPos,NTracks);
       CbmKFParticleInterface Temp;
       Temp.Construct(vDaughters, 2, 0);
-//      CbmKFParticleInterface Temp_topo;
-//      Temp_topo.Construct(vDaughters, 2, pvIntrface);
+      // CbmKFParticleInterface Temp_topo;
+      // Temp_topo.Construct(vDaughters, 2, pvIntrface);
 
       for(int iv=0; iv<4; iv++)
       {
-        if(!finite(Temp.GetChi2()[iv]) || !(Temp.GetChi2()[iv] > 0.0f) || !(Temp.GetChi2()[iv]==Temp.GetChi2()[iv])) continue;
-//        if(!finite(Temp_topo.GetChi2()[iv]) || !(Temp_topo.GetChi2()[iv] > 0.0f) || !(Temp_topo.GetChi2()[iv]==Temp_topo.GetChi2()[iv])) continue;
 
-        if(Temp.GetChi2()[iv]/Temp.GetNDF()[iv] < 3. /*&& Temp_topo.GetChi2()[iv]/Temp_topo.GetNDF()[iv] < 3. && Temp.GetZ()[iv] > 3.*/ && iTrP+iv < NPositive)
+        if(!finite(Temp.GetChi2()[iv]) || !(Temp.GetChi2()[iv] > 0.0f) || !(Temp.GetChi2()[iv]==Temp.GetChi2()[iv])) continue;
+        // if(!finite(Temp_topo.GetChi2()[iv]) || !(Temp_topo.GetChi2()[iv] > 0.0f) || !(Temp_topo.GetChi2()[iv]==Temp_topo.GetChi2()[iv])) continue;
+
+        if(Temp.GetChi2()[iv]/Temp.GetNDF()[iv] < 3. /*&& Temp_topo.GetChi2()[iv]/Temp_topo.GetNDF()[iv] < 3.*/ && Temp.GetZ()[iv] > 3. && iTrP+iv < NPositive)
         {
           IsSelectedPos[iTrP+iv] = 1;
           IsSelectedNeg[iTrN] = 1;
@@ -166,16 +172,44 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
       }
     }
   }
-  for(unsigned short iTrP=0; iTrP < Pos.size(); iTrP++)
-    if(IsSelectedPos[iTrP]) fPionPlus.push_back(Pos[iTrP]);
-  for(unsigned short iTrN=0; iTrN < Neg.size(); iTrN++)
-    if(IsSelectedNeg[iTrN]) fPionMinus.push_back(Neg[iTrN]);
 
-  fvec massP = 0.938272f;
+  int partId = 0;
+  for(unsigned short iTrP=0; iTrP < Pos.size(); iTrP++) {
+    if(IsSelectedPos[iTrP]) {
+      fPionPlus. push_back(Pos[iTrP]);
+      fPionPlusP.push_back(CbmKFParticle(&(Pos[iTrP])));
+      fPionPlusP.back().SetPDG(211);
+      fPionPlusP.back().SetId(partId++);
+    }
+  }
+  for(unsigned short iTrN=0; iTrN < Neg.size(); iTrN++) {
+    if(IsSelectedNeg[iTrN]) {
+      fPionMinus. push_back(Neg[iTrN]);
+      fPionMinusP.push_back(CbmKFParticle(&(Neg[iTrN])));
+      fPionMinusP.back().SetPDG(-211);
+      fPionMinusP.back().SetId(partId++);
+    }
+  }
+
+  const fvec massP = 0.938272f;
+  
   fPPlus  = fPionPlus;
   fPMinus = fPionMinus;
   fitter.Fit(fPPlus, massP);
   fitter.Fit(fPMinus, massP);
+
+  for(unsigned short iTrP=0; iTrP < fPPlus.size(); iTrP++) {
+    fPPlusP.push_back(CbmKFParticle(&(fPPlus[iTrP])));
+    fPPlusP.back().SetPDG(2212);
+    fPPlusP.back().SetId(partId++);
+  }
+  for(unsigned short iTrN=0; iTrN < fPMinus.size(); iTrN++) {
+    fPMinusP.push_back(CbmKFParticle(&(fPMinus[iTrN])));
+    fPMinusP.back().SetPDG(-2212);
+    fPMinusP.back().SetId(partId++);
+  }
+  
+
 //  std::cout << " Pos2 " << fPionPlus.size() << " Neg2 " << fPionMinus.size() << std::endl;
 }
 
@@ -189,28 +223,31 @@ void CbmL1ParticlesFinder::FindKs(TClonesArray *listMCTracks)
     unsigned short NPositive = fPionPlus.size();
     for(unsigned short iTrP=0; iTrP < NPositive; iTrP += fvecLen)
     {
-      CbmKFParticle_simd vDaughters[2] = {CbmKFParticle_simd(fPionMinus[iTrN]), CbmKFParticle_simd()};
+      CbmKFParticle_simd vDaughters[2] = {CbmKFParticle_simd(fPionMinusP[iTrN]), CbmKFParticle_simd()};
       int NTracks = (iTrP + fvecLen < NPositive) ? fvecLen : (NPositive - iTrP);
-      CbmKFTrackInterface* vPos[fvecLen];
+      CbmKFParticle* vPos[fvecLen];
       for(unsigned short iv=0; iv<NTracks; iv++)
-        vPos[iv] = &fPionPlus[iTrP+iv];
+        vPos[iv] = &fPionPlusP[iTrP+iv];
       vDaughters[1].Create(vPos,NTracks);
       CbmKFParticleInterface Ks;
+      Ks.SetPDG( 310 );
       Ks.Construct(vDaughters, 2, 0);
-//      CbmKFParticleInterface Ks_topo;
-//      Ks_topo.Construct(vDaughters, 2, pvIntrface);
+      // CbmKFParticleInterface Ks_topo;
+      // Ks_topo.SetPDG( 310 );
+      // Ks_topo.Construct(vDaughters, 2, pvIntrface);
 
       for(int iv=0; iv<NTracks; iv++)
       {
         if(!finite(Ks.GetChi2()[iv])) continue;
         if(!(Ks.GetChi2()[iv] > 0.0f)) continue;
         if(!(Ks.GetChi2()[iv]==Ks.GetChi2()[iv])) continue;
-//        if(!finite(Ks_topo.GetChi2()[iv]) || !(Ks_topo.GetChi2()[iv] > 0.0f) || !(Ks_topo.GetChi2()[iv]==Ks_topo.GetChi2()[iv])) continue;
+        // if(!finite(Ks_topo.GetChi2()[iv]) || !(Ks_topo.GetChi2()[iv] > 0.0f) || !(Ks_topo.GetChi2()[iv]==Ks_topo.GetChi2()[iv])) continue;
 
-        if( Ks.GetChi2()[iv]/Ks.GetNDF()[iv] < 3. /*&& Ks_topo.GetChi2()[iv]/Ks_topo.GetNDF()[iv] < 3. && Ks.GetZ()[iv] > 3.*/ && iTrP+iv < NPositive)
+        if( Ks.GetChi2()[iv]/Ks.GetNDF()[iv] < 3. /*&& Ks_topo.GetChi2()[iv]/Ks_topo.GetNDF()[iv] < 3.*/ && Ks.GetZ()[iv] > 3. && iTrP+iv < NPositive)
         {
           CbmKFParticle Ks_temp;
           Ks.GetKFParticle(Ks_temp, iv);
+          Ks_temp.SetId( fPionPlusP.size() + fPionMinusP.size() + fPPlusP.size() + fPMinusP.size() + fKs.size() ); // TODO
           fKs.push_back(Ks_temp);
           CbmL1PFMCParticle KsMC;
           KsMC.AddDaughterCandidates(fPionPlus[iTrP+iv].GetMCTracks());
@@ -242,6 +279,7 @@ std::cout << "P2!  " <<fPionMinus[iTrN].GetMCTracks()[0]->mother_ID<<endl;
       }
     }
   }
+
 
 /*  vector<CbmKFTrackInterface*> t1;
 
@@ -298,28 +336,32 @@ void CbmL1ParticlesFinder::FindLambda()
     unsigned short NPositive = fPPlus.size();
     for(unsigned short iTrP=0; iTrP < NPositive; iTrP += fvecLen)
     {
-      CbmKFParticle_simd vDaughters[2] = {CbmKFParticle_simd(fPionMinus[iTrN]), CbmKFParticle_simd()};
+      CbmKFParticle_simd vDaughters[2] = {CbmKFParticle_simd(fPionMinusP[iTrN]), CbmKFParticle_simd()};
       int NTracks = (iTrP + fvecLen < NPositive) ? fvecLen : (NPositive - iTrP);
-      CbmKFTrackInterface* vPos[fvecLen];
+      CbmKFParticle* vPos[fvecLen];
       for(unsigned short iv=0; iv<NTracks; iv++)
-        vPos[iv] = &fPPlus[iTrP+iv];
+        vPos[iv] = &fPPlusP[iTrP+iv];
       vDaughters[1].Create(vPos,NTracks);
       CbmKFParticleInterface Lambda;
+      Lambda.SetPDG(3122);
       Lambda.Construct(vDaughters, 2, 0);
-//      CbmKFParticleInterface Lambda_topo;
-//      Lambda_topo.Construct(vDaughters, 2, pvIntrface);
-
+	//      CbmKFParticleInterface Lambda_topo;
+        //      Lambda_topo.SetPDG(3122);
+	//      Lambda_topo.Construct(vDaughters, 2, pvIntrface);
+      
+	
       for(int iv=0; iv<NTracks; iv++)
       {
         if(!finite(Lambda.GetChi2()[iv])) continue;
         if(!(Lambda.GetChi2()[iv] > 0.0f)) continue;
         if(!(Lambda.GetChi2()[iv]==Lambda.GetChi2()[iv])) continue;
-//        if(!finite(Lambda_topo.GetChi2()[iv]) || !(Lambda_topo.GetChi2()[iv] > 0.0f) || !(Lambda_topo.GetChi2()[iv]==Lambda_topo.GetChi2()[iv])) continue;
-
+          //        if(!finite(Lambda_topo.GetChi2()[iv]) || !(Lambda_topo.GetChi2()[iv] > 0.0f) || !(Lambda_topo.GetChi2()[iv]==Lambda_topo.GetChi2()[iv])) continue;
+	
         if( Lambda.GetChi2()[iv]/Lambda.GetNDF()[iv] < 3. /*&& Lambda_topo.GetChi2()[iv]/Lambda_topo.GetNDF()[iv] < 3. && Lambda.GetZ()[iv] > 3.*/ && iTrP+iv < NPositive)
         {
           CbmKFParticle Lambda_temp;
           Lambda.GetKFParticle(Lambda_temp, iv);
+          Lambda_temp.SetId( fPionPlusP.size() + fPionMinusP.size() + fPPlusP.size() + fPMinusP.size() + fKs.size() + fLambda.size() ); // TODO
           fLambda.push_back(Lambda_temp);
           CbmL1PFMCParticle LambdaMC;
           LambdaMC.AddDaughterCandidates(fPPlus[iTrP+iv].GetMCTracks());
@@ -330,7 +372,6 @@ void CbmL1ParticlesFinder::FindLambda()
     }
   }
 }
-
 
 void CbmL1ParticlesFinder::FindParticles(vector<CbmL1Track> &vRTracks,TClonesArray *listMCTracks)
 {

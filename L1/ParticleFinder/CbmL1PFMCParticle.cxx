@@ -14,8 +14,10 @@
  */
 
 #include "CbmL1PFMCParticle.h"
+#include "CbmL1MCTrack.h"
 
-CbmL1PFMCParticle::CbmL1PFMCParticle() :isReconstructable(0),isRecRec(0),mcTrackID(-1),PDG(0)
+
+CbmL1PFMCParticle::CbmL1PFMCParticle() :isReconstructable(0),isRecRec(0),mcTrackID(-1),PDG(0),fIsReconstructable(0)
 {
 }
 
@@ -28,9 +30,16 @@ void CbmL1PFMCParticle::AddDaughter(CbmL1MCTrack* mcTrack)
   Daughters.push_back(mcTrack);
 }
 
-void CbmL1PFMCParticle::CalculateIsReconstructable(unsigned int NDaughters)
+void CbmL1PFMCParticle::AddDaughter( int i )
 {
-  if(Daughters.size() < NDaughters) isReconstructable = 0;
+  fDaughterIds.push_back(i);
+}
+
+void CbmL1PFMCParticle::CalculateIsReconstructable(unsigned int nDaughters)
+{
+  if(Daughters.size() < nDaughters) {
+    isReconstructable = 0;
+  }
   else
   {
     isReconstructable = 1;
@@ -39,9 +48,9 @@ void CbmL1PFMCParticle::CalculateIsReconstructable(unsigned int NDaughters)
   }
 }
 
-void CbmL1PFMCParticle::CalculateIsRecRec(unsigned int NDaughters)
+void CbmL1PFMCParticle::CalculateIsRecRec(unsigned int nDaughters)
 {
-  CalculateIsReconstructable(NDaughters);
+  CalculateIsReconstructable(nDaughters);
   isRecRec = isReconstructable;
   if(Daughters.size() != 0)
     for(unsigned int iV=0; iV<Daughters.size(); iV++)
@@ -116,3 +125,4 @@ void CbmL1PFMCParticle::FindCommonMC()
     }
   }
 }
+

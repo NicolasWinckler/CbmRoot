@@ -1,4 +1,3 @@
-
 #ifndef CbmKFParticleInterface_h
 #define CbmKFParticleInterface_h
 
@@ -92,6 +91,10 @@ class CbmKFParticleInterface
 
 void GetKFVertexJ(int j, CbmKFVertex *vtx);
 
+
+  void SetPDG ( fvec pdg ) { KFPart->SetPDG( pdg ); }
+  const fvec& GetPDG () const { return KFPart->GetPDG(); }
+  
  protected:
 
   fvec& Cij( Int_t i, Int_t j ){ 
@@ -106,3 +109,4 @@ void GetKFVertexJ(int j, CbmKFVertex *vtx);
 };
 
 #endif /* !CbmKFParticleInterface_h */
+

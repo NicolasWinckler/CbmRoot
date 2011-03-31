@@ -24,7 +24,7 @@ class CbmKFHit;
 class CbmKFVertexInterface;
 
 class CbmKFTrackInterface :public TObject{
-
+  
  public:  
 
   CbmKFTrackInterface(){}
@@ -64,6 +64,13 @@ class CbmKFTrackInterface :public TObject{
   Int_t Propagate( Double_t z_out, Double_t QP0 );
   Int_t Propagate( Double_t z_out );
 
+  int Id() const { return fId; };
+  void SetId( int id ){ fId = id; };
+  
+ protected:
+  
+  int fId;
+  
   ClassDef( CbmKFTrackInterface, 1 )
 };
 

@@ -16,7 +16,22 @@
 #include <vector>
 using namespace std;
 
-class CbmKFParticle:public TObject {
+class CbmKFParticle: public TObject {
+
+ public:
+  int Id() const { return fId; };
+  int NDaughters() const { return fDaughtersIds.size(); };
+  const vector<int>& DaughterIds() const { return fDaughtersIds; };
+  
+  void SetId( int id ){ fId = id; }; // should be always used (manualy)
+  void AddDaughter( int id ){ fDaughtersIds.push_back(id); };
+
+ private:
+  
+  int fId;                   // id of particle
+  vector<int> fDaughtersIds; // id of particles it created from. if size == 1 then this is id of track. TODO use in functions. why unsigned short int doesn't work???
+
+  int fPDG; // pdg hypothesis
   
  public:
 
@@ -25,7 +40,7 @@ class CbmKFParticle:public TObject {
   Double_t Chi2, Q;
   Bool_t AtProductionVertex;
 
-  CbmKFParticle(){};
+  CbmKFParticle():fId(-1){};
   CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0=0 );
 
   ~CbmKFParticle(){};
@@ -61,6 +76,9 @@ class CbmKFParticle:public TObject {
   Int_t    GetNDF  ()  const { return NDF;  }
   Double_t *GetParameters()  { return r; }
   Double_t *GetCovMatrix()   { return C; }
+
+  Bool_t GetAtProductionVertex() const { return AtProductionVertex; }
+
   
   Double_t GetParameter ( Int_t i )          const { return r[i]; }
   Double_t GetCovariance( Int_t i )          const { return C[i]; }
@@ -95,10 +113,12 @@ class CbmKFParticle:public TObject {
   void GetDecayLength( Double_t &L, Double_t &Error );
   void GetLifeTime( Double_t &T, Double_t &Error );
 
-
   void Extrapolate( Double_t r0[], double T );
   void ExtrapolateLine( Double_t r0[], double T );
 
+
+  void SetPDG ( int pdg ) { fPDG = pdg; }
+  int GetPDG () const { return fPDG; }
  protected:
 
   Double_t& Cij( Int_t i, Int_t j ){ 

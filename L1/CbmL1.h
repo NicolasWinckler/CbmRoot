@@ -20,7 +20,10 @@
 #include "CbmL1Track.h"
 #include "CbmL1Vtx.h"
 
+#include "CbmKFParticle.h"
+
 #include "CbmL1MCTrack.h"
+#include "CbmL1PFMCParticle.h"
 #include "CbmL1MCPoint.h"
 #include "CbmL1StsHit.h"
 
@@ -67,6 +70,7 @@ using std::vector;
 
 
 class L1Algo;
+class CbmL1ParticlesFinder;
 class L1FieldSlice;
 class CbmL1Track;
 class CbmL1MCTrack;
@@ -84,9 +88,10 @@ class CbmL1 : public FairTask
   private:
     CbmL1(const CbmL1&);
     CbmL1 operator=(const CbmL1&);
- public:
+  public:
 
    L1Algo *algo; // for access to L1 Algorithm from L1::Instance
+   CbmL1ParticlesFinder *PF;
 
    vector<CbmL1Track> vRTracks; // reconstructed tracks
    
@@ -102,8 +107,9 @@ class CbmL1 : public FairTask
     /**                                  Constructor
       * @param _fPerformance - type of Efficiency output: 0 - w\o efficiencies, doesn't use MC data; 1 - L1 standard efficiency definition; 2 - QA efficiency definition
       * @param fSTAPDataMode_ - way to work with files for the standalone package: 0 - off , 1 - write, 2  - read data and work only with it, 3 - write and read (debug)
+      * @param findParticleMode_ : 0 - don't run FindParticles; 1 - run, all MC particle is reco-able; 2 - run, MC particle is reco-able if created from reco-able tracks; 3 - run, MC particle is reco-able if created from reconstructed tracks
       */
-  CbmL1(const char *name, Int_t iVerbose = 1, Int_t _fPerformance = 0, int fSTAPDataMode_ = 0, TString fSTAPDataDir_ = "./");
+  CbmL1(const char *name, Int_t iVerbose = 1, Int_t _fPerformance = 0, int fSTAPDataMode_ = 0, TString fSTAPDataDir_ = "./", int findParticleMode_ = 0);
 
   ~CbmL1( /*if (targetFieldSlice) delete;*/ );
   
@@ -137,7 +143,10 @@ class CbmL1 : public FairTask
     /// Reconstruction Performance
    void TrackMatch();              // Procedure for match Reconstructed and MC Tracks. Should be called before Performances
    void EfficienciesPerformance(); // calculate efficiencies
-   void PartEffPerformance(CbmL1ParticlesFinder &PF); // calculate efficiencies
+   void GetMCParticles();          // create MC particles from MC tracks
+   void FindReconstructableMCParticles();
+   void MatchParticles();          // Procedure for match Reconstructed and MC Particles. Should be called before Performances
+   void PartEffPerformance(); // calculate efficiencies
    void TrackFitPerformance();     // pulls & residuals. Can be called only after Performance()
    void HistoPerformance();        // fill some histograms and calculate efficiencies
 
@@ -191,10 +200,19 @@ class CbmL1 : public FairTask
    vector<CbmL1MCTrack> vMCTracks;
    vector<int>          vHitMCRef; // indices of MCPoints in vMCPoints, indexed by index of hit in algo->vStsHits array. According to StsMatch. Used for IdealResponce
 
-
+  vector<CbmKFParticle> vRParticles;
+  vector<CbmL1PFMCParticle> vMCParticles;
+  vector<CbmL1TrackMatch> MCtoRParticleId; // array for match
+  vector<CbmL1TrackMatch> RtoMCParticleId; 
+  
    TDirectory *histodir;
    
    static CbmL1 *fInstance;
+
+ private:
+  void CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part); // recursive func, used in FindReconstructableMCParticles
+
+  int fFindParticlesMode;
   
    ClassDef(CbmL1,1);
 };

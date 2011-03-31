@@ -332,8 +332,421 @@ void CbmL1::EfficienciesPerformance()
   }
 } // void CbmL1::Performance()
 
-void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
+
+void CbmL1::GetMCParticles()
 {
+  vMCParticles.clear();
+    // convert
+  for(int i=0; i < listMCTracks->GetEntriesFast(); i++)
+  {
+    CbmMCTrack &mtra = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(i)));
+    CbmL1PFMCParticle part;
+    part.SetMCTrackID( i );
+    part.SetMotherId ( mtra.GetMotherId() );
+    part.SetPDG      ( mtra.GetPdgCode() );
+    vMCParticles.push_back( part );
+  }
+
+    // find relations
+  const unsigned int nParticles = vMCParticles.size();
+  for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
+    CbmL1PFMCParticle &part = vMCParticles[iP];
+    for(unsigned int iP2 = 0; iP2 < nParticles; iP2++) {
+      CbmL1PFMCParticle &part2 = vMCParticles[iP2];
+      
+      if(part.GetMotherId() == part2.GetMCTrackID()) {
+        part2.AddDaughter(iP);
+      }
+    }
+  }
+  //   // correct idices according to the new array
+  // for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
+  //   CbmL1PFMCParticle &part = vMCParticles[iP];
+  //   for(unsigned int iP2 = 0; iP2 < nParticles; iP2++) {
+  //     CbmL1PFMCParticle &part2 = vMCParticles[iP2];
+      
+  //     if(part.GetMotherId() == part2.GetMCTrackID()) {
+  //       part.SetMotherId (iP2);
+  //     }
+  //   }
+  // }
+}
+
+void CbmL1::FindReconstructableMCParticles()
+{
+  const unsigned int nParticles = vMCParticles.size();
+
+  for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
+    CbmL1PFMCParticle &part = vMCParticles[iP];
+    CheckMCParticleIsReconstructable(part);
+  }
+}
+
+void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
+{
+
+  if ( part.IsReconstructable2() ) return;
+  
+    // tracks
+  if ( /*part.NDaughters() == 0*/ part.GetPDG() == -211 ||
+                                  part.GetPDG() ==  211 ||
+                                  part.GetPDG() == 2212 ) { // TODO other particles
+    
+    switch ( fFindParticlesMode ) {
+      case 1:
+        part.SetAsReconstructable();
+        break;
+      case 2:
+        unsigned int i;
+        for ( i = 0; i < vMCTracks.size(); i++ ) // TODO opt
+          if (vMCTracks[i].ID == part.GetMCTrackID()) break;
+        if ( i != vMCTracks.size() )
+        if ( vMCTracks[i].IsReconstructable() )
+          part.SetAsReconstructable();
+        break;
+      case 3:
+//        int i;
+        for ( i = 0; i < vMCTracks.size(); i++ )
+          if (vMCTracks[i].ID == part.GetMCTrackID()) break;
+        if ( i != vMCTracks.size() )
+        if ( vMCTracks[i].IsReconstructed() )
+          part.SetAsReconstructable();
+        break;
+      default:
+        L1_assert(0);
+    };
+  }
+    //  mother particles
+  else if ( part.GetPDG() == 310 ||
+            part.GetPDG() == 3122 ) { // TODO other particles
+      // check whether all products are in MC data
+    
+    if ( part.GetPDG() == 310 ) {
+      if ( part.NDaughters() != 2 ) // reco-able Ks decay only on pi+ (211) + pi- (-211). non reco-able on pi0 (111) + pi0 (111)
+        return;
+      else {
+        const int pdg[2] = { vMCParticles[part.GetDaughterIds()[0]].GetPDG(),
+                             vMCParticles[part.GetDaughterIds()[1]].GetPDG() };
+        if ( pdg[0] != - pdg[1]  )
+          return;
+      }
+    }
+    
+    else if ( part.GetPDG() == 3122 ) {
+      if ( part.NDaughters() != 2 )   // reco-able Lambda0 decay only on p (2212) + pi- (-211). non reco - on n + pi0
+        return;
+      else {
+        const int pdg[2] = { vMCParticles[part.GetDaughterIds()[0]].GetPDG(),
+                             vMCParticles[part.GetDaughterIds()[1]].GetPDG() };
+        if (!( (pdg[0] == -211 && pdg[1] == 2212) ||
+               (pdg[0] == 2212 && pdg[1] == -211) ))
+          return;
+      }
+    }
+         
+         
+    const vector<int>& dIds = part.GetDaughterIds();
+    const unsigned int nD = dIds.size();
+    bool reco = 1;
+    for ( unsigned int iD = 0; iD < nD && reco; iD++ ) {
+      CbmL1PFMCParticle &dp = vMCParticles[dIds[iD]];
+      CheckMCParticleIsReconstructable(dp);
+      reco &= dp.IsReconstructable2();
+    }
+    if (reco) part.SetAsReconstructable();
+  
+  }
+
+}
+
+  /// Procedure for match Reconstructed and MC Particles. Should be called before Performances
+void CbmL1::MatchParticles()   // TODO currently only Ks
+{
+    // get all reco particles ( temp )
+  vRParticles.clear();
+  vRParticles = PF->GetPionPlusP();
+  for( unsigned int i = 0; i < PF->GetPionMinusP().size(); ++i ) {
+    vRParticles.push_back(PF->GetPionMinusP()[i]);
+  }
+  for( unsigned int i = 0; i < PF->GetPPlusP().size(); ++i ) {
+    vRParticles.push_back(PF->GetPPlusP()[i]);
+  }
+  for( unsigned int i = 0; i < PF->GetPMinusP().size(); ++i ) {
+    vRParticles.push_back(PF->GetPMinusP()[i]);
+  }
+  for( unsigned int i = 0; i < PF->GetKs().size(); ++i ) {
+    vRParticles.push_back(PF->GetKs()[i]);
+  }
+  for( unsigned int i = 0; i < PF->GetLambda().size(); ++i ) {
+    vRParticles.push_back(PF->GetLambda()[i]);
+  }
+
+  MCtoRParticleId.clear();
+  RtoMCParticleId.clear();
+  MCtoRParticleId.resize(vMCParticles.size());
+  RtoMCParticleId.resize(vRParticles.size() );
+  
+    // match tracks ( particles which are direct copy of tracks )
+  for( unsigned int iRP = 0; iRP < vRParticles.size(); iRP++ ) {
+    CbmKFParticle &rPart = vRParticles[iRP];
+    L1_assert( rPart.NDaughters() > 0 );
+    L1_ASSERT( static_cast<unsigned int>(rPart.Id()) == iRP, rPart.Id() << " != " << iRP );
+    if (rPart.NDaughters() != 1) continue;
+    
+    const int rTrackId = rPart.DaughterIds()[0];
+
+    if ( vRTracks[rTrackId].IsGhost() ) continue;
+    const int mcTrackId = vRTracks[rTrackId].GetMCTrack()->ID;
+
+    for ( unsigned int iMP = 0; iMP < vMCParticles.size(); iMP++ ) {
+      CbmL1PFMCParticle &mPart = vMCParticles[iMP];
+      if ( mPart.GetMCTrackID() == mcTrackId ) { // match is found
+        if( mPart.GetPDG() == rPart.GetPDG() ) {
+          MCtoRParticleId[iMP].ids.push_back(iRP);
+          RtoMCParticleId[iRP].ids.push_back(iMP);
+        }
+        else {
+          MCtoRParticleId[iMP].idsMI.push_back(iRP);
+          RtoMCParticleId[iRP].idsMI.push_back(iMP);
+        }
+      }
+    }
+  }
+
+    // match created mother particles
+  for( unsigned int iRP = 0; iRP < vRParticles.size(); iRP++ ) {
+    CbmKFParticle &rPart = vRParticles[iRP];
+    const unsigned int NRDaughters = rPart.NDaughters();
+    if (NRDaughters < 2) continue;
+    
+    unsigned int iD = 0;
+    int mmId = -2; // mother MC id
+    {
+      const int rdId = rPart.DaughterIds()[iD];
+      if ( !RtoMCParticleId[rdId].IsMatched() ) continue;
+      const int mdId = RtoMCParticleId[rdId].GetBestMatch();
+      mmId = vMCParticles[mdId].GetMotherId();
+    }
+    iD++;
+    for ( ; iD < NRDaughters; iD++ ) {
+      const int rdId = rPart.DaughterIds()[iD];
+      if ( !RtoMCParticleId[rdId].IsMatched() ) break;
+      const int mdId = RtoMCParticleId[rdId].GetBestMatch();
+      if( vMCParticles[mdId].GetMotherId() != mmId ) break;
+    }
+    if ( iD == NRDaughters && mmId != -1 ) { // match is found and it is not primary vertex
+      CbmL1PFMCParticle &mmPart = vMCParticles[mmId];
+      if( mmPart.GetPDG()     == rPart.GetPDG()     &&
+          mmPart.NDaughters() == rPart.NDaughters() ) {
+        MCtoRParticleId[mmId].ids.push_back(iRP);
+        RtoMCParticleId[iRP].ids.push_back(mmId);
+      }
+      else {
+        MCtoRParticleId[mmId].idsMI.push_back(iRP);
+        RtoMCParticleId[iRP].idsMI.push_back(mmId);
+      }
+    }
+  }
+  
+}
+
+struct TL1PartEfficiencies
+{
+  TL1PartEfficiencies():
+    names(),
+    indices(),
+    ratio_reco(),
+    mc(),
+    reco(),
+    ratio_ghost(),
+    ratio_bg(),
+    ghost(),
+    bg()
+  {
+          // add total efficiency
+    // AddCounter("piPlus"  ,"PiPlus  efficiency");
+    // AddCounter("piMinus" ,"PiMinus efficiency");
+    AddCounter("ks"           ,"KShort     ");
+    AddCounter("ks_prim"      ,"KShortPrim ");
+    AddCounter("ks_sec"       ,"KShortSec  ");
+    AddCounter("lambda"       ,"Lambda     ");
+    AddCounter("lambda_prim"  ,"LambdaPrim ");
+    AddCounter("lambda_sec"   ,"LambdaSec  ");
+  }
+  
+  virtual ~TL1PartEfficiencies(){};
+
+  virtual void AddCounter(TString shortname, TString name){
+    indices[shortname] = names.size();
+    names.push_back(name);
+    
+    ratio_reco.AddCounter();
+    mc.AddCounter();
+    reco.AddCounter();
+    
+    ratio_ghost.AddCounter();
+    ratio_bg.AddCounter();
+    ghost.AddCounter();
+    bg.AddCounter();
+  };
+  
+  TL1PartEfficiencies& operator+=(TL1PartEfficiencies& a){
+    mc += a.mc; reco += a.reco;
+    ghost += a.ghost; bg += a.bg;
+    return *this;
+  };
+  
+  void CalcEff(){
+    ratio_reco = reco/mc;
+
+    TL1TracksCatCounters<int> allReco = reco + ghost + bg;
+    ratio_ghost = ghost/allReco;
+    ratio_bg  = bg/allReco;
+  };
+  
+
+  void Inc(bool isReco, TString name)
+  {
+    const int index = indices[name];
+    
+    mc.counters[index]++;
+    if (isReco) reco.counters[index]++;
+  };
+
+  void IncReco(bool isGhost, bool isBg, TString name){
+    const int index = indices[name];
+
+    if (isGhost) ghost.     counters[index]++;
+    if (isBg)    bg.counters[index]++;
+  };
+
+  void PrintEff(){
+    cout.setf(ios::fixed);
+    cout.setf(ios::showpoint);
+    cout.precision(3);
+    cout << "Particle     : "
+         << "   Eff "
+         <<" / "<< " Ghost "
+         <<" / "<< "BackGr "
+         <<" / "<< "N Ghost"
+         <<" / "<< "N BackGr"
+         <<" / "<< "N Reco "
+         <<" | "<< "  N MC "  << endl;
+    
+    int NCounters = mc.NCounters;
+    for (int iC = 0; iC < NCounters; iC++){
+        cout << names[iC]
+             << "  : " << setw(6) << ratio_reco.counters[iC]              
+             << "  / " << setw(6) << ratio_ghost.counters[iC]  // particles w\o MCParticle
+             << "  / " << setw(6) << ratio_bg.counters[iC]     // particles with incorrect MCParticle
+             << "  / " << setw(6) << ghost.counters[iC]
+             << "  / " << setw(7) << bg.counters[iC]
+             << "  / " << setw(6) << reco.counters[iC]
+             << "  | " << setw(6) << mc.counters[iC]  << endl;
+    }
+  };
+
+ private:
+  vector<TString> names; // names counters indexed by index of counter
+  map<TString, int> indices; // indices of counters indexed by a counter shortname
+  
+  TL1TracksCatCounters<double> ratio_reco;
+  
+  TL1TracksCatCounters<int> mc;
+  TL1TracksCatCounters<int> reco;
+  
+  TL1TracksCatCounters<double> ratio_ghost;
+  TL1TracksCatCounters<double> ratio_bg;
+
+  TL1TracksCatCounters<int> ghost;
+  TL1TracksCatCounters<int> bg; // background
+};
+
+
+void CbmL1::PartEffPerformance()
+{
+    // void CbmL1::PartEffPerformance() TODO
+
+  {
+    
+    static TL1PartEfficiencies PARTEFF; // average efficiencies
+
+    static int NEVENTS               = 0;
+
+    TL1PartEfficiencies partEff; // efficiencies for current event
+
+    const int NRP = vRParticles.size();
+    for ( int iP = 0; iP < NRP; ++iP ) {
+      const CbmKFParticle &part = vRParticles[iP];
+      const int pdg = part.GetPDG();
+      
+      const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
+      const bool isGhost = !RtoMCParticleId[iP].IsMatched();
+      // if ( pdg == 211 )
+      //   partEff.IncReco(isGhost, isBG, "piPlus");
+      // if ( pdg == -211 )
+      //   partEff.IncReco(isGhost, isBG, "piMinus");
+      if ( pdg == 310 )
+        partEff.IncReco(isGhost, isBG, "ks");
+      else if ( pdg == 3122 )
+        partEff.IncReco(isGhost, isBG, "lambda");
+    }
+
+    
+    const int NMP = vMCParticles.size();
+    for ( int iP = 0; iP < NMP; ++iP ) {
+      const CbmL1PFMCParticle &part = vMCParticles[iP];
+      if ( !part.IsReconstructable2() ) continue;
+      const int pdg = part.GetPDG();
+      const int mId = part.GetMotherId();
+      
+      const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
+
+      // if ( pdg == 211 )
+      //   partEff.Inc(isReco, "piPlus");
+      // if ( pdg == -211 )
+      //   partEff.Inc(isReco, "piMinus");
+      if ( pdg == 310 ) {
+        partEff.Inc(isReco, "ks");
+        if ( mId == -1 )
+          partEff.Inc(isReco, "ks_prim");
+        else
+          partEff.Inc(isReco, "ks_sec");
+      }
+      else if ( pdg == 3122 ) {
+        partEff.Inc(isReco, "lambda");
+        if ( mId == -1 )
+          partEff.Inc(isReco, "lambda_prim");
+        else
+          partEff.Inc(isReco, "lambda_sec");
+      }
+
+    }
+
+    NEVENTS++;
+
+    PARTEFF += partEff;
+
+    partEff.CalcEff();
+    PARTEFF.CalcEff();
+
+      //   cout.precision(3);
+    if( fVerbose ){
+      cout << " ---- Particle finder --- " << endl;
+      // cout << "L1 STAT    : " << NEVENTS << " EVENT "               << endl << endl;
+      // partEff.PrintEff();
+      // cout << endl;
+      cout << "L1 ACCUMULATED STAT    : " << NEVENTS << " EVENTS "               << endl << endl;
+      PARTEFF.PrintEff();
+
+      cout<<endl;
+      // cout<<"CA Track Finder: " << L1_CATIME/L1_NEVENTS << " s/ev" << endl << endl;
+    }
+  }
+
+
+
+
   static int NKs = 0;
   static int NKsReco = 0;
   static int NKsReconstructable = 0;
@@ -356,17 +769,17 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
       NKsMC++;
     }
   }
-/*  for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
-    CbmL1MCTrack &mtra = *(mtraIt);
-    if(mtra.pdg == 310) 
-    {
-      CbmL1PFMCParticle temp_part;
-      KsMC.push_back(temp_part);
-      KsMC.back().SetMCTrackID(mtra.ID);
-      KsMC.back().SetPDG(mtra.pdg);
-      NKsMC++;
-    }
-  }*/
+  // for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
+  //   CbmL1MCTrack &mtra = *(mtraIt);
+  //   if(mtra.pdg == 310) 
+  //   {
+  //     CbmL1PFMCParticle temp_part;
+  //     KsMC.push_back(temp_part);
+  //     KsMC.back().SetMCTrackID(mtra.ID);
+  //     KsMC.back().SetPDG(mtra.pdg);
+  //     NKsMC++;
+  //   }
+  // }
   for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
     CbmL1MCTrack &mtra = *(mtraIt);
     for(unsigned int iV = 0; iV < KsMC.size(); iV++)
@@ -379,7 +792,7 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     if(KsMC[iV].IsRecRec() && KsMC[iV].GetPDG() == 310)          NKsRecRec++;
   }
 
-  vector<CbmL1PFMCParticle> PFKsMC = PF.GetKsMC();
+  vector<CbmL1PFMCParticle> PFKsMC = PF->GetKsMC();
 
   for(unsigned int iKs=0; iKs<PFKsMC.size(); iKs++)
   {
@@ -393,7 +806,7 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     }
   }
 
-  NKs += PF.GetKs().size();
+  NKs += PF->GetKs().size();
 
 //  cout.width (16);
   cout << "Particle   "<<"Efficiency,%	| "
@@ -449,17 +862,17 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
       NLambdaMC++;
     }
   }
-/*  for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
-    CbmL1MCTrack &mtra = *(mtraIt);
-    if(mtra.pdg == 310) 
-    {
-      CbmL1PFMCParticle temp_part;
-      LambdaMC.push_back(temp_part);
-      LambdaMC.back().SetMCTrackID(mtra.ID);
-      LambdaMC.back().SetPDG(mtra.pdg);
-      NLambdaMC++;
-    }
-  }*/
+  // for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
+  //   CbmL1MCTrack &mtra = *(mtraIt);
+  //   if(mtra.pdg == 310) 
+  //   {
+  //     CbmL1PFMCParticle temp_part;
+  //     LambdaMC.push_back(temp_part);
+  //     LambdaMC.back().SetMCTrackID(mtra.ID);
+  //     LambdaMC.back().SetPDG(mtra.pdg);
+  //     NLambdaMC++;
+  //   }
+  // }
   for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
     CbmL1MCTrack &mtra = *(mtraIt);
     for(unsigned int iV = 0; iV < LambdaMC.size(); iV++)
@@ -472,7 +885,7 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     if(LambdaMC[iV].IsRecRec() && LambdaMC[iV].GetPDG() == 3122)          NLambdaRecRec++;
   }
 
-  vector<CbmL1PFMCParticle> PFLambdaMC = PF.GetLambdaMC();
+  vector<CbmL1PFMCParticle> PFLambdaMC = PF->GetLambdaMC();
 
   for(unsigned int iLambda=0; iLambda<PFLambdaMC.size(); iLambda++)
   {
@@ -486,7 +899,7 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     }
   }
 
-  NLambda += PF.GetLambda().size();
+  NLambda += PF->GetLambda().size();
 
 //  cout.width (16);
   float effLambda = -1.f;
@@ -541,18 +954,18 @@ void CbmL1::PartEffPerformance(CbmL1ParticlesFinder &PF)
     gDirectory->cd("..");
   }
 
-  for(unsigned int iKs=0; iKs<PF.GetKs().size(); iKs++)
+  for(unsigned int iKs=0; iKs<PF->GetKs().size(); iKs++)
   {
     Double_t M, ErrM;
-    CbmKFParticle TempPart = PF.GetKs()[iKs];
+    CbmKFParticle TempPart = PF->GetKs()[iKs];
     TempPart.GetMass(M,ErrM);
     h_part_mass[0]->Fill(M);
   }
 
-  for(unsigned int iLambda=0; iLambda<PF.GetLambda().size(); iLambda++)
+  for(unsigned int iLambda=0; iLambda<PF->GetLambda().size(); iLambda++)
   {
     Double_t M, ErrM;
-    CbmKFParticle TempPart = PF.GetLambda()[iLambda];
+    CbmKFParticle TempPart = PF->GetLambda()[iLambda];
     TempPart.GetMass(M,ErrM);
     h_part_mass[1]->Fill(M);
   }

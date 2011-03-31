@@ -8,6 +8,7 @@
  */
 
 #include "CbmKFParticle_simd.h"
+#include "CbmKFParticle.h"
 #include "CbmKF.h"
 #include "CbmKFMath.h"
 #include "CbmKFTrack.h"
@@ -58,8 +59,73 @@ CbmKFParticle_simd::CbmKFParticle_simd()
   fIsVtxErrGuess = 0;
 }
 
+
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part) {
+  for( int i = 0; i < part.NDaughters(); ++i ) {
+    fDaughterIds.push_back( part.DaughterIds()[i] );
+  }
+  fId = part.Id();
+
+  fPDG = part.GetPDG();
+  
+  for( int i = 0; i < 8; ++i )
+    r[i] = part.GetParameters()[i];
+  for( int i = 0; i < 36; ++i )
+    C[i] = part.GetCovMatrix()[i];
+
+  NDF = part.GetNDF();
+  Chi2 = part.GetChi2();
+  Q = part.GetQ();
+  AtProductionVertex = part.GetAtProductionVertex();
+}
+
+
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle *part[]) {
+  Create(part);
+}
+
+void CbmKFParticle_simd::Create(CbmKFParticle *parts[], int N) {
+
+  { // check
+    bool ok = 1;
+    const int nD = (parts[0])->NDaughters();
+    for ( int ie = 1; ie < N; ie++ ) {
+      const CbmKFParticle &part = *(parts[ie]);
+      ok &= (parts[ie])->NDaughters() == nD;
+    }
+//    assert(ok);
+    if (!ok) {
+      std::cout << " void CbmKFParticle_simd::Create(CbmKFParticle *parts[], int N) " << std::endl;
+      exit(1);
+    }
+  }
+  
+  fDaughterIds.resize( (parts[0])->NDaughters(), fvec(-1) );
+
+  for ( int ie = 0; ie < N; ie++ ) {
+    CbmKFParticle &part = *(parts[ie]);
+
+    fId[ie] = part.Id();
+    fDaughterIds.back()[ie] = part.Id();
+
+    fPDG[ie] = part.GetPDG();
+    
+    for( int i = 0; i < 8; ++i )
+      r[i][ie] = part.GetParameters()[i];
+    for( int i = 0; i < 36; ++i )
+      C[i][ie] = part.GetCovMatrix()[i];
+
+    NDF[ie] = part.GetNDF();
+    Chi2[ie] = part.GetChi2();
+    Q[ie] = part.GetQ();
+    AtProductionVertex = part.GetAtProductionVertex(); // CHECKME
+  }
+}
+
 CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track)
 {
+  fDaughterIds.push_back( Track.Id() );
+  
   fvec m[6];
   fvec V[15];
   fvec TrMass;
@@ -161,8 +227,11 @@ void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks)
   double *m1[fvecLen];
   double *V1[fvecLen];
   CbmKFTrack *Tr[fvecLen];
+  fDaughterIds.push_back( fvec(-1) );
   for (int j=0; j<NTracks; j++)
   {
+    fDaughterIds.back()[j] =  Track[j]->Id();
+      
 //cout << "rrrrrrrrrrrrrrrr   " << Track[j].GetTrack()[0] << endl;
 
     //CbmKFTrackInterface tr_temp = *Track[j];
@@ -774,5 +843,4 @@ cout << "Bx  " << B[0]<< "By  " << B[1] << "Bz  " << B[2] << endl;
 }
 
 #undef cnst
-
 

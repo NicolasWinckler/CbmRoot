@@ -45,19 +45,19 @@ class CbmL1MCTrack
   CbmL1MCTrack(double mass, double q, TVector3 vr, TLorentzVector vp, int ID, int mother_ID, int pdg);
 //   CbmL1MCTrack(TmpMCPoints &mcPoint, TVector3 vr, TLorentzVector vp, int ID, int mother_ID);
 
-  bool IsPrimary(){return mother_ID < 0;};
-  bool IsReconstructable(){return isReconstructable;};
-  int  NStations(){return nStations;};
+  bool IsPrimary()         const {return mother_ID < 0;};
+  bool IsReconstructable() const {return isReconstructable;};
+  int  NStations()         const {return nStations;};
   
   void Init();
 
   void AddRecoTrack(CbmL1Track* rTr){rTracks.push_back(rTr);}
   vector< CbmL1Track* >&  GetRecoTracks(){ return rTracks;}
-  int  GetNClones(){ return rTracks.size() - 1;}
-  bool IsReconstructed(){ return rTracks.size(); }
+  int  GetNClones() const { return rTracks.size() - 1;}
+  bool IsReconstructed() const { return rTracks.size(); }
   
   void AddTouchTrack(CbmL1Track* tTr){tTracks.push_back(tTr);}
-  bool IsDisturbed(){ return tTracks.size(); }
+  bool IsDisturbed() const { return tTracks.size(); }
 
   friend class CbmL1;
  private:

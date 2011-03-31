@@ -68,30 +68,30 @@ class L1TrackPar{
  // =============================================================================================
 
 inline void L1TrackPar::Print(int i){
-  cout.setf(std::ios::scientific,std::ios::floatfield);
+  std::cout.setf(std::ios::scientific,std::ios::floatfield);
   if (i == -1){
-    cout << "T = " << endl;
-    cout << x  << endl;
-    cout << y  << endl;
-    cout << tx << endl;
-    cout << ty << endl;
-    cout << qp << endl;
-    cout << z  << endl;
+    std::cout << "T = " << std::endl;
+    std::cout << x  << std::endl;
+    std::cout << y  << std::endl;
+    std::cout << tx << std::endl;
+    std::cout << ty << std::endl;
+    std::cout << qp << std::endl;
+    std::cout << z  << std::endl;
   }
   else{
-    cout << "T = ";
-    cout << x[i]  << " ";
-    cout << y[i]  << " ";
-    cout << tx[i] << " ";
-    cout << ty[i] << " ";
-    cout << qp[i] << " ";
-    cout << z[i]  << endl;
-    cout << "C = ";
-    cout << C00[i]  << " ";
-    cout << C11[i]  << " ";
-    cout << C22[i]  << " ";
-    cout << C33[i]  << " ";
-    cout << C44[i]  << endl;
+    std::cout << "T = ";
+    std::cout << x[i]  << " ";
+    std::cout << y[i]  << " ";
+    std::cout << tx[i] << " ";
+    std::cout << ty[i] << " ";
+    std::cout << qp[i] << " ";
+    std::cout << z[i]  << std::endl;
+    std::cout << "C = ";
+    std::cout << C00[i]  << " ";
+    std::cout << C11[i]  << " ";
+    std::cout << C22[i]  << " ";
+    std::cout << C33[i]  << " ";
+    std::cout << C44[i]  << std::endl;
   }
 };
 

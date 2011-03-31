@@ -12,6 +12,8 @@
 
 #include "CbmKFTrackInterface.h"
 #include "CbmKFVertexInterface.h"
+//#include "CbmKFParticle.h"
+class CbmKFParticle;
 
 //#include "../L1/L1Algo/vectors/PSEUDO_F32vec1.h"
 //#include "../L1/L1Algo/vectors/PSEUDO_F32vec4.h"
@@ -29,7 +31,19 @@
 using namespace std;
 
 class CbmKFParticle_simd {
-
+  
+ public: // TODO private
+  fvec Id() const { return fId; };
+  int NDaughters() const { return fDaughterIds.size(); };
+  vector<fvec>& DaughterIds() { return fDaughterIds; };
+  
+  void SetId( fvec id ){ fId = id; };
+  void AddDaughterId( fvec id ){ fDaughterIds.push_back(id); };
+  
+ private:
+  fvec fId;                   // id of particle
+  vector<fvec> fDaughterIds; // id of particles it created from. if size == 1 then this is id of track.
+  
  public:
   void *operator new(size_t bytes) {return _mm_malloc(bytes, 16);}
   void operator delete(void *p) {_mm_free(p);}
@@ -39,12 +53,15 @@ class CbmKFParticle_simd {
   CbmKFParticle_simd();
   CbmKFParticle_simd( CbmKFTrackInterface *Track[]);
   CbmKFParticle_simd( CbmKFTrackInterface &Track);
-
+  CbmKFParticle_simd( CbmKFParticle *part[] );
+  CbmKFParticle_simd( CbmKFParticle &part );
+  
   ~CbmKFParticle_simd(){};
 
   // Construction
   void Create(CbmKFTrackInterface* Track[],int Ntracks = fvecLen);
-
+  void Create(CbmKFParticle *part[],int N = fvecLen);
+  
   // Accessors ?
 
   //* Simple accessors 
@@ -111,6 +128,9 @@ class CbmKFParticle_simd {
   void SetField();
   void SetField(CbmKFTrackInterface** Track);
 
+  void SetPDG ( fvec pdg ) { fPDG = pdg; }
+  const fvec& GetPDG () const { return fPDG; }
+  
  public:
 
   fvec r[8];
@@ -121,6 +141,8 @@ class CbmKFParticle_simd {
   fvec NDF _fvecalignment;
   fvec Chi2 _fvecalignment, Q _fvecalignment;
 
+  fvec fPDG; // PDG hypothesis
+  
   bool AtProductionVertex;
   bool fIsVtxGuess;
   bool fIsVtxErrGuess;
@@ -129,3 +151,4 @@ class CbmKFParticle_simd {
 
 } _fvecalignment;
 #endif /* !CBMKFPARTICLE_H */
+

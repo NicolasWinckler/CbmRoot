@@ -87,12 +87,14 @@ vStsHits(),
 vMCPoints(),
 vMCTracks(),
 vHitMCRef(),
-histodir(0)
+histodir(0),
+    fFindParticlesMode()
 {
   if( !fInstance ) fInstance = this;
+  PF = new CbmL1ParticlesFinder();
 }
 
-CbmL1::CbmL1(const char *name, Int_t iVerbose, Int_t _fPerformance, int fSTAPDataMode_, TString fSTAPDataDir_):FairTask(name,iVerbose),
+CbmL1::CbmL1(const char *name, Int_t iVerbose, Int_t _fPerformance, int fSTAPDataMode_, TString fSTAPDataDir_, int findParticleMode_):FairTask(name,iVerbose),
 algo(0), // for access to L1 Algorithm from L1::Instance
 
 vRTracks(), // reconstructed tracks
@@ -123,10 +125,11 @@ vStsHits(),
 vMCPoints(),
 vMCTracks(),
 vHitMCRef(),
-histodir(0)
+histodir(0),
+    fFindParticlesMode(findParticleMode_)
 {
   if( !fInstance ) fInstance = this;
-
+  PF = new CbmL1ParticlesFinder();
 }
 
 CbmL1::~CbmL1()
@@ -266,6 +269,28 @@ InitStatus CbmL1::Init()
   const int M=5; // polinom order
   const int N=(M+1)*(M+2)/2;
 
+///sdfsdf
+  FairField *dMF = CbmKF::Instance()->GetMagneticField();
+
+  fstream FileGeo;
+  FileGeo.open( "geo.dat", ios::out );
+
+  Double_t bfg[3],rfg[3];
+
+  rfg[0] = 0.; rfg[1] = 0.; rfg[2] = 0.;
+  dMF->GetFieldValue( rfg, bfg );
+  FileGeo<<rfg[2]<<" "<<bfg[0]<<" "<<bfg[1]<<" "<<bfg[2]<<" "<<endl;
+
+  rfg[0] = 0.; rfg[1] = 0.; rfg[2] = 2.5;
+  dMF->GetFieldValue( rfg, bfg );
+  FileGeo<<rfg[2]<<" "<<bfg[0]<<" "<<bfg[1]<<" "<<bfg[2]<<" "<<endl;
+
+  rfg[0] = 0.; rfg[1] = 0.; rfg[2] = 5.0;
+  dMF->GetFieldValue( rfg, bfg );
+  FileGeo<<rfg[2]<<" "<<bfg[0]<<" "<<bfg[1]<<" "<<bfg[2]<<" "<<endl<<endl;
+  FileGeo<<NStation<<endl;
+///sdfsdf
+
 
 //   { // field at the z=0 plane
 //     const double Xmax = 10, Ymax = 10;
@@ -327,6 +352,7 @@ InitStatus CbmL1::Init()
     double C[3][N];
     double z = 0;
     double Xmax, Ymax;
+fscal f_phi, f_sigma, b_phi, b_sigma; // angle and sigma front/back  side
     if( ist<NMvdStations ){
       CbmKFTube &t = CbmKF::Instance()->vMvdMaterial[ist];
       geo[ind++] = t.z;
@@ -334,7 +360,8 @@ InitStatus CbmL1::Init()
       geo[ind++] = t.r;
       geo[ind++] = t.R;
       geo[ind++] = t.RadLength;
-      fscal f_phi=0, f_sigma=5.e-4, b_phi=3.14159265358/2., b_sigma=5.e-4;
+      //fscal f_phi=0, f_sigma=5.e-4, b_phi=3.14159265358/2., b_sigma=5.e-4;
+      f_phi=0; f_sigma=5.e-4; b_phi=3.14159265358/2.; b_sigma=5.e-4;
       geo[ind++] = f_phi;
       geo[ind++] = f_sigma;
       geo[ind++] = b_phi;
@@ -351,7 +378,7 @@ InitStatus CbmL1::Init()
       geo[ind++] = st->GetRadLength();
   
       CbmStsSector* sector = st->GetSector(0);
-      fscal f_phi, f_sigma, b_phi, b_sigma; // angle and sigma front/back  side
+//      fscal f_phi, f_sigma, b_phi, b_sigma; // angle and sigma front/back  side
       f_phi = sector->GetRotation();
       b_phi = sector->GetRotation();
       if( sector->GetType()==1 ){
@@ -367,7 +394,7 @@ InitStatus CbmL1::Init()
       }
       f_sigma *= cos(f_phi);  // TODO: think about this
       b_sigma *= cos(b_phi);
-
+std::cout << " f_phi " << f_phi<<" b_phi "<<b_phi<<std::endl;
   //if( sector->GetType()==2 ){ //!! DEBUG !!
   //b_phi = sector->GetRotation() + 3.14159265358/2.;
   //b_sigma = 12./sqrt(12.);
@@ -450,6 +477,60 @@ InitStatus CbmL1::Init()
       C[2][i] = c2(i);
     }
 
+///asdasd
+
+
+  //for ( Int_t ist = 0; ist<NStation; ist++ )
+  {
+    double c_f = cos(f_phi);
+    double s_f = sin(f_phi);
+    double c_b = cos(b_phi);
+    double s_b = sin(b_phi);
+
+    double det_m = c_f*s_b - s_f*c_b;
+    det_m *=det_m;
+    double C00 = ( s_b*s_b*f_sigma*f_sigma + s_f*s_f*b_sigma*b_sigma )/det_m;
+//    double C10 =-( s_b*c_b*f_sigma*f_sigma + s_f*c_f*b_sigma*b_sigma )/det_m;
+    double C11 = ( c_b*c_b*f_sigma*f_sigma + c_f*c_f*b_sigma*b_sigma )/det_m;
+
+    float delta_x = sqrt(C00);
+    float delta_y = sqrt(C11);
+    FileGeo<<"    "<<ist<<" ";
+    if( ist<NMvdStations )
+    {
+      CbmKFTube &t = CbmKF::Instance()->vMvdMaterial[ist];
+      FileGeo<<t.z<<" ";
+      FileGeo<<t.dz<<" ";
+      FileGeo<<t.RadLength<<" ";
+      FileGeo<<delta_x<<" "; 
+      FileGeo<<delta_y<<endl;
+    }
+    else if(ist<(NStsStations+NMvdStations))
+    {
+      CbmStsStation *st = StsDigi.GetStation(ist - NMvdStations);
+      FileGeo<<st->GetZ()<<" ";
+      FileGeo<<st->GetD()<<" ";
+      FileGeo<<st->GetRadLength()<<" ";
+      FileGeo<<delta_x<<" "; 
+      FileGeo<<delta_y<<endl;
+    }
+    FileGeo<<"    "<<N<<endl;
+    FileGeo<<"       ";
+    for(int ik=0; ik<N; ik++)
+      FileGeo<< C[0][ik]<<" ";
+    FileGeo<<endl;
+    FileGeo<<"       ";
+    for(int ik=0; ik<N; ik++)
+      FileGeo<< C[1][ik]<<" ";
+    FileGeo<<endl;
+    FileGeo<<"       ";
+    for(int ik=0; ik<N; ik++)
+      FileGeo<< C[2][ik]<<" ";
+    FileGeo<<endl;
+
+  }
+///asdasd
+
     geo[ind++] = N;
     for( int k=0; k<3; k++ ){
       for( int j=0; j<N; j++) geo[ind++] = C[k][j];
@@ -472,6 +553,9 @@ InitStatus CbmL1::Init()
   }
   
   algo->Init(geo);
+///mvz start
+FileGeo.close();
+///mvz end
   return kSUCCESS;
 }
 
@@ -505,8 +589,8 @@ void CbmL1::Exec(Option_t * option)
   algo->CATrackFinder();
 //   IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-//  algo->L1KFTrackFitter();
-  algo->KFTrackFitter_simple();
+  algo->L1KFTrackFitter();
+//  algo->KFTrackFitter_simple();
   if( fVerbose>1 ) cout<<"L1 Track fitter  ok"<<endl;
   
     // save recontstructed tracks
@@ -526,6 +610,8 @@ void CbmL1::Exec(Option_t * option)
     }
     t.mass = 0.1395679; // pion mass
     t.is_electron = 0;
+
+    t.SetId(vRTracks.size());
     vRTracks.push_back(t);
   }
 
@@ -537,12 +623,23 @@ void CbmL1::Exec(Option_t * option)
     if( fVerbose>1 ) cout<<"Performance..."<<endl;
     TrackMatch();
   }
-//  PF.FindParticles(vRTracks,listMCTracks);
+
+  if ( fFindParticlesMode ) {
+      //Find Primary vertex, Ks, Lambdas,...
+    PF->FindParticles(vRTracks,listMCTracks);
+  }
+  
   if (fPerformance){
     EfficienciesPerformance();
     HistoPerformance();
     TrackFitPerformance();
-//    PartEffPerformance(PF);
+
+    if ( fFindParticlesMode ) {
+      GetMCParticles();
+      FindReconstructableMCParticles();
+      MatchParticles();
+      PartEffPerformance();
+    }
   }
   if( fVerbose>1 ) cout<<"End of L1"<<endl;
 
@@ -596,8 +693,8 @@ void CbmL1::IdealTrackFinder()
   for( vector<CbmL1MCTrack>::iterator i = vMCTracks.begin(); i != vMCTracks.end(); ++i){
     CbmL1MCTrack &MC = *i;
 
-    if (MC.IsReconstructable()) continue;
-    if (MC.ID >= 0) continue;
+    if (!MC.IsReconstructable()) continue;
+    if (!(MC.ID >= 0)) continue;
 
     L1Track algoTr;
     algoTr.NHits = MC.StsHits.size();

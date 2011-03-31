@@ -39,6 +39,7 @@ class CbmL1Track: public CbmL1TrackPar
 
     void AddMCTrack(CbmL1MCTrack* mcTr){mcTracks.push_back(mcTr);}
     vector< CbmL1MCTrack* >&  GetMCTracks(){ return mcTracks;}
+    CbmL1MCTrack* GetMCTrack(){ return mcTracks[0];}
     int  GetNMCTracks(){ return mcTracks.size();}
     bool IsGhost(){return !( mcTracks.size() );}
 
@@ -48,7 +49,7 @@ class CbmL1Track: public CbmL1TrackPar
     static bool compareChi2(const CbmL1Track &a, const CbmL1Track &b){ return (a.chi2 < b.chi2); }
     static bool comparePChi2(const CbmL1Track *a, const CbmL1Track *b){ return (a->chi2 < b->chi2); }
 
-    
+
     double TLast[6], CLast[15];
     vector<int> StsHits;
     int nStations;
@@ -56,7 +57,7 @@ class CbmL1Track: public CbmL1TrackPar
     map<int, int> hitMap; // how many hits from each mcTrack belong to current recoTrack
   private:
         // next members filled and used in Performance
-    vector< CbmL1MCTrack* >  mcTracks; // array of assosiated recoTracks
+    vector< CbmL1MCTrack* >  mcTracks; // array of assosiated recoTracks. Should be only one.
     double maxPurity; // maximum persent of hits, which belong to one mcTrack.
 };
 

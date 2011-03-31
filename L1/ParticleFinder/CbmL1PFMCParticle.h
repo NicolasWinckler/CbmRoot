@@ -16,9 +16,10 @@
 #ifndef _CbmL1PFMCParticle_h_
 #define _CbmL1PFMCParticle_h_
 
-#include "CbmL1MCTrack.h"
-
 #include <vector>
+using std::vector;
+
+class CbmL1MCTrack;
 
 struct McVector
 {
@@ -39,25 +40,52 @@ class CbmL1PFMCParticle
 
   void AddDaughterCandidates(vector< CbmL1MCTrack* >  &mcTracks);
   void AddDaughter(CbmL1MCTrack* mcTrack);
+  void AddDaughter( int i );
+  int  NDaughters() const { return fDaughterIds.size(); };
+  const vector<int>&  GetDaughterIds() const { return fDaughterIds; };
   void FindCommonMC();
 
   void SetPDG(int pdg) {PDG = pdg;}
   void SetMCTrackID(int id) {mcTrackID = id;}
-
-  int  GetMCTrackID() {return mcTrackID;}
-  int  GetPDG() {return PDG;}
-  bool IsReconstructable() {return isReconstructable;}
-  bool IsRecRec() {return isRecRec;}
-
+  void SetMotherId(int id) {fMotherId = id;}
+  
+  int  GetMCTrackID()      const {return mcTrackID;}
+  int  GetMotherId()       const {return fMotherId;}
+  int  GetPDG()            const {return PDG;}
+  bool IsReconstructable() const {return isReconstructable;} // TODO
+  bool IsRecRec()          const {return isRecRec;}
+  bool IsReconstructable2() const {return fIsReconstructable;}
+  void SetAsReconstructable() { fIsReconstructable = 1;}
+  
   void CalculateIsReconstructable(unsigned int NDaughters = 2);
   void CalculateIsRecRec(unsigned int NDaughters = 2);
-
+  
+  vector< CbmL1MCTrack* > Daughters; // TODO rid of me
  private: //data
   vector< McVector >  mcDaughtersCandidates;
-  vector< CbmL1MCTrack* > Daughters;
-  bool isReconstructable;
+
+  vector< int > fDaughterIds;
+  bool isReconstructable; // TODO rid of me
   bool isRecRec; //all daughters are reconstructable and reconstructed
   int mcTrackID; //MC track, which corresponds to the particle
+  int fMotherId; // index in L1 array of mother particle
   int PDG;
+  
+  bool fIsReconstructable;
+
 };
+
+struct CbmL1TrackMatch // used for Reco to MC match as well as for MC to Reco
+{
+  bool IsMatched() const { return ids.size() != 0 || idsMI.size() != 0; };
+  int  GetBestMatch() const { 
+    if      (ids.size()   != 0) return ids[0];
+    else if (idsMI.size() != 0) return idsMI[0];
+    else return -1;
+  };
+  vector<int> ids;
+  vector<int> idsMI; // matched but pdg is different - miss identification
+};
+
 #endif
+

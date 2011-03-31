@@ -1,4 +1,3 @@
-
 #include "CbmKFParticleInterface.h"
 
 #define cnst static const fvec
@@ -38,6 +37,11 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
   //fvec *r = KFPart->GetParameters();
   //fvec *C = KFPart->GetCovMatrix();
 
+  for( int tr=0; tr<NDaughters; tr++ )
+  {
+    KFPart->AddDaughterId( vDaughters[tr].Id() );
+  }
+  
   if(!(KFPart->fIsVtxGuess))
   {
     fvec Ty[NDaughters],Y[NDaughters],Z[NDaughters];
@@ -1025,6 +1029,12 @@ void CbmKFParticleInterface::GetKFVertexJ(int j, CbmKFVertex *vtx)
 
 void CbmKFParticleInterface::GetKFParticle(CbmKFParticle &Part, int iPart)
 {
+  Part.SetId(KFPart->Id()[iPart]);
+  for( int i = 0; i < KFPart->DaughterIds().size(); i++ )
+    Part.AddDaughter(KFPart->DaughterIds()[i][iPart]);
+
+  Part.SetPDG( KFPart->GetPDG()[iPart] );
+  
   for(int iP=0; iP<8; iP++)
     Part.GetParameters()[iP] = KFPart->GetParameters()[iP][iPart];
   for(int iC=0; iC<36; iC++)

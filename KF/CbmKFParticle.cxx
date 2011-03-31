@@ -23,6 +23,8 @@ ClassImp(CbmKFParticle)
 
 CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0){
 
+  fDaughtersIds.push_back( Track->Id() );
+  
   CbmKFTrack Tr( *Track );
   
   Double_t *m = Tr.GetTrack();
@@ -1417,3 +1419,4 @@ Double_t CbmKFParticle::GetDStoPoint( const Double_t xyz[] ) const
   return dS;
   //return sqrt(dx*dx+dy*dy+dz*dz);
 }
+

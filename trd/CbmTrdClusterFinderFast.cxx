@@ -135,8 +135,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
     }
   }
   //optimization ist only usefull if rowClusters are merged !!!
-  Float_t minimumChargeTH = 5e-03;
-  Float_t mChargeTH[57] = { 0.004,//0.003, 
+  Float_t minimumChargeTH = 3e-03;
+  Float_t mChargeTH[57] = { 0.003, 
 			    /*2e-06,*/ //for gausssian distributed charge
 			    0, 
 			    1e-06, 2e-06, 3e-06, 4e-06, 5e-06, 6e-06, 7e-06, 8e-06, 9e-06,

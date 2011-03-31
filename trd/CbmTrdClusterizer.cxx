@@ -1007,7 +1007,7 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
   }
   for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
     for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
-      fPadCharge[iPRow][iPCol] /= normalizationFactor/16000;
+      fPadCharge[iPRow][iPCol] /= normalizationFactor/10000;
       totalCharge += fPadCharge[iPRow][iPCol];
       fPadCharge[iPRow][iPCol] *= SliceELoss;
       //Test2->Fill(iPCol,iPRow,fPadCharge[iPRow][iPCol]);
@@ -1149,7 +1149,7 @@ void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
   //normalizationFactor = 1;
   for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
     for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {   
-      fPadCharge[iPRow][iPCol] /= normalizationFactor/16000;
+      fPadCharge[iPRow][iPCol] /= normalizationFactor/10000;
       totalCharge += fPadCharge[iPRow][iPCol];
       fPadCharge[iPRow][iPCol] *= SliceELoss;
     }

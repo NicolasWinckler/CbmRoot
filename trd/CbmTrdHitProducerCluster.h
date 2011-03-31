@@ -65,12 +65,12 @@ class CbmTrdHitProducerCluster : public FairTask
   void Register();
 
  private:
-  Int_t GetSector(Bool_t x, Int_t DigiCol, ModulePara* mPara);
+  Int_t GetSector(Bool_t x, Int_t DigiCol/*, ModulePara* mPara*/);
   void GetModuleInfo(Int_t qMaxIndex, MyHit* hit/*, MHitMap* ModuleHitMap*/, TH2F*& PRF);
-  void SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds, ModulePara* mPara, MyDigiList *neighbours, MyHit* hit, TH2F*& PRF);
+  void SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds/*, ModulePara* mPara*/, MyDigiList *neighbours, MyHit* hit, TH2F*& PRF);
   Float_t Prf(Float_t padWidth, Float_t sigma, Float_t qLeft, Float_t qMax, Float_t qRight);
-  void PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit, TH2F*& PRF);
-  void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/, TH2F*& PRF);
+  void PrfReco(Int_t qMaxIndex, Float_t qMax/*, ModulePara* mPara*/, Int_t *neighbourIds, MyHit* hit, TH2F*& PRF);
+  void SimpleReco(Int_t qMaxIndex, Float_t qMax/*, ModulePara* mPara*/, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/, TH2F*& PRF);
   void DrawHits();
   void CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F* longPR[20], TLegend*& legend, TH2F*& PRF, MyHit *hit);
   void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
@@ -88,6 +88,32 @@ class CbmTrdHitProducerCluster : public FairTask
   Int_t fPrfSingleRecoCounter;
   Int_t fPrfDoubleRecoCounter;
   Int_t fSimpleRecoCounter;
+
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Int_t fStation;
+  Int_t fLayer;
+  Int_t fmoduleId;
+  Int_t fxPos;
+  Int_t fyPos;
+  Int_t fzPos;
+  Int_t fnCol;
+  Int_t fnRow;
+  Int_t fNoSectors;
+  
+  std::vector<Float_t> fSectorSizeX;
+  std::vector<Float_t> fSectorSizeY;
+  std::vector<Float_t> fPadSizeX;
+  std::vector<Float_t> fPadSizeY;
+  std::vector<Int_t> fSecCol;
+  std::vector<Int_t> fSecRow;
+  std::vector<Int_t> fPadSizeXArray;
+  std::vector<Int_t> fPadSizeYArray;
+   
+  Float_t fModuleSize[3];
+  Float_t fModulePosition[3];
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
   std::map<Int_t,Int_t> fPadSizeLongMap;
 

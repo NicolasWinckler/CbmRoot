@@ -626,7 +626,8 @@ void CbmL1::Exec(Option_t * option)
 
   if ( fFindParticlesMode ) {
       //Find Primary vertex, Ks, Lambdas,...
-    PF->FindParticles(vRTracks,listMCTracks);
+    PF->FindParticles(vRTracks);
+    vRParticles = PF->GetParticles();
   }
   
   if (fPerformance){
@@ -639,6 +640,7 @@ void CbmL1::Exec(Option_t * option)
       FindReconstructableMCParticles();
       MatchParticles();
       PartEffPerformance();
+      PartHistoPerformance();
     }
   }
   if( fVerbose>1 ) cout<<"End of L1"<<endl;

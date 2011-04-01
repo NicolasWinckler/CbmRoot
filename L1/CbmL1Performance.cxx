@@ -385,7 +385,7 @@ void CbmL1::FindReconstructableMCParticles()
 void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
 {
 
-  if ( part.IsReconstructable2() ) return;
+  if ( part.IsReconstructable() ) return;
   
     // tracks
   if ( /*part.NDaughters() == 0*/ part.GetPDG() == -211 ||
@@ -451,7 +451,7 @@ void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
     for ( unsigned int iD = 0; iD < nD && reco; iD++ ) {
       CbmL1PFMCParticle &dp = vMCParticles[dIds[iD]];
       CheckMCParticleIsReconstructable(dp);
-      reco &= dp.IsReconstructable2();
+      reco &= dp.IsReconstructable();
     }
     if (reco) part.SetAsReconstructable();
   
@@ -460,27 +460,9 @@ void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
 }
 
   /// Procedure for match Reconstructed and MC Particles. Should be called before Performances
-void CbmL1::MatchParticles()   // TODO currently only Ks
+void CbmL1::MatchParticles()
 {
     // get all reco particles ( temp )
-  vRParticles.clear();
-  vRParticles = PF->GetPionPlusP();
-  for( unsigned int i = 0; i < PF->GetPionMinusP().size(); ++i ) {
-    vRParticles.push_back(PF->GetPionMinusP()[i]);
-  }
-  for( unsigned int i = 0; i < PF->GetPPlusP().size(); ++i ) {
-    vRParticles.push_back(PF->GetPPlusP()[i]);
-  }
-  for( unsigned int i = 0; i < PF->GetPMinusP().size(); ++i ) {
-    vRParticles.push_back(PF->GetPMinusP()[i]);
-  }
-  for( unsigned int i = 0; i < PF->GetKs().size(); ++i ) {
-    vRParticles.push_back(PF->GetKs()[i]);
-  }
-  for( unsigned int i = 0; i < PF->GetLambda().size(); ++i ) {
-    vRParticles.push_back(PF->GetLambda()[i]);
-  }
-
   MCtoRParticleId.clear();
   RtoMCParticleId.clear();
   MCtoRParticleId.resize(vMCParticles.size());
@@ -665,269 +647,89 @@ struct TL1PartEfficiencies
 
 void CbmL1::PartEffPerformance()
 {
-    // void CbmL1::PartEffPerformance() TODO
-
-  {
     
-    static TL1PartEfficiencies PARTEFF; // average efficiencies
+  static TL1PartEfficiencies PARTEFF; // average efficiencies
 
-    static int NEVENTS               = 0;
+  static int NEVENTS               = 0;
 
-    TL1PartEfficiencies partEff; // efficiencies for current event
+  TL1PartEfficiencies partEff; // efficiencies for current event
 
-    const int NRP = vRParticles.size();
-    for ( int iP = 0; iP < NRP; ++iP ) {
-      const CbmKFParticle &part = vRParticles[iP];
-      const int pdg = part.GetPDG();
+  const int NRP = vRParticles.size();
+  for ( int iP = 0; iP < NRP; ++iP ) {
+    const CbmKFParticle &part = vRParticles[iP];
+    const int pdg = part.GetPDG();
       
-      const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
-      const bool isGhost = !RtoMCParticleId[iP].IsMatched();
+    const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
+    const bool isGhost = !RtoMCParticleId[iP].IsMatched();
       // if ( pdg == 211 )
       //   partEff.IncReco(isGhost, isBG, "piPlus");
       // if ( pdg == -211 )
       //   partEff.IncReco(isGhost, isBG, "piMinus");
-      if ( pdg == 310 )
-        partEff.IncReco(isGhost, isBG, "ks");
-      else if ( pdg == 3122 )
-        partEff.IncReco(isGhost, isBG, "lambda");
-    }
+    if ( pdg == 310 )
+      partEff.IncReco(isGhost, isBG, "ks");
+    else if ( pdg == 3122 )
+      partEff.IncReco(isGhost, isBG, "lambda");
+  }
 
     
-    const int NMP = vMCParticles.size();
-    for ( int iP = 0; iP < NMP; ++iP ) {
-      const CbmL1PFMCParticle &part = vMCParticles[iP];
-      if ( !part.IsReconstructable2() ) continue;
-      const int pdg = part.GetPDG();
-      const int mId = part.GetMotherId();
+  const int NMP = vMCParticles.size();
+  for ( int iP = 0; iP < NMP; ++iP ) {
+    const CbmL1PFMCParticle &part = vMCParticles[iP];
+    if ( !part.IsReconstructable() ) continue;
+    const int pdg = part.GetPDG();
+    const int mId = part.GetMotherId();
       
-      const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
+    const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
 
       // if ( pdg == 211 )
       //   partEff.Inc(isReco, "piPlus");
       // if ( pdg == -211 )
       //   partEff.Inc(isReco, "piMinus");
-      if ( pdg == 310 ) {
-        partEff.Inc(isReco, "ks");
-        if ( mId == -1 )
-          partEff.Inc(isReco, "ks_prim");
-        else
-          partEff.Inc(isReco, "ks_sec");
-      }
-      else if ( pdg == 3122 ) {
-        partEff.Inc(isReco, "lambda");
-        if ( mId == -1 )
-          partEff.Inc(isReco, "lambda_prim");
-        else
-          partEff.Inc(isReco, "lambda_sec");
-      }
-
+    if ( pdg == 310 ) {
+      partEff.Inc(isReco, "ks");
+      if ( mId == -1 )
+        partEff.Inc(isReco, "ks_prim");
+      else
+        partEff.Inc(isReco, "ks_sec");
+    }
+    else if ( pdg == 3122 ) {
+      partEff.Inc(isReco, "lambda");
+      if ( mId == -1 )
+        partEff.Inc(isReco, "lambda_prim");
+      else
+        partEff.Inc(isReco, "lambda_sec");
     }
 
-    NEVENTS++;
+  }
 
-    PARTEFF += partEff;
+  NEVENTS++;
 
-    partEff.CalcEff();
-    PARTEFF.CalcEff();
+  PARTEFF += partEff;
 
-      //   cout.precision(3);
-    if( fVerbose ){
-      cout << " ---- Particle finder --- " << endl;
+  partEff.CalcEff();
+  PARTEFF.CalcEff();
+
+    //   cout.precision(3);
+  if( fVerbose ){
+    cout << " ---- Particle finder --- " << endl;
       // cout << "L1 STAT    : " << NEVENTS << " EVENT "               << endl << endl;
       // partEff.PrintEff();
       // cout << endl;
-      cout << "L1 ACCUMULATED STAT    : " << NEVENTS << " EVENTS "               << endl << endl;
-      PARTEFF.PrintEff();
+    cout << "L1 ACCUMULATED STAT    : " << NEVENTS << " EVENTS "               << endl << endl;
+    PARTEFF.PrintEff();
 
-      cout<<endl;
+    cout<<endl;
       // cout<<"CA Track Finder: " << L1_CATIME/L1_NEVENTS << " s/ev" << endl << endl;
-    }
   }
-
-
-
-
-  static int NKs = 0;
-  static int NKsReco = 0;
-  static int NKsReconstructable = 0;
-  static int NKsRecRec = 0;
-  static int NKsMC = 0;
-  static int NKsGhost = 0;
-  static int NKsBackground = 0;
-
-  vector <CbmL1PFMCParticle> KsMC;
-
-  for(int i=0; i< listMCTracks->GetEntriesFast(); i++)
-  {
-    CbmMCTrack &mtra = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(i)));
-    if(mtra.GetPdgCode() == 310) 
-    {
-      CbmL1PFMCParticle temp_part;
-      KsMC.push_back(temp_part);
-      KsMC.back().SetMCTrackID(i);
-      KsMC.back().SetPDG(mtra.GetPdgCode());
-      NKsMC++;
-    }
-  }
-  // for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
-  //   CbmL1MCTrack &mtra = *(mtraIt);
-  //   if(mtra.pdg == 310) 
-  //   {
-  //     CbmL1PFMCParticle temp_part;
-  //     KsMC.push_back(temp_part);
-  //     KsMC.back().SetMCTrackID(mtra.ID);
-  //     KsMC.back().SetPDG(mtra.pdg);
-  //     NKsMC++;
-  //   }
-  // }
-  for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
-    CbmL1MCTrack &mtra = *(mtraIt);
-    for(unsigned int iV = 0; iV < KsMC.size(); iV++)
-      if(mtra.mother_ID == KsMC[iV].GetMCTrackID()) KsMC[iV].AddDaughter(&mtra);
-  }
-  for(unsigned int iV = 0; iV < KsMC.size(); iV++)
-  {
-    KsMC[iV].CalculateIsRecRec(2);
-    if(KsMC[iV].IsReconstructable() && KsMC[iV].GetPDG() == 310) NKsReconstructable++;
-    if(KsMC[iV].IsRecRec() && KsMC[iV].GetPDG() == 310)          NKsRecRec++;
-  }
-
-  vector<CbmL1PFMCParticle> PFKsMC = PF->GetKsMC();
-
-  for(unsigned int iKs=0; iKs<PFKsMC.size(); iKs++)
-  {
-    PFKsMC[iKs].FindCommonMC();
-    if(PFKsMC[iKs].GetMCTrackID() == -1) NKsGhost++;
-    else
-    {
-      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PFKsMC[iKs].GetMCTrackID()))) -> GetPdgCode();
-      if(PDG == 310) NKsReco++;
-      else NKsBackground++;
-    }
-  }
-
-  NKs += PF->GetKs().size();
-
-//  cout.width (16);
-  cout << "Particle   "<<"Efficiency,%	| "
-                       <<"RecRecEff,%	| "
-                       <<"Rec Eff,%	| "
-                       <<"Backgr,%	| "
-                       <<"Ghosts,%	| "
-                       <<"NReco	| "
-                       <<"NRecRec	| "
-                       <<"NMCRec	| "
-                       <<"NMC	| "
-                       <<"NBkg"<<endl;
-  float effKs = -1.f;
-  float receffKs = -1.f;
-  float recreceffKs = -1.f;
-  float bkgKs = -1.f;
-  float ghostKs = -1.f;
-  if(NKsMC > 0) effKs = static_cast<double>(NKsReco)/static_cast<double>(NKsMC)*100.;
-  if(NKsRecRec > 0) recreceffKs = static_cast<double>(NKsReco)/static_cast<double>(NKsRecRec)*100.;
-  if(NKsReconstructable > 0) receffKs = static_cast<double>(NKsReco)/static_cast<double>(NKsReconstructable)*100.;
-  if(NKs > 0) bkgKs = static_cast<double>(NKsBackground)/static_cast<double>(NKs)*100.;
-  if(NKs > 0) ghostKs = static_cast<double>(NKsGhost)/static_cast<double>(NKs)*100.;
-  cout << "Ks         "<<effKs<<"	| "
-                       <<recreceffKs<<"	| "
-                       <<receffKs<<"	| "
-                       <<bkgKs<<"	| "
-                       <<ghostKs<<"	| "
-                       <<NKsReco<<"	| "
-                       <<NKsRecRec<<"		| "
-                       <<NKsReconstructable<<"		| "
-                       <<NKsMC<<"	| "
-                       <<NKsBackground<<endl;
-  // Lambda
-  static int NLambda = 0;
-  static int NLambdaReco = 0;
-  static int NLambdaReconstructable = 0;
-  static int NLambdaRecRec = 0;
-  static int NLambdaMC = 0;
-  static int NLambdaGhost = 0;
-  static int NLambdaBackground = 0;
-
-  vector <CbmL1PFMCParticle> LambdaMC;
-
-  for(int i=0; i< listMCTracks->GetEntriesFast(); i++)
-  {
-    CbmMCTrack &mtra = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(i)));
-    if(mtra.GetPdgCode() == 3122) 
-    {
-      CbmL1PFMCParticle temp_part;
-      LambdaMC.push_back(temp_part);
-      LambdaMC.back().SetMCTrackID(i);
-      LambdaMC.back().SetPDG(mtra.GetPdgCode());
-      NLambdaMC++;
-    }
-  }
-  // for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
-  //   CbmL1MCTrack &mtra = *(mtraIt);
-  //   if(mtra.pdg == 310) 
-  //   {
-  //     CbmL1PFMCParticle temp_part;
-  //     LambdaMC.push_back(temp_part);
-  //     LambdaMC.back().SetMCTrackID(mtra.ID);
-  //     LambdaMC.back().SetPDG(mtra.pdg);
-  //     NLambdaMC++;
-  //   }
-  // }
-  for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
-    CbmL1MCTrack &mtra = *(mtraIt);
-    for(unsigned int iV = 0; iV < LambdaMC.size(); iV++)
-      if(mtra.mother_ID == LambdaMC[iV].GetMCTrackID()) LambdaMC[iV].AddDaughter(&mtra);
-  }
-  for(unsigned int iV = 0; iV < LambdaMC.size(); iV++)
-  {
-    LambdaMC[iV].CalculateIsRecRec(2);
-    if(LambdaMC[iV].IsReconstructable() && LambdaMC[iV].GetPDG() == 3122) NLambdaReconstructable++;
-    if(LambdaMC[iV].IsRecRec() && LambdaMC[iV].GetPDG() == 3122)          NLambdaRecRec++;
-  }
-
-  vector<CbmL1PFMCParticle> PFLambdaMC = PF->GetLambdaMC();
-
-  for(unsigned int iLambda=0; iLambda<PFLambdaMC.size(); iLambda++)
-  {
-    PFLambdaMC[iLambda].FindCommonMC();
-    if(PFLambdaMC[iLambda].GetMCTrackID() == -1) NLambdaGhost++;
-    else
-    {
-      int PDG = (L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(PFLambdaMC[iLambda].GetMCTrackID()))) -> GetPdgCode();
-      if(PDG == 3122) NLambdaReco++;
-      else NLambdaBackground++;
-    }
-  }
-
-  NLambda += PF->GetLambda().size();
-
-//  cout.width (16);
-  float effLambda = -1.f;
-  float receffLambda = -1.f;
-  float recreceffLambda = -1.f;
-  float bkgLambda = -1.f;
-  float ghostLambda = -1.f;
-  if(NLambdaMC > 0) effLambda = static_cast<double>(NLambdaReco)/static_cast<double>(NLambdaMC)*100.;
-  if(NLambdaRecRec > 0) recreceffLambda = static_cast<double>(NLambdaReco)/static_cast<double>(NLambdaRecRec)*100.;
-  if(NLambdaReconstructable > 0) receffLambda = static_cast<double>(NLambdaReco)/static_cast<double>(NLambdaReconstructable)*100.;
-  if(NLambda > 0) bkgLambda = static_cast<double>(NLambdaBackground)/static_cast<double>(NLambda)*100.;
-  if(NLambda > 0) ghostLambda = static_cast<double>(NLambdaGhost)/static_cast<double>(NLambda)*100.;
-  cout << "Lambda     "<<effLambda<<"	| "
-                       <<recreceffLambda<<"	| "
-                       <<receffLambda<<"	| "
-                       <<bkgLambda<<"	| "
-                       <<ghostLambda<<"	| "
-                       <<NLambdaReco<<"	| "
-                       <<NLambdaRecRec<<"		| "
-                       <<NLambdaReconstructable<<"		| "
-                       <<NLambdaMC<<"	| "
-                       <<NLambdaBackground<<endl;
-
+}
+  
+void CbmL1::PartHistoPerformance()
+{
   static const int NParticles = 2; //Ks, Lambda
   static TH1F *h_part_mass[NParticles];
-
+  
   static bool first_call = 1;
-
+  
   if ( first_call )
   {
     first_call = 0;
@@ -954,20 +756,25 @@ void CbmL1::PartEffPerformance()
     gDirectory->cd("..");
   }
 
-  for(unsigned int iKs=0; iKs<PF->GetKs().size(); iKs++)
+  for(unsigned int iP=0; iP < vRParticles.size(); iP++)
   {
-    Double_t M, ErrM;
-    CbmKFParticle TempPart = PF->GetKs()[iKs];
-    TempPart.GetMass(M,ErrM);
-    h_part_mass[0]->Fill(M);
-  }
-
-  for(unsigned int iLambda=0; iLambda<PF->GetLambda().size(); iLambda++)
-  {
-    Double_t M, ErrM;
-    CbmKFParticle TempPart = PF->GetLambda()[iLambda];
-    TempPart.GetMass(M,ErrM);
-    h_part_mass[1]->Fill(M);
+    switch( vRParticles[iP].GetPDG() ) {
+      case 310:
+      {
+        Double_t M, ErrM;
+        CbmKFParticle TempPart = vRParticles[iP];
+        TempPart.GetMass(M,ErrM);
+        h_part_mass[0]->Fill(M);
+      }
+      break;
+      case 3122:
+      {
+        Double_t M, ErrM;
+        CbmKFParticle TempPart = vRParticles[iP];
+        TempPart.GetMass(M,ErrM);
+        h_part_mass[1]->Fill(M);
+      }
+    }
   }
 } // void CbmL1::ParticlesEfficienciesPerformance()
 

@@ -38,41 +38,31 @@ class CbmL1PFMCParticle
   CbmL1PFMCParticle();
   ~CbmL1PFMCParticle();
 
-  void AddDaughterCandidates(vector< CbmL1MCTrack* >  &mcTracks);
-  void AddDaughter(CbmL1MCTrack* mcTrack);
   void AddDaughter( int i );
   int  NDaughters() const { return fDaughterIds.size(); };
   const vector<int>&  GetDaughterIds() const { return fDaughterIds; };
   void FindCommonMC();
 
-  void SetPDG(int pdg) {PDG = pdg;}
-  void SetMCTrackID(int id) {mcTrackID = id;}
+  void SetPDG(int pdg) {fPDG = pdg;}
+  void SetMCTrackID(int id) {fMCTrackID = id;}
   void SetMotherId(int id) {fMotherId = id;}
   
-  int  GetMCTrackID()      const {return mcTrackID;}
+  int  GetMCTrackID()      const {return fMCTrackID;}
   int  GetMotherId()       const {return fMotherId;}
-  int  GetPDG()            const {return PDG;}
-  bool IsReconstructable() const {return isReconstructable;} // TODO
-  bool IsRecRec()          const {return isRecRec;}
-  bool IsReconstructable2() const {return fIsReconstructable;}
+  int  GetPDG()            const {return fPDG;}
+  bool IsReconstructable() const {return fIsReconstructable;}
   void SetAsReconstructable() { fIsReconstructable = 1;}
   
   void CalculateIsReconstructable(unsigned int NDaughters = 2);
   void CalculateIsRecRec(unsigned int NDaughters = 2);
   
-  vector< CbmL1MCTrack* > Daughters; // TODO rid of me
  private: //data
-  vector< McVector >  mcDaughtersCandidates;
-
-  vector< int > fDaughterIds;
-  bool isReconstructable; // TODO rid of me
-  bool isRecRec; //all daughters are reconstructable and reconstructed
-  int mcTrackID; //MC track, which corresponds to the particle
-  int fMotherId; // index in L1 array of mother particle
-  int PDG;
+  vector<int> fDaughterIds;
+  int fMCTrackID; // sim id of MC track, which corresponds to the particle
+  int fMotherId;  // index in L1 array of mother particle
+  int fPDG;
   
   bool fIsReconstructable;
-
 };
 
 struct CbmL1TrackMatch // used for Reco to MC match as well as for MC to Reco

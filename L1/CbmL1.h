@@ -149,6 +149,7 @@ class CbmL1 : public FairTask
    void PartEffPerformance(); // calculate efficiencies
    void TrackFitPerformance();     // pulls & residuals. Can be called only after Performance()
    void HistoPerformance();        // fill some histograms and calculate efficiencies
+   void PartHistoPerformance();    // histograms for particle finder
 
       /// STandAlone Package service-functions
    void WriteSTAPGeoData(void *geo, int size); // create geo_algo.dat
@@ -200,14 +201,14 @@ class CbmL1 : public FairTask
    vector<CbmL1MCTrack> vMCTracks;
    vector<int>          vHitMCRef; // indices of MCPoints in vMCPoints, indexed by index of hit in algo->vStsHits array. According to StsMatch. Used for IdealResponce
 
-  vector<CbmKFParticle> vRParticles;
-  vector<CbmL1PFMCParticle> vMCParticles;
+  vector<CbmKFParticle>  vRParticles;      // reco particles
+  vector<CbmL1PFMCParticle> vMCParticles;  // MC particles
   vector<CbmL1TrackMatch> MCtoRParticleId; // array for match
   vector<CbmL1TrackMatch> RtoMCParticleId; 
   
-   TDirectory *histodir;
+  TDirectory *histodir;
    
-   static CbmL1 *fInstance;
+  static CbmL1 *fInstance;
 
  private:
   void CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part); // recursive func, used in FindReconstructableMCParticles

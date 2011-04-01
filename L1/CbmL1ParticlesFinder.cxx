@@ -158,7 +158,7 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
   for(unsigned short iTrP=0; iTrP < Pos.size(); iTrP++) {
     if(IsSelectedPos[iTrP]) {
       fPionPlus.push_back(Pos[iTrP]);
-      CbmKFParticle tmp(CbmKFParticle(&(Pos[iTrP])));
+      CbmKFParticle tmp = static_cast<CbmL1Track*>(&(Pos[iTrP]));
       tmp.SetPDG(211);
       tmp.SetId(fParticles.size());
       fParticles.push_back(tmp);
@@ -167,7 +167,7 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
   for(unsigned short iTrN=0; iTrN < Neg.size(); iTrN++) {
     if(IsSelectedNeg[iTrN]) {
       fPionMinus.push_back(Neg[iTrN]);
-      CbmKFParticle tmp(CbmKFParticle(&(Neg[iTrN])));
+      CbmKFParticle tmp = static_cast<CbmL1Track*>(&(Neg[iTrN]));
       tmp.SetPDG(-211);
       tmp.SetId(fParticles.size());
       fParticles.push_back(tmp);
@@ -182,13 +182,13 @@ void CbmL1ParticlesFinder::SelectCandidates(vector<CbmL1Track> &vRTracks)
   fitter.Fit(fPMinus, massP);
 
   for(unsigned short iTrP=0; iTrP < fPPlus.size(); iTrP++) {
-    CbmKFParticle tmp(CbmKFParticle(&(fPPlus[iTrP])));
+    CbmKFParticle tmp = static_cast<CbmL1Track*>(&(fPPlus[iTrP]));
     tmp.SetPDG(2212);
     tmp.SetId(fParticles.size());
     fParticles.push_back(tmp);
   }
   for(unsigned short iTrN=0; iTrN < fPMinus.size(); iTrN++) {
-    CbmKFParticle tmp(CbmKFParticle(&(fPMinus[iTrN])));
+    CbmKFParticle tmp = static_cast<CbmL1Track*>(&(fPMinus[iTrN]));
     tmp.SetPDG(-2212);
     tmp.SetId(fParticles.size());
     fParticles.push_back(tmp);

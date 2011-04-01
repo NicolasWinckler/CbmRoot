@@ -695,12 +695,12 @@ void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
 // -------------------------------------------------------------------------
 
 // -----   Private method GetPadByDigi  ------------------------------------
-CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex,
-    UInt_t &charge) {
+CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, UInt_t &charge) {
   CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(digiIndex);
   CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
   if (digi) {
-    charge = match->GetTotalCharge();
+//    charge = match->GetTotalCharge();
+    charge = digi->GetADCCharge();
 
     Int_t detectorId = digi->GetDetectorId();
     Long64_t channelId = digi->GetChannelId();
@@ -782,8 +782,7 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     Double_t xPad = pad->GetX0();
     Double_t x;
     Bool_t exists = false;
-    for (map<Double_t, UInt_t>::iterator it = chargesX.begin(); it
-        != chargesX.end(); ++it) {
+    for (map<Double_t, UInt_t>::iterator it = chargesX.begin(); it != chargesX.end(); ++it) {
       x = (*it).first;
       if (TMath::Abs(x - xPad) < 1e-5) {
         exists = true;
@@ -837,16 +836,15 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
   Bool_t increase = true;
   vector<Double_t> xMin, xMax;
   Double_t previous = std::numeric_limits<Double_t>::max();
-  for (map<Double_t, UInt_t>::iterator it = chargesX.begin(); it
-      != chargesX.end(); ++it) {
+  for (map<Double_t, UInt_t>::iterator it = chargesX.begin(); it!= chargesX.end(); ++it) {
     Double_t x = (*it).first;
     UInt_t q = (*it).second;
-    if (increase != q > charge) {
+    if (increase != q >= charge) {
       assert(previous <= x);
       if (!increase) xMin.push_back(previous);
       else xMax.push_back(previous);
     }
-    increase = q > charge;
+    increase = q >= charge;
     charge = q;
 
     previous = x;
@@ -871,12 +869,12 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
       != chargesY.end(); ++it) {
     Double_t y = (*it).first;
     Int_t q = (*it).second;
-    if (increase != q > charge) {
+    if (increase != q >= charge) {
       assert(previous <= y);
       if (!increase) yMin.push_back(previous);
       else yMax.push_back(previous);
     }
-    increase = q > charge;
+    increase = q >= charge;
     charge = q;
 
     previous = y;

@@ -414,9 +414,6 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       cout << "   " << longSigma  << " mm position resolution for long pad size direction  ('')"  << endl << endl;
     */
 
-    // temp fix of nClusters
-    fClusters->Clear("C");
-    fClusterHits->Clear("C");
   }
 
 
@@ -480,6 +477,10 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   fPadSizeLongMap.clear();
   ModuleHitMap.clear();
   moduleDigiMap.clear();
+
+    // temp fix of nClusters
+    //fClusters->Clear("C");
+    //fClusterHits->Clear("C");
 }
 
 

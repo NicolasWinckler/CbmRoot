@@ -675,7 +675,7 @@ void CbmMuchHitFinderQa::FinishTask(){
 
 // -------------------------------------------------------------------------
 Double_t LandauMPV(Double_t *lg_x, Double_t *par) {
-  Double_t gaz_gain_mean=1.e+4;
+  Double_t gaz_gain_mean=1.7e+4;
   Double_t scale=1.e+6;
   gaz_gain_mean/=scale;
   Double_t mass = par[0]; // mass in MeV

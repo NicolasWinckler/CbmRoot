@@ -28,7 +28,7 @@ public:
   *@param name   Name of class
   *@param title  Task title
   **/
-  CbmAnaDimuonHisto(const char* name, TString histoFileName);
+  CbmAnaDimuonHisto(const char* name, TString histoFileName, Int_t nMixedEvents);
 
   /** Destructor **/
   virtual ~CbmAnaDimuonHisto();

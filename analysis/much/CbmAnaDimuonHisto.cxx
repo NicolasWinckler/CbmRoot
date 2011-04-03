@@ -20,8 +20,6 @@
 #include "FairRuntimeDb.h"
 #include "FairRunAna.h"
 
-#define NEVENTS 1000
-
 // -----   Default constructor   -------------------------------------------
 CbmAnaDimuonHisto::CbmAnaDimuonHisto(){
   
@@ -30,7 +28,7 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto(){
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName)
+CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName, Int_t nMixedEvents)
 :FairTask(name){
   fMmin = 0.7;
   fMmax = 0.9;
@@ -38,13 +36,13 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName)
   fMminCut = 0.78259-2*0.0083;
   fMmaxCut = 0.78259+2*0.0083;
   fHistoFileName=histoFileName;
-  fMuchHitsCut=13;
-  fStsHitsCut=8;
-  fChiToVertexCut=3.;
+  fMuchHitsCut=1;
+  fStsHitsCut=1;
+  fChiToVertexCut=101.;
   fMultiplicity=38;
   fBranching=9.e-5;
-  fSignalPairs=15;
-  fNoMixedEv=NEVENTS;
+  fSignalPairs=10;
+  fNoMixedEv=nMixedEvents;
 }
 
 // -------------------------------------------------------------------------
@@ -108,18 +106,6 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
  
   for (Int_t iDimuon=0;iDimuon<nDimuons;iDimuon++){
     CbmAnaDimuonCandidate* dimuon = (CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon);
-    for (Int_t sign=0;sign<2;sign++){
-      CbmAnaMuonCandidate* mu = dimuon->GetMu(sign);
-//      printf("mu(%2i,%i) planes: ",iDimuon,sign);
-      Int_t* points = mu->GetMuchPoints();
-      Int_t* hits   = mu->GetMuchHits();
-//      for (Int_t iPlane=0;iPlane<NPLANES;iPlane++){
-//        if (points[iPlane]>=0) printf("%2i",iPlane); else printf("  ");
-//        if (hits[iPlane]>=0)  printf("!",iPlane); else printf(" ");
-//      }
-//      printf("\n");
-    }//sign
-//    printf("%f\n",dimuon->GetMomentumMC().M());
     fDimuonMmc->Fill(dimuon->GetMomentumMC().M());
     if (!dimuon->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     fDimuonMrc->Fill(dimuon->GetMomentumRC().M());
@@ -128,20 +114,21 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
   for (Int_t iMuP=0;iMuP<nMuons;iMuP++){
     CbmAnaMuonCandidate* muP = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuP);
     if (muP->GetSign()<0) continue;
+//    printf("%i %i %f\n",muP->GetNMuchHits(),muP->GetNStsHits(),muP->GetChiToVertex());
     if (!muP->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     TLorentzVector pP = TLorentzVector(*(muP->GetMomentumRC()));
 //    printf("%f\n",pP.P());
     for (Int_t ev=fEvent+1; ev<fEvent+1+fNoMixedEv;ev++){
-      if (ev<NEVENTS) fTree->GetEntry(ev);
-      else            fTree->GetEntry(ev-NEVENTS);
+      if (ev<fNoMixedEv) fTree->GetEntry(ev);
+      else               fTree->GetEntry(ev-fNoMixedEv);
 //      printf("%f\n",pP.P());
       for (Int_t iMuN=0;iMuN<fMuCandidates->GetEntriesFast();iMuN++){
         CbmAnaMuonCandidate* muN = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuN);
         if (muN->GetSign()>0) continue;
         if (!muN->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
-        TLorentzVector* pN = muN->GetMomentumRC();
-        //printf("%f\n",pN->P());
-        fBgdM->Fill(((*pN)+pP).M());
+        TLorentzVector &pN = *muN->GetMomentumRC();
+//        printf("%f\n",pN.P());
+        fBgdM->Fill((pN+pP).M());
       } // negative muons
     } // events
     fTree->GetEntry(fEvent);

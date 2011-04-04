@@ -479,7 +479,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   moduleDigiMap.clear();
 
     // temp fix of nClusters
-    //fClusters->Clear("C");
+    fClusters->Clear("C");
     //fClusterHits->Clear("C");
 }
 

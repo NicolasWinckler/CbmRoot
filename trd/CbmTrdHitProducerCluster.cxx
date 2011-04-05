@@ -256,7 +256,8 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       moduleDigiMap[moduleId] = new MyDigiList;      
     } 
     moduleDigiMap[moduleId]->push_back(d);
-    
+
+    delete d;    
   }
   for (std::map<Int_t, MyDigiList*>::iterator it = moduleDigiMap.begin(); it != moduleDigiMap.end(); ++it) {
     (*it).second->sort(digiCidSorter);
@@ -1659,5 +1660,11 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   {
     //cout << " * CbmTrdHitProducerCluster * :: Finish()" << endl;
   }
+
+// -----   Public method EndOfEvent   --------------------------------------
+void CbmTrdHitProducerCluster::EndOfEvent() {
+  fClusterHits->Clear();
+}
+// -------------------------------------------------------------------------
 
   ClassImp(CbmTrdHitProducerCluster)

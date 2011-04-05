@@ -450,6 +450,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     
     iDigi++;
   }
+  delete point;
   //cout << nCount << endl;
   timer.Stop();
   Double_t rtime = timer.RealTime();

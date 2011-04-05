@@ -264,6 +264,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	    } 
 	    modules[moduleId]->push_back(d);
 	  }
+	delete d;
       }
       cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
       std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
@@ -593,5 +594,11 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyD
 void CbmTrdClusterFinderFast::Finish()
 {
 }
+
+// -----   Public method EndOfEvent   --------------------------------------
+void CbmTrdClusterFinderFast::EndOfEvent() {
+  fClusters->Clear("C");
+}
+// -------------------------------------------------------------------------
 
 ClassImp(CbmTrdClusterFinderFast)

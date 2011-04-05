@@ -60,6 +60,13 @@ class CbmTrdHitProducerCluster : public FairTask
   /** Executed task **/
   virtual void Exec(Option_t * option);
 
+  /** Virtual method EndOfEvent
+   **
+   ** Reset hit collection at the
+   ** end of the event.
+   **/
+  virtual void EndOfEvent();
+
   /** Finish task **/
   virtual void Finish();
   void Register();

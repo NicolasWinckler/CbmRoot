@@ -27,6 +27,7 @@ CbmTrdDigiPar::CbmTrdDigiPar(const char* name,
 // -----   Destructor   ----------------------------------------------------
 CbmTrdDigiPar::~CbmTrdDigiPar() 
 {
+  fModuleMap.clear();
   clear();
 }
 // -------------------------------------------------------------------------
@@ -140,7 +141,8 @@ Bool_t CbmTrdDigiPar::getParams(FairParamList* l) {
 					    padSizeX, padSizeY);
   }
 
-    return kTRUE;
+  delete values;
+  return kTRUE;
 }
 
 

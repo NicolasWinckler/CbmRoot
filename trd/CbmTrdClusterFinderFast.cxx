@@ -177,6 +177,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       DigiChargeSpectrum->GetYaxis()->SetTitleOffset(2);
       //DigiChargeSpectrum->SetMarkerStyle(4);
     }
+  MyDigi *d;
+
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
       minimumChargeTH = mChargeTH[iChargeTH];
@@ -225,8 +227,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	Int_t Station  = detInfo[1];
 	Int_t Layer    = detInfo[2];
 
-	
-	MyDigi *d = new MyDigi;
+	//      	MyDigi *d = new MyDigi;
+      	d = new MyDigi;
 	    
 	fModuleInfo = fDigiPar->GetModule(moduleId);
 	d->digiId = iDigi;
@@ -264,7 +266,6 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	    } 
 	    modules[moduleId]->push_back(d);
 	  }
-	//	delete d;
       }
       cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
       std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
@@ -307,11 +308,23 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	}
 	delete it->second;
       }
+      for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin();
+           it != modules.end(); ++it) {
+	/*
+	for (MyDigiList::iterator digisIt = it->second->begin(); 
+	     digisIt != it->second->end(); ++digisIt) {
+	    delete *digisIt;
+	  }
+	*/
+	delete it->second;
+      }
+      modules.clear();
       if (optimization)
 	{
 	  OptimalTH->Fill(mChargeTH[iChargeTH],ClusterSum);
 	}
     } //for (iChargeTH)
+     delete d;
   if (optimization)
     {
       TCanvas* c = new TCanvas ("c","c",1600,800);

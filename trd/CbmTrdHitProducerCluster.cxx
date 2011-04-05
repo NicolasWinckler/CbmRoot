@@ -68,6 +68,7 @@ CbmTrdHitProducerCluster::~CbmTrdHitProducerCluster()
   if(fModuleInfo){
     delete fModuleInfo;
   }
+  fLayersBeforeStation.clear();
 }
 
 // ----  Initialisation  ----------------------------------------------
@@ -257,7 +258,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     } 
     moduleDigiMap[moduleId]->push_back(d);
 
-    delete d;    
+    //    delete d;    
   }
   for (std::map<Int_t, MyDigiList*>::iterator it = moduleDigiMap.begin(); it != moduleDigiMap.end(); ++it) {
     (*it).second->sort(digiCidSorter);
@@ -476,7 +477,23 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   printf("*********************************************************\n\n");
 
   fPadSizeLongMap.clear();
+  /*
+  for (std::map<Int_t, MyHitList*>::iterator it1 = ModuleHitMap.begin(); it1 != ModuleHitMap.end(); ++it1) {
+    for (MyHitList::iterator hitIt = it1->second->begin(); 
+	 hitIt != it1->second->end(); ++hitIt) {
+      delete *It;
+    }
+   delete it1->second;
+  }
+  */
   ModuleHitMap.clear();
+  for (std::map<Int_t, MyDigiList*>::iterator it1 = moduleDigiMap.begin(); it1 != moduleDigiMap.end(); ++it1) {
+    for (MyDigiList::iterator digisIt = it1->second->begin(); 
+	 digisIt != it1->second->end(); ++digisIt) {
+      delete *digisIt;
+    }
+   delete it1->second;
+  }
   moduleDigiMap.clear();
 
     // temp fix of nClusters

@@ -467,6 +467,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     // ---- FinishTask-----------------------------------------------------
 void CbmTrdClusterizer::FinishEvent()
 {
+  for (fDigiMapIt = fDigiMap.begin();
+       fDigiMapIt != fDigiMap.end(); ++fDigiMapIt) {
+    delete fDigiMapIt->second;
+  }
   fDigiMap.clear();
   if ( fDigiCollection ) fDigiCollection->Clear();
   if ( fDigiMatchCollection ) fDigiMatchCollection->Clear();

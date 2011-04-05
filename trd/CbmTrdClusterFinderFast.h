@@ -78,12 +78,12 @@ class CbmTrdClusterFinderFast : public FairTask
   /** Executed task **/
   virtual void Exec(Option_t * option);
 
-  /** Virtual method EndOfEvent
+  /** Virtual method FinishEvent
    **
    ** Reset cluster collection at the
    ** end of the event.
    **/
-  virtual void EndOfEvent();
+  virtual void FinishEvent();
 
   /** Finish task **/
   virtual void Finish();

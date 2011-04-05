@@ -480,7 +480,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   moduleDigiMap.clear();
 
     // temp fix of nClusters
-    fClusters->Clear("C");
+//    fClusters->Clear("C");
     //fClusterHits->Clear("C");
 }
 
@@ -1662,8 +1662,9 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   }
 
 // -----   Public method EndOfEvent   --------------------------------------
-void CbmTrdHitProducerCluster::EndOfEvent() {
-  fClusterHits->Clear();
+void CbmTrdHitProducerCluster::FinishEvent() {
+  //  cout<<"In CbmTrdHitProducerCluster::FinishEvent()"<<endl;
+  if (fClusterHits) fClusterHits->Clear();
 }
 // -------------------------------------------------------------------------
 

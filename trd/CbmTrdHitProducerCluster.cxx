@@ -286,6 +286,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     {
       //cout << iCluster << endl;
       CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
+      fClusterId = iCluster;
       //cout << "NoDigis:" << cluster->GetNDigis() << endl;
       nDigi = cluster->GetNDigis();
       qMax = 0;
@@ -1656,7 +1657,7 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
 					   pos,
 					   dpos,
 					   dxy,
-					   iHit,
+					   fClusterId,//iHit,
 					   planeId,
 					   eLossTR,
 					   eLossdEdx,

@@ -107,6 +107,7 @@ class CbmTrdHitProducerCluster : public FairTask
   Int_t fnCol;
   Int_t fnRow;
   Int_t fNoSectors;
+  Int_t fClusterId;
   
   std::vector<Float_t> fSectorSizeX;
   std::vector<Float_t> fSectorSizeY;

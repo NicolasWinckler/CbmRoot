@@ -141,6 +141,10 @@ void CbmLitFindMvdTracks::ConvertOutputData()
          track->AddMvdHit(refId, hit);
       }
       track->SortMvdHits();
+
+      FairTrackParam parFirst;
+      CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parFirst);
+      track->SetParamFirst(parFirst);
    }
 }
 

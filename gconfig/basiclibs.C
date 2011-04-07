@@ -15,5 +15,5 @@ void basiclibs()
   gSystem->Load("libPluto");  
   gSystem->Load("libMinuit");
   gSystem->Load("libMLP");
-
+  gSystem->Load("libFairTools");
 }  

@@ -177,7 +177,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       DigiChargeSpectrum->GetYaxis()->SetTitleOffset(2);
       //DigiChargeSpectrum->SetMarkerStyle(4);
     }
-  MyDigi *d;
+  //  MyDigi *d;
 
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
@@ -227,8 +227,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	Int_t Station  = detInfo[1];
 	Int_t Layer    = detInfo[2];
 
-	//      	MyDigi *d = new MyDigi;
-      	d = new MyDigi;
+	MyDigi *d = new MyDigi;
+      	//d = new MyDigi;
 	    
 	fModuleInfo = fDigiPar->GetModule(moduleId);
 	d->digiId = iDigi;
@@ -266,6 +266,13 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	    } 
 	    modules[moduleId]->push_back(d);
 	  }
+	// Since the pointer is stored in a stl container which is used later out of the scope of this loop
+	// the pointer is set to NULL here to make clear that the objects must deleted elswhere. If the objects 
+	// are not deleted later this is a perfect memory leak. 
+	// The problem here is that the pointers are stored in several stl containers, so one has to use the stl
+	// container holding all pointers to delete the objects. 
+	d = NULL;
+	//	delete d;
       }
       cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
       std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
@@ -296,18 +303,36 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       /*
        * clean up
        */
+      // Here is now the point to delete all objects which are stored in stl containers. 
+      // ModuleNeighbourDigiMap hols all pointers to objects of type MyDigi, so this is
+      // the correct container to delete all of them. For the other stl containers one
+      // has only to delete the lists and not the MyDigi stored in the lists.
+      for (std::map<Int_t, MyDigiList*>::iterator it =  ModuleNeighbourDigiMap.begin(); 
+	   it !=  ModuleNeighbourDigiMap.end(); ++it) {
+	for (MyDigiList::iterator digisIt = it->second->begin(); 
+	     digisIt != it->second->end(); ++digisIt) {
+	  delete *digisIt;
+	}
+	delete it->second;
+      }
+      ModuleNeighbourDigiMap.clear();
+
       for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
 	   it != fModClusterMap.end(); ++it) {
 	for (ClusterList::iterator clusterIt = it->second->begin(); 
 	     clusterIt != it->second->end(); ++clusterIt) {
+	  /*
 	  for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
 	       digisIt != (*clusterIt)->end(); ++digisIt) {
 	    delete *digisIt;
 	  }
+	  */
 	  delete *clusterIt;
 	}
 	delete it->second;
       }
+      fModClusterMap.clear();
+      
       for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin();
            it != modules.end(); ++it) {
 	/*
@@ -324,7 +349,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	  OptimalTH->Fill(mChargeTH[iChargeTH],ClusterSum);
 	}
     } //for (iChargeTH)
-     delete d;
+  //     delete d;
   if (optimization)
     {
       TCanvas* c = new TCanvas ("c","c",1600,800);

@@ -478,15 +478,9 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   printf("*********************************************************\n\n");
 
   fPadSizeLongMap.clear();
-  /*
-  for (std::map<Int_t, MyHitList*>::iterator it1 = ModuleHitMap.begin(); it1 != ModuleHitMap.end(); ++it1) {
-    for (MyHitList::iterator hitIt = it1->second->begin(); 
-	 hitIt != it1->second->end(); ++hitIt) {
-      delete *It;
-    }
-   delete it1->second;
+  for (std::map<Int_t, MyHitList*>::iterator it2 = ModuleHitMap.begin(); it2 != ModuleHitMap.end(); ++it2) {
+    it2->second->clear();
   }
-  */
   ModuleHitMap.clear();
   for (std::map<Int_t, MyDigiList*>::iterator it1 = moduleDigiMap.begin(); it1 != moduleDigiMap.end(); ++it1) {
     for (MyDigiList::iterator digisIt = it1->second->begin(); 

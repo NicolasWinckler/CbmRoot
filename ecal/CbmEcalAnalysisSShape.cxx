@@ -224,7 +224,7 @@ CbmEcalAnalysisSShape::CbmEcalAnalysisSShape(const char* name, const Int_t iVerb
 InitStatus CbmEcalAnalysisSShape::Init()
 {
   FairRootManager* fManager=FairRootManager::Instance();
-  fMCPoints=(TClonesArray*)fManager->ActivateBranch("EcalPoint");
+  fMCPoints=(TClonesArray*)fManager->GetObject("EcalPoint");
   if (fMCPoints==NULL)
   {
     cerr << "There are no EcalPoint branch in the file!!!" << endl;

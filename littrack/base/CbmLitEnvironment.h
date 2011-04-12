@@ -94,6 +94,9 @@ public:
    /* Returns true if STS detector exists in TGeo. */
    bool IsSts() const;
 
+   /* Returns true if RICH detector exists in TGeo. */
+   bool IsRich() const;
+
    /* Returns true if TRD detector exists in TGeo. */
    bool IsTrd() const;
 

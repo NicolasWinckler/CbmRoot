@@ -219,6 +219,13 @@ private:
       TCanvas* c,
       std::vector<TH1F*>& histos);
 
+   /* Draws histogram of number of hits in station
+    * @name Canvas name
+    * @hist Pointer to histogram */
+   void DrawHitsStationHisto(
+   		const std::string& name,
+   		TH1F* hist);
+
    /* Draws histograms of number of hits in station */
    void DrawHitsStationHistos();
 
@@ -242,6 +249,7 @@ private:
    Bool_t fIsElectronSetup; // If "electron" setup detected than true
    Bool_t fIsMvd; // If MVD detected than true
    Bool_t fIsSts; // If STS detected than true
+   Bool_t fIsRich; // If RICH detected than true
    Bool_t fIsTrd; // If TRD detected than true
    Bool_t fIsMuch; // If MUCH detected than true
    Bool_t fIsTof; // If TOF detected than true
@@ -269,6 +277,8 @@ private:
    TClonesArray* fMvdHitMatches; // CbmMvdHitMatch array
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
+   TClonesArray* fStsHits; // CbmStsHit array
+   TClonesArray* fRichHits; // CbmRichHits array
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
    TClonesArray* fMuchMatches; // CbmTrackMatch array
@@ -305,6 +315,7 @@ private:
    TH1F* fhRecGhostNh;
 
    TH1F* fhMvdNofHitsInStation; // mean number of hits in station in MVD
+   TH1F* fhStsNofHitsInStation; // mean number of hits in station in STS
    TH1F* fhTrdNofHitsInStation; // mean number of hits in station in TRD
    TH1F* fhMuchNofHitsInStation; // mean number of hits in station in MUCH
    TH1F* fhTofNofHitsInStation; // mean number of hits in station in TOF

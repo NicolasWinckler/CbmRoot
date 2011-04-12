@@ -852,6 +852,11 @@ bool CbmLitEnvironment::IsSts() const
    return CheckDetectorPresence("sts");
 }
 
+bool CbmLitEnvironment::IsRich() const
+{
+   return CheckDetectorPresence("rich");
+}
+
 bool CbmLitEnvironment::IsTrd() const
 {
    return CheckDetectorPresence("trd");

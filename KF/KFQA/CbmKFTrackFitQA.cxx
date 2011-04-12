@@ -61,10 +61,10 @@ CbmKFTrackFitQA::CbmKFTrackFitQA()
   pull_MVDhit_y   = new TH1F("pull_MVDhit_y", "pull_MVDhit_y", 100, -5., 5.);
 
 
-  res_AtPV_x  = new TH1F("residual_AtPV_x", "residual_AtPV_x", 200, -0.04, 0.04);
-  res_AtPV_x  -> GetXaxis() -> SetTitle ("dX, um");
-  res_AtPV_y  = new TH1F("residual_AtPV_y", "residual_AtPV_y", 200, -0.04, 0.04);
-  res_AtPV_y  -> GetXaxis() -> SetTitle ("dY, um");
+  res_AtPV_x  = new TH1F("residual_AtPV_x", "residual_AtPV_x", 2000, -1., 1.);
+  res_AtPV_x  -> GetXaxis() -> SetTitle ("dX, cm");
+  res_AtPV_y  = new TH1F("residual_AtPV_y", "residual_AtPV_y", 2000, -1., 1.);
+  res_AtPV_y  -> GetXaxis() -> SetTitle ("dY, cm");
   res_AtPV_tx = new TH1F("residual_AtPV_tx", "residual_AtPV_tx", 200, -0.004, 0.004);
   res_AtPV_tx -> GetXaxis() -> SetTitle ("dtx");
   res_AtPV_ty = new TH1F("residual_AtPV_ty", "residual_AtPV_ty", 200, -0.004, 0.004);
@@ -200,7 +200,10 @@ void CbmKFTrackFitQA::Exec(Option_t * option)
      CbmMCTrack* MCTrack = (CbmMCTrack*)listMCTracks->At(StsTrackMatch->GetMCTrackId());
      CbmKFTrack KFTrack(*StsTrack);
      FillHistoAtFirstPoint(&MCTrackSortedArray[StsTrackMatch->GetMCTrackId()], MCTrack, &KFTrack);
-//        FillHistoAtParticleVertex(MCTrack, KFTrack);
+     if(MCTrack->GetP() >= 1 && MCTrack->GetMotherId()==-1 && MCTrackSortedArray[StsTrackMatch->GetMCTrackId()].MvdArray.size()>1)
+     {
+       FillHistoAtParticleVertex(MCTrack, &KFTrack);
+     }
   }
 }
 void CbmKFTrackFitQA::Finish()
@@ -226,26 +229,41 @@ void CbmKFTrackFitQA::FillHistoAtParticleVertex(CbmMCTrack *track_mc, CbmKFTrack
     qtrack = TDatabasePDG::Instance()->GetParticle(track_mc->GetPdgCode())->Charge()/3.0;
   else    qtrack = 0;
 
-  //differences of the KF track and MC track parameters calculation
-  Double_t ddx = fT[0] - track_mc->GetStartX();                // The difference between the x coordinates of the reconstructed and MC tracks
-  Double_t ddy = fT[1] - track_mc->GetStartY();                // The difference between the y coordinates of the reconstructed and MC tracks
-  Double_t ddtx = fT[2] - track_mc->GetPx()/track_mc->GetPz(); // The difference between the tx coordinates of the reconstructed and MC tracks
-  Double_t ddty = fT[3] - track_mc->GetPy()/track_mc->GetPz(); // The difference between the ty coordinates of the reconstructed and MC tracks
-  Double_t ddqp = fT[4] - (qtrack/track_mc->GetP());       // The difference between the qp coordinates of the reconstructed and MC tracks
+    Double_t PointPx = track_mc->GetPx();
+    Double_t PointPy = track_mc->GetPy();
+    Double_t PointPz = track_mc->GetPz();
+    Double_t P_mc = sqrt(PointPx*PointPx+PointPy*PointPy+PointPz*PointPz);
 
-  //differences of the KF track and MC track parameters
-  res_AtPV_x  -> Fill(ddx);
-  res_AtPV_y  -> Fill(ddy);
-  res_AtPV_tx -> Fill(ddtx);
-  res_AtPV_ty -> Fill(ddty);
-  res_AtPV_qp -> Fill(ddqp);
+    //differences of the KF track and MC track parameters calculation
+    Double_t ddx = fT[0] - track_mc->GetStartX();                         // The difference between x coordinates of the reconstructed and MC tracks
+    Double_t ddy = fT[1] - track_mc->GetStartY();                         // The difference between y coordinates of the reconstructed and MC tracks
+    Double_t ddtx = fT[2] - PointPx/PointPz;                             // The difference between tx of the reconstructed and MC tracks
+    Double_t ddty = fT[3] - PointPy/PointPz;        // The difference between ty of the reconstructed and MC tracks
+    Double_t ddqp = (fabs(1./fT[4]) - P_mc)/P_mc;  // p resolution
+    Double_t ddqp_p = fT[4] - (qtrack/sqrt(PointPx*PointPx+PointPy*PointPy+PointPz*PointPz));  //p residual
 
-  //pulls of the parameters
-  pull_AtPV_x  -> Fill(ddx/sqrt(fC[0]));
-  pull_AtPV_y  -> Fill(ddy/sqrt(fC[2]));
-  pull_AtPV_tx -> Fill(ddtx/sqrt(fC[5]));
-  pull_AtPV_ty -> Fill(ddty/sqrt(fC[9]));
-  pull_AtPV_qp -> Fill(ddqp/sqrt(fC[14]));
+    //differences of the KF track and MC track parameters
+    res_AtPV_x  -> Fill(ddx);
+    res_AtPV_y  -> Fill(ddy);
+    res_AtPV_tx -> Fill(ddtx);
+    res_AtPV_ty -> Fill(ddty);
+    if(finite(fT[4]) && (fabs(fT[4]) > 1.e-20)) res_AtPV_qp -> Fill(ddqp);
+    //pulls of the parameters
+    if( finite(fC[0])  && fC[0]>0  ) pull_AtPV_x  -> Fill(ddx/sqrt(fC[0]));
+    if( finite(fC[2])  && fC[2]>0  ) pull_AtPV_y  -> Fill(ddy/sqrt(fC[2]));
+    if( finite(fC[5])  && fC[5]>0  ) pull_AtPV_tx -> Fill(ddtx/sqrt(fC[5]));
+    if( finite(fC[9])  && fC[9]>0  ) pull_AtPV_ty -> Fill(ddty/sqrt(fC[9]));
+    if( finite(fC[14]) && fC[14]>0 ) pull_AtPV_qp -> Fill(ddqp_p/sqrt(fC[14]));
+
+    if(finite(fT[4]) && (fabs(fT[4]) > 1.e-20))
+    {
+      if(qtrack == (fabs(fT[4])/fT[4]))
+        q_QA->Fill(P_mc, 100.0);
+      else
+        q_QA->Fill(P_mc, 0.0);
+
+      if( finite(fC[14]) && fC[14]>0 ) dp_p-> Fill(P_mc,fabs(1./fT[4])*sqrt(fC[14])*100,1);
+    }
 }
 
 void CbmKFTrackFitQA::FillHistoAtFirstPoint(CbmKFTrErrMCPoints *mc_points, CbmMCTrack *track_mc, CbmKFTrack *track_kf)
@@ -348,7 +366,7 @@ void CbmKFTrackFitQA::Write()
   if (outfileName.IsNull()) outfileName = "outCbmTrackError.root";
 
   TFile* fout = new TFile(outfileName.Data(),"Recreate");
-/*
+
   //differences of the KF track and MC track parameters
   res_AtPV_x  -> Write();
   res_AtPV_y  -> Write();
@@ -362,7 +380,7 @@ void CbmKFTrackFitQA::Write()
   pull_AtPV_ty -> Write();
   pull_AtPV_qp -> Write();
   //differences of the KF track and MC track parameters
-*/
+
   res_AtFP_x  -> Write();
   res_AtFP_y  -> Write();
   res_AtFP_tx -> Write();
@@ -454,6 +472,7 @@ void CbmKFTrackFitQA::FillHitHistos()
     }
   }
   if(CbmKF::Instance()->vMvdMaterial.size() != 0)
+  {
     for (Int_t iMvd=0; iMvd<listMvdHits->GetEntriesFast(); iMvd++)
     {
       CbmMvdHit* MvdHit = (CbmMvdHit*)listMvdHits->At(iMvd);
@@ -470,6 +489,7 @@ void CbmKFTrackFitQA::FillHitHistos()
         pull_MVDhit_y -> Fill( dy/(MvdHit->GetDy()) );
       }
     }
+  }
 }
 
 void CbmKFTrackFitQA::StsHitMatch()

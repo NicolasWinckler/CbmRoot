@@ -137,7 +137,7 @@ Int_t CbmKFCone::Pass( Double_t ZCross, Double_t ZThick,
       }
     else
       {
-	cz1 = -200;
+	cz1 = ZCross; //TODO Check me
 	ct1 = 0;  
       }
     
@@ -148,15 +148,15 @@ Int_t CbmKFCone::Pass( Double_t ZCross, Double_t ZThick,
       }
     else
       {
-	cz2 = -200;
+	cz2 = ZCross; //TODO Check me
 	ct2 = 0;
       }
   
     if ( iz1<=-200 && iz2<=-200 && iZ1>-200 && iZ2>-200 )
       {
-	cz1 = ( iZ1 + iZ1 )/2;
+	cz1 = ( iZ1 + iZ2 )/2;
 	ct1 = fabs( iZ2 - iZ1 );	
-	cz2 = -200;
+	cz2 = ZCross; //TODO Check me
 	ct2 = 0;	
       }    
   }

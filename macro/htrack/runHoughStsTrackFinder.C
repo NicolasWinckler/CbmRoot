@@ -102,7 +102,6 @@
   rtdb->setSecondInput(parIo2);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
   // -----   STS digitizer   ------------------------------------------------

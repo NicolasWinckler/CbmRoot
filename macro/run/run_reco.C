@@ -398,7 +398,6 @@ void run_reco(Int_t nEvents = 2) {
 
 
   // -----   Intialise and run   --------------------------------------------
-  run->LoadGeometry();
   run->Init();
   cout << "Starting run" << endl;
   run->Run(0, nEvents);

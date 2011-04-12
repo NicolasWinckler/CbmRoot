@@ -17,6 +17,7 @@ CbmEcalMaximum::CbmEcalMaximum(CbmEcalCell* cell)
 
   fCX=cell->GetCenterX();
   fCY=cell->GetCenterY();
+  fI=1;
   for(i=1;i<5;i++)
   {
     cell->GetNeighborsList(i, cells);

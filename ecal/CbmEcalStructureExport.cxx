@@ -35,7 +35,7 @@ InitStatus CbmEcalStructureExport::Init()
     Fatal("Init()", "Can't find IOManager.");
     return kFATAL;
   }
-  fStr=(CbmEcalStructure*)io->GetObject("EcalStructure");
+  fStr=(CbmEcalStructure*)io->ActivateBranch("EcalStructure");
   if (!fStr) 
   {
     Fatal("Init()", "Can't find calorimeter structure in the system.");

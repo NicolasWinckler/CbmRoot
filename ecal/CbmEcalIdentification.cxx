@@ -101,26 +101,26 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
   e=cell->GetTotalEnergy();
   if (max==NULL)
   /** Check cells near given for maximums **/
-  for(p=cells.begin();p!=cells.end();++p)
-  {
-    x=(*p)->GetCenterX()-tr->GetX();
-    y=(*p)->GetCenterY()-tr->GetY();
-    dst=TMath::Sqrt(x*x+y*y);
-//      if (dst>fInf->GetModuleSize()*TMath::Sqrt(2.0)+0.001) continue;
-    x=tr->GetX(); x*=x; y=tr->GetY(); y*=y;
-    t=TMath::Sqrt(x+y);
-    x=(*p)->GetCenterX()-cell->GetCenterX();
-    y=(*p)->GetCenterY()-cell->GetCenterY();
-//    if (x*tr->GetTx()/t+y*tr->GetTy()/t<TMath::Sqrt(2.0)*fInf->GetModuleSize()/cell->GetType()+0.001)
-//    if (x*tr->GetTx()/t+y*tr->GetTy()/t<-0.01&&dst>fInf->GetModuleSize()/cell->GetType()+0.001) continue;
-    (*p)->GetNeighborsList(0, ocells);
-    e=(*p)->GetTotalEnergy();
-    for(op=ocells.begin(); op!=ocells.end();++op)
-      if ((*op)->GetTotalEnergy()>e) break;
-    if (op==ocells.end())
-      if (max==NULL||max->GetTotalEnergy()<(*p)->GetTotalEnergy())
-        max=*p;
-  }
+    for(p=cells.begin();p!=cells.end();++p)
+    {
+      x=(*p)->GetCenterX()-tr->GetX();
+      y=(*p)->GetCenterY()-tr->GetY();
+      dst=TMath::Sqrt(x*x+y*y);
+//        if (dst>fInf->GetModuleSize()*TMath::Sqrt(2.0)+0.001) continue;
+      x=tr->GetX(); x*=x; y=tr->GetY(); y*=y;
+      t=TMath::Sqrt(x+y);
+      x=(*p)->GetCenterX()-cell->GetCenterX();
+      y=(*p)->GetCenterY()-cell->GetCenterY();
+//      if (x*tr->GetTx()/t+y*tr->GetTy()/t<TMath::Sqrt(2.0)*fInf->GetModuleSize()/cell->GetType()+0.001)
+//      if (x*tr->GetTx()/t+y*tr->GetTy()/t<-0.01&&dst>fInf->GetModuleSize()/cell->GetType()+0.001) continue;
+      (*p)->GetNeighborsList(0, ocells);
+      e=(*p)->GetTotalEnergy();
+      for(op=ocells.begin(); op!=ocells.end();++op)
+        if ((*op)->GetTotalEnergy()>e) break;
+      if (op==ocells.end())
+        if (max==NULL||max->GetTotalEnergy()<(*p)->GetTotalEnergy())
+          max=*p;
+    }
 
   if (max==NULL)
   {

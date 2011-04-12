@@ -126,19 +126,19 @@ InitStatus CbmEcalAnalysis::Init()
   FairRootManager *manager= FairRootManager::Instance();
   
   // all tracks
-  fListStack        = (TClonesArray*)manager->GetObject("MCTrack");
+  fListStack        = (TClonesArray*)manager->ActivateBranch("MCTrack");
 
   //ECAL MC points inside ECAL
-  fListECALptsEdep  = (TClonesArray*)manager->GetObject("EcalPointLite");
+  fListECALptsEdep  = (TClonesArray*)manager->ActivateBranch("EcalPointLite");
 
   //ECAL MC points on entrance to ECAL
-  fListECALptsWall  = (TClonesArray*)manager->GetObject("EcalPoint");
+  fListECALptsWall  = (TClonesArray*)manager->ActivateBranch("EcalPoint");
 
   //ECAL hits
-  fListECALhits     = (TClonesArray*)manager->GetObject("EcalHitFastMC");
+  fListECALhits     = (TClonesArray*)manager->ActivateBranch("EcalHitFastMC");
 
   //ECAL reconstructed points
-  fListECALrp       = (TClonesArray*)manager->GetObject("EcalRecParticle");
+  fListECALrp       = (TClonesArray*)manager->ActivateBranch("EcalRecParticle");
 
   return kSUCCESS;
 }

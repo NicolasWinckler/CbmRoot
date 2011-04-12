@@ -125,18 +125,18 @@ InitStatus CbmEcalHitProducer::Init()
   }
   //ECAL MC points
   if (fUseMCPoints) 
-    fListECALpts = (TClonesArray*)fManager->GetObject("EcalPointLite");
+    fListECALpts = (TClonesArray*)fManager->ActivateBranch("EcalPointLite");
 
   //ECAL Summable hits
   if (fUseSummableHits) 
-    fListHits = (TClonesArray*)fManager->GetObject("EcalSumHit");
+    fListHits = (TClonesArray*)fManager->ActivateBranch("EcalSumHit");
   
   //ECAL UnSummable hits
   if (fUseUnSummableHits) 
-    fListUHits = (TClonesArray*)fManager->GetObject("EcalHit");
+    fListUHits = (TClonesArray*)fManager->ActivateBranch("EcalHit");
   
   // all tracks
-  fListStack = (TClonesArray *)fManager->GetObject("MCTrack");
+  fListStack = (TClonesArray *)fManager->ActivateBranch("MCTrack");
   fHitCollection = new TClonesArray("CbmEcalHit",100);
   if (fProduceHits)
     if (fProduceSummableHits)
@@ -157,7 +157,7 @@ InitStatus CbmEcalHitProducer::Init()
   }
   else
   {
-    fStr=(CbmEcalStructure*)fManager->GetObject("EcalStructure");
+    fStr=(CbmEcalStructure*)fManager->ActivateBranch("EcalStructure");
     if (!fStr) 
     {
       Fatal("Init()", "Can't find calorimeter structure in the system.");

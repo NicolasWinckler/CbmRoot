@@ -197,8 +197,9 @@ void CbmEcalClusterFinderV2::FormPreCluster(CbmEcalCell* cell)
     if (maxe<fMinClusterE[reg]) return;
   cell->GetNeighborsList(max, cells);
   cells.push_back(cell);
-  if (find(cells.begin(), cells.end(), min)==cells.end())
-    cells.push_back(min);
+  if (fUseMinimumCell==1)
+    if (find(cells.begin(), cells.end(), min)==cells.end())
+      cells.push_back(min);
   if (fCalibration==0)
   {
     fPreClusters.push_back(new CbmEcalPreCluster(cells, cell, min)); 
@@ -579,6 +580,7 @@ CbmEcalClusterFinderV2::CbmEcalClusterFinderV2(const char* name, const Int_t ver
     return;
   }
   fCalibration=par->GetInteger("calibrationmode");
+  fUseMinimumCell=par->GetInteger("useminimumcell");
 
   fIntSteps=par->GetInteger("intsteps");
   for(i=0;i<fRegions;i++)

@@ -120,7 +120,7 @@ CbmEcalSCurveLibRecord::CbmEcalSCurveLibRecord(const char* filename)
       fX[num][j]=x[j];
   }
 
-  delete x;
+  delete [] x;
   file->Close();
   delete file;
   InitA();
@@ -256,18 +256,19 @@ Int_t CbmEcalSCurveLibRecord::GetNum(Float_t energy, Float_t theta) const
 
 CbmEcalSCurveLibRecord::~CbmEcalSCurveLibRecord()
 {
-  delete fE;
-  delete fXL;
-  delete fXR;
-  delete fDXL;
-  delete fDXR; 
+  delete [] fE;
+  delete [] fXL;
+  delete [] fXR;
+  delete [] fDXL;
+  delete [] fDXR; 
   if (fX)
   {
     for(Int_t i=0;i<fPoints;i++)
-      delete fX[i];
-    delete fX;
+      delete [] fX[i];
+    delete [] fX;
   }
-  delete fTheta;
+  delete [] fTheta;
+  delete [] fA;
 }
 
 ClassImp(CbmEcalSCurveLibRecord)

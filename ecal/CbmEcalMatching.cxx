@@ -12,6 +12,7 @@
 #include "CbmEcalClusterV1.h"
 #include "CbmEcalStructure.h"
 #include "CbmEcalShowerLib.h"
+#include "CbmEcalShLib.h"
 #include "CbmEcalParam.h"
 
 #include <iostream>
@@ -36,6 +37,7 @@ CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose, const ch
     Warning("CbmEcalMatching","Energy threshold less than half energy deposition in cluster.");
   fMotherThr=par->GetDouble("motherthreshold");
   fPhotonThr=par->GetDouble("photonthreshold");
+  fUseOldShLib=par->GetDouble("useoldshowerlib");
   fAlgo=par->GetInteger("algorithm");
   if (fVerbose>10)
   {
@@ -68,13 +70,13 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init", "Can't find an array of reconstructed photons.");
     return kFATAL;
   }
-  fMCTracks=(TClonesArray*)io->GetObject("MCTrack");
+  fMCTracks=(TClonesArray*)io->ActivateBranch("MCTrack");
   if (!fMCTracks)
   {
     Fatal("Init", "Can't find array of MC tracks");
     return kFATAL;
   }
-  fPoints=(TClonesArray*)io->GetObject("EcalPoint");
+  fPoints=(TClonesArray*)io->ActivateBranch("EcalPoint");
   if (!fPoints)
   {
     Fatal("Init", "Can't find array of Ecal Points");
@@ -92,10 +94,25 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init", "Can't find array of clusters");
     return kFATAL;
   }
-  fShLib=(CbmEcalShowerLib*)io->GetObject("EcalShowerLib");
-  if (!fShLib)
+  if (fUseOldShLib!=0)
   {
-    Info("Init", "No shower library found in system. Will continue without chi2 calculation.");
+    fShowerLib=(CbmEcalShowerLib*)io->GetObject("EcalShowerLib");
+    if (!fShowerLib)
+    {
+      Fatal("Init", "No shower library found in system. Will continue without chi2 calculation.");
+      return kFATAL;
+    }
+    fShLib=NULL;
+  }
+  else
+  {
+    fShLib=(CbmEcalShLib*)io->GetObject("EcalShLib");
+    if (!fShLib)
+    {
+      Fatal("Init", "No shower library found in system. Will continue without chi2 calculation.");
+      return kFATAL;
+    }
+    fShowerLib=NULL;
   }
 
   fEv=0; 
@@ -167,7 +184,10 @@ void CbmEcalMatching::FormEpred(CbmEcalRecParticle* p)
     phi=TMath::ACos(cx/r)*TMath::RadToDeg();
     if (cy<0) phi=360.0-phi;
 
-    fEpred[k]=fShLib->GetSumEThetaPhi(x, y, cellsize, p->E(), theta, phi);
+    if (fUseOldShLib!=0)
+      fEpred[k]=fShowerLib->GetSumEThetaPhi(x, y, cellsize, p->E(), theta, phi);
+    else
+      fEpred[k]=fShLib->GetResponse(x, y, phi, theta, p->E(), type);
     fEsum+=fEpred[k];
   }
   fS=0;

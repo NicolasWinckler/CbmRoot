@@ -24,8 +24,10 @@ class CbmEcalClusterV1 : public TObject
 {
 friend class CbmEcalRecoSimple;
 friend class CbmEcalRecoSlow;
+friend class CbmEcalRecoSlow2;
 friend class CbmEcalClusterFinderV1;
 friend class CbmEcalClusterFinderV2;
+friend class CbmEcalClusterFinderV3;
 public:
   /** An empty constructor **/
   CbmEcalClusterV1();

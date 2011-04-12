@@ -32,6 +32,7 @@ class CbmEcalCell;
 class CbmEcalRecParticle : public TObject
 {
 friend class CbmEcalRecoSlow;
+friend class CbmEcalRecoSlow2;
 public:
 
   /** Default constructor **/

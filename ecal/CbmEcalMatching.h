@@ -14,6 +14,7 @@ class CbmEcalRecParticle;
 class TTree;
 class CbmEcalStructure;
 class CbmEcalShowerLib;
+class CbmEcalShLib;
 
 class CbmEcalMatching : public FairTask
 {
@@ -77,8 +78,10 @@ private:
   TClonesArray* fClusters;		//!
   /** Structure of the calorimeter system **/
   CbmEcalStructure* fStr;		//!
-  /** Shower library **/
-  CbmEcalShowerLib* fShLib;		//!
+  /** Shower library. An old implementation **/
+  CbmEcalShowerLib* fShowerLib;		//!
+  /** Shower library. A new implementation **/
+  CbmEcalShLib* fShLib;			//!
 
   /** A threshold: if energy of photon is more than threshold*Ecluster
    ** than cluster is formed by that photon **/
@@ -88,6 +91,8 @@ private:
   /** If energy of mother > fMotherThr*Energy_{doughtier} then use mother for cluster matching instead
    ** of doughtier**/
   Double_t fMotherThr;
+  /** Use old realization of shower lib **/
+  Int_t fUseOldShLib;
 
   /** An event number **/
   Int_t fEv;

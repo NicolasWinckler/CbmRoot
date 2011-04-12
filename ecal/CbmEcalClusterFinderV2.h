@@ -100,6 +100,8 @@ private:
   Double_t fTheta[10];
   /** Just form preclusters and store information in tree **/
   Int_t fCalibration;
+  /** Should we add a minimum cell to precluster? **/
+  Int_t fUseMinimumCell;
   /** Parameters for cluster construction **/
   Double_t fPar1[10];
   Double_t fPar2[10];

@@ -196,13 +196,13 @@ InitStatus CbmEcalAnalysisPi0::Init()
     Fatal("Init", "Can't find a Root Manager.");
     return kFATAL;
   }
-  fReco=(TClonesArray*)fManager->GetObject("EcalReco");
+  fReco=(TClonesArray*)fManager->ActivateBranch("EcalReco");
   if (!fReco)
   {
     Fatal("Init", "Can't find an array of reco parcles.");
     return kFATAL;
   }
-  fMC=(TClonesArray*)fManager->GetObject("MCTrack");
+  fMC=(TClonesArray*)fManager->ActivateBranch("MCTrack");
   if (!fMC)
   {
     Fatal("Init", "Can't find an array of MC tracks.");

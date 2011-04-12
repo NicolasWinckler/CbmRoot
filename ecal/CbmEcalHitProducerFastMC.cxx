@@ -80,9 +80,9 @@ InitStatus CbmEcalHitProducerFastMC::Init()
   FairRootManager* fManager = FairRootManager::Instance();
 
   // ECAL MC points
-  fListECALpts = (TClonesArray*)fManager->GetObject("EcalPoint");
+  fListECALpts = (TClonesArray*)fManager->ActivateBranch("EcalPoint");
   // all tracks
-  fListStack = (TClonesArray *)fManager->GetObject("MCTrack");
+  fListStack = (TClonesArray *)fManager->ActivateBranch("MCTrack");
   // new list of ECAL hits
   fHitCollection = new TClonesArray("CbmEcalHitFastMC",100);
   fManager->Register("EcalHitFastMC","ECAL",fHitCollection,kTRUE);

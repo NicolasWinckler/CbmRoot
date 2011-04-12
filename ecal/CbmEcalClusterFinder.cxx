@@ -71,7 +71,7 @@ InitStatus CbmEcalClusterFinder::Init()
   FairRootManager* fManager = FairRootManager::Instance();
 
   // new list of ECAL hits
-  fHitCollection = (TClonesArray*)fManager->GetObject("EcalHit");
+  fHitCollection = (TClonesArray*)fManager->ActivateBranch("EcalHit");
 
   fClusterCollection = new TClonesArray("CbmEcalCluster",100);
   fManager->Register("EcalCluster","ECAL",fClusterCollection,kTRUE);

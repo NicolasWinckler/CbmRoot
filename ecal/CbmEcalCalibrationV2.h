@@ -70,10 +70,11 @@ inline Int_t CbmEcalCalibrationV2::GetMethod(Double_t m) const
 }
 
 inline Int_t CbmEcalCalibrationV2::N(Int_t p, Int_t m, Int_t n) const 
-  {return n+3*m+9*p;}
+  {return n+3*m+3*fMethods*p;}
 
 inline Double_t CbmEcalCalibrationV2::GetEnergy(Double_t Ecls, Double_t tantheta, Int_t celltype) const
 {
+  if (Ecls<1e-5) return 0;
   Double_t theta=TMath::ATan(tantheta)*TMath::RadToDeg();
   Int_t m=celltype;
   if (m<0) GetMethod(tantheta);

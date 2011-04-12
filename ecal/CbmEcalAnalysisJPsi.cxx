@@ -3,10 +3,12 @@
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
 
-#include "CbmStsTrack.h"
+#include "CbmEcalIdParticle.h"
+#include "CbmEcalStructure.h"
+
 #include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
-#include "CbmEcalIdParticle.h"
+#include "CbmStsTrack.h"
 #include "CbmVertex.h"
 #include "CbmStsKFTrackFitter.h"
 
@@ -84,6 +86,7 @@ void CbmEcalAnalysisJPsi::Exec(Option_t* option)
     }
     if (j!=idn)
     {
+      fCellType=fStr->GetHitCell(ecalid->CellNum())->GetType();
       fEProb=ecalid->EProb();
       fShape=ecalid->Shape();
       fCaloE=ecalid->E()*fP;
@@ -144,6 +147,13 @@ InitStatus CbmEcalAnalysisJPsi::Init()
     Fatal("Init()","Can't find primary vertex.");
     return kFATAL;
   }
+  fStr=(CbmEcalStructure*)io->GetObject("EcalStructure");
+  if (!fStr)
+  {
+    Fatal("Init()", "Can't find calorimeter structure in the system.");
+    return kFATAL;
+  }
+
   fFitter=new CbmStsKFTrackFitter();
 
   return kSUCCESS;
@@ -174,6 +184,7 @@ void CbmEcalAnalysisJPsi::InitTree()
   fOut->Branch("mmcpdg", &fMotherMCPDG, "mmcpdg/I");
   fOut->Branch("charge", &fCharge, "charge/I");
   fOut->Branch("caloe", &fCaloE, "caloe/D");
+  fOut->Branch("tcell", &fCellType, "tcell/I");
 }
 
 void CbmEcalAnalysisJPsi::InitVariables()

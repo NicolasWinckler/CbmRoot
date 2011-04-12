@@ -37,13 +37,13 @@ InitStatus CbmEcalCalibrationV2::Init()
   fMethods=par->GetInteger("methods");
   fMethodB=new Double_t[fMethods];
   fP=new Double_t[fMethods*9];
-  for(m=0;m<3;m++)
+  for(m=0;m<fMethods;m++)
   {
     tmp="methodb["; tmp+=m; tmp+="]";
     fMethodB[m]=par->GetDouble(tmp);
   }
 
-  for(m=0;m<3;m++)
+  for(m=0;m<fMethods;m++)
   for(p=0;p<3;p++)
   for(n=0;n<3;n++)
   {
@@ -111,6 +111,7 @@ Double_t CbmEcalCalibrationV2::GetEnergy(Double_t Ecls, const CbmEcalCell* cell)
   Double_t y=cell->GetCenterY();
   Double_t tantheta=TMath::Sqrt(x*x+y*y)/fInf->GetZPos();
 
+//  cout << "--> "<< Ecls << " " << x << " " << y << " " << tantheta << " " << GetEnergy(Ecls, tantheta, cell->GetType()) << endl;
   return GetEnergy(Ecls, tantheta, cell->GetType());  
 }
 

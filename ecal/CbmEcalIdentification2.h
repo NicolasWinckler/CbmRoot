@@ -121,6 +121,9 @@ private:
   Double_t fCircRad;
 
 
+  /** Use simple maximum location algorithm **/
+  Int_t fSimpleMaximumLocationAlgo;
+  CbmEcalMaximum* FindMaximum(FairTrackParam* tr);
   /** Array of constants for maximums location **/
   Double_t* fF;				//!
   TFormula* fForm[6];			//!
@@ -132,6 +135,8 @@ private:
   Double_t fCPH;
   Double_t fPH;
   Double_t fPL;
+  /** Use old algorithm for shape calculation **/
+  Int_t fOldShapeAlgo;
   Int_t CheckMaximum(CbmEcalMaximum* max);
 
   /** Cluster construction stuff **/
@@ -145,6 +150,8 @@ private:
   Double_t* fPar3;			//!
   Int_t* fParI;				//!
   Int_t fIntSteps;
+  /** Use cell type instead of region in cluster construction **/
+  Int_t fUseCellType;
 
   void ConstructCluster(CbmEcalMaximum* max);
   Double_t SolveEllipse(CbmEcalCell* cell, Double_t cx, Double_t cy, Int_t reg);

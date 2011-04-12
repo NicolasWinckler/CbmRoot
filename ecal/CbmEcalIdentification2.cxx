@@ -110,18 +110,23 @@ void CbmEcalIdentification2::Identify(FairTrackParam* tr)
     fCellE2=GetEnergy(cell);
   cell=NULL;
 
-  for(i=0;i<nm;i++)
+  if (fSimpleMaximumLocationAlgo==1)
+    mxx=FindMaximum(tr);
+  else
   {
-//  cout << fZ << " -----------------------------------------------" << endl;
-    mx=(CbmEcalMaximum*)fMaximums->At(i);
-    if (!mx) continue;
-    if (CheckMaximum(mx))
+    for(i=0;i<nm;i++)
     {
-      if (cell&&fVerbose>10)
-	Info("Identify", "For track %d (%f, %f) more than one maximum located", fExtraNum, fX, fY);
-      cell=mx->Cell();
-      mx->SetMark(mx->Mark()+1);
-      mxx=mx;
+//    cout << fZ << " -----------------------------------------------" << endl;
+      mx=(CbmEcalMaximum*)fMaximums->At(i);
+      if (!mx) continue;
+      if (CheckMaximum(mx))
+      {
+        if (cell&&fVerbose>10)
+	  Info("Identify", "For track %d (%f, %f) more than one maximum located", fExtraNum, fX, fY);
+        cell=mx->Cell();
+        mx->SetMark(mx->Mark()+1);
+        mxx=mx;
+      }
     }
   }
   if (mxx==NULL)
@@ -129,6 +134,7 @@ void CbmEcalIdentification2::Identify(FairTrackParam* tr)
     if (fTreeOut) WriteTreeLight();
     return;
   }
+  cell=mxx->Cell();
 //  cout << "here" << endl;
   ConstructCluster(mxx);
   if (fCluster.size()==0)
@@ -141,8 +147,9 @@ void CbmEcalIdentification2::Identify(FairTrackParam* tr)
   e=0;
   for(p=fCluster.begin();p!=fCluster.end();++p)
     e+=GetEnergy(*p);
-//  fShape=-1111;
+//  fShape=-1111
   fE=fCal->GetEnergy(e, TMath::Tan(TMath::DegToRad()*fTheta), fRegion);
+//  cout << fE << " " << fRegion << endl;
 //  cout << e << "->" << fE << ", theta=" << fTheta << ", region=" << fRegion << endl;
   fMaxX=cell->GetCenterX();
   fMaxY=cell->GetCenterY();
@@ -166,6 +173,83 @@ void CbmEcalIdentification2::Identify(FairTrackParam* tr)
   new((*fId)[fN++]) CbmEcalIdParticle(cell, fX, fY, fZ, fE/tracke, -1111, fShape, fTrackNum, fEProb, fMCTrackNum);
 }
 
+/** Simple maximum location algorithm. Copy/paste from CbmEcalIdentification **/
+CbmEcalMaximum* CbmEcalIdentification2::FindMaximum(FairTrackParam* tr)
+{
+  CbmEcalCell* cell=fStr->GetCell(fX, fY);
+  if (cell==NULL) return NULL;
+  Double_t e=cell->GetTotalEnergy();
+  list<CbmEcalCell*> cells;
+  list<CbmEcalCell*> ocells;
+  list<CbmEcalCell*>::const_iterator p;
+  list<CbmEcalCell*>::const_iterator op;
+  CbmEcalCell* max=NULL;
+  Double_t x;
+  Double_t y;
+  Double_t dst;
+  Double_t t;
+ 
+ 
+//  Info("FindMaximum", "E=%f", e);
+  cell->GetNeighborsList(0, cells);  
+  for(p=cells.begin();p!=cells.end();++p)
+    if ((*p)->GetTotalEnergy()>e)
+      break;
+  if (p==cells.end())
+  {
+    max=cell;
+//    Info("FindMaximum", "Found cell is maximum");
+  }
+//  cell->GetNeighborsList(0, cells);
+//  e=cell->GetTotalEnergy();
+  if (max==NULL)
+  /** Check cells near given for maximums **/
+    for(p=cells.begin();p!=cells.end();++p)
+    {
+      x=(*p)->GetCenterX()-tr->GetX();
+      y=(*p)->GetCenterY()-tr->GetY();
+      dst=TMath::Sqrt(x*x+y*y);
+//        if (dst>fInf->GetModuleSize()*TMath::Sqrt(2.0)+0.001) continue;
+      x=tr->GetX(); x*=x; y=tr->GetY(); y*=y;
+      t=TMath::Sqrt(x+y);
+      x=(*p)->GetCenterX()-cell->GetCenterX();
+      y=(*p)->GetCenterY()-cell->GetCenterY();
+//      if (x*tr->GetTx()/t+y*tr->GetTy()/t<TMath::Sqrt(2.0)*fInf->GetModuleSize()/cell->GetType()+0.001)
+//      if (x*tr->GetTx()/t+y*tr->GetTy()/t<-0.01&&dst>fInf->GetModuleSize()/cell->GetType()+0.001) continue;
+      (*p)->GetNeighborsList(0, ocells);
+      e=(*p)->GetTotalEnergy();
+      for(op=ocells.begin(); op!=ocells.end();++op)
+        if ((*op)->GetTotalEnergy()>e) break;
+      if (op==ocells.end())
+        if (max==NULL||max->GetTotalEnergy()<(*p)->GetTotalEnergy())
+          max=*p;
+    }
+  if (max==NULL) return NULL;
+
+  Int_t i;
+  Int_t nm=fMaximums->GetEntriesFast();
+  CbmEcalMaximum* mx;
+  for(i=0;i<nm;i++)
+  {
+    mx=(CbmEcalMaximum*)fMaximums->At(i);
+    if (!mx) continue;
+    if (mx->Cell()==max) break;
+  }
+  if (i==nm)
+  {
+//    Info("FindMaximum", "Maximum (%f,%f,%f) not found in the table", fX, fY, max->GetTotalEnergy());
+//    for(i=0;i<nm;i++)
+//    {
+//      mx=(CbmEcalMaximum*)fMaximums->At(i);
+//      if (!mx) continue;
+//      Info("FindMaximum", "Table maximum %d (%f, %f, %f) ", i, mx->X(), mx->Y(), mx->Cell()->GetTotalEnergy());
+//    }
+    return NULL;
+  }
+  mx->SetMark(mx->Mark()+1);
+
+  return mx;
+}
 /** If identification failed :-( **/
 void CbmEcalIdentification2::WriteTreeLight()
 {
@@ -585,6 +669,8 @@ InitStatus CbmEcalIdentification2::Init()
   fUseHack=p->GetInteger("usehacks");
   fUseMC=p->GetInteger("usemcinfo");
   nm=p->GetString("eresolution");
+  fOldShapeAlgo=p->GetInteger("oldshapealgo");
+  fSimpleMaximumLocationAlgo=p->GetInteger("simplemaximumlocationalgo");
   fEResolution=new TFormula("calorimeter_energy_resolution", nm);
   if (fUseHack>0)
   {
@@ -637,11 +723,15 @@ InitStatus CbmEcalIdentification2::Init()
   }
   fQL=p->GetDouble("ql");
   fQH=p->GetDouble("qh");
-  fQCL=p->GetDouble("qcl");
-  fQCH=p->GetDouble("qch");
+  if (fOldShapeAlgo==0)
+  {
+    fQCL=p->GetDouble("qcl");
+    fQCH=p->GetDouble("qch");
+  }
   fCPL=p->GetDouble("cpl");
   fCPH=p->GetDouble("cph");
 
+  fUseCellType=p->GetInteger("usecelltype");
   // Clustering stuff
   fRegions=p->GetInteger("regions");
   fIntSteps=p->GetInteger("intsteps");
@@ -767,29 +857,34 @@ void CbmEcalIdentification2::ConstructCluster(CbmEcalMaximum* max)
   Double_t r;
 
   fCluster.clear();
-  for(i=0;i<fRegions;i++)
-    if (fThetaB[i]>fTheta)
-      break;
-  if (i==fRegions)
+  cell=max->Cell();
+  if (fUseCellType==1)
+    fRegion=cell->GetType();
+  else
+  {
+    for(i=0;i<fRegions;i++)
+      if (fThetaB[i]>fTheta)
+        break;
+    fRegion=i;
+  }
+  if (fRegion>=fRegions||fRegion<0)
   {
     Info("ConstructCluster", "Cluster can't be constructed. Theta=%f.", fTheta);
     return;
   }
-  fRegion=i;
-  cell=max->Cell();
-  if (fAlgo[i]==0)
+  if (fAlgo[fRegion]==0)
   {
-    cell->GetNeighborsList(0, cells);
+//    cell->GetNeighborsList(0, cells);
     cell->GetNeighborsList(max->I(), fCluster);
     fCluster.push_back(cell);
-    for(p=cells.begin();p!=cells.end();++p)
-      if ((*p)->GetTotalEnergy()<e)
-      {
-	cell=(*p);
-	e=(*p)->GetTotalEnergy();
-      }
-    if (find(fCluster.begin(), fCluster.end(), cell)==fCluster.end())
-      fCluster.push_back(cell);
+//    for(p=cells.begin();p!=cells.end();++p)
+//      if ((*p)->GetTotalEnergy()<e)
+//      {
+//	cell=(*p);
+//	e=(*p)->GetTotalEnergy();
+//     }
+//    if (find(fCluster.begin(), fCluster.end(), cell)==fCluster.end())
+//      fCluster.push_back(cell);
     return;
   }
 
@@ -946,7 +1041,25 @@ void CbmEcalIdentification2::ShapeAnalysis(CbmEcalMaximum* max)
 
 void CbmEcalIdentification2::CalculateShape(CbmEcalMaximum* max)
 {
- 
+  if (fOldShapeAlgo==1)
+  {
+    CbmEcalCell* cell=max->Cell();
+    Double_t e=cell->GetTotalEnergy();
+    list<CbmEcalCell*> cells;
+    cell->GetNeighborsList(max->I(), cells);
+    list<CbmEcalCell*>::const_iterator p=cells.begin();
+    Double_t e2=e;
+    for(;p!=cells.end();++p)
+      e2+=(*p)->GetTotalEnergy();
+
+    cell->GetNeighborsList(0, cells);
+    Double_t e3=e;
+    for(p=cells.begin();p!=cells.end();++p)
+      e3+=(*p)->GetTotalEnergy();
+    fShape=e2/e3;
+
+    return;
+  }
   TVector2 v1(fX, fY); v1=v1.Rotate(-fPhi*TMath::DegToRad());
   TVector2 v2(max->X(), max->Y()); v2=v2.Rotate(-fPhi*TMath::DegToRad());
   v1-=v2;

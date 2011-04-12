@@ -45,6 +45,7 @@
 #pragma link C++ class	CbmEcalQualityCheck;
 #pragma link C++ class  CbmEcalClusterFinderV1;
 #pragma link C++ class  CbmEcalClusterFinderV2;
+#pragma link C++ class  CbmEcalClusterFinderV3;
 #pragma link C++ class  CbmEcalTrackImport;
 #pragma link C++ class  CbmEcalCalibration;
 #pragma link C++ class  CbmEcalCalibrationV2;
@@ -60,12 +61,17 @@
 #pragma link C++ class  CbmEcalLightMap;
 #pragma link C++ class  CbmEcalAnalysisUniformity;
 #pragma link C++ class  CbmEcalAnalysisSimple;
+#pragma link C++ class  CbmEcalAnalysisShape;
 #pragma link C++ class  CbmEcalAnalysisJPsi;
 #pragma link C++ class  CbmEcalAnalysisDst;
 #pragma link C++ class  CbmEcalAnalysisBSh;
+#pragma link C++ class  CbmEcalAnalysisEres;
 #pragma link C++ class  CbmEcalMaximum;
 #pragma link C++ class  CbmEcalMaximumLocator;
 #pragma link C++ class  CbmEcalAnalysisSShape;
+#pragma link C++ class  CbmEcalShLibRecord;
+#pragma link C++ class  CbmEcalShLib;
+#pragma link C++ class  CbmEcalShLibTable;
+#pragma link C++ class  CbmEcalRecoSlow2;
 
 #endif
-

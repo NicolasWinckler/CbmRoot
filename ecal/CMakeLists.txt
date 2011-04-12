@@ -56,9 +56,11 @@ CbmEcalAnalysisCluster.cxx CbmEcalAnalysisUniformity.cxx
 CbmEcalAnalysisDst.cxx CbmEcalAnalysisBSh.cxx
 CbmEcalCalibrationV2.cxx CbmEcalAnalysisSimple.cxx CbmEcalIdentification2.cxx
 CbmEcalMaximum.cxx CbmEcalMaximumLocator.cxx CbmEcalAnalysisJPsi.cxx
-CbmEcalAnalysisSShape.cxx
+CbmEcalAnalysisSShape.cxx CbmEcalAnalysisShape.cxx
+CbmEcalShLibRecord.cxx CbmEcalShLib.cxx CbmEcalShLibTable.cxx
+CbmEcalClusterFinderV3.cxx CbmEcalRecoSlow2.cxx
+CbmEcalAnalysisEres.cxx
 )
-
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)
 

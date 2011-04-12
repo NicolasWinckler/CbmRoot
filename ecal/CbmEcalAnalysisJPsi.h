@@ -10,6 +10,7 @@ class TTree;
 class TClonesArray;
 class CbmVertex;
 class CbmStsKFTrackFitter;
+class CbmEcalStructure;
 
 class CbmEcalAnalysisJPsi : public FairTask
 {
@@ -59,6 +60,7 @@ private:
   Int_t fCharge;
   /** Energy in calorimeter **/
   Double_t fCaloE;
+  Int_t fCellType;
 
   TClonesArray* fMC;			//!
   TClonesArray* fStsTracks;		//!
@@ -66,6 +68,7 @@ private:
   TClonesArray* fEcalId;		//!
   CbmVertex* fPrimVertex;		//!
   CbmStsKFTrackFitter* fFitter;		//!
+  CbmEcalStructure* fStr;		//!
 
   ClassDef(CbmEcalAnalysisJPsi,1)
 };

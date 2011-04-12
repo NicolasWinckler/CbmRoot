@@ -11,6 +11,7 @@
 #include "CbmEcalCell.h"
 #include "CbmEcalPoint.h"
 #include "CbmEcalShowerLib.h"
+#include "CbmEcalShLib.h"
 #include "CbmEcalClusterV1.h"
 
 #include "TTree.h"
@@ -526,7 +527,10 @@ void CbmEcalQualityCheck::DrawCells()
       rad=TMath::Sqrt(x*x+y*y);
       phi=TMath::ACos(x/rad)*TMath::RadToDeg();
       if (y<0) phi=360-phi;
-      (*p)->fB+=fLib->GetSumEThetaPhi(dx, dy, fInf->GetModuleSize()/c->GetType(), r->E(), TMath::ATan(rad/fInf->GetZPos())*TMath::RadToDeg(), phi);
+      if (fLib)
+        (*p)->fB+=fLib->GetSumEThetaPhi(dx, dy, fInf->GetModuleSize()/c->GetType(), r->E(), TMath::ATan(rad/fInf->GetZPos())*TMath::RadToDeg(), phi);
+      else
+	(*p)->fB+=fShLib->GetResponse(dx, dy, phi, TMath::ATan(rad/fInf->GetZPos())*TMath::RadToDeg(), c->GetType());
     }
   }
   /** Normalization **/
@@ -616,13 +620,13 @@ InitStatus CbmEcalQualityCheck::Init()
     Fatal("Init", "Can't find array of reconstructed tracks named %s.", fInName.Data());
     return kFATAL;
   }
-  fMCTracks=(TClonesArray*)io->GetObject("MCTrack");
+  fMCTracks=(TClonesArray*)io->ActivateBranch("MCTrack");
   if (!fMCTracks)
   {
     Fatal("Init", "Can't find array of MC tracks");
     return kFATAL;
   }
-  fPoints=(TClonesArray*)io->GetObject("EcalPoint");
+  fPoints=(TClonesArray*)io->ActivateBranch("EcalPoint");
   if (!fPoints)
   {
     Fatal("Init", "Can't find array of Ecal Points");
@@ -661,9 +665,16 @@ InitStatus CbmEcalQualityCheck::Init()
   fLib=(CbmEcalShowerLib*)io->GetObject("EcalShowerLib");
   if (!fLib)
   {
-    Fatal("Init", "No shower library found in system.");
-    return kFATAL;
+    fShLib=(CbmEcalShLib*)io->GetObject("EcalShLib");
+    if (!fShLib)
+    {
+      Fatal("Init", "No shower library found in system.");
+      return kFATAL;
+    }
+    Info("Init", "Using a new version of shower library.");
   }
+  else
+    Info("Init", "Using an old version of shower library.");
   fTxt->SetTextFont(43);
   fTxt->SetTextSizePixels(8);
   fTxt->SetTextAlign(21);

@@ -24,6 +24,7 @@ class CbmEcalInf;
 class CbmEcalCell;
 class CbmEcalQualityCheckItem;
 class CbmEcalShowerLib;
+class CbmEcalShLib;
 class CbmEcalPoint;
 
 class CbmEcalQualityCheck : public FairTask
@@ -91,6 +92,7 @@ private:
   void DrawCells();
 
   CbmEcalShowerLib* fLib;	//!
+  CbmEcalShLib* fShLib;		//!
   std::list<CbmEcalQualityCheckItem*> fCells;		//!
   void DrawImage();
 

@@ -136,11 +136,6 @@ If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       finder/CbmLitTrackFinderNNParallel.cxx
-      parallel/LitTrackFinderNNBase.cxx
-      parallel/electron/LitTrackFinderNNBaseElectron.cxx
-      parallel/electron/LitTrackFinderNNScalarElectron.cxx
-      parallel/electron/LitTrackFinderNNVecElectron.cxx
-      parallel/muon/LitTrackFinderNNVecMuon.cxx
       qa/CbmLitParallelTrackFitterTest.cxx 
       qa/CbmLitParallelTrackFitterTestElectron.cxx 
       qa/CbmLitTrackFitSpeedTest.cxx
@@ -203,10 +198,6 @@ if(RULE_CHECKER_FOUND)
   CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)
 endif(RULE_CHECKER_FOUND)
 
-# fill list of header files from list of source files
-# by exchanging the file extension
-#CHANGE_FILE_EXTENSION(*.cxx *.h LITTRACK_HEADERS "${LITTRACK_SRCS}")
-
 IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
@@ -238,3 +229,7 @@ EndIf(TBB_FOUND)
 
 ################ install ###################
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
+
+
+#add_subdirectory(parallel)
+#add_subdirectory(cuda)

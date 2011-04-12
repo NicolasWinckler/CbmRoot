@@ -22,7 +22,7 @@
 #include "../LitTrackFinder.h"
 #include "LitTrackFinderNNBaseElectron.h"
 
-#include "CbmLitPtrTypes.h"
+//#include "CbmLitPtrTypes.h"
 
 //class CbmLitField;
 

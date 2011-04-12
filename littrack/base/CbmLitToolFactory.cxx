@@ -258,7 +258,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.IsAlwaysCreateMissingHit(false);
       settings.SetSigmaCoef(5.);
       settings.SetChiSqPixelHitCut(0, 15.);
-      settings.SetChiSqPixelHitCut(1, 25.);
+      settings.SetChiSqPixelHitCut(1, 50.);
       settings.SetChiSqStripHitCut(9.);
       trdFinderBranch->SetSettings(settings);
       trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
@@ -339,7 +339,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.IsAlwaysCreateMissingHit(false);
       settings.SetSigmaCoef(3.5);
       settings.SetChiSqPixelHitCut(15.);//13.86);
-      settings.SetChiSqStripHitCut(9.);
+      settings.SetChiSqStripHitCut(11.);
       muchFinderBranch->SetSettings(settings);
       muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       muchFinderBranch->SetVerbose(1);

@@ -957,9 +957,9 @@ void CbmL1::ReadSTAPAlgoData()
     for (int i = 0; i < n; i++){
       L1StsHit element;
       fadata >> element_f >> element_b >> element_iz;
-      element.f = static_cast<unsigned short int>(element_f);
-      element.b = static_cast<unsigned short int>(element_b);
-      element.iz = static_cast<char>(element_iz);
+      element.f = static_cast<THitI>(element_f);
+      element.b = static_cast<THitI>(element_b);
+      element.iz = static_cast<TZPosI>(element_iz);
       algo->vStsHits.push_back(element);
     };
     if (fVerbose >= 4) cout << "vStsHits[" << n << "]" << " have been read." << endl;

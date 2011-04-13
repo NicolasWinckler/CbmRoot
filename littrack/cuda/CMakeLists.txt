@@ -1,9 +1,9 @@
 # Add current directory to the nvcc include line.
 CUDA_INCLUDE_DIRECTORIES(
-   $ {CMAKE_CURRENT_SOURCE_DIR}
-   $ {CUDA_CUT_INCLUDE}
-   $ {ROOT_INCLUDE_DIR}
-   $ {CUDA_INCLUDE}
+   ${CMAKE_CURRENT_SOURCE_DIR}
+   ${CUDA_CUT_INCLUDE}
+   ${ROOT_INCLUDE_DIR}
+   ${CUDA_INCLUDE}
 )
 
 set(CUDA_SRCS

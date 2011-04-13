@@ -89,6 +89,11 @@ SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
 SET(CBMLIBDIR ${CMAKE_BINARY_DIR}/lib)  
 SET(LD_LIBRARY_PATH  ${CBMLIBDIR} ${LD_LIBRARY_PATH})
 
+Set(INCLUDE_DIRECTORIES 
+  ${ROOT_INCLUDE_DIR}
+  ${CBMROOT_SOURCE_DIR}/fairtools
+)
+
 # Recurse into the given subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
 # the project's entire directory structure.

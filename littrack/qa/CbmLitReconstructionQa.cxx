@@ -21,6 +21,8 @@
 #include "CbmStsTrack.h"
 #include "CbmMvdPoint.h"
 #include "CbmMvdHitMatch.h"
+#include "CbmRichRingMatch.h"
+#include "CbmRichHit.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -48,6 +50,13 @@ const Int_t PRIM=2; // primary tracks
 const Int_t SEC=3; // secondary tracks
 const Int_t MU=4; // primary muon tracks
 const Int_t EL=5; // primary electron tracks
+// RICH categories
+const Int_t RICHALL=0; // all rings
+const Int_t RICHALLREF=1; // all reference rings
+const Int_t RICHEL=2; // electron rings
+const Int_t RICHELREF=3; // electron reference rings
+const Int_t RICHPI=4; // pion rings
+const Int_t RICHPIREF=5; // pion reference rings
 // for hits in the track distribution
 const Int_t ALLHITS = 0;
 const Int_t TRUEHITS = 1;
@@ -63,6 +72,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fMinNofPointsMuch(10),
    fMinNofPointsTof(1),
    fQuota(0.7),
+   fMinNofHitsRich(7),
+   fQuotaRich(0.6),
 
    fMinNofHitsTrd(8),
    fMinNofHitsMuch(10),
@@ -76,6 +87,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fIsTof(false),
 
    fRefMomentum(1.),
+   fRefNofHitsInRing(15),
+
    fMinMom(0.),
    fMaxMom(25.),
    fNofBinsMom(25),
@@ -89,7 +102,15 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 
    fMCTracks(NULL),
    fGlobalTracks(NULL),
+   fMvdHits(NULL),
+   fMvdPoints(NULL),
+   fMvdHitMatches(NULL),
    fStsMatches(NULL),
+   fRichHits(NULL),
+   fRichRings(NULL),
+   fRichProjections(NULL),
+   fRichRingMatches(NULL),
+   fRichPoints(NULL),
    fMuchPixelHits(NULL),
    fMuchStrawHits(NULL),
    fMuchMatches(NULL),
@@ -116,6 +137,11 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 
    fhStsGhostNh(NULL),
    fhRecGhostNh(NULL),
+   fhRichGhostNh(NULL),
+
+   fhRichMom(),
+   fhRichNh(),
+   fhStsRichMom(),
 
    fhTrdNofHitsInStation(NULL),
    fhMuchNofHitsInStation(NULL),
@@ -156,6 +182,7 @@ InitStatus CbmLitReconstructionQa::Init()
 void CbmLitReconstructionQa::Exec(
    Option_t* opt)
 {
+   FillRichRingNofHits();
    ProcessHits();
    ProcessGlobalTracks();
    ProcessMcTracks();
@@ -228,6 +255,14 @@ void CbmLitReconstructionQa::ReadDataBranches()
    if (fIsRich) {
 	  fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
 	  if (NULL == fRichHits) { Fatal("Init","No RichHit array!"); }
+	  fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
+	  if (NULL == fRichRings) { Fatal("Init","No RichRing array!"); }
+	  fRichProjections = (TClonesArray*) ioman->GetObject("RichProjection");
+	  if (NULL == fRichProjections) { Fatal("Init","No RichProjection array!"); }
+	  fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
+	  if (NULL == fRichRingMatches) { Fatal("Init","No RichRingMatch array!"); }
+	  fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
+	  if (NULL == fRichPoints) { Fatal("Init","No RichPoint array!"); }
    }
 
    if (fIsMuch) {
@@ -291,11 +326,41 @@ void CbmLitReconstructionQa::ProcessHits()
    }
 }
 
+void CbmLitReconstructionQa::FillRichRingNofHits()
+{
+	if (!fIsRich) return;
+	fNofHitsInRingMap.clear();
+    Int_t nofRichHits = fRichHits->GetEntriesFast();
+    for (Int_t iHit=0; iHit < nofRichHits; iHit++) {
+        CbmRichHit* hit = static_cast<CbmRichHit*>(fRichHits->At(iHit));
+        if (NULL == hit) continue;
+
+        Int_t iPoint = hit->GetRefId();
+        if (iPoint < 0) continue;
+
+        FairMCPoint* point = static_cast<FairMCPoint*>(fRichPoints->At(iPoint));
+        if (NULL == point) continue;
+
+        Int_t iMCTrack = point->GetTrackID();
+        CbmMCTrack* track = static_cast<CbmMCTrack*>(fMCTracks->At(iMCTrack));
+        if (NULL == track) continue;
+
+        Int_t iMother = track->GetMotherId();
+        if (iMother == -1) continue;
+
+        fNofHitsInRingMap[iMother]++;
+    }
+}
+
 void CbmLitReconstructionQa::ProcessGlobalTracks()
 {
    fMcStsMap.clear();
    fMcHalfGlobalMap.clear();
    fMcGlobalMap.clear();
+   fMcRichMap.clear();
+   fMcStsRichMap.clear();
+   fMcStsRichTrdMap.clear();
+   fMcStsRichTrdTofMap.clear();
    Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
    for(Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
       CbmGlobalTrack* globalTrack = static_cast<CbmGlobalTrack*>(fGlobalTracks->At(iTrack));
@@ -306,12 +371,14 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       Int_t trdId = globalTrack->GetTrdTrackIndex();
       Int_t muchId = globalTrack->GetMuchTrackIndex();
       Int_t tofId = globalTrack->GetTofHitIndex();
+      Int_t richId = globalTrack->GetRichRingIndex();
 
       // check track segments
       Bool_t isStsOk = stsId > -1 && fIsSts;
       Bool_t isTrdOk = trdId > -1 && fIsTrd;
       Bool_t isMuchOk = muchId > -1 && fIsMuch;
       Bool_t isTofOk = tofId > -1 && fIsTof;
+      Bool_t isRichOk = richId > -1 && fIsRich;
 
       // check the quality of track segments
       CbmTrackMatch* stsTrackMatch;
@@ -351,9 +418,18 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
             isMuchOk = false;
          }
       }
+      CbmRichRingMatch* richRingMatch;
+      if (isRichOk) {
+         richRingMatch = static_cast<CbmRichRingMatch*>(fRichRingMatches->At(richId));
+         Int_t nofHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits() + richRingMatch->GetNofFakeHits();
+         isRichOk = CheckRingQuality(richRingMatch);
+         if (!isRichOk) { // ghost ring
+            fhRichGhostNh->Fill(nofHits);
+         }
+      }
 
       // Get MC indices of track segments
-      Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1;
+      Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1, richMCId = -1;
       if (isStsOk) { stsMCId = stsTrackMatch->GetMCTrackId(); }
       if (isTrdOk) { trdMCId = trdTrackMatch->GetMCTrackId(); }
       if (isMuchOk) { muchMCId = muchTrackMatch->GetMCTrackId(); }
@@ -362,43 +438,67 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
          CbmTofPoint* tofPoint = static_cast<CbmTofPoint*>(fTofPoints->At(tofHit->GetRefId()));
          tofMCId = tofPoint->GetTrackID();
       }
+      if (isRichOk) { richMCId = richRingMatch->GetMCTrackID(); }
+
+      Bool_t sts = isStsOk && stsMCId != -1;
+      Bool_t trd = isTrdOk && stsMCId == trdMCId;
+      Bool_t much = isMuchOk && stsMCId == muchMCId;
+      Bool_t tof = isTofOk && stsMCId == tofMCId;
+      Bool_t rich = isRichOk && stsMCId == richMCId;
 
       // select STS tracks only
-      if (isStsOk && stsMCId != -1) {
+      if (sts) {
          fMcStsMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
       }
       //FIXME
       if (fIsMuch && fIsTrd) { // if MUCH and TRD together
          // select STS+MUCH+TRD tracks
-         if ((isStsOk && stsMCId != -1) &&
-               ((isTrdOk && stsMCId == trdMCId) && (isMuchOk && stsMCId == muchMCId))) {
+         if (sts && (trd && much)) {
             fMcHalfGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
          }
          // select the longest tracks STS+MUCH+TRD+TOF
-         if ( (isStsOk && stsMCId != -1) &&
-               ((isTrdOk && stsMCId == trdMCId) && (isMuchOk && stsMCId == muchMCId)) &&
-               (isTofOk && stsMCId == tofMCId) ) {
+         if (sts && (trd && much) && tof) {
             fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
          }
       } else {
          // select STS+TRD(MUCH) tracks
-         if ((isStsOk && stsMCId != -1) &&
-               ((isTrdOk && stsMCId == trdMCId) || (isMuchOk && stsMCId == muchMCId))) {
+         if (sts && (trd || much)) {
             fMcHalfGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
          }
          // select the longest tracks STS+TRD(MUCH)+TOF
          if (fIsTrd || fIsMuch) {
-            if ( (isStsOk && stsMCId != -1) &&
-                  ((isTrdOk && stsMCId == trdMCId) || (isMuchOk && stsMCId == muchMCId)) &&
-                  (isTofOk && stsMCId == tofMCId) ) {
+            if (sts && (trd || much) && tof) {
                fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
             }
          } else { // for STS+TOF setup
-            if ( (isStsOk && stsMCId != -1) &&
-                  (isTofOk && stsMCId == tofMCId) ) {
+            if (sts && tof) {
                fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
             }
          }
+      }
+      // RICH: select tracks with RICH
+      if (fIsRich) {
+    	  // select only RICH
+    	  if (rich) {
+			  fMcRichMap.insert(std::pair<Int_t, Int_t>(richMCId, iTrack));
+		  }
+    	  // select STS+RICH tracks
+    	  if (sts && rich) {
+    		  fMcStsRichMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+    	  }
+    	  // select STS+RICH+TRD tracks
+    	  if (sts && rich && trd) {
+			  fMcStsRichTrdMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+		  }
+    	  if (fIsTrd) { // select STS+RICH+TRD+TOF tracks
+			  if (sts && rich && trd && tof) {
+				  fMcStsRichTrdTofMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+			  }
+    	  } else { // select STS+RICH+TOF tracks
+    		  if (sts && rich && tof) {
+				  fMcStsRichTrdTofMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+			  }
+    	  }
       }
    }
 }
@@ -474,6 +574,29 @@ Bool_t CbmLitReconstructionQa::CheckTrackQuality(
    return true;
 }
 
+Bool_t CbmLitReconstructionQa::CheckRingQuality(
+   CbmRichRingMatch* ringMatch)
+{
+   Int_t mcId = ringMatch->GetMCTrackID();
+   if(mcId < 0) { return false; }
+
+   Int_t nofTrue = ringMatch->GetNofTrueHits();
+   Int_t nofWrong = ringMatch->GetNofWrongHits();
+   Int_t nofFake = ringMatch->GetNofFakeHits();
+   Int_t nofHits = nofTrue + nofWrong + nofFake;
+   Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
+   Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
+
+   fhRichRingHits[ALLHITS]->Fill(nofHits);
+   fhRichRingHits[TRUEHITS]->Fill(nofTrue);
+   fhRichRingHits[FAKEHITS]->Fill(nofFake + nofWrong);
+   fhRichRingHits[TRUEALL]->Fill(quali);
+   fhRichRingHits[FAKEALL]->Fill(fakequali);
+
+   if (quali < fQuota) { return false; }
+   return true;
+}
+
 void CbmLitReconstructionQa::ProcessMcTracks()
 {
    Int_t nofMcTracks = fMCTracks->GetEntriesFast();
@@ -486,15 +609,18 @@ void CbmLitReconstructionQa::ProcessMcTracks()
       Int_t nofPointsTrd = mcTrack->GetNPoints(kTRD);
       Int_t nofPointsMuch = mcTrack->GetNPoints(kMUCH);
       Int_t nofPointsTof = mcTrack->GetNPoints(kTOF);
+      Int_t nofHitsRich = fNofHitsInRingMap[iMCTrack];
 
       // Check local tracks
       Bool_t isStsOk = nofPointsSts >= fMinNofPointsSts && fIsSts;
       Bool_t isTrdOk = nofPointsTrd >= fMinNofPointsTrd && fIsTrd;
       Bool_t isMuchOk = nofPointsMuch >= fMinNofPointsMuch && fIsMuch;
       Bool_t isTofOk = nofPointsTof >= fMinNofPointsTof && fIsTof;
+      Bool_t isRichOk = nofHitsRich >= fMinNofHitsRich && fIsRich;
+      Bool_t isRecOk = (fIsMuch && fIsTrd) ? (isTrdOk && isMuchOk) : (isTrdOk || isMuchOk); // MUCH+TRD
+
       Bool_t isStsReconstructed = fMcStsMap.find(iMCTrack) != fMcStsMap.end();
       Bool_t isHalfGlobalReconstructed = fMcHalfGlobalMap.find(iMCTrack) != fMcHalfGlobalMap.end();
-      Bool_t isRecOk = (fIsMuch && fIsTrd) ? (isTrdOk && isMuchOk) : (isTrdOk || isMuchOk); // MUCH+TRD
 
       // calculate polar angle
       TVector3 mom;
@@ -552,6 +678,20 @@ void CbmLitReconstructionQa::ProcessMcTracks()
             FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
          }
       }
+
+      // acceptance: RICH
+      if (isRichOk) {
+    	  // momentum dependence histograms
+    	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, fhRichMom, mcTrack->GetP());
+    	  // number of hits dependence histograms
+    	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, fhRichNh, fNofHitsInRingMap[iMCTrack]);
+      }
+      // acceptance: STS+RICH
+      if (isStsOk && isRichOk) {
+    	  // momentum dependence histograms
+    	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichMap, fhStsRichMom, mcTrack->GetP());
+      }
+
    } // Loop over MCTracks
 }
 
@@ -590,6 +730,42 @@ void CbmLitReconstructionQa::FillGlobalReconstructionHistos(
    }
 }
 
+void CbmLitReconstructionQa::FillGlobalReconstructionHistosRich(
+   const CbmMCTrack* mcTrack,
+   Int_t mcId,
+   const std::multimap<Int_t, Int_t>& mcMap,
+   std::vector<std::vector<TH1F*> >& hist,
+   Double_t par)
+{
+   // Get MC track properties (vertex, momentum, primary/secondary, pdg, etc...)
+   TVector3 vertex;
+   mcTrack->GetStartVertex(vertex);
+   Bool_t isPrim = mcTrack->GetMotherId() == -1;
+   Double_t mom = mcTrack->GetP();
+   Int_t nofHitsInRing = fNofHitsInRingMap[mcId];
+   Bool_t isRef = isPrim && mom > fRefMomentum && nofHitsInRing >= fRefNofHitsInRing;
+   Bool_t isPion = std::abs(mcTrack->GetPdgCode()) == 211;
+   Bool_t isElectron = std::abs(mcTrack->GetPdgCode()) == 11;
+
+   // Fill histograms for accepted tracks and rings
+   hist[RICHALL][ACC]->Fill(par);
+   if (isRef) { hist[RICHALLREF][ACC]->Fill(par); }
+   if (isElectron) { hist[RICHEL][ACC]->Fill(par); }
+   if (isElectron && isRef) { hist[RICHELREF][ACC]->Fill(par); }
+   if (isPion) { hist[RICHPI][ACC]->Fill(par); }
+   if (isPion && isRef) { hist[RICHPIREF][ACC]->Fill(par); }
+
+   // Fill histograms for reconstructed rings and tracks which are accepted
+   if (mcMap.find(mcId) != mcMap.end() ) {
+	   hist[RICHALL][REC]->Fill(par);
+	   if (isRef) { hist[RICHALLREF][REC]->Fill(par); }
+	   if (isElectron) { hist[RICHEL][REC]->Fill(par); }
+	   if (isElectron && isRef) { hist[RICHELREF][REC]->Fill(par); }
+	   if (isPion) { hist[RICHPI][REC]->Fill(par); }
+	   if (isPion && isRef) { hist[RICHPIREF][REC]->Fill(par); }
+   }
+}
+
 void CbmLitReconstructionQa::CreateHistos()
 {
    // Histogram list
@@ -608,6 +784,9 @@ void CbmLitReconstructionQa::CreateHistos()
    fhRecNp.resize(fNofCategories);
    fhRecAngle.resize(fNofCategories);
    fhTofMom.resize(fNofCategories);
+   fhRichMom.resize(fNofCategories);
+   fhRichNh.resize(fNofCategories);
+   fhStsRichMom.resize(fNofCategories);
    for (Int_t i = 0; i < fNofCategories; i++) {
       fhStsMom[i].resize(fNofTypes);
       fhStsMomNormHalfGlobal[i].resize(fNofTypes);
@@ -621,6 +800,9 @@ void CbmLitReconstructionQa::CreateHistos()
       fhRecNp[i].resize(fNofTypes);
       fhRecAngle[i].resize(fNofTypes);
       fhTofMom[i].resize(fNofTypes);
+      fhRichMom[i].resize(fNofTypes);
+      fhRichNh[i].resize(fNofTypes);
+      fhStsRichMom[i].resize(fNofTypes);
    }
 
    // Momentum distributions
@@ -629,8 +811,8 @@ void CbmLitReconstructionQa::CreateHistos()
    Int_t    nBinsMom = fNofBinsMom;
    // Number of points distributions
    Double_t minNofPoints   =  0.;
-   Double_t maxNofPoints   = 25.;
-   Int_t    nBinsNofPoints = 25;
+   Double_t maxNofPoints   = 50.;
+   Int_t    nBinsNofPoints = 50;
    // Polar angle distributions
    Double_t minAngle   =  fMinAngle; //grad
    Double_t maxAngle   = fMaxAngle; //grad
@@ -713,6 +895,24 @@ void CbmLitReconstructionQa::CreateHistos()
          histTitle = "TOF matching: " + type[j] + cat[i] + " " + " tracks";
          fhTofMom[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
          fHistoList->Add(fhTofMom[i][j]);
+
+         // RICH: momentum dependence
+         histName = "hRichMom" + type[j] + cat[i];
+         histTitle = "RICH momentum: " + type[j] + cat[i] + " " + " rings";
+         fhRichMom[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
+         fHistoList->Add(fhRichMom[i][j]);
+
+         // RICH:: number of hits dependence
+         histName = "hRichNh" + type[j] + cat[i];
+		 histTitle = "RICH number of hits: " + type[j] + cat[i] + " " + " rings";
+		 fhRichNh[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsNofPoints, minNofPoints, maxNofPoints);
+		 fHistoList->Add(fhRichNh[i][j]);
+
+         // STS+RICH: momentum dependence
+         histName = "hStsRichMom" + type[j] + cat[i];
+         histTitle = "STS+RICH momentum: " + type[j] + cat[i] + " " + " rings";
+         fhStsRichMom[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsMom, minMom, maxMom);
+         fHistoList->Add(fhStsRichMom[i][j]);
       }
    }
 
@@ -721,6 +921,8 @@ void CbmLitReconstructionQa::CreateHistos()
    fHistoList->Add(fhStsGhostNh);
    fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
    fHistoList->Add(fhRecGhostNh);
+   fhRichGhostNh = new TH1F("hRichGhostNh", "RICH: ghost rings", nBinsNofPoints, minNofPoints, maxNofPoints);
+   fHistoList->Add(fhRichGhostNh);
 
    const UInt_t maxNofStations = 30;
    fhMvdNofHitsInStation = new TH1F("hMvdNofHitsInStation", "MVD: number of hits", maxNofStations, 0, maxNofStations);
@@ -739,10 +941,13 @@ void CbmLitReconstructionQa::CreateHistos()
    Double_t hitmin[] = {0, 0, 0, -0.1, -0.1};
    Double_t hitmax[] = {20, 20, 20, 1.1, 1.1};
    Int_t hitbins[] = {20, 20, 20, 12, 12};
+   Double_t hitmaxrich[] = {50, 50, 50, 1.1, 1.1};
+   Int_t hitbinsrich[] = {50, 50, 50, 12, 12};
    fhMvdTrackHits.resize(nofHitsHistos);
    fhStsTrackHits.resize(nofHitsHistos);
    fhTrdTrackHits.resize(nofHitsHistos);
    fhMuchTrackHits.resize(nofHitsHistos);
+   fhRichRingHits.resize(nofHitsHistos);
    for(UInt_t i = 0; i < nofHitsHistos; i++) {
       std::string histName = "hMvdTrackHits" + hittype[i];
       std::string histTitle = "MVD hits in track: " + hittype[i];
@@ -763,6 +968,11 @@ void CbmLitReconstructionQa::CreateHistos()
       histTitle = "MUCH hits in track: " + hittype[i];
       fhMuchTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
       fHistoList->Add(fhMuchTrackHits[i]);
+
+      histName = "hRichRingHits" + hittype[i];
+      histTitle = "RICH hits in ring: " + hittype[i];
+      fhRichRingHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbinsrich[i], hitmin[i], hitmaxrich[i]);
+      fHistoList->Add(fhRichRingHits[i]);
    }
 }
 
@@ -792,6 +1002,9 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
       DivideHistos(fhRecNp[i][REC], fhRecNp[i][ACC], fhRecNp[i][EFF]);
       DivideHistos(fhRecAngle[i][REC], fhRecAngle[i][ACC], fhRecAngle[i][EFF]);
       DivideHistos(fhTofMom[i][REC], fhTofMom[i][ACC], fhTofMom[i][EFF]);
+      DivideHistos(fhRichMom[i][REC], fhRichMom[i][ACC], fhRichMom[i][EFF]);
+      DivideHistos(fhRichNh[i][REC], fhRichNh[i][ACC], fhRichNh[i][EFF]);
+      DivideHistos(fhStsRichMom[i][REC], fhStsRichMom[i][ACC], fhStsRichMom[i][EFF]);
    }
    fhMvdNofHitsInStation->Scale(1./fEventNo);
    fhStsNofHitsInStation->Scale(1./fEventNo);
@@ -841,6 +1054,12 @@ void CbmLitReconstructionQa::PrintEventStatistics()
    if (fIsTrd) { std::cout << " TRD=" << fTrdMatches->GetEntriesFast(); }
    if (fIsMuch) { std::cout << " MUCH=" << fMuchMatches->GetEntriesFast(); }
    std::cout << std::endl;
+
+   if (fIsRich) {
+	   std::cout << "RICH: nof rings=" << fRichRings->GetEntriesFast()
+			   << " nof projections=" << fRichProjections->GetEntriesFast()
+			   << std::endl;
+   }
 
    std::string det = RecDetector();
 
@@ -981,27 +1200,6 @@ void CbmLitReconstructionQa::Draw()
 
 void CbmLitReconstructionQa::DrawEfficiencyHistos()
 {
-   TCanvas* c1 = new TCanvas("rec_qa_global_efficiency_all","rec_qa_global_efficiency_all", 600, 500);
-   c1->SetGrid();
-
-   TCanvas* c2 = new TCanvas("rec_qa_global_efficiency_signal","rec_qa_global_efficiency_signal", 600, 500);
-   c2->SetGrid();
-
-   TCanvas* c3 = new TCanvas("rec_qa_half_global_efficiency_all","rec_qa_half_global_efficiency_all", 600, 500);
-   c3->SetGrid();
-
-   TCanvas* c4 = new TCanvas("rec_qa_half_global_efficiency_signal","rec_qa_half_global_efficiency_signal", 600, 500);
-   c4->SetGrid();
-
-   TCanvas* c5 = new TCanvas("rec_qa_sts_efficiency","rec_qa_sts_efficiency", 600, 500);
-   c5->SetGrid();
-
-   TCanvas* c6 = new TCanvas("rec_qa_rec_efficiency","rec_qa_rec_efficiency", 600, 500);
-   c6->SetGrid();
-
-   TCanvas* c7 = new TCanvas("rec_qa_tof_efficiency","rec_qa_tof_efficiency", 600, 500);
-   c7->SetGrid();
-
    std::string sname("STS");
    std::string rname;
    if (fIsMuch && !fIsTrd) { rname = "MUCH"; }
@@ -1014,70 +1212,83 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
    Int_t cat = fIsMuch ? MU : EL;
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
-   DrawGlobalEfficiency(c1, fhStsMomNormGlobal, fhHalfGlobalMomNormGlobal, fhGlobalMom, sname, hgname, gname, ALL);
+   DrawEfficiency("rec_qa_global_efficiency_all", fhStsMomNormGlobal,
+		   fhHalfGlobalMomNormGlobal, fhGlobalMom, sname, hgname, gname, ALL, ALL, ALL);
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
-   DrawGlobalEfficiency(c2, fhStsMomNormGlobal, fhHalfGlobalMomNormGlobal, fhGlobalMom, sname, hgname, gname, cat);
+   DrawEfficiency("rec_qa_global_efficiency_signal", fhStsMomNormGlobal,
+		   fhHalfGlobalMomNormGlobal, fhGlobalMom, sname, hgname, gname, cat, cat, cat);
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-   DrawGlobalEfficiency(c3, fhStsMomNormHalfGlobal, fhHalfGlobalMom, fhGlobalMom, sname, hgname, "", ALL);
+   DrawEfficiency("rec_qa_half_global_efficiency_all", fhStsMomNormHalfGlobal,
+		   fhHalfGlobalMom, fhGlobalMom, sname, hgname, "", ALL, ALL, 0);
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
-   DrawGlobalEfficiency(c4, fhStsMomNormHalfGlobal, fhHalfGlobalMom, fhGlobalMom, sname, hgname, "", cat);
+   DrawEfficiency("rec_qa_half_global_efficiency_signal", fhStsMomNormHalfGlobal,
+		   fhHalfGlobalMom, fhGlobalMom, sname, hgname, "", cat, cat, 0);
 
    // Draw efficiency for STS
-   DrawSegmentEfficiency(c5, fhStsMom, "STS", signal, cat);
+   DrawEfficiency("rec_qa_sts_efficiency", fhStsMom,
+  		   fhStsMom, fhStsMom, "STS: all", "STS: " + signal, "", ALL, cat, 0);
 
-   // Draw efficiency for TRD(MUCH)
-   DrawSegmentEfficiency(c6, fhRecMom, rname, signal, cat);
+   if (fIsTrd || fIsMuch) {
+	   // Draw efficiency for TRD(MUCH)
+	   DrawEfficiency("rec_qa_rec_efficiency", fhRecMom,
+				 fhRecMom, fhRecMom, rname + ": all", rname + ": " + signal, "", ALL, cat, 0);
+   }
 
-   // Draw efficiency for TOF
-   DrawSegmentEfficiency(c7, fhTofMom, "TOF", signal, cat);
+   if (fIsTof) {
+	   // Draw efficiency for TOF
+	   DrawEfficiency("rec_qa_tof_efficiency", fhTofMom,
+			   	 fhTofMom, fhTofMom, "TOF: all", "TOF: " + signal, "", ALL, cat, 0);
+   }
+
+   if (fIsRich) {
+	   // Draw efficiency for RICH for all set
+	   DrawEfficiency("rec_qa_rich_efficiency_all", fhRichMom,
+				fhRichMom, fhRichMom, "RICH: all", "RICH: reference", "", RICHALL, RICHALLREF, 0);
+
+	   // Draw efficiency for RICH for electron set
+	   DrawEfficiency("rec_qa_rich_efficiency_electrons", fhRichMom,
+				fhRichMom, fhRichMom, "RICH: electrons", "RICH: reference", "", RICHEL, RICHELREF, 0);
+
+	   // Draw efficiency for RICH for pion set
+	   DrawEfficiency("rec_qa_rich_efficiency_pions", fhRichMom,
+				fhRichMom, fhRichMom, "RICH: pions", "RICH: pions", "", RICHPI, RICHPIREF, 0);
+
+	   // Draw efficiency for STS+RICH for electron set
+	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", fhStsRichMom,
+				fhStsRichMom, fhStsRichMom, "STS+RICH: electrons", "STS+RICH: electrons", "", RICHEL, RICHELREF, 0);
+   }
 }
 
-void CbmLitReconstructionQa::DrawGlobalEfficiency(
-		TCanvas* canvas,
+void CbmLitReconstructionQa::DrawEfficiency(
+		const std::string& canvasName,
 		const std::vector<std::vector<TH1F*> >& hist1,
 		const std::vector<std::vector<TH1F*> >& hist2,
 		const std::vector<std::vector<TH1F*> >& hist3,
 		const std::string& name1,
 		const std::string& name2,
 		const std::string& name3,
-		Int_t category)
+		Int_t category1,
+		Int_t category2,
+		Int_t category3)
 {
+	TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+	canvas->SetGrid();
 	canvas->cd();
-	std::string hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist1[category][REC], hist1[category][ACC])) + ")";;
-	std::string hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist2[category][REC], hist2[category][ACC])) + ")";;
-	std::string hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist3[category][REC], hist3[category][ACC])) + ")";;
-	hist1[category][EFF]->SetMinimum(0.);
-	hist1[category][EFF]->SetMaximum(1.);
-	if (fIsTof && name3 != "") {
-	  DrawHist1D(hist1[category][EFF], hist2[category][EFF], hist3[category][EFF], NULL,
+	std::string hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist1[category1][REC], hist1[category1][ACC])) + ")";;
+	std::string hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist2[category2][REC], hist2[category2][ACC])) + ")";;
+	std::string hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist3[category3][REC], hist3[category3][ACC])) + ")";;
+	hist1[category1][EFF]->SetMinimum(0.);
+	hist1[category1][EFF]->SetMaximum(1.);
+	if (name3 != "") {
+	  DrawHist1D(hist1[category1][EFF], hist2[category2][EFF], hist3[category3][EFF], NULL,
 				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
 				 false, false, true, 0.3,0.3,0.85,0.6);
 	} else {
-	  DrawHist1D(hist1[category][EFF], hist2[category][EFF], NULL, NULL,
+	  DrawHist1D(hist1[category1][EFF], hist2[category2][EFF], NULL, NULL,
 				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
 				 false, false, true, 0.3,0.3,0.85,0.6);
 	}
-	lit::SaveCanvasAsImage(canvas, fOutputDir);
-}
-
-void CbmLitReconstructionQa::DrawSegmentEfficiency(
-		TCanvas* canvas,
-		const std::vector<std::vector<TH1F*> >& hist,
-		const std::string& detName,
-		const std::string& signal,
-		Int_t category)
-{
-	canvas->cd();
-	std::string hname1 = detName + ": all";
-	std::string hname2 = detName + ": " + signal;
-	hname1 += "(" + lit::ToString<Double_t>(CalcEfficiency(hist[ALL][REC], hist[ALL][ACC]))+ ")";
-	hname2 += "(" + lit::ToString<Double_t>(CalcEfficiency(hist[category][REC], hist[category][ACC])) + ")";
-	hist[ALL][EFF]->SetMinimum(0.);
-	hist[ALL][EFF]->SetMaximum(1.);
-	DrawHist1D(hist[ALL][EFF], hist[category][EFF], NULL, NULL,
-			  "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
-			  false, false, true, 0.3,0.3,0.85,0.6);
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
@@ -1091,31 +1302,18 @@ Double_t CbmLitReconstructionQa::CalcEfficiency(
 
 void CbmLitReconstructionQa::DrawHitsHistos()
 {
-   if (fIsMvd) {
-      TCanvas* cMvdHits = new TCanvas("rec_qa_mvd_hits","rec_qa_mvd_hits", 1200, 600);
-      DrawHitsHistos(cMvdHits, fhMvdTrackHits);
-   }
-
-   if (fIsSts) {
-      TCanvas* cStsHits = new TCanvas("rec_qa_sts_hits","rec_qa_sts_hits", 1200, 600);
-      DrawHitsHistos(cStsHits, fhStsTrackHits);
-   }
-
-   if (fIsTrd) {
-      TCanvas* cTrdHits = new TCanvas("rec_qa_trd_hits","rec_qa_trd_hits", 1200, 600);
-      DrawHitsHistos(cTrdHits, fhTrdTrackHits);
-   }
-
-   if (fIsMuch) {
-      TCanvas* cMuchHits = new TCanvas("rec_qa_much_hits","rec_qa_much_hits", 1200, 600);
-      DrawHitsHistos(cMuchHits, fhMuchTrackHits);
-   }
+   if (fIsMvd) { DrawHitsHistos("rec_qa_mvd_hits", fhMvdTrackHits); }
+   if (fIsSts) { DrawHitsHistos("rec_qa_sts_hits", fhStsTrackHits); }
+   if (fIsTrd) { DrawHitsHistos("rec_qa_trd_hits", fhTrdTrackHits); }
+   if (fIsMuch) { DrawHitsHistos("rec_qa_much_hits", fhMuchTrackHits); }
+   if (fIsRich) { DrawHitsHistos("rec_qa_rich_ring_hits", fhRichRingHits); }
 }
 
 void CbmLitReconstructionQa::DrawHitsHistos(
-   TCanvas* c,
+   const std::string& canvasName,
    std::vector<TH1F*>& histos)
 {
+   TCanvas* c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 600);
    c->Divide(2,1);
    c->SetGrid();
 

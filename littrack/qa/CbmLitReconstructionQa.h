@@ -18,6 +18,7 @@
 #include <vector>
 
 class CbmTrackMatch;
+class CbmRichRingMatch;
 class CbmMCTrack;
 class TClonesArray;
 class TH1;
@@ -62,6 +63,14 @@ public:
     * @param quota Quota value. */
    void SetQuota(Double_t quota) { fQuota = quota;}
 
+   /* Sets the minimum number of hits in MC RICH ring.
+    * @param minNofHits Minimum number of hits in MC RICH ring. */
+   void SetMinNofHitsRich(Int_t minNofHits) { fMinNofHitsRich = minNofHits;}
+
+   /* Sets the quota value for RICH
+    * @param quota Quota value. */
+   void SetQuotaRich(Double_t quota) { fQuotaRich = quota;}
+
    /* Sets the minimum number of hits in TRD track.
      * @param minNofPointsTrd Minimum number of hits in TRD. */
    void SetMinNofHitsTrd(Int_t minNofHitsTrd) { fMinNofHitsTrd = minNofHitsTrd;}
@@ -102,6 +111,9 @@ private:
    /* Fills hit related histograms */
    void ProcessHits();
 
+   /* Fill map with number of hits in MC RICH ring */
+   void FillRichRingNofHits();
+
    /* Loops over the reconstructed global tracks. Checks if the track is correct
     * than fills the multimaps <MC track index, reconstructed track index>. */
    void ProcessGlobalTracks();
@@ -111,10 +123,18 @@ private:
       Int_t stsId);
 
    /* Checks track quality based on fQuota value.
-     * @param trackMatch Track match */
+     * @param trackMatch Track match
+     * @param detId Detector identifier for this track match
+     * @return True if track is correctly reconstructed */
    Bool_t CheckTrackQuality(
       CbmTrackMatch* trackMatch,
       DetectorId detId);
+
+   /* Checks ring quality based on fQuota value.
+     * @param ringMatch Ring match
+     * @return True if ring is correctly reconstructed */
+   Bool_t CheckRingQuality(
+      CbmRichRingMatch* ringMatch);
 
    /* Loops over the MC tracks. Checks the track acceptance for different cases.
      * Fills the histograms of the accepted and reconstructed tracks. */
@@ -127,6 +147,19 @@ private:
     * @param hist vector with histograms to be filled
     * @param par value that will be added in the histos (momentum or number of points) */
    void FillGlobalReconstructionHistos(
+      const CbmMCTrack* mcTrack,
+      Int_t mcId,
+      const std::multimap<Int_t, Int_t>& mcMap,
+      std::vector<std::vector<TH1F*> >& hist,
+      Double_t par);
+
+    /* Fills the histograms of the accepted and reconstructed rings tracks.
+    * @param mcTrack MC track pointer
+    * @param mcId MC track index in the array
+    * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
+    * @param hist vector with histograms to be filled
+    * @param par value that will be added in the histos (momentum or number of points) */
+   void FillGlobalReconstructionHistosRich(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
       const std::multimap<Int_t, Int_t>& mcMap,
@@ -185,24 +218,18 @@ private:
    /* Draws efficiency histograms. */
    void DrawEfficiencyHistos();
 
-   /* Draws Global tracking efficiency */
-   void DrawGlobalEfficiency(
-   		TCanvas* canvas,
+   /* Draws efficiency plots */
+   void DrawEfficiency(
+   		const std::string& canvasName,
    		const std::vector<std::vector<TH1F*> >& hist1,
    		const std::vector<std::vector<TH1F*> >& hist2,
    		const std::vector<std::vector<TH1F*> >& hist3,
    		const std::string& name1,
    		const std::string& name2,
    		const std::string& name3,
-   		Int_t category);
-
-   /* Draw efficiency for global track segments STS, TRD, MUCH, TOF */
-   void DrawSegmentEfficiency(
-   		TCanvas* canvas,
-   		const std::vector<std::vector<TH1F*> >& hist,
-   		const std::string& detName,
-   		const std::string& signal,
-   		Int_t category);
+   		Int_t category1,
+   		Int_t category2,
+   		Int_t category3);
 
    /* Calculate efficiency for two histograms */
    Double_t CalcEfficiency(
@@ -213,10 +240,10 @@ private:
    void DrawHitsHistos();
 
    /* Draws histograms for hits
-    * @param c Pointer to canvas.
+    * @param canvasName Name of the canvas.
     * @param histos Vector with hits histograms. */
    void DrawHitsHistos(
-      TCanvas* c,
+	  const std::string& canvasName,
       std::vector<TH1F*>& histos);
 
    /* Draws histogram of number of hits in station
@@ -234,6 +261,9 @@ private:
    Int_t fMinNofPointsMuch; // Minimal number of MCPoints in MUCH
    Int_t fMinNofPointsTof; // Minimal number of MCPoints in TOF
    Double_t fQuota;  // True/all hits for track to be considered correctly reconstructed
+
+   Int_t fMinNofHitsRich; // Minimal number of hits in MC RICH ring
+   Double_t fQuotaRich; // True/all hits for ring to be considered correctly reconstructed
 
    // Minimal number of hits in track to be considered as accepted.
    // This is needed because the definition of the correctly reconstructed track
@@ -255,6 +285,8 @@ private:
    Bool_t fIsTof; // If TOF detected than true
 
    Double_t fRefMomentum; // Momentum cut for reference tracks
+   Int_t fRefNofHitsInRing; // Minimum number of hits in RICH ring to be considered as reference
+
    Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation
    Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation
    Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
@@ -269,6 +301,14 @@ private:
    std::multimap<Int_t, Int_t> fMcHalfGlobalMap; // STS+TRD(MUCH)
    std::multimap<Int_t, Int_t> fMcGlobalMap; // STS+TRD(MUCH)+TOF
 
+   std::multimap<Int_t, Int_t> fMcRichMap; // RICH
+   std::multimap<Int_t, Int_t> fMcStsRichMap; // STS+RICH
+   std::multimap<Int_t, Int_t> fMcStsRichTrdMap; // STS+RICH+TRD
+   std::multimap<Int_t, Int_t> fMcStsRichTrdTofMap; // STS+RICH+TRD+TOF
+
+   // Number of hits in the MC RICH ring
+   std::map<Int_t, Int_t> fNofHitsInRingMap;
+
    // Pointers to data arrays
    TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
@@ -279,6 +319,10 @@ private:
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
    TClonesArray* fStsHits; // CbmStsHit array
    TClonesArray* fRichHits; // CbmRichHits array
+   TClonesArray* fRichRings; // CbmRichRing array
+   TClonesArray* fRichProjections; // CbmRichProjection array
+   TClonesArray* fRichRingMatches; // CbmRichProjection array
+   TClonesArray* fRichPoints; // CbmRichPoint array
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
    TClonesArray* fMuchMatches; // CbmTrackMatch array
@@ -313,6 +357,13 @@ private:
    TH1F* fhStsGhostNh;
    // TRD(MUCH): ghost tracks (number of hits dependence)
    TH1F* fhRecGhostNh;
+   // RICH: ghost rings (number of hits dependence)
+   TH1F* fhRichGhostNh;
+
+   // RICH performance histograms
+   std::vector<std::vector<TH1F*> > fhRichMom;// RICH: momentum dependence
+   std::vector<std::vector<TH1F*> > fhRichNh;// RICH: number of hits
+   std::vector<std::vector<TH1F*> > fhStsRichMom;// STS+RICH: momentum dependence
 
    TH1F* fhMvdNofHitsInStation; // mean number of hits in station in MVD
    TH1F* fhStsNofHitsInStation; // mean number of hits in station in STS
@@ -326,6 +377,7 @@ private:
    std::vector<TH1F*> fhStsTrackHits;
    std::vector<TH1F*> fhTrdTrackHits;
    std::vector<TH1F*> fhMuchTrackHits;
+   std::vector<TH1F*> fhRichRingHits;
 
    TList* fHistoList; // List of histograms
 

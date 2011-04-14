@@ -19,6 +19,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
+${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/geane
 ${CBMROOT_SOURCE_DIR}/field

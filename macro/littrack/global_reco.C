@@ -79,16 +79,16 @@ void global_reco(Int_t nEvents = 10, // number of events
 		parFileList->Add(&stsDigiFile);
 		TObjString trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
 		parFileList->Add(&trdDigiFile);
-		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS"))->Atoi();
-		normTrdPoints = TString(gSystem->Getenv("NORMTRDPOINTS"))->Atoi();
-		normMuchPoints = TString(gSystem->Getenv("NORMMUCHPOINTS"))->Atoi();
-		normTofPoints = TString(gSystem->Getenv("NORMTOFPOINTS"))->Atoi();
-		normTrdHits = TString(gSystem->Getenv("NORMTRDHITS"))->Atoi();
-		normMuchHits = TString(gSystem->Getenv("NORMMUCHHITS"))->Atoi();
-		normTofHits = TString(gSystem->Getenv("NORMTOFHITS"))->Atoi();
-		momMin = TString(gSystem->Getenv("MOMMIN"))->Atof();
-		momMax = TString(gSystem->Getenv("MOMMAX"))->Atof();
-		momBins = TString(gSystem->Getenv("MOMBINS"))->Atoi();
+		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
+		normTrdPoints = TString(gSystem->Getenv("NORMTRDPOINTS")).Atoi();
+		normMuchPoints = TString(gSystem->Getenv("NORMMUCHPOINTS")).Atoi();
+		normTofPoints = TString(gSystem->Getenv("NORMTOFPOINTS")).Atoi();
+		normTrdHits = TString(gSystem->Getenv("NORMTRDHITS")).Atoi();
+		normMuchHits = TString(gSystem->Getenv("NORMMUCHHITS")).Atoi();
+		normTofHits = TString(gSystem->Getenv("NORMTOFHITS")).Atoi();
+		momMin = TString(gSystem->Getenv("MOMMIN")).Atof();
+		momMax = TString(gSystem->Getenv("MOMMAX")).Atof();
+		momBins = TString(gSystem->Getenv("MOMBINS")).Atoi();
 	}
 
 	Int_t iVerbose = 1;
@@ -289,7 +289,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 		}
 	}
 
-	if (opt == "all" || opt == "hits") {
+	if (opt == "all" || opt == "tracking") {
 	  if (IsRich(parFile)) {
 		  // ---------------------RICH Hit Producer ----------------------------------
 		  Double_t richPmtRad = 0.4; // PMT radius [cm]
@@ -348,6 +348,9 @@ void global_reco(Int_t nEvents = 10, // number of events
 		  assignTrack->UseAssign(richAssign);
 		  run->AddTask(assignTrack);
 		  // ------------------------------------------------------------------------
+
+//		  CbmRichRingQa* richQa = new CbmRichRingQa("Qa", "qa", 0);
+//		  run->AddTask(richQa);
 	  }
     }
 

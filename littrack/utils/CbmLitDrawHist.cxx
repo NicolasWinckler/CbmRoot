@@ -2,8 +2,8 @@
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2008
  **/
-#include "utils/CbmLitDrawHist.h"
-#include "utils/CbmLitUtils.h"
+#include "CbmLitDrawHist.h"
+#include "CbmLitUtils.h"
 
 #include "TH1.h"
 #include "TH2.h"

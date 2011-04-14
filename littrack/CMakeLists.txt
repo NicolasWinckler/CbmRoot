@@ -8,6 +8,7 @@ ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
 ${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
+${CBMROOT_SOURCE_DIR}/littrack/utils
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base

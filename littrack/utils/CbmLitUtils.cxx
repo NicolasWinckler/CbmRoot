@@ -1,4 +1,4 @@
-#include "utils/CbmLitUtils.h"
+#include "CbmLitUtils.h"
 
 #include "TCanvas.h"
 

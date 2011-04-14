@@ -90,7 +90,6 @@ public:
 
     void SingleParticleAcceptance();
     void MCPairs();
-    void MCPairsBg();
     void PairAcceptance();
     void FillSegmentCandidatesArray();
     void FillCandidateArray();
@@ -152,41 +151,6 @@ private:
     vector<DielectronCandidate> fSegmentCandidates;
 
     Double_t fWeight; //Multiplicity*BR
-
-    Int_t fNofMcEp;  //number of MC e+
-    Int_t fNofMcEm;  // number of MC e-
-    Int_t fNofMcEpBg;  
-    Int_t fNofMcEmBg; 
-
-    Int_t fNofAccEp; //number of accepted e+
-    Int_t fNofAccEm; //number of accepted e-
-    Int_t fNofAccEpBg; //number of accepted e+ from BG 
-    Int_t fNofAccEmBg; //number of accepted e- from BG 
-    Int_t fNofAccPairs; //number of accepted pairs of e-/e+
-
-    Int_t fNofRecPairs;
-    Int_t fNofRichIdPairs; //number of rich id signal pairs
-    Int_t fNofTrdIdPairs; //number of trd id signal pairs
-    Int_t fNofTofIdPairs; //number of tof id signal pairs
-    Int_t fNofChiPrimCutPairs;//number of signal pairs after chi primary cut
-    Int_t fNofGammaCutPairs;
-    Int_t fNofTTcutPairs;
-    Int_t fNofSTcutPairs;
-    Int_t fNofAngleCutPairs;
-    Int_t fNofAPcutPairs;
-    Int_t fNofPtcutPairs;
-
-    Int_t fNofRecBg;
-    Int_t fNofRichIdBg;
-    Int_t fNofTrdIdBg;
-    Int_t fNofTofIdBg;
-    Int_t fNofChiPrimCutBg;
-    Int_t fNofGammaCutBg;
-    Int_t fNofTTcutBg;
-    Int_t fNofSTcutBg;
-    Int_t fNofAngleCutBg;
-    Int_t fNofAPcutBg;
-    Int_t fNofPtcutBg;
 
 // ID cuts
     Double_t fTrdAnnCut;
@@ -310,6 +274,11 @@ private:
     TH2D* fh_apcut_gamma;
     TH2D* fh_apmcut_signal;
     TH2D* fh_apmcut_bg;
+    TH2D* fh_dsts_signal;
+    TH2D* fh_dsts_bg;
+    TH2D* fh_dsts_gamma;
+    TH2D* fh_dsts_pi0;
+    TH2D* fh_dsts_eta;
 
 //source of BG pairs
     TH2D*  fh_source_pair_reco;

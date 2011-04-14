@@ -608,8 +608,12 @@ void CbmAnaElectronsQa::StsQa()
 		//select only signal electrons
         if (pdg != 11 || motherId != -1) continue;
         //if (motherId != -1) continue;
+        //Int_t nMvdHits = stsTrack->GetNMvdHits();
+        //if (nMvdHits == 0) continue;
+
 		TVector3 momMC;
 		mcTrack->GetMomentum(momMC);
+        //fKFFitter.DoFit(stsTrack,11);
         Double_t chiPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
         fh_chiprim_signal->Fill(chiPrimary);
         //cout <<  << endl;

@@ -1,6 +1,6 @@
 void glue_electrons_qa ()
 {
-    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa";
+    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/elid.qa";
     TString outFileName = filePath +".all.root";
     Int_t nEvents = 200;   // number of files to be added
 
@@ -53,8 +53,10 @@ void glue_electrons_qa ()
         if (file->IsZombie()) continue;
 
         for (Int_t iH = 0; iH < histList->GetEntries(); iH++){
-        	TH1* h = (TH1*)histList->At(iH);
-        	h->Add((TH2D*) file->Get(h->GetName()));
+	    TH1* h = (TH1*)histList->At(iH);
+	    TH1* h1 = (TH1*) file->Get(h->GetName());
+            h1->Sumw2();
+        	h->Add(h1);
         }
 
         nofGoodFiles++;

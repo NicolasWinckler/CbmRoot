@@ -9,11 +9,13 @@
 #include "../../../littrack/utils/CbmLitUtils.h"
 
 void draw_electrons_qa()
+
 {
-	//SetStyles();
+//	SetStyles();
+gStyle->SetPalette(1);
 
 	TFile *file = new TFile
-        ("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/elid.qa.all.root");
+        ("/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/elid.qa.all.root");
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
    // gStyle->SetOptStat(0000);
@@ -125,7 +127,7 @@ void draw_electrons_qa()
 //ELECTRON IDENTIFICATION AND PION SUPPRESSION
 	{
 	std::string hname1, hname2, hname3, hname4;
-	TCanvas* c4 = new TCanvas("el_eff_pi_supp","el_eff_pi_supp",800,400);
+	TCanvas* c4 = new TCanvas("el_eff_pi_supp","el_eff_pi_supp",1000,500);
 	c4->Divide(2,1);
 	c4->cd(1);
 	TH1D* eff1 = Divide1DHists(fh_elid_rich, fh_acc_rich_el, "eff1", "Electron Identification",
@@ -134,14 +136,19 @@ void draw_electrons_qa()
 	TH1D* eff2 = Divide1DHists(fh_elid_trd, fh_acc_rich_el,	"eff2","",	"", "");
 	TH1D* eff3 = Divide1DHists(fh_elid_tof, fh_acc_rich_el, "eff3","","", "");
 
-	hname1 = "RICH (" +CalcEfficiency(fh_elid_rich,fh_acc_rich_el)+")";
-	hname2 = "TRD (" +CalcEfficiency(fh_elid_trd,fh_acc_rich_el)+")";
-	hname3 = "TOF ("+CalcEfficiency(fh_elid_tof,fh_acc_rich_el)+")";
+	hname1 = "RICH";// (" +CalcEfficiency(fh_elid_rich,fh_acc_rich_el)+")";
+	hname2 = "RICH+TRD";// (" +CalcEfficiency(fh_elid_trd,fh_acc_rich_el)+")";
+	hname3 = "RICH+TRD+TOF";// ("+CalcEfficiency(fh_elid_tof,fh_acc_rich_el)+")";
 	DrawHist1D(eff1, eff2, eff3, NULL, "", "momentum, GeV/c", "efficiency",
 			hname1, hname2, hname3, "",	false, false, true, 0.3,0.15, 0.99, 0.35);
 
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+
+        cout << "efff" <<endl ;
+        cout << fh_elid_rich->Integral(1.,6.) / fh_acc_rich_el->Integral(1., 6.) << endl;
+	cout << fh_elid_trd->Integral(1.,6.) / fh_acc_rich_el->Integral(1., 6.) << endl;
+	cout << fh_elid_tof->Integral(1.,6.) / fh_acc_rich_el->Integral(1., 6.) << endl;
 
 	c4->cd(2);
 	TH1D* supp1 = Divide1DHists(fh_acc_pi, fh_pi_as_el_rich,	"elid_pi_supp_rich","","", "");
@@ -150,9 +157,9 @@ void draw_electrons_qa()
 	TH1D* supp2 = Divide1DHists(fh_acc_pi, fh_pi_as_el_trd, "elid_pi_supp_rich_trd","","", "");
 	TH1D* supp3 = Divide1DHists(fh_acc_pi, fh_pi_as_el_tof,	"elid_pi_supp_rich_trd_tof","","", "");
 
-	hname1 = "RICH (" +CalcEfficiency(fh_acc_pi,fh_pi_as_el_rich)+")";
-	hname2 = "TRD (" +CalcEfficiency(fh_acc_pi,fh_pi_as_el_trd)+")";
-	hname3 = "TOF ("+CalcEfficiency(fh_acc_pi,fh_pi_as_el_tof)+")";
+	hname1 = "RICH";// (" +CalcEfficiency(fh_acc_pi,fh_pi_as_el_rich)+")";
+	hname2 = "RICH+TRD";// (" +CalcEfficiency(fh_acc_pi,fh_pi_as_el_trd)+")";
+	hname3 = "RICH+TRD+TOF";// ("+CalcEfficiency(fh_acc_pi,fh_pi_as_el_tof)+")";
 	for (int i = 1; i < fh_pi_as_el_trd->GetNbinsX(); i++){
 		if ( fabs(fh_pi_as_el_trd->GetBinContent(i)) < 0.00000001) fh_pi_as_el_trd->SetBinContent(i, 0.0000001);
 		if ( fabs(fh_pi_as_el_tof->GetBinContent(i)) < 0.00000001) fh_pi_as_el_tof->SetBinContent(i, 0.0000001);
@@ -163,6 +170,11 @@ void draw_electrons_qa()
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
+
+        cout << "supp" <<endl ;
+        cout << fh_acc_pi->Integral(1.,6.) / fh_pi_as_el_rich->Integral(1., 6.) << endl;
+	cout << fh_acc_pi->Integral(1.,6.) / fh_pi_as_el_trd->Integral(1., 6.) << endl;
+	cout << fh_acc_pi->Integral(1.,6.) / fh_pi_as_el_tof->Integral(1., 6.) << endl;
 	}
 
 //test distributions
@@ -205,18 +217,29 @@ void draw_electrons_qa()
 //StsQa
 	{
 	TCanvas *c6 = new TCanvas("stsQa","stsQa",1200,800);
-	c6->Divide(3,2);
-	c6->cd(1);
-	fh_rec_mc_mom_signal->Draw();
+       // c6->Divide(3,2);
+       // c6->cd(1);
+       // fh_mom_res_vs_mom_signal->ProjectionY()->Draw("COLZ");
+	
+      //  fh_rec_mc_mom_signal->Su();
+  //  TF1 *f1 = new TF1("f1", "gaus", -10, 10);
+   // f1->SetLineColor(kRed);
+ //   fh_rec_mc_mom_signal->Fit("f1", "R");
+fh_rec_mc_mom_signal->Draw("hist");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
-	gPad->SetLogy(true);
+        return;
+//	gPad->SetLogy(true);
 	c6->cd(2);
+
 	fh_mom_res_vs_mom_signal->Draw("COLZ");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	c6->cd(3);
 	fh_mean_mom_vs_mom_signal->Draw();
+	fh_mean_mom_vs_mom_signal->SetLineWidth(3);
+	fh_mean_mom_vs_mom_signal->SetMaximum(2);
+	fh_mean_mom_vs_mom_signal->SetMinimum(0.1);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	c6->cd(4);
@@ -227,6 +250,7 @@ void draw_electrons_qa()
 	fh_chiprim_signal2->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+
 	}
 }
 

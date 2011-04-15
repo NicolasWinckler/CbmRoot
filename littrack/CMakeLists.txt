@@ -1,6 +1,7 @@
-# Create a library called "libLittrack" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libLittrack".
+
+#add_subdirectory(std)
+INCLUDE(std/CMakeLists.txt)
 
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
@@ -9,6 +10,7 @@ ${GEANT3_INCLUDE_DIR}
 ${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/utils
+${CBMROOT_SOURCE_DIR}/littrack/std
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
@@ -65,40 +67,20 @@ base/CbmLitHitData.cxx
 ##base/CbmLitFieldFitter.cxx
 ##base/CbmLitSimpleGeometryConstructor.cxx
 base/CbmLitTask.cxx
+
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
-data/CbmLitTrackParam.cxx
-data/CbmLitTrack.cxx
-#data/CbmLitTrackBranch.cxx
-finder/CbmLitTrackFinderWeight.cxx
-finder/CbmLitTrackFinderBase.cxx
-finder/CbmLitTrackFinderBranch.cxx
-finder/CbmLitTrackFinderNN.cxx
-finder/CbmLitNearestHitToTrackMerger.cxx
-finder/CbmLitGating.cxx
-#finder/CbmLitTrackFinderNNCuda.cxx
+
 ##finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
 ##finder_cbm/CbmLitFindGlobalTracks.cxx 
 finder_cbm/CbmLitFindMvdTracks.cxx
-fitter/CbmLitTrackFitterImp.cxx 
-fitter/CbmLitKalmanFilter.cxx
-fitter/CbmLitTrackFitterWeight.cxx 
-fitter/CbmLitKalmanSmoother.cxx
-fitter/CbmLitTrackFitterIter.cxx 
+
 geo/CbmLitDet.cxx
 geo/CbmLitDetContFact.cxx 
 geo/CbmLitDetGeo.cxx 
 geo/CbmLitDetGeoPar.cxx
 geo/CbmLitDetPoint.cxx 
-propagation/CbmLitTGeoTrackPropagator.cxx 
-propagation/CbmLitRK4TrackExtrapolator.cxx
-propagation/CbmLitLineTrackExtrapolator.cxx
-propagation/CbmLitTrackPropagatorGeane.cxx
-propagation/CbmLitTGeoNavigator.cxx
-##propagation/CbmLitMaterialEffectsImp.cxx
-propagation/CbmLitCleverTrackExtrapolator.cxx
-propagation/CbmLitMyGeoNavigator.cxx
-propagation/CbmLitMyTrackPropagator.cxx 
+
 ##qa/CbmLitReconstructionQa.cxx
 ##qa/CbmLitFindGlobalTracksIdeal.cxx 
 qa/CbmLitCheckMultipleScattering.cxx
@@ -111,23 +93,7 @@ qa/CbmLitCheckBrem.cxx
 qa/CbmTrdHitsQa.cxx
 qa/CbmLitCreateStandaloneData.cxx
 qa/CbmLitTestMatrixMath.cxx
-weight/CbmLitWeightedHitCalculatorImp.cxx
-weight/CbmLitWeightCalculatorSimple.cxx
-weight/CbmLitWeightCalculatorGauss.cxx
-#weight/CbmLitWeightCalculatorOptimal.cxx
-weight/CbmLitWeightCalculatorTukey.cxx
-selection/CbmLitTrackSelectionEmpty.cxx
-selection/CbmLitTrackSelectionShortTracks.cxx 
-selection/CbmLitTrackSelectionSameSeed.cxx
-selection/CbmLitTrackSelectionSharedHits.cxx 
-#selection/CbmLitTrackSelectionD.cxx
-#selection/CbmLitTrackSelectionMomentum.cxx
-selection/CbmLitTrackSelectionTrd.cxx
-selection/CbmLitTrackSelectionMuch.cxx
-selection/CbmLitTrackSelectionMuchRobust.cxx
-#selection/CbmLitTrackSelectionChiSq.cxx 
-selection/CbmLitQualitySort.cxx
-selection/CbmLitTrackSelectionCuts.cxx
+
 ##utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx 
 utils/CbmLitMatrixMath.cxx 
@@ -181,13 +147,13 @@ EndIf(TBB_FOUND)
 
 SET(LITTRACK_SRCS 
 ${LITTRACK_SRCS_RULECHECKER}
+${LITTRACKSTD_SRCS}
 base/CbmLitEnvironment.cxx
 base/CbmLitFieldFitter.cxx
 base/CbmLitToolFactory.cxx
 base/CbmLitSimpleGeometryConstructor.cxx
 #finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
 finder_cbm/CbmLitFindGlobalTracks.cxx 
-propagation/CbmLitMaterialEffectsImp.cxx
 qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx 
 qa/CbmLitCheckField.cxx

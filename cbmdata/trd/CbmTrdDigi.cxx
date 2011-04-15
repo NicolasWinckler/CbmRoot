@@ -25,7 +25,10 @@ CbmTrdDigi::CbmTrdDigi(Int_t detId, Int_t col, Int_t row, Double_t charge,
   if (index >= 0)
           fMCIndex.push_back(index);
 };
-
+CbmTrdDigi::~CbmTrdDigi()
+{
+  fMCIndex.clear();
+}
 void CbmTrdDigi::Print() {
   cout<<"fDetID : "<<fDetId <<endl;
   cout<<"Col    : "<<fCol <<endl;

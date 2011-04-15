@@ -11,7 +11,8 @@ class CbmTrdDigi : public TObject
     CbmTrdDigi();
     CbmTrdDigi(Int_t detId, Int_t col, Int_t row, Double_t charge, 
                Double_t time, Int_t index=-1);
-
+    ~CbmTrdDigi();
+   
     void SetDetId(Int_t detId) {fDetId = detId;};
     void SetCol(Int_t col) {fCol = col;};
     void SetRow(Int_t row) {fRow = row;};

@@ -56,10 +56,10 @@ void global_reco(Int_t nEvents = 10, // number of events
 		// Normalization for efficiency
 		normStsPoints = 4;
 		normTrdPoints = 8;
-		normMuchPoints = 17;
+		normMuchPoints = 16;
 		normTofPoints = 1;
 		normTrdHits = 8;
-		normMuchHits = 13;
+		normMuchHits = 16;
 		normTofHits = 1;
 		//
 		momMin = 0.;

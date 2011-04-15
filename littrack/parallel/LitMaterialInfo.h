@@ -10,7 +10,9 @@
 #define LITMATERIALINFO_H_
 
 #include "LitTypes.h"
-#include "../utils/CbmLitUtils.h"
+
+//FIXME use parall impl for utils
+#include "../std/utils/CbmLitUtils.h"
 
 template<class T>
 class LitMaterialInfo

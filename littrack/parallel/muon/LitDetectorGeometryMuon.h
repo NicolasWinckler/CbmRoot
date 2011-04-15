@@ -13,8 +13,10 @@
 #include "../LitTypes.h"
 #include "../LitMaterialInfo.h"
 #include "../LitField.h"
-#include "../../base/CbmLitEnums.h"
-#include "../../utils/CbmLitUtils.h"
+
+// FIXME : do not use implementations from std
+#include "../../std/base/CbmLitEnums.h"
+#include "../../std/utils/CbmLitUtils.h"
 
 const unsigned char MAX_NOF_STATION_GROUPS = 6;
 const unsigned char MAX_NOF_STATIONS = 4;

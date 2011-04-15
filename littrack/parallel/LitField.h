@@ -10,7 +10,9 @@
 #define LIT_POLYNOM_DEGREE 7
 
 #include "LitMath.h"
-#include "../utils/CbmLitUtils.h"
+
+//FIXME: use parallel impl fo utils
+#include "../std/utils/CbmLitUtils.h"
 
 template<class T>
 class LitFieldValue

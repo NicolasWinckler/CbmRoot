@@ -4,7 +4,8 @@ ${INCLUDE_DIRECTORIES}
 #${SIMPATH}/basics/boost/include
 #${CBMROOT_SOURCE_DIR}/littrack
 #${CBMROOT_SOURCE_DIR}/littrack/utils
-#${CBMROOT_SOURCE_DIR}/littrack/std
+${ROOT_INCLUDE_DIR}
+${CBMROOT_SOURCE_DIR}/littrack/std
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -16,8 +17,13 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(STD_DIR "std/")
+#set(STD_DIR "")
 
 set(LITTRACKSTD_SRCS_RULECHECKER
+
+${STD_DIR}base/CbmLitDetectorLayout.cxx
+${STD_DIR}base/CbmLitHitData.cxx
+${STD_DIR}base/CbmLitPDG.cxx
 
 ${STD_DIR}data/CbmLitTrackParam.cxx
 ${STD_DIR}data/CbmLitTrack.cxx
@@ -38,7 +44,7 @@ ${STD_DIR}fitter/CbmLitTrackFitterIter.cxx
 ${STD_DIR}propagation/CbmLitTGeoTrackPropagator.cxx 
 ${STD_DIR}propagation/CbmLitRK4TrackExtrapolator.cxx
 ${STD_DIR}propagation/CbmLitLineTrackExtrapolator.cxx
-${STD_DIR}propagation/CbmLitTrackPropagatorGeane.cxx
+#${STD_DIR}propagation/CbmLitTrackPropagatorGeane.cxx
 ${STD_DIR}propagation/CbmLitTGeoNavigator.cxx
 ##${STD_DIR}propagation/CbmLitMaterialEffectsImp.cxx
 ${STD_DIR}propagation/CbmLitCleverTrackExtrapolator.cxx
@@ -60,6 +66,10 @@ ${STD_DIR}selection/CbmLitTrackSelectionSameSeed.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionSharedHits.cxx 
 ${STD_DIR}selection/CbmLitTrackSelectionShortTracks.cxx 
 ${STD_DIR}selection/CbmLitTrackSelectionTrd.cxx
+
+${STD_DIR}utils/CbmLitMath.cxx 
+${STD_DIR}utils/CbmLitUtils.cxx
+${STD_DIR}utils/CbmLitMatrixMath.cxx 
 )
 
 set(LITTRACKSTD_HEADERS

@@ -3,7 +3,7 @@
  * @since 2008
  **/
 #include "CbmLitDrawHist.h"
-#include "CbmLitUtils.h"
+#include "std/utils/CbmLitUtils.h"
 
 #include "TH1.h"
 #include "TH2.h"
@@ -18,6 +18,7 @@
 #include <string>
 #include <limits>
 #include <iostream>
+#include <sstream>
 
 /* Set default styles for histograms. */
 void SetStyles()

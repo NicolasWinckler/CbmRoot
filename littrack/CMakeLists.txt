@@ -59,11 +59,9 @@ EndIf(TBB_FOUND)
 link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
-base/CbmLitDetectorLayout.cxx
-base/CbmLitPDG.cxx
+
 ##base/CbmLitEnvironment.cxx  
 ##base/CbmLitToolFactory.cxx
-base/CbmLitHitData.cxx
 ##base/CbmLitFieldFitter.cxx
 ##base/CbmLitSimpleGeometryConstructor.cxx
 base/CbmLitTask.cxx
@@ -95,10 +93,7 @@ qa/CbmLitCreateStandaloneData.cxx
 qa/CbmLitTestMatrixMath.cxx
 
 ##utils/CbmLitConverter.cxx
-utils/CbmLitMath.cxx 
-utils/CbmLitMatrixMath.cxx 
-utils/CbmLitDrawHist.cxx
-utils/CbmLitUtils.cxx)
+utils/CbmLitDrawHist.cxx)
 
 If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 

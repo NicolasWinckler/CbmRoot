@@ -7,7 +7,7 @@
 
 #include "base/CbmLitEnums.h"
 #include "base/CbmLitDefaultSettings.h"
-#include "base/CbmLitToolFactory.h"
+#include "../base/CbmLitToolFactory.h"
 #include "data/CbmLitTrackParam.h"
 #include "interface/CbmLitTrackExtrapolator.h"
 #include "utils/CbmLitMath.h"

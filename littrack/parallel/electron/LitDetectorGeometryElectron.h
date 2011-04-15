@@ -14,7 +14,7 @@
 #include "../LitMaterialInfo.h"
 #include "../LitField.h"
 //#include "../base/CbmLitEnums.h"
-#include "../../utils/CbmLitUtils.h"
+#include "../../std/utils/CbmLitUtils.h"
 
 const unsigned char MAX_NOF_STATION_GROUPS_ELECTRON = 6;
 const unsigned char MAX_NOF_STATIONS_ELECTRON = 4;

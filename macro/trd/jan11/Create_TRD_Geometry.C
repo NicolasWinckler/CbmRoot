@@ -7,6 +7,7 @@
 #include "TGeoMatrix.h"
 #include "TFile.h"
 #include "TString.h"
+#include "TList.h"
 
 #include <iostream>
 
@@ -16,6 +17,14 @@ void create_keeping_volumes(const char* name, Int_t station, Float_t* first,
 			    Float_t thickness, 
 			    TGeoVolume* vol, TGeoMedium* med);
 
+void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
+		     Float_t Layer_thickness, Float_t Layer_pitch,
+		     Int_t Chambers_per_station, Float_t Position_Station[][4],
+		     Float_t Detector_size_x, Float_t Detector_size_y,
+		     TGeoManager*);
+
+//void create_trd_feb();
+//void create_trd_module();
 
 void Create_TRD_Geometry() {
 
@@ -60,7 +69,7 @@ void Create_TRD_Geometry() {
   par[6]  = 0.001000; // epsil
   par[7]  = -1.000000; // stmin
   TGeoMedium* air = new TGeoMedium("air", numed,pMat1, par);
-  
+
   // Mixture: polypropylene
   nel     = 2;
   density = 0.074000;
@@ -172,7 +181,11 @@ void Create_TRD_Geometry() {
   par[6]  = 0.001000; // epsil
   par[7]  = -1.000000; // stmin
   TGeoMedium* G10 = new TGeoMedium("G10", numed,pMat20, par);
-  
+
+  TList* media_ptr = gGeoMan->GetListOfMedia();
+  Int_t entries = media_ptr->GetEntries();
+  cout <<"Entries: "<<entries<<endl;
+
   // Here comes now the creation of needed TRD modules.
 
   // Add the keeping volumes for each trd station to the top
@@ -266,9 +279,21 @@ void Create_TRD_Geometry() {
 			 Inner_radius, Outer_radius, Distance, 
 			 Station_thickness, top, air);
 
+  Int_t Chambers_per_station = 1;
+  Float_t x101 = Detector_size_x[0] * 1;
+  Float_t y101 = Detector_size_y[0] * 0;
+  Float_t Position_Station1[][4] = { {x101, y101, 1, 0} };
+
+  create_trd_body(1, 1, Frame_width, Layer_thickness, Layer_pitch,
+		  Chambers_per_station, Position_Station1,
+		  Detector_size_x[0], Detector_size_y[0],
+		  gGeoMan);
+
+
    gGeoMan->CloseGeometry();
    TFile* outfile = new TFile("TRD_Geom.root","RECREATE");
-   top->Write();
+   //   top->Write();
+   gGeoMan->Write();
    outfile->Close();
    top->Draw("ogl");
 
@@ -313,3 +338,123 @@ void create_keeping_volumes(const char* name, Int_t station, Float_t* first,
    TGeoTranslation *trd_trans = new TGeoTranslation("",0. ,0. , position);
    vol->AddNode(trd, 0, trd_trans);
 }
+
+void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
+		     Float_t Layer_thickness, Float_t Layer_pitch,
+		     Int_t Chambers_per_station, Float_t Position_Station[][4],
+		     Float_t Detector_size_x, Float_t Detector_size_y,
+		     TGeoManager* man)
+{
+  Float_t Active_area_x = ( Detector_size_x / 2 ) - Frame_width;
+  Float_t Active_area_y = ( Detector_size_y / 2 ) - Frame_width;
+ 
+  // 12 mm gas (Jun10) - intelligent
+  Float_t radiator_thickness    =  29.000 /2.;
+  Float_t radiator_position     =  radiator_thickness - Layer_thickness /2.;
+  Float_t gas_thickness         =   6.000 /2.;
+  Float_t gas_position          =  radiator_position + radiator_thickness + gas_thickness;
+  Float_t padplane_thickness    =   0.030 /2.;
+  Float_t padplane_position     =  gas_position + gas_thickness + padplane_thickness;
+  Float_t mylar_thickness       =   1.500 /2.;
+  Float_t mylar_position        =  padplane_position + padplane_thickness + mylar_thickness;
+  Float_t electronics_thickness =   0.070 /2.;
+  Float_t electronics_position  =  mylar_position + mylar_thickness + electronics_thickness;
+  Float_t frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
+  Float_t frame_position        =  frame_thickness - Layer_thickness /2.;
+ 
+  Int_t module_number = (Int_t)Position_Station[0][2];
+
+
+  
+   TGeoBBox *trd_box = new TGeoBBox("", Detector_size_x/2, Detector_size_y/2,
+				    Layer_thickness/2);
+   TGeoShape *trd_shape = trd_box;
+   // Volume: trd1
+   TString name;
+   name.Form("trd%dmod%d", station, module_number);
+   TGeoVolume* trdmod1_box = new TGeoVolume(name, trd_shape, 
+					    man->GetMedium("air"));
+
+   // Radiator
+   TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, Active_area_y/2,
+				    radiator_thickness/2);
+   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("polypropylene"));
+   TGeoTranslation *trd_radiator_trans = new TGeoTranslation("", 0., 0., 
+							     radiator_position);
+   man->GetVolume(name)->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
+
+
+   // Gas
+   TGeoBBox *trd_gas = new TGeoBBox("", Active_area_x/2, Active_area_y/2,
+				    gas_thickness/2);
+   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd%dmod%dgas", station, module_number), trd_gas, man->GetMedium("TRDgas"));
+   TGeoTranslation *trd_gas_trans = new TGeoTranslation("", 0., 0., 
+							     gas_position);
+   man->GetVolume(name)->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
+
+
+   // Pad Plane
+   TGeoBBox *trd_pad = new TGeoBBox("", Active_area_x/2, Active_area_y/2,
+				    padplane_thickness/2);
+   TGeoVolume* trdmod1_padvol = new TGeoVolume(Form("trd%dmod%dpadplane", station, module_number), trd_pad, man->GetMedium("goldcoatedcopper"));
+   TGeoTranslation *trd_pad_trans = new TGeoTranslation("", 0., 0., 
+							     padplane_position);
+   man->GetVolume(name)->AddNode(trdmod1_padvol, 0, trd_pad_trans);
+
+
+   // mylar
+   TGeoBBox *trd_mylar = new TGeoBBox("", Active_area_x/2, Active_area_y/2,
+				    mylar_thickness/2);
+   TGeoVolume* trdmod1_mylarvol = new TGeoVolume(Form("trd%dmod%mylar", station, module_number), trd_mylar, man->GetMedium("mylar"));
+   TGeoTranslation *trd_mylar_trans = new TGeoTranslation("", 0., 0., 
+							     mylar_position);
+   man->GetVolume(name)->AddNode(trdmod1_mylarvol, 0, trd_mylar_trans);
+
+   // electronics
+   TGeoBBox *trd_el = new TGeoBBox("", Active_area_x/2, Active_area_y/2,
+				    electronics_thickness/2);
+   TGeoVolume* trdmod1_elvol = new TGeoVolume(Form("trd%dmod%delectronics", station, module_number), trd_el, man->GetMedium("goldcoatedcopper"));
+   TGeoTranslation *trd_el_trans = new TGeoTranslation("", 0., 0., 
+							     electronics_position);
+   man->GetVolume(name)->AddNode(trdmod1_elvol, 0, trd_el_trans);
+
+
+
+
+   TGeoBBox *trd_frame1 = new TGeoBBox("", Detector_size_x/2, Frame_width/2,
+				    frame_thickness);
+   TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("trd%dmod%dframe1", station, module_number), trd_frame1, man->GetMedium("G10"));
+   // Translation: 
+   TGeoTranslation *trd_frame1_trans = new TGeoTranslation("", 0.,
+							   Active_area_y+Frame_width/2, 
+							     frame_position);
+   man->GetVolume(name)->AddNode(trdmod1_frame1vol, 1, trd_frame1_trans);
+
+   trd_frame1_trans = new TGeoTranslation("", 0.,
+					  -(Active_area_y+Frame_width/2), 
+					  frame_position);
+   man->GetVolume(name)->AddNode(trdmod1_frame1vol, 2, trd_frame1_trans);
+
+   TGeoBBox *trd_frame2 = new TGeoBBox("", Frame_width/2, Active_area_y,
+				       frame_thickness);
+   TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd%dmod%dframe2", station, module_number), trd_frame2, man->GetMedium("G10"));
+   // Translation: 
+   TGeoTranslation *trd_frame2_trans = new TGeoTranslation("", Active_area_x+Frame_width/2, 0., 
+							     frame_position);
+   man->GetVolume(name)->AddNode(trdmod1_frame2vol, 1, trd_frame2_trans);
+
+   trd_frame2_trans = new TGeoTranslation("", -(Active_area_x+Frame_width/2), 
+					  0., frame_position);
+   man->GetVolume(name)->AddNode(trdmod1_frame2vol, 2, trd_frame2_trans);
+
+
+
+   TGeoTranslation *trd_trans = new TGeoTranslation("", Position_Station[0][0],
+						    Position_Station[0][1], 0.);
+   Int_t copynr = 1000 * layer + 1;
+   man->GetVolume("trd1")->AddNode(trdmod1_box, copynr, trd_trans);
+
+
+}
+//void create_trd_feb(){}
+//void create_trd_module(){}

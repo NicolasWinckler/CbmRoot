@@ -9,6 +9,7 @@
 #include "FairParamList.h"
 #include "FairDetParIo.h"
 #include "FairParIo.h"
+#include "FairLogger.h"
 
 #include "TString.h"
 
@@ -27,8 +28,15 @@ CbmTrdDigiPar::CbmTrdDigiPar(const char* name,
 // -----   Destructor   ----------------------------------------------------
 CbmTrdDigiPar::~CbmTrdDigiPar() 
 {
+  FairLogger *logger = FairLogger::GetLogger();
+  logger->Debug4(MESSAGE_ORIGIN, "Enter CbmTrdDigiPar::~CbmTrdDigiPar");
+  for (fModuleMapIt = fModuleMap.begin(); fModuleMapIt != fModuleMap.end(); 
+       ++fModuleMapIt) {
+    delete fModuleMapIt->second;
+  }      
   fModuleMap.clear();
   clear();
+  logger->Debug4(MESSAGE_ORIGIN, "Leave CbmTrdDigiPar::~CbmTrdDigiPar");
 }
 // -------------------------------------------------------------------------
 

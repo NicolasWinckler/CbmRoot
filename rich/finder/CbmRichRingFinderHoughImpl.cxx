@@ -11,7 +11,7 @@
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "FairTrackParam.h"
-#include "../../littrack/utils/CbmLitMemoryManagment.h"
+#include "../../littrack/std/utils/CbmLitMemoryManagment.h"
 
 #include "TString.h"
 #include "TStopwatch.h"

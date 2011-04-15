@@ -4,7 +4,7 @@
  * @version 1.0
  **/
 
-#include "finder_cbm/CbmLitFindGlobalTracks.h"
+#include "finder/CbmLitFindGlobalTracks.h"
 
 #include "base/CbmLitToolFactory.h"
 #include "base/CbmLitEnvironment.h"

@@ -3,7 +3,7 @@
  * @since 2011
  * @version 1.0
  **/
-#include "finder_cbm/CbmLitFindMvdTracks.h"
+#include "finder/CbmLitFindMvdTracks.h"
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitToolFactory.h"
 #include "data/CbmLitHit.h"

@@ -11,6 +11,7 @@ ${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/utils
 ${CBMROOT_SOURCE_DIR}/littrack/std
+${CBMROOT_SOURCE_DIR}/littrack/cbm
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
@@ -60,101 +61,101 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
 
-##base/CbmLitEnvironment.cxx  
-##base/CbmLitToolFactory.cxx
-##base/CbmLitFieldFitter.cxx
-##base/CbmLitSimpleGeometryConstructor.cxx
-base/CbmLitTask.cxx
+##cbm/base/CbmLitEnvironment.cxx  
+##cbm/base/CbmLitToolFactory.cxx
+##cbm/base/CbmLitFieldFitter.cxx
+##cbm/base/CbmLitSimpleGeometryConstructor.cxx
+cbm/base/CbmLitTask.cxx
 
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
 
-##finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
-##finder_cbm/CbmLitFindGlobalTracks.cxx 
-finder_cbm/CbmLitFindMvdTracks.cxx
+##cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
+##cbm/finder/CbmLitFindGlobalTracks.cxx 
+cbm/finder/CbmLitFindMvdTracks.cxx
 
-geo/CbmLitDet.cxx
-geo/CbmLitDetContFact.cxx 
-geo/CbmLitDetGeo.cxx 
-geo/CbmLitDetGeoPar.cxx
-geo/CbmLitDetPoint.cxx 
+cbm/geo/CbmLitDet.cxx
+cbm/geo/CbmLitDetContFact.cxx 
+cbm/geo/CbmLitDetGeo.cxx 
+cbm/geo/CbmLitDetGeoPar.cxx
+cbm/geo/CbmLitDetPoint.cxx 
 
-##qa/CbmLitReconstructionQa.cxx
-##qa/CbmLitFindGlobalTracksIdeal.cxx 
-qa/CbmLitCheckMultipleScattering.cxx
-##qa/CbmLitPropagationAnalysis.cxx 
-##qa/CbmLitRobustFitterAnalysis.cxx
-qa/CbmLitCheckSimpleGeo.cxx 
-##qa/CbmLitCheckField.cxx
-qa/CbmLitCheckEnergyLossMuons.cxx
-qa/CbmLitCheckBrem.cxx 
-qa/CbmTrdHitsQa.cxx
-qa/CbmLitCreateStandaloneData.cxx
-qa/CbmLitTestMatrixMath.cxx
+##cbm/qa/CbmLitReconstructionQa.cxx
+##cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
+cbm/qa/CbmLitCheckMultipleScattering.cxx
+##cbm/qa/CbmLitPropagationAnalysis.cxx 
+##cbm/qa/CbmLitRobustFitterAnalysis.cxx
+cbm/qa/CbmLitCheckSimpleGeo.cxx 
+##cbm/qa/CbmLitCheckField.cxx
+cbm/qa/CbmLitCheckEnergyLossMuons.cxx
+cbm/qa/CbmLitCheckBrem.cxx 
+cbm/qa/CbmTrdHitsQa.cxx
+cbm/qa/CbmLitCreateStandaloneData.cxx
+cbm/qa/CbmLitTestMatrixMath.cxx
 
-##utils/CbmLitConverter.cxx
-utils/CbmLitDrawHist.cxx)
+##cbm/utils/CbmLitConverter.cxx
+cbm/utils/CbmLitDrawHist.cxx)
 
 If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       finder/CbmLitTrackFinderNNParallel.cxx
-      qa/CbmLitParallelTrackFitterTest.cxx 
-      qa/CbmLitParallelTrackFitterTestElectron.cxx 
-      qa/CbmLitTrackFitSpeedTest.cxx
+      cbm/qa/CbmLitParallelTrackFitterTest.cxx 
+      cbm/qa/CbmLitParallelTrackFitterTestElectron.cxx 
+      cbm/qa/CbmLitTrackFitSpeedTest.cxx
      )
 EndIf(TBB_FOUND)
 
 set(LITTRACK_HEADERS
-base/CbmLitTask.h
+cbm/base/CbmLitTask.h
 cbm/CbmPropagatorGeane.h
 cbm/CbmPropagatorLit.h
-#finder_cbm/CbmLitTrdTrackFinderStandalone.h
-finder_cbm/CbmLitFindGlobalTracks.h
-#finder_cbm/CbmLitCudaTest.h 
-finder_cbm/CbmLitFindMvdTracks.h
-geo/CbmLitDet.h 
-geo/CbmLitDetContFact.h
-geo/CbmLitDetGeo.h 
-geo/CbmLitDetGeoPar.h 
-geo/CbmLitDetPoint.h
-qa/CbmLitReconstructionQa.h 
-qa/CbmLitFindGlobalTracksIdeal.h
-qa/CbmLitPropagationAnalysis.h 
-#qa/CbmLitRobustFitterAnalysis.h
-qa/CbmLitCheckSimpleGeo.h 
-qa/CbmLitCheckField.h
-qa/CbmLitCheckEnergyLossMuons.h 
-qa/CbmLitCheckMultipleScattering.h
-qa/CbmLitCheckBrem.h 
-qa/CbmTrdHitsQa.h
-qa/CbmLitCreateStandaloneData.h
-qa/CbmLitTestMatrixMath.h
+#cbm/finder/CbmLitTrdTrackFinderStandalone.h
+cbm/finder/CbmLitFindGlobalTracks.h
+#cbm/finder/CbmLitCudaTest.h 
+cbm/finder/CbmLitFindMvdTracks.h
+cbm/geo/CbmLitDet.h 
+cbm/geo/CbmLitDetContFact.h
+cbm/geo/CbmLitDetGeo.h 
+cbm/geo/CbmLitDetGeoPar.h 
+cbm/geo/CbmLitDetPoint.h
+cbm/qa/CbmLitReconstructionQa.h 
+cbm/qa/CbmLitFindGlobalTracksIdeal.h
+cbm/qa/CbmLitPropagationAnalysis.h 
+#cbm/qa/CbmLitRobustFitterAnalysis.h
+cbm/qa/CbmLitCheckSimpleGeo.h 
+cbm/qa/CbmLitCheckField.h
+cbm/qa/CbmLitCheckEnergyLossMuons.h 
+cbm/qa/CbmLitCheckMultipleScattering.h
+cbm/qa/CbmLitCheckBrem.h 
+cbm/qa/CbmTrdHitsQa.h
+cbm/qa/CbmLitCreateStandaloneData.h
+cbm/qa/CbmLitTestMatrixMath.h
 #cuda/CudaTest.h
 )
 
 If(TBB_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
-      qa/CbmLitTrackFitSpeedTest.h
+      cbm/qa/CbmLitTrackFitSpeedTest.h
      )
 EndIf(TBB_FOUND)
 
 SET(LITTRACK_SRCS 
 ${LITTRACK_SRCS_RULECHECKER}
 ${LITTRACKSTD_SRCS}
-base/CbmLitEnvironment.cxx
-base/CbmLitFieldFitter.cxx
-base/CbmLitToolFactory.cxx
-base/CbmLitSimpleGeometryConstructor.cxx
-#finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
-finder_cbm/CbmLitFindGlobalTracks.cxx 
-qa/CbmLitReconstructionQa.cxx
-qa/CbmLitFindGlobalTracksIdeal.cxx 
-qa/CbmLitCheckField.cxx
-qa/CbmLitPropagationAnalysis.cxx 
-#qa/CbmLitRobustFitterAnalysis.cxx
-utils/CbmLitConverter.cxx
+cbm/base/CbmLitEnvironment.cxx
+cbm/base/CbmLitFieldFitter.cxx
+cbm/base/CbmLitToolFactory.cxx
+cbm/base/CbmLitSimpleGeometryConstructor.cxx
+#cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
+cbm/finder/CbmLitFindGlobalTracks.cxx 
+cbm/qa/CbmLitReconstructionQa.cxx
+cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
+cbm/qa/CbmLitCheckField.cxx
+cbm/qa/CbmLitPropagationAnalysis.cxx 
+#cbm/qa/CbmLitRobustFitterAnalysis.cxx
+cbm/utils/CbmLitConverter.cxx
 )
 
 if(RULE_CHECKER_FOUND)

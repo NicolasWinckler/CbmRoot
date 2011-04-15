@@ -5,7 +5,7 @@
 
 #include "propagation/CbmLitMyGeoNavigator.h"
 
-#include "../base/CbmLitSimpleGeometryConstructor.h"
+#include "../cbm/base/CbmLitSimpleGeometryConstructor.h"
 #include "data/CbmLitTrackParam.h"
 #include "propagation/CbmLitMaterialInfo.h"
 #include "utils/CbmLitComparators.h"

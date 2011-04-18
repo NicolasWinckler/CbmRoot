@@ -30,7 +30,7 @@ void run_sim(Int_t nEvents = 2)
   TString richGeom   = "rich_standard.geo";
   TString trdGeom    = "trd_standard.geo";
   TString tofGeom    = "tof_standard.geo";
-  TString ecalGeom   = "ecal_v08a.geo";
+  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "field_v10e";   // name of field map

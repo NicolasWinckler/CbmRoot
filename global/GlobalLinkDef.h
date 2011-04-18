@@ -4,6 +4,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+
+#pragma link C++ class CbmEcalTrackingMuch+;
 #pragma link C++ class CbmFindGlobalTracks+;
 #pragma link C++ class CbmFindGlobalTracksQa+;
 #pragma link C++ class CbmFindPrimaryVertex+;

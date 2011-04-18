@@ -28,6 +28,7 @@ Check_Compiler()
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 
 # Check if the user wants to build the project in the source
 # directory
@@ -93,6 +94,24 @@ Set(INCLUDE_DIRECTORIES
   ${ROOT_INCLUDE_DIR}
   ${CBMROOT_SOURCE_DIR}/fairtools
 )
+
+# Configure FairVersion.h
+# ------------------------------
+find_package(Subversion) 
+if(Subversion_FOUND)
+  if(EXISTS ${PROJECT_SOURCE_DIR}/.svn/ )
+    Subversion_WC_INFO(${PROJECT_SOURCE_DIR} PROJECT)
+    set(FAIRROOT_SVN_REVISION ${PROJECT_WC_REVISION})
+    set(FAIRROOT_SVN_BRANCH ${PROJECT_WC_URL})
+    string(REGEX MATCH "[^/]+$" FAIRROOT_SVN_BRANCH ${FAIRROOT_SVN_BRANCH})
+  endif(EXISTS ${PROJECT_SOURCE_DIR}/.svn/ )
+
+  message(STATUS "FairRoot Revision - ${FAIRROOT_SVN_REVISION} Branch - ${FAIRROOT_SVN_BRANCH}") 
+  if(EXISTS ${INCLUDE_OUTPUT_DIRECTORY}/FairVersion.h)
+    file(REMOVE ${INCLUDE_OUTPUT_DIRECTORY}/FairVersion.h)
+  endif(EXISTS ${INCLUDE_OUTPUT_DIRECTORY}/FairVersion.h)
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/scripts/FairVersion.h.tmp ${INCLUDE_OUTPUT_DIRECTORY}/FairVersion.h @ONLY)
+endif(Subversion_FOUND)
 
 # Recurse into the given subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through

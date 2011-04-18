@@ -8,9 +8,9 @@
 
 #include "TChain.h"
 
-//#include <iostream>
+#include <iostream>
 
-//using namespace std;
+using namespace std;
 // -----   Default constructor   ------------------------------------------
 CbmDirectPhotonGenerator::CbmDirectPhotonGenerator()
   : fNEvent(-2), fInput(NULL)
@@ -31,6 +31,7 @@ CbmDirectPhotonGenerator::CbmDirectPhotonGenerator(const Char_t* fileName)
   fInput->SetBranchAddress("py", &fPY);
   fInput->SetBranchAddress("pz", &fPZ);
   fInput->SetBranchAddress("ev", &fEv);
+  fInput->SetBranchAddress("pdg", &fPDGId);
 }
 // ------------------------------------------------------------------------
 
@@ -65,7 +66,7 @@ Bool_t CbmDirectPhotonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     if (fEv>fNEvent) break;
     if (fPX!=0||fPY!=0||fPZ!=0)
       // Give track to PrimaryGenerator
-      primGen->AddTrack(22, fPX, fPY, fPZ, 0, 0, 0);
+      primGen->AddTrack(fPDGId, fPX, fPY, fPZ, 0, 0, 0);
     if (fEntry>=fEntries)
     {
       Error("ReadEvent", "No more events in input chain!");

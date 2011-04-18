@@ -39,6 +39,8 @@ private:
   Double_t fPX;		//!
   Double_t fPY;		//!
   Double_t fPZ;		//!
+  /** pdg id of the particle **/
+  Int_t fPDGId;
   /** Read event number **/
   Int_t fEv;		//!
   /** Current entry of chain **/

@@ -155,16 +155,7 @@ void run_sim(Int_t nEvents = 2)
 
 
   // -----   Create magnetic field   ----------------------------------------
-  if (fieldMap == "field_electron_standard" ) 
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "field_muon_standard" )
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "FieldMuonMagnet" )
-    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
-  else {
-    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-    exit;
-  }
+  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

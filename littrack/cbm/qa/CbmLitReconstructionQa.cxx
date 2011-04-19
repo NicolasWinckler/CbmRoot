@@ -165,19 +165,20 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 
    fHistoList(NULL),
 
-   fNofGlobalTracks(0),
-   fNofStsTracks(0),
-   fNofTrdTracks(0),
-   fNofMuchTracks(0),
-   fNofRichRings(0),
-   fNofRichProjections(0),
-   fNofMvdHits(0),
-   fNofStsHits(0),
-   fNofRichHits(0),
-   fNofTrdHits(0),
-   fNofMuchPixelHits(0),
-   fNofMuchStrawHits(0),
-   fNofTofHits(0),
+   fhNofGlobalTracks(NULL),
+   fhNofStsTracks(NULL),
+   fhNofTrdTracks(NULL),
+   fhNofMuchTracks(NULL),
+   fhNofRichRings(NULL),
+   fhNofRichProjections(NULL),
+   fhNofMvdHits(NULL),
+   fhNofStsHits(NULL),
+   fhNofRichHits(NULL),
+   fhNofTrdHits(NULL),
+   fhNofMuchPixelHits(NULL),
+   fhNofMuchStrawHits(NULL),
+   fhNofTofHits(NULL),
+
    fEventNo(0),
    fOutputDir("")
 {
@@ -941,6 +942,34 @@ void CbmLitReconstructionQa::CreateHistos()
       fhRichRingHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbinsrich[i], hitmin[i], hitmaxrich[i]);
       fHistoList->Add(fhRichRingHits[i]);
    }
+
+
+   fhNofGlobalTracks = new TH1F("hNofGlobalTracks","hNofGlobalTracks", 100, 1., 1.);
+   fHistoList->Add(fhNofGlobalTracks);
+   fhNofStsTracks = new TH1F("hNofStsTracks","hNofStsTracks", 100, 1., 1.);
+   fHistoList->Add(fhNofStsTracks);
+   fhNofTrdTracks = new TH1F("hNofTrdTracks","hNofTrdTracks", 100, 1., 1.);
+   fHistoList->Add(fhNofTrdTracks);
+   fhNofMuchTracks = new TH1F("hNofMuchTracks","hNofMuchTracks", 100, 1., 1.);
+   fHistoList->Add(fhNofMuchTracks);
+   fhNofRichRings = new TH1F("hNofRichRings","hNofRichRings", 100, 1., 1.);
+   fHistoList->Add(fhNofRichRings);
+   fhNofRichProjections = new TH1F("hNofRichProjections","hNofRichProjections", 100, 1., 1.);
+   fHistoList->Add(fhNofRichProjections);
+   fhNofMvdHits = new TH1F("hNofMvdHits","hNofMvdHits", 100, 1., 1.);
+   fHistoList->Add(fhNofMvdHits);
+   fhNofStsHits = new TH1F("hNofStsHits","hNofStsHits", 100, 1., 1.);
+   fHistoList->Add(fhNofStsHits);
+   fhNofRichHits = new TH1F("hNofRichHits","hNofRichHits", 100, 1., 1.);
+   fHistoList->Add(fhNofRichHits);
+   fhNofTrdHits = new TH1F("hNofTrdHits","hNofTrdHits", 100, 1., 1.);
+   fHistoList->Add(fhNofTrdHits);
+   fhNofMuchPixelHits = new TH1F("hNofMuchPixelHits","hNofMuchPixelHits", 100, 1., 1.);
+   fHistoList->Add(fhNofMuchPixelHits);
+   fhNofMuchStrawHits = new TH1F("hNofMuchStrawHits","hNofMuchStrawHits", 100, 1., 1.);
+   fHistoList->Add(fhNofMuchStrawHits);
+   fhNofTofHits = new TH1F("hNofTofHits","hNofTofHits", 100, 1., 1.);
+   fHistoList->Add(fhNofTofHits);
 }
 
 void CbmLitReconstructionQa::DivideHistos(
@@ -999,26 +1028,26 @@ void CbmLitReconstructionQa::WriteToFile()
 
 void CbmLitReconstructionQa::IncreaseCounters()
 {
-   fNofGlobalTracks += fGlobalTracks->GetEntriesFast();
+   fhNofGlobalTracks->Fill(fGlobalTracks->GetEntriesFast());
    if (fIsSts) {
-	   fNofStsTracks += fStsMatches->GetEntriesFast();
-	   fNofStsHits += fStsHits->GetEntriesFast();
+	   fhNofStsTracks->Fill(fStsMatches->GetEntriesFast());
+	   fhNofStsHits->Fill(fStsHits->GetEntriesFast());
    }
    if (fIsRich) {
-	   fNofRichRings += fRichRings->GetEntriesFast();
-	   fNofRichHits += fRichHits->GetEntriesFast();
-	   fNofRichProjections += fRichProjections->GetEntriesFast();
+	   fhNofRichRings->Fill(fRichRings->GetEntriesFast());
+	   fhNofRichHits->Fill(fRichHits->GetEntriesFast());
+	   fhNofRichProjections->Fill(fRichProjections->GetEntriesFast());
    }
    if (fIsTrd) {
-	   fNofTrdTracks += fTrdMatches->GetEntriesFast();
-	   fNofTrdHits += fTrdHits->GetEntriesFast();
+	   fhNofTrdTracks->Fill(fTrdMatches->GetEntriesFast());
+	   fhNofTrdHits->Fill(fTrdHits->GetEntriesFast());
    }
    if (fIsMuch) {
-	   fNofMuchTracks += fMuchMatches->GetEntriesFast();
-	   fNofMuchPixelHits += fMuchPixelHits->GetEntriesFast();
-	   fNofMuchStrawHits += fMuchStrawHits->GetEntriesFast();
+	   fhNofMuchTracks->Fill(fMuchMatches->GetEntriesFast());
+	   fhNofMuchPixelHits->Fill(fMuchPixelHits->GetEntriesFast());
+	   fhNofMuchStrawHits->Fill(fMuchStrawHits->GetEntriesFast());
    }
-   if (fIsTof) { fNofTofHits += fTofHits->GetEntriesFast(); }
+   if (fIsTof) { fhNofTofHits->Fill(fTofHits->GetEntriesFast()); }
 }
 
 std::string CbmLitReconstructionQa::RecDetector()
@@ -1096,25 +1125,25 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
 {
    out << "-I- CbmLitReconstructionQa final statistics:" << std::endl;
    out << "Number of hits: ";
-   if (fIsMvd) { out << "MVD=" << (Double_t)fNofMvdHits/(Double_t)fEventNo; }
-   if (fIsSts) { out << " STS=" << (Double_t)fNofStsHits/(Double_t)fEventNo; }
-   if (fIsRich) { out << " RICH=" << (Double_t)fNofRichHits/(Double_t)fEventNo; }
-   if (fIsTrd) { out << " TRD=" << (Double_t)fNofTrdHits/(Double_t)fEventNo; }
-   if (fIsMuch && fMuchPixelHits) { out << " MUCH(pixel)=" << (Double_t)fNofMuchPixelHits/(Double_t)fEventNo; }
-   if (fIsMuch && fMuchStrawHits) { out << " MUCH(straw)=" << (Double_t)fNofMuchStrawHits/(Double_t)fEventNo; }
-   if (fIsTof) { out << " TOF=" << (Double_t)fNofTofHits/(Double_t)fEventNo; }
+   if (fIsMvd) { out << "MVD=" << fhNofMvdHits->GetMean(); }
+   if (fIsSts) { out << " STS=" << fhNofStsHits->GetMean(); }
+   if (fIsRich) { out << " RICH=" << fhNofRichHits->GetMean(); }
+   if (fIsTrd) { out << " TRD=" << fhNofTrdHits->GetMean(); }
+   if (fIsMuch && fMuchPixelHits) { out << " MUCH(pixel)=" << fhNofMuchPixelHits->GetMean(); }
+   if (fIsMuch && fMuchStrawHits) { out << " MUCH(straw)=" << fhNofMuchStrawHits->GetMean(); }
+   if (fIsTof) { out << " TOF=" << fhNofTofHits->GetMean(); }
    out << std::endl;
 
    out << "Number of reconstructed tracks per event: ";
-   out << "global=" << (Double_t)fNofGlobalTracks/(Double_t)fEventNo;
-   if (fIsSts) { out << "  STS=" << (Double_t)fNofStsTracks/(Double_t)fEventNo; }
-   if (fIsTrd) { out << "  TRD=" << (Double_t)fNofTrdTracks/(Double_t)fEventNo; }
-   if (fIsMuch) { out << "  MUCH=" << (Double_t)fNofMuchTracks/(Double_t)fEventNo; }
+   out << "global=" << fhNofGlobalTracks->GetMean();
+   if (fIsSts) { out << "  STS=" << fhNofStsTracks->GetMean(); }
+   if (fIsTrd) { out << "  TRD=" << fhNofTrdTracks->GetMean(); }
+   if (fIsMuch) { out << "  MUCH=" << fhNofMuchTracks->GetMean(); }
    out << std::endl;
 
    if (fIsRich) {
-	   out << "RICH: nof rings=" << (Double_t)fNofRichRings/(Double_t)fEventNo
-			   << " nof projections=" << (Double_t)fNofRichProjections/(Double_t)fEventNo << std::endl;
+	   out << "RICH: nof rings=" << fhNofRichRings->GetMean()
+			   << " nof projections=" << fhNofRichProjections->GetMean() << std::endl;
    }
 
    std::string det = RecDetector();

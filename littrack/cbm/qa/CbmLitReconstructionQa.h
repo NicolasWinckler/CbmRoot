@@ -417,19 +417,19 @@ private:
    TList* fHistoList; // List of histograms
 
    // Total number of tracks/rings/hits counters
-   Int_t fNofGlobalTracks; // global tracks
-   Int_t fNofStsTracks; // STS tracks
-   Int_t fNofTrdTracks; // TRD tracks
-   Int_t fNofMuchTracks; // MUCH tracks
-   Int_t fNofRichRings; // RICH rings
-   Int_t fNofRichProjections; // RICH projections
-   Int_t fNofMvdHits; // MVD hits
-   Int_t fNofStsHits; // STS hits
-   Int_t fNofRichHits; // RICH tracks
-   Int_t fNofTrdHits; // TRD tracks
-   Int_t fNofMuchPixelHits; // MUCH pixel hits
-   Int_t fNofMuchStrawHits; // MUCH straw hits
-   Int_t fNofTofHits; // TOF hits
+   TH1F* fhNofGlobalTracks; // global tracks
+   TH1F* fhNofStsTracks; // STS tracks
+   TH1F* fhNofTrdTracks; // TRD tracks
+   TH1F* fhNofMuchTracks; // MUCH tracks
+   TH1F* fhNofRichRings; // RICH rings
+   TH1F* fhNofRichProjections; // RICH projections
+   TH1F* fhNofMvdHits; // MVD hits
+   TH1F* fhNofStsHits; // STS hits
+   TH1F* fhNofRichHits; // RICH tracks
+   TH1F* fhNofTrdHits; // TRD tracks
+   TH1F* fhNofMuchPixelHits; // MUCH pixel hits
+   TH1F* fhNofMuchStrawHits; // MUCH straw hits
+   TH1F* fhNofTofHits; // TOF hits
 
    Int_t fEventNo; // Event counter
 

@@ -30,6 +30,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TPad.h"
+#include "TFile.h"
 
 #include <iostream>
 #include <map>
@@ -194,7 +195,7 @@ InitStatus CbmLitReconstructionQa::Init()
 {
    DetermineSetup();
    ReadDataBranches();
-   CreateHistos();
+   CreateHistos(NULL);
 
    return kSUCCESS;
 }
@@ -240,6 +241,18 @@ void CbmLitReconstructionQa::DetermineSetup()
    if (fIsTrd) { std::cout << "TRD "; }
    if (fIsTof) { std::cout << "TOF "; }
    std::cout << std::endl;
+}
+
+void CbmLitReconstructionQa::SetDetectorPresence(
+		   DetectorId detId,
+		   bool isDet)
+{
+	if (detId == kMVD) fIsMvd = detId; else
+	if (detId == kSTS) fIsSts = detId; else
+	if (detId == kRICH) fIsRich = detId; else
+	if (detId == kTRD) fIsTrd = detId; else
+	if (detId == kMUCH) fIsMuch = detId; else
+	if (detId == kTOF) fIsTof = detId;
 }
 
 void CbmLitReconstructionQa::ReadDataBranches()
@@ -822,7 +835,8 @@ void CbmLitReconstructionQa::CreateEffHisto(
 		Int_t nofBins,
 		Double_t minBin,
 		Double_t maxBin,
-		const std::string& opt)
+		const std::string& opt,
+		TFile* file)
 {
 	hist.resize(fNofCategories);
 	for (Int_t i = 0; i < fNofCategories; i++) {hist[i].resize(fNofTypes);}
@@ -840,13 +854,18 @@ void CbmLitReconstructionQa::CreateEffHisto(
 	for (Int_t i = 0; i < fNofCategories; i++) {
 	   for (Int_t j = 0; j < fNofTypes; j++) {
 	      std::string histName = name + type[j] + cat[i];
-	      hist[i][j] = new TH1F(histName.c_str(), histName.c_str(), nofBins, minBin, maxBin);
+	      if (file == NULL){
+			  hist[i][j] = new TH1F(histName.c_str(), histName.c_str(), nofBins, minBin, maxBin);
+	      } else {
+	    	  hist[i][j] = (TH1F*)file->Get(histName.c_str());
+	      }
 	      fHistoList->Add(hist[i][j]);
 	   }
 	}
 }
 
-void CbmLitReconstructionQa::CreateHistos()
+void CbmLitReconstructionQa::CreateHistos(
+		TFile* file)
 {
    // Histogram list
    fHistoList = new TList();
@@ -856,52 +875,66 @@ void CbmLitReconstructionQa::CreateHistos()
    Double_t maxNofPoints = 100.;
    Int_t nBinsNofPoints = 100;
 
-   CreateEffHisto(fhStsMom, "hStsMom", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhStsMomNormHalfGlobal, "hStsMomNormHalfGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhStsMomNormGlobal, "hStsMomNormGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhStsNp, "hStsNp", nBinsNofPoints, minNofPoints, maxNofPoints, "tracking");
-   CreateEffHisto(fhStsAngle, "hStsAngle", fNofBinsAngle, fMinAngle, fMaxAngle, "tracking");
-   CreateEffHisto(fhHalfGlobalMom, "hHalfGlobalMom", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhHalfGlobalMomNormGlobal, "hHalfGlobalMomNormGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhGlobalMom, "hGlobalMom", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhRecMom, "hRecMom", fNofBinsMom, fMinMom, fMaxMom, "tracking");
-   CreateEffHisto(fhRecNp, "hRecNp", nBinsNofPoints, minNofPoints, maxNofPoints, "tracking");
-   CreateEffHisto(fhRecAngle, "hRecAngle", fNofBinsAngle, fMinAngle, fMaxAngle, "tracking");
-   CreateEffHisto(fhTofMom, "hTofMom", fNofBinsMom, fMinMom, fMaxMom, "tracking");
+   CreateEffHisto(fhStsMom, "hStsMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhStsMomNormHalfGlobal, "hStsMomNormHalfGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhStsMomNormGlobal, "hStsMomNormGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhStsNp, "hStsNp", nBinsNofPoints, minNofPoints, maxNofPoints, "tracking", file);
+   CreateEffHisto(fhStsAngle, "hStsAngle", fNofBinsAngle, fMinAngle, fMaxAngle, "tracking", file);
+   CreateEffHisto(fhHalfGlobalMom, "hHalfGlobalMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhHalfGlobalMomNormGlobal, "hHalfGlobalMomNormGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhGlobalMom, "hGlobalMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhRecMom, "hRecMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhRecNp, "hRecNp", nBinsNofPoints, minNofPoints, maxNofPoints, "tracking", file);
+   CreateEffHisto(fhRecAngle, "hRecAngle", fNofBinsAngle, fMinAngle, fMaxAngle, "tracking", file);
+   CreateEffHisto(fhTofMom, "hTofMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
 
-   CreateEffHisto(fhRichMom, "hRichMom", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhRichNh, "hRichNh", nBinsNofPoints, minNofPoints, maxNofPoints, "rich");
+   CreateEffHisto(fhRichMom, "hRichMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhRichNh, "hRichNh", nBinsNofPoints, minNofPoints, maxNofPoints, "rich", file);
 
-   CreateEffHisto(fhStsMomNormStsRich, "hStsMomNormStsRich", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhStsRichMom, "hStsRichMom", fNofBinsMom, fMinMom, fMaxMom, "rich");
+   CreateEffHisto(fhStsMomNormStsRich, "hStsMomNormStsRich", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichMom, "hStsRichMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
 
-   CreateEffHisto(fhStsMomNormStsRichTrd, "hStsMomNormStsRichTrd", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhStsRichMomNormStsRichTrd, "hStsRichMomNormStsRichTrd", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhStsRichTrdMom, "hStsRichTrdMom", fNofBinsMom, fMinMom, fMaxMom, "rich");
+   CreateEffHisto(fhStsMomNormStsRichTrd, "hStsMomNormStsRichTrd", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichMomNormStsRichTrd, "hStsRichMomNormStsRichTrd", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichTrdMom, "hStsRichTrdMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
 
-   CreateEffHisto(fhStsMomNormStsRichTrdTof, "hStsMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhStsRichMomNormStsRichTrdTof, "fhStsRichMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhStsRichTrdMomNormStsRichTrdTof, "fhStsRichTrdMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich");
-   CreateEffHisto(fhStsRichTrdTofMom, "fhStsRichTrdTofMom", fNofBinsMom, fMinMom, fMaxMom, "rich");
+   CreateEffHisto(fhStsMomNormStsRichTrdTof, "hStsMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichMomNormStsRichTrdTof, "fhStsRichMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichTrdMomNormStsRichTrdTof, "fhStsRichTrdMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichTrdTofMom, "fhStsRichTrdTofMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
 
    //Create histograms for ghost tracks
-   fhStsGhostNh = new TH1F("hStsGhostNh", "STS: ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
+   if (file == NULL){
+	   fhStsGhostNh = new TH1F("hStsGhostNh", "STS: ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
+	   fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
+	   fhRichGhostNh = new TH1F("hRichGhostNh", "RICH: ghost rings", nBinsNofPoints, minNofPoints, maxNofPoints);
+   } else {
+	   fhStsGhostNh = (TH1F*)file->Get("hStsGhostNh");
+	   fhRecGhostNh = (TH1F*)file->Get("hRecGhostNh");
+	   fhRichGhostNh = (TH1F*)file->Get("hRichGhostNh");
+   }
    fHistoList->Add(fhStsGhostNh);
-   fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
    fHistoList->Add(fhRecGhostNh);
-   fhRichGhostNh = new TH1F("hRichGhostNh", "RICH: ghost rings", nBinsNofPoints, minNofPoints, maxNofPoints);
    fHistoList->Add(fhRichGhostNh);
 
    const UInt_t maxNofStations = 30;
-   fhMvdNofHitsInStation = new TH1F("hMvdNofHitsInStation", "MVD: number of hits", maxNofStations, 0, maxNofStations);
+   if (file == NULL){
+	   fhMvdNofHitsInStation = new TH1F("hMvdNofHitsInStation", "MVD: number of hits", maxNofStations, 0, maxNofStations);
+	   fhStsNofHitsInStation = new TH1F("hStsNofHitsInStation", "STS: number of hits", maxNofStations, 0, maxNofStations);
+	   fhTrdNofHitsInStation = new TH1F("hTrdNofHitsInStation", "TRD: number of hits", maxNofStations, 0, maxNofStations);
+	   fhMuchNofHitsInStation = new TH1F("hMuchNofHitsInStation", "MUCH: number of hits", maxNofStations, 0, maxNofStations);
+	   fhTofNofHitsInStation = new TH1F("hTofNofHitsInStation", "TOF: number of hits", maxNofStations, 0, maxNofStations);
+   } else {
+	   fhMvdNofHitsInStation = (TH1F*)file->Get("hMvdNofHitsInStation");
+	   fhStsNofHitsInStation = (TH1F*)file->Get("hStsNofHitsInStation");
+	   fhTrdNofHitsInStation = (TH1F*)file->Get("hTrdNofHitsInStation");
+	   fhMuchNofHitsInStation = (TH1F*)file->Get("hMuchNofHitsInStation");
+	   fhTofNofHitsInStation = (TH1F*)file->Get("hTofNofHitsInStation");
+  }
    fHistoList->Add(fhMvdNofHitsInStation);
-   fhStsNofHitsInStation = new TH1F("hStsNofHitsInStation", "STS: number of hits", maxNofStations, 0, maxNofStations);
    fHistoList->Add(fhStsNofHitsInStation);
-   fhTrdNofHitsInStation = new TH1F("hTrdNofHitsInStation", "TRD: number of hits", maxNofStations, 0, maxNofStations);
    fHistoList->Add(fhTrdNofHitsInStation);
-   fhMuchNofHitsInStation = new TH1F("hMuchNofHitsInStation", "MUCH: number of hits", maxNofStations, 0, maxNofStations);
    fHistoList->Add(fhMuchNofHitsInStation);
-   fhTofNofHitsInStation = new TH1F("hTofNofHitsInStation", "TOF: number of hits", maxNofStations, 0, maxNofStations);
    fHistoList->Add(fhTofNofHitsInStation);
 
    const UInt_t nofHitsHistos = 5;
@@ -917,58 +950,73 @@ void CbmLitReconstructionQa::CreateHistos()
    fhMuchTrackHits.resize(nofHitsHistos);
    fhRichRingHits.resize(nofHitsHistos);
    for(UInt_t i = 0; i < nofHitsHistos; i++) {
-      std::string histName = "hMvdTrackHits" + hittype[i];
-      std::string histTitle = "MVD hits in track: " + hittype[i];
-      fhMvdTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+      std::string histName1 = "hMvdTrackHits" + hittype[i];
+      std::string histName2 = "hStsTrackHits" + hittype[i];
+      std::string histName3 = "hTrdTrackHits" + hittype[i];
+      std::string histName4 = "hMuchTrackHits" + hittype[i];
+      std::string histName5 = "hRichRingHits" + hittype[i];
+
+      if (file == NULL){
+		  fhMvdTrackHits[i] = new TH1F(histName1.c_str(), histName1.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		  fhStsTrackHits[i] = new TH1F(histName2.c_str(), histName2.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		  fhTrdTrackHits[i] = new TH1F(histName3.c_str(), histName3.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		  fhMuchTrackHits[i] = new TH1F(histName4.c_str(), histName4.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		  fhRichRingHits[i] = new TH1F(histName5.c_str(), histName5.c_str(), hitbinsrich[i], hitmin[i], hitmaxrich[i]);
+      } else {
+          fhMvdTrackHits[i] = (TH1F*)file->Get(histName1.c_str());
+          fhStsTrackHits[i] = (TH1F*)file->Get(histName2.c_str());
+          fhTrdTrackHits[i] = (TH1F*)file->Get(histName3.c_str());
+          fhMuchTrackHits[i] = (TH1F*)file->Get(histName4.c_str());
+          fhRichRingHits[i] = (TH1F*)file->Get(histName5.c_str());
+      }
       fHistoList->Add(fhMvdTrackHits[i]);
-
-      histName = "hStsTrackHits" + hittype[i];
-      histTitle = "STS hits in track: " + hittype[i];
-      fhStsTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
       fHistoList->Add(fhStsTrackHits[i]);
-
-      histName = "hTrdTrackHits" + hittype[i];
-      histTitle = "TRD hits in track: " + hittype[i];
-      fhTrdTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
       fHistoList->Add(fhTrdTrackHits[i]);
-
-      histName = "hMuchTrackHits" + hittype[i];
-      histTitle = "MUCH hits in track: " + hittype[i];
-      fhMuchTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
       fHistoList->Add(fhMuchTrackHits[i]);
-
-      histName = "hRichRingHits" + hittype[i];
-      histTitle = "RICH hits in ring: " + hittype[i];
-      fhRichRingHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbinsrich[i], hitmin[i], hitmaxrich[i]);
       fHistoList->Add(fhRichRingHits[i]);
    }
 
-
-   fhNofGlobalTracks = new TH1F("hNofGlobalTracks","hNofGlobalTracks", 100, 1., 1.);
+   if (file == NULL){
+	   fhNofGlobalTracks = new TH1F("hNofGlobalTracks","hNofGlobalTracks", 100, 1., 1.);
+	   fhNofStsTracks = new TH1F("hNofStsTracks","hNofStsTracks", 100, 1., 1.);
+	   fhNofTrdTracks = new TH1F("hNofTrdTracks","hNofTrdTracks", 100, 1., 1.);
+	   fhNofMuchTracks = new TH1F("hNofMuchTracks","hNofMuchTracks", 100, 1., 1.);
+	   fhNofRichRings = new TH1F("hNofRichRings","hNofRichRings", 100, 1., 1.);
+	   fhNofRichProjections = new TH1F("hNofRichProjections","hNofRichProjections", 100, 1., 1.);
+	   fhNofMvdHits = new TH1F("hNofMvdHits","hNofMvdHits", 100, 1., 1.);
+	   fhNofStsHits = new TH1F("hNofStsHits","hNofStsHits", 100, 1., 1.);
+	   fhNofRichHits = new TH1F("hNofRichHits","hNofRichHits", 100, 1., 1.);
+	   fhNofTrdHits = new TH1F("hNofTrdHits","hNofTrdHits", 100, 1., 1.);
+	   fhNofMuchPixelHits = new TH1F("hNofMuchPixelHits","hNofMuchPixelHits", 100, 1., 1.);
+	   fhNofMuchStrawHits = new TH1F("hNofMuchStrawHits","hNofMuchStrawHits", 100, 1., 1.);
+	   fhNofTofHits = new TH1F("hNofTofHits","hNofTofHits", 100, 1., 1.);
+   }else {
+	   fhNofGlobalTracks = (TH1F*)file->Get("hNofGlobalTracks");
+	   fhNofStsTracks = (TH1F*)file->Get("hNofStsTracks");
+	   fhNofTrdTracks = (TH1F*)file->Get("hNofTrdTracks");
+	   fhNofMuchTracks = (TH1F*)file->Get("hNofMuchTracks");
+	   fhNofRichRings = (TH1F*)file->Get("hNofRichRings");
+	   fhNofRichProjections = (TH1F*)file->Get("hNofRichProjections");
+	   fhNofMvdHits = (TH1F*)file->Get("hNofMvdHits");
+	   fhNofStsHits = (TH1F*)file->Get("hNofStsHits");
+	   fhNofRichHits = (TH1F*)file->Get("hNofRichHits");
+	   fhNofTrdHits = (TH1F*)file->Get("hNofTrdHits");
+	   fhNofMuchPixelHits = (TH1F*)file->Get("hNofMuchPixelHits");
+	   fhNofMuchStrawHits = (TH1F*)file->Get("hNofMuchStrawHits");
+	   fhNofTofHits = (TH1F*)file->Get("hNofTofHits");
+   }
    fHistoList->Add(fhNofGlobalTracks);
-   fhNofStsTracks = new TH1F("hNofStsTracks","hNofStsTracks", 100, 1., 1.);
    fHistoList->Add(fhNofStsTracks);
-   fhNofTrdTracks = new TH1F("hNofTrdTracks","hNofTrdTracks", 100, 1., 1.);
    fHistoList->Add(fhNofTrdTracks);
-   fhNofMuchTracks = new TH1F("hNofMuchTracks","hNofMuchTracks", 100, 1., 1.);
    fHistoList->Add(fhNofMuchTracks);
-   fhNofRichRings = new TH1F("hNofRichRings","hNofRichRings", 100, 1., 1.);
    fHistoList->Add(fhNofRichRings);
-   fhNofRichProjections = new TH1F("hNofRichProjections","hNofRichProjections", 100, 1., 1.);
    fHistoList->Add(fhNofRichProjections);
-   fhNofMvdHits = new TH1F("hNofMvdHits","hNofMvdHits", 100, 1., 1.);
    fHistoList->Add(fhNofMvdHits);
-   fhNofStsHits = new TH1F("hNofStsHits","hNofStsHits", 100, 1., 1.);
    fHistoList->Add(fhNofStsHits);
-   fhNofRichHits = new TH1F("hNofRichHits","hNofRichHits", 100, 1., 1.);
    fHistoList->Add(fhNofRichHits);
-   fhNofTrdHits = new TH1F("hNofTrdHits","hNofTrdHits", 100, 1., 1.);
    fHistoList->Add(fhNofTrdHits);
-   fhNofMuchPixelHits = new TH1F("hNofMuchPixelHits","hNofMuchPixelHits", 100, 1., 1.);
    fHistoList->Add(fhNofMuchPixelHits);
-   fhNofMuchStrawHits = new TH1F("hNofMuchStrawHits","hNofMuchStrawHits", 100, 1., 1.);
    fHistoList->Add(fhNofMuchStrawHits);
-   fhNofTofHits = new TH1F("hNofTofHits","hNofTofHits", 100, 1., 1.);
    fHistoList->Add(fhNofTofHits);
 }
 
@@ -1553,6 +1601,17 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	if (fIsTrd) {DrawHitsStationHisto("rec_qa_trd_hits_station", fhTrdNofHitsInStation);}
 	if (fIsMuch) {DrawHitsStationHisto("rec_qa_much_hits_station", fhMuchNofHitsInStation);}
 	if (fIsTof) {DrawHitsStationHisto("rec_qa_tof_hits_station", fhTofNofHitsInStation);}
+}
+
+void CbmLitReconstructionQa::DrawHistosFromFile(const std::string& fileName)
+{
+	TFile* file = new TFile(fileName.c_str());
+    //DetermineSetup();
+	CreateHistos(file);
+	CalculateEfficiencyHistos();
+	//WriteToFile();
+	PrintFinalStatistics(std::cout);
+	Draw();
 }
 
 ClassImp(CbmLitReconstructionQa);

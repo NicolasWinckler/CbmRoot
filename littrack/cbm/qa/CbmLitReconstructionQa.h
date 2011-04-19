@@ -98,6 +98,22 @@ public:
       fNofBinsMom = nofBins;
    }
 
+   /* Implement functionality of drawing histograms in the macro
+    * from the specified file
+    * @param fileName Name of the file */
+   void DrawHistosFromFile(const std::string& fileName);
+
+   /* Explicitly sets detectors in the setup
+    * detId Id of the detector kMVD, kSTS...
+    * isDet true if detector is in the setup */
+   void SetDetectorPresence(
+		   DetectorId detId,
+		   bool isDet);
+
+   /* Set explicitly electron setup of the detector
+    * isElectronSetup true if electron setup*/
+   void SetIsElectronSetup(bool isElectronSetup) {fIsElectronSetup = isElectronSetup;}
+
 private:
    /* Derived from FairTask. Executed after all events are processed. */
    virtual void Finish();
@@ -172,17 +188,21 @@ private:
    * @param nofBins Number of bins in the histograms
    * @param minBin Minimum value of the histograms
    * @param maxBin Maximum value of the histograms
-   * @param opt "tracking" for STS, TRD and TOF or "rich" for RICH*/
+   * @param opt "tracking" for STS, TRD and TOF or "rich" for RICH
+   * @param file if file==NULL then create histograms else read histograms from file*/
    void CreateEffHisto(
    		std::vector<std::vector<TH1F*> >& hist,
    		const std::string& name,
    		Int_t nofBins,
    		Double_t minBin,
    		Double_t maxBin,
-   		const std::string& opt);
+   		const std::string& opt,
+   		TFile* file);
 
-   /* Creates the histograms. */
-   void CreateHistos();
+   /* Creates the histograms.
+    *@param file if file==NULL then create histograms else read histograms from file*/
+   void CreateHistos(
+        TFile* file);
 
    /* Divides two histograms.
     * @param histo1 numerator
@@ -416,7 +436,7 @@ private:
 
    TList* fHistoList; // List of histograms
 
-   // Total number of tracks/rings/hits counters
+   // Total number of tracks/rings/hits histograms
    TH1F* fhNofGlobalTracks; // global tracks
    TH1F* fhNofStsTracks; // STS tracks
    TH1F* fhNofTrdTracks; // TRD tracks

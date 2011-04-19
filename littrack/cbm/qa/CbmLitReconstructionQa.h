@@ -166,6 +166,21 @@ private:
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
 
+   /* Creates histograms - hist using specified parameters.
+   * @param hist 2D vector of the histograms
+   * @param name Histogram name
+   * @param nofBins Number of bins in the histograms
+   * @param minBin Minimum value of the histograms
+   * @param maxBin Maximum value of the histograms
+   * @param opt "tracking" for STS, TRD and TOF or "rich" for RICH*/
+   void CreateEffHisto(
+   		std::vector<std::vector<TH1F*> >& hist,
+   		const std::string& name,
+   		Int_t nofBins,
+   		Double_t minBin,
+   		Double_t maxBin,
+   		const std::string& opt);
+
    /* Creates the histograms. */
    void CreateHistos();
 
@@ -205,6 +220,12 @@ private:
       const std::vector<std::vector<TH1F*> >& hist,
       const std::string& opt);
 
+   /* Calculates integrated efficiencies and forms string with statistic information for the RICH detector.
+    * @param hist vector with histograms
+    * @param opt if 'event' than forms string for event statistics, if 'final' than forms the string with final statistics. */
+   std::string EventEfficiencyStatisticsRichToString(
+      const std::vector<std::vector<TH1F*> >& hist,
+      const std::string& opt);
 
    /* Calculates integrated efficiencies for different polar angles
      * and returns a string with statistics.
@@ -224,12 +245,15 @@ private:
    		const std::vector<std::vector<TH1F*> >& hist1,
    		const std::vector<std::vector<TH1F*> >& hist2,
    		const std::vector<std::vector<TH1F*> >& hist3,
+   		const std::vector<std::vector<TH1F*> >& hist4,
    		const std::string& name1,
    		const std::string& name2,
    		const std::string& name3,
+   		const std::string& name4,
    		Int_t category1,
    		Int_t category2,
-   		Int_t category3);
+   		Int_t category3,
+   		Int_t category4);
 
    /* Calculate efficiency for two histograms */
    Double_t CalcEfficiency(
@@ -285,7 +309,7 @@ private:
    Bool_t fIsTof; // If TOF detected than true
 
    Double_t fRefMomentum; // Momentum cut for reference tracks
-   Int_t fRefNofHitsInRing; // Minimum number of hits in RICH ring to be considered as reference
+   Int_t fRefMinNofHitsRich; // Minimum number of hits in RICH ring to be considered as reference
 
    Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation
    Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation
@@ -363,7 +387,18 @@ private:
    // RICH performance histograms
    std::vector<std::vector<TH1F*> > fhRichMom;// RICH: momentum dependence
    std::vector<std::vector<TH1F*> > fhRichNh;// RICH: number of hits
+   //Norm STS+RICH
    std::vector<std::vector<TH1F*> > fhStsRichMom;// STS+RICH: momentum dependence
+   std::vector<std::vector<TH1F*> > fhStsMomNormStsRich;// STS: momentum dependence, normalized to STS+RICH
+   //Norm STS+RICH+TRD
+   std::vector<std::vector<TH1F*> > fhStsMomNormStsRichTrd;// STS: momentum dependence, normalized to STS+RICH+TRD
+   std::vector<std::vector<TH1F*> > fhStsRichTrdMom;// STS+RICH+TRD: momentum dependence
+   std::vector<std::vector<TH1F*> > fhStsRichMomNormStsRichTrd;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD
+   //Norm STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsMomNormStsRichTrdTof;// STS: momentum dependence, normalized to STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsRichMomNormStsRichTrdTof;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsRichTrdMomNormStsRichTrdTof;// STS+RICH+TRD: momentum dependence, normalized to STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsRichTrdTofMom;// STS+RICH+TRD+TOF: momentum dependence, normalized to STS+RICH+TRD+TOF
 
    TH1F* fhMvdNofHitsInStation; // mean number of hits in station in MVD
    TH1F* fhStsNofHitsInStation; // mean number of hits in station in STS
@@ -381,11 +416,19 @@ private:
 
    TList* fHistoList; // List of histograms
 
-   // Total number of tracks/hits counters
+   // Total number of tracks/rings/hits counters
    Int_t fNofGlobalTracks; // global tracks
    Int_t fNofStsTracks; // STS tracks
    Int_t fNofTrdTracks; // TRD tracks
    Int_t fNofMuchTracks; // MUCH tracks
+   Int_t fNofRichRings; // RICH rings
+   Int_t fNofRichProjections; // RICH projections
+   Int_t fNofMvdHits; // MVD hits
+   Int_t fNofStsHits; // STS hits
+   Int_t fNofRichHits; // RICH tracks
+   Int_t fNofTrdHits; // TRD tracks
+   Int_t fNofMuchPixelHits; // MUCH pixel hits
+   Int_t fNofMuchStrawHits; // MUCH straw hits
    Int_t fNofTofHits; // TOF hits
 
    Int_t fEventNo; // Event counter

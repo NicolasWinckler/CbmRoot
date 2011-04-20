@@ -22,6 +22,9 @@
 
 #define cnst static const fvec
 
+namespace lit {
+namespace parallel {
+
 class LitTrackFinderNNVecMuon : public LitTrackFinderNNBase,
    public LitTrackFinder
 {
@@ -114,5 +117,7 @@ private:
    unsigned char fMaxNofMissingHits;
 };
 
+} // namespace parallel
+} // namespace lit
 //#undef cnst
 #endif /* LITTRACKFINDERNNVECMUON_H_ */

@@ -26,6 +26,9 @@
 
 //class CbmLitField;
 
+namespace lit {
+namespace parallel {
+
 class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBaseElectronScal,
    public LitTrackFinderNNBase,
    public LitTrackFinder
@@ -84,5 +87,6 @@ public:
 // CbmLitField* fField;
 };
 
-
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFINDERNNSCALARELECTRON_H_ */

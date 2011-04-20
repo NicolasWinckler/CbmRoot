@@ -14,6 +14,9 @@
 #include "LitTrackParam.h"
 #include "LitHit.h"
 
+namespace lit {
+namespace parallel {
+
 inline void PackTrackParam(
    const LitTrackParam<fscal> par[],
    LitTrackParam<fvec>& lpar)
@@ -207,4 +210,6 @@ inline void UnpackTrack(
    std::cout << "UnpackTrack: not implemented!" << std::endl;
 }
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITVECPACK_H_ */

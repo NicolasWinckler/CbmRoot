@@ -191,7 +191,6 @@ If(TBB_FOUND)
   )
 EndIf(TBB_FOUND)
 
-################ install ###################
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
 
 

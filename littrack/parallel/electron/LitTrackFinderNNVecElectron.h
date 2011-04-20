@@ -23,6 +23,9 @@
 
 #define cnst static const fvec
 
+namespace lit {
+namespace parallel {
+
 const unsigned int MAX_NOF_TRACKS = 1500;
 
 class LitTrackFinderNNVecElectron : public LitTrackFinderNNBaseElectronVec,
@@ -101,4 +104,7 @@ public:
 };
 
 //#undef cnst
+
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFINDERNNVECELECTRON_H_ */

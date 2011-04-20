@@ -8,8 +8,8 @@
 
 #include "interface/CbmLitTrackFitter.h"
 #include "data/CbmLitPixelHit.h"
-#include "parallel/muon/LitDetectorGeometryMuon.h"
 #include "parallel/LitHit.h"
+#include "parallel/muon/LitDetectorGeometryMuon.h"
 
 class CbmLitTrack;
 class CbmLitTrackParam;
@@ -33,20 +33,20 @@ private:
       unsigned char stationGroup,
       unsigned char station,
       unsigned char substation,
-      LitDetectorLayoutMuon<fscal>& layout) const;
+      lit::parallel::LitDetectorLayoutMuon<fscal>& layout) const;
 
    bool CheckHit(
       unsigned char stationGroup,
       unsigned char station,
       unsigned char substation,
-      LitDetectorLayoutMuon<fscal>& layout,
+      lit::parallel::LitDetectorLayoutMuon<fscal>& layout,
       CbmLitTrack* track);
 
    void SerialHitToParallel(
       const CbmLitPixelHit& hit,
-      LitPixelHit<fscal>& lhit);
+      lit::parallel::LitPixelHit<fscal>& lhit);
 
-   LitDetectorLayoutMuon<fscal> fLayout;
+   lit::parallel::LitDetectorLayoutMuon<fscal> fLayout;
 };
 
 #endif /* CBMLITPARALLELTRACKFITTERTEST_H_ */

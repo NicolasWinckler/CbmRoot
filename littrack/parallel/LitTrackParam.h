@@ -11,6 +11,9 @@
 
 #include "LitTypes.h"
 
+namespace lit {
+namespace parallel {
+
 template<class T>
 class LitTrackParam
 {
@@ -45,4 +48,6 @@ public:
 typedef LitTrackParam<fvec> LitTrackParamVec;
 typedef LitTrackParam<fscal> LitTrackParamScal;
 
-#endif
+} // namespace parallel
+} // namespace lit
+#endif /* LITTRACKPARAM_H_ */

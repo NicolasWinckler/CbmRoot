@@ -13,6 +13,9 @@
 #include "LitTrackParam.h"
 #include "LitHit.h"
 
+namespace lit {
+namespace parallel {
+
 const unsigned char MAX_NOF_HITS_IN_TRACK = 30;
 
 class LitScalTrack
@@ -93,4 +96,6 @@ public:
 typedef LitTrack<fvec> LitTrackVec;
 typedef LitTrack<fscal> LitTrackScal;
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACK_H_ */

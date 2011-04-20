@@ -97,6 +97,4 @@ ENDIF (SSE_FOUND)
 #add_library(Littrackstd SHARED ${LITTRACKSTD_SRCS})
 #target_link_libraries(Littrackstd ${ROOT_LIBRARIES})
 #set_target_properties(Littrackstd PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
 #install(TARGETS Littrackstd DESTINATION ${CMAKE_BINARY_DIR}/lib)

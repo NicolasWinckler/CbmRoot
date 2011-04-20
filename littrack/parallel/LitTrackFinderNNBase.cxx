@@ -10,7 +10,7 @@
 
 //template<class T>
 //LitTrackFinderNNBase<T>::LitTrackFinderNNBase():
-LitTrackFinderNNBase::LitTrackFinderNNBase():
+lit::parallel::LitTrackFinderNNBase::LitTrackFinderNNBase():
    fSigmaCoef(5.),
    fMaxCovSq(20*20)
 {
@@ -19,14 +19,14 @@ LitTrackFinderNNBase::LitTrackFinderNNBase():
 
 //template<class T>
 //LitTrackFinderNNBase<T>::~LitTrackFinderNNBase()
-LitTrackFinderNNBase::~LitTrackFinderNNBase()
+lit::parallel::LitTrackFinderNNBase::~LitTrackFinderNNBase()
 {
 
 }
 
 //template<class T>
 //void LitTrackFinderNNBase<T>::MinMaxIndex(
-void LitTrackFinderNNBase::MinMaxIndex(
+void lit::parallel::LitTrackFinderNNBase::MinMaxIndex(
    const LitTrackParamScal* par,
    LitScalPixelHit** hits,
    unsigned int nofHits,

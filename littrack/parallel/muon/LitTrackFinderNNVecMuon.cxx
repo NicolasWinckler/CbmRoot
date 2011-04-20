@@ -31,25 +31,25 @@
 #ifdef LIT_USE_TBB
 class PropagateThroughAbsorberClass
 {
-   LitScalTrack** fTracks;
-   LitTrackFinderNNVecMuon* fFinder;
-   LitAbsorber<fvec>& fAbsorber;
+   lit::parallel::LitScalTrack** fTracks;
+   lit::parallel::LitTrackFinderNNVecMuon* fFinder;
+   lit::parallel::LitAbsorber<fvec>& fAbsorber;
    unsigned int* fTracksId;
 public:
    void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
       for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
          unsigned int start = fvecLen * iTrack;
          // Collect track group
-         LitScalTrack* tracks[fvecLen];
+         lit::parallel::LitScalTrack* tracks[fvecLen];
          for(unsigned int i = 0; i < fvecLen; i++) { tracks[i] = fTracks[fTracksId[start + i]]; }
          fFinder->PropagateThroughAbsorber(tracks, fAbsorber);
       }
    }
    PropagateThroughAbsorberClass(
-      LitTrackFinderNNVecMuon* finder,
-      LitScalTrack* tracks[],
+      lit::parallel::LitTrackFinderNNVecMuon* finder,
+      lit::parallel::LitScalTrack* tracks[],
       unsigned int* tracksId,
-      LitAbsorber<fvec>& absorber) :
+      lit::parallel::LitAbsorber<fvec>& absorber) :
       fFinder(finder),
       fTracks(tracks),
       fTracksId(tracksId),
@@ -60,8 +60,8 @@ public:
 
 class ProcessStationClass
 {
-   LitScalTrack** fTracks;
-   LitTrackFinderNNVecMuon* fFinder;
+   lit::parallel::LitScalTrack** fTracks;
+   lit::parallel::LitTrackFinderNNVecMuon* fFinder;
    unsigned int* fTracksId;
    unsigned char fStationGroup;
    unsigned char fStation;
@@ -70,14 +70,14 @@ public:
       for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
          unsigned int start = fvecLen * iTrack;
          // Collect track group
-         LitScalTrack* tracks[fvecLen];
+         lit::parallel::LitScalTrack* tracks[fvecLen];
          for(unsigned int i = 0; i < fvecLen; i++) { tracks[i] = fTracks[fTracksId[start + i]]; }
          fFinder->ProcessStation(tracks, fStationGroup, fStation);
       }
    }
    ProcessStationClass(
-      LitTrackFinderNNVecMuon* finder,
-      LitScalTrack** tracks,
+      lit::parallel::LitTrackFinderNNVecMuon* finder,
+      lit::parallel::LitScalTrack** tracks,
       unsigned int* tracksId,
       unsigned char stationGroup,
       unsigned char station) :
@@ -91,25 +91,25 @@ public:
 
 class PropagateToSubstationClass
 {
-   LitTrackParam<fvec>* flpar;
-   LitStationMuon<fvec>& fStation;
-   const LitFieldRegion<fvec>& fField;
+   lit::parallel::LitTrackParam<fvec>* flpar;
+   lit::parallel::LitStationMuon<fvec>& fStation;
+   const lit::parallel::LitFieldRegion<fvec>& fField;
 public:
    void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
       // Loop over the substations
       for (unsigned int i = r.begin(); i != r.end(); ++i) {
-         LitSubstationMuon<fvec>& substation = fStation.substations[i];
+         lit::parallel::LitSubstationMuon<fvec>& substation = fStation.substations[i];
          // Propagation through station
-         LitRK4Extrapolation<fvec>(flpar[i], substation.Z, fField);
+         lit::parallel::LitRK4Extrapolation<fvec>(flpar[i], substation.Z, fField);
          //    LitLineExtrapolation(lpar[iSubstation], substation.Z);
-         LitAddMaterial(flpar[i], substation.material);
+         lit::parallel::LitAddMaterial(flpar[i], substation.material);
 //       if (iSubstation < nofSubstations - 1) lpar[iSubstation + 1] = lpar[iSubstation];
       }
    }
    PropagateToSubstationClass(
-      LitTrackParam<fvec>* lpar,
-      LitStationMuon<fvec>& station,
-      const LitFieldRegion<fvec>& field) :
+      lit::parallel::LitTrackParam<fvec>* lpar,
+      lit::parallel::LitStationMuon<fvec>& station,
+      const lit::parallel::LitFieldRegion<fvec>& field) :
       flpar(lpar),
       fStation(station),
       fField(field) {}
@@ -119,9 +119,9 @@ public:
 
 class CollectHitsClass
 {
-   LitTrackFinderNNVecMuon* fFinder;
-   LitTrackParam<fvec>* flpar;
-   LitScalTrack** fTracks;
+   lit::parallel::LitTrackFinderNNVecMuon* fFinder;
+   lit::parallel::LitTrackParam<fvec>* flpar;
+   lit::parallel::LitScalTrack** fTracks;
    unsigned char fStationGroup;
    unsigned char fStation;
    unsigned int fNofSubstations;
@@ -130,9 +130,9 @@ public:
    void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
       // Loop over the substations
       for (unsigned int i = r.begin(); i != r.end(); ++i) {
-         LitTrackParamScal spar[fNofSubstations];
+         lit::parallel::LitTrackParamScal spar[fNofSubstations];
          for (unsigned char iSubstation = 0; iSubstation < fNofSubstations; iSubstation++) {
-            UnpackTrackParam(i, flpar[iSubstation], spar[iSubstation]);
+            lit::parallel::UnpackTrackParam(i, flpar[iSubstation], spar[iSubstation]);
          }
 
          fFinder->CollectHits(spar, fTracks[i], fStationGroup, fStation, fNofSubstations);
@@ -140,9 +140,9 @@ public:
    }
 
    CollectHitsClass(
-      LitTrackFinderNNVecMuon* finder,
-      LitTrackParam<fvec>* lpar,
-      LitScalTrack** tracks,
+      lit::parallel::LitTrackFinderNNVecMuon* finder,
+      lit::parallel::LitTrackParam<fvec>* lpar,
+      lit::parallel::LitScalTrack** tracks,
       unsigned char stationGroup,
       unsigned char station,
       unsigned char nofSubstations):
@@ -157,7 +157,7 @@ public:
 #endif //LIT_USE_TBB
 
 
-LitTrackFinderNNVecMuon::LitTrackFinderNNVecMuon():
+lit::parallel::LitTrackFinderNNVecMuon::LitTrackFinderNNVecMuon():
    fMaxNofMissingHits(2)
 {
    SetSigmaCoef(3.5);
@@ -168,11 +168,11 @@ LitTrackFinderNNVecMuon::LitTrackFinderNNVecMuon():
 #endif
 }
 
-LitTrackFinderNNVecMuon::~LitTrackFinderNNVecMuon()
+lit::parallel::LitTrackFinderNNVecMuon::~LitTrackFinderNNVecMuon()
 {
 }
 
-void LitTrackFinderNNVecMuon::DoFind(
+void lit::parallel::LitTrackFinderNNVecMuon::DoFind(
    LitScalPixelHit* hits[],
    unsigned int nofHits,
    LitScalTrack* trackSeeds[],
@@ -206,7 +206,7 @@ void LitTrackFinderNNVecMuon::DoFind(
    fHitData.Clear();
 }
 
-void LitTrackFinderNNVecMuon::ArrangeHits(
+void lit::parallel::LitTrackFinderNNVecMuon::ArrangeHits(
    LitScalPixelHit* hits[],
    unsigned int nofHits)
 {
@@ -243,7 +243,7 @@ void LitTrackFinderNNVecMuon::ArrangeHits(
    }
 }
 
-void LitTrackFinderNNVecMuon::InitTrackSeeds(
+void lit::parallel::LitTrackFinderNNVecMuon::InitTrackSeeds(
    LitScalTrack* trackSeeds[],
    unsigned int nofTrackSeeds)
 {
@@ -271,7 +271,7 @@ void LitTrackFinderNNVecMuon::InitTrackSeeds(
 }
 
 
-void LitTrackFinderNNVecMuon::FollowTracks()
+void lit::parallel::LitTrackFinderNNVecMuon::FollowTracks()
 {
    // temporary arrays to store track indexes from the fTracks array
    unsigned int tracksId1[fNofTracks];
@@ -369,7 +369,7 @@ void LitTrackFinderNNVecMuon::FollowTracks()
    } // loop over station groups
 }
 
-void LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
+void lit::parallel::LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
    LitScalTrack* tracks[],
    LitAbsorber<fvec>& absorber)
 {
@@ -394,7 +394,7 @@ void LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
    for(unsigned int i = 0; i < fvecLen; i++) { tracks[i]->paramLast = par[i]; }
 }
 
-void LitTrackFinderNNVecMuon::ProcessStation(
+void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
    LitScalTrack* tracks[],
    unsigned char stationGroup,
    unsigned char station)
@@ -454,7 +454,7 @@ void LitTrackFinderNNVecMuon::ProcessStation(
 }
 
 
-void LitTrackFinderNNVecMuon::CollectHits(
+void lit::parallel::LitTrackFinderNNVecMuon::CollectHits(
    LitTrackParamScal* par,
    LitScalTrack* track,
    unsigned char stationGroup,
@@ -495,7 +495,7 @@ void LitTrackFinderNNVecMuon::CollectHits(
    if (!hitAdded) { track->nofMissingHits++; }
 }
 
-bool LitTrackFinderNNVecMuon::AddNearestHit(
+bool lit::parallel::LitTrackFinderNNVecMuon::AddNearestHit(
    LitScalTrack* track,
    LitScalPixelHit* hits[],
    LitTrackParamScal* pars[],

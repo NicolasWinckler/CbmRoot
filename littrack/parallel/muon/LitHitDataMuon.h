@@ -16,6 +16,9 @@
 
 //#include <vector>
 
+namespace lit {
+namespace parallel {
+
 // Maximum number of hits for station/substation
 const unsigned int MAX_NOF_HITS = 2000;
 
@@ -198,4 +201,6 @@ public:
 
 } _fvecalignment;
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITHITDATAMUON_H_ */

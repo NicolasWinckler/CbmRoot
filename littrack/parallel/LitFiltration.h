@@ -13,6 +13,9 @@
 //#include "LitTypes.h"
 #include "LitHit.h"
 
+namespace lit {
+namespace parallel {
+
 /* Function performs calculations of the Kalman filter update step,
  * taking into account hit information, and updates
  * track parameters and its covariance matrix.
@@ -153,4 +156,6 @@ inline void LitFiltration(
    par.C14 -= KR4 * K4;
 }
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITFILTRATION_H_ */

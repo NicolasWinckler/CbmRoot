@@ -17,6 +17,9 @@
 #include "../LitFiltration.h"
 #include "../LitAddMaterial.h"
 
+namespace lit {
+namespace parallel {
+
 /* Performs SIMDized/scalar fast track fit.
  * Number of hits must be equal to the number of stations.
  *
@@ -67,4 +70,6 @@ inline void LitTrackFitterMuon(
    }
 }
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFITTERMUON_H_ */

@@ -417,20 +417,20 @@ void CbmLitEnvironment::MvdLayout()
 }
 
 void CbmLitEnvironment::GetMuchLayoutVec(
-   LitDetectorLayoutMuonVec& layout)
+   lit::parallel::LitDetectorLayoutMuonVec& layout)
 {
    GetMuchLayout(layout);
 }
 
 void CbmLitEnvironment::GetMuchLayoutScal(
-   LitDetectorLayoutMuonScal& layout)
+   lit::parallel::LitDetectorLayoutMuonScal& layout)
 {
    GetMuchLayout(layout);
 }
 
 template<class T>
 void CbmLitEnvironment::GetMuchLayout(
-   LitDetectorLayoutMuon<T>& layout)
+   lit::parallel::LitDetectorLayoutMuon<T>& layout)
 {
    std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
 #if LIT_POLYNOM_DEGREE==3
@@ -462,7 +462,7 @@ void CbmLitEnvironment::GetMuchLayout(
    std::cout << muchLayout.ToString();
    for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
       const CbmLitStationGroup& stationGroup = muchLayout.GetStationGroup(isg);
-      LitStationGroupMuon<T> sg;
+      lit::parallel::LitStationGroupMuon<T> sg;
 
       // Add absorber
       // Fit the field at Z front and Z back of the absorber
@@ -484,7 +484,7 @@ void CbmLitEnvironment::GetMuchLayout(
          sg.absorber.fieldSliceBack.cz[i] = aparBz[1][i];
       }
 
-      LitMaterialInfo<T>& mat1 = sg.absorber.material;
+      lit::parallel::LitMaterialInfo<T>& mat1 = sg.absorber.material;
       mat1.A = amat.GetA();
       mat1.Z = amat.GetZ();
       mat1.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 :
@@ -504,11 +504,11 @@ void CbmLitEnvironment::GetMuchLayout(
 
       for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
          const CbmLitStation& station = stationGroup.GetStation(ist);
-         LitStationMuon<T> st;
-         st.type = station.GetType();
+         lit::parallel::LitStationMuon<T> st;
+         st.type = lit::parallel::LitHitType(station.GetType());
          for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
             const CbmLitSubstation& substation = station.GetSubstation(iss);
-            LitSubstationMuon<T> ss;
+            lit::parallel::LitSubstationMuon<T> ss;
             ss.Z = substation.GetZ();
 
             // Fit the field at Z position of the substation
@@ -545,20 +545,20 @@ void CbmLitEnvironment::GetMuchLayout(
 }
 
 void CbmLitEnvironment::GetTrdLayoutVec(
-   LitDetectorLayoutElectronVec& layout)
+   lit::parallel::LitDetectorLayoutElectronVec& layout)
 {
    GetTrdLayout(layout);
 }
 
 void CbmLitEnvironment::GetTrdLayoutScal(
-   LitDetectorLayoutElectronScal& layout)
+   lit::parallel::LitDetectorLayoutElectronScal& layout)
 {
    GetTrdLayout(layout);
 }
 
 template<class T>
 void CbmLitEnvironment::GetTrdLayout(
-   LitDetectorLayoutElectron<T>& layout)
+   lit::parallel::LitDetectorLayoutElectron<T>& layout)
 {
    std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
 #if LIT_POLYNOM_DEGREE==3
@@ -591,7 +591,7 @@ void CbmLitEnvironment::GetTrdLayout(
 
    // add virtual planes
    for (int nvp = 0; nvp < 20; nvp++) {
-      LitVirtualPlaneElectron<T> virtualPlane;
+      lit::parallel::LitVirtualPlaneElectron<T> virtualPlane;
       float DZ = 10.;
       float Z = 105. + nvp * DZ;
       virtualPlane.Z = Z;
@@ -614,7 +614,7 @@ void CbmLitEnvironment::GetTrdLayout(
       }
 
       CbmLitMaterialInfo mat = trdMaterial[5]; //air material
-      LitMaterialInfo<T> m;
+      lit::parallel::LitMaterialInfo<T> m;
       m.A = mat.GetA();
       m.Z = mat.GetZ();
       m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
@@ -637,20 +637,20 @@ void CbmLitEnvironment::GetTrdLayout(
 
    for (int isg = 0; isg < trdLayout.GetNofStationGroups(); isg++) {
       const CbmLitStationGroup& stationGroup = trdLayout.GetStationGroup(isg);
-      LitStationGroupElectron<T> sg;
+      lit::parallel::LitStationGroupElectron<T> sg;
 
       for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
          const CbmLitStation& station = stationGroup.GetStation(ist);
 
          for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
             const CbmLitSubstation& substation = station.GetSubstation(iss);
-            LitStationElectron<T> st;
+            lit::parallel::LitStationElectron<T> st;
             st.Z = substation.GetZ();
 
             int matId = TrdMaterialId(isg, ist, trdLayout);
             for (int im = 0; im < 6; im++) {
                CbmLitMaterialInfo mat = trdMaterial[matId + im];
-               LitMaterialInfo<T> m;
+               lit::parallel::LitMaterialInfo<T> m;
                m.A = mat.GetA();
                m.Z = mat.GetZ();
                m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :

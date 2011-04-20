@@ -11,6 +11,9 @@
 
 #include "LitTypes.h"
 
+namespace lit {
+namespace parallel {
+
 template<class T>
 class LitStripHit
 {
@@ -37,6 +40,8 @@ public:
    }
 } _fvecalignment;
 
+typedef LitStripHit<fscal> LitStripHitScal;
+typedef LitStripHit<fvec> LitStripHitVec;
 
 template<class T>
 class LitPixelHit
@@ -143,4 +148,6 @@ public:
    }
 };
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITHIT_H_ */

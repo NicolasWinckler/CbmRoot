@@ -55,7 +55,7 @@ public:
 };
 #endif
 
-LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron()
+lit::parallel::LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron()
 {
 // CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 // fField = new CbmLitMapField(env->GetField());
@@ -74,11 +74,11 @@ LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron()
 #endif
 }
 
-LitTrackFinderNNScalarElectron::~LitTrackFinderNNScalarElectron()
+lit::parallel::LitTrackFinderNNScalarElectron::~LitTrackFinderNNScalarElectron()
 {
 }
 
-void LitTrackFinderNNScalarElectron::DoFind(
+void lit::parallel::LitTrackFinderNNScalarElectron::DoFind(
    LitScalPixelHit* hits[],
    unsigned int nofHits,
    LitScalTrack* trackSeeds[],
@@ -106,7 +106,7 @@ void LitTrackFinderNNScalarElectron::DoFind(
    fHitData.Clear();
 }
 
-void LitTrackFinderNNScalarElectron::FollowTracks()
+void lit::parallel::LitTrackFinderNNScalarElectron::FollowTracks()
 {
 #ifdef LIT_USE_TBB
    tbb::parallel_for(tbb::blocked_range<unsigned int>(0, fNofTracks),
@@ -120,7 +120,7 @@ void LitTrackFinderNNScalarElectron::FollowTracks()
 #endif
 }
 
-void LitTrackFinderNNScalarElectron::PropagateToFirstStation(
+void lit::parallel::LitTrackFinderNNScalarElectron::PropagateToFirstStation(
    LitScalTrack* track)
 {
    for (unsigned char ivp = 0; ivp < fLayout.GetNofVirtualPlanes()-1; ivp++) {
@@ -152,7 +152,7 @@ void LitTrackFinderNNScalarElectron::PropagateToFirstStation(
 
 }
 
-void LitTrackFinderNNScalarElectron::FollowTrack(
+void lit::parallel::LitTrackFinderNNScalarElectron::FollowTrack(
    LitScalTrack* track)
 {
    int nofStationGroups = fLayout.GetNofStationGroups();
@@ -161,7 +161,7 @@ void LitTrackFinderNNScalarElectron::FollowTrack(
    }
 }
 
-bool LitTrackFinderNNScalarElectron::ProcessStationGroup(
+bool lit::parallel::LitTrackFinderNNScalarElectron::ProcessStationGroup(
    LitScalTrack* track,
    int stationGroup)
 {
@@ -175,7 +175,7 @@ bool LitTrackFinderNNScalarElectron::ProcessStationGroup(
    return true;
 }
 
-bool LitTrackFinderNNScalarElectron::ProcessStation(
+bool lit::parallel::LitTrackFinderNNScalarElectron::ProcessStation(
    LitScalTrack* track,
    int stationGroup,
    int station)
@@ -217,7 +217,7 @@ bool LitTrackFinderNNScalarElectron::ProcessStation(
    return hitAdded;
 }
 
-bool LitTrackFinderNNScalarElectron::AddNearestHit(
+bool lit::parallel::LitTrackFinderNNScalarElectron::AddNearestHit(
    LitScalTrack* track,
    const std::pair<unsigned int, unsigned int>& hits,
    LitTrackParamScal* par,

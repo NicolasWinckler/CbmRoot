@@ -10,6 +10,7 @@
 #include "../LitField.h"
 #include "../LitMath.h"
 #include "../LitVecPack.h"
+#include "../LitTrack.h"
 
 //#include "CbmLitMemoryManagment.h"
 
@@ -40,23 +41,23 @@ public:
       for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
          unsigned int start = fvecLen * iTrack;
          // Collect track group
-         LitScalTrack* tracks[fvecLen];
+         lit::parallel::LitScalTrack* tracks[fvecLen];
          for(unsigned int i = 0; i < fvecLen; i++) { tracks[i] = fTracks[fTracksId[start + i]]; }
          fFinder->PropagateToFirstStation(tracks);
       }
    }
 
    PropagateToFirstStationClass(
-      LitTrackFinderNNVecElectron* finder,
-      LitScalTrack* tracks[],
+      lit::parallel::LitTrackFinderNNVecElectron* finder,
+      lit::parallel::LitScalTrack* tracks[],
       unsigned int* tracksId) :
       fFinder(finder),
       fTracks(tracks),
       fTracksId(tracksId) {}
 
 private:
-   LitTrackFinderNNVecElectron* fFinder;
-   LitScalTrack** fTracks;
+   lit::parallel::LitTrackFinderNNVecElectron* fFinder;
+   lit::parallel::LitScalTrack** fTracks;
    unsigned int* fTracksId;
 };
 
@@ -64,8 +65,8 @@ private:
 
 class ProcessStationClass
 {
-   LitScalTrack** fTracks;
-   LitTrackFinderNNVecElectron* fFinder;
+   lit::parallel::LitScalTrack** fTracks;
+   lit::parallel::LitTrackFinderNNVecElectron* fFinder;
    unsigned int* fTracksId;
    unsigned char fStationGroup;
    unsigned char fStation;
@@ -74,14 +75,14 @@ public:
       for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
          unsigned int start = fvecLen * iTrack;
          // Collect track group
-         LitScalTrack* tracks[fvecLen];
+         lit::parallel::LitScalTrack* tracks[fvecLen];
          for(unsigned int i = 0; i < fvecLen; i++) { tracks[i] = fTracks[fTracksId[start + i]]; }
          fFinder->ProcessStation(tracks, fStationGroup, fStation);
       }
    }
    ProcessStationClass(
-      LitTrackFinderNNVecElectron* finder,
-      LitScalTrack** tracks,
+      lit::parallel::LitTrackFinderNNVecElectron* finder,
+      lit::parallel::LitScalTrack** tracks,
       unsigned int* tracksId,
       unsigned char stationGroup,
       unsigned char station) :
@@ -96,16 +97,16 @@ public:
 
 class CollectHitsClass
 {
-   LitTrackFinderNNVecElectron* fFinder;
-   LitTrackParam<fvec> flpar;
-   LitScalTrack** fTracks;
+   lit::parallel::LitTrackFinderNNVecElectron* fFinder;
+   lit::parallel::LitTrackParam<fvec> flpar;
+   lit::parallel::LitScalTrack** fTracks;
    unsigned char fStationGroup;
    unsigned char fStation;
 
 public:
    void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
       for (unsigned int i = r.begin(); i != r.end(); ++i) {
-         LitTrackParamScal spar;
+         lit::parallel::LitTrackParamScal spar;
          UnpackTrackParam(i, flpar, spar);
 
          fFinder->CollectHits(&spar, fTracks[i], fStationGroup, fStation);
@@ -113,9 +114,9 @@ public:
    }
 
    CollectHitsClass(
-      LitTrackFinderNNVecElectron* finder,
-      LitTrackParam<fvec> lpar,
-      LitScalTrack** tracks,
+      lit::parallel::LitTrackFinderNNVecElectron* finder,
+      lit::parallel::LitTrackParam<fvec> lpar,
+      lit::parallel::LitScalTrack** tracks,
       unsigned char stationGroup,
       unsigned char station):
       fFinder(finder),
@@ -128,7 +129,7 @@ public:
 #endif //LIT_USE_TBB
 
 
-LitTrackFinderNNVecElectron::LitTrackFinderNNVecElectron()
+lit::parallel::LitTrackFinderNNVecElectron::LitTrackFinderNNVecElectron()
 {
    SetSigmaCoef(5.);
    SetMaxCovSq(20.*20.);
@@ -139,11 +140,11 @@ LitTrackFinderNNVecElectron::LitTrackFinderNNVecElectron()
 #endif
 }
 
-LitTrackFinderNNVecElectron::~LitTrackFinderNNVecElectron()
+lit::parallel::LitTrackFinderNNVecElectron::~LitTrackFinderNNVecElectron()
 {
 }
 
-void LitTrackFinderNNVecElectron::DoFind(
+void lit::parallel::LitTrackFinderNNVecElectron::DoFind(
    LitScalPixelHit* hits[],
    unsigned int nofHits,
    LitScalTrack* trackSeeds[],
@@ -184,7 +185,7 @@ void LitTrackFinderNNVecElectron::DoFind(
    fHitData.Clear();
 }
 
-void LitTrackFinderNNVecElectron::FollowTracks()
+void lit::parallel::LitTrackFinderNNVecElectron::FollowTracks()
 {
    // temporary arrays to store track indexes from the fTracks array
    unsigned int tracksId1[fNofTracks];
@@ -287,7 +288,7 @@ void LitTrackFinderNNVecElectron::FollowTracks()
    } // loop over station groups
 }
 
-void LitTrackFinderNNVecElectron::PropagateToFirstStation(
+void lit::parallel::LitTrackFinderNNVecElectron::PropagateToFirstStation(
    LitScalTrack* tracks[])
 {
    // Pack track parameters
@@ -309,7 +310,7 @@ void LitTrackFinderNNVecElectron::PropagateToFirstStation(
    for(unsigned int i = 0; i < fvecLen; i++) { tracks[i]->paramLast = par[i]; }
 }
 
-void LitTrackFinderNNVecElectron::ProcessStation(
+void lit::parallel::LitTrackFinderNNVecElectron::ProcessStation(
    LitScalTrack* tracks[],
    unsigned char stationGroup,
    unsigned char station)
@@ -345,7 +346,7 @@ void LitTrackFinderNNVecElectron::ProcessStation(
    }
 }
 
-void LitTrackFinderNNVecElectron::CollectHits(
+void lit::parallel::LitTrackFinderNNVecElectron::CollectHits(
    LitTrackParamScal* par,
    LitScalTrack* track,
    unsigned char stationGroup,
@@ -369,7 +370,7 @@ void LitTrackFinderNNVecElectron::CollectHits(
    if (!hitAdded) { track->nofMissingHits++; }
 }
 
-bool LitTrackFinderNNVecElectron::AddNearestHit(
+bool lit::parallel::LitTrackFinderNNVecElectron::AddNearestHit(
    LitScalTrack* track,
    const std::pair<unsigned int, unsigned int>& hits,
    unsigned int nofHits,

@@ -12,6 +12,9 @@
 #include "../LitHit.h"
 #include "LitDetectorGeometryElectron.h"
 
+namespace lit {
+namespace parallel {
+
 // Maximum number of hits for station
 const unsigned int MAX_NOF_HITS_ELECTRON = 2000;
 
@@ -173,4 +176,6 @@ public:
 typedef LitHitDataElectron<fscal> LitHitDataElectronScal;
 typedef LitHitDataElectron<fvec> LitHitDataElectronVec;
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITHITDATAELECTRON_H_ */

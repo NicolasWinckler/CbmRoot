@@ -44,22 +44,22 @@ public:
    const CbmLitDetectorLayout& GetTrdLayout() {return fTrdLayout;}
 
    /* Returns reference to the MUCH detector layout in SIMD format. */
-   void GetMuchLayoutVec(LitDetectorLayoutMuonVec& layout);
+   void GetMuchLayoutVec(lit::parallel::LitDetectorLayoutMuonVec& layout);
 
    /* Returns reference to the MUCH detector layout in scalar format. */
-   void GetMuchLayoutScal(LitDetectorLayoutMuonScal& layout);
+   void GetMuchLayoutScal(lit::parallel::LitDetectorLayoutMuonScal& layout);
 
    /* Template function that returns reference to the MUCH detector layout. */
-   template<class T> void GetMuchLayout(LitDetectorLayoutMuon<T>& layout);
+   template<class T> void GetMuchLayout(lit::parallel::LitDetectorLayoutMuon<T>& layout);
 
    /* Returns reference to the TRD detector layout in SIMD format. */
-   void GetTrdLayoutVec(LitDetectorLayoutElectronVec& layout);
+   void GetTrdLayoutVec(lit::parallel::LitDetectorLayoutElectronVec& layout);
 
    /* Returns reference to the TRD detector layout in scalar format. */
-   void GetTrdLayoutScal(LitDetectorLayoutElectronScal& layout);
+   void GetTrdLayoutScal(lit::parallel::LitDetectorLayoutElectronScal& layout);
 
    /* Template function that returns reference to the TRD detector layout. */
-   template<class T> void GetTrdLayout(LitDetectorLayoutElectron<T>& layout);
+   template<class T> void GetTrdLayout(lit::parallel::LitDetectorLayoutElectron<T>& layout);
 
    /* Returns reference to the MVD detector layout. */
    const CbmLitDetectorLayout& GetMvdLayout();

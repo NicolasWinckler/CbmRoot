@@ -80,5 +80,4 @@ If(TBB_FOUND)
   )
 EndIf(TBB_FOUND)
 
-################ install ###################
 install(TARGETS Littrackparallel DESTINATION ${CMAKE_BINARY_DIR}/lib)

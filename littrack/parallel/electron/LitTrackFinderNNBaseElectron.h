@@ -13,6 +13,9 @@
 
 #include <algorithm>
 
+namespace lit {
+namespace parallel {
+
 template<class T>
 class LitTrackFinderNNBaseElectron
 {
@@ -114,4 +117,6 @@ void LitTrackFinderNNBaseElectron<T>::InitTrackSeeds(
    }
 }
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFINDERNNBASEELECTRON_H_ */

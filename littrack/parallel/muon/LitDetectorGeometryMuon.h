@@ -13,10 +13,11 @@
 #include "../LitTypes.h"
 #include "../LitMaterialInfo.h"
 #include "../LitField.h"
+#include "../LitEnums.h"
+#include "../LitUtils.h"
 
-// FIXME : do not use implementations from std
-#include "../../std/base/CbmLitEnums.h"
-#include "../../std/utils/CbmLitUtils.h"
+namespace lit {
+namespace parallel{
 
 const unsigned char MAX_NOF_STATION_GROUPS = 6;
 const unsigned char MAX_NOF_STATIONS = 4;
@@ -44,7 +45,7 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = lit::ToString<T>(Z) + "\n" + material.ToStringShort();
+      std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
       str += fieldSlice.ToStringShort();
       return str;
    }
@@ -87,10 +88,10 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = type + " " + lit::ToString<int>(GetNofSubstations()) + "\n";
+      std::string str = type + " " + ToString<int>(GetNofSubstations()) + "\n";
       for (unsigned char i = 0; i < GetNofSubstations(); i++) {
 //       str += "substation\n";
-         str += lit::ToString<int>(i) + "\n" + substations[i].ToStringShort();
+         str += ToString<int>(i) + "\n" + substations[i].ToStringShort();
       }
       return str;
    }
@@ -127,7 +128,7 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = lit::ToString<T>(Z) + "\n" + material.ToStringShort();
+      std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
       str += fieldSliceFront.ToStringShort();
       str += fieldSliceBack.ToStringShort();
       return str;
@@ -175,10 +176,10 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = lit::ToString<int>(GetNofStations()) + "\n";
+      std::string str = ToString<int>(GetNofStations()) + "\n";
       for (unsigned char i = 0; i < GetNofStations(); i++) {
 //       str += "station\n";
-         str += lit::ToString<int>(i) + "\n" + stations[i].ToStringShort();
+         str += ToString<int>(i) + "\n" + stations[i].ToStringShort();
       }
 //    str += "absorber\n";
       str += absorber.ToStringShort();
@@ -242,10 +243,10 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = lit::ToString<int>(GetNofStationGroups()) + "\n";
+      std::string str = ToString<int>(GetNofStationGroups()) + "\n";
       for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
 //       str += "station group\n";
-         str += lit::ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
+         str += ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
       }
       return str;
    }
@@ -254,4 +255,6 @@ public:
 typedef LitDetectorLayoutMuon<fvec> LitDetectorLayoutMuonVec;
 typedef LitDetectorLayoutMuon<fscal> LitDetectorLayoutMuonScal;
 
-#endif
+} // namespace parallel
+} // namespace lit
+#endif /*LITDETECTORGEOMETRYMUON_H_*/

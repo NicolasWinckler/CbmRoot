@@ -14,6 +14,9 @@
 #include "LitMaterialInfo.h"
 #include "LitMath.h"
 
+namespace lit {
+namespace parallel {
+
 /* Function calculates material effects and adds them to the
  * track parameters and its covariance matrix.
  * @param par Reference to INPUT/OUTPUT track parameters.
@@ -230,5 +233,6 @@ inline void LitAddMaterialElectron(
     */
 }
 
-
+} // namespace parallel
+} // namespace lit
 #endif /* LITADDMATERIAL_H_ */

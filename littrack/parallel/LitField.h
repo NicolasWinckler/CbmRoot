@@ -7,12 +7,13 @@
 #ifndef LITFIELD_H_
 #define LITFIELD_H_
 
-#define LIT_POLYNOM_DEGREE 7
-
 #include "LitMath.h"
+#include "LitUtils.h"
 
-//FIXME: use parallel impl fo utils
-#include "../std/utils/CbmLitUtils.h"
+namespace lit {
+namespace parallel {
+
+#define LIT_POLYNOM_DEGREE 7
 
 template<class T>
 class LitFieldValue
@@ -403,12 +404,12 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = lit::ToString<T>(Z) + "\n";
-      for(unsigned int i = 0; i < N; i++) { str += lit::ToString<T>(cx[i]) + " "; }
+      std::string str = ToString<T>(Z) + "\n";
+      for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cx[i]) + " "; }
       str += "\n";
-      for(unsigned int i = 0; i < N; i++) { str += lit::ToString<T>(cy[i]) + " "; }
+      for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cy[i]) + " "; }
       str += "\n";
-      for(unsigned int i = 0; i < N; i++) { str += lit::ToString<T>(cz[i]) + " "; }
+      for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cz[i]) + " "; }
       str += "\n";
       return str;
    }
@@ -502,5 +503,6 @@ public:
    T z0;
 } _fvecalignment;
 
-
+} // namespace parallel
+} // namespace lit
 #endif /* LITFIELD_H_ */

@@ -12,7 +12,11 @@
 #define LITTRACKFINDERNNBASE_H_
 
 #include "LitHit.h"
+#include "LitTrackParam.h"
 #include "LitTrack.h"
+
+namespace lit {
+namespace parallel {
 
 //template<class T>
 class LitTrackFinderNNBase
@@ -46,4 +50,6 @@ private:
 //typedef LitTrackFinderNNBase<fscal> LitTrackFinderNNBaseScal;
 //typedef LitTrackFinderNNBase<fvec> LitTrackFinderNNBaseVec;
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFINDERNNBASE_H_ */

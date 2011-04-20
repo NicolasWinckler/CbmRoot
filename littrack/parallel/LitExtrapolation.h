@@ -13,6 +13,9 @@
 
 //#include "CbmLitField.h"
 
+namespace lit {
+namespace parallel {
+
 /* Line track extrapolation for parallel version of the tracking.
  *@param par Input/Output track parameters.
  *@param zOut Z position to extrapolate to.
@@ -928,4 +931,6 @@ inline void LitRK4ExtrapolationElectron(
 // par.Z = zOut;
 //}
 
-#endif
+} // namespace parallel
+} // namespace lit
+#endif /* LITEXTRAPOLATION_H_ */

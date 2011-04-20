@@ -10,9 +10,10 @@
 #define LITMATERIALINFO_H_
 
 #include "LitTypes.h"
+#include "LitUtils.h"
 
-//FIXME use parall impl for utils
-#include "../std/utils/CbmLitUtils.h"
+namespace lit {
+namespace parallel {
 
 template<class T>
 class LitMaterialInfo
@@ -55,8 +56,10 @@ public:
    }
 
    std::string ToStringShort() {
-      std::string str = lit::ToString<T>(Thickness) + " " + lit::ToString<T>(X0) + " " + lit::ToString<T>(Rho) + " "
-                        + lit::ToString<T>(Z) + " " + lit::ToString<T>(A) + " " + lit::ToString<T>(Zpos) + " " + lit::ToString<T>(I) + "\n";
+      std::string str = ToString<T>(Thickness) + " " + ToString<T>(X0)
+            + " " + ToString<T>(Rho) + " " + ToString<T>(Z) + " "
+            + ToString<T>(A) + " " + ToString<T>(Zpos)
+            + " " + ToString<T>(I) + "\n";
       return str;
    }
 } _fvecalignment;
@@ -64,4 +67,6 @@ public:
 typedef LitMaterialInfo<fvec> LitMaterialInfoVec;
 typedef LitMaterialInfo<fscal> LitMaterialInfoScal;
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITMATERIALINFO_H_ */

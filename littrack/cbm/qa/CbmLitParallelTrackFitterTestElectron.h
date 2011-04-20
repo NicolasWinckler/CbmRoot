@@ -34,19 +34,19 @@ private:
    unsigned char PlaneId(
       unsigned char stationGroup,
       unsigned char station,
-      LitDetectorLayoutElectronScal& layout) const;
+      lit::parallel::LitDetectorLayoutElectronScal& layout) const;
 
    bool CheckHit(
       unsigned char stationGroup,
       unsigned char station,
-      LitDetectorLayoutElectron<fscal>& layout,
+      lit::parallel::LitDetectorLayoutElectron<fscal>& layout,
       CbmLitTrack* track);
 
    void SerialHitToParallel(
       const CbmLitPixelHit& hit,
-      LitPixelHit<fscal>& lhit);
+      lit::parallel::LitPixelHitScal& lhit);
 
-   LitDetectorLayoutElectronScal fLayout;
+   lit::parallel::LitDetectorLayoutElectronScal fLayout;
 
 // TrackExtrapolatorPtr fExtrapolator;
 // TrackPropagatorPtr fPropagator;

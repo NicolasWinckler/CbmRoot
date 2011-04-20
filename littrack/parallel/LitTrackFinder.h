@@ -9,6 +9,9 @@
 #ifndef LITTRACKFINDER_H_
 #define LITTRACKFINDER_H_
 
+namespace lit {
+namespace parallel {
+
 class LitTrackFinder
 {
 public:
@@ -24,6 +27,6 @@ public:
       unsigned int& nofTracks) = 0;
 };
 
-
-
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFINDER_H_ */

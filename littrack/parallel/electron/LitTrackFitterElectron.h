@@ -17,6 +17,9 @@
 #include "parallel/LitFiltration.h"
 #include "parallel/LitAddMaterial.h"
 
+namespace lit {
+namespace parallel {
+
 /* Performs SIMDized/scalar fast track fit.
  * Number of hits must be equal to the number of stations.
  */
@@ -60,4 +63,6 @@ inline void LitTrackFitterElectron(
    }
 }
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITTRACKFITTERELECTRON_H_ */

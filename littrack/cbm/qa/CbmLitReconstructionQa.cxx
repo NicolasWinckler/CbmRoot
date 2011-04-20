@@ -180,7 +180,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fhNofMuchStrawHits(NULL),
    fhNofTofHits(NULL),
 
-   fEventNo(0),
+   fhEventNo(NULL),
+
    fOutputDir("")
 {
 }
@@ -203,7 +204,10 @@ InitStatus CbmLitReconstructionQa::Init()
 void CbmLitReconstructionQa::Exec(
    Option_t* opt)
 {
-   std::cout << "Event: " << fEventNo++ << std::endl;
+   // Increase event counter
+   fhEventNo->Fill(0.5);
+   std::cout << "Event: " << fhEventNo->GetEntries() << std::endl;
+
    FillRichRingNofHits();
    ProcessHits();
    ProcessGlobalTracks();
@@ -247,12 +251,15 @@ void CbmLitReconstructionQa::SetDetectorPresence(
 		   DetectorId detId,
 		   bool isDet)
 {
-	if (detId == kMVD) fIsMvd = detId; else
-	if (detId == kSTS) fIsSts = detId; else
-	if (detId == kRICH) fIsRich = detId; else
-	if (detId == kTRD) fIsTrd = detId; else
-	if (detId == kMUCH) fIsMuch = detId; else
-	if (detId == kTOF) fIsTof = detId;
+	switch(detId) {
+		case kMVD: fIsMvd = isDet; break;
+		case kSTS: fIsSts = isDet; break;
+		case kRICH: fIsRich = isDet; break;
+		case kTRD: fIsTrd = isDet; break;
+		case kMUCH: fIsMuch = isDet; break;
+		case kTOF: fIsTof = isDet; break;
+		default: break;
+	}
 }
 
 void CbmLitReconstructionQa::ReadDataBranches()
@@ -1018,6 +1025,14 @@ void CbmLitReconstructionQa::CreateHistos(
    fHistoList->Add(fhNofMuchPixelHits);
    fHistoList->Add(fhNofMuchStrawHits);
    fHistoList->Add(fhNofTofHits);
+
+   // Histogram store number of events
+   if (file == NULL){
+	   fhEventNo = new TH1F("hEventNo","hEventNo", 1, 0, 1.);
+   } else {
+	   fhEventNo = (TH1F*)file->Get("hEventNo");
+   }
+   fHistoList->Add(fhEventNo);
 }
 
 void CbmLitReconstructionQa::DivideHistos(
@@ -1061,11 +1076,12 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
       DivideHistos(fhStsRichTrdMomNormStsRichTrdTof[i][REC], fhStsRichTrdMomNormStsRichTrdTof[i][ACC], fhStsRichTrdMomNormStsRichTrdTof[i][EFF]);
       DivideHistos(fhStsRichTrdTofMom[i][REC], fhStsRichTrdTofMom[i][ACC], fhStsRichTrdTofMom[i][EFF]);
    }
-   fhMvdNofHitsInStation->Scale(1./fEventNo);
-   fhStsNofHitsInStation->Scale(1./fEventNo);
-   fhTrdNofHitsInStation->Scale(1./fEventNo);
-   fhMuchNofHitsInStation->Scale(1./fEventNo);
-   fhTofNofHitsInStation->Scale(1./fEventNo);
+   Int_t nofEvents = fhEventNo->GetEntries();
+   fhMvdNofHitsInStation->Scale(1./nofEvents);
+   fhStsNofHitsInStation->Scale(1./nofEvents);
+   fhTrdNofHitsInStation->Scale(1./nofEvents);
+   fhMuchNofHitsInStation->Scale(1./nofEvents);
+   fhTofNofHitsInStation->Scale(1./nofEvents);
 }
 
 void CbmLitReconstructionQa::WriteToFile()
@@ -1157,15 +1173,7 @@ void CbmLitReconstructionQa::PrintEventStatistics()
    std::cout << std::setw(w) << "STS+RICH+TRD" << EventEfficiencyStatisticsRichToString(fhStsRichTrdMom, "event");
    std::cout << std::setw(w) << "STS+RICH+TRD+TOF" << EventEfficiencyStatisticsRichToString(fhStsRichTrdTofMom, "event");
 
-   Double_t stsGhosts, recGhosts, richGhosts;
-   stsGhosts = fhStsGhostNh->GetEntries();
-   recGhosts = fhRecGhostNh->GetEntries();
-   richGhosts = fhRichGhostNh->GetEntries();
-   std::cout.precision(3);
-   if (fIsSts) { std::cout << "Ghosts STS per event: " << stsGhosts/fEventNo << std::endl; }
-   if (fIsMuch || fIsTrd) { std::cout << "Ghosts " << det << " per event: " << recGhosts/fEventNo << std::endl; }
-   if (fIsRich) { std::cout << "Ghosts RICH per event: " << richGhosts/fEventNo << std::endl; }
-   std::cout<<std::endl;
+   PrintGhostStatistics(std::cout);
 }
 
 void CbmLitReconstructionQa::PrintFinalStatistics(
@@ -1257,20 +1265,15 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
    out << std::setw(w) << "STS+RICH+TRD+TOF" << EventEfficiencyStatisticsRichToString(fhStsRichTrdTofMom, "final");
    out << std::setfill('_') << std::setw(7*17) << "_"<< std::endl;
 
-   Double_t stsGhosts, recGhosts, richGhosts;
-   stsGhosts = fhStsGhostNh->GetEntries();
-   recGhosts = fhRecGhostNh->GetEntries();
-   richGhosts = fhRichGhostNh->GetEntries();
-   if (fIsSts) { out << "Ghosts STS per event: " << stsGhosts/fEventNo << std::endl; }
-   if (fIsMuch || fIsTrd) { out << "Ghosts " << det << " per event: " << recGhosts/fEventNo << std::endl; }
-   if (fIsRich) { out << "Ghosts RICH per event: " << richGhosts/fEventNo << std::endl; }
+   PrintGhostStatistics(out);
 
    out << "Polar angle efficiency:" << std::endl;
    out << "STS:" << std::endl;
    out << PolarAngleEfficiency(fhStsAngle);
    out << det << ":" << std::endl;
    out << PolarAngleEfficiency(fhRecAngle);
-   out << "-------------------------------------------------------------" << std::endl;
+
+   out << std::setfill('-') << std::setw(7*17) << std::endl;
 }
 
 std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
@@ -1306,12 +1309,13 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
    ss6.precision(3);
    Int_t w = 17;
 
-   ss1 << allEff << "("<< allRec/fEventNo << "/" << allAcc/fEventNo << ")";
-   ss2 << refEff << "("<< refRec/fEventNo << "/" << refAcc/fEventNo << ")";
-   ss3 << primEff << "(" << primRec/fEventNo << "/" << primAcc/fEventNo << ")";
-   ss4 << secEff << "(" << secRec/fEventNo << "/" << secAcc/fEventNo << ")";
-   ss5 << elEff << "(" << elRec/fEventNo << "/" << elAcc/fEventNo << ")";
-   ss6 << muEff << "(" << muRec/fEventNo << "/" << muAcc/fEventNo << ")";
+   Int_t nofEvents = fhEventNo->GetEntries();
+   ss1 << allEff << "("<< allRec/nofEvents << "/" << allAcc/nofEvents << ")";
+   ss2 << refEff << "("<< refRec/nofEvents << "/" << refAcc/nofEvents << ")";
+   ss3 << primEff << "(" << primRec/nofEvents << "/" << primAcc/nofEvents << ")";
+   ss4 << secEff << "(" << secRec/nofEvents << "/" << secAcc/nofEvents << ")";
+   ss5 << elEff << "(" << elRec/nofEvents << "/" << elAcc/nofEvents << ")";
+   ss6 << muEff << "(" << muRec/nofEvents << "/" << muAcc/nofEvents << ")";
 
    if (opt == "final"){
 	   ss << std::setw(w) << ss1.str() << std::setw(w) << ss2.str() <<
@@ -1367,12 +1371,13 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsRichToString(
    ss6.precision(3);
    Int_t w = 17;
 
-   ss1 << allEff << "(" << allRec/fEventNo << "/" << allAcc/fEventNo << ")";
-   ss2 << allRefEff << "(" << allRefRec/fEventNo << "/" << allRefAcc/fEventNo << ")";
-   ss3 << elEff << "(" << elRec/fEventNo << "/" << elAcc/fEventNo << ")";
-   ss4 << elRefEff << "(" << elRefRec/fEventNo << "/" << elRefAcc/fEventNo << ")";
-   ss5 << piEff << "(" << piRec/fEventNo << "/" << piAcc/fEventNo << ")";
-   ss6 << piRefEff << "(" << piRefRec/fEventNo << "/" << piRefAcc/fEventNo << ")";
+   Int_t nofEvents = fhEventNo->GetEntries();
+   ss1 << allEff << "(" << allRec/nofEvents << "/" << allAcc/nofEvents << ")";
+   ss2 << allRefEff << "(" << allRefRec/nofEvents << "/" << allRefAcc/nofEvents << ")";
+   ss3 << elEff << "(" << elRec/nofEvents << "/" << elAcc/nofEvents << ")";
+   ss4 << elRefEff << "(" << elRefRec/nofEvents << "/" << elRefAcc/nofEvents << ")";
+   ss5 << piEff << "(" << piRec/nofEvents << "/" << piAcc/nofEvents << ")";
+   ss6 << piRefEff << "(" << piRefRec/nofEvents << "/" << piRefAcc/nofEvents << ")";
    if (opt == "event"){
 	   ss << std::setw(w) << ss1.str() << std::setw(w) << ss3.str()
 			   << std::setw(w) << ss4.str() << std::endl;
@@ -1383,6 +1388,21 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsRichToString(
    }
 
    return ss.str();
+}
+
+void CbmLitReconstructionQa::PrintGhostStatistics(
+   std::ostream& out)
+{
+	Int_t nofEvents = fhEventNo->GetEntries();
+	Double_t stsGhosts = fhStsGhostNh->GetEntries() / nofEvents;
+	Double_t recGhosts = fhRecGhostNh->GetEntries() / nofEvents;
+	Double_t richGhosts = fhRichGhostNh->GetEntries() / nofEvents;
+	out.precision(3);
+	out << "Ghosts per events:";
+	if (fIsSts) { out << " STS=" << stsGhosts; }
+	if (fIsMuch || fIsTrd) { out << " " << RecDetector() << "=" << recGhosts; }
+	if (fIsRich) { out << " RICH=" << richGhosts; }
+	out << std::endl;
 }
 
 
@@ -1402,13 +1422,14 @@ std::string CbmLitReconstructionQa::PolarAngleEfficiency(
       if (refAcc[i] != 0.) { refEff[i] = refRec[i] / refAcc[i]; }
    }
 
+   Int_t nofEvents = fhEventNo->GetEntries();
    std::stringstream ss;
    for (Int_t i = 0; i < fNofBinsAngle; i++) {
       Double_t angle0 = i*step;
       Double_t angle1 = angle0 + step;
       ss << "(" << angle0 << "-" << angle1 << ") "
-         << "all=" << allEff[i] << "(" << allRec[i]/fEventNo << "/" << allAcc[i]/fEventNo << ")"
-         << "  ref=" << refEff[i] << "(" << refRec[i]/fEventNo << "/" << refAcc[i]/fEventNo << ")" << std::endl;
+         << "all=" << allEff[i] << "(" << allRec[i]/nofEvents << "/" << allAcc[i]/nofEvents << ")"
+         << "  ref=" << refEff[i] << "(" << refRec[i]/nofEvents << "/" << refAcc[i]/nofEvents << ")" << std::endl;
    }
    return ss.str();
 }

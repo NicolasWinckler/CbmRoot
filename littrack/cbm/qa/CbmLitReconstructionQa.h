@@ -3,7 +3,7 @@
  * @since 2007
  * @version 2.0
  **
- ** CBM task class for global track reconstruction quality.
+ ** Task for global track reconstruction performance calculation.
  ** Produces efficiency histograms. Calculates different statistics.
  **/
 
@@ -247,6 +247,11 @@ private:
       const std::vector<std::vector<TH1F*> >& hist,
       const std::string& opt);
 
+   /* Prints ghosts statistics to the out stream
+    * @param out Output stream */
+   void PrintGhostStatistics(
+      std::ostream& out);
+
    /* Calculates integrated efficiencies for different polar angles
      * and returns a string with statistics.
     * @param hist Vector with histograms */
@@ -451,7 +456,7 @@ private:
    TH1F* fhNofMuchStrawHits; // MUCH straw hits
    TH1F* fhNofTofHits; // TOF hits
 
-   Int_t fEventNo; // Event counter
+   TH1F* fhEventNo; // Event counter
 
    std::string fOutputDir; // Output directory for images
 

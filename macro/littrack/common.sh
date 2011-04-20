@@ -89,8 +89,8 @@ function set_default_muon_geometry() {
     export MVDGEOM=
     export STSGEOM=sts_standard.geo
     export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
-    export MUCHGEOM=much_standard_2layers.geo
-    export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard_2layers.digi.root
+    export MUCHGEOM=much_standard.geo
+    export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard.digi.root
     export RICHGEOM=
     export TRDGEOM=
 #trd_muon_setup_new.geo
@@ -107,15 +107,15 @@ function set_default_muon_geometry() {
     
     export NORMSTSPOINTS=4
     export NORMTRDPOINTS=0
-    export NORMMUCHPOINTS=12
+    export NORMMUCHPOINTS=16
     export NORMTOFPOINTS=1
     export NORMTRDHITS=0
-    export NORMMUCHHITS=11
+    export NORMMUCHHITS=15
     export NORMTOFHITS=1
     
     export MOMMIN=0
-    export MOMMAX=25
-    export MOMBINS=25
+    export MOMMAX=16
+    export MOMBINS=16
 }
 
 
@@ -127,13 +127,13 @@ function set_default_electron_geometry() {
     export PIPEGEOM=pipe_much.geo
     export SHIELDGEOM=shield_standard.geo
     export MVDGEOM= #mvd_standard.geo
-    export STSGEOM=sts_same_z.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_same_z.digi.par
+    export STSGEOM=sts_standard.geo
+    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
     export MUCHGEOM=
     export MUCHDIGI=
     export RICHGEOM=rich_standard.geo
     export TRDGEOM=trd_standard.geo
-    export TRDDIGI=$VMCWORKDIR/parameters/trd/trd_standard.digi.par
+    export TRDDIGI=$VMCWORKDIR/parameters/trd/trd_standard_dec10.digi.par
     export TOFGEOM=tof_standard.geo
     export ECALGEOM=
     export FIELDMAP=field_electron_standard
@@ -145,16 +145,16 @@ function set_default_electron_geometry() {
     export PDG=11
     
     export NORMSTSPOINTS=4
-    export NORMTRDPOINTS=10
+    export NORMTRDPOINTS=8
     export NORMMUCHPOINTS=0
     export NORMTOFPOINTS=1
-    export NORMTRDHITS=9
+    export NORMTRDHITS=8
     export NORMMUCHHITS=0
     export NORMTOFHITS=1
     
     export MOMMIN=0
     export MOMMAX=12
-    export MOMBINS=24
+    export MOMBINS=12
 }
 
 

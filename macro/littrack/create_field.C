@@ -3,7 +3,7 @@
  * @since 2010
  * @version 1.0
  *
- * Macro convert an ASCII file with the magnetic field
+ * Macro converts an ASCII file with the magnetic field
  * to the ROOT format.
  **/
 
@@ -11,7 +11,7 @@ void create_field()
 {
 	// Input ASCII file
 	const char* fieldASCII = "NewField";
-	//Output ROOT file
+	// Output ROOT file
 	const char* fieldROOT = "/d/cbm02/andrey/field/NewField.root";
 	const char* mapName = "NewMap";
 

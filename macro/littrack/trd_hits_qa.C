@@ -4,16 +4,16 @@
  * @version 1.0
  **/
 
-void trd_hits_qa(Int_t nEvents = 1000)
+void trd_hits_qa(Int_t nEvents = 500)
 {
 	// Output directory
-	TString dir  = "/d/cbm02/andrey/test_electrons_fit_muon/";
+	TString dir = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
 	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis.
-	TString globalHitsFile = dir + "global.tracks.ideal.0000.root";
+	TString globalHitsFile = dir + "global.hits.digi.0000.root";
 	// Output file with TRD hits qa histograms
 	TString trdHitsQaFile = dir + "trd.hits.qa.0000.root";
 
@@ -38,7 +38,7 @@ void trd_hits_qa(Int_t nEvents = 1000)
 
 	//------------------------------------------------
 	CbmTrdHitsQa* trdHitsQa = new CbmTrdHitsQa();
-	trdHitsQa->SetOutputDir("./test/");
+	trdHitsQa->SetOutputDir("./test2/");
 	run->AddTask(trdHitsQa);
 	//------------------------------------------------
 

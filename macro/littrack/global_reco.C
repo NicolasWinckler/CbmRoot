@@ -372,6 +372,8 @@ void global_reco(Int_t nEvents = 10, // number of events
 		reconstructionQa->SetQuota(0.7);
 		reconstructionQa->SetMinNofHitsTrd(normTrdHits);
 		reconstructionQa->SetMinNofHitsMuch(normMuchHits);
+		reconstructionQa->SetMinNofHitsRich(7);
+		reconstructionQa->SetQuotaRich(0.7);
 		reconstructionQa->SetVerbose(normTofHits);
 		reconstructionQa->SetMomentumRange(momMin, momMax);
 		reconstructionQa->SetNofBinsMom(momBins);

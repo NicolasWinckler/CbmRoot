@@ -1,14 +1,14 @@
 void event_display()
 {
-	TString dir  = "/d/cbm02/andrey/test_electrons/";
+	TString dir  = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
 
-	gSystem->Load("/home/soft/tbb/libtbb");
+//	gSystem->Load("/home/soft/tbb/libtbb");
 //	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

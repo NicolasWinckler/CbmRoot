@@ -7,8 +7,8 @@ void draw_global_reco_qa()
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	std::string fileName = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-	std::string imageDir = "recoIm/";
+	std::string fileName = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/global.reco.0000.root";
+	std::string imageDir = "./test/";
 
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetOutputDir(imageDir);

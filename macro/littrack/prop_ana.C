@@ -15,17 +15,17 @@ void prop_ana(Int_t nEvents = 1000)
 	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
 	Int_t testFastPropagation;
 	if (script != "yes") {
-		dir = "/d/cbm02/andrey/test_electrons_fit_norich/";
+		dir = "/d/cbm02/andrey/muon/straw_trd_10mu/";
 		mcFile = dir + "mc.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";
 		propAnaFile = dir + "propagation.ana.0000.root";
-		imageDir = "./test_electrons_fit/";
-		nofTrdHits = 12;
-		nofMuchHits = 0;
-		nofTofHits = 0;
-		pdg = 11;
-		testFastPropagation = 1;
+		imageDir = "./test3/";
+		nofTrdHits = 4;
+		nofMuchHits = 21;
+		nofTofHits = 1;
+		pdg = 13;
+		testFastPropagation = 0;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -70,9 +70,9 @@ void prop_ana(Int_t nEvents = 1000)
 	propAna->SetPDGCode(pdg);
 	propAna->SetTestFastPropagation(testFastPropagation);
 	propAna->SetOutputDir(std::string(imageDir));
-	propAna->IsDrawPropagation(true);
+	propAna->IsDrawPropagation(false);
 	propAna->IsDrawFilter(true);
-	propAna->IsDrawSmoother(false);
+	propAna->IsDrawSmoother(true);
 	propAna->IsCloseCanvas(false);
 	propAna->IsFixedBounds(true);
 	propAna->SetPlaneNoPhd(nofTrdHits + nofMuchHits - 1);

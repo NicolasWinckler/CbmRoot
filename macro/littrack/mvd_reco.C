@@ -17,7 +17,7 @@ void mvd_reco(Int_t nEvents = 100)
 	Int_t momBins;
 	if (script != "yes") {
 		// Output directory
-		dir = "/d/cbm02/andrey/mvd/std_10e/";
+		dir = "/d/cbm02/andrey/mvd/std_10e_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -111,9 +111,9 @@ void mvd_reco(Int_t nEvents = 100)
 	//	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
 	//	run->AddTask(stsFHQa);
 
-	//  FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
-	//	run->AddTask(stsRecoQa);
-	// ------------------------------------------------------------------------
+	//FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
+	//run->AddTask(stsRecoQa);
+       // ------------------------------------------------------------------------
 
 
 	CbmLitFindMvdTracks* finder = new CbmLitFindMvdTracks();

@@ -8,14 +8,14 @@
 void draw3D()
 {
 	//Input directory
-	TString dir = "/d/cbm02/andrey/test_electrons_fit/";
+	TString dir = "/d/cbm02/andrey/mvd/std_10e/";
 	//Input MC file with TGeo
 //	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+//	gSystem->Load("/home/soft/tbb/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

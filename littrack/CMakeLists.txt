@@ -67,9 +67,6 @@ set(LITTRACK_SRCS_RULECHECKER
 ##cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/base/CbmLitTask.cxx
 
-cbm/CbmPropagatorGeane.cxx
-cbm/CbmPropagatorLit.cxx
-
 ##cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
 ##cbm/finder/CbmLitFindGlobalTracks.cxx 
 cbm/finder/CbmLitFindMvdTracks.cxx
@@ -79,6 +76,9 @@ cbm/geo/CbmLitDetContFact.cxx
 cbm/geo/CbmLitDetGeo.cxx 
 cbm/geo/CbmLitDetGeoPar.cxx
 cbm/geo/CbmLitDetPoint.cxx 
+
+cbm/propagation/CbmPropagatorGeane.cxx
+cbm/propagation/CbmPropagatorLit.cxx
 
 ##cbm/qa/CbmLitReconstructionQa.cxx
 ##cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
@@ -108,8 +108,6 @@ EndIf(TBB_FOUND)
 
 set(LITTRACK_HEADERS
 cbm/base/CbmLitTask.h
-cbm/CbmPropagatorGeane.h
-cbm/CbmPropagatorLit.h
 #cbm/finder/CbmLitTrdTrackFinderStandalone.h
 cbm/finder/CbmLitFindGlobalTracks.h
 #cbm/finder/CbmLitCudaTest.h 
@@ -119,6 +117,8 @@ cbm/geo/CbmLitDetContFact.h
 cbm/geo/CbmLitDetGeo.h 
 cbm/geo/CbmLitDetGeoPar.h 
 cbm/geo/CbmLitDetPoint.h
+cbm/propagation/CbmPropagatorGeane.h
+cbm/propagation/CbmPropagatorLit.h
 cbm/qa/CbmLitReconstructionQa.h 
 cbm/qa/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/CbmLitPropagationAnalysis.h 

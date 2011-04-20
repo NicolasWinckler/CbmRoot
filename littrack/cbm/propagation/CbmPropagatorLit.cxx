@@ -1,4 +1,4 @@
-#include "cbm/CbmPropagatorLit.h"
+#include "cbm/propagation/CbmPropagatorLit.h"
 
 #include "base/CbmLitToolFactory.h"
 #include "interface/CbmLitTrackPropagator.h"

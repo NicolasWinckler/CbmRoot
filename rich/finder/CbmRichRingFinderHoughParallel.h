@@ -10,7 +10,6 @@
 #include "CbmRichRingFinderHoughImpl.h"
 #include "CbmRichRingFinder.h"
 #include "TClonesArray.h"
-#include "TString.h"
 #include "CbmRichRingLight.h"
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
@@ -25,8 +24,6 @@ protected:
 
 	Int_t fRingCount;
 	Int_t fNEvent; /// event number
-	Int_t fVerbose; /// Verbosity level
-	TString fGeometryType;
 
 	Double_t fExecTime;//evaluate execution time
 
@@ -46,11 +43,10 @@ protected:
 public:
   	CbmRichRingFinderHoughParallel ();
 
-  	/** Standard constructor **/
   	CbmRichRingFinderHoughParallel ( Int_t verbose, TString geometry);
 
 	virtual ~CbmRichRingFinderHoughParallel();
-	void SetParameters(TString geometry);
+	void SetParameters();
     void AddRingsToOutputArray(TClonesArray *rRingArray,
     		std::vector<CbmRichRingLight*>& rings);
 

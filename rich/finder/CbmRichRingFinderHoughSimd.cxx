@@ -7,16 +7,8 @@
 #include <emmintrin.h>
 #include "CbmRichRingFinderHoughSimd.h"
 
-// -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHoughSimd::CbmRichRingFinderHoughSimd  ( TString geometry )
+CbmRichRingFinderHoughSimd::CbmRichRingFinderHoughSimd  ()
 {
-    cout << "-I- CbmRichRingFinderHough constructor for " << geometry << " RICH geometry"<<endl;
-    if (geometry != "compact" && geometry != "large"){
-        geometry = "compact";
-        cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
-    }
-    fGeometryType = geometry;
 
 }
 

@@ -473,7 +473,7 @@ void CbmRichRingQa::EfficiencyCalc()
         ring->SetRecFlag(-1);
 
         ///fake rings
-        if (lPercTrue < 0.5){
+        if (lPercTrue < 0.7){
             ring->SetRecFlag(1);
         }else{///true rings
 

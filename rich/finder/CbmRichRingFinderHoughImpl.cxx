@@ -12,7 +12,7 @@
 #include "CbmRichRing.h"
 #include "FairTrackParam.h"
 #include "../../littrack/std/utils/CbmLitMemoryManagment.h"
-
+//#include "../../littrack/utils/CbmLitMemoryManagment.h"
 #include "TString.h"
 #include "TStopwatch.h"
 #include "TSystem.h"
@@ -29,27 +29,13 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-// -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl  (TString geometry)
-{
-    cout << "-I- CbmRichRingFinderHoughImpl constructor for " << geometry << " RICH geometry"<<endl;
-    if (geometry != "compact" && geometry != "large"){
-        geometry = "compact";
-        cout << "-E- CbmRichRingFinderHoughImpl::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
-    }
-    fGeometryType = geometry;
-}
-
 CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
 {
-
-
 }
 
 void CbmRichRingFinderHoughImpl::Init()
 {
-    SetParameters(fGeometryType);
+    SetParameters();
 
     fHist.resize(fNofBinsXY);
     fHistR.resize(fNofBinsR);
@@ -58,16 +44,9 @@ void CbmRichRingFinderHoughImpl::Init()
     fFitCOP = new CbmRichRingFitterCOPLight();
 
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
-    if (fGeometryType == "large"){
-        richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
-    }
-    if (fGeometryType == "compact"){
-	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
-        //richSelectNNFile = "/u/slebedev/JUL09/trunk/macro/rich/NeuralNet_RingSelection_Weights1.txt";
-    }
+    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
     fANNSelect = new CbmRichRingSelectNeuralNet(richSelectNNFile);
     fANNSelect->Init();
-
 }
 
 // -----   Destructor   ----------------------------------------------------
@@ -94,131 +73,43 @@ void CbmRichRingFinderHoughImpl::DoFind()
 	fData.clear();
 }
 
-void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,
-		Float_t maxDistance, Float_t minDistance,
-		Float_t minRadius, Float_t maxRadius,
-		Int_t HTCut, Int_t hitCut,
-		Int_t HTCutR, Int_t hitCutR,
-		Int_t nofBinsX, Int_t nofBinsY,
-		Int_t nofBinsR, Float_t annCut,
-		Float_t usedHitsCut, Float_t usedHitsAllCut,
-		Float_t rmsCoeffEl, Float_t maxCutEl,
-		Float_t rmsCoeffCOP, Float_t maxCutCOP)
+void CbmRichRingFinderHoughImpl::SetParameters()
 {
-    //fNofParts = nofParts;
+	fMaxDistance = 11.5;
+	fMinDistance = 3.;
+	fMinDistanceSq = fMinDistance*fMinDistance;
+	fMaxDistanceSq = fMaxDistance*fMaxDistance;
 
-    fMaxDistance = maxDistance;
-    fMinDistance = minDistance;
-    fMinDistanceSq = fMinDistance*fMinDistance;
-    fMaxDistanceSq = fMaxDistance*fMaxDistance;
+	fMinRadius = 3.3;
+	fMaxRadius = 5.7;
 
-    fMinRadius = minRadius;
-    fMaxRadius = maxRadius;
+//  if (fNofParts == 1){
+//		fHTCut = 50;
+//		fHitCut = 5;
+//		fHTCutR = 20;
+//		fHitCutR = 3;
+//		fMinNofHitsInArea = 6;
+//  }else if (fNofParts == 2){
+	fHTCut = 5;
+	fHitCut = 2;
+	fHTCutR = 5;
+	fHitCutR = 2;
+	fMinNofHitsInArea = 4;
+//  }
 
-    fHTCut = HTCut;
-    fHitCut = hitCut;
-    fHTCutR = HTCutR;
-    fHitCutR = hitCutR;
+	fNofBinsX = 17;
+	fNofBinsY = 25;
+	fNofBinsR = 32;
 
-    fNofBinsX = nofBinsX;
-    fNofBinsY = nofBinsY;
-    fNofBinsR = nofBinsR;
+	fAnnCut = -0.6;
+	fUsedHitsCut = 0.4;
+	fUsedHitsAllCut = 0.4;
 
-    fAnnCut = annCut;
-    fUsedHitsCut = usedHitsCut;
-    fUsedHitsAllCut = usedHitsAllCut;
+	fRmsCoeffEl = 2.5;
+	fMaxCutEl = 1.2;
+	fRmsCoeffCOP = 3.;
+	fMaxCutCOP = 1.2;
 
-	fRmsCoeffEl = rmsCoeffEl;
-	fMaxCutEl = maxCutEl;
-	fRmsCoeffCOP = rmsCoeffCOP;
-	fMaxCutCOP = maxCutCOP;
-
-    fMinNofHitsInArea = 6;
-
-    fDx = 2.f*fMaxDistance / (Float_t)fNofBinsX;
-    fDy = 2.f*fMaxDistance / (Float_t)fNofBinsY;
-    fDr = fMaxRadius / (Float_t)fNofBinsR;
-    fNofBinsXY = fNofBinsX * fNofBinsY;
-}
-
-///Set Parameters for specify geometry
-void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
-{
-    if (geometry != "compact" && geometry != "large"){
-        geometry = "compact";
-        cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
-    }
-
-    if (geometry == "large"){
-        //fNofParts = 1;
-        fMinNofHitsInArea = 6;
-
-        fMaxDistance = 14;
-        fMinDistance = 3.;
-        fMinDistanceSq = fMinDistance*fMinDistance;
-        fMaxDistanceSq = fMaxDistance*fMaxDistance;
-
-        fMinRadius = 4.3;
-        fMaxRadius = 7.0;
-
-        fHTCut = 80;
-        fHitCut = 9;
-        fHTCutR = 35;
-        fHitCutR = 9;
-
-        fNofBinsX = 15;
-        fNofBinsY = 15;
-        fNofBinsR = 40;
-
-        fAnnCut = 0.0;
-        fUsedHitsCut = 0.35;
-        fUsedHitsAllCut = 0.4;
-
-    	fRmsCoeffEl = 1.;
-    	fMaxCutEl = 0.3;
-    	fRmsCoeffCOP = 3.;
-    	fMaxCutCOP = 1.2;
-    }
-
-    if (geometry == "compact"){
-        //fNofParts = 2;
-
-        fMaxDistance = 11.5;
-        fMinDistance = 3.;
-        fMinDistanceSq = fMinDistance*fMinDistance;
-        fMaxDistanceSq = fMaxDistance*fMaxDistance;
-
-        fMinRadius = 3.3;
-        fMaxRadius = 5.7;
-
-//        if (fNofParts == 1){
-//			fHTCut = 50;
-//			fHitCut = 5;
-//			fHTCutR = 20;
-//			fHitCutR = 3;
-//			fMinNofHitsInArea = 6;
-//        }else if (fNofParts == 2){
-			fHTCut = 5;
-			fHitCut = 2;
-			fHTCutR = 5;
-			fHitCutR = 2;
-			fMinNofHitsInArea = 4;
-//        }
-
-        fNofBinsX = 17;
-        fNofBinsY = 25;
-        fNofBinsR = 32;
-
-		fAnnCut = -0.6;
-		fUsedHitsCut = 0.4;
-		fUsedHitsAllCut = 0.4;
-
-    	fRmsCoeffEl = 2.5;
-    	fMaxCutEl = 1.2;
-    	fRmsCoeffCOP = 3.;
-    	fMaxCutCOP = 1.2;
-    }
 	kMAX_NOF_HITS = 65500;
 	fNofParts = 2;
     fDx = 1.36*fMaxDistance / (Float_t)fNofBinsX;
@@ -310,16 +201,13 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 //		}
 	}
 
-//	for (Int_t j = 0; j < fNofBinsXY; j++){
-//		fHist[j] = 0;
-//		cout << "fHist["<<j<<"]=0;" <<endl;
-//	}
+	for (Int_t j = 0; j < fNofBinsXY; j++){
+		fHist[j] = 0;
+	}
 
-	InitHist();
-
-//	for (Int_t k = 0; k < fNofBinsR; k++) {
-//		fHistR[k] = 0;
-//	}
+	for (Int_t k = 0; k < fNofBinsR; k++) {
+		fHistR[k] = 0;
+	}
 }
 
 void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsigned short int indmax)
@@ -484,7 +372,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 
 	fANNSelect->DoSelect(ring2);
 	Float_t select = ring2->GetSelectionNN();
-	//cout << ring2->GetRadius() << " " << ring2->GetSelectionNN() << endl;
+
 	//remove found hits only for good quality rings
 	if (select > fAnnCut) {
 
@@ -498,7 +386,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		fFoundRings.push_back(ring2);
 	}
 	//fFoundRings.push_back(ring2);
-        ring2=NULL;
+    ring2=NULL;
 	delete ring2;
 }
 
@@ -587,7 +475,6 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 //	usedHits.clear();
 	usedHitsAll.clear();
 	goodRingIndex.clear();
-
 }
 
 void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2)
@@ -675,7 +562,6 @@ Int_t CbmRichRingFinderHoughImpl::GetHitIndex(UShort_t hitInd)
 	for (UInt_t i = 0; i < size; i++){
 		if (fData[i].fId == hitInd) return i;
 	}
-
 }
 
 Bool_t CbmRichRingFinderHoughImpl::AreRingsCloseEnough(CbmRichRingLight* ring1,
@@ -687,470 +573,6 @@ Bool_t CbmRichRingFinderHoughImpl::AreRingsCloseEnough(CbmRichRingLight* ring1,
 	float r = sqrt(rx*rx + ry*ry);
 	if (r > 1.3f * (ring1->GetRadius() + ring2->GetRadius())) return false;
 	return true;
-
-}
-
-void CbmRichRingFinderHoughImpl::InitHist()
-{
-	fHist[0]=0;
-	fHist[1]=0;
-	fHist[2]=0;
-	fHist[3]=0;
-	fHist[4]=0;
-	fHist[5]=0;
-	fHist[6]=0;
-	fHist[7]=0;
-	fHist[8]=0;
-	fHist[9]=0;
-	fHist[10]=0;
-	fHist[11]=0;
-	fHist[12]=0;
-	fHist[13]=0;
-	fHist[14]=0;
-	fHist[15]=0;
-	fHist[16]=0;
-	fHist[17]=0;
-	fHist[18]=0;
-	fHist[19]=0;
-	fHist[20]=0;
-	fHist[21]=0;
-	fHist[22]=0;
-	fHist[23]=0;
-	fHist[24]=0;
-	fHist[25]=0;
-	fHist[26]=0;
-	fHist[27]=0;
-	fHist[28]=0;
-	fHist[29]=0;
-	fHist[30]=0;
-	fHist[31]=0;
-	fHist[32]=0;
-	fHist[33]=0;
-	fHist[34]=0;
-	fHist[35]=0;
-	fHist[36]=0;
-	fHist[37]=0;
-	fHist[38]=0;
-	fHist[39]=0;
-	fHist[40]=0;
-	fHist[41]=0;
-	fHist[42]=0;
-	fHist[43]=0;
-	fHist[44]=0;
-	fHist[45]=0;
-	fHist[46]=0;
-	fHist[47]=0;
-	fHist[48]=0;
-	fHist[49]=0;
-	fHist[50]=0;
-	fHist[51]=0;
-	fHist[52]=0;
-	fHist[53]=0;
-	fHist[54]=0;
-	fHist[55]=0;
-	fHist[56]=0;
-	fHist[57]=0;
-	fHist[58]=0;
-	fHist[59]=0;
-	fHist[60]=0;
-	fHist[61]=0;
-	fHist[62]=0;
-	fHist[63]=0;
-	fHist[64]=0;
-	fHist[65]=0;
-	fHist[66]=0;
-	fHist[67]=0;
-	fHist[68]=0;
-	fHist[69]=0;
-	fHist[70]=0;
-	fHist[71]=0;
-	fHist[72]=0;
-	fHist[73]=0;
-	fHist[74]=0;
-	fHist[75]=0;
-	fHist[76]=0;
-	fHist[77]=0;
-	fHist[78]=0;
-	fHist[79]=0;
-	fHist[80]=0;
-	fHist[81]=0;
-	fHist[82]=0;
-	fHist[83]=0;
-	fHist[84]=0;
-	fHist[85]=0;
-	fHist[86]=0;
-	fHist[87]=0;
-	fHist[88]=0;
-	fHist[89]=0;
-	fHist[90]=0;
-	fHist[91]=0;
-	fHist[92]=0;
-	fHist[93]=0;
-	fHist[94]=0;
-	fHist[95]=0;
-	fHist[96]=0;
-	fHist[97]=0;
-	fHist[98]=0;
-	fHist[99]=0;
-	fHist[100]=0;
-	fHist[101]=0;
-	fHist[102]=0;
-	fHist[103]=0;
-	fHist[104]=0;
-	fHist[105]=0;
-	fHist[106]=0;
-	fHist[107]=0;
-	fHist[108]=0;
-	fHist[109]=0;
-	fHist[110]=0;
-	fHist[111]=0;
-	fHist[112]=0;
-	fHist[113]=0;
-	fHist[114]=0;
-	fHist[115]=0;
-	fHist[116]=0;
-	fHist[117]=0;
-	fHist[118]=0;
-	fHist[119]=0;
-	fHist[120]=0;
-	fHist[121]=0;
-	fHist[122]=0;
-	fHist[123]=0;
-	fHist[124]=0;
-	fHist[125]=0;
-	fHist[126]=0;
-	fHist[127]=0;
-	fHist[128]=0;
-	fHist[129]=0;
-	fHist[130]=0;
-	fHist[131]=0;
-	fHist[132]=0;
-	fHist[133]=0;
-	fHist[134]=0;
-	fHist[135]=0;
-	fHist[136]=0;
-	fHist[137]=0;
-	fHist[138]=0;
-	fHist[139]=0;
-	fHist[140]=0;
-	fHist[141]=0;
-	fHist[142]=0;
-	fHist[143]=0;
-	fHist[144]=0;
-	fHist[145]=0;
-	fHist[146]=0;
-	fHist[147]=0;
-	fHist[148]=0;
-	fHist[149]=0;
-	fHist[150]=0;
-	fHist[151]=0;
-	fHist[152]=0;
-	fHist[153]=0;
-	fHist[154]=0;
-	fHist[155]=0;
-	fHist[156]=0;
-	fHist[157]=0;
-	fHist[158]=0;
-	fHist[159]=0;
-	fHist[160]=0;
-	fHist[161]=0;
-	fHist[162]=0;
-	fHist[163]=0;
-	fHist[164]=0;
-	fHist[165]=0;
-	fHist[166]=0;
-	fHist[167]=0;
-	fHist[168]=0;
-	fHist[169]=0;
-	fHist[170]=0;
-	fHist[171]=0;
-	fHist[172]=0;
-	fHist[173]=0;
-	fHist[174]=0;
-	fHist[175]=0;
-	fHist[176]=0;
-	fHist[177]=0;
-	fHist[178]=0;
-	fHist[179]=0;
-	fHist[180]=0;
-	fHist[181]=0;
-	fHist[182]=0;
-	fHist[183]=0;
-	fHist[184]=0;
-	fHist[185]=0;
-	fHist[186]=0;
-	fHist[187]=0;
-	fHist[188]=0;
-	fHist[189]=0;
-	fHist[190]=0;
-	fHist[191]=0;
-	fHist[192]=0;
-	fHist[193]=0;
-	fHist[194]=0;
-	fHist[195]=0;
-	fHist[196]=0;
-	fHist[197]=0;
-	fHist[198]=0;
-	fHist[199]=0;
-	fHist[200]=0;
-	fHist[201]=0;
-	fHist[202]=0;
-	fHist[203]=0;
-	fHist[204]=0;
-	fHist[205]=0;
-	fHist[206]=0;
-	fHist[207]=0;
-	fHist[208]=0;
-	fHist[209]=0;
-	fHist[210]=0;
-	fHist[211]=0;
-	fHist[212]=0;
-	fHist[213]=0;
-	fHist[214]=0;
-	fHist[215]=0;
-	fHist[216]=0;
-	fHist[217]=0;
-	fHist[218]=0;
-	fHist[219]=0;
-	fHist[220]=0;
-	fHist[221]=0;
-	fHist[222]=0;
-	fHist[223]=0;
-	fHist[224]=0;
-	fHist[225]=0;
-	fHist[226]=0;
-	fHist[227]=0;
-	fHist[228]=0;
-	fHist[229]=0;
-	fHist[230]=0;
-	fHist[231]=0;
-	fHist[232]=0;
-	fHist[233]=0;
-	fHist[234]=0;
-	fHist[235]=0;
-	fHist[236]=0;
-	fHist[237]=0;
-	fHist[238]=0;
-	fHist[239]=0;
-	fHist[240]=0;
-	fHist[241]=0;
-	fHist[242]=0;
-	fHist[243]=0;
-	fHist[244]=0;
-	fHist[245]=0;
-	fHist[246]=0;
-	fHist[247]=0;
-	fHist[248]=0;
-	fHist[249]=0;
-	fHist[250]=0;
-	fHist[251]=0;
-	fHist[252]=0;
-	fHist[253]=0;
-	fHist[254]=0;
-	fHist[255]=0;
-	fHist[256]=0;
-	fHist[257]=0;
-	fHist[258]=0;
-	fHist[259]=0;
-	fHist[260]=0;
-	fHist[261]=0;
-	fHist[262]=0;
-	fHist[263]=0;
-	fHist[264]=0;
-	fHist[265]=0;
-	fHist[266]=0;
-	fHist[267]=0;
-	fHist[268]=0;
-	fHist[269]=0;
-	fHist[270]=0;
-	fHist[271]=0;
-	fHist[272]=0;
-	fHist[273]=0;
-	fHist[274]=0;
-	fHist[275]=0;
-	fHist[276]=0;
-	fHist[277]=0;
-	fHist[278]=0;
-	fHist[279]=0;
-	fHist[280]=0;
-	fHist[281]=0;
-	fHist[282]=0;
-	fHist[283]=0;
-	fHist[284]=0;
-	fHist[285]=0;
-	fHist[286]=0;
-	fHist[287]=0;
-	fHist[288]=0;
-	fHist[289]=0;
-	fHist[290]=0;
-	fHist[291]=0;
-	fHist[292]=0;
-	fHist[293]=0;
-	fHist[294]=0;
-	fHist[295]=0;
-	fHist[296]=0;
-	fHist[297]=0;
-	fHist[298]=0;
-	fHist[299]=0;
-	fHist[300]=0;
-	fHist[301]=0;
-	fHist[302]=0;
-	fHist[303]=0;
-	fHist[304]=0;
-	fHist[305]=0;
-	fHist[306]=0;
-	fHist[307]=0;
-	fHist[308]=0;
-	fHist[309]=0;
-	fHist[310]=0;
-	fHist[311]=0;
-	fHist[312]=0;
-	fHist[313]=0;
-	fHist[314]=0;
-	fHist[315]=0;
-	fHist[316]=0;
-	fHist[317]=0;
-	fHist[318]=0;
-	fHist[319]=0;
-	fHist[320]=0;
-	fHist[321]=0;
-	fHist[322]=0;
-	fHist[323]=0;
-	fHist[324]=0;
-	fHist[325]=0;
-	fHist[326]=0;
-	fHist[327]=0;
-	fHist[328]=0;
-	fHist[329]=0;
-	fHist[330]=0;
-	fHist[331]=0;
-	fHist[332]=0;
-	fHist[333]=0;
-	fHist[334]=0;
-	fHist[335]=0;
-	fHist[336]=0;
-	fHist[337]=0;
-	fHist[338]=0;
-	fHist[339]=0;
-	fHist[340]=0;
-	fHist[341]=0;
-	fHist[342]=0;
-	fHist[343]=0;
-	fHist[344]=0;
-	fHist[345]=0;
-	fHist[346]=0;
-	fHist[347]=0;
-	fHist[348]=0;
-	fHist[349]=0;
-	fHist[350]=0;
-	fHist[351]=0;
-	fHist[352]=0;
-	fHist[353]=0;
-	fHist[354]=0;
-	fHist[355]=0;
-	fHist[356]=0;
-	fHist[357]=0;
-	fHist[358]=0;
-	fHist[359]=0;
-	fHist[360]=0;
-	fHist[361]=0;
-	fHist[362]=0;
-	fHist[363]=0;
-	fHist[364]=0;
-	fHist[365]=0;
-	fHist[366]=0;
-	fHist[367]=0;
-	fHist[368]=0;
-	fHist[369]=0;
-	fHist[370]=0;
-	fHist[371]=0;
-	fHist[372]=0;
-	fHist[373]=0;
-	fHist[374]=0;
-	fHist[375]=0;
-	fHist[376]=0;
-	fHist[377]=0;
-	fHist[378]=0;
-	fHist[379]=0;
-	fHist[380]=0;
-	fHist[381]=0;
-	fHist[382]=0;
-	fHist[383]=0;
-	fHist[384]=0;
-	fHist[385]=0;
-	fHist[386]=0;
-	fHist[387]=0;
-	fHist[388]=0;
-	fHist[389]=0;
-	fHist[390]=0;
-	fHist[391]=0;
-	fHist[392]=0;
-	fHist[393]=0;
-	fHist[394]=0;
-	fHist[395]=0;
-	fHist[396]=0;
-	fHist[397]=0;
-	fHist[398]=0;
-	fHist[399]=0;
-	fHist[400]=0;
-	fHist[401]=0;
-	fHist[402]=0;
-	fHist[403]=0;
-	fHist[404]=0;
-	fHist[405]=0;
-	fHist[406]=0;
-	fHist[407]=0;
-	fHist[408]=0;
-	fHist[409]=0;
-	fHist[410]=0;
-	fHist[411]=0;
-	fHist[412]=0;
-	fHist[413]=0;
-	fHist[414]=0;
-	fHist[415]=0;
-	fHist[416]=0;
-	fHist[417]=0;
-	fHist[418]=0;
-	fHist[419]=0;
-	fHist[420]=0;
-	fHist[421]=0;
-	fHist[422]=0;
-	fHist[423]=0;
-	fHist[424]=0;
-
-	fHistR[0]=0;
-	fHistR[1]=0;
-	fHistR[2]=0;
-	fHistR[3]=0;
-	fHistR[4]=0;
-	fHistR[5]=0;
-	fHistR[6]=0;
-	fHistR[7]=0;
-	fHistR[8]=0;
-	fHistR[9]=0;
-	fHistR[10]=0;
-	fHistR[11]=0;
-	fHistR[12]=0;
-	fHistR[13]=0;
-	fHistR[14]=0;
-	fHistR[15]=0;
-	fHistR[16]=0;
-	fHistR[17]=0;
-	fHistR[18]=0;
-	fHistR[19]=0;
-	fHistR[20]=0;
-	fHistR[21]=0;
-	fHistR[22]=0;
-	fHistR[23]=0;
-	fHistR[24]=0;
-	fHistR[25]=0;
-	fHistR[26]=0;
-	fHistR[27]=0;
-	fHistR[28]=0;
-	fHistR[29]=0;
-	fHistR[30]=0;
-	fHistR[31]=0;
-
 }
 
 void CbmRichRingFinderHoughImpl::FuzzyKE(TClonesArray* rHitArray)
@@ -1162,8 +584,6 @@ void CbmRichRingFinderHoughImpl::FuzzyKE(TClonesArray* rHitArray)
 	vector<Hit> hits;
 	rings.clear();
 	std::set<Int_t> hitSet;
-
-
 
 	for (Int_t iR = 0; iR < nofRings; iR++){
 		CbmRichRing ring = fFoundRings[iR];

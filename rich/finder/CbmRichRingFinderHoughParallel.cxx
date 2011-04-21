@@ -54,13 +54,7 @@ public:
 // -----   Standard constructor   ------------------------------------------
 CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel  ( Int_t verbose, TString geometry )
 {
-    cout << "-I- CbmRichRingFinderHoughParallel constructor for " << geometry << " RICH geometry"<<endl;
-    if (geometry != "compact" && geometry != "large"){
-        geometry = "compact";
-        cout << "-E- CbmRichRingFinderHoughParallel::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
-    }
-    fGeometryType = geometry;
+
 }
 
 void CbmRichRingFinderHoughParallel::Init()
@@ -68,12 +62,12 @@ void CbmRichRingFinderHoughParallel::Init()
     fNEvent = 0;
     fRingCount = 0;
 #ifdef HOUGH_IMPL_PARALLEL
-	fHTImpl1 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
-	fHTImpl2 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
+	fHTImpl1 = new CbmRichRingFinderHoughParallelImpl();
+	fHTImpl2 = new CbmRichRingFinderHoughParallelImpl();
 #endif
 #ifdef HOUGH_IMPL
-	fHTImpl1 = new CbmRichRingFinderHoughImpl(fGeometryType);
-	fHTImpl2 = new CbmRichRingFinderHoughImpl(fGeometryType);
+	fHTImpl1 = new CbmRichRingFinderHoughImpl();
+	fHTImpl2 = new CbmRichRingFinderHoughImpl();
 #endif
 
 	fHTImpl2->Init();
@@ -96,7 +90,7 @@ CbmRichRingFinderHoughParallel::~CbmRichRingFinderHoughParallel()
 Int_t CbmRichRingFinderHoughParallel::DoFind(const vector<CbmRichHoughHit>& data)
 {
 	fNEvent++;
-	if (fVerbose) cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
+	cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
 
 	std::vector<CbmRichHoughHit> UpH;
 	std::vector<CbmRichHoughHit> DownH;
@@ -139,8 +133,6 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
     fRingCount = 0;
 
 	fNEvent++;
-	if (fVerbose)
-		cout << "-------------------------    Event no. " << fNEvent<< "   -------------------------" << endl;
 
 	std::vector<CbmRichHoughHit> UpH;
 	std::vector<CbmRichHoughHit> DownH;
@@ -194,10 +186,7 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 	//for_each(DownH.begin(), DownH.end(), DeleteObject());
 	DownH.clear();
 
-	//FuzzyKE(rHitArray);
-	if (fVerbose)
-		cout << "CbmRichRingFinderHough: Number of output rings: "
-				<< rRingArray->GetEntriesFast() << endl;
+	cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
 
 	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent << " ms" << endl;
 

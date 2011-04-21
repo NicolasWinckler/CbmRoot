@@ -96,9 +96,6 @@ private:
 	Int_t fNofTrueMatchRings;
 	Int_t fNofTrueElIdRings;
 
-    Int_t fNofFakeRings;
-    Int_t fNofCloneRings;
-
 	TH1D* fhMCRings;
 	TH1D* fhAccRings;
 	TH1D* fhTrueFoundRings;

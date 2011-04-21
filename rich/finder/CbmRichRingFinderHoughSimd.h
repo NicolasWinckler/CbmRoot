@@ -22,9 +22,7 @@ public:
 class CbmRichRingFinderHoughSimd : public CbmRichRingFinderHoughImpl {
 
 public:
-
-  	/** Standard constructor **/
-  	CbmRichRingFinderHoughSimd ( TString geometry);
+  	CbmRichRingFinderHoughSimd ();
 
 	~CbmRichRingFinderHoughSimd(){;}
 

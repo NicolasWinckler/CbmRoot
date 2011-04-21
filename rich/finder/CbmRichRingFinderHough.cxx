@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------
 // CbmRichRingFinderHough source file
-// Base class for ring finders based on on HT method
+// Base class for ring finders based on Hough Transform method
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
 #include "CbmRichRingFinderHough.h"
@@ -30,27 +30,19 @@ using std::vector;
 // -----   Standard constructor   ------------------------------------------
 CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometry )
 {
-    cout << "-I- CbmRichRingFinderHough constructor for " << geometry << " RICH geometry"<<endl;
-    if (geometry != "compact" && geometry != "large"){
-        geometry = "compact";
-        cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
-    }
+	//FIXME: remove geometry type from function parameters
 
-    fGeometryType = geometry;
-    fIsFindOptPar = false;
+    cout << "-I- CbmRichRingFinderHough constructor"<<endl;
     fRingCount = 0;
     fNEvent = 0;
 
 #ifdef HOUGH_SERIAL
-	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);;
+	fHTImpl = new CbmRichRingFinderHoughImpl();
 #endif
 
 #ifdef HOUGH_SIMD
-	fHTImpl  = new CbmRichRingFinderHoughSimd(fGeometryType);;
+	fHTImpl  = new CbmRichRingFinderHoughSimd();
 #endif
-
-
 }
 
 void CbmRichRingFinderHough::Init()
@@ -60,8 +52,6 @@ void CbmRichRingFinderHough::Init()
 
 CbmRichRingFinderHough::CbmRichRingFinderHough()
 {
-
-
 }
 
 // -----   Destructor   ----------------------------------------------------
@@ -101,14 +91,10 @@ Int_t CbmRichRingFinderHough::DoFind(const vector<CbmRichHoughHit>& data)
 	DownH.clear();
 }
 
-
-
 Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
                                          TClonesArray* rProjArray,
                                          TClonesArray* rRingArray)
 {
-
-
 	TStopwatch timer;
 
 	fNEvent++;
@@ -124,15 +110,11 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	}
 	const Int_t nhits = rHitArray->GetEntriesFast();
 	if (!nhits) {
-		cout << "-E- CbmRichRingFinderHough::DoFind:No hits in this event."	<< endl;
+		cout << "-E- CbmRichRingFinderHough::DoFind: No hits in this event."	<< endl;
 		return -1;
 	}
 	UpH.reserve(nhits/2);
 	DownH.reserve(nhits/2);
-
-//	std::ofstream outEvents;
-//	outEvents.open("events.txt",std::ios_base::app);
-//	outEvents << fNEvent << " " << nhits << endl;
 
 	for(Int_t iHit = 0; iHit < nhits; iHit++) {
 		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
@@ -173,46 +155,7 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 
 	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent << " ms" << endl;
 
-	if (fIsFindOptPar == true ){
-		std::ofstream fout;
-		fout.open("opt_param_ht.txt",std::ios_base::app);
-		fout << fExecTime/fNEvent * 1000. << " ";
-	}
-
 	return 1;
-}
-
-void CbmRichRingFinderHough::Finish()
-{
-
-}
-
-void CbmRichRingFinderHough::SetParameters( Int_t nofParts,
-		Float_t maxDistance, Float_t minDistance,
-		Float_t minRadius, Float_t maxRadius,
-		Int_t HTCut, Int_t hitCut,
-		Int_t HTCutR, Int_t hitCutR,
-		Int_t nofBinsX, Int_t nofBinsY,
-		Int_t nofBinsR, Float_t annCut,
-		Float_t usedHitsCut, Float_t usedHitsAllCut,
-		Float_t rmsCoeffEl, Float_t maxCutEl,
-		Float_t rmsCoeffCOP, Float_t maxCutCOP)
-{
-	fHTImpl->SetParameters(nofParts,
-			maxDistance, minDistance,
-			minRadius, maxRadius,
-			HTCut, hitCut,
-			HTCutR, hitCutR,
-			nofBinsX, nofBinsY,
-			nofBinsR, annCut,
-			usedHitsCut, usedHitsAllCut,
-			rmsCoeffEl, maxCutEl,
-			rmsCoeffCOP, maxCutCOP);
-
-    ofstream fout;
-    fout.open("opt_param_ht.txt",std::ios_base::app);
-    fout << annCut << " " <<  rmsCoeffEl << " "<<
-    maxCutEl << " " <<  usedHitsCut<< " " << usedHitsAllCut << endl;
 }
 
 void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
@@ -229,4 +172,7 @@ void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
 	}
 }
 
+void CbmRichRingFinderHough::Finish()
+{
+}
 ClassImp(CbmRichRingFinderHough)

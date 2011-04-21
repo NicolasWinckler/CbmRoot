@@ -12,7 +12,7 @@
 //#include "CbmRichRingFitterEllipseTau.h"
 #include "CbmRichRingSelectNeuralNet.h"
 #include "TClonesArray.h"
-#include "TString.h"
+//#include "TString.h"
 
 #include <vector>
 #include <map>
@@ -105,13 +105,8 @@ protected:
 	CbmRichRingSelectNeuralNet* fANNSelect;
 	//CbmRichRingFitterEllipseTau* fFitEllipse;
 
-	TString fGeometryType;
-
 public:
   	CbmRichRingFinderHoughImpl ();
-
-  	/** Standard constructor **/
-  	CbmRichRingFinderHoughImpl (TString geometry);
 
 	virtual ~CbmRichRingFinderHoughImpl();
 	void SetParameters(Int_t nofParts,
@@ -124,7 +119,7 @@ public:
 			Float_t usedHitsCut, Float_t usedHitsAllCut,
 			Float_t rmsCoeffEl, Float_t maxCutEl,
 			Float_t rmsCoeffCOP, Float_t maxCutCOP);
-	void SetParameters(TString geometry);
+	void SetParameters();
 
 	///Calculate circle center and radius
 	void CalculateRingParameters(Float_t x2y2[],
@@ -157,7 +152,6 @@ public:
     Bool_t AreRingsCloseEnough(CbmRichRingLight* ring1, CbmRichRingLight* ring2);
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRingLight* ring);
-    void InitHist();
 	void Init();
 	void DoFind();
 

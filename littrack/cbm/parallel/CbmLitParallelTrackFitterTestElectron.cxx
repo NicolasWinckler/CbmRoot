@@ -3,7 +3,7 @@
  * @since 2010
  * @version 1.0
  **/
-#include "qa/CbmLitParallelTrackFitterTestElectron.h"
+#include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "data/CbmLitTrack.h"
@@ -68,14 +68,14 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 
    if (par.GetTx() == 0. && par.GetTy() == 0.) { return kLITERROR; }
 
-   LitTrackParam<fscal> lpar;
+   lit::parallel::LitTrackParam<fscal> lpar;
    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 
    int ihit = 0;
 
    for (unsigned char ivp = 0; ivp < fLayout.GetNofVirtualPlanes()-1; ivp++) {
-      LitVirtualPlaneElectron<fscal>& vp1 = fLayout.virtualPlanes[ivp];
-      LitVirtualPlaneElectron<fscal>& vp2 = fLayout.virtualPlanes[ivp+1];
+      lit::parallel::LitVirtualPlaneElectron<fscal>& vp1 = fLayout.virtualPlanes[ivp];
+      lit::parallel::LitVirtualPlaneElectron<fscal>& vp2 = fLayout.virtualPlanes[ivp+1];
 
 //       LitFieldRegion<fscal> field;
 //       LitFieldValue<fscal> v1, v2;
@@ -88,8 +88,8 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 //       LitRK4ExtrapolationTest(lpar, vp2.Z, fField);
 //       LitAddMaterial(lpar, vp2.material);
 
-      LitRK4ExtrapolationElectron(lpar, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
-      LitAddMaterialElectron(lpar, vp2.material);
+      lit::parallel::LitRK4ExtrapolationElectron(lpar, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
+      lit::parallel::LitAddMaterialElectron(lpar, vp2.material);
 
 //       if (vp2.Z < 200.)
 //          fExtrapolator->Extrapolate(&par, vp2.Z);
@@ -101,29 +101,29 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 
 
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
-      LitStationGroupElectron<fscal>& stationGroup = fLayout.stationGroups[isg];
+      lit::parallel::LitStationGroupElectron<fscal>& stationGroup = fLayout.stationGroups[isg];
 
       for (unsigned char ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-         LitStationElectron<fscal>& station = stationGroup.stations[ist];
+         lit::parallel::LitStationElectron<fscal>& station = stationGroup.stations[ist];
 
 //       LitStatus propStatus = fPropagator->Propagate(&par, station.Z, 211, NULL);
 //       if (propStatus != kLITSUCCESS) return kLITERROR;
 
-         LitLineExtrapolation(lpar, station.Z);
+         lit::parallel::LitLineExtrapolation(lpar, station.Z);
 
          for (unsigned char im = 0; im < station.GetNofMaterialsBefore(); im++) {
-            LitAddMaterialElectron(lpar, station.materialsBefore[im]);
+            lit::parallel::LitAddMaterialElectron(lpar, station.materialsBefore[im]);
          }
 
          LitTrackParamScalToCbmLitTrackParam(&lpar, &par);
 
          if (CheckHit(isg, ist, fLayout, track)) {
             const CbmLitHit* hit = track->GetHit(ihit);
-            LitTrackParam<fscal> ulpar = lpar;
-            LitPixelHit<fscal> lhit;
+            lit::parallel::LitTrackParam<fscal> ulpar = lpar;
+            lit::parallel::LitPixelHit<fscal> lhit;
             CbmLitPixelHit* pixelHit = (CbmLitPixelHit*) hit;
             SerialHitToParallel(*pixelHit, lhit);
-            LitFiltration(ulpar, lhit);
+            lit::parallel::LitFiltration(ulpar, lhit);
             fscal chisq = ChiSq(ulpar, lhit);
 
             lpar = ulpar;
@@ -139,7 +139,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
          }
 
          for (unsigned char im = 0; im < station.GetNofMaterialsAfter(); im++) {
-            LitAddMaterialElectron(lpar, station.materialsAfter[im]);
+            lit::parallel::LitAddMaterialElectron(lpar, station.materialsAfter[im]);
          }
       }
    }
@@ -154,7 +154,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 unsigned char CbmLitParallelTrackFitterTestElectron::PlaneId(
    unsigned char stationGroup,
    unsigned char station,
-   LitDetectorLayoutElectronScal& layout) const
+   lit::parallel::LitDetectorLayoutElectronScal& layout) const
 {
    int counter = 0;
    for(unsigned char i = 0; i < stationGroup; i++) {
@@ -169,7 +169,7 @@ unsigned char CbmLitParallelTrackFitterTestElectron::PlaneId(
 bool CbmLitParallelTrackFitterTestElectron::CheckHit(
    unsigned char stationGroup,
    unsigned char station,
-   LitDetectorLayoutElectronScal& layout,
+   lit::parallel::LitDetectorLayoutElectronScal& layout,
    CbmLitTrack* track)
 {
    unsigned char planeId = PlaneId(stationGroup, station, layout);
@@ -182,7 +182,7 @@ bool CbmLitParallelTrackFitterTestElectron::CheckHit(
 
 void CbmLitParallelTrackFitterTestElectron::SerialHitToParallel(
    const CbmLitPixelHit& hit,
-   LitPixelHit<fscal>& lhit)
+   lit::parallel::LitPixelHit<fscal>& lhit)
 {
    lhit.X = hit.GetX();
    lhit.Y = hit.GetY();

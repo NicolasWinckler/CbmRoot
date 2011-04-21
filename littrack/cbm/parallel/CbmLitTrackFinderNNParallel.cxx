@@ -1,11 +1,11 @@
-#include "finder/CbmLitTrackFinderNNParallel.h"
+#include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 
-#include "base/CbmLitEnvironment.h"
-#include "data/CbmLitHit.h"
-#include "data/CbmLitPixelHit.h"
-#include "data/CbmLitTrackParam.h"
-#include "data/CbmLitTrack.h"
-#include "utils/CbmLitMemoryManagment.h"
+#include "cbm/base/CbmLitEnvironment.h"
+#include "std/data/CbmLitHit.h"
+#include "std/data/CbmLitPixelHit.h"
+#include "std/data/CbmLitTrackParam.h"
+#include "std/data/CbmLitTrack.h"
+#include "std/utils/CbmLitMemoryManagment.h"
 
 #include "parallel/LitTypes.h"
 #include "parallel/LitHit.h"
@@ -29,19 +29,19 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 
    if (fTrackingType == "nn_parallel_muon") {
-      LitDetectorLayoutMuonVec layout;
+      lit::parallel::LitDetectorLayoutMuonVec layout;
       env->GetMuchLayoutVec(layout);
-      fTFParallelMuon = new LitTrackFinderNNVecMuon();
+      fTFParallelMuon = new lit::parallel::LitTrackFinderNNVecMuon();
       fTFParallelMuon->SetDetectorLayout(layout);
    } else if (fTrackingType == "nn_scalar_electron") {
-      LitDetectorLayoutElectronScal layout;
+      lit::parallel::LitDetectorLayoutElectronScal layout;
       env->GetTrdLayoutScal(layout);
-      fTFScalElectron = new LitTrackFinderNNScalarElectron();
+      fTFScalElectron = new lit::parallel::LitTrackFinderNNScalarElectron();
       fTFScalElectron->SetDetectorLayout(layout);
    } else if (fTrackingType == "nn_vec_electron") {
-      LitDetectorLayoutElectronVec layout;
+      lit::parallel::LitDetectorLayoutElectronVec layout;
       env->GetTrdLayoutVec(layout);
-      fTFVecElectron = new LitTrackFinderNNVecElectron();
+      fTFVecElectron = new lit::parallel::LitTrackFinderNNVecElectron();
       fTFVecElectron->SetDetectorLayout(layout);
    } else {
       std::cout << "-E- TRACKING TYPE NOT FOUND" << std::endl;
@@ -69,10 +69,10 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    TrackPtrVector& tracks)
 {
    const unsigned int NHITS = hits.size();
-   LitScalPixelHit* lhits[NHITS];
+   lit::parallel::LitScalPixelHit* lhits[NHITS];
    const unsigned int NTRACKS = trackSeeds.size();
-   LitScalTrack* lseeds[NTRACKS];
-   LitScalTrack* ltracks[NTRACKS];
+   lit::parallel::LitScalTrack* lseeds[NTRACKS];
+   lit::parallel::LitScalTrack* ltracks[NTRACKS];
 
    ConvertHits(hits, lhits);
    ConvertSeeds(trackSeeds, lseeds);
@@ -125,11 +125,11 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
 void CbmLitTrackFinderNNParallel::ConvertHits(
    HitPtrVector& hits,
-   LitScalPixelHit* lhits[])
+   lit::parallel::LitScalPixelHit* lhits[])
 {
    for (unsigned int i = 0; i < hits.size(); i++) {
       CbmLitPixelHit* hit = (CbmLitPixelHit*) hits[i];
-      LitScalPixelHit* lhit = new LitScalPixelHit;
+      lit::parallel::LitScalPixelHit* lhit = new lit::parallel::LitScalPixelHit;
       CbmLitPixelHitToLitScalPixelHit(hit, lhit);
       lhits[i] = lhit;
    }
@@ -137,12 +137,12 @@ void CbmLitTrackFinderNNParallel::ConvertHits(
 
 void CbmLitTrackFinderNNParallel::ConvertSeeds(
    TrackPtrVector& seeds,
-   LitScalTrack* lseeds[])
+   lit::parallel::LitScalTrack* lseeds[])
 {
    for (unsigned int i = 0; i < seeds.size(); i++) {
       CbmLitTrack* track = (CbmLitTrack*) seeds[i];
       const CbmLitTrackParam* par = track->GetParamLast();
-      LitScalTrack* ltrack = new LitScalTrack;
+      lit::parallel::LitScalTrack* ltrack = new lit::parallel::LitScalTrack;
 
       CbmLitTrackParamToLitTrackParamScal(par, &ltrack->paramFirst);
       CbmLitTrackParamToLitTrackParamScal(par, &ltrack->paramLast);
@@ -154,12 +154,12 @@ void CbmLitTrackFinderNNParallel::ConvertSeeds(
 }
 
 void CbmLitTrackFinderNNParallel::ConvertTracks(
-   LitScalTrack* ltracks[],
+   lit::parallel::LitScalTrack* ltracks[],
    unsigned int nofTracks,
    TrackPtrVector& tracks)
 {
    for (unsigned int i = 0; i < nofTracks; i++) {
-      LitScalTrack* ltrack = ltracks[i];
+      lit::parallel::LitScalTrack* ltrack = ltracks[i];
       CbmLitTrack* track = new CbmLitTrack;
       if (fTrackingType == "nn_parallel_muon") {
          LitScalTrackToCbmLitTrack(ltrack, track, kLITMUCH);

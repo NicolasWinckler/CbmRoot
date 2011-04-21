@@ -8,13 +8,19 @@
 #ifndef CBMLITTRACKFINDERNNPARALLEL_H_
 #define CBMLITTRACKFINDERNNPARALLEL_H_
 
-#include "interface/CbmLitTrackFinder.h"
+#include "std/interface/CbmLitTrackFinder.h"
 
-class LitTrackFinderNNVecMuon;
-class LitTrackFinderNNScalarElectron;
-class LitTrackFinderNNVecElectron;
-class LitScalPixelHit;
-class LitScalTrack;
+#include "parallel/LitHit.h"
+#include "parallel/LitTrack.h"
+#include "parallel/muon/LitTrackFinderNNVecMuon.h"
+#include "parallel/electron/LitTrackFinderNNScalarElectron.h"
+#include "parallel/electron/LitTrackFinderNNVecElectron.h"
+
+//class LitTrackFinderNNVecMuon;
+//class LitTrackFinderNNScalarElectron;
+//class LitTrackFinderNNVecElectron;
+//class LitScalPixelHit;
+//class LitScalTrack;
 
 class CbmLitTrackFinderNNParallel : public CbmLitTrackFinder
 {
@@ -40,22 +46,22 @@ public:
 private:
    void ConvertHits(
       HitPtrVector& hits,
-      LitScalPixelHit* lhits[]);
+      lit::parallel::LitScalPixelHit* lhits[]);
 
    void ConvertSeeds(
       TrackPtrVector& seeds,
-      LitScalTrack* lseeds[]);
+      lit::parallel::LitScalTrack* lseeds[]);
 
    void ConvertTracks(
-      LitScalTrack* ltracks[],
+      lit::parallel::LitScalTrack* ltracks[],
       unsigned int nofTracks,
       TrackPtrVector& tracks);
 
-   LitTrackFinderNNVecMuon* fTFParallelMuon;
+   lit::parallel::LitTrackFinderNNVecMuon* fTFParallelMuon;
 
-   LitTrackFinderNNScalarElectron* fTFScalElectron;
+   lit::parallel::LitTrackFinderNNScalarElectron* fTFScalElectron;
 
-   LitTrackFinderNNVecElectron* fTFVecElectron;
+   lit::parallel::LitTrackFinderNNVecElectron* fTFVecElectron;
 
    double fTime;
 

@@ -13,7 +13,6 @@
 #include "finder/CbmLitTrackFinderBranch.h"
 #include "finder/CbmLitTrackFinderWeight.h"
 #include "finder/CbmLitNearestHitToTrackMerger.h"
-#include "finder/CbmLitTrackFinderNNParallel.h"
 #include "fitter/CbmLitKalmanFilter.h"
 #include "fitter/CbmLitKalmanSmoother.h"
 #include "fitter/CbmLitTrackFitterImp.h"
@@ -31,9 +30,9 @@
 #include "selection/CbmLitTrackSelectionMuch.h"
 #include "selection/CbmLitTrackSelectionTrd.h"
 #include "selection/CbmLitTrackSelectionMuchRobust.h"
-#include "qa/CbmLitParallelTrackFitterTest.h"
-#include "qa/CbmLitParallelTrackFitterTestElectron.h"
-
+#include "cbm/parallel/CbmLitParallelTrackFitterTest.h"
+#include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
+#include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
 
 CbmLitToolFactory::CbmLitToolFactory()

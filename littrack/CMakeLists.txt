@@ -99,10 +99,10 @@ cbm/utils/CbmLitDrawHist.cxx)
 If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
-      finder/CbmLitTrackFinderNNParallel.cxx
-      cbm/qa/CbmLitParallelTrackFitterTest.cxx 
-      cbm/qa/CbmLitParallelTrackFitterTestElectron.cxx 
-      cbm/qa/CbmLitTrackFitSpeedTest.cxx
+      cbm/parallel/CbmLitTrackFinderNNParallel.cxx
+      cbm/parallel/CbmLitParallelTrackFitterTest.cxx 
+      cbm/parallel/CbmLitParallelTrackFitterTestElectron.cxx 
+      cbm/parallel/CbmLitTrackFitSpeedTest.cxx
      )
 EndIf(TBB_FOUND)
 
@@ -137,7 +137,7 @@ cbm/qa/CbmLitTestMatrixMath.h
 If(TBB_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
-      cbm/qa/CbmLitTrackFitSpeedTest.h
+      cbm/parallel/CbmLitTrackFitSpeedTest.h
      )
 EndIf(TBB_FOUND)
 
@@ -192,7 +192,6 @@ If(TBB_FOUND)
 EndIf(TBB_FOUND)
 
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
-
 
 #add_subdirectory(parallel)
 #add_subdirectory(cuda)

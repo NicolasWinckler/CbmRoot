@@ -7,7 +7,6 @@
 #include "../LitFiltration.h"
 #include "../LitField.h"
 #include "../LitMath.h"
-#include "../LitConverter.h"
 
 //#include "CbmLitEnvironment.h"
 //#include "CbmLitMapField.h"

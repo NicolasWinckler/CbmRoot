@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  */
-#include "qa/CbmLitTrackFitSpeedTest.h"
+#include "parallel/CbmLitTrackFitSpeedTest.h"
 
 #include "base/CbmLitToolFactory.h"
 #include "base/CbmLitEnvironment.h"
@@ -39,34 +39,34 @@
 
 class FastScalarFitClass
 {
-   LitTrackScal* fTracks;
-   LitDetectorLayoutMuonScal& fLayout;
+   lit::parallel::LitTrackScal* fTracks;
+   lit::parallel::LitDetectorLayoutMuonScal& fLayout;
 public:
    void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
       for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
-         LitTrackFitterMuon(fTracks[iTrack], fLayout);
+         lit::parallel::LitTrackFitterMuon(fTracks[iTrack], fLayout);
       }
    }
    FastScalarFitClass(
-      LitTrackScal* tracks,
-      LitDetectorLayoutMuonScal& layout) :
+      lit::parallel::LitTrackScal* tracks,
+      lit::parallel::LitDetectorLayoutMuonScal& layout) :
       fTracks(tracks),
       fLayout(layout) {}
 };
 
 class SIMDFitClass
 {
-   LitTrackVec* fTracks;
-   LitDetectorLayoutMuonVec& fLayout;
+   lit::parallel::LitTrackVec* fTracks;
+   lit::parallel::LitDetectorLayoutMuonVec& fLayout;
 public:
    void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
       for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
-         LitTrackFitterMuon(fTracks[iTrack], fLayout);
+         lit::parallel::LitTrackFitterMuon(fTracks[iTrack], fLayout);
       }
    }
    SIMDFitClass(
-      LitTrackVec* tracks,
-      LitDetectorLayoutMuonVec& layout) :
+      lit::parallel::LitTrackVec* tracks,
+      lit::parallel::LitDetectorLayoutMuonVec& layout) :
       fTracks(tracks),
       fLayout(layout) {}
 };
@@ -130,11 +130,11 @@ void CbmLitTrackFitSpeedTest::RunTest()
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 
    // For MUCH track fit
-   LitDetectorLayoutMuonScal layoutScal;
-   LitDetectorLayoutMuonVec layoutVec;
+   lit::parallel::LitDetectorLayoutMuonScal layoutScal;
+   lit::parallel::LitDetectorLayoutMuonVec layoutVec;
    // For TRD track fit
-   LitDetectorLayoutElectronScal layoutElectronScal;
-   LitDetectorLayoutElectronVec layoutElectronVec;
+   lit::parallel::LitDetectorLayoutElectronScal layoutElectronScal;
+   lit::parallel::LitDetectorLayoutElectronVec layoutElectronVec;
    if (!fIsElectronSetup) {
       env->GetMuchLayoutScal(layoutScal);
       env->GetMuchLayoutVec(layoutVec);
@@ -144,8 +144,8 @@ void CbmLitTrackFitSpeedTest::RunTest()
    }
 
    // Convert to LitTracksScal
-   LitTrackScal* tracksFast = new LitTrackScal[nofTracks];
-   LitTrackScal* tracksSIMD = new LitTrackScal[nofTracks];
+   lit::parallel::LitTrackScal* tracksFast = new lit::parallel::LitTrackScal[nofTracks];
+   lit::parallel::LitTrackScal* tracksSIMD = new lit::parallel::LitTrackScal[nofTracks];
    for(unsigned int i = 0; i < nofTracks; i++) {
       CbmLitTrackToLitTrackScal(fLitTracks[i], &tracksFast[i]);
       CbmLitTrackToLitTrackScal(fLitTracks[i], &tracksSIMD[i]);
@@ -170,13 +170,13 @@ void CbmLitTrackFitSpeedTest::RunTest()
    if (!fIsElectronSetup) {
       for (int c = 0; c < ntimes; c++) {
          for(unsigned int i = 0; i < nofTracks; i++) {
-            LitTrackFitterMuon(tracksFast[i], layoutScal);
+            lit::parallel::LitTrackFitterMuon(tracksFast[i], layoutScal);
          }
       }
    } else {
       for (int c = 0; c < ntimes; c++) {
          for(unsigned int i = 0; i < nofTracks; i++) {
-            LitTrackFitterElectron(tracksFast[i], layoutElectronScal);
+            lit::parallel::LitTrackFitterElectron(tracksFast[i], layoutElectronScal);
          }
       }
    }
@@ -186,29 +186,29 @@ void CbmLitTrackFitSpeedTest::RunTest()
    // Test fast SIMD version of the track fit
    std::cout << "Runing test SIMD track fit..." << std::endl;
    // Convert to LitTrackVec
-   LitTrackVec* tracksVec = new LitTrackVec[nofTracksVec];
-   const LitTrack<fscal>* tmp_trks[fvecLen];
+   lit::parallel::LitTrackVec* tracksVec = new lit::parallel::LitTrackVec[nofTracksVec];
+   const lit::parallel::LitTrack<fscal>* tmp_trks[fvecLen];
    for(unsigned int i = 0; i < nofTracksVec; i++) {
       for(unsigned char j = 0; j < fvecLen; j++) {
          tmp_trks[j] = &tracksSIMD[fvecLen*i + j];
       }
       for(unsigned short k = 0; k < fLitTracks[0]->GetNofHits(); k++) {
-         tracksVec[i].AddHit(new LitPixelHit<fvec>);
+         tracksVec[i].AddHit(new lit::parallel::LitPixelHit<fvec>);
       }
-      PackTrack(tmp_trks, tracksVec[i]);
+      lit::parallel::PackTrack(tmp_trks, tracksVec[i]);
    }
    TStopwatch timer3;
    timer3.Start();
    if (!fIsElectronSetup) {
       for (int c = 0; c < ntimes; c++) {
          for(unsigned int i = 0; i < nofTracksVec; i++) {
-            LitTrackFitterMuon(tracksVec[i], layoutVec);
+            lit::parallel::LitTrackFitterMuon(tracksVec[i], layoutVec);
          }
       }
    } else {
       for (int c = 0; c < ntimes; c++) {
          for(unsigned int i = 0; i < nofTracksVec; i++) {
-            LitTrackFitterElectron(tracksVec[i], layoutElectronVec);
+            lit::parallel::LitTrackFitterElectron(tracksVec[i], layoutElectronVec);
          }
       }
    }

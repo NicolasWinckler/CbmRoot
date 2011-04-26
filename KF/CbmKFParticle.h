@@ -41,7 +41,7 @@ class CbmKFParticle: public TObject {
   Bool_t AtProductionVertex;
 
   CbmKFParticle():fId(-1){};
-  CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0=0 );
+  CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0=0,  Int_t *qHypo=0 );
 
   ~CbmKFParticle(){};
 

@@ -21,10 +21,10 @@ using namespace std;
 
 ClassImp(CbmKFParticle)
 
-CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0){
+CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *qHypo){
 
   fDaughtersIds.push_back( Track->Id() );
-  
+
   CbmKFTrack Tr( *Track );
   
   Double_t *m = Tr.GetTrack();
@@ -40,6 +40,7 @@ CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0){
 
   double c2 = 1./(1. + a*a + b*b);
   double pq = 1./qp;
+  if(qHypo) pq *= *qHypo;
   double p2 = pq*pq;
   double pz = sqrt(p2*c2);
   double px = a*pz;
@@ -100,6 +101,7 @@ CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0){
   NDF = Tr.GetRefNDF();
   Chi2 = Tr.GetRefChi2();
   Q = (qp>0.) ?1 :( (qp<0) ?-1 :0);
+  if(qHypo) Q *= *qHypo;
   AtProductionVertex = 1;
 }
 

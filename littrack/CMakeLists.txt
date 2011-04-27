@@ -33,7 +33,7 @@ ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
 )
 
-#set(TBB_FOUND TRUE)
+set(TBB_FOUND FALSE)
 #set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
 #set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
 
@@ -94,14 +94,16 @@ cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
 
 ##cbm/utils/CbmLitConverter.cxx
-cbm/utils/CbmLitDrawHist.cxx)
+cbm/utils/CbmLitDrawHist.cxx
+
+cbm/parallel/CbmLitTrackFinderNNParallel.cxx
+cbm/parallel/CbmLitParallelTrackFitterTest.cxx 
+cbm/parallel/CbmLitParallelTrackFitterTestElectron.cxx 
+)
 
 If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
-      cbm/parallel/CbmLitTrackFinderNNParallel.cxx
-      cbm/parallel/CbmLitParallelTrackFitterTest.cxx 
-      cbm/parallel/CbmLitParallelTrackFitterTestElectron.cxx 
       cbm/parallel/CbmLitTrackFitSpeedTest.cxx
      )
 EndIf(TBB_FOUND)
@@ -132,6 +134,7 @@ cbm/qa/CbmTrdHitsQa.h
 cbm/qa/CbmLitCreateStandaloneData.h
 cbm/qa/CbmLitTestMatrixMath.h
 #cuda/CudaTest.h
+cbm/utils/CbmLitDrawHist.h
 )
 
 If(TBB_FOUND)
@@ -193,5 +196,5 @@ EndIf(TBB_FOUND)
 
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
 
-#add_subdirectory(parallel)
+add_subdirectory(parallel)
 #add_subdirectory(cuda)

@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Track data class for fast parallel version of the Littrack tracking.
+ * Track data class.
  **/
 
 #ifndef LITTRACK_H_

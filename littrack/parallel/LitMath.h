@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Mathematical functions for fast parallel version of the Littrack tracking.
+ * Useful math functions.
  **/
 
 #ifndef LITMATH_H_

@@ -12,14 +12,6 @@
 #include "../LitVecPack.h"
 #include "../LitTrack.h"
 
-//#include "CbmLitMemoryManagment.h"
-
-#ifdef LIT_USE_TBB
-#undef LIT_USE_TBB
-#endif
-
-#define LIT_USE_TBB // TBB will be used for multithreading
-
 #ifdef LIT_USE_TBB
 #include "tbb/task_scheduler_init.h"
 #include "tbb/parallel_for.h"

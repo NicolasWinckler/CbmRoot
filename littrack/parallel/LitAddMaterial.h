@@ -3,8 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Functions for calculation of the material effects used in the
- * parallel version of the tracking.
+ * Functions for calculation of the material effects.
  **/
 
 #ifndef LITADDMATERIAL_H_
@@ -17,8 +16,8 @@
 namespace lit {
 namespace parallel {
 
-/* Function calculates material effects and adds them to the
- * track parameters and its covariance matrix.
+/* Function calculates material effects and updates
+ * track parameters and covariance matrix.
  * @param par Reference to INPUT/OUTPUT track parameters.
  * @param mat Reference to material
  */
@@ -157,8 +156,7 @@ inline void LitAddMaterial(
 
 
 /* Function calculates material effects for electrons
- * and adds them to the
- * track parameters and its covariance matrix.
+ * and updates track parameters and covariance matrix.
  * @param par Reference to INPUT/OUTPUT track parameters.
  * @param mat Reference to material
  */

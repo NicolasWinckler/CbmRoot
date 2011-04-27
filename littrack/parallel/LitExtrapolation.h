@@ -2,7 +2,7 @@
  *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2009
  **
- ** Functions for track parameters extrapolation for parallel version of the tracking.
+ ** Functions for track parameters extrapolation.
  **/
 
 #ifndef LITEXTRAPOLATION_H_
@@ -11,12 +11,10 @@
 #include "LitTrackParam.h"
 #include "LitField.h"
 
-//#include "CbmLitField.h"
-
 namespace lit {
 namespace parallel {
 
-/* Line track extrapolation for parallel version of the tracking.
+/* Line track extrapolation.
  *@param par Input/Output track parameters.
  *@param zOut Z position to extrapolate to.
  */
@@ -49,7 +47,7 @@ inline void LitLineExtrapolation(
    par.Z = zOut;
 }
 
-/* Runge-Kutta track extrapolation for parallel version of the tracking.
+/* Runge-Kutta track extrapolation.
  *@param par Input/Output track parameters.
  *@param zOut Z position to extrapolate to.
  *@param field Reference to the field region.

@@ -4,9 +4,9 @@ set(INCLUDE_DIRECTORIES
 
 )
 
-set(TBB_FOUND TRUE)
-set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
-set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
+set(TBB_FOUND FALSE)
+#set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
+#set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
 
 If(TBB_FOUND)
   Set(INCLUDE_DIRECTORIES 
@@ -34,7 +34,7 @@ set(LITTRACKPARALLEL_SRCS
 
 )
 
-If(TBB_FOUND)
+#If(TBB_FOUND)
   Set(LITTRACKPARALLEL_SRCS
     ${LITTRACKPARALLEL_SRCS}
     LitTrackFinderNNBase.cxx
@@ -43,17 +43,17 @@ If(TBB_FOUND)
     electron/LitTrackFinderNNVecElectron.cxx
     muon/LitTrackFinderNNVecMuon.cxx
   )
-EndIf(TBB_FOUND)
+#EndIf(TBB_FOUND)
 
 set(LITTRACKPARALLEL_HEADERS
 
 )
 
-If(TBB_FOUND)
+#If(TBB_FOUND)
   Set(LITTRACKPARALLEL_HEADERS 
     ${LITTRACKPARALLEL_HEADERS}
   )
-EndIf(TBB_FOUND)
+#EndIf(TBB_FOUND)
 
 
 if(RULE_CHECKER_FOUND)

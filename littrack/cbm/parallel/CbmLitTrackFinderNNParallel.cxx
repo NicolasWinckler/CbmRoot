@@ -16,9 +16,10 @@
 #include "parallel/electron/LitTrackFinderNNScalarElectron.h"
 #include "parallel/electron/LitTrackFinderNNVecElectron.h"
 
+#include "TStopwatch.h"
+
 #include <iostream>
 
-#include "tbb/tick_count.h"
 
 CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
    const std::string& trackingType):
@@ -78,7 +79,9 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    ConvertSeeds(trackSeeds, lseeds);
    unsigned int nofTracks = 0;
 
-   tbb::tick_count t0 = tbb::tick_count::now();
+   TStopwatch timer1;
+   timer1.Start(kFALSE);
+
    if (fTrackingType == "nn_parallel_muon") {
       fTFParallelMuon->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
    } else if (fTrackingType == "nn_scalar_electron") {
@@ -86,10 +89,10 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    } else if (fTrackingType == "nn_vec_electron") {
       fTFVecElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
    }
+   timer1.Stop();
 
-   tbb::tick_count t1 = tbb::tick_count::now();
+   double dtime = timer1.RealTime();
 
-   double dtime = (t1-t0).seconds();
    fTime += dtime;
    std::cout << "Time: " << dtime << " sec" << std::endl;
    std::cout << "Total:" << fTime << " sec / " << fEventNo << " events." << std::endl;

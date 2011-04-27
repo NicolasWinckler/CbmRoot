@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Material info data class for fast parallel version of the Littrack tracking.
+ * Material info data class.
  **/
 
 #ifndef LITMATERIALINFO_H_

@@ -3,22 +3,19 @@
  * @since 2009
  * @version 1.0
  *
- * Functions of the Kalman filter update step
- * for parallel version of the tracking.
+ * Functions for Kalman filter update step.
  **/
 
 #ifndef LITFILTRATION_H_
 #define LITFILTRATION_H_
 
-//#include "LitTypes.h"
 #include "LitHit.h"
 
 namespace lit {
 namespace parallel {
 
-/* Function performs calculations of the Kalman filter update step,
- * taking into account hit information, and updates
- * track parameters and its covariance matrix.
+/* Function implements Kalman filter update step.
+ * It updates track parameters and covariance matrix.
  * @param par Reference to INPUT/OUTPUT track parameters.
  * @param mat Reference to pixel hit
  */
@@ -90,9 +87,8 @@ inline void LitFiltration (
    par.C14 += -K40 * cIn[4] - K41 * cIn[8];
 }
 
-/* Function performs calculations of the Kalman filter update step,
- * taking into account hit information, and updates
- * track parameters and its covariance matrix.
+/* Function implements Kalman filter update step.
+ * It updates track parameters and covariance matrix.
  * @param par Reference to INPUT/OUTPUT track parameters.
  * @param mat Reference to strip hit
  */

@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Hit data classes for fast parallel version of the Littrack tracking.
+ * Hit data classes.
  **/
 
 #ifndef LITHIT_H_

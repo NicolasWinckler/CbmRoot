@@ -2,6 +2,8 @@
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
+ *
+ * Classes and function to work with field.
  **/
 
 #ifndef LITFIELD_H_
@@ -10,10 +12,10 @@
 #include "LitMath.h"
 #include "LitUtils.h"
 
+#define LIT_POLYNOM_DEGREE 7
+
 namespace lit {
 namespace parallel {
-
-#define LIT_POLYNOM_DEGREE 7
 
 template<class T>
 class LitFieldValue

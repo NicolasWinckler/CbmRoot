@@ -3,7 +3,7 @@
  * @since 2010
  * @version 1.0
  **
- ** Interface class for fast tracking algorithm.
+ ** Interface class for tracking algorithm.
  **/
 
 #ifndef LITTRACKFINDER_H_

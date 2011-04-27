@@ -3,7 +3,7 @@
  * @since 2010
  * @version 1.0
  **
- ** Base class for fast implementation of the nearest
+ ** Base class for implementation of the nearest
  ** neighbor tracking algorithms. Implements some common
  ** functionality.
  **/

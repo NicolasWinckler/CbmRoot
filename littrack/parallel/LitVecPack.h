@@ -3,8 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Functions to pack and unpack vector data classes
- * for fast parallel version of the Littrack tracking.
+ * Functions to pack and unpack vector data classes.
  **/
 
 #ifndef LITVECPACK_H_

@@ -636,7 +636,7 @@ Bool_t CbmLitReconstructionQa::CheckRingQuality(
    fhRichRingHits[TRUEALL]->Fill(quali);
    fhRichRingHits[FAKEALL]->Fill(fakequali);
 
-   if (quali < fQuota) { return false; }
+   if (quali < fQuotaRich) { return false; }
    return true;
 }
 

@@ -1,7 +1,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 700){
+void run_reco(Int_t nEvents = 10){
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -32,8 +32,8 @@ void run_reco(Int_t nEvents = 700){
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
 	cbmlibs();
-
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
+
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	if (inFile != "") run->SetInputFile(inFile);
@@ -42,50 +42,83 @@ void run_reco(Int_t nEvents = 700){
 
     // =========================================================================
     // ===                     MVD local reconstruction                      ===
-    // =========================================================================
-//	if (IsMvd(parFile)) {
-		// -----   MVD Hitproducer   -----------------------------------------------
-		CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0,
-								  iVerbose);
-		run->AddTask(mvdHitProd);
-//	}
+	// =========================================================================
+    CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("MVD Digitizer", 0, iVerbose);
+    run->AddTask(mvdDigitizeL);
 
+    CbmMvdFindHits* mvdFindHits = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
+    run->AddTask(mvdFindHits);
+
+    // MVD ideal
+    //{
+    //CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
+    //run->AddTask(mvdHitProd);
+    //}
 
 	// =========================================================================
 	// ===                      STS local reconstruction                     ===
 	// =========================================================================
 
-	// -----   STS digitizer   -------------------------------------------------
-	FairTask* stsDigitize = new CbmStsIdealDigitize(iVerbose);
-	run->AddTask(stsDigitize);
+    { // STS REAL
+    Double_t threshold  =  4;
+    Double_t noiseWidth =  0.1;
+    Int_t    nofBits    = 20;
+    Double_t minStep    =  0.01;
+    Double_t StripDeadTime = 10.;
 
-	// -----   STS Cluster Finder   --------------------------------------------
-	//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
-	//                               iVerbose);
-	//  run->AddTask(stsClusterFinder);
+    CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+    stsDigitize->SetRealisticResponse();
+    stsDigitize->SetFrontThreshold (threshold);
+    stsDigitize->SetBackThreshold  (threshold);
+    stsDigitize->SetFrontNoiseWidth(noiseWidth);
+    stsDigitize->SetBackNoiseWidth (noiseWidth);
+    stsDigitize->SetFrontNofBits   (nofBits);
+    stsDigitize->SetBackNofBits    (nofBits);
+    stsDigitize->SetFrontMinStep   (minStep);
+    stsDigitize->SetBackMinStep    (minStep);
+    stsDigitize->SetStripDeadTime  (StripDeadTime);
+    run->AddTask(stsDigitize);
 
-	// -----  STS hit finding   ------------------------------------------------
-	FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
-	run->AddTask(stsFindHits);
+    FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+    run->AddTask(stsClusterFinder);
 
-	// -----  STS hit matching   -----------------------------------------------
-	CbmStsIdealMatchHits* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
-	run->AddTask(stsMatchHits);
+    FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
+    run->AddTask(stsFindHits);
 
-	// ---  STS track finding   ------------------------------------------------
+    CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
+    run->AddTask(stsMatchHits);
+    } // STS REAL
+
+/*
+    // STS IDEAL RESPONSE
+    {
+      FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
+      run->AddTask(stsDigitize);
+
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+      run->AddTask(stsClusterFinder);
+
+      FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
+      run->AddTask(stsFindHits);
+
+      FairTask* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
+      run->AddTask(stsMatchHits);
+    }
+*/
+
 	CbmKF* kalman = new CbmKF();
 	run->AddTask(kalman);
 	CbmL1* l1 = new CbmL1();
 	run->AddTask(l1);
+
 	CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
-	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);
+	Bool_t useMvd = kTRUE;
+	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, useMvd);
 	run->AddTask(stsFindTracks);
 
-	// ---   STS track matching   ----------------------------------------------
 	FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
 	run->AddTask(stsMatchTracks);
 
-	// ---   STS track fitting   -----------------------------------------------
 	CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
 	FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
 	run->AddTask(stsFitTracks);
@@ -95,24 +128,22 @@ void run_reco(Int_t nEvents = 700){
 	// =========================================================================
 	if (IsTrd(parFile)) {
 		// Update of the values for the radiator F.U. 17.08.07
-		Int_t trdNFoils    = 130;      // number of polyetylene foils
-		Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-		Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-		Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
-									 // production
+		Int_t trdNFoils = 130; // number of polyetylene foils
+		Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
+		Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
+		Bool_t simpleTR = kTRUE; // use fast and simple version for TR production
 
-		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
-										   trdDFoils, trdDGap);
+		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
 
 		// -----   TRD hit producer   ----------------------------------------------
-		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+		Double_t trdSigmaX[] = {300, 400, 500}; // Resolution in x [mum]
 		// Resolutions in y - station and angle dependent [mum]
 		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
 		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
 		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
 		CbmTrdHitProducerSmearing* trdHitProd = new
-			   CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+			   CbmTrdHitProducerSmearing("CbmTrdHitProducer", "CbmTrdHitProducer", radiator);
 
 		trdHitProd->SetSigmaX(trdSigmaX);
 		trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
@@ -124,8 +155,7 @@ void run_reco(Int_t nEvents = 700){
 	// =========================================================================
 	if (IsTof(parFile)) {
 		// ------   TOF hit producer   ---------------------------------------------
-		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
-									iVerbose);
+		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", iVerbose);
 		run->AddTask(tofHitProd);
 	} //isTof
 
@@ -138,64 +168,55 @@ void run_reco(Int_t nEvents = 700){
 	finder->SetMergerType("nearest_hit");
 	run->AddTask(finder);
 
-	// -----   Primary vertex finding   ---------------------------------------
 	CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
 	CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
 	run->AddTask(findVertex);
 
 
 	if (IsTrd(parFile)) {
-		// -----   TRD track matching   --------------------------------------------
 		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
 		run->AddTask(trdMatchTracks);
 
-		  // ----------- TRD track Pid Wkn ----------------------
-		CbmTrdSetTracksPidWkn* trdSetTracksPidTask = new
-		CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
+		CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
+				new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
 		run->AddTask(trdSetTracksPidTask);
 
-		// ----------- TRD track Pid Ann ----------------------
-		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
-		CbmTrdSetTracksPidANN("Ann","Ann");
+		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask =
+				new	CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
 		run->AddTask(trdSetTracksPidAnnTask);
 
-		// ----------- TRD track Pid Like ----------------------
-		// Since in the newest version of this method depends on the global
-		// track the task has to move after the global tracking
-		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask = new
-		CbmTrdSetTracksPidLike("Likelihood","Likelihood");
+		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
+				new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
 		run->AddTask(trdSetTracksPidLikeTask);
 	}//isTrd
 
     // =========================================================================
     // ===                        RICH reconstruction                        ===
     // =========================================================================
-	if (IsRich(parFile)) {
+	if (IsRich(parFile)){
+	//if (false){
 		// ---------------------RICH Hit Producer ----------------------------------
-		Double_t richPmtRad  = 0.4;     // PMT radius [cm]
-		Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-		Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
-		Int_t    richNoise   = 220;     // Number of noise points per event
+		Double_t richPmtRad = 0.4; // PMT radius [cm]
+		Double_t richPmtDist = 0.; // Distance between PMTs [cm]
+		Int_t richDetType = 4; // Detector type Hamamatsu H8500-03
+		Int_t richNoise = 220; // Number of noise points per event
 		Double_t collectionEff = 1.0;
-		Double_t richSMirror = 0.1;     // Sigma for additional point smearing due to light scattering in mirror
-		CbmRichHitProducer* richHitProd
-			= new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-					 richNoise, iVerbose, collectionEff,richSMirror);
+		Double_t richSMirror = 0.06; // Sigma for additional point smearing due to light scattering in mirror
+		CbmRichHitProducer* richHitProd	= new CbmRichHitProducer(richPmtRad, richPmtDist,
+				richDetType, richNoise, iVerbose, collectionEff,richSMirror);
 		run->AddTask(richHitProd);
 
 		//----------------------RICH Track Extrapolation ---------------------------
-		Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
-		Double_t richZPos = 300.;  // z position for extrapolation [cm]
-		CbmRichTrackExtrapolation* richExtra
-			= new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
+		Int_t richNSts = 4; // minimum number of STS hits for extrapolation
+		Double_t richZPos = 300.; // z position for extrapolation [cm]
+		CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
 		CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
 		richExtrapolate->UseExtrapolation(richExtra,richZPos);
 		run->AddTask(richExtrapolate);
 
 		//--------------------- Rich Track Projection to photodetector -------------
-		Int_t richZFlag = 1;       // Projection from IM plane (default)
-		CbmRichProjectionProducer* richProj =
-				new CbmRichProjectionProducer(iVerbose, richZFlag);
+		Int_t richZFlag = 1; // Projection from IM plane (default)
+		CbmRichProjectionProducer* richProj = new CbmRichProjectionProducer(iVerbose, richZFlag);
 		run->AddTask(richProj);
 
 		//--------------------- RICH Ring Finding ----------------------------------
@@ -208,7 +229,7 @@ void run_reco(Int_t nEvents = 700){
 
 		//-------------------- RICH Ring Fitting -----------------------------------
 		CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
-		CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
+		CbmRichFitRings* fitRings = new CbmRichFitRings("CbmRichFitRings","CbmRichFitRings",richFitter);
 		run->AddTask(fitRings);
 
 		// ------------------- RICH Ring matching  ---------------------------------
@@ -216,17 +237,49 @@ void run_reco(Int_t nEvents = 700){
 		run->AddTask(matchRings);
 
 	    //--------------------- RICH ring-track assignment ------------------------
-		Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-		Int_t    richNPoints  = 5;   // Minmum number of hits on ring
+		Double_t richDistance = 10.; // Max. dist. ring center to track [cm]
+		Int_t richNPoints  = 5;   // Minimum number of hits on ring
 		CbmRichRingTrackAssign* richAssign   =
 				new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
 		CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
 		assignTrack->UseAssign(richAssign);
 		run->AddTask(assignTrack);
 
-		CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
+		CbmRichRingQa* richQa   =  new CbmRichRingQa("CbmRichRingQa","CbmRichRingQa", 0);
 		run->AddTask(richQa);
+
+		CbmRichElectronsQa* elQa = new CbmRichElectronsQa("CbmRichElectronsQa", "CbmRichElectronsQa", 0);
+		elQa->SetGeoType("compact"); //or large
+		//elQa->SetImageOutDir(outImageDir);
+		elQa->SetRichAnnCut(-0.5);
+		elQa->SetUseRichAnn(true);
+		elQa->SetTrdAnnCut(0.8);
+		elQa->SetMeanA(5.02);
+		elQa->SetMeanB(4.68);
+		elQa->SetRmsA(0.22);
+		elQa->SetRmsB(0.167);
+		elQa->SetRmsCoeff(3.5);
+		elQa->SetDistCut(1.);
+		run->AddTask(elQa);
+
 	}//isRich
+
+	// Reconstruction Qa
+	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+	reconstructionQa->SetMinNofPointsSts(4);
+	reconstructionQa->SetMinNofPointsTrd(9);
+	reconstructionQa->SetMinNofPointsMuch(10);
+	reconstructionQa->SetMinNofPointsTof(1);
+	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetMinNofHitsTrd(9);
+	reconstructionQa->SetMinNofHitsMuch(10);
+	reconstructionQa->SetVerbose(0);
+	reconstructionQa->SetMomentumRange(0, 12);
+	reconstructionQa->SetNofBinsMom(12);
+	reconstructionQa->SetMinNofHitsRich(7);
+	reconstructionQa->SetQuotaRich(0.7);
+	reconstructionQa->SetOutputDir("recoIm/");
+	run->AddTask(reconstructionQa);
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===
@@ -236,7 +289,6 @@ void run_reco(Int_t nEvents = 700){
 //  CbmEcalHitProducerFastMC* ecalHitProd
 //    = new CbmEcalHitProducerFastMC("ECAL Hitproducer");
 //  run->AddTask(ecalHitProd);
-
 
     // -----  Parameter database   --------------------------------------------
     TString stsDigi = gSystem->Getenv("VMCWORKDIR");
@@ -252,8 +304,6 @@ void run_reco(Int_t nEvents = 700){
     rtdb->setOutput(parIo1);
     rtdb->saveOutput();
 
-    // -----   Intialise and run   --------------------------------------------
-    run->LoadGeometry();
     run->Init();
     cout << "Starting run" << endl;
     run->Run(0,nEvents);
@@ -263,7 +313,7 @@ void run_reco(Int_t nEvents = 700){
     Double_t rtime = timer.RealTime();
     Double_t ctime = timer.CpuTime();
     cout << endl << endl;
-    cout << "Macro finished succesfully." << endl;
+    cout << "Macro finished successfully." << endl;
     cout << "Output file is "    << outFile << endl;
     cout << "Parameter file is " << parFile << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;

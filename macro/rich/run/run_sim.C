@@ -21,9 +21,9 @@ void run_sim(Int_t nEvents = 700)
 	TString plutoFile = "";
 	TString plutoParticle = "";
 
-	// -----   Magnetic field   -----------------------------------------------
-	Double_t fieldZ     = 50.;             // field centre z position
-	Double_t fieldScale =  0.7;             // field scaling factor
+	// Magnetic field
+	Double_t fieldZ = 50.; // field centre z position
+	Double_t fieldScale =  1.0; // field scaling factor
 
 	if (script != "yes") {
 		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
@@ -38,7 +38,7 @@ void run_sim(Int_t nEvents = 700)
 		mvdGeom = "";
 		stsGeom    = "sts_standard.geo";
 		richGeom   = "rich_standard.geo";
-		trdGeom    = "trd_standard.geo";
+		trdGeom    = "trd_standard_dec10.geo";
 		tofGeom    = "tof_standard.geo";
 		//ecalGeom   = "ecal_FastMC.geo";
 
@@ -88,14 +88,11 @@ void run_sim(Int_t nEvents = 700)
 	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
 	cbmlibs();
 
-	// -----   Create simulation run   ----------------------------------------
 	FairRunSim* fRun = new FairRunSim();
 	fRun->SetName("TGeant3");              // Transport engine
 	fRun->SetOutputFile(outFile);          // Output file
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-	// ------------------------------------------------------------------------
 
-	// -----   Create media   -------------------------------------------------
 	fRun->SetMaterials("media.geo");       // Materials
 
 	// -----   Create detectors and passive volumes   -------------------------
@@ -177,7 +174,7 @@ void run_sim(Int_t nEvents = 700)
 	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	if (urqmd == "yes"){
-		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+		FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(inFile);
 		primGen->AddGenerator(urqmdGen);
 	}
 

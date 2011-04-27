@@ -8,8 +8,8 @@
  * Macro has 3 options "all", "hits" and "tracking".
  **/
 
-void global_reco(Int_t nEvents = 10, // number of events
-		TString opt = "all")
+void global_reco(Int_t nEvents = 100, // number of events
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -27,8 +27,8 @@ void global_reco(Int_t nEvents = 10, // number of events
 	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
-	     //   dir = "/d/cbm02/andrey/muon/straw_trd_10mu_urqmd/";
-		dir = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/";
+	   dir = "/d/cbm02/andrey/muon/std_10mu_urqmd/";
+//		dir = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -52,7 +52,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 		// Directory for output images
 		TString imageDir = "./trd_test/";
 		// Tracking type
-		trackingType = "branch";
+		trackingType = "nn_parallel";
 		// Normalization for efficiency
 		normStsPoints = 4;
 		normTrdPoints = 8;
@@ -96,7 +96,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	timer.Start();
 
 //	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 //	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");

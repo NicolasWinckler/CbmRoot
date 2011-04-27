@@ -17,11 +17,11 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	if (script != "yes") {
-		dir  = "/d/cbm02/andrey/muon/straw_trd_10mu/";
+      dir = "/d/cbm02/andrey/muon/std_10mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
-		muchDigiFile = parDir + "/much/much_standard_straw_trd.digi.root";
+		muchDigiFile = parDir + "/much/much_standard.digi.root";
 		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
 		parFileList->Add(&stsDigiFile);
 		TObjString trdDigiFile = parDir + "/trd/trd_standard.digi.par";
@@ -44,9 +44,9 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+//	gSystem->Load("/home/soft/tbb/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -180,20 +180,83 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	run->AddTask(findVertex);
 	// ------------------------------------------------------------------------
 
+
+   if (IsRich(parFile)) {
+     // ---------------------RICH Hit Producer ----------------------------------
+     Double_t richPmtRad = 0.4; // PMT radius [cm]
+     Double_t richPmtDist = 0.; // Distance between PMTs [cm]
+     Int_t richDetType = 4; // Detector type Hamamatsu H8500-03 (no WLS)
+     Int_t richNoise = 220; // Number of noise points per event
+     Double_t richCollEff = 1.0; // Collection Efficiency of PMT electron optics
+     Double_t richSMirror = 0.06; // Sigma for additional point smearing due to light scattering in mirror
+
+     CbmRichHitProducer* richHitProd = new CbmRichHitProducer(richPmtRad,
+         richPmtDist, richDetType, richNoise, iVerbose, richCollEff, richSMirror);
+     run->AddTask(richHitProd);
+     //--------------------------------------------------------------------------
+
+     //----------------------RICH Track Extrapolation ---------------------------
+     Int_t richNSts = 4; // minimum number of STS hits for extrapolation
+     Double_t richZPos = 300.; // z position for extrapolation [cm]
+     CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(
+         richNSts, iVerbose);
+     CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
+     richExtrapolate->UseExtrapolation(richExtra, richZPos);
+     run->AddTask(richExtrapolate);
+     //--------------------------------------------------------------------------
+
+     //--------------------- Rich Track Projection to photodetector -------------
+     Int_t richZFlag = 1; // Projetion from IM plane (default)
+     CbmRichProjectionProducer* richProj = new CbmRichProjectionProducer(iVerbose, richZFlag);
+     run->AddTask(richProj);
+     //--------------------------------------------------------------------------
+
+     //--------------------- RICH Ring Finding ----------------------------------
+     TString richGeoType = "compact";//choose between compact or large
+     CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose,   richGeoType);
+     CbmRichFindRings* richFindRings = new CbmRichFindRings();
+     richFindRings->UseFinder(richFinder);
+     run->AddTask(richFindRings);
+     //--------------------------------------------------------------------------
+
+     //-------------------- RICH Ring Fitting -----------------------------------
+     CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose,   1, richGeoType);
+     CbmRichFitRings* fitRings = new CbmRichFitRings("", "", richFitter);
+     run->AddTask(fitRings);
+     //--------------------------------------------------------------------------
+
+     // ------------------- RICH Ring matching  ---------------------------------
+     CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
+     run->AddTask(matchRings);
+     // -------------------------------------------------------------------------
+
+     //--------------------- RICH ring-track assignment ------------------------
+     Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
+     Int_t richNPoints = 5; // Minmum number of hits on ring
+     CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD(
+         richDistance, richNPoints, iVerbose);
+     CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
+     assignTrack->UseAssign(richAssign);
+     run->AddTask(assignTrack);
+     // ------------------------------------------------------------------------
+   }
+
 	// ------- Track finding QA check   ---------------------------------------
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(3);
-	reconstructionQa->SetMinNofPointsMuch(11);
-	reconstructionQa->SetMinNofPointsTof(1);
-	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(3);
-	reconstructionQa->SetMinNofHitsMuch(11);
-	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetMomentumRange(0., 12);
-	reconstructionQa->SetNofBinsMom(12);
-	reconstructionQa->SetOutputDir(std::string(imageDir));
-	run->AddTask(reconstructionQa);
+   CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+   reconstructionQa->SetMinNofPointsSts(4);
+   reconstructionQa->SetMinNofPointsTrd(8);
+   reconstructionQa->SetMinNofPointsMuch(16);
+   reconstructionQa->SetMinNofPointsTof(1);
+   reconstructionQa->SetQuota(0.7);
+   reconstructionQa->SetMinNofHitsTrd(8);
+   reconstructionQa->SetMinNofHitsMuch(16);
+   reconstructionQa->SetVerbose(0);
+   reconstructionQa->SetMomentumRange(0, 12);
+   reconstructionQa->SetNofBinsMom(12);
+   reconstructionQa->SetMinNofHitsRich(7);
+   reconstructionQa->SetQuotaRich(0.7);
+   reconstructionQa->SetOutputDir(std::string(imageDir));
+   run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

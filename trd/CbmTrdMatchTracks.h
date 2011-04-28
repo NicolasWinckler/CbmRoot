@@ -11,6 +11,7 @@
  ** each CbmTrdTrack.
  **
  ** Updated 18/06/10 by A.Lebedev to support digis in TRD.
+ ** Updated 12/04/11 by A.Lebedev to support clusters in TRD
  **/
 
 #ifndef CBMTRDMATCHTRACKS_H
@@ -26,48 +27,52 @@ public:
 	CbmTrdMatchTracks();
 
 	/** Constructor with verbosity level **/
-	CbmTrdMatchTracks(Int_t verbose);
+	CbmTrdMatchTracks(
+			Int_t verbose);
 
 	/** Constructor with name, title and verbosity
-	 **
 	 *@param name     Name of taks
 	 *@param title    Title of task   (default FairTask)
 	 *@param verbose  Verbosity level (default 1)
 	 **/
-	CbmTrdMatchTracks(const char* name, const char* title = "FairTask",
+	CbmTrdMatchTracks(
+			const char* name,
+			const char* title = "FairTask",
 			Int_t verbose = 1);
 
 	/** Destructor **/
 	virtual ~CbmTrdMatchTracks();
 
-	/** Intialisation at beginning of each event **/
+	/** Inherited from FairTask **/
 	virtual InitStatus Init();
 
-	/** Execution **/
-	virtual void Exec(Option_t* opt);
+	/** Inherited from FairTask **/
+	virtual void Exec(
+			Option_t* opt);
 
-	/** Finishing */
+	/** Inherited from FairTask */
 	virtual void Finish();
 
 private:
-
-        CbmTrdMatchTracks& operator=(const  CbmTrdMatchTracks&);
-        CbmTrdMatchTracks(const  CbmTrdMatchTracks&);        
                 
 	/** Execution in case of smearing hit producer **/
-	virtual void ExecSmearing(Option_t* opt);
+	virtual void ExecSmearing(
+			Option_t* opt);
 
 	/** Execution in case of digi hit producer **/
-	virtual void ExecDigi(Option_t* opt);
+	virtual void ExecDigi(
+			Option_t* opt);
 
 	/** Execution in  case of clustering **/
-        virtual void ExecCluster(Option_t* opt);
+    virtual void ExecCluster(
+    		Option_t* opt);
 
 	TClonesArray* fTracks; // Array of CbmTrdTracks
 	TClonesArray* fPoints; // Array of FairMCPoints
 	TClonesArray* fHits; // Array of CbmTrdHits
-        TClonesArray* fClusters; // Array of CbmTrdCluster
-	TClonesArray* fDigiMatches; // Array of CbmTrdDigiMatch;
+   TClonesArray* fClusters; // Array of CbmTrdCluster
+	TClonesArray* fDigiMatches; // Array of CbmTrdDigiMatch
+//	TClonesArray* fDigis; // Array of CbmTrdDigi
 	TClonesArray* fMatches; // Array of CbmTrackMatch
 
 	Int_t fNofHits; // Total number of hits
@@ -82,9 +87,9 @@ private:
 	Bool_t fUseDigis;
 
 	/** If true than matching will be done using clusters **/
-        Bool_t fUseClusters;
+   Bool_t fUseClusters;
 
-ClassDef(CbmTrdMatchTracks,2);
+    ClassDef(CbmTrdMatchTracks, 2);
 };
 
 #endif

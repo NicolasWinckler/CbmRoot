@@ -759,8 +759,6 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichTrdMap, fhStsRichTrdMomNormStsRichTrdTof, mcTrack->GetP());
          // STS+RICH+TRD+TOF normalized to STS+RICH+TRD+TOF
          FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichTrdTofMap, fhStsRichTrdTofMom, mcTrack->GetP());
-
-
       }
    } // Loop over MCTracks
 }

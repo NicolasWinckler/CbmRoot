@@ -17,7 +17,7 @@
 //#pragma link C++ class CbmLitToolFactory+;
 //#pragma link C++ class CbmLitHitData+;
 #pragma link C++ class CbmLitTask+;
-
+#pragma link C++ class CbmLitGlobalElectronId+;
 // cbm
 //#pragma link C++ class CbmPropagatorGeane+;
 //#pragma link C++ class CbmPropagatorLit+;

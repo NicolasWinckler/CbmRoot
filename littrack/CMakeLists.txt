@@ -9,7 +9,6 @@ ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
 ${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
-${CBMROOT_SOURCE_DIR}/littrack/utils
 ${CBMROOT_SOURCE_DIR}/littrack/std
 ${CBMROOT_SOURCE_DIR}/littrack/cbm
 ${CBMROOT_SOURCE_DIR}/geobase
@@ -31,6 +30,7 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/rich
 )
 
 set(TBB_FOUND FALSE)
@@ -66,6 +66,8 @@ set(LITTRACK_SRCS_RULECHECKER
 ##cbm/base/CbmLitFieldFitter.cxx
 ##cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/base/CbmLitTask.cxx
+
+cbm/elid/CbmLitGlobalElectronId.cxx
 
 ##cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
 ##cbm/finder/CbmLitFindGlobalTracks.cxx 
@@ -110,6 +112,7 @@ EndIf(TBB_FOUND)
 
 set(LITTRACK_HEADERS
 cbm/base/CbmLitTask.h
+cbm/elid/CbmLitGlobalElectronId.h
 #cbm/finder/CbmLitTrdTrackFinderStandalone.h
 cbm/finder/CbmLitFindGlobalTracks.h
 #cbm/finder/CbmLitCudaTest.h 

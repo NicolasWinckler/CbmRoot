@@ -1495,6 +1495,7 @@ void CbmLitReconstructionQa::Draw()
    DrawEfficiencyHistos();
    DrawHitsHistos();
    DrawHitsStationHistos();
+   DrawStsTracksQaHistos();
    std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
    PrintFinalStatistics(fout);
 }
@@ -1677,6 +1678,21 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	if (fIsTrd) {DrawHitsStationHisto("rec_qa_trd_hits_station", fhTrdNofHitsInStation);}
 	if (fIsMuch) {DrawHitsStationHisto("rec_qa_much_hits_station", fhMuchNofHitsInStation);}
 	if (fIsTof) {DrawHitsStationHisto("rec_qa_tof_hits_station", fhTofNofHitsInStation);}
+}
+
+void CbmLitReconstructionQa::DrawStsTracksQaHistos()
+{
+   TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa_chi2Vertex", "rec_qa_sts_tracks_qa_chi2Vertex", 600, 500);
+   DrawHist1D(fhStsChiprim, "Chi2Vertex", "Counter",
+            LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+            LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
+   lit::SaveCanvasAsImage(canvas1, fOutputDir);
+
+   TCanvas* canvas2 = new TCanvas("rec_qa_sts_tracks_qa_momres", "rec_qa_sts_tracks_qa_momres", 600, 500);
+   DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP", "Counter",
+            LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+            LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
+   lit::SaveCanvasAsImage(canvas2, fOutputDir);
 }
 
 void CbmLitReconstructionQa::DrawHistosFromFile(const std::string& fileName)

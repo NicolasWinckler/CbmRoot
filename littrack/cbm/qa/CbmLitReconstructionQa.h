@@ -312,6 +312,9 @@ private:
    /* Draws histograms of number of hits in station */
    void DrawHitsStationHistos();
 
+   /* Draws histograms of Sts tracks Qa */
+   void DrawStsTracksQaHistos();
+
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
    Int_t fMinNofPointsTrd; // Minimal number of MCPoints in TRD
    Int_t fMinNofPointsMuch; // Minimal number of MCPoints in MUCH

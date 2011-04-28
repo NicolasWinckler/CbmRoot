@@ -1689,7 +1689,7 @@ void CbmLitReconstructionQa::DrawStsTracksQaHistos()
    lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
    TCanvas* canvas2 = new TCanvas("rec_qa_sts_tracks_qa_momres", "rec_qa_sts_tracks_qa_momres", 600, 500);
-   DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP", "Counter",
+   DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP [%]", "Counter",
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
             LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
    lit::SaveCanvasAsImage(canvas2, fOutputDir);

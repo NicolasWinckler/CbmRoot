@@ -12,6 +12,7 @@
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
+#include "CbmStsKFTrackFitter.h"
 
 #include <map>
 #include <string>
@@ -19,9 +20,12 @@
 
 class CbmTrackMatch;
 class CbmRichRingMatch;
+class CbmVertex;
+class CbmStsKFTrackFitter;
 class CbmMCTrack;
 class TClonesArray;
 class TH1;
+class TH2F;
 class TH1F;
 class TList;
 class TCanvas;
@@ -181,6 +185,9 @@ private:
       const std::multimap<Int_t, Int_t>& mcMap,
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
+
+   /* Fills the histograms: momentum resolution vs. momentum and chi2Vertex.*/
+   void StsTracksQa();
 
    /* Creates histograms - hist using specified parameters.
    * @param hist 2D vector of the histograms
@@ -455,10 +462,15 @@ private:
    TH1F* fhNofMuchPixelHits; // MUCH pixel hits
    TH1F* fhNofMuchStrawHits; // MUCH straw hits
    TH1F* fhNofTofHits; // TOF hits
+   TH1F* fhStsChiprim; //chi2Vertex
+   TH2F* fhStsMomresVsMom; // momentum resolution vs momentum
 
    TH1F* fhEventNo; // Event counter
 
    std::string fOutputDir; // Output directory for images
+
+   CbmVertex *fPrimVertex;
+   CbmStsKFTrackFitter* fKFFitter;
 
    ClassDef(CbmLitReconstructionQa, 1);
 };

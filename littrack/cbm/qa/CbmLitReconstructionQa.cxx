@@ -23,9 +23,12 @@
 #include "CbmMvdHitMatch.h"
 #include "CbmRichRingMatch.h"
 #include "CbmRichHit.h"
+#include "CbmVertex.h"
+#include "CbmStsKFTrackFitter.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TList.h"
 #include "TCanvas.h"
 #include "TLegend.h"
@@ -179,6 +182,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fhNofMuchPixelHits(NULL),
    fhNofMuchStrawHits(NULL),
    fhNofTofHits(NULL),
+   fhStsChiprim(NULL),
+   fhStsMomresVsMom(NULL),
 
    fhEventNo(NULL),
 
@@ -212,6 +217,7 @@ void CbmLitReconstructionQa::Exec(
    ProcessHits();
    ProcessGlobalTracks();
    ProcessMcTracks();
+   StsTracksQa();
    PrintEventStatistics();
    IncreaseCounters();
 }
@@ -325,6 +331,12 @@ void CbmLitReconstructionQa::ReadDataBranches()
       fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
       if (NULL == fTofHits) { Fatal("Init", "No TofHit array!"); }
    }
+
+   fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
+   if (NULL == fPrimVertex) {Fatal("CbmAnaElectronsQa::Init", "No Primary Vertex!");}
+
+   fKFFitter = new CbmStsKFTrackFitter();
+   fKFFitter->Init();
 }
 
 void CbmLitReconstructionQa::ProcessHits()
@@ -834,6 +846,40 @@ void CbmLitReconstructionQa::FillGlobalReconstructionHistosRich(
    }
 }
 
+void CbmLitReconstructionQa::StsTracksQa()
+{
+   Int_t nSts = fStsTracks->GetEntriesFast();
+   for (Int_t i = 0; i < nSts; i++) {
+      CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(i);
+      if (!stsTrack) continue;
+      CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(i);
+      if (!stsTrackMatch) continue;
+      Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
+      if (mcIdSts < 0) continue;
+      CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdSts);
+
+      Int_t motherId = mcTrack->GetMotherId();
+
+      if (motherId != -1) continue;
+
+      TVector3 momMC;
+      mcTrack->GetMomentum(momMC);
+      //fKFFitter.DoFit(stsTrack,11);
+      Double_t chiPrimary = fKFFitter->GetChiToVertex(stsTrack, fPrimVertex);
+      fhStsChiprim->Fill(chiPrimary);
+
+      FairTrackParam vtxTrack;
+      fKFFitter->FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
+      TVector3 momRec;
+      vtxTrack.Momentum(momRec);
+
+      Double_t dpp = 100. * (momMC.Mag() - momRec.Mag()) / momMC.Mag();
+      fhStsMomresVsMom->Fill(momMC.Mag(), dpp);
+      //fh_count_mom_vs_mom_signal->Fill(momMC.Mag());
+      //fh_mean_mom_vs_mom_signal->Fill(momMC.Mag(), dpp);
+   }
+}
+
 void CbmLitReconstructionQa::CreateEffHisto(
 		std::vector<std::vector<TH1F*> >& hist,
 		const std::string& name,
@@ -995,6 +1041,8 @@ void CbmLitReconstructionQa::CreateHistos(
 	   fhNofMuchPixelHits = new TH1F("hNofMuchPixelHits","hNofMuchPixelHits", 100, 1., 1.);
 	   fhNofMuchStrawHits = new TH1F("hNofMuchStrawHits","hNofMuchStrawHits", 100, 1., 1.);
 	   fhNofTofHits = new TH1F("hNofTofHits","hNofTofHits", 100, 1., 1.);
+	   fhStsChiprim = new TH1F("fhStsChiprim","fhStsChiprim", 150, 0., 15.);
+	   fhStsMomresVsMom = new TH2F("fhStsMomresVsMom","fhStsMomresVsMom", 120, 0., 12., 100, -15., 15.);
    }else {
 	   fhNofGlobalTracks = (TH1F*)file->Get("hNofGlobalTracks");
 	   fhNofStsTracks = (TH1F*)file->Get("hNofStsTracks");
@@ -1009,6 +1057,8 @@ void CbmLitReconstructionQa::CreateHistos(
 	   fhNofMuchPixelHits = (TH1F*)file->Get("hNofMuchPixelHits");
 	   fhNofMuchStrawHits = (TH1F*)file->Get("hNofMuchStrawHits");
 	   fhNofTofHits = (TH1F*)file->Get("hNofTofHits");
+	   fhStsChiprim = (TH1F*)file->Get("fhStsChiprim");
+	   fhStsMomresVsMom = (TH2F*)file->Get("fhStsMomresVsMom");
    }
    fHistoList->Add(fhNofGlobalTracks);
    fHistoList->Add(fhNofStsTracks);
@@ -1023,6 +1073,8 @@ void CbmLitReconstructionQa::CreateHistos(
    fHistoList->Add(fhNofMuchPixelHits);
    fHistoList->Add(fhNofMuchStrawHits);
    fHistoList->Add(fhNofTofHits);
+   fHistoList->Add(fhStsChiprim);
+   fHistoList->Add(fhStsMomresVsMom);
 
    // Histogram store number of events
    if (file == NULL){
@@ -1264,6 +1316,11 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
    out << std::setfill('_') << std::setw(7*17) << "_"<< std::endl;
 
    PrintGhostStatistics(out);
+
+   out << "Chi2 to primary vertex: mean = " << fhStsChiprim->GetMean()
+         << " RMS = " << fhStsChiprim->GetRMS() << std::endl;
+   out << "Momentum resolution: mean = " << fhStsMomresVsMom->ProjectionY()->GetMean()
+         << " RMS = " << fhStsMomresVsMom->ProjectionY()->GetRMS() << std::endl;
 
    out << "Polar angle efficiency:" << std::endl;
    out << "STS:" << std::endl;

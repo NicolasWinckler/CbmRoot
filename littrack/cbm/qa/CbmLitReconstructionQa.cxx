@@ -1230,6 +1230,7 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
    std::ostream& out)
 {
    out << "-I- CbmLitReconstructionQa final statistics:" << std::endl;
+   out << "Number of events: " << (Int_t)fhEventNo->GetEntries() << std::endl;
    out << "Number of hits: ";
    if (fIsMvd) { out << "MVD=" << fhNofMvdHits->GetMean(); }
    if (fIsSts) { out << " STS=" << fhNofStsHits->GetMean(); }

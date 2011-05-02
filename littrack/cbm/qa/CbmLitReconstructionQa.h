@@ -29,6 +29,7 @@ class TH2F;
 class TH1F;
 class TList;
 class TCanvas;
+class CbmLitGlobalElectronId;
 
 class CbmLitReconstructionQa : public FairTask
 {
@@ -173,6 +174,14 @@ private:
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
 
+   /* */
+   void FillGlobalElIdHistos(
+      const CbmMCTrack* mcTrack,
+      Int_t mcId,
+      const std::multimap<Int_t, Int_t>& mcMap,
+      std::vector<TH1F*>& hist,
+      Double_t par);
+
     /* Fills the histograms of the accepted and reconstructed rings tracks.
     * @param mcTrack MC track pointer
     * @param mcId MC track index in the array
@@ -205,6 +214,16 @@ private:
    		Double_t maxBin,
    		const std::string& opt,
    		TFile* file);
+
+   /* */
+   void CreateEffHistoElId(
+         std::vector<TH1F*>& hist,
+         const std::string& name,
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin,
+         const std::string& opt,
+         TFile* file);
 
    /* Creates the histograms.
     *@param file if file==NULL then create histograms else read histograms from file*/
@@ -274,18 +293,14 @@ private:
    /* Draws efficiency plots */
    void DrawEfficiency(
    		const std::string& canvasName,
-   		const std::vector<std::vector<TH1F*> >& hist1,
-   		const std::vector<std::vector<TH1F*> >& hist2,
-   		const std::vector<std::vector<TH1F*> >& hist3,
-   		const std::vector<std::vector<TH1F*> >& hist4,
+   		const std::vector<TH1F*>* hist1,
+   		const std::vector<TH1F*>* hist2,
+   		const std::vector<TH1F*>* hist3,
+   		const std::vector<TH1F*>* hist4,
    		const std::string& name1,
    		const std::string& name2,
    		const std::string& name3,
-   		const std::string& name4,
-   		Int_t category1,
-   		Int_t category2,
-   		Int_t category3,
-   		Int_t category4);
+   		const std::string& name4);
 
    /* Calculate efficiency for two histograms */
    Double_t CalcEfficiency(
@@ -314,6 +329,9 @@ private:
 
    /* Draws histograms of Sts tracks Qa */
    void DrawStsTracksQaHistos();
+
+   /* Calculate electron Identification */
+   void ElectronIdentification();
 
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
    Int_t fMinNofPointsTrd; // Minimal number of MCPoints in TRD
@@ -466,7 +484,14 @@ private:
    TH1F* fhNofMuchStrawHits; // MUCH straw hits
    TH1F* fhNofTofHits; // TOF hits
    TH1F* fhStsChiprim; //chi2Vertex
-   TH2F* fhStsMomresVsMom; // momentum resolution vs momentum
+   TH2F* fhStsMomresVsMom; // momentum resolution vs. momentum
+
+
+   // Electron identification
+   TH1F* fhPiAcc;
+   std::vector<TH1F*> fhStsTrdMomElId; // STS+TRD: momentum dependence
+   std::vector<TH1F*> fhStsTrdMomElIdNormStsTrdTof; // STS+TRD: momentum dependence, normalized to STS+TRD+TOF
+   std::vector<TH1F*> fhStsTrdTofMomElId; // STS+TRD+TOF: momentum dependence
 
    TH1F* fhEventNo; // Event counter
 
@@ -474,6 +499,8 @@ private:
 
    CbmVertex *fPrimVertex;
    CbmStsKFTrackFitter* fKFFitter;
+
+   CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 
    ClassDef(CbmLitReconstructionQa, 1);
 };

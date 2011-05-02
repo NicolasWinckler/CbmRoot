@@ -9,6 +9,7 @@
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
+#include "elid/CbmLitGlobalElectronId.h"
 
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
@@ -34,6 +35,7 @@
 #include "TLegend.h"
 #include "TPad.h"
 #include "TFile.h"
+#include "TProfile.h"
 
 #include <iostream>
 #include <map>
@@ -187,7 +189,12 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 
    fhEventNo(NULL),
 
-   fOutputDir("")
+   fOutputDir(""),
+
+   fPrimVertex(NULL),
+   fKFFitter(NULL),
+
+   fElectronId(NULL)
 {
 }
 
@@ -202,6 +209,9 @@ InitStatus CbmLitReconstructionQa::Init()
    DetermineSetup();
    ReadDataBranches();
    CreateHistos(NULL);
+
+   fElectronId = new CbmLitGlobalElectronId();
+   fElectronId->Init();
 
    return kSUCCESS;
 }
@@ -700,6 +710,9 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMomNormHalfGlobal, mcTrack->GetP());
     	 // STS+TRD(MUCH)
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhHalfGlobalMom, mcTrack->GetP());
+
+         // STS+TRD: Electron identification
+         FillGlobalElIdHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhStsTrdMomElId, mcTrack->GetP());
       }
       // acceptance: STS+TRD(MUCH)+TOF
       if (isStsOk && isRecOk && isTofOk) {
@@ -711,6 +724,11 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhHalfGlobalMomNormGlobal, mcTrack->GetP());
     	 // STS+TRD(MUCH)+TOF
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhGlobalMom, mcTrack->GetP());
+
+         // STS+TRD normalized to STS+TRD+TOF: Electron identification
+         FillGlobalElIdHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhStsTrdMomElIdNormStsTrdTof, mcTrack->GetP());
+         // STS+TRD+TOF: Electron identification
+         FillGlobalElIdHistos(mcTrack, iMCTrack, fMcGlobalMap, fhStsTrdTofMomElId, mcTrack->GetP());
       }
 
       // acceptance: STS as 100% + local TRD(MUCH) track cutting on number of points
@@ -807,6 +825,29 @@ void CbmLitReconstructionQa::FillGlobalReconstructionHistos(
       if (!isPrim) { hist[SEC][REC]->Fill(par); }
       if (isPrim && isMuon) { hist[MU][REC]->Fill(par); }
       if (isPrim && isElectron) { hist[EL][REC]->Fill(par); }
+   }
+}
+
+void CbmLitReconstructionQa::FillGlobalElIdHistos(
+   const CbmMCTrack* mcTrack,
+   Int_t mcId,
+   const std::multimap<Int_t, Int_t>& mcMap,
+   std::vector<TH1F*>& hist,
+   Double_t par)
+{
+   Bool_t isMCPrim = mcTrack->GetMotherId() == -1;
+   Bool_t isMCElectron = std::abs(mcTrack->GetPdgCode()) == 11;
+   if (isMCPrim && isMCElectron) hist[ACC]->Fill(par);
+
+   // Fill histograms for identified tracks which are accepted
+   std::multimap<Int_t, Int_t>::const_iterator it = mcMap.find(mcId);
+   if (it != mcMap.end() ) {
+      // Make electron identification
+      Int_t globalId = (*it).second;
+      CbmGlobalTrack* track = static_cast<CbmGlobalTrack*>(fGlobalTracks->At(globalId));
+      Bool_t isTrdElectron = fElectronId->IsTrdElectron(track, mcTrack->GetP());
+
+      if (isMCPrim && isMCElectron && isTrdElectron) hist[REC]->Fill(par);
    }
 }
 
@@ -915,6 +956,29 @@ void CbmLitReconstructionQa::CreateEffHisto(
 	}
 }
 
+void CbmLitReconstructionQa::CreateEffHistoElId(
+      std::vector<TH1F*>& hist,
+      const std::string& name,
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin,
+      const std::string& opt,
+      TFile* file)
+{
+   hist.resize(fNofTypes);
+   std::string type[] = {"Acc", "Rec", "Eff" };
+
+   for (Int_t j = 0; j < fNofTypes; j++) {
+      std::string histName = name + type[j];
+      if (file == NULL){
+        hist[j] = new TH1F(histName.c_str(), histName.c_str(), nofBins, minBin, maxBin);
+      } else {
+        hist[j] = (TH1F*)file->Get(histName.c_str());
+      }
+      fHistoList->Add(hist[j]);
+   }
+}
+
 void CbmLitReconstructionQa::CreateHistos(
 		TFile* file)
 {
@@ -925,6 +989,8 @@ void CbmLitReconstructionQa::CreateHistos(
    Double_t minNofPoints =  0.;
    Double_t maxNofPoints = 100.;
    Int_t nBinsNofPoints = 100;
+
+   // Reconstruction efficiency histograms
 
    CreateEffHisto(fhStsMom, "hStsMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
    CreateEffHisto(fhStsMomNormHalfGlobal, "hStsMomNormHalfGlobal", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
@@ -953,6 +1019,12 @@ void CbmLitReconstructionQa::CreateHistos(
    CreateEffHisto(fhStsRichMomNormStsRichTrdTof, "fhStsRichMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
    CreateEffHisto(fhStsRichTrdMomNormStsRichTrdTof, "fhStsRichTrdMomNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
    CreateEffHisto(fhStsRichTrdTofMom, "fhStsRichTrdTofMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+
+   //Electron identification efficiency histograms
+
+   CreateEffHistoElId(fhStsTrdMomElId, "hStsTrdMomElId", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoElId(fhStsTrdMomElIdNormStsTrdTof, "hStsTrdMomElIdNormStsTrdTof", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoElId(fhStsTrdTofMomElId, "hStsTrdTofMomElId", fNofBinsMom, fMinMom, fMaxMom, "", file);
 
    //Create histograms for ghost tracks
    if (file == NULL){
@@ -1126,6 +1198,12 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
       DivideHistos(fhStsRichTrdMomNormStsRichTrdTof[i][REC], fhStsRichTrdMomNormStsRichTrdTof[i][ACC], fhStsRichTrdMomNormStsRichTrdTof[i][EFF]);
       DivideHistos(fhStsRichTrdTofMom[i][REC], fhStsRichTrdTofMom[i][ACC], fhStsRichTrdTofMom[i][EFF]);
    }
+
+   DivideHistos(fhStsTrdMomElId[REC], fhStsTrdMomElId[ACC], fhStsTrdMomElId[EFF]);
+   DivideHistos(fhStsTrdMomElIdNormStsTrdTof[REC], fhStsTrdMomElIdNormStsTrdTof[ACC], fhStsTrdMomElIdNormStsTrdTof[EFF]);
+   DivideHistos(fhStsTrdTofMomElId[REC], fhStsTrdTofMomElId[ACC], fhStsTrdTofMomElId[EFF]);
+
+
    Int_t nofEvents = fhEventNo->GetEntries();
    fhMvdNofHitsInStation->Scale(1./nofEvents);
    fhStsNofHitsInStation->Scale(1./nofEvents);
@@ -1515,105 +1593,112 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
    Int_t cat = fIsMuch ? MU : EL;
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
-   DrawEfficiency("rec_qa_global_efficiency_all", fhStsMomNormGlobal,
-		   fhHalfGlobalMomNormGlobal, fhGlobalMom, fhGlobalMom, sname, hgname, gname, "", ALL, ALL, ALL, 0);
+   DrawEfficiency("rec_qa_global_efficiency_all", &fhStsMomNormGlobal[ALL],
+		   &fhHalfGlobalMomNormGlobal[ALL], &fhGlobalMom[ALL], NULL, sname, hgname, gname, "");
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
-   DrawEfficiency("rec_qa_global_efficiency_signal", fhStsMomNormGlobal,
-		   fhHalfGlobalMomNormGlobal, fhGlobalMom, fhGlobalMom, sname, hgname, gname, "", cat, cat, cat, 0);
+   DrawEfficiency("rec_qa_global_efficiency_signal", &fhStsMomNormGlobal[cat],
+		   &fhHalfGlobalMomNormGlobal[cat], &fhGlobalMom[cat], NULL, sname, hgname, gname, "");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-   DrawEfficiency("rec_qa_half_global_efficiency_all", fhStsMomNormHalfGlobal,
-		   fhHalfGlobalMom, fhGlobalMom, fhGlobalMom, sname, hgname, "", "", ALL, ALL, 0, 0);
+   DrawEfficiency("rec_qa_half_global_efficiency_all", &fhStsMomNormHalfGlobal[ALL],
+		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
-   DrawEfficiency("rec_qa_half_global_efficiency_signal", fhStsMomNormHalfGlobal,
-		   fhHalfGlobalMom, fhGlobalMom, fhGlobalMom, sname, hgname, "", "", cat, cat, 0, 0);
+   DrawEfficiency("rec_qa_half_global_efficiency_signal", &fhStsMomNormHalfGlobal[cat],
+		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "");
 
    // Draw efficiency for STS
-   DrawEfficiency("rec_qa_sts_efficiency", fhStsMom,
-  		   fhStsMom, fhStsMom, fhStsMom, "STS: all", "STS: " + signal, "", "", ALL, cat, 0, 0);
+   DrawEfficiency("rec_qa_sts_efficiency", &fhStsMom[ALL],
+  		   &fhStsMom[cat], NULL, NULL, "STS: all", "STS: " + signal, "", "");
 
    if (fIsTrd || fIsMuch) {
 	   // Draw efficiency for TRD(MUCH)
-	   DrawEfficiency("rec_qa_rec_efficiency", fhRecMom,
-				 fhRecMom, fhRecMom, fhRecMom, rname + ": all", rname + ": " + signal, "", "", ALL, cat, 0, 0);
+	   DrawEfficiency("rec_qa_rec_efficiency", &fhRecMom[ALL],
+				 &fhRecMom[cat], NULL, NULL, rname + ": all", rname + ": " + signal, "", "");
    }
 
    if (fIsTof) {
 	   // Draw efficiency for TOF
-	   DrawEfficiency("rec_qa_tof_efficiency", fhTofMom,
-			   	 fhTofMom, fhTofMom, fhTofMom, "TOF: all", "TOF: " + signal, "", "", ALL, cat, 0, 0);
+	   DrawEfficiency("rec_qa_tof_efficiency", &fhTofMom[ALL],
+			   	 &fhTofMom[cat], NULL, NULL, "TOF: all", "TOF: " + signal, "", "");
    }
 
    if (fIsRich) {
 	   // Draw efficiency for RICH for all set
-	   DrawEfficiency("rec_qa_rich_efficiency_all", fhRichMom, fhRichMom, fhRichMom, fhRichMom,
-			   "RICH: all", "RICH: all ref", "", "", RICHALL, RICHALLREF, 0, 0);
+	   DrawEfficiency("rec_qa_rich_efficiency_all", &fhRichMom[RICHALL],
+	         &fhRichMom[RICHALLREF], NULL, NULL, "RICH: all", "RICH: all ref", "", "");
 
 	   // Draw efficiency for RICH for electron set
-	   DrawEfficiency("rec_qa_rich_efficiency_electrons", fhRichMom, fhRichMom, fhRichMom, fhRichMom,
-			   "RICH: electrons", "RICH: electrons ref", "", "", RICHEL, RICHELREF, 0, 0);
+	   DrawEfficiency("rec_qa_rich_efficiency_electrons", &fhRichMom[RICHEL],
+	         &fhRichMom[RICHELREF], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "");
 
 	   // Draw efficiency for RICH for pion set
-	   DrawEfficiency("rec_qa_rich_efficiency_pions", fhRichMom, fhRichMom, fhRichMom, fhRichMom,
-			   "RICH: pions", "RICH: pions ref", "", "", RICHPI, RICHPIREF, 0, 0);
+	   DrawEfficiency("rec_qa_rich_efficiency_pions", &fhRichMom[RICHPI],
+	         &fhRichMom[RICHPIREF], NULL, NULL, "RICH: pions", "RICH: pions ref", "", "");
 
 	   // Draw efficiency for STS+RICH for electron set
-	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", fhStsMomNormStsRich,
-			   fhStsRichMom, fhStsRichMom, fhStsRichMom,
-			   "STS", "STS+RICH", "", "", RICHEL, RICHEL, 0, 0);
+	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[RICHEL],
+			   &fhStsRichMom[RICHEL], NULL, NULL, "STS", "STS+RICH", "", "");
 
 	   // Draw efficiency for STS+RICH+TRD for electron set
-	   DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", fhStsMomNormStsRichTrd,
-			   fhStsRichMomNormStsRichTrd, fhStsRichTrdMom, fhStsRichTrdMom,
-			   "STS", "STS+RICH", "STS+RICH+TRD", "", RICHEL, RICHEL, RICHEL, 0);
+	   DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", &fhStsMomNormStsRichTrd[RICHEL],
+			   &fhStsRichMomNormStsRichTrd[RICHEL], &fhStsRichTrdMom[RICHEL], NULL,
+			   "STS", "STS+RICH", "STS+RICH+TRD", "");
 
 	   // Draw efficiency for STS+RICH+TRD+TOF for electron set
-	   DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", fhStsMomNormStsRichTrdTof,
-			   fhStsRichMomNormStsRichTrdTof, fhStsRichTrdMomNormStsRichTrdTof, fhStsRichTrdTofMom,
-			   "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", RICHEL, RICHEL, RICHEL, RICHEL);
+	   DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", &fhStsMomNormStsRichTrdTof[RICHEL],
+			   &fhStsRichMomNormStsRichTrdTof[RICHEL], &fhStsRichTrdMomNormStsRichTrdTof[RICHEL], &fhStsRichTrdTofMom[RICHEL],
+			   "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF");
    }
+
+   // Electron identification efficiencies
+   DrawEfficiency("rec_qa_sts_trd_elid_eff", &fhStsTrdMomElId,
+         NULL, NULL, NULL, "STS+TRD", "", "", "");
+
+   DrawEfficiency("rec_qa_sts_trd_tof_elid_eff", &fhStsTrdMomElIdNormStsTrdTof,
+         &fhStsTrdTofMomElId, NULL, NULL, "STS+TRD", "STS+TRD+TOF", "", "");
 }
 
 void CbmLitReconstructionQa::DrawEfficiency(
 		const std::string& canvasName,
-		const std::vector<std::vector<TH1F*> >& hist1,
-		const std::vector<std::vector<TH1F*> >& hist2,
-		const std::vector<std::vector<TH1F*> >& hist3,
-		const std::vector<std::vector<TH1F*> >& hist4,
+		const std::vector<TH1F*>* hist1,
+		const std::vector<TH1F*>* hist2,
+		const std::vector<TH1F*>* hist3,
+		const std::vector<TH1F*>* hist4,
 		const std::string& name1,
 		const std::string& name2,
 		const std::string& name3,
-		const std::string& name4,
-		Int_t category1,
-		Int_t category2,
-		Int_t category3,
-		Int_t category4)
+		const std::string& name4)
 {
 	TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
 	canvas->SetGrid();
 	canvas->cd();
-	std::string hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist1[category1][REC], hist1[category1][ACC])) + ")";;
-	std::string hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist2[category2][REC], hist2[category2][ACC])) + ")";;
-	std::string hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist3[category3][REC], hist3[category3][ACC])) + ")";;
-	std::string hname4 = name4 + "(" + lit::ToString<Double_t>(CalcEfficiency(hist4[category4][REC], hist4[category4][ACC])) + ")";;
+	std::string hname1, hname2, hname3, hname4;
+	if (hist1) hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist1)[REC], (*hist1)[ACC])) + ")";
+	if (hist2) hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist2)[REC], (*hist2)[ACC])) + ")";
+	if (hist3) hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist3)[REC], (*hist3)[ACC])) + ")";
+	if (hist4) hname4 = name4 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist4)[REC], (*hist4)[ACC])) + ")";
 
-	hist1[category1][EFF]->SetMinimum(0.);
-	hist1[category1][EFF]->SetMaximum(1.);
+	(*hist1)[EFF]->SetMinimum(0.);
+	(*hist1)[EFF]->SetMaximum(1.);
 
-	if (name3 != "" && name4 != ""){
-		DrawHist1D(hist1[category1][EFF], hist2[category2][EFF], hist3[category3][EFF], hist4[category4][EFF],
+	if (hist1 && hist2 && hist3 && hist4) {
+		DrawHist1D((*hist1)[EFF], (*hist2)[EFF], (*hist3)[EFF], (*hist4)[EFF],
 						 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, hname4,
 						 false, false, true, 0.3,0.3,0.85,0.6);
-	} else if (name3 != "") {
-	  DrawHist1D(hist1[category1][EFF], hist2[category2][EFF], hist3[category3][EFF], NULL,
+	} else if (hist1 && hist2 && hist3 && !hist4) {
+	  DrawHist1D((*hist1)[EFF], (*hist2)[EFF], (*hist3)[EFF], NULL,
 				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
 				 false, false, true, 0.3,0.3,0.85,0.6);
-	} else {
-	  DrawHist1D(hist1[category1][EFF], hist2[category2][EFF], NULL, NULL,
-				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, "",
+	} else if (hist1 && hist2 && !hist3 && !hist4){
+	  DrawHist1D((*hist1)[EFF], (*hist2)[EFF], NULL, NULL,
+				 "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
 				 false, false, true, 0.3,0.3,0.85,0.6);
-	}
+	} else if (hist1 && !hist2 && !hist3 && !hist4){
+     DrawHist1D((*hist1)[EFF], NULL, NULL, NULL,
+             "Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, "", "", "",
+             false, false, true, 0.3,0.3,0.85,0.6);
+   }
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
@@ -1686,14 +1771,23 @@ void CbmLitReconstructionQa::DrawStsTracksQaHistos()
    TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa_chi2Vertex", "rec_qa_sts_tracks_qa_chi2Vertex", 600, 500);
    DrawHist1D(fhStsChiprim, "Chi2Vertex", "Counter",
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
+            LIT_MARKER_STYLE1, false, false, "");
    lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
    TCanvas* canvas2 = new TCanvas("rec_qa_sts_tracks_qa_momres", "rec_qa_sts_tracks_qa_momres", 600, 500);
    DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP [%]", "Counter",
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
+            LIT_MARKER_STYLE1, false, false, "");
    lit::SaveCanvasAsImage(canvas2, fOutputDir);
+
+   TCanvas* canvas3 = new TCanvas("rec_qa_sts_tracks_qa_momres2D", "rec_qa_sts_tracks_qa_momres2D", 600, 500);
+   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter",
+            false, false, false, "COLZ");
+
+//   DrawHist1D(fhStsMomresVsMom->ProfileX(), "dP [%]", "Counter",
+//            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+//            LIT_MARKER_STYLE1, false, false, "same");
+   lit::SaveCanvasAsImage(canvas3, fOutputDir);
 }
 
 void CbmLitReconstructionQa::DrawHistosFromFile(const std::string& fileName)

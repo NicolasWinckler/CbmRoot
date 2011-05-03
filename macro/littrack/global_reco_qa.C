@@ -57,6 +57,11 @@ void global_reco_qa(Int_t nEvents = 10)
 	run->SetOutputFile(recoQaFile);
 	// ------------------------------------------------------------------------
 
+	CbmKF* kalman = new CbmKF();
+	run->AddTask(kalman);
+	CbmL1* l1 = new CbmL1();
+	run->AddTask(l1);
+
 	// -----   Track finding QA check   ------------------------------------
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);

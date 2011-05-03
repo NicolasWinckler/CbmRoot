@@ -28,10 +28,11 @@ void global_reco_qa(Int_t nEvents = 10)
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
-		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+		//globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
+		//globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+      recoFile = TString(gSystem->Getenv("RECOFILE"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
-                recoQaFile = TString(gSystem->Getenv("RECOQAFILE"));
+      recoQaFile = TString(gSystem->Getenv("RECOQAFILE"));
 	}
 
 	TStopwatch timer;
@@ -50,8 +51,9 @@ void global_reco_qa(Int_t nEvents = 10)
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->AddFriend(globalHitsFile);
-	run->AddFriend(globalTracksFile);
+	//run->AddFriend(globalHitsFile);
+	//run->AddFriend(globalTracksFile);
+	run->AddFriend(recoFile);
 	run->SetOutputFile(recoQaFile);
 	// ------------------------------------------------------------------------
 

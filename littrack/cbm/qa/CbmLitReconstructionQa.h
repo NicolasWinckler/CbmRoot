@@ -174,26 +174,31 @@ private:
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
 
-   /* */
+   /* @param opt option string*/
    void FillGlobalElIdHistos(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
       const std::multimap<Int_t, Int_t>& mcMap,
       std::vector<TH1F*>& hist,
-      Double_t par);
+      Double_t par,
+      const std::string& opt);
 
     /* Fills the histograms of the accepted and reconstructed rings tracks.
     * @param mcTrack MC track pointer
     * @param mcId MC track index in the array
     * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
     * @param hist vector with histograms to be filled
-    * @param par value that will be added in the histos (momentum or number of points) */
+    * @param par value that will be added in the histos (momentum or number of points)*/
+
    void FillGlobalReconstructionHistosRich(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
       const std::multimap<Int_t, Int_t>& mcMap,
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
+
+   /* Fills pion suppression histogramms.*/
+   void PionSuppression();
 
    /* Fills the histograms: momentum resolution vs. momentum and chi2Vertex.*/
    void StsTracksQa();
@@ -217,7 +222,7 @@ private:
 
    /* */
    void CreateEffHistoElId(
-         std::vector<TH1F*>& hist,
+         std::vector<std::vector<TH1F*> >& hist,
          const std::string& name,
          Int_t nofBins,
          Double_t minBin,
@@ -278,8 +283,15 @@ private:
    void PrintGhostStatistics(
       std::ostream& out);
 
+   /* Calculates integrated efficiencies and forms string with statistic information.
+    * @param hist vector with histograms
+    * @param opt if 'event' than forms string for event statistics, if 'final' than forms the string with final statistics. */
+   std::string EventEfficiencyStatisticsElIdToString(
+      const std::vector<std::vector<TH1F*> >& hist,
+      const std::string& opt);
+
    /* Calculates integrated efficiencies for different polar angles
-     * and returns a string with statistics.
+    * and returns a string with statistics.
     * @param hist Vector with histograms */
    std::string PolarAngleEfficiency(
       const std::vector<std::vector<TH1F*> >& hist);
@@ -488,10 +500,18 @@ private:
 
 
    // Electron identification
-   TH1F* fhPiAcc;
-   std::vector<TH1F*> fhStsTrdMomElId; // STS+TRD: momentum dependence
-   std::vector<TH1F*> fhStsTrdMomElIdNormStsTrdTof; // STS+TRD: momentum dependence, normalized to STS+TRD+TOF
-   std::vector<TH1F*> fhStsTrdTofMomElId; // STS+TRD+TOF: momentum dependence
+   std::vector<std::vector<TH1F*> > fhStsTrdMomElId; // STS+TRD: momentum dependence
+   std::vector<std::vector<TH1F*> > fhStsTrdMomElIdNormStsTrdTof; // STS+TRD: momentum dependence, normalized to STS+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsTrdTofMomElId; // STS+TRD+TOF: momentum dependence
+   //Norm STS+RICH
+   std::vector<std::vector<TH1F*> > fhStsRichMomElId;// STS+RICH: momentum dependence
+   //Norm STS+RICH+TRD
+   std::vector<std::vector<TH1F*> > fhStsRichMomElIdNormStsRichTrd;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD
+   std::vector<std::vector<TH1F*> > fhStsRichTrdMomElId;// STS+RICH+TRD: momentum dependence
+   //Norm STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsRichMomElIdNormStsRichTrdTof;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsRichTrdMomElIdNormStsRichTrdTof;// STS+RICH+TRD: momentum dependence, normalized to STS+RICH+TRD+TOF
+   std::vector<std::vector<TH1F*> > fhStsRichTrdTofMomElId;// STS+RICH+TRD+TOF: momentum dependence, normalized to STS+RICH+TRD+TOF
 
    TH1F* fhEventNo; // Event counter
 

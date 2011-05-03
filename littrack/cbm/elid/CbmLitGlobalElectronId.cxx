@@ -19,7 +19,7 @@
 
 CbmLitGlobalElectronId::CbmLitGlobalElectronId():
    fTrdAnnCut(0.85),
-   fRichAnnCut(0.0),
+   fRichAnnCut(-0.5),
    fRichUseAnn(true),
    fRichMeanA(-1.),
    fRichMeanB(-1.),
@@ -67,65 +67,68 @@ Bool_t CbmLitGlobalElectronId::IsRichElectron(
 		const CbmGlobalTrack* globalTrack,
 		Double_t momentum)
 {
-    Int_t richId = globalTrack->GetRichRingIndex();
-    if (richId < 0) return false;
-    CbmRichRing* ring = static_cast<CbmRichRing*>(fRichRings->At(richId));
-    if (NULL == ring) return false;
+   if (NULL == globalTrack) return false;
+   Int_t richId = globalTrack->GetRichRingIndex();
+   if (richId < 0) return false;
+   CbmRichRing* ring = static_cast<CbmRichRing*> (fRichRings->At(richId));
+   if (NULL == ring) return false;
 
-    if (fRichUseAnn == false){
-        Double_t axisA = ring->GetAaxis();
-        Double_t axisB = ring->GetBaxis();
-        Double_t dist = ring->GetDistance();
-        if (fabs(axisA-fRichMeanA) < fRichRmsCoeff*fRichRmsA &&
-        	fabs(axisB-fRichMeanB) < fRichRmsCoeff*fRichRmsB && dist < fRichDistCut){
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        Double_t ann = fRichElIdAnn->DoSelect(ring, momentum);
-        if (ann > fRichAnnCut) return true;
-        else return false;
-    }
+   if (fRichUseAnn == false) {
+      Double_t axisA = ring->GetAaxis();
+      Double_t axisB = ring->GetBaxis();
+      Double_t dist = ring->GetDistance();
+      if (fabs(axisA - fRichMeanA) < fRichRmsCoeff * fRichRmsA && fabs(axisB
+            - fRichMeanB) < fRichRmsCoeff * fRichRmsB && dist < fRichDistCut) {
+         return true;
+      } else {
+         return false;
+      }
+   } else {
+      Double_t ann = fRichElIdAnn->DoSelect(ring, momentum);
+      if (ann > fRichAnnCut) return true;
+      else return false;
+   }
 }
 
 Bool_t CbmLitGlobalElectronId::IsTrdElectron(
 		const CbmGlobalTrack* globalTrack,
 		Double_t momentum)
 {
-    Int_t trdId = globalTrack->GetTrdTrackIndex();
-    if (trdId < 0) return false;
-    CbmTrdTrack* trdTrack = static_cast<CbmTrdTrack*>(fTrdTracks->At(trdId));
-    if (NULL == trdTrack) return false;
+   if (NULL == globalTrack) return false;
+   Int_t trdId = globalTrack->GetTrdTrackIndex();
+   if (trdId < 0) return false;
+   CbmTrdTrack* trdTrack = static_cast<CbmTrdTrack*>(fTrdTracks->At(trdId));
+   if (NULL == trdTrack) return false;
 
-    Double_t ann = trdTrack->GetPidANN();
-    if (ann > fTrdAnnCut) return true;
-    else return false;
+   Double_t ann = trdTrack->GetPidANN();
+   if (ann > fTrdAnnCut) return true;
+   else return false;
 }
 
 Bool_t CbmLitGlobalElectronId::IsTofElectron(
 		const CbmGlobalTrack* globalTrack,
 		Double_t momentum)
 {
-    Int_t tofInd = globalTrack->GetTofHitIndex();
-    if (tofInd > 0) return false;
-    CbmTofHit* tofHit = static_cast<CbmTofHit*>(fTofHits->At(tofInd));
-    if (NULL == tofHit) return false;
+   Double_t trackLength = globalTrack->GetLength() / 100.;
 
-    Double_t trackLength = globalTrack->GetLength() / 100.;
-    Double_t time = 0.2998 * tofHit->GetTime(); // time in ns -> transfrom to ct in m
-    Double_t mass2 = TMath::Power(momentum, 2.) * (TMath::Power(time/ trackLength, 2) - 1);
+   Int_t tofId = globalTrack->GetTofHitIndex();
+   if (tofId < 0) return false;
+   CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);
+   if (NULL == tofHit)return false;
 
-    if (momentum >= 1.) {
-        if (mass2 < (0.013*momentum - 0.003)){
-            return true;
-        }
-    } else {
-        if (mass2 < 0.01){
-            return true;
-        }
-    }
-    return false;
+   Double_t time = 0.2998 * tofHit->GetTime(); // time in ns -> transfrom to ct in m
+   Double_t mass2 = TMath::Power(momentum, 2.) * (TMath::Power(time/ trackLength, 2) - 1);
+
+   if (momentum >= 1.) {
+       if (mass2 < (0.013*momentum - 0.003)){
+           return true;
+       }
+   } else {
+       if (mass2 < 0.01){
+           return true;//fTofM2
+       }
+   }
+   return false;
 }
 
 ClassImp(CbmLitGlobalElectronId);

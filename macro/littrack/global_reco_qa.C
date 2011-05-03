@@ -63,19 +63,21 @@ void global_reco_qa(Int_t nEvents = 10)
 	run->AddTask(l1);
 
 	// -----   Track finding QA check   ------------------------------------
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(9);
-	reconstructionQa->SetMinNofPointsMuch(0);
-	reconstructionQa->SetMinNofPointsTof(0);
-	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(9);
-	reconstructionQa->SetMinNofHitsMuch(0);
-	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetMomentumRange(0., 15);
-	reconstructionQa->SetNofBinsMom(15);
-	reconstructionQa->SetOutputDir(std::string(imageDir));
-	run->AddTask(reconstructionQa);
+   CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+   reconstructionQa->SetMinNofPointsSts(4);
+   reconstructionQa->SetMinNofPointsTrd(9);
+   reconstructionQa->SetMinNofPointsMuch(10);
+   reconstructionQa->SetMinNofPointsTof(1);
+   reconstructionQa->SetQuota(0.7);
+   reconstructionQa->SetMinNofHitsTrd(9);
+   reconstructionQa->SetMinNofHitsMuch(10);
+   reconstructionQa->SetVerbose(0);
+   reconstructionQa->SetMomentumRange(0, 12);
+   reconstructionQa->SetNofBinsMom(12);
+   reconstructionQa->SetMinNofHitsRich(7);
+   reconstructionQa->SetQuotaRich(0.7);
+   reconstructionQa->SetOutputDir("recoIm/");
+   run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

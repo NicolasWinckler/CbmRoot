@@ -62,11 +62,10 @@ class CbmMuchDigi : public TObject
   /** Set channel dead time**/
   void SetDeadTime(Double_t time) {fDeadTime = time;}
 
-
  private:
 
   Int_t    fDetectorId;      // Detector Id (including module number)
-  Long64_t    fChannelId;       // Channel Id within the module
+  Long64_t fChannelId;       // Channel Id within the module
   UInt_t   fADCCharge;       // Charge for the digi in ADC channels
   Double_t fTime;            // Time since event start [ns]
   Double_t fDTime;           // Time resolution [ns]

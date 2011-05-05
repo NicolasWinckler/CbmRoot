@@ -119,10 +119,6 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
 
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
-  /*
-  if (fDigiFile)
-    delete fDigiFile;
-  */
   if (fDigis) {
     fDigis->Delete();
     delete fDigis;
@@ -154,12 +150,12 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Double_t modLy = modSize[1];
 
   // Get track length within the module
-  Double_t xIn = point->GetXIn();
-  Double_t yIn = point->GetYIn();
-  Double_t xOut = point->GetXOut();
-  Double_t yOut = point->GetYOut();
-  Double_t zIn = point->GetZIn();
-  Double_t zOut = point->GetZOut();
+  Double_t xIn    = point->GetXIn();
+  Double_t yIn    = point->GetYIn();
+  Double_t zIn    = point->GetZIn();
+  Double_t xOut   = point->GetXOut();
+  Double_t yOut   = point->GetYOut();
+  Double_t zOut   = point->GetZOut();
   Double_t deltaX = xOut - xIn;
   Double_t deltaY = yOut - yIn;
   Double_t deltaZ = zOut - zIn;
@@ -260,52 +256,19 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         Double_t area;
         if (!PolygonsIntersect(*pad,spotPolygon,area)) continue; 
         UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
-        Long64_t channelId = pad->GetChannelId();
-
-        if (chargedPads.find(channelId) == chargedPads.end()) {
-          chargedPads[channelId] = new CbmMuchDigi(detectorId,channelId, time, fDTime);
-          chargedMatches[channelId] = new CbmMuchDigiMatch();
+        CbmMuchDigi*      digi  = pad->GetDigi();
+        CbmMuchDigiMatch* match = pad->GetMatch();
+        if (time>digi->GetTime()+digi->GetDeadTime()) {
+          AddDigi(pad);
+          digi->SetTime(time);
+          digi->SetDeadTime(fDeadTime);
         }
-        chargedMatches[channelId]->AddPoint(iPoint);
-        chargedMatches[channelId]->AddCharge(iCharge);
+        match->AddPoint(iPoint);
+        match->AddCharge(iCharge);
       }
-      
     } // loop fired sectors
-  } // loop primary electrons
-
-  if (chargedPads.size() == 0) {
-    fNOutside++;
-    return kFALSE;
-  }
-
-  for (map<Long64_t, CbmMuchDigi*>::iterator it = chargedPads.begin(); it
-  != chargedPads.end(); it++) {
-    Long64_t channelId = (*it).first;                      // Channel id within the module
-    pair<Int_t, Long64_t> uniqueId(detectorId, channelId); // Unique channel id within the MUCH
-    CbmMuchDigi* digi = chargedPads[channelId];
-    CbmMuchDigiMatch* match = chargedMatches[channelId];
-    if(!match) continue;
-    if (!digi) continue;
-    Int_t iCharge = match->GetTotalCharge();
-    if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
-      fChargedPads[uniqueId] = new CbmMuchDigi(digi);
-      fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
-      fChargedMatches[uniqueId]->AddPoint(iPoint);
-      fChargedMatches[uniqueId]->AddCharge(iCharge);
-    } else {
-      fChargedMatches[uniqueId]->AddPoint(iPoint);
-      fChargedMatches[uniqueId]->AddCharge(iCharge);
-      fNMulti++;
-    }
-
-    // Clear memory
-    delete digi;
-    delete match;
-  }
-
-  chargedPads.clear();
-  chargedMatches.clear();
-
+  } // loop over electrons
+  
   return kTRUE;
   //**************  Simulate avalanche (end) **********************************//
 }
@@ -370,11 +333,13 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
     ExecAdvanced(point, iPoint);
   } // MuchPoint loop
 
-  FirePads();
-
-//  for(Int_t iDigi = 0; iDigi < fDigis->GetEntriesFast(); ++iDigi){
-//    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-//  }
+  // Add remaining digis
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+  for (Int_t im=0;im<modules.size();im++){
+    if (modules[im]->GetDetectorType()!=1) continue;
+    vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
+    for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+  }
 
   // Screen output
   fTimer.Stop();
@@ -467,9 +432,6 @@ InitStatus CbmMuchDigitizeAdvancedGem::ReInit() {
 // -----   Private method Reset   ------------------------------------------
 void CbmMuchDigitizeAdvancedGem::Reset() {
   fNFailed = fNOutside = fNMulti = 0;
-  fChannelMap.clear();
-  fChargedPads.clear();
-  fChargedMatches.clear();
   if (fDigis)
     fDigis->Clear();
   if (fDigiMatches)
@@ -477,117 +439,19 @@ void CbmMuchDigitizeAdvancedGem::Reset() {
 }
 // -------------------------------------------------------------------------
 
-// -----   Private method FirePads   ---------------------------------------
-void CbmMuchDigitizeAdvancedGem::FirePads() {
-  // Add electronics noise // TODO Add noise in time
-  if (fMeanNoise && !fEpoch) AddNoise(); 
-
-  vector<CbmMuchDigi*> vdigi;
-  vector<CbmMuchDigiMatch*> vmatch;
-  
-  for (map<pair<Int_t, Long64_t> , CbmMuchDigi*>::iterator it =
-    fChargedPads.begin(); it != fChargedPads.end(); it++) {
-    // Randomly kill the pads
-    if (gRandom->Rndm() < fDeadPadsFrac) continue;
-    
-    CbmMuchDigi* digi = it->second;
-    CbmMuchDigiMatch* match = fChargedMatches[it->first];
-    
-    if (!fEpoch){
-      vdigi.push_back(digi);
-      vmatch.push_back(match);
-      continue;
-    }
-    
-    match->SortPointsInTime(fPoints);
-    CbmMuchDigi* new_digi = 0;
-    CbmMuchDigiMatch* new_match = 0;
-    for (Int_t i=0;i<match->GetNPoints();i++){
-      Int_t index  = match->GetRefIndex(i);
-      Int_t charge = match->GetCharge(i);
-      CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(index);
-//      Double_t time = point->GetTime();
-      Double_t time = -1;
-      while(time < 0) time = point->GetTime()  + gRandom->Gaus(0, fDTime);
-
-      if (!new_digi ? 1 : time > new_digi->GetTime()+new_digi->GetDeadTime()){ 
-        new_digi  = new CbmMuchDigi(digi);
-        new_match = new CbmMuchDigiMatch();
-        new_digi->SetTime(time);
-        vdigi.push_back(new_digi);
-        vmatch.push_back(new_match);
-      }
-//      new_digi->SetDeadTime(time-new_digi->GetTime()+fDeadTime);
-      new_digi->SetDeadTime(fDeadTime);
-      new_match->AddPoint(index);
-      new_match->AddCharge(charge);
-    }
-  }
-  
-  // Apply threshold
-  
-  for (UInt_t i=0,iDigi=0;i<vdigi.size();i++){
-    CbmMuchDigi* digi = vdigi[i];
-    CbmMuchDigiMatch* match = vmatch[i];
-    if (match->GetTotalCharge() < fQThreshold) continue;
-    Int_t adcChannel = match->GetTotalCharge() * fNADCChannels/ fQMax;
-    digi->SetADCCharge(adcChannel > fNADCChannels ? fNADCChannels-1 : adcChannel);
-    new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
-    new ((*fDigiMatches)[iDigi++]) CbmMuchDigiMatch(match);
-    delete digi;
-    delete match;
-  }
-  vdigi.clear();
-  vmatch.clear();
-}
 // -------------------------------------------------------------------------
-
-// -----   Private method AddNoise   ---------------------------------------
-void CbmMuchDigitizeAdvancedGem::AddNoise() {
-  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
-  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-    CbmMuchModule* mod = (*it);
-    if(mod->GetDetectorType() != 1) continue;
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
-    vector<CbmMuchPad*> pads = module->GetPads();
-    for (vector<CbmMuchPad*>::iterator iter = pads.begin(); iter != pads.end(); ++iter) {
-      AddNoise(*iter);
-    }
-  }
-}
-// -------------------------------------------------------------------------
-
-// -----   Private method AddNoise   ---------------------------------------
-void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
-  Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
-  UInt_t iCharge = (UInt_t) rndGaus;
-  Int_t detectorId = pad->GetDetectorId();
-  Long64_t channelId  = pad->GetChannelId();
-  pair<Int_t, Long64_t> uniqueId(detectorId, channelId);
-  if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
-    if (iCharge <= fQThreshold) return;
-    fChargedPads[uniqueId] = new CbmMuchDigi(pad->GetDetectorId(),
-        channelId, 0, 0); // No time and Dtime info   // TODO Add noise in time
-    fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
-  }
-  fChargedMatches[uniqueId]->AddPoint(-1);
-  fChargedMatches[uniqueId]->AddCharge(iCharge);
-}
-// -------------------------------------------------------------------------
-
-// -----   Private method FirePads   ---------------------------------------
 TPolyLine CbmMuchDigitizeAdvancedGem::GetPolygon(Double_t x0, Double_t y0, Double_t width,
     Double_t height) {
 
   Double_t x[5], y[5];
-  x[1] = -width / 2;
-  y[1] = +height / 2;
-  x[2] = +width / 2;
-  y[2] = +height / 2;
-  x[0] = -width / 2;
-  y[0] = -height / 2;
-  x[3] = +width / 2;
-  y[3] = -height / 2;
+  x[1] = -width /2;
+  y[1] = +height/2;
+  x[2] = +width /2;
+  y[2] = +height/2;
+  x[0] = -width /2;
+  y[0] = -height/2;
+  x[3] = +width /2;
+  y[3] = -height/2;
   x[4] = x[0];
   y[4] = y[0];
   for (int i = 0; i < 5; i++) {
@@ -597,25 +461,25 @@ TPolyLine CbmMuchDigitizeAdvancedGem::GetPolygon(Double_t x0, Double_t y0, Doubl
   TPolyLine pline(5, x, y);
   return pline;
 }
+// -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::ProjectionsIntersect(Double_t x11, Double_t x12,
     Double_t x21, Double_t x22, Double_t& length) {
   if (x11 > x22 || x12 < x21)
     return kFALSE;
   if (x22 < x12) {
-    if (x21 > x11)
-      length = x22 - x21;
-    else
-      length = x22 - x11;
+    if (x21 > x11) length = x22 - x21;
+    else           length = x22 - x11;
   } else {
-    if (x11 > x21)
-      length = x12 - x11;
-    else
-      length = x12 - x21;
+    if (x11 > x21) length = x12 - x11;
+    else           length = x12 - x21;
   }
   return kTRUE;
 }
+// -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area) {
   Double_t length, width;
   Double_t* x1 = polygon1.GetX();
@@ -675,8 +539,7 @@ Double_t CbmMuchDigitizeAdvancedGem::mu_sigma_n_e(Double_t &logT) {
   const int n = 7;
   double val = 0;
   double arg = 1;
-  double p[n] = { 74.5272, -49.7648, 14.4886, -2.23059, 0.188254,
-      -0.00792744, 0.00011976 };
+  double p[n] = { 74.5272, -49.7648, 14.4886, -2.23059, 0.188254,-0.00792744, 0.00011976 };
   for (int i = 0; i < n; i++) {
     val = val + arg * p[i];
     arg = arg * logT;
@@ -692,8 +555,7 @@ Double_t CbmMuchDigitizeAdvancedGem::p_sigma_n_e(Double_t &logT) {
   const int n = 7;
   double val = 0;
   double arg = 1;
-  double p[n] = { 175.879, -15.016, -34.6513, 13.346, -2.08732, 0.153678,
-      -0.00440115 };
+  double p[n] = { 175.879, -15.016, -34.6513, 13.346, -2.08732, 0.153678,-0.00440115 };
   for (int i = 0; i < n; i++) {
     val = val + arg * p[i];
     arg = arg * logT;
@@ -709,8 +571,7 @@ Double_t CbmMuchDigitizeAdvancedGem::e_sigma_n_e(Double_t &logT) {
   const int n = 7;
   double val = 0;
   double arg = 1;
-  double p[n] = { 4.06815, -0.225699, 0.464502, -0.141208, 0.0226821,
-      -0.00195697, 6.87497e-05 };
+  double p[n] = { 4.06815, -0.225699, 0.464502, -0.141208, 0.0226821,-0.00195697, 6.87497e-05 };
   for (int i = 0; i < n; i++) {
     val = val + arg * p[i];
     arg = arg * logT;
@@ -726,8 +587,7 @@ Double_t CbmMuchDigitizeAdvancedGem::mu_MPV_n_e(Double_t &logT) {
   const int n = 7;
   double val = 0;
   double arg = 1;
-  double p[n] = { 660.746, -609.335, 249.011, -55.6658, 7.04607, -0.472135,
-      0.0129834 };
+  double p[n] = { 660.746, -609.335, 249.011, -55.6658, 7.04607, -0.472135, 0.0129834 };
   for (int i = 0; i < n; i++) {
     val = val + arg * p[i];
     arg = arg * logT;
@@ -743,8 +603,7 @@ Double_t CbmMuchDigitizeAdvancedGem::p_MPV_n_e(Double_t &logT) {
   const int n = 7;
   double val = 0;
   double arg = 1;
-  double p[n] = { 4152.73, -3123.98, 1010.85, -178.092, 17.8764, -0.963169,
-      0.0216643 };
+  double p[n] = { 4152.73, -3123.98, 1010.85, -178.092, 17.8764, -0.963169, 0.0216643 };
   for (int i = 0; i < n; i++) {
     val = val + arg * p[i];
     arg = arg * logT;
@@ -760,8 +619,7 @@ Double_t CbmMuchDigitizeAdvancedGem::e_MPV_n_e(Double_t &logT) {
   const int n = 7;
   double val = 0;
   double arg = 1;
-  double p[n] = { 14.654, -0.786582, 2.32435, -0.875594, 0.167237,
-      -0.0162335, 0.000616855 };
+  double p[n] = { 14.654, -0.786582, 2.32435, -0.875594, 0.167237,-0.0162335, 0.000616855 };
   for (int i = 0; i < n; i++) {
     val = val + arg * p[i];
     arg = arg * logT;
@@ -769,6 +627,33 @@ Double_t CbmMuchDigitizeAdvancedGem::e_MPV_n_e(Double_t &logT) {
   return val;
 }
 // -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
+  CbmMuchDigiMatch* match = pad->GetMatch();
+  CbmMuchDigi* digi = pad->GetDigi();
+  
+  // Add noise
+  if (fMeanNoise){
+   Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
+   UInt_t noiseCharge = (UInt_t) rndGaus;
+   match->AddPoint(-1);
+   match->AddCharge(noiseCharge);
+  }
+  
+  // Check for threshold 
+  if (match->GetTotalCharge() < fQThreshold) {
+    match->Reset();
+    return kFALSE;
+  }
+  
+  Int_t adc = match->GetTotalCharge() * fNADCChannels/ fQMax;
+  digi->SetADCCharge(adc > fNADCChannels ? fNADCChannels-1 : adc);
+  new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
+  new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch(match);
+  match->Reset();
+  return kTRUE;
+}
 
 ClassImp(CbmMuchDigitizeAdvancedGem)
 

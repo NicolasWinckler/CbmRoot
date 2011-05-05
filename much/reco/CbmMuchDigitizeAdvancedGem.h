@@ -29,6 +29,7 @@
 class CbmMuchSector;
 class CbmMuchPoint;
 class CbmMCEpoch;
+class CbmMuchPad;
 class TChain;
 
 enum DetectorType {kGEM, kMICROMEGAS};
@@ -144,15 +145,6 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
     Double_t           fDeadTime;      // Channel dead time [ns]
     
-    /** Map of active channels to index of MuchDigi. **/
-    std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;
-
-    /** Map of channels, wounded by secondary electrons, to CbmMuchDigi.  **/
-    std::map<std::pair<Int_t, Long64_t>, CbmMuchDigi*> fChargedPads;
-
-    /** Map of DigiMatches, which matches pads wounded by secondary electrons.  **/
-    std::map<std::pair<Int_t, Long64_t>, CbmMuchDigiMatch*> fChargedMatches;
-
     /** Finish. **/
     virtual void FinishTask();
 
@@ -170,15 +162,6 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
 
     /** Advanced digis production using avalanches. **/
     Bool_t ExecAdvanced(CbmMuchPoint* point, Int_t iPoint);
-
-    /** Fills output arrays with digis, which have charge above the threshold. **/
-    void FirePads();
-
-    /** Add electronics noise. **/
-    void AddNoise();
-
-    /** Add electronics noise to the given pad. **/
-    void AddNoise(CbmMuchPad* pad);
 
     /** Builds a TPolyLine from given rectangle parameters (no rotation angle).
      *@param x0     X of the center.
@@ -212,6 +195,9 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      *@author Volodia Nikulin.
      *@since 14/04/2007.
      */
+    Bool_t AddDigi(CbmMuchPad* pad);
+
+    
     inline Int_t GasGain();
 
     static Double_t e_sigma_n_e(Double_t &logT);

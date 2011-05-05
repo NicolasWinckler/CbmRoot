@@ -72,6 +72,7 @@ class CbmMuchDigiMatch : public TObject
   UInt_t GetTotalCharge() const;
   void SortPointsInTime(TClonesArray* points);
 
+  void Reset();
  private:
 
   TArrayI fRefIndex;      // Array of MC point indices

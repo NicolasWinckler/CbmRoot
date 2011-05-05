@@ -134,4 +134,12 @@ void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
   time_vs_charge.clear();
 }
 
+
+// -------------------------------------------------------------------------
+
+void CbmMuchDigiMatch::Reset() {
+  fRefIndex.Reset();
+  fCharge.Reset(0);
+}
+
 ClassImp(CbmMuchDigiMatch)

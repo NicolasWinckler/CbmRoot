@@ -17,7 +17,7 @@ CbmMuchPad::CbmMuchPad():TPolyLine(){}
 // -------------------------------------------------------------------------
 
 // -----  Standard constructor  --------------------------------------------
-CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
+CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(),fCharge(0),fTime(0){
   // Generate detectorId
   fDetectorId = sector->GetDetectorId();
   Int_t iSector = sector->GetSectorIndex();
@@ -57,6 +57,9 @@ CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
   SetFillColor(0);
   SetLineWidth(1);
   SetLineColor(34);
+  fDigi = new CbmMuchDigi(fDetectorId,fChannelId,0,0,0);
+  fMatch = new CbmMuchDigiMatch();
+  
 }
 // -------------------------------------------------------------------------
 

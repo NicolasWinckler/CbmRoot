@@ -204,8 +204,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      *@param polygon2  Second polygon.
      *@param area      Intersection area.
      **/
-    Bool_t PolygonsIntersect(CbmMuchSector* sector, TPolyLine polygon1, TPolyLine polygon2,
-        Double_t& area);
+    Bool_t PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area);
 
     /**
      * Function returns a random number distributed according

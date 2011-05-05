@@ -263,14 +263,13 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
         TPolyLine* padPolygon = sector->GetPad(iChannel);
         Double_t area;
-        if (!PolygonsIntersect(sector, *padPolygon, spotPolygon, area))
+        if (!PolygonsIntersect(*padPolygon, spotPolygon, area))
           continue; // detailed search
         UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
         Long64_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // channel id within the module
 
         if (chargedPads.find(channelId) == chargedPads.end()) {
-          chargedPads[channelId] = new CbmMuchDigi(detectorId,
-              channelId, time, fDTime);
+          chargedPads[channelId] = new CbmMuchDigi(detectorId,channelId, time, fDTime);
           chargedMatches[channelId] = new CbmMuchDigiMatch();
         }
         chargedMatches[channelId]->AddPoint(iPoint);
@@ -623,8 +622,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ProjectionsIntersect(Double_t x11, Double_t x
   return kTRUE;
 }
 
-Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(CbmMuchSector* sector,
-    TPolyLine polygon1, TPolyLine polygon2, Double_t& area) {
+Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area) {
   Double_t length, width;
   Double_t* x1 = polygon1.GetX();
   Double_t* y1 = polygon1.GetY();

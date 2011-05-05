@@ -247,26 +247,20 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     }
 
     // Fire pads in intersected sectors
-    for (map<Int_t, CbmMuchSector*>::iterator it = firedSectors.begin(); it
-    != firedSectors.end(); it++) {
+    for (map<Int_t, CbmMuchSector*>::iterator it = firedSectors.begin(); it!= firedSectors.end(); it++) {
       // Get sector and its parameters
-      CbmMuchSector* sector = (*it).second;
-      Int_t iSector = (*it).first;
-      // Find fired pads
-      for (Int_t iChannel = 0; iChannel < sector->GetNChannels(); iChannel++) {
-        Double_t padRad = sector->GetPadRadius();
-        Double_t distX = xe - sector->GetPadX0(iChannel);
-        Double_t distY = ye - sector->GetPadY0(iChannel);
-        Double_t dist = TMath::Sqrt(distX * distX + distY * distY);
-        if (dist > padRad + fSpotRadius)
-          continue; // rough search
-
-        TPolyLine* padPolygon = sector->GetPad(iChannel);
+      CbmMuchSector* sector  = (*it).second;
+      Double_t padRad = sector->GetPadRadius();
+      
+      for (Int_t iPad=0;iPad<sector->GetNChannels();iPad++){
+        CbmMuchPad* pad = sector->GetPad(iPad);
+        // rough search
+        if (pow(pad->GetX0()-xe,2.)+pow(pad->GetY0()-ye,2.)>pow(padRad+fSpotRadius,2.)) continue; 
+        // detailed search
         Double_t area;
-        if (!PolygonsIntersect(*padPolygon, spotPolygon, area))
-          continue; // detailed search
+        if (!PolygonsIntersect(*pad,spotPolygon,area)) continue; 
         UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
-        Long64_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // channel id within the module
+        Long64_t channelId = pad->GetChannelId();
 
         if (chargedPads.find(channelId) == chargedPads.end()) {
           chargedPads[channelId] = new CbmMuchDigi(detectorId,channelId, time, fDTime);
@@ -274,8 +268,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         }
         chargedMatches[channelId]->AddPoint(iPoint);
         chargedMatches[channelId]->AddCharge(iCharge);
-
-      } // loop channels
+      }
+      
     } // loop fired sectors
   } // loop primary electrons
 

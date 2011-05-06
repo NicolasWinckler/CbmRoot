@@ -36,7 +36,7 @@ void QAsim_quasi_monolithic_trd(Int_t nEvents = 2)
   TString richGeom   = "rich_standard.geo";
   TString trdGeom    = "trd_quasi_monolithic.geo";
   TString tofGeom    = "tof_standard.geo";
-  TString ecalGeom   = "ecal_FastMC.geo";
+  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "field_electron_standard";   // name of field map

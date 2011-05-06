@@ -47,6 +47,7 @@ using std::pair;
 
 void CbmMuchDigitizeAdvancedGem::SetParContainers() {}
 void CbmMuchDigitizeAdvancedGem::FinishTask() {}
+InitStatus CbmMuchDigitizeAdvancedGem::ReInit() { return kSUCCESS; }
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
@@ -122,21 +123,11 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     return kFALSE;
   }
 
-  TVector3 modSize = module->GetSize();
-  Double_t modLx = modSize[0];
-  Double_t modLy = modSize[1];
-
-  // Get track length within the module
-  Double_t xIn    = point->GetXIn();
-  Double_t yIn    = point->GetYIn();
-  Double_t zIn    = point->GetZIn();
-  Double_t xOut   = point->GetXOut();
-  Double_t yOut   = point->GetYOut();
-  Double_t zOut   = point->GetZOut();
-  Double_t deltaX = xOut - xIn;
-  Double_t deltaY = yOut - yIn;
-  Double_t deltaZ = zOut - zIn;
-  Double_t lTrack = TMath::Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ); // track length
+  TVector3 posIn,posOut;
+  point->PositionIn(posIn);
+  point->PositionOut(posOut);
+  TVector3 delta = posOut-posIn;
+  Double_t lTrack = delta.Mag();
 
   //********** Primary electrons from the track (begin) ************************//
   // Get particle's characteristics
@@ -175,20 +166,13 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   else         nElectrons = (UInt_t) (nElectrons * lTrack / 0.36);
   //********** Primary electrons from the track (end)   ***********************//
 
-  Double_t hypotenuse = TMath::Sqrt(deltaX * deltaX + deltaY * deltaY);
-  Double_t cosphi_tr = deltaX / hypotenuse; // cos of track azim. angle
-  Double_t sinphi_tr = deltaY / hypotenuse; // sin of track azim. angle
-
-  map<Long64_t, CbmMuchDigi*> chargedPads;     // map from a channel id within the module to a fired digi
-  map<Long64_t, CbmMuchDigiMatch*> chargedMatches;     // the same for digi matches
   Double_t time = -1;
-  while(time < 0) time = point->GetTime()  + gRandom->Gaus(0, fDTime);
-  UInt_t nTrackCharge = 0;                  // total charge left by a track
+  while(time < 0) time = point->GetTime() + gRandom->Gaus(0, fDTime);
   for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
     // Coordinates of primary electrons along the track
-    Double_t aL = gRandom->Rndm() * hypotenuse;
-    Double_t xe = xIn + aL * cosphi_tr;
-    Double_t ye = yIn + aL * sinphi_tr;
+    Double_t aL = gRandom->Rndm();
+    Double_t xe = posIn[0]+aL*delta[0];
+    Double_t ye = posIn[1]+aL*delta[1];
 
     // Calculate number of secondary electrons for each primary electron
     UInt_t nSecElectrons = GasGain(); // number of secondary electrons
@@ -202,12 +186,10 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     map<Int_t, CbmMuchSector*> firedSectors; // map from a sector index to a fired sector
     for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
       CbmMuchSector* sector = module->GetSector(xVertex[iVertex], yVertex[iVertex]);
-
-      if (sector) {
-        Int_t iSector = sector->GetSectorIndex();
-        if (firedSectors.find(iSector) == firedSectors.end())
-          firedSectors[iSector] = sector;
-      }
+      if (!sector) continue;
+      Int_t iSector = sector->GetSectorIndex();
+      if (firedSectors.find(iSector) != firedSectors.end()) continue;
+      firedSectors[iSector] = sector;
     }
 
     // Fire pads in intersected sectors
@@ -226,6 +208,10 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
         CbmMuchDigi*      digi  = pad->GetDigi();
         CbmMuchDigiMatch* match = pad->GetMatch();
+        if (match->GetNPoints()==0) {
+          digi->SetTime(time);
+          digi->SetDeadTime(fDeadTime);
+        }
         if (time>digi->GetTime()+digi->GetDeadTime()) {
           AddDigi(pad);
           digi->SetTime(time);
@@ -236,7 +222,6 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
       }
     } // loop fired sectors
   } // loop over electrons
-  
   return kTRUE;
   //**************  Simulate avalanche (end) **********************************//
 }
@@ -250,30 +235,7 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
   cout << endl;
   cout << "-I- " << fName << "   :   Event " << ++fEvent << endl;
 
-  // Verbose screen output
-  if (fVerbose > 2) {
-    cout << endl << "-I- " << fName << ": executing event" << endl;
-    cout << "----------------------------------------------" << endl;
-  }
-
-  // Check for input arrays (Event-by-event approach)
-  if (!fEpoch && !fMCTracks) {
-    cout << "-W- " << fName << "::Exec: No input array (MCTrack)" << endl;
-    cout << "- " << fName << endl;
-    return;
-  }
-  if (!fEpoch && !fPoints) {
-    cerr << "-W- " << fName << "::Exec: No input array (MuchPoint) "
-    << endl;
-    cout << "- " << fName << endl;
-    return;
-  }
-
-  // Check for input arrays (Epoch approach)
-  if (fEpoch) {
-    fPoints = fMcEpoch->GetPoints(kMUCH);
-  }
-  
+  if (fEpoch) fPoints = fMcEpoch->GetPoints(kMUCH);
   
   Int_t notUsable = 0; // DEBUG: counter for not usable points
 
@@ -289,8 +251,7 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
     }
 
     // Get the module the point is in
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
-        point->GetDetectorID());
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(point->GetDetectorID());
     if (!module) {
       fNFailed++;
       continue;
@@ -380,20 +341,12 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
 }
 // -------------------------------------------------------------------------
 
-// -----   Private method ReInit   -----------------------------------------
-InitStatus CbmMuchDigitizeAdvancedGem::ReInit() {
-
-  return kSUCCESS;
-}
-// -------------------------------------------------------------------------
 
 // -----   Private method Reset   ------------------------------------------
 void CbmMuchDigitizeAdvancedGem::Reset() {
   fNFailed = fNOutside = fNMulti = 0;
-  if (fDigis)
-    fDigis->Clear();
-  if (fDigiMatches)
-    fDigiMatches->Delete(); // Delete because of memory leaks
+  if (fDigis) fDigis->Clear();
+  if (fDigiMatches) fDigiMatches->Delete(); // Delete because of memory leaks
 }
 // -------------------------------------------------------------------------
 
@@ -445,10 +398,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(TPolyLine polygon1, TPolyLi
   Double_t* x2 = polygon2.GetX();
   Double_t* y2 = polygon2.GetY();
 
-  if (!ProjectionsIntersect(x1[0], x1[3], x2[0], x2[3], width))
-    return kFALSE;
-  if (!ProjectionsIntersect(y1[0], y1[1], y2[0], y2[1], length))
-    return kFALSE;
+  if (!ProjectionsIntersect(x1[0], x1[3], x2[0], x2[3], width))  return kFALSE;
+  if (!ProjectionsIntersect(y1[0], y1[1], y2[0], y2[1], length)) return kFALSE;
   area = width * length;
   return kTRUE;
 }
@@ -529,4 +480,3 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
 }
 
 ClassImp(CbmMuchDigitizeAdvancedGem)
-

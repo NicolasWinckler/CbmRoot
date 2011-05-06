@@ -318,7 +318,8 @@ private:
    /* Calculate efficiency for two histograms */
    Double_t CalcEfficiency(
       TH1* histRec,
-      TH1* histAcc);
+      TH1* histAcc,
+      const std::string& opt);
 
    /* Draws histograms for hits */
    void DrawHitsHistos();

@@ -1793,17 +1793,9 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
    }
 
    if (fIsRich) {
-	   // Draw efficiency for RICH for all set
-	   DrawEfficiency("rec_qa_rich_efficiency_all", &fhRichMom[RICHALL],
-	         &fhRichMom[RICHALLREF], NULL, NULL, "RICH: all", "RICH: all ref", "", "", "");
-
 	   // Draw efficiency for RICH for electron set
 	   DrawEfficiency("rec_qa_rich_efficiency_electrons", &fhRichMom[RICHEL],
 	         &fhRichMom[RICHELREF], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "", "");
-
-	   // Draw efficiency for RICH for pion set
-	   DrawEfficiency("rec_qa_rich_efficiency_pions", &fhRichMom[RICHPI],
-	         &fhRichMom[RICHPIREF], NULL, NULL, "RICH: pions", "RICH: pions ref", "", "", "");
 
 	   // Draw efficiency for STS+RICH for electron set
 	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[RICHEL],
@@ -1853,16 +1845,11 @@ void CbmLitReconstructionQa::DrawEfficiency(
 	canvas->SetGrid();
 	canvas->cd();
 	std::string hname1, hname2, hname3, hname4;
-	Int_t rec = REC;
-	Int_t acc = ACC;
-	if (opt == "pisupp"){
-	   rec = ACC;
-	   acc = REC;
-	}
-	if (hist1) hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist1)[rec], (*hist1)[acc])) + ")";
-	if (hist2) hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist2)[rec], (*hist2)[acc])) + ")";
-	if (hist3) hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist3)[rec], (*hist3)[acc])) + ")";
-	if (hist4) hname4 = name4 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist4)[rec], (*hist4)[acc])) + ")";
+
+	if (hist1) hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist1)[REC], (*hist1)[ACC], opt), 1) + ")";
+	if (hist2) hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist2)[REC], (*hist2)[ACC], opt), 1) + ")";
+	if (hist3) hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist3)[REC], (*hist3)[ACC], opt), 1) + ")";
+	if (hist4) hname4 = name4 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist4)[REC], (*hist4)[ACC], opt), 1) + ")";
 
 	if (opt != "pisupp"){
 	   (*hist1)[EFF]->SetMinimum(0.);
@@ -1891,10 +1878,15 @@ void CbmLitReconstructionQa::DrawEfficiency(
 
 Double_t CbmLitReconstructionQa::CalcEfficiency(
    TH1* histRec,
-   TH1* histAcc)
+   TH1* histAcc,
+   const std::string& opt)
 {
-   if (histAcc->GetEntries() == 0) { return 0.; }
-   else { return Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries()); }
+   if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
+      return 0.;
+   } else {
+      if (opt != "pisupp") return 100.*Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+      else return Double_t(histAcc->GetEntries()) / Double_t(histRec->GetEntries());
+   }
 }
 
 void CbmLitReconstructionQa::DrawHitsHistos()
@@ -1917,18 +1909,16 @@ void CbmLitReconstructionQa::DrawHitsHistos(
    c->cd(1);
    DrawHist1D(histos[0], histos[1], histos[2], NULL,
               "Number of hits", "Number of hits", "Counter",
-              "all: " + lit::ToString<Double_t>(histos[0]->GetMean()),
-              "true: " + lit::ToString<Double_t>(histos[1]->GetMean()),
-              "fake: " + lit::ToString<Double_t>(histos[2]->GetMean()),  "",
+              "all: " + lit::ToString<Double_t>(histos[0]->GetMean(), 1),
+              "true: " + lit::ToString<Double_t>(histos[1]->GetMean(), 1),
+              "fake: " + lit::ToString<Double_t>(histos[2]->GetMean(), 1),  "",
               false, true, true, 0.25,0.99,0.55,0.75);
 
    c->cd(2);
-   DrawHist1D(histos[3], histos[4], NULL, NULL,
-              "Ratio", "Ratio", "Counter",
+   DrawHist1D(histos[3], histos[4], NULL, NULL, "Ratio", "Ratio", "Counter",
               "true/all: " + lit::ToString<Double_t>(histos[3]->GetMean()),
               "fake/all: " + lit::ToString<Double_t>(histos[4]->GetMean()),
-              "", "",
-              false, true, true, 0.25,0.99,0.55,0.75);
+              "", "", false, true, true, 0.25,0.99,0.55,0.75);
 
    lit::SaveCanvasAsImage(c, fOutputDir);
 }
@@ -1955,26 +1945,25 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 
 void CbmLitReconstructionQa::DrawStsTracksQaHistos()
 {
-   TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa_chi2Vertex", "rec_qa_sts_tracks_qa_chi2Vertex", 600, 500);
+   TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa", "rec_qa_sts_tracks_qa", 1200, 400);
+   canvas1->Divide(3,1);
+   canvas1->cd(1);
    DrawHist1D(fhStsChiprim, "#chi^{2}_{vertex}", "Counter",
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
             LIT_MARKER_STYLE1, false, false, "");
-   lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
-   TCanvas* canvas2 = new TCanvas("rec_qa_sts_tracks_qa_momres", "rec_qa_sts_tracks_qa_momres", 600, 500);
+   canvas1->cd(2);
    DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP [%]", "Counter",
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
             LIT_MARKER_STYLE1, false, false, "");
-   lit::SaveCanvasAsImage(canvas2, fOutputDir);
 
-   TCanvas* canvas3 = new TCanvas("rec_qa_sts_tracks_qa_momres2D", "rec_qa_sts_tracks_qa_momres2D", 600, 500);
-   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter",
-            false, false, false, "COLZ");
+   canvas1->cd(3);
+   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter", false, false, false, "COLZ");
 
 //   DrawHist1D(fhStsMomresVsMom->ProfileX(), "dP [%]", "Counter",
 //            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 //            LIT_MARKER_STYLE1, false, false, "same");
-   lit::SaveCanvasAsImage(canvas3, fOutputDir);
+   lit::SaveCanvasAsImage(canvas1, fOutputDir);
 }
 
 void CbmLitReconstructionQa::DrawHistosFromFile(const std::string& fileName)

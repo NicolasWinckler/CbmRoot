@@ -5,16 +5,18 @@ class TCanvas;
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
 namespace lit
 {
 
 template <class T>
 std::string ToString(
-   const T& value)
+   const T& value, int precision = 3)
 {
    std::stringstream ss;
-   ss.precision(5);
+   ss.setf(std::ios::fixed,std::ios::floatfield);
+   ss.precision(precision);
    ss << value;
    return ss.str();
 }

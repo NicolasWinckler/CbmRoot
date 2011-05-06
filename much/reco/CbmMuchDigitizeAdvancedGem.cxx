@@ -45,6 +45,9 @@ using std::setprecision;
 using std::map;
 using std::pair;
 
+void CbmMuchDigitizeAdvancedGem::SetParContainers() {}
+void CbmMuchDigitizeAdvancedGem::FinishTask() {}
+
 // -----   Default constructor   ------------------------------------------
 CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   FairTask("MuchDigitize", 1),
@@ -69,31 +72,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
 }
 // -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
-  FairTask("MuchDigitize", iVerbose),
-  fDigiFile(""),
-  fPoints(NULL),
-  fDigis(NULL),
-  fDigiMatches(NULL),
-  fDTime(3),
-  fNADCChannels(256),
-  fQMax(440000),
-  fMeanNoise(0),//(1500),
-  fMeanGasGain(1e4),
-  fDeadPadsFrac(0),
-  fGeoScheme(CbmMuchGeoScheme::Instance()),
-  fEpoch(0),
-  fMcChain(NULL),
-  fDeadTime(200)
-{
-    SetQThreshold(3);
-    SetSpotRadius();
-    Reset();
-}
-// -------------------------------------------------------------------------
-
-// -----   Constructor with name   -----------------------------------------
+// -----   Standard constructor    -----------------------------------------
 CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose) :
   FairTask(name, iVerbose),
   fDigiFile(digiFileName),
@@ -128,7 +107,6 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
     delete fDigiMatches;
   }
   SetSpotRadius();
-
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -138,8 +116,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   // Get module for the point
   Int_t detectorId = point->GetDetectorID();
   CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
-  if (!module)
-    return kFALSE;
+  if (!module) return kFALSE;
   if (module->GetNSectors() == 0) {
     fNOutside++;
     return kFALSE;
@@ -164,9 +141,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   //********** Primary electrons from the track (begin) ************************//
   // Get particle's characteristics
   Int_t trackID = point->GetTrackID();
-  if (trackID < 0) {
-    return kFALSE;
-  }
+  if (trackID < 0) return kFALSE;
+
   CbmMCTrack* mcTrack;
   if (!fEpoch) {
     mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
@@ -183,28 +159,20 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
   // Reject funny particles
   TParticlePDG *particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
-  if (!particle) {
-    return kFALSE;
-  }
-  if (TMath::Abs(particle->Charge()) < 0.1)
-    return kFALSE;
-  TVector3 momentum;                                // 3-momentum of the particle
-  point->Momentum(momentum);
-  Double_t mom = momentum.Mag() * 1e3;              // absolute momentum value [MeV/c]
-  Double_t mom2 = mom * mom;                        // squared momentum of the particle
-  Double_t mass = particle->Mass() * 1e3;           // mass of the particle [MeV/c^2]
-  Double_t mass2 = mass * mass;                     // squared mass of the particle
-  Double_t Tkin = TMath::Sqrt(mom2 + mass2) - mass; // kinetic energy of the particle
-  Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
-  Double_t mpv = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
-  UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 0.3 cm gap
-  while (nElectrons > 50000)
-    nElectrons = (UInt_t) (gRandom->Landau(mpv, sigma));     // restrict Landau tail to increase performance
+  if (!particle) return kFALSE;
+  if (TMath::Abs(particle->Charge()) < 0.1) return kFALSE;
+
+  Double_t m = particle->Mass();
+  TLorentzVector p;
+  p.SetXYZM(point->GetPx(),point->GetPy(),point->GetPz(),m);
+  Double_t Tkin = p.E()-p.M(); // kinetic energy of the particle
+  Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
+  Double_t mpv   = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
+  UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 3 mm gap
+  while (nElectrons > 50000) nElectrons = (UInt_t) (gRandom->Landau(mpv, sigma));     // restrict Landau tail to increase performance
   // Number of electrons for current track length
-  if (mass < 100.)
-    nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
-  else
-    nElectrons = (UInt_t) (nElectrons * lTrack / 0.36);
+  if (m < 0.1) nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
+  else         nElectrons = (UInt_t) (nElectrons * lTrack / 0.36);
   //********** Primary electrons from the track (end)   ***********************//
 
   Double_t hypotenuse = TMath::Sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -356,16 +324,6 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
 }
 // -------------------------------------------------------------------------
 
-// -----   Private method SetParContainers   -------------------------------
-void CbmMuchDigitizeAdvancedGem::SetParContainers() {
-}
-// -------------------------------------------------------------------------
-
-// -----   Private method Finish   -----------------------------------------
-void CbmMuchDigitizeAdvancedGem::FinishTask() {
-}
-// -------------------------------------------------------------------------
-
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchDigitizeAdvancedGem::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
@@ -496,137 +454,52 @@ Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(TPolyLine polygon1, TPolyLi
 }
 
 Int_t CbmMuchDigitizeAdvancedGem::GasGain() {
-  //  const Double_t q_mean  = 1.e4;  // mean gas gain, arbitrary value
   Double_t gasGain = -fMeanGasGain * TMath::Log(1 - gRandom->Rndm());
-  if (gasGain < 0.)
-    gasGain = 1e6;
+  if (gasGain < 0.) gasGain = 1e6;
   return (Int_t) gasGain;
 }
 
 Double_t CbmMuchDigitizeAdvancedGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
   Double_t logT;
-  if (mass < 100) {
+  TF1 fPol6("fPol6","pol6",-5,10);
+  if (mass < 0.1) {
     logT = log(Tkin * 0.511 / mass);
-    return CbmMuchDigitizeAdvancedGem::e_sigma_n_e(logT);
-  } else if (mass >= 100 && mass < 200) {
+    if (logT > 9.21034)    logT = 9.21034;
+    if (logT < min_logT_e) logT = min_logT_e;
+    return fPol6.EvalPar(&logT,sigma_e);
+  } else if (mass >= 0.1 && mass < 0.2) {
     logT = log(Tkin * 105.658 / mass);
-    return CbmMuchDigitizeAdvancedGem::mu_sigma_n_e(logT);
+    if (logT > 9.21034)    logT = 9.21034;
+    if (logT < min_logT_mu) logT = min_logT_mu;
+    return fPol6.EvalPar(&logT,sigma_mu);
   } else {
     logT = log(Tkin * 938.272 / mass);
-    return CbmMuchDigitizeAdvancedGem::p_sigma_n_e(logT);
+    if (logT > 9.21034)    logT = 9.21034;
+    if (logT < min_logT_p) logT = min_logT_p;
+    return fPol6.EvalPar(&logT,sigma_p);
   }
 }
 
 Double_t CbmMuchDigitizeAdvancedGem::MPV_n_e(Double_t Tkin, Double_t mass) {
   Double_t logT;
-  if (mass < 100.) {
+  TF1 fPol6("fPol6","pol6",-5,10);
+  if (mass < 0.1) {
     logT = log(Tkin * 0.511 / mass);
-    return CbmMuchDigitizeAdvancedGem::e_MPV_n_e(logT);
-  } else if (mass >= 100. && mass < 200.) {
+    if (logT > 9.21034)    logT = 9.21034;
+    if (logT < min_logT_e) logT = min_logT_e;
+    return fPol6.EvalPar(&logT,mpv_e);
+  } else if (mass >= 0.1 && mass < 0.2) {
     logT = log(Tkin * 105.658 / mass);
-    return CbmMuchDigitizeAdvancedGem::mu_MPV_n_e(logT);
+    if (logT > 9.21034)    logT = 9.21034;
+    if (logT < min_logT_mu) logT = min_logT_mu;
+    return fPol6.EvalPar(&logT,mpv_mu);
   } else {
     logT = log(Tkin * 938.272 / mass);
-    return CbmMuchDigitizeAdvancedGem::p_MPV_n_e(logT);
+    if (logT > 9.21034)    logT = 9.21034;
+    if (logT < min_logT_p) logT = min_logT_p;
+    return fPol6.EvalPar(&logT,mpv_p);
   }
 }
-
-Double_t CbmMuchDigitizeAdvancedGem::mu_sigma_n_e(Double_t &logT) {
-  if (logT < -0.916291)
-    logT = -0.916291;
-  if (logT > 9.21034)
-    logT = 9.21034;
-  const int n = 7;
-  double val = 0;
-  double arg = 1;
-  double p[n] = { 74.5272, -49.7648, 14.4886, -2.23059, 0.188254,-0.00792744, 0.00011976 };
-  for (int i = 0; i < n; i++) {
-    val = val + arg * p[i];
-    arg = arg * logT;
-  }
-  return val;
-}
-
-Double_t CbmMuchDigitizeAdvancedGem::p_sigma_n_e(Double_t &logT) {
-  if (logT < 1.09861)
-    logT = 1.09861;
-  if (logT > 9.21034)
-    logT = 9.21034;
-  const int n = 7;
-  double val = 0;
-  double arg = 1;
-  double p[n] = { 175.879, -15.016, -34.6513, 13.346, -2.08732, 0.153678,-0.00440115 };
-  for (int i = 0; i < n; i++) {
-    val = val + arg * p[i];
-    arg = arg * logT;
-  }
-  return val;
-}
-
-Double_t CbmMuchDigitizeAdvancedGem::e_sigma_n_e(Double_t &logT) {
-  if (logT < -3.21888)
-    logT = -3.21888;
-  if (logT > 9.21034)
-    logT = 9.21034;
-  const int n = 7;
-  double val = 0;
-  double arg = 1;
-  double p[n] = { 4.06815, -0.225699, 0.464502, -0.141208, 0.0226821,-0.00195697, 6.87497e-05 };
-  for (int i = 0; i < n; i++) {
-    val = val + arg * p[i];
-    arg = arg * logT;
-  }
-  return val;
-}
-
-Double_t CbmMuchDigitizeAdvancedGem::mu_MPV_n_e(Double_t &logT) {
-  if (logT < -0.916291)
-    logT = -0.916291;
-  if (logT > 9.21034)
-    logT = 9.21034;
-  const int n = 7;
-  double val = 0;
-  double arg = 1;
-  double p[n] = { 660.746, -609.335, 249.011, -55.6658, 7.04607, -0.472135, 0.0129834 };
-  for (int i = 0; i < n; i++) {
-    val = val + arg * p[i];
-    arg = arg * logT;
-  }
-  return val;
-}
-
-Double_t CbmMuchDigitizeAdvancedGem::p_MPV_n_e(Double_t &logT) {
-  if (logT < 1.09861)
-    logT = 1.09861;
-  if (logT > 9.21034)
-    logT = 9.21034;
-  const int n = 7;
-  double val = 0;
-  double arg = 1;
-  double p[n] = { 4152.73, -3123.98, 1010.85, -178.092, 17.8764, -0.963169, 0.0216643 };
-  for (int i = 0; i < n; i++) {
-    val = val + arg * p[i];
-    arg = arg * logT;
-  }
-  return val;
-}
-
-Double_t CbmMuchDigitizeAdvancedGem::e_MPV_n_e(Double_t &logT) {
-  if (logT < -3.21888)
-    logT = -3.21888;
-  if (logT > 9.21034)
-    logT = 9.21034;
-  const int n = 7;
-  double val = 0;
-  double arg = 1;
-  double p[n] = { 14.654, -0.786582, 2.32435, -0.875594, 0.167237,-0.0162335, 0.000616855 };
-  for (int i = 0; i < n; i++) {
-    val = val + arg * p[i];
-    arg = arg * logT;
-  }
-  return val;
-}
-// -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
@@ -635,10 +508,10 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
   
   // Add noise
   if (fMeanNoise){
-   Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
-   UInt_t noiseCharge = (UInt_t) rndGaus;
-   match->AddPoint(-1);
-   match->AddCharge(noiseCharge);
+    Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
+    UInt_t noiseCharge = (UInt_t) rndGaus;
+    match->AddPoint(-1);
+    match->AddCharge(noiseCharge);
   }
   
   // Check for threshold 

@@ -1,4 +1,7 @@
 /** CbmMuchDigitizeAdvancedGem.h
+ *@author Evgeny Kryshen <e.kryshen@gsi.de>
+ *@since 01.05.11
+ *@version 2.0
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 19.03.07
  *@version 1.0
@@ -22,7 +25,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchGeoScheme.h"
-
+#include "TF1.h"
 #include <map>
 
 
@@ -33,6 +36,16 @@ class CbmMuchPad;
 class TChain;
 
 enum DetectorType {kGEM, kMICROMEGAS};
+
+static double sigma_e[]  = { 4.06815, -0.225699, 0.464502, -0.141208, 0.0226821,-0.00195697, 6.87497e-05 };
+static double sigma_mu[] = { 74.5272, -49.7648, 14.4886, -2.23059, 0.188254,-0.00792744, 0.00011976 };
+static double sigma_p[]  = { 175.879, -15.016, -34.6513, 13.346, -2.08732, 0.153678,-0.00440115 };
+static double mpv_e[]    = { 14.654, -0.786582, 2.32435, -0.875594, 0.167237,-0.0162335, 0.000616855 };
+static double mpv_mu[]   = { 660.746, -609.335, 249.011, -55.6658, 7.04607, -0.472135, 0.0129834 };
+static double mpv_p[]    = { 4152.73, -3123.98, 1010.85, -178.092, 17.8764, -0.963169, 0.0216643 };
+static double min_logT_e  = -3.21888; 
+static double min_logT_mu = -0.916291; 
+static double min_logT_p  =  1.0986; 
 
 class CbmMuchDigitizeAdvancedGem : public FairTask
 {
@@ -144,6 +157,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
     Double_t           fDeadTime;      // Channel dead time [ns]
+//    static TF1*        fPol6;          // 6-order polynomial for Landau sigma and MPV
     
     /** Finish. **/
     virtual void FinishTask();
@@ -169,8 +183,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      *@param width  Width.
      *@param height Height.
      **/
-    TPolyLine GetPolygon(Double_t x0, Double_t y0,
-        Double_t width, Double_t height);
+    TPolyLine GetPolygon(Double_t x0, Double_t y0, Double_t width, Double_t height);
 
     /** Verifies whether projections with given coordinates are intersected.
      *@param x11     coordinate of one end of the first projection.
@@ -189,23 +202,14 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      **/
     Bool_t PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area);
 
+    Bool_t AddDigi(CbmMuchPad* pad);
+    inline Int_t GasGain();
     /**
      * Function returns a random number distributed according
      * exponential law, which reproduces the gas gain fluctuation.
      *@author Volodia Nikulin.
      *@since 14/04/2007.
      */
-    Bool_t AddDigi(CbmMuchPad* pad);
-
-    
-    inline Int_t GasGain();
-
-    static Double_t e_sigma_n_e(Double_t &logT);
-    static Double_t e_MPV_n_e(Double_t &logT);
-    static Double_t mu_sigma_n_e(Double_t &logT);
-    static Double_t mu_MPV_n_e(Double_t &logT);
-    static Double_t p_sigma_n_e(Double_t &logT);
-    static Double_t p_MPV_n_e(Double_t &logT);
 
     ClassDef(CbmMuchDigitizeAdvancedGem,1)
 };

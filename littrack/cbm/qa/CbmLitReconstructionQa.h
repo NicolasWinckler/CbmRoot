@@ -312,7 +312,8 @@ private:
    		const std::string& name1,
    		const std::string& name2,
    		const std::string& name3,
-   		const std::string& name4);
+   		const std::string& name4,
+   		const std::string& opt);
 
    /* Calculate efficiency for two histograms */
    Double_t CalcEfficiency(

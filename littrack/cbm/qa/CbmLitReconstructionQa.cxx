@@ -1294,7 +1294,7 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
    for (Int_t i = 0; i < 2; i++) {
       Int_t acc = ACC;
       Int_t rec = REC;
-      if (i == PISUPP){
+      if (i == 1){
          acc = REC;
          rec = ACC;
       }
@@ -1763,69 +1763,78 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
    DrawEfficiency("rec_qa_global_efficiency_all", &fhStsMomNormGlobal[ALL],
-		   &fhHalfGlobalMomNormGlobal[ALL], &fhGlobalMom[ALL], NULL, sname, hgname, gname, "");
+		   &fhHalfGlobalMomNormGlobal[ALL], &fhGlobalMom[ALL], NULL, sname, hgname, gname, "", "");
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
    DrawEfficiency("rec_qa_global_efficiency_signal", &fhStsMomNormGlobal[cat],
-		   &fhHalfGlobalMomNormGlobal[cat], &fhGlobalMom[cat], NULL, sname, hgname, gname, "");
+		   &fhHalfGlobalMomNormGlobal[cat], &fhGlobalMom[cat], NULL, sname, hgname, gname, "", "");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
    DrawEfficiency("rec_qa_half_global_efficiency_all", &fhStsMomNormHalfGlobal[ALL],
-		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "");
+		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "", "");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
    DrawEfficiency("rec_qa_half_global_efficiency_signal", &fhStsMomNormHalfGlobal[cat],
-		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "");
+		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "", "");
 
    // Draw efficiency for STS
    DrawEfficiency("rec_qa_sts_efficiency", &fhStsMom[ALL],
-  		   &fhStsMom[cat], NULL, NULL, "STS: all", "STS: " + signal, "", "");
+  		   &fhStsMom[cat], NULL, NULL, "STS: all", "STS: " + signal, "", "", "");
 
    if (fIsTrd || fIsMuch) {
 	   // Draw efficiency for TRD(MUCH)
 	   DrawEfficiency("rec_qa_rec_efficiency", &fhRecMom[ALL],
-				 &fhRecMom[cat], NULL, NULL, rname + ": all", rname + ": " + signal, "", "");
+				 &fhRecMom[cat], NULL, NULL, rname + ": all", rname + ": " + signal, "", "", "");
    }
 
    if (fIsTof) {
 	   // Draw efficiency for TOF
 	   DrawEfficiency("rec_qa_tof_efficiency", &fhTofMom[ALL],
-			   	 &fhTofMom[cat], NULL, NULL, "TOF: all", "TOF: " + signal, "", "");
+			   	 &fhTofMom[cat], NULL, NULL, "TOF: all", "TOF: " + signal, "", "", "");
    }
 
    if (fIsRich) {
 	   // Draw efficiency for RICH for all set
 	   DrawEfficiency("rec_qa_rich_efficiency_all", &fhRichMom[RICHALL],
-	         &fhRichMom[RICHALLREF], NULL, NULL, "RICH: all", "RICH: all ref", "", "");
+	         &fhRichMom[RICHALLREF], NULL, NULL, "RICH: all", "RICH: all ref", "", "", "");
 
 	   // Draw efficiency for RICH for electron set
 	   DrawEfficiency("rec_qa_rich_efficiency_electrons", &fhRichMom[RICHEL],
-	         &fhRichMom[RICHELREF], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "");
+	         &fhRichMom[RICHELREF], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "", "");
 
 	   // Draw efficiency for RICH for pion set
 	   DrawEfficiency("rec_qa_rich_efficiency_pions", &fhRichMom[RICHPI],
-	         &fhRichMom[RICHPIREF], NULL, NULL, "RICH: pions", "RICH: pions ref", "", "");
+	         &fhRichMom[RICHPIREF], NULL, NULL, "RICH: pions", "RICH: pions ref", "", "", "");
 
 	   // Draw efficiency for STS+RICH for electron set
 	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[RICHEL],
-			   &fhStsRichMom[RICHEL], NULL, NULL, "STS", "STS+RICH", "", "");
+			   &fhStsRichMom[RICHEL], NULL, NULL, "STS", "STS+RICH", "", "", "");
 
 	   // Draw efficiency for STS+RICH+TRD for electron set
 	   DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", &fhStsMomNormStsRichTrd[RICHEL],
 			   &fhStsRichMomNormStsRichTrd[RICHEL], &fhStsRichTrdMom[RICHEL], NULL,
-			   "STS", "STS+RICH", "STS+RICH+TRD", "");
+			   "STS", "STS+RICH", "STS+RICH+TRD", "", "");
 
 	   // Draw efficiency for STS+RICH+TRD+TOF for electron set
 	   DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", &fhStsMomNormStsRichTrdTof[RICHEL],
 			   &fhStsRichMomNormStsRichTrdTof[RICHEL], &fhStsRichTrdMomNormStsRichTrdTof[RICHEL], &fhStsRichTrdTofMom[RICHEL],
-			   "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF");
+			   "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
    }
 
    // Electron identification efficiencies
-   DrawEfficiency("rec_qa_sts_trd_elid_eff", &fhStsTrdMomElId[ELID],
-         NULL, NULL, NULL, "STS+TRD", "", "", "");
+//   DrawEfficiency("rec_qa_sts_trd_elid_eff", &fhStsTrdMomElId[ELID],
+//         NULL, NULL, NULL, "STS+TRD", "", "", "", "");
+//
+//   DrawEfficiency("rec_qa_sts_trd_tof_elid_eff", &fhStsTrdMomElIdNormStsTrdTof[ELID],
+//         &fhStsTrdTofMomElId[ELID], NULL, NULL, "STS+TRD", "STS+TRD+TOF", "", "", "");
 
-   DrawEfficiency("rec_qa_sts_trd_tof_elid_eff", &fhStsTrdMomElIdNormStsTrdTof[ELID],
-         &fhStsTrdTofMomElId[ELID], NULL, NULL, "STS+TRD", "STS+TRD+TOF", "", "");
+
+   DrawEfficiency("rec_qa_sts_rich_trd_tof_electron_identification", &fhStsRichMomElIdNormStsRichTrdTof[ELID],
+            &fhStsRichTrdMomElIdNormStsRichTrdTof[ELID], &fhStsRichTrdTofMomElId[ELID], NULL,
+            "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "");
+
+   DrawEfficiency("rec_qa_sts_rich_trd_tof_pion_suppression", &fhStsRichMomElIdNormStsRichTrdTof[PISUPP],
+         &fhStsRichTrdMomElIdNormStsRichTrdTof[PISUPP], &fhStsRichTrdTofMomElId[PISUPP], NULL,
+         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "pisupp");
 }
 
 void CbmLitReconstructionQa::DrawEfficiency(
@@ -1837,19 +1846,28 @@ void CbmLitReconstructionQa::DrawEfficiency(
 		const std::string& name1,
 		const std::string& name2,
 		const std::string& name3,
-		const std::string& name4)
+		const std::string& name4,
+		const std::string& opt)
 {
 	TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
 	canvas->SetGrid();
 	canvas->cd();
 	std::string hname1, hname2, hname3, hname4;
-	if (hist1) hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist1)[REC], (*hist1)[ACC])) + ")";
-	if (hist2) hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist2)[REC], (*hist2)[ACC])) + ")";
-	if (hist3) hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist3)[REC], (*hist3)[ACC])) + ")";
-	if (hist4) hname4 = name4 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist4)[REC], (*hist4)[ACC])) + ")";
+	Int_t rec = REC;
+	Int_t acc = ACC;
+	if (opt == "pisupp"){
+	   rec = ACC;
+	   acc = REC;
+	}
+	if (hist1) hname1 = name1 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist1)[rec], (*hist1)[acc])) + ")";
+	if (hist2) hname2 = name2 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist2)[rec], (*hist2)[acc])) + ")";
+	if (hist3) hname3 = name3 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist3)[rec], (*hist3)[acc])) + ")";
+	if (hist4) hname4 = name4 + "(" + lit::ToString<Double_t>(CalcEfficiency((*hist4)[rec], (*hist4)[acc])) + ")";
 
-	(*hist1)[EFF]->SetMinimum(0.);
-	(*hist1)[EFF]->SetMaximum(1.);
+	if (opt != "pisupp"){
+	   (*hist1)[EFF]->SetMinimum(0.);
+	   (*hist1)[EFF]->SetMaximum(1.);
+	}
 
 	if (hist1 && hist2 && hist3 && hist4) {
 		DrawHist1D((*hist1)[EFF], (*hist2)[EFF], (*hist3)[EFF], (*hist4)[EFF],

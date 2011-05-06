@@ -156,7 +156,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Double_t m = particle->Mass();
   TLorentzVector p;
   p.SetXYZM(point->GetPx(),point->GetPy(),point->GetPz(),m);
-  Double_t Tkin = p.E()-p.M(); // kinetic energy of the particle
+  Double_t Tkin = p.E()-m; // kinetic energy of the particle
   Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
   Double_t mpv   = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
   UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 3 mm gap
@@ -221,6 +221,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         match->AddCharge(iCharge);
       }
     } // loop fired sectors
+    firedSectors.clear();
+    firedSectors.delete();
   } // loop over electrons
   return kTRUE;
   //**************  Simulate avalanche (end) **********************************//

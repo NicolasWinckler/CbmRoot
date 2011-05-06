@@ -157,6 +157,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
     Double_t           fDeadTime;      // Channel dead time [ns]
+    Int_t              fChainEventId;  // Temporary solution for accessing MC chain in epoch approach
 //    static TF1*        fPol6;          // 6-order polynomial for Landau sigma and MPV
     
     /** Finish. **/

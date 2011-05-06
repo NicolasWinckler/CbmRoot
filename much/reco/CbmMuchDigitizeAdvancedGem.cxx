@@ -65,7 +65,8 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(200)
+  fDeadTime(200),
+  fChainEventId(0)
 {
     SetQThreshold(3);
     SetSpotRadius();
@@ -89,7 +90,8 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(200)
+  fDeadTime(200),
+  fChainEventId(0)
 {
   SetQThreshold(3),
   SetSpotRadius(),
@@ -139,7 +141,10 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
   } else {
     Int_t eventId = point->GetEventID();
-    fMcChain->GetEntry(eventId);
+    if (eventId!=fChainEventId) {
+      fChainEventId=eventId;
+      fMcChain->GetEntry(eventId);
+    }
     mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
   }
   if (!mcTrack) return kFALSE;
@@ -222,7 +227,6 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
       }
     } // loop fired sectors
     firedSectors.clear();
-    firedSectors.delete();
   } // loop over electrons
   return kTRUE;
   //**************  Simulate avalanche (end) **********************************//

@@ -331,6 +331,7 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
     
     fMCTracks = new TClonesArray("CbmMCTrack");
     fMcChain->SetBranchAddress("MCTrack",&fMCTracks);
+    fMcChain->GetEntry(fChainEventId);
   }
   
   // Register output array MuchDigi

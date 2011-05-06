@@ -46,13 +46,14 @@ if(NOT CBMROOT_MINIMAL)
   IF(NOT DEFINED ENV{SIMPATH})
     MESSAGE(FATAL_ERROR "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again.")
   ENDIF(NOT DEFINED ENV{SIMPATH})
-  STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
   SET(SIMPATH $ENV{SIMPATH})
 else(NOT CBMROOT_MINIMAL)
   if(NOT DEFINED ENV{ROOTSYS})
     MESSAGE(FATAL_ERROR "You did not define the environment variable ROOTSYS which is nedded for the installation of the minimal version of CbmRoot. Please set this variable and execute cmake again.")
   endif(NOT DEFINED ENV{ROOTSYS})
 endif(NOT CBMROOT_MINIMAL)
+
+STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
 
 # searches for needed packages
@@ -190,5 +191,6 @@ if(NOT CBMROOT_MINIMAL)
   WRITE_CONFIG_FILE(config.sh)
   WRITE_CONFIG_FILE(config.csh)
 else(NOT CBMROOT_MINIMAL)
-  WRITE_MINIMAL_CONFIG_FILE(config.sh)
+  SET(FULL_CONFIG_FILE "false")
+  WRITE_CONFIG_FILE(config.sh)
 endif(NOT CBMROOT_MINIMAL)

@@ -156,6 +156,8 @@ void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
 void CbmMuchDigiMatch::Reset() {
   fRefIndex.Reset();
   fCharge.Reset();
+  fRefIndex.Set(0);
+  fCharge.Set(0);
 }
 
 ClassImp(CbmMuchDigiMatch)

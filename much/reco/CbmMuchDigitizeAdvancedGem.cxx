@@ -222,8 +222,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
           digi->SetTime(time);
           digi->SetDeadTime(fDeadTime);
         }
-        match->AddPoint(iPoint);
-        match->AddCharge(iCharge);
+        match->AddCharge(iPoint,iCharge);
       }
     } // loop fired sectors
     firedSectors.clear();
@@ -468,8 +467,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
   if (fMeanNoise){
     Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
     UInt_t noiseCharge = (UInt_t) rndGaus;
-    match->AddPoint(-1);
-    match->AddCharge(noiseCharge);
+    match->AddCharge(-1,noiseCharge);
   }
   
   // Check for threshold 

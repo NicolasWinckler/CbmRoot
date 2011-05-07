@@ -75,6 +75,7 @@ Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
   return fRefIndex.At(i);
 }
 // -------------------------------------------------------------------------
+
 // -----   Public method AddCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
   if ( iCharge < 0 ) {
@@ -89,6 +90,21 @@ UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
   return n+1;
 }
 // -------------------------------------------------------------------------
+
+
+// -----   Public method AddCharge  ----------------------------------------
+UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t iCharge) {
+  for (Int_t i=0;i<fRefIndex.GetSize();i++){
+    if (fRefIndex[i]!=iPoint) continue;
+    fCharge[i]+=iCharge;
+    return 0;
+  }
+  AddPoint(iPoint);
+  return AddCharge(iCharge);
+}
+// -------------------------------------------------------------------------
+
+
 
 // -----   Public method GetCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {

@@ -72,6 +72,14 @@ class CbmMuchDigiMatch : public TObject
   UInt_t GetTotalCharge() const;
   void SortPointsInTime(TClonesArray* points);
 
+  void Reset();
+
+  /**
+   * Add a charge from a MC point. Index of the point can
+   * be accessed through GetRefIndex(i).
+   * @param iCharge Charge from the MuchPoint [electrons]
+   * @value Number of points the digi contains
+   */
   UInt_t AddCharge(Int_t iPoint, UInt_t iCharge);
 
  

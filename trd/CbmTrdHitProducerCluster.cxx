@@ -824,104 +824,106 @@ Int_t CbmTrdHitProducerCluster::GetSector(Bool_t x, Int_t DigiCol/*, ModulePara*
   }
   // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, ModulePara* mPara*/, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/,TH2F*& PRF)
-  {
-    //cout << "SimpleReco |->" << endl;
-    Int_t DigiCol = hit-> colId;
-    Int_t iSec = 0;
-    hit->dxPos = 0.5 * fPadSizeX[iSec];
-    if (DigiCol == 0)
-      {
-	//hit->xPos += 0.5 * mPara->PadSizeX[iSec];
-	hit->dxPos = 0.5 * fPadSizeX[iSec];
-      }
-    /*
+{
+  //cout << "SimpleReco |->" << endl;
+  Int_t DigiCol = hit-> colId;
+  Int_t iSec = 0;
+  hit->dxPos = 0.5 * fPadSizeX[iSec];
+  hit->exPos = hit->dxPos;
+  if (DigiCol == 0)
+    {
+      //hit->xPos += 0.5 * mPara->PadSizeX[iSec];
+      hit->dxPos = 0.5 * fPadSizeX[iSec];
+    }
+  /*
     while (DigiCol > 0)
-      {
-	if (mPara->SecCol[iSec] < mPara->nCol)
-	  {
-	    if (DigiCol > mPara->SecCol[iSec])
-	      {
-		hit->xPos += mPara->SectorSizeX[iSec];
-		DigiCol -= mPara->SecCol[iSec];
-		iSec++;
-	      }
-	    if (DigiCol <= mPara->SecCol[iSec] && DigiCol > 0)
-	      {
-		hit->xPos += DigiCol * mPara->PadSizeX[iSec] + 0.5 * mPara->PadSizeX[iSec];
-		DigiCol -= DigiCol;
-		hit->dxPos = 0.5 * mPara->PadSizeX[iSec];
-	      }
-	  }      
-	if (iSec == 0 && mPara->SecCol[iSec] == mPara->nCol && DigiCol > 0)
-	  {
-	    hit->xPos += DigiCol * mPara->PadSizeX[iSec] + 0.5 * mPara->PadSizeX[iSec];
-	    DigiCol -= DigiCol;
-	    hit->dxPos = 0.5 * mPara->PadSizeX[iSec];
-	  }
-	//cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
-      }
-    */
-    iSec = 0;
-    Int_t DigiRow = hit-> rowId;
-	hit->dyPos = 0.5 * fPadSizeY[iSec];
+    {
+    if (mPara->SecCol[iSec] < mPara->nCol)
+    {
+    if (DigiCol > mPara->SecCol[iSec])
+    {
+    hit->xPos += mPara->SectorSizeX[iSec];
+    DigiCol -= mPara->SecCol[iSec];
+    iSec++;
+    }
+    if (DigiCol <= mPara->SecCol[iSec] && DigiCol > 0)
+    {
+    hit->xPos += DigiCol * mPara->PadSizeX[iSec] + 0.5 * mPara->PadSizeX[iSec];
+    DigiCol -= DigiCol;
+    hit->dxPos = 0.5 * mPara->PadSizeX[iSec];
+    }
+    }      
+    if (iSec == 0 && mPara->SecCol[iSec] == mPara->nCol && DigiCol > 0)
+    {
+    hit->xPos += DigiCol * mPara->PadSizeX[iSec] + 0.5 * mPara->PadSizeX[iSec];
+    DigiCol -= DigiCol;
+    hit->dxPos = 0.5 * mPara->PadSizeX[iSec];
+    }
+    //cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
+    }
+  */
+  iSec = 0;
+  Int_t DigiRow = hit-> rowId;
+  hit->dyPos = 0.5 * fPadSizeY[iSec];
+  hit->eyPos = hit->dyPos;
     if (DigiRow == 0)
       {
 	//hit->yPos += 0.5 * mPara->PadSizeY[iSec];
 	hit->dyPos = 0.5 * fPadSizeY[iSec];
       }
-    /*
+  /*
     while (DigiRow > 0)
-      {
-	if (mPara->SecRow[iSec] < mPara->nRow)
-	  {
-	    if (DigiRow > mPara->SecRow[iSec])
-	      {
-		hit->yPos += mPara->SectorSizeY[iSec];
-		DigiRow -= mPara->SecRow[iSec];
-		iSec++;
-	      }
-	    if (DigiRow <= mPara->SecRow[iSec] && DigiRow > 0)
-	      {
-		hit->yPos += DigiRow * mPara->PadSizeY[iSec] + 0.5 * mPara->PadSizeY[iSec];
-		DigiRow -= DigiRow;
-		hit->dyPos = 0.5 * mPara->PadSizeY[iSec];
-	      }
-	  }      
-	if (iSec == 0 && mPara->SecRow[iSec] == mPara->nRow && DigiRow > 0)
-	  {
-	    hit->yPos += DigiRow * mPara->PadSizeY[iSec] + 0.5 * mPara->PadSizeY[iSec];
-	    DigiRow -= DigiRow;
-	    hit->dyPos = 0.5 * mPara->PadSizeY[iSec];
-	  }    
-	//cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
-      }
-    */
-    PrfReco(qMaxIndex, qMax/*, mPara*/, neighbourIds, hit, PRF);
+    {
+    if (mPara->SecRow[iSec] < mPara->nRow)
+    {
+    if (DigiRow > mPara->SecRow[iSec])
+    {
+    hit->yPos += mPara->SectorSizeY[iSec];
+    DigiRow -= mPara->SecRow[iSec];
+    iSec++;
+    }
+    if (DigiRow <= mPara->SecRow[iSec] && DigiRow > 0)
+    {
+    hit->yPos += DigiRow * mPara->PadSizeY[iSec] + 0.5 * mPara->PadSizeY[iSec];
+    DigiRow -= DigiRow;
+    hit->dyPos = 0.5 * mPara->PadSizeY[iSec];
+    }
+    }      
+    if (iSec == 0 && mPara->SecRow[iSec] == mPara->nRow && DigiRow > 0)
+    {
+    hit->yPos += DigiRow * mPara->PadSizeY[iSec] + 0.5 * mPara->PadSizeY[iSec];
+    DigiRow -= DigiRow;
+    hit->dyPos = 0.5 * mPara->PadSizeY[iSec];
+    }    
+    //cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
+    }
+  */
+  PrfReco(qMaxIndex, qMax/*, mPara*/, neighbourIds, hit, PRF);
   
-    //cout << "layer " << Layer << "  col " << nCol << "  row " << nRow << endl;
-    //cout << "      " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;
-    //cout << "         (" << x << "," << y << "," << z << ")" << endl;
+  //cout << "layer " << Layer << "  col " << nCol << "  row " << nRow << endl;
+  //cout << "      " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;
+  //cout << "         (" << x << "," << y << "," << z << ")" << endl;
   
-    TVector3  pos(hit->xPos/10.,   hit->yPos/10.,  hit->zPos/10.);
-    TVector3 dpos(hit->dxPos/10., hit->dyPos/10., hit->dzPos/10.);
-    Double_t dxy = 0;
-    Int_t planeId = 0;
-    Double_t eLossTR = 0;
-    Double_t eLossdEdx = 0;
-    Double_t eLoss = 0;
+  TVector3  pos(hit->xPos/10.,   hit->yPos/10.,  hit->zPos/10.);
+  TVector3 dpos(hit->exPos/10., hit->eyPos/10., hit->ezPos/10.);
+  Double_t dxy = 0;
+  Int_t planeId = 0;
+  Double_t eLossTR = 0;
+  Double_t eLossdEdx = 0;
+  Double_t eLoss = 0;
 
-    planeId=fLayersBeforeStation[(fStation)-1]+(fLayer);
+  planeId=fLayersBeforeStation[(fStation)-1]+(fLayer);
       
-    AddHit( qMaxIndex, fmoduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
+  AddHit( qMaxIndex, fmoduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
   
-    std::map<Int_t, MyHitList* >::iterator it = ModuleHitMap.find(fmoduleId);
-    if (it == ModuleHitMap.end())
-      {
-	ModuleHitMap[fmoduleId] = new MyHitList;
-      }
-    ModuleHitMap[fmoduleId]->push_back(hit);
-    // cout << "SimpleReco ->|" << endl;
-  }
+  std::map<Int_t, MyHitList* >::iterator it = ModuleHitMap.find(fmoduleId);
+  if (it == ModuleHitMap.end())
+    {
+      ModuleHitMap[fmoduleId] = new MyHitList;
+    }
+  ModuleHitMap[fmoduleId]->push_back(hit);
+  // cout << "SimpleReco ->|" << endl;
+}
 
   // --------------------------------------------------------------------
   void CbmTrdHitProducerCluster::DrawHits()

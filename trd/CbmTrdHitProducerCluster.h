@@ -30,12 +30,15 @@ typedef struct MyHit
   Int_t nRow;
   //
   Int_t moduleId;
-  Float_t xPos;
+  Float_t xPos;  //it is the center of pad with maximum charge which is shifted by the displacement calculated using the prf
   Float_t yPos;
   Float_t zPos;
-  Float_t dxPos;
+  Float_t dxPos; // displacement calculated using the prf
   Float_t dyPos;
   Float_t dzPos;
+  Float_t exPos; // error of the hit position (half pad size)
+  Float_t eyPos;
+  Float_t ezPos;
   Float_t charge;
 
   Int_t NoPrfRecoDim;

@@ -1,19 +1,22 @@
-#include "../../../littrack/utils/CbmLitDrawHist.cxx"
-//#include "../../../littrack/utils/CbmLitUtils.cxx"
+/** draw_analysis_all.C
+ * @author Elena Lebedeva <e.lebedeva@gsi.de>
+ * @since 2010
+ * @version 1.0
+ **/
 
+#include "../../../littrack/utils/CbmLitDrawHist.cxx"
 
 //CUT EFFICIENCY
-    TH1D* sAll_chi_prim;
-    TH1D* sAll_gammacut;
-    TH1D* sAll_stcut;
-    TH1D* sAll_ttcut;
-    TH1D* sAll_ptcut;
-    TH1D* bg_chi_prim;
-    TH1D* bg_gammacut;
-    TH1D* bg_stcut;
-    TH1D* bg_ttcut;
-    TH1D* bg_ptcut;
-
+TH1D* sAll_chi_prim;
+TH1D* sAll_gammacut;
+TH1D* sAll_stcut;
+TH1D* sAll_ttcut;
+TH1D* sAll_ptcut;
+TH1D* bg_chi_prim;
+TH1D* bg_gammacut;
+TH1D* bg_stcut;
+TH1D* bg_ttcut;
+TH1D* bg_ptcut;
 
 void draw_minv(TH1* srho1, TH1* somega1, TH1* sphi1, TH1* bg1, TH1* eta, TH1* pi0, TH1* omegaDalitz)
 {

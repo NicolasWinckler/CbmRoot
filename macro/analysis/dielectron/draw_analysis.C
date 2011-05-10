@@ -1,12 +1,16 @@
-//#include "../../../littrack/cbm/utils/CbmLitDrawHist.cxx"
-//#include "../../../littrack/std/utils/CbmLitUtils.cxx"
+/** draw_analysis.C
+ * @author Elena Lebedeva <e.lebedeva@gsi.de>
+ * @since 2010
+ * @version 1.0
+ **/
 
 void draw_eff_pty(TH2D* h1, TH2D* h2){
     char effTxt[60];
     if (h2->GetEntries() != 0) sprintf(effTxt,"%.1f\%", (Double_t)h1->GetEntries()/h2->GetEntries()*100.);
     TText *t3 = new TText(0.2, 1.8, effTxt);
     t3->Draw();
-} 
+}
+
 void draw_eff_mom(TH1D* h1, TH1D* h2){
     char effTxt[60];
     if (h2->GetEntries() != 0) sprintf(effTxt, "%.1f\%", (Double_t)h1->GetEntries()/h2->GetEntries()*100.);
@@ -35,8 +39,8 @@ TH1D* divideHisto1D(TH1D* h1, TH1D* h2)
     Int_t nBins = h1->GetNbinsX();
     Double_t min = h1->GetXaxis()->GetXmin();
     Double_t max = h1->GetXaxis()->GetXmax();
-    //h1->Sumw2();
-    //h2->Sumw2();
+    h1->Sumw2();
+    h2->Sumw2();
     TH1D* h3 = new TH1D(h1->GetName(), h1->GetTitle(), nBins, min, max);
     h3->Divide(h1, h2);
     return h3;
@@ -45,9 +49,13 @@ TH1D* divideHisto1D(TH1D* h1, TH1D* h2)
 
 void calculateSignalOverBg(TH1D* s, TH1D* bg)
 {
+
     TH1D* sClone = (TH1D*)s->Clone();
-    //sClone->SetPrintLevel(-1);
+    //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(-1);    
+    //TF1* fit = new TF1("gaus1", "gaus");
+   // fit->Config().MinimizerOptions().SetPrintLevel(-1);
     sClone->Fit("gaus");
+
     Double_t mean = sClone->GetFunction("gaus")->GetParameter("Mean");
     Double_t sigma = sClone->GetFunction("gaus")->GetParameter("Sigma");
     cout << "Mean = " << mean << " Sigma = " << sigma <<  endl;
@@ -66,39 +74,6 @@ void calculateSignalOverBg(TH1D* s, TH1D* bg)
     }
 
     cout << s->GetName() << " - S/BG = " << sumSignal/sumBg << ", BG/S = " << sumBg/sumSignal<<endl;
-/*
-    Int_t nBins = s->GetNbinsX();
-    Double_t max = -1.;
-    Double_t max1 = -10.;
-    Int_t maxind1 = 0;
-    Int_t maxind = 0;
-    for (Int_t i = 1; i <= nBins; i++){
-       Double_t value = s->GetBinContent(i);
-       if (value > max) {
-            max = value;
-            maxind = i;
-    
-        }
-    }
-    for (Int_t i = 1; i <= nBins; i++){
-       Double_t value = s->GetBinContent(i);
-       if (value > max1 && i != maxind) {
-            max1 = value;
-            maxind1 = i;
-        }
-    }
-
-    Double_t val = bg->GetBinContent(maxind);
-    Double_t val1 = bg->GetBinContent(maxind1);
-    Double_t val2 = bg->GetBinContent(maxind-1);
-    Double_t val3 = bg->GetBinContent(maxind1+1);
-
-    Double_t max2 = s->GetBinContent(maxind-1);
-    Double_t max3 = s->GetBinContent(maxind1+1);
-
-    Double_t sbg = (max+max1+max2+max3)/(val+val1+val2+val3);
-    cout << s->GetName() << " - S/BG = " << sbg << ", BG/S = " << 1./sbg<<endl;
-*/
 }
 
 //option == forward or back
@@ -155,6 +130,27 @@ void draw_minv(TH1* s1, TH1* bg1)
     gPad->SetLogy(true);
 }
 
+void scaleAllHistogramms(Int_t nofEvents)
+{
+    cout << "Scale all histogramms:" << endl;
+    TDirectory * dir = gDirectory;
+    TIter nextkey( dir->GetListOfKeys());
+    TKey *key;
+
+    Int_t count = 0;
+    while (key = (TKey*) nextkey()) {
+        TObject* obj = key->ReadObj();
+
+        if (obj->IsA()->InheritsFrom (TH1::Class())) {
+            TH1* h1 = (TH1*) obj;
+            cout << h1->GetName() << endl;
+            h1->Scale(1./(Double_t)nofEvents);
+            count++;
+        }
+    }
+    cout << count << " histogramms were scaled." << endl;
+}
+
 void draw_analysis(){
 
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -163,14 +159,19 @@ void draw_analysis(){
     gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
     cbmlibs();
 
-    TFile *file = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
-   //TString signalSt = "rho0"; //rho0, phi, omega
+    TString fileName = "/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all_temp.root";
+    TFile *file = new TFile(fileName);
+
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
     gROOT->SetStyle("Plain");
     gStyle->SetPalette(1,0);
+    
+    Int_t fNofEvents = fh_event_number->GetEntries();
+    cout << "File name = " << fileName << endl;
+    cout << "Number of events = " << fNofEvents<< endl;
 
-    TCanvas *c20 = new TCanvas("c20-signal-fit", "c20-signal-fit", 600, 600);
+    TCanvas *c1 = new TCanvas("c1-signal-fit", "c1-signal-fit", 600, 600);
     calculateSignalOverBg(fh_rec_signal_minv, fh_rec_bg_minv);
     calculateSignalOverBg(fh_chi_prim_signal_minv, fh_chi_prim_bg_minv);
     calculateSignalOverBg(fh_rich_id_signal_minv, fh_rich_id_bg_minv);
@@ -183,118 +184,120 @@ void draw_analysis(){
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
   //  calculateSignalOverBg(fh_apmcut_signal_minv, fh_apmcut_bg_minv);
 
+//SCALE ALL HISTOGRAMMS
+    scaleAllHistogramms(fNofEvents);
 
 // pty distribution of signal
-    TCanvas *c1 = new TCanvas("c1-pty","c1-pty",1000,1000);
-    c1->Divide(4,4);
-    c1->cd(1);
+    TCanvas *c2 = new TCanvas("c2-pty","c2-pty",1000,1000);
+    c2->Divide(4,4);
+    c2->cd(1);
     fh_mc_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_mc_signal_pty, fh_mc_signal_pty);
-    c1->cd(2);
+    c2->cd(2);
     fh_acc_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_acc_signal_pty, fh_mc_signal_pty);
-    c1->cd(3);
+    c2->cd(3);
     fh_reco_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_reco_signal_pty, fh_mc_signal_pty);
-    c1->cd(4);
+    c2->cd(4);
     fh_chi_prim_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_chi_prim_signal_pty, fh_mc_signal_pty);
-    c1->cd(5);
+    c2->cd(5);
     fh_rich_id_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_rich_id_signal_pty, fh_mc_signal_pty);
-    c1->cd(6);
+    c2->cd(6);
     fh_trd_id_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_trd_id_signal_pty, fh_mc_signal_pty);
-    c1->cd(7);
+    c2->cd(7);
     fh_tof_id_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_tof_id_signal_pty, fh_mc_signal_pty);
-    c1->cd(8);
+    c2->cd(8);
     fh_gammacut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_gammacut_signal_pty, fh_mc_signal_pty);
-    c1->cd(9);
+    c2->cd(9);
     fh_stcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_stcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(10);
+    c2->cd(10);
     fh_ttcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ttcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(11);
+    c2->cd(11);
     fh_ptcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_mc_signal_pty);
-    c1->cd(12);
+    c2->cd(12);
     fh_anglecut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_mc_signal_pty);
-/*    c1->cd(13);
+/*    c2->cd(13);
    fh_apmcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_apmcut_signal_pty, fh_mc_signal_pty);
 */
 
 
 //pty efficiency of signal
-    TCanvas *c1_1 = new TCanvas("c1_1-pty eff","c1_1-pty eff",1000,750);
-    c1_1->Divide(4,3);
-    c1_1->cd(1);
+    TCanvas *c3 = new TCanvas("c3-pty eff","c3-pty eff",1000,750);
+    c3->Divide(4,3);
+    c3->cd(1);
     TH2D* fh_acc_signal_pty_eff = divideHisto2D(fh_acc_signal_pty, fh_mc_signal_pty);
     fh_acc_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_acc_signal_pty, fh_mc_signal_pty);
 
-    c1_1->cd(2);
+    c3->cd(2);
     TH2D* fh_reco_signal_pty_eff = divideHisto2D(fh_reco_signal_pty, fh_acc_signal_pty);
     fh_reco_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_reco_signal_pty, fh_acc_signal_pty);
 
-    c1_1->cd(3);
+    c3->cd(3);
     TH2D* fh_chi_prim_signal_pty_eff = divideHisto2D(fh_chi_prim_signal_pty, fh_reco_signal_pty);
     fh_chi_prim_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_chi_prim_signal_pty, fh_reco_signal_pty);
 
-    c1_1->cd(4);
+    c3->cd(4);
     TH2D* fh_rich_id_signal_pty_eff = divideHisto2D(fh_rich_id_signal_pty, fh_chi_prim_signal_pty);
     fh_rich_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_rich_id_signal_pty, fh_chi_prim_signal_pty);
 
-    c1_1->cd(5);
+    c3->cd(5);
     TH2D* fh_trd_id_signal_pty_eff = divideHisto2D(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
     fh_trd_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_trd_id_signal_pty, fh_rich_id_signal_pty);
 
-    c1_1->cd(6);
+    c3->cd(6);
     TH2D* fh_tof_id_signal_pty_eff = divideHisto2D(fh_tof_id_signal_pty, fh_trd_id_signal_pty);
     fh_tof_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_tof_id_signal_pty, fh_trd_id_signal_pty);
 
-    c1_1->cd(7);
+    c3->cd(7);
     TH2D* fh_gammacut_signal_pty_eff = divideHisto2D(fh_gammacut_signal_pty, fh_tof_id_signal_pty);
     fh_gammacut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_gammacut_signal_pty, fh_tof_id_signal_pty);
 
-    c1_1->cd(8);
+    c3->cd(8);
     TH2D* fh_stcut_signal_pty_eff = divideHisto2D(fh_stcut_signal_pty, fh_gammacut_signal_pty);
     fh_stcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_stcut_signal_pty, fh_gammacut_signal_pty);
 
-    c1_1->cd(9);
+    c3->cd(9);
     TH2D* fh_ttcut_signal_pty_eff = divideHisto2D(fh_ttcut_signal_pty, fh_stcut_signal_pty);
     fh_ttcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_ttcut_signal_pty, fh_stcut_signal_pty);
 
-    c1_1->cd(10);
+    c3->cd(10);
     TH2D* fh_ptcut_signal_pty_eff = divideHisto2D(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
     fh_ptcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
 
-    c1_1->cd(11);
+    c3->cd(11);
     TH2D* fh_anglecut_signal_pty_eff = divideHisto2D(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
     fh_anglecut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
 
-    c1_1->cd(12);
+    c3->cd(12);
     //TH2D* fh_apmcut_signal_pty_eff = divideHisto2D(fh_apmcut_signal_pty, fh_anglecut_signal_pty);
     //fh_apmcut_signal_pty_eff->Draw("COLZ");
     //draw_eff_pty(fh_apmcut_signal_pty, fh_anglecut_signal_pty);
 
 
 //MOMENTUM DISTRIBUTION
-    TCanvas *c2 = new TCanvas("c2-mom", "c2-mom", 400, 400);
+    TCanvas *c4 = new TCanvas("c4-mom", "c4-mom", 400, 400);
     fh_mc_signal_mom->SetLineColor(kRed);
     fh_reco_signal_mom->SetLineColor(kBlue);
     fh_chi_prim_signal_mom->SetLineColor(kViolet);
@@ -343,86 +346,86 @@ void draw_analysis(){
 
 
 //EFFICIENCY vs. MOMENTUM 
-    TCanvas *c2_1 = new TCanvas("c2_1-mom eff","c2_1-mom eff", 1000, 750);
-    c2_1->Divide(4,3);
-    c2_1->cd(1);
+    TCanvas *c5 = new TCanvas("c5-mom eff","c5-mom eff", 1000, 750);
+    c5->Divide(4,3);
+    c5->cd(1);
     TH1D* fh_acc_signal_mom_eff = divideHisto1D(fh_acc_signal_mom,fh_mc_signal_mom);
     fh_acc_signal_mom_eff->Draw();
     draw_eff_mom(fh_acc_signal_mom,fh_mc_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(2);
+    c5->cd(2);
     TH1D* fh_reco_signal_mom_eff = divideHisto1D(fh_reco_signal_mom,fh_acc_signal_mom);
     fh_reco_signal_mom_eff->Draw();
     draw_eff_mom(fh_reco_signal_mom,fh_acc_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(3);
+    c5->cd(3);
     TH1D* fh_chi_prim_signal_mom_eff = divideHisto1D(fh_chi_prim_signal_mom,fh_reco_signal_mom);
     fh_chi_prim_signal_mom_eff->Draw();
     draw_eff_mom(fh_chi_prim_signal_mom,fh_reco_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(4);
+    c5->cd(4);
     TH1D* fh_rich_id_signal_mom_eff = divideHisto1D(fh_rich_id_signal_mom,fh_chi_prim_signal_mom);
     fh_rich_id_signal_mom_eff->Draw();
     draw_eff_mom(fh_rich_id_signal_mom,fh_chi_prim_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(5);
+    c5->cd(5);
     TH1D* fh_trd_id_signal_mom_eff = divideHisto1D(fh_trd_id_signal_mom,fh_rich_id_signal_mom);
     fh_trd_id_signal_mom_eff->Draw();
     draw_eff_mom(fh_trd_id_signal_mom,fh_rich_id_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(6);
+    c5->cd(6);
     TH1D* fh_tof_id_signal_mom_eff = divideHisto1D(fh_tof_id_signal_mom,fh_trd_id_signal_mom);
     fh_tof_id_signal_mom_eff->Draw();
     draw_eff_mom(fh_tof_id_signal_mom,fh_trd_id_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(7);
+    c5->cd(7);
     TH1D* fh_gammacut_signal_mom_eff = divideHisto1D(fh_gammacut_signal_mom,fh_tof_id_signal_mom);
     fh_gammacut_signal_mom_eff->Draw();
     draw_eff_mom(fh_gammacut_signal_mom,fh_tof_id_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(8);
+    c5->cd(8);
     TH1D* fh_stcut_signal_mom_eff = divideHisto1D(fh_stcut_signal_mom,fh_gammacut_signal_mom);
     fh_stcut_signal_mom_eff->Draw();
     draw_eff_mom(fh_stcut_signal_mom,fh_gammacut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(9);
+    c5->cd(9);
     TH1D* fh_ttcut_signal_mom_eff = divideHisto1D(fh_ttcut_signal_mom,fh_stcut_signal_mom);
     fh_ttcut_signal_mom_eff->Draw();
     draw_eff_mom(fh_ttcut_signal_mom,fh_stcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(10);
+    c5->cd(10);
     TH1D* fh_ptcut_signal_mom_eff = divideHisto1D(fh_ptcut_signal_mom,fh_ttcut_signal_mom);
     fh_ptcut_signal_mom_eff->Draw();
     draw_eff_mom(fh_ptcut_signal_mom,fh_ttcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(11);
+    c5->cd(11);
     TH1D* fh_anglecut_signal_mom_eff = divideHisto1D(fh_anglecut_signal_mom,fh_ptcut_signal_mom);
     fh_anglecut_signal_mom_eff->Draw();
     draw_eff_mom(fh_anglecut_signal_mom,fh_ptcut_signal_mom);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-    c2_1->cd(12);
+    c5->cd(12);
  //   TH1D* fh_apmcut_signal_mom_eff = divideHisto1D(fh_apmcut_signal_mom,fh_anglecut_signal_mom);
  //   fh_apmcut_signal_mom_eff->Draw();
  //   draw_eff_mom(fh_apmcut_signal_mom,fh_anglecut_signal_mom);
@@ -432,7 +435,7 @@ void draw_analysis(){
 
 
 //MOTHER PDG
-    TCanvas *c3 = new TCanvas("c3-mother pdg", "c3-mother pdg", 500, 500);
+    TCanvas *c6 = new TCanvas("c6-mother pdg", "c6-mother pdg", 500, 500);
     fh_mc_mother_pdg->Draw();
     fh_acc_mother_pdg->SetLineColor(kRed);
     fh_acc_mother_pdg->Draw("same");
@@ -441,9 +444,9 @@ void draw_analysis(){
     gPad->SetLogy(true);
 
 //ANALYSIS CUTS
-    TCanvas *c4 = new TCanvas("c4-cuts", "c4-cuts", 1000, 1000);
-    c4->Divide(4,3);
-    c4->cd(1);
+    TCanvas *c7 = new TCanvas("c7-cuts", "c7-cuts", 1000, 1000);
+    c7->Divide(4,3);
+    c7->cd(1);
     Double_t scaleSig = 1./fh_chi2_prim_signal->Integral();
     Double_t scaleBg = 1./fh_chi2_prim_bg->Integral();
     fh_chi2_prim_signal->SetLineColor(kRed);
@@ -453,7 +456,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c4->cd(2);
+    c7->cd(2);
     TH1D* fh_sig_chi2_prim = CalculateSignificance(fh_chi2_prim_signal, fh_chi2_prim_bg,
         "chi2_prim_significance", "significance", "forward");
     fh_sig_chi2_prim->Draw();
@@ -462,7 +465,7 @@ void draw_analysis(){
     fh_chi2_prim_signal->Scale(scaleSig);
     fh_chi2_prim_bg->Scale(scaleBg);
 
-    c4->cd(3);
+    c7->cd(3);
     Double_t scaleSig = 1./fh_pt_signal->Integral();
     Double_t scaleBg = 1./fh_pt_bg->Integral();
     fh_pt_signal->SetLineColor(kRed);
@@ -472,7 +475,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c4->cd(4);
+    c7->cd(4);
     TH1D* fh_sig_pt = CalculateSignificance(fh_pt_signal, fh_pt_bg , "pt_significance", "significance", "back");
     fh_sig_pt->Draw();
     gPad->SetGridx(true);
@@ -480,7 +483,7 @@ void draw_analysis(){
     fh_pt_signal->Scale(scaleSig);
     fh_pt_bg->Scale(scaleBg);
 
-    c4->cd(5);
+    c7->cd(5);
     Double_t scaleSig = 1./fh_position_signal->Integral();
     Double_t scaleBg = 1./fh_position_bg->Integral();
     fh_position_signal->SetLineColor(kRed);
@@ -490,7 +493,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c4->cd(6);
+    c7->cd(6);
     TH1D* fh_sig_position = CalculateSignificance(fh_position_signal, fh_position_bg, "position_significance", "significance", "back");
     fh_sig_position->Draw();
     gPad->SetGridx(true);
@@ -498,7 +501,7 @@ void draw_analysis(){
     fh_position_signal->Scale(scaleSig);
     fh_position_bg->Scale(scaleBg);
 
-    c4->cd(7);
+    c7->cd(7);
     Double_t scaleSig = 1./fh_angle_signal->Integral();
     Double_t scaleBg = 1./fh_angle_bg->Integral();
     fh_angle_signal->SetLineColor(kRed);
@@ -508,7 +511,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c4->cd(8);
+    c7->cd(8);
     TH1D* fh_sig_angle = CalculateSignificance(fh_angle_signal,fh_angle_bg, "angle_significance", "significance", "back");
     fh_sig_angle->Draw();
     gPad->SetGridx(true);
@@ -516,7 +519,7 @@ void draw_analysis(){
     fh_angle_signal->Scale(scaleSig);
     fh_angle_bg->Scale(scaleBg);
 
-    c4->cd(9);
+    c7->cd(9);
     Double_t scaleSig = 1./fh_mom_signal->Integral();
     Double_t scaleBg = 1./fh_mom_bg->Integral();
     fh_mom_signal->SetLineColor(kRed);
@@ -526,7 +529,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c4->cd(10); 
+    c7->cd(10); 
     TH1D* fh_sig_mom = CalculateSignificance(fh_mom_signal,fh_mom_bg, "momentum_significance", "significance", "back");
     fh_sig_mom->Draw();
     gPad->SetGridx(true);
@@ -534,7 +537,7 @@ void draw_analysis(){
     fh_mom_signal->Scale(scaleSig);
     fh_mom_bg->Scale(scaleBg);
 
-//    c4->cd(11);
+//    c7->cd(11);
 //    Double_t scaleSig = 1./fh_chi2sts_signal->Integral();
 //    Double_t scaleBg = 1./fh_chi2sts_bg->Integral();
 //    fh_chi2sts_signal->SetLineColor(kRed);
@@ -544,7 +547,7 @@ void draw_analysis(){
 //    gPad->SetGridx(true);
 //    gPad->SetGridy(true);
 //    gPad->SetLogy(true);
-//    c4->cd(12);
+//    c7->cd(12);
 //    TH1D* fh_sig_chi2sts = CalculateSignificance(fh_chi2sts_signal,fh_chi2sts_bg, "chi2sts_significance", "significance", "forward");
 //    fh_sig_chi2sts->Draw();
  //   gPad->SetGridx(true);
@@ -591,61 +594,61 @@ void draw_analysis(){
  //   if (sumofbins10 != 0) fh_source_pair_apmcut->Scale(100. * 1./sumofbins10);
     if (sumofbins11 != 0) fh_source_pair_stcut->Scale(100. * 1./sumofbins11);
 
-    TCanvas *c14 = new TCanvas("c14-pair sources", "c14-pair sources", 1000, 750);
-    c14->Divide(4,3);
-    c14->cd(1);
+    TCanvas *c8 = new TCanvas("c8-pair sources", "c8-pair sources", 1000, 750);
+    c8->Divide(4,3);
+    c8->cd(1);
     fh_source_pair_reco->Draw("COLZ");
-    c14->cd(2);
+    c8->cd(2);
     fh_source_pair_chi_prim->Draw("COLZ");
-    c14->cd(3);
+    c8->cd(3);
     fh_source_pair_rich_id->Draw("COLZ");
-    c14->cd(4);
+    c8->cd(4);
     fh_source_pair_trd_id->Draw("COLZ");
-    c14->cd(5);
+    c8->cd(5);
     fh_source_pair_tof_id->Draw("COLZ");
-    c14->cd(6);
+    c8->cd(6);
     fh_source_pair_gammacut->Draw("COLZ");
-    c14->cd(7);
+    c8->cd(7);
     fh_source_pair_stcut->Draw("COLZ");
-    c14->cd(8);
+    c8->cd(8);
     fh_source_pair_ttcut->Draw("COLZ");
-    c14->cd(9);
+    c8->cd(9);
     fh_source_pair_ptcut->Draw("COLZ");
-    c14->cd(10);
+    c8->cd(10);
     fh_source_pair_anglecut->Draw("COLZ");
-    c14->cd(11);
+    c8->cd(11);
   // fh_source_pair_apmcut->Draw("COLZ");
 
 
 //AP CUT DISTRIBUTION
-    TCanvas *c5 = new TCanvas("c5-apcut", "c5-apcut", 800, 800);
-    c5->Divide(2,2);
-    c5->cd(1); 
+    TCanvas *c9 = new TCanvas("c9-apcut", "c9-apcut", 800, 800);
+    c9->Divide(2,2);
+    c9->cd(1); 
     fh_apcut_signal->Draw("COLZ");
     TEllipse el1(0.5,0.5,0.2,0.3);
     el1.SetFillStyle(0);
     el1.SetLineWidth(3);
     el1.DrawEllipse(0.,0.,1.,0.45,0.,180.,0.);
-    c5->cd(2); 
+    c9->cd(2); 
     fh_apcut_bg->Draw("COLZ");
     TEllipse el2(0.5,0.5,0.2,0.3);
     el2.SetFillStyle(0);
     el2.SetLineWidth(3);
     el2.DrawEllipse(0.,0.,1.,0.45,0.,180.,0.);
-    c5->cd(3);
+    c9->cd(3);
     fh_apcut_pi0->Draw("COLZ");
-    c5->cd(4);
+    c9->cd(4);
     fh_apcut_gamma->Draw("COLZ");
 
 
 //APM CUT DISTRIBUTION
-    TCanvas *c5_1 = new TCanvas("c5-apmcut", "c5-apmcut", 800, 800);
-    c5_1->Divide(2,2);
-    c5_1->cd(1);
+    TCanvas *c10 = new TCanvas("c10-apmcut", "c10-apmcut", 800, 800);
+    c10->Divide(2,2);
+    c10->cd(1);
     fh_apmcut_signal->Draw("COLZ");
-    c5_1->cd(2); 
+    c10->cd(2); 
     fh_apmcut_bg->Draw("COLZ");
-    c5_1->cd(3);
+    c10->cd(3);
     TH1D* apmcut_py_s = fh_apmcut_signal->ProjectionY();
     TH1D* apmcut_py_bg = fh_apmcut_bg->ProjectionY();
     Double_t scaleSig = 1./apmcut_py_s->Integral();
@@ -657,7 +660,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c5_1->cd(4);
+    c10->cd(4);
     TH1D* fh_sig_apmcut_py = CalculateSignificance(apmcut_py_s, apmcut_py_bg, 
         "apmcut_py_significance", "significance", "back");
     fh_sig_apmcut_py->Draw();
@@ -668,17 +671,17 @@ void draw_analysis(){
 
 
 //TRACK TOPOLOGY CUT DISTRIBUTION FOR SEGMENT TRACKS
-    TCanvas *c6 = new TCanvas("c6-stcut", "c6-stcut", 1200, 600);
-    c6->Divide(4,2);
-    c6->cd(1);
+    TCanvas *c11 = new TCanvas("c11-stcut", "c11-stcut", 1200, 600);
+    c11->Divide(4,2);
+    c11->cd(1);
     fh_stcut_signal->Draw("COLZ");
-    c6->cd(2);
+    c11->cd(2);
     fh_stcut_bg->Draw("COLZ");
-    c6->cd(3);
+    c11->cd(3);
     fh_stcut_pi0->Draw("COLZ");
-    c6->cd(4);
+    c11->cd(4);
     fh_stcut_gamma->Draw("COLZ");
-    c6->cd(5);
+    c11->cd(5);
     TH1D* stcut_px_s = fh_stcut_signal->ProjectionX();
     TH1D* stcut_px_bg = fh_stcut_bg->ProjectionX();
     Double_t scaleSig = 1./stcut_px_s->Integral();
@@ -690,7 +693,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c6->cd(6);
+    c11->cd(6);
     TH1D* fh_sig_stcut_px = CalculateSignificance(stcut_px_s, stcut_px_bg, 
         "stcut_px_significance", "significance", "back");
     fh_sig_stcut_px->Draw();
@@ -699,7 +702,7 @@ void draw_analysis(){
     stcut_px_s->Scale(scaleSig);
     stcut_px_bg->Scale(scaleBg);
 
-    c6->cd(7);
+    c11->cd(7);
     TH1D* stcut_py_s = fh_stcut_signal->ProjectionY();
     TH1D* stcut_py_bg = fh_stcut_bg->ProjectionY();
     Double_t scaleSig = 1./stcut_py_s->Integral();
@@ -714,7 +717,7 @@ void draw_analysis(){
     stcut_py_s->Scale(scaleSig);
     stcut_py_bg->Scale(scaleBg);
 
-    c6->cd(8);
+    c11->cd(8);
     TH1D* fh_sig_stcut_py = CalculateSignificance(stcut_py_s, stcut_py_bg, 
         "stcut_py_significance", "significance", "back");
     fh_sig_stcut_py->Draw();
@@ -723,17 +726,17 @@ void draw_analysis(){
 
 
 //TRACK TOPOLOGY CUT DISTRIBUTION FOR FUL RECO TRACKS
-    TCanvas *c7 = new TCanvas("c7-ttcut", "c7-ttcut", 1200, 600);
-    c7->Divide(4,2);
-    c7->cd(1);
+    TCanvas *c12 = new TCanvas("c12-ttcut", "c12-ttcut", 1200, 600);
+    c12->Divide(4,2);
+    c12->cd(1);
     fh_ttcut_signal->Draw("COLZ");
-    c7->cd(2);
+    c12->cd(2);
     fh_ttcut_bg->Draw("COLZ");
-    c7->cd(3);
+    c12->cd(3);
     fh_ttcut_pi0->Draw("COLZ");
-    c7->cd(4);
+    c12->cd(4);
     fh_ttcut_gamma->Draw("COLZ");
-    c7->cd(5);
+    c12->cd(5);
     TH1D* ttcut_px_s = fh_ttcut_signal->ProjectionX();
     TH1D* ttcut_px_bg = fh_ttcut_bg->ProjectionX();
     Double_t scaleSig = 1./ttcut_px_s->Integral();
@@ -745,7 +748,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c7->cd(6);
+    c12->cd(6);
     TH1D* fh_sig_ttcut_px = CalculateSignificance(ttcut_px_s, ttcut_px_bg, 
         "ttcut_px_significance", "significance", "back");
     fh_sig_ttcut_px->Draw();
@@ -754,7 +757,7 @@ void draw_analysis(){
     ttcut_px_s->Scale(scaleSig);
     ttcut_px_bg->Scale(scaleBg);
 
-    c7->cd(7);
+    c12->cd(7);
     TH1D* ttcut_py_s = fh_ttcut_signal->ProjectionY();
     TH1D* ttcut_py_bg = fh_ttcut_bg->ProjectionY();
     Double_t scaleSig = 1./ttcut_py_s->Integral();
@@ -769,7 +772,7 @@ void draw_analysis(){
     ttcut_py_s->Scale(scaleSig);
     ttcut_py_bg->Scale(scaleBg);
 
-    c7->cd(8);
+    c12->cd(8);
     TH1D* fh_sig_ttcut_py = CalculateSignificance(ttcut_py_s, ttcut_py_bg, 
         "ttcut_py_significance", "significance", "back");
     fh_sig_ttcut_py->Draw();
@@ -788,9 +791,9 @@ void draw_analysis(){
 
 
 //ID CUTS DISTRIBUTION
-    TCanvas *c9 = new TCanvas("c9-id-cuts","c9-id-cuts",1200, 600);
-    c9->Divide(4,2);
-    c9->cd(1);
+    TCanvas *c13 = new TCanvas("c13-id-cuts","c13-id-cuts",1200, 600);
+    c13->Divide(4,2);
+    c13->cd(1);
     Double_t scaleSig = 1./fh_rich_ann_signal->Integral();
     Double_t scaleBg = 1./fh_rich_ann_bg->Integral();
     fh_rich_ann_signal->SetLineColor(kRed);
@@ -800,7 +803,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c9->cd(2);
+    c13->cd(2);
     TH1D* fh_sig_rich_ann = CalculateSignificance(fh_rich_ann_signal, fh_rich_ann_bg, 
         "rich_ann_significance", "significance", "back");
     fh_sig_rich_ann->Draw();
@@ -809,7 +812,7 @@ void draw_analysis(){
     fh_rich_ann_signal->Scale(scaleSig);
     fh_rich_ann_bg->Scale(scaleBg);
 
-    c9->cd(3);
+    c13->cd(3);
     Double_t scaleSig = 1./fh_trd_ann_signal->Integral();
     Double_t scaleBg = 1./fh_trd_ann_bg->Integral();
     fh_trd_ann_signal->SetLineColor(kRed);
@@ -819,7 +822,7 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c9->cd(4);
+    c13->cd(4);
     TH1D* fh_sig_trd_ann = CalculateSignificance(fh_trd_ann_signal, fh_trd_ann_bg, 
         "trd_ann_significance", "significance", "back");
     fh_sig_trd_ann->Draw();
@@ -828,32 +831,32 @@ void draw_analysis(){
     fh_trd_ann_signal->Scale(scaleSig);
     fh_trd_ann_bg->Scale(scaleBg);
 
-    c9->cd(5);
+    c13->cd(5);
     fh_tof_m2_signal->Draw("COLZ");
     gPad->SetLogz(true);
 
-    c9->cd(6);
+    c13->cd(6);
     fh_tof_m2_bg->Draw("COLZ");
     gPad->SetLogz(true);
 
-    TCanvas *c12 = new TCanvas("c12-dsts", "c12-dsts", 900, 600);
-    c12->Divide(3,2);
-    c12->cd(1);
+    TCanvas *c14 = new TCanvas("c14-dsts", "c14-dsts", 900, 600);
+    c14->Divide(3,2);
+    c14->cd(1);
     fh_dsts_signal->Draw("COLZ");
-    c12->cd(2); 
+    c14->cd(2); 
     fh_dsts_bg->Draw("COLZ");
-    c12->cd(3);
+    c14->cd(3);
     fh_dsts_gamma->Draw("COLZ");
-    c12->cd(4);
+    c14->cd(4);
     fh_dsts_pi0->Draw("COLZ");
-    c12->cd(5);
+    c14->cd(5);
     fh_dsts_eta->Draw("COLZ");
 
 //INVARIANT MASS DISTRIBUTION
     Int_t nRebin = 10;
-    TCanvas *c10 = new TCanvas("c10-minv", "c10-minv", 1200, 600);
-    c10->Divide(2,1);
-    c10->cd(1);
+    TCanvas *c15 = new TCanvas("c15-minv", "c15-minv", 1200, 600);
+    c15->Divide(2,1);
+    c15->cd(1);
 
     fh_mc_signal_minv->Rebin(nRebin);
     fh_acc_signal_minv->Rebin(nRebin);
@@ -916,7 +919,7 @@ void draw_analysis(){
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
-    c10->cd(2);
+    c15->cd(2);
     fh_rich_id_bg_minv->SetLineColor(kRed);
     fh_trd_id_bg_minv->SetLineColor(kBlue);
     fh_tof_id_bg_minv->SetLineColor(kGreen);
@@ -972,35 +975,35 @@ void draw_analysis(){
     gPad->SetLogy(true);
 
 //INVARIANT MASS DISTRIBUTION
-	TCanvas *c13 = new TCanvas("c13-minv", "c13-minv", 1200, 900);
-	c13->Divide(4,3);
-	c13->cd(1);
+	TCanvas *c16 = new TCanvas("c16-minv", "c16-minv", 1200, 900);
+	c16->Divide(4,3);
+	c16->cd(1);
 	draw_minv(fh_rec_signal_minv,fh_rec_bg_minv);
-    c13->cd(2);
+    c16->cd(2);
     draw_minv(fh_chi_prim_signal_minv,fh_chi_prim_bg_minv);
-	c13->cd(3);
+	c16->cd(3);
 	draw_minv(fh_rich_id_signal_minv,fh_rich_id_bg_minv);
-	c13->cd(4);
+	c16->cd(4);
 	draw_minv(fh_trd_id_signal_minv,fh_trd_id_bg_minv);
-	c13->cd(5);
+	c16->cd(5);
 	draw_minv(fh_tof_id_signal_minv,fh_tof_id_bg_minv);
-	c13->cd(6);
+	c16->cd(6);
 	draw_minv(fh_gammacut_signal_minv,fh_gammacut_bg_minv);
-	c13->cd(7);
+	c16->cd(7);
 	draw_minv(fh_stcut_signal_minv,fh_stcut_bg_minv);
-	c13->cd(8);
+	c16->cd(8);
 	draw_minv(fh_ttcut_signal_minv,fh_ttcut_bg_minv);
-	c13->cd(9);
+	c16->cd(9);
 	draw_minv(fh_ptcut_signal_minv,fh_ptcut_bg_minv);
-	c13->cd(10);
+	c16->cd(10);
 	draw_minv(fh_anglecut_signal_minv,fh_anglecut_bg_minv);
-    c13->cd(11);
+    c16->cd(11);
 //    draw_minv(fh_apmcut_signal_minv,fh_apmcut_bg_minv);
 
 //INVARIANT MASS DISTRIBUTION FOR PI0 AND ETA
-    TCanvas *c11 = new TCanvas("c11-minv-pi0-eta", "c11-minv-pi0-eta", 1200, 600);
-    c11->Divide(2,1);
-    c11->cd(1);
+    TCanvas *c17 = new TCanvas("c17-minv-pi0-eta", "c17-minv-pi0-eta", 1200, 600);
+    c17->Divide(2,1);
+    c17->cd(1);
     fh_rich_id_pi0_minv->SetLineColor(kRed);
     fh_trd_id_pi0_minv->SetLineColor(kBlue);
     fh_tof_id_pi0_minv->SetLineColor(kGreen);
@@ -1053,7 +1056,7 @@ void draw_analysis(){
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
 
-	c11->cd(2);
+	c17->cd(2);
 	fh_rich_id_eta_minv->SetLineColor(kRed);
 	fh_trd_id_eta_minv->SetLineColor(kBlue);
 	fh_tof_id_eta_minv->SetLineColor(kGreen);

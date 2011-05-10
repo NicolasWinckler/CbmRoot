@@ -1,3 +1,8 @@
+/** run_analysis.C
+ * @author Elena Lebedeva <e.lebedeva@gsi.de>
+ * @since 2010
+ * @version 1.0
+ **/
 
 void run_analysis(Int_t nEvents = 700)
 {

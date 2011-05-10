@@ -1,13 +1,14 @@
+/** CbmAnaDielectronTask.h
+ * @author Elena Lebedeva <e.lebedeva@gsi.de>
+ * @since 2010
+ * @version 2.0
+ **/
+
 #ifndef CBM_ANA_DIELECTRON_TASK_H
 #define CBM_ANA_DIELECTRON_TASK_H
 
 #include "FairTask.h"
 #include "FairBaseParSet.h"
-
-#include "TProfile.h"
-#include "TTree.h"
-#include "TFile.h"
-#include "TString.h"
 
 #include "CbmVertex.h"
 #include "CbmStsKFTrackFitter.h"
@@ -77,32 +78,64 @@ class CbmAnaDielectronTask : public FairTask {
 
 public:
     CbmAnaDielectronTask();
-    CbmAnaDielectronTask(const char *name, const char *title="CBM Task");
+
+    CbmAnaDielectronTask(
+        const char *name,
+        const char *title = "CbmAnaDielectronTask");
+
     virtual ~CbmAnaDielectronTask();
+
     virtual InitStatus Init();
+
     virtual void Exec(Option_t *option);
     
-    KinematicParams CalculateKinematicParams(CbmMCTrack* mctrackP, CbmMCTrack* mctrackM);
-    KinematicParams CalculateKinematicParams(DielectronCandidate* candP, DielectronCandidate* candM);
-    void CalculateArmPodParams(DielectronCandidate* candP, DielectronCandidate* candM,
-                       Double_t &alpha, Double_t &ptt);
-    void SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM, TH2D* h_source_pair);
+    KinematicParams CalculateKinematicParams(
+        CbmMCTrack* mctrackP, 
+        CbmMCTrack* mctrackM);
+
+    KinematicParams CalculateKinematicParams(
+        DielectronCandidate* candP, 
+        DielectronCandidate* candM);
+
+    void CalculateArmPodParams(
+        DielectronCandidate* candP, 
+        DielectronCandidate* candM,
+        Double_t &alpha, 
+        Double_t &ptt);
+
+    void SourcePairs(
+        DielectronCandidate* candP, 
+        DielectronCandidate* candM, 
+        TH2D* h_source_pair);
 
     void SingleParticleAcceptance();
+
     void MCPairs();
+
     void PairAcceptance();
+
     void FillSegmentCandidatesArray();
+
     void FillCandidateArray();
+
     void DifferenceSignalAndBg();
-    void PairsReco();
-    void Reco();
+
     void SetDefaultIdParameters();
-    void BgReco();
+
+    void SignalAndBgReco();
+
     void CheckGammaConvAndPi0();
+
     void FindClosestMvdHit();
+
     void CheckTrackTopologyCut();
+
     void CheckTrackTopologyRecoCut();
-    Bool_t CheckArmPod(Double_t alfa, Double_t pt);
+
+    Bool_t CheckArmPod(
+        Double_t alfa, 
+        Double_t pt);
+
     void CheckArmPodModified();
 
     virtual void Finish();
@@ -110,38 +143,43 @@ public:
     ClassDef(CbmAnaDielectronTask,1);
 
 private:
-    TClonesArray *fMCTracks;
 
+    void IsRichElectron(
+        CbmRichRing* ring, 
+        Double_t momentum, 
+        DielectronCandidate* cand);
+
+    void IsTrdElectron(
+        CbmTrdTrack* trdTrack, 
+        DielectronCandidate* cand);
+
+    void IsTofElectron(
+        CbmGlobalTrack* gTrack, 
+        Double_t momentum, 
+        DielectronCandidate* cand);
+
+    TClonesArray *fMCTracks;
     TClonesArray *fRichRings;
     TClonesArray *fRichProj;
     TClonesArray *fRichPoints;
     TClonesArray *fRichRingMatches;
     TClonesArray *fRichHits;
-
     TClonesArray *fGlobalTracks;
-
     TClonesArray *fStsTracks;
     TClonesArray *fStsTrackMatches;
     TClonesArray *fStsHits;
     TClonesArray *fMvdHits;
-
     TClonesArray *fTrdTracks;
     TClonesArray *fTrdHits;
     TClonesArray *fTrdTrackMatches;
-
     TClonesArray *fTofHits;
     TClonesArray *fTofPoints;
-
     CbmVertex *fPrimVertex;
     CbmStsKFTrackFitter fKFFitter;
 
     Bool_t fUseRich;
     Bool_t fUseTrd;
     Bool_t fUseTof;
-
-    void IsRichElectron(CbmRichRing* ring, Double_t momentum, DielectronCandidate* cand);
-    void IsTrdElectron(CbmTrdTrack* trdTrack, DielectronCandidate* cand);
-    void IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum, DielectronCandidate* cand);
 
     vector<DielectronCandidate> fCandidates;
     vector<DielectronCandidate> fSegmentCandidates;
@@ -157,24 +195,20 @@ private:
     Double_t fRmsB;
     Double_t fRmsCoeff;
     Double_t fDistCut;
+    CbmRichElectronIdAnn * fElIdAnn;
+    Bool_t fUseRichAnn;
 // Analysis cuts
     Double_t fChiPrimCut;
     Double_t fPtCut;
     Double_t fAngleCut;
     Double_t fGammaCut;
 
-    CbmRichElectronIdAnn * fElIdAnn;
-    Bool_t fUseRichAnn;
-
-    //list of all histogramms
-    vector<TH1*> fHistoList;
+    vector<TH1*> fHistoList; //list of all histogramms
 
 //signal momentum distribution
     TH1D* fh_mc_signal_mom;
     TH1D* fh_acc_signal_mom;
     TH1D* fh_reco_signal_mom;
-    TH1D* fh_sts_reco_signal_mom;
-    TH1D* fh_rich_reco_signal_mom;
     TH1D* fh_rich_id_signal_mom;
     TH1D* fh_trd_id_signal_mom;
     TH1D* fh_tof_id_signal_mom;
@@ -220,6 +254,7 @@ private:
     TH1D* fh_ttcut_bg_minv;
     TH1D* fh_stcut_bg_minv;
     TH1D* fh_apmcut_bg_minv;
+
 //pi0 minv
     TH1D* fh_rec_pi0_minv;
     TH1D* fh_rich_id_pi0_minv;

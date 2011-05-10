@@ -1,6 +1,6 @@
 void glue_analysis ()
 {
-    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/70_field/real/mytask.analysis";//.0000.root";
+    TString filePath = "/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/sts_1e_threshold/mytask.analysis";//.0000.root";
     TString outFileName = filePath +".all.root";
     Int_t nEvents = 200;   // number of files to be added
 
@@ -136,27 +136,26 @@ void glue_analysis ()
     histList->Add( new TH2D("fh_dsts_eta","fh_dsts_eta;d_{MVD} [cm];p^{e} [GeV/c]", 100, 0., 1., 100, 0., 5.) );
 
 //source of BG pairs
-	histList->Add( new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-    histList->Add( new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-    histList->Add( new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-    histList->Add( new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-    histList->Add( new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
-	histList->Add( new TH2D("fh_source_pair_apmcut","fh_source_pair_apmcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.) );
+	histList->Add( new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+    histList->Add( new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+	histList->Add( new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+	histList->Add( new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+	histList->Add( new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+	histList->Add( new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+    histList->Add( new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+	histList->Add( new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+    histList->Add( new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+    histList->Add( new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
+	histList->Add( new TH2D("fh_source_pair_apmcut","fh_source_pair_apmcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.) );
 
 //ID cut distributions
 	histList->Add( new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yield", 100, -1.1, 1.1) );
-	histList->Add( new TH2D("fh_rich_trd_ann_signal","fh_rich_trd_ann_signal;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2) );
-	histList->Add( new TH2D("fh_rich_trd_ann_bg","fh_rich_trd_ann_bg;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2) );
 	histList->Add( new TH1D("fh_rich_ann_bg", "fh_rich_ann_bg;ann output;yield", 100, -1.1, 1.1) );
 	histList->Add( new TH1D("fh_trd_ann_signal", "fh_trd_ann_signal;ann output;yield", 100, -1.1, 1.1) );
 	histList->Add( new TH1D("fh_trd_ann_bg", "fh_trd_ann_bg;ann output;yield", 100, -1.1, 1.1) );
 	histList->Add( new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2) );
 	histList->Add( new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2) );
+    histList->Add( new TH1D("fh_event_number","fh_event_number", 1, 0., 1.) );
 
 	Int_t nofGoodFiles = 0;
     for(Int_t i = 0; i < nEvents; i++) {
@@ -168,9 +167,9 @@ void glue_analysis ()
         if (file->IsZombie()) continue;
 
         for (Int_t iH = 0; iH < histList->GetEntries(); iH++){
-	    TH1* h = (TH1*)histList->At(iH);
+	        TH1* h = (TH1*)histList->At(iH);
             TH1* h1 = (TH1*) file->Get(h->GetName());
-           // h1->Sumw2();
+          //  h1->Sumw2();
             h->Add(h1);
         }
 

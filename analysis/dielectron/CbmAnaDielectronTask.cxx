@@ -60,165 +60,306 @@ ClassImp(CbmAnaDielectronTask);
 CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
 : FairTask(name)
 {
-    fEvents = 0;
-
     // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
     fWeight = 0.0;
     fUseRich = true;
     fUseTrd = true;
     fUseTof = true;
 
+    fHistoList.clear();
+
 //signal momentum distribution
     fh_mc_signal_mom = new TH1D("fh_mc_signal_mom", "fh_mc_signal_mom;momentum [GeV/c];yeild",100, 0., 15.);
+    fHistoList.push_back(fh_mc_signal_mom);
     fh_acc_signal_mom = new TH1D("fh_acc_signal_mom","fh_acc_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_acc_signal_mom);
     fh_sts_reco_signal_mom = new TH1D("fh_sts_reco_signal_mom","fh_sts_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_sts_reco_signal_mom);
     fh_rich_reco_signal_mom = new TH1D("fh_rich_reco_signal_mom","fh_rich_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_rich_reco_signal_mom);
     fh_reco_signal_mom = new TH1D("fh_reco_signal_mom","fh_reco_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
-    fh_chi_prim_signal_mom = new TH1D("fh_chi_prim_signal_mom","fh_chi_prim_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);    
+    fHistoList.push_back(fh_reco_signal_mom);
+    fh_chi_prim_signal_mom = new TH1D("fh_chi_prim_signal_mom","fh_chi_prim_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_chi_prim_signal_mom);
     fh_rich_id_signal_mom = new TH1D("fh_rich_id_signal_mom","fh_rich_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_rich_id_signal_mom);
     fh_trd_id_signal_mom = new TH1D("fh_trd_id_signal_mom","fh_trd_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_trd_id_signal_mom);
     fh_tof_id_signal_mom = new TH1D("fh_tof_id_signal_mom","fh_tof_id_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_tof_id_signal_mom);
     fh_ptcut_signal_mom = new TH1D("fh_ptcut_signal_mom","fh_ptcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_ptcut_signal_mom);
     fh_anglecut_signal_mom = new TH1D("fh_anglecut_signal_mom","fh_anglecut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_anglecut_signal_mom);
     fh_gammacut_signal_mom = new TH1D("fh_gammacut_signal_mom","fh_gammacut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_gammacut_signal_mom);
     fh_ttcut_signal_mom = new TH1D("fh_ttcut_signal_mom","fh_ttcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_ttcut_signal_mom);
     fh_stcut_signal_mom = new TH1D("fh_stcut_signal_mom","fh_stcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_stcut_signal_mom);
     fh_apmcut_signal_mom = new TH1D("fh_apmcut_signal_mom","fh_apmcut_signal_mom;momentum [GeV/c];yeild", 100, 0., 15.);
+    fHistoList.push_back(fh_apmcut_signal_mom);
 
 ///////
     fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
+    fHistoList.push_back(fh_mc_mother_pdg);
     fh_acc_mother_pdg = new TH1D("fh_acc_mother_pdg","fh_acc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
+    fHistoList.push_back(fh_acc_mother_pdg);
 
     fh_mc_vertex_gamma_xz = new TH2D("fh_mc_vertex_gamma_xz","fh_mc_vertex_gamma_xz;Z [cm];X [cm]",200, -10., 110., 200, -100.,100.);
+    fHistoList.push_back(fh_mc_vertex_gamma_xz);
     fh_mc_vertex_gamma_yz = new TH2D("fh_mc_vertex_gamma_yz", "fh_mc_vertex_gamma_yz;Z [cm];Y [cm]", 200, -10., 110., 200, -100., 100.);
-    fh_mc_vertex_gamma_xy = new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.); 
+    fHistoList.push_back(fh_mc_vertex_gamma_yz);
+    fh_mc_vertex_gamma_xy = new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.);
+    fHistoList.push_back(fh_mc_vertex_gamma_xy); 
 
     Int_t nofBinsMinv = 2000;
 //signal minv
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_mc_signal_minv);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_acc_signal_minv);
     fh_rec_signal_minv = new TH1D("fh_rec_signal_minv","fh_rec_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rec_signal_minv);
     fh_chi_prim_signal_minv = new TH1D("fh_chi_prim_signal_minv","fh_chi_prim_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_chi_prim_signal_minv);
     fh_rich_id_signal_minv = new TH1D("fh_rich_id_signal_minv","fh_rich_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rich_id_signal_minv);
     fh_trd_id_signal_minv = new TH1D("fh_trd_id_signal_minv", "fh_trd_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_trd_id_signal_minv);
     fh_tof_id_signal_minv = new TH1D("fh_tof_id_signal_minv","fh_tof_id_signal_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_tof_id_signal_minv);
     fh_ptcut_signal_minv = new TH1D("fh_ptcut_signal_minv","fh_ptcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ptcut_signal_minv);
     fh_anglecut_signal_minv = new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_anglecut_signal_minv);
     fh_gammacut_signal_minv = new TH1D("fh_gammacut_signal_minv","fh_gammacut_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_gammacut_signal_minv);
     fh_ttcut_signal_minv = new TH1D("fh_ttcut_signal_minv","fh_ttcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ttcut_signal_minv);
     fh_stcut_signal_minv = new TH1D("fh_stcut_signal_minv","fh_stcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_stcut_signal_minv);
     fh_apmcut_signal_minv = new TH1D("fh_apmcut_signal_minv","fh_apmcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_apmcut_signal_minv);
 
 //BG minv
     fh_rec_bg_minv = new TH1D("fh_rec_bg_minv","fh_rec_bg_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rec_bg_minv);
     fh_chi_prim_bg_minv = new TH1D("fh_chi_prim_bg_minv","fh_chi_prim_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_chi_prim_bg_minv);
     fh_rich_id_bg_minv = new TH1D("fh_rich_id_bg_minv","fh_rich_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rich_id_bg_minv);
     fh_trd_id_bg_minv = new TH1D("fh_trd_id_bg_minv","fh_trd_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_trd_id_bg_minv);
     fh_tof_id_bg_minv = new TH1D("fh_tof_id_bg_minv","fh_tof_id_bg_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_tof_id_bg_minv);
     fh_ptcut_bg_minv = new TH1D("fh_ptcut_bg_minv","fh_ptcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ptcut_bg_minv);
     fh_anglecut_bg_minv = new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_anglecut_bg_minv);
     fh_gammacut_bg_minv = new TH1D("fh_gammacut_bg_minv","fh_gammacut_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_gammacut_bg_minv);
     fh_ttcut_bg_minv = new TH1D("fh_ttcut_bg_minv","fh_ttcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ttcut_bg_minv);
     fh_stcut_bg_minv = new TH1D("fh_stcut_bg_minv","fh_stcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_stcut_bg_minv);
     fh_apmcut_bg_minv = new TH1D("fh_apmcut_bg_minv","fh_apmcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_apmcut_bg_minv);
 
 //pi0 minv
     fh_rec_pi0_minv = new TH1D("fh_rec_pi0_minv","fh_rec_pi0_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rec_pi0_minv);
     fh_chi_prim_pi0_minv = new TH1D("fh_chi_prim_pi0_minv","fh_chi_prim_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_chi_prim_pi0_minv);
     fh_rich_id_pi0_minv = new TH1D("fh_rich_id_pi0_minv","fh_rich_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rich_id_pi0_minv);
     fh_trd_id_pi0_minv = new TH1D("fh_trd_id_pi0_minv","fh_trd_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_trd_id_pi0_minv);
     fh_tof_id_pi0_minv = new TH1D("fh_tof_id_pi0_minv","fh_tof_id_pi0_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_tof_id_pi0_minv);
     fh_ptcut_pi0_minv = new TH1D("fh_ptcut_pi0_minv","fh_ptcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ptcut_pi0_minv);
     fh_anglecut_pi0_minv = new TH1D("fh_anglecut_pi0_minv","fh_anglecut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_anglecut_pi0_minv);
     fh_gammacut_pi0_minv = new TH1D("fh_gammacut_pi0_minv","fh_gammacut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_gammacut_pi0_minv);
     fh_ttcut_pi0_minv = new TH1D("fh_ttcut_pi0_minv","fh_ttcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ttcut_pi0_minv);
     fh_stcut_pi0_minv = new TH1D("fh_stcut_pi0_minv","fh_stcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_stcut_pi0_minv);
     fh_apmcut_pi0_minv = new TH1D("fh_apmcut_pi0_minv","fh_apmcut_pi0_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_apmcut_pi0_minv);
 
 //eta minv
     fh_rec_eta_minv = new TH1D("fh_rec_eta_minv","fh_rec_eta_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rec_eta_minv);
     fh_chi_prim_eta_minv = new TH1D("fh_chi_prim_eta_minv","fh_chi_prim_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_chi_prim_eta_minv);
 	fh_rich_id_eta_minv = new TH1D("fh_rich_id_eta_minv","fh_rich_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_rich_id_eta_minv);
 	fh_trd_id_eta_minv = new TH1D("fh_trd_id_eta_minv","fh_trd_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_trd_id_eta_minv);
 	fh_tof_id_eta_minv = new TH1D("fh_tof_id_eta_minv","fh_tof_id_eta_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_tof_id_eta_minv);
 	fh_ptcut_eta_minv = new TH1D("fh_ptcut_eta_minv","fh_ptcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ptcut_eta_minv);
 	fh_anglecut_eta_minv = new TH1D("fh_anglecut_eta_minv","fh_anglecut_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_anglecut_eta_minv);
 	fh_gammacut_eta_minv = new TH1D("fh_gammacut_eta_minv","fh_gammacut_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_gammacut_eta_minv);
 	fh_ttcut_eta_minv = new TH1D("fh_ttcut_eta_minv","fh_ttcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_ttcut_eta_minv);
     fh_stcut_eta_minv = new TH1D("fh_stcut_eta_minv","fh_stcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_stcut_eta_minv);
 	fh_apmcut_eta_minv = new TH1D("fh_apmcut_eta_minv","fh_apmcut_eta_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+    fHistoList.push_back(fh_apmcut_eta_minv);
+
+//gamma minv
+  //  fh_rec_gamma_minv = new TH1D("fh_rec_gamma_minv","fh_rec_gamma_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+  //  fh_chi_prim_gamma_minv = new TH1D("fh_chi_prim_gamma_minv","fh_chi_prim_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+  //  fh_rich_id_gamma_minv = new TH1D("fh_rich_id_gamma_minv","fh_rich_id_gamma_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+ //   fh_trd_id_gamma_minv = new TH1D("fh_trd_id_gamma_minv","fh_trd_id_gamma_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+ //   fh_tof_id_gamma_minv = new TH1D("fh_tof_id_gamma_minv","fh_tof_id_gamma_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
+ //   fh_ptcut_gamma_minv = new TH1D("fh_ptcut_gamma_minv","fh_ptcut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+ //   fh_anglecut_gamma_minv = new TH1D("fh_anglecut_gamma_minv","fh_anglecut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+ //   fh_gammacut_gamma_minv = new TH1D("fh_gammacut_gamma_minv","fh_gammacut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+ //   fh_ttcut_gamma_minv = new TH1D("fh_ttcut_gamma_minv","fh_ttcut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+ //   fh_stcut_gamma_minv = new TH1D("fh_stcut_gamma_minv","fh_stcut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
+ //   fh_apmcut_gamma_minv = new TH1D("fh_apmcut_gamma_minv","fh_apmcut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
 
 //pty distribution of the signal
     fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_mc_signal_pty);
     fh_acc_signal_pty = new TH2D("fh_acc_signal_pty","fh_acc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_acc_signal_pty);
     fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
-    fh_chi_prim_signal_pty = new TH2D("fh_chi_prim_signal_pty","fh_chi_prim_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);    
+    fHistoList.push_back(fh_reco_signal_pty);
+    fh_chi_prim_signal_pty = new TH2D("fh_chi_prim_signal_pty","fh_chi_prim_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_chi_prim_signal_pty);
     fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_rich_id_signal_pty);
     fh_trd_id_signal_pty = new TH2D("fh_trd_id_signal_pty","fh_trd_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_trd_id_signal_pty);
     fh_tof_id_signal_pty = new TH2D("fh_tof_id_signal_pty","fh_tof_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_tof_id_signal_pty);
     fh_ptcut_signal_pty = new TH2D("fh_ptcut_signal_pty","fh_ptcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_ptcut_signal_pty);
     fh_anglecut_signal_pty = new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_anglecut_signal_pty);
     fh_gammacut_signal_pty = new TH2D("fh_gammacut_signal_pty","fh_gammacut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_gammacut_signal_pty);
     fh_ttcut_signal_pty = new TH2D("fh_ttcut_signal_pty","fh_ttcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_ttcut_signal_pty);
     fh_stcut_signal_pty = new TH2D("fh_stcut_signal_pty","fh_stcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_stcut_signal_pty);
     fh_apmcut_signal_pty = new TH2D("fh_apmcut_signal_pty","fh_apmcut_signal_pty;Rapidity;p_{t} [GeV/c]",40, 0., 4., 20, 0., 2.);
+    fHistoList.push_back(fh_apmcut_signal_pty);
 
-// cut distribution
+// cut distributions
     fh_angle_signal = new TH1D("fh_angle_signal","fh_angle_signal;opening angle [deg];yeild", 360, 0., 180.);
+    fHistoList.push_back(fh_angle_signal);
     fh_angle_bg = new TH1D("fh_angle_bg","fh_angle_bg;opening angle [deg];yeild", 360, 0., 180.); 
+    fHistoList.push_back(fh_angle_bg);
     fh_position_signal = new TH1D("fh_position_signal","fh_position_signal", 100, 0., 0.02);
+    fHistoList.push_back(fh_position_signal);
     fh_position_bg = new TH1D("fh_position_bg","fh_position_bg",100, 0., 0.02);
+    fHistoList.push_back(fh_position_bg);
     fh_pt_signal = new TH1D("fh_pt_signal","fh_pt_signal;p_{t} [GeV/c];yeild",200, 0., 2.);
+    fHistoList.push_back(fh_pt_signal);
     fh_pt_bg = new TH1D("fh_pt_bg","fh_pt_bg;p_{t} [GeV/c];yeild",200, 0., 2.);
+    fHistoList.push_back(fh_pt_bg);
     fh_mom_signal = new TH1D("fh_mom_signal","fh_mom_signal;p [GeV/c];yeild",200, 0., 10.);
+    fHistoList.push_back(fh_mom_signal);
     fh_mom_bg = new TH1D("fh_mom_bg","fh_mom_bg;p [GeV/c];yeild",200, 0., 10.);
+    fHistoList.push_back(fh_mom_bg);
     fh_chi2_prim_signal = new TH1D("fh_chi2_prim_signal", "fh_chi2_prim_signal;chi2,yeild", 200, 0., 20.);
+    fHistoList.push_back(fh_chi2_prim_signal);
     fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;chi2,yeild", 200, 0., 20.);
+    fHistoList.push_back(fh_chi2_prim_bg);
     fh_chi2sts_signal = new TH1D("fh_chi2sts_signal", "fh_chi2sts_signal;chi2,yeild", 200, 0., 20.);
+    fHistoList.push_back(fh_chi2sts_signal);
     fh_chi2sts_bg = new TH1D("fh_chi2sts_bg","fh_chi2sts_bg;chi2,yeild", 200, 0., 20.);
+    fHistoList.push_back(fh_chi2sts_bg);
 
     fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_ttcut_signal);
     fh_stcut_signal = new TH2D("fh_stcut_signal", "fh_stcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_stcut_signal);
     fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_ttcut_bg);
     fh_stcut_bg = new TH2D("fh_stcut_bg","fh_stcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_stcut_bg);
     fh_apcut_signal = new TH2D("fh_apcut_signal", "fh_apcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
+    fHistoList.push_back(fh_apcut_signal);
     fh_apcut_bg = new TH2D("fh_apcut_bg","fh_apcut_bg;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+    fHistoList.push_back(fh_apcut_bg);
     fh_ttcut_pi0 = new TH2D("fh_ttcut_pi0","fh_ttcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_ttcut_pi0);
     fh_stcut_pi0 = new TH2D("fh_stcut_pi0","fh_stcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_stcut_pi0);
     fh_apcut_pi0 = new TH2D("fh_apcut_pi0","fh_apcut_pi0;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+    fHistoList.push_back(fh_apcut_pi0);
     fh_ttcut_gamma = new TH2D("fh_ttcut_gamma","fh_ttcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_ttcut_gamma);
     fh_stcut_gamma = new TH2D("fh_stcut_gamma","fh_stcut_gamma;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
+    fHistoList.push_back(fh_stcut_gamma);
     fh_apcut_gamma = new TH2D("fh_apcut_gamma","fh_apcut_gamma;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+    fHistoList.push_back(fh_apcut_gamma);
     fh_apmcut_signal = new TH2D("fh_apmcut_signal", "fh_apmcut_signal;#alpha;p_{t} [GeV/c]", 100, -1., 1., 200, 0., 1.);
+    fHistoList.push_back(fh_apmcut_signal);
     fh_apmcut_bg = new TH2D("fh_apmcut_bg","fh_apmcut_bg;#alpha;p_{t} [GeV/c];", 100, -1., 1., 200, 0., 1.);
+    fHistoList.push_back(fh_apmcut_bg);
     fh_dsts_signal = new TH2D("fh_dsts_signal","fh_dsts_signal;d_{MVD} [cm];p^{e} [GeV/c]", 100, 0., 1., 100, 0., 5.);
+    fHistoList.push_back(fh_dsts_signal);
     fh_dsts_bg = new TH2D("fh_dsts_bg", "fh_dsts_bg;d_{MVD} [cm];p^{e} [GeV/c]", 100, 0., 1., 100, 0., 5.);
+    fHistoList.push_back(fh_dsts_bg);
     fh_dsts_gamma = new TH2D("fh_dsts_gamma","fh_dsts_gamma;d_{MVD} [cm];p^{e} [GeV/c]", 100, 0., 1., 100, 0., 5.);
+    fHistoList.push_back(fh_dsts_gamma);
     fh_dsts_pi0 = new TH2D("fh_dsts_pi0","fh_dsts_pi0;d_{MVD} [cm];p^{e} [GeV/c]", 100, 0., 1., 100, 0., 5.);
+    fHistoList.push_back(fh_dsts_pi0);
     fh_dsts_eta = new TH2D("fh_dsts_eta","fh_dsts_eta;d_{MVD} [cm];p^{e} [GeV/c]", 100, 0., 1., 100, 0., 5.);
+    fHistoList.push_back(fh_dsts_eta);
 
 //source of BG pairs
-    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
-    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
-    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.);
-    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
-    fh_source_pair_apmcut = new TH2D("fh_source_pair_apmcut","fh_source_pair_apmcut;mother particle e+;mother particle e-", 4, 0., 4., 4, 0., 4.); 
+    fh_source_pair_reco = new TH2D("fh_source_pair_reco","fh_source_pair_reco;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fHistoList.push_back(fh_source_pair_reco);
+    fh_source_pair_chi_prim = new TH2D("fh_source_pair_chi_prim","fh_source_pair_chi_prim;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fHistoList.push_back(fh_source_pair_chi_prim);
+    fh_source_pair_rich_id = new TH2D("fh_source_pair_rich_id","fh_source_pair_rich_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fHistoList.push_back(fh_source_pair_rich_id);
+    fh_source_pair_trd_id = new TH2D("fh_source_pair_trd_id","fh_source_pair_trd_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fHistoList.push_back(fh_source_pair_trd_id);
+    fh_source_pair_tof_id = new TH2D("fh_source_pair_tof_id","fh_source_pair_tof_id;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fHistoList.push_back(fh_source_pair_tof_id);
+    fh_source_pair_ptcut = new TH2D("fh_source_pair_ptcut","fh_source_pair_ptcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fHistoList.push_back(fh_source_pair_ptcut);
+    fh_source_pair_anglecut = new TH2D("fh_source_pair_anglecut","fh_source_pair_anglecut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fHistoList.push_back(fh_source_pair_anglecut); 
+    fh_source_pair_gammacut = new TH2D("fh_source_pair_gammacut","fh_source_pair_gammacut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.);
+    fHistoList.push_back(fh_source_pair_gammacut); 
+    fh_source_pair_ttcut = new TH2D("fh_source_pair_ttcut","fh_source_pair_ttcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fHistoList.push_back(fh_source_pair_ttcut);
+    fh_source_pair_stcut = new TH2D("fh_source_pair_stcut","fh_source_pair_stcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fHistoList.push_back(fh_source_pair_stcut);
+    fh_source_pair_apmcut = new TH2D("fh_source_pair_apmcut","fh_source_pair_apmcut;mother particle e+;mother particle e-", 3, 0., 3., 3, 0., 3.); 
+    fHistoList.push_back(fh_source_pair_apmcut);
 
 //ID cut distributions
     fh_rich_ann_signal = new TH1D("fh_rich_ann_signal", "fh_rich_ann_signal;ann output;yeild", 100, -1.1, 1.1);
-    fh_rich_trd_ann_signal = new TH2D("fh_rich_trd_ann_signal","fh_rich_trd_ann_signal;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
-    fh_rich_trd_ann_bg = new TH2D("fh_rich_trd_ann_bg","fh_rich_trd_ann_bg;rich_ann;trd_ann",100, -1.2, 1.2, 100, -1.2, 1.2);
+    fHistoList.push_back(fh_rich_ann_signal);
     fh_rich_ann_bg = new TH1D("fh_rich_ann_bg", "fh_rich_ann_bg;ann output;yeild", 100, -1.1, 1.1);
+    fHistoList.push_back(fh_rich_ann_bg);
     fh_trd_ann_signal = new TH1D("fh_trd_ann_signal", "fh_trd_ann_signal;ann output;yeild", 100, -1.1, 1.1);
+    fHistoList.push_back(fh_trd_ann_signal);
     fh_trd_ann_bg = new TH1D("fh_trd_ann_bg", "fh_trd_ann_bg;ann output;yeild", 100, -1.1, 1.1);
+    fHistoList.push_back(fh_trd_ann_bg);
     fh_tof_m2_signal = new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
+    fHistoList.push_back(fh_tof_m2_signal);
     fh_tof_m2_bg = new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
+    fHistoList.push_back(fh_tof_m2_bg);
+
+    fh_event_number = new TH1D("fh_event_number","fh_event_number", 1, 0, 1.);
+    fHistoList.push_back(fh_event_number);
 
     SetDefaultIdParameters();
 }
@@ -372,9 +513,9 @@ InitStatus CbmAnaDielectronTask::Init()
 
 void CbmAnaDielectronTask::Exec(Option_t *option)
 {
+    fh_event_number->Fill(0.5);
 
-    fEvents++;
-    cout << "-I- CbmAnaDielectronTask event number " << fEvents << endl;
+    cout << "-I- CbmAnaDielectronTask, event number " << fh_event_number->GetEntries() << endl;
     MCPairs();
     SingleParticleAcceptance();
     PairAcceptance();
@@ -388,8 +529,6 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     PairsReco();
     Reco();
     BgReco();
-    Pi0Reco();
-    EtaReco();
 
   /*  cout << "fNofMcEp = " << fNofMcEp << ", per event " << fNofMcEp / (Double_t)fEvents << endl;
     cout << "fNofMcEm = " << fNofMcEm << ", per event " << fNofMcEm / (Double_t)fEvents << endl;
@@ -589,6 +728,7 @@ void CbmAnaDielectronTask::FillSegmentCandidatesArray()
         cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) /
                     (cand.energy - cand.momentum.Z()));
 
+        //only primary segment candidates
         if (cand.chiPrimary < fChiPrimCut) fSegmentCandidates.push_back(cand);
     }//gTracks
 }
@@ -846,8 +986,15 @@ void CbmAnaDielectronTask::BgReco()
             if (iM == iP ) continue;
 
             KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]); 
-            
+
             Bool_t isBG = !(fCandidates[iP].isMCSignalElectron && fCandidates[iM].isMCSignalElectron);
+
+            Bool_t isPi0 = (fCandidates[iP].isMCPi0Electron && fCandidates[iM].isMCPi0Electron
+                            && fCandidates[iP].MCMotherId == fCandidates[iM].MCMotherId);
+
+            Bool_t isEta = (fCandidates[iP].isMCEtaElectron && fCandidates[iM].isMCEtaElectron
+                    && fCandidates[iP].MCMotherId == fCandidates[iM].MCMotherId);
+
             Bool_t isChiPrimary = (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut);
             Bool_t isRichEl = (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron);
             Bool_t isTrdEl = (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron);
@@ -858,239 +1005,101 @@ void CbmAnaDielectronTask::BgReco()
             Bool_t isPtCut = (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut);
             Bool_t isAngleCut = (pRec.angle > fAngleCut);
             Bool_t isAPMCut = (fCandidates[iP].isAPMCutElectron && fCandidates[iM].isAPMCutElectron);
-            
 
+            if (isBG) fh_rec_bg_minv->Fill(pRec.minv);
+            if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_reco);
+            if (isPi0) fh_rec_pi0_minv->Fill(pRec.minv);
+            if (isEta) fh_rec_eta_minv->Fill(pRec.minv);
 
-            if (isBG) {
-                fh_rec_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_reco);
+            if (isChiPrimary){
+                if (isBG) fh_chi_prim_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_chi_prim);
+                if (isPi0) fh_chi_prim_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_chi_prim_eta_minv->Fill(pRec.minv);
             }
 
-            if (isBG && isChiPrimary){
-                fh_chi_prim_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_chi_prim);
+            if (isChiPrimary && isRichEl){
+                if (isBG) fh_rich_id_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_rich_id);
+                if (isPi0) fh_rich_id_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_rich_id_eta_minv->Fill(pRec.minv);
             }
 
-            if (isBG && isChiPrimary && isRichEl){
-                fh_rich_id_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_rich_id);
+			if (isChiPrimary && isRichEl && isTrdEl) {
+                if (isBG) fh_trd_id_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_trd_id);
+                if (isPi0) fh_trd_id_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_trd_id_eta_minv->Fill(pRec.minv);
             }
-			if (isBG && isChiPrimary && isRichEl && isTrdEl) {
-				fh_trd_id_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_trd_id);
+
+			if (isChiPrimary && isRichEl && isTrdEl && isTofEl) {
+                if (isBG) fh_tof_id_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_tof_id);
+				if (isBG) fh_angle_bg->Fill(pRec.angle);
+                if (isPi0) fh_tof_id_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_tof_id_eta_minv->Fill(pRec.minv);
             }
-			if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl) {
-			    fh_tof_id_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_tof_id);
-            
-				fh_angle_bg->Fill(pRec.angle);
+
+            if (isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut){
+                if (isBG) fh_gammacut_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_gammacut);
+                if (isPi0) fh_gammacut_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_gammacut_eta_minv->Fill(pRec.minv);
             }
-            if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut){
-                fh_gammacut_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_gammacut);
+
+            if (isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut){
+                if (isBG) fh_stcut_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_stcut);
+                if (isPi0) fh_stcut_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_stcut_eta_minv->Fill(pRec.minv);
             }
-            if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut){
-                fh_stcut_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_stcut);
+
+            if (isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut){
+                if (isBG) fh_ttcut_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_ttcut);
+                if (isPi0) fh_ttcut_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_ttcut_eta_minv->Fill(pRec.minv);
             }
-            if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut){
-                fh_ttcut_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_ttcut);
+
+            if (isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut){
+                if (isBG) fh_ptcut_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_ptcut);
+                if (isPi0) fh_ptcut_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_ptcut_eta_minv->Fill(pRec.minv);
             }
-            if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut){
-			    fh_ptcut_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_ptcut);
+
+            if (isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut) {
+                if (isBG) fh_anglecut_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_anglecut);
+                if (isPi0) fh_anglecut_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_anglecut_eta_minv->Fill(pRec.minv);
             }
-            if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut) {
-                fh_anglecut_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_anglecut);
-            }
-            if (isBG && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut && isAPMCut) {
-                fh_apmcut_bg_minv->Fill(pRec.minv);
-                SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_apmcut);
+
+            if (isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut && isAPMCut) {
+                if (isBG) fh_apmcut_bg_minv->Fill(pRec.minv);
+                if (isBG) SourcePairs(&fCandidates[iP], &fCandidates[iM], fh_source_pair_apmcut);
+                if (isPi0) fh_apmcut_pi0_minv->Fill(pRec.minv);
+                if (isEta) fh_apmcut_eta_minv->Fill(pRec.minv);
             }
         } // iM
     } // iP
 }
 
 void CbmAnaDielectronTask::SourcePairs(DielectronCandidate* candP, DielectronCandidate* candM, TH2D* h_source_pair)
-{  
-
-	Int_t mcMotherPdg = 0;
-
-    if (candP->isMCGammaElectron && candM->isMCGammaElectron && candP->MCMotherId != candM->MCMotherId) {
-        h_source_pair->Fill(0.5, 0.5);
-    } else if (candP->isMCPi0Electron && candM->isMCGammaElectron) {
-        h_source_pair->Fill(1.5, 0.5);
-    } else if (candP->isMCEtaElectron && candM->isMCGammaElectron) {
-        h_source_pair->Fill(2.5, 0.5);
-    } else if ((!candP->isMCGammaElectron && !candP->isMCPi0Electron && !candP->isMCEtaElectron) && candM->isMCGammaElectron) {
-        h_source_pair->Fill(3.5, 0.5);
-    /*    if (candP->MCMotherId != -1){
-            CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(candP->MCMotherId);
-            if (mother) {
-            	mcMotherPdg = mother->GetPdgCode();
-            }
-        }
-*/
-    } else if (candP->isMCGammaElectron && candM->isMCPi0Electron) {
-        h_source_pair->Fill(0.5, 1.5);
-    } else if (candP->isMCPi0Electron && candM->isMCPi0Electron && candP->MCMotherId != candM->MCMotherId) {
-        h_source_pair->Fill(1.5, 1.5);
-    } else if (candP->isMCEtaElectron && candM->isMCPi0Electron) {
-        h_source_pair->Fill(2.5, 1.5);
-    } else if ((!candP->isMCGammaElectron && !candP->isMCPi0Electron && !candP->isMCEtaElectron) && candM->isMCPi0Electron) {
-        h_source_pair->Fill(3.5, 1.5);
-    } else if (candP->isMCGammaElectron && candM->isMCEtaElectron) {
-        h_source_pair->Fill(0.5, 2.5);
-    } else if (candP->isMCPi0Electron && candM->isMCEtaElectron) {
-        h_source_pair->Fill(1.5, 2.5);
-    } else if (candP->isMCEtaElectron && candM->isMCEtaElectron) {
-        h_source_pair->Fill(2.5, 2.5);
-    } else if ((!candP->isMCGammaElectron && !candP->isMCPi0Electron && !candP->isMCEtaElectron) && candM->isMCEtaElectron){
-        h_source_pair->Fill(3.5, 2.5);
-   /*     if (candM->MCMotherId != -1){
-            CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(candM->MCMotherId);
-            if (mother) {
-            mcMotherPdg = mother->GetPdgCode();
-            if (mcMotherPdg != -1){
-     //       cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Mother PDG e- = " << mcMotherPdg << endl;
-            }
-            }
-        }
-*/
-    } else if (candP->isMCGammaElectron && (!candM->isMCGammaElectron && !candM->isMCPi0Electron && !candM->isMCEtaElectron)) {
-        h_source_pair->Fill(0.5, 3.5);
-    } else if (candP->isMCPi0Electron && (!candM->isMCGammaElectron && !candM->isMCPi0Electron && !candM->isMCEtaElectron)) {
-        h_source_pair->Fill(1.5, 3.5);
-    } else if (candP->isMCEtaElectron && (!candM->isMCGammaElectron && !candM->isMCPi0Electron && !candM->isMCEtaElectron)) {
-        h_source_pair->Fill(2.5, 3.5);
-    } else h_source_pair->Fill(3.5, 3.5);
-
-}
-void CbmAnaDielectronTask::Pi0Reco()
 {
-    Int_t ncand = fCandidates.size();
-    for (Int_t iP = 0; iP < ncand; iP++){
-        if (fCandidates[iP].charge < 0) continue;
-        for (Int_t iM = 0; iM < ncand; iM++){
-            if (fCandidates[iM].charge > 0) continue;
-            if (iM == iP ) continue;
-        
-            KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]);
+    if (candM->isMCGammaElectron) {
+        if (candP->isMCGammaElectron && candP->MCMotherId != candM->MCMotherId) h_source_pair->Fill(0.5, 0.5);
+        if (candP->isMCPi0Electron) h_source_pair->Fill(1.5, 0.5);
+        if (!candP->isMCGammaElectron && !candP->isMCPi0Electron) h_source_pair->Fill(2.5, 0.5);
+    } else if (candM->isMCPi0Electron) {
+        if (candP->isMCGammaElectron) h_source_pair->Fill(0.5, 1.5);
+        if (candP->isMCPi0Electron && candP->MCMotherId != candM->MCMotherId) h_source_pair->Fill(1.5, 1.5);
+        if (!candP->isMCGammaElectron && !candP->isMCPi0Electron) h_source_pair->Fill(2.5, 1.5);
+    } else if (!candM->isMCGammaElectron && !candM->isMCPi0Electron) {
+        if (candP->isMCGammaElectron) h_source_pair->Fill(0.5, 2.5);
+        if (candP->isMCPi0Electron) h_source_pair->Fill(1.5, 2.5);
+    } else h_source_pair->Fill(2.5, 2.5);
 
-            Bool_t isPi0 = (fCandidates[iP].isMCPi0Electron && fCandidates[iM].isMCPi0Electron
-                            && fCandidates[iP].MCMotherId == fCandidates[iM].MCMotherId);
-            Bool_t isChiPrimary = (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut);
-            Bool_t isRichEl = (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron);
-            Bool_t isTrdEl = (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron);
-            Bool_t isTofEl = (fCandidates[iP].isTofElectron && fCandidates[iM].isTofElectron);
-            Bool_t isGammaCut = (!fCandidates[iP].isGamma && !fCandidates[iM].isGamma);
-            Bool_t isStCut = (fCandidates[iP].isSTCutElectron && fCandidates[iM].isSTCutElectron);
-            Bool_t isTtCut = (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron);
-            Bool_t isPtCut = (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut);
-            Bool_t isAngleCut = (pRec.angle > fAngleCut);
-            Bool_t isAPMCut = (fCandidates[iP].isAPMCutElectron && fCandidates[iM].isAPMCutElectron); 
-
-			// select only electrons from the same pi0
-            if (isPi0) {
-                fh_rec_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary){
-                fh_chi_prim_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl){
-                fh_rich_id_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl) {
-			    fh_trd_id_pi0_minv->Fill(pRec.minv);
-            }
-			if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl) {
-			    fh_tof_id_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut){
-                fh_gammacut_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut){
-                fh_stcut_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut){
-                fh_ttcut_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut){
-			    fh_ptcut_pi0_minv->Fill(pRec.minv);
-            }
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut) {
-                fh_anglecut_pi0_minv->Fill(pRec.minv);
-            } 
-            if (isPi0 && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut && isAPMCut) {
-                fh_apmcut_pi0_minv->Fill(pRec.minv);
-            }
-        }//iM
-    }//iP
-}
-
-void CbmAnaDielectronTask::EtaReco()
-{
-    Int_t ncand = fCandidates.size();
-
-    for (Int_t iP = 0; iP < ncand; iP++){
-        if (fCandidates[iP].charge < 0) continue;
-        for (Int_t iM = 0; iM < ncand; iM++){
-            if (fCandidates[iM].charge > 0) continue;
-            if (iM == iP ) continue;
-
-            KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]);
-
-            Bool_t isEta = (fCandidates[iP].isMCEtaElectron && fCandidates[iM].isMCEtaElectron
-                    && fCandidates[iP].MCMotherId == fCandidates[iM].MCMotherId);
-            Bool_t isChiPrimary = (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iM].chiPrimary < fChiPrimCut);
-            Bool_t isRichEl = (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron);
-            Bool_t isTrdEl = (fCandidates[iP].isTrdElectron && fCandidates[iM].isTrdElectron);
-            Bool_t isTofEl = (fCandidates[iP].isTofElectron && fCandidates[iM].isTofElectron);
-            Bool_t isGammaCut = (!fCandidates[iP].isGamma && !fCandidates[iM].isGamma);
-            Bool_t isStCut = (fCandidates[iP].isSTCutElectron && fCandidates[iM].isSTCutElectron);
-            Bool_t isTtCut = (fCandidates[iP].isTTCutElectron && fCandidates[iM].isTTCutElectron);
-            Bool_t isPtCut = (fCandidates[iP].momentum.Perp() > fPtCut && fCandidates[iM].momentum.Perp() > fPtCut);
-            Bool_t isAngleCut = (pRec.angle > fAngleCut);
-            Bool_t isAPMCut = (fCandidates[iP].isAPMCutElectron && fCandidates[iM].isAPMCutElectron); 
-
-			// select only electrons from the same eta
-            if (isEta) {
-                fh_rec_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary){
-                fh_chi_prim_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary && isRichEl){
-                fh_rich_id_eta_minv->Fill(pRec.minv);
-            }
-			if (isEta && isChiPrimary && isRichEl && isTrdEl) {
-			    fh_trd_id_eta_minv->Fill(pRec.minv);
-            }
-			if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl) {
-				fh_tof_id_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut){
-                fh_gammacut_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut){
-                fh_stcut_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut){
-                fh_ttcut_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut){
-                fh_ptcut_eta_minv->Fill(pRec.minv);
-            }
-            if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut) {
-                fh_anglecut_eta_minv->Fill(pRec.minv);
-            }
-			if (isEta && isChiPrimary && isRichEl && isTrdEl && isTofEl && isGammaCut && isStCut && isTtCut && isPtCut && isAngleCut && isAPMCut) {
-                fh_apmcut_eta_minv->Fill(pRec.minv);
-            }
-        }//iM
-    }//iP
 }
 
 Bool_t CbmAnaDielectronTask::CheckArmPod(Double_t alfa, Double_t pt)
@@ -1129,20 +1138,22 @@ void CbmAnaDielectronTask::CheckArmPodModified()
                     candInd.push_back(iM);
                 } // if
             }// iM
-            //find min opening angle
-            Double_t minAng = 360.;
-            Int_t minInd = 0;
-            for (Int_t i = 0; i < angles1.size(); i++){
-                if (minAng > angles1[i]){
-                    minAng = angles1[i];
-                    minInd = i;
+            if (candInd.size() > 0){
+                //find min opening angle
+                Double_t minAng = 360.;
+                Int_t minInd = 0;
+                for (Int_t i = 0; i < angles1.size(); i++){
+                    if (minAng > angles1[i]){
+                        minAng = angles1[i];
+                        minInd = i;
+                    }
                 }
+                //APM
+                Double_t alfa = 0.;
+                Double_t ptt = 0.;
+                CalculateArmPodParams(&fCandidates[iP], &fCandidates[candInd[minInd]], alfa, ptt);
+                if (ptt > 0.02) fCandidates[iP].isAPMCutElectron = true;
             }
-            //APM
-            Double_t alfa = 0.;
-            Double_t ptt = 0.;
-            CalculateArmPodParams(&fCandidates[iP], &fCandidates[candInd[minInd]], alfa, ptt);
-            if (ptt > 0.02) fCandidates[iP].isAPMCutElectron = true;
         }//if electron
     } //iP
 }
@@ -1157,7 +1168,7 @@ void CbmAnaDielectronTask::CheckGammaConvAndPi0()
             if (iM == iP ) continue;
             if ((fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
                (fCandidates[iM].chiPrimary < fChiPrimCut && fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
-                
+
                 KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]); 
                 if (pRec.minv < fGammaCut) {
                     fCandidates[iM].isGamma = true;
@@ -1177,7 +1188,7 @@ void CbmAnaDielectronTask::CheckTrackTopologyCut() // cut for only segment track
     Int_t nCand = fCandidates.size();
     Int_t nSegmentCand = fSegmentCandidates.size();
     Double_t angCut = 1.5;
-    Double_t ppCut = 2.5;
+    Double_t ppCut = 1.5;
     for (Int_t iP = 0; iP < nCand; iP++){
         //if (fCandidates[iP].charge > 0){
             if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iP].isRichElectron && 
@@ -1219,8 +1230,8 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut() //cut only for full reco 
     angles1.reserve(50);
     mom1.reserve(50);
     Int_t nCand = fCandidates.size();
-    Double_t angCut = 3.5;
-    Double_t ppCut = 3.5;
+    Double_t angCut = 0.6;
+    Double_t ppCut = 4.0;
     for (Int_t iP = 0; iP < nCand; iP++){
         //if (fCandidates[iP].charge > 0){
             if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iP].isRichElectron && 
@@ -1292,7 +1303,7 @@ void CbmAnaDielectronTask::IsTofElectron(CbmGlobalTrack* gTrack, Double_t moment
     CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofIndex);
     if (NULL == tofHit){
         cand->isTofElectron = false;
-        cand->mass2 = 100.;   
+        cand->mass2 = 100.;
         return;
     }
     Double_t time = 0.2998 * tofHit->GetTime(); // time in ns -> transfrom to ct in m
@@ -1388,12 +1399,10 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
 
         if (fCandidates[i].isMCSignalElectron){
             fh_rich_ann_signal->Fill(fCandidates[i].richAnn, fWeight);
-            fh_rich_trd_ann_signal->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn, fWeight);
             fh_trd_ann_signal->Fill(fCandidates[i].trdAnn, fWeight);
             fh_tof_m2_signal->Fill(fCandidates[i].momentum.Mag(), fCandidates[i].mass2, fWeight);
         } else {
             fh_rich_ann_bg->Fill(fCandidates[i].richAnn);
-            fh_rich_trd_ann_bg->Fill(fCandidates[i].richAnn,fCandidates[i].trdAnn);
             fh_trd_ann_bg->Fill(fCandidates[i].trdAnn);
             fh_tof_m2_bg->Fill(fCandidates[i].momentum.Mag(), fCandidates[i].mass2);
        }
@@ -1465,8 +1474,8 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
     mom1.reserve(50);
     candInd.reserve(50);
     for (Int_t iP = 0; iP < nCand; iP++){
-		if (fCandidates[iP].chiPrimary < fChiPrimCut && 
-            fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron){
+		if (fCandidates[iP].chiPrimary < fChiPrimCut && fCandidates[iP].isRichElectron && 
+            fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron){
 			angles1.clear();
 			mom1.clear();
             candInd.clear();
@@ -1479,31 +1488,34 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
                     candInd.push_back(iM);
 				} // if
 			}// iM
-			//find min opening angle
-			Double_t minAng = 360.;
-			Int_t minInd = 0;
-			for (Int_t i = 0; i < angles1.size(); i++){
-				if (minAng > angles1[i]){
-					minAng = angles1[i];
-					minInd = i;
-				}
-			}
-			Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom1[minInd]);
 
-            //APM
-            Double_t alfa = 0.;
-            Double_t ptt = 0.;
-            CalculateArmPodParams(&fCandidates[iP], &fCandidates[candInd[minInd]], alfa, ptt);
- 
-			if (fCandidates[iP].isMCSignalElectron){
-                fh_ttcut_signal->Fill(sqrt_mom, minAng, fWeight);
-                fh_apmcut_signal->Fill(alfa, ptt, fWeight);
-            }else { 
-                fh_ttcut_bg->Fill(sqrt_mom, minAng);
-                fh_apmcut_bg->Fill(alfa, ptt, fWeight);
+            if (candInd.size() > 0){
+			    //find min opening angle
+			    Double_t minAng = 360.;
+			    Int_t minInd = 0;
+			    for (Int_t i = 0; i < angles1.size(); i++){
+				    if (minAng > angles1[i]){
+					    minAng = angles1[i];
+					    minInd = i;
+				    }
+			    }
+			    Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom1[minInd]);
+    
+                //APM
+                Double_t alfa = 0.;
+                Double_t ptt = 0.;
+                CalculateArmPodParams(&fCandidates[iP], &fCandidates[candInd[minInd]], alfa, ptt);
+    
+			    if (fCandidates[iP].isMCSignalElectron){
+                    fh_ttcut_signal->Fill(sqrt_mom, minAng, fWeight);
+                    fh_apmcut_signal->Fill(alfa, ptt, fWeight);
+                }else { 
+                    fh_ttcut_bg->Fill(sqrt_mom, minAng);
+                    fh_apmcut_bg->Fill(alfa, ptt, fWeight);
+                }
+			    if (fCandidates[iP].isMCPi0Electron) fh_ttcut_pi0->Fill(sqrt_mom, minAng);
+			    if (fCandidates[iP].isMCGammaElectron) fh_ttcut_gamma->Fill(sqrt_mom, minAng);
             }
-			if (fCandidates[iP].isMCPi0Electron) fh_ttcut_pi0->Fill(sqrt_mom, minAng);
-			if (fCandidates[iP].isMCGammaElectron) fh_ttcut_gamma->Fill(sqrt_mom, minAng);
 		}//if electron
     } //iP
 
@@ -1641,303 +1653,11 @@ void CbmAnaDielectronTask::FindClosestMvdHit()
 
 void CbmAnaDielectronTask::Finish()
 {
-    Double_t scale = 1./(Double_t)fEvents;
-
-//signal momentum distribution
-    fh_mc_signal_mom->Scale(scale);
-    fh_acc_signal_mom->Scale(scale);
-    fh_sts_reco_signal_mom->Scale(scale);
-    fh_rich_reco_signal_mom->Scale(scale);
-    fh_reco_signal_mom->Scale(scale);
-    fh_chi_prim_signal_mom->Scale(scale);
-    fh_rich_id_signal_mom->Scale(scale);
-    fh_trd_id_signal_mom->Scale(scale);
-    fh_tof_id_signal_mom->Scale(scale);
-    fh_ptcut_signal_mom->Scale(scale);
-    fh_anglecut_signal_mom->Scale(scale);
-    fh_gammacut_signal_mom->Scale(scale);
-    fh_ttcut_signal_mom->Scale(scale);
-    fh_stcut_signal_mom->Scale(scale);
-    fh_apmcut_signal_mom->Scale(scale);
-
-    fh_mc_mother_pdg->Scale(scale);
-    fh_acc_mother_pdg->Scale(scale);
-
-    fh_mc_vertex_gamma_xz->Scale(scale);
-    fh_mc_vertex_gamma_yz->Scale(scale);
-    fh_mc_vertex_gamma_xy->Scale(scale);
-
-//invariant mass distribution for signal
-    fh_mc_signal_minv->Scale(scale);
-    fh_acc_signal_minv->Scale(scale);
-    fh_rec_signal_minv->Scale(scale);
-    fh_chi_prim_signal_minv->Scale(scale);
-    fh_rich_id_signal_minv->Scale(scale);
-    fh_trd_id_signal_minv->Scale(scale);
-    fh_tof_id_signal_minv->Scale(scale);
-    fh_ptcut_signal_minv->Scale(scale);
-    fh_anglecut_signal_minv->Scale(scale);    
-    fh_gammacut_signal_minv->Scale(scale);
-    fh_ttcut_signal_minv->Scale(scale);
-    fh_stcut_signal_minv->Scale(scale);
-    fh_apmcut_signal_minv->Scale(scale);
-//BG minv
-    fh_rec_bg_minv->Scale(scale);
-    fh_chi_prim_bg_minv->Scale(scale);
-    fh_rich_id_bg_minv->Scale(scale);
-    fh_trd_id_bg_minv->Scale(scale);
-    fh_tof_id_bg_minv->Scale(scale);
-    fh_ptcut_bg_minv->Scale(scale);
-    fh_anglecut_bg_minv->Scale(scale);
-    fh_gammacut_bg_minv->Scale(scale);
-    fh_ttcut_bg_minv->Scale(scale);
-    fh_stcut_bg_minv->Scale(scale);
-    fh_apmcut_bg_minv->Scale(scale);
-//pi0 minv
-    fh_rec_pi0_minv->Scale(scale);
-    fh_chi_prim_pi0_minv->Scale(scale);
-    fh_rich_id_pi0_minv->Scale(scale);
-    fh_trd_id_pi0_minv->Scale(scale);
-    fh_tof_id_pi0_minv->Scale(scale);
-    fh_ptcut_pi0_minv->Scale(scale);
-    fh_anglecut_pi0_minv->Scale(scale);
-    fh_gammacut_pi0_minv->Scale(scale);
-    fh_ttcut_pi0_minv->Scale(scale);
-    fh_stcut_pi0_minv->Scale(scale);
-    fh_apmcut_pi0_minv->Scale(scale);
-
-//eta minv
-    fh_rec_eta_minv->Scale(scale);
-    fh_chi_prim_eta_minv->Scale(scale);
-	fh_rich_id_eta_minv->Scale(scale);
-	fh_trd_id_eta_minv->Scale(scale);
-	fh_tof_id_eta_minv->Scale(scale);
-	fh_ptcut_eta_minv->Scale(scale);
-	fh_anglecut_eta_minv->Scale(scale);
-	fh_gammacut_eta_minv->Scale(scale);
-	fh_ttcut_eta_minv->Scale(scale);
-    fh_stcut_eta_minv->Scale(scale);
-	fh_apmcut_eta_minv->Scale(scale);
-
-//pt/y distribution for signal
-    fh_mc_signal_pty->Scale(scale);
-    fh_acc_signal_pty->Scale(scale);
-    fh_reco_signal_pty->Scale(scale);
-    fh_chi_prim_signal_pty->Scale(scale);
-    fh_rich_id_signal_pty->Scale(scale); 
-    fh_trd_id_signal_pty->Scale(scale); 
-    fh_tof_id_signal_pty->Scale(scale);
-    fh_ptcut_signal_pty->Scale(scale);
-    fh_anglecut_signal_pty->Scale(scale);
-    fh_gammacut_signal_pty->Scale(scale);
-    fh_ttcut_signal_pty->Scale(scale);
-    fh_stcut_signal_pty->Scale(scale);
-    fh_apmcut_signal_pty->Scale(scale);
-
-// cuts distribution
-    fh_angle_signal->Scale(scale);
-    fh_angle_bg->Scale(scale);
-    fh_mom_signal->Scale(scale);
-    fh_mom_bg->Scale(scale);
-    fh_position_signal->Scale(scale);
-    fh_position_bg-> Scale(scale);
-    fh_pt_signal->Scale(scale);
-    fh_pt_bg->Scale(scale);
-    fh_chi2_prim_signal->Scale(scale);
-    fh_chi2_prim_bg->Scale(scale);
-    fh_chi2sts_signal->Scale(scale);
-    fh_chi2sts_bg->Scale(scale);
-
-    fh_ttcut_signal->Scale(scale);
-    fh_stcut_signal->Scale(scale);
-    fh_ttcut_bg->Scale(scale);
-    fh_stcut_bg->Scale(scale);
-    fh_apcut_signal->Scale(scale);
-    fh_apcut_bg->Scale(scale);
-    fh_ttcut_pi0->Scale(scale);
-    fh_stcut_pi0->Scale(scale);
-    fh_apcut_pi0->Scale(scale);
-    fh_ttcut_gamma->Scale(scale);
-    fh_stcut_gamma->Scale(scale);
-    fh_apcut_gamma->Scale(scale);
-    fh_apmcut_signal->Scale(scale);
-    fh_apmcut_bg->Scale(scale);
-    fh_dsts_signal->Scale(scale);
-    fh_dsts_bg->Scale(scale);
-    fh_dsts_gamma->Scale(scale);
-    fh_dsts_pi0->Scale(scale);
-    fh_dsts_eta->Scale(scale);
-
-//source of BG pairs
-    fh_source_pair_reco->Scale(scale);
-    fh_source_pair_chi_prim->Scale(scale);
-    fh_source_pair_rich_id->Scale(scale);
-    fh_source_pair_trd_id->Scale(scale);
-    fh_source_pair_tof_id->Scale(scale);
-    fh_source_pair_ptcut->Scale(scale);
-    fh_source_pair_anglecut->Scale(scale);
-    fh_source_pair_gammacut->Scale(scale);
-    fh_source_pair_ttcut->Scale(scale);
-    fh_source_pair_stcut->Scale(scale);
-    fh_source_pair_apmcut->Scale(scale);
-
-//ID cuts
-    fh_rich_ann_signal->Scale(scale);
-    fh_rich_ann_bg->Scale(scale);
-    fh_rich_trd_ann_signal->Scale(scale);
-    fh_rich_trd_ann_bg->Scale(scale);
-    fh_trd_ann_signal->Scale(scale);
-    fh_trd_ann_bg->Scale(scale);
-    fh_tof_m2_signal->Scale(scale);
-    fh_tof_m2_bg->Scale(scale);
-   
+    Double_t scale = 1./(Double_t)fh_event_number->GetEntries();
 
 ///WRITE HISTOGRAMS TO THE FILE
-//signal momentum distribution
-    fh_mc_signal_mom->Write();
-    fh_acc_signal_mom->Write();
-    fh_sts_reco_signal_mom->Write();
-    fh_rich_reco_signal_mom->Write();
-    fh_reco_signal_mom->Write();
-    fh_chi_prim_signal_mom->Write();
-    fh_rich_id_signal_mom->Write();
-    fh_trd_id_signal_mom->Write();
-    fh_tof_id_signal_mom->Write();
-    fh_ptcut_signal_mom->Write();
-    fh_anglecut_signal_mom->Write();
-    fh_gammacut_signal_mom->Write();
-    fh_ttcut_signal_mom->Write();
-    fh_stcut_signal_mom->Write();
-    fh_apmcut_signal_mom->Write();
-
-    fh_mc_mother_pdg->Write();
-    fh_acc_mother_pdg->Write();
-
-    fh_mc_vertex_gamma_xz->Write();
-    fh_mc_vertex_gamma_yz->Write();
-    fh_mc_vertex_gamma_xy->Write();
-
-// invariant mass distribution for signal
-    fh_mc_signal_minv->Write();
-    fh_acc_signal_minv->Write();
-    fh_rec_signal_minv->Write();
-    fh_chi_prim_signal_minv->Write();
-    fh_rich_id_signal_minv->Write();
-    fh_trd_id_signal_minv->Write();
-    fh_tof_id_signal_minv->Write();
-    fh_ptcut_signal_minv->Write();
-    fh_anglecut_signal_minv->Write();
-    fh_gammacut_signal_minv->Write();
-    fh_ttcut_signal_minv->Write();
-    fh_stcut_signal_minv->Write();
-    fh_apmcut_signal_minv->Write();
-//BG minv
-    fh_rec_bg_minv->Write();
-    fh_chi_prim_bg_minv->Write();
-    fh_rich_id_bg_minv->Write();
-    fh_trd_id_bg_minv->Write();
-    fh_tof_id_bg_minv->Write();
-    fh_ptcut_bg_minv->Write();
-    fh_anglecut_bg_minv->Write();
-    fh_gammacut_bg_minv->Write();
-    fh_ttcut_bg_minv->Write();
-    fh_stcut_bg_minv->Write();
-    fh_apmcut_bg_minv->Write();
-//pi0 minv
-    fh_rec_pi0_minv->Write();
-    fh_chi_prim_pi0_minv->Write();
-    fh_rich_id_pi0_minv->Write();
-    fh_trd_id_pi0_minv->Write();
-    fh_tof_id_pi0_minv->Write();
-    fh_ptcut_pi0_minv->Write();
-    fh_anglecut_pi0_minv->Write();
-    fh_gammacut_pi0_minv->Write();
-    fh_ttcut_pi0_minv->Write();
-    fh_stcut_pi0_minv->Write();
-    fh_apmcut_pi0_minv->Write();
-
- //eta minv
-    fh_rec_eta_minv->Write();
-    fh_chi_prim_eta_minv->Write();
-	fh_rich_id_eta_minv->Write();
-	fh_trd_id_eta_minv->Write();
-	fh_tof_id_eta_minv->Write();
-	fh_ptcut_eta_minv->Write();
-	fh_anglecut_eta_minv->Write();
-	fh_gammacut_eta_minv->Write();
-	fh_ttcut_eta_minv->Write();
-    fh_stcut_eta_minv->Write();
-	fh_apmcut_eta_minv->Write();
-
-// cuts distribution
-    fh_pt_signal->Write();
-    fh_pt_bg->Write();
-    fh_position_signal->Write();
-    fh_position_bg->Write();
-    fh_chi2_prim_signal->Write();
-    fh_chi2_prim_bg->Write();
-    fh_angle_signal->Write();
-    fh_angle_bg->Write();
-    fh_mom_signal->Write();
-    fh_mom_bg->Write();
-    fh_chi2sts_signal->Write();
-    fh_chi2sts_bg->Write();
-
-    fh_ttcut_signal->Write();
-    fh_stcut_signal->Write();
-    fh_ttcut_bg->Write();
-    fh_stcut_bg->Write();
-    fh_apcut_signal->Write();
-    fh_apcut_bg->Write();
-    fh_ttcut_pi0->Write();
-    fh_stcut_pi0->Write();
-    fh_apcut_pi0->Write();
-    fh_ttcut_gamma->Write();
-    fh_stcut_gamma->Write();
-    fh_apcut_gamma->Write();
-    fh_apmcut_signal->Write();
-    fh_apmcut_bg->Write();
-    fh_dsts_signal->Write();
-    fh_dsts_bg->Write();
-    fh_dsts_gamma->Write();
-    fh_dsts_pi0->Write();
-    fh_dsts_eta->Write();
-
-//source of BG pairs
-    fh_source_pair_reco->Write();
-    fh_source_pair_chi_prim->Write();
-    fh_source_pair_rich_id->Write();
-    fh_source_pair_trd_id->Write();
-    fh_source_pair_tof_id->Write();
-    fh_source_pair_ptcut->Write();
-    fh_source_pair_anglecut->Write();
-    fh_source_pair_gammacut->Write();
-    fh_source_pair_ttcut->Write();
-    fh_source_pair_stcut->Write();
-    fh_source_pair_apmcut->Write();
-
-//pty distribution of the signal
-    fh_mc_signal_pty->Write();
-    fh_acc_signal_pty->Write();
-    fh_reco_signal_pty->Write();
-    fh_chi_prim_signal_pty->Write();
-    fh_rich_id_signal_pty->Write();
-    fh_trd_id_signal_pty->Write();
-    fh_tof_id_signal_pty->Write();
-    fh_ptcut_signal_pty->Write();
-    fh_anglecut_signal_pty->Write();
-    fh_gammacut_signal_pty->Write();
-    fh_ttcut_signal_pty->Write();
-    fh_stcut_signal_pty->Write();
-    fh_apmcut_signal_pty->Write();
-
-    //ID cuts
-    fh_rich_ann_signal->Write();
-    fh_rich_trd_ann_signal->Write();
-    fh_rich_trd_ann_bg->Write();
-    fh_rich_ann_bg->Write();
-    fh_trd_ann_signal->Write();
-    fh_trd_ann_bg->Write();
-    fh_tof_m2_signal->Write();
-    fh_tof_m2_bg->Write();
+    for (Int_t i = 0; i < fHistoList.size(); i++){
+        fHistoList[i]->Scale(scale);
+        fHistoList[i]->Write();
+    }
 }

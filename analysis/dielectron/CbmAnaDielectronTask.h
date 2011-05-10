@@ -98,8 +98,6 @@ public:
     void Reco();
     void SetDefaultIdParameters();
     void BgReco();
-    void Pi0Reco();
-    void EtaReco();
     void CheckGammaConvAndPi0();
     void FindClosestMvdHit();
     void CheckTrackTopologyCut();
@@ -137,8 +135,6 @@ private:
     CbmVertex *fPrimVertex;
     CbmStsKFTrackFitter fKFFitter;
 
-    Int_t fEvents;
-
     Bool_t fUseRich;
     Bool_t fUseTrd;
     Bool_t fUseTof;
@@ -169,6 +165,9 @@ private:
 
     CbmRichElectronIdAnn * fElIdAnn;
     Bool_t fUseRichAnn;
+
+    //list of all histogramms
+    vector<TH1*> fHistoList;
 
 //signal momentum distribution
     TH1D* fh_mc_signal_mom;
@@ -311,12 +310,13 @@ private:
 //ID cuts distributions
     TH1D* fh_rich_ann_signal;
     TH1D* fh_rich_ann_bg;
-    TH2D* fh_rich_trd_ann_signal;
-    TH2D* fh_rich_trd_ann_bg;
     TH1D* fh_trd_ann_signal;
     TH1D* fh_trd_ann_bg;
     TH2D* fh_tof_m2_signal;
     TH2D* fh_tof_m2_bg;
+
+//store event number
+    TH1D* fh_event_number;
 
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

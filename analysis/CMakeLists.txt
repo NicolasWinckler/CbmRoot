@@ -65,7 +65,6 @@ timing/CbmAnaTimingMuchDigitizer.cxx
 timing/CbmAnaTimingMuchHitFinder.cxx
 
 dielectron/CbmAnaDielectronTask.cxx
-dielectron/CbmAnaElectronsQa.cxx
 )
 
 

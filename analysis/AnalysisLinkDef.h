@@ -30,7 +30,6 @@
 #pragma link C++ class CbmAnaTimingMuchHitFinder+;
 
 #pragma link C++ class CbmAnaDielectronTask+;
-#pragma link C++ class CbmAnaElectronsQa+;
 #endif
 
 

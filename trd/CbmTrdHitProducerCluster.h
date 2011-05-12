@@ -79,6 +79,7 @@ class CbmTrdHitProducerCluster : public FairTask
   void GetModuleInfo(Int_t qMaxIndex, MyHit* hit/*, MHitMap* ModuleHitMap*/, TH2F*& PRF);
   void SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds/*, ModulePara* mPara*/, MyDigiList *neighbours, MyHit* hit, TH2F*& PRF);
   Float_t Prf(Float_t padWidth, Float_t sigma, Float_t qLeft, Float_t qMax, Float_t qRight);
+  Float_t dPrf(Float_t padWidth, Float_t sigma, Float_t qLeft, Float_t qMax, Float_t qRight);
   void PrfReco(Int_t qMaxIndex, Float_t qMax/*, ModulePara* mPara*/, Int_t *neighbourIds, MyHit* hit, TH2F*& PRF);
   void SimpleReco(Int_t qMaxIndex, Float_t qMax/*, ModulePara* mPara*/, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/, TH2F*& PRF);
   void DrawHits();

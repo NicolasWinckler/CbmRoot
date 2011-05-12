@@ -679,6 +679,22 @@ Float_t CbmTrdHitProducerCluster::Prf(Float_t padWidth, Float_t sigma, Float_t q
   //cout << "Prf ->|" << endl;
   return recoPos;
 }
+ // --------------------------------------------------------------------
+Float_t CbmTrdHitProducerCluster::dPrf(Float_t padWidth, Float_t sigma, Float_t qLeft, Float_t qMax, Float_t qRight)
+{
+  Float_t dqLeft  = 0.1 * qLeft; // Asume 10% charge measurement error
+  Float_t dqRight = 0.1 * qRight;
+  Float_t dqMax   = 0.1 * qRight;
+  Float_t PosError = 
+    dqLeft * 
+    (0.5 * padWidth * -1. / qLeft * (log(qMax * qMax / (qRight * qLeft)) - log(qRight / qLeft)) / (pow(log(qMax * qMax / (qRight * qLeft)),2))) +
+    dqRight *
+    ((1. / (qLeft * qRight) * log(qMax * qMax / (qRight * qLeft)) - (1. / qRight * log(qRight / qLeft))) / (pow(log(qMax * qMax / (qRight * qLeft)),2))) +
+    dqMax *
+    (-1. / qMax * padWidth * log(qRight / qLeft) / log(qMax * qMax / (qRight * qLeft)));
+
+  return PosError;
+    }
   // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax/*, ModulePara* mPara*/, Int_t *neighbourIds, MyHit* hit, TH2F*& PRF)
 {

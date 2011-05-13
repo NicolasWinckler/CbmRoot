@@ -21,10 +21,11 @@
   Int_t   nEvents = 5;
 
   // Output file name
-  TString outFile = workDir+ "mvd.mcCentral.root";
+  TString outDir="./data/";
+  TString outFile = outDir+ "mvd.mcCentral.root";
 
   // Parameter file name
-  TString parFile = workDir+ "params.root";
+  TString parFile = outDir+ "params.root";
 
   // Cave geometry
   TString caveGeom = "cave.geo";
@@ -179,6 +180,9 @@
   cout << "Real time " << rtime << " s, CPU time " << ctime 
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
 
 }
 

@@ -17,20 +17,21 @@
 
     TString inDir   = gSystem->Getenv("VMCWORKDIR");
 
+    TString outDir="./data/";   
     // Input file (MC events)
-    TString inFile = inDir+ "/macro/mvd/qaData/mvd.mcCentral.root";
+    TString inFile = outDir+ "mvd.mcCentral.root";
 
     // Parameter file name
-    TString parFile =inDir+ "/macro/mvd/qaData/params.root";
+    TString parFile =outDir+ "params.root";
 
     // Output file
-    TString outFile =inDir+ "/macro/mvd/qaData/mvd.reco.root";
+    TString outFile =outDir+ "mvd.reco.root";
 
     // Background file (MC events, for pile-up)
     TString bgFile = inFile;
 
     // Delta file (Au Ions)
-    TString deltaFile =inDir+ "/macro/mvd/qaData/mvd.mcDelta.root";
+    TString deltaFile =outDir+ "mvd.mcDelta.root";
 
     // Number of events to process
     Int_t nEvents = 5;
@@ -167,7 +168,6 @@
     rtdb->setOutput(parIo1);
     rtdb->saveOutput();
     rtdb->print();
-    fRun->LoadGeometry();
     // ---------------------------------------------------------------------------
 
 
@@ -197,5 +197,7 @@
     cout << endl;
     // ---------------------------------------------------------------------------
 
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
 
 }

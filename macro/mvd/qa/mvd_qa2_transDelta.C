@@ -24,7 +24,8 @@
 
 
   // Output path
-  TString outpath = inDir+"/macro/mvd/qaData/";
+  TString outDir="./data/";   
+  TString outpath ="./data/";
 
   //output file
   TString outfile = "mvd.mcDelta.root";
@@ -207,6 +208,9 @@
   cout << "Real time " << rtime << " s, CPU time " << ctime 
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
 
 }
 

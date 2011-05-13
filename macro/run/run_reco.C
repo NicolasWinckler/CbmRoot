@@ -84,7 +84,7 @@ void run_reco(Int_t nEvents = 2) {
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-//  gSystem->Load("libEcal");
+  gSystem->Load("libEcal");
   gSystem->Load("libGlobal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");

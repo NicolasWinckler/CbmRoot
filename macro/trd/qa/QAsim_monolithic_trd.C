@@ -36,7 +36,7 @@ void QAsim_monolithic_trd(Int_t nEvents = 2)
   TString richGeom   = "rich_standard.geo";
   TString trdGeom    = "trd_monolithic.geo";
   TString tofGeom    = "tof_standard.geo";
-  TString ecalGeom   = "ecal/ecal_v08a.geo";
+//  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "field_electron_standard";   // name of field map
@@ -77,7 +77,7 @@ void QAsim_monolithic_trd(Int_t nEvents = 2)
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  gSystem->Load("libEcal");
+//  gSystem->Load("libEcal");
   // -----------------------------------------------------------------------
 
  
@@ -151,10 +151,12 @@ void QAsim_monolithic_trd(Int_t nEvents = 2)
     fRun->AddModule(tof);
   }
   
+/*
   if ( ecalGeom != "" ) {
     FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
   }
+*/
   
   // ------------------------------------------------------------------------
 

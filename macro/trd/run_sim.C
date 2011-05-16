@@ -20,7 +20,7 @@ void run_sim(Int_t nEvents = 2)
   // ========================================================================
   //          Adjust this part according to your requirements
 
-  // ----- Paths and file names  --------------------------------------------
+  // ----- Paths and fil names  --------------------------------------------
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
   TString outDir  = "data";
@@ -40,10 +40,10 @@ void run_sim(Int_t nEvents = 2)
   //TString trdGeom    = "trd_standard.geo";
   TString trdGeom    = digipar + ".geo";
   TString tofGeom    = "tof_standard.geo";
-  TString ecalGeom   = "ecal_FastMC.geo";
+  //TString ecalGeom   = "ecal_FastMC.geo";
   
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_electron_standard";   // name of field map
+  TString fieldMap    = "field_v10e";//"field_electron_standard";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   
@@ -81,7 +81,7 @@ void run_sim(Int_t nEvents = 2)
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  gSystem->Load("libEcal");
+  //gSystem->Load("libEcal");
   // -----------------------------------------------------------------------
 
  
@@ -154,16 +154,16 @@ void run_sim(Int_t nEvents = 2)
     tof->SetGeometryFileName(tofGeom);
     fRun->AddModule(tof);
   }
-  
+  /*
   if ( ecalGeom != "" ) {
     FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
   }
-  
+  */
   // ------------------------------------------------------------------------
 
 
-
+  /*
   // -----   Create magnetic field   ----------------------------------------
   if (fieldMap == "field_electron_standard" ) 
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
@@ -178,8 +178,15 @@ void run_sim(Int_t nEvents = 2)
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);
+  */
   // ------------------------------------------------------------------------
 
+  // -----   Create magnetic field   ----------------------------------------
+  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  magField->SetPosition(0., 0., fieldZ);
+  magField->SetScale(fieldScale);
+  fRun->SetField(magField);
+  // ------------------------------------------------------------------------
 
 
   // -----   Create PrimaryGenerator   --------------------------------------

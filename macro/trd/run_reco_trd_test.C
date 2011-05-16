@@ -97,12 +97,12 @@ TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  gSystem->Load("libEcal");
+  //gSystem->Load("libEcal");
   gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
+  //gSystem->Load("libKF");
+  //gSystem->Load("libL1");
+  //gSystem->Load("libLittrack");
+  //gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
 
   // ------------------------------------------------------------------------
 

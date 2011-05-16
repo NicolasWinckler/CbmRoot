@@ -72,7 +72,7 @@ void much_hits_gem(TString inFile = "",
    // ---  MuCh digitizer ----------------------------------------------------
 //   CbmMuchDigitizeSimpleGem* digitize = new CbmMuchDigitizeSimpleGem("MuchDigitizeSimpleGem", digiFile, iVerbose);
    CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem("MuchDigitizeAdvancedGem", digiFile, iVerbose);
-   digitize->SetSpotRadius(0.15);
+   digitize->SetSpotRadius(0.05);
    digitize->SetQThreshold(3);
    digitize->SetQMaximum(500000);
    digitize->SetNADCChannels(256);

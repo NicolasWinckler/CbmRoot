@@ -71,7 +71,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      * Sets radius of a spot from secondary electrons.
      * @param spotRadius Spot radius [cm] (0.03 cm by default).
      */
-    void SetSpotRadius(Double_t spotRadius = 0.03) { fSpotRadius = spotRadius; }
+    void SetSpotRadius(Double_t spotRadius = 0.05) { fSpotRadius = spotRadius; }
 
     /**
      * Sets mean gas gain value.

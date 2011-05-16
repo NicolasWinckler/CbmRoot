@@ -58,14 +58,14 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fDigiMatches(NULL),
   fDTime(3),
   fNADCChannels(256),
-  fQMax(440000),
+  fQMax(500000),
   fMeanNoise(0),//(1500),
   fMeanGasGain(1e4),
   fDeadPadsFrac(0),
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(200),
+  fDeadTime(400),
   fChainEventId(0)
 {
     SetQThreshold(3);
@@ -83,14 +83,14 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fDigiMatches(NULL),
   fDTime(3),
   fNADCChannels(256),
-  fQMax(440000),
+  fQMax(500000),
   fMeanNoise(0),//(1500),
   fMeanGasGain(1e4),
   fDeadPadsFrac(0),
   fGeoScheme(CbmMuchGeoScheme::Instance()),
   fEpoch(0),
   fMcChain(NULL),
-  fDeadTime(200),
+  fDeadTime(400),
   fChainEventId(0)
 {
   SetQThreshold(3),

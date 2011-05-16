@@ -1,33 +1,24 @@
-void much_draw3D(char* mcfile = "data/Jpsi.auau.25gev.centr.mc.root"){
+void much_draw3D(char* geofile = "geometry.root"){
+  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+  basiclibs();
+  gROOT->LoadMacro("$VMCWORKDIR/macro/much/muchlibs.C");
+  muchlibs();
+  
+  TFile* f = new TFile(mcfile);
+  f->Get("FairBaseParSet");
+  TGeoManager* gGeoManager = (TGeoManager*) f->Get("FAIRGeom");
+  gGeoManager->SetVisLevel(0);
 
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
+  // Check overlaps
+  gGeoManager->CheckOverlaps(0.0000001);
+  gGeoManager->PrintOverlaps();
 
-   gSystem->Load("libGeoBase");
-   gSystem->Load("libParBase");
-   gSystem->Load("libBase");
-   gSystem->Load("libCbmBase");
-   gSystem->Load("libCbmData");
-   gSystem->Load("libField");
-   gSystem->Load("libGen");
-   gSystem->Load("libPassive");
-   gSystem->Load("libSts");
-   gSystem->Load("libMuch");
+  TGeoVolume* master = gGeoManager->GetMasterVolume();
 
-   TFile* f = new TFile(mcfile);
-   f->Get("FairBaseParSet");
-   gGeoManager->SetVisLevel(0);
-//
-   // Check overlaps
-   gGeoManager->CheckOverlaps(0.0000001);
-   gGeoManager->PrintOverlaps();
+  // Draw all
+  //master->Draw("ogl");
 
-   TGeoVolume* master = gGeoManager->GetMasterVolume();
-
-   // Draw all
-   //master->Draw("ogl");
-
-   // Draw much
-   TGeoVolume* much = master->FindNode("much_0")->GetVolume();
-   much->Draw("ogl");
+  // Draw much
+  TGeoVolume* much = master->FindNode("much_0")->GetVolume();
+  much->Draw("ogl");
 }

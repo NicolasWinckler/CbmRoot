@@ -592,7 +592,7 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*&
 
   TVector3 posHit;
   TVector3 padSize;
-  fModuleInfo->GetPosition(ColOfSec, RowOfSec, moduleId, Sector, posHit, padSize);
+  fModuleInfo->GetPosition(ColOfSec+1, RowOfSec+1, moduleId, Sector, posHit, padSize);
   
   hit -> xPos = posHit[0]*10;
   hit -> yPos = posHit[1]*10;
@@ -686,12 +686,24 @@ Float_t CbmTrdHitProducerCluster::dPrf(Float_t padWidth, Float_t sigma, Float_t 
   Float_t dqRight = 0.1 * qRight;
   Float_t dqMax   = 0.1 * qRight;
   Float_t PosError = 
+    /*
+      dqLeft * 
+      (0.5 * padWidth * -1. / qLeft * (log(qMax * qMax / (qRight * qLeft)) - log(qRight / qLeft)) / (pow(log(qMax * qMax / (qRight * qLeft)),2))) +
+      dqRight *
+      ((1. / (qLeft * qRight) * log(qMax * qMax / (qRight * qLeft)) - (1. / qRight * log(qRight / qLeft))) / (pow(log(qMax * qMax / (qRight * qLeft)),2))) +
+      dqMax *
+      (-1. / qMax * padWidth * log(qRight / qLeft) / log(qMax * qMax / (qRight * qLeft)));
+    */
+    /*
     dqLeft * 
-    (0.5 * padWidth * -1. / qLeft * (log(qMax * qMax / (qRight * qLeft)) - log(qRight / qLeft)) / (pow(log(qMax * qMax / (qRight * qLeft)),2))) +
+    (-0.5 * padWidth * 1.0 / (qLeft * qLeft)   * 1.0 / (log(qMax * qMax / (qRight * qLeft)) * log(qMax * qMax / (qRight * qLeft)))) +
     dqRight *
-    ((1. / (qLeft * qRight) * log(qMax * qMax / (qRight * qLeft)) - (1. / qRight * log(qRight / qLeft))) / (pow(log(qMax * qMax / (qRight * qLeft)),2))) +
+    ( 0.5 * padWidth * 1.0 / (qRight * qRight) * 1.0 / (log(qMax * qMax / (qRight * qLeft)) * log(qMax * qMax / (qRight * qLeft)))) +
     dqMax *
-    (-1. / qMax * padWidth * log(qRight / qLeft) / log(qMax * qMax / (qRight * qLeft)));
+    (padWidth / qMax * log(qRight / qLeft) / (log((qMax * qMax) / (qRight * qLeft)) * log((qMax * qMax) / (qRight * qLeft))));
+    */
+    0.1 * (0.5 * padWidth - pow(0.5 * padWidth * log((qRight / qLeft)) / log((pow(qMax,2) / (qRight * qLeft))),2));
+  //pow(0.1 * 0.5 * padWidth * log((qRight / qLeft)) / log((pow(qMax,2) / (qRight * qLeft))),2);
 
   return PosError;
     }
@@ -722,6 +734,7 @@ void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax/*, ModulePa
     qRight = digi->GetCharge();
     padWidth = fPadSizeX[hit->secIdX];
     dxPos = Prf( padWidth, sigma, qLeft, qMax, qRight);
+    hit->exPos = dPrf( padWidth, sigma, qLeft, qMax, qRight);
   }
   if (up >= 0 && down >= 0) {
     digi = (CbmTrdDigi*) fDigis->At(up);
@@ -730,6 +743,7 @@ void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax/*, ModulePa
     qRight = digi->GetCharge();
     padWidth = fPadSizeY[hit->secIdY];
     dyPos = Prf( padWidth, sigma, qLeft, qMax, qRight);
+    hit->eyPos = dPrf( padWidth, sigma, qLeft, qMax, qRight);
   }
   //cout << " 1" << endl;
   if ((left >= 0 && right >= 0) && (up >= 0 && down >= 0)) {

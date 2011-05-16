@@ -82,7 +82,6 @@
   parInput2->open(stsDigiFile.Data(),"in");
   rtdb->setFirstInput(parInput1);
   rtdb->setSecondInput(parInput2);
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
 

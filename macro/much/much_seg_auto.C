@@ -64,7 +64,6 @@ void much_seg_auto(const char* mcFile = "",
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-//  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
 

@@ -53,7 +53,6 @@
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();  
   
 // ------ Qa task ---------------------------------------------------------  
   CbmMuchPhysicsQa *MuchQa = new CbmMuchPhysicsQa();

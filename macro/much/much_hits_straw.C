@@ -67,7 +67,6 @@ void much_hits_straw(TString inFile = "",
    rtdb->setFirstInput(parIo1);
    rtdb->setOutput(parIo1);
    rtdb->saveOutput();
-   fRun->LoadGeometry();
    // ------------------------------------------------------------------------
 
    // ---  MuCh digitizer ----------------------------------------------------

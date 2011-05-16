@@ -53,7 +53,6 @@ void much_hitsQa(){
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
   // ---  MuCh hit finder QA-------------------------------------------------

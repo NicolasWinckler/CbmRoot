@@ -67,7 +67,6 @@ void much_seg_manual(const char* mcFile = "",
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
   // -----  Segmentation task  ----------------------------------------------

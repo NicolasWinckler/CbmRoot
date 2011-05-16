@@ -67,7 +67,6 @@ void much_cluster_analyze(TString mcFile="",//"data/mc.standard.500.root",
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
   // ---  MuCh cluster analysis ---------------------------------------------

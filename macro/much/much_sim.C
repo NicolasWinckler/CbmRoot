@@ -228,6 +228,8 @@ void much_sim(TString inputSignal = "",
   // -----   Start run   ----------------------------------------------------
   cout << endl << "=== much_sim.C : Start run ..." << endl;
   fRun->Run(nEvents);
+  // Write geometry
+  fRun->CreateGeometryFile("geometry.root");
   // ------------------------------------------------------------------------
 
 

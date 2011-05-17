@@ -5,7 +5,7 @@ SET_TESTS_PROPERTIES(mvd_qa1_transUrqmd PROPERTIES PASS_REGULAR_EXPRESSION "Test
 
 GENERATE_ROOT_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/mvd/qa/mvd_qa2_transDelta.C)
 add_test(mvd_qa2_transDelta ${CBMROOT_BINARY_DIR}/macro/mvd/qa/mvd_qa2_transDelta.sh)
-SET_TESTS_PROPERTIES(mvd_qa2_transDelta PROPERTIES TIMEOUT "300")
+SET_TESTS_PROPERTIES(mvd_qa2_transDelta PROPERTIES TIMEOUT "500")
 SET_TESTS_PROPERTIES(mvd_qa2_transDelta PROPERTIES DEPENDS mvd_qa1_transUrqmd)
 SET_TESTS_PROPERTIES(mvd_qa2_transDelta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 

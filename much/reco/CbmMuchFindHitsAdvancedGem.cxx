@@ -57,11 +57,11 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
-  fAlgorithm = 0;
+  fAlgorithm = 3;
 
   fEvent = 0;
   fEpoch = 0;
-  fClusterSeparationTime = 2.; // ns
+  fClusterSeparationTime = 0.; // ns
 }
 // -------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
-  fAlgorithm = 0;
+  fAlgorithm = 3;
 
   fEvent = 0;
   fEpoch = 0;
@@ -92,7 +92,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name,
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
-  fAlgorithm = 0;
+  fAlgorithm = 3;
 
   fEvent = 0;
   fEpoch = 0;

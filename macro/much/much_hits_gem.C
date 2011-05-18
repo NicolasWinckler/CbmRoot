@@ -83,7 +83,7 @@ void much_hits_gem(TString inFile = "",
    // ---  MuCh hit finder ---------------------------------------------------
 //   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
    CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
-   findHits->SetAlgorithm(2);
+   findHits->SetAlgorithm(3);
 
    findHits->SetNStations(6);
    Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};

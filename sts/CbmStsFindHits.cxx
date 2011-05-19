@@ -482,8 +482,8 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
       vXY = 0.;
     }
     else {
-      vX  = dx / TMath::Sqrt(24.);
-      vY  = dx / TMath::Sqrt(24.) / TMath::Abs(TMath::Tan(stereoB));
+      vX  = dx / TMath::Sqrt(12.);
+      vY  = dx / TMath::Sqrt(12.) / TMath::Abs(TMath::Tan(stereoB));
       vXY = 0.;
     }
     
@@ -566,7 +566,7 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 
 	  vXTemp = (vX/2.) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
 	  vYTemp = (vX/(2.*(TMath::Tan(stereoB)))) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
-	  vXYTemp = (vX/(4.*(TMath::Tan(stereoB)))) * TMath::Sqrt(clusterB->GetMeanError()*clusterB->GetMeanError() - clusterF->GetMeanError()*clusterF->GetMeanError());
+	  vXYTemp = (vX/(4.*(TMath::Tan(stereoB)))) * (clusterB->GetMeanError()*clusterB->GetMeanError() - clusterF->GetMeanError()*clusterF->GetMeanError());
 	
 	  wX = vXTemp * vXTemp  * cosrot * cosrot 
                  - 2. * vXYTemp * cosrot * sinrot

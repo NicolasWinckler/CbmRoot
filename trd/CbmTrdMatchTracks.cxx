@@ -311,7 +311,7 @@ void CbmTrdMatchTracks::ExecDigi(
 			nPoints += it->second;
 		}
 
-		Int_t nofFake = 0;//matchMap[-1];
+		Int_t nofFake = 0;
 		Int_t nofWrong = nPoints - nofTrue - nofFake;
 		Int_t nofMcTracks = matchMap.size() - 1;
 
@@ -363,14 +363,12 @@ void CbmTrdMatchTracks::ExecCluster(
 			    for (Int_t iPoint = 0; iPoint < digiMatch->GetNofRefs(); iPoint++) {
                Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
                if (pointIndex < 0) { // Fake or background hit
-//                  matchMap[-1]++;
                   mcIdHit.insert(-1);
                   continue;
                }
                FairMCPoint* point = (FairMCPoint*) fPoints->At(pointIndex);
                if (point == NULL) continue;
                mcIdHit.insert(point->GetTrackID());
-//               matchMap[point->GetTrackID()]++;
 			    }
 			} // loop over cluster
 
@@ -391,21 +389,19 @@ void CbmTrdMatchTracks::ExecCluster(
 			nPoints += it->second;
 		}
 
-		Int_t nofFake = 0;//matchMap[-1];
-//		Int_t nofWrong = nPoints - nofTrue - nofFake;
+		Int_t nofFake = 0;
 		Int_t nofWrong = nofHits - nofTrue - nofFake;
 		Int_t nofMcTracks = matchMap.size() - 1;
 
 		new ((*fMatches)[iTrack]) CbmTrackMatch(bestMcTrackId, nofTrue,
 				nofWrong, nofFake, nofMcTracks);
 
-//		fNofHits += nPoints;
 		fNofHits += nofHits;
 		fNofTrueHits += nofTrue;
 		fNofWrongHits += nofWrong;
 		fNofFakeHits += nofFake;
 
-//		if (fVerbose > 1)
+		if (fVerbose > 1)
 			std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
 					<< " nofHits=" << nofHits << " nPoints=" << nPoints << " nofTrue=" << nofTrue
 					<< " nofWrong=" << nofWrong << " nofFake=" << nofFake

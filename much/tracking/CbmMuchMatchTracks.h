@@ -5,6 +5,8 @@
  * Matching of hits to clusters with several MC points
  * 2009-06-01 A.Lebedev
  * Include matching for straw hits
+ * 2011-05-19 A.Lebedev
+ * Correct matching in case of clustering
  **/
 
 #ifndef CBMMUCHMATCHTRACKS_H_
@@ -35,11 +37,6 @@ private:
 	void ExecStraw(
 			std::map<Int_t, Int_t> &matchMap,
 			Int_t index);
-
-	void DigiToTrackMatch(
-			const TClonesArray* digiMatches,
-			Int_t digiIndex,
-			std::map<Int_t, Int_t> &matchMap);
 
 	TClonesArray* fTracks;
 	TClonesArray* fPoints;

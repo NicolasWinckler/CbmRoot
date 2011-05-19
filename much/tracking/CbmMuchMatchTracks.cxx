@@ -72,9 +72,10 @@ void CbmMuchMatchTracks::Exec(
 
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {	// Loop over tracks
-		std::map<Int_t, Int_t> matchMap;
+	   // std::map stores MC track id to number of contributions of this MC track
+	   std::map<Int_t, Int_t> matchMap;
 
-		CbmMuchTrack* pTrack = (CbmMuchTrack*) fTracks->At(iTrack);
+		CbmMuchTrack* pTrack = static_cast<CbmMuchTrack*>(fTracks->At(iTrack));
 		if (pTrack == NULL) continue;
 
 		Int_t nofHits = pTrack->GetNofHits();
@@ -89,25 +90,25 @@ void CbmMuchMatchTracks::Exec(
 			}
 		} // Loop over hits
 
-		Int_t nofTrue = 0;
-		Int_t bestMcTrackId = -1;
-		Int_t nPoints = 0;
-		for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it != matchMap.end(); it++) {
-			if (it->first != -1 && it->second > nofTrue) {
-				bestMcTrackId = it->first;
-				nofTrue = it->second;
-			}
-			nPoints+=it->second;
-		}
-		
-		Int_t nofFake = 0;//matchMap[-1];
-		Int_t nofWrong = nPoints - nofTrue - nofFake;
-		Int_t nofMcTracks = matchMap.size() - 1;
+      Int_t nofTrue = 0;
+      Int_t bestMcTrackId = -1;
+      Int_t nPoints = 0;
+      for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it != matchMap.end(); it++) {
+         if (it->first != -1 && it->second >= nofTrue) {
+            bestMcTrackId = it->first;
+            nofTrue = it->second;
+         }
+         nPoints += it->second;
+      }
+
+      Int_t nofFake = 0;
+      Int_t nofWrong = nofHits - nofTrue - nofFake;
+      Int_t nofMcTracks = matchMap.size() - 1;
 
 		new ((*fMatches)[iTrack]) CbmTrackMatch(
 				bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks);
 
-		fNofHits += nPoints;
+		fNofHits += nofHits;
 		fNofTrueHits += nofTrue;
 		fNofWrongHits += nofWrong;
 		fNofFakeHits += nofFake;
@@ -139,43 +140,57 @@ void CbmMuchMatchTracks::ExecPixel(
 		std::map<Int_t, Int_t> &matchMap,
 		Int_t index)
 {
-	CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fPixelHits->At(index);
-	if (hit == NULL) return;
-	Int_t clusterId = hit->GetRefId();
-	CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
-	for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-		Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-		DigiToTrackMatch(fPixelDigiMatches, digiIndex, matchMap);
-	}
+   // std::set stores MC track indices contributed to a certain hit
+   std::set<Int_t> mcIdHit;
+   CbmMuchPixelHit* hit = static_cast<CbmMuchPixelHit*>(fPixelHits->At(index));
+   if (hit == NULL) return;
+
+   Int_t clusterId = hit->GetRefId();
+   CbmMuchCluster* cluster = static_cast<CbmMuchCluster*>(fClusters->At(clusterId));
+   if (cluster == NULL) return;
+
+   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
+       Int_t digiId = cluster->GetDigiIndex(iDigi);
+       CbmMuchDigiMatch* digiMatch = static_cast<CbmMuchDigiMatch*>(fPixelDigiMatches->At(digiId));
+       if (digiMatch == NULL) continue;
+       for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {
+         Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
+         if (pointIndex < 0) { // Fake or background hit
+            mcIdHit.insert(-1);
+            continue;
+         }
+         FairMCPoint* point = static_cast<FairMCPoint*>(fPoints->At(pointIndex));
+         if (point == NULL) continue;
+         mcIdHit.insert(point->GetTrackID());
+       }
+   } // loop over digis
+
+   for (std::set<Int_t>::iterator it = mcIdHit.begin(); it != mcIdHit.end(); it++) {
+      matchMap[*it]++;
+   }
 }
 
 void CbmMuchMatchTracks::ExecStraw(
 		std::map<Int_t, Int_t> &matchMap,
 		Int_t index)
 {
-	CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fStrawHits->At(index);
+	CbmMuchStrawHit* hit = static_cast<CbmMuchStrawHit*>(fStrawHits->At(index));
 	if (hit == NULL) return;
-	Int_t digiIndex = hit->GetRefId();
-	DigiToTrackMatch(fStrawDigiMatches, digiIndex, matchMap);
-}
 
-void CbmMuchMatchTracks::DigiToTrackMatch(
-		const TClonesArray* digiMatches,
-		Int_t digiIndex,
-		std::map<Int_t, Int_t> &matchMap)
-{
-	CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) digiMatches->At(digiIndex);
-	if (digiMatch == NULL) return;
-	for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {
-		Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
-		if (pointIndex < 0) { // Fake or background hit
-			matchMap[-1]++;
-			continue;
-		}
-		FairMCPoint* point = (FairMCPoint*) fPoints->At(pointIndex);
-		if (point == NULL) continue;
-		matchMap[point->GetTrackID()]++;
-	}
+	Int_t digiIndex = hit->GetRefId();
+   CbmMuchDigiMatch* digiMatch = static_cast<CbmMuchDigiMatch*>(digiMatches->At(digiIndex));
+   if (digiMatch == NULL) return;
+
+   for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {
+      Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
+      if (pointIndex < 0) { // Fake or background hit
+         matchMap[-1]++;
+         continue;
+      }
+      FairMCPoint* point = static_cast<FairMCPoint*>(fPoints->At(pointIndex));
+      if (point == NULL) continue;
+      matchMap[point->GetTrackID()]++;
+   }
 }
 
 ClassImp(CbmMuchMatchTracks);

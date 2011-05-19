@@ -178,7 +178,7 @@ void CbmMuchMatchTracks::ExecStraw(
 	if (hit == NULL) return;
 
 	Int_t digiIndex = hit->GetRefId();
-   CbmMuchDigiMatch* digiMatch = static_cast<CbmMuchDigiMatch*>(digiMatches->At(digiIndex));
+   CbmMuchDigiMatch* digiMatch = static_cast<CbmMuchDigiMatch*>(fStrawDigiMatches->At(digiIndex));
    if (digiMatch == NULL) return;
 
    for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {

@@ -87,6 +87,12 @@ selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx  
 selection/NNfunction.cxx 
 #LhcbRingFinder.cxx  
+prototype/CbmRichProt.cxx
+prototype/CbmRichProtHitProducer.cxx
+prototype/CbmRichProtPrepareExtrapolation.cxx
+prototype/CbmRichProtProjectionProducer.cxx
+prototype/CbmRichProtRingFinderHough.cxx
+prototype/CbmRichProtRingFinderHoughImpl.cxx
 )
 
 If(TBB_FOUND)
@@ -132,6 +138,12 @@ qa/CbmRichRingFitterQa.h
 qa/CbmRichElectronsQa.h
 #qa/CbmRichParallelQa.h  
 #LhcbRingFinder.h  
+prototype/CbmRichProt.h
+prototype/CbmRichProtHitProducer.h
+prototype/CbmRichProtPrepareExtrapolation.h
+prototype/CbmRichProtProjectionProducer.h
+prototype/CbmRichProtRingFinderHough.h
+prototype/CbmRichProtRingFinderHoughImpl.h
 )
 
 If(TBB_FOUND)

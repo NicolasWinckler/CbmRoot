@@ -52,5 +52,12 @@
 
 //#pragma link C++ class LhcbRingFinder;
 
+#pragma link C++ class CbmRichProt+;
+#pragma link C++ class CbmRichProtHitProducer+;
+#pragma link C++ class CbmRichProtPrepareExtrapolation+;
+#pragma link C++ class CbmRichProtProjectionProducer+;
+#pragma link C++ class CbmRichProtRingFinderHough+;
+#pragma link C++ class CbmRichProtRingFinderHoughImpl+;
+
 #endif
 

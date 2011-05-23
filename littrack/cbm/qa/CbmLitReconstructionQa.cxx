@@ -213,8 +213,10 @@ InitStatus CbmLitReconstructionQa::Init()
    ReadDataBranches();
    CreateHistos(NULL);
 
-   fElectronId = new CbmLitGlobalElectronId();
-   fElectronId->Init();
+   if (fIsElectronSetup) {
+      fElectronId = new CbmLitGlobalElectronId();
+      fElectronId->Init();
+   }
 
    return kSUCCESS;
 }
@@ -855,6 +857,8 @@ void CbmLitReconstructionQa::FillGlobalElIdHistos(
    Double_t par,
    const std::string& opt)
 {
+   if (!fIsElectronSetup) return;
+
    Bool_t isMCPrim = mcTrack->GetMotherId() == -1;
    Bool_t isMCElectron = std::abs(mcTrack->GetPdgCode()) == 11;
 
@@ -919,6 +923,8 @@ void CbmLitReconstructionQa::FillGlobalReconstructionHistosRich(
 
 void CbmLitReconstructionQa::PionSuppression()
 {
+   if (!fIsElectronSetup) return;
+
    Int_t nGlobal = fGlobalTracks->GetEntries();
    for (Int_t iTrack=0; iTrack<nGlobal; iTrack++) {
       CbmGlobalTrack* gTrack = (CbmGlobalTrack*)fGlobalTracks->At(iTrack);

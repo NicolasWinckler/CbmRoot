@@ -17,6 +17,8 @@
 #include "TClonesArray.h"
 #include "TSystem.h"
 
+#include <cmath>
+
 CbmLitGlobalElectronId::CbmLitGlobalElectronId():
    fTrdAnnCut(0.85),
    fRichAnnCut(-0.5),

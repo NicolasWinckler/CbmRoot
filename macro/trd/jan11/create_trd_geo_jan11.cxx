@@ -859,7 +859,7 @@ int main(void)
   float x352 = Detector_size_x[2] *  2;
   float y352 = Detector_size_y[2] * -3;
 
-  // ony 5 modules jan11 (was 6)
+  // only 5 modules jan11 (was 6)
 
   float x353 = Detector_size_x[2] *  6;
   float y353 = Detector_size_y[2] *  2;
@@ -884,7 +884,7 @@ int main(void)
   //  int Chamber_number_Station2 = 50;
   //  int Chamber_number_Station2 =  100;
   //  int Chamber_number_Station2 =  Chamber_number_Station1 + 22 * 2;   // = 100 - jun10
-  int Chamber_number_Station2 =  Chamber_number_Station1 + 21 * 2;   // = 98 - jun11
+  int Chamber_number_Station2 =  Chamber_number_Station1 + 21 * 2;       // = 102 - jan11
   float Position_Station2[][4] = { {x101,y101,1,0},{x102,y102,1,0},{x103,y103,1,0},{x104,y104,1,0},
 				   {x105,y105,1,0},{x106,y106,1,0},{x107,y107,1,0},{x108,y108,1,0},
 

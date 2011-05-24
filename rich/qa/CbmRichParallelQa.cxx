@@ -1,9 +1,8 @@
-/*
- * CbmRichParallelQa.cxx
- *
- *  Created on: 22.03.2010
- *      Author: Semen Lebedev
- */
+/** CbmRichParallelQa.cxx
+ * @author Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2010
+ * @version 1.0
+ **/
 
 #include "CbmRichParallelQa.h"
 #include "CbmRichHit.h"
@@ -129,29 +128,19 @@ CbmRichParallelQa::~CbmRichParallelQa()
 InitStatus CbmRichParallelQa::Init()
 {
     cout << "InitStatus CbmRichParallelQa::Init()" << endl;
-	// Get and check CbmRootManager
+
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (!ioman) {
-		cout << "-E- CbmRichParallelQa::Init: " << "RootManager not instantised!"<< endl;
-		return kERROR;
-	}
+	if (NULL == ioman) { Fatal("CbmRichParallelQa::Init","RootManager not instantised!");}
 
-	// Get hit Array
 	fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
-	if (!fRichHits) {
-		cout << "-W- CbmRichParallelQa::Init: No RichHit array!" << endl;
-	}
+	if (NULL == fRichHits) { Fatal("CbmRichParallelQa::Init","No RichHit array!");}
 
-	// Get RichRing Array
 	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
-	if (!fRichRings) {
-		cout << "-E- CbmRichParallelQa::Init: No RichRing array!" << endl;
-		return kERROR;
-	}
+	if (NULL == fRichRings) { Fatal("CbmRichParallelQa::Init","No RichRing array!");}
+
 	for (int i = 0; i<kMAX_NOF_THREADS;i++){
 		fHT[i]->Init();
 	}
-
 
 //	tbb::task_scheduler_init init();
 //	TMyObserver obs;
@@ -160,7 +149,8 @@ InitStatus CbmRichParallelQa::Init()
     return kSUCCESS;
 }
 
-void CbmRichParallelQa::Exec(Option_t* option)
+void CbmRichParallelQa::Exec(
+      Option_t* option)
 {
 	fEventNumber++;
 	cout << "-I- Read event " << fEventNumber<<endl;
@@ -191,7 +181,7 @@ void CbmRichParallelQa::Exec(Option_t* option)
 	if (fEventNumber == fNofEvents){
 		cout << "-I- NofTasks = " << fNofTasks << endl;
 		TMyObserver obs;
-		obs.FInit();    // set cpu-threads correspondence
+		obs.FInit(); // set cpu-threads correspondence
 		obs.observe(true);
 		tbb::task_scheduler_init init(fNofTasks);
 		DoTestWithTask();

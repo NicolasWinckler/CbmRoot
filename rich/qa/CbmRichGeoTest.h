@@ -4,9 +4,9 @@
 
 #include "FairTask.h"
 
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TClonesArray.h"
+class TH1D;
+class TH2D;
+class TClonesArray;
 
 #include <map>
 
@@ -16,15 +16,27 @@ class CbmRichGeoTest : public FairTask{
 
 public:
 	CbmRichGeoTest();
-	CbmRichGeoTest(const char *name, const char *title, Int_t verbose);
+
+	CbmRichGeoTest(
+	      const char *name,
+	      const char *title,
+	      Int_t verbose);
+
 	virtual ~CbmRichGeoTest();
+
 	virtual InitStatus Init();
-	virtual void Exec(Option_t* option);
+
+	virtual void Exec(
+	      Option_t* option);
+
 	virtual void Finish();
 	
 	void RingParameters();
+
 	void EventPoints();
+
 	void MCElectrons();
+
 private:
 	
 	TClonesArray* fRichHits;
@@ -34,7 +46,7 @@ private:
 	TClonesArray* fRichRingMatches; 
 	
 	Int_t fEventNum;
-///electrons
+// electrons
 	TH1D* fhNofHitsEl;
 	TH1D* fhAaxisEl;
 	TH1D* fhBaxisEl;
@@ -46,9 +58,8 @@ private:
 	TH2D* fhXYEl;
 	TH1D* fhMCEl;
 	TH1D* fhAccEl;
-	
-	
-///general plots
+
+// general plots
 	TH1D* fhNofHitsEvent;
 	TH1D* fhNofPointsEvent;
 	

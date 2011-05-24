@@ -21,9 +21,12 @@ public:
 
 class CbmRichRingFitterQa: public TObject {
 public:
+ 	CbmRichRingFitterQa();
+
 	void GenerateEllipse();
-	CbmRichRingFitterQa();
+
 	void DrawHist();
+
 private:
 	TH1D* fhErrorA;
 	TH1D* fhErrorB;

@@ -6,6 +6,10 @@
 #include "CbmMCTrack.h"
 #include "CbmRichPoint.h"
 
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TClonesArray.h"
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -15,8 +19,8 @@ using std::endl;
 using std::map;
 using std::vector;
 
-// -----   Default constructor   -------------------------------------------
-CbmRichGeoTest::CbmRichGeoTest() :FairTask("RichGeoTestQa")
+CbmRichGeoTest::CbmRichGeoTest()
+   :FairTask("RichGeoTestQa")
 {
 	fEventNum = 0;
 
@@ -38,81 +42,49 @@ CbmRichGeoTest::CbmRichGeoTest() :FairTask("RichGeoTestQa")
 	fhXYPointsOneEvent = new TH2D("fhXYPointsOneEvent", "fhXYPointsOneEvent",150, -150, 150, 250, -250, 250);
 	fhNofHitsEvent= new TH1D("fhNofHitsEvent", "fhNofHitsEvent", 50, 0, 2500);
 	fhNofPointsEvent= new TH1D("fhNofPointsEvent", "fhNofPointsEvent", 50, 0, 10000);
-
-
-
 }
-// -------------------------------------------------------------------------
 
-//------------  standard constructor (with verbosity level)  ---------------------------------
-CbmRichGeoTest::CbmRichGeoTest(const char *name, const char *title, Int_t verbose)
-  :FairTask(name)
+CbmRichGeoTest::CbmRichGeoTest(
+      const char *name,
+      const char *title,
+      Int_t verbose)
+     :FairTask(name)
 {
 
 }
 
-  // -----   Destructor   ----------------------------------------------------
 CbmRichGeoTest::~CbmRichGeoTest()
 {
 
-
 }
-// -------------------------------------------------------------------------
-
-
-// -----   Initialization   -----------------------------------------------
 
 InitStatus CbmRichGeoTest::Init()
 {
-	cout << "InitStatus CbmRichGeoTest::Init()"<<endl;
-	// Get and check FairRootManager
+	cout << "InitStatus CbmRichGeoTest::Init"<<endl;
+
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (!ioman) {
-		cout << "-E- CbmRichGeoTest::Init: " << "RootManager not instantised!"
-				<< endl;
-		return kERROR;
-	}
+	if (NULL == ioman) { Fatal("CbmRichGeoTest::Init","RootManager not instantised!"); }
 
-	// Get hit Array
 	fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
-	if ( !fRichHits) {
-		cout << "-W- CbmRichGeoTest::Init: No RichHit array!" << endl;
-	}
+	if ( !fRichHits) { Fatal("CbmRichGeoTest::Init","No RichHit array!"); }
 
-	// Get RichRing Array
 	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
-	if ( !fRichRings) {
-		cout << "-E- CbmRichGeoTest::Init: No RichRing array!" << endl;
-		return kERROR;
-	}
+	if ( NULL == fRichRings) { Fatal("CbmRichGeoTest::Init","No RichRing array!"); }
 
-	// Get MC Point array
 	fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
-	if ( !fRichPoints) {
-		cout << "-E- CbmRichGeoTest::Init: No RichPoint array!" << endl;
-		return kERROR;
-	}
+	if ( NULL == fRichPoints) { Fatal("CbmRichGeoTest::Init","No RichPoint array!"); }
 
-	// Get MC Point array
 	fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-	if ( !fMCTracks) {
-		cout << "-E- CbmRichGeoTest::Init: No MCTrack array!" << endl;
-		return kERROR;
-	}
+	if ( NULL == fMCTracks) { Fatal("CbmRichGeoTest::Init","No MCTrack array!"); }
 
-	// Get RichRingMatch array
 	fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
-	if ( !fRichRingMatches) {
-		cout << "-E- CbmRichGeoTest::Init: No RichRingMatch array!" << endl;
-		return kERROR;
-	}
+	if ( NULL == fRichRingMatches) { Fatal("CbmRichGeoTest::Init","No RichRingMatch array!"); }
 
 	return kSUCCESS;
 }
 
-
-
-void CbmRichGeoTest::Exec(Option_t* option)
+void CbmRichGeoTest::Exec(
+      Option_t* option)
 {
 	fEventNum++;
 	cout << "CbmRichGeoTest, event No. " <<  fEventNum << endl;
@@ -137,9 +109,7 @@ void CbmRichGeoTest::RingParameters()
 		Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
 		Double_t momentum = mcTrack->GetP();
 
-		if (pdg != 11 || motherId != -1) continue;//only primary electrons
-
-
+		if (pdg != 11 || motherId != -1) continue; // only primary electrons
 
 		Double_t axisA = ring->GetAaxis();
 		Double_t axisB = ring->GetBaxis();
@@ -152,7 +122,6 @@ void CbmRichGeoTest::RingParameters()
 		if (axisA > 10 || axisA < 1) continue;
 		if (axisB > 10 || axisB < 1) continue;
 
-
 		fhBoverAXYEl->Fill(xc, yc, axisB/axisA);
 		fhBoverAEl->Fill(axisB/axisA);
 		fhXYEl->Fill(xc, yc);
@@ -162,7 +131,6 @@ void CbmRichGeoTest::RingParameters()
 		fhBaxisVsMomEl->Fill(momentum, axisB );
 		fhAaxisVsMomEl->Fill(momentum, axisA );
 	}
-
 }
 
 void CbmRichGeoTest::EventPoints()
@@ -195,21 +163,19 @@ void CbmRichGeoTest::MCElectrons()
 		if (!mcTrack) continue;
 		Int_t motherId = mcTrack->GetMotherId();
 		Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
-		if (pdg != 11 || motherId != -1) continue;//only primary electrons
+		if (pdg != 11 || motherId != -1) continue; // only primary electrons
 
 		fhMCEl->Fill(mcTrack->GetP());
 		fhNofPointsEl->Fill(mcTrack->GetNPoints(kRICH));
 	}
-
 }
 
-// -----   Finish Task   ---------------------------------------------------
 void CbmRichGeoTest::Finish()
 {
 	fhAaxisEl->Write();
 	fhBaxisEl->Write();
 	fhBoverAEl->Write();
-   	fhBoverAXYEl->Write();
+   fhBoverAXYEl->Write();
 	fhXYEl->Write();
 	fhXYHits->Write();
 	fhXYPoints->Write();
@@ -224,8 +190,6 @@ void CbmRichGeoTest::Finish()
 	fhAaxisVsMomEl->Write();
 	fhNofPointsEl->Write();
 }
-
-// -------------------------------------------------------------------------
 
 ClassImp(CbmRichGeoTest)
 

@@ -10,13 +10,17 @@
 void run_sim(Int_t nEvents = 2)
 {
 
+  // ========================================================================
+  // geometry selection for sim + reco  by Cyrano
+  // ========================================================================
   ifstream whichTrdGeo;
   whichTrdGeo.open("whichTrdGeo",ios::in);
   TString digipar;
   if (whichTrdGeo) whichTrdGeo >> digipar;
-  cout << digipar << endl;
+  cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
     whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_standard";
+
   // ========================================================================
   //          Adjust this part according to your requirements
 

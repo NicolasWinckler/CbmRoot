@@ -36,8 +36,8 @@ void create_geometry_file(TString geomFile="trd_standard.geo")
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  //  TString trdGeom = "../macro/trd/" + geomFile;
-  TString trdGeom = geomFile;
+  TString trdGeom = "../macro/trd/" + geomFile;
+  //  TString trdGeom = geomFile;
   TString trdGeomOut = "geofile_" + fileName + ".root";
 
   // In general, the following parts need not be touched

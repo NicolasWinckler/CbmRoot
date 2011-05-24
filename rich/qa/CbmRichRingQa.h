@@ -1,43 +1,42 @@
-/*
-Class  : CbmRichRingQa
-Description : Quality checks or ring finders: efficiency calculation etc.
-Author : Semen Lebedev (S.Lebedev@gsi.de)
-*/
+/** CbmRichRingQa.h
+ * @author Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2005
+ * @version 3.0
+ **/
 
 #ifndef CBMRICHRINGQA_H
 #define CBMRICHRINGQA_H
 
 #include "CbmRichRing.h"
-
 #include "FairTask.h"
-#include "CbmRichRingFitterCOP.h"
-#include "CbmRichRingFitterEllipseTau.h"
-#include "CbmRichRingSelectImpl.h"
-#include "TH1D.h"
-#include "TH2D.h"
+
+class TH1D;
+class CbmRichRing;
+class CbmRichRingFitterCOP;
+class CbmRichRingSelectImpl;
 
 #include <map>
 #include <fstream>
 
 
-class CbmRichRingQa : public FairTask{
-
-    TClonesArray* fRings;        // Array of CbmRichRings
-    TClonesArray* fPoints;       // Array of FairMCPoints
-    TClonesArray* fTracks;       // Array of CbmMCTracks
-    TClonesArray* fHits;         // Array of CbmRichHits
-    TClonesArray* fMatches;      // Array of CbmRichRingMatch
-    TClonesArray* fProj;      // Array of CbmRichRingMatch
-    TClonesArray* fTrackMatch;  //Array of STSTrackMatch
-    TClonesArray* gTrackArray;   // Array of Global Tracks
+class CbmRichRingQa : public FairTask
+{
+private:
+    TClonesArray* fRings; // Array of CbmRichRings
+    TClonesArray* fPoints; // Array of FairMCPoints
+    TClonesArray* fTracks; // Array of CbmMCTracks
+    TClonesArray* fHits; // Array of CbmRichHits
+    TClonesArray* fMatches; // Array of CbmRichRingMatch
+    TClonesArray* fProj; // Array of CbmRichRingMatch
+    TClonesArray* fTrackMatch; //Array of STSTrackMatch
+    TClonesArray* gTrackArray; // Array of Global Tracks
 
     std::map<Int_t, Int_t> fRingMap;
-    std::map<Int_t, CbmRichRing > fRingMapWithHits;
     Int_t fEventNumber;
     Int_t fNofHitsInRingCut;
-    Bool_t fIsSaveToPdf;
+    Double_t fQuota;
 
-    public:
+public:
 
     /** Default constructor **/
     CbmRichRingQa();
@@ -45,7 +44,10 @@ class CbmRichRingQa : public FairTask{
     /** Standard Constructor with name, title, and verbosity level
         *@param verbose      verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
     */
-    CbmRichRingQa(const char *name, const char *title, Int_t verbose);
+    CbmRichRingQa(
+          const char *name,
+          const char *title,
+          Int_t verbose);
 
     /** Destructor **/
     virtual ~CbmRichRingQa();
@@ -54,49 +56,23 @@ class CbmRichRingQa : public FairTask{
     virtual InitStatus Init();
 
     /** Executed task **/
-    virtual void Exec(Option_t* option);
+    virtual void Exec(
+          Option_t* option);
 
     /** Finish task **/
     virtual void FinishTask();
 
     void EfficiencyCalc();
-    void DiffFakeTrue();
+
     void DiffFakeTrueCircle();
-    Bool_t DoesRingHaveProjection(Int_t trackId);
-    Double_t GetStsMomentum(CbmRichRing * ring);
-    void RingTrackMatchEff();
-    void SaveToPdf();
-    void SetIsSaveToPdf(Bool_t s){fIsSaveToPdf = s;}
 
-    CbmRichRingFitterCOP* fFitCOP;
-    CbmRichRingFitterEllipseTau* fFitEllipse;
-    CbmRichRingSelectImpl* fSelectImpl;
+    Double_t GetStsMomentum(
+          CbmRichRing * ring);
 
-    Int_t fNofAllRings;  //number of all MC rings
-    Int_t fNofMcElRings; //number of all electron MC rings
-    Int_t fNofMcPiRings; //number of all pion MC rings
-    Int_t fNofAccElRings;//number of El MC rings with proj and # hits more than HitCut
-    Int_t fNofAccPiRings;//number of Pi MC rings with proj and # hits more than HitCut
-
+    Int_t fNofAccElRings;
     Int_t fNofRecElRings;
-    Int_t fNofRecPiRings;
     Int_t fNofCloneRings;
     Int_t fNofFakeRings;
-
-    Int_t fNofTrueElBadFit;
-
-    TH1D* fh_RecElRingsMom;///Histogram of found rings vs momentum. Electron. Proj
-    TH1D* fh_AccElRingsMom;///Histogram of MC rings vs momentum. Electron. Proj
-
-    TH1D* fh_RecElRingsRadPos;///Histogram of found rings vs RadialPosition. Electron. Proj
-    TH1D* fh_AccElRingsRadPos;///Histogram of MC rings vs RadialPosition. Electron. Proj
-
-    TH1D* fh_RecElRingsNofHits;///Histogram of found rings vs nof Hits. Electron. Proj
-    TH1D* fh_AccElRingsNofHits;///Histogram of MC rings vs Nof hits. Electron. Proj
-
-    TH1D* fh_RecElRingsBoverA;
-    TH1D* fh_AccElRingsBoverA;
-
 
 /// Difference Fake and True rings histograms BEGIN
     TH1D* fh_FakeNofHits;
@@ -118,19 +94,10 @@ class CbmRichRingQa : public FairTask{
     TH1D* fh_TrueElRadius;
 /// Difference Fake and True rings histograms END
 
-/// Ring Track matching BEGIN
-    TH1D* fh_WrongMatchElDistance;
-    TH1D* fh_TrueMatchElDistance;
-    TH1D*  fh_TrueMatchElMom;
-/// Ring Track matching END
-
     std::ofstream  foutFakeAndTrue;
 
-    TH2D*  fh_HitsXY;//hits distribution (x,y)
-
-    TH1D*  fh_NhitsPerEvent;//Nof hits per event
-    TH1D*  fh_NprojPerEvent;//Nof projections/ event
-
+    CbmRichRingFitterCOP* fFitCOP;
+    CbmRichRingSelectImpl* fSelectImpl;
 
     ClassDef(CbmRichRingQa,1)
 

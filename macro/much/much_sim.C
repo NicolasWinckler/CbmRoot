@@ -45,7 +45,7 @@ void much_sim(TString inputSignal = "",
   // In case you want the additional W shielding around the pipe,
   // use shield_standard.geo or shield_compact.geo, respective to the
   // MUCH geometry. Otherwise, define an empty string.
-  TString muchGeom   = "much_standard.geo";
+  TString muchGeom   = "much/much_v11a.geo";
   TString pipeGeom   = "pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
 

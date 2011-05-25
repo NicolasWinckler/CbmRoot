@@ -19,7 +19,7 @@ void much_cluster_analyze(TString mcFile="",//"data/mc.standard.500.root",
     recoFile = "data/Jpsi.auau.25gev.centr.muchhits.root";
   }
   if (digiFile == "") {
-    digiFile = inputdir + "/parameters/much/much_standard.digi.root";
+    digiFile = inputdir + "/parameters/much/much_v11a.digi.root";
   }
   TString outFile = "data/dummy.root";
 

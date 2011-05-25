@@ -39,7 +39,7 @@ void much_reco(
 		stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
-		muchDigiFile = parDir + "/much/much_standard.digi.root";
+		muchDigiFile = parDir + "/much/much_v11a.digi.root";
 		// Directory for output images
 		TString imageDir = "./data/";
 		// Tracking type

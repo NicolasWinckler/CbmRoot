@@ -4,7 +4,8 @@
 
 #directory=jul10
 #directory=../macro/trd/geometry/trd.v11
-directory=geometry/trd.v11
+#directory=geometry/trd.v11
+directory=geometry
 
 for file in $directory/*.geo; do
  echo "Creating trd parameters for $file"

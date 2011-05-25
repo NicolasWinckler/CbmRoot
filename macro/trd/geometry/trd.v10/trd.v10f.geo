@@ -3,11 +3,12 @@
 //*********************************************************
 // stations located at 4500 / 6750 / 9000 mm in z
 // with frontside of radiators of the 1st layer  
-// v01 - 12 mm gas thickness                     
-// v02 -  6 mm gas thickness (standard)          
-// v03 - tilted, 6 mm gas thickness              
-// v04 - tilted, aligned, 6 mm gas thickness     
-// v05 - tilted layer pairs, 6 mm gas thickness  
+// v10a - v01 - 12 mm gas thickness                     
+// v10b - v02 -  6 mm gas thickness (standard)          
+// v10c - v03 - tilted, 6 mm gas thickness              
+// v10d - v04 - tilted, aligned, 6 mm gas thickness     
+// v10e - v05 - tilted layer pairs, 6 mm gas thickness  
+// v10f - v06 - derived from v10b - v02 station 2 only for SIS100
 //*********************************************************
 //*********************************************************
 // This is the geometry file of the following configuration

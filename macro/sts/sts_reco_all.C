@@ -16,7 +16,7 @@
 // --------------------------------------------------------------------------
 
 #include <math.h>
-void sts_reco_all(Int_t nEvents = 1) {
+void sts_reco_all(Int_t nEvents = 1000) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -28,7 +28,7 @@ void sts_reco_all(Int_t nEvents = 1) {
   TString parFile = "params.root";
   
   // STS digitisation file
-  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts_v11a.digi.par";
   
   // Output file
   TString outFile = "sts.reco.root";
@@ -149,13 +149,13 @@ void sts_reco_all(Int_t nEvents = 1) {
   
   
   // -----   STS track finding   --------------------------------------------
-  FairTask* kalman= new CbmKF();
+  CbmKF* kalman = new CbmKF();
   run->AddTask(kalman);
-  FairTask* l1 = new CbmL1();
+  CbmL1* l1 = new CbmL1("L1",1,3,0);
   run->AddTask(l1);
-  CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-  FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder, kTRUE);
-  run->AddTask(findTracks);
+  CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
+  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);
+  run->AddTask(stsFindTracks);
   // ------------------------------------------------------------------------
 
   

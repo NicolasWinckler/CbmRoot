@@ -6,7 +6,7 @@
 //
 // --------------------------------------------------------------------------
 
-void sts_mc(Int_t nEvents = 1)
+void sts_mc(Int_t nEvents = 1000)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -40,10 +40,10 @@ void sts_mc(Int_t nEvents = 1)
   Double_t fieldScale = 1.;      // field scaling factor
 
   // MVD geometry
-  TString mvdGeom = "mvd_standard.geo";
+  TString mvdGeom = "mvd_v08a.geo";
 
   // STS geometry
-  TString stsGeom = "sts_standard.geo";
+  TString stsGeom = "sts_v11a.geo";
   
   // In general, the following parts need not be touched
   // ========================================================================

@@ -26,7 +26,7 @@ void sts_reco(Int_t nEvents = 1) {
   TString parFile = "params.root";
   
   // STS digitisation file
-  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts_v11a.digi.par";
   
   // Output file
   TString outFile = "sts.reco.root";

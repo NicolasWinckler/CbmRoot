@@ -10,7 +10,7 @@
 // --------------------------------------------------------------------------
 
 #include <math.h>
-void sts_digi(Int_t nEvents = 1) {
+void sts_digi(Int_t nEvents = 1000) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -22,7 +22,7 @@ void sts_digi(Int_t nEvents = 1) {
   TString parFile = "params.root";
   
   // STS digitisation file
-  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts_v11a.digi.par";
   
   // Output file
   TString outFile = "sts.digi.root";

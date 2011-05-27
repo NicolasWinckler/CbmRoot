@@ -6,7 +6,7 @@
  * Macro runs propagation analysis task.
  **/
 
-void prop_ana(Int_t nEvents = 1000)
+void prop_ana(Int_t nEvents = 10000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -15,17 +15,17 @@ void prop_ana(Int_t nEvents = 1000)
 	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
 	Int_t testFastPropagation;
 	if (script != "yes") {
-		dir = "/d/cbm02/andrey/muon/straw_trd_10mu/";
+		dir = "/d/cbm02/andrey/muon/std_10mu/";
 		mcFile = dir + "mc.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";
 		propAnaFile = dir + "propagation.ana.0000.root";
-		imageDir = "./test3/";
-		nofTrdHits = 4;
-		nofMuchHits = 21;
+		imageDir = "./much_test/parallel_prop/";
+		nofTrdHits = 0;
+		nofMuchHits = 18;
 		nofTofHits = 1;
 		pdg = 13;
-		testFastPropagation = 0;
+		testFastPropagation = 1;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -42,9 +42,9 @@ void prop_ana(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+//	gSystem->Load("/home/soft/tbb/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -70,12 +70,11 @@ void prop_ana(Int_t nEvents = 1000)
 	propAna->SetPDGCode(pdg);
 	propAna->SetTestFastPropagation(testFastPropagation);
 	propAna->SetOutputDir(std::string(imageDir));
-	propAna->IsDrawPropagation(false);
+	propAna->IsDrawPropagation(true);
 	propAna->IsDrawFilter(true);
-	propAna->IsDrawSmoother(true);
+	propAna->IsDrawSmoother(false);
 	propAna->IsCloseCanvas(false);
 	propAna->IsFixedBounds(true);
-	propAna->SetPlaneNoPhd(nofTrdHits + nofMuchHits - 1);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -93,7 +92,6 @@ void prop_ana(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	// -----   Intialise and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
 //	Geane->SetField(run->GetField());
 	run->Run(0,nEvents);

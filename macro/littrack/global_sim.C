@@ -31,7 +31,7 @@ void global_sim(Int_t nEvents = 500)
 
 	// Files
 	TString inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/d/cbm02/andrey/electron/new_field/"; //directory for output simulation files
+	TString dir = "/d/cbm02/andrey/electron/v10b_10e_urqmd/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -58,25 +58,24 @@ void global_sim(Int_t nEvents = 500)
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_much.geo";
 		shieldGeom = "shield_standard.geo";
-		stsGeom    = "sts_standard.geo";
-		muchGeom   = "much_standard_straw_trd.geo";
-		trdGeom    = "trd_muon_setup_new.geo";
-		tofGeom    = "tof_standard.geo";
-		fieldMap   = "field_muon_standard";
-		magnetGeom = "magnet_muon_standard.geo";
+		stsGeom    = "sts/sts_v09a.geo";
+		muchGeom   = "much/much_v11a.geo";
+		trdGeom    = "";//"trd_muon_setup_new.geo";
+		tofGeom    = "tof/tof_v07a.geo";
+		fieldMap   = "field_v09m";
+		magnetGeom = "passive/magnet_09m.geo";
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
-		mvdGeom    = "";//"mvd_standard.geo";
-		stsGeom    = "sts_standard.geo";
-		richGeom   = "rich_standard.geo";
-		trdGeom    = "trd_standard_dec10.geo";//"trd_simple.geo";
-		tofGeom    = "tof_standard.geo";
+		mvdGeom    = "";//"mvd_v07a.geo";
+		stsGeom    = "sts/sts_v09a.geo";
+		richGeom   = "rich/rich_v08a.geo";
+		trdGeom    = "trd/trd_v10b.geo";
+		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
-//		fieldMap   = "field_electron_standard";
 		fieldMap   = "field_v10e";
-		magnetGeom = "magnet_electron_standard.geo";
+		magnetGeom = "passive/magnet_v09e.geo";
 	}
 
 	//if SCRIPT environment variable is set to "yes", i.e. macro is run via script
@@ -134,9 +133,9 @@ void global_sim(Int_t nEvents = 500)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+//	gSystem->Load("/home/soft/tbb/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

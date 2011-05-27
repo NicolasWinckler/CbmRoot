@@ -6,7 +6,18 @@
 ----- Last update : 19/12/2005                                               -----
 ----------------------------------------------------------------------------------
 
-macroses in TRD directory:
+
+# standard file contains only 5 events for run_sim:
+cbmroot_trunk/input/urqmd.ftn14
+
+# if you need more, get urqmd.auau.25gev.centr.0000.ftn14
+# from here
+http://cbm-wiki.gsi.de/cgi-bin/view/Computing/CbmDataUrQMD13
+# and link it to
+cbmroot_trunk/input/
+
+
+macros in TRD directory:
 
                 sim.C - makes the transport of UrQMD events. Output files are
    	                test.mc.root and test.mc.param.root

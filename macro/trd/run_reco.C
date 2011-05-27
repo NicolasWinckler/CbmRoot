@@ -45,11 +45,11 @@ void run_reco(Int_t nEvents = 2)
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_standard.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v09a.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  // STS digitisation file
-  //  TString stsDigiFile = "sts_standard.digi.par";
+  //  TObjString trdDigiFile =  paramDir + "/trd/trd_v10b.digi.par";
+  //  parFileList->Add(&trdDigiFile);
 
   TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";//"./trd.digi.par";
   parFileList->Add(&trdDigiFile);
@@ -109,14 +109,13 @@ void run_reco(Int_t nEvents = 2)
   // =========================================================================
 
   // Update of the values for the radiator F.U. 17.08.07
-  Int_t trdNFoils    = 130;      // number of polyetylene foils
+  Int_t   trdNFoils = 130;       // number of polyetylene foils
   Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
   Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-  Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
+  Bool_t  simpleTR  = kTRUE;     // use fast and simple version for TR
                                  // production
 
-  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
-                                       trdDFoils, trdDGap);
+  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
   // -----   TRD hit producer   ----------------------------------------------
   Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]

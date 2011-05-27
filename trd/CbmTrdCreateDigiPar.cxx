@@ -169,7 +169,7 @@ void CbmTrdCreateDigiPar::GetModuleInformation(){
   // levels of the geometry.
   // Knowing the nameing scheme of the volumes one gets the required
   // information with simple string manipulation.
-  // This is probably not the fastes way, but the speed has to be checked.
+  // This is probably not the fastest way, but the speed has to be checked.
   // The methode works only for versions of Root > 5.20.0, before the
   // class TStringTocken is not implemented
 
@@ -182,7 +182,6 @@ void CbmTrdCreateDigiPar::GetModuleInformation(){
   
   //put here as an example the full path string and the substrings
 
-// no layers in Jul10  
   while (bla->NextToken()) {
     if (bla->Contains("mod")) {
       TString bla3 = (TString) *bla;
@@ -274,6 +273,7 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 // no layers in Jul10  
 //              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
 //                                 LayerNode + "/" + ModuleNode + "/" + PartNode;
+
               TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
                                  ModuleNode + "/" + PartNode;
               gGeoManager->cd(FullPath.Data());
@@ -371,16 +371,6 @@ void CbmTrdCreateDigiPar::FinishTask(){
 }
 
 void CbmTrdCreateDigiPar::FillPadInfo(){
-  //----------------------------------------------------------------------
-  //    Int_t fStation;
-  //    Int_t fLayer;
-  //    Int_t fModuleType;
-  //    Int_t fModuleCopy;
-  
-  //-----------------------------------------------------------------------
-  // station 1
-  // jun10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types
-  // jun10: 4   8  12  20  26   56   -- sum of modules for this station
   
   // Reset the Array in case we have different sector sizes for
   // different detector modules
@@ -388,11 +378,16 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
   for (Int_t i=0; i < fMaxSectors; i++ ) {
     fSectorSizex.AddAt(0.,i);
     fSectorSizey.AddAt(0.,i);
-    fpadsizex.AddAt(0.,i);
-    fpadsizey.AddAt(0.,i);
+    fpadsizex.AddAt(   0.,i);
+    fpadsizey.AddAt(   0.,i);
   }
 
   Int_t moduleType;
+
+  //-----------------------------------------------------------------------
+  // station 1
+  // jul10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types
+  // jul10: 4   8  12  20  26   56   -- sum of modules for this station
 
   if (fStation==1) {
 
@@ -423,15 +418,15 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     for (Int_t i=0; i < fst1_sect_count; i++ ) {
       fSectorSizex.AddAt(fst1_pad_type[moduleType][i][0],i);
       fSectorSizey.AddAt(fst1_pad_type[moduleType][i][1],i);
-      fpadsizex.AddAt(fst1_pad_type[moduleType][i][2],i);
-      fpadsizey.AddAt(fst1_pad_type[moduleType][i][3],i);
+      fpadsizex.AddAt(   fst1_pad_type[moduleType][i][2],i);
+      fpadsizey.AddAt(   fst1_pad_type[moduleType][i][3],i);
     }
   }
 
   //-------------------------------------------------------------------------
   // station 2
-  // jun10: 4 + 4 + 4 + 8 + 6 + 74   -- number of module types
-  // jun10: 4   8  12  20  26  100   -- sum of modules for this station
+  // jul10: 4 + 4 + 4 + 8 + 6 + 74   -- number of module types
+  // jul10: 4   8  12  20  26  100   -- sum of modules for this station
    
   if (fStation==2) {
 
@@ -462,14 +457,14 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     for (Int_t i=0; i < fst2_sect_count; i++ ) {
       fSectorSizex.AddAt(fst2_pad_type[moduleType][i][0],i);
       fSectorSizey.AddAt(fst2_pad_type[moduleType][i][1],i);
-      fpadsizex.AddAt(fst2_pad_type[moduleType][i][2],i);
-      fpadsizey.AddAt(fst2_pad_type[moduleType][i][3],i);
+      fpadsizex.AddAt(   fst2_pad_type[moduleType][i][2],i);
+      fpadsizey.AddAt(   fst2_pad_type[moduleType][i][3],i);
     }
   }
   //------------------------------------------------------------------------
   // station 3
-  // jun10: 8 + 136   -- number of module types
-  // jun10: 2   144   -- sum of modules for this station
+  // jul10: 8 + 136   -- number of module types
+  // jul10: 8   144   -- sum of modules for this station
   
   if (fStation==3) {
     if (fModuleType==3) {
@@ -482,8 +477,8 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     for (Int_t i=0; i < fst3_sect_count; i++ ) {
       fSectorSizex.AddAt(fst3_pad_type[moduleType][i][0],i);
       fSectorSizey.AddAt(fst3_pad_type[moduleType][i][1],i);
-      fpadsizex.AddAt(fst3_pad_type[moduleType][i][2],i);
-      fpadsizey.AddAt(fst3_pad_type[moduleType][i][3],i);
+      fpadsizex.AddAt(   fst3_pad_type[moduleType][i][2],i);
+      fpadsizey.AddAt(   fst3_pad_type[moduleType][i][3],i);
     }
   }
   //-------------------------------------------------------------------------

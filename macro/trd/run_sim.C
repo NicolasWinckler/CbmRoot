@@ -24,7 +24,7 @@ void run_sim(Int_t nEvents = 2)
   // ========================================================================
   //          Adjust this part according to your requirements
 
-  // ----- Paths and fil names  --------------------------------------------
+  // ----- Paths and file names  --------------------------------------------
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
   //  TString inFile  = inDir + "/input/urqmd.auau.25gev.centr.0000.ftn14";
@@ -36,18 +36,18 @@ void run_sim(Int_t nEvents = 2)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_electron_standard.geo";
-  TString mvdGeom    = "mvd_standard.geo";
-  TString stsGeom    = "sts_standard.geo";
-  TString richGeom   = "rich_standard.geo";
+  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString mvdGeom    = "mvd/mvd_v07a.geo";
+  TString stsGeom    = "sts/sts_v11a.geo";
+  TString richGeom   = "rich/rich_v08a.geo";
 //  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
 //  TString trdGeom    = "trd/trd_v10b.geo";
   TString trdGeom    = "trd/" + digipar + ".geo";
-  TString tofGeom    = "tof_standard.geo";
-  //TString ecalGeom   = "ecal_FastMC.geo";
-  
+  TString tofGeom    = "tof/tof_v07a.geo";
+  //  TString ecalGeom   = "ecal/ecal_v08a.geo";
+ 
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_v10e";//"field_electron_standard";   // name of field map
+  TString fieldMap    = "field_v10e";    // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   
@@ -166,25 +166,6 @@ void run_sim(Int_t nEvents = 2)
   */
   // ------------------------------------------------------------------------
 
-
-  /*
-  // -----   Create magnetic field   ----------------------------------------
-  if (fieldMap == "field_electron_standard" ) 
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "field_muon_standard" )
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "FieldMuonMagnet" )
-    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
-  else {
-    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-    exit;
-  }
-  magField->SetPosition(0., 0., fieldZ);
-  magField->SetScale(fieldScale);
-  fRun->SetField(magField);
-  */
-  // ------------------------------------------------------------------------
-
   // -----   Create magnetic field   ----------------------------------------
   CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
@@ -194,7 +175,6 @@ void run_sim(Int_t nEvents = 2)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-//  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);

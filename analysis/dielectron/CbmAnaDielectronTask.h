@@ -47,9 +47,7 @@ public:
 	Int_t richInd;
 	Int_t trdInd;
 	Int_t tofInd;
-	Bool_t isRichElectron;
-	Bool_t isTrdElectron;
-	Bool_t isTofElectron;
+	Bool_t isElectron;
 	Bool_t isMCSignalElectron;
 	Bool_t isMCPi0Electron;
 	Bool_t isMCGammaElectron;
@@ -144,16 +142,23 @@ public:
 
 private:
 
-    void IsRichElectron(
+    void IsElectron(
+    	CbmRichRing * ring,
+    	Double_t momentum,
+    	CbmTrdTrack* trdTrack,
+    	CbmGlobalTrack * gTrack,
+    	DielectronCandidate* cand);
+
+    Bool_t IsRichElectron(
         CbmRichRing* ring, 
         Double_t momentum, 
         DielectronCandidate* cand);
 
-    void IsTrdElectron(
+    Bool_t IsTrdElectron(
         CbmTrdTrack* trdTrack, 
         DielectronCandidate* cand);
 
-    void IsTofElectron(
+    Bool_t IsTofElectron(
         CbmGlobalTrack* gTrack, 
         Double_t momentum, 
         DielectronCandidate* cand);
@@ -202,6 +207,10 @@ private:
     Double_t fPtCut;
     Double_t fAngleCut;
     Double_t fGammaCut;
+    Double_t fSTCutAngle;
+    Double_t fSTCutPP;
+    Double_t fTTCutAngle;
+    Double_t fTTCutPP;
 
     vector<TH1*> fHistoList; //list of all histogramms
 
@@ -209,9 +218,7 @@ private:
     TH1D* fh_mc_signal_mom;
     TH1D* fh_acc_signal_mom;
     TH1D* fh_reco_signal_mom;
-    TH1D* fh_rich_id_signal_mom;
-    TH1D* fh_trd_id_signal_mom;
-    TH1D* fh_tof_id_signal_mom;
+    TH1D* fh_el_id_signal_mom;
     TH1D* fh_chi_prim_signal_mom; 
     TH1D* fh_ptcut_signal_mom;
     TH1D* fh_anglecut_signal_mom;
@@ -231,9 +238,7 @@ private:
     TH1D* fh_mc_signal_minv;
     TH1D* fh_acc_signal_minv;
     TH1D* fh_rec_signal_minv; //minv of reconstructed signal (ideal ID)
-    TH1D* fh_rich_id_signal_minv;
-    TH1D* fh_trd_id_signal_minv;
-    TH1D* fh_tof_id_signal_minv;
+    TH1D* fh_el_id_signal_minv;
     TH1D* fh_chi_prim_signal_minv; //chi primary cut after identification for signal
     TH1D* fh_ptcut_signal_minv; //pt cut 
     TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal   
@@ -244,9 +249,7 @@ private:
 
 //BG minv
     TH1D* fh_rec_bg_minv;
-    TH1D* fh_rich_id_bg_minv;
-    TH1D* fh_trd_id_bg_minv;
-    TH1D* fh_tof_id_bg_minv;
+    TH1D* fh_el_id_bg_minv;
     TH1D* fh_chi_prim_bg_minv; //chi primary cut 
     TH1D* fh_ptcut_bg_minv; //pt cut 
     TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
@@ -257,9 +260,7 @@ private:
 
 //pi0 minv
     TH1D* fh_rec_pi0_minv;
-    TH1D* fh_rich_id_pi0_minv;
-    TH1D* fh_trd_id_pi0_minv;
-    TH1D* fh_tof_id_pi0_minv;
+    TH1D* fh_el_id_pi0_minv;
     TH1D* fh_chi_prim_pi0_minv; //chi primary cut
     TH1D* fh_ptcut_pi0_minv; //pt cut
     TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for pi0
@@ -270,9 +271,7 @@ private:
 
 //eta minv
     TH1D* fh_rec_eta_minv;
-	TH1D* fh_rich_id_eta_minv;
-	TH1D* fh_trd_id_eta_minv;
-	TH1D* fh_tof_id_eta_minv;
+	TH1D* fh_el_id_eta_minv;
 	TH1D* fh_chi_prim_eta_minv; //chi primary cut
 	TH1D* fh_ptcut_eta_minv; //pt cut
 	TH1D* fh_anglecut_eta_minv; // openning angle after pt cut for eta
@@ -316,9 +315,7 @@ private:
 
 //source of BG pairs
     TH2D*  fh_source_pair_reco;
-    TH2D*  fh_source_pair_rich_id;
-    TH2D* fh_source_pair_trd_id;
-    TH2D*  fh_source_pair_tof_id;
+    TH2D*  fh_source_pair_el_id;
     TH2D*  fh_source_pair_chi_prim;
     TH2D*  fh_source_pair_ptcut;
     TH2D*  fh_source_pair_anglecut;
@@ -331,9 +328,7 @@ private:
     TH2D* fh_mc_signal_pty;
     TH2D* fh_acc_signal_pty;
     TH2D* fh_reco_signal_pty;
-    TH2D* fh_rich_id_signal_pty;
-    TH2D* fh_trd_id_signal_pty;
-    TH2D* fh_tof_id_signal_pty;
+    TH2D* fh_el_id_signal_pty;
     TH2D* fh_chi_prim_signal_pty; 
     TH2D* fh_ptcut_signal_pty; 
     TH2D* fh_anglecut_signal_pty;
@@ -352,12 +347,26 @@ private:
 
 //store event number
     TH1D* fh_event_number;
+    TH1D* fh_nof_bg_tracks;
+    TH1D* fh_nof_el_tracks;
 
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};
     void SetUseTrd(Bool_t use){fUseTrd = use;};
     void SetUseTof(Bool_t use){fUseTof = use;};
     void SetWeight(Double_t weight){fWeight = weight;};
+
+    // ID cuts
+    void SetTrdAnnCut(Double_t par){fTrdAnnCut = par;}
+    void SetRichAnnCut(Double_t par){fRichAnnCut = par;}
+    void SetUseRichAnn(Bool_t par){fUseRichAnn = par;}
+    // Analysis cuts
+    void SetChiPrimCut(Double_t par){fChiPrimCut = par;}
+    void SetPtCut(Double_t par){fPtCut = par;}
+    void SetAngleCut(Double_t par){fAngleCut = par;}
+    void SetGammaCut(Double_t par){fGammaCut = par;}
+    void SetSTCut(Double_t ang, Double_t pp){fSTCutAngle = ang; fSTCutPP = pp;}
+    void SetTTCut(Double_t ang, Double_t pp){fTTCutAngle = ang; fTTCutPP = pp;}
 };
 
 #endif

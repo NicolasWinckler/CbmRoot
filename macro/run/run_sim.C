@@ -24,12 +24,12 @@ void run_sim(Int_t nEvents = 2)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_electron_standard.geo";
-  TString mvdGeom    = "mvd_standard.geo";
-  TString stsGeom    = "sts_standard.geo";
-  TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_standard.geo";
-  TString tofGeom    = "tof_standard.geo";
+  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString mvdGeom    = "mvd/mvd_v07a.geo";
+  TString stsGeom    = "sts/sts_v11a.geo";
+  TString richGeom   = "rich/rich_v08a.geo";
+  TString trdGeom    = "trd/trd_v10b.geo";
+  TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------

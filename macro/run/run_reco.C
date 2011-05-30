@@ -100,8 +100,11 @@ void run_reco(Int_t nEvents = 2) {
   // ------------------------------------------------------------------------
 
 
+
+
   // =========================================================================
-  // ===                     MVD local reconstruction                      ===
+  // ===             Detector Response Simulation (Digitiser)              ===
+  // ===                          (where available)                        ===
   // =========================================================================
 
 
@@ -110,6 +113,32 @@ void run_reco(Int_t nEvents = 2) {
   		new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
   run->AddTask(mvdDigi);
   // -------------------------------------------------------------------------
+ 
+
+  // -----   STS digitizer   -------------------------------------------------
+  Double_t threshold  =  4;
+  Double_t noiseWidth =  0.01;
+  Int_t    nofBits    = 20;
+  Double_t minStep    =  0.01,;
+  Double_t StripDeadTime = 0.1;
+  CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+  stsDigitize->SetRealisticResponse();
+  stsDigitize->SetFrontThreshold (threshold);
+  stsDigitize->SetBackThreshold  (threshold);
+  stsDigitize->SetFrontNoiseWidth(noiseWidth);
+  stsDigitize->SetBackNoiseWidth (noiseWidth);
+  stsDigitize->SetFrontNofBits   (nofBits);
+  stsDigitize->SetBackNofBits    (nofBits);
+  stsDigitize->SetFrontMinStep   (minStep);
+  stsDigitize->SetBackMinStep    (minStep);
+  stsDigitize->SetStripDeadTime  (StripDeadTime);
+  run->AddTask(stsDigitize);
+  // -------------------------------------------------------------------------
+
+
+  // =========================================================================
+  // ===                     MVD local reconstruction                      ===
+  // =========================================================================
 
 
   // -----   MVD Hit Finder   ------------------------------------------------
@@ -123,14 +152,11 @@ void run_reco(Int_t nEvents = 2) {
   // =========================================================================
 
 
+
+
   // =========================================================================
   // ===                      STS local reconstruction                     ===
   // =========================================================================
-
-  // -----   STS digitizer   -------------------------------------------------
-  FairTask* stsDigitize = new CbmStsIdealDigitize("STS Digitiser", iVerbose);
-  run->AddTask(stsDigitize);
-  // -------------------------------------------------------------------------
 
 
   // -----   STS Cluster Finder   --------------------------------------------
@@ -140,13 +166,13 @@ void run_reco(Int_t nEvents = 2) {
 
 
   // -----   STS hit finder   ------------------------------------------------
-  FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
+  FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
   run->AddTask(stsFindHits);
   // -------------------------------------------------------------------------
 
 
   // -----  STS hit matching   -----------------------------------------------
-  FairTask* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
+  FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
   run->AddTask(stsMatchHits);
   // -------------------------------------------------------------------------
 
@@ -176,6 +202,8 @@ void run_reco(Int_t nEvents = 2) {
 
   // ===                 End of STS local reconstruction                   ===
   // =========================================================================
+
+
 
 
   // =========================================================================
@@ -225,6 +253,8 @@ void run_reco(Int_t nEvents = 2) {
 
   // ===                   End of TOF local reconstruction                 ===
   // =========================================================================
+
+
 
 
   // =========================================================================

@@ -43,13 +43,13 @@
   TString pipeGeom    = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_electron_standard.geo";
-  TString fieldMap    = "field_electron_standard";
+  TString magnetGeom  = "passive/magnet_v09e.geo";
+  TString fieldMap    = "field_v10e";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
   // STS geometry
-  TString stsGeom     = "sts_standard.geo";
+  TString stsGeom     = "sts/sts_v11a.geo";
   //TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
 
 
@@ -110,6 +110,8 @@
   if (fieldMap == "field_electron_standard" ) 
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_v10e" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "FieldMuonMagnet" )
     CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);

@@ -4,25 +4,47 @@
   TStopwatch timer;
   timer.Start();
   gDebug=0;
+
+
+
+
+  // -----  Geometries  -----------------------------------------------------
+  TString caveGeom   = "cave.geo";
+  TString targetGeom = "target_au_250mu.geo";
+  TString pipeGeom   = "pipe_standard.geo";
+  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString stsGeom    = "sts/sts_v11a.geo";
+  TString richGeom   = "rich/rich_v08a.geo";
+  TString trdGeom    = "trd/trd_v10b.geo";
+  TString tofGeom    = "tof/tof_v07a.geo";
+//  TString ecalGeom   = "ecal/ecal_v08a.geo";
+
   // Load basic libraries
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
 
-  // Load this example libraries
+  // Load all needed libraries
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
+  gSystem->Load("libGen");
   gSystem->Load("libCbmBase");
   gSystem->Load("libCbmData");
   gSystem->Load("libField");
   gSystem->Load("libPassive");
   gSystem->Load("libSts");
-  gSystem->Load("libTof");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGen");
+  gSystem->Load("libTof");
+  //  gSystem->Load("libEcal");
 
+  FairLogger *logger = FairLogger::GetLogger();
+  logger->SetLogFileName("MyLog.log");
+  logger->SetLogToScreen(kTRUE);
+  logger->SetLogToFile(kTRUE);
+  logger->SetLogVerbosityLevel("HIGH");
+  logger->SetLogFileLevel("DEBUG4");
+  logger->SetLogScreenLevel("INFO");
 
 
   FairRunSim *fRun = new FairRunSim();
@@ -31,58 +53,50 @@
   // ------------------------
 
   fRun->SetName("TGeant3");
-  // Choose the Geant Navigation System
-  // fRun->SetGeoModel("G3Native");
   
-  fRun->SetOutputFile("auaumbias.root");
+  fRun->SetOutputFile("data/auaumbias.root");
 
   // Set Material file Name
   //-----------------------
 
   fRun->SetMaterials("media.geo");
   
-  // Create and add detectors
+  // Create and add passive materials and detectors
   //-------------------------
-
   FairModule *Cave= new CbmCave("CAVE");
-  Cave->SetGeometryFileName("cave.geo");
+  Cave->SetGeometryFileName(caveGeom);
   fRun->AddModule(Cave);
 
   FairModule *Pipe= new CbmPipe("PIPE");
-  Pipe->SetGeometryFileName("pipe_standard.geo");
+  Pipe->SetGeometryFileName(pipeGeom);
   fRun->AddModule(Pipe);
   
-  
+  FairModule *Target= new CbmTarget("Target");
+  Target->SetGeometryFileName(targetGeom);
+  fRun->AddModule(Target);		
+
   FairModule *Magnet= new CbmMagnet("MAGNET");
-  // 1- Active shielding Geometry
-  Magnet->SetGeometryFileName("magnet_electron_standard.geo");
-  // 2- Iron Magnet
-  // Magnet->SetGeometryFileName("magnet_iron.geo");
+  Magnet->SetGeometryFileName(magnetGeom);
   fRun->AddModule(Magnet);
   
   FairDetector *Sts= new CbmSts("STS", kTRUE);
-  Sts->SetGeometryFileName("sts_standard.geo");
+  Sts->SetGeometryFileName(stsGeom);
   fRun->AddModule(Sts);
 
-  
-  FairModule *Target= new CbmTarget("Target");
-  Target->SetGeometryFileName("target_au_250mu.geo");
-  fRun->AddModule(Target);		
-
-  FairDetector *Tof= new CbmTof("TOF", kTRUE );
-  Tof->SetGeometryFileName("tof_standard.geo");
-  fRun->AddModule(Tof);
-	
   FairDetector *Trd= new CbmTrd("TRD",kTRUE );
-  Trd->SetGeometryFileName("trd_standard.geo");
+  Trd->SetGeometryFileName(trdGeom);
   fRun->AddModule(Trd);
 
   FairDetector *Rich= new CbmRich("RICH", kTRUE);
-  Rich->SetGeometryFileName("rich_standard.geo");
+  Rich->SetGeometryFileName(richGeom);
   fRun->AddModule(Rich);
-
+  
+  FairDetector *Tof= new CbmTof("TOF", kTRUE );
+  Tof->SetGeometryFileName(tofGeom);
+  fRun->AddModule(Tof);
+	
   //FairDetector *Ecal= new CbmEcal("ECAL", kTRUE);
-  //Ecal->SetGeometryFileName("ecal_FastMC.geo");
+  //Ecal->SetGeometryFileName(ecalGeom);
   //fRun->AddModule(Ecal);
 
 
@@ -92,58 +106,41 @@
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   fRun->SetGenerator(primGen);
 
- // Urqmd  Generator
-//  FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator("../../input/00-03fm.100ev.f14");
-//  primGen->AddGenerator(urqmdGen);
-
- // Particle Generator
- //  FairParticleGenerator* partGen = new FairParticleGenerator(211, 10, 1., 1.,
- //  2);
- //  primGen->AddGenerator(partGen);
- 
  // Ion Generator
-     FairIonGenerator *fIongen= new FairIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
-     primGen->AddGenerator(fIongen);
+  FairIonGenerator *fIongen= new FairIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
+  primGen->AddGenerator(fIongen);
 
 
- // Field Map Definition
+  // Field Map Definition
  // --------------------
-  // 1- Reading the new field map in the old format
+  // Constant Field
+  CbmFieldConst *fMagField1=new CbmFieldConst();
+  fMagField1->SetField(0, 14 ,0 ); // values are in kG
+  // MinX=-75, MinY=-40,MinZ=-12 ,MaxX=75, MaxY=40 ,MaxZ=124 );  // values are in cm
+  fMagField1->SetFieldRegion(-74, -39 ,-22 , 74, 39 , 160 );
+  
+  fRun->SetField(fMagField1);
+  
+  // Store the partile trajectories
 
-//      CbmFieldMap *fMagField= new CbmFieldMap("FIELD.v04_pavel.map");
-   // Constant Field
-       CbmFieldConst *fMagField1=new CbmFieldConst();
-       fMagField1->SetField(0, 14 ,0 ); // values are in kG
-     // MinX=-75, MinY=-40,MinZ=-12 ,MaxX=75, MaxY=40 ,MaxZ=124 );  // values are in cm
-       fMagField1->SetFieldRegion(-74, -39 ,-22 , 74, 39 , 160 );
+  fRun->SetStoreTraj(kTRUE);
+  
+  // Initialize the simulation
 
- //  CbmField *fMagField2= new CbmFieldMapSym3("FieldActive");
-  // Active Shielding
-
-   
-   
-   fRun->SetField(fMagField1);
-   
-   fRun->SetStoreTraj(kTRUE);
-   
-   fRun->Init();
-
+  fRun->Init();
 
  // -Trajectories Visualization (TGeoManager Only )
  // -----------------------------------------------
 
-;
- // Set cuts for storing the trajectpries
-   FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-     trajFilter->SetStepSizeCut(0.01); // 1 cm
-     trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
-     trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
-     trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
-     trajFilter->SetStorePrimaries(kTRUE);
-     trajFilter->SetStoreSecondaries(kTRUE);
-  
-
-
+ // Set cuts for storing the trajectories
+  FairTrajFilter* trajFilter = FairTrajFilter::Instance();
+  trajFilter->SetStepSizeCut(0.01); // 1 cm
+  trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
+  trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
+  trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
+  trajFilter->SetStorePrimaries(kTRUE);
+  trajFilter->SetStoreSecondaries(kTRUE);
+ 
   // Fill the Parameter containers for this run
   //-------------------------------------------
 
@@ -160,8 +157,6 @@
 
   Int_t nEvents = 3;
   fRun->Run(nEvents);
-
-
 
   timer.Stop();
   Double_t rtime = timer.RealTime();

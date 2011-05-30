@@ -46,7 +46,7 @@ void run_reco(Int_t nEvents = 2) {
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v09a.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v11a.digi.par";
   parFileList->Add(&stsDigiFile);
 
   TObjString trdDigiFile =  paramDir + "/trd/trd_v10b.digi.par";

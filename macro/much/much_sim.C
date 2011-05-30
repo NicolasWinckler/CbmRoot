@@ -50,13 +50,13 @@ void much_sim(TString inputSignal = "",
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "magnet_muon_standard.geo";
-  TString stsGeom    = "sts_standard.geo";
+  TString magnetGeom = "passive/magnet_v09m.geo";
+  TString stsGeom    = "sts/sts_v11a.geo";
   TString trdGeom    = "";
   TString tofGeom    = "";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap   = "field_muon_standard";   // name of field map
+  TString  fieldMap   = "field_v09m";   // name of field map
   Double_t fieldZ     = 50.;                 // field center z position
   Double_t fieldScale =  1.;                 // field scaling factor
 
@@ -164,6 +164,8 @@ void much_sim(TString inputSignal = "",
   if (fieldMap == "field_electron_standard" ) 
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_v09m" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "FieldMuonMagnet" )
     CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);

@@ -37,13 +37,13 @@
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_electron_standard.geo";
-  TString fieldMap    = "field_electron_standard";
+  TString magnetGeom  = "passive/magnet_v09e.geo";
+  TString fieldMap    = "field_v10e";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
   // MVD geometry
-  TString mvdGeom = "mvd_standard.geo";
+  TString mvdGeom = "mvd/mvd_v07a.geo";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -118,6 +118,8 @@
 
   // -----   Create magnetic field   ----------------------------------------
   if ( fieldMap == "field_electron_standard")
+    magField = new CbmFieldMapSym2(fieldMap);
+  else if ( fieldMap == "field_v10e")
     magField = new CbmFieldMapSym2(fieldMap);
   else if ( fieldMap == "FieldAlligator" )
     magField = new CbmFieldMapSym2(fieldMap);

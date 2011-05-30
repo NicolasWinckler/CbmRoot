@@ -26,20 +26,21 @@ void QAsim_squared_segmented_trd(Int_t nEvents = 2)
   TString outFile = outDir + "/trd_squared_segmented.mc.root";
   TString parFile = outDir + "/params.root";
   
+
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_electron_standard.geo";
-  TString mvdGeom    = "mvd_standard.geo";
-  TString stsGeom    = "sts_standard.geo";
-  TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_squared_modules_jul10_v02.geo";
-  TString tofGeom    = "tof_standard.geo";
+  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString mvdGeom    = "mvd/mvd_v07a.geo";
+  TString stsGeom    = "sts/sts_v11a.geo";
+  TString richGeom   = "rich/rich_v08a.geo";
+  TString trdGeom    = "trd/trd_v10b.geo";
+  TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_electron_standard";   // name of field map
+  TString fieldMap    = "field_v10e";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   
@@ -166,6 +167,8 @@ void QAsim_squared_segmented_trd(Int_t nEvents = 2)
   if (fieldMap == "field_electron_standard" ) 
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_v10e" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "FieldMuonMagnet" )
     CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);

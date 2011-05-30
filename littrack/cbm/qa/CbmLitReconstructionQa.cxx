@@ -1816,6 +1816,13 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	   DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", &fhStsMomNormStsRichTrdTof[RICHEL],
 			   &fhStsRichMomNormStsRichTrdTof[RICHEL], &fhStsRichTrdMomNormStsRichTrdTof[RICHEL], &fhStsRichTrdTofMom[RICHEL],
 			   "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
+
+	   TCanvas* canvas = new TCanvas("rec_qa_sts_rich_trd_tof_momentum_electrons", "rec_qa_sts_rich_trd_tof_momentum_electrons", 600, 500);
+	   canvas->SetGrid();
+	   DrawHist1D(fhStsMomNormStsRichTrdTof[RICHEL][REC], fhStsRichMomNormStsRichTrdTof[RICHEL][REC],
+	         fhStsRichTrdMomNormStsRichTrdTof[RICHEL][REC], fhStsRichTrdTofMom[RICHEL][REC],
+	         "Efficiency", "Momentum [GeV/c]", "Efficiency", "STS", "STS+RICH",
+	         "STS+RICH+TRD", "STS+RICH+TRD+TOF", false, false, true, 0.3,0.3,0.85,0.6);
    }
 
    // Electron identification efficiencies
@@ -1959,9 +1966,10 @@ void CbmLitReconstructionQa::DrawStsTracksQaHistos()
             LIT_MARKER_STYLE1, false, false, "");
 
    canvas1->cd(2);
-   DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP [%]", "Counter",
-            LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, false, false, "");
+  // DrawHist1D(fhStsMomresVsMom->ProjectionY(), "dP [%]", "Counter",
+  //          LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+  //          LIT_MARKER_STYLE1, false, false, "");
+   fhStsMomresVsMom->ProjectionY()->Draw();
 
    canvas1->cd(3);
    DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter", false, false, false, "COLZ");

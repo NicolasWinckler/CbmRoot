@@ -3,7 +3,7 @@
  * @since 2007
  * @version 2.0
  **
- ** CBM task class for analysis of the track propagation and track fit.
+ ** Analysis of the track propagation and track fit.
  **/
 
 #ifndef CBMLITPROPAGATIONANALYSIS_H_
@@ -31,63 +31,114 @@ class TCanvas;
 class CbmLitPropagationAnalysis : public FairTask
 {
 public:
+   /* Constructor */
    CbmLitPropagationAnalysis();
+
+   /* Destructor */
    virtual ~CbmLitPropagationAnalysis();
 
+   /* Inherited from FairTask */
    virtual InitStatus Init();
+
+   /* Inherited from FairTask */
    virtual void Exec(
       Option_t* opt);
+
+   /* Inherited from FairTask */
    virtual void Finish();
+
+   /* Inherited from FairTask */
    virtual void SetParContainers();
 
+   /**/
    void SetNofPlanes(Int_t nofPlanes) {fNofPlanes = nofPlanes;}
+
+   /**/
    void SetNofTrdHits(Int_t nofTrdHits) {fNofTrdHits = nofTrdHits;}
+
+   /**/
    void SetNofMuchHits(Int_t nofMuchHits) {fNofMuchHits = nofMuchHits;}
+
+   /**/
    void SetNofTofHits(Int_t nofTofHits) {fNofTofHits = nofTofHits;}
+
+   /**/
    void SetTestFastPropagation(Bool_t isTestFastPropagation) {fIsTestFastPropagation = isTestFastPropagation;}
+
+   /**/
    void SetPDGCode(Int_t pdgCode) {fPDGCode = pdgCode;}
 
-   /**
-     * Sets the output directory for images.
-     * @param dir Directory name.
-     */
+   /* Sets the output directory for images. */
    void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
+   /* Set draw track propagation histograms */
    void IsDrawPropagation(Bool_t drawPropagation) {fIsDrawPropagation = drawPropagation;}
+
+   /* Setdraw track Kalman Filter update histograms */
    void IsDrawFilter(Bool_t drawFilter) {fIsDrawFilter = drawFilter;}
+
+   /* Set draw smoother histograms */
    void IsDrawSmoother(Bool_t drawSmoother) {fIsDrawSmoother = drawSmoother;}
+
+   /* Set close canvases after drawing */
    void IsCloseCanvas(Bool_t closeCanvas) {fIsCloseCanvas = closeCanvas;}
 
+   /* Set use of the fixed bounds */
    void IsFixedBounds(Bool_t isFixedBounds) {fIsFixedBounds = isFixedBounds;};
 
-   void SetPlaneNoPhd(Int_t planeNo) {fPlaneNoPhd = planeNo;}
+//   void SetPlaneNoPhd(Int_t planeNo) {fPlaneNoPhd = planeNo;}
 
 private:
+   /* Determines detector layout  */
    void DetermineSetup();
+
+   /* Reads and creates data branches */
    void ReadDataBranches();
+
+   /* Creates histograms */
    void CreateHistograms();
+
+   /* Creates track arrays */
    void CreateTrackArrays();
+
+   /* Checks global track acceptance */
    Bool_t CheckAcceptance(
       const CbmGlobalTrack* globalTrack);
+
+   /* Converts CbmGlobalTrack to CbmLitTrack */
    void GlobalTrackToLitTrack(
       const CbmGlobalTrack* globalTrack,
       CbmLitTrack* litTrack);
+
+   /* Converts CbmGlobalTrack to MC CbmLitTrack */
    void GlobalTrackToMCLitTrack(
       const CbmGlobalTrack* globalTrack,
       CbmLitTrack* litTrack);
+
+   /* Frees memory and deletes track arrays */
    void DeleteTrackArrays();
+
+   /* Run track propagation and track fit tests */
    void RunTest();
+
+   /* Tests track propagation for a specified track */
    void TestPropagation(
       CbmLitTrack* track,
       CbmLitTrack* mcTrack);
+
+   /* Tests track fitter for a specified track*/
    void TestFitter(
       CbmLitTrack* track,
       CbmLitTrack* mcTrack);
+
+   /* Fill pull/residual histograms for specified predicted track parameters */
    void FillHistosPropagation(
       const CbmLitTrackParam* par,
       const CbmLitTrackParam* mcPar,
       const CbmLitHit* hit,
       Int_t plane);
+
+   /**/
    void FillHistosFilter(
       const CbmLitTrackParam* par,
       const CbmLitTrackParam* mcPar,
@@ -95,38 +146,47 @@ private:
       Int_t plane,
       float chisq);
 
+   /**/
    void FillHistosFitter(
       const CbmLitTrack* track,
       const CbmLitTrack* mcTrack);
 
+   /**/
    void McPointToLitFitNode(
       FairMCPoint* point,
       CbmLitFitNode* node);
+
+   /**/
    std::vector<Double_t> CalcResidualsAndPulls(
       const CbmLitTrackParam* par,
       const CbmLitTrackParam* mcPar);
 
+   /**/
    void PrintStopwatchStatistics();
 
+   /**/
    void TestFastPropagation(
       CbmLitTrack* track,
       CbmLitTrack* mcTrack);
 
+   /**/
    void Draw();
 
+   /**/
    void DrawHistos(
       TCanvas* c[],
       Int_t v);
 
+   /**/
    void PrintResults(
       std::ostream& out,
       int v);
 
-   void DrawForPhd();
-
-   void DrawForPhd(
-      TCanvas* canvas,
-      Int_t v);
+//   void DrawForPhd();
+//
+//   void DrawForPhd(
+//      TCanvas* canvas,
+//      Int_t v);
 
    Bool_t fIsElectronSetup; // If "electron" setup detected than true
    Bool_t fIsSts; // If STS detected than true

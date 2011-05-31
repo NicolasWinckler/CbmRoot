@@ -268,7 +268,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::FollowTracks()
 
          for (unsigned int iTrack = 0; iTrack < nofTracks; iTrack++) {
             unsigned int id = tracksId1[iTrack];
-            if (fTracks[id]->nofMissingHits <= fMaxNofMissingHits) {
+            if (fTracks[id]->GetNofMissingHits() <= fMaxNofMissingHits) {
                tracksId2[nofTracksId2++]= id;
             }
          }
@@ -285,7 +285,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::PropagateToFirstStation(
 {
    // Pack track parameters
    LitTrackParamScal par[fvecLen];
-   for(unsigned int i = 0; i < fvecLen; i++) { par[i] = tracks[i]->paramLast; }
+   for(unsigned int i = 0; i < fvecLen; i++) { par[i] = tracks[i]->GetParamLast(); }
    LitTrackParamVec lpar;
    PackTrackParam(par, lpar);
 
@@ -299,7 +299,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::PropagateToFirstStation(
 
    // Unpack track parameters
    UnpackTrackParam(lpar, par);
-   for(unsigned int i = 0; i < fvecLen; i++) { tracks[i]->paramLast = par[i]; }
+   for(unsigned int i = 0; i < fvecLen; i++) { tracks[i]->SetParamLast(par[i]); }
 }
 
 void lit::parallel::LitTrackFinderNNVecElectron::ProcessStation(
@@ -313,7 +313,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::ProcessStation(
 
    // Pack track parameters
    LitTrackParamScal par[fvecLen];
-   for(unsigned int i = 0; i < fvecLen; i++) { par[i] = tracks[i]->paramLast; }
+   for(unsigned int i = 0; i < fvecLen; i++) { par[i] = tracks[i]->GetParamLast(); }
    LitTrackParam<fvec> lpar;
    PackTrackParam(par, lpar);
 
@@ -347,7 +347,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::CollectHits(
 // std::cout << "Collecting hits " << (int) station << ":" << (int) stationGroup << std::endl;
    std::pair<unsigned int, unsigned int> hits;
 
-   track->paramLast = *par;
+   track->SetParamLast(*par);
 
    LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station);
    unsigned int nh = fHitData.GetNofHits(stationGroup, station);
@@ -359,7 +359,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::CollectHits(
    bool hitAdded = AddNearestHit(track, hits, nofHits, stationGroup, station);
 
    // Check if hit was added, if not than increase number of missing hits
-   if (!hitAdded) { track->nofMissingHits++; }
+   if (!hitAdded) { track->IncNofMissingHits(); }
 }
 
 bool lit::parallel::LitTrackFinderNNVecElectron::AddNearestHit(
@@ -378,7 +378,7 @@ bool lit::parallel::LitTrackFinderNNVecElectron::AddNearestHit(
 
    // Pack track parameters
    LitTrackParamScal pars[fvecLen];
-   for(unsigned int i = 0; i < fvecLen; i++) { pars[i] = track->paramLast; }
+   for(unsigned int i = 0; i < fvecLen; i++) { pars[i] = track->GetParamLast(); }
    LitTrackParam<fvec> lpar;
    PackTrackParam(pars, lpar);
 
@@ -397,8 +397,9 @@ bool lit::parallel::LitTrackFinderNNVecElectron::AddNearestHit(
       LitTrackParam<fvec> ulpar = lpar;
 
       //First update track parameters with KF, than check whether the hit is in the validation gate.
-      LitFiltration(ulpar, lhit);
-      fvec chisq = ChiSq(ulpar, lhit);
+      fvec chisq = 0;
+      LitFiltration(ulpar, lhit, chisq);
+//      fvec chisq = ChiSq(ulpar, lhit);
 
       // Unpack track parameters
       UnpackTrackParam(ulpar, pars);
@@ -418,21 +419,22 @@ bool lit::parallel::LitTrackFinderNNVecElectron::AddNearestHit(
       LitTrackParam<fvec> lpar;
       for(unsigned int i = 0; i < dHits; i++) {
          hit[i] = *hitvec[start + i];
-         pars[i] = track->paramLast;
+         pars[i] = track->GetParamLast();
       }
       // Check if the number of remaining tracks is less than fvecLen.
       if (dHits < fvecLen) {
          for(unsigned int i = 0; i < fvecLen - dHits; i++) {
             hit[dHits+i] = *hitvec[start + dHits - 1];
-            pars[dHits+i] = track->paramLast;
+            pars[dHits+i] = track->GetParamLast();
          }
       }
       PackPixelHit(hit, lhit);
       PackTrackParam(pars, lpar);
 
       //First update track parameters with KF, than check whether the hit is in the validation gate.
-      LitFiltration(lpar, lhit);
-      fvec chisq = ChiSq(lpar, lhit);
+      fvec chisq = 0;
+      LitFiltration(lpar, lhit, chisq);
+//      fvec chisq = ChiSq(lpar, lhit);
 
       // Unpack track parameters
       UnpackTrackParam(lpar, pars);
@@ -448,9 +450,9 @@ bool lit::parallel::LitTrackFinderNNVecElectron::AddNearestHit(
    // if hit was attached than change track information
    if (hita != NULL) {
       track->AddHit(hita);
-      track->paramLast = param;
-      track->chiSq += chiSq;
-      track->NDF = NDF(*track);
+      track->SetParamLast(param);
+      track->IncChiSq(chiSq);
+      track->SetNDF(NDF(*track));
       hitAdded = true;
    }
    return hitAdded;

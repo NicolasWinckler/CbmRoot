@@ -473,18 +473,23 @@ void CbmLitEnvironment::GetMuchLayout(
 
       fieldFitter.FitSlice(aZ[0], aparBx[0], aparBy[0], aparBz[0]);
       fieldFitter.FitSlice(aZ[1], aparBx[1], aparBy[1], aparBz[1]);
-      sg.absorber.fieldSliceFront.Z = aZ[0];
-      sg.absorber.fieldSliceBack.Z = aZ[1];
-      for (int i = 0; i < N; i++) {
-         sg.absorber.fieldSliceFront.cx[i] = aparBx[0][i];
-         sg.absorber.fieldSliceFront.cy[i] = aparBy[0][i];
-         sg.absorber.fieldSliceFront.cz[i] = aparBz[0][i];
-         sg.absorber.fieldSliceBack.cx[i] = aparBx[1][i];
-         sg.absorber.fieldSliceBack.cy[i] = aparBy[1][i];
-         sg.absorber.fieldSliceBack.cz[i] = aparBz[1][i];
-      }
 
-      lit::parallel::LitMaterialInfo<T>& mat1 = sg.absorber.material;
+      lit::parallel::LitAbsorber<T> absorber;
+      lit::parallel::LitFieldSlice<T> frontSlice, backSlice;
+      frontSlice.Z = aZ[0];
+      backSlice.Z = aZ[1];
+      for (int i = 0; i < N; i++) {
+         frontSlice.cx[i] = aparBx[0][i];
+         frontSlice.cy[i] = aparBy[0][i];
+         frontSlice.cz[i] = aparBz[0][i];
+         backSlice.cx[i] = aparBx[1][i];
+         backSlice.cy[i] = aparBy[1][i];
+         backSlice.cz[i] = aparBz[1][i];
+      }
+      absorber.SetFieldSliceFront(frontSlice);
+      absorber.SetFieldSliceBack(backSlice);
+
+      lit::parallel::LitMaterialInfo<T> mat1;
       mat1.A = amat.GetA();
       mat1.Z = amat.GetZ();
       mat1.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 :
@@ -494,48 +499,54 @@ void CbmLitEnvironment::GetMuchLayout(
       mat1.X0 = amat.GetRL();
       mat1.Zpos = amat.GetZpos();
 
-      sg.absorber.Z = amat.GetZpos();
-
       mat1.RadThick = mat1.Thickness / mat1.X0; // Length/X0
       mat1.SqrtRadThick = sqrt(mat1.RadThick); // std::sqrt(Length/X0)
       mat1.LogRadThick = log(mat1.RadThick); // std::log(Length/X0)
+
+      absorber.SetMaterial(mat1);
+      absorber.SetZ(amat.GetZpos());
+      sg.SetAbsorber(absorber);
       //end add absorber
 
 
       for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
          const CbmLitStation& station = stationGroup.GetStation(ist);
          lit::parallel::LitStationMuon<T> st;
-         st.type = lit::parallel::LitHitType(station.GetType());
+         st.SetType(lit::parallel::LitHitType(station.GetType()));
          for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
             const CbmLitSubstation& substation = station.GetSubstation(iss);
             lit::parallel::LitSubstationMuon<T> ss;
-            ss.Z = substation.GetZ();
+            ss.SetZ(substation.GetZ());
 
             // Fit the field at Z position of the substation
+            lit::parallel::LitFieldSlice<T> lslice;
             std::vector<double> parBx, parBy, parBz;
-            ss.fieldSlice.Z = substation.GetZ();
+            lslice.Z = substation.GetZ();
             fieldFitter.FitSlice(substation.GetZ(), parBx, parBy, parBz);
             for (int i = 0; i < N; i++) {
-               ss.fieldSlice.cx[i] = parBx[i];
-               ss.fieldSlice.cy[i] = parBy[i];
-               ss.fieldSlice.cz[i] = parBz[i];
+               lslice.cx[i] = parBx[i];
+               lslice.cy[i] = parBy[i];
+               lslice.cz[i] = parBz[i];
             }
+            ss.SetFieldSlice(lslice);
 
             int matId = MaterialId(isg, ist, iss, muchLayout);
             CbmLitMaterialInfo mat = muchMaterial[matId];
-            ss.material.A = mat.GetA();
-            ss.material.Z = mat.GetZ();
-            ss.material.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
+            lit::parallel::LitMaterialInfo<T> lmat;
+            lmat.A = mat.GetA();
+            lmat.Z = mat.GetZ();
+            lmat.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
                             16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
-            ss.material.Rho = mat.GetRho();
-            ss.material.Thickness = mat.GetLength();
-            ss.material.X0 = mat.GetRL();
-            ss.material.Zpos = mat.GetZpos();
+            lmat.Rho = mat.GetRho();
+            lmat.Thickness = mat.GetLength();
+            lmat.X0 = mat.GetRL();
+            lmat.Zpos = mat.GetZpos();
 
-            ss.material.RadThick = ss.material.Thickness / ss.material.X0; // Length/X0
-            ss.material.SqrtRadThick = sqrt(ss.material.RadThick); // std::sqrt(Length/X0)
-            ss.material.LogRadThick = log(ss.material.RadThick); // std::log(Length/X0)
+            lmat.RadThick = ss.GetMaterial().Thickness / ss.GetMaterial().X0; // Length/X0
+            lmat.SqrtRadThick = sqrt(ss.GetMaterial().RadThick); // std::sqrt(Length/X0)
+            lmat.LogRadThick = log(ss.GetMaterial().RadThick); // std::log(Length/X0)
 
+            ss.SetMaterial(lmat);
             st.AddSubstation(ss);
          } // loop over substations
          sg.AddStation(st);

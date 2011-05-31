@@ -1,5 +1,6 @@
 # Create a library called "libLittrack".
 
+add_subdirectory(parallel)
 #add_subdirectory(std)
 INCLUDE(std/CMakeLists.txt)
 
@@ -201,5 +202,5 @@ EndIf(TBB_FOUND)
 
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
 
-add_subdirectory(parallel)
+#add_subdirectory(parallel)
 #add_subdirectory(cuda)

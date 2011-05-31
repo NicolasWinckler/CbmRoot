@@ -19,8 +19,7 @@ namespace parallel {
 /* Function calculates material effects and updates
  * track parameters and covariance matrix.
  * @param par Reference to INPUT/OUTPUT track parameters.
- * @param mat Reference to material
- */
+ * @param mat Reference to material */
 template<class T>
 inline void LitAddMaterial(
    LitTrackParam<T>& par,

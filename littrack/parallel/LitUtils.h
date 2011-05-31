@@ -17,6 +17,15 @@ std::string ToString(
    return ss.str();
 }
 
+class DeleteObject
+{
+public:
+   template<typename T>
+   void operator()(const T* ptr) const {
+      delete ptr;
+   }
+};
+
 } // namespace parallel
 } // namespace lit
 #endif /* LITUTILS_H_ */

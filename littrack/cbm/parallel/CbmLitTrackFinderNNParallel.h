@@ -16,6 +16,8 @@
 #include "parallel/electron/LitTrackFinderNNScalarElectron.h"
 #include "parallel/electron/LitTrackFinderNNVecElectron.h"
 
+#include <vector>
+
 //class LitTrackFinderNNVecMuon;
 //class LitTrackFinderNNScalarElectron;
 //class LitTrackFinderNNVecElectron;
@@ -46,15 +48,14 @@ public:
 private:
    void ConvertHits(
       HitPtrVector& hits,
-      lit::parallel::LitScalPixelHit* lhits[]);
+      std::vector<lit::parallel::LitScalPixelHit*>& lhits);
 
    void ConvertSeeds(
       TrackPtrVector& seeds,
-      lit::parallel::LitScalTrack* lseeds[]);
+      std::vector<lit::parallel::LitScalTrack*>& lseeds);
 
    void ConvertTracks(
-      lit::parallel::LitScalTrack* ltracks[],
-      unsigned int nofTracks,
+      const std::vector<lit::parallel::LitScalTrack*>& ltracks,
       TrackPtrVector& tracks);
 
    lit::parallel::LitTrackFinderNNVecMuon* fTFParallelMuon;

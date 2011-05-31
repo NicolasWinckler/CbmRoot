@@ -139,7 +139,7 @@ inline void PackTrack(
    for(unsigned char i = 0; i < fvecLen; i++) {
 //        const LitTrackParam<fscal>* par = &track[i]->paramFirst;
 
-//        lparFirst.X[i] = par->X;
+// lparFirst.X[i] = par->X;
 // lparFirst.Y[i] = par->Y;
 // lparFirst.Tx[i] = par->Tx;
 // lparFirst.Ty[i] = par->Ty;
@@ -185,7 +185,7 @@ inline void PackTrack(
       lparLast.C14[i] = par->C14;
    }
    //  std::cout << "pack hits" << std::endl;
-   unsigned short nofHits = track[0]->nofHits;
+   unsigned short nofHits = track[0]->GetNofHits();
    for(unsigned short iHit = 0; iHit < nofHits; iHit++) {
       LitPixelHit<fvec>* const lhit = ltrack.hits[iHit];
       for(unsigned char i = 0; i < fvecLen; i++) {
@@ -198,8 +198,8 @@ inline void PackTrack(
       }
    }
    //  std::cout << "pack hits finished" << std::endl;
-
-   ltrack.nofHits = nofHits;
+// FIXME: check if we need to set nofHits
+//   ltrack.nofHits = nofHits;
 }
 
 inline void UnpackTrack(

@@ -5,6 +5,7 @@
  **/
 
 #include "LitTrackFinderNNBase.h"
+#include "LitComparators.h"
 
 #include <algorithm>
 

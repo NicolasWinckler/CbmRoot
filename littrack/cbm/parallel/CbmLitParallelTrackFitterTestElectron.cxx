@@ -123,8 +123,9 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
             lit::parallel::LitPixelHit<fscal> lhit;
             CbmLitPixelHit* pixelHit = (CbmLitPixelHit*) hit;
             SerialHitToParallel(*pixelHit, lhit);
-            lit::parallel::LitFiltration(ulpar, lhit);
-            fscal chisq = ChiSq(ulpar, lhit);
+            fscal chisq = 0;
+            lit::parallel::LitFiltration(ulpar, lhit, chisq);
+//            fscal chisq = ChiSq(ulpar, lhit);
 
             lpar = ulpar;
 

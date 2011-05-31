@@ -3,16 +3,15 @@
  * @since 2009
  * @version 1.0
  *
- * Functions to fit a track
- * for fast parallel version of the Littrack tracking.
+ * Functions to fit a track.
  **/
 
 #ifndef LITTRACKFITTERMUON_H_
 #define LITTRACKFITTERMUON_H_
 
+#include "LitDetectorGeometryMuon.h"
 #include "../LitTypes.h"
 #include "../LitTrackParam.h"
-#include "LitDetectorGeometryMuon.h"
 #include "../LitExtrapolation.h"
 #include "../LitFiltration.h"
 #include "../LitAddMaterial.h"

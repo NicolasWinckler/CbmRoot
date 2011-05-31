@@ -5,6 +5,7 @@
 #include "LitHitDataElectron.h"
 //#include "../LitTrackFinderNNBase.h"
 //#include "../LitTrackFinder.h"
+#include "../LitComparators.h"
 
 //class LitScalPixelHit;
 //class LitScalTrack;
@@ -105,13 +106,13 @@ void LitTrackFinderNNBaseElectron<T>::InitTrackSeeds(
    //TODO : add threads here
    for (unsigned int i = 0; i < nofTrackSeeds; i++) {
       LitScalTrack* track = trackSeeds[i];
-      if (fabs(track->paramLast.Qp) > QpCut) { continue; }
+      if (fabs(track->GetParamLast().Qp) > QpCut) { continue; }
 //    if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
-      track->previouseTrackId = i;
+      track->SetPreviousTrackId(i);
 
       LitScalTrack* newTrack = new LitScalTrack(*track);
 //    newTrack->paramFirst = newTrack->paramLast;
-      newTrack->paramLast = newTrack->paramFirst;
+      newTrack->SetParamLast(newTrack->GetParamFirst());
       fTracks[fNofTracks++] = newTrack;
 //    fTracks.push_back(newTrack);
    }

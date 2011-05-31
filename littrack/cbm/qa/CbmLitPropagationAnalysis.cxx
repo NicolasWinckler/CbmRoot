@@ -40,10 +40,7 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchPoint.h"
 #include "CbmTrdPoint.h"
-
-#ifdef NEWMUCH
 #include "CbmMuchGeoScheme.h"
-#endif
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -195,17 +192,19 @@ void CbmLitPropagationAnalysis::DetermineSetup()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    fIsElectronSetup = env->IsElectronSetup();
-   fIsSts = true;
+   fIsSts = env->IsSts();
    fIsTrd = env->IsTrd();
    fIsMuch = env->IsMuch();
    fIsTof = env->IsTof();
 
    if (fIsElectronSetup) { std::cout << "-I- CBM electron setup detected" << std::endl; }
    else { std::cout << "-I- CBM muon setup detected" << std::endl; }
-   std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
-   if (fIsTrd) { std::cout << "TRD" << std::endl; }
-   if (fIsMuch) { std::cout << "MUCH" << std::endl; }
-   if (fIsTof) { std::cout << "TOF" << std::endl; }
+   std::cout << "-I- The following detectors were found in the CBM setup:";
+   if (fIsSts) { std::cout << " STS"; }
+   if (fIsMuch) { std::cout << " MUCH"; }
+   if (fIsTrd) { std::cout << " TRD"; }
+   if (fIsTof) { std::cout << " TOF"; }
+   std::cout << std::endl;
 }
 
 void CbmLitPropagationAnalysis::ReadDataBranches()
@@ -282,11 +281,7 @@ void CbmLitPropagationAnalysis::CreateHistograms()
                            "h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp",
                            "h_resp", "h_chisq"
                          };
-   std::string titles[] = { "resolution X at ", "resolution Y at ", "resolution Tx at ",
-                            "resolution Ty at ", "resolution Q/p at ", "pull X at ",
-                            "pull Y at ", "pull Tx at ", "pull Ty at ", "pull Q/p at ",
-                            "relative momentum resolution at ", "chi-square at"
-                          };
+
    Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
    Double_t boundL[fNofParams];
    Double_t boundR[fNofParams];
@@ -328,10 +323,8 @@ void CbmLitPropagationAnalysis::CreateHistograms()
       for (Int_t i = 0; i < fNofPlanes; i++) {
          for (Int_t j = 0; j < fNofParams; j++) {
             std::stringstream histName;
-            std::stringstream histTitle;
             histName << names[j] << "_" << var[v] << "_" << i;
-            histTitle << var2[v] << " " << titles[j] << i << " station";
-            TH1F* hist = new TH1F(histName.str().c_str(), histTitle.str().c_str(),
+            TH1F* hist = new TH1F(histName.str().c_str(), histName.str().c_str(),
                                   bins[j], boundL[j], boundR[j]);
             if (v == 0) { fPropagationHistos[i][j] = hist; }
             if (v == 1) { fFilterHistos[i][j] = hist; }
@@ -347,10 +340,8 @@ void CbmLitPropagationAnalysis::CreateHistograms()
    for (Int_t v = 0; v < 2; v++) {
       for (Int_t j = 0; j < fNofParams; j++) {
          std::stringstream histName;
-         std::stringstream histTitle;
          histName << names[j] << "_" << vr[v];
-         histTitle << titles[j] << " " << vr[v];
-         TH1F* hist = new TH1F(histName.str().c_str(), histTitle.str().c_str(),
+         TH1F* hist = new TH1F(histName.str().c_str(), histName.str().c_str(),
                                bins[j], boundL[j], boundR[j]);
          fStsHistos[v][j] = hist;
       }
@@ -789,7 +780,7 @@ void CbmLitPropagationAnalysis::Draw()
       PrintResults(fout, 2);
    }
 
-   DrawForPhd();
+//   DrawForPhd();
 }
 
 void CbmLitPropagationAnalysis::DrawHistos(
@@ -826,53 +817,53 @@ void CbmLitPropagationAnalysis::DrawHistos(
    }
 }
 
-void CbmLitPropagationAnalysis::DrawForPhd()
-{
-   const Int_t nofHist = 4;
-   TCanvas* canvas[3];
-   std::string cnames[] = {"c_phd_propagation_", "c_phd_filter_", "c_phd_smoother_"};
-   for (int c = 0; c < 3; c++) {
-      if (c == 0 && !fIsDrawPropagation) { continue; }
-      if (c == 1 && !fIsDrawFilter) { continue; }
-      if (c == 2 && !fIsDrawSmoother) { continue; }
-      std::string name = cnames[c] + lit::ToString<int>(fPlaneNoPhd);
-      canvas[c] = new TCanvas(name.c_str(),name.c_str(),1600,450);
-      canvas[c]->Divide(nofHist, 1);
-   }
-
-   if (fIsDrawPropagation) { DrawForPhd(canvas[0], 0); }
-   if (fIsDrawFilter) { DrawForPhd(canvas[1], 1); }
-   if (fIsDrawSmoother) { DrawForPhd(canvas[2], 2); }
-}
-
-void CbmLitPropagationAnalysis::DrawForPhd(
-   TCanvas* canvas,
-   Int_t v)
-{
-   Int_t param[] = {0, 5, 8, 4}; // indecis of the parameters that will be drawn
-   std::string xtitles[] = {"Residual X [cm]", "Residual Y [cm]", "Residual Tx",
-                            "Residual Ty", "Residual q/p [(GeV/c)^{-1}]", "Pull X", "Pull Y", "Pull Tx", "Pull Ty",
-                            "Pull q/p", "Resolution p [%]", "Chi-square"
-                           };
-   for (int j = 0; j < 4; j++) {
-      canvas->cd(j+1);
-      TH1F* hist = NULL;
-      if (v == 0) { hist = fPropagationHistos[fPlaneNoPhd][param[j]]; }
-      if (v == 1) { hist = fFilterHistos[fPlaneNoPhd][param[j]]; }
-      if (v == 2) { hist = fSmootherHistos[fPlaneNoPhd][param[j]]; }
-      DrawHist1D(hist, xtitles[param[j]], "Counter",
-                 LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, false, "");
-
-      hist->Fit("gaus");
-      TF1* fit = hist->GetFunction("gaus");
-      Double_t sigma = fit->GetParameter(2);
-      Double_t rms = hist->GetRMS();
-      DrawHistSigmaRMS(j, sigma, rms);
-   }
-   lit::SaveCanvasAsImage(canvas, fOutputDir);
-   if (fIsCloseCanvas) { canvas->Close(); }
-}
+//void CbmLitPropagationAnalysis::DrawForPhd()
+//{
+//   const Int_t nofHist = 4;
+//   TCanvas* canvas[3];
+//   std::string cnames[] = {"c_phd_propagation_", "c_phd_filter_", "c_phd_smoother_"};
+//   for (int c = 0; c < 3; c++) {
+//      if (c == 0 && !fIsDrawPropagation) { continue; }
+//      if (c == 1 && !fIsDrawFilter) { continue; }
+//      if (c == 2 && !fIsDrawSmoother) { continue; }
+//      std::string name = cnames[c] + lit::ToString<int>(fPlaneNoPhd);
+//      canvas[c] = new TCanvas(name.c_str(),name.c_str(),1600,450);
+//      canvas[c]->Divide(nofHist, 1);
+//   }
+//
+//   if (fIsDrawPropagation) { DrawForPhd(canvas[0], 0); }
+//   if (fIsDrawFilter) { DrawForPhd(canvas[1], 1); }
+//   if (fIsDrawSmoother) { DrawForPhd(canvas[2], 2); }
+//}
+//
+//void CbmLitPropagationAnalysis::DrawForPhd(
+//   TCanvas* canvas,
+//   Int_t v)
+//{
+//   Int_t param[] = {0, 5, 8, 4}; // indecis of the parameters that will be drawn
+//   std::string xtitles[] = {"Residual X [cm]", "Residual Y [cm]", "Residual Tx",
+//                            "Residual Ty", "Residual q/p [(GeV/c)^{-1}]", "Pull X", "Pull Y", "Pull Tx", "Pull Ty",
+//                            "Pull q/p", "Resolution p [%]", "Chi-square"
+//                           };
+//   for (int j = 0; j < 4; j++) {
+//      canvas->cd(j+1);
+//      TH1F* hist = NULL;
+//      if (v == 0) { hist = fPropagationHistos[fPlaneNoPhd][param[j]]; }
+//      if (v == 1) { hist = fFilterHistos[fPlaneNoPhd][param[j]]; }
+//      if (v == 2) { hist = fSmootherHistos[fPlaneNoPhd][param[j]]; }
+//      DrawHist1D(hist, xtitles[param[j]], "Counter",
+//                 LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+//                 LIT_MARKER_STYLE1, false, false, "");
+//
+//      hist->Fit("gaus");
+//      TF1* fit = hist->GetFunction("gaus");
+//      Double_t sigma = fit->GetParameter(2);
+//      Double_t rms = hist->GetRMS();
+//      DrawHistSigmaRMS(j, sigma, rms);
+//   }
+//   lit::SaveCanvasAsImage(canvas, fOutputDir);
+//   if (fIsCloseCanvas) { canvas->Close(); }
+//}
 
 void CbmLitPropagationAnalysis::PrintResults(
    std::ostream& out,

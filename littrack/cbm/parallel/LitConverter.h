@@ -129,31 +129,32 @@ inline void LitScalTrackToCbmLitTrack(
 {
    // Convert track parameters
    CbmLitTrackParam parFirst, parLast;
-   LitTrackParamScalToCbmLitTrackParam(&(ltrack->paramFirst), &parFirst);
-   LitTrackParamScalToCbmLitTrackParam(&(ltrack->paramLast), &parLast);
+   LitTrackParamScalToCbmLitTrackParam(&(ltrack->GetParamFirst()), &parFirst);
+   LitTrackParamScalToCbmLitTrackParam(&(ltrack->GetParamLast()), &parLast);
    track->SetParamLast(&parLast);
    track->SetParamFirst(&parFirst);
 
    // Copy other track parameters
-   track->SetChi2(ltrack->chiSq);
-   track->SetNDF(ltrack->NDF);
-   track->SetPreviousTrackId(ltrack->previouseTrackId);
+   track->SetChi2(ltrack->GetChiSq());
+   track->SetNDF(ltrack->GetNDF());
+   track->SetPreviousTrackId(ltrack->GetPreviousTrackId());
    track->SetQuality(kLITGOOD);
 // track->SetRefId(std::distance(ltracks.begin(), it));
 
    // Convert hits
-   for (int i = 0; i < ltrack->nofHits; i++) {
+   for (unsigned short i = 0; i < ltrack->GetNofHits(); i++) {
       CbmLitPixelHit* newHit = new CbmLitPixelHit;
-      newHit->SetX(ltrack->hits[i]->X);
-      newHit->SetY(ltrack->hits[i]->Y);
-      newHit->SetDx(ltrack->hits[i]->Dx);
-      newHit->SetDy(ltrack->hits[i]->Dy);
-      newHit->SetDxy(ltrack->hits[i]->Dxy);
-      newHit->SetPlaneId(ltrack->hits[i]->planeId);
+      const lit::parallel::LitScalPixelHit* lhit = ltrack->GetHit(i);
+      newHit->SetX(lhit->X);
+      newHit->SetY(lhit->Y);
+      newHit->SetDx(lhit->Dx);
+      newHit->SetDy(lhit->Dy);
+      newHit->SetDxy(lhit->Dxy);
+      newHit->SetPlaneId(lhit->planeId);
       newHit->SetHitType(kLITPIXELHIT);
       newHit->SetDetectorId(detId);
-      newHit->SetRefId(ltrack->hits[i]->refId);
-      newHit->SetZ(ltrack->hits[i]->Z);
+      newHit->SetRefId(lhit->refId);
+      newHit->SetZ(lhit->Z);
 //    std::cout << ltrack->hits[i];
       track->AddHit(newHit);
    }

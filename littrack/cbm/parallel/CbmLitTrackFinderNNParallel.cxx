@@ -69,11 +69,11 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    TrackPtrVector& trackSeeds,
    TrackPtrVector& tracks)
 {
-   const unsigned int NHITS = hits.size();
-   lit::parallel::LitScalPixelHit* lhits[NHITS];
-   const unsigned int NTRACKS = trackSeeds.size();
-   lit::parallel::LitScalTrack* lseeds[NTRACKS];
-   lit::parallel::LitScalTrack* ltracks[NTRACKS];
+//   const unsigned int NHITS = hits.size();
+   std::vector<lit::parallel::LitScalPixelHit*> lhits;
+//   const unsigned int NTRACKS = trackSeeds.size();
+   std::vector<lit::parallel::LitScalTrack*> lseeds;
+   std::vector<lit::parallel::LitScalTrack*> ltracks;
 
    ConvertHits(hits, lhits);
    ConvertSeeds(trackSeeds, lseeds);
@@ -83,11 +83,11 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    timer1.Start(kFALSE);
 
    if (fTrackingType == "nn_parallel_muon") {
-      fTFParallelMuon->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
+      fTFParallelMuon->DoFind(lhits, lseeds, ltracks);
    } else if (fTrackingType == "nn_scalar_electron") {
-      fTFScalElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
+//      fTFScalElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
    } else if (fTrackingType == "nn_vec_electron") {
-      fTFVecElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
+//      fTFVecElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
    }
    timer1.Stop();
 
@@ -98,28 +98,28 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    std::cout << "Total:" << fTime << " sec / " << fEventNo << " events." << std::endl;
    std::cout << "Average per event:" << fTime / fEventNo << " sec." << std::endl;
 
-   ConvertTracks(ltracks, nofTracks, tracks);
+   ConvertTracks(ltracks, tracks);
 
 // std::cout << "NOFTRACKS=" << nofTracks << " tracks.size=" << tracks.size() << std::endl;
 // for (unsigned int i = 0; i < tracks.size(); i++) {
 //    std::cout << tracks[i]->ToString();
 // }
 
-   for (unsigned int i = 0; i < NHITS; i++) {
-      delete lhits[i];
-   }
-// for_each(lhits.begin(), lhits.end(), DeleteObject());
-// lhits.clear();
-   for (unsigned int i = 0; i < NTRACKS; i++) {
-      delete lseeds[i];
-   }
-// for_each(lseeds.begin(), lseeds.end(), DeleteObject());
-// lseeds.clear();
-   for (unsigned int i = 0; i < nofTracks; i++) {
-      delete ltracks[i];
-   }
-// for_each(ltracks.begin(), ltracks.end(), DeleteObject());
-// ltracks.clear();
+//   for (unsigned int i = 0; i < NHITS; i++) {
+//      delete lhits[i];
+//   }
+ for_each(lhits.begin(), lhits.end(), DeleteObject());
+ lhits.clear();
+//   for (unsigned int i = 0; i < NTRACKS; i++) {
+//      delete lseeds[i];
+//   }
+ for_each(lseeds.begin(), lseeds.end(), DeleteObject());
+ lseeds.clear();
+//   for (unsigned int i = 0; i < nofTracks; i++) {
+//      delete ltracks[i];
+//   }
+ for_each(ltracks.begin(), ltracks.end(), DeleteObject());
+ ltracks.clear();
 
    std::cout << "Event: " << fEventNo++ << std::endl;
 
@@ -128,40 +128,42 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
 void CbmLitTrackFinderNNParallel::ConvertHits(
    HitPtrVector& hits,
-   lit::parallel::LitScalPixelHit* lhits[])
+   std::vector<lit::parallel::LitScalPixelHit*>& lhits)
 {
    for (unsigned int i = 0; i < hits.size(); i++) {
       CbmLitPixelHit* hit = (CbmLitPixelHit*) hits[i];
       lit::parallel::LitScalPixelHit* lhit = new lit::parallel::LitScalPixelHit;
       CbmLitPixelHitToLitScalPixelHit(hit, lhit);
-      lhits[i] = lhit;
+      lhits.push_back(lhit);
    }
 }
 
 void CbmLitTrackFinderNNParallel::ConvertSeeds(
    TrackPtrVector& seeds,
-   lit::parallel::LitScalTrack* lseeds[])
+   std::vector<lit::parallel::LitScalTrack*>& lseeds)
 {
    for (unsigned int i = 0; i < seeds.size(); i++) {
       CbmLitTrack* track = (CbmLitTrack*) seeds[i];
       const CbmLitTrackParam* par = track->GetParamLast();
       lit::parallel::LitScalTrack* ltrack = new lit::parallel::LitScalTrack;
 
-      CbmLitTrackParamToLitTrackParamScal(par, &ltrack->paramFirst);
-      CbmLitTrackParamToLitTrackParamScal(par, &ltrack->paramLast);
+      lit::parallel::LitTrackParamScal lpar;
+      CbmLitTrackParamToLitTrackParamScal(par, &lpar);
+      ltrack->SetParamFirst(lpar);
+      CbmLitTrackParamToLitTrackParamScal(par, &lpar);
+      ltrack->SetParamLast(lpar);
 
 //    ltrack->previouseTrackId = std::distance(seeds.begin(), it);
 
-      lseeds[i] = ltrack;
+      lseeds.push_back(ltrack);
    }
 }
 
 void CbmLitTrackFinderNNParallel::ConvertTracks(
-   lit::parallel::LitScalTrack* ltracks[],
-   unsigned int nofTracks,
+   const std::vector<lit::parallel::LitScalTrack*>& ltracks,
    TrackPtrVector& tracks)
 {
-   for (unsigned int i = 0; i < nofTracks; i++) {
+   for (unsigned int i = 0; i < ltracks.size(); i++) {
       lit::parallel::LitScalTrack* ltrack = ltracks[i];
       CbmLitTrack* track = new CbmLitTrack;
       if (fTrackingType == "nn_parallel_muon") {

@@ -105,7 +105,7 @@ public:
       int substation) const;
 
    /* Returns maximum hit error in [cm] and the name of the coordinate
-    * ("X", "Y", "U")for the specified substation.
+    * ("X", "Y", "U") for the specified substation.
     *@param stationGroup Index of the station group in the detector
     *@param station Index of the station in the station group
     *@param substation Index of the substation in the station

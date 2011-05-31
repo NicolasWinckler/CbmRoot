@@ -127,9 +127,11 @@ void lit::parallel::LitTrackFinderNNScalarElectron::PropagateToFirstStation(
 //        CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 //        track->paramLast = lpar;
 
-      LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
-//       LitRK4ExtrapolationElectron1(track->paramLast, vp2.Z, fField);
-      LitAddMaterialElectron(track->paramLast, vp2.material);
+      LitTrackParamScal par = track->GetParamLast();
+      LitRK4ExtrapolationElectron(par, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
+//       LitRK4ExtrapolationElectron1(par, vp2.Z, fField);
+      LitAddMaterialElectron(par, vp2.material);
+      track->SetParamLast(par);
    }
 
 //    const LitStationElectron<fscal>& st = fLayout.GetStation(0, 0);
@@ -160,8 +162,8 @@ bool lit::parallel::LitTrackFinderNNScalarElectron::ProcessStationGroup(
    int nofStations = fLayout.GetNofStations(stationGroup);
    for(int iStation = 0; iStation < nofStations; iStation++) {
       if (!ProcessStation(track, stationGroup, iStation)) {
-         track->nofMissingHits++;
-         if (track->nofMissingHits > fMaxNofMissingHits) { return false; }
+         track->IncNofMissingHits();
+         if (track->GetNofMissingHits() > fMaxNofMissingHits) { return false; }
       }
    }
    return true;
@@ -174,7 +176,7 @@ bool lit::parallel::LitTrackFinderNNScalarElectron::ProcessStation(
 {
    bool hitAdded = false;
 
-   LitTrackParamScal& par = track->paramLast;
+   LitTrackParamScal par = track->GetParamLast();
 
    const LitStationElectronScal& st = fLayout.GetStation(stationGroup, station);
 
@@ -205,6 +207,8 @@ bool lit::parallel::LitTrackFinderNNScalarElectron::ProcessStation(
    for (unsigned char im = 0; im < st.GetNofMaterialsAfter(); im++) {
       LitAddMaterialElectron(par, st.materialsAfter[im]);
    }
+
+   track->SetParamLast(par);
 
    return hitAdded;
 }
@@ -246,11 +250,11 @@ bool lit::parallel::LitTrackFinderNNScalarElectron::AddNearestHit(
 //    fFilter->Update(&par, &mhit);
 //     CbmLitTrackParamToLitTrackParamScal(&par, &upar);
 
-      LitFiltration(upar, lhit);
-
+      fscal chisq = 0;
+      LitFiltration(upar, lhit, chisq);
 
       static const fscal CHISQCUT = 50.;
-      fscal chisq = ChiSq(upar, lhit);
+//      fscal chisq = ChiSq(upar, lhit);
 
       if (chisq < CHISQCUT && chisq < chiSq) {
          chiSq = chisq;
@@ -262,9 +266,9 @@ bool lit::parallel::LitTrackFinderNNScalarElectron::AddNearestHit(
    // if hit was attached than change track information
    if (hita != NULL) {
       track->AddHit(hita);
-      track->paramLast = param;
-      track->chiSq += chiSq;
-      track->NDF = NDF(*track);
+      track->SetParamLast(param);
+      track->IncChiSq(chiSq);
+      track->SetNDF(NDF(*track));
       hitAdded = true;
    }
    return hitAdded;

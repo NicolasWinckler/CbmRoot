@@ -15,14 +15,17 @@ namespace lit {
 namespace parallel {
 
 /* Function implements Kalman filter update step.
- * It updates track parameters and covariance matrix.
+ * It updates track parameters and covariance matrix and
+ * calculates contribution to chi-square from this hit.
  * @param par Reference to INPUT/OUTPUT track parameters.
  * @param mat Reference to pixel hit
+ * @param chiSq OUTPUT contribution to chi-square
  */
 template<class T>
 inline void LitFiltration (
    LitTrackParam<T>& par,
-   const LitPixelHit<T> &hit)
+   const LitPixelHit<T> &hit,
+   T& chiSq)
 {
    static const T ONE = 1., TWO = 2.;
 
@@ -63,8 +66,7 @@ inline void LitFiltration (
    // Calculate filtered covariance matrix
    T cIn[15] = {par.C0,  par.C1,  par.C2,  par.C3,  par.C4,
                 par.C5,  par.C6,  par.C7,  par.C8,  par.C9,
-                par.C10, par.C11, par.C12, par.C13, par.C14
-               };
+                par.C10, par.C11, par.C12, par.C13, par.C14};
 
    par.C0  += -K00 * cIn[0] - K01 * cIn[1];
    par.C1  += -K00 * cIn[1] - K01 * cIn[5];
@@ -85,17 +87,28 @@ inline void LitFiltration (
    par.C13 += -K30 * cIn[4] - K31 * cIn[8];
 
    par.C14 += -K40 * cIn[4] - K41 * cIn[8];
+
+   // Calculate chi-square
+   T xmx = hit.X - par.X;
+   T ymy = hit.Y - par.Y;
+   T norm = dxx * dyy - dxx * par.C5 - dyy * par.C0 + par.C0 * par.C5
+              - dxy * dxy + TWO * dxy * par.C1 - par.C1 * par.C1;
+   chiSq = ((xmx * (dyy - par.C5) - ymy * (dxy - par.C1)) * xmx
+            +(-xmx * (dxy - par.C1) + ymy * (dxx - par.C0)) * ymy) / norm;
 }
 
 /* Function implements Kalman filter update step.
- * It updates track parameters and covariance matrix.
+ * It updates track parameters and covariance matrix and
+ * calculates contribution to chi-square from this hit.
  * @param par Reference to INPUT/OUTPUT track parameters.
  * @param mat Reference to strip hit
+ * @param chiSq OUTPUT contribution to chi-square
  */
 template<class T>
 inline void LitFiltration(
    LitTrackParam<T>& par,
-   const LitStripHit<T>& hit)
+   const LitStripHit<T>& hit,
+   T& chiSq)
 {
    static const T ONE = 1., TWO = 2.;
 
@@ -150,6 +163,10 @@ inline void LitFiltration(
    par.C13 -= KR3 * K4;
 
    par.C14 -= KR4 * K4;
+
+   // Calculate chi-square
+   T ru = hit.U - par.X * hit.phiCos - par.Y * hit.phiSin;
+   chiSq = (ru * ru) / (duu - phiCosSq * par.C0 - phi2SinCos * par.C1 - phiSinSq * par.C5);
 }
 
 } // namespace parallel

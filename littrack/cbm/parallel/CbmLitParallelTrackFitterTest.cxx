@@ -62,16 +62,16 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
    int ihit = 0;
 
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
-      lit::parallel::LitStationGroupMuon<fscal> stationGroup = fLayout.stationGroups[isg];
+      const lit::parallel::LitStationGroupMuon<fscal>& stationGroup = fLayout.GetStationGroup(isg);
       //Propagation through the absorber
       lit::parallel::LitFieldRegion<fscal> field;
       lit::parallel::LitFieldValue<fscal> v1, v2;
-      lit::parallel::LitAbsorber<fscal> absorber = stationGroup.absorber;
-      absorber.fieldSliceFront.GetFieldValue(lpar.X, lpar.Y, v1);
-      absorber.fieldSliceBack.GetFieldValue(lpar.X, lpar.Y, v2);
-      field.Set(v1, absorber.fieldSliceFront.Z, v2, absorber.fieldSliceBack.Z);
-      lit::parallel::LitRK4Extrapolation(lpar, absorber.Z, field);
-      lit::parallel::LitAddMaterial(lpar, absorber.material);
+      const lit::parallel::LitAbsorber<fscal>& absorber = stationGroup.GetAbsorber();
+      absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
+      absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v2);
+      field.Set(v1, absorber.GetFieldSliceFront().Z, v2, absorber.GetFieldSliceBack().Z);
+      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(), field);
+      lit::parallel::LitAddMaterial(lpar, absorber.GetMaterial());
       //propagate through the absorber using steps
       // first extrapolate input track parameters to the absorber
 //     LitRK4Extrapolation(lpar, absorber.Z - absorber.material.Thickness, field);
@@ -88,19 +88,19 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
       //end propagate through the absorber using steps
 
       //Approximate the field between the absorbers
-      lit::parallel::LitSubstationMuon<fscal> ss1 = stationGroup.stations[0].substations[0];
-      lit::parallel::LitSubstationMuon<fscal> ss2 = stationGroup.stations[1].substations[0];
-      ss1.fieldSlice.GetFieldValue(lpar.X, lpar.Y, v1);
-      ss2.fieldSlice.GetFieldValue(lpar.X, lpar.Y, v2);
-      field.Set(v1, ss1.fieldSlice.Z, v2, ss2.fieldSlice.Z);
+      const lit::parallel::LitSubstationMuon<fscal>& ss1 = stationGroup.GetStation(0).GetSubstation(0);
+      const lit::parallel::LitSubstationMuon<fscal>& ss2 = stationGroup.GetStation(1).GetSubstation(0);
+      ss1.GetFieldSlice().GetFieldValue(lpar.X, lpar.Y, v1);
+      ss2.GetFieldSlice().GetFieldValue(lpar.X, lpar.Y, v2);
+      field.Set(v1, ss1.GetFieldSlice().Z, v2, ss2.GetFieldSlice().Z);
       for (unsigned char ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-         lit::parallel::LitStationMuon<fscal> station = stationGroup.stations[ist];
+         const lit::parallel::LitStationMuon<fscal>& station = stationGroup.GetStation(ist);
          for (unsigned char iss = 0; iss < station.GetNofSubstations(); iss++) {
-            lit::parallel::LitSubstationMuon<fscal> substation = station.substations[iss];
+            const lit::parallel::LitSubstationMuon<fscal>& substation = station.GetSubstation(iss);
             // Propagation through station
 
-            lit::parallel::LitRK4Extrapolation(lpar, substation.Z, field);
-            lit::parallel::LitAddMaterial(lpar, substation.material);
+            lit::parallel::LitRK4Extrapolation(lpar, substation.GetZ(), field);
+            lit::parallel::LitAddMaterial(lpar, substation.GetMaterial());
 
             LitTrackParamScalToCbmLitTrackParam(&lpar, &par);
 
@@ -110,8 +110,9 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
                lit::parallel::LitPixelHit<fscal> lhit;
                CbmLitPixelHit* pixelHit = (CbmLitPixelHit*) hit;
                SerialHitToParallel(*pixelHit, lhit);
-               lit::parallel::LitFiltration(ulpar, lhit);
-               fscal chisq = ChiSq(ulpar, lhit);
+               fscal chisq = 0;
+               lit::parallel::LitFiltration(ulpar, lhit, chisq);
+//               fscal chisq = ChiSq(ulpar, lhit);
 
                CbmLitTrackParam upar;
                LitTrackParamScalToCbmLitTrackParam(&ulpar, &upar);
@@ -141,14 +142,14 @@ unsigned char CbmLitParallelTrackFitterTest::PlaneId(
 {
    int counter = 0;
    for(unsigned char i = 0; i < stationGroup; i++) {
-      for(unsigned char j = 0; j < layout.stationGroups[i].GetNofStations(); j++) {
-         counter += layout.stationGroups[i].stations[j].GetNofSubstations();
+      for(unsigned char j = 0; j < layout.GetStationGroup(i).GetNofStations(); j++) {
+         counter += layout.GetStationGroup(i).GetStation(j).GetNofSubstations();
       }
 //    counter++; // count for absorber
    }
 // counter++;//again count for absorber
    for(unsigned char j = 0; j < station; j++) {
-      counter += layout.stationGroups[stationGroup].stations[j].GetNofSubstations();
+      counter += layout.GetStationGroup(stationGroup).GetStation(j).GetNofSubstations();
    }
    counter += substation;
 

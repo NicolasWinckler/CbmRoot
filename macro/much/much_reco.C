@@ -36,7 +36,7 @@ void much_reco(
 		globalTracksFile = dir + "global.tracks.0000.root";
 		// Digi scheme file for STS.
 		// MUST be consistent with STS geometry used in MC transport.
-		stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
+		stsDigiFile = parDir+ "/sts/sts_v11a.digi.par";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_v11a.digi.root";
@@ -211,6 +211,13 @@ void much_reco(
 			CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
 			run->AddTask(muchMatchTracks);
 		}
+
+
+                // -----   Primary vertex finding   ---------------------------------------
+                CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
+                CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
+                run->AddTask(findVertex);
+                // ------------------------------------------------------------------------
 
 		// -----   Track finding QA check   ------------------------------------
 		CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();

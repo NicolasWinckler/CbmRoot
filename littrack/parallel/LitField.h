@@ -58,7 +58,7 @@ public:
 #endif
 
 public:
-   LitFieldSlice() {
+   LitFieldSlice():fZ(0.) {
       for(unsigned int i=0; i<N; i++) { cx[i] = cy[i] = cz[i] = 0.; }
    }
 
@@ -300,9 +300,38 @@ public:
 #endif
    }
 
-   T cx[N], cy[N], cz[N]; // polinom coefficients
-   T Z; // Z position of the slice
+   /* Sets polynom coefficients
+    * @param x Coefficients for Bx
+    * @param y Coefficients for By
+    * @param z Coefficients for Bz */
+   void SetCoefficients(
+         const std::vector<T>& x,
+         const std::vector<T>& y,
+         const std::vector<T>& z) {
+      for(unsigned int i = 0; i < N; i++) {
+         cx[i] = x[i];
+         cy[i] = y[i];
+         cz[i] = z[i];
+      }
+   }
 
+   /* @return Z position */
+   const T& GetZ() const {
+      return fZ;
+   }
+
+   /* Sets Z position
+    * @param Z Value */
+   void SetZ(const T& Z) {
+      fZ = Z;
+   }
+
+private:
+   T cx[N], cy[N], cz[N]; // polinom coefficients
+   T fZ; // Z position of the slice
+
+public:
+   /* Operator << for convenient output to std::ostream */
    friend std::ostream& operator<<(std::ostream& strm, const LitFieldSlice& slice) {
       strm << "LitFieldSlice: Z=" << slice.Z << ", cx=";
       for(unsigned int i = 0; i < N; i++) { strm << slice.cx[i] << " "; }
@@ -317,7 +346,7 @@ public:
    }
 
    std::string ToStringShort() const {
-      std::string str = ToString<T>(Z) + "\n";
+      std::string str = ToString<T>(GetZ()) + "\n";
       for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cx[i]) + " "; }
       str += "\n";
       for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cy[i]) + " "; }
@@ -344,7 +373,7 @@ public:
       const T B1z,
       const LitFieldValue<T> &B2,
       const T B2z ) {
-      z0 = B0z[0];
+      z0 = B0z;
       T dz1 = B1z - B0z, dz2 = B2z - B0z;
       T det = rcp(T(dz1 * dz2 * (dz2 - dz1)));
       T w21 = -dz2 * det;
@@ -412,6 +441,7 @@ public:
       B.Bz = cz0 + cz1 * dz + cz2 * dzdz;
    }
 
+private:
    T cx0, cx1, cx2 ; // Bx(z) = cx0 + cx1*(z-z0) + cx2*(z-z0)^2
    T cy0, cy1, cy2 ; // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2
    T cz0, cz1, cz2 ; // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2

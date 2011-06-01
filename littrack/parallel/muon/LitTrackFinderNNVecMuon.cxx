@@ -167,12 +167,11 @@ void lit::parallel::LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
    PackTrackParam(par, lpar);
 
    // Propagate through the absorber
-   LitFieldRegion<fvec> field;
-   LitFieldValue<fvec> v1, v2;
+   LitFieldValue<fvec> v1, v2, v3;
    absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
-   absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v2);
-   field.Set(v1, absorber.GetFieldSliceFront().Z, v2, absorber.GetFieldSliceBack().Z);
-   LitRK4Extrapolation(lpar, absorber.GetZ(), field);
+   absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
+   absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
+   LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
    LitAddMaterial(lpar, absorber.GetMaterial());
 
    // Unpack track parameters
@@ -227,13 +226,9 @@ void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
    PackTrackParam(par[0], lpar[0]);
 
    //Approximate the field between the absorbers
+   // TODO: Do not need to recalculate it for each station??
    LitFieldRegion<fvec> field;
-   LitFieldValue<fvec> v1, v2;
-   const LitSubstationMuon<fvec>& ss1 = stg.GetStation(0).GetSubstation(0);
-   const LitSubstationMuon<fvec>& ss2 = stg.GetStation(1).GetSubstation(0);
-   ss1.GetFieldSlice().GetFieldValue(lpar[0].X, lpar[0].Y, v1);
-   ss2.GetFieldSlice().GetFieldValue(lpar[0].X, lpar[0].Y, v2);
-   field.Set(v1, ss1.GetFieldSlice().Z, v2, ss2.GetFieldSlice().Z);
+   stg.GetFieldRegion(lpar[0].X, lpar[0].Y, field);
 
    // Propagate to each of the substations
    for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) { // loop over substations

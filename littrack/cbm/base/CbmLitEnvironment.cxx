@@ -468,25 +468,31 @@ void CbmLitEnvironment::GetMuchLayout(
       // Fit the field at Z front and Z back of the absorber
       int absorberMatId = MaterialId(isg, 0, 0, muchLayout) - 1;
       CbmLitMaterialInfo amat = muchMaterial[absorberMatId];
-      double aZ[2] = {amat.GetZpos() - amat.GetLength(), amat.GetZpos()};
-      std::vector<double> aparBx[2], aparBy[2], aparBz[2];
+      double aZ[3] = {amat.GetZpos() - amat.GetLength(),
+            amat.GetZpos() - 0.5 * amat.GetLength(), amat.GetZpos()};
 
+      std::vector<std::vector<double> > aparBx(3), aparBy(3), aparBz(3);
       fieldFitter.FitSlice(aZ[0], aparBx[0], aparBy[0], aparBz[0]);
       fieldFitter.FitSlice(aZ[1], aparBx[1], aparBy[1], aparBz[1]);
+      fieldFitter.FitSlice(aZ[2], aparBx[2], aparBy[2], aparBz[2]);
+
+      std::vector<std::vector<T> > aparBxT(3), aparByT(3), aparBzT(3);
+      for (int i = 0; i < 3; i++) {
+         aparBxT[i].assign(aparBx[i].begin(), aparBx[i].end());
+         aparByT[i].assign(aparBy[i].begin(), aparBy[i].end());
+         aparBzT[i].assign(aparBz[i].begin(), aparBz[i].end());
+      }
 
       lit::parallel::LitAbsorber<T> absorber;
-      lit::parallel::LitFieldSlice<T> frontSlice, backSlice;
-      frontSlice.Z = aZ[0];
-      backSlice.Z = aZ[1];
-      for (int i = 0; i < N; i++) {
-         frontSlice.cx[i] = aparBx[0][i];
-         frontSlice.cy[i] = aparBy[0][i];
-         frontSlice.cz[i] = aparBz[0][i];
-         backSlice.cx[i] = aparBx[1][i];
-         backSlice.cy[i] = aparBy[1][i];
-         backSlice.cz[i] = aparBz[1][i];
-      }
+      lit::parallel::LitFieldSlice<T> frontSlice, middleSlice, backSlice;
+      frontSlice.SetZ(aZ[0]);
+      middleSlice.SetZ(aZ[1]);
+      backSlice.SetZ(aZ[2]);
+      frontSlice.SetCoefficients(aparBxT[0], aparByT[0], aparBzT[0]);
+      middleSlice.SetCoefficients(aparBxT[1], aparByT[1], aparBzT[1]);
+      backSlice.SetCoefficients(aparBxT[2], aparByT[2], aparBzT[2]);
       absorber.SetFieldSliceFront(frontSlice);
+      absorber.SetFieldSliceMiddle(middleSlice);
       absorber.SetFieldSliceBack(backSlice);
 
       lit::parallel::LitMaterialInfo<T> mat1;
@@ -508,7 +514,6 @@ void CbmLitEnvironment::GetMuchLayout(
       sg.SetAbsorber(absorber);
       //end add absorber
 
-
       for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
          const CbmLitStation& station = stationGroup.GetStation(ist);
          lit::parallel::LitStationMuon<T> st;
@@ -517,18 +522,6 @@ void CbmLitEnvironment::GetMuchLayout(
             const CbmLitSubstation& substation = station.GetSubstation(iss);
             lit::parallel::LitSubstationMuon<T> ss;
             ss.SetZ(substation.GetZ());
-
-            // Fit the field at Z position of the substation
-            lit::parallel::LitFieldSlice<T> lslice;
-            std::vector<double> parBx, parBy, parBz;
-            lslice.Z = substation.GetZ();
-            fieldFitter.FitSlice(substation.GetZ(), parBx, parBy, parBz);
-            for (int i = 0; i < N; i++) {
-               lslice.cx[i] = parBx[i];
-               lslice.cy[i] = parBy[i];
-               lslice.cz[i] = parBz[i];
-            }
-            ss.SetFieldSlice(lslice);
 
             int matId = MaterialId(isg, ist, iss, muchLayout);
             CbmLitMaterialInfo mat = muchMaterial[matId];
@@ -551,6 +544,38 @@ void CbmLitEnvironment::GetMuchLayout(
          } // loop over substations
          sg.AddStation(st);
       } // loop over stations
+
+      // Magnetic field approximation for the station group
+      lit::parallel::LitFieldSlice<T> fSlice, mSlice, bSlice;
+      std::vector<std::vector<double> > parBx(3), parBy(3), parBz(3);
+      const CbmLitStation& frontStation = stationGroup.GetStation(0);
+      fscal fZ = frontStation.GetSubstation(0).GetZ();
+      fSlice.SetZ(fZ);
+      const CbmLitStation& backStation = stationGroup.GetStation(stationGroup.GetNofStations() - 1);
+      fscal bZ = backStation.GetSubstation(backStation.GetNofSubstations() - 1).GetZ();
+      bSlice.SetZ(bZ);
+      fscal mZ = fZ + 0.5 * (bZ - fZ);
+      mSlice.SetZ(mZ);
+
+      fieldFitter.FitSlice(fZ, parBx[0], parBy[0], parBz[0]);
+      fieldFitter.FitSlice(mZ, parBx[1], parBy[1], parBz[1]);
+      fieldFitter.FitSlice(bZ, parBx[2], parBy[2], parBz[2]);
+
+      std::vector<std::vector<T> > parBxT(3), parByT(3), parBzT(3);
+      for (int i = 0; i < 3; i++) {
+         parBxT[i].assign(parBx[i].begin(), parBx[i].end());
+         parByT[i].assign(parBy[i].begin(), parBy[i].end());
+         parBzT[i].assign(parBz[i].begin(), parBz[i].end());
+      }
+
+      fSlice.SetCoefficients(parBxT[0], parByT[0], parBzT[0]);
+      mSlice.SetCoefficients(parBxT[1], parByT[1], parBzT[1]);
+      bSlice.SetCoefficients(parBxT[2], parByT[2], parBzT[2]);
+      sg.SetFieldSliceFront(fSlice);
+      sg.SetFieldSliceMiddle(mSlice);
+      sg.SetFieldSliceBack(bSlice);
+      // end Magnetic field approximation for the station group
+
       layout.AddStationGroup(sg);
    } // loop over station groups
 }
@@ -608,21 +633,21 @@ void CbmLitEnvironment::GetTrdLayout(
       virtualPlane.Z = Z;
       // Fit the field at Z position of the substation
       std::vector<double> parBx, parBy, parBz;
-      virtualPlane.fieldSlice.Z = virtualPlane.Z;
+      virtualPlane.fieldSlice.SetZ(virtualPlane.Z);
       fieldFitter.FitSlice(Z, parBx, parBy, parBz);
-      for (int i = 0; i < N; i++) {
-         virtualPlane.fieldSlice.cx[i] = parBx[i];
-         virtualPlane.fieldSlice.cy[i] = parBy[i];
-         virtualPlane.fieldSlice.cz[i] = parBz[i];
-      }
+      std::vector<T> parBxT, parByT, parBzT;
+      parBxT.assign(parBx.begin(), parBx.end());
+      parByT.assign(parBy.begin(), parBy.end());
+      parByT.assign(parBz.begin(), parBz.end());
+      virtualPlane.fieldSlice.SetCoefficients(parBxT, parByT, parBzT);
+
       // Fit the field at Z between two virtual planes
-      virtualPlane.fieldSlice.Z = virtualPlane.Z + DZ/2.;
+      virtualPlane.fieldSlice.SetZ(virtualPlane.Z + DZ/2.);
       fieldFitter.FitSlice(Z+DZ/2., parBx, parBy, parBz);
-      for (int i = 0; i < N; i++) {
-         virtualPlane.fieldSliceMid.cx[i] = parBx[i];
-         virtualPlane.fieldSliceMid.cy[i] = parBy[i];
-         virtualPlane.fieldSliceMid.cz[i] = parBz[i];
-      }
+      parBxT.assign(parBx.begin(), parBx.end());
+      parByT.assign(parBy.begin(), parBy.end());
+      parByT.assign(parBz.begin(), parBz.end());
+      virtualPlane.fieldSliceMid.SetCoefficients(parBxT, parByT, parBzT);
 
       CbmLitMaterialInfo mat = trdMaterial[5]; //air material
       lit::parallel::LitMaterialInfo<T> m;

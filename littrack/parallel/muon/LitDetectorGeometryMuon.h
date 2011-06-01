@@ -31,8 +31,9 @@ public:
    /* Constructor */
    LitSubstationMuon():
       fZ(0.),
-      fMaterial(),
-      fFieldSlice() {}
+      fMaterial()
+//      fFieldSlice()
+   {}
 
    /* Destructor */
    virtual ~LitSubstationMuon() {}
@@ -59,21 +60,21 @@ public:
       fMaterial = material;
    }
 
-   /* @return field slice */
-   const LitFieldSlice<T>& GetFieldSlice() const {
-      return fFieldSlice;
-   }
-
-   /* Sets field slice
-    * @param Value */
-   void SetFieldSlice(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSlice = fieldSlice;
-   }
+//   /* @return field slice */
+//   const LitFieldSlice<T>& GetFieldSlice() const {
+//      return fFieldSlice;
+//   }
+//
+//   /* Sets field slice
+//    * @param Value */
+//   void SetFieldSlice(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSlice = fieldSlice;
+//   }
 
 private:
    T fZ; // Z position of the substation in [cm]
    LitMaterialInfo<T> fMaterial; // Material information of the substation
-   LitFieldSlice<T> fFieldSlice; // Magnetic field approximation
+//   LitFieldSlice<T> fFieldSlice; // Magnetic field approximation
 
 public:
    /* Operator << for convenient output to std::ostream */
@@ -86,7 +87,7 @@ public:
    /* @return std:string representation of the class */
    std::string ToStringShort() const {
       std::string str = ToString<T>(GetZ()) + "\n" + fMaterial.ToStringShort();
-      str += fFieldSlice.ToStringShort();
+//      str += fFieldSlice.ToStringShort();
       return str;
    }
 } _fvecalignment;
@@ -138,9 +139,21 @@ public:
       fType = type;
    }
 
+//   /* @return field slice */
+//   const LitFieldSlice<T>& GetFieldSlice() const {
+//      return fFieldSlice;
+//   }
+//
+//   /* Sets field slice
+//    * @param Value */
+//   void SetFieldSlice(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSlice = fieldSlice;
+//   }
+
 private:
    LitHitType fType; // Type of hits on the station
    std::vector<LitSubstationMuon<T> > fSubstations; // Array with substations in the station
+//   LitFieldSlice<T> fFieldSlice; // Magnetic field approximation in the middle of the station
 
 public:
    /* Operator << for convenient output to std::ostream */
@@ -180,6 +193,7 @@ public:
       fZ(0.),
       fMaterial(),
       fFieldSliceFront(),
+      fFieldSliceMiddle(),
       fFieldSliceBack() {}
 
    /* Destructor */
@@ -218,6 +232,17 @@ public:
       fFieldSliceFront = fieldSlice;
    }
 
+   /* @return field slice in middle of the absorber */
+   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
+      return fFieldSliceMiddle;
+   }
+
+   /* Sets field slice in the middle of the absorber
+    * @param Value */
+   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
+      fFieldSliceMiddle = fieldSlice;
+   }
+
    /* @return field slice in back of the absorber */
    const LitFieldSlice<T>& GetFieldSliceBack() const {
       return fFieldSliceBack;
@@ -233,6 +258,7 @@ private:
    T fZ; // Z position of the absorber in [cm]
    LitMaterialInfo<T> fMaterial; // Absorber material
    LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front of the absorber
+   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle of the absorber
    LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back of the absorber
 
 public:
@@ -267,11 +293,47 @@ class LitStationGroupMuon
 public:
    /* Constructor */
    LitStationGroupMuon():
+      fFieldSliceFront(),
+      fFieldSliceMiddle(),
+      fFieldSliceBack(),
       fStations(),
       fAbsorber() {}
 
    /* Destructor */
    virtual ~LitStationGroupMuon() {}
+
+   /* @return field slice in front of the absorber */
+   const LitFieldSlice<T>& GetFieldSliceFront() const {
+      return fFieldSliceFront;
+   }
+
+   /* Sets field slice in front of the absorber
+    * @param Value */
+   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
+      fFieldSliceFront = fieldSlice;
+   }
+
+   /* @return field slice in middle of the absorber */
+   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
+      return fFieldSliceMiddle;
+   }
+
+   /* Sets field slice in the middle of the absorber
+    * @param Value */
+   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
+      fFieldSliceMiddle = fieldSlice;
+   }
+
+   /* @return field slice in back of the absorber */
+   const LitFieldSlice<T>& GetFieldSliceBack() const {
+      return fFieldSliceBack;
+   }
+
+   /* Sets field slice in front of the absorber
+    * @param Value */
+   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
+      fFieldSliceBack = fieldSlice;
+   }
 
    /* Adds station to the station group
     * @param station Station to be added */
@@ -301,7 +363,26 @@ public:
       fAbsorber = absorber;
    }
 
+   /* Calculates field region for the group of stations
+    * @param x X position
+    * @param y Y position
+    * @param field OUTPUT field region */
+   void GetFieldRegion(T x, T y, LitFieldRegion<T>& field) const {
+      LitFieldValue<T> v1, v2, v3;
+      fFieldSliceFront.GetFieldValue(x, y, v1);
+      fFieldSliceMiddle.GetFieldValue(x, y, v2);
+      fFieldSliceBack.GetFieldValue(x, y, v3);
+      field.Set(v1, fFieldSliceFront.GetZ(), v2, fFieldSliceMiddle.GetZ(), v3, fFieldSliceBack.GetZ());
+   }
+
 private:
+   // This field slices are used to construct LitFieldRegion
+   // in the group of stations. We need 3 values in order to use
+   // parabolic approximation. So the values are in front, middle
+   // and back of the gap.
+   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front
+   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle
+   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back
    std::vector<LitStationMuon<T> > fStations; // Array with stations
    LitAbsorber<T> fAbsorber; // Absorber
 

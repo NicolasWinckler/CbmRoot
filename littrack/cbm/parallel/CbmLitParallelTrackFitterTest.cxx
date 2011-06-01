@@ -64,13 +64,12 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
       const lit::parallel::LitStationGroupMuon<fscal>& stationGroup = fLayout.GetStationGroup(isg);
       //Propagation through the absorber
-      lit::parallel::LitFieldRegion<fscal> field;
-      lit::parallel::LitFieldValue<fscal> v1, v2;
+      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
       const lit::parallel::LitAbsorber<fscal>& absorber = stationGroup.GetAbsorber();
       absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
-      absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v2);
-      field.Set(v1, absorber.GetFieldSliceFront().Z, v2, absorber.GetFieldSliceBack().Z);
-      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(), field);
+      absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
+      absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
+      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
       lit::parallel::LitAddMaterial(lpar, absorber.GetMaterial());
       //propagate through the absorber using steps
       // first extrapolate input track parameters to the absorber
@@ -88,17 +87,14 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
       //end propagate through the absorber using steps
 
       //Approximate the field between the absorbers
-      const lit::parallel::LitSubstationMuon<fscal>& ss1 = stationGroup.GetStation(0).GetSubstation(0);
-      const lit::parallel::LitSubstationMuon<fscal>& ss2 = stationGroup.GetStation(1).GetSubstation(0);
-      ss1.GetFieldSlice().GetFieldValue(lpar.X, lpar.Y, v1);
-      ss2.GetFieldSlice().GetFieldValue(lpar.X, lpar.Y, v2);
-      field.Set(v1, ss1.GetFieldSlice().Z, v2, ss2.GetFieldSlice().Z);
+      lit::parallel::LitFieldRegion<fscal> field;
+      stationGroup.GetFieldRegion(lpar.X, lpar.Y, field);
       for (unsigned char ist = 0; ist < stationGroup.GetNofStations(); ist++) {
          const lit::parallel::LitStationMuon<fscal>& station = stationGroup.GetStation(ist);
          for (unsigned char iss = 0; iss < station.GetNofSubstations(); iss++) {
             const lit::parallel::LitSubstationMuon<fscal>& substation = station.GetSubstation(iss);
-            // Propagation through station
 
+            // Propagation through station
             lit::parallel::LitRK4Extrapolation(lpar, substation.GetZ(), field);
             lit::parallel::LitAddMaterial(lpar, substation.GetMaterial());
 

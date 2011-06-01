@@ -238,11 +238,13 @@ private:
    /* Divides two histograms.
     * @param histo1 numerator
     * @param histo2 denominator
-    * @param histo3 output histogram */
+    * @param histo3 output histogram
+    * @param c coefficient*/
    void DivideHistos(
       TH1* histo1,
       TH1* histo2,
-      TH1* histo3);
+      TH1* histo3,
+      Double_t c);
 
    /* Calculates efficiency histograms. */
    void CalculateEfficiencyHistos();
@@ -320,6 +322,14 @@ private:
       TH1* histRec,
       TH1* histAcc,
       const std::string& opt);
+
+   /* Draw mean efficiency lines (up to 4) on the histogramm */
+   void DrawMeanEfficiencyLines(
+      TH1* h,
+      Double_t eff1,
+      Double_t eff2 = -1.,
+      Double_t eff3 = -1.,
+      Double_t eff4 = -1.);
 
    /* Draws histograms for hits */
    void DrawHitsHistos();
@@ -450,6 +460,11 @@ private:
    TH1F* fhRecGhostNh;
    // RICH: ghost rings (number of hits dependence)
    TH1F* fhRichGhostNh;
+   // RICH: ghost rings after STS matching (number of hits dependence)
+   TH1F* fhRichGhostStsMatchingNh;
+   // STS: ghost tracks after RICH matching (number of hits dependence)
+   TH1F* fhStsGhostRichMatchingNh;
+
 
    // RICH performance histograms
    std::vector<std::vector<TH1F*> > fhRichMom;// RICH: momentum dependence

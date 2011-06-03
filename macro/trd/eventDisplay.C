@@ -1,5 +1,17 @@
 eventDisplay()
 {
+
+  // ========================================================================
+  // geometry selection for sim + reco  by Cyrano
+  // ========================================================================
+  ifstream whichTrdGeo;
+  whichTrdGeo.open("whichTrdGeo",ios::in);
+  TString digipar;
+  if (whichTrdGeo) whichTrdGeo >> digipar;
+  cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
+  whichTrdGeo.close();
+  if (digipar.Length() == 0) digipar = "trd_standard";
+
    // Load basic libraries
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -36,16 +48,21 @@ eventDisplay()
   parIo1->open("data/params.root");
   rtdb->setFirstInput(parIo1);
 
+  TString paramDir = gSystem->Getenv("VMCWORKDIR");
+  paramDir += "/parameters";
+  TString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
+
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-  parIo2->open("./trd.digi.par","in");
+  cout << "-I- CbmTrdDigiPar: Using file " << trdDigiFile << endl;
+  parIo2->open(trdDigiFile, "in");
   rtdb->setSecondInput(parIo2);
   // ------------------------------------------------------------------------
 
-  FairEventManager *fMan= new FairEventManager();
-  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *TrdPoints =   new FairMCPointDraw ("TrdPoint",kBlue,  kFullSquare);
-  CbmPixelHitSetDraw *TrdHits =   new CbmPixelHitSetDraw ("TrdHit",kRed,  kFullSquare);
-  CbmTrdDigiDraw *TrdDigis =   new CbmTrdDigiDraw("TrdDigi",kGreen, kFullSquare);
+  FairEventManager   *fMan      = new FairEventManager   ();
+  FairMCTracks       *Track     = new FairMCTracks       ("Monte-Carlo Tracks");
+  FairMCPointDraw    *TrdPoints = new FairMCPointDraw    ("TrdPoint",kBlue , kFullSquare);
+  CbmPixelHitSetDraw *TrdHits   = new CbmPixelHitSetDraw ("TrdHit"  ,kRed  , kFullSquare);
+  CbmTrdDigiDraw     *TrdDigis  = new CbmTrdDigiDraw     ("TrdDigi" ,kGreen, kFullSquare);
 
   // ugly version to switch of the drawing of digis in layers which are not visible
   // in the eventdisplay.
@@ -67,12 +84,12 @@ eventDisplay()
   TrdDigis->SetLayerStation3(kTRUE,kTRUE,kTRUE,kTRUE);
                                                      
   fMan->AddTask(Track);
-  
   fMan->AddTask(TrdPoints);
   fMan->AddTask(TrdHits);
   fMan->AddTask(TrdDigis);
     
   fMan->Init();                    
 
-  gGeoManager->SetVisLevel(3);
+  // Automatic visible depth is disabled
+  //  gGeoManager->SetVisLevel(3);
 }

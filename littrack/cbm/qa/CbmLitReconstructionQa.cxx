@@ -1345,7 +1345,7 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
       DivideHistos(fhStsRichTrdTofMomElId[i][rec], fhStsRichTrdTofMomElId[i][acc], fhStsRichTrdTofMomElId[i][EFF], c);
    }
 
-   Int_t nofEvents = fhEventNo->GetEntries();
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
    fhMvdNofHitsInStation->Scale(1./nofEvents);
    fhStsNofHitsInStation->Scale(1./nofEvents);
    fhTrdNofHitsInStation->Scale(1./nofEvents);
@@ -1617,7 +1617,7 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
    ss6.precision(3);
    Int_t w = 17;
 
-   Int_t nofEvents = fhEventNo->GetEntries();
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
    ss1 << allEff << "("<< allRec/nofEvents << "/" << allAcc/nofEvents << ")";
    ss2 << refEff << "("<< refRec/nofEvents << "/" << refAcc/nofEvents << ")";
    ss3 << primEff << "(" << primRec/nofEvents << "/" << primAcc/nofEvents << ")";
@@ -1679,7 +1679,7 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsRichToString(
    ss6.precision(3);
    Int_t w = 17;
 
-   Int_t nofEvents = fhEventNo->GetEntries();
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
    ss1 << allEff << "(" << allRec/nofEvents << "/" << allAcc/nofEvents << ")";
    ss2 << allRefEff << "(" << allRefRec/nofEvents << "/" << allRefAcc/nofEvents << ")";
    ss3 << elEff << "(" << elRec/nofEvents << "/" << elAcc/nofEvents << ")";
@@ -1701,7 +1701,7 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsRichToString(
 void CbmLitReconstructionQa::PrintGhostStatistics(
    std::ostream& out)
 {
-	Int_t nofEvents = fhEventNo->GetEntries();
+	Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
 	Double_t stsGhosts = fhStsGhostNh->GetEntries() / nofEvents;
 	Double_t recGhosts = fhRecGhostNh->GetEntries() / nofEvents;
 	Double_t richGhosts = fhRichGhostNh->GetEntries() / nofEvents;
@@ -1740,7 +1740,7 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsElIdToString(
    ss2.precision(3);
    Int_t w = 17;
 
-   Int_t nofEvents = fhEventNo->GetEntries();
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
    ss1 << elEff << "("<< elRec/nofEvents << "/" << elAcc/nofEvents << ")";
    ss2 << piSupp << "("<< piAcc/nofEvents << "/" << piRec/nofEvents << ")";
 

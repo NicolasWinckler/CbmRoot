@@ -44,7 +44,8 @@ void create_digipar(TString geomFile="trd_squared_modules.geo", Int_t nEvents = 
   TString outFile = "data/test.eds." + fileName + ".root";
 
   // Digi Parameter Output File
-  TString digiFile = fileName + ".digi.par";
+  TString digiFile = fileName + ".digi.par.long";
+  //  TString digiFile = fileName + ".digi.par";
 
   // In general, the following parts need not be touched
   // ========================================================================

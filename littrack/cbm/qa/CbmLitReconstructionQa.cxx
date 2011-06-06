@@ -150,6 +150,7 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fhRecGhostNh(NULL),
    fhRichGhostNh(NULL),
    fhRichGhostStsMatchingNh(NULL),
+   fhRichGhostElIdNh(NULL),
    fhStsGhostRichMatchingNh(NULL),
 
    fhRichMom(),
@@ -451,6 +452,8 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       Bool_t isTofOk = tofId > -1 && fIsTof;
       Bool_t isRichOk = richId > -1 && fIsRich;
 
+
+
       // check the quality of track segments
       CbmTrackMatch* stsTrackMatch;
       if (isStsOk) {
@@ -509,10 +512,19 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
          if (!isRichOk) { // ghost ring
             fhRichGhostNh->Fill(nofHits);
 
-            // calculate number of ghost after STS matching
+            // calculate number of ghost after STS matching and electron identification
             CbmRichRing* ring = static_cast<CbmRichRing*>(fRichRings->At(richId));
             if (NULL != ring){
                if (ring->GetDistance() < 1.) fhRichGhostStsMatchingNh->Fill(nofHits);
+
+               Double_t momentumMc = 0.;
+               if (stsTrackMatch!=NULL){
+                  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(stsTrackMatch->GetMCTrackId());
+                  if (mcTrack != NULL) momentumMc = mcTrack->GetP();
+                }
+               std::cout << momentumMc << std::endl;
+                if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
+                   fhRichGhostElIdNh->Fill(nofHits);
             }
          }
       }
@@ -1148,18 +1160,21 @@ void CbmLitReconstructionQa::CreateHistos(
 	   fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
 	   fhRichGhostNh = new TH1F("hRichGhostNh", "RICH: ghost rings", nBinsNofPoints, minNofPoints, maxNofPoints);
       fhRichGhostStsMatchingNh = new TH1F("fhRichGhostStsMatchingNh", "RICH: ghost rings", nBinsNofPoints, minNofPoints, maxNofPoints);
+      fhRichGhostElIdNh = new TH1F("fhRichGhostElIdNh", "RICH: ghost rings", nBinsNofPoints, minNofPoints, maxNofPoints);
       fhStsGhostRichMatchingNh = new TH1F("fhStsGhostRichMatchingNh", "STS: ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
    } else {
 	   fhStsGhostNh = (TH1F*)file->Get("hStsGhostNh");
 	   fhRecGhostNh = (TH1F*)file->Get("hRecGhostNh");
 	   fhRichGhostNh = (TH1F*)file->Get("hRichGhostNh");
       fhRichGhostStsMatchingNh = (TH1F*)file->Get("fhRichGhostStsMatchingNh");
+      fhRichGhostElIdNh = (TH1F*)file->Get("fhRichGhostElIdNh");
       fhStsGhostRichMatchingNh = (TH1F*)file->Get("fhStsGhostRichMatchingNh");
    }
    fHistoList->Add(fhStsGhostNh);
    fHistoList->Add(fhRecGhostNh);
    fHistoList->Add(fhRichGhostNh);
    fHistoList->Add(fhRichGhostStsMatchingNh);
+   fHistoList->Add(fhRichGhostElIdNh);
    fHistoList->Add(fhStsGhostRichMatchingNh);
 
    const UInt_t maxNofStations = 30;
@@ -1707,6 +1722,7 @@ void CbmLitReconstructionQa::PrintGhostStatistics(
 	Double_t richGhosts = fhRichGhostNh->GetEntries() / nofEvents;
    Double_t richGhostsStsMatching = fhRichGhostStsMatchingNh->GetEntries() / nofEvents;
    Double_t stsGhostsRichMatching = fhStsGhostRichMatchingNh->GetEntries() / nofEvents;
+   Double_t richGhostsElId = fhRichGhostElIdNh->GetEntries() / nofEvents;
 
 	out.precision(3);
 	out << "Ghosts per events:";
@@ -1717,6 +1733,8 @@ void CbmLitReconstructionQa::PrintGhostStatistics(
 	   out << std::endl;
 	   out << "after STS-RICH matching: STS=" << stsGhostsRichMatching;
 	   out << " RICH=" << richGhostsStsMatching;
+	   out << std::endl;
+      out << "after STS-RICH matching and el identification: RICH=" << richGhostsElId;
 	}
 	out << std::endl;
 }

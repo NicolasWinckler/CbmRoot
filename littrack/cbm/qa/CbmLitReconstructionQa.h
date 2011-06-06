@@ -462,6 +462,8 @@ private:
    TH1F* fhRichGhostNh;
    // RICH: ghost rings after STS matching (number of hits dependence)
    TH1F* fhRichGhostStsMatchingNh;
+   // RICH: ghost rings after STS matching and electron identification (number of hits dependence)
+   TH1F* fhRichGhostElIdNh;
    // STS: ghost tracks after RICH matching (number of hits dependence)
    TH1F* fhStsGhostRichMatchingNh;
 

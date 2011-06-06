@@ -24,6 +24,9 @@
 #include "Riostream.h"
 #include <fstream>
 #include <cmath>
+
+#define winsize 6000
+
 using std::cout;
 using std::cin;
 using std::endl;
@@ -154,15 +157,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   TCanvas* c2 = NULL;
   TCanvas* c0 = new TCanvas("c0","c0",1800,450);	
   c0->Divide(3,1);
-  Topview[0] = new TH2F("TopView","TopView",    int(18000/mm2bin),-9000, 9000,int(12000/mm2bin),    0,12000);
+  Topview[0] = new TH2F("TopView","TopView",    int(2* winsize /mm2bin), -winsize, winsize, int(12000 /mm2bin),    0, 12000);
   Topview[0]->SetXTitle("x-Coordinate [mm]");
   Topview[0]->SetYTitle("z-Coordinate [mm]");
   Topview[0]->SetZTitle("#");
-  Topview[1] = new TH2F("FrontView","FrontView",int(18000/mm2bin),-9000, 9000,int(18000/mm2bin),-9000, 9000);
+  Topview[1] = new TH2F("FrontView","FrontView",int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
   Topview[1]->SetXTitle("x-Coordinate [mm]");
   Topview[1]->SetYTitle("y-Coordinate [mm]");
   Topview[1]->SetZTitle("#");
-  Topview[2] = new TH2F("SideView","SideView",  int(12000/mm2bin),    0,12000,int(18000/mm2bin),-9000, 9000);
+  Topview[2] = new TH2F("SideView","SideView",  int(12000 /mm2bin),    0, 12000, int(2* winsize /mm2bin), -winsize, winsize);
   Topview[2]->SetXTitle("z-Coordinate [mm]");
   Topview[2]->SetYTitle("y-Coordinate [mm]");
   Topview[2]->SetZTitle("#");
@@ -310,7 +313,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   cout << title << endl;
   //sprintf(Canfile1,"pics/Station%dLayer%d.png",fStation,fLayer);
   //sprintf(Canfile2,"pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,int(18000/mm2bin),-9000,9000,int(18000/mm2bin),-9000,9000);
+  Layer = new TH2F(name,title,int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -687,17 +690,17 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 			  Layer->Fill(-1 * stepX*mm2bin,-1 * stepY*mm2bin,HiteRate);
 			  */
 			  
-			    Layer->SetBinContent(     stepX+int(9000/mm2bin),      stepY+int(9000/mm2bin), HiteRate);
-			    Layer->SetBinContent(-1 * stepX+int(9000/mm2bin),      stepY+int(9000/mm2bin), HiteRate);
-			    Layer->SetBinContent(     stepX+int(9000/mm2bin), -1 * stepY+int(9000/mm2bin), HiteRate);
-			    Layer->SetBinContent(-1 * stepX+int(9000/mm2bin), -1 * stepY+int(9000/mm2bin), HiteRate);
+			    Layer->SetBinContent(     stepX+int( winsize /mm2bin),      stepY+int( winsize /mm2bin), HiteRate);
+			    Layer->SetBinContent(-1 * stepX+int( winsize /mm2bin),      stepY+int( winsize /mm2bin), HiteRate);
+			    Layer->SetBinContent(     stepX+int( winsize /mm2bin), -1 * stepY+int( winsize /mm2bin), HiteRate);
+			    Layer->SetBinContent(-1 * stepX+int( winsize /mm2bin), -1 * stepY+int( winsize /mm2bin), HiteRate);
 			  
 			}
 		    }
 		  else
 		    {
 		      //Layer->Fill(     stepX*mm2bin,     stepY*mm2bin,HiteRate);
-		      Layer->SetBinContent(stepX+int(9000/mm2bin), stepY+int(9000/mm2bin), HiteRate);
+		      Layer->SetBinContent(stepX+int( winsize /mm2bin), stepY+int( winsize /mm2bin), HiteRate);
 		    }
 		}
 	    }

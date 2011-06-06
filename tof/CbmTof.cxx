@@ -87,7 +87,7 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
        ) {
 
     fTrackID       = gMC->GetStack()->GetCurrentTrackNumber();
-    Volname = vol->getName();
+    Volname = vol->GetName();
     region = Volname[5]-'0';
     gMC->CurrentVolID(gap);
     gMC->CurrentVolOffID(1, cell);

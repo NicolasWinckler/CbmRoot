@@ -82,21 +82,21 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 //                    { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * Layer_number) }, 
 //  		      { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * Layer_number) } };
 
-  // v01, v02 // no tilting
-  float rot[12][4]={ { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-		       	     	       	       	     
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-		       	     	       	       	     
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. } };
+//  // v01, v02 // no tilting
+//  float rot[12][4]={ { 1500., 0., 0., 0. }, 
+//                     { 1500., 0., 0., 0. }, 
+//                     { 1500., 0., 0., 0. }, 
+//                     { 1500., 0., 0., 0. }, 
+//		       	     	       	       	     
+//                     { 2500., 0., 0., 0. }, 
+//                     { 2500., 0., 0., 0. }, 
+//                     { 2500., 0., 0., 0. }, 
+//                     { 2500., 0., 0., 0. }, 
+//		       	     	       	       	     
+//                     { 3500., 0., 0., 0. }, 
+//                     { 3500., 0., 0., 0. }, 
+//                     { 3500., 0., 0., 0. }, 
+//                     { 3500., 0., 0., 0. } };
 
 //  // hardcoded tilt position for the layers in stations 1, 2, 3 - kink position, angle
 //  // v03 // tilt around each layer front
@@ -132,21 +132,21 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 //                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
 //                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 } };
 
-//  // v05 // tilt around each layer front
-//  float rot[12][4]={ { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
-//                     { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
-//	   	        
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
-//	   	        
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
-//                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 }, 
-//                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 } };
+  // v05 // tilt around each layer front
+  float rot[12][4]={ { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
+                     { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
+	   	        
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
+	   	        
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
+                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 }, 
+                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 } };
 
   float ve1[3];   // buffer vector
   float ve2[3];   // buffer vector
@@ -228,13 +228,19 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
   bool four_digits = true;    // use 4-digit copy notation encoding the layer
   //  bool four_digits = false;   // use 4-digit copy notation encoding the layer
 
-  bool first_time_Module1 = true;
-  bool first_time_Module2 = true;
-  bool first_time_Module3 = true;
+  bool first_time_Module10 = true;
+  bool first_time_Module11 = true;
+  bool first_time_Module20 = true;
+  bool first_time_Module21 = true;
+  bool first_time_Module30 = true;
+  bool first_time_Module31 = true;
 
-  int Copy_number_Module1 = 1;
-  int Copy_number_Module2 = 1;
-  int Copy_number_Module3 = 1;
+  int Copy_number_Module10 = 1;
+  int Copy_number_Module11 = 1;
+  int Copy_number_Module20 = 1;
+  int Copy_number_Module21 = 1;
+  int Copy_number_Module30 = 1;
+  int Copy_number_Module31 = 1;
   int copy_number;
 
   float  Active_area_x[3];
@@ -341,27 +347,40 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
 
   for (int i=0; i< Chamber_number; i++){
 
-    int module_number = (int)Position_Station1[i][2];
+    int module_number = (int)Position_Station1[i][2] * 10 + Layer_number %2;
+//    int module_number = (int)Position_Station1[i][2];
     int j = (int)Position_Station1[i][2]-1;
 
 // define modules only for first layer per station
 // requires 4-digit notation
-    if ( (first_time_Module1 && ( module_number == 1 ) && ( Layer_number == 0 )) ||
-         (first_time_Module2 && ( module_number == 2 ) && ( Layer_number == 0 )) ||
-         (first_time_Module3 && ( module_number == 3 ) && ( Layer_number == 0 ))) {
+    if ( (first_time_Module10 && ( module_number == 10 ) && ( Layer_number == 0 )) ||
+         (first_time_Module11 && ( module_number == 11 ) && ( Layer_number == 1 )) ||
+         (first_time_Module20 && ( module_number == 20 ) && ( Layer_number == 0 )) ||
+         (first_time_Module21 && ( module_number == 21 ) && ( Layer_number == 1 )) ||
+         (first_time_Module30 && ( module_number == 30 ) && ( Layer_number == 0 )) ||
+         (first_time_Module31 && ( module_number == 31 ) && ( Layer_number == 1 ))) {
 
 //    if ( (first_time_Module1 && ( module_number == 1 )) ||
 //         (first_time_Module2 && ( module_number == 2 )) ||
 //         (first_time_Module3 && ( module_number == 3 ))) {
 
-      if (first_time_Module1 && ( module_number == 1 ) ) {
-        copy_number = Copy_number_Module1;
+      if (first_time_Module10 && ( module_number == 10 ) ) {
+        copy_number = Copy_number_Module10;
       }
-      if (first_time_Module2 && ( module_number == 2 ) ) {
-        copy_number = Copy_number_Module2;
+      if (first_time_Module11 && ( module_number == 11 ) ) {
+        copy_number = Copy_number_Module11;
       }
-      if (first_time_Module3 && ( module_number == 3 ) ) {
-        copy_number = Copy_number_Module3;
+      if (first_time_Module20 && ( module_number == 20 ) ) {
+        copy_number = Copy_number_Module20;
+      }
+      if (first_time_Module21 && ( module_number == 21 ) ) {
+        copy_number = Copy_number_Module21;
+      }
+      if (first_time_Module30 && ( module_number == 30 ) ) {
+        copy_number = Copy_number_Module30;
+      }
+      if (first_time_Module31 && ( module_number == 31 ) ) {
+        copy_number = Copy_number_Module31;
       }
   
       printf("Bin zum ersten mal hier. \n");
@@ -429,7 +448,8 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
       fprintf(geofile,"//*********************************\n");
   
       fprintf(geofile,"//*********************************\n");
-      fprintf(geofile,"trd%dmod%dgas\n",Station_number, module_number);
+      fprintf(geofile,"trd%dmod%dgas\n",Station_number, module_number/10);  // fix for CbmTrdGeoHandler
+      //      fprintf(geofile,"trd%dmod%dgas\n",Station_number, module_number);
 
       if (four_digits)
         // module numbering by 4-digit copy number
@@ -669,7 +689,8 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
         fprintf(geofile,"//*********************************\n");
 
 // 2011 fee volume
-      float fee_thickness =  50.; 
+//      float fee_thickness =  50.; 
+      float fee_thickness =  80.; 
 
       fprintf(geofile,"//*********************************\n");
       fprintf(geofile,"trd%dmod%dfee\n",Station_number, module_number);
@@ -693,21 +714,22 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
       fprintf(geofile,"%f %f %f\n",-Detector_size_x[j] /2 , Detector_size_y[j] /2 ,  fee_thickness/2);
       fprintf(geofile,"%f %f %f\n",-Detector_size_x[j] /2 ,-Detector_size_y[j] /2 ,  fee_thickness/2);
 
-      fprintf(geofile,"%f %f %f\n", 0., 0., 0.);
+      fprintf(geofile,"%f %f %f\n", 0., 0., 15.);   // thickness =  80.
+      //      fprintf(geofile,"%f %f %f\n", 0., 0., 0.);   // thickness =  50.
 
-      if (Station_number % 2 == 0) {
-        //horizontal position of pads - vertical febs
+      if ((Layer_number %2) == 0) {
+        // vertical position of pads - horizontal febs
         fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
       } 
       else {
-        // vertical position of pads - horizontal febs
+        // horizontal position of pads - vertical febs
         fprintf(geofile,"0.  1.  0.  -1.  0.  0.  0.  0.  1.\n");
       }
       fprintf(geofile,"//*********************************\n");
 
 // 2011 febs
 //      int   feb_number    = 1;
-      float feb_thickness = 4.; 
+      float feb_thickness = 2.;  // 2mm is Spadic Rev3 PCB thickness 
 
 // feb#1
       fprintf(geofile,"//*********************************\n");
@@ -771,32 +793,93 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
 
       fprintf(geofile,"//*********************************\n");
 
+// feb#6
+      fprintf(geofile,"//*********************************\n");
+      fprintf(geofile,"trd%dmod%dfeb#%d\n",Station_number, module_number, 6);
+      fprintf(geofile,"trd%dmod%dfee\n",Station_number, module_number);
+
+      fprintf(geofile,"%f %f %f\n", 0., 150., 0.);
+      fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+
+      fprintf(geofile,"//*********************************\n");
+
+// feb#7
+      fprintf(geofile,"//*********************************\n");
+      fprintf(geofile,"trd%dmod%dfeb#%d\n",Station_number, module_number, 7);
+      fprintf(geofile,"trd%dmod%dfee\n",Station_number, module_number);
+
+      fprintf(geofile,"%f %f %f\n", 0., -150., 0.);
+      fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+
+      fprintf(geofile,"//*********************************\n");
+
+// feb#8
+      fprintf(geofile,"//*********************************\n");
+      fprintf(geofile,"trd%dmod%dfeb#%d\n",Station_number, module_number, 8);
+      fprintf(geofile,"trd%dmod%dfee\n",Station_number, module_number);
+
+      fprintf(geofile,"%f %f %f\n", 0., 200., 0.);
+      fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+
+      fprintf(geofile,"//*********************************\n");
+
+// feb#9
+      fprintf(geofile,"//*********************************\n");
+      fprintf(geofile,"trd%dmod%dfeb#%d\n",Station_number, module_number, 9);
+      fprintf(geofile,"trd%dmod%dfee\n",Station_number, module_number);
+
+      fprintf(geofile,"%f %f %f\n", 0., -200., 0.);
+      fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+
+      fprintf(geofile,"//*********************************\n");
+
       }
 
-      if (first_time_Module1 && ( module_number == 1 )) {
-        first_time_Module1=false;
-        Copy_number_Module1 = copy_number+1 ;
+      if (first_time_Module10 && ( module_number == 10 )) {
+        first_time_Module10=false;
+        Copy_number_Module10 = copy_number+1 ;
       }
-      if (first_time_Module2 && ( module_number == 2 ) ) {
-        first_time_Module2=false;
-        Copy_number_Module2 = copy_number+1 ;
+      if (first_time_Module11 && ( module_number == 11 )) {
+        first_time_Module11=false;
+        Copy_number_Module11 = copy_number+1 ;
       }
-      if (first_time_Module3 && ( module_number == 3 ) ) {
-        first_time_Module3=false;
-        Copy_number_Module3 = copy_number+1 ;
+      if (first_time_Module20 && ( module_number == 20 ) ) {
+        first_time_Module20=false;
+        Copy_number_Module20 = copy_number+1 ;
+      }
+      if (first_time_Module21 && ( module_number == 21 ) ) {
+        first_time_Module21=false;
+        Copy_number_Module21 = copy_number+1 ;
+      }
+      if (first_time_Module30 && ( module_number == 30 ) ) {
+        first_time_Module30=false;
+        Copy_number_Module30 = copy_number+1 ;
+      }
+      if (first_time_Module31 && ( module_number == 31 ) ) {
+        first_time_Module31=false;
+        Copy_number_Module31 = copy_number+1 ;
       }
 
     }
     else {
 
-      if ( module_number == 1 ) {
-        copy_number = Copy_number_Module1;
+      if ( module_number == 10 ) {
+        copy_number = Copy_number_Module10;
       } 
-      else if ( module_number == 2 ) {
-        copy_number = Copy_number_Module2;
+      else if ( module_number == 11 ) {
+        copy_number = Copy_number_Module11;
       } 
-      else if ( module_number == 3 ) {
-        copy_number = Copy_number_Module3;
+      else if ( module_number == 20 ) {
+        copy_number = Copy_number_Module20;
+      } 
+      else if ( module_number == 21 ) {
+        copy_number = Copy_number_Module21;
+      } 
+      else if ( module_number == 30 ) {
+        copy_number = Copy_number_Module30;
+      } 
+      else if ( module_number == 31 ) {
+        copy_number = Copy_number_Module31;
       } 
       else {
         printf("There is something wrong. We don't have more than three different detector sizes\n");
@@ -823,14 +906,23 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
 
       fprintf(geofile,"//*********************************\n");
   
-      if ( module_number == 1 ) {
-        Copy_number_Module1 = copy_number+1 ;
+      if ( module_number == 10 ) {
+        Copy_number_Module10 = copy_number+1 ;
       }
-      if ( module_number == 2 ) {
-        Copy_number_Module2 = copy_number+1 ;
+      if ( module_number == 11 ) {
+        Copy_number_Module11 = copy_number+1 ;
       }
-      if ( module_number == 3 ) {
-        Copy_number_Module3 = copy_number+1 ;
+      if ( module_number == 20 ) {
+        Copy_number_Module20 = copy_number+1 ;
+      }
+      if ( module_number == 21 ) {
+        Copy_number_Module21 = copy_number+1 ;
+      }
+      if ( module_number == 30 ) {
+        Copy_number_Module30 = copy_number+1 ;
+      }
+      if ( module_number == 31 ) {
+        Copy_number_Module31 = copy_number+1 ;
       }
   
     }

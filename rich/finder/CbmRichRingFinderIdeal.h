@@ -58,8 +58,10 @@ class CbmRichRingFinderIdeal : public CbmRichRingFinder
    **
    *@value Number of tracks created
    **/
- virtual Int_t DoFind(TClonesArray* hitArray, TClonesArray* projArray,
-		      TClonesArray* ringArray);
+ virtual Int_t DoFind(
+       TClonesArray* hitArray,
+       TClonesArray* projArray,
+		 TClonesArray* ringArray);
 
 
  private:

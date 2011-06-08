@@ -99,7 +99,6 @@ If(TBB_FOUND)
   Set(RICH_SRCS 
       ${RICH_SRCS}
       finder/CbmRichRingFinderHoughParallel.cxx
-      finder/CbmRichRingFinderHoughParallelImpl.cxx
      )
 EndIf(TBB_FOUND)
 

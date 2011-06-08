@@ -1,20 +1,23 @@
-// --------------------------------------------------------------------------------------
-// CbmRichRingFinderHough source file
-// Base class for ring finders based on Hough Transform method
-// Implementation: Semen Lebedev (s.lebedev@gsi.de)
+/** CbmRichRingFinderHough.cxx
+ * @author Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2007
+ * @version 2.0
+ **/
 
 #include "CbmRichRingFinderHough.h"
 #include "CbmRichRingFinderHoughImpl.h"
 //#include "CbmRichRingFinderHoughSimd.h"
 //#include "../../littrack/utils/CbmLitMemoryManagment.h"
-
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "FairTrackParam.h"
+#include "CbmRichRingFitterCOPLight.h"
+#include "CbmRichRingSelectNeuralNet.h"
 
 #include "TString.h"
 #include "TStopwatch.h"
 #include "TSystem.h"
+#include "TClonesArray.h"
 
 #include <iostream>
 #include <cmath>
@@ -22,17 +25,15 @@
 #include <algorithm>
 #include <fstream>
 
-
 using std::cout;
 using std::endl;
 using std::vector;
 
-// -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometry )
+CbmRichRingFinderHough::CbmRichRingFinderHough(
+      Int_t verbose,
+      TString geometry)
 {
 	//FIXME: remove geometry type from function parameters
-
-    cout << "-I- CbmRichRingFinderHough constructor"<<endl;
     fRingCount = 0;
     fNEvent = 0;
 
@@ -54,20 +55,20 @@ CbmRichRingFinderHough::CbmRichRingFinderHough()
 {
 }
 
-// -----   Destructor   ----------------------------------------------------
 CbmRichRingFinderHough::~CbmRichRingFinderHough()
 {
 	delete fHTImpl;
 }
 
-Int_t CbmRichRingFinderHough::DoFind(const vector<CbmRichHoughHit>& data)
+Int_t CbmRichRingFinderHough::DoFind(
+      const vector<CbmRichHoughHit>& data)
 {
 	fNEvent++;
 	if (fVerbose) cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
 
 	std::vector<CbmRichHoughHit> UpH;
 	std::vector<CbmRichHoughHit> DownH;
-    fRingCount = 0;
+   fRingCount = 0;
 
 	UpH.reserve(data.size()/2);
 	DownH.reserve(data.size()/2);
@@ -91,9 +92,10 @@ Int_t CbmRichRingFinderHough::DoFind(const vector<CbmRichHoughHit>& data)
 	DownH.clear();
 }
 
-Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
-                                         TClonesArray* rProjArray,
-                                         TClonesArray* rRingArray)
+Int_t CbmRichRingFinderHough::DoFind(
+      TClonesArray* rHitArray,
+      TClonesArray* rProjArray,
+      TClonesArray* rRingArray)
 {
 	TStopwatch timer;
 
@@ -104,26 +106,27 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	std::vector<CbmRichHoughHit> DownH;
     fRingCount = 0;
 
-	if (!rHitArray) {
+	if (NULL == rHitArray) {
 		cout << "-E- CbmRichRingFinderHough::DoFind: Hit array missing! "<< rHitArray << endl;
 		return -1;
 	}
 	const Int_t nhits = rHitArray->GetEntriesFast();
-	if (!nhits) {
+	if (nhits <= 0) {
 		cout << "-E- CbmRichRingFinderHough::DoFind: No hits in this event."	<< endl;
 		return -1;
 	}
+
 	UpH.reserve(nhits/2);
 	DownH.reserve(nhits/2);
 
+	// convert CbmRichHit to CbmRichHoughHit and
+	// sort hits according to the photodetector (up or down)
 	for(Int_t iHit = 0; iHit < nhits; iHit++) {
 		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
 		if (hit) {
 			CbmRichHoughHit tempPoint;
 			tempPoint.fHit.fX = hit->GetX();
 			tempPoint.fHit.fY = hit->GetY();
-			//outEvents << hit->GetX() << " " << hit->GetY() << endl;
-
 			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
 			tempPoint.fId = iHit;
 			tempPoint.fIsUsed = false;
@@ -151,15 +154,17 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	DownH.clear();
 	fExecTime += timer.CpuTime();
 
-	cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
-
-	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent << " ms" << endl;
+	cout << "CbmRichRingFinderHough: Number of output rings: "<<
+	      rRingArray->GetEntriesFast() << endl;
+	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent <<
+	      " ms" << endl;
 
 	return 1;
 }
 
-void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
-		std::vector<CbmRichRingLight*>& rings)
+void CbmRichRingFinderHough::AddRingsToOutputArray(
+      TClonesArray *rRingArray,
+		const vector<CbmRichRingLight*>& rings)
 {
 	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
 		if (rings[iRing]->GetRecFlag() == -1)	continue;
@@ -175,4 +180,5 @@ void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
 void CbmRichRingFinderHough::Finish()
 {
 }
+
 ClassImp(CbmRichRingFinderHough)

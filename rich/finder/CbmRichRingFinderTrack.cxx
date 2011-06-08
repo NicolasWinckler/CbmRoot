@@ -17,15 +17,9 @@
 using std::cout;
 using std::endl;
 
-CbmRichRingFinderTrack::CbmRichRingFinderTrack(Int_t verbose, TString geometry )
+CbmRichRingFinderTrack::CbmRichRingFinderTrack()
 {
-    cout << "-I- CbmRichRingFinderHoughBase constructor for " << geometry << " RICH geometry"<<endl;
-    if (geometry != "compact" && geometry != "large"){
-        geometry = "compact";
-        cout << "-E- CbmRichRingFinderHoughBase::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
-    }
-    //fGeometryType = geometry;
+
 }
 
 

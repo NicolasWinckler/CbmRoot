@@ -1,18 +1,30 @@
+/** CbmRichFuzzyKE.cxx
+ * @author Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2007
+ * @version 1.0
+ **/
+
 #include "CbmRichFuzzyKE.h"
+
 #include "TRandom.h"
-#include <iostream>
 #include "TH2D.h"
 #include "TCanvas.h"
 #include "TMarker.h"
 #include "TArc.h"
 #include "TMath.h"
+
+#include <iostream>
 using std::cout;
 using std::endl;
 
-CbmRichFuzzyKE::CbmRichFuzzyKE(){
+CbmRichFuzzyKE::CbmRichFuzzyKE()
+{
 	fQ = 2.;
 }
-Double_t CbmRichFuzzyKE::u(Int_t i, Int_t j)
+
+Double_t CbmRichFuzzyKE::u(
+      Int_t i,
+      Int_t j)
 {
 	Double_t K = fEllipses.size();
 	
@@ -24,7 +36,8 @@ Double_t CbmRichFuzzyKE::u(Int_t i, Int_t j)
 	return 1./sumDD;
 }
 
-Double_t CbmRichFuzzyKE::r(Int_t i)
+Double_t CbmRichFuzzyKE::r(
+      Int_t i)
 {
 	Double_t sum1 = 0;
 	Double_t sum2 = 0;	
@@ -39,7 +52,10 @@ Double_t CbmRichFuzzyKE::r(Int_t i)
 	return sum1 / sum2;
 }
 
-Double_t CbmRichFuzzyKE::teta(Int_t i, Int_t j, Int_t focus)
+Double_t CbmRichFuzzyKE::teta(
+      Int_t i,
+      Int_t j,
+      Int_t focus)
 {
 	Double_t xf;
 	Double_t yf;
@@ -69,7 +85,8 @@ Double_t CbmRichFuzzyKE::teta(Int_t i, Int_t j, Int_t focus)
 	}
 }
 
-Double_t CbmRichFuzzyKE::v11(Int_t i)
+Double_t CbmRichFuzzyKE::v11(
+      Int_t i)
 {
 	Double_t sum1 = 0;
 	Double_t sum2 = 0;
@@ -77,16 +94,15 @@ Double_t CbmRichFuzzyKE::v11(Int_t i)
 	
 	for (Int_t jN = 0; jN < N; jN++){
 		Double_t uij = fUNew[i][jN];//pow(u(i,jN), fQ);
-		
-		//cout << teta(i,jN,1) << " " ;
 		sum1 += uij * (fHits[jN].fX - (fRNew[i] - d2(i,jN)) * cos(teta(i,jN,1)) );
 		sum2 += uij;
 	}
-	//cout << endl;
+
 	return sum1/sum2;
 }
 
-Double_t CbmRichFuzzyKE::v12(Int_t i)
+Double_t CbmRichFuzzyKE::v12(
+      Int_t i)
 {
 	Double_t sum1 = 0;
 	Double_t sum2 = 0;
@@ -100,7 +116,8 @@ Double_t CbmRichFuzzyKE::v12(Int_t i)
 	return sum1/sum2;
 }
 
-Double_t CbmRichFuzzyKE::v21(Int_t i)
+Double_t CbmRichFuzzyKE::v21(
+      Int_t i)
 {
 	Double_t sum1 = 0;
 	Double_t sum2 = 0;
@@ -114,7 +131,8 @@ Double_t CbmRichFuzzyKE::v21(Int_t i)
 	return sum1/sum2;
 }
 
-Double_t CbmRichFuzzyKE::v22(Int_t i)
+Double_t CbmRichFuzzyKE::v22(
+      Int_t i)
 {
 	Double_t sum1 = 0;
 	Double_t sum2 = 0;
@@ -128,7 +146,9 @@ Double_t CbmRichFuzzyKE::v22(Int_t i)
 	return sum1/sum2;
 }
 
-Double_t CbmRichFuzzyKE::d1(Int_t i, Int_t j)
+Double_t CbmRichFuzzyKE::d1(
+      Int_t i,
+      Int_t j)
 {
 	Double_t xf1 = fEllipses[i].fV11;
 	Double_t yf1 = fEllipses[i].fV12;
@@ -138,7 +158,9 @@ Double_t CbmRichFuzzyKE::d1(Int_t i, Int_t j)
 	return result;
 }
 
-Double_t CbmRichFuzzyKE::d2(Int_t i, Int_t j)
+Double_t CbmRichFuzzyKE::d2(
+      Int_t i,
+      Int_t j)
 {
 	Double_t xf2 = fEllipses[i].fV21;
 	Double_t yf2 = fEllipses[i].fV22;
@@ -149,7 +171,9 @@ Double_t CbmRichFuzzyKE::d2(Int_t i, Int_t j)
 }
 
 // i-ellipse , j-hit
-Double_t CbmRichFuzzyKE::D(Int_t i, Int_t j)
+Double_t CbmRichFuzzyKE::D(
+      Int_t i,
+      Int_t j)
 {
 	Double_t radius = fEllipses[i].fR;
 	Double_t ri = d1(i,j) + d2(i,j) - radius;
@@ -180,26 +204,13 @@ void CbmRichFuzzyKE::Minimize(){
 			fU[iK][iN] = 1.;
 		}
 	}
-	/*cout << " init param:" << endl;
-	for(Int_t iK=0; iK<K; iK++){
-			cout << fEllipses[iK].fR <<" " << fEllipses[iK].fV11 << " " <<
-			" " << fEllipses[iK].fV12 << " " << fEllipses[iK].fV21 << " " << fEllipses[iK].fV22 << endl;
-	}
-	cout << " hits param:" << N <<endl;*/
 
 	for (Int_t iter = 0; iter < 50; iter++){
-		//std::cout << "iter = " << iter << std::endl;
-		
 		for(Int_t iK=0; iK<K; iK++){
 			tempEllipses[iK].fR = r(iK);	
 			fRNew[iK] = tempEllipses[iK].fR;
 		}
-		//for(Int_t iK=0; iK<K; iK++){
-	//		for(Int_t jN =0; jN <N; jN++){
-	//			fUNew[iK][jN] = u(iK, jN);
-	//		}
-		//}
-		
+
 		for(Int_t iK=0; iK<K; iK++){
 			for(Int_t jN =0; jN <N; jN++){
 				fUNew[iK][jN] = u(iK, jN);
@@ -217,7 +228,7 @@ void CbmRichFuzzyKE::Minimize(){
 				er += fabs(tempU[iK][jN] - fU[iK][jN]);
 			}
 		}
-		//cout << "er = "  << er << endl;
+
 		fEllipses.clear();
 		fEllipses.assign(tempEllipses.begin(), tempEllipses.end());
 
@@ -225,18 +236,7 @@ void CbmRichFuzzyKE::Minimize(){
 			fU[iK].clear();
 			fU[iK].assign(tempU[iK].begin(), tempU[iK].end());
 		}
-		//for(Int_t iK=0; iK<K; iK++){
-		//		cout << tempEllipses[iK].fR <<" " << fEllipses[iK].fV11 << " " <<
-		//		" " << fEllipses[iK].fV12 << " " << fEllipses[iK].fV21 << " " << fEllipses[iK].fV22 << endl;
-		//}
-		//cout << endl;
 	}// iter
-	/*cout << "after minimization: "<< endl;
-	for(Int_t iK=0; iK<K; iK++){
-			cout << tempEllipses[iK].fR <<" " << fEllipses[iK].fV11 << " " <<
-			" " << fEllipses[iK].fV12 << " " << fEllipses[iK].fV21 << " " << fEllipses[iK].fV22 << endl;
-	}
-	cout << endl;*/
 	Draw(kGreen);
 }
 
@@ -284,10 +284,10 @@ void CbmRichFuzzyKE::GenerateEllipses()
 	h->SetStats(kFALSE);
 	h->Draw();
 	Draw(kRed);
-
 }
 
-Ellipse CbmRichFuzzyKE::ParTransform(CbmRichRing* ellipse)
+Ellipse CbmRichFuzzyKE::ParTransform(
+      CbmRichRing* ellipse)
 {
 	Ellipse el;
 	
@@ -299,14 +299,9 @@ Ellipse CbmRichFuzzyKE::ParTransform(CbmRichRing* ellipse)
 	return el;
 }
 
-void CbmRichFuzzyKE::Draw(Int_t color)
+void CbmRichFuzzyKE::Draw(
+      Int_t color)
 {
-	//TCanvas* c = new TCanvas();
-	//c->SetGrid();
-	//TH2D *h = new TH2D("h", "Simulated rings", 25, 0,15, 25, 0 ,15);
-	//h->SetStats(kFALSE);
-	//h->Draw();
-
 	TMarker fDisplayedHit;
 	fDisplayedHit.SetMarkerStyle ( 21 );
 	fDisplayedHit.SetMarkerSize ( 1 );
@@ -337,7 +332,9 @@ void CbmRichFuzzyKE::Draw(Int_t color)
 	}
 }
 
-std::vector<Double_t> CbmRichFuzzyKE::GetXYABP(Ellipse el){
+std::vector<Double_t> CbmRichFuzzyKE::GetXYABP(
+      Ellipse el)
+{
 	///calculate center of the ellipse
 	 Double_t xc = (el.fV11 + el.fV21)/2.;
 	 Double_t yc = (el.fV12 + el.fV22)/2.;

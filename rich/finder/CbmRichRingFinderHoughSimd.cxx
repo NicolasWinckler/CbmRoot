@@ -12,8 +12,10 @@ CbmRichRingFinderHoughSimd::CbmRichRingFinderHoughSimd  ()
 
 }
 
-void CbmRichRingFinderHoughSimd::HoughTransformGroup(unsigned short int indmin,
-		unsigned short int indmax, Int_t iPart)
+void CbmRichRingFinderHoughSimd::HoughTransformGroup(
+      unsigned short int indmin,
+		unsigned short int indmax,
+		Int_t iPart)
 {
 //	register Float_t r12, r13, r23;
 //    register Float_t rx0, rx1, rx2, ry0, ry1,ry2; //rx[3], ry[3];//, x[3], y[3];

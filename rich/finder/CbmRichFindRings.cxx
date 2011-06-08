@@ -1,28 +1,12 @@
-/******************************************************************************
-*  $Id: CbmRichFindRings.cxx,v 1.2 2006/01/26 09:49:07 hoehne Exp $
-*
-*  Class  : CbmRichFindRings
-*  Description: This is the implementation of the FindRings class. This
-*               takes a particular Ring Finder to find the rings.
-*
-*  Author : Supriya Das
-*  E-mail : S.Das@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichFindRings.cxx,v $
-*  Revision 1.2  2006/01/26 09:49:07  hoehne
-*  Array of projected tracks added for track-based ring finders
-*
-*  Revision 1.1  2006/01/19 11:24:39  hoehne
-*  initial revision
-*
-*
-*******************************************************************************/
-#include "CbmRichFindRings.h"
+/** CbmRichFindRings.cxx
+ * @author S. Das, contact Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2006
+ * @version 1.0
+ **/
 
+#include "CbmRichFindRings.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingFinder.h"
-
 #include "FairHit.h"
 #include "FairRootManager.h"
 
@@ -33,132 +17,82 @@
 using std::cout;
 using std::endl;
 
-
-// -----   Default constructor   -------------------------------------------
 CbmRichFindRings::CbmRichFindRings()
-  : FairTask("RICH Find Rings") {
-  fFinder         = NULL;
-  fRichHitArray   = NULL;
-  fProjArray      = NULL;
-  fRingArray      = NULL;
-  fNofRings       = 0;
-  fVerbose        = 1;
+  : FairTask("RICH Find Rings")
+{
+  fFinder = NULL;
+  fRichHitArray = NULL;
+  fProjArray = NULL;
+  fRingArray = NULL;
+  fNofRings = 0;
+  fVerbose = 1;
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Standard constructor   ------------------------------------------
-CbmRichFindRings::CbmRichFindRings(CbmRichRingFinder* finder,
-				   Int_t verbose)
-  : FairTask("RICH Find Rings") {
-  fFinder         = finder;
-  fRichHitArray   = NULL;
-  fProjArray      = NULL;
-  fRingArray      = NULL;
-  fNofRings       = 0;
-  fVerbose        = verbose;
+CbmRichFindRings::CbmRichFindRings(
+      CbmRichRingFinder* finder,
+      Int_t verbose)
+  : FairTask("RICH Find Rings")
+{
+  fFinder = finder;
+  fRichHitArray = NULL;
+  fProjArray = NULL;
+  fRingArray = NULL;
+  fNofRings = 0;
+  fVerbose = verbose;
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Constructor with name and title   -------------------------------
-CbmRichFindRings::CbmRichFindRings(const char* name, const char* title,
-				   CbmRichRingFinder* finder,
-				   Int_t verbose)
-  : FairTask(name) {
-  fFinder         = finder;
-  fRichHitArray   = NULL;
-  fProjArray      = NULL;
-  fRingArray      = NULL;
-  fNofRings       = 0;
-  fVerbose        = verbose;
+CbmRichFindRings::CbmRichFindRings(
+      const char* name,
+      const char* title,
+      CbmRichRingFinder* finder,
+		Int_t verbose)
+  : FairTask(name)
+{
+  fFinder = finder;
+  fRichHitArray = NULL;
+  fProjArray = NULL;
+  fRingArray = NULL;
+  fNofRings = 0;
+  fVerbose = verbose;
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmRichFindRings::~CbmRichFindRings() {
+CbmRichFindRings::~CbmRichFindRings()
+{
   fRingArray->Delete();
 }
-// -------------------------------------------------------------------------
 
+InitStatus CbmRichFindRings::Init()
+{
+  if (NULL == fFinder) { Fatal("CbmRichFindRings::Init","No ring finder selected!"); }
 
-
-// -----   Public method Init (abstract in base class)  --------------------
-InitStatus CbmRichFindRings::Init() {
-
-  // Check for Ring finder
-  if (! fFinder) {
-    cout << "-E- CbmRichFindRings::Init: No ring finder selected!" << endl;
-    return kERROR;
-  }
-
-  // Get and check FairRootManager
   FairRootManager* ioman = FairRootManager::Instance();
-  if (! ioman) {
-    cout << "-E- CbmRichFindRings::Init: "
-	 << "RootManager not instantised!" << endl;
-    return kFATAL;
-  }
+  if (NULL == ioman) { Fatal("CbmRichFindRings::Init","RootManager not instantised!"); }
 
-  // Get RICH hit Array
-  fRichHitArray
-    = (TClonesArray*) ioman->GetObject("RichHit");
-  if ( ! fRichHitArray) {
-    cout << "-W- CbmRichFindRings::Init: No Rich Hit array!"
-	 << endl;
-  }
+  fRichHitArray = (TClonesArray*) ioman->GetObject("RichHit");
+  if (NULL == fRichHitArray) { Fatal("CbmRichFindRings::Init","No Rich Hit array!"); }
 
-  // Get RICH Ring Array of projected tracks
-  fProjArray
-    = (TClonesArray*) ioman->GetObject("RichProjection");
-  if ( ! fProjArray) {
-    cout << "-W- CbmRichFindRings::Init: No Rich Ring Array of projected tracks!"
-	 << endl;
-  }
+  fProjArray = (TClonesArray*) ioman->GetObject("RichProjection");
+  if (NULL == fProjArray) { Fatal("CbmRichFindRings::Init","No Rich Ring Array of projected tracks!"); }
 
-  // Create and register RichRing array
   fRingArray = new TClonesArray("CbmRichRing",100);
   ioman->Register("RichRing", "RICH", fRingArray, kTRUE);
 
-  // Set verbosity of ring finder
   fFinder->SetVerbose(fVerbose);
-
-  // Call the Init method of the ring finder
   fFinder->Init();
 
   return kSUCCESS;
-
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Public method Exec   --------------------------------------------
-void CbmRichFindRings::Exec(Option_t* opt) {
+void CbmRichFindRings::Exec(
+      Option_t* opt)
+{
   fRingArray->Clear();
   fNofRings = fFinder->DoFind(fRichHitArray, fProjArray, fRingArray);
-  /*
-  for (Int_t iRing=0; iRing<fRingArray->GetEntriesFast(); iRing++) {
-    CbmRichRing* ring = (CbmRichRing*) fRingArray->At(iRing);
-    ring->SortRings();
-  }
-  */
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Public method Finish   ------------------------------------------
-void CbmRichFindRings::Finish() {
+void CbmRichFindRings::Finish()
+{
   fRingArray->Clear();
 }
-// -------------------------------------------------------------------------
-
-
-
 
 ClassImp(CbmRichFindRings)

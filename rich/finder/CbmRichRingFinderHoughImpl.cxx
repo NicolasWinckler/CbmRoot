@@ -1,18 +1,19 @@
-
-// --------------------------------------------------------------------------------------
-// CbmRichRingFinderHoughBase source file
-// Base class for ring finders based on on HT method
-// Implementation: Semen Lebedev (s.lebedev@gsi.de)
+/** CbmRichRingFinderHoughImpl.cxx
+ * @author Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2008
+ * @version 2.0
+ **/
 
 #include "CbmRichRingFinderHoughImpl.h"
-//#include "CbmRichFuzzyKE.h"
 #include "CbmRichRingLight.h"
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "FairTrackParam.h"
 #include "../../littrack/std/utils/CbmLitMemoryManagment.h"
-//#include "../../littrack/utils/CbmLitMemoryManagment.h"
+#include "CbmRichRingFitterCOPLight.h"
+#include "CbmRichRingSelectNeuralNet.h"
+
 #include "TString.h"
 #include "TStopwatch.h"
 #include "TSystem.h"
@@ -23,7 +24,6 @@
 #include <set>
 #include <algorithm>
 #include <iostream>
-
 
 using std::cout;
 using std::endl;
@@ -39,7 +39,7 @@ void CbmRichRingFinderHoughImpl::Init()
 
     fHist.resize(fNofBinsXY);
     fHistR.resize(fNofBinsR);
-	fHitInd.resize(fNofParts);
+	 fHitInd.resize(fNofParts);
 
     fFitCOP = new CbmRichRingFitterCOPLight();
 
@@ -49,7 +49,6 @@ void CbmRichRingFinderHoughImpl::Init()
     fANNSelect->Init();
 }
 
-// -----   Destructor   ----------------------------------------------------
 CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 {
 	delete fFitCOP;
@@ -58,10 +57,7 @@ CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 
 void CbmRichRingFinderHoughImpl::DoFind()
 {
-	if (fData.size() > kMAX_NOF_HITS) {
-		cout<< "-E- CbmRichRingFinderHoughImpl::DoFind: Number of hits is more than "<< kMAX_NOF_HITS << endl;
-		return ;
-	}
+	if (fData.size() > kMAX_NOF_HITS) {Fatal("DoFind","Number of hits is more than " + kMAX_NOF_HITS);}
 
 	for_each(fFoundRings.begin(), fFoundRings.end(), DeleteObject());
 	fFoundRings.clear();
@@ -90,58 +86,59 @@ void CbmRichRingFinderHoughImpl::SetParameters()
 //		fHitCutR = 3;
 //		fMinNofHitsInArea = 6;
 //  }else if (fNofParts == 2){
-	fHTCut = 5;
+	fHTCut = 7;
 	fHitCut = 2;
 	fHTCutR = 5;
 	fHitCutR = 2;
 	fMinNofHitsInArea = 4;
 //  }
 
-	fNofBinsX = 17;
+	fNofBinsX = 25;
 	fNofBinsY = 25;
 	fNofBinsR = 32;
 
-	fAnnCut = -0.6;
-	fUsedHitsCut = 0.4;
+	fAnnCut = 0.6;
 	fUsedHitsAllCut = 0.4;
 
 	fRmsCoeffEl = 2.5;
-	fMaxCutEl = 1.2;
+	fMaxCutEl = 1.0;
 	fRmsCoeffCOP = 3.;
-	fMaxCutCOP = 1.2;
+	fMaxCutCOP = 1.0;
 
 	kMAX_NOF_HITS = 65500;
 	fNofParts = 2;
-    fDx = 1.36*fMaxDistance / (Float_t)fNofBinsX;
-    fDy = 2.*fMaxDistance / (Float_t)fNofBinsY;
-    fDr = fMaxRadius / (Float_t)fNofBinsR;
-    fNofBinsXY = fNofBinsX * fNofBinsY;
+   fDx = 2.*fMaxDistance / (Float_t)fNofBinsX;
+   fDy = 2.*fMaxDistance / (Float_t)fNofBinsY;
+   fDr = fMaxRadius / (Float_t)fNofBinsR;
+   fNofBinsXY = fNofBinsX * fNofBinsY;
 }
 
 void CbmRichRingFinderHoughImpl::HoughTransformReconstruction()
 {
-    Int_t indmin, indmax;
-    for (UInt_t iHit = 0; iHit < fData.size(); iHit++)
-    {
-        if (fData[iHit].fIsUsed == true) continue;
+   Int_t indmin, indmax;
+   for (UInt_t iHit = 0; iHit < fData.size(); iHit++){
+      if (fData[iHit].fIsUsed == true) continue;
 
-        fCurMinX = fData[iHit].fHit.fX  - 0.36f*fMaxDistance;
-		fCurMinY = fData[iHit].fHit.fY - fMaxDistance;
+      fCurMinX = fData[iHit].fHit.fX - fMaxDistance;
+      fCurMinY = fData[iHit].fHit.fY - fMaxDistance;
 
-		DefineLocalAreaAndHits(fData[iHit].fHit.fX, fData[iHit].fHit.fY , &indmin, &indmax);
-		HoughTransform(indmin, indmax);
-		FindPeak(indmin, indmax);
-    }//main loop over hits
+      DefineLocalAreaAndHits(fData[iHit].fHit.fX, fData[iHit].fHit.fY , &indmin, &indmax);
+      HoughTransform(indmin, indmax);
+      FindPeak(indmin, indmax);
+   }//main loop over hits
 }
 
-void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
-		Int_t *indmin, Int_t *indmax)
+void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(
+      Float_t x0,
+      Float_t y0,
+		Int_t *indmin,
+		Int_t *indmax)
 {
     CbmRichHoughHit mpnt;
     std::vector<CbmRichHoughHit>::iterator itmin, itmax;
 
 	//find all hits which are in the corridor
-	mpnt.fHit.fX = x0 - 0.36f*fMaxDistance;
+	mpnt.fHit.fX = x0 - fMaxDistance;
 	itmin = std::lower_bound(fData.begin(), fData.end(), mpnt, CbmRichHoughHitCmpUp());
 
 	mpnt.fHit.fX = x0 + fMaxDistance;
@@ -165,13 +162,13 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 
 	register Int_t indmin1=*indmin;
 	register Int_t indmax1=*indmax;
-	register Float_t maxDistance08 = 0.8f*fMaxDistance;
+	register Float_t maxDistance = fMaxDistance;
 
 	if (fNofParts == 2){
 		for (Int_t i = indmin1; i <= indmax1; i+=2) {
 			if (fData[i].fIsUsed == true) continue;
 			register Float_t ry = y0 - fData[i].fHit.fY;
-			if (fabs(ry) > maxDistance08) continue;
+			if (fabs(ry) > maxDistance) continue;
 			register Float_t rx = x0 - fData[i].fHit.fX;
 			register Float_t d = rx	* rx +ry * ry;
 			if (d > fMaxDistanceSq) continue;
@@ -181,7 +178,7 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 		for (Int_t i = indmin1+1; i <= indmax1; i+=2) {
 			if (fData[i].fIsUsed == true) continue;
 			register Float_t ry = y0 - fData[i].fHit.fY;
-			if (fabs(ry) > maxDistance08) continue;
+			if (fabs(ry) > maxDistance) continue;
 			register Float_t rx = x0 - fData[i].fHit.fX;
 			register Float_t d = rx	* rx +ry * ry;
 			if (d > fMaxDistanceSq) continue;
@@ -192,7 +189,7 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 //		for (Int_t i = indmin1; i <= indmax1; i++) {
 //			if (fData[i]->fIsUsed == true) continue;
 //			ry = y0 - fData[i]->fY;
-//			if (fabs(ry) > maxDistance08) continue;
+//			if (fabs(ry) > maxDistance) continue;
 //			rx = x0 - fData[i]->fX;
 //			Float_t d = rx	* rx +ry * ry;
 //			if (d > fMaxDistanceSq) continue;
@@ -210,19 +207,21 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 	}
 }
 
-void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsigned short int indmax)
+void CbmRichRingFinderHoughImpl::HoughTransform(
+      unsigned short int indmin,
+      unsigned short int indmax)
 {
     for (Int_t iPart = 0; iPart < fNofParts; iPart++){
-//    	Int_t nofHits = fHitInd[iPart].size();
-//	    if (nofHits <= fMinNofHitsInArea) continue;
     	HoughTransformGroup(indmin, indmax, iPart);
     }//iPart
 }
 
-void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
-		unsigned short int indmax, Int_t iPart)
+void CbmRichRingFinderHoughImpl::HoughTransformGroup(
+      unsigned short int indmin,
+		unsigned short int indmax,
+		Int_t iPart)
 {
-	register unsigned short nofHits;// = fHitInd[iPart].size();
+	 register unsigned short nofHits;// = fHitInd[iPart].size();
     register float xcs, ycs; // xcs = xc - fCurMinX
     register float dx = 1.0f/fDx, dy = 1.0f/fDy, dr = 1.0f/fDr;
 
@@ -296,7 +295,9 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
 	//hitIndPart.clear();
 }
 
-void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
+void CbmRichRingFinderHoughImpl::FindPeak(
+      Int_t indmin,
+      Int_t indmax)
 {
 //Find MAX bin R and compare it with CUT
     Int_t maxBinR = -1, maxR = -1;
@@ -323,8 +324,8 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 	CbmRichRingLight* ring1 = new CbmRichRingLight();
 
 //Find Preliminary Xc, Yc, R
-    register Float_t xc, yc, r;
-    register Float_t rx, ry, dr;
+   register Float_t xc, yc, r;
+   register Float_t rx, ry, dr;
 	xc = (maxXY/fNofBinsX + 0.5f)* fDx + fCurMinX;
 	yc = (maxXY%fNofBinsX + 0.5f)* fDy + fCurMinY;
 	r = (maxR + 0.5f)* fDr;
@@ -375,22 +376,20 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 
 	//remove found hits only for good quality rings
 	if (select > fAnnCut) {
-
 		RemoveHitsAroundRing(indmin, indmax, ring2);
 		//RemoveHitsAroundEllipse(indmin, indmax, ring2);
-
-		//fFoundRings.push_back(ring2);
 	}
 
 	if (select > -0.7) {
 		fFoundRings.push_back(ring2);
 	}
-	//fFoundRings.push_back(ring2);
-    ring2=NULL;
+	ring2=NULL;
 	delete ring2;
 }
 
-void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax,
+void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(
+      Int_t indmin,
+      Int_t indmax,
 		CbmRichRingLight* ring)
 {
 	Float_t rms = TMath::Sqrt(ring->GetChi2()/ring->GetNofHits());
@@ -412,8 +411,6 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 {
 	Int_t nofRings = fFoundRings.size();
 	std::sort(fFoundRings.begin(), fFoundRings.end(), CbmRichRingComparatorMore());
-//	std::vector<std::set<UShort_t> > usedHits;
-//	usedHits.reserve(nofRings);
 	std::set<UShort_t> usedHitsAll;
 	std::vector<UShort_t> goodRingIndex;
 	goodRingIndex.reserve(nofRings);
@@ -423,23 +420,6 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 		CbmRichRingLight* ring = fFoundRings[iRing];
 		ring->SetRecFlag(-1);
 		Int_t nofHits = ring->GetNofHits();
-//		Bool_t isGoodRing = true;
-//		for (Int_t iRSet = 0; iRSet < usedHits.size(); iRSet++){
-//			ring2 = fFoundRings[goodRingIndex[iRSet]];
-//			if (AreRingsCloseEnough(ring2, ring)) continue;
-//			Int_t nofUsedHits = 0;
-//			for(Int_t iHit = 0; iHit < nofHits; iHit++){
-//				std::set<UShort_t>::iterator it = usedHits[iRSet].find(ring->GetHit(iHit));
-//				if(it != usedHits[iRSet].end()){
-//					nofUsedHits++;
-//				}
-//			}
-//			if ((Float_t)nofUsedHits/(Float_t)nofHits > fUsedHitsCut){
-//				isGoodRing = false;
-//				break;
-//			}
-//		}// iRSet
-
 		Bool_t isGoodRingAll = true;
 		Int_t nofUsedHitsAll = 0;
 		for(Int_t iHit = 0; iHit < nofHits; iHit++){
@@ -452,23 +432,15 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 			isGoodRingAll = false;
 		}
 
-		if (/*isGoodRing && */ isGoodRingAll){
-			//fFitEllipse->DoFit(fFoundRings[iRing]);
+		if (isGoodRingAll){
 			fFoundRings[iRing]->SetRecFlag(1);
 			for (Int_t iRSet = 0; iRSet < goodRingIndex.size(); iRSet++){
-				//ring2 = fFoundRings[goodRingIndex[iRSet]];
-				//if (AreRingsCloseEnough(ring2, ring)) continue;
-
-				ReAssingSharedHits(goodRingIndex[iRSet]	,iRing);
+				ReAssingSharedHits(goodRingIndex[iRSet],iRing);
 			}
 			goodRingIndex.push_back(iRing);
-			//std::set<UShort_t> usedHitsT;
 			for(Int_t iHit = 0; iHit < nofHits; iHit++){
-				//usedHitsT.insert(ring->GetHit(iHit));
 				usedHitsAll.insert(ring->GetHitId(iHit));
 			}
-//			usedHits.push_back(usedHitsT);
-//			usedHitsT.clear();
 		}// isGoodRing
 	}// iRing
 
@@ -477,7 +449,9 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 	goodRingIndex.clear();
 }
 
-void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2)
+void CbmRichRingFinderHoughImpl::ReAssingSharedHits(
+      Int_t ringInd1,
+      Int_t ringInd2)
 {
 	CbmRichRingLight* ring1 = fFoundRings[ringInd1];
 	CbmRichRingLight* ring2 = fFoundRings[ringInd2];
@@ -510,7 +484,9 @@ void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringIn
 	}//iHit1
 }
 
-void CbmRichRingFinderHoughImpl::ReAssingSharedHitsEllipse(Int_t ringInd1, Int_t ringInd2)
+void CbmRichRingFinderHoughImpl::ReAssingSharedHitsEllipse(
+      Int_t ringInd1,
+      Int_t ringInd2)
 {
 //	CbmRichRing* ring1 = fFoundRings[ringInd1];
 //	CbmRichRing* ring2 = fFoundRings[ringInd2];
@@ -556,7 +532,8 @@ void CbmRichRingFinderHoughImpl::ReAssingSharedHitsEllipse(Int_t ringInd1, Int_t
 //	}
 }
 
-Int_t CbmRichRingFinderHoughImpl::GetHitIndex(UShort_t hitInd)
+Int_t CbmRichRingFinderHoughImpl::GetHitIndex(
+      UShort_t hitInd)
 {
 	UInt_t size = fData.size();
 	for (UInt_t i = 0; i < size; i++){
@@ -564,18 +541,8 @@ Int_t CbmRichRingFinderHoughImpl::GetHitIndex(UShort_t hitInd)
 	}
 }
 
-Bool_t CbmRichRingFinderHoughImpl::AreRingsCloseEnough(CbmRichRingLight* ring1,
-		CbmRichRingLight* ring2)
-{
-	float rx = ring1->GetCenterX() - ring2->GetCenterX();
-	float ry = ring1->GetCenterY() - ring2->GetCenterY();
-
-	float r = sqrt(rx*rx + ry*ry);
-	if (r > 1.3f * (ring1->GetRadius() + ring2->GetRadius())) return false;
-	return true;
-}
-
-void CbmRichRingFinderHoughImpl::FuzzyKE(TClonesArray* rHitArray)
+void CbmRichRingFinderHoughImpl::FuzzyKE(
+      TClonesArray* rHitArray)
 {
 /*	Int_t nofRings = fFoundRings.size();
 	vector<CbmRichRing> foundRingsFuzzy;
@@ -668,43 +635,12 @@ void CbmRichRingFinderHoughImpl::FuzzyKE(TClonesArray* rHitArray)
 	//fFoundRings.assign(foundRingsFuzzy.begin(), foundRingsFuzzy.end());*/
 }
 
-void CbmRichRingFinderHoughImpl::CalculateRingParameters(Float_t x2y2[],
-                             Float_t rx[],
-                             Float_t ry[],
-                             Float_t x0,
-                             Float_t y0,
-                             Float_t *xc,
-                             Float_t *yc,
-                             Float_t *r)
-{
-    register Float_t t5, t10, t19, t21, t41, det;
-
-    det = rx[2]*ry[0] - rx[0]*ry[2];
-
-    if (det != 0.0f){
-        t19 = 0.5f / det;
-        t5 = x2y2[1] - x2y2[2];
-        t10 = x2y2[0] - x2y2[1];
-        *xc = (t5 * ry[0] - t10 * ry[2]) * t19;
-        *yc = (t10 * rx[2] - t5 * rx[0]) * t19;
-
-         //radius calculation
-         t21 = (x0 - *xc) * (x0 - *xc);
-         t41 = (y0 - *yc) * (y0 - *yc);
-         *r = sqrt(t21 + t41);
-
-    }else {
-        *xc = -1.0f;
-        *yc = -1.0f;
-        *r = -1.0f;
-    }
-}
-
-void CbmRichRingFinderHoughImpl::CalculateRingParametersOld(Float_t x[],
-			Float_t y[],
-			Float_t *xc,
-			Float_t *yc,
-			Float_t *r)
+void CbmRichRingFinderHoughImpl::CalculateRingParameters(
+      Float_t x[],
+		Float_t y[],
+		Float_t *xc,
+		Float_t *yc,
+		Float_t *r)
 {
     register Float_t t1, t2, t3, t4, t5, t6, t8, t9,
         t10, t11, t14, t16, t19, t21, t41;
@@ -731,7 +667,10 @@ void CbmRichRingFinderHoughImpl::CalculateRingParametersOld(Float_t x[],
     *r = sqrt(t21 + t41);
 }
 
-void CbmRichRingFinderHoughImpl::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
+void CbmRichRingFinderHoughImpl::RemoveHitsAroundEllipse(
+      Int_t indmin,
+      Int_t indmax,
+      CbmRichRing * ring)
 {
 	Double_t A = ring->GetAPar();
 	Double_t B = ring->GetBPar();

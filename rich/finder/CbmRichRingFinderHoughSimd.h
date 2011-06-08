@@ -27,8 +27,11 @@ public:
 	~CbmRichRingFinderHoughSimd(){;}
 
 	virtual void HoughTransformReconstruction();
-	virtual void HoughTransformGroup(unsigned short int indmin,
-			unsigned short int indmax, Int_t iPart);
+
+	virtual void HoughTransformGroup(
+	      unsigned short int indmin,
+			unsigned short int indmax,
+			Int_t iPart);
 
 	std::vector<CbmRichHoughHitVec> fDataV;
 

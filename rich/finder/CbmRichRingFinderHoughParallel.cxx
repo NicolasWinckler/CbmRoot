@@ -1,7 +1,8 @@
-// --------------------------------------------------------------------------------------
-// CbmRichRingFinderHoughBase source file
-// Base class for ring finders based on on HT method
-// Implementation: Semen Lebedev (s.lebedev@gsi.de)
+/** CbmRichRingFinderHoughParallel.cxx
+ * @author Semen Lebedev <s.lebedev@gsi.de>
+ * @since 2010
+ * @version 1.0
+ **/
 
 #include "tbb/task_scheduler_init.h"
 #include "tbb/task.h"
@@ -51,8 +52,9 @@ public:
 };
 #endif
 
-// -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel  ( Int_t verbose, TString geometry )
+CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel  (
+      Int_t verbose,
+      TString geometry )
 {
 
 }
@@ -80,14 +82,14 @@ CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel()
 
 
 }
-// -----   Destructor   ----------------------------------------------------
+
 CbmRichRingFinderHoughParallel::~CbmRichRingFinderHoughParallel()
 {
 
 }
 
-
-Int_t CbmRichRingFinderHoughParallel::DoFind(const vector<CbmRichHoughHit>& data)
+Int_t CbmRichRingFinderHoughParallel::DoFind(
+      const vector<CbmRichHoughHit>& data)
 {
 	fNEvent++;
 	cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
@@ -121,16 +123,14 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(const vector<CbmRichHoughHit>& data
 }
 
 
-Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
-                                            TClonesArray* rProjArray,
-                                         TClonesArray* rRingArray) {
-
-	//TStopwatch timer;
-	//timer.Start();
+Int_t CbmRichRingFinderHoughParallel::DoFind(
+      TClonesArray* rHitArray,
+      TClonesArray* rProjArray,
+      TClonesArray* rRingArray) {
 
 	tbb::tick_count t0 = tbb::tick_count::now();
 
-    fRingCount = 0;
+   fRingCount = 0;
 
 	fNEvent++;
 
@@ -165,18 +165,12 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 	fHTImpl1->SetData(UpH);
 	fHTImpl2->SetData(DownH);
 
-	//fHTImpl1->DoFind();
-	//fHTImpl2->DoFind();
-
 	FinderTask a(fHTImpl1);
 	FinderTask b(fHTImpl2);
 	tbb::parallel_invoke(a, b);
 
 	AddRingsToOutputArray(rRingArray, fHTImpl2->GetFoundRings());
 	AddRingsToOutputArray(rRingArray, fHTImpl1->GetFoundRings());
-
-	//timer.Stop();
-	//fExecTime += timer.CpuTime();
 
 	tbb::tick_count t1 = tbb::tick_count::now();
 
@@ -193,8 +187,9 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 	return 1;
 }
 
-void CbmRichRingFinderHoughParallel::AddRingsToOutputArray(TClonesArray *rRingArray,
-		std::vector<CbmRichRingLight*>& rings)
+void CbmRichRingFinderHoughParallel::AddRingsToOutputArray(
+      TClonesArray *rRingArray,
+		vector<CbmRichRingLight*>& rings)
 {
 	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
 		if (rings[iRing]->GetRecFlag() == -1)	continue;

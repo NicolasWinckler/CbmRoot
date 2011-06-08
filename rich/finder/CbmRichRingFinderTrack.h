@@ -12,7 +12,8 @@
 class CbmRichRingFinderTrack : public CbmRichRingFinder {
 
 public:
-  	CbmRichRingFinderTrack ( Int_t verbose, TString geometry);
+  	CbmRichRingFinderTrack();
+
 	virtual ~CbmRichRingFinderTrack();
 
 	virtual void HoughTransformReconstruction();

@@ -42,7 +42,6 @@
 #pragma link C++ class  CbmEcalRecoSimple;
 #pragma link C++ class  CbmEcalRecoSlow;
 #pragma link C++ class  CbmEcalClusterV1+;
-#pragma link C++ class	CbmEcalQualityCheck;
 #pragma link C++ class  CbmEcalClusterFinderV1;
 #pragma link C++ class  CbmEcalClusterFinderV2;
 #pragma link C++ class  CbmEcalClusterFinderV3;
@@ -74,4 +73,8 @@
 #pragma link C++ class  CbmEcalShLibTable;
 #pragma link C++ class  CbmEcalRecoSlow2;
 
+#ifdef WITH_TASIMAGE
+  #pragma link C++ class CbmEcalQualityCheck;
+#endif
+         
 #endif

@@ -1800,8 +1800,8 @@ void CbmLitReconstructionQa::Draw()
 {
    SetStyles();
    DrawEfficiencyHistos();
-   //DrawHitsHistos();
-   //DrawHitsStationHistos();
+   DrawHitsHistos();
+   DrawHitsStationHistos();
    DrawStsTracksQaHistos();
    std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
    PrintFinalStatistics(fout);
@@ -1820,51 +1820,51 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
    std::string signal = fIsMuch ? "muons" : "electrons";
    Int_t cat = fIsMuch ? MU : EL;
 
-//   // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
-//   DrawEfficiency("rec_qa_global_efficiency_all", &fhStsMomNormGlobal[ALL],
-//		   &fhHalfGlobalMomNormGlobal[ALL], &fhGlobalMom[ALL], NULL, sname, hgname, gname, "", "");
-//
-//   // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
-//   DrawEfficiency("rec_qa_global_efficiency_signal", &fhStsMomNormGlobal[cat],
-//		   &fhHalfGlobalMomNormGlobal[cat], &fhGlobalMom[cat], NULL, sname, hgname, gname, "", "");
-//
-//   // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-//   DrawEfficiency("rec_qa_half_global_efficiency_all", &fhStsMomNormHalfGlobal[ALL],
-//		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "", "");
-//
-//   // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
-//   DrawEfficiency("rec_qa_half_global_efficiency_signal", &fhStsMomNormHalfGlobal[cat],
-//		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "", "");
-//
-//   // Draw efficiency for STS
-//   DrawEfficiency("rec_qa_sts_efficiency", &fhStsMom[ALL],
-//  		   &fhStsMom[cat], NULL, NULL, "STS: all", "STS: " + signal, "", "", "");
-//
-//   if (fIsTrd || fIsMuch) {
-//	   // Draw efficiency for TRD(MUCH)
-//	   DrawEfficiency("rec_qa_rec_efficiency", &fhRecMom[ALL],
-//				 &fhRecMom[cat], NULL, NULL, rname + ": all", rname + ": " + signal, "", "", "");
-//   }
-//
-//   if (fIsTof) {
-//	   // Draw efficiency for TOF
-//	   DrawEfficiency("rec_qa_tof_efficiency", &fhTofMom[ALL],
-//			   	 &fhTofMom[cat], NULL, NULL, "TOF: all", "TOF: " + signal, "", "", "");
-//   }
+   // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
+   DrawEfficiency("rec_qa_global_efficiency_all", &fhStsMomNormGlobal[ALL],
+		   &fhHalfGlobalMomNormGlobal[ALL], &fhGlobalMom[ALL], NULL, sname, hgname, gname, "", "");
+
+   // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
+   DrawEfficiency("rec_qa_global_efficiency_signal", &fhStsMomNormGlobal[cat],
+		   &fhHalfGlobalMomNormGlobal[cat], &fhGlobalMom[cat], NULL, sname, hgname, gname, "", "");
+
+   // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
+   DrawEfficiency("rec_qa_half_global_efficiency_all", &fhStsMomNormHalfGlobal[ALL],
+		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "", "");
+
+   // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
+   DrawEfficiency("rec_qa_half_global_efficiency_signal", &fhStsMomNormHalfGlobal[cat],
+		   &fhHalfGlobalMom[cat], NULL, NULL, sname, hgname, "", "", "");
+
+   // Draw efficiency for STS
+   DrawEfficiency("rec_qa_sts_efficiency", &fhStsMom[ALL],
+  		   &fhStsMom[cat], NULL, NULL, "STS: all", "STS: " + signal, "", "", "");
+
+   if (fIsTrd || fIsMuch) {
+	   // Draw efficiency for TRD(MUCH)
+	   DrawEfficiency("rec_qa_rec_efficiency", &fhRecMom[ALL],
+				 &fhRecMom[cat], NULL, NULL, rname + ": all", rname + ": " + signal, "", "", "");
+   }
+
+   if (fIsTof) {
+	   // Draw efficiency for TOF
+	   DrawEfficiency("rec_qa_tof_efficiency", &fhTofMom[ALL],
+			   	 &fhTofMom[cat], NULL, NULL, "TOF: all", "TOF: " + signal, "", "", "");
+   }
 
    if (fIsRich) {
-//	   // Draw efficiency for RICH for electron set
-//	   DrawEfficiency("rec_qa_rich_efficiency_electrons", &fhRichMom[RICHEL],
-//	         &fhRichMom[RICHELREF], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "", "");
-//
-//	   // Draw efficiency for STS+RICH for electron set
-//	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[RICHEL],
-//			   &fhStsRichMom[RICHEL], NULL, NULL, "STS", "STS+RICH", "", "", "");
-//
-//	   // Draw efficiency for STS+RICH+TRD for electron set
-//	   DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", &fhStsMomNormStsRichTrd[RICHEL],
-//			   &fhStsRichMomNormStsRichTrd[RICHEL], &fhStsRichTrdMom[RICHEL], NULL,
-//			   "STS", "STS+RICH", "STS+RICH+TRD", "", "");
+	   // Draw efficiency for RICH for electron set
+	   DrawEfficiency("rec_qa_rich_efficiency_electrons", &fhRichMom[RICHEL],
+	         &fhRichMom[RICHELREF], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "", "");
+
+	   // Draw efficiency for STS+RICH for electron set
+	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[RICHEL],
+			   &fhStsRichMom[RICHEL], NULL, NULL, "STS", "STS+RICH", "", "", "");
+
+	   // Draw efficiency for STS+RICH+TRD for electron set
+	   DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", &fhStsMomNormStsRichTrd[RICHEL],
+			   &fhStsRichMomNormStsRichTrd[RICHEL], &fhStsRichTrdMom[RICHEL], NULL,
+			   "STS", "STS+RICH", "STS+RICH+TRD", "", "");
 
 	   // Draw efficiency for STS+RICH+TRD+TOF for electron set
 	   DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", &fhStsMomNormStsRichTrdTof[RICHEL],

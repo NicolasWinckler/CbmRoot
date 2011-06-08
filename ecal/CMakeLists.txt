@@ -3,7 +3,7 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
+${ROOT_INCLUDE_DIR} 
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -46,8 +46,7 @@ CbmEcalShowerLib.cxx CbmEcalTrackExtrapolation.cxx
 CbmEcalTracking.cxx CbmEcalStructureFiller.cxx
 CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
 CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
-#CbmEcalQualityCheck.cxx 
-CbmEcalClusterFinderV1.cxx CbmEcalClusterFinderV2.cxx
+CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx CbmEcalClusterFinderV2.cxx
 CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
 CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
 CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx CbmEcalAnalysisMaterial.cxx
@@ -62,15 +61,6 @@ CbmEcalShLibRecord.cxx CbmEcalShLib.cxx CbmEcalShLibTable.cxx
 CbmEcalClusterFinderV3.cxx CbmEcalRecoSlow2.cxx
 CbmEcalAnalysisEres.cxx
 )
-FIND_PATH(TASImagePath NAMES TASImage.h PATHS
-  ${SIMPATH}/tools/root/include
-  NO_DEFAULT_PATH
-)
-If(TASImagePath)
-  Message("Found TASImage.h")
-  Set(ECAL_SRCS_RULECHECKER ${ECAL_SRCS_RULECHECKER} CbmEcalQualityCheck.cxx)
-  Add_Definitions(-DWITH_TASIMAGE)
-EndIf(TASImagePath)
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)
 

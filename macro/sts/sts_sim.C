@@ -32,16 +32,16 @@ void sts_sim(Int_t nEvents = 1000)
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_muon_standard.geo";
-  TString fieldMap    = "field_muon_standard";
+  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString fieldMap    = "field_v10e";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
   // MVD geometry
-  TString mvdGeom = "mvd_v08a.geo";
+  TString mvdGeom    = "mvd/mvd_v07a.geo";
 
   // STS geometry
-  TString stsGeom = "sts_v11a.geo";
+  TString stsGeom    = "sts/sts_v11a.geo";
   
   //STS geometry for the same z position of all sensors
   //TString stsGeom = "sts_same_z.geo";
@@ -126,16 +126,7 @@ void sts_sim(Int_t nEvents = 1000)
   
   
   // -----   Create magnetic field   ----------------------------------------
-  if (fieldMap == "field_electron_standard" ) 
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "field_muon_standard" )
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "FieldMuonMagnet" )
-    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
-  else {
-    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-    exit;
-  }
+  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   run->SetField(magField);
@@ -176,7 +167,7 @@ void sts_sim(Int_t nEvents = 1000)
   // -----   Start run   ----------------------------------------------------
   run->Run(nEvents);
   // ------------------------------------------------------------------------
-
+  run->CreateGeometryFile("data/geofile_full.root");
   
   
   // -----   Finish   -------------------------------------------------------

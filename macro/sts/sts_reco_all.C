@@ -28,7 +28,13 @@ void sts_reco_all(Int_t nEvents = 1000) {
   TString parFile = "params.root";
   
   // STS digitisation file
-  TString digiFile = "sts_v11a.digi.par";
+  TList *parFileList = new TList();
+
+  TString paramDir = gSystem->Getenv("VMCWORKDIR");
+  paramDir += "/parameters";
+
+  TObjString stsDigiFile = paramDir + "/sts/sts_v11a.digi.par";
+  parFileList->Add(&stsDigiFile);
   
   // Output file
   TString outFile = "sts.reco.root";
@@ -51,7 +57,6 @@ void sts_reco_all(Int_t nEvents = 1000) {
   cout << "***************************************************" << endl;
   cout << "*** Input file        : " << inFile << endl;
   cout << "*** Parameter file    : " << parFile << endl;
-  cout << "*** Digitisation file : " << digiFile << endl;
   cout << "*** Output file       : " << outFile << endl;
   cout << "*** Number of events  : " << nEvents << endl;
   cout << "***************************************************" << endl;
@@ -93,17 +98,19 @@ void sts_reco_all(Int_t nEvents = 1000) {
   gSystem->Load("libCbmBase");
   gSystem->Load("libCbmData");
   gSystem->Load("libField");
+  gSystem->Load("libGen");
   gSystem->Load("libPassive");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
-  gSystem->Load("libGen");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  gSystem->Load("libGlobal");
   gSystem->Load("libEcal");
+  gSystem->Load("libGlobal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
+  gSystem->Load("libLittrack");
+
   // ------------------------------------------------------------------------
 
   
@@ -194,15 +201,11 @@ void sts_reco_all(Int_t nEvents = 1000) {
   
 
   // -----  Parameter database   --------------------------------------------
-  TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
-  stsDigiFile += "/parameters/sts/";
-  stsDigiFile += digiFile;
-  cout << "digi file = " << stsDigiFile << endl;
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  FairParRootFileIo*  parIo1 = new FairParRootFileIo();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
-  parIo2->open(stsDigiFile.Data(),"in");
+  parIo2->open(parFileList, "in");
   rtdb->setFirstInput(parIo1);
   rtdb->setSecondInput(parIo2);
   rtdb->setOutput(parIo1);
@@ -212,7 +215,6 @@ void sts_reco_all(Int_t nEvents = 1000) {
   
   
   // -----   Initialise and run   -------------------------------------------
-  run->LoadGeometry();
   run->Init();
   run->Run(0, nEvents);
   // ------------------------------------------------------------------------

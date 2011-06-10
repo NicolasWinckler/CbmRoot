@@ -537,7 +537,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
       if (isTofOk) {
          CbmTofHit* tofHit = static_cast<CbmTofHit*>(fTofHits->At(tofId));
          CbmTofPoint* tofPoint = static_cast<CbmTofPoint*>(fTofPoints->At(tofHit->GetRefId()));
-         tofMCId = tofPoint->GetTrackID();
+         if (tofPoint != NULL) tofMCId = tofPoint->GetTrackID();
       }
       if (isRichOk) { richMCId = richRingMatch->GetMCTrackID(); }
 
@@ -1009,15 +1009,14 @@ void CbmLitReconstructionQa::StsTracksQa()
    Int_t nSts = fStsTracks->GetEntriesFast();
    for (Int_t i = 0; i < nSts; i++) {
       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(i);
-      if (!stsTrack) continue;
+      if (stsTrack == NULL) continue;
       CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(i);
-      if (!stsTrackMatch) continue;
+      if (stsTrackMatch == NULL) continue;
       Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
       if (mcIdSts < 0) continue;
       CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdSts);
-
+      if (mcTrack == NULL) continue;
       Int_t motherId = mcTrack->GetMotherId();
-
       if (motherId != -1) continue;
 
       TVector3 momMC;
@@ -1919,7 +1918,7 @@ void CbmLitReconstructionQa::DrawEfficiency(
 	std::string yTitle = "Efficiency [%]";
 	if (opt != "pisupp"){
 	   (*hist1)[EFF]->SetMinimum(0.);
-	   (*hist1)[EFF]->SetMaximum(1.);
+	   (*hist1)[EFF]->SetMaximum(100.);
 	} else {
 	   yTitle = "Pion suppression";
 	}

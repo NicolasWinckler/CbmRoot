@@ -571,12 +571,15 @@ void CbmL1::Exec(Option_t * option)
 // -----   Finish CbmStsFitPerformanceTask task   -----------------------------
 void CbmL1::Finish(){
   TDirectory *curr = gDirectory;
+  TFile *currentFile = gFile;
   // Open output file and write histograms
   TFile* outfile = new TFile("L1_histo.root","RECREATE");
   outfile->cd();
   writedir2current(histodir);
   outfile->Close();
-  curr->cd();
+  outfile->Delete();
+  gFile = currentFile;
+  gDirectory = curr;
 }
 
 

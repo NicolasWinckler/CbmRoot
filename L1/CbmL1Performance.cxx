@@ -734,9 +734,9 @@ void CbmL1::PartHistoPerformance()
   {
     first_call = 0;
 
-    histodir->cd();
-    histodir->mkdir("Particles");
-
+    TDirectory *currentDir = gDirectory;
+    gDirectory->cd("L1");    
+    gDirectory->mkdir("Particles");
     gDirectory->cd("Particles");
     {
       struct {
@@ -753,7 +753,7 @@ void CbmL1::PartHistoPerformance()
         h_part_mass[iPart] = new TH1F(Table[iPart].name.data(),Table[iPart].title.data(), Table[iPart].n, Table[iPart].l, Table[iPart].r);
       }
     }
-    gDirectory->cd("..");
+    gDirectory = currentDir;
   }
 
   for(unsigned int iP=0; iP < vRParticles.size(); iP++)
@@ -826,12 +826,9 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   {
     first_call = 0;
 
-      //TDirectory *maindir = gDirectory;
-      //histodir->cd();
 
     TDirectory *curdir = gDirectory;
-      //histodir = gROOT->mkdir("L1");
-    histodir->cd();
+    gDirectory->cd("L1");
 
     p_eff_all_vs_mom = new TProfile("p_eff_all_vs_mom", "AllSet Efficiency vs Momentum",
                                     100, 0.0, 5.0, 0.0, 100.0);
@@ -969,7 +966,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
       // ----- Create list of all histogram pointers
       
-    curdir->cd();
+    gDirectory = curdir;
       
   }// first_call
 
@@ -1231,13 +1228,9 @@ void CbmL1::TrackFitPerformance()
   {
     first_call = 0;
 
-      //TDirectory *maindir = gDirectory;
-      //histodir->cd();
-
-      //TDirectory *curdir = gDirectory;
-      //histodir = gROOT->mkdir("L1");
-    histodir->cd();
-    histodir->mkdir("Fit");
+    TDirectory *currentDir = gDirectory;
+    gDirectory->cd("L1");
+    gDirectory->mkdir("Fit");
     gDirectory->cd("Fit");
     {
       
@@ -1279,7 +1272,7 @@ void CbmL1::TrackFitPerformance()
       }
       h_fit_chi2 = new TH1F("h_fit_chi2", "Chi2/NDF", 50, -0.5, 10.0);
     }
-    gDirectory->cd("..");
+    gDirectory = currentDir;
   } // if first call
   
   for (vector<CbmL1Track>::iterator it = vRTracks.begin(); it != vRTracks.end(); ++it){
@@ -1493,6 +1486,7 @@ void CbmL1::TrackFitPerformance()
 void CbmL1::FieldApproxCheck()
 {
   TDirectory *curr = gDirectory;
+  TFile *currentFile = gFile;
   TFile* fout = new TFile("FieldApprox.root","RECREATE");
   fout->cd();
 
@@ -1621,7 +1615,9 @@ void CbmL1::FieldApproxCheck()
   } // for ista
 
   fout->Close();
-  curr->cd();
+  fout->Delete();
+  gFile = currentFile;
+  gDirectory = curr;
 } // void CbmL1::FieldApproxCheck()
 
 void CbmL1::InputPerformance()
@@ -1635,10 +1631,11 @@ void CbmL1::InputPerformance()
   if ( first_call ){
     first_call = 0;
     
-    TDirectory *curr = gDirectory;
-    histodir->cd();
-    histodir->mkdir("Input");
-    histodir->cd("Input");
+    TDirectory *currentDir = gDirectory;
+    gDirectory->mkdir("L1");
+    gDirectory->cd("L1");
+    histodir = gDirectory;
+    gDirectory->mkdir("Input");
     gDirectory->cd("Input");
     
     nStripFHits = new TH1I("nHits_f", "NHits On Front Strip", 10, 0, 10);
@@ -1657,7 +1654,7 @@ void CbmL1::InputPerformance()
     histo = resY;
     histo->GetXaxis()->SetTitle("Residual y, um");
     
-    curr->cd();
+    gDirectory = currentDir;
   } // first_call
 
   std::map<unsigned int, unsigned int> stripFToNHitMap,stripBToNHitMap;

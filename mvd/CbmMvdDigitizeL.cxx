@@ -177,6 +177,8 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
 
     //fLorentzNorm=0.00013010281679422413;
     fLorentzNorm=1;
+    
+    SetPixelSize(18.4);
 }
 // -------------------------------------------------------------------------
 
@@ -289,6 +291,9 @@ CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
 
     //fLorentzNorm=0.00013010281679422413;
     fLorentzNorm=1;
+    
+    SetPixelSize(18.4);
+    
  }
 
 
@@ -317,32 +322,36 @@ void CbmMvdDigitizeL::SetPixelSize(Double_t pixelSize) {
     fPixelSizeY=fPixelSize;
 
     if( pixelSize == 10 ){
-	fPar0 = 3.42157e+02;
-	fPar1 = 7.67981e-01;
-	fPar2 = 0;
-        fLandauMPV   = 9.34187e+02;
-        fLandauSigma = 1.87871e+02;
-	fLandauGain=1.56;	
-    }
-    else if( pixelSize == 18.4 ){
-	fPar0 = 3.30883e+02;
-	fPar1 = 9.35416e-01;
-	fPar2 = 0;
-        fLandauMPV   = 758.1;
-        fLandauSigma = 170.;// goal value: 145.3;
-
-    }
-    else if( pixelSize == 30 ){
-	//fPar0 = 4.12073e+02;
-	//fPar1 = 1.11360e+00;
-	//fPar2 = 0;
 	fPar0 = 4.12073e+02;
 	fPar1 = 0.8e+00;
 	fPar2 = 0;
 	fLandauMPV   = 8.62131e+02;
-        //fLandauSigma = 1.68846e+02;
 	fLandauSigma = 2.e+02;
-	//fLandauGain=1.25;
+        fLandauGain=1.56;	
+    }
+    else if( pixelSize == 18.4 ){
+	/*fPar0 = 3.30883e+02;
+	fPar1 = 9.35416e-01;
+	fPar2 = 0;
+        fLandauMPV   = 758.1;
+        fLandauSigma = 170.;// goal value: 145.3;*/
+	
+	
+	fPar0 = 4.12073e+02;
+	fPar1 = 0.8e+00;
+	fPar2 = 0;
+	fLandauMPV   = 8.62131e+02;
+	fLandauSigma = 2.e+02;
+        fLandauGain=1.56;
+
+    }
+    else if( pixelSize == 30 ){
+	fPar0 = 4.12073e+02;
+	fPar1 = 0.8e+00;
+	fPar2 = 0;
+	fLandauMPV   = 8.62131e+02;
+	fLandauSigma = 2.e+02;
+        fLandauGain=1.56;
 
     }
     else {

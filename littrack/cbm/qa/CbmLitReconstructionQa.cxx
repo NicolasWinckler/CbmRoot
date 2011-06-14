@@ -74,6 +74,10 @@ const Int_t FAKEALL = 4;
 //electron identification
 const Int_t ELID = 0;
 const Int_t PISUPP = 1;
+//detector acceptance
+const Int_t DETACCMC = 0;
+const Int_t DETACCACC = 1;
+const Int_t DETACCEFF = 2;
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
    FairTask("LitReconstructionQA", 1),
@@ -194,6 +198,25 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fhNofTofHits(NULL),
    fhStsChiprim(NULL),
    fhStsMomresVsMom(NULL),
+
+   fhStsTrdMomElId(),
+   fhStsTrdMomElIdNormStsTrdTof(),
+   fhStsTrdTofMomElId(),
+   fhStsRichMomElId(),
+   fhStsRichMomElIdNormStsRichTrd(),
+   fhStsRichTrdMomElId(),
+   fhStsRichMomElIdNormStsRichTrdTof(),
+   fhStsRichTrdMomElIdNormStsRichTrdTof(),
+   fhStsRichTrdTofMomElId(),
+
+   fhStsDetAcc(),
+   fhStsRichDetAcc(),
+   fhStsTrdDetAcc(),
+   fhStsTofDetAcc(),
+   fhStsRichTrdDetAcc(),
+   fhStsRichTrdTofDetAcc(),
+   fhStsTrdTofDetAcc(),
+
 
    fhEventNo(NULL),
 
@@ -522,7 +545,6 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
                   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(stsTrackMatch->GetMCTrackId());
                   if (mcTrack != NULL) momentumMc = mcTrack->GetP();
                 }
-               std::cout << momentumMc << std::endl;
                 if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
                    fhRichGhostElIdNh->Fill(nofHits);
             }
@@ -608,18 +630,22 @@ void CbmLitReconstructionQa::ProcessMvd(
    Int_t stsId)
 {
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(stsId));
+   if (NULL == track) return;
    Int_t nofHits = track->GetNMvdHits();
    fhMvdTrackHits[ALLHITS]->Fill(nofHits);
 
    CbmTrackMatch* stsTrackMatch = static_cast<CbmTrackMatch*>(fStsMatches->At(stsId));
+   if (NULL == stsTrackMatch) return;
    Int_t stsMcTrackId = stsTrackMatch->GetMCTrackId();
 
    Int_t nofTrueHits = 0, nofFakeHits = 0;
    for (Int_t iHit = 0; iHit < nofHits; iHit++) {
       Int_t hitId = track->GetMvdHitIndex(iHit);
       CbmMvdHitMatch* hitMatch = static_cast<CbmMvdHitMatch*>(fMvdHitMatches->At(hitId));
+      if (NULL == hitMatch) continue;
       Int_t pointId = hitMatch->GetPointId();
       CbmMvdPoint* point = static_cast<CbmMvdPoint*>(fMvdPoints->At(pointId));
+      if (NULL == point) continue;
       Int_t mcTrackId = point->GetTrackID();
       if (mcTrackId == stsMcTrackId) { // true hit
          nofTrueHits++;
@@ -698,6 +724,17 @@ Bool_t CbmLitReconstructionQa::CheckRingQuality(
    return true;
 }
 
+void CbmLitReconstructionQa::FillMcHistoForDetAcc(Double_t mom)
+{
+   fhStsDetAcc[DETACCMC]->Fill(mom);
+   fhStsRichDetAcc[DETACCMC]->Fill(mom);
+   fhStsTrdDetAcc[DETACCMC]->Fill(mom);
+   fhStsTofDetAcc[DETACCMC]->Fill(mom);
+   fhStsRichTrdDetAcc[DETACCMC]->Fill(mom);
+   fhStsRichTrdTofDetAcc[DETACCMC]->Fill(mom);
+   fhStsTrdTofDetAcc[DETACCMC]->Fill(mom);
+}
+
 void CbmLitReconstructionQa::ProcessMcTracks()
 {
    Int_t nofMcTracks = fMCTracks->GetEntriesFast();
@@ -728,6 +765,10 @@ void CbmLitReconstructionQa::ProcessMcTracks()
       mcTrack->GetMomentum(mom);
       Double_t angle = std::abs(mom.Theta() * 180 / TMath::Pi());
 
+      Bool_t isPrimElectron = (mcTrack->GetMotherId() == -1 && std::abs(mcTrack->GetPdgCode()) == 11);
+
+      if (isPrimElectron) FillMcHistoForDetAcc(mcTrack->GetP());
+
       // Check accepted tracks cutting on minimal number of MC points
       // acceptance: STS tracks only
       if (isStsOk) {
@@ -737,10 +778,11 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsNp, nofPointsSts);
          // number of points dependence histograms
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsAngle, angle);
+
+         if (isPrimElectron) fhStsDetAcc[DETACCACC]->Fill(mcTrack->GetP());
       }
       // acceptance: STS+TRD(MUCH)
       if (isStsOk && isRecOk) {
-    	 // std::cout << "isStsOk && isRecOk" << std::endl;
          // momentum dependence histograms
     	 // STS normalized to STS+TRD(MUCH)
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMomNormHalfGlobal, mcTrack->GetP());
@@ -749,10 +791,11 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 
          // STS+TRD: Electron identification
          FillGlobalElIdHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhStsTrdMomElId[ELID], mcTrack->GetP(), "trd");
+
+         if (isPrimElectron) fhStsTrdDetAcc[DETACCACC]->Fill(mcTrack->GetP());
       }
       // acceptance: STS+TRD(MUCH)+TOF
       if (isStsOk && isRecOk && isTofOk) {
-    	 // std::cout << "isStsOk && isRecOk && isTofOk" << std::endl;
          // momentum dependence histograms
     	 // STS normalized to STS+TRD(MUCH)+TOF
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMomNormGlobal, mcTrack->GetP());
@@ -765,6 +808,13 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalElIdHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhStsTrdMomElIdNormStsTrdTof[ELID], mcTrack->GetP(), "trd");
          // STS+TRD+TOF: Electron identification
          FillGlobalElIdHistos(mcTrack, iMCTrack, fMcGlobalMap, fhStsTrdTofMomElId[ELID], mcTrack->GetP(), "trd+tof");
+
+         if (isPrimElectron) fhStsTrdTofDetAcc[DETACCACC]->Fill(mcTrack->GetP());
+      }
+
+      // acceptance: STS+TOF
+      if (isStsOk && isTofOk) {
+         if (isPrimElectron) fhStsTofDetAcc[DETACCACC]->Fill(mcTrack->GetP());
       }
 
       // acceptance: STS as 100% + local TRD(MUCH) track cutting on number of points
@@ -808,6 +858,7 @@ void CbmLitReconstructionQa::ProcessMcTracks()
         // STS+RICH: Electron identification
         FillGlobalElIdHistos(mcTrack, iMCTrack, fMcStsRichMap, fhStsRichMomElId[ELID], mcTrack->GetP(), "rich");
 
+        if (isPrimElectron) fhStsRichDetAcc[DETACCACC]->Fill(mcTrack->GetP());
       }
       // acceptance: STS+RICH+TRD
       if (isStsOk && isRichOk && isTrdOk) {
@@ -822,6 +873,8 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalElIdHistos(mcTrack, iMCTrack, fMcStsRichMap, fhStsRichMomElIdNormStsRichTrd[ELID], mcTrack->GetP(), "rich");
          // STS+RICH+TRD: Electron identification
          FillGlobalElIdHistos(mcTrack, iMCTrack, fMcStsRichTrdMap, fhStsRichTrdMomElId[ELID], mcTrack->GetP(), "rich+trd");
+
+         if (isPrimElectron) fhStsRichTrdDetAcc[DETACCACC]->Fill(mcTrack->GetP());
       }
       // acceptance: STS+RICH+TRD+TOF
       if (isStsOk && isRichOk && isTrdOk && isTofOk) {
@@ -840,7 +893,9 @@ void CbmLitReconstructionQa::ProcessMcTracks()
           FillGlobalElIdHistos(mcTrack, iMCTrack, fMcStsRichTrdMap, fhStsRichTrdMomElIdNormStsRichTrdTof[ELID], mcTrack->GetP(), "rich+trd");
           // STS+RICH+TRD+TOF: Electron identification
           FillGlobalElIdHistos(mcTrack, iMCTrack, fMcStsRichTrdTofMap, fhStsRichTrdTofMomElId[ELID], mcTrack->GetP(), "rich+trd+tof");
-     }
+
+          if (isPrimElectron) fhStsRichTrdTofDetAcc[DETACCACC]->Fill(mcTrack->GetP());
+      }
    } // Loop over MCTracks
 }
 
@@ -1097,6 +1152,29 @@ void CbmLitReconstructionQa::CreateEffHistoElId(
    }
 }
 
+void CbmLitReconstructionQa::CreateEffHistoDetAcc(
+      std::vector<TH1F*>& hist,
+      const std::string& name,
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin,
+      const std::string& opt,
+      TFile* file)
+{
+   hist.resize(fNofTypes);
+   std::string type[] = {"Mc", "Acc", "Eff" };
+
+   for (Int_t j = 0; j < fNofTypes; j++) {
+      std::string histName = name + type[j];
+      if (file == NULL){
+        hist[j] = new TH1F(histName.c_str(), histName.c_str(), nofBins, minBin, maxBin);
+      } else {
+        hist[j] = (TH1F*)file->Get(histName.c_str());
+      }
+      fHistoList->Add(hist[j]);
+   }
+}
+
 void CbmLitReconstructionQa::CreateHistos(
 		TFile* file)
 {
@@ -1152,6 +1230,15 @@ void CbmLitReconstructionQa::CreateHistos(
    CreateEffHistoElId(fhStsRichMomElIdNormStsRichTrdTof, "fhStsRichMomElIdNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "", file);
    CreateEffHistoElId(fhStsRichTrdMomElIdNormStsRichTrdTof, "fhStsRichTrdMomElIdNormStsRichTrdTof", fNofBinsMom, fMinMom, fMaxMom, "", file);
    CreateEffHistoElId(fhStsRichTrdTofMomElId, "fhStsRichTrdTofMomElId", fNofBinsMom, fMinMom, fMaxMom, "", file);
+
+   // Detector acceptance histogramm
+   CreateEffHistoDetAcc(fhStsDetAcc, "hStsDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoDetAcc(fhStsRichDetAcc, "hStsRichDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoDetAcc(fhStsTrdDetAcc, "hStsTrdDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoDetAcc(fhStsTofDetAcc, "hStsTofDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoDetAcc(fhStsRichTrdDetAcc, "hStsRichTrdDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoDetAcc(fhStsRichTrdTofDetAcc, "fhStsRichTrdTofDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
+   CreateEffHistoDetAcc(fhStsTrdTofDetAcc, "fhStsTrdTofDetAcc", fNofBinsMom, fMinMom, fMaxMom, "", file);
 
    //Create histograms for ghost tracks
    if (file == NULL){
@@ -1359,6 +1446,14 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
       DivideHistos(fhStsRichTrdTofMomElId[i][rec], fhStsRichTrdTofMomElId[i][acc], fhStsRichTrdTofMomElId[i][EFF], c);
    }
 
+   DivideHistos(fhStsDetAcc[DETACCACC], fhStsDetAcc[DETACCMC], fhStsDetAcc[DETACCEFF], 100.);
+   DivideHistos(fhStsRichDetAcc[DETACCACC], fhStsRichDetAcc[DETACCMC], fhStsRichDetAcc[DETACCEFF], 100.);
+   DivideHistos(fhStsTrdDetAcc[DETACCACC], fhStsTrdDetAcc[DETACCMC], fhStsTrdDetAcc[DETACCEFF], 100.);
+   DivideHistos(fhStsTofDetAcc[DETACCACC], fhStsTofDetAcc[DETACCMC], fhStsTofDetAcc[DETACCEFF], 100.);
+   DivideHistos(fhStsRichTrdDetAcc[DETACCACC], fhStsRichTrdDetAcc[DETACCMC], fhStsRichTrdDetAcc[DETACCEFF], 100.);
+   DivideHistos(fhStsRichTrdTofDetAcc[DETACCACC], fhStsRichTrdTofDetAcc[DETACCMC], fhStsRichTrdTofDetAcc[DETACCEFF], 100.);
+   DivideHistos(fhStsTrdTofDetAcc[DETACCACC], fhStsTrdTofDetAcc[DETACCMC], fhStsTrdTofDetAcc[DETACCEFF], 100.);
+
    Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
    fhMvdNofHitsInStation->Scale(1./nofEvents);
    fhStsNofHitsInStation->Scale(1./nofEvents);
@@ -1456,6 +1551,7 @@ void CbmLitReconstructionQa::PrintEventStatistics()
    std::cout << std::setw(w) << "STS+RICH+TRD" << EventEfficiencyStatisticsRichToString(fhStsRichTrdMom, "event");
    std::cout << std::setw(w) << "STS+RICH+TRD+TOF" << EventEfficiencyStatisticsRichToString(fhStsRichTrdTofMom, "event");
 
+   PrintDetectorAcceptanceStatistics(std::cout);
    PrintGhostStatistics(std::cout);
 }
 
@@ -1582,6 +1678,7 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
    out << std::setw(w) << "STS+RICH+TRD+TOF" << EventEfficiencyStatisticsElIdToString(fhStsRichTrdTofMomElId, "final");
    out << std::setfill('_') << std::setw(7*17) << "_"<< std::endl;
 
+   PrintDetectorAcceptanceStatistics(out);
    PrintGhostStatistics(out);
 
    out << "Chi2 to primary vertex: mean = " << fhStsChiprim->GetMean()
@@ -1738,6 +1835,44 @@ void CbmLitReconstructionQa::PrintGhostStatistics(
 	out << std::endl;
 }
 
+std::string CbmLitReconstructionQa::EventDetectorAcceptanceStatisticsToString(
+   const std::vector<TH1F*>& hist,
+   const std::string& effName)
+{
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
+
+   Double_t eff = 0.;
+
+   Double_t mc = hist[DETACCMC]->GetEntries();
+   Double_t acc = hist[DETACCACC]->GetEntries();
+   if (mc != 0.) { eff = 100.*acc / mc; }
+
+   std::stringstream ss;
+   ss.precision(3);
+
+   ss << effName << ": " << eff << "(" << acc/nofEvents << "/" << mc/nofEvents << ")";
+   return ss.str();
+}
+
+void CbmLitReconstructionQa::PrintDetectorAcceptanceStatistics(
+   std::ostream& out)
+{
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
+
+   out << "Detector acceptance efficiency for primary electrons:" << std::endl;
+   if (!fIsSts) { return;}
+
+   out << EventDetectorAcceptanceStatisticsToString(fhStsDetAcc, "STS") << std::endl;;
+   if (fIsRich)out << EventDetectorAcceptanceStatisticsToString(fhStsRichDetAcc, "STS-RICH") << std::endl;
+   if (fIsTrd) out << EventDetectorAcceptanceStatisticsToString(fhStsTrdDetAcc, "STS-TRD") << std::endl;
+   if (fIsTof) out << EventDetectorAcceptanceStatisticsToString(fhStsTofDetAcc, "STS-TOF") << std::endl;
+   if (fIsRich && fIsTrd) out << EventDetectorAcceptanceStatisticsToString(fhStsRichTrdDetAcc, "STS-RICH-TRD") << std::endl;
+   if (fIsRich && fIsTrd && fIsTof) out << EventDetectorAcceptanceStatisticsToString(fhStsRichTrdTofDetAcc, "STS-RICH-TRD-TOF") << std::endl;
+   if (fIsTrd && fIsTof) out << EventDetectorAcceptanceStatisticsToString(fhStsTrdTofDetAcc, "STS-TRD-TOF") << std::endl;
+
+   out << std::endl;
+}
+
 std::string CbmLitReconstructionQa::EventEfficiencyStatisticsElIdToString(
    const std::vector<std::vector<TH1F*> >& hist,
    const std::string& opt)
@@ -1885,6 +2020,14 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
             &fhStsRichTrdMomElIdNormStsRichTrdTof[PISUPP], &fhStsRichTrdTofMomElId[PISUPP], NULL,
             "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "pisupp");
     }
+
+   if (fIsRich) {
+      // Draw detector acceptance
+      DrawEfficiency("rec_qa_sts_rich_trd_tof_detector_acceptance", &fhStsDetAcc,
+            &fhStsRichDetAcc, &fhStsRichTrdDetAcc, &fhStsRichTrdTofDetAcc,
+            "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
+
+   }
 }
 
 void CbmLitReconstructionQa::DrawEfficiency(

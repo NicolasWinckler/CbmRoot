@@ -157,6 +157,11 @@ private:
    Bool_t CheckRingQuality(
       CbmRichRingMatch* ringMatch);
 
+   /* Add MC momentum to the histograms for detector acc calculation
+    * @param mom MC momentum of the MC track*/
+   void FillMcHistoForDetAcc(
+         Double_t mom);
+
    /* Loops over the MC tracks. Checks the track acceptance for different cases.
      * Fills the histograms of the accepted and reconstructed tracks. */
    void ProcessMcTracks();
@@ -189,7 +194,6 @@ private:
     * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
     * @param hist vector with histograms to be filled
     * @param par value that will be added in the histos (momentum or number of points)*/
-
    void FillGlobalReconstructionHistosRich(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
@@ -223,6 +227,16 @@ private:
    /* */
    void CreateEffHistoElId(
          std::vector<std::vector<TH1F*> >& hist,
+         const std::string& name,
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin,
+         const std::string& opt,
+         TFile* file);
+
+   /* */
+   void CreateEffHistoDetAcc(
+         std::vector<TH1F*>& hist,
          const std::string& name,
          Int_t nofBins,
          Double_t minBin,
@@ -283,6 +297,15 @@ private:
    /* Prints ghosts statistics to the out stream
     * @param out Output stream */
    void PrintGhostStatistics(
+      std::ostream& out);
+
+   /* */
+   std::string EventDetectorAcceptanceStatisticsToString(
+      const std::vector<TH1F*>& hist,
+      const std::string& effName);
+
+   /* */
+   void PrintDetectorAcceptanceStatistics(
       std::ostream& out);
 
    /* Calculates integrated efficiencies and forms string with statistic information.
@@ -519,6 +542,9 @@ private:
 
 
    // Electron identification
+   // h[category][histogram type]:
+   // track category (ElId, PiSupp)
+   // histogram type (acc, rec, eff)
    std::vector<std::vector<TH1F*> > fhStsTrdMomElId; // STS+TRD: momentum dependence
    std::vector<std::vector<TH1F*> > fhStsTrdMomElIdNormStsTrdTof; // STS+TRD: momentum dependence, normalized to STS+TRD+TOF
    std::vector<std::vector<TH1F*> > fhStsTrdTofMomElId; // STS+TRD+TOF: momentum dependence
@@ -532,12 +558,26 @@ private:
    std::vector<std::vector<TH1F*> > fhStsRichTrdMomElIdNormStsRichTrdTof;// STS+RICH+TRD: momentum dependence, normalized to STS+RICH+TRD+TOF
    std::vector<std::vector<TH1F*> > fhStsRichTrdTofMomElId;// STS+RICH+TRD+TOF: momentum dependence, normalized to STS+RICH+TRD+TOF
 
+   // Detector acceptance
+   // h[histogram type]:
+   // histogram type (mc, acc, eff)
+   // local detector acceptance
+   std::vector<TH1F*> fhStsDetAcc; // STS detector acceptance
+   // pair detector acceptance
+   std::vector<TH1F*> fhStsRichDetAcc; // STS-RICH detector acceptance
+   std::vector<TH1F*> fhStsTrdDetAcc; // STS-TRD detector acceptance
+   std::vector<TH1F*> fhStsTofDetAcc; // STS-TOF detector acceptance
+   // global detector acceptance
+   std::vector<TH1F*> fhStsRichTrdDetAcc; // STS-RICH-TOF detector acceptance
+   std::vector<TH1F*> fhStsRichTrdTofDetAcc; // STS-RICH-TRD-TOF detector acceptance
+   std::vector<TH1F*> fhStsTrdTofDetAcc; // STS-TRD-TOF detector acceptance
+
    TH1F* fhEventNo; // Event counter
 
    std::string fOutputDir; // Output directory for images
 
-   CbmVertex *fPrimVertex;
-   CbmStsKFTrackFitter* fKFFitter;
+   CbmVertex *fPrimVertex; // Pointer to the primary vertex
+   CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 

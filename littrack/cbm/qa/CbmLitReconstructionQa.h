@@ -224,24 +224,34 @@ private:
    		const std::string& opt,
    		TFile* file);
 
-   /* */
+   /* Creates histograms for electron identification- hist using specified parameters.
+   * @param hist 2D vector of the histograms
+   * @param name Histogram name
+   * @param nofBins Number of bins in the histograms
+   * @param minBin Minimum value of the histograms
+   * @param maxBin Maximum value of the histograms
+   * @param file if file==NULL then create histograms else read histograms from file*/
    void CreateEffHistoElId(
          std::vector<std::vector<TH1F*> >& hist,
          const std::string& name,
          Int_t nofBins,
          Double_t minBin,
          Double_t maxBin,
-         const std::string& opt,
          TFile* file);
 
-   /* */
+   /* Creates histograms for detector acceptance - hist using specified parameters.
+   * @param hist vector of the histograms
+   * @param name Histogram name
+   * @param nofBins Number of bins in the histograms
+   * @param minBin Minimum value of the histograms
+   * @param maxBin Maximum value of the histograms
+   * @param file if file==NULL then create histograms else read histograms from file*/
    void CreateEffHistoDetAcc(
          std::vector<TH1F*>& hist,
          const std::string& name,
          Int_t nofBins,
          Double_t minBin,
          Double_t maxBin,
-         const std::string& opt,
          TFile* file);
 
    /* Creates the histograms.
@@ -294,18 +304,37 @@ private:
       const std::vector<std::vector<TH1F*> >& hist,
       const std::string& opt);
 
+   /* Prints nof points, hits, tracks, rings etc. statistics to the out stream
+    * @param out Output stream */
+   void PrintNofStatistics(
+      std::ostream& out);
+
+   /* Prints nof points or hits or tracks or rings etc. statistics to string
+    * @param  */
+   std::string PrintNofStatisticsToString(
+      const std::string& name,
+      TH1F* mvd,
+      TH1F* sts,
+      TH1F* rich,
+      TH1F* trd,
+      TH1F* muchP,
+      TH1F* muchS,
+      TH1F* tof);
+
    /* Prints ghosts statistics to the out stream
     * @param out Output stream */
    void PrintGhostStatistics(
       std::ostream& out);
 
    /* */
-   std::string EventDetectorAcceptanceStatisticsToString(
-      const std::vector<TH1F*>& hist,
-      const std::string& effName);
+   std::string EventDetAccElStatisticsToString(
+         const std::string& effName,
+         TH1F* hmc,
+         TH1F* hacc,
+         TH1F* hrec);
 
    /* */
-   void PrintDetectorAcceptanceStatistics(
+   void PrintDetAccElStatistics(
       std::ostream& out);
 
    /* Calculates integrated efficiencies and forms string with statistic information.
@@ -439,19 +468,27 @@ private:
    TClonesArray* fMvdHits; // CbmMvdHit array
    TClonesArray* fMvdPoints; // CbmMvdPoint array
    TClonesArray* fMvdHitMatches; // CbmMvdHitMatch array
+
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
    TClonesArray* fStsHits; // CbmStsHit array
+   TClonesArray* fStsPoints; // CbmStsPoint array
+
    TClonesArray* fRichHits; // CbmRichHits array
    TClonesArray* fRichRings; // CbmRichRing array
    TClonesArray* fRichProjections; // CbmRichProjection array
    TClonesArray* fRichRingMatches; // CbmRichProjection array
    TClonesArray* fRichPoints; // CbmRichPoint array
+
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
    TClonesArray* fMuchMatches; // CbmTrackMatch array
+   TClonesArray* fMuchPoints; // CbmMuchPoint array
+
    TClonesArray* fTrdMatches; // CbmTrackMatch array
    TClonesArray* fTrdHits; // CbmTrdHit array
+   TClonesArray* fTrdPoints; // CbmTrdPoint array
+
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 
@@ -530,13 +567,22 @@ private:
    TH1F* fhNofMuchTracks; // MUCH tracks
    TH1F* fhNofRichRings; // RICH rings
    TH1F* fhNofRichProjections; // RICH projections
+   // hits
    TH1F* fhNofMvdHits; // MVD hits
    TH1F* fhNofStsHits; // STS hits
-   TH1F* fhNofRichHits; // RICH tracks
-   TH1F* fhNofTrdHits; // TRD tracks
+   TH1F* fhNofRichHits; // RICH hits
+   TH1F* fhNofTrdHits; // TRD hits
    TH1F* fhNofMuchPixelHits; // MUCH pixel hits
    TH1F* fhNofMuchStrawHits; // MUCH straw hits
    TH1F* fhNofTofHits; // TOF hits
+   // points
+   TH1F* fhNofMvdPoints; // MVD points
+   TH1F* fhNofStsPoints; // STS points
+   TH1F* fhNofRichPoints; // RICH points
+   TH1F* fhNofTrdPoints; // TRD points
+   TH1F* fhNofMuchPoints; // MUCH points
+   TH1F* fhNofTofPoints; // TOF points
+
    TH1F* fhStsChiprim; //chi2Vertex
    TH2F* fhStsMomresVsMom; // momentum resolution vs. momentum
 
@@ -558,19 +604,19 @@ private:
    std::vector<std::vector<TH1F*> > fhStsRichTrdMomElIdNormStsRichTrdTof;// STS+RICH+TRD: momentum dependence, normalized to STS+RICH+TRD+TOF
    std::vector<std::vector<TH1F*> > fhStsRichTrdTofMomElId;// STS+RICH+TRD+TOF: momentum dependence, normalized to STS+RICH+TRD+TOF
 
-   // Detector acceptance
+   // Detector acceptance for primary electrons (signal)
    // h[histogram type]:
    // histogram type (mc, acc, eff)
    // local detector acceptance
-   std::vector<TH1F*> fhStsDetAcc; // STS detector acceptance
+   std::vector<TH1F*> fhStsDetAccEl; // STS detector acceptance
    // pair detector acceptance
-   std::vector<TH1F*> fhStsRichDetAcc; // STS-RICH detector acceptance
-   std::vector<TH1F*> fhStsTrdDetAcc; // STS-TRD detector acceptance
-   std::vector<TH1F*> fhStsTofDetAcc; // STS-TOF detector acceptance
+   std::vector<TH1F*> fhStsRichDetAccEl; // STS-RICH detector acceptance
+   std::vector<TH1F*> fhStsTrdDetAccEl; // STS-TRD detector acceptance
+   std::vector<TH1F*> fhStsTofDetAccEl; // STS-TOF detector acceptance
    // global detector acceptance
-   std::vector<TH1F*> fhStsRichTrdDetAcc; // STS-RICH-TOF detector acceptance
-   std::vector<TH1F*> fhStsRichTrdTofDetAcc; // STS-RICH-TRD-TOF detector acceptance
-   std::vector<TH1F*> fhStsTrdTofDetAcc; // STS-TRD-TOF detector acceptance
+   std::vector<TH1F*> fhStsRichTrdDetAccEl; // STS-RICH-TOF detector acceptance
+   std::vector<TH1F*> fhStsRichTrdTofDetAccEl; // STS-RICH-TRD-TOF detector acceptance
+   std::vector<TH1F*> fhStsTrdTofDetAccEl; // STS-TRD-TOF detector acceptance
 
    TH1F* fhEventNo; // Event counter
 

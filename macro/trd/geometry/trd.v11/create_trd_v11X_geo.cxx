@@ -2,6 +2,11 @@
 //   Generator for CbmTrd Geometry
 //
 //
+// Update 20110616 - David Emschermann 
+// - allow variable frame width - 15 / 20 mm 
+// - resulting in 570 x 570 mm2 and 960 x 960 mm2 sized pad planes
+// - multiple of 30 mm allow for 5 mm and 7.5 mm wide pads
+//
 // Update 20110602 - David Emschermann 
 // - change order of modules
 //
@@ -218,7 +223,7 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 }
 
 //--------------------------------------------------------------------
-int TrdModules1(int Station_number, int Layer_number, float frame_width, float Layer_thickness, float Layer_pitch, int Chamber_number, float Position_Station1[][4], float* Detector_size_x, float* Detector_size_y) {
+int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, float Layer_thickness, float Layer_pitch, int Chamber_number, float Position_Station1[][4], float* Detector_size_x, float* Detector_size_y) {
 
   // create box of air with size of 'Detector_size_x[0] x Detector_size_y[0]' and fill
   // this box with the
@@ -247,12 +252,12 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
 //  Active_area_x[2] = Detector_size_x[2] - frame_width;
 //  Active_area_y[2] = Detector_size_x[2] / 2 - frame_width;
   // squared 
-  Active_area_x[0] = Detector_size_x[0] /2 - frame_width;
-  Active_area_y[0] = Detector_size_y[0] /2 - frame_width;
-  Active_area_x[1] = Detector_size_x[1] /2 - frame_width;
-  Active_area_y[1] = Detector_size_y[1] /2 - frame_width;
-  Active_area_x[2] = Detector_size_x[2] /2 - frame_width;
-  Active_area_y[2] = Detector_size_y[2] /2 - frame_width;
+  Active_area_x[0] = Detector_size_x[0] /2 - frame_width_array[0];
+  Active_area_y[0] = Detector_size_y[0] /2 - frame_width_array[0];
+  Active_area_x[1] = Detector_size_x[1] /2 - frame_width_array[1];
+  Active_area_y[1] = Detector_size_y[1] /2 - frame_width_array[1];
+  Active_area_x[2] = Detector_size_x[2] /2 - frame_width_array[2];
+  Active_area_y[2] = Detector_size_y[2] /2 - frame_width_array[2];
  
 
   // 12 mm gas (Jun10) - intelligent
@@ -341,8 +346,9 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
 
   for (int i=0; i< Chamber_number; i++){
 
-    int module_number = (int)Position_Station1[i][2];
-    int j = (int)Position_Station1[i][2]-1;
+    int   module_number = (int)Position_Station1[i][2];
+    int   j = (int)Position_Station1[i][2]-1;
+    float frame_width =  frame_width_array[module_number-1];
 
 // define modules only for first layer per station
 // requires 4-digit notation
@@ -744,8 +750,10 @@ int main(void)
   //  string geoname  = path + "trd_squared_modules_jul10_v03.geo" ; // tilted, 6 mm gas
   //  string geoname  = path + "trd_squared_modules_jul10_v04.geo" ; // tilted, aligned, 6 mm gas
   //  string geoname  = path + "trd_squared_modules_jul10_v05.geo" ; // tilted layer pairs, 6 mm gas
-  string geoname  = path + "trd_may11_v11a.geo" ; // test
-  string infoname = path + "trd_may11_v11a.geo.info";
+  //  string geoname  = path + "trd_may11_v11a.geo" ; // test
+  //  string infoname = path + "trd_may11_v11a.geo.info";
+  string geoname  = path + "trd_v11a.geo" ; // test
+  string infoname = path + "trd_v11a.geo.info";
   //  string parametername  = path + "trd_segmented.txt";
 
   geofile = fopen(geoname.c_str(),  "w+");
@@ -762,7 +770,8 @@ int main(void)
   int   Station_number;      // Number of TRD stations in the setup
   float Detector_size_x[3];  // length in mm of a detector module in x-direction       
   float Detector_size_y[3];  // length in mm of a detector module in y-direction       
-  float Frame_width;         // Width of detector frames in mm
+  //  float Frame_width;         // Width of detector frames in mm
+  float Frame_width[3];      // Width of detector frames in mm
   float Inner_radius[3];     // Inner acceptance in mm
   float Outer_radius[3];     // Outer acceptance in mm
 
@@ -794,7 +803,10 @@ int main(void)
   float Inner_acceptance[3]  = {50, 50, 50};
   float Outer_acceptance[3]  = {500, 500, 500};
   // DE with frames
-  Frame_width          = 20;
+  Frame_width[0]        = 15;
+  Frame_width[1]        = 15;
+  Frame_width[2]        = 20;
+  //  Frame_width          = 20;
   //  Frame_width          = 0;
 
   //--------- Basic calculations ----------------------------------------------
@@ -1393,8 +1405,8 @@ int main(void)
 
     printf("Distance, Inner_radius, Outer_radius, Station_thickness: %f, %f, %f, %f \n",
             Distance[counter], Inner_radius[counter], Outer_radius[counter], Station_thickness);
-    printf("Layer_number, Layer_thickness, layer_pitch, frame_width: %d, %f, %f, %f \n",
-	   Layer_number, Layer_thickness, Layer_pitch, Frame_width);
+    printf("Layer_number, Layer_thickness, layer_pitch, frame_width: %d, %f, %f, %f, %f, %f \n",
+	   Layer_number, Layer_thickness, Layer_pitch, Frame_width[0], Frame_width[1], Frame_width[2]);
     printf("Detector_size_x %d: %f\n",counter,Detector_size_x[counter]);
   
     // The distance is measured to the start of the station. In GEANT the

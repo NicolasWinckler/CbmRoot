@@ -71,9 +71,10 @@ typedef struct ModulePara
   std::vector<Float_t> PadSizeY;
   std::vector<Int_t> SecCol;
   std::vector<Int_t> SecRow;
+  /*
   std::vector<Int_t> PadSizeXArray;
   std::vector<Int_t> PadSizeYArray;
-   
+  */
   Float_t ModuleSizeX;
   Float_t ModuleSizeY;
   Float_t ModulePositionX;
@@ -181,6 +182,32 @@ class CbmTrdClusterizer : public FairTask {
   Int_t   fModuleCopy;
   Int_t   fModuleID;//Unique number for detector module
   Int_t   fMCindex;// index to MCPoint
+  /*
+  Int_t fStation;
+  Int_t fLayer;
+  Int_t fmoduleId;
+  Int_t fnCol;
+  Int_t fnRow;
+  Int_t fNoSectors;
+  
+  std::vector<Float_t> fSectorSizeX;
+  std::vector<Float_t> fSectorSizeY;
+  std::vector<Float_t> fPadSizeX;
+  std::vector<Float_t> fPadSizeY;
+  std::vector<Int_t> fSecCol;
+  std::vector<Int_t> fSecRow;
+  std::vector<Float_t> fPadSizeXArray;
+  std::vector<Float_t> fPadSizeYArray;
+   
+  Float_t fModuleSizeX;
+  Float_t fModuleSizeY;
+  Float_t fModulePositionX;
+  Float_t fModulePositionY;
+  Float_t fModulePositionZ;
+*/
+
+
+
 
   Double_t tempx;
   Double_t tempy;
@@ -189,7 +216,7 @@ class CbmTrdClusterizer : public FairTask {
   static const Int_t Accuracy = 1000; // fMathieson array accuracy in values per mm
   static const Int_t fPadNrX = 15;//7; // has to be odd
   static const Int_t fPadNrY = 5;//5; // has to be odd
-  static const Int_t fNoSectors = 3;
+  //static const Int_t fNoSectors = 3;
   static const Int_t endOfMathiesonArray = 35; //+- mm
   Double_t fMathieson[endOfMathiesonArray * 1000];//endOfMathiesonArray * Accuracy
   Double_t fModuleSize[3];
@@ -214,8 +241,9 @@ class CbmTrdClusterizer : public FairTask {
   std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
 
   std::map<Int_t, ModulePara*> fModuleParaMap;
+  std::map<Int_t, ModulePara*>::iterator fModuleParaMapIt;
 
-  TH1F* fIntegralTest;
+  //TH1F* fIntegralTest;
 
   ClassDef(CbmTrdClusterizer,1)
 

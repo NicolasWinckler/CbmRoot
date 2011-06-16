@@ -162,7 +162,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 
   cout << "================CbmTrdClusterizer=====================" << endl;
 
-  fIntegralTest = new TH1F("IntegrationTest","IntegrationTest",200000,0,20000);
+  //fIntegralTest = new TH1F("IntegrationTest","IntegrationTest",200000,0,20000);
 
   Digicounter = 0;
   CbmTrdPoint *pt=NULL;
@@ -472,6 +472,13 @@ void CbmTrdClusterizer::FinishEvent()
     delete fDigiMapIt->second;
   }
   fDigiMap.clear();
+
+  for (fModuleParaMapIt = fModuleParaMap.begin();
+       fModuleParaMapIt != fModuleParaMap.end(); ++fModuleParaMapIt) {
+    delete fModuleParaMapIt->second;
+  }
+  fModuleParaMap.clear();
+  
   if ( fDigiCollection ) fDigiCollection->Clear();
   if ( fDigiMatchCollection ) fDigiMatchCollection->Clear();
 }
@@ -1018,7 +1025,7 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
       //Test2->Fill(iPCol,iPRow,fPadCharge[iPRow][iPCol]);
     }
   }
-  fIntegralTest->Fill(totalCharge);
+  //fIntegralTest->Fill(totalCharge);
   /*
   c->cd(1);
   Test->Draw("colz");
@@ -1067,12 +1074,20 @@ void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
       if (direction == 0 || direction == 2) {
 	if (yPos > yNextPad) {
 	  iPadRow++;
+	  if (iPadRow >= fPadNrY){
+	    cout << "too big row" << endl;
+	    continue;
+	  }
 	  yNextPad += H[iPadRow];
 	}
       }
       else {
 	if (yPos < yNextPad) {
 	  iPadRow--;
+	  if (iPadRow < 0){
+	    cout << "too small row" << endl;
+	    continue;
+	  }
 	  yNextPad -= H[iPadRow];
 	}
       }
@@ -1087,12 +1102,20 @@ void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
 	if (direction == 0 || direction == 1) {
 	  if (xPos > xNextPad) {
 	    iPadCol++;
+	    if (iPadCol >= fPadNrX){
+	      cout << "too small col" << endl;
+	      continue;
+	    }
 	    xNextPad += W[iPadCol];
 	  }
 	}
 	else {
 	  if (xPos < xNextPad) {
 	    iPadCol--;
+	    if (iPadCol < 0){
+	      cout << "too big col" << endl;
+	      continue;
+	    }
 	    xNextPad -= W[iPadCol];
 	  }
 	}
@@ -1159,7 +1182,7 @@ void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
       fPadCharge[iPRow][iPCol] *= SliceELoss;
     }
   }
-  fIntegralTest->Fill(totalCharge);
+  //fIntegralTest->Fill(totalCharge);
 }
     // --------------------------------------------------------------------
 Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset) 

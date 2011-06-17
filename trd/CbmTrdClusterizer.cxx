@@ -573,7 +573,7 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
       }
 
       Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
-         fModuleType = detInfo[3];
+      fModuleType = detInfo[3];
       fModuleCopy = detInfo[4];
       //---------------------------------------------------------------------------------------------------
       std::map<Int_t, ModulePara* >::iterator it = fModuleParaMap.find(detID);
@@ -582,7 +582,9 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
 	fModuleParaMap[detID] = mPara;
 	/*
 	  add a matrix 0 -> nrow and ncol for pad width and height of each pad to get wride of the padsizematrix !!!! 
-	 */
+	*/
+	Float_t averagePadSizeX;
+	Float_t averagePadSizeY;
 	mPara -> Station = detInfo[1];
 	mPara -> Layer = detInfo[2];
 	mPara -> moduleId = detID;//moduleId;
@@ -622,22 +624,37 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
 	      mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizex(i);
 	      mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizey(i);
 	      mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizex(i);
+	      averagePadSizeX += mPara -> PadSizeX[i];
+	      averagePadSizeY += mPara -> PadSizeY[i];
 	    }
 	  }
 	/*
-	mPara -> PadSizeXArray.resize(mPara -> nCol);
-	mPara -> PadSizeYArray.resize(mPara -> nRow);
-	for (Int_t i = 0; i < mPara -> nCol; i++) {
+	  mPara -> PadSizeXArray.resize(mPara -> nCol);
+	  mPara -> PadSizeYArray.resize(mPara -> nRow);
+	  for (Int_t i = 0; i < mPara -> nCol; i++) {
 	  mPara -> PadSizeXArray[i] = ;
-	}
-	for (Int_t i = 0; i < mPara -> nRow; i++) {
+	  }
+	  for (Int_t i = 0; i < mPara -> nRow; i++) {
 	  mPara -> PadSizeYArray[i] = ;
-	}
+	  }
 	*/
 	for (Int_t i = 0; i < NoSectors; i++) {
 	  mPara -> SecRow[i]      = Int_t(mPara->SectorSizeY[i] / mPara->PadSizeY[i]);
 	  mPara -> SecCol[i]      = Int_t(mPara->SectorSizeX[i] / mPara->PadSizeX[i]);
 	}
+	averagePadSizeX /= NoSectors;
+	averagePadSizeY /= NoSectors;
+	/*
+	fPadNrX = Int_t((endOfMathiesonArray / averagePadSizeX) + 0.5);//approximate to int
+	if (fPadNrX % 2 == 0)
+	  fPadNrX++;
+	fPadNrY = Int_t((endOfMathiesonArray / averagePadSizeY) + 0.5);//approximate to int
+	if (fPadNrY % 2 == 0)
+	  fPadNrY++;
+	fPadCharge.resize(fPadNrY);
+	for (Int_t i = 0; i < fPadNrY; i++)
+	  fPadCharge[i].resize(fPadNrX);
+	*/
       }
       //---------------------------------------------------------------------------------------------------
   

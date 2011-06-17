@@ -7,6 +7,7 @@
 
 #include <map>
 #include <list>
+#include <vector>
 #include "CbmTrdDigi.h"
 
 class CbmTrdDigiPar;
@@ -183,28 +184,28 @@ class CbmTrdClusterizer : public FairTask {
   Int_t   fModuleID;//Unique number for detector module
   Int_t   fMCindex;// index to MCPoint
   /*
-  Int_t fStation;
-  Int_t fLayer;
-  Int_t fmoduleId;
-  Int_t fnCol;
-  Int_t fnRow;
-  Int_t fNoSectors;
+    Int_t fStation;
+    Int_t fLayer;
+    Int_t fmoduleId;
+    Int_t fnCol;
+    Int_t fnRow;
+    Int_t fNoSectors;
   
-  std::vector<Float_t> fSectorSizeX;
-  std::vector<Float_t> fSectorSizeY;
-  std::vector<Float_t> fPadSizeX;
-  std::vector<Float_t> fPadSizeY;
-  std::vector<Int_t> fSecCol;
-  std::vector<Int_t> fSecRow;
-  std::vector<Float_t> fPadSizeXArray;
-  std::vector<Float_t> fPadSizeYArray;
+    std::vector<Float_t> fSectorSizeX;
+    std::vector<Float_t> fSectorSizeY;
+    std::vector<Float_t> fPadSizeX;
+    std::vector<Float_t> fPadSizeY;
+    std::vector<Int_t> fSecCol;
+    std::vector<Int_t> fSecRow;
+    std::vector<Float_t> fPadSizeXArray;
+    std::vector<Float_t> fPadSizeYArray;
    
-  Float_t fModuleSizeX;
-  Float_t fModuleSizeY;
-  Float_t fModulePositionX;
-  Float_t fModulePositionY;
-  Float_t fModulePositionZ;
-*/
+    Float_t fModuleSizeX;
+    Float_t fModuleSizeY;
+    Float_t fModulePositionX;
+    Float_t fModulePositionY;
+    Float_t fModulePositionZ;
+  */
 
 
 
@@ -214,13 +215,21 @@ class CbmTrdClusterizer : public FairTask {
 
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
   static const Int_t Accuracy = 1000; // fMathieson array accuracy in values per mm
-  static const Int_t fPadNrX = 15;//7; // has to be odd
-  static const Int_t fPadNrY = 5;//5; // has to be odd
+
+  static const Int_t fPadNrX = 31;//15;//7; // has to be odd
+  static const Int_t fPadNrY = 31;//5;//5; // has to be odd
+    Double_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
+  /*
+    Int_t fPadNrX;//7; // has to be odd
+    Int_t fPadNrY;//5; // has to be odd
+    std::vector< std::vector <Double_t> > fPadCharge;
+  */
   //static const Int_t fNoSectors = 3;
   static const Int_t endOfMathiesonArray = 35; //+- mm
   Double_t fMathieson[endOfMathiesonArray * 1000];//endOfMathiesonArray * Accuracy
   Double_t fModuleSize[3];
-  Double_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
+ 
+ 
   Float_t fEfficiency; // Digi production efficiency (0-100%)
 
   TClonesArray *fTrdPoints; //! Trd MC points

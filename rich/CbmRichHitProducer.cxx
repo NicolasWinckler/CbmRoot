@@ -497,8 +497,8 @@ void CbmRichHitProducer::Exec(
       cout <<"-------------------------------------------------------------------"<<endl;
       cout << endl;
    }
-   cout << "nof cross section hits = " << fNofCrossSectionHits << ", per event = " <<
-         (Double_t) fNofCrossSectionHits / nevents << endl;
+   cout << "nof cross section hits = " << fNofCrossTalkHits << ", per event = " <<
+         (Double_t) fNofCrossTalkHits / nevents << endl;
 }
 
 void CbmRichHitProducer::AddHit(

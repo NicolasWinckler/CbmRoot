@@ -546,7 +546,7 @@ void L1AlgoDraw::DrawInputHits()
     L1Station &st = vStations[ista];
     Int_t n_poly = 0;
     Int_t n_poly_fake = 0;
-    for (int ih = StsHitsStartIndex[ista]; ih<=StsHitsStopIndex[ista]; ih++){
+    for (int ih = StsHitsStartIndex[ista]; ih < StsHitsStopIndex[ista]; ih++){
       L1StsHit &h = vStsHits[ih];
       int iMC = CbmL1::Instance()->vHitMCRef[ih];
       //if( (vSFlag[h.f] | vSFlagB[h.b] )&0x02 ) continue; // if used
@@ -671,7 +671,7 @@ void L1AlgoDraw::DrawRestHits(int *StsRestHitsStartIndex, int *StsRestHitsStopIn
     L1Station &st = vStations[ista];
     Int_t n_poly = 0;
     Int_t n_poly_fake = 0;
-    for (int iRestHit = StsRestHitsStartIndex[ista]; iRestHit<=StsRestHitsStopIndex[ista]; iRestHit++){
+    for (int iRestHit = StsRestHitsStartIndex[ista]; iRestHit < StsRestHitsStopIndex[ista]; iRestHit++){
       int ih = realIHit[iRestHit];
       L1StsHit &h = vStsHits[ih];
       int iMC = CbmL1::Instance()->vHitMCRef[ih];
@@ -769,6 +769,7 @@ void L1AlgoDraw::ClearVeiw()
   YZ->Clear();
   XZ->Clear();
   YX->Clear();
+  XYZ->Clear();
 }
 
 L1AlgoDraw::Point L1AlgoDraw::GetHitCoor(int ih)
@@ -777,7 +778,7 @@ L1AlgoDraw::Point L1AlgoDraw::GetHitCoor(int ih)
         // find station
   int ista = 0;
   for (int i = 0; i < NStations; i++){
-    if ( (StsHitsStartIndex[i] <= ih) && (StsHitsStopIndex[i] >= ih) ){
+    if ( (StsHitsStartIndex[i] <= ih) && (StsHitsStopIndex[i] > ih) ){
       ista = i;
       break;
     }

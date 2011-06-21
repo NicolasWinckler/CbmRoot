@@ -7,6 +7,7 @@
 
 #include "base/CbmLitFieldFitter.h"
 #include "base/CbmLitEnvironment.h"
+#include "../std/utils/CbmLitUtils.h"
 
 #include "FairField.h"
 
@@ -783,14 +784,45 @@ CbmLitFieldFitter::~CbmLitFieldFitter()
 
 }
 
+template <class T>
+void CbmLitFieldFitter::FitSlice(
+   float Z,
+   lit::parallel::LitFieldSlice<T>& slice)
+{
+   std::vector<double> aparBx, aparBy, aparBz;
+   FitSlice(Z, aparBx, aparBy, aparBz);
+
+   std::vector<T> aparBxT, aparByT, aparBzT;
+   aparBxT.assign(aparBx.begin(), aparBx.end());
+   aparByT.assign(aparBy.begin(), aparBy.end());
+   aparBzT.assign(aparBz.begin(), aparBz.end());
+
+   slice.SetZ(Z);
+   slice.SetCoefficients(aparBxT, aparByT, aparBzT);
+}
+
+void CbmLitFieldFitter::FitSliceScal(
+   float Z,
+   lit::parallel::LitFieldSlice<fscal>& slice)
+{
+   FitSlice<fscal>(Z, slice);
+}
+
+void CbmLitFieldFitter::FitSliceVec(
+   float Z,
+   lit::parallel::LitFieldSlice<fvec>& slice)
+{
+   FitSlice<fvec>(Z, slice);
+}
+
 void CbmLitFieldFitter::FitSlice(
    double Z,
    std::vector<double>& parBx,
    std::vector<double>& parBy,
    std::vector<double>& parBz)
 {
-   double tanXangle = std::tan(fXangle*3.14159265/180); //
-   double tanYangle = std::tan(fYangle*3.14159265/180); //
+   double tanXangle = std::tan(fXangle*3.14159265/180.); //
+   double tanYangle = std::tan(fYangle*3.14159265/180.); //
 
    double Xmax = Z * tanXangle;
    double Ymax = Z * tanYangle;
@@ -847,9 +879,8 @@ void CbmLitFieldFitter::FitSlice(
    int nofParams = theFCN->GetPolynom()->GetNofCoefficients();
 
    for (int i = 0; i < nofParams; i++) {
-      std::stringstream ss;
-      ss << "c" << i;
-      theMinuit.SetParameter(i, ss.str().c_str(), 0., 0.1, 1., -1.);
+      std::string ss = "c" + lit::ToString<int>(i);
+      theMinuit.SetParameter(i, ss.c_str(), 0., 0.1, 1., -1.);
    }
    theMinuit.CreateMinimizer();
    theMinuit.Minimize();

@@ -188,8 +188,7 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    if (fIsElectronSetup) {
       if (fTrackingType == "branch" || fTrackingType == "nn" ||
-            fTrackingType == "weight" || fTrackingType == "nn_scalar" ||
-            fTrackingType == "nn_vec") {
+            fTrackingType == "weight" || fTrackingType == "nn_parallel") {
          std::string st("e_");
          st += fTrackingType;
          fFinder = factory->CreateTrackFinder(st);
@@ -382,7 +381,9 @@ void CbmLitFindGlobalTracks::RunTrackReconstruction()
 void CbmLitFindGlobalTracks::SelectTracksForTofMerging()
 {
    // The aim of this procedure is to select only those tracks
-   // which have at least one hit in the last detector group.
+   // which have at least one hit in the last station group.
+   // Only those tracks will be propagated further and merged
+   // with TOF hits.
 
    const CbmLitDetectorLayout& layout = CbmLitEnvironment::Instance()->GetLayout();
    int nofStationGroups = layout.GetNofStationGroups();

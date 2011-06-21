@@ -34,18 +34,13 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
       env->GetMuchLayoutVec(layout);
       fTFParallelMuon = new lit::parallel::LitTrackFinderNNVecMuon();
       fTFParallelMuon->SetDetectorLayout(layout);
-   } else if (fTrackingType == "nn_scalar_electron") {
-      lit::parallel::LitDetectorLayoutElectronScal layout;
-      env->GetTrdLayoutScal(layout);
-      fTFScalElectron = new lit::parallel::LitTrackFinderNNScalarElectron();
-      fTFScalElectron->SetDetectorLayout(layout);
-   } else if (fTrackingType == "nn_vec_electron") {
+   } else if (fTrackingType == "nn_parallel_electron") {
       lit::parallel::LitDetectorLayoutElectronVec layout;
       env->GetTrdLayoutVec(layout);
       fTFVecElectron = new lit::parallel::LitTrackFinderNNVecElectron();
       fTFVecElectron->SetDetectorLayout(layout);
    } else {
-      std::cout << "-E- TRACKING TYPE NOT FOUND" << std::endl;
+      std::cout << "-E- CbmLitTrackFinderNNParallel: TRACKING TYPE NOT FOUND!" << std::endl;
       exit(0);
    }
 }
@@ -84,10 +79,8 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
    if (fTrackingType == "nn_parallel_muon") {
       fTFParallelMuon->DoFind(lhits, lseeds, ltracks);
-   } else if (fTrackingType == "nn_scalar_electron") {
-//      fTFScalElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
-   } else if (fTrackingType == "nn_vec_electron") {
-//      fTFVecElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
+   } else if (fTrackingType == "nn_parallel_electron") {
+      fTFVecElectron->DoFind(lhits, lseeds, ltracks);
    }
    timer1.Stop();
 
@@ -168,7 +161,7 @@ void CbmLitTrackFinderNNParallel::ConvertTracks(
       CbmLitTrack* track = new CbmLitTrack;
       if (fTrackingType == "nn_parallel_muon") {
          LitScalTrackToCbmLitTrack(ltrack, track, kLITMUCH);
-      } else if (fTrackingType == "nn_scalar_electron" || fTrackingType == "nn_vec_electron") {
+      } else if (fTrackingType == "nn_parallel_electron") {
          LitScalTrackToCbmLitTrack(ltrack, track, kLITTRD);
       }
       tracks.push_back(track);

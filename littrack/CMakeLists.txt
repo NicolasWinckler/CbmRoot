@@ -153,6 +153,7 @@ EndIf(TBB_FOUND)
 SET(LITTRACK_SRCS 
 ${LITTRACK_SRCS_RULECHECKER}
 ${LITTRACKSTD_SRCS}
+cbm/base/CbmLitFieldGridCreator.cxx
 cbm/base/CbmLitEnvironment.cxx
 cbm/base/CbmLitFieldFitter.cxx
 cbm/base/CbmLitToolFactory.cxx

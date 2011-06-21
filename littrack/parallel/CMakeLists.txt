@@ -39,7 +39,6 @@ set(LITTRACKPARALLEL_SRCS
     ${LITTRACKPARALLEL_SRCS}
     LitTrackFinderNNBase.cxx
     electron/LitTrackFinderNNBaseElectron.cxx
-    electron/LitTrackFinderNNScalarElectron.cxx
     electron/LitTrackFinderNNVecElectron.cxx
     muon/LitTrackFinderNNVecMuon.cxx
   )

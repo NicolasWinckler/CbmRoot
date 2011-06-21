@@ -27,6 +27,13 @@ class LitFieldValue
 public:
    // components of the magnetic field
    T Bx, By, Bz;
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitFieldValue& v) {
+      strm << "LitFieldValue: Bx=" << v.Bx << ", By=" << v.By
+            << ", Bz=" << v.Bz << std::endl;
+      return strm;
+   }
 } _fvecalignment;
 
 
@@ -446,6 +453,123 @@ private:
    T cy0, cy1, cy2 ; // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2
    T cz0, cz1, cz2 ; // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2
    T z0;
+} _fvecalignment;
+
+
+
+/* Class stores a grid of magnetic field
+ * values in XY slice at Z position. */
+class LitFieldGrid
+{
+public:
+   /* Constructor */
+   LitFieldGrid() {}
+
+   /* Destructor */
+   virtual ~LitFieldGrid() {}
+
+   fscal GetZ() const {
+      return fZ;
+   }
+
+   void SetZ(fscal Z) {
+      fZ = Z;
+   }
+
+   void SetField(
+         const std::vector<std::vector<LitFieldValue<fscal> > >& field,
+         fscal xmin,
+         fscal xmax,
+         fscal ymin,
+         fscal ymax,
+         int nofCellsX,
+         int nofCellsY) {
+      fField = field;
+      fXMin = xmin;
+      fXMax = xmax;
+      fYMin = ymin;
+      fYMax = ymax;
+      fNofCellsX = nofCellsX;
+      fNofCellsY = nofCellsY;
+      fCellSizeX = ((xmax - xmin) / nofCellsX);
+      fCellSizeY = ((ymax - ymin) / nofCellsY);
+   }
+
+   void GetFieldValue(
+      fscal x,
+      fscal y,
+      LitFieldValue<fscal> &B) const {
+      // Check bound conditions and if out of bounds
+      // return zero field values.
+      // Can be removed considering performance!
+      if (x < fXMin || x > fXMax || y < fYMin || y > fXMax) {
+         B.Bx = 0.;
+         B.By = 0.;
+         B.Bz = 0.;
+         return;
+      }
+      // Calculate cell indices for X and Y
+      unsigned short ix = short((x - fXMin) / fCellSizeX);
+      unsigned short iy = short((y - fYMin) / fCellSizeY);
+      // Field values on the cell nodes
+      const LitFieldValue<fscal>& v1 = fField[ix  ][iy];
+      const LitFieldValue<fscal>& v2 = fField[ix+1][iy];
+      const LitFieldValue<fscal>& v3 = fField[ix  ][iy+1];
+      const LitFieldValue<fscal>& v4 = fField[ix+1][iy+1];
+      // Calculate weights depending on the distance to the cell nodes
+      fscal dx1 = (x - ix * fCellSizeX);
+      fscal dx2 = (x - (ix + 1) * fCellSizeX);
+      fscal dy1 = (y - iy * fCellSizeY);
+      fscal dy2 = (y - (iy + 1) * fCellSizeY);
+      fscal d1 = dx1 * dx1 + dy1 * dy1;
+      fscal d2 = dx2 * dx2 + dy1 * dy1;
+      fscal d3 = dx1 * dx1 + dy2 * dy2;
+      fscal d4 = dx2 * dx2 + dy2 * dy2;
+      fscal dsum = d1 + d2 + d3 + d4;
+      // Calculate output weighted mean B value
+      B.Bx = (d1 * v1.Bx + d2 * v2.Bx + d3 * v3.Bx + d4 * v4.Bx) / dsum;
+      B.By = (d1 * v1.By + d2 * v2.By + d3 * v3.By + d4 * v4.By) / dsum;
+      B.Bz = (d1 * v1.Bz + d2 * v2.Bz + d3 * v3.Bz + d4 * v4.Bz) / dsum;
+   }
+
+   void GetFieldValue(
+      fvec x,
+      fvec y,
+      LitFieldValue<fvec> &B) const {
+      LitFieldValue<fscal> v;
+      // Get field value for each packed value
+      for (unsigned int i = 0; i < fvecLen; i++) {
+         // Get field value in scalar format
+         GetFieldValue(x[i], y[i], v);
+         // Store field value in vector format
+         B.Bx[i] = v.Bx;
+         B.By[i] = v.By;
+         B.Bz[i] = v.Bz;
+      }
+   }
+
+private:
+   fscal fXMin, fXMax; // Maximum and minimum grid size in X [cm]
+   fscal fYMin, fYMax; // Maximum and minimum grid size in Y [cm]
+   fscal fZ; // Z position of grid slice
+   unsigned short fNofCellsX; // Number of cells along X
+   unsigned short fNofCellsY; // Number of cells along Y
+   fscal fCellSizeX; // Cell size along X [cm]
+   fscal fCellSizeY; // Cell size along Y [cm]
+   // Field values in cell nodes.
+   // Total number of field values is
+   // (fNofCellsX + 1) * (fNofCellsY + 1)
+   std::vector<std::vector<LitFieldValue<fscal> > > fField;
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitFieldGrid& grid) {
+      strm << "LitFieldGrid: Z=" << grid.fZ << " Xmin=" << grid.fXMin
+            << " Xmax=" << grid.fXMax << " Ymin=" << grid.fYMin << " Ymax="
+            << grid.fYMax << " nofCellsX=" << grid.fNofCellsX << " nofCellsY="
+            << grid.fNofCellsY << " cellSizeX=" << grid.fCellSizeX
+            << " cellSizeY=" << grid.fCellSizeY << " field.size=" << grid.fField.size();
+      return strm;
+   }
 } _fvecalignment;
 
 } // namespace parallel

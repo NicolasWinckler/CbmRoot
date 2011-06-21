@@ -11,7 +11,6 @@
 #define CBMLITCHECKFIELD_H_
 
 #include "FairTask.h"
-
 #include <vector>
 
 class FairField;
@@ -23,6 +22,7 @@ class TList;
 class TF1;
 class TF2;
 class CbmLitFieldFitter;
+class CbmLitFieldGridCreator;
 class CBmLitPolynom;
 
 class CbmLitCheckField : public FairTask
@@ -50,6 +50,7 @@ public:
    /* Getters */
    Bool_t IsCheckFieldApproximation() const {return fIsCheckFieldApproximation;}
    Bool_t IsCheckFieldMap() const {return fIsCheckFieldMap;}
+   Bool_t IsCheckGridCreator() const {return fIsCheckGridCreator;}
    Bool_t IsDrawBx() const {return fDrawBx;}
    Bool_t IsDrawBy() const {return fDrawBy;}
    Bool_t IsDrawBz() const {return fDrawBz;}
@@ -62,6 +63,7 @@ public:
    /* Setters */
    void IsCheckFieldApproximation(Bool_t isCheckFieldApproximation) {fIsCheckFieldApproximation = isCheckFieldApproximation;}
    void IsCheckFieldMap(Bool_t isCheckFieldMap) {fIsCheckFieldMap = isCheckFieldMap;}
+   void IsCheckGridCreator(Bool_t isCheckGridCreator) {fIsCheckGridCreator = isCheckGridCreator;}
    void IsDrawBx(Bool_t drawBx) {fDrawBx = drawBx;}
    void IsDrawBy(Bool_t drawBy) {fDrawBy = drawBy;}
    void IsDrawBz(Bool_t drawBz) {fDrawBz = drawBz;}
@@ -81,32 +83,35 @@ public:
    void SetPolynomDegreeIndex(unsigned int degreeIndex) {fPolynomDegreeIndex = degreeIndex;}
 
 private:
-   /* Creates field fitters for each polynom degree
-    * and approximates magnetic field in each
-    * slice along Z */
-   void CreateFieldFitter();
-
    /* Creates histograms */
    void CreateHistos();
+
+   /* */
+   void CreateFitterErrHistos();
+
+   /* */
+   void CreateGridErrHistos();
 
    /* Fills graphs for field map and field approximation
     * for each field component (Bx, By, Bz, |B|) */
    void FillBHistos();
 
-   /* Fills error histograms, i.e. relative and absolute
-    * differences between field map value and approximated
-    * value for each slice along z and each field component
-    * (Bx, By, Bz, |B|) */
-   void FillErrHistos();
+   /* Checks field approximation tool */
+   void CheckFieldFitter();
+
+   /* Checks field creator tool */
+   void CheckGridCreator();
 
    /* Fills histograms for magnetic field map along Z
     * for different polar angles and each field component
     * (Bx, By, Bz, |B|) */
-   void FillHistosAlongZ();
+   void CheckFieldMap();
 
    /* Draws canvas with histograms for each approximated field slice
-    * @param v Defines field component (BX, BY, BZ, MOD)*/
-   void DrawSlices(Int_t v);
+    * @param v Defines field component (BX, BY, BZ, MOD)
+    * @param opt Drawing option: "grid" to plot results for grid creator
+    * "apr" to plot results for field fitter */
+   void DrawSlices(Int_t v, const std::string& opt);
 
    /* Draws comparison for different polynom orders for each slice
     * @param opt Should be "rel" for relative errors or "abs" for absolute errors */
@@ -118,11 +123,12 @@ private:
    /* Draws field components along Z coordinate */
    void DrawFieldAlongZ();
 
-   FairField* fField; // Pointer to the magnetic field map
-
-   TList* fHistoList; // List of histograms
-
-   Int_t fNofSlices; // Number of slices along Z for field approximation
+   // Pointer to the magnetic field map
+   FairField* fField;
+   // List of histograms
+   TList* fHistoList;
+   // Number of slices along Z for field approximation
+   Int_t fNofSlices;
 
    // Slice is defined as rectangle at a certain Z position
    // with upper left corner coordinate equals to [-X, -Y]
@@ -133,37 +139,79 @@ private:
    std::vector<Double_t> fXpos; // X coordinate
    std::vector<Double_t> fYpos; // Y coordinate
 
-   // Polynom coefficients for approximated field slice
-   // for each field component [Bx, By, Bz].
-   // [polynom order][slice number][coefficient index]
-   std::vector<std::vector<std::vector<Double_t> > > fCx; // for Bx
-   std::vector<std::vector<std::vector<Double_t> > > fCy; // for By
-   std::vector<std::vector<std::vector<Double_t> > >fCz; // for Bz
+   // Output directory for images
+   std::string fOutputDir;
 
-   // Field map graph for each component and each slice
-   // [BX, BY, BZ][slice number]
-   std::vector<std::vector<TGraph2D*> >fhBGraph;
-   // Approximated field graph for each component, each slice and each polynom order
-   // [BX, BY, BZ][slice number][polynom order]
-   std::vector<std::vector<std::vector<TGraph2D*> > >fhBAprGraph;
+   //
+   // Field approximation variables
+   //
+   // Acceptance angle for X
+   Double_t fXangle;
+   // Acceptance angle for Y
+   Double_t fYangle;
+   // Number of bins for X
+   Int_t fNofBinsX;
+   // Number of bins for Y
+   Int_t fNofBinsY;
+   // If true than only values inside an ellipse will be used for field approximation
+   Bool_t fUseEllipseAcc;
+   // Degree of the polynom
+   UInt_t fPolynomDegreeIndex;
+   // Number of polynoms for tests
+   UInt_t fNofPolynoms;
+   // Array with polynom degrees to be analyzed
+   std::vector<UInt_t> fDegrees;
+   // Field fitter tool for each polynom degree
+   std::vector<CbmLitFieldFitter*> fFitter;
 
-   // Error histograms
-   // [BX, BY, BZ][slice number][polynom number]
-   std::vector<std::vector<std::vector<TH2D*> > >fhBErrH2D; // 2D absolute error error distribution in (X, Y)
-   std::vector<std::vector<std::vector<TH1D*> > >fhBErrH1D; // Absolute error
-   std::vector<std::vector<std::vector<TH1D*> > >fhBRelErrH1D; // Relative error
-   std::vector<std::vector<std::vector<TH2D*> > >fhBRelErrH2D; // 2D relative error distribution in (X, Y)
+   //
+   // Field grid
+   //
+   // Field grid creator tool
+   CbmLitFieldGridCreator* fGridCreator;
 
-   // Field map values histograms along Z
-   // [BX, BY, BZ][polynom number]
-   std::vector<std::vector<TGraph*> >fhBAlongZGraph;
+   //
+   // Field map along Z axis
+   //
    std::vector<Double_t> fAlongZAngles; // Polar angles [grad]
    Double_t fZMin; // Minimum Z position [cm]
    Double_t fZMax; // Maximum Z position [cm]
    Double_t fZStep; // Step size [cm]
 
+   //
+   // Histograms and graphs
+   //
+   // Field map graph for each component and each slice
+   // [BX, BY, BZ, MOD][slice number]
+   std::vector<std::vector<TGraph2D*> >fhBGraph;
+   // Approximated field graph for each component, each slice and each polynom order
+   // [BX, BY, BZ, MOD][slice number][polynom order]
+   std::vector<std::vector<std::vector<TGraph2D*> > >fhBAprGraph;
+
+   // Error histograms
+   // [BX, BY, BZ, MOD][slice number][polynom number]
+   std::vector<std::vector<std::vector<TH2D*> > >fhBErrH2D; // 2D absolute error error distribution in (X, Y)
+   std::vector<std::vector<std::vector<TH1D*> > >fhBErrH1D; // Absolute error
+   std::vector<std::vector<std::vector<TH1D*> > >fhBRelErrH1D; // Relative error
+   std::vector<std::vector<std::vector<TH2D*> > >fhBRelErrH2D; // 2D relative error distribution in (X, Y)
+
+   // Error histograms for grid creator tool
+   // [BX, BY, BZ, MOD][slice number]
+   std::vector<std::vector<TH2D*> > fhGridBErrH2D; // 2D absolute error error distribution in (X, Y)
+   std::vector<std::vector<TH1D*> > fhGridBErrH1D; // Absolute error
+   std::vector<std::vector<TH1D*> > fhGridBRelErrH1D; // Relative error
+   std::vector<std::vector<TH2D*> > fhGridBRelErrH2D; // 2D relative error distribution in (X, Y)
+   // Grid field graph for each component and each slice
+   // [BX, BY, BZ][slice number]
+   std::vector<std::vector<TGraph2D*> > fhGridBGraph;
+
+   // Field map values histograms along Z
+   // [BX, BY, BZ][polynom number]
+   std::vector<std::vector<TGraph*> >fhBAlongZGraph;
+
    Bool_t fIsCheckFieldApproximation; // If true than field approximation is checked
    Bool_t fIsCheckFieldMap; // If true than field map is checked
+   Bool_t fIsCheckGridCreator; // If true than field creator is checked
 
    // Drawing options
    Bool_t fDrawBx; // Draw Bx field component histograms
@@ -181,24 +229,6 @@ private:
    static const Int_t BY = 1; // By
    static const Int_t BZ = 2; // Bz
    static const Int_t MOD = 3; // Mod = std::sqrt(Bx*Bx + By*By + Bz*Bz)
-
-   Double_t fXangle; // Acceptance angle for X
-   Double_t fYangle; // Acceptance angle for Y
-
-   Int_t fNofBinsX; // Number of bins for X
-   Int_t fNofBinsY; // Number of bins for Y
-
-   Bool_t fUseEllipseAcc; // If true than only values inside an ellipse will be used for field approximation
-
-   std::string fOutputDir; // Output directory for images
-
-   std::vector<CbmLitFieldFitter*> fFitter; // Field fitter tool for each polynom degree
-
-   UInt_t fPolynomDegreeIndex; // Degree of the polynom
-
-   UInt_t fNofPolynoms; // Number of polynoms for tests
-
-   std::vector<UInt_t> fDegrees; // Array with polynom degrees to be analyzed
 
    ClassDef(CbmLitCheckField, 1);
 };

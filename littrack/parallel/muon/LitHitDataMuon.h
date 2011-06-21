@@ -115,7 +115,7 @@ public:
     * @param station Index of the station in the station group
     * @param substation Index of the substation in the station
     * @return Number of hits */
-   int GetNofHits(
+   unsigned int GetNofHits(
       int stationGroup,
       int station,
       int substation) const {

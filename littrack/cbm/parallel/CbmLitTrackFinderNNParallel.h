@@ -13,7 +13,6 @@
 #include "parallel/LitHit.h"
 #include "parallel/LitTrack.h"
 #include "parallel/muon/LitTrackFinderNNVecMuon.h"
-#include "parallel/electron/LitTrackFinderNNScalarElectron.h"
 #include "parallel/electron/LitTrackFinderNNVecElectron.h"
 
 #include <vector>
@@ -59,8 +58,6 @@ private:
       TrackPtrVector& tracks);
 
    lit::parallel::LitTrackFinderNNVecMuon* fTFParallelMuon;
-
-   lit::parallel::LitTrackFinderNNScalarElectron* fTFScalElectron;
 
    lit::parallel::LitTrackFinderNNVecElectron* fTFVecElectron;
 

@@ -3,8 +3,13 @@
  * @since 2010
  * @version 1.0
  *
- * Classes for geometry description for "electron" setup
- * of CBM in the Littrack parallel version of the tracking.
+ * Classes for geometry description of the 'electron' setup of CBM.
+ * Detector layout consists of station groups. Each station
+ * group consists of stations. In addition virtual planes
+ * are introduced in order to store material and field
+ * values between STS and TRD detectors.
+ * Detector layout also provides access to
+ * material of the detector and approximated magnetic field.
  **/
 
 #ifndef LITDETECTORGEOMETRYELECTRON_H_
@@ -17,73 +22,85 @@
 namespace lit {
 namespace parallel {
 
-const unsigned char MAX_NOF_STATION_GROUPS_ELECTRON = 6;
-const unsigned char MAX_NOF_STATIONS_ELECTRON = 4;
-const unsigned char MAX_NOF_VIRTUAL_PLANES_ELECTRON = 50;
-const unsigned char MAX_NOF_MATERIAL_LAYERS_PER_STATION_BEFORE = 3;
-const unsigned char MAX_NOF_MATERIAL_LAYERS_PER_STATION_AFTER = 3;
-
 template<class T>
 class LitStationElectron
 {
 public:
+   /* Constructor */
    LitStationElectron():
-      nofMaterialsBefore(0),
-      nofMaterialsAfter(0),
-      Z(0.) {}
+      fMaterialsBefore(),
+      fMaterialsAfter(),
+      fZ(0.) {}
 
+   /* Destructor */
    virtual ~LitStationElectron() {};
 
-   T Z;
-   LitMaterialInfo<T> materialsBefore[MAX_NOF_MATERIAL_LAYERS_PER_STATION_BEFORE];
-   LitMaterialInfo<T> materialsAfter[MAX_NOF_MATERIAL_LAYERS_PER_STATION_AFTER];
-
    void AddMaterialBefore(const LitMaterialInfo<T>& material) {
-      materialsBefore[nofMaterialsBefore++] = material;
+      fMaterialsBefore.push_back(material);
    }
 
    void AddMaterialAfter(const LitMaterialInfo<T>& material) {
-      materialsAfter[nofMaterialsAfter++] = material;
+      fMaterialsAfter.push_back(material);
+   }
+
+   const LitMaterialInfo<T>& GetMaterialBefore(unsigned int materialId) const {
+      return fMaterialsBefore[materialId];
+   }
+
+   const LitMaterialInfo<T>& GetMaterialAfter(unsigned int materialId) const {
+      return fMaterialsAfter[materialId];
    }
 
    unsigned char GetNofMaterialsBefore() const {
-      return nofMaterialsBefore;
+      return fMaterialsBefore.size();
    }
 
    unsigned char GetNofMaterialsAfter() const {
-      return nofMaterialsAfter;
+      return fMaterialsAfter.size();
    }
 
+   void SetZ(T z) {
+      fZ = z;
+   }
+
+   T GetZ() const {
+      return fZ;
+   }
+
+private:
+   // List of material before Z station center
+   std::vector<LitMaterialInfo<T> > fMaterialsBefore;
+   // List of material after Z station center
+   std::vector<LitMaterialInfo<T> > fMaterialsAfter;
+   // Z center of the station [cm]
+   T fZ;
+
+public:
    friend std::ostream& operator<<(std::ostream& strm, const LitStationElectron& station ) {
-      strm << "LitStationElectron: " << "Z=" << station.Z << std::endl;
+      strm << "LitStationElectron: " << "Z=" << station.GetZ() << std::endl;
       strm << "   materials before:" << std::endl;
       for (unsigned char i = 0; i < station.GetNofMaterialsBefore(); i++) {
-         strm << "      " << (int)i << " " << station.materialsBefore[i];
+         strm << "      " << (int)i << " " << station.GetMaterialBefore(i);
       }
       strm << "   materials after:" << std::endl;
       for (unsigned char i = 0; i < station.GetNofMaterialsAfter(); i++) {
-         strm << "      " << (int)i << " " << station.materialsAfter[i];
+         strm << "      " << (int)i << " " << station.GetMaterialAfter(i);
       }
       return strm;
    }
 
-   std::string ToStringShort() {
-      std::string str = ToString<T>(Z) + "\n";
-      str += ToString<T>(GetNofMaterialsBefore) + "\n";
+   std::string ToStringShort() const {
+      std::string str = ToString<T>(GetZ()) + "\n";
+      str += ToString<T>(GetNofMaterialsBefore()) + "\n";
       for (unsigned char i = 0; i < GetNofMaterialsBefore(); i++) {
-         str += materialsBefore[i].ToStringShort() + "\n";
+         str += GetMaterialBefore(i).ToStringShort() + "\n";
       }
-      str += ToString<T>(GetNofMaterialsAfter) + "\n";
+      str += ToString<T>(GetNofMaterialsAfter()) + "\n";
       for (unsigned char i = 0; i < GetNofMaterialsAfter(); i++) {
-         str += materialsAfter[i].ToStringShort() + "\n";
+         str += GetMaterialAfter(i).ToStringShort() + "\n";
       }
       return str;
    }
-
-private:
-   unsigned char nofMaterialsBefore;
-   unsigned char nofMaterialsAfter;
-
 } _fvecalignment;
 
 typedef LitStationElectron<fvec> LitStationElectronVec;
@@ -95,31 +112,87 @@ template<class T>
 class LitVirtualPlaneElectron
 {
 public:
+   /* Constructor */
    LitVirtualPlaneElectron():
-      Z(0),
-      material(),
-      fieldSlice(),
-      fieldSliceMid() {}
+      fZ(0.),
+      fMaterial(),
+//      fFieldSlice(),
+//      fFieldSliceMid(),
+      fFieldGrid(),
+      fFieldGridMid() {}
 
+   /* Destructor */
    virtual ~LitVirtualPlaneElectron() {}
 
-   T Z;
-   LitMaterialInfo<T> material;
-   LitFieldSlice<T> fieldSlice;
-   LitFieldSlice<T> fieldSliceMid;
+   void SetZ(T z) {
+      fZ = z;
+   }
+
+   T GetZ() const {
+      return fZ;
+   }
+
+   void SetMaterial(const LitMaterialInfo<T>& material) {
+      fMaterial = material;
+   }
+
+   const LitMaterialInfo<T>& GetMaterial() const {
+      return fMaterial;
+   }
+
+//   void SetFieldSlice(const LitFieldSlice<T>& slice) {
+//      fFieldSlice = slice;
+//   }
+//
+//   const LitFieldSlice<T>& GetFieldSlice() const {
+//      return fFieldSlice;
+//   }
+//
+//   void SetFieldSliceMid(const LitFieldSlice<T>& slice) {
+//      fFieldSliceMid = slice;
+//   }
+//
+//   const LitFieldSlice<T>& GetFieldSliceMid() const {
+//      return fFieldSliceMid;
+//   }
+
+   void SetFieldGrid(const LitFieldGrid& grid) {
+      fFieldGrid = grid;
+   }
+
+   const LitFieldGrid& GetFieldGrid() const {
+      return fFieldGrid;
+   }
+
+   void SetFieldGridMid(const LitFieldGrid& grid) {
+      fFieldGridMid = grid;
+   }
+
+   const LitFieldGrid& GetFieldGridMid() const {
+      return fFieldGridMid;
+   }
+
+private:
+   T fZ; // Z position of center of virtual plane
+   LitMaterialInfo<T> fMaterial; // Material of the virtual plane
+//   LitFieldSlice<T> fFieldSlice; // Field slice
+//   LitFieldSlice<T> fFieldSliceMid;
+
+   LitFieldGrid fFieldGrid;
+   LitFieldGrid fFieldGridMid;
 
    friend std::ostream& operator<<(std::ostream& strm, const LitVirtualPlaneElectron& plane) {
-      strm << "LitVirtualPlaneElectron: Z=" << plane.Z << ", material=" << plane.material;
-      // strm << "fieldSlice=" << plane.fieldSlice;
-      // strm << "fieldSliceMid=" << plane.fieldSliceMid;
+      strm << "LitVirtualPlaneElectron: Z=" << plane.GetZ() << ", material=" << plane.GetMaterial();
+      // strm << "fieldSlice=" << plane.GetFieldSlice();
+      // strm << "fieldSliceMid=" << plane.GetFieldSliceMid();
 //    strm << std::endl;
       return strm;
    }
 
-   std::string ToStringShort() {
-      std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
-      str += fieldSlice.ToStringShort();
-      str += fieldSliceMid.ToStringShort();
+   std::string ToStringShort() const {
+      std::string str = ToString<T>(GetZ()) + "\n" + GetMaterial().ToStringShort();
+//      str += GetFieldSlice().ToStringShort();
+//      str += GetFieldSliceMid().ToStringShort();
       return str;
    }
 
@@ -134,43 +207,46 @@ template<class T>
 class LitStationGroupElectron
 {
 public:
+   /* Constructor */
    LitStationGroupElectron():
-      nofStations(0) {}
+      fStations() {}
 
+   /* Destructor */
    virtual ~LitStationGroupElectron() {}
 
    void AddStation(const LitStationElectron<T>& station) {
-      stations[nofStations++] = station;
+      fStations.push_back(station);
+   }
+
+   const LitStationElectron<T>& GetStation(unsigned int stationId) const {
+      return fStations[stationId];
    }
 
    unsigned char GetNofStations() const {
-      return nofStations;
+      return fStations.size();
    }
 
-   // array with stations in the station group
-   LitStationElectron<T> stations[MAX_NOF_STATIONS_ELECTRON];
+private:
+   // Array with stations in the station group
+   std::vector<LitStationElectron<T> > fStations;
 
+public:
    friend std::ostream& operator<<(std::ostream& strm, const LitStationGroupElectron& stationGroup) {
       strm << "LitStationGroupElectron: " << "nofStations=" << (int) stationGroup.GetNofStations() << std::endl;
       for (unsigned char i = 0; i < stationGroup.GetNofStations(); i++) {
-         strm << "  " << (int) i << " " << stationGroup.stations[i];
+         strm << "  " << (int) i << " " << stationGroup.GetStation(i);
       }
       return strm;
    }
 
-   std::string ToStringShort() {
+   std::string ToStringShort() const {
       std::string str = ToString<int>(GetNofStations()) + "\n";
       for (unsigned char i = 0; i < GetNofStations(); i++) {
 //       str += "station\n";
-         str += ToString<int>(i) + "\n" + stations[i].ToStringShort();
+         str += ToString<int>(i) + "\n" + GetStation(i).ToStringShort();
       }
       return str;
    }
-
-private:
-   // number of stations in the station group
-   unsigned char nofStations;
-
 } _fvecalignment;
 
 typedef LitStationGroupElectron<fvec> LitStationGroupElectronVec;
@@ -182,84 +258,79 @@ template<class T>
 class LitDetectorLayoutElectron
 {
 public:
-   LitDetectorLayoutElectron():nofStationGroups(0), nofVirtualPlanes(0) {};
+   /* Constructor */
+   LitDetectorLayoutElectron():
+      fStationGroups(),
+      fVirtualPlanes() {}
 
+   /* Destructor */
    virtual ~LitDetectorLayoutElectron() {}
 
-
    void AddStationGroup(const LitStationGroupElectron<T>& stationGroup) {
-      stationGroups[nofStationGroups++] = stationGroup;
+      fStationGroups.push_back(stationGroup);
    }
 
    void AddVirtualPlane(const LitVirtualPlaneElectron<T>& plane) {
-      virtualPlanes[nofVirtualPlanes++] = plane;
+      fVirtualPlanes.push_back(plane);
    }
 
    unsigned char GetNofStationGroups() const {
-      return nofStationGroups;
+      return fStationGroups.size();
    }
 
    unsigned char GetNofStations(unsigned char stationGroup) const {
-      return stationGroups[stationGroup].GetNofStations();
+      return fStationGroups[stationGroup].GetNofStations();
    }
 
    unsigned char GetNofVirtualPlanes() const {
-      return nofVirtualPlanes;
+      return fVirtualPlanes.size();
    }
 
-   const LitStationGroupElectron<T>& GetStationGroup(unsigned char stationGroup) {
-      return stationGroups[stationGroup];
+   const LitStationGroupElectron<T>& GetStationGroup(unsigned char stationGroup) const {
+      return fStationGroups[stationGroup];
    }
 
-   const LitStationElectron<T>& GetStation(unsigned char stationGroup, unsigned char station) {
-      return stationGroups[stationGroup].stations[station];
+   const LitStationElectron<T>& GetStation(unsigned char stationGroup, unsigned char station) const {
+      return fStationGroups[stationGroup].GetStation(station);
    }
 
-   const LitVirtualPlaneElectron<T>& GetVirtualPlane(unsigned char planeId) {
-      return stationGroups[planeId];
+   const LitVirtualPlaneElectron<T>& GetVirtualPlane(unsigned char planeId) const {
+      return fVirtualPlanes[planeId];
    }
 
+private:
    // array with station groups
-   LitStationGroupElectron<T> stationGroups[MAX_NOF_STATION_GROUPS_ELECTRON];
-
+   std::vector<LitStationGroupElectron<T> > fStationGroups;
    // array with virtual planes
-   LitVirtualPlaneElectron<T> virtualPlanes[MAX_NOF_VIRTUAL_PLANES_ELECTRON];
+   std::vector<LitVirtualPlaneElectron<T> > fVirtualPlanes;
 
+public:
    friend std::ostream& operator<<(std::ostream& strm, const LitDetectorLayoutElectron& layout) {
       strm << "LitDetectorLayoutElectron: " << std::endl;
       strm << "   virtual planes: nofVirtualPlanes=" << (int)layout.GetNofVirtualPlanes() << std::endl;
       for (unsigned char i = 0; i < layout.GetNofVirtualPlanes(); i++) {
-         strm << (int) i << " " << layout.virtualPlanes[i];
+         strm << (int) i << " " << layout.GetVirtualPlane(i);
       }
       strm << "   station groups: nofStationGroups=" << (int)layout.GetNofStationGroups() << std::endl;
       for (unsigned char i = 0; i < layout.GetNofStationGroups(); i++) {
-         strm << "      " << (int) i << " " << layout.stationGroups[i];
+         strm << "      " << (int) i << " " << layout.GetStationGroup(i);
       }
       return strm;
    }
 
-   std::string ToStringShort() {
+   std::string ToStringShort() const {
       std::string str = ToString<int>(GetNofVirtualPlanes()) + "\n";
       for (unsigned char i = 0; i < GetNofVirtualPlanes(); i++) {
          // str += "virtual planes\n";
-         str += ToString<int>(i) + "\n" + virtualPlanes[i].ToStringShort();
+         str += ToString<int>(i) + "\n" + GetVirtualPlane(i).ToStringShort();
       }
       str = ToString<int>(GetNofStationGroups()) + "\n";
       for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
 //       str += "station group\n";
-         str += ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
+         str += ToString<int>(i) + "\n" + GetStationGroup(i).ToStringShort();
       }
       return str;
    }
-
-private:
-
-   //number of station groups
-   unsigned char nofStationGroups;
-
-   // number of virtual planes
-   unsigned char nofVirtualPlanes;
-
 } _fvecalignment;
 
 typedef LitDetectorLayoutElectron<fvec> LitDetectorLayoutElectronVec;

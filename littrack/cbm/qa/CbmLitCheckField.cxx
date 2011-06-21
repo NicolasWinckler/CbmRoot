@@ -8,8 +8,11 @@
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitFloat.h"
 #include "base/CbmLitFieldFitter.h"
+#include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
 #include "utils/CbmLitDrawHist.h"
+
+#include "../../parallel/LitField.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -38,9 +41,6 @@ CbmLitCheckField::CbmLitCheckField():
    fZpos(),
    fXpos(),
    fYpos(),
-   fCx(),
-   fCy(),
-   fCz(),
    fhBGraph(),
    fhBAprGraph(),
    fhBErrH2D(),
@@ -54,6 +54,7 @@ CbmLitCheckField::CbmLitCheckField():
    fZStep(10.),
    fIsCheckFieldApproximation(true),
    fIsCheckFieldMap(true),
+   fIsCheckGridCreator(true),
    fDrawBx(true),
    fDrawBy(true),
    fDrawBz(true),
@@ -85,43 +86,30 @@ InitStatus CbmLitCheckField::Init()
    // Set draw styles
    SetStyles();
 
+   // Set Z positions of slices
+   fZpos.push_back(30.);
+   fZpos.push_back(50.);
+   fZpos.push_back(100.);
+   fZpos.push_back(150.);
+   fZpos.push_back(200.);
+   fZpos.push_back(300.);
+   fZpos.push_back(400.);
+   fNofSlices = fZpos.size();
+
+   // Set polynom degrees
 // fDegrees.push_back(3);
 // fDegrees.push_back(5);
    fDegrees.push_back(7);
 // fDegrees.push_back(9);
    fNofPolynoms = fDegrees.size();
 
-   fZpos.push_back(30.);
-   fZpos.push_back(50.);
-   fZpos.push_back(100.);
-//   fZpos.push_back(105.);
-//   fZpos.push_back(115.);
-   fZpos.push_back(125.);
-// fZpos.push_back(135.);
-   fZpos.push_back(145.);
-// fZpos.push_back(155.);
-//   fZpos.push_back(165.);
-   fZpos.push_back(200.);
-//   fZpos.push_back(300.);
-//   fZpos.push_back(400.);
-   fNofSlices = fZpos.size();
-
    fXpos.resize(fNofSlices);
    fYpos.resize(fNofSlices);
    for (Int_t i = 0; i < fNofSlices; i++) {
-      Double_t tanXangle = std::tan(fXangle*3.14159265/180); //
-      Double_t tanYangle = std::tan(fYangle*3.14159265/180); //
+      Double_t tanXangle = std::tan(fXangle * 3.14159265 / 180); //
+      Double_t tanYangle = std::tan(fYangle * 3.14159265 / 180); //
       fXpos[i] = fZpos[i] * tanXangle;
       fYpos[i] = fZpos[i] * tanYangle;
-   }
-
-   fCx.resize(fNofSlices);
-   fCy.resize(fNofSlices);
-   fCz.resize(fNofSlices);
-   for (Int_t i = 0; i < fNofSlices; i++) {
-      fCx[i].resize(fNofPolynoms);
-      fCy[i].resize(fNofPolynoms);
-      fCz[i].resize(fNofPolynoms);
    }
 
    fAlongZAngles.push_back(0.);
@@ -130,6 +118,24 @@ InitStatus CbmLitCheckField::Init()
    fAlongZAngles.push_back(15.);
    fAlongZAngles.push_back(20.);
    fAlongZAngles.push_back(25.);
+
+   // Create field approximation tool for each polynom degree
+   if (fIsCheckFieldApproximation) {
+      fFitter.resize(fNofPolynoms);
+      for (UInt_t i = 0; i < fNofPolynoms; i++) {
+         fFitter[i] = new CbmLitFieldFitter(fDegrees[i]);
+         fFitter[i]->SetXangle(fXangle);
+         fFitter[i]->SetYangle(fYangle);
+         fFitter[i]->SetNofBinsX(100);//fNofBinsX);
+         fFitter[i]->SetNofBinsY(100);//fNofBinsY);
+         fFitter[i]->SetUseEllipseAcc(fUseEllipseAcc);
+      }
+   }
+
+   // Create grid creator tool
+   if (fIsCheckGridCreator) {
+      fGridCreator = new CbmLitFieldGridCreator();
+   }
 }
 
 void CbmLitCheckField::SetParContainers()
@@ -142,25 +148,23 @@ void CbmLitCheckField::SetParContainers()
 void CbmLitCheckField::Exec(
    Option_t* opt)
 {
-   fNofSlices = fZpos.size();
-
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    fField = env->GetField();
 
    // Fill and create graphs and histograms
    CreateHistos();
-   if (fIsCheckFieldApproximation) { CreateFieldFitter(); }
    FillBHistos();
-   if (fIsCheckFieldApproximation) { FillErrHistos(); }
-   if (fIsCheckFieldMap) { FillHistosAlongZ(); }
+   if (fIsCheckFieldApproximation) { CheckFieldFitter(); }
+   if (fIsCheckGridCreator) { CheckGridCreator(); }
+   if (fIsCheckFieldMap) { CheckFieldMap(); }
 
    // Draw graphs and histograms
    if (fIsCheckFieldApproximation) {
       if (fDrawSlices) {
-         if (IsDrawBx()) { DrawSlices(BX); }
-         if (IsDrawBy()) { DrawSlices(BY); }
-         if (IsDrawBz()) { DrawSlices(BZ); }
-         if (IsDrawBz()) { DrawSlices(MOD); }
+         if (IsDrawBx()) { DrawSlices(BX, "apr"); }
+         if (IsDrawBy()) { DrawSlices(BY, "apr"); }
+         if (IsDrawBz()) { DrawSlices(BZ, "apr"); }
+         if (IsDrawBz()) { DrawSlices(MOD, "apr"); }
       }
 
       if (fDrawPoly) {
@@ -174,28 +178,18 @@ void CbmLitCheckField::Exec(
          DrawFieldAlongZ();
       }
    }
+   if (fIsCheckGridCreator) {
+      if (fDrawSlices) {
+         if (IsDrawBx()) { DrawSlices(BX, "grid"); }
+         if (IsDrawBy()) { DrawSlices(BY, "grid"); }
+         if (IsDrawBz()) { DrawSlices(BZ, "grid"); }
+         if (IsDrawBz()) { DrawSlices(MOD, "grid"); }
+      }
+   }
 }
 
 void CbmLitCheckField::Finish()
 {
-}
-
-void CbmLitCheckField::CreateFieldFitter()
-{
-   // Approximate magnetic field for each polynom degree
-   fFitter.resize(fNofPolynoms);
-   for (UInt_t i = 0; i < fNofPolynoms; i++) {
-      std::cout << "Approximate magnetic field with " << fDegrees[i] << " degree polynom" << std::endl;
-      fFitter[i] = new CbmLitFieldFitter(fDegrees[i]);
-      fFitter[i]->SetXangle(fXangle);
-      fFitter[i]->SetYangle(fYangle);
-      fFitter[i]->SetNofBinsX(100);//fNofBinsX);
-      fFitter[i]->SetNofBinsY(100);//fNofBinsY);
-      fFitter[i]->SetUseEllipseAcc(fUseEllipseAcc);
-      for(Int_t j = 0; j < fNofSlices; j++) {
-         fFitter[i]->FitSlice(fZpos[j], fCx[j][i], fCy[j][i], fCz[j][i]);
-      }
-   }
 }
 
 void CbmLitCheckField::CreateHistos()
@@ -203,15 +197,39 @@ void CbmLitCheckField::CreateHistos()
    // Histogram list
    fHistoList = new TList();
 
-   // Resize histogram vectors
    fhBGraph.resize(4);
+   for (Int_t i = 0; i < 4; i++) {
+      fhBGraph[i].resize(fNofSlices);
+   }
+   for (Int_t v = 0; v < 4; v++) {
+      for (Int_t i = 0; i < fNofSlices; i++) {
+         fhBGraph[v][i] = new TGraph2D();
+      }
+   }
+
+   CreateFitterErrHistos();
+   CreateGridErrHistos();
+
+   fhBAlongZGraph.resize(3);
+   for (Int_t i = 0; i < 3; i++) {
+      fhBAlongZGraph[i].resize(fAlongZAngles.size());
+   }
+   for (Int_t v = 0; v < 3; v++) {
+      for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
+         fhBAlongZGraph[v][i] = new TGraph();
+      }
+   }
+}
+
+void CbmLitCheckField::CreateFitterErrHistos()
+{
+   // Resize histogram vectors
    fhBAprGraph.resize(4);
    fhBErrH1D.resize(4);
    fhBErrH2D.resize(4);
    fhBRelErrH1D.resize(4);
    fhBRelErrH2D.resize(4);
    for (Int_t i = 0; i < 4; i++) {
-      fhBGraph[i].resize(fNofSlices);
       fhBAprGraph[i].resize(fNofSlices);
       fhBErrH1D[i].resize(fNofSlices);
       fhBErrH2D[i].resize(fNofSlices);
@@ -227,10 +245,6 @@ void CbmLitCheckField::CreateHistos()
    }
 
    std::string names[] = {"Bx", "By", "Bz", "Mod"};
-   std::string namesErrH1D[] = {"BxErrH1D", "ByErrH1D", "BzErrH1D", "ModErrH1D"};
-   std::string namesErrH2D[] = {"BxErrH2D", "ByErrH2D", "BzErrH2D", "ModErrH2D"};
-   std::string namesRelErrH1D[] = {"BxRelErrH1D", "ByRelErrH1D", "BzRelErrH1D", "ModRelErrH1D"};
-   std::string namesRelErrH2D[] = {"BxRelErrH2D", "ByRelErrH2D", "BzRelErrH2D", "ModRelErrH2D"};
 
    Int_t nofBinsX = fNofBinsX;
    Int_t nofBinsY = fNofBinsY;
@@ -249,45 +263,90 @@ void CbmLitCheckField::CreateHistos()
    // Create histograms
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
-         fhBGraph[v][i] = new TGraph2D();
-
          for(Int_t j = 0; j < fNofPolynoms; j++) {
             fhBAprGraph[v][i][j] = new TGraph2D();
 
-            std::string histName = "h" + namesErrH1D[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
+            std::string histName = "hBErrH1D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
             fhBErrH1D[v][i][j] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
             fHistoList->Add(fhBErrH1D[v][i][j]);
 
-            histName = "h" + namesErrH2D[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
+            histName = "hBErrH2D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
             fhBErrH2D[v][i][j] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
             fHistoList->Add(fhBErrH2D[v][i][j]);
 
-            histName = "h" + namesRelErrH1D[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
+            histName = "hBRelErrH1D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
             fhBRelErrH1D[v][i][j] = new TH1D(histName.c_str(), histName.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
             fHistoList->Add(fhBRelErrH1D[v][i][j]);
 
-            histName = "h" + namesRelErrH2D[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
+            histName = "hBRelErrH2D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
             fhBRelErrH2D[v][i][j] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
             fHistoList->Add(fhBRelErrH2D[v][i][j]);
          }
       }
    }
+   std::cout << "Field fitter error histograms created" << std::endl;
+}
 
-   fhBAlongZGraph.resize(3);
-   for (Int_t i = 0; i < 3; i++) {
-      fhBAlongZGraph[i].resize(fAlongZAngles.size());
+void CbmLitCheckField::CreateGridErrHistos()
+{
+   // Resize histogram vectors
+   fhGridBGraph.resize(4);
+   fhGridBErrH1D.resize(4);
+   fhGridBErrH2D.resize(4);
+   fhGridBRelErrH1D.resize(4);
+   fhGridBRelErrH2D.resize(4);
+   for (Int_t i = 0; i < 4; i++) {
+      fhGridBGraph[i].resize(fNofSlices);
+      fhGridBErrH1D[i].resize(fNofSlices);
+      fhGridBErrH2D[i].resize(fNofSlices);
+      fhGridBRelErrH1D[i].resize(fNofSlices);
+      fhGridBRelErrH2D[i].resize(fNofSlices);
    }
-   for (Int_t v = 0; v < 3; v++) {
-      for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
-         fhBAlongZGraph[v][i] = new TGraph();
+
+   std::string names[] = {"Bx", "By", "Bz", "Mod"};
+
+   Int_t nofBinsX = fNofBinsX;
+   Int_t nofBinsY = fNofBinsY;
+   Int_t nofBinsErrB = 100;
+   Int_t nofBinsRelErrB = 100;
+   Int_t nofBinsErrX = 100;
+   Int_t nofBinsErrY = 100;
+   Double_t minErrB = 0., maxErrB = 0., minRelErrB = 0., maxRelErrB = 0.;
+   if (fFixedBounds) {
+      minErrB = -0.5;
+      maxErrB = 0.5;
+      minRelErrB = -10.;
+      maxRelErrB = 10.;
+   }
+
+   // Create histograms
+   for (Int_t v = 0; v < 4; v++) {
+      for (Int_t i = 0; i < fNofSlices; i++) {
+         fhGridBGraph[v][i] = new TGraph2D();
+
+         std::string histName = "hGridBErrH1D" + names[v] + lit::ToString<Int_t>(i);
+         fhGridBErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
+         fHistoList->Add(fhGridBErrH1D[v][i]);
+
+         histName = "hGridBErrH2D" + names[v] + lit::ToString<Int_t>(i);
+         fhGridBErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+         fHistoList->Add(fhGridBErrH2D[v][i]);
+
+         histName = "hGridBRelErrH1D" + names[v] + lit::ToString<Int_t>(i);
+         fhGridBRelErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
+         fHistoList->Add(fhGridBRelErrH1D[v][i]);
+
+         histName = "hGridBRelErrH2D" + names[v] + lit::ToString<Int_t>(i);
+         fhGridBRelErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+         fHistoList->Add(fhGridBRelErrH2D[v][i]);
       }
    }
+   std::cout << "Grid creator error histograms created" << std::endl;
 }
 
 void CbmLitCheckField::FillBHistos()
 {
    for (UInt_t iSlice = 0; iSlice < fNofSlices; iSlice++) { // loop over z positions
-      std::cout << "Fill B histograms for slice " << iSlice << std::endl;
       Double_t max[4] = {
          std::numeric_limits<Double_t>::min(),
          std::numeric_limits<Double_t>::min(),
@@ -338,19 +397,6 @@ void CbmLitCheckField::FillBHistos()
             fhBGraph[BY][iSlice]->SetPoint(cnt, X, Y, B[BY]);
             fhBGraph[BZ][iSlice]->SetPoint(cnt, X, Y, B[BZ]);
             fhBGraph[MOD][iSlice]->SetPoint(cnt, X, Y, Bmod);
-
-            if (fIsCheckFieldApproximation) {
-               for (Int_t p = 0; p < fNofPolynoms; p++) {
-                  Double_t Bx = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCx[iSlice][p][0]);
-                  Double_t By = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCy[iSlice][p][0]);
-                  Double_t Bz = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCz[iSlice][p][0]);
-                  Double_t mod = std::sqrt(Bx*Bx + By*By + Bz*Bz);
-                  fhBAprGraph[BX][iSlice][p]->SetPoint(cnt, X, Y, Bx);
-                  fhBAprGraph[BY][iSlice][p]->SetPoint(cnt, X, Y, By);
-                  fhBAprGraph[BZ][iSlice][p]->SetPoint(cnt, X, Y, Bz);
-                  fhBAprGraph[MOD][iSlice][p]->SetPoint(cnt, X, Y, mod);
-               }
-            }
             cnt++;
          }
       }
@@ -363,29 +409,56 @@ void CbmLitCheckField::FillBHistos()
       fhBGraph[BY][iSlice]->SetMaximum(max[BY] + 0.1 * std::abs(max[BY]));
       fhBGraph[BZ][iSlice]->SetMaximum(max[BZ] + 0.1 * std::abs(max[BZ]));
       fhBGraph[MOD][iSlice]->SetMaximum(max[MOD] + 0.1 * std::abs(max[MOD]));
-
-      if (fIsCheckFieldApproximation) {
-         for (Int_t p = 0; p < fNofPolynoms; p++) {
-            fhBAprGraph[BX][iSlice][p]->SetMinimum(min[BX] - 0.1 * std::abs(min[BX]));
-            fhBAprGraph[BY][iSlice][p]->SetMinimum(min[BY] - 0.1 * std::abs(min[BY]));
-            fhBAprGraph[BZ][iSlice][p]->SetMinimum(min[BZ] - 0.1 * std::abs(min[BZ]));
-            fhBAprGraph[MOD][iSlice][p]->SetMinimum(min[MOD] - 0.1 * std::abs(min[MOD]));
-
-            fhBAprGraph[BX][iSlice][p]->SetMaximum(max[BX] + 0.1 * std::abs(max[BX]));
-            fhBAprGraph[BY][iSlice][p]->SetMaximum(max[BY] + 0.1 * std::abs(max[BY]));
-            fhBAprGraph[BZ][iSlice][p]->SetMaximum(max[BZ] + 0.1 * std::abs(max[BZ]));
-            fhBAprGraph[MOD][iSlice][p]->SetMaximum(max[MOD] + 0.1 * std::abs(max[MOD]));
-         }
-      }
    }
 }
 
-void CbmLitCheckField::FillErrHistos()
+void CbmLitCheckField::CheckFieldFitter()
 {
+   std::vector<std::vector<lit::parallel::LitFieldSlice<float> > > slices;
+   slices.resize(fNofPolynoms);
+   for (UInt_t i = 0; i < fNofPolynoms; i++) {slices[i].resize(fNofSlices);}
+
+   // Approximate field slices in each slices for each polynom degree
+   for (UInt_t i = 0; i < fNofPolynoms; i++) {
+      for(Int_t j = 0; j < fNofSlices; j++) {
+         fFitter[i]->FitSlice(fZpos[j], slices[i][j]);
+      }
+   }
+
+   // Fill graph for approximated field map
+   for (UInt_t iSlice = 0; iSlice < fNofSlices; iSlice++) { // Loop over slices
+      Double_t Z = fZpos[iSlice];
+      Int_t cnt = 0;
+
+      Double_t HX = 2 * fXpos[iSlice] / fNofBinsX; // Step size for X position
+      Double_t HY = 2 * fYpos[iSlice] / fNofBinsY; // Step size for Y position
+      for (Int_t iX = 0; iX < fNofBinsX; iX++) { // Loop over x position
+         Double_t X = -fXpos[iSlice] + (iX + 0.5) * HX;
+         for (Int_t iY = 0; iY < fNofBinsY; iY++) { // Loop over y position
+            Double_t Y = -fYpos[iSlice] + (iY + 0.5)  * HY;
+
+            // Check acceptance for ellipse
+            Double_t el = (X*X)/(fXpos[iSlice]*fXpos[iSlice]) + (Y*Y)/(fYpos[iSlice]*fYpos[iSlice]);
+            if (fUseEllipseAcc && el > 1.) { continue; }
+
+            for (Int_t p = 0; p < fNofPolynoms; p++) {
+               lit::parallel::LitFieldValue<float> v;
+               slices[p][iSlice].GetFieldValue(X, Y, v);
+               Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+               fhBAprGraph[BX][iSlice][p]->SetPoint(cnt, X, Y, v.Bx);
+               fhBAprGraph[BY][iSlice][p]->SetPoint(cnt, X, Y, v.By);
+               fhBAprGraph[BZ][iSlice][p]->SetPoint(cnt, X, Y, v.Bz);
+               fhBAprGraph[MOD][iSlice][p]->SetPoint(cnt, X, Y, mod);
+            }
+            cnt++;
+         } // End loop over y position
+      } // End loop over x position
+   } // End loop over slices
+
+   // Fill error histograms
    Int_t nofBinsX = 100;
    Int_t nofBinsY = 100;
    for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
-      std::cout << "Fill error histograms for slice " << iSlice << std::endl;
       Double_t Z = fZpos[iSlice];
       Double_t HX = 2 * fXpos[iSlice] / nofBinsX; // step size for X position
       Double_t HY = 2 * fYpos[iSlice] / nofBinsY; // step size for Y position
@@ -395,10 +468,8 @@ void CbmLitCheckField::FillErrHistos()
             Double_t Y = -fYpos[iSlice] + (iY+0.5) * HY;
 
             // Check acceptance for ellipse
-            if (fUseEllipseAcc) {
-               Double_t el = (X*X)/(fXpos[iSlice]*fXpos[iSlice]) + (Y*Y)/(fYpos[iSlice]*fYpos[iSlice]);
-               if (el > 1.) { continue; }
-            }
+            Double_t el = (X*X)/(fXpos[iSlice]*fXpos[iSlice]) + (Y*Y)/(fYpos[iSlice]*fYpos[iSlice]);
+            if (fUseEllipseAcc && el > 1.) { continue; }
 
             // Get field value
             Double_t pos[3] = {X, Y, Z};
@@ -408,15 +479,14 @@ void CbmLitCheckField::FillErrHistos()
             Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
             for (Int_t p = 0; p < fNofPolynoms; p++) {
-               Double_t aprBx = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCx[iSlice][p][0]);
-               Double_t aprBy = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCy[iSlice][p][0]);
-               Double_t aprBz = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCz[iSlice][p][0]);
-               Double_t aprMod = std::sqrt(aprBx*aprBx + aprBy*aprBy + aprBz*aprBz);
+               lit::parallel::LitFieldValue<float> v;
+               slices[p][iSlice].GetFieldValue(X, Y, v);
+               Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 
-               Double_t errBx = B[0] - aprBx;
-               Double_t errBy = B[1] - aprBy;
-               Double_t errBz = B[2] - aprBz;
-               Double_t errMod = Bmod - aprMod;
+               Double_t errBx = B[0] - v.Bx;
+               Double_t errBy = B[1] - v.By;
+               Double_t errBz = B[2] - v.Bz;
+               Double_t errMod = Bmod - mod;
                Double_t relErrBx = 0., relErrBy = 0., relErrBz = 0., relErrMod = 0.;
                if (B[0] != 0.) { relErrBx = (errBx / B[0]) * 100.; }
                else { relErrBx = 0.; }
@@ -449,7 +519,96 @@ void CbmLitCheckField::FillErrHistos()
    }
 }
 
-void CbmLitCheckField::FillHistosAlongZ()
+void CbmLitCheckField::CheckGridCreator()
+{
+   std::vector<lit::parallel::LitFieldGrid> grids;
+   grids.resize(fNofSlices);
+   for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
+      fGridCreator->CreateGrid(fZpos[iSlice], grids[iSlice]);
+   }
+
+   // Fill graph
+   for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
+      Int_t cnt = 0;
+      Double_t Z = fZpos[iSlice];
+      Double_t HX = 2 * fXpos[iSlice] / fNofBinsX; // step size for X position
+      Double_t HY = 2 * fYpos[iSlice] / fNofBinsY; // step size for Y position
+      for (Int_t iX = 0; iX < fNofBinsX; iX++) { // loop over x position
+         Double_t X = -fXpos[iSlice] + (iX + 0.5) * HX;
+         for (Int_t iY = 0; iY < fNofBinsY; iY++) { // loop over y position
+            Double_t Y = -fYpos[iSlice] + (iY + 0.5)  * HY;
+            lit::parallel::LitFieldValue<float> v;
+            grids[iSlice].GetFieldValue(X, Y, v);
+            Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+            fhGridBGraph[BX][iSlice]->SetPoint(cnt, X, Y, v.Bx);
+            fhGridBGraph[BY][iSlice]->SetPoint(cnt, X, Y, v.By);
+            fhGridBGraph[BZ][iSlice]->SetPoint(cnt, X, Y, v.Bz);
+            fhGridBGraph[MOD][iSlice]->SetPoint(cnt, X, Y, mod);
+            cnt++;
+         }
+      }
+   }
+
+   // Fill error histograms
+   Int_t nofBinsX = 100;
+   Int_t nofBinsY = 100;
+   for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
+      Double_t Z = fZpos[iSlice];
+      Double_t HX = 2 * fXpos[iSlice] / nofBinsX; // step size for X position
+      Double_t HY = 2 * fYpos[iSlice] / nofBinsY; // step size for Y position
+      for (Int_t iX = 0; iX < nofBinsX; iX++) { // loop over x position
+         Double_t X = -fXpos[iSlice] + (iX+0.5) * HX;
+         for (Int_t iY = 0; iY < nofBinsY; iY++) { // loop over y position
+            Double_t Y = -fYpos[iSlice] + (iY+0.5) * HY;
+
+            // Get field value
+            Double_t pos[3] = {X, Y, Z};
+            Double_t B[3];
+            fField->GetFieldValue(pos, B);
+
+            Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+
+            lit::parallel::LitFieldValue<float> v;
+            grids[iSlice].GetFieldValue(X, Y, v);
+            Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+
+            Double_t errBx = B[0] - v.Bx;
+            Double_t errBy = B[1] - v.By;
+            Double_t errBz = B[2] - v.Bz;
+            Double_t errMod = Bmod - mod;
+            Double_t relErrBx = 0., relErrBy = 0., relErrBz = 0., relErrMod = 0.;
+            if (B[0] != 0.) { relErrBx = (errBx / B[0]) * 100.; }
+            else { relErrBx = 0.; }
+            if (B[1] != 0.) { relErrBy = (errBy / B[1]) * 100.; }
+            else { relErrBy = 0.; }
+            if (B[2] != 0.) { relErrBz = (errBz / B[2]) * 100.; }
+            else { relErrBz = 0.; }
+            if (Bmod != 0.) { relErrMod = (errMod / Bmod) * 100.; }
+            else { relErrMod = 0.; }
+
+            fhGridBErrH2D[BX][iSlice]->Fill(X, Y, errBx);
+            fhGridBErrH1D[BX][iSlice]->Fill(errBx);
+            fhGridBRelErrH1D[BX][iSlice]->Fill(relErrBx);
+            fhGridBRelErrH2D[BX][iSlice]->Fill(X, Y, relErrBx);
+            fhGridBErrH2D[BY][iSlice]->Fill(X, Y, errBy);
+            fhGridBErrH1D[BY][iSlice]->Fill(errBy);
+            fhGridBRelErrH1D[BY][iSlice]->Fill(relErrBy);
+            fhGridBRelErrH2D[BY][iSlice]->Fill(X, Y, relErrBy);
+            fhGridBErrH2D[BZ][iSlice]->Fill(X, Y, errBz);
+            fhGridBErrH1D[BZ][iSlice]->Fill(errBz);
+            fhGridBRelErrH1D[BZ][iSlice]->Fill(relErrBz);
+            fhGridBRelErrH2D[BZ][iSlice]->Fill(X, Y, relErrBz);
+            fhGridBErrH2D[MOD][iSlice]->Fill(X, Y, errMod);
+            fhGridBErrH1D[MOD][iSlice]->Fill(errMod);
+            fhGridBRelErrH1D[MOD][iSlice]->Fill(relErrMod);
+            fhGridBRelErrH2D[MOD][iSlice]->Fill(X, Y, relErrMod);
+
+         }
+      }
+   }
+}
+
+void CbmLitCheckField::CheckFieldMap()
 {
    for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
       Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
@@ -473,14 +632,14 @@ void CbmLitCheckField::FillHistosAlongZ()
 }
 
 void CbmLitCheckField::DrawSlices(
-   Int_t v)
+   Int_t v,
+   const std::string& opt)
 {
    std::string names[] = {"field_slice_Bx_", "field_slice_By_", "field_slice_Bz_", "field_slice_Mod_"};
    TCanvas* canvas[fNofSlices];
    for (Int_t s = 0; s < fNofSlices; s++) {
-      std::stringstream ss;
-      ss << names[v] << "z_" << fZpos[s];
-      canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1200, 800);
+      std::string ss = names[v] + "z_" + lit::ToString<float>(fZpos[s]) + "_" + opt;
+      canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 1200, 800);
       canvas[s]->Divide(3, 2);
    }
 
@@ -495,29 +654,29 @@ void CbmLitCheckField::DrawSlices(
                   false, false, false, "TRI1");
 
       canvas[i]->cd(2);
-      TH1D* hist2 = fhBErrH1D[v][i][fPolynomDegreeIndex];
+      TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhGridBErrH1D[v][i];
       DrawHist1D(hist2, std::string(title + " [kGauss]"), "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
                  LIT_MARKER_STYLE1, false, true, "");
 
       canvas[i]->cd(3);
-      TH2D* hist3 = fhBErrH2D[v][i][fPolynomDegreeIndex];
+      TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhGridBErrH2D[v][i];
       DrawHist2D(hist3, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
                  false, false, false, "colz");
 
       canvas[i]->cd(4);
-      TGraph2D* graph2 = fhBAprGraph[v][i][fPolynomDegreeIndex];
+      TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhGridBGraph[v][i];
       DrawGraph2D(graph2, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
                   false, false, false, "TRI1");
 
       canvas[i]->cd(5);
-      TH1D* hist4 = fhBRelErrH1D[v][i][fPolynomDegreeIndex];
+      TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhGridBRelErrH1D[v][i];
       DrawHist1D(hist4, std::string(title + " relative error [%]"), "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
                  LIT_MARKER_STYLE1, false, true, "");
 
       canvas[i]->cd(6);
-      TH2D* hist5 = fhBRelErrH2D[v][i][fPolynomDegreeIndex];
+      TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhGridBRelErrH2D[v][i];
       DrawHist2D(hist5, "X [cm]", "Y [cm]", std::string(title + " relative error [%]"),
                  false, false, false, "colz");
 

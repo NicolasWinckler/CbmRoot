@@ -11,26 +11,22 @@
 
 #include "../LitHit.h"
 #include "LitDetectorGeometryElectron.h"
+#include "../LitComparators.h"
+
+#include <algorithm>
 
 namespace lit {
 namespace parallel {
-
-// Maximum number of hits for station
-const unsigned int MAX_NOF_HITS_ELECTRON = 2000;
 
 template<class T>
 class LitHitDataElectron
 {
 public:
    /* Constructor */
-   LitHitDataElectron() {
-      for(int i = 0; i < MAX_NOF_STATION_GROUPS_ELECTRON; i++) {
-         for(int j = 0; j < MAX_NOF_STATIONS_ELECTRON; j++) {
-            fNofHits[i][j] = 0;
-            fMaxErr[i][j] = 0.;
-         }
-      }
-   };
+   LitHitDataElectron():
+      fMaxErr(),
+      fHits(),
+      fLayout() {};
 
    /* Destructor */
    virtual ~LitHitDataElectron() {};
@@ -41,6 +37,17 @@ public:
    void SetDetectorLayout(
       const LitDetectorLayoutElectron<T>& layout) {
       fLayout = layout;
+      int nofGroups = layout.GetNofStationGroups();
+      fHits.resize(nofGroups);
+      fMaxErr.resize(nofGroups);
+      for(int i = 0; i < nofGroups; i++) {
+         int nofStations = layout.GetNofStations(i);
+         fHits[i].resize(nofStations);
+         fMaxErr[i].resize(nofStations);
+         for(int j = 0; j < nofStations; j++) {
+            fHits[i][j].reserve(1500);
+         }
+      }
    }
 
    /* Adds the hit using station group, station and substation indices
@@ -52,8 +59,7 @@ public:
       int stationGroup,
       int station,
       LitScalPixelHit* hit) {
-      unsigned int& nofHits = fNofHits[stationGroup][station];
-      fHits[stationGroup][station][nofHits++] = hit;
+      fHits[stationGroup][station].push_back(hit);
       if (fMaxErr[stationGroup][station] < hit->Dx) {
          fMaxErr[stationGroup][station] = hit->Dx;
       }
@@ -90,7 +96,7 @@ public:
     *@param station Index of the station in the station group
     *@return Hit iterators
     */
-   LitScalPixelHit** GetHits(
+   const std::vector<LitScalPixelHit*>& GetHits(
       int stationGroup,
       int station) {
       return fHits[stationGroup][station];
@@ -101,10 +107,10 @@ public:
     *@param station Index of the station in the station group
     *@return Number of hits
     */
-   int GetNofHits(
+   unsigned int GetNofHits(
       int stationGroup,
       int station) const {
-      return fNofHits[stationGroup][station];
+      return fHits[stationGroup][station].size();
    }
 
    /* Returns maximum hit error in [cm] and the name of the coordinate
@@ -121,15 +127,31 @@ public:
 
    /* Clears the hit arrays */
    void Clear() {
-      for(int i = 0; i < MAX_NOF_STATION_GROUPS_ELECTRON; i++) {
-         for(int j = 0; j < MAX_NOF_STATIONS_ELECTRON; j++) {
-            fNofHits[i][j] = 0;
+      for(unsigned int i = 0; i < fHits.size(); i++) {
+         for(unsigned int j = 0; j < fHits[i].size(); j++) {
+            fHits[i][j].clear();
+            fHits[i][j].reserve(1500);
             fMaxErr[i][j] = 0.;
          }
       }
    }
 
-public:
+
+   /* Sorts hits in each substation by X coordinate */
+   void SortHits() {
+      for (int i = 0; i < fLayout.GetNofStationGroups(); i++) {
+         for (int j = 0; j < fLayout.GetNofStations(i); j++) {
+               std::vector<LitScalPixelHit*>& shits = fHits[i][j];
+               std::sort(shits.begin(), shits.end(), ComparePixelHitXLess());
+   //                std::cout << "station group " << i << " station " << j << std::endl;
+   //                for(unsigned int i = 0; i < nh; i++)
+   //                   std::cout << *shits[i];
+   //          }
+         }
+      }
+   }
+
+private:
    /* Calculates station group and station indices using the
     * detector plane number.
     *@param planeId [in] Detector plane index
@@ -152,12 +174,10 @@ public:
    }
 
    // Arrays with hits
-   LitScalPixelHit* fHits[MAX_NOF_STATION_GROUPS_ELECTRON][MAX_NOF_STATIONS_ELECTRON][MAX_NOF_HITS_ELECTRON];
-   // number of hits
-   unsigned int fNofHits[MAX_NOF_STATION_GROUPS_ELECTRON][MAX_NOF_STATIONS_ELECTRON];
-   // Arrays with maximum hit position errors for each substation
-   fscal fMaxErr[MAX_NOF_STATION_GROUPS_ELECTRON][MAX_NOF_STATIONS_ELECTRON];
-
+   std::vector<std::vector<PixelHitArray> > fHits;
+   // Arrays with maximum hit position errors for each station
+   std::vector<std::vector<fscal> > fMaxErr;
+   // Detector layout
    LitDetectorLayoutElectron<T> fLayout;
 
    friend std::ostream& operator<<(std::ostream& strm, const LitHitDataElectron& hitData) {

@@ -130,6 +130,18 @@ void DoTrackSelectionMuon(
    DoTrackSelectionSameSeed(itBegin, itEnd);
 }
 
+
+
+void DoTrackSelectionElectron(
+   TrackIterator itBegin,
+   TrackIterator itEnd)
+{
+   for (std::vector<LitScalTrack*>::iterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+      LitScalTrack* track = *iTrack;
+      if (track->GetNofHits() < 2) track->IsGood(false);
+   }
+}
+
 } // namespace parallel
 } // namespace lit
 #endif /* LITTRACKSELECTION_H_ */

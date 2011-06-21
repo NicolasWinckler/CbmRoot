@@ -16,6 +16,17 @@
 namespace lit {
 namespace parallel {
 
+inline void PackFieldValue(
+   const LitFieldValue<fscal> value[],
+   LitFieldValue<fvec>& lvalue)
+{
+   for(unsigned char i = 0; i < fvecLen; i++) {
+      lvalue.Bx[i] = value[i].Bx;
+      lvalue.By[i] = value[i].By;
+      lvalue.Bz[i] = value[i].Bz;
+   }
+}
+
 inline void PackTrackParam(
    const LitTrackParam<fscal> par[],
    LitTrackParam<fvec>& lpar)

@@ -307,20 +307,15 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       muchFinderNN->Initialize();
       TrackFinderPtr finder(muchFinderNN);
       return finder;
+   } else if(name == "e_nn_parallel") {
+      CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_parallel_electron");
+      finderNN->Initialize();
+      TrackFinderPtr finder(finderNN);
+      return finder;
    } else if(name == "mu_nn_parallel") {
       CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel("nn_parallel_muon");
       muchFinderNN->Initialize();
       TrackFinderPtr finder(muchFinderNN);
-      return finder;
-   } else if(name == "e_nn_scalar") {
-      CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_scalar_electron");
-      finderNN->Initialize();
-      TrackFinderPtr finder(finderNN);
-      return finder;
-   } else if(name == "e_nn_vec") {
-      CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_vec_electron");
-      finderNN->Initialize();
-      TrackFinderPtr finder(finderNN);
       return finder;
    } else if(name == "mu_branch") {
       CbmLitTrackFinderBranch* muchFinderBranch = new CbmLitTrackFinderBranch();

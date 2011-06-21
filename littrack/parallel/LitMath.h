@@ -62,7 +62,7 @@ inline unsigned short NDF(
 {
    // TODO check NDF
 
-   unsigned short ndf =  2 * track.GetNofHits() - 5;
+   short ndf =  2 * track.GetNofHits() - 5;
    if (ndf > 0) { return ndf; }
    else { return 1; }
 

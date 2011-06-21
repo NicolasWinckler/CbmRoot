@@ -3,11 +3,12 @@
  * @since 2010
  * @version 1.0
  **
- ** Parallel (multithreaded and SIMDized) version of the nearest
- ** neighbor tracking. As input to tracking arrays with track seeds
- ** and hits from the detector are used. The track is prolongated
- ** from station to station and the nearest hit is attached to track.
- ** Threading Building Blocks library is used for multithreading.
+ ** Parallel SIMDized implementation of the TRD tracking.
+ ** Input: array with track seeds and array with hits.
+ ** Output: reconstructed tracks.
+ ** Algorithm is based on track following and Kalman Filter methods.
+ ** The track is propagated from station to station and the track
+ ** branch is created for each hit in the validation gate.
  **/
 
 #ifndef LITTRACKFINDERNNVECELECTRON_H_
@@ -17,9 +18,9 @@
 #include "LitHitDataElectron.h"
 #include "../LitHit.h"
 #include "../LitTrack.h"
-#include "../LitTrackFinderNNBase.h"
-#include "../LitTrackFinder.h"
-#include "LitTrackFinderNNBaseElectron.h"
+//#include "../LitTrackFinderNNBase.h"
+//#include "../LitTrackFinder.h"
+//#include "LitTrackFinderNNBaseElectron.h"
 
 #define cnst static const fvec
 
@@ -28,9 +29,7 @@ namespace parallel {
 
 const unsigned int MAX_NOF_TRACKS = 1500;
 
-class LitTrackFinderNNVecElectron : public LitTrackFinderNNBaseElectronVec,
-   public LitTrackFinderNNBase,
-   public LitTrackFinder
+class LitTrackFinderNNVecElectron
 {
 public:
    /* Constructor */
@@ -41,12 +40,9 @@ public:
 
    /* Inherited from LitTrackFinder */
    virtual void DoFind(
-      LitScalPixelHit* hits[],
-      unsigned int nofHits,
-      LitScalTrack* trackSeeds[],
-      unsigned int nofTrackSeeds,
-      LitScalTrack* tracks[],
-      unsigned int& nofTracks);
+      const PixelHitArray& hits,
+      const TrackArray& trackSeeds,
+      TrackArray& tracks);
 
    void SetDetectorLayout(LitDetectorLayoutElectron<fvec>& layout) {
       fLayout = layout;
@@ -54,6 +50,13 @@ public:
    }
 
 public:
+
+   void ArrangeHits(
+       const PixelHitArray& hits);
+
+   void InitTrackSeeds(
+      const TrackArray& trackSeeds);
+
    /* Follows tracks through the detector
     * @param itBegin Iterator to the first track.
     * @param itEnd Iterator to the last track.
@@ -88,19 +91,36 @@ public:
     */
    bool AddNearestHit(
       LitScalTrack* track,
-      const std::pair<unsigned int, unsigned int>& hits,
+      const PixelHitConstIteratorPair& hits,
       unsigned int nofHits,
       int stationGroup,
       int station);
 
-//private:
-// LitScalTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
-// unsigned int fNofTracks;
-//
-// LitDetectorLayoutElectron<fvec> fLayout; // detector geometry
-// LitHitDataElectron<fvec> fHitData; // arranged hits
-//
-// unsigned char fMaxNofMissingHits;
+   /*
+    *
+    */
+   void MinMaxIndex(
+      const LitTrackParamScal* par,
+      const PixelHitArray& hits,
+      fscal maxErr,
+      PixelHitConstIterator& first,
+      PixelHitConstIterator& last);
+
+private:
+   /* Local copy of tracks */
+   TrackArray fTracks;
+   /* Detector geometry */
+   LitDetectorLayoutElectron<fvec> fLayout;
+   /* Arranged hits */
+   LitHitDataElectron<fvec> fHitData;
+   /* Maximum number of missing hits */
+   unsigned char fMaxNofMissingHits;
+   /* Sigma coefficient for fast hit search */
+   fscal fSigmaCoef;
+   /* Maximum covariance value */
+   fscal fMaxCovSq;
+   /* Chi square cut for pixel hits */
+   fvec fChiSqPixelHitCut;
 };
 
 //#undef cnst

@@ -12,7 +12,7 @@
 #include "parallel/electron/LitDetectorGeometryElectron.h"
 #include "parallel/LitHit.h"
 
-//class CbmLitField;
+class CbmLitField;
 class CbmLitTrack;
 class CbmLitTrackParam;
 
@@ -48,9 +48,9 @@ private:
 
    lit::parallel::LitDetectorLayoutElectronScal fLayout;
 
-// TrackExtrapolatorPtr fExtrapolator;
-// TrackPropagatorPtr fPropagator;
-// CbmLitField* fField;
+   TrackExtrapolatorPtr fExtrapolator;
+   TrackPropagatorPtr fPropagator;
+   CbmLitField* fField;
 };
 
 #endif /* CBMLITPARALLELTRACKFITTERTESTELECTRON_H_ */

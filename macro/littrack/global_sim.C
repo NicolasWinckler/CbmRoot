@@ -253,7 +253,7 @@ void global_sim(Int_t nEvents = 1000)
 	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	if (urqmd == "yes") {
-		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+		CbmUnigenGenerator*  urqmdGen = new CbmUnigenGenerator(inFile);
 		primGen->AddGenerator(urqmdGen);
 	}
 

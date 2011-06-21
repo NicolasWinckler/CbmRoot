@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ../common.sh
+. $VMCWORKDIR/macro/littrack/common.sh
 default_init
 
 create_output_dir events_electron/
@@ -20,11 +20,11 @@ export TRDHITPRODUCERTYPE=smearing
 
 set_default_file_names $DIR 0000
 
-export INFILE=$INFILEPREFIX/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14
+export INFILE=$VMCWORKDIR/input/urqmd.auau.25gev.centr.root
     
-root -b -q "../global_sim.C($NEVENTS)"
+root -b -q "$VMCWORKDIR/macro/littrack/global_sim.C($NEVENTS)"
 #root -b -q "../global_reco.C($NEVENTS, \"all\")"
-root -b -q "../global_reco.C($NEVENTS, \"hits\")"
-root -b -q "../global_reco.C($NEVENTS, \"tracking\")"
+root -b -q "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"hits\")"
+root -b -q "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 
 export SCRIPT=no

@@ -7,7 +7,7 @@
  * of the CBM event.
  **/
 
-void global_reco_ideal(Int_t nEvents = 10000)
+void global_reco_ideal(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -17,7 +17,7 @@ void global_reco_ideal(Int_t nEvents = 10000)
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	if (script != "yes") {
-      dir = "/d/cbm02/andrey/muon/std_10mu/";
+	   dir = "/d/cbm02/andrey/electron/v10b_10mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";

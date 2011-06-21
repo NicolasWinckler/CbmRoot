@@ -15,7 +15,7 @@ function default_init() {
     export INFILEPREFIX=/d/cbm03/urqmd
     
     #Build directory of CBMROOT
-    export MYBUILDDIR=/u/andrey/cbm/trunk/build_new/
+    export MYBUILDDIR=/u/andrey/cbm/trunk/build_lxir039/
     
     #!/bin/sh
     cd $MYBUILDDIR
@@ -59,7 +59,7 @@ function set_simulation_parameters() {
 # Function sets default file names using a specified DIR and file number
 function set_default_file_names() {
     DIR=$1
-    xxxx=$2
+    XXXX=$2
     export MCFILE=$DIR/mc.$XXXX.root
     export PARFILE=$DIR/param.$XXXX.root
     export GLOBALRECOFILE=$DIR/global.reco.$XXXX.root
@@ -124,20 +124,20 @@ function set_default_muon_geometry() {
 function set_default_electron_geometry() {
     export CAVEGEOM=cave.geo
     export TARGETGEOM=target_au_250mu.geo
-    export PIPEGEOM=pipe_much.geo
-    export SHIELDGEOM=shield_standard.geo
-    export MVDGEOM= #mvd_standard.geo
-    export STSGEOM=sts_standard.geo
+    export PIPEGEOM=pipe_standard.geo
+    export SHIELDGEOM=
+    export MVDGEOM=
+    export STSGEOM=sts/sts_v09a.geo
     export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
     export MUCHGEOM=
     export MUCHDIGI=
-    export RICHGEOM=rich_standard.geo
-    export TRDGEOM=trd_standard.geo
-    export TRDDIGI=$VMCWORKDIR/parameters/trd/trd_standard_dec10.digi.par
-    export TOFGEOM=tof_standard.geo
+    export RICHGEOM=rich/rich_v08a.geo
+    export TRDGEOM=trd/trd_v10b.geo
+    export TRDDIGI=$VMCWORKDIR/parameters/trd/trd_v10b.digi.par
+    export TOFGEOM=tof/tof_v07a.geo
     export ECALGEOM=
-    export FIELDMAP=field_electron_standard
-    export MAGNETGEOM=magnet_electron_standard.geo
+    export FIELDMAP=field_v10e
+    export MAGNETGEOM=passive/magnet_v09e.geo
     
     export NOFTRDHITS=12
     export NOFMUCHHITS=0
@@ -159,13 +159,21 @@ function set_default_electron_geometry() {
 
 
 
-# Function exports and creates output directories for DIR and IMAGEDIR
-function create_output_dirs()
+# Function exports and creates output directories for DIR
+function create_output_dir()
 {
-    export DIR=$DIRPREFIX/$1
-    export IMAGEDIR=$IMAGEDIRPREFIX/$1/results/
+    export DIR=$1
     rm -r $DIR
     mkdir $DIR
+}
+
+
+
+# Function exports and creates output directories for IMAGEDIR
+function create_image_dir()
+{
+    export IMAGEDIR=$1
     rm -r $IMAGEDIR
     mkdir $IMAGEDIR
 }
+

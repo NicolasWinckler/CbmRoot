@@ -6,7 +6,7 @@
  * Macro runs propagation analysis task.
  **/
 
-void prop_ana(Int_t nEvents = 10000)
+void prop_ana(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -15,14 +15,14 @@ void prop_ana(Int_t nEvents = 10000)
 	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
 	Int_t testFastPropagation;
 	if (script != "yes") {
-		dir = "/d/cbm02/andrey/muon/std_10mu/";
+	   dir = "/d/cbm02/andrey/electron/v10b_10mu/";
 		mcFile = dir + "mc.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";
 		propAnaFile = dir + "propagation.ana.0000.root";
-		imageDir = "./much_test/parallel_prop/";
-		nofTrdHits = 0;
-		nofMuchHits = 18;
+		imageDir = "./test/";
+		nofTrdHits = 12;
+		nofMuchHits = 0;
 		nofTofHits = 1;
 		pdg = 13;
 		testFastPropagation = 1;

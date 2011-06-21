@@ -18,6 +18,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	TString dir, imageDir, mcFile, parFile, globalRecoFile, muchDigiFile, trackingType;
+	TString trdHitProducerType;
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	Int_t normStsPoints, normTrdPoints, normMuchPoints, normTofPoints;
@@ -34,11 +35,11 @@ void global_reco(Int_t nEvents = 10, // number of events
 		// Parameters file
 		parFile = dir + "param.0000.root";
 		// Output file with reconstructed tracks and hits
-		globalRecoFile = dir + "global.reco.clustering_1cm2.0000.root";
+		globalRecoFile = dir + "global.reco.smearing.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.clustering_1cm2.0000.root";
+		globalHitsFile = dir + "global.hits.smearing.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.clustering_1cm2.0000.root";
+		globalTracksFile = dir + "global.tracks.smearing.parallel.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 //		muchDigiFile = parDir + "/much/much_standard_straw_trd.digi.root";
@@ -47,13 +48,15 @@ void global_reco(Int_t nEvents = 10, // number of events
 		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
 		parFileList->Add(&stsDigiFile);
 		// Digi scheme for TRD
-//		TObjString trdDigiFile = parDir + "/trd/trd_standard_dec10.digi.par";
-		TObjString trdDigiFile = parDir + "/trd/trd.v10b.1cm2.digi.par";
+		TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par";
+//		TObjString trdDigiFile = parDir + "/trd/trd.v10b.1cm2.digi.par";
 		parFileList->Add(&trdDigiFile);
 		// Directory for output images
-		TString imageDir = "./trd_test/cluster_1cm2/";
+		TString imageDir = "./test/";
 		// Tracking type
-		trackingType = "branch";
+		trackingType = "nn_parallel";
+		// TRD hit producer type: smearing, digi, clustering
+		trdHitProducerType = "clustering";
 		// Normalization for efficiency
 		normStsPoints = 4;
 		normTrdPoints = 8;
@@ -75,11 +78,13 @@ void global_reco(Int_t nEvents = 10, // number of events
 		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
 		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
+		trdHitProducerType = TString(gSystem->Getenv("TRDHITPRODUCERTYPE"));
 		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
 		TObjString stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
 		parFileList->Add(&stsDigiFile);
 		TObjString trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
 		parFileList->Add(&trdDigiFile);
+		std::cout << std::endl << std::endl << "TRD_DIGI_TRD_DIGI" << trdDigiFile.GetString() << std::endl << std::endl;
 		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
 		normTrdPoints = TString(gSystem->Getenv("NORMTRDPOINTS")).Atoi();
 		normMuchPoints = TString(gSystem->Getenv("NORMMUCHPOINTS")).Atoi();
@@ -221,49 +226,51 @@ void global_reco(Int_t nEvents = 10, // number of events
 
 			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
-			// ----- TRD hit smearing -----
-//			Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
-//			// Resolutions in y - station and angle dependent [mum]
-//			Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
-//			Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
-//			Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
-//
-//			// Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
-//			// // Resolutions in y - station and angle dependent [mum]
-//			// Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-//			// Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-//			// Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-//
-//			CbmTrdHitProducerSmearing* trdHitProd =
-//					new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-//			// CbmTrdHitProducerSmearing* trdHitProd =
-//			// new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
-//			trdHitProd->SetSigmaX(trdSigmaX);
-//			trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-//			run->AddTask(trdHitProd);
-			// ----- End TRD hit smearing -----
+			if (trdHitProducerType == "smearing") {
+            // ----- TRD hit smearing -----
+            Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
+            // Resolutions in y - station and angle dependent [mum]
+            Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
+            Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
+            Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-			// ----- TRD Digitizer -----
-//			CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(
-//					"TRD Digitizer", "TRD task", radiator);
-//			run->AddTask(trdDigitizer);
-//
-//			CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi(
-//					"TRD Hit Producer", "TRD task");
-//			run->AddTask(trdHitProd);
-			// ----- End TRD Digitizer -----
+            // Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
+            // // Resolutions in y - station and angle dependent [mum]
+            // Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+            // Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+            // Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
 
-			// ----- TRD clustering -----
-			CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
-			run->AddTask(trdClustering);
+            CbmTrdHitProducerSmearing* trdHitProd =
+                  new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+            // CbmTrdHitProducerSmearing* trdHitProd =
+            // new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
+            trdHitProd->SetSigmaX(trdSigmaX);
+            trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+            run->AddTask(trdHitProd);
+            // ----- End TRD hit smearing -----
+			} else if (trdHitProducerType == "digi") {
+            // ----- TRD Digitizer -----
+            CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(
+                  "TRD Digitizer", "TRD task", radiator);
+            run->AddTask(trdDigitizer);
 
-			CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
-			run->AddTask(trdClusterfindingfast);
+            CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi(
+                  "TRD Hit Producer", "TRD task");
+            run->AddTask(trdHitProd);
+            // ----- End TRD Digitizer -----
+			} else if (trdHitProducerType == "clustering") {
+            // ----- TRD clustering -----
+            CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
+            run->AddTask(trdClustering);
 
-			CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
-			run->AddTask(trdClusterHitProducer);
-			// ----- End TRD Clustering -----
-			// ------------------------------------------------------------------------
+            CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
+            run->AddTask(trdClusterfindingfast);
+
+            CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
+            run->AddTask(trdClusterHitProducer);
+            // ----- End TRD Clustering -----
+			}
+//			// ------------------------------------------------------------------------
 		}
 
 		if (IsTof(parFile)) {

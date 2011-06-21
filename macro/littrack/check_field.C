@@ -40,12 +40,13 @@ void check_field(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitCheckField* checkField = new CbmLitCheckField();
-	checkField->SetXangle(27.);
-	checkField->SetYangle(27.);
+	checkField->SetXangle(35.);
+	checkField->SetYangle(35.);
 	checkField->SetNofBinsX(30);
 	checkField->SetNofBinsY(30);
 	checkField->IsCheckFieldApproximation(true);
-	checkField->IsCheckFieldMap(false);
+	checkField->IsCheckFieldMap(true);
+	checkField->IsCheckGridCreator(true);
 	checkField->IsDrawBx(true);
 	checkField->IsDrawBy(true);
 	checkField->IsDrawBz(true);
@@ -54,7 +55,7 @@ void check_field(Int_t nEvents = 1)
 	checkField->IsDrawPoly(true);
 	checkField->IsDrawSlices(true);
 	checkField->IsFixedBounds(false);
-	checkField->SetUseEllipseAcc(true);
+	checkField->SetUseEllipseAcc(false);
 	checkField->SetPolynomDegreeIndex(0);
 	checkField->SetOutputDir("test/");
 	run->AddTask(checkField);

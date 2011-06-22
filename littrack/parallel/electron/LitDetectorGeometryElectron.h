@@ -67,6 +67,28 @@ public:
       return fZ;
    }
 
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      std::string str = "LitStationElectron: Z=" + lit::parallel::ToString<T>(GetZ()) + "\n";
+      str += "   materials before:\n";
+      for (unsigned char i = 0; i < GetNofMaterialsBefore(); i++) {
+         str += "      " + lit::parallel::ToString<int>((int)i)
+               + " " + GetMaterialBefore(i).ToString();
+      }
+      str += "   materials after:\n";
+      for (unsigned char i = 0; i < GetNofMaterialsAfter(); i++) {
+         str += "      " + lit::parallel::ToString<int>((int)i)
+               + " " + GetMaterialAfter(i).ToString();
+      }
+      return str;
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitStationElectron& station ) {
+      strm << station.ToString();
+      return strm;
+   }
+
 private:
    // List of material before Z station center
    std::vector<LitMaterialInfo<T> > fMaterialsBefore;
@@ -74,33 +96,6 @@ private:
    std::vector<LitMaterialInfo<T> > fMaterialsAfter;
    // Z center of the station [cm]
    T fZ;
-
-public:
-   friend std::ostream& operator<<(std::ostream& strm, const LitStationElectron& station ) {
-      strm << "LitStationElectron: " << "Z=" << station.GetZ() << std::endl;
-      strm << "   materials before:" << std::endl;
-      for (unsigned char i = 0; i < station.GetNofMaterialsBefore(); i++) {
-         strm << "      " << (int)i << " " << station.GetMaterialBefore(i);
-      }
-      strm << "   materials after:" << std::endl;
-      for (unsigned char i = 0; i < station.GetNofMaterialsAfter(); i++) {
-         strm << "      " << (int)i << " " << station.GetMaterialAfter(i);
-      }
-      return strm;
-   }
-
-   std::string ToStringShort() const {
-      std::string str = ToString<T>(GetZ()) + "\n";
-      str += ToString<T>(GetNofMaterialsBefore()) + "\n";
-      for (unsigned char i = 0; i < GetNofMaterialsBefore(); i++) {
-         str += GetMaterialBefore(i).ToStringShort() + "\n";
-      }
-      str += ToString<T>(GetNofMaterialsAfter()) + "\n";
-      for (unsigned char i = 0; i < GetNofMaterialsAfter(); i++) {
-         str += GetMaterialAfter(i).ToStringShort() + "\n";
-      }
-      return str;
-   }
 } _fvecalignment;
 
 typedef LitStationElectron<fvec> LitStationElectronVec;

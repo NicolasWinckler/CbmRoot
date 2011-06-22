@@ -169,6 +169,29 @@ public:
       }
    }
 
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      std::string str = "HitDataMuon:\n";
+      for(int i = 0; i < fLayout.GetNofStationGroups(); i++) {
+         str += " station group " + lit::parallel::ToString<int>(i) + "\n";
+         for(int j = 0; j < fLayout.GetNofStations(i); j++) {
+            str += "  station " + lit::parallel::ToString<int>(j) + "\n";
+            for(int k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
+               str += "   substation " + lit::parallel::ToString<int>(k)
+                     + ": " +  lit::parallel::ToString<int>(GetNofHits(i, j, k)) + " hits, "
+                     + "max err=" + lit::parallel::ToString<T>(GetMaxErr(i, j, k)) + "\n";
+            }
+         }
+      }
+      return str;
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitHitDataMuon& hitData) {
+      strm << hitData.ToString();
+      return strm;
+   }
+
 public:
    /* Calculates station group, station and substation indices using the
     * detector plane number.
@@ -201,22 +224,6 @@ public:
    std::vector<std::vector<std::vector<fscal> > > fMaxErr;
    // Detector layout
    LitDetectorLayoutMuon<T> fLayout;
-
-   friend std::ostream& operator<<(std::ostream& strm, const LitHitDataMuon& hitData) {
-      strm << "HitDataMuon:" << std::endl;
-      for(int i = 0; i < hitData.fLayout.GetNofStationGroups(); i++) {
-         strm << " station group " << i << std::endl;
-         for(int j = 0; j < hitData.fLayout.GetNofStations(i); j++) {
-            strm << "  station " << j << std::endl;
-            for(int k = 0; k < hitData.fLayout.GetNofSubstations(i, j); k++) {
-               strm << "   substation " << k << ": " << hitData.GetNofHits(i, j, k) << " hits, "
-                    << "max err=" << hitData.GetMaxErr(i, j, k) << std::endl;
-            }
-         }
-      }
-      return strm;
-   }
-
 } _fvecalignment;
 
 } // namespace parallel

@@ -152,6 +152,23 @@ public:
       fIsGood = isGood;
    }
 
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      return "LitTrack: nofHits=" + lit::parallel::ToString<int>(GetNofHits())
+            + " chiSq=" + lit::parallel::ToString<fscal>(GetChiSq())
+            + " NDF=" + lit::parallel::ToString<int>(GetNDF())
+            + " nofMissingHits=" + lit::parallel::ToString<int>(GetNofMissingHits())
+            + " previousTrackId=" + lit::parallel::ToString<int>(GetPreviousTrackId())
+            + " paramFirst=" + GetParamFirst().ToString()
+            + " paramLast=" + GetParamLast().ToString() + "\n";
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitScalTrack& track) {
+      strm << track.ToString();
+      return strm;
+   }
+
 private:
    PixelHitArray fHits; // Array of hits
    LitTrackParamScal fParamFirst; // First track parameter
@@ -161,16 +178,6 @@ private:
    unsigned short fNofMissingHits; // Number of missing hits
    unsigned short fPreviousTrackId; // Id of the track seed
    bool fIsGood; // true id track is "good"
-
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitScalTrack& track) {
-      strm << "LitTrack: " << "nofHits=" << track.GetNofHits() << " chiSq=" << track.GetChiSq()
-           << " NDF=" << track.GetNDF() << " nofMissingHits=" << track.GetNofMissingHits()
-           << " previousTrackId=" << track.GetPreviousTrackId()
-           << " paramFirst=" << track.GetParamFirst() << " paramLast=" << track.GetParamLast()
-           << std::endl;
-      return strm;
-   }
 };
 
 
@@ -201,17 +208,23 @@ public:
       return hits.size();
    }
 
-   LitTrackParam<T> paramLast; // Last parameter of the track
-   std::vector<LitPixelHit<T>*> hits; // Array of hits
-   fscal chiSq; // chi-square of the track
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      return "LitTrack: nofHits=" + lit::parallel::ToString<int>(GetNofHits())
+            + " chiSq=" + lit::parallel::ToString<T>(chiSq)
+            + " paramLast=" + paramLast.ToString() + "\n";
+   }
 
    /* Operator << for convenient output to std::ostream */
    friend std::ostream& operator<<(std::ostream& strm, const LitTrack& track) {
-      strm << "LitTrack: " << "nofHits=" << track.GetNofHits() << " chiSq=" << track.chiSq
-           << " paramLast=" << track.paramLast
-           << std::endl;
+      strm << track.ToString();
       return strm;
    }
+
+public:
+   LitTrackParam<T> paramLast; // Last parameter of the track
+   std::vector<LitPixelHit<T>*> hits; // Array of hits
+   fscal chiSq; // chi-square of the track
 } _fvecalignment;
 
 /* Some typedefs for convenience */

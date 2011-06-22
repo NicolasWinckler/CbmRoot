@@ -35,7 +35,7 @@ InitStatus CbmLitCreateStandaloneData::Init()
 
    std::ofstream outfile("sa_geometry.txt");
    //outfile << layout;
-   outfile << layout.ToStringShort();
+   outfile << layout.ToString();
 // outfile << layout.GetNofStationGroups() << std::endl;
 // for (int isg = 0; isg < layout.GetNofStationGroups(); isg++) {
 //    LitStationGroupScal sg = layout.GetStationGroup(isg);

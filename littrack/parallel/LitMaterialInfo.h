@@ -36,6 +36,24 @@ public:
    /* Destructor */
    virtual ~LitMaterialInfo() {}
 
+   /* Return std::string representation of this class */
+   std::string ToString() const {
+      return "LitMaterialinfo: Thickness=" + lit::parallel::ToString<T>(Thickness)
+            + ", X0=" + lit::parallel::ToString<T>(X0)
+            + ", Rho=" + lit::parallel::ToString<T>(Rho)
+            + ", Z=" + lit::parallel::ToString<T>(Z)
+            + ", A=" + lit::parallel::ToString<T>(A)
+            + ", Zpos=" + lit::parallel::ToString<T>(Zpos)
+            + ", I=" + lit::parallel::ToString<T>(I) + "\n";
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitMaterialInfo& mat) {
+      strm << mat.ToString();
+      return strm;
+   }
+
+public:
    T Thickness; // Thickness of the material [cm]
    T X0; // Radiation length [cm]
    T Rho; // Density [g/cm^3]
@@ -49,23 +67,6 @@ public:
    // I = (Z > 16)? 10 * Z * 1e-9 : 16 * std::pow(Z, 0.9) * 1e-9;
    T I;
    T ElLoss; // (exp(radThick * log(THREE) / log (TWO)) - exp(-TWO * radThick));
-
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitMaterialInfo& mat) {
-      strm << "LitMaterialinfo: Thickness=" << mat.Thickness << ", X0=" << mat.X0
-           << ", Rho=" << mat.Rho << ", Z=" << mat.Z << ", A=" << mat.A
-           << ", Zpos=" << mat.Zpos << ", I=" << mat.I << std::endl;
-      return strm;
-   }
-
-   /* @return std::string representation of this class */
-   std::string ToStringShort() const {
-      std::string str = ToString<T>(Thickness) + " " + ToString<T>(X0)
-            + " " + ToString<T>(Rho) + " " + ToString<T>(Z) + " "
-            + ToString<T>(A) + " " + ToString<T>(Zpos)
-            + " " + ToString<T>(I) + "\n";
-      return str;
-   }
 } _fvecalignment;
 
 /* Some typedefs for convenience */

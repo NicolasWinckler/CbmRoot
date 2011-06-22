@@ -32,7 +32,6 @@ public:
    LitSubstationMuon():
       fZ(0.),
       fMaterial()
-//      fFieldSlice()
    {}
 
    /* Destructor */
@@ -60,36 +59,21 @@ public:
       fMaterial = material;
    }
 
-//   /* @return field slice */
-//   const LitFieldSlice<T>& GetFieldSlice() const {
-//      return fFieldSlice;
-//   }
-//
-//   /* Sets field slice
-//    * @param Value */
-//   void SetFieldSlice(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSlice = fieldSlice;
-//   }
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      return "LitSubstationMuon: Z=" + lit::parallel::ToString<T>(GetZ())
+            + ", material=" + GetMaterial().ToString();
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitSubstationMuon& substation ) {
+      strm << substation.ToString();
+      return strm;
+   }
 
 private:
    T fZ; // Z position of the substation in [cm]
    LitMaterialInfo<T> fMaterial; // Material information of the substation
-//   LitFieldSlice<T> fFieldSlice; // Magnetic field approximation
-
-public:
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitSubstationMuon& substation ) {
-      strm << "LitSubstationMuon: " << "Z=" << substation.GetZ() << ", material=" << substation.GetMaterial();
-//    strm << ", fieldSlice=" << substation.GetFieldSlice();
-      return strm;
-   }
-
-   /* @return std:string representation of the class */
-   std::string ToStringShort() const {
-      std::string str = ToString<T>(GetZ()) + "\n" + fMaterial.ToStringShort();
-//      str += fFieldSlice.ToStringShort();
-      return str;
-   }
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -139,42 +123,25 @@ public:
       fType = type;
    }
 
-//   /* @return field slice */
-//   const LitFieldSlice<T>& GetFieldSlice() const {
-//      return fFieldSlice;
-//   }
-//
-//   /* Sets field slice
-//    * @param Value */
-//   void SetFieldSlice(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSlice = fieldSlice;
-//   }
-
-private:
-   LitHitType fType; // Type of hits on the station
-   std::vector<LitSubstationMuon<T> > fSubstations; // Array with substations in the station
-//   LitFieldSlice<T> fFieldSlice; // Magnetic field approximation in the middle of the station
-
-public:
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitStationMuon& station) {
-      strm << "LitStationMuon: type=" << station.GetType() << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
-      for (unsigned char i = 0; i < station.GetNofSubstations(); i++) {
-         strm << "    " << (int) i << " " << station.GetSubstation(i);
-      }
-      return strm;
-   }
-
-   /* @return std:string representation of the class */
-   std::string ToStringShort() const {
-      std::string str = GetType() + " " + ToString<int>(GetNofSubstations()) + "\n";
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      std::string str = "LitStationMuon: type=" + lit::parallel::ToString<LitHitType>(GetType())
+            + ", nofSubstations=" + lit::parallel::ToString<int>((int)GetNofSubstations()) + "\n";
       for (unsigned char i = 0; i < GetNofSubstations(); i++) {
-//       str += "substation\n";
-         str += ToString<int>(i) + "\n" + GetSubstation(i).ToStringShort();
+         str += "    " + lit::parallel::ToString<int>((int)i) + " " + GetSubstation(i).ToString();
       }
       return str;
    }
 
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitStationMuon& station) {
+      strm << station.ToString();
+      return strm;
+   }
+
+private:
+   LitHitType fType; // Type of hits on the station
+   std::vector<LitSubstationMuon<T> > fSubstations; // Array with substations in the station
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -254,30 +221,24 @@ public:
       fFieldSliceBack = fieldSlice;
    }
 
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      return "LitAbsorber: Z=" + lit::parallel::ToString<T>(GetZ())
+            + ", material=" + GetMaterial().ToString();
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitAbsorber& absorber) {
+      strm << absorber.ToString();
+      return strm;
+   }
+
 private:
    T fZ; // Z position of the absorber in [cm]
    LitMaterialInfo<T> fMaterial; // Absorber material
    LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front of the absorber
    LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle of the absorber
    LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back of the absorber
-
-public:
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitAbsorber& absorber) {
-      strm << "LitAbsorber: Z=" << absorber.GetZ() << ", material=" << absorber.GetMaterial();
-//    strm << "fieldSliceFront=" << absorber.GetFieldSliceFront()
-//       << " fieladSliceBack=" << absorber.GetFieldSliceBack();
-      return strm;
-   }
-
-   /* @return std:string representation of the class */
-   std::string ToStringShort() const {
-      std::string str = ToString<T>(GetZ()) + "\n" + GetMaterial().ToStringShort();
-      str += GetFieldSliceFront().ToStringShort();
-      str += GetFieldSliceBack().ToStringShort();
-      return str;
-   }
-
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -375,6 +336,23 @@ public:
       field.Set(v1, fFieldSliceFront.GetZ(), v2, fFieldSliceMiddle.GetZ(), v3, fFieldSliceBack.GetZ());
    }
 
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      std::string str = "LitStationGroupMuon: nofStations="
+            + lit::parallel::ToString<int>((int)GetNofStations()) + "\n";
+      for (unsigned char i = 0; i < GetNofStations(); i++) {
+         str += "  " + lit::parallel::ToString<int>((int)i) + " " + GetStation(i).ToString();
+      }
+      str += "  " + GetAbsorber().ToString();
+      return str;
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitStationGroupMuon& stationGroup) {
+      strm << stationGroup.ToSting();
+      return strm;
+   }
+
 private:
    // This field slices are used to construct LitFieldRegion
    // in the group of stations. We need 3 values in order to use
@@ -385,30 +363,6 @@ private:
    LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back
    std::vector<LitStationMuon<T> > fStations; // Array with stations
    LitAbsorber<T> fAbsorber; // Absorber
-
-public:
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitStationGroupMuon& stationGroup) {
-      strm << "LitStationGroupMuon: " << "nofStations=" << (int) stationGroup.GetNofStations() << std::endl;
-      for (unsigned char i = 0; i < stationGroup.GetNofStations(); i++) {
-         strm << "  " << (int) i << " " << stationGroup.GetStation(i);
-      }
-      strm << "  " << stationGroup.GetAbsorber();
-      return strm;
-   }
-
-   /* @return std:string representation of the class */
-   std::string ToStringShort() const {
-      std::string str = ToString<int>(GetNofStations()) + "\n";
-      for (unsigned char i = 0; i < GetNofStations(); i++) {
-//       str += "station\n";
-         str += ToString<int>(i) + "\n" + GetStation(i).ToStringShort();
-      }
-//    str += "absorber\n";
-      str += GetAbsorber().ToStringShort();
-      return str;
-   }
-
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -473,28 +427,24 @@ public:
       return fStationGroups[stationGroup].GetStation(station).GetSubstation(substation);
    }
 
-private:
-   std::vector<LitStationGroupMuon<T> > fStationGroups; // Array with station groups
-
-public:
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitDetectorLayoutMuon& layout) {
-      strm << "LitDetectorLayoutMuon: " << "nofStationGroups=" << (int)layout.GetNofStationGroups() << std::endl;
-      for (unsigned char i = 0; i < layout.GetNofStationGroups(); i++) {
-         strm << (int) i << " " << layout.GetStationGroup(i);
-      }
-      return strm;
-   }
-
-   /* @return std:string representation of the class */
-   std::string ToStringShort() const {
-      std::string str = ToString<int>(GetNofStationGroups()) + "\n";
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      std::string str = "LitDetectorLayoutMuon: nofStationGroups="
+            + lit::parallel::ToString<int>((int)GetNofStationGroups()) + "\n";
       for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
-//       str += "station group\n";
-         str += ToString<int>(i) + "\n" + GetStationGroup(i).ToStringShort();
+         str += lit::parallel::ToString<int>((int)i) + " " + GetStationGroup(i).ToString();
       }
       return str;
    }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitDetectorLayoutMuon& layout) {
+      strm << layout.ToString();
+      return strm;
+   }
+
+private:
+   std::vector<LitStationGroupMuon<T> > fStationGroups; // Array with station groups
 } _fvecalignment;
 
 /* Some typedefs for convenience */

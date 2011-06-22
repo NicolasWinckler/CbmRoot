@@ -25,15 +25,22 @@ template<class T>
 class LitFieldValue
 {
 public:
-   // components of the magnetic field
-   T Bx, By, Bz;
+   /* Returns std::string representation of the class */
+   std::string ToString() const {
+      return "LitFieldValue: Bx=" + lit::parallel::ToString<T>(Bx)
+            + ", By=" + lit::parallel::ToString<T>(By)
+               + ", Bz=" + lit::parallel::ToString<T>(Bz) + std::endl;
+   }
 
    /* Operator << for convenient output to std::ostream */
    friend std::ostream& operator<<(std::ostream& strm, const LitFieldValue& v) {
-      strm << "LitFieldValue: Bx=" << v.Bx << ", By=" << v.By
-            << ", Bz=" << v.Bz << std::endl;
+      strm << v.ToString();
       return strm;
    }
+
+public:
+   // components of the magnetic field
+   T Bx, By, Bz;
 } _fvecalignment;
 
 
@@ -333,36 +340,30 @@ public:
       fZ = Z;
    }
 
-private:
-   T cx[N], cy[N], cz[N]; // polinom coefficients
-   T fZ; // Z position of the slice
-
-public:
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitFieldSlice& slice) {
-      strm << "LitFieldSlice: Z=" << slice.Z << ", cx=";
-      for(unsigned int i = 0; i < N; i++) { strm << slice.cx[i] << " "; }
-      strm << std::endl;
-      strm << "LitFieldSlice: cy=";
-      for(unsigned int i = 0; i < N; i++) { strm << slice.cy[i] << " "; }
-      strm << std::endl;
-      strm << "LitFieldSlice: cz=";
-      for(unsigned int i = 0; i < N; i++) { strm << slice.cz[i] << " "; }
-      strm << std::endl;
-      return strm;
-   }
-
-   std::string ToStringShort() const {
-      std::string str = ToString<T>(GetZ()) + "\n";
-      for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cx[i]) + " "; }
+   /* Returns std::string representation of the class */
+   std::string ToString() const {
+      std::string str = "";
+      str = "LitFieldSlice: Z=" + lit::parallel::ToString<T>(fZ) + ", cx=";
+      for(unsigned int i = 0; i < N; i++) { str += lit::parallel::ToString<T>(cx[i]) + " "; }
       str += "\n";
-      for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cy[i]) + " "; }
+      str += "LitFieldSlice: cy=";
+      for(unsigned int i = 0; i < N; i++) { str += lit::parallel::ToString<T>(cy[i]) + " "; }
       str += "\n";
-      for(unsigned int i = 0; i < N; i++) { str += ToString<T>(cz[i]) + " "; }
+      str += "LitFieldSlice: cz=";
+      for(unsigned int i = 0; i < N; i++) { str += lit::parallel::ToString<T>(cz[i]) + " "; }
       str += "\n";
       return str;
    }
 
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitFieldSlice& slice) {
+      strm << slice.ToString();
+      return strm;
+   }
+
+private:
+   T cx[N], cy[N], cz[N]; // polinom coefficients
+   T fZ; // Z position of the slice
 } _fvecalignment;
 
 
@@ -548,6 +549,25 @@ public:
       }
    }
 
+   /* Returns std::string representation of the class */
+   std::string ToString() const {
+      return "LitFieldGrid: Z=" + lit::parallel::ToString<fscal>(fZ)
+         + " Xmin=" + lit::parallel::ToString<fscal>(fXMin)
+         + " Xmax=" + lit::parallel::ToString<fscal>(fXMax)
+         + " Ymin=" + lit::parallel::ToString<fscal>(fYMin)
+         + " Ymax=" + lit::parallel::ToString<fscal>(fYMax)
+         + " nofCellsX=" + lit::parallel::ToString<fscal>(fNofCellsX)
+         + " nofCellsY=" + lit::parallel::ToString<fscal>(fNofCellsY)
+         + " cellSizeX=" + lit::parallel::ToString<fscal>(fCellSizeX)
+         + " cellSizeY=" + lit::parallel::ToString<fscal>(fCellSizeY)
+         + " field.size=" + lit::parallel::ToString<fscal>(fField.size()) + "\n";
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitFieldGrid& grid) {
+      strm << grid.ToString();
+      return strm;
+   }
 private:
    fscal fXMin, fXMax; // Maximum and minimum grid size in X [cm]
    fscal fYMin, fYMax; // Maximum and minimum grid size in Y [cm]
@@ -560,16 +580,6 @@ private:
    // Total number of field values is
    // (fNofCellsX + 1) * (fNofCellsY + 1)
    std::vector<std::vector<LitFieldValue<fscal> > > fField;
-
-   /* Operator << for convenient output to std::ostream */
-   friend std::ostream& operator<<(std::ostream& strm, const LitFieldGrid& grid) {
-      strm << "LitFieldGrid: Z=" << grid.fZ << " Xmin=" << grid.fXMin
-            << " Xmax=" << grid.fXMax << " Ymin=" << grid.fYMin << " Ymax="
-            << grid.fYMax << " nofCellsX=" << grid.fNofCellsX << " nofCellsY="
-            << grid.fNofCellsY << " cellSizeX=" << grid.fCellSizeX
-            << " cellSizeY=" << grid.fCellSizeY << " field.size=" << grid.fField.size();
-      return strm;
-   }
 } _fvecalignment;
 
 } // namespace parallel

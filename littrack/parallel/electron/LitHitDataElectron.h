@@ -151,6 +151,26 @@ public:
       }
    }
 
+   /* Returns std::string representation for the class */
+   std::string ToString() const {
+      std::string str = "HitDataElectron:\n";
+      for(int i = 0; i < fLayout.GetNofStationGroups(); i++) {
+         str += " station group " + lit::parallel::ToString<int>(i) + "\n";
+         for(int j = 0; j < fLayout.GetNofStations(i); j++) {
+            str += "   station " + lit::parallel::ToString<int>(j)
+                  + ": " + lit::parallel::ToString<int>(GetNofHits(i, j)) + " hits, "
+                  + "max err=" + lit::parallel::ToString<T>(GetMaxErr(i, j)) + "\n";
+         }
+      }
+      return str;
+   }
+
+   /* Operator << for convenient output to std::ostream */
+   friend std::ostream& operator<<(std::ostream& strm, const LitHitDataElectron& hitData) {
+      strm << hitData.ToString();
+      return strm;
+   }
+
 private:
    /* Calculates station group and station indices using the
     * detector plane number.
@@ -179,18 +199,6 @@ private:
    std::vector<std::vector<fscal> > fMaxErr;
    // Detector layout
    LitDetectorLayoutElectron<T> fLayout;
-
-   friend std::ostream& operator<<(std::ostream& strm, const LitHitDataElectron& hitData) {
-      strm << "HitDataElectron:" << std::endl;
-      for(int i = 0; i < hitData.fLayout.GetNofStationGroups(); i++) {
-         strm << " station group " << i << std::endl;
-         for(int j = 0; j < hitData.fLayout.GetNofStations(i); j++) {
-            strm << "   station " << j << ": " << hitData.GetNofHits(i, j) << " hits, "
-                 << "max err=" << hitData.GetMaxErr(i, j) << std::endl;
-         }
-      }
-      return strm;
-   }
 } _fvecalignment;
 
 typedef LitHitDataElectron<fscal> LitHitDataElectronScal;

@@ -92,26 +92,12 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
    ConvertTracks(ltracks, tracks);
 
-// std::cout << "NOFTRACKS=" << nofTracks << " tracks.size=" << tracks.size() << std::endl;
-// for (unsigned int i = 0; i < tracks.size(); i++) {
-//    std::cout << tracks[i]->ToString();
-// }
-
-//   for (unsigned int i = 0; i < NHITS; i++) {
-//      delete lhits[i];
-//   }
- for_each(lhits.begin(), lhits.end(), DeleteObject());
- lhits.clear();
-//   for (unsigned int i = 0; i < NTRACKS; i++) {
-//      delete lseeds[i];
-//   }
- for_each(lseeds.begin(), lseeds.end(), DeleteObject());
- lseeds.clear();
-//   for (unsigned int i = 0; i < nofTracks; i++) {
-//      delete ltracks[i];
-//   }
- for_each(ltracks.begin(), ltracks.end(), DeleteObject());
- ltracks.clear();
+   for_each(lhits.begin(), lhits.end(), DeleteObject());
+   lhits.clear();
+   for_each(lseeds.begin(), lseeds.end(), DeleteObject());
+   lseeds.clear();
+   for_each(ltracks.begin(), ltracks.end(), DeleteObject());
+   ltracks.clear();
 
    std::cout << "Event: " << fEventNo++ << std::endl;
 

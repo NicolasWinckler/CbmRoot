@@ -2146,7 +2146,7 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	   DrawHist1D(fhStsMomNormStsRichTrdTof[RICHEL][REC], fhStsRichMomNormStsRichTrdTof[RICHEL][REC],
 	         fhStsRichTrdMomNormStsRichTrdTof[RICHEL][REC], fhStsRichTrdTofMom[RICHEL][REC],
 	         "Efficiency", "Momentum [GeV/c]", "Efficiency", "STS", "STS+RICH",
-	         "STS+RICH+TRD", "STS+RICH+TRD+TOF", false, false, true, 0.3,0.3,0.85,0.6);
+	         "STS+RICH+TRD", "STS+RICH+TRD+TOF", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 
       DrawEfficiency("rec_qa_sts_rich_trd_tof_electron_identification", &fhStsRichMomElIdNormStsRichTrdTof[ELID],
                &fhStsRichTrdMomElIdNormStsRichTrdTof[ELID], &fhStsRichTrdTofMomElId[ELID], NULL,
@@ -2205,25 +2205,25 @@ void CbmLitReconstructionQa::DrawEfficiency(
 	if (hist1 && hist2 && hist3 && hist4) {
 		DrawHist1D((*hist1)[EFF], (*hist2)[EFF], (*hist3)[EFF], (*hist4)[EFF],
 						 yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, hname3, hname4,
-						 false, false, true, 0.3,0.3,0.85,0.6);
+						 kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 		DrawMeanEfficiencyLines((*hist1)[EFF], eff1, eff2, eff3, eff4);
 
 	} else if (hist1 && hist2 && hist3 && !hist4) {
 	  DrawHist1D((*hist1)[EFF], (*hist2)[EFF], (*hist3)[EFF], NULL,
 	        yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, hname3, "",
-				 false, false, true, 0.3,0.3,0.85,0.6);
+	        kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
      DrawMeanEfficiencyLines((*hist1)[EFF], eff1, eff2, eff3);
 
 	} else if (hist1 && hist2 && !hist3 && !hist4){
 	  DrawHist1D((*hist1)[EFF], (*hist2)[EFF], NULL, NULL,
 	        yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, "", "",
-				 false, false, true, 0.3,0.3,0.85,0.6);
+	        kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
      DrawMeanEfficiencyLines((*hist1)[EFF], eff1, eff2);
 
 	} else if (hist1 && !hist2 && !hist3 && !hist4){
      DrawHist1D((*hist1)[EFF], NULL, NULL, NULL,
            yTitle, "Momentum [GeV/c]", yTitle, hname1, "", "", "",
-             false, false, true, 0.3,0.3,0.85,0.6);
+           kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
      DrawMeanEfficiencyLines((*hist1)[EFF], eff1);
 
    }
@@ -2303,13 +2303,13 @@ void CbmLitReconstructionQa::DrawHitsHistos(
               "all: " + lit::ToString<Double_t>(histos[0]->GetMean(), 1),
               "true: " + lit::ToString<Double_t>(histos[1]->GetMean(), 1),
               "fake: " + lit::ToString<Double_t>(histos[2]->GetMean(), 1),  "",
-              false, true, true, 0.25,0.99,0.55,0.75);
+              kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
 
    c->cd(2);
    DrawHist1D(histos[3], histos[4], NULL, NULL, "Ratio", "Ratio", "Counter",
               "true/all: " + lit::ToString<Double_t>(histos[3]->GetMean()),
               "fake/all: " + lit::ToString<Double_t>(histos[4]->GetMean()),
-              "", "", false, true, true, 0.25,0.99,0.55,0.75);
+              "", "", kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
 
    lit::SaveCanvasAsImage(c, fOutputDir);
 }
@@ -2321,7 +2321,7 @@ void CbmLitReconstructionQa::DrawHitsStationHisto(
 	TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1200, 600);
 	DrawHist1D(hist, "Station number", "Number of hits",
 			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-			LIT_MARKER_STYLE1, false, false, "HIST TEXT0");
+			LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "HIST TEXT0");
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
@@ -2342,7 +2342,7 @@ void CbmLitReconstructionQa::DrawStsTracksQaHistos()
    fhStsChiprim->Scale(1./fhStsChiprim->Integral());
    DrawHist1D(fhStsChiprim, "#chi^{2}_{vertex}", "Yield",
             kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, false, true, "");
+            LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
@@ -2350,12 +2350,13 @@ void CbmLitReconstructionQa::DrawStsTracksQaHistos()
    TH1* projY = (TH1*)fhStsMomresVsMom->ProjectionY()->Clone();
    projY->Scale(1./projY->Integral());
    DrawHist1D(projY, "dP [%]", "Yield", kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, false, true, "");
+            LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(3);
-   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter", false, false, false, "COLZ");
+   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter",
+         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 

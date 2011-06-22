@@ -70,36 +70,36 @@ void CbmLitCheckEnergyLossMuons::DrawGraphs()
 
    DrawGraph(fTable[0], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenCircle, true, true, "ALP");
+             kOpenCircle, kLitLogScale, kLitLogScale, "ALP");
 
    DrawGraph(fTable[1], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenSquare, true, true, "LP");
+             kOpenSquare, kLitLogScale, kLitLogScale, "LP");
 
    DrawGraph(fTable[2], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenTriangleUp, true, true, "LP");
+             kOpenTriangleUp, kLitLogScale, kLitLogScale, "LP");
 
    DrawGraph(fTable[3], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenDiamond, true, true, "LP");
+             kOpenDiamond, kLitLogScale, kLitLogScale, "LP");
 
 
    DrawGraph(fCalc[0], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenCircle, true, true, "LP");
+             kOpenCircle, kLitLogScale, kLitLogScale, "LP");
 
    DrawGraph(fCalc[1], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenSquare, true, true, "LP");
+             kOpenSquare, kLitLogScale, kLitLogScale, "LP");
 
    DrawGraph(fCalc[2], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenTriangleUp, true, true, "LP");
+             kOpenTriangleUp, kLitLogScale, kLitLogScale, "LP");
 
    DrawGraph(fCalc[3], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
              LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenDiamond, true, true, "LP");
+             kOpenDiamond, kLitLogScale, kLitLogScale, "LP");
 
 // TLegend* l1 = new TLegend(0.20, 0.97, 0.9, 0.7);
 // l1->SetFillColor(kWhite);

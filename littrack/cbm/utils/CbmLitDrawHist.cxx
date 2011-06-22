@@ -47,8 +47,8 @@ void DrawHist1D(
    Int_t lineStyle,
    Int_t markerSize,
    Int_t markerStyle,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
@@ -60,8 +60,8 @@ void DrawHist1D(
    hist->SetMarkerColor(color);
    hist->SetMarkerSize(markerSize);
    hist->SetMarkerStyle(markerStyle);
-   if (logx) { gPad->SetLogx(); }
-   if (logy) { gPad->SetLogy(); }
+   if (logx == kLitLogScale) { gPad->SetLogx(); }
+   if (logy == kLitLogScale) { gPad->SetLogy(); }
    hist->GetXaxis()->SetLabelSize(textSize);
    hist->GetXaxis()->SetNdivisions(505, kTRUE);
    hist->GetYaxis()->SetLabelSize(textSize);
@@ -80,18 +80,18 @@ void DrawHist2D(
    const std::string& titleX,
    const std::string& titleY,
    const std::string& titleZ,
-   Bool_t logx,
-   Bool_t logy,
-   Bool_t logz,
+   LitScale logx,
+   LitScale logy,
+   LitScale logz,
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
    hist->GetXaxis()->SetTitle(titleX.c_str());
    hist->GetYaxis()->SetTitle(titleY.c_str());
    hist->GetZaxis()->SetTitle(titleZ.c_str());
-   if (logx) { gPad->SetLogx(); }
-   if (logy) { gPad->SetLogy(); }
-   if (logz) { gPad->SetLogz(); }
+   if (logx == kLitLogScale) { gPad->SetLogx(); }
+   if (logy == kLitLogScale) { gPad->SetLogy(); }
+   if (logz == kLitLogScale) { gPad->SetLogz(); }
    hist->GetXaxis()->SetLabelSize(textSize);
    hist->GetXaxis()->SetNdivisions(505, kTRUE);
    hist->GetYaxis()->SetLabelSize(textSize);
@@ -124,8 +124,8 @@ void DrawHist1D(
    const std::string& hist2label,
    const std::string& hist3label,
    const std::string& hist4label,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    Bool_t drawLegend,
    Double_t x1,
    Double_t y1,
@@ -199,8 +199,8 @@ void DrawGraph(
    Int_t lineStyle,
    Int_t markerSize,
    Int_t markerStyle,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
@@ -211,8 +211,8 @@ void DrawGraph(
    graph->SetMarkerSize(markerSize);
    graph->SetMarkerStyle(markerStyle);
    if (drawOpt.find("A") != std::string::npos) {
-      if (logx) { gPad->SetLogx(); }
-      if (logy) { gPad->SetLogy(); }
+      if (logx == kLitLogScale) { gPad->SetLogx(); }
+      if (logy == kLitLogScale) { gPad->SetLogy(); }
       graph->GetXaxis()->SetTitle(titleX.c_str());
       graph->GetYaxis()->SetTitle(titleY.c_str());
       graph->GetXaxis()->SetLabelSize(textSize);
@@ -240,8 +240,8 @@ void DrawGraph(
    const std::string& hist1label,
    const std::string& hist2label,
    const std::string& hist3label,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    Bool_t drawLegend,
    Double_t x1,
    Double_t y1,
@@ -295,18 +295,18 @@ void DrawGraph2D(
    const std::string& titleX,
    const std::string& titleY,
    const std::string& titleZ,
-   Bool_t logx,
-   Bool_t logy,
-   Bool_t logz,
+   LitScale logx,
+   LitScale logy,
+   LitScale logz,
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
    graph->GetXaxis()->SetTitle(titleX.c_str());
    graph->GetYaxis()->SetTitle(titleY.c_str());
    graph->GetZaxis()->SetTitle(titleZ.c_str());
-   if (logx) { gPad->SetLogx(); }
-   if (logy) { gPad->SetLogy(); }
-   if (logz) { gPad->SetLogz(); }
+   if (logx == kLitLogScale) { gPad->SetLogx(); }
+   if (logy == kLitLogScale) { gPad->SetLogy(); }
+   if (logz == kLitLogScale) { gPad->SetLogz(); }
    graph->GetXaxis()->SetLabelSize(textSize);
    graph->GetXaxis()->SetNdivisions(505, kTRUE);
    graph->GetYaxis()->SetLabelSize(textSize);

@@ -15,7 +15,7 @@
 #include "TGraph.h"
 #include "TGraph2D.h"
 
-// Set of standard settings for drawing
+// Set of default settings for drawing
 const Int_t LIT_COLOR1 = kRed;
 const Int_t LIT_COLOR2 = kBlue;
 const Int_t LIT_COLOR3 = kGreen+3;
@@ -31,6 +31,9 @@ const Int_t LIT_MARKER_STYLE2 = kOpenSquare;
 const Int_t LIT_MARKER_STYLE3 = kOpenTriangleUp;
 const Int_t LIT_MARKER_STYLE4 = kOpenDiamond;
 const Double_t LIT_TEXT_SIZE = 0.06;
+
+enum LitScale { kLitLogScale = 0, kLitLinearScale = 1};
+
 
 /* Set default styles for histograms. */
 void SetStyles();
@@ -57,8 +60,8 @@ void DrawHist1D(
    Int_t lineStyle,
    Int_t markerSize,
    Int_t markerStyle,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    const std::string& drawOpt);
 
 
@@ -78,9 +81,9 @@ void DrawHist2D(
    const std::string& titleX,
    const std::string& titleY,
    const std::string& titleZ,
-   Bool_t logx,
-   Bool_t logy,
-   Bool_t logz,
+   LitScale logx,
+   LitScale logy,
+   LitScale logz,
    const std::string& drawOpt);
 
 
@@ -117,8 +120,8 @@ void DrawHist1D(
    const std::string& hist2label,
    const std::string& hist3label,
    const std::string& hist4label,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    Bool_t drawLegend,
    Double_t x1,
    Double_t y1,
@@ -159,8 +162,8 @@ void DrawGraph(
    Int_t lineStyle,
    Int_t markerSize,
    Int_t markerStyle,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    const std::string& drawOpt);
 
 
@@ -192,8 +195,8 @@ void DrawGraph(
    const std::string& hist1label,
    const std::string& hist2label,
    const std::string& hist3label,
-   Bool_t logx,
-   Bool_t logy,
+   LitScale logx,
+   LitScale logy,
    Bool_t drawLegend,
    Double_t x1,
    Double_t y1,
@@ -215,9 +218,9 @@ void DrawGraph2D(
    const std::string& titleX,
    const std::string& titleY,
    const std::string& titleZ,
-   Bool_t logx,
-   Bool_t logy,
-   Bool_t logz,
+   LitScale logx,
+   LitScale logy,
+   LitScale logz,
    const std::string& drawOpt);
 
 /* Divide two histograms.

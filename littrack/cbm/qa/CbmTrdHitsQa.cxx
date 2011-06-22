@@ -207,29 +207,30 @@ void CbmTrdHitsQa::Draw()
       chX->cd(i + 1);
       DrawHist1D(fhX[i], "X [cm]", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chX, fOutputDir);
 
       chY->cd(i + 1);
       DrawHist1D(fhY[i], "Y [cm]", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chY, fOutputDir);
 
       chDx->cd(i + 1);
       DrawHist1D(fhDx[i], "Dx [cm]", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chDx, fOutputDir);
 
       chDy->cd(i + 1);
       DrawHist1D(fhDy[i], "Dy [cm]", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chDy, fOutputDir);
 
       chXY->cd(i + 1);
-      DrawHist2D(fhXY[i], "X [cm]", "Y [cm]", "Counter", false, false, true, "colz");
+      DrawHist2D(fhXY[i], "X [cm]", "Y [cm]", "Counter",
+            kLitLinearScale, kLitLinearScale, kLitLogScale, "colz");
       lit::SaveCanvasAsImage(chXY, fOutputDir);
 
 
@@ -238,19 +239,19 @@ void CbmTrdHitsQa::Draw()
       chResX->cd(i + 1);
       DrawHist1D(fhResX[i], "Residual X [cm]", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chResX, fOutputDir);
 
       chResY->cd(i + 1);
       DrawHist1D(fhResY[i], "Residual Y [cm]", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chResY, fOutputDir);
 
       chPullX->cd(i + 1);
       DrawHist1D(fhPullX[i], "Pull X", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chPullX, fOutputDir);
 
       TH1F* hist = fhPullX[i];
@@ -266,7 +267,7 @@ void CbmTrdHitsQa::Draw()
       chPullY->cd(i + 1);
       DrawHist1D(fhPullY[i], "Pull Y", "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, false, true, "");
+                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
       lit::SaveCanvasAsImage(chPullY, fOutputDir);
       hist = fhPullY[i];
       hist->Fit("gaus");

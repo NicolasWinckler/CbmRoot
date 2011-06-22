@@ -13,7 +13,6 @@
 #include "parallel/LitTrack.h"
 #include "parallel/LitConverter.h"
 #include "parallel/muon/LitTrackFinderNNVecMuon.h"
-#include "parallel/electron/LitTrackFinderNNScalarElectron.h"
 #include "parallel/electron/LitTrackFinderNNVecElectron.h"
 
 #include "TStopwatch.h"

@@ -37,8 +37,6 @@ set(LITTRACKPARALLEL_SRCS
 #If(TBB_FOUND)
   Set(LITTRACKPARALLEL_SRCS
     ${LITTRACKPARALLEL_SRCS}
-    LitTrackFinderNNBase.cxx
-    electron/LitTrackFinderNNBaseElectron.cxx
     electron/LitTrackFinderNNVecElectron.cxx
     muon/LitTrackFinderNNVecMuon.cxx
   )

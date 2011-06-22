@@ -1,7 +1,11 @@
 #!/bin/sh
 
+echo $PATH
+echo $LD_LIBRARY_PATH
+which root
+
 . $VMCWORKDIR/macro/littrack/common.sh
-default_init
+#default_init
 
 create_output_dir events_electron/
 create_image_dir results_electron/

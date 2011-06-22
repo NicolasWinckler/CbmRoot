@@ -440,7 +440,9 @@ void global_reco(Int_t nEvents = 10, // number of events
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	cout << endl << endl;
-	cout << "Macro finished successfully." << endl;
+ 	cout << "Macro finished successfully." << endl;
+        cout << "Test passed"<< endl;
+        cout << " All ok " << endl;
 	cout << "Output file is " << globalRecoFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time "	<< timer.CpuTime() << " s" << endl;

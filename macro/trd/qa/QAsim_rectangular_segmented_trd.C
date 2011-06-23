@@ -24,7 +24,7 @@ void QAsim_rectangular_segmented_trd(Int_t nEvents = 2)
   TString inFile  = inDir + "/input/urqmd.ftn14";
   TString outDir  = "data";
   TString outFile = outDir + "/trd_rectangular_segmented.mc.root";
-  TString parFile = outDir + "/params.root";
+  TString parFile = outDir + "/params_rectangular.root";
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";

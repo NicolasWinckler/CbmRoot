@@ -24,7 +24,7 @@ void QAsim_quasi_monolithic_trd(Int_t nEvents = 2)
   TString inFile  = inDir + "/input/urqmd.ftn14";
   TString outDir  = "data";
   TString outFile = outDir + "/trd_quasi_monolithic.mc.root";
-  TString parFile = outDir + "/params.root";
+  TString parFile = outDir + "/params_quasi.root";
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";

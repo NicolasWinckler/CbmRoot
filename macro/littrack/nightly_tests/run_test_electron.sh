@@ -27,9 +27,9 @@ set_default_file_names $DIR 0000
 
 export INFILE=$VMCWORKDIR/input/urqmd.auau.25gev.centr.root
     
-root -b -q "$VMCWORKDIR/macro/littrack/global_sim.C($NEVENTS)"
+root -b -q -l "$VMCWORKDIR/macro/littrack/global_sim.C($NEVENTS)"
 #root -b -q "../global_reco.C($NEVENTS, \"all\")"
-root -b -q "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"hits\")"
-root -b -q "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
+root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"hits\")"
+root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 
 export SCRIPT=no

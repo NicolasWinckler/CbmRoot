@@ -168,6 +168,7 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fhRecNp(),
    fhRecAngle(),
    fhTofMom(),
+   fhTofAngle(),
 
    fhStsGhostNh(NULL),
    fhRecGhostNh(NULL),
@@ -834,7 +835,7 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMom, mcTrack->GetP());
          // number of points dependence histograms
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsNp, nofPointsSts);
-         // number of points dependence histograms
+         // polar angle dependence histograms
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsAngle, angle);
 
          if (isPrimElectron) fhStsDetAccEl[DETACCACC]->Fill(mcTrack->GetP());
@@ -891,11 +892,15 @@ void CbmLitReconstructionQa::ProcessMcTracks()
          if (isHalfGlobalReconstructed && isStsOk && isRecOk && isTofOk) {
             // momentum dependence histograms
             FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
+            // polar angle dependence histograms
+            FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofAngle, angle);
          }
       } else { // for STS+TOF setup
          if (isStsOk && isTofOk) {
             // momentum dependence histograms
             FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
+            // polar angle dependence histograms
+            FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofAngle, angle);
          }
       }
 
@@ -1256,6 +1261,7 @@ void CbmLitReconstructionQa::CreateHistos(
    CreateEffHisto(fhRecNp, "hRecNp", nBinsNofPoints, minNofPoints, maxNofPoints, "tracking", file);
    CreateEffHisto(fhRecAngle, "hRecAngle", fNofBinsAngle, fMinAngle, fMaxAngle, "tracking", file);
    CreateEffHisto(fhTofMom, "hTofMom", fNofBinsMom, fMinMom, fMaxMom, "tracking", file);
+   CreateEffHisto(fhTofAngle, "hTofAngle", fNofBinsAngle, fMinAngle, fMaxAngle, "tracking", file);
 
    CreateEffHisto(fhRichMom, "hRichMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
    CreateEffHisto(fhRichNh, "hRichNh", nBinsNofPoints, minNofPoints, maxNofPoints, "rich", file);
@@ -1521,6 +1527,7 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
       DivideHistos(fhRecNp[i][REC], fhRecNp[i][ACC], fhRecNp[i][EFF], 100.);
       DivideHistos(fhRecAngle[i][REC], fhRecAngle[i][ACC], fhRecAngle[i][EFF], 100.);
       DivideHistos(fhTofMom[i][REC], fhTofMom[i][ACC], fhTofMom[i][EFF], 100.);
+      DivideHistos(fhTofAngle[i][REC], fhTofAngle[i][ACC], fhTofAngle[i][EFF], 100.);
       DivideHistos(fhRichMom[i][REC], fhRichMom[i][ACC], fhRichMom[i][EFF], 100.);
       DivideHistos(fhRichNh[i][REC], fhRichNh[i][ACC], fhRichNh[i][EFF], 100.);
 
@@ -1794,13 +1801,22 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
    out << "Momentum resolution: mean = " << fhStsMomresVsMom->ProjectionY()->GetMean()
          << " RMS = " << fhStsMomresVsMom->ProjectionY()->GetRMS() << std::endl;
 
-   out << "Polar angle efficiency:" << std::endl;
-   out << "STS:" << std::endl;
-   out << PolarAngleEfficiency(fhStsAngle);
-   out << det << ":" << std::endl;
-   out << PolarAngleEfficiency(fhRecAngle);
+   out << "Tracking efficiency in dependence on polar angle:" << std::endl;
+   w = 17;
+   out << std::setfill('_') << std::setw(7*w) << "_"<< std::endl;
+   out << std::setfill(' ') << std::setw(w) << " " << std::setw(w)
+      << "all" << std::setw(w) << "reference"
+      << std::setw(w) << "primary"<< std::setw(w) << "secondary"
+      << std::setw(w) << "electron"<< std::setw(w) << "muon" << std::endl;
+   out << std::setfill('_') << std::setw(7*17) << "_"<< std::endl;
 
-   out << std::setfill('-') << std::setw(7*17) << std::endl;
+   out << std::setfill('-') << std::left << std::setw(7*w) << "STS" << std::endl;
+   out << std::setfill(' ') << std::left << PolarAngleEfficiency(fhStsAngle);
+   out << std::setfill('-') << std::left << std::setw(7*w) << det << std::endl;
+   out << std::setfill(' ') << std::left << PolarAngleEfficiency(fhRecAngle);
+   out << std::setfill('-') << std::left << std::setw(7*w) << "TOF" << std::endl;
+   out << std::setfill(' ') << std::left << PolarAngleEfficiency(fhTofAngle);
+   out << std::setfill('_') << std::setw(7*17) << "_" << std::endl;
 }
 
 std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
@@ -2125,26 +2141,56 @@ std::string CbmLitReconstructionQa::PolarAngleEfficiency(
    const std::vector<std::vector<TH1F*> >& hist)
 {
    Double_t step = (fMaxAngle - fMinAngle) / fNofBinsAngle;
-   Double_t allEff[fNofBinsAngle], refEff[fNofBinsAngle];
-   Double_t allRec[fNofBinsAngle], refRec[fNofBinsAngle];
-   Double_t allAcc[fNofBinsAngle], refAcc[fNofBinsAngle];
+   Double_t eff[fNofCategories][fNofBinsAngle];
+   Double_t rec[fNofCategories][fNofBinsAngle];
+   Double_t acc[fNofCategories][fNofBinsAngle];
    for(Int_t i = 0; i < fNofBinsAngle; i++) {
-      allRec[i] = hist[ALL][REC]->GetBinContent(i+1);
-      allAcc[i] = hist[ALL][ACC]->GetBinContent(i+1);
-      if (allAcc[i] != 0.) { allEff[i] = allRec[i] / allAcc[i]; }
-      refRec[i] = hist[REF][REC]->GetBinContent(i+1);
-      refAcc[i] = hist[REF][ACC]->GetBinContent(i+1);
-      if (refAcc[i] != 0.) { refEff[i] = refRec[i] / refAcc[i]; }
+      rec[ALL][i] = hist[ALL][REC]->GetBinContent(i+1);
+      acc[ALL][i] = hist[ALL][ACC]->GetBinContent(i+1);
+      if (acc[ALL][i] != 0.) { eff[ALL][i] = 100.*rec[ALL][i] / acc[ALL][i]; }
+      rec[REF][i] = hist[REF][REC]->GetBinContent(i+1);
+      acc[REF][i] = hist[REF][ACC]->GetBinContent(i+1);
+      if (acc[REF][i] != 0.) { eff[REF][i] = 100.*rec[REF][i] / acc[REF][i]; }
+      rec[PRIM][i] = hist[PRIM][REC]->GetBinContent(i+1);
+      acc[PRIM][i] = hist[PRIM][ACC]->GetBinContent(i+1);
+      if (acc[PRIM][i] != 0.) { eff[PRIM][i] = 100.*rec[PRIM][i] / acc[PRIM][i]; }
+      rec[SEC][i] = hist[SEC][REC]->GetBinContent(i+1);
+      acc[SEC][i] = hist[SEC][ACC]->GetBinContent(i+1);
+      if (acc[SEC][i] != 0.) { eff[SEC][i] = 100.*rec[SEC][i] / acc[SEC][i]; }
+      rec[EL][i] = hist[EL][REC]->GetBinContent(i+1);
+      acc[EL][i] = hist[EL][ACC]->GetBinContent(i+1);
+      if (acc[EL][i] != 0.) { eff[EL][i] = 100.*rec[EL][i] / acc[EL][i]; }
+      rec[MU][i] = hist[MU][REC]->GetBinContent(i+1);
+      acc[MU][i] = hist[MU][ACC]->GetBinContent(i+1);
+      if (acc[MU][i] != 0.) { eff[MU][i] = 100.*rec[MU][i] / acc[MU][i]; }
    }
 
-   Double_t nofEvents = fhEventNo->GetEntries();
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
+   Int_t w = 17;
    std::stringstream ss;
    for (Int_t i = 0; i < fNofBinsAngle; i++) {
+      std::stringstream ss0, ss1, ss2, ss3, ss4, ss5, ss6;
+      ss0.precision(3);
+      ss1.precision(3);
+      ss2.precision(3);
+      ss3.precision(3);
+      ss4.precision(3);
+      ss5.precision(3);
+      ss6.precision(3);
+
       Double_t angle0 = i*step;
       Double_t angle1 = angle0 + step;
-      ss << "(" << angle0 << "-" << angle1 << ") "
-         << "all=" << allEff[i] << "(" << allRec[i]/nofEvents << "/" << allAcc[i]/nofEvents << ")"
-         << "  ref=" << refEff[i] << "(" << refRec[i]/nofEvents << "/" << refAcc[i]/nofEvents << ")" << std::endl;
+      ss0 << "(" << angle0 << "-" << angle1 << ")";
+      ss1 << eff[ALL][i] << "(" << rec[ALL][i]/nofEvents << "/" << acc[ALL][i]/nofEvents << ")";
+      ss2 << eff[REF][i] << "(" << rec[REF][i]/nofEvents << "/" << acc[REF][i]/nofEvents << ")";
+      ss3 << eff[PRIM][i] << "(" << rec[PRIM][i]/nofEvents << "/" << acc[PRIM][i]/nofEvents << ")";
+      ss4 << eff[SEC][i] << "(" << rec[SEC][i]/nofEvents << "/" << acc[SEC][i]/nofEvents << ")";
+      ss5 << eff[EL][i] << "(" << rec[EL][i]/nofEvents << "/" << acc[EL][i]/nofEvents << ")";
+      ss6 << eff[MU][i] << "(" << rec[MU][i]/nofEvents << "/" << acc[MU][i]/nofEvents << ")";
+      ss << std::setw(w) << ss0.str() << std::setw(w) << ss1.str()
+            << std::setw(w) << ss2.str() << std::setw(w) << ss3.str()
+            << std::setw(w) << ss4.str() << std::setw(w) << ss5.str()
+            << std::setw(w) << ss6.str() << std::endl;
    }
    return ss.str();
 }

@@ -522,6 +522,7 @@ private:
    std::vector<std::vector<TH1F*> > fhRecNp; // TRD(MUCH): number of points dependence
    std::vector<std::vector<TH1F*> > fhRecAngle; // TRD(MUCH): polar angle dependence
    std::vector<std::vector<TH1F*> > fhTofMom; // TOF: momentum dependence
+   std::vector<std::vector<TH1F*> > fhTofAngle; // TOF: momentum dependence
    // histograms for ghost tracks
    // STS: ghost tracks (number of hits dependence)
    TH1F* fhStsGhostNh;

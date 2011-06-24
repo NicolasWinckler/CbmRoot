@@ -87,18 +87,18 @@ function set_default_muon_geometry() {
     export PIPEGEOM=pipe_much.geo
     export SHIELDGEOM=shield_standard.geo
     export MVDGEOM=
-    export STSGEOM=sts_standard.geo
+    export STSGEOM=sts/sts_v09a.geo
     export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
-    export MUCHGEOM=much_standard.geo
-    export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard.digi.root
+    export MUCHGEOM=much/much_v11a.geo
+    export MUCHDIGI=$VMCWORKDIR/parameters/much/much_v11a.digi.root
     export RICHGEOM=
     export TRDGEOM=
 #trd_muon_setup_new.geo
     export TRDDIGI=
-    export TOFGEOM=tof_standard.geo
+    export TOFGEOM=tof/tof_v07a.geo
     export ECALGEOM=
-    export FIELDMAP=field_muon_standard
-    export MAGNETGEOM=magnet_muon_standard.geo
+    export FIELDMAP=field_v10e
+    export MAGNETGEOM=passive/magnet_v09m.geo
     
     export NOFTRDHITS=0
     export NOFMUCHHITS=13

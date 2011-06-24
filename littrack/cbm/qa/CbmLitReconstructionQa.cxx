@@ -121,11 +121,15 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fMvdHits(NULL),
    fMvdPoints(NULL),
    fMvdHitMatches(NULL),
+   fMvdDigis(NULL),
+   fMvdClusters(NULL),
 
    fStsTracks(NULL),
    fStsMatches(NULL),
-   fStsHits(NULL),
    fStsPoints(NULL),
+   fStsDigis(NULL),
+   fStsClusters(NULL),
+   fStsHits(NULL),
 
    fRichHits(NULL),
    fRichRings(NULL),
@@ -137,10 +141,14 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fMuchStrawHits(NULL),
    fMuchMatches(NULL),
    fMuchPoints(NULL),
+   fMuchDigis(NULL),
+   fMuchClusters(NULL),
 
    fTrdMatches(NULL),
    fTrdHits(NULL),
    fTrdPoints(NULL),
+   fTrdDigis(NULL),
+   fTrdClusters(NULL),
 
    fTofPoints(NULL),
    fTofHits(NULL),
@@ -215,6 +223,16 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
    fhNofTrdPoints(NULL),
    fhNofMuchPoints(NULL),
    fhNofTofPoints(NULL),
+
+   fhNofMvdDigis(NULL),
+   fhNofStsDigis(NULL),
+   fhNofMuchDigis(NULL),
+   fhNofTrdDigis(NULL),
+
+   fhNofMvdClusters(NULL),
+   fhNofStsClusters(NULL),
+   fhNofMuchClusters(NULL),
+   fhNofTrdClusters(NULL),
 
    fhStsChiprim(NULL),
    fhStsMomresVsMom(NULL),
@@ -350,6 +368,10 @@ void CbmLitReconstructionQa::ReadDataBranches()
       if (NULL == fMvdPoints) { Fatal("Init",": No MvdPoint array!"); }
       fMvdHitMatches = (TClonesArray*) ioman->GetObject("MvdHitMatch");
       if (NULL == fMvdHitMatches) { Fatal("Init",": No MvdHitMatch array!"); }
+      fMvdDigis = (TClonesArray*) ioman->GetObject("MvdDigi");
+      //if (NULL == fMvdDigis) { Fatal("Init",": No MvdDigi array!"); }
+      fMvdClusters = (TClonesArray*) ioman->GetObject("MvdCluster");
+      //if (NULL == fMvdClusters) { Fatal("Init",": No MvdCluster array!"); }
    }
 
    if (fIsSts) {
@@ -361,6 +383,10 @@ void CbmLitReconstructionQa::ReadDataBranches()
       if (NULL == fStsHits) { Fatal("Init",": No StsHit array!"); }
       fStsPoints = (TClonesArray*) ioman->GetObject("StsPoint");
       if (NULL == fStsPoints) { Fatal("Init",": No StsPoint array!"); }
+      fStsDigis = (TClonesArray*) ioman->GetObject("StsDigi");
+      //if (NULL == fStsDigis) { Fatal("Init",": No StsDigi array!"); }
+      fStsClusters = (TClonesArray*) ioman->GetObject("StsCluster");
+      //if (NULL == fStsClusters) { Fatal("Init",": No StsCluster array!"); }
    }
 
    if (fIsRich) {
@@ -384,6 +410,10 @@ void CbmLitReconstructionQa::ReadDataBranches()
       if (NULL == fMuchMatches) { Fatal("Init","No MuchTrackMatch array!"); }
       fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
       if (NULL == fMuchPoints) { Fatal("Init","No MuchPoint array!"); }
+      fMuchDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
+//      if (NULL == fMuchDigis) { Fatal("Init","No MuchDigi array!"); }
+      fMuchClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
+//      if (NULL == fMuchClusters) { Fatal("Init","No MuchCluster array!"); }
    }
 
    if (fIsTrd) {
@@ -393,6 +423,10 @@ void CbmLitReconstructionQa::ReadDataBranches()
       if (NULL == fTrdHits) { Fatal("Init","No TrdHit array!"); }
       fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
       if (NULL == fTrdPoints) { Fatal("Init","No TrdPoint array!"); }
+      fTrdDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
+//      if (NULL == fTrdDigis) { Fatal("Init","No TrdDigi array!"); }
+      fTrdClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
+//      if (NULL == fTrdClusters) { Fatal("Init","No TrdCluster array!"); }
    }
 
    if (fIsTof) {
@@ -1368,6 +1402,16 @@ void CbmLitReconstructionQa::CreateHistos(
 	   fhNofMuchPoints = new TH1F("hNofMuchPoints","hNofMuchPoints", nofBinsC, 1., maxXC);
 	   fhNofTofPoints = new TH1F("hNofTofPoints","hNofTofPoints", nofBinsC, 1., maxXC);
 
+	   fhNofMvdDigis = new TH1F("hNofMvdDigis","hNofMvdDigis", nofBinsC, 1., maxXC);
+      fhNofStsDigis = new TH1F("hNofStsDigis","hNofStsDigis", nofBinsC, 1., maxXC);
+      fhNofMuchDigis = new TH1F("hNofMuchDigis","hNofMuchDigis", nofBinsC, 1., maxXC);
+      fhNofTrdDigis = new TH1F("hNofTrdDigis","hNofTrdDigis", nofBinsC, 1., maxXC);
+
+      fhNofMvdClusters = new TH1F("hNofMvdClusters","hNofMvdClusters", nofBinsC, 1., maxXC);
+      fhNofStsClusters = new TH1F("hNofStsClusters","hNofStsClusters", nofBinsC, 1., maxXC);
+      fhNofMuchClusters = new TH1F("hNofMuchClusters","hNofMuchClusters", nofBinsC, 1., maxXC);
+      fhNofTrdClusters = new TH1F("hNofTrdClusters","hNofTrdClusters", nofBinsC, 1., maxXC);
+
 	   fhStsChiprim = new TH1F("fhStsChiprim","fhStsChiprim", 150, 0., 15.);
 	   fhStsMomresVsMom = new TH2F("fhStsMomresVsMom","fhStsMomresVsMom", 120, 0., 12., 100, -15., 15.);
    }else {
@@ -1392,6 +1436,16 @@ void CbmLitReconstructionQa::CreateHistos(
       fhNofTrdPoints = (TH1F*)file->Get("hNofTrdPoints");
       fhNofMuchPoints = (TH1F*)file->Get("hNofMuchPoints");
       fhNofTofPoints = (TH1F*)file->Get("hNofTofPoints");
+
+      fhNofMvdDigis = (TH1F*)file->Get("hNofMvdDigis");
+      fhNofStsDigis = (TH1F*)file->Get("hNofStsDigis");
+      fhNofMuchDigis = (TH1F*)file->Get("hNofMuchDigis");
+      fhNofTrdDigis = (TH1F*)file->Get("hNofTrdDigis");
+
+      fhNofMvdClusters = (TH1F*)file->Get("hNofMvdClusters");
+      fhNofStsClusters = (TH1F*)file->Get("hNofStsClusters");
+      fhNofMuchClusters = (TH1F*)file->Get("hNofMuchClusters");
+      fhNofTrdClusters = (TH1F*)file->Get("hNofTrdClusters");
 
 	   fhStsChiprim = (TH1F*)file->Get("fhStsChiprim");
 	   fhStsMomresVsMom = (TH2F*)file->Get("fhStsMomresVsMom");
@@ -1418,10 +1472,20 @@ void CbmLitReconstructionQa::CreateHistos(
    fHistoList->Add(fhNofMuchPoints);
    fHistoList->Add(fhNofTofPoints);
 
+   fHistoList->Add(fhNofMvdDigis);
+   fHistoList->Add(fhNofStsDigis);
+   fHistoList->Add(fhNofMuchDigis);
+   fHistoList->Add(fhNofTrdDigis);
+
+   fHistoList->Add(fhNofMvdDigis);
+   fHistoList->Add(fhNofStsClusters);
+   fHistoList->Add(fhNofMuchDigis);
+   fHistoList->Add(fhNofTrdDigis);
+
    fHistoList->Add(fhStsChiprim);
    fHistoList->Add(fhStsMomresVsMom);
 
-   // Histogram store number of events
+   // Histogram stores number of events
    if (file == NULL){
 	   fhEventNo = new TH1F("hEventNo","hEventNo", 1, 0, 1.);
    } else {
@@ -1530,6 +1594,8 @@ void CbmLitReconstructionQa::IncreaseCounters()
 	   fhNofStsTracks->Fill(fStsMatches->GetEntriesFast());
 	   fhNofStsHits->Fill(fStsHits->GetEntriesFast());
       fhNofStsPoints->Fill(fStsPoints->GetEntriesFast());
+      if (NULL != fStsDigis) fhNofStsDigis->Fill(fStsDigis->GetEntriesFast());
+      if (NULL != fStsClusters) fhNofStsClusters->Fill(fStsClusters->GetEntriesFast());
    }
    if (fIsRich) {
 	   fhNofRichRings->Fill(fRichRings->GetEntriesFast());
@@ -1541,12 +1607,16 @@ void CbmLitReconstructionQa::IncreaseCounters()
 	   fhNofTrdTracks->Fill(fTrdMatches->GetEntriesFast());
 	   fhNofTrdHits->Fill(fTrdHits->GetEntriesFast());
       fhNofTrdPoints->Fill(fTrdPoints->GetEntriesFast());
+      if (NULL != fTrdDigis) fhNofTrdDigis->Fill(fTrdDigis->GetEntriesFast());
+      if (NULL != fTrdClusters) fhNofTrdClusters->Fill(fTrdClusters->GetEntriesFast());
    }
    if (fIsMuch) {
 	   fhNofMuchTracks->Fill(fMuchMatches->GetEntriesFast());
 	   fhNofMuchPixelHits->Fill(fMuchPixelHits->GetEntriesFast());
 	   fhNofMuchStrawHits->Fill(fMuchStrawHits->GetEntriesFast());
       fhNofMuchPoints->Fill(fMuchPoints->GetEntriesFast());
+      if (NULL != fMuchDigis) fhNofMuchDigis->Fill(fMuchDigis->GetEntriesFast());
+      if (NULL != fMuchClusters) fhNofMuchClusters->Fill(fMuchClusters->GetEntriesFast());
    }
    if (fIsTof) {
       fhNofTofHits->Fill(fTofHits->GetEntriesFast());
@@ -1611,9 +1681,9 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
    PrintNofStatistics(out);
    out << std::endl;
 
-   out << "Number of global tracks per event global=" << (Int_t)fhNofGlobalTracks->GetMean()<< std::endl;
+   out << "Number of global tracks per event: " << (Int_t)fhNofGlobalTracks->GetMean()<< std::endl;
    if (fIsRich) {
-	   out << "RICH nof projections=" << (Int_t)fhNofRichProjections->GetMean() << std::endl;
+	   out << "Number of track projections in RICH: " << (Int_t)fhNofRichProjections->GetMean() << std::endl;
    }
 
    std::string det = RecDetector();
@@ -1861,13 +1931,19 @@ void CbmLitReconstructionQa::PrintNofStatistics(
 
    out << std::setfill('_') << std::setw(8*w) << "_"<< std::endl;
 
-   out << PrintNofStatisticsToString("nof points",fhNofMvdPoints, fhNofStsPoints, fhNofRichPoints,
+   out << PrintNofStatisticsToString("Points",fhNofMvdPoints, fhNofStsPoints, fhNofRichPoints,
          fhNofTrdPoints, fhNofMuchPoints, fhNofMuchPoints, fhNofTofPoints);
 
-   out << PrintNofStatisticsToString("nof hits",fhNofMvdHits, fhNofStsHits, fhNofRichHits,
+   out << PrintNofStatisticsToString("Digis", fhNofMvdDigis, fhNofStsDigis, NULL,
+         fhNofTrdDigis, fhNofMuchDigis, NULL, NULL);
+
+   out << PrintNofStatisticsToString("Clusters", fhNofMvdClusters, fhNofStsClusters, NULL,
+         fhNofTrdClusters, fhNofMuchClusters, NULL, NULL);
+
+   out << PrintNofStatisticsToString("Hits",fhNofMvdHits, fhNofStsHits, fhNofRichHits,
          fhNofTrdHits, fhNofMuchPixelHits, fhNofMuchStrawHits, fhNofTofHits);
 
-   out << PrintNofStatisticsToString("nof tracks",NULL, fhNofStsTracks, fhNofRichRings,
+   out << PrintNofStatisticsToString("Tracks",NULL, fhNofStsTracks, fhNofRichRings,
          fhNofTrdTracks, fhNofMuchTracks, fhNofMuchTracks, NULL);
 }
 
@@ -1885,12 +1961,19 @@ std::string CbmLitReconstructionQa::PrintNofStatisticsToString(
    Int_t w = 12;
 
    if (mvd != NULL && fIsMvd) { ss1 << (Int_t)mvd->GetMean(); }
+      else { ss1 << "-"; }
    if (sts != NULL && fIsSts) { ss2 << (Int_t)sts->GetMean(); }
+      else { ss2 << "-"; }
    if (rich != NULL && fIsRich) { ss3 << (Int_t)rich->GetMean(); }
+      else { ss3 << "-"; }
    if (trd != NULL && fIsTrd) { ss4 << (Int_t)trd->GetMean(); }
+      else { ss4 << "-"; }
    if (muchP != NULL && fIsMuch) { ss5 << (Int_t)muchP->GetMean(); }
+      else { ss5 << "-"; }
    if (muchS != NULL && fIsMuch) { ss6 << (Int_t)muchS->GetMean(); }
+      else { ss6 << "-"; }
    if (tof!= NULL && fIsTof) { ss7 << (Int_t)tof->GetMean(); }
+      else { ss7 << "-"; }
 
    ss << std::setw(w) << name <<
          std::setw(w) << ss1.str() << std::setw(w) << ss2.str() <<

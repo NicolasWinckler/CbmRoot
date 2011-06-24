@@ -424,7 +424,7 @@ private:
    // But this can lead to the situation when a reconstructed track has 4 hits,
    // all of them from the same MC track, which means that the track is correctly
    // reconstructed. BUT the real MC track has 12 points(hits). This is especially
-   // important for the MUCH detector. To avoid such situations on has to put
+   // important for the MUCH detector. To avoid such situations one has to put
    // such cut.
    Int_t fMinNofHitsTrd; // for TRD track
    Int_t fMinNofHitsMuch; // for MUCH track
@@ -440,8 +440,8 @@ private:
    Double_t fRefMomentum; // Momentum cut for reference tracks
    Int_t fRefMinNofHitsRich; // Minimum number of hits in RICH ring to be considered as reference
 
-   Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation
-   Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation
+   Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
+   Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
    Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
    Double_t fMinAngle; // Minimum polar angle [grad]
    Double_t fMaxAngle; // Maximum polar angle [grad]
@@ -465,14 +465,19 @@ private:
    // Pointers to data arrays
    TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
+
    TClonesArray* fMvdHits; // CbmMvdHit array
    TClonesArray* fMvdPoints; // CbmMvdPoint array
    TClonesArray* fMvdHitMatches; // CbmMvdHitMatch array
+   TClonesArray* fMvdDigis; // CbmMvdDigi array
+   TClonesArray* fMvdClusters; // CbmMvdClusters array
 
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
-   TClonesArray* fStsHits; // CbmStsHit array
    TClonesArray* fStsPoints; // CbmStsPoint array
+   TClonesArray* fStsDigis; // CbmStsDigi array
+   TClonesArray* fStsClusters; // CbmStsCluster array
+   TClonesArray* fStsHits; // CbmStsHit array
 
    TClonesArray* fRichHits; // CbmRichHits array
    TClonesArray* fRichRings; // CbmRichRing array
@@ -484,10 +489,14 @@ private:
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
    TClonesArray* fMuchMatches; // CbmTrackMatch array
    TClonesArray* fMuchPoints; // CbmMuchPoint array
+   TClonesArray* fMuchDigis; // CbmMuchDigi array
+   TClonesArray* fMuchClusters; // CbmMuchCluster array
 
    TClonesArray* fTrdMatches; // CbmTrackMatch array
    TClonesArray* fTrdHits; // CbmTrdHit array
    TClonesArray* fTrdPoints; // CbmTrdPoint array
+   TClonesArray* fTrdDigis; // CbmTrdDigi array
+   TClonesArray* fTrdClusters; // CbmTrdCluster array
 
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
@@ -582,6 +591,16 @@ private:
    TH1F* fhNofTrdPoints; // TRD points
    TH1F* fhNofMuchPoints; // MUCH points
    TH1F* fhNofTofPoints; // TOF points
+   // digis
+   TH1F* fhNofMvdDigis; // MVD digis
+   TH1F* fhNofStsDigis; // STS digis
+   TH1F* fhNofTrdDigis; // TRD digis
+   TH1F* fhNofMuchDigis; // MUCH digis
+   // clusters
+   TH1F* fhNofMvdClusters; // MVD clusters
+   TH1F* fhNofStsClusters; // STS clusters
+   TH1F* fhNofTrdClusters; // TRD clusters
+   TH1F* fhNofMuchClusters; // MUCH clusters
 
    TH1F* fhStsChiprim; //chi2Vertex
    TH2F* fhStsMomresVsMom; // momentum resolution vs. momentum

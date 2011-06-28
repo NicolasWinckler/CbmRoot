@@ -25,9 +25,6 @@ public:
    /* Returns pointer to the singleton object instance. */
    static CbmLitSimpleGeometryConstructor* Instance();
 
-   /* Destructor */
-   virtual ~CbmLitSimpleGeometryConstructor();
-
    /* Returns array of materials for simplified geometry. */
    const std::vector<CbmLitMaterialInfo>& GetMyGeoNodes() const {return fMyGeoNodes;}
 
@@ -40,12 +37,20 @@ public:
    /* Draws geometry. */
    void Draw();
 
-protected:
+private:
    /* Constructor is protected since singleton pattern is used.
     * Pointer to the object is returned by static Instance() method. */
    CbmLitSimpleGeometryConstructor();
 
-private:
+   /* Destructor */
+   virtual ~CbmLitSimpleGeometryConstructor();
+
+   /* Copy constructor */
+   CbmLitSimpleGeometryConstructor(const CbmLitSimpleGeometryConstructor&);
+
+   /* Assignment operator */
+   const CbmLitSimpleGeometryConstructor& operator=(const CbmLitSimpleGeometryConstructor&);
+
    /* Constructs simplified geometry. */
    void ConstructGeometry();
 
@@ -72,8 +77,6 @@ private:
 
    /* Constructs simplified TRD geometry. */
    void ConstructTrd();
-
-   static CbmLitSimpleGeometryConstructor* fInstance; // static instance
 
    TGeoManager* fGeo; // Pointer to full geometry
    TGeoManager* fSimpleGeo; // Pointer to simplified geometry

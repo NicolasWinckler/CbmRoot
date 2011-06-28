@@ -17,9 +17,6 @@
 class CbmLitToolFactory
 {
 public:
-   /* Constructor */
-   virtual ~CbmLitToolFactory();
-
    /* Returns pointer to the singleton object instance. */
    static CbmLitToolFactory* Instance();
 
@@ -51,13 +48,19 @@ public:
    HitToTrackMergerPtr CreateHitToTrackMerger(
       const std::string& name);
 
-protected:
+private:
    /* Constructor is protected since singleton pattern is used.
     * Pointer to the object is returned by static Instance() method. */
    CbmLitToolFactory();
 
-private:
-   static CbmLitToolFactory* fInstance; // static instance
+   /* Constructor */
+   virtual ~CbmLitToolFactory();
+
+   /* Copy constructor */
+   CbmLitToolFactory(const CbmLitToolFactory&);
+
+   /* Assignment operator */
+   const CbmLitToolFactory& operator=(const CbmLitToolFactory&);
 };
 
 #endif /*CBMLITTOOLFACTORY_H_*/

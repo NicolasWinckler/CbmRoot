@@ -25,9 +25,6 @@ class TGeoMaterial;
 class CbmLitEnvironment
 {
 public:
-   /* Destructor */
-   virtual ~CbmLitEnvironment();
-
    /* Returns pointer to the singleton object instance. */
    static CbmLitEnvironment* Instance();
 
@@ -109,10 +106,19 @@ public:
    /* Returns true if simple TRD is simulated. */
    bool IsTrdSimple() const;
 
-protected:
+private:
    /* Constructor is protected since singleton pattern is used.
     * Pointer to the object is returned by static Instance() method. */
    CbmLitEnvironment();
+
+   /* Destructor */
+   virtual ~CbmLitEnvironment();
+
+   /* Copy constructor */
+   CbmLitEnvironment(const CbmLitEnvironment&);
+
+   /* Assignment operator */
+   const CbmLitEnvironment& operator=(const CbmLitEnvironment&);
 
    /* Combines MUCH and TRD layout. */
    void CombineMuchAndTrd();
@@ -129,7 +135,6 @@ protected:
    /* Constructs MVD layout */
    void MvdLayout();
 
-private:
    /* Creates detector layout out of an array stations. */
    void DetermineLayout(
       const std::vector<CbmLitStation>& stations,
@@ -148,8 +153,6 @@ private:
    /* Returns true if detector exists in TGeo. */
    bool CheckDetectorPresence(
       const std::string& name) const;
-
-   static CbmLitEnvironment* fInstance; // static instance
 
    CbmLitDetectorLayout fLayout; // current detector layout
    CbmLitDetectorLayout fMuchTrdLayout; // MUCH+TRD detector layout

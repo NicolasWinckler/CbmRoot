@@ -33,7 +33,6 @@
 #include "cbm/parallel/CbmLitParallelTrackFitterTest.h"
 #include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
 #include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
-CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
 
 CbmLitToolFactory::CbmLitToolFactory()
 {
@@ -41,15 +40,12 @@ CbmLitToolFactory::CbmLitToolFactory()
 
 CbmLitToolFactory::~CbmLitToolFactory()
 {
-   if (fInstance != NULL) { delete fInstance; }
 }
 
 CbmLitToolFactory* CbmLitToolFactory::Instance()
 {
-   if (fInstance == NULL) {
-      fInstance = new CbmLitToolFactory();
-   }
-   return fInstance;
+   static CbmLitToolFactory instance;
+   return &instance;
 }
 
 TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(

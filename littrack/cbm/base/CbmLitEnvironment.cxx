@@ -39,8 +39,6 @@
 #include <algorithm>
 #include <cmath>
 
-CbmLitEnvironment* CbmLitEnvironment::fInstance = NULL;
-
 CbmLitEnvironment::CbmLitEnvironment():
    fField(NULL)
 {
@@ -48,15 +46,12 @@ CbmLitEnvironment::CbmLitEnvironment():
 
 CbmLitEnvironment::~CbmLitEnvironment()
 {
-   if (fInstance != NULL) { delete fInstance; }
 }
 
 CbmLitEnvironment* CbmLitEnvironment::Instance()
 {
-   if (fInstance == NULL) {
-      fInstance = new CbmLitEnvironment();
-   }
-   return fInstance;
+   static CbmLitEnvironment instance;
+   return &instance;
 }
 
 FairField* CbmLitEnvironment::GetField()

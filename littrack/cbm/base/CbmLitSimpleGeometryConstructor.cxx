@@ -21,8 +21,6 @@
 #include <sstream>
 #include <algorithm>
 
-CbmLitSimpleGeometryConstructor* CbmLitSimpleGeometryConstructor::fInstance = NULL;
-
 CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
    fGeo(NULL),
    fSimpleGeo(NULL),
@@ -39,15 +37,12 @@ CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
 
 CbmLitSimpleGeometryConstructor::~CbmLitSimpleGeometryConstructor()
 {
-   if (fInstance != NULL) { delete fInstance; }
 }
 
 CbmLitSimpleGeometryConstructor* CbmLitSimpleGeometryConstructor::Instance()
 {
-   if (fInstance == NULL) {
-      fInstance = new CbmLitSimpleGeometryConstructor();
-   }
-   return fInstance;
+   static CbmLitSimpleGeometryConstructor instance;
+   return &instance;
 }
 
 void CbmLitSimpleGeometryConstructor::Draw()

@@ -52,6 +52,8 @@ function set_simulation_parameters() {
     export PIONS=${pars[10]}
     # If "yes" PLUTO particles will be embedded
     export PLUTO=${pars[11]}
+    # If "yes" than CbmUnigenGenerator willbe useed instead of FairUrqmdGenerator
+    export USEUNIGEN=${pars[12]}
 }
 
 

@@ -14,8 +14,8 @@ create_image_dir results_muon/
 export NEVENTS=10
 export DETECTORSETUP=muon
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E   PI  PLUTO
-pars=(5    5    5   5   20   20   10     yes   yes no  no  no)
+#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E   PI  PLUTO USEUNIGEN
+pars=(5    5    5   5   20   20   10     yes   yes no  no  no    yes)
 set_simulation_parameters $pars    
 
 set_default_muon_geometry

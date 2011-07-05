@@ -54,7 +54,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 		// Directory for output images
 		TString imageDir = "./test/";
 		// Tracking type
-		trackingType = "nn_parallel";
+		trackingType = "branching";
 		// TRD hit producer type: smearing, digi, clustering
 		trdHitProducerType = "clustering";
 		// Normalization for efficiency

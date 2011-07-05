@@ -31,8 +31,8 @@ create_output_dir /d/cbm02/andrey/electron/v10b_10e_urqmd
 
 export DETECTORSETUP=electron
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI  PLUTO
-pars=(5    5    5   5   20   20   10     yes   no yes no  no)
+#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI  PLUTO USEUNIGEN
+pars=(5    5    5   5   20   20   10     yes   no yes no  no    no)
 set_simulation_parameters $pars    
 
 set_default_electron_geometry

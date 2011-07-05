@@ -28,6 +28,7 @@ void global_sim(Int_t nEvents = 1000)
 	TString electrons = "no"; // If "yes" than primary electrons will be generated
 	TString pions = "no"; // If "yes" than primary pions will be generated
 	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
+        TString useUnigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
@@ -96,14 +97,7 @@ void global_sim(Int_t nEvents = 1000)
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		pions = TString(gSystem->Getenv("PIONS"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
-
-		std::cout << "NMUONSPLUS=" << NMUONSPLUS << " NMUONSMINUS=" << NMUONSMINUS
-		          << " NELECTRONS=" << NELECTRONS << " NPOSITRONS=" << NPOSITRONS
-		          << " NPIONSPLUS=" << NPIONSPLUS << " NPIONSMINUS=" << NPIONSMINUS
-		          << " NPLUTO=" << NPLUTO
-		          << " urqmd=" << urqmd << " muons=" << muons
-		          << " electrons=" << electrons << " pions=" << pions
-		          << " pluto=" << pluto << std::endl;
+                useUnigen = TString(gSystem->Getenv("USEUNIGEN"));
 
 		plutoFile.resize(NPLUTO);
 		for (Int_t i = 0; i < NPLUTO; i++) {
@@ -252,9 +246,14 @@ void global_sim(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
-	if (urqmd == "yes") {
+	if (urqmd == "yes" && useUnigen == "yes") {
 		CbmUnigenGenerator*  urqmdGen = new CbmUnigenGenerator(inFile);
 		primGen->AddGenerator(urqmdGen);
+	}
+
+	if (urqmd == "yes" && useUnigen != "yes") {
+	    FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(inFile);
+            primGen->AddGenerator(urqmdGen);
 	}
 
 	if (pluto == "yes") {

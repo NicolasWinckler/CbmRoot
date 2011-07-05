@@ -107,7 +107,7 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
- TStopwatch timer;
+  TStopwatch timer;
   timer.Start();
   cout << "================CbmTrdClusterFinderFast===============" << endl;
   Int_t counterI = 0;
@@ -122,15 +122,21 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
     cout << "  minimum charge threshold optimization run" << endl <<"  rowClusterMerger: on" << endl;
   }
   else {
-    if (dynamic) {
-      cout << "  rowClusterMerger: on (as function of module distance (r_min = " << mRMax <<" mm) from beam pipe)"<< endl;
+    if (fMultiHit){
+      cout << "  multi hit detection: on" << endl;
     }
     else {
-      if (rowClusterMerger) {
-	cout << "  rowClusterMerger: on" << endl;
+      cout << "  multi hit detection: off" << endl;
+      if (dynamic) {
+	cout << "  rowClusterMerger: on (as function of module distance (r_min = " << mRMax <<" mm) from beam pipe)"<< endl;
       }
       else {
-	cout << "  rowClusterMerger: off" << endl;
+	if (rowClusterMerger) {
+	  cout << "  rowClusterMerger: on" << endl;
+	}
+	else {
+	  cout << "  rowClusterMerger: off" << endl;
+	}
       }
     }
   }
@@ -146,7 +152,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 			    1e-02, 2e-02, 3e-02, 4e-02, 5e-02, 6e-02, 7e-02, 8e-02, 9e-02,
 			    1e-01, 2e-01, 3e-01, 4e-01, 5e-01, 6e-01, 7e-01, 8e-01, 9e-01,
 			    1e-00  };
-  Int_t nChargeTH = 1;
+   Int_t nChargeTH = 1;
 
   TH1F* DigiChargeSpectrum = NULL;
   TProfile* OptimalTH = NULL;
@@ -181,7 +187,10 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
-      minimumChargeTH = mChargeTH[iChargeTH];
+      if (fMultiHit)
+	minimumChargeTH = 0.001;
+      else
+	minimumChargeTH = mChargeTH[iChargeTH];
       //minimumChargeTH = 0.0;
       /*
        * Digis are sorted according to the moduleId. A combiId is calculted based 
@@ -228,7 +237,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	Int_t Layer    = detInfo[2];
 
 	MyDigi *d = new MyDigi;
-      	//d = new MyDigi;
+	//d = new MyDigi;
 	    
 	fModuleInfo = fDigiPar->GetModule(moduleId);
 	d->digiId = iDigi;
@@ -297,7 +306,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	  }
 	}
 	fModClusterMap[it->first] = clusterModule(rowClusterMerger, it->second, ModuleNeighbourDigiMap[it->first]);
-    	//drawCluster(it->first, fModClusterMap[it->first]);
+	//drawCluster(it->first, fModClusterMap[it->first]);
       }
       addCluster(fModClusterMap);
       /*
@@ -322,10 +331,10 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	for (ClusterList::iterator clusterIt = it->second->begin(); 
 	     clusterIt != it->second->end(); ++clusterIt) {
 	  /*
-	  for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
-	       digisIt != (*clusterIt)->end(); ++digisIt) {
+	    for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
+	    digisIt != (*clusterIt)->end(); ++digisIt) {
 	    delete *digisIt;
-	  }
+	    }
 	  */
 	  delete *clusterIt;
 	}
@@ -334,11 +343,11 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       fModClusterMap.clear();
       
       for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin();
-           it != modules.end(); ++it) {
+	   it != modules.end(); ++it) {
 	/*
-	for (MyDigiList::iterator digisIt = it->second->begin(); 
-	     digisIt != it->second->end(); ++digisIt) {
-	    delete *digisIt;
+	  for (MyDigiList::iterator digisIt = it->second->begin(); 
+	  digisIt != it->second->end(); ++digisIt) {
+	  delete *digisIt;
 	  }
 	*/
 	delete it->second;
@@ -375,91 +384,91 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 }
 
   //----------------------------------------------------------------------
-bool digiSorter(MyDigi *a, MyDigi *b)
-{ return (a->combiId < b->combiId); }
+  bool digiSorter(MyDigi *a, MyDigi *b)
+  { return (a->combiId < b->combiId); }
 
   //----------------------------------------------------------------------
-ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyDigiList *digis, MyDigiList *neighbours)
-{
-  /*
-   *  3 new Lists are initialized: 
-   *  currentList for the activ row, 
-   *  openList for the previous row and 
-   *  closedList for finished rows.
-   *  Digis in the TCloneArray digis are sorted according to their combiId (rowId * (nCol+1) + colId).
-   */
-  std::list<RowCluster*> closedList;
-  std::list<RowCluster*> openList;
-  std::list<RowCluster*> currentList;
-  RowCluster *currentCluster = new RowCluster;
+  ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyDigiList *digis, MyDigiList *neighbours)
+  {
+    /*
+     *  3 new Lists are initialized: 
+     *  currentList for the activ row, 
+     *  openList for the previous row and 
+     *  closedList for finished rows.
+     *  Digis in the TCloneArray digis are sorted according to their combiId (rowId * (nCol+1) + colId).
+     */
+    std::list<RowCluster*> closedList;
+    std::list<RowCluster*> openList;
+    std::list<RowCluster*> currentList;
+    RowCluster *currentCluster = new RowCluster;
 
-  digis->sort(digiSorter);
-  neighbours->sort(digiSorter);
-  MyDigiList::iterator left  = neighbours->begin();
-  MyDigiList::iterator right = neighbours->end();
+    digis->sort(digiSorter);
+    neighbours->sort(digiSorter);
+    MyDigiList::iterator left  = neighbours->begin();
+    MyDigiList::iterator right = neighbours->end();
 
-  for (MyDigiList::iterator it = digis->begin(); it != digis->end(); ++it) {
+    for (MyDigiList::iterator it = digis->begin(); it != digis->end(); ++it) {
 
-    if (currentCluster->digis->empty() || 
-	currentCluster->digis->back()->combiId + 1 == (*it)->combiId) {
-      /*
-       * Digis within the same row are related to the 'currentCluster' if they are closed-by.
-       */
-
-      currentCluster->digis->push_back(*it);
-      
-    }
-    else {
-  
-      /*
-       * the currentCluster is stored to the currentList
-       * (and merged to the clusters of the previous row) 
-       * if a break between the activ digi and the currentCluster is found.
-       */
-      if (rowClusterMerger) {
-	mergeRowCluster(currentCluster, &openList);
-      }
-      currentList.push_back(currentCluster);
- 
-      if ((*it)->rowId > currentCluster->row) {
+      if (currentCluster->digis->empty() || 
+	  currentCluster->digis->back()->combiId + 1 == (*it)->combiId) {
 	/*
-	 * did we move into a new row?      
-	 * The openList is spliced to the end of the closedList if the next row is reached
+	 * Digis within the same row are related to the 'currentCluster' if they are closed-by.
 	 */
-	closedList.splice(closedList.end(), openList);
 
-	if ((*it)->rowId > currentCluster->row + 1) {
-	  /*
-	   *  did we skip at least one line?
-	   *  Then the currentList is directly spliced to the end of the closedList since the 
-	   *  cluster is definitely finished.
-	   */
-	  closedList.splice(closedList.end(), currentList);
-	}
-	else {
-	  /*
-	   * if we didn't skip a line, the currentList ist spliced to the end of the openList.
-	   */
-	  openList.splice(openList.begin(), currentList);
-	}
+	currentCluster->digis->push_back(*it);
+      
       }
-      /*
-       * A new currentCluster is initialized if the activ digi is not closed-by the currentCluster.
-       */
-      currentCluster = new RowCluster;
-      currentCluster->digis->push_back(*it);
-    }
-  }
-  /*
-   * handle last row
-   */
-  mergeRowCluster(currentCluster, &openList);
-  currentList.push_back(currentCluster);
-  closedList.splice(closedList.end(), openList);
-  closedList.splice(closedList.end(), currentList);
+      else {
+  
+	/*
+	 * the currentCluster is stored to the currentList
+	 * (and merged to the clusters of the previous row) 
+	 * if a break between the activ digi and the currentCluster is found.
+	 */
+	if (rowClusterMerger) {
+	  mergeRowCluster(currentCluster, &openList);
+	}
+	currentList.push_back(currentCluster);
+ 
+	if ((*it)->rowId > currentCluster->row) {
+	  /*
+	   * did we move into a new row?      
+	   * The openList is spliced to the end of the closedList if the next row is reached
+	   */
+	  closedList.splice(closedList.end(), openList);
 
-  return findCluster(&closedList);
-}
+	  if ((*it)->rowId > currentCluster->row + 1) {
+	    /*
+	     *  did we skip at least one line?
+	     *  Then the currentList is directly spliced to the end of the closedList since the 
+	     *  cluster is definitely finished.
+	     */
+	    closedList.splice(closedList.end(), currentList);
+	  }
+	  else {
+	    /*
+	     * if we didn't skip a line, the currentList ist spliced to the end of the openList.
+	     */
+	    openList.splice(openList.begin(), currentList);
+	  }
+	}
+	/*
+	 * A new currentCluster is initialized if the activ digi is not closed-by the currentCluster.
+	 */
+	currentCluster = new RowCluster;
+	currentCluster->digis->push_back(*it);
+      }
+    }
+    /*
+     * handle last row
+     */
+    mergeRowCluster(currentCluster, &openList);
+    currentList.push_back(currentCluster);
+    closedList.splice(closedList.end(), openList);
+    closedList.splice(closedList.end(), currentList);
+
+    return findCluster(&closedList);
+  }
 
   //----------------------------------------------------------------------
   void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
@@ -584,41 +593,101 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyD
   }
 
   //--------------------------------------------------------------------
-  void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
-  {
-    ClusterSum = 0;
-    Float_t Charge;
-    Float_t qMax;
-    for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 
-      {
-	for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
-	  {
-	    ClusterSum++;
-	    TArrayI digiIndices( (*iCluster)->size() );
-	    Int_t i = 0;
-	    Charge = 0;
-	    qMax = 0;
-	    for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) 
-	      {
-		digiIndices.SetAt((*iDigi)->digiId,i);
+void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
+{
+  ClusterSum = 0;
+  Float_t Charge;
+  Float_t qMax;
+  Float_t deltaCharge;
+  Float_t preDelta;
+  for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 
+    {
+      for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
+	{
+	  ClusterSum++;
+	  TArrayI digiIndices( 3/*(*iCluster)->size()*/ );
+	  Int_t idigi = 0;
+	  Int_t i = 1;
+	  Charge = 0;
+	  qMax = 0;
+	  deltaCharge = 0;
+	  preDelta = 0;
+	  MyDigiList::iterator lastDigi = (*iCluster)->begin();
+	  MyDigiList::iterator nextDigi = (*iCluster)->begin();
+	  for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) 
+	    {
+	      if (fMultiHit){
+		if (idigi < (*iCluster)->size()-1) {
+		  nextDigi++;
+		}
+		if (nextDigi != (*iCluster)->end()) {
+		  //cout << (*iDigi)->charge << " " << (*nextDigi)->charge << "    ";
+		  deltaCharge = (*nextDigi)->charge - (*iDigi)->charge;
+		  if (preDelta >= 0 && deltaCharge <= 0) {
+		    //cout << "pre" << preDelta << " delta" << deltaCharge << endl;
+		    //cout << (*lastDigi)->charge << " " << (*iDigi)->charge << " " << (*nextDigi)->charge << endl;
+		    i = 1;
+		    if ((*lastDigi) != (*iDigi))
+		      i++;
+		    if ((*nextDigi) != (*iDigi))
+		      i++;
+
+		    digiIndices.Reset();
+		    digiIndices.Set(i);
+
+		    i = 0;
+		    if ((*lastDigi) != (*iDigi)){
+		      digiIndices.SetAt((*lastDigi)->digiId,i);
+		      Charge += (*lastDigi)->charge;
+		      i++;
+		    }
+
+		    digiIndices.SetAt((*iDigi)->digiId,i);
+		    Charge += (*iDigi)->charge;
+		    i++;
+ 
+		    if ((*nextDigi) != (*iDigi)){
+		      digiIndices.SetAt((*nextDigi)->digiId,i);
+		      Charge += (*nextDigi)->charge;
+		    }
+
+		    qMax = (*iDigi)->charge;
+
+		    TClonesArray& clref = *fClusters;
+		    Int_t size = clref.GetEntriesFast();
+
+		    new ((*fClusters)[size]) CbmTrdCluster(digiIndices, Charge, qMax);
+		    digiIndices.Reset();
+		    //digiIndices.Set(3);
+		    Charge = 0;
+		   
+		  }
+		  preDelta = deltaCharge;	     
+		  lastDigi = iDigi;
+		}
+		//cout << endl;
+	      }
+	      else {
+		digiIndices.SetAt((*iDigi)->digiId,idigi);
 		Charge += (*iDigi)->charge;
-		i++;
+	
 		if (qMax < (*iDigi)->charge)
 		  {
 		    qMax = (*iDigi)->charge;
 		  }
 	      }
-
+	      idigi++;
+	    }	 	  
+	  if (!fMultiHit){
 	    TClonesArray& clref = *fClusters;
 	    Int_t size = clref.GetEntriesFast();
 
 	    new ((*fClusters)[size]) CbmTrdCluster(digiIndices, Charge, qMax);
-	  }
-       
-      }
- 
-    cout << " Found " << ClusterSum << " Cluster" << endl;
-  }
+	  }	  
+	}       
+    } 
+  cout << " Found " << ClusterSum << " Cluster" << endl;
+}
 
   // ---- Register ------------------------------------------------------
   void CbmTrdClusterFinderFast::Register()
@@ -629,15 +698,15 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyD
 
 
   // ---- Finish --------------------------------------------------------
-void CbmTrdClusterFinderFast::Finish()
-{
-}
+  void CbmTrdClusterFinderFast::Finish()
+  {
+  }
 
-// -----   Public method EndOfEvent   --------------------------------------
-void CbmTrdClusterFinderFast::FinishEvent() {
-  //  cout<<"In CbmTrdClusterFinderFast::FinishEvent()"<<endl;  
-  if (fClusters) fClusters->Clear("C");
-}
-// -------------------------------------------------------------------------
+  // -----   Public method EndOfEvent   --------------------------------------
+  void CbmTrdClusterFinderFast::FinishEvent() {
+    //  cout<<"In CbmTrdClusterFinderFast::FinishEvent()"<<endl;  
+    if (fClusters) fClusters->Clear("C");
+  }
+  // -------------------------------------------------------------------------
 
-ClassImp(CbmTrdClusterFinderFast)
+  ClassImp(CbmTrdClusterFinderFast)

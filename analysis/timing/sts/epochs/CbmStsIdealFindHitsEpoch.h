@@ -44,6 +44,7 @@ class CbmStsIdealFindHitsEpoch : public FairTask
   /** Execution **/
   virtual void Exec(Option_t* opt);
 
+  void SetSliceSeparationTime(Int_t time) {fSliceSeparationTime=time;} 
 
 
  private:
@@ -86,6 +87,7 @@ class CbmStsIdealFindHitsEpoch : public FairTask
   CbmStsIdealFindHitsEpoch(const CbmStsIdealFindHitsEpoch&);
   CbmStsIdealFindHitsEpoch operator=(const CbmStsIdealFindHitsEpoch&);
 
+  
   ClassDef(CbmStsIdealFindHitsEpoch,1);
   
   Int_t    fNStations;

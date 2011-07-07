@@ -28,6 +28,9 @@
 //#pragma link C++ class CbmAnaEpochTest+;
 #pragma link C++ class CbmAnaTimingMuchDigitizer+;
 #pragma link C++ class CbmAnaTimingMuchHitFinder+;
+#pragma link C++ class CbmAnaTimingStsDigitizer+;
+#pragma link C++ class CbmAnaTimingStsHitFinder+;
+
 
 #pragma link C++ class CbmAnaDielectronTask+;
 #endif

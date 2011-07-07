@@ -63,7 +63,8 @@ much/CbmAnaAngularAcceptance.cxx
 #timing/CbmAnaEpochTest.cxx
 timing/CbmAnaTimingMuchDigitizer.cxx
 timing/CbmAnaTimingMuchHitFinder.cxx
-
+timing/CbmAnaTimingStsDigitizer.cxx
+timing/CbmAnaTimingStsHitFinder.cxx
 dielectron/CbmAnaDielectronTask.cxx
 )
 

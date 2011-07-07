@@ -31,6 +31,8 @@ private:
   TClonesArray* fDigiMatches;   //!
   TClonesArray* fHits;          //!
   CbmMCEpoch*   fMcEpoch;       //!
+  TH1D* fHitTimeAll;
+  TH1D* fHitTimeCorrected;
 
   ClassDef(CbmAnaTimingStsHitFinder,1);
 };

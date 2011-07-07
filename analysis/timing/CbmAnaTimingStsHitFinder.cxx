@@ -15,15 +15,17 @@
 #include "TClonesArray.h"
 #include "TH1D.h"
 #include "TCanvas.h"
-
+#include "CbmStsHit.h"
+#include "TVector3.h"
 #include <map>
 #include <vector>
+
 using std::vector;
 using std::multimap;
 
 // -----   Default constructor   -------------------------------------------
 CbmAnaTimingStsHitFinder::CbmAnaTimingStsHitFinder():
-  fEvent(0),fDigiFile("much_digi.root"),fHistoName("histo.root")
+    FairTask("Task"),fEvent(0),fHistoName("histo.root")
 {}
 // -------------------------------------------------------------------------
 
@@ -57,6 +59,10 @@ InitStatus CbmAnaTimingStsHitFinder::Init(){
   fDigiMatches = (TClonesArray*) fManager->GetObject("StsDigiMatch");
   fHits        = (TClonesArray*) fManager->GetObject("StsHit");
   fMcEpoch     = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
+  fHitTimeAll       = new TH1D("fHitTimeAll","fHitTimeAll",1000,0,1000);
+  fHitTimeCorrected = new TH1D("fHitTimeAll","fHitTimeAll",1000,0,1000);
+  fHitTimeAll->SetLineColor(kBlue);
+  fHitTimeCorrected->SetLineColor(kBlue);
 }
 // -------------------------------------------------------------------------
 
@@ -65,13 +71,30 @@ InitStatus CbmAnaTimingStsHitFinder::Init(){
 void CbmAnaTimingStsHitFinder::Exec(Option_t* opt){
   Int_t nHits = fHits->GetEntriesFast();
   printf("nHits=%i\n",nHits);
+  for (Int_t i=0;i<nHits;i++){
+    CbmStsHit* hit = (CbmStsHit*) fHits->At(i);
+    Double_t t = hit->GetTimeStamp();
+    TVector3 r;
+    hit->Position(r);
+    fHitTimeAll->Fill(t);
+    fHitTimeCorrected->Fill(t-r.Mag()/29.97);
+  }
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaTimingStsHitFinder::Finish(){
+  TCanvas* c1 = new TCanvas("c1","c1",1000,800);
+  c1->Divide(1,2);
+  c1->cd(1);
+  fHitTimeAll->Draw();
+  c1->cd(2);
+  fHitTimeCorrected->Draw();
+  
   TFile* f = new TFile(fHistoName.Data(),"RECREATE");
+  fHitTimeAll->Write();
+  fHitTimeCorrected->Write();
   f->Close();
 }
 // -------------------------------------------------------------------------

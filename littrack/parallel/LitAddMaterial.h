@@ -1,10 +1,20 @@
-/** LitAddMaterial.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitAddMaterial.h
  *
- * Functions for calculation of the material effects.
- **/
+ * \brief Functions for calculation of the material effects.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ * The influence of the material on the track momentum is taken
+ * into account by calculating the expected average energy loss due
+ * to ionization (Bethe-Bloch formula) and bremsstrahlung
+ * (Bethe-Heitler formula). The influence on the
+ * covariance matrix due to multiple scattering is included by adding
+ * process noise in the track propagation. Here, a gaussian approximation
+ * using the Highland formula is used to estimate the average scattering
+ * angle.
+ */
 
 #ifndef LITADDMATERIAL_H_
 #define LITADDMATERIAL_H_
@@ -16,10 +26,12 @@
 namespace lit {
 namespace parallel {
 
-/* Function calculates material effects and updates
- * track parameters and covariance matrix.
- * @param par Reference to INPUT/OUTPUT track parameters.
- * @param mat Reference to material */
+/**
+ * \brief Function calculates material effects and updates track parameters and covariance matrix.
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] mat Reference to material
+ */
 template<class T>
 inline void LitAddMaterial(
    LitTrackParam<T>& par,
@@ -154,10 +166,11 @@ inline void LitAddMaterial(
 
 
 
-/* Function calculates material effects for electrons
- * and updates track parameters and covariance matrix.
- * @param par Reference to INPUT/OUTPUT track parameters.
- * @param mat Reference to material
+/**
+ * \brief Function calculates material effects for electrons and updates track parameters and covariance matrix.
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] mat Reference to material.
  */
 template<class T>
 inline void LitAddMaterialElectron(

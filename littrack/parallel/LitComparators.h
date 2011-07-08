@@ -1,10 +1,13 @@
-/** LitComparators.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitComparators.h
  *
- * Comparators used in the STL algorithms.
- **/
+ * \brief Comparators used in the STL algorithms.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ *
+ */
 #ifndef LITCOMPARATORS_H_
 #define LITCOMPARATORS_H_
 
@@ -14,6 +17,17 @@
 namespace lit {
 namespace parallel {
 
+/**
+ * \class ComparePixelHitXLess
+ *
+ * \brief Comparator class used in STL algorithms for \c LitScalPixelHit class.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ * This comparator class can be used in STL sort and find algorithms
+ * to sort in \a ascending order \c LitScalPixelHit objects by its X coordinate.
+ */
 class ComparePixelHitXLess :
    public std::binary_function<
    const LitScalPixelHit*,
@@ -28,6 +42,18 @@ public:
 
 
 
+/**
+* \class CompareTrackChi2OverNdfLess
+*
+* \brief Comparator class used in STL algorithms for \c LitScalTrack class.
+*
+* \author Andrey Lebedev <andrey.lebedev@gsi.de>
+* \date 2009
+*
+* This comparator class can be used in STL sort and find algorithms
+* to sort in \a ascending order \c LitScalTracks objects by its
+* (chi-square / NDF) value.
+*/
 class CompareTrackChi2OverNdfLess :
    public std::binary_function<
    const LitScalTrack*,
@@ -42,6 +68,18 @@ public:
 
 
 
+/**
+* \class CompareTrackNofHitsMore
+*
+* \brief Comparator class used in STL algorithms for \c LitScalTrack class.
+*
+* \author Andrey Lebedev <andrey.lebedev@gsi.de>
+* \date 2009
+*
+* This comparator class can be used in STL sort and find algorithms
+* to sort in \a descending order \c LitScalTracks objects by a
+* number of hits.
+*/
 class CompareTrackNofHitsMore :
    public std::binary_function<
    const LitScalTrack*,
@@ -56,6 +94,18 @@ public:
 
 
 
+/**
+* \class CompareTrackPrevTrackIdLess
+*
+* \brief Comparator class used in STL algorithms for \c LitScalTrack class.
+*
+* \author Andrey Lebedev <andrey.lebedev@gsi.de>
+* \date 2009
+*
+* This comparator class can be used in STL sort and find algorithms
+* to sort in \a ascending order \c LitScalTracks objects by its
+* previous track index value.
+*/
 class CompareTrackPrevTrackIdLess :
    public std::binary_function<
    const LitScalTrack*,

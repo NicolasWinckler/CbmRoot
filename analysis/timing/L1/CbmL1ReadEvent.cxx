@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <vector>
+#include "TVector3.h"
 
 using std::cout;
 using std::endl;
@@ -384,6 +385,11 @@ void CbmL1::ReadEvent()
     s.x        = th.x;
     s.y        = th.y;
 
+    TVector3 pos;
+    CbmStsHit* stsHit = (CbmStsHit*) listStsHitsAll->At(s.ExtIndex);
+    stsHit->Position(pos);
+    double timeStamp = stsHit->GetTimeStamp()-pos.Mag()/29.97;
+    
     if( th.indStripF <0 || th.indStripF >= NStrips ) continue;
     if( th.indStripB <0 || th.indStripB >= NStripsB ) continue;
 
@@ -396,6 +402,7 @@ void CbmL1::ReadEvent()
 //     }
 
     L1StsHit h;
+    h.t = timeStamp;
     h.f = tsF.effIndex;
     h.b = tsB.effIndex;
 

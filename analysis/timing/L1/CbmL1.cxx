@@ -489,7 +489,6 @@ void CbmL1::Exec(Option_t * option)
     };
   }
   vRTracks.clear();
-  vHitStore.clear();
   multimap<Int_t,Int_t> mapHits;
   TVector3 pos;
   for(Int_t ihit=0;ihit<listStsHitsAll->GetEntriesFast();ihit++){
@@ -503,10 +502,16 @@ void CbmL1::Exec(Option_t * option)
   Int_t nHits=0;
   vector<Int_t> sliceUpperEdge;
   Int_t last_time=-1000;
+  Int_t nHits_slice = 0;
   for (multimap<Int_t,Int_t>::iterator it=mapHits.begin();it!=mapHits.end();it++){
-    if (nHits!=0 && it->first>=last_time+fSliceSeperationTime) sliceUpperEdge.push_back(nHits);
+    if (nHits!=0 && it->first>=last_time+fSliceSeperationTime) { 
+      if (nHits_slice>7) sliceUpperEdge.push_back(nHits);
+      else if (sliceUpperEdge.size()>0) sliceUpperEdge[sliceUpperEdge.size()-1]=nHits;
+      nHits_slice=0;
+    }
     last_time = it->first;
     nHits++;
+    nHits_slice++;
   }
   sliceUpperEdge.push_back(nHits-1);
   printf("nHits=%i",nHits);

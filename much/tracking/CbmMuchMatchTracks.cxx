@@ -6,6 +6,7 @@
 #include "CbmTrackMatch.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
+#include "CbmMCEpoch.h"
 
 #include "FairMCPoint.h"
 #include "FairRootManager.h"
@@ -29,7 +30,9 @@ CbmMuchMatchTracks::CbmMuchMatchTracks()
 	fMatches(NULL),
 	fPixelDigiMatches(NULL),
 	fStrawDigiMatches(NULL),
-	fClusters(NULL)
+	fClusters(NULL),
+	fIsEpoch(0),
+	fMcEpoch(NULL)
 {
 }
 
@@ -49,9 +52,12 @@ InitStatus CbmMuchMatchTracks::Init()
 	fTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
 	if (fTracks == NULL) Fatal("CbmMuchMatchTracks::Init", "No MuchTrack array!");
 
-	fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
-	if (fPoints == NULL) Fatal("CbmMuchMatchTracks::Init", "No MuchPoint array!");
-
+	if (!fIsEpoch){
+	  fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+	  if (fPoints == NULL) Fatal("CbmMuchMatchTracks::Init", "No MuchPoint array!");
+	} else fMcEpoch = (CbmMCEpoch*) ioman->GetObject("MCEpoch.");
+	
+	
 	fPixelDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
 	fStrawDigiMatches = (TClonesArray*) ioman->GetObject("MuchStrawDigiMatch");
 	if (fPixelDigiMatches == NULL && fStrawDigiMatches == NULL) Fatal("CbmMuchMatchTracks::Init", "No MuchDigiMatch && MuchStrawDigiMatch array!");
@@ -68,7 +74,9 @@ InitStatus CbmMuchMatchTracks::Init()
 void CbmMuchMatchTracks::Exec(
 		Option_t* opt)
 {
-	fMatches->Clear();
+        if (fIsEpoch) fPoints = fMcEpoch->GetPoints(kMUCH);
+
+        fMatches->Clear();
 
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {	// Loop over tracks

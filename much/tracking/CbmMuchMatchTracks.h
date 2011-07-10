@@ -13,7 +13,7 @@
 #define CBMMUCHMATCHTRACKS_H_ 1
 
 #include "FairTask.h"
-
+class CbmMCEpoch;
 #include <map>
 
 class TClonesArray;
@@ -28,7 +28,7 @@ public:
 	virtual void Exec(
 		  Option_t* opt);
 	virtual void Finish();
-
+        void SetEpoch(Bool_t isEpoch) { fIsEpoch = isEpoch; }
 private:
 	void ExecPixel(
 			std::map<Int_t, Int_t> &matchMap,
@@ -46,7 +46,8 @@ private:
 	TClonesArray* fPixelDigiMatches;
 	TClonesArray* fStrawDigiMatches;
 	TClonesArray* fClusters;
-
+        CbmMCEpoch*   fMcEpoch;
+	
 	Int_t fNofHits;
 	Int_t fNofTrueHits;
 	Int_t fNofWrongHits;
@@ -54,6 +55,8 @@ private:
 
 	Int_t fNEvents;
 
+	Bool_t fIsEpoch; // = 1 in the epoch approach
+	
 	ClassDef(CbmMuchMatchTracks,1);
 };
 

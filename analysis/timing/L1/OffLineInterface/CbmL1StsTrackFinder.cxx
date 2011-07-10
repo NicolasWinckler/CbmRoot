@@ -88,11 +88,10 @@ Int_t CbmL1StsTrackFinder::DoFind() {
       t->SetChi2(T.chi2);
       t->SetNDF(T.NDF);
       t->SetPidHypo( T.T[4]>=0 ?211 :-211 );
-      
       for (vector<int>::iterator ih = it->StsHits.begin(); ih != it->StsHits.end(); ++ih){
-        Int_t id = *ih>0 ? *ih : -(*ih);
-        if (*ih>0) t->AddStsHit(id,(FairHit*) fStsHits->At(id));
-        else       t->AddMvdHit(id,(FairHit*) fMvdHits->At(id));
+        Int_t id = *ih<0 ? -(*ih)-1 : *ih;
+        if (*ih<0) t->AddMvdHit(id,(FairHit*) fMvdHits->At(id));
+        else       t->AddStsHit(id,(FairHit*) fStsHits->At(id));
       }
     }
 

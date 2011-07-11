@@ -276,7 +276,7 @@ void CbmStsIdealDigitizeEpoch::Exec(Option_t* opt) {
       } else {
         new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,1, channelB, 0, time);
         new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
-        fChannelMap[a] = fNDigis;
+        fChannelMap[b] = fNDigis;
         fNDigis++;
       }
     }

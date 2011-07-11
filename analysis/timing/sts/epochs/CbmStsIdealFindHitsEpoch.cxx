@@ -472,19 +472,19 @@ Int_t CbmStsIdealFindHitsEpoch::FindHits(CbmStsStation* station,
     
     vector<Int_t> sliceF;
     vector<Int_t> sliceB;
-    multimap<Int_t,Int_t> mapAll;
+    multimap<Double_t,Int_t> mapAll;
     for (set<Int_t>::iterator it1=fSet.begin(); it1!=fSet.end(); it1++) {
       CbmStsDigi* digi = (CbmStsDigi*) fDigis->At(*it1);
-      Int_t t = digi->GetTime();
-      mapAll.insert(pair<Int_t,Int_t>(t,2*(*it1)));
+      Double_t t = digi->GetTimeStamp();
+      mapAll.insert(pair<Double_t,Int_t>(t,2*(*it1)));
     }
     for (set<Int_t>::iterator it2=bSet.begin(); it2!=bSet.end(); it2++) {
       CbmStsDigi* digi = (CbmStsDigi*) fDigis->At(*it2);
-      Int_t t = digi->GetTime();
-      mapAll.insert(pair<Int_t,Int_t>(t,2*(*it2)+1));
+      Double_t t = digi->GetTimeStamp();
+      mapAll.insert(pair<Double_t,Int_t>(t,2*(*it2)+1));
     }
     Double_t last_time = -1.e+10;
-    multimap<Int_t,Int_t>::iterator it=mapAll.begin();
+    multimap<Double_t,Int_t>::iterator it=mapAll.begin();
     while (it!=mapAll.end() || sliceF.size()>0 || sliceB.size()>0){
       if (it==mapAll.end() ? 1 : last_time>0 ? it->first-last_time > fSliceSeparationTime : 0){
         if (!sliceF.size() && !sliceB.size()) continue;
@@ -528,11 +528,13 @@ Int_t CbmStsIdealFindHitsEpoch::FindHits(CbmStsStation* station,
             if ( statLayer == -1 ) 
               cout << "unknown layer for hit at z = " << zHit << endl;
             
-            Double_t time1  = digiF->GetTime();
-            Double_t time2  = digiB->GetTime();
+            Double_t time1   = digiF->GetTimeStamp();
+            Double_t time2   = digiB->GetTimeStamp();
+            Double_t dtime1  = digiF->GetTimeStampError();
+            Double_t dtime2  = digiB->GetTimeStampError();
+
             Double_t time   = (time1+time2)/2.;
-            Double_t digiDt = 4;
-            Double_t dtime = TMath::Abs(time1-time2)+digiDt;
+            Double_t dtime = TMath::Abs(time1-time2)+(dtime1+dtime2)/2.;
             new ((*fHits)[nHits++]) CbmStsHit(sensorDetId, pos, dpos, wXY, 
                                               iDigiF, iDigiB, iChanF, iChanB, statLayer);
             ((CbmStsHit*)fHits->At(nHits-1))->SetTimeStamp(time);

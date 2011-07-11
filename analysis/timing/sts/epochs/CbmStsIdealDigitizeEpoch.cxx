@@ -220,6 +220,7 @@ void CbmStsIdealDigitizeEpoch::Exec(Option_t* opt) {
     if ( fChannelMap.find(a) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
       new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,0, channelF, 0, time);
+      ((CbmStsDigi*) fDigis->At(fNDigis))->SetTimeStamp(time);
       new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
       fChannelMap[a] = fNDigis;
       fNDigis++;
@@ -236,6 +237,7 @@ void CbmStsIdealDigitizeEpoch::Exec(Option_t* opt) {
         }
       } else {
         new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,0, channelF, 0, time);
+        ((CbmStsDigi*) fDigis->At(fNDigis))->SetTimeStamp(time);
         new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
         fChannelMap[a] = fNDigis;
         fNDigis++;
@@ -259,6 +261,7 @@ void CbmStsIdealDigitizeEpoch::Exec(Option_t* opt) {
     if ( fChannelMap.find(b) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
       new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,1, channelB, 0, time);
+      ((CbmStsDigi*) fDigis->At(fNDigis))->SetTimeStamp(time);
       new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
       fChannelMap[b] = fNDigis;
       fNDigis++;
@@ -275,6 +278,7 @@ void CbmStsIdealDigitizeEpoch::Exec(Option_t* opt) {
         }
       } else {
         new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,1, channelB, 0, time);
+        ((CbmStsDigi*) fDigis->At(fNDigis))->SetTimeStamp(time);
         new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
         fChannelMap[b] = fNDigis;
         fNDigis++;

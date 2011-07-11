@@ -69,14 +69,17 @@ InitStatus CbmAnaTimingStsDigitizer::Init(){
   fStsDigiMatches = (TClonesArray*) fManager->GetObject("StsDigiMatch");
   if (fEpoch)
     fMcEpoch         = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
-  else 
+  else { 
     fStsPoints   = (TClonesArray*) fManager->GetObject("StsPoint");
-
-  
-  fDigiTimeAll = new TH1D("fDigiTimeAll","DigiTimeAll",1000,0,1000);
+    fMcTracks    = (TClonesArray*) fManager->GetObject("MCTrack");
+  }
+  fPointsTimeAll    = new TH1D("fPointsTimeAll","; time [ns]; Entries",1000,0,1000);
+  fPointsTimeSector = new TH1D("fPointsTimeSector","; time [ns]; Entries",1000,0,1000);
+  fDigiTimeAll      = new TH1D("fDigiTimeAll","; time [ns]; Entries",1000,0,1000);
+  fDigiTimeSector   = new TH1D("fDigiTimeSector","; time [ns]; Entries",1000,0,1000);
+  fPointsTimeAll->SetLineColor(kBlue);
+  fPointsTimeSector->SetLineColor(kBlue);
   fDigiTimeAll->SetLineColor(kBlue);
-  
-  fDigiTimeSector = new TH1D("fDigiTimeSector","DigiTimeSector",1000,0,1000);
   fDigiTimeSector->SetLineColor(kBlue);
   
   fDigiVsSector = new TH1D("fDigiVsSector","DigiVsSector",100,0,100);
@@ -88,7 +91,7 @@ InitStatus CbmAnaTimingStsDigitizer::Init(){
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingStsDigitizer::Exec(Option_t* opt){
-  if (fEpoch) fStsPoints = fMcEpoch->GetPoints(kMUCH);
+  if (fEpoch) fStsPoints = fMcEpoch->GetPoints(kSTS);
   
   Int_t nStsPoints = fStsPoints ? fStsPoints->GetEntriesFast() : 0;
   Int_t nStsDigis  = fStsDigis  ? fStsDigis->GetEntriesFast() : 0;
@@ -105,25 +108,35 @@ void CbmAnaTimingStsDigitizer::Exec(Option_t* opt){
     if (fVerbose>2) printf("  Sts point: %5i time=%8.1f",i,t);
     if (fVerbose>2) printf(" Detector Id: %8i",point->GetDetectorID());
     if (fVerbose>2) printf("\n");
+    fPointsTimeAll->Fill(t);
+    if (point->GetDetectorID() != 121) continue;
+    fPointsTimeSector->Fill(t);
+    
+    if (fEpoch) continue;
+    if (t<2) continue;
+    CbmMCTrack* track = (CbmMCTrack*) fMcTracks->At(point->GetTrackID());
+    printf("iTrack=%4i t=%4.0f pdg=%i p=%f\n",point->GetTrackID(),t,track->GetPdgCode(),track->GetP());
   }
   
   for (Int_t i=0;i<nStsDigis;i++) {
     CbmStsDigi* digi = (CbmStsDigi*) fStsDigis->At(i);
+    CbmStsDigiMatch* digiMatch = (CbmStsDigiMatch*) fStsDigiMatches->At(i);
     Int_t station = digi->GetStationNr();
     Int_t sector  = digi->GetSectorNr();
     Int_t side    = digi->GetSide();
     Int_t channel = digi->GetChannelNr();
-    Int_t time    = digi->GetTime();
+    Double_t t       = digi->GetTime();
     Int_t detId   = digi->GetDetectorId();
     
-    if (fVerbose>2) printf("  Digi: %5i time=%8i detId=%8i",i,time,detId);
+    if (fVerbose>2) printf("  Digi: %5i time=%8i detId=%8i",i,t,detId);
     if (fVerbose>2) printf(" station=%i", station);
     if (fVerbose>2) printf(" sector=%i", sector);
     if (fVerbose>2) printf(" side=%i", side);
     if (fVerbose>2) printf("\n");
-    fDigiTimeAll->Fill(time);
+    fDigiTimeAll->Fill(t);
     if (station==fStationId && side==fSideId) fDigiVsSector->Fill(sector);
-    if (station==fStationId && side==fSideId && sector==fSectorId)  fDigiTimeSector->Fill(time);
+    FairMCPoint* point= (FairMCPoint*) fStsPoints->At(digiMatch->GetRefIndex(0));
+    if (point->GetDetectorID()==121) fDigiTimeSector->Fill(t);
   }
 }
 // -------------------------------------------------------------------------
@@ -131,14 +144,25 @@ void CbmAnaTimingStsDigitizer::Exec(Option_t* opt){
 
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaTimingStsDigitizer::Finish(){
-  TCanvas* c1 = new TCanvas("c1","c1",1000,800);
+  TCanvas* c1 = new TCanvas("c1","Points",1000,800);
   c1->Divide(1,2);
   c1->cd(1);
-  fDigiTimeAll->Draw();
+//  fDigiVsSector->Draw();
+  fPointsTimeAll->Draw();
   c1->cd(2);
+  fPointsTimeSector->Draw();
+
+  
+  TCanvas* c2 = new TCanvas("c2","Digis",1000,800);
+  c2->Divide(1,2);
+  c2->cd(1);
+  fDigiTimeAll->Draw();
+  c2->cd(2);
   fDigiTimeSector->Draw();
 
   TFile* f = new TFile(fHistoName.Data(),"RECREATE");
+  fPointsTimeAll->Write();
+  fPointsTimeSector->Write();
   fDigiTimeAll->Write();
   fDigiVsSector->Write();
   fDigiTimeSector->Write();

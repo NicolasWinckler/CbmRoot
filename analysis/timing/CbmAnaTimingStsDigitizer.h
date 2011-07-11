@@ -37,6 +37,7 @@ private:
   CbmStsDigiScheme* fDigiScheme;  /** Digitisation scheme **/
   Int_t         fEvent;             //!
   TString       fHistoName;
+  TClonesArray* fMcTracks;         //!
   TClonesArray* fStsPoints;        //!
   TClonesArray* fStsDigis;         //!
   TClonesArray* fStsDigiMatches;   //!
@@ -46,6 +47,8 @@ private:
   Int_t fSideId;
   Int_t fChannelId;
   Bool_t fEpoch;
+  TH1D* fPointsTimeAll;
+  TH1D* fPointsTimeSector;
   TH1D* fDigiTimeAll;
   TH1D* fDigiTimeSector;
   TH1D* fDigiVsSector;

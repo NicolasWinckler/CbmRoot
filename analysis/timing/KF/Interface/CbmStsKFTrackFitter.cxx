@@ -115,16 +115,23 @@ Int_t CbmStsKFTrackFitter::DoFit( CbmStsTrack* track, Int_t pidHypo )
   // SetTime
   Double_t m = 0.140;
   Double_t p = 1./track->GetParamFirst()->GetQp();
-  Double_t v = p/sqrt(p*p+m*m);
+  Double_t v = (p > 0 ? p:-p)/sqrt(p*p+m*m);
   double timeStamp = 0;
-  for (Int_t i=0;i<track->GetNStsHits();i++){
-    Int_t id = track->GetStsHitIndex(i);
-    FairHit* hit = (FairHit*) fStsHitsArray->At(id);
-    TVector3 pos;
-    hit->Position(pos);
-    timeStamp+= hit->GetTimeStamp()-pos.Mag()/v/29.97;
-  }
-  track->SetTime(timeStamp/track->GetNStsHits());
+//  for (Int_t i=0;i<track->GetNStsHits();i++){
+//    Int_t id = track->GetStsHitIndex(i);
+//    FairHit* hit = (FairHit*) fStsHitsArray->At(id);
+//    TVector3 pos;
+//    hit->Position(pos);
+////    timeStamp+= hit->GetTimeStamp()-pos.Mag()/v/29.97;
+//    timeStamp+= hit->GetTimeStamp();
+//  }
+//  track->SetTime(timeStamp/track->GetNStsHits());
+  if (track->GetNStsHits()<=0) return !ok;
+  FairHit* hit = (FairHit*) fStsHitsArray->At(track->GetStsHitIndex(0));
+  TVector3 pos;
+  hit->Position(pos);
+  timeStamp = hit->GetTimeStamp()-pos.Mag()/v/29.97;
+  track->SetTime(timeStamp);
 //  printf("time=%f\n",track->GetTime());
 
   return !ok;

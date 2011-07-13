@@ -59,8 +59,8 @@ InitStatus CbmAnaTimingStsHitFinder::Init(){
   fDigiMatches = (TClonesArray*) fManager->GetObject("StsDigiMatch");
   fHits        = (TClonesArray*) fManager->GetObject("StsHit");
   fMcEpoch     = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
-  fHitTimeAll       = new TH1D("fHitTimeAll","fHitTimeAll",1000,0,1000);
-  fHitTimeCorrected = new TH1D("fHitTimeAll","fHitTimeAll",1000,0,1000);
+  fHitTimeAll       = new TH1D("fHitTimeAll","time [ns]; Entries",600,0,600);
+  fHitTimeCorrected = new TH1D("fHitTimeCorrected",";time [ns]; Entries",600,0,600);
   fHitTimeAll->SetLineColor(kBlue);
   fHitTimeCorrected->SetLineColor(kBlue);
 }

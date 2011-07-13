@@ -33,7 +33,8 @@ private:
   CbmMCEpoch*   fMcEpoch;       //!
   TClonesArray* fStsTracks;     //!
   TH1D* fTrackTime;
-
+  TH1D* fTrackTimeFromHit;
+  TH1D* fTrackTimeFromLastHit;
   ClassDef(CbmAnaTimingStsTracking,1);
 };
 

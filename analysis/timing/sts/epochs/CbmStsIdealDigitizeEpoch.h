@@ -43,12 +43,14 @@ class CbmStsIdealDigitizeEpoch : public FairTask
   // epoch
   void SetEpoch(Bool_t epoch) {fEpoch=epoch;}
   void SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; }
-  
+  void SetTimeSmearing(Double_t dtime)  {fDtime = dtime; }
  private:
   // epochs
   Bool_t            fEpoch; 
   CbmMCEpoch*       fMcEpoch;
-
+  Double_t          fDtime;
+  Double_t          fDeadTime;
+  
   CbmGeoStsPar*     fGeoPar;       /** Geometry parameter container **/
   CbmStsDigiPar*    fDigiPar;      /** Digitisation parameter container **/
   CbmStsDigiScheme* fDigiScheme;   /** Digitisation scheme **/
@@ -62,7 +64,6 @@ class CbmStsIdealDigitizeEpoch : public FairTask
   Int_t             fNDigis;
   TStopwatch        fTimer;
 
-  Double_t          fDeadTime;
   /** Map of active channels (pair detectorId, channel number) 
    ** to index of StsDigi **/
   std::map<std::pair<Int_t, Int_t>, Int_t> fChannelMap;     //!

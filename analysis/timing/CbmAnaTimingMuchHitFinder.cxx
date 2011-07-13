@@ -24,6 +24,8 @@
 #include "TArc.h"
 #include "CbmMuchCluster.h"
 #include "TLatex.h"
+#include "CbmMuchPixelHit.h"
+#include "TCanvas.h"
 
 #include <map>
 #include <vector>
@@ -76,6 +78,7 @@ InitStatus CbmAnaTimingMuchHitFinder::Init(){
   fMuchDigis       = (TClonesArray*) fManager->GetObject("MuchDigi");
   fMuchDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fMuchClusters    = (TClonesArray*) fManager->GetObject("MuchCluster");
+  fMuchHits        = (TClonesArray*) fManager->GetObject("MuchPixelHit");
   fMcEpoch         = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
   
   CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
@@ -86,12 +89,67 @@ InitStatus CbmAnaTimingMuchHitFinder::Init(){
     fModules[i] = new CbmMuchModuleGem(*module);
   }
   
+  fHitTimeAll       = new TH1D("fHitTimeAll",";time [ns]; Entries",600,0,600);
+  fHitTimeCorrected = new TH1D("fHitTimeCorrected",";time [ns]; Entries",600,0,600);
+  fHitTimeAll->SetLineColor(kBlue);
+  fHitTimeCorrected->SetLineColor(kBlue);
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingMuchHitFinder::Exec(Option_t* opt){
+//  DrawSlices();
+  AnalyseHitTimeDistributions();
+}
+// -------------------------------------------------------------------------
+
+
+// -----   Public method Exec   --------------------------------------------
+void CbmAnaTimingMuchHitFinder::AnalyseHitTimeDistributions(){
+  Int_t nHits = fMuchHits->GetEntriesFast();
+  printf("nHits=%i\n",nHits);
+  for (Int_t i=0;i<nHits;i++){
+    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchHits->At(i);
+    Double_t t = hit->GetTime();
+    TVector3 r;
+    hit->Position(r);
+    fHitTimeAll->Fill(t);
+    fHitTimeCorrected->Fill(t-r.Mag()/29.97);
+  }
+}
+// -------------------------------------------------------------------------
+
+
+// -----   Public method Finish   ------------------------------------------
+void CbmAnaTimingMuchHitFinder::Finish(){
+  TCanvas* c1 = new TCanvas("c1","c1",1200,800);
+  c1->Divide(1,2);
+  c1->cd(1);
+  fHitTimeAll->Draw();
+  c1->cd(2);
+  fHitTimeCorrected->Draw();
+  
+  TFile* f = new TFile(fHistoName.Data(),"RECREATE");
+  fHitTimeAll->Write();
+  fHitTimeCorrected->Write();
+//  fDetEventTime->Write();
+  f->Close();
+  
+//  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
+//  Double_t r    = module->GetCutRadius();
+//  TArc* cMin = new TArc(0,0,r,0,360);
+//  cMin->SetFillColor(10);
+//  cMin->Draw("f");
+
+}
+// -------------------------------------------------------------------------
+
+
+
+
+// -----   Public method Exec   --------------------------------------------
+void CbmAnaTimingMuchHitFinder::DrawSlices(){
   CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
   module->ClearDigis();
   for (Int_t iDigi = 0; iDigi < fMuchDigis->GetEntriesFast(); iDigi++) {
@@ -221,20 +279,7 @@ void CbmAnaTimingMuchHitFinder::Exec(Option_t* opt){
 // -------------------------------------------------------------------------
 
 
-// -----   Public method Finish   ------------------------------------------
-void CbmAnaTimingMuchHitFinder::Finish(){
-  TFile* f = new TFile(fHistoName.Data(),"RECREATE");
-//  fDetEventTime->Write();
-  f->Close();
-  
 
-//  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,4);
-//  Double_t r    = module->GetCutRadius();
-//  TArc* cMin = new TArc(0,0,r,0,360);
-//  cMin->SetFillColor(10);
-//  cMin->Draw("f");
 
-}
-// -------------------------------------------------------------------------
 
 ClassImp(CbmAnaTimingMuchHitFinder);

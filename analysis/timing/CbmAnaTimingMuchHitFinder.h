@@ -28,6 +28,9 @@ public:
   virtual void SetParContainers();
 
 private:
+  void DrawSlices();
+  void AnalyseHitTimeDistributions();
+  
   Int_t         fEvent;             //!
   CbmMuchGeoScheme* fGeoScheme;     //!
   TString       fHistoName;
@@ -36,7 +39,11 @@ private:
   TClonesArray* fMuchPoints;        //!
   TClonesArray* fMuchDigis;         //!
   TClonesArray* fMuchDigiMatches;   //!
+  TClonesArray* fMuchHits;          //!
   CbmMCEpoch*   fMcEpoch;           //!
+  TH1D*         fHitTimeAll;
+  TH1D*         fHitTimeCorrected;
+
   
   CbmMuchModuleGem* fModules[NSLICES];
 

@@ -20,6 +20,8 @@ public:
    void SetTrackingType(const std::string& trackingType) { fTrackingType = trackingType;}
    void SetMergerType(const std::string& mergerType) { fMergerType = mergerType;}
    void SetFitterType(const std::string& fitterType) { fFitterType = fitterType;}
+   void SetSliceSeparationTime(double time) { fSliceSeparationTime = time; }
+   void SetHitTimeResolution(double time) { fHitTimeResolution = time; }
 private:
    virtual void Finish();
    void ReadAndCreateDataBranches();
@@ -59,7 +61,8 @@ private:
 
 
    Int_t fEventNo; // event counter
-
+   Double_t fSliceSeparationTime;
+   Double_t fHitTimeResolution;
    ClassDef(CbmLitFindMuchTracksEpoch, 1);
 };
 

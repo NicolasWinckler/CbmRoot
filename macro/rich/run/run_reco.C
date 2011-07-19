@@ -1,7 +1,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 10){
+void run_reco(Int_t nEvents = 700){
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -21,7 +21,7 @@ void run_reco(Int_t nEvents = 10){
 		parFile = TString(gSystem->Getenv("PARFILE"));
 	}
 
-    TString stsDigiFile = "sts_standard.digi.par";
+    TString stsDigiFile = "sts_v11a.digi.par";
     gDebug = 0;
 
     TStopwatch timer;
@@ -111,7 +111,7 @@ void run_reco(Int_t nEvents = 10){
 	CbmL1* l1 = new CbmL1();
 	run->AddTask(l1);
 
-	CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
+	CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
 	Bool_t useMvd = kTRUE;
 	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, useMvd);
 	run->AddTask(stsFindTracks);
@@ -249,17 +249,6 @@ void run_reco(Int_t nEvents = 10){
 		run->AddTask(richQa);
 
 		CbmRichElectronsQa* elQa = new CbmRichElectronsQa("CbmRichElectronsQa", "CbmRichElectronsQa", 0);
-		elQa->SetGeoType("compact"); //or large
-		//elQa->SetImageOutDir(outImageDir);
-		elQa->SetRichAnnCut(-0.5);
-		elQa->SetUseRichAnn(true);
-		elQa->SetTrdAnnCut(0.8);
-		elQa->SetMeanA(5.02);
-		elQa->SetMeanB(4.68);
-		elQa->SetRmsA(0.22);
-		elQa->SetRmsB(0.167);
-		elQa->SetRmsCoeff(3.5);
-		elQa->SetDistCut(1.);
 		run->AddTask(elQa);
 
 	}//isRich
@@ -277,7 +266,7 @@ void run_reco(Int_t nEvents = 10){
 	reconstructionQa->SetMomentumRange(0, 12);
 	reconstructionQa->SetNofBinsMom(12);
 	reconstructionQa->SetMinNofHitsRich(7);
-	reconstructionQa->SetQuotaRich(0.7);
+	reconstructionQa->SetQuotaRich(0.6);
 	reconstructionQa->SetOutputDir("recoIm/");
 	run->AddTask(reconstructionQa);
 
@@ -321,5 +310,4 @@ void run_reco(Int_t nEvents = 10){
 
     cout << " Test passed" << endl;
     cout << " All ok " << endl;
-    exit(0);
 }

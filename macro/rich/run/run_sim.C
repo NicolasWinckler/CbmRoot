@@ -5,24 +5,23 @@ void run_sim(Int_t nEvents = 700)
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	gRandom->SetSeed(10);
+	//gRandom->SetSeed(10);
 
 	TString inFile = "", parFile = "", outFile ="";
-	TString caveGeom = "", targetGeom = "", pipeGeom   = "",
-			magnetGeom = "", mvdGeom    = "", mvdGeom = "",stsGeom = "", richGeom= "",
-			trdGeom = "", tofGeom = "", ecalGeom = "";
+	TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "", mvdGeom = "",
+	      mvdGeom = "",stsGeom = "", richGeom= "", trdGeom = "", tofGeom = "", ecalGeom = "";
 	TString fieldMap = "";
 
 	TString electrons = ""; // If "yes" than primary electrons will be generated
-	Int_t NELECTRONS = 0;
-	Int_t NPOSITRONS = 0;
+	Int_t NELECTRONS = 0; // number of e- to be generated
+	Int_t NPOSITRONS = 0; // number of e+ to be generated
 	TString urqmd = ""; // If "yes" than UrQMD will be used as background
 	TString pluto = ""; // If "yes" PLUTO particles will be embedded
 	TString plutoFile = "";
 	TString plutoParticle = "";
 
 	// Magnetic field
-	Double_t fieldZ = 50.; // field centre z position
+	Double_t fieldZ = 50.; // field center z position
 	Double_t fieldScale =  1.0; // field scaling factor
 
 	if (script != "yes") {
@@ -30,19 +29,18 @@ void run_sim(Int_t nEvents = 700)
 		parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
 		outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
 
-		caveGeom   = "cave.geo";
-		targetGeom = "target_au_250mu.geo";
-		pipeGeom   = "pipe_standard.geo";
-		magnetGeom = "magnet_electron_standard.geo";
-		mvdGeom    = "mvd_standard.geo";
-		mvdGeom = "";
-		stsGeom    = "sts_standard.geo";
-		richGeom   = "rich_standard.geo";
-		trdGeom    = "trd_standard_dec10.geo";
-		tofGeom    = "tof_standard.geo";
-		//ecalGeom   = "ecal_FastMC.geo";
+	   caveGeom = "cave.geo";
+	   targetGeom = "target_au_250mu.geo";
+	   pipeGeom = "pipe_standard.geo";
+	   mvdGeom = "";//"mvd_v08a.geo";
+	   stsGeom = "sts/sts_v11a.geo";
+	   richGeom = "rich/rich_v08a.geo";
+	   trdGeom = "trd/trd_v10b.geo";
+	   tofGeom = "tof/tof_v07a.geo";
+	   ecalGeom = "";//"ecal_FastMC.geo";
+	   fieldMap = "field_v10e";
+	   magnetGeom = "passive/magnet_v09e.geo";
 
-		fieldMap = "field_electron_standard";
 		electrons = "yes";
 		NELECTRONS = 5;
 		NPOSITRONS = 5;
@@ -89,13 +87,12 @@ void run_sim(Int_t nEvents = 700)
 	cbmlibs();
 
 	FairRunSim* fRun = new FairRunSim();
-	fRun->SetName("TGeant3");              // Transport engine
-	fRun->SetOutputFile(outFile);          // Output file
+	fRun->SetName("TGeant3"); // Transport engine
+	fRun->SetOutputFile(outFile);
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
-	fRun->SetMaterials("media.geo");       // Materials
+	fRun->SetMaterials("media.geo"); // Materials
 
-	// -----   Create detectors and passive volumes   -------------------------
 	if ( caveGeom != "" ) {
 		FairModule* cave = new CbmCave("CAVE");
 		cave->SetGeometryFileName(caveGeom);
@@ -156,12 +153,13 @@ void run_sim(Int_t nEvents = 700)
 	// }
 
 	// -----   Create magnetic field   ----------------------------------------
-	if (fieldMap == "field_electron_standard" )
-		CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+	CbmFieldMap* magField = NULL;
+	if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
+	   magField = new CbmFieldMapSym2(fieldMap);
 	else if (fieldMap == "field_muon_standard" )
-		CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+		magField = new CbmFieldMapSym2(fieldMap);
 	else if (fieldMap == "FieldMuonMagnet" )
-		CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
+		magField = new CbmFieldMapSym3(fieldMap);
 	else {
 		cout << "===> ERROR: Unknown field map " << fieldMap << endl;
 		exit;
@@ -268,10 +266,8 @@ void run_sim(Int_t nEvents = 700)
 	rtdb->saveOutput();
 	rtdb->print();
 
-	// -----   Start run   ----------------------------------------------------
 	fRun->Run(nEvents);
 
-	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	Double_t rtime = timer.RealTime();
 	Double_t ctime = timer.CpuTime();

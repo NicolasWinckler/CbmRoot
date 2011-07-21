@@ -462,9 +462,9 @@ std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsRichToString(
 	   ss << std::setw(w) << ss1.str() << std::setw(w) << ss3.str()
 			   << std::setw(w) << ss4.str() << std::endl;
    } else if (opt == "final") {
-	   ss << std::setw(w) << ss1.str() << std::setw(w) << ss2.str() <<
-			   std::setw(w) << ss3.str() << std::setw(w) << ss4.str() <<
-			   std::setw(w) << ss5.str() << std::setw(w) << ss6.str() << std::endl;
+	   ss << std::setw(w) << ss1.str() << std::setw(w) << ss2.str()
+	      << std::setw(w) << ss3.str() << std::setw(w) << ss4.str()
+	      << std::setw(w) << ss5.str() << std::setw(w) << ss6.str() << std::endl;
    }
 
    return ss.str();

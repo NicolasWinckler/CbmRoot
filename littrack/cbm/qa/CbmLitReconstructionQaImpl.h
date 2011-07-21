@@ -297,6 +297,11 @@ private:
       TH1F* muchS,
       TH1F* tof);
 
+   void HitsHistosToPTree(
+         boost::property_tree::ptree* pt,
+         const std::string& name,
+         std::vector<TH1F*>& histos);
+
    void EventEfficiencyStatisticsToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,

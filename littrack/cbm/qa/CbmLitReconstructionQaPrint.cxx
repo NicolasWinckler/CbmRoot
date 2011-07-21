@@ -125,6 +125,20 @@ void CbmLitReconstructionQaPrint::PrintFinalStatistics(
    out << "Number of global tracks per event: "<<(Int_t)pt->get("hNofGlobalTracks", -1.)<< std::endl;
    out << "Number of track projections in RICH: " <<(Int_t)pt->get("hNofRichProjections", -1.) << std::endl;
 
+   //print hits histos statistics (nof all, true, fake hits in track/ring)
+   w = 10;
+   out << std::setfill('_') << std::setw(6*w) << "_"<< std::endl;
+   out << std::setfill(' ') << std::setw(w) << " " << std::setw(w)
+      << "all" << std::setw(w) << "true" << std::setw(w) << "fake"
+      << std::setw(w) << "true/all"<< std::setw(w) << "fake/all" << std::endl;
+   out << std::setfill('_') << std::setw(6*w) << "_"<< std::endl;
+   out << std::setfill(' ');
+   out << PrintHitsStatisticsToString(pt, "hMvdTrackHits", "MVD");
+   out << PrintHitsStatisticsToString(pt, "hStsTrackHits", "STS");
+   out << PrintHitsStatisticsToString(pt, "hTrdTrackHits", "TRD");
+   out << PrintHitsStatisticsToString(pt, "hMuchTrackHits", "MUCH");
+   out << PrintHitsStatisticsToString(pt, "hRichRingHits", "RICH");
+
    // print reconstruction efficiency without RICH
    w = 17;
    out << std::setfill('_') << std::setw(7*w) << "_"<< std::endl;
@@ -293,19 +307,19 @@ std::string CbmLitReconstructionQaPrint::PrintNofStatisticsToString(
    std::stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6, ss7;
    Int_t w = 12;
 
-   if (mvd != "") { ss1 << (Int_t)pt->get(mvd, -1.f); }
+   if (mvd != "") { ss1 << (Int_t)pt->get(mvd, -1.); }
       else { ss1 << "-"; }
-   if (sts != "") { ss2 << (Int_t)pt->get(sts, -1.f); }
+   if (sts != "") { ss2 << (Int_t)pt->get(sts, -1.); }
       else { ss2 << "-"; }
-   if (rich != "") { ss3 << (Int_t)pt->get(rich, -1.f); }
+   if (rich != "") { ss3 << (Int_t)pt->get(rich, -1.); }
       else { ss3 << "-"; }
-   if (trd != "") { ss4 << (Int_t)pt->get(trd, -1.f); }
+   if (trd != "") { ss4 << (Int_t)pt->get(trd, -1.); }
       else { ss4 << "-"; }
-   if (muchP != "") { ss5 << (Int_t)pt->get(muchP, -1.f); }
+   if (muchP != "") { ss5 << (Int_t)pt->get(muchP, -1.); }
       else { ss5 << "-"; }
-   if (muchS != "") { ss6 << (Int_t)pt->get(muchS, -1.f); }
+   if (muchS != "") { ss6 << (Int_t)pt->get(muchS, -1.); }
       else { ss6 << "-"; }
-   if (tof!= "") { ss7 << (Int_t)pt->get(tof, -1.f); }
+   if (tof!= "") { ss7 << (Int_t)pt->get(tof, -1.); }
       else { ss7 << "-"; }
 
    ss << std::setw(w) << name <<
@@ -313,6 +327,38 @@ std::string CbmLitReconstructionQaPrint::PrintNofStatisticsToString(
          std::setw(w) << ss3.str() << std::setw(w) << ss4.str() <<
          std::setw(w) << ss5.str() << std::setw(w) << ss6.str() <<
          std::setw(w) << ss7.str() <<std::endl;
+
+   return ss.str();
+}
+
+std::string CbmLitReconstructionQaPrint::PrintHitsStatisticsToString(
+   boost::property_tree::ptree* pt,
+   const std::string& hist,
+   const std::string& name)
+{
+   Double_t all = pt->get(hist+".all", -1.);
+   Double_t trueh = pt->get(hist+".true", -1.);
+   Double_t fakeh = pt->get(hist+".fake", -1.);
+   Double_t toa = pt->get(hist+".trueOverAll", -1.);
+   Double_t foa = pt->get(hist+".fakeOverAll", -1.);
+
+   std::stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6;
+   ss1.precision(3);
+   ss2.precision(3);
+   ss3.precision(3);
+   ss4.precision(3);
+   ss5.precision(3);
+   Int_t w = 10;
+
+   if (all == -1.) ss1 << "-"; else ss1 << all;
+   if (trueh == -1.) ss2 << "-"; else ss2 << trueh;
+   if (fakeh == -1.) ss3 << "-"; else ss3 << fakeh;
+   if (toa == -1.) ss4 << "-"; else ss4 << 100. * toa;
+   if (foa == -1.) ss5 << "-"; else ss5 << 100. * foa;
+
+   ss << std::setw(w) << name << std::setw(w) << ss1.str() <<
+         std::setw(w) << ss2.str() << std::setw(w) << ss3.str() <<
+         std::setw(w) << ss4.str() << std::setw(w) << ss5.str() << std::endl;
 
    return ss.str();
 }

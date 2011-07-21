@@ -56,6 +56,14 @@ private:
       const std::string& muchS,
       const std::string& tof);
 
+   /* Print hits histos statistics (nof all, true, fake hits in track/ring)
+    * @param hist histogram name
+    * @param name string of the first column in the table */
+   static std::string PrintHitsStatisticsToString(
+      boost::property_tree::ptree* pt,
+      const std::string& hist,
+      const std::string& name);
+
    /* Calculates integrated efficiencies and forms string with statistic information.
     * @param name histogram name
     * @param opt if 'event' than forms string for event statistics, if 'final' than forms the string with final statistics. */

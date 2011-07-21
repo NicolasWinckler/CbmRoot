@@ -1730,6 +1730,13 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
       pt.put("hNofRichProjections", (Int_t)fhNofRichProjections->GetMean());
    }
 
+   // print hits histos (nof all, true, fake per track/ring)
+   if (fIsMvd) HitsHistosToPTree(&pt, "hMvdTrackHits", fhMvdTrackHits);
+   if (fIsSts) HitsHistosToPTree(&pt, "hStsTrackHits", fhStsTrackHits);
+   if (fIsTrd) HitsHistosToPTree(&pt, "hTrdTrackHits", fhTrdTrackHits);
+   if (fIsMuch) HitsHistosToPTree(&pt, "hMuchTrackHits", fhMuchTrackHits);
+   if (fIsRich) HitsHistosToPTree(&pt, "hRichRingHits", fhRichRingHits);
+
    // Print efficiency without RICH
    EventEfficiencyStatisticsToPTree(&pt, "hStsMom", fhStsMom);
    EventEfficiencyStatisticsToPTree(&pt, "hRecMom", fhRecMom);
@@ -1861,6 +1868,19 @@ void CbmLitReconstructionQaImpl::NofStatisticsToPTree(
       pt->put(st, (Int_t)tof->GetMean());
    }
 }
+
+void CbmLitReconstructionQaImpl::HitsHistosToPTree(
+      boost::property_tree::ptree* pt,
+      const std::string& name,
+      std::vector<TH1F*>& histos)
+{
+   pt->put(name+".all", histos[0]->GetMean());
+   pt->put(name+".true", histos[1]->GetMean());
+   pt->put(name+".fake", histos[2]->GetMean());
+   pt->put(name+".trueOverAll", histos[3]->GetMean());
+   pt->put(name+".fakeOverAll", histos[4]->GetMean());
+}
+
 
 void CbmLitReconstructionQaImpl::EventEfficiencyStatisticsToPTree(
       boost::property_tree::ptree* pt,
@@ -2215,27 +2235,28 @@ void CbmLitReconstructionQaImpl::DrawEfficiency(
 
 	if (hist1 && hist2 && hist3 && hist4) {
 		DrawHist1D((*hist1)[kEff], (*hist2)[kEff], (*hist3)[kEff], (*hist4)[kEff],
-						 yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, hname3, hname4,
-						 kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
+				yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, hname3, hname4,
+				kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 		DrawMeanEfficiencyLines((*hist1)[kEff], eff1, eff2, eff3, eff4);
-
+      if (opt == "pisupp") gPad->SetLogy(true);
 	} else if (hist1 && hist2 && hist3 && !hist4) {
-	  DrawHist1D((*hist1)[kEff], (*hist2)[kEff], (*hist3)[kEff], NULL,
+	   DrawHist1D((*hist1)[kEff], (*hist2)[kEff], (*hist3)[kEff], NULL,
 	        yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, hname3, "",
 	        kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
-     DrawMeanEfficiencyLines((*hist1)[kEff], eff1, eff2, eff3);
-
+	   DrawMeanEfficiencyLines((*hist1)[kEff], eff1, eff2, eff3);
+	   if (opt == "pisupp") gPad->SetLogy(true);
 	} else if (hist1 && hist2 && !hist3 && !hist4){
-	  DrawHist1D((*hist1)[kEff], (*hist2)[kEff], NULL, NULL,
+	   DrawHist1D((*hist1)[kEff], (*hist2)[kEff], NULL, NULL,
 	        yTitle, "Momentum [GeV/c]", yTitle, hname1, hname2, "", "",
 	        kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
-     DrawMeanEfficiencyLines((*hist1)[kEff], eff1, eff2);
-
+	   DrawMeanEfficiencyLines((*hist1)[kEff], eff1, eff2);
+      if (opt == "pisupp") gPad->SetLogy(true);
 	} else if (hist1 && !hist2 && !hist3 && !hist4){
-     DrawHist1D((*hist1)[kEff], NULL, NULL, NULL,
+	   DrawHist1D((*hist1)[kEff], NULL, NULL, NULL,
            yTitle, "Momentum [GeV/c]", yTitle, hname1, "", "", "",
            kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
-     DrawMeanEfficiencyLines((*hist1)[kEff], eff1);
+	   DrawMeanEfficiencyLines((*hist1)[kEff], eff1);
+      if (opt == "pisupp") gPad->SetLogy(true);
    }
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }

@@ -58,6 +58,8 @@ public:
     Bool_t isTTCutElectron;
     Bool_t isSTCutElectron;
     Bool_t isAPMCutElectron;
+    Bool_t isDSTSCutElectron;
+    Bool_t isDSTSCut2Electron;
     Double_t richAnn;
     Double_t trdAnn;
     Double_t mass2;
@@ -106,7 +108,14 @@ public:
         DielectronCandidate* candM, 
         TH2D* h_source_pair);
 
+    void TrackSource(
+    		DielectronCandidate* cand,
+    		Double_t binNum,
+    		Int_t pdg);
+
     void SingleParticleAcceptance();
+
+    void FillRichRingNofHits();
 
     void MCPairs();
 
@@ -124,7 +133,13 @@ public:
 
     void CheckGammaConvAndPi0();
 
-    void FindClosestMvdHit();
+    void FindClosestMvdHit(
+    		Int_t mvdStationNum,
+    		TH2D* signal,
+    		TH2D* bg,
+    		TH2D* gamma,
+    		TH2D* pi0,
+    		TH2D* eta);
 
     void CheckTrackTopologyCut();
 
@@ -211,8 +226,15 @@ private:
     Double_t fSTCutPP;
     Double_t fTTCutAngle;
     Double_t fTTCutPP;
+    Double_t fDSTSCutP;
+    Double_t fDSTSCutD;
+    Double_t fDSTSCut2P;
+    Double_t fDSTSCut2D;
 
     vector<TH1*> fHistoList; //list of all histogramms
+
+    // Number of hits in the MC RICH ring
+    std::map<Int_t, Int_t> fNofHitsInRingMap;
 
 //signal momentum distribution
     TH1D* fh_mc_signal_mom;
@@ -226,6 +248,8 @@ private:
     TH1D* fh_ttcut_signal_mom;
     TH1D* fh_stcut_signal_mom;
     TH1D* fh_apmcut_signal_mom;
+    TH1D* fh_dstscut_signal_mom;
+    TH1D* fh_dsts2cut_signal_mom;
 
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
@@ -246,6 +270,11 @@ private:
     TH1D* fh_ttcut_signal_minv;
     TH1D* fh_stcut_signal_minv;
     TH1D* fh_apmcut_signal_minv;
+    TH1D* fh_dstscut_signal_minv;
+    TH1D* fh_dsts2cut_signal_minv;
+
+    TH2D* fh_ttcut_signal_minv_pt;
+    TH2D* fh_ptcut_signal_minv_pt;
 
 //BG minv
     TH1D* fh_rec_bg_minv;
@@ -257,6 +286,8 @@ private:
     TH1D* fh_ttcut_bg_minv;
     TH1D* fh_stcut_bg_minv;
     TH1D* fh_apmcut_bg_minv;
+    TH1D* fh_dstscut_bg_minv;
+    TH1D* fh_dsts2cut_bg_minv;
 
 //pi0 minv
     TH1D* fh_rec_pi0_minv;
@@ -268,6 +299,8 @@ private:
     TH1D* fh_ttcut_pi0_minv;
     TH1D* fh_stcut_pi0_minv;
     TH1D* fh_apmcut_pi0_minv;
+    TH1D* fh_dstscut_pi0_minv;
+    TH1D* fh_dsts2cut_pi0_minv;
 
 //eta minv
     TH1D* fh_rec_eta_minv;
@@ -279,6 +312,8 @@ private:
 	TH1D* fh_ttcut_eta_minv;
     TH1D* fh_stcut_eta_minv;
 	TH1D* fh_apmcut_eta_minv;
+	TH1D* fh_dstscut_eta_minv;
+	TH1D* fh_dsts2cut_eta_minv;
 
 // cuts distribution
     TH1D* fh_pt_signal;
@@ -313,6 +348,12 @@ private:
     TH2D* fh_dsts_pi0;
     TH2D* fh_dsts_eta;
 
+    TH2D* fh_dsts2_signal;
+	TH2D* fh_dsts2_bg;
+	TH2D* fh_dsts2_gamma;
+	TH2D* fh_dsts2_pi0;
+	TH2D* fh_dsts2_eta;
+
 //source of BG pairs
     TH2D*  fh_source_pair_reco;
     TH2D*  fh_source_pair_el_id;
@@ -323,6 +364,8 @@ private:
     TH2D*  fh_source_pair_ttcut;
     TH2D*  fh_source_pair_stcut;
     TH2D*  fh_source_pair_apmcut;
+    TH2D*  fh_source_pair_dstscut;
+    TH2D*  fh_source_pair_dsts2cut;
 
 //pt/y distribution for signal
     TH2D* fh_mc_signal_pty;
@@ -336,6 +379,8 @@ private:
     TH2D* fh_ttcut_signal_pty;
     TH2D* fh_stcut_signal_pty;
     TH2D* fh_apmcut_signal_pty;
+    TH2D* fh_dstscut_signal_pty;
+    TH2D* fh_dsts2cut_signal_pty;
 
 //ID cuts distributions
     TH1D* fh_rich_ann_signal;
@@ -349,6 +394,20 @@ private:
     TH1D* fh_event_number;
     TH1D* fh_nof_bg_tracks;
     TH1D* fh_nof_el_tracks;
+    TH2D* fh_source_tracks;
+
+	TH1D* fh_gamma_mom;
+	TH1D* fh_pi0_mom;
+	TH1D* fh_pions_mom;
+	TH1D* fh_proton_mom;
+	TH1D* fh_kaons_mom;
+	TH1D* fh_other_mom;
+	TH1D* fh_gamma_id_mom;
+	TH1D* fh_pi0_id_mom;
+	TH1D* fh_pions_id_mom;
+	TH1D* fh_proton_id_mom;
+	TH1D* fh_kaons_id_mom;
+	TH1D* fh_other_id_mom;
 
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

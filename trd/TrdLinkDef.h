@@ -21,6 +21,7 @@
 #pragma link C++ class  CbmGeoTrdPar;
 #pragma link C++ class  CbmTrdClusterizer;
 #pragma link C++ class  CbmTrdHitRateTest;
+#pragma link C++ class  CbmTrdHitDensityTest;
 //#pragma link C++ class  CbmTrdCluster;
 #pragma link C++ class  CbmTrdContFact;
 #pragma link C++ class  CbmTrdRadiator;

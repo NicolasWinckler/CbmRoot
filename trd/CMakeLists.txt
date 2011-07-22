@@ -38,6 +38,7 @@ CbmTrdHitProducerIdeal.cxx
 CbmTrdHitProducerSmearing.cxx
 CbmTrdClusterizer.cxx 
 CbmTrdHitRateTest.cxx
+CbmTrdHitDensityTest.cxx
 # CbmTrdCluster.cxx 
 CbmTrdHitProducerQa.cxx  
 CbmTrdRadiator.cxx  

@@ -123,6 +123,10 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
     fhStationEffR[i]   = new TH1D(Form("hStationEffR%i",i),"",100,0,station->GetRmax());
   }
   
+  fPointsTimeAll    = new TH1D("fPointsTimeAll","; time [ns]; Entries",600,0,600);
+  fPointsTimeAll->SetLineColor(kBlue);
+
+  
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -130,106 +134,38 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
+  TimeDistributions();
+//  DetailedAnalysis();
+}
+// -------------------------------------------------------------------------
+
+
+// -----   Public method Exec   --------------------------------------------
+void CbmAnaTimingMuchDigitizer::TimeDistributions(){
   if (fEpoch) fMuchPoints = fMcEpoch->GetPoints(kMUCH);
   
   Int_t nMuchPoints = fMuchPoints ? fMuchPoints->GetEntriesFast() : 0;
-  Int_t nMuchDigis  = fMuchDigis  ? fMuchDigis->GetEntriesFast() : 0;
-  if (fVerbose>-1) printf(" Event: %4i",fEvent++);
-  if (fVerbose>0) printf(" nMuchPoints: %4i",nMuchPoints);
-  if (fVerbose>0) printf(" nMuchDigis: %4i",nMuchDigis);
-  if (fVerbose>-1) printf("\n");
-   
-  CbmMuchSector* sector = ((CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,fModuleId))->GetSector(fSectorId);     
-  TVector3 l = sector->GetSize();
-  TVector3 p = sector->GetPosition();
 
   for (Int_t i=0;i<nMuchPoints;i++){
     FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(i);
-//    if (fVerbose>2) printf("  Much point: %i time=%f",i,point->GetTime());
-//    if (fVerbose>2) printf("Detector Id: %i",point->GetDetectorID());
-//    if (fVerbose>2) printf("\n");
     Double_t x = point->GetX();
     Double_t y = point->GetY();
     Double_t t = point->GetTime();
-    if (fGeoScheme->GetModuleIndex(point->GetDetectorID())!=fModuleId) continue;
-    fhPointXYT->Fill(x,y,t);
-    if (x>p[0]-l[0]/2 && x <p[0]+l[0]/2 && y>p[1]-l[1]/2 && y<p[1]+l[1]/2)  fhSectorPointXYT->Fill(x,y,t);
-  }
-
-  for (Int_t i=0;i<nMuchDigis;i++) {
-    CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(i);
-    Int_t    detId     = digi->GetDetectorId();
-    Long64_t channelId = digi->GetChannelId();
-    Double_t time      = digi->GetTime();
-    Double_t dead_time = digi->GetDeadTime();
-    UInt_t   adcCharge = digi->GetADCCharge(); 
-    if (fGeoScheme->GetStationIndex(detId)!=0) continue;
-    if (fGeoScheme->GetLayerIndex(detId)!=0) continue;
-    if (fGeoScheme->GetLayerSideIndex(detId)!=0) continue;
-    if (fGeoScheme->GetModuleIndex(detId)!=fModuleId) continue;
-    fhModuleT->Fill(time);
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detId);
-    Int_t iSector  = module->GetSectorIndex(channelId);
-    Int_t iChannel = module->GetChannelIndex(channelId);
-    CbmMuchPad* pad = module->GetPad(channelId);
-    Double_t x = pad->GetX0();
-    Double_t y = pad->GetY0();
-    fhDigiXYT->Fill(x,y,time,digi->GetADCCharge());
-    if (iSector!=fSectorId) continue;
-    fhSectorDigiXYT->Fill(x,y,time,digi->GetADCCharge());
-    if (time>0 && time<10000) fhChannelHits->Fill(iChannel);
-    for (Double_t t=time;t<time+dead_time;t++){
-      fhhChannelT[iChannel]->Fill(t,0.2);
-//      fhChannelT->Fill(t,0.2);
-    }
-    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
-    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
-      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
-      Double_t point_time   = point->GetTime();
-      Double_t point_charge = match->GetCharge(ipoint);
-//      fhPointT->Fill(point_time,point_charge);
-      fhhPointT[iChannel]->Fill(point_time);
-    }
-
-    
-    
-    if (iChannel!=fChannelId) continue;
-    printf("time=%f dead_time=%f\n",time,dead_time);
-//    fhChannelT->Fill(time);
-    for (Double_t t=time;t<time+dead_time;t++){
-      fhChannelT->Fill(t,0.2);
-    }
-//    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
-    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
-      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
-      Double_t point_time   = point->GetTime();
-      Double_t point_charge = match->GetCharge(ipoint);
-//      fhPointT->Fill(point_time,point_charge);
-      fhPointT->Fill(point_time);
-    }
-    
-  }
-
-  for (Int_t i=0;i<nMuchDigis;i++) {
-    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
-    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
-      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
-      Double_t x = point->GetX();
-      Double_t y = point->GetY();
-      Double_t r = sqrt(x*x+y*y);
-      Int_t stationId = fGeoScheme->GetStationIndex(point->GetDetectorID()); 
-      fhStationTotalR[stationId]->Fill(r);
-      if (ipoint!=0) continue;
-      fhStationFoundR[stationId]->Fill(r);
-    }
+//    fhPointXYT->Fill(x,y,t);
+    fPointsTimeAll->Fill(t);
   }
 }
 // -------------------------------------------------------------------------
 
 
+
+
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaTimingMuchDigitizer::Finish(){
-
+  TCanvas* cPointsTimeAll = new TCanvas("cPointsTimeAll","PointsTime",1200,400);
+  fPointsTimeAll->Draw();
+  
+  
 //  CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,fModuleId);
 //  Double_t r    = module->GetCutRadius();
 //  TVector3 size = module->GetSize();
@@ -383,7 +319,7 @@ void CbmAnaTimingMuchDigitizer::Finish(){
     gPad->SetGridy(0);
     fhStationEffR[i]->Draw();
     fhStationTotalR[i]->Write();
-    fhStationFoundR[i]->Write();   
+    fhStationFoundR[i]->Write();
     fhStationEffR[i]->Write();
     
   }
@@ -393,9 +329,111 @@ void CbmAnaTimingMuchDigitizer::Finish(){
   fhModuleT->Write();
 
 //  fDetEventTime->Write();
+
+  fPointsTimeAll->Write();
   f->Close();
 
 }
 // -------------------------------------------------------------------------
+
+
+// -----   Public method Exec   --------------------------------------------
+void CbmAnaTimingMuchDigitizer::DetailedAnalysis(){
+  if (fEpoch) fMuchPoints = fMcEpoch->GetPoints(kMUCH);
+  
+  Int_t nMuchPoints = fMuchPoints ? fMuchPoints->GetEntriesFast() : 0;
+  Int_t nMuchDigis  = fMuchDigis  ? fMuchDigis->GetEntriesFast() : 0;
+  if (fVerbose>-1) printf(" Event: %4i",fEvent++);
+  if (fVerbose>0) printf(" nMuchPoints: %4i",nMuchPoints);
+  if (fVerbose>0) printf(" nMuchDigis: %4i",nMuchDigis);
+  if (fVerbose>-1) printf("\n");
+   
+  CbmMuchSector* sector = ((CbmMuchModuleGem*) fGeoScheme->GetModule(0,0,0,fModuleId))->GetSector(fSectorId);     
+  TVector3 l = sector->GetSize();
+  TVector3 p = sector->GetPosition();
+
+  for (Int_t i=0;i<nMuchPoints;i++){
+    FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(i);
+//    if (fVerbose>2) printf("  Much point: %i time=%f",i,point->GetTime());
+//    if (fVerbose>2) printf("Detector Id: %i",point->GetDetectorID());
+//    if (fVerbose>2) printf("\n");
+    Double_t x = point->GetX();
+    Double_t y = point->GetY();
+    Double_t t = point->GetTime();
+    if (fGeoScheme->GetModuleIndex(point->GetDetectorID())!=fModuleId) continue;
+    fhPointXYT->Fill(x,y,t);
+    if (x>p[0]-l[0]/2 && x <p[0]+l[0]/2 && y>p[1]-l[1]/2 && y<p[1]+l[1]/2)  fhSectorPointXYT->Fill(x,y,t);
+  }
+
+  for (Int_t i=0;i<nMuchDigis;i++) {
+    CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(i);
+    Int_t    detId     = digi->GetDetectorId();
+    Long64_t channelId = digi->GetChannelId();
+    Double_t time      = digi->GetTime();
+    Double_t dead_time = digi->GetDeadTime();
+    UInt_t   adcCharge = digi->GetADCCharge(); 
+    if (fGeoScheme->GetStationIndex(detId)!=0) continue;
+    if (fGeoScheme->GetLayerIndex(detId)!=0) continue;
+    if (fGeoScheme->GetLayerSideIndex(detId)!=0) continue;
+    if (fGeoScheme->GetModuleIndex(detId)!=fModuleId) continue;
+    fhModuleT->Fill(time);
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detId);
+    Int_t iSector  = module->GetSectorIndex(channelId);
+    Int_t iChannel = module->GetChannelIndex(channelId);
+    CbmMuchPad* pad = module->GetPad(channelId);
+    Double_t x = pad->GetX0();
+    Double_t y = pad->GetY0();
+    fhDigiXYT->Fill(x,y,time,digi->GetADCCharge());
+    if (iSector!=fSectorId) continue;
+    fhSectorDigiXYT->Fill(x,y,time,digi->GetADCCharge());
+    if (time>0 && time<10000) fhChannelHits->Fill(iChannel);
+    for (Double_t t=time;t<time+dead_time;t++){
+      fhhChannelT[iChannel]->Fill(t,0.2);
+//      fhChannelT->Fill(t,0.2);
+    }
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
+    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
+      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
+      Double_t point_time   = point->GetTime();
+      Double_t point_charge = match->GetCharge(ipoint);
+//      fhPointT->Fill(point_time,point_charge);
+      fhhPointT[iChannel]->Fill(point_time);
+    }
+
+    
+    
+    if (iChannel!=fChannelId) continue;
+    printf("time=%f dead_time=%f\n",time,dead_time);
+//    fhChannelT->Fill(time);
+    for (Double_t t=time;t<time+dead_time;t++){
+      fhChannelT->Fill(t,0.2);
+    }
+//    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
+    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
+      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
+      Double_t point_time   = point->GetTime();
+      Double_t point_charge = match->GetCharge(ipoint);
+//      fhPointT->Fill(point_time,point_charge);
+      fhPointT->Fill(point_time);
+    }
+    
+  }
+
+  for (Int_t i=0;i<nMuchDigis;i++) {
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(i);
+    for (Int_t ipoint=0;ipoint<match->GetNPoints();ipoint++){
+      FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(match->GetRefIndex(ipoint));
+      Double_t x = point->GetX();
+      Double_t y = point->GetY();
+      Double_t r = sqrt(x*x+y*y);
+      Int_t stationId = fGeoScheme->GetStationIndex(point->GetDetectorID()); 
+      fhStationTotalR[stationId]->Fill(r);
+      if (ipoint!=0) continue;
+      fhStationFoundR[stationId]->Fill(r);
+    }
+  }
+}
+// -------------------------------------------------------------------------
+
 
 ClassImp(CbmAnaTimingMuchDigitizer);

@@ -61,9 +61,9 @@ InitStatus CbmAnaTimingStsTracking::Init(){
   fHits        = (TClonesArray*) fManager->GetObject("StsHit");
   fMcEpoch     = (CbmMCEpoch*)   fManager->GetObject("MCEpoch.");
   fStsTracks   = (TClonesArray*) fManager->GetObject("StsTrack");
-  fTrackTime        = new TH1D("fTrackTime","fTrackTime",1000,0,1000);
-  fTrackTimeFromHit = new TH1D("fTrackTimeFromHit","fTrackTime",1000,0,1000);
-  fTrackTimeFromLastHit = new TH1D("fTrackTimeFromLastHit","fTrackTime",1000,0,1000);
+  fTrackTime        = new TH1D("fTrackTime","; time [ns]; Entries",1000,0,1000);
+  fTrackTimeFromHit = new TH1D("fTrackTimeFromHit","; time [ns]; Entries",1000,0,1000);
+  fTrackTimeFromLastHit = new TH1D("fTrackTimeFromLastHit","; time [ns]; Entries",1000,0,1000);
   fTrackTime->SetLineColor(kBlue);
   fTrackTimeFromHit->SetLineColor(kBlue);
   fTrackTimeFromLastHit->SetLineColor(kBlue);
@@ -103,6 +103,8 @@ void CbmAnaTimingStsTracking::Finish(){
 
   TFile* f = new TFile(fHistoName.Data(),"RECREATE");
   fTrackTime->Write();
+  fTrackTimeFromHit->Write();
+  fTrackTimeFromLastHit->Write();
   f->Close();
 }
 // -------------------------------------------------------------------------

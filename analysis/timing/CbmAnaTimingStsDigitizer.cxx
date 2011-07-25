@@ -73,10 +73,10 @@ InitStatus CbmAnaTimingStsDigitizer::Init(){
     fStsPoints   = (TClonesArray*) fManager->GetObject("StsPoint");
     fMcTracks    = (TClonesArray*) fManager->GetObject("MCTrack");
   }
-  fPointsTimeAll    = new TH1D("fPointsTimeAll","; time [ns]; Entries",1000,0,1000);
-  fPointsTimeSector = new TH1D("fPointsTimeSector","; time [ns]; Entries",1000,0,1000);
-  fDigiTimeAll      = new TH1D("fDigiTimeAll","; time [ns]; Entries",1000,0,1000);
-  fDigiTimeSector   = new TH1D("fDigiTimeSector","; time [ns]; Entries",1000,0,1000);
+  fPointsTimeAll    = new TH1D("fPointsTimeAll","; time [ns]; Entries",600,0,600);
+  fPointsTimeSector = new TH1D("fPointsTimeSector","; time [ns]; Entries",600,0,600);
+  fDigiTimeAll      = new TH1D("fDigiTimeAll","; time [ns]; Entries",600,0,600);
+  fDigiTimeSector   = new TH1D("fDigiTimeSector","; time [ns]; Entries",600,0,600);
   fPointsTimeAll->SetLineColor(kBlue);
   fPointsTimeSector->SetLineColor(kBlue);
   fDigiTimeAll->SetLineColor(kBlue);
@@ -125,7 +125,7 @@ void CbmAnaTimingStsDigitizer::Exec(Option_t* opt){
     Int_t sector  = digi->GetSectorNr();
     Int_t side    = digi->GetSide();
     Int_t channel = digi->GetChannelNr();
-    Double_t t       = digi->GetTime();
+    Double_t t    = digi->GetTimeStamp();
     Int_t detId   = digi->GetDetectorId();
     
     if (fVerbose>2) printf("  Digi: %5i time=%8i detId=%8i",i,t,detId);

@@ -30,6 +30,9 @@ public:
   void SetEpoch(Bool_t epoch) {fEpoch = epoch; }
   
 private:
+  void TimeDistributions();
+  void DetailedAnalysis();
+  
   Int_t         fEvent;             //!
   CbmMuchGeoScheme* fGeoScheme;     //!
   TString       fHistoName;
@@ -52,6 +55,8 @@ private:
   TH1D* fhStationTotalR[5]; //!
   TH1D* fhStationFoundR[5]; //!
   TH1D* fhStationEffR[5]; //!
+
+  TH1D* fPointsTimeAll; //!
 
   Int_t fChannelId;
   Int_t fSectorId;

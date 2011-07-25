@@ -4,7 +4,7 @@ void runTimingStsDigitizer(){
 //  TString inFile    = dir + "mc.root";
   TString parFile   = dir + "param.root";
   TString digFile   = dir + "sts.reco.root";
-  TString histoFile = dir + "histo.root";
+  TString histoFile = dir + "histo.digis.root";
   TString outFile   = dir + "dummy.root";
   TString digiFile    = "sts_v11a.digi.par";
 
@@ -41,9 +41,9 @@ void runTimingStsDigitizer(){
 //  task->SetModuleId(4);
 //  task->SetSectorId(37);
 //  task->SetChannelId(3);
-//  task->SetEpoch(1);
-  task->SetVerbose(3);
+  task->SetEpoch(1);
+  task->SetVerbose(2);
   fRun->AddTask(task);
   fRun->Init();
-  fRun->Run(10);
+  fRun->Run(100);
 }

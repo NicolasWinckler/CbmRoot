@@ -1,8 +1,9 @@
-void much_reco_epoch(){
-  Int_t nEvents=100;
+void much_reco(){
+  Int_t nEvents=10;
   TString dir = "data1/";
-  TString epochFile   = dir + "epoch.root";
-  TString outFile   = dir + "much.reco.root";
+  TString mcFile   = dir + "mc.root";
+  TString stsRecoFile = dir + "sts.reco.0.root";
+  TString outFile   = dir + "much.reco.0.root";
   TString parFile   = dir + "param.root";
   
   TString digiFile = gSystem->Getenv("VMCWORKDIR");
@@ -19,7 +20,8 @@ void much_reco_epoch(){
   muchlibs();
 
   FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile(epochFile);
+  fRun->SetInputFile(mcFile);
+  fRun->AddFriend(stsRecoFile);
   fRun->SetOutputFile(outFile);
 
   // ---  MuCh digitizer ----------------------------------------------------
@@ -28,27 +30,22 @@ void much_reco_epoch(){
   digitize->SetQMaximum(500000);
   digitize->SetNADCChannels(256);
   digitize->SetMeanGasGain(17000);
-  digitize->SetEpoch(1);
-  digitize->SetMcChain(mcFileChain);
-  digitize->SetDeadTime(10); // ns
-  digitize->SetDTime(0.1);     // ns
+  digitize->SetDeadTime(500); // ns
+  digitize->SetDTime(4);      // ns
   
   fRun->AddTask(digitize);
   
   CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
   findHits->SetAlgorithm(3);
-  findHits->SetClusterSeparationTime(10);
-  findHits->SetEpoch(1);
   fRun->AddTask(findHits);
-//  
-//  CbmLitFindMuchTracksEpoch* finder = new CbmLitFindMuchTracksEpoch();
-//  finder->SetTrackingType("branch");
-//  finder->SetMergerType("nearest_hit");
-//  fRun->AddTask(finder);
-//  
-//  CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-//  muchMatchTracks->SetEpoch(1);
-//  fRun->AddTask(muchMatchTracks);
+  
+  CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+  finder->SetTrackingType("branch");
+  finder->SetMergerType("nearest_hit");
+  fRun->AddTask(finder);
+  
+  CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+  fRun->AddTask(muchMatchTracks);
   
   // ------------------------------------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();

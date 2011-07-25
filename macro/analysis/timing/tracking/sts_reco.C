@@ -1,7 +1,7 @@
 void sts_reco(TString dir = "data/", Int_t nEvents=10){
   TString mcFile      = dir + "mc.root";
   TString parFile     = dir + "param.root";
-  TString stsRecoFile = dir + "sts.reco.root";
+  TString stsRecoFile = dir + "sts.reco.0.root";
   TString digiFile    = "sts_v11a.digi.par";
 
   Int_t iVerbose = 1;

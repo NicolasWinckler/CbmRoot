@@ -41,7 +41,7 @@ void sts_reco_epoch(TString dir = "data/", Int_t nEvents=10){
   // -----   STS digitiser   ------------------------------------------------
   CbmStsIdealDigitizeEpoch* stsDigitize = new CbmStsIdealDigitizeEpoch("STSDigitize", iVerbose);
   stsDigitize->SetEpoch(1);
-  stsDigitize->SetTimeSmearing(4);
+  stsDigitize->SetTimeSmearing(0.01);
   run->AddTask(stsDigitize);
   // ------------------------------------------------------------------------
 

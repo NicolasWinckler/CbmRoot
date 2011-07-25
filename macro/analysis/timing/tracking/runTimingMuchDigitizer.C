@@ -1,13 +1,12 @@
-void runTimingStsHitFinder(){
+void runTimingMuchDigitizer(){
   TString dir = "data/";
   TString inFile    = dir + "epoch.root";
-//  TString inFile    = dir + "mc.root";
+  TString muchFile  = dir + "much.reco.root";
   TString parFile   = dir + "param.root";
-  TString digFile   = dir + "sts.reco.root";
-  TString histoFile = dir + "histo.hits.root";
+  TString histoFile = dir + "histo.muchhits.root";
   TString outFile   = dir + "dummy.root";
-  TString digiFile    = "sts_v11a.digi.par";
-
+  TString digiFile = gSystem->Getenv("VMCWORKDIR");
+  digiFile += "/parameters/much/much_v11a.digi.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -18,7 +17,7 @@ void runTimingStsHitFinder(){
   
   CbmRunAna *fRun= new CbmRunAna();
   fRun->SetInputFile(inFile);
-  fRun->AddFriend(digFile);
+  fRun->AddFriend(muchFile);
   fRun->SetOutputFile(outFile);
 
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
@@ -28,8 +27,13 @@ void runTimingStsHitFinder(){
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
 
-  CbmAnaTimingStsHitFinder* task = new CbmAnaTimingStsHitFinder("TimingMuchHitFinder",histoFile);
+  CbmAnaTimingMuchDigitizer* task = new CbmAnaTimingMuchDigitizer("TimingMuchDigitizer",digiFile,histoFile);
+  task->SetModuleId(4);
+  task->SetSectorId(10);
+  task->SetChannelId(3);
+  task->SetEpoch(1);
+  task->SetVerbose(2);
   fRun->AddTask(task);
   fRun->Init();
-  fRun->Run(100);
+  fRun->Run(1000);
 }

@@ -7,8 +7,8 @@ INCLUDE(std/CMakeLists.txt)
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
 ${GEANT3_INCLUDE_DIR}
-#${CLHEP_INCLUDE_DIR}
-${SIMPATH}/basics/boost/include
+${Boost_INCLUDE_DIR}
+#${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/std
 ${CBMROOT_SOURCE_DIR}/littrack/cbm

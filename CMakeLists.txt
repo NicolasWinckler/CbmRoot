@@ -74,6 +74,17 @@ else(CBMROOT_MINIMAL)
   find_package(RuleChecker)
   find_package(TBB)
   find_package(SSE)
+
+#  set(Boost_DEBUG TRUE)
+  If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+    set(BOOST_ROOT ${SIMPATH})
+  Else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+    set(BOOST_ROOT ${SIMPATH}/basics/boost)
+  EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+#  MESSAGE("BOOST: ${BOOST_ROOT}")
+#  MESSAGE("${ROOT_LIBRARY_DIR} ${ROOT_INCLUDE_DIR} ${ROOT_DEFINITIONS}")
+  set(Boost_NO_SYSTEM_PATHS TRUE)
+  find_package(Boost 1.41)
 endif(CBMROOT_MINIMAL)
 
 

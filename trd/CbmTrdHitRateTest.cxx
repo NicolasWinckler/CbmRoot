@@ -33,6 +33,7 @@ using std::endl;
 using std::pair;
 using std::vector;
 
+
 // ---- Default constructor -------------------------------------------
 CbmTrdHitRateTest::CbmTrdHitRateTest()
     :FairTask("TrdCluster")
@@ -141,14 +142,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   printf("Introduction:\n");
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
-  //Bool_t Fast = false;
-  Bool_t Fast = true;
+  Bool_t Fast = false;
+  //Bool_t Fast = true;
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
   Double_t mm2bin = 5;
  
   fStation = 0;
   fLayer = 0;
+  tFile = new TFile("CbmTrdHitRateTest.root","RECREATE"," ROOT file with histograms");
 
   TH1F* HitPad = NULL;
   TH2F* Layer = NULL;
@@ -202,9 +204,13 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 
   Int_t ModuleID;
   Int_t Sector = 0;
-  Int_t NofModules = fDigiPar->GetNrOfModules();
-  for (Int_t i = 0; i < NofModules; i++) {
+  const Int_t NofModules = fDigiPar->GetNrOfModules();
+  //TH2F *Module[NofModules];
+  for (Int_t i = 0; i < NofModules; i++) {  
     ModuleID = fDigiPar->GetModuleId(i);
+    // TString name;
+    //name.Form("Module%d",ModuleID);
+    //Module[i] = new TH2F(name,name,1000,-500,500,1000,-500,500);
     fModuleInfo = fDigiPar->GetModule(ModuleID);
     //printf("%d:\n  %.1f %.1f %.1f\n",ModuleID,fModuleInfo->GetX(), fModuleInfo->GetY(),fModuleInfo->GetZ());
     GetModuleInformationSL(ModuleID);
@@ -302,6 +308,11 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       c0->Update();
     }
   c0->Update();
+  /*
+  for (Int_t i = 0; i < NofModules; i++)
+    Module[i]->Write("", TObject::kOverwrite);
+  */
+  tFile->Close();
 }
 void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
 {
@@ -337,11 +348,16 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   HitPad->SetYTitle("count");
   HitPad->GetYaxis()->SetRangeUser(1,1e04);
 
-  c1 = new TCanvas("c1","c1",1000,900);	
+  sprintf(name,"c1_S%d_L%d",fStation,fLayer);
+  sprintf(title,"c1 Station %d, Layer %d",fStation,fLayer);
+  c1 = new TCanvas(name,title,1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
   Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
+
+  sprintf(name,"c2_S%d_L%d",fStation,fLayer);
+  sprintf(title,"c2 Station %d, Layer %d",fStation,fLayer);
+  c2 = new TCanvas(name,title,1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);
   c2->cd(1)->SetLogy(1);
@@ -349,6 +365,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   c2->cd(1)->SetGridy(1);
   
   HitPad->Draw();
+ 
 }
 
   // --------------------------------------------------------------------
@@ -629,6 +646,12 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
 }
 void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
+  Double_t ZRangeL = 1e00;//1e05;
+  Double_t ZRangeU = 1e05;//1e06;
+  TString name;
+  name.Form("Module%d",GeoPara->moduleId);
+  TH2F *Module = new TH2F(name,name,1500/mm2bin,-750,750,1500/mm2bin,-750,750);
+  Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
   //cout << "Histo" << endl;
   //cout << Mpos[2] << endl;
   const Int_t nR = nRow;
@@ -675,8 +698,11 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
 	      HitPad->Fill(HiteRate);
 	    }
+	  Int_t mStepY = Int_t((planeStartY-Mpos[1]));
+	  Int_t mStepX = Int_t((planeStartX-Mpos[0]));
 	  for (Int_t stepY = int(planeStartY/mm2bin); stepY < int(planeStopY/mm2bin); stepY++)
 	    {
+	      mStepX = Int_t((planeStartX-Mpos[0]));
 	      for (Int_t stepX = int(planeStartX/mm2bin); stepX < int(planeStopX/mm2bin); stepX++)
 		{
 		  if (Fast)
@@ -700,9 +726,12 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 		  else
 		    {
 		      //Layer->Fill(     stepX*mm2bin,     stepY*mm2bin,HiteRate);
-		      Layer->SetBinContent(stepX+int( winsize /mm2bin), stepY+int( winsize /mm2bin), HiteRate);
+		      Module->Fill(mStepX,mStepY,HiteRate);
+		      Layer ->SetBinContent(stepX+int( winsize /mm2bin), stepY+int( winsize /mm2bin), HiteRate);
 		    }
+		  mStepX += mm2bin;
 		}
+	      mStepY += mm2bin;
 	    }
 	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)             Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
 
@@ -731,6 +760,13 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
     c0->cd(i+1);
     Topview[i]->Draw("colz");
   }
+  Layer->Write("", TObject::kOverwrite);
+  HitPad->Write("", TObject::kOverwrite);
+  Module->Write("", TObject::kOverwrite);
+  delete Module;
+  for (Int_t i = 0; i < 3; i++)
+    Topview[i]->Write("", TObject::kOverwrite);
+
   //c0->Update();
   /*
     c2->cd(1);
@@ -811,7 +847,7 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
 {
   /*
- //----------------------Pad--------------------------------------
+  //----------------------Pad--------------------------------------
   const Int_t nR = nRow;
   const Int_t nC = nCol;
   Int_t iSecX = 0;
@@ -821,56 +857,56 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
   Int_t SecRow = int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
   Int_t SecCol = int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
   for (Int_t iR = 0; iR < nR; iR++)
-    {
-      StartX = Mpos[0]-Msize[0];
-      for (Int_t iC = 0; iC < nC; iC++)
-	{
-	  TLine* Pa = new TLine(StartX,
-				StartY,
-				StartX+Psize[0+iSecX*nSec],
-				StartY);
-	  TLine* Pb = new TLine(StartX,
-				StartY+Psize[1+iSecY*nSec],
-				StartX+Psize[0+iSecX*nSec],
-				StartY+Psize[1+iSecY*nSec]);
-	  TLine* Pc = new TLine(StartX,
-				StartY,
-				StartX,
-				StartY+Psize[1+iSecY*nSec]);
-	  TLine* Pd = new TLine(StartX+Psize[0+iSecX*nSec],
-				StartY,
-				StartX+Psize[0+iSecX*nSec],
-				StartY+Psize[1+iSecY*nSec]);
-	  c1->cd(1);
-	  Pa->SetLineColor(17);
-	  //Pa->SetLineStyle(3);
-	  Pa->Draw("same");
-	  Pb->SetLineColor(17);
-	  //Pb->SetLineStyle(3);
-	  Pb->Draw("same");
-	  Pc->SetLineColor(17);
-	  //Pc->SetLineStyle(3);
-	  Pc->Draw("same");
-	  Pd->SetLineColor(17);
-	  //Pd->SetLineStyle(3);
-	  Pd->Draw("same");
-	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)              Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
+  {
+  StartX = Mpos[0]-Msize[0];
+  for (Int_t iC = 0; iC < nC; iC++)
+  {
+  TLine* Pa = new TLine(StartX,
+  StartY,
+  StartX+Psize[0+iSecX*nSec],
+  StartY);
+  TLine* Pb = new TLine(StartX,
+  StartY+Psize[1+iSecY*nSec],
+  StartX+Psize[0+iSecX*nSec],
+  StartY+Psize[1+iSecY*nSec]);
+  TLine* Pc = new TLine(StartX,
+  StartY,
+  StartX,
+  StartY+Psize[1+iSecY*nSec]);
+  TLine* Pd = new TLine(StartX+Psize[0+iSecX*nSec],
+  StartY,
+  StartX+Psize[0+iSecX*nSec],
+  StartY+Psize[1+iSecY*nSec]);
+  c1->cd(1);
+  Pa->SetLineColor(17);
+  //Pa->SetLineStyle(3);
+  Pa->Draw("same");
+  Pb->SetLineColor(17);
+  //Pb->SetLineStyle(3);
+  Pb->Draw("same");
+  Pc->SetLineColor(17);
+  //Pc->SetLineStyle(3);
+  Pc->Draw("same");
+  Pd->SetLineColor(17);
+  //Pd->SetLineStyle(3);
+  Pd->Draw("same");
+  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)              Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
 
-	  if (iC == SecCol-1)
-	    {
-	      iSecX++;
-	      SecCol += int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
-	    }
-	  StartX += Psize[0+iSecX*nSec];
-	}
-      iSecX = 0;
-      if (iR == SecRow-1)
-	{          
-	  iSecY++;
-	  SecRow += int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
-	}
-      StartY += Psize[1+iSecY*nSec];
-    }
+  if (iC == SecCol-1)
+  {
+  iSecX++;
+  SecCol += int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
+  }
+  StartX += Psize[0+iSecX*nSec];
+  }
+  iSecX = 0;
+  if (iR == SecRow-1)
+  {          
+  iSecY++;
+  SecRow += int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
+  }
+  StartY += Psize[1+iSecY*nSec];
+  }
 
   */
   //----------------------Sector--------------------------------------
@@ -938,8 +974,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
   Mc->Draw("same");
   Md->Draw("same");
   //c1->Update();
- 
-  
+  c1->Write("", TObject::kOverwrite);
 }
 
   // -------------------------------------------------------------------

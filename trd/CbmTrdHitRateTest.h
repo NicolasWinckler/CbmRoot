@@ -104,6 +104,8 @@ class CbmTrdHitRateTest : public FairTask {
  
   Int_t Digicounter;
 
+  TFile *tFile;
+
   Int_t   fStation;
   Int_t   fLayer;
   Int_t   fModuleType;

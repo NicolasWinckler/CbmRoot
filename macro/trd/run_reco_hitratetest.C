@@ -38,6 +38,8 @@ void run_reco_hitratetest()
 
   gStyle->SetPalette(1);
   gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetOptTitle(kFALSE);
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;

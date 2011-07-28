@@ -4,7 +4,7 @@
  * @version 1.0
  **/
 
-#include "../../../littrack/utils/CbmLitDrawHist.cxx"
+//#include "../../../littrack/cbm/utils/CbmLitDrawHist.cxx"
 
 //CUT EFFICIENCY
 TH1D* sAll_chi_prim;
@@ -18,8 +18,31 @@ TH1D* bg_stcut;
 TH1D* bg_ttcut;
 TH1D* bg_ptcut;
 
+void scaleAllHistogramms(TFile* file, Int_t nofEvents)
+{
+    cout << "Scale all histogramms:" << endl;
+    TDirectory * dir = gDirectory;
+    TIter nextkey( dir->GetListOfKeys());
+    TKey *key;
+
+    Int_t count = 0;
+    while (key = (TKey*) nextkey()) {
+        TObject* obj = key->ReadObj();
+
+        if (obj->IsA()->InheritsFrom (TH1::Class())) {
+            TH1* h = (TH1*) obj;
+            cout << h->GetName() << endl;
+            TH1* h1 = (TH1*)file->Get(h->GetName());
+            h1->Scale(1./(Double_t)nofEvents);
+            count++;
+        }
+    }
+    cout << count << " histogramms were scaled." << endl;
+}
+
 void draw_minv(TH1* srho1, TH1* somega1, TH1* sphi1, TH1* bg1, TH1* eta, TH1* pi0, TH1* omegaDalitz)
 {
+
     TH1D* sRho = (TH1D*)srho1->Clone();
     sRho->SetFillColor(kMagenta-3);
     sRho->SetLineColor(kBlack);
@@ -59,6 +82,16 @@ void draw_minv(TH1* srho1, TH1* somega1, TH1* sphi1, TH1* bg1, TH1* eta, TH1* pi
     sbg->Add(sOmegaDalitz);
     sbg->SetMinimum(1e-8);
     sbg->SetMaximum(1e-1);
+
+    sbg->Rebin(10);
+	bg->Rebin(10);
+	sPi0->Rebin(10);
+	sEta->Rebin(10);
+	sOmegaDalitz->Rebin(10);
+	sOmega->Rebin(10);
+	sRho->Rebin(10);
+	sPhi->Rebin(10);
+
 
     sbg->Draw();
     bg->Draw("same");
@@ -155,8 +188,21 @@ void calc_cut_eff(Double_t min, Double_t max)
     leg->Draw();
 }
 
-void draw_analysis_all(){
-    TFile *fileRho0 = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/mytask.analysis.all.root");
+void draw_analysis_all()
+{
+	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+	basiclibs();
+
+	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+	cbmlibs();
+
+
+	Int_t fNofEvents;
+
+    TFile *fileRho0 = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/70_field/delta/mytask.analysis.delta.all.root");
+    fNofEvents = fh_event_number->GetEntries();
+	scaleAllHistogramms(fileRho0, fNofEvents);
+
     TH1D* rho_chi_prim = (TH1D*)fh_chi_prim_signal_minv->Clone();
     TH1D* rho_gammacut = (TH1D*)fh_gammacut_signal_minv->Clone();
     TH1D* rho_stcut = (TH1D*)fh_stcut_signal_minv->Clone();
@@ -181,21 +227,27 @@ void draw_analysis_all(){
     TH1D* pi0_ttcut = (TH1D*)fh_ttcut_pi0_minv->Clone();
     TH1D* pi0_ptcut = (TH1D*)fh_ptcut_pi0_minv->Clone();
 
-    TFile *fileOmega = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *fileOmega = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/70_field/delta/mytask.analysis.delta.all.root");
+    fNofEvents = fh_event_number->GetEntries();
+	scaleAllHistogramms(fileOmega, fNofEvents);
     TH1D* omega_chi_prim = (TH1D*)fh_chi_prim_signal_minv->Clone();
     TH1D* omega_gammacut = (TH1D*)fh_gammacut_signal_minv->Clone();
     TH1D* omega_stcut = (TH1D*)fh_stcut_signal_minv->Clone();
     TH1D* omega_ttcut = (TH1D*)fh_ttcut_signal_minv->Clone();
     TH1D* omega_ptcut = (TH1D*)fh_ptcut_signal_minv->Clone();
 
-    TFile *filePhi = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *filePhi = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/70_field/delta/mytask.analysis.delta.all.root");
+    fNofEvents = fh_event_number->GetEntries();
+	scaleAllHistogramms(filePhi, fNofEvents);
     TH1D* phi_chi_prim = (TH1D*)fh_chi_prim_signal_minv->Clone();
     TH1D* phi_gammacut = (TH1D*)fh_gammacut_signal_minv->Clone();
     TH1D* phi_stcut = (TH1D*)fh_stcut_signal_minv->Clone();
     TH1D* phi_ttcut = (TH1D*)fh_ttcut_signal_minv->Clone();
     TH1D* phi_ptcut = (TH1D*)fh_ptcut_signal_minv->Clone();
 
-    TFile *fileOmegaDalitz = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega_dalitz/25gev/100_field/real/mytask.analysis.all.root");
+    TFile *fileOmegaDalitz = new TFile("/lustre/cbm/user/ebelolap/oct10/urqmd_omega_dalitz/25gev/70_field/delta/mytask.analysis.delta.all.root");
+    fNofEvents = fh_event_number->GetEntries();
+	scaleAllHistogramms(fileOmegaDalitz, fNofEvents);
     TH1D* omegaD_chi_prim = (TH1D*)fh_chi_prim_signal_minv->Clone();
     TH1D* omegaD_gammacut = (TH1D*)fh_gammacut_signal_minv->Clone();
     TH1D* omegaD_stcut = (TH1D*)fh_stcut_signal_minv->Clone();

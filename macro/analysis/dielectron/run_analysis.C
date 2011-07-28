@@ -4,7 +4,7 @@
  * @version 1.0
  **/
 
-void run_analysis(Int_t nEvents = 700)
+void run_analysis(Int_t nEvents = 200, Int_t cutNum = 1)
 {
     Int_t iVerbose = 0;
 
@@ -16,10 +16,15 @@ void run_analysis(Int_t nEvents = 700)
     TString inFile1 = "", inFile2 = "", parFile = "", outFile ="";
 
     if (script != "yes") {
-        TString inFile1 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-        TString inFile2 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-        TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-        TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.analysis.root";
+        TString DIR="/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real";
+        TString inFile1 = DIR+"/mvd.mc.0000.root";
+        TString parFile = DIR+"/mvd.param.0000.root";
+        TString inFile2 = DIR+"/mvd.reco.0000.root";
+        TString outFile = DIR+"_test.root";
+        //TString inFile1 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+        //TString inFile2 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+        //TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+        //TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.analysis.root";
     } else {
         inFile1 = TString(gSystem->Getenv("MCFILE"));
         inFile2 = TString(gSystem->Getenv("RECOFILE"));
@@ -40,7 +45,8 @@ void run_analysis(Int_t nEvents = 700)
 
     // Number of events
     Int_t coutBunch = 100;
-
+    TStopwatch timer;
+    timer.Start();
 
     FairRunAna* fRun = new FairRunAna();
     fRun->SetName("TGeant3");
@@ -86,36 +92,74 @@ void run_analysis(Int_t nEvents = 700)
     if (plutoParticle == "pi0") task->SetWeight(4.38);
 
 
-/*
-     // electron ID cuts
-     task->SetRichAnnCut(-0.5);
-     task->SetUseRichAnn(true);
-     task->SetRichMom(5.5);
-     task->SetRichDist(1.);          // if 0. momentum dependent cut will be used
-     task->SetRichAxisAmean(4.95);
-     task->SetRichAxisAsigma(0.30);
-     task->SetRichAxisBmean(4.54);
-     task->SetRichAxisBsigma(0.22);
-     task->SetRichCoeff(3.5);        // +-3.5 * sigma cut
-     task->SetTrdEloss(0.05);
-     task->SetTrdAnn(0.8);
-     task->SetTofM2(0.);             // if 0. momentum dependent cut will be used
-     // di-electron analysis cuts
-     task->SetGcut(0.03);       // Gamma conversion cut (GeV/c^2)
-     task->Set2Dpcut(1.5);       // Sqrt(momentum) of closest neighbour (GeV/c)
-     task->Set2Dtcut(1.5);       // Opening angle of closest neighbour (deg)
-     task->SetPtcut(0.25);       // Transverse momentum of the identified tracks (GeV/c)
-     task->SetTcut(2.);         // Opening angle (deg)
-     task->SetPi0cut(0.2);      // pi0-Dalitz reconstruction
-     task->SetCoutBunch(coutBunch);
-*/  
-  
      task->SetUseRich(true);
      task->SetUseTrd(true);
      task->SetUseTof(true);
+/*
+     Double_t chiPr = 0.0;
+     Double_t angST = 0.0;
+     Double_t angTT = 0.0;
 
+     if (cutNum == 0){
+    	 chiPr = 1.5;
+    	 angST = 1.5;
+    	 angTT = 0.75;
+
+     } else if (cutNum == 1){
+    	 chiPr = 2;
+		 angST = 1.5;
+		 angTT = 0.75;
+
+     } else if (cutNum == 2){
+    	 chiPr = 3;
+		 angST = 1.5;
+		 angTT = 0.75;
+     } else if (cutNum == 3){
+    	 chiPr = 2;
+		 angST = 0.7;
+		 angTT = 0.75;
+     } else if (cutNum == 4){
+    	 chiPr = 3;
+		 angST = 1.5;
+		 angTT = 0.75;
+     } else if (cutNum == 5){
+    	 chiPr = 2;
+		 angST = 2.5;
+		 angTT = 0.75;
+     } else if (cutNum == 6){
+    	 chiPr = 2;
+		 angST = 3.;
+		 angTT = 0.75;
+     } else if (cutNum == 7){
+    	 chiPr = 3;
+		 angST = 0.7;
+		 angTT = 0.75;
+     } else if (cutNum == 8){
+    	 chiPr = 2;
+		 angST = 0.7;
+		 angTT = 2.;
+     } else if (cutNum == 9){
+    	 chiPr = 2;
+		 angST = 0.7;
+		 angTT = 3.5;
+     } else if (cutNum == 10){
+
+     } else if (cutNum == 11){
+
+     }*/
+     // ID cuts
+/*     task->SetTrdAnnCut(0.85);
+     task->SetRichAnnCut(0.0);
+     task->SetUseRichAnn(true);
+     // Analysis cuts
+     task->SetChiPrimCut(chiPr);
+     task->SetPtCut(0.2);
+     task->SetAngleCut(1.);
+     task->SetGammaCut(0.025);
+     task->SetSTCut(angST, 1.5);// ang, pp
+     task->SetTTCut(angTT, 4.);// ang, pp
+*/
      fRun->AddTask(task);
-
 
     TString stsDigi = gSystem->Getenv("VMCWORKDIR");
     stsDigi += "/parameters/sts/";
@@ -131,6 +175,14 @@ void run_analysis(Int_t nEvents = 700)
     fRun->Init();
     fRun->Run(0, nEvents);
 
+    timer.Stop();
+    Double_t rtime = timer.RealTime();
+    Double_t ctime = timer.CpuTime();
+    cout << endl << endl;
+    cout << "Macro finished succesfully." << endl;
+    cout << "Output file is " << outFile << endl;
+    cout << "Parameter file is " << parFile << endl;
+    cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
     cout << " Test passed" << endl;
     cout << " All ok " << endl;
     exit(0);

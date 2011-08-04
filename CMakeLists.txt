@@ -81,6 +81,7 @@ else(CBMROOT_MINIMAL)
   Else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
     set(BOOST_ROOT ${SIMPATH}/basics/boost)
   EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+  Message("-- Looking for Boost ...")
   find_package(Boost 1.41)
 endif(CBMROOT_MINIMAL)
 

@@ -7,7 +7,8 @@ INCLUDE(std/CMakeLists.txt)
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
 ${GEANT3_INCLUDE_DIR}
-${Boost_INCLUDE_DIR}
+#${Boost_INCLUDE_DIR}
+/misc/cbmsoft/Etch64/may11/fairsoft/basics/boost_1_46_1/include/
 #${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/std

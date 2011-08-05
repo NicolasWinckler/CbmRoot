@@ -40,8 +40,21 @@ public:
       std::ostream& out,
       boost::property_tree::ptree* pt);
 
-private:
+   static void PrintLineParLatexTable(
+         const std::string& parName,
+         Int_t nofLines,
+         const std::string& colName,
+         const std::string& name,
+         const std::vector<boost::property_tree::ptree>& pts);
 
+   static void PrintLineLatexTable(
+         const std::string& colName,
+         const std::string& name,
+         const std::vector<boost::property_tree::ptree>& pts);
+
+   static void PrintLatexTable();
+
+private:
 
    /* Prints nof points or hits or tracks or rings etc. statistics to string
     * @param  */
@@ -99,7 +112,6 @@ private:
    static std::string PolarAngleEfficiencyToString(
       boost::property_tree::ptree* pt,
       const std::string& name);
-
 };
 
 #endif /* CBMLITRECONSTRUCTIONQAPRINT_H_ */

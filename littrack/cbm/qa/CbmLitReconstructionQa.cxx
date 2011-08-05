@@ -6,6 +6,7 @@
 
 #include "qa/CbmLitReconstructionQa.h"
 #include "qa/CbmLitReconstructionQaImpl.h"
+#include "qa/CbmLitReconstructionQaPrint.h"
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
    FairTask("LitReconstructionQA", 1)
@@ -89,6 +90,12 @@ void CbmLitReconstructionQa::SetOutputDir(const std::string& dir)
    fImpl->SetOutputDir(dir);
 }
 
+
+void CbmLitReconstructionQa::SetOutputJsonFileName(const std::string& path)
+{
+   fImpl->SetOutputJsonFileName(path);
+}
+
 void CbmLitReconstructionQa::SetMomentumRange(Double_t minMom, Double_t maxMom)
 {
    fImpl->SetMomentumRange(minMom, maxMom);
@@ -113,6 +120,11 @@ void CbmLitReconstructionQa::SetDetectorPresence(
 void CbmLitReconstructionQa::SetIsElectronSetup(bool isElectronSetup)
 {
    fImpl->SetIsElectronSetup(isElectronSetup);
+}
+
+void CbmLitReconstructionQa::PrintLatexTable()
+{
+   CbmLitReconstructionQaPrint::PrintLatexTable();
 }
 
 ClassImp(CbmLitReconstructionQa);

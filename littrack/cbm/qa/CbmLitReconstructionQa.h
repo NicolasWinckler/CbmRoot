@@ -78,6 +78,10 @@ public:
     * @param dir Directory name. */
    void SetOutputDir(const std::string& dir);
 
+   /* Sets the output json file name.
+    * @param dir path. */
+   void SetOutputJsonFileName(const std::string& path);
+
    /* Sets momentum range for efficiency calculation */
    void SetMomentumRange(Double_t minMom, Double_t maxMom);
 
@@ -99,6 +103,8 @@ public:
    /* Set explicitly electron setup of the detector
     * isElectronSetup true if electron setup*/
    void SetIsElectronSetup(bool isElectronSetup);
+
+   static void PrintLatexTable();
 
 private:
    /* Derived from FairTask. Executed after all events are processed. */

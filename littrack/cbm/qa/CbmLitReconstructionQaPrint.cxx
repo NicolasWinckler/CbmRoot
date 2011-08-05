@@ -14,6 +14,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "utils/CbmLitUtils.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -582,3 +584,109 @@ std::string CbmLitReconstructionQaPrint::PolarAngleEfficiencyToString(
    return ss.str();
 }
 
+void CbmLitReconstructionQaPrint::PrintLineLatexTable(
+      const std::string& colName,
+      const std::string& name,
+      const std::vector<boost::property_tree::ptree>& pts)
+{
+   std::cout << " & ";
+   std::cout << colName ;
+   for (Int_t i = 0; i < pts.size(); i++){
+      std::cout << " & " << lit::ToString<Double_t>(pts[i].get(name, -1.), 1) ;
+   }
+   std::cout << " \\\\ \n " << std::endl;
+}
+
+void CbmLitReconstructionQaPrint::PrintLineParLatexTable(
+      const std::string& parName,
+      Int_t nofLines,
+      const std::string& colName,
+      const std::string& name,
+      const std::vector<boost::property_tree::ptree>& pts)
+{
+   std::cout << "\\multirow{"<<nofLines << "}{15mm}{\\begin{sideways}\\parbox{8mm}{"<<parName
+         << "}\\end{sideways}} & ";
+
+   std::cout << colName ;
+   for (Int_t i = 0; i < pts.size(); i++){
+      std::cout << " & " << lit::ToString<Double_t>(pts[i].get(name, -1.), 1) ;
+   }
+   std::cout << " \\\\ \n" << std::endl;
+}
+
+void CbmLitReconstructionQaPrint::PrintLatexTable()
+{
+   Int_t n = 4;
+   std::vector<std::string> files;
+   files.resize(n);
+   files[0] = std::string("/lustre/cbm/user/ebelolap/aug11/25gev/100field/nomvd/rho0/_req_qa_json_file.txt");
+   files[1] = std::string("/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/rho0/_req_qa_json_file.txt");
+   files[2] = std::string("/lustre/cbm/user/ebelolap/aug11/25gev/70field/nomvd/rho0/_req_qa_json_file.txt");
+   files[3] = std::string("/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/_req_qa_json_file.txt");
+   std::vector<boost::property_tree::ptree> pts;
+   pts.resize(n);
+   for (Int_t i = 0; i < 4; i++) {
+      read_json(files[i], pts[i]);
+   }
+
+   PrintLineLatexTable("nof events", "hEventNo", pts);
+
+   PrintLineParLatexTable("Nof hits, tracks", 9, "global tracks", "hNofGlobalTracks", pts);
+   PrintLineLatexTable("MVD hits", "hNofMvdHits", pts);
+   PrintLineLatexTable("STS hits", "hNofStsHits", pts);
+   PrintLineLatexTable("STS tracks", "hNofStsTracks", pts);
+   PrintLineLatexTable("RICH hits", "hNofRichHits", pts);
+   PrintLineLatexTable("RICH rings", "hNofRichRings", pts);
+   PrintLineLatexTable("TRD hits", "hNofTrdHits", pts);
+   PrintLineLatexTable("TRD tracks", "hNofTrdTracks", pts);
+   PrintLineLatexTable("TOF hits", "hNofTofHits", pts);
+   std::cout << "\\hline" <<std::endl;
+
+   PrintLineParLatexTable("Local reconstruction efficiency, signal electron", 10, "STS", "hStsMom.el.eff", pts);
+   PrintLineLatexTable("nof STS ghosts", "fhStsGhostNh", pts);
+   PrintLineLatexTable("nof STS ghosts, matching", "fhStsGhostRichMatchingNh", pts);
+   PrintLineLatexTable("RICH", "hRichMom.richEl.eff", pts);
+   PrintLineLatexTable("nof RICH ghosts", "fhRichGhostNh", pts);
+   PrintLineLatexTable("nof RICH ghosts, matching", "fhRichGhostStsMatchingNh", pts);
+   PrintLineLatexTable("nof RICH ghosts, el. id.", "fhRichGhostElIdNh", pts);
+   PrintLineLatexTable("TRD", "hRecMom.el.eff", pts);
+   PrintLineLatexTable("nof TRD ghosts", "fhRecGhostNh", pts);
+   PrintLineLatexTable("TOF matching", "hTofMom.el.eff", pts);
+   std::cout << "\\hline" <<std::endl;
+
+   PrintLineParLatexTable("Global reconstruction, signal electron", 4, "STS", "hStsMomNormStsRichTrdTof.richEl.eff", pts);
+   PrintLineLatexTable("STS+RICH", "hStsRichMomNormStsRichTrdTof.richEl.eff", pts);
+   PrintLineLatexTable("STS+RICH+TRD", "hStsRichTrdMomNormStsRichTrdTof.richEl.eff", pts);
+   PrintLineLatexTable("STS+RICH+TRD+TOF", "hStsRichTrdTofMom.richEl.eff", pts);
+   std::cout << "\\hline" <<std::endl;
+
+   PrintLineParLatexTable("Electron identification, pion suppression", 6, "RICH", "hStsRichMomElIdNormStsRichTrdTof.el.eff", pts);
+   PrintLineLatexTable("RICH", "hStsRichMomElIdNormStsRichTrdTof.pi.supp", pts);
+   PrintLineLatexTable("RICH+TRD", "hStsRichTrdMomElIdNormStsRichTrdTof.el.eff", pts);
+   PrintLineLatexTable("RICH+TRD", "hStsRichTrdMomElIdNormStsRichTrdTof.pi.supp", pts);
+   PrintLineLatexTable("RICH+TRD+TOF", "hStsRichTrdTofMomElId.el.eff", pts);
+   PrintLineLatexTable("RICH+TRD+TOF", "hStsRichTrdTofMomElId.pi.supp", pts);
+   std::cout << "\\hline" <<std::endl;
+
+   PrintLineParLatexTable("Detector acceptance, ACC/MC", 6, "STS", "hStsDetAccEl.detAccAcc.eff", pts);
+   PrintLineLatexTable("STS+RICH", "hStsRichDetAccEl.detAccAcc.eff", pts);
+   PrintLineLatexTable("STS+TRD", "hStsTrdDetAccEl.detAccAcc.eff", pts);
+   PrintLineLatexTable("STS+RICH+TRD", "hStsRichTrdDetAccEl.detAccAcc.eff", pts);
+   PrintLineLatexTable("STS+RICH+TRD+TOF", "hStsRichTrdTofDetAccEl.detAccAcc.eff", pts);
+   PrintLineLatexTable("STS+TRD+TOF", "hStsTrdTofDetAccEl.detAccAcc.eff", pts);
+   std::cout << "\\hline" <<std::endl;
+
+   PrintLineParLatexTable("Detector acceptance, REC/MC", 6, "STS", "hStsDetAccEl.detAccRec.eff", pts);
+   PrintLineLatexTable("STS+RICH", "hStsRichDetAccEl.detAccRec.eff", pts);
+   PrintLineLatexTable("STS+TRD", "hStsTrdDetAccEl.detAccRec.eff", pts);
+   PrintLineLatexTable("STS+RICH+TRD", "hStsRichTrdDetAccEl.detAccRec.eff", pts);
+   PrintLineLatexTable("STS+RICH+TRD+TOF", "hStsRichTrdTofDetAccEl.detAccRec.eff", pts);
+   PrintLineLatexTable("STS+TRD+TOF", "hStsTrdTofDetAccEl.detAccRec.eff", pts);
+   std::cout << "\\hline" <<std::endl;
+
+   PrintLineParLatexTable("STS qa", 4, "$\\chi^2_{prim}$ mean", "fhStsChiprim.mean", pts);
+   PrintLineLatexTable("$\\chi^2_{prim}$ rms", "fhStsChiprim.rms", pts);
+   PrintLineLatexTable("$dP/P$ [\\%] mean", "fhStsMomresVsMom.mean", pts);
+   PrintLineLatexTable("$dP/P$ [\\%] rms", "fhStsMomresVsMom.rms", pts);
+   std::cout << "\\hline" <<std::endl;
+}

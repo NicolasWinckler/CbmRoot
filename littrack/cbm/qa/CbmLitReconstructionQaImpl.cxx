@@ -1823,8 +1823,7 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
    PolarAngleEfficiencyToPTree(&pt, "hRecAngle", fhRecAngle);
    PolarAngleEfficiencyToPTree(&pt, "hTofAngle", fhTofAngle);
 
-   write_json("req_qa_json.txt", pt);
-
+   if (fOutputJsonFileName != "") write_json(fOutputJsonFileName, pt);
    return pt;
 }
 
@@ -2439,5 +2438,5 @@ void CbmLitReconstructionQaImpl::DrawHistosFromFile(const std::string& fileName)
 	//WriteToFile();
    boost::property_tree::ptree pt = PrintPTree();
    CbmLitReconstructionQaPrint::PrintFinalStatistics(std::cout, &pt);
-	Draw();
+	//Draw();
 }

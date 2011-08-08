@@ -1213,15 +1213,16 @@ void draw_analysis(){
 			source_tracks_clone->SetBinContent(x,y,val);
 		}
 	}
-	source_tracks_clone->GetXaxis()->SetBinLabel(1,"Reco");
-	source_tracks_clone->GetXaxis()->SetBinLabel(2,"Chi2");
-	source_tracks_clone->GetXaxis()->SetBinLabel(3,"ID");
-	source_tracks_clone->GetYaxis()->SetBinLabel(1,"gamma");
-	source_tracks_clone->GetYaxis()->SetBinLabel(2,"pi0");
-	source_tracks_clone->GetYaxis()->SetBinLabel(3,"pions");
-	source_tracks_clone->GetYaxis()->SetBinLabel(4,"protons");
-	source_tracks_clone->GetYaxis()->SetBinLabel(5,"kaons");
-	source_tracks_clone->GetYaxis()->SetBinLabel(6,"other");
+	Int_t nx = 4;
+	char* xLabels[4] = {"reco", "chiPrim", "el id", "gammacut"};
+	for (Int_t x = 1; x <= nx; x++){
+	   source_tracks_clone->GetXaxis()->SetBinLabel(x,xLabels[x-1]);
+	}
+   Int_t ny = 6;
+   char* yLabels[6] = {"gamma", "pi0", "pions", "protons", "kaons", "other"};
+   for (Int_t y = 1; y <= ny; y++){
+      source_tracks_clone->GetYaxis()->SetBinLabel(y,yLabels[y-1]);
+   }
 	source_tracks_clone->SetMarkerColor(0);
 	source_tracks_clone->Draw("text COLZ");
 

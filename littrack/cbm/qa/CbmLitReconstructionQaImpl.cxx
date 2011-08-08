@@ -6,6 +6,7 @@
 
 #include "qa/CbmLitReconstructionQaImpl.h"
 #include "qa/CbmLitReconstructionQaPrint.h"
+#include "qa/CbmLitReconstructionQaHTML.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitDrawHist.h"
@@ -2105,6 +2106,9 @@ void CbmLitReconstructionQaImpl::Draw()
    std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
    boost::property_tree::ptree pt = PrintPTree();
    CbmLitReconstructionQaPrint::PrintFinalStatistics(fout, &pt);
+
+   std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
+   CbmLitReconstructionQaHTML::PrintFinalStatistics(foutHtml, &pt);
 }
 
 void CbmLitReconstructionQaImpl::DrawEfficiencyHistos()

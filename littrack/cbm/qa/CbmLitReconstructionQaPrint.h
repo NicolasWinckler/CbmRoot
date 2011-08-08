@@ -11,7 +11,6 @@
 #include "TObject.h"
 #include <string>
 
-
 #include <boost/property_tree/ptree.hpp>
 
 
@@ -39,20 +38,6 @@ public:
    static void PrintFinalStatistics(
       std::ostream& out,
       boost::property_tree::ptree* pt);
-
-   static void PrintLineParLatexTable(
-         const std::string& parName,
-         Int_t nofLines,
-         const std::string& colName,
-         const std::string& name,
-         const std::vector<boost::property_tree::ptree>& pts);
-
-   static void PrintLineLatexTable(
-         const std::string& colName,
-         const std::string& name,
-         const std::vector<boost::property_tree::ptree>& pts);
-
-   static void PrintLatexTable();
 
 private:
 

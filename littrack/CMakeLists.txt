@@ -89,6 +89,7 @@ cbm/propagation/CbmPropagatorLit.cxx
 ##cbm/qa/CbmLitReconstructionQa.cxx
 cbm/qa/CbmLitReconstructionQaImpl.cxx
 cbm/qa/CbmLitReconstructionQaPrint.cxx
+cbm/qa/CbmLitReconstructionQaLatex.cxx
 ##cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/CbmLitCheckMultipleScattering.cxx
 ##cbm/qa/CbmLitPropagationAnalysis.cxx 

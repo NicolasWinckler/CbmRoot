@@ -104,7 +104,8 @@ public:
     * isElectronSetup true if electron setup*/
    void SetIsElectronSetup(bool isElectronSetup);
 
-   static void PrintLatexTable();
+   static void PrintLatexTable(
+         const std::vector<std::string>& files);
 
 private:
    /* Derived from FairTask. Executed after all events are processed. */

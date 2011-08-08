@@ -6,7 +6,7 @@
 
 #include "qa/CbmLitReconstructionQa.h"
 #include "qa/CbmLitReconstructionQaImpl.h"
-#include "qa/CbmLitReconstructionQaPrint.h"
+#include "qa/CbmLitReconstructionQaLatex.h"
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
    FairTask("LitReconstructionQA", 1)
@@ -122,9 +122,10 @@ void CbmLitReconstructionQa::SetIsElectronSetup(bool isElectronSetup)
    fImpl->SetIsElectronSetup(isElectronSetup);
 }
 
-void CbmLitReconstructionQa::PrintLatexTable()
+void CbmLitReconstructionQa::PrintLatexTable(
+      const std::vector<std::string>& files)
 {
-   CbmLitReconstructionQaPrint::PrintLatexTable();
+   CbmLitReconstructionQaLatex::PrintLatexTable(files);
 }
 
 ClassImp(CbmLitReconstructionQa);

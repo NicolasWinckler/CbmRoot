@@ -180,45 +180,44 @@ TH1D* CalculateCumulativeProbability(TH1D* histo, TString name, TString title)
 
 void draw_minv(TH1* s1, TH1* bg1)
 {
-    TH1D* s = (TH1D*)s1->Clone();
-	s->SetFillColor(kRed);
-    s->SetLineColor(kBlack);
-    TH1D* bg = (TH1D*)bg1->Clone();
-	bg->SetFillColor(kYellow - 10);
-    bg->SetLineColor(kBlack);
-	TH1D* sbg = (TH1D*)bg->Clone();
-    sbg->SetFillColor(kBlue);
-    sbg->SetLineColor(kBlack);
-    sbg->Add(s);
-	sbg->SetMinimum(1e-8);
-	sbg->Draw();
-	bg->Draw("same");
-	s->Draw("same");
-    gPad->SetGridx(true);
-    gPad->SetGridy(true);
-    gPad->SetLogy(true);
+   TH1D* s = (TH1D*)s1->Clone();
+   s->SetFillColor(kRed);
+   s->SetLineColor(kBlack);
+   TH1D* bg = (TH1D*)bg1->Clone();
+   bg->SetFillColor(kYellow - 10);
+   bg->SetLineColor(kBlack);
+   TH1D* sbg = (TH1D*)bg->Clone();
+   sbg->SetFillColor(kBlue);
+   sbg->SetLineColor(kBlack);
+   sbg->Add(s);
+   sbg->SetMinimum(1e-8);
+   sbg->Draw();
+   bg->Draw("same");
+   s->Draw("same");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+   gPad->SetLogy(true);
 }
 
 void scaleAllHistogramms(TFile* file, Int_t nofEvents)
 {
-    cout << "Scale all histogramms:" << endl;
-    TDirectory * dir = gDirectory;
-    TIter nextkey( dir->GetListOfKeys());
-    TKey *key;
+   cout << "Scale all histogramms:" << endl;
+   TDirectory * dir = gDirectory;
+   TIter nextkey( dir->GetListOfKeys());
+   TKey *key;
 
-    Int_t count = 0;
-    while (key = (TKey*) nextkey()) {
-        TObject* obj = key->ReadObj();
-
-        if (obj->IsA()->InheritsFrom (TH1::Class())) {
-            TH1* h = (TH1*) obj;
-            cout << h->GetName() << endl;
-            TH1* h1 = (TH1*)file->Get(h->GetName());
-            h1->Scale(1./(Double_t)nofEvents);
-            count++;
-        }
-    }
-    cout << count << " histogramms were scaled." << endl;
+   Int_t count = 0;
+   while (key = (TKey*) nextkey()) {
+      TObject* obj = key->ReadObj();
+      if (obj->IsA()->InheritsFrom (TH1::Class())) {
+         TH1* h = (TH1*) obj;
+         cout << h->GetName() << endl;
+         TH1* h1 = (TH1*)file->Get(h->GetName());
+         h1->Scale(1./(Double_t)nofEvents);
+         count++;
+      }
+   }
+   cout << count << " histogramms were scaled." << endl;
 }
 
 void draw_analysis(){
@@ -229,7 +228,8 @@ void draw_analysis(){
     gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
     cbmlibs();
 
-    TString fileName = "/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/70_field/delta/mytask.analysis.delta.all.root";
+    Bool_t fUseMvd = true;
+    TString fileName = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/phi/analysis.all.root";
     TFile *file = new TFile(fileName);
 
     gStyle->SetHistLineWidth(3);
@@ -246,8 +246,8 @@ void draw_analysis(){
     calculateSignalOverBg(fh_chi_prim_signal_minv, fh_chi_prim_bg_minv);
     calculateSignalOverBg(fh_el_id_signal_minv, fh_el_id_bg_minv);
     calculateSignalOverBg(fh_gammacut_signal_minv, fh_gammacut_bg_minv);
-    calculateSignalOverBg(fh_dstscut_signal_minv, fh_dstscut_bg_minv);
-    calculateSignalOverBg(fh_dsts2cut_signal_minv, fh_dsts2cut_bg_minv);
+    if (fUseMvd) calculateSignalOverBg(fh_dstscut_signal_minv, fh_dstscut_bg_minv);
+    if (fUseMvd) calculateSignalOverBg(fh_dsts2cut_signal_minv, fh_dsts2cut_bg_minv);
     calculateSignalOverBg(fh_stcut_signal_minv, fh_stcut_bg_minv);
     calculateSignalOverBg(fh_ttcut_signal_minv, fh_ttcut_bg_minv);
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
@@ -257,112 +257,115 @@ void draw_analysis(){
 //SCALE ALL HISTOGRAMMS
     scaleAllHistogramms(file, fNofEvents);
 
+    Int_t hi = 1;
 // pty distribution of signal
-    TCanvas *c2 = new TCanvas("c2-pty","c2-pty",1000,1000);
-    c2->Divide(4,4);
-    c2->cd(1);
+    TCanvas *c2 = new TCanvas("c2-pty","c2-pty",750,1000);
+    c2->Divide(3,4);
+    c2->cd(hi++);
     fh_mc_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_mc_signal_pty, fh_mc_signal_pty);
-    c2->cd(2);
+    c2->cd(hi++);
     fh_acc_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_acc_signal_pty, fh_mc_signal_pty);
-    c2->cd(3);
+    c2->cd(hi++);
     fh_reco_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_reco_signal_pty, fh_mc_signal_pty);
-    c2->cd(4);
+    c2->cd(hi++);
     fh_chi_prim_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_chi_prim_signal_pty, fh_mc_signal_pty);
-    c2->cd(5);
+    c2->cd(hi++);
     fh_el_id_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_el_id_signal_pty, fh_mc_signal_pty);
-    c2->cd(6);
+    c2->cd(hi++);
     fh_gammacut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_gammacut_signal_pty, fh_mc_signal_pty);
-    c2->cd(7);
-    fh_dstscut_signal_pty->Draw("COLZ");
-    draw_eff_pty(fh_dstscut_signal_pty, fh_mc_signal_pty);
-    c2->cd(8);
-    fh_dsts2cut_signal_pty->Draw("COLZ");
-    draw_eff_pty(fh_dsts2cut_signal_pty, fh_mc_signal_pty);
-    c2->cd(9);
+    if (fUseMvd) {
+       c2->cd(hi++);
+       fh_dstscut_signal_pty->Draw("COLZ");
+       draw_eff_pty(fh_dstscut_signal_pty, fh_mc_signal_pty);
+       c2->cd(hi++);
+       fh_dsts2cut_signal_pty->Draw("COLZ");
+       draw_eff_pty(fh_dsts2cut_signal_pty, fh_mc_signal_pty);
+    }
+    c2->cd(hi++);
     fh_stcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_stcut_signal_pty, fh_mc_signal_pty);
-    c2->cd(10);
+    c2->cd(hi++);
     fh_ttcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ttcut_signal_pty, fh_mc_signal_pty);
-    c2->cd(11);
+    c2->cd(hi++);
     fh_ptcut_signal_pty->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_mc_signal_pty);
-    c2->cd(13);
- //   fh_anglecut_signal_pty->Draw("COLZ");
-//    draw_eff_pty(fh_anglecut_signal_pty, fh_mc_signal_pty);
-    c2->cd(12);
-
-/*
-   fh_apmcut_signal_pty->Draw("COLZ");
-    draw_eff_pty(fh_apmcut_signal_pty, fh_mc_signal_pty);
-*/
+    c2->cd(hi++);
+    fh_anglecut_signal_pty->Draw("COLZ");
+    draw_eff_pty(fh_anglecut_signal_pty, fh_mc_signal_pty);
+    c2->cd(hi++);
+   //fh_apmcut_signal_pty->Draw("COLZ");
+   //draw_eff_pty(fh_apmcut_signal_pty, fh_mc_signal_pty);
 
 
+    hi = 1;
 //pty efficiency of signal
-    TCanvas *c3 = new TCanvas("c3-pty eff","c3-pty eff",1000,750);
-    c3->Divide(4,3);
-    c3->cd(1);
+    TCanvas *c3 = new TCanvas("c3-pty eff","c3-pty eff",750,1000);
+    c3->Divide(3,4);
+    c3->cd(hi++);
     TH2D* fh_acc_signal_pty_eff = divideHisto2D(fh_acc_signal_pty, fh_mc_signal_pty);
     fh_acc_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_acc_signal_pty, fh_mc_signal_pty);
 
-    c3->cd(2);
+    c3->cd(hi++);
     TH2D* fh_reco_signal_pty_eff = divideHisto2D(fh_reco_signal_pty, fh_acc_signal_pty);
     fh_reco_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_reco_signal_pty, fh_acc_signal_pty);
 
-    c3->cd(3);
+    c3->cd(hi++);
     TH2D* fh_chi_prim_signal_pty_eff = divideHisto2D(fh_chi_prim_signal_pty, fh_reco_signal_pty);
     fh_chi_prim_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_chi_prim_signal_pty, fh_reco_signal_pty);
 
-    c3->cd(4);
+    c3->cd(hi++);
     TH2D* fh_el_id_signal_pty_eff = divideHisto2D(fh_el_id_signal_pty, fh_chi_prim_signal_pty);
     fh_el_id_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_el_id_signal_pty, fh_chi_prim_signal_pty);
 
-    c3->cd(5);
+    c3->cd(hi++);
     TH2D* fh_gammacut_signal_pty_eff = divideHisto2D(fh_gammacut_signal_pty, fh_el_id_signal_pty);
     fh_gammacut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_gammacut_signal_pty, fh_el_id_signal_pty);
 
-    c3->cd(6);
-//    TH2D* fh_dstscut_signal_pty_eff = divideHisto2D(fh_dstscut_signal_pty, fh_gammacut_signal_pty);
-//    fh_dstscut_signal_pty_eff->Draw("COLZ");
-//    draw_eff_pty(fh_dstscut_signal_pty, fh_gammacut_signal_pty);
+    if (fUseMvd) {
+    c3->cd(hi++);
+       TH2D* fh_dstscut_signal_pty_eff = divideHisto2D(fh_dstscut_signal_pty, fh_gammacut_signal_pty);
+       fh_dstscut_signal_pty_eff->Draw("COLZ");
+       draw_eff_pty(fh_dstscut_signal_pty, fh_gammacut_signal_pty);
 
-    c3->cd(7);
-    //    TH2D* fh_dsts2cut_signal_pty_eff = divideHisto2D(fh_dsts2cut_signal_pty, fh_dstscut_signal_pty);
-    //    fh_dsts2cut_signal_pty_eff->Draw("COLZ");
-    //    draw_eff_pty(fh_dsts2cut_signal_pty, fh_dstscut_signal_pty);
+       c3->cd(hi++);
+       TH2D* fh_dsts2cut_signal_pty_eff = divideHisto2D(fh_dsts2cut_signal_pty, fh_dstscut_signal_pty);
+       fh_dsts2cut_signal_pty_eff->Draw("COLZ");
+       draw_eff_pty(fh_dsts2cut_signal_pty, fh_dstscut_signal_pty);
+    }
 
-    c3->cd(8);
-    //    TH2D* fh_stcut_signal_pty_eff = divideHisto2D(fh_stcut_signal_pty, fh_dsts2cut_signal_pty);
-    //    fh_stcut_signal_pty_eff->Draw("COLZ");
-     //   draw_eff_pty(fh_stcut_signal_pty, fh_dstscut_signal_pty);
+    c3->cd(hi++);
+    TH2D* fh_stcut_signal_pty_eff = divideHisto2D(fh_stcut_signal_pty, fh_dsts2cut_signal_pty);
+    fh_stcut_signal_pty_eff->Draw("COLZ");
+    draw_eff_pty(fh_stcut_signal_pty, fh_dstscut_signal_pty);
 
-    c3->cd(9);
+    c3->cd(hi++);
     TH2D* fh_ttcut_signal_pty_eff = divideHisto2D(fh_ttcut_signal_pty, fh_stcut_signal_pty);
     fh_ttcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_ttcut_signal_pty, fh_stcut_signal_pty);
 
-    c3->cd(10);
+    c3->cd(hi++);
     TH2D* fh_ptcut_signal_pty_eff = divideHisto2D(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
     fh_ptcut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_ptcut_signal_pty, fh_ttcut_signal_pty);
 
-    c3->cd(11);
+    c3->cd(hi++);
     TH2D* fh_anglecut_signal_pty_eff = divideHisto2D(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
     fh_anglecut_signal_pty_eff->Draw("COLZ");
     draw_eff_pty(fh_anglecut_signal_pty, fh_ptcut_signal_pty);
 
-    c3->cd(12);
+    c3->cd(hi++);
     //TH2D* fh_apmcut_signal_pty_eff = divideHisto2D(fh_apmcut_signal_pty, fh_anglecut_signal_pty);
     //fh_apmcut_signal_pty_eff->Draw("COLZ");
     //draw_eff_pty(fh_apmcut_signal_pty, fh_anglecut_signal_pty);
@@ -374,8 +377,8 @@ void draw_analysis(){
     fh_reco_signal_mom->SetLineColor(kBlue);
     fh_chi_prim_signal_mom->SetLineColor(kViolet);
     fh_el_id_signal_mom->SetLineColor(kGreen);
- //   fh_dstscut_signal_mom->SetLineColor(kMagenta);
-    //   fh_dsts2cut_signal_mom->SetLineColor(kBlack);
+    if (fUseMvd) fh_dstscut_signal_mom->SetLineColor(kMagenta);
+    if (fUseMvd) fh_dsts2cut_signal_mom->SetLineColor(kBlack);
     fh_gammacut_signal_mom->SetLineColor(kGreen+3);
     fh_stcut_signal_mom->SetLineColor(kOrange-3);
     fh_ttcut_signal_mom->SetLineColor(kYellow+7);
@@ -387,8 +390,8 @@ void draw_analysis(){
     fh_reco_signal_mom->Draw("same");
     fh_chi_prim_signal_mom->Draw("same");
     fh_el_id_signal_mom->Draw("same");
- //   fh_dstscut_signal_mom->Draw("same");
-    //   fh_dsts2cut_signal_mom->Draw("same");
+    if (fUseMvd) fh_dstscut_signal_mom->Draw("same");
+    if (fUseMvd) fh_dsts2cut_signal_mom->Draw("same");
     fh_gammacut_signal_mom->Draw("same");
     fh_stcut_signal_mom->Draw("same");
     fh_ttcut_signal_mom->Draw("same");
@@ -402,8 +405,8 @@ void draw_analysis(){
     leg3->AddEntry(fh_reco_signal_mom, "rec", "l");
     leg3->AddEntry(fh_chi_prim_signal_mom, "chi prim", "l");
     leg3->AddEntry(fh_el_id_signal_mom, "rich id", "l");
-//    leg3->AddEntry(fh_dstscut_signal_mom, "dsts cut", "l");
-//    leg3->AddEntry(fh_dsts2cut_signal_mom, "dsts2 cut", "l");
+    if (fUseMvd) leg3->AddEntry(fh_dstscut_signal_mom, "dsts cut", "l");
+    if (fUseMvd) leg3->AddEntry(fh_dsts2cut_signal_mom, "dsts2 cut", "l");
     leg3->AddEntry(fh_gammacut_signal_mom, "gamma cut", "l");
     leg3->AddEntry(fh_stcut_signal_mom, "st cut", "l");
     leg3->AddEntry(fh_ttcut_signal_mom, "tt cut", "l");
@@ -508,66 +511,57 @@ void draw_analysis(){
     gPad->SetLogy(true);
 
 //ANALYSIS CUTS
+    hi = 1;
     TCanvas *c7 = new TCanvas("c7-cuts", "c7-cuts", 1000, 1000);
     c7->Divide(4,3);
-    c7->cd(1);
+    c7->cd(hi++);
     Double_t scaleSig = 1./fh_chi2_prim_signal->Integral();
     Double_t scaleBg = 1./fh_chi2_prim_bg->Integral();
     fh_chi2_prim_signal->SetLineColor(kRed);
     fh_chi2_prim_bg->SetLineColor(kBlue);
+    fh_chi2_prim_signal->SetLineWidth(2);
+    fh_chi2_prim_bg->SetLineWidth(2);
     fh_chi2_prim_signal->Draw();
     fh_chi2_prim_bg->Draw("same");
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c7->cd(2);
+    c7->cd(hi++);
     TH1D* fh_sig_chi2_prim = CalculateSignificance(fh_chi2_prim_signal, fh_chi2_prim_bg,
         "chi2_prim_significance", "significance", "forward");
+    fh_sig_chi2_prim->SetLineWidth(2);
     fh_sig_chi2_prim->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     fh_chi2_prim_signal->Scale(scaleSig);
     fh_chi2_prim_bg->Scale(scaleBg);
 
-    c7->cd(3);
+    c7->cd(hi++);
     Double_t scaleSig = 1./fh_pt_signal->Integral();
     Double_t scaleBg = 1./fh_pt_bg->Integral();
     fh_pt_signal->SetLineColor(kRed);
     fh_pt_bg->SetLineColor(kBlue);
+    fh_pt_signal->SetLineWidth(2);
+    fh_pt_bg->SetLineWidth(2);
     fh_pt_signal->Draw();
     fh_pt_bg->Draw("same");
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c7->cd(4);
+    c7->cd(hi++);
     TH1D* fh_sig_pt = CalculateSignificance(fh_pt_signal, fh_pt_bg , "pt_significance", "significance", "back");
+    fh_sig_pt->SetLineWidth(2);
     fh_sig_pt->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     fh_pt_signal->Scale(scaleSig);
     fh_pt_bg->Scale(scaleBg);
 
-    c7->cd(5);
-    Double_t scaleSig = 1./fh_position_signal->Integral();
-    Double_t scaleBg = 1./fh_position_bg->Integral();
-    fh_position_signal->SetLineColor(kRed);
-    fh_position_bg->SetLineColor(kBlue);
-    fh_position_signal->Draw();
-    fh_position_bg->Draw("same");
-    gPad->SetGridx(true);
-    gPad->SetGridy(true);
-    gPad->SetLogy(true);
-    c7->cd(6);
-    TH1D* fh_sig_position = CalculateSignificance(fh_position_signal, fh_position_bg, "position_significance", "significance", "back");
-    fh_sig_position->Draw();
-    gPad->SetGridx(true);
-    gPad->SetGridy(true); 
-    fh_position_signal->Scale(scaleSig);
-    fh_position_bg->Scale(scaleBg);
-
-    c7->cd(7);
+    c7->cd(hi++);
     Double_t scaleSig = 1./fh_angle_signal->Integral();
     Double_t scaleBg = 1./fh_angle_bg->Integral();
+    fh_angle_signal->SetLineWidth(2);
+    fh_angle_bg->SetLineWidth(2);
     fh_angle_signal->SetLineColor(kRed);
     fh_angle_bg->SetLineColor(kBlue);
     fh_angle_signal->Draw();
@@ -575,17 +569,20 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c7->cd(8);
+    c7->cd(hi++);
     TH1D* fh_sig_angle = CalculateSignificance(fh_angle_signal,fh_angle_bg, "angle_significance", "significance", "back");
+    fh_sig_angle->SetLineWidth(2);
     fh_sig_angle->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     fh_angle_signal->Scale(scaleSig);
     fh_angle_bg->Scale(scaleBg);
 
-    c7->cd(9);
+    c7->cd(hi++);
     Double_t scaleSig = 1./fh_mom_signal->Integral();
     Double_t scaleBg = 1./fh_mom_bg->Integral();
+    fh_mom_signal->SetLineWidth(2);
+    fh_mom_bg->SetLineWidth(2);
     fh_mom_signal->SetLineColor(kRed);
     fh_mom_bg->SetLineColor(kBlue);
     fh_mom_signal->Draw();
@@ -593,92 +590,75 @@ void draw_analysis(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-    c7->cd(10); 
+    c7->cd(hi++);
     TH1D* fh_sig_mom = CalculateSignificance(fh_mom_signal,fh_mom_bg, "momentum_significance", "significance", "back");
+    fh_sig_mom->SetLineWidth(2);
     fh_sig_mom->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     fh_mom_signal->Scale(scaleSig);
     fh_mom_bg->Scale(scaleBg);
 
-//    c7->cd(11);
-//    Double_t scaleSig = 1./fh_chi2sts_signal->Integral();
-//    Double_t scaleBg = 1./fh_chi2sts_bg->Integral();
-//    fh_chi2sts_signal->SetLineColor(kRed);
-//    fh_chi2sts_bg->SetLineColor(kBlue);
-//    fh_chi2sts_signal->Draw();
-//    fh_chi2sts_bg->Draw("same");
-//    gPad->SetGridx(true);
-//    gPad->SetGridy(true);
-//    gPad->SetLogy(true);
-//    c7->cd(12);
-//    TH1D* fh_sig_chi2sts = CalculateSignificance(fh_chi2sts_signal,fh_chi2sts_bg, "chi2sts_significance", "significance", "forward");
-//    fh_sig_chi2sts->Draw();
- //   gPad->SetGridx(true);
- //   gPad->SetGridy(true);
- //   fh_chi2sts_signal->Scale(scaleSig);
- //   fh_chi2sts_bg->Scale(scaleBg);
+    c7->cd(hi++);
+    Double_t scaleSig = 1./fh_chi2sts_signal->Integral();
+    Double_t scaleBg = 1./fh_chi2sts_bg->Integral();
+    fh_chi2sts_signal->SetLineWidth(2);
+    fh_chi2sts_bg->SetLineWidth(2);
+    fh_chi2sts_signal->SetLineColor(kRed);
+    fh_chi2sts_bg->SetLineColor(kBlue);
+    fh_chi2sts_signal->Draw();
+    fh_chi2sts_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    c7->cd(hi++);
+    TH1D* fh_sig_chi2sts = CalculateSignificance(fh_chi2sts_signal,fh_chi2sts_bg, "chi2sts_significance", "significance", "forward");
+    fh_sig_chi2sts->SetLineWidth(2);
+    fh_sig_chi2sts->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    fh_chi2sts_signal->Scale(scaleSig);
+    fh_chi2sts_bg->Scale(scaleBg);
 
 //SOURCE OF BG CANDIDATES
-    Double_t sumofbins1 =0;
-    Double_t sumofbins2 =0;
-    Double_t sumofbins3 =0;
-    Double_t sumofbins4 =0;
-    Double_t sumofbins5 =0;
-    Double_t sumofbins6 =0;
-    Double_t sumofbins7 =0;
-    Double_t sumofbins8 =0;
-    Double_t sumofbins9 =0;
-    Double_t sumofbins10 =0;
-    Double_t sumofbins11 =0;
-    for (int x = 1; x <= 3; x++){
-        for (int y =1;y<=3; y++) {
-          sumofbins1 += fh_source_pair_reco->GetBinContent(x,y);
-          sumofbins2 += fh_source_pair_el_id->GetBinContent(x,y);
-          sumofbins4 += fh_source_pair_dstscut->GetBinContent(x,y);
-          sumofbins5 += fh_source_pair_chi_prim->GetBinContent(x,y);
-          sumofbins6 += fh_source_pair_ptcut->GetBinContent(x,y);
-          sumofbins7 += fh_source_pair_anglecut->GetBinContent(x,y);
-          sumofbins8 += fh_source_pair_gammacut->GetBinContent(x,y);
-          sumofbins9 += fh_source_pair_ttcut->GetBinContent(x,y);
-   //       sumofbins10 += fh_source_pair_apmcut->GetBinContent(x,y);
-          sumofbins11 += fh_source_pair_stcut->GetBinContent(x,y);
-        }
-    }
-    if (sumofbins1 != 0) fh_source_pair_reco->Scale(100. * 1./sumofbins1);
-    if (sumofbins2 != 0) fh_source_pair_el_id->Scale(100. * 1./sumofbins2);
-    if (sumofbins4 != 0) fh_source_pair_dstscut->Scale(100. * 1./sumofbins4);
-    if (sumofbins5 != 0) fh_source_pair_chi_prim->Scale(100. * 1./sumofbins5);
-    if (sumofbins6 != 0) fh_source_pair_ptcut->Scale(100. * 1./sumofbins6);
-    if (sumofbins7 != 0) fh_source_pair_anglecut->Scale(100. * 1./sumofbins7);
-    if (sumofbins8 != 0) fh_source_pair_gammacut->Scale(100. * 1./sumofbins8);
-    if (sumofbins9 != 0) fh_source_pair_ttcut->Scale(100. * 1./sumofbins9);
- //   if (sumofbins10 != 0) fh_source_pair_apmcut->Scale(100. * 1./sumofbins10);
-    if (sumofbins11 != 0) fh_source_pair_stcut->Scale(100. * 1./sumofbins11);
+    fh_source_pair_reco->Scale(100. /fh_source_pair_reco->Integral());
+    fh_source_pair_chi_prim->Scale(100. /fh_source_pair_chi_prim->Integral());
+    fh_source_pair_el_id->Scale(100. /fh_source_pair_el_id->Integral());
+    fh_source_pair_gammacut->Scale(100. /fh_source_pair_gammacut->Integral());
+    fh_source_pair_dstscut->Scale(100. /fh_source_pair_dstscut->Integral());
+    fh_source_pair_dsts2cut->Scale(100. /fh_source_pair_dsts2cut->Integral());
+    fh_source_pair_stcut->Scale(100. /fh_source_pair_stcut->Integral());
+    fh_source_pair_ttcut->Scale(100. /fh_source_pair_ttcut->Integral());
+    fh_source_pair_ptcut->Scale(100. /fh_source_pair_ptcut->Integral());
+    fh_source_pair_anglecut->Scale(100. /fh_source_pair_anglecut->Integral());
+    //fh_source_pair_apmcut->Scale(100. /fh_source_pair_apmcut->Integral());
 
+    hi = 1;
     TCanvas *c8 = new TCanvas("c8-pair sources", "c8-pair sources", 1000, 750);
     c8->Divide(4,3);
-    c8->cd(1);
+    c8->cd(hi++);
     fh_source_pair_reco->Draw("COLZ");
-    c8->cd(2);
+    c8->cd(hi++);
     fh_source_pair_chi_prim->Draw("COLZ");
-    c8->cd(3);
+    c8->cd(hi++);
     fh_source_pair_el_id->Draw("COLZ");
-    c8->cd(4);
-
-    c8->cd(5);
+    c8->cd(hi++);
     fh_source_pair_gammacut->Draw("COLZ");
-    c8->cd(6);
-//    fh_source_pair_dstscut->Draw("COLZ");
-    c8->cd(7);
+    if (fUseMvd){
+       c8->cd(hi++);
+       fh_source_pair_dstscut->Draw("COLZ");
+       c8->cd(hi++);
+       fh_source_pair_dsts2cut->Draw("COLZ");
+    }
+    c8->cd(hi++);
     fh_source_pair_stcut->Draw("COLZ");
-    c8->cd(8);
+    c8->cd(hi++);
     fh_source_pair_ttcut->Draw("COLZ");
-    c8->cd(9);
+    c8->cd(hi++);
     fh_source_pair_ptcut->Draw("COLZ");
-    c8->cd(10);
+    c8->cd(hi++);
     fh_source_pair_anglecut->Draw("COLZ");
-    c8->cd(11);
+    c8->cd(hi++);
   // fh_source_pair_apmcut->Draw("COLZ");
 
 
@@ -715,6 +695,8 @@ void draw_analysis(){
     TH1D* apmcut_py_bg = fh_apmcut_bg->ProjectionY();
     Double_t scaleSig = 1./apmcut_py_s->Integral();
     Double_t scaleBg = 1./apmcut_py_bg->Integral();
+    apmcut_py_s->SetLineWidth(2);
+    apmcut_py_bg->SetLineWidth(2);
     apmcut_py_s->SetLineColor(kRed);
     apmcut_py_bg->SetLineColor(kBlue);
     apmcut_py_s->Draw();
@@ -724,7 +706,8 @@ void draw_analysis(){
     gPad->SetLogy(true);
     c10->cd(4);
     TH1D* fh_sig_apmcut_py = CalculateSignificance(apmcut_py_s, apmcut_py_bg, 
-        "apmcut_py_significance", "significance", "back");
+        "apmcut_py_significance", "significance;p_{t} [GeV/c];significance", "back");
+    fh_sig_apmcut_py->SetLineWidth(2);
     fh_sig_apmcut_py->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
@@ -733,8 +716,8 @@ void draw_analysis(){
 
 
 //TRACK TOPOLOGY CUT DISTRIBUTION FOR SEGMENT TRACKS
-    TCanvas *c11 = new TCanvas("c11-stcut", "c11-stcut", 1200, 900);
-    c11->Divide(4,3);
+    TCanvas *c11 = new TCanvas("c11-stcut", "c11-stcut", 1200, 600);
+    c11->Divide(4,2);
     c11->cd(1);
     fh_stcut_signal->Draw("COLZ");
     c11->cd(2);
@@ -748,6 +731,8 @@ void draw_analysis(){
     TH1D* stcut_px_bg = fh_stcut_bg->ProjectionX();
     Double_t scaleSig = 1./stcut_px_s->Integral();
     Double_t scaleBg = 1./stcut_px_bg->Integral();
+    stcut_px_s->SetLineWidth(2);
+    stcut_px_bg->SetLineWidth(2);
     stcut_px_s->SetLineColor(kRed);
     stcut_px_bg->SetLineColor(kBlue);
     stcut_px_s->Draw();
@@ -756,41 +741,46 @@ void draw_analysis(){
     gPad->SetGridy(true);
     gPad->SetLogy(true);
     c11->cd(6);
-    TH1D* fh_sig_stcut_px = CalculateSignificance(stcut_px_s, stcut_px_bg, 
-        "stcut_px_significance", "significance", "back");
+    TH1D* fh_sig_stcut_px = CalculateSignificance(stcut_px_s, stcut_px_bg, "stcut_px_significance",
+          "significance;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];significance", "back");
+    fh_sig_stcut_px->SetLineWidth(2);
     fh_sig_stcut_px->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     stcut_px_s->Scale(scaleSig);
     stcut_px_bg->Scale(scaleBg);
 
-  //  c11->cd(7);
- //   TH1D* stcut_py_s = fh_stcut_signal->ProjectionY();
-//    TH1D* stcut_py_bg = fh_stcut_bg->ProjectionY();
- //   Double_t scaleSig = 1./stcut_py_s->Integral();
-//    Double_t scaleBg = 1./stcut_py_bg->Integral();
-//    stcut_py_s->SetLineColor(kRed);
-  //  stcut_py_bg->SetLineColor(kBlue);
-  //  stcut_py_s->Draw();
- //   stcut_py_bg->Draw("same");
-  //  gPad->SetGridx(true);
-  //  gPad->SetGridy(true);
-  //  gPad->SetLogy(true);
- //   stcut_py_s->Scale(scaleSig);
- //   stcut_py_bg->Scale(scaleBg);
+    c11->cd(7);
+    TH1D* stcut_py_s = fh_stcut_signal->ProjectionY();
+    TH1D* stcut_py_bg = fh_stcut_bg->ProjectionY();
+    Double_t scaleSig = 1./stcut_py_s->Integral();
+    Double_t scaleBg = 1./stcut_py_bg->Integral();
+    stcut_py_s->SetLineWidth(2);
+    stcut_py_bg->SetLineWidth(2);
+    stcut_py_s->SetLineColor(kRed);
+    stcut_py_bg->SetLineColor(kBlue);
+    stcut_py_s->Draw();
+    stcut_py_bg->Draw("same");
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+    gPad->SetLogy(true);
+    stcut_py_s->Scale(scaleSig);
+    stcut_py_bg->Scale(scaleBg);
 
- //   c11->cd(8);
- //   TH1D* fh_sig_stcut_py = CalculateSignificance(stcut_py_s, stcut_py_bg,
-  //      "stcut_py_significance", "significance", "back");
-  //  fh_sig_stcut_py->Draw();
-  //  gPad->SetGridx(true);
-  //  gPad->SetGridy(true);
- //   c11->cd(9);
- //   TH2D* fh_significance = CalculateSignificance2D(fh_stcut_signal, fh_stcut_bg, "stcut_2dsignificance", "significance");
- //   fh_significance->Draw("COLZ");
+    c11->cd(8);
+    TH1D* fh_sig_stcut_py = CalculateSignificance(stcut_py_s, stcut_py_bg,"stcut_py_significance",
+          "significance;#theta_{e^{#pm},rec} [deg];significance", "back");
+    fh_sig_stcut_py->SetLineWidth(2);
+    fh_sig_stcut_py->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
+//   c11->cd(9);
+//   TH2D* fh_significance = CalculateSignificance2D(fh_stcut_signal, fh_stcut_bg, "stcut_2dsignificance", "significance");
+//   fh_significance->Draw("COLZ");
 
 
-//TRACK TOPOLOGY CUT DISTRIBUTION FOR FUL RECO TRACKS
+//TRACK TOPOLOGY CUT DISTRIBUTION FOR FULL RECO TRACKS
     TCanvas *c12 = new TCanvas("c12-ttcut", "c12-ttcut", 1200, 600);
     c12->Divide(4,2);
     c12->cd(1);
@@ -806,6 +796,8 @@ void draw_analysis(){
     TH1D* ttcut_px_bg = fh_ttcut_bg->ProjectionX();
     Double_t scaleSig = 1./ttcut_px_s->Integral();
     Double_t scaleBg = 1./ttcut_px_bg->Integral();
+    ttcut_px_s->SetLineWidth(2);
+    ttcut_px_bg->SetLineWidth(2);
     ttcut_px_s->SetLineColor(kRed);
     ttcut_px_bg->SetLineColor(kBlue);
     ttcut_px_s->Draw();
@@ -815,7 +807,8 @@ void draw_analysis(){
     gPad->SetLogy(true);
     c12->cd(6);
     TH1D* fh_sig_ttcut_px = CalculateSignificance(ttcut_px_s, ttcut_px_bg, 
-        "ttcut_px_significance", "significance", "back");
+        "ttcut_px_significance", "significance;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];significance", "back");
+    fh_sig_ttcut_px->SetLineWidth(2);
     fh_sig_ttcut_px->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
@@ -827,6 +820,8 @@ void draw_analysis(){
     TH1D* ttcut_py_bg = fh_ttcut_bg->ProjectionY();
     Double_t scaleSig = 1./ttcut_py_s->Integral();
     Double_t scaleBg = 1./ttcut_py_bg->Integral();
+    ttcut_py_s->SetLineWidth(2);
+    ttcut_py_bg->SetLineWidth(2);
     ttcut_py_s->SetLineColor(kRed);
     ttcut_py_bg->SetLineColor(kBlue);
     ttcut_py_s->Draw();
@@ -838,9 +833,10 @@ void draw_analysis(){
     ttcut_py_bg->Scale(scaleBg);
 
     c12->cd(8);
-   // TH1D* fh_sig_ttcut_py = CalculateSignificance(ttcut_py_s, ttcut_py_bg,
-  //      "ttcut_py_significance", "significance", "back");
-//    fh_sig_ttcut_py->Draw();
+    TH1D* fh_sig_ttcut_py = CalculateSignificance(ttcut_py_s, ttcut_py_bg,
+        "ttcut_py_significance", "significance;#theta_{e^{#pm},rec} [deg];significance", "back");
+    fh_sig_ttcut_py->SetLineWidth(2);
+    fh_sig_ttcut_py->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
@@ -866,6 +862,8 @@ void draw_analysis(){
     c13->cd(1);
     Double_t scaleSig = 1./fh_rich_ann_signal->Integral();
     Double_t scaleBg = 1./fh_rich_ann_bg->Integral();
+    fh_rich_ann_signal->SetLineWidth(2);
+    fh_rich_ann_bg->SetLineWidth(2);
     fh_rich_ann_signal->SetLineColor(kRed);
     fh_rich_ann_bg->SetLineColor(kBlue);
     fh_rich_ann_signal->Draw();
@@ -875,7 +873,8 @@ void draw_analysis(){
     gPad->SetLogy(true);
     c13->cd(2);
     TH1D* fh_sig_rich_ann = CalculateSignificance(fh_rich_ann_signal, fh_rich_ann_bg, 
-        "rich_ann_significance", "significance", "back");
+        "rich_ann_significance", "significance;ann output;significance", "back");
+    fh_sig_rich_ann->SetLineWidth(2);
     fh_sig_rich_ann->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
@@ -885,6 +884,8 @@ void draw_analysis(){
     c13->cd(3);
     Double_t scaleSig = 1./fh_trd_ann_signal->Integral();
     Double_t scaleBg = 1./fh_trd_ann_bg->Integral();
+    fh_trd_ann_signal->SetLineWidth(2);
+    fh_trd_ann_bg->SetLineWidth(2);
     fh_trd_ann_signal->SetLineColor(kRed);
     fh_trd_ann_bg->SetLineColor(kBlue);
     fh_trd_ann_signal->Draw();
@@ -894,7 +895,8 @@ void draw_analysis(){
     gPad->SetLogy(true);
     c13->cd(4);
     TH1D* fh_sig_trd_ann = CalculateSignificance(fh_trd_ann_signal, fh_trd_ann_bg, 
-        "trd_ann_significance", "significance", "back");
+        "trd_ann_significance", "significance;ann output;significance", "back");
+    fh_sig_trd_ann->SetLineWidth(2);
     fh_sig_trd_ann->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
@@ -909,21 +911,24 @@ void draw_analysis(){
     fh_tof_m2_bg->Draw("COLZ");
     gPad->SetLogz(true);
 
-    TCanvas *c14 = new TCanvas("c14-dsts", "c14-dsts", 900, 600);
-    c14->Divide(3,2);
-    c14->cd(1);
-    fh_dsts_signal->Draw("COLZ");
-    c14->cd(2); 
-    fh_dsts_bg->Draw("COLZ");
-    c14->cd(3);
-    fh_dsts_gamma->Draw("COLZ");
-    c14->cd(4);
-    fh_dsts_pi0->Draw("COLZ");
-    c14->cd(5);
-    fh_dsts_eta->Draw("COLZ");
-    c14->cd(6);
- //   TH2D* fh_significance_dsts = CalculateSignificance2D(fh_dsts_signal, fh_dsts_bg, "dsts_2dsignificance", "significance");
-//    fh_significance_dsts->Draw("COLZ");
+//DSTS CUT
+    if (fUseMvd) {
+       TCanvas *c14 = new TCanvas("c14-dsts", "c14-dsts", 900, 600);
+       c14->Divide(3,2);
+       c14->cd(1);
+       fh_dsts_signal->Draw("COLZ");
+       c14->cd(2);
+       fh_dsts_bg->Draw("COLZ");
+       c14->cd(3);
+       fh_dsts_gamma->Draw("COLZ");
+       c14->cd(4);
+       fh_dsts_pi0->Draw("COLZ");
+       c14->cd(5);
+       fh_dsts_eta->Draw("COLZ");
+       c14->cd(6);
+    //   TH2D* fh_significance_dsts = CalculateSignificance2D(fh_dsts_signal, fh_dsts_bg, "dsts_2dsignificance", "significance");
+   //    fh_significance_dsts->Draw("COLZ");
+    }
 
 //INVARIANT MASS DISTRIBUTION
     Int_t nRebin = 10;
@@ -936,8 +941,8 @@ void draw_analysis(){
     fh_rec_signal_minv->Rebin(nRebin);
     fh_chi_prim_signal_minv->Rebin(nRebin);
     fh_el_id_signal_minv->Rebin(nRebin);
-    fh_dstscut_signal_minv->Rebin(nRebin);
-    fh_dsts2cut_signal_minv->Rebin(nRebin);
+    if (fUseMvd) fh_dstscut_signal_minv->Rebin(nRebin);
+    if (fUseMvd) fh_dsts2cut_signal_minv->Rebin(nRebin);
     fh_gammacut_signal_minv->Rebin(nRebin);
     fh_stcut_signal_minv->Rebin(nRebin);
     fh_ttcut_signal_minv->Rebin(nRebin);
@@ -949,8 +954,8 @@ void draw_analysis(){
     fh_acc_signal_minv->SetLineColor(kOrange+3);
     fh_chi_prim_signal_minv->SetLineColor(kOrange+7);
     fh_el_id_signal_minv->SetLineColor(kRed);
-    fh_dstscut_signal_minv->SetLineColor(kGreen);
-    fh_dsts2cut_signal_minv->SetLineColor(kBlack);
+    if (fUseMvd) fh_dstscut_signal_minv->SetLineColor(kGreen);
+    if (fUseMvd) fh_dsts2cut_signal_minv->SetLineColor(kBlack);
     fh_gammacut_signal_minv->SetLineColor(kPink-6);
     fh_stcut_signal_minv->SetLineColor(kOrange-3);
     fh_ttcut_signal_minv->SetLineColor(kYellow+1);
@@ -963,8 +968,8 @@ void draw_analysis(){
     fh_rec_signal_minv->Draw("same");
     fh_chi_prim_signal_minv->Draw("same");
     fh_el_id_signal_minv->Draw("same");
-    fh_dstscut_signal_minv->Draw("same");
-    fh_dsts2cut_signal_minv->Draw("same");
+    if (fUseMvd) fh_dstscut_signal_minv->Draw("same");
+    if (fUseMvd) fh_dsts2cut_signal_minv->Draw("same");
     fh_gammacut_signal_minv->Draw("same");
     fh_stcut_signal_minv->Draw("same");
     fh_ttcut_signal_minv->Draw("same");
@@ -979,8 +984,8 @@ void draw_analysis(){
     leg3->AddEntry(fh_chi_prim_signal_minv, "chi prim", "l");
     leg3->AddEntry(fh_el_id_signal_minv, "rich id", "l");
     leg3->AddEntry(fh_gammacut_signal_minv, "gamma cut", "l");
-    leg3->AddEntry(fh_dstscut_signal_minv, "dsts cut", "l");
-    leg3->AddEntry(fh_dsts2cut_signal_minv, "dsts2 cut", "l");
+    if (fUseMvd) leg3->AddEntry(fh_dstscut_signal_minv, "dsts cut", "l");
+    if (fUseMvd) leg3->AddEntry(fh_dsts2cut_signal_minv, "dsts2 cut", "l");
     leg3->AddEntry(fh_stcut_signal_minv, "st cut", "l");
     leg3->AddEntry(fh_ttcut_signal_minv, "tt cut", "l");
     leg3->AddEntry(fh_ptcut_signal_minv, "pt cut", "l");
@@ -996,8 +1001,8 @@ void draw_analysis(){
     fh_el_id_bg_minv->SetLineColor(kRed);
     fh_chi_prim_bg_minv->SetLineColor(kOrange+7);
     fh_gammacut_bg_minv->SetLineColor(kPink-6);
-    fh_dstscut_bg_minv->SetLineColor(kGreen);
-    fh_dsts2cut_bg_minv->SetLineColor(kBlack);
+    if (fUseMvd) fh_dstscut_bg_minv->SetLineColor(kGreen);
+    if (fUseMvd) fh_dsts2cut_bg_minv->SetLineColor(kBlack);
     fh_stcut_bg_minv->SetLineColor(kOrange-3);
     fh_ttcut_bg_minv->SetLineColor(kYellow+1);
     fh_ptcut_bg_minv->SetLineColor(kMagenta);
@@ -1007,8 +1012,8 @@ void draw_analysis(){
     fh_rec_bg_minv->Rebin(nRebin);
     fh_chi_prim_bg_minv->Rebin(nRebin);
     fh_el_id_bg_minv->Rebin(nRebin);
-    fh_dstscut_bg_minv->Rebin(nRebin);
-    fh_dsts2cut_bg_minv->Rebin(nRebin);
+    if (fUseMvd) fh_dstscut_bg_minv->Rebin(nRebin);
+    if (fUseMvd) fh_dsts2cut_bg_minv->Rebin(nRebin);
     fh_gammacut_bg_minv->Rebin(nRebin);
     fh_stcut_bg_minv->Rebin(nRebin);
     fh_ttcut_bg_minv->Rebin(nRebin);
@@ -1020,8 +1025,8 @@ void draw_analysis(){
     fh_rec_bg_minv->SetMinimum(1e-8);
     fh_chi_prim_bg_minv->Draw("same");
     fh_el_id_bg_minv->Draw("same");
-    fh_dstscut_bg_minv->Draw("same");
-    fh_dsts2cut_bg_minv->Draw("same");
+    if (fUseMvd) fh_dstscut_bg_minv->Draw("same");
+    if (fUseMvd) fh_dsts2cut_bg_minv->Draw("same");
     fh_gammacut_bg_minv->Draw("same");
     fh_stcut_bg_minv->Draw("same");
     fh_ttcut_bg_minv->Draw("same");
@@ -1034,8 +1039,8 @@ void draw_analysis(){
     leg->AddEntry(fh_chi_prim_bg_minv, "chi prim", "l");
     leg->AddEntry(fh_el_id_bg_minv, "rich id", "l");
     leg->AddEntry(fh_gammacut_bg_minv, "gamma cut", "l");
-    leg->AddEntry(fh_dstscut_bg_minv, "dsts cut", "l");
-    leg->AddEntry(fh_dsts2cut_bg_minv, "dsts2 cut", "l");
+    if (fUseMvd) leg->AddEntry(fh_dstscut_bg_minv, "dsts cut", "l");
+    if (fUseMvd) leg->AddEntry(fh_dsts2cut_bg_minv, "dsts2 cut", "l");
     leg->AddEntry(fh_stcut_bg_minv, "st cut", "l");
     leg->AddEntry(fh_ttcut_bg_minv, "tt cut", "l");
     leg->AddEntry(fh_ptcut_bg_minv, "pt cut", "l");
@@ -1048,29 +1053,32 @@ void draw_analysis(){
     gPad->SetLogy(true);
 
 //INVARIANT MASS DISTRIBUTION
+   hi = 1;
 	TCanvas *c16 = new TCanvas("c16-minv", "c16-minv", 1200, 900);
 	c16->Divide(4,3);
-	c16->cd(1);
+	c16->cd(hi++);
 	draw_minv(fh_rec_signal_minv,fh_rec_bg_minv);
-    c16->cd(2);
-    draw_minv(fh_chi_prim_signal_minv,fh_chi_prim_bg_minv);
-	c16->cd(3);
+   c16->cd(hi++);
+   draw_minv(fh_chi_prim_signal_minv,fh_chi_prim_bg_minv);
+	c16->cd(hi++);
 	draw_minv(fh_el_id_signal_minv,fh_el_id_bg_minv);
-	c16->cd(4);
+	c16->cd(hi++);
 	draw_minv(fh_gammacut_signal_minv,fh_gammacut_bg_minv);
-	c16->cd(5);
-	draw_minv(fh_dstscut_signal_minv,fh_dstscut_bg_minv);
-	c16->cd(6);
-	draw_minv(fh_dsts2cut_signal_minv,fh_dsts2cut_bg_minv);
-	c16->cd(7);
+	if (fUseMvd) {
+      c16->cd(hi++);
+      draw_minv(fh_dstscut_signal_minv,fh_dstscut_bg_minv);
+      c16->cd(hi++);
+      draw_minv(fh_dsts2cut_signal_minv,fh_dsts2cut_bg_minv);
+	}
+	c16->cd(hi++);
 	draw_minv(fh_stcut_signal_minv,fh_stcut_bg_minv);
-	c16->cd(8);
+	c16->cd(hi++);
 	draw_minv(fh_ttcut_signal_minv,fh_ttcut_bg_minv);
-	c16->cd(9);
+	c16->cd(hi++);
 	draw_minv(fh_ptcut_signal_minv,fh_ptcut_bg_minv);
-	c16->cd(10);
+	c16->cd(hi++);
 //	draw_minv(fh_anglecut_signal_minv,fh_anglecut_bg_minv);
-    c16->cd(11);
+    c16->cd(hi++);
 //    draw_minv(fh_apmcut_signal_minv,fh_apmcut_bg_minv);
 
 //INVARIANT MASS DISTRIBUTION FOR PI0 AND ETA
@@ -1078,7 +1086,7 @@ void draw_analysis(){
     c17->Divide(2,1);
     c17->cd(1);
     fh_el_id_pi0_minv->SetLineColor(kRed);
-    fh_dstscut_pi0_minv->SetLineColor(kGreen);
+    if (fUseMvd) fh_dstscut_pi0_minv->SetLineColor(kGreen);
     fh_chi_prim_pi0_minv->SetLineColor(kOrange+7);
     fh_gammacut_pi0_minv->SetLineColor(kPink-6);
     fh_stcut_pi0_minv->SetLineColor(kOrange-3);
@@ -1089,7 +1097,7 @@ void draw_analysis(){
 
     fh_rec_pi0_minv->Rebin(nRebin);
     fh_el_id_pi0_minv->Rebin(nRebin);
-    fh_dstscut_pi0_minv->Rebin(nRebin);
+    if (fUseMvd) fh_dstscut_pi0_minv->Rebin(nRebin);
     fh_chi_prim_pi0_minv->Rebin(nRebin);
     fh_gammacut_pi0_minv->Rebin(nRebin);
     fh_stcut_pi0_minv->Rebin(nRebin);
@@ -1101,7 +1109,7 @@ void draw_analysis(){
     fh_rec_pi0_minv->Draw();
     fh_chi_prim_pi0_minv->Draw("same");
     fh_el_id_pi0_minv->Draw("same");
-    fh_dstscut_pi0_minv->Draw("same");
+    if (fUseMvd) fh_dstscut_pi0_minv->Draw("same");
     fh_gammacut_pi0_minv->Draw("same");
     fh_stcut_pi0_minv->Draw("same");
     fh_ttcut_pi0_minv->Draw("same");
@@ -1114,7 +1122,7 @@ void draw_analysis(){
     leg3->AddEntry(fh_chi_prim_pi0_minv, "chi prim", "l");
 	leg3->AddEntry(fh_el_id_pi0_minv, "rich id", "l");
     leg3->AddEntry(fh_gammacut_pi0_minv, "gamma cut", "l");
-    leg3->AddEntry(fh_dstscut_pi0_minv, "dsts cut", "l");
+    if (fUseMvd) leg3->AddEntry(fh_dstscut_pi0_minv, "dsts cut", "l");
     leg3->AddEntry(fh_stcut_pi0_minv, "st cut", "l");
     leg3->AddEntry(fh_ttcut_pi0_minv, "tt cut", "l");
 	leg3->AddEntry(fh_ptcut_pi0_minv, "pt cut", "l");
@@ -1127,7 +1135,7 @@ void draw_analysis(){
 
 	c17->cd(2);
 	fh_el_id_eta_minv->SetLineColor(kRed);
-//	fh_dstscut_eta_minv->SetLineColor(kGreen);
+	if (fUseMvd) fh_dstscut_eta_minv->SetLineColor(kGreen);
 	fh_chi_prim_eta_minv->SetLineColor(kOrange+7);
 	fh_gammacut_eta_minv->SetLineColor(kPink-6);
     fh_stcut_eta_minv->SetLineColor(kOrange-3);
@@ -1136,23 +1144,23 @@ void draw_analysis(){
     fh_anglecut_eta_minv->SetLineColor(kViolet+10);
 //	fh_apmcut_eta_minv->SetLineColor(kPink+8);
     
-    fh_rec_eta_minv->Rebin(nRebin);
-    fh_el_id_eta_minv->Rebin(nRebin);
-//    fh_dstscut_eta_minv->Rebin(nRebin);
-    fh_chi_prim_eta_minv->Rebin(nRebin);
-    fh_gammacut_eta_minv->Rebin(nRebin);
-    fh_stcut_eta_minv->Rebin(nRebin);
-    fh_ttcut_eta_minv->Rebin(nRebin);
-    fh_ptcut_eta_minv->Rebin(nRebin);
-    fh_anglecut_eta_minv->Rebin(nRebin);
+   fh_rec_eta_minv->Rebin(nRebin);
+   fh_el_id_eta_minv->Rebin(nRebin);
+   if (fUseMvd) fh_dstscut_eta_minv->Rebin(nRebin);
+   fh_chi_prim_eta_minv->Rebin(nRebin);
+   fh_gammacut_eta_minv->Rebin(nRebin);
+   fh_stcut_eta_minv->Rebin(nRebin);
+   fh_ttcut_eta_minv->Rebin(nRebin);
+   fh_ptcut_eta_minv->Rebin(nRebin);
+   fh_anglecut_eta_minv->Rebin(nRebin);
 //  fh_apmcut_eta_minv->Rebin(nRebin);
 
 	fh_rec_eta_minv->Draw();
-    fh_chi_prim_eta_minv->Draw("same");
+   fh_chi_prim_eta_minv->Draw("same");
 	fh_el_id_eta_minv->Draw("same");
-//	fh_dstscut_eta_minv->Draw("same");
+	if (fUseMvd) fh_dstscut_eta_minv->Draw("same");
 	fh_gammacut_eta_minv->Draw("same");
-    fh_stcut_eta_minv->Draw("same");
+   fh_stcut_eta_minv->Draw("same");
 	fh_ttcut_eta_minv->Draw("same");
     fh_ptcut_eta_minv->Draw("same");
     fh_anglecut_eta_minv->Draw("same");
@@ -1160,39 +1168,41 @@ void draw_analysis(){
 
 	TLegend* leg4 = new TLegend(0.65,0.6,1., 1.);
 	leg4->AddEntry(fh_rec_eta_minv, "rec", "l");
-    leg4->AddEntry(fh_chi_prim_eta_minv, "chi prim", "l");
+   leg4->AddEntry(fh_chi_prim_eta_minv, "chi prim", "l");
 	leg4->AddEntry(fh_el_id_eta_minv, "rich id", "l");
-    leg4->AddEntry(fh_gammacut_eta_minv, "gamma cut", "l");
- //   leg4->AddEntry(fh_dstscut_eta_minv, "dsts cut", "l");
-    leg4->AddEntry(fh_stcut_eta_minv, "st cut", "l");
-    leg4->AddEntry(fh_ttcut_eta_minv, "tt cut", "l");
+   leg4->AddEntry(fh_gammacut_eta_minv, "gamma cut", "l");
+   if (fUseMvd) leg4->AddEntry(fh_dstscut_eta_minv, "dsts cut", "l");
+   leg4->AddEntry(fh_stcut_eta_minv, "st cut", "l");
+   leg4->AddEntry(fh_ttcut_eta_minv, "tt cut", "l");
 	leg4->AddEntry(fh_ptcut_eta_minv, "pt cut", "l");
-    leg4->AddEntry(fh_anglecut_eta_minv, "angle cut", "l");
- //   leg4->AddEntry(fh_apmcut_eta_minv, "apm cut", "l");
+   leg4->AddEntry(fh_anglecut_eta_minv, "angle cut", "l");
+//   leg4->AddEntry(fh_apmcut_eta_minv, "apm cut", "l");
 	leg4->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
 
+	//SOURCE TRACKS
 	TCanvas *c18 = new TCanvas("c18-nof-tracks", "c18-nof-tracks", 1200, 800);
 	c18->Divide(3,2);
 	c18->cd(1);
+	fh_nof_bg_tracks->SetLineWidth(2);
 	fh_nof_bg_tracks->Draw("hist text0");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	c18->cd(2);
-//	fh_nof_el_tracks->Draw("hist text0");
-//	gPad->SetGridx(true);
-//	gPad->SetGridy(true);
+	fh_nof_el_tracks->SetLineWidth(2);
+	fh_nof_el_tracks->Draw("hist text0");
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
 	c18->cd(3);
-//	TH1D* purity = new TH1D("purity","purity",7, 0., 7.);
-//	purity->Divide(fh_nof_bg_tracks,fh_nof_el_tracks);
-//	purity->Draw("hist text0");
-//	gPad->SetGridx(true);
-//	gPad->SetGridy(true);
+	TH1D* purity = new TH1D("purity","purity",7, 0., 7.);
+	purity->Divide(fh_nof_bg_tracks,fh_nof_el_tracks);
+	purity->SetLineWidth(2);
+	purity->Draw("hist text0");
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
 	c18->cd(4);
-//	fh_source_tracks->Draw("text COLZ");
-//	c18->cd(5);
 	TH2D * source_tracks_clone = fh_source_tracks->Clone();
 	Int_t nBinsX = source_tracks_clone->GetNbinsX();
 	Int_t nBinsY = source_tracks_clone->GetNbinsY();
@@ -1212,23 +1222,28 @@ void draw_analysis(){
 	source_tracks_clone->GetYaxis()->SetBinLabel(4,"protons");
 	source_tracks_clone->GetYaxis()->SetBinLabel(5,"kaons");
 	source_tracks_clone->GetYaxis()->SetBinLabel(6,"other");
+	source_tracks_clone->SetMarkerColor(0);
 	source_tracks_clone->Draw("text COLZ");
 
-	TCanvas *c19 = new TCanvas("c19-minv-pt", "c19-minv-pt",400, 400);
+//MINV vs. PT
+	TCanvas *c19 = new TCanvas("c19-minv-pt", "c19-minv-pt",500, 500);
 	fh_ttcut_signal_minv_pt->Draw("COLZ");
 
-	TCanvas *c20 = new TCanvas("c20-dsts-2MVD", "c20-dsts-2MVD", 1200, 800);
-	c20->Divide(3,2);
-	c20->cd(1);
-	fh_dsts2_signal->Draw("COLZ");
-	c20->cd(2);
-	fh_dsts2_bg->Draw("COLZ");
-	c20->cd(3);
-	fh_dsts2_gamma->Draw("COLZ");
-	c20->cd(4);
-	fh_dsts2_pi0->Draw("COLZ");
-	c20->cd(5);
-	fh_dsts2_eta->Draw("COLZ");
+//DSTS 2 CUT
+	if (fUseMvd) {
+      TCanvas *c20 = new TCanvas("c20-dsts-2MVD", "c20-dsts-2MVD", 1200, 800);
+      c20->Divide(3,2);
+      c20->cd(1);
+      fh_dsts2_signal->Draw("COLZ");
+      c20->cd(2);
+      fh_dsts2_bg->Draw("COLZ");
+      c20->cd(3);
+      fh_dsts2_gamma->Draw("COLZ");
+      c20->cd(4);
+      fh_dsts2_pi0->Draw("COLZ");
+      c20->cd(5);
+      fh_dsts2_eta->Draw("COLZ");
+	}
 
 	TCanvas *c21 = new TCanvas("c21-bg-sources-vs-mom","c21-bg-sources-vs-mom",1200, 800);
 	c21->Divide(3,2);

@@ -8,17 +8,17 @@ which root
 
 export SCRIPT=yes
 
-create_output_dir events_electron/
-create_image_dir results_electron/
+create_output_dir events_muon/
+create_image_dir results_muon/
 
-export NEVENTS=500
-export DETECTORSETUP=electron
+export NEVENTS=10
+export DETECTORSETUP=muon
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI  PLUTO USEUNIGEN
-pars=(5    5    5   5   20   20   10     yes   no yes no  no    yes)
+#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E   PI  PLUTO USEUNIGEN
+pars=(5    5    5   5   20   20   10     yes   yes no  no  no    yes)
 set_simulation_parameters $pars    
 
-set_default_electron_geometry
+set_default_muon_geometry
 
 export TRACKINGTYPE=branch
 export TRDHITPRODUCERTYPE=smearing

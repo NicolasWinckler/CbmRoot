@@ -50,6 +50,9 @@ hyperon/CbmAnaHypSelectLambda.cxx
 hyperon/CbmAnaHypRecCascade.cxx
 hyperon/CbmAnaHypMix.cxx
 
+#CbmD0Analysis.cxx
+V0/CbmV0Analysis.cxx
+
 much/CbmAnaMuch.cxx
 much/CbmAnaMuchJpsiPolarization.cxx
 much/CbmPolarizedGenerator.cxx
@@ -65,7 +68,7 @@ timing/CbmAnaTimingMuchDigitizer.cxx
 timing/CbmAnaTimingMuchHitFinder.cxx
 timing/CbmAnaTimingStsDigitizer.cxx
 timing/CbmAnaTimingStsHitFinder.cxx
-dielectron/CbmAnaDielectronTask.cxx
+#dielectron/CbmAnaDielectronTask.cxx
 )
 
 

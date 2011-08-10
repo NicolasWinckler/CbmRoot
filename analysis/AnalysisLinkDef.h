@@ -4,6 +4,10 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+//#pragma link C++ class  CbmD0Analysis+;
+//#pragma link C++ class  CbmD0TrackInfo+;
+#pragma link C++ class  CbmV0Analysis+;
+#pragma link C++ class  CbmV0TrackInfo+;
 #pragma link C++ class CbmAnaHypYPtGenerator+;
 #pragma link C++ class CbmAnaHypSecFinder+;
 #pragma link C++ class CbmAnaHypSecFinderQa+;

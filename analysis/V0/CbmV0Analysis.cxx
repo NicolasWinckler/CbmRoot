@@ -74,7 +74,7 @@ InitStatus CbmV0Analysis::ReInit(){
   fSTSTrackMatch = (TClonesArray*) fManger->GetObject("StsTrackMatch");
   fPrimVtx = (CbmVertex*) fManger->GetObject("PrimaryVertex");
   fHitArray = (TClonesArray *)  fManger->GetObject("StsHit");
-//  fMvdHitArray = (TClonesArray *)  fManger->GetObject("MvdHit");
+  fMvdHitArray = (TClonesArray *)  fManger->GetObject("MvdHit");
   return kSUCCESS;
 }
 

@@ -72,7 +72,7 @@ class CbmV0Analysis :public FairTask {
   TClonesArray *listStsTracks;
   CbmVertex* fPrimVtx;
   TClonesArray * fHitArray;
-//  TClonesArray * fMvdHitArray;
+  TClonesArray * fMvdHitArray;
 
   CbmStsKFTrackFitter Fitter;
 

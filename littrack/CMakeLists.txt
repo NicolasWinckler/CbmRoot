@@ -86,11 +86,10 @@ cbm/geo/CbmLitDetPoint.cxx
 cbm/propagation/CbmPropagatorGeane.cxx
 cbm/propagation/CbmPropagatorLit.cxx
 
-##cbm/qa/CbmLitReconstructionQa.cxx
-cbm/qa/CbmLitReconstructionQaImpl.cxx
-cbm/qa/CbmLitReconstructionQaPrint.cxx
-cbm/qa/CbmLitReconstructionQaHTML.cxx
-cbm/qa/CbmLitReconstructionQaLatex.cxx
+#cbm/qa/CbmLitReconstructionQaImpl.cxx
+#cbm/qa/CbmLitReconstructionQaPrint.cxx
+#cbm/qa/CbmLitReconstructionQaHTML.cxx
+#cbm/qa/CbmLitReconstructionQaLatex.cxx
 ##cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/CbmLitCheckMultipleScattering.cxx
 ##cbm/qa/CbmLitPropagationAnalysis.cxx 
@@ -118,6 +117,16 @@ If(TBB_FOUND)
      )
 EndIf(TBB_FOUND)
 
+If(Boost_FOUND)
+  Set(LITTRACK_SRCS_RULECHECKER 
+      ${LITTRACK_SRCS_RULECHECKER}
+      cbm/qa/CbmLitReconstructionQaImpl.cxx
+      cbm/qa/CbmLitReconstructionQaPrint.cxx
+      cbm/qa/CbmLitReconstructionQaHTML.cxx
+      cbm/qa/CbmLitReconstructionQaLatex.cxx
+     )
+EndIf(Boost_FOUND)
+
 set(LITTRACK_HEADERS
 cbm/base/CbmLitTask.h
 cbm/elid/CbmLitGlobalElectronId.h
@@ -132,7 +141,7 @@ cbm/geo/CbmLitDetGeoPar.h
 cbm/geo/CbmLitDetPoint.h
 cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
-cbm/qa/CbmLitReconstructionQa.h 
+#cbm/qa/CbmLitReconstructionQa.h 
 cbm/qa/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/CbmLitPropagationAnalysis.h 
 #cbm/qa/CbmLitRobustFitterAnalysis.h
@@ -155,6 +164,13 @@ If(TBB_FOUND)
      )
 EndIf(TBB_FOUND)
 
+If(Boost_FOUND)
+  Set(LITTRACK_HEADERS 
+      ${LITTRACK_HEADERS}
+      cbm/qa/CbmLitReconstructionQa.h
+     )
+EndIf(Boost_FOUND)
+
 SET(LITTRACK_SRCS 
 ${LITTRACK_SRCS_RULECHECKER}
 ${LITTRACKSTD_SRCS}
@@ -165,13 +181,20 @@ cbm/base/CbmLitToolFactory.cxx
 cbm/base/CbmLitSimpleGeometryConstructor.cxx
 #cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
-cbm/qa/CbmLitReconstructionQa.cxx
+#cbm/qa/CbmLitReconstructionQa.cxx
 cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/CbmLitCheckField.cxx
 cbm/qa/CbmLitPropagationAnalysis.cxx 
 #cbm/qa/CbmLitRobustFitterAnalysis.cxx
 cbm/utils/CbmLitConverter.cxx
 )
+
+If(Boost_FOUND)
+  Set(LITTRACK_SRCS
+      ${LITTRACK_SRCS}
+      cbm/qa/CbmLitReconstructionQa.cxx
+     )
+EndIf(Boost_FOUND)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)

@@ -1,11 +1,12 @@
-/** LitField.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitField.h
  *
- * Classes and function to work with magnetic field.
- **/
-
+ * \brief Classes to work with magnetic field.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 #ifndef LITFIELD_H_
 #define LITFIELD_H_
 
@@ -19,20 +20,33 @@
 namespace lit {
 namespace parallel {
 
-/* Class represents magnetic field value
- * at a certain point in the space */
+/**
+ * \class LitFieldValue
+ *
+ * \brief Magnetic field value at a certain point in the space.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitFieldValue
 {
 public:
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitFieldValue: Bx=" + lit::parallel::ToString<T>(Bx)
             + ", By=" + lit::parallel::ToString<T>(By)
                + ", Bz=" + lit::parallel::ToString<T>(Bz) + std::endl;
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitFieldValue& v) {
       strm << v.ToString();
       return strm;
@@ -45,11 +59,19 @@ public:
 
 
 
-/* Class represents approximated magnetic field
- * slice in XY plane perpendicular to Z.
+/**
+ * \class LitFieldSlice
+ *
+ * \brief Approximated magnetic field slice in XY plane perpendicular to Z.
+ *
  * It stores coefficients of the polynomial function
  * for each field component Bx, By and Bz.
- * Order of the polynom is defined by LIT_POLYNOM_DEGREE. */
+ * Order of the polynom is defined by LIT_POLYNOM_DEGREE.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitFieldSlice
 {
@@ -72,10 +94,23 @@ public:
 #endif
 
 public:
+   /**
+    * \brief Constructor.
+    */
    LitFieldSlice():fZ(0.) {
       for(unsigned int i=0; i<N; i++) { cx[i] = cy[i] = cz[i] = 0.; }
    }
 
+   /**
+    * \brief Returns field value at a certain (X, Y) position.
+    *
+    * LIT_POLYNOM_DEGREE defines a polynom order
+    * which is used for output field value calculation.
+    *
+    * \param[in] x X position.
+    * \param[in] y Y position.
+    * \param[out] B Field value.
+    */
    void GetFieldValue(
       const T& x,
       const T& y,
@@ -314,10 +349,13 @@ public:
 #endif
    }
 
-   /* Sets polynom coefficients
-    * @param x Coefficients for Bx
-    * @param y Coefficients for By
-    * @param z Coefficients for Bz */
+   /**
+    * \brief Sets polynom coefficients.
+    *
+    * \param[in] x Coefficients for Bx.
+    * \param[in] y Coefficients for By
+    * \param[in] z Coefficients for Bz
+    */
    void SetCoefficients(
          const std::vector<T>& x,
          const std::vector<T>& y,
@@ -329,18 +367,26 @@ public:
       }
    }
 
-   /* @return Z position */
+   /**
+    * \brief Returns Z position of the slice.
+    * \return Z position of the slice.
+    */
    const T& GetZ() const {
       return fZ;
    }
 
-   /* Sets Z position
-    * @param Z Value */
+   /**
+    * \brief Sets Z position of the slice.
+    * \param[in] Z Value of Z coordinate.
+    */
    void SetZ(const T& Z) {
       fZ = Z;
    }
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       std::string str = "";
       str = "LitFieldSlice: Z=" + lit::parallel::ToString<T>(fZ) + ", cx=";
@@ -355,7 +401,10 @@ public:
       return str;
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitFieldSlice& slice) {
       strm << slice.ToString();
       return strm;
@@ -368,12 +417,34 @@ private:
 
 
 
-/* Class for magnetic field approximation
- * along Z using parabola. */
+/**
+ * \class LitFieldRegion
+ *
+ * \brief Storage for field approximation along Z.
+ *
+ * Field is approximated along Z coordinate using
+ * straight line or parabola.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitFieldRegion
 {
 public:
+   /**
+    * \brief Sets field region using three field values.
+    *
+    * In this case parabolic approximation is used.
+    *
+    * \param[in] B0 First field value.
+    * \param[in] B0z Z position of the first field value.
+    * \param[in] B1 Second field value.
+    * \param[in] B1z Z position of the second field value.
+    * \param[in] B2 Third field value.
+    * \param[in] B2z Z position of the third field value.
+    */
    void Set(
       const LitFieldValue<T> &B0,
       const T B0z,
@@ -408,6 +479,16 @@ public:
       cz2 = dB1 * w21 + dB2 * w22;
    }
 
+   /**
+    * \brief Sets field region using two field values.
+    *
+    * In this case straight line approximation is used.
+    *
+    * \param[in] B0 First field value.
+    * \param[in] B0z Z position of the first field value.
+    * \param[in] B1 Second field value.
+    * \param[in] B1z Z position of the second field value.
+    */
    void Set(
       const LitFieldValue<T>& B0,
       const T B0z,
@@ -424,6 +505,9 @@ public:
       cx2 = cy2 = cz2 = 0;
    }
 
+   /**
+    *
+    */
    void Shift(
       T z) {
       T dz = z-z0;
@@ -439,6 +523,12 @@ public:
       cz1+= cz2dz + cz2dz;
    }
 
+   /**
+    * \brief Returns field value at a certain Z position.
+    *
+    * \param[in] z Z position of the field value.
+    * \param[out] B Field value.
+    */
    void GetFieldValue(
       const T& z,
       LitFieldValue<T> &B) const {
@@ -458,25 +548,72 @@ private:
 
 
 
-/* Class stores a grid of magnetic field
- * values in XY slice at Z position. */
+/**
+ * \class LitFieldGrid
+ *
+ * \brief Class stores a grid of magnetic field values in XY slice at Z position.
+ *
+ * This approach is used as an alternative to
+ * parabolic field approximation. It is more
+ * precise - the same grid is used as
+ * in the full magnetic field map. However
+ * the access to the grid can not be SIMDized.
+ * And the values are accessed one by one
+ * and packed later to the vector.
+ * But it is still fast!
+ *
+ * The value of the field is calculated as a weighted
+ * mean of the four surrounding values.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 class LitFieldGrid
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor
+    */
    LitFieldGrid() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor
+    */
    virtual ~LitFieldGrid() {}
 
+   /**
+    * \brief Returns Z position of the grid.
+    * \return Z position of the grid.
+    */
    fscal GetZ() const {
       return fZ;
    }
 
+   /**
+    * \brief Sets Z position of the grid.
+    * \param[in] Z position of the grid.
+    */
    void SetZ(fscal Z) {
       fZ = Z;
    }
 
+   /**
+    * \brief Set field values for the grid.
+    *
+    * Grid is a rectangle with
+    * (xmin, ymax) as a top left corner and
+    * (xmax, ymin) as a bottom right corner and
+    * has a total number of cells nofCellsX*nofCellsY.
+    *
+    * \param[in] field 2D vector of field values.
+    * \param[in] xmax Maximum X position.
+    * \param[in] xmin Minimum X position.
+    * \param[in] ymax Maximum Y position.
+    * \param[in] ymin Minimum Y position.
+    * \parma[in] nofCellsX Number of cells in X.
+    * \param[in] nofCellsY Number of cells in Y.
+    */
    void SetField(
          const std::vector<std::vector<LitFieldValue<fscal> > >& field,
          fscal xmin,
@@ -496,6 +633,15 @@ public:
       fCellSizeY = ((ymax - ymin) / nofCellsY);
    }
 
+   /**
+    * \brief Returns field value for (X, Y) position (scalar version).
+    *
+    * Note this version of the function is for scalar variables.
+    *
+    * \param[in] x X position.
+    * \param[in] y Y position.
+    * \param[out] B Field value.
+    */
    void GetFieldValue(
       fscal x,
       fscal y,
@@ -533,6 +679,15 @@ public:
       B.Bz = (d1 * v1.Bz + d2 * v2.Bz + d3 * v3.Bz + d4 * v4.Bz) / dsum;
    }
 
+   /**
+    * \brief Returns field value for (X, Y) position (SIMD version).
+    *
+    * Note this version of the function is for vector variables.
+    *
+    * \param[in] x X position.
+    * \param[in] y Y position.
+    * \param[out] B Field value.
+    */
    void GetFieldValue(
       fvec x,
       fvec y,
@@ -549,7 +704,10 @@ public:
       }
    }
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitFieldGrid: Z=" + lit::parallel::ToString<fscal>(fZ)
          + " Xmin=" + lit::parallel::ToString<fscal>(fXMin)
@@ -563,7 +721,10 @@ public:
          + " field.size=" + lit::parallel::ToString<fscal>(fField.size()) + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitFieldGrid& grid) {
       strm << grid.ToString();
       return strm;

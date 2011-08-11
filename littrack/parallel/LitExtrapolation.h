@@ -1,10 +1,20 @@
-/** LitExtrapolation.h
- *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2009
- **
- ** Functions for track parameters extrapolation.
- **/
-
+/**
+ * \file LitExtrapolation.h
+ *
+ * \brief Functions for track parameters extrapolation.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ * The extrapolation of the trajectory is done according
+ * to the equation of motion. If the track passes a magnetic
+ * field the equation of motion for a charged particle is solved
+ * applying the 4th order Runge-Kutta method and the transport
+ * matrix is calculated by integrating the derivatives along the
+ * so called zero trajectory. If passing a field free region a
+ * straight line is used for extrapolation and the transport matrix
+ * calculation.
+ */
 #ifndef LITEXTRAPOLATION_H_
 #define LITEXTRAPOLATION_H_
 
@@ -14,9 +24,12 @@
 namespace lit {
 namespace parallel {
 
-/* Line track extrapolation.
- * @param par Input/Output track parameters.
- * @param zOut Z position to extrapolate to. */
+/**
+ * \brief Line track extrapolation for the field free regions.
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] zOut Z position to extrapolate to.
+ */
 template<class T>
 inline void LitLineExtrapolation(
    LitTrackParam<T>& par,
@@ -46,12 +59,15 @@ inline void LitLineExtrapolation(
    par.Z = zOut;
 }
 
-/* Runge-Kutta track extrapolation.
- *@param par Input/Output track parameters.
- *@param zOut Z position to extrapolate to.
- *@param field1 Field value at starting point of extrapolation
- *@param field2 Field value in the middle point of extrapolation
- *@param field3 Field value at the end point of extrapolation */
+/**
+ * \brief Runge-Kutta track extrapolation in the magnetic field.
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] zOut Z position to extrapolate to.
+ * \param[in] field1 Field value at starting point of extrapolation.
+ * \param[in] field2 Field value in the middle point of extrapolation.
+ * \param[in] field3 Field value at the end point of extrapolation.
+ */
 template<class T>
 inline void LitRK4Extrapolation(
    LitTrackParam<T>& par,
@@ -326,11 +342,13 @@ inline void LitRK4Extrapolation(
    par.Z = zOut;
 }
 
-/* Runge-Kutta track extrapolation.
- * Intarface with LitFieldRegion instead of LitFieldValue.
- * @param par Input/Output track parameters.
- * @param zOut Z position to extrapolate to.
- * @param field Field region */
+/**
+ * \brief Runge-Kutta track extrapolation in the magnetic field. Interface with LitFieldRegion instead of LitFieldValue.
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] zOut Z position to extrapolate to.
+ * \param[in] field Reference to field region.
+ */
 template<class T>
 inline void LitRK4Extrapolation(
    LitTrackParam<T>& par,

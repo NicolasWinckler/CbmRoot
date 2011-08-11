@@ -22,25 +22,26 @@ void CbmLitReconstructionQaHTML::PrintFinalStatistics(
    std::ostream& out,
    boost::property_tree::ptree* pt)
 {
-   out << "<html><body>";
+   out.precision(3);
+   out << "<html><body>" << HtmlHeadString();
 
    out << "<h1>CbmLitReconstructionQa final statistics</h1>" << std::endl;
    out << "<p>Number of events: " << pt->get("hEventNo", -1) << "</p>" << std::endl;
 
    // Number of objects statistics
    out << "<h2>Number of objects statistics</h2>";
-   out << "<table border=\"1\" frame=\"border\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>MVD</th><th>STS</th><th>RICH</th><th>TRD</th>"
          << "<th>MUCH pix</th><th>MUCH st</th><th>TOF</th></tr>" << std::endl;
-   out << PrintNofStatisticsToString(pt, "Points","hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
+   out << PrintNofStatisticsToString(0, pt, "Points","hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
          "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
-   out << PrintNofStatisticsToString(pt, "Digis", "hNofMvdDigis", "hNofStsDigis", "",
+   out << PrintNofStatisticsToString(1, pt, "Digis", "hNofMvdDigis", "hNofStsDigis", "",
          "hNofTrdDigis", "hNofMuchDigis", "", "");
-   out << PrintNofStatisticsToString(pt, "Clusters", "hNofMvdClusters", "hNofStsClusters", "",
+   out << PrintNofStatisticsToString(2, pt, "Clusters", "hNofMvdClusters", "hNofStsClusters", "",
          "hNofTrdClusters", "hNofMuchClusters", "", "");
-   out << PrintNofStatisticsToString(pt, "Hits","hNofMvdHits", "hNofStsHits", "hNofRichHits",
+   out << PrintNofStatisticsToString(3, pt, "Hits","hNofMvdHits", "hNofStsHits", "hNofRichHits",
          "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
-   out << PrintNofStatisticsToString(pt, "Tracks","", "hNofStsTracks", "hNofRichRings",
+   out << PrintNofStatisticsToString(4, pt, "Tracks","", "hNofStsTracks", "hNofRichRings",
          "hNofTrdTracks", "hNofMuchTracks", "hNofMuchTracks", "");
    out << "</table>" << std::endl;
 
@@ -49,38 +50,38 @@ void CbmLitReconstructionQaHTML::PrintFinalStatistics(
 
    // True and fake hits histograms (nof all, true, fake hits in track/ring)
    out << "<h2>True and fake hits</h2>";
-   out << "<table border=\"1\" frame=\"border\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>all</th><th>true</th><th>fake</th>"
          << "<th>true/all</th><th>fake/all</th></tr>" << std::endl;
-   out << PrintHitsStatisticsToString(pt, "hMvdTrackHits", "MVD");
-   out << PrintHitsStatisticsToString(pt, "hStsTrackHits", "STS");
-   out << PrintHitsStatisticsToString(pt, "hTrdTrackHits", "TRD");
-   out << PrintHitsStatisticsToString(pt, "hMuchTrackHits", "MUCH");
-   out << PrintHitsStatisticsToString(pt, "hRichRingHits", "RICH");
+   out << PrintHitsStatisticsToString(0, pt, "hMvdTrackHits", "MVD");
+   out << PrintHitsStatisticsToString(1, pt, "hStsTrackHits", "STS");
+   out << PrintHitsStatisticsToString(2, pt, "hTrdTrackHits", "TRD");
+   out << PrintHitsStatisticsToString(3, pt, "hMuchTrackHits", "MUCH");
+   out << PrintHitsStatisticsToString(4, pt, "hRichRingHits", "RICH");
    out << "</table>" << std::endl;
 
    // Reconstruction efficiency without RICH
    out << "<h2>Reconstruction efficiency w/o RICH</h2>";
-   out << "<table border=\"1\" frame=\"border\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>all</th><th>reference</th><th>primary</th>"
          << "<th>secondary</th><th>electron</th><th>muon</th></tr>" << std::endl;
    out << "<tr><td>STS</td>" << EventEfficiencyStatisticsToString(pt, "hStsMom") << "</tr>";
-   out << "<tr><td>TRD(MUCH)</td>" << EventEfficiencyStatisticsToString(pt, "hRecMom") << "</tr>";
+   out << "<tr class=\"alt\"><td>TRD(MUCH)</td>" << EventEfficiencyStatisticsToString(pt, "hRecMom") << "</tr>";
    out << "<tr><td>TOF matching</td>" << EventEfficiencyStatisticsToString(pt, "hTofMom") << "</tr>";
 
    out << "<tr><td colspan=\"7\">Normalization STS+TRD(MUCH)</td></tr>" << std::endl;
    out << "<tr><td>STS</td>" << EventEfficiencyStatisticsToString(pt, "hStsMomNormHalfGlobal") << "</tr>";
-   out << "<tr><td>STS+TRD(MUCH)</td>" << EventEfficiencyStatisticsToString(pt, "hHalfGlobalMom") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+TRD(MUCH)</td>" << EventEfficiencyStatisticsToString(pt, "hHalfGlobalMom") << "</tr>";
 
    out << "<tr><td colspan=\"7\">Normalization STS+TRD(MUCH)+TOF</td></tr>" << std::endl;
    out << "<tr><td>STS</td>" << EventEfficiencyStatisticsToString(pt, "hStsMomNormGlobal") << "</tr>";
-   out << "<tr><td>STS+TRD(MUCH)</td>" << EventEfficiencyStatisticsToString(pt, "hHalfGlobalMomNormGlobal") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+TRD(MUCH)</td>" << EventEfficiencyStatisticsToString(pt, "hHalfGlobalMomNormGlobal") << "</tr>";
    out << "<tr><td>STS+TRD(MUCH)+TOF</td>" << EventEfficiencyStatisticsToString(pt, "hGlobalMom") << "</tr>";
    out << "</table>" << std::endl;
 
    // Reconstruction efficiency with RICH
    out << "<h2>Reconstruction efficiency with RICH</h2>";
-   out << "<table border=\"1\" frame=\"border\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>all</th><th>all ref</th><th>electron</th>"
          << "<th>electron ref</th><th>pion</th><th>pion ref</th></tr>" << std::endl;
 
@@ -88,23 +89,23 @@ void CbmLitReconstructionQaHTML::PrintFinalStatistics(
 
    out << "<tr><td colspan=\"7\">Normalization STS+RICH</td></tr>" << std::endl;
    out << "<tr><td>STS</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsMomNormStsRich") << "</tr>";
-   out << "<tr><td>STS+RICH</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMom") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+RICH</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMom") << "</tr>";
 
    out << "<tr><td colspan=\"7\">Normalization STS+RICH+TRD</td></tr>" << std::endl;
    out << "<tr><td>STS</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsMomNormStsRichTrd") << "</tr>";
-   out << "<tr><td>STS+RICH</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMomNormStsRichTrd") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+RICH</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMomNormStsRichTrd") << "</tr>";
    out << "<tr><td>STS+RICH+TRD</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichTrdMom") << "</tr>";
 
    out << "<tr><td colspan=\"7\">Normalization STS+RICH+TRD+TOF</td></tr>" << std::endl;
    out << "<tr><td>STS</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsMomNormStsRichTrdTof") << "</tr>";
-   out << "<tr><td>STS+RICH</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMomNormStsRichTrdTof") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+RICH</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMomNormStsRichTrdTof") << "</tr>";
    out << "<tr><td>STS+RICH+TRD</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichTrdMomNormStsRichTrdTof") << "</tr>";
-   out << "<tr><td>STS+RICH+TRD+TOF</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichTrdTofMom") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+RICH+TRD+TOF</td>" << EventEfficiencyStatisticsRichToString(pt, "hStsRichTrdTofMom") << "</tr>";
    out << "</table>" << std::endl;
 
    // Print electron identification statistics
    out << "<h2>Electron identification</h2>" << std::endl;
-   out << "<table border=\"1\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>Efficiency</th><th>Pion supp.</th></tr>" << std::endl;
 
    out << "<tr><td colspan=\"3\">Normalization STS+TRD</td></tr>" << std::endl;
@@ -112,32 +113,32 @@ void CbmLitReconstructionQaHTML::PrintFinalStatistics(
 
    out << "<tr><td colspan=\"3\">Normalization STS+TRD+TOF</td></tr>" << std::endl;
    out << "<tr><td>STS+TRD</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsTrdMomElIdNormStsTrdTof") << "</tr>";
-   out << "<tr><td>STS+TRD+TOF</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsTrdTofMomElId") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+TRD+TOF</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsTrdTofMomElId") << "</tr>";
 
    out << "<tr><td colspan=\"3\">Normalization STS+RICH</td></tr>" << std::endl;
    out << "<tr><td>STS+RICH</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichMomElId") << "</tr>";
 
    out << "<tr><td colspan=\"3\">Normalization STS+RICH+TRD</td></tr>" << std::endl;
    out << "<tr><td>STS+RICH</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichMomElIdNormStsRichTrd") << "</tr>";
-   out << "<tr><td>STS+RICH+TRD</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichTrdMomElId") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+RICH+TRD</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichTrdMomElId") << "</tr>";
 
    out << "<tr><td colspan=\"3\">Normalization STS+RICH+TRD+TOF</td></tr>" << std::endl;
    out << "<tr><td>STS+RICH</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichMomElIdNormStsRichTrdTof") << "</tr>";
-   out << "<tr><td>STS+RICH+TRD</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichTrdMomElIdNormStsRichTrdTof") << "</tr>";
+   out << "<tr class=\"alt\"><td>STS+RICH+TRD</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichTrdMomElIdNormStsRichTrdTof") << "</tr>";
    out << "<tr><td>STS+RICH+TRD+TOF</td>" << EventEfficiencyStatisticsElIdToString(pt, "hStsRichTrdTofMomElId") << "</tr>";
    out << "</table>" << std::endl;
 
    // Detector acceptance efficiency
    out << "<h2>Detector acceptance for primary electrons</h2>" << std::endl;
-   out << "<table border=\"1\" frame=\"border\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>kAcc/MC</th><th>kRec/MC</th></tr>" << std::endl;
-   out << EventDetAccElStatisticsToString(pt, "STS", "hStsDetAccEl");
-   out << EventDetAccElStatisticsToString(pt, "STS-RICH","hStsRichDetAccEl");
-   out << EventDetAccElStatisticsToString(pt, "STS-TRD", "hStsTrdDetAccEl");
-   out << EventDetAccElStatisticsToString(pt, "STS-TOF", "hStsTofDetAccEl");
-   out << EventDetAccElStatisticsToString(pt, "STS-RICH-TRD", "hStsRichTrdDetAccEl");
-   out << EventDetAccElStatisticsToString(pt, "STS-RICH-TRD-TOF", "hStsRichTrdTofDetAccEl");
-   out << EventDetAccElStatisticsToString(pt, "STS-TRD-TOF", "hStsTrdTofDetAccEl");
+   out << EventDetAccElStatisticsToString(0, pt, "STS", "hStsDetAccEl");
+   out << EventDetAccElStatisticsToString(1, pt, "STS-RICH","hStsRichDetAccEl");
+   out << EventDetAccElStatisticsToString(2, pt, "STS-TRD", "hStsTrdDetAccEl");
+   out << EventDetAccElStatisticsToString(3, pt, "STS-TOF", "hStsTofDetAccEl");
+   out << EventDetAccElStatisticsToString(4, pt, "STS-RICH-TRD", "hStsRichTrdDetAccEl");
+   out << EventDetAccElStatisticsToString(5, pt, "STS-RICH-TRD-TOF", "hStsRichTrdTofDetAccEl");
+   out << EventDetAccElStatisticsToString(6, pt, "STS-TRD-TOF", "hStsTrdTofDetAccEl");
    out << "</table>" << std::endl;
 
    // Ghost statistics
@@ -161,7 +162,7 @@ void CbmLitReconstructionQaHTML::PrintFinalStatistics(
 
    // Tracking efficiency vs. polar angle
    out << "<h2>Tracking efficiency in dependence on polar angle</h2>" << std::endl;
-   out << "<table border=\"1\" frame=\"border\">";
+   out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>all</th><th>reference</th><th>primary</th>"
          << "<th>secondary</th><th>electron</th><th>muon</th></tr>" << std::endl;
    out << "<tr><td colspan=\"7\">STS</td></tr>" << std::endl;
@@ -172,10 +173,25 @@ void CbmLitReconstructionQaHTML::PrintFinalStatistics(
    out << PolarAngleEfficiencyToString(pt, "hTofAngle");
    out << "</table>" << std::endl;
 
+   // Images
+   out << "<h3>rec_qa_global_efficiency_all</h3><img src=\"rec_qa_global_efficiency_all.png\" alt=\"rec_qa_global_efficiency_all\" />";
+   out << "<h3>rec_qa_global_efficiency_signal</h3><img src=\"rec_qa_global_efficiency_signal.png\" alt=\"rec_qa_global_efficiency_signal\" />";
+   out << "<h3>rec_qa_sts_efficiency</h3><img src=\"rec_qa_sts_efficiency.png\" alt=\"rec_qa_sts_efficiency\" />";
+   out << "<h3>rec_qa_rec_efficiency</h3><img src=\"rec_qa_rec_efficiency.png\" alt=\"rec_qa_rec_efficiency\" />";
+   out << "<h3>rec_qa_tof_efficiency</h3><img src=\"rec_qa_tof_efficiency.png\" alt=\"rec_qa_tof_efficiency\" />";
+   out << "<h3>rec_qa_rich_efficiency_electrons</h3><img src=\"rec_qa_rich_efficiency_electrons.png\" alt=\"rec_qa_rich_efficiency_electrons\" />";
+   out << "<h3>rec_qa_sts_rich_efficiency_electrons</h3><img src=\"rec_qa_sts_rich_efficiency_electrons.png\" alt=\"rec_qa_sts_rich_efficiency_electrons\" />";
+   out << "<h3>rec_qa_sts_rich_trd_efficiency_electrons</h3><img src=\"rec_qa_sts_rich_trd_efficiency_electrons.png\" alt=\"rec_qa_sts_rich_trd_efficiency_electrons\" />";
+   out << "<h3>rec_qa_sts_rich_trd_tof_efficiency_electrons</h3><img src=\"rec_qa_sts_rich_trd_tof_efficiency_electrons.png\" alt=\"rec_qa_sts_rich_trd_tof_efficiency_electrons\" />";
+   out << "<h3>rec_qa_sts_rich_trd_tof_detector_acceptance</h3><img src=\"rec_qa_sts_rich_trd_tof_detector_acceptance.png\" alt=\"rec_qa_sts_rich_trd_tof_detector_acceptance\" />";
+   out << "<h3>rec_qa_sts_rich_trd_tof_electron_identification</h3><img src=\"rec_qa_sts_rich_trd_tof_electron_identification.png\" alt=\"rec_qa_sts_rich_trd_tof_electron_identification\" />";
+   out << "<h3>rec_qa_sts_rich_trd_tof_pion_suppression</h3><img src=\"rec_qa_sts_rich_trd_tof_pion_suppression.png\" alt=\"rec_qa_sts_rich_trd_tof_pion_suppression\" />";
+
    out <<  "</body></html>";
 }
 
 std::string CbmLitReconstructionQaHTML::PrintNofStatisticsToString(
+   int row,
    boost::property_tree::ptree* pt,
    const std::string& name,
    const std::string& mvd,
@@ -187,7 +203,8 @@ std::string CbmLitReconstructionQaHTML::PrintNofStatisticsToString(
    const std::string& tof)
 {
    std::stringstream ss;
-   ss << "<tr><td>" << name << "</td>";
+   if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
+   ss << "<td>" << name << "</td>";
 
    if (mvd != "") { ss << "<td>" << (int)pt->get(mvd, -1.) << "</td>"; }
       else { ss << "<td>-</td>"; }
@@ -209,6 +226,7 @@ std::string CbmLitReconstructionQaHTML::PrintNofStatisticsToString(
 }
 
 std::string CbmLitReconstructionQaHTML::PrintHitsStatisticsToString(
+   int row,
    boost::property_tree::ptree* pt,
    const std::string& hist,
    const std::string& name)
@@ -220,7 +238,8 @@ std::string CbmLitReconstructionQaHTML::PrintHitsStatisticsToString(
    double foa = pt->get(hist+".fakeOverAll", -1.);
 
    std::stringstream ss;
-   ss << "<tr><td>" << name << "</td>";
+   if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
+   ss << "<td>" << name << "</td>";
    if (all == -1.) ss << "<td>-</td>"; else ss << "<td>" << all << "</td>";
    if (trueh == -1.) ss << "<td>-</td>"; else ss << "<td>" << trueh << "</td>";
    if (fakeh == -1.) ss << "<td>-</td>"; else ss << "<td>" << fakeh << "</td>";
@@ -270,24 +289,24 @@ std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsRichToString(
    boost::property_tree::ptree* pt,
    const std::string& name)
 {
-   double allRec = pt->get(name+".richAll.rec", -1.);
-   double allAcc = pt->get(name+".richAll.acc", -1.);
-   double allEff = pt->get(name+".richAll.eff", -1.);
-   double allRefRec = pt->get(name+".richAllRef.rec", -1.);
-   double allRefAcc = pt->get(name+".richAllRef.acc", -1.);
-   double allRefEff = pt->get(name+".richAllRef.eff", -1.);
-   double elRec = pt->get(name+".richEl.rec", -1.);
-   double elAcc = pt->get(name+".richEl.acc", -1.);
-   double elEff = pt->get(name+".richEl.eff", -1.);
-   double elRefRec = pt->get(name+".richElRef.rec", -1.);
-   double elRefAcc = pt->get(name+".richElRef.acc", -1.);
-   double elRefEff = pt->get(name+".richElRef.eff", -1.);
-   double piRec = pt->get(name+".richPi.rec", -1.);
-   double piAcc = pt->get(name+".richPi.acc", -1.);
-   double piEff = pt->get(name+".richPi.eff", -1.);
-   double piRefRec = pt->get(name+".richPiRef.rec", -1.);
-   double piRefAcc = pt->get(name+".richPiRef.acc", -1.);
-   double piRefEff = pt->get(name+".richPiRef.eff", -1.);
+   double allRec = pt->get(name + ".richAll.rec", -1.);
+   double allAcc = pt->get(name + ".richAll.acc", -1.);
+   double allEff = pt->get(name + ".richAll.eff", -1.);
+   double allRefRec = pt->get(name + ".richAllRef.rec", -1.);
+   double allRefAcc = pt->get(name + ".richAllRef.acc", -1.);
+   double allRefEff = pt->get(name + ".richAllRef.eff", -1.);
+   double elRec = pt->get(name + ".richEl.rec", -1.);
+   double elAcc = pt->get(name + ".richEl.acc", -1.);
+   double elEff = pt->get(name + ".richEl.eff", -1.);
+   double elRefRec = pt->get(name + ".richElRef.rec", -1.);
+   double elRefAcc = pt->get(name + ".richElRef.acc", -1.);
+   double elRefEff = pt->get(name + ".richElRef.eff", -1.);
+   double piRec = pt->get(name + ".richPi.rec", -1.);
+   double piAcc = pt->get(name + ".richPi.acc", -1.);
+   double piEff = pt->get(name + ".richPi.eff", -1.);
+   double piRefRec = pt->get(name + ".richPiRef.rec", -1.);
+   double piRefAcc = pt->get(name + ".richPiRef.acc", -1.);
+   double piRefEff = pt->get(name + ".richPiRef.eff", -1.);
 
    std::stringstream ss;
 
@@ -320,6 +339,7 @@ std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsElIdToString(
 }
 
 std::string CbmLitReconstructionQaHTML::EventDetAccElStatisticsToString(
+   int row,
    boost::property_tree::ptree* pt,
    const std::string& effName,
    const std::string& name)
@@ -331,7 +351,8 @@ std::string CbmLitReconstructionQaHTML::EventDetAccElStatisticsToString(
    double effRec = pt->get(name + ".detAccRec.eff", -1.);
 
    std::stringstream ss;
-   ss << "<tr><td>" << effName << "</td>";
+   if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
+   ss << "<td>" << effName << "</td>";
    ss << "<td>" << effAcc << "(" << acc << "/" << mc << ")" << "</td>";
    ss << "<td>" << effRec << "(" << rec << "/" << mc << ")" << "</td>";
    ss << "</tr>";
@@ -356,7 +377,8 @@ std::string CbmLitReconstructionQaHTML::PolarAngleEfficiencyToString(
    for (int i = 0; i < nofBinsAngle; i++) {
       std::string angle0 = lit::ToString<int>(i*step);
       std::string angle1 = lit::ToString<int>(i*step + step);
-      ss << "<tr><td>(" << angle0 << "-" << angle1 << ")</td>";
+      if ((i % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
+      ss << "<td>(" << angle0 << "-" << angle1 << ")</td>";
 
       ss << "<td>" << pt->get(name+".all.eff."+angle0 +"_" + angle1, -1.)
           << "(" << pt->get(name+".all.rec."+angle0 +"_" + angle1, -1.)
@@ -381,3 +403,37 @@ std::string CbmLitReconstructionQaHTML::PolarAngleEfficiencyToString(
    }
    return ss.str();
 }
+
+std::string CbmLitReconstructionQaHTML::HtmlHeadString()
+{
+   std::string str = "<head><style type=\"text/css\">";
+   str += "#efficiency";
+   str += "{";
+   str += "font-family:Verdana, Arial, Helvetica, sans-serif;";
+   str += "width:100%;";
+   str += "border-collapse:collapse;";
+   str += "}";
+   str += "#efficiency td, #efficiency th";
+   str += "{";
+   str += "font-size:1em;";
+   str += "border:1px solid #98bf21;";
+   str += "padding:3px 7px 2px 7px;";
+   str += "}";
+   str += "#efficiency th";
+   str += "{";
+   str += "font-size:1.1em;";
+   str += "text-align:left;";
+   str += "padding-top:5px;";
+   str += "padding-bottom:4px;";
+   str += "background-color:#A7C942;";
+   str += "color:#ffffff;";
+   str += "}";
+   str += "#efficiency tr.alt td";
+   str += "{";
+   str += "color:#000000;";
+   str += "background-color:#EAF2D3;";
+   str += "}";
+   str += "</style></head>";
+   return str;
+}
+

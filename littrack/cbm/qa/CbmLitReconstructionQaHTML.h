@@ -9,10 +9,7 @@
 #define CBMLITRECONSTRUCTIONQAHTML_H_
 
 #include <string>
-
-
 #include <boost/property_tree/ptree.hpp>
-
 
 class CbmLitReconstructionQaHTML
 {
@@ -35,6 +32,7 @@ private:
    /* Prints nof points or hits or tracks or rings etc. statistics to string
     * @param  */
    static std::string PrintNofStatisticsToString(
+      int row,
       boost::property_tree::ptree* pt,
       const std::string& name,
       const std::string& mvd,
@@ -46,9 +44,12 @@ private:
       const std::string& tof);
 
    /* Print hits histos statistics (nof all, true, fake hits in track/ring)
+    * @param row Row number in the table
+    * @param pt Pointer to the property_tree
     * @param hist histogram name
     * @param name string of the first column in the table */
    static std::string PrintHitsStatisticsToString(
+      int row,
       boost::property_tree::ptree* pt,
       const std::string& hist,
       const std::string& name);
@@ -75,6 +76,7 @@ private:
       const std::string& name);
 
    static std::string EventDetAccElStatisticsToString(
+      int row,
       boost::property_tree::ptree* pt,
       const std::string& effName,
       const std::string& name);
@@ -85,6 +87,9 @@ private:
    static std::string PolarAngleEfficiencyToString(
       boost::property_tree::ptree* pt,
       const std::string& name);
+
+   /* Return string with CSS style for the HTML page */
+   static std::string HtmlHeadString();
 };
 
 #endif /* CBMLITRECONSTRUCTIONQAHTML_H_ */

@@ -98,7 +98,9 @@
 //#pragma link C++ class CbmLitMyTrackPropagator+;
 
 // qa
+#ifdef BOOST
 #pragma link C++ class CbmLitReconstructionQa+;
+#endif
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 #pragma link C++ class CbmLitPropagationAnalysis+;
 //#pragma link C++ class CbmLitRobustFitterAnalysis+;

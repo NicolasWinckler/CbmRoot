@@ -25,6 +25,7 @@ namespace lit {
 namespace parallel {
 
 /**
+ * \fn template<class T> inline void LitLineExtrapolation(LitTrackParam<T>& par, T zOut)
  * \brief Line track extrapolation for the field free regions.
  *
  * \param[in,out] par Reference to track parameters.
@@ -60,6 +61,7 @@ inline void LitLineExtrapolation(
 }
 
 /**
+ * \fn template<class T> inline void LitRK4Extrapolation(LitTrackParam<T>& par, T zOut, const LitFieldValue<T>& field1, const LitFieldValue<T>& field2, const LitFieldValue<T>& field3)
  * \brief Runge-Kutta track extrapolation in the magnetic field.
  *
  * \param[in,out] par Reference to track parameters.
@@ -343,6 +345,7 @@ inline void LitRK4Extrapolation(
 }
 
 /**
+ * \fn template<class T> inline void LitRK4Extrapolation(LitTrackParam<T>& par, T zOut, const LitFieldRegion<T>& field)
  * \brief Runge-Kutta track extrapolation in the magnetic field. Interface with LitFieldRegion instead of LitFieldValue.
  *
  * \param[in,out] par Reference to track parameters.

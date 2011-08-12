@@ -1,11 +1,12 @@
-/** LitHit.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitHit.h
  *
- * Hit data classes.
- **/
-
+ * \brief Hit data classes.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 #ifndef LITHIT_H_
 #define LITHIT_H_
 
@@ -16,24 +17,40 @@
 namespace lit {
 namespace parallel {
 
-/* Base class for strip like hits.
+/**
+ * \class LitStripHit
+ *
+ * \brief Base class for strip hits.
+ *
  * Each hit contains U measurement and its error
- * and sine and cosine of strip rotation angle phi. */
+ * and sine and cosine of strip rotation angle phi.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitStripHit
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitStripHit():
       phiCos(0.),
       phiSin(0.),
       U(0.),
       Du(0.) {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitStripHit() {}
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitStripHit: phiCos=" + lit::parallel::ToString<T>(phiCos)
             + " phiSin=" + lit::parallel::ToString<T>(phiSin)
@@ -41,7 +58,10 @@ public:
             + " Du=" + lit::parallel::ToString<T>(Du) + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitStripHit& hit) {
       strm << hit.ToString();
       return strm;
@@ -54,20 +74,39 @@ public:
    T Du; // U measurement error [cm]
 } _fvecalignment;
 
-/* Some typedefs for convenience */
+/**
+ * \typedef LitStripHit<fscal> LitStripHitScal
+ * \brief Scalar version of LitStripHit.
+ */
 typedef LitStripHit<fscal> LitStripHitScal;
+
+/**
+ * \typedef LitStripHit<fvec> LitStripHitVec
+ * \brief Vector version of LitStripHit.
+ */
 typedef LitStripHit<fvec> LitStripHitVec;
 
 
 
-/* Base class for pixel hits.
+/**
+ * \class LitPixelHit
+ *
+ * \brief Base class for pixel hits.
+ *
  * Each hit contains X, Y position measurements and
- * corresponding errors and covariance between X and Y. */
+ * corresponding errors and covariance between X and Y.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitPixelHit
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitPixelHit():
       X(0.),
       Y(0.),
@@ -75,10 +114,15 @@ public:
       Dy(0.),
       Dxy(0.) {}
 
-   /* Destructor */
+   /**
+    * Destructor.
+    */
    virtual ~LitPixelHit() {}
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitPixelHit: X=" + lit::parallel::ToString<T>(X)
          + " Y=" + lit::parallel::ToString<T>(Y)
@@ -87,7 +131,10 @@ public:
          + " Dxy=" + lit::parallel::ToString<T>(Dxy) + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitPixelHit& hit) {
       strm << hit.ToString();
       return strm;
@@ -99,19 +146,38 @@ public:
    T Dxy; // Covariance between X and Y [cm]
 } _fvecalignment;
 
-/* Some typedefs for convenience */
+/**
+ * \typedef LitPixelHit<fscal> LitPixelHitScal
+ * \brief Scalar version of LitPixelHit.
+ */
 typedef LitPixelHit<fscal> LitPixelHitScal;
+
+/**
+ * \typedef LitPixelHit<fvec> LitPixelHitVec
+ * \brief Vector version of LitPixelHit.
+ */
 typedef LitPixelHit<fvec> LitPixelHitVec;
 
 
 
-/* Base class for scalar strip hits.
- * Contains more information in comparison with LitStripHit.
- * Used for input scalar strip hit data to tracking. */
+/**
+ * \class LitScalStripHit
+ *
+ * \brief Base class for scalar strip hits.
+ *
+ * Contains more information in comparison with \c LitStripHit.
+ * Used for input scalar strip hit data to tracking.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 class LitScalStripHit
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitScalStripHit():
       phiCos(0.),
       phiSin(0.),
@@ -121,10 +187,15 @@ public:
       refId(0),
       Z(0.) {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitScalStripHit() {}
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitScalStripHit: phiCos=" + lit::parallel::ToString<fscal>(phiCos)
             + " phiSin=" + lit::parallel::ToString<fscal>(phiSin)
@@ -135,7 +206,10 @@ public:
             + " Z=" + lit::parallel::ToString<fscal>(Z) + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitScalStripHit& hit) {
       strm << "LitScalStripHit: " << "phiCos=" << hit.phiCos << " phiSin=" << hit.phiSin
            << " U=" << hit.U << " Du=" << hit.Du << " planeId=" << (int)hit.planeId
@@ -155,13 +229,24 @@ public:
 
 
 
-/* Base class for scalar pixel hits.
- * Contains more information in comparison with LitPixelHit.
- * Used for input scalar pixel hit data to tracking. */
+/**
+ * \class LitScalPixelHit
+ *
+ * \brief Base class for scalar pixel hits.
+ *
+ * Contains more information in comparison with \c LitPixelHit.
+ * Used for input scalar strip hit data to tracking.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 class LitScalPixelHit
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitScalPixelHit():
       X(0.),
       Y(0.),
@@ -172,10 +257,15 @@ public:
       refId(0),
       Z(0.) {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitScalPixelHit() {}
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
     std::string ToString() const {
        return "LitScalPixelHit: X=" + lit::parallel::ToString<fscal>(X)
           + " Y=" + lit::parallel::ToString<fscal>(Y)
@@ -187,7 +277,10 @@ public:
           + " Z=" + lit::parallel::ToString<fscal>(Z) + "\n";
     }
 
-   /* Operator << for convenient output to std::ostream */
+    /**
+     * \brief Operator << for convenient output to std::ostream.
+     * \return Insertion stream in order to be able to call a succession of insertion operations.
+     */
    friend std::ostream& operator<<(std::ostream& strm, const LitScalPixelHit& hit) {
       strm << hit.ToString();
       return strm;
@@ -204,11 +297,34 @@ public:
 
 
 
-/* Some typedefs for convenience */
+/**
+ * \typedef std::vector<LitScalPixelHit*> PixelHitArray
+ * \brief Vector of \c LitScalPixelHit.
+ */
 typedef std::vector<LitScalPixelHit*> PixelHitArray;
+
+/**
+ * \typedef std::vector<LitScalPixelHit*>::iterator PixelHitIterator
+ * \brief Iterator for \c PixelHitArray.
+ */
 typedef std::vector<LitScalPixelHit*>::iterator PixelHitIterator;
+
+/**
+ * \typedef std::vector<LitScalPixelHit*>::const_iterator PixelHitConstIterator
+ * \brief Constant iterator for \c PixelHitArray.
+ */
 typedef std::vector<LitScalPixelHit*>::const_iterator PixelHitConstIterator;
+
+/**
+ * \typedef std::pair<PixelHitIterator, PixelHitIterator> PixelHitIteratorPair
+ * \brief Pair of iterators for \c PixelHitArray.
+ */
 typedef std::pair<PixelHitIterator, PixelHitIterator> PixelHitIteratorPair;
+
+/**
+ * \typedef std::pair<PixelHitConstIterator, PixelHitConstIterator> PixelHitConstIteratorPair
+ * \brief Pair of constant iterators for \c PixelHitArray.
+ */
 typedef std::pair<PixelHitConstIterator, PixelHitConstIterator> PixelHitConstIteratorPair;
 
 } // namespace parallel

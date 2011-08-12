@@ -1,11 +1,12 @@
-/** LitFiltration.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitAddFiltration.h
  *
- * Functions for Kalman filter update step.
- **/
-
+ * \brief Functions for Kalman filter update step.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 #ifndef LITFILTRATION_H_
 #define LITFILTRATION_H_
 
@@ -14,12 +15,16 @@
 namespace lit {
 namespace parallel {
 
-/* Function implements Kalman filter update step.
+/**
+ * \fn template<class T> inline void LitFiltration (LitTrackParam<T>& par, const LitPixelHit<T> &hit, T& chiSq)
+ * \brief Function implements Kalman filter update step for pixel hit.
+ *
  * It updates track parameters and covariance matrix and
  * calculates contribution to chi-square from this hit.
- * @param par Reference to INPUT/OUTPUT track parameters.
- * @param mat Reference to pixel hit
- * @param chiSq OUTPUT contribution to chi-square
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] hit Reference to pixel hit.
+ * \param[out] chiSq Contribution to chi-square.
  */
 template<class T>
 inline void LitFiltration (
@@ -97,12 +102,16 @@ inline void LitFiltration (
             +(-xmx * (dxy - par.C1) + ymy * (dxx - par.C0)) * ymy) / norm;
 }
 
-/* Function implements Kalman filter update step.
+/**
+ * \fn template<class T> inline void LitFiltration(LitTrackParam<T>& par, const LitStripHit<T>& hit, T& chiSq)
+ * \brief Function implements Kalman filter update step for strip hit.
+ *
  * It updates track parameters and covariance matrix and
  * calculates contribution to chi-square from this hit.
- * @param par Reference to INPUT/OUTPUT track parameters.
- * @param mat Reference to strip hit
- * @param chiSq OUTPUT contribution to chi-square
+ *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] hit Reference to strip hit.
+ * \param[out] chiSq Contribution to chi-square.
  */
 template<class T>
 inline void LitFiltration(

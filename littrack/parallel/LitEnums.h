@@ -15,6 +15,7 @@ namespace lit {
 namespace parallel {
 
 /**
+ * \enum LitHitType
  * \brief Type of the hit and station.
  */
 enum LitHitType {

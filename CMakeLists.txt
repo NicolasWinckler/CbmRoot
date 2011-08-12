@@ -82,6 +82,13 @@ else(CBMROOT_MINIMAL)
     set(BOOST_ROOT ${SIMPATH}/basics/boost)
   EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
   Message("-- Looking for Boost ...")
+  # If an older version of boost is found both of the variables below are
+  # cached and in a second cmake run, a good boost version is found even 
+  # if the version is to old. 
+  # To overcome this problem both variables are cleared before checking
+  # for boost.
+  Unset(Boost_INCLUDE_DIR CACHE)
+  Unset(Boost_LIBRARY_DIRS CACHE)
   find_package(Boost 1.41)
 endif(CBMROOT_MINIMAL)
 

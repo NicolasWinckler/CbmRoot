@@ -1,11 +1,12 @@
-/** LitTrack.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitTrack.h
  *
- * Track data class.
- **/
-
+ * \brief Track data class.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 #ifndef LITTRACK_H_
 #define LITTRACK_H_
 
@@ -18,13 +19,24 @@
 namespace lit {
 namespace parallel {
 
-/* Class implements scalar track data.
+/**
+ * \class LitScalTrack
+ *
+ * \brief Scalar track data class.
+ *
  * It is used for input and output scalar data to
- * tracking algorithm. */
+ * tracking algorithm.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 class LitScalTrack
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitScalTrack():
       fParamFirst(),
       fParamLast(),
@@ -36,123 +48,180 @@ public:
       fHits.reserve(30);
    }
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitScalTrack() {}
 
-   /* Adds hit to track
-    * @param hit Pointer to hit */
+   /**
+    * \brief Adds hit to track.
+    * @param hit Pointer to hit.
+    */
    void AddHit(LitScalPixelHit* hit) {
       fHits.push_back(hit);
    }
 
-   /* @return Number of hits in track */
+   /**
+    * \brief Returns number of hits in track.
+    * \return Number of hits in track.
+    */
    unsigned short GetNofHits() const {
       return fHits.size();
    }
 
-   /* In general should not be used. One has to add hits
+   /**
+    * \brief Depricated.
+    *
+    * In general should not be used. One has to add hits
     * using AddHit method. Currently used in track selection
-    * algorithm. */
+    * algorithm.
+    */
    void SetNofHits(unsigned short nofHits) {
       return fHits.resize(nofHits);
    }
 
-   /* @param index Index of the hit
-    * @return Pointer to the hit */
+   /**
+    * \brief Returns pointer to the hit.
+    *
+    * \param[in] index Index of the hit in track.
+    * \return Pointer to hit.
+    */
    const LitScalPixelHit* GetHit(unsigned short index) const {
       return fHits[index];
    }
 
-   /* @return First track parameter */
+   /**
+    * \brief Returns first parameter of the track.
+    * \return First track parameter.
+    */
    const LitTrackParamScal& GetParamFirst() const {
       return fParamFirst;
    }
 
-   /* Set first track parameter
-    * @param param Pointer to track parameter */
+   /**
+    * \brief Sets first track parameter.
+    * \param[in] param Reference to track parameter to be set.
+    */
    void SetParamFirst(const LitTrackParamScal& param) {
       fParamFirst = param;
    }
 
-   /* @return Last track parameter */
+   /**
+    * \brief Returns last parameter of the track.
+    * \return Last track parameter.
+    */
    const LitTrackParamScal& GetParamLast() const {
       return fParamLast;
    }
 
-   /* Set last track parameter
-    * @param param Pointer to track parameter */
+   /**
+    * \brief Sets last track parameter.
+    * \param[in] param Reference to track parameter to be set.
+    */
    void SetParamLast(const LitTrackParamScal& param) {
       fParamLast = param;
    }
 
-   /* @return Chi-square */
+   /**
+    * \brief Returns chi square of the track.
+    * \return Chi square of the track.
+    */
    fscal GetChiSq() const {
       return fChiSq;
    }
 
-   /* Sets chi-square
-    * @param chiSq Chi-square value */
+   /**
+    * \brief Sets chi square.
+    * \param[in] chiSq Chi square value to be set.
+    */
    void SetChiSq(fscal chiSq) {
       fChiSq = chiSq;
    }
 
-   /* Increases chi-square by dChiSq
-    * @param dChiSq value of dChiSq */
+   /**
+    * \brief Increases chi square by dChiSq.
+    * \param[in] dChiSq Value of dChiSq.
+    */
    void IncChiSq(fscal dChiSq) {
       fChiSq += dChiSq;
    }
 
-   /* @return Number of degrees of freedom */
+   /**
+    * \brief Returns number of degrees of freedom.
+    * \return Number of degrees of freedom.
+    */
    unsigned short GetNDF() const {
       return fNDF;
    }
 
-   /* Sets number of degrees of freedom
-    * @param NDF Value */
+   /**
+    * \brief Sets number of degrees of freedom.
+    * \param[in] NDF NDF value to be set.
+    */
    void SetNDF(unsigned short NDF) {
       fNDF = NDF;
    }
 
-   /* @return Number of missing hits */
+   /**
+    * \brief Returns number of missing hits.
+    * \return Number of missing hits.
+    */
    unsigned short GetNofMissingHits() const {
       return fNofMissingHits;
    }
 
-   /* Sets number of missing hits
-    * @param nofMissingHits Value */
+   /**
+    * \brief Sets number of missing hits.
+    * \param[in] nofMissingHits Number of missing hits to be set.
+    */
    void SetNofMissingHits(unsigned short nofMissingHits) {
       fNofMissingHits = nofMissingHits;
    }
 
-   /* Increases number of missing hits by dNofMissingHits
-    * @param dNofMissingHits Value */
+   /**
+    * \brief Increases number of missing hits by dNofMissingHits.
+    * \param[in] dNofMissingHits Value of dNofMissingHits.
+    */
    void IncNofMissingHits(unsigned short dNofMissingHits = 1) {
       fNofMissingHits += dNofMissingHits;
    }
 
-   /* @return Previous track id */
+   /**
+    * \brief Return Previous track index.
+    * \return Previous track id.
+    */
    unsigned short GetPreviousTrackId() const {
       return fPreviousTrackId;
    }
 
-   /* Sets previous trackId
-    * @param previousTrackId Value */
+   /**
+    * \brief Sets previous trackId.
+    * \param previousTrackId Value of previous track index.
+    */
    void SetPreviousTrackId(unsigned short previousTrackId) {
       fPreviousTrackId = previousTrackId;
    }
 
-   /* @return Is good track */
+   /**
+    * \brief Returns true if track is good.
+    * \return True if track is good.
+    */
    bool IsGood() const {
       return fIsGood;
    }
 
-   /* Sets is good track
-    * @param isGood Value */
+   /**
+    * \brief Sets is good track.
+    * \param[in] isGood Value.
+    */
    void IsGood(bool isGood) {
       fIsGood = isGood;
    }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitTrack: nofHits=" + lit::parallel::ToString<int>(GetNofHits())
             + " chiSq=" + lit::parallel::ToString<fscal>(GetChiSq())
@@ -163,7 +232,10 @@ public:
             + " paramLast=" + GetParamLast().ToString() + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitScalTrack& track) {
       strm << track.ToString();
       return strm;
@@ -182,40 +254,63 @@ private:
 
 
 
-/* Class implements track data. */
+/**
+ * \class LitTrack
+ *
+ * \brief Base track data class.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitTrack
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitTrack():
       paramLast(),
       chiSq(0.) {
       hits.reserve(30);
    }
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitTrack(){}
 
-   /* Adds hit to track
-    * @param hit Pointer to hit */
+   /**
+    * \brief Adds hit to track.
+    * \param[in] hit Pointer to hit to be added.
+    */
    void AddHit(LitPixelHit<T>* hit) {
       hits.push_back(hit);
    }
 
-   /* @return Number of hits in track */
+   /**
+    * \brief Return number of hits in track.
+    * \return Number of hits in track.
+    */
    unsigned short GetNofHits() const {
       return hits.size();
    }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitTrack: nofHits=" + lit::parallel::ToString<int>(GetNofHits())
             + " chiSq=" + lit::parallel::ToString<T>(chiSq)
             + " paramLast=" + paramLast.ToString() + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitTrack& track) {
       strm << track.ToString();
       return strm;
@@ -227,14 +322,28 @@ public:
    fscal chiSq; // chi-square of the track
 } _fvecalignment;
 
-/* Some typedefs for convenience */
+/**
+ * \typedef LitTrack<fvec> LitTrackVec
+ * \brief Vector version of the \c LitTrack class.
+ */
 typedef LitTrack<fvec> LitTrackVec;
+
+/**
+ * \typedef LitTrack<fscal> LitTrackScal
+ * \brief Scalar version of the \c LitTrack class.
+ */
 typedef LitTrack<fscal> LitTrackScal;
 
-
-
-/* Some typedefs for convenience */
+/**
+ * \typedef std::vector<LitScalTrack*> TrackArray
+ * \brief Vector of \c LitScalTrack objects.
+ */
 typedef std::vector<LitScalTrack*> TrackArray;
+
+/**
+ * \typedef std::vector<LitScalTrack*>::iterator TrackIterator
+ * \brief Iterators for \c TrackArray.
+ */
 typedef std::vector<LitScalTrack*>::iterator TrackIterator;
 
 } // namespace parallel

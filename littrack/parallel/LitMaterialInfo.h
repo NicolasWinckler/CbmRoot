@@ -1,11 +1,12 @@
-/** LitMaterialInfo.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitMaterialInfo.h
  *
- * Material info data class.
- **/
-
+ * \brief Material info data class.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 #ifndef LITMATERIALINFO_H_
 #define LITMATERIALINFO_H_
 
@@ -15,11 +16,22 @@
 namespace lit {
 namespace parallel {
 
+/**
+ * \class LitMaterialInfo
+ *
+ * \brief Proprties of the material.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 template<class T>
 class LitMaterialInfo
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitMaterialInfo():
       Thickness(0.),
       X0(0.),
@@ -33,10 +45,15 @@ public:
       I(0.),
       ElLoss(0.) {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitMaterialInfo() {}
 
-   /* Return std::string representation of this class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       return "LitMaterialinfo: Thickness=" + lit::parallel::ToString<T>(Thickness)
             + ", X0=" + lit::parallel::ToString<T>(X0)
@@ -47,7 +64,10 @@ public:
             + ", I=" + lit::parallel::ToString<T>(I) + "\n";
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitMaterialInfo& mat) {
       strm << mat.ToString();
       return strm;
@@ -69,8 +89,16 @@ public:
    T ElLoss; // (exp(radThick * log(THREE) / log (TWO)) - exp(-TWO * radThick));
 } _fvecalignment;
 
-/* Some typedefs for convenience */
+/**
+ * \typedef LitMaterialInfo<fvec> LitMaterialInfoVec
+ * \brief Vector version of LitMaterialInfo.
+ */
 typedef LitMaterialInfo<fvec> LitMaterialInfoVec;
+
+/**
+ * \typedef LitMaterialInfo<fscal> LitMaterialInfoScal
+ * \brief Scalar version of LitMaterialInfo.
+ */
 typedef LitMaterialInfo<fscal> LitMaterialInfoScal;
 
 } // namespace parallel

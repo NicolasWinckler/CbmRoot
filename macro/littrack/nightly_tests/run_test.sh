@@ -21,8 +21,9 @@ cd /u/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/
 . ./run_test_electron.sh
 . ./run_test_muon.sh
 
-DAY=`date +%y-%m-%d-%T`
+DAY=`date +%y-%m-%d`
 cd /u/andrey/web-docs/tests
+rm -r -f $DAY
 mkdir $DAY
 
 cp -r /u/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/results_electron /u/andrey/web-docs/tests/$DAY/results_electron

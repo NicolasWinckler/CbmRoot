@@ -27,6 +27,7 @@ namespace lit {
 namespace parallel {
 
 /**
+ * \fn template<class T> inline void LitAddMaterial(LitTrackParam<T>& par, const LitMaterialInfo<T>& mat)
  * \brief Function calculates material effects and updates track parameters and covariance matrix.
  *
  * \param[in,out] par Reference to track parameters.
@@ -167,6 +168,7 @@ inline void LitAddMaterial(
 
 
 /**
+ * \fn template<class T> inline void LitAddMaterialElectron(LitTrackParam<T>& par, const LitMaterialInfo<T>& mat)
  * \brief Function calculates material effects for electrons and updates track parameters and covariance matrix.
  *
  * \param[in,out] par Reference to track parameters.

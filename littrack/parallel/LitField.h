@@ -13,8 +13,10 @@
 #include "LitMath.h"
 #include "LitUtils.h"
 
-/* Order of the polynomial function which
- * is used for magnetic field approximation */
+/**
+ * \def LIT_POLYNOM_DEGREE
+ * \brief Order of the polynomial function which is used for magnetic field approximation
+ */
 #define LIT_POLYNOM_DEGREE 7
 
 namespace lit {
@@ -611,7 +613,7 @@ public:
     * \param[in] xmin Minimum X position.
     * \param[in] ymax Maximum Y position.
     * \param[in] ymin Minimum Y position.
-    * \parma[in] nofCellsX Number of cells in X.
+    * \param[in] nofCellsX Number of cells in X.
     * \param[in] nofCellsY Number of cells in Y.
     */
    void SetField(

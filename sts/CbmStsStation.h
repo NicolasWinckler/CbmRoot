@@ -99,7 +99,7 @@ class CbmStsStation : public TNamed
   std::map<Int_t, Int_t> fSectorMap; //! Map from sector number to index
   std::map<Int_t, Int_t> fMcIdMap;   //! Map from McId to index
   
-  Double_t fSensorZ[20];
+  Double_t fSensorZ[30];
  
  private:
 

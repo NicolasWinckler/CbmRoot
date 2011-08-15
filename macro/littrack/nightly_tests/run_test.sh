@@ -15,9 +15,9 @@ cmake ../cbmroot
 . ./config.sh
 make -j6
 
-cp /d/cbm02/andrey/tests/field_v10e.root /d/cbm02/andrey/tests/nightly/trunk/cbmroot/input/field_v10e.root
+cp /d/cbm02/andrey/tests/field_v10e.root /data.local1/andrey/tests/nightly/trunk/cbmroot/input/field_v10e.root
 
-cd /d/cbm02/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/
+cd /data.local1/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/
 . ./run_test_electron.sh
 . ./run_test_muon.sh
 
@@ -26,5 +26,5 @@ cd /u/andrey/web-docs/tests
 rm -r -f $DAY
 mkdir $DAY
 
-cp -r /u/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/results_electron /u/andrey/web-docs/tests/$DAY/results_electron
-cp -r /u/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/results_muon /u/andrey/web-docs/tests/$DAY/results_muon
+cp -r /data.local1/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/results_electron /u/andrey/web-docs/tests/$DAY/results_electron
+cp -r /data.local1/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/results_muon /u/andrey/web-docs/tests/$DAY/results_muon

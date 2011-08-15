@@ -1,3 +1,13 @@
+/**
+ * \file LitTypes.h
+ *
+ * \brief Header files for SSE operations.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
+
 #ifndef LITTYPES_H_
 #define LITTYPES_H_
 

@@ -1,10 +1,12 @@
-/** LitVecPack.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitVecPack.h
  *
- * Functions to pack and unpack vector data classes.
- **/
+ * \brief Functions to pack and unpack vector data classes.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ */
 
 #ifndef LITVECPACK_H_
 #define LITVECPACK_H_
@@ -16,6 +18,13 @@
 namespace lit {
 namespace parallel {
 
+/**
+ * \fn void inline void PackFieldValue(const LitFieldValue<fscal> value[], LitFieldValue<fvec>& lvalue)
+ * \brief Packs \c LitFieldValue.
+ *
+ * \param[in] value Array of fvecLen length of LitFieldValue<fscal> objects to be packed into a vector.
+ * \param[out] lvalue Packed LitFieldValue.
+ */
 inline void PackFieldValue(
    const LitFieldValue<fscal> value[],
    LitFieldValue<fvec>& lvalue)
@@ -27,6 +36,15 @@ inline void PackFieldValue(
    }
 }
 
+
+
+/**
+ * \fn inline void PackTrackParam(const LitTrackParam<fscal> par[], LitTrackParam<fvec>& lpar)
+ * \brief Packs \c LitTrackParam.
+ *
+ * \param[in] par Array of fvecLen length of LitTrackParam<fscal> objects to be packed into a vector.
+ * \param[out] lpar Packed LitTrackParam.
+ */
 inline void PackTrackParam(
    const LitTrackParam<fscal> par[],
    LitTrackParam<fvec>& lpar)
@@ -56,6 +74,15 @@ inline void PackTrackParam(
    }
 }
 
+
+
+/**
+ * \fn inline void UnpackTrackParam(const LitTrackParam<fvec>& lpar, LitTrackParam<fscal> par[])
+ * \brief Unpacks \c LitTrackParam.
+ *
+ * \param[in] lpar Packed LitTrackParam to be unpacked.
+ * \param[out] par Array of fvecLen length to store unpacked scalar objects.
+ */
 inline void UnpackTrackParam(
    const LitTrackParam<fvec>& lpar,
    LitTrackParam<fscal> par[])
@@ -85,6 +112,16 @@ inline void UnpackTrackParam(
    }
 }
 
+
+
+/**
+ * \fn inline void UnpackTrackParam(unsigned int i, const LitTrackParam<fvec>& lpar, LitTrackParam<fscal>& par)
+ * \brief Unpacks \c LitTrackParam.
+ *
+ * \param[in] i Index of vector LitTrackParam to be unpacked to scalar.
+ * \param[in] lpar Packed LitTrackParam to be unpacked.
+ * \param[out] par Array of fvecLen length to store unpacked scalar objects.
+ */
 inline void UnpackTrackParam(
    unsigned int i,
    const LitTrackParam<fvec>& lpar,
@@ -113,6 +150,15 @@ inline void UnpackTrackParam(
    par.C14 = lpar.C14[i];
 }
 
+
+
+/**
+ * \fn inline void PackPixelHit(const LitScalPixelHit hit[], LitPixelHit<fvec>& lhit)
+ * \brief Packs \c LitPixelHit.
+ *
+ * \param[in] par Array of fvecLen length of LitScalPixelHit objects to be packed into a vector.
+ * \param[out] lpar Packed LitPixelHit.
+ */
 inline void PackPixelHit(
    const LitScalPixelHit hit[],
    LitPixelHit<fvec>& lhit)
@@ -126,6 +172,15 @@ inline void PackPixelHit(
    }
 }
 
+
+
+/**
+ * \fn inline void UnpackPixelHit(const LitPixelHit<fvec>& lhit, LitScalPixelHit hit[])
+ * \brief Unpacks \c LitPixelHit.
+ *
+ * \param[in] lpar Packed LitPixelHit to be unpacked.
+ * \param[out] par Array of fvecLen length to store unpacked scalar objects.
+ */
 inline void UnpackPixelHit(
    const LitPixelHit<fvec>& lhit,
    LitScalPixelHit hit[])
@@ -140,6 +195,14 @@ inline void UnpackPixelHit(
 }
 
 
+
+/**
+ * \fn inline void PackTrack(const LitTrack<fscal>* track[], LitTrack<fvec>& ltrack)
+ * \brief Packs \c LitTrack.
+ *
+ * \param[in] par Array of fvecLen length of LitTrack objects to be packed into a vector.
+ * \param[out] lpar Packed LitTrack.
+ */
 inline void PackTrack(
    const LitTrack<fscal>* track[],
    LitTrack<fvec>& ltrack)
@@ -213,6 +276,17 @@ inline void PackTrack(
 //   ltrack.nofHits = nofHits;
 }
 
+
+
+/**
+ * \fn inline void UnpackTrack(const LitTrack<fvec>& ltrack, LitTrack<fscal> track[])
+ * \brief Unpacks \c LitTrack.
+ *
+ * NOTE: Currently not implemented!
+ *
+ * \param[in] lpar Packed LitTrack to be unpacked.
+ * \param[out] par Array of fvecLen length to store unpacked scalar objects.
+ */
 inline void UnpackTrack(
    const LitTrack<fvec>& ltrack,
    LitTrack<fscal> track[])

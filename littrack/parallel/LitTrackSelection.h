@@ -1,10 +1,12 @@
-/** LitTrackSelection.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
+/**
+ * \file LitTrackSelection.h
  *
- * Implementation of the track selection algorithms.
- **/
+ * \brief Implementation of the track selection algorithms.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ *
+ */
 #ifndef LITTRACKSELECTION_H_
 #define LITTRACKSELECTION_H_
 
@@ -19,6 +21,17 @@
 namespace lit {
 namespace parallel {
 
+/**
+ * \fn void SortTracksByQuality(TrackIterator itBegin, TrackIterator itEnd)
+ * \brief Sorts track array by quality.
+ *
+ * First tracks are sorted by the number of hits.
+ * Than each subset of tracks with equal number
+ * of hits is sorted by the chi square.
+ *
+ * \param[in] itBegin Iterator to the first track.
+ * \param[in] itEnd Iterator to the last track.
+ */
 void SortTracksByQuality(
    TrackIterator itBegin,
    TrackIterator itEnd)
@@ -42,6 +55,13 @@ void SortTracksByQuality(
 
 
 
+/**
+ * \fn void DoTrackSelectionSameSeed(TrackIterator itBegin, TrackIterator itEnd)
+ * \brief Selects the best track for each subset of tracks with the same previous track index.
+ *
+ * \param[in] itBegin Iterator to the first track.
+ * \param[in] itEnd Iterator to the last track.
+ */
 void DoTrackSelectionSameSeed(
       TrackIterator itBegin,
       TrackIterator itEnd)
@@ -68,6 +88,20 @@ void DoTrackSelectionSameSeed(
 
 
 
+/**
+ * \fn void DoTrackSelectionSharedHits(TrackIterator itBegin, TrackIterator itEnd)
+ * \brief Removes clone and ghost tracks sorting by quality and checking of shared hits.
+ *
+ * This selection algorithm works in two steps. First, tracks are sorted by
+ * their quality which is defined by the track length and chi-square.
+ * Then, starting from the highest quality tracks all hits belonging to
+ * a track are checked. In particular, the number of hits shared with other
+ * tracks is calculated and the track is rejected if more than
+ * MAX_NOF_SHARED_HITS of the hits are shared.
+ *
+ * \param[in] itBegin Iterator to the first track.
+ * \param[in] itEnd Iterator to the last track.
+ */
 void DoTrackSelectionSharedHits(
    TrackIterator itBegin,
    TrackIterator itEnd)
@@ -118,6 +152,13 @@ void DoTrackSelectionSharedHits(
 
 
 
+/**
+ * \fn void DoTrackSelectionMuon(TrackIterator itBegin, TrackIterator itEnd)
+ * \brief Track selection for the MUCH tracking.
+ *
+ * \param[in] itBegin Iterator to the first track.
+ * \param[in] itEnd Iterator to the last track.
+ */
 void DoTrackSelectionMuon(
    TrackIterator itBegin,
    TrackIterator itEnd)
@@ -132,6 +173,13 @@ void DoTrackSelectionMuon(
 
 
 
+/**
+ * \fn void DoTrackSelectionElectron(TrackIterator itBegin, TrackIterator itEnd)
+ * \brief Track selection for the TRD tracking.
+ *
+ * \param[in] itBegin Iterator to the first track.
+ * \param[in] itEnd Iterator to the last track.
+ */
 void DoTrackSelectionElectron(
    TrackIterator itBegin,
    TrackIterator itEnd)

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /u/andrey/tests/
+cd /d/cbm02/andrey/tests/
 rm -r -f nightly
 mkdir nightly
 cd nightly
@@ -15,9 +15,9 @@ cmake ../cbmroot
 . ./config.sh
 make -j6
 
-cp /u/andrey/tests/field_v10e.root /u/andrey/tests/nightly/trunk/cbmroot/input/field_v10e.root
+cp /d/cbm02/andrey/tests/field_v10e.root /d/cbm02/andrey/tests/nightly/trunk/cbmroot/input/field_v10e.root
 
-cd /u/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/
+cd /d/cbm02/andrey/tests/nightly/trunk/cbmroot/macro/littrack/nightly_tests/
 . ./run_test_electron.sh
 . ./run_test_muon.sh
 

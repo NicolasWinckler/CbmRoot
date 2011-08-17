@@ -11,7 +11,7 @@ export SCRIPT=yes
 create_output_dir events_electron/
 create_image_dir results_electron/
 
-export NEVENTS=10
+export NEVENTS=2
 export DETECTORSETUP=electron
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI  PLUTO USEUNIGEN
@@ -20,6 +20,7 @@ set_simulation_parameters $pars
 
 set_default_electron_geometry
 
+export STSHITPRODUCERTYPE=real
 export TRACKINGTYPE=branch
 export TRDHITPRODUCERTYPE=smearing
 

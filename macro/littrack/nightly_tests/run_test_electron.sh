@@ -20,6 +20,7 @@ set_simulation_parameters $pars
 
 set_default_electron_geometry
 
+export STSHITPRODUCERTYPE=real
 export TRACKINGTYPE=branch
 export TRDHITPRODUCERTYPE=smearing
 

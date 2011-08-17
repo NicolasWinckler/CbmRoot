@@ -18,7 +18,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	TString dir, imageDir, mcFile, parFile, globalRecoFile, muchDigiFile, trackingType;
-	TString trdHitProducerType;
+	TString stsHitProducerType, trdHitProducerType;
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	Int_t normStsPoints, normTrdPoints, normMuchPoints, normTofPoints;
@@ -55,6 +55,8 @@ void global_reco(Int_t nEvents = 10, // number of events
 		TString imageDir = "./test/";
 		// Tracking type
 		trackingType = "branching";
+		// STS hit producer type: real, ideal
+		stsHitProducerType = "real";
 		// TRD hit producer type: smearing, digi, clustering
 		trdHitProducerType = "clustering";
 		// Normalization for efficiency
@@ -78,6 +80,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
 		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
+		stsHitProducerType = TString(gSystem->Getenv("STSHITPRODUCERTYPE"));
 		trdHitProducerType = TString(gSystem->Getenv("TRDHITPRODUCERTYPE"));
 		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
 		TObjString stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
@@ -139,18 +142,50 @@ void global_reco(Int_t nEvents = 10, // number of events
 			// -------------------------------------------------------------------------
 		}
 
-		// ----- STS reconstruction   ---------------------------------------------
-		FairTask* stsDigitize =	new CbmStsIdealDigitize("STSDigitize", iVerbose);
-		run->AddTask(stsDigitize);
+		if (stsHitProducerType == "real") {
+		// ----- STS REAL reconstruction -----------------------------------------------
+         Double_t threshold  =  4;
+         Double_t noiseWidth =  0.01;
+         Int_t    nofBits    = 20;
+         Double_t minStep    =  0.01;
+         Double_t StripDeadTime = 0.1;
+         CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+         stsDigitize->SetRealisticResponse();
+         stsDigitize->SetFrontThreshold (threshold);
+         stsDigitize->SetBackThreshold  (threshold);
+         stsDigitize->SetFrontNoiseWidth(noiseWidth);
+         stsDigitize->SetBackNoiseWidth (noiseWidth);
+         stsDigitize->SetFrontNofBits   (nofBits);
+         stsDigitize->SetBackNofBits    (nofBits);
+         stsDigitize->SetFrontMinStep   (minStep);
+         stsDigitize->SetBackMinStep    (minStep);
+         stsDigitize->SetStripDeadTime  (StripDeadTime);
+         run->AddTask(stsDigitize);
 
-		FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
-		run->AddTask(stsClusterFinder);
+         FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+         run->AddTask(stsClusterFinder);
 
-		FairTask* stsFindHits =	new CbmStsIdealFindHits("STSFindHits", iVerbose);
-		run->AddTask(stsFindHits);
+         FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
+         run->AddTask(stsFindHits);
 
-		FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
-		run->AddTask(stsMatchHits);
+         FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+         run->AddTask(stsMatchHits);
+
+		} else if (stsHitProducerType == "ideal") {
+
+         // ----- STS IDEAL reconstruction   ---------------------------------------------
+         FairTask* stsDigitize =	new CbmStsIdealDigitize("STSDigitize", iVerbose);
+         run->AddTask(stsDigitize);
+
+         FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+         run->AddTask(stsClusterFinder);
+
+         FairTask* stsFindHits =	new CbmStsIdealFindHits("STSFindHits", iVerbose);
+         run->AddTask(stsFindHits);
+
+         FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
+         run->AddTask(stsMatchHits);
+		}
 
 		FairTask* kalman = new CbmKF();
 		run->AddTask(kalman);

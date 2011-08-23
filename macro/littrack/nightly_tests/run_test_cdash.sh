@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $VMCWORKDIR/Dart.sh Nightly Dart.cfg    
+. $VMCWORKDIR/Dart.sh Nightly $VMCWORKDIR/Dart.cfg    
 
 DAY=`date +%y-%m-%d`
 cd /u/andrey/web-docs/tests

@@ -7,6 +7,7 @@
 #include "qa/CbmLitReconstructionQaImpl.h"
 #include "qa/CbmLitReconstructionQaPrint.h"
 #include "qa/CbmLitReconstructionQaHTML.h"
+#include "qa/CbmLitReconstructionQaChecker.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitDrawHist.h"
@@ -40,6 +41,7 @@
 #include "TFile.h"
 #include "TProfile.h"
 #include "TLine.h"
+#include "TSystem.h"
 
 #include <iostream>
 #include <map>
@@ -1824,7 +1826,7 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
    PolarAngleEfficiencyToPTree(&pt, "hRecAngle", fhRecAngle);
    PolarAngleEfficiencyToPTree(&pt, "hTofAngle", fhTofAngle);
 
-   if (fOutputJsonFileName != "") write_json(fOutputJsonFileName, pt);
+   write_json(std::string(fOutputDir + "rec_qa.json").c_str(), pt);
    return pt;
 }
 
@@ -2103,12 +2105,23 @@ void CbmLitReconstructionQaImpl::Draw()
    DrawHitsStationHistos();
    DrawStsTracksQaHistos();
    DrawMcEfficiencyGraph();
-   std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
-   boost::property_tree::ptree pt = PrintPTree();
-   CbmLitReconstructionQaPrint::PrintFinalStatistics(fout, &pt);
 
+   boost::property_tree::ptree qa = PrintPTree();
+
+   boost::property_tree::ptree ideal, check;
+   std::string qaIdealFile = std::string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
+   read_json(qaIdealFile.c_str(), ideal);
+
+   CbmLitReconstructionQaChecker qaChecker;
+   qaChecker.DoCheck(qa, ideal, check);
+   write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
+
+   std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
+   CbmLitReconstructionQaPrint::PrintFinalStatistics(fout, &qa);
+
+   CbmLitReconstructionQaHTML html;
    std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-   CbmLitReconstructionQaHTML::PrintFinalStatistics(foutHtml, &pt);
+   html.Create(foutHtml, &qa, &ideal, &check);
 }
 
 void CbmLitReconstructionQaImpl::DrawEfficiencyHistos()

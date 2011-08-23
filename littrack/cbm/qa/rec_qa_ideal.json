@@ -1,0 +1,74 @@
+{
+    "hGlobalMom":
+    {
+        "all":
+        {
+            "eff":
+            {
+               "min": "99",
+               "max": "100"
+            }
+        },
+        "el":
+        {
+            "eff":
+            {
+               "min": "99",
+               "max": "100"
+            }
+        },
+        "mu":
+        {
+            "eff":
+            {
+               "min": "99",
+               "max": "100"
+            }
+        }
+    },
+    "hNofGlobalTracks": 
+    {
+       "min": "100",
+       "max": "200"
+    },
+    "hNofStsHits": 
+    {
+       "min": "20000",
+       "max": "30000"
+    },
+    "hNofTofHits":
+    {
+       "min": "20000",
+       "max": "30000"
+    },
+    "hRecMom":
+    {
+        "all":
+        {
+            "eff":
+            {
+               "min": "90",
+               "max": "100"
+            }
+        }
+    },
+    "hStsMom":
+    {
+        "all":
+        {
+            "eff": 
+            {
+               "min": "99",
+               "max": "100"
+            }
+        },
+        "ref":
+        {
+            "eff":
+            {
+               "min": "95",
+               "max": "100"
+            }
+        }
+    }
+}

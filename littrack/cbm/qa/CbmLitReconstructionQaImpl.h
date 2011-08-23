@@ -94,10 +94,6 @@ public:
     * @param dir Directory name. */
    void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
-   /* Sets the output json file name.
-    * @param dir path. */
-   void SetOutputJsonFileName(const std::string& path) { fOutputJsonFileName = path;}
-
    /* Sets momentum range for efficiency calculation */
    void SetMomentumRange(Double_t minMom, Double_t maxMom) {
       fMinMom = minMom;
@@ -627,7 +623,6 @@ private:
    TH1F* fhEventNo; // Event counter
 
    std::string fOutputDir; // Output directory for images
-   std::string fOutputJsonFileName; // Output directory for images
 
    CbmVertex *fPrimVertex; // Pointer to the primary vertex
    CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm

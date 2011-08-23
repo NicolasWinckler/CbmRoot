@@ -91,11 +91,6 @@ void CbmLitReconstructionQa::SetOutputDir(const std::string& dir)
 }
 
 
-void CbmLitReconstructionQa::SetOutputJsonFileName(const std::string& path)
-{
-   fImpl->SetOutputJsonFileName(path);
-}
-
 void CbmLitReconstructionQa::SetMomentumRange(Double_t minMom, Double_t maxMom)
 {
    fImpl->SetMomentumRange(minMom, maxMom);

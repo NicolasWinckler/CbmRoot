@@ -1,3 +1,11 @@
+
+
+set(CUDA_BUILD_TYPE "Device")
+#set(CUDA_BUILD_TYPE "Emulation")
+# Load some basic macros which are needed later on
+include(${CMAKE_SOURCE_DIR}/cmake/cuda/FindCuda.cmake)
+
+
 # Add current directory to the nvcc include line.
 CUDA_INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}
@@ -37,7 +45,7 @@ CUDA_ADD_LIBRARY(cudaimpl $ {CUDA_SRCS})
 
 ##############################################################################
 # Use the CUDA_COMPILE macro.
-CUDA_COMPILE(CUDA_FILES )
+CUDA_COMPILE(CUDA_FILES)
 
 IF(UNIX AND NOT WIN32)
 FIND_PROGRAM(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
@@ -66,9 +74,9 @@ include_directories(
 #
 #)
 
-link_directories(
-   $ {LINK_DIRECTORIES}
-)
+#link_directories(
+#   $ {LINK_DIRECTORIES}
+#)
 
 set(CUDALITTRACK_SRCS
     LitCudaTest.cxx
@@ -88,7 +96,7 @@ ADD_LIBRARY(cudalittrack SHARED
            )
 
 ############### build the library #####################
-add_library(cudalittrack SHARED $ {CUDALITTRACK_SRCS})
+#add_library(cudalittrack SHARED $ {CUDALITTRACK_SRCS})
 
 target_link_libraries(
    cudalittrack $ {ROOT_LIBRARIES}
@@ -100,4 +108,4 @@ set_target_properties(cudalittrack PROPERTIES $ {FAIRROOT_LIBRARY_PROPERTIES})
 
 ############### install the library #############
 ######
-install(TARGETS cudalittrack DESTINATION $ {CMAKE_BINARY_DIR}/lib)
+#install(TARGETS cudalittrack DESTINATION $ {CMAKE_BINARY_DIR}/lib)

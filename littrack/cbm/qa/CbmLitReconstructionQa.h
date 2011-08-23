@@ -78,10 +78,6 @@ public:
     * @param dir Directory name. */
    void SetOutputDir(const std::string& dir);
 
-   /* Sets the output json file name.
-    * @param dir path. */
-   void SetOutputJsonFileName(const std::string& path);
-
    /* Sets momentum range for efficiency calculation */
    void SetMomentumRange(Double_t minMom, Double_t maxMom);
 
@@ -112,7 +108,6 @@ private:
    virtual void Finish();
 
    CbmLitReconstructionQaImpl* fImpl;
-
 
    ClassDef(CbmLitReconstructionQa, 1);
 };

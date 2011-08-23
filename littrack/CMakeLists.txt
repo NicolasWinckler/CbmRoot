@@ -124,6 +124,7 @@ If(Boost_FOUND)
       cbm/qa/CbmLitReconstructionQaPrint.cxx
       cbm/qa/CbmLitReconstructionQaHTML.cxx
       cbm/qa/CbmLitReconstructionQaLatex.cxx
+      cbm/qa/CbmLitReconstructionQaChecker.cxx
      )
 EndIf(Boost_FOUND)
 
@@ -203,12 +204,12 @@ endif(RULE_CHECKER_FOUND)
 IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-msse -O3 ")
+  "-msse -O3 -w")
   Message(STATUS "LitTrack will be compiled with SSE support")
 ELSE (SSE_FOUND)
   Message(STATUS "LitTrack will be compiled without SSE support")
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-O3 ")
+  "-O3 -w")
 ENDIF (SSE_FOUND)
 
 

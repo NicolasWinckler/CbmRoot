@@ -11,7 +11,7 @@ export SCRIPT=yes
 create_output_dir events_muon/
 create_image_dir results_muon/
 
-export NEVENTS=500
+export NEVENTS=5
 export DETECTORSETUP=muon
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E   PI  PLUTO USEUNIGEN

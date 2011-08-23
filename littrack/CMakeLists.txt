@@ -77,6 +77,8 @@ cbm/elid/CbmLitGlobalElectronId.cxx
 ##cbm/finder/CbmLitFindGlobalTracks.cxx 
 cbm/finder/CbmLitFindMvdTracks.cxx
 
+cbm/generators/CbmLitPolarizedGenerator.cxx
+
 cbm/geo/CbmLitDet.cxx
 cbm/geo/CbmLitDetContFact.cxx 
 cbm/geo/CbmLitDetGeo.cxx 
@@ -135,6 +137,7 @@ cbm/elid/CbmLitGlobalElectronId.h
 cbm/finder/CbmLitFindGlobalTracks.h
 #cbm/finder/CbmLitCudaTest.h 
 cbm/finder/CbmLitFindMvdTracks.h
+cbm/generators/CbmLitPolarizedGenerator.h
 cbm/geo/CbmLitDet.h 
 cbm/geo/CbmLitDetContFact.h
 cbm/geo/CbmLitDetGeo.h 

@@ -265,43 +265,60 @@ void global_sim(Int_t nEvents = 1000)
 		}
 	}
 
-	if (muons == "yes") {
-		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, NMUONSMINUS);
-		boxGen1->SetPRange(1.5, 16.);
-		boxGen1->SetPhiRange(0.,360.);
-		boxGen1->SetThetaRange(2.5, 25.);
-		boxGen1->SetCosTheta();
-		boxGen1->Init();
-		primGen->AddGenerator(boxGen1);
-
-		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, NMUONSPLUS);
-		boxGen2->SetPRange(1.5, 16.);
-		boxGen2->SetPhiRange(0.,360.);
-		boxGen2->SetThetaRange(2.5, 25.);
-		boxGen2->SetCosTheta();
-		boxGen2->Init();
-		primGen->AddGenerator(boxGen2);
+	if (muons == "yes" || electrons == "yes") {
+      CbmLitPolarizedGenerator *polGen;
+      if (muons == "yes") polGen = new CbmLitPolarizedGenerator(443, NMUONSPLUS);
+      else if (electrons == "yes") polGen = new CbmLitPolarizedGenerator(443, NELECTRONS);
+      polGen->SetDistributionPt(0.176);        // 25 GeV
+      polGen->SetDistributionY(1.9875,0.228);  // 25 GeV
+      polGen->SetRangePt(0.,3.);
+      polGen->SetRangeY(1.,3.);
+      polGen->SetBox(0);
+      polGen->SetRefFrame(CbmLitPolarizedGenerator::kHelicity);
+      if (muons == "yes") polGen->SetDecayMode(CbmLitPolarizedGenerator::kDiMuon);
+      else if (electrons == "yes") polGen->SetDecayMode(CbmLitPolarizedGenerator::kDiElectron);
+      polGen->SetAlpha(0);
+      polGen->Init();
+      primGen->AddGenerator(polGen);
 	}
 
-	if (electrons == "yes") {
-		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, NELECTRONS);
-		boxGen1->SetPtRange(0.,3.);
-//		boxGen1->SetPRange(30, 30);
-		boxGen1->SetPhiRange(0.,360.);
-		boxGen1->SetThetaRange(2.5,25.);
-		boxGen1->SetCosTheta();
-		boxGen1->Init();
-		primGen->AddGenerator(boxGen1);
-
-		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, NPOSITRONS);
-		boxGen2->SetPtRange(0.,3.);
-//		boxGen2->SetPRange(30, 30);
-		boxGen2->SetPhiRange(0.,360.);
-		boxGen2->SetThetaRange(2.5,25.);
-		boxGen2->SetCosTheta();
-		boxGen2->Init();
-		primGen->AddGenerator(boxGen2);
-	}
+//	if (muons == "yes") {
+//		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, NMUONSMINUS);
+//		boxGen1->SetPRange(1.5, 16.);
+//		boxGen1->SetPhiRange(0.,360.);
+//		boxGen1->SetThetaRange(2.5, 25.);
+//		boxGen1->SetCosTheta();
+//		boxGen1->Init();
+//		primGen->AddGenerator(boxGen1);
+//
+//		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, NMUONSPLUS);
+//		boxGen2->SetPRange(1.5, 16.);
+//		boxGen2->SetPhiRange(0.,360.);
+//		boxGen2->SetThetaRange(2.5, 25.);
+//		boxGen2->SetCosTheta();
+//		boxGen2->Init();
+//		primGen->AddGenerator(boxGen2);
+//	}
+//
+//	if (electrons == "yes") {
+//		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, NELECTRONS);
+//		boxGen1->SetPtRange(0.,3.);
+////		boxGen1->SetPRange(30, 30);
+//		boxGen1->SetPhiRange(0.,360.);
+//		boxGen1->SetThetaRange(2.5,25.);
+//		boxGen1->SetCosTheta();
+//		boxGen1->Init();
+//		primGen->AddGenerator(boxGen1);
+//
+//		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, NPOSITRONS);
+//		boxGen2->SetPtRange(0.,3.);
+////		boxGen2->SetPRange(30, 30);
+//		boxGen2->SetPhiRange(0.,360.);
+//		boxGen2->SetThetaRange(2.5,25.);
+//		boxGen2->SetCosTheta();
+//		boxGen2->Init();
+//		primGen->AddGenerator(boxGen2);
+//	}
 
 	if (pions == "yes") {
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(211, NPIONSPLUS);

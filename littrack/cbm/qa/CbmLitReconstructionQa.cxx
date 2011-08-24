@@ -7,6 +7,7 @@
 #include "qa/CbmLitReconstructionQa.h"
 #include "qa/CbmLitReconstructionQaImpl.h"
 #include "qa/CbmLitReconstructionQaLatex.h"
+#include "qa/CbmLitQaHTMLGeneratorStudy.h"
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
    FairTask("LitReconstructionQA", 1)
@@ -121,6 +122,14 @@ void CbmLitReconstructionQa::PrintLatexTable(
       const std::vector<std::string>& files)
 {
    CbmLitReconstructionQaLatex::PrintLatexTable(files);
+}
+
+void CbmLitReconstructionQa::CreateStudyHTML(
+      const std::vector<std::string>& results,
+      const std::vector<std::string>& names)
+{
+   CbmLitQaHTMLGeneratorStudy html;
+   html.Create(results, names);
 }
 
 ClassImp(CbmLitReconstructionQa);

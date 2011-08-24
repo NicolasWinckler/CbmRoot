@@ -127,6 +127,7 @@ If(Boost_FOUND)
       cbm/qa/CbmLitReconstructionQaHTML.cxx
       cbm/qa/CbmLitReconstructionQaLatex.cxx
       cbm/qa/CbmLitReconstructionQaChecker.cxx
+      cbm/qa/CbmLitQaHTMLGeneratorStudy.cxx
      )
 EndIf(Boost_FOUND)
 

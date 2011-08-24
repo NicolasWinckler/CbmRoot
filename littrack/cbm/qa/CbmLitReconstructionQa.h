@@ -103,6 +103,10 @@ public:
    static void PrintLatexTable(
          const std::vector<std::string>& files);
 
+   static void CreateStudyHTML(
+         const std::vector<std::string>& results,
+         const std::vector<std::string>& names);
+
 private:
    /* Derived from FairTask. Executed after all events are processed. */
    virtual void Finish();

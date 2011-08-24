@@ -1,10 +1,10 @@
-/** CbmLitReconstructionQaLatex.cxx
+/** CbmLitQaLatexGenerator.cxx
  * @author Semen Lebedev <s.lebedev@gsi.de>
  * @since 2011
  * @version 1.0
  **/
 
-#include "qa/CbmLitReconstructionQaLatex.h"
+#include "qa/CbmLitQaLatexGenerator.h"
 
 #include <iostream>
 //#include <sstream>
@@ -15,7 +15,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-void CbmLitReconstructionQaLatex::PrintRowGroup(
+void CbmLitQaLatexGenerator::PrintRowGroup(
       const std::string& groupName,
       Int_t nofRows,
       const std::string& rowName,
@@ -38,7 +38,7 @@ void CbmLitReconstructionQaLatex::PrintRowGroup(
    std::cout << " \\\\ \n" << std::endl;
 }
 
-void CbmLitReconstructionQaLatex::PrintRow(
+void CbmLitQaLatexGenerator::PrintRow(
       const std::string& rowName,
       const std::string& name1,
       const std::string& name2,
@@ -57,7 +57,7 @@ void CbmLitReconstructionQaLatex::PrintRow(
    std::cout << " \\\\ \n " << std::endl;
 }
 
-std::string CbmLitReconstructionQaLatex::ToStringAutoPrecision(Double_t d)
+std::string CbmLitQaLatexGenerator::ToStringAutoPrecision(Double_t d)
 {
    if (d < .05) return lit::ToString<Double_t>(d, 3);
    if (d < 5.0) return lit::ToString<Double_t>(d, 2);
@@ -68,7 +68,7 @@ std::string CbmLitReconstructionQaLatex::ToStringAutoPrecision(Double_t d)
 
 }
 
-void CbmLitReconstructionQaLatex::PrintLatexTable(
+void CbmLitQaLatexGenerator::PrintLatexTable(
       const std::vector<std::string>& files)
 {
    Int_t n = files.size();

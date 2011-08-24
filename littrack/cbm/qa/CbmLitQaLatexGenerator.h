@@ -1,12 +1,12 @@
-/** CbmLitReconstructionQaLatex.h
+/** CbmLitQaLatexGenerator.h
  * @author Semen Lebedev <s.lebedev@gsi.de>
  * @since 2011
  * @version 1.0
  **
  **/
 
-#ifndef CBMLITRECONSTRUCTIONQALATEX_H_
-#define CBMLITRECONSTRUCTIONQALATEX_H_
+#ifndef CBMLITQALATEXGENERATOR_H_
+#define CBMLITQALATEXGENERATOR_H_
 
 #include "TObject.h"
 #include <string>
@@ -15,14 +15,14 @@
 #include <boost/property_tree/ptree.hpp>
 
 
-class CbmLitReconstructionQaLatex
+class CbmLitQaLatexGenerator
 {
 public:
    /* Constructor */
-   CbmLitReconstructionQaLatex(){;}
+   CbmLitQaLatexGenerator(){;}
 
    /* Destructor */
-   virtual ~CbmLitReconstructionQaLatex(){;}
+   virtual ~CbmLitQaLatexGenerator(){;}
 
    /* This method should be called from a macro, it creates
     * a latex table.
@@ -66,4 +66,4 @@ private:
          Double_t d);
 };
 
-#endif /* CBMLITRECONSTRUCTIONQALATEX_H_ */
+#endif /* CBMLITQALATEXGENERATOR_H_ */

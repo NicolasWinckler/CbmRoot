@@ -1,10 +1,10 @@
-/** CbmLitReconstructionQaPrint.cxx
+/** CbmLitQaPrintGenerator.cxx
  * @author Semen Lebedev <s.lebedev@gsi.de>
  * @since 2011
  * @version 1.0
  **/
 
-#include "qa/CbmLitReconstructionQaPrint.h"
+#include "qa/CbmLitQaPrintGenerator.h"
 
 #include <iostream>
 #include <map>
@@ -21,7 +21,7 @@
 
 
 
-void CbmLitReconstructionQaPrint::PrintEventStatistics(
+void CbmLitQaPrintGenerator::PrintEventStatistics(
    std::ostream& out,
    boost::property_tree::ptree* pt)
 {
@@ -95,7 +95,7 @@ void CbmLitReconstructionQaPrint::PrintEventStatistics(
 }
 
 
-void CbmLitReconstructionQaPrint::PrintFinalStatistics(
+void CbmLitQaPrintGenerator::PrintFinalStatistics(
    std::ostream& out,
    boost::property_tree::ptree* pt)
 {
@@ -295,7 +295,7 @@ void CbmLitReconstructionQaPrint::PrintFinalStatistics(
    out << std::setfill('_') << std::setw(7*w) << "_" << std::endl;
 }
 
-std::string CbmLitReconstructionQaPrint::PrintNofStatisticsToString(
+std::string CbmLitQaPrintGenerator::PrintNofStatisticsToString(
    boost::property_tree::ptree* pt,
    const std::string& name,
    const std::string& mvd,
@@ -333,7 +333,7 @@ std::string CbmLitReconstructionQaPrint::PrintNofStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaPrint::PrintHitsStatisticsToString(
+std::string CbmLitQaPrintGenerator::PrintHitsStatisticsToString(
    boost::property_tree::ptree* pt,
    const std::string& hist,
    const std::string& name)
@@ -365,7 +365,7 @@ std::string CbmLitReconstructionQaPrint::PrintHitsStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsToString(
+std::string CbmLitQaPrintGenerator::EventEfficiencyStatisticsToString(
    boost::property_tree::ptree* pt,
    const std::string& name,
    const std::string& opt)
@@ -421,7 +421,7 @@ std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsRichToString(
+std::string CbmLitQaPrintGenerator::EventEfficiencyStatisticsRichToString(
    boost::property_tree::ptree* pt,
    const std::string& name,
    const std::string& opt)
@@ -472,7 +472,7 @@ std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsRichToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsElIdToString(
+std::string CbmLitQaPrintGenerator::EventEfficiencyStatisticsElIdToString(
    boost::property_tree::ptree* pt,
    const std::string& name,
    const std::string& opt)
@@ -497,7 +497,7 @@ std::string CbmLitReconstructionQaPrint::EventEfficiencyStatisticsElIdToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaPrint::EventDetAccElStatisticsToString(
+std::string CbmLitQaPrintGenerator::EventDetAccElStatisticsToString(
    boost::property_tree::ptree* pt,
    const std::string& effName,
    const std::string& name)
@@ -524,7 +524,7 @@ std::string CbmLitReconstructionQaPrint::EventDetAccElStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaPrint::PolarAngleEfficiencyToString(
+std::string CbmLitQaPrintGenerator::PolarAngleEfficiencyToString(
    boost::property_tree::ptree* pt,
    const std::string& name)
 {

@@ -6,8 +6,8 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITRECOQASTUDYGENERATORHTML_H_
-#define CBMLITRECOQASTUDYGENERATORHTML_H_
+#ifndef CBMLITQAHTMLGENERATORSTUDY_H_
+#define CBMLITQAHTMLGENERATORSTUDY_H_
 
 #include <vector>
 #include <string>
@@ -100,4 +100,4 @@ private:
    std::vector<std::string> fStudyResults;
 };
 
-#endif /* CBMLITRECOQASTUDYGENERATORHTML_H_ */
+#endif /* CBMLITQAHTMLGENERATORSTUDY_H_ */

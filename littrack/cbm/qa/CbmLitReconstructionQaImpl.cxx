@@ -5,8 +5,8 @@
  **/
 
 #include "qa/CbmLitReconstructionQaImpl.h"
-#include "qa/CbmLitReconstructionQaPrint.h"
-#include "qa/CbmLitReconstructionQaHTML.h"
+#include "qa/CbmLitQaPrintGenerator.h"
+#include "qa/CbmLitQaHTMLGenerator.h"
 #include "qa/CbmLitReconstructionQaChecker.h"
 
 #include "base/CbmLitEnvironment.h"
@@ -347,7 +347,7 @@ void CbmLitReconstructionQaImpl::Exec(
    IncreaseCounters();
 
    boost::property_tree::ptree pt = PrintPTree();
-   CbmLitReconstructionQaPrint::PrintEventStatistics(std::cout, &pt);
+   CbmLitQaPrintGenerator::PrintEventStatistics(std::cout, &pt);
 }
 
 void CbmLitReconstructionQaImpl::Finish()
@@ -355,7 +355,7 @@ void CbmLitReconstructionQaImpl::Finish()
    CalculateEfficiencyHistos();
    WriteToFile();
    boost::property_tree::ptree pt = PrintPTree();
-   CbmLitReconstructionQaPrint::PrintFinalStatistics(std::cout, &pt);
+   CbmLitQaPrintGenerator::PrintFinalStatistics(std::cout, &pt);
    Draw();
 }
 
@@ -2117,9 +2117,9 @@ void CbmLitReconstructionQaImpl::Draw()
    write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
 
    std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
-   CbmLitReconstructionQaPrint::PrintFinalStatistics(fout, &qa);
+   CbmLitQaPrintGenerator::PrintFinalStatistics(fout, &qa);
 
-   CbmLitReconstructionQaHTML html;
+   CbmLitQaHTMLGenerator html;
    std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
    html.Create(foutHtml, &qa, &ideal, &check);
 }
@@ -2454,6 +2454,6 @@ void CbmLitReconstructionQaImpl::DrawHistosFromFile(const std::string& fileName)
 	CalculateEfficiencyHistos();
 	//WriteToFile();
    boost::property_tree::ptree pt = PrintPTree();
-   CbmLitReconstructionQaPrint::PrintFinalStatistics(std::cout, &pt);
+   CbmLitQaPrintGenerator::PrintFinalStatistics(std::cout, &pt);
 	//Draw();
 }

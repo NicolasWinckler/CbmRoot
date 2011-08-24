@@ -1,10 +1,10 @@
 /**
- * \file CbmLitReconstructionQaHTML.cxx
+ * \file CbmLitQaHTMLGenerator.cxx
  *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#include "qa/CbmLitReconstructionQaHTML.h"
+#include "qa/CbmLitQaHTMLGenerator.h"
 
 #include <iostream>
 #include <map>
@@ -18,7 +18,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-void CbmLitReconstructionQaHTML::Create(
+void CbmLitQaHTMLGenerator::Create(
    std::ostream& out,
    const boost::property_tree::ptree* qa,
    const boost::property_tree::ptree* ideal,
@@ -200,7 +200,7 @@ void CbmLitReconstructionQaHTML::Create(
    out <<  "</body></html>";
 }
 
-std::string CbmLitReconstructionQaHTML::PrintNofStatisticsToString(
+std::string CbmLitQaHTMLGenerator::PrintNofStatisticsToString(
    int row,
    const std::string& name,
    const std::string& mvd,
@@ -234,7 +234,7 @@ std::string CbmLitReconstructionQaHTML::PrintNofStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::PrintHitsStatisticsToString(
+std::string CbmLitQaHTMLGenerator::PrintHitsStatisticsToString(
    int row,
    const std::string& hist,
    const std::string& name)
@@ -253,7 +253,7 @@ std::string CbmLitReconstructionQaHTML::PrintHitsStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsToString(
+std::string CbmLitQaHTMLGenerator::EventEfficiencyStatisticsToString(
    const std::string& name)
 {
    std::string allRec = PrintValue("", name + ".all.rec", "small");
@@ -287,7 +287,7 @@ std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsRichToString(
+std::string CbmLitQaHTMLGenerator::EventEfficiencyStatisticsRichToString(
    const std::string& name)
 {
    std::string allRec = PrintValue("", name + ".richAll.rec", "small");
@@ -321,7 +321,7 @@ std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsRichToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsElIdToString(
+std::string CbmLitQaHTMLGenerator::EventEfficiencyStatisticsElIdToString(
    const std::string& name)
 {
    std::string elRec = PrintValue("", name + ".el.rec", "small");
@@ -338,7 +338,7 @@ std::string CbmLitReconstructionQaHTML::EventEfficiencyStatisticsElIdToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::EventDetAccElStatisticsToString(
+std::string CbmLitQaHTMLGenerator::EventDetAccElStatisticsToString(
    int row,
    const std::string& effName,
    const std::string& name)
@@ -359,7 +359,7 @@ std::string CbmLitReconstructionQaHTML::EventDetAccElStatisticsToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::PolarAngleEfficiencyToString(
+std::string CbmLitQaHTMLGenerator::PolarAngleEfficiencyToString(
    const std::string& name)
 {
    float maxAngle = fQa->get("MaxAngle", -1.);
@@ -402,7 +402,7 @@ std::string CbmLitReconstructionQaHTML::PolarAngleEfficiencyToString(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::PrintValue(
+std::string CbmLitQaHTMLGenerator::PrintValue(
       const std::string& valueTitle,
       const std::string& valueName,
       const std::string& tag)
@@ -426,7 +426,7 @@ std::string CbmLitReconstructionQaHTML::PrintValue(
    return ss.str();
 }
 
-std::string CbmLitReconstructionQaHTML::HtmlHeadString()
+std::string CbmLitQaHTMLGenerator::HtmlHeadString()
 {
    std::string str = "<head><style type=\"text/css\">";
    str += "#efficiency";

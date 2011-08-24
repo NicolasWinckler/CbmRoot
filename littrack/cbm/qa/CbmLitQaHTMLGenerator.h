@@ -1,19 +1,19 @@
 /**
- * \file CbmLitReconstructionQaHTML.h
+ * \file CbmLitQaHTMLGenerator.h
  *
  * \brief Creates HTML page out of property trees.
  *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITRECONSTRUCTIONQAHTML_H_
-#define CBMLITRECONSTRUCTIONQAHTML_H_
+#ifndef CBMLITQAHTMLGENERATOR_H_
+#define CBMLITQAHTMLGENERATOR_H_
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 
 /**
- * \class CbmLitReconstructionQaHTML
+ * \class CbmLitQaHTMLGenerator
  *
  * \brief Creates HTML page out of property trees.
  *
@@ -21,13 +21,13 @@
  * \date 2011
  *
  */
-class CbmLitReconstructionQaHTML
+class CbmLitQaHTMLGenerator
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitReconstructionQaHTML() {
+   CbmLitQaHTMLGenerator() {
       fErrorColor = "#FF0000";
       fWarningColor = "#FFFF00";
       fNormalColor = "#00FF00";
@@ -36,7 +36,7 @@ public:
    /**
     * \brief Destructor
     */
-   virtual ~CbmLitReconstructionQaHTML(){}
+   virtual ~CbmLitQaHTMLGenerator(){}
 
    /**
     * \brief Creates HTML with final statistics.
@@ -175,4 +175,4 @@ private:
    std::string fWarningColor; // warning
    std::string fNormalColor; // normal
 };
-#endif /* CBMLITRECONSTRUCTIONQAHTML_H_ */
+#endif /* CBMLITQAHTMLGENERATOR_H_ */

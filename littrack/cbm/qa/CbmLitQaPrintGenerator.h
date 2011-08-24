@@ -1,12 +1,12 @@
-/** CbmLitReconstructionQaPrint.h
+/** CbmLitQaPrintGenerator.h
  * @author Semen Lebedev <s.lebedev@gsi.de>
  * @since 2011
  * @version 1.0
  **
  **/
 
-#ifndef CBMLITRECONSTRUCTIONQAPRINT_H_
-#define CBMLITRECONSTRUCTIONQAPRINT_H_
+#ifndef CBMLITQAPRINTGENERATOR_H_
+#define CBMLITQAPRINTGENARATOR_H_
 
 #include "TObject.h"
 #include <string>
@@ -14,14 +14,14 @@
 #include <boost/property_tree/ptree.hpp>
 
 
-class CbmLitReconstructionQaPrint
+class CbmLitQaPrintGenerator
 {
 public:
    /* Constructor */
-   CbmLitReconstructionQaPrint(){;}
+   CbmLitQaPrintGenerator(){;}
 
    /* Destructor */
-   virtual ~CbmLitReconstructionQaPrint(){;}
+   virtual ~CbmLitQaPrintGenerator(){;}
 
    //boost::property_tree::ptree* fPt;
 
@@ -99,4 +99,4 @@ private:
       const std::string& name);
 };
 
-#endif /* CBMLITRECONSTRUCTIONQAPRINT_H_ */
+#endif /* CBMLITQAPRINTGENARATOR_H_ */

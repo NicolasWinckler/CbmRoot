@@ -6,7 +6,7 @@
 
 #include "qa/CbmLitReconstructionQa.h"
 #include "qa/CbmLitReconstructionQaImpl.h"
-#include "qa/CbmLitReconstructionQaLatex.h"
+#include "qa/CbmLitQaLatexGenerator.h"
 #include "qa/CbmLitQaHTMLGeneratorStudy.h"
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
@@ -121,7 +121,7 @@ void CbmLitReconstructionQa::SetIsElectronSetup(bool isElectronSetup)
 void CbmLitReconstructionQa::PrintLatexTable(
       const std::vector<std::string>& files)
 {
-   CbmLitReconstructionQaLatex::PrintLatexTable(files);
+   CbmLitQaLatexGenerator::PrintLatexTable(files);
 }
 
 void CbmLitReconstructionQa::CreateStudyHTML(

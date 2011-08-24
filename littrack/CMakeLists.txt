@@ -123,10 +123,10 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/CbmLitReconstructionQaImpl.cxx
-      cbm/qa/CbmLitReconstructionQaPrint.cxx
-      cbm/qa/CbmLitReconstructionQaHTML.cxx
-      cbm/qa/CbmLitReconstructionQaLatex.cxx
       cbm/qa/CbmLitReconstructionQaChecker.cxx
+      cbm/qa/CbmLitQaPrintGenerator.cxx
+      cbm/qa/CbmLitQaHTMLGenerator.cxx
+      cbm/qa/CbmLitQaLatexGenerator.cxx
       cbm/qa/CbmLitQaHTMLGeneratorStudy.cxx
      )
 EndIf(Boost_FOUND)

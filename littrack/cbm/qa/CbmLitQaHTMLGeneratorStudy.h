@@ -9,6 +9,8 @@
 #ifndef CBMLITQAHTMLGENERATORSTUDY_H_
 #define CBMLITQAHTMLGENERATORSTUDY_H_
 
+#include "CbmLitQaBaseGenerator.h"
+
 #include <vector>
 #include <string>
 #include <boost/property_tree/ptree.hpp>
@@ -27,7 +29,8 @@
  * \date 2011
  *
  */
-class CbmLitQaHTMLGeneratorStudy {
+class CbmLitQaHTMLGeneratorStudy : public CbmLitQaBaseGenerator
+{
 public:
    /**
     * \brief Constructor.
@@ -42,10 +45,12 @@ public:
    /**
     * \brief Main function which creates HTML.
     *
+    * \param[in] title Title of the page.
     * \param[in] results List of directories with results.
     * \param[in] names Name of the studies.
     */
    void Create(
+         const std::string& title,
          const std::vector<std::string>& results,
          const std::vector<std::string>& names);
 
@@ -92,10 +97,6 @@ private:
    std::vector<boost::property_tree::ptree> fCheck;
    // Names of studies
    std::vector<std::string> fStudyNames;
-   // Background colors for error highlighting
-   std::string fErrorColor; // error
-   std::string fWarningColor; // warning
-   std::string fNormalColor; // normal
    // Names of directories with study results
    std::vector<std::string> fStudyResults;
 };

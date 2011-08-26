@@ -113,9 +113,20 @@ void CbmLitReconstructionQa::SetDetectorPresence(
    fImpl->SetDetectorPresence(detId, isDet);
 }
 
+bool CbmLitReconstructionQa::GetDetectorPresence(
+      DetectorId detId) const
+{
+   return fImpl->GetDetectorPresence(detId);
+}
+
 void CbmLitReconstructionQa::SetIsElectronSetup(bool isElectronSetup)
 {
    fImpl->SetIsElectronSetup(isElectronSetup);
+}
+
+bool CbmLitReconstructionQa::IsElectronSetup() const
+{
+   return fImpl->IsElectronSetup();
 }
 
 void CbmLitReconstructionQa::PrintLatexTable(
@@ -125,11 +136,19 @@ void CbmLitReconstructionQa::PrintLatexTable(
 }
 
 void CbmLitReconstructionQa::CreateStudyHTML(
+      const std::string& title,
       const std::vector<std::string>& results,
       const std::vector<std::string>& names)
 {
    CbmLitQaHTMLGeneratorStudy html;
-   html.Create(results, names);
+   html.SetIsElectronSetup(IsElectronSetup());
+   html.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
+   html.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
+   html.SetDetectorPresence(kRICH, GetDetectorPresence(kRICH));
+   html.SetDetectorPresence(kTRD, GetDetectorPresence(kTRD));
+   html.SetDetectorPresence(kMUCH, GetDetectorPresence(kMUCH));
+   html.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
+   html.Create(title, results, names);
 }
 
 ClassImp(CbmLitReconstructionQa);

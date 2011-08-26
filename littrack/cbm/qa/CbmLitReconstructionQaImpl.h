@@ -110,16 +110,34 @@ public:
     * @param fileName Name of the file */
    void DrawHistosFromFile(const std::string& fileName);
 
-   /* Explicitly sets detectors in the setup
-    * detId Id of the detector kMVD, kSTS...
-    * isDet true if detector is in the setup */
+   /**
+    * \brief Explicitly sets detectors in the setup.
+    * \param[in] detId Id of the detector kMVD, kSTS...
+    * \param[in] isDet TRUE if detector is in the setup.
+    */
    void SetDetectorPresence(
 		   DetectorId detId,
 		   bool isDet);
 
-   /* Set explicitly electron setup of the detector
-    * isElectronSetup true if electron setup*/
+   /**
+    * \brief Return TRUE if detector presents in the setup.
+    * \param[in] detId Id of the detector kMVD, kSTS...
+    * \return TRUE if detector is in the setup.
+    */
+   bool GetDetectorPresence(
+         DetectorId detId) const;
+
+   /**
+    * \brief Set explicitly electron setup of the detector.
+    * \param[in] isElectronSetup TRUE if electron setup.
+    */
    void SetIsElectronSetup(bool isElectronSetup) {fIsElectronSetup = isElectronSetup;}
+
+   /**
+    * \brief Return TRUE if electron setup of CBM is detected.
+    * \return Return TRUE if electron setup of CBM is detected.
+    */
+   bool IsElectronSetup() const {return fIsElectronSetup;}
 
    /* Derived from FairTask. Executed after all events are processed. */
    virtual void Finish();

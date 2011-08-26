@@ -96,14 +96,31 @@ public:
 		   DetectorId detId,
 		   bool isDet);
 
-   /* Set explicitly electron setup of the detector
-    * isElectronSetup true if electron setup*/
+   /**
+    * \brief Return TRUE if detector presents in the setup.
+    * \param[in] detId Id of the detector kMVD, kSTS...
+    * \return TRUE if detector is in the setup.
+    */
+   bool GetDetectorPresence(
+         DetectorId detId) const;
+
+   /**
+    * \brief Set explicitly electron setup of the detector.
+    * \param[in] isElectronSetup true if electron setup
+    */
    void SetIsElectronSetup(bool isElectronSetup);
+
+   /**
+    * \brief Return TRUE if electron setup of CBM is detected.
+    * \return Return TRUE if electron setup of CBM is detected.
+    */
+   bool IsElectronSetup() const;
 
    static void PrintLatexTable(
          const std::vector<std::string>& files);
 
-   static void CreateStudyHTML(
+   void CreateStudyHTML(
+         const std::string& title,
          const std::vector<std::string>& results,
          const std::vector<std::string>& names);
 

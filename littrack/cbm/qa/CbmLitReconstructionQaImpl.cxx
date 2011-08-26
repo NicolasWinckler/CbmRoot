@@ -397,6 +397,20 @@ void CbmLitReconstructionQaImpl::SetDetectorPresence(
 	}
 }
 
+bool CbmLitReconstructionQaImpl::GetDetectorPresence(
+         DetectorId detId) const
+{
+   switch(detId) {
+      case kMVD: return fIsMvd;
+      case kSTS: return fIsSts;
+      case kRICH: return fIsRich;
+      case kTRD: return fIsTrd;
+      case kMUCH: return fIsMuch;
+      case kTOF: return fIsTof;
+      default: break;
+   }
+}
+
 void CbmLitReconstructionQaImpl::ReadDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();

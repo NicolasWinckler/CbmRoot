@@ -9,6 +9,7 @@
 #ifndef CBMLITQAHTMLGENERATOR_H_
 #define CBMLITQAHTMLGENERATOR_H_
 
+#include "CbmLitQaBaseGenerator.h"
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 
@@ -21,17 +22,13 @@
  * \date 2011
  *
  */
-class CbmLitQaHTMLGenerator
+class CbmLitQaHTMLGenerator : public CbmLitQaBaseGenerator
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitQaHTMLGenerator() {
-      fErrorColor = "#FF0000";
-      fWarningColor = "#FFFF00";
-      fNormalColor = "#00FF00";
-   }
+   CbmLitQaHTMLGenerator() {}
 
    /**
     * \brief Destructor
@@ -170,9 +167,5 @@ private:
    const boost::property_tree::ptree* fIdeal;
    // Property tree with checked results
    const boost::property_tree::ptree* fCheck;
-   // Background colors for error highlighting
-   std::string fErrorColor; // error
-   std::string fWarningColor; // warning
-   std::string fNormalColor; // normal
 };
 #endif /* CBMLITQAHTMLGENERATOR_H_ */

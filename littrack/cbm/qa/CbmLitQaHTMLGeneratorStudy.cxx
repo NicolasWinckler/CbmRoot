@@ -14,9 +14,7 @@
 
 CbmLitQaHTMLGeneratorStudy::CbmLitQaHTMLGeneratorStudy()
 {
-   fErrorColor = "#FF0000";
-   fWarningColor = "#FFFF00";
-   fNormalColor = "#00FF00";
+
 }
 
 CbmLitQaHTMLGeneratorStudy::~CbmLitQaHTMLGeneratorStudy()
@@ -25,9 +23,11 @@ CbmLitQaHTMLGeneratorStudy::~CbmLitQaHTMLGeneratorStudy()
 }
 
 void CbmLitQaHTMLGeneratorStudy::Create(
+      const std::string& title,
       const std::vector<std::string>& results,
       const std::vector<std::string>& names)
 {
+   fTitle = title;
    fNofStudies = results.size();
    fQa.resize(fNofStudies);
    fCheck.resize(fNofStudies);
@@ -52,7 +52,7 @@ void CbmLitQaHTMLGeneratorStudy::Create(
    out.precision(3);
    out << "<html><body>" << HtmlHeadString();
 
-   out << "<h1>Study</h1>" << std::endl;
+   out << "<h1>" << fTitle << "</h1>" << std::endl;
 
    out << "<h2>Number of objects</h2>";
    out << "<table id=\"efficiency\" >";
@@ -62,111 +62,130 @@ void CbmLitQaHTMLGeneratorStudy::Create(
 
    out << PrintRow(row++, "hEventNo", "Number of events");
 
-//   out << PrintRow(row++, "hNofMvdPoints", "MVD points");
-//   out << PrintRow(row++, "hNofMvdDigis", "MVD digis");
-//   out << PrintRow(row++, "hNofMvdClusters", "MVD clusters");
-//   out << PrintRow(row++, "hNofMvdHits", "MVD hits");
+   if (fIsMvd) {
+      out << PrintRow(row++, "hNofMvdPoints", "MVD points");
+      out << PrintRow(row++, "hNofMvdDigis", "MVD digis");
+      out << PrintRow(row++, "hNofMvdClusters", "MVD clusters");
+      out << PrintRow(row++, "hNofMvdHits", "MVD hits");
+   }
 
-   out << PrintRow(row++, "hNofStsPoints", "STS points");
-   out << PrintRow(row++, "hNofStsDigis", "STS digis");
-   out << PrintRow(row++, "hNofStsClusters", "STS clusters");
-   out << PrintRow(row++, "hNofStsHits", "STS hits");
-   out << PrintRow(row++, "hNofStsTracks", "STS tracks");
+   if (fIsSts) {
+      out << PrintRow(row++, "hNofStsPoints", "STS points");
+      out << PrintRow(row++, "hNofStsDigis", "STS digis");
+      out << PrintRow(row++, "hNofStsClusters", "STS clusters");
+      out << PrintRow(row++, "hNofStsHits", "STS hits");
+      out << PrintRow(row++, "hNofStsTracks", "STS tracks");
+   }
 
-   out << PrintRow(row++, "hNofRichPoints", "RICH points");
-   out << PrintRow(row++, "hNofRichHits", "RICH hits");
-   out << PrintRow(row++, "hNofRichProjections", "RICH projections");
-   out << PrintRow(row++, "hNofRichRings", "RICH rings");
+   if (fIsRich) {
+      out << PrintRow(row++, "hNofRichPoints", "RICH points");
+      out << PrintRow(row++, "hNofRichHits", "RICH hits");
+      out << PrintRow(row++, "hNofRichProjections", "RICH projections");
+      out << PrintRow(row++, "hNofRichRings", "RICH rings");
+   }
 
-   out << PrintRow(row++, "hNofTrdPoints", "TRD points");
-   out << PrintRow(row++, "hNofTrdDigis", "TRD digis");
-   out << PrintRow(row++, "hNofTrdClusters", "TRD clusters");
-   out << PrintRow(row++, "hNofTrdHits", "TRD hits");
-   out << PrintRow(row++, "hNofTrdTracks", "TRD tracks");
+   if (fIsTrd) {
+      out << PrintRow(row++, "hNofTrdPoints", "TRD points");
+      out << PrintRow(row++, "hNofTrdDigis", "TRD digis");
+      out << PrintRow(row++, "hNofTrdClusters", "TRD clusters");
+      out << PrintRow(row++, "hNofTrdHits", "TRD hits");
+      out << PrintRow(row++, "hNofTrdTracks", "TRD tracks");
+   }
 
-//   out << PrintRow(row++, "hNofMuchPoints", "MUCH points");
-//   out << PrintRow(row++, "hNofMuchDigis", "MUCH digis");
-//   out << PrintRow(row++, "hNofMuchClusters", "MUCH clusters");
-//   out << PrintRow(row++, "hNofMuchPixelHits", "MUCH pixel hits");
-//   out << PrintRow(row++, "hNofMuchStrawHits", "MUCH straw hits");
-//   out << PrintRow(row++, "hNofMuchTracks", "MUCH tracks");
+   if (fIsMuch) {
+      out << PrintRow(row++, "hNofMuchPoints", "MUCH points");
+      out << PrintRow(row++, "hNofMuchDigis", "MUCH digis");
+      out << PrintRow(row++, "hNofMuchClusters", "MUCH clusters");
+      out << PrintRow(row++, "hNofMuchPixelHits", "MUCH pixel hits");
+      out << PrintRow(row++, "hNofMuchStrawHits", "MUCH straw hits");
+      out << PrintRow(row++, "hNofMuchTracks", "MUCH tracks");
+   }
 
-   out << PrintRow(row++, "hNofTofPoints", "TOF points");
-//   out << PrintRow(row++, "hNofTofDigis", "TOF digis");
-//   out << PrintRow(row++, "hNofTofClusters", "TOF clusters");
-   out << PrintRow(row++, "hNofTofHits", "TOF hits");
+   if (fIsTof) {
+      out << PrintRow(row++, "hNofTofPoints", "TOF points");
+      //out << PrintRow(row++, "hNofTofDigis", "TOF digis");
+      //out << PrintRow(row++, "hNofTofClusters", "TOF clusters");
+      out << PrintRow(row++, "hNofTofHits", "TOF hits");
+   }
 
    out << PrintRow(row++, "hNofGlobalTracks", "Global tracks");
-
    out << "</table>" << std::endl;
 
-   out << "<h2>Efficiencies</h2>";
+   std::string signal = "el";
+   if (!fIsElectronSetup) signal = "mu";
+   std::string recDet = (fIsTrd) ? "TRD" : (fIsMuch) ? "MUCH" :
+         (fIsMuch && fIsTrd) ? "MUCH+TRD" : "";
+
+   out << "<h2>Reconstruction efficiency</h2>";
    out << "<table id=\"efficiency\" >";
    out << PrintTableHeader();
    row = 0;
    out << PrintRowEff(row++, "hStsMom.all", "STS all");
-   out << PrintRowEff(row++, "hStsMom.el", "STS el");
-   out << PrintRowEff(row++, "hRecMom.all", "TRD all");
-   out << PrintRowEff(row++, "hRecMom.el", "TRD el");
+   out << PrintRowEff(row++, "hStsMom." + signal, "STS " + signal);
+   out << PrintRowEff(row++, "hRecMom.all", recDet + " all");
+   out << PrintRowEff(row++, "hRecMom." + signal, recDet + " " + signal);
    out << PrintRowEff(row++, "hTofMom.all", "TOF all");
-   out << PrintRowEff(row++, "hTofMom.el", "TOF el");
+   out << PrintRowEff(row++, "hTofMom." + signal, "TOF " + signal);
 
-   out << PrintEmptyRow(row++, "Normalization STS+TRD(MUCH)");
+   out << PrintEmptyRow(row++, "Normalization STS+" + recDet);
    out << PrintRowEff(row++, "hStsMomNormHalfGlobal.all", "STS all");
-   out << PrintRowEff(row++, "hStsMomNormHalfGlobal.el", "STS el");
-   out << PrintRowEff(row++, "hHalfGlobalMom.all", "STS+TRD all");
-   out << PrintRowEff(row++, "hHalfGlobalMom.el", "STS+TRD el");
+   out << PrintRowEff(row++, "hStsMomNormHalfGlobal." + signal, "STS " + signal);
+   out << PrintRowEff(row++, "hHalfGlobalMom.all", "STS+" + recDet + " all");
+   out << PrintRowEff(row++, "hHalfGlobalMom." + signal, "STS+" + recDet + " " + signal);
 
-   out << PrintEmptyRow(row++, "Normalization STS+TRD(MUCH)+TOF");
+   out << PrintEmptyRow(row++, "Normalization STS+" + recDet + "+TOF");
    out << PrintRowEff(row++, "hStsMomNormGlobal.all", "STS all");
-   out << PrintRowEff(row++, "hStsMomNormGlobal.el", "STS el");
-   out << PrintRowEff(row++, "hHalfGlobalMomNormGlobal.all", "STS+TRD all");
-   out << PrintRowEff(row++, "hHalfGlobalMomNormGlobal.el", "STS+TRD el");
-   out << PrintRowEff(row++, "hGlobalMom.all", "STS+TRD+TOF all");
-   out << PrintRowEff(row++, "hGlobalMom.all", "STS+TRD+TOF el");
+   out << PrintRowEff(row++, "hStsMomNormGlobal." + signal, "STS " + signal);
+   out << PrintRowEff(row++, "hHalfGlobalMomNormGlobal.all", "STS+" + recDet + " all");
+   out << PrintRowEff(row++, "hHalfGlobalMomNormGlobal." + signal, "STS+" + recDet + " " + signal);
+   out << PrintRowEff(row++, "hGlobalMom.all", "STS+" + recDet + "+TOF all");
+   out << PrintRowEff(row++, "hGlobalMom.all", "STS+" + recDet + "+TOF " + signal);
 
-   out << PrintEmptyRow(row++, "Efficiency with RICH");
-   out << PrintRowEff(row++, "hRichMom.richEl", "RICH el");
-   out << PrintRowEff(row++, "hRichMom.richElRef", "RICH el");
+   if (fIsRich) {
+      out << PrintEmptyRow(row++, "Efficiency with RICH");
+      out << PrintRowEff(row++, "hRichMom.richEl", "RICH el");
+      out << PrintRowEff(row++, "hRichMom.richElRef", "RICH el");
 
-   out << PrintEmptyRow(row++, "Normalization STS+RICH");
-   out << PrintRowEff(row++, "hStsMomNormStsRich.richEl", "STS el");
-   out << PrintRowEff(row++, "hStsRichMom.richEl", "STS+RICH el");
+      out << PrintEmptyRow(row++, "Normalization STS+RICH");
+      out << PrintRowEff(row++, "hStsMomNormStsRich.richEl", "STS el");
+      out << PrintRowEff(row++, "hStsRichMom.richEl", "STS+RICH el");
 
-   out << PrintEmptyRow(row++, "Normalization STS+RICH+TRD");
-   out << PrintRowEff(row++, "hStsMomNormStsRichTrd.richEl", "STS el");
-   out << PrintRowEff(row++, "hStsRichMomNormStsRichTrd.richEl", "STS+RICH el");
-   out << PrintRowEff(row++, "hStsRichTrdMom.richEl", "STS+RICH+TRD el");
+      out << PrintEmptyRow(row++, "Normalization STS+RICH+TRD");
+      out << PrintRowEff(row++, "hStsMomNormStsRichTrd.richEl", "STS el");
+      out << PrintRowEff(row++, "hStsRichMomNormStsRichTrd.richEl", "STS+RICH el");
+      out << PrintRowEff(row++, "hStsRichTrdMom.richEl", "STS+RICH+TRD el");
 
-   out << PrintEmptyRow(row++, "Normalization STS+RICH+TRD+TOF");
-   out << PrintRowEff(row++, "hStsMomNormStsRichTrdTof.richEl", "STS el");
-   out << PrintRowEff(row++, "hStsRichMomNormStsRichTrdTof.richEl", "STS+RICH el");
-   out << PrintRowEff(row++, "hStsRichTrdMomNormStsRichTrdTof.richEl", "STS+RICH+TRD el");
-   out << PrintRowEff(row++, "hStsRichTrdTofMom.richEl", "STS+RICH+TRD+TOF el");
-
+      out << PrintEmptyRow(row++, "Normalization STS+RICH+TRD+TOF");
+      out << PrintRowEff(row++, "hStsMomNormStsRichTrdTof.richEl", "STS el");
+      out << PrintRowEff(row++, "hStsRichMomNormStsRichTrdTof.richEl", "STS+RICH el");
+      out << PrintRowEff(row++, "hStsRichTrdMomNormStsRichTrdTof.richEl", "STS+RICH+TRD el");
+      out << PrintRowEff(row++, "hStsRichTrdTofMom.richEl", "STS+RICH+TRD+TOF el");
+   }
    out << "</table>" << std::endl;
 
-   out << "<h2>Ghosts</h2>";
+   out << "<h2>Ghost rate</h2>";
    out << "<table id=\"efficiency\" >";
    out << PrintTableHeader();
    row = 0;
    out << PrintRow(row++, "fhStsGhostNh", "STS");
-   out << PrintRow(row++, "fhRecGhostNh", "TRD(MUCH)");
-   out << PrintRow(row++, "fhRichGhostNh", "RICH");
-   out << PrintEmptyRow(row++, "after STS-RICH matching");
-   out << PrintRow(row++, "fhStsGhostRichMatchingNh", "STS");
-   out << PrintRow(row++, "fhRichGhostStsMatchingNh", "RICH");
-   out << PrintEmptyRow(row++, "after STS-RICH matching and el identification");
-   out << PrintRow(row++, "fhRichGhostElIdNh", "RICH");
+   out << PrintRow(row++, "fhRecGhostNh", recDet);
+   if (fIsRich) {
+      out << PrintRow(row++, "fhRichGhostNh", "RICH");
+      out << PrintEmptyRow(row++, "after STS-RICH matching");
+      out << PrintRow(row++, "fhStsGhostRichMatchingNh", "STS");
+      out << PrintRow(row++, "fhRichGhostStsMatchingNh", "RICH");
+      out << PrintEmptyRow(row++, "after STS-RICH matching and el identification");
+      out << PrintRow(row++, "fhRichGhostElIdNh", "RICH");
+   }
    out << "</table>" << std::endl;
 
-   out << PrintImage("STS reconstruction efficiency", "rec_qa_sts_efficiency.png");
-   out << PrintImage("TRD reconstruction efficiency", "rec_qa_rec_efficiency.png");
-   out << PrintImage("TOF hit matching efficiency", "rec_qa_tof_efficiency.png");
-   out << PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons.png");
+   if (fIsSts) out << PrintImage("STS reconstruction efficiency", "rec_qa_sts_efficiency.png");
+   if (fIsTrd || fIsMuch) out << PrintImage(recDet + " reconstruction efficiency", "rec_qa_rec_efficiency.png");
+   if (fIsTof) out << PrintImage("TOF hit matching efficiency", "rec_qa_tof_efficiency.png");
+   if (fIsRich) out << PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons.png");
    out << PrintImage("Global reconstruction efficiency", "rec_qa_global_efficiency_all.png");
-   out << PrintImage("Global reconstruction efficiency for electrons", "rec_qa_global_efficiency_signal.png");
-   out << PrintImage("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons.png");
+   out << PrintImage("Global reconstruction efficiency for signal", "rec_qa_global_efficiency_signal.png");
+   if (fIsRich) out << PrintImage("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons.png");
 
    out <<  "</body></html>";
 }
@@ -233,7 +252,8 @@ std::string CbmLitQaHTMLGeneratorStudy::PrintImage(
    int ncols = 2;
    ss << "<h2>" << title << "</h2>";
    ss << "<table id=\"efficiency\" >";
-   for (int i = 0; i < fNofStudies / ncols; i++) {
+   int nRows = ceil((float)fNofStudies / (float)ncols);
+   for (int i = 0; i < nRows; i++) {
       ss << "<tr>";
       for (int j = 0; j < ncols; j++) {
          int iStudy = ncols * i + j;
@@ -280,9 +300,12 @@ std::string CbmLitQaHTMLGeneratorStudy::PrintValue(
    }
 
    std::stringstream ss;
-   ss << "<" << tag << " title=\"" << hint << "\" style=\"background-color:" << color
-         << "\">" << valueTitle << fQa[studyId].get(valueName, -1.) << "</" << tag << ">";
-
+   if (fIsUseChecking) {
+      ss << "<" << tag << " title=\"" << hint << "\" style=\"background-color:" << color
+            << "\">" << valueTitle << fQa[studyId].get(valueName, -1.) << "</" << tag << ">";
+   } else {
+      ss << "<" << tag << ">" << valueTitle << fQa[studyId].get(valueName, -1.) << "</" << tag << ">";
+   }
    return ss.str();
 }
 

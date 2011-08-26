@@ -124,6 +124,7 @@ If(Boost_FOUND)
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/CbmLitReconstructionQaImpl.cxx
       cbm/qa/CbmLitReconstructionQaChecker.cxx
+      cbm/qa/CbmLitQaBaseGenerator.cxx
       cbm/qa/CbmLitQaPrintGenerator.cxx
       cbm/qa/CbmLitQaHTMLGenerator.cxx
       cbm/qa/CbmLitQaLatexGenerator.cxx

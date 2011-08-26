@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ../../../Dart.sh Nightly ../../../Dart.cfg    
+. /data.local1/andrey/cbm_nightly/Dart.sh Nightly /data.local1/andrey/cbm_nightly/Dart.cfg    
 
 DAY=`date +%y-%m-%d`
 cd /u/andrey/web-docs/tests

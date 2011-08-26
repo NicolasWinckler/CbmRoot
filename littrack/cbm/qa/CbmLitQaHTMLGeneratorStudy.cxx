@@ -308,36 +308,3 @@ std::string CbmLitQaHTMLGeneratorStudy::PrintValue(
    }
    return ss.str();
 }
-
-std::string CbmLitQaHTMLGeneratorStudy::HtmlHeadString()
-{
-   std::string str = "<head><style type=\"text/css\">";
-   str += "#efficiency";
-   str += "{";
-   str += "font-family:Verdana, Arial, Helvetica, sans-serif;";
-//   str += "width:100%;";
-   str += "border-collapse:collapse;";
-   str += "}";
-   str += "#efficiency td, #efficiency th";
-   str += "{";
-   str += "font-size:1em;";
-   str += "border:1px solid #98bf21;";
-   str += "padding:3px 7px 2px 7px;";
-   str += "}";
-   str += "#efficiency th";
-   str += "{";
-   str += "font-size:1.1em;";
-   str += "text-align:left;";
-   str += "padding-top:5px;";
-   str += "padding-bottom:4px;";
-   str += "background-color:#A7C942;";
-   str += "color:#ffffff;";
-   str += "}";
-   str += "#efficiency tr.alt td";
-   str += "{";
-   str += "color:#000000;";
-   str += "background-color:#EAF2D3;";
-   str += "}";
-   str += "</style></head>";
-   return str;
-}

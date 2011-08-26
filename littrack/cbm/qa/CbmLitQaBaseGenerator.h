@@ -55,6 +55,13 @@ public:
    }
 
 protected:
+   /**
+    * \brief Return string with CSS style for the HTML page.
+    * \return std::string with CSS style for the HTML page.
+    */
+   std::string HtmlHeadString();
+
+
    bool fIsElectronSetup; // If "electron" setup detected than true
    bool fIsMvd; // If MVD detected than true
    bool fIsSts; // If STS detected than true

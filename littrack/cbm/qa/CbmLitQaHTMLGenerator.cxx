@@ -34,9 +34,8 @@ void CbmLitQaHTMLGenerator::Create(
    out << "<h1>CbmLitReconstructionQa final statistics</h1>" << std::endl;
    out << PrintValue("Number of events: ", "hEventNo", "p");
 
-
    // Number of objects statistics
-   out << "<h2>Number of objects statistics</h2>";
+   out << "<h2>Number of objects</h2>";
    out << "<table id=\"efficiency\" >";
    out << "<tr><th></th><th>MVD</th><th>STS</th><th>RICH</th><th>TRD</th>"
          << "<th>MUCH pix</th><th>MUCH st</th><th>TOF</th></tr>" << std::endl;
@@ -425,37 +424,3 @@ std::string CbmLitQaHTMLGenerator::PrintValue(
          << "\">" << valueTitle << fQa->get(valueName, -1.) << "</" << tag << ">";
    return ss.str();
 }
-
-std::string CbmLitQaHTMLGenerator::HtmlHeadString()
-{
-   std::string str = "<head><style type=\"text/css\">";
-   str += "#efficiency";
-   str += "{";
-   str += "font-family:Verdana, Arial, Helvetica, sans-serif;";
-//   str += "width:100%;";
-   str += "border-collapse:collapse;";
-   str += "}";
-   str += "#efficiency td, #efficiency th";
-   str += "{";
-   str += "font-size:1em;";
-   str += "border:1px solid #98bf21;";
-   str += "padding:3px 7px 2px 7px;";
-   str += "}";
-   str += "#efficiency th";
-   str += "{";
-   str += "font-size:1.1em;";
-   str += "text-align:left;";
-   str += "padding-top:5px;";
-   str += "padding-bottom:4px;";
-   str += "background-color:#A7C942;";
-   str += "color:#ffffff;";
-   str += "}";
-   str += "#efficiency tr.alt td";
-   str += "{";
-   str += "color:#000000;";
-   str += "background-color:#EAF2D3;";
-   str += "}";
-   str += "</style></head>";
-   return str;
-}
-

@@ -154,12 +154,6 @@ private:
          const std::string& valueName,
          const std::string& tag);
 
-   /**
-    * \brief Return string with CSS style for the HTML page.
-    * \return std::string with CSS style for the HTML page.
-    */
-   std::string HtmlHeadString();
-
 private:
    // Property tree of Qa results
    const boost::property_tree::ptree* fQa;

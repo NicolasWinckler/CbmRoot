@@ -56,36 +56,80 @@ public:
 
 private:
 
+   /**
+    * \brief Creates HTML page and writes output to ostream.
+    * \param[out] out std::ostream for output.
+    */
    void Create(
       std::ostream& out);
 
+   /**
+    * \brief Return string with HTML table header.
+    * \return String with HTML table header.
+    */
    std::string PrintTableHeader();
 
+   /**
+    * \brief Prints one row in a table.
+    * \param[in] row Row counter. Used to highlight row.
+    * \param[in] property Name of the property in property tree.
+    * \param[in] name Name of the row.
+    * \return std::string with table row in HTML format.
+    */
    std::string PrintRow(
       int row,
       const std::string& property,
       const std::string& name);
 
+   /**
+    * \brief Prints table row which spans over all columns.
+    * \param[in] row Row counter. Used to highlight row.
+    * \param[in] name Name of the row.
+    * \return std::string with table row in HTML format.
+    */
    std::string PrintEmptyRow(
          int row,
          const std::string& name);
 
+   /**
+    * \brief Prints one row with efficiencies in a table.
+    * \param[in] row Row counter. Used to highlight row.
+    * \param[in] property Name of the property in property tree.
+    * \param[in] name Name of the row.
+    * \return std::string with table row in HTML format.
+    */
    std::string PrintRowEff(
          int row,
          const std::string& property,
          const std::string& name);
 
+   /**
+    * \brief Prints images with reconstruction performance.
+    * \param[in] title Title of the image.
+    * \param[in] file Name of the image file.
+    * \return std::string with table which contains images in HTML format.
+    */
    std::string PrintImage(
          const std::string& title,
          const std::string& file);
 
+   /**
+    * \brief Print property value from property tree to std::string.
+    *
+    * Uniforms output style of properties. Colors background
+    * in dependence on the correctness of the property.
+    *
+    * \param[in] studyId Index of the study from which to take the value.
+    * \param[in] valueTitle Property title which is printed before the property value.
+    * \param[in] valueName Property name in the property tree.
+    * \param[in] tag HTML tag which is used to print the property i.e. "p", "b", "td".
+    * \return std::string with property in HTML format.
+    */
    std::string PrintValue(
          int studyId,
          const std::string& valueTitle,
          const std::string& valueName,
          const std::string& tag);
-
-   std::string HtmlHeadString();
 
    // Number of studies
    int fNofStudies;

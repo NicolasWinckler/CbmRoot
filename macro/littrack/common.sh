@@ -17,7 +17,6 @@ function default_init() {
     #Build directory of CBMROOT
     export MYBUILDDIR=/u/andrey/cbm/trunk/build_lxir039/
     
-    #!/bin/sh
     cd $MYBUILDDIR
     . ./config.sh
     cd -

@@ -14,7 +14,7 @@
 #xterm -hold -e ". ./fit.sh muon 100 fast"&
 #xterm -hold -e ". ./fit.sh electron 100 fast"&
 
-export NEVENTS=500
+#export NEVENTS=500
 #root -b -q "./global_sim.C($NEVENTS)"
 #root -b -q "./global_reco.C($NEVENTS, \"hits\")"
 #root -b -q "./global_reco.C($NEVENTS, \"tracking\")"
@@ -25,14 +25,14 @@ export NEVENTS=500
 # TRD test of differen hit producers
 . ./common.sh
 default_init
-export NEVENTS=500
+export NEVENTS=1000
 
 create_output_dir /d/cbm02/andrey/electron/v10b_10e_urqmd
 
 export DETECTORSETUP=electron
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI  PLUTO USEUNIGEN
-pars=(5    5    5   5   20   20   10     yes   no yes no  no    no)
+pars=(5    5    5   5   20   20   10     no    no yes yes  no    no)
 set_simulation_parameters $pars    
 
 set_default_electron_geometry

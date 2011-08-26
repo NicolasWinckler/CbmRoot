@@ -7,11 +7,12 @@ void draw_global_reco_qa()
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	std::string fileName = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/global.reco.0000.root";
-	std::string imageDir = "./test/";
+	std::string fileName = "/data.local1/andrey/sts_qa/sts4_events_electron/global.tracks.0000.root";
+	std::string imageDir = "/data.local1/andrey/sts_qa/sts4_results_electron/";
 
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetOutputDir(imageDir);
+	reconstructionQa->SetOutputJsonFileName("/data.local1/andrey/sts_qa/sts4_results_electron/rec_qa.json");
 	reconstructionQa->SetIsElectronSetup(true);
 	reconstructionQa->SetDetectorPresence(kMVD, false);
 	reconstructionQa->SetDetectorPresence(kSTS, true);

@@ -12,11 +12,23 @@ namespace lit
 
 template <class T>
 std::string ToString(
-   const T& value, int precision = 3)
+   const T& value)
 {
    std::stringstream ss;
-   ss.setf(std::ios::fixed,std::ios::floatfield);
-   ss.precision(precision);
+   ss << (T)value;
+   return ss.str();
+}
+
+template <class T>
+std::string NumberToString(
+   const T& value, int precision = 1)
+{
+   // First determine number of digits in float
+   std::string digis = ToString<int>(value);
+   int ndigis = digis.size();
+
+   std::stringstream ss;
+   ss.precision(ndigis + precision);
    ss << value;
    return ss.str();
 }

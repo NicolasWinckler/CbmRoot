@@ -13,6 +13,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 #include "utils/CbmLitUtils.h"
 
@@ -420,7 +421,8 @@ std::string CbmLitQaHTMLGenerator::PrintValue(
    }
 
    std::stringstream ss;
+   std::string value = lit::NumberToString(fQa->get(valueName, -1.), 1);
    ss << "<" << tag << " title=\"" << hint << "\" style=\"background-color:" << color
-         << "\">" << valueTitle << fQa->get(valueName, -1.) << "</" << tag << ">";
+         << "\">" << valueTitle << value << "</" << tag << ">";
    return ss.str();
 }

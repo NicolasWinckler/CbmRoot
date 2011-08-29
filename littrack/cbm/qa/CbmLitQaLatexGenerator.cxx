@@ -59,13 +59,12 @@ void CbmLitQaLatexGenerator::PrintRow(
 
 std::string CbmLitQaLatexGenerator::ToStringAutoPrecision(Double_t d)
 {
-   if (d < .05) return lit::ToString<Double_t>(d, 3);
-   if (d < 5.0) return lit::ToString<Double_t>(d, 2);
-   if (d < 100.0) return lit::ToString<Double_t>(d, 1);
-   return lit::ToString<Double_t>(d, 0);
+//   if (d < .05) return lit::ToString<Double_t>(d, 3);
+//   if (d < 5.0) return lit::ToString<Double_t>(d, 2);
+//   if (d < 100.0) return lit::ToString<Double_t>(d, 1);
+//   return lit::ToString<Double_t>(d, 0);
 
-
-
+   return lit::NumberToString<Double_t>(d, 1);
 }
 
 void CbmLitQaLatexGenerator::PrintLatexTable(

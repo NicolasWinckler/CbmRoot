@@ -2250,10 +2250,10 @@ void CbmLitReconstructionQaImpl::DrawEfficiency(
 	if (hist3) eff3 = CalcEfficiency((*hist3)[kRec], (*hist3)[kAcc], opt);
 	if (hist4) eff4 = CalcEfficiency((*hist4)[kRec], (*hist4)[kAcc], opt);
 
-	if (hist1) hname1 = name1 + "(" + lit::ToString<Double_t>(eff1, 1) + ")";
-	if (hist2) hname2 = name2 + "(" + lit::ToString<Double_t>(eff2, 1) + ")";
-	if (hist3) hname3 = name3 + "(" + lit::ToString<Double_t>(eff3, 1) + ")";
-	if (hist4) hname4 = name4 + "(" + lit::ToString<Double_t>(eff4, 1) + ")";
+	if (hist1) hname1 = name1 + "(" + lit::NumberToString<Double_t>(eff1, 1) + ")";
+	if (hist2) hname2 = name2 + "(" + lit::NumberToString<Double_t>(eff2, 1) + ")";
+	if (hist3) hname3 = name3 + "(" + lit::NumberToString<Double_t>(eff3, 1) + ")";
+	if (hist4) hname4 = name4 + "(" + lit::NumberToString<Double_t>(eff4, 1) + ")";
 
 	std::string yTitle = "Efficiency [%]";
 	if (opt != "pisupp"){
@@ -2394,15 +2394,15 @@ void CbmLitReconstructionQaImpl::DrawHitsHistos(
    c->cd(1);
    DrawHist1D(histos[0], histos[1], histos[2], NULL,
               "Number of hits", "Number of hits", "Counter",
-              "all: " + lit::ToString<Double_t>(histos[0]->GetMean(), 1),
-              "true: " + lit::ToString<Double_t>(histos[1]->GetMean(), 1),
-              "fake: " + lit::ToString<Double_t>(histos[2]->GetMean(), 1),  "",
+              "all: " + lit::NumberToString<Double_t>(histos[0]->GetMean(), 1),
+              "true: " + lit::NumberToString<Double_t>(histos[1]->GetMean(), 1),
+              "fake: " + lit::NumberToString<Double_t>(histos[2]->GetMean(), 1),  "",
               kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
 
    c->cd(2);
    DrawHist1D(histos[3], histos[4], NULL, NULL, "Ratio", "Ratio", "Counter",
-              "true/all: " + lit::ToString<Double_t>(histos[3]->GetMean()),
-              "fake/all: " + lit::ToString<Double_t>(histos[4]->GetMean()),
+              "true/all: " + lit::NumberToString<Double_t>(histos[3]->GetMean()),
+              "fake/all: " + lit::NumberToString<Double_t>(histos[4]->GetMean()),
               "", "", kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
 
    lit::SaveCanvasAsImage(c, fOutputDir);

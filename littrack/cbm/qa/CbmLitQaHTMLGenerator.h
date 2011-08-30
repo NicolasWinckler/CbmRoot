@@ -55,88 +55,88 @@ private:
     * \brief Prints number of points or hits or tracks or rings etc. to std::string.
     *
     * \param[in] row Row number in the table.
-    * \param[in] name Name of the object i.e. Points, Hits, Tracks etc.
-    * \param[in] mvd Property name which stores number of objects for MVD.
-    * \param[in] sts Property name which stores number of objects for STS.
-    * \param[in] rich Property name which stores number of objects for RICH.
-    * \param[in] trd Property name which stores number of objects for TRD.
-    * \param[in] muchP Property name which stores number of objects for MUCH pixels.
-    * \param[in] muchS Property name which stores number of objects for MUCH straws.
-    * \param[in] tof Property name which stores number of objects for TOF.
+    * \param[in] rowName Name of the row in the table.
+    * \param[in] detName Name of the detector "Mvd", "Sts", "Trd" etc.
     * \return std::string with number of objects.
     */
-   std::string PrintNofStatisticsToString(
+   std::string PrintRowNofObjects(
       int row,
-      const std::string& name,
-      const std::string& mvd,
-      const std::string& sts,
-      const std::string& rich,
-      const std::string& trd,
-      const std::string& muchP,
-      const std::string& muchS,
-      const std::string& tof);
+      const std::string& rowName,
+      const std::string& detName);
 
    /**
     * \brief Prints hits histograms statistics (number of all, true, fake hits in track or ring).
     *
     * \param[in] row Row number in the table.
-    * \param[in] hist Histogram name.
-    * \param[in] name Name of the row in table.
+    * \param[in] rowName Name of the row in table.
+    * \param[in] histName Histogram name.
     * \return std::string with hits histogram statistics.
     */
-   std::string PrintHitsStatisticsToString(
+   std::string PrintRowHits(
       int row,
-      const std::string& hist,
-      const std::string& name);
+      const std::string& rowName,
+      const std::string& histName);
 
    /**
     * \brief Prints efficiency statistics to string (without RICH detector).
     *
-    * \param[in] name Histogram name.
+    * \param[in] row Row number in the table.
+    * \param[in] rowName Name of the row in table.
+    * \param[in] histName Histogram name.
     * \return std::string with efficiencies.
     */
-   std::string EventEfficiencyStatisticsToString(
-      const std::string& name);
+   std::string PrintRowEfficiency(
+         int row,
+         const std::string& rowName,
+         const std::string& histName);
 
    /**
     * \brief Prints efficiency statistics to string (with RICH detector).
     *
-    * \param[in] name Histogram name.
+    * \param[in] row Row number in the table.
+    * \param[in] rowName Name of the row in table.
+    * \param[in] histName Histogram name.
     * \return std::string with efficiencies.
     */
-   std::string EventEfficiencyStatisticsRichToString(
-      const std::string& name);
+   std::string PrintRowEfficiencyRich(
+         int row,
+         const std::string& rowName,
+         const std::string& histName);
 
    /**
     * \brief Prints efficiency statistics for electron identification to string.
     *
-    * \param[in] name Histogram name.
+    * \param[in] row Row number in the table.
+    * \param[in] rowName Name of the row in table.
+    * \param[in] histName Histogram name.
     * \return std::string with efficiencies.
     */
-   std::string EventEfficiencyStatisticsElIdToString(
-      const std::string& name);
+   std::string PrintRowEfficiencyElId(
+         int row,
+         const std::string& rowName,
+         const std::string& histName);
 
    /**
     * \brief Prints detector acceptance for primary electrons to string.
     *
     * \param[in] row Row number in the table.
-    * \param[in] effName Name of the row in the table.
-    * \param[in] name Name of the histogram.
+    * \param[in] rowName Name of the row in table.
+    * \param[in] histName Histogram name.
     * \return std::string with detector acceptance.
     */
-   std::string EventDetAccElStatisticsToString(
+   std::string PrintRowDetAccEl(
       int row,
-      const std::string& effName,
-      const std::string& name);
+      const std::string& rowName,
+      const std::string& histName);
 
    /**
     * \brief Prints efficiencies for different polar angles to string.
     *
-    * \param[in] name Histogram name.
+    * \param[in] histName Histogram name.
     * \return std::string with efficiencies.
     */
-   std::string PolarAngleEfficiencyToString(
-      const std::string& name);
+   std::string PrintPolarAngleEfficiency(
+      const std::string& histName);
 
    /**
     * \brief Print property value from property tree to std::string.

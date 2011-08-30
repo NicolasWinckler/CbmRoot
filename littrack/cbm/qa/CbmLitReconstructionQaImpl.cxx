@@ -2134,6 +2134,13 @@ void CbmLitReconstructionQaImpl::Draw()
    CbmLitQaPrintGenerator::PrintFinalStatistics(fout, &qa);
 
    CbmLitQaHTMLGenerator html;
+   html.SetIsElectronSetup(fIsElectronSetup);
+   html.SetDetectorPresence(kMVD, fIsMvd);
+   html.SetDetectorPresence(kSTS, fIsSts);
+   html.SetDetectorPresence(kRICH, fIsRich);
+   html.SetDetectorPresence(kTRD, fIsTrd);
+   html.SetDetectorPresence(kMUCH, fIsMuch);
+   html.SetDetectorPresence(kTOF, fIsTof);
    std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
    html.Create(foutHtml, &qa, &ideal, &check);
 }

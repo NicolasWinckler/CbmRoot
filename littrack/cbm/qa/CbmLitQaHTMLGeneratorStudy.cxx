@@ -23,6 +23,7 @@ CbmLitQaHTMLGeneratorStudy::~CbmLitQaHTMLGeneratorStudy()
 }
 
 void CbmLitQaHTMLGeneratorStudy::Create(
+      std::ostream& out,
       const std::string& title,
       const std::vector<std::string>& results,
       const std::vector<std::string>& names)
@@ -42,8 +43,7 @@ void CbmLitQaHTMLGeneratorStudy::Create(
       read_json(results[i] + "/rec_qa_check.json", fCheck[i]);
    }
 
-   std::ofstream foutHtml(std::string("rec_qa_study.html").c_str());
-   Create(foutHtml);
+   Create(out);
 }
 
 void CbmLitQaHTMLGeneratorStudy::Create(

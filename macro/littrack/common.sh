@@ -88,8 +88,8 @@ function set_default_muon_geometry() {
     export PIPEGEOM=pipe_much.geo
     export SHIELDGEOM=shield_standard.geo
     export MVDGEOM=
-    export STSGEOM=sts/sts_v09a.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
+    export STSGEOM=sts/sts_v11a.geo
+    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_v11a.digi.par
     export MUCHGEOM=much/much_v11a.geo
     export MUCHDIGI=$VMCWORKDIR/parameters/much/much_v11a.digi.root
     export RICHGEOM=
@@ -128,8 +128,8 @@ function set_default_electron_geometry() {
     export PIPEGEOM=pipe_standard.geo
     export SHIELDGEOM=
     export MVDGEOM=
-    export STSGEOM=sts/sts_v09a.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
+    export STSGEOM=sts/sts_v11a.geo
+    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_v11a.digi.par
     export MUCHGEOM=
     export MUCHDIGI=
     export RICHGEOM=rich/rich_v08a.geo

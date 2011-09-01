@@ -7,36 +7,69 @@ void qa_study()
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
    cbmrootlibs();
 
-   std::vector<std::string> results, names;
-//   results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v09a.geo_sts_v09a.digi.par_results_muon");
-   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a.digi.par_results_muon");
-//   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-4.digi.par_results_muon");
-   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-6.digi.par_results_muon");
-//   results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-7.digi.par_results_muon");
-   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-8.digi.par_results_muon");
-//   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b.digi.par_results_muon");
-//   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-4.digi.par_results_muon");
-//   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-6.digi.par_results_muon");
-//   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-8.digi.par_results_muon");
+   TString script = TString(gSystem->Getenv("SCRIPT"));
 
-//   names.push_back("v09a");
-   names.push_back("v11a");
-//   names.push_back("v11a_0-4");
-   names.push_back("v11a_0-6");
-//   names.push_back("v11a_0-7");
-   names.push_back("v11a_0-8");
-//   names.push_back("v11b");
-//   names.push_back("v11b_0-4");
-//   names.push_back("v11b_0-6");
-//   names.push_back("v11b_0-8");
+   std::vector<std::string> results, names;
+   std::string outputDir;
+   Int_t electronSetup, mvd, sts, rich, trd, much, tof;
+   if (script == "yes") {
+      Int_t nofStudies = TString(gSystem->Getenv("NSTUDIES")).Atoi();
+      for (Int_t i = 0; i < nofStudies; i++) {
+         std::ostringstream ssresult, ssname;
+         ssresult << "STUDYRESULT" << i+1;
+         ssname << "STUDYNAME" << i+1;
+         results.push_back(gSystem->Getenv(ssresult.str().c_str()));
+         names.push_back(gSystem->Getenv(ssname.str().c_str()));
+      }
+      outputDir = std::string(gSystem->Getenv("STUDYOUTPUTDIR"));
+      electronSetup = TString(gSystem->Getenv("STUDYELECTRONSETUP")).Atoi();
+      mvd = TString(gSystem->Getenv("STUDYMVD")).Atoi();
+      sts = TString(gSystem->Getenv("STUDYSTS")).Atoi();
+      rich = TString(gSystem->Getenv("STUDYRICH")).Atoi();
+      trd = TString(gSystem->Getenv("STUDYTRD")).Atoi();
+      much = TString(gSystem->Getenv("STUDYMUCH")).Atoi();
+      tof = TString(gSystem->Getenv("STUDYTOF")).Atoi();
+   } else {
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v09a.geo_sts_v09a.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a.digi.par_results_muon");
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-4.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-6.digi.par_results_muon");
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-7.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-8.digi.par_results_muon");
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b.digi.par_results_muon");
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-4.digi.par_results_muon");
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-6.digi.par_results_muon");
+   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-8.digi.par_results_muon");
+
+   //   names.push_back("v09a");
+      names.push_back("v11a");
+   //   names.push_back("v11a_0-4");
+      names.push_back("v11a_0-6");
+   //   names.push_back("v11a_0-7");
+      names.push_back("v11a_0-8");
+   //   names.push_back("v11b");
+   //   names.push_back("v11b_0-4");
+   //   names.push_back("v11b_0-6");
+   //   names.push_back("v11b_0-8");
+
+      outputDir = "./";
+      electronSetup = 0;
+      mvd = 0;
+      sts = 1;
+      rich = 0;
+      trd = 0;
+      much = 1;
+      tof = 1;
+   }
 
    CbmLitReconstructionQa qa;
-   qa.SetIsElectronSetup(false);
-   qa.SetDetectorPresence(kMVD, false);
-   qa.SetDetectorPresence(kSTS, true);
-   qa.SetDetectorPresence(kRICH, false);
-   qa.SetDetectorPresence(kTRD, false);
-   qa.SetDetectorPresence(kMUCH, true);
-   qa.SetDetectorPresence(kTOF, true);
-   qa.CreateStudyHTML("Event reconstruction for different stereo angles in STS", results, names);
+   qa.SetOutputDir(outputDir);
+   qa.SetIsElectronSetup(electronSetup);
+   qa.SetDetectorPresence(kMVD, mvd);
+   qa.SetDetectorPresence(kSTS, sts);
+   qa.SetDetectorPresence(kRICH, rich);
+   qa.SetDetectorPresence(kTRD, trd);
+   qa.SetDetectorPresence(kMUCH, much);
+   qa.SetDetectorPresence(kTOF, tof);
+   qa.CreateStudyHTML("Event reconstruction performance", results, names);
 }

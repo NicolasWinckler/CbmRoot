@@ -94,6 +94,10 @@ public:
     * @param dir Directory name. */
    void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
+   /* Returns the output directory for images.
+    * @return Output directory name. */
+   const std::string& GetOutputDir() const { return fOutputDir;}
+
    /* Sets momentum range for efficiency calculation */
    void SetMomentumRange(Double_t minMom, Double_t maxMom) {
       fMinMom = minMom;

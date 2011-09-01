@@ -8,6 +8,7 @@
 #include "qa/CbmLitReconstructionQaImpl.h"
 #include "qa/CbmLitQaLatexGenerator.h"
 #include "qa/CbmLitQaHTMLGeneratorStudy.h"
+#include <fstream>
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
    FairTask("LitReconstructionQA", 1)
@@ -148,7 +149,8 @@ void CbmLitReconstructionQa::CreateStudyHTML(
    html.SetDetectorPresence(kTRD, GetDetectorPresence(kTRD));
    html.SetDetectorPresence(kMUCH, GetDetectorPresence(kMUCH));
    html.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
-   html.Create(title, results, names);
+   std::ofstream foutHtml(std::string(fImpl->GetOutputDir() + "/rec_qa_study.html").c_str());
+   html.Create(foutHtml, title, results, names);
 }
 
 ClassImp(CbmLitReconstructionQa);

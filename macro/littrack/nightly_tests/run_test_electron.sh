@@ -9,7 +9,6 @@ which root
 export SCRIPT=yes
 
 create_output_dir events_electron/
-create_image_dir results_electron/
 
 export NEVENTS=500
 export DETECTORSETUP=electron
@@ -21,7 +20,6 @@ set_simulation_parameters $pars
 set_default_electron_geometry
 
 export STSHITPRODUCERTYPE=real
-export TRACKINGTYPE=branch
 export TRDHITPRODUCERTYPE=smearing
 
 set_default_file_names $DIR 0000
@@ -32,6 +30,19 @@ export INFILE=/data.local1/andrey/tests/urqmd/auau/25gev/centr/urqmd.auau.25gev.
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_sim.C($NEVENTS)"
 #root -b -q "../global_reco.C($NEVENTS, \"all\")"
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"hits\")"
+
+# Test different global tracking algorithms
+# Branching algorithm
+export TRACKINGTYPE=branch
+create_image_dir results_electron_branch/
+root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
+# Nearest neighbour algorithm
+export TRACKINGTYPE=nn
+create_image_dir results_electron_nn/
+root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
+# Nearest neighbour parallel algorithm
+export TRACKINGTYPE=nn_parallel
+create_image_dir results_electron_nn_parallel/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 
 export SCRIPT=no

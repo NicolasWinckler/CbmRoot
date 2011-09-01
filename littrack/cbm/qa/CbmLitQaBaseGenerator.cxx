@@ -17,7 +17,7 @@ CbmLitQaBaseGenerator::CbmLitQaBaseGenerator():
    fErrorColor("#FF0000"),
    fWarningColor("#FFFF00"),
    fNormalColor("#00FF00"),
-   fIsUseChecking(false),
+   fIsUseChecking(true),
    fTitle("")
 {
 

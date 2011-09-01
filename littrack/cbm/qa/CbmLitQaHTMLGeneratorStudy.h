@@ -45,14 +45,18 @@ public:
    /**
     * \brief Main function which creates HTML.
     *
+    * \param[in] out Output stream for HTML.
     * \param[in] title Title of the page.
     * \param[in] results List of directories with results.
     * \param[in] names Name of the studies.
     */
    void Create(
+         std::ostream& out,
          const std::string& title,
          const std::vector<std::string>& results,
          const std::vector<std::string>& names);
+
+
 
 private:
 

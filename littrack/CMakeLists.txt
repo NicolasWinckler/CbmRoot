@@ -152,7 +152,7 @@ cbm/qa/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/CbmLitPropagationAnalysis.h 
 #cbm/qa/CbmLitRobustFitterAnalysis.h
 cbm/qa/CbmLitCheckSimpleGeo.h 
-cbm/qa/CbmLitCheckField.h
+cbm/qa/CbmLitFieldQa.h
 cbm/qa/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/CbmLitCheckMultipleScattering.h
 cbm/qa/CbmLitCheckBrem.h 
@@ -189,7 +189,7 @@ cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
 #cbm/qa/CbmLitReconstructionQa.cxx
 cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
-cbm/qa/CbmLitCheckField.cxx
+cbm/qa/CbmLitFieldQa.cxx
 cbm/qa/CbmLitPropagationAnalysis.cxx 
 #cbm/qa/CbmLitRobustFitterAnalysis.cxx
 cbm/utils/CbmLitConverter.cxx

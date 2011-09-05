@@ -107,7 +107,7 @@
 #pragma link C++ class CbmLitPropagationAnalysis+;
 //#pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitCheckSimpleGeo+;
-#pragma link C++ class CbmLitCheckField+;
+#pragma link C++ class CbmLitFieldQa+;
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;

@@ -26,7 +26,7 @@
 
 lit::parallel::LitTrackFinderNNVecElectron::LitTrackFinderNNVecElectron():
    fMaxNofMissingHits(4),
-   fSigmaCoef(3.5),
+   fSigmaCoef(5.),
    fMaxCovSq(20.*20.),
    fChiSqPixelHitCut(25.)
 {
@@ -191,7 +191,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::PropagateToFirstStation(
    LitTrackParamVec lpar;
    PackTrackParam(par, lpar);
 
-   for (unsigned char ivp = 0; ivp < fLayout.GetNofVirtualPlanes()-1; ivp++) {
+   for (unsigned char ivp = 0; ivp < fLayout.GetNofVirtualPlanes() - 1; ivp++) {
       const LitVirtualPlaneElectronVec& vp1 = fLayout.GetVirtualPlane(ivp);
       const LitVirtualPlaneElectronVec& vp2 = fLayout.GetVirtualPlane(ivp + 1);
 

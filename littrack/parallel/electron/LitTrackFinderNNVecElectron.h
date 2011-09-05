@@ -1,14 +1,11 @@
-/** LitTrackFinderNNVecElectron.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
- **
- ** Parallel SIMDized implementation of the TRD tracking.
- ** Input: array with track seeds and array with hits.
- ** Output: reconstructed tracks.
- ** Algorithm is based on track following and Kalman Filter methods.
- ** The track is propagated from station to station and the track
- ** branch is created for each hit in the validation gate.
+/**
+ * \file LitTrackFinderNNVecElectron.h
+ *
+ * \brief Parallel SIMDized implementation of TRD tracking.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ *
  **/
 
 #ifndef LITTRACKFINDERNNVECELECTRON_H_
@@ -18,38 +15,62 @@
 #include "LitHitDataElectron.h"
 #include "../LitHit.h"
 #include "../LitTrack.h"
-//#include "../LitTrackFinderNNBase.h"
-//#include "../LitTrackFinder.h"
-//#include "LitTrackFinderNNBaseElectron.h"
-
-#define cnst static const fvec
 
 namespace lit {
 namespace parallel {
 
-const unsigned int MAX_NOF_TRACKS = 1500;
-
+/**
+ * \class LitTrackFinderNNVecElectron
+ *
+ * \brief Parallel SIMDized implementation of TRD tracking.
+ *
+ * Parallel SIMDized implementation of TRD tracking.
+ * Input: array with track seeds and array with hits.
+ * Output: reconstructed tracks.
+ * Algorithm is based on track following and Kalman Filter methods.
+ * Implementation is based on nearest neighbor approach:
+ * track is propagated from station to station and
+ * nearest hit from validation gate is attached to track.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ *
+ **/
 class LitTrackFinderNNVecElectron
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitTrackFinderNNVecElectron();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitTrackFinderNNVecElectron();
 
-   /* Inherited from LitTrackFinder */
-   virtual void DoFind(
+   /**
+    * \brief Main function for track reconstruction.
+    * \param[in] Hit array.
+    * \param[in] Track seed array.
+    * \param[out] Output array with reconstructed tracks.
+    */
+   void DoFind(
       const PixelHitArray& hits,
       const TrackArray& trackSeeds,
       TrackArray& tracks);
 
-   void SetDetectorLayout(LitDetectorLayoutElectron<fvec>& layout) {
+   /*
+    * \brief Set detector layout.
+    * \param[in] layout Detector layout to be set.
+    */
+   void SetDetectorLayout(
+         const LitDetectorLayoutElectron<fvec>& layout) {
       fLayout = layout;
       fHitData.SetDetectorLayout(layout);
    }
 
-public:
+private:
 
    void ArrangeHits(
        const PixelHitArray& hits);
@@ -122,8 +143,6 @@ private:
    /* Chi square cut for pixel hits */
    fvec fChiSqPixelHitCut;
 };
-
-//#undef cnst
 
 } // namespace parallel
 } // namespace lit

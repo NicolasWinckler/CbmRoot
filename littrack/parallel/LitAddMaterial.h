@@ -188,7 +188,7 @@ inline void LitAddMaterialElectron(
    T thickness = norm * mat.Thickness;
    T radThick = thickness / mat.X0;
    T sqrtRadThick = sqrt(radThick);
-   T logRadThick = mat.LogRadThick;//log(radThick);//mat.LogRadThick;
+   T logRadThick = log(radThick);//mat.LogRadThick;
 
    // no thickness scaling
 // T thickness = mat.Thickness;
@@ -200,7 +200,8 @@ inline void LitAddMaterialElectron(
     * Energy loss corrections
     */
    par.Qp *= exp(radThick);
-   par.C14 += par.Qp * par.Qp * mat.ElLoss;//(exp(radThick * C_LOG) - exp(-TWO * radThick));
+//   par.C14 += par.Qp * par.Qp * mat.ElLoss; // no thickness scaling
+   par.C14 += (exp(radThick * C_LOG) - exp(-TWO * radThick)); // thickness scaling
    /*
     * End of energy loss corrections
     */

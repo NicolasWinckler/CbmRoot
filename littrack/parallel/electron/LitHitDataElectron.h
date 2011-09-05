@@ -1,16 +1,18 @@
-/** LitHitDataElectron.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
- **
- ** Class for accessing the hits in the track reconstruction.
+/**
+ * \file LitHitDataElectron.h
+ *
+ * \brief Class for accessing hits in track reconstruction.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ *
  **/
 
 #ifndef LITHITDATAELECTRON_H_
 #define LITHITDATAELECTRON_H_
 
-#include "../LitHit.h"
 #include "LitDetectorGeometryElectron.h"
+#include "../LitHit.h"
 #include "../LitComparators.h"
 
 #include <algorithm>
@@ -18,21 +20,37 @@
 namespace lit {
 namespace parallel {
 
+/**
+ * \class LitHitDataElectron
+ *
+ * \brief Class for accessing hits in track reconstruction.
+ *
+ * Hits are arranged by stations and sorted on each
+ * station by X coordinate in acceding order.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ */
 template<class T>
 class LitHitDataElectron
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitHitDataElectron():
       fMaxErr(),
       fHits(),
       fLayout() {};
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitHitDataElectron() {};
 
-   /* Sets the detector layout for which the hits are arranged
-    *@param layout Detector layout
+   /**
+    * \brief Set detector layout for which hits are arranged.
+    * \param[in] layout Detector layout.
     */
    void SetDetectorLayout(
       const LitDetectorLayoutElectron<T>& layout) {
@@ -50,10 +68,11 @@ public:
       }
    }
 
-   /* Adds the hit using station group, station and substation indices
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param hit Pointer to the hit to be added
+   /**
+    * \brief Add hit using station group, station and substation indices.
+    * \param[in] stationGroup Station group index in detector layout.
+    * \param[in] station Station index in station group.
+    * \param[in] hit Pointer to hit to be added.
     */
    void AddHit(
       int stationGroup,
@@ -65,9 +84,10 @@ public:
       }
    }
 
-   /*Adds the hit using absolute detector plane (station) index in the detector
-    *@param planeId Index of the detector plane (station) in the detector
-    *@param hit Pointer to the hit to be added
+   /**
+    * Add hit using absolute detector station index in detector layout.
+    * \param[in] planeId Station index in detector layout.
+    * \param[in] hit Pointer to hit to be added.
     */
    void AddHit(
       unsigned char planeId,
@@ -78,11 +98,12 @@ public:
       AddHit(stationGroup, station, hit);
    }
 
-   /* Returns the hit using station group and station indices
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param hitId Hit index in the array of hits for the specified station
-    *@return Hit pointer
+   /**
+    * \brief Return hit using station group and station indices.
+    * \param[in] stationGroup Station group index in detector layout.
+    * \param[in] station Station index in station group.
+    * \param[in] hitId Hit index in array of hits for specified station.
+    * \return Hit pointer.
     */
    const LitScalPixelHit* GetHit(
       int stationGroup,
@@ -91,10 +112,11 @@ public:
       return fHits[stationGroup][station][hitId];
    }
 
-   /* Returns hit iterators using station group and station indices
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@return Hit iterators
+   /**
+    * \brief Return vector of hits using station group and station indices.
+    * \param[in] stationGroup Station group index in detector layout.
+    * \param[in] station Station index in station group.
+    * \return Vector of hits.
     */
    const std::vector<LitScalPixelHit*>& GetHits(
       int stationGroup,
@@ -102,10 +124,11 @@ public:
       return fHits[stationGroup][station];
    }
 
-   /* Returns number of hits for the specified station
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@return Number of hits
+   /**
+    * \brief Return number of hits for specified station.
+    * \param[in] stationGroup Station group index in detector layout.
+    * \param[in] station Station index in station group.
+    * \return Number of hits in station.
     */
    unsigned int GetNofHits(
       int stationGroup,
@@ -113,11 +136,11 @@ public:
       return fHits[stationGroup][station].size();
    }
 
-   /* Returns maximum hit error in [cm] and the name of the coordinate
-    * ("X", "Y", "U")for the specified station.
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@return Pair of hit error and and coordinate ID
+   /**
+    * \brief Return maximum hit error in [cm] for specified station.
+    * \param[in] stationGroup Station group index in detector layout.
+    * \param[in] station Station index in station group.
+    * \return Hit error.
     */
    fscal GetMaxErr(
       int stationGroup,
@@ -125,7 +148,9 @@ public:
       return fMaxErr[stationGroup][station];
    }
 
-   /* Clears the hit arrays */
+   /**
+    * \brief Clear hit arrays.
+    */
    void Clear() {
       for(unsigned int i = 0; i < fHits.size(); i++) {
          for(unsigned int j = 0; j < fHits[i].size(); j++) {
@@ -137,7 +162,9 @@ public:
    }
 
 
-   /* Sorts hits in each substation by X coordinate */
+   /**
+    * \brief Sort hits in each station by X coordinate.
+    */
    void SortHits() {
       for (int i = 0; i < fLayout.GetNofStationGroups(); i++) {
          for (int j = 0; j < fLayout.GetNofStations(i); j++) {
@@ -151,7 +178,10 @@ public:
       }
    }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Returns std::string representation of the class.
+    * \return Class representation as std::string.
+    */
    std::string ToString() const {
       std::string str = "HitDataElectron:\n";
       for(int i = 0; i < fLayout.GetNofStationGroups(); i++) {
@@ -165,18 +195,21 @@ public:
       return str;
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitHitDataElectron& hitData) {
       strm << hitData.ToString();
       return strm;
    }
 
 private:
-   /* Calculates station group and station indices using the
-    * detector plane number.
-    *@param planeId [in] Detector plane index
-    *@param stationGroup [out] Index of the station group in the detector
-    *@param station [out] Index of the station in the station group
+   /**
+    * \brief Calculate station group and station indices using the absolute detector plane number.
+    * \param[in] planeId Absolute station index in detector layout.
+    * \param[out] stationGroup Station group index in detector layout.
+    * \param[out] station Station index in station group.
     */
    void StationByPlaneId(
       unsigned char planeId,
@@ -201,7 +234,16 @@ private:
    LitDetectorLayoutElectron<T> fLayout;
 } _fvecalignment;
 
+/**
+ * \typedef LitHitDataElectron<fscal> LitHitDataElectronScal
+ * \brief Scalar version of LitHitDataElectron.
+ */
 typedef LitHitDataElectron<fscal> LitHitDataElectronScal;
+
+/**
+ * \typedef LitHitDataElectron<fvec> LitHitDataElectronVec
+ * \brief Vector version of LitHitDataElectron.
+ */
 typedef LitHitDataElectron<fvec> LitHitDataElectronVec;
 
 } // namespace parallel

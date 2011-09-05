@@ -666,19 +666,32 @@ public:
       const LitFieldValue<fscal>& v3 = fField[ix  ][iy+1];
       const LitFieldValue<fscal>& v4 = fField[ix+1][iy+1];
       // Calculate weights depending on the distance to the cell nodes
-      fscal dx1 = (x - ix * fCellSizeX);
-      fscal dx2 = (x - (ix + 1) * fCellSizeX);
-      fscal dy1 = (y - iy * fCellSizeY);
-      fscal dy2 = (y - (iy + 1) * fCellSizeY);
-      fscal d1 = dx1 * dx1 + dy1 * dy1;
-      fscal d2 = dx2 * dx2 + dy1 * dy1;
-      fscal d3 = dx1 * dx1 + dy2 * dy2;
-      fscal d4 = dx2 * dx2 + dy2 * dy2;
-      fscal dsum = d1 + d2 + d3 + d4;
+      fscal dx1 = (x - ix * fCellSizeX - fXMin);
+      fscal dx2 = (x - (ix + 1) * fCellSizeX - fXMin);
+      fscal dy1 = (y - iy * fCellSizeY - fYMin);
+      fscal dy2 = (y - (iy + 1) * fCellSizeY - fYMin);
+      fscal w1 = 1./(dx1 * dx1 + dy1 * dy1);
+      fscal w2 = 1./(dx2 * dx2 + dy1 * dy1);
+      fscal w3 = 1./(dx1 * dx1 + dy2 * dy2);
+      fscal w4 = 1./(dx2 * dx2 + dy2 * dy2);
+      fscal wsum = w1 + w2 + w3 + w4;
+//      std::cout << "distances: " << 1./w1 << " " << 1./w2 << " "
+//            << 1./w3 << " " << 1./w4 << " " << std::endl;
+//      std::cout << "distances sqrt: " << sqrt(1./w1) << " " << sqrt(1./w2) << " "
+//            << sqrt(1./w3) << " " << sqrt(1./w4) << " " << std::endl;
+//      std::cout << "weights: " << w1/wsum << " " << w2/wsum << " "
+//            << w3/wsum << " " << w4/wsum << " " << std::endl;
+      if (wsum == 0.) { // Can be removed considering performance!
+         B.Bx = 0.;
+         B.By = 0.;
+         B.Bz = 0.;
+         std::cout << "LitFieldGrid::GetFieldValue: zero wsum=" << wsum << std::endl;
+         return;
+      }
       // Calculate output weighted mean B value
-      B.Bx = (d1 * v1.Bx + d2 * v2.Bx + d3 * v3.Bx + d4 * v4.Bx) / dsum;
-      B.By = (d1 * v1.By + d2 * v2.By + d3 * v3.By + d4 * v4.By) / dsum;
-      B.Bz = (d1 * v1.Bz + d2 * v2.Bz + d3 * v3.Bz + d4 * v4.Bz) / dsum;
+      B.Bx = (w1 * v1.Bx + w2 * v2.Bx + w3 * v3.Bx + w4 * v4.Bx) / wsum;
+      B.By = (w1 * v1.By + w2 * v2.By + w3 * v3.By + w4 * v4.By) / wsum;
+      B.Bz = (w1 * v1.Bz + w2 * v2.Bz + w3 * v3.Bz + w4 * v4.Bz) / wsum;
    }
 
    /**

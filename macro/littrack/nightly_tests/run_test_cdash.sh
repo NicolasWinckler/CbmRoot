@@ -2,6 +2,8 @@
 
 . /data.local1/andrey/cbm_nightly/Dart.sh Nightly /data.local1/andrey/cbm_nightly/Dart.cfg    
 
+. /tmp/andrey/build_cbm_may11/config.sh
+
 #. ./run_test_electron.sh
 #. ./run_test_muon.sh
 

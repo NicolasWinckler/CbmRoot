@@ -1,4 +1,4 @@
-/** CbmLitCheckField.h
+/** CbmLitFieldQa.h
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
@@ -7,8 +7,8 @@
  ** its approximation.
  **/
 
-#ifndef CBMLITCHECKFIELD_H_
-#define CBMLITCHECKFIELD_H_
+#ifndef CBMLITFIELDQA_H_
+#define CBMLITFIELDQA_H_
 
 #include "FairTask.h"
 #include <vector>
@@ -25,14 +25,14 @@ class CbmLitFieldFitter;
 class CbmLitFieldGridCreator;
 class CBmLitPolynom;
 
-class CbmLitCheckField : public FairTask
+class CbmLitFieldQa : public FairTask
 {
 public:
    /* Constructor */
-   CbmLitCheckField();
+   CbmLitFieldQa();
 
    /* Destructor */
-   virtual ~CbmLitCheckField();
+   virtual ~CbmLitFieldQa();
 
    /* Inherited from FairTask */
    virtual InitStatus Init();
@@ -230,7 +230,7 @@ private:
    static const Int_t BZ = 2; // Bz
    static const Int_t MOD = 3; // Mod = std::sqrt(Bx*Bx + By*By + Bz*Bz)
 
-   ClassDef(CbmLitCheckField, 1);
+   ClassDef(CbmLitFieldQa, 1);
 };
 
-#endif /* CBMLITCHECKFIELD_H_ */
+#endif /* CBMLITFIELDQA_H_ */

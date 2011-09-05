@@ -1,9 +1,9 @@
-/** CbmLitCheckField.cxx
+/** CbmLitFieldQa.cxx
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
  **/
-#include "qa/CbmLitCheckField.h"
+#include "qa/CbmLitFieldQa.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitFloat.h"
@@ -34,7 +34,7 @@
 #include <string>
 #include <limits>
 
-CbmLitCheckField::CbmLitCheckField():
+CbmLitFieldQa::CbmLitFieldQa():
    fField(NULL),
    fHistoList(NULL),
    fNofSlices(0),
@@ -77,11 +77,11 @@ CbmLitCheckField::CbmLitCheckField():
 
 }
 
-CbmLitCheckField::~CbmLitCheckField()
+CbmLitFieldQa::~CbmLitFieldQa()
 {
 }
 
-InitStatus CbmLitCheckField::Init()
+InitStatus CbmLitFieldQa::Init()
 {
    // Set draw styles
    SetStyles();
@@ -138,14 +138,14 @@ InitStatus CbmLitCheckField::Init()
    }
 }
 
-void CbmLitCheckField::SetParContainers()
+void CbmLitFieldQa::SetParContainers()
 {
    FairRunAna* ana = FairRunAna::Instance();
    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
    rtdb->getContainer("FairFieldPar");
 }
 
-void CbmLitCheckField::Exec(
+void CbmLitFieldQa::Exec(
    Option_t* opt)
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
@@ -188,11 +188,11 @@ void CbmLitCheckField::Exec(
    }
 }
 
-void CbmLitCheckField::Finish()
+void CbmLitFieldQa::Finish()
 {
 }
 
-void CbmLitCheckField::CreateHistos()
+void CbmLitFieldQa::CreateHistos()
 {
    // Histogram list
    fHistoList = new TList();
@@ -221,7 +221,7 @@ void CbmLitCheckField::CreateHistos()
    }
 }
 
-void CbmLitCheckField::CreateFitterErrHistos()
+void CbmLitFieldQa::CreateFitterErrHistos()
 {
    // Resize histogram vectors
    fhBAprGraph.resize(4);
@@ -287,7 +287,7 @@ void CbmLitCheckField::CreateFitterErrHistos()
    std::cout << "Field fitter error histograms created" << std::endl;
 }
 
-void CbmLitCheckField::CreateGridErrHistos()
+void CbmLitFieldQa::CreateGridErrHistos()
 {
    // Resize histogram vectors
    fhGridBGraph.resize(4);
@@ -344,7 +344,7 @@ void CbmLitCheckField::CreateGridErrHistos()
    std::cout << "Grid creator error histograms created" << std::endl;
 }
 
-void CbmLitCheckField::FillBHistos()
+void CbmLitFieldQa::FillBHistos()
 {
    for (UInt_t iSlice = 0; iSlice < fNofSlices; iSlice++) { // loop over z positions
       Double_t max[4] = {
@@ -412,7 +412,7 @@ void CbmLitCheckField::FillBHistos()
    }
 }
 
-void CbmLitCheckField::CheckFieldFitter()
+void CbmLitFieldQa::CheckFieldFitter()
 {
    std::vector<std::vector<lit::parallel::LitFieldSlice<float> > > slices;
    slices.resize(fNofPolynoms);
@@ -519,7 +519,7 @@ void CbmLitCheckField::CheckFieldFitter()
    }
 }
 
-void CbmLitCheckField::CheckGridCreator()
+void CbmLitFieldQa::CheckGridCreator()
 {
    std::vector<lit::parallel::LitFieldGrid> grids;
    grids.resize(fNofSlices);
@@ -608,7 +608,7 @@ void CbmLitCheckField::CheckGridCreator()
    }
 }
 
-void CbmLitCheckField::CheckFieldMap()
+void CbmLitFieldQa::CheckFieldMap()
 {
    for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
       Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
@@ -631,7 +631,7 @@ void CbmLitCheckField::CheckFieldMap()
    }
 }
 
-void CbmLitCheckField::DrawSlices(
+void CbmLitFieldQa::DrawSlices(
    Int_t v,
    const std::string& opt)
 {
@@ -684,7 +684,7 @@ void CbmLitCheckField::DrawSlices(
    }
 }
 
-void CbmLitCheckField::DrawPoly(
+void CbmLitFieldQa::DrawPoly(
    const std::string& opt)
 {
    TCanvas* canvas[fNofSlices];
@@ -747,7 +747,7 @@ void CbmLitCheckField::DrawPoly(
    }
 }
 
-void CbmLitCheckField::DrawFieldSlices()
+void CbmLitFieldQa::DrawFieldSlices()
 {
    TCanvas* canvas[fNofSlices];
    for (Int_t s = 0; s < fNofSlices; s++) {
@@ -781,7 +781,7 @@ void CbmLitCheckField::DrawFieldSlices()
    }
 }
 
-void CbmLitCheckField::DrawFieldAlongZ()
+void CbmLitFieldQa::DrawFieldAlongZ()
 {
    TCanvas* canvas = new TCanvas("field_map_along_z", "field_map_along_z", 1200, 800);
    canvas->Divide(3, 2);
@@ -800,4 +800,4 @@ void CbmLitCheckField::DrawFieldAlongZ()
    }
    lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
-ClassImp(CbmLitCheckField);
+ClassImp(CbmLitFieldQa);

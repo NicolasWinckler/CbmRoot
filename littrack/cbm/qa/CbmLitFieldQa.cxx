@@ -1,7 +1,8 @@
-/** CbmLitFieldQa.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file CbmLitFieldQa.cxx
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
 #include "qa/CbmLitFieldQa.h"
 
@@ -52,16 +53,16 @@ CbmLitFieldQa::CbmLitFieldQa():
    fZMin(-10.),
    fZMax(300.),
    fZStep(10.),
-   fIsCheckFieldApproximation(true),
-   fIsCheckFieldMap(true),
-   fIsCheckGridCreator(true),
+   fCheckFieldMap(true),
+   fCheckFieldApproximation(true),
+   fCheckGridCreator(true),
+   fDrawFieldMap(true),
+   fDrawFieldApproximation(true),
+   fDrawGridCreator(true),
    fDrawBx(true),
    fDrawBy(true),
    fDrawBz(true),
    fDrawMod(true),
-   fDrawFieldMap(true),
-   fDrawPoly(true),
-   fDrawSlices(true),
    fFixedBounds(true),
    fXangle(25.),
    fYangle(25.),
@@ -72,7 +73,7 @@ CbmLitFieldQa::CbmLitFieldQa():
    fFitter(),
    fPolynomDegreeIndex(1),
    fNofPolynoms(4),
-   fDegrees()
+   fPolynomDegrees()
 {
 
 }
@@ -86,23 +87,10 @@ InitStatus CbmLitFieldQa::Init()
    // Set draw styles
    SetStyles();
 
-   // Set Z positions of slices
-   fZpos.push_back(30.);
-   fZpos.push_back(50.);
-   fZpos.push_back(100.);
-   fZpos.push_back(150.);
-   fZpos.push_back(200.);
-   fZpos.push_back(300.);
-   fZpos.push_back(400.);
    fNofSlices = fZpos.size();
+   fNofPolynoms = fPolynomDegrees.size();
 
-   // Set polynom degrees
-// fDegrees.push_back(3);
-// fDegrees.push_back(5);
-   fDegrees.push_back(7);
-// fDegrees.push_back(9);
-   fNofPolynoms = fDegrees.size();
-
+   // Calculate (X, Y) window for each slice
    fXpos.resize(fNofSlices);
    fYpos.resize(fNofSlices);
    for (Int_t i = 0; i < fNofSlices; i++) {
@@ -112,6 +100,7 @@ InitStatus CbmLitFieldQa::Init()
       fYpos[i] = fZpos[i] * tanYangle;
    }
 
+   //
    fAlongZAngles.push_back(0.);
    fAlongZAngles.push_back(5.);
    fAlongZAngles.push_back(10.);
@@ -120,10 +109,10 @@ InitStatus CbmLitFieldQa::Init()
    fAlongZAngles.push_back(25.);
 
    // Create field approximation tool for each polynom degree
-   if (fIsCheckFieldApproximation) {
+   if (fCheckFieldApproximation) {
       fFitter.resize(fNofPolynoms);
       for (UInt_t i = 0; i < fNofPolynoms; i++) {
-         fFitter[i] = new CbmLitFieldFitter(fDegrees[i]);
+         fFitter[i] = new CbmLitFieldFitter(fPolynomDegrees[i]);
          fFitter[i]->SetXangle(fXangle);
          fFitter[i]->SetYangle(fYangle);
          fFitter[i]->SetNofBinsX(100);//fNofBinsX);
@@ -133,9 +122,12 @@ InitStatus CbmLitFieldQa::Init()
    }
 
    // Create grid creator tool
-   if (fIsCheckGridCreator) {
+   if (fCheckGridCreator) {
       fGridCreator = new CbmLitFieldGridCreator();
    }
+
+   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+   fField = env->GetField();
 }
 
 void CbmLitFieldQa::SetParContainers()
@@ -148,55 +140,64 @@ void CbmLitFieldQa::SetParContainers()
 void CbmLitFieldQa::Exec(
    Option_t* opt)
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fField = env->GetField();
-
    // Fill and create graphs and histograms
    CreateHistos();
+
+   // This is always needed since field map is always drawn for comparison
    FillBHistos();
-   if (fIsCheckFieldApproximation) { CheckFieldFitter(); }
-   if (fIsCheckGridCreator) { CheckGridCreator(); }
-   if (fIsCheckFieldMap) { CheckFieldMap(); }
 
-   // Draw graphs and histograms
-   if (fIsCheckFieldApproximation) {
-      if (fDrawSlices) {
-         if (IsDrawBx()) { DrawSlices(BX, "apr"); }
-         if (IsDrawBy()) { DrawSlices(BY, "apr"); }
-         if (IsDrawBz()) { DrawSlices(BZ, "apr"); }
-         if (IsDrawBz()) { DrawSlices(MOD, "apr"); }
-      }
-
-      if (fDrawPoly) {
-         DrawPoly("rel");
-         DrawPoly("abs");
-      }
-   }
-   if (fIsCheckFieldMap) {
+   // Check and draw field map
+   if (fCheckFieldMap) {
       if (fDrawFieldMap) {
          DrawFieldSlices();
          DrawFieldAlongZ();
       }
    }
-   if (fIsCheckGridCreator) {
-      if (fDrawSlices) {
-         if (IsDrawBx()) { DrawSlices(BX, "grid"); }
-         if (IsDrawBy()) { DrawSlices(BY, "grid"); }
-         if (IsDrawBz()) { DrawSlices(BZ, "grid"); }
-         if (IsDrawBz()) { DrawSlices(MOD, "grid"); }
+
+   // Check and draw field approximation
+   if (fCheckFieldApproximation) {
+      FillFieldApproximationHistos();
+      if (fDrawFieldApproximation) {
+         if (fDrawBx) { DrawSlices(BX, "apr"); }
+         if (fDrawBy) { DrawSlices(BY, "apr"); }
+         if (fDrawBz) { DrawSlices(BZ, "apr"); }
+         if (fDrawMod) { DrawSlices(MOD, "apr"); }
+
+         DrawPoly("rel");
+         DrawPoly("abs");
+      }
+   }
+
+   // Check and draw histograms for grid creator tool
+   if (fCheckGridCreator) {
+      FillGridCreatorHistos();
+      if (fDrawGridCreator) {
+         if (fDrawBx) { DrawSlices(BX, "grid"); }
+         if (fDrawBy) { DrawSlices(BY, "grid"); }
+         if (fDrawBz) { DrawSlices(BZ, "grid"); }
+         if (fDrawMod) { DrawSlices(MOD, "grid"); }
       }
    }
 }
 
 void CbmLitFieldQa::Finish()
 {
+   TIter next(fHistoList);
+   while ( TObject* histo = ((TObject*)next()) ) { histo->Write(); }
 }
 
 void CbmLitFieldQa::CreateHistos()
 {
-   // Histogram list
    fHistoList = new TList();
 
+   CreateFieldHistos();
+   CreateFitterHistos();
+   CreateGridHistos();
+}
+
+void CbmLitFieldQa::CreateFieldHistos()
+{
+   // [BX, BY, BZ, MOD] components
    fhBGraph.resize(4);
    for (Int_t i = 0; i < 4; i++) {
       fhBGraph[i].resize(fNofSlices);
@@ -204,12 +205,11 @@ void CbmLitFieldQa::CreateHistos()
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          fhBGraph[v][i] = new TGraph2D();
+         fHistoList->Add(fhBGraph[v][i]);
       }
    }
 
-   CreateFitterErrHistos();
-   CreateGridErrHistos();
-
+   // [BX, BY, BZ]
    fhBAlongZGraph.resize(3);
    for (Int_t i = 0; i < 3; i++) {
       fhBAlongZGraph[i].resize(fAlongZAngles.size());
@@ -221,7 +221,7 @@ void CbmLitFieldQa::CreateHistos()
    }
 }
 
-void CbmLitFieldQa::CreateFitterErrHistos()
+void CbmLitFieldQa::CreateFitterHistos()
 {
    // Resize histogram vectors
    fhBAprGraph.resize(4);
@@ -265,6 +265,7 @@ void CbmLitFieldQa::CreateFitterErrHistos()
       for (Int_t i = 0; i < fNofSlices; i++) {
          for(Int_t j = 0; j < fNofPolynoms; j++) {
             fhBAprGraph[v][i][j] = new TGraph2D();
+            fHistoList->Add(fhBAprGraph[v][i][j]);
 
             std::string histName = "hBErrH1D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
             fhBErrH1D[v][i][j] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
@@ -284,23 +285,23 @@ void CbmLitFieldQa::CreateFitterErrHistos()
          }
       }
    }
-   std::cout << "Field fitter error histograms created" << std::endl;
+   std::cout << "-I- CbmLitFieldQa::CreateFitterErrHistos: Field fitter error histograms created" << std::endl;
 }
 
-void CbmLitFieldQa::CreateGridErrHistos()
+void CbmLitFieldQa::CreateGridHistos()
 {
    // Resize histogram vectors
-   fhGridBGraph.resize(4);
-   fhGridBErrH1D.resize(4);
-   fhGridBErrH2D.resize(4);
-   fhGridBRelErrH1D.resize(4);
-   fhGridBRelErrH2D.resize(4);
+   fhBGridGraph.resize(4);
+   fhBGridErrH1D.resize(4);
+   fhBGridErrH2D.resize(4);
+   fhBGridRelErrH1D.resize(4);
+   fhBGridRelErrH2D.resize(4);
    for (Int_t i = 0; i < 4; i++) {
-      fhGridBGraph[i].resize(fNofSlices);
-      fhGridBErrH1D[i].resize(fNofSlices);
-      fhGridBErrH2D[i].resize(fNofSlices);
-      fhGridBRelErrH1D[i].resize(fNofSlices);
-      fhGridBRelErrH2D[i].resize(fNofSlices);
+      fhBGridGraph[i].resize(fNofSlices);
+      fhBGridErrH1D[i].resize(fNofSlices);
+      fhBGridErrH2D[i].resize(fNofSlices);
+      fhBGridRelErrH1D[i].resize(fNofSlices);
+      fhBGridRelErrH2D[i].resize(fNofSlices);
    }
 
    std::string names[] = {"Bx", "By", "Bz", "Mod"};
@@ -322,43 +323,45 @@ void CbmLitFieldQa::CreateGridErrHistos()
    // Create histograms
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
-         fhGridBGraph[v][i] = new TGraph2D();
+         fhBGridGraph[v][i] = new TGraph2D();
+         fHistoList->Add(fhBGridGraph[v][i]);
 
          std::string histName = "hGridBErrH1D" + names[v] + lit::ToString<Int_t>(i);
-         fhGridBErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
-         fHistoList->Add(fhGridBErrH1D[v][i]);
+         fhBGridErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
+         fHistoList->Add(fhBGridErrH1D[v][i]);
 
          histName = "hGridBErrH2D" + names[v] + lit::ToString<Int_t>(i);
-         fhGridBErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
-         fHistoList->Add(fhGridBErrH2D[v][i]);
+         fhBGridErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+         fHistoList->Add(fhBGridErrH2D[v][i]);
 
          histName = "hGridBRelErrH1D" + names[v] + lit::ToString<Int_t>(i);
-         fhGridBRelErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
-         fHistoList->Add(fhGridBRelErrH1D[v][i]);
+         fhBGridRelErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
+         fHistoList->Add(fhBGridRelErrH1D[v][i]);
 
          histName = "hGridBRelErrH2D" + names[v] + lit::ToString<Int_t>(i);
-         fhGridBRelErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
-         fHistoList->Add(fhGridBRelErrH2D[v][i]);
+         fhBGridRelErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+         fHistoList->Add(fhBGridRelErrH2D[v][i]);
       }
    }
-   std::cout << "Grid creator error histograms created" << std::endl;
+   std::cout << "-I- CbmLitFieldQa::CreateGridErrHistos(): Grid creator error histograms created" << std::endl;
 }
 
 void CbmLitFieldQa::FillBHistos()
 {
-   for (UInt_t iSlice = 0; iSlice < fNofSlices; iSlice++) { // loop over z positions
-      Double_t max[4] = {
-         std::numeric_limits<Double_t>::min(),
-         std::numeric_limits<Double_t>::min(),
-         std::numeric_limits<Double_t>::min(),
-         std::numeric_limits<Double_t>::min()
-      };
-      Double_t min[4] = {
-         std::numeric_limits<Double_t>::max(),
-         std::numeric_limits<Double_t>::max(),
-         std::numeric_limits<Double_t>::max(),
-         std::numeric_limits<Double_t>::max()
-      };
+   // Fill graphs for magnetic field for each (X, Y) slice
+   for (UInt_t iSlice = 0; iSlice < fNofSlices; iSlice++) { // loop over slices
+//      Double_t max[4] = {
+//         std::numeric_limits<Double_t>::min(),
+//         std::numeric_limits<Double_t>::min(),
+//         std::numeric_limits<Double_t>::min(),
+//         std::numeric_limits<Double_t>::min()
+//      };
+//      Double_t min[4] = {
+//         std::numeric_limits<Double_t>::max(),
+//         std::numeric_limits<Double_t>::max(),
+//         std::numeric_limits<Double_t>::max(),
+//         std::numeric_limits<Double_t>::max()
+//      };
 
       Double_t Z = fZpos[iSlice];
 
@@ -382,16 +385,16 @@ void CbmLitFieldQa::FillBHistos()
 
             Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-            // Find maximum entry in the histogram
-            if (max[BX] < B[0]) { max[BX] = B[0]; }
-            if (max[BY] < B[1]) { max[BY] = B[1]; }
-            if (max[BZ] < B[2]) { max[BZ] = B[2]; }
-            if (max[MOD] < Bmod) { max[MOD] = Bmod; }
-            // Find minimum entry in the histogram
-            if (min[BX] > B[0]) { min[BX] = B[0]; }
-            if (min[BY] > B[1]) { min[BY] = B[1]; }
-            if (min[BZ] > B[2]) { min[BZ] = B[2]; }
-            if (min[MOD] > Bmod) { min[MOD] = Bmod; }
+//            // Find maximum entry in the histogram
+//            if (max[BX] < B[0]) { max[BX] = B[0]; }
+//            if (max[BY] < B[1]) { max[BY] = B[1]; }
+//            if (max[BZ] < B[2]) { max[BZ] = B[2]; }
+//            if (max[MOD] < Bmod) { max[MOD] = Bmod; }
+//            // Find minimum entry in the histogram
+//            if (min[BX] > B[0]) { min[BX] = B[0]; }
+//            if (min[BY] > B[1]) { min[BY] = B[1]; }
+//            if (min[BZ] > B[2]) { min[BZ] = B[2]; }
+//            if (min[MOD] > Bmod) { min[MOD] = Bmod; }
 
             fhBGraph[BX][iSlice]->SetPoint(cnt, X, Y, B[BX]);
             fhBGraph[BY][iSlice]->SetPoint(cnt, X, Y, B[BY]);
@@ -400,28 +403,52 @@ void CbmLitFieldQa::FillBHistos()
             cnt++;
          }
       }
-      fhBGraph[BX][iSlice]->SetMinimum(min[BX] - 0.1 * std::abs(min[BX]));
-      fhBGraph[BY][iSlice]->SetMinimum(min[BY] - 0.1 * std::abs(min[BY]));
-      fhBGraph[BZ][iSlice]->SetMinimum(min[BZ] - 0.1 * std::abs(min[BZ]));
-      fhBGraph[MOD][iSlice]->SetMinimum(min[MOD] - 0.1 * std::abs(min[MOD]));
+//      fhBGraph[BX][iSlice]->SetMinimum(min[BX] - 0.1 * std::abs(min[BX]));
+//      fhBGraph[BY][iSlice]->SetMinimum(min[BY] - 0.1 * std::abs(min[BY]));
+//      fhBGraph[BZ][iSlice]->SetMinimum(min[BZ] - 0.1 * std::abs(min[BZ]));
+//      fhBGraph[MOD][iSlice]->SetMinimum(min[MOD] - 0.1 * std::abs(min[MOD]));
+//
+//      fhBGraph[BX][iSlice]->SetMaximum(max[BX] + 0.1 * std::abs(max[BX]));
+//      fhBGraph[BY][iSlice]->SetMaximum(max[BY] + 0.1 * std::abs(max[BY]));
+//      fhBGraph[BZ][iSlice]->SetMaximum(max[BZ] + 0.1 * std::abs(max[BZ]));
+//      fhBGraph[MOD][iSlice]->SetMaximum(max[MOD] + 0.1 * std::abs(max[MOD]));
+   }
 
-      fhBGraph[BX][iSlice]->SetMaximum(max[BX] + 0.1 * std::abs(max[BX]));
-      fhBGraph[BY][iSlice]->SetMaximum(max[BY] + 0.1 * std::abs(max[BY]));
-      fhBGraph[BZ][iSlice]->SetMaximum(max[BZ] + 0.1 * std::abs(max[BZ]));
-      fhBGraph[MOD][iSlice]->SetMaximum(max[MOD] + 0.1 * std::abs(max[MOD]));
+   // Fill histograms for magnetic field along Z
+   for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
+      Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
+      for (Int_t istep = 0; istep < nofSteps; istep++) {
+         Double_t Z = fZMin + istep * fZStep;
+         Double_t tanXangle = std::tan(fAlongZAngles[i]*3.14159265/180); //
+         Double_t tanYangle = std::tan(fAlongZAngles[i]*3.14159265/180); //
+         Double_t X = Z * tanXangle;
+         Double_t Y = Z * tanYangle;
+
+         // Get field value
+         Double_t pos[3] = {X, Y, Z};
+         Double_t B[3];
+         fField->GetFieldValue(pos, B);
+
+         fhBAlongZGraph[BX][i]->SetPoint(istep, Z, B[0]);
+         fhBAlongZGraph[BY][i]->SetPoint(istep, Z, B[1]);
+         fhBAlongZGraph[BZ][i]->SetPoint(istep, Z, B[2]);
+      }
    }
 }
 
-void CbmLitFieldQa::CheckFieldFitter()
+void CbmLitFieldQa::FillFieldApproximationHistos()
 {
    std::vector<std::vector<lit::parallel::LitFieldSlice<float> > > slices;
    slices.resize(fNofPolynoms);
    for (UInt_t i = 0; i < fNofPolynoms; i++) {slices[i].resize(fNofSlices);}
 
-   // Approximate field slices in each slices for each polynom degree
+   // Approximate field in each slice for each polynomial degree
    for (UInt_t i = 0; i < fNofPolynoms; i++) {
       for(Int_t j = 0; j < fNofSlices; j++) {
          fFitter[i]->FitSlice(fZpos[j], slices[i][j]);
+         std::cout << "-I- CbmLitFieldQa::FillFieldApproximationHistos: "
+               << " field approximation (degree=" << fPolynomDegrees[i]
+               << ", Z=" << fZpos[j] << ")" << std::endl;
       }
    }
 
@@ -519,7 +546,7 @@ void CbmLitFieldQa::CheckFieldFitter()
    }
 }
 
-void CbmLitFieldQa::CheckGridCreator()
+void CbmLitFieldQa::FillGridCreatorHistos()
 {
    std::vector<lit::parallel::LitFieldGrid> grids;
    grids.resize(fNofSlices);
@@ -540,10 +567,10 @@ void CbmLitFieldQa::CheckGridCreator()
             lit::parallel::LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
-            fhGridBGraph[BX][iSlice]->SetPoint(cnt, X, Y, v.Bx);
-            fhGridBGraph[BY][iSlice]->SetPoint(cnt, X, Y, v.By);
-            fhGridBGraph[BZ][iSlice]->SetPoint(cnt, X, Y, v.Bz);
-            fhGridBGraph[MOD][iSlice]->SetPoint(cnt, X, Y, mod);
+            fhBGridGraph[BX][iSlice]->SetPoint(cnt, X, Y, v.Bx);
+            fhBGridGraph[BY][iSlice]->SetPoint(cnt, X, Y, v.By);
+            fhBGridGraph[BZ][iSlice]->SetPoint(cnt, X, Y, v.Bz);
+            fhBGridGraph[MOD][iSlice]->SetPoint(cnt, X, Y, mod);
             cnt++;
          }
       }
@@ -586,47 +613,24 @@ void CbmLitFieldQa::CheckGridCreator()
             if (Bmod != 0.) { relErrMod = (errMod / Bmod) * 100.; }
             else { relErrMod = 0.; }
 
-            fhGridBErrH2D[BX][iSlice]->Fill(X, Y, errBx);
-            fhGridBErrH1D[BX][iSlice]->Fill(errBx);
-            fhGridBRelErrH1D[BX][iSlice]->Fill(relErrBx);
-            fhGridBRelErrH2D[BX][iSlice]->Fill(X, Y, relErrBx);
-            fhGridBErrH2D[BY][iSlice]->Fill(X, Y, errBy);
-            fhGridBErrH1D[BY][iSlice]->Fill(errBy);
-            fhGridBRelErrH1D[BY][iSlice]->Fill(relErrBy);
-            fhGridBRelErrH2D[BY][iSlice]->Fill(X, Y, relErrBy);
-            fhGridBErrH2D[BZ][iSlice]->Fill(X, Y, errBz);
-            fhGridBErrH1D[BZ][iSlice]->Fill(errBz);
-            fhGridBRelErrH1D[BZ][iSlice]->Fill(relErrBz);
-            fhGridBRelErrH2D[BZ][iSlice]->Fill(X, Y, relErrBz);
-            fhGridBErrH2D[MOD][iSlice]->Fill(X, Y, errMod);
-            fhGridBErrH1D[MOD][iSlice]->Fill(errMod);
-            fhGridBRelErrH1D[MOD][iSlice]->Fill(relErrMod);
-            fhGridBRelErrH2D[MOD][iSlice]->Fill(X, Y, relErrMod);
+            fhBGridErrH2D[BX][iSlice]->Fill(X, Y, errBx);
+            fhBGridErrH1D[BX][iSlice]->Fill(errBx);
+            fhBGridRelErrH1D[BX][iSlice]->Fill(relErrBx);
+            fhBGridRelErrH2D[BX][iSlice]->Fill(X, Y, relErrBx);
+            fhBGridErrH2D[BY][iSlice]->Fill(X, Y, errBy);
+            fhBGridErrH1D[BY][iSlice]->Fill(errBy);
+            fhBGridRelErrH1D[BY][iSlice]->Fill(relErrBy);
+            fhBGridRelErrH2D[BY][iSlice]->Fill(X, Y, relErrBy);
+            fhBGridErrH2D[BZ][iSlice]->Fill(X, Y, errBz);
+            fhBGridErrH1D[BZ][iSlice]->Fill(errBz);
+            fhBGridRelErrH1D[BZ][iSlice]->Fill(relErrBz);
+            fhBGridRelErrH2D[BZ][iSlice]->Fill(X, Y, relErrBz);
+            fhBGridErrH2D[MOD][iSlice]->Fill(X, Y, errMod);
+            fhBGridErrH1D[MOD][iSlice]->Fill(errMod);
+            fhBGridRelErrH1D[MOD][iSlice]->Fill(relErrMod);
+            fhBGridRelErrH2D[MOD][iSlice]->Fill(X, Y, relErrMod);
 
          }
-      }
-   }
-}
-
-void CbmLitFieldQa::CheckFieldMap()
-{
-   for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
-      Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
-      for (Int_t istep = 0; istep < nofSteps; istep++) {
-         Double_t Z = fZMin + istep * fZStep;
-         Double_t tanXangle = std::tan(fAlongZAngles[i]*3.14159265/180); //
-         Double_t tanYangle = std::tan(fAlongZAngles[i]*3.14159265/180); //
-         Double_t X = Z * tanXangle;
-         Double_t Y = Z * tanYangle;
-
-         // Get field value
-         Double_t pos[3] = {X, Y, Z};
-         Double_t B[3];
-         fField->GetFieldValue(pos, B);
-
-         fhBAlongZGraph[BX][i]->SetPoint(istep, Z, B[0]);
-         fhBAlongZGraph[BY][i]->SetPoint(istep, Z, B[1]);
-         fhBAlongZGraph[BZ][i]->SetPoint(istep, Z, B[2]);
       }
    }
 }
@@ -654,29 +658,29 @@ void CbmLitFieldQa::DrawSlices(
             kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
 
       canvas[i]->cd(2);
-      TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhGridBErrH1D[v][i];
+      TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhBGridErrH1D[v][i];
       DrawHist1D(hist2, std::string(title + " [kGauss]"), "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
                  LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
 
       canvas[i]->cd(3);
-      TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhGridBErrH2D[v][i];
+      TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhBGridErrH2D[v][i];
       DrawHist2D(hist3, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
             kLitLinearScale, kLitLinearScale, kLitLinearScale, "colz");
 
       canvas[i]->cd(4);
-      TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhGridBGraph[v][i];
+      TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
       DrawGraph2D(graph2, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
             kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
 
       canvas[i]->cd(5);
-      TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhGridBRelErrH1D[v][i];
+      TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1D[v][i];
       DrawHist1D(hist4, std::string(title + " relative error [%]"), "Counter",
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
                  LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
 
       canvas[i]->cd(6);
-      TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhGridBRelErrH2D[v][i];
+      TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2D[v][i];
       DrawHist2D(hist5, "X [cm]", "Y [cm]", std::string(title + " relative error [%]"),
             kLitLinearScale, kLitLinearScale, kLitLinearScale, "colz");
 
@@ -733,7 +737,7 @@ void CbmLitFieldQa::DrawPoly(
 
             if (v == 0) {
                std::stringstream ss;
-               ss << fDegrees[j];
+               ss << fPolynomDegrees[j];
                l1->AddEntry(hist1, ss.str().c_str(),"lp");
             }
          }

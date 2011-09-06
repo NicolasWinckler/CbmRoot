@@ -1,12 +1,14 @@
-/** check_field.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file field_qa.C
  *
- * Macro draws field map and checks field map approximation.
+ * \brief Macro runs CbmLitFieldQa task which checks field map and its approximation.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
  **/
 
-void check_field(Int_t nEvents = 1)
+void field_qa(Int_t nEvents = 1)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -24,10 +26,6 @@ void check_field(Int_t nEvents = 1)
 	TStopwatch timer;
 	timer.Start();
 
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
-
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -40,20 +38,39 @@ void check_field(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitFieldQa* fieldQa = new CbmLitFieldQa();
+	fieldQa->SetCheckFieldMap(false);
+	fieldQa->SetCheckFieldApproximation(false);
+	fieldQa->SetCheckGridCreator(true);
+
+	std::vector<Double_t> zPos;
+//   zPos.push_back(30.);
+//   zPos.push_back(50.);
+   zPos.push_back(100.);
+//   zPos.push_back(150.);
+//   zPos.push_back(200.);
+   zPos.push_back(300.);
+//   zPos.push_back(400.);
+   fieldQa->SetSliceZPosition(zPos);
+
+   std::vector<UInt_t> degrees;
+// degrees.push_back(3);
+// degrees.push_back(5);
+   degrees.push_back(7);
+// degrees.push_back(9);
+   fieldQa->SetPolynomDegrees(degrees);
+
 	fieldQa->SetXangle(35.);
 	fieldQa->SetYangle(35.);
 	fieldQa->SetNofBinsX(30);
 	fieldQa->SetNofBinsY(30);
-	fieldQa->IsCheckFieldApproximation(false);
-	fieldQa->IsCheckFieldMap(true);
-	fieldQa->IsCheckGridCreator(true);
-	fieldQa->IsDrawBx(true);
-	fieldQa->IsDrawBy(true);
-	fieldQa->IsDrawBz(true);
-	fieldQa->IsDrawMod(true);
-	fieldQa->IsDrawFieldMap(true);
-	fieldQa->IsDrawPoly(false);
-	fieldQa->IsDrawSlices(true);
+
+	fieldQa->SetDrawFieldMap(true);
+	fieldQa->SetDrawFieldApproximation(true);
+   fieldQa->SetDrawGridCreator(true);
+	fieldQa->SetDrawBx(true);
+	fieldQa->SetDrawBy(true);
+	fieldQa->SetDrawBz(true);
+	fieldQa->SetDrawMod(true);
 	fieldQa->IsFixedBounds(false);
 	fieldQa->SetUseEllipseAcc(false);
 	fieldQa->SetPolynomDegreeIndex(0);

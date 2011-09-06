@@ -1,10 +1,10 @@
-/** CbmLitFieldQa.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- ** Task for checking magnetic field map and
- ** its approximation.
+/**
+ * \file CbmLitFieldQa.h
+ *
+ * \brief Field map approximation QA.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
 
 #ifndef CBMLITFIELDQA_H_
@@ -25,53 +25,66 @@ class CbmLitFieldFitter;
 class CbmLitFieldGridCreator;
 class CBmLitPolynom;
 
+/**
+ * \class CbmLitFieldQa
+ *
+ * \brief Field map approximation QA.
+ *
+ * Task checks magnetic field map, its
+ * polynomial approximation and approximation
+ * based on the grid creation.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ **/
 class CbmLitFieldQa : public FairTask
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitFieldQa();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitFieldQa();
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual InitStatus Init();
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Exec(
       Option_t* opt);
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Finish();
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void SetParContainers();
 
-   /* Getters */
-   Bool_t IsCheckFieldApproximation() const {return fIsCheckFieldApproximation;}
-   Bool_t IsCheckFieldMap() const {return fIsCheckFieldMap;}
-   Bool_t IsCheckGridCreator() const {return fIsCheckGridCreator;}
-   Bool_t IsDrawBx() const {return fDrawBx;}
-   Bool_t IsDrawBy() const {return fDrawBy;}
-   Bool_t IsDrawBz() const {return fDrawBz;}
-   Bool_t IsDrawMod() const {return fDrawMod;}
-   Bool_t IsDrawFieldMap() const {return fDrawFieldMap;}
-   Bool_t IsDrawPoly() const {return fDrawPoly;}
-   Bool_t IsDrawSlices() const {return fDrawSlices;}
-   Bool_t IsFixedBounds() const {return fFixedBounds;}
-
    /* Setters */
-   void IsCheckFieldApproximation(Bool_t isCheckFieldApproximation) {fIsCheckFieldApproximation = isCheckFieldApproximation;}
-   void IsCheckFieldMap(Bool_t isCheckFieldMap) {fIsCheckFieldMap = isCheckFieldMap;}
-   void IsCheckGridCreator(Bool_t isCheckGridCreator) {fIsCheckGridCreator = isCheckGridCreator;}
-   void IsDrawBx(Bool_t drawBx) {fDrawBx = drawBx;}
-   void IsDrawBy(Bool_t drawBy) {fDrawBy = drawBy;}
-   void IsDrawBz(Bool_t drawBz) {fDrawBz = drawBz;}
-   void IsDrawMod(Bool_t drawMod) {fDrawMod = drawMod;}
-   void IsDrawFieldMap(Bool_t drawFieldMap) {fDrawFieldMap = drawFieldMap;}
-   void IsDrawPoly(Bool_t drawPoly) {fDrawPoly = drawPoly;}
-   void IsDrawSlices(Bool_t drawSlices) {fDrawSlices = drawSlices;}
-   void IsFixedBounds(Bool_t fixedBounds) {fFixedBounds = fixedBounds;}
+   void SetSliceZPosition(const std::vector<Double_t>& zPos) { fZpos = zPos; }
+   void SetPolynomDegrees(const std::vector<UInt_t>& degrees) { fPolynomDegrees = degrees; }
+   void SetCheckFieldMap(Bool_t checkFieldMap) { fCheckFieldMap = checkFieldMap; }
+   void SetCheckFieldApproximation(Bool_t checkFieldApproximation) { fCheckFieldApproximation = checkFieldApproximation; }
+   void SetCheckGridCreator(Bool_t isCheckGridCreator) { fCheckGridCreator = isCheckGridCreator; }
+   void SetDrawFieldMap(Bool_t drawFieldMap) { fDrawFieldMap = drawFieldMap; }
+   void SetDrawFieldApproximation(Bool_t drawFieldApproximation) { fDrawFieldApproximation = drawFieldApproximation; }
+   void SetDrawGridCreator(Bool_t drawGridCreator) { fDrawGridCreator = drawGridCreator; }
+   void SetDrawBx(Bool_t drawBx) { fDrawBx = drawBx; }
+   void SetDrawBy(Bool_t drawBy) { fDrawBy = drawBy; }
+   void SetDrawBz(Bool_t drawBz) { fDrawBz = drawBz; }
+   void SetDrawMod(Bool_t drawMod) { fDrawMod = drawMod; }
+   void IsFixedBounds(Bool_t fixedBounds) { fFixedBounds = fixedBounds; }
 
    /* Setters */
    void SetXangle(double xangle) {fXangle = xangle;}
@@ -83,49 +96,72 @@ public:
    void SetPolynomDegreeIndex(unsigned int degreeIndex) {fPolynomDegreeIndex = degreeIndex;}
 
 private:
-   /* Creates histograms */
+   /**
+    * \brief Create histograms.
+    */
    void CreateHistos();
 
-   /* */
-   void CreateFitterErrHistos();
+   /**
+    * \brief Create field histograms.
+    */
+   void CreateFieldHistos();
 
-   /* */
-   void CreateGridErrHistos();
+   /**
+    * \brief Create histograms for field approximation.
+    */
+   void CreateFitterHistos();
 
-   /* Fills graphs for field map and field approximation
-    * for each field component (Bx, By, Bz, |B|) */
+   /**
+    * \brief Create histograms for grid creator.
+    */
+   void CreateGridHistos();
+
+   /**
+    * \brief Fill graphs and histos for field map for each field component (Bx, By, Bz, |B|).
+    */
    void FillBHistos();
 
-   /* Checks field approximation tool */
-   void CheckFieldFitter();
+   /**
+    * \brief Fill histograms for polynomial field approximation.
+    */
+   void FillFieldApproximationHistos();
 
-   /* Checks field creator tool */
-   void CheckGridCreator();
+   /**
+    * \brief fill histograms for grid creator tool.
+    */
+   void FillGridCreatorHistos();
 
-   /* Fills histograms for magnetic field map along Z
-    * for different polar angles and each field component
-    * (Bx, By, Bz, |B|) */
-   void CheckFieldMap();
+   /**
+    * \brief Draw canvas with histograms for each approximated slice.
+    * \param[in] v Defines field component (BX, BY, BZ, MOD).
+    * \param[in] opt Drawing option:
+    *                   "grid" to plot results for grid creator
+    *                   "apr" to plot results for field fitter.
+    */
+   void DrawSlices(
+         Int_t v,
+         const std::string& opt);
 
-   /* Draws canvas with histograms for each approximated field slice
-    * @param v Defines field component (BX, BY, BZ, MOD)
-    * @param opt Drawing option: "grid" to plot results for grid creator
-    * "apr" to plot results for field fitter */
-   void DrawSlices(Int_t v, const std::string& opt);
+   /**
+    * \brief Draw comparison for different polynomial orders for each slice.
+    * \param[in] opt "rel" for relative errors or "abs" for absolute errors.
+    */
+   void DrawPoly(
+         const std::string& opt);
 
-   /* Draws comparison for different polynom orders for each slice
-    * @param opt Should be "rel" for relative errors or "abs" for absolute errors */
-   void DrawPoly(const std::string& opt);
-
-   /* Draws field components and its errors for each slice */
+   /**
+    * \brief Draw field map components for each slice.
+    */
    void DrawFieldSlices();
 
-   /* Draws field components along Z coordinate */
+   /**
+    * \brief Draw field map components along Z coordinate.
+    */
    void DrawFieldAlongZ();
 
    // Pointer to the magnetic field map
    FairField* fField;
-   // List of histograms
+   // List of histograms and graphs
    TList* fHistoList;
    // Number of slices along Z for field approximation
    Int_t fNofSlices;
@@ -160,7 +196,7 @@ private:
    // Number of polynoms for tests
    UInt_t fNofPolynoms;
    // Array with polynom degrees to be analyzed
-   std::vector<UInt_t> fDegrees;
+   std::vector<UInt_t> fPolynomDegrees;
    // Field fitter tool for each polynom degree
    std::vector<CbmLitFieldFitter*> fFitter;
 
@@ -187,8 +223,11 @@ private:
    // Approximated field graph for each component, each slice and each polynom order
    // [BX, BY, BZ, MOD][slice number][polynom order]
    std::vector<std::vector<std::vector<TGraph2D*> > >fhBAprGraph;
+   // Grid field graph for each component and each slice
+   // [BX, BY, BZ][slice number]
+   std::vector<std::vector<TGraph2D*> > fhBGridGraph;
 
-   // Error histograms
+   // Error histograms for polynomial approximation
    // [BX, BY, BZ, MOD][slice number][polynom number]
    std::vector<std::vector<std::vector<TH2D*> > >fhBErrH2D; // 2D absolute error error distribution in (X, Y)
    std::vector<std::vector<std::vector<TH1D*> > >fhBErrH1D; // Absolute error
@@ -197,30 +236,27 @@ private:
 
    // Error histograms for grid creator tool
    // [BX, BY, BZ, MOD][slice number]
-   std::vector<std::vector<TH2D*> > fhGridBErrH2D; // 2D absolute error error distribution in (X, Y)
-   std::vector<std::vector<TH1D*> > fhGridBErrH1D; // Absolute error
-   std::vector<std::vector<TH1D*> > fhGridBRelErrH1D; // Relative error
-   std::vector<std::vector<TH2D*> > fhGridBRelErrH2D; // 2D relative error distribution in (X, Y)
-   // Grid field graph for each component and each slice
-   // [BX, BY, BZ][slice number]
-   std::vector<std::vector<TGraph2D*> > fhGridBGraph;
+   std::vector<std::vector<TH2D*> > fhBGridErrH2D; // 2D absolute error error distribution in (X, Y)
+   std::vector<std::vector<TH1D*> > fhBGridErrH1D; // Absolute error
+   std::vector<std::vector<TH1D*> > fhBGridRelErrH1D; // Relative error
+   std::vector<std::vector<TH2D*> > fhBGridRelErrH2D; // 2D relative error distribution in (X, Y)
 
    // Field map values histograms along Z
-   // [BX, BY, BZ][polynom number]
+   // [BX, BY, BZ][polar angle]
    std::vector<std::vector<TGraph*> >fhBAlongZGraph;
 
-   Bool_t fIsCheckFieldApproximation; // If true than field approximation is checked
-   Bool_t fIsCheckFieldMap; // If true than field map is checked
-   Bool_t fIsCheckGridCreator; // If true than field creator is checked
+   Bool_t fCheckFieldMap; // If true than field map is checked
+   Bool_t fCheckFieldApproximation; // If true than field approximation is checked
+   Bool_t fCheckGridCreator; // If true than field creator is checked
 
    // Drawing options
+   Bool_t fDrawFieldMap; // Draw field map
+   Bool_t fDrawFieldApproximation; // Draw field approximation
+   Bool_t fDrawGridCreator; // Draw grid creator histograms
    Bool_t fDrawBx; // Draw Bx field component histograms
    Bool_t fDrawBy; // Draw By field component histograms
    Bool_t fDrawBz; // Draw Bz field component histograms
    Bool_t fDrawMod; // Draw field module histograms
-   Bool_t fDrawFieldMap; // Draw field map
-   Bool_t fDrawPoly; // Draw comparison for different polynom orders
-   Bool_t fDrawSlices; // Draw field slices
 
    Bool_t fFixedBounds; // Fixed bounds for error histograms
 

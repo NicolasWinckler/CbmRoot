@@ -6,7 +6,7 @@
  * Macro runs propagation analysis task.
  **/
 
-void prop_ana(Int_t nEvents = 1000)
+void prop_qa(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 

@@ -150,7 +150,7 @@ cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
 #cbm/qa/CbmLitReconstructionQa.h 
 cbm/qa/CbmLitFindGlobalTracksIdeal.h
-cbm/qa/CbmLitPropagationAnalysis.h 
+cbm/qa/CbmLitPropagationQa.h 
 #cbm/qa/CbmLitRobustFitterAnalysis.h
 cbm/qa/CbmLitCheckSimpleGeo.h 
 cbm/qa/CbmLitFieldQa.h
@@ -191,7 +191,7 @@ cbm/finder/CbmLitFindGlobalTracks.cxx
 #cbm/qa/CbmLitReconstructionQa.cxx
 cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/CbmLitFieldQa.cxx
-cbm/qa/CbmLitPropagationAnalysis.cxx 
+cbm/qa/CbmLitPropagationQa.cxx 
 #cbm/qa/CbmLitRobustFitterAnalysis.cxx
 cbm/utils/CbmLitConverter.cxx
 )

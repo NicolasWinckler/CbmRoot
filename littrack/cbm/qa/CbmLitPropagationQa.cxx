@@ -1,10 +1,11 @@
-/** CbmLitPropagationAnalysis.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 2.0
+/**
+ * \file CbmLitPropagationQa.cxx
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ *
  **/
-
-#include "qa/CbmLitPropagationAnalysis.h"
+#include "qa/CbmLitPropagationQa.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitToolFactory.h"
@@ -57,7 +58,7 @@
 #include <fstream>
 
 
-CbmLitPropagationAnalysis::CbmLitPropagationAnalysis():
+CbmLitPropagationQa::CbmLitPropagationQa():
    fIsElectronSetup(false),
    fIsSts(false),
    fIsTrd(false),
@@ -133,11 +134,11 @@ CbmLitPropagationAnalysis::CbmLitPropagationAnalysis():
 {
 }
 
-CbmLitPropagationAnalysis::~CbmLitPropagationAnalysis()
+CbmLitPropagationQa::~CbmLitPropagationQa()
 {
 }
 
-InitStatus CbmLitPropagationAnalysis::Init()
+InitStatus CbmLitPropagationQa::Init()
 {
    DetermineSetup();
    ReadDataBranches();
@@ -157,14 +158,14 @@ InitStatus CbmLitPropagationAnalysis::Init()
    CreateHistograms();
 }
 
-void CbmLitPropagationAnalysis::SetParContainers()
+void CbmLitPropagationQa::SetParContainers()
 {
    FairRunAna* ana = FairRunAna::Instance();
    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
    rtdb->getContainer("CbmGeoMuchPar");
 }
 
-void CbmLitPropagationAnalysis::Exec(
+void CbmLitPropagationQa::Exec(
    Option_t* opt)
 {
    CreateTrackArrays();
@@ -174,7 +175,7 @@ void CbmLitPropagationAnalysis::Exec(
    std::cout << "Event: " << fEvents++ << std::endl;
 }
 
-void CbmLitPropagationAnalysis::Finish()
+void CbmLitPropagationQa::Finish()
 {
    for(Int_t i = 0; i < fNofPlanes; i++) {
       for(Int_t j = 0; j < fNofParams; j++) {
@@ -188,7 +189,7 @@ void CbmLitPropagationAnalysis::Finish()
    Draw();
 }
 
-void CbmLitPropagationAnalysis::DetermineSetup()
+void CbmLitPropagationQa::DetermineSetup()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    fIsElectronSetup = env->IsElectronSetup();
@@ -207,61 +208,61 @@ void CbmLitPropagationAnalysis::DetermineSetup()
    std::cout << std::endl;
 }
 
-void CbmLitPropagationAnalysis::ReadDataBranches()
+void CbmLitPropagationQa::ReadDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
-   if (NULL == ioman) { Fatal("CbmLitPropagationAnalysis::Init","CbmRootManager is not instantiated"); }
+   if (NULL == ioman) { Fatal("CbmLitPropagationQa::Init","CbmRootManager is not instantiated"); }
 
    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-   if (NULL == fMCTracks) { Fatal("CbmLitPropagationAnalysis::Init","No MCTrack array!"); }
+   if (NULL == fMCTracks) { Fatal("CbmLitPropagationQa::Init","No MCTrack array!"); }
 
    fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
-   if (NULL == fGlobalTracks) { Fatal("CbmLitPropagationAnalysis::Init","No GlobalTrack array!"); }
+   if (NULL == fGlobalTracks) { Fatal("CbmLitPropagationQa::Init","No GlobalTrack array!"); }
 
    if (fIsSts) {
       fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
-      if (NULL == fStsTracks) { Fatal("CbmLitPropagationAnalysis::Init", "No STSTrack array!"); }
+      if (NULL == fStsTracks) { Fatal("CbmLitPropagationQa::Init", "No STSTrack array!"); }
 //       fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
-//       if (NULL == fStsTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No StsTrackMatch array!");
+//       if (NULL == fStsTrackMatches) Fatal("CbmLitPropagationQa::Init", "No StsTrackMatch array!");
    }
 
    if (fIsMuch) {
       fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
-      if (NULL == fMuchTracks) { Fatal("CbmLitPropagationAnalysis::Init", "No MuchTrack array!"); }
+      if (NULL == fMuchTracks) { Fatal("CbmLitPropagationQa::Init", "No MuchTrack array!"); }
       fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
       fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
-      if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) { Fatal("CbmLitPropagationAnalysis::Init", "No MuchPixelHit AND MuchStrawHit arrays!"); }
+      if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) { Fatal("CbmLitPropagationQa::Init", "No MuchPixelHit AND MuchStrawHit arrays!"); }
       fMuchTrackMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
-      if (NULL == fMuchTrackMatches) { Fatal("CbmLitPropagationAnalysis::Init", "No MuchTrackMatch array!"); }
+      if (NULL == fMuchTrackMatches) { Fatal("CbmLitPropagationQa::Init", "No MuchTrackMatch array!"); }
       fMuchPixelDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
       fMuchStrawDigiMatches = (TClonesArray*) ioman->GetObject("MuchStrawDigiMatch");
-      if (NULL == fMuchPixelDigiMatches && NULL == fMuchStrawDigiMatches) { Fatal("CbmLitPropagationAnalysis::Init", "No MuchDigiMatches array!"); }
+      if (NULL == fMuchPixelDigiMatches && NULL == fMuchStrawDigiMatches) { Fatal("CbmLitPropagationQa::Init", "No MuchDigiMatches array!"); }
       fMuchClusters  = (TClonesArray*) ioman->GetObject("MuchCluster");
-      if (NULL == fMuchClusters) { Fatal("CbmLitPropagationAnalysis::Init", "No MuchCluster array!"); }
+      if (NULL == fMuchClusters) { Fatal("CbmLitPropagationQa::Init", "No MuchCluster array!"); }
       fMuchPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
-      if (NULL == fMuchPoints) { Fatal("CbmLitPropagationAnalysis::Init", "No MuchPoint array!"); }
+      if (NULL == fMuchPoints) { Fatal("CbmLitPropagationQa::Init", "No MuchPoint array!"); }
    }
 
    if (fIsTrd) {
       fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
-      if (NULL == fTrdTracks) { Fatal("CbmLitPropagationAnalysis::Init", "No TrdTrack array!"); }
+      if (NULL == fTrdTracks) { Fatal("CbmLitPropagationQa::Init", "No TrdTrack array!"); }
       fTrdHits  = (TClonesArray*) ioman->GetObject("TrdHit");
-      if (NULL == fTrdHits) { Fatal("CbmLitPropagationAnalysis::Init", "No TRDHit array!"); }
+      if (NULL == fTrdHits) { Fatal("CbmLitPropagationQa::Init", "No TRDHit array!"); }
       fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
-      if (!fTrdTrackMatches) { Fatal("CbmLitPropagationAnalysis::Init", "No TrdTrackMatch array!"); }
+      if (!fTrdTrackMatches) { Fatal("CbmLitPropagationQa::Init", "No TrdTrackMatch array!"); }
       fTrdPoints  = (TClonesArray*) ioman->GetObject("TrdPoint");
-      if (NULL == fTrdPoints) { Fatal("CbmLitPropagationAnalysis::Init", "No TRDPoint array!"); }
+      if (NULL == fTrdPoints) { Fatal("CbmLitPropagationQa::Init", "No TRDPoint array!"); }
    }
 
    if (fIsTof) {
       fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
-      if (NULL == fTofPoints) { Fatal("CbmLitPropagationAnalysis::Init", "No TofPoint array!"); }
+      if (NULL == fTofPoints) { Fatal("CbmLitPropagationQa::Init", "No TofPoint array!"); }
       fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
-      if (NULL == fTofHits) { Fatal("CbmLitPropagationAnalysis::Init", "No TofHit array!"); }
+      if (NULL == fTofHits) { Fatal("CbmLitPropagationQa::Init", "No TofHit array!"); }
    }
 }
 
-void CbmLitPropagationAnalysis::CreateHistograms()
+void CbmLitPropagationQa::CreateHistograms()
 {
    //0,1,2,3,4 - residuals (x,y,tx,ty,q/p)
    //5,6,7,8,9 - pulls (x,y,tx,ty,q/p)
@@ -348,7 +349,7 @@ void CbmLitPropagationAnalysis::CreateHistograms()
    }
 }
 
-void CbmLitPropagationAnalysis::CreateTrackArrays()
+void CbmLitPropagationQa::CreateTrackArrays()
 {
    Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
    for (Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
@@ -371,11 +372,11 @@ void CbmLitPropagationAnalysis::CreateTrackArrays()
    }
 
    if (fLitTracks.size() != fLitMcTracks.size()) {
-      Fatal("CbmLitPropagationAnalysis", "LitTrack vector size != LitMcVector size");
+      Fatal("CbmLitPropagationQa", "LitTrack vector size != LitMcVector size");
    }
 }
 
-Bool_t CbmLitPropagationAnalysis::CheckAcceptance(
+Bool_t CbmLitPropagationQa::CheckAcceptance(
    const CbmGlobalTrack* globalTrack)
 {
    Int_t trdId = globalTrack->GetTrdTrackIndex();
@@ -394,7 +395,7 @@ Bool_t CbmLitPropagationAnalysis::CheckAcceptance(
    return true;
 }
 
-void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
+void CbmLitPropagationQa::GlobalTrackToLitTrack(
    const CbmGlobalTrack* globalTrack,
    CbmLitTrack* litTrack)
 {
@@ -450,7 +451,7 @@ void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
    }
 }
 
-void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
+void CbmLitPropagationQa::GlobalTrackToMCLitTrack(
    const CbmGlobalTrack* globalTrack,
    CbmLitTrack* litTrack)
 {
@@ -522,7 +523,7 @@ void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
    litTrack->SetFitNodes(nodes);
 }
 
-void CbmLitPropagationAnalysis::DeleteTrackArrays()
+void CbmLitPropagationQa::DeleteTrackArrays()
 {
    for_each(fLitTracks.begin(), fLitTracks.end(), DeleteObject());
    for_each(fLitMcTracks.begin(), fLitMcTracks.end(), DeleteObject());
@@ -530,7 +531,7 @@ void CbmLitPropagationAnalysis::DeleteTrackArrays()
    fLitMcTracks.clear();
 }
 
-void CbmLitPropagationAnalysis::RunTest()
+void CbmLitPropagationQa::RunTest()
 {
    for(Int_t i = 0; i < fLitTracks.size(); i++) {
       if (fLitTracks[i]->GetNofHits() != fNofPlanes) { continue; }
@@ -544,7 +545,7 @@ void CbmLitPropagationAnalysis::RunTest()
    }
 }
 
-void CbmLitPropagationAnalysis::TestPropagation(
+void CbmLitPropagationQa::TestPropagation(
    CbmLitTrack* track,
    CbmLitTrack* mcTrack)
 {
@@ -560,7 +561,7 @@ void CbmLitPropagationAnalysis::TestPropagation(
    fPropagationWatch.Stop();
 }
 
-void CbmLitPropagationAnalysis::TestFitter(
+void CbmLitPropagationQa::TestFitter(
    CbmLitTrack* track,
    CbmLitTrack* mcTrack)
 {
@@ -576,7 +577,7 @@ void CbmLitPropagationAnalysis::TestFitter(
    }
 }
 
-void CbmLitPropagationAnalysis::FillHistosPropagation(
+void CbmLitPropagationQa::FillHistosPropagation(
    const CbmLitTrackParam* par,
    const CbmLitTrackParam* mcPar,
    const CbmLitHit* hit,
@@ -589,7 +590,7 @@ void CbmLitPropagationAnalysis::FillHistosPropagation(
    fPropagationHistos[plane][11]->Fill(0.);//ChiSq(par, hit));
 }
 
-void CbmLitPropagationAnalysis::FillHistosFilter(
+void CbmLitPropagationQa::FillHistosFilter(
    const CbmLitTrackParam* par,
    const CbmLitTrackParam* mcPar,
    const CbmLitHit* hit,
@@ -603,7 +604,7 @@ void CbmLitPropagationAnalysis::FillHistosFilter(
    fFilterHistos[plane][11]->Fill(chisq);//ChiSq(par, hit));
 }
 
-void CbmLitPropagationAnalysis::FillHistosFitter(
+void CbmLitPropagationQa::FillHistosFitter(
    const CbmLitTrack* track,
    const CbmLitTrack* mcTrack)
 {
@@ -621,7 +622,7 @@ void CbmLitPropagationAnalysis::FillHistosFitter(
    }
 }
 
-void CbmLitPropagationAnalysis::McPointToLitFitNode(
+void CbmLitPropagationQa::McPointToLitFitNode(
    FairMCPoint* point,
    CbmLitFitNode* node)
 {
@@ -671,7 +672,7 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
    node->SetPredictedParam(&par);
 }
 
-std::vector<Double_t> CbmLitPropagationAnalysis::CalcResidualsAndPulls(
+std::vector<Double_t> CbmLitPropagationQa::CalcResidualsAndPulls(
    const CbmLitTrackParam* par,
    const CbmLitTrackParam* mcPar)
 {
@@ -691,7 +692,7 @@ std::vector<Double_t> CbmLitPropagationAnalysis::CalcResidualsAndPulls(
    return r;
 }
 
-void CbmLitPropagationAnalysis::PrintStopwatchStatistics()
+void CbmLitPropagationQa::PrintStopwatchStatistics()
 {
    std::cout << "Stopwatch: " << std::endl;
    std::cout << "propagation: counts=" << fPropagationWatch.Counter()
@@ -711,7 +712,7 @@ void CbmLitPropagationAnalysis::PrintStopwatchStatistics()
              << "/" << fSmootherWatch.CpuTime() << std::endl;
 }
 
-void CbmLitPropagationAnalysis::TestFastPropagation(
+void CbmLitPropagationQa::TestFastPropagation(
    CbmLitTrack* track,
    CbmLitTrack* mcTrack)
 {
@@ -724,7 +725,7 @@ void CbmLitPropagationAnalysis::TestFastPropagation(
    }
 }
 
-void CbmLitPropagationAnalysis::Draw()
+void CbmLitPropagationQa::Draw()
 {
    SetStyles();
 
@@ -783,7 +784,7 @@ void CbmLitPropagationAnalysis::Draw()
 //   DrawForPhd();
 }
 
-void CbmLitPropagationAnalysis::DrawHistos(
+void CbmLitPropagationQa::DrawHistos(
    TCanvas* c[],
    int v)
 {
@@ -817,7 +818,7 @@ void CbmLitPropagationAnalysis::DrawHistos(
    }
 }
 
-//void CbmLitPropagationAnalysis::DrawForPhd()
+//void CbmLitPropagationQa::DrawForPhd()
 //{
 //   const Int_t nofHist = 4;
 //   TCanvas* canvas[3];
@@ -836,7 +837,7 @@ void CbmLitPropagationAnalysis::DrawHistos(
 //   if (fIsDrawSmoother) { DrawForPhd(canvas[2], 2); }
 //}
 //
-//void CbmLitPropagationAnalysis::DrawForPhd(
+//void CbmLitPropagationQa::DrawForPhd(
 //   TCanvas* canvas,
 //   Int_t v)
 //{
@@ -865,7 +866,7 @@ void CbmLitPropagationAnalysis::DrawHistos(
 //   if (fIsCloseCanvas) { canvas->Close(); }
 //}
 
-void CbmLitPropagationAnalysis::PrintResults(
+void CbmLitPropagationQa::PrintResults(
    std::ostream& out,
    int v)
 {
@@ -884,4 +885,4 @@ void CbmLitPropagationAnalysis::PrintResults(
    }
 }
 
-ClassImp(CbmLitPropagationAnalysis);
+ClassImp(CbmLitPropagationQa);

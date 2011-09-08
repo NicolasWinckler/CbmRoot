@@ -104,7 +104,7 @@
 #pragma link C++ class CbmLitReconstructionQa+;
 #endif
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
-#pragma link C++ class CbmLitPropagationAnalysis+;
+#pragma link C++ class CbmLitPropagationQa+;
 //#pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitCheckSimpleGeo+;
 #pragma link C++ class CbmLitFieldQa+;

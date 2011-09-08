@@ -1,13 +1,15 @@
-/** CbmLitPropagationAnalysis.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 2.0
- **
- ** Analysis of the track propagation and track fit.
+/**
+ * \file CbmLitPropagationQa.h
+ *
+ * \brief Track propagation and track fit QA.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ *
  **/
 
-#ifndef CBMLITPROPAGATIONANALYSIS_H_
-#define CBMLITPROPAGATIONANALYSIS_H_ 1
+#ifndef CBMLITPROPAGATIONQA_H_
+#define CBMLITPROPAGATIONQA_H_ 1
 
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitPtrTypes.h"
@@ -28,14 +30,23 @@ class TClonesArray;
 class TH1F;
 class TCanvas;
 
-class CbmLitPropagationAnalysis : public FairTask
+/**
+ * \file CbmLitPropagationQa
+ *
+ * \brief Track propagation and track fit QA.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ *
+ **/
+class CbmLitPropagationQa : public FairTask
 {
 public:
    /* Constructor */
-   CbmLitPropagationAnalysis();
+   CbmLitPropagationQa();
 
    /* Destructor */
-   virtual ~CbmLitPropagationAnalysis();
+   virtual ~CbmLitPropagationQa();
 
    /* Inherited from FairTask */
    virtual InitStatus Init();
@@ -278,7 +289,7 @@ private:
    std::vector<std::vector<std::vector<Double_t> > > fSigma;
    std::vector<std::vector<std::vector<Double_t> > > fRms;
 
-   ClassDef(CbmLitPropagationAnalysis, 1);
+   ClassDef(CbmLitPropagationQa, 1);
 };
 
 #endif

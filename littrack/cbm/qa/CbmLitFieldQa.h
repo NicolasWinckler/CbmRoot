@@ -132,6 +132,11 @@ private:
    void FillGridCreatorHistos();
 
    /**
+    * \brief Create property tree and serialize it to JSON.
+    */
+   void CreatePropertyTree();
+
+   /**
     * \brief Draw canvas with histograms for each approximated slice.
     * \param[in] v Defines field component (BX, BY, BZ, MOD).
     * \param[in] opt Drawing option:
@@ -265,6 +270,9 @@ private:
    static const Int_t BY = 1; // By
    static const Int_t BZ = 2; // Bz
    static const Int_t MOD = 3; // Mod = std::sqrt(Bx*Bx + By*By + Bz*Bz)
+
+   // Store image names
+   std::vector<std::string> fImageList;
 
    ClassDef(CbmLitFieldQa, 1);
 };

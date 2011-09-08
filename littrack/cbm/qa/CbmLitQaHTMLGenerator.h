@@ -11,7 +11,6 @@
 
 #include "CbmLitQaBaseGenerator.h"
 #include <string>
-#include <boost/property_tree/ptree.hpp>
 
 /**
  * \class CbmLitQaHTMLGenerator
@@ -138,28 +137,5 @@ private:
    std::string PrintPolarAngleEfficiency(
       const std::string& histName);
 
-   /**
-    * \brief Print property value from property tree to std::string.
-    *
-    * Uniforms output style of properties. Colors background
-    * in dependence on the correctness of the property.
-    *
-    * \param[in] valueTitle Property title which is printed before the property value.
-    * \param[in] valueName Property name in the property tree.
-    * \param[in] tag HTML tag which is used to print the property i.e. "p", "b", "td".
-    * \return std::string with property in HTML format.
-    */
-   std::string PrintValue(
-         const std::string& valueTitle,
-         const std::string& valueName,
-         const std::string& tag);
-
-private:
-   // Property tree of Qa results
-   const boost::property_tree::ptree* fQa;
-   // Property with ideal values
-   const boost::property_tree::ptree* fIdeal;
-   // Property tree with checked results
-   const boost::property_tree::ptree* fCheck;
 };
 #endif /* CBMLITQAHTMLGENERATOR_H_ */

@@ -5,6 +5,7 @@
  * \date 2011
  */
 #include "CbmLitQaBaseGenerator.h"
+#include "../std/utils/CbmLitUtils.h"
 
 CbmLitQaBaseGenerator::CbmLitQaBaseGenerator():
    fIsElectronSetup(true),
@@ -41,6 +42,31 @@ void CbmLitQaBaseGenerator::SetDetectorPresence(
       case kTOF: fIsTof = isDet; break;
       default: break;
    }
+}
+
+std::string CbmLitQaBaseGenerator::HtmlPrintValue(
+      const std::string& valueTitle,
+      const std::string& valueName,
+      const std::string& tag)
+{
+   // Print the value with corresponding color
+   float check = fCheck->get(valueName, -1.);
+   std::string color = (check == -1.) ? fWarningColor :
+      (check == 0.) ? fErrorColor : fNormalColor;
+
+   // Hint text
+   std::string hint = "";
+   if (check == 0. || check == 1.) {
+      float min = fIdeal->get(valueName + ".min", -1.);
+      float max = fIdeal->get(valueName + ".max", -1.);
+      hint = "Limits (" + lit::ToString<float>(min) + ", " + lit::ToString<float>(max) + ")";
+   }
+
+   std::stringstream ss;
+   std::string value = lit::NumberToString(fQa->get(valueName, -1.), 1);
+   ss << "<" << tag << " title=\"" << hint << "\" style=\"background-color:" << color
+         << "\">" << valueTitle << value << "</" << tag << ">";
+   return ss.str();
 }
 
 std::string CbmLitQaBaseGenerator::HtmlHeadString()

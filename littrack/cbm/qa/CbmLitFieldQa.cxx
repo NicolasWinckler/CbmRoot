@@ -12,6 +12,7 @@
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
 #include "utils/CbmLitDrawHist.h"
+#include "CbmLitFieldQaHTMLGenerator.h"
 
 #include "../../parallel/LitField.h"
 
@@ -34,6 +35,9 @@
 #include <cmath>
 #include <string>
 #include <limits>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 CbmLitFieldQa::CbmLitFieldQa():
    fField(NULL),
@@ -73,7 +77,8 @@ CbmLitFieldQa::CbmLitFieldQa():
    fFitter(),
    fPolynomDegreeIndex(1),
    fNofPolynoms(4),
-   fPolynomDegrees()
+   fPolynomDegrees(),
+   fImageList()
 {
 
 }
@@ -178,6 +183,8 @@ void CbmLitFieldQa::Exec(
          if (fDrawMod) { DrawSlices(MOD, "grid"); }
       }
    }
+
+   CreatePropertyTree();
 }
 
 void CbmLitFieldQa::Finish()
@@ -635,6 +642,53 @@ void CbmLitFieldQa::FillGridCreatorHistos()
    }
 }
 
+void CbmLitFieldQa::CreatePropertyTree()
+{
+   // Create and serialize property tree
+   boost::property_tree::ptree qa;
+   qa.put("NofPolynoms", fNofPolynoms);
+   qa.put("NofSlices", fNofSlices);
+   std::string vnames[4] = {"BX", "BY", "BZ", "MOD"};
+
+   for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
+      std::string slice = "slice" + lit::ToString<Int_t>(iSlice);
+      qa.put(slice + ".Z", fZpos[iSlice]);
+      for (Int_t iPolynom = 0; iPolynom < fNofPolynoms; iPolynom++) {
+         for (Int_t v = 0; v < 4; v++) {
+            std::string name = slice + ".polynomial" + lit::ToString<Int_t>(iPolynom);
+            qa.put(name + ".degree", fPolynomDegrees[iPolynom]);
+            qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBErrH1D[v][iSlice][iPolynom]->GetMean());
+            qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBErrH1D[v][iSlice][iPolynom]->GetRMS());
+            qa.put(name + ".err." + vnames[v] + ".rel.mean", fhBRelErrH1D[v][iSlice][iPolynom]->GetMean());
+            qa.put(name + ".err." + vnames[v] + ".rel.rms", fhBRelErrH1D[v][iSlice][iPolynom]->GetRMS());
+         }
+      }
+      std::string name = slice + ".grid";
+      for (Int_t v = 0; v < 4; v++) {
+         qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBGridErrH1D[v][iSlice]->GetMean());
+         qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBGridErrH1D[v][iSlice]->GetRMS());
+         qa.put(name + ".err." + vnames[v] + ".rel.mean", fhBGridRelErrH1D[v][iSlice]->GetMean());
+         qa.put(name + ".err." + vnames[v] + ".rel.rms", fhBGridRelErrH1D[v][iSlice]->GetRMS());
+      }
+   }
+
+   // Put image names to property tree
+   for (Int_t i = 0; i < fImageList.size(); i++) {
+      qa.put("images.png." + fImageList[i], fImageList[i] + ".png");
+      qa.put("images.eps." + fImageList[i], fImageList[i] + ".eps");
+   }
+
+   write_json(std::string(fOutputDir + "field_qa.json").c_str(), qa);
+
+   // Create HTML page
+   // TODO: implement ideal and check property trees
+   boost::property_tree::ptree ideal, check;
+   CbmLitFieldQaHTMLGenerator html;
+   std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
+   html.Create(foutHtml, &qa, &ideal, &check);
+}
+
+
 void CbmLitFieldQa::DrawSlices(
    Int_t v,
    const std::string& opt)
@@ -685,6 +739,7 @@ void CbmLitFieldQa::DrawSlices(
             kLitLinearScale, kLitLinearScale, kLitLinearScale, "colz");
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
+      fImageList.push_back(canvas[i]->GetName());
    }
 }
 
@@ -748,6 +803,7 @@ void CbmLitFieldQa::DrawPoly(
       l1->Draw();
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
+      fImageList.push_back(canvas[i]->GetName());
    }
 }
 
@@ -782,6 +838,7 @@ void CbmLitFieldQa::DrawFieldSlices()
             kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
+      fImageList.push_back(canvas[i]->GetName());
    }
 }
 
@@ -803,5 +860,6 @@ void CbmLitFieldQa::DrawFieldAlongZ()
                 0.7, 0.5, 0.9, 0.3);
    }
    lit::SaveCanvasAsImage(canvas, fOutputDir);
+   fImageList.push_back(canvas->GetName());
 }
 ClassImp(CbmLitFieldQa);

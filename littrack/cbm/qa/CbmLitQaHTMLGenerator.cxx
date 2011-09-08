@@ -35,7 +35,7 @@ void CbmLitQaHTMLGenerator::Create(
    out << "<html><body>" << HtmlHeadString();
 
    out << "<h1>CbmLitReconstructionQa final statistics</h1>" << std::endl;
-   out << PrintValue("Number of events: ", "hEventNo", "p");
+   out << HtmlPrintValue("Number of events: ", "hEventNo", "p");
 
    // Number of objects statistics
    out << "<h2>Number of objects</h2>";
@@ -149,18 +149,18 @@ void CbmLitQaHTMLGenerator::Create(
    // Ghost statistics
    out << "<h2>Ghosts per event</h2>";
    out << "<ul>";
-   if (fIsSts) out << "<li>" << PrintValue("STS=", "fhStsGhostNh", "b");
-   if (fIsTrd || fIsMuch) out << "<li>" << PrintValue("TRD(MUCH)=", "fhRecGhostNh", "b");
-   if (fIsRich) out << "<li>" << PrintValue("RICH=", "fhRichGhostNh", "b");
+   if (fIsSts) out << "<li>" << HtmlPrintValue("STS=", "fhStsGhostNh", "b");
+   if (fIsTrd || fIsMuch) out << "<li>" << HtmlPrintValue("TRD(MUCH)=", "fhRecGhostNh", "b");
+   if (fIsRich) out << "<li>" << HtmlPrintValue("RICH=", "fhRichGhostNh", "b");
    if (fIsRich) {
       out << "<li>after STS-RICH matching:";
       out << "<ul>";
-      out << "<li>" << PrintValue("STS=", "fhStsGhostRichMatchingNh", "b");
-      out << "<li>" << PrintValue("RICH=", "fhRichGhostStsMatchingNh", "b");
+      out << "<li>" << HtmlPrintValue("STS=", "fhStsGhostRichMatchingNh", "b");
+      out << "<li>" << HtmlPrintValue("RICH=", "fhRichGhostStsMatchingNh", "b");
       out << "</ul>";
       out << "<li>after STS-RICH matching and el identification: ";
       out << "<ul>";
-      out << "<li>" << PrintValue("RICH=", "fhRichGhostElIdNh", "b");
+      out << "<li>" << HtmlPrintValue("RICH=", "fhRichGhostElIdNh", "b");
       out << "</ul>";
    }
    out << "</ul>";
@@ -168,11 +168,11 @@ void CbmLitQaHTMLGenerator::Create(
    // STS quality numbers
    out << "<h2>STS quality numbers</h2>";
    out << "<p>Chi2 to primary vertex: ";
-   out << PrintValue("mean = ", "fhStsChiprim.mean", "b");
-   out << PrintValue(" RMS = ", "fhStsChiprim.rms", "b") << "</p>";
+   out << HtmlPrintValue("mean = ", "fhStsChiprim.mean", "b");
+   out << HtmlPrintValue(" RMS = ", "fhStsChiprim.rms", "b") << "</p>";
    out << "<p>Momentum resolution: ";
-   out << PrintValue("mean = ", "fhStsMomresVsMom.mean", "b");
-   out << PrintValue(" RMS = ", "fhStsMomresVsMom.rms", "b") << "</p>";
+   out << HtmlPrintValue("mean = ", "fhStsMomresVsMom.mean", "b");
+   out << HtmlPrintValue(" RMS = ", "fhStsMomresVsMom.rms", "b") << "</p>";
 
    // Tracking efficiency vs. polar angle
    out << "<h2>Tracking efficiency in dependence on polar angle</h2>";
@@ -218,22 +218,22 @@ std::string CbmLitQaHTMLGenerator::PrintRowNofObjects(
    std::stringstream ss;
    if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
    ss << "<td>" << rowName << "</td>";
-   ss << PrintValue("", "hNof" + detName + "Points", "td");
+   ss << HtmlPrintValue("", "hNof" + detName + "Points", "td");
    if (detName == "Much") {
-      ss << PrintValue("", "hNof" + detName + "Digis", "td");
-      ss << PrintValue("", "hNof" + detName + "Clusters", "td");
-      ss << "<td>" << PrintValue("", "hNofMuchPixelHits", "small")
-            << "/" << PrintValue("", "hNofMuchStrawHits", "small")  << "</td>";
+      ss << HtmlPrintValue("", "hNof" + detName + "Digis", "td");
+      ss << HtmlPrintValue("", "hNof" + detName + "Clusters", "td");
+      ss << "<td>" << HtmlPrintValue("", "hNofMuchPixelHits", "small")
+            << "/" << HtmlPrintValue("", "hNofMuchStrawHits", "small")  << "</td>";
    } else {
-      ss << PrintValue("", "hNof" + detName + "Digis", "td");
-      ss << PrintValue("", "hNof" + detName + "Clusters", "td");
-      ss << PrintValue("", "hNof" + detName + "Hits", "td");
+      ss << HtmlPrintValue("", "hNof" + detName + "Digis", "td");
+      ss << HtmlPrintValue("", "hNof" + detName + "Clusters", "td");
+      ss << HtmlPrintValue("", "hNof" + detName + "Hits", "td");
    }
    if (detName == "Rich") {
-      ss << "<td>" << PrintValue("", "hNofRichRings", "small")
-            << "/" << PrintValue("", "hNofRichProjections", "small")  << "</td>";
+      ss << "<td>" << HtmlPrintValue("", "hNofRichRings", "small")
+            << "/" << HtmlPrintValue("", "hNofRichProjections", "small")  << "</td>";
    } else {
-      ss << PrintValue("", "hNof" + detName + "Tracks", "td");
+      ss << HtmlPrintValue("", "hNof" + detName + "Tracks", "td");
    }
    ss << "</tr>" << std::endl;
    return ss.str();
@@ -244,11 +244,11 @@ std::string CbmLitQaHTMLGenerator::PrintRowHits(
    const std::string& rowName,
    const std::string& histName)
 {
-   std::string all = PrintValue("", histName + ".all", "td");
-   std::string trueh = PrintValue("", histName + ".true", "td");
-   std::string fakeh = PrintValue("", histName + ".fake", "td");
-   std::string toa = PrintValue("", histName + ".trueOverAll", "td");
-   std::string foa = PrintValue("", histName + ".fakeOverAll", "td");
+   std::string all = HtmlPrintValue("", histName + ".all", "td");
+   std::string trueh = HtmlPrintValue("", histName + ".true", "td");
+   std::string fakeh = HtmlPrintValue("", histName + ".fake", "td");
+   std::string toa = HtmlPrintValue("", histName + ".trueOverAll", "td");
+   std::string foa = HtmlPrintValue("", histName + ".fakeOverAll", "td");
 
    std::stringstream ss;
    if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
@@ -263,24 +263,24 @@ std::string CbmLitQaHTMLGenerator::PrintRowEfficiency(
       const std::string& rowName,
       const std::string& histName)
 {
-   std::string allRec = PrintValue("", histName + ".all.rec", "small");
-   std::string allAcc = PrintValue("", histName + ".all.acc", "small");
-   std::string allEff = PrintValue("", histName + ".all.eff", "b");
-   std::string refRec = PrintValue("", histName + ".ref.rec", "small");
-   std::string refAcc = PrintValue("", histName + ".ref.acc", "small");
-   std::string refEff = PrintValue("", histName + ".ref.eff", "b");
-   std::string primRec = PrintValue("", histName + ".prim.rec", "small");
-   std::string primAcc = PrintValue("", histName + ".prim.acc", "small");
-   std::string primEff = PrintValue("", histName + ".prim.eff", "b");
-   std::string secRec = PrintValue("", histName + ".sec.rec", "small");
-   std::string secAcc = PrintValue("", histName + ".sec.acc", "small");
-   std::string secEff = PrintValue("", histName + ".sec.eff", "b");
-   std::string muRec = PrintValue("", histName + ".mu.rec", "small");
-   std::string muAcc = PrintValue("", histName + ".mu.acc", "small");
-   std::string muEff = PrintValue("", histName + ".mu.eff", "b");
-   std::string elRec = PrintValue("", histName + ".el.rec", "small");
-   std::string elAcc = PrintValue("", histName + ".el.acc", "small");
-   std::string elEff = PrintValue("", histName + ".el.eff", "b");
+   std::string allRec = HtmlPrintValue("", histName + ".all.rec", "small");
+   std::string allAcc = HtmlPrintValue("", histName + ".all.acc", "small");
+   std::string allEff = HtmlPrintValue("", histName + ".all.eff", "b");
+   std::string refRec = HtmlPrintValue("", histName + ".ref.rec", "small");
+   std::string refAcc = HtmlPrintValue("", histName + ".ref.acc", "small");
+   std::string refEff = HtmlPrintValue("", histName + ".ref.eff", "b");
+   std::string primRec = HtmlPrintValue("", histName + ".prim.rec", "small");
+   std::string primAcc = HtmlPrintValue("", histName + ".prim.acc", "small");
+   std::string primEff = HtmlPrintValue("", histName + ".prim.eff", "b");
+   std::string secRec = HtmlPrintValue("", histName + ".sec.rec", "small");
+   std::string secAcc = HtmlPrintValue("", histName + ".sec.acc", "small");
+   std::string secEff = HtmlPrintValue("", histName + ".sec.eff", "b");
+   std::string muRec = HtmlPrintValue("", histName + ".mu.rec", "small");
+   std::string muAcc = HtmlPrintValue("", histName + ".mu.acc", "small");
+   std::string muEff = HtmlPrintValue("", histName + ".mu.eff", "b");
+   std::string elRec = HtmlPrintValue("", histName + ".el.rec", "small");
+   std::string elAcc = HtmlPrintValue("", histName + ".el.acc", "small");
+   std::string elEff = HtmlPrintValue("", histName + ".el.eff", "b");
 
    std::stringstream ss;
    if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
@@ -300,24 +300,24 @@ std::string CbmLitQaHTMLGenerator::PrintRowEfficiencyRich(
       const std::string& rowName,
       const std::string& histName)
 {
-   std::string allRec = PrintValue("", histName + ".richAll.rec", "small");
-   std::string allAcc = PrintValue("", histName + ".richAll.acc", "small");
-   std::string allEff = PrintValue("", histName + ".richAll.eff", "b");
-   std::string allRefRec = PrintValue("", histName + ".richAllRef.rec", "small");
-   std::string allRefAcc = PrintValue("", histName + ".richAllRef.acc", "small");
-   std::string allRefEff = PrintValue("", histName + ".richAllRef.eff", "b");
-   std::string elRec = PrintValue("", histName + ".richEl.rec", "small");
-   std::string elAcc = PrintValue("", histName + ".richEl.acc", "small");
-   std::string elEff = PrintValue("", histName + ".richEl.eff", "b");
-   std::string elRefRec = PrintValue("", histName + ".richElRef.rec", "small");
-   std::string elRefAcc = PrintValue("", histName + ".richElRef.acc", "small");
-   std::string elRefEff = PrintValue("", histName + ".richElRef.eff", "b");
-   std::string piRec = PrintValue("", histName + ".richPi.rec", "small");
-   std::string piAcc = PrintValue("", histName + ".richPi.acc", "small");
-   std::string piEff = PrintValue("", histName + ".richPi.eff", "b");
-   std::string piRefRec = PrintValue("", histName + ".richPiRef.rec", "small");
-   std::string piRefAcc = PrintValue("", histName + ".richPiRef.acc", "small");
-   std::string piRefEff = PrintValue("", histName + ".richPiRef.eff", "b");
+   std::string allRec = HtmlPrintValue("", histName + ".richAll.rec", "small");
+   std::string allAcc = HtmlPrintValue("", histName + ".richAll.acc", "small");
+   std::string allEff = HtmlPrintValue("", histName + ".richAll.eff", "b");
+   std::string allRefRec = HtmlPrintValue("", histName + ".richAllRef.rec", "small");
+   std::string allRefAcc = HtmlPrintValue("", histName + ".richAllRef.acc", "small");
+   std::string allRefEff = HtmlPrintValue("", histName + ".richAllRef.eff", "b");
+   std::string elRec = HtmlPrintValue("", histName + ".richEl.rec", "small");
+   std::string elAcc = HtmlPrintValue("", histName + ".richEl.acc", "small");
+   std::string elEff = HtmlPrintValue("", histName + ".richEl.eff", "b");
+   std::string elRefRec = HtmlPrintValue("", histName + ".richElRef.rec", "small");
+   std::string elRefAcc = HtmlPrintValue("", histName + ".richElRef.acc", "small");
+   std::string elRefEff = HtmlPrintValue("", histName + ".richElRef.eff", "b");
+   std::string piRec = HtmlPrintValue("", histName + ".richPi.rec", "small");
+   std::string piAcc = HtmlPrintValue("", histName + ".richPi.acc", "small");
+   std::string piEff = HtmlPrintValue("", histName + ".richPi.eff", "b");
+   std::string piRefRec = HtmlPrintValue("", histName + ".richPiRef.rec", "small");
+   std::string piRefAcc = HtmlPrintValue("", histName + ".richPiRef.acc", "small");
+   std::string piRefEff = HtmlPrintValue("", histName + ".richPiRef.eff", "b");
 
    std::stringstream ss;
    if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
@@ -337,12 +337,12 @@ std::string CbmLitQaHTMLGenerator::PrintRowEfficiencyElId(
       const std::string& rowName,
       const std::string& histName)
 {
-   std::string elRec = PrintValue("", rowName + ".el.rec", "small");
-   std::string elAcc = PrintValue("", rowName + ".el.acc", "small");
-   std::string elEff = PrintValue("", rowName + ".el.eff", "b");
-   std::string piRec = PrintValue("", rowName + ".pi.rec", "small");
-   std::string piAcc = PrintValue("", rowName + ".pi.acc", "small");
-   std::string piSupp = PrintValue("", rowName + ".pi.supp", "b");
+   std::string elRec = HtmlPrintValue("", rowName + ".el.rec", "small");
+   std::string elAcc = HtmlPrintValue("", rowName + ".el.acc", "small");
+   std::string elEff = HtmlPrintValue("", rowName + ".el.eff", "b");
+   std::string piRec = HtmlPrintValue("", rowName + ".pi.rec", "small");
+   std::string piAcc = HtmlPrintValue("", rowName + ".pi.acc", "small");
+   std::string piSupp = HtmlPrintValue("", rowName + ".pi.supp", "b");
 
    std::stringstream ss;
    if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
@@ -358,11 +358,11 @@ std::string CbmLitQaHTMLGenerator::PrintRowDetAccEl(
    const std::string& rowName,
    const std::string& histName)
 {
-   std::string acc = PrintValue("", histName + ".detAccAcc.acc", "small");
-   std::string mc = PrintValue("", histName + ".detAccAcc.mc", "small");
-   std::string effAcc = PrintValue("", histName + ".detAccAcc.eff", "b");
-   std::string rec = PrintValue("", histName + ".detAccRec.rec", "small");
-   std::string effRec = PrintValue("", histName + ".detAccRec.eff", "b");
+   std::string acc = HtmlPrintValue("", histName + ".detAccAcc.acc", "small");
+   std::string mc = HtmlPrintValue("", histName + ".detAccAcc.mc", "small");
+   std::string effAcc = HtmlPrintValue("", histName + ".detAccAcc.eff", "b");
+   std::string rec = HtmlPrintValue("", histName + ".detAccRec.rec", "small");
+   std::string effRec = HtmlPrintValue("", histName + ".detAccRec.eff", "b");
 
    std::stringstream ss;
    if ((row % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
@@ -392,51 +392,28 @@ std::string CbmLitQaHTMLGenerator::PrintPolarAngleEfficiency(
       if ((i % 2) == 0) ss << "<tr>"; else ss << "<tr class = \"alt\">";
       ss << "<td>(" << angle0 << "-" << angle1 << ")</td>";
 
-      ss << "<td>" << PrintValue("", histName + ".all.eff." + angle0 + "_" + angle1, "b")
-          << "(" << PrintValue("", histName + ".all.rec." + angle0 + "_" + angle1, "small")
-          << "/" << PrintValue("", histName + ".all.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
-      ss << "<td>" << PrintValue("", histName + ".ref.eff." + angle0 + "_" + angle1, "b")
-          << "(" << PrintValue("", histName + ".ref.rec." + angle0 + "_" + angle1, "small")
-          << "/" << PrintValue("", histName + ".ref.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
-      ss << "<td>" << PrintValue("", histName + ".prim.eff." + angle0 + "_" + angle1, "b")
-          << "(" << PrintValue("", histName + ".prim.rec." + angle0 + "_" + angle1, "small")
-          << "/" << PrintValue("", histName + ".prim.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
-      ss << "<td>" << PrintValue("", histName + ".sec.eff." + angle0 + "_" + angle1, "b")
-          << "(" << PrintValue("", histName + ".sec.rec." + angle0 + "_" + angle1, "small")
-          << "/" << PrintValue("", histName + ".sec.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
-      ss << "<td>" << PrintValue("", histName + ".el.eff." + angle0 + "_" + angle1, "b")
-          << "(" << PrintValue("", histName + ".el.rec." + angle0 + "_" + angle1, "small")
-          << "/" << PrintValue("", histName + ".el.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
-      ss << "<td>" << PrintValue("", histName + ".mu.eff." + angle0 + "_" + angle1, "b")
-          << "(" << PrintValue("", histName + ".mu.rec." + angle0 + "_" + angle1, "small")
-          << "/" << PrintValue("", histName + ".mu.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
+      ss << "<td>" << HtmlPrintValue("", histName + ".all.eff." + angle0 + "_" + angle1, "b")
+          << "(" << HtmlPrintValue("", histName + ".all.rec." + angle0 + "_" + angle1, "small")
+          << "/" << HtmlPrintValue("", histName + ".all.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
+      ss << "<td>" << HtmlPrintValue("", histName + ".ref.eff." + angle0 + "_" + angle1, "b")
+          << "(" << HtmlPrintValue("", histName + ".ref.rec." + angle0 + "_" + angle1, "small")
+          << "/" << HtmlPrintValue("", histName + ".ref.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
+      ss << "<td>" << HtmlPrintValue("", histName + ".prim.eff." + angle0 + "_" + angle1, "b")
+          << "(" << HtmlPrintValue("", histName + ".prim.rec." + angle0 + "_" + angle1, "small")
+          << "/" << HtmlPrintValue("", histName + ".prim.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
+      ss << "<td>" << HtmlPrintValue("", histName + ".sec.eff." + angle0 + "_" + angle1, "b")
+          << "(" << HtmlPrintValue("", histName + ".sec.rec." + angle0 + "_" + angle1, "small")
+          << "/" << HtmlPrintValue("", histName + ".sec.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
+      ss << "<td>" << HtmlPrintValue("", histName + ".el.eff." + angle0 + "_" + angle1, "b")
+          << "(" << HtmlPrintValue("", histName + ".el.rec." + angle0 + "_" + angle1, "small")
+          << "/" << HtmlPrintValue("", histName + ".el.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
+      ss << "<td>" << HtmlPrintValue("", histName + ".mu.eff." + angle0 + "_" + angle1, "b")
+          << "(" << HtmlPrintValue("", histName + ".mu.rec." + angle0 + "_" + angle1, "small")
+          << "/" << HtmlPrintValue("", histName + ".mu.acc." + angle0 + "_" + angle1, "small") << ")" << "</td>";
 
       ss << "</tr>" << std::endl;
    }
    return ss.str();
 }
 
-std::string CbmLitQaHTMLGenerator::PrintValue(
-      const std::string& valueTitle,
-      const std::string& valueName,
-      const std::string& tag)
-{
-   // Print the value with corresponding color
-   float check = fCheck->get(valueName, -1.);
-   std::string color = (check == -1.) ? fWarningColor :
-      (check == 0.) ? fErrorColor : fNormalColor;
 
-   // Hint text
-   std::string hint = "";
-   if (check == 0. || check == 1.) {
-      float min = fIdeal->get(valueName + ".min", -1.);
-      float max = fIdeal->get(valueName + ".max", -1.);
-      hint = "Limits (" + lit::ToString<float>(min) + ", " + lit::ToString<float>(max) + ")";
-   }
-
-   std::stringstream ss;
-   std::string value = lit::NumberToString(fQa->get(valueName, -1.), 1);
-   ss << "<" << tag << " title=\"" << hint << "\" style=\"background-color:" << color
-         << "\">" << valueTitle << value << "</" << tag << ">";
-   return ss.str();
-}

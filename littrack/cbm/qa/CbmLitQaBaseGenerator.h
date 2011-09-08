@@ -10,7 +10,7 @@
 #define CBMLITQABASEGENERATOR_H_
 
 #include "CbmDetectorList.h"
-
+#include <boost/property_tree/ptree.hpp>
 #include <string>
 
 /**
@@ -62,6 +62,22 @@ protected:
    std::string HtmlHeadString();
 
 
+   /**
+    * \brief Print property value from property tree to std::string.
+    *
+    * Uniforms output style of properties. Colors background
+    * in dependence on the correctness of the property.
+    *
+    * \param[in] valueTitle Property title which is printed before the property value.
+    * \param[in] valueName Property name in the property tree.
+    * \param[in] tag HTML tag which is used to print the property i.e. "p", "b", "td".
+    * \return std::string with property in HTML format.
+    */
+   std::string HtmlPrintValue(
+         const std::string& valueTitle,
+         const std::string& valueName,
+         const std::string& tag);
+
    bool fIsElectronSetup; // If "electron" setup detected than true
    bool fIsMvd; // If MVD detected than true
    bool fIsSts; // If STS detected than true
@@ -80,6 +96,13 @@ protected:
 
    // Title of the page
    std::string fTitle;
+
+   // Property tree of Qa results
+   const boost::property_tree::ptree* fQa;
+   // Property with ideal values
+   const boost::property_tree::ptree* fIdeal;
+   // Property tree with checked results
+   const boost::property_tree::ptree* fCheck;
 };
 
 #endif /* CBMLITQABASEGENERATOR_H_ */

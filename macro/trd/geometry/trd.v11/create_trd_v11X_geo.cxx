@@ -3,6 +3,9 @@
 //
 //
 // Update 20110616 - David Emschermann 
+// - 12 mm gas thickness (instead of 6 mm) by default 
+//
+// Update 20110616 - David Emschermann 
 // - allow variable frame width - 15 / 20 mm 
 // - resulting in 570 x 570 mm2 and 960 x 960 mm2 sized pad planes
 // - multiple of 30 mm allow for 5 mm and 7.5 mm wide pads
@@ -87,21 +90,21 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 //                    { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * Layer_number) }, 
 //  		      { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * Layer_number) } };
 
-  // v01, v02 // no tilting
-  float rot[12][4]={ { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-		       	     	       	       	     
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-		       	     	       	       	     
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. } };
+//  // v01, v02 // no tilting
+//  float rot[12][4]={ { 1500., 0., 0., 0. }, 
+//                     { 1500., 0., 0., 0. }, 
+//                     { 1500., 0., 0., 0. }, 
+//                     { 1500., 0., 0., 0. }, 
+//		       	     	       	       	     
+//                     { 2500., 0., 0., 0. }, 
+//                     { 2500., 0., 0., 0. }, 
+//                     { 2500., 0., 0., 0. }, 
+//                     { 2500., 0., 0., 0. }, 
+//		       	     	       	       	     
+//                     { 3500., 0., 0., 0. }, 
+//                     { 3500., 0., 0., 0. }, 
+//                     { 3500., 0., 0., 0. }, 
+//                     { 3500., 0., 0., 0. } };
 
 //  // hardcoded tilt position for the layers in stations 1, 2, 3 - kink position, angle
 //  // v03 // tilt around each layer front
@@ -137,21 +140,21 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 //                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
 //                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 } };
 
-//  // v05 // tilt around each layer front
-//  float rot[12][4]={ { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
-//                     { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
-//	   	        
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
-//                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
-//	   	        
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
-//                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
-//                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 }, 
-//                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 } };
+  // v05 // tilt around each layer front
+  float rot[12][4]={ { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
+                     { 1500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 1.5/4.5 }, 
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 1.5/4.5 }, 
+	   	        
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
+                     { 2500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 2.5/6.75 }, 
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 2.5/6.75 }, 
+	   	        
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
+                     { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 0), 3.5/9.0 }, 
+                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 }, 
+                     { 4500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * 2), 3.5/9.0 } };
 
   float ve1[3];   // buffer vector
   float ve2[3];   // buffer vector
@@ -260,11 +263,11 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
   Active_area_y[2] = Detector_size_y[2] /2 - frame_width_array[2];
  
 
-  // 12 mm gas (Jun10) - intelligent
+  // 12 mm gas (from Jun10) - intelligent
   float radiator_thickness    =  29.000 /2.;
   float radiator_position     =  radiator_thickness - Layer_thickness /2.;
-  //  float gas_thickness         =  12.000 /2.;
-  float gas_thickness         =   6.000 /2.;
+  float gas_thickness         =  12.000 /2.;
+  //  float gas_thickness         =   6.000 /2.;
   float gas_position          =  radiator_position + radiator_thickness + gas_thickness;
   float padplane_thickness    =   0.030 /2.;
   float padplane_position     =  gas_position + gas_thickness + padplane_thickness;

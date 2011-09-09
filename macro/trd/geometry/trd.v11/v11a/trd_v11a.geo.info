@@ -1,18 +1,12 @@
 TRD geometry v11a
-D. Emschermann, June 2011
+D. Emschermann, September 2011
 
-derived from v10b, with following changes:
-- only 2 different module sizes, 60 cm x 60 cm and 100 cm x 100 cm
-- changed layout of the inner part (3m x 3m) of TRD stations 1 and 2
-- reduced the total number of TRD modules
-- variable frame thickness of 15 mm / 20 mm
-- results in pad plane size of 570 mm x 570 mm and 960 mm x 960 mm
-- multiple of 30 mm allows for pad width of 5 mm or 7.5 mm
+Derived from v10b, reduced total number of TRD modules to 904
 
 Number of stations: 3
 Number of layers per station: 4
 Planar geometry
-Gas thickness 6 mm
+Gas thickness 12 mm
 
 Inner Radius of station 1: 240.000000
 Outer Radius of station 1: 4600.000000

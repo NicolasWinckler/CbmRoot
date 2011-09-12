@@ -1,24 +1,22 @@
-/** simple_geo.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file simple_geo_qa.C
  *
- * Macro checks the creation of the simplified geometry.
+ * \brief Check simplified geometry creator.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
  **/
 
-void simple_geo(Int_t nEvents = 1)
+void simple_geo_qa(Int_t nEvents = 1)
 {
-	TString dir = "/d/cbm02/andrey/test_electrons_fit_muon/";
+	TString dir = "/data.local1/andrey/events/std_electron_5jpsi/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "simple.geo.0000.root";
 
 	TStopwatch timer;
 	timer.Start();
-
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -51,9 +49,8 @@ void simple_geo(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	// -----   Intialise and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
-	run->Run(0,nEvents);
+	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------

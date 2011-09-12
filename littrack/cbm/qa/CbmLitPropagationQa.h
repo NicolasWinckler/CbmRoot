@@ -42,114 +42,147 @@ class TCanvas;
 class CbmLitPropagationQa : public FairTask
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitPropagationQa();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPropagationQa();
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual InitStatus Init();
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Exec(
       Option_t* opt);
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Finish();
 
-   /* Inherited from FairTask */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void SetParContainers();
 
-   /**/
-   void SetNofPlanes(Int_t nofPlanes) {fNofPlanes = nofPlanes;}
-
-   /**/
+   /* Setters */
+   void SetNofPlanes(Int_t nofPlanes) { fNofPlanes = nofPlanes; }
    void SetNofTrdHits(Int_t nofTrdHits) {fNofTrdHits = nofTrdHits;}
-
-   /**/
    void SetNofMuchHits(Int_t nofMuchHits) {fNofMuchHits = nofMuchHits;}
-
-   /**/
    void SetNofTofHits(Int_t nofTofHits) {fNofTofHits = nofTofHits;}
-
-   /**/
    void SetTestFastPropagation(Bool_t isTestFastPropagation) {fIsTestFastPropagation = isTestFastPropagation;}
-
-   /**/
    void SetPDGCode(Int_t pdgCode) {fPDGCode = pdgCode;}
-
-   /* Sets the output directory for images. */
    void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
-
-   /* Set draw track propagation histograms */
    void IsDrawPropagation(Bool_t drawPropagation) {fIsDrawPropagation = drawPropagation;}
-
-   /* Setdraw track Kalman Filter update histograms */
    void IsDrawFilter(Bool_t drawFilter) {fIsDrawFilter = drawFilter;}
-
-   /* Set draw smoother histograms */
    void IsDrawSmoother(Bool_t drawSmoother) {fIsDrawSmoother = drawSmoother;}
-
-   /* Set close canvases after drawing */
    void IsCloseCanvas(Bool_t closeCanvas) {fIsCloseCanvas = closeCanvas;}
-
-   /* Set use of the fixed bounds */
    void IsFixedBounds(Bool_t isFixedBounds) {fIsFixedBounds = isFixedBounds;};
 
-//   void SetPlaneNoPhd(Int_t planeNo) {fPlaneNoPhd = planeNo;}
-
 private:
-   /* Determines detector layout  */
+   /**
+    * \brief Determine detector layout.
+    */
    void DetermineSetup();
 
-   /* Reads and creates data branches */
+   /**
+    * \brief Read and create data branches.
+    */
    void ReadDataBranches();
 
-   /* Creates histograms */
+   /**
+    * \brief Create histograms.
+    */
    void CreateHistograms();
 
-   /* Creates track arrays */
+   /**
+    * \brief Create track arrays.
+    */
    void CreateTrackArrays();
 
-   /* Checks global track acceptance */
+   /**
+    * \brief Check global track acceptance.
+    * \param[in] globalTrack Pointer to the global track.
+    * \return True if global track is accepted.
+    */
    Bool_t CheckAcceptance(
       const CbmGlobalTrack* globalTrack);
 
-   /* Converts CbmGlobalTrack to CbmLitTrack */
+   /**
+    * \brief Convert CbmGlobalTrack to CbmLitTrack.
+    * \param[in] globalTrack Pointer to the global track to be converted.
+    * \param[out] litTrack Output CbmLitTrack.
+    */
    void GlobalTrackToLitTrack(
       const CbmGlobalTrack* globalTrack,
       CbmLitTrack* litTrack);
 
-   /* Converts CbmGlobalTrack to MC CbmLitTrack */
+   /**
+    * \brief Convert CbmGlobalTrack to Monte-Carlo CbmLitTrack.
+    * \param[in] globalTrack Pointer to the global track to be converted.
+    * \param[out] litTrack Output CbmLitTrack.
+    */
    void GlobalTrackToMCLitTrack(
       const CbmGlobalTrack* globalTrack,
       CbmLitTrack* litTrack);
 
-   /* Frees memory and deletes track arrays */
+   /**
+    * \brief Free memory and delete track arrays.
+    */
    void DeleteTrackArrays();
 
-   /* Run track propagation and track fit tests */
+   /**
+    * \brief Run track propagation and track fit tests.
+    */
    void RunTest();
 
-   /* Tests track propagation for a specified track */
+   /**
+    * \brief Test track propagation for a specified track.
+    * \param[in] track Track to be propagated.
+    * \param[in] mcTrack Corresponding MC track for comparison.
+    */
    void TestPropagation(
-      CbmLitTrack* track,
-      CbmLitTrack* mcTrack);
+      const CbmLitTrack* track,
+      const CbmLitTrack* mcTrack);
 
-   /* Tests track fitter for a specified track*/
+   /**
+    * \brief Test track fitter for a specified track.
+    * \param[in,out] track Track to be fitted.
+    * \param[in] mcTrack Corresponding MC track for comparison.
+    */
    void TestFitter(
       CbmLitTrack* track,
-      CbmLitTrack* mcTrack);
+      const CbmLitTrack* mcTrack);
 
-   /* Fill pull/residual histograms for specified predicted track parameters */
+   /**
+    * \brief Fill pull/residual histograms for specified predicted track parameters.
+    * \param[in] par Calculated track parameters.
+    * \param[in] mcPar Monte-Carlo track parameters.
+    * \param[in] hit Hit at plane where parameters are calculated.
+    * \param[in] plane Plane number.
+    */
    void FillHistosPropagation(
       const CbmLitTrackParam* par,
       const CbmLitTrackParam* mcPar,
       const CbmLitHit* hit,
       Int_t plane);
 
-   /**/
+   /**
+    * \brief Fill pull/residual histograms for specified updated track parameters.
+    * \param[in] par Calculated track parameters.
+    * \param[in] mcPar Monte-Carlo track parameters.
+    * \param[in] hit Hit at plane where parameters are calculated.
+    * \param[in] plane Plane number.
+    * \param[in] chiSq Chi square value.
+    */
    void FillHistosFilter(
       const CbmLitTrackParam* par,
       const CbmLitTrackParam* mcPar,
@@ -157,47 +190,57 @@ private:
       Int_t plane,
       float chisq);
 
-   /**/
+   /**
+    *
+    */
    void FillHistosFitter(
       const CbmLitTrack* track,
       const CbmLitTrack* mcTrack);
 
-   /**/
+   /**
+    *
+    */
    void McPointToLitFitNode(
       FairMCPoint* point,
       CbmLitFitNode* node);
 
-   /**/
+   /**
+    *
+    */
    std::vector<Double_t> CalcResidualsAndPulls(
       const CbmLitTrackParam* par,
       const CbmLitTrackParam* mcPar);
 
-   /**/
+   /**
+    *
+    */
    void PrintStopwatchStatistics();
 
-   /**/
+   /**
+    *
+    */
    void TestFastPropagation(
       CbmLitTrack* track,
       CbmLitTrack* mcTrack);
 
-   /**/
+   /**
+    *
+    */
    void Draw();
 
-   /**/
+   /**
+    *
+    */
    void DrawHistos(
       TCanvas* c[],
       Int_t v);
 
-   /**/
+   /**
+    *
+    */
    void PrintResults(
       std::ostream& out,
       int v);
-
-//   void DrawForPhd();
-//
-//   void DrawForPhd(
-//      TCanvas* canvas,
-//      Int_t v);
 
    Bool_t fIsElectronSetup; // If "electron" setup detected than true
    Bool_t fIsSts; // If STS detected than true
@@ -270,16 +313,14 @@ private:
 
    //Drawing options
    //If true than specified histograms are drawn.
-   Bool_t fIsDrawPropagation;
-   Bool_t fIsDrawFilter;
-   Bool_t fIsDrawSmoother;
+   Bool_t fIsDrawPropagation; // for propagation
+   Bool_t fIsDrawFilter; // for filter
+   Bool_t fIsDrawSmoother; // for smoother
 
    Bool_t fIsCloseCanvas; // If true than canvas will be closed after drawing
    std::string fOutputDir; // Output directory for image files
 
-   Bool_t fIsFixedBounds;
-
-   Int_t fPlaneNoPhd; // Number of the plane fo Phd drawing
+   Bool_t fIsFixedBounds; // If true than fixed bounds are used for histograms
 
    // Vectors to store sigma and RMS value for different parameters.
    // [v][plane number][parameter]

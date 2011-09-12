@@ -1,26 +1,34 @@
-#include "qa/CbmLitCheckSimpleGeo.h"
+/**
+ * \file CbmLitSimpleGeoQa.cxx
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ **/
+
+#include "qa/CbmLitSimpleGeoQa.h"
 
 #include "base/CbmLitSimpleGeometryConstructor.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-CbmLitCheckSimpleGeo::CbmLitCheckSimpleGeo()
+CbmLitSimpleGeoQa::CbmLitSimpleGeoQa()
 {
 }
 
-CbmLitCheckSimpleGeo::~CbmLitCheckSimpleGeo()
+CbmLitSimpleGeoQa::~CbmLitSimpleGeoQa()
 {
 }
 
-InitStatus CbmLitCheckSimpleGeo::Init()
+InitStatus CbmLitSimpleGeoQa::Init()
 {
    fGeoConstructor = CbmLitSimpleGeometryConstructor::Instance();
    fGeoConstructor->Draw();
    return kSUCCESS;
 }
 
-void CbmLitCheckSimpleGeo::SetParContainers()
+void CbmLitSimpleGeoQa::SetParContainers()
 {
    FairRunAna* ana = FairRunAna::Instance();
    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
@@ -29,14 +37,14 @@ void CbmLitCheckSimpleGeo::SetParContainers()
    rtdb->getContainer("CbmGeoStsPar");
 }
 
-void CbmLitCheckSimpleGeo::Exec(
+void CbmLitSimpleGeoQa::Exec(
    Option_t* opt)
 {
 
 }
 
-void CbmLitCheckSimpleGeo::Finish()
+void CbmLitSimpleGeoQa::Finish()
 {
 }
 
-ClassImp(CbmLitCheckSimpleGeo);
+ClassImp(CbmLitSimpleGeoQa);

@@ -127,8 +127,6 @@ CbmLitPropagationQa::CbmLitPropagationQa():
 
    fIsFixedBounds(true),
 
-   fPlaneNoPhd(13),
-
    fSigma(),
    fRms()
 {
@@ -151,6 +149,7 @@ InitStatus CbmLitPropagationQa::Init()
       fFitter = factory->CreateTrackFitter("lit_kalman");
       fSmoother = factory->CreateTrackFitter("kalman_smoother");
    } else {
+      fPropagator = factory->CreateTrackPropagator("lit");
       if (fIsMuch) { fParallelFitter = factory->CreateTrackFitter("kalman_parallel_muon"); }
       else { fParallelFitter = factory->CreateTrackFitter("kalman_parallel_electron"); }
    }
@@ -546,8 +545,8 @@ void CbmLitPropagationQa::RunTest()
 }
 
 void CbmLitPropagationQa::TestPropagation(
-   CbmLitTrack* track,
-   CbmLitTrack* mcTrack)
+   const CbmLitTrack* track,
+   const CbmLitTrack* mcTrack)
 {
    CbmLitTrackParam par(*track->GetParamLast());
    fPropagationWatch.Start(kFALSE);
@@ -563,7 +562,7 @@ void CbmLitPropagationQa::TestPropagation(
 
 void CbmLitPropagationQa::TestFitter(
    CbmLitTrack* track,
-   CbmLitTrack* mcTrack)
+   const CbmLitTrack* mcTrack)
 {
    LitStatus fitStatus, smoothStatus;
    fFitterWatch.Start(kFALSE);
@@ -577,6 +576,22 @@ void CbmLitPropagationQa::TestFitter(
    }
 }
 
+void CbmLitPropagationQa::TestFastPropagation(
+   CbmLitTrack* track,
+   CbmLitTrack* mcTrack)
+{
+   // Propagate tracks to the last STS station
+   CbmLitTrackParam par(*track->GetParamLast());
+   fPropagator->Propagate(&par, 100., track->GetPDG());
+   track->SetParamLast(&par);
+   LitStatus fitStatus = fParallelFitter->Fit(track);
+   if (fitStatus == kLITSUCCESS) {
+      for (Int_t i = 0; i < track->GetNofHits(); i++) {
+         FillHistosPropagation(track->GetFitNode(i)->GetPredictedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
+         FillHistosFilter(track->GetFitNode(i)->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i, track->GetFitNode(i)->GetChiSqFiltered());
+      }
+   }
+}
 void CbmLitPropagationQa::FillHistosPropagation(
    const CbmLitTrackParam* par,
    const CbmLitTrackParam* mcPar,
@@ -710,19 +725,6 @@ void CbmLitPropagationQa::PrintStopwatchStatistics()
              << "/" << fSmootherWatch.RealTime()
              << " s, cpu=" << fSmootherWatch.CpuTime()/fSmootherWatch.Counter()
              << "/" << fSmootherWatch.CpuTime() << std::endl;
-}
-
-void CbmLitPropagationQa::TestFastPropagation(
-   CbmLitTrack* track,
-   CbmLitTrack* mcTrack)
-{
-   LitStatus fitStatus = fParallelFitter->Fit(track);
-   if (fitStatus == kLITSUCCESS) {
-      for (Int_t i = 0; i < track->GetNofHits(); i++) {
-         FillHistosPropagation(track->GetFitNode(i)->GetPredictedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
-         FillHistosFilter(track->GetFitNode(i)->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i, track->GetFitNode(i)->GetChiSqFiltered());
-      }
-   }
 }
 
 void CbmLitPropagationQa::Draw()

@@ -96,7 +96,7 @@ cbm/propagation/CbmPropagatorLit.cxx
 cbm/qa/CbmLitCheckMultipleScattering.cxx
 ##cbm/qa/CbmLitPropagationAnalysis.cxx 
 ##cbm/qa/CbmLitRobustFitterAnalysis.cxx
-cbm/qa/CbmLitCheckSimpleGeo.cxx 
+cbm/qa/CbmLitSimpleGeoQa.cxx 
 ##cbm/qa/CbmLitCheckField.cxx
 cbm/qa/CbmLitCheckEnergyLossMuons.cxx
 cbm/qa/CbmLitCheckBrem.cxx 
@@ -152,7 +152,7 @@ cbm/propagation/CbmPropagatorLit.h
 cbm/qa/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/CbmLitPropagationQa.h 
 #cbm/qa/CbmLitRobustFitterAnalysis.h
-cbm/qa/CbmLitCheckSimpleGeo.h 
+cbm/qa/CbmLitSimpleGeoQa.h 
 cbm/qa/CbmLitFieldQa.h
 cbm/qa/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/CbmLitCheckMultipleScattering.h

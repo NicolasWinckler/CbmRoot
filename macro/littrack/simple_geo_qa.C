@@ -13,7 +13,7 @@ void simple_geo_qa(Int_t nEvents = 1)
 	TString dir = "/data.local1/andrey/events/std_electron_5jpsi/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
-	TString outFile = dir + "simple.geo.0000.root";
+	TString outFile = dir + "simple.geo.qa.0000.root";
 
 	TStopwatch timer;
 	timer.Start();
@@ -28,13 +28,13 @@ void simple_geo_qa(Int_t nEvents = 1)
 	run->SetOutputFile(outFile);
 
 	// -------------------------------------------------------------------------
-	CbmLitCheckSimpleGeo* geo = new CbmLitCheckSimpleGeo();
+	CbmLitSimpleGeoQa* geo = new CbmLitSimpleGeoQa();
 	run->AddTask(geo);
 	// -------------------------------------------------------------------------
 
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_v11a.digi.par";
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

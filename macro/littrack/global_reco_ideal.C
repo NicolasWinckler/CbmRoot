@@ -1,13 +1,13 @@
-/** global_reco_ideal.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
+/**
+ * \file global_reco_ideal.C
  *
- * Macro runs ideal or partially ideal reconstruction
- * of the CBM event.
+ * \brief Macro runs ideal event reconstruction.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  **/
 
-void global_reco_ideal(Int_t nEvents = 1000)
+void global_reco_ideal(Int_t nEvents = 5000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -17,14 +17,14 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	if (script != "yes") {
-	   dir = "/d/cbm02/andrey/electron/v10b_10mu/";
+	   dir = "/data.local1/andrey/events/std_electron_10pi_no_rich/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
-		muchDigiFile = parDir + "/much/much_standard.digi.root";
-		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
+		muchDigiFile = parDir + "/much/much_v11a.digi.root";
+		TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par";
 		parFileList->Add(&stsDigiFile);
-		TObjString trdDigiFile = parDir + "/trd/trd_standard.digi.par";
+		TObjString trdDigiFile = parDir + "/trd/trd_v11b.digi.par";
 		parFileList->Add(&trdDigiFile);
 		imageDir = "./test/";
 	} else {
@@ -43,10 +43,6 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
-
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

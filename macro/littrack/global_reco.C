@@ -8,7 +8,7 @@
  * Macro has 3 options "all", "hits" and "tracking".
  **/
 
-void global_reco(Int_t nEvents = 10, // number of events
+void global_reco(Int_t nEvents = 5000, // number of events
 		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -29,36 +29,36 @@ void global_reco(Int_t nEvents = 10, // number of events
 	if (script != "yes") {
 		// Output directory
 //	   dir = "/d/cbm02/andrey/muon/std_10mu_urqmd/";
-		dir = "/d/cbm02/andrey/electron/v10b_10e_urqmd/";
+		dir = "/data.local1/andrey/events/std_electron_10pi_no_rich/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
 		parFile = dir + "param.0000.root";
 		// Output file with reconstructed tracks and hits
-		globalRecoFile = dir + "global.reco.smearing.0000.root";
+		globalRecoFile = dir + "global.reco.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.smearing.0000.root";
+		globalHitsFile = dir + "global.hits.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.smearing.parallel.0000.root";
+		globalTracksFile = dir + "global.tracks.nn.parallel.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 //		muchDigiFile = parDir + "/much/much_standard_straw_trd.digi.root";
 		muchDigiFile = parDir + "/much/much_standard.digi.root";
 		// Digi scheme for STS
-		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
+		TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par";
 		parFileList->Add(&stsDigiFile);
 		// Digi scheme for TRD
 		TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par";
 //		TObjString trdDigiFile = parDir + "/trd/trd.v10b.1cm2.digi.par";
 		parFileList->Add(&trdDigiFile);
 		// Directory for output images
-		TString imageDir = "./test/";
+		TString imageDir = "./test2/";
 		// Tracking type
-		trackingType = "branching";
+		trackingType = "nn_parallel";
 		// STS hit producer type: real, ideal
 		stsHitProducerType = "real";
 		// TRD hit producer type: smearing, digi, clustering
-		trdHitProducerType = "clustering";
+		trdHitProducerType = "smearing";
 		// Normalization for efficiency
 		normStsPoints = 4;
 		normTrdPoints = 8;

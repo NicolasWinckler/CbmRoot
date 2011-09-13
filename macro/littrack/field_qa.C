@@ -38,23 +38,23 @@ void field_qa(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitFieldQa* fieldQa = new CbmLitFieldQa();
-	fieldQa->SetCheckFieldMap(false);
-	fieldQa->SetCheckFieldApproximation(false);
+	fieldQa->SetCheckFieldMap(true);
+	fieldQa->SetCheckFieldApproximation(true);
 	fieldQa->SetCheckGridCreator(true);
 
 	std::vector<Double_t> zPos;
 //   zPos.push_back(30.);
 //   zPos.push_back(50.);
    zPos.push_back(100.);
-//   zPos.push_back(150.);
-//   zPos.push_back(200.);
+   zPos.push_back(150.);
+   zPos.push_back(200.);
    zPos.push_back(300.);
-//   zPos.push_back(400.);
+   zPos.push_back(400.);
    fieldQa->SetSliceZPosition(zPos);
 
    std::vector<UInt_t> degrees;
 // degrees.push_back(3);
-// degrees.push_back(5);
+//   degrees.push_back(5);
    degrees.push_back(7);
 // degrees.push_back(9);
    fieldQa->SetPolynomDegrees(degrees);
@@ -74,7 +74,7 @@ void field_qa(Int_t nEvents = 1)
 	fieldQa->IsFixedBounds(false);
 	fieldQa->SetUseEllipseAcc(false);
 	fieldQa->SetPolynomDegreeIndex(0);
-	fieldQa->SetOutputDir("test3/");
+	fieldQa->SetOutputDir("/u/andrey/cbm/trunk/cbmroot/macro/littrack/test3/");
 	run->AddTask(fieldQa);
 
 	// -----  Parameter database   --------------------------------------------

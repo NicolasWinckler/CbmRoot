@@ -1,13 +1,13 @@
-/** global_sim.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
+/**
+ * \file global_sim.C
  *
- * Macro runs simulation for "electron" or "muon" setups
- * of the CBM.
+ * \brief Macro runs simulation for "electron" or "muon" setups of CBM.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
  **/
 
-void global_sim(Int_t nEvents = 1000)
+void global_sim(Int_t nEvents = 5000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -20,19 +20,19 @@ void global_sim(Int_t nEvents = 1000)
 	Int_t NMUONSMINUS = 5; // number of embedded muons
 	Int_t NELECTRONS = 5; // number of embedded electrons
 	Int_t NPOSITRONS = 5; // number of embedded positrons
-	Int_t NPIONSPLUS = 20; // number of embedded pions
-	Int_t NPIONSMINUS = 20; // number of embedded pions
+	Int_t NPIONSPLUS = 5; // number of embedded pions
+	Int_t NPIONSMINUS = 5; // number of embedded pions
 	Int_t NPLUTO = 10; // number of embedded particles from pluto
 	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
-	TString muons = "yes"; // If "yes" than primary muons will be generated
+	TString muons = "no"; // If "yes" than primary muons will be generated
 	TString electrons = "no"; // If "yes" than primary electrons will be generated
-	TString pions = "no"; // If "yes" than primary pions will be generated
+	TString pions = "yes"; // If "yes" than primary pions will be generated
 	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
-        TString useUnigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
+   TString useUnigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/d/cbm02/andrey/electron/v10b_10mu/"; //directory for output simulation files
+	TString dir = "/data.local1/andrey/events/std_electron_10pi_no_rich/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -59,19 +59,19 @@ void global_sim(Int_t nEvents = 1000)
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_much.geo";
 		shieldGeom = "shield_standard.geo";
-		stsGeom    = "sts/sts_v09a.geo";
+		stsGeom    = "sts/sts_v11a.geo";
 		muchGeom   = "much/much_v11a.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
 		tofGeom    = "tof/tof_v07a.geo";
-		fieldMap   = "field_v09m";
-		magnetGeom = "passive/magnet_09m.geo";
+		fieldMap   = "field_v10e";
+		magnetGeom = "passive/magnet_v09m.geo";
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "";//"mvd_v07a.geo";
-		stsGeom    = "sts/sts_v09a.geo";
-		richGeom   = "rich/rich_v08a.geo";
+		stsGeom    = "sts/sts_v11a.geo";
+		richGeom   = "";//"rich/rich_v08a.geo";
 		trdGeom    = "trd/trd_v10b.geo";
 		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
@@ -97,7 +97,7 @@ void global_sim(Int_t nEvents = 1000)
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		pions = TString(gSystem->Getenv("PIONS"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
-                useUnigen = TString(gSystem->Getenv("USEUNIGEN"));
+      useUnigen = TString(gSystem->Getenv("USEUNIGEN"));
 
 		plutoFile.resize(NPLUTO);
 		for (Int_t i = 0; i < NPLUTO; i++) {
@@ -126,10 +126,6 @@ void global_sim(Int_t nEvents = 1000)
 
 	TStopwatch timer;
 	timer.Start();
-
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

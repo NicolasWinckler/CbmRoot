@@ -1,12 +1,13 @@
-/** prop_ana.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
+/**
+ * \file prop_qa.C
  *
- * Macro runs propagation analysis task.
+ * \brief Macro runs propagation analysis task.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \since 2010
  **/
 
-void prop_qa(Int_t nEvents = 1000)
+void prop_qa(Int_t nEvents = 5000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -15,16 +16,16 @@ void prop_qa(Int_t nEvents = 1000)
 	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
 	Int_t testFastPropagation;
 	if (script != "yes") {
-	   dir = "/d/cbm02/andrey/electron/v10b_10mu/";
+	   dir = "/data.local1/andrey/events/std_electron_10pi/";
 		mcFile = dir + "mc.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";
-		propAnaFile = dir + "propagation.ana.0000.root";
+		propAnaFile = dir + "propagation.qa.0000.root";
 		imageDir = "./test/";
 		nofTrdHits = 12;
 		nofMuchHits = 0;
 		nofTofHits = 1;
-		pdg = 13;
+		pdg = 11;
 		testFastPropagation = 1;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
@@ -42,10 +43,6 @@ void prop_qa(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
-
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -62,20 +59,20 @@ void prop_qa(Int_t nEvents = 1000)
 //	run->AddTask(Geane);
 
 	// -------------------------------------------------------------------------
-	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(nofTrdHits + nofMuchHits + nofTofHits);
-	propAna->SetNofTrdHits(nofTrdHits);
-	propAna->SetNofMuchHits(nofMuchHits);
-	propAna->SetNofTofHits(nofTofHits);
-	propAna->SetPDGCode(pdg);
-	propAna->SetTestFastPropagation(testFastPropagation);
-	propAna->SetOutputDir(std::string(imageDir));
-	propAna->IsDrawPropagation(true);
-	propAna->IsDrawFilter(true);
-	propAna->IsDrawSmoother(false);
-	propAna->IsCloseCanvas(false);
-	propAna->IsFixedBounds(true);
-	run->AddTask(propAna);
+	CbmLitPropagationQa* propQa = new CbmLitPropagationQa();
+	propQa->SetNofPlanes(nofTrdHits + nofMuchHits + nofTofHits);
+	propQa->SetNofTrdHits(nofTrdHits);
+	propQa->SetNofMuchHits(nofMuchHits);
+	propQa->SetNofTofHits(nofTofHits);
+	propQa->SetPDGCode(pdg);
+	propQa->SetTestFastPropagation(testFastPropagation);
+	propQa->SetOutputDir(std::string(imageDir));
+	propQa->IsDrawPropagation(true);
+	propQa->IsDrawFilter(true);
+	propQa->IsDrawSmoother(false);
+	propQa->IsCloseCanvas(false);
+	propQa->IsFixedBounds(true);
+	run->AddTask(propQa);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";

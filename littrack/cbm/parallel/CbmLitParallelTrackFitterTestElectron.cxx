@@ -25,8 +25,6 @@
 #include "../std/interface/CbmLitField.h"
 #include "../base/CbmLitMapField.h"
 
-#include "parallel/LitExtrapolationTest.h"
-
 CbmLitParallelTrackFitterTestElectron::CbmLitParallelTrackFitterTestElectron()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();

@@ -102,12 +102,12 @@
 // qa
 #ifdef BOOST_FOUND
 #pragma link C++ class CbmLitReconstructionQa+;
+#pragma link C++ class CbmLitFieldQa+;
 #endif
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 #pragma link C++ class CbmLitPropagationQa+;
 //#pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitSimpleGeoQa+;
-#pragma link C++ class CbmLitFieldQa+;
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;

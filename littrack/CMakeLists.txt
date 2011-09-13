@@ -130,6 +130,7 @@ If(Boost_FOUND)
       cbm/qa/CbmLitQaLatexGenerator.cxx
       cbm/qa/CbmLitQaHTMLGeneratorStudy.cxx
       cbm/qa/CbmLitFieldQaHTMLGenerator.cxx
+      cbm/qa/CbmLitFieldQa.cxx
      )
 EndIf(Boost_FOUND)
 
@@ -153,7 +154,7 @@ cbm/qa/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/CbmLitPropagationQa.h 
 #cbm/qa/CbmLitRobustFitterAnalysis.h
 cbm/qa/CbmLitSimpleGeoQa.h 
-cbm/qa/CbmLitFieldQa.h
+#cbm/qa/CbmLitFieldQa.h
 cbm/qa/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/CbmLitCheckMultipleScattering.h
 cbm/qa/CbmLitCheckBrem.h 
@@ -163,6 +164,13 @@ cbm/qa/CbmLitTestMatrixMath.h
 #cuda/CudaTest.h
 cbm/utils/CbmLitDrawHist.h
 )
+
+If(Boost_FOUND)
+  Set(LITTRACK_HEADERS 
+      ${LITTRACK_HEADERS}
+      cbm/qa/CbmLitFieldQa.h
+     )
+EndIf(Boost_FOUND)
 
 If(TBB_FOUND)
   Set(LITTRACK_HEADERS 
@@ -190,7 +198,6 @@ cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
 #cbm/qa/CbmLitReconstructionQa.cxx
 cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
-cbm/qa/CbmLitFieldQa.cxx
 cbm/qa/CbmLitPropagationQa.cxx 
 #cbm/qa/CbmLitRobustFitterAnalysis.cxx
 cbm/utils/CbmLitConverter.cxx

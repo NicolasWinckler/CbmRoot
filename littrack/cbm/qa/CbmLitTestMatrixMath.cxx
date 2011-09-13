@@ -52,7 +52,7 @@ void CbmLitTestMatrixMath::TestInvSym15(
 
    myf rd1[25], rd2[15];
    Convert15To25(&input1[0], rd1);
-   TMatrixTSym<double> r1(5, rd1);
+   TMatrixTSym<myf> r1(5, rd1);
    r1.InvertFast();
    Convert25To15(r1.GetMatrixArray(), rd2);
    std:: cout << "Output ROOT: " << ArrayToString(rd2, 15);

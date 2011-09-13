@@ -171,7 +171,7 @@ void lit::parallel::LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
    absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
    absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
    absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
-   LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
+// TODO  LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
    LitAddMaterial(lpar, absorber.GetMaterial());
 
    // Unpack track parameters

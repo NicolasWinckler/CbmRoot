@@ -1,3 +1,10 @@
+/**
+ * \file CbmLitSimpleGeometryConstructor.cxx
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ **/
+
 #include "base/CbmLitSimpleGeometryConstructor.h"
 
 #include "base/CbmLitEnvironment.h"
@@ -30,7 +37,8 @@ CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
    fMyTrdGeoNodes(),
    fIsTrd(false),
    fIsMuch(false),
-   fIsTof(false)
+   fIsTof(false),
+   fIsRich(false)
 {
    ConstructGeometry();
 }
@@ -62,6 +70,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
    fIsTrd = env->IsTrd();
    fIsMuch = env->IsMuch();
    fIsTof = env->IsTof();
+   fIsRich = env->IsRich();
 
    CreateMediumList();
    std::cout << "Medium list created" << std::endl;
@@ -78,6 +87,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
    if (fIsMuch) { ConstructMuch(); }
    if (fIsTrd) { ConstructTrd(); }
    if (fIsTof) { ConstructTof(); }
+   if (fIsRich) { ConstructRich(); }
 
    fSimpleGeo->CloseGeometry();
    fSimpleGeo->Print();
@@ -88,6 +98,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
    std::sort(fMyGeoNodes.begin(), fMyGeoNodes.end(), CompareMaterialInfoZLess());
    std::sort(fMyMuchGeoNodes.begin(), fMyMuchGeoNodes.end(), CompareMaterialInfoZLess());
    std::sort(fMyTrdGeoNodes.begin(), fMyTrdGeoNodes.end(), CompareMaterialInfoZLess());
+   std::sort(fMyRichGeoNodes.begin(), fMyRichGeoNodes.end(), CompareMaterialInfoZLess());
 
    std::cout << "My Simple Geometry:" << std::endl;
    for (size_t i = 0; i < fMyGeoNodes.size(); ++i) {
@@ -98,9 +109,13 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 //    for (size_t i = 0; i < fMyMuchGeoNodes.size(); ++i)
 //       std::cout << i << " " << fMyMuchGeoNodes[i].ToString();
 //
-// std::cout << "My TRD Simple Geometry:" << std::endl;
-//    for (size_t i = 0; i < fMyTrdGeoNodes.size(); ++i)
-//       std::cout << i << " " << fMyTrdGeoNodes[i].ToString();
+//   std::cout << "My TRD Simple Geometry:" << std::endl;
+//   for (size_t i = 0; i < fMyTrdGeoNodes.size(); ++i)
+//      std::cout << i << " " << fMyTrdGeoNodes[i].ToString();
+
+   std::cout << "My RICH Simple Geometry:" << std::endl;
+   for (size_t i = 0; i < fMyRichGeoNodes.size(); ++i)
+      std::cout << i << " " << fMyRichGeoNodes[i].ToString();
 
    gGeoManager = fGeo;
    std::cout << "-I- Simple geometry construction finished" << std::endl;
@@ -367,3 +382,9 @@ void CbmLitSimpleGeometryConstructor::ConstructTof()
 
    std::cout << "-I- Construction of the TOF geometry finished" << std::endl;
 }
+
+void CbmLitSimpleGeometryConstructor::ConstructRich()
+{
+
+}
+

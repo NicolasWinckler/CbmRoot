@@ -195,12 +195,13 @@ void lit::parallel::LitTrackFinderNNVecElectron::PropagateToFirstStation(
       const LitVirtualPlaneElectronVec& vp1 = fLayout.GetVirtualPlane(ivp);
       const LitVirtualPlaneElectronVec& vp2 = fLayout.GetVirtualPlane(ivp + 1);
 
-      lit::parallel::LitFieldValue<fvec> v1, v2, v3;
-      vp1.GetFieldGrid().GetFieldValue(lpar.X, lpar.Y, v1);
-      vp1.GetFieldGridMid().GetFieldValue(lpar.X, lpar.Y, v2);
-      vp2.GetFieldGrid().GetFieldValue(lpar.X, lpar.Y, v3);
+//      lit::parallel::LitFieldValue<fvec> v1, v2, v3;
+//      vp1.GetFieldGrid().GetFieldValue(lpar.X, lpar.Y, v1);
+//      vp1.GetFieldGridMid().GetFieldValue(lpar.X, lpar.Y, v2);
+//      vp2.GetFieldGrid().GetFieldValue(lpar.X, lpar.Y, v3);
 
-      lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(), v1, v2, v3);
+      lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(),
+            vp1.GetFieldGrid(), vp1.GetFieldGridMid(), vp2.GetFieldGrid());
       lit::parallel::LitAddMaterialElectron(lpar, vp2.GetMaterial());
    }
 

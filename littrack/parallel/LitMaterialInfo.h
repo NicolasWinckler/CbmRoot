@@ -19,7 +19,7 @@ namespace parallel {
 /**
  * \class LitMaterialInfo
  *
- * \brief Proprties of the material.
+ * \brief Properties of the material.
  *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
@@ -49,6 +49,16 @@ public:
     * \brief Destructor.
     */
    virtual ~LitMaterialInfo() {}
+
+   /**
+    * \brief Calculate some material properties to speed up reconstruction.
+    */
+   void CalculateValues() {
+      RadThick = Thickness / X0; // Length/X0
+      SqrtRadThick = sqrt(RadThick); // std::sqrt(Length/X0)
+      LogRadThick = log(RadThick); // std::log(Length/X0)
+      ElLoss = exp(RadThick * log(3.) / log (2.)) - exp(-2. * RadThick);
+   }
 
    /**
     * \brief Returns std::string representation of the class.

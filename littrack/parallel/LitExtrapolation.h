@@ -66,17 +66,17 @@ inline void LitLineExtrapolation(
  *
  * \param[in,out] par Reference to track parameters.
  * \param[in] zOut Z position to extrapolate to.
- * \param[in] field1 Field value at starting point of extrapolation.
- * \param[in] field2 Field value in the middle point of extrapolation.
- * \param[in] field3 Field value at the end point of extrapolation.
+ * \param[in] field1 Field grid at starting point of extrapolation.
+ * \param[in] field2 Field grid in the middle point of extrapolation.
+ * \param[in] field3 Field grid at the end point of extrapolation.
  */
 template<class T>
 inline void LitRK4Extrapolation(
    LitTrackParam<T>& par,
    T zOut,
-   const LitFieldValue<T>& field1,
-   const LitFieldValue<T>& field2,
-   const LitFieldValue<T>& field3)
+   const LitFieldGrid& field1,
+   const LitFieldGrid& field2,
+   const LitFieldGrid& field3)
 {
    static const T fC = 0.000299792458;
    static const T ZERO = 0., ONE = 1., TWO = 2., C1_3 = 1./3., C1_6 = 1./6.;
@@ -100,19 +100,23 @@ inline void LitRK4Extrapolation(
 
    T F[25]; // derivatives, transport matrix
 
-   // Get field values
+   // Field values for each step
    LitFieldValue<T> B[4];
+   // Field grid for each step
+   const LitFieldGrid* Bgrid[4] = {&field1, &field2, &field2, &field3};
 //   field.GetFieldValue(zIn + coef[0] * h, B[0]);
 //   field.GetFieldValue(zIn + coef[1] * h, B[1]);
 //   B[2] = B[1];
 //   field.GetFieldValue(zIn + coef[3] * h, B[3]);
-   B[0] = field1;
-   B[1] = field2;
-   B[2] = B[1];
-   B[3] = field3;
+//   B[0] = field1;
+//   B[1] = field2;
+//   B[2] = B[1];
+//   B[3] = field3;
 
    // Calculation for zero step
    {
+      Bgrid[0]->GetFieldValue(x[0], x[1], B[0]);
+
       T Bx = B[0].Bx;
       T By = B[0].By;
       T Bz = B[0].Bz;
@@ -147,6 +151,8 @@ inline void LitRK4Extrapolation(
       x[1] = par.Y  + coef[iStep] * ky[iStep - 1];
       x[2] = par.Tx + coef[iStep] * ktx[iStep - 1];
       x[3] = par.Ty + coef[iStep] * kty[iStep - 1];
+
+      Bgrid[iStep]->GetFieldValue(x[0], x[1], B[iStep]);
 
       T Bx = B[iStep].Bx;
       T By = B[iStep].By;
@@ -366,7 +372,7 @@ inline void LitRK4Extrapolation(
    field.GetFieldValue(zIn + C1_2 * h, v2);
    field.GetFieldValue(zIn + h, v3);
 
-   LitRK4Extrapolation(par, zOut, v1, v2, v3);
+// TODO   LitRK4Extrapolation(par, zOut, v1, v2, v3);
 }
 
 } // namespace parallel

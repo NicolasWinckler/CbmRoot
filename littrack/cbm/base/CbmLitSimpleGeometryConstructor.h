@@ -1,9 +1,10 @@
-/** CbmLitSimpleGeometryConstructor.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
+/**
+ * \file CbmLitSimpleGeometryConstructor.h
  *
- * Class constructs simplified geometry.
+ * \brief Simplified geometry constructor.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  **/
 
 #ifndef CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
@@ -22,36 +23,68 @@ class TGeoVolume;
 class CbmLitSimpleGeometryConstructor
 {
 public:
-   /* Returns pointer to the singleton object instance. */
+   /**
+    * \brief Return pointer to singleton object.
+    * \return Pointer to singleton object.
+    */
    static CbmLitSimpleGeometryConstructor* Instance();
 
-   /* Returns array of materials for simplified geometry. */
+   /**
+    * \brief Return array of materials for simplified geometry.
+    * \return Array of materials for simplified geometry.
+    */
    const std::vector<CbmLitMaterialInfo>& GetMyGeoNodes() const {return fMyGeoNodes;}
 
-   /* Returns array of materials for MUCH geometry. */
+   /**
+    * \brief Returs array of materials for MUCH geometry.
+    * \return Array of materials for MUCH geometry.
+    */
    const std::vector<CbmLitMaterialInfo>& GetMyMuchGeoNodes() const {return fMyMuchGeoNodes;}
 
-   /* Returns array of materials for TRD geometry. */
+   /**
+    * \brief Return array of materials for TRD geometry.
+    * \return Array of materials for TRD geometry.
+    */
    const std::vector<CbmLitMaterialInfo>& GetMyTrdGeoNodes() const {return fMyTrdGeoNodes;}
 
-   /* Draws geometry. */
+   /**
+    * \brief Return array of materials for RICH geometry.
+    * \return Array of materials for RICH geometry.
+    */
+   const std::vector<CbmLitMaterialInfo>& GetMyRichGeoNodes() const {return fMyRichGeoNodes;}
+
+   /**
+    * \brief Draw simplified geometry.
+    */
    void Draw();
 
 private:
-   /* Constructor is protected since singleton pattern is used.
-    * Pointer to the object is returned by static Instance() method. */
+   /**
+    * \brief Constructor.
+    *
+    * Constructor is protected since singleton pattern is used.
+    * Pointer to object is returned by static Instance() method.
+    */
    CbmLitSimpleGeometryConstructor();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitSimpleGeometryConstructor();
 
-   /* Copy constructor */
+   /**
+    * \brief Copy constructor.
+    */
    CbmLitSimpleGeometryConstructor(const CbmLitSimpleGeometryConstructor&);
 
-   /* Assignment operator */
+   /**
+    * \brief Assignment operator.
+    */
    const CbmLitSimpleGeometryConstructor& operator=(const CbmLitSimpleGeometryConstructor&);
 
-   /* Constructs simplified geometry. */
+   /**
+    * \brief Main function for simplified geometry construction.
+    */
    void ConstructGeometry();
 
    /* */
@@ -61,22 +94,39 @@ private:
    /* */
    void CreateMediumList();
 
-   /* Converts TGeoMedium to CbmLitMaterialInfo. */
+   /**
+    * \brief Convert TGeoMedium to CbmLitMaterialInfo.
+    * \param[in] med Pointer to TGeoMedium.
+    * \param[out] mat Output CbmLitMaterialInfo.
+    */
    void GeoMediumToMaterialInfo(
       const TGeoMedium* med,
       CbmLitMaterialInfo& mat);
 
-   /* Constructs simplified STS geometry. */
+   /**
+    * \brief Construct simplified STS geometry.
+    */
    void ConstructSts();
 
-   /* Constructs simplified MUCH geometry. */
+   /**
+    * \brief Construct simplified MUCH geometry.
+    */
    void ConstructMuch();
 
-   /* Constructs simplified TOF geometry. */
+   /**
+    * \brief Construct simplified TOF geometry.
+    */
    void ConstructTof();
 
-   /* Constructs simplified TRD geometry. */
+   /**
+    * \brief Construct simplified TRD geometry.
+    */
    void ConstructTrd();
+
+   /**
+    * \brief Construct simplified RICH geometry.
+    */
+   void ConstructRich();
 
    TGeoManager* fGeo; // Pointer to full geometry
    TGeoManager* fSimpleGeo; // Pointer to simplified geometry
@@ -86,10 +136,12 @@ private:
    std::vector<CbmLitMaterialInfo> fMyGeoNodes; // Vector of materials for the simplified geometry
    std::vector<CbmLitMaterialInfo> fMyMuchGeoNodes; // Vector of materials for the MUCH simplified geometry
    std::vector<CbmLitMaterialInfo> fMyTrdGeoNodes; // Vector of materials for the TRD simplified geometry
+   std::vector<CbmLitMaterialInfo> fMyRichGeoNodes; // Vector of materials for the RICH simplified geometry
 
    bool fIsTrd; // true if TRD in TGeo
    bool fIsMuch; // true if MUCH in TGeo
    bool fIsTof; // true if TOF in TGeo
+   bool fIsRich; // true if TOF in TGeo
 };
 
 #endif /* CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_ */

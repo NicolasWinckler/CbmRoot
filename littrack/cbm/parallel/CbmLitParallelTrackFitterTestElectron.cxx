@@ -25,6 +25,8 @@
 #include "../std/interface/CbmLitField.h"
 #include "../base/CbmLitMapField.h"
 
+#include "parallel/LitExtrapolationTest.h"
+
 CbmLitParallelTrackFitterTestElectron::CbmLitParallelTrackFitterTestElectron()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
@@ -69,7 +71,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
    if (par.GetTx() == 0. && par.GetTy() == 0.) { return kLITERROR; }
 
    lit::parallel::LitTrackParam<fscal> lpar;
-   CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
+//   CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 
    int ihit = 0;
 
@@ -77,44 +79,43 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
       const lit::parallel::LitVirtualPlaneElectron<fscal>& vp1 = fLayout.GetVirtualPlane(ivp);
       const lit::parallel::LitVirtualPlaneElectron<fscal>& vp2 = fLayout.GetVirtualPlane(ivp+1);
 
-      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
-      myf bx[3], by[3], bz[3];
-      myf z1 = lpar.Z;
-      myf z2 = lpar.Z + (vp2.GetZ() - lpar.Z) / 2.0;
-      myf z3 = vp2.GetZ();
-      fField->GetFieldValue(lpar.X, lpar.Y, z1, bx[0], by[0], bz[0]);
-      fField->GetFieldValue(lpar.X, lpar.Y, z2, bx[1], by[1], bz[1]);
-      fField->GetFieldValue(lpar.X, lpar.Y, z3, bx[2], by[2], bz[2]);
-      v1.Bx = bx[0];
-      v1.By = by[0];
-      v1.Bz = bz[0];
-      v2.Bx = bx[1];
-      v2.By = by[1];
-      v2.Bz = bz[1];
-      v3.Bx = bx[2];
-      v3.By = by[2];
-      v3.Bz = bz[2];
-      if (vp2.GetZ() < 300.) lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(), v1, v2, v3);
-      else lit::parallel::LitLineExtrapolation(lpar, vp2.GetZ());
+//      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
+//      myf bx[3], by[3], bz[3];
+//      myf z1 = lpar.Z;
+//      myf z2 = lpar.Z + (vp2.GetZ() - lpar.Z) / 2.0;
+//      myf z3 = vp2.GetZ();
+////      std::cout << (int)ivp << " " << z1 << " " << z2 << " " << z3 << std::endl;
+//      fField->GetFieldValue(lpar.X, lpar.Y, z1, bx[0], by[0], bz[0]);
+//      fField->GetFieldValue(lpar.X, lpar.Y, z2, bx[1], by[1], bz[1]);
+//      fField->GetFieldValue(lpar.X, lpar.Y, z3, bx[2], by[2], bz[2]);
+//      v1.Bx = bx[0];
+//      v1.By = by[0];
+//      v1.Bz = bz[0];
+//      v2.Bx = bx[1];
+//      v2.By = by[1];
+//      v2.Bz = bz[1];
+//      v3.Bx = bx[2];
+//      v3.By = by[2];
+//      v3.Bz = bz[2];
+//      if (vp2.GetZ() < 420.)
+//         lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(), v1, v2, v3);
+//      else lit::parallel::LitLineExtrapolation(lpar, vp2.GetZ());
 //      lit::parallel::LitAddMaterial(lpar, vp2.GetMaterial());
 
 
-//      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
-//      vp1.GetFieldGrid().GetFieldValue(lpar.X, lpar.Y, v1);
-//      vp1.GetFieldGridMid().GetFieldValue(lpar.X, lpar.Y, v2);
-//      vp2.GetFieldGrid().GetFieldValue(lpar.X, lpar.Y, v3);
-//      if (vp2.GetZ() < 300.) lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(), v1, v2, v3);
+//      if (vp2.GetZ() < 420.) lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(),
+//              vp1.GetFieldGrid(), vp1.GetFieldGridMid(), vp2.GetFieldGrid());
 //      else lit::parallel::LitLineExtrapolation(lpar, vp2.GetZ());
 ////      lit::parallel::LitAddMaterialElectron(lpar, vp2.GetMaterial());
 //      lit::parallel::LitAddMaterial(lpar, vp2.GetMaterial());
 
 
 //       fExtrapolator->Extrapolate(&par, vp2.GetZ());
-//       LitStatus propStatus = fPropagator->Propagate(&par, vp2.GetZ(), 13, NULL);
-//       if (propStatus != kLITSUCCESS) return kLITERROR;
+       LitStatus propStatus = fPropagator->Propagate(&par, vp2.GetZ(), 13, NULL);
+       if (propStatus != kLITSUCCESS) return kLITERROR;
    }
 
-//    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
+    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 
 
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {

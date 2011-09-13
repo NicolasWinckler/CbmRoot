@@ -484,10 +484,7 @@ void CbmLitEnvironment::GetMuchLayout(
       mat1.Thickness = amat.GetLength();
       mat1.X0 = amat.GetRL();
       mat1.Zpos = amat.GetZpos();
-
-      mat1.RadThick = mat1.Thickness / mat1.X0; // Length/X0
-      mat1.SqrtRadThick = sqrt(mat1.RadThick); // std::sqrt(Length/X0)
-      mat1.LogRadThick = log(mat1.RadThick); // std::log(Length/X0)
+      mat1.CalculateValues();
 
       absorber.SetMaterial(mat1);
       absorber.SetZ(amat.GetZpos());
@@ -514,10 +511,7 @@ void CbmLitEnvironment::GetMuchLayout(
             lmat.Thickness = mat.GetLength();
             lmat.X0 = mat.GetRL();
             lmat.Zpos = mat.GetZpos();
-
-            lmat.RadThick = ss.GetMaterial().Thickness / ss.GetMaterial().X0; // Length/X0
-            lmat.SqrtRadThick = sqrt(ss.GetMaterial().RadThick); // std::sqrt(Length/X0)
-            lmat.LogRadThick = log(ss.GetMaterial().RadThick); // std::log(Length/X0)
+            lmat.CalculateValues();
 
             ss.SetMaterial(lmat);
             st.AddSubstation(ss);
@@ -560,7 +554,7 @@ template<class T>
 void CbmLitEnvironment::GetTrdLayout(
    lit::parallel::LitDetectorLayoutElectron<T>& layout)
 {
-   std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
+   std::cout << "Getting TRD layout for parallel version of tracking..." << std::endl;
 
    CbmLitFieldGridCreator gridCreator;
    CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
@@ -590,10 +584,7 @@ void CbmLitEnvironment::GetTrdLayout(
       m.Thickness = DZ;//mat.GetLength();
       m.X0 = mat.GetRL();
       m.Zpos = Z + DZ;//mat.GetZpos();
-      m.RadThick = m.Thickness / m.X0; // Length/X0
-      m.SqrtRadThick = sqrt(m.RadThick); // std::sqrt(Length/X0)
-      m.LogRadThick = log(m.RadThick); // std::log(Length/X0)
-      m.ElLoss = exp(m.RadThick * log(3.) / log (2.)) - exp(-2. * m.RadThick);
+      m.CalculateValues();
 
       virtualPlane.SetZ(Z);
       virtualPlane.SetFieldGrid(fieldGrid);
@@ -628,11 +619,7 @@ void CbmLitEnvironment::GetTrdLayout(
                m.Thickness = mat.GetLength();
                m.X0 = mat.GetRL();
                m.Zpos = mat.GetZpos();
-
-               m.RadThick = m.Thickness / m.X0; // Length/X0
-               m.SqrtRadThick = sqrt(m.RadThick); // std::sqrt(Length/X0)
-               m.LogRadThick = log(m.RadThick); // std::log(Length/X0)
-               m.ElLoss = exp(m.RadThick * log(3.) / log (2.)) - exp(-2. * m.RadThick);
+               m.CalculateValues();
 
                if (im < 3) { st.AddMaterialBefore(m); }
                else { st.AddMaterialAfter(m); }

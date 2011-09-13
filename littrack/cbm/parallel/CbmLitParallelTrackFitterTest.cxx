@@ -69,7 +69,7 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
       absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
       absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
       absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
-      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
+//TODO      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
       lit::parallel::LitAddMaterial(lpar, absorber.GetMaterial());
       //propagate through the absorber using steps
       // first extrapolate input track parameters to the absorber
@@ -95,7 +95,7 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
             const lit::parallel::LitSubstationMuon<fscal>& substation = station.GetSubstation(iss);
 
             // Propagation through station
-            lit::parallel::LitRK4Extrapolation(lpar, substation.GetZ(), field);
+//     TODO       lit::parallel::LitRK4Extrapolation(lpar, substation.GetZ(), field);
             lit::parallel::LitAddMaterial(lpar, substation.GetMaterial());
 
             LitTrackParamScalToCbmLitTrackParam(&lpar, &par);

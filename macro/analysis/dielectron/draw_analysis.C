@@ -51,20 +51,24 @@ void calculateSignalOverBg(TH1D* s, TH1D* bg)
 {
 
     TH1D* sClone = (TH1D*)s->Clone();
-    //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(-1);    
+    //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(-1);
+    //ROOT::Math::MinimizerOptions opt;
+    //opt.SetPrintLevel(0);
     //TF1* fit = new TF1("gaus1", "gaus");
-   // fit->Config().MinimizerOptions().SetPrintLevel(-1);
+    //fit->Print("");//Config().MinimizerOptions().SetPrintLevel(-1);
+   // TFitterMinuit theMinuit;
+    //theMinuit.SetPrintLevel(-1);
     sClone->Fit("gaus");
 
     Double_t mean = sClone->GetFunction("gaus")->GetParameter("Mean");
     Double_t sigma = sClone->GetFunction("gaus")->GetParameter("Sigma");
     cout << "Mean = " << mean << " Sigma = " << sigma <<  endl;
-    cout << "Min = " << mean - 2.*sigma << " Max = " << mean + 2*sigma << endl;
+    //cout << "Min = " << mean - 2.*sigma << " Max = " << mean + 2*sigma << endl;
 
     Int_t minInd = s->FindBin(mean - 2.*sigma);
     Int_t maxInd = s->FindBin(mean + 2.*sigma);
 
-    cout << "nof bins = " << maxInd - minInd +1 << endl;
+    //cout << "nof bins = " << maxInd - minInd +1 << endl;
 
     Double_t sumSignal = 0.;
     Double_t sumBg = 0.;
@@ -211,7 +215,7 @@ void scaleAllHistogramms(TFile* file, Int_t nofEvents)
       TObject* obj = key->ReadObj();
       if (obj->IsA()->InheritsFrom (TH1::Class())) {
          TH1* h = (TH1*) obj;
-         cout << h->GetName() << endl;
+         //cout << h->GetName() << endl;
          TH1* h1 = (TH1*)file->Get(h->GetName());
          h1->Scale(1./(Double_t)nofEvents);
          count++;
@@ -229,9 +233,10 @@ void draw_analysis(){
     cbmlibs();
 
     Bool_t fUseMvd = true;
-    TString fileName = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/phi/analysis.all.root";
+    TString fileName = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omega/analysis.delta.all.root";
     TFile *file = new TFile(fileName);
 
+    //gStyle->SetPaintTextFormat("4.2f");
     gStyle->SetHistLineWidth(3);
 	//SetStyles();
     gROOT->SetStyle("Plain");
@@ -913,8 +918,8 @@ void draw_analysis(){
 
 //DSTS CUT
     if (fUseMvd) {
-       TCanvas *c14 = new TCanvas("c14-dsts", "c14-dsts", 900, 600);
-       c14->Divide(3,2);
+       TCanvas *c14 = new TCanvas("c14-dsts", "c14-dsts", 800, 800);
+       c14->Divide(2,2);
        c14->cd(1);
        fh_dsts_signal->Draw("COLZ");
        c14->cd(2);
@@ -924,11 +929,29 @@ void draw_analysis(){
        c14->cd(4);
        fh_dsts_pi0->Draw("COLZ");
        c14->cd(5);
-       fh_dsts_eta->Draw("COLZ");
-       c14->cd(6);
+       //fh_dsts_eta->Draw("COLZ");
+       //c14->cd(6);
     //   TH2D* fh_significance_dsts = CalculateSignificance2D(fh_dsts_signal, fh_dsts_bg, "dsts_2dsignificance", "significance");
    //    fh_significance_dsts->Draw("COLZ");
     }
+
+//DSTS 2 CUT
+    if (fUseMvd) {
+       TCanvas *c20 = new TCanvas("c20-dsts-2MVD", "c20-dsts-2MVD", 800, 800);
+       c20->Divide(2,2);
+       c20->cd(1);
+       fh_dsts2_signal->Draw("COLZ");
+       c20->cd(2);
+       fh_dsts2_bg->Draw("COLZ");
+       c20->cd(3);
+       fh_dsts2_gamma->Draw("COLZ");
+       c20->cd(4);
+       fh_dsts2_pi0->Draw("COLZ");
+       //c20->cd(5);
+       //fh_dsts2_eta->Draw("COLZ");
+    }
+
+
 
 //INVARIANT MASS DISTRIBUTION
     Int_t nRebin = 10;
@@ -947,8 +970,8 @@ void draw_analysis(){
     fh_stcut_signal_minv->Rebin(nRebin);
     fh_ttcut_signal_minv->Rebin(nRebin);
     fh_ptcut_signal_minv->Rebin(nRebin);
-//    fh_anglecut_signal_minv->Rebin(nRebin);
-//   fh_apmcut_signal_minv->Rebin(nRebin);
+    fh_anglecut_signal_minv->Rebin(nRebin);
+   fh_apmcut_signal_minv->Rebin(nRebin);
 
     fh_mc_signal_minv->SetLineColor(kGreen+3);
     fh_acc_signal_minv->SetLineColor(kOrange+3);
@@ -1018,8 +1041,8 @@ void draw_analysis(){
     fh_stcut_bg_minv->Rebin(nRebin);
     fh_ttcut_bg_minv->Rebin(nRebin);
     fh_ptcut_bg_minv->Rebin(nRebin);
-//    fh_anglecut_bg_minv->Rebin(nRebin);
- //   fh_apmcut_bg_minv->Rebin(nRebin);
+    fh_anglecut_bg_minv->Rebin(nRebin);
+    fh_apmcut_bg_minv->Rebin(nRebin);
 
     fh_rec_bg_minv->Draw();
     fh_rec_bg_minv->SetMinimum(1e-8);
@@ -1077,9 +1100,9 @@ void draw_analysis(){
 	c16->cd(hi++);
 	draw_minv(fh_ptcut_signal_minv,fh_ptcut_bg_minv);
 	c16->cd(hi++);
-//	draw_minv(fh_anglecut_signal_minv,fh_anglecut_bg_minv);
+	draw_minv(fh_anglecut_signal_minv,fh_anglecut_bg_minv);
     c16->cd(hi++);
-//    draw_minv(fh_apmcut_signal_minv,fh_apmcut_bg_minv);
+    draw_minv(fh_apmcut_signal_minv,fh_apmcut_bg_minv);
 
 //INVARIANT MASS DISTRIBUTION FOR PI0 AND ETA
     TCanvas *c17 = new TCanvas("c17-minv-pi0-eta", "c17-minv-pi0-eta", 1200, 600);
@@ -1092,7 +1115,7 @@ void draw_analysis(){
     fh_stcut_pi0_minv->SetLineColor(kOrange-3);
     fh_ttcut_pi0_minv->SetLineColor(kYellow+1);
     fh_ptcut_pi0_minv->SetLineColor(kMagenta);
-    fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
+//    fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
  //   fh_apmcut_pi0_minv->SetLineColor(kPink+8);
 
     fh_rec_pi0_minv->Rebin(nRebin);
@@ -1103,7 +1126,7 @@ void draw_analysis(){
     fh_stcut_pi0_minv->Rebin(nRebin);
     fh_ttcut_pi0_minv->Rebin(nRebin);
     fh_ptcut_pi0_minv->Rebin(nRebin);
-    fh_anglecut_pi0_minv->Rebin(nRebin);
+//    fh_anglecut_pi0_minv->Rebin(nRebin);
  //   fh_apmcut_pi0_minv->Rebin(nRebin);
 
     fh_rec_pi0_minv->Draw();
@@ -1114,19 +1137,19 @@ void draw_analysis(){
     fh_stcut_pi0_minv->Draw("same");
     fh_ttcut_pi0_minv->Draw("same");
     fh_ptcut_pi0_minv->Draw("same");
-    fh_anglecut_pi0_minv->Draw("same");
+//    fh_anglecut_pi0_minv->Draw("same");
  //   fh_apmcut_pi0_minv->Draw("same");
 
     TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
     leg3->AddEntry(fh_rec_pi0_minv, "rec", "l");
-    leg3->AddEntry(fh_chi_prim_pi0_minv, "chi prim", "l");
-	leg3->AddEntry(fh_el_id_pi0_minv, "rich id", "l");
-    leg3->AddEntry(fh_gammacut_pi0_minv, "gamma cut", "l");
-    if (fUseMvd) leg3->AddEntry(fh_dstscut_pi0_minv, "dsts cut", "l");
-    leg3->AddEntry(fh_stcut_pi0_minv, "st cut", "l");
-    leg3->AddEntry(fh_ttcut_pi0_minv, "tt cut", "l");
-	leg3->AddEntry(fh_ptcut_pi0_minv, "pt cut", "l");
-    leg3->AddEntry(fh_anglecut_pi0_minv, "angle cut", "l");
+    leg3->AddEntry(fh_chi_prim_pi0_minv, "#chi^{2}_{prim}", "l");
+	leg3->AddEntry(fh_el_id_pi0_minv, "ID", "l");
+   leg3->AddEntry(fh_gammacut_pi0_minv, "m_{#gamma}", "l");
+   if (fUseMvd) leg3->AddEntry(fh_dstscut_pi0_minv, "dsts", "l");
+   leg3->AddEntry(fh_stcut_pi0_minv, "ST", "l");
+   leg3->AddEntry(fh_ttcut_pi0_minv, "TT", "l");
+	leg3->AddEntry(fh_ptcut_pi0_minv, "P_{t}", "l");
+//    leg3->AddEntry(fh_anglecut_pi0_minv, "angle cut", "l");
 //    leg3->AddEntry(fh_apmcut_pi0_minv, "apm cut", "l");
 	leg3->Draw();
 	gPad->SetGridx(true);
@@ -1138,10 +1161,10 @@ void draw_analysis(){
 	if (fUseMvd) fh_dstscut_eta_minv->SetLineColor(kGreen);
 	fh_chi_prim_eta_minv->SetLineColor(kOrange+7);
 	fh_gammacut_eta_minv->SetLineColor(kPink-6);
-    fh_stcut_eta_minv->SetLineColor(kOrange-3);
+   fh_stcut_eta_minv->SetLineColor(kOrange-3);
 	fh_ttcut_eta_minv->SetLineColor(kYellow+1); 
-    fh_ptcut_eta_minv->SetLineColor(kMagenta);
-    fh_anglecut_eta_minv->SetLineColor(kViolet+10);
+   fh_ptcut_eta_minv->SetLineColor(kMagenta);
+//   fh_anglecut_eta_minv->SetLineColor(kViolet+10);
 //	fh_apmcut_eta_minv->SetLineColor(kPink+8);
     
    fh_rec_eta_minv->Rebin(nRebin);
@@ -1152,7 +1175,7 @@ void draw_analysis(){
    fh_stcut_eta_minv->Rebin(nRebin);
    fh_ttcut_eta_minv->Rebin(nRebin);
    fh_ptcut_eta_minv->Rebin(nRebin);
-   fh_anglecut_eta_minv->Rebin(nRebin);
+//   fh_anglecut_eta_minv->Rebin(nRebin);
 //  fh_apmcut_eta_minv->Rebin(nRebin);
 
 	fh_rec_eta_minv->Draw();
@@ -1162,48 +1185,66 @@ void draw_analysis(){
 	fh_gammacut_eta_minv->Draw("same");
    fh_stcut_eta_minv->Draw("same");
 	fh_ttcut_eta_minv->Draw("same");
-    fh_ptcut_eta_minv->Draw("same");
-    fh_anglecut_eta_minv->Draw("same");
+   fh_ptcut_eta_minv->Draw("same");
+//   fh_anglecut_eta_minv->Draw("same");
 //	fh_apmcut_eta_minv->Draw("same");
 
 	TLegend* leg4 = new TLegend(0.65,0.6,1., 1.);
-	leg4->AddEntry(fh_rec_eta_minv, "rec", "l");
-   leg4->AddEntry(fh_chi_prim_eta_minv, "chi prim", "l");
-	leg4->AddEntry(fh_el_id_eta_minv, "rich id", "l");
-   leg4->AddEntry(fh_gammacut_eta_minv, "gamma cut", "l");
-   if (fUseMvd) leg4->AddEntry(fh_dstscut_eta_minv, "dsts cut", "l");
-   leg4->AddEntry(fh_stcut_eta_minv, "st cut", "l");
-   leg4->AddEntry(fh_ttcut_eta_minv, "tt cut", "l");
-	leg4->AddEntry(fh_ptcut_eta_minv, "pt cut", "l");
-   leg4->AddEntry(fh_anglecut_eta_minv, "angle cut", "l");
+   leg4->AddEntry(fh_rec_eta_minv, "rec", "l");
+   leg4->AddEntry(fh_chi_prim_eta_minv, "#chi^{2}_{prim}", "l");
+  leg4->AddEntry(fh_el_id_eta_minv, "ID", "l");
+  leg4->AddEntry(fh_gammacut_eta_minv, "m_{#gamma}", "l");
+  if (fUseMvd) leg4->AddEntry(fh_dstscut_eta_minv, "dsts", "l");
+  leg4->AddEntry(fh_stcut_eta_minv, "ST", "l");
+  leg4->AddEntry(fh_ttcut_eta_minv, "TT", "l");
+  leg4->AddEntry(fh_ptcut_eta_minv, "P_{t}", "l");
+//   leg4->AddEntry(fh_anglecut_eta_minv, "angle cut", "l");
 //   leg4->AddEntry(fh_apmcut_eta_minv, "apm cut", "l");
 	leg4->Draw();
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
 
+
 	//SOURCE TRACKS
-	TCanvas *c18 = new TCanvas("c18-nof-tracks", "c18-nof-tracks", 1200, 800);
-	c18->Divide(3,2);
+	gStyle->SetPaintTextFormat("4.1f");
+	TCanvas *c18 = new TCanvas("c18-nof-tracks", "c18-nof-tracks", 1200, 400);
+	c18->Divide(3,1);
 	c18->cd(1);
+	fh_nof_bg_tracks->SetNameTitle("fh_nof_bg_tracks","fh_nof_bg_tracks;analysis step;tracks/event");
 	fh_nof_bg_tracks->SetLineWidth(2);
+	fh_nof_bg_tracks->SetMarkerSize(2.2);
+	fh_nof_bg_tracks->SetStats(false);
 	fh_nof_bg_tracks->Draw("hist text0");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+	gPad->SetLogy(true);
+
 	c18->cd(2);
+	fh_nof_el_tracks->SetNameTitle("fh_nof_el_tracks","fh_nof_el_tracks;analysis step;tracks/event");
 	fh_nof_el_tracks->SetLineWidth(2);
-	fh_nof_el_tracks->Draw("hist text0");
+	fh_nof_el_tracks->SetMarkerSize(2.2);
+	fh_nof_el_tracks->SetStats(false);
+	fh_nof_el_tracks->Draw("");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+	gPad->SetLogy(true);
+
 	c18->cd(3);
 	TH1D* purity = new TH1D("purity","purity",7, 0., 7.);
 	purity->Divide(fh_nof_bg_tracks,fh_nof_el_tracks);
+	purity->SetNameTitle("purity","purity;analysis step;purity");
 	purity->SetLineWidth(2);
+	purity->SetMarkerSize(1.5);
+	purity->SetStats(false);
 	purity->Draw("hist text0");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
-	c18->cd(4);
+	gPad->SetLogy(true);
+
+	TCanvas *c18_1 = new TCanvas("c18_1-nof-tracks", "c18_1-nof-tracks", 500, 500);
 	TH2D * source_tracks_clone = fh_source_tracks->Clone();
+	source_tracks_clone->SetStats(false);
 	Int_t nBinsX = source_tracks_clone->GetNbinsX();
 	Int_t nBinsY = source_tracks_clone->GetNbinsY();
 	for (Int_t x = 1; x <= nBinsX; x++){
@@ -1213,38 +1254,34 @@ void draw_analysis(){
 			source_tracks_clone->SetBinContent(x,y,val);
 		}
 	}
-	Int_t nx = 4;
-	char* xLabels[4] = {"reco", "chiPrim", "el id", "gammacut"};
-	for (Int_t x = 1; x <= nx; x++){
-	   source_tracks_clone->GetXaxis()->SetBinLabel(x,xLabels[x-1]);
-	}
+	source_tracks_clone->GetXaxis()->SetLabelSize(0.06);
+	source_tracks_clone->GetYaxis()->SetLabelSize(0.06);
    Int_t ny = 6;
-   char* yLabels[6] = {"gamma", "pi0", "pions", "protons", "kaons", "other"};
+   char* yLabels[6] = {"#gamma", "#pi^{0}", "#pi^{#pm}", "p", "K", "oth"};
    for (Int_t y = 1; y <= ny; y++){
       source_tracks_clone->GetYaxis()->SetBinLabel(y,yLabels[y-1]);
    }
 	source_tracks_clone->SetMarkerColor(0);
+	source_tracks_clone->SetMarkerSize(2.2);
 	source_tracks_clone->Draw("text COLZ");
 
-//MINV vs. PT
+   Int_t nx = 7;
+   fh_nof_bg_tracks->GetXaxis()->SetLabelSize(0.06);
+   fh_nof_el_tracks->GetXaxis()->SetLabelSize(0.06);
+   purity->GetXaxis()->SetLabelSize(0.06);
+   source_tracks_clone->GetXaxis()->SetLabelSize(0.06);
+   char* xLabels[7] = {"rec", "#chi^{2}_{prim}", "ID", "m_{#gamma}", "ST", "TT", "P_{t}"};
+   for (Int_t i = 1; i <= nx; i++){
+      fh_nof_bg_tracks->GetXaxis()->SetBinLabel(i,xLabels[i-1]);
+      fh_nof_el_tracks->GetXaxis()->SetBinLabel(i,xLabels[i-1]);
+      purity->GetXaxis()->SetBinLabel(i,xLabels[i-1]);
+      source_tracks_clone->GetXaxis()->SetBinLabel(i,xLabels[i-1]);
+   }
+
+
+   //MINV vs. PT
 	TCanvas *c19 = new TCanvas("c19-minv-pt", "c19-minv-pt",500, 500);
 	fh_ttcut_signal_minv_pt->Draw("COLZ");
-
-//DSTS 2 CUT
-	if (fUseMvd) {
-      TCanvas *c20 = new TCanvas("c20-dsts-2MVD", "c20-dsts-2MVD", 1200, 800);
-      c20->Divide(3,2);
-      c20->cd(1);
-      fh_dsts2_signal->Draw("COLZ");
-      c20->cd(2);
-      fh_dsts2_bg->Draw("COLZ");
-      c20->cd(3);
-      fh_dsts2_gamma->Draw("COLZ");
-      c20->cd(4);
-      fh_dsts2_pi0->Draw("COLZ");
-      c20->cd(5);
-      fh_dsts2_eta->Draw("COLZ");
-	}
 
 	TCanvas *c21 = new TCanvas("c21-bg-sources-vs-mom","c21-bg-sources-vs-mom",1200, 800);
 	c21->Divide(3,2);
@@ -1291,5 +1328,4 @@ void draw_analysis(){
 	fh_prob_mom_bg->SetLineColor(kBlue);
 	fh_prob_mom_signal->Draw();
 	fh_prob_mom_bg->Draw("same");
-
 }

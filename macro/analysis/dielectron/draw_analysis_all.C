@@ -22,6 +22,8 @@ TH1D* bg_stcut;
 TH1D* bg_ttcut;
 TH1D* bg_ptcut;
 
+Double_t lineW = 5.;
+
 void scaleAllHistogramms(TFile* file, Int_t nofEvents)
 {
     cout << "Scale all histogramms:" << endl;
@@ -176,8 +178,8 @@ void calc_cut_eff(Double_t min, Double_t max)
     char txt2[100];
     sprintf(txt2,"cut_eff_%.2f_%.2f",min,max);
     TCanvas* can = new TCanvas(txt2, txt2, 158,28,500,500);
-    grS->SetLineWidth(3.);
-    grBg->SetLineWidth(3.);
+    grS->SetLineWidth(lineW);
+    grBg->SetLineWidth(lineW);
     grS->SetLineColor(kRed);
     grBg->SetLineColor(kBlue);
     grBg->SetMinimum(1);
@@ -206,16 +208,16 @@ TH1D* calc_s_bg(Double_t min, Double_t max)
    Int_t bin1 = sAll_el_id->FindBin(min);
    Int_t bin2 = sAll_el_id->FindBin(max);
    Int_t n = 7;
-   Double_t y[7] = {100. *(bg_el_id->Integral(bin1, bin2) / sAll_el_id->Integral(bin1, bin2)),
-                   100. *(bg_gammacut->Integral(bin1, bin2) / sAll_gammacut->Integral(bin1, bin2)),
-                   100. *(bg_dstscut->Integral(bin1, bin2) / sAll_dstscut->Integral(bin1, bin2)),
-                   100. *(bg_dsts2cut->Integral(bin1, bin2) / sAll_dsts2cut->Integral(bin1, bin2)),
-                   100. *(bg_stcut->Integral(bin1, bin2) / sAll_stcut->Integral(bin1, bin2)),
-                   100. *(bg_ttcut->Integral(bin1, bin2) / sAll_ttcut->Integral(bin1, bin2)),
-                   100. *(bg_ptcut->Integral(bin1, bin2) / sAll_ptcut->Integral(bin1, bin2))
+   Double_t y[7] = {(sAll_el_id->Integral(bin1, bin2)/bg_el_id->Integral(bin1, bin2) ),
+                   (sAll_gammacut->Integral(bin1, bin2)/bg_gammacut->Integral(bin1, bin2) ),
+                   (sAll_dstscut->Integral(bin1, bin2)/bg_dstscut->Integral(bin1, bin2) ),
+                   (sAll_dsts2cut->Integral(bin1, bin2)/bg_dsts2cut->Integral(bin1, bin2) ),
+                   (sAll_stcut->Integral(bin1, bin2)/bg_stcut->Integral(bin1, bin2) ),
+                   (sAll_ttcut->Integral(bin1, bin2)/bg_ttcut->Integral(bin1, bin2) ),
+                   (sAll_ptcut->Integral(bin1, bin2)/bg_ptcut->Integral(bin1, bin2) )
                    };
 
-   TH1D* gr_s_bg = new TH1D("gr_s_bg", "gr_s_bg;cuts;(S/BG)^{-1}", n, 0, n);
+   TH1D* gr_s_bg = new TH1D("gr_s_bg", "gr_s_bg;cuts;S/BG", n, 0, n);
    char* yLabels[7] = {"ID", "m_{#gamma}", "dsts", "dsts2", "ST", "TT", "P_{t}"};
    gr_s_bg->GetXaxis()->SetLabelSize(0.06);
    for (Int_t i = 1; i <= n; i++){
@@ -232,14 +234,14 @@ void draw_s_bg()
    TH1D* h_06_12 = calc_s_bg(0.6, 1.2);
 
    TCanvas* can = new TCanvas("s_bg_regions", "s_bg_regions", 500, 500);
-   h_00_02->SetLineWidth(3.);
-   h_02_06->SetLineWidth(3.);
-   h_06_12->SetLineWidth(3.);
+   h_00_02->SetLineWidth(lineW);
+   h_02_06->SetLineWidth(lineW);
+   h_06_12->SetLineWidth(lineW);
    h_00_02->SetLineColor(kRed);
    h_02_06->SetLineColor(kBlue);
    h_06_12->SetLineColor(kBlack);
-   h_00_02->SetMinimum(200);
-   h_00_02->SetMaximum(2e5);
+   h_00_02->SetMinimum(1e-3);
+   h_00_02->SetMaximum(2);
    h_00_02->Draw("");
    h_02_06->Draw("same");
    h_06_12->Draw("same");
@@ -258,13 +260,13 @@ void draw_s_bg()
 void draw_s_bg_signals()
 {
     Int_t n = 7;
-    Double_t y_rho0[7] = { 1081, 970, 943, 870, 799, 725, 587};
-    Double_t y_omega[7] = { 45.7, 41.4, 40, 39, 35.7,33.0, 30.4 };
-    Double_t y_phi[7] = {134, 122,120,118.7,110.3,101,96 };
+    Double_t y_rho0[7] = { 1./246., 1./207., 1./201., 1./187., 1./156., 1./134., 1./111.};
+    Double_t y_omega[7] = { 0.151, 0.181, 0.191, 0.190, 0.232,0.256, 0.294 };
+    Double_t y_phi[7] = {0.112, 0.111,0.110, 0.112,0.154,0.180,0.178 };
 
-    TH1D* gr_s_bg_rho0 = new TH1D("gr_s_bg_rho0", "gr_s_bg;cuts;(S/BG)^{-1}", n, 0, n);
-    TH1D* gr_s_bg_omega = new TH1D("gr_s_bg_omega", "gr_s_bg;cuts;(S/BG)^{-1}", n, 0, n);
-    TH1D* gr_s_bg_phi = new TH1D("gr_s_bg_phi", "gr_s_bg;cuts;(S/BG)^{-1}", n, 0, n);
+    TH1D* gr_s_bg_rho0 = new TH1D("gr_s_bg_rho0", "gr_s_bg;cuts;S/BG", n, 0, n);
+    TH1D* gr_s_bg_omega = new TH1D("gr_s_bg_omega", "gr_s_bg;cuts;S/BG", n, 0, n);
+    TH1D* gr_s_bg_phi = new TH1D("gr_s_bg_phi", "gr_s_bg;cuts;S/BG", n, 0, n);
 
     char* yLabels[7] = {"ID", "m_{#gamma}", "dsts", "dsts2", "ST", "TT", "P_{t}"};
     gr_s_bg_rho0->GetXaxis()->SetLabelSize(0.06);
@@ -276,14 +278,14 @@ void draw_s_bg_signals()
     }
 
     TCanvas* can = new TCanvas("s_bg_signals", "s_bg_signals", 500, 500);
-    gr_s_bg_rho0->SetLineWidth(3.);
-    gr_s_bg_omega->SetLineWidth(3.);
-    gr_s_bg_phi->SetLineWidth(3.);
+    gr_s_bg_rho0->SetLineWidth(lineW);
+    gr_s_bg_omega->SetLineWidth(lineW);
+    gr_s_bg_phi->SetLineWidth(lineW);
     gr_s_bg_rho0->SetLineColor(kRed);
     gr_s_bg_omega->SetLineColor(kBlue);
     gr_s_bg_phi->SetLineColor(kBlack);
-    gr_s_bg_rho0->SetMinimum(9);
-    gr_s_bg_rho0->SetMaximum(2100);
+    gr_s_bg_rho0->SetMinimum(0.002);
+    gr_s_bg_rho0->SetMaximum(1.);
     gr_s_bg_rho0->Draw("");
     gr_s_bg_omega->Draw("same");
     gr_s_bg_phi->Draw("same");
@@ -299,7 +301,6 @@ void draw_s_bg_signals()
     leg->Draw();
 }
 
-
 void draw_analysis_all()
 {
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -308,10 +309,10 @@ void draw_analysis_all()
    gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
    cbmlibs();
 
-   TString fnRho0 = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/analysis.all.root";
-   TString fnOmega = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/omega/analysis.all.root";
-   TString fnPhi = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/phi/analysis.all.root";
-   TString fnOmegaD = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/omegadalitz/analysis.all.root";
+   TString fnRho0 = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/rho0/analysis.delta.all.root";
+   TString fnOmega = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omega/analysis.delta.all.root";
+   TString fnPhi = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/phi/analysis.delta.all.root";
+   TString fnOmegaD = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omegadalitz/analysis.delta.all.root";
 
    TFile *fileRho0 = new TFile(fnRho0);
    Int_t nofEvents = fh_event_number->GetEntries();

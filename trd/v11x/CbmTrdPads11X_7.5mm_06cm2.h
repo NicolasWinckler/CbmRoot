@@ -7,8 +7,8 @@
 // v1.7 - 20110914 DE - v11x - 7.5 mm pad width - 4 cm2
 // v1.6 - 20110914 DE - v11x - 7.5 mm pad width - 3 cm2
 // v1.5 - 20110914 DE - v11x - 7.5 mm pad width - 2 cm2
-// v1.4 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 7.5 mm pad width
-// v1.3 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 5.0 mm pad width
+// v1.4 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 7.5 mm pad width - 1 cm2
+// v1.3 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 5.0 mm pad width - 1 cm2
 // v1.2 - 20110524 DE - adapted to v11X (May11) with 24 TRD in the inner zone
 // v1.1 - 20110523 DE - 5x20 mm2 sized pads almost everywhere, tracking test
 // v1.0 - 20100708 DE - reduce pad size in trd1mod1-2 to 20/30 from 30/35 
@@ -28,70 +28,70 @@
 #ifndef CBMTRDPADS_H
 #define CBMTRDPADS_H
 
-// v1.4
+// v1.8
   Int_t fst1_sect_count = 3;
   Float_t fst1_pad_type[6][3][4] =   // array of pad sizes in station 1
     { { { 57., 24., .75,  8.0 }, 
         { 57.,  9., .75,  9.0 }, 
         { 57., 24., .75,  8.0 } },     
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //  3 x  80 mm +  1 x  90 mm +  3 x  80 mm,   76 *  7 =  532 pads
       { { 57., 24., .75,  8.0 },  
         { 57.,  9., .75,  9.0 },  
         { 57., 24., .75,  8.0 } },
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 57., 24., .75,  8.0 },  
         { 57.,  9., .75,  9.0 },  
         { 57., 24., .75,  8.0 } },
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 57., 24., .75,  8.0 },  
         { 57.,  9., .75,  9.0 },  
         { 57., 24., .75,  8.0 } },
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 } },
-        // 20 x  15 mm + 24 x  15 mm + 20 x  15 mm,  128 * 64 = 8192 pads
+        //  4 x  80 mm +  4 x  80 mm +  4 x  80 mm,  128 * 12 =  768 pads
       { { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 } } };
-        // 20 x  15 mm + 24 x  15 mm + 20 x  15 mm,  128 * 64 = 8192 pads
+        //
 
   Int_t fst2_sect_count = 3;
   Float_t fst2_pad_type[6][3][4] =   // array of pad sizes in station 2
     { { { 57., 24., .75,  8.0 }, 
         { 57.,  9., .75,  9.0 }, 
         { 57., 24., .75,  8.0 } },     
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 57., 24., .75,  8.0 },  
         { 57.,  9., .75,  9.0 },  
         { 57., 24., .75,  8.0 } },
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 57., 24., .75,  8.0 },  
         { 57.,  9., .75,  9.0 },  
         { 57., 24., .75,  8.0 } },
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 57., 24., .75,  8.0 },  
         { 57.,  9., .75,  9.0 },  
         { 57., 24., .75,  8.0 } },
-        // 16 x  15 mm +  6 x  15 mm + 16 x  15 mm,   76 * 38 = 2888 pads
+        //
       { { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 } },
-        // 20 x  15 mm + 24 x  15 mm + 20 x  15 mm,  128 * 64 = 8192 pads
+        //
       { { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 } } };
-        // 20 x  15 mm + 24 x  15 mm + 20 x  15 mm,  128 * 64 = 8192 pads
+        //
 
   Int_t fst3_sect_count = 3;
   Float_t fst3_pad_type[2][3][4] =   // array of pad sizes in station 3
     { { { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 } },
-        // 20 x  15 mm + 24 x  15 mm + 20 x  15 mm,  128 * 64 = 8192 pads
+        //
       { { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 },  
         { 96., 32., .75,  8.0 } } };
-        // 20 x  15 mm + 24 x  15 mm + 20 x  15 mm,  128 * 64 = 8192 pads
+        //
 
 #endif

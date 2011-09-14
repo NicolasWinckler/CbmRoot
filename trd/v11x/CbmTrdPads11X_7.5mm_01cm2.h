@@ -3,8 +3,8 @@
 // -----               Created 03/12/2009 by D. Emschermann            -----
 // -------------------------------------------------------------------------
 //
-// v1.4 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 7.5 mm pad width
-// v1.3 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 5.0 mm pad width
+// v1.4 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 7.5 mm pad width - 1 cm2
+// v1.3 - 20110616 DE - adapted to v11X with variable frame size - 570 mm and 960 mm - 5.0 mm pad width - 1 cm2
 // v1.2 - 20110524 DE - adapted to v11X (May11) with 24 TRD in the inner zone
 // v1.1 - 20110523 DE - 5x20 mm2 sized pads almost everywhere, tracking test
 // v1.0 - 20100708 DE - reduce pad size in trd1mod1-2 to 20/30 from 30/35 

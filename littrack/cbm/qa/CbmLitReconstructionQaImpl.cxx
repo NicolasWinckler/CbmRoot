@@ -299,6 +299,7 @@ CbmLitReconstructionQaImpl::CbmLitReconstructionQaImpl():
    fhStsRichTrdTofDetAccEl(),
    fhStsTrdTofDetAccEl(),
 
+   fhMCMomVsAngle(),
 
    fhEventNo(NULL),
 
@@ -888,6 +889,8 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
 
       if (isPrimElectron) FillMcHistoForDetAcc(mcTrack->GetP());
 
+
+
       // Check accepted tracks cutting on minimal number of MC points
       // acceptance: STS tracks only
       if (isStsOk) {
@@ -899,6 +902,8 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsAngle, angle);
 
          if (isPrimElectron) fhStsDetAccEl[kDetAccAcc]->Fill(mcTrack->GetP());
+
+         FillMCMomVsAngle(mcTrack);
       }
       // acceptance: STS+TRD(MUCH)
       if (isStsOk && isRecOk) {
@@ -1234,6 +1239,29 @@ void CbmLitReconstructionQaImpl::StsTracksQa()
       Double_t dpp = 100. * (momMC.Mag() - momRec.Mag()) / momMC.Mag();
       fhStsMomresVsMom->Fill(momMC.Mag(), dpp);
    }
+}
+
+void CbmLitReconstructionQaImpl::FillMCMomVsAngle(
+      const CbmMCTrack* mcTrack)
+{
+   // Get MC track properties (vertex, momentum, primary/secondary, pdg, etc...)
+   TVector3 vertex;
+   mcTrack->GetStartVertex(vertex);
+   Bool_t isPrim = mcTrack->GetMotherId() == -1;
+   Double_t p = mcTrack->GetP();
+   Bool_t isRef = isPrim && p > fRefMomentum;
+   Bool_t isMuon = std::abs(mcTrack->GetPdgCode()) == 13;
+   Bool_t isElectron = std::abs(mcTrack->GetPdgCode()) == 11;
+   TVector3 mom;
+   mcTrack->GetMomentum(mom);
+   Double_t angle = std::abs(mom.Theta() * 180 / TMath::Pi());
+
+   fhMCMomVsAngle[kAll]->Fill(p, angle);
+   if (isPrim) { fhMCMomVsAngle[kPrim]->Fill(p, angle); }
+   if (isRef) { fhMCMomVsAngle[kRef]->Fill(p, angle); }
+   if (!isPrim) { fhMCMomVsAngle[kSec]->Fill(p, angle); }
+   if (isPrim && isMuon) { fhMCMomVsAngle[kMu]->Fill(p, angle); }
+   if (isPrim && isElectron) { fhMCMomVsAngle[kEl]->Fill(p, angle); }
 }
 
 void CbmLitReconstructionQaImpl::CreateEffHisto(
@@ -1574,6 +1602,21 @@ void CbmLitReconstructionQaImpl::CreateHistos(
    fHistoList->Add(fhStsChiprim);
    fHistoList->Add(fhStsMomresVsMom);
 
+   // MC momentum vs. polar angle histograms
+   fhMCMomVsAngle.resize(fNofCategories);
+   std::string cat[fNofCategories];
+   cat[kAll] = "All"; cat[kRef] = "Ref"; cat[kPrim] = "Prim";
+   cat[kSec] = "Sec"; cat[kMu] = "Muon"; cat[kEl] = "Electron";
+   for (Int_t i = 0; i < fNofCategories; i++) {
+      std::string histName = "hMCMomVsAngle" + cat[i];
+      if (file == NULL){
+         fhMCMomVsAngle[i] = new TH2F(histName.c_str(), histName.c_str(), fNofBinsMom, fMinMom, fMaxMom, 10, 0., 35.);
+      } else {
+         fhMCMomVsAngle[i] = (TH2F*)file->Get(histName.c_str());
+      }
+      fHistoList->Add(fhMCMomVsAngle[i]);
+   }
+
    // Histogram stores number of events
    if (file == NULL){
 	   fhEventNo = new TH1F("hEventNo","hEventNo", 1, 0, 1.);
@@ -1596,6 +1639,8 @@ void CbmLitReconstructionQaImpl::DivideHistos(
 
 void CbmLitReconstructionQaImpl::CalculateEfficiencyHistos()
 {
+   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
+
    // Divide histograms for efficiency calculation
    for (Int_t i = 0; i < fNofCategories; i++) {
       DivideHistos(fhStsMom[i][kRec], fhStsMom[i][kAcc], fhStsMom[i][kEff], 100.);
@@ -1625,6 +1670,8 @@ void CbmLitReconstructionQaImpl::CalculateEfficiencyHistos()
       DivideHistos(fhStsRichMomNormStsRichTrdTof[i][kRec], fhStsRichMomNormStsRichTrdTof[i][kAcc], fhStsRichMomNormStsRichTrdTof[i][kEff], 100.);
       DivideHistos(fhStsRichTrdMomNormStsRichTrdTof[i][kRec], fhStsRichTrdMomNormStsRichTrdTof[i][kAcc], fhStsRichTrdMomNormStsRichTrdTof[i][kEff], 100.);
       DivideHistos(fhStsRichTrdTofMom[i][kRec], fhStsRichTrdTofMom[i][kAcc], fhStsRichTrdTofMom[i][kEff], 100.);
+
+      fhMCMomVsAngle[i]->Scale(1./nofEvents);
    }
 
    for (Int_t i = 0; i < 2; i++) {
@@ -1658,7 +1705,6 @@ void CbmLitReconstructionQaImpl::CalculateEfficiencyHistos()
    DivideHistos(fhStsRichTrdTofDetAccEl[kDetAccAcc], fhStsRichTrdTofDetAccEl[kDetAccMc], fhStsRichTrdTofDetAccEl[kDetAccEff], 100.);
    DivideHistos(fhStsTrdTofDetAccEl[kDetAccAcc], fhStsTrdTofDetAccEl[kDetAccMc], fhStsTrdTofDetAccEl[kDetAccEff], 100.);
 
-   Double_t nofEvents = (Double_t)fhEventNo->GetEntries();
    fhMvdNofHitsInStation->Scale(1./nofEvents);
    fhStsNofHitsInStation->Scale(1./nofEvents);
    fhTrdNofHitsInStation->Scale(1./nofEvents);
@@ -2119,6 +2165,7 @@ void CbmLitReconstructionQaImpl::Draw()
    DrawHitsStationHistos();
    DrawStsTracksQaHistos();
    DrawMcEfficiencyGraph();
+   DrawMCMomVsAngle();
 
    boost::property_tree::ptree qa = PrintPTree();
 
@@ -2467,6 +2514,24 @@ void CbmLitReconstructionQaImpl::DrawStsTracksQaHistos()
    lit::SaveCanvasAsImage(canvas1, fOutputDir);
 }
 
+void CbmLitReconstructionQaImpl::DrawMCMomVsAngle()
+{
+   TCanvas* canvas1 = new TCanvas("rec_qa_mc_mom_vs_angle", "rec_qa_mc_mom_vs_angle", 1200, 600);
+   canvas1->Divide(2,1);
+   canvas1->cd(1);
+   DrawHist2D(fhMCMomVsAngle[kAll], "Momentum [GeV/c]", "Polar angle [grad]", "Tracks per event",
+         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   canvas1->cd(2);
+   DrawHist2D(fhMCMomVsAngle[kEl], "Momentum [GeV/c]", "Polar angle [grad]", "Tracks per event",
+         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   lit::SaveCanvasAsImage(canvas1, fOutputDir);
+}
 void CbmLitReconstructionQaImpl::DrawHistosFromFile(const std::string& fileName)
 {
 	TFile* file = new TFile(fileName.c_str());

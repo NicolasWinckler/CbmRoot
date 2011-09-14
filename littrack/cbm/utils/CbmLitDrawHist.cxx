@@ -3,7 +3,8 @@
  * @since 2008
  **/
 #include "CbmLitDrawHist.h"
-#include "std/utils/CbmLitUtils.h"
+//#include "std/utils/CbmLitUtils.h"
+#include "../../std/utils/CbmLitUtils.h"
 
 #include "TH1.h"
 #include "TH2.h"

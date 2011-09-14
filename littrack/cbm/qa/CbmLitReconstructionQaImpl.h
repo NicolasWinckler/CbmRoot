@@ -231,6 +231,10 @@ private:
    /* Fills the histograms: momentum resolution vs. momentum and chi2Vertex.*/
    void StsTracksQa();
 
+   /* Fill MC momentum vs polar angle histogram */
+   void FillMCMomVsAngle(
+         const CbmMCTrack* mcTrack);
+
    /* Creates histograms - hist using specified parameters.
    * @param hist 2D vector of the histograms
    * @param name Histogram name
@@ -409,6 +413,8 @@ private:
 
    /* Draws histograms of Sts tracks Qa */
    void DrawStsTracksQaHistos();
+
+   void DrawMCMomVsAngle();
 
    /* Calculate electron Identification */
    void ElectronIdentification();
@@ -641,6 +647,11 @@ private:
    std::vector<TH1F*> fhStsRichTrdDetAccEl; // STS-RICH-TOF detector acceptance
    std::vector<TH1F*> fhStsRichTrdTofDetAccEl; // STS-RICH-TRD-TOF detector acceptance
    std::vector<TH1F*> fhStsTrdTofDetAccEl; // STS-TRD-TOF detector acceptance
+
+   // MC mom vs polar angle at vertex
+   // [track category]
+   // track category (all, ref, prim, sec, muon, electron)
+   std::vector<TH2F*> fhMCMomVsAngle;
 
    TH1F* fhEventNo; // Event counter
 

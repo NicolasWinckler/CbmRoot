@@ -143,7 +143,8 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
   Bool_t Fast = false;
-  fDraw = false;
+  //  fDraw = false;
+  fDraw = true;
   //Bool_t Fast = true;
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
@@ -259,8 +260,8 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       Topview[1]->Reset();
       Topview[2]->Reset();
 
-      sprintf(Canfile1,"Pics/HitPerPadFrontView_S%d_L%d.png",fStation,fLayer);
-      sprintf(Canfile2,"Pics/HitPerPadSpectra_S%d_L%d.png",fStation,fLayer);
+      sprintf(Canfile1,"pics/HitPerPadFrontView_S%d_L%d.png",fStation,fLayer);
+      sprintf(Canfile2,"pics/HitPerPadSpectra_S%d_L%d.png",fStation,fLayer);
 
       HistoInit(c1, c2,  Layer, HitPad, Canfile1, Canfile2, ZRangeL, ZRangeU, mm2bin);
       if(fDraw)
@@ -285,7 +286,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 	Outimage1->WriteImage(Canfile1);
       }
       /*
-	sprintf(Canfile1,"Pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+	sprintf(Canfile1,"pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
 	c1->cd(1)->Print(Canfile1);
       */
       delete Layer;
@@ -299,7 +300,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 	Outimage2->WriteImage(Canfile2);
       }
       /*
-	sprintf(Canfile2,"Pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+	sprintf(Canfile2,"pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
 	c2->cd(1)->Print(Canfile2);
       */
       delete HitPad;
@@ -336,8 +337,8 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   sprintf(name,"S%d_L%d",fStation,fLayer);
   sprintf(title,"Station %d, Layer %d",fStation,fLayer);
   cout << title << endl;
-  //sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  //sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
+  //sprintf(Canfile1,"pics/Station%dLayer%d.png",fStation,fLayer);
+  //sprintf(Canfile2,"pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
   Layer = new TH2F(name,title,int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");

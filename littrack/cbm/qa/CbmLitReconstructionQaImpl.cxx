@@ -2502,15 +2502,20 @@ void CbmLitReconstructionQaImpl::DrawStsTracksQaHistos()
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
-   canvas1->cd(3);
-   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter",
-         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
-   gPad->SetGridx(true);
-   gPad->SetGridy(true);
+//   canvas1->cd(3);
+//   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter",
+//         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
+//   gPad->SetGridx(true);
+//   gPad->SetGridy(true);
 
-//   DrawHist1D(fhStsMomresVsMom->ProfileX(), "dP [%]", "Counter",
-//            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-//            LIT_MARKER_STYLE1, false, false, "same");
+   canvas1->cd(3);
+   fhStsMomresVsMom->FitSlicesY();
+   TH1* momslice = (TH1*) gDirectory->Get("fhStsMomresVsMom_2");
+   momslice->Rebin(2);
+   momslice->Scale(1./2.);
+   DrawHist1D(momslice, "dP [%]", "Counter",
+            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+            LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "");
    lit::SaveCanvasAsImage(canvas1, fOutputDir);
 }
 

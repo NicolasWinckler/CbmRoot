@@ -1856,7 +1856,7 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
    }
    if (fIsSts && fIsRich && fIsTrd && fIsTof){
       EventDetAccElStatisticsToPTree(&pt, "hStsRichTrdTofDetAccEl", fhStsRichTrdTofDetAccEl[kDetAccMc],
-         fhStsRichTrdDetAccEl[kDetAccAcc], fhStsRichTrdTofMom[kRichEl][kRec]);
+         fhStsRichTrdTofDetAccEl[kDetAccAcc], fhStsRichTrdTofMom[kRichEl][kRec]);
    }
    if (fIsSts && fIsTrd && fIsTof){
       EventDetAccElStatisticsToPTree(&pt, "hStsTrdTofDetAccEl", fhStsTrdTofDetAccEl[kDetAccMc],
@@ -2309,6 +2309,18 @@ void CbmLitReconstructionQaImpl::DrawEfficiency(
 	if (hist3) hname3 = name3 + "(" + lit::NumberToString<Double_t>(eff3, 1) + ")";
 	if (hist4) hname4 = name4 + "(" + lit::NumberToString<Double_t>(eff4, 1) + ")";
 
+/*	Double_t nrebin = 10.;
+	if (hist1 != NULL) (*hist1)[kEff]->Rebin(nrebin);
+	if (hist2 != NULL) (*hist2)[kEff]->Rebin(nrebin);
+	if (hist3 != NULL) (*hist3)[kEff]->Rebin(nrebin);
+	if (hist4 != NULL) (*hist4)[kEff]->Rebin(nrebin);
+
+	if (hist1 != NULL) (*hist1)[kEff]->Scale(1./nrebin);
+	if (hist2 != NULL) (*hist2)[kEff]->Scale(1./nrebin);
+	if (hist3 != NULL) (*hist3)[kEff]->Scale(1./nrebin);
+	if (hist4 != NULL) (*hist4)[kEff]->Scale(1./nrebin);
+*/
+
 	std::string yTitle = "Efficiency [%]";
 	if (opt != "pisupp"){
 	   (*hist1)[kEff]->SetMinimum(0.);
@@ -2484,8 +2496,8 @@ void CbmLitReconstructionQaImpl::DrawHitsStationHistos()
 
 void CbmLitReconstructionQaImpl::DrawStsTracksQaHistos()
 {
-   TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa", "rec_qa_sts_tracks_qa", 1200, 400);
-   canvas1->Divide(3,1);
+   TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa", "rec_qa_sts_tracks_qa", 900, 900);
+   canvas1->Divide(2,2);
    canvas1->cd(1);
    fhStsChiprim->Scale(1./fhStsChiprim->Integral());
    DrawHist1D(fhStsChiprim, "#chi^{2}_{vertex}", "Yield",
@@ -2511,12 +2523,30 @@ void CbmLitReconstructionQaImpl::DrawStsTracksQaHistos()
    canvas1->cd(3);
    fhStsMomresVsMom->FitSlicesY();
    TH1* momslice = (TH1*) gDirectory->Get("fhStsMomresVsMom_2");
-   momslice->Rebin(2);
-   momslice->Scale(1./2.);
-   DrawHist1D(momslice, "dP [%]", "Counter",
+   //momslice->Rebin(2);
+   //momslice->Scale(1./2.);
+   DrawHist1D(momslice, "P [GeV/c]", "dP/P, #sigma [%]",
             kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
             LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
    lit::SaveCanvasAsImage(canvas1, fOutputDir);
+
+   canvas1->cd(4);
+   Int_t nBins = fhStsMomresVsMom->GetNbinsX();
+   TH1D* momResRms = (TH1D*)fhStsMomresVsMom->ProjectionX()->Clone();
+   for (Int_t i = 1; i < nBins; i++){
+      TH1* projY = (TH1*)fhStsMomresVsMom->ProjectionY("_py", i, i);
+      Double_t rms = projY->GetRMS();
+      momResRms->SetBinContent(i, rms);
+      momResRms->SetBinError(i, momslice->GetBinError(i));
+   }
+   DrawHist1D(momResRms, "P [GeV/c]", "dP/P, RMS [%]",
+            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+            LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "P");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
 }
 
 void CbmLitReconstructionQaImpl::DrawMCMomVsAngle()
@@ -2546,5 +2576,5 @@ void CbmLitReconstructionQaImpl::DrawHistosFromFile(const std::string& fileName)
 	//WriteToFile();
    boost::property_tree::ptree pt = PrintPTree();
    CbmLitQaPrintGenerator::PrintFinalStatistics(std::cout, &pt);
-	//Draw();
+	Draw();
 }

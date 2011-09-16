@@ -22,6 +22,9 @@
 #include "CbmTofPoint.h"
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
+#include "FairRuntimeDb.h"
+#include "FairRunAna.h"
+#include "FairGeoNode.h"
 #include "CbmDetectorList.h"
 #include "CbmHit.h"
 #include "CbmStsTrack.h"
@@ -35,6 +38,7 @@
 #include "CbmStsDetectorId.h"
 #include "CbmTrdDetectorId.h"
 #include "CbmMuchGeoScheme.h"
+#include "CbmGeoStsPar.h"
 #include "CbmStsPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmMuchPoint.h"
@@ -584,6 +588,21 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
    fNofTrdStationsMap.clear();
    fNofMuchStationsMap.clear();
 
+   // STS
+   FairRunAna* run = FairRunAna::Instance();
+   FairRuntimeDb* runDb = run->GetRuntimeDb();
+   CbmGeoStsPar* stsGeoPar = (CbmGeoStsPar*) runDb->getContainer("CbmGeoStsPar");
+   TObjArray* stsNodes = stsGeoPar->GetGeoSensitiveNodes();
+   Int_t nofStsStations = stsNodes->GetEntries();
+   std::map<Int_t, Int_t> stsStationNrFromMcId;
+   for (Int_t ist = 0; ist < nofStsStations; ist++) {
+     FairGeoNode* stsNode = (FairGeoNode*) stsNodes->At(ist);
+     std::string stsNodeName(stsNode->GetName());
+     std::string stsStationNr = stsNodeName.substr(10, 2); //stsNodeName[10] + stsNodeName[11];
+     int stationNr = atoi(stsStationNr.c_str());
+     stsStationNrFromMcId[stsNode->getMCid()] = stationNr;
+   }
+
    // std::map<MC track index, set with station numbers>
    std::map<Int_t, std::set<Int_t> > stsStations;
    CbmStsDetectorId stsDetectorId;
@@ -591,7 +610,7 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
    for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
       CbmStsPoint* point = static_cast<CbmStsPoint*>(fStsPoints->At(iPoint));
       Int_t mcTrackId = point->GetTrackID();
-      Int_t stationId = stsDetectorId.StationNr(point->GetDetectorID());
+      Int_t stationId = stsStationNrFromMcId[point->GetDetectorID()];//stsDetectorId.StationNr(point->GetDetectorID());
 //      std::cout << stationId << " ";
       stsStations[mcTrackId].insert(stationId);
    }
@@ -609,7 +628,9 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
            it != stsStations.end(); it++) {
       fNofStsStationsMap[(*it).first] = (*it).second.size();
    }
+   // end STS
 
+   // MUCH
    if (fIsMuch) {
       // std::map<MC track index, set with station numbers>
       std::map<Int_t, std::set<Int_t> > muchStations;
@@ -636,7 +657,9 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
          fNofMuchStationsMap[(*it).first] = (*it).second.size();
       }
    }
+   // end MUCH
 
+   // TRD
    if (fIsTrd) {
       // std::map<MC track index, set with station numbers>
       std::map<Int_t, std::set<Int_t> > trdStations;
@@ -664,6 +687,7 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
          fNofTrdStationsMap[(*it).first] = (*it).second.size();
       }
    }
+   // end TRD
 }
 
 void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
@@ -960,7 +984,7 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
       if (mcTrack == NULL) { continue; }
 
       // Check accepted tracks cutting on minimal number of MC points
-      Int_t nofPointsSts = mcTrack->GetNPoints(kSTS);
+      Int_t nofPointsSts = fNofStsStationsMap[iMCTrack];//mcTrack->GetNPoints(kSTS);
       Int_t nofPointsTrd = fNofTrdStationsMap[iMCTrack];//mcTrack->GetNPoints(kTRD);
       Int_t nofPointsMuch = fNofMuchStationsMap[iMCTrack];//mcTrack->GetNPoints(kMUCH);
       Int_t nofPointsTof = mcTrack->GetNPoints(kTOF);

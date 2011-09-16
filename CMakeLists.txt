@@ -90,6 +90,15 @@ else(CBMROOT_MINIMAL)
   Unset(Boost_INCLUDE_DIR CACHE)
   Unset(Boost_LIBRARY_DIRS CACHE)
   find_package(Boost 1.41)
+  If (Boost_FOUND)
+    Set(Boost_Avail 1)
+  Else (Boost_FOUND)
+    Set(Boost_Avail 0)
+  EndIf (Boost_FOUND)
+
+
+
+
 endif(CBMROOT_MINIMAL)
 
 
@@ -154,7 +163,7 @@ add_subdirectory (much)
 #add_subdirectory (much_feb07)
 #add_subdirectory (lhetrack) 
 add_subdirectory (littrack) 
-add_subdirectory (htrack)
+#add_subdirectory (htrack)
 add_subdirectory (global) 
 add_subdirectory (KF)
 add_subdirectory (L1)

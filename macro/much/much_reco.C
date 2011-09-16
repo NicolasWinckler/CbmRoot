@@ -12,7 +12,8 @@
 
 void much_reco(
 		Int_t nEvents = 100, // number of events
-		TString opt = "all") // if opt == "all" STS + hit producers + global tracking are executed
+		TString opt = "all")
+//, Bool_t boost) // if opt == "all" STS + hit producers + global tracking are executed
                              // if opt == "hits" STS + hit producers are executed
                              // if opt == "tracking" global tracking is executed
 {
@@ -220,19 +221,27 @@ void much_reco(
                 // ------------------------------------------------------------------------
 
 		// -----   Track finding QA check   ------------------------------------
-		CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-		reconstructionQa->SetMinNofPointsSts(4);
-		reconstructionQa->SetMinNofPointsTrd(10);
-		reconstructionQa->SetMinNofPointsMuch(11);
-		reconstructionQa->SetMinNofPointsTof(1);
-		reconstructionQa->SetQuota(0.7);
-		reconstructionQa->SetMinNofHitsTrd(9);
-		reconstructionQa->SetMinNofHitsMuch(11);
-		reconstructionQa->SetVerbose(1);
-		reconstructionQa->SetMomentumRange(0., 25);
-		reconstructionQa->SetNofBinsMom(25);
-		reconstructionQa->SetOutputDir(std::string(imageDir));
-		run->AddTask(reconstructionQa);
+                // Execute the task only if BOOST is available, otherwise
+                // the macro will crash.
+                // The ENV variable is set in the cmake generated test scripts. 
+                TString bla = gSystem->Getenv("BOOST");
+                Int_t boost=bla.Atoi();
+
+                if (boost) {
+  		  CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+		  reconstructionQa->SetMinNofPointsSts(4);
+		  reconstructionQa->SetMinNofPointsTrd(10);
+		  reconstructionQa->SetMinNofPointsMuch(11);
+		  reconstructionQa->SetMinNofPointsTof(1);
+		  reconstructionQa->SetQuota(0.7);
+		  reconstructionQa->SetMinNofHitsTrd(9);
+		  reconstructionQa->SetMinNofHitsMuch(11);
+		  reconstructionQa->SetVerbose(1);
+		  reconstructionQa->SetMomentumRange(0., 25);
+		  reconstructionQa->SetNofBinsMom(25);
+		  reconstructionQa->SetOutputDir(std::string(imageDir));
+		  run->AddTask(reconstructionQa);
+                }
 		// ------------------------------------------------------------------------
 	}
 

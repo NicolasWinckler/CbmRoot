@@ -1,9 +1,11 @@
-/** CbmLitReconstructionQaImpl.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 2.0
+/**
+ * \file CbmLitReconstructionQaImpl.cxx
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ *
+ * Implementation of global track reconstruction QA.
  **/
-
 #include "qa/CbmLitReconstructionQaImpl.h"
 #include "qa/CbmLitQaPrintGenerator.h"
 #include "qa/CbmLitQaHTMLGenerator.h"
@@ -30,6 +32,12 @@
 #include "CbmRichRing.h"
 #include "CbmVertex.h"
 #include "CbmStsKFTrackFitter.h"
+#include "CbmStsDetectorId.h"
+#include "CbmTrdDetectorId.h"
+#include "CbmMuchGeoScheme.h"
+#include "CbmStsPoint.h"
+#include "CbmTrdPoint.h"
+#include "CbmMuchPoint.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -339,6 +347,7 @@ void CbmLitReconstructionQaImpl::Exec(
    fhEventNo->Fill(0.5);
    std::cout << "Event: " << fhEventNo->GetEntries() << std::endl;
 
+   FillNofCrossedStationsHistos();
    FillRichRingNofHits();
    ProcessHits();
    ProcessGlobalTracks();
@@ -567,6 +576,94 @@ void CbmLitReconstructionQaImpl::FillRichRingNofHits()
 
         fNofHitsInRingMap[iMother]++;
     }
+}
+
+void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
+{
+   fNofStsStationsMap.clear();
+   fNofTrdStationsMap.clear();
+   fNofMuchStationsMap.clear();
+
+   // std::map<MC track index, set with station numbers>
+   std::map<Int_t, std::set<Int_t> > stsStations;
+   CbmStsDetectorId stsDetectorId;
+   Int_t nofStsPoints = fStsPoints->GetEntriesFast();
+   for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
+      CbmStsPoint* point = static_cast<CbmStsPoint*>(fStsPoints->At(iPoint));
+      Int_t mcTrackId = point->GetTrackID();
+      Int_t stationId = stsDetectorId.StationNr(point->GetDetectorID());
+//      std::cout << stationId << " ";
+      stsStations[mcTrackId].insert(stationId);
+   }
+
+//   for (std::map<Int_t, std::set<Int_t> >::iterator it = stsStations.begin();
+//         it != stsStations.end(); it++) {
+//      std::cout << "STS mcid=" << (*it).first << " ns=" << (*it).second.size() << " | ";
+//      for (std::set<Int_t>::iterator it2 = (*it).second.begin();
+//               it2 != (*it).second.end(); it2++) {
+//         std::cout << " " << (*it2);
+//      }
+//      std::cout << std::endl;
+//   }
+   for (std::map<Int_t, std::set<Int_t> >::iterator it = stsStations.begin();
+           it != stsStations.end(); it++) {
+      fNofStsStationsMap[(*it).first] = (*it).second.size();
+   }
+
+   if (fIsMuch) {
+      // std::map<MC track index, set with station numbers>
+      std::map<Int_t, std::set<Int_t> > muchStations;
+      Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+      for (Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++) {
+         CbmMuchPoint* point = static_cast<CbmMuchPoint*>(fMuchPoints->At(iPoint));
+         Int_t mcTrackId = point->GetTrackID();
+         Int_t stationId = 10 * CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID())
+            + CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID());
+         muchStations[mcTrackId].insert(stationId);
+      }
+
+//      for (std::map<Int_t, std::set<Int_t> >::iterator it = muchStations.begin();
+//            it != muchStations.end(); it++) {
+//         std::cout << "MUCH mcid=" << (*it).first << " ns=" << (*it).second.size() << " | ";
+//         for (std::set<Int_t>::iterator it2 = (*it).second.begin();
+//                  it2 != (*it).second.end(); it2++) {
+//            std::cout << " " << (*it2);
+//         }
+//         std::cout << std::endl;
+//      }
+      for (std::map<Int_t, std::set<Int_t> >::iterator it = muchStations.begin();
+              it != muchStations.end(); it++) {
+         fNofMuchStationsMap[(*it).first] = (*it).second.size();
+      }
+   }
+
+   if (fIsTrd) {
+      // std::map<MC track index, set with station numbers>
+      std::map<Int_t, std::set<Int_t> > trdStations;
+      CbmTrdDetectorId trdDetectorId;
+      Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
+      for (Int_t iPoint = 0; iPoint < nofTrdPoints; iPoint++) {
+         CbmTrdPoint* point = static_cast<CbmTrdPoint*>(fTrdPoints->At(iPoint));
+         Int_t mcTrackId = point->GetTrackID();
+         Int_t* detInfo = trdDetectorId.GetDetectorInfo(point->GetDetectorID());
+         Int_t stationId = 10 * detInfo[1] + detInfo[2];
+         trdStations[mcTrackId].insert(stationId);
+      }
+
+//      for (std::map<Int_t, std::set<Int_t> >::iterator it = trdStations.begin();
+//            it != trdStations.end(); it++) {
+//         std::cout << "TRD mcid=" << (*it).first << " ns=" << (*it).second.size() << " | ";
+//         for (std::set<Int_t>::iterator it2 = (*it).second.begin();
+//                  it2 != (*it).second.end(); it2++) {
+//            std::cout << " " << (*it2);
+//         }
+//         std::cout << std::endl;
+//      }
+      for (std::map<Int_t, std::set<Int_t> >::iterator it = trdStations.begin();
+              it != trdStations.end(); it++) {
+         fNofTrdStationsMap[(*it).first] = (*it).second.size();
+      }
+   }
 }
 
 void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
@@ -864,8 +961,8 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
 
       // Check accepted tracks cutting on minimal number of MC points
       Int_t nofPointsSts = mcTrack->GetNPoints(kSTS);
-      Int_t nofPointsTrd = mcTrack->GetNPoints(kTRD);
-      Int_t nofPointsMuch = mcTrack->GetNPoints(kMUCH);
+      Int_t nofPointsTrd = fNofTrdStationsMap[iMCTrack];//mcTrack->GetNPoints(kTRD);
+      Int_t nofPointsMuch = fNofMuchStationsMap[iMCTrack];//mcTrack->GetNPoints(kMUCH);
       Int_t nofPointsTof = mcTrack->GetNPoints(kTOF);
       Int_t nofHitsRich = fNofHitsInRingMap[iMCTrack];
 

@@ -1,10 +1,10 @@
-/** CbmLitReconstructionQaImpl.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 2.0
- **
- ** Task for global track reconstruction performance calculation.
- ** Produces efficiency histograms. Calculates different statistics.
+/**
+ * \file CbmLitReconstructionQaImpl.h
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ *
+ * Implementation of global track reconstruction QA.
  **/
 
 #ifndef CBMLITRECONSTRUCTIONQAIMPL_H_
@@ -33,85 +33,132 @@ class TList;
 class TCanvas;
 class CbmLitGlobalElectronId;
 
+/**
+ * \class CbmLitReconstructionQaImpl
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ *
+ * Implementation of global track reconstruction QA.
+ **/
 class CbmLitReconstructionQaImpl : public FairTask
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitReconstructionQaImpl();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitReconstructionQaImpl();
 
-   /* Derived from FairTask. Executed before starting event-by-event execution. */
+   /**
+    * \brief Derived from FairTask.
+    */
    virtual InitStatus Init();
 
-   /* Derived from FairTask. Executed on each event.
-     * @param opt Options */
+   /**
+    * \brief Derived from FairTask.
+    */
    virtual void Exec(
       Option_t* opt);
 
-   /* Sets the minimum number of MC points in STS.
-    * @param minNofPointsSts Minimum number of MC points in STS. */
+   /**
+    * \brief Set minimum number of MC points in STS.
+    * \param[in] minNofPointsSts Minimum number of MC points in STS.
+    */
    void SetMinNofPointsSts(Int_t minNofPointsSts) {fMinNofPointsSts = minNofPointsSts; }
 
-   /* Sets the minimum number of MC points in TRD.
-     * @param minNofPointsTrd Minimum number of MC points in TRD. */
+   /**
+    * \brief Set minimum number of MC points in TRD.
+    * \param[in] minNofPointsTrd Minimum number of MC points in TRD.
+    */
    void SetMinNofPointsTrd(Int_t minNofPointsTrd) { fMinNofPointsTrd = minNofPointsTrd;}
 
-   /* Sets the minimum number of MC points in MUCH.
-    * @param minNofPointsMuch Minimum number of MC points in MUCH. */
+   /**
+    * \brief Set minimum number of MC points in MUCH.
+    * \param[in] minNofPointsMuch Minimum number of MC points in MUCH.
+    */
    void SetMinNofPointsMuch(Int_t minNofPointsMuch) { fMinNofPointsMuch = minNofPointsMuch;}
 
-   /* Sets the minimum number of MC points in TOF.
-    * @param minNofPointsTof Minimum number of MC points in TOF. */
+   /**
+    * \brief Set minimum number of MC points in TOF.
+    * \param[in] minNofPointsTof Minimum number of MC points in TOF.
+    */
    void SetMinNofPointsTof(Int_t minNofPointsTof) { fMinNofPointsTof = minNofPointsTof;}
 
-   /* Sets the quota value, which is true/all hits for track to be considered correctly reconstructed.
-    * @param quota Quota value. */
+   /**
+    * \brief Set quota value, which is true/all hits for track to be considered correctly reconstructed.
+    * \param[in] param quota Quota value.
+    */
    void SetQuota(Double_t quota) { fQuota = quota;}
 
-   /* Sets the minimum number of hits in MC RICH ring.
-    * @param minNofHits Minimum number of hits in MC RICH ring. */
+   /**
+    * \brief Set minimum number of hits in MC RICH ring.
+    * \param minNofHits Minimum number of hits in MC RICH ring.
+    */
    void SetMinNofHitsRich(Int_t minNofHits) { fMinNofHitsRich = minNofHits;}
 
-   /* Sets the quota value for RICH
-    * @param quota Quota value. */
+   /**
+    * \brief Set quota value for RICH.
+    * \param[in] quota Quota value.
+    */
    void SetQuotaRich(Double_t quota) { fQuotaRich = quota;}
 
-   /* Sets the minimum number of hits in TRD track.
-     * @param minNofPointsTrd Minimum number of hits in TRD. */
+   /**
+    * \brief Set minimum number of hits in TRD track.
+    * \param[in] minNofPointsTrd Minimum number of hits in TRD.
+    */
    void SetMinNofHitsTrd(Int_t minNofHitsTrd) { fMinNofHitsTrd = minNofHitsTrd;}
 
-   /* Sets the minimum number of hits in MUCH track.
-    * @param minNofHitsMuch Minimum number of hits in MUCH track. */
+   /**
+    * \brief Set minimum number of hits in MUCH track.
+    * \param[in] minNofHitsMuch Minimum number of hits in MUCH track.
+    */
    void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch;}
 
-   /* Sets the verbose level for printout.
-    * @param verbose Verbose value. */
+   /**
+    * \brief Set verbose level for print.
+    * \param[in] verbose Verbose value.
+    */
    void SetVerbose(Int_t verbose) { fVerbose = verbose;}
 
-   /* Sets the output directory for images.
-    * @param dir Directory name. */
+   /**
+    * \brief Set output directory for images.
+    * \param[in] dir Directory name.
+    */
    void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
-   /* Returns the output directory for images.
-    * @return Output directory name. */
+   /**
+    * \brief Return output directory for images.
+    * \return Output directory name.
+    */
    const std::string& GetOutputDir() const { return fOutputDir;}
 
-   /* Sets momentum range for efficiency calculation */
+   /**
+    * \brief Set momentum range for efficiency calculation.
+    * \param[in] minMom Minimum momentum.
+    * \param[in] maxMom Maximum momentum.
+    */
    void SetMomentumRange(Double_t minMom, Double_t maxMom) {
       fMinMom = minMom;
       fMaxMom = maxMom;
    }
 
-   /* Set number of bins for efficiency v. momentum histograms */
+   /**
+    * \brief Set number of bins for efficiency v. momentum histograms.
+    * \param[in] nofBins Number of bins.
+    */
    void SetNofBinsMom(Int_t nofBins) {
       fNofBinsMom = nofBins;
    }
 
-   /* Implement functionality of drawing histograms in the macro
-    * from the specified file
-    * @param fileName Name of the file */
+   /**
+    * \brief Implement functionality of drawing histograms in macro from the specified file.
+    * \param[in] fileName Name of the file.
+    */
    void DrawHistosFromFile(const std::string& fileName);
 
    /**
@@ -143,59 +190,91 @@ public:
     */
    bool IsElectronSetup() const {return fIsElectronSetup;}
 
-   /* Derived from FairTask. Executed after all events are processed. */
+   /**
+    * \brief Derived from FairTask.
+    */
    virtual void Finish();
+
 private:
 
-   /* Determines the CBM detector setup, based on TGeoManager stored in the input MC file. */
+   /**
+    * \brief Determine CBM detector setup, based on TGeoManager stored in the input MC file.
+    */
    void DetermineSetup();
 
-   /* Reads necessary data branches from the input data files. */
+   /**
+    * \brief Read data branches from input data files.
+    */
    void ReadDataBranches();
 
-   /* Fills hit related histograms */
+   /**
+    * \brief Fill hit related histograms.
+    */
    void ProcessHits();
 
-   /* Fill map with number of hits in MC RICH ring */
+   /**
+    * \brief Fill histogram with number of crossed stations by MC track.
+    */
+   void FillNofCrossedStationsHistos();
+
+   /**
+    * \brief Fill map with number of hits in MC RICH ring.
+    */
    void FillRichRingNofHits();
 
-   /* Loops over the reconstructed global tracks. Checks if the track is correct
-    * than fills the multimaps <MC track index, reconstructed track index>. */
+   /**
+    * \brief Loop over the reconstructed global tracks.
+    *
+    * Check if track is correct and fill
+    * std::multimap <MC track index, reconstructed track index>.
+    */
    void ProcessGlobalTracks();
 
-   /* Checks correctness of MVD attached hits*/
+   /**
+    * \brief Check correctness attached MVD hits.
+    */
    void ProcessMvd(
       Int_t stsId);
 
-   /* Checks track quality based on fQuota value.
-     * @param trackMatch Track match
-     * @param detId Detector identifier for this track match
-     * @return True if track is correctly reconstructed */
+   /**
+    * \brief Check track quality based on fQuota value.
+    * \param[in] trackMatch Track match.
+    * \param[in] detId Detector identifier for this track match.
+    * \return True if track is correctly reconstructed.
+    */
    Bool_t CheckTrackQuality(
       CbmTrackMatch* trackMatch,
       DetectorId detId);
 
-   /* Checks ring quality based on fQuota value.
-     * @param ringMatch Ring match
-     * @return True if ring is correctly reconstructed */
+   /**
+    * \brief Check ring quality based on fQuota value.
+    * \param[in] ringMatch Ring match.
+    * \return True if ring is correctly reconstructed.
+    */
    Bool_t CheckRingQuality(
       CbmRichRingMatch* ringMatch);
 
-   /* Add MC momentum to the histograms for detector acc calculation
-    * @param mom MC momentum of the MC track*/
+   /**
+    * \brief Add MC momentum to histograms for detector acceptance calculation.
+    * \param[in] mom Momentum of MC track.
+    */
    void FillMcHistoForDetAcc(
          Double_t mom);
 
-   /* Loops over the MC tracks. Checks the track acceptance for different cases.
-     * Fills the histograms of the accepted and reconstructed tracks. */
+   /**
+    * \brief Loop over the MC tracks. Check track acceptance for different cases.
+    * Fill histograms of accepted and reconstructed tracks.
+    */
    void ProcessMcTracks();
 
-   /* Fills the histograms of the accepted and reconstructed tracks.
-    * @param mcTrack MC track pointer
-    * @param mcId MC track index in the array
-    * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
-    * @param hist vector with histograms to be filled
-    * @param par value that will be added in the histos (momentum or number of points) */
+   /**
+    * \brief Fill histograms of accepted and reconstructed tracks.
+    * \param[in] mcTrack MC track pointer.
+    * \param[in] mcId MC track index in array.
+    * \param[in] mcMap Map from MC track index to reconstructed track index. Map is filled in ProcessGlobalTrack function.
+    * \param[in] hist Vector with histograms to be filled.
+    * \param[in] par Value that will be added in histogram (momentum or number of points).
+    */
    void FillGlobalReconstructionHistos(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
@@ -203,7 +282,9 @@ private:
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
 
-   /* @param opt option string*/
+   /**
+    * \brief ADD COMMENTS.
+    */
    void FillGlobalElIdHistos(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
@@ -212,12 +293,14 @@ private:
       Double_t par,
       const std::string& opt);
 
-    /* Fills the histograms of the accepted and reconstructed rings tracks.
-    * @param mcTrack MC track pointer
-    * @param mcId MC track index in the array
-    * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
-    * @param hist vector with histograms to be filled
-    * @param par value that will be added in the histos (momentum or number of points)*/
+    /**
+     * \brief Fill histograms of accepted and reconstructed rings tracks.
+     * \param[in] mcTrack MC track pointer.
+     * \param[in] mcId MC track index in the array.
+     * \param[in] mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
+     * \param[in] hist Vector with histograms to be filled.
+     * \param[in] par Value that will be added in histogram (momentum or number of points)
+     */
    void FillGlobalReconstructionHistosRich(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
@@ -225,24 +308,32 @@ private:
       std::vector<std::vector<TH1F*> >& hist,
       Double_t par);
 
-   /* Fills pion suppression histogramms.*/
+   /**
+    * \brief Fill pion suppression histogramms.
+    */
    void PionSuppression();
 
-   /* Fills the histograms: momentum resolution vs. momentum and chi2Vertex.*/
+   /**
+    * \brief Fill histograms: momentum resolution vs. momentum and chi2Vertex.
+    */
    void StsTracksQa();
 
-   /* Fill MC momentum vs polar angle histogram */
+   /**
+    * \brief Fill MC momentum vs. polar angle histogram.
+    */
    void FillMCMomVsAngle(
          const CbmMCTrack* mcTrack);
 
-   /* Creates histograms - hist using specified parameters.
-   * @param hist 2D vector of the histograms
-   * @param name Histogram name
-   * @param nofBins Number of bins in the histograms
-   * @param minBin Minimum value of the histograms
-   * @param maxBin Maximum value of the histograms
-   * @param opt "tracking" for STS, TRD and TOF or "rich" for RICH
-   * @param file if file==NULL then create histograms else read histograms from file*/
+   /**
+    * \brief Create efficiency histograms using specified parameters.
+    * \param[out] hist 2D vector of histograms.
+    * \param[in] name Histogram name.
+    * \param[in] nofBins Number of bins in histograms.
+    * \param[in] minBin Minimum value of histograms.
+    * \param[in] maxBin Maximum value of histograms.
+    * \param[in] opt "tracking" for STS, TRD and TOF or "rich" for RICH.
+    * \param[in] file If file==NULL then create histograms else read histograms from file.
+    */
    void CreateEffHisto(
    		std::vector<std::vector<TH1F*> >& hist,
    		const std::string& name,
@@ -252,13 +343,15 @@ private:
    		const std::string& opt,
    		TFile* file);
 
-   /* Creates histograms for electron identification- hist using specified parameters.
-   * @param hist 2D vector of the histograms
-   * @param name Histogram name
-   * @param nofBins Number of bins in the histograms
-   * @param minBin Minimum value of the histograms
-   * @param maxBin Maximum value of the histograms
-   * @param file if file==NULL then create histograms else read histograms from file*/
+   /**
+    * \brief Create electron identification histograms using specified parameters.
+    * \param[out] hist 2D vector of histograms.
+    * \param[in] name Histogram name.
+    * \param[in] nofBins Number of bins in histograms.
+    * \param[in] minBin Minimum value of histograms.
+    * \param[in] maxBin Maximum value of histograms.
+    * \param[in] file If file==NULL then create histograms else read histograms from file.
+    */
    void CreateEffHistoElId(
          std::vector<std::vector<TH1F*> >& hist,
          const std::string& name,
@@ -267,13 +360,15 @@ private:
          Double_t maxBin,
          TFile* file);
 
-   /* Creates histograms for detector acceptance - hist using specified parameters.
-   * @param hist vector of the histograms
-   * @param name Histogram name
-   * @param nofBins Number of bins in the histograms
-   * @param minBin Minimum value of the histograms
-   * @param maxBin Maximum value of the histograms
-   * @param file if file==NULL then create histograms else read histograms from file*/
+   /**
+    * \brief Create histograms for detector acceptance using specified parameters.
+    * \param[out] hist vector of histograms.
+    * \param[in] name Histogram name.
+    * \param[in] nofBins Number of bins in histograms.
+    * \param[in] minBin Minimum value of histograms.
+    * \param[in] maxBin Maximum value of histograms.
+    * \param[in] file If file==NULL then create histograms else read histograms from file.
+    */
    void CreateEffHistoDetAcc(
          std::vector<TH1F*>& hist,
          const std::string& name,
@@ -282,37 +377,54 @@ private:
          Double_t maxBin,
          TFile* file);
 
-   /* Creates the histograms.
-    *@param file if file==NULL then create histograms else read histograms from file*/
+   /**
+    * \brief Create histograms.
+    * \param[in] file If file==NULL then create histograms else read histograms from file.
+    */
    void CreateHistos(
         TFile* file);
 
-   /* Divides two histograms.
-    * @param histo1 numerator
-    * @param histo2 denominator
-    * @param histo3 output histogram
-    * @param c coefficient*/
+   /**
+    * \brief Divide two histograms.
+    * \param[in] histo1 Numerator.
+    * \param[in] histo2 Denominator.
+    * \param[out] histo3 Output histogram.
+    * \param[in] c Coefficient.
+    */
    void DivideHistos(
       TH1* histo1,
       TH1* histo2,
       TH1* histo3,
       Double_t c);
 
-   /* Calculates efficiency histograms. */
+   /**
+    * \brief Calculate efficiency histograms.
+    */
    void CalculateEfficiencyHistos();
 
-   /* Writes the histograms to output file. */
+   /**
+    * \brief Write histograms to output file.
+    */
    void WriteToFile();
 
-   /* Increase number of tracks counters. */
+   /**
+    * \brief Increase number of tracks counters.
+    */
    void IncreaseCounters();
 
-   /* Returns std::string of the detector used in the global reconstruction. */
+   /**
+    * \brief Return std::string of detector used in global reconstruction.
+    */
    std::string RecDetector();
 
-   /* Prints statistics to property tree and return property tree. */
+   /**
+    * \brief Print statistics to property tree and return property tree.
+    */
    boost::property_tree::ptree PrintPTree();
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void NofStatisticsToPTree(
       boost::property_tree::ptree* pt,
       TH1F* mvd,
@@ -323,26 +435,41 @@ private:
       TH1F* muchS,
       TH1F* tof);
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void HitsHistosToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,
          std::vector<TH1F*>& histos);
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void EventEfficiencyStatisticsToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,
          const std::vector<std::vector<TH1F*> >& hist);
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void EventEfficiencyStatisticsRichToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,
          const std::vector<std::vector<TH1F*> >& hist);
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void EventEfficiencyStatisticsElIdToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,
          const std::vector<std::vector<TH1F*> >& hist);
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void EventDetAccElStatisticsToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,
@@ -350,18 +477,27 @@ private:
          TH1F* hacc,
          TH1F* hrec);
 
+   /**
+    * \brief TODO ADD COMMENTS
+    */
    void PolarAngleEfficiencyToPTree(
          boost::property_tree::ptree* pt,
          const std::string& name,
          const std::vector<std::vector<TH1F*> >& hist);
 
-   /* Draws histograms. */
+   /**
+    * \brief Draw histograms.
+    */
    void Draw();
 
-   /* Draws efficiency histograms. */
+   /**
+    * \brief Draw efficiency histograms.
+    */
    void DrawEfficiencyHistos();
 
-   /* Draws efficiency plots */
+   /**
+    * \brief Draw efficiency plots. TODO ADD COMMENTS
+    */
    void DrawEfficiency(
       const std::string& canvasName,
       const std::vector<TH1F*>* hist1,
@@ -374,16 +510,22 @@ private:
    	const std::string& name4,
    	const std::string& opt);
 
-   /* Draws ACC and REC efficiency graphs normalized to MC*/
+   /**
+    * \brief Draw ACC and REC efficiency graphs normalized to MC.
+    */
    void DrawMcEfficiencyGraph();
 
-   /* Calculate efficiency for two histograms */
+   /**
+    * \brief Calculate efficiency for two histograms.
+    */
    Double_t CalcEfficiency(
       TH1* histRec,
       TH1* histAcc,
       const std::string& opt);
 
-   /* Draw mean efficiency lines (up to 4) on the histogramm */
+   /**
+    * \brief Draw mean efficiency lines (up to 4) on the histogramm.
+    */
    void DrawMeanEfficiencyLines(
       TH1* h,
       Double_t eff1,
@@ -391,32 +533,47 @@ private:
       Double_t eff3 = -1.,
       Double_t eff4 = -1.);
 
-   /* Draws histograms for hits */
+   /**
+    * \brief Draw histograms for hits.
+    */
    void DrawHitsHistos();
 
-   /* Draws histograms for hits
-    * @param canvasName Name of the canvas.
-    * @param histos Vector with hits histograms. */
+   /**
+    * \brief Draw histograms for hits.
+    * \param[in] canvasName Name of canvas.
+    * \param[in] histos Vector with hits histograms.
+    */
    void DrawHitsHistos(
 	   const std::string& canvasName,
       std::vector<TH1F*>& histos);
 
-   /* Draws histogram of number of hits in station
-    * @name Canvas name
-    * @hist Pointer to histogram */
+   /**
+    * \brief Draw histogram of number of hits in station.
+    * \param[in] name Canvas name.
+    * \param[in] hist Pointer to histogram.
+    */
    void DrawHitsStationHisto(
       const std::string& name,
       TH1F* hist);
 
-   /* Draws histograms of number of hits in station */
+   /**
+    * \brief Draw histograms of number of hits in station.
+    */
    void DrawHitsStationHistos();
 
-   /* Draws histograms of Sts tracks Qa */
+   /**
+    * \brief Draw histograms of Sts tracks Qa.
+    */
    void DrawStsTracksQaHistos();
 
+   /**
+    * \brief Draw MC momentum vs. angle histogram.
+    */
    void DrawMCMomVsAngle();
 
-   /* Calculate electron Identification */
+   /**
+    * \brief Calculate electron Identification.
+    */
    void ElectronIdentification();
 
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
@@ -471,6 +628,12 @@ private:
 
    // Number of hits in the MC RICH ring
    std::map<Int_t, Int_t> fNofHitsInRingMap;
+
+   // Number of crossed stations
+   // <MC track index, number of crossed stations>
+   std::map<Int_t, Int_t> fNofStsStationsMap;
+   std::map<Int_t, Int_t> fNofTrdStationsMap;
+   std::map<Int_t, Int_t> fNofMuchStationsMap;
 
    // Pointers to data arrays
    TClonesArray* fMCTracks; // CbmMCTrack array
@@ -661,7 +824,6 @@ private:
    CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
-
 };
 
 #endif /* CBMLITRECONSTRUCTIONQAIMPL_H_ */

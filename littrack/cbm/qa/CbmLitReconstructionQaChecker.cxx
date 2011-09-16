@@ -36,7 +36,7 @@ void CbmLitReconstructionQaChecker::DoCheck(
 
       // Check if value exists in ideal
       if (!vmin || !vmax) {
-         std::cout << "Value " << v.first << " doesn't exist in ideal property tree." << std::endl;
+//         std::cout << "Value " << v.first << " doesn't exist in ideal property tree." << std::endl;
          // -1 in the output tree indicates that value was not checked because
          // it was not found in ideal property tree
          out.put(v.first, -1.f);
@@ -45,11 +45,11 @@ void CbmLitReconstructionQaChecker::DoCheck(
          // Check that qa value lays within (min, max) limits
          if (v.second >= vmin && v.second <= vmax) {
             // Qa value is within limits
-            std::cout << "Value " << v.first << " is within limits." << std::endl;
+//            std::cout << "Value " << v.first << " is within limits." << std::endl;
             out.put(v.first, 1.f);
          } else {
             // Qa value is out of range
-            std::cout << "Value " << v.first << " is out of range." << std::endl;
+//            std::cout << "Value " << v.first << " is out of range." << std::endl;
             out.put(v.first, 0.f);
          }
       }

@@ -116,6 +116,12 @@ public:
     */
    bool IsElectronSetup() const;
 
+   /**
+    * \brief Set if consecute MC points are used for efficiency normalization.
+    * \param[in] param quota Quota value.
+    */
+   void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts);
+
    static void PrintLatexTable(
          const std::vector<std::string>& files);
 

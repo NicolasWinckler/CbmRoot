@@ -17,6 +17,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -94,6 +95,12 @@ public:
     * \param[in] param quota Quota value.
     */
    void SetQuota(Double_t quota) { fQuota = quota;}
+
+   /**
+    * \brief Set if consecute MC points are used for efficiency normalization.
+    * \param[in] param quota Quota value.
+    */
+   void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts) { fUseConsecutivePointsInSts = useConsecutivePointsInSts; }
 
    /**
     * \brief Set minimum number of hits in MC RICH ring.
@@ -216,6 +223,14 @@ private:
     * \brief Fill histogram with number of crossed stations by MC track.
     */
    void FillNofCrossedStationsHistos();
+
+   /**
+    * \brief Return maximum number of consecutive numbers in std:set.
+    * \param[in] numbers Set with numbers.
+    * \return Maximum number.
+    */
+   Int_t MaxConsecutiveNumbers(
+         const std::set<Int_t>& numbers);
 
    /**
     * \brief Fill map with number of hits in MC RICH ring.
@@ -582,6 +597,8 @@ private:
    Int_t fMinNofPointsTof; // Minimal number of MCPoints in TOF
    Double_t fQuota;  // True/all hits for track to be considered correctly reconstructed
 
+   Bool_t fUseConsecutivePointsInSts; // Use consecutive MC points for STS normalization
+
    Int_t fMinNofHitsRich; // Minimal number of hits in MC RICH ring
    Double_t fQuotaRich; // True/all hits for ring to be considered correctly reconstructed
 
@@ -632,6 +649,7 @@ private:
    // Number of crossed stations
    // <MC track index, number of crossed stations>
    std::map<Int_t, Int_t> fNofStsStationsMap;
+   std::map<Int_t, Int_t> fNofStsConsecutiveStationsMap;
    std::map<Int_t, Int_t> fNofTrdStationsMap;
    std::map<Int_t, Int_t> fNofMuchStationsMap;
 

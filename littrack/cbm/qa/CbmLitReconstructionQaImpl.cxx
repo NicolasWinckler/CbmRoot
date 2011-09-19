@@ -142,6 +142,7 @@ CbmLitReconstructionQaImpl::CbmLitReconstructionQaImpl():
    fMinNofPointsMuch(10),
    fMinNofPointsTof(1),
    fQuota(0.7),
+   fUseConsecutivePointsInSts(false),
    fMinNofHitsRich(7),
    fQuotaRich(0.6),
 
@@ -622,11 +623,17 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
 //               it2 != (*it).second.end(); it2++) {
 //         std::cout << " " << (*it2);
 //      }
-//      std::cout << std::endl;
+//      std::cout << " mc=" << MaxConsecutiveNumbers((*it).second) << std::endl;
 //   }
    for (std::map<Int_t, std::set<Int_t> >::iterator it = stsStations.begin();
            it != stsStations.end(); it++) {
       fNofStsStationsMap[(*it).first] = (*it).second.size();
+   }
+
+   // Fill map for maximum number of consecutive MC points in STS
+   for (std::map<Int_t, std::set<Int_t> >::iterator it = stsStations.begin();
+              it != stsStations.end(); it++) {
+      fNofStsConsecutiveStationsMap[(*it).first] = MaxConsecutiveNumbers((*it).second);
    }
    // end STS
 
@@ -688,6 +695,37 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
       }
    }
    // end TRD
+}
+
+//Bool_t CbmLitReconstructionQaImpl::HasStsConsecutivePoints(
+//      Int_t mcId)
+//{
+//   if (!fUseConsecutivePointsInSts) { return true; }
+//   else {
+//
+//   }
+//}
+
+Int_t CbmLitReconstructionQaImpl::MaxConsecutiveNumbers(
+      const std::set<Int_t>& numbers)
+{
+   if (numbers.size() == 0) return 0;
+   if (numbers.size() == 1) return 1;
+
+   std::vector<Int_t> a(numbers.begin(), numbers.end());
+
+   int maxCnt = 0;
+   int cnt = 1;
+   for (Int_t i = 0; i < a.size() - 1; i++) {
+      if (a[i] == (a[i + 1] - 1)) {
+         cnt++;
+      } else {
+         maxCnt = std::max(cnt, maxCnt);
+         cnt = 1;
+      }
+   }
+   maxCnt = std::max(cnt, maxCnt);
+   return maxCnt;
 }
 
 void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
@@ -991,7 +1029,9 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
       Int_t nofHitsRich = fNofHitsInRingMap[iMCTrack];
 
       // Check local tracks
-      Bool_t isStsOk = nofPointsSts >= fMinNofPointsSts && fIsSts;
+      Bool_t stsConsecutive = (fUseConsecutivePointsInSts) ?
+            fNofStsConsecutiveStationsMap[iMCTrack] >= fMinNofPointsSts : true;
+      Bool_t isStsOk = nofPointsSts >= fMinNofPointsSts && fIsSts && stsConsecutive;
       Bool_t isTrdOk = nofPointsTrd >= fMinNofPointsTrd && fIsTrd;
       Bool_t isMuchOk = nofPointsMuch >= fMinNofPointsMuch && fIsMuch;
       Bool_t isTofOk = nofPointsTof >= fMinNofPointsTof && fIsTof;

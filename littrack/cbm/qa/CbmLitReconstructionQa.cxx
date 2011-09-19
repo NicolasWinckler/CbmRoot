@@ -130,6 +130,11 @@ bool CbmLitReconstructionQa::IsElectronSetup() const
    return fImpl->IsElectronSetup();
 }
 
+void CbmLitReconstructionQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts)
+{
+   fImpl->SetUseConsecutivePointsInSts(useConsecutivePointsInSts);
+}
+
 void CbmLitReconstructionQa::PrintLatexTable(
       const std::vector<std::string>& files)
 {

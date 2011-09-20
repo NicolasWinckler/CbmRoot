@@ -78,13 +78,13 @@ void DrawHist1D(
  */
 void DrawHist2D(
    TH2* hist,
-   const std::string& titleX,
-   const std::string& titleY,
-   const std::string& titleZ,
-   LitScale logx,
-   LitScale logy,
-   LitScale logz,
-   const std::string& drawOpt);
+   const std::string& titleX = "",
+   const std::string& titleY = "",
+   const std::string& titleZ = "",
+   LitScale logx = kLitLinearScale,
+   LitScale logy = kLitLinearScale,
+   LitScale logz = kLitLinearScale,
+   const std::string& drawOpt = "COLZ");
 
 
 
@@ -127,8 +127,6 @@ void DrawHist1D(
    Double_t y1,
    Double_t x2,
    Double_t y2);
-
-
 
 /* Draws gma/RMS value on the histogram
  * @param index Index of letter for the histogram

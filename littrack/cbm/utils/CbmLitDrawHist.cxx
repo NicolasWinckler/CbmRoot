@@ -16,6 +16,8 @@
 #include "TGraph.h"
 #include "TGraph2D.h"
 #include "TMath.h"
+#include "TGaxis.h"
+
 #include <string>
 #include <limits>
 #include <iostream>
@@ -53,8 +55,8 @@ void DrawHist1D(
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
-   hist->GetXaxis()->SetTitle(titleX.c_str());
-   hist->GetYaxis()->SetTitle(titleY.c_str());
+   if (titleX != "") hist->GetXaxis()->SetTitle(titleX.c_str());
+   if (titleY != "") hist->GetYaxis()->SetTitle(titleY.c_str());
    hist->SetLineColor(color);
    hist->SetLineWidth(lineWidth);
    hist->SetLineStyle(lineStyle);
@@ -87,9 +89,9 @@ void DrawHist2D(
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
-   hist->GetXaxis()->SetTitle(titleX.c_str());
-   hist->GetYaxis()->SetTitle(titleY.c_str());
-   hist->GetZaxis()->SetTitle(titleZ.c_str());
+   if (titleX != "") hist->GetXaxis()->SetTitle(titleX.c_str());
+   if (titleY != "") hist->GetYaxis()->SetTitle(titleY.c_str());
+   if (titleZ != "") hist->GetZaxis()->SetTitle(titleZ.c_str());
    if (logx == kLitLogScale) { gPad->SetLogx(); }
    if (logy == kLitLogScale) { gPad->SetLogy(); }
    if (logz == kLitLogScale) { gPad->SetLogz(); }
@@ -162,7 +164,7 @@ void DrawHist1D(
       if (max < hist4->GetMaximum()) { max = hist4->GetMaximum(); }
    }
 
-   if (hist1 != NULL) { hist1->SetMaximum(max * 1.05); }
+   if (hist1 != NULL) { hist1->SetMaximum(max * 1.10); }
 
    TLegend* l1 = new TLegend(x1, y1, x2, y2);
    l1->SetFillColor(kWhite);
@@ -173,7 +175,6 @@ void DrawHist1D(
    if (hist4 != NULL) { l1->AddEntry(hist4,hist4label.c_str(),"lp"); }
    if (drawLegend) { l1->Draw(); }
 }
-
 
 void  DrawHistSigmaRMS(
    Int_t index,

@@ -10,7 +10,7 @@
 
 void simple_geo_qa(Int_t nEvents = 1)
 {
-	TString dir = "/data.local1/andrey/events/std_electron_5jpsi/";
+	TString dir = "/d/cbm02/andrey/events/std_electron_10pi/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "simple.geo.qa.0000.root";

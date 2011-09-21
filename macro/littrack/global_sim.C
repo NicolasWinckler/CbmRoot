@@ -7,7 +7,7 @@
  * \date 2010
  **/
 
-void global_sim(Int_t nEvents = 5000)
+void global_sim(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -23,16 +23,16 @@ void global_sim(Int_t nEvents = 5000)
 	Int_t NPIONSPLUS = 5; // number of embedded pions
 	Int_t NPIONSMINUS = 5; // number of embedded pions
 	Int_t NPLUTO = 10; // number of embedded particles from pluto
-	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
+	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
 	TString muons = "no"; // If "yes" than primary muons will be generated
-	TString electrons = "no"; // If "yes" than primary electrons will be generated
-	TString pions = "yes"; // If "yes" than primary pions will be generated
+	TString electrons = "yes"; // If "yes" than primary electrons will be generated
+	TString pions = "no"; // If "yes" than primary pions will be generated
 	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
    TString useUnigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/data.local1/andrey/events/std_electron_10pi_no_rich/"; //directory for output simulation files
+	TString dir = "/data.local1/andrey/events/trd_v11a/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -71,8 +71,8 @@ void global_sim(Int_t nEvents = 5000)
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "";//"mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
-		richGeom   = "";//"rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v10b.geo";
+		richGeom   = "rich/rich_v08a.geo";
+		trdGeom    = "trd/trd_v11a.geo";//"trd/trd_v10b.geo";
 		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";
@@ -319,7 +319,7 @@ void global_sim(Int_t nEvents = 5000)
 	if (pions == "yes") {
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(211, NPIONSPLUS);
 //		boxGen1->SetPtRange(0.,3.);
-		boxGen1->SetPRange(0., 12);
+		boxGen1->SetPRange(0.3, 1.);
 		boxGen1->SetPhiRange(0.,360.);
 		boxGen1->SetThetaRange(2.5,25.);
 		boxGen1->SetCosTheta();
@@ -328,7 +328,7 @@ void global_sim(Int_t nEvents = 5000)
 
 		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-211, NPIONSMINUS);
 //		boxGen2->SetPtRange(0.,3.);
-		boxGen2->SetPRange(0., 12);
+		boxGen2->SetPRange(0.3, 1.);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5,25.);
 		boxGen2->SetCosTheta();

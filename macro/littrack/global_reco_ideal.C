@@ -17,7 +17,7 @@ void global_reco_ideal(Int_t nEvents = 5000)
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	if (script != "yes") {
-	   dir = "/data.local1/andrey/events/std_electron_10pi_no_rich/";
+	   dir = "/data.local1/andrey/events/std_electron_10pi_low_mom/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";

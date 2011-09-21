@@ -12,22 +12,33 @@ cd -
 
 export SCRIPT=yes
 
-cd /data.local1/andrey/sts_qa_muon/
-create_output_dir $3_$4_events_muon
-create_image_dir $3_$4_results_muon
+cd /data.local1/andrey/sts_qa_$5/
+create_output_dir $3_$4_events_$5
+create_image_dir $3_$4_results_$5
 cd -
 
-export DIR=/data.local1/andrey/sts_qa_muon/$3_$4_events_muon/
-export IMAGEDIR=/data.local1/andrey/sts_qa_muon/$3_$4_results_muon/
+export DIR=/data.local1/andrey/sts_qa_$5/$3_$4_events_$5/
+export IMAGEDIR=/data.local1/andrey/sts_qa_$5/$3_$4_results_$5/
 
 export NEVENTS=$1
-export DETECTORSETUP=muon
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU  E  PI  PLUTO USEUNIGEN
-pars=(5    5    5   5   20   20   10     yes   yes no no  no    no)
-set_simulation_parameters $pars    
+if [ "$5" = "muon" ] ; then
+    export DETECTORSETUP=muon
+#         NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU   E  PI PLUTO USEUNIGEN
+    pars=(5    5    5   5   5    5    10     yes    yes no no no    no)
+    set_simulation_parameters $pars
+    set_default_muon_geometry
+else
 
-set_default_muon_geometry
+if [ "$5" = "electron" ] ; then
+    export DETECTORSETUP=electron
+#         NMU+ NMU- NE- NE+ NPI+ NPI- NPLUTO URQMD MU E   PI PLUTO USEUNIGEN
+    pars=(5    5    5   5   5    5    10     yes   no yes no no    no)
+    set_simulation_parameters $pars    
+    set_default_electron_geometry
+
+fi
+fi
 
 export STSGEOM=sts/$3
 export STSDIGI=$VMCWORKDIR/parameters/sts/$4

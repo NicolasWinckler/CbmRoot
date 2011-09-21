@@ -31,28 +31,42 @@ void qa_study()
       tof = TString(gSystem->Getenv("STUDYTOF")).Atoi();
    } else {
    //   results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v09a.geo_sts_v09a.digi.par_results_muon");
-      results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a.digi.par_results_muon");
-   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-4.digi.par_results_muon");
-      results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-6.digi.par_results_muon");
-   //   results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-7.digi.par_results_muon");
-      results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11a.geo_sts_v11a_0-8.digi.par_results_muon");
-   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b.digi.par_results_muon");
-   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-4.digi.par_results_muon");
-   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-6.digi.par_results_muon");
-   //   results.push_back("/u/andrey/cbm/results/STS_QA/sts_v11b.geo_sts_v11b_0-8.digi.par_results_muon");
+//      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a.digi.par_results_muon");
+//      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-4.digi.par_results_muon");
+//      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-6.digi.par_results_muon");
+//      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-7.digi.par_results_muon");
+//      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11a.geo_sts_v11a_0-8.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11b.geo_sts_v11b.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11b.geo_sts_v11b_0-4.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11b.geo_sts_v11b_0-6.digi.par_results_muon");
+      results.push_back("/u/andrey/cbm/results/STS_QA/muon/sts_v11b.geo_sts_v11b_0-8.digi.par_results_muon");
 
    //   names.push_back("v09a");
-      names.push_back("v11a");
-   //   names.push_back("v11a_0-4");
-      names.push_back("v11a_0-6");
+//      names.push_back("v11a");
+//      names.push_back("v11a_0-4");
+//      names.push_back("v11a_0-6");
    //   names.push_back("v11a_0-7");
-      names.push_back("v11a_0-8");
-   //   names.push_back("v11b");
-   //   names.push_back("v11b_0-4");
-   //   names.push_back("v11b_0-6");
-   //   names.push_back("v11b_0-8");
+//      names.push_back("v11a_0-8");
+      names.push_back("v11b");
+      names.push_back("v11b_0-4");
+      names.push_back("v11b_0-6");
+      names.push_back("v11b_0-8");
 
-      outputDir = "./";
+//      results.push_back("/u/andrey/cbm/trunk/cbmroot/macro/littrack/sts_qa/4conspoints");
+//      results.push_back("/u/andrey/cbm/trunk/cbmroot/macro/littrack/sts_qa/4points");
+//      results.push_back("/u/andrey/cbm/trunk/cbmroot/macro/littrack/sts_qa/5points");
+//      results.push_back("/u/andrey/cbm/trunk/cbmroot/macro/littrack/sts_qa/6points");
+//      results.push_back("/u/andrey/cbm/trunk/cbmroot/macro/littrack/sts_qa/7points");
+//      results.push_back("/u/andrey/cbm/trunk/cbmroot/macro/littrack/sts_qa/8points");
+//
+//      names.push_back("4 con points");
+//      names.push_back("4 points");
+//      names.push_back("5 points");
+//      names.push_back("6 points");
+//      names.push_back("7 points");
+//      names.push_back("8 points");
+
+      outputDir = "./sts_qa/muon/";
       electronSetup = 0;
       mvd = 0;
       sts = 1;

@@ -1,14 +1,20 @@
+/**
+ * \file event_display.C
+ *
+ * \brief Run event display.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ *
+ **/
+
 void event_display()
 {
-	TString dir  = "/d/cbm02/andrey/electron/std_10e_urqmd_no_mvd/";
+	TString dir  = "/d/cbm02/andrey/events/std_electron_10pi/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
-
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -21,7 +27,6 @@ void event_display()
 
 	run->SetInputFile(mcFile);
 	run->SetOutputFile("test.root");
-	run->LoadGeometry();
 
 	FairEventManager *fMan= new FairEventManager();
 	FairMCTracks *Track = new FairMCTracks ("Monte-Carlo Tracks");

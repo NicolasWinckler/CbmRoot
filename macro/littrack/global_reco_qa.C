@@ -5,42 +5,38 @@
  * Macro runs CbmLitReconstructionQa class.
  **/
 
-void global_reco_qa(Int_t nEvents = 10)
+void global_reco_qa(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
     	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/trdsimple_10pi/";
+		dir  = "/data.local1/andrey/events/std_electron/";
 		//Output directory for images
-		imageDir = "./test/";
+		imageDir = "./sts_qa/4conspoints/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
 		parFile = dir + "param.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.trd10.0000.root";
+		globalHitsFile = dir + "global.hits.0000.root";
 		// File with global tracks
 		globalTracksFile = dir + "global.tracks.0000.root";
 		// Output file with histograms
-                recoQaFile = dir + "reco.qa.trd100.0000.root";
+      recoQaFile = dir + "reco.qa.4conspoints.0000.root";
 	} else {
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
+//		mcFile = TString(gSystem->Getenv("MCFILE"));
+//		parFile = TString(gSystem->Getenv("PARFILE"));
 		//globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 		//globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
-      recoFile = TString(gSystem->Getenv("RECOFILE"));
-		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
-      recoQaFile = TString(gSystem->Getenv("RECOQAFILE"));
+//      recoFile = TString(gSystem->Getenv("RECOFILE"));
+//		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+//      recoQaFile = TString(gSystem->Getenv("RECOQAFILE"));
 	}
 
 	TStopwatch timer;
 	timer.Start();
-
-	//gSystem->Load("/home/soft/tbb/libtbb");
-	//gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -51,9 +47,9 @@ void global_reco_qa(Int_t nEvents = 10)
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	//run->AddFriend(globalHitsFile);
-	//run->AddFriend(globalTracksFile);
-	run->AddFriend(recoFile);
+	run->AddFriend(globalHitsFile);
+	run->AddFriend(globalTracksFile);
+//	run->AddFriend(recoFile);
 	run->SetOutputFile(recoQaFile);
 	// ------------------------------------------------------------------------
 
@@ -64,19 +60,20 @@ void global_reco_qa(Int_t nEvents = 10)
 
 	// -----   Track finding QA check   ------------------------------------
    CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+   reconstructionQa->SetUseConsecutivePointsInSts(true);
    reconstructionQa->SetMinNofPointsSts(4);
-   reconstructionQa->SetMinNofPointsTrd(9);
+   reconstructionQa->SetMinNofPointsTrd(8);
    reconstructionQa->SetMinNofPointsMuch(10);
    reconstructionQa->SetMinNofPointsTof(1);
    reconstructionQa->SetQuota(0.7);
-   reconstructionQa->SetMinNofHitsTrd(9);
+   reconstructionQa->SetMinNofHitsTrd(8);
    reconstructionQa->SetMinNofHitsMuch(10);
    reconstructionQa->SetVerbose(0);
    reconstructionQa->SetMomentumRange(0, 12);
    reconstructionQa->SetNofBinsMom(12);
    reconstructionQa->SetMinNofHitsRich(7);
-   reconstructionQa->SetQuotaRich(0.7);
-   reconstructionQa->SetOutputDir("recoIm/");
+   reconstructionQa->SetQuotaRich(0.6);
+   reconstructionQa->SetOutputDir(std::string(imageDir));
    run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 
@@ -90,7 +87,6 @@ void global_reco_qa(Int_t nEvents = 10)
 	// ------------------------------------------------------------------------
 
 	// -----   Initialize and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
 	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------

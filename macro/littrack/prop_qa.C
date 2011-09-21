@@ -7,7 +7,7 @@
  * \since 2010
  **/
 
-void prop_qa(Int_t nEvents = 5000)
+void prop_qa(Int_t nEvents = 1)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -16,7 +16,7 @@ void prop_qa(Int_t nEvents = 5000)
 	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
 	Int_t testFastPropagation;
 	if (script != "yes") {
-	   dir = "/data.local1/andrey/events/std_electron_10pi/";
+	   dir = "/data.local1/andrey/events/std_electron_10pi_low_mom/";
 		mcFile = dir + "mc.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";

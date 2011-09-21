@@ -63,15 +63,12 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    TrackPtrVector& trackSeeds,
    TrackPtrVector& tracks)
 {
-//   const unsigned int NHITS = hits.size();
    std::vector<lit::parallel::LitScalPixelHit*> lhits;
-//   const unsigned int NTRACKS = trackSeeds.size();
    std::vector<lit::parallel::LitScalTrack*> lseeds;
    std::vector<lit::parallel::LitScalTrack*> ltracks;
 
    ConvertHits(hits, lhits);
    ConvertSeeds(trackSeeds, lseeds);
-   unsigned int nofTracks = 0;
 
    TStopwatch timer1;
    timer1.Start(kFALSE);
@@ -128,7 +125,7 @@ void CbmLitTrackFinderNNParallel::ConvertSeeds(
       lit::parallel::LitTrackParamScal lpar;
       CbmLitTrackParamToLitTrackParamScal(par, &lpar);
       ltrack->SetParamFirst(lpar);
-      CbmLitTrackParamToLitTrackParamScal(par, &lpar);
+     // CbmLitTrackParamToLitTrackParamScal(par, &lpar);
       ltrack->SetParamLast(lpar);
 
 //    ltrack->previouseTrackId = std::distance(seeds.begin(), it);

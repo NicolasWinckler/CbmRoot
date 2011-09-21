@@ -28,9 +28,8 @@ lit::parallel::LitTrackFinderNNVecElectron::LitTrackFinderNNVecElectron():
    fMaxNofMissingHits(4),
    fSigmaCoef(5.),
    fMaxCovSq(20.*20.),
-   fChiSqPixelHitCut(25.)
+   fChiSqPixelHitCut(15.)
 {
-
 }
 
 lit::parallel::LitTrackFinderNNVecElectron::~LitTrackFinderNNVecElectron()
@@ -202,7 +201,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::PropagateToFirstStation(
 
       lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(),
             vp1.GetFieldGrid(), vp1.GetFieldGridMid(), vp2.GetFieldGrid());
-      lit::parallel::LitAddMaterialElectron(lpar, vp2.GetMaterial());
+      lit::parallel::LitAddMaterial(lpar, vp2.GetMaterial());
    }
 
    //lit::parallel::LitLineExtrapolation(lpar, vp2.GetZ());
@@ -230,7 +229,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::ProcessStation(
    // Propagate to station
    LitLineExtrapolation(lpar, sta.GetZ());
    for (unsigned char im = 0; im < sta.GetNofMaterialsBefore(); im++) {
-      LitAddMaterialElectron(lpar, sta.GetMaterialBefore(im));
+      LitAddMaterial(lpar, sta.GetMaterialBefore(im));
    }
 
    UnpackTrackParam(lpar, par);
@@ -239,7 +238,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::ProcessStation(
    }
 
    for (unsigned char im = 0; im < sta.GetNofMaterialsAfter(); im++) {
-      LitAddMaterialElectron(lpar, sta.GetMaterialAfter(im));
+      LitAddMaterial(lpar, sta.GetMaterialAfter(im));
    }
 }
 

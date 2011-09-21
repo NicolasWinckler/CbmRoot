@@ -160,6 +160,10 @@ private:
    TrackFinderPtr fFinder; // track finder
    HitToTrackMergerPtr fMerger; // hit-to-track merger
    TrackFitterPtr fFitter; // track fitter
+   // track propagator
+   // Used to propagate STS track to the last STS station!!!
+   // Since this cannot be done in parallel mode!!!
+   TrackPropagatorPtr fPropagator;
 
    // Settings
    // Tracking method to be used

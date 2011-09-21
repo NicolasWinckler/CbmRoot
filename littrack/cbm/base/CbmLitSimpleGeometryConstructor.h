@@ -19,6 +19,7 @@
 class TGeoManager;
 class TGeoMedium;
 class TGeoVolume;
+class TGeoNode;
 
 class CbmLitSimpleGeometryConstructor
 {
@@ -127,6 +128,13 @@ private:
     * \brief Construct simplified RICH geometry.
     */
    void ConstructRich();
+
+   /**
+    * \brief Construct RICH node with TRAP shape.
+    */
+   void ReadRichTRAP(
+         TGeoNode* node,
+         double startZ);
 
    TGeoManager* fGeo; // Pointer to full geometry
    TGeoManager* fSimpleGeo; // Pointer to simplified geometry

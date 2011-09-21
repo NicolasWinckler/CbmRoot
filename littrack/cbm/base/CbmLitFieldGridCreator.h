@@ -1,11 +1,12 @@
-/** CbmLitFieldGridCreator.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
- **
- ** Class creates grid with magnetic field
- ** values at a certain Z position.
- **/
+/**
+ * \file CbmLitFieldGridCreator.h
+ *
+ * \brief Class creates grid with magnetic field values at a certain Z position.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
+ *
+ */
 #ifndef CBMLITFIELDGRIDCREATOR_H_
 #define CBMLITFIELDGRIDCREATOR_H_
 
@@ -13,30 +14,49 @@
 #include "../../parallel/LitField.h"
 class FairField;
 
-class CbmLitFieldGridCreator {
+class CbmLitFieldGridCreator
+{
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitFieldGridCreator();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitFieldGridCreator();
 
-   /* Sets acceptance angle for X. */
+   /**
+    * \brief Set acceptance angle for X.
+    * \param[in] xangle Angle value.
+    */
    void SetXangle(float xangle) {fXangle = xangle;}
 
-   /* Sets acceptance angle for Y. */
+   /**
+    * \brief Set acceptance angle for Y.
+    * \param[in] yangle Angle value.
+    */
    void SetYangle(float yangle) {fYangle = yangle;}
 
-   /* Sets cell size for X. */
+   /**
+    * \brief Set cell size for X.
+    * \param[in] cellSizeX Cell size value.
+    */
    void SetCellSizeX(int cellSizeX) {fCellSizeX = cellSizeX;}
 
-   /* Sets cell size for Y. */
+   /**
+    * \brief Set cell size for Y.
+    * \param[in] cellSizeY Cell size value.
+    */
    void SetCellSizeY(int cellSizeY) {fCellSizeY = cellSizeY;}
 
-   /* Creates grid with magnetic field values in (X, Y) slice
-    * Z position.
-    *@param Z Z position of the slice.
-    *@param grid Output grid */
+   /**
+    * \brief Main function which creates grid with magnetic field values in (X, Y) slice.
+    *
+    * \param[in] Z Z position of the slice.
+    * \param[out] grid Output grid.
+    */
    void CreateGrid(
       fscal Z,
       lit::parallel::LitFieldGrid& grid);

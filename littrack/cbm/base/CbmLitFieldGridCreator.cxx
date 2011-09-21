@@ -1,11 +1,10 @@
-/** CbmLitFieldGridCreator.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
- **
- ** Class creates grid with magnetic field
- ** values at a certain Z position.
- **/
+/**
+ * \file CbmLitFieldGridCreator.cxx
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
+ *
+ */
 #include "CbmLitFieldGridCreator.h"
 #include "CbmLitEnvironment.h"
 #include "../../parallel/LitField.h"
@@ -67,5 +66,5 @@ void CbmLitFieldGridCreator::CreateGrid(
    }
    grid.SetZ(Z);
    grid.SetField(field, -Xmax, Xmax, -Ymax, Ymax, nofCellsX, nofCellsY);
-   std::cout << "Grid created: " << grid << std::endl;
+   std::cout << "Grid created: " << grid;
 }

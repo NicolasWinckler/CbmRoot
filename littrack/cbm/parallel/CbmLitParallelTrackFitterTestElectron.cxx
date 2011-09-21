@@ -69,7 +69,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
    if (par.GetTx() == 0. && par.GetTy() == 0.) { return kLITERROR; }
 
    lit::parallel::LitTrackParam<fscal> lpar;
-//   CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
+   CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 
    int ihit = 0;
 
@@ -101,19 +101,19 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 //      lit::parallel::LitAddMaterial(lpar, vp2.GetMaterial());
 
 
-//      if (vp2.GetZ() < 420.) lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(),
-//              vp1.GetFieldGrid(), vp1.GetFieldGridMid(), vp2.GetFieldGrid());
-//      else lit::parallel::LitLineExtrapolation(lpar, vp2.GetZ());
-////      lit::parallel::LitAddMaterialElectron(lpar, vp2.GetMaterial());
-//      lit::parallel::LitAddMaterial(lpar, vp2.GetMaterial());
+      if (vp2.GetZ() < 420.) lit::parallel::LitRK4Extrapolation(lpar, vp2.GetZ(),
+              vp1.GetFieldGrid(), vp1.GetFieldGridMid(), vp2.GetFieldGrid());
+      else lit::parallel::LitLineExtrapolation(lpar, vp2.GetZ());
+//      lit::parallel::LitAddMaterialElectron(lpar, vp2.GetMaterial());
+      lit::parallel::LitAddMaterial(lpar, vp2.GetMaterial());
 
 
 //       fExtrapolator->Extrapolate(&par, vp2.GetZ());
-       LitStatus propStatus = fPropagator->Propagate(&par, vp2.GetZ(), 13, NULL);
-       if (propStatus != kLITSUCCESS) return kLITERROR;
+//       LitStatus propStatus = fPropagator->Propagate(&par, vp2.GetZ(), 13, NULL);
+//       if (propStatus != kLITSUCCESS) return kLITERROR;
    }
 
-    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
+//    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 
 
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {

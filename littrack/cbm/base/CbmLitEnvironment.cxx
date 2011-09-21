@@ -558,13 +558,15 @@ void CbmLitEnvironment::GetTrdLayout(
 
    CbmLitFieldGridCreator gridCreator;
    CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
-   std::vector<CbmLitMaterialInfo> trdMaterial = geoConstructor->GetMyTrdGeoNodes();
+   const std::vector<CbmLitMaterialInfo>& trdMaterial = geoConstructor->GetMyTrdGeoNodes();
+   const std::vector<CbmLitMaterialInfo>& richMaterial = geoConstructor->GetMyRichGeoNodes();
 
    TrdLayout();
    const CbmLitDetectorLayout& trdLayout = GetTrdLayout();
    std::cout << trdLayout.ToString();
 
    // Add virtual planes
+   int richMatCnt = 0;
    for (int nvp = 0; nvp < 33; nvp++) {
       lit::parallel::LitVirtualPlaneElectron<T> virtualPlane;
       float DZ = 10.;
@@ -574,14 +576,20 @@ void CbmLitEnvironment::GetTrdLayout(
       gridCreator.CreateGrid(Z, fieldGrid);
       gridCreator.CreateGrid(Z + DZ/2., fieldGridMid);
 
-      CbmLitMaterialInfo mat = trdMaterial[5]; //air material
+      CbmLitMaterialInfo mat;
       lit::parallel::LitMaterialInfo<T> m;
+      if (nvp >= 10 && nvp <= 15) { // Add RICH material
+         mat = richMaterial[richMatCnt++];
+         m.Thickness = mat.GetLength();
+      } else { // Add air
+         mat = trdMaterial[5]; //air material
+         m.Thickness = DZ;//mat.GetLength();
+      }
       m.A = mat.GetA();
       m.Z = mat.GetZ();
       m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
             16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
       m.Rho = mat.GetRho();
-      m.Thickness = DZ;//mat.GetLength();
       m.X0 = mat.GetRL();
       m.Zpos = Z + DZ;//mat.GetZpos();
       m.CalculateValues();
@@ -593,7 +601,7 @@ void CbmLitEnvironment::GetTrdLayout(
 
       layout.AddVirtualPlane(virtualPlane);
    }
-   //
+   // end add virtual planes
 
    for (int isg = 0; isg < trdLayout.GetNofStationGroups(); isg++) {
       const CbmLitStationGroup& stationGroup = trdLayout.GetStationGroup(isg);
@@ -630,6 +638,8 @@ void CbmLitEnvironment::GetTrdLayout(
       } // loop over stations
       layout.AddStationGroup(sg);
    } // loop over station groups
+   std::cout << layout;
+   std::cout << "Finish getting TRD layout for parallel version of tracking..." << std::endl;
 }
 
 int CbmLitEnvironment::MaterialId(

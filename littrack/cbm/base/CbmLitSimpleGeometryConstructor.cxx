@@ -23,6 +23,8 @@
 #include "TGeoMatrix.h"
 #include "TGeoBBox.h"
 #include "TGeoCone.h"
+#include "TGeoSphere.h"
+#include "TGeoArb8.h"
 
 #include <iostream>
 #include <sstream>
@@ -165,7 +167,13 @@ void CbmLitSimpleGeometryConstructor::CreateMediumList()
       fMedium["RPCgas"] = CreateMedium("RPCgas");
       fMedium["RPCglass"] = CreateMedium("RPCglass");
    }
-
+   if (fIsRich) {
+      fMedium["aluminium"] = CreateMedium("aluminium");
+      fMedium["CsI"] = CreateMedium("CsI");
+      fMedium["RICHglass"] = CreateMedium("RICHglass");
+      fMedium["kapton"] = CreateMedium("kapton");
+      fMedium["RICHgas_CO2_dis"] = CreateMedium("RICHgas_CO2_dis");
+   }
 }
 
 void CbmLitSimpleGeometryConstructor::ConstructSts()
@@ -385,6 +393,93 @@ void CbmLitSimpleGeometryConstructor::ConstructTof()
 
 void CbmLitSimpleGeometryConstructor::ConstructRich()
 {
+   std::cout << "-I- Construction of the RICH geometry started" << std::endl;
 
+   TGeoNode* rich = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject("rich1_0");
+   const double* richPos  = rich->GetMatrix()->GetTranslation();
+
+   TGeoNode* gas1 = (TGeoNode*) rich->GetNodes()->FindObject("rich1gas1_0");
+   const double* gas1Pos  = gas1->GetMatrix()->GetTranslation();
+   ReadRichTRAP(gas1, richPos[2]);
+
+   TGeoNode* gas3 = (TGeoNode*) rich->GetNodes()->FindObject("rich1gas3_0");
+   const double* gas3Pos  = gas3->GetMatrix()->GetTranslation();
+   ReadRichTRAP(gas3, richPos[2]);
+
+   // Photodetector
+   TGeoNode* photo = (TGeoNode*) gas1->GetNodes()->FindObject("rich1d_1");
+   const double* photoPos  = photo->GetMatrix()->GetTranslation();
+   photo->Print();
+   TGeoBBox* photoShape = (TGeoBBox*) photo->GetVolume()->GetShape();
+   TGeoMedium* photoMed = photo->GetVolume()->GetMedium();
+   TGeoShape* photoShape1 = new TGeoCone(photoShape->GetDZ(), 0., 300.,   0.,   300.);
+   TGeoMedium* photoMed1 = fMedium[photoMed->GetName()];
+   TGeoVolume* photoVolume1 = new TGeoVolume(photo->GetName(), photoShape1, photoMed1);
+   myf photoZ1 = richPos[2] + gas1Pos[2] + photoPos[2];
+   TGeoMatrix* photoMatrix1 = new TGeoTranslation(0, 0, photoZ1);
+   fSimpleGeo->GetTopVolume()->AddNode(photoVolume1, 0, photoMatrix1);
+
+   CbmLitMaterialInfo photoLitMaterial;
+   photoLitMaterial.SetLength(2. * photoShape->GetDZ());
+   photoLitMaterial.SetZpos(photoZ1);
+   GeoMediumToMaterialInfo(photoMed1, photoLitMaterial);
+   fMyGeoNodes.push_back(photoLitMaterial);
+   fMyRichGeoNodes.push_back(photoLitMaterial);
+   // end photodetector
+
+   // Mirror
+   TGeoNode* mgl = (TGeoNode*) gas3->GetNodes()->FindObject("rich1mgl_1");
+   const double* mglPos  = mgl->GetMatrix()->GetTranslation();
+   TGeoSphere* mglShape = (TGeoSphere*) mgl->GetVolume()->GetShape();
+   TGeoMedium* mglMed = mgl->GetVolume()->GetMedium();
+   double mglDZ = mglShape->GetRmax() - mglShape->GetRmin();
+   TGeoShape* mglShape1 = new TGeoCone(mglDZ, 0., 300.,   0.,   300.);
+   TGeoMedium* mglMed1 = fMedium[mglMed->GetName()];
+   TGeoVolume* mglVolume1 = new TGeoVolume(mgl->GetName(), mglShape1, mglMed1);
+   myf mglZ1 = richPos[2] + gas3Pos[2];// + mglPos[2];
+   TGeoMatrix* mglMatrix1 = new TGeoTranslation(0, 0, mglZ1);
+   fSimpleGeo->GetTopVolume()->AddNode(mglVolume1, 0, mglMatrix1);
+
+   CbmLitMaterialInfo mglLitMaterial;
+   mglLitMaterial.SetLength(mglDZ);
+   mglLitMaterial.SetZpos(mglZ1);
+   GeoMediumToMaterialInfo(mglMed1, mglLitMaterial);
+   fMyGeoNodes.push_back(mglLitMaterial);
+   fMyRichGeoNodes.push_back(mglLitMaterial);
+   // end mirror
+
+   // Entrance
+   TGeoNode* entrance = (TGeoNode*) rich->GetNodes()->FindObject("rich1entrance_0");
+   ReadRichTRAP(entrance, richPos[2]);
+   // end entrance
+
+   // Exit
+   TGeoNode* exit = (TGeoNode*) rich->GetNodes()->FindObject("rich1exit_0");
+   ReadRichTRAP(exit, richPos[2]);
+   // end exit
+
+   std::cout << "-I- Construction of the RICH geometry finished" << std::endl;
+}
+
+void CbmLitSimpleGeometryConstructor::ReadRichTRAP(
+      TGeoNode* node,
+      double startZ)
+{
+   TGeoTrap* shape = (TGeoTrap*) node->GetVolume()->GetShape();
+   TGeoMedium* med = node->GetVolume()->GetMedium();
+   double DZ = 2 * shape->GetDz();
+   TGeoShape* shape1 = new TGeoCone(DZ, 0., 300.,   0.,   300.);
+   TGeoMedium* med1 = fMedium[med->GetName()];
+   TGeoVolume* volume1 = new TGeoVolume(node->GetName(), shape1, med1);
+   myf Z1 = startZ +  node->GetMatrix()->GetTranslation()[2];
+   TGeoMatrix* matrix1 = new TGeoTranslation(0, 0, Z1);
+   fSimpleGeo->GetTopVolume()->AddNode(volume1, 0, matrix1);
+
+   CbmLitMaterialInfo litMaterial;
+   litMaterial.SetLength(DZ);
+   litMaterial.SetZpos(Z1);
+   GeoMediumToMaterialInfo(med1, litMaterial);
+   fMyGeoNodes.push_back(litMaterial);
+   fMyRichGeoNodes.push_back(litMaterial);
 }
 

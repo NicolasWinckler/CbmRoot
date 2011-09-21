@@ -24,10 +24,11 @@ export SCRIPT=yes
 
 function study_summary()
 {
-    cd /u/andrey/web-docs/tests/$DAY
+    cd /u/andrey/web-docs/tests/$DAY/
     rm -r -f summary_$1
     mkdir summary_$1
     cd summary_$1
+    export SCRIPT=yes
     export STUDYOUTPUTDIR=./
     export NSTUDIES=3
     export STUDYRESULT1=../results_$1_branch
@@ -65,5 +66,6 @@ study_summary electron
 
 chmod -R u+rwX,g+rx,o+rx /u/andrey/web-docs/tests/$DAY/
 
+export SCRIPT=no
 
 

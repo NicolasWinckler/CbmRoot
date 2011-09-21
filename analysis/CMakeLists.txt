@@ -26,6 +26,7 @@ ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface 
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/rich
+${CBMROOT_SOURCE_DIR}/littrack
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -64,11 +65,13 @@ much/CbmAnaAngularAcceptance.cxx
 
 #timing/CbmAnaTimingAnalysis.cxx 
 #timing/CbmAnaEpochTest.cxx
-timing/CbmAnaTimingMuchDigitizer.cxx
-timing/CbmAnaTimingMuchHitFinder.cxx
-timing/CbmAnaTimingStsDigitizer.cxx
-timing/CbmAnaTimingStsHitFinder.cxx
-#dielectron/CbmAnaDielectronTask.cxx
+#timing/CbmAnaTimingMuchDigitizer.cxx
+#timing/CbmAnaTimingMuchHitFinder.cxx
+#timing/CbmAnaTimingStsDigitizer.cxx
+#timing/CbmAnaTimingStsHitFinder.cxx
+
+dielectron/CbmAnaDielectronTask.cxx
+dielectron/CbmAnaDielectronTaskDraw.cxx
 )
 
 

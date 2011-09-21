@@ -1,8 +1,8 @@
 #!/bin/sh
 
-DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/70_field/delta
+DIR=/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omega
 
-OUTPUTFILE=$DIR/mytask.analysis.delta.all.root
-INPUTFILES=$DIR/mytask.analysis.delta.0*.root
+OUTPUTFILE=$DIR/analysis.delta.all.root
+INPUTFILES=$DIR/analysis.delta.0*.root
 
 hadd -T -f $OUTPUTFILE $INPUTFILES

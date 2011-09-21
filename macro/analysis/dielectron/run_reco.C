@@ -7,10 +7,10 @@ void run_reco(Int_t nEvents = 700){
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	gRandom->SetSeed(10);
+	//gRandom->SetSeed(10);
 
 	TString inFile = "", parFile = "", outFile ="", deltaFile ="";
-    TString delta = ""; // if "yes" Delta electrons will be embedded
+   TString delta = ""; // if "yes" Delta electrons will be embedded
 	if (script != "yes") {
 		TString inFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
 		TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
@@ -23,12 +23,11 @@ void run_reco(Int_t nEvents = 700){
 		deltaFile = TString(gSystem->Getenv("DELTAFILE"));
 	}
 
-    //TString stsDigiFile = "sts_standard.digi.par";
-    TString stsDigiFile = "sts_Jan2011.digi.par";
-    gDebug = 0;
+	TString stsDigiFile = "sts_v11a.digi.par";
+   gDebug = 0;
 
-    TStopwatch timer;
-    timer.Start();
+   TStopwatch timer;
+   timer.Start();
 
 	// ----  Load libraries   -------------------------------------------------
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -46,40 +45,41 @@ void run_reco(Int_t nEvents = 700){
     // =========================================================================
     // ===                     MVD local reconstruction                      ===
 	// =========================================================================
-    CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("MVD Digitizer", 0, iVerbose);
-    mvdDigitizeL->SetPixelSize(18.4); //should be 20x20
-    mvdDigitizeL->SetEpiThickness(0.0014);
-   //mvdDigitizeL->ShowDebugHistograms();
-    //mvdDigitizeL->SetBgFileName(bgFile);
-    //mvdDigitizeL->SetPileUp(0);
-    if (delta == "yes"){
-		mvdDigitizeL->SetDeltaName(deltaFile);
-		mvdDigitizeL->SetDeltaEvents(1000); //1/1000 target
-    }
-    run->AddTask(mvdDigitizeL);
+	Bool_t useMvdInTracking = kFALSE;
+	if (IsMvd(parFile)) {
+	   useMvdInTracking = kTRUE;
+      CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("CbmMvdDigitizeL", 0, iVerbose);
+      mvdDigitizeL->SetPixelSize(18.4); //should be 20x20
+      mvdDigitizeL->SetEpiThickness(0.0014);
+      //mvdDigitizeL->ShowDebugHistograms();
+      //mvdDigitizeL->SetBgFileName(bgFile);
+      //mvdDigitizeL->SetPileUp(0);
+      if (delta == "yes"){
+         mvdDigitizeL->SetDeltaName(deltaFile);
+         mvdDigitizeL->SetDeltaEvents(1000); //1/1000 target
+      }
+      run->AddTask(mvdDigitizeL);
 
-    CbmMvdFindHits* mvdFindHits = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
-    mvdFindHits->SetSigmaNoise(11,kTRUE);
-    //mvdFindHits->ShowDebugHistograms();
+      CbmMvdFindHits* mvdFindHits = new CbmMvdFindHits("CbmMvdFindHits", 0, iVerbose);
+      mvdFindHits->SetSigmaNoise(11,kTRUE);
+      //mvdFindHits->ShowDebugHistograms();
+      mvdFindHits->SetAdcDynamic(150);
+      mvdFindHits->SetAdcOffset(0);
+      mvdFindHits->SetAdcBits(1);
+      mvdFindHits->SetSeedThreshold(1); //75 ele
+      mvdFindHits->SetNeighbourThreshold(1); //75 el
+      run->AddTask(mvdFindHits);
 
-    mvdFindHits->SetAdcDynamic(150);
-    mvdFindHits->SetAdcOffset(0);
-    mvdFindHits->SetAdcBits(1);
-
-    mvdFindHits->SetSeedThreshold(1); //75 ele
-    mvdFindHits->SetNeighbourThreshold(1); //75 el
-    run->AddTask(mvdFindHits);
-
-    // MVD ideal
-    //{
-    //CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
-    //run->AddTask(mvdHitProd);
-    //}
+      // MVD ideal
+      //{
+      //CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
+      //run->AddTask(mvdHitProd);
+      //}
+	}
 
 	// =========================================================================
 	// ===                      STS local reconstruction                     ===
 	// =========================================================================
-
     if (true){ // STS REAL
     Double_t threshold  =  4;
     Double_t noiseWidth =  0.1;
@@ -100,7 +100,7 @@ void run_reco(Int_t nEvents = 700){
     stsDigitize->SetStripDeadTime  (StripDeadTime);
     run->AddTask(stsDigitize);
 
-    FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+    FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
     run->AddTask(stsClusterFinder);
 
     FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
@@ -109,10 +109,10 @@ void run_reco(Int_t nEvents = 700){
     CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
     run->AddTask(stsMatchHits);
     } else { // STS IDEAL RESPONSE
-      FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
+      FairTask* stsDigitize = new CbmStsIdealDigitize("CbmStsIdealDigitize", iVerbose);
       run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
       run->AddTask(stsClusterFinder);
 
       FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
@@ -120,7 +120,7 @@ void run_reco(Int_t nEvents = 700){
 
       FairTask* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
       run->AddTask(stsMatchHits);
-    }
+   }
 
 
 	CbmKF* kalman = new CbmKF();
@@ -129,9 +129,9 @@ void run_reco(Int_t nEvents = 700){
 //	CbmL1* l1 = new CbmL1("CbmL1",1, 3); //to fill L1 histo
 	run->AddTask(l1);
 
-	CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
-	Bool_t useMvd = kTRUE;
-	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, useMvd);
+	CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
+	//Bool_t useMvdInTracking = kTRUE;
+	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, useMvdInTracking);
 	run->AddTask(stsFindTracks);
 
 	FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
@@ -269,6 +269,7 @@ void run_reco(Int_t nEvents = 700){
 	// Reconstruction Qa
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
+	reconstructionQa->SetUseConsecutivePointsInSts(true);
 	reconstructionQa->SetMinNofPointsTrd(9);
 	reconstructionQa->SetMinNofPointsMuch(10);
 	reconstructionQa->SetMinNofPointsTof(1);
@@ -281,6 +282,7 @@ void run_reco(Int_t nEvents = 700){
 	reconstructionQa->SetMinNofHitsRich(7);
 	reconstructionQa->SetQuotaRich(0.6);
 	reconstructionQa->SetOutputDir("recoIm/");
+	reconstructionQa->SetOutputJsonFileName("rec_qa_json_file.txt");
 	run->AddTask(reconstructionQa);
 
     // =========================================================================

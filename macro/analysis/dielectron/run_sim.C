@@ -5,12 +5,12 @@ void run_sim(Int_t nEvents = 700)
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	gRandom->SetSeed(10);
+	//gRandom->SetSeed(10);
 
 	TString inFile = "", parFile = "", outFile ="";
-	TString caveGeom = "", targetGeom = "", pipeGeom   = "",
-			magnetGeom = "", mvdGeom    = "", mvdGeom = "",stsGeom = "", richGeom= "",
-			trdGeom = "", tofGeom = "", ecalGeom = "";
+	TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "",
+	      mvdGeom    = "", mvdGeom = "",stsGeom = "", richGeom= "", trdGeom = "",
+	      tofGeom = "", ecalGeom = "";
 	TString fieldMap = "";
 
 	TString electrons = ""; // If "yes" than primary electrons will be generated
@@ -30,19 +30,18 @@ void run_sim(Int_t nEvents = 700)
 		parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
 		outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
 
-		caveGeom   = "cave.geo";
-		targetGeom = "target_au_250mu.geo";
-		pipeGeom   = "pipe_standard.geo";
-		magnetGeom = "magnet_electron_standard.geo";
-		mvdGeom    = "mvd_standard.geo";
-		mvdGeom = "";
-		stsGeom    = "sts_standard.geo";
-		richGeom   = "rich_standard.geo";
-		trdGeom    = "trd_standard_dec10.geo";
-		tofGeom    = "tof_standard.geo";
-		//ecalGeom   = "ecal_FastMC.geo";
+      caveGeom = "cave.geo";
+      targetGeom = "target_au_025mu.geo";
+      pipeGeom = "pipe_standard.geo";
+      mvdGeom = "";//"mvd/mvd_v08a.geo";
+      stsGeom = "sts/sts_v11a.geo";
+      richGeom = "rich/rich_v08a.geo";
+      trdGeom = "trd/trd_v10b.geo";
+      tofGeom = "tof/tof_v07a.geo";
+      ecalGeom = "";//"ecal_FastMC.geo";
+      fieldMap = "field_v10e";
+      magnetGeom = "passive/magnet_v09e.geo";
 
-		fieldMap = "field_electron_standard";
 		electrons = "yes";
 		NELECTRONS = 5;
 		NPOSITRONS = 5;
@@ -68,8 +67,8 @@ void run_sim(Int_t nEvents = 700)
 		fieldMap = TString(gSystem->Getenv("FIELDMAP"));
 		magnetGeom = TString(gSystem->Getenv("MAGNETGEOM"));
 
-		Int_t NELECTRONS = TString(gSystem->Getenv("NELECTRONS")).Atoi();
-		Int_t NPOSITRONS = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
+		NELECTRONS = TString(gSystem->Getenv("NELECTRONS")).Atoi();
+		NPOSITRONS = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
@@ -156,7 +155,7 @@ void run_sim(Int_t nEvents = 700)
 	// }
 
 	// -----   Create magnetic field   ----------------------------------------
-	if (fieldMap == "field_electron_standard" )
+	if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
 		CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
 	else if (fieldMap == "field_muon_standard" )
 		CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);

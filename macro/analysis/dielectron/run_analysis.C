@@ -3,23 +3,24 @@
  * @since 2010
  * @version 1.0
  **/
+#include "../../../cbmbase/CbmDetectorList.h";
 
-void run_analysis(Int_t nEvents = 200, Int_t cutNum = 1)
+void run_analysis(Int_t nEvents = 10)
 {
     Int_t iVerbose = 0;
 
     TString script = TString(gSystem->Getenv("SCRIPT"));
     TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-    gRandom->SetSeed(10);
+    //gRandom->SetSeed(10);
 
     TString inFile1 = "", inFile2 = "", parFile = "", outFile ="";
 
     if (script != "yes") {
-        TString DIR="/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/100_field/real";
-        TString inFile1 = DIR+"/mvd.mc.0000.root";
-        TString parFile = DIR+"/mvd.param.0000.root";
-        TString inFile2 = DIR+"/mvd.reco.0000.root";
+        TString DIR="/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/";
+        TString inFile1 = DIR+"/mc.0000.root";
+        TString parFile = DIR+"/param.0000.root";
+        TString inFile2 = DIR+"/reco.ideal.0000.root";
         TString outFile = DIR+"_test.root";
         //TString inFile1 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
         //TString inFile2 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
@@ -32,7 +33,7 @@ void run_analysis(Int_t nEvents = 200, Int_t cutNum = 1)
         outFile = TString(gSystem->Getenv("DILEPANALYSISFILE"));
     }
 
-    TString stsDigiFile = "sts_standard.digi.par";
+    TString stsDigiFile = "sts_v11a.digi.par";
     gDebug = 0;
 
     // load libraries
@@ -41,10 +42,8 @@ void run_analysis(Int_t nEvents = 200, Int_t cutNum = 1)
     gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
     cbmlibs();
     gSystem->Load("libAnalysis");
-    gSystem->Load("libDielectron");
+    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
-    // Number of events
-    Int_t coutBunch = 100;
     TStopwatch timer;
     timer.Start();
 
@@ -63,7 +62,7 @@ void run_analysis(Int_t nEvents = 200, Int_t cutNum = 1)
      // create and add task
   //   CbmDielectronTask *task = new CbmDielectronTask("name", "title");
 
-   CbmAnaDielectronTask *task = new CbmAnaDielectronTask("name", "title");
+   CbmAnaDielectronTask *task = new CbmAnaDielectronTask("CbmAnaDielectronTask", "CbmAnaDielectronTask");
     // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
 
 // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy
@@ -91,74 +90,11 @@ void run_analysis(Int_t nEvents = 200, Int_t cutNum = 1)
 // weight pi0 = Multiplicity * Branching Ratio = 365 * 1.2e-2  for 25 AGeV beam energy
     if (plutoParticle == "pi0") task->SetWeight(4.38);
 
-
+     task->SetUseMvd(IsMvd(parFile));
      task->SetUseRich(true);
      task->SetUseTrd(true);
      task->SetUseTof(true);
-/*
-     Double_t chiPr = 0.0;
-     Double_t angST = 0.0;
-     Double_t angTT = 0.0;
 
-     if (cutNum == 0){
-    	 chiPr = 1.5;
-    	 angST = 1.5;
-    	 angTT = 0.75;
-
-     } else if (cutNum == 1){
-    	 chiPr = 2;
-		 angST = 1.5;
-		 angTT = 0.75;
-
-     } else if (cutNum == 2){
-    	 chiPr = 3;
-		 angST = 1.5;
-		 angTT = 0.75;
-     } else if (cutNum == 3){
-    	 chiPr = 2;
-		 angST = 0.7;
-		 angTT = 0.75;
-     } else if (cutNum == 4){
-    	 chiPr = 3;
-		 angST = 1.5;
-		 angTT = 0.75;
-     } else if (cutNum == 5){
-    	 chiPr = 2;
-		 angST = 2.5;
-		 angTT = 0.75;
-     } else if (cutNum == 6){
-    	 chiPr = 2;
-		 angST = 3.;
-		 angTT = 0.75;
-     } else if (cutNum == 7){
-    	 chiPr = 3;
-		 angST = 0.7;
-		 angTT = 0.75;
-     } else if (cutNum == 8){
-    	 chiPr = 2;
-		 angST = 0.7;
-		 angTT = 2.;
-     } else if (cutNum == 9){
-    	 chiPr = 2;
-		 angST = 0.7;
-		 angTT = 3.5;
-     } else if (cutNum == 10){
-
-     } else if (cutNum == 11){
-
-     }*/
-     // ID cuts
-/*     task->SetTrdAnnCut(0.85);
-     task->SetRichAnnCut(0.0);
-     task->SetUseRichAnn(true);
-     // Analysis cuts
-     task->SetChiPrimCut(chiPr);
-     task->SetPtCut(0.2);
-     task->SetAngleCut(1.);
-     task->SetGammaCut(0.025);
-     task->SetSTCut(angST, 1.5);// ang, pp
-     task->SetTTCut(angTT, 4.);// ang, pp
-*/
      fRun->AddTask(task);
 
     TString stsDigi = gSystem->Getenv("VMCWORKDIR");

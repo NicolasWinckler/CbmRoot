@@ -4,13 +4,7 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/u/ebelolap/OCT10/build64
-
-#Output directory for simulation files
-#export DIR=/lustre/cbm/user/ebelolap/oct10/rho0/10gev/100_field
-
-#Output directory for image files
-#export IMAGEDIR=/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/100_field/real/images/
+export MYBUILDDIR=/u/slebedev/JUL09/build64
 
 export TRACKINGTYPE=branch
 
@@ -33,81 +27,81 @@ export PLUTO=yes
 
 #If "yes" DELTA electrons will be embedded
 export DELTA=yes
+export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/25gev/100field/deltasource/mc.delta.root
+ 	  
+#Collision energy: 25gev or 10gev -> set proper weight into analysis
+export ENERGY=25gev
 #---------------------------------------------------
+
 # Geometries
     export CAVEGEOM=cave.geo
     export TARGETGEOM=target_au_025mu.geo
     export PIPEGEOM=pipe_standard.geo
-    #pipe_standard_tobias.geo
-    #pipe_standard.geo
     export SHIELDGEOM=
-   
-    export MVDGEOM=mvd_2maps_2008.geo
-    #3maps-5-10-15cm_active-MimoSIS-Malice_abs-Cu-1cm_noFPC.geo
-    #mvd_2maps_2008.geo
-    export STSGEOM=sts_Jan2011.geo
+    export MVDGEOM=mvd/mvd_v08a.geo
+    export STSGEOM=sts/sts_v11a.geo
     export MUCHGEOM=
-    export RICHGEOM=rich_standard.geo
-    export TRDGEOM=trd_standard_dec10.geo
-    export TOFGEOM=tof_standard.geo
+    export RICHGEOM=rich/rich_v08a.geo
+    export TRDGEOM=trd/trd_v10b.geo
+    export TOFGEOM=tof/tof_v07a.geo
     export ECALGEOM=
-    export FIELDMAP=field_electron_standard
-    export MAGNETGEOM=magnet_electron_standard.geo
-	export FIELDMAPSCALE=0.7
-#----------------------------------------------------	
+    export FIELDMAP=field_v10e
+    export MAGNETGEOM=passive/magnet_v09e.geo
+	export FIELDMAPSCALE=1.0
+	
+	export FIELDDIR=100field
+	export MVDDIR=mvd
+	
+#----------------------------------------------------
 #number of events for each thread
-export NEVENTS=700
+export NEVENTS=600
 
-for Z in 1; do
-    
+C=0
+
+for Z in 1 2 3 4; do
     if [ $Z = "0" ] ; then
         export PLUTOPARTICLE=
-        export DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_only/25gev/70_field
+        export DIR=
         export PLUTO=no
     fi
 	if [ $Z = "1" ] ; then 
 		export PLUTOPARTICLE=rho0 
-		export DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_rho0/25gev/70_field/delta
+		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/rho0
 	fi	
 	if [ $Z = "2" ] ; then 
 		export PLUTOPARTICLE=omegaepem
-		export DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_omega/25gev/70_field/delta
+		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/omega
 	fi	
 	if [ $Z = "3" ] ; then 
 		export PLUTOPARTICLE=omegadalitz
-		export DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_omega_dalitz/25gev/70_field/delta
+		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/omegadalitz
 	fi	
 	if [ $Z = "4" ] ; then 
 		export PLUTOPARTICLE=phi
-		export DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_phi/25gev/70_field/delta
+		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/phi
 	fi
-        if [ $Z = "5" ] ; then 
+    if [ $Z = "5" ] ; then 
 		export PLUTOPARTICLE=pi0 
-		export DIR=/lustre/cbm/user/ebelolap/oct10/urqmd_pi0/25gev/70_field/real
+		export DIR=
 	fi	
 
-#    for K in 0 1; do
-#   for Y in 0 ; do
-#    for X in 1 ; do
+  # for K in 0; do
+  # for Y in 0 ; do
+   # for X in 1 ; do
 
-   for K in 0; do
-	 for Y in 0 1 2 3 4 5 6 7 8 9 ; do
-      for X in 0 1 2 3 4 5 6 7 8 9 ; do
+  for K in 0; do
+	for Y in 0 1 2 3 4 5 6 7 8 9 ; do
+     for X in 0 1 2 3 4 5 6 7 8 9 ; do
 
 	  export XXXX=0$K$Y$X
-	  echo batch $XXXX submitted
+	  #echo batch $XXXX submitted
 	  export INFILE=/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
 	  export MCFILE=$DIR/mc.$XXXX.root
 	  export PARFILE=$DIR/param.$XXXX.root
-      export RECOFILE=$DIR/reco.nodelta.all.ideal.$XXXX.root
- 	  export DELTAFILE=/lustre/cbm/user/ebelolap/oct10/delta/25gev/70_field/mc.delta.0000.root
-
-	  export RECORICHFILE=$DIR/rich.reco.$XXXX.root
-	  export ELIDFILE=$DIR/elid.qa.$XXXX.root
+      export RECOFILE=$DIR/reco.delta.$XXXX.root
       export RECOQAFILE=$DIR/litreco.qa.$XXXX.root
-	  export DILEPANALYSISFILE=$DIR/mytask.analysis.$XXXX.root
+	  export DILEPANALYSISFILE=$DIR/analysis.delta.$XXXX.root
 
- 	 
 	  if [ $Z = "1" ] ; then 
 		export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/rho0/epem/pluto.auau.25gev.rho0.epem.$XXXX.root
 	  fi	
@@ -123,11 +117,21 @@ for Z in 1; do
  	  if [ $Z = "5" ] ; then 
 		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/pi0/gammaepem/pluto.auau.25gev.pi0.gammaepem.10k.$XXXX.root
 	  fi	  
-    #      . ./sim.sh
-	 #xterm -hold -e ". ./sim.sh $number"&
-       bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
+       	# . ./sim.sh
+	 	# xterm -hold -e ". ./sim.sh $number"&
+     	 bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
+     	
+     	#FILESIZE=$(stat -c%s "$MCFILE")
+        #FILESIZERECO=$(stat -c%s "$RECOFILE")        
+     	#if [ ! -e $MCFILE ] || [ "$FILESIZE" -le 1300000000 ] || [ ! -e $RECOFILE ] || [ "$FILESIZERECO" -le 1200000000 ]; then
+        #if [ ! -e $MCFILE ]; then                        
+        #        bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
+        #        (( C += 1 ))
+        #        echo $C
+     	#fi
 	  done
 	 done
 	done
+        echo $COUNT
 done
 export SCRIPT=no

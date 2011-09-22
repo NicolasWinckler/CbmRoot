@@ -136,7 +136,7 @@ public:
     * \brief Set output directory for images.
     * \param[in] dir Directory name.
     */
-   void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
+   void SetOutputDir(const std::string& dir = "") { fOutputDir = dir;}
 
    /**
     * \brief Return output directory for images.

@@ -1314,9 +1314,9 @@ void CbmLitReconstructionQaImpl::PionSuppression()
       Bool_t isStsOk = stsId > -1 && fIsSts;
       Bool_t isTrdOk = trdId > -1 && fIsTrd;
       Bool_t isTofOk = tofId > -1 && fIsTof;
-      Bool_t isRichOk = richId > -1 && fIsRich;
-     // FairTrackParam* proj   = (FairTrackParam*)fRichProjections->At(iTrack);
-     // if (proj != NULL && proj->GetX()!= 0 &&  proj->GetY()!= 0) isRichOk = true;
+      Bool_t isRichOk = false;//richId > -1 && fIsRich;
+      FairTrackParam* proj   = (FairTrackParam*)fRichProjections->At(iTrack);
+      if (proj != NULL && proj->GetX()!= 0 &&  proj->GetY()!= 0) isRichOk = true;
 
       if (!isStsOk) continue;
       CbmStsTrack* stsTrack = (CbmStsTrack*)fStsTracks->At(stsId);
@@ -1335,25 +1335,25 @@ void CbmLitReconstructionQaImpl::PionSuppression()
 
       if (!isPion) continue;
 
-//      if (isTrdOk) fhStsTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
-//      if (isTrdOk && isTofOk) fhStsTrdMomElIdNormStsTrdTof[kPionSupp][kAcc]->Fill(momentum);
-//      if (isTrdOk && isTofOk) fhStsTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
-//      if (isRichOk) fhStsRichMomElId[kPionSupp][kAcc]->Fill(momentum);
-//      if (isRichOk && isTrdOk) fhStsRichMomElIdNormStsRichTrd[kPionSupp][kAcc]->Fill(momentum);
-//      if (isRichOk && isTrdOk) fhStsRichTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
-//      if (isRichOk && isTrdOk && isTofOk) fhStsRichMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
-//      if (isRichOk && isTrdOk && isTofOk) fhStsRichTrdMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
-//      if (isRichOk && isTrdOk && isTofOk) fhStsRichTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
+      if (isTrdOk) fhStsTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
+      if (isTrdOk && isTofOk) fhStsTrdMomElIdNormStsTrdTof[kPionSupp][kAcc]->Fill(momentum);
+      if (isTrdOk && isTofOk) fhStsTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
+      if (isRichOk) fhStsRichMomElId[kPionSupp][kAcc]->Fill(momentum);
+      if (isRichOk && isTrdOk) fhStsRichMomElIdNormStsRichTrd[kPionSupp][kAcc]->Fill(momentum);
+      if (isRichOk && isTrdOk) fhStsRichTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
+      if (isRichOk && isTrdOk && isTofOk) fhStsRichMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
+      if (isRichOk && isTrdOk && isTofOk) fhStsRichTrdMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
+      if (isRichOk && isTrdOk && isTofOk) fhStsRichTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
 
-      fhStsTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
-      fhStsTrdMomElIdNormStsTrdTof[kPionSupp][kAcc]->Fill(momentum);
-      fhStsTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
-      fhStsRichMomElId[kPionSupp][kAcc]->Fill(momentum);
-      fhStsRichMomElIdNormStsRichTrd[kPionSupp][kAcc]->Fill(momentum);
-      fhStsRichTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
-      fhStsRichMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
-      fhStsRichTrdMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
-      fhStsRichTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsTrdMomElIdNormStsTrdTof[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsRichMomElId[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsRichMomElIdNormStsRichTrd[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsRichTrdMomElId[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsRichMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsRichTrdMomElIdNormStsRichTrdTof[kPionSupp][kAcc]->Fill(momentum);
+//      fhStsRichTrdTofMomElId[kPionSupp][kAcc]->Fill(momentum);
 
       Bool_t isRichElectron = fElectronId->IsRichElectron(gTrack, mcTrack->GetP());
       Bool_t isTrdElectron = fElectronId->IsTrdElectron(gTrack, mcTrack->GetP());
@@ -2047,7 +2047,7 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
    PolarAngleEfficiencyToPTree(&pt, "hRecAngle", fhRecAngle);
    PolarAngleEfficiencyToPTree(&pt, "hTofAngle", fhTofAngle);
 
-   write_json(std::string(fOutputDir + "rec_qa.json").c_str(), pt);
+   if (fOutputDir != "") write_json(std::string(fOutputDir + "rec_qa.json").c_str(), pt);
    return pt;
 }
 
@@ -2336,21 +2336,26 @@ void CbmLitReconstructionQaImpl::Draw()
 
    CbmLitReconstructionQaChecker qaChecker;
    qaChecker.DoCheck(qa, ideal, check);
-   write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
+   if (fOutputDir != "") write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
 
-   std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
-   CbmLitQaPrintGenerator::PrintFinalStatistics(fout, &qa);
+   if (fOutputDir != ""){
+      std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
+      CbmLitQaPrintGenerator::PrintFinalStatistics(fout, &qa);
+   }
 
-   CbmLitQaHTMLGenerator html;
-   html.SetIsElectronSetup(fIsElectronSetup);
-   html.SetDetectorPresence(kMVD, fIsMvd);
-   html.SetDetectorPresence(kSTS, fIsSts);
-   html.SetDetectorPresence(kRICH, fIsRich);
-   html.SetDetectorPresence(kTRD, fIsTrd);
-   html.SetDetectorPresence(kMUCH, fIsMuch);
-   html.SetDetectorPresence(kTOF, fIsTof);
-   std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-   html.Create(foutHtml, &qa, &ideal, &check);
+   if (fOutputDir != ""){
+      CbmLitQaHTMLGenerator html;
+      html.SetIsElectronSetup(fIsElectronSetup);
+      html.SetDetectorPresence(kMVD, fIsMvd);
+      html.SetDetectorPresence(kSTS, fIsSts);
+      html.SetDetectorPresence(kRICH, fIsRich);
+      html.SetDetectorPresence(kTRD, fIsTrd);
+      html.SetDetectorPresence(kMUCH, fIsMuch);
+      html.SetDetectorPresence(kTOF, fIsTof);
+
+      std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
+      html.Create(foutHtml, &qa, &ideal, &check);
+   }
 }
 
 void CbmLitReconstructionQaImpl::DrawEfficiencyHistos()
@@ -2515,7 +2520,7 @@ void CbmLitReconstructionQaImpl::DrawEfficiency(
 	   DrawMeanEfficiencyLines((*hist1)[kEff], eff1);
       if (opt == "pisupp") gPad->SetLogy(true);
    }
-	lit::SaveCanvasAsImage(canvas, fOutputDir);
+	if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 void CbmLitReconstructionQaImpl::DrawMcEfficiencyGraph()
@@ -2632,7 +2637,7 @@ void CbmLitReconstructionQaImpl::DrawHitsHistos(
               "fake/all: " + lit::NumberToString<Double_t>(histos[4]->GetMean()),
               "", "", kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
 
-   lit::SaveCanvasAsImage(c, fOutputDir);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(c, fOutputDir);
 }
 
 void CbmLitReconstructionQaImpl::DrawHitsStationHisto(
@@ -2643,7 +2648,7 @@ void CbmLitReconstructionQaImpl::DrawHitsStationHisto(
 	DrawHist1D(hist, "Station number", "Number of hits",
 			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "HIST TEXT0");
-	lit::SaveCanvasAsImage(canvas, fOutputDir);
+	if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 void CbmLitReconstructionQaImpl::DrawHitsStationHistos()
@@ -2691,7 +2696,7 @@ void CbmLitReconstructionQaImpl::DrawStsTracksQaHistos()
             LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
-   lit::SaveCanvasAsImage(canvas1, fOutputDir);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
    canvas1->cd(4);
    Int_t nBins = fhStsMomresVsMom->GetNbinsX();
@@ -2726,7 +2731,7 @@ void CbmLitReconstructionQaImpl::DrawMCMomVsAngle()
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
-   lit::SaveCanvasAsImage(canvas1, fOutputDir);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas1, fOutputDir);
 }
 void CbmLitReconstructionQaImpl::DrawHistosFromFile(const std::string& fileName)
 {

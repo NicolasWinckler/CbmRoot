@@ -1,5 +1,5 @@
 void streamer(Int_t nEvents=100){
-  TString dir = "data1";
+  TString dir = "data";
   TString inFile         = dir + "/mc.root";
   TString parFile        = dir + "/param.root";
   TString outFile        = dir + "/epoch.root";

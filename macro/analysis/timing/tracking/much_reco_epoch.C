@@ -1,6 +1,6 @@
 void much_reco_epoch(){
   Int_t nEvents=100;
-  TString dir = "data1/";
+  TString dir = "data/";
   TString epochFile   = dir + "epoch.root";
   TString outFile   = dir + "much.reco.root";
   TString parFile   = dir + "param.root";

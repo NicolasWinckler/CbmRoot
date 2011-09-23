@@ -32,6 +32,7 @@ public:
 private:
   void TimeDistributions();
   void DetailedAnalysis();
+  void SignalShape();
   
   Int_t         fEvent;             //!
   CbmMuchGeoScheme* fGeoScheme;     //!
@@ -55,13 +56,21 @@ private:
   TH1D* fhStationTotalR[5]; //!
   TH1D* fhStationFoundR[5]; //!
   TH1D* fhStationEffR[5]; //!
-
+  TH1D* fhChargeVsTime[100];
+  TH1D* fhSignalShape[100];
+  Double_t fShape[2000];
   TH1D* fPointsTimeAll; //!
-
+  TH1D* fhThresholdTime;
+  TH1D* fhMaxTime;
+  TH1D* fhMaxCharge;
+  
   Int_t fChannelId;
   Int_t fSectorId;
   Int_t fModuleId;
   Bool_t fEpoch;
+  
+  Int_t nTotal;
+  Int_t nLost;
   ClassDef(CbmAnaTimingMuchDigitizer,1)
 };
 

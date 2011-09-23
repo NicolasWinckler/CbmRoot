@@ -17,6 +17,7 @@
 
 #include "TObject.h"
 #include "TArrayI.h"
+#include "TArrayD.h"
 class TClonesArray;
 
 
@@ -71,7 +72,7 @@ class CbmMuchDigiMatch : public TObject
   UInt_t GetCharge(Int_t i) const;
   UInt_t GetTotalCharge() const;
   void SortPointsInTime(TClonesArray* points);
-
+  
   void Reset();
 
   /**
@@ -82,12 +83,20 @@ class CbmMuchDigiMatch : public TObject
    */
   UInt_t AddCharge(Int_t iPoint, UInt_t iCharge);
 
+  UInt_t AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime);
  
+  Int_t GetNoPrimaryElectrons() { return fDriftTimePerPrimaryElectron.GetSize(); }
+  Int_t    GetRefIndexPerPrimaryElectron(Int_t i)  { return fRefIndexPerPrimaryElectron[i]; }
+  Int_t    GetChargePerPrimaryElectron(Int_t i)    { return fChargePerPrimaryElectron[i]; }
+  Double_t GetDriftTimePerPrimaryElectron(Int_t i) { return fDriftTimePerPrimaryElectron[i]; }
  private:
 
-  TArrayI fRefIndex;      // Array of MC point indices
-  TArrayI fCharge;        // Array of charges from each MC point
-
+  TArrayI fRefIndex;                    // Array of MC point indices
+  TArrayI fCharge;                      // Array of charges from each MC point
+  TArrayI fRefIndexPerPrimaryElectron;  // Array of ref indices per primary electron 
+  TArrayI fChargePerPrimaryElectron;    // Array of charges per primary electron
+  TArrayD fDriftTimePerPrimaryElectron; // Array of driftTimes per primary electron 
+  TArrayD fSignalShape;                 // Array of time bins
   ClassDef(CbmMuchDigiMatch,1);
 
 };

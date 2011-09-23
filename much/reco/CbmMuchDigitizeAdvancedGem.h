@@ -132,8 +132,11 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     void SetEpoch(Bool_t epoch) {fEpoch=epoch;}
     void SetMcChain(TChain* mcChain) {fMcChain=mcChain;}
     void SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; } 
+    void SetDriftVelocity(Double_t velocity) {fDriftVelocity = velocity; }
+    void SetPeakingTime(Double_t peakingTime) {fPeakingTime = peakingTime; }
+    void SetRemainderTime(Double_t remainderTime) {fRemainderTime = remainderTime; }
+    void SetTimeBinWidth(Double_t timeBinWidth) {fTimeBinWidth = timeBinWidth; }
   private:
-
     CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
     TString            fDigiFile;      // Digitization file
     TClonesArray*      fPoints;        // Input array of CbmMuchPoint
@@ -157,6 +160,10 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
     Double_t           fDeadTime;      // Channel dead time [ns]
+    Double_t           fDriftVelocity; // Drift Velocity [um/ns]
+    Double_t           fPeakingTime;   // Peaking time [ns]
+    Double_t           fRemainderTime; // Remainder time = t_r [ns]: remainder is simulated as exp(-t/t_r)
+    Double_t           fTimeBinWidth;  // Width of the bin for signal shape simulation
     Int_t              fChainEventId;  // Temporary solution for accessing MC chain in epoch approach
 //    static TF1*        fPol6;          // 6-order polynomial for Landau sigma and MPV
     

@@ -1,4 +1,4 @@
-void runTimingMuchDigitizer(){
+ void runTimingMuchDigitizer(){
   TString dir = "data/";
   TString inFile    = dir + "epoch.root";
   TString muchFile  = dir + "much.reco.root";

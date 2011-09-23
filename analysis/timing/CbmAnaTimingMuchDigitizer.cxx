@@ -126,6 +126,27 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
   fPointsTimeAll    = new TH1D("fPointsTimeAll","; time [ns]; Entries",600,0,600);
   fPointsTimeAll->SetLineColor(kBlue);
 
+  for (Int_t i=0;i<100;i++){
+    fhChargeVsTime[i] = new TH1D(Form("fhChargeVsTime%i",i),";time [ns];charge [electrons]",400,0,40);
+    fhSignalShape[i]  = new TH1D(Form("fhSignalShape%i",i),";time [ns]; voltage [a.u.]",2000,0,200);
+  }
+  
+  Int_t nShapeTimeBins=2000;
+  Double_t nBinsInNs=10;
+  Double_t peakingTime=20;
+  Double_t fallingEdgeTime=40;
+  for (Int_t i=0;i<nShapeTimeBins;i++){
+    Double_t time = i/nBinsInNs;
+    if (time<=peakingTime) fShape[i]=time/peakingTime;
+    else fShape[i] = exp(-(time-peakingTime)/fallingEdgeTime); 
+  }
+ 
+  fhThresholdTime = new TH1D("ThresholdTime",";ns;Entries",100,0,100);
+  fhMaxTime = new TH1D("MaxTime",";ns;Entries",100,0,100);
+  fhMaxCharge = new TH1D("MaxCharge",";charge;Entries",100,0,1000000);
+
+  Int_t nTotal = 0;
+  Int_t nLost = 0;
   
   return kSUCCESS;
 }
@@ -134,11 +155,61 @@ InitStatus CbmAnaTimingMuchDigitizer::Init(){
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingMuchDigitizer::Exec(Option_t* opt){
-  TimeDistributions();
+//  TimeDistributions();
 //  DetailedAnalysis();
+  SignalShape();
 }
 // -------------------------------------------------------------------------
 
+
+// -----   Public method Exec   --------------------------------------------
+void CbmAnaTimingMuchDigitizer::SignalShape(){
+  Int_t nShapeTimeBins=2000;
+  Double_t nBinsInNs=10;
+  Double_t fSignalShape[2000];
+  for (Int_t iMatch=0;iMatch<fMuchDigiMatches->GetEntriesFast();iMatch++) {
+    nTotal++;
+    printf("Match: %i ",iMatch);
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fMuchDigiMatches->At(iMatch);
+    Int_t nElectrons = match->GetNoPrimaryElectrons();
+    //printf("nElectrons: %i\n",nElectrons);
+    for (Int_t j=0;j<nShapeTimeBins;j++) fSignalShape[j]=0;
+    for (Int_t i=0;i<nElectrons;i++) {
+      Int_t charge = match->GetChargePerPrimaryElectron(i); 
+      Double_t driftTime = match->GetDriftTimePerPrimaryElectron(i); 
+      //printf("  electron: %i charge: %i drift time: %f\n",i,charge,driftTime);
+      for (Int_t j=0;j<nShapeTimeBins;j++){
+        Int_t bin = Int_t(driftTime*nBinsInNs+j);
+        if (bin>nShapeTimeBins) break;
+        fSignalShape[bin]+=charge*fShape[j];
+      }
+      if (iMatch>99) continue;
+      fhChargeVsTime[iMatch]->Fill(driftTime,charge);
+    }
+    Double_t max = 0;
+    Double_t t_max = 0;
+    Double_t t_thr = -1;
+    Double_t thr = 10000;
+    for (Int_t j=0;j<nShapeTimeBins;j++){
+      if (fSignalShape[j]>max) {
+        max = fSignalShape[j];
+        t_max = j/nBinsInNs;
+      }
+      if (t_thr<0 && fSignalShape[j]>thr) t_thr=j/nBinsInNs;
+    }
+    if (t_thr<0) nLost++;
+    printf(" max=%f",max);
+    printf(" t_max=%f",t_max);
+    printf(" \n");
+    fhThresholdTime->Fill(t_thr);
+    fhMaxTime->Fill(t_max);
+    fhMaxCharge->Fill(max);
+
+    if (iMatch>99) continue;
+    for (Int_t j=0;j<nShapeTimeBins;j++) fhSignalShape[iMatch]->Fill(j/nBinsInNs,fSignalShape[j]);
+  }
+  
+}
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaTimingMuchDigitizer::TimeDistributions(){
@@ -162,6 +233,39 @@ void CbmAnaTimingMuchDigitizer::TimeDistributions(){
 
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaTimingMuchDigitizer::Finish(){
+  printf("nTotal=%i nLost=%i Eff=%f\n",nTotal,nLost,(nTotal-nLost)/Double_t(nTotal));
+  TCanvas* cChargeVsTime = new TCanvas("cChargeVsTime","Charge vs Time",1900,1000);
+  cChargeVsTime->Divide(5,5);
+  for (Int_t i=0;i<25;i++){
+    cChargeVsTime->cd(i+1);
+    fhChargeVsTime[i]->Draw();
+  }  
+
+  TCanvas* cSignalShape = new TCanvas("cSignalShape","Signal shape",1900,1000);
+  cSignalShape->Divide(5,5);
+  for (Int_t i=0;i<25;i++){
+    cSignalShape->cd(i+1);
+    fhSignalShape[i]->Draw();
+  }  
+
+  TCanvas* cDeltaShape = new TCanvas("cDeltaShape","Delta shape",1900,1000);
+  TH1D* hDeltaShape = new TH1D("hDeltaShape","hDeltaShape",1000,0,1000);
+  for (Int_t i=0;i<1000;i++) hDeltaShape->Fill(i,fShape[i]);
+  hDeltaShape->Draw();
+  
+  TCanvas* cThresholdTime = new TCanvas("cThresholdTime","Threshold time",1000,800);
+  fhThresholdTime->Draw();
+  
+  TCanvas* cMaxTime = new TCanvas("cMaxTime","Max time",1000,800);
+  fhMaxTime->Draw();
+
+  TCanvas* cMaxCharge = new TCanvas("cMaxCharge","Max charge",1000,800);
+  fhMaxCharge->Draw();
+
+  
+  return;
+  
+  
   TCanvas* cPointsTimeAll = new TCanvas("cPointsTimeAll","PointsTime",1200,400);
   fPointsTimeAll->Draw();
   

@@ -29,6 +29,11 @@ using std::pair;
 CbmMuchDigiMatch::CbmMuchDigiMatch() {
   fRefIndex.Set(0);
   fCharge.Set(0);
+  fRefIndexPerPrimaryElectron.Set(0);
+  fChargePerPrimaryElectron.Set(0);
+  fDriftTimePerPrimaryElectron.Set(0);
+  fSignalShape.Set(0);
+
 };
 // -------------------------------------------------------------------------
 // -----   Standard constructor   ------------------------------------------
@@ -42,6 +47,15 @@ CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match){
       for(Int_t i=0; i<fRefIndex.GetSize();i++){
          fRefIndex.AddAt(match->GetRefIndex(i), i);
          fCharge.AddAt(match->GetCharge(i), i);
+      }
+      Int_t nEl = match->GetNoPrimaryElectrons(); 
+      fRefIndexPerPrimaryElectron.Set(nEl);
+      fChargePerPrimaryElectron.Set(nEl);
+      fDriftTimePerPrimaryElectron.Set(nEl); 
+      for(Int_t i=0; i<nEl;i++){
+        fRefIndexPerPrimaryElectron.AddAt(match->GetRefIndexPerPrimaryElectron(i),i);
+        fChargePerPrimaryElectron.AddAt(match->GetChargePerPrimaryElectron(i),i);
+        fDriftTimePerPrimaryElectron.AddAt(match->GetDriftTimePerPrimaryElectron(i),i);
       }
    }
 }
@@ -156,8 +170,30 @@ void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
 void CbmMuchDigiMatch::Reset() {
   fRefIndex.Reset();
   fCharge.Reset();
+  fRefIndexPerPrimaryElectron.Reset(0);
+  fChargePerPrimaryElectron.Reset(0);
+  fDriftTimePerPrimaryElectron.Reset(0);
+  fSignalShape.Reset(0);
   fRefIndex.Set(0);
   fCharge.Set(0);
+  fRefIndexPerPrimaryElectron.Set(0);
+  fChargePerPrimaryElectron.Set(0);
+  fDriftTimePerPrimaryElectron.Set(0);
+  fSignalShape.Set(0);
 }
+
+
+UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime) {
+  AddCharge(iPoint,iCharge);
+//  printf("Add...\n");
+  Int_t n = fRefIndexPerPrimaryElectron.GetSize();
+  fRefIndexPerPrimaryElectron.Set(n+1);
+  fChargePerPrimaryElectron.Set(n+1);
+  fDriftTimePerPrimaryElectron.Set(n+1);
+  fRefIndexPerPrimaryElectron.AddAt(iPoint, n);
+  fChargePerPrimaryElectron.AddAt(iCharge, n);
+  fDriftTimePerPrimaryElectron.AddAt(driftTime, n);
+}
+
 
 ClassImp(CbmMuchDigiMatch)

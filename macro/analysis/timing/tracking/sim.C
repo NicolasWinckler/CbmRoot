@@ -1,10 +1,10 @@
 void sim(){
-  TString dir = "data1/";
+  TString dir = "data/";
   TString inputSignal="";
   TString inputBgr = "data/urqmd.auau.25gev.mbias.0000.ftn14";
   TString outFile  = dir + "mc.root";
   TString parFile  = dir + "param.root";
-  Int_t nEvents = 1000;
+  Int_t nEvents = 20;
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();

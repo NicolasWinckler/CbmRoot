@@ -6,8 +6,8 @@
 
 //#pragma link C++ class  CbmD0Analysis+;
 //#pragma link C++ class  CbmD0TrackInfo+;
-#pragma link C++ class  CbmV0Analysis+;
-#pragma link C++ class  CbmV0TrackInfo+;
+//#pragma link C++ class  CbmV0Analysis+;
+//#pragma link C++ class  CbmV0TrackInfo+;
 #pragma link C++ class CbmAnaHypYPtGenerator+;
 #pragma link C++ class CbmAnaHypSecFinder+;
 #pragma link C++ class CbmAnaHypSecFinderQa+;
@@ -28,15 +28,16 @@
 #pragma link C++ class CbmAnaDimuonHisto+;
 #pragma link C++ class CbmAnaAngularAcceptance+;
 
-//#pragma link C++ class CbmAnaTimingAnalysis+;
-//#pragma link C++ class CbmAnaEpochTest+;
+#pragma link C++ class CbmAnaTimingAnalysis+;
+#pragma link C++ class CbmAnaEpochTest+;
 //#pragma link C++ class CbmAnaTimingMuchDigitizer+;
 //#pragma link C++ class CbmAnaTimingMuchHitFinder+;
 //#pragma link C++ class CbmAnaTimingStsDigitizer+;
 //#pragma link C++ class CbmAnaTimingStsHitFinder+;
+#pragma link C++ class CbmAnaTimingStsTracking+;
 
 
-#pragma link C++ class CbmAnaDielectronTask+;
+//#pragma link C++ class CbmAnaDielectronTask+;
 #pragma link C++ class CbmAnaDielectronTaskDraw+;
 #endif
 

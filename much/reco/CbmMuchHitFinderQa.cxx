@@ -299,6 +299,8 @@ InitStatus CbmMuchHitFinderQa::Init()
 
   fhNpadsVsS = new TH2D("hNpadsVsS","Number of fired pads vs pad area:area:n pads",10,-5,0,10,0.5,10.5);
 
+  pointsFile = fopen ("points.txt","w");
+  padsFile = fopen ("pads.txt","w");
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -321,18 +323,51 @@ void CbmMuchHitFinderQa::SetParContainers() {
 void CbmMuchHitFinderQa::Exec(Option_t * option){
   fEvent++;
   Info("Exec",Form("Event:%i",fEvent));
-
+  fprintf(pointsFile,"Event %i\n",fEvent);
+  fprintf(padsFile,"Event %i\n",fEvent);
+  
   if (fPullsQaOn) PullsQa();
   if (fOccupancyQaOn) OccupancyQa();
   if (fDigitizerQaOn) DigitizerQa();
   if (fStatisticsQaOn) StatisticsQa();
   if (fClusterDeconvQaOn) ClusterDeconvQa();
+  
+  for (int i=0;i<fPoints->GetEntriesFast();i++){
+    CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(i);
+    Int_t stId = fGeoScheme->GetStationIndex(point->GetDetectorID());
+    if (stId!=0) continue;
+    Int_t layerId = fGeoScheme->GetLayerIndex(point->GetDetectorID());
+    if (layerId!=0) continue;
+    printf("point %4i xin=%6.2f yin=%6.2f xout=%6.2f yout=%6.2f zin=%6.2f\n",i,point->GetXIn(),point->GetYIn(),point->GetXOut(),point->GetYOut(),point->GetZIn());
+    fprintf (pointsFile, "%7.3f %7.3f %7.3f %7.3f\n",point->GetXIn(),point->GetYIn(),point->GetXOut(),point->GetYOut());
+  }
+
+  for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
+    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
+    Int_t detectorId = digi->GetDetectorId();
+    Int_t stId = fGeoScheme->GetStationIndex(detectorId);
+    if (stId!=0) continue;
+    Int_t layerId = fGeoScheme->GetLayerIndex(detectorId);
+    if (layerId!=0) continue;
+    Long64_t channelId  = digi->GetChannelId();
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+    if(!module) continue;
+    CbmMuchPad* pad = module->GetPad(digi->GetChannelId());
+    Double_t x0 = pad->GetX0();
+    Double_t y0 = pad->GetY0();
+    UInt_t charge = digi->GetADCCharge();
+    printf("digi %4i x0=%5.1f y0=%5.1f charge=%3i\n",i,x0,y0,charge);
+    fprintf(padsFile,"%5.1f %5.1f %3i\n",x0,y0,charge);
+  }
 }
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
 void CbmMuchHitFinderQa::FinishTask(){
+  fclose (pointsFile);
+  fclose (padsFile);
+
   gStyle->SetPaperSize(20,20);
 
   Double_t errors[100];

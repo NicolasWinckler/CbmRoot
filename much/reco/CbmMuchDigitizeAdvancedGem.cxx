@@ -66,6 +66,10 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fEpoch(0),
   fMcChain(NULL),
   fDeadTime(400),
+  fDriftVelocity(100),
+  fPeakingTime(20),
+  fRemainderTime(40),
+  fTimeBinWidth(1),
   fChainEventId(0)
 {
     SetQThreshold(3);
@@ -91,6 +95,10 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fEpoch(0),
   fMcChain(NULL),
   fDeadTime(400),
+  fDriftVelocity(100),
+  fPeakingTime(20),
+  fRemainderTime(40),
+  fTimeBinWidth(1),
   fChainEventId(0)
 {
   SetQThreshold(3),
@@ -222,7 +230,11 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
           digi->SetTime(time);
           digi->SetDeadTime(fDeadTime);
         }
-        match->AddCharge(iPoint,iCharge);
+        // add drift time info
+        Double_t driftVolumeWidth = 0.4;
+        Double_t driftLengthInUm = (1-aL)*driftVolumeWidth*10000; //[cm]->[um]
+        Double_t driftTime = driftLengthInUm/fDriftVelocity; // [ns]
+        match->AddCharge(iPoint,iCharge,driftTime);
       }
     } // loop fired sectors
     firedSectors.clear();

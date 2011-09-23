@@ -152,7 +152,8 @@ private:
   Int_t GetNSectors(Int_t iStation);
   TVector2 GetMinPadSize(Int_t iStation);
   TVector2 GetMaxPadSize(Int_t iStation);
-
+  FILE * pointsFile;
+  FILE * padsFile;
 
   ClassDef(CbmMuchHitFinderQa,1)
 };

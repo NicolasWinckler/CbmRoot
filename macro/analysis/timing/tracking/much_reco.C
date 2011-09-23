@@ -1,6 +1,6 @@
 void much_reco(){
   Int_t nEvents=10;
-  TString dir = "data1/";
+  TString dir = "data/";
   TString mcFile   = dir + "mc.root";
   TString stsRecoFile = dir + "sts.reco.0.root";
   TString outFile   = dir + "much.reco.0.root";

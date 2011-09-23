@@ -25,7 +25,7 @@ lit::parallel::LitTrackFinderNNVecMuon::LitTrackFinderNNVecMuon():
    fMaxNofMissingHits(3),
    fSigmaCoef(3.5),
    fMaxCovSq(20.*20.),
-   fChiSqPixelHitCut(15.)
+   fChiSqPixelHitCut(25.)
 {
 
 }
@@ -46,15 +46,18 @@ void lit::parallel::LitTrackFinderNNVecMuon::DoFind(
 
    DoTrackSelectionMuon(fTracks.begin(), fTracks.end());
 
+//   std::cout << "NOF TRACKS = " << fTracks.size() << std::endl;
    // Copy tracks to output
    for (unsigned int iTrack = 0; iTrack < fTracks.size(); iTrack++) {
       LitScalTrack* track = fTracks[iTrack];
+     // std::cout << "BEFORE " << *track;
       if (!track->IsGood()) { continue; }
+//      std::cout << "AFTER " << *track;
       tracks.push_back(new LitScalTrack(*track));
    }
 
 //   for (unsigned int i = 0; i < tracks.size(); i++)
-//      std::cout << *tracks[i];
+//     std::cout << *tracks[i];
 
    for_each(fTracks.begin(), fTracks.end(), DeleteObject());
    fTracks.clear();
@@ -167,12 +170,15 @@ void lit::parallel::LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
    PackTrackParam(par, lpar);
 
    // Propagate through the absorber
-   LitFieldValue<fvec> v1, v2, v3;
-   absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
-   absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
-   absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
-// TODO  LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
+//   LitFieldValue<fvec> v1, v2, v3;
+//   absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
+//   absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
+//   absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
+   LitRK4Extrapolation(lpar, absorber.GetZ(),
+		   absorber.GetFieldGridFront(), absorber.GetFieldGridMiddle(), absorber.GetFieldGridBack());
    LitAddMaterial(lpar, absorber.GetMaterial());
+
+  // std::cout << "absorber:" << absorber.GetZ() << " " << lpar;
 
    // Unpack track parameters
    UnpackTrackParam(lpar, par);
@@ -234,8 +240,8 @@ void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
    for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) { // loop over substations
       const LitSubstationMuon<fvec>& substation = sta.GetSubstation(iSubstation);
       // Propagation through station
-      LitRK4Extrapolation(lpar[iSubstation], substation.GetZ(), field);
-//    LitLineExtrapolation(lpar[iSubstation], substation.Z);
+//      LitRK4Extrapolation(lpar[iSubstation], substation.GetZ(), field);
+      LitLineExtrapolation(lpar[iSubstation], substation.GetZ());
       LitAddMaterial(lpar[iSubstation], substation.GetMaterial());
       if (iSubstation < nofSubstations - 1) { lpar[iSubstation + 1] = lpar[iSubstation]; }
    } // loop over substations

@@ -429,26 +429,29 @@ void CbmLitEnvironment::GetMuchLayout(
    lit::parallel::LitDetectorLayoutMuon<T>& layout)
 {
    std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
-#if LIT_POLYNOM_DEGREE==3
-   CbmLitFieldFitter fieldFitter(3); // set polynom degree
-   static const unsigned int N = 10; // set number of coefficients
-#else
-#if LIT_POLYNOM_DEGREE==5
-   CbmLitFieldFitter fieldFitter(5); // set polynom degree
-   static const unsigned int N = 21; // set number of coefficients
-#else
-#if LIT_POLYNOM_DEGREE==7
-   CbmLitFieldFitter fieldFitter(7); // set polynom degree
-   static const unsigned int N = 36; // set number of coefficients
-#else
-#if LIT_POLYNOM_DEGREE==9
-   CbmLitFieldFitter fieldFitter(9); // set polynom degree
-   static const unsigned int N = 55; // set number of coefficients
-#endif
-#endif
-#endif
-#endif
-   std::cout << "Field fitter initialized" << std::endl;
+//#if LIT_POLYNOM_DEGREE==3
+//   CbmLitFieldFitter fieldFitter(3); // set polynom degree
+//   static const unsigned int N = 10; // set number of coefficients
+//#else
+//#if LIT_POLYNOM_DEGREE==5
+//   CbmLitFieldFitter fieldFitter(5); // set polynom degree
+//   static const unsigned int N = 21; // set number of coefficients
+//#else
+//#if LIT_POLYNOM_DEGREE==7
+//   CbmLitFieldFitter fieldFitter(7); // set polynom degree
+//   static const unsigned int N = 36; // set number of coefficients
+//#else
+//#if LIT_POLYNOM_DEGREE==9
+//   CbmLitFieldFitter fieldFitter(9); // set polynom degree
+//   static const unsigned int N = 55; // set number of coefficients
+//#endif
+//#endif
+//#endif
+//#endif
+//   std::cout << "Field fitter initialized" << std::endl;
+
+   CbmLitFieldGridCreator gridCreator;
+
    CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
    std::cout << "Simple geometry constructor initialized" << std::endl;
    std::vector<CbmLitMaterialInfo> muchMaterial = geoConstructor->GetMyMuchGeoNodes();
@@ -467,13 +470,20 @@ void CbmLitEnvironment::GetMuchLayout(
       double aZ[3] = {amat.GetZpos() - amat.GetLength(),
             amat.GetZpos() - 0.5 * amat.GetLength(), amat.GetZpos()};
       lit::parallel::LitAbsorber<T> absorber;
-      lit::parallel::LitFieldSlice<T> frontSlice, middleSlice, backSlice;
-      fieldFitter.FitSlice<T>(aZ[0], frontSlice);
-      fieldFitter.FitSlice<T>(aZ[1], middleSlice);
-      fieldFitter.FitSlice<T>(aZ[2], backSlice);
-      absorber.SetFieldSliceFront(frontSlice);
-      absorber.SetFieldSliceMiddle(middleSlice);
-      absorber.SetFieldSliceBack(backSlice);
+//      lit::parallel::LitFieldSlice<T> frontSlice, middleSlice, backSlice;
+//      fieldFitter.FitSlice<T>(aZ[0], frontSlice);
+//      fieldFitter.FitSlice<T>(aZ[1], middleSlice);
+//      fieldFitter.FitSlice<T>(aZ[2], backSlice);
+//      absorber.SetFieldSliceFront(frontSlice);
+//      absorber.SetFieldSliceMiddle(middleSlice);
+//      absorber.SetFieldSliceBack(backSlice);
+      lit::parallel::LitFieldGrid frontGrid, middleGrid, backGrid;
+      gridCreator.CreateGrid(aZ[0], frontGrid);
+      gridCreator.CreateGrid(aZ[1], middleGrid);
+      gridCreator.CreateGrid(aZ[2], backGrid);
+      absorber.SetFieldGridFront(frontGrid);
+      absorber.SetFieldGridMiddle(middleGrid);
+      absorber.SetFieldGridBack(backGrid);
 
       lit::parallel::LitMaterialInfo<T> mat1;
       mat1.A = amat.GetA();
@@ -520,18 +530,24 @@ void CbmLitEnvironment::GetMuchLayout(
       } // loop over stations
 
       // Magnetic field approximation for the station group
-      lit::parallel::LitFieldSlice<T> fSlice, mSlice, bSlice;
+//      lit::parallel::LitFieldSlice<T> fSlice, mSlice, bSlice;
+      lit::parallel::LitFieldGrid fGrid, mGrid, bGrid;
       const CbmLitStation& frontStation = stationGroup.GetStation(0);
       fscal fZ = frontStation.GetSubstation(0).GetZ();
       const CbmLitStation& backStation = stationGroup.GetStation(stationGroup.GetNofStations() - 1);
       fscal bZ = backStation.GetSubstation(backStation.GetNofSubstations() - 1).GetZ();
       fscal mZ = fZ + 0.5 * (bZ - fZ);
-      fieldFitter.FitSlice(fZ, fSlice);
-      fieldFitter.FitSlice(mZ, mSlice);
-      fieldFitter.FitSlice(bZ, bSlice);
-      sg.SetFieldSliceFront(fSlice);
-      sg.SetFieldSliceMiddle(mSlice);
-      sg.SetFieldSliceBack(bSlice);
+//      fieldFitter.FitSlice(fZ, fSlice);
+//      fieldFitter.FitSlice(mZ, mSlice);
+//      fieldFitter.FitSlice(bZ, bSlice);
+//      sg.SetFieldSliceFront(fSlice);
+//      sg.SetFieldSliceMiddle(mSlice);
+//      sg.SetFieldSliceBack(bSlice);
+
+      gridCreator.CreateGrid(fZ, fGrid);
+      gridCreator.CreateGrid(mZ, mGrid);
+      gridCreator.CreateGrid(bZ, bGrid);
+
       // end Magnetic field approximation for the station group
 
       layout.AddStationGroup(sg);

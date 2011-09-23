@@ -159,9 +159,12 @@ public:
    LitAbsorber():
       fZ(0.),
       fMaterial(),
-      fFieldSliceFront(),
-      fFieldSliceMiddle(),
-      fFieldSliceBack() {}
+//      fFieldSliceFront(),
+//      fFieldSliceMiddle(),
+//      fFieldSliceBack()
+      fFieldGridFront(),
+         fFieldGridMiddle(),
+         fFieldGridBack() {}
 
    /* Destructor */
    virtual ~LitAbsorber() {}
@@ -188,37 +191,70 @@ public:
       fMaterial = material;
    }
 
-   /* @return field slice in front of the absorber */
-   const LitFieldSlice<T>& GetFieldSliceFront() const {
-      return fFieldSliceFront;
+//   /* @return field slice in front of the absorber */
+//   const LitFieldSlice<T>& GetFieldSliceFront() const {
+//      return fFieldSliceFront;
+//   }
+//
+//   /* Sets field slice in front of the absorber
+//    * @param Value */
+//   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSliceFront = fieldSlice;
+//   }
+//
+//   /* @return field slice in middle of the absorber */
+//   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
+//      return fFieldSliceMiddle;
+//   }
+//
+//   /* Sets field slice in the middle of the absorber
+//    * @param Value */
+//   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSliceMiddle = fieldSlice;
+//   }
+//
+//   /* @return field slice in back of the absorber */
+//   const LitFieldSlice<T>& GetFieldSliceBack() const {
+//      return fFieldSliceBack;
+//   }
+//
+//   /* Sets field slice in front of the absorber
+//    * @param Value */
+//   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSliceBack = fieldSlice;
+//   }
+
+   /* @return field grid in front of the absorber */
+   const LitFieldGrid& GetFieldGridFront() const {
+      return fFieldGridFront;
    }
 
-   /* Sets field slice in front of the absorber
+   /* Sets field grid in front of the absorber
     * @param Value */
-   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSliceFront = fieldSlice;
+   void SetFieldGridFront(const LitFieldGrid& fieldGrid) {
+      fFieldGridFront = fieldGrid;
    }
 
-   /* @return field slice in middle of the absorber */
-   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
-      return fFieldSliceMiddle;
+   /* @return field grid in the middle of the absorber */
+   const LitFieldGrid& GetFieldGridMiddle() const {
+      return fFieldGridMiddle;
    }
 
-   /* Sets field slice in the middle of the absorber
+   /* Sets field grid in the middle of the absorber
     * @param Value */
-   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSliceMiddle = fieldSlice;
+   void SetFieldGridMiddle(const LitFieldGrid& fieldGrid) {
+      fFieldGridMiddle = fieldGrid;
    }
 
-   /* @return field slice in back of the absorber */
-   const LitFieldSlice<T>& GetFieldSliceBack() const {
-      return fFieldSliceBack;
+   /* @return field grid in the back of the absorber */
+   const LitFieldGrid& GetFieldGridBack() const {
+      return fFieldGridBack;
    }
 
-   /* Sets field slice in front of the absorber
+   /* Sets field grid in the back of the absorber.
     * @param Value */
-   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSliceBack = fieldSlice;
+   void SetFieldGridBack(const LitFieldGrid& fieldGrid) {
+      fFieldGridBack = fieldGrid;
    }
 
    /* Returns std::string representation for the class */
@@ -236,9 +272,13 @@ public:
 private:
    T fZ; // Z position of the absorber in [cm]
    LitMaterialInfo<T> fMaterial; // Absorber material
-   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front of the absorber
-   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle of the absorber
-   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back of the absorber
+   LitFieldGrid fFieldGridFront; // Magnetic field approximation in front of absorber
+   LitFieldGrid fFieldGridMiddle; // Magnetic field approximation in the middle of absorber
+   LitFieldGrid fFieldGridBack; // Magnetic field approximation in the back of absorber
+
+//   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front of the absorber
+//   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle of the absorber
+//   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back of the absorber
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -254,46 +294,83 @@ class LitStationGroupMuon
 public:
    /* Constructor */
    LitStationGroupMuon():
-      fFieldSliceFront(),
-      fFieldSliceMiddle(),
-      fFieldSliceBack(),
+//      fFieldSliceFront(),
+//      fFieldSliceMiddle(),
+//      fFieldSliceBack(),
+		fFieldGridFront(),
+		fFieldGridMiddle(),
+		fFieldGridBack(),
       fStations(),
       fAbsorber() {}
 
    /* Destructor */
    virtual ~LitStationGroupMuon() {}
 
-   /* @return field slice in front of the absorber */
-   const LitFieldSlice<T>& GetFieldSliceFront() const {
-      return fFieldSliceFront;
+//   /* @return field slice in front of the absorber */
+//   const LitFieldSlice<T>& GetFieldSliceFront() const {
+//      return fFieldSliceFront;
+//   }
+//
+//   /* Sets field slice in front of the absorber
+//    * @param Value */
+//   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSliceFront = fieldSlice;
+//   }
+//
+//   /* @return field slice in middle of the absorber */
+//   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
+//      return fFieldSliceMiddle;
+//   }
+//
+//   /* Sets field slice in the middle of the absorber
+//    * @param Value */
+//   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSliceMiddle = fieldSlice;
+//   }
+//
+//   /* @return field slice in back of the absorber */
+//   const LitFieldSlice<T>& GetFieldSliceBack() const {
+//      return fFieldSliceBack;
+//   }
+//
+//   /* Sets field slice in front of the absorber
+//    * @param Value */
+//   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
+//      fFieldSliceBack = fieldSlice;
+//   }
+
+
+   /* @return field grid in front of the absorber */
+   const LitFieldGrid& GetFieldGridFront() const {
+      return fFieldGridFront;
    }
 
-   /* Sets field slice in front of the absorber
+   /* Sets field grid in front of the absorber
     * @param Value */
-   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSliceFront = fieldSlice;
+   void SetFieldGridFront(const LitFieldGrid& fieldGrid) {
+      fFieldGridFront = fieldGrid;
    }
 
-   /* @return field slice in middle of the absorber */
-   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
-      return fFieldSliceMiddle;
+   /* @return field grid in the middle of the absorber */
+   const LitFieldGrid& GetFieldGridMiddle() const {
+      return fFieldGridMiddle;
    }
 
-   /* Sets field slice in the middle of the absorber
+   /* Sets field grid in the middle of the absorber
     * @param Value */
-   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSliceMiddle = fieldSlice;
+   void SetFieldGridMiddle(const LitFieldGrid& fieldGrid) {
+      fFieldGridMiddle = fieldGrid;
    }
 
-   /* @return field slice in back of the absorber */
-   const LitFieldSlice<T>& GetFieldSliceBack() const {
-      return fFieldSliceBack;
+   /* @return field grid in the back of the absorber */
+   const LitFieldGrid& GetFieldGridBack() const {
+      return fFieldGridBack;
    }
 
-   /* Sets field slice in front of the absorber
+   /* Sets field grid in the back of the absorber.
     * @param Value */
-   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
-      fFieldSliceBack = fieldSlice;
+   void SetFieldGridBack(const LitFieldGrid& fieldGrid) {
+      fFieldGridBack = fieldGrid;
    }
 
    /* Adds station to the station group
@@ -330,10 +407,10 @@ public:
     * @param field OUTPUT field region */
    void GetFieldRegion(T x, T y, LitFieldRegion<T>& field) const {
       LitFieldValue<T> v1, v2, v3;
-      fFieldSliceFront.GetFieldValue(x, y, v1);
-      fFieldSliceMiddle.GetFieldValue(x, y, v2);
-      fFieldSliceBack.GetFieldValue(x, y, v3);
-      field.Set(v1, fFieldSliceFront.GetZ(), v2, fFieldSliceMiddle.GetZ(), v3, fFieldSliceBack.GetZ());
+      fFieldGridFront.GetFieldValue(x, y, v1);
+      fFieldGridMiddle.GetFieldValue(x, y, v2);
+      fFieldGridBack.GetFieldValue(x, y, v3);
+      field.Set(v1, fFieldGridFront.GetZ(), v2, fFieldGridMiddle.GetZ(), v3, fFieldGridBack.GetZ());
    }
 
    /* Returns std::string representation for the class */
@@ -358,9 +435,14 @@ private:
    // in the group of stations. We need 3 values in order to use
    // parabolic approximation. So the values are in front, middle
    // and back of the gap.
-   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front
-   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle
-   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back
+//   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front
+//   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle
+//   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back
+
+      LitFieldGrid fFieldGridFront; // Magnetic field approximation in front
+      LitFieldGrid fFieldGridMiddle; // Magnetic field approximation in the middle
+      LitFieldGrid fFieldGridBack; // Magnetic field approximation in the back
+
    std::vector<LitStationMuon<T> > fStations; // Array with stations
    LitAbsorber<T> fAbsorber; // Absorber
 } _fvecalignment;

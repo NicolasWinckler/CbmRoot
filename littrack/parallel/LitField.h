@@ -660,6 +660,16 @@ public:
       // Calculate cell indices for X and Y
       unsigned short ix = short((x - fXMin) / fCellSizeX);
       unsigned short iy = short((y - fYMin) / fCellSizeY);
+
+      // Check bound conditions and if out of bounds
+      // return zero field values.
+      // Can be removed considering performance!
+      if (ix < 0 || iy < 0 || ix >= fNofCellsX - 1 || iy >= fNofCellsY - 1) {
+    	  B.Bx = 0.;
+    	  B.By = 0.;
+    	  B.Bz = 0.;
+    	  return;
+      }
       // Field values on the cell nodes
       const LitFieldValue<fscal>& v1 = fField[ix  ][iy];
       const LitFieldValue<fscal>& v2 = fField[ix+1][iy];

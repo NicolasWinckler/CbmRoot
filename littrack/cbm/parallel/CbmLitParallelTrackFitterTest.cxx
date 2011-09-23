@@ -60,16 +60,16 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 
    int ihit = 0;
-
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
       const lit::parallel::LitStationGroupMuon<fscal>& stationGroup = fLayout.GetStationGroup(isg);
       //Propagation through the absorber
-      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
+//      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
       const lit::parallel::LitAbsorber<fscal>& absorber = stationGroup.GetAbsorber();
-      absorber.GetFieldSliceFront().GetFieldValue(lpar.X, lpar.Y, v1);
-      absorber.GetFieldSliceMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
-      absorber.GetFieldSliceBack().GetFieldValue(lpar.X, lpar.Y, v3);
-//TODO      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(), v1, v2, v3);
+//      absorber.GetFieldGridFront().GetFieldValue(lpar.X, lpar.Y, v1);
+//      absorber.GetFieldGridMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
+//      absorber.GetFieldGridBack().GetFieldValue(lpar.X, lpar.Y, v3);
+      lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(),
+    		  absorber.GetFieldGridFront(), absorber.GetFieldGridMiddle(), absorber.GetFieldGridBack());
       lit::parallel::LitAddMaterial(lpar, absorber.GetMaterial());
       //propagate through the absorber using steps
       // first extrapolate input track parameters to the absorber
@@ -95,7 +95,7 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
             const lit::parallel::LitSubstationMuon<fscal>& substation = station.GetSubstation(iss);
 
             // Propagation through station
-//     TODO       lit::parallel::LitRK4Extrapolation(lpar, substation.GetZ(), field);
+            lit::parallel::LitRK4Extrapolation(lpar, substation.GetZ(), field);
             lit::parallel::LitAddMaterial(lpar, substation.GetMaterial());
 
             LitTrackParamScalToCbmLitTrackParam(&lpar, &par);

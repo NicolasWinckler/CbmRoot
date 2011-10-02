@@ -4,9 +4,10 @@
 
 void basiclibs()
 {
+  gSystem->Load("libGdml");
   gSystem->Load("libGeom");
   gSystem->Load("libGeomPainter");
-  
+ 
   gSystem->Load("libVMC");
   gSystem->Load("libPhysics");
   gSystem->Load("libEG"); 

@@ -18,7 +18,7 @@ cp -r /tmp/andrey/build_cbm_may11/macro/littrack/nightly_tests/results_electron_
 
 cp -r /tmp/andrey/build_cbm_may11/macro/littrack/nightly_tests/results_muon_branch /u/andrey/web-docs/tests/$DAY/results_muon_branch
 cp -r /tmp/andrey/build_cbm_may11/macro/littrack/nightly_tests/results_muon_nn /u/andrey/web-docs/tests/$DAY/results_muon_nn
-cp -r /tmp/andrey/build_cbm_may11/macro/littrack/nightly_tests/results_muon_nn_parallel /u/andrey/web-docs/tests/$DAY/results_muon_branch
+cp -r /tmp/andrey/build_cbm_may11/macro/littrack/nightly_tests/results_muon_nn_parallel /u/andrey/web-docs/tests/$DAY/results_muon_nn_parallel
 
 export SCRIPT=yes
 

@@ -8,8 +8,8 @@
  * Macro has 3 options "all", "hits" and "tracking".
  **/
 
-void global_reco(Int_t nEvents = 10, // number of events
-		TString opt = "hits")
+void global_reco(Int_t nEvents = 1000, // number of events
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -28,7 +28,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
-		dir = "/data.local1/andrey/events/trd_v11a/";
+		dir = "/data.local1/andrey/events/std_muon/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -38,7 +38,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
 		globalHitsFile = dir + "global.hits.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.0000.root";
+		globalTracksFile = dir + "global.tracks.nn_parallel.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 //		muchDigiFile = parDir + "/much/much_standard_straw_trd.digi.root";
@@ -47,13 +47,13 @@ void global_reco(Int_t nEvents = 10, // number of events
 		TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par";
 		parFileList->Add(&stsDigiFile);
 		// Digi scheme for TRD
-//		TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par";
-		TObjString trdDigiFile = parDir + "/trd/v11a/trd_v11a_7.5mm_01cm2.digi.par";
+		TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par";
+	     //   TObjString trdDigiFile = parDir + "/trd/v11a/trd_v11a_7.5mm_01cm2.digi.par";
 		parFileList->Add(&trdDigiFile);
 		// Directory for output images
-		TString imageDir = "./test2/";
+		TString imageDir = "./test_muon_nn_parallel/";
 		// Tracking type
-		trackingType = "branch";
+		trackingType = "nn_parallel";
 		// STS hit producer type: real, ideal
 		stsHitProducerType = "real";
 		// TRD hit producer type: smearing, digi, clustering
@@ -68,8 +68,8 @@ void global_reco(Int_t nEvents = 10, // number of events
 		normTofHits = 1;
 		//
 		momMin = 0.;
-		momMax = 12.;
-		momBins = 12.;
+		momMax = 16.;
+		momBins = 16.;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));

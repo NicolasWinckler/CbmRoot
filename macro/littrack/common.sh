@@ -115,8 +115,8 @@ function set_default_muon_geometry() {
     export NORMTOFHITS=1
     
     export MOMMIN=0
-    export MOMMAX=16
-    export MOMBINS=16
+    export MOMMAX=12
+    export MOMBINS=12
 }
 
 

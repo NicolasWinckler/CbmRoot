@@ -20,8 +20,13 @@ void qa_study()
          ssname << "STUDYNAME" << i+1;
          results.push_back(gSystem->Getenv(ssresult.str().c_str()));
          names.push_back(gSystem->Getenv(ssname.str().c_str()));
+
+	 std::cout << "STUDYRESULT" << i+1 << "=" << results[i] << std::endl;
+         std::cout << "STUDYNAME" << i+1 << "=" << names[i] << std::endl;
+
       }
       outputDir = std::string(gSystem->Getenv("STUDYOUTPUTDIR"));
+      std::cout << "STUDYOUTPUTDIR=" << outputDir << std::endl;
       electronSetup = TString(gSystem->Getenv("STUDYELECTRONSETUP")).Atoi();
       mvd = TString(gSystem->Getenv("STUDYMVD")).Atoi();
       sts = TString(gSystem->Getenv("STUDYSTS")).Atoi();

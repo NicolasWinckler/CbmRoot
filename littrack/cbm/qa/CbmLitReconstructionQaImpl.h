@@ -640,6 +640,7 @@ private:
 
    std::multimap<Int_t, Int_t> fMcRichMap; // RICH
    std::multimap<Int_t, Int_t> fMcStsRichMap; // STS+RICH
+   std::multimap<Int_t, Int_t> fMcStsRichNoMatchingMap; // STS+RICH
    std::multimap<Int_t, Int_t> fMcStsRichTrdMap; // STS+RICH+TRD
    std::multimap<Int_t, Int_t> fMcStsRichTrdTofMap; // STS+RICH+TRD+TOF
 
@@ -733,6 +734,7 @@ private:
    std::vector<std::vector<TH1F*> > fhRichMom;// RICH: momentum dependence
    std::vector<std::vector<TH1F*> > fhRichNh;// RICH: number of hits
    //Norm STS+RICH
+   std::vector<std::vector<TH1F*> > fhStsRichNoMatchingMom;// STS+RICH no matching: momentum dependence
    std::vector<std::vector<TH1F*> > fhStsRichMom;// STS+RICH: momentum dependence
    std::vector<std::vector<TH1F*> > fhStsMomNormStsRich;// STS: momentum dependence, normalized to STS+RICH
    //Norm STS+RICH+TRD
@@ -796,7 +798,7 @@ private:
 
    TH1F* fhStsChiprim; //chi2Vertex
    TH2F* fhStsMomresVsMom; // momentum resolution vs. momentum
-
+   TH1F* fhTrackLength; // trackLength
 
    // Electron identification
    // h[category][histogram type]:

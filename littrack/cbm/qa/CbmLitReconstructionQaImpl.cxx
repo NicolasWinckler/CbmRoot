@@ -238,6 +238,7 @@ CbmLitReconstructionQaImpl::CbmLitReconstructionQaImpl():
 
    fhStsMomNormStsRich(),
    fhStsRichMom(),
+   fhStsRichNoMatchingMom(),
 
    fhStsMomNormStsRichTrd(),
    fhStsRichMomNormStsRichTrd(),
@@ -293,6 +294,7 @@ CbmLitReconstructionQaImpl::CbmLitReconstructionQaImpl():
 
    fhStsChiprim(NULL),
    fhStsMomresVsMom(NULL),
+   fhTrackLength(NULL),
 
    fhStsTrdMomElId(),
    fhStsTrdMomElIdNormStsTrdTof(),
@@ -735,6 +737,7 @@ void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
    fMcGlobalMap.clear();
    fMcRichMap.clear();
    fMcStsRichMap.clear();
+   fMcStsRichNoMatchingMap.clear();
    fMcStsRichTrdMap.clear();
    fMcStsRichTrdTofMap.clear();
    Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
@@ -847,6 +850,7 @@ void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
       Bool_t much = isMuchOk && stsMCId == muchMCId;
       Bool_t tof = isTofOk && stsMCId == tofMCId;
       Bool_t rich = isRichOk && stsMCId == richMCId;
+      Bool_t richNoMatching = isRichOk;
 
       // select STS tracks only
       if (sts) {
@@ -888,6 +892,10 @@ void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
     	  if (sts && rich) {
     		  fMcStsRichMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
     	  }
+        // select STS+RICH tracks no matching
+         if (sts && richNoMatching) {
+            fMcStsRichNoMatchingMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+         }
     	  // select STS+RICH+TRD tracks
     	  if (sts && rich && trd) {
 			  fMcStsRichTrdMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
@@ -1143,6 +1151,9 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
           FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsMap, fhStsMomNormStsRich, mcTrack->GetP());
     	  // STS+RICH
     	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichMap, fhStsRichMom, mcTrack->GetP());
+
+    	  //STS+RICH no matching
+    	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichNoMatchingMap, fhStsRichNoMatchingMom, mcTrack->GetP());
 
         // STS+RICH: Electron identification
         FillGlobalElIdHistos(mcTrack, iMCTrack, fMcStsRichMap, fhStsRichMomElId[kElectronId], mcTrack->GetP(), "rich");
@@ -1400,6 +1411,40 @@ void CbmLitReconstructionQaImpl::StsTracksQa()
       Double_t dpp = 100. * (momMC.Mag() - momRec.Mag()) / momMC.Mag();
       fhStsMomresVsMom->Fill(momMC.Mag(), dpp);
    }
+
+   //Track length in TOF detector
+   Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
+   for (Int_t iG = 0; iG < nofGlobalTracks; iG++){
+      CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(iG);
+      if(!gTrack) continue;
+
+      Int_t tofIndex = gTrack->GetTofHitIndex();
+      if (tofIndex < 0) continue;
+      CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofIndex);
+      if (NULL == tofHit) continue;
+
+      Double_t trackLength = gTrack->GetLength();
+      Int_t stsInd = gTrack->GetStsTrackIndex();
+      if (stsInd < 0) continue;
+      CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsMatches->At(stsInd);
+      if (stsMatch == NULL) continue;
+      Int_t stsMCTrackId = stsMatch->GetMCTrackId();
+      if (stsMCTrackId < 0) continue;
+      CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMCTrackId);
+      if (mcTrack1 == NULL) continue;
+
+      Int_t nofTofPoints = fTofPoints->GetEntriesFast();
+      for (Int_t iTof = 0; iTof < nofTofPoints; iTof++){
+         CbmTofPoint* tofPoint  = (CbmTofPoint*) fTofPoints->At(iTof);
+         if(NULL == tofPoint) continue;
+         if (tofPoint->GetTrackID() == stsMCTrackId){
+
+            Double_t dll = 100. * (tofPoint->GetLength() - trackLength) / tofPoint->GetLength();
+            fhTrackLength->Fill(dll);
+            break;
+         }
+      }
+   }
 }
 
 void CbmLitReconstructionQaImpl::FillMCMomVsAngle(
@@ -1540,6 +1585,7 @@ void CbmLitReconstructionQaImpl::CreateHistos(
 
    CreateEffHisto(fhStsMomNormStsRich, "hStsMomNormStsRich", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
    CreateEffHisto(fhStsRichMom, "hStsRichMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
+   CreateEffHisto(fhStsRichNoMatchingMom, "fhStsRichNoMatchingMom", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
 
    CreateEffHisto(fhStsMomNormStsRichTrd, "hStsMomNormStsRichTrd", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
    CreateEffHisto(fhStsRichMomNormStsRichTrd, "hStsRichMomNormStsRichTrd", fNofBinsMom, fMinMom, fMaxMom, "rich", file);
@@ -1692,6 +1738,8 @@ void CbmLitReconstructionQaImpl::CreateHistos(
 
 	   fhStsChiprim = new TH1F("fhStsChiprim","fhStsChiprim", 150, 0., 15.);
 	   fhStsMomresVsMom = new TH2F("fhStsMomresVsMom","fhStsMomresVsMom", 120, 0., 12., 100, -15., 15.);
+      fhTrackLength = new TH1F("fhTrackLength","fhTrackLength", 40, -2., 2.);
+
    }else {
 	   fhNofGlobalTracks = (TH1F*)file->Get("hNofGlobalTracks");
 	   fhNofStsTracks = (TH1F*)file->Get("hNofStsTracks");
@@ -1727,6 +1775,7 @@ void CbmLitReconstructionQaImpl::CreateHistos(
 
 	   fhStsChiprim = (TH1F*)file->Get("fhStsChiprim");
 	   fhStsMomresVsMom = (TH2F*)file->Get("fhStsMomresVsMom");
+      fhTrackLength = (TH1F*)file->Get("fhTrackLength");
    }
    fHistoList->Add(fhNofGlobalTracks);
    fHistoList->Add(fhNofStsTracks);
@@ -1762,6 +1811,7 @@ void CbmLitReconstructionQaImpl::CreateHistos(
 
    fHistoList->Add(fhStsChiprim);
    fHistoList->Add(fhStsMomresVsMom);
+   fHistoList->Add(fhTrackLength);
 
    // MC momentum vs. polar angle histograms
    fhMCMomVsAngle.resize(fNofCategories);
@@ -1822,6 +1872,7 @@ void CbmLitReconstructionQaImpl::CalculateEfficiencyHistos()
 
       DivideHistos(fhStsMomNormStsRich[i][kRec], fhStsMomNormStsRich[i][kAcc], fhStsMomNormStsRich[i][kEff], 100.);
       DivideHistos(fhStsRichMom[i][kRec], fhStsRichMom[i][kAcc], fhStsRichMom[i][kEff], 100.);
+      DivideHistos(fhStsRichNoMatchingMom[i][kRec], fhStsRichNoMatchingMom[i][kAcc], fhStsRichNoMatchingMom[i][kEff], 100.);
 
       DivideHistos(fhStsMomNormStsRichTrd[i][kRec], fhStsMomNormStsRichTrd[i][kAcc], fhStsMomNormStsRichTrd[i][kEff], 100.);
       DivideHistos(fhStsRichMomNormStsRichTrd[i][kRec], fhStsRichMomNormStsRichTrd[i][kAcc], fhStsRichMomNormStsRichTrd[i][kEff], 100.);
@@ -1975,6 +2026,7 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
    EventEfficiencyStatisticsRichToPTree(&pt, "hRichMom", fhRichMom);
    EventEfficiencyStatisticsRichToPTree(&pt, "hStsMomNormStsRich", fhStsMomNormStsRich);
    EventEfficiencyStatisticsRichToPTree(&pt, "hStsRichMom", fhStsRichMom);
+   EventEfficiencyStatisticsRichToPTree(&pt, "hStsRichNoMatchingMom", fhStsRichNoMatchingMom);
    EventEfficiencyStatisticsRichToPTree(&pt, "hStsMomNormStsRichTrd", fhStsMomNormStsRichTrd);
    EventEfficiencyStatisticsRichToPTree(&pt, "hStsRichMomNormStsRichTrd", fhStsRichMomNormStsRichTrd);
    EventEfficiencyStatisticsRichToPTree(&pt, "hStsRichTrdMom", fhStsRichTrdMom);
@@ -2038,6 +2090,8 @@ boost::property_tree::ptree CbmLitReconstructionQaImpl::PrintPTree()
    pt.put("fhStsChiprim.rms", fhStsChiprim->GetRMS());
    pt.put("fhStsMomresVsMom.mean", fhStsMomresVsMom->ProjectionY()->GetMean());
    pt.put("fhStsMomresVsMom.rms", fhStsMomresVsMom->ProjectionY()->GetRMS());
+   pt.put("fhTrackLength.mean", fhTrackLength->GetMean());
+   pt.put("fhTrackLength.rms", fhTrackLength->GetRMS());
 
    // Polar angle efficiency
    pt.put("MinAngle", fMinAngle);
@@ -2412,6 +2466,10 @@ void CbmLitReconstructionQaImpl::DrawEfficiencyHistos()
 	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[kRichEl],
 			&fhStsRichMom[kRichEl], NULL, NULL, "STS", "STS+RICH", "", "", "");
 
+      // Draw efficiency for STS+RICH No matching for electron set
+      DrawEfficiency("rec_qa_sts_rich_no_matching_efficiency_electrons", &fhStsMomNormStsRich[kRichEl],
+         &fhStsRichNoMatchingMom[kRichEl], NULL, NULL, "STS", "STS+RICH (No Matching)", "", "", "");
+
 	   // Draw efficiency for STS+RICH+TRD for electron set
 	   DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", &fhStsMomNormStsRichTrd[kRichEl],
 			&fhStsRichMomNormStsRichTrd[kRichEl], &fhStsRichTrdMom[kRichEl], NULL,
@@ -2475,17 +2533,17 @@ void CbmLitReconstructionQaImpl::DrawEfficiency(
 	if (hist3) hname3 = name3 + "(" + lit::NumberToString<Double_t>(eff3, 1) + ")";
 	if (hist4) hname4 = name4 + "(" + lit::NumberToString<Double_t>(eff4, 1) + ")";
 
-/*	Double_t nrebin = 10.;
-	if (hist1 != NULL) (*hist1)[kEff]->Rebin(nrebin);
-	if (hist2 != NULL) (*hist2)[kEff]->Rebin(nrebin);
-	if (hist3 != NULL) (*hist3)[kEff]->Rebin(nrebin);
-	if (hist4 != NULL) (*hist4)[kEff]->Rebin(nrebin);
+//	Double_t nrebin = 10.;
+//	if (hist1 != NULL) (*hist1)[kEff]->Rebin(nrebin);
+//	if (hist2 != NULL) (*hist2)[kEff]->Rebin(nrebin);
+//	if (hist3 != NULL) (*hist3)[kEff]->Rebin(nrebin);
+//	if (hist4 != NULL) (*hist4)[kEff]->Rebin(nrebin);
+//
+//	if (hist1 != NULL) (*hist1)[kEff]->Scale(1./nrebin);
+//	if (hist2 != NULL) (*hist2)[kEff]->Scale(1./nrebin);
+//	if (hist3 != NULL) (*hist3)[kEff]->Scale(1./nrebin);
+//	if (hist4 != NULL) (*hist4)[kEff]->Scale(1./nrebin);
 
-	if (hist1 != NULL) (*hist1)[kEff]->Scale(1./nrebin);
-	if (hist2 != NULL) (*hist2)[kEff]->Scale(1./nrebin);
-	if (hist3 != NULL) (*hist3)[kEff]->Scale(1./nrebin);
-	if (hist4 != NULL) (*hist4)[kEff]->Scale(1./nrebin);
-*/
 
 	std::string yTitle = "Efficiency [%]";
 	if (opt != "pisupp"){
@@ -2710,6 +2768,14 @@ void CbmLitReconstructionQaImpl::DrawStsTracksQaHistos()
    DrawHist1D(momResRms, "P [GeV/c]", "dP/P, RMS [%]",
             kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
             LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "P");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   TCanvas* canvas2 = new TCanvas("rec_qa_track_length", "rec_qa_track_length", 500, 500);
+   fhTrackLength->Scale(1./fhTrackLength->Integral());
+   DrawHist1D(fhTrackLength, "dL/L [%]", "Yield",
+            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+            LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 

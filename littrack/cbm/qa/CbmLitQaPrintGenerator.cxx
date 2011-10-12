@@ -170,7 +170,7 @@ void CbmLitQaPrintGenerator::PrintFinalStatistics(
    out << std::setw(w) << s2 << EventEfficiencyStatisticsToString(pt, "hGlobalMom", "final");
    out << std::setfill('_') << std::setw(7*w) << "_"<< std::endl;
 
-   // print RICH reconstruction
+   // print RICH reconstruction efficiency
    out << std::right;
    out << std::setfill('_') << std::setw(7*w) << "_"<< std::endl;
    out << std::setfill(' ') << std::setw(w) << " " << std::setw(w)
@@ -186,6 +186,7 @@ void CbmLitQaPrintGenerator::PrintFinalStatistics(
    out << std::setw(7*w) << "Normalization STS+RICH " << std::endl;
    out << std::setfill(' ') << std::left;
    out << std::setw(w) << "STS" << EventEfficiencyStatisticsRichToString(pt, "hStsMomNormStsRich", "final");
+   out << std::setw(w) << "STS+RICH no match" << EventEfficiencyStatisticsRichToString(pt, "hStsRichNoMatchingMom", "final");
    out << std::setw(w) << "STS+RICH" << EventEfficiencyStatisticsRichToString(pt, "hStsRichMom", "final");
 
    out << std::setfill('-') << std::left;
@@ -275,6 +276,9 @@ void CbmLitQaPrintGenerator::PrintFinalStatistics(
          << " RMS = " << pt->get("fhStsChiprim.rms", -1.) << std::endl;
    out << "Momentum resolution: mean = " << pt->get("fhStsMomresVsMom.mean", -1.)
          << " RMS = " << pt->get("fhStsMomresVsMom.rms", -1.) << std::endl;
+   //track length
+   out << "Track length 100%*(MC-Rec)/MC: mean = " << pt->get("fhTrackLength.mean", -1.)
+         << " RMS = " << pt->get("fhTrackLength.rms", -1.) << std::endl;
 
    // Tracking efficiency vs. polar angle
    out << "Tracking efficiency in dependence on polar angle:" << std::endl;

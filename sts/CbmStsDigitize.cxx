@@ -632,7 +632,7 @@ InitStatus CbmStsDigitize::Init() {
   fStripSignalF = new Double_t[2000];
   fStripSignalB = new Double_t[2000];
 
-  fEnergyLossToSignal    = 200000.;
+  fEnergyLossToSignal    = 280000.;
 
   fFNofSteps = (Int_t)TMath::Power(2,(Double_t)fFNofBits);
   fBNofSteps = (Int_t)TMath::Power(2,(Double_t)fBNofBits);

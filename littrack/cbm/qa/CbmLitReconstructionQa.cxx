@@ -1,7 +1,7 @@
-/** CbmLitReconstructionQaImpl.cxx
+/** CbmLitReconstructionQa.cxx
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2007
- * @version 2.0
+ * @version 3.0
  **/
 
 #include "qa/CbmLitReconstructionQa.h"

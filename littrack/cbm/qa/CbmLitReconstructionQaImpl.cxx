@@ -1058,8 +1058,6 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
 
       if (isPrimElectron) FillMcHistoForDetAcc(mcTrack->GetP());
 
-
-
       // Check accepted tracks cutting on minimal number of MC points
       // acceptance: STS tracks only
       if (isStsOk) {
@@ -2462,6 +2460,10 @@ void CbmLitReconstructionQaImpl::DrawEfficiencyHistos()
 	   DrawEfficiency("rec_qa_rich_efficiency_electrons", &fhRichMom[kRichEl],
 	      &fhRichMom[kRichElRef], NULL, NULL, "RICH: electrons", "RICH: electrons ref", "", "", "");
 
+      // Draw efficiency vs. nof hits in ring for RICH for electron set
+      DrawEfficiency("rec_qa_rich_efficiency_vs_nofhits_electrons", &fhRichNh[kRichEl],
+         NULL, NULL, NULL, "RICH: electrons", "", "", "", "");
+
 	   // Draw efficiency for STS+RICH for electron set
 	   DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", &fhStsMomNormStsRich[kRichEl],
 			&fhStsRichMom[kRichEl], NULL, NULL, "STS", "STS+RICH", "", "", "");
@@ -2533,17 +2535,17 @@ void CbmLitReconstructionQaImpl::DrawEfficiency(
 	if (hist3) hname3 = name3 + "(" + lit::NumberToString<Double_t>(eff3, 1) + ")";
 	if (hist4) hname4 = name4 + "(" + lit::NumberToString<Double_t>(eff4, 1) + ")";
 
-//	Double_t nrebin = 10.;
-//	if (hist1 != NULL) (*hist1)[kEff]->Rebin(nrebin);
-//	if (hist2 != NULL) (*hist2)[kEff]->Rebin(nrebin);
-//	if (hist3 != NULL) (*hist3)[kEff]->Rebin(nrebin);
-//	if (hist4 != NULL) (*hist4)[kEff]->Rebin(nrebin);
-//
-//	if (hist1 != NULL) (*hist1)[kEff]->Scale(1./nrebin);
-//	if (hist2 != NULL) (*hist2)[kEff]->Scale(1./nrebin);
-//	if (hist3 != NULL) (*hist3)[kEff]->Scale(1./nrebin);
-//	if (hist4 != NULL) (*hist4)[kEff]->Scale(1./nrebin);
+/*	Double_t nrebin = 10.;
+	if (hist1 != NULL) (*hist1)[kEff]->Rebin(nrebin);
+	if (hist2 != NULL) (*hist2)[kEff]->Rebin(nrebin);
+	if (hist3 != NULL) (*hist3)[kEff]->Rebin(nrebin);
+	if (hist4 != NULL) (*hist4)[kEff]->Rebin(nrebin);
 
+	if (hist1 != NULL) (*hist1)[kEff]->Scale(1./nrebin);
+	if (hist2 != NULL) (*hist2)[kEff]->Scale(1./nrebin);
+	if (hist3 != NULL) (*hist3)[kEff]->Scale(1./nrebin);
+	if (hist4 != NULL) (*hist4)[kEff]->Scale(1./nrebin);
+*/
 
 	std::string yTitle = "Efficiency [%]";
 	if (opt != "pisupp"){

@@ -5,7 +5,7 @@
  * \date 2007
  *
  **/
-#include "qa/CbmLitPropagationQa.h"
+#include "qa/propagation/CbmLitPropagationQa.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitToolFactory.h"

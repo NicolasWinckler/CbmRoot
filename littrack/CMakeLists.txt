@@ -65,16 +65,10 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
 
-##cbm/base/CbmLitEnvironment.cxx  
-##cbm/base/CbmLitToolFactory.cxx
-##cbm/base/CbmLitFieldFitter.cxx
-##cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/base/CbmLitTask.cxx
 
 cbm/elid/CbmLitGlobalElectronId.cxx
 
-##cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
-##cbm/finder/CbmLitFindGlobalTracks.cxx 
 cbm/finder/CbmLitFindMvdTracks.cxx
 
 cbm/generators/CbmLitPolarizedGenerator.cxx
@@ -88,23 +82,14 @@ cbm/geo/CbmLitDetPoint.cxx
 cbm/propagation/CbmPropagatorGeane.cxx
 cbm/propagation/CbmPropagatorLit.cxx
 
-#cbm/qa/CbmLitReconstructionQaImpl.cxx
-#cbm/qa/CbmLitReconstructionQaPrint.cxx
-#cbm/qa/CbmLitReconstructionQaHTML.cxx
-#cbm/qa/CbmLitReconstructionQaLatex.cxx
-##cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/CbmLitCheckMultipleScattering.cxx
-##cbm/qa/CbmLitPropagationAnalysis.cxx 
-##cbm/qa/CbmLitRobustFitterAnalysis.cxx
 cbm/qa/CbmLitSimpleGeoQa.cxx 
-##cbm/qa/CbmLitCheckField.cxx
 cbm/qa/CbmLitCheckEnergyLossMuons.cxx
 cbm/qa/CbmLitCheckBrem.cxx 
 cbm/qa/CbmTrdHitsQa.cxx
 cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
 
-##cbm/utils/CbmLitConverter.cxx
 cbm/utils/CbmLitDrawHist.cxx
 
 cbm/parallel/CbmLitTrackFinderNNParallel.cxx
@@ -137,9 +122,7 @@ EndIf(Boost_FOUND)
 set(LITTRACK_HEADERS
 cbm/base/CbmLitTask.h
 cbm/elid/CbmLitGlobalElectronId.h
-#cbm/finder/CbmLitTrdTrackFinderStandalone.h
 cbm/finder/CbmLitFindGlobalTracks.h
-#cbm/finder/CbmLitCudaTest.h 
 cbm/finder/CbmLitFindMvdTracks.h
 cbm/generators/CbmLitPolarizedGenerator.h
 cbm/geo/CbmLitDet.h 
@@ -149,19 +132,15 @@ cbm/geo/CbmLitDetGeoPar.h
 cbm/geo/CbmLitDetPoint.h
 cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
-#cbm/qa/CbmLitReconstructionQa.h 
 cbm/qa/CbmLitFindGlobalTracksIdeal.h
-cbm/qa/CbmLitPropagationQa.h 
-#cbm/qa/CbmLitRobustFitterAnalysis.h
+cbm/qa/propagation/CbmLitPropagationQa.h 
 cbm/qa/CbmLitSimpleGeoQa.h 
-#cbm/qa/CbmLitFieldQa.h
 cbm/qa/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/CbmLitCheckMultipleScattering.h
 cbm/qa/CbmLitCheckBrem.h 
 cbm/qa/CbmTrdHitsQa.h
 cbm/qa/CbmLitCreateStandaloneData.h
 cbm/qa/CbmLitTestMatrixMath.h
-#cuda/CudaTest.h
 cbm/utils/CbmLitDrawHist.h
 )
 
@@ -194,12 +173,9 @@ cbm/base/CbmLitEnvironment.cxx
 cbm/base/CbmLitFieldFitter.cxx
 cbm/base/CbmLitToolFactory.cxx
 cbm/base/CbmLitSimpleGeometryConstructor.cxx
-#cbm/finder/CbmLitTrdTrackFinderStandalone.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
-#cbm/qa/CbmLitReconstructionQa.cxx
 cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
-cbm/qa/CbmLitPropagationQa.cxx 
-#cbm/qa/CbmLitRobustFitterAnalysis.cxx
+cbm/qa/propagation/CbmLitPropagationQa.cxx 
 cbm/utils/CbmLitConverter.cxx
 )
 

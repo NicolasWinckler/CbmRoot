@@ -89,6 +89,8 @@ cbm/qa/CbmLitCheckBrem.cxx
 cbm/qa/CbmTrdHitsQa.cxx
 cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
+cbm/qa/mc/CbmLitMCTrack.cxx
+cbm/qa/mc/CbmLitMCTrackCreator.cxx
 
 cbm/utils/CbmLitDrawHist.cxx
 

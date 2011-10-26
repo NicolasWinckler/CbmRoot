@@ -4,7 +4,6 @@
 
 void basiclibs()
 {
-  gSystem->Load("libGdml");
   gSystem->Load("libGeom");
   gSystem->Load("libGeomPainter");
  

@@ -6,7 +6,15 @@
  **/
 #include "CbmLitMCTrackCreator.h"
 #include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairGeoNode.h"
 #include "FairMCPoint.h"
+#include "CbmMvdPoint.h"
+#include "CbmGeoStsPar.h"
+#include "CbmStsDetectorId.h"
+#include "CbmMuchGeoScheme.h"
+#include "CbmTrdDetectorId.h"
 
 CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fMCTracks(NULL),
@@ -33,6 +41,8 @@ CbmLitMCTrackCreator* CbmLitMCTrackCreator::Instance()
 
 void CbmLitMCTrackCreator::Create()
 {
+   FillStationMaps();
+
    fLitMCTracks.clear();
 
    AddPoints(kMVD, fMvdPoints);
@@ -67,7 +77,12 @@ void CbmLitMCTrackCreator::AddPoints(
    for (int iPoint = 0; iPoint < nofPoints; iPoint++) {
       FairMCPoint* fairPoint = static_cast<FairMCPoint*>(array->At(iPoint));
       CbmLitMCPoint litPoint;
-      FairMCPointToLitMCPoint(fairPoint, &litPoint, iPoint);
+      int stationId = -1;
+      if (detId == kMVD) stationId = fMvdStationsMap[iPoint]; else
+      if (detId == kSTS) stationId = fStsStationsMap[iPoint]; else
+      if (detId == kTRD) stationId = fTrdStationsMap[iPoint]; else
+      if (detId == kMUCH) stationId = fMuchStationsMap[iPoint];
+      FairMCPointToLitMCPoint(fairPoint, &litPoint, iPoint, stationId);
       fLitMCTracks[fairPoint->GetTrackID()].AddPoint(detId, litPoint);
    }
 }
@@ -75,7 +90,8 @@ void CbmLitMCTrackCreator::AddPoints(
 void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
       const FairMCPoint* fairPoint,
       CbmLitMCPoint* litPoint,
-      int refId)
+      int refId,
+      int stationId)
 {
    litPoint->SetX(fairPoint->GetX());
    litPoint->SetY(fairPoint->GetY());
@@ -84,5 +100,75 @@ void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
    litPoint->SetPy(fairPoint->GetPy());
    litPoint->SetPz(fairPoint->GetPz());
    litPoint->SetRefId(refId);
-   litPoint->SetStationId(-1);
+   litPoint->SetStationId(stationId);
+}
+
+void CbmLitMCTrackCreator::FillStationMaps()
+{
+   fMvdStationsMap.clear();
+   fStsStationsMap.clear();
+   fTrdStationsMap.clear();
+   fMuchStationsMap.clear();
+
+   // MVD
+   if (NULL != fMvdPoints) {
+      Int_t nofMvdPoints = fMvdPoints->GetEntriesFast();
+       for (Int_t iPoint = 0; iPoint < nofMvdPoints; iPoint++) {
+          CbmMvdPoint* point = static_cast<CbmMvdPoint*>(fMvdPoints->At(iPoint));
+          fMvdStationsMap[iPoint] = point->GetStationNr() - 1;
+       }
+   }
+   // end MVD
+
+   // STS
+   if (NULL != fStsPoints) {
+      FairRunAna* run = FairRunAna::Instance();
+      FairRuntimeDb* runDb = run->GetRuntimeDb();
+      CbmGeoStsPar* stsGeoPar = (CbmGeoStsPar*) runDb->getContainer("CbmGeoStsPar");
+      TObjArray* stsNodes = stsGeoPar->GetGeoSensitiveNodes();
+      Int_t nofStsStations = stsNodes->GetEntries();
+      std::map<Int_t, Int_t> stsStationNrFromMcId;
+      for (Int_t ist = 0; ist < nofStsStations; ist++) {
+        FairGeoNode* stsNode = (FairGeoNode*) stsNodes->At(ist);
+        std::string stsNodeName(stsNode->GetName());
+        std::string stsStationNr = stsNodeName.substr(10, 2);
+        int stationNr = atoi(stsStationNr.c_str());
+        stsStationNrFromMcId[stsNode->getMCid()] = stationNr - 1;
+      }
+
+      CbmStsDetectorId stsDetectorId;
+      Int_t nofStsPoints = fStsPoints->GetEntriesFast();
+      for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
+         FairMCPoint* point = static_cast<FairMCPoint*>(fStsPoints->At(iPoint));
+         Int_t stationId = stsStationNrFromMcId[point->GetDetectorID()];
+         fStsStationsMap[iPoint] = stationId;
+      }
+   }
+   // end STS
+
+   // MUCH
+   if (NULL != fMuchPoints) {
+      Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+      for (Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++) {
+         FairMCPoint* point = static_cast<FairMCPoint*>(fMuchPoints->At(iPoint));
+         //Int_t stationId = 10 * CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID())
+         //   + CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID());
+         Int_t stationId = CbmMuchGeoScheme::Instance()->GetLayerSideNr(point->GetDetectorID());
+         fMuchStationsMap[iPoint] = stationId;
+      }
+   }
+   // end MUCH
+
+   // TRD
+   if (NULL != fTrdPoints) {
+      CbmTrdDetectorId trdDetectorId;
+      Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
+      for (Int_t iPoint = 0; iPoint < nofTrdPoints; iPoint++) {
+         FairMCPoint* point = static_cast<FairMCPoint*>(fTrdPoints->At(iPoint));
+         Int_t* detInfo = trdDetectorId.GetDetectorInfo(point->GetDetectorID());
+         Int_t stationId = 10 * detInfo[1] + detInfo[2];
+         fTrdStationsMap[iPoint] = stationId;
+      }
+   }
+   // end TRD
 }

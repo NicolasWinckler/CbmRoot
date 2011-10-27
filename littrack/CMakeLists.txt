@@ -135,7 +135,8 @@ cbm/geo/CbmLitDetPoint.h
 cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
 cbm/qa/CbmLitFindGlobalTracksIdeal.h
-cbm/qa/propagation/CbmLitPropagationQa.h 
+cbm/qa/propagation/CbmLitPropagationQa.h
+cbm/qa/propagation/CbmLitFitQa.h
 cbm/qa/CbmLitSimpleGeoQa.h 
 cbm/qa/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/CbmLitCheckMultipleScattering.h
@@ -178,6 +179,7 @@ cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
 cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/propagation/CbmLitPropagationQa.cxx 
+cbm/qa/propagation/CbmLitFitQa.cxx
 cbm/utils/CbmLitConverter.cxx
 )
 

@@ -106,6 +106,7 @@
 #endif
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 #pragma link C++ class CbmLitPropagationQa+;
+#pragma link C++ class CbmLitFitQa+;
 //#pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitSimpleGeoQa+;
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;

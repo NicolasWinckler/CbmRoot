@@ -12,6 +12,7 @@
 #include "std/base/CbmLitFloat.h"
 #include <string>
 #include <sstream>
+#include <cmath>
 
 /**
  * \class CbmLitMCPoint
@@ -45,6 +46,9 @@ public:
    myf GetPz() const { return fPz; }
    int GetRefId() const { return fRefId; }
    int GetStationId() const { return fStationId; }
+   myf GetTx() const { return fPx / fPz; }
+   myf GetTy() const { return fPy / fPz; }
+   myf GetP() const { return std::sqrt(fPx*fPx + fPy*fPy + fPz*fPz);}
 
    /* Setters */
    void SetX(myf x) { fX = x; }

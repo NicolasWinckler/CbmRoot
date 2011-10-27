@@ -47,6 +47,16 @@ public:
     */
    void Create();
 
+   /**
+    * \brief Return CbmLitMCTrack by its index.
+    * \param[in] mcId MC index of track.
+    * \return MC track.
+    */
+   const CbmLitMCTrack& GetTrack(
+         int mcId) const {
+      return fLitMCTracks.find(mcId)->second;
+   }
+
 private:
 
    /**
@@ -72,7 +82,13 @@ private:
    void FairMCPointToLitMCPoint(
          const FairMCPoint* fairPoint,
          CbmLitMCPoint* litPoint,
-         int refId);
+         int refId,
+         int stationId);
+
+   /**
+    * \brief Fill maps for MC points to station id.
+    */
+   void FillStationMaps();
 
    TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fMvdPoints; // CbmMvdPoint array
@@ -84,6 +100,12 @@ private:
    // Stores created CbmLitMCTrack objects.
    // std::map<MC track index, CbmLitMCTrack object>.
    std::map<int, CbmLitMCTrack> fLitMCTracks;
+
+   // Map <MC point index, station index>
+   std::map<int, int>fMvdStationsMap; // for MVD
+   std::map<int, int>fStsStationsMap; // for STS
+   std::map<int, int>fTrdStationsMap; // for TRD
+   std::map<int, int>fMuchStationsMap; // for MUCH
 };
 
 #endif /* CBMLITMCTRACKCREATOR_H_ */

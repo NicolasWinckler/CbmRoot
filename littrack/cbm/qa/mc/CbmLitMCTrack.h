@@ -33,6 +33,11 @@ public:
       fPoints[kTRD];
       fPoints[kMUCH];
       fPoints[kTOF];
+      fStationPoints[kMVD];
+      fStationPoints[kSTS];
+      fStationPoints[kTRD];
+      fStationPoints[kMUCH];
+      fStationPoints[kTOF];
    }
 
    /**
@@ -47,6 +52,7 @@ public:
     */
    void AddPoint(DetectorId detId, const CbmLitMCPoint& point) {
       fPoints[detId].push_back(point);
+      fStationPoints[detId][point.GetStationId()].push_back(point);
    }
 
    /**
@@ -77,9 +83,40 @@ public:
       return fPoints.find(detId)->second.size();
    }
 
+   /**
+    * \brief Return MC point for specified detector id and point index.
+    * \param[in] detId Detector identificator.
+    * \param[in] stationId Station id.
+    * \param[in] index Index of MC point.
+    * \return MC point.
+    */
+   const CbmLitMCPoint& GetPointAtStation(
+         DetectorId detId,
+         int stationId,
+         int index) const {
+      return fStationPoints.find(detId)->second.find(stationId)->second[index];
+   }
+
+   /**
+    * \brief Return number of MC points for specified detector id.
+    * \param[in] detId Detector identificator.
+    *  \param[in] stationId Station id.
+    * \return Number of MC points.
+    */
+   unsigned int GetNofPointsAtStation(
+         DetectorId detId,
+         int stationId) const {
+      if (fStationPoints.find(detId)->second.count(stationId) > 0) {
+         return fStationPoints.find(detId)->second.find(stationId)->second.size();
+      } else return 0;
+   }
+
 private:
-   // std::map<detector id, std::vector of points>
+   // std::map<detector id, std::vector of MC points>
    std::map<int, std::vector<CbmLitMCPoint> > fPoints;
+
+   // std::map<detector id, std::map<station id, std::vector of MC points> >
+   std::map<int, std::map<int, std::vector<CbmLitMCPoint> > > fStationPoints;
 
 private:
 
@@ -89,7 +126,8 @@ private:
       std::stringstream ss;
       ss << detName << " npoints=" << GetNofPoints(detId) << " points=(";
       for (int i = 0; i < GetNofPoints(detId); i++) {
-         ss << GetPoint(detId, i).GetRefId() << ",";
+         //ss << GetPoint(detId, i).GetRefId() << ",";
+         ss << GetPoint(detId, i);
       }
       ss << ") ";
       return ss.str();

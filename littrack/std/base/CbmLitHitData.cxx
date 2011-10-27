@@ -54,12 +54,12 @@ void CbmLitHitData::AddHit(
    fHits[stationGroup][station][substation].push_back(hit);
 
    if (hit->GetType() == kLITSTRIPHIT) {
-      CbmLitStripHit* stripHit = static_cast<const CbmLitStripHit*>(hit);
+      CbmLitStripHit* stripHit = static_cast<CbmLitStripHit*>(hit);
       if (fMaxErr[stationGroup][station][substation].first < stripHit->GetDu()) {
          fMaxErr[stationGroup][station][substation] = std::pair<myf, char>(stripHit->GetDu(), 'U');
       }
    } else if (hit->GetType() == kLITPIXELHIT) {
-      CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
+      CbmLitPixelHit* pixelHit = static_cast<CbmLitPixelHit*>(hit);
       if (fMaxErr[stationGroup][station][substation].first < pixelHit->GetDx()) {
          fMaxErr[stationGroup][station][substation] = std::pair<myf, char>(pixelHit->GetDx(), 'X');
       }

@@ -55,9 +55,9 @@ LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 {
    LitStatus result = kLITSUCCESS;
    if (hit->GetType() == kLITSTRIPHIT) {
-      result = MultivariateGaussWeight(par, static_cast<const CbmLitStripHit*>(hit), T);
+      result = MultivariateGaussWeight(par, static_cast<CbmLitStripHit*>(hit), T);
    } else if (hit->GetType() == kLITPIXELHIT) {
-      result = MultivariateGaussWeight(par, static_cast<const CbmLitPixelHit*>(hit), T);
+      result = MultivariateGaussWeight(par, static_cast<CbmLitPixelHit*>(hit), T);
    }
    return result;
 }

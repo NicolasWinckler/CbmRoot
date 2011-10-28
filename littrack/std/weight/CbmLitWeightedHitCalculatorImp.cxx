@@ -31,9 +31,9 @@ void CbmLitWeightedHitCalculatorImp::DoCalculate(
    CbmLitHit* hit)
 {
    if (hit->GetType() == kLITSTRIPHIT) {
-      CalculateWeightedHit(itBegin, itEnd, static_cast<const CbmLitStripHit*>(hit));
+      CalculateWeightedHit(itBegin, itEnd, static_cast<CbmLitStripHit*>(hit));
    } else if (hit->GetType() == kLITPIXELHIT) {
-      CalculateWeightedHit(itBegin, itEnd, static_cast<const CbmLitPixelHit*>(hit));
+      CalculateWeightedHit(itBegin, itEnd, static_cast<CbmLitPixelHit*>(hit));
    }
 }
 
@@ -52,7 +52,7 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
    //calculate effective weight matrix G
    myf eG00 = 0., eG01 = 0., eG11 = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
-      CbmLitPixelHit* h = static_cast<const CbmLitPixelHit*>(*it);
+      CbmLitPixelHit* h = static_cast<CbmLitPixelHit*>(*it);
       if (h->IsOutlier()) { continue; }
       myf dxx = h->GetDx() * h->GetDx();
       myf dyy = h->GetDy() * h->GetDy();
@@ -74,7 +74,7 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
    // calculate effective x and y
    myf m0 = 0., m1 = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
-      CbmLitPixelHit* h = static_cast<const CbmLitPixelHit*>(*it);
+      CbmLitPixelHit* h = static_cast<CbmLitPixelHit*>(*it);
       if (h->IsOutlier()) { continue; }
       myf dxx = h->GetDx() * h->GetDx();
       myf dyy = h->GetDy() * h->GetDy();
@@ -110,7 +110,7 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
    //calculate effective weight matrix G
    myf eG = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
-      CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(*it);
+      CbmLitStripHit* h = static_cast<CbmLitStripHit*>(*it);
       if (h->IsOutlier()) { continue; }
       myf duu = h->GetDu() * h->GetDu();
       myf w = h->GetW();
@@ -121,7 +121,7 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
 
    myf m0 = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
-      CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(*it);
+      CbmLitStripHit* h = static_cast<CbmLitStripHit*>(*it);
       if (h->IsOutlier()) { continue; }
       myf duu = h->GetDu() * h->GetDu();
       myf u = h->GetU();

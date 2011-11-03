@@ -109,16 +109,20 @@ EndIf(TBB_FOUND)
 If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
-      cbm/qa/CbmLitReconstructionQaImpl.cxx
-      cbm/qa/CbmLitReconstructionQaChecker.cxx
-      cbm/qa/CbmLitQaBaseGenerator.cxx
-      cbm/qa/CbmLitQaPrintGenerator.cxx
-      cbm/qa/CbmLitQaHTMLGenerator.cxx
-      cbm/qa/CbmLitQaLatexGenerator.cxx
-      cbm/qa/CbmLitQaHTMLGeneratorStudy.cxx
+      cbm/qa/reconstruction/CbmLitReconstructionQaImpl.cxx
+      cbm/qa/reconstruction/CbmLitReconstructionQaChecker.cxx
+      cbm/qa/reconstruction/CbmLitQaBaseGenerator.cxx
+      cbm/qa/reconstruction/CbmLitQaPrintGenerator.cxx
+      cbm/qa/reconstruction/CbmLitQaHTMLGenerator.cxx
+      cbm/qa/reconstruction/CbmLitQaLatexGenerator.cxx
+      cbm/qa/reconstruction/CbmLitQaHTMLGeneratorStudy.cxx
+      cbm/qa/reconstruction/CbmLitQaHistCreator.cxx      
+      cbm/qa/reconstruction/CbmLitQaDraw.cxx    
+      cbm/qa/reconstruction/CbmLitQaPTreeCreator.cxx       
+      cbm/qa/reconstruction/CbmLitQaHistNames.cxx          
       cbm/qa/CbmLitFieldQaHTMLGenerator.cxx
       cbm/qa/CbmLitFieldQa.cxx
-     )
+     )  
 EndIf(Boost_FOUND)
 
 set(LITTRACK_HEADERS
@@ -164,7 +168,7 @@ EndIf(TBB_FOUND)
 If(Boost_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
-      cbm/qa/CbmLitReconstructionQa.h
+      cbm/qa/reconstruction/CbmLitReconstructionQa.h
      )
 EndIf(Boost_FOUND)
 
@@ -186,7 +190,7 @@ cbm/utils/CbmLitConverter.cxx
 If(Boost_FOUND)
   Set(LITTRACK_SRCS
       ${LITTRACK_SRCS}
-      cbm/qa/CbmLitReconstructionQa.cxx
+      cbm/qa/reconstruction/CbmLitReconstructionQa.cxx
      )
 EndIf(Boost_FOUND)
 

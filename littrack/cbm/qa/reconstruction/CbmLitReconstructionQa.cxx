@@ -4,10 +4,10 @@
  * @version 3.0
  **/
 
-#include "qa/CbmLitReconstructionQa.h"
-#include "qa/CbmLitReconstructionQaImpl.h"
-#include "qa/CbmLitQaLatexGenerator.h"
-#include "qa/CbmLitQaHTMLGeneratorStudy.h"
+#include "qa/reconstruction/CbmLitReconstructionQa.h"
+#include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
+#include "qa/reconstruction/CbmLitQaLatexGenerator.h"
+#include "qa/reconstruction/CbmLitQaHTMLGeneratorStudy.h"
 #include <fstream>
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
@@ -101,6 +101,26 @@ void CbmLitReconstructionQa::SetMomentumRange(Double_t minMom, Double_t maxMom)
 void CbmLitReconstructionQa::SetNofBinsMom(Int_t nofBins)
 {
    fImpl->SetNofBinsMom(nofBins);
+}
+
+void CbmLitReconstructionQa::SetYRange(Double_t minY, Double_t maxY)
+{
+   fImpl->SetYRange(minY, maxY);
+}
+
+void CbmLitReconstructionQa::SetNofBinsY(Int_t nofBins)
+{
+   fImpl->SetNofBinsY(nofBins);
+}
+
+void CbmLitReconstructionQa::SetPtRange(Double_t minPt, Double_t maxPt)
+{
+   fImpl->SetPtRange(minPt, maxPt);
+}
+
+void CbmLitReconstructionQa::SetNofBinsPt(Int_t nofBins)
+{
+   fImpl->SetNofBinsPt(nofBins);
 }
 
 void CbmLitReconstructionQa::DrawHistosFromFile(const std::string& fileName)

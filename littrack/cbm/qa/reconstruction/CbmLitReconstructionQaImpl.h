@@ -20,6 +20,7 @@
 #include <set>
 
 #include <boost/property_tree/ptree.hpp>
+#include "CbmLitQaHistNames.h"
 
 class CbmTrackMatch;
 class CbmRichRingMatch;
@@ -29,10 +30,12 @@ class CbmMCTrack;
 class TClonesArray;
 class TH1;
 class TH2F;
+class TH3F;
 class TH1F;
-class TList;
-class TCanvas;
 class CbmLitGlobalElectronId;
+class CbmLitQaHistManager;
+
+using namespace std;
 
 /**
  * \class CbmLitReconstructionQaImpl
@@ -66,6 +69,17 @@ public:
    virtual void Exec(
       Option_t* opt);
 
+   TH1F* H1(
+      const string& name);
+
+   TH2F* H2(
+      const string& name);
+
+   TH3F* H3(
+      const string& name);
+
+   TH1* H(
+      const string& name);
    /**
     * \brief Set minimum number of MC points in STS.
     * \param[in] minNofPointsSts Minimum number of MC points in STS.
@@ -136,7 +150,7 @@ public:
     * \brief Set output directory for images.
     * \param[in] dir Directory name.
     */
-   void SetOutputDir(const std::string& dir = "") { fOutputDir = dir;}
+   void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
    /**
     * \brief Return output directory for images.
@@ -160,6 +174,42 @@ public:
     */
    void SetNofBinsMom(Int_t nofBins) {
       fNofBinsMom = nofBins;
+   }
+
+   /**
+    * \brief Set Pt range for efficiency calculation.
+    * \param[in] minPt Minimum Pt.
+    * \param[in] maxPt Maximum Pt.
+    */
+   void SetPtRange(Double_t minPt, Double_t maxPt) {
+      fMinPt = minPt;
+      fMaxPt = maxPt;
+   }
+
+   /**
+    * \brief Set number of bins for efficiency v. momentum histograms.
+    * \param[in] nofBins Number of bins.
+    */
+   void SetNofBinsPt(Int_t nofBins) {
+      fNofBinsPt = nofBins;
+   }
+
+   /**
+    * \brief Set rapidity range for efficiency calculation.
+    * \param[in] minY Minimum rapidity.
+    * \param[in] maxY Maximum rapidity.
+    */
+   void SetYRange(Double_t minY, Double_t maxY) {
+      fMinY = minY;
+      fMaxY = maxY;
+   }
+
+   /**
+    * \brief Set number of bins for efficiency v. rapidity histograms.
+    * \param[in] nofBins Number of bins.
+    */
+   void SetNofBinsY(Int_t nofBins) {
+      fNofBinsY = nofBins;
    }
 
    /**
@@ -271,10 +321,14 @@ private:
 
    /**
     * \brief Add MC momentum to histograms for detector acceptance calculation.
-    * \param[in] mom Momentum of MC track.
+    * \param[in] p Momentum of MC track.
+    * \param[in] y Rapidity of Mc track.
+    * \param[in] pt Transverse momentum of MC track.
     */
    void FillMcHistoForDetAcc(
-         Double_t mom);
+         Double_t p,
+         Double_t y,
+         Double_t pt);
 
    /**
     * \brief Loop over the MC tracks. Check track acceptance for different cases.
@@ -287,46 +341,45 @@ private:
     * \param[in] mcTrack MC track pointer.
     * \param[in] mcId MC track index in array.
     * \param[in] mcMap Map from MC track index to reconstructed track index. Map is filled in ProcessGlobalTrack function.
-    * \param[in] hist Vector with histograms to be filled.
+    * \param[in] hist main name of the histograms to be filled.
     * \param[in] par Value that will be added in histogram (momentum or number of points).
     */
    void FillGlobalReconstructionHistos(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
-      const std::multimap<Int_t, Int_t>& mcMap,
-      std::vector<std::vector<TH1F*> >& hist,
-      Double_t par);
+      const multimap<Int_t, Int_t>& mcMap,
+      const string& hist,
+      Double_t par = -1.);
 
    /**
     * \brief ADD COMMENTS.
     */
-   void FillGlobalElIdHistos(
+   void FillGlobalElIdHistos3D(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
-      const std::multimap<Int_t, Int_t>& mcMap,
-      std::vector<TH1F*>& hist,
-      Double_t par,
-      const std::string& opt);
+      const multimap<Int_t, Int_t>& mcMap,
+      const string& hist,
+      const string& opt);
 
     /**
      * \brief Fill histograms of accepted and reconstructed rings tracks.
      * \param[in] mcTrack MC track pointer.
      * \param[in] mcId MC track index in the array.
      * \param[in] mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
-     * \param[in] hist Vector with histograms to be filled.
+     * \param[in] hist main name of the histograms to be filled.
      * \param[in] par Value that will be added in histogram (momentum or number of points)
      */
    void FillGlobalReconstructionHistosRich(
       const CbmMCTrack* mcTrack,
       Int_t mcId,
-      const std::multimap<Int_t, Int_t>& mcMap,
-      std::vector<std::vector<TH1F*> >& hist,
-      Double_t par);
+      const multimap<Int_t, Int_t>& mcMap,
+      const string& hist,
+      Double_t par = -1.);
 
    /**
     * \brief Fill pion suppression histogramms.
     */
-   void PionSuppression();
+   void PionSuppression3D();
 
    /**
     * \brief Fill histograms: momentum resolution vs. momentum and chi2Vertex.
@@ -400,6 +453,16 @@ private:
         TFile* file);
 
    /**
+    * \brief Create x,y,z projections from 3D histogram. New histograms
+    * will be added to histogram manager (fHM) with names hist+"px", "py", "pz"
+    * \hist[in] Name of the histogram.
+    * \opt Options.
+    */
+   void CreateProjections3D(
+         const string& hist,
+         LitQaNameOption opt);
+
+   /**
     * \brief Divide two histograms.
     * \param[in] histo1 Numerator.
     * \param[in] histo2 Denominator.
@@ -411,6 +474,11 @@ private:
       TH1* histo2,
       TH1* histo3,
       Double_t c);
+
+   void DivideHistos(
+      const string& hist,
+      LitQaNameOption opt,
+      Bool_t addProjections = false);
 
    /**
     * \brief Calculate efficiency histograms.
@@ -433,158 +501,9 @@ private:
    std::string RecDetector();
 
    /**
-    * \brief Print statistics to property tree and return property tree.
-    */
-   boost::property_tree::ptree PrintPTree();
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void NofStatisticsToPTree(
-      boost::property_tree::ptree* pt,
-      TH1F* mvd,
-      TH1F* sts,
-      TH1F* rich,
-      TH1F* trd,
-      TH1F* muchP,
-      TH1F* muchS,
-      TH1F* tof);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void HitsHistosToPTree(
-         boost::property_tree::ptree* pt,
-         const std::string& name,
-         std::vector<TH1F*>& histos);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void EventEfficiencyStatisticsToPTree(
-         boost::property_tree::ptree* pt,
-         const std::string& name,
-         const std::vector<std::vector<TH1F*> >& hist);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void EventEfficiencyStatisticsRichToPTree(
-         boost::property_tree::ptree* pt,
-         const std::string& name,
-         const std::vector<std::vector<TH1F*> >& hist);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void EventEfficiencyStatisticsElIdToPTree(
-         boost::property_tree::ptree* pt,
-         const std::string& name,
-         const std::vector<std::vector<TH1F*> >& hist);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void EventDetAccElStatisticsToPTree(
-         boost::property_tree::ptree* pt,
-         const std::string& name,
-         TH1F* hmc,
-         TH1F* hacc,
-         TH1F* hrec);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   void PolarAngleEfficiencyToPTree(
-         boost::property_tree::ptree* pt,
-         const std::string& name,
-         const std::vector<std::vector<TH1F*> >& hist);
-
-   /**
     * \brief Draw histograms.
     */
    void Draw();
-
-   /**
-    * \brief Draw efficiency histograms.
-    */
-   void DrawEfficiencyHistos();
-
-   /**
-    * \brief Draw efficiency plots. TODO ADD COMMENTS
-    */
-   void DrawEfficiency(
-      const std::string& canvasName,
-      const std::vector<TH1F*>* hist1,
-   	const std::vector<TH1F*>* hist2,
-   	const std::vector<TH1F*>* hist3,
-   	const std::vector<TH1F*>* hist4,
-   	const std::string& name1,
-   	const std::string& name2,
-   	const std::string& name3,
-   	const std::string& name4,
-   	const std::string& opt);
-
-   /**
-    * \brief Draw ACC and REC efficiency graphs normalized to MC.
-    */
-   void DrawMcEfficiencyGraph();
-
-   /**
-    * \brief Calculate efficiency for two histograms.
-    */
-   Double_t CalcEfficiency(
-      TH1* histRec,
-      TH1* histAcc,
-      const std::string& opt);
-
-   /**
-    * \brief Draw mean efficiency lines (up to 4) on the histogramm.
-    */
-   void DrawMeanEfficiencyLines(
-      TH1* h,
-      Double_t eff1,
-      Double_t eff2 = -1.,
-      Double_t eff3 = -1.,
-      Double_t eff4 = -1.);
-
-   /**
-    * \brief Draw histograms for hits.
-    */
-   void DrawHitsHistos();
-
-   /**
-    * \brief Draw histograms for hits.
-    * \param[in] canvasName Name of canvas.
-    * \param[in] histos Vector with hits histograms.
-    */
-   void DrawHitsHistos(
-	   const std::string& canvasName,
-      std::vector<TH1F*>& histos);
-
-   /**
-    * \brief Draw histogram of number of hits in station.
-    * \param[in] name Canvas name.
-    * \param[in] hist Pointer to histogram.
-    */
-   void DrawHitsStationHisto(
-      const std::string& name,
-      TH1F* hist);
-
-   /**
-    * \brief Draw histograms of number of hits in station.
-    */
-   void DrawHitsStationHistos();
-
-   /**
-    * \brief Draw histograms of Sts tracks Qa.
-    */
-   void DrawStsTracksQaHistos();
-
-   /**
-    * \brief Draw MC momentum vs. angle histogram.
-    */
-   void DrawMCMomVsAngle();
 
    /**
     * \brief Calculate electron Identification.
@@ -627,6 +546,12 @@ private:
    Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
    Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
    Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
+   Double_t fMinPt; // Minimum Pt for tracks for efficiency calculation [GeV/c]
+   Double_t fMaxPt; // Maximum Pt for tracks for efficiency calculation [GeV/c]
+   Int_t fNofBinsPt; // Number of bins for efficiency vs. Pt histogram
+   Double_t fMinY; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
+   Double_t fMaxY; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
+   Int_t fNofBinsY; // Number of bins for efficiency vs. rapidity histogram
    Double_t fMinAngle; // Minimum polar angle [grad]
    Double_t fMaxAngle; // Maximum polar angle [grad]
    Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
@@ -693,157 +618,15 @@ private:
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 
-   // track categories: all, ref, prim, sec, muon, electron
-   Int_t fNofCategories;
-   // histogram types: acc, rec, eff
-   Int_t fNofTypes;
-
-   // Histograms
-   // h[track category][histogram type]:
-   // track category (all, ref, prim, sec, muon, electron)
-   // histogram type (acc, rec, eff)
-   std::vector<std::vector<TH1F*> > fhStsMom; // STS: momentum dependence
-   std::vector<std::vector<TH1F*> > fhStsMomNormHalfGlobal; // STS: momentum dependence, normalized to STS+TRD(MUCH)
-   std::vector<std::vector<TH1F*> > fhStsMomNormGlobal; // STS: momentum dependence, normalized to STS+TRD(MUCH)+TOF
-   std::vector<std::vector<TH1F*> > fhStsNp; // STS: number of points dependence
-   std::vector<std::vector<TH1F*> > fhStsAngle; // STS: polar angle dependence
-   std::vector<std::vector<TH1F*> > fhHalfGlobalMom; // STS+TRD(MUCH): momentum dependence
-   std::vector<std::vector<TH1F*> > fhHalfGlobalMomNormGlobal; // STS+TRD(MUCH): momentum dependence, normalized to STS+TRD(MUCH)+TOF
-   std::vector<std::vector<TH1F*> > fhGlobalMom; // STS+TRD(MUCH)+TOF: momentum dependence
-   std::vector<std::vector<TH1F*> > fhRecMom; // TRD(MUCH): momentum dependence
-   std::vector<std::vector<TH1F*> > fhRecNp; // TRD(MUCH): number of points dependence
-   std::vector<std::vector<TH1F*> > fhRecAngle; // TRD(MUCH): polar angle dependence
-   std::vector<std::vector<TH1F*> > fhTofMom; // TOF: momentum dependence
-   std::vector<std::vector<TH1F*> > fhTofAngle; // TOF: momentum dependence
-   // histograms for ghost tracks
-   // STS: ghost tracks (number of hits dependence)
-   TH1F* fhStsGhostNh;
-   // TRD(MUCH): ghost tracks (number of hits dependence)
-   TH1F* fhRecGhostNh;
-   // RICH: ghost rings (number of hits dependence)
-   TH1F* fhRichGhostNh;
-   // RICH: ghost rings after STS matching (number of hits dependence)
-   TH1F* fhRichGhostStsMatchingNh;
-   // RICH: ghost rings after STS matching and electron identification (number of hits dependence)
-   TH1F* fhRichGhostElIdNh;
-   // STS: ghost tracks after RICH matching (number of hits dependence)
-   TH1F* fhStsGhostRichMatchingNh;
-
-
-   // RICH performance histograms
-   std::vector<std::vector<TH1F*> > fhRichMom;// RICH: momentum dependence
-   std::vector<std::vector<TH1F*> > fhRichNh;// RICH: number of hits
-   //Norm STS+RICH
-   std::vector<std::vector<TH1F*> > fhStsRichNoMatchingMom;// STS+RICH no matching: momentum dependence
-   std::vector<std::vector<TH1F*> > fhStsRichMom;// STS+RICH: momentum dependence
-   std::vector<std::vector<TH1F*> > fhStsMomNormStsRich;// STS: momentum dependence, normalized to STS+RICH
-   //Norm STS+RICH+TRD
-   std::vector<std::vector<TH1F*> > fhStsMomNormStsRichTrd;// STS: momentum dependence, normalized to STS+RICH+TRD
-   std::vector<std::vector<TH1F*> > fhStsRichTrdMom;// STS+RICH+TRD: momentum dependence
-   std::vector<std::vector<TH1F*> > fhStsRichMomNormStsRichTrd;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD
-   //Norm STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsMomNormStsRichTrdTof;// STS: momentum dependence, normalized to STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsRichMomNormStsRichTrdTof;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsRichTrdMomNormStsRichTrdTof;// STS+RICH+TRD: momentum dependence, normalized to STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsRichTrdTofMom;// STS+RICH+TRD+TOF: momentum dependence, normalized to STS+RICH+TRD+TOF
-
-   TH1F* fhMvdNofHitsInStation; // mean number of hits in station in MVD
-   TH1F* fhStsNofHitsInStation; // mean number of hits in station in STS
-   TH1F* fhTrdNofHitsInStation; // mean number of hits in station in TRD
-   TH1F* fhMuchNofHitsInStation; // mean number of hits in station in MUCH
-   TH1F* fhTofNofHitsInStation; // mean number of hits in station in TOF
-
-   // histograms of number of hits in track
-   // all, true, fake, true/all, fake/all
-   std::vector<TH1F*> fhMvdTrackHits;
-   std::vector<TH1F*> fhStsTrackHits;
-   std::vector<TH1F*> fhTrdTrackHits;
-   std::vector<TH1F*> fhMuchTrackHits;
-   std::vector<TH1F*> fhRichRingHits;
-
-   TList* fHistoList; // List of histograms
-
-   // Total number of tracks/rings/hits histograms
-   TH1F* fhNofGlobalTracks; // global tracks
-   TH1F* fhNofStsTracks; // STS tracks
-   TH1F* fhNofTrdTracks; // TRD tracks
-   TH1F* fhNofMuchTracks; // MUCH tracks
-   TH1F* fhNofRichRings; // RICH rings
-   TH1F* fhNofRichProjections; // RICH projections
-   // hits
-   TH1F* fhNofMvdHits; // MVD hits
-   TH1F* fhNofStsHits; // STS hits
-   TH1F* fhNofRichHits; // RICH hits
-   TH1F* fhNofTrdHits; // TRD hits
-   TH1F* fhNofMuchPixelHits; // MUCH pixel hits
-   TH1F* fhNofMuchStrawHits; // MUCH straw hits
-   TH1F* fhNofTofHits; // TOF hits
-   // points
-   TH1F* fhNofMvdPoints; // MVD points
-   TH1F* fhNofStsPoints; // STS points
-   TH1F* fhNofRichPoints; // RICH points
-   TH1F* fhNofTrdPoints; // TRD points
-   TH1F* fhNofMuchPoints; // MUCH points
-   TH1F* fhNofTofPoints; // TOF points
-   // digis
-   TH1F* fhNofMvdDigis; // MVD digis
-   TH1F* fhNofStsDigis; // STS digis
-   TH1F* fhNofTrdDigis; // TRD digis
-   TH1F* fhNofMuchDigis; // MUCH digis
-   // clusters
-   TH1F* fhNofMvdClusters; // MVD clusters
-   TH1F* fhNofStsClusters; // STS clusters
-   TH1F* fhNofTrdClusters; // TRD clusters
-   TH1F* fhNofMuchClusters; // MUCH clusters
-
-   TH1F* fhStsChiprim; //chi2Vertex
-   TH2F* fhStsMomresVsMom; // momentum resolution vs. momentum
-   TH1F* fhTrackLength; // trackLength
-
-   // Electron identification
-   // h[category][histogram type]:
-   // track category (ElId, PiSupp)
-   // histogram type (acc, rec, eff)
-   std::vector<std::vector<TH1F*> > fhStsTrdMomElId; // STS+TRD: momentum dependence
-   std::vector<std::vector<TH1F*> > fhStsTrdMomElIdNormStsTrdTof; // STS+TRD: momentum dependence, normalized to STS+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsTrdTofMomElId; // STS+TRD+TOF: momentum dependence
-   //Norm STS+RICH
-   std::vector<std::vector<TH1F*> > fhStsRichMomElId;// STS+RICH: momentum dependence
-   //Norm STS+RICH+TRD
-   std::vector<std::vector<TH1F*> > fhStsRichMomElIdNormStsRichTrd;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD
-   std::vector<std::vector<TH1F*> > fhStsRichTrdMomElId;// STS+RICH+TRD: momentum dependence
-   //Norm STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsRichMomElIdNormStsRichTrdTof;// STS+RICH: momentum dependence, normalized to STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsRichTrdMomElIdNormStsRichTrdTof;// STS+RICH+TRD: momentum dependence, normalized to STS+RICH+TRD+TOF
-   std::vector<std::vector<TH1F*> > fhStsRichTrdTofMomElId;// STS+RICH+TRD+TOF: momentum dependence, normalized to STS+RICH+TRD+TOF
-
-   // Detector acceptance for primary electrons (signal)
-   // h[histogram type]:
-   // histogram type (mc, acc, eff)
-   // local detector acceptance
-   std::vector<TH1F*> fhStsDetAccEl; // STS detector acceptance
-   // pair detector acceptance
-   std::vector<TH1F*> fhStsRichDetAccEl; // STS-RICH detector acceptance
-   std::vector<TH1F*> fhStsTrdDetAccEl; // STS-TRD detector acceptance
-   std::vector<TH1F*> fhStsTofDetAccEl; // STS-TOF detector acceptance
-   // global detector acceptance
-   std::vector<TH1F*> fhStsRichTrdDetAccEl; // STS-RICH-TOF detector acceptance
-   std::vector<TH1F*> fhStsRichTrdTofDetAccEl; // STS-RICH-TRD-TOF detector acceptance
-   std::vector<TH1F*> fhStsTrdTofDetAccEl; // STS-TRD-TOF detector acceptance
-
-   // MC mom vs polar angle at vertex
-   // [track category]
-   // track category (all, ref, prim, sec, muon, electron)
-   std::vector<TH2F*> fhMCMomVsAngle;
-
-   TH1F* fhEventNo; // Event counter
-
-   std::string fOutputDir; // Output directory for images
+   string fOutputDir; // Output directory for images
 
    CbmVertex *fPrimVertex; // Pointer to the primary vertex
    CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
+
+  // CbmLitQaHistCreator* fHistCreator; // Histogram creator tool
+   CbmLitQaHistManager* fHM; // histogram manager
 };
 
 #endif /* CBMLITRECONSTRUCTIONQAIMPL_H_ */

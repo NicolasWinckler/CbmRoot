@@ -4,7 +4,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#include "qa/CbmLitQaHTMLGenerator.h"
+#include "qa/reconstruction/CbmLitQaHTMLGenerator.h"
 
 #include <iostream>
 #include <map>

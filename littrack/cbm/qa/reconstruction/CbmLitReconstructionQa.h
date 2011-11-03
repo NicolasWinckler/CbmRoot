@@ -84,6 +84,18 @@ public:
    /* Set number of bins for efficiency v. momentum histograms */
    void SetNofBinsMom(Int_t nofBins);
 
+   /* Sets rapidity range for efficiency calculation */
+   void SetYRange(Double_t minY, Double_t maxY);
+
+   /* Set number of bins for efficiency v. rapidity histograms */
+   void SetNofBinsY(Int_t nofBins);
+
+   /* Sets Pt range for efficiency calculation */
+   void SetPtRange(Double_t minPt, Double_t maxPt);
+
+   /* Set number of bins for efficiency v. Pt histograms */
+   void SetNofBinsPt(Int_t nofBins);
+
    /* Implement functionality of drawing histograms in the macro
     * from the specified file
     * @param fileName Name of the file */

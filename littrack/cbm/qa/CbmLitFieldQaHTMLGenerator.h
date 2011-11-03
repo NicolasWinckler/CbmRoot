@@ -9,7 +9,7 @@
 #ifndef CBMLITFIELDQAHTMLGENERATOR_H_
 #define CBMLITFIELDQAHTMLGENERATOR_H_
 
-#include "CbmLitQaBaseGenerator.h"
+#include "reconstruction/CbmLitQaBaseGenerator.h"
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 

@@ -4,7 +4,7 @@
  * @version 1.0
  **/
 
-#include "qa/CbmLitQaLatexGenerator.h"
+#include "qa/reconstruction/CbmLitQaLatexGenerator.h"
 
 #include <iostream>
 //#include <sstream>

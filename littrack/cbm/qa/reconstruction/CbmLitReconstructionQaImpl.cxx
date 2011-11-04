@@ -1407,9 +1407,9 @@ void CbmLitReconstructionQaImpl::CreateProjections3D(
 
    for (Int_t i = 0; i < cat.size(); i++) {
       for (Int_t j = 0; j < type.size(); j++){
-         TH1D* px = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionX()->Clone());
-         TH1D* py = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionY()->Clone());
-         TH1D* pz = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionZ()->Clone());
+         TH1D* px = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionX());
+         TH1D* py = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionY());
+         TH1D* pz = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionZ());
          px->SetName(string(hist+"px_"+cat[i]+"_"+type[j]).c_str());
          py->SetName(string(hist+"py_"+cat[i]+"_"+type[j]).c_str());
          pz->SetName(string(hist+"pz_"+cat[i]+"_"+type[j]).c_str());

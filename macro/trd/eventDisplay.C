@@ -37,7 +37,7 @@ eventDisplay()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile("data/test.mc.root");
-  fRun->AddFriend("data/test.eds.root");
+  fRun->AddFriend("data/test.esd.root");
   
   fRun->SetOutputFile("data/test.root");
 

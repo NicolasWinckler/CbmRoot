@@ -35,7 +35,7 @@ void run_reco(Int_t nEvents = 2)
   TString parFile = "data/params.root";
 
   // Output file
-  TString outFile = "data/test.eds.root";
+  TString outFile = "data/test.esd.root";
 
   //  Digitisation files.
   // The sts digi file is not needed. The code is only here to
@@ -182,4 +182,4 @@ void run_reco(Int_t nEvents = 2)
   cout << " All ok " << endl;
 }
   // Output file
-  TString outFile = "data/test.eds.root";
+  TString outFile = "data/test.esd.root";

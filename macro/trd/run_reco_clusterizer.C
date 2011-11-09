@@ -65,7 +65,7 @@ TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
 
 
   // Output file
-  TString outFile = "data/test.eds.root";
+  TString outFile = "data/test.esd.root";
 
 
   // In general, the following parts need not be touched

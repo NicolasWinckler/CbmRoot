@@ -61,7 +61,7 @@ void run_reco_hitdensitytest(Int_t nEvents)
   parFileList->Add(&trdDigiFile);
 
   // Output file
-  TString outFile = "data/test.eds.root";
+  TString outFile = "data/test.esd.root";
 
 
   // In general, the following parts need not be touched

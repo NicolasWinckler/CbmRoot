@@ -594,6 +594,9 @@ void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
    fMcStsRichNoMatchingMap.clear();
    fMcStsRichTrdMap.clear();
    fMcStsRichTrdTofMap.clear();
+
+   ProcessRichRings();
+
    Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
    for(Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
       CbmGlobalTrack* globalTrack = static_cast<CbmGlobalTrack*>(fGlobalTracks->At(iTrack));
@@ -740,31 +743,51 @@ void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
       if (fIsRich) {
     	  // select only RICH
     	  if (isRichOk) {
-			  fMcRichMap.insert(std::pair<Int_t, Int_t>(richMCId, iTrack));
+    		 // fill in ProcessRichRings() procedure, because
+    		 // loop over all found rings needed
+			//  fMcRichMap.insert(pair<Int_t, Int_t>(richMCId, iTrack));
 		  }
     	  // select STS+RICH tracks
     	  if (sts && rich) {
-    		  fMcStsRichMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+    		  fMcStsRichMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
     	  }
         // select STS+RICH tracks no matching
          if (sts && richNoMatching) {
-            fMcStsRichNoMatchingMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+            fMcStsRichNoMatchingMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
          }
     	  // select STS+RICH+TRD tracks
     	  if (sts && rich && trd) {
-			  fMcStsRichTrdMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+			  fMcStsRichTrdMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
 		  }
     	  if (fIsTrd) { // select STS+RICH+TRD+TOF tracks
 			  if (sts && rich && trd && tof) {
-				  fMcStsRichTrdTofMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+				  fMcStsRichTrdTofMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
 			  }
     	  } else { // select STS+RICH+TOF tracks
     		  if (sts && rich && tof) {
-				  fMcStsRichTrdTofMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+				  fMcStsRichTrdTofMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
 			  }
     	  }
       }
    }
+}
+
+void CbmLitReconstructionQaImpl::ProcessRichRings()
+{
+   if (!fIsRich) return;
+   Int_t nofRings = fRichRings->GetEntriesFast();
+   for(Int_t iRing = 0; iRing < nofRings; iRing++) {
+	  CbmRichRing* ring = static_cast<CbmRichRing*>(fRichRings->At(iRing));
+	  if (ring == NULL) { continue; }
+	  CbmRichRingMatch* richRingMatch = static_cast<CbmRichRingMatch*>(fRichRingMatches->At(iRing));
+	  if (richRingMatch == NULL){ continue;}
+	  Bool_t isRichOk = CheckRingQuality(richRingMatch);
+	  Int_t richMCId = -1;
+	  if (isRichOk) { richMCId = richRingMatch->GetMCTrackID(); }
+	  if (isRichOk && -1 != richMCId) {
+         fMcRichMap.insert(std::pair<Int_t, Int_t>(richMCId, iRing));
+	  }
+   }// iRing
 }
 
 void CbmLitReconstructionQaImpl::ProcessMvd(

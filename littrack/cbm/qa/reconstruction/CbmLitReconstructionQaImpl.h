@@ -296,6 +296,14 @@ private:
    void ProcessGlobalTracks();
 
    /**
+    * \brief Loop over the reconstructed RICH rings.
+    *
+    * Check if ring is correct and fill
+    * std::multimap <MC track index, reconstructed ring index>.
+    */
+   void ProcessRichRings();
+
+   /**
     * \brief Check correctness attached MVD hits.
     */
    void ProcessMvd(

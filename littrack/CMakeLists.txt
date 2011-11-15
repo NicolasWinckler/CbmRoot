@@ -138,7 +138,7 @@ cbm/geo/CbmLitDetGeoPar.h
 cbm/geo/CbmLitDetPoint.h
 cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
-cbm/qa/CbmLitFindGlobalTracksIdeal.h
+cbm/finder/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/propagation/CbmLitPropagationQa.h
 cbm/qa/propagation/CbmLitFitQa.h
 cbm/qa/CbmLitSimpleGeoQa.h 
@@ -181,7 +181,7 @@ cbm/base/CbmLitFieldFitter.cxx
 cbm/base/CbmLitToolFactory.cxx
 cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
-cbm/qa/CbmLitFindGlobalTracksIdeal.cxx 
+cbm/finder/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/propagation/CbmLitPropagationQa.cxx 
 cbm/qa/propagation/CbmLitFitQa.cxx
 cbm/utils/CbmLitConverter.cxx

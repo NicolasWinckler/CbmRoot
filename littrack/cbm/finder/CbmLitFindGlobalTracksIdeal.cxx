@@ -3,7 +3,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  */
-#include "qa/CbmLitFindGlobalTracksIdeal.h"
+#include "finder/CbmLitFindGlobalTracksIdeal.h"
 
 #include "base/CbmLitEnvironment.h"
 

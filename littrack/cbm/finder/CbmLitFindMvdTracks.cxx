@@ -1,14 +1,15 @@
-/** CbmLitFindMvdTracks.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
- **/
+/**
+ * \file CbmLitFindMvdTracks.cxx
+ * \brief MVD tracking based on littrack package.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
+ *
+ */
 #include "finder/CbmLitFindMvdTracks.h"
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitToolFactory.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitPixelHit.h"
-#include "data/CbmLitStripHit.h"
 #include "data/CbmLitTrack.h"
 #include "data/CbmLitTrackParam.h"
 #include "finder/CbmLitTrackFinderNN.h"
@@ -23,7 +24,16 @@
 #include <iostream>
 #include <algorithm>
 
-CbmLitFindMvdTracks::CbmLitFindMvdTracks()
+CbmLitFindMvdTracks::CbmLitFindMvdTracks():
+   fIsMvd(false),
+   fIsSts(false),
+   fStsTracks(NULL),
+   fMvdHits(NULL),
+   fLitStsTracks(),
+   fLitMvdHits(),
+   fLitOutputTracks(),
+   fFinder(),
+   fEventNo(0)
 {
 
 }
@@ -38,10 +48,8 @@ InitStatus CbmLitFindMvdTracks::Init()
    DetermineSetup();
    ReadAndCreateDataBranches();
 
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   env->GetMvdLayout();
-
-   InitTrackReconstruction();
+   CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+   fFinder = factory->CreateTrackFinder("mvd_nn");
 
    return kSUCCESS;
 }
@@ -50,13 +58,9 @@ void CbmLitFindMvdTracks::Exec(
    Option_t* opt)
 {
    ConvertInputData();
-
    RunTrackReconstruction();
-
    ConvertOutputData();
-
    ClearArrays();
-
    std::cout << "-I- Event: " << fEventNo++ << std::endl;
 }
 
@@ -99,8 +103,6 @@ void CbmLitFindMvdTracks::ReadAndCreateDataBranches()
    if (fIsSts) {
       fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
       if (NULL == fStsTracks) { Fatal("Init","No StsTrack array!"); }
-      fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
-      if (NULL == fStsHits) { Fatal("Init","No StsHit array!"); }
    }
 }
 
@@ -110,10 +112,8 @@ void CbmLitFindMvdTracks::ConvertInputData()
    // Change last and first parameters of the track seeds
    for(int iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
       CbmLitTrack* track = fLitStsTracks[iTrack];
-      const CbmLitTrackParam* parLast = track->GetParamLast();
       const CbmLitTrackParam* parFirst = track->GetParamFirst();
       track->SetParamLast(parFirst);
-      track->SetParamFirst(parLast);
    }
    std::cout << "-I- Number of STS tracks: " << fLitStsTracks.size() << std::endl;
 
@@ -146,12 +146,6 @@ void CbmLitFindMvdTracks::ConvertOutputData()
       CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parFirst);
       track->SetParamFirst(parFirst);
    }
-}
-
-void CbmLitFindMvdTracks::InitTrackReconstruction()
-{
-   CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-   fFinder = factory->CreateTrackFinder("mvd_nn");//"mvd_" + fTrackingType);
 }
 
 void CbmLitFindMvdTracks::ClearArrays()

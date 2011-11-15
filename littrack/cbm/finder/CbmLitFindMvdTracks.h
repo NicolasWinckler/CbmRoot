@@ -1,8 +1,10 @@
-/** CbmLitFindMvdTracks.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
- **/
+/**
+ * \file CbmLitFindMvdTracks.h
+ * \brief MVD tracking based on littrack package.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
+ *
+ */
 #ifndef CBMLITFINDMVDTRACKS_H_
 #define CBMLITFINDMVDTRACKS_H_
 
@@ -10,55 +12,78 @@
 #include "base/CbmLitPtrTypes.h"
 #include "FairTask.h"
 
+/**
+ * \class CbmLitFindMvdTracks.h
+ * \brief MVD tracking based on littrack package.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
+ *
+ * This MVD tracking uses STS tracks as seeds,
+ * propagates tracks through MVD and attaches
+ * nearest MVD hits.
+ *
+ */
 class CbmLitFindMvdTracks : public FairTask
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitFindMvdTracks();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitFindMvdTracks();
 
-   /* Inherited from FairTask. */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual InitStatus Init();
 
-   /* Inherited from FairTask. */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Exec(Option_t* opt);
 
-   /* Inherited from FairTask. */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void SetParContainers();
 
-   /* Sets the tracking algorithm to be used.
-     * @param trackingType Name of the tracking algorithm.
-     * "branch" - branching tracking
-     * "nn" - nearest neighbor tracking
-     * "weight" - weighting tracking */
-   void SetTrackingType(const std::string& trackingType) { fTrackingType = trackingType;}
-
 private:
-   /* Inherited from FairTask. */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Finish();
 
-   /* Determines the CBM detector setup, based on TGeoManager stored in the input MC file. */
+   /**
+    * \brief Determine CBM detector setup based on TGeoManager. */
    void DetermineSetup();
 
-   /* Reads necessary data branches from the input data files and
-    * creates branches for CbmGlobalTrack, CbmTrdTrack, CbmMuchTrack */
+   /**
+    * \brief Read necessary data branches from the input data files.
+    */
    void ReadAndCreateDataBranches();
 
-   /* Converts input data from CBMROOT data classes to LIT data classes. */
+   /**
+    * \brief Convert input data from CBMROOT data classes to littrack data classes.
+    */
    void ConvertInputData();
 
-   /* Converts output data LIT data classes to CBMROOT data classes. */
+   /**
+    * \brief Convert output littrack data classes to CBMROOT data classes.
+    */
    void ConvertOutputData();
 
-   /* Runs the track reconstruction. */
+   /**
+    * \brief Run track reconstruction.
+    */
    void RunTrackReconstruction();
 
-   /* Create and initializes track finder and track merger objects. */
-   void InitTrackReconstruction();
-
-   /* Clear arrays and frees the memory. */
+   /**
+    * \brief Clear arrays and free memory.
+    */
    void ClearArrays();
 
    Bool_t fIsMvd; // If MVD detected than true
@@ -66,29 +91,15 @@ private:
 
    // Pointers to data arrays
    TClonesArray* fStsTracks; // CbmStsTrack array
-   TClonesArray* fStsHits; // CbmStsHit
    TClonesArray* fMvdHits; // CbmMvdHits
 
-   // LIT data arrays
+   // littrack data arrays
    TrackPtrVector fLitStsTracks; // STS tracks
    HitPtrVector fLitMvdHits; // MVD
    TrackPtrVector fLitOutputTracks; // output Lit tracks
 
    // Tools
    TrackFinderPtr fFinder; // track finder
-// HitToTrackMergerPtr fMerger; // hit-to-track merger
-// TrackFitterPtr fFitter; // track fitter
-
-   // Settings
-   // Tracking method to be used
-   // "branch" - branching method
-   // "nn" - nearest neighbor method
-   // "weight" - weighting method
-   std::string fTrackingType;
-
-   // stopwatches
-// TStopwatch fTrackingWatch; // stopwatch for tracking
-// TStopwatch fMergerWatch; // stopwatch for merger
 
    Int_t fEventNo; // event counter
 

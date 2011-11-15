@@ -20,6 +20,7 @@
 
 #include "TClonesArray.h"
 #include "TH1F.h"
+#include "TF1.h"
 #include "TCanvas.h"
 
 CbmLitFitQa::CbmLitFitQa():
@@ -49,12 +50,18 @@ void CbmLitFitQa::Exec(
 
 void CbmLitFitQa::Finish()
 {
-   DrawHistos("fit_qa_sts_first_param", fStsHistosFirst);
-   DrawHistos("fit_qa_sts_last_param", fStsHistosLast);
-   DrawHistos("fit_qa_trd_first_param", fTrdHistosFirst);
-   DrawHistos("fit_qa_trd_last_param", fTrdHistosLast);
-   DrawHistos("fit_qa_much_first_param", fMuchHistosFirst);
-   DrawHistos("fit_qa_much_last_param", fMuchHistosLast);
+   if (NULL != fStsTracks) {
+      DrawHistos("fit_qa_sts_first_param", fStsHistosFirst);
+      DrawHistos("fit_qa_sts_last_param", fStsHistosLast);
+   }
+   if (NULL != fTrdTracks) {
+      DrawHistos("fit_qa_trd_first_param", fTrdHistosFirst);
+      DrawHistos("fit_qa_trd_last_param", fTrdHistosLast);
+   }
+   if (NULL != fMuchTracks) {
+      DrawHistos("fit_qa_much_first_param", fMuchHistosFirst);
+      DrawHistos("fit_qa_much_last_param", fMuchHistosLast);
+   }
 }
 
 void CbmLitFitQa::SetParContainers()
@@ -324,16 +331,13 @@ void CbmLitFitQa::DrawHistos(
                  LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
                  LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
 
-//      TF1* fit = hist->GetFunction("gaus");
-//      Double_t sigma = 0., rms = 0.;
-//      if (fit) {
-//         fSigma[v][plane][i] = sigma = fit->GetParameter(2);
-//         fRms[v][plane][i] = rms = hist->GetRMS();
-//      }
-//      DrawHistSigmaRMS(i, sigma, rms);
+      TF1* fit = hist->GetFunction("gaus");
+      Double_t sigma = 0.;
+      if (NULL != fit) { sigma = fit->GetParameter(2);}
+      Double_t rms = hist->GetRMS();
+      DrawHistSigmaRMS(i, sigma, rms);
    }
 //   lit::SaveCanvasAsImage(canvas, fOutputDir);
-//   if (fIsCloseCanvas) { c[plane]->Close(); }
 }
 
 

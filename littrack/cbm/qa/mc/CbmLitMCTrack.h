@@ -28,6 +28,7 @@ public:
     * \brief Constructor.
     */
    CbmLitMCTrack() {
+      // Initialize all maps
       fPoints[kMVD];
       fPoints[kSTS];
       fPoints[kTRD];
@@ -85,6 +86,10 @@ public:
 
    /**
     * \brief Return MC point for specified detector id and point index.
+    *
+    * Before accessing points with this function one has to check
+    * the number of points on this station!
+    *
     * \param[in] detId Detector identificator.
     * \param[in] stationId Station id.
     * \param[in] index Index of MC point.
@@ -98,7 +103,7 @@ public:
    }
 
    /**
-    * \brief Return number of MC points for specified detector id.
+    * \brief Return number of MC points for specified detector ID and station ID.
     * \param[in] detId Detector identificator.
     *  \param[in] stationId Station id.
     * \return Number of MC points.

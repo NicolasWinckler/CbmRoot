@@ -433,6 +433,8 @@ void CbmLitConverter::MvdHitArrayToHitVector(
       CbmLitPixelHit* litHit = new CbmLitPixelHit();
       CbmHitToLitPixelHit(hit, iHit, litHit);
       litHit->SetDetectorId(kLITMVD);
+      //litHit->SetDx(0.0005);
+      //litHit->SetDy(0.0005);
       litHits.push_back(litHit);
    }
 }

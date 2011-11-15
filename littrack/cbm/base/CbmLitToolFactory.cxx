@@ -361,7 +361,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       CbmLitTrackFinderNN* mvdFinderNN = new CbmLitTrackFinderNN();
       CbmLitTrackFinderSettings settings;
       settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
+      settings.SetPropagator(CreateTrackPropagator("rk4"));
       settings.SetSeedSelection(CreateTrackSelection("empty"));
       settings.SetFinalSelection(CreateTrackSelection("empty"));
       settings.SetFilter(CreateTrackUpdate("kalman"));
@@ -370,7 +370,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.SetSigmaCoef(3.5);
       settings.SetChiSqPixelHitCut(15.);//13.86);
       settings.SetChiSqStripHitCut(9.);
-      settings.SetPDG(13);
+      settings.SetPDG(211);
       settings.IsProcessSubstationsTogether(true);
       mvdFinderNN->SetSettings(settings);
       mvdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMvdLayout());

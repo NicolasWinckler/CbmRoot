@@ -1,12 +1,6 @@
 /**
  * \file CbmLitFitQa.h
- *
  * \brief Track fit QA for track reconstruction.
- *
- * Calculates residual and pull distributions for
- * first and last track parameters of MVD/STS, TRD and MUCH
- * for reconstructed tracks.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
@@ -25,6 +19,10 @@ class CbmLitMCPoint;
  * \class CbmLitFitQa
  *
  * \brief Track fit QA for track reconstruction.
+ *
+ * Calculates residual and pull distributions for
+ * first and last track parameters of MVD/STS, TRD and MUCH
+ * for reconstructed tracks.
  *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011

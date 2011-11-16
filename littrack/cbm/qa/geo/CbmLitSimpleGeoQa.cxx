@@ -6,7 +6,7 @@
  *
  **/
 
-#include "qa/CbmLitSimpleGeoQa.h"
+#include "qa/geo/CbmLitSimpleGeoQa.h"
 
 #include "base/CbmLitSimpleGeometryConstructor.h"
 

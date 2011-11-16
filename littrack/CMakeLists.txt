@@ -8,8 +8,6 @@ set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
 ${GEANT3_INCLUDE_DIR}
 ${Boost_INCLUDE_DIR}
-#/misc/cbmsoft/Etch64/may11/fairsoft/basics/boost_1_46_1/include/
-#${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/std
 ${CBMROOT_SOURCE_DIR}/littrack/cbm
@@ -82,15 +80,15 @@ cbm/geo/CbmLitDetPoint.cxx
 cbm/propagation/CbmPropagatorGeane.cxx
 cbm/propagation/CbmPropagatorLit.cxx
 
+cbm/qa/geo/CbmLitSimpleGeoQa.cxx 
 cbm/qa/material/CbmLitCheckMultipleScattering.cxx
-cbm/qa/CbmLitSimpleGeoQa.cxx 
 cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
 cbm/qa/material/CbmLitCheckBrem.cxx 
+cbm/qa/mc/CbmLitMCTrack.cxx
+cbm/qa/mc/CbmLitMCTrackCreator.cxx
 cbm/qa/CbmTrdHitsQa.cxx
 cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
-cbm/qa/mc/CbmLitMCTrack.cxx
-cbm/qa/mc/CbmLitMCTrackCreator.cxx
 
 cbm/utils/CbmLitDrawHist.cxx
 
@@ -141,7 +139,7 @@ cbm/propagation/CbmPropagatorLit.h
 cbm/finder/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/propagation/CbmLitPropagationQa.h
 cbm/qa/propagation/CbmLitFitQa.h
-cbm/qa/CbmLitSimpleGeoQa.h 
+cbm/qa/geo/CbmLitSimpleGeoQa.h 
 cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/material/CbmLitCheckMultipleScattering.h
 cbm/qa/material/CbmLitCheckBrem.h 

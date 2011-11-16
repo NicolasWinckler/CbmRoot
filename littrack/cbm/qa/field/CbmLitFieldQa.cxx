@@ -4,7 +4,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  **/
-#include "qa/CbmLitFieldQa.h"
+#include "qa/field/CbmLitFieldQa.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitFloat.h"
@@ -14,7 +14,7 @@
 #include "utils/CbmLitDrawHist.h"
 #include "CbmLitFieldQaHTMLGenerator.h"
 
-#include "../../parallel/LitField.h"
+#include "../../../parallel/LitField.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"

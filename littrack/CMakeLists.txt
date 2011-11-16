@@ -120,8 +120,8 @@ If(Boost_FOUND)
       cbm/qa/reconstruction/CbmLitQaDraw.cxx    
       cbm/qa/reconstruction/CbmLitQaPTreeCreator.cxx       
       cbm/qa/reconstruction/CbmLitQaHistNames.cxx          
-      cbm/qa/CbmLitFieldQaHTMLGenerator.cxx
-      cbm/qa/CbmLitFieldQa.cxx
+      cbm/qa/field/CbmLitFieldQaHTMLGenerator.cxx
+      cbm/qa/field/CbmLitFieldQa.cxx
      )  
 EndIf(Boost_FOUND)
 
@@ -154,7 +154,7 @@ cbm/utils/CbmLitDrawHist.h
 If(Boost_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
-      cbm/qa/CbmLitFieldQa.h
+      cbm/qa/field/CbmLitFieldQa.h
      )
 EndIf(Boost_FOUND)
 

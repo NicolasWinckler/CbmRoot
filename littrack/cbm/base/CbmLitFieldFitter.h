@@ -1,11 +1,8 @@
-/** CbmLitFieldFitter.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- ** Class performs approximation of magnetic field using
- ** 0-9 degree polynom. MINUIT is used for minimization.
- ** Also my LSM fit is implemented.
+/**
+ * \file CbmLitFieldFitter.h
+ * \brief Implementation of the polynomial field approximation.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
 
 #ifndef CBMLITFIELDFITTER_H_
@@ -15,70 +12,108 @@
 #include "../../parallel/LitField.h"
 class FairField;
 
-/* Class represents polynom. */
+/**
+ * \class CbmLitPolynom
+ * \brief Abstract class for polynomial function.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ */
 class CbmLitPolynom
 {
 public:
-   /* Returns calculated value. */
+	/**
+	 * \brief Constructor.
+	 */
+	CbmLitPolynom() {}
+
+	/**
+	 * \brief Destructor.
+	 */
+	virtual ~CbmLitPolynom() {}
+
+   /**
+    * \brief Returns calculated value.
+    * \param[in] x X coordinate.
+    * \param[in] y Y coordinate.
+    * \param[in] c Array of polynomial coefficients.
+    * \return Calculated field value.
+    */
    virtual double Calculate(
       double x,
       double y,
       double c[]) const = 0;
 
-   /* Returns number of coefficients. */
+   /**
+    * \brief Return number of coefficients for this polynomial function.
+    * \return Number of coefficients for this polynomial function.
+    */
    virtual unsigned int GetNofCoefficients() const = 0;
 };
 
+/**
+ * \class CbmLitFieldFitter
+ * \brief Implementation of the polynomial field approximation.
+ *
+ * Class performs approximation of magnetic field using
+ * 0-9 degree polynomial. MINUIT is used for minimization.
+ * Also custom LSM fit is implemented for comparison.
+ *
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ */
 class CbmLitFieldFitter
 {
 public:
-   /* Constructor
-    * @param polynomDegree Polynom degree to be used for field approximation */
+   /**
+    * \brief Constructor.
+    * \param[in] polynomDegree Polynomial degree to be used for field approximation.
+    */
    CbmLitFieldFitter(unsigned int polynomDegree);
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitFieldFitter();
 
-   /* Fits (X, Y) slice of the magnetic field at Z position
-    *@param Z Z position of the slice.
-    *@param slice Output field slice */
+   /**
+    * \brief Fits (X, Y) slice of the magnetic field at Z position.
+    * \param[in] Z Z position of the slice.
+    * \param[out] slice Output approximated field slice.
+    */
    template <class T>
    void FitSlice(
       float Z,
       lit::parallel::LitFieldSlice<T>& slice);
 
-   /* FitSlice implementation using fscal data type */
+   /**
+    * \brief FitSlice implementation using fscal data type.
+    */
    void FitSliceScal(
       float Z,
       lit::parallel::LitFieldSlice<fscal>& slice);
 
-   /* FitSlice implementation using fvec data type */
+   /**
+    * \brief FitSlice implementation using fvec data type.
+    */
    void FitSliceVec(
       float Z,
       lit::parallel::LitFieldSlice<fvec>& slice);
 
-   /* Sets acceptance angle for X. */
+   /* Setters */
    void SetXangle(double xangle) {fXangle = xangle;}
-
-   /* Sets acceptance angle for Y. */
    void SetYangle(double yangle) {fYangle = yangle;}
-
-   /* Sets number of bins for X. */
    void SetNofBinsX(int nofBinsX) {fNofBinsX = nofBinsX;}
-
-   /* Sets number of bins for Y. */
    void SetNofBinsY(int nofBinsY) {fNofBinsY = nofBinsY;}
-
-   /* Sets Ellipse shape for acceptance. */
    void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
 
 private:
 
-   /* Fits the (X, Y) slice of the magnetic field at Z position.
-    * @param Z Z position of the slice.
-    * @param parBx Output vector with polynom coefficients for Bx.
-    * @param parBy Output vector with polynom coefficients for By.
-    * @param parBz Output vector with polynom coefficients for Bz.
+   /**
+    * \brief Fit (X, Y) slice of magnetic field at Z position.
+    * \param[in] Z Z position of the slice.
+    * \param[out] parBx Output vector with polynomial coefficients for Bx.
+    * \param[out] parBy Output vector with polynomial coefficients for By.
+    * \param[out] parBz Output vector with polynomial coefficients for Bz.
     */
    void FitSlice(
       double Z,
@@ -86,11 +121,12 @@ private:
       std::vector<double>& parBy,
       std::vector<double>& parBz);
 
-   /* Fits the (X, Y) slice of the magnetic field.
-    * @param x Vector with X coordinates.
-    * @param y Vector with y coordinates.
-    * @param z Vector with field values.
-    * @param par Output vector with polynom coefficients.
+   /**
+    * \brief Fit (X, Y) slice of magnetic field.
+    * \param[in] x Vector with X coordinates.
+    * \param[in] y Vector with y coordinates.
+    * \param[in] z Vector with field values.
+    * \param[out] par Output vector with polynomial coefficients.
     */
    void FitSlice(
       const std::vector<double>& x,
@@ -98,11 +134,12 @@ private:
       const std::vector<double>& z,
       std::vector<double>& par);
 
-   /* Fits the (X, Y) slice of the magnetic field at Z position.
-    * @param Z Z position of the slice.
-    * @param parBx Output vector with polynom coefficients for Bx.
-    * @param parBy Output vector with polynom coefficients for By.
-    * @param parBz Output vector with polynom coefficients for Bz.
+   /**
+    * \brief Fit (X, Y) slice of the magnetic field at Z position.
+    * \param[in] Z Z position of the slice.
+    * \param[out] parBx Output vector with polynomial coefficients for Bx.
+    * \param[out] parBy Output vector with polynomial coefficients for By.
+    * \param[out] parBz Output vector with polynomial coefficients for Bz.
     */
    void FitSliceMy(
       double Z,
@@ -110,7 +147,10 @@ private:
       std::vector<double>& parBy,
       std::vector<double>& parBz);
 
-   /* Returns polynom. */
+   /**
+    * \brief Return polynomial which is used for approximation.
+    * \return Polynomial which is used for approximation.
+    */
    const CbmLitPolynom* GetPolynom() const {return fPolynom;}
 
 private:
@@ -124,8 +164,8 @@ private:
 
    bool fUseEllipseAcc; // If true than only values inside an ellipse will be fitted
 
-   unsigned int fPolynomDegree; // Degree of the polynom to be used for the field approximation
-   CbmLitPolynom* fPolynom; // Polynom to be used for field approximation
+   unsigned int fPolynomDegree; // Degree of the polynomial to be used for the field approximation
+   CbmLitPolynom* fPolynom; // Polynomial to be used for field approximation
 };
 
 #endif /* CBMLITFIELDFITTER_H_ */

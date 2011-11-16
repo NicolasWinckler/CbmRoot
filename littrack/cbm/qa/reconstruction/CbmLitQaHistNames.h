@@ -27,7 +27,7 @@ public:
 
       if (opt == kTracking || opt == kRich || opt == kElid){
          return fTypes;
-      } else if (opt == kDetAcc){
+      } else {
          return fTypeDetAcc;
       }
    }
@@ -37,14 +37,13 @@ public:
     */
    static const vector<string>& GetCategories(
          LitQaNameOption opt) {
-
-      if (opt == kTracking){
+      if (opt == kTracking) {
          return fCatTracking;
-      } else if (opt == kRich){
+      } else if (opt == kRich) {
          return fCatRich;
-      } else if (opt == kElid){
+      } else if (opt == kElid) {
          return fCatElid;
-      } else if (opt == kDetAcc) {
+      } else {
          return fCatDetAcc;
       }
    }
@@ -57,7 +56,7 @@ public:
 
       if (opt == kTracking || opt == kRich || opt == kElid){
          return fTypes.size();
-      } else if (opt == kDetAcc){
+      } else {
          return fTypeDetAcc.size();
       }
    }
@@ -67,14 +66,13 @@ public:
     */
    static int GetNofCategories(
          LitQaNameOption opt) {
-
       if (opt == kTracking){
          return fCatTracking.size();
       } else if (opt == kRich){
          return fCatRich.size();
       } else if (opt == kElid){
          return fCatElid.size();
-      } else if (opt == kDetAcc) {
+      } else {
          return fCatDetAcc.size();
       }
    }

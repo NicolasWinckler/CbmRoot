@@ -51,7 +51,6 @@ CbmLitToolFactory* CbmLitToolFactory::Instance()
 TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
    const std::string& name)
 {
-   //TrackExtrapolatorPtr extrapolator = NULL;
    if(name == "line") {
       TrackExtrapolatorPtr extrapolator(new CbmLitLineTrackExtrapolator());
       extrapolator->Initialize();
@@ -67,13 +66,12 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
       extrapolator->Initialize();
       return extrapolator;
    }
-// return TrackExtrapolatorPtr();
+   return TrackExtrapolatorPtr();
 }
 
 TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
    const std::string& name)
 {
-// CbmLitTrackPropagator* propagator = NULL;
    if(name == "geane") {
       TrackPropagatorPtr propagator(new CbmLitTrackPropagatorGeane());
       propagator->Initialize();
@@ -95,24 +93,23 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
       propagator->Initialize();
       return propagator;
    }
-// return propagator;
+   return TrackPropagatorPtr();
 }
+
 TrackUpdatePtr CbmLitToolFactory::CreateTrackUpdate(
    const std::string& name)
 {
-// CbmLitTrackUpdate* update = NULL;
    if(name == "kalman") {
       TrackUpdatePtr update(new CbmLitKalmanFilter());
       update->Initialize();
       return update;
    }
-// return update;
+   return TrackUpdatePtr();
 }
 
 TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
    const std::string& name)
 {
-// CbmLitTrackFitter* fitter = NULL;
    if(name == "lit_kalman") {
       TrackPropagatorPtr propagator = CreateTrackPropagator("lit");
       //((CbmLitTGeoTrackPropagator*) propagator)->IsCalcTransportMatrix(true);
@@ -145,13 +142,12 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
       TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestElectron());
       return fitter;
    }
-// return fitter;
+   return TrackFitterPtr();
 }
 
 TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
    const std::string& name)
 {
-// CbmLitTrackSelection* selection = NULL;
    if(name == "empty") {
       TrackSelectionPtr selection(new CbmLitTrackSelectionEmpty());
       selection->Initialize();
@@ -205,7 +201,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
       TrackSelectionPtr selection(trdSelection);
       return selection;
    }
-// return selection;
+   return TrackSelectionPtr();
 }
 
 TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
@@ -379,6 +375,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       TrackFinderPtr finder(mvdFinderNN);
       return finder;
    }
+   return TrackFinderPtr();
 }
 
 HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
@@ -397,8 +394,6 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
       nhMerger->Initialize();
       HitToTrackMergerPtr merger(nhMerger);
       return merger;
-   } else if(name == "") {
-
-//    return finder;
    }
+   return HitToTrackMergerPtr();
 }

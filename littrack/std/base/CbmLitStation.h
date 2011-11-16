@@ -53,7 +53,7 @@ public:
       std::stringstream ss;
       ss << "Station: type=" << GetType()
          << " nofSubstations=" << GetNofSubstations() << std::endl;
-      return ss.str();;
+      return ss.str();
    }
 
 private:

@@ -152,6 +152,8 @@ Bool_t CbmLitPolarizedGenerator::GenerateDaughters(
   Info("ReadEvent","Particle generated: pdg=%3i pt=%7.4f y=%7.4f",-pdg,v2.Pt(),v2.Rapidity());
   primGen->AddTrack( pdg,v1[0],v1[1],v1[2], 0, 0, 0);
   primGen->AddTrack(-pdg,v2[0],v2[1],v2[2], 0, 0, 0);
+
+  return kTRUE;
 }
 // ------------------------------------------------------------------------
 

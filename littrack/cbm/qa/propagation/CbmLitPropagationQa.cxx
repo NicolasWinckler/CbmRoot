@@ -155,6 +155,8 @@ InitStatus CbmLitPropagationQa::Init()
    }
 
    CreateHistograms();
+
+   return kSUCCESS;
 }
 
 void CbmLitPropagationQa::SetParContainers()

@@ -92,6 +92,8 @@ InitStatus CbmLitTrackFitSpeedTest::Init()
    fFitterLitKalman = factory->CreateTrackFitter("lit_kalman");
 
    CreateHistograms();
+
+   return kSUCCESS;
 }
 
 void CbmLitTrackFitSpeedTest::SetParContainers()

@@ -133,6 +133,8 @@ InitStatus CbmLitFieldQa::Init()
 
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    fField = env->GetField();
+
+   return kSUCCESS;
 }
 
 void CbmLitFieldQa::SetParContainers()

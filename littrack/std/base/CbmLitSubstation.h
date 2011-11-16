@@ -32,7 +32,7 @@ public:
    virtual std::string ToString() const {
       std::stringstream ss;
       ss << "Substation: z=" << GetZ() << std::endl;
-      return ss.str();;
+      return ss.str();
    }
 
 private:

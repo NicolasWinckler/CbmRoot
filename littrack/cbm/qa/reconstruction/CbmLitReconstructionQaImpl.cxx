@@ -278,7 +278,7 @@ bool CbmLitReconstructionQaImpl::GetDetectorPresence(
       case kTRD: return fIsTrd;
       case kMUCH: return fIsMuch;
       case kTOF: return fIsTof;
-      default: break;
+      default: return false;
    }
 }
 

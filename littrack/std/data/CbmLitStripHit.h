@@ -77,7 +77,7 @@ public:
          << " refId=" << GetRefId() << " w=" << GetW()
          << " isOutlier=" << IsOutlier()
          << " hitType=" << GetType() << std::endl;
-      return ss.str();;
+      return ss.str();
    }
 
 protected:

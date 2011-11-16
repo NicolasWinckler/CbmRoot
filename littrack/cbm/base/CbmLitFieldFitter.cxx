@@ -1,10 +1,8 @@
-/** CbmLitFieldFitter.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- *
+/**
+ * \file CbmLitFieldFitter.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
-
 #include "base/CbmLitFieldFitter.h"
 #include "base/CbmLitEnvironment.h"
 #include "../std/utils/CbmLitUtils.h"
@@ -17,52 +15,98 @@
 
 #include <cmath>
 
-/* 0 degree polynom.
- * 1 coefficient.
+/**
+ * \class CbmLitPolynom0
+ * \brief 0 degree polynomial with 1 coefficient.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom0 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom0() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom0() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
       return c[0];
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 1;}
 };
 
-/* 1st degree polynom
- * 3 coefficients.
+/**
+ * \class CbmLitPolynom1
+ * \brief 1st degree polynomial with 3 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom1 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom1() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom1() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
       return c[0] + c[1]*x + c[2]*y;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 3;}
 };
 
-
-/* 2nd degree polynom
- * 6 coefficients.
+/**
+ * \class CbmLitPolynom2
+ * \brief 2nd degree polynomial with 6 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom2 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom2() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom2() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
@@ -71,18 +115,35 @@ public:
              + c[1]*x + c[2]*y
              + c[3]*x*x + c[4]*x*y + c[5]*y*y;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 6;}
 };
 
-/* 3rd degree polynom
- * 10 coefficients.
+/**
+ * \class CbmLitPolynom3
+ * \brief 3rd degree polynomial with 10 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom3 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom3() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom3() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
@@ -99,38 +160,39 @@ public:
              + c[3]*x2 + c[4]*x*y + c[5]*y2
              + c[6]*x3 + c[7]*x2y + c[8]*xy2 + c[9]*y3;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 10;}
 };
 
-/* 4th degree polynom
- * 15 coefficients.
+/**
+ * \class CbmLitPolynom4
+ * \brief 4th degree polynomial with 15 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom4 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom4() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom4() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
-//    double xy = x*y;
-//    double x2 = x*x;
-//    double y2 = y*y;
-//    double x2y = x2*y;
-//    double xy2 = x*y2;
-//    double x3 = x2*x;
-//    double y3 = y2*y;
-//    double x4 = x2*x2;
-//    double y4 = y2*y2;
-//    double x3y = x3*y;
-//    double x2y2 = x2*y2;
-//    double xy3 = x*y3;
-//
-//    return c[0] + c[1]*x + c[2]*y + c[3]*x2 + c[4]*xy + c[5]*y2 +
-//       c[6]*x3 + c[7]*x2y + c[8]*xy2 + c[9]*y3 +
-//       c[10]*x4 + c[11]*x3y + c[12]*x2y2 + c[13]*xy3 + c[14]*y4;
 
       double x2 = x*x;
       double y2 = y*y;
@@ -153,36 +215,39 @@ public:
              +c[6]*x3 +c[7]*x2y +c[8]*xy2 +c[9]*y3
              +c[10]*x4 +c[11]*x3y +c[12]*x2y2 +c[13]*xy3 +c[14]*y4;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 15;}
 };
 
-
-/* 5th degree polynom
- * 21 coefficients.
+/**
+ * \class CbmLitPolynom5
+ * \brief 5th degree polynomial with 21 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom5 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom5() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom5() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
-//    double x2 = x*x;
-//    double y2 = y*y;
-//    double yx2 = y*x2;
-//    double xy2 = x*y2;
-//    double x3 = x2*x;
-//    double y3 = y2*y;
-//    double x4 = x2*x2;
-//    double y4 = y2*y2;
-//    double x5 = x4*x;
-//    double y5 = y4*y;
-//    return c[0] + c[1]*x + c[2]*y + c[3]*x*y + c[4]*x2 + c[5]*y2 + c[6]*xy2 + c[7]*yx2 + c[8]*x3 + c[9]*y3 +
-//          c[10]*x2*y2 + c[11]*x*y3 + c[12]*y*x3 + c[13]*x4 + c[14]*y4 + c[15]*x2*y3 + c[16]*y2*x3 +
-//          c[17]*x*y4 + c[18]*y*x4 + c[19]*x5 + c[20]*y5;
 
       double x2 = x*x;
       double y2 = y*y;
@@ -213,39 +278,39 @@ public:
              +c[10]*x4 +c[11]*x3y +c[12]*x2y2 +c[13]*xy3 +c[14]*y4
              +c[15]*x5 +c[16]*x4y +c[17]*x3y2 +c[18]*x2y3 +c[19]*xy4 +c[20]*y5;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 21;}
 };
 
-
-/* 6th degree polynom
- * 28 coefficients.
+/**
+ * \class CbmLitPolynom6
+ * \brief 6th degree polynomial with 28 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom6 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom6() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom6() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
-//    double x2 = x*x;
-//    double y2 = y*y;
-//    double yx2 = y*x2;
-//    double xy2 = x*y2;
-//    double x3 = x2*x;
-//    double y3 = y2*y;
-//    double x4 = x2*x2;
-//    double y4 = y2*y2;
-//    double x5 = x4*x;
-//    double y5 = y4*y;
-//    double x6 = x4*x2;
-//    double y6 = y4*y2;
-//    return c[0] + c[1]*x + c[2]*y + c[3]*x*y2 + c[4]*x*y + c[5]*x2 + c[6]*y2 + c[7]*x3 + c[8]*y3 + c[9]*y*x2 +
-//          c[10]*x*y3 + c[11]*y*x3 + c[12]*x2*y2 + c[13]*x4 + c[14]*y4 + c[15]*x6 + c[16]*y6 + c[17]*x2*y4 +
-//          c[18]*y2*x4 + c[19]*x*y5 + c[20]*y*x5 + c[21]*x3*y3 + c[22]*x2*y3 + c[23]*y2*x3 + c[24]*x*y4 +
-//          c[25]*y*x4 + c[26]*y5 + c[27]*x5;
 
       double x2 = x*x;
       double y2 = y*y;
@@ -285,42 +350,40 @@ public:
              +c[15]*x5 +c[16]*x4y +c[17]*x3y2 +c[18]*x2y3 +c[19]*xy4 +c[20]*y5
              +c[21]*x6 +c[22]*x5y +c[23]*x4y2 +c[24]*x3y3 +c[25]*x2y4 +c[26]*xy5 +c[27]*y6;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 28;}
 };
 
-
-/* 7th degree polynom
- * 36 coefficients.
+/**
+ * \class CbmLitPolynom7
+ * \brief 7th degree polynomial with 36 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom7 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom7() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom7() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
-//    double x2 = x*x;
-//    double y2 = y*y;
-//    double yx2 = y*x2;
-//    double xy2 = x*y2;
-//    double x3 = x2*x;
-//    double y3 = y2*y;
-//    double x4 = x2*x2;
-//    double y4 = y2*y2;
-//    double x5 = x4*x;
-//    double y5 = y4*y;
-//    double x6 = x4*x2;
-//    double y6 = y4*y2;
-//    double x7 = x4*x3;
-//    double y7 = y4*y3;
-//    return c[0] + c[1]*x + c[2]*y + c[3]*x*y2 + c[4]*x*y + c[5]*x2 + c[6]*y2 + c[7]*x3 + c[8]*y3 + c[9]*y*x2 +
-//          c[10]*x*y3 + c[11]*y*x3 + c[12]*x2*y2 + c[13]*x4 + c[14]*y4 + c[15]*x6 + c[16]*y6 + c[17]*x2*y4 +
-//          c[18]*y2*x4 + c[19]*x*y5 + c[20]*y*x5 + c[21]*x3*y3 + c[22]*x7 + c[23]*y7 + c[24]*y3*x4 + c[25]*x2*y5 +
-//          c[26]*y2*x5 + c[27]*x*y6 + c[28]*y*x6 + c[29]*x2*y3 + c[30]*y2*x3 + c[31]*x*y4 + c[32]*y*x4 +
-//          c[33]*x3*y4 + c[34]*y5 + c[35]*x5;
+
       double x2 = x*x;
       double y2 = y*y;
       double xy = x*y;
@@ -369,46 +432,39 @@ public:
              +c[21]*x6 +c[22]*x5y +c[23]*x4y2 +c[24]*x3y3 +c[25]*x2y4 +c[26]*xy5 +c[27]*y6
              +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 36;}
 };
 
-
-/* 8th degree polynom
- * 45 coefficients.
+/**
+ * \class CbmLitPolynom8
+ * \brief 8th degree polynomial with 45 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom8 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom8() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom8() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
-//    double x2 = x*x;
-//    double y2 = y*y;
-//    double yx2 = y*x2;
-//    double xy2 = x*y2;
-//    double x3 = x2*x;
-//    double y3 = y2*y;
-//    double x4 = x2*x2;
-//    double y4 = y2*y2;
-//    double x5 = x4*x;
-//    double y5 = y4*y;
-//    double x6 = x4*x2;
-//    double y6 = y4*y2;
-//    double x7 = x4*x3;
-//    double y7 = y4*y3;
-//    double x8 = x4*x4;
-//    double y8 = y4*y4;
-//
-//    return c[0] + c[1]*x + c[2]*y + c[3]*x*y2 + c[4]*x*y + c[5]*x2 + c[6]*y2 + c[7]*x3 + c[8]*y3 + c[9]*y*x2 +
-//          c[10]*y*x7 + c[11]*y2*x6 + c[12]*x*y7 + c[13]*x2*y6 + c[14]*x*y3 + c[15]*y*x3 + c[16]*x2*y2 + c[17]*x4 +
-//          c[18]*y4 + c[19]*x6 + c[20]*y6 + c[21]*x4*y4 + c[22]*x2*y4 + c[23]*y2*x4 + c[24]*x*y5 + c[25]*y*x5 +
-//          c[26]*x3*y3 + c[27]*x7 + c[28]*y7 + c[29]*x3*y5 + c[30]*y3*x4 + c[31]*x2*y5 + c[32]*y2*x5 + c[33]*x*y6 +
-//          c[34]*y*x6 + c[35]*x2*y3 + c[36]*y2*x3 + c[37]*x*y4 + c[38]*y*x4 + c[39]*x3*y4 + c[40]*y5 + c[41]*x5 +
-//          c[42]*y3*x5 + c[43]*x8 + c[44]*y8;
 
       double x2 = x*x;
       double y2 = y*y;
@@ -466,50 +522,42 @@ public:
              +c[10]*x4 +c[11]*x3y +c[12]*x2y2 +c[13]*xy3 +c[14]*y4
              +c[15]*x5 +c[16]*x4y +c[17]*x3y2 +c[18]*x2y3 +c[19]*xy4 +c[20]*y5
              +c[21]*x6 +c[22]*x5y +c[23]*x4y2 +c[24]*x3y3 +c[25]*x2y4 +c[26]*xy5 +c[27]*y6
-             +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7;
+             +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7
       +c[36]*x8 +c[37]*x7y +c[38]*x6y2 +c[39]*x5y3 +c[40]*x4y4 +c[41]*x3y5 +c[42]*x2y6 +c[43]*xy7 +c[44]*y8;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 45;}
 };
 
-/* 9th degree polynom
- * 55 coefficients.
+/**
+ * \class CbmLitPolynom9
+ * \brief 9th degree polynomial with 55 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom9 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom9() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom9() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
       double c[]) const {
-//    double x2 = x*x;
-//    double y2 = y*y;
-//    double yx2 = y*x2;
-//    double xy2 = x*y2;
-//    double x3 = x2*x;
-//    double y3 = y2*y;
-//    double x4 = x2*x2;
-//    double y4 = y2*y2;
-//    double x5 = x4*x;
-//    double y5 = y4*y;
-//    double x6 = x4*x2;
-//    double y6 = y4*y2;
-//    double x7 = x4*x3;
-//    double y7 = y4*y3;
-//    double x8 = x4*x4;
-//    double y8 = y4*y4;
-//    double x9 = x5*x4;
-//    double y9 = y5*y4;
-//
-//    return c[0] + c[1]*x + c[2]*y + c[3]*xy2 + c[4]*x*y + c[5]*x2 + c[6]*y2 + c[7]*x3 + c[8]*y3 + c[9]*yx2 + c[10]*y*x7 +
-//          c[11]*y2*x6 + c[12]*x*y7 + c[13]*x2*y6 + c[14]*x2*y7 + c[15]*x9 + c[16]*y9 + c[17]*x*y3 + c[18]*y*x3 + c[19]*x2*y2 +
-//          c[20]*x4 + c[21]*y4 + c[22]*x6 + c[23]*y6 + c[24]*x4*y4 + c[25]*x2*y4 + c[26]*y2*x4 + c[27]*x*y5 + c[28]*y*x5 +
-//          c[29]*x3*y3 + c[30]*x7 + c[31]*y7 + c[32]*x3*y5 + c[33]*y3*x4 + c[34]*x2*y5 + c[35]*y2*x5 + c[36]*x*y6 + c[37]*y*x6 +
-//          c[38]*x2*y3 + c[39]*y2*x3 + c[40]*x*y4 + c[41]*y*x4 + c[42]*x3*y4 + c[43]*y5 + c[44]*x5 + c[45]*y3*x5 + c[46]*x*y8 +
-//          c[47]*y3*x6 + c[48]*x4*y5 + c[49]*y4*x5 + c[50]*x3*y6 + c[51]*y2*x7 + c[52]*y*x8 + c[53]*x8 + c[54]*y8;
 
       double x2 = x*x;
       double y2 = y*y;
@@ -578,23 +626,39 @@ public:
              +c[10]*x4 +c[11]*x3y +c[12]*x2y2 +c[13]*xy3 +c[14]*y4
              +c[15]*x5 +c[16]*x4y +c[17]*x3y2 +c[18]*x2y3 +c[19]*xy4 +c[20]*y5
              +c[21]*x6 +c[22]*x5y +c[23]*x4y2 +c[24]*x3y3 +c[25]*x2y4 +c[26]*xy5 +c[27]*y6
-             +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7;
+             +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7
       +c[36]*x8 +c[37]*x7y +c[38]*x6y2 +c[39]*x5y3 +c[40]*x4y4 +c[41]*x3y5 +c[42]*x2y6 +c[43]*xy7 +c[44]*y8
       +c[45]*x9 +c[46]*x8y +c[47]*x7y2 +c[48]*x6y3 +c[49]*x5y4 +c[50]*x4y5 +c[51]*x3y6 +c[52]*x2y7 +c[53]*xy8 +c[54]*y9;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 55;}
 };
 
-
-/* 10th degree polynom
- * 66 coefficients.
+/**
+ * \class CbmLitPolynom10
+ * \brief 10th degree polynomial with 66 coefficients.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  */
 class CbmLitPolynom10 : public CbmLitPolynom
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
    CbmLitPolynom10() {}
+
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPolynom10() {}
 
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    double Calculate(
       double x,
       double y,
@@ -678,17 +742,32 @@ public:
              +c[10]*x4 +c[11]*x3y +c[12]*x2y2 +c[13]*xy3 +c[14]*y4
              +c[15]*x5 +c[16]*x4y +c[17]*x3y2 +c[18]*x2y3 +c[19]*xy4 +c[20]*y5
              +c[21]*x6 +c[22]*x5y +c[23]*x4y2 +c[24]*x3y3 +c[25]*x2y4 +c[26]*xy5 +c[27]*y6
-             +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7;
+             +c[28]*x7 +c[29]*x6y +c[30]*x5y2 +c[31]*x4y3 +c[32]*x3y4 +c[33]*x2y5 +c[34]*xy6 +c[35]*y7
       +c[36]*x8 +c[37]*x7y +c[38]*x6y2 +c[39]*x5y3 +c[40]*x4y4 +c[41]*x3y5 +c[42]*x2y6 +c[43]*xy7 +c[44]*y8
       +c[45]*x9 +c[46]*x8y +c[47]*x7y2 +c[48]*x6y3 +c[49]*x5y4 +c[50]*x4y5 +c[51]*x3y6 +c[52]*x2y7 +c[53]*xy8 +c[54]*y9
       +c[55]*x10 +c[56]*x9y +c[57]*x8y2 +c[58]*x7y3 +c[59]*x6y4 +c[60]*x5y5 +c[61]*x4y6 +c[62]*x3y7 +c[63]*x2y8 +c[64]*xy9 +c[65]*y10;
    }
+
+   /**
+    * \brief Inherited from CbmLitPolynom.
+    */
    unsigned int GetNofCoefficients() const {return 66;}
 };
 
+
+
+/**
+ * \class FCNPolynom
+ * \brief Implements FCNBase which is used for MINUIT minimization.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ */
 class FCNPolynom : public ROOT::Minuit2::FCNBase
 {
 public:
+   /**
+    * \brief Constructor.
+    */
    FCNPolynom(
       const std::vector<double>& x,
       const std::vector<double>& y,
@@ -699,10 +778,19 @@ public:
       fZ(z),
       fPolynom(polynom) {}
 
+   /**
+    * \brief Destructor.
+    */
    ~FCNPolynom() {}
 
+   /**
+    * \brief Inherited from FCNBase.
+    */
    virtual double Up() const {return 1.;}
 
+   /**
+    * \brief Inherited from FCNBase.
+    */
    virtual double operator()(
       const std::vector<double>& par) const {
       double* p = const_cast<double*>(&par[0]);
@@ -721,6 +809,10 @@ public:
       return r;
    }
 
+   /**
+    * \brief Return polynomial which is used for minimization.
+    * \return Polynomial which is used for minimization.
+    */
    const CbmLitPolynom* GetPolynom() const {return fPolynom;}
 
 private:
@@ -776,6 +868,7 @@ CbmLitFieldFitter::CbmLitFieldFitter(
       break;
    default:
       fPolynom = NULL;
+      break;
    }
 }
 

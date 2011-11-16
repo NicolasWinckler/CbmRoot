@@ -77,6 +77,8 @@ InitStatus CbmLitRobustFitterAnalysis::Init()
 // fNof2DParams = 2;
 
    CreateHistograms();
+
+   return kSUCCESS;
 }
 
 void CbmLitRobustFitterAnalysis::SetParContainers()

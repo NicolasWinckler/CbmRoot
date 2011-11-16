@@ -39,6 +39,7 @@ InitStatus CbmLitFitQa::Init()
    ReadDataBranches();
    CreateHistograms();
    fMCTrackCreator = CbmLitMCTrackCreator::Instance();
+   return kSUCCESS;
 }
 
 void CbmLitFitQa::Exec(

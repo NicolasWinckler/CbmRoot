@@ -1,4 +1,4 @@
-#include "qa/CbmLitCheckEnergyLossMuons.h"
+#include "qa/material/CbmLitCheckEnergyLossMuons.h"
 
 #include "data/CbmLitTrackParam.h"
 #include "propagation/CbmLitMaterialInfo.h"

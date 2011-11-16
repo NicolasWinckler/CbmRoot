@@ -1,4 +1,4 @@
-#include "qa/CbmLitCheckBrem.h"
+#include "qa/material/CbmLitCheckBrem.h"
 
 #include "data/CbmLitTrackParam.h"
 #include "propagation/CbmLitMaterialInfo.h"

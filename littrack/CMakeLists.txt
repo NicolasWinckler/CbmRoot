@@ -82,10 +82,10 @@ cbm/geo/CbmLitDetPoint.cxx
 cbm/propagation/CbmPropagatorGeane.cxx
 cbm/propagation/CbmPropagatorLit.cxx
 
-cbm/qa/CbmLitCheckMultipleScattering.cxx
+cbm/qa/material/CbmLitCheckMultipleScattering.cxx
 cbm/qa/CbmLitSimpleGeoQa.cxx 
-cbm/qa/CbmLitCheckEnergyLossMuons.cxx
-cbm/qa/CbmLitCheckBrem.cxx 
+cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
+cbm/qa/material/CbmLitCheckBrem.cxx 
 cbm/qa/CbmTrdHitsQa.cxx
 cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
@@ -142,9 +142,9 @@ cbm/finder/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/propagation/CbmLitPropagationQa.h
 cbm/qa/propagation/CbmLitFitQa.h
 cbm/qa/CbmLitSimpleGeoQa.h 
-cbm/qa/CbmLitCheckEnergyLossMuons.h 
-cbm/qa/CbmLitCheckMultipleScattering.h
-cbm/qa/CbmLitCheckBrem.h 
+cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
+cbm/qa/material/CbmLitCheckMultipleScattering.h
+cbm/qa/material/CbmLitCheckBrem.h 
 cbm/qa/CbmTrdHitsQa.h
 cbm/qa/CbmLitCreateStandaloneData.h
 cbm/qa/CbmLitTestMatrixMath.h

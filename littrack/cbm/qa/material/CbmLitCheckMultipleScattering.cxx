@@ -1,4 +1,4 @@
-#include "qa/CbmLitCheckMultipleScattering.h"
+#include "qa/material/CbmLitCheckMultipleScattering.h"
 
 #include "geo/CbmLitDetPoint.h"
 #include "utils/CbmLitDrawHist.h"

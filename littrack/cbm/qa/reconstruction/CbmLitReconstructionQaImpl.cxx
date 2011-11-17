@@ -1273,39 +1273,39 @@ void CbmLitReconstructionQaImpl::PionSuppression3D()
 
       if (!isPion) continue;
 
-      if (isTrdOk) H3("hStsTrdMomElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isTrdOk && isTofOk) H3("hStsTrdMomElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-      if (isTrdOk && isTofOk) H3("hStsTrdTofMomElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk) H3("hStsRichMomElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk) H3("hStsRichMomElIdNormStsRichTrd_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk) H3("hStsRichTrdMomElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichMomElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichTrdMomElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichTrdTofMomElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isTrdOk) H3("hStsTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isTrdOk && isTofOk) H3("hStsTrd3DElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+      if (isTrdOk && isTofOk) H3("hStsTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk) H3("hStsRich3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk) H3("hStsRich3DElIdNormStsRichTrd_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk) H3("hStsRichTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk && isTofOk) H3("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
 
-//      H3("hStsTrdMomElId_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsTrdMomElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsTrdTofMomElId_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsRichMomElId_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsRichMomElIdNormStsRichTrd_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsRichTrdMomElId_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsRichMomElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsRichTrdMomElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-//      H3("hStsRichTrdTofMomElId_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsTrd3DElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsRich3DElId_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsRich3DElIdNormStsRichTrd_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsRichTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+//      H3("hStsRichTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
 
       Bool_t isRichElectron = fElectronId->IsRichElectron(gTrack, mcTrack->GetP());
       Bool_t isTrdElectron = fElectronId->IsTrdElectron(gTrack, mcTrack->GetP());
       Bool_t isTofElectron = fElectronId->IsTofElectron(gTrack, mcTrack->GetP());
 
-      if (isTrdElectron) H3("hStsTrdMomElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isTrdElectron) H3("hStsTrdMomElIdNormStsTrdTof_PiSupp_Rec")->Fill(p, y, pt);
-      if (isTrdElectron && isTofElectron) H3("hStsTrdTofMomElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron) H3("hStsRichMomElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron) H3("hStsRichMomElIdNormStsRichTrd_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron && isTrdElectron) H3("hStsRichTrdMomElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron) H3("hStsRichMomElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron && isTrdElectron) H3("hStsRichTrdMomElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron && isTrdElectron && isTofElectron) H3("hStsRichTrdTofMomElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isTrdElectron) H3("hStsTrd3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isTrdElectron) H3("hStsTrd3DElIdNormStsTrdTof_PiSupp_Rec")->Fill(p, y, pt);
+      if (isTrdElectron && isTofElectron) H3("hStsTrdTof3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron) H3("hStsRich3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron) H3("hStsRich3DElIdNormStsRichTrd_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron && isTrdElectron) H3("hStsRichTrd3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron) H3("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron && isTrdElectron) H3("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron && isTrdElectron && isTofElectron) H3("hStsRichTrdTof3DElId_PiSupp_Rec")->Fill(p, y, pt);
    }
 }
 

@@ -104,7 +104,7 @@
 // -----   Default constructor   -------------------------------------------
 CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
 {
-    fVerbose      = 1;
+    fVerbose = 1;
     fFieldName = "compact";
     InitHistForRadiusCorrection();
 }
@@ -112,7 +112,10 @@ CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau(Int_t verbose,Double_t correction, TString fieldName)
+CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau(
+      Int_t verbose,
+      Double_t correction,
+      TString fieldName)
 {
     fVerbose = verbose;
     fFieldName = fieldName;
@@ -127,8 +130,10 @@ CbmRichRingFitterEllipseTau::~CbmRichRingFitterEllipseTau()
     fY.clear();
 }
 
-void CbmRichRingFitterEllipseTau::DoFit1(CbmRichRing *pRing, vector<Double_t> hitX,
-		vector<Double_t> hitY)
+void CbmRichRingFitterEllipseTau::DoFit1(
+      CbmRichRing *pRing,
+      const vector<Double_t>& hitX,
+		const vector<Double_t>& hitY)
 {
 	fX.assign(hitX.begin(), hitX.end());
 	fY.assign(hitY.begin(), hitY.end());
@@ -139,7 +144,8 @@ void CbmRichRingFitterEllipseTau::DoFit1(CbmRichRing *pRing, vector<Double_t> hi
 }
 
 // -----   Public method: DoFit   ------------------------------------------
-void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
+void CbmRichRingFitterEllipseTau::DoFit(
+      CbmRichRing *pRing)
 {
     Int_t fNumHits = pRing->GetNofHits();
 
@@ -148,9 +154,8 @@ void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
 		pRing->SetRadius(-1.);
 
 		if (fVerbose > 1)
-			cout <<" No way for RingFitter as ellipse: Number of Hits is less then 5 "
-					<<endl;
-		return;
+			cout <<" No way for RingFitter as ellipse: Number of Hits is less then 5 "	<<endl;
+		   return;
 	}
     fX.clear();
     fY.clear();

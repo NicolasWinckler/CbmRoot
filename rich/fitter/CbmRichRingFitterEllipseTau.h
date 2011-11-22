@@ -33,31 +33,52 @@ class CbmRichRingFitterEllipseTau : public CbmRichRingFitterEllipseBase
 {
 public:
 
-
-/***** Methods *****/
-
    /** Default constructor **/
    CbmRichRingFitterEllipseTau();
 
    /** Standard constructor **/
-   CbmRichRingFitterEllipseTau(Int_t verbose,
-                               Double_t correction,
-                               TString fieldName);
+   CbmRichRingFitterEllipseTau(
+         Int_t verbose,
+         Double_t correction,
+         TString fieldName);
 
    /** Destructor **/
    virtual ~CbmRichRingFitterEllipseTau();
 
-   void DoFit1(CbmRichRing *pRing, vector<Double_t> hitX, vector<Double_t> hitY);
-   void DoFit(CbmRichRing *pRing);
+   void DoFit1(
+         CbmRichRing *pRing,
+         const vector<Double_t>& hitX,
+         const vector<Double_t>& hitY);
 
-	void TransEllipse(CbmRichRing *pRing);
+   void DoFit(
+         CbmRichRing *pRing);
+
+	void TransEllipse(
+	      CbmRichRing *pRing);
+
 	void InitMatrices();
+
 	void Taubin();
+
 	void Inv5x5();
-	void AMultB(const Double_t * const ap, Int_t na, Int_t ncolsa,
-	            const Double_t * const bp, Int_t nb, Int_t ncolsb, Double_t *cp);
-	void Jacobi(Double_t a[5][5], Double_t d[5], Double_t v[5][5]);
-	void Eigsrt(Double_t d[5],  Double_t v[5][5]);
+
+	void AMultB(
+	      const Double_t * const ap,
+	      Int_t na, Int_t ncolsa,
+	      const Double_t * const bp,
+	      Int_t nb,
+	      Int_t ncolsb,
+	      Double_t *cp);
+
+	void Jacobi(
+	      Double_t a[5][5],
+	      Double_t d[5],
+	      Double_t v[5][5]);
+
+	void Eigsrt(
+	      Double_t d[5],
+	      Double_t v[5][5]);
+
 private:
 
 	Double_t fM[36];

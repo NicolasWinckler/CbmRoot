@@ -51,8 +51,10 @@ CbmRichRingFitterEllipse::~CbmRichRingFitterEllipse()
 
 }
 
-void CbmRichRingFitterEllipse::DoFit1(CbmRichRing *pRing, std::vector<Double_t> x,
-                                     std::vector<Double_t> y)
+void CbmRichRingFitterEllipse::DoFit1(
+      CbmRichRing *pRing,
+      std::vector<Double_t> x,
+      std::vector<Double_t> y)
 {
 
     std::vector<Double_t> fpar;

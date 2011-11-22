@@ -13,6 +13,7 @@
 
 class TClonesArray;
 class CbmRichRing;
+using namespace std;
 
 class CbmRichRingFitterCOP
 {
@@ -21,6 +22,11 @@ public:
    CbmRichRingFitterCOP();
    ~CbmRichRingFitterCOP();
    void Init();
+
+   void DoFit1(
+         CbmRichRing *pRing,
+         const vector<double>& hitX,
+         const vector<double>& hitY);
 
    void DoFit(CbmRichRing *ring);
 
@@ -31,8 +37,8 @@ private:
 	TClonesArray* fHitsArray;
 
 	static const int MAX_NOF_HITS_IN_RING = 200;
-	std::vector<float> fHitX;
-	std::vector<float> fHitY;
+	vector<double> fHitX;
+	vector<double> fHitY;
 	int fNofHits;
 };
 

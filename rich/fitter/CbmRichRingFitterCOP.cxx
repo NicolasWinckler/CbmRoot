@@ -7,9 +7,7 @@
 #include <iostream>
 #include <cmath>
 
-using std::cout;
-using std::endl;
-using std::fabs;
+using namespace std;
 
 // -----   Default constructor   -------------------------------------------
 CbmRichRingFitterCOP::CbmRichRingFitterCOP()
@@ -23,9 +21,21 @@ CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 	fHitY.clear();
 }
 
+void CbmRichRingFitterCOP::DoFit1(
+      CbmRichRing *pRing,
+      const vector<double>& hitX,
+      const vector<double>& hitY)
+{
+   fHitX.clear();
+   fHitY.clear();
+   fHitX.assign(hitX.begin(), hitX.end());
+   fHitY.assign(hitY.begin(), hitY.end());
+   fNofHits = fHitX.size();
+   FitRing(pRing);
+}
 
-
-void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
+void CbmRichRingFitterCOP::DoFit(
+      CbmRichRing *pRing)
 {
 	fNofHits = pRing->GetNofHits();
 	if (fNofHits < 3) {
@@ -36,8 +46,7 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 	}
 
 	if (fNofHits >= MAX_NOF_HITS_IN_RING) {
-		cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"
-		<<fNofHits <<endl;
+		cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"<<fNofHits <<endl;
 		pRing->SetRadius(0.);
 		pRing->SetCenterX(0.);
 		pRing->SetCenterY(0.);
@@ -175,8 +184,7 @@ void CbmRichRingFitterCOP::Init()
 	// Get hit Array
 	fHitsArray = (TClonesArray*) ioman->GetObject("RichHit");
 	if ( ! fHitsArray) {
-		cout << "-W- CbmRichRingFitterImpl::Init(): No RichHit array!"
-		<< endl;
+		cout << "-W- CbmRichRingFitterImpl::Init(): No RichHit array!"<< endl;
 	}
 	fHitX.resize(MAX_NOF_HITS_IN_RING);
 	fHitY.resize(MAX_NOF_HITS_IN_RING);

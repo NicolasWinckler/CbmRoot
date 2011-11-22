@@ -177,7 +177,7 @@ void CbmMCEpoch::CreateArrays() {
     switch(det) {
     case kSTS:  fPoints[det] = new TClonesArray("CbmStsPoint", 1000); break;
     case kMUCH: fPoints[det] = new TClonesArray("CbmMuchPoint", 1000); break;
-    default:    fPoints[det] = NULL;
+    default:    fPoints[det] = NULL; break;
     }
   }
 

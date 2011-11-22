@@ -58,7 +58,7 @@ class CbmGlobalTrack : public TObject
   void SetPidHypo(Int_t iPid)        { fPidHypo  = iPid;  }
   void SetChi2(Double_t chi2)        { fChi2     = chi2;  }
   void SetNDF(Int_t ndf)             { fNDF      = ndf;   }
-  void SetFlag(Int_t iFlag)          { fFlag     = fFlag; }
+  void SetFlag(Int_t iFlag)          { fFlag     = iFlag; }
   void SetLength(Double_t length)    { fLength   = length;}
 
 

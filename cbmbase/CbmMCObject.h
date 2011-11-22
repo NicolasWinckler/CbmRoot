@@ -38,7 +38,7 @@ public:
 	void SetEntry(FairLinkedData* data, int index);
 	void SetEntry(CbmMCEntry link);
 
-	void SetStage(std::vector<CbmMCEntry> stage);
+	void SetStage(std::vector<CbmMCEntry> stage) {fStage = stage;}
 	void SetLink(FairLink link, int index);
 	void AddLink(FairLink link, int index);
 
@@ -55,7 +55,7 @@ public:
 	int GetNLinks(int entryIndex)const {return fStage.at(entryIndex).GetNLinks();}
 	std::vector<CbmMCEntry> GetEntryVector() const{return fStage;}
 
-	FairMultiLinkedData PosInList(std::pair<int, int> link);
+//	FairMultiLinkedData PosInList(std::pair<int, int> link);
 	FairMultiLinkedData PosInList(FairLink link);
 
 	FairMultiLinkedData GetLinksWithType(DataType type){

@@ -1,12 +1,11 @@
 
 void run_reco_geotest(Int_t nEvents = 250)
 {
-
    Int_t iVerbose = 0;
 
-   TString inFile = "/d/cbm02/slebedev/rich/JUL09/correction/mc.00.root";
-   TString parFile = "/d/cbm02/slebedev/rich/JUL09/correction/params.00.root";
-   TString outFile = "/d/cbm02/slebedev/rich/JUL09/correction/reco.00.root";
+   TString inFile = "/d/cbm02/slebedev/rich/JUL09/geotest/mc.0000.root";
+   TString parFile = "/d/cbm02/slebedev/rich/JUL09/geotest/params.0000.root";
+   TString outFile = "/d/cbm02/slebedev/rich/JUL09/geotest/reco.0000.root";
 
    TString stsDigiFile = "sts_standard.digi.par";
 

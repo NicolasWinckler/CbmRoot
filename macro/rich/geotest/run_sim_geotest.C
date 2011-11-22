@@ -1,10 +1,10 @@
-void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
+void run_sim_geotest(Int_t nEvents = 250)
 {
   //  nEvents = 10;
 
-  TString outDir  = "/d/cbm02/slebedev/rich/JUL09/correction/";
-  TString outFile = outDir + "mc.00.root";
-  TString parFile = outDir + "params.00.root";
+  TString outDir  = "/d/cbm02/slebedev/rich/JUL09/geotest/";
+  TString outFile = outDir + "mc.0000.root";
+  TString parFile = outDir + "params.0000.root";
 
   TString caveGeom = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
@@ -61,12 +61,6 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
      fRun->AddModule(magnet);
   }
 
-  if ( mvdGeom != "" ) {
-     FairDetector* mvd = new CbmMvd("MVD", kTRUE);
-     mvd->SetGeometryFileName(mvdGeom);
-     fRun->AddModule(mvd);
-  }
-
   if ( stsGeom != "" ) {
      FairDetector* sts = new CbmSts("STS", kTRUE);
      sts->SetGeometryFileName(stsGeom);
@@ -94,8 +88,6 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);
-
-
 
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
@@ -149,4 +141,3 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   cout << " All ok " << endl;
   exit(0);
 }
-

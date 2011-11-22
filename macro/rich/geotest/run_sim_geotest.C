@@ -3,110 +3,106 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   //  nEvents = 10;
 
   TString outDir  = "/d/cbm02/slebedev/rich/JUL09/correction/";
-  char txt[200];
-  sprintf(txt,"%.4i",nElectrons);
   TString outFile = outDir + "mc.00.root";
   TString parFile = outDir + "params.00.root";
 
-  // -----  Geometries  -----------------------------------------------------
-  TString caveGeom   = "cave.geo";
+  TString caveGeom = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
-  TString pipeGeom   = "pipe_rich_large.geo";
-  TString magnetGeom = "magnet_electron_standard.geo";
-  TString mvdGeom    = "mvd_standard.geo";
-  mvdGeom = "";
-  TString stsGeom    = "sts_standard.geo";
-  stsGeom = "";
-  TString richGeom   = "rich_large.geo";
+  TString pipeGeom = "pipe_standard.geo";
+  TString stsGeom = "sts/sts_v11a.geo";
+  TString richGeom = "rich/rich_v08a.geo";
+  TString fieldMap = "field_v10e";
+  TString magnetGeom = "passive/magnet_v09e.geo";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_electron_standard";   // name of field map
-  Double_t fieldZ     = 50.;             // field centre z position
+  TString fieldMap = "field_v10e";   // name of field map
+  Double_t fieldZ = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
 
   gDebug = 0;
-
   TStopwatch timer;
   timer.Start();
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
+
   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
   cbmlibs();
 
-  // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
-  fRun->SetName("TGeant3");              // Transport engine
-  fRun->SetOutputFile(outFile);          // Output file
+  fRun->SetName("TGeant3"); // Transport engine
+  fRun->SetOutputFile(outFile);
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  // ------------------------------------------------------------------------
 
-  // -----   Create media   -------------------------------------------------
-  fRun->SetMaterials("media.geo");       // Materials
-  // ------------------------------------------------------------------------
+  fRun->SetMaterials("media.geo"); // Materials
 
-  // -----   Create detectors and passive volumes   -------------------------
+
   if ( caveGeom != "" ) {
-    FairModule* cave = new CbmCave("CAVE");
-    cave->SetGeometryFileName(caveGeom);
-    fRun->AddModule(cave);
+     FairModule* cave = new CbmCave("CAVE");
+     cave->SetGeometryFileName(caveGeom);
+     fRun->AddModule(cave);
   }
 
   if ( pipeGeom != "" ) {
-    FairModule* pipe = new CbmPipe("PIPE");
-    pipe->SetGeometryFileName(pipeGeom);
-    fRun->AddModule(pipe);
+     FairModule* pipe = new CbmPipe("PIPE");
+     pipe->SetGeometryFileName(pipeGeom);
+     fRun->AddModule(pipe);
   }
 
   if ( targetGeom != "" ) {
-    FairModule* target = new CbmTarget("Target");
-    target->SetGeometryFileName(targetGeom);
-    fRun->AddModule(target);
+     FairModule* target = new CbmTarget("Target");
+     target->SetGeometryFileName(targetGeom);
+     fRun->AddModule(target);
   }
 
   if ( magnetGeom != "" ) {
-    FairModule* magnet = new CbmMagnet("MAGNET");
-    magnet->SetGeometryFileName(magnetGeom);
-    fRun->AddModule(magnet);
+     FairModule* magnet = new CbmMagnet("MAGNET");
+     magnet->SetGeometryFileName(magnetGeom);
+     fRun->AddModule(magnet);
+  }
+
+  if ( mvdGeom != "" ) {
+     FairDetector* mvd = new CbmMvd("MVD", kTRUE);
+     mvd->SetGeometryFileName(mvdGeom);
+     fRun->AddModule(mvd);
   }
 
   if ( stsGeom != "" ) {
-    FairDetector* sts = new CbmSts("STS", kTRUE);
-    sts->SetGeometryFileName(stsGeom);
-    fRun->AddModule(sts);
+     FairDetector* sts = new CbmSts("STS", kTRUE);
+     sts->SetGeometryFileName(stsGeom);
+     fRun->AddModule(sts);
   }
 
   if ( richGeom != "" ) {
-    FairDetector* rich = new CbmRich("RICH", kTRUE);
-    rich->SetGeometryFileName(richGeom);
-    fRun->AddModule(rich);
+     FairDetector* rich = new CbmRich("RICH", kTRUE);
+     rich->SetGeometryFileName(richGeom);
+     fRun->AddModule(rich);
   }
 
   // -----   Create magnetic field   ----------------------------------------
   CbmFieldMap* magField = NULL;
-  if ( fieldMap == "field_electron_standard")
-    magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap == "field_muon_standard" )
-    magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap = "FieldMuonMagnet" )
-    magField = new CbmFieldMapSym3(fieldMap);
+  if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
+     magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_muon_standard" )
+     magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "FieldMuonMagnet" )
+     magField = new CbmFieldMapSym3(fieldMap);
   else {
-    cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
-    exit;
+     cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+     exit;
   }
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);
 
 
-  // -----   Create PrimaryGenerator   --------------------------------------
+
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
-  // -----   Create BoxGenerator   --------------------------------------
-  Int_t kfCode1=11;   // electrons
-  Int_t kfCode2=-11;   // positrons
+  Int_t kfCode1=11; // electrons
+  Int_t kfCode2=-11; // positrons
 
-  FairBoxGenerator* boxGen1 = new FairBoxGenerator(kfCode1, nElectrons/2);
+  FairBoxGenerator* boxGen1 = new FairBoxGenerator(kfCode1, 1);
   boxGen1->SetPtRange(0.,3.);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(2.5,25.);
@@ -114,7 +110,7 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
 
-  FairBoxGenerator* boxGen2 = new FairBoxGenerator(kfCode2, nElectrons/2);
+  FairBoxGenerator* boxGen2 = new FairBoxGenerator(kfCode2, 1);
   boxGen2->SetPtRange(0.,3.);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5,25.);
@@ -123,11 +119,7 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   primGen->AddGenerator(boxGen2);
 
   fRun->SetGenerator(primGen);
-
-  // -----   Run initialisation   -------------------------------------------
   fRun->Init();
-  // ------------------------------------------------------------------------
-
 
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
@@ -140,15 +132,9 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   rtdb->setOutput(parOut);
   rtdb->saveOutput();
   rtdb->print();
-  // ------------------------------------------------------------------------
 
-
-  // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
-  // ------------------------------------------------------------------------
 
-
-  // -----   Finish   -------------------------------------------------------
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -157,8 +143,7 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
   cout << "Output file is "    << outFile << endl;
   cout << "Parameter file is " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime
-       << "s" << endl << endl;
-  // ------------------------------------------------------------------------
+      << "s" << endl << endl;
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;

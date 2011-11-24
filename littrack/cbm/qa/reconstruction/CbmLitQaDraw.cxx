@@ -214,22 +214,22 @@ void CbmLitQaDraw::DrawEfficiency(
 
    if (h1 != NULL && h2 != NULL && h3 != NULL && h4 != NULL) {
       DrawHist1D(h1, h2, h3, h4, yTitle, xTitle,
-         yTitle, hname1, hname2, hname3, hname4, kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
+         yTitle, hname1, hname2, hname3, hname4, kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3, eff4);
 
    } else if (h1 != NULL && h2 != NULL && h3 != NULL && h4 == NULL) {
       DrawHist1D(h1, h2, h3, NULL, yTitle, xTitle,
-         yTitle, hname1, hname2, hname3, "", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
+         yTitle, hname1, hname2, hname3, "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3);
 
    } else if (h1 != NULL && h2 != NULL && h3 == NULL && h4 == NULL){
       DrawHist1D(h1, h2, NULL, NULL, yTitle, xTitle,
-         yTitle, hname1, hname2, "", "", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
+         yTitle, hname1, hname2, "", "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1, eff2);
 
    } else if (h1 != NULL && h2 == NULL && h3 == NULL && h4 == NULL){
       DrawHist1D(h1, NULL, NULL, NULL, yTitle, xTitle,
-         yTitle, hname1, "", "", "", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
+         yTitle, hname1, "", "", "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1);
    }
 
@@ -344,13 +344,13 @@ void CbmLitQaDraw::DrawHitsHistos(
               "all: " + lit::NumberToString<Double_t>(H1(hist+"_All")->GetMean(), 1),
               "true: " + lit::NumberToString<Double_t>(H1(hist+"_True")->GetMean(), 1),
               "fake: " + lit::NumberToString<Double_t>(H1(hist+"_Fake")->GetMean(), 1),  "",
-              kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
+              kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    c->cd(2);
    DrawHist1D(H1(hist+"_TrueOverAll"), H1(hist+"_FakeOverAll"), NULL, NULL, "Ratio", "Ratio", "Counter",
               "true/all: " + lit::NumberToString<Double_t>(H1(hist+"_TrueOverAll")->GetMean()),
               "fake/all: " + lit::NumberToString<Double_t>(H1(hist+"_FakeOverAll")->GetMean()),
-              "", "", kLitLinearScale, kLitLogScale, true, 0.25,0.99,0.55,0.75);
+              "", "", kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    if (fOutputDir != "") lit::SaveCanvasAsImage(c, fOutputDir);
 }
@@ -360,9 +360,7 @@ void CbmLitQaDraw::DrawHitsStationHisto(
       TH1F* hist)
 {
    TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1200, 600);
-   DrawHist1D(hist, "Station number", "Number of hits",
-         LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-         LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "HIST TEXT0");
+   DrawHist1D(hist, "Station number", "Number of hits", kLitLinear, kLitLinear, "HIST TEXT0");
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
@@ -381,17 +379,14 @@ void CbmLitQaDraw::DrawStsTracksQaHistos()
    canvas1->Divide(2,2);
    canvas1->cd(1);
    H1("hStsChiprim")->Scale(1./H1("hStsChiprim")->Integral());
-   DrawHist1D(H1("hStsChiprim"), "#chi^{2}_{vertex}", "Yield",
-            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
+   DrawHist1D(H1("hStsChiprim"), "#chi^{2}_{vertex}", "Yield", kLitLinear, kLitLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(2);
    TH1* projY = (TH1*)H2("hStsMomresVsMom")->ProjectionY()->Clone();
    projY->Scale(1./projY->Integral());
-   DrawHist1D(projY, "dP [%]", "Yield", kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
+   DrawHist1D(projY, "dP [%]", "Yield", kLitLinear, kLitLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
@@ -404,9 +399,7 @@ void CbmLitQaDraw::DrawStsTracksQaHistos()
    canvas1->cd(3);
    H2("hStsMomresVsMom")->FitSlicesY();
    TH1* momslice = (TH1*) gDirectory->Get("hStsMomresVsMom_2");
-   DrawHist1D(momslice, "P [GeV/c]", "dP/P, #sigma [%]",
-            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "");
+   DrawHist1D(momslice, "P [GeV/c]", "dP/P, #sigma [%]", kLitLinear, kLitLinear);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas1, fOutputDir);
@@ -420,17 +413,13 @@ void CbmLitQaDraw::DrawStsTracksQaHistos()
       momResRms->SetBinContent(i, rms);
       momResRms->SetBinError(i, momslice->GetBinError(i));
    }
-   DrawHist1D(momResRms, "P [GeV/c]", "dP/P, RMS [%]",
-            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "P");
+   DrawHist1D(momResRms, "P [GeV/c]", "dP/P, RMS [%]", kLitLinear, kLitLinear, "P");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    TCanvas* canvas2 = new TCanvas("rec_qa_track_length", "rec_qa_track_length", 500, 500);
    H1("hTrackLength")->Scale(1./H1("hTrackLength")->Integral());
-   DrawHist1D(H1("hTrackLength"), "dL/L [%]", "Yield",
-            kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-            LIT_MARKER_STYLE1, kLitLinearScale, kLitLinearScale, "");
+   DrawHist1D(H1("hTrackLength"), "dL/L [%]", "Yield", kLitLinear, kLitLinear);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
@@ -442,13 +431,13 @@ void CbmLitQaDraw::DrawMCMomVsAngle()
    canvas1->Divide(2,1);
    canvas1->cd(1);
    DrawHist2D(H2("hMCMomVsAngle_All"), "Momentum [GeV/c]", "Polar angle [grad]", "Tracks per event",
-         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
+         kLitLinear, kLitLinear, kLitLinear, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(2);
    DrawHist2D(H2("hMCMomVsAngle_El"), "Momentum [GeV/c]", "Polar angle [grad]", "Tracks per event",
-         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
+         kLitLinear, kLitLinear, kLitLinear, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 

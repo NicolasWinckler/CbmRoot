@@ -32,7 +32,7 @@ const Int_t LIT_MARKER_STYLE3 = kOpenTriangleUp;
 const Int_t LIT_MARKER_STYLE4 = kOpenDiamond;
 const Double_t LIT_TEXT_SIZE = 0.06;
 
-enum LitScale { kLitLogScale = 0, kLitLinearScale = 1};
+enum LitScale { kLitLog = 0, kLitLinear = 1};
 
 
 /* Set default styles for histograms. */
@@ -42,28 +42,27 @@ void SetStyles();
  * @param hist Pointer to the histogram.
  * @param titleX X axis title.
  * @param titleY Y axis title.
+ * @param logx If true than X axis is plotted in logarithmic scale.
+ * @param logy If true than Y axis is plotted in logarithmic scale.
+ * @param drawOpt Other drawing options (see ROOT documentation for details).
  * @param color Color.
  * @param lineWidth Line width.
  * @param lineStyle Line style (see ROOT documentation for details).
  * @param markerSize Marker size.
  * @param markerStyle Marker style (see ROOt documentation for details).
- * @param logx If true than X axis is plotted in logarithmic scale.
- * @param logy If true than Y axis is plotted in logarithmic scale.
- * @param drawOpt Other drawing options (see ROOT documentation for details).
  */
 void DrawHist1D(
    TH1* hist,
    const std::string& titleX = "",
    const std::string& titleY = "",
-   Int_t color = kBlack,
+   LitScale logx = kLitLinear,
+   LitScale logy = kLitLinear,
+   const std::string& drawOpt = "",
+   Int_t color = LIT_COLOR1,
    Int_t lineWidth = LIT_LINE_WIDTH,
    Int_t lineStyle = LIT_LINE_STYLE1,
    Int_t markerSize = LIT_MARKER_SIZE,
-   Int_t markerStyle = LIT_MARKER_STYLE1,
-   LitScale logx = kLitLinearScale,
-   LitScale logy = kLitLinearScale,
-   const std::string& drawOpt = "");
-
+   Int_t markerStyle = LIT_MARKER_STYLE1);
 
 
 /* Draws 2D histogram.
@@ -81,11 +80,10 @@ void DrawHist2D(
    const std::string& titleX = "",
    const std::string& titleY = "",
    const std::string& titleZ = "",
-   LitScale logx = kLitLinearScale,
-   LitScale logy = kLitLinearScale,
-   LitScale logz = kLitLinearScale,
+   LitScale logx = kLitLinear,
+   LitScale logy = kLitLinear,
+   LitScale logz = kLitLinear,
    const std::string& drawOpt = "COLZ");
-
 
 
 /* Draws up to 3 1D histograms. If hist == NULL than histogram will not be drawn.

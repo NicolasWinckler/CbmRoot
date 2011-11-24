@@ -805,9 +805,7 @@ void CbmLitPropagationQa::DrawHistos(
          if (v == 2) { hist = fSmootherHistos[plane][i]; }
          if (i != 11) { hist->Fit("gaus"); }
          hist->SetMaximum(hist->GetMaximum() * 1.50);
-         DrawHist1D(hist, xtitles[i], "Counter",
-                    LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                    LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
+         DrawHist1D(hist, xtitles[i], "Counter", kLitLinear, kLitLog);
 
          TF1* fit = hist->GetFunction("gaus");
          Double_t sigma = 0., rms = 0.;

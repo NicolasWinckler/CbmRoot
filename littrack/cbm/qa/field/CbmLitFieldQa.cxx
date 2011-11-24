@@ -711,34 +711,30 @@ void CbmLitFieldQa::DrawSlices(
       canvas[i]->cd(1);
       TGraph2D* graph1 = fhBGraph[v][i];
       DrawGraph2D(graph1, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
+            kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(2);
       TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhBGridErrH1D[v][i];
-      DrawHist1D(hist2, std::string(title + " [kGauss]"), "Counter",
-                 LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
+      DrawHist1D(hist2, std::string(title + " [kGauss]"), "Counter", kLitLinear, kLitLog);
 
       canvas[i]->cd(3);
       TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhBGridErrH2D[v][i];
       DrawHist2D(hist3, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "colz");
+            kLitLinear, kLitLinear, kLitLinear, "colz");
 
       canvas[i]->cd(4);
       TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
       DrawGraph2D(graph2, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
+            kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(5);
       TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1D[v][i];
-      DrawHist1D(hist4, std::string(title + " relative error [%]"), "Counter",
-                 LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                 LIT_MARKER_STYLE1, kLitLinearScale, kLitLogScale, "");
+      DrawHist1D(hist4, std::string(title + " relative error [%]"), "Counter", kLitLinear, kLitLog);
 
       canvas[i]->cd(6);
       TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2D[v][i];
       DrawHist2D(hist5, "X [cm]", "Y [cm]", std::string(title + " relative error [%]"),
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "colz");
+            kLitLinear, kLitLinear, kLitLinear, "colz");
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
@@ -788,9 +784,8 @@ void CbmLitFieldQa::DrawPoly(
             std::string draw_opt;
             if (j == 0) { draw_opt = ""; }
             else { draw_opt = "SAME"; }
-            DrawHist1D(hist1, title, "Counter",
-                       1+j, LIT_LINE_WIDTH, 1+j, LIT_MARKER_SIZE,
-                       kDot, kLitLinearScale, kLitLogScale, draw_opt.c_str());
+            DrawHist1D(hist1, title, "Counter", kLitLinear, kLitLog, draw_opt.c_str(),
+                       1+j, LIT_LINE_WIDTH, 1+j, LIT_MARKER_SIZE, kDot);
 
             if (v == 0) {
                std::stringstream ss;
@@ -822,22 +817,22 @@ void CbmLitFieldQa::DrawFieldSlices()
       canvas[i]->cd(1);
       TGraph2D* graphBx = fhBGraph[BX][i];
       DrawGraph2D(graphBx, "X [cm]", "Y [cm]", "B_{x} [kGauss]",
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
+            kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(2);
       TGraph2D* graphBy = fhBGraph[BY][i];
       DrawGraph2D(graphBy, "X [cm]", "Y [cm]", "B_{y} [kGauss]",
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
+            kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(3);
       TGraph2D* graphBz = fhBGraph[BZ][i];
       DrawGraph2D(graphBz, "X [cm]", "Y [cm]", "B_{z} [kGauss]",
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
+            kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(4);
       TGraph2D* graphMod = fhBGraph[MOD][i];
       DrawGraph2D(graphMod, "X [cm]", "Y [cm]", "|B| [kGauss]",
-            kLitLinearScale, kLitLinearScale, kLitLinearScale, "TRI1");
+            kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
@@ -858,7 +853,7 @@ void CbmLitFieldQa::DrawFieldAlongZ()
       DrawGraph(graphBx, graphBy, graphBz,
                 std::string(lit::ToString<Double_t>(fAlongZAngles[i]) + "#circ"),
                 "Z [cm]", "B [kGauss]",
-                "B_{x}", "B_{y}", "B_{z}", kLitLinearScale, kLitLinearScale, false,
+                "B_{x}", "B_{y}", "B_{z}", kLitLinear, kLitLinear, false,
                 0.7, 0.5, 0.9, 0.3);
    }
    lit::SaveCanvasAsImage(canvas, fOutputDir);

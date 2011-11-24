@@ -25,34 +25,38 @@ export ELECTRONS=no
 # If "yes" PLUTO particles will be embedded
 export PLUTO=yes
 
-#If "yes" DELTA electrons will be embedded
-export DELTA=yes
-export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/25gev/100field/deltasource/mc.delta.root
+
  	  
 #Collision energy: 25gev or 10gev -> set proper weight into analysis
 export ENERGY=25gev
 #---------------------------------------------------
 
 # Geometries
-    export CAVEGEOM=cave.geo
-    export TARGETGEOM=target_au_025mu.geo
-    export PIPEGEOM=pipe_standard.geo
-    export SHIELDGEOM=
-    export MVDGEOM=mvd/mvd_v08a.geo
-    export STSGEOM=sts/sts_v11a.geo
-    export MUCHGEOM=
-    export RICHGEOM=rich/rich_v08a.geo
-    export TRDGEOM=trd/trd_v10b.geo
-    export TOFGEOM=tof/tof_v07a.geo
-    export ECALGEOM=
-    export FIELDMAP=field_v10e
-    export MAGNETGEOM=passive/magnet_v09e.geo
+	export CAVEGEOM=cave.geo
+	export TARGETGEOM=target_au_025mu.geo
+	export PIPEGEOM=pipe_standard.geo
+	export SHIELDGEOM=
+	export MVDGEOM=
+	#mvd/mvd_v08a.geo
+	export STSGEOM=sts/sts_v11a.geo
+	export MUCHGEOM=
+	export RICHGEOM=rich/rich_v08a.geo
+	export TRDGEOM=trd/trd_v10b.geo
+	export TOFGEOM=tof/tof_v07a.geo
+	export ECALGEOM=
+	export FIELDMAP=field_v10e
+	export MAGNETGEOM=passive/magnet_v09e.geo
 	export FIELDMAPSCALE=1.0
+
+export FIELDDIR=100field
+export MVDDIR=nomvd
 	
-	export FIELDDIR=100field
-	export MVDDIR=mvd
 	
-#----------------------------------------------------
+#If "yes" DELTA electrons will be embedded
+export DELTA=no
+export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/25gev/$MVDDIR/deltasource/mc.delta.root	
+
+
 #number of events for each thread
 export NEVENTS=600
 
@@ -98,9 +102,9 @@ for Z in 1 2 3 4; do
 	  export INFILE=/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
 	  export MCFILE=$DIR/mc.$XXXX.root
 	  export PARFILE=$DIR/param.$XXXX.root
-      export RECOFILE=$DIR/reco.delta.$XXXX.root
-      export RECOQAFILE=$DIR/litreco.qa.$XXXX.root
-	  export DILEPANALYSISFILE=$DIR/analysis.delta.$XXXX.root
+      export RECOFILE=$DIR/reco.$XXXX.root
+      export RECOQAFILE=$DIR/reco.litqa.$XXXX.root
+	  export DILEPANALYSISFILE=$DIR/analysis.$XXXX.root
 
 	  if [ $Z = "1" ] ; then 
 		export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/rho0/epem/pluto.auau.25gev.rho0.epem.$XXXX.root

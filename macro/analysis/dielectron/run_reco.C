@@ -270,11 +270,11 @@ void run_reco(Int_t nEvents = 700){
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetUseConsecutivePointsInSts(true);
-	reconstructionQa->SetMinNofPointsTrd(9);
+	reconstructionQa->SetMinNofPointsTrd(8);
 	reconstructionQa->SetMinNofPointsMuch(10);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(9);
+	reconstructionQa->SetMinNofHitsTrd(8);
 	reconstructionQa->SetMinNofHitsMuch(10);
 	reconstructionQa->SetVerbose(0);
 	reconstructionQa->SetMomentumRange(0, 12);
@@ -282,7 +282,6 @@ void run_reco(Int_t nEvents = 700){
 	reconstructionQa->SetMinNofHitsRich(7);
 	reconstructionQa->SetQuotaRich(0.6);
 	reconstructionQa->SetOutputDir("recoIm/");
-	reconstructionQa->SetOutputJsonFileName("rec_qa_json_file.txt");
 	run->AddTask(reconstructionQa);
 
     // =========================================================================

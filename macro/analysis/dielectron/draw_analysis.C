@@ -15,9 +15,10 @@ void draw_analysis(){
     gSystem->Load("libAnalysis");
 
     Bool_t useMvd = true;
+    Bool_t drawSignificance = true;
 
-    std::string fileName = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/phi/analysis.all.root";
+    std::string fileName = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/analysis.delta.all.root";
 
     CbmAnaDielectronTaskDraw *draw = new CbmAnaDielectronTaskDraw();
-    draw->DrawHistosFromFile(fileName, useMvd);
+    draw->DrawHistosFromFile(fileName, useMvd);//, drawSignificance);
 }

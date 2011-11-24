@@ -38,8 +38,6 @@ public:
 
    virtual void Finish();
 
-
-
 private:
 
 	void RingParameters();
@@ -131,7 +129,7 @@ private:
    TH1D* fhNofHitsCircleFitEff;
    TH1D* fhNofHitsEllipseFitEff;
 
-	vector<TH1*> fHists;
+	vector<TH1*> fHists; // store all TH1 pointers of the histogramm
 
 	ClassDef(CbmRichGeoTest,1)
 };

@@ -67,34 +67,34 @@ using namespace std;
 
 ClassImp(CbmAnaDielectronTask);
 
-void CbmAnaDielectronTask::CreateMinvHisto(
-      TH1D* h,
+TH1D* CbmAnaDielectronTask::CreateMinvHisto(
       const string& name)
 {
-   h = new TH1D(name.c_str(), name.c_str(), 2000, 0., 2.);
+   TH1D* h = new TH1D(name.c_str(), name.c_str(), 2000, 0., 2.);
    h->GetXaxis()->SetTitle("M_{ee} [GeV/c^{2}]");
    h->GetYaxis()->SetTitle("Yield");
    fHistoList.push_back(h);
+   return h;
 }
 
-void CbmAnaDielectronTask::CreateSignalMomHisto(
-      TH1D* h,
+TH1D* CbmAnaDielectronTask::CreateSignalMomHisto(
       const string& name)
 {
-   h = new TH1D(name.c_str(), name.c_str(), 100, 0., 15.);
+   TH1D* h = new TH1D(name.c_str(), name.c_str(), 100, 0., 15.);
    h->GetXaxis()->SetTitle("p [GeV/c]");
    h->GetYaxis()->SetTitle("Yield");
    fHistoList.push_back(h);
+   return h;
 }
 
-void CbmAnaDielectronTask::CreatePtYHisto(
-      TH2D* h,
+TH2D* CbmAnaDielectronTask::CreatePtYHisto(
       const string& name)
 {
-   h = new TH2D(name.c_str(), name.c_str(), 40, 0., 4., 20, 0., 2.);
+   TH2D* h = new TH2D(name.c_str(), name.c_str(), 40, 0., 4., 20, 0., 2.);
    h->GetXaxis()->SetTitle("Rapidity");
    h->GetYaxis()->SetTitle("p_{t} [GeV/c]");
    fHistoList.push_back(h);
+   return h;
 }
 
 CbmAnaDielectronTask::CbmAnaDielectronTask(
@@ -111,19 +111,19 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
    fHistoList.clear();
 
    //signal momentum distribution
-   CreateSignalMomHisto(fh_mc_signal_mom,"fh_mc_signal_mom");
-   CreateSignalMomHisto(fh_acc_signal_mom,"fh_acc_signal_mom");
-   CreateSignalMomHisto(fh_reco_signal_mom,"fh_reco_signal_mom");
-   CreateSignalMomHisto(fh_chi_prim_signal_mom,"fh_chi_prim_signal_mom");
-   CreateSignalMomHisto(fh_el_id_signal_mom,"fh_el_id_signal_mom");
-   CreateSignalMomHisto(fh_ptcut_signal_mom,"fh_ptcut_signal_mom");
-   CreateSignalMomHisto(fh_anglecut_signal_mom,"fh_anglecut_signal_mom");
-   CreateSignalMomHisto(fh_gammacut_signal_mom,"fh_gammacut_signal_mom");
-   CreateSignalMomHisto(fh_ttcut_signal_mom,"fh_ttcut_signal_mom");
-   CreateSignalMomHisto(fh_stcut_signal_mom,"fh_stcut_signal_mom");
-   CreateSignalMomHisto(fh_apmcut_signal_mom,"fh_apmcut_signal_mom");
-   CreateSignalMomHisto(fh_dstscut_signal_mom,"fh_dstscut_signal_mom");
-   CreateSignalMomHisto(fh_dsts2cut_signal_mom,"fh_dsts2cut_signal_mom");
+   fh_mc_signal_mom = CreateSignalMomHisto("fh_mc_signal_mom");
+   fh_acc_signal_mom = CreateSignalMomHisto("fh_acc_signal_mom");
+   fh_reco_signal_mom = CreateSignalMomHisto("fh_reco_signal_mom");
+   fh_chi_prim_signal_mom = CreateSignalMomHisto("fh_chi_prim_signal_mom");
+   fh_el_id_signal_mom = CreateSignalMomHisto("fh_el_id_signal_mom");
+   fh_ptcut_signal_mom = CreateSignalMomHisto("fh_ptcut_signal_mom");
+   fh_anglecut_signal_mom = CreateSignalMomHisto("fh_anglecut_signal_mom");
+   fh_gammacut_signal_mom = CreateSignalMomHisto("fh_gammacut_signal_mom");
+   fh_ttcut_signal_mom = CreateSignalMomHisto("fh_ttcut_signal_mom");
+   fh_stcut_signal_mom = CreateSignalMomHisto("fh_stcut_signal_mom");
+   fh_apmcut_signal_mom = CreateSignalMomHisto("fh_apmcut_signal_mom");
+   fh_dstscut_signal_mom = CreateSignalMomHisto("fh_dstscut_signal_mom");
+   fh_dsts2cut_signal_mom = CreateSignalMomHisto("fh_dsts2cut_signal_mom");
 
    // Mother PDG
    fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
@@ -139,19 +139,19 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
    fHistoList.push_back(fh_mc_vertex_gamma_xy);
 
    // signal minv
-   CreateMinvHisto(fh_mc_signal_minv, "fh_mc_signal_minv");
-   CreateMinvHisto(fh_acc_signal_minv, "fh_acc_signal_minv");
-   CreateMinvHisto(fh_rec_signal_minv, "fh_rec_signal_minv");
-   CreateMinvHisto(fh_chi_prim_signal_minv, "fh_chi_prim_signal_minv");
-   CreateMinvHisto(fh_el_id_signal_minv, "fh_el_id_signal_minv");
-   CreateMinvHisto(fh_gammacut_signal_minv, "fh_gammacut_signal_minv");
-   CreateMinvHisto(fh_stcut_signal_minv, "fh_stcut_signal_minv");
-   CreateMinvHisto(fh_ttcut_signal_minv, "fh_ttcut_signal_minv");
-   CreateMinvHisto(fh_ptcut_signal_minv, "fh_ptcut_signal_minv");
-   CreateMinvHisto(fh_anglecut_signal_minv, "fh_anglecut_signal_minv");
-   CreateMinvHisto(fh_apmcut_signal_minv, "fh_apmcut_signal_minv");
-   CreateMinvHisto(fh_dstscut_signal_minv, "fh_dstscut_signal_minv");
-   CreateMinvHisto(fh_dsts2cut_signal_minv, "fh_dsts2cut_signal_minv");
+   fh_mc_signal_minv = CreateMinvHisto("fh_mc_signal_minv");
+   fh_acc_signal_minv = CreateMinvHisto("fh_acc_signal_minv");
+   fh_rec_signal_minv = CreateMinvHisto("fh_rec_signal_minv");
+   fh_chi_prim_signal_minv = CreateMinvHisto("fh_chi_prim_signal_minv");
+   fh_el_id_signal_minv = CreateMinvHisto("fh_el_id_signal_minv");
+   fh_gammacut_signal_minv = CreateMinvHisto("fh_gammacut_signal_minv");
+   fh_stcut_signal_minv = CreateMinvHisto("fh_stcut_signal_minv");
+   fh_ttcut_signal_minv = CreateMinvHisto("fh_ttcut_signal_minv");
+   fh_ptcut_signal_minv = CreateMinvHisto("fh_ptcut_signal_minv");
+   fh_anglecut_signal_minv = CreateMinvHisto("fh_anglecut_signal_minv");
+   fh_apmcut_signal_minv = CreateMinvHisto("fh_apmcut_signal_minv");
+   fh_dstscut_signal_minv = CreateMinvHisto("fh_dstscut_signal_minv");
+   fh_dsts2cut_signal_minv = CreateMinvHisto("fh_dsts2cut_signal_minv");
 
    // signal minv vs. Pt
    fh_ttcut_signal_minv_pt = new TH2D("fh_ttcut_signal_minv_pt","fh_ttcut_signal_minv_pt;M_{ee} [GeV/c^{2}];p_{t} [GeV/c]",2000, 0., 2., 20, 0., 2.);
@@ -160,43 +160,43 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
    fHistoList.push_back(fh_ptcut_signal_minv_pt);
 
    //BG minv
-   CreateMinvHisto(fh_rec_bg_minv,"fh_rec_bg_minv");
-   CreateMinvHisto(fh_chi_prim_bg_minv,"fh_chi_prim_bg_minv");
-   CreateMinvHisto(fh_el_id_bg_minv,"fh_el_id_bg_minv");
-   CreateMinvHisto(fh_ptcut_bg_minv,"fh_ptcut_bg_minv");
-   CreateMinvHisto(fh_anglecut_bg_minv,"fh_anglecut_bg_minv");
-   CreateMinvHisto(fh_gammacut_bg_minv,"fh_gammacut_bg_minv");
-   CreateMinvHisto(fh_ttcut_bg_minv,"fh_ttcut_bg_minv");
-   CreateMinvHisto(fh_stcut_bg_minv,"fh_stcut_bg_minv");
-   CreateMinvHisto(fh_apmcut_bg_minv,"fh_apmcut_bg_minv");
-   CreateMinvHisto(fh_dstscut_bg_minv,"fh_dstscut_bg_minv");
-   CreateMinvHisto(fh_dsts2cut_bg_minv,"fh_dsts2cut_bg_minv");
+   fh_rec_bg_minv = CreateMinvHisto("fh_rec_bg_minv");
+   fh_chi_prim_bg_minv = CreateMinvHisto("fh_chi_prim_bg_minv");
+   fh_el_id_bg_minv = CreateMinvHisto("fh_el_id_bg_minv");
+   fh_ptcut_bg_minv = CreateMinvHisto("fh_ptcut_bg_minv");
+   fh_anglecut_bg_minv = CreateMinvHisto("fh_anglecut_bg_minv");
+   fh_gammacut_bg_minv = CreateMinvHisto("fh_gammacut_bg_minv");
+   fh_ttcut_bg_minv = CreateMinvHisto("fh_ttcut_bg_minv");
+   fh_stcut_bg_minv = CreateMinvHisto("fh_stcut_bg_minv");
+   fh_apmcut_bg_minv = CreateMinvHisto("fh_apmcut_bg_minv");
+   fh_dstscut_bg_minv = CreateMinvHisto("fh_dstscut_bg_minv");
+   fh_dsts2cut_bg_minv = CreateMinvHisto("fh_dsts2cut_bg_minv");
 
    //pi0 minv
-   CreateMinvHisto(fh_rec_pi0_minv,"fh_rec_pi0_minv");
-   CreateMinvHisto(fh_chi_prim_pi0_minv,"fh_chi_prim_pi0_minv");
-   CreateMinvHisto(fh_el_id_pi0_minv,"fh_el_id_pi0_minv");
-   CreateMinvHisto(fh_ptcut_pi0_minv,"fh_ptcut_pi0_minv");
-   CreateMinvHisto(fh_anglecut_pi0_minv,"fh_anglecut_pi0_minv");
-   CreateMinvHisto(fh_gammacut_pi0_minv,"fh_gammacut_pi0_minv");
-   CreateMinvHisto(fh_ttcut_pi0_minv,"fh_ttcut_pi0_minv");
-   CreateMinvHisto(fh_stcut_pi0_minv,"fh_stcut_pi0_minv");
-   CreateMinvHisto(fh_apmcut_pi0_minv,"fh_apmcut_pi0_minv");
-   CreateMinvHisto(fh_dstscut_pi0_minv,"fh_dstscut_pi0_minv");
-   CreateMinvHisto(fh_dsts2cut_pi0_minv,"fh_dsts2cut_pi0_minv");
+   fh_rec_pi0_minv = CreateMinvHisto("fh_rec_pi0_minv");
+   fh_chi_prim_pi0_minv = CreateMinvHisto("fh_chi_prim_pi0_minv");
+   fh_el_id_pi0_minv = CreateMinvHisto("fh_el_id_pi0_minv");
+   fh_ptcut_pi0_minv = CreateMinvHisto("fh_ptcut_pi0_minv");
+   fh_anglecut_pi0_minv = CreateMinvHisto("fh_anglecut_pi0_minv");
+   fh_gammacut_pi0_minv = CreateMinvHisto("fh_gammacut_pi0_minv");
+   fh_ttcut_pi0_minv = CreateMinvHisto("fh_ttcut_pi0_minv");
+   fh_stcut_pi0_minv = CreateMinvHisto("fh_stcut_pi0_minv");
+   fh_apmcut_pi0_minv = CreateMinvHisto("fh_apmcut_pi0_minv");
+   fh_dstscut_pi0_minv = CreateMinvHisto("fh_dstscut_pi0_minv");
+   fh_dsts2cut_pi0_minv = CreateMinvHisto("fh_dsts2cut_pi0_minv");
 
    //eta minv
-   CreateMinvHisto(fh_rec_eta_minv,"fh_rec_eta_minv");
-   CreateMinvHisto(fh_chi_prim_eta_minv,"fh_chi_prim_eta_minv");
-   CreateMinvHisto(fh_el_id_eta_minv,"fh_el_id_eta_minv");
-   CreateMinvHisto(fh_ptcut_eta_minv,"fh_ptcut_eta_minv");
-   CreateMinvHisto(fh_anglecut_eta_minv,"fh_anglecut_eta_minv");
-   CreateMinvHisto(fh_gammacut_eta_minv,"fh_gammacut_eta_minv");
-   CreateMinvHisto(fh_ttcut_eta_minv,"fh_ttcut_eta_minv");
-   CreateMinvHisto(fh_stcut_eta_minv,"fh_stcut_eta_minv");
-   CreateMinvHisto(fh_apmcut_eta_minv,"fh_apmcut_eta_minv");
-   CreateMinvHisto(fh_dstscut_eta_minv,"fh_dstscut_eta_minv");
-   CreateMinvHisto(fh_dsts2cut_eta_minv,"fh_dsts2cut_eta_minv");
+   fh_rec_eta_minv = CreateMinvHisto("fh_rec_eta_minv");
+   fh_chi_prim_eta_minv = CreateMinvHisto("fh_chi_prim_eta_minv");
+   fh_el_id_eta_minv = CreateMinvHisto("fh_el_id_eta_minv");
+   fh_ptcut_eta_minv = CreateMinvHisto("fh_ptcut_eta_minv");
+   fh_anglecut_eta_minv = CreateMinvHisto("fh_anglecut_eta_minv");
+   fh_gammacut_eta_minv = CreateMinvHisto("fh_gammacut_eta_minv");
+   fh_ttcut_eta_minv = CreateMinvHisto("fh_ttcut_eta_minv");
+   fh_stcut_eta_minv = CreateMinvHisto("fh_stcut_eta_minv");
+   fh_apmcut_eta_minv = CreateMinvHisto("fh_apmcut_eta_minv");
+   fh_dstscut_eta_minv = CreateMinvHisto("fh_dstscut_eta_minv");
+   fh_dsts2cut_eta_minv = CreateMinvHisto("fh_dsts2cut_eta_minv");
 
    //gamma minv
 //  fh_rec_gamma_minv = new TH1D("fh_rec_gamma_minv","fh_rec_gamma_minv;M_{ee} [GeV/c^{2}];yeild", nofBinsMinv, 0., 2.);
@@ -210,19 +210,19 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
 //  fh_apmcut_gamma_minv = new TH1D("fh_apmcut_gamma_minv","fh_apmcut_gamma_minv;M_{ee} [GeV/c^{2}];yeild",nofBinsMinv, 0., 2.);
 
    //pty distribution of the signal
-   CreatePtYHisto(fh_mc_signal_pty, "fh_mc_signal_pty");
-   CreatePtYHisto(fh_acc_signal_pty, "fh_acc_signal_pty");
-   CreatePtYHisto(fh_reco_signal_pty, "fh_reco_signal_pty");
-   CreatePtYHisto(fh_chi_prim_signal_pty, "fh_chi_prim_signal_pty");
-   CreatePtYHisto(fh_el_id_signal_pty, "fh_el_id_signal_pty");
-   CreatePtYHisto(fh_ptcut_signal_pty, "fh_ptcut_signal_pty");
-   CreatePtYHisto(fh_anglecut_signal_pty, "fh_anglecut_signal_pty");
-   CreatePtYHisto(fh_gammacut_signal_pty, "fh_gammacut_signal_pty");
-   CreatePtYHisto(fh_ttcut_signal_pty, "fh_ttcut_signal_pty");
-   CreatePtYHisto(fh_stcut_signal_pty, "fh_stcut_signal_pty");
-   CreatePtYHisto(fh_apmcut_signal_pty, "fh_apmcut_signal_pty");
-   CreatePtYHisto(fh_dstscut_signal_pty, "fh_dstscut_signal_pty");
-   CreatePtYHisto(fh_dsts2cut_signal_pty, "fh_dsts2cut_signal_pty");
+   fh_mc_signal_pty = CreatePtYHisto("fh_mc_signal_pty");
+   fh_acc_signal_pty = CreatePtYHisto("fh_acc_signal_pty");
+   fh_reco_signal_pty = CreatePtYHisto("fh_reco_signal_pty");
+   fh_chi_prim_signal_pty = CreatePtYHisto("fh_chi_prim_signal_pty");
+   fh_el_id_signal_pty = CreatePtYHisto("fh_el_id_signal_pty");
+   fh_ptcut_signal_pty = CreatePtYHisto("fh_ptcut_signal_pty");
+   fh_anglecut_signal_pty = CreatePtYHisto("fh_anglecut_signal_pty");
+   fh_gammacut_signal_pty = CreatePtYHisto("fh_gammacut_signal_pty");
+   fh_ttcut_signal_pty = CreatePtYHisto("fh_ttcut_signal_pty");
+   fh_stcut_signal_pty = CreatePtYHisto("fh_stcut_signal_pty");
+   fh_apmcut_signal_pty = CreatePtYHisto("fh_apmcut_signal_pty");
+   fh_dstscut_signal_pty = CreatePtYHisto("fh_dstscut_signal_pty");
+   fh_dsts2cut_signal_pty = CreatePtYHisto("fh_dsts2cut_signal_pty");
 
    // analysis cut distributions
    fh_angle_signal = new TH1D("fh_angle_signal","fh_angle_signal;#Theta_{1,2} [deg];Yield", 160, 0., 80.);
@@ -237,18 +237,18 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
    fHistoList.push_back(fh_mom_signal);
    fh_mom_bg = new TH1D("fh_mom_bg","fh_mom_bg;p [GeV/c];Yield",200, 0., 10.);
    fHistoList.push_back(fh_mom_bg);
-   fh_chi2_prim_signal = new TH1D("fh_chi2_prim_signal", "fh_chi2_prim_signal;#chi^{2}_prim;Yield", 200, 0., 20.);
+   fh_chi2_prim_signal = new TH1D("fh_chi2_prim_signal", "fh_chi2_prim_signal;#chi^{2}_{prim};Yield", 200, 0., 20.);
    fHistoList.push_back(fh_chi2_prim_signal);
-   fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;#chi^{2}_prim;Yield", 200, 0., 20.);
+   fh_chi2_prim_bg = new TH1D("fh_chi2_prim_bg","fh_chi2_prim_bg;#chi^{2}_{prim};Yield", 200, 0., 20.);
    fHistoList.push_back(fh_chi2_prim_bg);
    fh_chi2sts_signal = new TH1D("fh_chi2sts_signal", "fh_chi2sts_signal;#chi^{2};Yield", 200, 0., 20.);
    fHistoList.push_back(fh_chi2sts_signal);
    fh_chi2sts_bg = new TH1D("fh_chi2sts_bg","fh_chi2sts_bg;#chi^{2};Yield", 200, 0., 20.);
    fHistoList.push_back(fh_chi2sts_bg);
    // TT cut
-   fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{+}} p_{e^{-}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
+   fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{+}} p_{e^{-}}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
    fHistoList.push_back(fh_ttcut_signal);
-   fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{+}} p_{e^{-}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
+   fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{+}} p_{e^{-}}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
    fHistoList.push_back(fh_ttcut_bg);
    fh_ttcut_pi0 = new TH2D("fh_ttcut_pi0","fh_ttcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
    fHistoList.push_back(fh_ttcut_pi0);

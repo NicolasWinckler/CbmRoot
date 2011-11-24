@@ -29,23 +29,28 @@ public:
     virtual ~CbmAnaDielectronTaskDraw(){;}
 
     /**
-     *  Implement functionality of drawing histograms in the macro
+     * Implement functionality of drawing histograms in the macro
      * from the specified file, this function should be called from macro.
      * \param fileName Name of the file
-     * \param draw histograms related to the MVD detector?
+     * \param useMvd draw histograms related to the MVD detector?
      **/
     void DrawHistosFromFile(
           const string& fileName,
-          Bool_t useMvd);
+          Bool_t useMvd = true,
+          Bool_t drawSig = true,
+          Bool_t drawCumProb = true);
 
 private:
     Bool_t fUseMvd; // do you want to draw histograms related to the MVD detector?
+    Bool_t fDrawSignificance; // do you want to draw significance histograms of 1D cuts?
+    Bool_t fDrawCumProb; // do you want to draw cumulative probability histograms of 1D cuts?
+
     string fFileName; // path to file with histograms
     TFile* fFile; // TFile with histograms
-    map<string, TH1*> fHistoMap; // map which connects histogram name and pointer to the histogram
+    map<string, TH1*> fHistoMap; // map which connects histogram's name and pointer to the histogram
 
     /**
-     * Read all histogramms from file to map fHistoMap.
+     * Read all histograms from file to map fHistoMap.
      */
     void ReadAllHistosToMap(
           TFile* file);

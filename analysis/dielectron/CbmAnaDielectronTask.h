@@ -93,16 +93,13 @@ public:
     virtual void Exec(
           Option_t *option);
     
-    void CreateMinvHisto(
-          TH1D* h,
+    TH1D* CreateMinvHisto(
           const string& name);
 
-    void CreateSignalMomHisto(
-          TH1D* h,
+    TH1D* CreateSignalMomHisto(
           const string& name);
 
-    void CreatePtYHisto(
-          TH2D* h,
+    TH2D* CreatePtYHisto(
           const string& name);
 
     KinematicParams CalculateKinematicParams(

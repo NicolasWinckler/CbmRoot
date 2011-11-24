@@ -72,7 +72,7 @@ InitStatus CbmRichFindRings::Init()
   if (NULL == fRichHitArray) { Fatal("CbmRichFindRings::Init","No Rich Hit array!"); }
 
   fProjArray = (TClonesArray*) ioman->GetObject("RichProjection");
-  if (NULL == fProjArray) { Fatal("CbmRichFindRings::Init","No Rich Ring Array of projected tracks!"); }
+  //if (NULL == fProjArray) { Fatal("CbmRichFindRings::Init","No Rich Ring Array of projected tracks!"); }
 
   fRingArray = new TClonesArray("CbmRichRing",100);
   ioman->Register("RichRing", "RICH", fRingArray, kTRUE);

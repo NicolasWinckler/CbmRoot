@@ -121,7 +121,7 @@ InitStatus CbmRichHitProducer::Init()
    TArrayD *fdetA=det->getParameters(); // get other geometry parameters: width in x, width in y, thickness
    fDetWidthX = fdetA->At(0);
    fDetWidthY = fdetA->At(1);
-   for(Int_t i=0;i<fdetA->GetSize();i++) cout << "Array detector " << fdetA->At(i)<< endl;
+   for(Int_t i = 0; i < fdetA->GetSize(); i++) cout << "Array detector " << fdetA->At(i)<< endl;
    FairGeoRotation fdetR=detTr->getRotMatrix();
    // detector might be rotated by theta around x-axis:
    if (fVerbose) {
@@ -141,11 +141,11 @@ InitStatus CbmRichHitProducer::Init()
    // fdetR(8) = cos(theta)cos(phi)
 
 
-   theta = TMath::ASin(fdetR(7)); // tilting angle around x-axis
-   phi = -1.*TMath::ASin(fdetR(2)); // tilting angle around y-axis
+   fTheta = TMath::ASin(fdetR(7)); // tilting angle around x-axis
+   fPhi = -1.*TMath::ASin(fdetR(2)); // tilting angle around y-axis
 
-   if (fVerbose) cout << "Rich Photodetector was tilted around x by " << theta*180./TMath::Pi() << " degrees" << endl;
-   if (fVerbose) cout << "Rich Photodetector was tilted around y by " << phi*180./TMath::Pi() << " degrees" << endl;
+   if (fVerbose) cout << "Rich Photodetector was tilted around x by " << fTheta*180./TMath::Pi() << " degrees" << endl;
+   if (fVerbose) cout << "Rich Photodetector was tilted around y by " << fPhi*180./TMath::Pi() << " degrees" << endl;
 
    // get refractive index of gas
    FairGeoNode *gas= dynamic_cast<FairGeoNode*> (fPassNodes->FindObject("rich1gas1"));
@@ -171,13 +171,13 @@ InitStatus CbmRichHitProducer::Init()
    if (fVerbose) cout << " refractive index for lowest photon energies (n-1)*10000  " << (nrefrac-1.0)*10000.0 << endl;
 
    // transform nominal detector position (for tilted photodetector), x>0, y>0:
-   Double_t fDetY_org,fDetX_org;
+   Double_t fDetY_org, fDetX_org;
    fDetZ_org = fDetZ;
    fDetY_org = fDetY;
    fDetX_org = fDetX;
-   fDetX = fDetX_org*TMath::Cos(phi)+fDetZ_org*TMath::Sin(phi);
-   fDetY = -fDetX_org*TMath::Sin(theta)*TMath::Sin(phi) + fDetY_org*TMath::Cos(theta) + fDetZ_org*TMath::Sin(theta)*TMath::Cos(phi);
-   fDetZ = -fDetX_org*TMath::Cos(theta)*TMath::Sin(phi) - fDetY_org*TMath::Sin(theta) + fDetZ_org*TMath::Cos(theta)*TMath::Cos(phi);
+   fDetX = fDetX_org*TMath::Cos(fPhi)+fDetZ_org*TMath::Sin(fPhi);
+   fDetY = -fDetX_org*TMath::Sin(fTheta)*TMath::Sin(fPhi) + fDetY_org*TMath::Cos(fTheta) + fDetZ_org*TMath::Sin(fTheta)*TMath::Cos(fPhi);
+   fDetZ = -fDetX_org*TMath::Cos(fTheta)*TMath::Sin(fPhi) - fDetY_org*TMath::Sin(fTheta) + fDetZ_org*TMath::Cos(fTheta)*TMath::Cos(fPhi);
 
    if (fVerbose > 0) {
       cout << "---------------------- RICH Hit Producer ---------------------------------------" << endl;
@@ -315,37 +315,8 @@ void CbmRichHitProducer::Exec(
 
       TVector3 posPoint;
       pt->Position(posPoint);
-
-      Double_t xDet,yDet,zDet;
-      xDet = posPoint.X();
-
-      // tilt points by
-      // -theta, -phi for x>0, y>0
-      //  theta, -phi for x>0, y<0
-      //  theta,  phi for x<0, y<0
-      // -theta,  phi for x<0, y>0
-      // and shift x position in order to avoid overlap
-      if (posPoint.X() > 0 && posPoint.Y() > 0) {
-         xDet = posPoint.X()*TMath::Cos(phi) + posPoint.Z()*TMath::Sin(phi) - fDetZ_org*TMath::Sin(phi);
-         yDet = -posPoint.X()*TMath::Sin(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Cos(theta) + posPoint.Z()*TMath::Sin(theta)*TMath::Cos(phi);
-         zDet = -posPoint.X()*TMath::Cos(theta)*TMath::Sin(phi) - posPoint.Y()*TMath::Sin(theta) + posPoint.Z()*TMath::Cos(theta)*TMath::Cos(phi);
-      }
-      if (posPoint.X() > 0 && posPoint.Y() < 0) {
-         xDet = posPoint.X()*TMath::Cos(phi) + posPoint.Z()*TMath::Sin(phi) - fDetZ_org*TMath::Sin(phi);
-         yDet = posPoint.X()*TMath::Sin(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Cos(theta) - posPoint.Z()*TMath::Sin(theta)*TMath::Cos(phi);
-         zDet = -posPoint.X()*TMath::Cos(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Sin(theta) + posPoint.Z()*TMath::Cos(theta)*TMath::Cos(phi);
-      }
-      if (posPoint.X() < 0 && posPoint.Y() < 0) {
-         xDet = posPoint.X()*TMath::Cos(phi) - posPoint.Z()*TMath::Sin(phi) + fDetZ_org*TMath::Sin(phi);
-         yDet = -posPoint.X()*TMath::Sin(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Cos(theta) - posPoint.Z()*TMath::Sin(theta)*TMath::Cos(phi);
-         zDet = posPoint.X()*TMath::Cos(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Sin(theta) + posPoint.Z()*TMath::Cos(theta)*TMath::Cos(phi);
-      }
-      if (posPoint.X() < 0 && posPoint.Y() > 0) {
-         xDet = posPoint.X()*TMath::Cos(phi) - posPoint.Z()*TMath::Sin(phi) + fDetZ_org*TMath::Sin(phi);
-         yDet = posPoint.X()*TMath::Sin(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Cos(theta) + posPoint.Z()*TMath::Sin(theta)*TMath::Cos(phi);
-         zDet = posPoint.X()*TMath::Cos(theta)*TMath::Sin(phi) - posPoint.Y()*TMath::Sin(theta) + posPoint.Z()*TMath::Cos(theta)*TMath::Cos(phi);
-      }
-      TVector3 detPoint(xDet,yDet,zDet);
+      TVector3 detPoint;
+      TiltPoint(&posPoint, &detPoint, fPhi, fTheta, fDetZ_org);
 
       if (fVerbose > 1) cout << " position in Labsystem " << posPoint.X() << " " << posPoint.Y() << " " << posPoint.Z() << endl;
       if (fVerbose > 1) cout << " tilted position in Labsystem " << detPoint.X() << " " << detPoint.Y() << " " << detPoint.Z() << endl;
@@ -354,8 +325,8 @@ void CbmRichHitProducer::Exec(
       CbmMCTrack* p = (CbmMCTrack*) fListStack->At(trackID);
       Int_t gcode = TMath::Abs(p->GetPdgCode());
 
-      if ((fVerbose) && ((zDet < (fDetZ-0.25)) || (zDet > (fDetZ+0.25)))) {
-         cout << " z-position not at " << fDetZ << " but " << zDet << endl;
+      if ((fVerbose) && ((detPoint.Z() < (fDetZ-0.25)) || (detPoint.Z() > (fDetZ+0.25)))) {
+         cout << " z-position not at " << fDetZ << " but " << detPoint.Z() << endl;
       }
 
       // hit position as a center of PMT
@@ -456,7 +427,7 @@ void CbmRichHitProducer::Exec(
    // add noise hits
    for(Int_t j = 0; j < fNoise; j++) {
       Double_t rand = gRandom->Rndm();
-      Double_t xRand = (fDetX-fDetZ_org*TMath::Sin(phi))-fDetWidthX + rand*2.*fDetWidthX;
+      Double_t xRand = (fDetX-fDetZ_org*TMath::Sin(fPhi))-fDetWidthX + rand*2.*fDetWidthX;
       rand = gRandom->Rndm();
       if (rand < 0.5 ) xRand = -1.*xRand;
       rand = gRandom->Rndm();
@@ -500,6 +471,44 @@ void CbmRichHitProducer::Exec(
    cout << "nof cross section hits = " << fNofCrossTalkHits << ", per event = " <<
          (Double_t) fNofCrossTalkHits / nevents << endl;
 }
+
+void CbmRichHitProducer::TiltPoint(
+      TVector3 *inPos,
+      TVector3 *outPos,
+      Double_t phi,
+      Double_t theta,
+      Double_t detZOrig,
+      Bool_t noTilting)
+{
+   if (noTilting == false){
+      Double_t xDet,yDet,zDet;
+
+      if (inPos->X() > 0 && inPos->Y() > 0) {
+         xDet = inPos->X()*TMath::Cos(phi) + inPos->Z()*TMath::Sin(phi) - detZOrig*TMath::Sin(phi);
+         yDet = -inPos->X()*TMath::Sin(theta)*TMath::Sin(phi) + inPos->Y()*TMath::Cos(theta) + inPos->Z()*TMath::Sin(theta)*TMath::Cos(phi);
+         zDet = -inPos->X()*TMath::Cos(theta)*TMath::Sin(phi) - inPos->Y()*TMath::Sin(theta) + inPos->Z()*TMath::Cos(theta)*TMath::Cos(phi);
+      }
+      if (inPos->X() > 0 && inPos->Y() < 0) {
+         xDet = inPos->X()*TMath::Cos(phi) + inPos->Z()*TMath::Sin(phi) - detZOrig*TMath::Sin(phi);
+         yDet = inPos->X()*TMath::Sin(theta)*TMath::Sin(phi) + inPos->Y()*TMath::Cos(theta) - inPos->Z()*TMath::Sin(theta)*TMath::Cos(phi);
+         zDet = -inPos->X()*TMath::Cos(theta)*TMath::Sin(phi) + inPos->Y()*TMath::Sin(theta) + inPos->Z()*TMath::Cos(theta)*TMath::Cos(phi);
+      }
+      if (inPos->X() < 0 && inPos->Y() < 0) {
+         xDet = inPos->X()*TMath::Cos(phi) - inPos->Z()*TMath::Sin(phi) + detZOrig*TMath::Sin(phi);
+         yDet = -inPos->X()*TMath::Sin(theta)*TMath::Sin(phi) + inPos->Y()*TMath::Cos(theta) - inPos->Z()*TMath::Sin(theta)*TMath::Cos(phi);
+         zDet = inPos->X()*TMath::Cos(theta)*TMath::Sin(phi) + inPos->Y()*TMath::Sin(theta) + inPos->Z()*TMath::Cos(theta)*TMath::Cos(phi);
+      }
+      if (inPos->X() < 0 && inPos->Y() > 0) {
+         xDet = inPos->X()*TMath::Cos(phi) - inPos->Z()*TMath::Sin(phi) + detZOrig*TMath::Sin(phi);
+         yDet = inPos->X()*TMath::Sin(theta)*TMath::Sin(phi) + inPos->Y()*TMath::Cos(theta) + inPos->Z()*TMath::Sin(theta)*TMath::Cos(phi);
+         zDet = inPos->X()*TMath::Cos(theta)*TMath::Sin(phi) - inPos->Y()*TMath::Sin(theta) + inPos->Z()*TMath::Cos(theta)*TMath::Cos(phi);
+      }
+      outPos->SetXYZ(xDet,yDet,zDet);
+   } else {
+      outPos->SetXYZ(inPos->X(), inPos->Y(), inPos->Z());
+   }
+}
+
 
 void CbmRichHitProducer::AddHit(
       TVector3 &posHit,
@@ -597,7 +606,6 @@ void CbmRichHitProducer::AddCrossTalkHits(
 
       AddHit(posHit, posHitErr, RichDetID, pmtID, ampl, pointInd);
       fNofCrossTalkHits++;
-      //cout << "(" << x << " " << y << ") (" << xHit << " " << yHit << ")" << endl;
    }
 }
 

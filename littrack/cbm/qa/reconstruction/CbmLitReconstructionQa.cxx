@@ -6,8 +6,7 @@
 
 #include "qa/reconstruction/CbmLitReconstructionQa.h"
 #include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
-#include "qa/reconstruction/CbmLitQaLatexGenerator.h"
-#include "qa/reconstruction/CbmLitQaHTMLGeneratorStudy.h"
+#include "qa/report/study/CbmLitQaReconstructionReportStudy.h"
 #include <fstream>
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
@@ -155,27 +154,25 @@ void CbmLitReconstructionQa::SetUseConsecutivePointsInSts(Bool_t useConsecutiveP
    fImpl->SetUseConsecutivePointsInSts(useConsecutivePointsInSts);
 }
 
-void CbmLitReconstructionQa::PrintLatexTable(
-      const std::vector<std::string>& files)
+void CbmLitReconstructionQa::CreateReport(
+      const string& type,
+      const string& title,
+      const vector<string>& results,
+      const vector<string>& names)
 {
-   CbmLitQaLatexGenerator::PrintLatexTable(files);
-}
+   CbmLitQaReconstructionReportStudy report(type);
+   report.SetIsElectronSetup(IsElectronSetup());
+   report.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
+   report.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
+   report.SetDetectorPresence(kRICH, GetDetectorPresence(kRICH));
+   report.SetDetectorPresence(kTRD, GetDetectorPresence(kTRD));
+   report.SetDetectorPresence(kMUCH, GetDetectorPresence(kMUCH));
+   report.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
 
-void CbmLitReconstructionQa::CreateStudyHTML(
-      const std::string& title,
-      const std::vector<std::string>& results,
-      const std::vector<std::string>& names)
-{
-   CbmLitQaHTMLGeneratorStudy html;
-   html.SetIsElectronSetup(IsElectronSetup());
-   html.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
-   html.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
-   html.SetDetectorPresence(kRICH, GetDetectorPresence(kRICH));
-   html.SetDetectorPresence(kTRD, GetDetectorPresence(kTRD));
-   html.SetDetectorPresence(kMUCH, GetDetectorPresence(kMUCH));
-   html.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
-   std::ofstream foutHtml(std::string(fImpl->GetOutputDir() + "/rec_qa_study.html").c_str());
-   html.Create(foutHtml, title, results, names);
+   string fileType = ".tex";
+   if (type == "html") fileType = ".html";
+   ofstream fout(string(fImpl->GetOutputDir() + "/rec_qa_study"+fileType).c_str());
+   report.CreateReport(fout, title, results, names);
 }
 
 ClassImp(CbmLitReconstructionQa);

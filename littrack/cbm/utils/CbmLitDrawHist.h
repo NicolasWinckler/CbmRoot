@@ -53,16 +53,16 @@ void SetStyles();
  */
 void DrawHist1D(
    TH1* hist,
-   const std::string& titleX,
-   const std::string& titleY,
-   Int_t color,
-   Int_t lineWidth,
-   Int_t lineStyle,
-   Int_t markerSize,
-   Int_t markerStyle,
-   LitScale logx,
-   LitScale logy,
-   const std::string& drawOpt);
+   const std::string& titleX = "",
+   const std::string& titleY = "",
+   Int_t color = kBlack,
+   Int_t lineWidth = LIT_LINE_WIDTH,
+   Int_t lineStyle = LIT_LINE_STYLE1,
+   Int_t markerSize = LIT_MARKER_SIZE,
+   Int_t markerStyle = LIT_MARKER_STYLE1,
+   LitScale logx = kLitLinearScale,
+   LitScale logy = kLitLinearScale,
+   const std::string& drawOpt = "");
 
 
 

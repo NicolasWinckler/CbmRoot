@@ -109,17 +109,24 @@ If(Boost_FOUND)
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/reconstruction/CbmLitReconstructionQaImpl.cxx
       cbm/qa/reconstruction/CbmLitReconstructionQaChecker.cxx
-      cbm/qa/reconstruction/CbmLitQaBaseGenerator.cxx
-      cbm/qa/reconstruction/CbmLitQaPrintGenerator.cxx
-      cbm/qa/reconstruction/CbmLitQaHTMLGenerator.cxx
-      cbm/qa/reconstruction/CbmLitQaLatexGenerator.cxx
-      cbm/qa/reconstruction/CbmLitQaHTMLGeneratorStudy.cxx
       cbm/qa/reconstruction/CbmLitQaHistCreator.cxx      
       cbm/qa/reconstruction/CbmLitQaDraw.cxx    
       cbm/qa/reconstruction/CbmLitQaPTreeCreator.cxx       
       cbm/qa/reconstruction/CbmLitQaHistNames.cxx          
-      cbm/qa/field/CbmLitFieldQaHTMLGenerator.cxx
-      cbm/qa/field/CbmLitFieldQa.cxx
+#      cbm/qa/field/CbmLitFieldQaHTMLGenerator.cxx
+      cbm/qa/field/CbmLitFieldQa.cxx      
+      cbm/qa/report/study/CbmLitQaBaseReportStudy.cxx
+      cbm/qa/report/study/CbmLitQaHtmlReportElementStudy.cxx
+      cbm/qa/report/study/CbmLitQaLatexReportElementStudy.cxx      
+      cbm/qa/report/study/CbmLitQaReconstructionReportStudy.cxx            
+#    cbm/qa/report/simulation/CbmLitQaHtmlGenerator.cxx
+       cbm/qa/report/simulation/CbmLitQaBaseReport.cxx
+       cbm/qa/report/simulation/CbmLitQaTxtReportElement.cxx
+       cbm/qa/report/simulation/CbmLitQaHtmlReportElement.cxx       
+       cbm/qa/report/simulation/CbmLitQaLatexReportElement.cxx              
+       cbm/qa/report/simulation/CbmLitQaReconstructionReport.cxx      
+      
+
      )  
 EndIf(Boost_FOUND)
 

@@ -7,8 +7,7 @@
  * Implementation of global track reconstruction QA.
  **/
 #include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
-#include "qa/reconstruction/CbmLitQaPrintGenerator.h"
-#include "qa/reconstruction/CbmLitQaHTMLGenerator.h"
+#include "qa/report/simulation/CbmLitQaReconstructionReport.h"
 #include "qa/reconstruction/CbmLitReconstructionQaChecker.h"
 #include "qa/CbmLitHistManager.h"
 #include "qa/reconstruction/CbmLitQaHistCreator.h"
@@ -196,7 +195,7 @@ void CbmLitReconstructionQaImpl::Exec(
    ptc->fMaxAngle = fMaxAngle;
    ptc->fNofBinsAngle = fNofBinsAngle;
    boost::property_tree::ptree pt = ptc->PrintPTree();
-   CbmLitQaPrintGenerator::PrintEventStatistics(std::cout, &pt);
+   //CbmLitQaPrintGenerator::PrintEventStatistics(std::cout, &pt);
 }
 
 void CbmLitReconstructionQaImpl::Finish()
@@ -1634,7 +1633,9 @@ void CbmLitReconstructionQaImpl::Draw()
    ptc->fNofBinsAngle = fNofBinsAngle;
    boost::property_tree::ptree qa = ptc->PrintPTree();
 
-   CbmLitQaPrintGenerator::PrintFinalStatistics(cout, &qa);
+
+   CbmLitQaReconstructionReport report("txt");
+   report.CreateReport(cout, &qa);
 
    boost::property_tree::ptree ideal, check;
    std::string qaIdealFile = std::string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
@@ -1645,12 +1646,17 @@ void CbmLitReconstructionQaImpl::Draw()
    if (fOutputDir != "") write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
 
    if (fOutputDir != ""){
-      std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
-      CbmLitQaPrintGenerator::PrintFinalStatistics(fout, &qa);
+      ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
+      CbmLitQaReconstructionReport reportHtml("html");
+      reportHtml.CreateReport(foutHtml, &qa);
+
+      ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
+      CbmLitQaReconstructionReport reportLatex("latex");
+      reportLatex.CreateReport(foutLatex, &qa);
    }
 
    if (fOutputDir != ""){
-      CbmLitQaHTMLGenerator html;
+      /*CbmLitQaHTMLGenerator html;
       html.SetIsElectronSetup(fIsElectronSetup);
       html.SetDetectorPresence(kMVD, fIsMvd);
       html.SetDetectorPresence(kSTS, fIsSts);
@@ -1660,7 +1666,7 @@ void CbmLitReconstructionQaImpl::Draw()
       html.SetDetectorPresence(kTOF, fIsTof);
 
       std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-      html.Create(foutHtml, &qa, &ideal, &check);
+      html.Create(foutHtml, &qa, &ideal, &check);*/
    }
 }
 

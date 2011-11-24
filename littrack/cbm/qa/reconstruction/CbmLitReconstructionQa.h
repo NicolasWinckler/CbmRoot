@@ -16,6 +16,8 @@
 
 class CbmLitReconstructionQaImpl;
 
+using namespace std;
+
 class CbmLitReconstructionQa : public FairTask
 {
 public:
@@ -134,13 +136,11 @@ public:
     */
    void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts);
 
-   static void PrintLatexTable(
-         const std::vector<std::string>& files);
-
-   void CreateStudyHTML(
-         const std::string& title,
-         const std::vector<std::string>& results,
-         const std::vector<std::string>& names);
+   void CreateReport(
+         const string& type,
+         const string& title,
+         const vector<string>& results,
+         const vector<string>& names);
 
 private:
    /* Derived from FairTask. Executed after all events are processed. */

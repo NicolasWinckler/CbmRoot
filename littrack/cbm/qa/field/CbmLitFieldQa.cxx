@@ -12,7 +12,7 @@
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
 #include "utils/CbmLitDrawHist.h"
-#include "CbmLitFieldQaHTMLGenerator.h"
+//#include "CbmLitFieldQaHTMLGenerator.h"
 
 #include "../../../parallel/LitField.h"
 
@@ -684,10 +684,10 @@ void CbmLitFieldQa::CreatePropertyTree()
 
    // Create HTML page
    // TODO: implement ideal and check property trees
-   boost::property_tree::ptree ideal, check;
+   /*boost::property_tree::ptree ideal, check;
    CbmLitFieldQaHTMLGenerator html;
    std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-   html.Create(foutHtml, &qa, &ideal, &check);
+   html.Create(foutHtml, &qa, &ideal, &check);*/
 }
 
 

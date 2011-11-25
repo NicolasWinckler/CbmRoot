@@ -20,6 +20,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
+${CBMROOT_SOURCE_DIR}/littrack
 #/u/slebedev/Baykal/tbb21_017oss/include
 #/u/andrey/soft/tbb/tbb22_009oss/include
 )

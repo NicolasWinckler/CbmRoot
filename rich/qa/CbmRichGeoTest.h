@@ -89,28 +89,24 @@ private:
 
 	vector<TH1D*> fhNofHits; // number of hits per ring
 	// ellipse fitting parameters
-	vector<TH1D*> fhAaxis; // major axis (A)
-	vector<TH1D*> fhBaxis; // minor axis (B)
+	vector<TH2D*> fhAaxisVsMom; // major axis (A) vs. MC momentum
+	vector<TH2D*> fhBaxisVsMom; // minor axis (B) vs. MC momentum
 	vector<TH1D*> fhBoverA; // B/A distribution
 	vector<TH2D*> fhXcYcEllipse; // (Xc, Yc) of ellipse center
    // circle fitting parameters
 	vector<TH2D*> fhXcYcCircle; // (Xc, Yc) of circle center
-	vector<TH1D*> fhRadius; // circle radius
-   // A, B, radius vs. MC momentum
-	vector<TH2D*> fhBaxisVsMom;
-	vector<TH2D*> fhAaxisVsMom;
-	vector<TH2D*> fhRadiusVsMom;
+	vector<TH2D*> fhRadiusVsMom; // circle radius vs. MC momentum
 	
 	// Difference between Mc Points and Hits fit
    // ellipse fitting parameters
-   TH1D* fhDiffAaxis; // major axis (A)
-   TH1D* fhDiffBaxis; // minor axis (B)
-   TH1D* fhDiffXcEllipse; // Xc of ellipse center
-   TH1D* fhDiffYcEllipse; // Yc of ellipse center
+   TH2D* fhDiffAaxis; // major axis (A)
+   TH2D* fhDiffBaxis; // minor axis (B)
+   TH2D* fhDiffXcEllipse; // Xc of ellipse center
+   TH2D* fhDiffYcEllipse; // Yc of ellipse center
    // circle fitting parameters
-   TH1D* fhDiffXcCircle; // Xc of circle center
-   TH1D* fhDiffYcCircle; // Xc of circle center
-   TH1D* fhDiffRadius; // circle radius
+   TH2D* fhDiffXcCircle; // Xc of circle center
+   TH2D* fhDiffYcCircle; // Xc of circle center
+   TH2D* fhDiffRadius; // circle radius
 
    // Hits and points
    TH1D* fhDiffXhit;

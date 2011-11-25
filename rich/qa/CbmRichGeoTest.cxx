@@ -1,3 +1,10 @@
+/**
+ * \file CbmRichGeoTest.cxx
+ *
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
+ **/
+
 #include "CbmRichGeoTest.h"
 #include "FairRootManager.h"
 #include "CbmRichHit.h"
@@ -105,15 +112,6 @@ CbmRichGeoTest::CbmRichGeoTest()
    fHists.push_back(fhNofHitsCircleFitEff);
    fhNofHitsEllipseFitEff = new TH1D("fhNofHitsEllipseFitEff", "fhNofHitsEllipseFitEff;Nof hits in ring;Efficiency [%]", 50, 0., 50.);
    fHists.push_back(fhNofHitsEllipseFitEff);
-}
-
-CbmRichGeoTest::CbmRichGeoTest(
-      const char *name,
-      const char *title,
-      Int_t verbose)
-     :FairTask(name)
-{
-
 }
 
 CbmRichGeoTest::~CbmRichGeoTest()

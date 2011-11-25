@@ -1,4 +1,12 @@
- 
+ /**
+ * \file CbmRichGeoTest.h
+ *
+ * \brief RICH geometry checking and testing.
+ *
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
+ **/
+
 #ifndef CBMRICHGEOTEST_H
 #define CBMRICHGEOTEST_H
 
@@ -16,32 +24,62 @@ class CbmGeoRichPar;
 
 using namespace std;
 
+/**
+ * \class CbmRichGeoTest
+ *
+ * \brief RICH geometry checking and testing.
+ *
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
+ **/
 class CbmRichGeoTest : public FairTask
 {
 
 public:
+   /**
+    * \brief Standard constructor.
+    */
    CbmRichGeoTest();
 
-   CbmRichGeoTest(
-	      const char *name,
-	      const char *title,
-	      Int_t verbose);
-
+   /**
+    * \brief Standard destructor.
+    */
    virtual ~CbmRichGeoTest();
 
+   /**
+    * \brief SetParContainers.
+    */
    void SetParContainers();
 
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual InitStatus Init();
 
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Exec(
 		   Option_t* option);
 
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Finish();
 
 private:
-
+   /**
+    * \brief Loop over all rings in array and fill ring parameters histograms.
+    */
 	void RingParameters();
 	
+   /**
+    * \brief Fit ring using ellipse fitter and fill histograms.
+    * \param[in] histIndex Fitting type index, 0 - hit fitting, 1 - MC points fitting.
+    * \param[in] ring Pointer to CbmRichRing to be fitted and filled in histograms.
+    * \param[in] momentum MC momentum of particle produced ring.
+    * \param[in] x,y X and Y coordinates of MC point (is used only in case of MC points fitting).
+    */
 	void FitAndFillHistEllipse(
 	      Int_t histIndex,
 	      CbmRichRing* ring,
@@ -49,6 +87,13 @@ private:
 	      const vector<Double_t>& x,
 	      const vector<Double_t>& y);
 
+   /**
+    * \brief Fit ring using circle fitter and fill histograms.
+    * \param[in] histIndex Fitting type index, 0 - hit fitting, 1 - MC points fitting.
+    * \param[in] ring Pointer to CbmRichRing to be fitted and filled in histograms.
+    * \param[in] momentum MC momentum of particle produced ring.
+    * \param[in] x,y X and Y coordinates of MC point (is used only in case of MC points fitting).
+    */
    void FitAndFillHistCircle(
          Int_t histIndex,
          CbmRichRing* ring,
@@ -56,14 +101,31 @@ private:
          const vector<Double_t>& x,
          const vector<Double_t>& y);
 
+   /**
+    * \brief Calculate difference between ellipse parameters
+    *  for two fitting using hits and MC points for fit and fill
+    *  corresponding histograms.
+    * \param[in] ring Ring fitted using hits.
+    * \param[in] ringMc Ring fitted using MC points
+    */
    void FillMcVsHitFitEllipse(
          CbmRichRing* ring,
          CbmRichRing* ringMc);
 
+   /**
+    * \brief Calculate difference between circle parameters
+    *  for two fitting using hits and MC points for fit and fill
+    *  corresponding histograms.
+    * \param[in] ring Ring fitted using hits.
+    * \param[in] ringMc Ring fitted using MC points
+    */
    void FillMcVsHitFitCircle(
          CbmRichRing* ring,
          CbmRichRing* ringMc);
 
+   /**
+    * \brief Calculate residuals between hits and Mc points and fill histograms.
+    */
    void HitsAndPoints();
 
 	void Draw();
@@ -119,13 +181,16 @@ private:
    Double_t fMaxBaxis;
    Double_t fMinRadius;
    Double_t fMaxRadius;
-   TH1D* fhNofHitsAll;
-   TH1D* fhNofHitsCircleFit;
-   TH1D* fhNofHitsEllipseFit;
+   TH1D* fhNofHitsAll; // distribution of the number of hits in ring for all
+   TH1D* fhNofHitsCircleFit; // distribution of the number of hits in ring
+                             // for good fitted rings using circle  fitting
+   TH1D* fhNofHitsEllipseFit; // distribution of the number of hits in ring
+                              // for good fitted rings using ellipse  fitting
+
    TH1D* fhNofHitsCircleFitEff;
    TH1D* fhNofHitsEllipseFitEff;
 
-	vector<TH1*> fHists; // store all TH1 pointers of the histogramm
+	vector<TH1*> fHists; // store all TH1 pointers of the histogram
 
 	ClassDef(CbmRichGeoTest,1)
 };

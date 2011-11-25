@@ -377,7 +377,7 @@ void CbmAnaDielectronTaskDraw::DrawPtYDistribution(
       TH2D* h2,
       const string& text)
 {
-   DrawHist2D( h1, "", "", "per event", kLitLinear, kLitLinear, kLitLinear, "COLZ");
+   DrawHist2D( h1, kLitLinear, kLitLinear, kLitLinear, "COLZ");
    DrawEfficiencyOnHist(h1, h2, 0.2, 1.8);
    DrawTextOnHist(text, 0.50, 0.78, 0.70, 0.9);
 }
@@ -425,8 +425,8 @@ void CbmAnaDielectronTaskDraw::DrawPtYEfficiency(
       const string& text)
 {
    TH2D* eff = DivideHisto2D(h1, h2);
-   DrawHist2D(eff, "Rapidity", "p_{t} [GeV/c]", "Efficiency [%]", kLitLinear,
-         kLitLinear, kLitLinear, "COLZ");
+   eff->GetZaxis()->SetTitle("Efficiency [%]");
+   DrawHist2D(eff);
    DrawEfficiencyOnHist(h1, h2, 0.2, 1.8);
    DrawTextOnHist(text, 0.50, 0.78, 0.70, 0.9);
 }
@@ -507,9 +507,7 @@ void CbmAnaDielectronTaskDraw::DrawMomentumEfficiencyAll()
           DivideHisto1D(H1("fh_ptcut_signal_mom"), H1("fh_mc_signal_mom")),
           DivideHisto1D(H1("fh_anglecut_signal_mom"), H1("fh_mc_signal_mom")),
           DivideHisto1D(H1("fh_apmcut_signal_mom"), H1("fh_mc_signal_mom")),
-          false,
-          "p [GeV/c]",
-          "Efficiency [%]"
+          false
     );
 }
 
@@ -518,8 +516,7 @@ void CbmAnaDielectronTaskDraw::DrawMotherPdg()
 {
    TCanvas *c6 = new TCanvas("mother_pdg", "mother_pdg", 500, 500);
    DrawHist1D(H1("fh_mc_mother_pdg"), H1("fh_acc_mother_pdg"), NULL, NULL,
-      "", "pdg", "Yield", "MC", "acc", "", "", kLitLinear, kLitLog,
-      true, 0.7, 0.7, 0.99, 0.99);
+         "MC", "acc", "", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
@@ -537,8 +534,7 @@ void CbmAnaDielectronTaskDraw::Draw1DCutsForSandBg(
    bg->SetLineWidth(2);
    s->Scale(scaleSig);
    bg->Scale(scaleBg);
-   DrawHist1D(s,bg,NULL,NULL,"","","", "S","BG","","",kLitLinear,kLitLog,
-         true,0.7,0.7,0.99,0.99);
+   DrawHist1D(s, bg, NULL, NULL, "S", "BG", "", "", kLitLinear, kLitLog, true,0.7,0.7,0.99,0.99);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
@@ -554,7 +550,7 @@ void CbmAnaDielectronTaskDraw::Draw1DSignificance(
    significance->SetLineWidth(2);
    significance->GetXaxis()->SetTitle(s->GetXaxis()->GetTitle());
 
-   DrawHist1D(significance, "", "Significance");
+   DrawHist1D(significance);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
@@ -632,7 +628,7 @@ void CbmAnaDielectronTaskDraw::DrawSourcesBgPairs(
    h->SetMarkerColor(0);
    h->SetMarkerSize(3);
    h->Scale(100. / h->Integral());
-   DrawHist2D(h, "", "" , "", kLitLinear, kLitLinear, kLitLinear, "text COLZ");
+   DrawHist2D(h, kLitLinear, kLitLinear, kLitLinear, "text COLZ");
    h->GetXaxis()->SetLabelSize(0.1);
    h->GetYaxis()->SetLabelSize(0.1);
    DrawTextOnHist(text, 0.50, 0.90, 0.70, 0.99);
@@ -782,11 +778,11 @@ void CbmAnaDielectronTaskDraw::DrawGammaVertex()
    TCanvas *c8 = new TCanvas("gamma_vertex","gamma_vertex", 1200, 400);
    c8->Divide(3,1);
    c8->cd(1);
-   DrawHist2D(H2("fh_mc_vertex_gamma_xz"), "X [cm]", "Z [cm]", "");
+   DrawHist2D(H2("fh_mc_vertex_gamma_xz"));
    c8->cd(2);
-   DrawHist2D(H2("fh_mc_vertex_gamma_yz"), "Y [cm]", "Z [cm]", "");
+   DrawHist2D(H2("fh_mc_vertex_gamma_yz"));
    c8->cd(3);
-   DrawHist2D(H2("fh_mc_vertex_gamma_xy"), "X [cm]", "Y [cm]", "");
+   DrawHist2D(H2("fh_mc_vertex_gamma_xy"));
 }
 
 //Draw Dsts cut distribution for the first and the second MVD stations
@@ -841,87 +837,85 @@ void CbmAnaDielectronTaskDraw::Draw1DHistoAfterEachCut(
       TH1D* pt,
       TH1D* angle,
       TH1D* apm,
-      Bool_t logy,
-      const string& titleX,
-      const string& titleY)
+      Bool_t logy)
 {
    string drOpt = "";
    Double_t min = 9999999999.;
    TH1D* firstHisto = NULL;
    if (mc != NULL){
-      DrawHist1D( mc, titleX, titleY, kLitLinear, kLitLinear, drOpt, kGreen+3);
+      DrawHist1D( mc, kLitLinear, kLitLinear, drOpt, kGreen+3);
       drOpt = "same";// if the hist is drawn, next histos must be drawn with "same" parameter
       if (firstHisto == NULL) firstHisto = mc;
       if (min > mc->GetMinimum()) { min = mc->GetMinimum(); }
    }
    if (acc != NULL){
-      DrawHist1D( acc, titleX, titleY, kLitLinear, kLitLinear, drOpt, kOrange+3);
+      DrawHist1D( acc, kLitLinear, kLitLinear, drOpt, kOrange+3);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = acc;
       if (min > acc->GetMinimum()) { min = acc->GetMinimum(); }
    }
    if (rec != NULL){
-      DrawHist1D( rec, titleX, titleY, kLitLinear, kLitLinear, drOpt, kBlack);
+      DrawHist1D( rec, kLitLinear, kLitLinear, drOpt, kBlack);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = rec;
       if (min > rec->GetMinimum()) { min = rec->GetMinimum(); }
    }
    if (chi_prim != NULL){
-      DrawHist1D( chi_prim, titleX, titleY, kLitLinear, kLitLinear, drOpt, kOrange+7);
+      DrawHist1D( chi_prim, kLitLinear, kLitLinear, drOpt, kOrange+7);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = chi_prim;
       if (min > chi_prim->GetMinimum()) { min = chi_prim->GetMinimum(); }
    }
    if (elid != NULL){
-      DrawHist1D( elid, titleX, titleY, kLitLinear, kLitLinear, drOpt, kRed);
+      DrawHist1D( elid, kLitLinear, kLitLinear, drOpt, kRed);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = elid;
       if (min > elid->GetMinimum()) { min = elid->GetMinimum(); }
    }
    if (gamma != NULL){
-      DrawHist1D( gamma,titleX, titleY, kLitLinear, kLitLinear, drOpt, kPink-6);
+      DrawHist1D( gamma, kLitLinear, kLitLinear, drOpt, kPink-6);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = gamma;
       if (min > gamma->GetMinimum()) { min = gamma->GetMinimum(); }
    }
    if (dsts != NULL && fUseMvd){
-      DrawHist1D( dsts, titleX, titleY, kLitLinear, kLitLinear, drOpt, kGreen);
+      DrawHist1D( dsts, kLitLinear, kLitLinear, drOpt, kGreen);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = dsts;
       if (min > dsts->GetMinimum()) { min = dsts->GetMinimum(); }
    }
    if (dsts2 != NULL && fUseMvd){
-      DrawHist1D( dsts2, titleX, titleY, kLitLinear, kLitLinear, drOpt, kBlack);
+      DrawHist1D( dsts2, kLitLinear, kLitLinear, drOpt, kBlack);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = dsts2;
       if (min > dsts2->GetMinimum()) { min = dsts2->GetMinimum(); }
    }
    if (st != NULL){
-      DrawHist1D( st, titleX, titleY, kLitLinear, kLitLinear, drOpt, kOrange-3);
+      DrawHist1D( st, kLitLinear, kLitLinear, drOpt, kOrange-3);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = st;
       if (min > st->GetMinimum()) { min = st->GetMinimum(); }
    }
    if (tt != NULL){
-      DrawHist1D( tt, titleX, titleY, kLitLinear, kLitLinear, drOpt, kYellow+1);
+      DrawHist1D( tt, kLitLinear, kLitLinear, drOpt, kYellow+1);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = tt;
       if (min > tt->GetMinimum()) { min = tt->GetMinimum(); }
    }
    if (pt != NULL){
-      DrawHist1D( pt, titleX, titleY, kLitLinear, kLitLinear, drOpt, kMagenta);
+      DrawHist1D( pt, kLitLinear, kLitLinear, drOpt, kMagenta);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = pt;
       if (min > pt->GetMinimum()) { min = pt->GetMinimum(); }
    }
    if (angle != NULL){
-      DrawHist1D( angle, titleX, titleY, kLitLinear, kLitLinear, drOpt, kViolet+10);
+      DrawHist1D( angle, kLitLinear, kLitLinear, drOpt, kViolet+10);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = angle;
       if (min > angle->GetMinimum()) { min = angle->GetMinimum(); }
    }
    if (apm != NULL){
-      DrawHist1D( apm, titleX, titleY, kLitLinear, kLitLinear, drOpt, kPink+8);
+      DrawHist1D( apm, kLitLinear, kLitLinear, drOpt, kPink+8);
       drOpt = "same";
       if (firstHisto == NULL) firstHisto = apm;
       if (min > apm->GetMinimum()) { min = apm->GetMinimum(); }
@@ -1004,7 +998,7 @@ void CbmAnaDielectronTaskDraw::DrawMinvBothSandBG(
    sbg->Add(s);
    sbg->SetMinimum(1e-8);
 
-   DrawHist1D(sbg, bg, s, NULL, "","","", "","","","", kLitLinear, kLitLog, false, 0,0,0,0);
+   DrawHist1D(sbg, bg, s, NULL, "","","","", kLitLinear, kLitLog, false, 0,0,0,0);
    s->SetFillColor(kRed);
    s->SetLineColor(kBlack);
    s->SetLineWidth(1);
@@ -1105,20 +1099,19 @@ void CbmAnaDielectronTaskDraw::DrawBGSourceTracks()
    TCanvas *c18 = new TCanvas("nof_tracks_per_event", "nof_tracks_per_event", 1200, 400);
    c18->Divide(3,1);
    c18->cd(1);
-   DrawHist1D( H1("fh_nof_bg_tracks"), "analysis step", "tracks/event",
-         kLitLinear, kLitLog, "hist text0");
+   DrawHist1D( H1("fh_nof_bg_tracks"), kLitLinear, kLitLog, "hist text0");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    c18->cd(2);
-   DrawHist1D( H1("fh_nof_el_tracks"), "analysis step", "tracks/event", kLitLinear, kLitLog);
+   DrawHist1D( H1("fh_nof_el_tracks"), kLitLinear, kLitLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    c18->cd(3);
-   TH1D* purity = new TH1D("purity","purity",7, 0., 7.);
+   TH1D* purity = new TH1D("purity","purity;Analysis steps;Purity",7, 0., 7.);
    purity->Divide(H1("fh_nof_bg_tracks"), H1("fh_nof_el_tracks"));
-   DrawHist1D( purity, "analysis step", "purity", kLitLinear, kLitLog, "hist text0");
+   DrawHist1D( purity, kLitLinear, kLitLog, "hist text0");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
@@ -1143,8 +1136,7 @@ void CbmAnaDielectronTaskDraw::DrawBGSourceTracks()
    }
    source_tracks_clone->SetMarkerColor(kBlack);
    source_tracks_clone->SetMarkerSize(1.8);
-   DrawHist2D(source_tracks_clone, "Analysis step", "Particle" , "",
-         kLitLinear, kLitLinear, kLitLinear, "text COLZ");
+   DrawHist2D(source_tracks_clone, kLitLinear, kLitLinear, kLitLinear, "text COLZ");
 
    Int_t nx = 7;
    H1("fh_nof_bg_tracks")->GetXaxis()->SetLabelSize(0.06);
@@ -1172,17 +1164,17 @@ void CbmAnaDielectronTaskDraw::DrawBgSourcesVsMomentum()
    TCanvas *c21 = new TCanvas("bg_sources_vs_momentum","bg_sources_vs_momentum",900, 600);
    c21->Divide(3,2);
    c21->cd(1);
-   DrawHist1D(H1("fh_gamma_mom"), "", "", kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_gamma_mom"), kLitLinear, kLitLinear);
    c21->cd(2);
-   DrawHist1D(H1("fh_pi0_mom"), "", "", kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_pi0_mom"), kLitLinear, kLitLinear);
    c21->cd(3);
-   DrawHist1D(H1("fh_pions_mom"), "", "", kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_pions_mom"), kLitLinear, kLitLinear);
    c21->cd(4);
-   DrawHist1D(H1("fh_proton_mom"), "", "", kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_proton_mom"), kLitLinear, kLitLinear);
    c21->cd(5);
-   DrawHist1D(H1("fh_kaons_mom"), "", "", kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_kaons_mom"), kLitLinear, kLitLinear);
    c21->cd(6);
-   DrawHist1D(H1("fh_other_mom"), "", "", kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_other_mom"), kLitLinear, kLitLinear);
 }
 
 TH1D* CbmAnaDielectronTaskDraw::CreateCumulativeProbabilityHisto(

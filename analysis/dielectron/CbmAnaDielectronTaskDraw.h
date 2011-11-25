@@ -273,9 +273,7 @@ private:
           TH1D* pt,
           TH1D* angle,
           TH1D* apm,
-          Bool_t logy = false,
-          const string& titleX = "",
-          const string& titleY = "");
+          Bool_t logy = false);
 
     //Draw Invariant mass distributions after each cut
     void DrawInvariantMassAfterEachCut();

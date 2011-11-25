@@ -29,6 +29,7 @@ public:
 
    void CreateEffHist(
          const string& name,
+         const string& xTitle,
          Int_t nofBins,
          Double_t minBin,
          Double_t maxBin,
@@ -40,6 +41,8 @@ public:
 
    void Create1DHist(
          const string& name,
+         const string& xTitle,
+         const string& yTitle,
          Int_t nofBins,
          Double_t minBin,
          Double_t maxBin);

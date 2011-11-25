@@ -1427,6 +1427,7 @@ void CbmLitReconstructionQaImpl::CreateProjections3D(
    const vector<string>& type = CbmLitQaHistNames::GetTypes(opt);
    const vector<string>& cat = CbmLitQaHistNames::GetCategories(opt);
 
+   string yTitle = "Yield";
    for (Int_t i = 0; i < cat.size(); i++) {
       for (Int_t j = 0; j < type.size(); j++){
          TH1D* px = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionX());
@@ -1435,6 +1436,13 @@ void CbmLitReconstructionQaImpl::CreateProjections3D(
          px->SetName(string(hist+"px_"+cat[i]+"_"+type[j]).c_str());
          py->SetName(string(hist+"py_"+cat[i]+"_"+type[j]).c_str());
          pz->SetName(string(hist+"pz_"+cat[i]+"_"+type[j]).c_str());
+
+         // set Y axis titles
+         if (type[j] == "Eff") yTitle = "Efficiency [%]";
+         if (opt == kElid && type[j] == "Eff" && cat[i] == "PiSupp") yTitle = "Pion suppression";
+         px->GetYaxis()->SetTitle(yTitle.c_str());
+         py->GetYaxis()->SetTitle(yTitle.c_str());
+         pz->GetYaxis()->SetTitle(yTitle.c_str());
          fHM->Add(px->GetName(), px);
          fHM->Add(py->GetName(), py);
          fHM->Add(pz->GetName(), pz);
@@ -1463,6 +1471,7 @@ void CbmLitReconstructionQaImpl::DivideHistos(
 
    if (addProjections) CreateProjections3D(hist, opt);
 
+   string yTitle = "Efficiency [%]";
    for (Int_t i = 0; i < cat.size(); i++) {
       Double_t c = 100.;
       Int_t acc = 0;
@@ -1472,6 +1481,7 @@ void CbmLitReconstructionQaImpl::DivideHistos(
          acc = 1;
          rec = 0;
          c = 1.;
+         yTitle = "Pion suppression";
       }
       DivideHistos(H(hist+"_"+cat[i]+"_"+type[rec]), H(hist+"_"+cat[i]+"_"+type[acc]),
             H(hist+"_"+cat[i]+"_"+type[2]), c);
@@ -1483,6 +1493,9 @@ void CbmLitReconstructionQaImpl::DivideHistos(
                H(hist+"py_"+cat[i]+"_"+type[2]), c);
          DivideHistos(H(hist+"pz_"+cat[i]+"_"+type[rec]), H(hist+"pz_"+cat[i]+"_"+type[acc]),
                H(hist+"pz_"+cat[i]+"_"+type[2]), c);
+         H(hist+"px_"+cat[i]+"_"+type[2])->GetYaxis()->SetTitle(yTitle.c_str());
+         H(hist+"py_"+cat[i]+"_"+type[2])->GetYaxis()->SetTitle(yTitle.c_str());
+         H(hist+"pz_"+cat[i]+"_"+type[2])->GetYaxis()->SetTitle(yTitle.c_str());
       }
    }
 }

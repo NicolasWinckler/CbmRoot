@@ -171,8 +171,8 @@ void CbmLitQaDraw::DrawEfficiency(
    canvas->SetGrid();
    canvas->cd();
 
-   string xTitle = "Momentum [GeV/c]";
-   string yTitle = "Efficiency [%]";
+   string legendLabel = "Efficiency";
+
    TH1* h1 = NULL, *h2 = NULL, *h3 = NULL, *h4 = NULL;
 
    if (hist1 != "") h1 = H(hist1+"_Eff");
@@ -209,27 +209,27 @@ void CbmLitQaDraw::DrawEfficiency(
       h1->SetMinimum(0.);
       h1->SetMaximum(100.);
    } else {
-      yTitle = "Pion suppression";
+      legendLabel = "Pion suppression";
    }
 
    if (h1 != NULL && h2 != NULL && h3 != NULL && h4 != NULL) {
-      DrawHist1D(h1, h2, h3, h4, yTitle, xTitle,
-         yTitle, hname1, hname2, hname3, hname4, kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+      DrawHist1D(h1, h2, h3, h4, legendLabel, "",
+         "", hname1, hname2, hname3, hname4, kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3, eff4);
 
    } else if (h1 != NULL && h2 != NULL && h3 != NULL && h4 == NULL) {
-      DrawHist1D(h1, h2, h3, NULL, yTitle, xTitle,
-         yTitle, hname1, hname2, hname3, "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+      DrawHist1D(h1, h2, h3, NULL, legendLabel, "",
+         "", hname1, hname2, hname3, "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3);
 
    } else if (h1 != NULL && h2 != NULL && h3 == NULL && h4 == NULL){
-      DrawHist1D(h1, h2, NULL, NULL, yTitle, xTitle,
-         yTitle, hname1, hname2, "", "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+      DrawHist1D(h1, h2, NULL, NULL, legendLabel, "",
+         "", hname1, hname2, "", "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1, eff2);
 
    } else if (h1 != NULL && h2 == NULL && h3 == NULL && h4 == NULL){
-      DrawHist1D(h1, NULL, NULL, NULL, yTitle, xTitle,
-         yTitle, hname1, "", "", "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+      DrawHist1D(h1, NULL, NULL, NULL, legendLabel, "",
+         "", hname1, "", "", "", kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
       DrawMeanEfficiencyLines(h1, eff1);
    }
 

@@ -50,6 +50,8 @@
 #include "TLatex.h"
 #include "TF1.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -103,10 +105,6 @@ CbmLitPropagationQa::CbmLitPropagationQa():
    fPropagationHistos(),
    fFilterHistos(),
    fSmootherHistos(),
-
-   fNofParams(12),
-
-   fStsHistos(),
 
    fPropagationWatch(),
    fFitterWatch(),
@@ -179,7 +177,7 @@ void CbmLitPropagationQa::Exec(
 void CbmLitPropagationQa::Finish()
 {
    for(Int_t i = 0; i < fNofPlanes; i++) {
-      for(Int_t j = 0; j < fNofParams; j++) {
+      for(Int_t j = 0; j < NOF_PARAMS; j++) {
          fPropagationHistos[i][j]->Write();
          fFilterHistos[i][j]->Write();
          fSmootherHistos[i][j]->Write();
@@ -274,78 +272,49 @@ void CbmLitPropagationQa::CreateHistograms()
    fFilterHistos.resize(fNofPlanes);
    fSmootherHistos.resize(fNofPlanes);
    for(Int_t i = 0; i < fNofPlanes; i++) {
-      fPropagationHistos[i].resize(fNofParams);
-      fFilterHistos[i].resize(fNofParams);
-      fSmootherHistos[i].resize(fNofParams);
+      fPropagationHistos[i].resize(NOF_PARAMS);
+      fFilterHistos[i].resize(NOF_PARAMS);
+      fSmootherHistos[i].resize(NOF_PARAMS);
    }
 
    std::string names[] = { "h_resx", "h_resy", "h_restx", "h_resty", "h_resqp",
                            "h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp",
-                           "h_resp", "h_chisq"
-                         };
+                           "h_resp", "h_chisq"};
 
-   Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
-   Double_t boundL[fNofParams];
-   Double_t boundR[fNofParams];
+   std::string xtitles[] = {"Residual X [cm]", "Residual Y [cm]", "Residual Tx",
+                            "Residual Ty", "Residual q/p [(GeV/c)^{-1}]", "Pull X", "Pull Y", "Pull Tx", "Pull Ty",
+                            "Pull q/p", "Resolution p [%]", "Chi-square"};
+
+   std::vector<Int_t> bins(NOF_PARAMS, 200);
+   std::vector<std::pair<Double_t, Double_t> > bounds;
    if (fIsFixedBounds) {
-      boundL[0] = -10.;
-      boundL[1] = -10.;
-      boundL[2] = -.15;
-      boundL[3] = -.15;
-      boundL[4] = -.1;
-      boundL[5] =-5.;
-      boundL[6] = -5.;
-      boundL[7] = -5.;
-      boundL[8] = -5.;
-      boundL[9] =-7.;
-      boundL[10] =-30.;
-      boundL[11] =-1.;
-      boundR[0] =  10.;
-      boundR[1] = 10.;
-      boundR[2] = .15;
-      boundR[3] = .15;
-      boundR[4] = .1;
-      boundR[5] = 5.;
-      boundR[6] = 5.;
-      boundR[7] = 5.;
-      boundR[8] = 5.;
-      boundR[9] = 7.;
-      boundR[10] = 30.;
-      boundR[11] = 20.;
+      bounds = boost::assign::list_of
+            (std::make_pair(-10., 10.))(std::make_pair(-10., 10.)) // X, Y residuals
+            (std::make_pair(-.15, .15))(std::make_pair(-.15, .15)) // Tx, Ty residuals
+            (std::make_pair(-.1, .1)) // Qp residual
+            (std::make_pair(-5., 5.))(std::make_pair(-5., 5.)) // X, Y pull
+            (std::make_pair(-5., 5.))(std::make_pair(-5., 5.)) // Tx, Ty pull
+            (std::make_pair(-7., 7.)) // Qp pull
+            (std::make_pair(-30., 30.)) // momentum resolution
+            (std::make_pair(-1., 20.)); // chi-square
    } else {
-      for (Int_t i = 0; i < fNofParams; i++) {
-         boundL[i] = 0.;
-         boundR[i] = 0.;
-      }
+      bounds.assign(NOF_PARAMS, std::make_pair(0.,0.));
    }
+
    std::string var[] = {"p", "f", "s"};
    std::string var2[] = {"[propagation]", "[filter]", "[smoother]"};
 
    for (Int_t v = 0; v < 3; v++) {
       for (Int_t i = 0; i < fNofPlanes; i++) {
-         for (Int_t j = 0; j < fNofParams; j++) {
+         for (Int_t j = 0; j < NOF_PARAMS; j++) {
             std::stringstream histName;
             histName << names[j] << "_" << var[v] << "_" << i;
-            TH1F* hist = new TH1F(histName.str().c_str(), histName.str().c_str(),
-                                  bins[j], boundL[j], boundR[j]);
+            TH1F* hist = new TH1F(histName.str().c_str(), std::string(histName.str() + ";" + xtitles[j] + ";Counter").c_str(),
+                                  bins[j], bounds[j].first, bounds[j].second);
             if (v == 0) { fPropagationHistos[i][j] = hist; }
             if (v == 1) { fFilterHistos[i][j] = hist; }
             if (v == 2) { fSmootherHistos[i][j] = hist; }
          }
-      }
-   }
-
-   fStsHistos.resize(2);
-   fStsHistos[0].resize(fNofParams);
-   fStsHistos[1].resize(fNofParams);
-   std::string vr[] = {"stsl","stsf"};
-   for (Int_t v = 0; v < 2; v++) {
-      for (Int_t j = 0; j < fNofParams; j++) {
-         std::stringstream histName;
-         histName << names[j] << "_" << vr[v];
-         TH1F* hist = new TH1F(histName.str().c_str(), histName.str().c_str(),
-                               bins[j], boundL[j], boundR[j]);
-         fStsHistos[v][j] = hist;
       }
    }
 }
@@ -756,8 +725,8 @@ void CbmLitPropagationQa::Draw()
       fSigma[c].resize(fNofPlanes);
       fRms[c].resize(fNofPlanes);
       for (int i = 0; i < fNofPlanes; i++) {
-         fSigma[c][i].resize(fNofParams);
-         fRms[c][i].resize(fNofParams);
+         fSigma[c][i].resize(NOF_PARAMS);
+         fRms[c][i].resize(NOF_PARAMS);
       }
    }
 
@@ -792,12 +761,8 @@ void CbmLitPropagationQa::DrawHistos(
    TCanvas* c[],
    int v)
 {
-   std::string xtitles[] = {"Residual X [cm]", "Residual Y [cm]", "Residual Tx",
-                            "Residual Ty", "Residual q/p [(GeV/c)^{-1}]", "Pull X", "Pull Y", "Pull Tx", "Pull Ty",
-                            "Pull q/p", "Resolution p [%]", "Chi-square"
-                           };
    for (int plane = 0; plane < fNofPlanes; plane++) {
-      for (int i = 0; i < fNofParams; i++) {
+      for (int i = 0; i < NOF_PARAMS; i++) {
          c[plane]->cd(i+1);
          TH1F* hist = NULL;
          if (v == 0) { hist = fPropagationHistos[plane][i]; }
@@ -805,8 +770,6 @@ void CbmLitPropagationQa::DrawHistos(
          if (v == 2) { hist = fSmootherHistos[plane][i]; }
          if (i != 11) { hist->Fit("gaus"); }
          hist->SetMaximum(hist->GetMaximum() * 1.50);
-         hist->GetXaxis()->SetTitle(xtitles[i].c_str());
-         hist->GetYaxis()->SetTitle("Counter");
          DrawHist1D(hist, kLitLinear, kLitLog);
 
          TF1* fit = hist->GetFunction("gaus");
@@ -822,54 +785,6 @@ void CbmLitPropagationQa::DrawHistos(
    }
 }
 
-//void CbmLitPropagationQa::DrawForPhd()
-//{
-//   const Int_t nofHist = 4;
-//   TCanvas* canvas[3];
-//   std::string cnames[] = {"c_phd_propagation_", "c_phd_filter_", "c_phd_smoother_"};
-//   for (int c = 0; c < 3; c++) {
-//      if (c == 0 && !fIsDrawPropagation) { continue; }
-//      if (c == 1 && !fIsDrawFilter) { continue; }
-//      if (c == 2 && !fIsDrawSmoother) { continue; }
-//      std::string name = cnames[c] + lit::ToString<int>(fPlaneNoPhd);
-//      canvas[c] = new TCanvas(name.c_str(),name.c_str(),1600,450);
-//      canvas[c]->Divide(nofHist, 1);
-//   }
-//
-//   if (fIsDrawPropagation) { DrawForPhd(canvas[0], 0); }
-//   if (fIsDrawFilter) { DrawForPhd(canvas[1], 1); }
-//   if (fIsDrawSmoother) { DrawForPhd(canvas[2], 2); }
-//}
-//
-//void CbmLitPropagationQa::DrawForPhd(
-//   TCanvas* canvas,
-//   Int_t v)
-//{
-//   Int_t param[] = {0, 5, 8, 4}; // indecis of the parameters that will be drawn
-//   std::string xtitles[] = {"Residual X [cm]", "Residual Y [cm]", "Residual Tx",
-//                            "Residual Ty", "Residual q/p [(GeV/c)^{-1}]", "Pull X", "Pull Y", "Pull Tx", "Pull Ty",
-//                            "Pull q/p", "Resolution p [%]", "Chi-square"
-//                           };
-//   for (int j = 0; j < 4; j++) {
-//      canvas->cd(j+1);
-//      TH1F* hist = NULL;
-//      if (v == 0) { hist = fPropagationHistos[fPlaneNoPhd][param[j]]; }
-//      if (v == 1) { hist = fFilterHistos[fPlaneNoPhd][param[j]]; }
-//      if (v == 2) { hist = fSmootherHistos[fPlaneNoPhd][param[j]]; }
-//      DrawHist1D(hist, xtitles[param[j]], "Counter",
-//                 LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-//                 LIT_MARKER_STYLE1, false, false, "");
-//
-//      hist->Fit("gaus");
-//      TF1* fit = hist->GetFunction("gaus");
-//      Double_t sigma = fit->GetParameter(2);
-//      Double_t rms = hist->GetRMS();
-//      DrawHistSigmaRMS(j, sigma, rms);
-//   }
-//   lit::SaveCanvasAsImage(canvas, fOutputDir);
-//   if (fIsCloseCanvas) { canvas->Close(); }
-//}
-
 void CbmLitPropagationQa::PrintResults(
    std::ostream& out,
    int v)
@@ -881,7 +796,7 @@ void CbmLitPropagationQa::PrintResults(
    out << "plane     resx             resy           restx             resty           resqp            pullx         pully        pulltx       pullty      pullqp      resmom        chisq" << std::endl;
    for (int i = 0; i < fNofPlanes; i++) {
       out << std::setw(3) << i << " ";
-      for (int j = 0; j < fNofParams; j++) {
+      for (int j = 0; j < NOF_PARAMS; j++) {
          int w = (j < 5)? 7 : 5;
          out << std::setw(w) << fSigma[v][i][j] << "(" << std::setw(w) << fRms[v][i][j] << ") ";
       }

@@ -108,7 +108,7 @@ void CbmLitFitQa::CreateHistograms()
        "Residual Ty", "Residual q/p [(GeV/c)^{-1}]",
        "Pull X", "Pull Y", "Pull Tx", "Pull Ty", "Pull q/p" };
 
-   Int_t nofBins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
+   std::vector<Int_t> bins(NOF_PARAMS, 200);
    std::vector<std::pair<Float_t, Float_t> > bounds;
    if (fIsFixedBounds) {
       bounds = boost::assign::list_of
@@ -125,27 +125,27 @@ void CbmLitFitQa::CreateHistograms()
    for (Int_t j = 0; j < NOF_PARAMS; j++) {
       std::string histName1 = "hStsFirst" + names[j];
       fStsHistosFirst[j] = new TH1F(histName1.c_str(), std::string(histName1 + ";" + xtitles[j] + ";Counter").c_str(),
-            nofBins[j], bounds[j].first, bounds[j].second);
+            bins[j], bounds[j].first, bounds[j].second);
 
       std::string histName2 = "hStsLast" + names[j];
       fStsHistosLast[j] = new TH1F(histName2.c_str(), std::string(histName2 + ";" + xtitles[j] + ";Counter").c_str(),
-            nofBins[j], bounds[j].first, bounds[j].second);
+            bins[j], bounds[j].first, bounds[j].second);
 
       std::string histName3 = "hTrdFirst" + names[j];
       fTrdHistosFirst[j] = new TH1F(histName3.c_str(), std::string(histName3 + ";" + xtitles[j] + ";Counter").c_str(),
-            nofBins[j], bounds[j].first, bounds[j].second);
+            bins[j], bounds[j].first, bounds[j].second);
 
       std::string histName4 = "hTrdLast" + names[j];
       fTrdHistosLast[j] = new TH1F(histName4.c_str(), std::string(histName4 + ";" + xtitles[j] + ";Counter").c_str(),
-            nofBins[j], bounds[j].first, bounds[j].second);
+            bins[j], bounds[j].first, bounds[j].second);
 
       std::string histName5 = "hMuchFirst" + names[j];
       fMuchHistosFirst[j] = new TH1F(histName5.c_str(), std::string(histName5 + ";" + xtitles[j] + ";Counter").c_str(),
-            nofBins[j], bounds[j].first, bounds[j].second);
+            bins[j], bounds[j].first, bounds[j].second);
 
       std::string histName6 = "hMuchLast" + names[j];
       fMuchHistosLast[j] = new TH1F(histName6.c_str(), std::string(histName6 + ";" + xtitles[j] + ";Counter").c_str(),
-            nofBins[j], bounds[j].first, bounds[j].second);
+            bins[j], bounds[j].first, bounds[j].second);
    }
 }
 

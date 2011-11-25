@@ -296,10 +296,7 @@ private:
    std::vector<std::vector<TH1F*> > fPropagationHistos; //for propagation analysis
    std::vector<std::vector<TH1F*> > fFilterHistos; // for fitter analysis
    std::vector<std::vector<TH1F*> > fSmootherHistos; // for smoother analysis
-   Int_t fNofParams; // number of parameters = 12
-
-   // Histograms for first and last STS parameters
-   std::vector<std::vector<TH1F*> > fStsHistos;
+   static const Int_t NOF_PARAMS = 12; // number of parameters = 12
 
    //Time analysis
    TStopwatch fPropagationWatch; // for the propagation

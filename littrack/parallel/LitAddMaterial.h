@@ -188,9 +188,9 @@ inline void LitAddMaterialElectron(
    T thickness = norm * mat.Thickness;
    T radThick = thickness / mat.X0;
    T sqrtRadThick = sqrt(radThick);
-   T logRadThick = log(radThick);//mat.LogRadThick;
+   T logRadThick = log(radThick);
 
-   // no thickness scaling
+   // no material thickness scaling
 // T thickness = mat.Thickness;
 // T radThick = mat.RadThick;
 // T sqrtRadThick = mat.SqrtRadThick;

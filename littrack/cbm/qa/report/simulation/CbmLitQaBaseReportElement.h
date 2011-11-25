@@ -9,7 +9,6 @@
 #ifndef CbmLitQaBaseReportElement_H_
 #define CbmLitQaBaseReportElement_H_
 
-
 #include <vector>
 #include <string>
 #include <boost/property_tree/ptree.hpp>
@@ -19,7 +18,6 @@ using namespace std;
  * \class CbmLitQaBaseReportElement
  *
  * \brief CbmLitQaBaseReportElement.
-
  *
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
@@ -65,7 +63,7 @@ public:
          const string& name) = 0;
 
    /**
-    * \brief Prints table row which contains two column.
+    * \brief Prints table row which contains two columns.
     * \param[in] name1 The first column text.
     * \param[in] name2 The second column text etc.
     * \return string with table row in specific format.
@@ -86,8 +84,9 @@ public:
    virtual string PrintValue(
          const string& hist) = 0;
 
-   /* Prints nof points or hits or tracks or rings etc. statistics to string
-    * @param  */
+   /**
+    * \brief Print number of points or hits or tracks or rings etc. to string.
+    */
    virtual string PrintNofStatistics(
          const string& name,
          const string& mvd,
@@ -98,50 +97,61 @@ public:
          const string& muchS,
          const string& tof) = 0;
 
-   /* Print hits histos statistics (nof all, true, fake hits in track/ring)
-    * \param[in] name string of the first column in the table
-    * \param[in] hist histogram name */
+   /**
+    * \brief Print hits histogram statistics (nof all, true, fake hits in track/ring).
+    * \param[in] name String of the first column in the table.
+    * \param[in] hist Histogram name.
+    */
    virtual string PrintHits(
          const string& name,
          const string& hist) = 0;
 
-   /* Calculates integrated efficiencies and forms string with statistic information.
-    * \param[in] name string of the first column in the table
-    * \param[in] hist histogram name */
+   /**
+    * \brief Calculate integrated efficiencies and forms string with statistic information.
+    * \param[in] name String of the first column in the table.
+    * \param[in] hist Histogram name.
+    */
    virtual string PrintEfficiency(
          const string& name,
          const string& hist) = 0;
 
-   /* Calculates integrated efficiencies and forms string with statistic information for the RICH detector.
-    * \param[in] name string of the first column in the table
-    * \param[in] hist histogram name */
+   /**
+    * \brief Calculate integrated efficiencies and forms string with statistic information for the RICH detector.
+    * \param[in] name String of the first column in the table.
+    * \param[in] hist Histogram name.
+    */
    virtual string PrintEfficiencyRich(
          const string& name,
          const string& hist) = 0;
 
-   /* Print integrated efficiencies and forms string with electron identification statistic information.
-    * \param[in] name string of the first column in the table
-    * \param[in] hist histogram name */
+   /**
+    * \brief Print integrated efficiencies and forms string with electron identification statistic information.
+    * \param[in] name string of the first column in the table.
+    * \param[in] hist histogram name.
+    */
    virtual string PrintEfficiencyElId(
          const string& name,
          const string& hist) = 0;
 
-   /* Print detector acceptance efficiencies.
-    * \param[in] name string of the first column in the table
-    * \param[in] hist histogram name */
+   /**
+    * \brief Print detector acceptance efficiencies.
+    * \param[in] name string of the first column in the table.
+    * \param[in] hist histogram name.
+    */
    virtual string PrintDetAccEl(
          const string& name,
          const string& hist) = 0;
 
-   /* Calculates integrated efficiencies for different polar angles
-    * and returns a string with statistics.
-    * \param[in] name string of the first column in the table
-    * \param[in] hist histogram name */
+   /**
+    * \brief Calculate integrated efficiencies for different polar angles and returns a string with statistics.
+    * \param[in] name string of the first column in the table.
+    * \param[in] hist histogram name.
+    */
    virtual string PrintPolarAngle(
          const string& hist) = 0;
 
    /**
-    * \brief Prints images with reconstruction performance.
+    * \brief Print images with reconstruction performance.
     * \param[in] title Title of the image.
     * \param[in] file Name of the image file.
     * \return string with table which contains images in HTML format.

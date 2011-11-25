@@ -9,10 +9,10 @@
 #ifndef CBMLITQABASEREPORT_H_
 #define CBMLITQABASEREPORT_H_
 
+#include "CbmLitQaBaseReportElement.h"
 #include "CbmDetectorList.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
-#include "CbmLitQaBaseReportElement.h"
 
 using namespace std;
 
@@ -78,7 +78,6 @@ protected:
    virtual void Create(
       ostream& out) = 0;
 
-
    CbmLitQaBaseReportElement* fR;
 
    bool fIsElectronSetup; // If "electron" setup detected than true
@@ -90,7 +89,6 @@ protected:
    bool fIsTof; // If TOF detected than true
 
    string fTitle; // report title
-
 };
 
 #endif /* CBMLITQABASEREPORT_H_ */

@@ -13,13 +13,15 @@
 #include <boost/property_tree/ptree.hpp>
 
 CbmLitQaBaseReport::CbmLitQaBaseReport():
+   fR(NULL),
    fIsElectronSetup(true),
    fIsMvd(true),
    fIsSts(true),
    fIsRich(true),
    fIsTrd(true),
    fIsMuch(true),
-   fIsTof(true)
+   fIsTof(true),
+   fTitle("")
 {
 
 }

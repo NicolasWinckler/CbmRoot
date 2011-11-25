@@ -210,10 +210,12 @@ void CbmMuchSegmentManual::SegmentMuch(){
   }
 
   // Save parameters
+  TFile* oldfile = gFile;
   TFile* f = new TFile(fDigiFileName, "RECREATE");
   fStations->Write("stations",1);
 
   f->Close();
+  gFile=oldfile;
 
   // Draw colored stations
   DrawSegmentation();

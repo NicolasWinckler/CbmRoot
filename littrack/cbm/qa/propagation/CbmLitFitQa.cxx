@@ -23,6 +23,8 @@
 #include "TF1.h"
 #include "TCanvas.h"
 
+#include <boost/assign/list_of.hpp>
+
 CbmLitFitQa::CbmLitFitQa():
    fIsFixedBounds(true)
 {
@@ -101,48 +103,48 @@ void CbmLitFitQa::CreateHistograms()
    std::string names[] = { "ResX", "ResY", "ResTx", "ResTy", "ResQp",
                            "PullX", "PullY", "PullTx", "PullTy", "PullQp" };
 
+   std::string xtitles[] = {
+       "Residual X [cm]", "Residual Y [cm]", "Residual Tx",
+       "Residual Ty", "Residual q/p [(GeV/c)^{-1}]",
+       "Pull X", "Pull Y", "Pull Tx", "Pull Ty", "Pull q/p" };
+
    Int_t nofBins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
-   std::pair<Float_t, Float_t> bounds[NOF_PARAMS];
+   std::vector<std::pair<Float_t, Float_t> > bounds;
    if (fIsFixedBounds) {
-      bounds[0] = std::make_pair(-1., 1.);
-      bounds[1] = std::make_pair(-1., 1.);
-      bounds[2] = std::make_pair(-.01, .01);
-      bounds[3] = std::make_pair(-.01, .01);
-      bounds[4] = std::make_pair(-.1, .1);
-      bounds[5] = std::make_pair(-5., 5.);
-      bounds[6] = std::make_pair(-5., 5.);
-      bounds[7] = std::make_pair(-5., 5.);
-      bounds[8] = std::make_pair(-5., 5.);
-      bounds[9] = std::make_pair(-7., 7.);
+      bounds = boost::assign::list_of
+            (std::make_pair(-1., 1.))(std::make_pair(-1., 1.)) // X, Y residuals
+            (std::make_pair(-.01, .01))(std::make_pair(-.01, .01)) // Tx, Ty residuals
+            (std::make_pair(-.1, .1)) // Qp residual
+            (std::make_pair(-5., 5.))(std::make_pair(-5., 5.)) // X, Y pull
+            (std::make_pair(-5., 5.))(std::make_pair(-5., 5.)) // Tx, Ty pull
+            (std::make_pair(-7., 7.)); // Qp pull
    } else {
-      for (Int_t i = 0; i < NOF_PARAMS; i++) {
-         bounds[i] = std::make_pair(0., 0.);
-      }
+      bounds.assign(NOF_PARAMS, std::make_pair(0.,0.));
    }
 
    for (Int_t j = 0; j < NOF_PARAMS; j++) {
       std::string histName1 = "hStsFirst" + names[j];
-      fStsHistosFirst[j] = new TH1F(histName1.c_str(), histName1.c_str(),
+      fStsHistosFirst[j] = new TH1F(histName1.c_str(), std::string(histName1 + ";" + xtitles[j] + ";Counter").c_str(),
             nofBins[j], bounds[j].first, bounds[j].second);
 
       std::string histName2 = "hStsLast" + names[j];
-      fStsHistosLast[j] = new TH1F(histName2.c_str(), histName2.c_str(),
+      fStsHistosLast[j] = new TH1F(histName2.c_str(), std::string(histName2 + ";" + xtitles[j] + ";Counter").c_str(),
             nofBins[j], bounds[j].first, bounds[j].second);
 
       std::string histName3 = "hTrdFirst" + names[j];
-      fTrdHistosFirst[j] = new TH1F(histName3.c_str(), histName3.c_str(),
+      fTrdHistosFirst[j] = new TH1F(histName3.c_str(), std::string(histName3 + ";" + xtitles[j] + ";Counter").c_str(),
             nofBins[j], bounds[j].first, bounds[j].second);
 
       std::string histName4 = "hTrdLast" + names[j];
-      fTrdHistosLast[j] = new TH1F(histName4.c_str(), histName4.c_str(),
+      fTrdHistosLast[j] = new TH1F(histName4.c_str(), std::string(histName4 + ";" + xtitles[j] + ";Counter").c_str(),
             nofBins[j], bounds[j].first, bounds[j].second);
 
       std::string histName5 = "hMuchFirst" + names[j];
-      fMuchHistosFirst[j] = new TH1F(histName5.c_str(), histName5.c_str(),
+      fMuchHistosFirst[j] = new TH1F(histName5.c_str(), std::string(histName5 + ";" + xtitles[j] + ";Counter").c_str(),
             nofBins[j], bounds[j].first, bounds[j].second);
 
       std::string histName6 = "hMuchLast" + names[j];
-      fMuchHistosLast[j] = new TH1F(histName6.c_str(), histName6.c_str(),
+      fMuchHistosLast[j] = new TH1F(histName6.c_str(), std::string(histName6 + ";" + xtitles[j] + ";Counter").c_str(),
             nofBins[j], bounds[j].first, bounds[j].second);
    }
 }
@@ -318,17 +320,12 @@ void CbmLitFitQa::DrawHistos(
    TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1400, 600);
    canvas->Divide(5, 2);
 
-   std::string xtitles[] = {
-       "Residual X [cm]", "Residual Y [cm]", "Residual Tx",
-       "Residual Ty", "Residual q/p [(GeV/c)^{-1}]",
-       "Pull X", "Pull Y", "Pull Tx", "Pull Ty", "Pull q/p" };
-
    for (int i = 0; i < NOF_PARAMS; i++) {
       canvas->cd(i+1);
       TH1F* hist = histos[i];
       hist->Fit("gaus");
       hist->SetMaximum(hist->GetMaximum() * 1.50);
-      DrawHist1D(hist, xtitles[i], "Counter", kLitLinear, kLitLog);
+      DrawHist1D(hist, "", "", kLitLinear, kLitLog);
 
       TF1* fit = hist->GetFunction("gaus");
       Double_t sigma = 0.;

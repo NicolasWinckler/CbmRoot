@@ -90,10 +90,10 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
    ConvertTracks(ltracks, tracks);
 
    for_each(lhits.begin(), lhits.end(), DeleteObject());
-   lhits.clear();
    for_each(lseeds.begin(), lseeds.end(), DeleteObject());
-   lseeds.clear();
    for_each(ltracks.begin(), ltracks.end(), DeleteObject());
+   lhits.clear();
+   lseeds.clear();
    ltracks.clear();
 
    std::cout << "Event: " << fEventNo++ << std::endl;
@@ -120,16 +120,12 @@ void CbmLitTrackFinderNNParallel::ConvertSeeds(
    for (unsigned int i = 0; i < seeds.size(); i++) {
       CbmLitTrack* track = (CbmLitTrack*) seeds[i];
       const CbmLitTrackParam* par = track->GetParamLast();
-      lit::parallel::LitScalTrack* ltrack = new lit::parallel::LitScalTrack;
+      lit::parallel::LitScalTrack* ltrack = new lit::parallel::LitScalTrack();
 
       lit::parallel::LitTrackParamScal lpar;
       CbmLitTrackParamToLitTrackParamScal(par, &lpar);
       ltrack->SetParamFirst(lpar);
-     // CbmLitTrackParamToLitTrackParamScal(par, &lpar);
       ltrack->SetParamLast(lpar);
-
-//    ltrack->previouseTrackId = std::distance(seeds.begin(), it);
-
       lseeds.push_back(ltrack);
    }
 }

@@ -1,9 +1,9 @@
-/** CbmLitTrackFinderNNParallel.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- **/
+/**
+ * \file CbmLitTrackFinderNNParallel.h
+ * \brief Implementation of the CbmLitTrackFinder interface for the parallel nearest neighbor tracking.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ */
 
 #ifndef CBMLITTRACKFINDERNNPARALLEL_H_
 #define CBMLITTRACKFINDERNNPARALLEL_H_
@@ -17,31 +17,42 @@
 
 #include <vector>
 
-//class LitTrackFinderNNVecMuon;
-//class LitTrackFinderNNScalarElectron;
-//class LitTrackFinderNNVecElectron;
-//class LitScalPixelHit;
-//class LitScalTrack;
-
+/**
+ * \class CbmLitTrackFinderNNParallel
+ * \brief Implementation of the CbmLitTrackFinder interface for the parallel nearest neighbor tracking.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ */
 class CbmLitTrackFinderNNParallel : public CbmLitTrackFinder
 {
 public:
-   /* Constructor */
-   CbmLitTrackFinderNNParallel(const std::string& trackingType);
+   /**
+    * \brief Constructor.
+    */
+   CbmLitTrackFinderNNParallel(
+         const std::string& trackingType);
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackFinderNNParallel();
 
-   /* Inherited from CbmLitTrackFinder */
+   /**
+    * \brief Inherited from CbmLitTrackFinder.
+    */
    virtual LitStatus DoFind(
       HitPtrVector& hits,
       TrackPtrVector& trackSeeds,
       TrackPtrVector& tracks);
 
-   /* Inherited from CbmLitTool */
+   /**
+    * \brief Inherited from CbmLitTool.
+    */
    virtual LitStatus Initialize();
 
-   /* Inherited from CbmLitTool */
+   /**
+    * \brief Inherited from CbmLitTool.
+    */
    virtual LitStatus Finalize();
 
 private:
@@ -57,14 +68,16 @@ private:
       const std::vector<lit::parallel::LitScalTrack*>& ltracks,
       TrackPtrVector& tracks);
 
+   // Parallel NN track finder for muon setup.
    lit::parallel::LitTrackFinderNNVecMuon* fTFParallelMuon;
-
+   // Parallel NN track finder for electron setup.
    lit::parallel::LitTrackFinderNNVecElectron* fTFVecElectron;
 
+   // For time calculation
    double fTime;
-
+   // Event number
    int fEventNo;
-
+   // Type of the parallel tracking to be used
    std::string fTrackingType;
 };
 

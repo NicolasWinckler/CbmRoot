@@ -30,7 +30,7 @@
 #include "selection/CbmLitTrackSelectionMuch.h"
 #include "selection/CbmLitTrackSelectionTrd.h"
 #include "selection/CbmLitTrackSelectionMuchRobust.h"
-#include "cbm/parallel/CbmLitParallelTrackFitterTest.h"
+#include "cbm/parallel/CbmLitParallelTrackFitterTestMuon.h"
 #include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
 #include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 

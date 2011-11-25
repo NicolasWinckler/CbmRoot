@@ -94,7 +94,7 @@ cbm/qa/CbmLitTestMatrixMath.cxx
 cbm/utils/CbmLitDrawHist.cxx
 
 cbm/parallel/CbmLitTrackFinderNNParallel.cxx
-cbm/parallel/CbmLitParallelTrackFitterTest.cxx 
+cbm/parallel/CbmLitParallelTrackFitterTestMuon.cxx 
 cbm/parallel/CbmLitParallelTrackFitterTestElectron.cxx 
 )
 

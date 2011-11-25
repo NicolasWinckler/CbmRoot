@@ -1,9 +1,10 @@
-/** CbmLitParallelTrackFitterTest.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file CbmLitParallelTrackFitterTestMuon.cxx
+ * \brief Parallel track fitter used to test propagation and track fit.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
-#include "cbm/parallel/CbmLitParallelTrackFitterTest.h"
+#include "cbm/parallel/CbmLitParallelTrackFitterTestMuon.h"
 
 #include "cbm/base/CbmLitEnvironment.h"
 #include "std/data/CbmLitTrack.h"
@@ -21,29 +22,29 @@
 #include "parallel/LitConverter.h"
 #include "parallel/LitMath.h"
 
-CbmLitParallelTrackFitterTest::CbmLitParallelTrackFitterTest()
+CbmLitParallelTrackFitterTestMuon::CbmLitParallelTrackFitterTestMuon()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    env->GetMuchLayoutScal(fLayout);
    std::cout << fLayout;
 }
 
-CbmLitParallelTrackFitterTest::~CbmLitParallelTrackFitterTest()
+CbmLitParallelTrackFitterTestMuon::~CbmLitParallelTrackFitterTestMuon()
 {
 
 }
 
-LitStatus CbmLitParallelTrackFitterTest::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitParallelTrackFitterTest::Finalize()
+LitStatus CbmLitParallelTrackFitterTestMuon::Initialize()
 {
    return kLITSUCCESS;
 }
 
-LitStatus CbmLitParallelTrackFitterTest::Fit(
+LitStatus CbmLitParallelTrackFitterTestMuon::Finalize()
+{
+   return kLITSUCCESS;
+}
+
+LitStatus CbmLitParallelTrackFitterTestMuon::Fit(
    CbmLitTrack* track,
    bool downstream)
 {
@@ -130,11 +131,11 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
    return kLITSUCCESS;
 }
 
-unsigned char CbmLitParallelTrackFitterTest::PlaneId(
+unsigned char CbmLitParallelTrackFitterTestMuon::PlaneId(
    unsigned char stationGroup,
    unsigned char station,
    unsigned char substation,
-   lit::parallel::LitDetectorLayoutMuon<fscal>& layout) const
+   const lit::parallel::LitDetectorLayoutMuon<fscal>& layout) const
 {
    int counter = 0;
    for(unsigned char i = 0; i < stationGroup; i++) {
@@ -154,12 +155,12 @@ unsigned char CbmLitParallelTrackFitterTest::PlaneId(
    return counter;
 }
 
-bool CbmLitParallelTrackFitterTest::CheckHit(
+bool CbmLitParallelTrackFitterTestMuon::CheckHit(
    unsigned char stationGroup,
    unsigned char station,
    unsigned char substation,
-   lit::parallel::LitDetectorLayoutMuon<fscal>& layout,
-   CbmLitTrack* track)
+   const lit::parallel::LitDetectorLayoutMuon<fscal>& layout,
+   CbmLitTrack* track) const
 {
    unsigned char planeId = PlaneId(stationGroup, station, substation, layout);
    for (int i = 0; i < track->GetNofHits(); i++) {
@@ -169,9 +170,9 @@ bool CbmLitParallelTrackFitterTest::CheckHit(
    return false;
 }
 
-void CbmLitParallelTrackFitterTest::SerialHitToParallel(
+void CbmLitParallelTrackFitterTestMuon::SerialHitToParallel(
    const CbmLitPixelHit& hit,
-   lit::parallel::LitPixelHit<fscal>& lhit)
+   lit::parallel::LitPixelHit<fscal>& lhit) const
 {
    lhit.X = hit.GetX();
    lhit.Y = hit.GetY();

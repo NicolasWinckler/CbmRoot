@@ -1164,17 +1164,17 @@ void CbmAnaDielectronTaskDraw::DrawBgSourcesVsMomentum()
    TCanvas *c21 = new TCanvas("bg_sources_vs_momentum","bg_sources_vs_momentum",900, 600);
    c21->Divide(3,2);
    c21->cd(1);
-   DrawHist1D(H1("fh_gamma_mom"), kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_gamma_mom"));
    c21->cd(2);
-   DrawHist1D(H1("fh_pi0_mom"), kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_pi0_mom"));
    c21->cd(3);
-   DrawHist1D(H1("fh_pions_mom"), kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_pions_mom"));
    c21->cd(4);
-   DrawHist1D(H1("fh_proton_mom"), kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_proton_mom"));
    c21->cd(5);
-   DrawHist1D(H1("fh_kaons_mom"), kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_kaons_mom"));
    c21->cd(6);
-   DrawHist1D(H1("fh_other_mom"), kLitLinear, kLitLinear);
+   DrawHist1D(H1("fh_other_mom"));
 }
 
 TH1D* CbmAnaDielectronTaskDraw::CreateCumulativeProbabilityHisto(

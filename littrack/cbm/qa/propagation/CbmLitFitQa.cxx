@@ -325,7 +325,7 @@ void CbmLitFitQa::DrawHistos(
       TH1F* hist = histos[i];
       hist->Fit("gaus");
       hist->SetMaximum(hist->GetMaximum() * 1.50);
-      DrawHist1D(hist, "", "", kLitLinear, kLitLog);
+      DrawHist1D(hist, kLitLinear, kLitLog);
 
       TF1* fit = hist->GetFunction("gaus");
       Double_t sigma = 0.;

@@ -77,6 +77,9 @@ void CbmLitQaHistCreator::Create1DHist(
 
 void CbmLitQaHistCreator::Create2DHist(
       const string& name,
+      const string& xTitle,
+      const string& yTitle,
+      const string& zTitle,
       Int_t nofBinsX,
       Double_t minBinX,
       Double_t maxBinX,
@@ -84,7 +87,8 @@ void CbmLitQaHistCreator::Create2DHist(
       Double_t minBinY,
       Double_t maxBinY)
 {
-   TH2F* h = new TH2F(name.c_str(), name.c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
+   TH2F* h = new TH2F(name.c_str(),
+         (name+";"+xTitle+";"+yTitle+";"+zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
    fHM->Add(name, h);
 }
 
@@ -125,15 +129,15 @@ CbmLitQaHistManager* CbmLitQaHistCreator::Create()
    CreateEffHist3D("hSts3DNormHalfGlobal", kTracking);
    CreateEffHist3D("hSts3DNormGlobal", kTracking);
    CreateEffHist("hStsNp", "Number of points", nBinsNofPoints, minNofPoints, maxNofPoints, kTracking);
-   CreateEffHist("hStsAngle", "Angle", fNofBinsAngle, fMinAngle, fMaxAngle, kTracking);
+   CreateEffHist("hStsAngle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, kTracking);
    CreateEffHist3D("hHalfGlobal3D", kTracking);
    CreateEffHist3D("hHalfGlobal3DNormGlobal", kTracking);
    CreateEffHist3D("hGlobal3D", kTracking);
    CreateEffHist3D("hRec3D", kTracking);
    CreateEffHist("hRecNp", "Number of points",nBinsNofPoints, minNofPoints, maxNofPoints, kTracking);
-   CreateEffHist("hRecAngle", "Angle", fNofBinsAngle, fMinAngle, fMaxAngle, kTracking);
+   CreateEffHist("hRecAngle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, kTracking);
    CreateEffHist3D("hTof3D", kTracking);
-   CreateEffHist("hTofAngle", "Angle", fNofBinsAngle, fMinAngle, fMaxAngle, kTracking);
+   CreateEffHist("hTofAngle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, kTracking);
 
    CreateEffHist3D("hRich3D", kRich);
    CreateEffHist("hRichNh", "Number of hits", nBinsNofPoints, minNofPoints, maxNofPoints, kRich);
@@ -244,7 +248,7 @@ CbmLitQaHistManager* CbmLitQaHistCreator::Create()
    Create1DHist("hNofTrdClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
 
    Create1DHist("hStsChiprim", "#chi^{2}_{vertex}", "Yield", 150, 0., 15.);
-   Create2DHist("hStsMomresVsMom", 120, 0., 12., 100, -15., 15.);
+   Create2DHist("hStsMomresVsMom", "P [GeV/c]", "dP/P", "Counter", 120, 0., 12., 100, -15., 15.);
    Create1DHist("hTrackLength", "dL/L [%]", "Yield", 40, -2., 2.);
 
    // MC momentum vs. polar angle histograms
@@ -253,7 +257,8 @@ CbmLitQaHistManager* CbmLitQaHistCreator::Create()
    cat[3] = "Sec"; cat[4] = "Mu"; cat[5] = "El";
    for (Int_t i = 0; i < 6; i++) {
       string histName = "hMCMomVsAngle_" + cat[i];
-      Create2DHist(histName.c_str(), fNofBinsMom, fMinMom, fMaxMom, 10, 0., 35.);
+      Create2DHist(histName.c_str(), "P [GeV/c]", "Polar angle [grad]", "Counter",
+            fNofBinsMom, fMinMom, fMaxMom, 10, 0., 35.);
    }
 
    // Histogram stores number of events

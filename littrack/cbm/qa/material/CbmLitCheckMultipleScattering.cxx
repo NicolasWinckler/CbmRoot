@@ -48,8 +48,8 @@ InitStatus CbmLitCheckMultipleScattering::Init()
    Double_t minEloss = 0.0;
    Double_t maxEloss = 1.;
 
-   fh_theta_mc = new TH1F("fh_theta_mc", "theta_mc", nBins, minTheta, maxTheta);
-   fh_eloss_mc = new TH1F("fh_eloss_mc", "eloss_mc", nBins, minEloss, maxEloss);
+   fh_theta_mc = new TH1F("fh_theta_mc", "theta_mc;Projected scattering angle [rad];Counter", nBins, minTheta, maxTheta);
+   fh_eloss_mc = new TH1F("fh_eloss_mc", "eloss_mc;Energy loss [GeV/c];Counter", nBins, minEloss, maxEloss);
    fh_eloss_rec = new TH1F("fh_eloss_rec", "eloss_rec", nBins, minEloss, maxEloss);
    fh_dep_energy = new TH1F("fh_dep_energy", "dep_energy", nBins, minEloss, maxEloss);
 
@@ -141,8 +141,7 @@ void CbmLitCheckMultipleScattering::Draw()
 
    TCanvas* canvas1 = new TCanvas("multiple_scattering_theta", "multiple_scattering_theta", 700, 500);
    canvas1->cd(1);
-   DrawHist1D(fh_theta_mc, "projected scattering angle [rad]", "counter", kLitLinear,
-         kLitLog, "", kBlue, 2, 1, 1, kDot);
+   DrawHist1D(fh_theta_mc, kLitLinear, kLitLog, "", kBlue, 2, 1, 1, kDot);
 
    fh_theta_mc->Fit("gaus");
    TF1* fit1 = fh_theta_mc->GetFunction("gaus");
@@ -163,9 +162,8 @@ void CbmLitCheckMultipleScattering::Draw()
    canvas2->cd(1);
    std::string eloss_mc = "MC(" + lit::ToString<Double_t>(fh_eloss_mc->GetMean()) + ")";
    std::string eloss_rec = "Reco(" + lit::ToString<Double_t>(fh_eloss_rec->GetMean()) + ")";
-   DrawHist1D(fh_eloss_mc, fh_eloss_rec, NULL, NULL,
-              "Energy loss", "energy loss [GeV/c]", "counter",
-              eloss_mc, eloss_rec, "","", kLitLog, kLitLog, true, 0.6, 0.6, 0.9, 0.9);
+   DrawHist1D(fh_eloss_mc, fh_eloss_rec, NULL, NULL, eloss_mc, eloss_rec, "","",
+         kLitLog, kLitLog, true, 0.6, 0.6, 0.9, 0.9);
 
    lit::SaveCanvasAsImage(canvas2, fOutputDir);
 }

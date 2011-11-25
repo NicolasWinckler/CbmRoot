@@ -136,7 +136,7 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
       TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
       return fitter;
    } else if (name == "kalman_parallel_muon") {
-      TrackFitterPtr fitter(new CbmLitParallelTrackFitterTest());
+      TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestMuon());
       return fitter;
    } else if (name == "kalman_parallel_electron") {
       TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestElectron());

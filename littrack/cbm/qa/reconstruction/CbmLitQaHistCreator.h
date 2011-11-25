@@ -49,6 +49,9 @@ public:
 
    void Create2DHist(
          const string& name,
+         const string& xTitle,
+         const string& yTitle,
+         const string& zTitle,
          Int_t nofBinsX,
          Double_t minBinX,
          Double_t maxBinX,

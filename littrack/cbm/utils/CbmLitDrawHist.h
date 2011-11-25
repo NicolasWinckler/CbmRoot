@@ -53,8 +53,6 @@ void SetStyles();
  */
 void DrawHist1D(
    TH1* hist,
-   const std::string& titleX = "",
-   const std::string& titleY = "",
    LitScale logx = kLitLinear,
    LitScale logy = kLitLinear,
    const std::string& drawOpt = "",
@@ -77,9 +75,6 @@ void DrawHist1D(
  */
 void DrawHist2D(
    TH2* hist,
-   const std::string& titleX = "",
-   const std::string& titleY = "",
-   const std::string& titleZ = "",
    LitScale logx = kLitLinear,
    LitScale logy = kLitLinear,
    LitScale logz = kLitLinear,
@@ -111,9 +106,6 @@ void DrawHist1D(
    TH1* hist2,
    TH1* hist3,
    TH1* hist4,
-   const std::string& legendLabel,
-   const std::string& xAxisLabel,
-   const std::string& yAxisLabel,
    const std::string& hist1label,
    const std::string& hist2label,
    const std::string& hist3label,

@@ -43,8 +43,6 @@ void SetStyles()
 /* Draws 1D histogram.*/
 void DrawHist1D(
    TH1* hist,
-   const std::string& titleX,
-   const std::string& titleY,
    LitScale logx,
    LitScale logy,
    const std::string& drawOpt,
@@ -55,8 +53,6 @@ void DrawHist1D(
    Int_t markerStyle)
 {
    Double_t textSize = LIT_TEXT_SIZE;
-   if (titleX != "") hist->GetXaxis()->SetTitle(titleX.c_str());
-   if (titleY != "") hist->GetYaxis()->SetTitle(titleY.c_str());
    hist->SetLineColor(color);
    hist->SetLineWidth(lineWidth);
    hist->SetLineStyle(lineStyle);
@@ -80,18 +76,12 @@ void DrawHist1D(
 /* Draws 1D histogram.*/
 void DrawHist2D(
    TH2* hist,
-   const std::string& titleX,
-   const std::string& titleY,
-   const std::string& titleZ,
    LitScale logx,
    LitScale logy,
    LitScale logz,
    const std::string& drawOpt)
 {
    Double_t textSize = LIT_TEXT_SIZE;
-   if (titleX != "") hist->GetXaxis()->SetTitle(titleX.c_str());
-   if (titleY != "") hist->GetYaxis()->SetTitle(titleY.c_str());
-   if (titleZ != "") hist->GetZaxis()->SetTitle(titleZ.c_str());
    if (logx == kLitLog) { gPad->SetLogx(); }
    if (logy == kLitLog) { gPad->SetLogy(); }
    if (logz == kLitLog) { gPad->SetLogz(); }
@@ -120,9 +110,6 @@ void DrawHist1D(
    TH1* hist2,
    TH1* hist3,
    TH1* hist4,
-   const std::string& legendLabel,
-   const std::string& xAxisLabel,
-   const std::string& yAxisLabel,
    const std::string& hist1label,
    const std::string& hist2label,
    const std::string& hist3label,
@@ -137,25 +124,25 @@ void DrawHist1D(
 {
    Double_t max;
    if (hist1 != NULL) {
-      DrawHist1D(hist1, xAxisLabel, yAxisLabel, logx, logy, "",
+      DrawHist1D(hist1, logx, logy, "",
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE, LIT_MARKER_STYLE1);
       max = hist1->GetMaximum();
    }
 
    if (hist2 != NULL) {
-      DrawHist1D(hist2, xAxisLabel, yAxisLabel, logx, logy, "SAME",
+      DrawHist1D(hist2, logx, logy, "SAME",
             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE, LIT_MARKER_STYLE2);
       if (max < hist2->GetMaximum()) { max = hist2->GetMaximum(); }
    }
 
    if (hist3 != NULL) {
-      DrawHist1D(hist3, xAxisLabel, yAxisLabel, logx, logy, "SAME",
+      DrawHist1D(hist3, logx, logy, "SAME",
             LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE, LIT_MARKER_STYLE3);
       if (max < hist3->GetMaximum()) { max = hist3->GetMaximum(); }
    }
 
    if (hist4 != NULL) {
-      DrawHist1D(hist4, xAxisLabel, yAxisLabel, logx, logy, "SAME",
+      DrawHist1D(hist4, logx, logy, "SAME",
             LIT_COLOR4, LIT_LINE_WIDTH, LIT_LINE_STYLE4, LIT_MARKER_SIZE, LIT_MARKER_STYLE4);
       if (max < hist4->GetMaximum()) { max = hist4->GetMaximum(); }
    }
@@ -164,7 +151,6 @@ void DrawHist1D(
 
    TLegend* l1 = new TLegend(x1, y1, x2, y2);
    l1->SetFillColor(kWhite);
-   if (legendLabel != "") { l1->SetHeader(legendLabel.c_str()); }
    if (hist1 != NULL) { l1->AddEntry(hist1,hist1label.c_str(),"lp"); }
    if (hist2 != NULL) { l1->AddEntry(hist2,hist2label.c_str(),"lp"); }
    if (hist3 != NULL) { l1->AddEntry(hist3,hist3label.c_str(),"lp"); }

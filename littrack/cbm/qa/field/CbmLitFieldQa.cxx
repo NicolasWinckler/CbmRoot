@@ -39,6 +39,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+using namespace std;
+
 CbmLitFieldQa::CbmLitFieldQa():
    fField(NULL),
    fHistoList(NULL),
@@ -710,17 +712,22 @@ void CbmLitFieldQa::DrawSlices(
    for (Int_t i = 0; i < fNofSlices; i++) {
       canvas[i]->cd(1);
       TGraph2D* graph1 = fhBGraph[v][i];
+
       DrawGraph2D(graph1, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
             kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(2);
       TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhBGridErrH1D[v][i];
-      DrawHist1D(hist2, std::string(title + " [kGauss]"), "Counter", kLitLinear, kLitLog);
+      hist2->GetXaxis()->SetTitle(string(title + " [kGauss]").c_str());
+      hist2->GetYaxis()->SetTitle("Counter");
+      DrawHist1D(hist2, kLitLinear, kLitLog);
 
       canvas[i]->cd(3);
       TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhBGridErrH2D[v][i];
-      DrawHist2D(hist3, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
-            kLitLinear, kLitLinear, kLitLinear, "colz");
+      hist3->GetXaxis()->SetTitle("X [cm]");
+      hist3->GetYaxis()->SetTitle("Y [cm]");
+      hist3->GetXaxis()->SetTitle(string(title + " [kGauss]").c_str());
+      DrawHist2D(hist3, kLitLinear, kLitLinear, kLitLinear, "colz");
 
       canvas[i]->cd(4);
       TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
@@ -729,12 +736,16 @@ void CbmLitFieldQa::DrawSlices(
 
       canvas[i]->cd(5);
       TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1D[v][i];
-      DrawHist1D(hist4, std::string(title + " relative error [%]"), "Counter", kLitLinear, kLitLog);
+      hist4->GetXaxis()->SetTitle(string(title + " relative error [%]").c_str());
+      hist4->GetYaxis()->SetTitle("Counter");
+      DrawHist1D(hist4, kLitLinear, kLitLog);
 
       canvas[i]->cd(6);
       TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2D[v][i];
-      DrawHist2D(hist5, "X [cm]", "Y [cm]", std::string(title + " relative error [%]"),
-            kLitLinear, kLitLinear, kLitLinear, "colz");
+      hist5->GetXaxis()->SetTitle("X [cm]");
+      hist5->GetYaxis()->SetTitle("Y [cm]");
+      hist5->GetXaxis()->SetTitle(string(title + " relative error [%]").c_str());
+      DrawHist2D(hist5, kLitLinear, kLitLinear, kLitLinear, "colz");
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
@@ -784,7 +795,9 @@ void CbmLitFieldQa::DrawPoly(
             std::string draw_opt;
             if (j == 0) { draw_opt = ""; }
             else { draw_opt = "SAME"; }
-            DrawHist1D(hist1, title, "Counter", kLitLinear, kLitLog, draw_opt.c_str(),
+            hist1->GetXaxis()->SetTitle(title.c_str());
+            hist1->GetYaxis()->SetTitle("Counter");
+            DrawHist1D(hist1, kLitLinear, kLitLog, draw_opt.c_str(),
                        1+j, LIT_LINE_WIDTH, 1+j, LIT_MARKER_SIZE, kDot);
 
             if (v == 0) {

@@ -26,8 +26,8 @@ void CbmRichRingFitterCOP::DoFit1(
       const vector<double>& hitX,
       const vector<double>& hitY)
 {
-   fHitX.clear();
-   fHitY.clear();
+  // fHitX.clear();
+  // fHitY.clear();
    fHitX.assign(hitX.begin(), hitX.end());
    fHitY.assign(hitY.begin(), hitY.end());
    fNofHits = fHitX.size();

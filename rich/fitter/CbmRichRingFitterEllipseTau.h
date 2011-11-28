@@ -27,7 +27,7 @@
 
 using namespace std;
 
-#define MAX_NOF_HITS 150
+#define MAX_NOF_HITS 400
 
 class CbmRichRingFitterEllipseTau : public CbmRichRingFitterEllipseBase
 {

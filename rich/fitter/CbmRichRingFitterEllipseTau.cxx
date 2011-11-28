@@ -135,9 +135,19 @@ void CbmRichRingFitterEllipseTau::DoFit1(
       const vector<Double_t>& hitX,
 		const vector<Double_t>& hitY)
 {
-	fX.assign(hitX.begin(), hitX.end());
-	fY.assign(hitY.begin(), hitY.end());
+   if (hitX.size() > MAX_NOF_HITS){
+      cout <<endl << endl<<  "-E- MAX_NOF_HITS = " << MAX_NOF_HITS <<
+            ". Please set limits in CbmRichRingFitterEllipseTau.h file." << endl << endl;
+   }
+   fX.clear();
+   fY.clear();
+	//fX.assign(hitX.begin(), hitX.end());
+	//fY.assign(hitY.begin(), hitY.end());
 
+	for (Int_t i = 0; i < hitX.size(); i++){
+	   fX.push_back(hitX[i]);
+	   fY.push_back(hitY[i]);
+	}
 	InitMatrices();
 	Taubin();
 	TransEllipse(pRing);

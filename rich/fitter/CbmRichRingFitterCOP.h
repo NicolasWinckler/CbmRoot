@@ -36,7 +36,7 @@ private:
 
 	TClonesArray* fHitsArray;
 
-	static const int MAX_NOF_HITS_IN_RING = 200;
+	static const int MAX_NOF_HITS_IN_RING = 400;
 	vector<double> fHitX;
 	vector<double> fHitY;
 	int fNofHits;

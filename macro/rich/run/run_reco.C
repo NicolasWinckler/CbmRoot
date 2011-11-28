@@ -1,7 +1,8 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 700){
+void run_reco(Int_t nEvents = 10){
+
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -66,7 +67,7 @@ void run_reco(Int_t nEvents = 700){
     Double_t minStep    =  0.01;
     Double_t StripDeadTime = 10.;
 
-    CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+    CbmStsDigitize* stsDigitize = new CbmStsDigitize("CbmStsDigitize", iVerbose);
     stsDigitize->SetRealisticResponse();
     stsDigitize->SetFrontThreshold (threshold);
     stsDigitize->SetBackThreshold  (threshold);
@@ -79,7 +80,7 @@ void run_reco(Int_t nEvents = 700){
     stsDigitize->SetStripDeadTime  (StripDeadTime);
     run->AddTask(stsDigitize);
 
-    FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+    FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
     run->AddTask(stsClusterFinder);
 
     FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
@@ -194,7 +195,6 @@ void run_reco(Int_t nEvents = 700){
     // ===                        RICH reconstruction                        ===
     // =========================================================================
 	if (IsRich(parFile)){
-	//if (false){
 		// ---------------------RICH Hit Producer ----------------------------------
 		Double_t richPmtRad = 0.4; // PMT radius [cm]
 		Double_t richPmtDist = 0.; // Distance between PMTs [cm]
@@ -254,21 +254,26 @@ void run_reco(Int_t nEvents = 700){
 	}//isRich
 
 	// Reconstruction Qa
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(9);
-	reconstructionQa->SetMinNofPointsMuch(10);
-	reconstructionQa->SetMinNofPointsTof(1);
-	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(9);
-	reconstructionQa->SetMinNofHitsMuch(10);
-	reconstructionQa->SetVerbose(0);
-	reconstructionQa->SetMomentumRange(0, 12);
-	reconstructionQa->SetNofBinsMom(12);
-	reconstructionQa->SetMinNofHitsRich(7);
-	reconstructionQa->SetQuotaRich(0.6);
-	reconstructionQa->SetOutputDir("recoIm/");
-	run->AddTask(reconstructionQa);
+   CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+   reconstructionQa->SetMinNofPointsSts(4);
+   reconstructionQa->SetUseConsecutivePointsInSts(true);
+   reconstructionQa->SetMinNofPointsTrd(8);
+   reconstructionQa->SetMinNofPointsMuch(10);
+   reconstructionQa->SetMinNofPointsTof(1);
+   reconstructionQa->SetQuota(0.7);
+   reconstructionQa->SetMinNofHitsTrd(8);
+   reconstructionQa->SetMinNofHitsMuch(10);
+   reconstructionQa->SetVerbose(0);
+   reconstructionQa->SetMomentumRange(0, 12);
+   reconstructionQa->SetNofBinsMom(120);
+   reconstructionQa->SetPtRange(0, 3);
+   reconstructionQa->SetNofBinsPt(30);
+   reconstructionQa->SetYRange(0, 4);
+   reconstructionQa->SetNofBinsY(40);
+   reconstructionQa->SetMinNofHitsRich(7);
+   reconstructionQa->SetQuotaRich(0.6);
+   reconstructionQa->SetOutputDir("recqa/");
+   run->AddTask(reconstructionQa);
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===

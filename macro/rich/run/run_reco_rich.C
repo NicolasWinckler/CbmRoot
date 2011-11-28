@@ -1,4 +1,4 @@
-void run_reco_rich(Int_t nEvents = 700) {
+void run_reco_rich(Int_t nEvents = 100) {
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -10,12 +10,12 @@ void run_reco_rich(Int_t nEvents = 700) {
 
 	Bool_t isRichTrackingOn = false;
 	if (script != "yes") {
-	        TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-	        TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-	        TString parFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-	        TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root";
+	   TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+	   TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+	   TString parFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+	   TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root";
 	} else {
-		isRichTrackingOn = false;
+		isRichTrackingOn = true;
 		inFile1 = TString(gSystem->Getenv("MCFILE"));
 		inFile2 = TString(gSystem->Getenv("RECOFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -34,12 +34,12 @@ void run_reco_rich(Int_t nEvents = 700) {
     cbmlibs();
 
 	FairRunAna *run = new FairRunAna();
-	if (inFile1 != "") run->SetInputFile(inFile1);
-	if (inFile2 != "") run->AddFriend(inFile2);
+	if (inFile1 != "") run->SetInputFile(inFile2);
+	if (inFile2 != "") run->AddFriend(inFile1);
 	if (outFile != "") run->SetOutputFile(outFile);
 
-    FairTask* kalman= new CbmKF();
-    run->AddTask(kalman);
+   FairTask* kalman= new CbmKF();
+   run->AddTask(kalman);
 
 	// ---------------------RICH Hit Producer ----------------------------------
 	Double_t richPmtRad = 0.4; // PMT radius [cm]
@@ -47,29 +47,24 @@ void run_reco_rich(Int_t nEvents = 700) {
 	Int_t richDetType = 4; // Detector type Hamamatsu H8500-03
 	Int_t richNoise = 220; // Number of noise points per event
 	Double_t collectionEff = 1.;
-	Double_t richSMirror = 0.00001; // Sigma for additional point smearing due to light scattering in mirror
+	Double_t richSMirror = 0.06; // Sigma for additional point smearing due to light scattering in mirror
 	CbmRichHitProducer* richHitProd = new CbmRichHitProducer(richPmtRad,
-			richPmtDist, richDetType, richNoise, iVerbose, collectionEff,
-			richSMirror);
+			richPmtDist, richDetType, richNoise, iVerbose, collectionEff,richSMirror);
 	run->AddTask(richHitProd);
-	//--------------------------------------------------------------------------
+
 	if(isRichTrackingOn){
 		 //----------------------RICH Track Extrapolation ---------------------------
 		 Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
 		 Double_t richZPos = 300.;  // z position for extrapolation [cm]
-		 CbmRichTrackExtrapolation* richExtra
-		 = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
+		 CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
 		 CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
 		 richExtrapolate->UseExtrapolation(richExtra,richZPos);
 		 run->AddTask(richExtrapolate);
-		 //--------------------------------------------------------------------------
 
-		 //--------------------- Rich Track Projection to photodetector -------------
 		 Int_t richZFlag = 1;       // Projection from IM plane (default)
 		 CbmRichProjectionProducer* richProj =
 		 new CbmRichProjectionProducer(iVerbose, richZFlag);
 		 run->AddTask(richProj);
-		 //--------------------------------------------------------------------------
 	}
 
 	//--------------------- RICH Ring Finding ----------------------------------
@@ -79,18 +74,15 @@ void run_reco_rich(Int_t nEvents = 700) {
 	CbmRichFindRings* richFindRings = new CbmRichFindRings();
 	richFindRings->UseFinder(richFinder);
 	run->AddTask(richFindRings);
-	//--------------------------------------------------------------------------
 
 	//-------------------- RICH Ring Fitting -----------------------------------
 	CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose,1, richGeoType);
-	CbmRichFitRings* fitRings = new CbmRichFitRings("", "", richFitter);
+	CbmRichFitRings* fitRings = new CbmRichFitRings("CbmRichFitRings", "CbmRichFitRings", richFitter);
 	run->AddTask(fitRings);
-	//--------------------------------------------------------------------------
 
 	// ------------------- RICH Ring matching  ---------------------------------
 	CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
 	run->AddTask(matchRings);
-	// -------------------------------------------------------------------------
 
 	//--------------------- RICH ring-track assignment ------------------------
 	Double_t richDistance = 10.; // Max. distance between ring center to track [cm]
@@ -100,16 +92,30 @@ void run_reco_rich(Int_t nEvents = 700) {
 	CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
 	assignTrack->UseAssign(richAssign);
 	run->AddTask(assignTrack);
-	// ------------------------------------------------------------------------
 
-	CbmRichRingQa* richQa = new CbmRichRingQa("Qa", "qa", 0);
+	CbmRichRingQa* richQa = new CbmRichRingQa("CbmRichRingQa", "CbmRichRingQa", 0);
 	run->AddTask(richQa);
 
-	// ------------------------------------------------------------------------
-
+   CbmRichElectronsQa* richElQa = new CbmRichElectronsQa("CbmRichElectronsQa", "CbmRichElectronsQa", 0);
+   run->AddTask(richElQa);
 	// ===                 End of RICH local reconstruction                  ===
 	// =========================================================================
 
+//	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+//	reconstructionQa->SetMinNofPointsSts(4);
+//	reconstructionQa->SetMinNofPointsTrd(9);
+//	reconstructionQa->SetMinNofPointsMuch(10);
+//	reconstructionQa->SetMinNofPointsTof(1);
+//	reconstructionQa->SetQuota(0.7);
+//	reconstructionQa->SetMinNofHitsTrd(9);
+//	reconstructionQa->SetMinNofHitsMuch(10);
+//	reconstructionQa->SetVerbose(0);
+//	reconstructionQa->SetMomentumRange(0, 12);
+//	reconstructionQa->SetNofBinsMom(12);
+//	reconstructionQa->SetMinNofHitsRich(7);
+//	reconstructionQa->SetQuotaRich(0.6);
+//	reconstructionQa->SetOutputDir("recoIm/");
+//	run->AddTask(reconstructionQa);
 
 	// -----  Parameter database   --------------------------------------------
 	TString stsDigi = gSystem->Getenv("VMCWORKDIR");
@@ -124,27 +130,20 @@ void run_reco_rich(Int_t nEvents = 700) {
 	rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);
 	rtdb->saveOutput();
-	// ------------------------------------------------------------------------
 
-	// -----   Intialise and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
 	cout << "Starting run" << endl;
 	run->Run(0, nEvents);
-	// ------------------------------------------------------------------------
 
-	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	Double_t rtime = timer.RealTime();
 	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
+	cout << "Macro finished successfully." << endl;
 	cout << "Output file is " << outFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
 	cout << endl;
-	// ------------------------------------------------------------------------
-
 	cout << " Test passed" << endl;
 	cout << " All ok " << endl;
 	exit(0);

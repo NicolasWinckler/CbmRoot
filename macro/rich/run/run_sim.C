@@ -193,7 +193,20 @@ void run_sim(Int_t nEvents = 700)
 		boxGen2->SetCosTheta();
 		boxGen2->Init();
 		primGen->AddGenerator(boxGen2);
-	}
+
+//      CbmLitPolarizedGenerator *polGen;
+//      polGen = new CbmLitPolarizedGenerator(443, NELECTRONS);
+//      polGen->SetDistributionPt(0.176);        // 25 GeV
+//      polGen->SetDistributionY(1.9875,0.228);  // 25 GeV
+//      polGen->SetRangePt(0.,3.);
+//      polGen->SetRangeY(1.,3.);
+//      polGen->SetBox(0);
+//      polGen->SetRefFrame(CbmLitPolarizedGenerator::kHelicity);
+//      polGen->SetDecayMode(CbmLitPolarizedGenerator::kDiElectron);
+//      polGen->SetAlpha(0);
+//      polGen->Init();
+//      primGen->AddGenerator(polGen);
+   }
 
 	if (pluto == "yes") {
 		FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile);
@@ -203,56 +216,6 @@ void run_sim(Int_t nEvents = 700)
 	fRun->SetGenerator(primGen);
 
 	fRun->Init();
-
-	if (pluto == "yes" && plutoParticle != "rho0"){
-		Float_t bratioEta[6];
-		Int_t modeEta[6];
-
-		TGeant3* gMC3 = (TGeant3*) gMC;
-
-		for (Int_t kz = 0; kz < 6; ++kz) {
-			bratioEta[kz] = 0.;
-			modeEta[kz]   = 0;
-		}
-
-		Int_t ipa    = 17;
-		bratioEta[0] = 39.38;  //2gamma
-		bratioEta[1] = 32.20;  //3pi0
-		bratioEta[2] = 22.70;  //pi+pi-pi0
-		bratioEta[3] = 4.69;   //pi+pi-gamma
-		bratioEta[4] = 0.60;   //e+e-gamma
-		bratioEta[5] = 4.4e-2; //pi02gamma
-
-		modeEta[0] = 101;    //2gamma
-		modeEta[1] = 70707;  //3pi0
-		modeEta[2] = 80907;  //pi+pi-pi0
-		modeEta[3] = 80901;  //pi+pi-gamma
-		modeEta[4] = 30201;  //e+e-gamma
-		modeEta[5] = 10107;  //pi02gamma
-		gMC3->Gsdk(ipa, bratioEta, modeEta);
-
-		Float_t bratioPi0[6];
-		Int_t modePi0[6];
-
-		for (Int_t kz = 0; kz < 6; ++kz) {
-			bratioPi0[kz] = 0.;
-			modePi0[kz] = 0;
-		}
-
-		ipa = 7;
-		bratioPi0[0] = 98.798;
-		bratioPi0[1] = 1.198;
-
-		modePi0[0] = 101;
-		modePi0[1] = 30201;
-
-		gMC3->Gsdk(ipa, bratioPi0, modePi0);
-
-		Int_t t = time(NULL);
-		TRandom *rnd = new TRandom(t);
-		gMC->SetRandom(rnd);
-	}
-
 
 	// -----   Runtime database   ---------------------------------------------
 	CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");

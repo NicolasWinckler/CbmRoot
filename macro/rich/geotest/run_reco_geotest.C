@@ -1,5 +1,5 @@
 
-void run_reco_geotest(Int_t nEvents = 250)
+void run_reco_geotest(Int_t nEvents = 10000)
 {
    Int_t iVerbose = 0;
 

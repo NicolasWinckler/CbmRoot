@@ -1,4 +1,4 @@
-void run_sim_geotest(Int_t nEvents = 250)
+void run_sim_geotest(Int_t nEvents = 10000)
 {
   //  nEvents = 10;
 

@@ -30,7 +30,7 @@ public:
    CbmLitMCPoint():
       fX(0.), fY(0.), fZ(0.),
       fPx(0.), fPy(0.), fPz(0.),
-      fRefId(-1), fStationId(-1) {}
+      fRefId(-1), fStationId(-1), fQ(1.) {}
 
    /*
     * \brief Destructor.
@@ -49,6 +49,12 @@ public:
    myf GetTx() const { return fPx / fPz; }
    myf GetTy() const { return fPy / fPz; }
    myf GetP() const { return std::sqrt(fPx*fPx + fPy*fPy + fPz*fPz);}
+   myf GetQp() const {
+      myf p = GetP();
+      myf res = (p != 0.) ? fQ/p : 0.;
+      return res;
+   }
+
 
    /* Setters */
    void SetX(myf x) { fX = x; }
@@ -57,6 +63,7 @@ public:
    void SetPx(myf px) { fPx = px; }
    void SetPy(myf py) { fPy = py; }
    void SetPz(myf pz) { fPz = pz; }
+   void SetQ(myf q) { fQ = q; }
    void SetRefId(int refId) { fRefId = refId; }
    void SetStationId(int stationId) { fStationId = stationId; }
 
@@ -86,6 +93,7 @@ private:
    myf fPx, fPy, fPz; // Momentum components.
    int fRefId; // Reference index.
    int fStationId; // Station index.
+   myf fQ; // +/-1 - negative or positive charge
 };
 
 #endif /* CBMLITMCPOINT_H_ */

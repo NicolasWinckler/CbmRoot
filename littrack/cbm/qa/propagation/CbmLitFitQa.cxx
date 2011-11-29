@@ -17,6 +17,7 @@
 
 #include "FairRootManager.h"
 #include "CbmTrdDetectorId.h"
+#include "CbmMuchGeoScheme.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -264,7 +265,10 @@ void CbmLitFitQa::ProcessMuchTrack(
 
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fMuchPixelHits->At(track->GetHitIndex(0)));
-   Int_t firstStation = firstHit->GetPlaneId();
+//   Int_t firstStation = firstHit->GetPlaneId();
+   Int_t firstStation = 100 * CbmMuchGeoScheme::GetStationIndex(firstHit->GetDetectorId())
+            + 10 * CbmMuchGeoScheme::GetLayerIndex(firstHit->GetDetectorId())
+            + CbmMuchGeoScheme::GetLayerSideIndex(firstHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kMUCH, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kMUCH, firstStation, 0);
       FillResidualsAndPulls(firstParam, &firstPoint, fMuchHistosFirst);
@@ -272,7 +276,10 @@ void CbmLitFitQa::ProcessMuchTrack(
 
    // Fill histograms for last track parameters
    const CbmBaseHit* lastHit = static_cast<const CbmBaseHit*>(fMuchPixelHits->At(track->GetHitIndex(nofHits - 1)));
-   Int_t lastStation = firstHit->GetPlaneId();
+//   Int_t lastStation = lastHit->GetPlaneId();
+   Int_t lastStation = 100 * CbmMuchGeoScheme::GetStationIndex(lastHit->GetDetectorId())
+              + 10 * CbmMuchGeoScheme::GetLayerIndex(lastHit->GetDetectorId())
+              + CbmMuchGeoScheme::GetLayerSideIndex(lastHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kMUCH, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kMUCH, lastStation, 0);
       FillResidualsAndPulls(lastParam, &lastPoint, fMuchHistosLast);
@@ -289,28 +296,27 @@ void CbmLitFitQa::FillResidualsAndPulls(
    Float_t resY = par->GetY() - mcPoint->GetY();
    Float_t resTx = par->GetTx() - mcPoint->GetTx();
    Float_t resTy = par->GetTy() - mcPoint->GetTy();
-   //Float_t resQp = par->GetQp() - mcPar->GetQp();
+   Float_t resQp = par->GetQp() - mcPoint->GetQp();
 
    // Pulls
    Double_t C[15];
    par->CovMatrix(C);
-   Float_t pullX = 0., pullY = 0., pullTx = 0., pullTy = 0., pullQp = 0.;
-   if (C[0] > 0.) { pullX = resX / (std::sqrt(C[0])); }
-   if (C[5] > 0.) { pullY = resY / (std::sqrt(C[5])); }
-   if (C[9] > 0.) { pullTx = resTx / (std::sqrt(C[9])); }
-   if (C[12] > 0.) { pullTy = resTy / (std::sqrt(C[12])); }
-   //if (C[14] > 0.) { pullQp = resQp / (std::sqrt(C[14])); }
+   Float_t pullX = (C[0] > 0.) ? resX / (std::sqrt(C[0])) : 0.;
+   Float_t pullY = (C[5] > 0.) ? resY / (std::sqrt(C[5])) : 0.;
+   Float_t pullTx = (C[9] > 0.) ? resTx / (std::sqrt(C[9])) : 0.;
+   Float_t pullTy = (C[12] > 0.) ? resTy / (std::sqrt(C[12])) : 0.;
+   Float_t pullQp = (C[14] > 0.) ? resQp / (std::sqrt(C[14])) : 0.;
 
    histos[0]->Fill(resX);
    histos[1]->Fill(resY);
    histos[2]->Fill(resTx);
    histos[3]->Fill(resTy);
-//   histos[4]->Fill(resQp);
+   histos[4]->Fill(resQp);
    histos[5]->Fill(pullX);
    histos[6]->Fill(pullY);
    histos[7]->Fill(pullTx);
    histos[8]->Fill(pullTy);
-//   histos[9]->Fill(pullQp);
+   histos[9]->Fill(pullQp);
 }
 
 void CbmLitFitQa::DrawHistos(

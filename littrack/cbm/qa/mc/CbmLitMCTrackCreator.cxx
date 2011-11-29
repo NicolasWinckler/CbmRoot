@@ -15,6 +15,9 @@
 #include "CbmStsDetectorId.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmTrdDetectorId.h"
+#include "CbmMCTrack.h"
+
+#include "TDatabasePDG.h"
 
 CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fMCTracks(NULL),
@@ -101,6 +104,10 @@ void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
    litPoint->SetPz(fairPoint->GetPz());
    litPoint->SetRefId(refId);
    litPoint->SetStationId(stationId);
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(fairPoint->GetTrackID()));
+   double charge = TDatabasePDG::Instance()->GetParticle(mcTrack->GetPdgCode())->Charge();
+   myf q = (charge > 0) ? 1. : -1;
+   litPoint->SetQ(q);
 }
 
 void CbmLitMCTrackCreator::FillStationMaps()
@@ -151,9 +158,10 @@ void CbmLitMCTrackCreator::FillStationMaps()
       Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
       for (Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++) {
          FairMCPoint* point = static_cast<FairMCPoint*>(fMuchPoints->At(iPoint));
-         //Int_t stationId = 10 * CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID())
-         //   + CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID());
-         Int_t stationId = CbmMuchGeoScheme::Instance()->GetLayerSideNr(point->GetDetectorID());
+         Int_t stationId = 100 * CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID())
+            + 10 * CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID())
+            + CbmMuchGeoScheme::GetLayerSideIndex(point->GetDetectorID());
+//         Int_t stationId = CbmMuchGeoScheme::Instance()->GetLayerSideNr(point->GetDetectorID());
          fMuchStationsMap[iPoint] = stationId;
       }
    }

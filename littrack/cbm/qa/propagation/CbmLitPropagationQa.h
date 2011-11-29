@@ -29,6 +29,8 @@ class CbmGlobalTrack;
 class TClonesArray;
 class TH1F;
 class TCanvas;
+class CbmLitMCPoint;
+class CbmLitMCTrack;
 
 /**
  * \file CbmLitPropagationQa
@@ -113,8 +115,8 @@ private:
     * \param[in] globalTrack Pointer to the global track.
     * \return True if global track is accepted.
     */
-   Bool_t CheckAcceptance(
-      const CbmGlobalTrack* globalTrack);
+//   Bool_t CheckAcceptance(
+//      const CbmGlobalTrack* globalTrack);
 
    /**
     * \brief Convert CbmGlobalTrack to CbmLitTrack.
@@ -130,9 +132,9 @@ private:
     * \param[in] globalTrack Pointer to the global track to be converted.
     * \param[out] litTrack Output CbmLitTrack.
     */
-   void GlobalTrackToMCLitTrack(
-      const CbmGlobalTrack* globalTrack,
-      CbmLitTrack* litTrack);
+//   void GlobalTrackToMCLitTrack(
+//      const CbmGlobalTrack* globalTrack,
+//      CbmLitTrack* litTrack);
 
    /**
     * \brief Free memory and delete track arrays.
@@ -150,8 +152,7 @@ private:
     * \param[in] mcTrack Corresponding MC track for comparison.
     */
    void TestPropagation(
-      const CbmLitTrack* track,
-      const CbmLitTrack* mcTrack);
+      const CbmLitTrack* track);
 
    /**
     * \brief Test track fitter for a specified track.
@@ -159,8 +160,7 @@ private:
     * \param[in] mcTrack Corresponding MC track for comparison.
     */
    void TestFitter(
-      CbmLitTrack* track,
-      const CbmLitTrack* mcTrack);
+      CbmLitTrack* track);
 
    /**
     * \brief Fill pull/residual histograms for specified predicted track parameters.
@@ -171,7 +171,7 @@ private:
     */
    void FillHistosPropagation(
       const CbmLitTrackParam* par,
-      const CbmLitTrackParam* mcPar,
+      const CbmLitMCPoint* mcPar,
       const CbmLitHit* hit,
       Int_t plane);
 
@@ -185,7 +185,7 @@ private:
     */
    void FillHistosFilter(
       const CbmLitTrackParam* par,
-      const CbmLitTrackParam* mcPar,
+      const CbmLitMCPoint* mcPar,
       const CbmLitHit* hit,
       Int_t plane,
       float chisq);
@@ -195,21 +195,21 @@ private:
     */
    void FillHistosFitter(
       const CbmLitTrack* track,
-      const CbmLitTrack* mcTrack);
+      const CbmLitMCTrack* mcTrack);
 
    /**
     *
     */
-   void McPointToLitFitNode(
-      FairMCPoint* point,
-      CbmLitFitNode* node);
+//   void McPointToLitFitNode(
+//      FairMCPoint* point,
+//      CbmLitFitNode* node);
 
    /**
     *
     */
    std::vector<Double_t> CalcResidualsAndPulls(
       const CbmLitTrackParam* par,
-      const CbmLitTrackParam* mcPar);
+      const CbmLitMCPoint* mcPoint);
 
    /**
     *
@@ -220,9 +220,14 @@ private:
     *
     */
    void TestFastPropagation(
-      CbmLitTrack* track,
-      CbmLitTrack* mcTrack);
+      CbmLitTrack* track);
 
+   Int_t GetMcTrackId(
+         const CbmGlobalTrack* track);
+
+   CbmLitMCPoint GetMcPointByHit(
+         const CbmLitHit* hit,
+         const CbmLitMCTrack* mcTrack);
    /**
     *
     */
@@ -249,7 +254,7 @@ private:
    Bool_t fIsTof; // If TOF detected than true
 
    TrackPtrVector fLitTracks; // array with reconstructed global tracks converted to LitTracks
-   TrackPtrVector fLitMcTracks; // array with MC track converted to LitTracks
+//   TrackPtrVector fLitMcTracks; // array with MC track converted to LitTracks
    Int_t fNofPlanes; // number of planes in the detector
 
    Int_t fPDGCode; // PDG code for the track fit
@@ -260,23 +265,23 @@ private:
    Int_t fNofTofHits; // number of TOF hits
 
    // Pointers to data arrays
-   TClonesArray* fMCTracks; // CbmMCTrack array
+//   TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
    TClonesArray* fStsTracks; // CbmStsTrack array
-// TClonesArray* fStsTrackMatches; // CbmStsTrackMatch array
+   TClonesArray* fStsTrackMatches; // CbmStsTrackMatch array
    TClonesArray* fMuchTracks; // CbmMuchTracks array
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
-   TClonesArray* fMuchPoints; // CbmMuchPoint array
+//   TClonesArray* fMuchPoints; // CbmMuchPoint array
    TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
-   TClonesArray* fMuchPixelDigiMatches; // CbmMuchDigiMatch array for pixel hits
-   TClonesArray* fMuchStrawDigiMatches; // CbmMuchDigiMatch array for straw hits
-   TClonesArray* fMuchClusters; // CbmMuchCluster array
+//   TClonesArray* fMuchPixelDigiMatches; // CbmMuchDigiMatch array for pixel hits
+//   TClonesArray* fMuchStrawDigiMatches; // CbmMuchDigiMatch array for straw hits
+//   TClonesArray* fMuchClusters; // CbmMuchCluster array
    TClonesArray* fTrdTracks; // CbmTrdTrack array
    TClonesArray* fTrdHits; // CbmTrdHit array
-   TClonesArray* fTrdPoints; // CbmTrdPoint array
+//   TClonesArray* fTrdPoints; // CbmTrdPoint array
    TClonesArray* fTrdTrackMatches; // CbmTrdTrackMatch array
-   TClonesArray* fTofPoints; // CbmTofPoint array
+//   TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 
    // Tools

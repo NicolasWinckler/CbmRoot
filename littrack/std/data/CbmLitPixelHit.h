@@ -68,7 +68,8 @@ public:
          << " dxy=" << GetDxy() << " planeId=" << GetPlaneId()
          << " refId=" << GetRefId() << " w=" << GetW()
          << " isOutlier=" << IsOutlier()
-         << " hitType=" << GetType() << std::endl;
+         << " hitType=" << GetType()
+         << " detId=" << GetDetectorId() << std::endl;
       return ss.str();
    }
 

@@ -145,6 +145,8 @@ private:
 	      const vector<Double_t>& x,
 	      const vector<Double_t>& y);
 
+	void PrintStatisctics();
+
 	TClonesArray* fRichHits;
 	TClonesArray* fRichRings;
 	TClonesArray* fRichPoints; 
@@ -208,6 +210,15 @@ private:
    // Detector acceptance vs pt, y, p
    TH3D* fhMc3D;
    TH3D* fhAcc3D;
+
+   // numbers in dependence on XY position onto the photodetector
+   TH2D* fhNofHitsXY;
+   TH2D* fhNofPointsXY;
+   TH2D* fhBoverAXY;
+   TH2D* fhBaxisXY;
+   TH2D* fhAaxisXY;
+   TH2D* fhRadiusXY;
+   TH2D* fhCounterXY;
 
 	vector<TH1*> fHists; // store all TH1 pointers of the histogram
 

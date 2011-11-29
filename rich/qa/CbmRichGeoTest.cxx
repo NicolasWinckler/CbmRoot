@@ -124,8 +124,22 @@ CbmRichGeoTest::CbmRichGeoTest()
    fHists.push_back(fhMc3D);
    fhAcc3D = new TH3D("fhAcc3D", "fhAcc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30., 0., 3., 40., 0., 4.);;
    fHists.push_back(fhAcc3D);
-   //fhEff3D = new TH3D("fhEff3D", "fhEff3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30., 0., 3., 40., 0., 4.);;
-   //fHists.push_back(fhEff3D);
+
+   // numbers in dependence on XY position onto the photodetector
+   fhNofHitsXY = new TH2D("fhNofHitsXY", "fhNofHitsXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhNofHitsXY);
+   fhNofPointsXY = new TH2D("fhNofPointsXY", "fhNofPointsXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhNofPointsXY);
+   fhBoverAXY = new TH2D("fhBoverAXY", "fhBoverAXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhBoverAXY);
+   fhBaxisXY = new TH2D("fhBaxisXY", "fhBaxisXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhBaxisXY);
+   fhAaxisXY = new TH2D("fhAaxisXY", "fhAaxisXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhAaxisXY);
+   fhRadiusXY = new TH2D("fhRadiusXY", "fhRadiusXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhRadiusXY);
+   fhCounterXY = new TH2D("fhCounterXY", "fhCounterXY;X [cm];Y [cm];Yield", 50, -200., 200., 50, -200, 200);
+   fHists.push_back(fhCounterXY);
 }
 
 CbmRichGeoTest::~CbmRichGeoTest()
@@ -261,6 +275,9 @@ void CbmRichGeoTest::RingParameters()
       FitAndFillHistCircle(0, ring, momentum, x, y); //hits
       FitAndFillHistCircle(1, ringMc, momentum, xMc, yMc); // points
       FillMcVsHitFitCircle(ring, ringMc);
+
+      Double_t r = ringMc->GetRadius();
+
       if (ring->GetRadius() > fMinRadius && ring->GetRadius() < fMaxRadius){
          fhNofHitsCircleFit->Fill(ring->GetNofHits());
       }
@@ -275,6 +292,20 @@ void CbmRichGeoTest::RingParameters()
 	       &&  ring->GetBaxis() > fMinBaxis && ring->GetAaxis() < fMaxBaxis ){
 	      fhNofHitsEllipseFit->Fill(ring->GetNofHits());
 	   }
+	   Double_t np = xMc.size();
+      Double_t xc = ringMc->GetCenterX();
+      Double_t yc = ringMc->GetCenterY();
+      Double_t a = ringMc->GetAaxis();
+      Double_t b = ringMc->GetBaxis();
+      Double_t nh = ring->GetNofHits();
+
+	   fhNofHitsXY->Fill(xc, yc, nh);
+	   fhNofPointsXY->Fill(xc, yc, np);
+	   fhBoverAXY->Fill(xc, yc, a/b);
+	   fhBaxisXY->Fill(xc, yc, b);
+	   fhAaxisXY->Fill(xc, yc, a);
+	   fhRadiusXY->Fill(xc, yc, r);
+	   fhCounterXY->Fill(xc, yc);
 
 		delete ringMc;
 	}// iR
@@ -531,7 +562,6 @@ void CbmRichGeoTest::DrawHist()
    TH1D* pxEff = Divide1DHists(pxAcc, pxMc, "pxEff", "", "P [GeV/c]", "Efficiency");
    TH1D* pyEff = Divide1DHists(pyAcc, pyMc, "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
    TH1D* pzEff = Divide1DHists(pzAcc, pzMc, "pzEff", "", "Rapidity", "Efficiency");
-
    cAccEff->cd(1);
    DrawHist1D(pxMc);
    cAccEff->cd(2);
@@ -550,11 +580,41 @@ void CbmRichGeoTest::DrawHist()
    DrawHist1D(pyEff);
    cAccEff->cd(9);
    DrawHist1D(pzEff);
+
+   TCanvas *cNumbersVsXY = new TCanvas("cnumbersVsXY", "cnumbersVsXY", 900, 600);
+   cNumbersVsXY->Divide(3,2);
+   cNumbersVsXY->cd(1);
+   fhNofHitsXY->Divide(fhCounterXY);
+   fhNofHitsXY->Draw("COLZ");
+   cNumbersVsXY->cd(2);
+   fhNofPointsXY->Divide(fhCounterXY);
+   fhNofPointsXY->Draw("COLZ");
+   cNumbersVsXY->cd(3);
+   fhBoverAXY->Divide(fhCounterXY);
+   fhBoverAXY->Draw("COLZ");
+   cNumbersVsXY->cd(4);
+   fhBaxisXY->Divide(fhCounterXY);
+   fhBaxisXY->Draw("COLZ");
+   cNumbersVsXY->cd(5);
+   fhAaxisXY->Divide(fhCounterXY);
+   fhAaxisXY->Draw("COLZ");
+   cNumbersVsXY->cd(6);
+   fhRadiusXY->Divide(fhCounterXY);
+   fhRadiusXY->Draw("COLZ");
+}
+
+void CbmRichGeoTest::PrintStatisctics()
+{
+   cout << "-I- CbmRichGeoTest final statistics:" << endl;
+   cout << "Detector Acceptance = " << CalcEfficiency(fhAcc3D, fhMc3D) << endl;
+   cout << "Circle fit efficiency = " << CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll) << endl;
+   cout << "Ellipse fit efficiency = " << CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll) << endl;
 }
 
 void CbmRichGeoTest::Finish()
 {
    DrawHist();
+   PrintStatisctics();
    for (Int_t i = 0; i < fHists.size(); i++){
       fHists[i]->Write();
    }

@@ -24,6 +24,7 @@
 
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TH3D.h"
 #include "TCanvas.h"
 #include "TEllipse.h"
 #include "TClonesArray.h"
@@ -44,6 +45,7 @@ CbmRichGeoTest::CbmRichGeoTest()
 {
 	fEventNum = 0;
 	fNofDrawnRings = 0;
+	fMinNofHits = 7;
 
    fMinAaxis = 3.5;
    fMaxAaxis = 6.5;
@@ -116,6 +118,14 @@ CbmRichGeoTest::CbmRichGeoTest()
    fHists.push_back(fhNofHitsCircleFitEff);
    fhNofHitsEllipseFitEff = new TH1D("fhNofHitsEllipseFitEff", "fhNofHitsEllipseFitEff;Nof hits in ring;Efficiency [%]", 50, 0., 50.);
    fHists.push_back(fhNofHitsEllipseFitEff);
+
+   // Detector acceptance efficiency vs. pt, y, p
+   fhMc3D = new TH3D("fhMc3D", "fhMc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30., 0., 3., 40., 0., 4.);
+   fHists.push_back(fhMc3D);
+   fhAcc3D = new TH3D("fhAcc3D", "fhAcc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30., 0., 3., 40., 0., 4.);;
+   fHists.push_back(fhAcc3D);
+   //fhEff3D = new TH3D("fhEff3D", "fhEff3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30., 0., 3., 40., 0., 4.);;
+   //fHists.push_back(fhEff3D);
 }
 
 CbmRichGeoTest::~CbmRichGeoTest()
@@ -182,8 +192,23 @@ void CbmRichGeoTest::Exec(
 {
 	fEventNum++;
 	cout << "CbmRichGeoTest, event No. " <<  fEventNum << endl;
+	FillMcHist();
 	RingParameters();
 	HitsAndPoints();
+}
+
+void CbmRichGeoTest::FillMcHist()
+{
+   for (Int_t i = 0; i < fMCTracks->GetEntriesFast(); i++){
+      CbmMCTrack* mcTrack = (CbmMCTrack*)fMCTracks->At(i);
+      if (!mcTrack) continue;
+      Int_t motherId = mcTrack->GetMotherId();
+      Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
+
+      if (pdg != 11 || motherId != -1) continue; // only primary electrons
+
+      fhMc3D->Fill(mcTrack->GetP(), mcTrack->GetPt(), mcTrack->GetRapidity());
+   }
 }
 
 void CbmRichGeoTest::RingParameters()
@@ -201,8 +226,15 @@ void CbmRichGeoTest::RingParameters()
 		Int_t motherId = mcTrack->GetMotherId();
 		Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
 		Double_t momentum = mcTrack->GetP();
+      Double_t pt = mcTrack->GetPt();
+      Double_t rapidity = mcTrack->GetRapidity();
 
 		if (pdg != 11 || motherId != -1) continue; // only primary electrons
+      cout << "Nof hits = " << ring->GetNofHits() << endl;
+		if (ring->GetNofHits() >= fMinNofHits){
+		   cout << "nofHits here " << endl;
+		   fhAcc3D->Fill(momentum, pt, rapidity);
+		}
 
 		vector<double> xMc, yMc;
 		Int_t nofRichPoints = fRichPoints->GetEntriesFast();
@@ -232,7 +264,7 @@ void CbmRichGeoTest::RingParameters()
       if (ring->GetRadius() > fMinRadius && ring->GetRadius() < fMaxRadius){
          fhNofHitsCircleFit->Fill(ring->GetNofHits());
       }
-	   if (ring->GetNofHits() < 9 && ring->GetNofHits() >= 7){
+	   if (fNofDrawnRings < 10 && ring->GetNofHits() <= 7 && ring->GetNofHits() >= 7){
 	      DrawRing(ring, xMc, yMc);
 	   }
 
@@ -385,6 +417,7 @@ void CbmRichGeoTest::DrawRing(
 
 void CbmRichGeoTest::DrawHist()
 {
+   //SetStyles();
    for (int i = 0; i < 2; i++){
       stringstream ss;
       if (i == 0) ss << "hits fitting";
@@ -480,11 +513,48 @@ void CbmRichGeoTest::DrawHist()
    cFitEff->cd(5);
    fhNofHitsEllipseFitEff->Divide(fhNofHitsEllipseFit, fhNofHitsAll);
    DrawHist1D(fhNofHitsEllipseFitEff);
+
+   TCanvas *cAccEff = new TCanvas("cAccEff", "cAccEff", 900, 900);
+   cAccEff->Divide(3,3);
+   TH1D* pxMc = fhMc3D->ProjectionX();
+   pxMc->SetName((string(fhMc3D->GetName())+"_px").c_str());
+   TH1D* pyMc = fhMc3D->ProjectionY();
+   pyMc->SetName((string(fhMc3D->GetName())+"_py").c_str());
+   TH1D* pzMc = fhMc3D->ProjectionZ();
+   pzMc->SetName((string(fhMc3D->GetName())+"_pz").c_str());
+   TH1D* pxAcc = fhAcc3D->ProjectionX();
+   pxAcc->SetName((string(fhAcc3D->GetName())+"_px").c_str());
+   TH1D* pyAcc = fhAcc3D->ProjectionY();
+   pyAcc->SetName((string(fhAcc3D->GetName())+"_py").c_str());
+   TH1D* pzAcc = fhAcc3D->ProjectionZ();
+   pzAcc->SetName((string(fhAcc3D->GetName())+"_pz").c_str());
+   TH1D* pxEff = Divide1DHists(pxAcc, pxMc, "pxEff", "", "P [GeV/c]", "Efficiency");
+   TH1D* pyEff = Divide1DHists(pyAcc, pyMc, "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
+   TH1D* pzEff = Divide1DHists(pzAcc, pzMc, "pzEff", "", "Rapidity", "Efficiency");
+
+   cAccEff->cd(1);
+   DrawHist1D(pxMc);
+   cAccEff->cd(2);
+   DrawHist1D(pyMc);
+   cAccEff->cd(3);
+   DrawHist1D(pzMc);
+   cAccEff->cd(4);
+   DrawHist1D(pxAcc);
+   cAccEff->cd(5);
+   DrawHist1D(pyAcc);
+   cAccEff->cd(6);
+   DrawHist1D(pzAcc);
+   cAccEff->cd(7);
+   DrawHist1D(pxEff);
+   cAccEff->cd(8);
+   DrawHist1D(pyEff);
+   cAccEff->cd(9);
+   DrawHist1D(pzEff);
 }
 
 void CbmRichGeoTest::Finish()
 {
-   Draw();
+   DrawHist();
    for (Int_t i = 0; i < fHists.size(); i++){
       fHists[i]->Write();
    }

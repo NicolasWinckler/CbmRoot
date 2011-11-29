@@ -14,6 +14,7 @@
 
 class TH1D;
 class TH2D;
+class TH3D;
 class TClonesArray;
 class CbmRichRingFitterCOP;
 class CbmRichRingFitterEllipseTau;
@@ -68,6 +69,12 @@ public:
    virtual void Finish();
 
 private:
+
+   /**
+    * \brief Fill MC histogram for detector acceptance calculation.
+    */
+   void FillMcHist();
+
    /**
     * \brief Loop over all rings in array and fill ring parameters histograms.
     */
@@ -156,6 +163,7 @@ private:
 	CbmRichRingFitterEllipseTau* fTauFit;
 
 	Int_t fEventNum;
+	Int_t fMinNofHits;
 
 	vector<TH1D*> fhNofHits; // number of hits per ring
 	// ellipse fitting parameters
@@ -194,9 +202,12 @@ private:
                              // for good fitted rings using circle  fitting
    TH1D* fhNofHitsEllipseFit; // distribution of the number of hits in ring
                               // for good fitted rings using ellipse  fitting
-
    TH1D* fhNofHitsCircleFitEff;
    TH1D* fhNofHitsEllipseFitEff;
+
+   // Detector acceptance vs pt, y, p
+   TH3D* fhMc3D;
+   TH3D* fhAcc3D;
 
 	vector<TH1*> fHists; // store all TH1 pointers of the histogram
 

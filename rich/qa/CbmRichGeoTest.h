@@ -124,11 +124,19 @@ private:
          CbmRichRing* ringMc);
 
    /**
-    * \brief Calculate residuals between hits and Mc points and fill histograms.
+    * \brief Calculate residuals between hits and MC points and fill histograms.
     */
    void HitsAndPoints();
 
-	void Draw();
+   /**
+    *  \brief Draw histograms.
+    */
+	void DrawHist();
+
+	void DrawRing(
+	      CbmRichRing* ring,
+	      const vector<Double_t>& x,
+	      const vector<Double_t>& y);
 
 	TClonesArray* fRichHits;
 	TClonesArray* fRichRings;
@@ -191,6 +199,8 @@ private:
    TH1D* fhNofHitsEllipseFitEff;
 
 	vector<TH1*> fHists; // store all TH1 pointers of the histogram
+
+	Int_t fNofDrawnRings; // store number of drawn rings
 
 	ClassDef(CbmRichGeoTest,1)
 };

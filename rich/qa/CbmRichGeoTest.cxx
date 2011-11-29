@@ -28,11 +28,14 @@
 #include "TEllipse.h"
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "TPad.h"
+#include "TLatex.h"
 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -40,6 +43,7 @@ CbmRichGeoTest::CbmRichGeoTest()
    :FairTask("RichGeoTestQa")
 {
 	fEventNum = 0;
+	fNofDrawnRings = 0;
 
    fMinAaxis = 3.5;
    fMaxAaxis = 6.5;
@@ -228,6 +232,9 @@ void CbmRichGeoTest::RingParameters()
       if (ring->GetRadius() > fMinRadius && ring->GetRadius() < fMaxRadius){
          fhNofHitsCircleFit->Fill(ring->GetNofHits());
       }
+	   if (ring->GetNofHits() < 9 && ring->GetNofHits() >= 7){
+	      DrawRing(ring, xMc, yMc);
+	   }
 
 		FitAndFillHistEllipse(0, ring, momentum, x, y);// hits
 		FitAndFillHistEllipse(1, ringMc, momentum, xMc, yMc); // points
@@ -236,6 +243,7 @@ void CbmRichGeoTest::RingParameters()
 	       &&  ring->GetBaxis() > fMinBaxis && ring->GetAaxis() < fMaxBaxis ){
 	      fhNofHitsEllipseFit->Fill(ring->GetNofHits());
 	   }
+
 		delete ringMc;
 	}// iR
 }
@@ -315,8 +323,67 @@ void CbmRichGeoTest::HitsAndPoints()
    }
 }
 
+void CbmRichGeoTest::DrawRing(
+      CbmRichRing* ring,
+      const vector<Double_t>& x,
+      const vector<Double_t>& y)
+{
+   stringstream ss;
+   ss << "Event" << fNofDrawnRings;
+   fNofDrawnRings++;
+   TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 500, 500);
+   c->SetGrid(true, true);
+   TH2D* pad = new TH2D("pad", ";X [cm];Y [cm]", 1, -10., 10., 1, -10., 10);
+   pad->SetStats(false);
+   pad->Draw();
 
-void CbmRichGeoTest::Draw()
+   // find min and max x and y positions of the hits
+   // in order to shift drawing
+   double xmin = 99999., xmax = -99999., ymin = 99999., ymax = -99999.;
+   for (int i = 0; i < ring->GetNofHits(); i++){
+      CbmRichHit* hit = (CbmRichHit*)fRichHits->At(ring->GetHit(i));
+      double hitX = hit->GetX();
+      double hitY = hit->GetY();
+      if (xmin > hitX) xmin = hitX;
+      if (xmax < hitX) xmax = hitX;
+      if (ymin > hitY) ymin = hitY;
+      if (ymax < hitY) ymax = hitY;
+   }
+   double xCur = (xmin + xmax) / 2.;
+   double yCur = (ymin + ymax) / 2.;
+
+   //Draw circle and center
+   TEllipse* circle = new TEllipse(ring->GetCenterX() - xCur,
+         ring->GetCenterY() - yCur, ring->GetRadius());
+   circle->SetFillStyle(0);
+   circle->SetLineWidth(3);
+   circle->Draw();
+   TEllipse* center = new TEllipse(ring->GetCenterX() - xCur, ring->GetCenterY() - yCur, 0.25);
+   center->Draw();
+
+   // Draw hits
+   for (int i = 0; i < ring->GetNofHits(); i++){
+      CbmRichHit* hit = (CbmRichHit*)fRichHits->At(ring->GetHit(i));
+      TEllipse* hitDr = new TEllipse(hit->GetX() - xCur, hit->GetY() - yCur, 0.25);
+      hitDr->SetFillColor(kRed);
+      hitDr->Draw();
+   }
+
+   // Draw MC Points
+   for (int i = 0; i < x.size(); i++){
+      TEllipse* pointDr = new TEllipse(x[i] - xCur, y[i] - yCur, 0.1);
+      pointDr->SetFillColor(kBlue);
+      pointDr->Draw();
+   }
+
+   //Draw information
+   stringstream ss2;
+   ss2 << "(r, n)=(" << setprecision(3) << ring->GetRadius() << ", " << ring->GetNofHits()<<")";
+   TLatex* latex = new TLatex(-8., 8., ss2.str().c_str());
+   latex->Draw();
+}
+
+void CbmRichGeoTest::DrawHist()
 {
    for (int i = 0; i < 2; i++){
       stringstream ss;

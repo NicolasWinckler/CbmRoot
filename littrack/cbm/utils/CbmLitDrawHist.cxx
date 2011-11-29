@@ -101,7 +101,7 @@ void DrawHist2D(
    gPad->SetLeftMargin(0.17);
    gPad->SetRightMargin(0.30);
    gPad->SetBottomMargin(0.15);
-
+   gPad->SetTicks(1, 1);
    hist->Draw(drawOpt.c_str());
 }
 

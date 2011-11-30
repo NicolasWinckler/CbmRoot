@@ -5,8 +5,9 @@
  * \date 2011
  */
 #include "CbmLitQaReconstructionReportStudy.h"
-#include "CbmLitQaHtmlReportElementStudy.h"
-#include "CbmLitQaLatexReportElementStudy.h"
+#include "../CbmLitQaHtmlReportElement.h"
+#include "../CbmLitQaLatexReportElement.h"
+#include "../CbmLitQaTxtReportElement.h"
 
 #include "utils/CbmLitUtils.h"
 
@@ -18,8 +19,9 @@
 CbmLitQaReconstructionReportStudy::CbmLitQaReconstructionReportStudy(
       const string& type)
 {
-   if (type == "latex") fR = new CbmLitQaLatexReportElementStudy();
-   else fR = new CbmLitQaHtmlReportElementStudy();
+   if (type == "latex") fR = new CbmLitQaLatexReportElement();
+   else if (type == "html") fR = new CbmLitQaHtmlReportElement();
+   else if (type == "txt")  fR = new CbmLitQaTxtReportElement();
 }
 
 CbmLitQaReconstructionReportStudy::~CbmLitQaReconstructionReportStudy()
@@ -33,61 +35,58 @@ void CbmLitQaReconstructionReportStudy::Create(
    out.precision(3);
    out << fR->PrintHead();
 
-   out << fR->PrintSubtitle(fTitle);
+   //out << fR->PrintSubtitle(fTitle);
 
-   out << fR->PrintTableBegin("Number of objects");
-
-   int row = 0;
-
-   out << fR->PrintRow(row++, "hEventNo", "Number of events");
+   out << fR->PrintTableBegin("Number of objects", fStudyNames);
+   out << fR->PrintRow("hEventNo", "Number of events");
 
    if (fIsMvd) {
-      out << fR->PrintRow(row++, "hNofMvdPoints", "MVD points");
-      out << fR->PrintRow(row++, "hNofMvdDigis", "MVD digis");
-      out << fR->PrintRow(row++, "hNofMvdClusters", "MVD clusters");
-      out << fR->PrintRow(row++, "hNofMvdHits", "MVD hits");
+      out << PrintRow("hNofMvdPoints", "MVD points");
+      out << PrintRow("hNofMvdDigis", "MVD digis");
+      out << PrintRow("hNofMvdClusters", "MVD clusters");
+      out << PrintRow("hNofMvdHits", "MVD hits");
    }
 
    if (fIsSts) {
-      out << fR->PrintRow(row++, "hNofStsPoints", "STS points");
-      out << fR->PrintRow(row++, "hNofStsDigis", "STS digis");
-      out << fR->PrintRow(row++, "hNofStsClusters", "STS clusters");
-      out << fR->PrintRow(row++, "hNofStsHits", "STS hits");
-      out << fR->PrintRow(row++, "hNofStsTracks", "STS tracks");
+      out << PrintRow("hNofStsPoints", "STS points");
+      out << PrintRow("hNofStsDigis", "STS digis");
+      out << PrintRow("hNofStsClusters", "STS clusters");
+      out << PrintRow("hNofStsHits", "STS hits");
+      out << PrintRow("hNofStsTracks", "STS tracks");
    }
 
    if (fIsRich) {
-      out << fR->PrintRow(row++, "hNofRichPoints", "RICH points");
-      out << fR->PrintRow(row++, "hNofRichHits", "RICH hits");
-      out << fR->PrintRow(row++, "hNofRichProjections", "RICH projections");
-      out << fR->PrintRow(row++, "hNofRichRings", "RICH rings");
+      out << PrintRow("hNofRichPoints", "RICH points");
+      out << PrintRow("hNofRichHits", "RICH hits");
+      out << PrintRow("hNofRichProjections", "RICH projections");
+      out << PrintRow("hNofRichRings", "RICH rings");
    }
 
    if (fIsTrd) {
-      out << fR->PrintRow(row++, "hNofTrdPoints", "TRD points");
-      out << fR->PrintRow(row++, "hNofTrdDigis", "TRD digis");
-      out << fR->PrintRow(row++, "hNofTrdClusters", "TRD clusters");
-      out << fR->PrintRow(row++, "hNofTrdHits", "TRD hits");
-      out << fR->PrintRow(row++, "hNofTrdTracks", "TRD tracks");
+      out << PrintRow("hNofTrdPoints", "TRD points");
+      out << PrintRow("hNofTrdDigis", "TRD digis");
+      out << PrintRow("hNofTrdClusters", "TRD clusters");
+      out << PrintRow("hNofTrdHits", "TRD hits");
+      out << PrintRow("hNofTrdTracks", "TRD tracks");
    }
 
    if (fIsMuch) {
-      out << fR->PrintRow(row++, "hNofMuchPoints", "MUCH points");
-      out << fR->PrintRow(row++, "hNofMuchDigis", "MUCH digis");
-      out << fR->PrintRow(row++, "hNofMuchClusters", "MUCH clusters");
-      out << fR->PrintRow(row++, "hNofMuchPixelHits", "MUCH pixel hits");
-      out << fR->PrintRow(row++, "hNofMuchStrawHits", "MUCH straw hits");
-      out << fR->PrintRow(row++, "hNofMuchTracks", "MUCH tracks");
+      out << PrintRow("hNofMuchPoints", "MUCH points");
+      out << PrintRow("hNofMuchDigis", "MUCH digis");
+      out << PrintRow("hNofMuchClusters", "MUCH clusters");
+      out << PrintRow("hNofMuchPixelHits", "MUCH pixel hits");
+      out << PrintRow("hNofMuchStrawHits", "MUCH straw hits");
+      out << PrintRow("hNofMuchTracks", "MUCH tracks");
    }
 
    if (fIsTof) {
-      out << fR->PrintRow(row++, "hNofTofPoints", "TOF points");
+      out << PrintRow("hNofTofPoints", "TOF points");
       //out << PrintRow(row++, "hNofTofDigis", "TOF digis");
       //out << PrintRow(row++, "hNofTofClusters", "TOF clusters");
-      out << fR->PrintRow(row++, "hNofTofHits", "TOF hits");
+      out << PrintRow("hNofTofHits", "TOF hits");
    }
 
-   out << fR->PrintRow(row++, "hNofGlobalTracks", "Global tracks");
+   out << PrintRow("hNofGlobalTracks", "Global tracks");
    out << fR->PrintTableEnd() << endl;
 
 
@@ -96,73 +95,121 @@ void CbmLitQaReconstructionReportStudy::Create(
    string recDet = (fIsTrd) ? "TRD" : (fIsMuch) ? "MUCH" :
          (fIsMuch && fIsTrd) ? "MUCH+TRD" : "";
 
-   out << fR->PrintTableBegin("Reconstruction efficiency");
-   row = 0;
-   out << fR->PrintRowEff(row++, "hSts3D.all", "STS all");
-   out << fR->PrintRowEff(row++, "hSts3D." + signal, "STS " + signal);
-   out << fR->PrintRowEff(row++, "hRec3D.all", recDet + " all");
-   out << fR->PrintRowEff(row++, "hRec3D." + signal, recDet + " " + signal);
-   out << fR->PrintRowEff(row++, "hTof3D.all", "TOF all");
-   out << fR->PrintRowEff(row++, "hTof3D." + signal, "TOF " + signal);
+   out << fR->PrintTableBegin("Reconstruction efficiency", fStudyNames);
+   out << PrintRowEff("hSts3D.all", "STS all");
+   out << PrintRowEff("hSts3D." + signal, "STS " + signal);
+   out << PrintRowEff("hRec3D.all", recDet + " all");
+   out << PrintRowEff("hRec3D." + signal, recDet + " " + signal);
+   out << PrintRowEff("hTof3D.all", "TOF all");
+   out << PrintRowEff("hTof3D." + signal, "TOF " + signal);
 
-   out << fR->PrintEmptyRow(row++, "Normalization STS+" + recDet);
-   out << fR->PrintRowEff(row++, "hSts3DNormHalfGlobal.all", "STS all");
-   out << fR->PrintRowEff(row++, "hSts3DNormHalfGlobal." + signal, "STS " + signal);
-   out << fR->PrintRowEff(row++, "hHalfGlobal3D.all", "STS+" + recDet + " all");
-   out << fR->PrintRowEff(row++, "hHalfGlobal3D." + signal, "STS+" + recDet + " " + signal);
+   out << fR->PrintEmptyRow(fStudyNames.size()+1, "Normalization STS+" + recDet);
+   out << PrintRowEff("hSts3DNormHalfGlobal.all", "STS all");
+   out << PrintRowEff("hSts3DNormHalfGlobal." + signal, "STS " + signal);
+   out << PrintRowEff("hHalfGlobal3D.all", "STS+" + recDet + " all");
+   out << PrintRowEff("hHalfGlobal3D." + signal, "STS+" + recDet + " " + signal);
 
-   out << fR->PrintEmptyRow(row++, "Normalization STS+" + recDet + "+TOF");
-   out << fR->PrintRowEff(row++, "hSts3DNormGlobal.all", "STS all");
-   out << fR->PrintRowEff(row++, "hSts3DNormGlobal." + signal, "STS " + signal);
-   out << fR->PrintRowEff(row++, "hHalfGlobal3DNormGlobal.all", "STS+" + recDet + " all");
-   out << fR->PrintRowEff(row++, "hHalfGlobal3DNormGlobal." + signal, "STS+" + recDet + " " + signal);
-   out << fR->PrintRowEff(row++, "hGlobal3D.all", "STS+" + recDet + "+TOF all");
-   out << fR->PrintRowEff(row++, "hGlobal3D.all", "STS+" + recDet + "+TOF " + signal);
+   out << fR->PrintEmptyRow(fStudyNames.size()+1, "Normalization STS+" + recDet + "+TOF");
+   out << PrintRowEff("hSts3DNormGlobal.all", "STS all");
+   out << PrintRowEff("hSts3DNormGlobal." + signal, "STS " + signal);
+   out << PrintRowEff("hHalfGlobal3DNormGlobal.all", "STS+" + recDet + " all");
+   out << PrintRowEff("hHalfGlobal3DNormGlobal." + signal, "STS+" + recDet + " " + signal);
+   out << PrintRowEff("hGlobal3D.all", "STS+" + recDet + "+TOF all");
+   out << PrintRowEff("hGlobal3D.all", "STS+" + recDet + "+TOF " + signal);
 
    if (fIsRich) {
-      out << fR->PrintEmptyRow(row++, "Efficiency with RICH");
-      out << fR->PrintRowEff(row++, "hRich3D.El", "RICH el");
-      out << fR->PrintRowEff(row++, "hRich3D.ElRef", "RICH el ref");
+      out << fR->PrintEmptyRow(fStudyNames.size()+1, "Efficiency with RICH");
+      out << PrintRowEff("hRich3D.El", "RICH el");
+      out << PrintRowEff("hRich3D.ElRef", "RICH el ref");
 
-      out << fR->PrintEmptyRow(row++, "Normalization STS+RICH");
-      out << fR->PrintRowEff(row++, "hSts3DNormStsRich.El", "STS el");
-      out << fR->PrintRowEff(row++, "hStsRich3D.El", "STS+RICH el");
+      out << fR->PrintEmptyRow(fStudyNames.size()+1, "Normalization STS+RICH");
+      out << PrintRowEff("hSts3DNormStsRich.El", "STS el");
+      out << PrintRowEff("hStsRich3D.El", "STS+RICH el");
 
-      out << fR->PrintEmptyRow(row++, "Normalization STS+RICH+TRD");
-      out << fR->PrintRowEff(row++, "hSts3DNormStsRichTrd.El", "STS el");
-      out << fR->PrintRowEff(row++, "hStsRich3DNormStsRichTrd.El", "STS+RICH el");
-      out << fR->PrintRowEff(row++, "hStsRichTrd3D.El", "STS+RICH+TRD el");
+      out << fR->PrintEmptyRow(fStudyNames.size()+1, "Normalization STS+RICH+TRD");
+      out << PrintRowEff("hSts3DNormStsRichTrd.El", "STS el");
+      out << PrintRowEff("hStsRich3DNormStsRichTrd.El", "STS+RICH el");
+      out << PrintRowEff("hStsRichTrd3D.El", "STS+RICH+TRD el");
 
-      out << fR->PrintEmptyRow(row++, "Normalization STS+RICH+TRD+TOF");
-      out << fR->PrintRowEff(row++, "hSts3DNormStsRichTrdTof.El", "STS el");
-      out << fR->PrintRowEff(row++, "hStsRich3DNormStsRichTrdTof.El", "STS+RICH el");
-      out << fR->PrintRowEff(row++, "hStsRichTrd3DNormStsRichTrdTof.El", "STS+RICH+TRD el");
-      out << fR->PrintRowEff(row++, "hStsRichTrdTof3D.El", "STS+RICH+TRD+TOF el");
+      out << fR->PrintEmptyRow(fStudyNames.size()+1, "Normalization STS+RICH+TRD+TOF");
+      out << PrintRowEff("hSts3DNormStsRichTrdTof.El", "STS el");
+      out << PrintRowEff("hStsRich3DNormStsRichTrdTof.El", "STS+RICH el");
+      out << PrintRowEff("hStsRichTrd3DNormStsRichTrdTof.El", "STS+RICH+TRD el");
+      out << PrintRowEff("hStsRichTrdTof3D.El", "STS+RICH+TRD+TOF el");
    }
    out << fR->PrintTableEnd() << endl;
 
-   out << fR->PrintTableBegin("Ghost rate");
-   row = 0;
-   out << fR->PrintRow(row++, "fhStsGhostNh", "STS");
-   out << fR->PrintRow(row++, "fhRecGhostNh", recDet);
+   out << fR->PrintTableBegin("Ghost rate", fStudyNames);
+   out << PrintRow("fhStsGhostNh", "STS");
+   out << PrintRow("fhRecGhostNh", recDet);
    if (fIsRich) {
-      out << fR->PrintRow(row++, "fhRichGhostNh", "RICH");
-      out << fR->PrintEmptyRow(row++, "after STS-RICH matching");
-      out << fR->PrintRow(row++, "fhStsGhostRichMatchingNh", "STS");
-      out << fR->PrintRow(row++, "fhRichGhostStsMatchingNh", "RICH");
-      out << fR->PrintEmptyRow(row++, "after STS-RICH matching and el identification");
-      out << fR->PrintRow(row++, "fhRichGhostElIdNh", "RICH");
+      out << PrintRow("fhRichGhostNh", "RICH");
+      out << fR->PrintEmptyRow(fStudyNames.size()+1, "after STS-RICH matching");
+      out << PrintRow("fhStsGhostRichMatchingNh", "STS");
+      out << PrintRow("fhRichGhostStsMatchingNh", "RICH");
+      out << fR->PrintEmptyRow(fStudyNames.size()+1, "after STS-RICH matching and el identification");
+      out << PrintRow("fhRichGhostElIdNh", "RICH");
    }
    out << fR->PrintTableEnd() << endl;
    // For image paths put only file name without type, e.g. ".eps" or ".png".
    // Type will be added automatically.
-   if (fIsSts) out << fR->PrintImage("STS reconstruction efficiency", "rec_qa_sts_efficiency");
-   if (fIsTrd || fIsMuch) out << fR->PrintImage(recDet + " reconstruction efficiency", "rec_qa_rec_efficiency");
-   if (fIsTof) out << fR->PrintImage("TOF hit matching efficiency", "rec_qa_tof_efficiency");
-   if (fIsRich) out << fR->PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
-   out << fR->PrintImage("Global reconstruction efficiency", "rec_qa_global_efficiency_all");
-   out << fR->PrintImage("Global reconstruction efficiency for signal", "rec_qa_global_efficiency_signal");
-   if (fIsRich) out << fR->PrintImage("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
+   if (fIsSts) out << PrintImage("STS reconstruction efficiency", "rec_qa_sts_efficiency");
+   if (fIsTrd || fIsMuch) out << PrintImage(recDet + " reconstruction efficiency", "rec_qa_rec_efficiency");
+   if (fIsTof) out << PrintImage("TOF hit matching efficiency", "rec_qa_tof_efficiency");
+   if (fIsRich) out << PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
+   out << PrintImage("Global reconstruction efficiency", "rec_qa_global_efficiency_all");
+   out << PrintImage("Global reconstruction efficiency for signal", "rec_qa_global_efficiency_signal");
+   if (fIsRich) out << PrintImage("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
 
    out <<  fR->PrintCloseDocument();
+}
+
+
+string CbmLitQaReconstructionReportStudy::PrintRow(
+      const string& property,
+      const string& name)
+{
+   string n[7] = {"","","","","","",""};
+   for (int i = 0; i < fStudyNames.size(); i++) {
+      n[i] = PrintValue(i, property);
+   }
+   return fR->PrintRow(name, n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
+}
+
+string CbmLitQaReconstructionReportStudy::PrintRowEff(
+      const string& property,
+      const string& name)
+{
+   string n[7] = {"","","","","","",""};
+   for (int i = 0; i < fStudyNames.size(); i++) {
+      stringstream ss;
+      string eff = PrintValue(i, property + ".eff");
+      string acc = PrintValue(i, property + ".acc");
+      string rec = PrintValue(i, property + ".rec");
+      ss << eff << " ("<< rec << "/" << acc << ")";
+      n[i] = ss.str();
+   }
+   return fR->PrintRow(name, n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
+}
+
+string CbmLitQaReconstructionReportStudy::PrintImage(
+      const string& title,
+      const string& file)
+{
+   stringstream ss;
+   for (int i = 0; i < fStudyNames.size(); i++){
+      string fileName = fStudyResults[i] + "/" + file;
+      ss << fR->PrintImage(fStudyNames[i] + " " +title, fileName);
+   }
+   return ss.str();
+}
+
+string CbmLitQaReconstructionReportStudy::PrintValue(
+      int studyId,
+      const string& valueName)
+{
+   stringstream ss;
+   ss << fQa[studyId].get(valueName, -1.);
+
+   return ss.str();
 }

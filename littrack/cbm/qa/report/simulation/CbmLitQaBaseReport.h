@@ -9,7 +9,7 @@
 #ifndef CBMLITQABASEREPORT_H_
 #define CBMLITQABASEREPORT_H_
 
-#include "CbmLitQaBaseReportElement.h"
+#include "../CbmLitQaBaseReportElement.h"
 #include "CbmDetectorList.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
@@ -69,6 +69,23 @@ public:
          ostream& out,
          boost::property_tree::ptree* qa);
 
+
+   void SetPtreeQa(boost::property_tree::ptree* qa){fQa = qa;}
+
+   void SetPtreeIdeal(boost::property_tree::ptree* ideal){fIdeal = ideal;}
+
+   void SetPtreeCheck(boost::property_tree::ptree* check){fCheck = check;}
+
+   void SetOutputDir(const string& dir){fOutputDir = dir;}
+
+   void SetErrorColor(const string& color){fErrorColor = color;}
+
+   void SetWarningColor(const string& color){fWarningColor = color;}
+
+   void SetNormalColor(const string& color){fNormalColor = color;}
+
+   void SetIsUseChecking(bool isCheck){fIsUseChecking = isCheck;}
+
 protected:
 
    /**
@@ -89,6 +106,23 @@ protected:
    bool fIsTof; // If TOF detected than true
 
    string fTitle; // report title
+
+   // Property tree of Qa results for each study
+   boost::property_tree::ptree* fQa;
+   // Property with ideal values
+   boost::property_tree::ptree* fIdeal;
+   // Property tree with checked results for each study
+   boost::property_tree::ptree* fCheck;
+   // Name of directory with results
+   string fOutputDir;
+
+   // Background colors for error highlighting
+   string fErrorColor; // error
+   string fWarningColor; // warning
+   string fNormalColor; // normal
+
+   // If TRUE than results are highlighted depending on the results of checking procedure
+   bool fIsUseChecking;
 };
 
 #endif /* CBMLITQABASEREPORT_H_ */

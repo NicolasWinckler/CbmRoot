@@ -12,7 +12,7 @@
 #include "CbmDetectorList.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
-#include "CbmLitQaBaseReportElementStudy.h"
+#include "../CbmLitQaBaseReportElement.h"
 
 using namespace std;
 
@@ -71,6 +71,24 @@ public:
          const vector<string>& results,
          const vector<string>& names);
 
+   void SetPtreeQa(const vector<boost::property_tree::ptree>& qa){fQa = qa;}
+
+   void SetPtreeIdeal(boost::property_tree::ptree* ideal){fIdeal = ideal;}
+
+   void SetPtreeCheck(const vector<boost::property_tree::ptree>& check){fCheck = check;}
+
+   void SetStudyNames(const vector<string>& names){fStudyNames = names;}
+
+   void SetStudyResults(const vector<string>& results){fStudyResults = results;}
+
+   void SetErrorColor(const string& color){fErrorColor = color;}
+
+   void SetWarningColor(const string& color){fWarningColor = color;}
+
+   void SetNormalColor(const string& color){fNormalColor = color;}
+
+   void SetIsUseChecking(bool isCheck){fIsUseChecking = isCheck;}
+
 protected:
 
    /**
@@ -80,8 +98,7 @@ protected:
    virtual void Create(
       ostream& out) = 0;
 
-
-   CbmLitQaBaseReportElementStudy* fR;
+   CbmLitQaBaseReportElement* fR;
 
    bool fIsElectronSetup; // If "electron" setup detected than true
    bool fIsMvd; // If MVD detected than true
@@ -93,6 +110,24 @@ protected:
 
    string fTitle; // report title
 
+   // Property tree of Qa results for each study
+   vector<boost::property_tree::ptree> fQa;
+   // Property with ideal values
+   boost::property_tree::ptree* fIdeal;
+   // Property tree with checked results for each study
+   vector<boost::property_tree::ptree> fCheck;
+   // Names of studies
+   vector<string> fStudyNames;
+   // Names of directories with study results
+   vector<string> fStudyResults;
+
+   // Background colors for error highlighting
+   string fErrorColor; // error
+   string fWarningColor; // warning
+   string fNormalColor; // normal
+
+   // If TRUE than results are highlighted depending on the results of checking procedure
+   bool fIsUseChecking;
 };
 
 #endif /* CbmLitQaBaseReportStudy_H_ */

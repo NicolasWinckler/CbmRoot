@@ -62,15 +62,15 @@ void CbmLitQaBaseReport::CreateReport(
    //read_json(outputDir + "/rec_qa_check.json", check);
 
 
-   fR->SetPtreeQa(qa);
-  // fR->SetPtreeIdeal(&ideal);
-  // fR->SetPtreeCheck(&check);
-  // fR->SetOutputDir(outputDir);
+   SetPtreeQa(qa);
+  // SetPtreeIdeal(&ideal);
+  // SetPtreeCheck(&check);
+  // SetOutputDir(outputDir);
 
-   fR->SetErrorColor("#FF0000");
-   fR->SetWarningColor("#FFFF00");
-   fR->SetNormalColor("#00FF00");
-   fR->SetIsUseChecking(true);
+   SetErrorColor("#FF0000");
+   SetWarningColor("#FFFF00");
+   SetNormalColor("#00FF00");
+   SetIsUseChecking(true);
 
    Create(out);
 }

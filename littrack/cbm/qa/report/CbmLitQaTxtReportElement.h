@@ -1,23 +1,23 @@
 /**
- * \file CbmLitQaHtmlReportElementStudy.h
+ * \file CbmLitQaTxtReportElement.h
  *
  * \brief Base class.
  *
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CbmLitQaHtmlReportElementStudy_H_
-#define CbmLitQaHtmlReportElementStudy_H_
+#ifndef CbmLitQaTxtReportElement_H_
+#define CbmLitQaTxtReportElement_H_
 
 #include <vector>
 #include <string>
 #include <boost/property_tree/ptree.hpp>
-#include "CbmLitQaBaseReportElementStudy.h"
+#include "CbmLitQaBaseReportElement.h"
 
 
 using namespace std;
 /**
- * \class CbmLitQaHtmlReportElementStudy
+ * \class CbmLitQaTxtReportElement
  *
  * \brief .
  *
@@ -26,25 +26,26 @@ using namespace std;
  * \date 2011
  *
  */
-class CbmLitQaHtmlReportElementStudy: public CbmLitQaBaseReportElementStudy
+class CbmLitQaTxtReportElement: public CbmLitQaBaseReportElement
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitQaHtmlReportElementStudy();
+   CbmLitQaTxtReportElement();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitQaHtmlReportElementStudy();
+   virtual ~CbmLitQaTxtReportElement();
 
 
    /**
     * \brief Inherited from CbmLitQaBaseReportElement.
     */
    virtual string PrintTableBegin(
-         const string& caption = "");
+         const string& caption,
+         const vector<string>& colNames);
 
    /**
     * \brief Inherited from CbmLitQaBaseReportElement.
@@ -54,31 +55,23 @@ public:
    /**
     * \brief Inherited from CbmLitQaBaseReportElement.
     */
-   virtual string PrintSubtitle(
-         const string& name = "");
+   virtual string PrintEmptyRow(
+         int nofCols,
+         const string& name);
 
    /**
     * \brief Inherited from CbmLitQaBaseReportElement.
     */
    virtual string PrintRow(
-      int row,
-      const string& property,
-      const string& name);
+         const string& name1,
+         const string& name2,
+         const string& name3 = "",
+         const string& name4 = "",
+         const string& name5 = "",
+         const string& name6 = "",
+         const string& name7 = "",
+         const string& name8 = "");
 
-   /**
-    * \brief Inherited from CbmLitQaBaseReportElement.
-    */
-   virtual string PrintEmptyRow(
-         int row,
-         const string& name);
-
-   /**
-    * \brief Inherited from CbmLitQaBaseReportElement.
-    */
-   virtual string PrintRowEff(
-         int row,
-         const string& property,
-         const string& name);
 
    /**
     * \brief Inherited from CbmLitQaBaseReportElement.
@@ -90,15 +83,6 @@ public:
    /**
     * \brief Inherited from CbmLitQaBaseReportElement.
     */
-   virtual string PrintValue(
-         int studyId,
-         const string& valueTitle,
-         const string& valueName,
-         const string& tag);
-
-   /**
-    * \brief Inherited from CbmLitQaBaseReportElement.
-    */
    virtual string PrintHead();
 
    /**
@@ -106,6 +90,9 @@ public:
     */
    virtual string PrintCloseDocument();
 
+private:
+   int fColW; // column width
+
 };
 
-#endif /* CbmLitQaHtmlReportElementStudy_H_ */
+#endif /* CbmLitQaTxtReportElement_H_ */

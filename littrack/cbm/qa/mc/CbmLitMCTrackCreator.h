@@ -11,6 +11,8 @@
 
 #include "CbmLitMCTrack.h"
 #include <map>
+#include <iostream>
+#include <assert.h>
 
 class TClonesArray;
 class FairMCPoint;
@@ -41,11 +43,21 @@ public:
     */
    static CbmLitMCTrackCreator* Instance();
 
-   /*
+   /**
     * \brief Creates array of CbmLitMCTracks for current event.
     * Has to be executed in Exec() function of the task.
     */
    void Create();
+
+   /**
+    * \brief Check whether a track exists in the array.
+    * \param[in] mcId MC index of track.
+    * \return true if track exists in array.
+    */
+   bool TrackExists(
+         int mcId) const {
+      return (fLitMCTracks.count(mcId) > 0) ? true : false;
+   }
 
    /**
     * \brief Return CbmLitMCTrack by its index.
@@ -54,6 +66,7 @@ public:
     */
    const CbmLitMCTrack& GetTrack(
          int mcId) const {
+      assert(fLitMCTracks.count(mcId) != 0);
       return fLitMCTracks.find(mcId)->second;
    }
 

@@ -29,6 +29,7 @@ class CbmGlobalTrack;
 class TClonesArray;
 class TH1F;
 class TCanvas;
+class CbmLitMCTrackCreator;
 class CbmLitMCPoint;
 class CbmLitMCTrack;
 
@@ -76,10 +77,7 @@ public:
    virtual void SetParContainers();
 
    /* Setters */
-   void SetNofPlanes(Int_t nofPlanes) { fNofPlanes = nofPlanes; }
-   void SetNofTrdHits(Int_t nofTrdHits) {fNofTrdHits = nofTrdHits;}
-   void SetNofMuchHits(Int_t nofMuchHits) {fNofMuchHits = nofMuchHits;}
-   void SetNofTofHits(Int_t nofTofHits) {fNofTofHits = nofTofHits;}
+   void SetMinNofHits(Int_t nofHits) {fMinNofHits = nofHits;}
    void SetTestFastPropagation(Bool_t isTestFastPropagation) {fIsTestFastPropagation = isTestFastPropagation;}
    void SetPDGCode(Int_t pdgCode) {fPDGCode = pdgCode;}
    void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
@@ -128,15 +126,6 @@ private:
       CbmLitTrack* litTrack);
 
    /**
-    * \brief Convert CbmGlobalTrack to Monte-Carlo CbmLitTrack.
-    * \param[in] globalTrack Pointer to the global track to be converted.
-    * \param[out] litTrack Output CbmLitTrack.
-    */
-//   void GlobalTrackToMCLitTrack(
-//      const CbmGlobalTrack* globalTrack,
-//      CbmLitTrack* litTrack);
-
-   /**
     * \brief Free memory and delete track arrays.
     */
    void DeleteTrackArrays();
@@ -166,27 +155,23 @@ private:
     * \brief Fill pull/residual histograms for specified predicted track parameters.
     * \param[in] par Calculated track parameters.
     * \param[in] mcPar Monte-Carlo track parameters.
-    * \param[in] hit Hit at plane where parameters are calculated.
     * \param[in] plane Plane number.
     */
    void FillHistosPropagation(
       const CbmLitTrackParam* par,
       const CbmLitMCPoint* mcPar,
-      const CbmLitHit* hit,
       Int_t plane);
 
    /**
     * \brief Fill pull/residual histograms for specified updated track parameters.
     * \param[in] par Calculated track parameters.
     * \param[in] mcPar Monte-Carlo track parameters.
-    * \param[in] hit Hit at plane where parameters are calculated.
     * \param[in] plane Plane number.
     * \param[in] chiSq Chi square value.
     */
    void FillHistosFilter(
       const CbmLitTrackParam* par,
       const CbmLitMCPoint* mcPar,
-      const CbmLitHit* hit,
       Int_t plane,
       float chisq);
 
@@ -196,13 +181,6 @@ private:
    void FillHistosFitter(
       const CbmLitTrack* track,
       const CbmLitMCTrack* mcTrack);
-
-   /**
-    *
-    */
-//   void McPointToLitFitNode(
-//      FairMCPoint* point,
-//      CbmLitFitNode* node);
 
    /**
     *
@@ -254,34 +232,23 @@ private:
    Bool_t fIsTof; // If TOF detected than true
 
    TrackPtrVector fLitTracks; // array with reconstructed global tracks converted to LitTracks
-//   TrackPtrVector fLitMcTracks; // array with MC track converted to LitTracks
    Int_t fNofPlanes; // number of planes in the detector
 
    Int_t fPDGCode; // PDG code for the track fit
 
-   // Track acceptance parameters
-   Int_t fNofTrdHits; // number of TRD hits
-   Int_t fNofMuchHits; // number of MUCH hits
-   Int_t fNofTofHits; // number of TOF hits
+   Int_t fMinNofHits; // Cut on number of hits in track
 
    // Pointers to data arrays
-//   TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsTrackMatches; // CbmStsTrackMatch array
    TClonesArray* fMuchTracks; // CbmMuchTracks array
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
-//   TClonesArray* fMuchPoints; // CbmMuchPoint array
    TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
-//   TClonesArray* fMuchPixelDigiMatches; // CbmMuchDigiMatch array for pixel hits
-//   TClonesArray* fMuchStrawDigiMatches; // CbmMuchDigiMatch array for straw hits
-//   TClonesArray* fMuchClusters; // CbmMuchCluster array
    TClonesArray* fTrdTracks; // CbmTrdTrack array
    TClonesArray* fTrdHits; // CbmTrdHit array
-//   TClonesArray* fTrdPoints; // CbmTrdPoint array
    TClonesArray* fTrdTrackMatches; // CbmTrdTrackMatch array
-//   TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 
    // Tools
@@ -331,6 +298,8 @@ private:
    // parameter: see description above
    std::vector<std::vector<std::vector<Double_t> > > fSigma;
    std::vector<std::vector<std::vector<Double_t> > > fRms;
+
+   CbmLitMCTrackCreator* fMCTrackCreator;
 
    ClassDef(CbmLitPropagationQa, 1);
 };

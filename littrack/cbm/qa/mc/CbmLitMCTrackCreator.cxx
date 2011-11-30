@@ -54,6 +54,7 @@ void CbmLitMCTrackCreator::Create()
    AddPoints(kMUCH, fMuchPoints);
    AddPoints(kTOF, fTofPoints);
 
+//   std::cout << "CbmLitMCTrackCreator: nof MC tracks=" << fLitMCTracks.size() << std::endl;
 //   std::map<int, CbmLitMCTrack>::iterator it;
 //   for (it = fLitMCTracks.begin(); it != fLitMCTracks.end(); it++)
 //       std::cout << (*it).first << " => " << (*it).second;
@@ -85,6 +86,7 @@ void CbmLitMCTrackCreator::AddPoints(
       if (detId == kSTS) stationId = fStsStationsMap[iPoint]; else
       if (detId == kTRD) stationId = fTrdStationsMap[iPoint]; else
       if (detId == kMUCH) stationId = fMuchStationsMap[iPoint];
+      if (stationId < 0) continue;
       FairMCPointToLitMCPoint(fairPoint, &litPoint, iPoint, stationId);
       fLitMCTracks[fairPoint->GetTrackID()].AddPoint(detId, litPoint);
    }

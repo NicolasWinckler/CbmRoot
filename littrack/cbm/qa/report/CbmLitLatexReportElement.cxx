@@ -1,30 +1,23 @@
 /**
- * \file CbmLitQaLatexReportElement.cxx
- *
+ * \file CbmLitLatexReportElement.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaLatexReportElement.h"
-#include "utils/CbmLitUtils.h"
+#include "CbmLitLatexReportElement.h"
 
-#include "TSystem.h"
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-CbmLitQaLatexReportElement::CbmLitQaLatexReportElement()
+CbmLitLatexReportElement::CbmLitLatexReportElement()
 {
 
 }
 
-CbmLitQaLatexReportElement::~CbmLitQaLatexReportElement()
+CbmLitLatexReportElement::~CbmLitLatexReportElement()
 {
 
 }
 
-string CbmLitQaLatexReportElement::PrintTableBegin(
+string CbmLitLatexReportElement::TableBegin(
       const string& caption,
-      const vector<string>& colNames)
+      const vector<string>& colNames) const
 {
    stringstream ss;
    ss << "\\begin{table}[h]" << endl;
@@ -43,21 +36,21 @@ string CbmLitQaLatexReportElement::PrintTableBegin(
    return ss.str();
 }
 
-string CbmLitQaLatexReportElement::PrintTableEnd()
+string CbmLitLatexReportElement::TableEnd() const
 {
    return "\\end{tabular} \\end{table}";
 }
 
-string CbmLitQaLatexReportElement::PrintEmptyRow(
+string CbmLitLatexReportElement::TableEmptyRow(
       int nofCols,
-      const string& name)
+      const string& name) const
 {
    stringstream ss;
    ss << "\\multicolumn{" << nofCols << "}{|c|}{" << name << "} \\\\ \\hline" << endl;
    return ss.str();
 }
 
-string CbmLitQaLatexReportElement::PrintRow(
+string CbmLitLatexReportElement::TableRow(
       const string& name1,
       const string& name2,
       const string& name3,
@@ -65,7 +58,7 @@ string CbmLitQaLatexReportElement::PrintRow(
       const string& name5,
       const string& name6,
       const string& name7,
-      const string& name8)
+      const string& name8) const
 {
    stringstream ss;
    ss << name1 << " & " << name2;
@@ -80,9 +73,9 @@ string CbmLitQaLatexReportElement::PrintRow(
    return ss.str();
 }
 
-string CbmLitQaLatexReportElement::PrintImage(
+string CbmLitLatexReportElement::Image(
       const string& title,
-      const string& file)
+      const string& file) const
 {
    stringstream ss;
 
@@ -94,7 +87,7 @@ string CbmLitQaLatexReportElement::PrintImage(
    return ss.str();
 }
 
-string CbmLitQaLatexReportElement::PrintHead()
+string CbmLitLatexReportElement::DocumentBegin() const
 {
    string str = "\\documentclass[a4paper,14pt]{article}";
    str += "\\usepackage{amssymb}";
@@ -108,8 +101,7 @@ string CbmLitQaLatexReportElement::PrintHead()
    return str;
 }
 
-
-string CbmLitQaLatexReportElement::PrintCloseDocument()
+string CbmLitLatexReportElement::DocumentEnd() const
 {
    return "\\end{document}";
 }

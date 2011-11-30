@@ -1,31 +1,23 @@
 /**
- * \file CbmLitQaHtmlReportElement.cxx
- *
+ * \file CbmLitHtmlReportElement.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaHtmlReportElement.h"
-#include "utils/CbmLitUtils.h"
+#include "CbmLitHtmlReportElement.h"
 
-#include "TSystem.h"
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-CbmLitQaHtmlReportElement::CbmLitQaHtmlReportElement()
+CbmLitHtmlReportElement::CbmLitHtmlReportElement()
 {
 }
 
-CbmLitQaHtmlReportElement::~CbmLitQaHtmlReportElement()
+CbmLitHtmlReportElement::~CbmLitHtmlReportElement()
 {
 
 }
 
-string CbmLitQaHtmlReportElement::PrintTableBegin(
+string CbmLitHtmlReportElement::TableBegin(
       const string& caption,
-      const vector<string>& colNames)
+      const vector<string>& colNames) const
 {
-
    stringstream ss;
    ss << "<h2>" << caption << "</h2>";
    ss << "<table id=\"efficiency\" >" << endl;
@@ -37,24 +29,21 @@ string CbmLitQaHtmlReportElement::PrintTableBegin(
    return ss.str();
 }
 
-
-
-string CbmLitQaHtmlReportElement::PrintTableEnd()
+string CbmLitHtmlReportElement::TableEnd() const
 {
    return "</table>";
 }
 
-string CbmLitQaHtmlReportElement::PrintEmptyRow(
+string CbmLitHtmlReportElement::TableEmptyRow(
       int nofCols,
-      const string& name)
+      const string& name) const
 {
-
    stringstream ss;
    ss << "<td colspan=\"" << nofCols << "\">" << name << "</td></tr>" << endl;
    return ss.str();
 }
 
-string CbmLitQaHtmlReportElement::PrintRow(
+string CbmLitHtmlReportElement::TableRow(
       const string& name1,
       const string& name2,
       const string& name3,
@@ -62,7 +51,7 @@ string CbmLitQaHtmlReportElement::PrintRow(
       const string& name5,
       const string& name6,
       const string& name7,
-      const string& name8)
+      const string& name8) const
 {
    stringstream ss;
    ss << "<tr>";
@@ -79,9 +68,9 @@ string CbmLitQaHtmlReportElement::PrintRow(
    return ss.str();
 }
 
-string CbmLitQaHtmlReportElement::PrintImage(
+string CbmLitHtmlReportElement::Image(
       const string& title,
-      const string& file)
+      const string& file) const
 {
    stringstream ss;
    ss << "<h3>" << title << "</h3>";
@@ -90,7 +79,7 @@ string CbmLitQaHtmlReportElement::PrintImage(
    return ss.str();
 }
 
-string CbmLitQaHtmlReportElement::PrintHead()
+string CbmLitHtmlReportElement::DocumentBegin() const
 {
    string str = "<html><body><head><style type=\"text/css\">";
    str += "#efficiency";
@@ -123,7 +112,7 @@ string CbmLitQaHtmlReportElement::PrintHead()
    return str;
 }
 
-string CbmLitQaHtmlReportElement::PrintCloseDocument()
+string CbmLitHtmlReportElement::DocumentEnd() const
 {
    return "</body></html>";
 }

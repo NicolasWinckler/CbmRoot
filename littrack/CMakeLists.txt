@@ -120,9 +120,9 @@ If(Boost_FOUND)
       cbm/qa/report/study/CbmLitQaReconstructionReportStudy.cxx            
        cbm/qa/report/simulation/CbmLitQaBaseReport.cxx
        cbm/qa/report/simulation/CbmLitQaReconstructionReport.cxx      
-       cbm/qa/report/CbmLitQaTxtReportElement.cxx
-       cbm/qa/report/CbmLitQaHtmlReportElement.cxx       
-       cbm/qa/report/CbmLitQaLatexReportElement.cxx          
+       cbm/qa/report/CbmLitTextReportElement.cxx
+       cbm/qa/report/CbmLitHtmlReportElement.cxx       
+       cbm/qa/report/CbmLitLatexReportElement.cxx          
      )  
 EndIf(Boost_FOUND)
 

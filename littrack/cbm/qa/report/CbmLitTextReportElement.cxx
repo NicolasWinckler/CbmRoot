@@ -1,35 +1,30 @@
 /**
- * \file CbmLitQaTxtReportElement.cxx
- *
+ * \file CbmLitTextReportElement.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaTxtReportElement.h"
-#include "utils/CbmLitUtils.h"
+#include "CbmLitTextReportElement.h"
+#include <sstream>
+#include <iomanip>
 
-#include "TSystem.h"
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-CbmLitQaTxtReportElement::CbmLitQaTxtReportElement()
+CbmLitTextReportElement::CbmLitTextReportElement():
+   fColW(17)
 {
-   fColW = 17;
 }
 
-CbmLitQaTxtReportElement::~CbmLitQaTxtReportElement()
+CbmLitTextReportElement::~CbmLitTextReportElement()
 {
 
 }
 
-string CbmLitQaTxtReportElement::PrintTableBegin(
+string CbmLitTextReportElement::TableBegin(
       const string& caption,
-      const vector<string>& colNames)
+      const vector<string>& colNames) const
 {
    stringstream ss;
 
    ss << caption << endl;
-   Int_t w = 17;
+   int w = 17;
    ss << right;
    ss << setfill('_') << setw((colNames.size()+1)*w) << "_"<< endl;
    ss << setfill(' ');
@@ -44,18 +39,16 @@ string CbmLitQaTxtReportElement::PrintTableBegin(
    return ss.str();
 }
 
-
-
-string CbmLitQaTxtReportElement::PrintTableEnd()
+string CbmLitTextReportElement::TableEnd() const
 {
    stringstream ss;
    ss << endl;
    return ss.str();
 }
 
-string CbmLitQaTxtReportElement::PrintEmptyRow(
+string CbmLitTextReportElement::TableEmptyRow(
       int nofCols,
-      const string& name)
+      const string& name) const
 {
    stringstream ss;
    ss << setfill('-') << left;
@@ -64,7 +57,7 @@ string CbmLitQaTxtReportElement::PrintEmptyRow(
    return ss.str();
 }
 
-string CbmLitQaTxtReportElement::PrintRow(
+string CbmLitTextReportElement::TableRow(
       const string& name1,
       const string& name2,
       const string& name3,
@@ -72,7 +65,7 @@ string CbmLitQaTxtReportElement::PrintRow(
       const string& name5,
       const string& name6,
       const string& name7,
-      const string& name8)
+      const string& name8) const
 {
    stringstream ss;
    ss << left << setw(fColW) << name1 << right
@@ -88,22 +81,21 @@ string CbmLitQaTxtReportElement::PrintRow(
    return ss.str();
 }
 
-string CbmLitQaTxtReportElement::PrintImage(
+string CbmLitTextReportElement::Image(
       const string& title,
-      const string& file)
+      const string& file) const
 {
    return "";
 }
 
-string CbmLitQaTxtReportElement::PrintHead()
+string CbmLitTextReportElement::DocumentBegin() const
 {
    stringstream ss;
-   ss << "-I- CbmLitReconstructionReport final statistics:" << endl;
+   ss << "-I- Reconstruction QA final statistics:" << endl;
    return ss.str();
 }
 
-
-string CbmLitQaTxtReportElement::PrintCloseDocument()
+string CbmLitTextReportElement::DocumentEnd() const
 {
    return "";
 }

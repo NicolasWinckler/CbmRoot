@@ -9,7 +9,7 @@
 #ifndef CBMLITQABASEREPORT_H_
 #define CBMLITQABASEREPORT_H_
 
-#include "../CbmLitQaBaseReportElement.h"
+#include "../CbmLitReportElement.h"
 #include "CbmDetectorList.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
@@ -95,7 +95,7 @@ protected:
    virtual void Create(
       ostream& out) = 0;
 
-   CbmLitQaBaseReportElement* fR;
+   CbmLitReportElement* fR;
 
    bool fIsElectronSetup; // If "electron" setup detected than true
    bool fIsMvd; // If MVD detected than true

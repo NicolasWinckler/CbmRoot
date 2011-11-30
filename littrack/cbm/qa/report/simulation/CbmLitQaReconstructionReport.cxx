@@ -5,9 +5,9 @@
  * \date 2011
  */
 #include "CbmLitQaReconstructionReport.h"
-#include "../CbmLitQaHtmlReportElement.h"
-#include "../CbmLitQaLatexReportElement.h"
-#include "../CbmLitQaTxtReportElement.h"
+#include "../CbmLitHtmlReportElement.h"
+#include "../CbmLitLatexReportElement.h"
+#include "../CbmLitTextReportElement.h"
 
 #include "utils/CbmLitUtils.h"
 
@@ -22,9 +22,9 @@ using namespace boost::assign;
 CbmLitQaReconstructionReport::CbmLitQaReconstructionReport(
       const string& type)
 {
-   if (type == "latex") fR = new CbmLitQaLatexReportElement();
-   if (type == "html") fR = new CbmLitQaHtmlReportElement();
-   else if (type == "txt") fR = new CbmLitQaTxtReportElement();
+   if (type == "latex") fR = new CbmLitLatexReportElement();
+   if (type == "html") fR = new CbmLitHtmlReportElement();
+   else if (type == "txt") fR = new CbmLitTextReportElement();
 }
 
 CbmLitQaReconstructionReport::~CbmLitQaReconstructionReport()
@@ -36,13 +36,13 @@ void CbmLitQaReconstructionReport::Create(
    ostream& out)
 {
    out.precision(3);
-   out << fR->PrintHead();
+   out << fR->DocumentBegin();
 
    out << "Number of events: " << PrintValue("hEventNo") << endl;
 
    //Number of objects table
    vector<string> cols1 = list_of("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF");
-   out << fR->PrintTableBegin("Number of objects statistics", cols1);
+   out << fR->TableBegin("Number of objects statistics", cols1);
    out << PrintNofStatistics("Points", "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
          "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
    out << PrintNofStatistics("Digis", "hNofMvdDigis", "hNofStsDigis", "",
@@ -53,79 +53,79 @@ void CbmLitQaReconstructionReport::Create(
          "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
    out << PrintNofStatistics("Tracks","", "hNofStsTracks", "hNofRichRings",
          "hNofTrdTracks", "hNofMuchTracks", "hNofMuchTracks", "");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    out << "Number of global tracks per event: "<<PrintValue("hNofGlobalTracks")<< endl;
    out << "Number of track projections in RICH: " <<PrintValue("hNofRichProjections") << endl;
 
    //Print hits histos statistics (nof all, true, fake hits in track/ring)
    vector<string> cols2 = list_of("all")("true")("fake")("true/all")("fake/all");
-   out << fR->PrintTableBegin("Hits statistics", cols2);
+   out << fR->TableBegin("Hits statistics", cols2);
    out << PrintHits("MVD", "hMvdTrackHits");
    out << PrintHits("STS", "hStsTrackHits");
    out << PrintHits("TRD", "hTrdTrackHits");
    out << PrintHits("MUCH", "hMuchTrackHits");
    out << PrintHits("RICH", "hRichRingHits");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    //Print reconstruction efficiency without RICH
    vector<string> cols3 = list_of("all")("reference")("primary")("secondary")("electron")("muon");
-   out << fR->PrintTableBegin("Reconstruction efficiency without RICH", cols3);
+   out << fR->TableBegin("Reconstruction efficiency without RICH", cols3);
    out << PrintEfficiency("STS", "hSts3D");
    out << PrintEfficiency("TRD(MUCH)", "hRec3D");
    out << PrintEfficiency("TOF matching", "hTof3D");
-   out << fR->PrintEmptyRow(cols3.size()+1, "Normalization STS+TRD(MUCH)");
+   out << fR->TableEmptyRow(cols3.size()+1, "Normalization STS+TRD(MUCH)");
    out << PrintEfficiency("STS", "hSts3DNormHalfGlobal");
    string s = "STS+TRD(MUCH)";
    out << PrintEfficiency(s, "hHalfGlobal3D");
-   out << fR->PrintEmptyRow(cols3.size()+1, "Normalization STS+TRD(MUCH)+TOF");
+   out << fR->TableEmptyRow(cols3.size()+1, "Normalization STS+TRD(MUCH)+TOF");
    out << PrintEfficiency("STS", "hSts3DNormGlobal");
    out << PrintEfficiency(s, "hHalfGlobal3DNormGlobal");
    string s2 = s + "+TOF";
    out << PrintEfficiency(s2, "hGlobal3D");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    //Print RICH reconstruction efficiency
    vector<string> cols4 = list_of("all")("all reference")("electron")("electron ref")("pion")("pion ref");
-   out << fR->PrintTableBegin("Reconstruction efficiency with RICH", cols4);
+   out << fR->TableBegin("Reconstruction efficiency with RICH", cols4);
    out << PrintEfficiencyRich("RICH", "hRich3D");
-   out << fR->PrintEmptyRow(cols4.size()+1, "Normalization STS+RICH");
+   out << fR->TableEmptyRow(cols4.size()+1, "Normalization STS+RICH");
    out << PrintEfficiencyRich("STS", "hSts3DNormStsRich");
    out << PrintEfficiencyRich("STS+RICH no match", "hStsRichNoMatching3D");
    out << PrintEfficiencyRich("STS+RICH", "hStsRich3D");
-   out << fR->PrintEmptyRow(cols4.size()+1, "Normalization STS+RICH+TRD");
+   out << fR->TableEmptyRow(cols4.size()+1, "Normalization STS+RICH+TRD");
    out << PrintEfficiencyRich("STS", "hSts3DNormStsRichTrd");
    out << PrintEfficiencyRich("STS+RICH", "hStsRich3DNormStsRichTrd");
    out << PrintEfficiencyRich("STS+RICH+TRD", "hStsRichTrd3D");
-   out << fR->PrintEmptyRow(cols4.size()+1, "Normalization STS+RICH+TRD+TOF");
+   out << fR->TableEmptyRow(cols4.size()+1, "Normalization STS+RICH+TRD+TOF");
    out << PrintEfficiencyRich("STS", "hSts3DNormStsRichTrdTof");
    out << PrintEfficiencyRich("STS+RICH", "hStsRich3DNormStsRichTrdTof");
    out << PrintEfficiencyRich("STS+RICH+TRD", "hStsRichTrd3DNormStsRichTrdTof");
    out << PrintEfficiencyRich("STS+RICH+TRD+TOF", "hStsRichTrdTof3D");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    // print electron identification statistics
    vector<string> cols5 = list_of("efficiency")("pion supp");
-   out << fR->PrintTableBegin("Electron identification efficiency and pion suppression", cols5);
-   out << fR->PrintEmptyRow(cols5.size()+1, "Normalization STS+TRD");
+   out << fR->TableBegin("Electron identification efficiency and pion suppression", cols5);
+   out << fR->TableEmptyRow(cols5.size()+1, "Normalization STS+TRD");
    out << PrintEfficiencyElId("STS+TRD", "hStsTrd3DElId");
-   out << fR->PrintEmptyRow(cols5.size()+1, "Normalization STS+TRD+TOF");
+   out << fR->TableEmptyRow(cols5.size()+1, "Normalization STS+TRD+TOF");
    out << PrintEfficiencyElId("STS+TRD", "hStsTrd3DElIdNormStsTrdTof");
    out << PrintEfficiencyElId("STS+TRD+TOF", "hStsTrdTof3DElId");
-   out << fR->PrintEmptyRow(cols5.size()+1, "Normalization STS+RICH");
+   out << fR->TableEmptyRow(cols5.size()+1, "Normalization STS+RICH");
    out << PrintEfficiencyElId("STS+RICH", "hStsRich3DElId");
-   out << fR->PrintEmptyRow(cols5.size()+1, "Normalization STS+RICH+TRD");
+   out << fR->TableEmptyRow(cols5.size()+1, "Normalization STS+RICH+TRD");
    out << PrintEfficiencyElId("STS+RICH", "hStsRich3DElIdNormStsRichTrd");
    out << PrintEfficiencyElId("STS+RICH+TRD", "hStsRichTrd3DElId");
-   out << fR->PrintEmptyRow(cols5.size()+1, "Normalization STS+RICH+TRD+TOF");
+   out << fR->TableEmptyRow(cols5.size()+1, "Normalization STS+RICH+TRD+TOF");
    out << PrintEfficiencyElId("STS+RICH", "hStsRich3DElIdNormStsRichTrdTof");
    out << PrintEfficiencyElId("STS+RICH+TRD", "hStsRichTrd3DElIdNormStsRichTrdTof");
    out << PrintEfficiencyElId("STS+RICH+TRD+TOF", "hStsRichTrdTof3DElId");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    // detector acceptance efficiency
    vector<string> cols6 = list_of("ACC/MC")("REC/MC");
-   out << fR->PrintTableBegin("Detector acceptance for primary electrons", cols6);
+   out << fR->TableBegin("Detector acceptance for primary electrons", cols6);
    out << PrintDetAccEl("STS", "hStsDetAcc3DEl");
    out << PrintDetAccEl("STS-RICH","hStsRichDetAcc3DEl");
    out << PrintDetAccEl("STS-TRD", "hStsTrdDetAcc3DEl");
@@ -133,58 +133,58 @@ void CbmLitQaReconstructionReport::Create(
    out << PrintDetAccEl("STS-RICH-TRD", "hStsRichTrdDetAcc3DEl");
    out << PrintDetAccEl("STS-RICH-TRD-TOF", "hStsRichTrdTofDetAcc3DEl");
    out << PrintDetAccEl("STS-TRD-TOF", "hStsTrdTofDetAcc3DEl");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    // ghost statistics
    vector<string> colsGhost = list_of("Number of ghosts");
-   out << fR->PrintTableBegin("Number of ghosts per event", colsGhost);
-   out << fR->PrintRow("STS", PrintValue("fhStsGhostNh"));
-   out << fR->PrintRow("TRD(MUCH)", PrintValue("fhRecGhostNh"));
-   out << fR->PrintRow("RICH", PrintValue("fhRichGhostNh"));
-   out << fR->PrintEmptyRow(2, "after STS-RICH matching");
-   out << fR->PrintRow("STS", PrintValue("fhStsGhostRichMatchingNh"));
-   out << fR->PrintRow("RICH", PrintValue("fhRichGhostStsMatchingNh"));
-   out << fR->PrintEmptyRow(2, "after STS-RICH matching and el id");
-   out << fR->PrintRow("RICH", PrintValue("fhRichGhostElIdNh"));
-   out << fR->PrintTableEnd();
+   out << fR->TableBegin("Number of ghosts per event", colsGhost);
+   out << fR->TableRow("STS", PrintValue("fhStsGhostNh"));
+   out << fR->TableRow("TRD(MUCH)", PrintValue("fhRecGhostNh"));
+   out << fR->TableRow("RICH", PrintValue("fhRichGhostNh"));
+   out << fR->TableEmptyRow(2, "after STS-RICH matching");
+   out << fR->TableRow("STS", PrintValue("fhStsGhostRichMatchingNh"));
+   out << fR->TableRow("RICH", PrintValue("fhRichGhostStsMatchingNh"));
+   out << fR->TableEmptyRow(2, "after STS-RICH matching and el id");
+   out << fR->TableRow("RICH", PrintValue("fhRichGhostElIdNh"));
+   out << fR->TableEnd();
 
    // STS quality numbers
    vector<string> colsStsQa = list_of("Mean")("RMS");
-   out << fR->PrintTableBegin("STS quality numbers", colsStsQa);
-   out << fR->PrintRow("Chi2 to primary vertex", PrintValue("fhStsChiprim.mean"),
+   out << fR->TableBegin("STS quality numbers", colsStsQa);
+   out << fR->TableRow("Chi2 to primary vertex", PrintValue("fhStsChiprim.mean"),
          PrintValue("fhStsChiprim.rms"));
-   out << fR->PrintRow("Momentum resolution", PrintValue("fhStsMomresVsMom.mean"),
+   out << fR->TableRow("Momentum resolution", PrintValue("fhStsMomresVsMom.mean"),
          PrintValue("fhStsMomresVsMom.rms"));
-   out << fR->PrintRow("Tr. len. 100*(MC-Rec)/MC", PrintValue("fhTrackLength.mean"),
+   out << fR->TableRow("Tr. len. 100*(MC-Rec)/MC", PrintValue("fhTrackLength.mean"),
          PrintValue("fhTrackLength.rms"));
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
    // Tracking efficiency vs. polar angle
    vector<string> cols7 = list_of("all")("reference")("primary")("secondary")("electron")("muon");
-   out << fR->PrintTableBegin("Tracking efficiency in dependence on polar angle", cols7);
-   out << fR->PrintEmptyRow(cols7.size()+1, "STS");
+   out << fR->TableBegin("Tracking efficiency in dependence on polar angle", cols7);
+   out << fR->TableEmptyRow(cols7.size()+1, "STS");
    out << setfill(' ') << left << PrintPolarAngle("hStsAngle");
-   out << fR->PrintEmptyRow(cols7.size()+1, "TRD(MUCH)");
+   out << fR->TableEmptyRow(cols7.size()+1, "TRD(MUCH)");
    out << setfill(' ') << left << PrintPolarAngle("hRecAngle");
-   out << fR->PrintEmptyRow(cols7.size()+1, "TOF");
+   out << fR->TableEmptyRow(cols7.size()+1, "TOF");
    out << setfill(' ') << left << PrintPolarAngle("hTofAngle");
-   out << fR->PrintTableEnd();
+   out << fR->TableEnd();
 
-   out << fR->PrintImage("Global efficiency all", "rec_qa_global_efficiency_all");
-   out << fR->PrintImage("Global efficiency signal", "rec_qa_global_efficiency_signal");
-   out << fR->PrintImage("STS efficiency", "rec_qa_sts_efficiency");
-   out << fR->PrintImage("TRD(MUCH) efficiency", "rec_qa_rec_efficiency");
-   out << fR->PrintImage("TOF matching efficiency", "rec_qa_tof_efficiency");
+   out << fR->Image("Global efficiency all", "rec_qa_global_efficiency_all");
+   out << fR->Image("Global efficiency signal", "rec_qa_global_efficiency_signal");
+   out << fR->Image("STS efficiency", "rec_qa_sts_efficiency");
+   out << fR->Image("TRD(MUCH) efficiency", "rec_qa_rec_efficiency");
+   out << fR->Image("TOF matching efficiency", "rec_qa_tof_efficiency");
    if (fIsRich){
-      out << fR->PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
-      out << fR->PrintImage("STS+RICH efficiency electrons", "rec_qa_sts_rich_efficiency_electrons");
-      out << fR->PrintImage("STS+RICH+TRD efficiency electrons", "rec_qa_sts_rich_trd_efficiency_electrons");
-      out << fR->PrintImage("STS+RICH+TRD+TOF efficiency electrons", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
+      out << fR->Image("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
+      out << fR->Image("STS+RICH efficiency electrons", "rec_qa_sts_rich_efficiency_electrons");
+      out << fR->Image("STS+RICH+TRD efficiency electrons", "rec_qa_sts_rich_trd_efficiency_electrons");
+      out << fR->Image("STS+RICH+TRD+TOF efficiency electrons", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
       //out << fR->PrintImage("STS+RICH+TRD+TOF detector acceptance electrons", "rec_qa_sts_rich_trd_tof_detector_acceptance");
-      out << fR->PrintImage("STS+RICH+TRD+TOF electron identification efficiency electrons", "rec_qa_sts_rich_trd_tof_electron_identification");
-      out << fR->PrintImage("STS+RICH+TRD+TOF pion suppression", "rec_qa_sts_rich_trd_tof_pion_suppression");
+      out << fR->Image("STS+RICH+TRD+TOF electron identification efficiency electrons", "rec_qa_sts_rich_trd_tof_electron_identification");
+      out << fR->Image("STS+RICH+TRD+TOF pion suppression", "rec_qa_sts_rich_trd_tof_pion_suppression");
    }
-   out <<  fR->PrintCloseDocument();
+   out <<  fR->DocumentEnd();
 }
 
 string CbmLitQaReconstructionReport::PrintNofStatistics(
@@ -214,7 +214,7 @@ string CbmLitQaReconstructionReport::PrintNofStatistics(
    if (tof!= "") { ss7 << (Int_t)fQa->get(tof, -1.); }
       else { ss7 << "-"; }
 
-   return fR->PrintRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(),
+   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(),
          ss6.str(), ss7.str());
 }
 
@@ -241,7 +241,7 @@ string CbmLitQaReconstructionReport::PrintHits(
    if (toa == -1.) ss4 << "-"; else ss4 << 100. * toa;
    if (foa == -1.) ss5 << "-"; else ss5 << 100. * foa;
 
-   return fR->PrintRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str());
+   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str());
 }
 
 string CbmLitQaReconstructionReport::PrintEfficiency(
@@ -282,7 +282,7 @@ string CbmLitQaReconstructionReport::PrintEfficiency(
    ss5 << elEff << "(" << elRec << "/" << elAcc << ")";
    ss6 << muEff << "(" << muRec << "/" << muAcc << ")";
 
-   return fR->PrintRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(), ss6.str());
+   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(), ss6.str());
 }
 
 string CbmLitQaReconstructionReport::PrintEfficiencyRich(
@@ -323,7 +323,7 @@ string CbmLitQaReconstructionReport::PrintEfficiencyRich(
    ss5 << piEff << "<small>(" << piRec << "/" << piAcc << ")</small>";
    ss6 << piRefEff << "<small>(" << piRefRec << "/" << piRefAcc << ")</small>";
 
-   return fR->PrintRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(), ss6.str());
+   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(), ss6.str());
 }
 
 string CbmLitQaReconstructionReport::PrintEfficiencyElId(
@@ -344,7 +344,7 @@ string CbmLitQaReconstructionReport::PrintEfficiencyElId(
    ss1 << elEff << "("<< elRec << "/" << elAcc << ")";
    ss2 << piSupp << "("<< piAcc << "/" << piRec << ")";
 
-   return fR->PrintRow(name, ss1.str(), ss2.str());
+   return fR->TableRow(name, ss1.str(), ss2.str());
 }
 
 string CbmLitQaReconstructionReport::PrintDetAccEl(
@@ -366,7 +366,7 @@ string CbmLitQaReconstructionReport::PrintDetAccEl(
    ss1 << effAcc << "(" << acc << "/" << mc << ")";
    ss2 << effRec << "(" << rec << "/" << mc << ")";
 
-   return fR->PrintRow(name, ss1.str(), ss2.str());
+   return fR->TableRow(name, ss1.str(), ss2.str());
 }
 
 string CbmLitQaReconstructionReport::PrintPolarAngle(
@@ -419,7 +419,7 @@ string CbmLitQaReconstructionReport::PrintPolarAngle(
           << "(" << fQa->get(hist+".mu.rec."+angle0 +"_" + angle1, -1.)
           << "/" << fQa->get(hist+".mu.acc."+angle0 +"_" + angle1, -1.) << ")";
 
-      ss << fR->PrintRow(ss0.str(), ss1.str(), ss2.str(), ss3.str(), ss4.str(),
+      ss << fR->TableRow(ss0.str(), ss1.str(), ss2.str(), ss3.str(), ss4.str(),
             ss5.str(), ss6.str()) << endl;;
 
    }

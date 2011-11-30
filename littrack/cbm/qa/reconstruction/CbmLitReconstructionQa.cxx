@@ -171,6 +171,7 @@ void CbmLitReconstructionQa::CreateReport(
 
    string fileType = ".tex";
    if (type == "html") fileType = ".html";
+   if (type == "txt") fileType = ".txt";
    ofstream fout(string(fImpl->GetOutputDir() + "/rec_qa_study"+fileType).c_str());
    report.CreateReport(fout, title, results, names);
 }

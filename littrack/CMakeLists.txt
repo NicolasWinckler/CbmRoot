@@ -116,18 +116,13 @@ If(Boost_FOUND)
       cbm/qa/reconstruction/CbmLitQaHistNames.cxx          
 #      cbm/qa/field/CbmLitFieldQaHTMLGenerator.cxx
       cbm/qa/field/CbmLitFieldQa.cxx      
-      cbm/qa/report/study/CbmLitQaBaseReportStudy.cxx
-      cbm/qa/report/study/CbmLitQaHtmlReportElementStudy.cxx
-      cbm/qa/report/study/CbmLitQaLatexReportElementStudy.cxx      
+      cbm/qa/report/study/CbmLitQaBaseReportStudy.cxx 
       cbm/qa/report/study/CbmLitQaReconstructionReportStudy.cxx            
-#    cbm/qa/report/simulation/CbmLitQaHtmlGenerator.cxx
        cbm/qa/report/simulation/CbmLitQaBaseReport.cxx
-       cbm/qa/report/simulation/CbmLitQaTxtReportElement.cxx
-       cbm/qa/report/simulation/CbmLitQaHtmlReportElement.cxx       
-       cbm/qa/report/simulation/CbmLitQaLatexReportElement.cxx              
        cbm/qa/report/simulation/CbmLitQaReconstructionReport.cxx      
-      
-
+       cbm/qa/report/CbmLitQaTxtReportElement.cxx
+       cbm/qa/report/CbmLitQaHtmlReportElement.cxx       
+       cbm/qa/report/CbmLitQaLatexReportElement.cxx          
      )  
 EndIf(Boost_FOUND)
 

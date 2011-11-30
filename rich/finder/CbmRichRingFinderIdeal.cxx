@@ -1,4 +1,4 @@
-/******************************************************************************
+/**
 *  $Id: CbmRichRingFinderIdeal.cxx,v 1.5 2006/02/01 13:16:58 hoehne Exp $
 *
 *  Class  : CbmRichRingFinderIdeal
@@ -8,25 +8,7 @@
 *  Author : Supriya Das
 *  E-mail : S.Das@gsi.de
 *
-*******************************************************************************
-*  $Log: CbmRichRingFinderIdeal.cxx,v $
-*  Revision 1.5  2006/02/01 13:16:58  hoehne
-*  definition of reconstructable ring slightly changed
-*
-*  Revision 1.4  2006/01/30 14:34:35  hoehne
-*  correct FairMCPoint to CbmRichPoint in line 141
-*
-*  Revision 1.3  2006/01/27 11:37:08  hoehne
-*  some "return -1" removed to allow for standalone running without track information
-*
-*  Revision 1.2  2006/01/26 09:49:40  hoehne
-*  array of projected tracks added for track-based ring finders
-*
-*  Revision 1.1  2006/01/19 11:20:45  hoehne
-*  initial revision: ideal RingFinder
-*
-*
-*******************************************************************************/
+*/
 #include "CbmRichRingFinderIdeal.h"
 
 #include "CbmRichHit.h"
@@ -196,9 +178,9 @@ Int_t CbmRichRingFinderIdeal::DoFind(TClonesArray* hitArray, TClonesArray* projA
 //    if ( pMCtr->GetRichPoints() < 1 ) continue; // to ensure that there is a point corresponding to the track
 
 //    nMCacc++;
-    if ( hitMap[iMCTrack] < 3 ){
-    continue;
-    } // needs at least 3 hits to make a ring
+    //if ( hitMap[iMCTrack] < 3 ){
+    //continue;
+    //} // needs at least 3 hits to make a ring
     nMCacc++;
 
     new((*ringArray)[nRings]) CbmRichRing();

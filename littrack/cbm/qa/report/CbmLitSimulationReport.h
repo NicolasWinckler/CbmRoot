@@ -1,45 +1,40 @@
 /**
- * \file CbmLitQaBaseReportStudy.h
- *
- * \brief Base class for report generators.
- *
+ * \file CbmLitSimulationReport.h
+ * \brief Base class for simulation reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CbmLitQaBaseReportStudy_H_
-#define CbmLitQaBaseReportStudy_H_
+#ifndef CBMLITSIMULATIONREPORT_H_
+#define CBMLITSIMULATIONREPORT_H_
 
+#include "CbmLitReportElement.h"
 #include "CbmDetectorList.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
-#include "../CbmLitReportElement.h"
 
 using namespace std;
 
 /**
- * \class CbmLitQaBaseReportStudy
- *
- * \brief Base class for report generators.
- *
+ * \class CbmLitSimulationReport
+ * \brief Base class for simulation reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
- *
  */
-class CbmLitQaBaseReportStudy {
+class CbmLitSimulationReport
+{
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitQaBaseReportStudy();
+   CbmLitSimulationReport();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitQaBaseReportStudy();
+   virtual ~CbmLitSimulationReport();
 
    /**
     * \brief Set detector presence to TRUE if QA results for this detector has to be displayed in output.
-    *
     * \param[in] detId Id of the detector kMVD, kSTS...
     * \param[in] isDet True if detector is in the setup.
     */
@@ -49,7 +44,6 @@ public:
 
    /**
     * \brief Set explicitly electron setup of the detector.
-    *
     * \param[in] isElectronSetup true if electron setup.
     */
    void SetIsElectronSetup(
@@ -59,27 +53,21 @@ public:
 
    /**
     * \brief Main function which creates report file.
-    *
     * \param[in] out Output stream for report file.
-    * \param[in] title Title of the page.
-    * \param[in] results List of directories with results.
-    * \param[in] names Name of the studies.
+    * \param[in] qa Property tree with results.
     */
    void CreateReport(
          ostream& out,
-         const string& title,
-         const vector<string>& results,
-         const vector<string>& names);
+         boost::property_tree::ptree* qa);
 
-   void SetPtreeQa(const vector<boost::property_tree::ptree>& qa){fQa = qa;}
+
+   void SetPtreeQa(boost::property_tree::ptree* qa){fQa = qa;}
 
    void SetPtreeIdeal(boost::property_tree::ptree* ideal){fIdeal = ideal;}
 
-   void SetPtreeCheck(const vector<boost::property_tree::ptree>& check){fCheck = check;}
+   void SetPtreeCheck(boost::property_tree::ptree* check){fCheck = check;}
 
-   void SetStudyNames(const vector<string>& names){fStudyNames = names;}
-
-   void SetStudyResults(const vector<string>& results){fStudyResults = results;}
+   void SetOutputDir(const string& dir){fOutputDir = dir;}
 
    void SetErrorColor(const string& color){fErrorColor = color;}
 
@@ -111,15 +99,13 @@ protected:
    string fTitle; // report title
 
    // Property tree of Qa results for each study
-   vector<boost::property_tree::ptree> fQa;
+   boost::property_tree::ptree* fQa;
    // Property with ideal values
    boost::property_tree::ptree* fIdeal;
    // Property tree with checked results for each study
-   vector<boost::property_tree::ptree> fCheck;
-   // Names of studies
-   vector<string> fStudyNames;
-   // Names of directories with study results
-   vector<string> fStudyResults;
+   boost::property_tree::ptree* fCheck;
+   // Name of directory with results
+   string fOutputDir;
 
    // Background colors for error highlighting
    string fErrorColor; // error
@@ -130,4 +116,4 @@ protected:
    bool fIsUseChecking;
 };
 
-#endif /* CbmLitQaBaseReportStudy_H_ */
+#endif /* CBMLITSIMULATIONREPORT_H_ */

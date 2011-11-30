@@ -1,10 +1,9 @@
 /**
- * \file CbmLitQaBaseReportStudy.cxx
- *
+ * \file CbmLitStudyReport.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaBaseReportStudy.h"
+#include "CbmLitStudyReport.h"
 #include "../std/utils/CbmLitUtils.h"
 
 #include "TSystem.h"
@@ -12,7 +11,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-CbmLitQaBaseReportStudy::CbmLitQaBaseReportStudy():
+CbmLitStudyReport::CbmLitStudyReport():
    fIsElectronSetup(true),
    fIsMvd(true),
    fIsSts(true),
@@ -24,12 +23,12 @@ CbmLitQaBaseReportStudy::CbmLitQaBaseReportStudy():
 
 }
 
-CbmLitQaBaseReportStudy::~CbmLitQaBaseReportStudy()
+CbmLitStudyReport::~CbmLitStudyReport()
 {
 
 }
 
-void CbmLitQaBaseReportStudy::SetDetectorPresence(
+void CbmLitStudyReport::SetDetectorPresence(
          DetectorId detId,
          bool isDet)
 {
@@ -44,7 +43,7 @@ void CbmLitQaBaseReportStudy::SetDetectorPresence(
    }
 }
 
-void CbmLitQaBaseReportStudy::CreateReport(
+void CbmLitStudyReport::CreateReport(
       ostream& out,
       const string& title,
       const vector<string>& results,

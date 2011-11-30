@@ -9,7 +9,7 @@
 #ifndef CbmLitQaReconstructionReport_H_
 #define CbmLitQaReconstructionReport_H_
 
-#include "CbmLitQaBaseReport.h"
+#include "../CbmLitSimulationReport.h"
 
 #include <vector>
 #include <string>
@@ -30,7 +30,7 @@ using namespace std;
  * \date 2011
  *
  */
-class CbmLitQaReconstructionReport : public CbmLitQaBaseReport
+class CbmLitQaReconstructionReport : public CbmLitSimulationReport
 {
 public:
    /**

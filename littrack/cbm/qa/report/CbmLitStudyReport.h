@@ -1,41 +1,37 @@
 /**
- * \file CbmLitQaBaseReport.h
- *
- * \brief Base class for report generators.
- *
+ * \file CbmLitStudyReport.h
+ * \brief Base class for study reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITQABASEREPORT_H_
-#define CBMLITQABASEREPORT_H_
+#ifndef CBMLITSTUDYREPORT_H_
+#define CBMLITSTUDYREPORT_H_
 
-#include "../CbmLitReportElement.h"
 #include "CbmDetectorList.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
+#include "CbmLitReportElement.h"
 
 using namespace std;
 
 /**
- * \class CbmLitQaBaseReport
- *
- * \brief Base class for report generators.
- *
+ * \class CbmLitStudyReport
+ * \brief Base class for study reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
- *
  */
-class CbmLitQaBaseReport {
+class CbmLitStudyReport
+{
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitQaBaseReport();
+   CbmLitStudyReport();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitQaBaseReport();
+   virtual ~CbmLitStudyReport();
 
    /**
     * \brief Set detector presence to TRUE if QA results for this detector has to be displayed in output.
@@ -67,16 +63,19 @@ public:
     */
    void CreateReport(
          ostream& out,
-         boost::property_tree::ptree* qa);
+         const string& title,
+         const vector<string>& results,
+         const vector<string>& names);
 
-
-   void SetPtreeQa(boost::property_tree::ptree* qa){fQa = qa;}
+   void SetPtreeQa(const vector<boost::property_tree::ptree>& qa){fQa = qa;}
 
    void SetPtreeIdeal(boost::property_tree::ptree* ideal){fIdeal = ideal;}
 
-   void SetPtreeCheck(boost::property_tree::ptree* check){fCheck = check;}
+   void SetPtreeCheck(const vector<boost::property_tree::ptree>& check){fCheck = check;}
 
-   void SetOutputDir(const string& dir){fOutputDir = dir;}
+   void SetStudyNames(const vector<string>& names){fStudyNames = names;}
+
+   void SetStudyResults(const vector<string>& results){fStudyResults = results;}
 
    void SetErrorColor(const string& color){fErrorColor = color;}
 
@@ -108,13 +107,15 @@ protected:
    string fTitle; // report title
 
    // Property tree of Qa results for each study
-   boost::property_tree::ptree* fQa;
+   vector<boost::property_tree::ptree> fQa;
    // Property with ideal values
    boost::property_tree::ptree* fIdeal;
    // Property tree with checked results for each study
-   boost::property_tree::ptree* fCheck;
-   // Name of directory with results
-   string fOutputDir;
+   vector<boost::property_tree::ptree> fCheck;
+   // Names of studies
+   vector<string> fStudyNames;
+   // Names of directories with study results
+   vector<string> fStudyResults;
 
    // Background colors for error highlighting
    string fErrorColor; // error
@@ -125,4 +126,4 @@ protected:
    bool fIsUseChecking;
 };
 
-#endif /* CBMLITQABASEREPORT_H_ */
+#endif /* CBMLITSTUDYREPORT_H_ */

@@ -1,10 +1,10 @@
 /**
- * \file CbmLitQaBaseReport.cxx
+ * \file CbmLitSimulationReport.cxx
  *
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaBaseReport.h"
+#include "CbmLitSimulationReport.h"
 #include "../std/utils/CbmLitUtils.h"
 
 #include "TSystem.h"
@@ -12,7 +12,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-CbmLitQaBaseReport::CbmLitQaBaseReport():
+CbmLitSimulationReport::CbmLitSimulationReport():
    fR(NULL),
    fIsElectronSetup(true),
    fIsMvd(true),
@@ -26,12 +26,12 @@ CbmLitQaBaseReport::CbmLitQaBaseReport():
 
 }
 
-CbmLitQaBaseReport::~CbmLitQaBaseReport()
+CbmLitSimulationReport::~CbmLitSimulationReport()
 {
 
 }
 
-void CbmLitQaBaseReport::SetDetectorPresence(
+void CbmLitSimulationReport::SetDetectorPresence(
          DetectorId detId,
          bool isDet)
 {
@@ -46,7 +46,7 @@ void CbmLitQaBaseReport::SetDetectorPresence(
    }
 }
 
-void CbmLitQaBaseReport::CreateReport(
+void CbmLitSimulationReport::CreateReport(
       ostream& out,
       boost::property_tree::ptree* qa)
 {

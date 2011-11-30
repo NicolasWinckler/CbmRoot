@@ -116,9 +116,9 @@ If(Boost_FOUND)
       cbm/qa/reconstruction/CbmLitQaHistNames.cxx          
 #      cbm/qa/field/CbmLitFieldQaHTMLGenerator.cxx
       cbm/qa/field/CbmLitFieldQa.cxx      
-      cbm/qa/report/study/CbmLitQaBaseReportStudy.cxx 
+      cbm/qa/report/CbmLitStudyReport.cxx 
       cbm/qa/report/study/CbmLitQaReconstructionReportStudy.cxx            
-       cbm/qa/report/simulation/CbmLitQaBaseReport.cxx
+       cbm/qa/report/CbmLitSimulationReport.cxx
        cbm/qa/report/simulation/CbmLitQaReconstructionReport.cxx      
        cbm/qa/report/CbmLitTextReportElement.cxx
        cbm/qa/report/CbmLitHtmlReportElement.cxx       

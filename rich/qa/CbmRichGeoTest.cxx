@@ -606,10 +606,43 @@ void CbmRichGeoTest::DrawHist()
 
 void CbmRichGeoTest::PrintStatisctics()
 {
+   cout << endl;
    cout << "-I- CbmRichGeoTest final statistics:" << endl;
    cout << "Detector Acceptance = " << CalcEfficiency(fhAcc3D, fhMc3D) << endl;
    cout << "Circle fit efficiency = " << CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll) << endl;
    cout << "Ellipse fit efficiency = " << CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll) << endl;
+   cout << endl;
+
+   cout << "Nof Points per ring, mean = " << fhNofHits[1]->GetMean() << " rms = " << fhNofHits[1]->GetRMS() << endl;
+   cout << "Nof Hits per ring, mean = " << fhNofHits[0]->GetMean() << " rms = " << fhNofHits[0]->GetRMS() << endl;
+
+
+   cout << endl << "McPoint fitting" << endl;
+   cout << "Ellipse fitting" << endl;
+   cout << "A, mean = " << fhAaxisVsMom[1]->GetMean(2) << " rms = " << fhAaxisVsMom[1]->GetRMS(2) << endl;
+   cout << "B, mean = " << fhBaxisVsMom[1]->GetMean(2) << " rms = " << fhBaxisVsMom[1]->GetRMS(2) << endl;
+   cout << "B/A, mean = " << fhBoverA[1]->GetMean() << " rms = " << fhBoverA[1]->GetRMS() << endl;
+   cout << "Circle fitting" << endl;
+   cout << "R, mean = " << fhRadiusVsMom[1]->GetMean(2) << " rms = " << fhRadiusVsMom[1]->GetRMS(2) << endl;
+
+   cout << endl << "Hit fitting" << endl;
+   cout << "Ellipse fitting" << endl;
+   cout << "A, mean = " << fhAaxisVsMom[0]->GetMean(2) << " rms = " << fhAaxisVsMom[0]->GetRMS(2) << endl;
+   cout << "B, mean = " << fhBaxisVsMom[0]->GetMean(2) << " rms = " << fhBaxisVsMom[0]->GetRMS(2) << endl;
+   cout << "B/A, mean = " << fhBoverA[0]->GetMean() << " rms = " << fhBoverA[0]->GetRMS() << endl;
+   cout << "Circle fitting" << endl;
+   cout << "R, mean = " << fhRadiusVsMom[0]->GetMean(2) << " rms = " << fhRadiusVsMom[0]->GetRMS(2) << endl;
+
+   cout << endl << "McPoint fit vs. hit fit" << endl;
+   cout << "Ellipse fitting" << endl;
+   cout << "dA, mean = " << fhDiffAaxis->GetMean(2) << " rms = " << fhDiffAaxis->GetRMS(2) << endl;
+   cout << "dB, mean = " << fhDiffBaxis->GetMean(2) << " rms = " << fhDiffBaxis->GetRMS(2) << endl;
+   cout << "dX, mean = " << fhDiffXcEllipse->GetMean(2) << " rms = " << fhDiffXcEllipse->GetRMS(2) << endl;
+   cout << "dY, mean = " << fhDiffYcEllipse->GetMean(2) << " rms = " << fhDiffYcEllipse->GetRMS(2) << endl;
+   cout << "Circle fitting" << endl;
+   cout << "dR, mean = " << fhDiffRadius->GetMean(2) << " rms = " << fhDiffRadius->GetRMS(2) << endl;
+   cout << "dX, mean = " << fhDiffXcCircle->GetMean(2) << " rms = " << fhDiffXcCircle->GetRMS(2) << endl;
+   cout << "dY, mean = " << fhDiffYcCircle->GetMean(2) << " rms = " << fhDiffYcCircle->GetRMS(2) << endl;
 }
 
 void CbmRichGeoTest::Finish()

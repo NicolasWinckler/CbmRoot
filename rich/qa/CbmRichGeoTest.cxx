@@ -230,11 +230,12 @@ void CbmRichGeoTest::RingParameters()
 	Int_t nofRings = fRichRings->GetEntriesFast();
 	for (Int_t iR = 0; iR < nofRings; iR++){
 		CbmRichRing *ring = (CbmRichRing*) fRichRings->At(iR);
-		if (!ring) continue;
+		if (NULL == ring) continue;
 		CbmRichRingMatch* ringMatch = (CbmRichRingMatch*) fRichRingMatches->At(iR);
-		if (!ringMatch) continue;
+		if (NULL == ringMatch) continue;
 
 		Int_t mcTrackId = ringMatch->GetMCTrackID();
+		if (mcTrackId < 0) continue;
 		CbmMCTrack* mcTrack = (CbmMCTrack*)fMCTracks->At(mcTrackId);
 		if (!mcTrack) continue;
 		Int_t motherId = mcTrack->GetMotherId();
@@ -255,7 +256,9 @@ void CbmRichGeoTest::RingParameters()
 		for (Int_t iPoint = 0; iPoint < nofRichPoints; iPoint++){
 		   CbmRichPoint* richPoint = (CbmRichPoint*) fRichPoints->At(iPoint);
 		   if (richPoint == NULL) continue;
-	      CbmMCTrack* mcTrackRich = (CbmMCTrack*)fMCTracks->At(richPoint->GetTrackID());
+		   Int_t trackId = richPoint->GetTrackID();
+		   if (trackId < 0) continue;
+	      CbmMCTrack* mcTrackRich = (CbmMCTrack*)fMCTracks->At(trackId);
 	      if (!mcTrackRich) continue;
 	      Int_t motherIdRich = mcTrackRich->GetMotherId();
 		   if (motherIdRich == mcTrackId){

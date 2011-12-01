@@ -6,7 +6,7 @@
 
 #include "qa/reconstruction/CbmLitReconstructionQa.h"
 #include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
-#include "qa/report/study/CbmLitQaReconstructionReportStudy.h"
+#include "qa/reconstruction/CbmLitQaReconstructionReportStudy.h"
 #include <fstream>
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
@@ -155,12 +155,12 @@ void CbmLitReconstructionQa::SetUseConsecutivePointsInSts(Bool_t useConsecutiveP
 }
 
 void CbmLitReconstructionQa::CreateReport(
-      const string& type,
+      LitReportType reportType,
       const string& title,
       const vector<string>& results,
       const vector<string>& names)
 {
-   CbmLitQaReconstructionReportStudy report(type);
+   CbmLitQaReconstructionReportStudy report(reportType);
    report.SetIsElectronSetup(IsElectronSetup());
    report.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
    report.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
@@ -170,8 +170,8 @@ void CbmLitReconstructionQa::CreateReport(
    report.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
 
    string fileType = ".tex";
-   if (type == "html") fileType = ".html";
-   if (type == "txt") fileType = ".txt";
+   if (reportType == kLitHtml) fileType = ".html";
+   if (reportType == kLitText) fileType = ".txt";
    ofstream fout(string(fImpl->GetOutputDir() + "/rec_qa_study"+fileType).c_str());
    report.CreateReport(fout, title, results, names);
 }

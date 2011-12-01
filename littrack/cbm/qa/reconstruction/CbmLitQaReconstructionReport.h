@@ -1,44 +1,32 @@
 /**
  * \file CbmLitQaReconstructionReport.h
- *
- * \brief Creates HTML page for sudy of the reconstruction performance.
- *
+ * \brief Creates report for reconstruction performance.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CbmLitQaReconstructionReport_H_
-#define CbmLitQaReconstructionReport_H_
+#ifndef CBMLITQARECONSTRUCTIONREPORT_H_
+#define CBMLITQARECONSTRUCTIONREPORT_H_
 
-#include "../CbmLitSimulationReport.h"
-
-#include <vector>
+#include "../report/CbmLitSimulationReport.h"
 #include <string>
-#include <boost/property_tree/ptree.hpp>
+#include <sstream>
+using std::string;
+using std::stringstream;
 
-using namespace std;
 /**
  * \class CbmLitQaReconstructionReport
- *
- * \brief Creates HTML page for study of the reconstruction performance.
- *
- * Generates report from a number of results of different
- * simulations and reconstructions. Creates comparison tables.
- * Very useful for studies since all numbers are automatically
- * put in the comparison tables.
- *
+ * \brief Creates report for reconstruction performance.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
- *
  */
 class CbmLitQaReconstructionReport : public CbmLitSimulationReport
 {
 public:
    /**
-    * \brief Constructor.
-    * \param[in] type type of the report. "latex" or "html"
+    * \brief Constructor with report type.
+    * \param[in] reportType Type of report to be produced.
     */
-   CbmLitQaReconstructionReport(
-         const string& type);
+   CbmLitQaReconstructionReport(LitReportType reportType);
 
    /**
     * \brief Destructor.
@@ -134,4 +122,4 @@ protected:
          const string& hist);
 };
 
-#endif /* CbmLitQaReconstructionReport_H_ */
+#endif /* CBMLITQARECONSTRUCTIONREPORT_H_ */

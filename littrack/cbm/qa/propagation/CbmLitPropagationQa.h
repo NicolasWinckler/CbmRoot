@@ -80,7 +80,7 @@ public:
    void SetMinNofHits(Int_t nofHits) {fMinNofHits = nofHits;}
    void SetTestFastPropagation(Bool_t isTestFastPropagation) {fIsTestFastPropagation = isTestFastPropagation;}
    void SetPDGCode(Int_t pdgCode) {fPDGCode = pdgCode;}
-   void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
+   void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
    void IsDrawPropagation(Bool_t drawPropagation) {fIsDrawPropagation = drawPropagation;}
    void IsDrawFilter(Bool_t drawFilter) {fIsDrawFilter = drawFilter;}
    void IsDrawSmoother(Bool_t drawSmoother) {fIsDrawSmoother = drawSmoother;}
@@ -200,9 +200,15 @@ private:
    void TestFastPropagation(
       CbmLitTrack* track);
 
+   /**
+    *
+    */
    Int_t GetMcTrackId(
          const CbmGlobalTrack* track);
 
+   /**
+    *
+    */
    CbmLitMCPoint GetMcPointByHit(
          const CbmLitHit* hit,
          const CbmLitMCTrack* mcTrack);

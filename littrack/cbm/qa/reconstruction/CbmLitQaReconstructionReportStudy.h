@@ -1,25 +1,19 @@
 /**
  * \file CbmLitQaReconstructionReportStudy.h
- *
- * \brief Creates report for study of the reconstruction performance.
- *
+ * \brief Creates study report for reconstruction.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CbmLitQaReconstructionReportStudy_H_
-#define CbmLitQaReconstructionReportStudy_H_
+#ifndef CBMLITQARECONSTRUCTIONREPORTSTUDY_H_
+#define CBMLITQARECONSTRUCTIONREPORTSTUDY_H_
 
-#include "../CbmLitStudyReport.h"
-
-#include <vector>
+#include "../report/CbmLitStudyReport.h"
 #include <string>
-#include <boost/property_tree/ptree.hpp>
+using std::string;
 
-using namespace std;
 /**
  * \class CbmLitQaReconstructionReportStudy
- *
- * \brief Creates report for study of the reconstruction performance.
+ * \brief Creates study report for reconstruction.
  *
  * Generates report from a number of results of different
  * simulations and reconstructions. Creates comparison tables.
@@ -47,14 +41,14 @@ public:
 protected:
 
    /**
-    * \brief Creates report and writes output to ostream.
+    * \brief Create report and write output to ostream.
     * \param[out] out ostream for output.
     */
    virtual void Create(
       ostream& out);
 
    /**
-    * \brief Prints one row in a table.
+    * \brief Print one row in a table.
     * \param[in] row Row counter. Used to highlight row.
     * \param[in] property Name of the property in property tree.
     * \param[in] name Name of the row.
@@ -65,8 +59,7 @@ protected:
       const string& name);
 
    /**
-    * \brief Prints one row with efficiencies in a table.
-    * \param[in] row Row counter. Used to highlight row.
+    * \brief Print one row with efficiencies in a table.
     * \param[in] property Name of the property in property tree.
     * \param[in] name Name of the row.
     * \return string with table row in HTML format.
@@ -76,7 +69,7 @@ protected:
          const string& name);
 
    /**
-    * \brief Prints images with reconstruction performance.
+    * \brief Print images with reconstruction performance.
     * \param[in] title Title of the image.
     * \param[in] file Name of the image file.
     * \return string with table which contains images in HTML format.
@@ -93,4 +86,4 @@ protected:
          const string& valueTitle);
 };
 
-#endif /* CbmLitQaReconstructionReportStudy_H_ */
+#endif /* CBMLITQARECONSTRUCTIONREPORTSTUDY_H_ */

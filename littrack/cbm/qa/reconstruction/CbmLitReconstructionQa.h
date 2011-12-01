@@ -12,7 +12,7 @@
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
-
+#include "../report/CbmLitReport.h"
 
 class CbmLitReconstructionQaImpl;
 
@@ -137,7 +137,7 @@ public:
    void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts);
 
    void CreateReport(
-         const string& type,
+         LitReportType reportType,
          const string& title,
          const vector<string>& results,
          const vector<string>& names);

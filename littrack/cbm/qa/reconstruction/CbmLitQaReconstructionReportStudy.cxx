@@ -4,7 +4,7 @@
  * \date 2011
  */
 #include "CbmLitQaReconstructionReportStudy.h"
-#include "../CbmLitReportElement.h"
+#include "../report/CbmLitReportElement.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -153,7 +153,6 @@ void CbmLitQaReconstructionReportStudy::Create(
    out <<  fR->DocumentEnd();
 }
 
-
 string CbmLitQaReconstructionReportStudy::PrintRow(
       const string& property,
       const string& name)
@@ -199,6 +198,5 @@ string CbmLitQaReconstructionReportStudy::PrintValue(
 {
    stringstream ss;
    ss << fQa[studyId].get(valueName, -1.);
-
    return ss.str();
 }

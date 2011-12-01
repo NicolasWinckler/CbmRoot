@@ -113,7 +113,9 @@ If(Boost_FOUND)
       cbm/qa/reconstruction/CbmLitQaHistCreator.cxx      
       cbm/qa/reconstruction/CbmLitQaDraw.cxx    
       cbm/qa/reconstruction/CbmLitQaPTreeCreator.cxx       
-      cbm/qa/reconstruction/CbmLitQaHistNames.cxx          
+      cbm/qa/reconstruction/CbmLitQaHistNames.cxx
+      cbm/qa/reconstruction/CbmLitQaReconstructionReportStudy.cxx            
+      cbm/qa/reconstruction/CbmLitQaReconstructionReport.cxx   
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/report/CbmLitReport.cxx      
       cbm/qa/report/CbmLitStudyReport.cxx
@@ -121,8 +123,6 @@ If(Boost_FOUND)
       cbm/qa/report/CbmLitTextReportElement.cxx
       cbm/qa/report/CbmLitHtmlReportElement.cxx       
       cbm/qa/report/CbmLitLatexReportElement.cxx  
-      cbm/qa/report/study/CbmLitQaReconstructionReportStudy.cxx            
-      cbm/qa/report/simulation/CbmLitQaReconstructionReport.cxx        
   )  
 EndIf(Boost_FOUND)
 

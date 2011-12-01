@@ -7,7 +7,7 @@
  * Implementation of global track reconstruction QA.
  **/
 #include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
-#include "qa/report/simulation/CbmLitQaReconstructionReport.h"
+#include "qa/reconstruction/CbmLitQaReconstructionReport.h"
 #include "qa/reconstruction/CbmLitReconstructionQaChecker.h"
 #include "qa/CbmLitHistManager.h"
 #include "qa/reconstruction/CbmLitQaHistCreator.h"
@@ -1647,7 +1647,7 @@ void CbmLitReconstructionQaImpl::Draw()
    boost::property_tree::ptree qa = ptc->PrintPTree();
 
 
-   CbmLitQaReconstructionReport report("txt");
+   CbmLitQaReconstructionReport report(kLitText);
    report.CreateReport(cout, &qa);
 
    boost::property_tree::ptree ideal, check;
@@ -1660,11 +1660,11 @@ void CbmLitReconstructionQaImpl::Draw()
 
    if (fOutputDir != ""){
       ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
-      CbmLitQaReconstructionReport reportHtml("html");
+      CbmLitQaReconstructionReport reportHtml(kLitHtml);
       reportHtml.CreateReport(foutHtml, &qa);
 
       ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
-      CbmLitQaReconstructionReport reportLatex("latex");
+      CbmLitQaReconstructionReport reportLatex(kLitLatex);
       reportLatex.CreateReport(foutLatex, &qa);
    }
 

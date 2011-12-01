@@ -44,19 +44,19 @@ class CbmTrackMatch : public TObject
 
 
   /** Index of matched MC track **/
-  Int_t GetMCTrackId()    { return fMCTrackId;    };
+  Int_t GetMCTrackId() const { return fMCTrackId;    };
 
   /** Number of true hits on track (from matched MC track) **/
-  Int_t GetNofTrueHits()  { return fNofTrueHits;  };
+  Int_t GetNofTrueHits() const { return fNofTrueHits;  };
 
   /** Number of wrong hits on track (from other MC tracks) **/
-  Int_t GetNofWrongHits() { return fNofWrongHits; };
+  Int_t GetNofWrongHits() const { return fNofWrongHits; };
 
   /** Number of fake hits on track (from no MC track) **/
-  Int_t GetNofFakeHits()  { return fNofFakeHits;  };
+  Int_t GetNofFakeHits() const { return fNofFakeHits;  };
 
   /** Number of MCTracks with common hits **/
-  Int_t GetNofMCTracks()  { return fNofMCTracks;  };
+  Int_t GetNofMCTracks() const { return fNofMCTracks;  };
 
 
  private:

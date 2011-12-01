@@ -10,7 +10,8 @@
 #include "CbmLitReportElement.h"
 #include <string>
 
-using namespace std;
+using std::string;
+using std::vector;
 
 /**
  * \class CbmLitHtmlReportElement

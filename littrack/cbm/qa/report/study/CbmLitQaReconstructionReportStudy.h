@@ -34,11 +34,10 @@ class CbmLitQaReconstructionReportStudy : public CbmLitStudyReport
 {
 public:
    /**
-    * \brief Constructor.
-    * \param[in] type type of the report. "latex" or "html"
+    * \brief Constructor with report type.
+    * \param[in] reportType Type of report to be produced.
     */
-   CbmLitQaReconstructionReportStudy(
-         const string& type);
+   CbmLitQaReconstructionReportStudy(LitReportType reportType);
 
    /**
     * \brief Destructor.

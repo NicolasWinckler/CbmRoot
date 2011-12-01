@@ -5,23 +5,12 @@
  * \date 2011
  */
 #include "CbmLitSimulationReport.h"
-#include "../std/utils/CbmLitUtils.h"
-
-#include "TSystem.h"
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-CbmLitSimulationReport::CbmLitSimulationReport():
-   fR(NULL),
-   fIsElectronSetup(true),
-   fIsMvd(true),
-   fIsSts(true),
-   fIsRich(true),
-   fIsTrd(true),
-   fIsMuch(true),
-   fIsTof(true),
-   fTitle("")
+CbmLitSimulationReport::CbmLitSimulationReport(LitReportType reportType):
+   CbmLitReport(reportType)
 {
 
 }
@@ -29,21 +18,6 @@ CbmLitSimulationReport::CbmLitSimulationReport():
 CbmLitSimulationReport::~CbmLitSimulationReport()
 {
 
-}
-
-void CbmLitSimulationReport::SetDetectorPresence(
-         DetectorId detId,
-         bool isDet)
-{
-   switch(detId) {
-      case kMVD: fIsMvd = isDet; break;
-      case kSTS: fIsSts = isDet; break;
-      case kRICH: fIsRich = isDet; break;
-      case kTRD: fIsTrd = isDet; break;
-      case kMUCH: fIsMuch = isDet; break;
-      case kTOF: fIsTof = isDet; break;
-      default: break;
-   }
 }
 
 void CbmLitSimulationReport::CreateReport(

@@ -1,32 +1,21 @@
 /**
  * \file CbmLitQaReconstructionReportStudy.cxx
- *
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
 #include "CbmLitQaReconstructionReportStudy.h"
-#include "../CbmLitHtmlReportElement.h"
-#include "../CbmLitLatexReportElement.h"
-#include "../CbmLitTextReportElement.h"
-
-#include "utils/CbmLitUtils.h"
-
-#include "TSystem.h"
+#include "../CbmLitReportElement.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 CbmLitQaReconstructionReportStudy::CbmLitQaReconstructionReportStudy(
-      const string& type)
+      LitReportType reportType) : CbmLitStudyReport(reportType)
 {
-   if (type == "latex") fR = new CbmLitLatexReportElement();
-   else if (type == "html") fR = new CbmLitHtmlReportElement();
-   else if (type == "txt")  fR = new CbmLitTextReportElement();
 }
 
 CbmLitQaReconstructionReportStudy::~CbmLitQaReconstructionReportStudy()
 {
-   if (fR != NULL) delete fR;
 }
 
 void CbmLitQaReconstructionReportStudy::Create(

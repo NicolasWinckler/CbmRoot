@@ -104,8 +104,16 @@ void CbmLitQaDraw::DrawEfficiencyHistos()
 
    if (fIsRich) {
       // Draw efficiency for RICH for electron set
-      DrawEfficiency("rec_qa_rich_efficiency_electrons", "hRich3Dpx_El",
+      DrawEfficiency("rec_qa_rich_efficiency_electrons_mom", "hRich3Dpx_El",
          "hRich3Dpx_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "");
+
+      // Draw efficiency for RICH for electron set vs. rapidity
+      DrawEfficiency("rec_qa_rich_efficiency_electrons_rapidity", "hRich3Dpy_El",
+         "hRich3Dpy_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "");
+
+      // Draw efficiency for RICH for electron set vs. pt
+      DrawEfficiency("rec_qa_rich_efficiency_electrons_pt", "hRich3Dpz_El",
+         "hRich3Dpz_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "");
 
       // Draw efficiency vs. nof hits in ring for RICH for electron set
       DrawEfficiency("rec_qa_rich_efficiency_vs_nofhits_electrons", "hRichNh_El",

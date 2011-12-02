@@ -13,6 +13,7 @@
 #pragma link C++ class CbmRichElectronIdAnn+;
 #pragma link C++ class CbmRichContFact;
 #pragma link C++ class CbmGeoRichPar;
+#pragma link C++ class CbmRichTrainAnnSelect;
 
 //fitter
 #pragma link C++ class CbmRichRingFitterCircle+;
@@ -35,7 +36,6 @@
 //qa
 #pragma link C++ class  CbmRichTestSim+;
 #pragma link C++ class  CbmRichTestHits+;
-#pragma link C++ class  CbmRichRingQa+;
 #pragma link C++ class CbmRichGeoTest+;
 #pragma link C++ class CbmRichElectronsQa+;
 //#pragma link C++ class CbmRichParallelQa+;

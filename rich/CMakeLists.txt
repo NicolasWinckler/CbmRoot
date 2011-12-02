@@ -55,6 +55,7 @@ CbmGeoRichPar.cxx
 CbmRichContFact.cxx
 CbmRichMatchRings.cxx
 CbmRichElectronIdAnn.cxx
+CbmRichTrainAnnSelect.cxx
 finder/CbmRichRingFinderTrack.cxx
 finder/CbmRichRingFinderIdeal.cxx 
 finder/CbmRichFindRings.cxx
@@ -79,7 +80,6 @@ tracks/CbmRichRingTrackAssignIdeal.cxx
 tracks/CbmRichAssignTrack.cxx
 qa/CbmRichTestSim.cxx  
 qa/CbmRichTestHits.cxx 
-qa/CbmRichRingQa.cxx
 qa/CbmRichGeoTest.cxx 
 qa/CbmRichRingFitterQa.cxx
 qa/CbmRichElectronsQa.cxx 
@@ -111,6 +111,7 @@ CbmGeoRichPar.h
 CbmRichContFact.h
 CbmRichMatchRings.h
 CbmRichElectronIdAnn.h
+CbmRichTrainAnnSelect.h
 finder/CbmRichRingFinderTrack.h
 finder/CbmRichRingFinderIdeal.h
 finder/CbmRichFindRings.h
@@ -132,7 +133,6 @@ tracks/CbmRichRingTrackAssignClosestD.h
 tracks/CbmRichRingTrackAssignIdeal.h 
 tracks/CbmRichAssignTrack.h
 qa/CbmRichTestSim.h qa/CbmRichTestHits.h 
-qa/CbmRichRingQa.h
 qa/CbmRichGeoTest.h 
 qa/CbmRichRingFitterQa.h 
 qa/CbmRichElectronsQa.h

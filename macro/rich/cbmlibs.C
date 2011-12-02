@@ -24,6 +24,7 @@ void cbmlibs()
 	  gSystem->Load("libGlobal");
 	  gSystem->Load("libL1");
 	  gSystem->Load("libLittrack");
+     gSystem->Load("libMuch");
 
 	  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
 }

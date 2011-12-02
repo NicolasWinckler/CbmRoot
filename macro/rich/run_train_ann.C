@@ -4,25 +4,20 @@
     Author : Semen Lebedev
     E-mail : S.Lebedev@gsi.de
 */
-void run_train_ann_select(
-      Int_t nEvents = 200)
+void run_train_ann(
+      Int_t nEvents = 100)
 {
-   Int_t iVerbose = 0;
-
-   TString script = TString(gSystem->Getenv("SCRIPT"));
-   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-
    gRandom->SetSeed(10);
 
-   TString inFile1 = "", inFile2 = "", inFile3 = "", parFile = "", outFile ="";
-
-   Bool_t isRichTrackingOn = false;
-   if (script != "yes") {
    TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/mc.0000.root";
    TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/reco.0000.root";
    TString parFile ="/d/cbm02/slebedev/rich/JUL09/param.0000.root";
    TString outFile ="/d/cbm02/slebedev/rich/JUL09/richannselect.0000.root";
-   }
+
+   // please specify what you want to run
+   // select = train ANN for fake rejection algorithm
+   // electron = train ANN for electron identification algorithm
+   TString option = "select"; // or electron
 
    TString stsDigiFile = "sts_standard.digi.par";
 
@@ -38,7 +33,9 @@ void run_train_ann_select(
    if (inFile2 != "") run->AddFriend(inFile1);
    if (outFile != "") run->SetOutputFile(outFile);
 
-   CbmRichTrainAnnSelect* richAnn = new CbmRichTrainAnnSelect();
+   FairTask* richAnn;
+   if (option == "select") richAnn = new CbmRichTrainAnnSelect();
+   if (option == "electron") richAnn = new CbmRichTrainAnnElectrons();
    run->AddTask(richAnn);
 
    // -----  Parameter database   --------------------------------------------

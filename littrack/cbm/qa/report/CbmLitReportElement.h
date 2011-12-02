@@ -68,19 +68,11 @@ public:
 
    /**
     * \brief Return string with table row tags.
-    * \param[in] name1 The first column text.
-    * \param[in] name2 The second column text etc.
+    * \param[in] data Array of strings with data for each cell in a row.
     * \return string with table row tags.
     */
    virtual string TableRow(
-         const string& name1,
-         const string& name2,
-         const string& name3 = "",
-         const string& name4 = "",
-         const string& name5 = "",
-         const string& name6 = "",
-         const string& name7 = "",
-         const string& name8 = "") const = 0;
+         const vector<string>& row) const = 0;
 
    /**
     * \brief Return string with image tags.

@@ -44,28 +44,14 @@ string CbmLitHtmlReportElement::TableEmptyRow(
 }
 
 string CbmLitHtmlReportElement::TableRow(
-      const string& name1,
-      const string& name2,
-      const string& name3,
-      const string& name4,
-      const string& name5,
-      const string& name6,
-      const string& name7,
-      const string& name8) const
+      const vector<string>& row) const
 {
-   stringstream ss;
-   ss << "<tr>";
-   ss << "<td>" << name1 << "</td>";
-   ss << "<td>" << name2 << "</td>";
-   if (name3 != "") ss << "<td>" << name3 << "</td>";
-   if (name4 != "") ss << "<td>" << name4 << "</td>";
-   if (name5 != "") ss << "<td>" << name5 << "</td>";
-   if (name6 != "") ss << "<td>" << name6 << "</td>";
-   if (name7 != "") ss << "<td>" << name7 << "</td>";
-   if (name8 != "") ss << "<td>" << name8 << "</td>";
-
-   ss << "</tr>" << endl;
-   return ss.str();
+   string st = "<tr>";
+   for (int i = 0; i < row.size(); i++) {
+      st += "<td>" + row[i] + "</td>";
+   }
+   st += "</tr> \n";
+   return st;
 }
 
 string CbmLitHtmlReportElement::Image(

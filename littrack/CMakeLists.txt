@@ -117,6 +117,7 @@ If(Boost_FOUND)
       cbm/qa/reconstruction/CbmLitQaReconstructionReportStudy.cxx            
       cbm/qa/reconstruction/CbmLitQaReconstructionReport.cxx   
       cbm/qa/field/CbmLitFieldQa.cxx
+      cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/report/CbmLitReport.cxx      
       cbm/qa/report/CbmLitStudyReport.cxx
       cbm/qa/report/CbmLitSimulationReport.cxx

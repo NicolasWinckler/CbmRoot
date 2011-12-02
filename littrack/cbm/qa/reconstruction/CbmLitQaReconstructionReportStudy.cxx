@@ -8,6 +8,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/assign/list_of.hpp>
+using boost::assign::list_of;
 
 CbmLitQaReconstructionReportStudy::CbmLitQaReconstructionReportStudy(
       LitReportType reportType) : CbmLitStudyReport(reportType)
@@ -27,7 +29,7 @@ void CbmLitQaReconstructionReportStudy::Create(
    //out << fR->PrintSubtitle(fTitle);
 
    out << fR->TableBegin("Number of objects", fStudyNames);
-   out << fR->TableRow("hEventNo", "Number of events");
+   out << fR->TableRow(list_of("hEventNo")("Number of events"));
 
    if (fIsMvd) {
       out << PrintRow("hNofMvdPoints", "MVD points");
@@ -161,7 +163,7 @@ string CbmLitQaReconstructionReportStudy::PrintRow(
    for (int i = 0; i < fStudyNames.size(); i++) {
       n[i] = PrintValue(i, property);
    }
-   return fR->TableRow(name, n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
+   return fR->TableRow(list_of(name)(n[0])(n[1])(n[2])(n[3])(n[4])(n[5])(n[6]));
 }
 
 string CbmLitQaReconstructionReportStudy::PrintRowEff(
@@ -177,7 +179,7 @@ string CbmLitQaReconstructionReportStudy::PrintRowEff(
       ss << eff << " ("<< rec << "/" << acc << ")";
       n[i] = ss.str();
    }
-   return fR->TableRow(name, n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
+   return fR->TableRow(list_of(name)(n[0])(n[1])(n[2])(n[3])(n[4])(n[5])(n[6]));
 }
 
 string CbmLitQaReconstructionReportStudy::PrintImage(

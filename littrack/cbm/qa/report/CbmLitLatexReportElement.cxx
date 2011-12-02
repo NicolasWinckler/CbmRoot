@@ -51,26 +51,14 @@ string CbmLitLatexReportElement::TableEmptyRow(
 }
 
 string CbmLitLatexReportElement::TableRow(
-      const string& name1,
-      const string& name2,
-      const string& name3,
-      const string& name4,
-      const string& name5,
-      const string& name6,
-      const string& name7,
-      const string& name8) const
+      const vector<string>& row) const
 {
-   stringstream ss;
-   ss << name1 << " & " << name2;
-   if (name3 != "") ss << " & " << name3;
-   if (name4 != "") ss << " & " << name4;
-   if (name5 != "") ss << " & " << name5;
-   if (name6 != "") ss << " & " << name6;
-   if (name7 != "") ss << " & " << name7;
-   if (name8 != "") ss << " & " << name8;
-   ss << " \\\\ \\hline";
-   ss << endl;
-   return ss.str();
+   string st;
+   for (int i = 0; i < row.size(); i++) {
+      st += (i < (row.size() - 1)) ? (row[i] + " & ") : (row[i]);
+   }
+   st += " \\\\ \\hline \n";
+   return st;
 }
 
 string CbmLitLatexReportElement::Image(

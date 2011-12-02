@@ -55,14 +55,7 @@ public:
     * \brief Inherited from CbmLitReportElement.
     */
    virtual string TableRow(
-         const string& name1,
-         const string& name2,
-         const string& name3 = "",
-         const string& name4 = "",
-         const string& name5 = "",
-         const string& name6 = "",
-         const string& name7 = "",
-         const string& name8 = "") const;
+         const vector<string>& row) const;
 
    /**
     * \brief Inherited from CbmLitReportElement.

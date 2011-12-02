@@ -17,7 +17,7 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 
 CbmLitReconstructionQa::~CbmLitReconstructionQa()
 {
-
+   if (fImpl) delete fImpl;
 }
 
 InitStatus CbmLitReconstructionQa::Init()

@@ -64,11 +64,7 @@ LitStatus CbmLitParallelTrackFitterTestMuon::Fit(
    for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
       const lit::parallel::LitStationGroupMuon<fscal>& stationGroup = fLayout.GetStationGroup(isg);
       //Propagation through the absorber
-//      lit::parallel::LitFieldValue<fscal> v1, v2, v3;
       const lit::parallel::LitAbsorber<fscal>& absorber = stationGroup.GetAbsorber();
-//      absorber.GetFieldGridFront().GetFieldValue(lpar.X, lpar.Y, v1);
-//      absorber.GetFieldGridMiddle().GetFieldValue(lpar.X, lpar.Y, v2);
-//      absorber.GetFieldGridBack().GetFieldValue(lpar.X, lpar.Y, v3);
       lit::parallel::LitRK4Extrapolation(lpar, absorber.GetZ(),
     		  absorber.GetFieldGridFront(), absorber.GetFieldGridMiddle(), absorber.GetFieldGridBack());
       lit::parallel::LitAddMaterial(lpar, absorber.GetMaterial());
@@ -109,7 +105,6 @@ LitStatus CbmLitParallelTrackFitterTestMuon::Fit(
                SerialHitToParallel(*pixelHit, lhit);
                fscal chisq = 0;
                lit::parallel::LitFiltration(ulpar, lhit, chisq);
-//               fscal chisq = ChiSq(ulpar, lhit);
 
                CbmLitTrackParam upar;
                LitTrackParamScalToCbmLitTrackParam(&ulpar, &upar);
@@ -142,16 +137,12 @@ unsigned char CbmLitParallelTrackFitterTestMuon::PlaneId(
       for(unsigned char j = 0; j < layout.GetStationGroup(i).GetNofStations(); j++) {
          counter += layout.GetStationGroup(i).GetStation(j).GetNofSubstations();
       }
-//    counter++; // count for absorber
    }
-// counter++;//again count for absorber
    for(unsigned char j = 0; j < station; j++) {
       counter += layout.GetStationGroup(stationGroup).GetStation(j).GetNofSubstations();
    }
    counter += substation;
 
-// std::cout << "PlaneId: " << stationGroup << " " << station << " " << substation
-//    << " " << counter << std::endl;
    return counter;
 }
 

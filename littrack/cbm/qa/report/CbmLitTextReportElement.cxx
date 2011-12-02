@@ -58,25 +58,13 @@ string CbmLitTextReportElement::TableEmptyRow(
 }
 
 string CbmLitTextReportElement::TableRow(
-      const string& name1,
-      const string& name2,
-      const string& name3,
-      const string& name4,
-      const string& name5,
-      const string& name6,
-      const string& name7,
-      const string& name8) const
+      const vector<string>& row) const
 {
    stringstream ss;
-   ss << left << setw(fColW) << name1 << right
-      << setw(fColW) << name2;
-   if (name3 != "") ss << setw(fColW) << name3;
-   if (name4 != "") ss << setw(fColW) << name4;
-   if (name5 != "") ss << setw(fColW) << name5;
-   if (name6 != "") ss << setw(fColW) << name6;
-   if (name7 != "") ss << setw(fColW) << name7;
-   if (name8 != "") ss << setw(fColW) << name8;
-
+   ss << right;
+   for (int i = 0; i < row.size(); i++) {
+      ss << setw(fColW) << row[i];
+   }
    ss << endl;
    return ss.str();
 }

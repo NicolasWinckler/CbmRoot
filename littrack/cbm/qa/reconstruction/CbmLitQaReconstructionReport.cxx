@@ -5,6 +5,7 @@
  */
 #include "CbmLitQaReconstructionReport.h"
 #include "../report/CbmLitReportElement.h"
+#include "../../../std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
 #include <iomanip>
@@ -14,6 +15,7 @@ using std::endl;
 using std::setfill;
 using std::left;
 using boost::assign::list_of;
+using lit::ToString;
 
 CbmLitQaReconstructionReport::CbmLitQaReconstructionReport(
       LitReportType reportType) : CbmLitSimulationReport(reportType)
@@ -33,8 +35,8 @@ void CbmLitQaReconstructionReport::Create(
    out << "Number of events: " << PrintValue("hEventNo") << endl;
 
    //Number of objects table
-   vector<string> cols1 = list_of("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF");
-   out << fR->TableBegin("Number of objects statistics", cols1);
+   out << fR->TableBegin("Number of objects statistics",
+         list_of("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF"));
    out << PrintNofStatistics("Points", "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
          "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
    out << PrintNofStatistics("Digis", "hNofMvdDigis", "hNofStsDigis", "",
@@ -47,12 +49,11 @@ void CbmLitQaReconstructionReport::Create(
          "hNofTrdTracks", "hNofMuchTracks", "hNofMuchTracks", "");
    out << fR->TableEnd();
 
-   out << "Number of global tracks per event: "<<PrintValue("hNofGlobalTracks")<< endl;
-   out << "Number of track projections in RICH: " <<PrintValue("hNofRichProjections") << endl;
+   out << "Number of global tracks per event: " << PrintValue("hNofGlobalTracks")<< endl;
+   out << "Number of track projections in RICH: " << PrintValue("hNofRichProjections") << endl;
 
    //Print hits histos statistics (nof all, true, fake hits in track/ring)
-   vector<string> cols2 = list_of("all")("true")("fake")("true/all")("fake/all");
-   out << fR->TableBegin("Hits statistics", cols2);
+   out << fR->TableBegin("Hits statistics", list_of("all")("true")("fake")("true/all")("fake/all"));
    out << PrintHits("MVD", "hMvdTrackHits");
    out << PrintHits("STS", "hStsTrackHits");
    out << PrintHits("TRD", "hTrdTrackHits");
@@ -116,8 +117,7 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    // detector acceptance efficiency
-   vector<string> cols6 = list_of("ACC/MC")("REC/MC");
-   out << fR->TableBegin("Detector acceptance for primary electrons", cols6);
+   out << fR->TableBegin("Detector acceptance for primary electrons", list_of("ACC/MC")("REC/MC"));
    out << PrintDetAccEl("STS", "hStsDetAcc3DEl");
    out << PrintDetAccEl("STS-RICH","hStsRichDetAcc3DEl");
    out << PrintDetAccEl("STS-TRD", "hStsTrdDetAcc3DEl");
@@ -128,27 +128,22 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    // ghost statistics
-   vector<string> colsGhost = list_of("Number of ghosts");
-   out << fR->TableBegin("Number of ghosts per event", colsGhost);
-   out << fR->TableRow("STS", PrintValue("fhStsGhostNh"));
-   out << fR->TableRow("TRD(MUCH)", PrintValue("fhRecGhostNh"));
-   out << fR->TableRow("RICH", PrintValue("fhRichGhostNh"));
+   out << fR->TableBegin("Number of ghosts per event", list_of("Number of ghosts"));
+   out << fR->TableRow(list_of("STS")(PrintValue("fhStsGhostNh").c_str()));
+   out << fR->TableRow(list_of("TRD(MUCH)")(PrintValue("fhRecGhostNh").c_str()));
+   out << fR->TableRow(list_of("RICH")(PrintValue("fhRichGhostNh").c_str()));
    out << fR->TableEmptyRow(2, "after STS-RICH matching");
-   out << fR->TableRow("STS", PrintValue("fhStsGhostRichMatchingNh"));
-   out << fR->TableRow("RICH", PrintValue("fhRichGhostStsMatchingNh"));
+   out << fR->TableRow(list_of("STS")(PrintValue("fhStsGhostRichMatchingNh").c_str()));
+   out << fR->TableRow(list_of("RICH")(PrintValue("fhRichGhostStsMatchingNh").c_str()));
    out << fR->TableEmptyRow(2, "after STS-RICH matching and el id");
-   out << fR->TableRow("RICH", PrintValue("fhRichGhostElIdNh"));
+   out << fR->TableRow(list_of("RICH")(PrintValue("fhRichGhostElIdNh").c_str()));
    out << fR->TableEnd();
 
    // STS quality numbers
-   vector<string> colsStsQa = list_of("Mean")("RMS");
-   out << fR->TableBegin("STS quality numbers", colsStsQa);
-   out << fR->TableRow("Chi2 to primary vertex", PrintValue("fhStsChiprim.mean"),
-         PrintValue("fhStsChiprim.rms"));
-   out << fR->TableRow("Momentum resolution", PrintValue("fhStsMomresVsMom.mean"),
-         PrintValue("fhStsMomresVsMom.rms"));
-   out << fR->TableRow("Tr. len. 100*(MC-Rec)/MC", PrintValue("fhTrackLength.mean"),
-         PrintValue("fhTrackLength.rms"));
+   out << fR->TableBegin("STS quality numbers", list_of("Mean")("RMS"));
+   out << fR->TableRow(list_of("Chi2 to primary vertex")(PrintValue("fhStsChiprim.mean").c_str())(PrintValue("fhStsChiprim.rms").c_str()));
+   out << fR->TableRow(list_of("Momentum resolution")(PrintValue("fhStsMomresVsMom.mean").c_str())(PrintValue("fhStsMomresVsMom.rms").c_str()));
+   out << fR->TableRow(list_of("Tr. len. 100*(MC-Rec)/MC")(PrintValue("fhTrackLength.mean").c_str())(PrintValue("fhTrackLength.rms").c_str()));
    out << fR->TableEnd();
 
    // Tracking efficiency vs. polar angle
@@ -189,51 +184,31 @@ string CbmLitQaReconstructionReport::PrintNofStatistics(
         const string& muchS,
         const string& tof)
 {
-   stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6, ss7;
-
-   if (mvd != "") { ss1 << (Int_t)fQa->get(mvd, -1.); }
-      else { ss1 << "-"; }
-   if (sts != "") { ss2 << (Int_t)fQa->get(sts, -1.); }
-      else { ss2 << "-"; }
-   if (rich != "") { ss3 << (Int_t)fQa->get(rich, -1.); }
-      else { ss3 << "-"; }
-   if (trd != "") { ss4 << (Int_t)fQa->get(trd, -1.); }
-      else { ss4 << "-"; }
-   if (muchP != "") { ss5 << (Int_t)fQa->get(muchP, -1.); }
-      else { ss5 << "-"; }
-   if (muchS != "") { ss6 << (Int_t)fQa->get(muchS, -1.); }
-      else { ss6 << "-"; }
-   if (tof!= "") { ss7 << (Int_t)fQa->get(tof, -1.); }
-      else { ss7 << "-"; }
-
-   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(),
-         ss6.str(), ss7.str());
+   string st1 = (mvd != "") ? ToString<Int_t>(fQa->get(mvd, -1.)) : "-";
+   string st2 = (sts != "") ? ToString<Int_t>(fQa->get(sts, -1.)) : "-";
+   string st3 = (rich != "") ? ToString<Int_t>(fQa->get(rich, -1.)) : "-";
+   string st4 = (trd != "") ? ToString<Int_t>(fQa->get(trd, -1.)) : "-";
+   string st5 = (muchP != "") ? ToString<Int_t>(fQa->get(muchP, -1.)) : "-";
+   string st6 = (muchS != "") ? ToString<Int_t>(fQa->get(muchS, -1.)) : "-";
+   string st7 = (tof!= "") ? ToString<Int_t>(fQa->get(tof, -1.)) : "-";
+   return fR->TableRow(list_of(name)(st1)(st2)(st3)(st4)(st5)(st6)(st7));
 }
 
 string CbmLitQaReconstructionReport::PrintHits(
         const string& name,
         const string& hist)
 {
-   Double_t all = fQa->get(hist+".all", -1.);
-   Double_t trueh = fQa->get(hist+".true", -1.);
-   Double_t fakeh = fQa->get(hist+".fake", -1.);
-   Double_t toa = fQa->get(hist+".trueOverAll", -1.);
-   Double_t foa = fQa->get(hist+".fakeOverAll", -1.);
-
-   stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6;
-   ss1.precision(3);
-   ss2.precision(3);
-   ss3.precision(3);
-   ss4.precision(3);
-   ss5.precision(3);
-
-   if (all == -1.) ss1 << "-"; else ss1 << all;
-   if (trueh == -1.) ss2 << "-"; else ss2 << trueh;
-   if (fakeh == -1.) ss3 << "-"; else ss3 << fakeh;
-   if (toa == -1.) ss4 << "-"; else ss4 << 100. * toa;
-   if (foa == -1.) ss5 << "-"; else ss5 << 100. * foa;
-
-   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str());
+   float all = fQa->get(hist + ".all", -1.);
+   float trueh = fQa->get(hist + ".true", -1.);
+   float fakeh = fQa->get(hist + ".fake", -1.);
+   float toa = fQa->get(hist + ".trueOverAll", -1.);
+   float foa = fQa->get(hist + ".fakeOverAll", -1.);
+   string st1 = (all == -1.) ? "-" : ToString<float>(all);
+   string st2 = (trueh == -1.) ? "-" : ToString<float>(trueh);
+   string st3 = (fakeh == -1.) ? "-" : ToString<float>(fakeh);
+   string st4 = (toa == -1.) ? "-" : ToString<float>(100. * toa);
+   string st5 = (foa == -1.) ? "-" : ToString<float>(100. * foa);
+   return fR->TableRow(list_of(name)(st1)(st2)(st3)(st4)(st5));
 }
 
 string CbmLitQaReconstructionReport::PrintEfficiency(
@@ -259,7 +234,7 @@ string CbmLitQaReconstructionReport::PrintEfficiency(
    Double_t elAcc = fQa->get(hist+".el.acc", -1.);
    Double_t elEff = fQa->get(hist+".el.eff", -1.);
 
-   stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6;
+   stringstream ss1, ss2, ss3, ss4, ss5, ss6;
    ss1.precision(3);
    ss2.precision(3);
    ss3.precision(3);
@@ -274,7 +249,7 @@ string CbmLitQaReconstructionReport::PrintEfficiency(
    ss5 << elEff << "(" << elRec << "/" << elAcc << ")";
    ss6 << muEff << "(" << muRec << "/" << muAcc << ")";
 
-   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(), ss6.str());
+   return fR->TableRow(list_of(name)(ss1.str())(ss2.str())(ss3.str())(ss4.str())(ss5.str())(ss6.str()));
 }
 
 string CbmLitQaReconstructionReport::PrintEfficiencyRich(
@@ -300,7 +275,7 @@ string CbmLitQaReconstructionReport::PrintEfficiencyRich(
    Double_t piRefAcc = fQa->get(hist+".PiRef.acc", -1.);
    Double_t piRefEff = fQa->get(hist+".PiRef.eff", -1.);
 
-   stringstream ss, ss1, ss2, ss3, ss4, ss5, ss6;
+   stringstream ss1, ss2, ss3, ss4, ss5, ss6;
    ss1.precision(3);
    ss2.precision(3);
    ss3.precision(3);
@@ -308,14 +283,14 @@ string CbmLitQaReconstructionReport::PrintEfficiencyRich(
    ss5.precision(3);
    ss6.precision(3);
 
-   ss1 << allEff << "<small>(" << allRec << "/" << allAcc << ")</small>";
-   ss2 << allRefEff << "<small>(" << allRefRec << "/" << allRefAcc << ")</small>";
-   ss3 << elEff << "<small>(" << elRec << "/" << elAcc << ")</small>";
-   ss4 << elRefEff << "<small>(" << elRefRec << "/" << elRefAcc << ")</small>";
-   ss5 << piEff << "<small>(" << piRec << "/" << piAcc << ")</small>";
-   ss6 << piRefEff << "<small>(" << piRefRec << "/" << piRefAcc << ")</small>";
+   ss1 << allEff << "(" << allRec << "/" << allAcc << ")";
+   ss2 << allRefEff << "(" << allRefRec << "/" << allRefAcc << ")";
+   ss3 << elEff << "(" << elRec << "/" << elAcc << ")";
+   ss4 << elRefEff << "(" << elRefRec << "/" << elRefAcc << ")";
+   ss5 << piEff << "(" << piRec << "/" << piAcc << ")";
+   ss6 << piRefEff << "(" << piRefRec << "/" << piRefAcc << ")";
 
-   return fR->TableRow(name, ss1.str(), ss2.str(), ss3.str(), ss4.str(), ss5.str(), ss6.str());
+   return fR->TableRow(list_of(name)(ss1.str())(ss2.str())(ss3.str())(ss4.str())(ss5.str())(ss6.str()));
 }
 
 string CbmLitQaReconstructionReport::PrintEfficiencyElId(
@@ -329,14 +304,14 @@ string CbmLitQaReconstructionReport::PrintEfficiencyElId(
    Double_t piAcc = fQa->get(hist+".pi.acc", -1.);
    Double_t piSupp = fQa->get(hist+".pi.supp", -1.);
 
-   stringstream ss, ss1, ss2;
+   stringstream ss1, ss2;
    ss1.precision(3);
    ss2.precision(3);
 
    ss1 << elEff << "("<< elRec << "/" << elAcc << ")";
    ss2 << piSupp << "("<< piAcc << "/" << piRec << ")";
 
-   return fR->TableRow(name, ss1.str(), ss2.str());
+   return fR->TableRow(list_of(name)(ss1.str())(ss2.str()));
 }
 
 string CbmLitQaReconstructionReport::PrintDetAccEl(
@@ -350,15 +325,14 @@ string CbmLitQaReconstructionReport::PrintDetAccEl(
   // Double_t mc = pt->get(hist+".detAccRec.mc", -1.);
    Double_t effRec = fQa->get(hist+".detAccRec.eff", -1.);
 
-   stringstream ss, ss1, ss2;
-   ss.precision(3);
+   stringstream ss1, ss2;
    ss1.precision(3);
    ss2.precision(3);
 
    ss1 << effAcc << "(" << acc << "/" << mc << ")";
    ss2 << effRec << "(" << rec << "/" << mc << ")";
 
-   return fR->TableRow(name, ss1.str(), ss2.str());
+   return fR->TableRow(list_of(name)(ss1.str())(ss2.str()));
 }
 
 string CbmLitQaReconstructionReport::PrintPolarAngle(
@@ -410,10 +384,7 @@ string CbmLitQaReconstructionReport::PrintPolarAngle(
       ss6 << fQa->get(hist+".mu.eff."+angle0 +"_" + angle1, -1.)
           << "(" << fQa->get(hist+".mu.rec."+angle0 +"_" + angle1, -1.)
           << "/" << fQa->get(hist+".mu.acc."+angle0 +"_" + angle1, -1.) << ")";
-
-      ss << fR->TableRow(ss0.str(), ss1.str(), ss2.str(), ss3.str(), ss4.str(),
-            ss5.str(), ss6.str()) << endl;;
-
+      ss << fR->TableRow(list_of(ss0.str())(ss1.str())(ss2.str())(ss3.str())(ss4.str())(ss5.str())(ss6.str()));
    }
    return ss.str();
 }

@@ -7,7 +7,6 @@
 
 #include "CbmRichTrainAnnSelect.h"
 
-//#include "CbmRichPoint.h"
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
@@ -16,10 +15,6 @@
 #include "CbmRichRingSelectImpl.h"
 #include "FairRootManager.h"
 #include "cbm/utils/CbmLitDrawHist.h"
-
-//#include "FairTrackParam.h"
-//#include "CbmGlobalTrack.h"
-//#include "CbmTrackMatch.h"
 
 #include "TMultiLayerPerceptron.h"
 #include "TCanvas.h"
@@ -41,6 +36,7 @@ CbmRichTrainAnnSelect::CbmRichTrainAnnSelect()
    fEventNumber = 0;
 
    fMaxNofTrainSamples = 1500;
+   fAnnCut = -.5;
 
    fhNofHits.resize(2);
    fhAngle.resize(2);
@@ -61,7 +57,7 @@ CbmRichTrainAnnSelect::CbmRichTrainAnnSelect()
       fHists.push_back(fhAngle[i]);
       fhNofHitsOnRing[i] = new TH1D(string("fhNofHitsOnRing"+ss).c_str(),"Number of hits on ring;Nof hits on ring;Counter",50,0,50);
       fHists.push_back(fhNofHitsOnRing[i]);
-      fhChi2[i] = new TH1D(string("fhFakeChi2"+ss).c_str(),"Chi2;Chi2;Counter",50,0.,1.);
+      fhChi2[i] = new TH1D(string("fhFakeChi2"+ss).c_str(),"Chi2;Chi2;Counter", 50, 0., 0.5);
       fHists.push_back(fhChi2[i]);
       fhRadPos[i] = new TH1D(string("fhRadPos"+ss).c_str(),"Radial position;Radial position [cm];Counter",150,0,150);
       fHists.push_back(fhRadPos[i]);
@@ -249,11 +245,10 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
    //network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
    //network.Export();
 
-   Double_t annCut = -.5;
    Double_t params[6];
 
-   Int_t nofFakeLikeTrue = 0;
-   Int_t nofTrueLikeFake = 0;
+   fNofFakeLikeTrue = 0;
+   fNofTrueLikeFake = 0;
 
    for (int j = 0; j < 2; j++){
       for (int i = 0; i < fRSParams[j].size(); i++){
@@ -270,8 +265,8 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
         // if (netEval < minEval) netEval = minEval + 0.01;
 
          fhAnnOutput[j]->Fill(netEval);
-         if (netEval >= annCut && j == 1) nofFakeLikeTrue++;
-         if (netEval < annCut && j == 0) nofTrueLikeFake++;
+         if (netEval >= fAnnCut && j == 1) fNofFakeLikeTrue++;
+         if (netEval < fAnnCut && j == 0) fNofTrueLikeFake++;
       }
    }
 }
@@ -280,8 +275,9 @@ void CbmRichTrainAnnSelect::Draw()
 {
    cout <<"nof Trues = " << fRSParams[0].size() << endl;
    cout <<"nof Fakes = " << fRSParams[1].size() << endl;
-   //cout <<"Fake like True = " << nofFakeLikeTrue << endl;
-   //cout <<"True like Fake = " << nofTrueLikeFake << endl;
+   cout <<"Fake like True = " << fNofFakeLikeTrue << endl;
+   cout <<"True like Fake = " << fNofTrueLikeFake << endl;
+   cout << "ANN cut = " << fAnnCut << endl;
 
    Double_t cumProbFake = 0.;
    Double_t cumProbTrue = 0.;
@@ -331,7 +327,7 @@ void CbmRichTrainAnnSelect::FinishTask()
    Draw();
 
    TDirectory *current = gDirectory;
-   TDirectory *rich = current->mkdir("CbmRichRingQa");
+   TDirectory *rich = current->mkdir("CbmRichTrainAnnSelect");
    rich->cd();
 
    for (int i = 0; i < fHists.size(); i++ ){

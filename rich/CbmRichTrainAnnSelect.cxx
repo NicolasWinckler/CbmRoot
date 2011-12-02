@@ -196,8 +196,8 @@ void CbmRichTrainAnnSelect::DiffFakeTrueCircle()
          fhAngle[1]->Fill(angle);
          fhNofHitsOnRing[1]->Fill(hitsOnRing);
          fhRadPos[1]->Fill(radPos);
-         fhChi2[1]->Fill(chi2);
          fhRadius[1]->Fill(radius);
+         fhChi2[1]->Fill(chi2);
          fRSParams[1].push_back(p);
       }
 
@@ -206,8 +206,8 @@ void CbmRichTrainAnnSelect::DiffFakeTrueCircle()
          fhAngle[0]->Fill(angle);
          fhNofHitsOnRing[0]->Fill(hitsOnRing);
          fhRadPos[0]->Fill(radPos);
-         fhChi2[0]->Fill(chi2);
          fhRadius[0]->Fill(radius);
+         fhChi2[0]->Fill(chi2);
          fRSParams[0].push_back(p);
       }
    }// iMatches
@@ -230,11 +230,12 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
    for (int j = 0; j < 2; j++){
       for (int i = 0; i < fRSParams[j].size(); i++){
          x[0] = fRSParams[j][i].fNofHits;
-         x[0] = fRSParams[j][i].fAngle;
-         x[0] = fRSParams[j][i].fHitsOnRing;
-         x[0] = fRSParams[j][i].fRadPos;
-         x[0] = fRSParams[j][i].fChi2;
-         x[0] = fRSParams[j][i].fRadius;
+         x[1] = fRSParams[j][i].fAngle;
+         x[2] = fRSParams[j][i].fHitsOnRing;
+         x[3] = fRSParams[j][i].fRadPos;
+         x[5] = fRSParams[j][i].fRadius;
+         x[4] = fRSParams[j][i].fChi2;
+
          if (j == 0) xOut = 1.;
          if (j == 1) xOut = -1.;
          simu->Fill();
@@ -257,11 +258,11 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
    for (int j = 0; j < 2; j++){
       for (int i = 0; i < fRSParams[j].size(); i++){
          params[0] = fRSParams[j][i].fNofHits;
-         params[0] = fRSParams[j][i].fAngle;
-         params[0] = fRSParams[j][i].fHitsOnRing;
-         params[0] = fRSParams[j][i].fRadPos;
-         params[0] = fRSParams[j][i].fChi2;
-         params[0] = fRSParams[j][i].fRadius;
+         params[1] = fRSParams[j][i].fAngle;
+         params[2] = fRSParams[j][i].fHitsOnRing;
+         params[3] = fRSParams[j][i].fRadPos;
+         params[5] = fRSParams[j][i].fRadius;
+         params[4] = fRSParams[j][i].fChi2;
 
          Double_t netEval = network.Evaluate(0,params);
 
@@ -296,32 +297,32 @@ void CbmRichTrainAnnSelect::Draw()
 
    TCanvas* c1 = new TCanvas("ann_select_ann_output", "ann_select_ann_output", 500, 500);
    DrawHist1D(fhAnnOutput[0], fhAnnOutput[1], NULL, NULL, "True", "Fake", "", "",
-         kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_select_cum_prob", "ann_select_cum_prob", 500, 500);
    DrawHist1D(fhCumProb[0], fhCumProb[1], NULL, NULL, "True", "Fake", "", "",
-         kLitLinear, kLitLinear, true, 0.8, 0.99, 0.8, 0.99);
+         kLitLinear, kLitLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c3 = new TCanvas("ann_select_params", "ann_select_params", 900, 600);
    c3->Divide(3, 2);
    c3->cd(1);
    DrawHist1D(fhNofHits[0], fhNofHits[1], NULL, NULL, "True", "Fake", "", "",
-            kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(2);
    DrawHist1D(fhAngle[0], fhAngle[1], NULL, NULL, "True", "Fake", "", "",
-            kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(3);
    DrawHist1D(fhNofHitsOnRing[0], fhNofHitsOnRing[1], NULL, NULL, "True", "Fake", "", "",
-            kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(4);
    DrawHist1D(fhRadPos[0], fhRadPos[1], NULL, NULL, "True", "Fake", "", "",
-            kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(5);
    DrawHist1D(fhChi2[0], fhChi2[1], NULL, NULL, "True", "Fake", "", "",
-            kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(6);
    DrawHist1D(fhRadius[0], fhRadius[1], NULL, NULL, "True", "Fake", "", "",
-            kLitLinear, kLitLog, true, 0.8, 0.99, 0.8, 0.99);
+            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
 }
 
 void CbmRichTrainAnnSelect::FinishTask()

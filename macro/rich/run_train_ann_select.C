@@ -38,8 +38,8 @@ void run_train_ann_select(
    if (inFile2 != "") run->AddFriend(inFile1);
    if (outFile != "") run->SetOutputFile(outFile);
 
-   CbmRichRingQa* richQa = new CbmRichRingQa();
-   run->AddTask(richQa);
+   CbmRichTrainAnnSelect* richAnn = new CbmRichTrainAnnSelect();
+   run->AddTask(richAnn);
 
    // -----  Parameter database   --------------------------------------------
    TString stsDigi = gSystem->Getenv("VMCWORKDIR");

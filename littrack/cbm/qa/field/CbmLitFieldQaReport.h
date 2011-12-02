@@ -50,18 +50,6 @@ private:
     * \return String with HTML.
     */
    std::string PrintSummaryTable();
-
-//   /**
-//    * \brief Prints table row which spans over all columns.
-//    * \param[in] row Row counter. Used to highlight row.
-//    * \param[in] ncols Number of columns to span.
-//    * \param[in] name Name of the row.
-//    * \return std::string with table row in HTML format.
-//    */
-//   std::string PrintEmptyRow(
-//         int row,
-//         int ncols,
-//         const std::string& name);
 };
 
 #endif /* CBMLITFIELDQAREPORT_H_ */

@@ -171,23 +171,27 @@ private:
 	Int_t fEventNum;
 	Int_t fMinNofHits;
 
+   // fitting parameters
+	// [0] = hits fit, [1] = MC points fit
 	vector<TH1D*> fhNofHits; // number of hits per ring
-	// ellipse fitting parameters
+	// for ellipse
 	vector<TH2D*> fhAaxisVsMom; // major axis (A) vs. MC momentum
 	vector<TH2D*> fhBaxisVsMom; // minor axis (B) vs. MC momentum
 	vector<TH1D*> fhBoverA; // B/A distribution
 	vector<TH2D*> fhXcYcEllipse; // (Xc, Yc) of ellipse center
-   // circle fitting parameters
+   vector<TH1D*> fhChi2Ellipse; // Chi2
+   // for circle
 	vector<TH2D*> fhXcYcCircle; // (Xc, Yc) of circle center
 	vector<TH2D*> fhRadiusVsMom; // circle radius vs. MC momentum
-	
-	// Difference between Mc Points and Hits fit
-   // ellipse fitting parameters
+   vector<TH1D*> fhChi2Circle; // chi2
+
+	// Difference between MC Points and Hits fit
+   // for ellipse fitting parameters
    TH2D* fhDiffAaxis; // major axis (A)
    TH2D* fhDiffBaxis; // minor axis (B)
    TH2D* fhDiffXcEllipse; // Xc of ellipse center
    TH2D* fhDiffYcEllipse; // Yc of ellipse center
-   // circle fitting parameters
+   // for circle fitting parameters
    TH2D* fhDiffXcCircle; // Xc of circle center
    TH2D* fhDiffYcCircle; // Xc of circle center
    TH2D* fhDiffRadius; // circle radius

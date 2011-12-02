@@ -313,8 +313,8 @@ void CbmRichTrainAnnElectrons::Draw()
 
    Double_t cumProbFake = 0.;
    Double_t cumProbTrue = 0.;
-   Int_t nofFake = fhAnnOutput[1]->GetEntries();
-   Int_t nofTrue = fhAnnOutput[0]->GetEntries();
+   Int_t nofFake = (Int_t)fhAnnOutput[1]->GetEntries();
+   Int_t nofTrue = (Int_t)fhAnnOutput[0]->GetEntries();
    for (Int_t i = 1; i <= fhAnnOutput[1]->GetNbinsX(); i++){
       cumProbFake += fhAnnOutput[1]->GetBinContent(i);
       fhCumProb[1]->SetBinContent(i, (Double_t)cumProbFake/nofFake);

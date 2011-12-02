@@ -233,8 +233,8 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
          x[1] = fRSParams[j][i].fAngle;
          x[2] = fRSParams[j][i].fHitsOnRing;
          x[3] = fRSParams[j][i].fRadPos;
-         x[5] = fRSParams[j][i].fRadius;
-         x[4] = fRSParams[j][i].fChi2;
+         x[4] = fRSParams[j][i].fRadius;
+         x[5] = fRSParams[j][i].fChi2;
 
          if (j == 0) xOut = 1.;
          if (j == 1) xOut = -1.;
@@ -261,8 +261,8 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
          params[1] = fRSParams[j][i].fAngle;
          params[2] = fRSParams[j][i].fHitsOnRing;
          params[3] = fRSParams[j][i].fRadPos;
-         params[5] = fRSParams[j][i].fRadius;
-         params[4] = fRSParams[j][i].fChi2;
+         params[4] = fRSParams[j][i].fRadius;
+         params[5] = fRSParams[j][i].fChi2;
 
          Double_t netEval = network.Evaluate(0,params);
 

@@ -84,7 +84,6 @@ CbmRichGeoTest::CbmRichGeoTest()
       fhRadiusVsMom[i] = new TH2D(("fhRadiusVsMom"+t).c_str(), ("fhRadiusVsMom"+t+";P [GeV/c];Radius [cm];Yield").c_str(), 100, 0., 12, 100, 0., 10.);
       fHists.push_back(fhRadiusVsMom[i]);
 	}
-
    // Difference between Mc Points and Hits fit
    fhDiffAaxis = new TH2D("fhDiffAaxis", "fhDiffAaxis;Nof hits in ring;A_{point}-A_{hit} [cm];Yield", 40, 0., 40., 100, -1.5, 1.5);
    fHists.push_back(fhDiffAaxis);
@@ -245,9 +244,7 @@ void CbmRichGeoTest::RingParameters()
       Double_t rapidity = mcTrack->GetRapidity();
 
 		if (pdg != 11 || motherId != -1) continue; // only primary electrons
-      cout << "Nof hits = " << ring->GetNofHits() << endl;
 		if (ring->GetNofHits() >= fMinNofHits){
-		   cout << "nofHits here " << endl;
 		   fhAcc3D->Fill(momentum, pt, rapidity);
 		}
 
@@ -399,7 +396,7 @@ void CbmRichGeoTest::DrawRing(
    fNofDrawnRings++;
    TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 500, 500);
    c->SetGrid(true, true);
-   TH2D* pad = new TH2D("pad", ";X [cm];Y [cm]", 1, -10., 10., 1, -10., 10);
+   TH2D* pad = new TH2D("pad", ";X [cm];Y [cm]", 1, -150., 150., 1, -150., 150);
    pad->SetStats(false);
    pad->Draw();
 
@@ -424,20 +421,20 @@ void CbmRichGeoTest::DrawRing(
    circle->SetFillStyle(0);
    circle->SetLineWidth(3);
    circle->Draw();
-   TEllipse* center = new TEllipse(ring->GetCenterX() - xCur, ring->GetCenterY() - yCur, 0.25);
+   TEllipse* center = new TEllipse(ring->GetCenterX() - xCur, ring->GetCenterY() - yCur, 2.5);
    center->Draw();
 
    // Draw hits
    for (int i = 0; i < ring->GetNofHits(); i++){
       CbmRichHit* hit = (CbmRichHit*)fRichHits->At(ring->GetHit(i));
-      TEllipse* hitDr = new TEllipse(hit->GetX() - xCur, hit->GetY() - yCur, 0.25);
+      TEllipse* hitDr = new TEllipse(hit->GetX() - xCur, hit->GetY() - yCur, 2.5);
       hitDr->SetFillColor(kRed);
       hitDr->Draw();
    }
 
    // Draw MC Points
    for (int i = 0; i < x.size(); i++){
-      TEllipse* pointDr = new TEllipse(x[i] - xCur, y[i] - yCur, 0.1);
+      TEllipse* pointDr = new TEllipse(x[i] - xCur, y[i] - yCur, 1);
       pointDr->SetFillColor(kBlue);
       pointDr->Draw();
    }
@@ -447,6 +444,20 @@ void CbmRichGeoTest::DrawRing(
    ss2 << "(r, n)=(" << setprecision(3) << ring->GetRadius() << ", " << ring->GetNofHits()<<")";
    TLatex* latex = new TLatex(-8., 8., ss2.str().c_str());
    latex->Draw();
+}
+
+TH1D* CbmRichGeoTest::CreateAccVsMinNofHitsHist()
+{
+   Int_t nofMc = fhMc3D->GetEntries();
+   TH1D* hist = (TH1D*)fhNofHits[0]->Clone("fhAccVsMinNofHitsHist");
+   hist->GetXaxis()->SetTitle("Required min nof hits in ring");
+   hist->GetYaxis()->SetTitle("Detector acceptance [%]");
+   Double_t sum = 0.;
+   for (int i = hist->GetNbinsX(); i > 1 ; i--){
+      sum += fhNofHits[0]->GetBinContent(i);
+      hist->SetBinContent(i, 100. * sum / nofMc);
+   }
+   return hist;
 }
 
 void CbmRichGeoTest::DrawHist()
@@ -551,8 +562,12 @@ void CbmRichGeoTest::DrawHist()
    fhNofHitsEllipseFitEff = Divide1DHists(fhNofHitsEllipseFit, fhNofHitsAll, "", "", "Nof hits in ring", "Efficiency");
    cFitEff->cd(2);
    DrawHist1D(fhNofHitsCircleFitEff);
+   TLatex* circleFitEffTxt = new TLatex(15, 0.5, CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll).c_str());
+   circleFitEffTxt->Draw();
    cFitEff->cd(3);
    DrawHist1D(fhNofHitsEllipseFitEff);
+   TLatex* ellipseFitEffTxt = new TLatex(15, 0.5, CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll).c_str());
+   ellipseFitEffTxt->Draw();
 
    TCanvas *cAccEff = new TCanvas("rich_geo_acc_eff", "rich_geo_acc_eff", 900, 600);
    cAccEff->Divide(3,2);
@@ -569,17 +584,19 @@ void CbmRichGeoTest::DrawHist()
    TH1D* pzAcc = fhAcc3D->ProjectionZ();
    pzAcc->SetName((string(fhAcc3D->GetName())+"_pz").c_str());
    cAccEff->cd(1);
-   DrawHist1D((TH1D*)pxMc->Clone(), (TH1D*)pxAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawHist1D((TH1D*)pxMc->Clone(), (TH1D*)pxAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
    cAccEff->cd(2);
-   DrawHist1D((TH1D*)pyMc->Clone(), (TH1D*)pyAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawHist1D((TH1D*)pyMc->Clone(), (TH1D*)pyAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
    cAccEff->cd(3);
-   DrawHist1D((TH1D*)pzMc->Clone(), (TH1D*)pzAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawHist1D((TH1D*)pzMc->Clone(), (TH1D*)pzAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
 
    TH1D* pxEff = Divide1DHists(pxAcc, pxMc, "pxEff", "", "P [GeV/c]", "Efficiency");
    TH1D* pyEff = Divide1DHists(pyAcc, pyMc, "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
    TH1D* pzEff = Divide1DHists(pzAcc, pzMc, "pzEff", "", "Rapidity", "Efficiency");
    cAccEff->cd(4);
    DrawHist1D(pxEff);
+   TLatex* pxEffTxt = new TLatex(3, 0.5, CalcEfficiency(pxAcc, pxMc).c_str());
+   pxEffTxt->Draw();
    cAccEff->cd(5);
    DrawHist1D(pyEff);
    cAccEff->cd(6);
@@ -605,6 +622,10 @@ void CbmRichGeoTest::DrawHist()
    cNumbersVsXY->cd(6);
    fhRadiusXY->Divide(fhCounterXY);
    fhRadiusXY->Draw("COLZ");
+
+   TCanvas *cAccVsMinNofHits = new TCanvas("rich_geo_acc_vs_min_nof_hits", "rich_geo_acc_vs_min_nof_hits", 600, 600);
+   TH1D* h = CreateAccVsMinNofHitsHist();
+   DrawHist1D(h);
 }
 
 void CbmRichGeoTest::PrintStatisctics()

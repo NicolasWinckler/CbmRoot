@@ -135,6 +135,8 @@ private:
     */
    void HitsAndPoints();
 
+	TH1D* CreateAccVsMinNofHitsHist();
+
    /**
     *  \brief Draw histograms.
     */
@@ -144,6 +146,8 @@ private:
 	      CbmRichRing* ring,
 	      const vector<Double_t>& x,
 	      const vector<Double_t>& y);
+
+
 
 	void PrintStatisctics();
 

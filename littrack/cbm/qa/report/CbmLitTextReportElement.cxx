@@ -91,11 +91,18 @@ string CbmLitTextReportElement::Image(
 string CbmLitTextReportElement::DocumentBegin() const
 {
    stringstream ss;
-   ss << "-I- Reconstruction QA final statistics:" << endl;
+   ss << "------------------------------------------------" << endl;
    return ss.str();
 }
 
 string CbmLitTextReportElement::DocumentEnd() const
 {
    return "";
+}
+
+string CbmLitTextReportElement::Title(
+      int size,
+      const string& title) const
+{
+   return title;
 }

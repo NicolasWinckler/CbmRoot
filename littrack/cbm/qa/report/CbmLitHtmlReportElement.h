@@ -80,6 +80,13 @@ public:
     * \brief Inherited from CbmLitReportElement.
     */
    virtual string DocumentEnd() const;
+
+   /**
+    * \brief Inherited from CbmLitReportElement.
+    */
+   virtual string Title(
+         int size,
+         const string& title) const;
 };
 
 #endif /* CBMLITHTMLREPORTELEMENT_H_ */

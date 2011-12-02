@@ -116,3 +116,12 @@ string CbmLitHtmlReportElement::DocumentEnd() const
 {
    return "</body></html>";
 }
+
+string CbmLitHtmlReportElement::Title(
+      int size,
+      const string& title) const
+{
+   stringstream ss;
+   ss << "<h" << size + 1 << ">" << title << "</h" << size + 1 << ">";
+   return ss.str();
+}

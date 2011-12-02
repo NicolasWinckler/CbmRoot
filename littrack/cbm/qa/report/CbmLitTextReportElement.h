@@ -81,6 +81,13 @@ public:
     */
    virtual string DocumentEnd() const;
 
+   /**
+    * \brief Inherited from CbmLitReportElement.
+    */
+   virtual string Title(
+         int size,
+         const string& title) const;
+
 private:
    int fColW; // column width
 };

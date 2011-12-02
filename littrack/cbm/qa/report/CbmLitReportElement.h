@@ -100,9 +100,19 @@ public:
 
    /**
     * \brief Return string with close tags of the document.
-    * \return string Return string with close tags of the document.
+    * \return string with close tags of the document.
     */
    virtual string DocumentEnd() const = 0;
+
+   /**
+    * \brief Return string with title.
+    * \param[in] size Size of the title. [0-5]. 0 is the largest size.
+    * \param[in] title Title string.
+    * \return string with subtitle.
+    */
+   virtual string Title(
+         int size,
+         const string& title) const = 0;
 };
 
 #endif /* CBMLITREPORTELEMENT_H_ */

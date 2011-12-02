@@ -105,3 +105,13 @@ string CbmLitLatexReportElement::DocumentEnd() const
 {
    return "\\end{document}";
 }
+
+string CbmLitLatexReportElement::Title(
+      int size,
+      const string& title) const
+{
+   string st = "\\";
+   for (int i = 0; i < size; i++) st += "sub";
+   st += "title{" + title + "}";
+   return st;
+}

@@ -93,11 +93,6 @@ void run_reco_rich(Int_t nEvents = 100) {
 	assignTrack->UseAssign(richAssign);
 	run->AddTask(assignTrack);
 
-	CbmRichRingQa* richQa = new CbmRichRingQa("CbmRichRingQa", "CbmRichRingQa", 0);
-	run->AddTask(richQa);
-
-   CbmRichElectronsQa* richElQa = new CbmRichElectronsQa("CbmRichElectronsQa", "CbmRichElectronsQa", 0);
-   run->AddTask(richElQa);
 	// ===                 End of RICH local reconstruction                  ===
 	// =========================================================================
 

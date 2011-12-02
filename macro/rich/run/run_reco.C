@@ -244,13 +244,6 @@ void run_reco(Int_t nEvents = 10){
 		CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
 		assignTrack->UseAssign(richAssign);
 		run->AddTask(assignTrack);
-
-		CbmRichRingQa* richQa   =  new CbmRichRingQa("CbmRichRingQa","CbmRichRingQa", 0);
-		run->AddTask(richQa);
-
-		CbmRichElectronsQa* elQa = new CbmRichElectronsQa("CbmRichElectronsQa", "CbmRichElectronsQa", 0);
-		run->AddTask(elQa);
-
 	}//isRich
 
 	// Reconstruction Qa

@@ -1,26 +1,23 @@
 /**
- * \file CbmLitReconstructionQaChecker.h
- *
- * \brief Automatic checker for reconstruction quality results.
- *
+ * \file CbmLitResultChecker.h
+ * \brief Automatic checker of QA results.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  *
  */
-#ifndef CBMLITRECONSTRUCTIONQACHECKER_H_
-#define CBMLITRECONSTRUCTIONQACHECKER_H_
+#ifndef CBMLITRESULTCHECKER_H_
+#define CBMLITRESULTCHECKER_H_
 
 #include <boost/property_tree/ptree.hpp>
 #include <map>
 
 /**
- * \class CbmLitReconstructionQaChecker
+ * \class CbmLitResultChecker
  *
- * \brief Automatic checker for reconstruction quality results.
+ * \brief Automatic checker of QA results.
  *
- * Checks reconstruction quality results.
- * The check is done by comparing two property trees:
- * "reconstruction quality" property tree vs.
+ * Checking procedure compares two property trees:
+ * "quality" property tree obtained from QA procedure vs.
  * "ideal results" property tree. Results are
  * stored in the third property tree as "0" - "1"
  * if value was compared to the ideal result
@@ -30,17 +27,18 @@
  * \date 2011
  *
  */
-class CbmLitReconstructionQaChecker {
+class CbmLitResultChecker
+{
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitReconstructionQaChecker();
+   CbmLitResultChecker();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitReconstructionQaChecker();
+   virtual ~CbmLitResultChecker();
 
    /**
     * \brief Checks reconstruction quality results.
@@ -68,4 +66,4 @@ private:
          std::map<std::string, float>& mymap);
 };
 
-#endif /* CBMLITRECONSTRUCTIONQACHECKER_H_ */
+#endif /* CBMLITRESULTCHECKER_H_ */

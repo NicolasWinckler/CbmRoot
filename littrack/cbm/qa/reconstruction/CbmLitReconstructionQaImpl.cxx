@@ -8,7 +8,7 @@
  **/
 #include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
 #include "qa/reconstruction/CbmLitQaReconstructionReport.h"
-#include "qa/base/CbmLitReconstructionQaChecker.h"
+#include "qa/base/CbmLitResultChecker.h"
 #include "qa/base/CbmLitHistManager.h"
 #include "qa/reconstruction/CbmLitQaHistCreator.h"
 #include "qa/reconstruction/CbmLitQaDraw.h"
@@ -1653,7 +1653,7 @@ void CbmLitReconstructionQaImpl::Draw()
    std::string qaIdealFile = std::string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
    read_json(qaIdealFile.c_str(), ideal);
 
-   CbmLitReconstructionQaChecker qaChecker;
+   CbmLitResultChecker qaChecker;
    qaChecker.DoCheck(qa, ideal, check);
    if (fOutputDir != "") write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
 

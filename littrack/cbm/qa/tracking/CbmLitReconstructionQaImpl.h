@@ -20,7 +20,7 @@
 #include <set>
 
 #include <boost/property_tree/ptree.hpp>
-#include "CbmLitQaHistNames.h"
+#include "CbmLitTrackingQaHistNames.h"
 
 class CbmTrackMatch;
 class CbmRichRingMatch;

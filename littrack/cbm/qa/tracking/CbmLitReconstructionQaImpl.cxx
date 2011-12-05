@@ -10,8 +10,8 @@
 #include "qa/tracking/CbmLitQaReconstructionReport.h"
 #include "qa/base/CbmLitResultChecker.h"
 #include "qa/base/CbmLitHistManager.h"
-#include "qa/tracking/CbmLitQaHistCreator.h"
-#include "qa/tracking/CbmLitQaDraw.h"
+#include "qa/tracking/CbmLitTrackingQaHistCreator.h"
+#include "qa/tracking/CbmLitTrackingQaDraw.h"
 #include "qa/tracking/CbmLitQaPTreeCreator.h"
 
 #include "base/CbmLitEnvironment.h"
@@ -1399,33 +1399,20 @@ void CbmLitReconstructionQaImpl::FillMCMomVsAngle(
 void CbmLitReconstructionQaImpl::CreateHistos(
 		TFile* file)
 {
-   CbmLitQaHistCreator* hc = new CbmLitQaHistCreator();
-   hc->fMinMom = fMinMom;
-   hc->fMaxMom = fMaxMom;
-   hc->fNofBinsMom = fNofBinsMom;
-   hc->fMinPt = fMinPt;
-   hc->fMaxPt = fMaxPt;
-   hc->fNofBinsPt = fNofBinsPt;
-   hc->fMinY = fMinY;
-   hc->fMaxY = fMaxY;
-   hc->fNofBinsY = fNofBinsY;
-   hc->fMinAngle = fMinAngle;
-   hc->fMaxAngle = fMaxAngle;
-   hc->fNofBinsAngle = fNofBinsAngle;
-
-   if (file != NULL){
-      fHM = hc->ReadFromFile(file);
-   } else {
-      fHM = hc->Create();
-   }
+   CbmLitTrackingQaHistCreator* hc = new CbmLitTrackingQaHistCreator();
+   hc->SetMomAxis(fMinMom, fMaxMom, fNofBinsMom);
+   hc->SetPtAxis(fMinPt, fMaxPt, fNofBinsPt);
+   hc->SetRapidityAxis(fMinY, fMaxY, fNofBinsY);
+   hc->SetAngleAxis(fMinAngle, fMaxAngle, fNofBinsAngle);
+   fHM = (file != NULL) ? hc->ReadFromFile(file) : hc->Create();
 }
 
 void CbmLitReconstructionQaImpl::CreateProjections3D(
    const string& hist,
    LitQaNameOption opt)
 {
-   const vector<string>& type = CbmLitQaHistNames::GetTypes(opt);
-   const vector<string>& cat = CbmLitQaHistNames::GetCategories(opt);
+   const vector<string>& type = CbmLitTrackingQaHistNames::GetTypes(opt);
+   const vector<string>& cat = CbmLitTrackingQaHistNames::GetCategories(opt);
 
    string yTitle = "Yield";
    for (Int_t i = 0; i < cat.size(); i++) {
@@ -1466,8 +1453,8 @@ void CbmLitReconstructionQaImpl::DivideHistos(
    LitQaNameOption opt,
    Bool_t addProjections)
 {
-   const vector<string>& type = CbmLitQaHistNames::GetTypes(opt);
-   const vector<string>& cat = CbmLitQaHistNames::GetCategories(opt);
+   const vector<string>& type = CbmLitTrackingQaHistNames::GetTypes(opt);
+   const vector<string>& cat = CbmLitTrackingQaHistNames::GetCategories(opt);
 
    if (addProjections) CreateProjections3D(hist, opt);
 
@@ -1620,7 +1607,7 @@ std::string CbmLitReconstructionQaImpl::RecDetector()
 
 void CbmLitReconstructionQaImpl::Draw()
 {
-   CbmLitQaDraw* drawQa = new CbmLitQaDraw(fHM);
+   CbmLitTrackingQaDraw* drawQa = new CbmLitTrackingQaDraw(fHM);
    drawQa->fIsElectronSetup = fIsElectronSetup;
    drawQa->fIsMvd = fIsMvd;
    drawQa->fIsSts = fIsSts;

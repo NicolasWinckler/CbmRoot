@@ -1,11 +1,11 @@
-/*
- * CbmLitQaHistCreator.cxx
- *
- *  Created on: 17.10.2011
- *      Author: slebedev
+/**
+ * \file CbmLitTrackingQaHistCreator.cxx
+ * \brief Create histograms for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  */
-#include "qa/tracking/CbmLitQaHistCreator.h"
-#include "qa/tracking/CbmLitQaHistNames.h"
+#include "qa/tracking/CbmLitTrackingQaHistCreator.h"
+#include "qa/tracking/CbmLitTrackingQaHistNames.h"
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TH1.h"
@@ -19,21 +19,41 @@
 
 #include <iostream>
 
-using namespace std;
+CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
+   fMinMom(0.),
+   fMaxMom(12.),
+   fNofBinsMom(120),
+   fMinPt(0.),
+   fMaxPt(3.),
+   fNofBinsPt(30),
+   fMinY(0.),
+   fMaxY(4.),
+   fNofBinsY(40),
+   fMinAngle(0.),
+   fMaxAngle(25.),
+   fNofBinsAngle(3),
+   fHM(NULL)
+{
+}
 
-void CbmLitQaHistCreator::CreateEffHist(
+CbmLitTrackingQaHistCreator::~CbmLitTrackingQaHistCreator()
+{
+   if (fHM) delete fHM;
+}
+
+void CbmLitTrackingQaHistCreator::CreateEffHist(
       const string& name,
       const string& xTitle,
-      Int_t nofBins,
-      Double_t minBin,
-      Double_t maxBin,
+      int nofBins,
+      float minBin,
+      float maxBin,
       LitQaNameOption opt)
 {
-   const vector<string>& type = CbmLitQaHistNames::GetTypes(opt);
-   const vector<string>& cat = CbmLitQaHistNames::GetCategories(opt);
+   const vector<string>& type = CbmLitTrackingQaHistNames::GetTypes(opt);
+   const vector<string>& cat = CbmLitTrackingQaHistNames::GetCategories(opt);
    string yTitle = "Yield";
-   for (Int_t i = 0; i < cat.size(); i++) {
-      for (Int_t j = 0; j < type.size(); j++) {
+   for (int i = 0; i < cat.size(); i++) {
+      for (int j = 0; j < type.size(); j++) {
          string histName = name + "_" + cat[i] + "_" + type[j];
          if (type[j] == "Eff") yTitle = "Efficiency [%]";
          fHM->Add(histName, new TH1F(histName.c_str(),
@@ -42,15 +62,15 @@ void CbmLitQaHistCreator::CreateEffHist(
    }
 }
 
-void CbmLitQaHistCreator::CreateEffHist3D(
+void CbmLitTrackingQaHistCreator::CreateEffHist3D(
       const string& name,
       LitQaNameOption opt)
 {
-   const vector<string>& types = CbmLitQaHistNames::GetTypes(opt);
-   const vector<string>& cat = CbmLitQaHistNames::GetCategories(opt);
+   const vector<string>& types = CbmLitTrackingQaHistNames::GetTypes(opt);
+   const vector<string>& cat = CbmLitTrackingQaHistNames::GetCategories(opt);
 
-   for (Int_t i = 0; i < cat.size(); i++) {
-      for (Int_t j = 0; j < types.size(); j++) {
+   for (int i = 0; i < cat.size(); i++) {
+      for (int j = 0; j < types.size(); j++) {
          string histName = name + "_" + cat[i] + "_" + types[j];
          fHM->Add(histName, new TH3F(histName.c_str(),
                (histName+";P [GeV/c];Rapidity;P_{t} [GeV/c]").c_str(),
@@ -61,39 +81,37 @@ void CbmLitQaHistCreator::CreateEffHist3D(
    }
 }
 
-
-void CbmLitQaHistCreator::Create1DHist(
+void CbmLitTrackingQaHistCreator::Create1DHist(
       const string& name,
       const string& xTitle,
       const string& yTitle,
-      Int_t nofBins,
-      Double_t minBin,
-      Double_t maxBin)
+      int nofBins,
+      float minBin,
+      float maxBin)
 {
    TH1F* h = new TH1F(name.c_str(),
          (name+";"+xTitle+";"+yTitle).c_str(), nofBins, minBin, maxBin);
    fHM->Add(name, h);
 }
 
-void CbmLitQaHistCreator::Create2DHist(
+void CbmLitTrackingQaHistCreator::Create2DHist(
       const string& name,
       const string& xTitle,
       const string& yTitle,
       const string& zTitle,
-      Int_t nofBinsX,
-      Double_t minBinX,
-      Double_t maxBinX,
-      Int_t nofBinsY,
-      Double_t minBinY,
-      Double_t maxBinY)
+      int nofBinsX,
+      float minBinX,
+      float maxBinX,
+      int nofBinsY,
+      float minBinY,
+      float maxBinY)
 {
    TH2F* h = new TH2F(name.c_str(),
          (name+";"+xTitle+";"+yTitle+";"+zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
    fHM->Add(name, h);
 }
 
-
-CbmLitQaHistManager* CbmLitQaHistCreator::ReadFromFile(
+CbmLitQaHistManager* CbmLitTrackingQaHistCreator::ReadFromFile(
       TFile* file)
 {
    cout<< "ReadAllHistosFromFile" <<endl;
@@ -102,7 +120,7 @@ CbmLitQaHistManager* CbmLitQaHistCreator::ReadFromFile(
    TDirectory* dir = gDirectory;
    TIter nextkey( dir->GetListOfKeys());
    TKey *key;
-   Int_t c = 0;
+   int c = 0;
    while (key = (TKey*) nextkey()) {
       TObject* obj = key->ReadObj();
       if (obj->IsA()->InheritsFrom (TH1::Class())) {
@@ -115,14 +133,14 @@ CbmLitQaHistManager* CbmLitQaHistCreator::ReadFromFile(
    return fHM;
 }
 
-CbmLitQaHistManager* CbmLitQaHistCreator::Create()
+CbmLitQaHistManager* CbmLitTrackingQaHistCreator::Create()
 {
    fHM = new CbmLitQaHistManager();
 
    // Number of points distributions
-   Double_t minNofPoints =  0.;
-   Double_t maxNofPoints = 100.;
-   Int_t nBinsNofPoints = 100;
+   float minNofPoints =  0.;
+   float maxNofPoints = 100.;
+   int nBinsNofPoints = 100;
 
    // Reconstruction efficiency histograms
    CreateEffHist3D("hSts3D", kTracking);
@@ -183,22 +201,22 @@ CbmLitQaHistManager* CbmLitQaHistCreator::Create()
    Create1DHist("hRichGhostElIdNh", "Nof ghosts", "Yield",nBinsNofPoints, minNofPoints, maxNofPoints);
    Create1DHist("hStsGhostRichMatchingNh", "Nof ghosts", "Yield",nBinsNofPoints, minNofPoints, maxNofPoints);
 
-   const UInt_t maxNofStations = 30;
+   const int maxNofStations = 30;
    Create1DHist("hMvdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
    Create1DHist("hStsNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
    Create1DHist("hTrdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
    Create1DHist("hMuchNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
    Create1DHist("hTofNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
 
-   const UInt_t nofHitsHistos = 5;
+   const int nofHitsHistos = 5;
    string hittype[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
-   Double_t hitmin[] = {0, 0, 0, -0.1, -0.1};
-   Double_t hitmax[] = {20, 20, 20, 1.1, 1.1};
-   Int_t hitbins[] = {20, 20, 20, 12, 12};
-   Double_t hitmaxrich[] = {50, 50, 50, 1.1, 1.1};
-   Int_t hitbinsrich[] = {50, 50, 50, 12, 12};
+   float hitmin[] = {0, 0, 0, -0.1, -0.1};
+   float hitmax[] = {20, 20, 20, 1.1, 1.1};
+   int hitbins[] = {20, 20, 20, 12, 12};
+   float hitmaxrich[] = {50, 50, 50, 1.1, 1.1};
+   int hitbinsrich[] = {50, 50, 50, 12, 12};
    string xTitle = "Number of hits";
-   for(UInt_t i = 0; i < nofHitsHistos; i++) {
+   for(int i = 0; i < nofHitsHistos; i++) {
       string histName1 = "hMvdTrackHits_" + hittype[i];
       string histName2 = "hStsTrackHits_" + hittype[i];
       string histName3 = "hTrdTrackHits_" + hittype[i];
@@ -213,8 +231,8 @@ CbmLitQaHistManager* CbmLitQaHistCreator::Create()
       Create1DHist(histName5.c_str(), xTitle, "Counter", hitbinsrich[i], hitmin[i], hitmaxrich[i]);
    }
 
-   Int_t nofBinsC = 1000;
-   Double_t maxXC = 50000.;
+   int nofBinsC = 1000;
+   float maxXC = 50000.;
    Create1DHist("hNofGlobalTracks", "Tracks per event", "Counter", nofBinsC, 1., maxXC);
    Create1DHist("hNofStsTracks", "Tracks per event", "Counter", nofBinsC, 1., maxXC);
    Create1DHist("hNofTrdTracks", "Tracks per event", "Counter", nofBinsC, 1., maxXC);
@@ -255,7 +273,7 @@ CbmLitQaHistManager* CbmLitQaHistCreator::Create()
    string cat[6];
    cat[0] = "All"; cat[1] = "Ref"; cat[2] = "Prim";
    cat[3] = "Sec"; cat[4] = "Mu"; cat[5] = "El";
-   for (Int_t i = 0; i < 6; i++) {
+   for (int i = 0; i < 6; i++) {
       string histName = "hMCMomVsAngle_" + cat[i];
       Create2DHist(histName.c_str(), "P [GeV/c]", "Polar angle [grad]", "Counter",
             fNofBinsMom, fMinMom, fMaxMom, 10, 0., 35.);

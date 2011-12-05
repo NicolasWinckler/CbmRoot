@@ -1,14 +1,12 @@
-/*
- * CbmLitQaDraw.h
- *
- *  Created on: 17.10.2011
- *      Author: slebedev
+/**
+ * \file CbmLitTrackingQaDraw.h
+ * \brief Draw histograms for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  */
 
-#ifndef CBMLITQADRAW_H_
-#define CBMLITQADRAW_H_
-
-#include "TObject.h"
+#ifndef CBMLITTRACKINGQADRAW_H_
+#define CBMLITTRACKINGQADRAW_H_
 
 #include <string>
 
@@ -18,21 +16,28 @@ class TH1F;
 class TH2F;
 class TH3F;
 
-using namespace std;
+using std::string;
 
-class CbmLitQaDraw
+/**
+ * \class CbmLitTrackingQaDraw
+ * \brief Draw histograms for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
+ */
+class CbmLitTrackingQaDraw
 {
 public:
 
    /**
-    *
+    * \brief Constructor.
     */
-   CbmLitQaDraw(CbmLitQaHistManager* hm){fHM = hm; fRebin = 1;}
+   CbmLitTrackingQaDraw(
+         CbmLitQaHistManager* hm):fHM(hm), fRebin(1){}
 
    /**
-    *
+    * \brief Destructor.
     */
-   ~CbmLitQaDraw(){;}
+   ~CbmLitTrackingQaDraw(){}
 
    /**
     *
@@ -42,41 +47,42 @@ public:
    /**
     *
     */
-   void SetRebinForDraw(Int_t rebin = 1) {if (rebin >=1) fRebin = rebin; else fRebin = 1;}
+   void SetRebinForDraw(int rebin = 1) {if (rebin >=1) fRebin = rebin; else fRebin = 1;}
 
-   Bool_t fIsElectronSetup; // If "electron" setup detected than true
-   Bool_t fIsMvd; // If MVD detected than true
-   Bool_t fIsSts; // If STS detected than true
-   Bool_t fIsRich; // If RICH detected than true
-   Bool_t fIsTrd; // If TRD detected than true
-   Bool_t fIsMuch; // If MUCH detected than true
-   Bool_t fIsTof; // If TOF detected than true
+   bool fIsElectronSetup; // If "electron" setup detected than true
+   bool fIsMvd; // If MVD detected than true
+   bool fIsSts; // If STS detected than true
+   bool fIsRich; // If RICH detected than true
+   bool fIsTrd; // If TRD detected than true
+   bool fIsMuch; // If MUCH detected than true
+   bool fIsTof; // If TOF detected than true
    string fOutputDir; // Output directory for images
 
 private:
-   CbmLitQaHistManager* fHM; // histogram manager
-   Int_t fRebin;
-
    /**
-    *
+    * \brief Return TH1F histogram from histogram manager.
+    * \return TH1F histogram from histogram manager.
     */
    TH1F* H1(
       const string& name);
 
    /**
-    *
+    * \brief Return TH2F histogram from histogram manager.
+    * \return TH2F histogram from histogram manager.
     */
    TH2F* H2(
       const string& name);
 
    /**
-    *
+    * \brief Return TH3F histogram from histogram manager.
+    * \return TH3F histogram from histogram manager.
     */
    TH3F* H3(
       const string& name);
 
    /**
-    *
+    * \brief Return TH1 histogram from histogram manager.
+    * \return TH1 histogram from histogram manager.
     */
    TH1* H(
       const string& name);
@@ -107,7 +113,7 @@ private:
    /**
     * \brief Calculate efficiency for two histograms.
     */
-   Double_t CalcEfficiency(
+   float CalcEfficiency(
       TH1* histRec,
       TH1* histAcc,
       const std::string& opt);
@@ -117,10 +123,10 @@ private:
     */
    void DrawMeanEfficiencyLines(
       TH1* h,
-      Double_t eff1 = -1.,
-      Double_t eff2 = -1.,
-      Double_t eff3 = -1.,
-      Double_t eff4 = -1.);
+      float eff1 = -1.,
+      float eff2 = -1.,
+      float eff3 = -1.,
+      float eff4 = -1.);
 
    /**
     * \brief Draw ACC and REC efficiency graphs normalized to MC.
@@ -164,6 +170,9 @@ private:
     * \brief Draw MC momentum vs. angle histogram.
     */
    void DrawMCMomVsAngle();
+
+   CbmLitQaHistManager* fHM; // histogram manager
+   int fRebin;
 };
 
-#endif /* CBMLITQADRAW_H_ */
+#endif /* CBMLITTRACKINGQADRAW_H_ */

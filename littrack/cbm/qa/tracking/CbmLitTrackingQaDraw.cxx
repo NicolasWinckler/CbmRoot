@@ -1,10 +1,10 @@
-/*
- * CbmLitQaHistCreator.cxx
- *
- *  Created on: 17.10.2011
- *      Author: slebedev
+/**
+ * \file CbmLitTrackingQaDraw.cxx
+ * \brief Draw histograms for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  */
-#include "qa/tracking/CbmLitQaDraw.h"
+#include "qa/tracking/CbmLitTrackingQaDraw.h"
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TCanvas.h"
@@ -19,9 +19,7 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
-void CbmLitQaDraw::Draw()
+void CbmLitTrackingQaDraw::Draw()
 {
    SetStyles();
    DrawEfficiencyHistos();
@@ -32,31 +30,31 @@ void CbmLitQaDraw::Draw()
    DrawMCMomVsAngle();
 }
 
-TH1F* CbmLitQaDraw::H1(
+TH1F* CbmLitTrackingQaDraw::H1(
       const string& name)
 {
    return fHM->H1(name);
 }
 
-TH2F* CbmLitQaDraw::H2(
+TH2F* CbmLitTrackingQaDraw::H2(
       const string& name)
 {
    return fHM->H2(name);
 }
 
-TH3F* CbmLitQaDraw::H3(
+TH3F* CbmLitTrackingQaDraw::H3(
       const string& name)
 {
    return fHM->H3(name);
 }
 
-TH1* CbmLitQaDraw::H(
+TH1* CbmLitTrackingQaDraw::H(
       const string& name)
 {
    return fHM->H(name);
 }
 
-void CbmLitQaDraw::DrawEfficiencyHistos()
+void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 {
    //return;
    string sname("STS");
@@ -162,7 +160,7 @@ void CbmLitQaDraw::DrawEfficiencyHistos()
    }
 }
 
-void CbmLitQaDraw::DrawEfficiency(
+void CbmLitTrackingQaDraw::DrawEfficiency(
       const string& canvasName,
       const string& hist1,
       const string& hist2,
@@ -186,7 +184,7 @@ void CbmLitQaDraw::DrawEfficiency(
    if (hist3 != "") h3 = H(hist3+"_Eff");
    if (hist4 != "") h4 = H(hist4+"_Eff");
 
-   Double_t eff1, eff2, eff3, eff4;
+   float eff1, eff2, eff3, eff4;
 
    if (hist1 != "") eff1 = CalcEfficiency(H(hist1+"_Rec"), H(hist1+"_Acc"), opt);
    if (hist2 != "") eff2 = CalcEfficiency(H(hist2+"_Rec"), H(hist2+"_Acc"), opt);
@@ -194,10 +192,10 @@ void CbmLitQaDraw::DrawEfficiency(
    if (hist4 != "") eff4 = CalcEfficiency(H(hist4+"_Rec"), H(hist4+"_Acc"), opt);
 
    string hname1, hname2, hname3, hname4;
-   if (hist1 != "") hname1 = name1 + "(" + lit::NumberToString<Double_t>(eff1, 1) + ")";
-   if (hist2 != "") hname2 = name2 + "(" + lit::NumberToString<Double_t>(eff2, 1) + ")";
-   if (hist3 != "") hname3 = name3 + "(" + lit::NumberToString<Double_t>(eff3, 1) + ")";
-   if (hist4 != "") hname4 = name4 + "(" + lit::NumberToString<Double_t>(eff4, 1) + ")";
+   if (hist1 != "") hname1 = name1 + "(" + lit::NumberToString<float>(eff1, 1) + ")";
+   if (hist2 != "") hname2 = name2 + "(" + lit::NumberToString<float>(eff2, 1) + ")";
+   if (hist3 != "") hname3 = name3 + "(" + lit::NumberToString<float>(eff3, 1) + ")";
+   if (hist4 != "") hname4 = name4 + "(" + lit::NumberToString<float>(eff4, 1) + ")";
 
    if (fRebin > 1) {
       if (hist1 != "") h1->Rebin(fRebin);
@@ -241,7 +239,7 @@ void CbmLitQaDraw::DrawEfficiency(
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
-Double_t CbmLitQaDraw::CalcEfficiency(
+float CbmLitTrackingQaDraw::CalcEfficiency(
    TH1* histRec,
    TH1* histAcc,
    const string& opt)
@@ -249,20 +247,20 @@ Double_t CbmLitQaDraw::CalcEfficiency(
    if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
       return 0.;
    } else {
-      if (opt != "pisupp") return 100.*Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
-      else return Double_t(histAcc->GetEntries()) / Double_t(histRec->GetEntries());
+      if (opt != "pisupp") return 100.*float(histRec->GetEntries()) / float(histAcc->GetEntries());
+      else return float(histAcc->GetEntries()) / float(histRec->GetEntries());
    }
 }
 
-void CbmLitQaDraw::DrawMeanEfficiencyLines(
+void CbmLitTrackingQaDraw::DrawMeanEfficiencyLines(
    TH1* h,
-   Double_t eff1,
-   Double_t eff2,
-   Double_t eff3,
-   Double_t eff4)
+   float eff1,
+   float eff2,
+   float eff3,
+   float eff4)
 {
-   Double_t minY = h->GetXaxis()->GetXmin();
-   Double_t maxY = h->GetXaxis()->GetXmax();
+   float minY = h->GetXaxis()->GetXmin();
+   float maxY = h->GetXaxis()->GetXmax();
 
    TLine* line1 = new TLine(minY, eff1, maxY, eff1);
    line1->SetLineWidth(1);
@@ -291,7 +289,7 @@ void CbmLitQaDraw::DrawMeanEfficiencyLines(
    }
 }
 
-void CbmLitQaDraw::DrawMcEfficiencyGraph()
+void CbmLitTrackingQaDraw::DrawMcEfficiencyGraph()
 {
  /*  boost::property_tree::ptree pt = PrintPTree();
 
@@ -325,7 +323,7 @@ void CbmLitQaDraw::DrawMcEfficiencyGraph()
 }
 
 
-void CbmLitQaDraw::DrawHitsHistos()
+void CbmLitTrackingQaDraw::DrawHitsHistos()
 {
    if (fIsMvd) { DrawHitsHistos("rec_qa_mvd_hits", "hMvdTrackHits"); }
    if (fIsSts) { DrawHitsHistos("rec_qa_sts_hits", "hStsTrackHits"); }
@@ -334,7 +332,7 @@ void CbmLitQaDraw::DrawHitsHistos()
    if (fIsRich) { DrawHitsHistos("rec_qa_rich_ring_hits", "hRichRingHits"); }
 }
 
-void CbmLitQaDraw::DrawHitsHistos(
+void CbmLitTrackingQaDraw::DrawHitsHistos(
    const string& canvasName,
    const string& hist)
 {
@@ -344,21 +342,21 @@ void CbmLitQaDraw::DrawHitsHistos(
 
    c->cd(1);
    DrawHist1D(H1(hist+"_All"), H1(hist+"_True"), H1(hist+"_Fake"), NULL,
-              "all: " + lit::NumberToString<Double_t>(H1(hist+"_All")->GetMean(), 1),
-              "true: " + lit::NumberToString<Double_t>(H1(hist+"_True")->GetMean(), 1),
-              "fake: " + lit::NumberToString<Double_t>(H1(hist+"_Fake")->GetMean(), 1),  "",
+              "all: " + lit::NumberToString<float>(H1(hist+"_All")->GetMean(), 1),
+              "true: " + lit::NumberToString<float>(H1(hist+"_True")->GetMean(), 1),
+              "fake: " + lit::NumberToString<float>(H1(hist+"_Fake")->GetMean(), 1),  "",
               kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    c->cd(2);
    DrawHist1D(H1(hist+"_TrueOverAll"), H1(hist+"_FakeOverAll"), NULL, NULL,
-              "true/all: " + lit::NumberToString<Double_t>(H1(hist+"_TrueOverAll")->GetMean()),
-              "fake/all: " + lit::NumberToString<Double_t>(H1(hist+"_FakeOverAll")->GetMean()),
+              "true/all: " + lit::NumberToString<float>(H1(hist+"_TrueOverAll")->GetMean()),
+              "fake/all: " + lit::NumberToString<float>(H1(hist+"_FakeOverAll")->GetMean()),
               "", "", kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    if (fOutputDir != "") lit::SaveCanvasAsImage(c, fOutputDir);
 }
 
-void CbmLitQaDraw::DrawHitsStationHisto(
+void CbmLitTrackingQaDraw::DrawHitsStationHisto(
       const std::string& name,
       TH1F* hist)
 {
@@ -367,7 +365,7 @@ void CbmLitQaDraw::DrawHitsStationHisto(
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
-void CbmLitQaDraw::DrawHitsStationHistos()
+void CbmLitTrackingQaDraw::DrawHitsStationHistos()
 {
    if (fIsMvd) {DrawHitsStationHisto("rec_qa_mvd_hits_station", H1("hMvdNofHitsInStation"));}
    if (fIsSts) {DrawHitsStationHisto("rec_qa_sts_hits_station", H1("hStsNofHitsInStation"));}
@@ -376,7 +374,7 @@ void CbmLitQaDraw::DrawHitsStationHistos()
    if (fIsTof) {DrawHitsStationHisto("rec_qa_tof_hits_station", H1("hTofNofHitsInStation"));}
 }
 
-void CbmLitQaDraw::DrawStsTracksQaHistos()
+void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
 {
    TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa", "rec_qa_sts_tracks_qa", 900, 900);
    canvas1->Divide(2,2);
@@ -414,7 +412,7 @@ void CbmLitQaDraw::DrawStsTracksQaHistos()
    TH1D* momResRms = (TH1D*)H2("hStsMomresVsMom")->ProjectionX()->Clone();
    for (Int_t i = 1; i < nBins; i++){
       TH1* projY = (TH1*)H2("hStsMomresVsMom")->ProjectionY("_py", i, i);
-      Double_t rms = projY->GetRMS();
+      float rms = projY->GetRMS();
       momResRms->SetBinContent(i, rms);
       momResRms->SetBinError(i, momslice->GetBinError(i));
    }
@@ -432,7 +430,7 @@ void CbmLitQaDraw::DrawStsTracksQaHistos()
 
 }
 
-void CbmLitQaDraw::DrawMCMomVsAngle()
+void CbmLitTrackingQaDraw::DrawMCMomVsAngle()
 {
    TCanvas* canvas1 = new TCanvas("rec_qa_mc_mom_vs_angle", "rec_qa_mc_mom_vs_angle", 1200, 600);
    canvas1->Divide(2,1);

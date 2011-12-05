@@ -55,7 +55,8 @@
 //
 //	return par;
 //}
-
+#include "../../littrack/utils/CbmLitDrawHist.cxx"
+#include "../../littrack/utils/CbmLitUtils.cxx"
 void trd_elid_qa_draw()
 {
 //	gStyle->SetCanvasColor(kWhite);
@@ -66,10 +67,11 @@ void trd_elid_qa_draw()
 //	gStyle->SetPalette(1);
 //	gStyle->SetOptStat(0);
 //	gStyle->SetOptTitle(0);
-	gStyle->SetPalette(1,0);
-    gStyle->SetHistLineWidth(3);
+  //      gStyle->SetPalette(1,0);
+ //   gStyle->SetHistLineWidth(3);
+   SetStyles();
 
-	TFile* file = new TFile("/d/cbm06/user/slebedev/trd/JUL09/reco/param1/st/piel.0009.reco.root");
+   TFile* file = new TFile("/d/cbm06/user/slebedev/trd/JUL09/reco/param3/st/piel.0001.reco.root");
 
     fhPiELossSum->SetLineWidth(3);
     fhElELossSum->SetLineWidth(3);
@@ -85,7 +87,7 @@ void trd_elid_qa_draw()
     fhEldEdX->SetLineStyle(2);
     fhElELoss->SetLineStyle(2);
 
-    c1 = new TCanvas("c1","c1",10,10,800,800);
+    c1 = new TCanvas("c1","c1",10,10,600,600);
     c1->Divide(2,3);
     c1->cd(1);
     fhPiELossSum->Draw();
@@ -144,7 +146,7 @@ void trd_elid_qa_draw()
 		fhPidANNEl[i]->SetLineStyle(2);
     }
 
-    c2 = new TCanvas("c2","c2",10,10,800,800);
+    c2 = new TCanvas("c2","c2",10,10,600,600);
     c2->Divide(3,3);
     c2->cd(1);
     fhNofTrdHitsEl->Draw();
@@ -170,42 +172,42 @@ void trd_elid_qa_draw()
 		leg1->DrawClone();
     }
 
-	TCanvas* c3 = new TCanvas("c3","c3",10,10,800,800);
-	c3->Divide(4, 3);
-	TH1D *fhElossSortPi[12];
-	TH1D *fhElossSortEl[12];
+    TCanvas* c3 = new TCanvas("c3","c3",10,10,800,600);
+    c3->Divide(4, 3);
+    TH1D *fhElossSortPi[12];
+    TH1D *fhElossSortEl[12];
 	for (int i = 0; i < 12; i++){
-		c3->cd(i+1);
-		sprintf(histName,"fhElossSortPi%d",i);
-		fhElossSortPi[i] = (TH1D*)file->Get(histName);
-		sprintf(histName,"fhElossSortEl%d",i);
-		fhElossSortEl[i] = (TH1D*)file->Get(histName);
+	    c3->cd(i+1);
+	    sprintf(histName,"fhElossSortPi%d",i);
+	    fhElossSortPi[i] = (TH1D*)file->Get(histName);
+	    sprintf(histName,"fhElossSortEl%d",i);
+	    fhElossSortEl[i] = (TH1D*)file->Get(histName);
 
-		fhElossSortPi[i]->SetLineWidth(3);
-		fhElossSortPi[i]->SetStats(false);
-		//fhElossSortPi[i]->Rebin(5);
-		//fhElossSortPi[i]->Fit("landau");
-		fhElossSortPi[i]->SetMinimum(1);
-		fhElossSortPi[i]->SetMaximum(1.2*TMath::Max(fhElossSortEl[i]->GetMaximum(),
-				fhElossSortPi[i]->GetMaximum()));
-		fhElossSortPi[i]->Draw();
+	    fhElossSortPi[i]->SetLineWidth(3);
+	    fhElossSortPi[i]->SetStats(false);
+	    fhElossSortPi[i]->Rebin(25);
+	    //fhElossSortPi[i]->Fit("landau");
+	    fhElossSortPi[i]->SetMinimum(1);
+	    fhElossSortPi[i]->SetMaximum(1.2*TMath::Max(fhElossSortEl[i]->GetMaximum(),
+							fhElossSortPi[i]->GetMaximum()));
+	    fhElossSortPi[i]->Draw();
 
-		fhElossSortEl[i]->SetLineWidth(3);
-		fhElossSortEl[i]->SetLineStyle(2);
-		fhElossSortEl[i]->SetStats(false);
-		//fhElossSortEl[i]->Rebin(5);
-		fhElossSortEl[i]->Draw("same");
+	    fhElossSortEl[i]->SetLineWidth(3);
+	    fhElossSortEl[i]->SetLineStyle(2);
+	    fhElossSortEl[i]->SetStats(false);
+	    fhElossSortEl[i]->Rebin(25);
+	    fhElossSortEl[i]->Draw("same");
 
-		TLegend* leg1 = new TLegend(0.4,0.8, 0.99, 0.99, "mean value");
-		sprintf(legTxt1,"electrons (%.1e)", fhElossSortEl[i]->GetMean());
-		leg1->AddEntry(fhElossSortEl[i], legTxt1);
-		sprintf(legTxt1,"pions (%.1e)",fhElossSortPi[i]->GetMean());
-		leg1->AddEntry(fhElossSortPi[i], legTxt1);
-		leg1->DrawClone();
+	    TLegend* leg1 = new TLegend(0.3,0.75, 0.99, 0.99, "mean value");
+	    sprintf(legTxt1,"electrons (%.1e)", fhElossSortEl[i]->GetMean());
+	    leg1->AddEntry(fhElossSortEl[i], legTxt1);
+	    sprintf(legTxt1,"pions (%.1e)",fhElossSortPi[i]->GetMean());
+	    leg1->AddEntry(fhElossSortPi[i], legTxt1);
+	    leg1->DrawClone();
 
-    	gPad->SetLogy(true);
-        gPad->SetGridy(true);
-        gPad->SetGridx(true);
+	    gPad->SetLogy(true);
+	    gPad->SetGridy(true);
+	    gPad->SetGridx(true);
 	}
 
 	TCanvas* c4 = new TCanvas("c4","c4",10,10,800,800);

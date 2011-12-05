@@ -1,7 +1,7 @@
 
-void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType)
+void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 {
-	Int_t nEvents = 100;
+	Int_t nEvents = 10000;
 
 	TString fileNumSt, trdGeomFile;
 
@@ -18,22 +18,43 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType)
 	if (fileNum == 9)fileNumSt = "9";
 
 
+	TString paramSt;
+    Int_t trdNFoils;
+    Float_t trdDFoils;
+    Float_t trdDGap;
+    Bool_t simpleTR = kTRUE;
+
+	if (paramNum == 1){
+		paramSt = "param1";
+	    trdNFoils = 130;
+	    trdDFoils = 0.0013;
+	    trdDGap = 0.02;
+	}else if (paramNum == 2){
+		paramSt = "param2";
+	    trdNFoils = 60;
+	    trdDFoils = 0.0015;
+	    trdDGap = 0.05;
+	}else if (paramNum == 3){
+		paramSt = "param3";
+	    trdNFoils = 70;
+	    trdDFoils = 0.0014;
+	    trdDGap = 0.04;
+	}
+
 	TString dir;
-	if (trdGeoType == 1)dir = "/d/cbm02/slebedev/trd/JUL09/st/";
-	if (trdGeoType == 2)dir = "/d/cbm02/slebedev/trd/JUL09/mb/";
+	if (trdGeoType == 1)dir = "/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/st/";
+	if (trdGeoType == 2)dir = "/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/mb/";
 
 	TString geoTypeSt;
 	if (trdGeoType == 1) geoTypeSt = "st";
 	if (trdGeoType == 2) geoTypeSt = "mb";
 
-	TString inFile = dir + "piel.000" + fileNumSt + ".mc.root";
-	TString parFile = dir + "piel.000" + fileNumSt + ".params.root";
+	TString inFile = "/d/cbm06/user/slebedev/trd/JUL09/sim/"+geoTypeSt+"/piel.000" + fileNumSt + ".mc.root";
+	TString parFile = "/d/cbm06/user/slebedev/trd/JUL09/sim/"+geoTypeSt+"/piel.000" + fileNumSt + ".params.root";
 	TString outFile = dir + "piel.000" + fileNumSt + ".reco.root";
 
-	TString outTxtFileNameEl =
-		"/d/cbm02/slebedev/trd/JUL09/"+geoTypeSt+"/"+geoTypeSt+"_electrons_mom_000"+fileNumSt+".txt";
-	TString outTxtFileNamePi =
-		"/d/cbm02/slebedev/trd/JUL09/"+geoTypeSt+"/"+geoTypeSt+"_pions_mom_000"+fileNumSt+".txt";
+	TString outTxtFileNameEl = dir + geoTypeSt+"_electrons_mom_000"+fileNumSt+".txt";
+	TString outTxtFileNamePi = dir + geoTypeSt+"_pions_mom_000"+fileNumSt+".txt";
 
 	Int_t iVerbose = 0;
 	//TString stsDigiFile = "sts_standard.digi.par";
@@ -46,36 +67,14 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType)
 	// ----  Load libraries   -------------------------------------------------
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
-	gSystem->Load("libGeoBase");
-	gSystem->Load("libParBase");
-	gSystem->Load("libBase");
-	gSystem->Load("libCbmBase");
-	gSystem->Load("libCbmData");
-	gSystem->Load("libField");
-	gSystem->Load("libGen");
-	gSystem->Load("libPassive");
-	gSystem->Load("libMvd");
-	gSystem->Load("libSts");
-	gSystem->Load("libRich");
-	gSystem->Load("libTrd");
-	gSystem->Load("libTof");
-	gSystem->Load("libEcal");
-	gSystem->Load("libGlobal");
-	gSystem->Load("libKF");
-	gSystem->Load("libL1");
+	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+	cbmlibs();
 
 	FairRunAna *run = new FairRunAna();
 	run->SetInputFile(inFile);
 	// run->AddFile(inFile2);
 	run->SetOutputFile(outFile);
 
-
-	// Update of the values for the radiator F.U. 17.08.07
-	Int_t trdNFoils = 130; // number of polyetylene foils
-	Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
-	Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
-	Bool_t simpleTR = kTRUE; // use fast and simple version for TR
-	// production
 
 	CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils,
 			trdDFoils, trdDGap);

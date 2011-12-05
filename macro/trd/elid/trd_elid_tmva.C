@@ -56,7 +56,7 @@ void trd_elid_tmva() {
 	inVector.resize(fNofLayers);
 	inVector1.resize(fNofLayers);
 	inVector2.resize(fNofLayers);
-	TString inputDir = "/d/cbm02/slebedev/trd/JUN09/"+geoType+"/";
+	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/"+geoType+"/";
 	TString fileNameEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
 	TString fileNamePi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
 	TString fileNameTestEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";

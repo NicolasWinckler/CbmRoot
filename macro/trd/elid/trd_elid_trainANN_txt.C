@@ -41,9 +41,9 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0, Double_t sigma
 	gSystem->Load("libTrd");
 
 
-//	paramNum = 3;
-//	fileNum = 1;
-//	Double_t sigmaError = 0.0;
+	paramNum = 3;
+	fileNum = 1;
+	Double_t sigmaError = 0.0;
 	Int_t maxNofTrain = 200500;
 	Int_t transType = 3;
 
@@ -90,11 +90,11 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0, Double_t sigma
 	trainer->SetSigmaError(sigmaError);
 
 	//Cut will be calculated automatically, taken into account 90% of electron efficiency
-	trainer->SetIsDoTrain(true);
+	trainer->SetIsDoTrain(false);
 	trainer->SetTransformType(transType);
 	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3, kLIKELIHOOD = 4
 	trainer->SetIdMethod(1);
 	trainer->Run();
-	//trainer->DrawHistos();
+	trainer->DrawHistos();
 
 }

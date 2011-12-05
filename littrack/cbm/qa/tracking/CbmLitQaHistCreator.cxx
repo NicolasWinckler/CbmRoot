@@ -4,8 +4,8 @@
  *  Created on: 17.10.2011
  *      Author: slebedev
  */
-#include "qa/reconstruction/CbmLitQaHistCreator.h"
-#include "qa/reconstruction/CbmLitQaHistNames.h"
+#include "qa/tracking/CbmLitQaHistCreator.h"
+#include "qa/tracking/CbmLitQaHistNames.h"
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TH1.h"

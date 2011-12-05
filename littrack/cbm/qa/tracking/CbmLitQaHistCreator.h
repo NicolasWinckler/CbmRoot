@@ -10,7 +10,7 @@
 
 #include "TObject.h"
 
-#include "qa/reconstruction/CbmLitQaHistNames.h"
+#include "qa/tracking/CbmLitQaHistNames.h"
 
 #include <string>
 

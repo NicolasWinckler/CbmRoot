@@ -4,9 +4,9 @@
  * @version 3.0
  **/
 
-#include "qa/reconstruction/CbmLitReconstructionQa.h"
-#include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
-#include "qa/reconstruction/CbmLitQaReconstructionReportStudy.h"
+#include "qa/tracking/CbmLitReconstructionQa.h"
+#include "qa/tracking/CbmLitReconstructionQaImpl.h"
+#include "qa/tracking/CbmLitQaReconstructionReportStudy.h"
 #include <fstream>
 
 #include "TSystem.h"

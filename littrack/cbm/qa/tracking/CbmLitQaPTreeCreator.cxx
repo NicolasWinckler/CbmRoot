@@ -4,7 +4,7 @@
  *  Created on: 17.10.2011
  *      Author: slebedev
  */
-#include "qa/reconstruction/CbmLitQaPTreeCreator.h"
+#include "qa/tracking/CbmLitQaPTreeCreator.h"
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TH1F.h"

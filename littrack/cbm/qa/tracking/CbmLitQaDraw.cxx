@@ -4,7 +4,7 @@
  *  Created on: 17.10.2011
  *      Author: slebedev
  */
-#include "qa/reconstruction/CbmLitQaDraw.h"
+#include "qa/tracking/CbmLitQaDraw.h"
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TCanvas.h"

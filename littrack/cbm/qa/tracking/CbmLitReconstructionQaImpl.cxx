@@ -6,13 +6,13 @@
  *
  * Implementation of global track reconstruction QA.
  **/
-#include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
-#include "qa/reconstruction/CbmLitQaReconstructionReport.h"
+#include "qa/tracking/CbmLitReconstructionQaImpl.h"
+#include "qa/tracking/CbmLitQaReconstructionReport.h"
 #include "qa/base/CbmLitResultChecker.h"
 #include "qa/base/CbmLitHistManager.h"
-#include "qa/reconstruction/CbmLitQaHistCreator.h"
-#include "qa/reconstruction/CbmLitQaDraw.h"
-#include "qa/reconstruction/CbmLitQaPTreeCreator.h"
+#include "qa/tracking/CbmLitQaHistCreator.h"
+#include "qa/tracking/CbmLitQaDraw.h"
+#include "qa/tracking/CbmLitQaPTreeCreator.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitUtils.h"

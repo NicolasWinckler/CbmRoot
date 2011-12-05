@@ -22,20 +22,15 @@ string CbmLitTextReportElement::TableBegin(
       const vector<string>& colNames) const
 {
    stringstream ss;
-
    ss << caption << endl;
-   int w = 17;
    ss << right;
-   ss << setfill('_') << setw((colNames.size()+1)*w) << "_"<< endl;
+   ss << setfill('_') << setw(colNames.size() * fColW) << "_"<< endl;
    ss << setfill(' ');
-   ss << setw(w) << " "; // first column is empty
-
    for (int i = 0; i < colNames.size(); i++){
-      ss << setw(w) << colNames[i];
+      ss << setw(fColW) << colNames[i];
    }
    ss << endl;
-   ss << setfill('_') << setw((colNames.size()+1)*w) << "_"<< endl;
-
+   ss << setfill('_') << setw(colNames.size() * fColW) << "_"<< endl;
    return ss.str();
 }
 
@@ -52,7 +47,7 @@ string CbmLitTextReportElement::TableEmptyRow(
 {
    stringstream ss;
    ss << setfill('-') << left;
-   ss << setw(nofCols*fColW) << name << endl;
+   ss << setw(nofCols * fColW) << name << endl;
    ss << setfill(' ') << left;
    return ss.str();
 }

@@ -1,6 +1,5 @@
 /**
  * \file CbmLitFieldQa.cxx
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  **/
@@ -12,7 +11,7 @@
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
 #include "utils/CbmLitDrawHist.h"
-//#include "CbmLitFieldQaHTMLGenerator.h"
+#include "../field/CbmLitFieldQaReport.h"
 
 #include "../../../parallel/LitField.h"
 
@@ -38,8 +37,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
-using namespace std;
 
 CbmLitFieldQa::CbmLitFieldQa():
    fField(NULL),
@@ -686,10 +683,10 @@ void CbmLitFieldQa::CreatePropertyTree()
 
    // Create HTML page
    // TODO: implement ideal and check property trees
-   /*boost::property_tree::ptree ideal, check;
-   CbmLitFieldQaHTMLGenerator html;
+   boost::property_tree::ptree ideal, check;
+   CbmLitFieldQaReport html(kLitHtml);
    std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-   html.Create(foutHtml, &qa, &ideal, &check);*/
+   html.Create(foutHtml, &qa, &ideal, &check);
 }
 
 

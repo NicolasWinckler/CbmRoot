@@ -9,6 +9,11 @@
 #include "qa/reconstruction/CbmLitQaReconstructionReportStudy.h"
 #include <fstream>
 
+#include "TSystem.h"
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 CbmLitReconstructionQa::CbmLitReconstructionQa():
    FairTask("LitReconstructionQA", 1)
 {
@@ -173,7 +178,29 @@ void CbmLitReconstructionQa::CreateReport(
    if (reportType == kLitHtml) fileType = ".html";
    if (reportType == kLitText) fileType = ".txt";
    ofstream fout(string(fImpl->GetOutputDir() + "/rec_qa_study"+fileType).c_str());
-   report.CreateReport(fout, title, results, names);
+
+   vector<boost::property_tree::ptree*> qa;
+   vector<boost::property_tree::ptree*> check;
+   qa.resize(results.size());
+   check.resize(results.size());
+
+   boost::property_tree::ptree ideal;
+   string qaIdealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
+   read_json(qaIdealFile.c_str(), ideal);
+
+   for (int i = 0; i < results.size(); i++) {
+      qa[i] = new boost::property_tree::ptree;
+      check[i] = new boost::property_tree::ptree;
+      read_json(results[i] + "/rec_qa.json", *(qa[i]));
+      read_json(results[i] + "/rec_qa_check.json", *(check[i]));
+   }
+
+   report.Create(fout, names, qa, &ideal, check);
+
+   for (int i = 0; i < results.size(); i++) {
+      delete qa[i];
+      delete check[i];
+   }
 }
 
 ClassImp(CbmLitReconstructionQa);

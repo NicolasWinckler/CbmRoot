@@ -21,14 +21,22 @@ CbmLitQaReconstructionReportStudy::~CbmLitQaReconstructionReportStudy()
 }
 
 void CbmLitQaReconstructionReportStudy::Create(
-   ostream& out)
+      ostream& out,
+      const vector<string>& studyNames,
+      const vector<boost::property_tree::ptree*>& qa,
+      boost::property_tree::ptree* ideal,
+      const vector<boost::property_tree::ptree*>& check)
 {
+   fStudyNames = studyNames;
+   fQa = qa;
+   fIdeal = ideal;
+   fCheck = check;
+
    out.precision(3);
    out << fR->DocumentBegin();
+   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
 
-   //out << fR->PrintSubtitle(fTitle);
-
-   out << fR->TableBegin("Number of objects", fStudyNames);
+   out << fR->TableBegin("Number of objects", list_of(string("")).range(fStudyNames));
    out << fR->TableRow(list_of("hEventNo")("Number of events"));
 
    if (fIsMvd) {
@@ -188,7 +196,7 @@ string CbmLitQaReconstructionReportStudy::PrintImage(
 {
    stringstream ss;
    for (int i = 0; i < fStudyNames.size(); i++){
-      string fileName = fStudyResults[i] + "/" + file;
+      string fileName = "./" + file; //fStudyResults[i] + "/" + file;
       ss << fR->Image(fStudyNames[i] + " " +title, fileName);
    }
    return ss.str();
@@ -199,6 +207,6 @@ string CbmLitQaReconstructionReportStudy::PrintValue(
       const string& valueName)
 {
    stringstream ss;
-   ss << fQa[studyId].get(valueName, -1.);
+   ss << fQa[studyId]->get(valueName, -1.);
    return ss.str();
 }

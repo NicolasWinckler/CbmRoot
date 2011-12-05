@@ -38,14 +38,17 @@ public:
     */
    virtual ~CbmLitQaReconstructionReportStudy();
 
-protected:
-
    /**
-    * \brief Create report and write output to ostream.
-    * \param[out] out ostream for output.
+    * \brief Inherited from CbmLitStudyReport.
     */
-   virtual void Create(
-      ostream& out);
+   void Create(
+         ostream& out,
+         const vector<string>& studyNames,
+         const vector<boost::property_tree::ptree*>& qa,
+         boost::property_tree::ptree* ideal,
+         const vector<boost::property_tree::ptree*>& check);
+
+protected:
 
    /**
     * \brief Print one row in a table.

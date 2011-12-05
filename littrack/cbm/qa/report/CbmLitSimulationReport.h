@@ -38,25 +38,19 @@ public:
     * \brief Main function which creates report file.
     * \param[in] out Output stream for report file.
     * \param[in] qa Property tree with results.
-    */
-   void CreateReport(
-         ostream& out,
-         boost::property_tree::ptree* qa);
-
-   /* Setters */
-   void SetPtreeQa(boost::property_tree::ptree* qa){ fQa = qa; }
-   void SetPtreeIdeal(boost::property_tree::ptree* ideal){ fIdeal = ideal; }
-   void SetPtreeCheck(boost::property_tree::ptree* check){ fCheck = check; }
-   void SetOutputDir(const string& dir){ fOutputDir = dir; }
-
-protected:
-   /**
-    * \brief Creates report and writes output to ostream.
-    * \param[out] out ostream for output.
+    * \param[in] ideal Property tree with ideal results.
+    * \param[in] check Property tree with checked results.
     */
    virtual void Create(
-      ostream& out) = 0;
+         ostream& out,
+         boost::property_tree::ptree* qa,
+         boost::property_tree::ptree* ideal,
+         boost::property_tree::ptree* check) = 0;
 
+   /* Setters */
+//   void SetOutputDir(const string& dir){ fOutputDir = dir; }
+
+protected:
    // Property tree of Qa results for each study
    boost::property_tree::ptree* fQa;
    // Property with ideal values
@@ -64,7 +58,7 @@ protected:
    // Property tree with checked results for each study
    boost::property_tree::ptree* fCheck;
    // Name of directory with results
-   string fOutputDir;
+//   string fOutputDir;
 };
 
 #endif /* CBMLITSIMULATIONREPORT_H_ */

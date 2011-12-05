@@ -31,12 +31,7 @@ public:
    virtual ~CbmLitFieldQaReport();
 
    /**
-    * \brief Main function which creates HTML.
-    *
-    * \param[out] out Output stream.
-    * \param[in] qa Property tree with field Qa results.
-    * \param[in] ideal Property tree with ideal values.
-    * \param[in] check Property tree with checked results.
+    * \brief Inherited from CbmLitSimulationReport.
     */
    void Create(
       std::ostream& out,
@@ -46,10 +41,16 @@ public:
 
 private:
    /**
-    * \brief Prints summary table for field QA in HTML format.
-    * \return String with HTML.
+    * \brief Return  string with summary table for field QA.
+    * \return String with summary table for field QA.
     */
    std::string PrintSummaryTable();
+
+   /**
+    * \brief Return string with images for field QA.
+    * \return  Return string with images for field QA.
+    */
+   std::string PrintListOfImages();
 };
 
 #endif /* CBMLITFIELDQAREPORT_H_ */

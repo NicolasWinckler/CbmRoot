@@ -19,21 +19,20 @@ string CbmLitLatexReportElement::TableBegin(
       const string& caption,
       const vector<string>& colNames) const
 {
-   stringstream ss;
-   ss << "\\begin{table}[h]" << endl;
-   ss << "\\centering";
-   if (caption != "") ss << "\\caption{" << caption << "}" << endl;
-   ss << "\\begin{tabular}{|";
-   for (int i = 0; i < colNames.size() + 1; i++){
-      ss << "c|";
+   string st = "\\begin{table}[h] \n";
+   st += "\\centering";
+   if (caption != "") st += "\\caption{" + caption + "} \n";
+   st += "\\begin{tabular}{|";
+   for (int i = 0; i < colNames.size(); i++) {
+      st += "c|";
    }
-   ss << "} \\hline" << endl;
+   st += "} \\hline \n";
    // names start from the second column
    for (int i = 0; i < colNames.size(); i++) {
-      ss << "& " << colNames[i];
+      st += (i < (colNames.size() - 1)) ? (colNames[i] + " & ") : (colNames[i]);
    }
-   ss << "\\\\ \\hline" << endl;
-   return ss.str();
+   st += "\\\\ \\hline \n";
+   return st;
 }
 
 string CbmLitLatexReportElement::TableEnd() const

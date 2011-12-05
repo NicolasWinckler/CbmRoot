@@ -1646,9 +1646,8 @@ void CbmLitReconstructionQaImpl::Draw()
    ptc->fNofBinsAngle = fNofBinsAngle;
    boost::property_tree::ptree qa = ptc->PrintPTree();
 
-
    CbmLitQaReconstructionReport report(kLitText);
-   report.CreateReport(cout, &qa);
+   report.Create(cout, &qa, NULL, NULL);
 
    boost::property_tree::ptree ideal, check;
    std::string qaIdealFile = std::string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
@@ -1661,11 +1660,11 @@ void CbmLitReconstructionQaImpl::Draw()
    if (fOutputDir != ""){
       ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
       CbmLitQaReconstructionReport reportHtml(kLitHtml);
-      reportHtml.CreateReport(foutHtml, &qa);
+      reportHtml.Create(foutHtml, &qa, NULL, NULL);
 
       ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
       CbmLitQaReconstructionReport reportLatex(kLitLatex);
-      reportLatex.CreateReport(foutLatex, &qa);
+      reportLatex.Create(foutLatex, &qa, NULL, NULL);
    }
 
    if (fOutputDir != ""){

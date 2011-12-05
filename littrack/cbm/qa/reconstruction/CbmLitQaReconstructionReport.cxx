@@ -27,8 +27,15 @@ CbmLitQaReconstructionReport::~CbmLitQaReconstructionReport()
 }
 
 void CbmLitQaReconstructionReport::Create(
-   ostream& out)
+   ostream& out,
+   boost::property_tree::ptree* qa,
+   boost::property_tree::ptree* ideal,
+   boost::property_tree::ptree* check)
 {
+   fQa = qa;
+   fIdeal = ideal;
+   fCheck = check;
+
    out.precision(3);
    out << fR->DocumentBegin();
 
@@ -36,7 +43,7 @@ void CbmLitQaReconstructionReport::Create(
 
    //Number of objects table
    out << fR->TableBegin("Number of objects statistics",
-         list_of("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF"));
+         list_of("")("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF"));
    out << PrintNofStatistics("Points", "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
          "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
    out << PrintNofStatistics("Digis", "hNofMvdDigis", "hNofStsDigis", "",
@@ -53,7 +60,7 @@ void CbmLitQaReconstructionReport::Create(
    out << "Number of track projections in RICH: " << PrintValue("hNofRichProjections") << endl;
 
    //Print hits histos statistics (nof all, true, fake hits in track/ring)
-   out << fR->TableBegin("Hits statistics", list_of("all")("true")("fake")("true/all")("fake/all"));
+   out << fR->TableBegin("Hits statistics", list_of("")("all")("true")("fake")("true/all")("fake/all"));
    out << PrintHits("MVD", "hMvdTrackHits");
    out << PrintHits("STS", "hStsTrackHits");
    out << PrintHits("TRD", "hTrdTrackHits");
@@ -62,7 +69,7 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    //Print reconstruction efficiency without RICH
-   vector<string> cols3 = list_of("all")("reference")("primary")("secondary")("electron")("muon");
+   vector<string> cols3 = list_of("")("all")("reference")("primary")("secondary")("electron")("muon");
    out << fR->TableBegin("Reconstruction efficiency without RICH", cols3);
    out << PrintEfficiency("STS", "hSts3D");
    out << PrintEfficiency("TRD(MUCH)", "hRec3D");
@@ -79,7 +86,7 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    //Print RICH reconstruction efficiency
-   vector<string> cols4 = list_of("all")("all reference")("electron")("electron ref")("pion")("pion ref");
+   vector<string> cols4 = list_of("")("all")("all reference")("electron")("electron ref")("pion")("pion ref");
    out << fR->TableBegin("Reconstruction efficiency with RICH", cols4);
    out << PrintEfficiencyRich("RICH", "hRich3D");
    out << fR->TableEmptyRow(cols4.size()+1, "Normalization STS+RICH");
@@ -98,7 +105,7 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    // print electron identification statistics
-   vector<string> cols5 = list_of("efficiency")("pion supp");
+   vector<string> cols5 = list_of("")("efficiency")("pion supp");
    out << fR->TableBegin("Electron identification efficiency and pion suppression", cols5);
    out << fR->TableEmptyRow(cols5.size()+1, "Normalization STS+TRD");
    out << PrintEfficiencyElId("STS+TRD", "hStsTrd3DElId");
@@ -117,7 +124,7 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    // detector acceptance efficiency
-   out << fR->TableBegin("Detector acceptance for primary electrons", list_of("ACC/MC")("REC/MC"));
+   out << fR->TableBegin("Detector acceptance for primary electrons", list_of("")("ACC/MC")("REC/MC"));
    out << PrintDetAccEl("STS", "hStsDetAcc3DEl");
    out << PrintDetAccEl("STS-RICH","hStsRichDetAcc3DEl");
    out << PrintDetAccEl("STS-TRD", "hStsTrdDetAcc3DEl");
@@ -128,7 +135,7 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    // ghost statistics
-   out << fR->TableBegin("Number of ghosts per event", list_of("Number of ghosts"));
+   out << fR->TableBegin("Number of ghosts per event", list_of("")("Number of ghosts"));
    out << fR->TableRow(list_of("STS")(PrintValue("fhStsGhostNh").c_str()));
    out << fR->TableRow(list_of("TRD(MUCH)")(PrintValue("fhRecGhostNh").c_str()));
    out << fR->TableRow(list_of("RICH")(PrintValue("fhRichGhostNh").c_str()));
@@ -140,14 +147,14 @@ void CbmLitQaReconstructionReport::Create(
    out << fR->TableEnd();
 
    // STS quality numbers
-   out << fR->TableBegin("STS quality numbers", list_of("Mean")("RMS"));
+   out << fR->TableBegin("STS quality numbers", list_of("")("Mean")("RMS"));
    out << fR->TableRow(list_of("Chi2 to primary vertex")(PrintValue("fhStsChiprim.mean").c_str())(PrintValue("fhStsChiprim.rms").c_str()));
    out << fR->TableRow(list_of("Momentum resolution")(PrintValue("fhStsMomresVsMom.mean").c_str())(PrintValue("fhStsMomresVsMom.rms").c_str()));
    out << fR->TableRow(list_of("Tr. len. 100*(MC-Rec)/MC")(PrintValue("fhTrackLength.mean").c_str())(PrintValue("fhTrackLength.rms").c_str()));
    out << fR->TableEnd();
 
    // Tracking efficiency vs. polar angle
-   vector<string> cols7 = list_of("all")("reference")("primary")("secondary")("electron")("muon");
+   vector<string> cols7 = list_of("")("all")("reference")("primary")("secondary")("electron")("muon");
    out << fR->TableBegin("Tracking efficiency in dependence on polar angle", cols7);
    out << fR->TableEmptyRow(cols7.size()+1, "STS");
    out << setfill(' ') << left << PrintPolarAngle("hStsAngle");

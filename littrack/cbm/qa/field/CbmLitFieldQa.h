@@ -1,8 +1,6 @@
 /**
  * \file CbmLitFieldQa.h
- *
  * \brief Field map approximation QA.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  **/
@@ -27,12 +25,11 @@ class CBmLitPolynom;
 
 /**
  * \class CbmLitFieldQa
- *
  * \brief Field map approximation QA.
  *
- * Task checks magnetic field map, its
- * polynomial approximation and approximation
- * based on the grid creation.
+ * Task checks magnetic field map.
+ * Compares field map with its polynomial approximation
+ * and with approximation based on grid.
  *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009

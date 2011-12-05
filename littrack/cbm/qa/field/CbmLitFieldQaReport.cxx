@@ -34,20 +34,10 @@ void CbmLitFieldQaReport::Create(
    fIdeal = ideal;
    fCheck = check;
 
-   out.precision(3);
    out << fR->DocumentBegin() << std::endl;
    out << fR->Title(0, "Magnetic field QA") << std::endl;
    out << PrintSummaryTable();
-
-   // List all images
-   out << fR->Title(1, "List of images");
-   boost::property_tree::ptree pt = fQa->get_child("images.png");
-   for (boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {
-      boost::property_tree::ptree::value_type v = *it;
-      std::string imageName = pt.get(v.first, "");
-      out << fR->Image(imageName, imageName);
-   }
-
+   out << PrintListOfImages();
    out << fR->DocumentEnd();
 }
 
@@ -61,7 +51,7 @@ std::string CbmLitFieldQaReport::PrintSummaryTable()
    assert(nofPolynoms > 0);
 
    const Int_t nerr = 4; // number of errors [absMean, absRMS, relMean, relRMS]
-   std::vector<string> colNames = list_of("").repeat(nerr, "Grid");
+   std::vector<string> colNames = list_of("")("Grid")("Grid")("Grid")("Grid");
    for (int i = 0; i < nofPolynoms; i++) {
       std::string pol = ToString<int>(i);
       int degree = fQa->get("slice0.polynomial" + pol + ".degree", -1.);
@@ -70,6 +60,12 @@ std::string CbmLitFieldQaReport::PrintSummaryTable()
       push_back(colNames).repeat(nerr, colName);
    }
    ss << fR->TableBegin("Summary table", colNames);
+
+   std::vector<string> colErrNames(1, "");
+   for (int i = 0; i < nofPolynoms + 1; i++) {
+      push_back(colErrNames)("abs mean")("abs RMS")("rel mean")("rel RMS");
+   }
+   ss << fR->TableRow(colErrNames);
 
    std::string vnames[4] = {"BX", "BY", "BZ", "MOD"};
    for (Int_t iSlice = 0; iSlice < nofSlices; iSlice++) {
@@ -93,9 +89,23 @@ std::string CbmLitFieldQaReport::PrintSummaryTable()
             row.push_back(ToString<float>(fQa->get(prefix + ".err." + vnames[v] + ".rel.mean", -1.)));
             row.push_back(ToString<float>(fQa->get(prefix + ".err." + vnames[v] + ".rel.rms", -1.)));
          }
-         fR->TableRow(row);
+         ss << fR->TableRow(row);
       }
    }
+   ss << fR->TableEnd();
 
+   return ss.str();
+}
+
+std::string CbmLitFieldQaReport::PrintListOfImages()
+{
+   stringstream ss;
+   ss << fR->Title(1, "List of images");
+   boost::property_tree::ptree pt = fQa->get_child("images.png");
+   for (boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {
+      boost::property_tree::ptree::value_type v = *it;
+      std::string imageName = pt.get(v.first, "");
+      ss << fR->Image(imageName, imageName);
+   }
    return ss.str();
 }

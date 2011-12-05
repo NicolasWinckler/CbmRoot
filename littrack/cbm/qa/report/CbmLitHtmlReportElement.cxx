@@ -21,7 +21,7 @@ string CbmLitHtmlReportElement::TableBegin(
    stringstream ss;
    ss << "<h2>" << caption << "</h2>";
    ss << "<table id=\"efficiency\" >" << endl;
-   ss << "<tr><th></th>";
+   ss << "<tr>";
    for (int i = 0; i < colNames.size(); i++) {
       ss << "<th>" << colNames[i] << "</th>";
    }

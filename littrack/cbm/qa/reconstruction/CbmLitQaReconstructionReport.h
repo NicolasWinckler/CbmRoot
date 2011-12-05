@@ -33,14 +33,16 @@ public:
     */
    virtual ~CbmLitQaReconstructionReport();
 
-protected:
-
    /**
-    * \brief Creates HTML page and writes output to ostream.
-    * \param[out] out ostream for output.
+    * \brief Inherited from CbmLitSimulationReport.
     */
    void Create(
-      ostream& out);
+      ostream& out,
+      boost::property_tree::ptree* qa,
+      boost::property_tree::ptree* ideal,
+      boost::property_tree::ptree* check);
+
+protected:
 
    /**
     * \brief Prints specified value.

@@ -5,7 +5,7 @@
  *      Author: slebedev
  */
 #include "qa/reconstruction/CbmLitQaPTreeCreator.h"
-#include "qa/CbmLitHistManager.h"
+#include "qa/base/CbmLitHistManager.h"
 
 #include "TH1F.h"
 #include "TH2F.h"

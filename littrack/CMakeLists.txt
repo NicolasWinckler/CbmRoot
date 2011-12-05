@@ -108,8 +108,8 @@ EndIf(TBB_FOUND)
 If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
+      cbm/qa/base/CbmLitReconstructionQaChecker.cxx
       cbm/qa/reconstruction/CbmLitReconstructionQaImpl.cxx
-      cbm/qa/reconstruction/CbmLitReconstructionQaChecker.cxx
       cbm/qa/reconstruction/CbmLitQaHistCreator.cxx      
       cbm/qa/reconstruction/CbmLitQaDraw.cxx    
       cbm/qa/reconstruction/CbmLitQaPTreeCreator.cxx       

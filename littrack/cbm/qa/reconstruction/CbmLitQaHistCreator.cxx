@@ -6,7 +6,7 @@
  */
 #include "qa/reconstruction/CbmLitQaHistCreator.h"
 #include "qa/reconstruction/CbmLitQaHistNames.h"
-#include "qa/CbmLitHistManager.h"
+#include "qa/base/CbmLitHistManager.h"
 
 #include "TH1.h"
 #include "TFile.h"

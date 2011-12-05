@@ -8,8 +8,8 @@
  **/
 #include "qa/reconstruction/CbmLitReconstructionQaImpl.h"
 #include "qa/reconstruction/CbmLitQaReconstructionReport.h"
-#include "qa/reconstruction/CbmLitReconstructionQaChecker.h"
-#include "qa/CbmLitHistManager.h"
+#include "qa/base/CbmLitReconstructionQaChecker.h"
+#include "qa/base/CbmLitHistManager.h"
 #include "qa/reconstruction/CbmLitQaHistCreator.h"
 #include "qa/reconstruction/CbmLitQaDraw.h"
 #include "qa/reconstruction/CbmLitQaPTreeCreator.h"

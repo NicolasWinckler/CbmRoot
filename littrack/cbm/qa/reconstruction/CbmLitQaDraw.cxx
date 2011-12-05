@@ -5,7 +5,7 @@
  *      Author: slebedev
  */
 #include "qa/reconstruction/CbmLitQaDraw.h"
-#include "qa/CbmLitHistManager.h"
+#include "qa/base/CbmLitHistManager.h"
 
 #include "TCanvas.h"
 #include "TLine.h"

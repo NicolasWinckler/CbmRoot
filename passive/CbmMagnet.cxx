@@ -15,18 +15,37 @@
 #include "TList.h"
 #include "TObjArray.h"
 
-CbmMagnet::~CbmMagnet()
-{
-}
 CbmMagnet::CbmMagnet()
 {
 }
 
-CbmMagnet::CbmMagnet(const char * name, const char *Title)
-  : FairModule(name ,Title)
+CbmMagnet::CbmMagnet(const char *name, const char *title, Double_t px, Double_t py, Double_t pz,
+							Double_t rx, Double_t ry, Double_t rz)
+  : CbmModule(name, title)
+{
+  frot = new TGeoRotation("", rx, ry, rz);
+  fposrot = new TGeoCombiTrans(px, py, pz, frot);
+}
+
+CbmMagnet::~CbmMagnet()
 {
 }
+
 void CbmMagnet::ConstructGeometry()
+{
+	TString fileName=GetGeometryFileName();
+	if (fileName.EndsWith(".geo"))
+	{	ConstructASCIIGeometry();}
+	else if (fileName.EndsWith(".root"))
+	{	ConstructRootGeometry();}
+	else if (fileName.EndsWith(".gdml"))
+	{	ConstructGDMLGeometry(fposrot);}
+	else
+	{	std::cout << "Geometry format not supported." << std::endl;
+	}
+}
+
+void CbmMagnet::ConstructASCIIGeometry()
 {
 	FairGeoLoader *loader=FairGeoLoader::Instance();
 	FairGeoInterface *GeoInterface =loader->getGeoInterface();
@@ -61,18 +80,5 @@ void CbmMagnet::ConstructGeometry()
         par->setInputVersion(fRun->GetRunId(),1);	
 }
 
+
 ClassImp(CbmMagnet)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

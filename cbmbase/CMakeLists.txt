@@ -64,8 +64,17 @@ CbmMCTestHitCompare.cxx
 CbmMCEntry.cxx
 CbmMCList.cxx
 
-
+CbmModule.cxx
 )
+
+EXEC_PROGRAM( ${ROOT_CONFIG_EXECUTABLE} 
+    ARGS "--has-gdml"
+    OUTPUT_VARIABLE ROOT_HAS_GDML )
+
+If ( ${ROOT_HAS_GDML} STREQUAL yes )
+  Message(STATUS "Build CbmModule with Gdml support")
+  Add_Definitions(-DROOT_HAS_GDML)
+EndIf ( ${ROOT_HAS_GDML} STREQUAL yes )
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${CBMBASE_SRCS}" "${INCLUDE_DIRECTORIES}" CBMBASE_RULES)
@@ -83,7 +92,13 @@ ROOT_GENERATE_DICTIONARY("${CBMBASE_HEADERS}" "${CBMBASE_LINKDEF}" "${CBMBASE_DI
 SET(CBMBASE_SRCS ${CBMBASE_SRCS} ${CBMBASE_DICTIONARY})
 
 add_library(CbmBase SHARED ${CBMBASE_SRCS})
-target_link_libraries(CbmBase ${ROOT_LIBRARIES})
+
+If ( ${ROOT_HAS_GDML} STREQUAL yes )
+  target_link_libraries(CbmBase ${ROOT_LIBRARIES} -lGdml)
+Else ( ${ROOT_HAS_GDML} STREQUAL yes )
+  target_link_libraries(CbmBase ${ROOT_LIBRARIES})
+EndIf ( ${ROOT_HAS_GDML} STREQUAL yes )
+
 set_target_properties(CbmBase PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################

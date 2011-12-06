@@ -39,5 +39,7 @@
 #pragma link C++ class CbmMCTestHitCompare+;
 #pragma link C++ class CbmMCEntry+;
 #pragma link C++ class CbmMCList+;
+
+#pragma link C++ class CbmModule+;
 #endif
 

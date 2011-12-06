@@ -1,8 +1,6 @@
 /**
  * \file CbmLitMCTrackCreator.h
- *
  * \brief Creates CbmLitMCTrack objects.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
@@ -18,14 +16,13 @@ class TClonesArray;
 class FairMCPoint;
 
 /**
- * \class CbmLitMCTrackCreator.h
- *
+ * \class CbmLitMCTrackCreator
  * \brief Creates CbmLitMCTrack objects.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
-class CbmLitMCTrackCreator {
+class CbmLitMCTrackCreator
+{
 private:
    /**
     * \brief Constructor.

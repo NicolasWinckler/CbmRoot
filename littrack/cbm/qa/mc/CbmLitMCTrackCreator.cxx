@@ -1,6 +1,5 @@
 /**
  * \file CbmLitMCTrackCreator.cxx
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
@@ -85,7 +84,8 @@ void CbmLitMCTrackCreator::AddPoints(
       if (detId == kMVD) stationId = fMvdStationsMap[iPoint]; else
       if (detId == kSTS) stationId = fStsStationsMap[iPoint]; else
       if (detId == kTRD) stationId = fTrdStationsMap[iPoint]; else
-      if (detId == kMUCH) stationId = fMuchStationsMap[iPoint];
+      if (detId == kMUCH) stationId = fMuchStationsMap[iPoint]; else
+      if (detId == kTOF) stationId = 0;
       if (stationId < 0) continue;
       FairMCPointToLitMCPoint(fairPoint, &litPoint, iPoint, stationId);
       fLitMCTracks[fairPoint->GetTrackID()].AddPoint(detId, litPoint);

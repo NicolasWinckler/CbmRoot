@@ -25,6 +25,7 @@ CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fTrdPoints(NULL),
    fMuchPoints(NULL),
    fTofPoints(NULL),
+   fRichPoints(NULL),
    fLitMCTracks()
 {
    ReadDataBranches();
@@ -52,6 +53,7 @@ void CbmLitMCTrackCreator::Create()
    AddPoints(kTRD, fTrdPoints);
    AddPoints(kMUCH, fMuchPoints);
    AddPoints(kTOF, fTofPoints);
+   AddPoints(kRICH, fRichPoints);
 
 //   std::cout << "CbmLitMCTrackCreator: nof MC tracks=" << fLitMCTracks.size() << std::endl;
 //   std::map<int, CbmLitMCTrack>::iterator it;
@@ -69,6 +71,7 @@ void CbmLitMCTrackCreator::ReadDataBranches()
    fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
    fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
    fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
+   fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
 }
 
 void CbmLitMCTrackCreator::AddPoints(
@@ -85,10 +88,16 @@ void CbmLitMCTrackCreator::AddPoints(
       if (detId == kSTS) stationId = fStsStationsMap[iPoint]; else
       if (detId == kTRD) stationId = fTrdStationsMap[iPoint]; else
       if (detId == kMUCH) stationId = fMuchStationsMap[iPoint]; else
-      if (detId == kTOF) stationId = 0;
+      if (detId == kTOF) stationId = 0; else
+      if (detId == kRICH) stationId = 0;
       if (stationId < 0) continue;
       FairMCPointToLitMCPoint(fairPoint, &litPoint, iPoint, stationId);
-      fLitMCTracks[fairPoint->GetTrackID()].AddPoint(detId, litPoint);
+      if (detId != kRICH) {
+         fLitMCTracks[fairPoint->GetTrackID()].AddPoint(detId, litPoint);
+      } else {
+         const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(fairPoint->GetTrackID()));
+         fLitMCTracks[mcTrack->GetMotherId()].AddPoint(detId, litPoint);
+      }
    }
 }
 

@@ -63,7 +63,7 @@ public:
     */
    const CbmLitMCTrack& GetTrack(
          int mcId) const {
-      assert(fLitMCTracks.count(mcId) != 0);
+      assert(TrackExists(mcId));
       return fLitMCTracks.find(mcId)->second;
    }
 
@@ -106,6 +106,7 @@ private:
    TClonesArray* fTrdPoints; // CbmTrdPoint array
    TClonesArray* fMuchPoints; // CbmMuchPoint array
    TClonesArray* fTofPoints; // CbmTofPoint array
+   TClonesArray* fRichPoints; // CbmRichPoint array
 
    // Stores created CbmLitMCTrack objects.
    // std::map<MC track index, CbmLitMCTrack object>.

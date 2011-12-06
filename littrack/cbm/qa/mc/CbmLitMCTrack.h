@@ -11,6 +11,7 @@
 
 #include "CbmLitMCPoint.h"
 #include "CbmDetectorList.h"
+#include <assert.h>
 #include <map>
 #include <vector>
 
@@ -22,7 +23,8 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
-class CbmLitMCTrack {
+class CbmLitMCTrack
+{
 public:
    /**
     * \brief Constructor.
@@ -34,6 +36,7 @@ public:
       fPoints[kTRD];
       fPoints[kMUCH];
       fPoints[kTOF];
+      fPoints[kRICH];
       fStationPoints[kMVD];
       fStationPoints[kSTS];
       fStationPoints[kTRD];
@@ -53,7 +56,7 @@ public:
     */
    void AddPoint(DetectorId detId, const CbmLitMCPoint& point) {
       fPoints[detId].push_back(point);
-      fStationPoints[detId][point.GetStationId()].push_back(point);
+      if (detId != kRICH) fStationPoints[detId][point.GetStationId()].push_back(point);
    }
 
    /**
@@ -72,6 +75,7 @@ public:
     * \return MC point.
     */
    const CbmLitMCPoint& GetPoint(DetectorId detId, int index) const {
+      assert(GetNofPoints(detId) != 0);
       return fPoints.find(detId)->second[index];
    }
 
@@ -99,6 +103,7 @@ public:
          DetectorId detId,
          int stationId,
          int index) const {
+      assert((detId != kRICH) && (GetNofPointsAtStation(detId, stationId) != 0));
       return fStationPoints.find(detId)->second.find(stationId)->second[index];
    }
 
@@ -111,6 +116,7 @@ public:
    unsigned int GetNofPointsAtStation(
          DetectorId detId,
          int stationId) const {
+      assert(detId != kRICH);
       if (fStationPoints.find(detId)->second.count(stationId) > 0) {
          return fStationPoints.find(detId)->second.find(stationId)->second.size();
       } else return 0;

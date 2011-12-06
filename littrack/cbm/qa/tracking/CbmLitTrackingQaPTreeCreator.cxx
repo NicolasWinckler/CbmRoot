@@ -4,7 +4,7 @@
  *  Created on: 17.10.2011
  *      Author: slebedev
  */
-#include "qa/tracking/CbmLitQaPTreeCreator.h"
+#include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TH1F.h"
@@ -15,27 +15,25 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-using namespace std;
-
-TH1F* CbmLitQaPTreeCreator::H1(
+TH1F* CbmLitTrackingQaPTreeCreator::H1(
       const string& name)
 {
-   return fHM->H1(name);
+   return fHM->H1F(name);
 }
 
-TH2F* CbmLitQaPTreeCreator::H2(
+TH2F* CbmLitTrackingQaPTreeCreator::H2(
       const string& name)
 {
-   return fHM->H2(name);
+   return fHM->H2F(name);
 }
 
-TH3F* CbmLitQaPTreeCreator::H3(
+TH3F* CbmLitTrackingQaPTreeCreator::H3(
       const string& name)
 {
-   return fHM->H3(name);
+   return fHM->H3F(name);
 }
 
-boost::property_tree::ptree CbmLitQaPTreeCreator::PrintPTree()
+boost::property_tree::ptree CbmLitTrackingQaPTreeCreator::PrintPTree()
 {
    boost::property_tree::ptree pt;
 
@@ -159,7 +157,7 @@ boost::property_tree::ptree CbmLitQaPTreeCreator::PrintPTree()
    return pt;
 }
 
-void CbmLitQaPTreeCreator::NofStatisticsToPTree(
+void CbmLitTrackingQaPTreeCreator::NofStatisticsToPTree(
    boost::property_tree::ptree* pt,
    const string& mvd,
    const string& sts,
@@ -192,7 +190,7 @@ void CbmLitQaPTreeCreator::NofStatisticsToPTree(
    }
 }
 
-void CbmLitQaPTreeCreator::HitsHistosToPTree(
+void CbmLitTrackingQaPTreeCreator::HitsHistosToPTree(
       boost::property_tree::ptree* pt,
       const string& name)
 {
@@ -204,7 +202,7 @@ void CbmLitQaPTreeCreator::HitsHistosToPTree(
 }
 
 
-void CbmLitQaPTreeCreator::EventEfficiencyStatisticsToPTree(
+void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsToPTree(
       boost::property_tree::ptree* pt,
       const string& name)
 {
@@ -255,7 +253,7 @@ void CbmLitQaPTreeCreator::EventEfficiencyStatisticsToPTree(
    pt->put(name+".el.eff", elEff);
 }
 
-void CbmLitQaPTreeCreator::EventEfficiencyStatisticsRichToPTree(
+void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsRichToPTree(
       boost::property_tree::ptree* pt,
       const std::string& name)
 {
@@ -306,7 +304,7 @@ void CbmLitQaPTreeCreator::EventEfficiencyStatisticsRichToPTree(
    pt->put(name+".PiRef.eff", piRefEff);
 }
 
-void CbmLitQaPTreeCreator::EventEfficiencyStatisticsElIdToPTree(
+void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsElIdToPTree(
       boost::property_tree::ptree* pt,
       const string& name)
 {
@@ -329,7 +327,7 @@ void CbmLitQaPTreeCreator::EventEfficiencyStatisticsElIdToPTree(
    pt->put(name+".pi.supp", piSupp);
 }
 
-void CbmLitQaPTreeCreator::EventDetAccElStatisticsToPTree(
+void CbmLitTrackingQaPTreeCreator::EventDetAccElStatisticsToPTree(
       boost::property_tree::ptree* pt,
       const string& name,
       const string& hmc,
@@ -358,7 +356,7 @@ void CbmLitQaPTreeCreator::EventDetAccElStatisticsToPTree(
    pt->put(name+".detAccRec.eff", effRec);
 }
 
-void CbmLitQaPTreeCreator::PolarAngleEfficiencyToPTree(
+void CbmLitTrackingQaPTreeCreator::PolarAngleEfficiencyToPTree(
       boost::property_tree::ptree* pt,
       const string& name,
       const string& hist)

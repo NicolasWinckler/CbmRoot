@@ -10,7 +10,7 @@
 
 #include <string>
 
-class CbmLitQaHistManager;
+class CbmLitHistManager;
 class TH1;
 class TH1F;
 class TH2F;
@@ -32,7 +32,7 @@ public:
     * \brief Constructor.
     */
    CbmLitTrackingQaDraw(
-         CbmLitQaHistManager* hm):fHM(hm), fRebin(1){}
+         CbmLitHistManager* hm):fHM(hm), fRebin(1){}
 
    /**
     * \brief Destructor.
@@ -171,7 +171,7 @@ private:
     */
    void DrawMCMomVsAngle();
 
-   CbmLitQaHistManager* fHM; // histogram manager
+   CbmLitHistManager* fHM; // histogram manager
    int fRebin;
 };
 

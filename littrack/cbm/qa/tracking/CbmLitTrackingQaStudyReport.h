@@ -1,18 +1,18 @@
 /**
- * \file CbmLitQaReconstructionReportStudy.h
+ * \file CbmLitTrackingQaStudyReport.h
  * \brief Creates study report for reconstruction.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITQARECONSTRUCTIONREPORTSTUDY_H_
-#define CBMLITQARECONSTRUCTIONREPORTSTUDY_H_
+#ifndef CBMLITTRACKINGQASTUDYREPORT_H_
+#define CBMLITTRACKINGQASTUDYREPORT_H_
 
 #include "../report/CbmLitStudyReport.h"
 #include <string>
 using std::string;
 
 /**
- * \class CbmLitQaReconstructionReportStudy
+ * \class CbmLitTrackingQaStudyReport
  * \brief Creates study report for reconstruction.
  *
  * Generates report from a number of results of different
@@ -24,19 +24,19 @@ using std::string;
  * \date 2011
  *
  */
-class CbmLitQaReconstructionReportStudy : public CbmLitStudyReport
+class CbmLitTrackingQaStudyReport : public CbmLitStudyReport
 {
 public:
    /**
     * \brief Constructor with report type.
     * \param[in] reportType Type of report to be produced.
     */
-   CbmLitQaReconstructionReportStudy(LitReportType reportType);
+   CbmLitTrackingQaStudyReport(LitReportType reportType);
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitQaReconstructionReportStudy();
+   virtual ~CbmLitTrackingQaStudyReport();
 
    /**
     * \brief Inherited from CbmLitStudyReport.
@@ -89,4 +89,4 @@ protected:
          const string& valueTitle);
 };
 
-#endif /* CBMLITQARECONSTRUCTIONREPORTSTUDY_H_ */
+#endif /* CBMLITTRACKINGQASTUDYREPORT_H_ */

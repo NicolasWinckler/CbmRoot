@@ -18,6 +18,8 @@
 #include "TClass.h"
 
 #include <iostream>
+using std::cout;
+using std::endl;
 
 CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
    fMinMom(0.),
@@ -111,11 +113,11 @@ void CbmLitTrackingQaHistCreator::Create2DHist(
    fHM->Add(name, h);
 }
 
-CbmLitQaHistManager* CbmLitTrackingQaHistCreator::ReadFromFile(
+CbmLitHistManager* CbmLitTrackingQaHistCreator::ReadFromFile(
       TFile* file)
 {
-   cout<< "ReadAllHistosFromFile" <<endl;
-   fHM = new CbmLitQaHistManager();
+   cout << "ReadAllHistosFromFile" << endl;
+   fHM = new CbmLitHistManager();
 
    TDirectory* dir = gDirectory;
    TIter nextkey( dir->GetListOfKeys());
@@ -133,9 +135,9 @@ CbmLitQaHistManager* CbmLitTrackingQaHistCreator::ReadFromFile(
    return fHM;
 }
 
-CbmLitQaHistManager* CbmLitTrackingQaHistCreator::Create()
+CbmLitHistManager* CbmLitTrackingQaHistCreator::Create()
 {
-   fHM = new CbmLitQaHistManager();
+   fHM = new CbmLitHistManager();
 
    // Number of points distributions
    float minNofPoints =  0.;

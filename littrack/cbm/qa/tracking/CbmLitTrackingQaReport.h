@@ -1,11 +1,11 @@
 /**
- * \file CbmLitQaReconstructionReport.h
+ * \file CbmLitTrackingQaReport.h
  * \brief Creates report for reconstruction performance.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITQARECONSTRUCTIONREPORT_H_
-#define CBMLITQARECONSTRUCTIONREPORT_H_
+#ifndef CBMLITTRACKINGQAREPORT_H_
+#define CBMLITTRACKINGQAREPORT_H_
 
 #include "../report/CbmLitSimulationReport.h"
 #include <string>
@@ -14,24 +14,24 @@ using std::string;
 using std::stringstream;
 
 /**
- * \class CbmLitQaReconstructionReport
+ * \class CbmLitTrackingQaReport
  * \brief Creates report for reconstruction performance.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitQaReconstructionReport : public CbmLitSimulationReport
+class CbmLitTrackingQaReport : public CbmLitSimulationReport
 {
 public:
    /**
     * \brief Constructor with report type.
     * \param[in] reportType Type of report to be produced.
     */
-   CbmLitQaReconstructionReport(LitReportType reportType);
+   CbmLitTrackingQaReport(LitReportType reportType);
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitQaReconstructionReport();
+   virtual ~CbmLitTrackingQaReport();
 
    /**
     * \brief Inherited from CbmLitSimulationReport.
@@ -50,8 +50,7 @@ protected:
     * \return string with table row in specific format.
     */
    string PrintValue(
-         const string& hist)
-   {
+         const string& hist) {
       stringstream ss;
       ss << fQa->get(hist, -1.);
       return ss.str();
@@ -124,4 +123,4 @@ protected:
          const string& hist);
 };
 
-#endif /* CBMLITQARECONSTRUCTIONREPORT_H_ */
+#endif /* CBMLITTRACKINGQAREPORT_H_ */

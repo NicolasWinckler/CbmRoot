@@ -1,46 +1,67 @@
-/** CbmLitReconstructionQa.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 3.0
- **
- ** Task for global track reconstruction performance calculation.
- ** Produces efficiency histograms. Calculates different statistics.
- **/
+/**
+ * \file CbmLitTrackingQa.h
+ * \brief FairTask for tracking performance calculation.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ */
 
-#ifndef CBMLITRECONSTRUCTIONQA_H_
-#define CBMLITRECONSTRUCTIONQA_H_
+#ifndef CBMLITTRACKINGQA_H_
+#define CBMLITTRACKINGQA_H_
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
 #include "../report/CbmLitReport.h"
 
-class CbmLitReconstructionQaImpl;
+class CbmLitTrackingQaImpl;
 
-using namespace std;
+using std::string;
+using std::vector;
 
-class CbmLitReconstructionQa : public FairTask
+/**
+ * \class CbmLitTrackingQa.h
+ * \brief FairTask for tracking performance calculation.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ */
+class CbmLitTrackingQa : public FairTask
 {
 public:
-   /* Constructor */
-   CbmLitReconstructionQa();
+   /**
+    * \brief Constructor.
+    */
+   CbmLitTrackingQa();
 
-   /* Destructor */
-   virtual ~CbmLitReconstructionQa();
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmLitTrackingQa();
 
-   /* Derived from FairTask. Executed before starting event-by-event execution. */
+   /**
+    * \brief Derived from FairTask.
+    */
    virtual InitStatus Init();
 
-   /* Derived from FairTask. Executed on each event.
-     * @param opt Options */
+   /**
+    * \brief Derived from FairTask.
+    */
    virtual void Exec(
       Option_t* opt);
 
-   /* Sets the minimum number of MC points in STS.
-    * @param minNofPointsSts Minimum number of MC points in STS. */
+   /**
+    * \brief Derived from FairTask.
+    */
+   virtual void Finish();
+
+   /**
+    * \brief Set minimum number of MC points in STS.
+    * \param[in] minNofPointsSts Minimum number of MC points in STS.
+    */
    void SetMinNofPointsSts(Int_t minNofPointsSts);
 
-   /* Sets the minimum number of MC points in TRD.
-     * @param minNofPointsTrd Minimum number of MC points in TRD. */
+   /**
+    * \brief Set minimum number of MC points in TRD.
+    * \param[in] minNofPointsTrd Minimum number of MC points in TRD.
+    */
    void SetMinNofPointsTrd(Int_t minNofPointsTrd);
 
    /* Sets the minimum number of MC points in MUCH.
@@ -143,12 +164,9 @@ public:
          const vector<string>& names);
 
 private:
-   /* Derived from FairTask. Executed after all events are processed. */
-   virtual void Finish();
+   CbmLitTrackingQaImpl* fImpl;
 
-   CbmLitReconstructionQaImpl* fImpl;
-
-   ClassDef(CbmLitReconstructionQa, 1);
+   ClassDef(CbmLitTrackingQa, 1);
 };
 
-#endif /* CBMLITRECONSTRUCTIONQA_H_ */
+#endif /* CBMLITTRACKINGQA_H_ */

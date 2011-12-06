@@ -1,12 +1,12 @@
-/** CbmLitReconstructionQa.cxx
+/** CbmLitTrackingQa.cxx
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2007
  * @version 3.0
  **/
 
-#include "qa/tracking/CbmLitReconstructionQa.h"
-#include "qa/tracking/CbmLitReconstructionQaImpl.h"
-#include "qa/tracking/CbmLitQaReconstructionReportStudy.h"
+#include "qa/tracking/CbmLitTrackingQa.h"
+#include "qa/tracking/CbmLitTrackingQaImpl.h"
+#include "qa/tracking/CbmLitTrackingQaStudyReport.h"
 #include <fstream>
 
 #include "TSystem.h"
@@ -14,158 +14,158 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-CbmLitReconstructionQa::CbmLitReconstructionQa():
-   FairTask("LitReconstructionQA", 1)
+CbmLitTrackingQa::CbmLitTrackingQa():
+   FairTask("LitTrackingQA", 1)
 {
-   fImpl = new CbmLitReconstructionQaImpl();
+   fImpl = new CbmLitTrackingQaImpl();
 }
 
-CbmLitReconstructionQa::~CbmLitReconstructionQa()
+CbmLitTrackingQa::~CbmLitTrackingQa()
 {
    if (fImpl) delete fImpl;
 }
 
-InitStatus CbmLitReconstructionQa::Init()
+InitStatus CbmLitTrackingQa::Init()
 {
    return fImpl->Init();
 }
 
-void CbmLitReconstructionQa::Exec(
+void CbmLitTrackingQa::Exec(
    Option_t* opt)
 {
    fImpl->Exec(opt);
 }
 
-void CbmLitReconstructionQa::Finish()
+void CbmLitTrackingQa::Finish()
 {
    fImpl->Finish();
 }
 
-void CbmLitReconstructionQa::SetMinNofPointsSts(Int_t minNofPointsSts)
+void CbmLitTrackingQa::SetMinNofPointsSts(Int_t minNofPointsSts)
 {
    fImpl->SetMinNofPointsSts(minNofPointsSts);
 }
 
-void CbmLitReconstructionQa::SetMinNofPointsTrd(Int_t minNofPointsTrd)
+void CbmLitTrackingQa::SetMinNofPointsTrd(Int_t minNofPointsTrd)
 {
    fImpl->SetMinNofPointsTrd(minNofPointsTrd);
 }
 
-void CbmLitReconstructionQa::SetMinNofPointsMuch(Int_t minNofPointsMuch)
+void CbmLitTrackingQa::SetMinNofPointsMuch(Int_t minNofPointsMuch)
 {
    fImpl->SetMinNofPointsMuch(minNofPointsMuch);
 }
 
-void CbmLitReconstructionQa::SetMinNofPointsTof(Int_t minNofPointsTof)
+void CbmLitTrackingQa::SetMinNofPointsTof(Int_t minNofPointsTof)
 {
    fImpl->SetMinNofPointsTof(minNofPointsTof);
 }
 
-void CbmLitReconstructionQa::SetQuota(Double_t quota)
+void CbmLitTrackingQa::SetQuota(Double_t quota)
 {
    fImpl->SetQuota(quota);
 }
 
-void CbmLitReconstructionQa::SetMinNofHitsRich(Int_t minNofHits)
+void CbmLitTrackingQa::SetMinNofHitsRich(Int_t minNofHits)
 {
    fImpl->SetMinNofHitsRich(minNofHits);
 }
 
-void CbmLitReconstructionQa::SetQuotaRich(Double_t quota)
+void CbmLitTrackingQa::SetQuotaRich(Double_t quota)
 {
    fImpl->SetQuotaRich(quota);
 }
 
-void CbmLitReconstructionQa::SetMinNofHitsTrd(Int_t minNofHitsTrd)
+void CbmLitTrackingQa::SetMinNofHitsTrd(Int_t minNofHitsTrd)
 {
    fImpl->SetMinNofHitsTrd(minNofHitsTrd);
 }
 
-void CbmLitReconstructionQa::SetMinNofHitsMuch(Int_t minNofHitsMuch)
+void CbmLitTrackingQa::SetMinNofHitsMuch(Int_t minNofHitsMuch)
 {
    fImpl->SetMinNofHitsMuch(minNofHitsMuch);
 }
 
-void CbmLitReconstructionQa::SetVerbose(Int_t verbose)
+void CbmLitTrackingQa::SetVerbose(Int_t verbose)
 {
    fImpl->SetVerbose(verbose);
 }
 
-void CbmLitReconstructionQa::SetOutputDir(const std::string& dir)
+void CbmLitTrackingQa::SetOutputDir(const std::string& dir)
 {
    fImpl->SetOutputDir(dir);
 }
 
 
-void CbmLitReconstructionQa::SetMomentumRange(Double_t minMom, Double_t maxMom)
+void CbmLitTrackingQa::SetMomentumRange(Double_t minMom, Double_t maxMom)
 {
    fImpl->SetMomentumRange(minMom, maxMom);
 }
 
-void CbmLitReconstructionQa::SetNofBinsMom(Int_t nofBins)
+void CbmLitTrackingQa::SetNofBinsMom(Int_t nofBins)
 {
    fImpl->SetNofBinsMom(nofBins);
 }
 
-void CbmLitReconstructionQa::SetYRange(Double_t minY, Double_t maxY)
+void CbmLitTrackingQa::SetYRange(Double_t minY, Double_t maxY)
 {
    fImpl->SetYRange(minY, maxY);
 }
 
-void CbmLitReconstructionQa::SetNofBinsY(Int_t nofBins)
+void CbmLitTrackingQa::SetNofBinsY(Int_t nofBins)
 {
    fImpl->SetNofBinsY(nofBins);
 }
 
-void CbmLitReconstructionQa::SetPtRange(Double_t minPt, Double_t maxPt)
+void CbmLitTrackingQa::SetPtRange(Double_t minPt, Double_t maxPt)
 {
    fImpl->SetPtRange(minPt, maxPt);
 }
 
-void CbmLitReconstructionQa::SetNofBinsPt(Int_t nofBins)
+void CbmLitTrackingQa::SetNofBinsPt(Int_t nofBins)
 {
    fImpl->SetNofBinsPt(nofBins);
 }
 
-void CbmLitReconstructionQa::DrawHistosFromFile(const std::string& fileName)
+void CbmLitTrackingQa::DrawHistosFromFile(const std::string& fileName)
 {
    fImpl->DrawHistosFromFile(fileName);
 }
 
-void CbmLitReconstructionQa::SetDetectorPresence(
+void CbmLitTrackingQa::SetDetectorPresence(
       DetectorId detId,
       bool isDet){
    fImpl->SetDetectorPresence(detId, isDet);
 }
 
-bool CbmLitReconstructionQa::GetDetectorPresence(
+bool CbmLitTrackingQa::GetDetectorPresence(
       DetectorId detId) const
 {
    return fImpl->GetDetectorPresence(detId);
 }
 
-void CbmLitReconstructionQa::SetIsElectronSetup(bool isElectronSetup)
+void CbmLitTrackingQa::SetIsElectronSetup(bool isElectronSetup)
 {
    fImpl->SetIsElectronSetup(isElectronSetup);
 }
 
-bool CbmLitReconstructionQa::IsElectronSetup() const
+bool CbmLitTrackingQa::IsElectronSetup() const
 {
    return fImpl->IsElectronSetup();
 }
 
-void CbmLitReconstructionQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts)
+void CbmLitTrackingQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts)
 {
    fImpl->SetUseConsecutivePointsInSts(useConsecutivePointsInSts);
 }
 
-void CbmLitReconstructionQa::CreateReport(
+void CbmLitTrackingQa::CreateReport(
       LitReportType reportType,
       const string& title,
       const vector<string>& results,
       const vector<string>& names)
 {
-   CbmLitQaReconstructionReportStudy report(reportType);
+   CbmLitTrackingQaStudyReport report(reportType);
    report.SetIsElectronSetup(IsElectronSetup());
    report.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
    report.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
@@ -203,4 +203,4 @@ void CbmLitReconstructionQa::CreateReport(
    }
 }
 
-ClassImp(CbmLitReconstructionQa);
+ClassImp(CbmLitTrackingQa);

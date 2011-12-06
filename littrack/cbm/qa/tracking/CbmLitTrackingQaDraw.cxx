@@ -33,25 +33,25 @@ void CbmLitTrackingQaDraw::Draw()
 TH1F* CbmLitTrackingQaDraw::H1(
       const string& name)
 {
-   return fHM->H1(name);
+   return fHM->H1F(name);
 }
 
 TH2F* CbmLitTrackingQaDraw::H2(
       const string& name)
 {
-   return fHM->H2(name);
+   return fHM->H2F(name);
 }
 
 TH3F* CbmLitTrackingQaDraw::H3(
       const string& name)
 {
-   return fHM->H3(name);
+   return fHM->H3F(name);
 }
 
 TH1* CbmLitTrackingQaDraw::H(
       const string& name)
 {
-   return fHM->H(name);
+   return fHM->H1(name);
 }
 
 void CbmLitTrackingQaDraw::DrawEfficiencyHistos()

@@ -1,9 +1,9 @@
 /**
- * \file CbmLitQaReconstructionReportStudy.cxx
+ * \file CbmLitTrackingQaStudyReport.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaReconstructionReportStudy.h"
+#include "CbmLitTrackingQaStudyReport.h"
 #include "../report/CbmLitReportElement.h"
 
 #include <boost/property_tree/ptree.hpp>
@@ -11,16 +11,16 @@
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
 
-CbmLitQaReconstructionReportStudy::CbmLitQaReconstructionReportStudy(
+CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport(
       LitReportType reportType) : CbmLitStudyReport(reportType)
 {
 }
 
-CbmLitQaReconstructionReportStudy::~CbmLitQaReconstructionReportStudy()
+CbmLitTrackingQaStudyReport::~CbmLitTrackingQaStudyReport()
 {
 }
 
-void CbmLitQaReconstructionReportStudy::Create(
+void CbmLitTrackingQaStudyReport::Create(
       ostream& out,
       const vector<string>& studyNames,
       const vector<boost::property_tree::ptree*>& qa,
@@ -163,7 +163,7 @@ void CbmLitQaReconstructionReportStudy::Create(
    out <<  fR->DocumentEnd();
 }
 
-string CbmLitQaReconstructionReportStudy::PrintRow(
+string CbmLitTrackingQaStudyReport::PrintRow(
       const string& property,
       const string& name)
 {
@@ -174,7 +174,7 @@ string CbmLitQaReconstructionReportStudy::PrintRow(
    return fR->TableRow(list_of(name)(n[0])(n[1])(n[2])(n[3])(n[4])(n[5])(n[6]));
 }
 
-string CbmLitQaReconstructionReportStudy::PrintRowEff(
+string CbmLitTrackingQaStudyReport::PrintRowEff(
       const string& property,
       const string& name)
 {
@@ -190,7 +190,7 @@ string CbmLitQaReconstructionReportStudy::PrintRowEff(
    return fR->TableRow(list_of(name)(n[0])(n[1])(n[2])(n[3])(n[4])(n[5])(n[6]));
 }
 
-string CbmLitQaReconstructionReportStudy::PrintImage(
+string CbmLitTrackingQaStudyReport::PrintImage(
       const string& title,
       const string& file)
 {
@@ -202,7 +202,7 @@ string CbmLitQaReconstructionReportStudy::PrintImage(
    return ss.str();
 }
 
-string CbmLitQaReconstructionReportStudy::PrintValue(
+string CbmLitTrackingQaStudyReport::PrintValue(
       int studyId,
       const string& valueName)
 {

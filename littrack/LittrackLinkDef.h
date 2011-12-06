@@ -101,7 +101,7 @@
 
 // qa
 #ifdef BOOST_FOUND
-#pragma link C++ class CbmLitReconstructionQa+;
+#pragma link C++ class CbmLitTrackingQa+;
 #pragma link C++ class CbmLitFieldQa+;
 #endif
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;

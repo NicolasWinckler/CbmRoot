@@ -10,7 +10,7 @@
 
 #include "qa/tracking/CbmLitTrackingQaHistNames.h"
 #include <string>
-class CbmLitQaHistManager;
+class CbmLitHistManager;
 class TFile;
 using std::string;
 
@@ -38,14 +38,14 @@ public:
     * \param[in] file Pointer to file with histograms.
     * \return CbmLitQaHistManager for histograms in specified file.
     */
-   CbmLitQaHistManager* ReadFromFile(
+   CbmLitHistManager* ReadFromFile(
          TFile* file);
 
    /**
     * \brief Create histograms for tracking QA.
     * \return CbmLitQaHistManager for created histograms.
     */
-   CbmLitQaHistManager* Create();
+   CbmLitHistManager* Create();
 
    /**
     * \brief Set properties of momentum axis in histograms.
@@ -155,7 +155,7 @@ private:
    float fMaxAngle; // Maximum polar angle [grad]
    int fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
 
-   CbmLitQaHistManager* fHM; // Histogram manager for created histograms
+   CbmLitHistManager* fHM; // Histogram manager for created histograms
 };
 
 #endif /* CBMLITQAHISTCREATOR_H_ */

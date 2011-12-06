@@ -1,51 +1,60 @@
-/*
- * CbmLitQaPTreeCreator.h
- *
- *  Created on: 17.10.2011
- *      Author: slebedev
+/**
+ * \file CbmLitTrackingQaPTreeCreator.h
+ * \brief Create property tree for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  */
 
-#ifndef CBMLITQAPTREECREATOR_H_
-#define CBMLITQAPTREECREATOR_H_
-
-#include "TObject.h"
+#ifndef CBMLITTRACKINGQAPTREECREATOR_H_
+#define CBMLITTRACKINGQAPTREECREATOR_H_
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 
-class CbmLitQaHistManager;
+class CbmLitHistManager;
 class TH1F;
 class TH2F;
 class TH3F;
 
-using namespace std;
+using std::string;
 
-class CbmLitQaPTreeCreator
+/**
+ * \class CbmLitTrackingQaPTreeCreator
+ * \brief Create property tree for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
+ */
+class CbmLitTrackingQaPTreeCreator
 {
 public:
-   CbmLitQaPTreeCreator(CbmLitQaHistManager* hm){fHM = hm;}
-   ~CbmLitQaPTreeCreator(){;}
+   /**
+    * \brief Constructor.
+    */
+   CbmLitTrackingQaPTreeCreator(CbmLitHistManager* hm) : fHM(hm){}
+
+   /**
+    * \brief Destructor.
+    */
+   ~CbmLitTrackingQaPTreeCreator(){}
 
    /**
     * \brief Print statistics to property tree and return property tree.
     */
    boost::property_tree::ptree PrintPTree();
 
-   Bool_t fIsElectronSetup; // If "electron" setup detected than true
-   Bool_t fIsMvd; // If MVD detected than true
-   Bool_t fIsSts; // If STS detected than true
-   Bool_t fIsRich; // If RICH detected than true
-   Bool_t fIsTrd; // If TRD detected than true
-   Bool_t fIsMuch; // If MUCH detected than true
-   Bool_t fIsTof; // If TOF detected than true
+   bool fIsElectronSetup; // If "electron" setup detected than true
+   bool fIsMvd; // If MVD detected than true
+   bool fIsSts; // If STS detected than true
+   bool fIsRich; // If RICH detected than true
+   bool fIsTrd; // If TRD detected than true
+   bool fIsMuch; // If MUCH detected than true
+   bool fIsTof; // If TOF detected than true
    string fOutputDir; // Output directory for images
-   Double_t fMinAngle; // Minimum polar angle [grad]
-   Double_t fMaxAngle; // Maximum polar angle [grad]
-   Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
+   float fMinAngle; // Minimum polar angle [grad]
+   float fMaxAngle; // Maximum polar angle [grad]
+   int fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
 
 private:
-   CbmLitQaHistManager* fHM;
-
    /**
     * \brief TODO ADD COMMENTS
     */
@@ -122,6 +131,9 @@ private:
          boost::property_tree::ptree* pt,
          const string& name,
          const string& hist);
+
+   // Pointer to histogram manager
+   CbmLitHistManager* fHM;
 };
 
-#endif /* CBMLITQAPTREECREATOR_H_ */
+#endif /* CBMLITTRACKINGQAPTREECREATOR_H_ */

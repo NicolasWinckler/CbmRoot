@@ -1,18 +1,18 @@
 /**
- * \file CbmLitReconstructionQaImpl.cxx
+ * \file CbmLitTrackingQaImpl.cxx
  *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
  *
  * Implementation of global track reconstruction QA.
  **/
-#include "qa/tracking/CbmLitReconstructionQaImpl.h"
-#include "qa/tracking/CbmLitQaReconstructionReport.h"
+#include "qa/tracking/CbmLitTrackingQaImpl.h"
+#include "qa/tracking/CbmLitTrackingQaReport.h"
 #include "qa/base/CbmLitResultChecker.h"
 #include "qa/base/CbmLitHistManager.h"
 #include "qa/tracking/CbmLitTrackingQaHistCreator.h"
 #include "qa/tracking/CbmLitTrackingQaDraw.h"
-#include "qa/tracking/CbmLitQaPTreeCreator.h"
+#include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitUtils.h"
@@ -64,7 +64,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 
-CbmLitReconstructionQaImpl::CbmLitReconstructionQaImpl():
+CbmLitTrackingQaImpl::CbmLitTrackingQaImpl():
    FairTask("LitReconstructionQA", 1),
 
    fMinNofPointsSts(4),
@@ -148,11 +148,11 @@ CbmLitReconstructionQaImpl::CbmLitReconstructionQaImpl():
 {
 }
 
-CbmLitReconstructionQaImpl::~CbmLitReconstructionQaImpl()
+CbmLitTrackingQaImpl::~CbmLitTrackingQaImpl()
 {
 }
 
-InitStatus CbmLitReconstructionQaImpl::Init()
+InitStatus CbmLitTrackingQaImpl::Init()
 {
    DetermineSetup();
    ReadDataBranches();
@@ -166,7 +166,7 @@ InitStatus CbmLitReconstructionQaImpl::Init()
    return kSUCCESS;
 }
 
-void CbmLitReconstructionQaImpl::Exec(
+void CbmLitTrackingQaImpl::Exec(
    Option_t* opt)
 {
    // Increase event counter
@@ -182,7 +182,7 @@ void CbmLitReconstructionQaImpl::Exec(
    StsTracksQa();
    IncreaseCounters();
 
-   CbmLitQaPTreeCreator* ptc = new CbmLitQaPTreeCreator(fHM);
+   CbmLitTrackingQaPTreeCreator* ptc = new CbmLitTrackingQaPTreeCreator(fHM);
    ptc->fIsElectronSetup = fIsElectronSetup;
    ptc->fIsMvd = fIsMvd;
    ptc->fIsSts = fIsSts;
@@ -198,38 +198,38 @@ void CbmLitReconstructionQaImpl::Exec(
    //CbmLitQaPrintGenerator::PrintEventStatistics(std::cout, &pt);
 }
 
-void CbmLitReconstructionQaImpl::Finish()
+void CbmLitTrackingQaImpl::Finish()
 {
    CalculateEfficiencyHistos();
    Draw();
    WriteToFile();
 }
 
-TH1F* CbmLitReconstructionQaImpl::H1(
+TH1F* CbmLitTrackingQaImpl::H1(
+      const string& name)
+{
+   return fHM->H1F(name);
+}
+
+TH2F* CbmLitTrackingQaImpl::H2(
+      const string& name)
+{
+   return fHM->H2F(name);
+}
+
+TH3F* CbmLitTrackingQaImpl::H3(
+      const string& name)
+{
+   return fHM->H3F(name);
+}
+
+TH1* CbmLitTrackingQaImpl::H(
       const string& name)
 {
    return fHM->H1(name);
 }
 
-TH2F* CbmLitReconstructionQaImpl::H2(
-      const string& name)
-{
-   return fHM->H2(name);
-}
-
-TH3F* CbmLitReconstructionQaImpl::H3(
-      const string& name)
-{
-   return fHM->H3(name);
-}
-
-TH1* CbmLitReconstructionQaImpl::H(
-      const string& name)
-{
-   return fHM->H(name);
-}
-
-void CbmLitReconstructionQaImpl::DetermineSetup()
+void CbmLitTrackingQaImpl::DetermineSetup()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    fIsElectronSetup = env->IsElectronSetup();
@@ -252,7 +252,7 @@ void CbmLitReconstructionQaImpl::DetermineSetup()
    std::cout << std::endl;
 }
 
-void CbmLitReconstructionQaImpl::SetDetectorPresence(
+void CbmLitTrackingQaImpl::SetDetectorPresence(
 		   DetectorId detId,
 		   bool isDet)
 {
@@ -267,7 +267,7 @@ void CbmLitReconstructionQaImpl::SetDetectorPresence(
 	}
 }
 
-bool CbmLitReconstructionQaImpl::GetDetectorPresence(
+bool CbmLitTrackingQaImpl::GetDetectorPresence(
          DetectorId detId) const
 {
    switch(detId) {
@@ -281,7 +281,7 @@ bool CbmLitReconstructionQaImpl::GetDetectorPresence(
    }
 }
 
-void CbmLitReconstructionQaImpl::ReadDataBranches()
+void CbmLitTrackingQaImpl::ReadDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
    if (NULL == ioman) { Fatal("Init","CbmRootManager is not instantiated"); }
@@ -336,7 +336,7 @@ void CbmLitReconstructionQaImpl::ReadDataBranches()
    if (fIsMuch) {
       fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
       fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
-      if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) { Fatal("CbmLitReconstructionQaImpl::Init", "No MuchPixelHit AND MuchStrawHit arrays!"); }
+      if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) { Fatal("CbmLitTrackingQaImpl::Init", "No MuchPixelHit AND MuchStrawHit arrays!"); }
       fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
       if (NULL == fMuchMatches) { Fatal("Init","No MuchTrackMatch array!"); }
       fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
@@ -374,7 +374,7 @@ void CbmLitReconstructionQaImpl::ReadDataBranches()
    fKFFitter->Init();
 }
 
-void CbmLitReconstructionQaImpl::ProcessHits()
+void CbmLitTrackingQaImpl::ProcessHits()
 {
    if (fIsMvd) {
       for (Int_t i = 0; i < fMvdHits->GetEntriesFast(); i++) {
@@ -412,7 +412,7 @@ void CbmLitReconstructionQaImpl::ProcessHits()
    }
 }
 
-void CbmLitReconstructionQaImpl::FillRichRingNofHits()
+void CbmLitTrackingQaImpl::FillRichRingNofHits()
 {
 	if (!fIsRich) return;
 	fNofHitsInRingMap.clear();
@@ -438,7 +438,7 @@ void CbmLitReconstructionQaImpl::FillRichRingNofHits()
    }
 }
 
-void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
+void CbmLitTrackingQaImpl::FillNofCrossedStationsHistos()
 {
    fNofStsStationsMap.clear();
    fNofTrdStationsMap.clear();
@@ -552,7 +552,7 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
    // end TRD
 }
 
-//Bool_t CbmLitReconstructionQaImpl::HasStsConsecutivePoints(
+//Bool_t CbmLitTrackingQaImpl::HasStsConsecutivePoints(
 //      Int_t mcId)
 //{
 //   if (!fUseConsecutivePointsInSts) { return true; }
@@ -561,7 +561,7 @@ void CbmLitReconstructionQaImpl::FillNofCrossedStationsHistos()
 //   }
 //}
 
-Int_t CbmLitReconstructionQaImpl::MaxConsecutiveNumbers(
+Int_t CbmLitTrackingQaImpl::MaxConsecutiveNumbers(
       const std::set<Int_t>& numbers)
 {
    if (numbers.size() == 0) return 0;
@@ -583,7 +583,7 @@ Int_t CbmLitReconstructionQaImpl::MaxConsecutiveNumbers(
    return maxCnt;
 }
 
-void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
+void CbmLitTrackingQaImpl::ProcessGlobalTracks()
 {
    fMcStsMap.clear();
    fMcHalfGlobalMap.clear();
@@ -771,7 +771,7 @@ void CbmLitReconstructionQaImpl::ProcessGlobalTracks()
    }
 }
 
-void CbmLitReconstructionQaImpl::ProcessRichRings()
+void CbmLitTrackingQaImpl::ProcessRichRings()
 {
    if (!fIsRich) return;
    Int_t nofRings = fRichRings->GetEntriesFast();
@@ -789,7 +789,7 @@ void CbmLitReconstructionQaImpl::ProcessRichRings()
    }// iRing
 }
 
-void CbmLitReconstructionQaImpl::ProcessMvd(
+void CbmLitTrackingQaImpl::ProcessMvd(
    Int_t stsId)
 {
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(stsId));
@@ -824,7 +824,7 @@ void CbmLitReconstructionQaImpl::ProcessMvd(
    }
 }
 
-Bool_t CbmLitReconstructionQaImpl::CheckTrackQuality(
+Bool_t CbmLitTrackingQaImpl::CheckTrackQuality(
    CbmTrackMatch* trackMatch,
    DetectorId detId)
 {
@@ -864,7 +864,7 @@ Bool_t CbmLitReconstructionQaImpl::CheckTrackQuality(
    return true;
 }
 
-Bool_t CbmLitReconstructionQaImpl::CheckRingQuality(
+Bool_t CbmLitTrackingQaImpl::CheckRingQuality(
    CbmRichRingMatch* ringMatch)
 {
    Int_t mcId = ringMatch->GetMCTrackID();
@@ -887,7 +887,7 @@ Bool_t CbmLitReconstructionQaImpl::CheckRingQuality(
    return true;
 }
 
-void CbmLitReconstructionQaImpl::FillMcHistoForDetAcc(
+void CbmLitTrackingQaImpl::FillMcHistoForDetAcc(
       Double_t p,
       Double_t y,
       Double_t pt)
@@ -901,7 +901,7 @@ void CbmLitReconstructionQaImpl::FillMcHistoForDetAcc(
    H3("hStsTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
 }
 
-void CbmLitReconstructionQaImpl::ProcessMcTracks()
+void CbmLitTrackingQaImpl::ProcessMcTracks()
 {
    Int_t nofMcTracks = fMCTracks->GetEntriesFast();
    for (Int_t iMCTrack = 0; iMCTrack < nofMcTracks; iMCTrack++) {
@@ -1077,7 +1077,7 @@ void CbmLitReconstructionQaImpl::ProcessMcTracks()
    } // Loop over MCTracks
 }
 
-void CbmLitReconstructionQaImpl::FillGlobalReconstructionHistos(
+void CbmLitTrackingQaImpl::FillGlobalReconstructionHistos(
    const CbmMCTrack* mcTrack,
    Int_t mcId,
    const multimap<Int_t, Int_t>& mcMap,
@@ -1134,7 +1134,7 @@ void CbmLitReconstructionQaImpl::FillGlobalReconstructionHistos(
    }
 }
 
-void CbmLitReconstructionQaImpl::FillGlobalElIdHistos3D(
+void CbmLitTrackingQaImpl::FillGlobalElIdHistos3D(
    const CbmMCTrack* mcTrack,
    Int_t mcId,
    const multimap<Int_t, Int_t>& mcMap,
@@ -1172,7 +1172,7 @@ void CbmLitReconstructionQaImpl::FillGlobalElIdHistos3D(
    }
 }
 
-void CbmLitReconstructionQaImpl::FillGlobalReconstructionHistosRich(
+void CbmLitTrackingQaImpl::FillGlobalReconstructionHistosRich(
    const CbmMCTrack* mcTrack,
    Int_t mcId,
    const multimap<Int_t, Int_t>& mcMap,
@@ -1230,7 +1230,7 @@ void CbmLitReconstructionQaImpl::FillGlobalReconstructionHistosRich(
    }
 }
 
-void CbmLitReconstructionQaImpl::PionSuppression3D()
+void CbmLitTrackingQaImpl::PionSuppression3D()
 {
    if (!fIsElectronSetup) return;
 
@@ -1308,7 +1308,7 @@ void CbmLitReconstructionQaImpl::PionSuppression3D()
    }
 }
 
-void CbmLitReconstructionQaImpl::StsTracksQa()
+void CbmLitTrackingQaImpl::StsTracksQa()
 {
    Int_t nSts = fStsTracks->GetEntriesFast();
    for (Int_t i = 0; i < nSts; i++) {
@@ -1373,7 +1373,7 @@ void CbmLitReconstructionQaImpl::StsTracksQa()
    }
 }
 
-void CbmLitReconstructionQaImpl::FillMCMomVsAngle(
+void CbmLitTrackingQaImpl::FillMCMomVsAngle(
       const CbmMCTrack* mcTrack)
 {
    // Get MC track properties (vertex, momentum, primary/secondary, pdg, etc...)
@@ -1396,7 +1396,7 @@ void CbmLitReconstructionQaImpl::FillMCMomVsAngle(
    if (isPrim && isElectron) { H2("hMCMomVsAngle_El")->Fill(p, angle); }
 }
 
-void CbmLitReconstructionQaImpl::CreateHistos(
+void CbmLitTrackingQaImpl::CreateHistos(
 		TFile* file)
 {
    CbmLitTrackingQaHistCreator* hc = new CbmLitTrackingQaHistCreator();
@@ -1407,7 +1407,7 @@ void CbmLitReconstructionQaImpl::CreateHistos(
    fHM = (file != NULL) ? hc->ReadFromFile(file) : hc->Create();
 }
 
-void CbmLitReconstructionQaImpl::CreateProjections3D(
+void CbmLitTrackingQaImpl::CreateProjections3D(
    const string& hist,
    LitQaNameOption opt)
 {
@@ -1437,7 +1437,7 @@ void CbmLitReconstructionQaImpl::CreateProjections3D(
    }
 }
 
-void CbmLitReconstructionQaImpl::DivideHistos(
+void CbmLitTrackingQaImpl::DivideHistos(
    TH1* histo1,
    TH1* histo2,
    TH1* histo3,
@@ -1448,7 +1448,7 @@ void CbmLitReconstructionQaImpl::DivideHistos(
    histo3->Divide(histo1, histo2, c, 1., "");
 }
 
-void CbmLitReconstructionQaImpl::DivideHistos(
+void CbmLitTrackingQaImpl::DivideHistos(
    const string& hist,
    LitQaNameOption opt,
    Bool_t addProjections)
@@ -1487,7 +1487,7 @@ void CbmLitReconstructionQaImpl::DivideHistos(
    }
 }
 
-void CbmLitReconstructionQaImpl::CalculateEfficiencyHistos()
+void CbmLitTrackingQaImpl::CalculateEfficiencyHistos()
 {
    Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
 
@@ -1549,12 +1549,12 @@ void CbmLitReconstructionQaImpl::CalculateEfficiencyHistos()
    H1("hTofNofHitsInStation")->Scale(1./nofEvents);
 }
 
-void CbmLitReconstructionQaImpl::WriteToFile()
+void CbmLitTrackingQaImpl::WriteToFile()
 {
    fHM->WriteToFile();
 }
 
-void CbmLitReconstructionQaImpl::IncreaseCounters()
+void CbmLitTrackingQaImpl::IncreaseCounters()
 {
    H1("hNofGlobalTracks")->Fill(fGlobalTracks->GetEntriesFast());
 
@@ -1596,7 +1596,7 @@ void CbmLitReconstructionQaImpl::IncreaseCounters()
    }
 }
 
-std::string CbmLitReconstructionQaImpl::RecDetector()
+std::string CbmLitTrackingQaImpl::RecDetector()
 {
    std::string recDet = "";
    if (fIsTrd && !fIsMuch) { recDet = "TRD"; }
@@ -1605,7 +1605,7 @@ std::string CbmLitReconstructionQaImpl::RecDetector()
    return recDet;
 }
 
-void CbmLitReconstructionQaImpl::Draw()
+void CbmLitTrackingQaImpl::Draw()
 {
    CbmLitTrackingQaDraw* drawQa = new CbmLitTrackingQaDraw(fHM);
    drawQa->fIsElectronSetup = fIsElectronSetup;
@@ -1619,7 +1619,7 @@ void CbmLitReconstructionQaImpl::Draw()
    drawQa->SetRebinForDraw(1);
    drawQa->Draw();
 
-   CbmLitQaPTreeCreator* ptc = new CbmLitQaPTreeCreator(fHM);
+   CbmLitTrackingQaPTreeCreator* ptc = new CbmLitTrackingQaPTreeCreator(fHM);
    ptc->fIsElectronSetup = fIsElectronSetup;
    ptc->fIsMvd = fIsMvd;
    ptc->fIsSts = fIsSts;
@@ -1633,7 +1633,7 @@ void CbmLitReconstructionQaImpl::Draw()
    ptc->fNofBinsAngle = fNofBinsAngle;
    boost::property_tree::ptree qa = ptc->PrintPTree();
 
-   CbmLitQaReconstructionReport report(kLitText);
+   CbmLitTrackingQaReport report(kLitText);
    report.Create(cout, &qa, NULL, NULL);
 
    boost::property_tree::ptree ideal, check;
@@ -1646,11 +1646,11 @@ void CbmLitReconstructionQaImpl::Draw()
 
    if (fOutputDir != ""){
       ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
-      CbmLitQaReconstructionReport reportHtml(kLitHtml);
+      CbmLitTrackingQaReport reportHtml(kLitHtml);
       reportHtml.Create(foutHtml, &qa, NULL, NULL);
 
       ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
-      CbmLitQaReconstructionReport reportLatex(kLitLatex);
+      CbmLitTrackingQaReport reportLatex(kLitLatex);
       reportLatex.Create(foutLatex, &qa, NULL, NULL);
    }
 
@@ -1669,7 +1669,7 @@ void CbmLitReconstructionQaImpl::Draw()
    }
 }
 
-void CbmLitReconstructionQaImpl::DrawHistosFromFile(
+void CbmLitTrackingQaImpl::DrawHistosFromFile(
       const std::string& fileName)
 {
 	TFile* file = new TFile(fileName.c_str());

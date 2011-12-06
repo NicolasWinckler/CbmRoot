@@ -1,14 +1,12 @@
 /**
- * \file CbmLitReconstructionQaImpl.h
- *
+ * \file CbmLitTrackingQaImpl.h
+ * \brief Implementation of global track reconstruction QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
- *
- * Implementation of global track reconstruction QA.
- **/
+ */
 
-#ifndef CBMLITRECONSTRUCTIONQAIMPL_H_
-#define CBMLITRECONSTRUCTIONQAIMPL_H_
+#ifndef CBMLITTRACKINGQAIMPL_H_
+#define CBMLITTRACKINGQAIMPL_H_
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
@@ -33,30 +31,28 @@ class TH2F;
 class TH3F;
 class TH1F;
 class CbmLitGlobalElectronId;
-class CbmLitQaHistManager;
+class CbmLitHistManager;
 
 using namespace std;
 
 /**
- * \class CbmLitReconstructionQaImpl
- *
+ * \class CbmLitTrackingQaImpl
+ * \brief Implementation of global track reconstruction QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
- *
- * Implementation of global track reconstruction QA.
- **/
-class CbmLitReconstructionQaImpl : public FairTask
+ */
+class CbmLitTrackingQaImpl : public FairTask
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitReconstructionQaImpl();
+   CbmLitTrackingQaImpl();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitReconstructionQaImpl();
+   virtual ~CbmLitTrackingQaImpl();
 
    /**
     * \brief Derived from FairTask.
@@ -634,7 +630,7 @@ private:
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 
   // CbmLitQaHistCreator* fHistCreator; // Histogram creator tool
-   CbmLitQaHistManager* fHM; // histogram manager
+   CbmLitHistManager* fHM; // histogram manager
 };
 
-#endif /* CBMLITRECONSTRUCTIONQAIMPL_H_ */
+#endif /* CBMLITTRACKINGQAIMPL_H_ */

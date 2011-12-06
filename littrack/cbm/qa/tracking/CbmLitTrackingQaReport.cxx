@@ -1,9 +1,9 @@
 /**
- * \file CbmLitQaReconstructionReport.cxx
+ * \file CbmLitTrackingQaReport.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitQaReconstructionReport.h"
+#include "CbmLitTrackingQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
@@ -17,16 +17,16 @@ using std::left;
 using boost::assign::list_of;
 using lit::ToString;
 
-CbmLitQaReconstructionReport::CbmLitQaReconstructionReport(
+CbmLitTrackingQaReport::CbmLitTrackingQaReport(
       LitReportType reportType) : CbmLitSimulationReport(reportType)
 {
 }
 
-CbmLitQaReconstructionReport::~CbmLitQaReconstructionReport()
+CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 {
 }
 
-void CbmLitQaReconstructionReport::Create(
+void CbmLitTrackingQaReport::Create(
    ostream& out,
    boost::property_tree::ptree* qa,
    boost::property_tree::ptree* ideal,
@@ -181,7 +181,7 @@ void CbmLitQaReconstructionReport::Create(
    out <<  fR->DocumentEnd();
 }
 
-string CbmLitQaReconstructionReport::PrintNofStatistics(
+string CbmLitTrackingQaReport::PrintNofStatistics(
         const string& name,
         const string& mvd,
         const string& sts,
@@ -201,7 +201,7 @@ string CbmLitQaReconstructionReport::PrintNofStatistics(
    return fR->TableRow(list_of(name)(st1)(st2)(st3)(st4)(st5)(st6)(st7));
 }
 
-string CbmLitQaReconstructionReport::PrintHits(
+string CbmLitTrackingQaReport::PrintHits(
         const string& name,
         const string& hist)
 {
@@ -218,7 +218,7 @@ string CbmLitQaReconstructionReport::PrintHits(
    return fR->TableRow(list_of(name)(st1)(st2)(st3)(st4)(st5));
 }
 
-string CbmLitQaReconstructionReport::PrintEfficiency(
+string CbmLitTrackingQaReport::PrintEfficiency(
      const string& name,
      const string& hist)
 {
@@ -259,7 +259,7 @@ string CbmLitQaReconstructionReport::PrintEfficiency(
    return fR->TableRow(list_of(name)(ss1.str())(ss2.str())(ss3.str())(ss4.str())(ss5.str())(ss6.str()));
 }
 
-string CbmLitQaReconstructionReport::PrintEfficiencyRich(
+string CbmLitTrackingQaReport::PrintEfficiencyRich(
       const string& name,
       const string& hist)
 {
@@ -300,7 +300,7 @@ string CbmLitQaReconstructionReport::PrintEfficiencyRich(
    return fR->TableRow(list_of(name)(ss1.str())(ss2.str())(ss3.str())(ss4.str())(ss5.str())(ss6.str()));
 }
 
-string CbmLitQaReconstructionReport::PrintEfficiencyElId(
+string CbmLitTrackingQaReport::PrintEfficiencyElId(
       const string& name,
       const string& hist)
 {
@@ -321,7 +321,7 @@ string CbmLitQaReconstructionReport::PrintEfficiencyElId(
    return fR->TableRow(list_of(name)(ss1.str())(ss2.str()));
 }
 
-string CbmLitQaReconstructionReport::PrintDetAccEl(
+string CbmLitTrackingQaReport::PrintDetAccEl(
       const string& name,
       const string& hist)
 {
@@ -342,7 +342,7 @@ string CbmLitQaReconstructionReport::PrintDetAccEl(
    return fR->TableRow(list_of(name)(ss1.str())(ss2.str()));
 }
 
-string CbmLitQaReconstructionReport::PrintPolarAngle(
+string CbmLitTrackingQaReport::PrintPolarAngle(
       const string& hist)
 {
    Double_t maxAngle = fQa->get("MaxAngle", -1.);

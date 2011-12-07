@@ -1,63 +1,13 @@
-
-void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
+void trd_elid_reco(Int_t nEvents = 20)
 {
-	Int_t nEvents = 10000;
+   Int_t trdNFoils = 70;
+   Float_t trdDFoils = 0.0014;
+   Float_t trdDGap = 0.04;
+   Bool_t simpleTR = kTRUE;
 
-	TString fileNumSt, trdGeomFile;
-
-	Double_t momentum;
-	if (fileNum == 0)fileNumSt = "0";
-	if (fileNum == 1)fileNumSt = "1";
-	if (fileNum == 2)fileNumSt = "2";
-	if (fileNum == 3)fileNumSt = "3";
-	if (fileNum == 4)fileNumSt = "4";
-	if (fileNum == 5)fileNumSt = "5";
-	if (fileNum == 6)fileNumSt = "6";
-	if (fileNum == 7)fileNumSt = "7";
-	if (fileNum == 8)fileNumSt = "8";
-	if (fileNum == 9)fileNumSt = "9";
-
-
-	TString paramSt;
-    Int_t trdNFoils;
-    Float_t trdDFoils;
-    Float_t trdDGap;
-    Bool_t simpleTR = kTRUE;
-
-	if (paramNum == 1){
-		paramSt = "param1";
-	    trdNFoils = 130;
-	    trdDFoils = 0.0013;
-	    trdDGap = 0.02;
-	}else if (paramNum == 2){
-		paramSt = "param2";
-	    trdNFoils = 60;
-	    trdDFoils = 0.0015;
-	    trdDGap = 0.05;
-	}else if (paramNum == 3){
-		paramSt = "param3";
-	    trdNFoils = 70;
-	    trdDFoils = 0.0014;
-	    trdDGap = 0.04;
-	}
-
-	TString dir;
-	if (trdGeoType == 1)dir = "/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/st/";
-	if (trdGeoType == 2)dir = "/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/mb/";
-
-	TString geoTypeSt;
-	if (trdGeoType == 1) geoTypeSt = "st";
-	if (trdGeoType == 2) geoTypeSt = "mb";
-
-	TString inFile = "/d/cbm06/user/slebedev/trd/JUL09/sim/"+geoTypeSt+"/piel.000" + fileNumSt + ".mc.root";
-	TString parFile = "/d/cbm06/user/slebedev/trd/JUL09/sim/"+geoTypeSt+"/piel.000" + fileNumSt + ".params.root";
-	TString outFile = dir + "piel.000" + fileNumSt + ".reco.root";
-
-	TString outTxtFileNameEl = dir + geoTypeSt+"_electrons_mom_000"+fileNumSt+".txt";
-	TString outTxtFileNamePi = dir + geoTypeSt+"_pions_mom_000"+fileNumSt+".txt";
-
-	Int_t iVerbose = 0;
-	//TString stsDigiFile = "sts_standard.digi.par";
+	TString inFile = "/d/cbm06/user/slebedev/trd/piel.0000.mc.root";
+	TString parFile = "/d/cbm06/user/slebedev/trd/piel.0000.params.root";
+	TString outFile = "/d/cbm06/user/slebedev/trd/piel.0000.reco.root";
 
 	gDebug = 0;
 
@@ -72,9 +22,7 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 	// run->AddFile(inFile2);
 	run->SetOutputFile(outFile);
 
-
-	CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils,
-			trdDFoils, trdDGap);
+	CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
 	// -----   TRD hit producer   ----------------------------------------------
 	Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
@@ -84,8 +32,7 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 	Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
 	CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(
-			"TRD Hitproducer", "TRD task", radiator);
-
+			"CbmTrdHitProducer", "CbmTrdHitProducer", radiator);
 	trdHitProd->SetSigmaX(trdSigmaX);
 	trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
 	run->AddTask(trdHitProd);
@@ -95,32 +42,20 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 	trdFindTracks->UseFinder(trdTrackFinder);
 	run->AddTask(trdFindTracks);
 
-	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
+	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(0);
 	run->AddTask(trdMatchTracks);
-
-	CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("Ann", "Ann");
-	//trdSetTracksPidAnnTask->SetTRDGeometryType("mb");
-	run->AddTask(trdSetTracksPidAnnTask);
-
 
 	CbmTrdElectronsTrainAnn* elAnn = new CbmTrdElectronsTrainAnn();
 	run->AddTask(elAnn);
 
 
 	// -----  Parameter database   --------------------------------------------
-	//TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-	//stsDigi += "/parameters/sts/";
-	//stsDigi += stsDigiFile;
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
-	// FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
 	parIo1->open(parFile.Data());
-	// parIo2->open(stsDigi.Data(),"in");
 	rtdb->setFirstInput(parIo1);
-	// rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);
 	rtdb->saveOutput();
-	// ------------------------------------------------------------------------
 
 	run->Init();
 	run->Run(0, nEvents);

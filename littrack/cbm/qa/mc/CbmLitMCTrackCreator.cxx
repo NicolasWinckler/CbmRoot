@@ -116,8 +116,8 @@ void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
    litPoint->SetRefId(refId);
    litPoint->SetStationId(stationId);
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(fairPoint->GetTrackID()));
-   Int_t pdgCode = mcTrack->GetPdgCode();
-   double charge = (pdgCode != 50000050) ? TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge() : 0.;
+   TParticlePDG* pdgParticle = TDatabasePDG::Instance()->GetParticle(mcTrack->GetPdgCode());
+   double charge = (pdgParticle != NULL) ? pdgParticle->Charge() : 0.;
    myf q = (charge > 0) ? 1. : -1;
    litPoint->SetQ(q);
 }

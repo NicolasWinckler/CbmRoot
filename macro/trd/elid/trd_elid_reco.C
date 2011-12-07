@@ -61,9 +61,6 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 
 	gDebug = 0;
 
-	TStopwatch timer;
-	timer.Start();
-
 	// ----  Load libraries   -------------------------------------------------
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -101,17 +98,13 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
 	run->AddTask(trdMatchTracks);
 
-	CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN(
-			"Ann", "Ann");
+	CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("Ann", "Ann");
 	//trdSetTracksPidAnnTask->SetTRDGeometryType("mb");
 	run->AddTask(trdSetTracksPidAnnTask);
 
 
-	CbmTrdElectronsQa* elQa = new CbmTrdElectronsQa();
-	elQa->SetOutFileNameEl((const char*)outTxtFileNameEl);
-	elQa->SetOutFileNamePi((const char*)outTxtFileNamePi);
-	elQa->SetGeoType(geoTypeSt);
-	run->AddTask(elQa);
+	CbmTrdElectronsTrainAnn* elAnn = new CbmTrdElectronsTrainAnn();
+	run->AddTask(elAnn);
 
 
 	// -----  Parameter database   --------------------------------------------
@@ -129,26 +122,7 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType, Int_t paramNum)
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------
 
-
-	// -----   Intialise and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
 	run->Run(0, nEvents);
-	// ------------------------------------------------------------------------
-
-
-	// -----   Finish   -------------------------------------------------------
-	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
-	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is " << outFile << endl;
-	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
-	cout << endl;
-	// ------------------------------------------------------------------------
-
-	exit(0);
 }
 

@@ -121,29 +121,30 @@ void DrawHist1D(
    Double_t x1,
    Double_t y1,
    Double_t x2,
-   Double_t y2)
+   Double_t y2,
+   const std::string& drawOpt)
 {
    Double_t max;
    if (hist1 != NULL) {
-      DrawHist1D(hist1, logx, logy, "",
+      DrawHist1D(hist1, logx, logy, drawOpt,
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE, LIT_MARKER_STYLE1);
       max = hist1->GetMaximum();
    }
 
    if (hist2 != NULL) {
-      DrawHist1D(hist2, logx, logy, "SAME",
+      DrawHist1D(hist2, logx, logy, "SAME"+drawOpt,
             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE, LIT_MARKER_STYLE2);
       if (max < hist2->GetMaximum()) { max = hist2->GetMaximum(); }
    }
 
    if (hist3 != NULL) {
-      DrawHist1D(hist3, logx, logy, "SAME",
+      DrawHist1D(hist3, logx, logy, "SAME"+drawOpt,
             LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE, LIT_MARKER_STYLE3);
       if (max < hist3->GetMaximum()) { max = hist3->GetMaximum(); }
    }
 
    if (hist4 != NULL) {
-      DrawHist1D(hist4, logx, logy, "SAME",
+      DrawHist1D(hist4, logx, logy, "SAMEP"+drawOpt,
             LIT_COLOR4, LIT_LINE_WIDTH, LIT_LINE_STYLE4, LIT_MARKER_SIZE, LIT_MARKER_STYLE4);
       if (max < hist4->GetMaximum()) { max = hist4->GetMaximum(); }
    }

@@ -224,22 +224,22 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
 
    if (h1 != NULL && h2 != NULL && h3 != NULL && h4 != NULL) {
       DrawHist1D(h1, h2, h3, h4, hname1, hname2, hname3, hname4,
-            kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3, eff4);
 
    } else if (h1 != NULL && h2 != NULL && h3 != NULL && h4 == NULL) {
       DrawHist1D(h1, h2, h3, NULL, hname1, hname2, hname3, "",
-            kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3);
 
    } else if (h1 != NULL && h2 != NULL && h3 == NULL && h4 == NULL){
       DrawHist1D(h1, h2, NULL, NULL, hname1, hname2, "", "",
-            kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1, eff2);
 
    } else if (h1 != NULL && h2 == NULL && h3 == NULL && h4 == NULL){
       DrawHist1D(h1, NULL, NULL, NULL, hname1, "", "", "",
-            kLitLinear, kLitLinear, true, 0.3,0.3,0.85,0.6);
+            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1);
    }
 

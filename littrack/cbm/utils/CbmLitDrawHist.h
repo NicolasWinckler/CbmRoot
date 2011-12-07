@@ -100,6 +100,7 @@ void DrawHist2D(
  * @param y1 coordinates of the Legend in the current pad
  * @param x2 coordinates of the Legend in the current pad
  * @param y2 coordinates of the Legend in the current pad
+ * @param drawOpt Draw option for TH1->Draw method
  */
 void DrawHist1D(
    TH1* hist1,
@@ -116,7 +117,8 @@ void DrawHist1D(
    Double_t x1,
    Double_t y1,
    Double_t x2,
-   Double_t y2);
+   Double_t y2,
+   const std::string& drawOpt = "");
 
 /* Draws gma/RMS value on the histogram
  * @param index Index of letter for the histogram

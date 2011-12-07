@@ -1465,9 +1465,11 @@ void CbmLitTrackingQaImpl::DivideHistos(
    TH1* histo3,
    Double_t c)
 {
-   histo1->Sumw2();
-   histo2->Sumw2();
-   histo3->Divide(histo1, histo2, c, 1., "");
+   //histo1->Sumw2();
+   //histo2->Sumw2();
+   histo3->Sumw2();
+   histo3->Divide(histo1, histo2, 1., 1., "B");
+   histo3->Scale(c);
 }
 
 void CbmLitTrackingQaImpl::DivideHistos(

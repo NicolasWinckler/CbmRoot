@@ -620,7 +620,6 @@ private:
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 
-  // CbmLitQaHistCreator* fHistCreator; // Histogram creator tool
    CbmLitHistManager* fHM; // histogram manager
 };
 

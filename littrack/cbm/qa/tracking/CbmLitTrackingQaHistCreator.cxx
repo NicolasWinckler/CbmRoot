@@ -14,6 +14,7 @@
 #include "TH3F.h"
 
 #include <iostream>
+#include <assert.h>
 using std::cout;
 using std::endl;
 
@@ -36,7 +37,6 @@ CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
 
 CbmLitTrackingQaHistCreator::~CbmLitTrackingQaHistCreator()
 {
-   if (fHM) delete fHM;
 }
 
 void CbmLitTrackingQaHistCreator::CreateEffHist(
@@ -109,17 +109,11 @@ void CbmLitTrackingQaHistCreator::Create2DHist(
    fHM->Add(name, h);
 }
 
-CbmLitHistManager* CbmLitTrackingQaHistCreator::ReadFromFile(
-      TFile* file)
+void CbmLitTrackingQaHistCreator::Create(
+      CbmLitHistManager* histManager)
 {
-   fHM = new CbmLitHistManager();
-   fHM->ReadFromFile(file);
-   return fHM;
-}
-
-CbmLitHistManager* CbmLitTrackingQaHistCreator::Create()
-{
-   fHM = new CbmLitHistManager();
+   assert(histManager != NULL);
+   fHM = histManager;
 
    // Number of points distributions
    float minNofPoints =  0.;
@@ -265,6 +259,4 @@ CbmLitHistManager* CbmLitTrackingQaHistCreator::Create()
 
    // Histogram stores number of events
    Create1DHist("hEventNo", "", "",1, 0, 1.);
-
-   return fHM;
 }

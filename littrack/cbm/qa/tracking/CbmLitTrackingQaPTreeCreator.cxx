@@ -1,8 +1,8 @@
-/*
- * CbmLitQaHistCreator.cxx
- *
- *  Created on: 17.10.2011
- *      Author: slebedev
+/**
+ * \file CbmLitTrackingQaPTreeCreator.h
+ * \brief Create property tree for tracking QA.
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  */
 #include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
 #include "qa/base/CbmLitHistManager.h"
@@ -12,8 +12,22 @@
 #include "TH3F.h"
 
 #include <iostream>
+#include <assert.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+
+using boost::property_tree::ptree;
+
+CbmLitTrackingQaPTreeCreator::CbmLitTrackingQaPTreeCreator():
+   fHM(NULL)
+{
+
+}
+
+CbmLitTrackingQaPTreeCreator::~CbmLitTrackingQaPTreeCreator()
+{
+
+}
 
 TH1F* CbmLitTrackingQaPTreeCreator::H1(
       const string& name)
@@ -33,9 +47,13 @@ TH3F* CbmLitTrackingQaPTreeCreator::H3(
    return fHM->H3F(name);
 }
 
-boost::property_tree::ptree CbmLitTrackingQaPTreeCreator::PrintPTree()
+ptree CbmLitTrackingQaPTreeCreator::Create(
+      CbmLitHistManager* histManager)
 {
-   boost::property_tree::ptree pt;
+   assert(histManager != NULL);
+   fHM = histManager;
+
+   ptree pt;
 
    pt.put("IsElectronSetup", fIsElectronSetup);
    pt.put("hEventNo", (Int_t)H1("hEventNo")->GetEntries());
@@ -158,7 +176,7 @@ boost::property_tree::ptree CbmLitTrackingQaPTreeCreator::PrintPTree()
 }
 
 void CbmLitTrackingQaPTreeCreator::NofStatisticsToPTree(
-   boost::property_tree::ptree* pt,
+   ptree* pt,
    const string& mvd,
    const string& sts,
    const string& rich,
@@ -191,7 +209,7 @@ void CbmLitTrackingQaPTreeCreator::NofStatisticsToPTree(
 }
 
 void CbmLitTrackingQaPTreeCreator::HitsHistosToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const string& name)
 {
    pt->put(name+".all", H1(name+"_All")->GetMean());
@@ -201,36 +219,33 @@ void CbmLitTrackingQaPTreeCreator::HitsHistosToPTree(
    pt->put(name+".fakeOverAll", H1(name+"_FakeOverAll")->GetMean());
 }
 
-
 void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const string& name)
 {
-   Double_t allEff = 0., refEff = 0., primEff = 0., secEff = 0., muEff = 0., elEff = 0.;
-
    Double_t allRec = H3(name+"_All_Rec")->GetEntries();
    Double_t allAcc = H3(name+"_All_Acc")->GetEntries();
-   if (allAcc != 0.) { allEff = 100.*allRec / allAcc; }
+   Double_t allEff = (allAcc != 0.) ? 100. * allRec / allAcc : 0.;
 
    Double_t refRec = H3(name+"_Ref_Rec")->GetEntries();
    Double_t refAcc = H3(name+"_Ref_Acc")->GetEntries();
-   if (refAcc != 0.) { refEff = 100.*refRec / refAcc; }
+   Double_t refEff = (refAcc != 0.) ? 100. * refRec / refAcc : 0.;
 
    Double_t primRec = H3(name+"_Prim_Rec")->GetEntries();
    Double_t primAcc = H3(name+"_Prim_Acc")->GetEntries();
-   if (primAcc != 0.) { primEff = 100.*primRec / primAcc; }
+   Double_t primEff = (primAcc != 0.) ? 100. * primRec / primAcc : 0.;
 
    Double_t secRec = H3(name+"_Sec_Rec")->GetEntries();
    Double_t secAcc = H3(name+"_Sec_Acc")->GetEntries();
-   if (secAcc != 0.) { secEff = 100.*secRec / secAcc; }
+   Double_t secEff = (secAcc != 0.) ? 100. * secRec / secAcc : 0.;
 
    Double_t muRec = H3(name+"_Mu_Rec")->GetEntries();
    Double_t muAcc = H3(name+"_Mu_Acc")->GetEntries();
-   if (muAcc != 0.) { muEff = 100.*muRec / muAcc; }
+   Double_t muEff = (muAcc != 0.) ? 100. * muRec / muAcc : 0;
 
    Double_t elRec = H3(name+"_El_Rec")->GetEntries();
    Double_t elAcc = H3(name+"_El_Acc")->GetEntries();
-   if (elAcc != 0.) { elEff = 100.*elRec / elAcc; }
+   Double_t elEff = (elAcc != 0.) ? 100. * elRec / elAcc : 0;
 
    Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
    pt->put(name+".all.rec", allRec/nofEvents);
@@ -254,34 +269,32 @@ void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsToPTree(
 }
 
 void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsRichToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const std::string& name)
 {
-   Double_t allEff = 0., allRefEff = 0., elEff = 0., elRefEff = 0., piEff = 0., piRefEff = 0.;
-
    Double_t allRec = H3(name+"_All_Rec")->GetEntries();
    Double_t allAcc = H3(name+"_All_Acc")->GetEntries();
-   if (allAcc != 0.) { allEff = 100.*allRec / allAcc; }
+   Double_t allEff = (allAcc != 0.) ? 100. * allRec / allAcc : 0.;
 
    Double_t allRefRec = H3(name+"_AllRef_Rec")->GetEntries();
    Double_t allRefAcc = H3(name+"_AllRef_Acc")->GetEntries();
-   if (allRefAcc != 0.) { allRefEff = 100.*allRefRec / allRefAcc; }
+   Double_t allRefEff = (allRefAcc != 0.) ? 100. * allRefRec / allRefAcc : 0.;
 
    Double_t elRec = H3(name+"_El_Rec")->GetEntries();
    Double_t elAcc = H3(name+"_El_Acc")->GetEntries();
-   if (elAcc != 0.) { elEff = 100.*elRec / elAcc; }
+   Double_t elEff = (elAcc != 0.) ? 100. * elRec / elAcc : 0.;
 
    Double_t elRefRec = H3(name+"_ElRef_Rec")->GetEntries();
    Double_t elRefAcc = H3(name+"_ElRef_Acc")->GetEntries();
-   if (elRefAcc != 0.) { elRefEff = 100.*elRefRec / elRefAcc; }
+   Double_t elRefEff = (elRefAcc != 0.) ? 100. * elRefRec / elRefAcc : 0.;
 
    Double_t piRec = H3(name+"_Pi_Rec")->GetEntries();
    Double_t piAcc = H3(name+"_Pi_Acc")->GetEntries();
-   if (piAcc != 0.) { piEff = 100.*piRec / piAcc; }
+   Double_t piEff = (piAcc != 0.) ? 100. * piRec / piAcc : 0.;
 
    Double_t piRefRec = H3(name+"_PiRef_Rec")->GetEntries();
    Double_t piRefAcc = H3(name+"_PiRef_Acc")->GetEntries();
-   if (piRefAcc != 0.) { piRefEff = 100.*piRefRec / piRefAcc; }
+   Double_t piRefEff = (piRefAcc != 0.) ? 100. * piRefRec / piRefAcc : 0.;
 
    Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
    pt->put(name+".All.rec", allRec/nofEvents);
@@ -305,18 +318,16 @@ void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsRichToPTree(
 }
 
 void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsElIdToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const string& name)
 {
-   Double_t elEff = 0.;
    Double_t elRec = H3(name+"_ElId_Rec")->GetEntries();
    Double_t elAcc = H3(name+"_ElId_Acc")->GetEntries();
-   if (elAcc != 0.) { elEff = 100.*elRec / elAcc; }
+   Double_t elEff = (elAcc != 0.) ? 100. * elRec / elAcc : 0.;
 
-   Double_t piSupp = 0.;
    Double_t piRec = H3(name+"_PiSupp_Rec")->GetEntries();
    Double_t piAcc = H3(name+"_PiSupp_Acc")->GetEntries();
-   if (piRec != 0.) { piSupp = piAcc / piRec; }
+   Double_t piSupp = (piRec != 0.) ? piAcc / piRec : 0.;
 
    Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
    pt->put(name+".el.rec", elRec/nofEvents);
@@ -328,24 +339,18 @@ void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsElIdToPTree(
 }
 
 void CbmLitTrackingQaPTreeCreator::EventDetAccElStatisticsToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const string& name,
       const string& hmc,
       const string& hacc,
-      const string& hrec
-   )
+      const string& hrec)
 {
-   Double_t effAcc = 0., effRec = 0.;
-
    Double_t mc = H3(hmc)->GetEntries();
    Double_t acc = H3(hacc)->GetEntries();
-   if (mc != 0.) { effAcc = 100.*acc / mc; }
+   Double_t effAcc = (mc != 0.) ? 100. * acc / mc : 0.;
 
-   Double_t rec = 0.;
-   if (hrec != ""){
-      rec = H3(hrec)->GetEntries();
-      if (mc != 0.) { effRec = 100.*rec / mc; }
-   }
+   Double_t rec = (hrec != "") ? H3(hrec)->GetEntries() : 0.;
+   Double_t effRec = (hrec != "" && mc != 0.) ? 100. * rec / mc : 0.;
 
    Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
    pt->put(name+".detAccAcc.acc", acc/nofEvents);
@@ -357,7 +362,7 @@ void CbmLitTrackingQaPTreeCreator::EventDetAccElStatisticsToPTree(
 }
 
 void CbmLitTrackingQaPTreeCreator::PolarAngleEfficiencyToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const string& name,
       const string& hist)
 {

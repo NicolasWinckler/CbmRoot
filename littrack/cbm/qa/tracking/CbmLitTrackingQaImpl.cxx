@@ -144,12 +144,13 @@ CbmLitTrackingQaImpl::CbmLitTrackingQaImpl():
    fKFFitter(NULL),
 
    fElectronId(NULL),
-   fHM(NULL)
+   fHM(new CbmLitHistManager())
 {
 }
 
 CbmLitTrackingQaImpl::~CbmLitTrackingQaImpl()
 {
+   if (fHM != NULL) delete fHM;
 }
 
 InitStatus CbmLitTrackingQaImpl::Init()
@@ -182,20 +183,19 @@ void CbmLitTrackingQaImpl::Exec(
    StsTracksQa();
    IncreaseCounters();
 
-   CbmLitTrackingQaPTreeCreator* ptc = new CbmLitTrackingQaPTreeCreator(fHM);
-   ptc->fIsElectronSetup = fIsElectronSetup;
-   ptc->fIsMvd = fIsMvd;
-   ptc->fIsSts = fIsSts;
-   ptc->fIsRich = fIsRich;
-   ptc->fIsTrd = fIsTrd;
-   ptc->fIsMuch = fIsMuch;
-   ptc->fIsTof = fIsTof;
-   ptc->fOutputDir = fOutputDir;
-   ptc->fMinAngle = fMinAngle;
-   ptc->fMaxAngle = fMaxAngle;
-   ptc->fNofBinsAngle = fNofBinsAngle;
-   boost::property_tree::ptree pt = ptc->PrintPTree();
-   //CbmLitQaPrintGenerator::PrintEventStatistics(std::cout, &pt);
+   CbmLitTrackingQaPTreeCreator ptc;
+   ptc.fIsElectronSetup = fIsElectronSetup;
+   ptc.fIsMvd = fIsMvd;
+   ptc.fIsSts = fIsSts;
+   ptc.fIsRich = fIsRich;
+   ptc.fIsTrd = fIsTrd;
+   ptc.fIsMuch = fIsMuch;
+   ptc.fIsTof = fIsTof;
+   ptc.fOutputDir = fOutputDir;
+   ptc.fMinAngle = fMinAngle;
+   ptc.fMaxAngle = fMaxAngle;
+   ptc.fNofBinsAngle = fNofBinsAngle;
+   boost::property_tree::ptree pt = ptc.Create(fHM);
 }
 
 void CbmLitTrackingQaImpl::Finish()
@@ -551,15 +551,6 @@ void CbmLitTrackingQaImpl::FillNofCrossedStationsHistos()
    }
    // end TRD
 }
-
-//Bool_t CbmLitTrackingQaImpl::HasStsConsecutivePoints(
-//      Int_t mcId)
-//{
-//   if (!fUseConsecutivePointsInSts) { return true; }
-//   else {
-//
-//   }
-//}
 
 Int_t CbmLitTrackingQaImpl::MaxConsecutiveNumbers(
       const std::set<Int_t>& numbers)
@@ -1399,12 +1390,16 @@ void CbmLitTrackingQaImpl::FillMCMomVsAngle(
 void CbmLitTrackingQaImpl::CreateHistos(
 		TFile* file)
 {
-   CbmLitTrackingQaHistCreator* hc = new CbmLitTrackingQaHistCreator();
-   hc->SetMomAxis(fMinMom, fMaxMom, fNofBinsMom);
-   hc->SetPtAxis(fMinPt, fMaxPt, fNofBinsPt);
-   hc->SetRapidityAxis(fMinY, fMaxY, fNofBinsY);
-   hc->SetAngleAxis(fMinAngle, fMaxAngle, fNofBinsAngle);
-   fHM = (file != NULL) ? hc->ReadFromFile(file) : hc->Create();
+   if (file != NULL) {
+      fHM->ReadFromFile(file);
+   } else {
+      CbmLitTrackingQaHistCreator hc;
+      hc.SetMomAxis(fMinMom, fMaxMom, fNofBinsMom);
+      hc.SetPtAxis(fMinPt, fMaxPt, fNofBinsPt);
+      hc.SetRapidityAxis(fMinY, fMaxY, fNofBinsY);
+      hc.SetAngleAxis(fMinAngle, fMaxAngle, fNofBinsAngle);
+      hc.Create(fHM);
+   }
 }
 
 void CbmLitTrackingQaImpl::CreateProjections3D(
@@ -1619,19 +1614,19 @@ void CbmLitTrackingQaImpl::Draw()
    drawQa->SetRebinForDraw(1);
    drawQa->Draw();
 
-   CbmLitTrackingQaPTreeCreator* ptc = new CbmLitTrackingQaPTreeCreator(fHM);
-   ptc->fIsElectronSetup = fIsElectronSetup;
-   ptc->fIsMvd = fIsMvd;
-   ptc->fIsSts = fIsSts;
-   ptc->fIsRich = fIsRich;
-   ptc->fIsTrd = fIsTrd;
-   ptc->fIsMuch = fIsMuch;
-   ptc->fIsTof = fIsTof;
-   ptc->fOutputDir = fOutputDir;
-   ptc->fMinAngle = fMinAngle;
-   ptc->fMaxAngle = fMaxAngle;
-   ptc->fNofBinsAngle = fNofBinsAngle;
-   boost::property_tree::ptree qa = ptc->PrintPTree();
+   CbmLitTrackingQaPTreeCreator ptc;
+   ptc.fIsElectronSetup = fIsElectronSetup;
+   ptc.fIsMvd = fIsMvd;
+   ptc.fIsSts = fIsSts;
+   ptc.fIsRich = fIsRich;
+   ptc.fIsTrd = fIsTrd;
+   ptc.fIsMuch = fIsMuch;
+   ptc.fIsTof = fIsTof;
+   ptc.fOutputDir = fOutputDir;
+   ptc.fMinAngle = fMinAngle;
+   ptc.fMaxAngle = fMaxAngle;
+   ptc.fNofBinsAngle = fNofBinsAngle;
+   boost::property_tree::ptree qa = ptc.Create(fHM);
 
    CbmLitTrackingQaReport report(kLitText);
    report.Create(cout, &qa, NULL, NULL);

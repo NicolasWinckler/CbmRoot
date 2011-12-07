@@ -17,6 +17,7 @@ class TH2F;
 class TH3F;
 
 using std::string;
+using boost::property_tree::ptree;
 
 /**
  * \class CbmLitTrackingQaPTreeCreator
@@ -30,17 +31,18 @@ public:
    /**
     * \brief Constructor.
     */
-   CbmLitTrackingQaPTreeCreator(CbmLitHistManager* hm) : fHM(hm){}
+   CbmLitTrackingQaPTreeCreator();
 
    /**
     * \brief Destructor.
     */
-   ~CbmLitTrackingQaPTreeCreator(){}
+   ~CbmLitTrackingQaPTreeCreator();
 
    /**
     * \brief Print statistics to property tree and return property tree.
     */
-   boost::property_tree::ptree PrintPTree();
+   ptree Create(
+         CbmLitHistManager* histManager);
 
    bool fIsElectronSetup; // If "electron" setup detected than true
    bool fIsMvd; // If MVD detected than true
@@ -77,7 +79,7 @@ private:
     * \brief TODO ADD COMMENTS
     */
    void NofStatisticsToPTree(
-      boost::property_tree::ptree* pt,
+      ptree* pt,
       const string& mvd,
       const string& sts,
       const string& rich,
@@ -90,35 +92,35 @@ private:
     * \brief TODO ADD COMMENTS
     */
    void HitsHistosToPTree(
-         boost::property_tree::ptree* pt,
+         ptree* pt,
          const string& name);
 
    /**
     * \brief TODO ADD COMMENTS
     */
    void EventEfficiencyStatisticsToPTree(
-         boost::property_tree::ptree* pt,
+         ptree* pt,
          const string& name);
 
    /**
     * \brief TODO ADD COMMENTS
     */
    void EventEfficiencyStatisticsRichToPTree(
-         boost::property_tree::ptree* pt,
+         ptree* pt,
          const string& name);
 
    /**
     * \brief TODO ADD COMMENTS
     */
    void EventEfficiencyStatisticsElIdToPTree(
-         boost::property_tree::ptree* pt,
+         ptree* pt,
          const string& name);
 
    /**
     * \brief TODO ADD COMMENTS
     */
    void EventDetAccElStatisticsToPTree(
-         boost::property_tree::ptree* pt,
+         ptree* pt,
          const string& name,
          const string& hmc,
          const string& hacc,
@@ -128,7 +130,7 @@ private:
     * \brief TODO ADD COMMENTS
     */
    void PolarAngleEfficiencyToPTree(
-         boost::property_tree::ptree* pt,
+         ptree* pt,
          const string& name,
          const string& hist);
 

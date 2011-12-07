@@ -34,18 +34,11 @@ public:
    virtual ~CbmLitTrackingQaHistCreator();
 
    /**
-    * \brief Read histograms from file and return CbmLitQaHistManager.
-    * \param[in] file Pointer to file with histograms.
-    * \return CbmLitQaHistManager for histograms in specified file.
-    */
-   CbmLitHistManager* ReadFromFile(
-         TFile* file);
-
-   /**
     * \brief Create histograms for tracking QA.
-    * \return CbmLitQaHistManager for created histograms.
+    * \param[in] histManager CbmLitQaHistManager to be filled with created histograms.
     */
-   CbmLitHistManager* Create();
+   void Create(
+         CbmLitHistManager* histManager);
 
    /**
     * \brief Set properties of momentum axis in histograms.

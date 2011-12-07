@@ -96,35 +96,28 @@ void CbmLitTrackingQa::SetOutputDir(const std::string& dir)
    fImpl->SetOutputDir(dir);
 }
 
-
-void CbmLitTrackingQa::SetMomentumRange(Double_t minMom, Double_t maxMom)
+void CbmLitTrackingQa::SetMomAxis(
+      Double_t min,
+      Double_t max,
+      Int_t nofBins)
 {
-   fImpl->SetMomentumRange(minMom, maxMom);
+   fImpl->SetMomAxis(min, max, nofBins);
 }
 
-void CbmLitTrackingQa::SetNofBinsMom(Int_t nofBins)
+void CbmLitTrackingQa::SetRapidityAxis(
+      Double_t min,
+      Double_t max,
+      Int_t nofBins)
 {
-   fImpl->SetNofBinsMom(nofBins);
+   fImpl->SetRapidityAxis(min, max, nofBins);
 }
 
-void CbmLitTrackingQa::SetYRange(Double_t minY, Double_t maxY)
+void CbmLitTrackingQa::SetPtAxis(
+      Double_t min,
+      Double_t max,
+      Int_t nofBins)
 {
-   fImpl->SetYRange(minY, maxY);
-}
-
-void CbmLitTrackingQa::SetNofBinsY(Int_t nofBins)
-{
-   fImpl->SetNofBinsY(nofBins);
-}
-
-void CbmLitTrackingQa::SetPtRange(Double_t minPt, Double_t maxPt)
-{
-   fImpl->SetPtRange(minPt, maxPt);
-}
-
-void CbmLitTrackingQa::SetNofBinsPt(Int_t nofBins)
-{
-   fImpl->SetNofBinsPt(nofBins);
+   fImpl->SetPtAxis(min, max, nofBins);
 }
 
 void CbmLitTrackingQa::DrawHistosFromFile(const std::string& fileName)

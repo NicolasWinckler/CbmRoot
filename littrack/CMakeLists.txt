@@ -5,7 +5,7 @@ add_subdirectory(parallel)
 INCLUDE(std/CMakeLists.txt)
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
+${INCLUDE_DIRECTORIES}
 ${GEANT3_INCLUDE_DIR}
 ${Boost_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/littrack
@@ -109,13 +109,14 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/base/CbmLitResultChecker.cxx
+      cbm/qa/base/CbmLitHistManager.cxx
       cbm/qa/tracking/CbmLitTrackingQaImpl.cxx
       cbm/qa/tracking/CbmLitTrackingQaHistCreator.cxx      
       cbm/qa/tracking/CbmLitTrackingQaDraw.cxx    
       cbm/qa/tracking/CbmLitTrackingQaPTreeCreator.cxx       
       cbm/qa/tracking/CbmLitTrackingQaHistNames.cxx
       cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
-      cbm/qa/tracking/CbmLitTrackingQaReport.cxx   
+      cbm/qa/tracking/CbmLitTrackingQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/report/CbmLitReport.cxx      
@@ -171,6 +172,7 @@ If(Boost_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
       cbm/qa/tracking/CbmLitTrackingQa.h
+      cbm/qa/clustering/CbmLitClusteringQa.h
      )
 EndIf(Boost_FOUND)
 
@@ -193,6 +195,7 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS
       ${LITTRACK_SRCS}
       cbm/qa/tracking/CbmLitTrackingQa.cxx
+      cbm/qa/clustering/CbmLitClusteringQa.cxx
      )
 EndIf(Boost_FOUND)
 

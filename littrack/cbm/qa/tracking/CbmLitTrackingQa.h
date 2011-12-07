@@ -101,23 +101,38 @@ public:
     * @param dir Directory name. */
    void SetOutputDir(const std::string& dir);
 
-   /* Sets momentum range for efficiency calculation */
-   void SetMomentumRange(Double_t minMom, Double_t maxMom);
+   /**
+    * \brief Set properties of momentum axis in histograms.
+    * \param[in] min Minimum momentum.
+    * \param[in] max Maximum momentum.
+    * \param[in] nofBins Number of bins.
+    */
+   void SetMomAxis(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins);
 
-   /* Set number of bins for efficiency v. momentum histograms */
-   void SetNofBinsMom(Int_t nofBins);
+   /**
+    * \brief Set properties of Pt axis in histograms.
+    * \param[in] min Minimum Pt.
+    * \param[in] max Maximum Pt.
+    * \param[in] nofBins Number of bins.
+    */
+   void SetPtAxis(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins);
 
-   /* Sets rapidity range for efficiency calculation */
-   void SetYRange(Double_t minY, Double_t maxY);
-
-   /* Set number of bins for efficiency v. rapidity histograms */
-   void SetNofBinsY(Int_t nofBins);
-
-   /* Sets Pt range for efficiency calculation */
-   void SetPtRange(Double_t minPt, Double_t maxPt);
-
-   /* Set number of bins for efficiency v. Pt histograms */
-   void SetNofBinsPt(Int_t nofBins);
+   /**
+    * \brief Set properties of rapidity axis in histograms.
+    * \param[in] min Minimum rapidity.
+    * \param[in] max Maximum rapidity.
+    * \param[in] nofBins Number of bins.
+    */
+   void SetRapidityAxis(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins);
 
    /* Implement functionality of drawing histograms in the macro
     * from the specified file

@@ -65,6 +65,11 @@ public:
    virtual void Exec(
       Option_t* opt);
 
+   /**
+    * \brief Derived from FairTask.
+    */
+   virtual void Finish();
+
    TH1F* H1(
       const string& name);
 
@@ -155,56 +160,47 @@ public:
    const std::string& GetOutputDir() const { return fOutputDir;}
 
    /**
-    * \brief Set momentum range for efficiency calculation.
-    * \param[in] minMom Minimum momentum.
-    * \param[in] maxMom Maximum momentum.
-    */
-   void SetMomentumRange(Double_t minMom, Double_t maxMom) {
-      fMinMom = minMom;
-      fMaxMom = maxMom;
-   }
-
-   /**
-    * \brief Set number of bins for efficiency v. momentum histograms.
+    * \brief Set properties of momentum axis in histograms.
+    * \param[in] min Minimum momentum.
+    * \param[in] max Maximum momentum.
     * \param[in] nofBins Number of bins.
     */
-   void SetNofBinsMom(Int_t nofBins) {
+   void SetMomAxis(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
+      fMinMom = min;
+      fMaxMom = max;
       fNofBinsMom = nofBins;
    }
 
    /**
-    * \brief Set Pt range for efficiency calculation.
-    * \param[in] minPt Minimum Pt.
-    * \param[in] maxPt Maximum Pt.
-    */
-   void SetPtRange(Double_t minPt, Double_t maxPt) {
-      fMinPt = minPt;
-      fMaxPt = maxPt;
-   }
-
-   /**
-    * \brief Set number of bins for efficiency v. momentum histograms.
+    * \brief Set properties of Pt axis in histograms.
+    * \param[in] min Minimum Pt.
+    * \param[in] max Maximum Pt.
     * \param[in] nofBins Number of bins.
     */
-   void SetNofBinsPt(Int_t nofBins) {
+   void SetPtAxis(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
+      fMinPt = min;
+      fMaxPt = max;
       fNofBinsPt = nofBins;
    }
 
    /**
-    * \brief Set rapidity range for efficiency calculation.
-    * \param[in] minY Minimum rapidity.
-    * \param[in] maxY Maximum rapidity.
-    */
-   void SetYRange(Double_t minY, Double_t maxY) {
-      fMinY = minY;
-      fMaxY = maxY;
-   }
-
-   /**
-    * \brief Set number of bins for efficiency v. rapidity histograms.
+    * \brief Set properties of rapidity axis in histograms.
+    * \param[in] min Minimum rapidity.
+    * \param[in] max Maximum rapidity.
     * \param[in] nofBins Number of bins.
     */
-   void SetNofBinsY(Int_t nofBins) {
+   void SetRapidityAxis(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
+      fMinY = min;
+      fMaxY = max;
       fNofBinsY = nofBins;
    }
 
@@ -242,11 +238,6 @@ public:
     * \return Return TRUE if electron setup of CBM is detected.
     */
    bool IsElectronSetup() const {return fIsElectronSetup;}
-
-   /**
-    * \brief Derived from FairTask.
-    */
-   virtual void Finish();
 
 private:
 

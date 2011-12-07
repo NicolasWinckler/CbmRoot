@@ -142,6 +142,7 @@ private:
          float maxBinY);
 
 private:
+
    float fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
    float fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
    int fNofBinsMom; // Number of bins for efficiency vs. momentum histogram

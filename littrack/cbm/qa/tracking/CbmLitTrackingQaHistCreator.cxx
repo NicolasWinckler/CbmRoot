@@ -9,13 +9,9 @@
 #include "qa/base/CbmLitHistManager.h"
 
 #include "TH1.h"
-#include "TFile.h"
-#include "TDirectory.h"
-#include "TKey.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
-#include "TClass.h"
 
 #include <iostream>
 using std::cout;
@@ -116,22 +112,8 @@ void CbmLitTrackingQaHistCreator::Create2DHist(
 CbmLitHistManager* CbmLitTrackingQaHistCreator::ReadFromFile(
       TFile* file)
 {
-   cout << "ReadAllHistosFromFile" << endl;
    fHM = new CbmLitHistManager();
-
-   TDirectory* dir = gDirectory;
-   TIter nextkey( dir->GetListOfKeys());
-   TKey *key;
-   int c = 0;
-   while (key = (TKey*) nextkey()) {
-      TObject* obj = key->ReadObj();
-      if (obj->IsA()->InheritsFrom (TH1::Class())) {
-         TH1* h = (TH1*) obj;
-         TH1* h1 = (TH1*)file->Get(h->GetName());
-         fHM->Add(h->GetName(), h1);
-         cout << c++ << " " << h->GetName()<< endl;
-      }
-   }
+   fHM->ReadFromFile(file);
    return fHM;
 }
 

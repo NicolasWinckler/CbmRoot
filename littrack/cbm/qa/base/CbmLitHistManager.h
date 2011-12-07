@@ -8,16 +8,18 @@
 #ifndef CBMLITHISTMANAGER_H_
 #define CBMLITHISTMANAGER_H_
 
-#include "TH1.h"
 #include <map>
 #include <string>
 
+class TFile;
+class TH1;
 class TH1F;
 class TH2F;
 class TH3F;
 
 using std::map;
 using std::pair;
+using std::string;
 
 /**
  * \class CbmLitHistManager
@@ -32,12 +34,12 @@ public:
    /**
     * \brief Constructor.
     */
-   CbmLitHistManager() {}
+   CbmLitHistManager();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitHistManager() {}
+   virtual ~CbmLitHistManager();
 
    /**
     * \brief Add new histogram to manager.
@@ -91,14 +93,16 @@ public:
    }
 
    /**
-    * \brief Write all histograms to current file.
+    * \brief Write all histograms to current opened file.
     */
-   void WriteToFile() {
-      map<string, TH1*>::iterator it;
-      for (it = fHistMap.begin(); it != fHistMap.end(); it++){
-         it->second->Write();
-      }
-   }
+   void WriteToFile();
+
+   /**
+    * \brief Read histograms from file.
+    * \param[in] file Pointer to file with histograms.
+    */
+   void ReadFromFile(
+         TFile* file);
 
 private:
    // Map of histogram name to its pointer

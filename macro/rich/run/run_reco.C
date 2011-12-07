@@ -247,26 +247,23 @@ void run_reco(Int_t nEvents = 10){
 	}//isRich
 
 	// Reconstruction Qa
-   CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-   reconstructionQa->SetMinNofPointsSts(4);
-   reconstructionQa->SetUseConsecutivePointsInSts(true);
-   reconstructionQa->SetMinNofPointsTrd(8);
-   reconstructionQa->SetMinNofPointsMuch(10);
-   reconstructionQa->SetMinNofPointsTof(1);
-   reconstructionQa->SetQuota(0.7);
-   reconstructionQa->SetMinNofHitsTrd(8);
-   reconstructionQa->SetMinNofHitsMuch(10);
-   reconstructionQa->SetVerbose(0);
-   reconstructionQa->SetMomentumRange(0, 12);
-   reconstructionQa->SetNofBinsMom(120);
-   reconstructionQa->SetPtRange(0, 3);
-   reconstructionQa->SetNofBinsPt(30);
-   reconstructionQa->SetYRange(0, 4);
-   reconstructionQa->SetNofBinsY(40);
-   reconstructionQa->SetMinNofHitsRich(7);
-   reconstructionQa->SetQuotaRich(0.6);
-   reconstructionQa->SetOutputDir("recqa/");
-   run->AddTask(reconstructionQa);
+   CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+   trackingQa->SetMinNofPointsSts(4);
+   trackingQa->SetUseConsecutivePointsInSts(true);
+   trackingQa->SetMinNofPointsTrd(8);
+   trackingQa->SetMinNofPointsMuch(10);
+   trackingQa->SetMinNofPointsTof(1);
+   trackingQa->SetQuota(0.7);
+   trackingQa->SetMinNofHitsTrd(8);
+   trackingQa->SetMinNofHitsMuch(10);
+   trackingQa->SetVerbose(0);
+   trackingQa->SetMomAxis(0, 12, 120);
+   trackingQa->SetPtAxis(0, 3, 30);
+   trackingQa->SetRapidityAxis(0, 4, 40);
+   trackingQa->SetMinNofHitsRich(7);
+   trackingQa->SetQuotaRich(0.6);
+   trackingQa->SetOutputDir("recqa/");
+   run->AddTask(trackingQa);
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===

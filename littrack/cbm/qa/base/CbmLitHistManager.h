@@ -10,6 +10,7 @@
 
 #include <map>
 #include <string>
+#include <assert.h>
 
 class TFile;
 class TH1;
@@ -59,6 +60,7 @@ public:
     */
    TH1F* H1F(
          const string& name) const {
+      assert(fHistMap.count(name) != 0);
       return (TH1F*)fHistMap.find(name)->second;
    }
 
@@ -69,6 +71,7 @@ public:
     */
    TH2F* H2F(
          const string& name) const {
+      assert(fHistMap.count(name) != 0);
       return (TH2F*)fHistMap.find(name)->second;
    }
 
@@ -79,6 +82,7 @@ public:
     */
    TH3F* H3F(
          const string& name) const {
+      assert(fHistMap.count(name) != 0);
       return (TH3F*)fHistMap.find(name)->second;
    }
 
@@ -89,6 +93,7 @@ public:
     */
    TH1* H1(
          const string& name) const {
+      assert(fHistMap.count(name) != 0);
       return (TH1*)fHistMap.find(name)->second;
    }
 

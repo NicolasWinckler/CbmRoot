@@ -12,17 +12,14 @@ void eloss_ana(Int_t nEvents = 20000)
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
    cbmrootlibs();
 
-
    FairRunAna *run= new FairRunAna();
    run->SetInputFile(inFile);
    run->SetOutputFile(outFile);
-
 
    CbmLitCheckMultipleScattering* msCheck = new CbmLitCheckMultipleScattering();
    msCheck->SetOutputDir("/home/d/andrey/eloss/");
    run->AddTask(msCheck);
 
-   run->LoadGeometry();
    run->Init();
    run->Run(0,nEvents);
 

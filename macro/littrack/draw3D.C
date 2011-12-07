@@ -1,21 +1,16 @@
-/** draw3D.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- * Macro draws 3D view of the CBM detector using TGeo functionality.
+/**
+ * \file draw3D.C
+ * \brief Macro draws 3D view of CBM detector using TGeo functionality.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  **/
 
 void draw3D()
 {
 	//Input directory
 	TString dir = "/d/cbm02/andrey/mvd/std_10e/";
-	//Input MC file with TGeo
-//	TString mcFile = dir + "mc.0000.root";
+	//Input parameter file with TGeo
 	TString parFile = dir + "param.0000.root";
-
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -24,8 +19,6 @@ void draw3D()
 
 	TFile* f = new TFile(parFile);
 	f->Get("FairBaseParSet");
-//	TFile* f = new TFile(mcFile);
-//	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
 	gGeoManager->SetVisLevel(4);
 
 	// Check overlaps

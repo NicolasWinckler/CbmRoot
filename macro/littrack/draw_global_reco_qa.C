@@ -1,3 +1,10 @@
+/**
+ * \file draw_global_reco_qa.C
+ * \brief Macroe draws histograms produced by tracking QA.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ */
+
 #include "../../cbmbase/CbmDetectorList.h"
 
 void draw_global_reco_qa()
@@ -10,9 +17,8 @@ void draw_global_reco_qa()
 	std::string fileName = "/data.local1/andrey/sts_qa/sts4_events_electron/global.tracks.0000.root";
 	std::string imageDir = "/data.local1/andrey/sts_qa/sts4_results_electron/";
 
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+	CbmLitTrackingQa* reconstructionQa = new CbmLitTrackingQa();
 	reconstructionQa->SetOutputDir(imageDir);
-	reconstructionQa->SetOutputJsonFileName("/data.local1/andrey/sts_qa/sts4_results_electron/rec_qa.json");
 	reconstructionQa->SetIsElectronSetup(true);
 	reconstructionQa->SetDetectorPresence(kMVD, false);
 	reconstructionQa->SetDetectorPresence(kSTS, true);

@@ -1,63 +1,44 @@
-/** mvd_reco.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
+/**
+ * \file mvd_reco.C
+ * \brief Macro runs littrack MVD tracking.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
  **/
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void mvd_reco(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, imageDir, mcFile, parFile, mvdRecoFile, trackingType;
-	TList *parFileList = new TList();
-	TObjString stsDigiFile;
-	Int_t normStsPoints;
-	Float_t momMin, momMax;
-	Int_t momBins;
-	if (script != "yes") {
-		// Output directory
-		dir = "/d/cbm02/andrey/mvd/std_10e_urqmd/";
-		// MC transport file
-		mcFile = dir + "mc.0000.root";
-		// Parameters file
-		parFile = dir + "param.0000.root";
-		// Output file with reconstructed tracks and hits
-		mvdRecoFile = dir + "mvd.reco.0000.root";
-		// Digi scheme for STS
-		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
-		parFileList->Add(&stsDigiFile);
-		// Directory for output images
-		TString imageDir = "./test/";
-		// Tracking type
-		trackingType = "branch";
-		// Normalization for efficiency
-		normStsPoints = 4;
-		//
-		momMin = 0.;
-		momMax = 12.;
-		momBins = 12.;
-	} else {
+	TString dir = "/data.local1/andrey/events/mvd_urqmd_5jpsi/"; // Output directory
+   TString mcFile = dir + "mc.0000.root"; // MC transport file
+   TString parFile = dir + "param.0000.root"; // Parameters file
+  	TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
+
+   TList *parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // Digi scheme for STS
+
+   TString resultDir = "./test/"; // Directory for output results
+
+   Int_t normStsPoints = 4; // STS normalization for efficiency
+
+	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		globalRecoFile = TString(gSystem->Getenv("MVDRECOFILE"));
-		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
-		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
-		TObjString stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
-		parFileList->Add(&stsDigiFile);
-		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS"))->Atoi();
-		momMin = TString(gSystem->Getenv("MOMMIN"))->Atof();
-		momMax = TString(gSystem->Getenv("MOMMAX"))->Atof();
-		momBins = TString(gSystem->Getenv("MOMBINS"))->Atoi();
+		mvdRecoFile = TString(gSystem->Getenv("MVDRECOFILE"));
+		resultDir = TString(gSystem->Getenv("IMAGEDIR"));
+		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
+		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
 	}
+   parFileList->Add(&stsDigiFile);
 
-	Int_t iVerbose = 1;
+   Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
-
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -107,48 +88,31 @@ void mvd_reco(Int_t nEvents = 100)
 	CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
 	FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
 	run->AddTask(fitTracks);
-
-	//	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
-	//	run->AddTask(stsFHQa);
-
-	//FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
-	//run->AddTask(stsRecoQa);
-       // ------------------------------------------------------------------------
-
+   // ------------------------------------------------------------------------
 
 	CbmLitFindMvdTracks* finder = new CbmLitFindMvdTracks();
-	finder->SetTrackingType(std::string(trackingType));
 	run->AddTask(finder);
-
 
 	CbmLitFindGlobalTracks* globalFinder = new CbmLitFindGlobalTracks();
 	run->AddTask(globalFinder);
 
+   // -----   Primary vertex finding   ---------------------------------------
+   CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
+   CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
+   run->AddTask(findVertex);
+   // ------------------------------------------------------------------------
 
 	// -----   Track finding QA check   ------------------------------------
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-	reconstructionQa->SetMinNofPointsSts(normStsPoints);
-//	reconstructionQa->SetMinNofPointsTrd(normTrdPoints);
-//	reconstructionQa->SetMinNofPointsMuch(normMuchPoints);
-//	reconstructionQa->SetMinNofPointsTof(normTofPoints);
-	reconstructionQa->SetQuota(0.7);
-//	reconstructionQa->SetMinNofHitsTrd(normTrdHits);
-//	reconstructionQa->SetMinNofHitsMuch(normMuchHits);
-	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetMomentumRange(momMin, momMax);
-	reconstructionQa->SetNofBinsMom(momBins);
-	reconstructionQa->SetOutputDir(std::string(imageDir));
-	run->AddTask(reconstructionQa);
+	CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+	trackingQa->SetMinNofPointsSts(normStsPoints);
+	trackingQa->SetQuota(0.7);
+	trackingQa->SetVerbose(1);
+	trackingQa->SetOutputDir(std::string(resultDir));
+	run->AddTask(trackingQa);
 	// ------------------------------------------------------------------------
 
-
-
-//	// -----   Primary vertex finding   ---------------------------------------
-//	CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
-//	CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
-//	run->AddTask(findVertex);
-//	// ------------------------------------------------------------------------
-
+	CbmLitFitQa* fitQa = new CbmLitFitQa();
+   run->AddTask(fitQa);
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
@@ -163,7 +127,6 @@ void mvd_reco(Int_t nEvents = 100)
 	// ------------------------------------------------------------------------
 
 	// -----   Initialize and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
 	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------

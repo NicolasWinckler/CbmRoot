@@ -81,7 +81,7 @@ void qa_study()
       tof = 1;
    }
 
-   CbmLitReconstructionQa qa;
+   CbmLitTrackingQa qa;
    qa.SetOutputDir(outputDir);
    qa.SetIsElectronSetup(electronSetup);
    qa.SetDetectorPresence(kMVD, mvd);
@@ -90,5 +90,5 @@ void qa_study()
    qa.SetDetectorPresence(kTRD, trd);
    qa.SetDetectorPresence(kMUCH, much);
    qa.SetDetectorPresence(kTOF, tof);
-   qa.CreateStudyHTML("Event reconstruction performance", results, names);
+   qa.CreateReport(kLitHtml, "Event reconstruction performance", results, names);
 }

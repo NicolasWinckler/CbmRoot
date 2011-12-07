@@ -1,11 +1,13 @@
 /**
  * \file global_reco_ideal.C
- *
  * \brief Macro runs ideal event reconstruction.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
  **/
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void global_reco_ideal(Int_t nEvents = 5000)
 {
@@ -16,8 +18,9 @@ void global_reco_ideal(Int_t nEvents = 5000)
 	TString dir, imageDir, mcFile, parFile, globalTracksFile;
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
+	TString muchDigiFile;
 	if (script != "yes") {
-	   dir = "/data.local1/andrey/events/std_electron_10pi_low_mom/";
+	   dir = "/data.local1/andrey/events/std_muon_5jpsi/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
@@ -238,21 +241,19 @@ void global_reco_ideal(Int_t nEvents = 5000)
    }
 
 	// ------- Track finding QA check   ---------------------------------------
-   CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-   reconstructionQa->SetMinNofPointsSts(4);
-   reconstructionQa->SetMinNofPointsTrd(8);
-   reconstructionQa->SetMinNofPointsMuch(16);
-   reconstructionQa->SetMinNofPointsTof(1);
-   reconstructionQa->SetQuota(0.7);
-   reconstructionQa->SetMinNofHitsTrd(8);
-   reconstructionQa->SetMinNofHitsMuch(16);
-   reconstructionQa->SetVerbose(0);
-   reconstructionQa->SetMomentumRange(0, 12);
-   reconstructionQa->SetNofBinsMom(12);
-   reconstructionQa->SetMinNofHitsRich(7);
-   reconstructionQa->SetQuotaRich(0.7);
-   reconstructionQa->SetOutputDir(std::string(imageDir));
-   run->AddTask(reconstructionQa);
+   CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+   trackingQa->SetMinNofPointsSts(4);
+   trackingQa->SetMinNofPointsTrd(8);
+   trackingQa->SetMinNofPointsMuch(16);
+   trackingQa->SetMinNofPointsTof(1);
+   trackingQa->SetQuota(0.7);
+   trackingQa->SetMinNofHitsTrd(8);
+   trackingQa->SetMinNofHitsMuch(16);
+   trackingQa->SetVerbose(0);
+   trackingQa->SetMinNofHitsRich(7);
+   trackingQa->SetQuotaRich(0.6);
+   trackingQa->SetOutputDir(std::string(imageDir));
+   run->AddTask(trackingQa);
 	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

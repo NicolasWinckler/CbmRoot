@@ -1,11 +1,13 @@
-/** create_field.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
- *
- * Macro converts an ASCII file with the magnetic field
- * to the ROOT format.
- **/
+/**
+ * \file create_field.C
+ * \brief Macro converts ASCII file with magnetic field to ROOT file.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ */
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void create_field()
 {

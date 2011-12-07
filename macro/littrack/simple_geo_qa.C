@@ -1,12 +1,13 @@
 /**
  * \file simple_geo_qa.C
- *
  * \brief Check simplified geometry creator.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- *
- **/
+ */
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void simple_geo_qa(Int_t nEvents = 1)
 {

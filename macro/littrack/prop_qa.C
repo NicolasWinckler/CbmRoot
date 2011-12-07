@@ -1,41 +1,35 @@
 /**
  * \file prop_qa.C
- *
  * \brief Macro runs propagation analysis task.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \since 2010
  **/
 
-void prop_qa(Int_t nEvents = 1)
+#include <iostream>
+using std::cout;
+using std::endl;
+
+void prop_qa(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-//	Double_t trdHitErr = 100; // if == 0 than standard errors are used
-	TString dir, imageDir, mcFile, parFile, globalTracksFile, propAnaFile;
-	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
-	Int_t testFastPropagation;
-	if (script != "yes") {
-	   dir = "/data.local1/andrey/events/std_electron_10pi_low_mom/";
-		mcFile = dir + "mc.0000.root";
-		globalTracksFile = dir + "global.tracks.ideal.0000.root";
-		parFile = dir + "param.0000.root";
-		propAnaFile = dir + "propagation.qa.0000.root";
-		imageDir = "./test/";
-		nofTrdHits = 12;
-		nofMuchHits = 0;
-		nofTofHits = 1;
-		pdg = 11;
-		testFastPropagation = 1;
-	} else {
+	TString dir = "/data.local1/andrey/events/std_muon_5jpsi/";
+	TString mcFile = dir + "mc.0000.root";
+	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
+	TString parFile = dir + "param.0000.root";
+	TString propAnaFile = dir + "propagation.qa.0000.root";
+	TString resultDir = "./test/";
+	Int_t nofHits = 10;
+	Int_t pdg = 13;
+	Int_t testFastPropagation = 1;
+
+	if(script == "yes") {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSIDEALFILE"));
-		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+		resultDir = TString(gSystem->Getenv("RESULTDIR"));
 		propAnaFile = TString(gSystem->Getenv("PROPANAFILE"));
-		nofTrdHits = TString(gSystem->Getenv("NOFTRDHITS")).Atoi();
-		nofMuchHits = TString(gSystem->Getenv("NOFMUCHHITS")).Atoi();
-		nofTofHits = TString(gSystem->Getenv("NOFTOFHITS")).Atoi();
+		nofHits = TString(gSystem->Getenv("NOFHITS")).Atoi();
 		pdg = TString(gSystem->Getenv("PDG")).Atoi();
 		testFastPropagation = TString(gSystem->Getenv("TESTFASTPROPAGATION")).Atoi();
 	}
@@ -53,22 +47,14 @@ void prop_qa(Int_t nEvents = 1)
 	run->AddFriend(globalTracksFile);
 	run->SetOutputFile(propAnaFile);
 
-//	FairGeane* Geane = new FairGeane(inFile.Data());
-//	FairGeane* Geane = new FairGeane(parFile.Data());
-//	FairGeane *Geane = new FairGeane();
-//	run->AddTask(Geane);
-
 	// -------------------------------------------------------------------------
 	CbmLitPropagationQa* propQa = new CbmLitPropagationQa();
-	propQa->SetNofPlanes(nofTrdHits + nofMuchHits + nofTofHits);
-	propQa->SetNofTrdHits(nofTrdHits);
-	propQa->SetNofMuchHits(nofMuchHits);
-	propQa->SetNofTofHits(nofTofHits);
+	propQa->SetMinNofHits(nofHits);
 	propQa->SetPDGCode(pdg);
 	propQa->SetTestFastPropagation(testFastPropagation);
-	propQa->SetOutputDir(std::string(imageDir));
+	propQa->SetOutputDir(std::string(resultDir));
 	propQa->IsDrawPropagation(true);
-	propQa->IsDrawFilter(true);
+	propQa->IsDrawFilter(false);
 	propQa->IsDrawSmoother(false);
 	propQa->IsCloseCanvas(false);
 	propQa->IsFixedBounds(true);
@@ -90,14 +76,13 @@ void prop_qa(Int_t nEvents = 1)
 
 	// -----   Intialise and run   --------------------------------------------
 	run->Init();
-//	Geane->SetField(run->GetField());
 	run->Run(0,nEvents);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
+	cout << "Macro finished successfully." << endl;
 	cout << "Output file is "    << propAnaFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;

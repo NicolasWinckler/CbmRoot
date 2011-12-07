@@ -1,16 +1,18 @@
-/** determine setup.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- * Macro determines detector presence in the CBM setup.
- **/
+/**
+ * \file determine setup.C
+ * \brief Macro determines detector presence in CBM setup.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ */
 
 
 
-/* Determines detector presence in the TGeo by its name.
- * @param parFile Name of the parameter file with TGeo.
- * @param name Detector name.
- * @return True if detector presents in the TGeo.
+/**
+ * \function CheckDetectorPresence
+ * \brief Determines detector presence in TGeo by its name.
+ * \param[in] parFile Name of the parameter file with TGeo.
+ * \param[in] name Detector name.
+ * \return True if detector presents in the TGeo.
  */
 Bool_t CheckDetectorPresence(
 		const TString& parFile,
@@ -42,14 +44,16 @@ Bool_t CheckDetectorPresence(
 		}
 	}
 	f->Close();
-    gFile=currentfile;
+   gFile=currentfile;
 	delete f;
 	return false;
 }
 
-/* Determines TRD detector presence in the TGeo.
- * @param parFile Name of the parameter file with TGeo.
- * @return True if TRD presents in the TGeo.
+/**
+ * \function IsTrd
+ * \brief Determines TRD detector presence in TGeo.
+ * \param[in] parFile Name of parameter file with TGeo.
+ * \return True if TRD exists in TGeo.
  */
 Bool_t IsTrd(
 		const TString& parFile)
@@ -57,9 +61,11 @@ Bool_t IsTrd(
 	return CheckDetectorPresence(parFile, "trd");
 }
 
-/* Determines MUCH detector presence in the TGeo.
- * @param parFile Name of the parameter file with TGeo.
- * @return True if MUCH presents in the TGeo.
+/**
+ * \function IsMuch
+ * \brief Determines MUCH detector presence in TGeo.
+ * \param[in] parFile Name of parameter file with TGeo.
+ * \return True if MUCH exists in TGeo.
  */
 Bool_t IsMuch(
 		const TString& parFile)
@@ -67,9 +73,11 @@ Bool_t IsMuch(
 	return CheckDetectorPresence(parFile, "much");
 }
 
-/* Determines TOFdetector presence in the TGeo.
- * @param parFile Name of the parameter file with TGeo.
- * @return True if TOF presents in the TGeo.
+/**
+ * \function IsTof
+ * \brief Determines TOF detector presence in TGeo.
+ * \param[in] parFile Name of parameter file with TGeo.
+ * \return True if TOF exists in TGeo.
  */
 Bool_t IsTof(
 		const TString& parFile)
@@ -77,9 +85,11 @@ Bool_t IsTof(
 	return CheckDetectorPresence(parFile, "tof");
 }
 
-/* Determines RICH detector presence in the TGeo.
- * @param parFile Name of the parameter file with TGeo.
- * @return True if RICH presents in the TGeo.
+/**
+ * \function IsRich
+ * \brief Determines RICH detector presence in TGeo.
+ * \param[in] parFile Name of parameter file with TGeo.
+ * \return True if RICH exists in TGeo.
  */
 Bool_t IsRich(
 		const TString& parFile)
@@ -87,9 +97,11 @@ Bool_t IsRich(
 	return CheckDetectorPresence(parFile, "rich");
 }
 
-/* Determines MVD detector presence in the TGeo.
- * @param parFile Name of the parameter file with TGeo.
- * @return True if RICH presents in the TGeo.
+/**
+ * \function IsMvd
+ * \brief Determines MVD detector presence in TGeo.
+ * \param[in] parFile Name of the parameter file with TGeo.
+ * \return True if MVD exists in TGeo.
  */
 Bool_t IsMvd(
 		const TString& parFile)

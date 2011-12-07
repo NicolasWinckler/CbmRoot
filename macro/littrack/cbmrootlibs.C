@@ -1,9 +1,9 @@
-/** cbmrootlibs.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- * Macro loads CBMROOT libraries.
- **/
+/**
+ * \file cbmrootlibs.C
+ * \brief Macro loads CBMROOT libraries.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ */
 
 void cbmrootlibs()
 {
@@ -32,5 +32,4 @@ void cbmrootlibs()
    gSystem->Load("libLittrack");
    gSystem->Load("libLittrackparallel");
    gSystem->Load("libMinuit2"); // Needed for field fitter
-
 }

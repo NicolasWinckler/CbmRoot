@@ -1,8 +1,15 @@
-//#include "../../littrack/utils/CbmLitDrawHist.h"
-#include "../../littrack/utils/CbmLitDrawHist.cxx"
-#include "../../littrack/utils/CbmLitUtils.cxx"
+/**
+ * \file draw_rec_qa.C
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
+ */
 
-//const TString dir  = "/d/cbm02/andrey/trdstd_10e_urqmd/";
+#include "../../littrack/cbm/utils/CbmLitDrawHist.cxx"
+#include "../../littrack/std/utils/CbmLitUtils.cxx"
+#include "TH1.h"
+#include "TFile.h"
+#include "TString.h"
+
 const TString dir  = "/d/cbm02/andrey/phd/much1_10mu_urqmd/";
 const TFile *file1 = new TFile(dir + "global.tracks.branch.0000.root");
 const TFile *file2 = new TFile(dir + "global.tracks.nn.0000.root");
@@ -43,11 +50,10 @@ void DrawEffMethodsMuch()
 
 	canvas->cd();
 	eff1->SetMinimum(0.);
-	eff1->SetMaximum(1.);
-	DrawHist1D(eff1, eff2, eff3,NULL,
-			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,"",
-			false, false, true, 0.3,0.3,0.85,0.6);
-	SaveCanvasAsImage(canvas, "./test/");
+	eff1->SetMaximum(100.);
+	DrawHist1D(eff1, eff2, eff3, NULL, hname1, hname2, hname3, "",
+			kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6);
+	lit::SaveCanvasAsImage(canvas, "./test/");
 }
 
 void DrawEffMethodsTrd()
@@ -63,17 +69,17 @@ void DrawEffMethodsTrd()
 
 	TH1* eff1_1 = (TH1*)file1->Get("hRecMomEffAll");
 	TH1* eff2_1 = (TH1*)file2->Get("hRecMomEffAll");
-    TH1* eff1_2 = (TH1*)file1->Get("hRecMomEffElectron");
+   TH1* eff1_2 = (TH1*)file1->Get("hRecMomEffElectron");
 	TH1* eff2_2 = (TH1*)file2->Get("hRecMomEffElectron");
 	
 	TH1* acc1_1 = (TH1*)file1->Get("hRecMomAccAll");
 	TH1* acc2_1 = (TH1*)file2->Get("hRecMomAccAll");
-    TH1* acc1_2 = (TH1*)file1->Get("hRecMomAccElectron");
+   TH1* acc1_2 = (TH1*)file1->Get("hRecMomAccElectron");
 	TH1* acc2_2 = (TH1*)file2->Get("hRecMomAccElectron");
 
-   	TH1* rec1_1 = (TH1*)file1->Get("hRecMomRecAll");
+   TH1* rec1_1 = (TH1*)file1->Get("hRecMomRecAll");
 	TH1* rec2_1 = (TH1*)file2->Get("hRecMomRecAll");
-    TH1* rec1_2 = (TH1*)file1->Get("hRecMomRecElectron");
+   TH1* rec1_2 = (TH1*)file1->Get("hRecMomRecElectron");
 	TH1* rec2_2 = (TH1*)file2->Get("hRecMomRecElectron");
 
 	std::string hname1, hname2, hname3, hname4;
@@ -89,30 +95,24 @@ void DrawEffMethodsTrd()
 
 	canvas->cd();
 	eff1_1->SetMinimum(0.);
-	eff1_1->SetMaximum(1.);
-	DrawHist1D(eff1_1, eff2_1, eff1_2, eff2_2,
-			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, hname4,
-			false, false, true, 0.2,0.2,0.85,0.6);
-
-	SaveCanvasAsImage(canvas, "./test/");
+	eff1_1->SetMaximum(100.);
+	DrawHist1D(eff1_1, eff2_1, eff1_2, eff2_2, hname1, hname2, hname3, hname4,
+			kLitLinear, kLitLinear, true, 0.2, 0.2, 0.85, 0.6);
+	lit::SaveCanvasAsImage(canvas, "./test/");
 
 	canvas_all->cd();
 	eff1_1->SetMinimum(0.);
 	eff1_1->SetMaximum(1.);
-	DrawHist1D(eff1_1, eff2_1, NULL, NULL,
-			"Efficiency all", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "", "",
-			false, false, true, 0.3,0.3,0.85,0.6);
-
-	SaveCanvasAsImage(canvas_all, "./test/");
+	DrawHist1D(eff1_1, eff2_1, NULL, NULL, hname1, hname2, "", "",
+			kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6);
+	lit::SaveCanvasAsImage(canvas_all, "./test/");
 
 	canvas_electrons->cd();
 	eff1_2->SetMinimum(0.);
 	eff1_2->SetMaximum(1.);
-	DrawHist1D(eff1_2, eff2_2, NULL, NULL,
-			"Efficiency electrons", "Momentum [GeV/c]", "Efficiency", hname3, hname4, "", "",
-			false, false, true, 0.3,0.3,0.85,0.6);
-
-	SaveCanvasAsImage(canvas_electrons, "./test/");
+	DrawHist1D(eff1_2, eff2_2, NULL, NULL, hname3, hname4, "", "",
+			kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6);
+	lit::SaveCanvasAsImage(canvas_electrons, "./test/");
 }
 
 

@@ -9,10 +9,6 @@ void fit_speed(Int_t nEvents = 10000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
-
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -23,17 +19,11 @@ void fit_speed(Int_t nEvents = 10000)
 	run->AddFriend(globalTracksFile);
 	run->SetOutputFile(outFile);
 
-//	FairGeane* Geane = new FairGeane(inFile.Data());
-//	FairGeane* Geane = new FairGeane(parFile.Data());
-//	FairGeane *Geane = new FairGeane();
-//	run->AddTask(Geane);
-
 	// -------------------------------------------------------------------------
 	CbmLitTrackFitSpeedTest* test = new CbmLitTrackFitSpeedTest();
 	test->SetNofPlanes(13);
 	test->SetNofTrdHits(0);
 	test->SetNofMuchHits(13);
-	test->SetNofTofHits(0);
 	run->AddTask(test);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -51,9 +41,7 @@ void fit_speed(Int_t nEvents = 10000)
 	// ------------------------------------------------------------------------
 
 	// -----   Intialise and run   --------------------------------------------
-	run->LoadGeometry();
 	run->Init();
-//	Geane->SetField(run->GetField());
 	run->Run(0,nEvents);
 	// ------------------------------------------------------------------------
 

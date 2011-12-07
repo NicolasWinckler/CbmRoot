@@ -1,8 +1,12 @@
-/** trd_hits_qa.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2010
- * @version 1.0
+/**
+ * \file trd_hits_qa.C
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
  **/
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void trd_hits_qa(Int_t nEvents = 500)
 {
@@ -21,10 +25,6 @@ void trd_hits_qa(Int_t nEvents = 500)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
-
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -38,7 +38,7 @@ void trd_hits_qa(Int_t nEvents = 500)
 
 	//------------------------------------------------
 	CbmTrdHitsQa* trdHitsQa = new CbmTrdHitsQa();
-	trdHitsQa->SetOutputDir("./test2/");
+	trdHitsQa->SetOutputDir("./test/");
 	run->AddTask(trdHitsQa);
 	//------------------------------------------------
 

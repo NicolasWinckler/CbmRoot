@@ -1,11 +1,8 @@
 /**
  * \file event_display.C
- *
- * \brief Run event display.
- *
+ * \brief Macro runs event display.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- *
  **/
 
 void event_display()

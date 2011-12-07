@@ -1,12 +1,16 @@
-/** global_reco.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file global_reco.C
+ * \brief Event reconstruction macro.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2010
  *
- * Macro runs STS hit and track reconstruction and TRD, MUCH and TOF digitizers
- * and hit finders and finally Littrack global tracking.
+ * Macro runs event reconstruction in MVD, STS, TRD, MUCH and TOF.
  * Macro has 3 options "all", "hits" and "tracking".
- **/
+ */
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void global_reco(Int_t nEvents = 1000, // number of events
 		TString opt = "tracking")
@@ -17,76 +21,56 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, imageDir, mcFile, parFile, globalRecoFile, muchDigiFile, trackingType;
-	TString stsHitProducerType, trdHitProducerType;
-	TList *parFileList = new TList();
-	TObjString stsDigiFile, trdDigiFile;
-	Int_t normStsPoints, normTrdPoints, normMuchPoints, normTofPoints;
-	Int_t normTrdHits, normMuchHits, normTofHits;
-	Float_t momMin, momMax;
-	Int_t momBins;
-	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
-	if (script != "yes") {
-		// Output directory
-		dir = "/data.local1/andrey/events/std_muon/";
-		// MC transport file
-		mcFile = dir + "mc.0000.root";
-		// Parameters file
-		parFile = dir + "param.0000.root";
-		// Output file with reconstructed tracks and hits
-		globalRecoFile = dir + "global.reco.0000.root";
-		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.0000.root";
-		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.nn_parallel.0000.root";
-		// Digi scheme file for MUCH.
-		// MUST be consistent with MUCH geometry used in MC transport.
-//		muchDigiFile = parDir + "/much/much_standard_straw_trd.digi.root";
-		muchDigiFile = parDir + "/much/much_v11a.digi.root";
-		// Digi scheme for STS
-		TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par";
-		parFileList->Add(&stsDigiFile);
-		// Digi scheme for TRD
-		TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par";
-	     //   TObjString trdDigiFile = parDir + "/trd/v11a/trd_v11a_7.5mm_01cm2.digi.par";
-		parFileList->Add(&trdDigiFile);
-		// Directory for output images
-		TString imageDir = "./test_muon_nn_parallel/";
-		// Tracking type
-		trackingType = "nn_parallel";
-		// STS hit producer type: real, ideal
-		stsHitProducerType = "real";
-		// TRD hit producer type: smearing, digi, clustering
-		trdHitProducerType = "clustering";
-		// Normalization for efficiency
-		normStsPoints = 4;
-		normTrdPoints = 8;
-		normMuchPoints = 16;
-		normTofPoints = 1;
-		normTrdHits = 8;
-		normMuchHits = 16;
-		normTofHits = 1;
-		//
-		momMin = 0.;
-		momMax = 16.;
-		momBins = 16.;
-	} else {
+   // Input and output data
+   TString dir = "/data.local1/andrey/events/std_electron_5jpsi/"; // Output directory
+   TString mcFile = dir + "mc.0000.root"; // MC transport file
+   TString parFile = dir + "param.0000.root"; // Parameters file
+   TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
+   TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
+   TString globalTracksFile = dir + "global.tracks.0000.root";// Output file with global tracks
+
+   // Digi files
+   TList *parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+   TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
+
+   // Directory for output results
+   TString resultDir = "./test/";
+
+   // Reconstruction parameters
+   TString globalTrackingType = "branch"; // Global tracking type
+   TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
+   TString trdHitProducerType = "clustering"; // TRD hit producer type: smearing, digi, clustering
+   TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
+
+   // Normalization for efficiency
+   Int_t normStsPoints = 4;
+   Int_t normTrdPoints = 8;
+   Int_t normMuchPoints = 16;
+   Int_t normTofPoints = 1;
+   Int_t normTrdHits = 8;
+   Int_t normMuchHits = 16;
+   Int_t normTofHits = 1;
+
+	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
 		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
-		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
-		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
-		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
+
+		resultDir = TString(gSystem->Getenv("RESULTDIR"));
+
+		globalTrackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
 		stsHitProducerType = TString(gSystem->Getenv("STSHITPRODUCERTYPE"));
 		trdHitProducerType = TString(gSystem->Getenv("TRDHITPRODUCERTYPE"));
-		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
-		TObjString stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
-		parFileList->Add(&stsDigiFile);
-		TObjString trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
-		parFileList->Add(&trdDigiFile);
-		std::cout << std::endl << std::endl << "TRD_DIGI_TRD_DIGI" << trdDigiFile.GetString() << std::endl << std::endl;
+		muchHitProducerType = TString(gSystem->Getenv("MUCHHITPRODUCERTYPE"));
+
+		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
+		trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
+		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
+
 		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
 		normTrdPoints = TString(gSystem->Getenv("NORMTRDPOINTS")).Atoi();
 		normMuchPoints = TString(gSystem->Getenv("NORMMUCHPOINTS")).Atoi();
@@ -94,10 +78,10 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		normTrdHits = TString(gSystem->Getenv("NORMTRDHITS")).Atoi();
 		normMuchHits = TString(gSystem->Getenv("NORMMUCHHITS")).Atoi();
 		normTofHits = TString(gSystem->Getenv("NORMTOFHITS")).Atoi();
-		momMin = TString(gSystem->Getenv("MOMMIN")).Atof();
-		momMax = TString(gSystem->Getenv("MOMMAX")).Atof();
-		momBins = TString(gSystem->Getenv("MOMBINS")).Atoi();
 	}
+
+   parFileList->Add(&stsDigiFile);
+   parFileList->Add(&trdDigiFile);
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
@@ -122,7 +106,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		run->SetOutputFile(globalTracksFile);
 	} else {
 		std::cout << "-E- Incorrect opt parameter" << std::endl;
-		exit();
+		exit(0);
 	}
 
 	if (opt == "all" || opt == "hits") {
@@ -193,46 +177,38 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
 		run->AddTask(stsMatchTracks);
 
-		CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
-		run->AddTask(fitTracks);
-
-		//	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
-		//	run->AddTask(stsFHQa);
-
-		//  FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
-		//	run->AddTask(stsRecoQa);
+//		CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
+//		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
+//		run->AddTask(fitTracks);
 		// ------------------------------------------------------------------------
 
 		if (IsMuch(parFile)) {
 			// ----- MUCH reconstruction ---------------------------------------
-//			// Simple
-//		   CbmMuchDigitizeSimpleGem* muchDigitize = 	new CbmMuchDigitizeSimpleGem(
-//			      "MuchDigitize", muchDigiFile.Data(), iVerbose);
-//			run->AddTask(muchDigitize);
-//       CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem(
-//               "MuchFindHits", muchDigiFile.Data(), iVerbose);
-//       run->AddTask(muchFindHits);
-//			// End Simple
+		   if (muchHitProducerType == "simple") {
+            CbmMuchDigitizeSimpleGem* muchDigitize = 	new CbmMuchDigitizeSimpleGem(
+                  "MuchDigitize", muchDigiFile.Data(), iVerbose);
+            run->AddTask(muchDigitize);
+            CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem(
+                  "MuchFindHits", muchDigiFile.Data(), iVerbose);
+            run->AddTask(muchFindHits);
+		   } else if (muchHitProducerType == "advanced") {
+            CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem(
+                  "MuchDigitizeAdvancedGem", muchDigiFile.Data(), iVerbose);
+            digitize->SetSpotRadius(0.05);
+            digitize->SetQThreshold(3);
+            digitize->SetQMaximum(500000);
+            digitize->SetNADCChannels(256);
+            digitize->SetDeadPadsFrac(0.05);
+            run->AddTask(digitize);
 
-			// Advanced
-			CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem(
-			      "MuchDigitizeAdvancedGem", muchDigiFile.Data(), iVerbose);
-			digitize->SetSpotRadius(0.05);
-			digitize->SetQThreshold(3);
-			digitize->SetQMaximum(500000);
-			digitize->SetNADCChannels(256);
-			digitize->SetDeadPadsFrac(0.05);
-			run->AddTask(digitize);
-
-			CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem(
-			      "MuchFindHitsAdvancedGem", muchDigiFile.Data(), iVerbose);
-			findHits->SetAlgorithm(3);
-			findHits->SetNStations(6);
-			Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-			findHits->SetThresholdRatios(thresholds);
-			run->AddTask(findHits);
-			// End Advanced
+            CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem(
+                  "MuchFindHitsAdvancedGem", muchDigiFile.Data(), iVerbose);
+            findHits->SetAlgorithm(3);
+            findHits->SetNStations(6);
+            Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+            findHits->SetThresholdRatios(thresholds);
+            run->AddTask(findHits);
+		   }
 
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
 			      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
@@ -264,28 +240,18 @@ void global_reco(Int_t nEvents = 1000, // number of events
             Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
             Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-            // Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
-            // // Resolutions in y - station and angle dependent [mum]
-            // Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-            // Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-            // Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-
             CbmTrdHitProducerSmearing* trdHitProd =
                   new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-            // CbmTrdHitProducerSmearing* trdHitProd =
-            // new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
             trdHitProd->SetSigmaX(trdSigmaX);
             trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
             run->AddTask(trdHitProd);
             // ----- End TRD hit smearing -----
 			} else if (trdHitProducerType == "digi") {
             // ----- TRD Digitizer -----
-            CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(
-                  "TRD Digitizer", "TRD task", radiator);
+            CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer", "TRD task", radiator);
             run->AddTask(trdDigitizer);
 
-            CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi(
-                  "TRD Hit Producer", "TRD task");
+            CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi("TRD Hit Producer", "TRD task");
             run->AddTask(trdHitProd);
             // ----- End TRD Digitizer -----
 			} else if (trdHitProducerType == "clustering") {
@@ -300,7 +266,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
             run->AddTask(trdClusterHitProducer);
             // ----- End TRD Clustering -----
 			}
-//			// ------------------------------------------------------------------------
+			// ------------------------------------------------------------------------
 		}
 
 		if (IsTof(parFile)) {
@@ -314,16 +280,12 @@ void global_reco(Int_t nEvents = 1000, // number of events
 
 	if (opt == "all" || opt == "tracking") {
 		// ------ Global track reconstruction -------------------------------------
-		//	FairGeane* Geane = new FairGeane(parFile.Data());
-		//	FairGeane *Geane = new FairGeane();
-		//	run->AddTask(Geane);
-
 		CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
 		// Tracking method to be used
 		// "branch" - branching tracking
 		// "nn" - nearest neighbor tracking
 		// "weight" - weighting tracking
-		finder->SetTrackingType(std::string(trackingType));
+		finder->SetTrackingType(std::string(globalTrackingType));
 
 		// Hit-to-track merger method to be used
 		// "nearest_hit" - assigns nearest hit to the track
@@ -334,9 +296,6 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		if (IsTrd(parFile)) {
 			CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
 			run->AddTask(trdMatchTracks);
-
-			//			CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("Ann","Ann");
-			//			run->AddTask(trdSetTracksPidAnnTask);
 		}
 
 		if (IsMuch(parFile)) {
@@ -410,10 +369,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		  assignTrack->UseAssign(richAssign);
 		  run->AddTask(assignTrack);
 		  // ------------------------------------------------------------------------
-
-//		  CbmRichRingQa* richQa = new CbmRichRingQa("Qa", "qa", 0);
-//		  run->AddTask(richQa);
-	  }
+	   }
     }
 
     if (opt == "all" || opt == "tracking") {
@@ -432,22 +388,23 @@ void global_reco(Int_t nEvents = 1000, // number of events
 
 	if (opt == "all" || opt == "tracking") {
 		// -----   Track finding QA check   ------------------------------------
-		CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-		reconstructionQa->SetMinNofPointsSts(normStsPoints);
-		reconstructionQa->SetMinNofPointsTrd(normTrdPoints);
-		reconstructionQa->SetMinNofPointsMuch(normMuchPoints);
-		reconstructionQa->SetMinNofPointsTof(normTofPoints);
-		reconstructionQa->SetQuota(0.7);
-		reconstructionQa->SetMinNofHitsTrd(normTrdHits);
-		reconstructionQa->SetMinNofHitsMuch(normMuchHits);
-		reconstructionQa->SetMinNofHitsRich(7);
-		reconstructionQa->SetQuotaRich(0.7);
-		reconstructionQa->SetVerbose(normTofHits);
-		reconstructionQa->SetMomentumRange(momMin, momMax);
-		reconstructionQa->SetNofBinsMom(momBins);
-		reconstructionQa->SetOutputDir(std::string(imageDir));
-		run->AddTask(reconstructionQa);
+		CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+		trackingQa->SetMinNofPointsSts(normStsPoints);
+		trackingQa->SetMinNofPointsTrd(normTrdPoints);
+		trackingQa->SetMinNofPointsMuch(normMuchPoints);
+		trackingQa->SetMinNofPointsTof(normTofPoints);
+		trackingQa->SetQuota(0.7);
+		trackingQa->SetMinNofHitsTrd(normTrdHits);
+		trackingQa->SetMinNofHitsMuch(normMuchHits);
+		trackingQa->SetMinNofHitsRich(7);
+		trackingQa->SetQuotaRich(0.6);
+		trackingQa->SetVerbose(normTofHits);
+		trackingQa->SetOutputDir(std::string(resultDir));
+		run->AddTask(trackingQa);
 		// ------------------------------------------------------------------------
+
+		CbmLitFitQa* fitQa = new CbmLitFitQa();
+		run->AddTask(fitQa);
 	}
 
 	// -----  Parameter database   --------------------------------------------
@@ -471,8 +428,8 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	timer.Stop();
 	cout << endl << endl;
  	cout << "Macro finished successfully." << endl;
-        cout << "Test passed"<< endl;
-        cout << " All ok " << endl;
+   cout << "Test passed"<< endl;
+   cout << " All ok " << endl;
 	cout << "Output file is " << globalRecoFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time "	<< timer.CpuTime() << " s" << endl;

@@ -1,12 +1,12 @@
 /**
  * \file field_qa.C
- *
  * \brief Macro runs CbmLitFieldQa task which checks field map and its approximation.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  *
  **/
+
+#include <iostream>
 
 void field_qa(Int_t nEvents = 1)
 {
@@ -46,10 +46,10 @@ void field_qa(Int_t nEvents = 1)
 //   zPos.push_back(30.);
 //   zPos.push_back(50.);
    zPos.push_back(100.);
-   zPos.push_back(150.);
+//   zPos.push_back(150.);
    zPos.push_back(200.);
-   zPos.push_back(300.);
-   zPos.push_back(400.);
+//   zPos.push_back(300.);
+//   zPos.push_back(400.);
    fieldQa->SetSliceZPosition(zPos);
 
    std::vector<UInt_t> degrees;
@@ -93,11 +93,9 @@ void field_qa(Int_t nEvents = 1)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	cout << endl << endl;
-	cout << "Macro finished successfully." << endl;
-	cout << "Output file is " << outFile << endl;
-	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
-	cout << endl;
+   std::cout << "Macro finished successfully." << std::endl;
+   std::cout << "Output file is " << outFile << std::endl;
+   std::cout << "Parameter file is " << parFile << std::endl;
+   std::cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << std::endl;
 	// ------------------------------------------------------------------------
 }

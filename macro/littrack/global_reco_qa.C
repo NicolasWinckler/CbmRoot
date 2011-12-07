@@ -1,39 +1,23 @@
-/** global_reco_qa.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- * Macro runs CbmLitReconstructionQa class.
+/**
+ * \file global_reco_qa.C
+ * \brief Macro runs CbmLitTrackingQa class.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void global_reco_qa(Int_t nEvents = 500)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
-
-    	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
-	if (script != "yes") {
-		// Output directory
-		dir  = "/data.local1/andrey/events/std_electron/";
-		//Output directory for images
-		imageDir = "./sts_qa/4conspoints/";
-		// MC transport file
-		mcFile = dir + "mc.0000.root";
-		// Parameter file
-		parFile = dir + "param.0000.root";
-		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.0000.root";
-		// File with global tracks
-		globalTracksFile = dir + "global.tracks.0000.root";
-		// Output file with histograms
-      recoQaFile = dir + "reco.qa.4conspoints.0000.root";
-	} else {
-//		mcFile = TString(gSystem->Getenv("MCFILE"));
-//		parFile = TString(gSystem->Getenv("PARFILE"));
-		//globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
-		//globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
-//      recoFile = TString(gSystem->Getenv("RECOFILE"));
-//		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
-//      recoQaFile = TString(gSystem->Getenv("RECOQAFILE"));
-	}
+	TString dir  = "/data.local1/andrey/events/std_electron/"; // Output directory
+	TString resultDir = "./sts_qa/4conspoints/"; //Output directory for results
+	TString mcFile = dir + "mc.0000.root"; // MC transport file
+	TString parFile = dir + "param.0000.root"; // Parameter file
+   TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed event
+   TString globalTracksFile = dir + "global.tracks.0000.root"; // File with global tracks
+	TString recoQaFile = dir + "reco.qa.4conspoints.0000.root"; // Output file with histograms
 
 	TStopwatch timer;
 	timer.Start();
@@ -43,13 +27,11 @@ void global_reco_qa(Int_t nEvents = 500)
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->AddFriend(globalHitsFile);
 	run->AddFriend(globalTracksFile);
-//	run->AddFriend(recoFile);
 	run->SetOutputFile(recoQaFile);
 	// ------------------------------------------------------------------------
 
@@ -59,22 +41,20 @@ void global_reco_qa(Int_t nEvents = 500)
 	run->AddTask(l1);
 
 	// -----   Track finding QA check   ------------------------------------
-   CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-   reconstructionQa->SetUseConsecutivePointsInSts(true);
-   reconstructionQa->SetMinNofPointsSts(4);
-   reconstructionQa->SetMinNofPointsTrd(8);
-   reconstructionQa->SetMinNofPointsMuch(10);
-   reconstructionQa->SetMinNofPointsTof(1);
-   reconstructionQa->SetQuota(0.7);
-   reconstructionQa->SetMinNofHitsTrd(8);
-   reconstructionQa->SetMinNofHitsMuch(10);
-   reconstructionQa->SetVerbose(0);
-   reconstructionQa->SetMomentumRange(0, 12);
-   reconstructionQa->SetNofBinsMom(12);
-   reconstructionQa->SetMinNofHitsRich(7);
-   reconstructionQa->SetQuotaRich(0.6);
-   reconstructionQa->SetOutputDir(std::string(imageDir));
-   run->AddTask(reconstructionQa);
+   CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+   trackingQa->SetUseConsecutivePointsInSts(true);
+   trackingQa->SetMinNofPointsSts(4);
+   trackingQa->SetMinNofPointsTrd(8);
+   trackingQa->SetMinNofPointsMuch(10);
+   trackingQa->SetMinNofPointsTof(1);
+   trackingQa->SetQuota(0.7);
+   trackingQa->SetMinNofHitsTrd(8);
+   trackingQa->SetMinNofHitsMuch(10);
+   trackingQa->SetVerbose(0);
+   trackingQa->SetMinNofHitsRich(7);
+   trackingQa->SetQuotaRich(0.6);
+   trackingQa->SetOutputDir(std::string(resultDir));
+   run->AddTask(trackingQa);
 	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

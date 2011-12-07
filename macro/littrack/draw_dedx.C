@@ -1,22 +1,17 @@
-/** draw_dedx.C
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- *
- * Macro draws energy losses.
+/**
+ * \file draw_dedx.C
+ * \brief Macro draws energy losses.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  **/
 
 void draw_dedx() {
-	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
-
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	CbmLitCheckEnergyLoss checker;
+	CbmLitCheckEnergyLossMuons checker;
 	checker.SetMaterial("iron");
 	checker.Check();
 

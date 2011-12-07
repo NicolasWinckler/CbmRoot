@@ -13,6 +13,9 @@
 #include "qa/tracking/CbmLitTrackingQaHistCreator.h"
 #include "qa/tracking/CbmLitTrackingQaDraw.h"
 #include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
+#include "qa/mc/CbmLitMCPoint.h"
+#include "qa/mc/CbmLitMCTrack.h"
+#include "qa/mc/CbmLitMCTrackCreator.h"
 
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitUtils.h"
@@ -44,6 +47,7 @@
 #include "CbmStsPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmMuchPoint.h"
+#include "fitter/CbmRichRingFitterEllipseTau.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -162,8 +166,10 @@ InitStatus CbmLitTrackingQaImpl::Init()
    if (fIsElectronSetup) {
       fElectronId = new CbmLitGlobalElectronId();
       fElectronId->Init();
+      fRichEllipseFitter = new CbmRichRingFitterEllipseTau();
+      fRichEllipseFitter->Init();
    }
-
+   fMCTrackCreator = CbmLitMCTrackCreator::Instance();
    return kSUCCESS;
 }
 
@@ -174,6 +180,7 @@ void CbmLitTrackingQaImpl::Exec(
    H1("hEventNo")->Fill(0.5);
    std::cout << "Event: " << H1("hEventNo")->GetEntries() << std::endl;
 
+   fMCTrackCreator->Create();
    FillNofCrossedStationsHistos();
    FillRichRingNofHits();
    ProcessHits();
@@ -1009,15 +1016,35 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
 
       // acceptance: RICH
       if (isRichOk) {
-    	  // p-y-pt dependence histograms
-    	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRich3D");
-    	  // number of hits dependence histograms
-    	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichNh", fNofHitsInRingMap[iMCTrack]);
+         // p-y-pt dependence histograms
+    	   FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRich3D");
+    	   // number of hits dependence histograms
+    	   FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichNh", fNofHitsInRingMap[iMCTrack]);
+
+    	   if (fMCTrackCreator->TrackExists(iMCTrack)){
+            const CbmLitMCTrack& track = fMCTrackCreator->GetTrack(iMCTrack);
+            Int_t nofPointsRich = track.GetNofPoints(kRICH);
+            const vector<CbmLitMCPoint>& richPoints = track.GetPoints(kRICH);
+            vector<Double_t> xRich, yRich;
+            for (Int_t i = 0 ; i < nofPointsRich; i++){
+               xRich.push_back(richPoints[i].GetX());
+               yRich.push_back(richPoints[i].GetY());
+            }
+            CbmRichRing* ring = new CbmRichRing();
+            fRichEllipseFitter->DoFit1(ring, xRich, yRich);
+            // B/A dependence histograms
+            Double_t boa = ring->GetBaxis()/ring->GetAaxis();
+            FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichBoA", boa);
+            // radial position dependence histograms
+            Double_t radPos = ring->GetRadialPosition();
+            FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichRadPos", radPos);
+            if (ring != NULL) delete ring;
+    	   }
       }
       // acceptance: STS+RICH
       if (isStsOk && isRichOk) {
     	  // STS
-          FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsMap, "hSts3DNormStsRich");
+        FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsMap, "hSts3DNormStsRich");
     	  // STS+RICH
     	  FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichMap, "hStsRich3D");
 
@@ -1031,7 +1058,7 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
       }
       // acceptance: STS+RICH+TRD
       if (isStsOk && isRichOk && isTrdOk) {
-    	 // STS
+    	   // STS
          FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsMap, "hSts3DNormStsRichTrd");
          // STS+RICH
          FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichMap, "hStsRich3DNormStsRichTrd");
@@ -1057,13 +1084,13 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
          FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcStsRichTrdTofMap, "hStsRichTrdTof3D");
 
          // STS+RICH: Electron identification
-          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichMap, "hStsRich3DElIdNormStsRichTrdTof_ElId", "rich");
-          // STS+RICH+TRD: Electron identification
-          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichTrdMap, "hStsRichTrd3DElIdNormStsRichTrdTof_ElId", "rich+trd");
-          // STS+RICH+TRD+TOF: Electron identification
-          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichTrdTofMap, "hStsRichTrdTof3DElId_ElId", "rich+trd+tof");
+         FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichMap, "hStsRich3DElIdNormStsRichTrdTof_ElId", "rich");
+         // STS+RICH+TRD: Electron identification
+         FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichTrdMap, "hStsRichTrd3DElIdNormStsRichTrdTof_ElId", "rich+trd");
+         // STS+RICH+TRD+TOF: Electron identification
+         FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichTrdTofMap, "hStsRichTrdTof3DElId_ElId", "rich+trd+tof");
 
-          if (isPrimElectron) H3("hStsRichTrdTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) H3("hStsRichTrdTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
    } // Loop over MCTracks
 }
@@ -1505,6 +1532,8 @@ void CbmLitTrackingQaImpl::CalculateEfficiencyHistos()
    // RICH performance
    DivideHistos("hRich3D", kRich, true);
    DivideHistos("hRichNh", kRich);
+   DivideHistos("hRichBoA", kRich);
+   DivideHistos("hRichRadPos", kRich);
    DivideHistos("hSts3DNormStsRich", kRich, true);
    DivideHistos("hStsRich3D", kRich, true);
    DivideHistos("hStsRichNoMatching3D", kRich, true);

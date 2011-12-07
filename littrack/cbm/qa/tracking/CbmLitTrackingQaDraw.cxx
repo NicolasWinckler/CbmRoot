@@ -117,6 +117,14 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
       DrawEfficiency("rec_qa_rich_efficiency_vs_nofhits_electrons", "hRichNh_El",
          "", "", "", "RICH: electrons", "", "", "", "");
 
+      // Draw efficiency vs. B/A for ellipse fitting for RICH for electron set
+      DrawEfficiency("rec_qa_rich_efficiency_vs_boa_electrons", "hRichBoA_El",
+         "", "", "", "RICH: electrons", "", "", "", "");
+
+      // Draw efficiency vs. radial position of the ring for RICH for electron set
+      DrawEfficiency("rec_qa_rich_efficiency_vs_radial_position_electrons", "hRichRadPos_El",
+         "", "", "", "RICH: electrons", "", "", "", "");
+
       // Draw efficiency for STS+RICH for electron set
       DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", "hSts3DNormStsRichpx_El",
          "hStsRich3Dpx_El", "", "", "STS", "STS+RICH", "", "", "");

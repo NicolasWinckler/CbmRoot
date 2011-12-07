@@ -137,6 +137,8 @@ void CbmLitTrackingQaHistCreator::Create(
 
    CreateEffHist3D("hRich3D", kRich);
    CreateEffHist("hRichNh", "Number of hits", nBinsNofPoints, minNofPoints, maxNofPoints, kRich);
+   CreateEffHist("hRichBoA", "B/A", 50, 0.0, 1.0, kRich);
+   CreateEffHist("hRichRadPos", "Radial position [cm]", 50, 0., 150., kRich);
 
    CreateEffHist3D("hSts3DNormStsRich", kRich);
    CreateEffHist3D("hStsRich3D", kRich);

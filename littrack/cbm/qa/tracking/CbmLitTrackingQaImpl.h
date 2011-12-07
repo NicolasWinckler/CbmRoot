@@ -20,6 +20,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include "CbmLitTrackingQaHistNames.h"
 
+
 class CbmTrackMatch;
 class CbmRichRingMatch;
 class CbmVertex;
@@ -32,7 +33,8 @@ class TH3F;
 class TH1F;
 class CbmLitGlobalElectronId;
 class CbmLitHistManager;
-
+class CbmRichRingFitterEllipseTau;
+class CbmLitMCTrackCreator;
 using namespace std;
 
 /**
@@ -619,7 +621,9 @@ private:
    CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
+   CbmRichRingFitterEllipseTau* fRichEllipseFitter; // ellipse fitter
 
+   CbmLitMCTrackCreator* fMCTrackCreator;
    CbmLitHistManager* fHM; // histogram manager
 };
 

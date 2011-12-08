@@ -61,6 +61,7 @@ tracking/CbmMuchTrackFinderIdeal.cxx
 set(MUCH_SRCS
     ${MUCHRULECHECKER_SRCS}
     geo/CbmMuchModuleGem.cxx
+    geo/CbmMuchModuleSector.cxx
    )
 
 if(RULE_CHECKER_FOUND)

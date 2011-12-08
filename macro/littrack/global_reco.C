@@ -62,7 +62,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 
 		resultDir = TString(gSystem->Getenv("RESULTDIR"));
 
-		globalTrackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
+		globalTrackingType = TString(gSystem->Getenv("GLOBALTRACKINGTYPE"));
 		stsHitProducerType = TString(gSystem->Getenv("STSHITPRODUCERTYPE"));
 		trdHitProducerType = TString(gSystem->Getenv("TRDHITPRODUCERTYPE"));
 		muchHitProducerType = TString(gSystem->Getenv("MUCHHITPRODUCERTYPE"));

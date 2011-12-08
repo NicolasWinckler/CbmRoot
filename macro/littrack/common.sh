@@ -1,58 +1,28 @@
 #!/bin/sh
 
-# Default initialisation
-function default_init() {
-    #Macro will be running via script
-    export SCRIPT=yes
-    
-    #Prefix for output directory
-    export DIRPREFIX=/d/cbm02/andrey/test
-    
-    #Prefix for output directory
-    export IMAGEDIRPREFIX=/d/cbm02/andrey/test
-    
-    #Prefix for input UrQMD file
-    export INFILEPREFIX=/d/cbm03/urqmd
-    
-    #Build directory of CBMROOT
-    export MYBUILDDIR=/u/andrey/cbm/trunk/build_lxir039/
-    
-    cd $MYBUILDDIR
-    . ./config.sh
-    cd -
-}
-
-
-
 # Function sets simulation parameters
 function set_simulation_parameters() {
     pars=$1
-    # number of embedded muons
+    # number of embedded muons from FairBoxGenerator
     export NMUONSPLUS=${pars[0]}
-    # number of embedded muons
+    # number of embedded muons from FairBoxGenerator
     export NMUONSMINUS=${pars[1]}
-    # number of embedded electrons
+    # number of embedded electrons from FairBoxGenerator
     export NELECTRONS=${pars[2]}
-    # number of embedded positrons
+    # number of embedded positrons from FairBoxGenerator
     export NPOSITRONS=${pars[3]}
-    # number of embedded pions
+    # number of embedded pions from FairBoxGenerator
     export NPIONSPLUS=${pars[4]}
-    # number of embedded pions
+    # number of embedded pions from FairBoxGenerator
     export NPIONSMINUS=${pars[5]}
-    # number of embedded particles from pluto. MAX = 10.
-    export NPLUTO=${pars[6]}
+    # number of embedded J/Psi decayed to mu+ and mu- 
+    export NJPSITOMUONS=${pars[6]}
+    # number of embedded J/Psi decayed to e+ and e- 
+    export NJPSITOELECTRONS=${pars[7]}
     # If "yes" than UrQMD will be used as background
-    export URQMD=${pars[7]}
-    # If "yes" than primary muons will be generated
-    export MUONS=${pars[8]}
-    # If "yes" than primary electrons will be generated
-    export ELECTRONS=${pars[9]}
-    # If "yes" than primary pions will be generated
-    export PIONS=${pars[10]}
-    # If "yes" PLUTO particles will be embedded
-    export PLUTO=${pars[11]}
-    # If "yes" than CbmUnigenGenerator willbe useed instead of FairUrqmdGenerator
-    export USEUNIGEN=${pars[12]}
+    export URQMD=${pars[8]}
+    # If "yes" than CbmUnigenGenerator will be useed instead of FairUrqmdGenerator
+    export UNIGEN=${pars[9]}
 }
 
 
@@ -70,13 +40,6 @@ function set_default_file_names() {
     export PROPANAFILE=$DIR/propagation.ana.$XXXX.root
     export RICHFILE=$DIR/rich.reco.$XXXX.root
     export ELIDFILE=$DIR/elid.qa.$XXXX.root
-  
-    COUNT=0
-    while [ $COUNT -lt $NPLUTO ]; do
-        echo PLUTO FILE COUNT IS: $COUNT
-        export PLUTOFILE$COUNT=/home/d/andrey/pluto/Jpsi.000$COUNT.root
-        let COUNT=COUNT+1    
-    done 
 }
 
 
@@ -94,17 +57,11 @@ function set_default_muon_geometry() {
     export MUCHDIGI=$VMCWORKDIR/parameters/much/much_v11a.digi.root
     export RICHGEOM=
     export TRDGEOM=
-#trd_muon_setup_new.geo
     export TRDDIGI=
     export TOFGEOM=tof/tof_v07a.geo
     export ECALGEOM=
     export FIELDMAP=field_v10e
     export MAGNETGEOM=passive/magnet_v09m.geo
-    
-    export NOFTRDHITS=0
-    export NOFMUCHHITS=13
-    export NOFTOFHITS=1
-    export PDG=13
     
     export NORMSTSPOINTS=4
     export NORMTRDPOINTS=0
@@ -113,10 +70,6 @@ function set_default_muon_geometry() {
     export NORMTRDHITS=0
     export NORMMUCHHITS=15
     export NORMTOFHITS=1
-    
-    export MOMMIN=0
-    export MOMMAX=12
-    export MOMBINS=12
 }
 
 
@@ -140,11 +93,6 @@ function set_default_electron_geometry() {
     export FIELDMAP=field_v10e
     export MAGNETGEOM=passive/magnet_v09e.geo
     
-    export NOFTRDHITS=12
-    export NOFMUCHHITS=0
-    export NOFTOFHITS=1
-    export PDG=11
-    
     export NORMSTSPOINTS=4
     export NORMTRDPOINTS=8
     export NORMMUCHPOINTS=0
@@ -152,10 +100,6 @@ function set_default_electron_geometry() {
     export NORMTRDHITS=8
     export NORMMUCHHITS=0
     export NORMTOFHITS=1
-    
-    export MOMMIN=0
-    export MOMMAX=12
-    export MOMBINS=12
 }
 
 
@@ -164,17 +108,17 @@ function set_default_electron_geometry() {
 function create_output_dir()
 {
     export DIR=$1
-    rm -r $DIR
+    rm -r -f $DIR
     mkdir $DIR
 }
 
 
 
-# Function exports and creates output directories for IMAGEDIR
-function create_image_dir()
+# Function exports and creates output directories for RESULTDIR
+function create_result_dir()
 {
-    export IMAGEDIR=$1
-    rm -r $IMAGEDIR
-    mkdir $IMAGEDIR
+    export RESULTDIR=$1
+    rm -r -f $RESULTDIR
+    mkdir $RESULTDIR
 }
 

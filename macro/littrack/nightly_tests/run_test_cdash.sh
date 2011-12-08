@@ -67,5 +67,3 @@ study_summary electron
 chmod -R u+rwX,g+rx,o+rx /u/andrey/web-docs/tests/$DAY/
 
 export SCRIPT=no
-
-

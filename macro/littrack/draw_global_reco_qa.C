@@ -17,14 +17,14 @@ void draw_global_reco_qa()
 	std::string fileName = "/data.local1/andrey/sts_qa/sts4_events_electron/global.tracks.0000.root";
 	std::string imageDir = "/data.local1/andrey/sts_qa/sts4_results_electron/";
 
-	CbmLitTrackingQa* reconstructionQa = new CbmLitTrackingQa();
-	reconstructionQa->SetOutputDir(imageDir);
-	reconstructionQa->SetIsElectronSetup(true);
-	reconstructionQa->SetDetectorPresence(kMVD, false);
-	reconstructionQa->SetDetectorPresence(kSTS, true);
-	reconstructionQa->SetDetectorPresence(kRICH, true);
-	reconstructionQa->SetDetectorPresence(kTRD, true);
-	reconstructionQa->SetDetectorPresence(kMUCH, false);
-	reconstructionQa->SetDetectorPresence(kTOF, true);
-	reconstructionQa->DrawHistosFromFile(fileName);
+	CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+	trackingQa->SetOutputDir(imageDir);
+	trackingQa->SetIsElectronSetup(true);
+	trackingQa->SetDetectorPresence(kMVD, false);
+	trackingQa->SetDetectorPresence(kSTS, true);
+	trackingQa->SetDetectorPresence(kRICH, true);
+	trackingQa->SetDetectorPresence(kTRD, true);
+	trackingQa->SetDetectorPresence(kMUCH, false);
+	trackingQa->SetDetectorPresence(kTOF, true);
+	trackingQa->DrawHistosFromFile(fileName);
 }

@@ -8,6 +8,7 @@
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchModuleStraws.h"
+#include "CbmMuchModuleSector.h"
 #include "TObjArray.h"
 #include "TFile.h"
 #include "TMath.h"
@@ -46,6 +47,13 @@ CbmMuchGeoScheme::CbmMuchGeoScheme() {
   fLayersDz.Set(0); // Distance between layers [cm]
   fSupportLz.Set(0); // Support thickness [cm]
   fModuleDesign.Set(0); // Support thickness [cm]
+  // Sector-type module parameters
+  fNSectorsPerLayer.Set(0); // Number of sectors per layer
+  fActiveLzSector=0;        // Active volume thickness
+  fSpacerR=0;               // Spacer width in R
+  fSpacerPhi=0;             // Spacer width in Phi
+  fOverlapR=0;              // Overlap in R direction
+
   fAbsorbers = new TObjArray();
   Info("CbmMuchGeoScheme", "CbmMuchGeoScheme created");
 }
@@ -347,7 +355,7 @@ void CbmMuchGeoScheme::ReadGeoFile(const char* geoName) {
   fLayersDz.Set(fNst); // Distance between layers [cm]
   fSupportLz.Set(fNst); // Support thickness [cm]
   fModuleDesign.Set(fNst); // Module design (0/1)
-
+  fNSectorsPerLayer.Set(fNst); // Number of sectors per layer in sector GEM geometry
   geo.getline(b, 200);
 
   // # Absorber specification
@@ -424,8 +432,28 @@ void CbmMuchGeoScheme::ReadGeoFile(const char* geoName) {
   geo.get(b, 30);
   geo >> fStrawLz;
   geo.getline(b, 200);
-  geo.close();
 
+  geo.getline(b, 200);
+
+  // # Sector-type GEM module specification
+  geo.getline(b, 200);
+  geo.get(b, 30);
+  for (i = 0; i < fNst; i++)  geo >> fNSectorsPerLayer[i];
+  geo.getline(b, 200);
+  geo.get(b, 30);
+  geo >> fActiveLzSector;
+  geo.getline(b, 200);
+  geo.get(b, 30);
+  geo >> fSpacerR;
+  geo.getline(b, 200);
+  geo.get(b, 30);
+  geo >> fSpacerPhi;
+  geo.getline(b, 200);
+  geo.get(b, 30);
+  geo >> fOverlapR;
+  geo.getline(b, 200);
+
+  geo.close();
 }
 // -------------------------------------------------------------------------
 
@@ -495,6 +523,18 @@ void CbmMuchGeoScheme::Print() {
   printf("\n");
   printf("Straw module specification:\n");
   printf("  Straw thickness [cm]        :%7.1f\n", fStrawLz);
+
+  printf("\n");
+  printf("Sector-type GEM module specification (type 3):\n");
+  printf("  Number of sectors/layer     :");
+  for (i = 0; i < fNst; i++)
+    printf("%7i", fNSectorsPerLayer[i]);
+  printf("\n");
+  printf("  Active volume lz [cm]       :%7.1f\n", fActiveLzSector);
+  printf("  Spacer in r [cm]            :%7.1f\n", fSpacerR);
+  printf("  Spacer in phi [cm]          :%7.1f\n", fSpacerPhi);
+  printf("  Overlap in r [cm]           :%7.1f\n", fOverlapR);
+  printf("\n");
 }
 // -------------------------------------------------------------------------
 
@@ -559,6 +599,9 @@ void CbmMuchGeoScheme::CreateStations() {
       case 2:
         station = CreateStationStraw(st);
         break;
+      case 3:
+        station = CreateStationGem(st);
+        break;
       default:
         Fatal("CbmMuchGeoScheme", "Detector type %i not defined",fDetType[st]);
     }
@@ -576,6 +619,7 @@ void CbmMuchGeoScheme::CreateStations() {
 
 // -------------------------------------------------------------------------
 CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
+  
   Double_t stGlobalZ0 = fStationZ0[st] + fMuchZ1;
   Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st] + 2
       * fActiveLz) / 2.;
@@ -600,39 +644,66 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
     Double_t moduleZ = sideDz; // Z position of the module center in the layer cs
     if (fModuleDesign[st]) {
       // Create modules
-      Double_t moduleDx = fSpacerLx + fActiveLx / 2.; // half-width of the module including spacers
-      Double_t moduleDy = fSpacerLy + fActiveLy / 2.; // half-length of the module including spacers
-      Int_t nx = Int_t(TMath::Ceil(rmax / 2. / moduleDx)); // half-number of modules along the X direction
-      Int_t ny = Int_t(TMath::Ceil(rmax / (fActiveLy - fOverlapY))); // half-number of modules along the Y direction
-      for (Int_t ix = 1; ix <= nx; ++ix) {
-        Double_t moduleX = moduleDx * (2 * ix - 1);
-        for (Int_t iy = -ny; iy < ny; ++iy) {
-          moduleZ *= -1;
-          Bool_t isBack = (moduleZ > 0);
+      if (fDetType[st]==3){ // start sector modules
+        Double_t phi0 = TMath::Pi()/fNSectorsPerLayer[st];
+        Double_t ymin = rmin;
+        Double_t ymax = rmax;
+        Double_t dy  = (ymax-ymin)/2.;
+        Double_t dx1 = ymin*TMath::Tan(phi0)+fOverlapR/TMath::Cos(phi0); 
+        Double_t dx2 = ymax*TMath::Tan(phi0)+fOverlapR/TMath::Cos(phi0); 
+        Double_t dz  = fActiveLzSector/2.;
+        TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
+        TVector3 pos;
+        
+        for (Int_t iModule=0;iModule<fNSectorsPerLayer[st];iModule++){
+          Double_t phi = 2*phi0*iModule;
+          Bool_t isBack = iModule%2; 
+          pos[0] = (ymin+dy)*cos(phi);
+          pos[1] = (ymin+dy)*sin(phi);
+          pos[2] = (isBack ? 1 : -1)*moduleZ + layerGlobalZ0;
           CbmMuchLayerSide* side = layer->GetSide(isBack);
-          Double_t moduleY = (fActiveLy - fOverlapY) * (iy + 1. / 2.);
+          side->AddModule(new CbmMuchModuleSector(st, l, 0, side->GetNModules(), pos,size,dx1,dx2,dy,dz,rmin));
+        }
+        // Set support shape
+        layer->SetSupportDx(sqrt(rmax*rmax+dx2*dx2));
+        layer->SetSupportDy(sqrt(rmax*rmax+dx2*dx2));
+        layer->SetSupportDz(fSupportLz[st] / 2.);
 
-          Int_t intersect = Intersect(moduleX, moduleY, moduleDx, moduleDy, rmin);
-          if (intersect == 2)
-            continue;
-          Double_t rHole = (intersect == 1) ? rmin : -1;
-          // Skip module if not in the acceptance
-          if (!Intersect(moduleX, moduleY, fActiveLx / 2., fActiveLy / 2., rmax))
-            continue;
-          // Create modules with positive and negative x
-          for(Int_t i=0; i<2; ++i){
-            TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
-            TVector3 pos = TVector3(TMath::Power(-1, i)*moduleX, moduleY, moduleZ + layerGlobalZ0);
-            side->AddModule(new CbmMuchModuleGem(st, l, isBack, side->GetNModules(), pos, size,
-                rHole));
-          }
-        } // mY
-      } // mX
-      // Set support shape
-      layer->SetSupportDx(nx * (fActiveLx + 2. * fSpacerLx));
-      layer->SetSupportDy((2 * ny + 1) * (fActiveLy - fOverlapY) / 2.
-          + fOverlapY / 2. + fSpacerLy);
-      layer->SetSupportDz(fSupportLz[st] / 2.);
+      } else { // start rectangular modules
+        Double_t moduleDx = fSpacerLx + fActiveLx / 2.; // half-width of the module including spacers
+        Double_t moduleDy = fSpacerLy + fActiveLy / 2.; // half-length of the module including spacers
+        Int_t nx = Int_t(TMath::Ceil(rmax / 2. / moduleDx)); // half-number of modules along the X direction
+        Int_t ny = Int_t(TMath::Ceil(rmax / (fActiveLy - fOverlapY))); // half-number of modules along the Y direction
+        for (Int_t ix = 1; ix <= nx; ++ix) {
+          Double_t moduleX = moduleDx * (2 * ix - 1);
+          for (Int_t iy = -ny; iy < ny; ++iy) {
+            moduleZ *= -1;
+            Bool_t isBack = (moduleZ > 0);
+            CbmMuchLayerSide* side = layer->GetSide(isBack);
+            Double_t moduleY = (fActiveLy - fOverlapY) * (iy + 1. / 2.);
+
+            Int_t intersect = Intersect(moduleX, moduleY, moduleDx, moduleDy, rmin);
+            if (intersect == 2)
+              continue;
+            Double_t rHole = (intersect == 1) ? rmin : -1;
+            // Skip module if not in the acceptance
+            if (!Intersect(moduleX, moduleY, fActiveLx / 2., fActiveLy / 2., rmax))
+              continue;
+            // Create modules with positive and negative x
+            for(Int_t i=0; i<2; ++i){
+              TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
+              TVector3 pos = TVector3(TMath::Power(-1, i)*moduleX, moduleY, moduleZ + layerGlobalZ0);
+              side->AddModule(new CbmMuchModuleGem(st, l, isBack, side->GetNModules(), pos, size,
+                  rHole));
+            }
+          } // mY
+        } // mX
+        // Set support shape
+        layer->SetSupportDx(nx * (fActiveLx + 2. * fSpacerLx));
+        layer->SetSupportDy((2 * ny + 1) * (fActiveLy - fOverlapY) / 2.
+            + fOverlapY / 2. + fSpacerLy);
+        layer->SetSupportDz(fSupportLz[st] / 2.);
+      } // end rectangular modules
     } else {
       TVector3 size = TVector3(2 * rmax, 2 * rmax, fActiveLz);
       TVector3 pos = TVector3(0, 0, layerGlobalZ0 - moduleZ);

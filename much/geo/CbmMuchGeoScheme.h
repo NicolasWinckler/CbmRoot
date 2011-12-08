@@ -230,6 +230,13 @@ class CbmMuchGeoScheme: public TObject {
     // Straw module parameters
     Double_t fStrawLz;
 
+    // Sector-type module parameters
+    TArrayI fNSectorsPerLayer; // Number of sectors per layer
+    Double_t fActiveLzSector;  // Active volume thickness [cm]
+    Double_t fSpacerR;         // Spacer width in R [cm]
+    Double_t fSpacerPhi;       // Spacer width in Phi [cm]
+    Double_t fOverlapR;        // Overlap in R direction [cm]
+
     TArrayD fAbsorberZ1; // Absorber Zin position [cm] in the cave reference frame
     TArrayD fAbsorberLz; // Absorber thickness [cm]
     TArrayC fAbsorberMat; // Absorber material

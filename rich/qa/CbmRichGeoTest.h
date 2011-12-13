@@ -135,6 +135,10 @@ private:
     */
    void HitsAndPoints();
 
+   /**
+    * \brief Create histogram: RICH detector acceptance vs.
+    * minimum required number of hits in ring
+    */
 	TH1D* CreateAccVsMinNofHitsHist();
 
    /**
@@ -142,13 +146,20 @@ private:
     */
 	void DrawHist();
 
+	/**
+	 * \brief Draw ring in separate TCanvas.
+	 * \param[in] ring Ring to be drawn.
+	 * \param[in] x MCPoints X coordinates.
+	 * \param[in] y MCPoints Y coordinates.
+	 */
 	void DrawRing(
 	      CbmRichRing* ring,
 	      const vector<Double_t>& x,
 	      const vector<Double_t>& y);
 
-
-
+   /**
+    * \brief Print out final results.
+    */
 	void PrintStatisctics();
 
 	TClonesArray* fRichHits;
@@ -169,7 +180,7 @@ private:
 	CbmRichRingFitterEllipseTau* fTauFit;
 
 	Int_t fEventNum;
-	Int_t fMinNofHits;
+	Int_t fMinNofHits; // Min number of hits in ring for detector acceptance calculation.
 
    // fitting parameters
 	// [0] = hits fit, [1] = MC points fit
@@ -184,6 +195,11 @@ private:
 	vector<TH2D*> fhXcYcCircle; // (Xc, Yc) of circle center
 	vector<TH2D*> fhRadiusVsMom; // circle radius vs. MC momentum
    vector<TH1D*> fhChi2Circle; // chi2
+
+   // R, A, B distribution for different number of hits from 0 to 40
+   TH2D* fhRadiusVsNofHits;
+   TH2D* fhAaxisVsNofHits;
+   TH2D* fhBaxisVsNofHits;
 
 	// Difference between MC Points and Hits fit
    // for ellipse fitting parameters

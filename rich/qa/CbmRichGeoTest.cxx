@@ -105,6 +105,11 @@ CbmRichGeoTest::CbmRichGeoTest()
    fhDiffRadius = new TH2D("fhDiffRadius", "fhDiffRadius;Nof hits in ring;Radius_{point}-Radius_{hit} [cm];Counter", 40, 0., 40., 100, -1.5, 1.5);
    fHists.push_back(fhDiffRadius);
 
+   // R, A, B distribution for different number of hits from 0 to 40
+   fhRadiusVsNofHits = new TH2D("fhRadiusVsNofHits", "fhRadiusVsNofHits;Nof hits in ring;Radius [cm];Counter", 40, 0., 40., 200, 0., 20.);
+   fhAaxisVsNofHits = new TH2D("fhAaxisVsNofHits", "fhAaxisVsNofHits;Nof hits in ring;A axis [cm];Counter", 40, 0., 40., 200, 0., 20.);
+   fhBaxisVsNofHits = new TH2D("fhBaxisVsNofHits", "fhBaxisVsNofHits;Nof hits in ring;B axis [cm];Counter", 40, 0., 40., 200, 0., 20.);
+
    // Hits and points
    fhDiffXhit = new TH1D("fhDiffXhit", "fhDiffXhit;Y_{point}-Y_{hit} [cm];Counter", 200, -1., 1.);
    fHists.push_back(fhDiffXhit);
@@ -337,6 +342,10 @@ void CbmRichGeoTest::FitAndFillHistEllipse(
    fhBaxisVsMom[histIndex]->Fill(momentum, axisB);
    fhAaxisVsMom[histIndex]->Fill(momentum, axisA);
    fhChi2Ellipse[histIndex]->Fill(ring->GetChi2()/ring->GetNDF());
+   if (histIndex == 0){ // only hit fit
+      fhAaxisVsNofHits->Fill(nofHitsRing, axisA);
+      fhBaxisVsNofHits->Fill(nofHitsRing, axisB);
+   }
 }
 
 void CbmRichGeoTest::FitAndFillHistCircle(
@@ -351,9 +360,13 @@ void CbmRichGeoTest::FitAndFillHistCircle(
    Double_t radius = ring->GetRadius();
    Double_t xcCircle = ring->GetCenterX();
    Double_t ycCircle = ring->GetCenterY();
+   Int_t nofHitsRing = ring->GetNofHits();
    fhXcYcCircle[histIndex]->Fill(xcCircle, ycCircle);
    fhRadiusVsMom[histIndex]->Fill(momentum, radius);
    fhChi2Circle[histIndex]->Fill(ring->GetChi2()/ring->GetNDF());
+   if (histIndex == 0){ // only hit fit
+      fhRadiusVsNofHits->Fill(nofHitsRing, radius);
+   }
 }
 
 void CbmRichGeoTest::FillMcVsHitFitEllipse(
@@ -637,6 +650,44 @@ void CbmRichGeoTest::DrawHist()
    TCanvas *cAccVsMinNofHits = new TCanvas("rich_geo_acc_vs_min_nof_hits", "rich_geo_acc_vs_min_nof_hits", 600, 600);
    TH1D* h = CreateAccVsMinNofHitsHist();
    DrawHist1D(h);
+
+   TCanvas *cRABvsNofHits = new TCanvas("rich_geo_rab_vs_nof_hits", "rich_geo_rab_vs_nof_hits", 900, 300);
+   cRABvsNofHits->Divide(3, 1);
+   cRABvsNofHits->cd(1);
+   DrawHist2D(fhRadiusVsNofHits);
+   cRABvsNofHits->cd(2);
+   DrawHist2D(fhAaxisVsNofHits);
+   cRABvsNofHits->cd(3);
+   DrawHist2D(fhBaxisVsNofHits);
+
+   stringstream ss;
+   TH1D* prRMean = fhRadiusVsNofHits->ProjectionX("fhRadiusVsNofHits_mean");
+   TH1D* prRRms = fhRadiusVsNofHits->ProjectionX("fhRadiusVsNofHits_rms");
+   TH1D* prAMean = fhAaxisVsNofHits->ProjectionX("fhAaxisVsNofHits_mean");
+   TH1D* prARms = fhAaxisVsNofHits->ProjectionX("fhAaxisVsNofHits_rms");
+   TH1D* prBMean = fhBaxisVsNofHits->ProjectionX("fhBaxisVsNofHits_mean");
+   TH1D* prBRms = fhBaxisVsNofHits->ProjectionX("fhBaxisVsNofHits_rms");
+   for (Int_t i = 1; i <= fhRadiusVsNofHits->GetXaxis()->GetNbins(); i++){
+      ss << "_py" << i;
+      TH1D* pr = fhRadiusVsNofHits->ProjectionY(ss.str().c_str(), i, i);
+      prRMean->SetBinContent(i, pr->GetMean());
+      prRRms->SetBinContent(i, pr->GetRMS());
+      pr = fhAaxisVsNofHits->ProjectionY(ss.str().c_str(), i, i);
+      prAMean->SetBinContent(i, pr->GetMean());
+      prARms->SetBinContent(i, pr->GetRMS());
+      pr = fhBaxisVsNofHits->ProjectionY(ss.str().c_str(), i, i);
+      prBMean->SetBinContent(i, pr->GetMean());
+      prBRms->SetBinContent(i, pr->GetRMS());
+   }
+   TCanvas *cRABMeanRmsvsNofHits = new TCanvas("rich_geo_rab_mean_rms_vs_nof_hits", "rich_geo_rab_mean_rms_vs_nof_hits", 900, 450);
+   cRABMeanRmsvsNofHits->Divide(2, 1);
+   cRABMeanRmsvsNofHits->cd(1);
+   DrawHist1D( prRMean, prAMean, prBMean, NULL,
+         "R", "A", "B", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   cRABMeanRmsvsNofHits->cd(2);
+   DrawHist1D( prRRms, prARms, prBRms, NULL,
+         "R", "A", "B", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+
 }
 
 void CbmRichGeoTest::PrintStatisctics()

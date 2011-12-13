@@ -6,7 +6,7 @@ export SCRIPT=yes
 
 create_output_dir events_muon/
 
-export NEVENTS=2
+export NEVENTS=500
 export DETECTORSETUP=muon
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN

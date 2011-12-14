@@ -341,6 +341,7 @@ void CbmRichRingFitterEllipseTau::TransEllipse(CbmRichRing *pRing)
 	Double_t centerY = -xc * sina / 2. - yc * cosa / 2.;
 
 	pRing->SetXYABPhi(centerX, centerY, axisA, axisB, alpha);
+	pRing->SetRadius( (axisA + axisB) / 2.);
 
 	if (pRing->GetAaxis() < pRing->GetBaxis()) {
 

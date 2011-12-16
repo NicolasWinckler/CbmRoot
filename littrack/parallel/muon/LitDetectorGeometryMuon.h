@@ -426,7 +426,7 @@ public:
 
    /* Operator << for convenient output to std::ostream */
    friend std::ostream& operator<<(std::ostream& strm, const LitStationGroupMuon& stationGroup) {
-      strm << stationGroup.ToSting();
+      strm << stationGroup.ToString();
       return strm;
    }
 

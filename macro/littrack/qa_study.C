@@ -90,5 +90,5 @@ void qa_study()
    qa.SetDetectorPresence(kTRD, trd);
    qa.SetDetectorPresence(kMUCH, much);
    qa.SetDetectorPresence(kTOF, tof);
-   qa.CreateReport(kLitHtml, "Event reconstruction performance", results, names);
+   qa.CreateReport("Event reconstruction performance", results, names);
 }

@@ -405,6 +405,9 @@ void global_reco(Int_t nEvents = 1000, // number of events
 
 		CbmLitFitQa* fitQa = new CbmLitFitQa();
 		run->AddTask(fitQa);
+
+		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+		run->AddTask(clusteringQa);
 	}
 
 	// -----  Parameter database   --------------------------------------------

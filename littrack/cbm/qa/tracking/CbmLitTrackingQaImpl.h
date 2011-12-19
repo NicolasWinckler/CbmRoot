@@ -11,6 +11,7 @@
 #include "FairTask.h"
 #include "CbmDetectorList.h"
 #include "CbmStsKFTrackFitter.h"
+#include "CbmLitTrackingQaHistNames.h"
 
 #include <map>
 #include <string>
@@ -18,8 +19,6 @@
 #include <set>
 
 #include <boost/property_tree/ptree.hpp>
-#include "CbmLitTrackingQaHistNames.h"
-
 
 class CbmTrackMatch;
 class CbmRichRingMatch;
@@ -35,7 +34,10 @@ class CbmLitGlobalElectronId;
 class CbmLitHistManager;
 class CbmRichRingFitterEllipseTau;
 class CbmLitMCTrackCreator;
-using namespace std;
+
+using std::multimap;
+using std::string;
+using std::map;
 
 /**
  * \class CbmLitTrackingQaImpl
@@ -72,17 +74,6 @@ public:
     */
    virtual void Finish();
 
-   TH1F* H1(
-      const string& name);
-
-   TH2F* H2(
-      const string& name);
-
-   TH3F* H3(
-      const string& name);
-
-   TH1* H(
-      const string& name);
    /**
     * \brief Set minimum number of MC points in STS.
     * \param[in] minNofPointsSts Minimum number of MC points in STS.
@@ -162,51 +153,6 @@ public:
    const std::string& GetOutputDir() const { return fOutputDir;}
 
    /**
-    * \brief Set properties of momentum axis in histograms.
-    * \param[in] min Minimum momentum.
-    * \param[in] max Maximum momentum.
-    * \param[in] nofBins Number of bins.
-    */
-   void SetMomAxis(
-         Double_t min,
-         Double_t max,
-         Int_t nofBins) {
-      fMinMom = min;
-      fMaxMom = max;
-      fNofBinsMom = nofBins;
-   }
-
-   /**
-    * \brief Set properties of Pt axis in histograms.
-    * \param[in] min Minimum Pt.
-    * \param[in] max Maximum Pt.
-    * \param[in] nofBins Number of bins.
-    */
-   void SetPtAxis(
-         Double_t min,
-         Double_t max,
-         Int_t nofBins) {
-      fMinPt = min;
-      fMaxPt = max;
-      fNofBinsPt = nofBins;
-   }
-
-   /**
-    * \brief Set properties of rapidity axis in histograms.
-    * \param[in] min Minimum rapidity.
-    * \param[in] max Maximum rapidity.
-    * \param[in] nofBins Number of bins.
-    */
-   void SetRapidityAxis(
-         Double_t min,
-         Double_t max,
-         Int_t nofBins) {
-      fMinY = min;
-      fMaxY = max;
-      fNofBinsY = nofBins;
-   }
-
-   /**
     * \brief Implement functionality of drawing histograms in macro from the specified file.
     * \param[in] fileName Name of the file.
     */
@@ -252,11 +198,6 @@ private:
     * \brief Read data branches from input data files.
     */
    void ReadDataBranches();
-
-   /**
-    * \brief Fill hit related histograms.
-    */
-   void ProcessHits();
 
    /**
     * \brief Fill histogram with number of crossed stations by MC track.
@@ -540,20 +481,6 @@ private:
    Double_t fRefMomentum; // Momentum cut for reference tracks
    Int_t fRefMinNofHitsRich; // Minimum number of hits in RICH ring to be considered as reference
 
-   Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
-   Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
-   Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
-   Double_t fMinPt; // Minimum Pt for tracks for efficiency calculation [GeV/c]
-   Double_t fMaxPt; // Maximum Pt for tracks for efficiency calculation [GeV/c]
-   Int_t fNofBinsPt; // Number of bins for efficiency vs. Pt histogram
-   Double_t fMinY; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
-   Double_t fMaxY; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
-   Int_t fNofBinsY; // Number of bins for efficiency vs. rapidity histogram
-   Double_t fMinAngle; // Minimum polar angle [grad]
-   Double_t fMaxAngle; // Maximum polar angle [grad]
-   Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
-
-
    // Maps for reconstructed tracks
    // <MC track index, reconstructed track index>
    std::multimap<Int_t, Int_t> fMcStsMap; // STS
@@ -580,18 +507,12 @@ private:
    TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
 
-   TClonesArray* fMvdHits; // CbmMvdHit array
    TClonesArray* fMvdPoints; // CbmMvdPoint array
    TClonesArray* fMvdHitMatches; // CbmMvdHitMatch array
-   TClonesArray* fMvdDigis; // CbmMvdDigi array
-   TClonesArray* fMvdClusters; // CbmMvdClusters array
 
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
    TClonesArray* fStsPoints; // CbmStsPoint array
-   TClonesArray* fStsDigis; // CbmStsDigi array
-   TClonesArray* fStsClusters; // CbmStsCluster array
-   TClonesArray* fStsHits; // CbmStsHit array
 
    TClonesArray* fRichHits; // CbmRichHits array
    TClonesArray* fRichRings; // CbmRichRing array
@@ -599,18 +520,11 @@ private:
    TClonesArray* fRichRingMatches; // CbmRichProjection array
    TClonesArray* fRichPoints; // CbmRichPoint array
 
-   TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
-   TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
    TClonesArray* fMuchMatches; // CbmTrackMatch array
    TClonesArray* fMuchPoints; // CbmMuchPoint array
-   TClonesArray* fMuchDigis; // CbmMuchDigi array
-   TClonesArray* fMuchClusters; // CbmMuchCluster array
 
    TClonesArray* fTrdMatches; // CbmTrackMatch array
-   TClonesArray* fTrdHits; // CbmTrdHit array
    TClonesArray* fTrdPoints; // CbmTrdPoint array
-   TClonesArray* fTrdDigis; // CbmTrdDigi array
-   TClonesArray* fTrdClusters; // CbmTrdCluster array
 
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array

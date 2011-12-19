@@ -19,39 +19,29 @@
 #include <iostream>
 #include <string>
 
-void CbmLitTrackingQaDraw::Draw()
+CbmLitTrackingQaDraw::CbmLitTrackingQaDraw():
+   fRebin(1)
 {
+
+}
+
+CbmLitTrackingQaDraw::~CbmLitTrackingQaDraw()
+{
+
+}
+
+void CbmLitTrackingQaDraw::Draw(
+      CbmLitHistManager* histManager)
+{
+   assert(histManager != NULL);
+   fHM = histManager;
+
    SetStyles();
    DrawEfficiencyHistos();
    DrawHitsHistos();
-   DrawHitsStationHistos();
    DrawStsTracksQaHistos();
    DrawMcEfficiencyGraph();
    DrawMCMomVsAngle();
-}
-
-TH1F* CbmLitTrackingQaDraw::H1(
-      const string& name)
-{
-   return fHM->H1F(name);
-}
-
-TH2F* CbmLitTrackingQaDraw::H2(
-      const string& name)
-{
-   return fHM->H2F(name);
-}
-
-TH3F* CbmLitTrackingQaDraw::H3(
-      const string& name)
-{
-   return fHM->H3F(name);
-}
-
-TH1* CbmLitTrackingQaDraw::H(
-      const string& name)
-{
-   return fHM->H1(name);
 }
 
 void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
@@ -69,49 +59,49 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
    string cat = fIsMuch ? "Mu" : "El";
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
-   DrawEfficiency("rec_qa_global_efficiency_all", "hSts3DNormGlobalpx_All",
-         "hHalfGlobal3DNormGlobalpx_All", "hGlobal3Dpx_All", "", sname, hgname, gname, "", "");
+   DrawEfficiency("rec_qa_global_efficiency_all", "hSts3DNormGlobal_All",
+         "hHalfGlobal3DNormGlobal_All", "hGlobal3D_All", "", sname, hgname, gname, "", "", "_px");
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
-   DrawEfficiency("rec_qa_global_efficiency_signal", "hSts3DNormGlobalpx_"+cat,
-         "hHalfGlobal3DNormGlobalpx_"+cat, "hGlobal3Dpx_"+cat, "", sname, hgname, gname, "", "");
+   DrawEfficiency("rec_qa_global_efficiency_signal", "hSts3DNormGlobal_" + cat,
+         "hHalfGlobal3DNormGlobal_" + cat, "hGlobal3D_" + cat, "", sname, hgname, gname, "", "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-   DrawEfficiency("rec_qa_half_global_efficiency_all", "hSts3DNormHalfGlobalpx_All",
-         "hHalfGlobal3Dpx_"+cat, "", "", sname, hgname, "", "", "");
+   DrawEfficiency("rec_qa_half_global_efficiency_all", "hSts3DNormHalfGlobal_All",
+         "hHalfGlobal3D_" + cat, "", "", sname, hgname, "", "", "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
-   DrawEfficiency("rec_qa_half_global_efficiency_signal", "hSts3DNormHalfGlobalpx_"+cat,
-         "hHalfGlobal3Dpx_"+cat, "", "", sname, hgname, "", "", "");
+   DrawEfficiency("rec_qa_half_global_efficiency_signal", "hSts3DNormHalfGlobal_" + cat,
+         "hHalfGlobal3D_" + cat, "", "", sname, hgname, "", "", "", "_px");
 
    // Draw efficiency for STS
-   DrawEfficiency("rec_qa_sts_efficiency", "hSts3Dpx_All",
-         "hSts3Dpx_"+cat, "", "", "STS: all", "STS: " + signal, "", "", "");
+   DrawEfficiency("rec_qa_sts_efficiency", "hSts3D_All", "hSts3D_" + cat,
+         "", "", "STS: all", "STS: " + signal, "", "", "", "_px");
 
    if (fIsTrd || fIsMuch) {
       // Draw efficiency for TRD(MUCH)
-      DrawEfficiency("rec_qa_rec_efficiency", "hRec3Dpx_All",
-         "hRec3Dpx_"+cat, "", "", rname + ": all", rname + ": " + signal, "", "", "");
+      DrawEfficiency("rec_qa_rec_efficiency", "hRec3D_All", "hRec3D_" + cat,
+            "", "", rname + ": all", rname + ": " + signal, "", "", "", "_px");
    }
 
    if (fIsTof) {
       // Draw efficiency for TOF
-      DrawEfficiency("rec_qa_tof_efficiency", "hTof3Dpx_All",
-         "hTof3Dpx_"+cat, "", "", "TOF: all", "TOF: " + signal, "", "", "");
+      DrawEfficiency("rec_qa_tof_efficiency", "hTof3D_All",
+         "hTof3D_" + cat, "", "", "TOF: all", "TOF: " + signal, "", "", "", "_px");
    }
 
    if (fIsRich) {
       // Draw efficiency for RICH for electron set
-      DrawEfficiency("rec_qa_rich_efficiency_electrons_mom", "hRich3Dpx_El",
-         "hRich3Dpx_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "");
+      DrawEfficiency("rec_qa_rich_efficiency_electrons_mom", "hRich3D_El",
+         "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_px");
 
       // Draw efficiency for RICH for electron set vs. rapidity
-      DrawEfficiency("rec_qa_rich_efficiency_electrons_rapidity", "hRich3Dpy_El",
-         "hRich3Dpy_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "");
+      DrawEfficiency("rec_qa_rich_efficiency_electrons_rapidity", "hRich3D_El",
+         "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_py");
 
       // Draw efficiency for RICH for electron set vs. pt
-      DrawEfficiency("rec_qa_rich_efficiency_electrons_pt", "hRich3Dpz_El",
-         "hRich3Dpz_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "");
+      DrawEfficiency("rec_qa_rich_efficiency_electrons_pt", "hRich3D_El",
+         "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_pz");
 
       // Draw efficiency vs. nof hits in ring for RICH for electron set
       DrawEfficiency("rec_qa_rich_efficiency_vs_nofhits_electrons", "hRichNh_El",
@@ -126,22 +116,22 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
          "", "", "", "RICH: electrons", "", "", "", "");
 
       // Draw efficiency for STS+RICH for electron set
-      DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", "hSts3DNormStsRichpx_El",
-         "hStsRich3Dpx_El", "", "", "STS", "STS+RICH", "", "", "");
+      DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", "hSts3DNormStsRich_El",
+         "hStsRich3D_El", "", "", "STS", "STS+RICH", "", "", "", "_px");
 
       // Draw efficiency for STS+RICH No matching for electron set
-      DrawEfficiency("rec_qa_sts_rich_no_matching_efficiency_electrons", "hSts3DNormStsRichpx_El",
-         "hStsRichNoMatching3Dpx_El", "", "", "STS", "STS+RICH (No Matching)", "", "", "");
+      DrawEfficiency("rec_qa_sts_rich_no_matching_efficiency_electrons", "hSts3DNormStsRich_El",
+         "hStsRichNoMatching3D_El", "", "", "STS", "STS+RICH (No Matching)", "", "", "", "_px");
 
       // Draw efficiency for STS+RICH+TRD for electron set
-      DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", "hSts3DNormStsRichTrdpx_El",
-         "hStsRich3DNormStsRichTrdpx_El", "hStsRichTrd3Dpx_El", "",
-         "STS", "STS+RICH", "STS+RICH+TRD", "", "");
+      DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", "hSts3DNormStsRichTrd_El",
+         "hStsRich3DNormStsRichTrd_El", "hStsRichTrd3D_El", "",
+         "STS", "STS+RICH", "STS+RICH+TRD", "", "", "_px");
 
       // Draw efficiency for STS+RICH+TRD+TOF for electron set
-      DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", "hSts3DNormStsRichTrdTofpx_El",
-         "hStsRich3DNormStsRichTrdTofpx_El", "hStsRichTrd3DNormStsRichTrdTofpx_El", "hStsRichTrdTof3Dpx_El",
-         "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
+      DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", "hSts3DNormStsRichTrdTof_El",
+         "hStsRich3DNormStsRichTrdTof_El", "hStsRichTrd3DNormStsRichTrdTof_El", "hStsRichTrdTof3D_El",
+         "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "", "_px");
 
 //      TCanvas* canvas = new TCanvas("rec_qa_sts_rich_trd_tof_momentum_electrons", "rec_qa_sts_rich_trd_tof_momentum_electrons", 600, 500);
 //      canvas->SetGrid();
@@ -150,19 +140,19 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 //         "Efficiency", "Momentum [GeV/c]", "Efficiency", "STS", "STS+RICH",
 //         "STS+RICH+TRD", "STS+RICH+TRD+TOF", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 
-      DrawEfficiency("rec_qa_sts_rich_trd_tof_electron_identification", "hStsRich3DElIdNormStsRichTrdTofpx_ElId",
-         "hStsRichTrd3DElIdNormStsRichTrdTofpx_ElId", "hStsRichTrdTof3DElIdpx_ElId", "",
-         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "");
+      DrawEfficiency("rec_qa_sts_rich_trd_tof_electron_identification", "hStsRich3DElIdNormStsRichTrdTof_ElId",
+         "hStsRichTrd3DElIdNormStsRichTrdTof_ElId", "hStsRichTrdTof3DElId_ElId", "",
+         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "", "_px");
 
-      DrawEfficiency("rec_qa_sts_rich_trd_tof_pion_suppression", "hStsRich3DElIdNormStsRichTrdTofpx_PiSupp",
-         "hStsRichTrd3DElIdNormStsRichTrdTofpx_PiSupp", "hStsRichTrdTof3DElIdpx_PiSupp", "",
-         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "pisupp");
+      DrawEfficiency("rec_qa_sts_rich_trd_tof_pion_suppression", "hStsRich3DElIdNormStsRichTrdTof_PiSupp",
+         "hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp", "hStsRichTrdTof3DElId_PiSupp", "",
+         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "pisupp", "_px");
     }
 
    if (fIsRich) {
       // Draw detector acceptance
-      //DrawEfficiency("rec_qa_sts_rich_trd_tof_detector_acceptance", "hStsDetAcc3Dpx_El",
-      //      "hStsRichDetAcc3Dpx_El", "hStsRichTrdDetAcc3Dpx_El", "hStsRichTrdTofDetAcc3Dpx_El",
+      //DrawEfficiency("rec_qa_sts_rich_trd_tof_detector_acceptance", "hStsDetAcc3D_El_px",
+      //      "hStsRichDetAcc3D_El_px", "hStsRichTrdDetAcc3D_El_px", "hStsRichTrdTofDetAcc3D_El_px",
       //     "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
 
    }
@@ -178,32 +168,28 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
       const string& name2,
       const string& name3,
       const string& name4,
-      const string& opt)
+      const string& opt,
+      const string& proj)
 {
 
    TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
    canvas->SetGrid();
    canvas->cd();
 
-   TH1* h1 = NULL, *h2 = NULL, *h3 = NULL, *h4 = NULL;
+   TH1* h1 = (hist1 != "") ? fHM->H1(hist1 + "_Eff" + proj) : NULL;
+   TH1* h2 = (hist2 != "") ? fHM->H1(hist2 + "_Eff" + proj) : NULL;
+   TH1* h3 = (hist3 != "") ? fHM->H1(hist3 + "_Eff" + proj) : NULL;
+   TH1* h4 = (hist4 != "") ? fHM->H1(hist4 + "_Eff" + proj) : NULL;
 
-   if (hist1 != "") h1 = H(hist1+"_Eff");
-   if (hist2 != "") h2 = H(hist2+"_Eff");
-   if (hist3 != "") h3 = H(hist3+"_Eff");
-   if (hist4 != "") h4 = H(hist4+"_Eff");
+   float eff1 = (hist1 != "") ? CalcEfficiency(fHM->H1(hist1 + "_Rec" + proj), fHM->H1(hist1 + "_Acc" + proj), opt) : 0.;
+   float eff2 = (hist2 != "") ? CalcEfficiency(fHM->H1(hist2 + "_Rec" + proj), fHM->H1(hist2 + "_Acc" + proj), opt) : 0.;
+   float eff3 = (hist3 != "") ? CalcEfficiency(fHM->H1(hist3 + "_Rec" + proj), fHM->H1(hist3 + "_Acc" + proj), opt) : 0.;
+   float eff4 = (hist4 != "") ? CalcEfficiency(fHM->H1(hist4 + "_Rec" + proj), fHM->H1(hist4 + "_Acc" + proj), opt) : 0.;
 
-   float eff1, eff2, eff3, eff4;
-
-   if (hist1 != "") eff1 = CalcEfficiency(H(hist1+"_Rec"), H(hist1+"_Acc"), opt);
-   if (hist2 != "") eff2 = CalcEfficiency(H(hist2+"_Rec"), H(hist2+"_Acc"), opt);
-   if (hist3 != "") eff3 = CalcEfficiency(H(hist3+"_Rec"), H(hist3+"_Acc"), opt);
-   if (hist4 != "") eff4 = CalcEfficiency(H(hist4+"_Rec"), H(hist4+"_Acc"), opt);
-
-   string hname1, hname2, hname3, hname4;
-   if (hist1 != "") hname1 = name1 + "(" + lit::NumberToString<float>(eff1, 1) + ")";
-   if (hist2 != "") hname2 = name2 + "(" + lit::NumberToString<float>(eff2, 1) + ")";
-   if (hist3 != "") hname3 = name3 + "(" + lit::NumberToString<float>(eff3, 1) + ")";
-   if (hist4 != "") hname4 = name4 + "(" + lit::NumberToString<float>(eff4, 1) + ")";
+   string hname1 = (hist1 != "") ? name1 + "(" + lit::NumberToString<float>(eff1, 1) + ")" : name1;
+   string hname2 = (hist2 != "") ? name2 + "(" + lit::NumberToString<float>(eff2, 1) + ")" : name2;
+   string hname3 = (hist3 != "") ? name3 + "(" + lit::NumberToString<float>(eff3, 1) + ")" : name3;
+   string hname4 = (hist4 != "") ? name4 + "(" + lit::NumberToString<float>(eff4, 1) + ")" : name4;
 
    if (fRebin > 1) {
       if (hist1 != "") h1->Rebin(fRebin);
@@ -349,37 +335,24 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
    c->SetGrid();
 
    c->cd(1);
-   DrawHist1D(H1(hist+"_All"), H1(hist+"_True"), H1(hist+"_Fake"), NULL,
-              "all: " + lit::NumberToString<float>(H1(hist+"_All")->GetMean(), 1),
-              "true: " + lit::NumberToString<float>(H1(hist+"_True")->GetMean(), 1),
-              "fake: " + lit::NumberToString<float>(H1(hist+"_Fake")->GetMean(), 1),  "",
+   TH1F* hAll = fHM->H1F(hist + "_All");
+   TH1F* hTrue = fHM->H1F(hist + "_True");
+   TH1F* hFake = fHM->H1F(hist + "_Fake");
+   DrawHist1D(hAll, hTrue, hFake, NULL,
+              "all: " + lit::NumberToString<float>(hAll->GetMean(), 1),
+              "true: " + lit::NumberToString<float>(hTrue->GetMean(), 1),
+              "fake: " + lit::NumberToString<float>(hFake->GetMean(), 1),  "",
               kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    c->cd(2);
-   DrawHist1D(H1(hist+"_TrueOverAll"), H1(hist+"_FakeOverAll"), NULL, NULL,
-              "true/all: " + lit::NumberToString<float>(H1(hist+"_TrueOverAll")->GetMean()),
-              "fake/all: " + lit::NumberToString<float>(H1(hist+"_FakeOverAll")->GetMean()),
+   TH1F* hTrueOverAll = fHM->H1F(hist+"_TrueOverAll");
+   TH1F* hFakeOverAll = fHM->H1F(hist+"_FakeOverAll");
+   DrawHist1D(hTrueOverAll, hFakeOverAll, NULL, NULL,
+              "true/all: " + lit::NumberToString<float>(hTrueOverAll->GetMean()),
+              "fake/all: " + lit::NumberToString<float>(hFakeOverAll->GetMean()),
               "", "", kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    if (fOutputDir != "") lit::SaveCanvasAsImage(c, fOutputDir);
-}
-
-void CbmLitTrackingQaDraw::DrawHitsStationHisto(
-      const std::string& name,
-      TH1F* hist)
-{
-   TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1200, 600);
-   DrawHist1D(hist, kLitLinear, kLitLinear, "HIST TEXT0");
-   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
-}
-
-void CbmLitTrackingQaDraw::DrawHitsStationHistos()
-{
-   if (fIsMvd) {DrawHitsStationHisto("rec_qa_mvd_hits_station", H1("hMvdNofHitsInStation"));}
-   if (fIsSts) {DrawHitsStationHisto("rec_qa_sts_hits_station", H1("hStsNofHitsInStation"));}
-   if (fIsTrd) {DrawHitsStationHisto("rec_qa_trd_hits_station", H1("hTrdNofHitsInStation"));}
-   if (fIsMuch) {DrawHitsStationHisto("rec_qa_much_hits_station", H1("hMuchNofHitsInStation"));}
-   if (fIsTof) {DrawHitsStationHisto("rec_qa_tof_hits_station", H1("hTofNofHitsInStation"));}
 }
 
 void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
@@ -387,13 +360,14 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa", "rec_qa_sts_tracks_qa", 900, 900);
    canvas1->Divide(2,2);
    canvas1->cd(1);
-   H1("hStsChiprim")->Scale(1./H1("hStsChiprim")->Integral());
-   DrawHist1D(H1("hStsChiprim"), kLitLinear, kLitLog);
+   TH1F* hChiprim = fHM->H1F("hStsChiprim");
+   hChiprim->Scale(1. / hChiprim->Integral());
+   DrawHist1D(hChiprim, kLitLinear, kLitLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(2);
-   TH1* projY = (TH1*)H2("hStsMomresVsMom")->ProjectionY()->Clone();
+   TH1* projY = (TH1*)fHM->H2F("hStsMomresVsMom")->ProjectionY();
    projY->Scale(1./projY->Integral());
    DrawHist1D(projY, kLitLinear, kLitLog);
    gPad->SetGridx(true);
@@ -406,7 +380,7 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
 //   gPad->SetGridy(true);
 
    canvas1->cd(3);
-   H2("hStsMomresVsMom")->FitSlicesY();
+   fHM->H2F("hStsMomresVsMom")->FitSlicesY();
    TH1* momslice = (TH1*) gDirectory->Get("hStsMomresVsMom_2");
    momslice->GetXaxis()->SetTitle("P [GeV/c]");
    momslice->GetYaxis()->SetTitle("dP/P, #sigma [%]");
@@ -416,10 +390,11 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
    canvas1->cd(4);
-   Int_t nBins = H2("hStsMomresVsMom")->GetNbinsX();
-   TH1D* momResRms = (TH1D*)H2("hStsMomresVsMom")->ProjectionX()->Clone();
+   TH2F* hMomres = fHM->H2F("hStsMomresVsMom");
+   Int_t nBins = hMomres->GetNbinsX();
+   TH1D* momResRms = (TH1D*)hMomres->ProjectionX();
    for (Int_t i = 1; i < nBins; i++){
-      TH1* projY = (TH1*)H2("hStsMomresVsMom")->ProjectionY("_py", i, i);
+      TH1* projY = (TH1*)hMomres->ProjectionY("_py", i, i);
       float rms = projY->GetRMS();
       momResRms->SetBinContent(i, rms);
       momResRms->SetBinError(i, momslice->GetBinError(i));
@@ -431,11 +406,11 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    gPad->SetGridy(true);
 
    TCanvas* canvas2 = new TCanvas("rec_qa_track_length", "rec_qa_track_length", 500, 500);
-   H1("hTrackLength")->Scale(1./H1("hTrackLength")->Integral());
-   DrawHist1D(H1("hTrackLength"), kLitLinear, kLitLinear);
+   TH1F* hLength = fHM->H1F("hTrackLength");
+   hLength->Scale(1. / hLength->Integral());
+   DrawHist1D(hLength, kLitLinear, kLitLinear);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
-
 }
 
 void CbmLitTrackingQaDraw::DrawMCMomVsAngle()
@@ -443,12 +418,12 @@ void CbmLitTrackingQaDraw::DrawMCMomVsAngle()
    TCanvas* canvas1 = new TCanvas("rec_qa_mc_mom_vs_angle", "rec_qa_mc_mom_vs_angle", 1200, 600);
    canvas1->Divide(2,1);
    canvas1->cd(1);
-   DrawHist2D(H2("hMCMomVsAngle_All"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
+   DrawHist2D(fHM->H2F("hMCMomVsAngle_All"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(2);
-   DrawHist2D(H2("hMCMomVsAngle_El"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
+   DrawHist2D(fHM->H2F("hMCMomVsAngle_El"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 

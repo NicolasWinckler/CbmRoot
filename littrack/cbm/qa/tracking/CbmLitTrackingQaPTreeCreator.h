@@ -60,24 +60,6 @@ private:
    /**
     * \brief TODO ADD COMMENTS
     */
-   TH1F* H1(
-      const string& name);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   TH2F* H2(
-      const string& name);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
-   TH3F* H3(
-      const string& name);
-
-   /**
-    * \brief TODO ADD COMMENTS
-    */
    void NofStatisticsToPTree(
       ptree* pt,
       const string& mvd,

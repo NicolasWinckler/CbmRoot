@@ -44,14 +44,6 @@ void CbmLitTrackingQaReport::Create(
    //Number of objects table
    out << fR->TableBegin("Number of objects statistics",
          list_of("")("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF"));
-   out << PrintNofStatistics("Points", "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
-         "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
-   out << PrintNofStatistics("Digis", "hNofMvdDigis", "hNofStsDigis", "",
-         "hNofTrdDigis", "hNofMuchDigis", "", "");
-   out << PrintNofStatistics("Clusters", "hNofMvdClusters", "hNofStsClusters", "",
-         "hNofTrdClusters", "hNofMuchClusters", "", "");
-   out << PrintNofStatistics("Hits","hNofMvdHits", "hNofStsHits", "hNofRichHits",
-         "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
    out << PrintNofStatistics("Tracks","", "hNofStsTracks", "hNofRichRings",
          "hNofTrdTracks", "hNofMuchTracks", "hNofMuchTracks", "");
    out << fR->TableEnd();

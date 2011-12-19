@@ -29,24 +29,6 @@ CbmLitTrackingQaPTreeCreator::~CbmLitTrackingQaPTreeCreator()
 
 }
 
-TH1F* CbmLitTrackingQaPTreeCreator::H1(
-      const string& name)
-{
-   return fHM->H1F(name);
-}
-
-TH2F* CbmLitTrackingQaPTreeCreator::H2(
-      const string& name)
-{
-   return fHM->H2F(name);
-}
-
-TH3F* CbmLitTrackingQaPTreeCreator::H3(
-      const string& name)
-{
-   return fHM->H3F(name);
-}
-
 ptree CbmLitTrackingQaPTreeCreator::Create(
       CbmLitHistManager* histManager)
 {
@@ -56,23 +38,15 @@ ptree CbmLitTrackingQaPTreeCreator::Create(
    ptree pt;
 
    pt.put("IsElectronSetup", fIsElectronSetup);
-   pt.put("hEventNo", (Int_t)H1("hEventNo")->GetEntries());
+   pt.put("hEventNo", (Int_t)fHM->H1F("hEventNo")->GetEntries());
 
    // Print NOF statistics
-   NofStatisticsToPTree(&pt,"hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
-         "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
-   NofStatisticsToPTree(&pt, "hNofMvdDigis", "hNofStsDigis", "",
-         "hNofTrdDigis", "hNofMuchDigis", "", "");
-   NofStatisticsToPTree(&pt, "hNofMvdClusters", "hNofStsClusters", "",
-         "hNofTrdClusters", "hNofMuchClusters", "", "");
-   NofStatisticsToPTree(&pt, "hNofMvdHits", "hNofStsHits", "hNofRichHits",
-         "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
    NofStatisticsToPTree(&pt, "", "hNofStsTracks", "hNofRichRings",
          "hNofTrdTracks", "hNofMuchTracks", "hNofMuchTracks", "");
 
-   pt.put("hNofGlobalTracks", (Int_t)H1("hNofGlobalTracks")->GetMean());
+   pt.put("hNofGlobalTracks", (Int_t)fHM->H1F("hNofGlobalTracks")->GetMean());
    if (fIsRich) {
-      pt.put("hNofRichProjections", (Int_t)H1("hNofRichProjections")->GetMean());
+      pt.put("hNofRichProjections", (Int_t)fHM->H1F("hNofRichProjections")->GetMean());
    }
 
    // print hits histos (nof all, true, fake per track/ring)
@@ -147,21 +121,21 @@ ptree CbmLitTrackingQaPTreeCreator::Create(
    }
 
    // print ghost statistics
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
-   pt.put("fhStsGhostNh", H1("hStsGhostNh")->GetEntries() / nofEvents);
-   pt.put("fhRecGhostNh", H1("hRecGhostNh")->GetEntries() / nofEvents);
-   pt.put("fhRichGhostNh", H1("hRichGhostNh")->GetEntries() / nofEvents);
-   pt.put("fhRichGhostStsMatchingNh", H1("hRichGhostStsMatchingNh")->GetEntries() / nofEvents);
-   pt.put("fhStsGhostRichMatchingNh", H1("hStsGhostRichMatchingNh")->GetEntries() / nofEvents);
-   pt.put("fhRichGhostElIdNh", H1("hRichGhostElIdNh")->GetEntries() / nofEvents);
+   Double_t nofEvents = (Double_t)fHM->H1F("hEventNo")->GetEntries();
+   pt.put("fhStsGhostNh", fHM->H1F("hStsGhostNh")->GetEntries() / nofEvents);
+   pt.put("fhRecGhostNh", fHM->H1F("hRecGhostNh")->GetEntries() / nofEvents);
+   pt.put("fhRichGhostNh", fHM->H1F("hRichGhostNh")->GetEntries() / nofEvents);
+   pt.put("fhRichGhostStsMatchingNh", fHM->H1F("hRichGhostStsMatchingNh")->GetEntries() / nofEvents);
+   pt.put("fhStsGhostRichMatchingNh", fHM->H1F("hStsGhostRichMatchingNh")->GetEntries() / nofEvents);
+   pt.put("fhRichGhostElIdNh", fHM->H1F("hRichGhostElIdNh")->GetEntries() / nofEvents);
 
    // STS Qa
-   pt.put("fhStsChiprim.mean", H1("hStsChiprim")->GetMean());
-   pt.put("fhStsChiprim.rms", H1("hStsChiprim")->GetRMS());
-   pt.put("fhStsMomresVsMom.mean", H2("hStsMomresVsMom")->ProjectionY()->GetMean());
-   pt.put("fhStsMomresVsMom.rms", H2("hStsMomresVsMom")->ProjectionY()->GetRMS());
-   pt.put("fhTrackLength.mean", H1("hTrackLength")->GetMean());
-   pt.put("fhTrackLength.rms", H1("hTrackLength")->GetRMS());
+   pt.put("fhStsChiprim.mean", fHM->H1F("hStsChiprim")->GetMean());
+   pt.put("fhStsChiprim.rms", fHM->H1F("hStsChiprim")->GetRMS());
+   pt.put("fhStsMomresVsMom.mean", fHM->H2F("hStsMomresVsMom")->ProjectionY()->GetMean());
+   pt.put("fhStsMomresVsMom.rms", fHM->H2F("hStsMomresVsMom")->ProjectionY()->GetRMS());
+   pt.put("fhTrackLength.mean", fHM->H1F("hTrackLength")->GetMean());
+   pt.put("fhTrackLength.rms", fHM->H1F("hTrackLength")->GetRMS());
 
    // Polar angle efficiency
    pt.put("MinAngle", fMinAngle);
@@ -186,25 +160,25 @@ void CbmLitTrackingQaPTreeCreator::NofStatisticsToPTree(
    const string& tof)
 {
    if (mvd != "" && fIsMvd) {
-      pt->put(mvd, (Int_t)H1(mvd)->GetMean());
+      pt->put(mvd, (Int_t)fHM->H1F(mvd)->GetMean());
    }
    if (sts != "" && fIsSts) {
-      pt->put(sts, (Int_t)H1(sts)->GetMean());
+      pt->put(sts, (Int_t)fHM->H1F(sts)->GetMean());
    }
    if (rich != "" && fIsRich) {
-      pt->put(rich, (Int_t)H1(rich)->GetMean());
+      pt->put(rich, (Int_t)fHM->H1F(rich)->GetMean());
    }
    if (trd != "" && fIsTrd) {
-      pt->put(trd, (Int_t)H1(trd)->GetMean());
+      pt->put(trd, (Int_t)fHM->H1F(trd)->GetMean());
    }
    if (muchP != "" && fIsMuch) {
-      pt->put(muchP, (Int_t)H1(muchP)->GetMean());
+      pt->put(muchP, (Int_t)fHM->H1F(muchP)->GetMean());
    }
    if (muchS != "" && fIsMuch) {
-      pt->put(muchS, (Int_t)H1(muchS)->GetMean());
+      pt->put(muchS, (Int_t)fHM->H1F(muchS)->GetMean());
    }
    if (tof != "" && fIsTof) {
-      pt->put(tof, (Int_t)H1(tof)->GetMean());
+      pt->put(tof, (Int_t)fHM->H1F(tof)->GetMean());
    }
 }
 
@@ -212,42 +186,42 @@ void CbmLitTrackingQaPTreeCreator::HitsHistosToPTree(
       ptree* pt,
       const string& name)
 {
-   pt->put(name+".all", H1(name+"_All")->GetMean());
-   pt->put(name+".true", H1(name+"_True")->GetMean());
-   pt->put(name+".fake", H1(name+"_Fake")->GetMean());
-   pt->put(name+".trueOverAll", H1(name+"_TrueOverAll")->GetMean());
-   pt->put(name+".fakeOverAll", H1(name+"_FakeOverAll")->GetMean());
+   pt->put(name+".all", fHM->H1F(name+"_All")->GetMean());
+   pt->put(name+".true", fHM->H1F(name+"_True")->GetMean());
+   pt->put(name+".fake", fHM->H1F(name+"_Fake")->GetMean());
+   pt->put(name+".trueOverAll", fHM->H1F(name+"_TrueOverAll")->GetMean());
+   pt->put(name+".fakeOverAll", fHM->H1F(name+"_FakeOverAll")->GetMean());
 }
 
 void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsToPTree(
       ptree* pt,
       const string& name)
 {
-   Double_t allRec = H3(name+"_All_Rec")->GetEntries();
-   Double_t allAcc = H3(name+"_All_Acc")->GetEntries();
+   Double_t allRec = fHM->H3F(name+"_All_Rec")->GetEntries();
+   Double_t allAcc = fHM->H3F(name+"_All_Acc")->GetEntries();
    Double_t allEff = (allAcc != 0.) ? 100. * allRec / allAcc : 0.;
 
-   Double_t refRec = H3(name+"_Ref_Rec")->GetEntries();
-   Double_t refAcc = H3(name+"_Ref_Acc")->GetEntries();
+   Double_t refRec = fHM->H3F(name+"_Ref_Rec")->GetEntries();
+   Double_t refAcc = fHM->H3F(name+"_Ref_Acc")->GetEntries();
    Double_t refEff = (refAcc != 0.) ? 100. * refRec / refAcc : 0.;
 
-   Double_t primRec = H3(name+"_Prim_Rec")->GetEntries();
-   Double_t primAcc = H3(name+"_Prim_Acc")->GetEntries();
+   Double_t primRec = fHM->H3F(name+"_Prim_Rec")->GetEntries();
+   Double_t primAcc = fHM->H3F(name+"_Prim_Acc")->GetEntries();
    Double_t primEff = (primAcc != 0.) ? 100. * primRec / primAcc : 0.;
 
-   Double_t secRec = H3(name+"_Sec_Rec")->GetEntries();
-   Double_t secAcc = H3(name+"_Sec_Acc")->GetEntries();
+   Double_t secRec = fHM->H3F(name+"_Sec_Rec")->GetEntries();
+   Double_t secAcc = fHM->H3F(name+"_Sec_Acc")->GetEntries();
    Double_t secEff = (secAcc != 0.) ? 100. * secRec / secAcc : 0.;
 
-   Double_t muRec = H3(name+"_Mu_Rec")->GetEntries();
-   Double_t muAcc = H3(name+"_Mu_Acc")->GetEntries();
+   Double_t muRec = fHM->H3F(name+"_Mu_Rec")->GetEntries();
+   Double_t muAcc = fHM->H3F(name+"_Mu_Acc")->GetEntries();
    Double_t muEff = (muAcc != 0.) ? 100. * muRec / muAcc : 0;
 
-   Double_t elRec = H3(name+"_El_Rec")->GetEntries();
-   Double_t elAcc = H3(name+"_El_Acc")->GetEntries();
+   Double_t elRec = fHM->H3F(name+"_El_Rec")->GetEntries();
+   Double_t elAcc = fHM->H3F(name+"_El_Acc")->GetEntries();
    Double_t elEff = (elAcc != 0.) ? 100. * elRec / elAcc : 0;
 
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
+   Double_t nofEvents = (Double_t)fHM->H1F("hEventNo")->GetEntries();
    pt->put(name+".all.rec", allRec/nofEvents);
    pt->put(name+".all.acc", allAcc/nofEvents);
    pt->put(name+".all.eff", allEff);
@@ -272,70 +246,70 @@ void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsRichToPTree(
       ptree* pt,
       const std::string& name)
 {
-   Double_t allRec = H3(name+"_All_Rec")->GetEntries();
-   Double_t allAcc = H3(name+"_All_Acc")->GetEntries();
+   Double_t allRec = fHM->H3F(name+"_All_Rec")->GetEntries();
+   Double_t allAcc = fHM->H3F(name+"_All_Acc")->GetEntries();
    Double_t allEff = (allAcc != 0.) ? 100. * allRec / allAcc : 0.;
 
-   Double_t allRefRec = H3(name+"_AllRef_Rec")->GetEntries();
-   Double_t allRefAcc = H3(name+"_AllRef_Acc")->GetEntries();
+   Double_t allRefRec = fHM->H3F(name+"_AllRef_Rec")->GetEntries();
+   Double_t allRefAcc = fHM->H3F(name+"_AllRef_Acc")->GetEntries();
    Double_t allRefEff = (allRefAcc != 0.) ? 100. * allRefRec / allRefAcc : 0.;
 
-   Double_t elRec = H3(name+"_El_Rec")->GetEntries();
-   Double_t elAcc = H3(name+"_El_Acc")->GetEntries();
+   Double_t elRec = fHM->H3F(name+"_El_Rec")->GetEntries();
+   Double_t elAcc = fHM->H3F(name+"_El_Acc")->GetEntries();
    Double_t elEff = (elAcc != 0.) ? 100. * elRec / elAcc : 0.;
 
-   Double_t elRefRec = H3(name+"_ElRef_Rec")->GetEntries();
-   Double_t elRefAcc = H3(name+"_ElRef_Acc")->GetEntries();
+   Double_t elRefRec = fHM->H3F(name+"_ElRef_Rec")->GetEntries();
+   Double_t elRefAcc = fHM->H3F(name+"_ElRef_Acc")->GetEntries();
    Double_t elRefEff = (elRefAcc != 0.) ? 100. * elRefRec / elRefAcc : 0.;
 
-   Double_t piRec = H3(name+"_Pi_Rec")->GetEntries();
-   Double_t piAcc = H3(name+"_Pi_Acc")->GetEntries();
+   Double_t piRec = fHM->H3F(name+"_Pi_Rec")->GetEntries();
+   Double_t piAcc = fHM->H3F(name+"_Pi_Acc")->GetEntries();
    Double_t piEff = (piAcc != 0.) ? 100. * piRec / piAcc : 0.;
 
-   Double_t piRefRec = H3(name+"_PiRef_Rec")->GetEntries();
-   Double_t piRefAcc = H3(name+"_PiRef_Acc")->GetEntries();
+   Double_t piRefRec = fHM->H3F(name+"_PiRef_Rec")->GetEntries();
+   Double_t piRefAcc = fHM->H3F(name+"_PiRef_Acc")->GetEntries();
    Double_t piRefEff = (piRefAcc != 0.) ? 100. * piRefRec / piRefAcc : 0.;
 
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
-   pt->put(name+".All.rec", allRec/nofEvents);
-   pt->put(name+".All.acc", allAcc/nofEvents);
-   pt->put(name+".All.eff", allEff);
-   pt->put(name+".AllRef.rec", allRefRec/nofEvents);
-   pt->put(name+".AllRef.acc", allRefAcc/nofEvents);
-   pt->put(name+".AllRef.eff", allRefEff);
-   pt->put(name+".El.rec", elRec/nofEvents);
-   pt->put(name+".El.acc", elAcc/nofEvents);
-   pt->put(name+".El.eff", elEff);
-   pt->put(name+".ElRef.rec", elRefRec/nofEvents);
-   pt->put(name+".ElRef.acc", elRefAcc/nofEvents);
-   pt->put(name+".ElRef.eff", elRefEff);
-   pt->put(name+".Pi.rec", piRec/nofEvents);
-   pt->put(name+".Pi.acc", piAcc/nofEvents);
-   pt->put(name+".Pi.eff", piEff);
-   pt->put(name+".PiRef.rec", piRefRec/nofEvents);
-   pt->put(name+".PiRef.acc", piRefAcc/nofEvents);
-   pt->put(name+".PiRef.eff", piRefEff);
+   Double_t nofEvents = (Double_t)fHM->H1F("hEventNo")->GetEntries();
+   pt->put(name + ".All.rec", allRec/nofEvents);
+   pt->put(name + ".All.acc", allAcc/nofEvents);
+   pt->put(name + ".All.eff", allEff);
+   pt->put(name + ".AllRef.rec", allRefRec/nofEvents);
+   pt->put(name + ".AllRef.acc", allRefAcc/nofEvents);
+   pt->put(name + ".AllRef.eff", allRefEff);
+   pt->put(name + ".El.rec", elRec/nofEvents);
+   pt->put(name + ".El.acc", elAcc/nofEvents);
+   pt->put(name + ".El.eff", elEff);
+   pt->put(name + ".ElRef.rec", elRefRec/nofEvents);
+   pt->put(name + ".ElRef.acc", elRefAcc/nofEvents);
+   pt->put(name + ".ElRef.eff", elRefEff);
+   pt->put(name + ".Pi.rec", piRec/nofEvents);
+   pt->put(name + ".Pi.acc", piAcc/nofEvents);
+   pt->put(name + ".Pi.eff", piEff);
+   pt->put(name + ".PiRef.rec", piRefRec/nofEvents);
+   pt->put(name + ".PiRef.acc", piRefAcc/nofEvents);
+   pt->put(name + ".PiRef.eff", piRefEff);
 }
 
 void CbmLitTrackingQaPTreeCreator::EventEfficiencyStatisticsElIdToPTree(
       ptree* pt,
       const string& name)
 {
-   Double_t elRec = H3(name+"_ElId_Rec")->GetEntries();
-   Double_t elAcc = H3(name+"_ElId_Acc")->GetEntries();
+   Double_t elRec = fHM->H3F(name + "_ElId_Rec")->GetEntries();
+   Double_t elAcc = fHM->H3F(name + "_ElId_Acc")->GetEntries();
    Double_t elEff = (elAcc != 0.) ? 100. * elRec / elAcc : 0.;
 
-   Double_t piRec = H3(name+"_PiSupp_Rec")->GetEntries();
-   Double_t piAcc = H3(name+"_PiSupp_Acc")->GetEntries();
+   Double_t piRec = fHM->H3F(name + "_PiSupp_Rec")->GetEntries();
+   Double_t piAcc = fHM->H3F(name + "_PiSupp_Acc")->GetEntries();
    Double_t piSupp = (piRec != 0.) ? piAcc / piRec : 0.;
 
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
-   pt->put(name+".el.rec", elRec/nofEvents);
-   pt->put(name+".el.acc", elAcc/nofEvents);
-   pt->put(name+".el.eff", elEff);
-   pt->put(name+".pi.rec", piRec/nofEvents);
-   pt->put(name+".pi.acc", piAcc/nofEvents);
-   pt->put(name+".pi.supp", piSupp);
+   Double_t nofEvents = (Double_t)fHM->H1F("hEventNo")->GetEntries();
+   pt->put(name + ".el.rec", elRec/nofEvents);
+   pt->put(name + ".el.acc", elAcc/nofEvents);
+   pt->put(name + ".el.eff", elEff);
+   pt->put(name + ".pi.rec", piRec/nofEvents);
+   pt->put(name + ".pi.acc", piAcc/nofEvents);
+   pt->put(name + ".pi.supp", piSupp);
 }
 
 void CbmLitTrackingQaPTreeCreator::EventDetAccElStatisticsToPTree(
@@ -345,20 +319,20 @@ void CbmLitTrackingQaPTreeCreator::EventDetAccElStatisticsToPTree(
       const string& hacc,
       const string& hrec)
 {
-   Double_t mc = H3(hmc)->GetEntries();
-   Double_t acc = H3(hacc)->GetEntries();
+   Double_t mc = fHM->H3F(hmc)->GetEntries();
+   Double_t acc = fHM->H3F(hacc)->GetEntries();
    Double_t effAcc = (mc != 0.) ? 100. * acc / mc : 0.;
 
-   Double_t rec = (hrec != "") ? H3(hrec)->GetEntries() : 0.;
+   Double_t rec = (hrec != "") ? fHM->H3F(hrec)->GetEntries() : 0.;
    Double_t effRec = (hrec != "" && mc != 0.) ? 100. * rec / mc : 0.;
 
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
-   pt->put(name+".detAccAcc.acc", acc/nofEvents);
-   pt->put(name+".detAccAcc.mc", mc/nofEvents);
-   pt->put(name+".detAccAcc.eff", effAcc);
-   pt->put(name+".detAccRec.rec", rec/nofEvents);
-   pt->put(name+".detAccRec.mc", mc/nofEvents);
-   pt->put(name+".detAccRec.eff", effRec);
+   Double_t nofEvents = (Double_t)fHM->H1F("hEventNo")->GetEntries();
+   pt->put(name + ".detAccAcc.acc", acc/nofEvents);
+   pt->put(name + ".detAccAcc.mc", mc/nofEvents);
+   pt->put(name + ".detAccAcc.eff", effAcc);
+   pt->put(name + ".detAccRec.rec", rec/nofEvents);
+   pt->put(name + ".detAccRec.mc", mc/nofEvents);
+   pt->put(name + ".detAccRec.eff", effRec);
 }
 
 void CbmLitTrackingQaPTreeCreator::PolarAngleEfficiencyToPTree(
@@ -373,32 +347,32 @@ void CbmLitTrackingQaPTreeCreator::PolarAngleEfficiencyToPTree(
    Int_t kAll = 0, kRef = 1, kPrim = 2, kSec = 3, kEl = 4, kMu = 5;
 
    for(Int_t i = 0; i < fNofBinsAngle; i++) {
-      rec[kAll][i] = H1(hist+"_All_Rec")->GetBinContent(i+1);
-      acc[kAll][i] = H1(hist+"_All_Acc")->GetBinContent(i+1);
+      rec[kAll][i] = fHM->H1F(hist+"_All_Rec")->GetBinContent(i+1);
+      acc[kAll][i] = fHM->H1F(hist+"_All_Acc")->GetBinContent(i+1);
       if (acc[kAll][i] != 0.) { eff[kAll][i] = 100.*rec[kAll][i] / acc[kAll][i]; }
 
-      rec[kRef][i] = H1(hist+"_Ref_Rec")->GetBinContent(i+1);
-      acc[kRef][i] = H1(hist+"_Ref_Acc")->GetBinContent(i+1);
+      rec[kRef][i] = fHM->H1F(hist+"_Ref_Rec")->GetBinContent(i+1);
+      acc[kRef][i] = fHM->H1F(hist+"_Ref_Acc")->GetBinContent(i+1);
       if (acc[kRef][i] != 0.) { eff[kRef][i] = 100.*rec[kRef][i] / acc[kRef][i]; }
 
-      rec[kPrim][i] = H1(hist+"_Prim_Rec")->GetBinContent(i+1);
-      acc[kPrim][i] = H1(hist+"_Prim_Acc")->GetBinContent(i+1);
+      rec[kPrim][i] = fHM->H1F(hist+"_Prim_Rec")->GetBinContent(i+1);
+      acc[kPrim][i] = fHM->H1F(hist+"_Prim_Acc")->GetBinContent(i+1);
       if (acc[kPrim][i] != 0.) { eff[kPrim][i] = 100.*rec[kPrim][i] / acc[kPrim][i]; }
 
-      rec[kSec][i] = H1(hist+"_Sec_Rec")->GetBinContent(i+1);
-      acc[kSec][i] = H1(hist+"_Sec_Acc")->GetBinContent(i+1);
+      rec[kSec][i] = fHM->H1F(hist+"_Sec_Rec")->GetBinContent(i+1);
+      acc[kSec][i] = fHM->H1F(hist+"_Sec_Acc")->GetBinContent(i+1);
       if (acc[kSec][i] != 0.) { eff[kSec][i] = 100.*rec[kSec][i] / acc[kSec][i]; }
 
-      rec[kEl][i] = H1(hist+"_El_Rec")->GetBinContent(i+1);
-      acc[kEl][i] = H1(hist+"_El_Acc")->GetBinContent(i+1);
+      rec[kEl][i] = fHM->H1F(hist+"_El_Rec")->GetBinContent(i+1);
+      acc[kEl][i] = fHM->H1F(hist+"_El_Acc")->GetBinContent(i+1);
       if (acc[kEl][i] != 0.) { eff[kEl][i] = 100.*rec[kEl][i] / acc[kEl][i]; }
 
-      rec[kMu][i] = H1(hist+"_Mu_Rec")->GetBinContent(i+1);
-      acc[kMu][i] = H1(hist+"_Mu_Acc")->GetBinContent(i+1);
+      rec[kMu][i] = fHM->H1F(hist+"_Mu_Rec")->GetBinContent(i+1);
+      acc[kMu][i] = fHM->H1F(hist+"_Mu_Acc")->GetBinContent(i+1);
       if (acc[kMu][i] != 0.) { eff[kMu][i] = 100.*rec[kMu][i] / acc[kMu][i]; }
    }
 
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
+   Double_t nofEvents = (Double_t)fHM->H1F("hEventNo")->GetEntries();
    Int_t w = 17;
    std::stringstream ss;
    for (Int_t i = 0; i < fNofBinsAngle; i++) {

@@ -13,21 +13,18 @@
 #include "TH2F.h"
 #include "TH3F.h"
 
-#include <iostream>
 #include <assert.h>
-using std::cout;
-using std::endl;
 
 CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
    fMinMom(0.),
    fMaxMom(12.),
-   fNofBinsMom(120),
+   fNofBinsMom(12),
    fMinPt(0.),
    fMaxPt(3.),
-   fNofBinsPt(30),
+   fNofBinsPt(3),
    fMinY(0.),
    fMaxY(4.),
-   fNofBinsY(40),
+   fNofBinsY(4),
    fMinAngle(0.),
    fMaxAngle(25.),
    fNofBinsAngle(3),
@@ -55,7 +52,8 @@ void CbmLitTrackingQaHistCreator::CreateEffHist(
          string histName = name + "_" + cat[i] + "_" + type[j];
          if (type[j] == "Eff") yTitle = "Efficiency [%]";
          fHM->Add(histName, new TH1F(histName.c_str(),
-               (histName+";"+xTitle+";"+yTitle).c_str(), nofBins, minBin, maxBin));
+               (histName + ";" + xTitle + ";" + yTitle).c_str(), nofBins, minBin, maxBin));
+         TAxis* xa = fHM->H1F(histName)->GetXaxis();
       }
    }
 }
@@ -71,7 +69,7 @@ void CbmLitTrackingQaHistCreator::CreateEffHist3D(
       for (int j = 0; j < types.size(); j++) {
          string histName = name + "_" + cat[i] + "_" + types[j];
          fHM->Add(histName, new TH3F(histName.c_str(),
-               (histName+";P [GeV/c];Rapidity;P_{t} [GeV/c]").c_str(),
+               (histName + ";P [GeV/c];Rapidity;P_{t} [GeV/c]").c_str(),
                fNofBinsMom, fMinMom, fMaxMom,
                fNofBinsY, fMinY, fMaxY,
                fNofBinsPt, fMinPt, fMaxPt));
@@ -88,7 +86,7 @@ void CbmLitTrackingQaHistCreator::Create1DHist(
       float maxBin)
 {
    TH1F* h = new TH1F(name.c_str(),
-         (name+";"+xTitle+";"+yTitle).c_str(), nofBins, minBin, maxBin);
+         (name + ";" + xTitle + ";" + yTitle).c_str(), nofBins, minBin, maxBin);
    fHM->Add(name, h);
 }
 
@@ -105,7 +103,7 @@ void CbmLitTrackingQaHistCreator::Create2DHist(
       float maxBinY)
 {
    TH2F* h = new TH2F(name.c_str(),
-         (name+";"+xTitle+";"+yTitle+";"+zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
+         (name + ";" + xTitle + ";" + yTitle + ";" + zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
    fHM->Add(name, h);
 }
 
@@ -181,13 +179,6 @@ void CbmLitTrackingQaHistCreator::Create(
    Create1DHist("hRichGhostElIdNh", "Nof ghosts", "Yield",nBinsNofPoints, minNofPoints, maxNofPoints);
    Create1DHist("hStsGhostRichMatchingNh", "Nof ghosts", "Yield",nBinsNofPoints, minNofPoints, maxNofPoints);
 
-   const int maxNofStations = 30;
-   Create1DHist("hMvdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1DHist("hStsNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1DHist("hTrdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1DHist("hMuchNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1DHist("hTofNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-
    const int nofHitsHistos = 5;
    string hittype[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
    float hitmin[] = {0, 0, 0, -0.1, -0.1};
@@ -219,31 +210,6 @@ void CbmLitTrackingQaHistCreator::Create(
    Create1DHist("hNofMuchTracks", "Tracks per event", "Counter", nofBinsC, 1., maxXC);
    Create1DHist("hNofRichRings", "Rings per event", "Counter", nofBinsC, 1., maxXC);
    Create1DHist("hNofRichProjections", "Projections per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1DHist("hNofMvdHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofStsHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofRichHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofTrdHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofMuchPixelHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofMuchStrawHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofTofHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1DHist("hNofMvdPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofStsPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofRichPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofTrdPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofMuchPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofTofPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1DHist("hNofMvdDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofStsDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofMuchDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofTrdDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1DHist("hNofMvdClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofStsClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofMuchClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-   Create1DHist("hNofTrdClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
 
    Create1DHist("hStsChiprim", "#chi^{2}_{vertex}", "Yield", 150, 0., 15.);
    Create2DHist("hStsMomresVsMom", "P [GeV/c]", "dP/P", "Counter", 120, 0., 12., 100, -15., 15.);

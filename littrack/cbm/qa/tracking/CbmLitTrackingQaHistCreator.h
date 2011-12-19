@@ -11,7 +11,6 @@
 #include "qa/tracking/CbmLitTrackingQaHistNames.h"
 #include <string>
 class CbmLitHistManager;
-class TFile;
 using std::string;
 
 /**

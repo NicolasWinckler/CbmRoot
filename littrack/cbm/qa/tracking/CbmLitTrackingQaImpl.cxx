@@ -1,11 +1,8 @@
 /**
  * \file CbmLitTrackingQaImpl.cxx
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
- *
- * Implementation of global track reconstruction QA.
- **/
+ */
 #include "qa/tracking/CbmLitTrackingQaImpl.h"
 #include "qa/tracking/CbmLitTrackingQaReport.h"
 #include "qa/base/CbmLitResultChecker.h"
@@ -94,13 +91,6 @@ CbmLitTrackingQaImpl::CbmLitTrackingQaImpl():
    fRefMomentum(1.),
    fRefMinNofHitsRich(15),
 
-   fMinMom(0.),
-   fMaxMom(25.),
-   fNofBinsMom(25),
-   fMinAngle(0.),
-   fMaxAngle(30.),
-   fNofBinsAngle(3),
-
    fMcStsMap(),
    fMcHalfGlobalMap(),
    fMcGlobalMap(),
@@ -108,18 +98,12 @@ CbmLitTrackingQaImpl::CbmLitTrackingQaImpl():
    fMCTracks(NULL),
    fGlobalTracks(NULL),
 
-   fMvdHits(NULL),
    fMvdPoints(NULL),
    fMvdHitMatches(NULL),
-   fMvdDigis(NULL),
-   fMvdClusters(NULL),
 
    fStsTracks(NULL),
    fStsMatches(NULL),
    fStsPoints(NULL),
-   fStsDigis(NULL),
-   fStsClusters(NULL),
-   fStsHits(NULL),
 
    fRichHits(NULL),
    fRichRings(NULL),
@@ -127,21 +111,15 @@ CbmLitTrackingQaImpl::CbmLitTrackingQaImpl():
    fRichRingMatches(NULL),
    fRichPoints(NULL),
 
-   fMuchPixelHits(NULL),
-   fMuchStrawHits(NULL),
    fMuchMatches(NULL),
    fMuchPoints(NULL),
-   fMuchDigis(NULL),
-   fMuchClusters(NULL),
 
    fTrdMatches(NULL),
-   fTrdHits(NULL),
    fTrdPoints(NULL),
-   fTrdDigis(NULL),
-   fTrdClusters(NULL),
 
    fTofPoints(NULL),
    fTofHits(NULL),
+
    fOutputDir(""),
 
    fPrimVertex(NULL),
@@ -177,32 +155,17 @@ void CbmLitTrackingQaImpl::Exec(
    Option_t* opt)
 {
    // Increase event counter
-   H1("hEventNo")->Fill(0.5);
-   std::cout << "Event: " << H1("hEventNo")->GetEntries() << std::endl;
+   fHM->H1F("hEventNo")->Fill(0.5);
+   std::cout << "Event: " << fHM->H1F("hEventNo")->GetEntries() << std::endl;
 
    fMCTrackCreator->Create();
    FillNofCrossedStationsHistos();
    FillRichRingNofHits();
-   ProcessHits();
    ProcessGlobalTracks();
    ProcessMcTracks();
    PionSuppression3D();
    StsTracksQa();
    IncreaseCounters();
-
-   CbmLitTrackingQaPTreeCreator ptc;
-   ptc.fIsElectronSetup = fIsElectronSetup;
-   ptc.fIsMvd = fIsMvd;
-   ptc.fIsSts = fIsSts;
-   ptc.fIsRich = fIsRich;
-   ptc.fIsTrd = fIsTrd;
-   ptc.fIsMuch = fIsMuch;
-   ptc.fIsTof = fIsTof;
-   ptc.fOutputDir = fOutputDir;
-   ptc.fMinAngle = fMinAngle;
-   ptc.fMaxAngle = fMaxAngle;
-   ptc.fNofBinsAngle = fNofBinsAngle;
-   boost::property_tree::ptree pt = ptc.Create(fHM);
 }
 
 void CbmLitTrackingQaImpl::Finish()
@@ -210,30 +173,6 @@ void CbmLitTrackingQaImpl::Finish()
    CalculateEfficiencyHistos();
    Draw();
    WriteToFile();
-}
-
-TH1F* CbmLitTrackingQaImpl::H1(
-      const string& name)
-{
-   return fHM->H1F(name);
-}
-
-TH2F* CbmLitTrackingQaImpl::H2(
-      const string& name)
-{
-   return fHM->H2F(name);
-}
-
-TH3F* CbmLitTrackingQaImpl::H3(
-      const string& name)
-{
-   return fHM->H3F(name);
-}
-
-TH1* CbmLitTrackingQaImpl::H(
-      const string& name)
-{
-   return fHM->H1(name);
 }
 
 void CbmLitTrackingQaImpl::DetermineSetup()
@@ -300,16 +239,10 @@ void CbmLitTrackingQaImpl::ReadDataBranches()
    if (NULL == fGlobalTracks) { Fatal("Init","No GlobalTrack array!"); }
 
    if (fIsMvd) {
-      fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
-      if (NULL == fMvdHits) { Fatal("Init",": No MvdHit array!"); }
       fMvdPoints = (TClonesArray*) ioman->GetObject("MvdPoint");
       if (NULL == fMvdPoints) { Fatal("Init",": No MvdPoint array!"); }
       fMvdHitMatches = (TClonesArray*) ioman->GetObject("MvdHitMatch");
       if (NULL == fMvdHitMatches) { Fatal("Init",": No MvdHitMatch array!"); }
-      fMvdDigis = (TClonesArray*) ioman->GetObject("MvdDigi");
-      //if (NULL == fMvdDigis) { Fatal("Init",": No MvdDigi array!"); }
-      fMvdClusters = (TClonesArray*) ioman->GetObject("MvdCluster");
-      //if (NULL == fMvdClusters) { Fatal("Init",": No MvdCluster array!"); }
    }
 
    if (fIsSts) {
@@ -317,14 +250,8 @@ void CbmLitTrackingQaImpl::ReadDataBranches()
       if (NULL == fStsTracks) { Fatal("Init",": No StsTrack array!"); }
       fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
       if (NULL == fStsMatches) { Fatal("Init",": No StsTrackMatch array!"); }
-      fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
-      if (NULL == fStsHits) { Fatal("Init",": No StsHit array!"); }
       fStsPoints = (TClonesArray*) ioman->GetObject("StsPoint");
       if (NULL == fStsPoints) { Fatal("Init",": No StsPoint array!"); }
-      fStsDigis = (TClonesArray*) ioman->GetObject("StsDigi");
-      //if (NULL == fStsDigis) { Fatal("Init",": No StsDigi array!"); }
-      fStsClusters = (TClonesArray*) ioman->GetObject("StsCluster");
-      //if (NULL == fStsClusters) { Fatal("Init",": No StsCluster array!"); }
    }
 
    if (fIsRich) {
@@ -341,30 +268,17 @@ void CbmLitTrackingQaImpl::ReadDataBranches()
    }
 
    if (fIsMuch) {
-      fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
-      fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
-      if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) { Fatal("CbmLitTrackingQaImpl::Init", "No MuchPixelHit AND MuchStrawHit arrays!"); }
       fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
       if (NULL == fMuchMatches) { Fatal("Init","No MuchTrackMatch array!"); }
       fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
       if (NULL == fMuchPoints) { Fatal("Init","No MuchPoint array!"); }
-      fMuchDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
-//      if (NULL == fMuchDigis) { Fatal("Init","No MuchDigi array!"); }
-      fMuchClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
-//      if (NULL == fMuchClusters) { Fatal("Init","No MuchCluster array!"); }
    }
 
    if (fIsTrd) {
       fTrdMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
       if (NULL == fTrdMatches) { Fatal("Init","No TrdTrackMatch array!"); }
-      fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
-      if (NULL == fTrdHits) { Fatal("Init","No TrdHit array!"); }
       fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
       if (NULL == fTrdPoints) { Fatal("Init","No TrdPoint array!"); }
-      fTrdDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
-//      if (NULL == fTrdDigis) { Fatal("Init","No TrdDigi array!"); }
-      fTrdClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
-//      if (NULL == fTrdClusters) { Fatal("Init","No TrdCluster array!"); }
    }
 
    if (fIsTof) {
@@ -379,44 +293,6 @@ void CbmLitTrackingQaImpl::ReadDataBranches()
 
    fKFFitter = new CbmStsKFTrackFitter();
    fKFFitter->Init();
-}
-
-void CbmLitTrackingQaImpl::ProcessHits()
-{
-   if (fIsMvd) {
-      for (Int_t i = 0; i < fMvdHits->GetEntriesFast(); i++) {
-         CbmHit* hit = static_cast<CbmHit*>(fMvdHits->At(i));
-         H1("hMvdNofHitsInStation")->Fill(hit->GetStationNr());
-      }
-   }
-   if (fIsSts) {
-      for (Int_t i = 0; i < fStsHits->GetEntriesFast(); i++) {
-         CbmHit* hit = static_cast<CbmHit*>(fStsHits->At(i));
-         H1("hStsNofHitsInStation")->Fill(hit->GetStationNr());
-      }
-   }
-   if (fIsTrd) {
-      for (Int_t i = 0; i < fTrdHits->GetEntriesFast(); i++) {
-         CbmBaseHit* hit = static_cast<CbmBaseHit*>(fTrdHits->At(i));
-         H1("hTrdNofHitsInStation")->Fill(hit->GetPlaneId());
-      }
-   }
-   if (fIsMuch) {
-      for (Int_t i = 0; i < fMuchPixelHits->GetEntriesFast(); i++) {
-         CbmBaseHit* hit = static_cast<CbmBaseHit*>(fMuchPixelHits->At(i));
-         H1("hMuchNofHitsInStation")->Fill(hit->GetPlaneId());
-      }
-      for (Int_t i = 0; i < fMuchStrawHits->GetEntriesFast(); i++) {
-         CbmBaseHit* hit = static_cast<CbmBaseHit*>(fMuchStrawHits->At(i));
-         H1("hMuchNofHitsInStation")->Fill(hit->GetPlaneId());
-      }
-   }
-   if (fIsTof) {
-      for (Int_t i = 0; i < fTofHits->GetEntriesFast(); i++) {
-         CbmBaseHit* hit = static_cast<CbmBaseHit*>(fTofHits->At(i));
-         H1("hTofNofHitsInStation")->Fill(hit->GetPlaneId());
-      }
-   }
 }
 
 void CbmLitTrackingQaImpl::FillRichRingNofHits()
@@ -620,13 +496,13 @@ void CbmLitTrackingQaImpl::ProcessGlobalTracks()
          isStsOk = CheckTrackQuality(stsTrackMatch, kSTS);
          if (!isStsOk) { // ghost track
             Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
-            H1("hStsGhostNh")->Fill(nofHits);
+            fHM->H1F("hStsGhostNh")->Fill(nofHits);
 
             // calculate number of ghost after RICH matching
             if (isRichOk){
                CbmRichRing* ring = static_cast<CbmRichRing*>(fRichRings->At(richId));
                if (NULL != ring){
-                  if (ring->GetDistance() < 1.) H1("hStsGhostRichMatchingNh")->Fill(nofHits);
+                  if (ring->GetDistance() < 1.) fHM->H1F("hStsGhostRichMatchingNh")->Fill(nofHits);
                }
             }
          } else {
@@ -640,7 +516,7 @@ void CbmLitTrackingQaImpl::ProcessGlobalTracks()
          if (nofHits >= fMinNofHitsTrd) {
             isTrdOk = CheckTrackQuality(trdTrackMatch, kTRD);
             if (!isTrdOk) { // ghost track
-               H1("hRecGhostNh")->Fill(nofHits);
+               fHM->H1F("hRecGhostNh")->Fill(nofHits);
             }
          } else {
             isTrdOk = false;
@@ -653,7 +529,7 @@ void CbmLitTrackingQaImpl::ProcessGlobalTracks()
          if (nofHits >= fMinNofHitsMuch) {
             isMuchOk = CheckTrackQuality(muchTrackMatch, kMUCH);
             if (!isMuchOk) { // ghost track
-               H1("hRecGhostNh")->Fill(nofHits);
+               fHM->H1F("hRecGhostNh")->Fill(nofHits);
             }
          } else {
             isMuchOk = false;
@@ -669,12 +545,12 @@ void CbmLitTrackingQaImpl::ProcessGlobalTracks()
          Int_t nofHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits() + richRingMatch->GetNofFakeHits();
          isRichOk = CheckRingQuality(richRingMatch);
          if (!isRichOk) { // ghost ring
-            H1("hRichGhostNh")->Fill(nofHits);
+            fHM->H1F("hRichGhostNh")->Fill(nofHits);
 
             // calculate number of ghost after STS matching and electron identification
             CbmRichRing* ring = static_cast<CbmRichRing*>(fRichRings->At(richId));
             if (NULL != ring){
-               if (ring->GetDistance() < 1.) H1("hRichGhostStsMatchingNh")->Fill(nofHits);
+               if (ring->GetDistance() < 1.) fHM->H1F("hRichGhostStsMatchingNh")->Fill(nofHits);
 
                Double_t momentumMc = 0.;
                if (stsTrackMatch!=NULL){
@@ -682,7 +558,7 @@ void CbmLitTrackingQaImpl::ProcessGlobalTracks()
                   if (mcTrack != NULL) momentumMc = mcTrack->GetP();
                 }
                 if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
-                   H1("hRichGhostElIdNh")->Fill(nofHits);
+                   fHM->H1F("hRichGhostElIdNh")->Fill(nofHits);
             }
          }
       }
@@ -793,7 +669,7 @@ void CbmLitTrackingQaImpl::ProcessMvd(
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(stsId));
    if (NULL == track) return;
    Int_t nofHits = track->GetNMvdHits();
-   H1("hMvdTrackHits_All")->Fill(nofHits);
+   fHM->H1F("hMvdTrackHits_All")->Fill(nofHits);
 
    CbmTrackMatch* stsTrackMatch = static_cast<CbmTrackMatch*>(fStsMatches->At(stsId));
    if (NULL == stsTrackMatch) return;
@@ -814,11 +690,11 @@ void CbmLitTrackingQaImpl::ProcessMvd(
          nofFakeHits++;
       }
    }
-   H1("hMvdTrackHits_True")->Fill(nofTrueHits);
-   H1("hMvdTrackHits_Fake")->Fill(nofFakeHits);
+   fHM->H1F("hMvdTrackHits_True")->Fill(nofTrueHits);
+   fHM->H1F("hMvdTrackHits_Fake")->Fill(nofFakeHits);
    if (nofHits != 0) {
-      H1("hMvdTrackHits_TrueOverAll")->Fill(Float_t(nofTrueHits) / Float_t(nofHits));
-      H1("hMvdTrackHits_FakeOverAll")->Fill(Float_t(nofFakeHits) / Float_t(nofHits));
+      fHM->H1F("hMvdTrackHits_TrueOverAll")->Fill(Float_t(nofTrueHits) / Float_t(nofHits));
+      fHM->H1F("hMvdTrackHits_FakeOverAll")->Fill(Float_t(nofFakeHits) / Float_t(nofHits));
    }
 }
 
@@ -837,29 +713,28 @@ Bool_t CbmLitTrackingQaImpl::CheckTrackQuality(
    Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
 
    if(detId == kSTS) {
-      H1("hStsTrackHits_All")->Fill(nofHits);
-      H1("hStsTrackHits_True")->Fill(nofTrue);
-      H1("hStsTrackHits_Fake")->Fill(nofFake + nofWrong);
-      H1("hStsTrackHits_TrueOverAll")->Fill(quali);
-      H1("hStsTrackHits_FakeOverAll")->Fill(fakequali);
+      fHM->H1F("hStsTrackHits_All")->Fill(nofHits);
+      fHM->H1F("hStsTrackHits_True")->Fill(nofTrue);
+      fHM->H1F("hStsTrackHits_Fake")->Fill(nofFake + nofWrong);
+      fHM->H1F("hStsTrackHits_TrueOverAll")->Fill(quali);
+      fHM->H1F("hStsTrackHits_FakeOverAll")->Fill(fakequali);
    }
    if(detId == kTRD) {
-      H1("hTrdTrackHits_All")->Fill(nofHits);
-      H1("hTrdTrackHits_True")->Fill(nofTrue);
-      H1("hTrdTrackHits_Fake")->Fill(nofFake + nofWrong);
-      H1("hTrdTrackHits_TrueOverAll")->Fill(quali);
-      H1("hTrdTrackHits_FakeOverAll")->Fill(fakequali);
+      fHM->H1F("hTrdTrackHits_All")->Fill(nofHits);
+      fHM->H1F("hTrdTrackHits_True")->Fill(nofTrue);
+      fHM->H1F("hTrdTrackHits_Fake")->Fill(nofFake + nofWrong);
+      fHM->H1F("hTrdTrackHits_TrueOverAll")->Fill(quali);
+      fHM->H1F("hTrdTrackHits_FakeOverAll")->Fill(fakequali);
    }
    if(detId == kMUCH) {
-      H1("hMuchTrackHits_All")->Fill(nofHits);
-      H1("hMuchTrackHits_True")->Fill(nofTrue);
-      H1("hMuchTrackHits_Fake")->Fill(nofFake + nofWrong);
-      H1("hMuchTrackHits_TrueOverAll")->Fill(quali);
-      H1("hMuchTrackHits_FakeOverAll")->Fill(fakequali);
+      fHM->H1F("hMuchTrackHits_All")->Fill(nofHits);
+      fHM->H1F("hMuchTrackHits_True")->Fill(nofTrue);
+      fHM->H1F("hMuchTrackHits_Fake")->Fill(nofFake + nofWrong);
+      fHM->H1F("hMuchTrackHits_TrueOverAll")->Fill(quali);
+      fHM->H1F("hMuchTrackHits_FakeOverAll")->Fill(fakequali);
    }
 
-   if (quali < fQuota) { return false; }
-   return true;
+   return (quali < fQuota) ? false : true;
 }
 
 Bool_t CbmLitTrackingQaImpl::CheckRingQuality(
@@ -875,14 +750,13 @@ Bool_t CbmLitTrackingQaImpl::CheckRingQuality(
    Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
    Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
 
-   H1("hRichRingHits_All")->Fill(nofHits);
-   H1("hRichRingHits_True")->Fill(nofTrue);
-   H1("hRichRingHits_Fake")->Fill(nofFake + nofWrong);
-   H1("hRichRingHits_TrueOverAll")->Fill(quali);
-   H1("hRichRingHits_FakeOverAll")->Fill(fakequali);
+   fHM->H1F("hRichRingHits_All")->Fill(nofHits);
+   fHM->H1F("hRichRingHits_True")->Fill(nofTrue);
+   fHM->H1F("hRichRingHits_Fake")->Fill(nofFake + nofWrong);
+   fHM->H1F("hRichRingHits_TrueOverAll")->Fill(quali);
+   fHM->H1F("hRichRingHits_FakeOverAll")->Fill(fakequali);
 
-   if (quali < fQuotaRich) { return false; }
-   return true;
+   return (quali < fQuotaRich) ? false : true;
 }
 
 void CbmLitTrackingQaImpl::FillMcHistoForDetAcc(
@@ -890,13 +764,13 @@ void CbmLitTrackingQaImpl::FillMcHistoForDetAcc(
       Double_t y,
       Double_t pt)
 {
-   H3("hStsDetAcc3D_El_Mc")->Fill(p, y, pt);
-   H3("hStsRichDetAcc3D_El_Mc")->Fill(p, y, pt);
-   H3("hStsTrdDetAcc3D_El_Mc")->Fill(p, y, pt);
-   H3("hStsTofDetAcc3D_El_Mc")->Fill(p, y, pt);
-   H3("hStsRichTrdDetAcc3D_El_Mc")->Fill(p, y, pt);
-   H3("hStsRichTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
-   H3("hStsTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsRichDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsTrdDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsTofDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsRichTrdDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsRichTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
+   fHM->H3F("hStsTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
 }
 
 void CbmLitTrackingQaImpl::ProcessMcTracks()
@@ -948,7 +822,7 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
          // polar angle dependence histograms
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, "hStsAngle", angle);
 
-         if (isPrimElectron) H3("hStsDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) fHM->H3F("hStsDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
 
          FillMCMomVsAngle(mcTrack);
       }
@@ -962,7 +836,7 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
          // STS+TRD: Electron identification
          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcHalfGlobalMap, "hStsTrd3DElId_ElId", "trd");
 
-         if (isPrimElectron) H3("hStsTrdDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) fHM->H3F("hStsTrdDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
       // acceptance: STS+TRD(MUCH)+TOF
       if (isStsOk && isRecOk && isTofOk) {
@@ -979,12 +853,12 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
          // STS+TRD+TOF: Electron identification
          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcGlobalMap, "hStsTrdTof3DElId_ElId", "trd+tof");
 
-         if (isPrimElectron) H3("hStsTrdTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) fHM->H3F("hStsTrdTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
 
       // acceptance: STS+TOF
       if (isStsOk && isTofOk) {
-         if (isPrimElectron) H3("hStsTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) fHM->H3F("hStsTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
 
       // acceptance: STS as 100% + local TRD(MUCH) track cutting on number of points
@@ -1054,7 +928,7 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
         // STS+RICH: Electron identification
         FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichMap, "hStsRich3DElId_ElId", "rich");
 
-        if (isPrimElectron) H3("hStsRichDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+        if (isPrimElectron) fHM->H3F("hStsRichDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
       // acceptance: STS+RICH+TRD
       if (isStsOk && isRichOk && isTrdOk) {
@@ -1070,7 +944,7 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
          // STS+RICH+TRD: Electron identification
          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichTrdMap, "hStsRichTrd3DElId_ElId", "rich+trd");
 
-         if (isPrimElectron) H3("hStsRichTrdDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) fHM->H3F("hStsRichTrdDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
       // acceptance: STS+RICH+TRD+TOF
       if (isStsOk && isRichOk && isTrdOk && isTofOk) {
@@ -1090,7 +964,7 @@ void CbmLitTrackingQaImpl::ProcessMcTracks()
          // STS+RICH+TRD+TOF: Electron identification
          FillGlobalElIdHistos3D(mcTrack, iMCTrack, fMcStsRichTrdTofMap, "hStsRichTrdTof3DElId_ElId", "rich+trd+tof");
 
-         if (isPrimElectron) H3("hStsRichTrdTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
+         if (isPrimElectron) fHM->H3F("hStsRichTrdTofDetAcc3D_El_Acc")->Fill(mcP, mcY, mcPt);
       }
    } // Loop over MCTracks
 }
@@ -1113,41 +987,41 @@ void CbmLitTrackingQaImpl::FillGlobalReconstructionHistos(
    Bool_t isMuon = std::abs(mcTrack->GetPdgCode()) == 13;
    Bool_t isElectron = std::abs(mcTrack->GetPdgCode()) == 11;
 
-   if (par != -1.){
+   if (par != -1.) {
       // Fill histograms for accepted tracks
-      H1(hist+"_All_Acc")->Fill(par);
-      if (isPrim) { H1(hist+"_Prim_Acc")->Fill(par); }
-      if (isRef) { H1(hist+"_Ref_Acc")->Fill(par); }
-      if (!isPrim) { H1(hist+"_Sec_Acc")->Fill(par); }
-      if (isPrim && isMuon) { H1(hist+"_Mu_Acc")->Fill(par); }
-      if (isPrim && isElectron) { H1(hist+"_El_Acc")->Fill(par); }
+      fHM->H1F(hist + "_All_Acc")->Fill(par);
+      if (isPrim) { fHM->H1F(hist + "_Prim_Acc")->Fill(par); }
+      if (isRef) { fHM->H1F(hist + "_Ref_Acc")->Fill(par); }
+      if (!isPrim) { fHM->H1F(hist + "_Sec_Acc")->Fill(par); }
+      if (isPrim && isMuon) { fHM->H1F(hist + "_Mu_Acc")->Fill(par); }
+      if (isPrim && isElectron) { fHM->H1F(hist + "_El_Acc")->Fill(par); }
 
       // Fill histograms for reconstructed tracks which are accepted
       if (mcMap.find(mcId) != mcMap.end() ) {
-         H1(hist+"_All_Rec")->Fill(par);
-         if (isPrim) { H1(hist+"_Prim_Rec")->Fill(par); }
-         if (isRef) { H1(hist+"_Ref_Rec")->Fill(par); }
-         if (!isPrim) { H1(hist+"_Sec_Rec")->Fill(par); }
-         if (isPrim && isMuon) { H1(hist+"_Mu_Rec")->Fill(par); }
-         if (isPrim && isElectron) { H1(hist+"_El_Rec")->Fill(par); }
+         fHM->H1F(hist + "_All_Rec")->Fill(par);
+         if (isPrim) { fHM->H1F(hist + "_Prim_Rec")->Fill(par); }
+         if (isRef) { fHM->H1F(hist + "_Ref_Rec")->Fill(par); }
+         if (!isPrim) { fHM->H1F(hist + "_Sec_Rec")->Fill(par); }
+         if (isPrim && isMuon) { fHM->H1F(hist + "_Mu_Rec")->Fill(par); }
+         if (isPrim && isElectron) { fHM->H1F(hist + "_El_Rec")->Fill(par); }
       }
-   }else {
+   } else {
       // Fill histograms for accepted tracks
-      H3(hist+"_All_Acc")->Fill(p, y, pt);
-      if (isPrim) { H3(hist+"_Prim_Acc")->Fill(p, y, pt); }
-      if (isRef) { H3(hist+"_Ref_Acc")->Fill(p, y, pt); }
-      if (!isPrim) { H3(hist+"_Sec_Acc")->Fill(p, y, pt); }
-      if (isPrim && isMuon) { H3(hist+"_Mu_Acc")->Fill(p, y, pt); }
-      if (isPrim && isElectron) { H3(hist+"_El_Acc")->Fill(p, y, pt); }
+      fHM->H3F(hist+"_All_Acc")->Fill(p, y, pt);
+      if (isPrim) { fHM->H3F(hist + "_Prim_Acc")->Fill(p, y, pt); }
+      if (isRef) { fHM->H3F(hist + "_Ref_Acc")->Fill(p, y, pt); }
+      if (!isPrim) { fHM->H3F(hist + "_Sec_Acc")->Fill(p, y, pt); }
+      if (isPrim && isMuon) { fHM->H3F(hist + "_Mu_Acc")->Fill(p, y, pt); }
+      if (isPrim && isElectron) { fHM->H3F(hist + "_El_Acc")->Fill(p, y, pt); }
 
       // Fill histograms for reconstructed tracks which are accepted
       if (mcMap.find(mcId) != mcMap.end() ) {
-         H3(hist+"_All_Rec")->Fill(p, y, pt);
-         if (isPrim) { H3(hist+"_Prim_Rec")->Fill(p, y, pt); }
-         if (isRef) { H3(hist+"_Ref_Rec")->Fill(p, y, pt); }
-         if (!isPrim) { H3(hist+"_Sec_Rec")->Fill(p, y, pt); }
-         if (isPrim && isMuon) { H3(hist+"_Mu_Rec")->Fill(p, y, pt); }
-         if (isPrim && isElectron) { H3(hist+"_El_Rec")->Fill(p, y, pt); }
+         fHM->H3F(hist + "_All_Rec")->Fill(p, y, pt);
+         if (isPrim) { fHM->H3F(hist + "_Prim_Rec")->Fill(p, y, pt); }
+         if (isRef) { fHM->H3F(hist + "_Ref_Rec")->Fill(p, y, pt); }
+         if (!isPrim) { fHM->H3F(hist + "_Sec_Rec")->Fill(p, y, pt); }
+         if (isPrim && isMuon) { fHM->H3F(hist + "_Mu_Rec")->Fill(p, y, pt); }
+         if (isPrim && isElectron) { fHM->H3F(hist + "_El_Rec")->Fill(p, y, pt); }
       }
    }
 }
@@ -1167,7 +1041,7 @@ void CbmLitTrackingQaImpl::FillGlobalElIdHistos3D(
    Double_t y = mcTrack->GetRapidity();
    Double_t pt = mcTrack->GetPt();
 
-   if (isMCPrim && isMCElectron) H3(hist+"_Acc")->Fill(p, y, pt);
+   if (isMCPrim && isMCElectron) fHM->H3F(hist+"_Acc")->Fill(p, y, pt);
 
    Bool_t isRichId = (opt.find("rich") != std::string::npos);
    Bool_t isTrdId = (opt.find("trd") != std::string::npos);
@@ -1186,7 +1060,7 @@ void CbmLitTrackingQaImpl::FillGlobalElIdHistos3D(
 
       Bool_t isElectron = isRichElectron && isTrdElectron && isTofElectron;
 
-      if (isMCPrim && isMCElectron && isElectron) H3(hist+"_Rec")->Fill(p, y, pt);
+      if (isMCPrim && isMCElectron && isElectron) fHM->H3F(hist + "_Rec")->Fill(p, y, pt);
    }
 }
 
@@ -1211,39 +1085,39 @@ void CbmLitTrackingQaImpl::FillGlobalReconstructionHistosRich(
 
    if (par != -1.){
       // Fill histograms for accepted tracks and rings
-      H1(hist+"_All_Acc")->Fill(par);
-      if (isRef) { H1(hist+"_AllRef_Acc")->Fill(par); }
-      if (isElectron && isPrim) { H1(hist+"_El_Acc")->Fill(par); }
-      if (isElectron && isRef) { H1(hist+"_ElRef_Acc")->Fill(par); }
-      if (isPion) { H1(hist+"_Pi_Acc")->Fill(par); }
-      if (isPion && isRef) { H1(hist+"_PiRef_Acc")->Fill(par); }
+      fHM->H1F(hist + "_All_Acc")->Fill(par);
+      if (isRef) { fHM->H1F(hist + "_AllRef_Acc")->Fill(par); }
+      if (isElectron && isPrim) { fHM->H1F(hist + "_El_Acc")->Fill(par); }
+      if (isElectron && isRef) { fHM->H1F(hist + "_ElRef_Acc")->Fill(par); }
+      if (isPion) { fHM->H1F(hist + "_Pi_Acc")->Fill(par); }
+      if (isPion && isRef) { fHM->H1F(hist + "_PiRef_Acc")->Fill(par); }
 
       // Fill histograms for reconstructed rings and tracks which are accepted
       if (mcMap.find(mcId) != mcMap.end() ) {
-         H1(hist+"_All_Rec")->Fill(par);
-         if (isRef) { H1(hist+"_AllRef_Rec")->Fill(par); }
-         if (isElectron && isPrim) { H1(hist+"_El_Rec")->Fill(par); }
-         if (isElectron && isRef) { H1(hist+"_ElRef_Rec")->Fill(par); }
-         if (isPion) { H1(hist+"_Pi_Rec")->Fill(par); }
-         if (isPion && isRef) { H1(hist+"_PiRef_Rec")->Fill(par); }
+         fHM->H1F(hist + "_All_Rec")->Fill(par);
+         if (isRef) { fHM->H1F(hist + "_AllRef_Rec")->Fill(par); }
+         if (isElectron && isPrim) { fHM->H1F(hist + "_El_Rec")->Fill(par); }
+         if (isElectron && isRef) { fHM->H1F(hist + "_ElRef_Rec")->Fill(par); }
+         if (isPion) { fHM->H1F(hist + "_Pi_Rec")->Fill(par); }
+         if (isPion && isRef) { fHM->H1F(hist + "_PiRef_Rec")->Fill(par); }
       }
    } else {
       // Fill histograms for accepted tracks and rings
-      H3(hist+"_All_Acc")->Fill(p, y, pt);
-      if (isRef) { H3(hist+"_AllRef_Acc")->Fill(p, y, pt); }
-      if (isElectron && isPrim) { H3(hist+"_El_Acc")->Fill(p, y, pt); }
-      if (isElectron && isRef) { H3(hist+"_ElRef_Acc")->Fill(p, y, pt); }
-      if (isPion) { H3(hist+"_Pi_Acc")->Fill(p, y, pt); }
-      if (isPion && isRef) { H3(hist+"_PiRef_Acc")->Fill(p, y, pt); }
+      fHM->H3F(hist+"_All_Acc")->Fill(p, y, pt);
+      if (isRef) { fHM->H3F(hist+"_AllRef_Acc")->Fill(p, y, pt); }
+      if (isElectron && isPrim) { fHM->H3F(hist+"_El_Acc")->Fill(p, y, pt); }
+      if (isElectron && isRef) { fHM->H3F(hist+"_ElRef_Acc")->Fill(p, y, pt); }
+      if (isPion) { fHM->H3F(hist+"_Pi_Acc")->Fill(p, y, pt); }
+      if (isPion && isRef) { fHM->H3F(hist+"_PiRef_Acc")->Fill(p, y, pt); }
 
       // Fill histograms for reconstructed rings and tracks which are accepted
       if (mcMap.find(mcId) != mcMap.end() ) {
-         H3(hist+"_All_Rec")->Fill(p, y, pt);
-         if (isRef) { H3(hist+"_AllRef_Rec")->Fill(p, y, pt); }
-         if (isElectron && isPrim) { H3(hist+"_El_Rec")->Fill(p, y, pt); }
-         if (isElectron && isRef) { H3(hist+"_ElRef_Rec")->Fill(p, y, pt); }
-         if (isPion) { H3(hist+"_Pi_Rec")->Fill(p, y, pt); }
-         if (isPion && isRef) { H3(hist+"_PiRef_Rec")->Fill(p, y, pt); }
+         fHM->H3F(hist+"_All_Rec")->Fill(p, y, pt);
+         if (isRef) { fHM->H3F(hist+"_AllRef_Rec")->Fill(p, y, pt); }
+         if (isElectron && isPrim) { fHM->H3F(hist+"_El_Rec")->Fill(p, y, pt); }
+         if (isElectron && isRef) { fHM->H3F(hist+"_ElRef_Rec")->Fill(p, y, pt); }
+         if (isPion) { fHM->H3F(hist+"_Pi_Rec")->Fill(p, y, pt); }
+         if (isPion && isRef) { fHM->H3F(hist+"_PiRef_Rec")->Fill(p, y, pt); }
       }
    }
 }
@@ -1290,15 +1164,15 @@ void CbmLitTrackingQaImpl::PionSuppression3D()
 
       if (!isPion) continue;
 
-      if (isTrdOk) H3("hStsTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isTrdOk && isTofOk) H3("hStsTrd3DElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-      if (isTrdOk && isTofOk) H3("hStsTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk) H3("hStsRich3DElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk) H3("hStsRich3DElIdNormStsRichTrd_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk) H3("hStsRichTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk && isTofOk) H3("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
-      if (isRichOk && isTrdOk && isTofOk) H3("hStsRichTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isTrdOk) fHM->H3F("hStsTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isTrdOk && isTofOk) fHM->H3F("hStsTrd3DElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+      if (isTrdOk && isTofOk) fHM->H3F("hStsTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk) fHM->H3F("hStsRich3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk) fHM->H3F("hStsRich3DElIdNormStsRichTrd_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk) fHM->H3F("hStsRichTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk && isTofOk) fHM->H3F("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk && isTofOk) fHM->H3F("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Acc")->Fill(p, y, pt);
+      if (isRichOk && isTrdOk && isTofOk) fHM->H3F("hStsRichTrdTof3DElId_PiSupp_Acc")->Fill(p, y, pt);
 
 //      H3("hStsTrd3DElId_PiSupp_Acc")->Fill(p, y, pt);
 //      H3("hStsTrd3DElIdNormStsTrdTof_PiSupp_Acc")->Fill(p, y, pt);
@@ -1314,15 +1188,15 @@ void CbmLitTrackingQaImpl::PionSuppression3D()
       Bool_t isTrdElectron = fElectronId->IsTrdElectron(gTrack, mcTrack->GetP());
       Bool_t isTofElectron = fElectronId->IsTofElectron(gTrack, mcTrack->GetP());
 
-      if (isTrdElectron) H3("hStsTrd3DElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isTrdElectron) H3("hStsTrd3DElIdNormStsTrdTof_PiSupp_Rec")->Fill(p, y, pt);
-      if (isTrdElectron && isTofElectron) H3("hStsTrdTof3DElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron) H3("hStsRich3DElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron) H3("hStsRich3DElIdNormStsRichTrd_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron && isTrdElectron) H3("hStsRichTrd3DElId_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron) H3("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron && isTrdElectron) H3("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
-      if (isRichElectron && isTrdElectron && isTofElectron) H3("hStsRichTrdTof3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isTrdElectron) fHM->H3F("hStsTrd3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isTrdElectron) fHM->H3F("hStsTrd3DElIdNormStsTrdTof_PiSupp_Rec")->Fill(p, y, pt);
+      if (isTrdElectron && isTofElectron) fHM->H3F("hStsTrdTof3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron) fHM->H3F("hStsRich3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron) fHM->H3F("hStsRich3DElIdNormStsRichTrd_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron && isTrdElectron) fHM->H3F("hStsRichTrd3DElId_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron) fHM->H3F("hStsRich3DElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron && isTrdElectron) fHM->H3F("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp_Rec")->Fill(p, y, pt);
+      if (isRichElectron && isTrdElectron && isTofElectron) fHM->H3F("hStsRichTrdTof3DElId_PiSupp_Rec")->Fill(p, y, pt);
    }
 }
 
@@ -1345,7 +1219,7 @@ void CbmLitTrackingQaImpl::StsTracksQa()
       mcTrack->GetMomentum(momMC);
       //fKFFitter.DoFit(stsTrack,11);
       Double_t chiPrimary = fKFFitter->GetChiToVertex(stsTrack, fPrimVertex);
-      H1("hStsChiprim")->Fill(chiPrimary);
+      fHM->H1F("hStsChiprim")->Fill(chiPrimary);
 
       FairTrackParam vtxTrack;
       fKFFitter->FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
@@ -1353,7 +1227,7 @@ void CbmLitTrackingQaImpl::StsTracksQa()
       vtxTrack.Momentum(momRec);
 
       Double_t dpp = 100. * (momMC.Mag() - momRec.Mag()) / momMC.Mag();
-      H2("hStsMomresVsMom")->Fill(momMC.Mag(), dpp);
+      fHM->H2F("hStsMomresVsMom")->Fill(momMC.Mag(), dpp);
    }
 
    //Track length in TOF detector
@@ -1384,7 +1258,7 @@ void CbmLitTrackingQaImpl::StsTracksQa()
          if (tofPoint->GetTrackID() == stsMCTrackId){
 
             Double_t dll = 100. * (tofPoint->GetLength() - trackLength) / tofPoint->GetLength();
-            H1("hTrackLength")->Fill(dll);
+            fHM->H1F("hTrackLength")->Fill(dll);
             break;
          }
       }
@@ -1406,12 +1280,12 @@ void CbmLitTrackingQaImpl::FillMCMomVsAngle(
    mcTrack->GetMomentum(mom);
    Double_t angle = std::abs(mom.Theta() * 180 / TMath::Pi());
 
-   H2("hMCMomVsAngle_All")->Fill(p, angle);
-   if (isPrim) { H2("hMCMomVsAngle_Prim")->Fill(p, angle); }
-   if (isRef) { H2("hMCMomVsAngle_Ref")->Fill(p, angle); }
-   if (!isPrim) { H2("hMCMomVsAngle_Sec")->Fill(p, angle); }
-   if (isPrim && isMuon) { H2("hMCMomVsAngle_Mu")->Fill(p, angle); }
-   if (isPrim && isElectron) { H2("hMCMomVsAngle_El")->Fill(p, angle); }
+   fHM->H2F("hMCMomVsAngle_All")->Fill(p, angle);
+   if (isPrim) { fHM->H2F("hMCMomVsAngle_Prim")->Fill(p, angle); }
+   if (isRef) { fHM->H2F("hMCMomVsAngle_Ref")->Fill(p, angle); }
+   if (!isPrim) { fHM->H2F("hMCMomVsAngle_Sec")->Fill(p, angle); }
+   if (isPrim && isMuon) { fHM->H2F("hMCMomVsAngle_Mu")->Fill(p, angle); }
+   if (isPrim && isElectron) { fHM->H2F("hMCMomVsAngle_El")->Fill(p, angle); }
 }
 
 void CbmLitTrackingQaImpl::CreateHistos(
@@ -1421,10 +1295,6 @@ void CbmLitTrackingQaImpl::CreateHistos(
       fHM->ReadFromFile(file);
    } else {
       CbmLitTrackingQaHistCreator hc;
-      hc.SetMomAxis(fMinMom, fMaxMom, fNofBinsMom);
-      hc.SetPtAxis(fMinPt, fMaxPt, fNofBinsPt);
-      hc.SetRapidityAxis(fMinY, fMaxY, fNofBinsY);
-      hc.SetAngleAxis(fMinAngle, fMaxAngle, fNofBinsAngle);
       hc.Create(fHM);
    }
 }
@@ -1438,13 +1308,21 @@ void CbmLitTrackingQaImpl::CreateProjections3D(
 
    string yTitle = "Yield";
    for (Int_t i = 0; i < cat.size(); i++) {
-      for (Int_t j = 0; j < type.size(); j++){
-         TH1D* px = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionX());
-         TH1D* py = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionY());
-         TH1D* pz = (TH1D*)(H3(hist+"_"+cat[i]+"_"+type[j])->ProjectionZ());
-         px->SetName(string(hist+"px_"+cat[i]+"_"+type[j]).c_str());
-         py->SetName(string(hist+"py_"+cat[i]+"_"+type[j]).c_str());
-         pz->SetName(string(hist+"pz_"+cat[i]+"_"+type[j]).c_str());
+      for (Int_t j = 0; j < type.size(); j++) {
+         string histName = hist + "_" + cat[i] + "_" + type[j];
+         TH3F* hist3D = fHM->H3F(histName);
+
+         string pxName = histName + "_px";
+         string pyName = histName + "_py";
+         string pzName = histName + "_pz";
+
+         Int_t nofBinsX = hist3D->GetNbinsX();
+         Int_t nofBinsY = hist3D->GetNbinsY();
+         Int_t nofBinsZ = hist3D->GetNbinsZ();
+
+         TH1D* px = hist3D->ProjectionX(pxName.c_str());
+         TH1D* py = hist3D->ProjectionY(pyName.c_str());
+         TH1D* pz = hist3D->ProjectionZ(pzName.c_str());
 
          // set Y axis titles
          if (type[j] == "Eff") yTitle = "Efficiency [%]";
@@ -1494,26 +1372,27 @@ void CbmLitTrackingQaImpl::DivideHistos(
          c = 1.;
          yTitle = "Pion suppression";
       }
-      DivideHistos(H(hist+"_"+cat[i]+"_"+type[rec]), H(hist+"_"+cat[i]+"_"+type[acc]),
-            H(hist+"_"+cat[i]+"_"+type[2]), c);
+
+      string histNameRec = hist + "_" + cat[i] + "_" + type[rec];
+      string histNameAcc = hist + "_" + cat[i] + "_" + type[acc];
+      string histNameEff = hist + "_" + cat[i] + "_" + type[2];
+
+      DivideHistos(fHM->H1(histNameRec), fHM->H1(histNameAcc), fHM->H1(histNameEff), c);
 
       if (addProjections){
-         DivideHistos(H(hist+"px_"+cat[i]+"_"+type[rec]), H(hist+"px_"+cat[i]+"_"+type[acc]),
-               H(hist+"px_"+cat[i]+"_"+type[2]), c);
-         DivideHistos(H(hist+"py_"+cat[i]+"_"+type[rec]), H(hist+"py_"+cat[i]+"_"+type[acc]),
-               H(hist+"py_"+cat[i]+"_"+type[2]), c);
-         DivideHistos(H(hist+"pz_"+cat[i]+"_"+type[rec]), H(hist+"pz_"+cat[i]+"_"+type[acc]),
-               H(hist+"pz_"+cat[i]+"_"+type[2]), c);
-         H(hist+"px_"+cat[i]+"_"+type[2])->GetYaxis()->SetTitle(yTitle.c_str());
-         H(hist+"py_"+cat[i]+"_"+type[2])->GetYaxis()->SetTitle(yTitle.c_str());
-         H(hist+"pz_"+cat[i]+"_"+type[2])->GetYaxis()->SetTitle(yTitle.c_str());
+         DivideHistos(fHM->H1(histNameRec + "_px"), fHM->H1(histNameAcc + "_px"), fHM->H1(histNameEff + "_px"), c);
+         DivideHistos(fHM->H1(histNameRec + "_py"), fHM->H1(histNameAcc + "_py"), fHM->H1(histNameEff + "_py"), c);
+         DivideHistos(fHM->H1(histNameRec + "_pz"), fHM->H1(histNameAcc + "_pz"), fHM->H1(histNameEff + "_pz"), c);
+         fHM->H1(histNameEff + "_px")->GetYaxis()->SetTitle(yTitle.c_str());
+         fHM->H1(histNameEff + "_py")->GetYaxis()->SetTitle(yTitle.c_str());
+         fHM->H1(histNameEff + "_pz")->GetYaxis()->SetTitle(yTitle.c_str());
       }
    }
 }
 
 void CbmLitTrackingQaImpl::CalculateEfficiencyHistos()
 {
-   Double_t nofEvents = (Double_t)H1("hEventNo")->GetEntries();
+   Double_t nofEvents = (Double_t)fHM->H1("hEventNo")->GetEntries();
 
    // Divide histograms for efficiency calculation
    // tracking performance
@@ -1568,11 +1447,7 @@ void CbmLitTrackingQaImpl::CalculateEfficiencyHistos()
    DivideHistos("hStsRichTrdTofDetAcc3D", kDetAcc, true);
    DivideHistos("hStsTrdTofDetAcc3D", kDetAcc, true);
 
-   H1("hMvdNofHitsInStation")->Scale(1./nofEvents);
-   H1("hStsNofHitsInStation")->Scale(1./nofEvents);
-   H1("hTrdNofHitsInStation")->Scale(1./nofEvents);
-   H1("hMuchNofHitsInStation")->Scale(1./nofEvents);
-   H1("hTofNofHitsInStation")->Scale(1./nofEvents);
+   std::cout << "END CalculateEfficiencyHistos" << std::endl;
 }
 
 void CbmLitTrackingQaImpl::WriteToFile()
@@ -1582,44 +1457,14 @@ void CbmLitTrackingQaImpl::WriteToFile()
 
 void CbmLitTrackingQaImpl::IncreaseCounters()
 {
-   H1("hNofGlobalTracks")->Fill(fGlobalTracks->GetEntriesFast());
-
-   if (fIsMvd) {
-      H1("hNofMvdHits")->Fill(fMvdHits->GetEntriesFast());
-      H1("hNofMvdPoints")->Fill(fMvdPoints->GetEntriesFast());
-   }
-   if (fIsSts) {
-      H1("hNofStsTracks")->Fill(fStsMatches->GetEntriesFast());
-	   H1("hNofStsHits")->Fill(fStsHits->GetEntriesFast());
-	   H1("hNofStsPoints")->Fill(fStsPoints->GetEntriesFast());
-      if (NULL != fStsDigis) H1("hNofStsDigis")->Fill(fStsDigis->GetEntriesFast());
-      if (NULL != fStsClusters) H1("hNofStsClusters")->Fill(fStsClusters->GetEntriesFast());
-   }
+   fHM->H1F("hNofGlobalTracks")->Fill(fGlobalTracks->GetEntriesFast());
+   if (fIsSts) { fHM->H1F("hNofStsTracks")->Fill(fStsMatches->GetEntriesFast()); }
    if (fIsRich) {
-      H1("hNofRichRings")->Fill(fRichRings->GetEntriesFast());
-      H1("hNofRichHits")->Fill(fRichHits->GetEntriesFast());
-      H1("hNofRichPoints")->Fill(fRichPoints->GetEntriesFast());
-      H1("hNofRichProjections")->Fill(fRichProjections->GetEntriesFast());
+      fHM->H1F("hNofRichRings")->Fill(fRichRings->GetEntriesFast());
+      fHM->H1F("hNofRichProjections")->Fill(fRichProjections->GetEntriesFast());
    }
-   if (fIsTrd) {
-      H1("hNofTrdTracks")->Fill(fTrdMatches->GetEntriesFast());
-	   H1("hNofTrdHits")->Fill(fTrdHits->GetEntriesFast());
-	   H1("hNofTrdPoints")->Fill(fTrdPoints->GetEntriesFast());
-      if (NULL != fTrdDigis) H1("hNofTrdDigis")->Fill(fTrdDigis->GetEntriesFast());
-      if (NULL != fTrdClusters) H1("hNofTrdClusters")->Fill(fTrdClusters->GetEntriesFast());
-   }
-   if (fIsMuch) {
-      H1("hNofMuchTracks")->Fill(fMuchMatches->GetEntriesFast());
-	   H1("hNofMuchPixelHits")->Fill(fMuchPixelHits->GetEntriesFast());
-	   H1("hNofMuchStrawHits")->Fill(fMuchStrawHits->GetEntriesFast());
-	   H1("hNofMuchPoints")->Fill(fMuchPoints->GetEntriesFast());
-      if (NULL != fMuchDigis) H1("hNofMuchDigis")->Fill(fMuchDigis->GetEntriesFast());
-      if (NULL != fMuchClusters) H1("hNofMuchClusters")->Fill(fMuchClusters->GetEntriesFast());
-   }
-   if (fIsTof) {
-      H1("hNofTofHits")->Fill(fTofHits->GetEntriesFast());
-      H1("hNofTofPoints")->Fill(fTofPoints->GetEntriesFast());
-   }
+   if (fIsTrd) { fHM->H1F("hNofTrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
+   if (fIsMuch) { fHM->H1F("hNofMuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
 }
 
 std::string CbmLitTrackingQaImpl::RecDetector()
@@ -1633,17 +1478,17 @@ std::string CbmLitTrackingQaImpl::RecDetector()
 
 void CbmLitTrackingQaImpl::Draw()
 {
-   CbmLitTrackingQaDraw* drawQa = new CbmLitTrackingQaDraw(fHM);
-   drawQa->fIsElectronSetup = fIsElectronSetup;
-   drawQa->fIsMvd = fIsMvd;
-   drawQa->fIsSts = fIsSts;
-   drawQa->fIsRich = fIsRich;
-   drawQa->fIsTrd = fIsTrd;
-   drawQa->fIsMuch = fIsMuch;
-   drawQa->fIsTof = fIsTof;
-   drawQa->fOutputDir = fOutputDir;
-   drawQa->SetRebinForDraw(1);
-   drawQa->Draw();
+   CbmLitTrackingQaDraw drawQa;
+   drawQa.fIsElectronSetup = fIsElectronSetup;
+   drawQa.fIsMvd = fIsMvd;
+   drawQa.fIsSts = fIsSts;
+   drawQa.fIsRich = fIsRich;
+   drawQa.fIsTrd = fIsTrd;
+   drawQa.fIsMuch = fIsMuch;
+   drawQa.fIsTof = fIsTof;
+   drawQa.fOutputDir = fOutputDir;
+   drawQa.SetRebinForDraw(1);
+   drawQa.Draw(fHM);
 
    CbmLitTrackingQaPTreeCreator ptc;
    ptc.fIsElectronSetup = fIsElectronSetup;
@@ -1654,9 +1499,9 @@ void CbmLitTrackingQaImpl::Draw()
    ptc.fIsMuch = fIsMuch;
    ptc.fIsTof = fIsTof;
    ptc.fOutputDir = fOutputDir;
-   ptc.fMinAngle = fMinAngle;
-   ptc.fMaxAngle = fMaxAngle;
-   ptc.fNofBinsAngle = fNofBinsAngle;
+   ptc.fMinAngle = 0;//fMinAngle;
+   ptc.fMaxAngle = 25.;//fMaxAngle;
+   ptc.fNofBinsAngle = 3;//fNofBinsAngle;
    boost::property_tree::ptree qa = ptc.Create(fHM);
 
    CbmLitTrackingQaReport report(kLitText);
@@ -1668,9 +1513,11 @@ void CbmLitTrackingQaImpl::Draw()
 
    CbmLitResultChecker qaChecker;
    qaChecker.DoCheck(qa, ideal, check);
-   if (fOutputDir != "") write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
+   if (fOutputDir != "") {
+      write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
+   }
 
-   if (fOutputDir != ""){
+   if (fOutputDir != "") {
       ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
       CbmLitTrackingQaReport reportHtml(kLitHtml);
       reportHtml.Create(foutHtml, &qa, NULL, NULL);
@@ -1678,20 +1525,6 @@ void CbmLitTrackingQaImpl::Draw()
       ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
       CbmLitTrackingQaReport reportLatex(kLitLatex);
       reportLatex.Create(foutLatex, &qa, NULL, NULL);
-   }
-
-   if (fOutputDir != ""){
-      /*CbmLitQaHTMLGenerator html;
-      html.SetIsElectronSetup(fIsElectronSetup);
-      html.SetDetectorPresence(kMVD, fIsMvd);
-      html.SetDetectorPresence(kSTS, fIsSts);
-      html.SetDetectorPresence(kRICH, fIsRich);
-      html.SetDetectorPresence(kTRD, fIsTrd);
-      html.SetDetectorPresence(kMUCH, fIsMuch);
-      html.SetDetectorPresence(kTOF, fIsTof);
-
-      std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-      html.Create(foutHtml, &qa, &ideal, &check);*/
    }
 }
 

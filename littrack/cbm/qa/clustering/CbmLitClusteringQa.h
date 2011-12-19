@@ -9,6 +9,8 @@
 #define CBMLITCLUSTERINGQA_H_
 
 #include "FairTask.h"
+class CbmLitHistManager;
+class CbmLitClusteringQaCalculator;
 
 class CbmLitClusteringQa : public FairTask
 {
@@ -38,6 +40,10 @@ public:
      * \brief Derived from FairTask.
      */
     virtual void Finish();
+
+private:
+    CbmLitHistManager* fHM; // Histogram manager
+    CbmLitClusteringQaCalculator* fClusteringQa; // Clustering performance calculator
 
     ClassDef(CbmLitClusteringQa, 1);
 };

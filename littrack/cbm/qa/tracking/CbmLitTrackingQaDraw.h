@@ -31,23 +31,25 @@ public:
    /**
     * \brief Constructor.
     */
-   CbmLitTrackingQaDraw(
-         CbmLitHistManager* hm):fHM(hm), fRebin(1){}
+   CbmLitTrackingQaDraw();
 
    /**
     * \brief Destructor.
     */
-   ~CbmLitTrackingQaDraw(){}
+   ~CbmLitTrackingQaDraw();
 
    /**
     *
     */
-   void Draw();
+   void Draw(
+         CbmLitHistManager* histManager);
 
    /**
     *
     */
-   void SetRebinForDraw(int rebin = 1) {if (rebin >=1) fRebin = rebin; else fRebin = 1;}
+   void SetRebinForDraw(int rebin = 1) {
+      fRebin = (rebin >= 1) ? rebin : 1;
+   }
 
    bool fIsElectronSetup; // If "electron" setup detected than true
    bool fIsMvd; // If MVD detected than true
@@ -59,34 +61,6 @@ public:
    string fOutputDir; // Output directory for images
 
 private:
-   /**
-    * \brief Return TH1F histogram from histogram manager.
-    * \return TH1F histogram from histogram manager.
-    */
-   TH1F* H1(
-      const string& name);
-
-   /**
-    * \brief Return TH2F histogram from histogram manager.
-    * \return TH2F histogram from histogram manager.
-    */
-   TH2F* H2(
-      const string& name);
-
-   /**
-    * \brief Return TH3F histogram from histogram manager.
-    * \return TH3F histogram from histogram manager.
-    */
-   TH3F* H3(
-      const string& name);
-
-   /**
-    * \brief Return TH1 histogram from histogram manager.
-    * \return TH1 histogram from histogram manager.
-    */
-   TH1* H(
-      const string& name);
-
    /**
     * \brief Draw efficiency histograms.
     */
@@ -108,7 +82,8 @@ private:
       const string& name2,
       const string& name3,
       const string& name4,
-      const string& opt = "");
+      const string& opt = "",
+      const string& proj = "");
 
    /**
     * \brief Calculate efficiency for two histograms.
@@ -146,20 +121,6 @@ private:
    void DrawHitsHistos(
       const string& canvasName,
       const string& hist);
-
-   /**
-    * \brief Draw histogram of number of hits in station.
-    * \param[in] name Canvas name.
-    * \param[in] hist Pointer to histogram.
-    */
-   void DrawHitsStationHisto(
-      const string& name,
-      TH1F* hist);
-
-   /**
-    * \brief Draw histograms of number of hits in station.
-    */
-   void DrawHitsStationHistos();
 
    /**
     * \brief Draw histograms of Sts tracks Qa.

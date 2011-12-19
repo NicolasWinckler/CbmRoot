@@ -39,50 +39,21 @@ void CbmLitTrackingQaStudyReport::Create(
    out << fR->TableBegin("Number of objects", list_of(string("")).range(fStudyNames));
    out << fR->TableRow(list_of("hEventNo")("Number of events"));
 
-   if (fIsMvd) {
-      out << PrintRow("hNofMvdPoints", "MVD points");
-      out << PrintRow("hNofMvdDigis", "MVD digis");
-      out << PrintRow("hNofMvdClusters", "MVD clusters");
-      out << PrintRow("hNofMvdHits", "MVD hits");
-   }
-
    if (fIsSts) {
-      out << PrintRow("hNofStsPoints", "STS points");
-      out << PrintRow("hNofStsDigis", "STS digis");
-      out << PrintRow("hNofStsClusters", "STS clusters");
-      out << PrintRow("hNofStsHits", "STS hits");
       out << PrintRow("hNofStsTracks", "STS tracks");
    }
 
    if (fIsRich) {
-      out << PrintRow("hNofRichPoints", "RICH points");
-      out << PrintRow("hNofRichHits", "RICH hits");
       out << PrintRow("hNofRichProjections", "RICH projections");
       out << PrintRow("hNofRichRings", "RICH rings");
    }
 
    if (fIsTrd) {
-      out << PrintRow("hNofTrdPoints", "TRD points");
-      out << PrintRow("hNofTrdDigis", "TRD digis");
-      out << PrintRow("hNofTrdClusters", "TRD clusters");
-      out << PrintRow("hNofTrdHits", "TRD hits");
       out << PrintRow("hNofTrdTracks", "TRD tracks");
    }
 
    if (fIsMuch) {
-      out << PrintRow("hNofMuchPoints", "MUCH points");
-      out << PrintRow("hNofMuchDigis", "MUCH digis");
-      out << PrintRow("hNofMuchClusters", "MUCH clusters");
-      out << PrintRow("hNofMuchPixelHits", "MUCH pixel hits");
-      out << PrintRow("hNofMuchStrawHits", "MUCH straw hits");
       out << PrintRow("hNofMuchTracks", "MUCH tracks");
-   }
-
-   if (fIsTof) {
-      out << PrintRow("hNofTofPoints", "TOF points");
-      //out << PrintRow(row++, "hNofTofDigis", "TOF digis");
-      //out << PrintRow(row++, "hNofTofClusters", "TOF clusters");
-      out << PrintRow("hNofTofHits", "TOF hits");
    }
 
    out << PrintRow("hNofGlobalTracks", "Global tracks");

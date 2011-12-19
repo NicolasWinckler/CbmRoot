@@ -96,30 +96,6 @@ void CbmLitTrackingQa::SetOutputDir(const std::string& dir)
    fImpl->SetOutputDir(dir);
 }
 
-void CbmLitTrackingQa::SetMomAxis(
-      Double_t min,
-      Double_t max,
-      Int_t nofBins)
-{
-   fImpl->SetMomAxis(min, max, nofBins);
-}
-
-void CbmLitTrackingQa::SetRapidityAxis(
-      Double_t min,
-      Double_t max,
-      Int_t nofBins)
-{
-   fImpl->SetRapidityAxis(min, max, nofBins);
-}
-
-void CbmLitTrackingQa::SetPtAxis(
-      Double_t min,
-      Double_t max,
-      Int_t nofBins)
-{
-   fImpl->SetPtAxis(min, max, nofBins);
-}
-
 void CbmLitTrackingQa::DrawHistosFromFile(const std::string& fileName)
 {
    fImpl->DrawHistosFromFile(fileName);
@@ -153,12 +129,11 @@ void CbmLitTrackingQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsI
 }
 
 void CbmLitTrackingQa::CreateReport(
-      LitReportType reportType,
       const string& title,
       const vector<string>& results,
       const vector<string>& names)
 {
-   CbmLitTrackingQaStudyReport report(reportType);
+   CbmLitTrackingQaStudyReport report(kLitHtml);
    report.SetIsElectronSetup(IsElectronSetup());
    report.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
    report.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
@@ -167,10 +142,10 @@ void CbmLitTrackingQa::CreateReport(
    report.SetDetectorPresence(kMUCH, GetDetectorPresence(kMUCH));
    report.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
 
-   string fileType = ".tex";
-   if (reportType == kLitHtml) fileType = ".html";
-   if (reportType == kLitText) fileType = ".txt";
-   ofstream fout(string(fImpl->GetOutputDir() + "/rec_qa_study"+fileType).c_str());
+   string fileType = ".html";
+//   if (reportType == kLitHtml) fileType = ".html";
+//   if (reportType == kLitText) fileType = ".txt";
+   ofstream fout(string(fImpl->GetOutputDir() + "/rec_qa_study" + fileType).c_str());
 
    vector<boost::property_tree::ptree*> qa;
    vector<boost::property_tree::ptree*> check;

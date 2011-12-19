@@ -8,6 +8,7 @@
 #ifndef CBMLITHISTMANAGER_H_
 #define CBMLITHISTMANAGER_H_
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <assert.h>
@@ -60,6 +61,9 @@ public:
     */
    TH1F* H1F(
          const string& name) const {
+      if (fHistMap.count(name) == 0) {
+         std::cout << "fHistMap.count(name) == 0: name=" << name << std::endl;
+      }
       assert(fHistMap.count(name) != 0);
       return (TH1F*)fHistMap.find(name)->second;
    }
@@ -93,6 +97,9 @@ public:
     */
    TH1* H1(
          const string& name) const {
+      if (fHistMap.count(name) == 0) {
+         std::cout << "H1: " <<  name << std::endl;
+      }
       assert(fHistMap.count(name) != 0);
       return (TH1*)fHistMap.find(name)->second;
    }

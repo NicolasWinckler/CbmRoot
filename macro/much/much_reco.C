@@ -13,15 +13,15 @@
 void much_reco(
 		Int_t nEvents = 100, // number of events
 		TString opt = "all")
-//, Bool_t boost) // if opt == "all" STS + hit producers + global tracking are executed
-                             // if opt == "hits" STS + hit producers are executed
-                             // if opt == "tracking" global tracking is executed
+   // if opt == "all" STS + hit producers + global tracking are executed
+   // if opt == "hits" STS + hit producers are executed
+   // if opt == "tracking" global tracking is executed
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, imageDir, mcFile, parFile, globalRecoFile, stsDigiFile, muchDigiFile, trackingType;
-	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
+	TString dir, imageDir, mcFile, parFile, globalRecoFile, globalTracksFile,
+	   globalHitsFile, stsDigiFile, muchDigiFile, trackingType;
 	if (script != "yes") {
 		// Output directory
 		dir  = "data/";
@@ -42,7 +42,7 @@ void much_reco(
 		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_v11a.digi.root";
 		// Directory for output images
-		TString imageDir = "./data/";
+		TString imageDir = "./test/";
 		// Tracking type
 		trackingType = "branch";
 	} else {
@@ -55,16 +55,11 @@ void much_reco(
 		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
 		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
-		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
 	}
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
-
-//	gSystem->Load("/home/soft/tbb/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -85,7 +80,7 @@ void much_reco(
 		run->SetOutputFile(globalTracksFile);
 	} else {
 		std::cout << "-E- Incorrect opt parameter" << std::endl;
-		exit();
+		exit(0);
 	}
 
 	if (opt == "all" || opt == "hits") {
@@ -228,19 +223,17 @@ void much_reco(
                 Int_t boost=bla.Atoi();
 
                 if (boost) {
-  		  CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-		  reconstructionQa->SetMinNofPointsSts(4);
-		  reconstructionQa->SetMinNofPointsTrd(10);
-		  reconstructionQa->SetMinNofPointsMuch(11);
-		  reconstructionQa->SetMinNofPointsTof(1);
-		  reconstructionQa->SetQuota(0.7);
-		  reconstructionQa->SetMinNofHitsTrd(9);
-		  reconstructionQa->SetMinNofHitsMuch(11);
-		  reconstructionQa->SetVerbose(1);
-		  reconstructionQa->SetMomentumRange(0., 25);
-		  reconstructionQa->SetNofBinsMom(25);
-		  reconstructionQa->SetOutputDir(std::string(imageDir));
-		  run->AddTask(reconstructionQa);
+  		  CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+		  trackingQa->SetMinNofPointsSts(4);
+		  trackingQa->SetMinNofPointsTrd(10);
+		  trackingQa->SetMinNofPointsMuch(11);
+		  trackingQa->SetMinNofPointsTof(1);
+		  trackingQa->SetQuota(0.7);
+		  trackingQa->SetMinNofHitsTrd(9);
+		  trackingQa->SetMinNofHitsMuch(11);
+		  trackingQa->SetVerbose(1);
+		  trackingQa->SetOutputDir(std::string(imageDir));
+		  run->AddTask(trackingQa);
                 }
 		// ------------------------------------------------------------------------
 	}

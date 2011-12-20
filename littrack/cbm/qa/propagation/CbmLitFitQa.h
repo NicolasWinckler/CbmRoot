@@ -61,6 +61,13 @@ public:
     */
    virtual void SetParContainers();
 
+   /* Setters */
+   void SetMvdMinNofHits(Int_t minNofHits) { fMvdMinNofHits = minNofHits; }
+   void SetStsMinNofHits(Int_t minNofHits) { fStsMinNofHits = minNofHits; }
+   void SetTrdMinNofHits(Int_t minNofHits) { fTrdMinNofHits = minNofHits; }
+   void SetMuchMinNofHits(Int_t minNofHits) { fMuchMinNofHits = minNofHits; }
+   void SetOutputDir(const std::string& dir) { fOutputDir = dir; }
+
 private:
 
    /**
@@ -84,11 +91,14 @@ private:
    void FillResidualsAndPulls(
       const FairTrackParam* par,
       const CbmLitMCPoint* mcPoint,
-      std::vector<TH1F*>& histos);
+      std::vector<TH1F*>& histos,
+      std::vector<TH1F*>& wrongCov,
+      Float_t wrongPar);
 
    void DrawHistos(
          const std::string& name,
-         std::vector<TH1F*>& histos);
+         std::vector<TH1F*>& histos,
+         std::vector<TH1F*>& wrongHistos);
 
    // Data branches
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
@@ -117,10 +127,28 @@ private:
    std::vector<TH1F*> fMuchHistosFirst; // MUCH first track parameter
    std::vector<TH1F*> fMuchHistosLast; // MUCH last track parameter
 
+   // Histograms for calculation of number of incorrect diagonal elements
+   // histogram[parameter]
+   // [0-4] number of wrong diagona; elements in cov matrix in dependence on number of hits
+   static const Int_t NOF_PARAMS_WRONG_COV = 5;
+   std::vector<TH1F*> fStsHistosFirstWrongCov; // STS first track parameter
+   std::vector<TH1F*> fStsHistosLastWrongCov; // STS last track parameter
+   std::vector<TH1F*> fTrdHistosFirstWrongCov; // TRD first track parameter
+   std::vector<TH1F*> fTrdHistosLastWrongCov; // TRD last track parameter
+   std::vector<TH1F*> fMuchHistosFirstWrongCov; // MUCH first track parameter
+   std::vector<TH1F*> fMuchHistosLastWrongCov; // MUCH last track parameter
+
    // MC track creator tool
    CbmLitMCTrackCreator* fMCTrackCreator;
 
-   Bool_t fIsFixedBounds;
+   Bool_t fIsFixedBounds; // if true than fixed bounds are used for histograms
+
+   Int_t fMvdMinNofHits; // Cut on minimum number of hits in track in MVD
+   Int_t fStsMinNofHits; // Cut on minimum number of hits in track in STS
+   Int_t fTrdMinNofHits; // Cut on minimum number of hits in track in TRD
+   Int_t fMuchMinNofHits; // Cut on minimum number of hits in track in MUCH
+
+   std::string fOutputDir; // Output directory for images
 
    ClassDef(CbmLitFitQa, 1)
 };

@@ -1,6 +1,5 @@
 /**
  * \file CbmLitFitQa.cxx
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
@@ -14,6 +13,7 @@
 #include "CbmStsHit.h"
 #include "CbmMvdHit.h"
 #include "utils/CbmLitDrawHist.h"
+#include "utils/CbmLitUtils.h"
 
 #include "FairRootManager.h"
 #include "CbmTrdDetectorId.h"
@@ -27,7 +27,12 @@
 #include <boost/assign/list_of.hpp>
 
 CbmLitFitQa::CbmLitFitQa():
-   fIsFixedBounds(true)
+   fIsFixedBounds(true),
+   fMvdMinNofHits(0),
+   fStsMinNofHits(0),
+   fTrdMinNofHits(0),
+   fMuchMinNofHits(0),
+   fOutputDir("./test/")
 {
 
 }
@@ -48,6 +53,9 @@ InitStatus CbmLitFitQa::Init()
 void CbmLitFitQa::Exec(
    Option_t* opt)
 {
+   static Int_t nofEvents = 0;
+   std::cout << "CbmLitFitQa: event=" << nofEvents++ << std::endl;
+
    fMCTrackCreator->Create();
    ProcessGlobalTracks();
 }
@@ -55,16 +63,16 @@ void CbmLitFitQa::Exec(
 void CbmLitFitQa::Finish()
 {
    if (NULL != fStsTracks) {
-      DrawHistos("fit_qa_sts_first_param", fStsHistosFirst);
-      DrawHistos("fit_qa_sts_last_param", fStsHistosLast);
+      DrawHistos("fit_qa_sts_first_param", fStsHistosFirst, fStsHistosFirstWrongCov);
+      DrawHistos("fit_qa_sts_last_param", fStsHistosLast, fStsHistosLastWrongCov);
    }
    if (NULL != fTrdTracks) {
-      DrawHistos("fit_qa_trd_first_param", fTrdHistosFirst);
-      DrawHistos("fit_qa_trd_last_param", fTrdHistosLast);
+      DrawHistos("fit_qa_trd_first_param", fTrdHistosFirst, fTrdHistosFirstWrongCov);
+      DrawHistos("fit_qa_trd_last_param", fTrdHistosLast, fTrdHistosLastWrongCov);
    }
    if (NULL != fMuchTracks) {
-      DrawHistos("fit_qa_much_first_param", fMuchHistosFirst);
-      DrawHistos("fit_qa_much_last_param", fMuchHistosLast);
+      DrawHistos("fit_qa_much_first_param", fMuchHistosFirst, fMuchHistosFirstWrongCov);
+      DrawHistos("fit_qa_much_last_param", fMuchHistosLast, fMuchHistosLastWrongCov);
    }
 }
 
@@ -94,6 +102,10 @@ void CbmLitFitQa::ReadDataBranches()
 
 void CbmLitFitQa::CreateHistograms()
 {
+   //
+   // Residual and pull histograms
+   //
+
    fStsHistosFirst.resize(NOF_PARAMS);
    fStsHistosLast.resize(NOF_PARAMS);
    fTrdHistosFirst.resize(NOF_PARAMS);
@@ -148,6 +160,47 @@ void CbmLitFitQa::CreateHistograms()
       fMuchHistosLast[j] = new TH1F(histName6.c_str(), std::string(histName6 + ";" + xtitles[j] + ";Counter").c_str(),
             bins[j], bounds[j].first, bounds[j].second);
    }
+
+   //
+   // Number of wrong fits
+   //
+
+   fStsHistosFirstWrongCov.resize(NOF_PARAMS_WRONG_COV);
+   fStsHistosLastWrongCov.resize(NOF_PARAMS_WRONG_COV);
+   fTrdHistosFirstWrongCov.resize(NOF_PARAMS_WRONG_COV);
+   fTrdHistosLastWrongCov.resize(NOF_PARAMS_WRONG_COV);
+   fMuchHistosFirstWrongCov.resize(NOF_PARAMS_WRONG_COV);
+   fMuchHistosLastWrongCov.resize(NOF_PARAMS_WRONG_COV);
+
+   Int_t minNofHits = 0;
+   Int_t maxNofHits = 20;
+
+   for (Int_t j = 0; j < NOF_PARAMS_WRONG_COV; j++) {
+      int k = j + 5; // to start with pulls
+       std::string histName1 = "hStsFirstWrongCov" + names[k];
+       fStsHistosFirstWrongCov[j] = new TH1F(histName1.c_str(), std::string(histName1 + ";Number of hits;Counter").c_str(),
+             bins[k], minNofHits, maxNofHits);
+
+       std::string histName2 = "hStsLastWrongCov" + names[k];
+       fStsHistosLastWrongCov[j] = new TH1F(histName2.c_str(), std::string(histName2 + ";Number of hits;Counter").c_str(),
+             bins[k], minNofHits, maxNofHits);
+
+       std::string histName3 = "hTrdFirstWrongCov" + names[k];
+       fTrdHistosFirstWrongCov[j] = new TH1F(histName3.c_str(), std::string(histName3 + ";Number of hits;Counter").c_str(),
+             bins[k], minNofHits, maxNofHits);
+
+       std::string histName4 = "hTrdLastWrongCov" + names[k];
+       fTrdHistosLastWrongCov[j] = new TH1F(histName4.c_str(), std::string(histName4 + ";Number of hits;Counter").c_str(),
+             bins[k], minNofHits, maxNofHits);
+
+       std::string histName5 = "hMuchFirstWrongCov" + names[k];
+       fMuchHistosFirstWrongCov[j] = new TH1F(histName5.c_str(), std::string(histName5 + ";Number of hits;Counter").c_str(),
+             bins[k], minNofHits, maxNofHits);
+
+       std::string histName6 = "hMuchLastWrongCov" + names[k];
+       fMuchHistosLastWrongCov[j] = new TH1F(histName6.c_str(), std::string(histName6 + ";Number of hits;Counter").c_str(),
+             bins[k], minNofHits, maxNofHits);
+    }
 }
 
 void CbmLitFitQa::ProcessGlobalTracks()
@@ -172,7 +225,9 @@ void CbmLitFitQa::ProcessStsTrack(
 
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(trackId));
    Int_t nofStsHits = track->GetNStsHits();
+   Int_t nofMvdHits = track->GetNMvdHits();
    if (nofStsHits < 1) return; // No hits in STS
+   if (nofMvdHits < fMvdMinNofHits || nofStsHits < fStsMinNofHits) return; // cut on number of hits in track
 
    const CbmLitMCTrack& mcTrack = fMCTrackCreator->GetTrack(mcId);
 
@@ -180,20 +235,19 @@ void CbmLitFitQa::ProcessStsTrack(
    FairTrackParam* lastParam = track->GetParamLast();
 
    // Fill histograms for first track parameters
-   Int_t nofMvdHits = track->GetNMvdHits();
    if (nofMvdHits > 0) { // first track parameters in MVD
       const CbmMvdHit* firstHit = static_cast<const CbmMvdHit*>(fMvdHits->At(track->GetMvdHitIndex(0)));
       Int_t firstStation = firstHit->GetStationNr() - 1; // to start with 0
       if (mcTrack.GetNofPointsAtStation(kMVD, firstStation) > 0) {
          const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kMVD, firstStation, 0);
-         FillResidualsAndPulls(firstParam, &firstPoint, fStsHistosFirst);
+         FillResidualsAndPulls(firstParam, &firstPoint, fStsHistosFirst, fStsHistosFirstWrongCov, nofMvdHits + nofStsHits);
       }
    } else { // first track parameters in STS
       const CbmStsHit* firstHit = static_cast<const CbmStsHit*>(fStsHits->At(track->GetStsHitIndex(0)));
       Int_t firstStation = firstHit->GetStationNr() - 1; // to start with 0
       if (mcTrack.GetNofPointsAtStation(kSTS, firstStation) > 0) {
          const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kSTS, firstStation, 0);
-         FillResidualsAndPulls(firstParam, &firstPoint, fStsHistosFirst);
+         FillResidualsAndPulls(firstParam, &firstPoint, fStsHistosFirst, fStsHistosFirstWrongCov, nofMvdHits + nofStsHits);
       }
    }
 
@@ -202,7 +256,7 @@ void CbmLitFitQa::ProcessStsTrack(
    Int_t lastStation = lastHit->GetStationNr() - 1; // to start with 0
    if (mcTrack.GetNofPointsAtStation(kSTS, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kSTS, lastStation, 0);
-      FillResidualsAndPulls(lastParam, &lastPoint, fStsHistosLast);
+      FillResidualsAndPulls(lastParam, &lastPoint, fStsHistosLast, fStsHistosLastWrongCov, nofMvdHits + nofStsHits);
    }
 }
 
@@ -218,6 +272,7 @@ void CbmLitFitQa::ProcessTrdTrack(
    CbmTrack* track = static_cast<CbmTrack*>(fTrdTracks->At(trackId));
    Int_t nofHits = track->GetNofHits();
    if (nofHits < 1) return; // No hits
+   if (nofHits < fTrdMinNofHits) return; // cut on number of hits in track
 
    const CbmLitMCTrack& mcTrack = fMCTrackCreator->GetTrack(mcId);
 
@@ -232,7 +287,7 @@ void CbmLitFitQa::ProcessTrdTrack(
    Int_t firstStation = 10 * detInfo[1] + detInfo[2];
    if (mcTrack.GetNofPointsAtStation(kTRD, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kTRD, firstStation, 0);
-      FillResidualsAndPulls(firstParam, &firstPoint, fTrdHistosFirst);
+      FillResidualsAndPulls(firstParam, &firstPoint, fTrdHistosFirst, fTrdHistosFirstWrongCov, nofHits);
    }
 
    // Fill histograms for last track parameters
@@ -241,7 +296,7 @@ void CbmLitFitQa::ProcessTrdTrack(
    Int_t lastStation = 10 * detInfo[1] + detInfo[2];
    if (mcTrack.GetNofPointsAtStation(kTRD, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kTRD, lastStation, 0);
-      FillResidualsAndPulls(lastParam, &lastPoint, fTrdHistosLast);
+      FillResidualsAndPulls(lastParam, &lastPoint, fTrdHistosLast, fTrdHistosLastWrongCov, nofHits);
    }
 }
 
@@ -257,6 +312,7 @@ void CbmLitFitQa::ProcessMuchTrack(
    CbmTrack* track = static_cast<CbmTrack*>(fMuchTracks->At(trackId));
    Int_t nofHits = track->GetNofHits();
    if (nofHits < 1) return; // No hits
+   if (nofHits < fMuchMinNofHits) return; // cut on number of hits in track
 
    const CbmLitMCTrack& mcTrack = fMCTrackCreator->GetTrack(mcId);
 
@@ -271,7 +327,7 @@ void CbmLitFitQa::ProcessMuchTrack(
             + CbmMuchGeoScheme::GetLayerSideIndex(firstHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kMUCH, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kMUCH, firstStation, 0);
-      FillResidualsAndPulls(firstParam, &firstPoint, fMuchHistosFirst);
+      FillResidualsAndPulls(firstParam, &firstPoint, fMuchHistosFirst, fMuchHistosFirstWrongCov, nofHits);
    }
 
    // Fill histograms for last track parameters
@@ -282,49 +338,52 @@ void CbmLitFitQa::ProcessMuchTrack(
               + CbmMuchGeoScheme::GetLayerSideIndex(lastHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kMUCH, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kMUCH, lastStation, 0);
-      FillResidualsAndPulls(lastParam, &lastPoint, fMuchHistosLast);
+      FillResidualsAndPulls(lastParam, &lastPoint, fMuchHistosLast, fMuchHistosLastWrongCov, nofHits);
    }
 }
 
 void CbmLitFitQa::FillResidualsAndPulls(
    const FairTrackParam* par,
    const CbmLitMCPoint* mcPoint,
-   std::vector<TH1F*>& histos)
+   std::vector<TH1F*>& histos,
+   std::vector<TH1F*>& wrongCov,
+   Float_t wrongPar)
 {
    // Residuals
-   Float_t resX = par->GetX() - mcPoint->GetX();
-   Float_t resY = par->GetY() - mcPoint->GetY();
-   Float_t resTx = par->GetTx() - mcPoint->GetTx();
-   Float_t resTy = par->GetTy() - mcPoint->GetTy();
-   Float_t resQp = par->GetQp() - mcPoint->GetQp();
+   Float_t res[5] = {0., 0., 0., 0., 0.}; // [x, y, tx, ty, qp]
+   res[0] = par->GetX() - mcPoint->GetX();
+   res[1] = par->GetY() - mcPoint->GetY();
+   res[2] = par->GetTx() - mcPoint->GetTx();
+   res[3] = par->GetTy() - mcPoint->GetTy();
+   res[4] = par->GetQp() - mcPoint->GetQp();
+   for (Int_t i = 0; i < 5; i++) { histos[i]->Fill(res[i]); }
 
    // Pulls
    Double_t C[15];
    par->CovMatrix(C);
-   Float_t pullX = (C[0] > 0.) ? resX / (std::sqrt(C[0])) : 0.;
-   Float_t pullY = (C[5] > 0.) ? resY / (std::sqrt(C[5])) : 0.;
-   Float_t pullTx = (C[9] > 0.) ? resTx / (std::sqrt(C[9])) : 0.;
-   Float_t pullTy = (C[12] > 0.) ? resTy / (std::sqrt(C[12])) : 0.;
-   Float_t pullQp = (C[14] > 0.) ? resQp / (std::sqrt(C[14])) : 0.;
 
-   histos[0]->Fill(resX);
-   histos[1]->Fill(resY);
-   histos[2]->Fill(resTx);
-   histos[3]->Fill(resTy);
-   histos[4]->Fill(resQp);
-   histos[5]->Fill(pullX);
-   histos[6]->Fill(pullY);
-   histos[7]->Fill(pullTx);
-   histos[8]->Fill(pullTy);
-   histos[9]->Fill(pullQp);
+   Float_t sigma[5] = {0., 0., 0., 0., 0.}; // [x, y, tx, ty, qp]
+   sigma[0] = (C[0] > 0.) ? std::sqrt(C[0]) : -1.;
+   sigma[1] = (C[5] > 0.) ? std::sqrt(C[5]) : -1.;
+   sigma[2] = (C[9] > 0.) ? std::sqrt(C[9]) : -1.;
+   sigma[3] = (C[12] > 0.) ? std::sqrt(C[12]) : -1.;
+   sigma[4] = (C[14] > 0.) ? std::sqrt(C[14]) : -1.;
+   for (Int_t i = 0; i < 5; i++) {
+      if (sigma[i] < 0) { // wrong covariance
+         wrongCov[i]->Fill(wrongPar);
+      } else { // good covariance
+         histos[i + 5]->Fill(res[i] / sigma[i]);
+      }
+   }
 }
 
 void CbmLitFitQa::DrawHistos(
       const std::string& name,
-      std::vector<TH1F*>& histos)
+      std::vector<TH1F*>& histos,
+      std::vector<TH1F*>& wrongHistos)
 {
-   TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1400, 600);
-   canvas->Divide(5, 2);
+   TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1400, 900);
+   canvas->Divide(5, 3);
 
    for (int i = 0; i < NOF_PARAMS; i++) {
       canvas->cd(i+1);
@@ -339,8 +398,13 @@ void CbmLitFitQa::DrawHistos(
       Double_t rms = hist->GetRMS();
       DrawHistSigmaRMS(i, sigma, rms);
    }
-//   lit::SaveCanvasAsImage(canvas, fOutputDir);
-}
 
+   for (int i = 0; i < NOF_PARAMS_WRONG_COV; i++) {
+      canvas->cd(i + 1 + 10);
+      DrawHist1D(wrongHistos[i], kLitLinear, kLitLog);
+   }
+
+   lit::SaveCanvasAsImage(canvas, fOutputDir);
+}
 
 ClassImp(CbmLitFitQa)

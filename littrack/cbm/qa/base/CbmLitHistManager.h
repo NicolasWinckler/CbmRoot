@@ -116,6 +116,11 @@ public:
    void ReadFromFile(
          TFile* file);
 
+   /**
+    * \brief Clears memory. Removes all histograms.
+    */
+   void Clear();
+
 private:
    // Map of histogram name to its pointer
    map<string, TH1*> fHistMap;

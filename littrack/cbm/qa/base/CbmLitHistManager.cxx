@@ -58,3 +58,12 @@ void CbmLitHistManager::ReadFromFile(
       }
    }
 }
+
+void CbmLitHistManager::Clear()
+{
+   map<string, TH1*>::iterator it;
+   for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
+      delete (*it).second;
+   }
+   fHistMap.clear();
+}

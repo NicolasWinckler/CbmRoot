@@ -182,6 +182,10 @@ InitStatus CbmMvdFindHits::Init() {
     }
 
     fDigis = (TClonesArray*) ioman->GetObject(fBranchName);
+    if ( ! fDigis ) {
+	cout << "-E- " << GetName() << "::Init: No FairRootManager!" << endl;
+	return kFATAL;
+    }
     Register();
     //if(fShowDebugHistos){
     fResolutionHistoX=new TH1F("SinglePointResolution_X","SinglePointResolution_X",10000,-0.0100,0.0100);
@@ -245,6 +249,7 @@ InitStatus CbmMvdFindHits::Init() {
     cout << "------- CbmMvdFindHits::Init completed ------" << endl;
     cout << "---------------------------------------------" << endl;
 
+
    
     Int_t adcMax = fAdcOffset + fAdcDynamic;
     fAdcSteps= (Int_t)TMath::Power(2,fAdcBits);
@@ -256,6 +261,8 @@ InitStatus CbmMvdFindHits::Init() {
 
     delete histoName;
     delete histoTotalChargeName;
+
+    return kSUCCESS;
 
 }
 // -------------------------------------------------------------------------

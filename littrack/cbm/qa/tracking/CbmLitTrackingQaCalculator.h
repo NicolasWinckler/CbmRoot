@@ -1,12 +1,12 @@
 /**
- * \file CbmLitTrackingQaImpl.h
+ * \file CbmLitTrackingQaCalculator.h
  * \brief Implementation of global track reconstruction QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
  */
 
-#ifndef CBMLITTRACKINGQAIMPL_H_
-#define CBMLITTRACKINGQAIMPL_H_
+#ifndef CBMLITTRACKINGQACALCULATOR_H_
+#define CBMLITTRACKINGQACALCULATOR_H_
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
@@ -40,23 +40,23 @@ using std::string;
 using std::map;
 
 /**
- * \class CbmLitTrackingQaImpl
+ * \class CbmLitTrackingQaCalculator
  * \brief Implementation of global track reconstruction QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
  */
-class CbmLitTrackingQaImpl : public FairTask
+class CbmLitTrackingQaCalculator : public FairTask
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitTrackingQaImpl();
+   CbmLitTrackingQaCalculator();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitTrackingQaImpl();
+   virtual ~CbmLitTrackingQaCalculator();
 
    /**
     * \brief Derived from FairTask.
@@ -541,4 +541,4 @@ private:
    CbmLitHistManager* fHM; // histogram manager
 };
 
-#endif /* CBMLITTRACKINGQAIMPL_H_ */
+#endif /* CBMLITTRACKINGQACALCULATOR_H_ */

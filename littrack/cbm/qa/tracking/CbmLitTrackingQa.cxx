@@ -5,7 +5,7 @@
  **/
 
 #include "qa/tracking/CbmLitTrackingQa.h"
-#include "qa/tracking/CbmLitTrackingQaImpl.h"
+#include "qa/tracking/CbmLitTrackingQaCalculator.h"
 #include "qa/tracking/CbmLitTrackingQaStudyReport.h"
 #include <fstream>
 
@@ -17,7 +17,7 @@
 CbmLitTrackingQa::CbmLitTrackingQa():
    FairTask("LitTrackingQA", 1)
 {
-   fImpl = new CbmLitTrackingQaImpl();
+   fImpl = new CbmLitTrackingQaCalculator();
 }
 
 CbmLitTrackingQa::~CbmLitTrackingQa()
@@ -84,11 +84,6 @@ void CbmLitTrackingQa::SetMinNofHitsTrd(Int_t minNofHitsTrd)
 void CbmLitTrackingQa::SetMinNofHitsMuch(Int_t minNofHitsMuch)
 {
    fImpl->SetMinNofHitsMuch(minNofHitsMuch);
-}
-
-void CbmLitTrackingQa::SetVerbose(Int_t verbose)
-{
-   fImpl->SetVerbose(verbose);
 }
 
 void CbmLitTrackingQa::SetOutputDir(const std::string& dir)

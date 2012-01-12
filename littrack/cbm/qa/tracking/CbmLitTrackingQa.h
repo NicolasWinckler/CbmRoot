@@ -12,7 +12,7 @@
 #include "CbmDetectorList.h"
 #include "../report/CbmLitReport.h"
 
-class CbmLitTrackingQaImpl;
+class CbmLitTrackingQaCalculator;
 
 using std::string;
 using std::vector;
@@ -93,10 +93,6 @@ public:
     * @param minNofHitsMuch Minimum number of hits in MUCH track. */
    void SetMinNofHitsMuch(Int_t minNofHitsMuch);
 
-   /* Sets the verbose level for printout.
-    * @param verbose Verbose value. */
-   void SetVerbose(Int_t verbose);
-
    /* Sets the output directory for images.
     * @param dir Directory name. */
    void SetOutputDir(const std::string& dir);
@@ -145,7 +141,7 @@ public:
          const vector<string>& names);
 
 private:
-   CbmLitTrackingQaImpl* fImpl;
+   CbmLitTrackingQaCalculator* fImpl;
 
    ClassDef(CbmLitTrackingQa, 1);
 };

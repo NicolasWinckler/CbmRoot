@@ -11,6 +11,7 @@
 #define CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
 
 #include "propagation/CbmLitMaterialInfo.h"
+#include "base/CbmLitDetectorSetup.h"
 
 #include <string>
 #include <map>
@@ -146,10 +147,7 @@ private:
    std::vector<CbmLitMaterialInfo> fMyTrdGeoNodes; // Vector of materials for the TRD simplified geometry
    std::vector<CbmLitMaterialInfo> fMyRichGeoNodes; // Vector of materials for the RICH simplified geometry
 
-   bool fIsTrd; // true if TRD in TGeo
-   bool fIsMuch; // true if MUCH in TGeo
-   bool fIsTof; // true if TOF in TGeo
-   bool fIsRich; // true if TOF in TGeo
+   CbmLitDetectorSetup fDet;
 };
 
 #endif /* CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_ */

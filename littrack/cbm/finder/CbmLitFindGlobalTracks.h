@@ -21,6 +21,7 @@
 
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitDetectorSetup.h"
 
 #include "TStopwatch.h"
 
@@ -83,11 +84,6 @@ private:
    virtual void Finish();
 
    /**
-    * Determines the CBM detector setup, based on TGeoManager stored in the input MC file.
-    */
-   void DetermineSetup();
-
-   /**
     * Reads necessary data branches from the input data files and
     * creates branches for CbmGlobalTrack, CbmTrdTrack, CbmMuchTrack
     */
@@ -134,10 +130,7 @@ private:
     */
    void SelectTracksForTofMerging();
 
-   Bool_t fIsElectronSetup; // If "electron" setup detected than true
-   Bool_t fIsTrd; // If TRD detected than true
-   Bool_t fIsMuch; // If MUCH detected than true
-   Bool_t fIsTof; // If TOF detected than true
+   CbmLitDetectorSetup fDet;
 
    // Pointers to data arrays
    TClonesArray* fStsTracks; // CbmStsTrack array

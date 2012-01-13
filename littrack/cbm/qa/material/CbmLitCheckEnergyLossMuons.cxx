@@ -11,7 +11,8 @@
 #include <cstdlib>
 
 CbmLitCheckEnergyLossMuons::CbmLitCheckEnergyLossMuons():
-   fMat("iron")
+   fMat("iron"),
+   fOutputDir("./test/")
 {
    fMom[0] = 47.04;
    fMom[1] = 56.16;

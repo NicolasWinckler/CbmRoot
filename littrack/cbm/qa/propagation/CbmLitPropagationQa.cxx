@@ -56,11 +56,7 @@
 
 
 CbmLitPropagationQa::CbmLitPropagationQa():
-   fIsElectronSetup(false),
-   fIsSts(false),
-   fIsTrd(false),
-   fIsMuch(false),
-   fIsTof(false),
+   fDet(),
 
    fLitTracks(),
 
@@ -121,7 +117,9 @@ CbmLitPropagationQa::~CbmLitPropagationQa()
 
 InitStatus CbmLitPropagationQa::Init()
 {
-   DetermineSetup();
+   fDet.DetermineSetup();
+   std::cout << fDet.ToString();
+
    ReadDataBranches();
 
    // Create tools
@@ -133,7 +131,7 @@ InitStatus CbmLitPropagationQa::Init()
       fSmoother = factory->CreateTrackFitter("kalman_smoother");
    } else {
       fPropagator = factory->CreateTrackPropagator("lit");
-      if (fIsMuch) { fParallelFitter = factory->CreateTrackFitter("kalman_parallel_muon"); }
+      if (fDet.GetDet(kMUCH)) { fParallelFitter = factory->CreateTrackFitter("kalman_parallel_muon"); }
       else { fParallelFitter = factory->CreateTrackFitter("kalman_parallel_electron"); }
    }
 
@@ -175,28 +173,6 @@ void CbmLitPropagationQa::Finish()
    Draw();
 }
 
-void CbmLitPropagationQa::DetermineSetup()
-{
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fIsElectronSetup = env->IsElectronSetup();
-   fIsSts = env->IsSts();
-   fIsTrd = env->IsTrd();
-   fIsMuch = env->IsMuch();
-   fIsTof = env->IsTof();
-
-   fNofPlanes = env->GetLayout().GetNofPlanes();
-   if (fIsTof) fNofPlanes++;
-
-   if (fIsElectronSetup) { std::cout << "-I- CBM electron setup detected" << std::endl; }
-   else { std::cout << "-I- CBM muon setup detected" << std::endl; }
-   std::cout << "-I- The following detectors were found in the CBM setup:";
-   if (fIsSts) { std::cout << " STS"; }
-   if (fIsMuch) { std::cout << " MUCH"; }
-   if (fIsTrd) { std::cout << " TRD"; }
-   if (fIsTof) { std::cout << " TOF"; }
-   std::cout << std::endl;
-}
-
 void CbmLitPropagationQa::ReadDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
@@ -205,14 +181,14 @@ void CbmLitPropagationQa::ReadDataBranches()
    fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
    if (NULL == fGlobalTracks) { Fatal("CbmLitPropagationQa::Init","No GlobalTrack array!"); }
 
-   if (fIsSts) {
+   if (fDet.GetDet(kSTS)) {
       fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
       if (NULL == fStsTracks) { Fatal("CbmLitPropagationQa::Init", "No STSTrack array!"); }
       fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
       if (NULL == fStsTrackMatches) Fatal("CbmLitPropagationQa::Init", "No StsTrackMatch array!");
    }
 
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
       if (NULL == fMuchTracks) { Fatal("CbmLitPropagationQa::Init", "No MuchTrack array!"); }
       fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
@@ -222,7 +198,7 @@ void CbmLitPropagationQa::ReadDataBranches()
       if (NULL == fMuchTrackMatches) { Fatal("CbmLitPropagationQa::Init", "No MuchTrackMatch array!"); }
    }
 
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
       if (NULL == fTrdTracks) { Fatal("CbmLitPropagationQa::Init", "No TrdTrack array!"); }
       fTrdHits  = (TClonesArray*) ioman->GetObject("TrdHit");
@@ -231,7 +207,7 @@ void CbmLitPropagationQa::ReadDataBranches()
       if (!fTrdTrackMatches) { Fatal("CbmLitPropagationQa::Init", "No TrdTrackMatch array!"); }
    }
 
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
       if (NULL == fTofHits) { Fatal("CbmLitPropagationQa::Init", "No TofHit array!"); }
    }
@@ -528,7 +504,7 @@ Int_t CbmLitPropagationQa::GetMcTrackId(
    if (stsId < 0) return -1;
    CbmTrackMatch* stsMatch = static_cast<CbmTrackMatch*>(fStsTrackMatches->At(stsId));
 
-   if (fIsMuch && fIsTrd) {
+   if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
       if (trdId < 0 || muchId < 0) return -1;
       CbmTrackMatch* trdMatch = static_cast<CbmTrackMatch*>(fTrdTrackMatches->At(trdId));
       CbmTrackMatch* muchMatch = static_cast<CbmTrackMatch*>(fMuchTrackMatches->At(muchId));
@@ -537,7 +513,7 @@ Int_t CbmLitPropagationQa::GetMcTrackId(
       } else {
          return -1;
       }
-   } else if (fIsMuch) {
+   } else if (fDet.GetDet(kMUCH)) {
       if (muchId < 0) return -1;
       CbmTrackMatch* muchMatch = static_cast<CbmTrackMatch*>(fMuchTrackMatches->At(muchId));
       if (stsMatch->GetMCTrackId() == muchMatch->GetMCTrackId()) {
@@ -545,7 +521,7 @@ Int_t CbmLitPropagationQa::GetMcTrackId(
       } else {
          return -1;
       }
-   } else if (fIsTrd) {
+   } else if (fDet.GetDet(kTRD)) {
       if (trdId < 0) return -1;
       CbmTrackMatch* trdMatch = static_cast<CbmTrackMatch*>(fTrdTrackMatches->At(trdId));
       if (stsMatch->GetMCTrackId() == trdMatch->GetMCTrackId()) {

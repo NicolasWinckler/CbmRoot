@@ -64,29 +64,22 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-
-CbmLitTrackingQaCalculator::CbmLitTrackingQaCalculator():
-   FairTask("LitReconstructionQA", 1),
+CbmLitTrackingQaCalculator::CbmLitTrackingQaCalculator(
+      CbmLitHistManager* histManager):
 
    fMinNofPointsSts(4),
    fMinNofPointsTrd(8),
    fMinNofPointsMuch(10),
    fMinNofPointsTof(1),
    fQuota(0.7),
+   fQuotaRich(0.6),
    fUseConsecutivePointsInSts(false),
    fMinNofHitsRich(7),
-   fQuotaRich(0.6),
 
    fMinNofHitsTrd(8),
    fMinNofHitsMuch(10),
 
-   fIsElectronSetup(false),
-   fIsMvd(false),
-   fIsSts(false),
-   fIsRich(false),
-   fIsTrd(false),
-   fIsMuch(false),
-   fIsTof(false),
+   fDet(),
 
    fRefMomentum(1.),
    fRefMinNofHitsRich(15),
@@ -120,39 +113,36 @@ CbmLitTrackingQaCalculator::CbmLitTrackingQaCalculator():
    fTofPoints(NULL),
    fTofHits(NULL),
 
-   fOutputDir(""),
-
    fPrimVertex(NULL),
    fKFFitter(NULL),
 
    fElectronId(NULL),
-   fHM(new CbmLitHistManager())
+
+   fHM(histManager)
 {
 }
 
 CbmLitTrackingQaCalculator::~CbmLitTrackingQaCalculator()
 {
-   if (fHM != NULL) delete fHM;
 }
 
-InitStatus CbmLitTrackingQaCalculator::Init()
+void CbmLitTrackingQaCalculator::Init()
 {
-   DetermineSetup();
-   ReadDataBranches();
-   CreateHistos(NULL);
+   fDet.DetermineSetup();
+   std::cout << fDet.ToString();
 
-   if (fIsElectronSetup) {
+   ReadDataBranches();
+
+   if (fDet.GetElectronSetup()) {
       fElectronId = new CbmLitGlobalElectronId();
       fElectronId->Init();
       fRichEllipseFitter = new CbmRichRingFitterEllipseTau();
       fRichEllipseFitter->Init();
    }
    fMCTrackCreator = CbmLitMCTrackCreator::Instance();
-   return kSUCCESS;
 }
 
-void CbmLitTrackingQaCalculator::Exec(
-   Option_t* opt)
+void CbmLitTrackingQaCalculator::Exec()
 {
    // Increase event counter
    fHM->H1F("hEventNo")->Fill(0.5);
@@ -171,60 +161,6 @@ void CbmLitTrackingQaCalculator::Exec(
 void CbmLitTrackingQaCalculator::Finish()
 {
    CalculateEfficiencyHistos();
-   Draw();
-   WriteToFile();
-}
-
-void CbmLitTrackingQaCalculator::DetermineSetup()
-{
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fIsElectronSetup = env->IsElectronSetup();
-   fIsMvd = env->IsMvd();
-   fIsSts = env->IsSts();
-   fIsRich = env->IsRich();
-   fIsTrd = env->IsTrd();
-   fIsMuch = env->IsMuch();
-   fIsTof = env->IsTof();
-
-   if (fIsElectronSetup) { std::cout << "-I- CBM electron setup detected" << std::endl; }
-   else { std::cout << "-I- CBM muon setup detected" << std::endl; }
-   std::cout << "-I- The following detectors were found in the CBM setup: ";
-   if (fIsMvd) { std::cout << "MVD "; }
-   if (fIsSts) { std::cout << "STS "; }
-   if (fIsRich) { std::cout << "RICH "; }
-   if (fIsMuch) { std::cout << "MUCH "; }
-   if (fIsTrd) { std::cout << "TRD "; }
-   if (fIsTof) { std::cout << "TOF "; }
-   std::cout << std::endl;
-}
-
-void CbmLitTrackingQaCalculator::SetDetectorPresence(
-		   DetectorId detId,
-		   bool isDet)
-{
-	switch(detId) {
-		case kMVD: fIsMvd = isDet; break;
-		case kSTS: fIsSts = isDet; break;
-		case kRICH: fIsRich = isDet; break;
-		case kTRD: fIsTrd = isDet; break;
-		case kMUCH: fIsMuch = isDet; break;
-		case kTOF: fIsTof = isDet; break;
-		default: break;
-	}
-}
-
-bool CbmLitTrackingQaCalculator::GetDetectorPresence(
-         DetectorId detId) const
-{
-   switch(detId) {
-      case kMVD: return fIsMvd;
-      case kSTS: return fIsSts;
-      case kRICH: return fIsRich;
-      case kTRD: return fIsTrd;
-      case kMUCH: return fIsMuch;
-      case kTOF: return fIsTof;
-      default: return false;
-   }
 }
 
 void CbmLitTrackingQaCalculator::ReadDataBranches()
@@ -238,14 +174,14 @@ void CbmLitTrackingQaCalculator::ReadDataBranches()
    fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
    if (NULL == fGlobalTracks) { Fatal("Init","No GlobalTrack array!"); }
 
-   if (fIsMvd) {
+   if (fDet.GetDet(kMVD)) {
       fMvdPoints = (TClonesArray*) ioman->GetObject("MvdPoint");
       if (NULL == fMvdPoints) { Fatal("Init",": No MvdPoint array!"); }
       fMvdHitMatches = (TClonesArray*) ioman->GetObject("MvdHitMatch");
       if (NULL == fMvdHitMatches) { Fatal("Init",": No MvdHitMatch array!"); }
    }
 
-   if (fIsSts) {
+   if (fDet.GetDet(kSTS)) {
       fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
       if (NULL == fStsTracks) { Fatal("Init",": No StsTrack array!"); }
       fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
@@ -254,7 +190,7 @@ void CbmLitTrackingQaCalculator::ReadDataBranches()
       if (NULL == fStsPoints) { Fatal("Init",": No StsPoint array!"); }
    }
 
-   if (fIsRich) {
+   if (fDet.GetDet(kRICH)) {
 	  fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
 	  if (NULL == fRichHits) { Fatal("Init","No RichHit array!"); }
 	  fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
@@ -267,21 +203,21 @@ void CbmLitTrackingQaCalculator::ReadDataBranches()
 	  if (NULL == fRichPoints) { Fatal("Init","No RichPoint array!"); }
    }
 
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
       if (NULL == fMuchMatches) { Fatal("Init","No MuchTrackMatch array!"); }
       fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
       if (NULL == fMuchPoints) { Fatal("Init","No MuchPoint array!"); }
    }
 
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       fTrdMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
       if (NULL == fTrdMatches) { Fatal("Init","No TrdTrackMatch array!"); }
       fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
       if (NULL == fTrdPoints) { Fatal("Init","No TrdPoint array!"); }
    }
 
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
       if (NULL == fTofPoints) { Fatal("Init", "No TofPoint array!"); }
       fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
@@ -297,7 +233,7 @@ void CbmLitTrackingQaCalculator::ReadDataBranches()
 
 void CbmLitTrackingQaCalculator::FillRichRingNofHits()
 {
-	if (!fIsRich) return;
+	if (!fDet.GetDet(kRICH)) return;
 	fNofHitsInRingMap.clear();
    Int_t nofRichHits = fRichHits->GetEntriesFast();
    for (Int_t iHit=0; iHit < nofRichHits; iHit++) {
@@ -376,7 +312,7 @@ void CbmLitTrackingQaCalculator::FillNofCrossedStationsHistos()
    // end STS
 
    // MUCH
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       // std::map<MC track index, set with station numbers>
       std::map<Int_t, std::set<Int_t> > muchStations;
       Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
@@ -405,7 +341,7 @@ void CbmLitTrackingQaCalculator::FillNofCrossedStationsHistos()
    // end MUCH
 
    // TRD
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       // std::map<MC track index, set with station numbers>
       std::map<Int_t, std::set<Int_t> > trdStations;
       CbmTrdDetectorId trdDetectorId;
@@ -483,11 +419,11 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
       Int_t richId = globalTrack->GetRichRingIndex();
 
       // check track segments
-      Bool_t isStsOk = stsId > -1 && fIsSts;
-      Bool_t isTrdOk = trdId > -1 && fIsTrd;
-      Bool_t isMuchOk = muchId > -1 && fIsMuch;
-      Bool_t isTofOk = tofId > -1 && fIsTof;
-      Bool_t isRichOk = richId > -1 && fIsRich;
+      Bool_t isStsOk = stsId > -1 && fDet.GetDet(kSTS);
+      Bool_t isTrdOk = trdId > -1 && fDet.GetDet(kTRD);
+      Bool_t isMuchOk = muchId > -1 && fDet.GetDet(kMUCH);
+      Bool_t isTofOk = tofId > -1 && fDet.GetDet(kTOF);
+      Bool_t isRichOk = richId > -1 && fDet.GetDet(kRICH);
 
       // check the quality of track segments
       CbmTrackMatch* stsTrackMatch;
@@ -587,7 +523,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          fMcStsMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
       }
 
-      if (fIsMuch && fIsTrd) { // if MUCH and TRD together
+      if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) { // if MUCH and TRD together
          // select STS+MUCH+TRD tracks
          if (sts && (trd && much)) {
             fMcHalfGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
@@ -602,7 +538,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
             fMcHalfGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
          }
          // select the longest tracks STS+TRD(MUCH)+TOF
-         if (fIsTrd || fIsMuch) {
+         if (fDet.GetDet(kTRD) || fDet.GetDet(kMUCH)) {
             if (sts && (trd || much) && tof) {
                fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
             }
@@ -613,7 +549,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          }
       }
       // RICH: select tracks with RICH
-      if (fIsRich) {
+      if (fDet.GetDet(kRICH)) {
     	  // select only RICH
     	  if (isRichOk) {
     		 // fill in ProcessRichRings() procedure, because
@@ -632,7 +568,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
     	  if (sts && rich && trd) {
 			  fMcStsRichTrdMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
 		  }
-    	  if (fIsTrd) { // select STS+RICH+TRD+TOF tracks
+    	  if (fDet.GetDet(kTRD)) { // select STS+RICH+TRD+TOF tracks
 			  if (sts && rich && trd && tof) {
 				  fMcStsRichTrdTofMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
 			  }
@@ -647,7 +583,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
 
 void CbmLitTrackingQaCalculator::ProcessRichRings()
 {
-   if (!fIsRich) return;
+   if (!fDet.GetDet(kRICH)) return;
    Int_t nofRings = fRichRings->GetEntriesFast();
    for(Int_t iRing = 0; iRing < nofRings; iRing++) {
 	  CbmRichRing* ring = static_cast<CbmRichRing*>(fRichRings->At(iRing));
@@ -790,12 +726,12 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
       // Check local tracks
       Bool_t stsConsecutive = (fUseConsecutivePointsInSts) ?
             fNofStsConsecutiveStationsMap[iMCTrack] >= fMinNofPointsSts : true;
-      Bool_t isStsOk = nofPointsSts >= fMinNofPointsSts && fIsSts && stsConsecutive;
-      Bool_t isTrdOk = nofPointsTrd >= fMinNofPointsTrd && fIsTrd;
-      Bool_t isMuchOk = nofPointsMuch >= fMinNofPointsMuch && fIsMuch;
-      Bool_t isTofOk = nofPointsTof >= fMinNofPointsTof && fIsTof;
-      Bool_t isRichOk = nofHitsRich >= fMinNofHitsRich && fIsRich;
-      Bool_t isRecOk = (fIsMuch && fIsTrd) ? (isTrdOk && isMuchOk) : (isTrdOk || isMuchOk); // MUCH+TRD
+      Bool_t isStsOk = nofPointsSts >= fMinNofPointsSts && fDet.GetDet(kSTS) && stsConsecutive;
+      Bool_t isTrdOk = nofPointsTrd >= fMinNofPointsTrd && fDet.GetDet(kTRD);
+      Bool_t isMuchOk = nofPointsMuch >= fMinNofPointsMuch && fDet.GetDet(kMUCH);
+      Bool_t isTofOk = nofPointsTof >= fMinNofPointsTof && fDet.GetDet(kTOF);
+      Bool_t isRichOk = nofHitsRich >= fMinNofHitsRich && fDet.GetDet(kRICH);
+      Bool_t isRecOk = (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) ? (isTrdOk && isMuchOk) : (isTrdOk || isMuchOk); // MUCH+TRD
 
       Bool_t isStsReconstructed = fMcStsMap.find(iMCTrack) != fMcStsMap.end();
       Bool_t isHalfGlobalReconstructed = fMcHalfGlobalMap.find(iMCTrack) != fMcHalfGlobalMap.end();
@@ -866,13 +802,13 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
          // p-y-pt dependence histograms
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, "hRec3D");
          // number of points dependence histograms
-         Int_t np = fIsElectronSetup ? nofPointsTrd : nofPointsMuch;
+         Int_t np = fDet.GetElectronSetup() ? nofPointsTrd : nofPointsMuch;
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, "hRecNp", np);
          // polar angle dependence histograms
          FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, "hRecAngle", angle);
       }
 
-      if (fIsTrd || fIsMuch) {
+      if (fDet.GetDet(kTRD) || fDet.GetDet(kMUCH)) {
          if (isHalfGlobalReconstructed && isStsOk && isRecOk && isTofOk) {
             // p-y-pt dependence histograms
             FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, "hTof3D");
@@ -1033,7 +969,7 @@ void CbmLitTrackingQaCalculator::FillGlobalElIdHistos3D(
    const string& hist,
    const string& opt)
 {
-   if (!fIsElectronSetup) return;
+   if (!fDet.GetElectronSetup()) return;
 
    Bool_t isMCPrim = mcTrack->GetMotherId() == -1;
    Bool_t isMCElectron = std::abs(mcTrack->GetPdgCode()) == 11;
@@ -1124,7 +1060,7 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
 
 void CbmLitTrackingQaCalculator::PionSuppression3D()
 {
-   if (!fIsElectronSetup) return;
+   if (!fDet.GetElectronSetup()) return;
 
    Int_t nGlobal = fGlobalTracks->GetEntries();
    for (Int_t iTrack=0; iTrack<nGlobal; iTrack++) {
@@ -1138,9 +1074,9 @@ void CbmLitTrackingQaCalculator::PionSuppression3D()
       Int_t richId = gTrack->GetRichRingIndex();
 
       // check track segments
-      Bool_t isStsOk = stsId > -1 && fIsSts;
-      Bool_t isTrdOk = trdId > -1 && fIsTrd;
-      Bool_t isTofOk = tofId > -1 && fIsTof;
+      Bool_t isStsOk = stsId > -1 && fDet.GetDet(kSTS);
+      Bool_t isTrdOk = trdId > -1 && fDet.GetDet(kTRD);
+      Bool_t isTofOk = tofId > -1 && fDet.GetDet(kTOF);
       Bool_t isRichOk = false;//richId > -1 && fIsRich;
       FairTrackParam* proj   = (FairTrackParam*)fRichProjections->At(iTrack);
       if (proj != NULL && proj->GetX()!= 0 &&  proj->GetY()!= 0) isRichOk = true;
@@ -1286,17 +1222,6 @@ void CbmLitTrackingQaCalculator::FillMCMomVsAngle(
    if (!isPrim) { fHM->H2F("hMCMomVsAngle_Sec")->Fill(p, angle); }
    if (isPrim && isMuon) { fHM->H2F("hMCMomVsAngle_Mu")->Fill(p, angle); }
    if (isPrim && isElectron) { fHM->H2F("hMCMomVsAngle_El")->Fill(p, angle); }
-}
-
-void CbmLitTrackingQaCalculator::CreateHistos(
-		TFile* file)
-{
-   if (file != NULL) {
-      fHM->ReadFromFile(file);
-   } else {
-      CbmLitTrackingQaHistCreator hc;
-      hc.Create(fHM);
-   }
 }
 
 void CbmLitTrackingQaCalculator::CreateProjections3D(
@@ -1446,93 +1371,16 @@ void CbmLitTrackingQaCalculator::CalculateEfficiencyHistos()
    DivideHistos("hStsRichTrdDetAcc3D", kDetAcc, true);
    DivideHistos("hStsRichTrdTofDetAcc3D", kDetAcc, true);
    DivideHistos("hStsTrdTofDetAcc3D", kDetAcc, true);
-
-   std::cout << "END CalculateEfficiencyHistos" << std::endl;
-}
-
-void CbmLitTrackingQaCalculator::WriteToFile()
-{
-   fHM->WriteToFile();
 }
 
 void CbmLitTrackingQaCalculator::IncreaseCounters()
 {
    fHM->H1F("hNofGlobalTracks")->Fill(fGlobalTracks->GetEntriesFast());
-   if (fIsSts) { fHM->H1F("hNofStsTracks")->Fill(fStsMatches->GetEntriesFast()); }
-   if (fIsRich) {
+   if (fDet.GetDet(kSTS)) { fHM->H1F("hNofStsTracks")->Fill(fStsMatches->GetEntriesFast()); }
+   if (fDet.GetDet(kRICH)) {
       fHM->H1F("hNofRichRings")->Fill(fRichRings->GetEntriesFast());
       fHM->H1F("hNofRichProjections")->Fill(fRichProjections->GetEntriesFast());
    }
-   if (fIsTrd) { fHM->H1F("hNofTrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
-   if (fIsMuch) { fHM->H1F("hNofMuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
-}
-
-std::string CbmLitTrackingQaCalculator::RecDetector()
-{
-   std::string recDet = "";
-   if (fIsTrd && !fIsMuch) { recDet = "TRD"; }
-   else if (fIsMuch && !fIsTrd) { recDet = "MUCH"; }
-   else if (fIsMuch && fIsTrd) { recDet = "MUCH+TRD"; }
-   return recDet;
-}
-
-void CbmLitTrackingQaCalculator::Draw()
-{
-   CbmLitTrackingQaDraw drawQa;
-   drawQa.fIsElectronSetup = fIsElectronSetup;
-   drawQa.fIsMvd = fIsMvd;
-   drawQa.fIsSts = fIsSts;
-   drawQa.fIsRich = fIsRich;
-   drawQa.fIsTrd = fIsTrd;
-   drawQa.fIsMuch = fIsMuch;
-   drawQa.fIsTof = fIsTof;
-   drawQa.fOutputDir = fOutputDir;
-   drawQa.SetRebinForDraw(1);
-   drawQa.Draw(fHM);
-
-   CbmLitTrackingQaPTreeCreator ptc;
-   ptc.fIsElectronSetup = fIsElectronSetup;
-   ptc.fIsMvd = fIsMvd;
-   ptc.fIsSts = fIsSts;
-   ptc.fIsRich = fIsRich;
-   ptc.fIsTrd = fIsTrd;
-   ptc.fIsMuch = fIsMuch;
-   ptc.fIsTof = fIsTof;
-   ptc.fOutputDir = fOutputDir;
-   ptc.fMinAngle = 0;//fMinAngle;
-   ptc.fMaxAngle = 25.;//fMaxAngle;
-   ptc.fNofBinsAngle = 3;//fNofBinsAngle;
-   boost::property_tree::ptree qa = ptc.Create(fHM);
-
-   CbmLitTrackingQaReport report(kLitText);
-   report.Create(cout, &qa, NULL, NULL);
-
-   boost::property_tree::ptree ideal, check;
-   std::string qaIdealFile = std::string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
-   read_json(qaIdealFile.c_str(), ideal);
-
-   CbmLitResultChecker qaChecker;
-   qaChecker.DoCheck(qa, ideal, check);
-   if (fOutputDir != "") {
-      write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check);
-   }
-
-   if (fOutputDir != "") {
-      ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
-      CbmLitTrackingQaReport reportHtml(kLitHtml);
-      reportHtml.Create(foutHtml, &qa, NULL, NULL);
-
-      ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
-      CbmLitTrackingQaReport reportLatex(kLitLatex);
-      reportLatex.Create(foutLatex, &qa, NULL, NULL);
-   }
-}
-
-void CbmLitTrackingQaCalculator::DrawHistosFromFile(
-      const std::string& fileName)
-{
-	TFile* file = new TFile(fileName.c_str());
-	CreateHistos(file);
-	CalculateEfficiencyHistos();
-	Draw();
+   if (fDet.GetDet(kTRD)) { fHM->H1F("hNofTrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
+   if (fDet.GetDet(kMUCH)) { fHM->H1F("hNofMuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
 }

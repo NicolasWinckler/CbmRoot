@@ -19,11 +19,7 @@
 #include <iostream>
 
 CbmLitFindGlobalTracksIdeal::CbmLitFindGlobalTracksIdeal():
-   fIsElectronSetup(false),
-   fIsSts(false),
-   fIsTrd(false),
-   fIsMuch(false),
-   fIsTof(false),
+   fDet(),
 
    fMCTracks(NULL),
    fStsMatches(NULL),
@@ -49,7 +45,9 @@ CbmLitFindGlobalTracksIdeal::~CbmLitFindGlobalTracksIdeal()
 
 InitStatus CbmLitFindGlobalTracksIdeal::Init()
 {
-   DetermineSetup();
+   fDet.DetermineSetup();
+   std::cout << fDet.ToString();
+
    ReadDataBranches();
 
    return kSUCCESS;
@@ -58,10 +56,10 @@ InitStatus CbmLitFindGlobalTracksIdeal::Init()
 void CbmLitFindGlobalTracksIdeal::Exec(
    Option_t* opt)
 {
-   if (fIsSts) { FillTrackMap(fMcStsMap, fStsMatches); }
-   if (fIsTrd) { FillTrackMap(fMcTrdMap, fTrdMatches); }
-   if (fIsMuch) { FillTrackMap(fMcMuchMap, fMuchMatches); }
-   if (fIsTof) { FillMapTof(); }
+   if (fDet.GetDet(kSTS)) { FillTrackMap(fMcStsMap, fStsMatches); }
+   if (fDet.GetDet(kTRD)) { FillTrackMap(fMcTrdMap, fTrdMatches); }
+   if (fDet.GetDet(kMUCH)) { FillTrackMap(fMcMuchMap, fMuchMatches); }
+   if (fDet.GetDet(kTOF)) { FillMapTof(); }
 
    CreateGlobalTracks();
 
@@ -70,23 +68,6 @@ void CbmLitFindGlobalTracksIdeal::Exec(
 
 void CbmLitFindGlobalTracksIdeal::Finish()
 {
-}
-
-void CbmLitFindGlobalTracksIdeal::DetermineSetup()
-{
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fIsElectronSetup = env->IsElectronSetup();
-   fIsSts = true;
-   fIsTrd = env->IsTrd();
-   fIsMuch = env->IsMuch();
-   fIsTof = env->IsTof();
-
-   if (fIsElectronSetup) { std::cout << "-I- CBM electron setup detected" << std::endl; }
-   else { std::cout << "-I- CBM muon setup detected" << std::endl; }
-   std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
-   if (fIsTrd) { std::cout << "TRD" << std::endl; }
-   if (fIsMuch) { std::cout << "MUCH" << std::endl; }
-   if (fIsTof) { std::cout << "TOF" << std::endl; }
 }
 
 void CbmLitFindGlobalTracksIdeal::ReadDataBranches()
@@ -98,25 +79,25 @@ void CbmLitFindGlobalTracksIdeal::ReadDataBranches()
    if (NULL == fMCTracks) { Fatal("Init","No MCTrack array!"); }
 
    //STS data
-   if (fIsSts) {
+   if (fDet.GetDet(kSTS)) {
       fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
       if (NULL == fStsMatches) { Fatal("Init","No StsTrackMatch array!"); }
    }
 
    //MUCH data
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
       if (NULL == fMuchMatches) { Fatal("Init","No MuchTrackMatch array!"); }
    }
 
    //TRD data
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       fTrdMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
       if (NULL == fTrdMatches) { Fatal("Init","No TrdTrackMatch array!"); }
    }
 
    //TOF data
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       fTofMCPoints = (TClonesArray*) ioman->GetObject("TofPoint");
       if (NULL == fTofMCPoints ) { Fatal("Init","No TofPoint array!"); }
       fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
@@ -167,10 +148,10 @@ void CbmLitFindGlobalTracksIdeal::CreateGlobalTracks()
       CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iMCTrack);
       if (mcTrack==NULL) { continue; }
       Int_t stsId = -1, trdId = -1, muchId = -1, tofId = -1;
-      if (fIsSts && (fMcStsMap.find(iMCTrack) != fMcStsMap.end())) { stsId = fMcStsMap[iMCTrack]; }
-      if (fIsTrd && (fMcTrdMap.find(iMCTrack) != fMcTrdMap.end())) { trdId = fMcTrdMap[iMCTrack]; }
-      if (fIsMuch && (fMcMuchMap.find(iMCTrack) != fMcMuchMap.end())) { muchId = fMcMuchMap[iMCTrack]; }
-      if (fIsTof && (fMcTofMap.find(iMCTrack) != fMcTofMap.end())) { tofId = fMcTofMap[iMCTrack]; }
+      if (fDet.GetDet(kSTS) && (fMcStsMap.find(iMCTrack) != fMcStsMap.end())) { stsId = fMcStsMap[iMCTrack]; }
+      if (fDet.GetDet(kTRD) && (fMcTrdMap.find(iMCTrack) != fMcTrdMap.end())) { trdId = fMcTrdMap[iMCTrack]; }
+      if (fDet.GetDet(kMUCH) && (fMcMuchMap.find(iMCTrack) != fMcMuchMap.end())) { muchId = fMcMuchMap[iMCTrack]; }
+      if (fDet.GetDet(kTOF) && (fMcTofMap.find(iMCTrack) != fMcTofMap.end())) { tofId = fMcTofMap[iMCTrack]; }
 
       if (stsId == -1 && trdId == -1 && muchId == -1 && tofId == -1) { continue; }
 

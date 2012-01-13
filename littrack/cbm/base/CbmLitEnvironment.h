@@ -82,30 +82,6 @@ public:
    /* Returns reference to the TOF detector layout. */
    const CbmLitStation& GetTofStation();
 
-   /* Returns true if electron setup is used. */
-   bool IsElectronSetup() const;
-
-   /* Returns true if MVD detector exists in TGeo. */
-   bool IsMvd() const;
-
-   /* Returns true if STS detector exists in TGeo. */
-   bool IsSts() const;
-
-   /* Returns true if RICH detector exists in TGeo. */
-   bool IsRich() const;
-
-   /* Returns true if TRD detector exists in TGeo. */
-   bool IsTrd() const;
-
-   /* Returns true if MUCH detector exists in TGeo. */
-   bool IsMuch() const;
-
-   /* Returns true if TOF detector exists in TGeo. */
-   bool IsTof() const;
-
-   /* Returns true if simple TRD is simulated. */
-   bool IsTrdSimple() const;
-
 private:
    /* Constructor is protected since singleton pattern is used.
     * Pointer to the object is returned by static Instance() method. */
@@ -149,10 +125,6 @@ private:
 
    /* Returns true if segmented TRD is simulated. */
    bool IsTrdSegmented() const;
-
-   /* Returns true if detector exists in TGeo. */
-   bool CheckDetectorPresence(
-      const std::string& name) const;
 
    CbmLitDetectorLayout fLayout; // current detector layout
    CbmLitDetectorLayout fMuchTrdLayout; // MUCH+TRD detector layout

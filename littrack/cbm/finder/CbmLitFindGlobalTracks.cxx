@@ -33,10 +33,7 @@
 #include <cmath>
 
 CbmLitFindGlobalTracks::CbmLitFindGlobalTracks():
-   fIsElectronSetup(false),
-   fIsTrd(false),
-   fIsMuch(false),
-   fIsTof(false),
+   fDet(),
 
    fStsTracks(NULL),
    fStsHits(NULL),
@@ -77,7 +74,9 @@ CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()
 
 InitStatus CbmLitFindGlobalTracks::Init()
 {
-   DetermineSetup();
+   fDet.DetermineSetup();
+   std::cout << fDet.ToString();
+
    ReadAndCreateDataBranches();
 
    InitTrackReconstruction();
@@ -87,8 +86,8 @@ InitStatus CbmLitFindGlobalTracks::Init()
 void CbmLitFindGlobalTracks::Exec(
    Option_t* opt)
 {
-   if (fIsTrd) { fTrdTracks->Clear(); }
-   if (fIsMuch) { fMuchTracks->Clear(); }
+   if (fDet.GetDet(kTRD)) { fTrdTracks->Clear(); }
+   if (fDet.GetDet(kMUCH)) { fMuchTracks->Clear(); }
    fGlobalTracks->Clear();
 
    ConvertInputData();
@@ -118,23 +117,6 @@ void CbmLitFindGlobalTracks::Finish()
    PrintStopwatchStatistics();
 }
 
-void CbmLitFindGlobalTracks::DetermineSetup()
-{
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fIsElectronSetup = env->IsElectronSetup();
-   if (env->IsTrdSimple()) { fIsElectronSetup = true; }
-   fIsTrd = env->IsTrd();
-   fIsMuch = env->IsMuch();
-   fIsTof = env->IsTof();
-
-   if (fIsElectronSetup) { std::cout << "-I- CBM electron setup detected" << std::endl; }
-   else { std::cout << "-I- CBM muon setup detected" << std::endl; }
-   std::cout << "-I- The following detectors were found in the CBM setup and will be used for global tracking:" << std::endl;
-   if (fIsTrd) { std::cout << "TRD" << std::endl; }
-   if (fIsMuch) { std::cout << "MUCH" << std::endl; }
-   if (fIsTof) { std::cout << "TOF" << std::endl; }
-}
-
 void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
@@ -147,7 +129,7 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
    if (NULL == fStsHits) { Fatal("Init","No StsHit array!"); }
 
    //MUCH data
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
       fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
       if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) { Fatal("Init", "No MuchPixelHit or MuchStrawHit array!"); }
@@ -156,14 +138,14 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
    }
 
    //TRD data
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
       if (NULL == fTrdHits) { Fatal("Init", "No TRDHit array!"); }
       std::cout << "-I- TRDHit branch found in tree" << std::endl;
    }
 
    //TOF data
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
       if (NULL == fTofHits) { Fatal("Init", "No TofHit array!"); }
       std::cout << "-I- TofHit branch found in tree" << std::endl;
@@ -173,12 +155,12 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
    fGlobalTracks = new TClonesArray("CbmGlobalTrack",100);
    ioman->Register("GlobalTrack", "Global", fGlobalTracks, kTRUE);
 
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       fMuchTracks = new TClonesArray("CbmMuchTrack", 100);
       ioman->Register("MuchTrack", "Much", fMuchTracks, kTRUE);
    }
 
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       fTrdTracks = new TClonesArray("CbmTrdTrack", 100);
       ioman->Register("TrdTrack", "Trd", fTrdTracks, kTRUE);
    }
@@ -187,7 +169,7 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 void CbmLitFindGlobalTracks::InitTrackReconstruction()
 {
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-   if (fIsElectronSetup) {
+   if (fDet.GetElectronSetup()) {
       if (fTrackingType == "branch" || fTrackingType == "nn" ||
             fTrackingType == "weight" || fTrackingType == "nn_parallel") {
          std::string st("e_");
@@ -207,7 +189,7 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
       }
    }
 
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       if (fMergerType == "nearest_hit") {
          fMerger = factory->CreateHitToTrackMerger("tof_nearest_hit");
       } else {
@@ -254,7 +236,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
    if (fTrdHits) {
       CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitHits);
       //If MUCH-TRD setup, than shift plane id for the TRD hits
-      if (fIsMuch && fIsTrd) {
+      if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
          Int_t nofPlanes = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
          for (Int_t i = 0; i < fLitHits.size(); i++) {
             CbmLitHit* hit = fLitHits[i];
@@ -372,15 +354,15 @@ void CbmLitFindGlobalTracks::ClearArrays()
 void CbmLitFindGlobalTracks::RunTrackReconstruction()
 {
    // Track finding in TRD or MUCH
-   if (fIsMuch || fIsTrd) {
+   if (fDet.GetDet(kMUCH) || fDet.GetDet(kTRD)) {
       fTrackingWatch.Start(kFALSE);
       fFinder->DoFind(fLitHits, fLitStsTracks, fLitOutputTracks);
       fTrackingWatch.Stop();
    }
    // Merging of TOF hits to global tracks
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       // If there are no TRD or MUCH than merge STS tracks with TOF
-      if (!(fIsMuch || fIsTrd)) {
+      if (!(fDet.GetDet(kMUCH) || fDet.GetDet(kTRD))) {
          for(TrackPtrIterator it = fLitStsTracks.begin(); it != fLitStsTracks.end(); it++) {
             CbmLitTrack* track = new CbmLitTrack(*(*it));
             fLitOutputTracks.push_back(track);
@@ -388,7 +370,7 @@ void CbmLitFindGlobalTracks::RunTrackReconstruction()
       }
 
       // Selection of tracks to be merged with TOF
-      if (fIsMuch || fIsTrd) { SelectTracksForTofMerging(); }
+      if (fDet.GetDet(kMUCH) || fDet.GetDet(kTRD)) { SelectTracksForTofMerging(); }
 
       fMergerWatch.Start(kFALSE);
       fMerger->DoMerge(fLitTofHits, fLitOutputTracks);

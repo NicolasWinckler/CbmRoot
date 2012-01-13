@@ -10,6 +10,7 @@
 
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitDetectorSetup.h"
 #include "FairTask.h"
 
 /**
@@ -58,10 +59,6 @@ private:
    virtual void Finish();
 
    /**
-    * \brief Determine CBM detector setup based on TGeoManager. */
-   void DetermineSetup();
-
-   /**
     * \brief Read necessary data branches from the input data files.
     */
    void ReadAndCreateDataBranches();
@@ -86,8 +83,7 @@ private:
     */
    void ClearArrays();
 
-   Bool_t fIsMvd; // If MVD detected than true
-   Bool_t fIsSts; // If MVD detected than true
+   CbmLitDetectorSetup fDet; // For detector presence
 
    // Pointers to data arrays
    TClonesArray* fStsTracks; // CbmStsTrack array

@@ -8,6 +8,7 @@
 #ifndef CBMLITTRACKINGQADRAW_H_
 #define CBMLITTRACKINGQADRAW_H_
 
+#include "cbm/base/CbmLitDetectorSetup.h"
 #include <string>
 
 class CbmLitHistManager;
@@ -39,26 +40,25 @@ public:
    ~CbmLitTrackingQaDraw();
 
    /**
-    *
+    * \brief Draw histograms.\
+    * \param[in] histManager Pointer to histogram manager.
+    * \param[in] outputDir Output directory for images. If not specified images are not saved.
     */
    void Draw(
-         CbmLitHistManager* histManager);
+         CbmLitHistManager* histManager,
+         const std::string& outputDir = "");
 
    /**
-    *
+    * \brief Set rebining factor for histograms.
     */
-   void SetRebinForDraw(int rebin = 1) {
+   void SetRebin(int rebin = 1) {
       fRebin = (rebin >= 1) ? rebin : 1;
    }
 
-   bool fIsElectronSetup; // If "electron" setup detected than true
-   bool fIsMvd; // If MVD detected than true
-   bool fIsSts; // If STS detected than true
-   bool fIsRich; // If RICH detected than true
-   bool fIsTrd; // If TRD detected than true
-   bool fIsMuch; // If MUCH detected than true
-   bool fIsTof; // If TOF detected than true
-   string fOutputDir; // Output directory for images
+   void SetDetectorSetup(
+         const CbmLitDetectorSetup& detectorSetup) {
+      fDet = detectorSetup;
+   }
 
 private:
    /**
@@ -68,7 +68,6 @@ private:
 
    /**
     * \brief Draw efficiency plots. TODO ADD COMMENTS
-    *
     * \param[in] opt Can be "pisupp" for pion suppression drawing
     * \param[in] projName Can be "p", "y", "pt".
     */
@@ -87,6 +86,7 @@ private:
 
    /**
     * \brief Calculate efficiency for two histograms.
+    * TODO: Add comments
     */
    float CalcEfficiency(
       TH1* histRec,
@@ -95,6 +95,7 @@ private:
 
    /**
     * \brief Draw mean efficiency lines (up to 4) on the histogramm.
+    * TODO: Add comments
     */
    void DrawMeanEfficiencyLines(
       TH1* h,
@@ -133,7 +134,9 @@ private:
    void DrawMCMomVsAngle();
 
    CbmLitHistManager* fHM; // histogram manager
-   int fRebin;
+   int fRebin; // Rebining factor for histograms
+   CbmLitDetectorSetup fDet; // Detector setup
+   string fOutputDir; // Output directory for images
 };
 
 #endif /* CBMLITTRACKINGQADRAW_H_ */

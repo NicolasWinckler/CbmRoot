@@ -1,12 +1,14 @@
 #ifndef CBMLITCHECKENERGYLOSSMUONS_H_
 #define CBMLITCHECKENERGYLOSSMUONS_H_
 
-#include "base/CbmLitTask.h"
+#include "FairTask.h"
 
 #include <string>
+using std::string;
+
 class TGraph;
 
-class CbmLitCheckEnergyLossMuons : public CbmLitTask
+class CbmLitCheckEnergyLossMuons : public FairTask
 {
 public:
    CbmLitCheckEnergyLossMuons();
@@ -30,6 +32,8 @@ private:
    TGraph* fTable[4];
    TGraph* fCalc[4];
    std::string fMat;
+
+   string fOutputDir;
 
    ClassDef(CbmLitCheckEnergyLossMuons, 1);
 };

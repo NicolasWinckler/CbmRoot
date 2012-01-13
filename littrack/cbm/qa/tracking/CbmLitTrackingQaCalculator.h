@@ -8,10 +8,10 @@
 #ifndef CBMLITTRACKINGQACALCULATOR_H_
 #define CBMLITTRACKINGQACALCULATOR_H_
 
-#include "FairTask.h"
 #include "CbmDetectorList.h"
 #include "CbmStsKFTrackFitter.h"
 #include "CbmLitTrackingQaHistNames.h"
+#include "cbm/base/CbmLitDetectorSetup.h"
 
 #include <map>
 #include <string>
@@ -34,6 +34,7 @@ class CbmLitGlobalElectronId;
 class CbmLitHistManager;
 class CbmRichRingFitterEllipseTau;
 class CbmLitMCTrackCreator;
+class TFile;
 
 using std::multimap;
 using std::string;
@@ -45,13 +46,14 @@ using std::map;
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
  */
-class CbmLitTrackingQaCalculator : public FairTask
+class CbmLitTrackingQaCalculator
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitTrackingQaCalculator();
+   CbmLitTrackingQaCalculator(
+         CbmLitHistManager* histManager);
 
    /**
     * \brief Destructor.
@@ -59,26 +61,25 @@ public:
    virtual ~CbmLitTrackingQaCalculator();
 
    /**
-    * \brief Derived from FairTask.
+    * \brief Initialization. Has to be called in FairTask::Init.
     */
-   virtual InitStatus Init();
+   void Init();
 
    /**
-    * \brief Derived from FairTask.
+    * \brief Execution. Has to be called in FairTask::Exec.
     */
-   virtual void Exec(
-      Option_t* opt);
+   void Exec();
 
    /**
-    * \brief Derived from FairTask.
+    * \brief Finish. Has to be called in FairTask::Finish.
     */
-   virtual void Finish();
+   void Finish();
 
    /**
     * \brief Set minimum number of MC points in STS.
     * \param[in] minNofPointsSts Minimum number of MC points in STS.
     */
-   void SetMinNofPointsSts(Int_t minNofPointsSts) {fMinNofPointsSts = minNofPointsSts; }
+   void SetMinNofPointsSts(Int_t minNofPointsSts) { fMinNofPointsSts = minNofPointsSts; }
 
    /**
     * \brief Set minimum number of MC points in TRD.
@@ -134,65 +135,7 @@ public:
     */
    void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch;}
 
-   /**
-    * \brief Set verbose level for print.
-    * \param[in] verbose Verbose value.
-    */
-   void SetVerbose(Int_t verbose) { fVerbose = verbose;}
-
-   /**
-    * \brief Set output directory for images.
-    * \param[in] dir Directory name.
-    */
-   void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
-
-   /**
-    * \brief Return output directory for images.
-    * \return Output directory name.
-    */
-   const std::string& GetOutputDir() const { return fOutputDir;}
-
-   /**
-    * \brief Implement functionality of drawing histograms in macro from the specified file.
-    * \param[in] fileName Name of the file.
-    */
-   void DrawHistosFromFile(const std::string& fileName);
-
-   /**
-    * \brief Explicitly sets detectors in the setup.
-    * \param[in] detId Id of the detector kMVD, kSTS...
-    * \param[in] isDet TRUE if detector is in the setup.
-    */
-   void SetDetectorPresence(
-		   DetectorId detId,
-		   bool isDet);
-
-   /**
-    * \brief Return TRUE if detector presents in the setup.
-    * \param[in] detId Id of the detector kMVD, kSTS...
-    * \return TRUE if detector is in the setup.
-    */
-   bool GetDetectorPresence(
-         DetectorId detId) const;
-
-   /**
-    * \brief Set explicitly electron setup of the detector.
-    * \param[in] isElectronSetup TRUE if electron setup.
-    */
-   void SetIsElectronSetup(bool isElectronSetup) {fIsElectronSetup = isElectronSetup;}
-
-   /**
-    * \brief Return TRUE if electron setup of CBM is detected.
-    * \return Return TRUE if electron setup of CBM is detected.
-    */
-   bool IsElectronSetup() const {return fIsElectronSetup;}
-
 private:
-
-   /**
-    * \brief Determine CBM detector setup, based on TGeoManager stored in the input MC file.
-    */
-   void DetermineSetup();
 
    /**
     * \brief Read data branches from input data files.
@@ -424,30 +367,16 @@ private:
    void CalculateEfficiencyHistos();
 
    /**
-    * \brief Write histograms to output file.
-    */
-   void WriteToFile();
-
-   /**
     * \brief Increase number of tracks counters.
     */
    void IncreaseCounters();
-
-   /**
-    * \brief Return std::string of detector used in global reconstruction.
-    */
-   std::string RecDetector();
-
-   /**
-    * \brief Draw histograms.
-    */
-   void Draw();
 
    /**
     * \brief Calculate electron Identification.
     */
    void ElectronIdentification();
 
+   // Acceptance defined by MC points
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
    Int_t fMinNofPointsTrd; // Minimal number of MCPoints in TRD
    Int_t fMinNofPointsMuch; // Minimal number of MCPoints in MUCH
@@ -456,6 +385,7 @@ private:
 
    Bool_t fUseConsecutivePointsInSts; // Use consecutive MC points for STS normalization
 
+   // Acceptance in RICH
    Int_t fMinNofHitsRich; // Minimal number of hits in MC RICH ring
    Double_t fQuotaRich; // True/all hits for ring to be considered correctly reconstructed
 
@@ -470,13 +400,7 @@ private:
    Int_t fMinNofHitsTrd; // for TRD track
    Int_t fMinNofHitsMuch; // for MUCH track
 
-   Bool_t fIsElectronSetup; // If "electron" setup detected than true
-   Bool_t fIsMvd; // If MVD detected than true
-   Bool_t fIsSts; // If STS detected than true
-   Bool_t fIsRich; // If RICH detected than true
-   Bool_t fIsTrd; // If TRD detected than true
-   Bool_t fIsMuch; // If MUCH detected than true
-   Bool_t fIsTof; // If TOF detected than true
+   CbmLitDetectorSetup fDet; // For access of detector presence in setup
 
    Double_t fRefMomentum; // Momentum cut for reference tracks
    Int_t fRefMinNofHitsRich; // Minimum number of hits in RICH ring to be considered as reference
@@ -528,8 +452,6 @@ private:
 
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
-
-   string fOutputDir; // Output directory for images
 
    CbmVertex *fPrimVertex; // Pointer to the primary vertex
    CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm

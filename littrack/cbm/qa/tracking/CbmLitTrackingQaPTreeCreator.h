@@ -44,18 +44,6 @@ public:
    ptree Create(
          CbmLitHistManager* histManager);
 
-   bool fIsElectronSetup; // If "electron" setup detected than true
-   bool fIsMvd; // If MVD detected than true
-   bool fIsSts; // If STS detected than true
-   bool fIsRich; // If RICH detected than true
-   bool fIsTrd; // If TRD detected than true
-   bool fIsMuch; // If MUCH detected than true
-   bool fIsTof; // If TOF detected than true
-   string fOutputDir; // Output directory for images
-   float fMinAngle; // Minimum polar angle [grad]
-   float fMaxAngle; // Maximum polar angle [grad]
-   int fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
-
 private:
    /**
     * \brief TODO ADD COMMENTS
@@ -116,8 +104,7 @@ private:
          const string& name,
          const string& hist);
 
-   // Pointer to histogram manager
-   CbmLitHistManager* fHM;
+   CbmLitHistManager* fHM; // Pointer to histogram manager
 };
 
 #endif /* CBMLITTRACKINGQAPTREECREATOR_H_ */

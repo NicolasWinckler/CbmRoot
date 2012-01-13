@@ -6,7 +6,6 @@
 
 #pragma link C++ class CbmLitPolarizedGenerator+;
 
-#pragma link C++ class CbmLitTask+;
 #pragma link C++ class CbmLitGlobalElectronId+;
 #pragma link C++ class CbmLitFindGlobalTracks+;
 #pragma link C++ class CbmLitFindMvdTracks+;

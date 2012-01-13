@@ -8,6 +8,7 @@
 #ifndef CBMLITFINDGLOBALTRACKSIDEAL_H_
 #define CBMLITFINDGLOBALTRACKSIDEAL_H_
 
+#include "base/CbmLitDetectorSetup.h"
 #include "FairTask.h"
 
 #include <map>
@@ -58,11 +59,6 @@ private:
    virtual void Finish();
 
    /**
-     * \brief Determine the CBM detector setup based on TGeoManager.
-     */
-   void DetermineSetup();
-
-   /**
     * \brief Read necessary data branches from the input data files.
     */
    void ReadDataBranches();
@@ -84,11 +80,7 @@ private:
     */
    void CreateGlobalTracks();
 
-   Bool_t fIsElectronSetup; // If "electron" setup detected than true
-   Bool_t fIsSts; // If STS detected than true
-   Bool_t fIsTrd; // If TRD detected than true
-   Bool_t fIsMuch; // If MUCH detected than true
-   Bool_t fIsTof; // If TOF detected than true
+   CbmLitDetectorSetup fDet;
 
    // Pointers to data arrays
    TClonesArray* fMCTracks; // CbmMCTrack

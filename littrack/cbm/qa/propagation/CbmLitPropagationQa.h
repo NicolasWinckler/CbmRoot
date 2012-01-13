@@ -1,8 +1,6 @@
 /**
  * \file CbmLitPropagationQa.h
- *
  * \brief Track propagation and track fit QA.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
  *
@@ -13,6 +11,7 @@
 
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitDetectorSetup.h"
 
 #include "FairTask.h"
 #include "TStopwatch.h"
@@ -35,9 +34,7 @@ class CbmLitMCTrack;
 
 /**
  * \file CbmLitPropagationQa
- *
  * \brief Track propagation and track fit QA.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
  *
@@ -88,11 +85,6 @@ public:
    void IsFixedBounds(Bool_t isFixedBounds) {fIsFixedBounds = isFixedBounds;};
 
 private:
-   /**
-    * \brief Determine detector layout.
-    */
-   void DetermineSetup();
-
    /**
     * \brief Read and create data branches.
     */
@@ -231,11 +223,7 @@ private:
       std::ostream& out,
       int v);
 
-   Bool_t fIsElectronSetup; // If "electron" setup detected than true
-   Bool_t fIsSts; // If STS detected than true
-   Bool_t fIsTrd; // If TRD detected than true
-   Bool_t fIsMuch; // If MUCH detected than true
-   Bool_t fIsTof; // If TOF detected than true
+   CbmLitDetectorSetup fDet;
 
    TrackPtrVector fLitTracks; // array with reconstructed global tracks converted to LitTracks
    Int_t fNofPlanes; // number of planes in the detector

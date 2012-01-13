@@ -37,10 +37,7 @@ CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
    fMyGeoNodes(),
    fMyMuchGeoNodes(),
    fMyTrdGeoNodes(),
-   fIsTrd(false),
-   fIsMuch(false),
-   fIsTof(false),
-   fIsRich(false)
+   fDet()
 {
    ConstructGeometry();
 }
@@ -68,11 +65,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
    fGeo = gGeoManager;
    fGeo->Print();
 
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fIsTrd = env->IsTrd();
-   fIsMuch = env->IsMuch();
-   fIsTof = env->IsTof();
-   fIsRich = env->IsRich();
+   fDet.DetermineSetup();
 
    CreateMediumList();
    std::cout << "Medium list created" << std::endl;
@@ -86,10 +79,10 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 
 
    ConstructSts();
-   if (fIsMuch) { ConstructMuch(); }
-   if (fIsTrd) { ConstructTrd(); }
-   if (fIsTof) { ConstructTof(); }
-   if (fIsRich) { ConstructRich(); }
+   if (fDet.GetDet(kMUCH)) { ConstructMuch(); }
+   if (fDet.GetDet(kTRD)) { ConstructTrd(); }
+   if (fDet.GetDet(kTOF)) { ConstructTof(); }
+   if (fDet.GetDet(kRICH)) { ConstructRich(); }
 
    fSimpleGeo->CloseGeometry();
    fSimpleGeo->Print();
@@ -151,23 +144,23 @@ void CbmLitSimpleGeometryConstructor::CreateMediumList()
    fMedium["air"] = CreateMedium("air");
    fMedium["silicon"] = CreateMedium("silicon");
 
-   if (fIsMuch) {
+   if (fDet.GetDet(kMUCH)) {
       fMedium["MUCHiron"] = CreateMedium("MUCHiron");
       fMedium["MUCHargon"] = CreateMedium("MUCHargon");
    }
-   if (fIsTrd) {
+   if (fDet.GetDet(kTRD)) {
       fMedium["polypropylene"] = CreateMedium("polypropylene");
       fMedium["TRDgas"] = CreateMedium("TRDgas");
       fMedium["goldcoatedcopper"] = CreateMedium("goldcoatedcopper");
       fMedium["mylar"] = CreateMedium("mylar");
       fMedium["carbon"] = CreateMedium("carbon");
    }
-   if (fIsTof) {
+   if (fDet.GetDet(kTOF)) {
       fMedium["aluminium"] = CreateMedium("aluminium");
       fMedium["RPCgas"] = CreateMedium("RPCgas");
       fMedium["RPCglass"] = CreateMedium("RPCglass");
    }
-   if (fIsRich) {
+   if (fDet.GetDet(kRICH)) {
       fMedium["aluminium"] = CreateMedium("aluminium");
       fMedium["CsI"] = CreateMedium("CsI");
       fMedium["RICHglass"] = CreateMedium("RICHglass");

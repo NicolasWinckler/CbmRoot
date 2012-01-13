@@ -7,6 +7,7 @@
 #include "base/CbmLitFieldGridCreator.h"
 #include "base/CbmLitSimpleGeometryConstructor.h"
 #include "base/CbmLitEnvironment.h"
+#include "base/CbmLitDetectorSetup.h"
 #include "utils/CbmLitMemoryManagment.h"
 #include "utils/CbmLitComparators.h"
 
@@ -81,18 +82,16 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
    static Bool_t layoutCreated = false;
 
    if (!layoutCreated) {
-//    if (IsTrd()) {
-      if (IsTrdSimple()) {
-         TrdLayoutSimple();
-         fLayout = fTrdLayout;
-//       }
-      } else if (IsMuch() && !IsTrd()) {
+      CbmLitDetectorSetup det;
+      det.DetermineSetup();
+
+      if (det.GetDet(kMUCH) && !det.GetDet(kTRD)) {
          MuchLayout();
          fLayout = fMuchLayout;
-      } else if (IsTrd() && !IsMuch()) {
+      } else if (det.GetDet(kTRD) && !det.GetDet(kMUCH)) {
          TrdLayout();
          fLayout = fTrdLayout;
-      } else if (IsMuch() && IsTrd()) {
+      } else if (det.GetDet(kMUCH) && det.GetDet(kTRD)) {
          CombineMuchAndTrd();
          fLayout = fMuchTrdLayout;
       }
@@ -784,72 +783,4 @@ bool CbmLitEnvironment::IsTrdSegmented() const
    } else {
       return true;
    }
-}
-
-bool CbmLitEnvironment::IsTrdSimple() const
-{
-   FairRunAna* ana = FairRunAna::Instance();
-   FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-   FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
-   TObjArray* detList = baseParSet->GetDetList();
-   FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
-   if (!trd) { return false; }
-   TString name = trd->GetGeometryFileName();
-   if(name.Contains("simple")) {
-      return true;
-   } else {
-      return false;
-   }
-}
-
-bool CbmLitEnvironment::CheckDetectorPresence(
-   const std::string& name) const
-{
-   TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
-   for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-      TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-      if (TString(node->GetName()).Contains(name.c_str())) { return true; }
-   }
-
-   if (name == "mvd") {
-      TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
-      if (node1 && node1->GetVolume()->FindNode("mvdstation01_0")) { return true; }
-   }
-
-   return false;
-}
-
-bool CbmLitEnvironment::IsElectronSetup() const
-{
-   return CheckDetectorPresence("rich");// || CheckDetectorPresence("trd");
-}
-
-bool CbmLitEnvironment::IsMvd() const
-{
-   return CheckDetectorPresence("mvd");
-}
-
-bool CbmLitEnvironment::IsSts() const
-{
-   return CheckDetectorPresence("sts");
-}
-
-bool CbmLitEnvironment::IsRich() const
-{
-   return CheckDetectorPresence("rich");
-}
-
-bool CbmLitEnvironment::IsTrd() const
-{
-   return CheckDetectorPresence("trd");
-}
-
-bool CbmLitEnvironment::IsMuch() const
-{
-   return CheckDetectorPresence("much");
-}
-
-bool CbmLitEnvironment::IsTof() const
-{
-   return CheckDetectorPresence("tof");
 }

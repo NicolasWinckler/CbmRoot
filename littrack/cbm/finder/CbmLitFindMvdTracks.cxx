@@ -25,8 +25,7 @@
 #include <algorithm>
 
 CbmLitFindMvdTracks::CbmLitFindMvdTracks():
-   fIsMvd(false),
-   fIsSts(false),
+   fDet(),
    fStsTracks(NULL),
    fMvdHits(NULL),
    fLitStsTracks(),
@@ -45,7 +44,9 @@ CbmLitFindMvdTracks::~CbmLitFindMvdTracks()
 
 InitStatus CbmLitFindMvdTracks::Init()
 {
-   DetermineSetup();
+   fDet.DetermineSetup();
+   std::cout << fDet.ToString();
+
    ReadAndCreateDataBranches();
 
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
@@ -76,31 +77,19 @@ void CbmLitFindMvdTracks::Finish()
 
 }
 
-void CbmLitFindMvdTracks::DetermineSetup()
-{
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fIsMvd = env->IsMvd();
-   fIsSts = env->IsSts();
-
-   std::cout << "-I- Found detectors:";
-   if (fIsMvd) { std::cout << "MVD "; }
-   if (fIsSts) { std::cout << "STS "; }
-   std::cout << std::endl;
-}
-
 void CbmLitFindMvdTracks::ReadAndCreateDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
    if (NULL == ioman) { Fatal("Init","CbmRootManager is not instantiated"); }
 
    // MVD data
-   if (fIsMvd) {
+   if (fDet.GetDet(kMVD)) {
       fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
       if (NULL == fMvdHits) { Fatal("Init", "No MvdHit array!"); }
    }
 
    //STS data
-   if (fIsSts) {
+   if (fDet.GetDet(kSTS)) {
       fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
       if (NULL == fStsTracks) { Fatal("Init","No StsTrack array!"); }
    }

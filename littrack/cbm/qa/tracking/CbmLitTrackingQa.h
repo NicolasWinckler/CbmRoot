@@ -11,7 +11,9 @@
 #include "FairTask.h"
 #include "CbmDetectorList.h"
 #include "../report/CbmLitReport.h"
+#include "cbm/base/CbmLitDetectorSetup.h"
 
+class CbmLitHistManager;
 class CbmLitTrackingQaCalculator;
 
 using std::string;
@@ -51,6 +53,11 @@ public:
     * \brief Derived from FairTask.
     */
    virtual void Finish();
+
+   /**
+    *
+    */
+   void CreateReport();
 
    /**
     * \brief Set minimum number of MC points in STS.
@@ -95,39 +102,7 @@ public:
 
    /* Sets the output directory for images.
     * @param dir Directory name. */
-   void SetOutputDir(const std::string& dir);
-
-   /* Implement functionality of drawing histograms in the macro
-    * from the specified file
-    * @param fileName Name of the file */
-   void DrawHistosFromFile(const std::string& fileName);
-
-   /* Explicitly sets detectors in the setup
-    * detId Id of the detector kMVD, kSTS...
-    * isDet true if detector is in the setup */
-   void SetDetectorPresence(
-		   DetectorId detId,
-		   bool isDet);
-
-   /**
-    * \brief Return TRUE if detector presents in the setup.
-    * \param[in] detId Id of the detector kMVD, kSTS...
-    * \return TRUE if detector is in the setup.
-    */
-   bool GetDetectorPresence(
-         DetectorId detId) const;
-
-   /**
-    * \brief Set explicitly electron setup of the detector.
-    * \param[in] isElectronSetup true if electron setup
-    */
-   void SetIsElectronSetup(bool isElectronSetup);
-
-   /**
-    * \brief Return TRUE if electron setup of CBM is detected.
-    * \return Return TRUE if electron setup of CBM is detected.
-    */
-   bool IsElectronSetup() const;
+   void SetOutputDir(const std::string& dir) { fOutputDir = dir; }
 
    /**
     * \brief Set if consecute MC points are used for efficiency normalization.
@@ -140,8 +115,20 @@ public:
          const vector<string>& results,
          const vector<string>& names);
 
+   /**
+    * \brief Draw histograms in macro from the specified file.
+    * \param[in] fileName Name of the file.
+    */
+   void DrawHistosFromFile(
+         const std::string& fileName);
+
+   void WriteToFile();
+
 private:
-   CbmLitTrackingQaCalculator* fImpl;
+   CbmLitHistManager* fHM; // Histogram manager
+   CbmLitTrackingQaCalculator* fTrackingQa; // Tracking performance calculator
+   string fOutputDir; // Output directory for results
+   CbmLitDetectorSetup fDet;
 
    ClassDef(CbmLitTrackingQa, 1);
 };

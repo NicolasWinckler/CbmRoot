@@ -105,6 +105,16 @@ public:
    }
 
    /**
+    * \brief Check existence of histogram in manager.
+    * \param[in] name Name of histogram.
+    * \return True if histogram exists in manager.
+    */
+   bool Exists(
+         const string& name) const {
+      return fHistMap.count(name);
+   }
+
+   /**
     * \brief Write all histograms to current opened file.
     */
    void WriteToFile();

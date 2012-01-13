@@ -64,7 +64,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
 
-cbm/base/CbmLitTask.cxx
+cbm/base/CbmLitDetectorSetup.cxx
 
 cbm/elid/CbmLitGlobalElectronId.cxx
 
@@ -135,7 +135,6 @@ If(Boost_FOUND)
 EndIf(Boost_FOUND)
 
 set(LITTRACK_HEADERS
-cbm/base/CbmLitTask.h
 cbm/elid/CbmLitGlobalElectronId.h
 cbm/finder/CbmLitFindGlobalTracks.h
 cbm/finder/CbmLitFindMvdTracks.h

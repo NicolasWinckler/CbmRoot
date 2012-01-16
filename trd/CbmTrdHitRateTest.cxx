@@ -145,7 +145,6 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Bool_t Fast = true;//false;
   //  fDraw = false;
   fDraw = true;
-  //Bool_t Fast = true;
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
   Double_t mm2bin = 2.5;

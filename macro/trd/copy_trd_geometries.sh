@@ -4,6 +4,7 @@
 
 echo \# copy geometries
 cp -v geometry/trd.v12/trd_v12a.geo ../../geometry/trd
+cp -v geometry/trd.v12/media.geo    ../../geometry/trd
 #cp -v geometry/trd.v11/v11?/*.geo* ../../geometry/trd
 #cp -v geometry/trd.v11/*.geo       ../../geometry/trd
 echo

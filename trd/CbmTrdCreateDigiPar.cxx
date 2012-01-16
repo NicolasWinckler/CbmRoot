@@ -386,6 +386,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
 
   //-----------------------------------------------------------------------
   // station 1
+  // v11x:  8 + X +16 + X +26 +  X   -- number of detector sizes
+  // v11x:  4 + 4 +12 + 4 + 6 + 20   -- number of pad plane types
+  // v11x:  4   8  20  24  30   50   -- sum of modules for this station
+  //
   // jul10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types
   // jul10: 4   8  12  20  26   56   -- sum of modules for this station
 
@@ -400,7 +404,7 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
     
     if (fModuleType==2) {
-      if (fModuleCopy <= 4) {
+      if (fModuleCopy <= 12) { //v11x
 	moduleType=2;
       } else {
 	moduleType=3;
@@ -425,6 +429,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
 
   //-------------------------------------------------------------------------
   // station 2
+  // v11x:  8 + X +16 + X +54 +  X   -- number of detector sizes
+  // v11x:  4 + 4 +12 + 4 +54 +  X   -- number of pad plane types
+  // v11x:  4   8  20  24  78    X   -- sum of modules for this station
+  //
   // jul10: 4 + 4 + 4 + 8 + 6 + 74   -- number of module types
   // jul10: 4   8  12  20  26  100   -- sum of modules for this station
    
@@ -439,7 +447,7 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
 
     if (fModuleType==2) {
-      if (fModuleCopy <= 4) {
+      if (fModuleCopy <= 12) { //v11x
 	moduleType=2;
       } else {
 	moduleType=3;
@@ -463,6 +471,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
   }
   //------------------------------------------------------------------------
   // station 3
+  // v11x:  X + X + X + X +98 +  X   -- number of detector sizes
+  // v11x:  X + X + X + X + 8 + 90   -- number of pad plane types
+  // v11x:                  8   98   -- sum of modules for this station
+  //
   // jul10: 8 + 136   -- number of module types
   // jul10: 8   144   -- sum of modules for this station
   
@@ -474,6 +486,7 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
  	moduleType=1;
       }
     }
+
     for (Int_t i=0; i < fst3_sect_count; i++ ) {
       fSectorSizex.AddAt(fst3_pad_type[moduleType][i][0],i);
       fSectorSizey.AddAt(fst3_pad_type[moduleType][i][1],i);

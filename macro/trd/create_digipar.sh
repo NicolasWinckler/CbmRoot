@@ -1,5 +1,5 @@
 #!/bin/bash
-# create for a list of geiometries the corresponding trd digitization
+# create for a list of geometries the corresponding trd digitization
 # parameters
 
 #directory=jul10

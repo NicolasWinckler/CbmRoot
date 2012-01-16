@@ -142,7 +142,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   printf("Introduction:\n");
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
-  Bool_t Fast = false;
+  Bool_t Fast = true;//false;
   //  fDraw = false;
   fDraw = true;
   //Bool_t Fast = true;
@@ -221,7 +221,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
     fModuleInfo = fDigiPar->GetModule(ModuleID);
     //printf("%d:\n  %.1f %.1f %.1f\n",ModuleID,fModuleInfo->GetX(), fModuleInfo->GetY(),fModuleInfo->GetZ());
     GetModuleInformationSL(ModuleID);
-    FillVector(ModuleID, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3);
+    FillVector(Fast, ModuleID, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3);
     //cout << i << " " << ModuleID << endl;
   }
   vector< vector<int> > LiSi;
@@ -256,6 +256,8 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   fLayer = 1;
   for (vector< vector<int> >::size_type j = 0; j < LiSi.size(); j++)
     {
+      Int_t NumberOfLayerPerStation = LiSi[j].size();
+ 
       Topview[0]->Reset();
       Topview[1]->Reset();
       Topview[2]->Reset();
@@ -267,7 +269,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       if(fDraw)
 	border->Draw("same");
       Lines = false;
-      for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
+      for (vector<int>::size_type i = 0; i < NumberOfLayerPerStation; i++)
 	{	 
 	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
 	}
@@ -276,7 +278,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 	Layer->Draw("colz");
       }
       Lines = true;
-      for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
+      for (vector<int>::size_type i = 0; i < NumberOfLayerPerStation; i++)
 	{
 	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
 	}
@@ -794,7 +796,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 
 
 }
-void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
+void CbmTrdHitRateTest::FillVector(Bool_t Fast, Int_t VolumeID,
 				   vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
 				   vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
 				   vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3)
@@ -807,18 +809,20 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 	  //Mcounter[0]++;
 	  L1S1.push_back (VolumeID);
 	}
-      if (fLayer == 2)
-	{
-	  L2S1.push_back (VolumeID);
-	}
-      if (fLayer == 3)
-	{
-	  L3S1.push_back (VolumeID);
-	}
-      if (fLayer == 4)
-	{
-	  L4S1.push_back (VolumeID);
-	}
+      if (!Fast) {
+	if (fLayer == 2)
+	  {
+	    L2S1.push_back (VolumeID);
+	  }
+	if (fLayer == 3)
+	  {
+	    L3S1.push_back (VolumeID);
+	  }
+	if (fLayer == 4)
+	  {
+	    L4S1.push_back (VolumeID);
+	  }
+      }
     }
   if (fStation == 2)
     {
@@ -827,18 +831,20 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 	  //Mcounter[1]++;
 	  L1S2.push_back (VolumeID);
 	}
-      if (fLayer == 2)
-	{
-	  L2S2.push_back (VolumeID);
-	}
-      if (fLayer == 3)
-	{
-	  L3S2.push_back (VolumeID);
-	}
-      if (fLayer == 4)
-	{
-	  L4S2.push_back (VolumeID);
-	}
+      if (!Fast) {
+	if (fLayer == 2)
+	  {
+	    L2S2.push_back (VolumeID);
+	  }
+	if (fLayer == 3)
+	  {
+	    L3S2.push_back (VolumeID);
+	  }
+	if (fLayer == 4)
+	  {
+	    L4S2.push_back (VolumeID);
+	  }
+      }
     }
   if (fStation == 3)
     {
@@ -847,18 +853,20 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 	  //Mcounter[2][0]++;
 	  L1S3.push_back (VolumeID);
 	}
-      if (fLayer == 2)
-	{
-	  L2S3.push_back (VolumeID);
-	}
-      if (fLayer == 3)
-	{
-	  L3S3.push_back (VolumeID);
-	}
-      if (fLayer == 4)
-	{
-	  L4S3.push_back (VolumeID);
-	}
+      if (!Fast) {
+	if (fLayer == 2)
+	  {
+	    L2S3.push_back (VolumeID);
+	  }
+	if (fLayer == 3)
+	  {
+	    L3S3.push_back (VolumeID);
+	  }
+	if (fLayer == 4)
+	  {
+	    L4S3.push_back (VolumeID);
+	  }
+      }
     }
 }
 void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)

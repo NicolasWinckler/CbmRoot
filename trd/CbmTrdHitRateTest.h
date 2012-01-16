@@ -86,7 +86,7 @@ class CbmTrdHitRateTest : public FairTask {
 
   void GetModuleInformationSL( Int_t VolumeID);
 
-  void FillVector( Int_t VolumeID,
+  void FillVector(Bool_t Fast, Int_t VolumeID,
 		   std::vector<int>& L1S1, std::vector<int>& L2S1, std::vector<int>& L3S1, std::vector<int>& L4S1, 
 		   std::vector<int>& L1S2, std::vector<int>& L2S2, std::vector<int>& L3S2, std::vector<int>& L4S2, 
 		   std::vector<int>& L1S3, std::vector<int>& L2S3, std::vector<int>& L3S3, std::vector<int>& L4S3);

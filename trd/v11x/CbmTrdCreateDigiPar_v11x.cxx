@@ -386,55 +386,36 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
 
   //-----------------------------------------------------------------------
   // station 1
-  // v12x:  8 + X + X +16 + X + X +26 +  X +  X  -- number of detector sizes
-  // v12x:  4 + 4 + 0 + 4 + 8 + 4 +12 + 14 +  0  -- number of pad plane types
-  // v12x:  4   8   8  12  20  24  36   50   50  -- sum of modules for this station
-  //
   // v11x:  8 + X +16 + X +26 +  X   -- number of detector sizes
-  // v11x:  8 + 0 +12 + 4 + 6 + 20   -- number of pad plane types
-  // v11x:  8   8  20  24  30   50   -- sum of modules for this station
+  // v11x:  4 + 4 +12 + 4 + 6 + 20   -- number of pad plane types
+  // v11x:  4   8  20  24  30   50   -- sum of modules for this station
+  //
+  // jul10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types
+  // jul10: 4   8  12  20  26   56   -- sum of modules for this station
 
   if (fStation==1) {
 
-    if (fModuleType==1) 
-    {
-      if (fModuleCopy <= 4) 
-      {
+    if (fModuleType==1) {
+      if (fModuleCopy <= 4) {
 	moduleType=0;
-      } else if (fModuleCopy <= 8) 
-      {
+      } else {
 	moduleType=1;
-      } else
-      {
+      }
+    }
+    
+    if (fModuleType==2) {
+      if (fModuleCopy <= 12) { //v11x
 	moduleType=2;
-      }
-    }
-    
-    if (fModuleType==2) 
-    {
-      if (fModuleCopy <= 4) 
-      {
+      } else {
 	moduleType=3;
-      } else if (fModuleCopy <= 12) 
-      {
-	moduleType=4;
-      } else
-      {
-	moduleType=5;
       }
     }
     
-    if (fModuleType==3) 
-    {
-      if (fModuleCopy <= 12) 
-      {
-	moduleType=6;
-      } else if (fModuleCopy <= 26) 
-      {
-	moduleType=7;
-      } else
-      {
-	moduleType=8;
+    if (fModuleType==3) {
+      if (fModuleCopy <= 6) {
+	moduleType=4;
+      } else {
+	moduleType=5;
       }
     }
 
@@ -448,13 +429,12 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
 
   //-------------------------------------------------------------------------
   // station 2
-  // v12x:  8 + X +16 + X +54 + X   -- number of detector sizes
-  // v12x:  4 + 4 +12 + 4 +12 +42   -- number of pad plane types
-  // v12x:  4   8  20  24  36  78   -- sum of modules for this station
+  // v11x:  8 + X +16 + X +54 +  X   -- number of detector sizes
+  // v11x:  4 + 4 +12 + 4 +54 +  X   -- number of pad plane types
+  // v11x:  4   8  20  24  78    X   -- sum of modules for this station
   //
-  // v11x:  8 + X +16 + X +54 + X   -- number of detector sizes
-  // v11x:  4 + 4 +12 + 4 +54 + X   -- number of pad plane types
-  // v11x:  4   8  20  24  78   X   -- sum of modules for this station
+  // jul10: 4 + 4 + 4 + 8 + 6 + 74   -- number of module types
+  // jul10: 4   8  12  20  26  100   -- sum of modules for this station
    
   if (fStation==2) {
 
@@ -467,7 +447,7 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
 
     if (fModuleType==2) {
-      if (fModuleCopy <= 12) {
+      if (fModuleCopy <= 12) { //v11x
 	moduleType=2;
       } else {
 	moduleType=3;
@@ -475,7 +455,7 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
 
     if (fModuleType==3) {
-      if (fModuleCopy <= 12) {
+      if (fModuleCopy <= 6) {
  	moduleType=4;
       } else {
 	moduleType=5;
@@ -491,29 +471,19 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
   }
   //------------------------------------------------------------------------
   // station 3
-  // v12x:  98 +  X +  X +  X   -- number of detector sizes
-  // v12x:   8 + 12 + 24 + 54   -- number of pad plane types
-  // v12x:   8   20   44   98   -- sum of modules for this station
+  // v11x:  X + X + X + X +98 +  X   -- number of detector sizes
+  // v11x:  X + X + X + X + 8 + 90   -- number of pad plane types
+  // v11x:                  8   98   -- sum of modules for this station
   //
-  // v11x:  98 +  X   -- number of detector sizes
-  // v11x:   8 + 90   -- number of pad plane types
-  // v11x:   8   98   -- sum of modules for this station
+  // jul10: 8 + 136   -- number of module types
+  // jul10: 8   144   -- sum of modules for this station
   
   if (fStation==3) {
-    if (fModuleType==3)
-    {
-      if (fModuleCopy <= 8) 
-      {
-	moduleType=0;
-      } else if (fModuleCopy <= 20) 
-      {
-	moduleType=1;
-      } else if (fModuleCopy <= 44) 
-      {
-	moduleType=2;
-      } else
-      {
-	moduleType=3;
+    if (fModuleType==3) {
+      if (fModuleCopy <= 8) {
+ 	moduleType=0;
+      } else {
+ 	moduleType=1;
       }
     }
 

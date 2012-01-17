@@ -1344,6 +1344,35 @@ int main(void)
   int Chamber_number_Station3 = 98;   // may11
   float Position_Station3[144][4];
 
+  // v12x
+  int station3[9][11] = { { 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4 },
+                          { 4,  4,  4,  3,  3,  3,  3,  3,  4,  4,  4 },
+                          { 4,  4,  3,  3,  2,  2,  2,  3,  3,  4,  4 },
+                          { 4,  4,  3,  2,  1,  1,  1,  2,  3,  4,  4 },
+                          { 4,  4,  3,  2,  1,  0,  1,  2,  3,  4,  4 },
+                          { 4,  4,  3,  2,  1,  1,  1,  2,  3,  4,  4 },
+                          { 4,  4,  3,  3,  2,  2,  2,  3,  3,  4,  4 },
+                          { 4,  4,  4,  3,  3,  3,  3,  3,  4,  4,  4 },
+                          { 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4 } };
+  // number of modules 1x0, 8x1, 12x2, 24x3, 54x4
+
+  int a = 0;
+  for ( int type = 1; type <=4; type++)
+    for ( int j = 0; j < 9; j++) 
+      for ( int i = 0; i < 11; i++) 
+	if (station3[j][i]==type)
+          {
+            int y = -(j-4);
+            int x =   i-5;
+            printf("a:%2d, type:%2d x:%2d, y:%2d   \n", a, type, x, y);
+            Position_Station3[a][0] = Detector_size_x[2] * x;
+            Position_Station3[a][1] = Detector_size_y[2] * y;
+            Position_Station3[a][2] = 3;
+            Position_Station3[a][3] = 0;
+            a++;
+          }
+
+/*
   // may11
   int station3[9][2] = { {-5, 5}, {-5, 5}, {-5, 5}, {-5, 5},
                          {-5, 5},
@@ -1417,6 +1446,7 @@ int main(void)
 //    printf("\n%3d\n\n",a);
 //  }
 
+*/
   //------------------------------------------------------------------
   //------------------------------------------------------------------
 

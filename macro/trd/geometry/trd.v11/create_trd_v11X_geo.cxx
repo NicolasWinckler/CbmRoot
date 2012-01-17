@@ -1328,78 +1328,33 @@ int main(void)
   int Chamber_number_Station3 = 98;   // may11
   float Position_Station3[144][4];
 
-  // may11
-  int station3[9][2] = { {-5, 5}, {-5, 5}, {-5, 5}, {-5, 5},
-                         {-5, 5},
-	  	         {-5, 5}, {-5, 5}, {-5, 5}, {-5, 5} }; 
-//  // jan11
-//  int station3[9][2] = { {-5, 5}, {-7, 7}, {-7, 7}, {-7, 7},
-//                         {-7, 7},
-//	  	         {-7, 7}, {-7, 7}, {-7, 7}, {-5, 5} }; 
-//  // jun10
-//  int station3[11][2] = { {-1, 1}, {-5, 5}, {-7, 7}, {-7, 7}, {-7, 7},
-//                          {-7, 7},
-//	  	          {-7, 7}, {-7, 7}, {-7, 7}, {-5, 5}, {-1, 1} }; 
-  int a =0;
+  // v11x                                                                       
+  int station3[9][11] = { { 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4 },
+                          { 4,  4,  4,  3,  3,  3,  3,  3,  4,  4,  4 },
+                          { 4,  4,  3,  3,  2,  2,  2,  3,  3,  4,  4 },
+                          { 4,  4,  3,  2,  1,  1,  1,  2,  3,  4,  4 },
+                          { 4,  4,  3,  2,  1,  0,  1,  2,  3,  4,  4 },
+                          { 4,  4,  3,  2,  1,  1,  1,  2,  3,  4,  4 },
+                          { 4,  4,  3,  3,  2,  2,  2,  3,  3,  4,  4 },
+                          { 4,  4,  4,  3,  3,  3,  3,  3,  4,  4,  4 },
+                          { 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4 } };
+  // number of modules 1x0, 8x1, 12x2, 24x3, 54x4                               
 
-  // central 8 modules (1x1 hole)
-  for ( int i = 0; i < 3; i++) 
-  {
-    int y = -(i-1);
-    for ( int j = -1; j <= 1; j++) 
-      if (!((j==0)&&(y==0)))  // leave 1x1 center free
-      {
-        int x = j;
-        printf("x:%2d, y:%2d   ",x, y);
-        Position_Station3[a][0] = Detector_size_x[2] * x;
-        Position_Station3[a][1] = Detector_size_y[2] * y;
-        Position_Station3[a][2] = 3;
-        Position_Station3[a][3] = 0;
-        a++;
-      }
-    printf("\n%3d\n\n",a);
-  }
-
-  // jun10
-  // central 124 modules (3x3 hole)
-  //  for ( int i = 0; i < 11; i++) 
-  // may11
-  // central 90 modules (3x3 hole)
-  for ( int i = 0; i < 9; i++) 
-  {
-    //    int y = -(i-5);
-    int y = -(i-4);
-    for ( int j = station3[i][0]; j <= station3[i][1]; j++) 
-      if (!( (j>=-1)&&(j<=1)&&(y>=-1)&&(y<=1) ))  // leave 3x3 center free
-      {
-        int x = j;
-        printf("x:%2d, y:%2d   ",x, y);
-        Position_Station3[a][0] = Detector_size_x[2] * x;
-        Position_Station3[a][1] = Detector_size_y[2] * y;
-        Position_Station3[a][2] = 3;
-        Position_Station3[a][3] = 0;
-        a++;
-      }
-    printf("\n%3d\n\n",a);
-  }
-
-// may11
-//  // 12 modules left and right column
-//  for ( int i = 0; i < 2; i++ ) 
-//  {
-//    int x = 8*(i*2-1);
-//    for ( int j = 1; j <= 6; j++) 
-//      {
-//        float y = j-3.5;
-//        printf("x:%2d, y:%4.1f   ",x, y);
-//        Position_Station3[a][0] = Detector_size_x[2] * x;
-//        Position_Station3[a][1] = Detector_size_y[2] * y;
-//        Position_Station3[a][2] = 3;
-//        Position_Station3[a][3] = 0;
-//        a++;
-//      }
-//    printf("\n%3d\n\n",a);
-//  }
+  int a = 0;
+  for ( int type = 1; type <=4; type++)
+    for ( int j = 0; j < 9; j++)
+      for ( int i = 0; i < 11; i++)
+        if (station3[j][i]==type)
+          {
+            int y = -(j-4);
+            int x =   i-5;
+            printf("a:%2d, type:%2d x:%2d, y:%2d   \n", a, type, x, y);
+            Position_Station3[a][0] = Detector_size_x[2] * x;
+            Position_Station3[a][1] = Detector_size_y[2] * y;
+            Position_Station3[a][2] = 3;
+            Position_Station3[a][3] = 0;
+            a++;
+          }
 
   //------------------------------------------------------------------
   //------------------------------------------------------------------

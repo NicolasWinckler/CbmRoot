@@ -8,6 +8,8 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "TColor.h"
+
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TImage.h"
@@ -139,10 +141,20 @@ InitStatus CbmTrdHitRateTest::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitRateTest::Exec(Option_t * option)
 {
+  /*
+  const Int_t Number = 11;
+  Double_t r[Number] =      {1.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 1.00, 0.50, 1.00};
+  Double_t g[Number] =      {0.00, 0.00, 0.00, 0.50, 1.00, 1.00, 1.00, 1.00, 1.00, 0.50, 1.00};
+  Double_t b[Number] =      {1.00, 1.00, 1.00, 1.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.50, 1.00};
+  Double_t length[Number] = {0.00, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00};
+  Int_t nb = 99;
+  Int_t a = TColor::CreateGradientColorTable(Number,length,r,g,b,nb);
+  */
   printf("Introduction:\n");
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
   Bool_t Fast = true;//false;
+  Bool_t firstLayer = false;
   //  fDraw = false;
   fDraw = true;
   Double_t ZRangeL = 1e00;//1e05;
@@ -795,7 +807,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 
 
 }
-void CbmTrdHitRateTest::FillVector(Bool_t Fast, Int_t VolumeID,
+void CbmTrdHitRateTest::FillVector(Bool_t firstLayer, Int_t VolumeID,
 				   vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
 				   vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
 				   vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3)
@@ -808,7 +820,7 @@ void CbmTrdHitRateTest::FillVector(Bool_t Fast, Int_t VolumeID,
 	  //Mcounter[0]++;
 	  L1S1.push_back (VolumeID);
 	}
-      if (!Fast) {
+      if (!firstLayer) {
 	if (fLayer == 2)
 	  {
 	    L2S1.push_back (VolumeID);
@@ -830,7 +842,7 @@ void CbmTrdHitRateTest::FillVector(Bool_t Fast, Int_t VolumeID,
 	  //Mcounter[1]++;
 	  L1S2.push_back (VolumeID);
 	}
-      if (!Fast) {
+      if (!firstLayer) {
 	if (fLayer == 2)
 	  {
 	    L2S2.push_back (VolumeID);
@@ -852,7 +864,7 @@ void CbmTrdHitRateTest::FillVector(Bool_t Fast, Int_t VolumeID,
 	  //Mcounter[2][0]++;
 	  L1S3.push_back (VolumeID);
 	}
-      if (!Fast) {
+      if (!firstLayer) {
 	if (fLayer == 2)
 	  {
 	    L2S3.push_back (VolumeID);

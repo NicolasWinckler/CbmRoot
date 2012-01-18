@@ -154,6 +154,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
   Bool_t Fast = true;//false;
+  //  Bool_t Fast = false;
   Bool_t firstLayer = false;
   //  fDraw = false;
   fDraw = true;

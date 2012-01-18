@@ -700,6 +700,13 @@ polypropylene	   -2	12.01 1.008 6. 1. 0.074 3  6
                    0  0  20.  .001
                    0
 
+// polyethylene foam, density 20 kg/qm, introduced as radiator in trd.v12a
+// ratio of PE in this material is 0.02/0.925=0.21, 0.79 air
+// air neglected for multiple scattering
+pefoam20           -2   12.01 1.008 6. 1. 0.02 2  4
+                   0  0  20.  .001
+                   0
+
 carbondioxide      -2  12.01  16.0  6. 8. 1.9768e-3 1  2
                    0  0  20.  .001
                    0

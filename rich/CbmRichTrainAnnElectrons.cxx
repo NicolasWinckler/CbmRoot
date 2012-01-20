@@ -324,54 +324,54 @@ void CbmRichTrainAnnElectrons::Draw()
    }
 
    TCanvas* c1 = new TCanvas("ann_select_ann_output", "ann_select_ann_output", 500, 500);
-   DrawHist1D(fhAnnOutput[0], fhAnnOutput[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhAnnOutput[0], fhAnnOutput[1], NULL, NULL, "True", "Fake", "", "",
          kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_select_cum_prob", "ann_select_cum_prob", 500, 500);
-   DrawHist1D(fhCumProb[0], fhCumProb[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhCumProb[0], fhCumProb[1], NULL, NULL, "True", "Fake", "", "",
          kLitLinear, kLitLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c3 = new TCanvas("ann_select_params", "ann_select_params", 900, 900);
    c3->Divide(3, 3);
    c3->cd(1);
-   DrawHist1D(fhAaxis[0], fhAaxis[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhAaxis[0], fhAaxis[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(2);
-   DrawHist1D(fhBaxis[0], fhBaxis[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhBaxis[0], fhBaxis[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(3);
-   DrawHist1D(fhAaxisCor[0], fhAaxisCor[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhAaxisCor[0], fhAaxisCor[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(4);
-   DrawHist1D(fhBaxisCor[0], fhBaxisCor[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhBaxisCor[0], fhBaxisCor[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(5);
-   DrawHist1D(fhDist[0], fhDist[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhDist[0], fhDist[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(6);
-   DrawHist1D(fhNofHits[0], fhNofHits[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhNofHits[0], fhNofHits[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(7);
-   DrawHist1D(fhChi2[0], fhChi2[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhChi2[0], fhChi2[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(8);
-   DrawHist1D(fhRadPos[0], fhRadPos[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhRadPos[0], fhRadPos[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c4 = new TCanvas("ann_select_params_2d", "ann_select_params_2d", 600, 900);
    c4->Divide(2, 3);
    c4->cd(1);
-   DrawHist2D(fhAaxisVsMom[0]);
+   DrawH2(fhAaxisVsMom[0]);
    c4->cd(2);
-   DrawHist2D(fhAaxisVsMom[1]);
+   DrawH2(fhAaxisVsMom[1]);
    c4->cd(3);
-   DrawHist2D(fhBaxisVsMom[0]);
+   DrawH2(fhBaxisVsMom[0]);
    c4->cd(4);
-   DrawHist2D(fhBaxisVsMom[1]);
+   DrawH2(fhBaxisVsMom[1]);
    c4->cd(5);
-   DrawHist2D(fhPhiVsRadAng[0]);
+   DrawH2(fhPhiVsRadAng[0]);
    c4->cd(6);
-   DrawHist2D(fhPhiVsRadAng[1]);
+   DrawH2(fhPhiVsRadAng[1]);
 }
 
 void CbmRichTrainAnnElectrons::FinishTask()

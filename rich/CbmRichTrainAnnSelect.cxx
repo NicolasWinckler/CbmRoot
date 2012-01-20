@@ -292,32 +292,32 @@ void CbmRichTrainAnnSelect::Draw()
    }
 
    TCanvas* c1 = new TCanvas("ann_select_ann_output", "ann_select_ann_output", 500, 500);
-   DrawHist1D(fhAnnOutput[0], fhAnnOutput[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhAnnOutput[0], fhAnnOutput[1], NULL, NULL, "True", "Fake", "", "",
          kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_select_cum_prob", "ann_select_cum_prob", 500, 500);
-   DrawHist1D(fhCumProb[0], fhCumProb[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhCumProb[0], fhCumProb[1], NULL, NULL, "True", "Fake", "", "",
          kLitLinear, kLitLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c3 = new TCanvas("ann_select_params", "ann_select_params", 900, 600);
    c3->Divide(3, 2);
    c3->cd(1);
-   DrawHist1D(fhNofHits[0], fhNofHits[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhNofHits[0], fhNofHits[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(2);
-   DrawHist1D(fhAngle[0], fhAngle[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhAngle[0], fhAngle[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(3);
-   DrawHist1D(fhNofHitsOnRing[0], fhNofHitsOnRing[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhNofHitsOnRing[0], fhNofHitsOnRing[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(4);
-   DrawHist1D(fhRadPos[0], fhRadPos[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhRadPos[0], fhRadPos[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(5);
-   DrawHist1D(fhChi2[0], fhChi2[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhChi2[0], fhChi2[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(6);
-   DrawHist1D(fhRadius[0], fhRadius[1], NULL, NULL, "True", "Fake", "", "",
+   DrawH1(fhRadius[0], fhRadius[1], NULL, NULL, "True", "Fake", "", "",
             kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
 }
 

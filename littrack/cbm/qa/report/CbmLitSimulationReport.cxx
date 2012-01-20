@@ -16,3 +16,9 @@ CbmLitSimulationReport::~CbmLitSimulationReport()
 {
 
 }
+
+bool CbmLitSimulationReport::PropertyExists(
+      const std::string& name) const
+{
+   return (fQa->count(name) != 0) ? true : false;
+}

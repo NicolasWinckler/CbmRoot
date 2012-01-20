@@ -41,22 +41,12 @@ public:
    virtual ~CbmLitReport();
 
    /**
-    * \brief Set detector presence to TRUE if QA results for this detector has to be displayed in output.
-    * \param[in] detId Id of the detector kMVD, kSTS...
-    * \param[in] isDet True if detector is in the setup.
+    * \brief Check if the property with name name exists in the QA property tree.
+    * \param[in] name Name of property.
+    * \return True if property exists, otherwise return false.
     */
-   void SetDetectorPresence(
-         DetectorId detId,
-         bool isDet);
-
-   /**
-    * \brief Set explicitly electron setup of the detector.
-    * \param[in] isElectronSetup true if electron setup.
-    */
-   void SetIsElectronSetup(
-         bool isElectronSetup) {
-      fIsElectronSetup = isElectronSetup;
-   }
+   virtual bool PropertyExists(
+         const std::string& name) const = 0;
 
    /* Setters */
    void SetTitle(const string& title) { fTitle = title; }
@@ -70,14 +60,6 @@ protected:
    string fTitle; // Title of report
    string fAuthor; // Author of report
 //   string fDate; // Date when report was generated
-
-   bool fIsElectronSetup; // If "electron" setup detected than true
-   bool fIsMvd; // If MVD detected than true
-   bool fIsSts; // If STS detected than true
-   bool fIsRich; // If RICH detected than true
-   bool fIsTrd; // If TRD detected than true
-   bool fIsMuch; // If MUCH detected than true
-   bool fIsTof; // If TOF detected than true
 
    // Background colors for error highlighting
    string fErrorColor; // error

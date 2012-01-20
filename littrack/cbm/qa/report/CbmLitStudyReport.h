@@ -14,6 +14,7 @@
 using std::vector;
 using std::string;
 using std::ostream;
+using boost::property_tree::ptree;
 
 /**
  * \class CbmLitStudyReport
@@ -46,21 +47,25 @@ public:
    virtual void Create(
          ostream& out,
          const vector<string>& studyNames,
-         const vector<boost::property_tree::ptree*>& qa,
-         boost::property_tree::ptree* ideal,
-         const vector<boost::property_tree::ptree*>& check) = 0;
+         const vector<ptree*>& qa,
+         ptree* ideal,
+         const vector<ptree*>& check) = 0;
+
+   /**
+    * \brief Inherited from CbmLitReport.
+    */
+   bool PropertyExists(
+         const std::string& name) const;
 
 protected:
    // Property tree of Qa results for each study
-   vector<boost::property_tree::ptree*> fQa;
+   vector<ptree*> fQa;
    // Property with ideal values
-   boost::property_tree::ptree* fIdeal;
+   ptree* fIdeal;
    // Property tree with checked results for each study
-   vector<boost::property_tree::ptree*> fCheck;
+   vector<ptree*> fCheck;
    // Names of studies
    vector<string> fStudyNames;
-//   // Names of directories with study results
-//   vector<string> fStudyResults;
 };
 
 #endif /* CBMLITSTUDYREPORT_H_ */

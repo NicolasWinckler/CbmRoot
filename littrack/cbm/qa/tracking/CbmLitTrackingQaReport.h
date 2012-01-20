@@ -1,6 +1,6 @@
 /**
  * \file CbmLitTrackingQaReport.h
- * \brief Creates report for reconstruction performance.
+ * \brief Create report for tracking QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
@@ -59,15 +59,13 @@ protected:
    /**
     * \brief Print number of points or hits or tracks or rings etc. to string.
     */
-   virtual string PrintNofStatistics(
-         const string& name,
-         const string& mvd,
-         const string& sts,
-         const string& rich,
-         const string& trd,
-         const string& muchP,
-         const string& muchS,
-         const string& tof);
+   string PrintNofStatistics(
+           const string& global,
+           const string& sts,
+           const string& richRing,
+           const string& richProj,
+           const string& trd,
+           const string& much);
 
    /**
     * \brief Print hits histogram statistics (nof all, true, fake hits in track/ring).

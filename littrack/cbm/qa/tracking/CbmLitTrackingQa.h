@@ -122,13 +122,11 @@ public:
    void DrawHistosFromFile(
          const std::string& fileName);
 
-   void WriteToFile();
-
 private:
    CbmLitHistManager* fHM; // Histogram manager
    CbmLitTrackingQaCalculator* fTrackingQa; // Tracking performance calculator
    string fOutputDir; // Output directory for results
-   CbmLitDetectorSetup fDet;
+   CbmLitDetectorSetup fDet; // Detector presence information
 
    ClassDef(CbmLitTrackingQa, 1);
 };

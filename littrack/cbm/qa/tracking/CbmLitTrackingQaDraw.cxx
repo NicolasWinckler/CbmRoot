@@ -41,6 +41,8 @@ void CbmLitTrackingQaDraw::Draw(
    fHM = histManager;
    fOutputDir = outputDir;
 
+   fDet.DetermineSetup();
+
    SetStyles();
    DrawEfficiencyHistos();
    DrawHitsHistos();

@@ -13,6 +13,7 @@
 
 using std::ostream;
 using std::string;
+using boost::property_tree::ptree;
 
 /**
  * \class CbmLitSimulationReport
@@ -43,22 +44,23 @@ public:
     */
    virtual void Create(
          ostream& out,
-         boost::property_tree::ptree* qa,
-         boost::property_tree::ptree* ideal,
-         boost::property_tree::ptree* check) = 0;
+         ptree* qa,
+         ptree* ideal,
+         ptree* check) = 0;
 
-   /* Setters */
-//   void SetOutputDir(const string& dir){ fOutputDir = dir; }
+   /**
+    * \brief Inherited from CbmLitReport.
+    */
+   bool PropertyExists(
+         const string& name) const;
 
 protected:
    // Property tree of Qa results for each study
-   boost::property_tree::ptree* fQa;
+   ptree* fQa;
    // Property with ideal values
-   boost::property_tree::ptree* fIdeal;
+   ptree* fIdeal;
    // Property tree with checked results for each study
-   boost::property_tree::ptree* fCheck;
-   // Name of directory with results
-//   string fOutputDir;
+   ptree* fCheck;
 };
 
 #endif /* CBMLITSIMULATIONREPORT_H_ */

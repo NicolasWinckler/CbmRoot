@@ -32,14 +32,25 @@ public:
     */
    virtual ~CbmLitClusteringQaDraw();
 
+   /**
+    * \brief Draw histograms.
+    * \param[in] histManager Pointer to histogram manager.
+    * \param[in] outputDir Output directory for images. If not specified images are not saved.
+    */
+   void Draw(
+         CbmLitHistManager* histManager,
+         const string& outputDir = "");
+
 private:
+
    void DrawHitsStationHisto(
-         const std::string& name,
+         const string& name,
          TH1F* hist);
 
    void DrawHitsStationHistos();
 
-   CbmLitHistManager* fHM;
+   CbmLitHistManager* fHM; // Pointer to histogram manager
+   string fOutputDir; // Output directory for images
 };
 
 #endif /* CBMLITCLUSTERINGQADRAW_H_ */

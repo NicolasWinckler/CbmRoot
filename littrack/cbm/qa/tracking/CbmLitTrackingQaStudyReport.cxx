@@ -32,38 +32,30 @@ void CbmLitTrackingQaStudyReport::Create(
    fIdeal = ideal;
    fCheck = check;
 
+   bool isSts = PropertyExists("hNofStsTracks");
+   bool isRich = PropertyExists("hNofRichRings");
+   bool isTrd = PropertyExists("hNofTrdTracks");
+   bool isMuch = PropertyExists("hNofMuchTracks");
+   bool isTof = true;
+
    out.precision(3);
    out << fR->DocumentBegin();
    out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
 
    out << fR->TableBegin("Number of objects", list_of(string("")).range(fStudyNames));
    out << fR->TableRow(list_of("hEventNo")("Number of events"));
-
-   if (fIsSts) {
-      out << PrintRow("hNofStsTracks", "STS tracks");
-   }
-
-   if (fIsRich) {
-      out << PrintRow("hNofRichProjections", "RICH projections");
-      out << PrintRow("hNofRichRings", "RICH rings");
-   }
-
-   if (fIsTrd) {
-      out << PrintRow("hNofTrdTracks", "TRD tracks");
-   }
-
-   if (fIsMuch) {
-      out << PrintRow("hNofMuchTracks", "MUCH tracks");
-   }
-
-   out << PrintRow("hNofGlobalTracks", "Global tracks");
+   if (PropertyExists("hNofStsTracks")) out << PrintRow("hNofStsTracks", "STS tracks");
+   if (PropertyExists("hNofRichProjections"))out << PrintRow("hNofRichProjections", "RICH projections");
+   if (PropertyExists("hNofRichRings"))out << PrintRow("hNofRichRings", "RICH rings");
+   if (PropertyExists("hNofTrdTracks"))out << PrintRow("hNofTrdTracks", "TRD tracks");
+   if (PropertyExists("hNofMuchTracks"))out << PrintRow("hNofMuchTracks", "MUCH tracks");
+   if (PropertyExists("hNofGlobalTracks"))out << PrintRow("hNofGlobalTracks", "Global tracks");
    out << fR->TableEnd() << endl;
 
-
    string signal = "el";
-   if (!fIsElectronSetup) signal = "mu";
-   string recDet = (fIsTrd) ? "TRD" : (fIsMuch) ? "MUCH" :
-         (fIsMuch && fIsTrd) ? "MUCH+TRD" : "";
+   if (!isRich) signal = "mu";
+   string recDet = (isTrd) ? "TRD" : (isMuch) ? "MUCH" :
+         (isTrd && isMuch) ? "MUCH+TRD" : "";
 
    out << fR->TableBegin("Reconstruction efficiency", fStudyNames);
    out << PrintRowEff("hSts3D.all", "STS all");
@@ -87,21 +79,21 @@ void CbmLitTrackingQaStudyReport::Create(
    out << PrintRowEff("hGlobal3D.all", "STS+" + recDet + "+TOF all");
    out << PrintRowEff("hGlobal3D.all", "STS+" + recDet + "+TOF " + signal);
 
-   if (fIsRich) {
-      out << fR->TableEmptyRow(fStudyNames.size()+1, "Efficiency with RICH");
+   if (isRich) {
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Efficiency with RICH");
       out << PrintRowEff("hRich3D.El", "RICH el");
       out << PrintRowEff("hRich3D.ElRef", "RICH el ref");
 
-      out << fR->TableEmptyRow(fStudyNames.size()+1, "Normalization STS+RICH");
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+RICH");
       out << PrintRowEff("hSts3DNormStsRich.El", "STS el");
       out << PrintRowEff("hStsRich3D.El", "STS+RICH el");
 
-      out << fR->TableEmptyRow(fStudyNames.size()+1, "Normalization STS+RICH+TRD");
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+RICH+TRD");
       out << PrintRowEff("hSts3DNormStsRichTrd.El", "STS el");
       out << PrintRowEff("hStsRich3DNormStsRichTrd.El", "STS+RICH el");
       out << PrintRowEff("hStsRichTrd3D.El", "STS+RICH+TRD el");
 
-      out << fR->TableEmptyRow(fStudyNames.size()+1, "Normalization STS+RICH+TRD+TOF");
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+RICH+TRD+TOF");
       out << PrintRowEff("hSts3DNormStsRichTrdTof.El", "STS el");
       out << PrintRowEff("hStsRich3DNormStsRichTrdTof.El", "STS+RICH el");
       out << PrintRowEff("hStsRichTrd3DNormStsRichTrdTof.El", "STS+RICH+TRD el");
@@ -112,24 +104,24 @@ void CbmLitTrackingQaStudyReport::Create(
    out << fR->TableBegin("Ghost rate", fStudyNames);
    out << PrintRow("fhStsGhostNh", "STS");
    out << PrintRow("fhRecGhostNh", recDet);
-   if (fIsRich) {
+   if (isRich) {
       out << PrintRow("fhRichGhostNh", "RICH");
-      out << fR->TableEmptyRow(fStudyNames.size()+1, "after STS-RICH matching");
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "after STS-RICH matching");
       out << PrintRow("fhStsGhostRichMatchingNh", "STS");
       out << PrintRow("fhRichGhostStsMatchingNh", "RICH");
-      out << fR->TableEmptyRow(fStudyNames.size()+1, "after STS-RICH matching and el identification");
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "after STS-RICH matching and el identification");
       out << PrintRow("fhRichGhostElIdNh", "RICH");
    }
    out << fR->TableEnd() << endl;
    // For image paths put only file name without type, e.g. ".eps" or ".png".
    // Type will be added automatically.
-   if (fIsSts) out << PrintImage("STS reconstruction efficiency", "rec_qa_sts_efficiency");
-   if (fIsTrd || fIsMuch) out << PrintImage(recDet + " reconstruction efficiency", "rec_qa_rec_efficiency");
-   if (fIsTof) out << PrintImage("TOF hit matching efficiency", "rec_qa_tof_efficiency");
-   if (fIsRich) out << PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
+   if (isSts) out << PrintImage("STS reconstruction efficiency", "rec_qa_sts_efficiency");
+   if (isTrd || isMuch) out << PrintImage(recDet + " reconstruction efficiency", "rec_qa_rec_efficiency");
+   if (isTof) out << PrintImage("TOF hit matching efficiency", "rec_qa_tof_efficiency");
+   if (isRich) out << PrintImage("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
    out << PrintImage("Global reconstruction efficiency", "rec_qa_global_efficiency_all");
    out << PrintImage("Global reconstruction efficiency for signal", "rec_qa_global_efficiency_signal");
-   if (fIsRich) out << PrintImage("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
+   if (isRich) out << PrintImage("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
 
    out <<  fR->DocumentEnd();
 }

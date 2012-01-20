@@ -9,6 +9,8 @@
 #define CBMLITCLUSTERINGQA_H_
 
 #include "FairTask.h"
+#include <string>
+using std::string;
 class CbmLitHistManager;
 class CbmLitClusteringQaCalculator;
 
@@ -41,9 +43,13 @@ public:
      */
     virtual void Finish();
 
+    /** Setters */
+    void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
+
 private:
     CbmLitHistManager* fHM; // Histogram manager
     CbmLitClusteringQaCalculator* fClusteringQa; // Clustering performance calculator
+    string fOutputDir; // Output directory for results
 
     ClassDef(CbmLitClusteringQa, 1);
 };

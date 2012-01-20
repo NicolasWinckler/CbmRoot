@@ -7,10 +7,13 @@
 #include "CbmLitClusteringQaDraw.h"
 #include "qa/base/CbmLitHistManager.h"
 #include "utils/CbmLitDrawHist.h"
+#include "utils/CbmLitUtils.h"
 
 #include "TCanvas.h"
 
-CbmLitClusteringQaDraw::CbmLitClusteringQaDraw()
+CbmLitClusteringQaDraw::CbmLitClusteringQaDraw():
+   fHM(NULL),
+   fOutputDir("")
 {
 
 }
@@ -20,13 +23,24 @@ CbmLitClusteringQaDraw::~CbmLitClusteringQaDraw()
 
 }
 
+void CbmLitClusteringQaDraw::Draw(
+      CbmLitHistManager* histManager,
+      const string& outputDir)
+{
+   assert(histManager != NULL);
+   fHM = histManager;
+   fOutputDir = outputDir;
+
+   DrawHitsStationHistos();
+}
+
 void CbmLitClusteringQaDraw::DrawHitsStationHisto(
       const string& name,
       TH1F* hist)
 {
    TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1200, 600);
    DrawHist1D(hist, kLitLinear, kLitLinear, "HIST TEXT0");
-   //if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 void CbmLitClusteringQaDraw::DrawHitsStationHistos()

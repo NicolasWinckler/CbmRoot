@@ -67,11 +67,9 @@ void CbmLitTrackingQa::Exec(
 void CbmLitTrackingQa::Finish()
 {
    fTrackingQa->Finish();
-
    fHM->WriteToFile();
 
    CbmLitTrackingQaDraw drawQa;
-   drawQa.SetDetectorSetup(fDet);
    drawQa.Draw(fHM, fOutputDir);
 
    CreateReport();

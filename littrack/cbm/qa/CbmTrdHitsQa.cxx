@@ -206,35 +206,35 @@ void CbmTrdHitsQa::Draw()
 
    for (Int_t i = 0; i < fNofPlanes; i++) {
       chX->cd(i + 1);
-      DrawHist1D(fhX[i], kLitLinear, kLitLog);
+      DrawH1(fhX[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chX, fOutputDir);
 
       chY->cd(i + 1);
-      DrawHist1D(fhY[i], kLitLinear, kLitLog);
+      DrawH1(fhY[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chY, fOutputDir);
 
       chDx->cd(i + 1);
-      DrawHist1D(fhDx[i], kLitLinear, kLitLog);
+      DrawH1(fhDx[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chDx, fOutputDir);
 
       chDy->cd(i + 1);
-      DrawHist1D(fhDy[i], kLitLinear, kLitLog);
+      DrawH1(fhDy[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chDy, fOutputDir);
 
       chXY->cd(i + 1);
-      DrawHist2D(fhXY[i], kLitLinear, kLitLinear, kLitLog, "colz");
+      DrawH2(fhXY[i], kLitLinear, kLitLinear, kLitLog, "colz");
       lit::SaveCanvasAsImage(chXY, fOutputDir);
 
       chResX->cd(i + 1);
-      DrawHist1D(fhResX[i], kLitLinear, kLitLog);
+      DrawH1(fhResX[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chResX, fOutputDir);
 
       chResY->cd(i + 1);
-      DrawHist1D(fhResY[i], kLitLinear, kLitLog);
+      DrawH1(fhResY[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chResY, fOutputDir);
 
       chPullX->cd(i + 1);
-      DrawHist1D(fhPullX[i], kLitLinear, kLitLog);
+      DrawH1(fhPullX[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chPullX, fOutputDir);
 
       TH1F* hist = fhPullX[i];
@@ -248,7 +248,7 @@ void CbmTrdHitsQa::Draw()
       DrawHistSigmaRMS(i, sigma, rms);
 
       chPullY->cd(i + 1);
-      DrawHist1D(fhPullY[i], kLitLinear, kLitLog);
+      DrawH1(fhPullY[i], kLitLinear, kLitLog);
       lit::SaveCanvasAsImage(chPullY, fOutputDir);
       hist = fhPullY[i];
       hist->Fit("gaus");

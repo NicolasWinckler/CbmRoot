@@ -717,14 +717,14 @@ void CbmLitFieldQa::DrawSlices(
       TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhBGridErrH1D[v][i];
       hist2->GetXaxis()->SetTitle(string(title + " [kGauss]").c_str());
       hist2->GetYaxis()->SetTitle("Counter");
-      DrawHist1D(hist2, kLitLinear, kLitLog);
+      DrawH1(hist2, kLitLinear, kLitLog);
 
       canvas[i]->cd(3);
       TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhBGridErrH2D[v][i];
       hist3->GetXaxis()->SetTitle("X [cm]");
       hist3->GetYaxis()->SetTitle("Y [cm]");
       hist3->GetXaxis()->SetTitle(string(title + " [kGauss]").c_str());
-      DrawHist2D(hist3, kLitLinear, kLitLinear, kLitLinear, "colz");
+      DrawH2(hist3, kLitLinear, kLitLinear, kLitLinear, "colz");
 
       canvas[i]->cd(4);
       TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
@@ -735,14 +735,14 @@ void CbmLitFieldQa::DrawSlices(
       TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1D[v][i];
       hist4->GetXaxis()->SetTitle(string(title + " relative error [%]").c_str());
       hist4->GetYaxis()->SetTitle("Counter");
-      DrawHist1D(hist4, kLitLinear, kLitLog);
+      DrawH1(hist4, kLitLinear, kLitLog);
 
       canvas[i]->cd(6);
       TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2D[v][i];
       hist5->GetXaxis()->SetTitle("X [cm]");
       hist5->GetYaxis()->SetTitle("Y [cm]");
       hist5->GetXaxis()->SetTitle(string(title + " relative error [%]").c_str());
-      DrawHist2D(hist5, kLitLinear, kLitLinear, kLitLinear, "colz");
+      DrawH2(hist5, kLitLinear, kLitLinear, kLitLinear, "colz");
 
       lit::SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
@@ -794,7 +794,7 @@ void CbmLitFieldQa::DrawPoly(
             else { draw_opt = "SAME"; }
             hist1->GetXaxis()->SetTitle(title.c_str());
             hist1->GetYaxis()->SetTitle("Counter");
-            DrawHist1D(hist1, kLitLinear, kLitLog, draw_opt.c_str(),
+            DrawH1(hist1, kLitLinear, kLitLog, draw_opt.c_str(),
                        1+j, LIT_LINE_WIDTH, 1+j, LIT_MARKER_SIZE, kDot);
 
             if (v == 0) {

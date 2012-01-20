@@ -51,7 +51,7 @@ void SetStyles();
  * @param markerSize Marker size.
  * @param markerStyle Marker style (see ROOt documentation for details).
  */
-void DrawHist1D(
+void DrawH1(
    TH1* hist,
    LitScale logx = kLitLinear,
    LitScale logy = kLitLinear,
@@ -73,7 +73,7 @@ void DrawHist1D(
  * @param logz If true than Z axis is plotted in logarithmic scale.
  * @param drawOpt Other drawing options (see ROOT documentation for details).
  */
-void DrawHist2D(
+void DrawH2(
    TH2* hist,
    LitScale logx = kLitLinear,
    LitScale logy = kLitLinear,
@@ -102,7 +102,7 @@ void DrawHist2D(
  * @param y2 coordinates of the Legend in the current pad
  * @param drawOpt Draw option for TH1->Draw method
  */
-void DrawHist1D(
+void DrawH1(
    TH1* hist1,
    TH1* hist2,
    TH1* hist3,
@@ -221,7 +221,7 @@ void DrawGraph2D(
  * @param axisX X axis title.
  * @param axisY Y axis title.
  */
-TH1D* Divide1DHists(
+TH1D* DivideH1(
    TH1D* h1,
    TH1D* h2,
    const std::string& name,

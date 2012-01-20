@@ -390,7 +390,7 @@ void CbmLitFitQa::DrawHistos(
       TH1F* hist = histos[i];
       hist->Fit("gaus");
       hist->SetMaximum(hist->GetMaximum() * 1.50);
-      DrawHist1D(hist, kLitLinear, kLitLog);
+      DrawH1(hist, kLitLinear, kLitLog);
 
       TF1* fit = hist->GetFunction("gaus");
       Double_t sigma = 0.;
@@ -401,7 +401,7 @@ void CbmLitFitQa::DrawHistos(
 
    for (int i = 0; i < NOF_PARAMS_WRONG_COV; i++) {
       canvas->cd(i + 1 + 10);
-      DrawHist1D(wrongHistos[i], kLitLinear, kLitLog);
+      DrawH1(wrongHistos[i], kLitLinear, kLitLog);
    }
 
    lit::SaveCanvasAsImage(canvas, fOutputDir);

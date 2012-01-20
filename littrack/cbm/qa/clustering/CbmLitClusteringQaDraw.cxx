@@ -39,7 +39,7 @@ void CbmLitClusteringQaDraw::DrawHitsStationHisto(
       TH1F* hist)
 {
    TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1200, 600);
-   DrawHist1D(hist, kLitLinear, kLitLinear, "HIST TEXT0");
+   DrawH1(hist, kLitLinear, kLitLinear, "HIST TEXT0");
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 

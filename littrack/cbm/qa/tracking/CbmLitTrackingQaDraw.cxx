@@ -216,22 +216,22 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
    }
 
    if (h1 != NULL && h2 != NULL && h3 != NULL && h4 != NULL) {
-      DrawHist1D(h1, h2, h3, h4, hname1, hname2, hname3, hname4,
+      DrawH1(h1, h2, h3, h4, hname1, hname2, hname3, hname4,
             kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3, eff4);
 
    } else if (h1 != NULL && h2 != NULL && h3 != NULL && h4 == NULL) {
-      DrawHist1D(h1, h2, h3, NULL, hname1, hname2, hname3, "",
+      DrawH1(h1, h2, h3, NULL, hname1, hname2, hname3, "",
             kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1, eff2, eff3);
 
    } else if (h1 != NULL && h2 != NULL && h3 == NULL && h4 == NULL){
-      DrawHist1D(h1, h2, NULL, NULL, hname1, hname2, "", "",
+      DrawH1(h1, h2, NULL, NULL, hname1, hname2, "", "",
             kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1, eff2);
 
    } else if (h1 != NULL && h2 == NULL && h3 == NULL && h4 == NULL){
-      DrawHist1D(h1, NULL, NULL, NULL, hname1, "", "", "",
+      DrawH1(h1, NULL, NULL, NULL, hname1, "", "", "",
             kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
       DrawMeanEfficiencyLines(h1, eff1);
    }
@@ -345,7 +345,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
    TH1F* hAll = fHM->H1F(hist + "_All");
    TH1F* hTrue = fHM->H1F(hist + "_True");
    TH1F* hFake = fHM->H1F(hist + "_Fake");
-   DrawHist1D(hAll, hTrue, hFake, NULL,
+   DrawH1(hAll, hTrue, hFake, NULL,
               "all: " + lit::NumberToString<float>(hAll->GetMean(), 1),
               "true: " + lit::NumberToString<float>(hTrue->GetMean(), 1),
               "fake: " + lit::NumberToString<float>(hFake->GetMean(), 1),  "",
@@ -354,7 +354,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
    c->cd(2);
    TH1F* hTrueOverAll = fHM->H1F(hist+"_TrueOverAll");
    TH1F* hFakeOverAll = fHM->H1F(hist+"_FakeOverAll");
-   DrawHist1D(hTrueOverAll, hFakeOverAll, NULL, NULL,
+   DrawH1(hTrueOverAll, hFakeOverAll, NULL, NULL,
               "true/all: " + lit::NumberToString<float>(hTrueOverAll->GetMean()),
               "fake/all: " + lit::NumberToString<float>(hFakeOverAll->GetMean()),
               "", "", kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
@@ -369,14 +369,14 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    canvas1->cd(1);
    TH1F* hChiprim = fHM->H1F("hStsChiprim");
    hChiprim->Scale(1. / hChiprim->Integral());
-   DrawHist1D(hChiprim, kLitLinear, kLitLog);
+   DrawH1(hChiprim, kLitLinear, kLitLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(2);
    TH1* projY = (TH1*)fHM->H2F("hStsMomresVsMom")->ProjectionY();
    projY->Scale(1./projY->Integral());
-   DrawHist1D(projY, kLitLinear, kLitLog);
+   DrawH1(projY, kLitLinear, kLitLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
@@ -391,7 +391,7 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    TH1* momslice = (TH1*) gDirectory->Get("hStsMomresVsMom_2");
    momslice->GetXaxis()->SetTitle("P [GeV/c]");
    momslice->GetYaxis()->SetTitle("dP/P, #sigma [%]");
-   DrawHist1D(momslice, kLitLinear, kLitLinear);
+   DrawH1(momslice, kLitLinear, kLitLinear);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas1, fOutputDir);
@@ -408,14 +408,14 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    }
    momResRms->GetXaxis()->SetTitle("P [GeV/c]");
    momResRms->GetYaxis()->SetTitle("dP/P, RMS [%]");
-   DrawHist1D(momResRms, kLitLinear, kLitLinear, "P");
+   DrawH1(momResRms, kLitLinear, kLitLinear, "P");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    TCanvas* canvas2 = new TCanvas("rec_qa_track_length", "rec_qa_track_length", 500, 500);
    TH1F* hLength = fHM->H1F("hTrackLength");
    hLength->Scale(1. / hLength->Integral());
-   DrawHist1D(hLength, kLitLinear, kLitLinear);
+   DrawH1(hLength, kLitLinear, kLitLinear);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
@@ -425,12 +425,12 @@ void CbmLitTrackingQaDraw::DrawMCMomVsAngle()
    TCanvas* canvas1 = new TCanvas("rec_qa_mc_mom_vs_angle", "rec_qa_mc_mom_vs_angle", 1200, 600);
    canvas1->Divide(2,1);
    canvas1->cd(1);
-   DrawHist2D(fHM->H2F("hMCMomVsAngle_All"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
+   DrawH2(fHM->H2F("hMCMomVsAngle_All"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
    canvas1->cd(2);
-   DrawHist2D(fHM->H2F("hMCMomVsAngle_El"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
+   DrawH2(fHM->H2F("hMCMomVsAngle_El"), kLitLinear, kLitLinear, kLitLinear, "COLZ");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 

@@ -41,7 +41,7 @@ void SetStyles()
 
 
 /* Draws 1D histogram.*/
-void DrawHist1D(
+void DrawH1(
    TH1* hist,
    LitScale logx,
    LitScale logy,
@@ -75,7 +75,7 @@ void DrawHist1D(
 }
 
 /* Draws 1D histogram.*/
-void DrawHist2D(
+void DrawH2(
    TH2* hist,
    LitScale logx,
    LitScale logy,
@@ -106,7 +106,7 @@ void DrawHist2D(
 }
 
 /* Draws up to 4 1D histograms. If hist == NULL than histogram will not be drawn. */
-void DrawHist1D(
+void DrawH1(
    TH1* hist1,
    TH1* hist2,
    TH1* hist3,
@@ -126,25 +126,25 @@ void DrawHist1D(
 {
    Double_t max;
    if (hist1 != NULL) {
-      DrawHist1D(hist1, logx, logy, drawOpt,
+      DrawH1(hist1, logx, logy, drawOpt,
             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE, LIT_MARKER_STYLE1);
       max = hist1->GetMaximum();
    }
 
    if (hist2 != NULL) {
-      DrawHist1D(hist2, logx, logy, "SAME"+drawOpt,
+      DrawH1(hist2, logx, logy, "SAME"+drawOpt,
             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE, LIT_MARKER_STYLE2);
       if (max < hist2->GetMaximum()) { max = hist2->GetMaximum(); }
    }
 
    if (hist3 != NULL) {
-      DrawHist1D(hist3, logx, logy, "SAME"+drawOpt,
+      DrawH1(hist3, logx, logy, "SAME"+drawOpt,
             LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE, LIT_MARKER_STYLE3);
       if (max < hist3->GetMaximum()) { max = hist3->GetMaximum(); }
    }
 
    if (hist4 != NULL) {
-      DrawHist1D(hist4, logx, logy, "SAMEP"+drawOpt,
+      DrawH1(hist4, logx, logy, "SAMEP"+drawOpt,
             LIT_COLOR4, LIT_LINE_WIDTH, LIT_LINE_STYLE4, LIT_MARKER_SIZE, LIT_MARKER_STYLE4);
       if (max < hist4->GetMaximum()) { max = hist4->GetMaximum(); }
    }
@@ -312,7 +312,7 @@ void DrawGraph2D(
    graph->Draw(drawOpt.c_str());
 }
 
-TH1D* Divide1DHists(
+TH1D* DivideH1(
    TH1D* h1,
    TH1D* h2,
    const std::string& name,

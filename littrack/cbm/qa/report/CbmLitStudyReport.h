@@ -39,18 +39,13 @@ public:
    /**
     * \brief Main function which creates report file.
     * \param[in] out Output stream for report file.
+    * \param[in] resultDirectories Vector of directory names.
     * \param[in] studyNames Names of studies.
-    * \param[in] qa Vector of property trees with results.
-    * \param[in] ideal Vector of property trees with ideal results.
-    * \param[in] check Vector of property trees with checked results.
     */
-   virtual void Create( // TODO: check if we have to pass ptrees, since directory names are already passed
+   virtual void Create(
          ostream& out,
          const vector<string>& resultDirectories,
-         const vector<string>& studyNames,
-         const vector<ptree*>& qa,
-         ptree* ideal,
-         const vector<ptree*>& check) = 0;
+         const vector<string>& studyNames) = 0;
 
    /**
     * \brief Inherited from CbmLitReport.
@@ -59,16 +54,11 @@ public:
          const std::string& name) const;
 
 protected:
-   // Property tree of Qa results for each study
-   vector<ptree*> fQa;
-   // Property with ideal values
-   ptree* fIdeal;
-   // Property tree with checked results for each study
-   vector<ptree*> fCheck;
-   // Directory names of study results
-   vector<string> fResultDirectories;
-   // Names of studies
-   vector<string> fStudyNames;
+   vector<ptree> fQa; // Property tree of Qa results for each study
+   ptree fIdeal; // Property with ideal values
+   vector<ptree> fCheck; // Property tree with checked results for each study
+   vector<string> fResultDirectories; // Directory names of study results
+   vector<string> fStudyNames; // Names of studies
 };
 
 #endif /* CBMLITSTUDYREPORT_H_ */

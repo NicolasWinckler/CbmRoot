@@ -34,12 +34,13 @@ public:
     */
    void Create(
          ostream& out,
-         const vector<string>& studyNames,
-         const vector<boost::property_tree::ptree*>& qa,
-         boost::property_tree::ptree* ideal,
-         const vector<boost::property_tree::ptree*>& check);
+         const vector<string>& resultDirectories,
+         const vector<string>& studyNames);
 
 private:
+
+   void Create(
+         ostream& out);
 
    string PrintRow(
          const string& property,

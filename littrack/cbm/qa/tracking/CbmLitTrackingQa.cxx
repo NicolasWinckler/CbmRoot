@@ -155,38 +155,15 @@ void CbmLitTrackingQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsI
 
 void CbmLitTrackingQa::CreateSummaryReport(
       const string& title,
-      const vector<string>& results,
-      const vector<string>& names)
+      const vector<string>& resultDirectories,
+      const vector<string>& studyNames)
 {
    CbmLitTrackingQaStudyReport report(kLitHtml);
-
    string fileType = ".html";
 //   if (reportType == kLitHtml) fileType = ".html";
 //   if (reportType == kLitText) fileType = ".txt";
    ofstream fout(string(fOutputDir + "/rec_qa_study" + fileType).c_str());
-
-   vector<boost::property_tree::ptree*> qa;
-   vector<boost::property_tree::ptree*> check;
-   qa.resize(results.size());
-   check.resize(results.size());
-
-   boost::property_tree::ptree ideal;
-   string qaIdealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
-   read_json(qaIdealFile.c_str(), ideal);
-
-   for (int i = 0; i < results.size(); i++) {
-      qa[i] = new boost::property_tree::ptree;
-      check[i] = new boost::property_tree::ptree;
-      read_json(results[i] + "/rec_qa.json", *(qa[i]));
-      read_json(results[i] + "/rec_qa_check.json", *(check[i]));
-   }
-
-   report.Create(fout, results, names, qa, &ideal, check);
-
-   for (int i = 0; i < results.size(); i++) {
-      delete qa[i];
-      delete check[i];
-   }
+   report.Create(fout, resultDirectories, studyNames);
 }
 
 void CbmLitTrackingQa::DrawHistosFromFile(

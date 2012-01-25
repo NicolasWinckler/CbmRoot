@@ -6,6 +6,10 @@
 #include "CbmLitTrackingQaStudyReport.h"
 #include "../report/CbmLitReportElement.h"
 
+#include "TSystem.h"
+
+
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
@@ -23,17 +27,34 @@ CbmLitTrackingQaStudyReport::~CbmLitTrackingQaStudyReport()
 void CbmLitTrackingQaStudyReport::Create(
       ostream& out,
       const vector<string>& resultDirectories,
-      const vector<string>& studyNames,
-      const vector<boost::property_tree::ptree*>& qa,
-      boost::property_tree::ptree* ideal,
-      const vector<boost::property_tree::ptree*>& check)
+      const vector<string>& studyNames)
 {
+   int nofStudies = resultDirectories.size();
+
    fResultDirectories = resultDirectories;
    fStudyNames = studyNames;
-   fQa = qa;
-   fIdeal = ideal;
-   fCheck = check;
 
+   fQa.resize(nofStudies);
+   fCheck.resize(nofStudies);
+   for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
+      read_json(resultDirectories[iStudy] + "/rec_qa.json", fQa[iStudy]);
+      read_json(resultDirectories[iStudy] + "/rec_qa_check.json", fCheck[iStudy]);
+   }
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
+   read_json(idealFile.c_str(), fIdeal);
+
+   Create(out);
+
+   fResultDirectories.clear();
+   fStudyNames.clear();
+   fQa.clear();
+   fCheck.clear();
+   fIdeal.clear();
+}
+
+void CbmLitTrackingQaStudyReport::Create(
+      ostream& out)
+{
    // TODO: Correct detector presence.
    bool isSts = PropertyExists("hNofStsTracks");
    bool isRich = PropertyExists("hNofRichRings");
@@ -187,6 +208,6 @@ string CbmLitTrackingQaStudyReport::PrintValue(
       const string& valueName)
 {
    stringstream ss;
-   ss << fQa[studyId]->get(valueName, -1.);
+   ss << fQa[studyId].get(valueName, -1.);
    return ss.str();
 }

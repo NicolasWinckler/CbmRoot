@@ -8,6 +8,8 @@
 #include "../report/CbmLitReportElement.h"
 #include "../std/utils/CbmLitUtils.h"
 
+#include "TSystem.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
@@ -27,22 +29,40 @@ CbmLitClusteringQaStudyReport::~CbmLitClusteringQaStudyReport()
 
 void CbmLitClusteringQaStudyReport::Create(
       ostream& out,
-      const vector<string>& studyNames,
-      const vector<boost::property_tree::ptree*>& qa,
-      boost::property_tree::ptree* ideal,
-      const vector<boost::property_tree::ptree*>& check)
+      const vector<string>& resultDirectories,
+      const vector<string>& studyNames)
 {
-   fStudyNames = studyNames;
-   fQa = qa;
-   fIdeal = ideal;
-   fCheck = check;
+   int nofStudies = resultDirectories.size();
 
+   fResultDirectories = resultDirectories;
+   fStudyNames = studyNames;
+
+   fQa.resize(nofStudies);
+   fCheck.resize(nofStudies);
+   for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
+      read_json(resultDirectories[iStudy] + "/clustering_qa.json", fQa[iStudy]);
+      read_json(resultDirectories[iStudy] + "/clustering_qa_check.json", fCheck[iStudy]);
+   }
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/clustering_qa_ideal.json");
+   read_json(idealFile.c_str(), fIdeal);
+
+   Create(out);
+
+   fResultDirectories.clear();
+   fStudyNames.clear();
+   fQa.clear();
+   fCheck.clear();
+   fIdeal.clear();
+}
+
+void CbmLitClusteringQaStudyReport::Create(
+      ostream& out)
+{
    out.precision(3);
    out << fR->DocumentBegin();
    out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
 
    out << fR->TableBegin("Number of objects", list_of(string("")).range(fStudyNames));
-//   out << fR->TableRow(list_of("hEventNo")("Number of events"));
 
    if (PropertyExists("hNofMvdPoints")) out << PrintRow("hNofMvdPoints", "MVD points");
    if (PropertyExists("hNofMvdDigis")) out << PrintRow("hNofMvdDigis", "MVD digis");
@@ -82,7 +102,7 @@ string CbmLitClusteringQaStudyReport::PrintRow(
    vector<string> row;
    row.push_back(name);
    for (int iStudyId = 0; iStudyId < fStudyNames.size(); iStudyId++) {
-      row.push_back(ToString<float>(fQa[iStudyId]->get(property, -1.)));
+      row.push_back(ToString<float>(fQa[iStudyId].get(property, -1.)));
    }
    return fR->TableRow(row);
 }

@@ -4,6 +4,7 @@
  * \date 2011
  */
 #include "CbmLitStudyReport.h"
+#include <cassert>
 
 CbmLitStudyReport::CbmLitStudyReport(LitReportType reportType):
    CbmLitReport(reportType)
@@ -19,5 +20,6 @@ CbmLitStudyReport::~CbmLitStudyReport()
 bool CbmLitStudyReport::PropertyExists(
       const std::string& name) const
 {
-   return (fQa[0]->count(name) != 0) ? true : false;
+   assert(fQa.size() != 0);
+   return (fQa[0].count(name) != 0) ? true : false;
 }

@@ -44,12 +44,15 @@ public:
    void Create(
          ostream& out,
          const vector<string>& resultDirectories,
-         const vector<string>& studyNames,
-         const vector<boost::property_tree::ptree*>& qa,
-         boost::property_tree::ptree* ideal,
-         const vector<boost::property_tree::ptree*>& check);
+         const vector<string>& studyNames);
 
 protected:
+    /**
+    * \brief Create and write report text to output stream.
+    * \param[out] out Output stream.
+    */
+   void Create(
+         ostream& out);
 
    /**
     * \brief Print one row in a table.

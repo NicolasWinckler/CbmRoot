@@ -71,12 +71,12 @@ public:
     * \brief Generate summary report out of several different simulation results.
     * \param[in] title Title of report.
     * \param[in] resultDirectories Paths to directories with resuls.
-    * \param[in] names Study names which displayed in report.
+    * \param[in] studyNames Study names which are displayed in report.
     */
    void CreateSummaryReport(
          const string& title,
          const vector<string>& resultDirectories,
-         const vector<string>& names);
+         const vector<string>& studyNames);
 
    /**
     * \brief Draw histograms in macro from the specified file.

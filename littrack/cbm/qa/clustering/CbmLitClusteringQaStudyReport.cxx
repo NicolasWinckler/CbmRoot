@@ -16,8 +16,7 @@
 using boost::assign::list_of;
 using lit::ToString;
 
-CbmLitClusteringQaStudyReport::CbmLitClusteringQaStudyReport(
-      LitReportType reportType) : CbmLitStudyReport(reportType)
+CbmLitClusteringQaStudyReport::CbmLitClusteringQaStudyReport()
 {
 
 }
@@ -28,10 +27,13 @@ CbmLitClusteringQaStudyReport::~CbmLitClusteringQaStudyReport()
 }
 
 void CbmLitClusteringQaStudyReport::Create(
+      LitReportType reportType,
       ostream& out,
       const vector<string>& resultDirectories,
       const vector<string>& studyNames)
 {
+   CreateReportElement(reportType);
+
    int nofStudies = resultDirectories.size();
 
    fResultDirectories = resultDirectories;
@@ -53,6 +55,8 @@ void CbmLitClusteringQaStudyReport::Create(
    fQa.clear();
    fCheck.clear();
    fIdeal.clear();
+
+   DeleteReportElement();
 }
 
 void CbmLitClusteringQaStudyReport::Create(

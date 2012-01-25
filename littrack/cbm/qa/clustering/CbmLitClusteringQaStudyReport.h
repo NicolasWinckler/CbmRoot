@@ -22,7 +22,7 @@ public:
    /**
     * \brief Constructor.
     */
-   CbmLitClusteringQaStudyReport(LitReportType reportType);
+   CbmLitClusteringQaStudyReport();
 
    /**
     * \brief Destructor.
@@ -33,6 +33,7 @@ public:
     * \brief Inherited from CbmLitStudyReport.
     */
    void Create(
+         LitReportType reportType,
          ostream& out,
          const vector<string>& resultDirectories,
          const vector<string>& studyNames);

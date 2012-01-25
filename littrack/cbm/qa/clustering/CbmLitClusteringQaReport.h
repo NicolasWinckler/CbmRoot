@@ -24,7 +24,7 @@ public:
    /**
     * \brief Constructor.
     */
-   CbmLitClusteringQaReport(LitReportType reportType);
+   CbmLitClusteringQaReport();
 
    /**
     * \brief Destructor.
@@ -35,12 +35,17 @@ public:
     * \brief Inherited from CbmLitSimulationReport.
     */
    void Create(
+      LitReportType reportType,
       ostream& out,
-      boost::property_tree::ptree* qa,
-      boost::property_tree::ptree* ideal,
-      boost::property_tree::ptree* check);
+      const string& resultDirectory);
 
 private:
+   /**
+    * \brief
+    */
+   void Create(
+      ostream& out);
+
    /**
     *
     */

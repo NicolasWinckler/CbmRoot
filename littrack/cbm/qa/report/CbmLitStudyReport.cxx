@@ -6,8 +6,7 @@
 #include "CbmLitStudyReport.h"
 #include <cassert>
 
-CbmLitStudyReport::CbmLitStudyReport(LitReportType reportType):
-   CbmLitReport(reportType)
+CbmLitStudyReport::CbmLitStudyReport()
 {
 
 }

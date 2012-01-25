@@ -66,99 +66,99 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
    string cat = fDet.GetDet(kMUCH) ? "Mu" : "El";
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
-   DrawEfficiency("rec_qa_global_efficiency_all", "hSts3DNormGlobal_All",
+   DrawEfficiency("tracking_qa_global_efficiency_all", "hSts3DNormGlobal_All",
          "hHalfGlobal3DNormGlobal_All", "hGlobal3D_All", "", sname, hgname, gname, "", "", "_px");
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
-   DrawEfficiency("rec_qa_global_efficiency_signal", "hSts3DNormGlobal_" + cat,
+   DrawEfficiency("tracking_qa_global_efficiency_signal", "hSts3DNormGlobal_" + cat,
          "hHalfGlobal3DNormGlobal_" + cat, "hGlobal3D_" + cat, "", sname, hgname, gname, "", "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-   DrawEfficiency("rec_qa_half_global_efficiency_all", "hSts3DNormHalfGlobal_All",
+   DrawEfficiency("tracking_qa_half_global_efficiency_all", "hSts3DNormHalfGlobal_All",
          "hHalfGlobal3D_" + cat, "", "", sname, hgname, "", "", "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
-   DrawEfficiency("rec_qa_half_global_efficiency_signal", "hSts3DNormHalfGlobal_" + cat,
+   DrawEfficiency("tracking_qa_half_global_efficiency_signal", "hSts3DNormHalfGlobal_" + cat,
          "hHalfGlobal3D_" + cat, "", "", sname, hgname, "", "", "", "_px");
 
    // Draw efficiency for STS
-   DrawEfficiency("rec_qa_sts_efficiency", "hSts3D_All", "hSts3D_" + cat,
+   DrawEfficiency("tracking_qa_sts_efficiency", "hSts3D_All", "hSts3D_" + cat,
          "", "", "STS: all", "STS: " + signal, "", "", "", "_px");
 
    if (fDet.GetDet(kTRD) || fDet.GetDet(kMUCH)) {
       // Draw efficiency for TRD(MUCH)
-      DrawEfficiency("rec_qa_rec_efficiency", "hRec3D_All", "hRec3D_" + cat,
+      DrawEfficiency("tracking_qa_rec_efficiency", "hRec3D_All", "hRec3D_" + cat,
             "", "", rname + ": all", rname + ": " + signal, "", "", "", "_px");
    }
 
    if (fDet.GetDet(kTOF)) {
       // Draw efficiency for TOF
-      DrawEfficiency("rec_qa_tof_efficiency", "hTof3D_All",
+      DrawEfficiency("tracking_qa_tof_efficiency", "hTof3D_All",
          "hTof3D_" + cat, "", "", "TOF: all", "TOF: " + signal, "", "", "", "_px");
    }
 
    if (fDet.GetDet(kRICH)) {
       // Draw efficiency for RICH for electron set
-      DrawEfficiency("rec_qa_rich_efficiency_electrons_mom", "hRich3D_El",
+      DrawEfficiency("tracking_qa_rich_efficiency_electrons_mom", "hRich3D_El",
          "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_px");
 
       // Draw efficiency for RICH for electron set vs. rapidity
-      DrawEfficiency("rec_qa_rich_efficiency_electrons_rapidity", "hRich3D_El",
+      DrawEfficiency("tracking_qa_rich_efficiency_electrons_rapidity", "hRich3D_El",
          "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_py");
 
       // Draw efficiency for RICH for electron set vs. pt
-      DrawEfficiency("rec_qa_rich_efficiency_electrons_pt", "hRich3D_El",
+      DrawEfficiency("tracking_qa_rich_efficiency_electrons_pt", "hRich3D_El",
          "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_pz");
 
       // Draw efficiency vs. nof hits in ring for RICH for electron set
-      DrawEfficiency("rec_qa_rich_efficiency_vs_nofhits_electrons", "hRichNh_El",
+      DrawEfficiency("tracking_qa_rich_efficiency_vs_nofhits_electrons", "hRichNh_El",
          "", "", "", "RICH: electrons", "", "", "", "");
 
       // Draw efficiency vs. B/A for ellipse fitting for RICH for electron set
-      DrawEfficiency("rec_qa_rich_efficiency_vs_boa_electrons", "hRichBoA_El",
+      DrawEfficiency("tracking_qa_rich_efficiency_vs_boa_electrons", "hRichBoA_El",
          "", "", "", "RICH: electrons", "", "", "", "");
 
       // Draw efficiency vs. radial position of the ring for RICH for electron set
-      DrawEfficiency("rec_qa_rich_efficiency_vs_radial_position_electrons", "hRichRadPos_El",
+      DrawEfficiency("tracking_qa_rich_efficiency_vs_radial_position_electrons", "hRichRadPos_El",
          "", "", "", "RICH: electrons", "", "", "", "");
 
       // Draw efficiency for STS+RICH for electron set
-      DrawEfficiency("rec_qa_sts_rich_efficiency_electrons", "hSts3DNormStsRich_El",
+      DrawEfficiency("tracking_qa_sts_rich_efficiency_electrons", "hSts3DNormStsRich_El",
          "hStsRich3D_El", "", "", "STS", "STS+RICH", "", "", "", "_px");
 
       // Draw efficiency for STS+RICH No matching for electron set
-      DrawEfficiency("rec_qa_sts_rich_no_matching_efficiency_electrons", "hSts3DNormStsRich_El",
+      DrawEfficiency("tracking_qa_sts_rich_no_matching_efficiency_electrons", "hSts3DNormStsRich_El",
          "hStsRichNoMatching3D_El", "", "", "STS", "STS+RICH (No Matching)", "", "", "", "_px");
 
       // Draw efficiency for STS+RICH+TRD for electron set
-      DrawEfficiency("rec_qa_sts_rich_trd_efficiency_electrons", "hSts3DNormStsRichTrd_El",
+      DrawEfficiency("tracking_qa_sts_rich_trd_efficiency_electrons", "hSts3DNormStsRichTrd_El",
          "hStsRich3DNormStsRichTrd_El", "hStsRichTrd3D_El", "",
          "STS", "STS+RICH", "STS+RICH+TRD", "", "", "_px");
 
       // Draw efficiency for STS+RICH+TRD+TOF for electron set
-      DrawEfficiency("rec_qa_sts_rich_trd_tof_efficiency_electrons", "hSts3DNormStsRichTrdTof_El",
+      DrawEfficiency("tracking_qa_sts_rich_trd_tof_efficiency_electrons", "hSts3DNormStsRichTrdTof_El",
          "hStsRich3DNormStsRichTrdTof_El", "hStsRichTrd3DNormStsRichTrdTof_El", "hStsRichTrdTof3D_El",
          "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "", "_px");
 
-//      TCanvas* canvas = new TCanvas("rec_qa_sts_rich_trd_tof_momentum_electrons", "rec_qa_sts_rich_trd_tof_momentum_electrons", 600, 500);
+//      TCanvas* canvas = new TCanvas("tracking_qa_sts_rich_trd_tof_momentum_electrons", "tracking_qa_sts_rich_trd_tof_momentum_electrons", 600, 500);
 //      canvas->SetGrid();
 //      DrawHist1D(H1("hSts3DNormStsRichTrdTof_El_Rec"), H1("hStsRich3DNormStsRichTrdTof_El_Rec"),
 //         H1("hStsRichTrd3DNormStsRichTrdTof_El_Rec"), H1("hStsRichTrdTof3D_El_Rec"),
 //         "Efficiency", "Momentum [GeV/c]", "Efficiency", "STS", "STS+RICH",
 //         "STS+RICH+TRD", "STS+RICH+TRD+TOF", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 
-      DrawEfficiency("rec_qa_sts_rich_trd_tof_electron_identification", "hStsRich3DElIdNormStsRichTrdTof_ElId",
+      DrawEfficiency("tracking_qa_sts_rich_trd_tof_electron_identification", "hStsRich3DElIdNormStsRichTrdTof_ElId",
          "hStsRichTrd3DElIdNormStsRichTrdTof_ElId", "hStsRichTrdTof3DElId_ElId", "",
          "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "", "_px");
 
-      DrawEfficiency("rec_qa_sts_rich_trd_tof_pion_suppression", "hStsRich3DElIdNormStsRichTrdTof_PiSupp",
+      DrawEfficiency("tracking_qa_sts_rich_trd_tof_pion_suppression", "hStsRich3DElIdNormStsRichTrdTof_PiSupp",
          "hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp", "hStsRichTrdTof3DElId_PiSupp", "",
          "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "pisupp", "_px");
     }
 
    if (fDet.GetDet(kRICH)) {
       // Draw detector acceptance
-      //DrawEfficiency("rec_qa_sts_rich_trd_tof_detector_acceptance", "hStsDetAcc3D_El_px",
+      //DrawEfficiency("tracking_qa_sts_rich_trd_tof_detector_acceptance", "hStsDetAcc3D_El_px",
       //      "hStsRichDetAcc3D_El_px", "hStsRichTrdDetAcc3D_El_px", "hStsRichTrdTofDetAcc3D_El_px",
       //     "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
 
@@ -326,11 +326,11 @@ void CbmLitTrackingQaDraw::DrawMcEfficiencyGraph()
 
 void CbmLitTrackingQaDraw::DrawHitsHistos()
 {
-   if (fDet.GetDet(kMVD)) { DrawHitsHistos("rec_qa_mvd_hits", "hMvdTrackHits"); }
-   if (fDet.GetDet(kSTS)) { DrawHitsHistos("rec_qa_sts_hits", "hStsTrackHits"); }
-   if (fDet.GetDet(kTRD)) { DrawHitsHistos("rec_qa_trd_hits", "hTrdTrackHits"); }
-   if (fDet.GetDet(kMUCH)) { DrawHitsHistos("rec_qa_much_hits", "hMuchTrackHits"); }
-   if (fDet.GetDet(kRICH)) { DrawHitsHistos("rec_qa_rich_ring_hits", "hRichRingHits"); }
+   if (fDet.GetDet(kMVD)) { DrawHitsHistos("tracking_qa_mvd_hits", "hMvdTrackHits"); }
+   if (fDet.GetDet(kSTS)) { DrawHitsHistos("tracking_qa_sts_hits", "hStsTrackHits"); }
+   if (fDet.GetDet(kTRD)) { DrawHitsHistos("tracking_qa_trd_hits", "hTrdTrackHits"); }
+   if (fDet.GetDet(kMUCH)) { DrawHitsHistos("tracking_qa_much_hits", "hMuchTrackHits"); }
+   if (fDet.GetDet(kRICH)) { DrawHitsHistos("tracking_qa_rich_ring_hits", "hRichRingHits"); }
 }
 
 void CbmLitTrackingQaDraw::DrawHitsHistos(
@@ -364,7 +364,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
 
 void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
 {
-   TCanvas* canvas1 = new TCanvas("rec_qa_sts_tracks_qa", "rec_qa_sts_tracks_qa", 900, 900);
+   TCanvas* canvas1 = new TCanvas("tracking_qa_sts_tracks_qa", "tracking_qa_sts_tracks_qa", 900, 900);
    canvas1->Divide(2,2);
    canvas1->cd(1);
    TH1F* hChiprim = fHM->H1F("hStsChiprim");
@@ -412,7 +412,7 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 
-   TCanvas* canvas2 = new TCanvas("rec_qa_track_length", "rec_qa_track_length", 500, 500);
+   TCanvas* canvas2 = new TCanvas("tracking_qa_track_length", "tracking_qa_track_length", 500, 500);
    TH1F* hLength = fHM->H1F("hTrackLength");
    hLength->Scale(1. / hLength->Integral());
    DrawH1(hLength, kLitLinear, kLitLinear);
@@ -422,7 +422,7 @@ void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
 
 void CbmLitTrackingQaDraw::DrawMCMomVsAngle()
 {
-   TCanvas* canvas1 = new TCanvas("rec_qa_mc_mom_vs_angle", "rec_qa_mc_mom_vs_angle", 1200, 600);
+   TCanvas* canvas1 = new TCanvas("tracking_qa_mc_mom_vs_angle", "tracking_qa_mc_mom_vs_angle", 1200, 600);
    canvas1->Divide(2,1);
    canvas1->cd(1);
    DrawH2(fHM->H2F("hMCMomVsAngle_All"), kLitLinear, kLitLinear, kLitLinear, "COLZ");

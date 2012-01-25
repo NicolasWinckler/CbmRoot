@@ -6,8 +6,10 @@
 #include "CbmLitTrackingQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
+#include "TSystem.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <iomanip>
 
 using std::vector;
@@ -15,10 +17,10 @@ using std::endl;
 using std::setfill;
 using std::left;
 using boost::assign::list_of;
+using boost::property_tree::json_parser_error;
 using lit::ToString;
 
-CbmLitTrackingQaReport::CbmLitTrackingQaReport(
-      LitReportType reportType) : CbmLitSimulationReport(reportType)
+CbmLitTrackingQaReport::CbmLitTrackingQaReport()
 {
 }
 
@@ -27,17 +29,46 @@ CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 }
 
 void CbmLitTrackingQaReport::Create(
+   LitReportType reportType,
    ostream& out,
-   boost::property_tree::ptree* qa,
-   boost::property_tree::ptree* ideal,
-   boost::property_tree::ptree* check)
+   const string& resultDirectory)
 {
-   fQa = qa;
-   fIdeal = ideal;
-   fCheck = check;
+   CreateReportElement(reportType);
 
+   try {
+      read_json(resultDirectory + "/tracking_qa.json", fQa);
+   } catch (json_parser_error error) {
+      std::cout << error.what();
+   }
+
+   try {
+      read_json(resultDirectory + "/tracking_qa_check.json", fCheck);
+   } catch (json_parser_error error) {
+      std::cout << error.what();
+   }
+
+   try {
+      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking_qa_ideal.json");
+      read_json(idealFile.c_str(), fIdeal);
+   } catch (json_parser_error error) {
+      std::cout << error.what();
+   }
+
+   Create(out);
+
+   fQa.clear();
+   fCheck.clear();
+   fIdeal.clear();
+
+   DeleteReportElement();
+}
+
+void CbmLitTrackingQaReport::Create(
+   ostream& out)
+{
    out.precision(3);
    out << fR->DocumentBegin();
+   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
 
    out << "Number of events: " << PrintValue("hEventNo") << endl;
 
@@ -154,19 +185,19 @@ void CbmLitTrackingQaReport::Create(
    out << setfill(' ') << left << PrintPolarAngle("hTofAngle");
    out << fR->TableEnd();
 
-   out << fR->Image("Global efficiency all", "rec_qa_global_efficiency_all");
-   out << fR->Image("Global efficiency signal", "rec_qa_global_efficiency_signal");
-   out << fR->Image("STS efficiency", "rec_qa_sts_efficiency");
-   out << fR->Image("TRD(MUCH) efficiency", "rec_qa_rec_efficiency");
-   out << fR->Image("TOF matching efficiency", "rec_qa_tof_efficiency");
+   out << fR->Image("Global efficiency all", "tracking_qa_global_efficiency_all");
+   out << fR->Image("Global efficiency signal", "tracking_qa_global_efficiency_signal");
+   out << fR->Image("STS efficiency", "tracking_qa_sts_efficiency");
+   out << fR->Image("TRD(MUCH) efficiency", "tracking_qa_rec_efficiency");
+   out << fR->Image("TOF matching efficiency", "tracking_qa_tof_efficiency");
    // TODO: Check for RICH detector
-   out << fR->Image("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
-   out << fR->Image("STS+RICH efficiency electrons", "rec_qa_sts_rich_efficiency_electrons");
-   out << fR->Image("STS+RICH+TRD efficiency electrons", "rec_qa_sts_rich_trd_efficiency_electrons");
-   out << fR->Image("STS+RICH+TRD+TOF efficiency electrons", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
-   //out << fR->PrintImage("STS+RICH+TRD+TOF detector acceptance electrons", "rec_qa_sts_rich_trd_tof_detector_acceptance");
-   out << fR->Image("STS+RICH+TRD+TOF electron identification efficiency electrons", "rec_qa_sts_rich_trd_tof_electron_identification");
-   out << fR->Image("STS+RICH+TRD+TOF pion suppression", "rec_qa_sts_rich_trd_tof_pion_suppression");
+   out << fR->Image("RICH efficiency electrons", "tracking_qa_rich_efficiency_electrons");
+   out << fR->Image("STS+RICH efficiency electrons", "tracking_qa_sts_rich_efficiency_electrons");
+   out << fR->Image("STS+RICH+TRD efficiency electrons", "tracking_qa_sts_rich_trd_efficiency_electrons");
+   out << fR->Image("STS+RICH+TRD+TOF efficiency electrons", "tracking_qa_sts_rich_trd_tof_efficiency_electrons");
+   //out << fR->PrintImage("STS+RICH+TRD+TOF detector acceptance electrons", "tracking_qa_sts_rich_trd_tof_detector_acceptance");
+   out << fR->Image("STS+RICH+TRD+TOF electron identification efficiency electrons", "tracking_qa_sts_rich_trd_tof_electron_identification");
+   out << fR->Image("STS+RICH+TRD+TOF pion suppression", "tracking_qa_sts_rich_trd_tof_pion_suppression");
    out <<  fR->DocumentEnd();
 }
 
@@ -178,12 +209,12 @@ string CbmLitTrackingQaReport::PrintNofStatistics(
         const string& trd,
         const string& much)
 {
-   string st1 = (global != "") ? ToString<Int_t>(fQa->get(global, -1.)) : "-";
-   string st2 = (sts != "") ? ToString<Int_t>(fQa->get(sts, -1.)) : "-";
-   string st3 = (richRing != "") ? ToString<Int_t>(fQa->get(richRing, -1.)) : "-";
-   string st4 = (richProj != "") ? ToString<Int_t>(fQa->get(richProj, -1.)) : "-";
-   string st5 = (trd != "") ? ToString<Int_t>(fQa->get(trd, -1.)) : "-";
-   string st6 = (much != "") ? ToString<Int_t>(fQa->get(much, -1.)) : "-";
+   string st1 = (global != "") ? ToString<Int_t>(fQa.get(global, -1.)) : "-";
+   string st2 = (sts != "") ? ToString<Int_t>(fQa.get(sts, -1.)) : "-";
+   string st3 = (richRing != "") ? ToString<Int_t>(fQa.get(richRing, -1.)) : "-";
+   string st4 = (richProj != "") ? ToString<Int_t>(fQa.get(richProj, -1.)) : "-";
+   string st5 = (trd != "") ? ToString<Int_t>(fQa.get(trd, -1.)) : "-";
+   string st6 = (much != "") ? ToString<Int_t>(fQa.get(much, -1.)) : "-";
    return fR->TableRow(list_of(st1)(st2)(st3)(st4)(st5)(st6));
 }
 
@@ -191,11 +222,11 @@ string CbmLitTrackingQaReport::PrintHits(
         const string& name,
         const string& hist)
 {
-   float all = fQa->get(hist + ".all", -1.);
-   float trueh = fQa->get(hist + ".true", -1.);
-   float fakeh = fQa->get(hist + ".fake", -1.);
-   float toa = fQa->get(hist + ".trueOverAll", -1.);
-   float foa = fQa->get(hist + ".fakeOverAll", -1.);
+   float all = fQa.get(hist + ".all", -1.);
+   float trueh = fQa.get(hist + ".true", -1.);
+   float fakeh = fQa.get(hist + ".fake", -1.);
+   float toa = fQa.get(hist + ".trueOverAll", -1.);
+   float foa = fQa.get(hist + ".fakeOverAll", -1.);
    string st1 = (all == -1.) ? "-" : ToString<float>(all);
    string st2 = (trueh == -1.) ? "-" : ToString<float>(trueh);
    string st3 = (fakeh == -1.) ? "-" : ToString<float>(fakeh);
@@ -208,24 +239,24 @@ string CbmLitTrackingQaReport::PrintEfficiency(
      const string& name,
      const string& hist)
 {
-   Double_t allRec = fQa->get(hist + ".all.rec", -1.);
-   Double_t allAcc = fQa->get(hist + ".all.acc", -1.);
-   Double_t allEff = fQa->get(hist + ".all.eff", -1.);
-   Double_t refRec = fQa->get(hist + ".ref.rec", -1.);
-   Double_t refAcc = fQa->get(hist + ".ref.acc", -1.);
-   Double_t refEff = fQa->get(hist + ".ref.eff", -1.);
-   Double_t primRec = fQa->get(hist + ".prim.rec", -1.);
-   Double_t primAcc = fQa->get(hist + ".prim.acc", -1.);
-   Double_t primEff = fQa->get(hist + ".prim.eff", -1.);
-   Double_t secRec = fQa->get(hist + ".sec.rec", -1.);
-   Double_t secAcc = fQa->get(hist + ".sec.acc", -1.);
-   Double_t secEff = fQa->get(hist + ".sec.eff", -1.);
-   Double_t muRec = fQa->get(hist + ".mu.rec", -1.);
-   Double_t muAcc = fQa->get(hist + ".mu.acc", -1.);
-   Double_t muEff = fQa->get(hist + ".mu.eff", -1.);
-   Double_t elRec = fQa->get(hist + ".el.rec", -1.);
-   Double_t elAcc = fQa->get(hist + ".el.acc", -1.);
-   Double_t elEff = fQa->get(hist + ".el.eff", -1.);
+   Double_t allRec = fQa.get(hist + ".all.rec", -1.);
+   Double_t allAcc = fQa.get(hist + ".all.acc", -1.);
+   Double_t allEff = fQa.get(hist + ".all.eff", -1.);
+   Double_t refRec = fQa.get(hist + ".ref.rec", -1.);
+   Double_t refAcc = fQa.get(hist + ".ref.acc", -1.);
+   Double_t refEff = fQa.get(hist + ".ref.eff", -1.);
+   Double_t primRec = fQa.get(hist + ".prim.rec", -1.);
+   Double_t primAcc = fQa.get(hist + ".prim.acc", -1.);
+   Double_t primEff = fQa.get(hist + ".prim.eff", -1.);
+   Double_t secRec = fQa.get(hist + ".sec.rec", -1.);
+   Double_t secAcc = fQa.get(hist + ".sec.acc", -1.);
+   Double_t secEff = fQa.get(hist + ".sec.eff", -1.);
+   Double_t muRec = fQa.get(hist + ".mu.rec", -1.);
+   Double_t muAcc = fQa.get(hist + ".mu.acc", -1.);
+   Double_t muEff = fQa.get(hist + ".mu.eff", -1.);
+   Double_t elRec = fQa.get(hist + ".el.rec", -1.);
+   Double_t elAcc = fQa.get(hist + ".el.acc", -1.);
+   Double_t elEff = fQa.get(hist + ".el.eff", -1.);
 
    stringstream ss1, ss2, ss3, ss4, ss5, ss6;
    ss1.precision(3);
@@ -249,24 +280,24 @@ string CbmLitTrackingQaReport::PrintEfficiencyRich(
       const string& name,
       const string& hist)
 {
-   Double_t allRec = fQa->get(hist + ".All.rec", -1.);
-   Double_t allAcc = fQa->get(hist + ".All.acc", -1.);
-   Double_t allEff = fQa->get(hist + ".All.eff", -1.);
-   Double_t allRefRec = fQa->get(hist + ".AllRef.rec", -1.);
-   Double_t allRefAcc = fQa->get(hist + ".AllRef.acc", -1.);
-   Double_t allRefEff = fQa->get(hist + ".AllRef.eff", -1.);
-   Double_t elRec = fQa->get(hist + ".El.rec", -1.);
-   Double_t elAcc = fQa->get(hist + ".El.acc", -1.);
-   Double_t elEff = fQa->get(hist + ".El.eff", -1.);
-   Double_t elRefRec = fQa->get(hist + ".ElRef.rec", -1.);
-   Double_t elRefAcc = fQa->get(hist + ".ElRef.acc", -1.);
-   Double_t elRefEff = fQa->get(hist + ".ElRef.eff", -1.);
-   Double_t piRec = fQa->get(hist + ".Pi.rec", -1.);
-   Double_t piAcc = fQa->get(hist + ".Pi.acc", -1.);
-   Double_t piEff = fQa->get(hist + ".Pi.eff", -1.);
-   Double_t piRefRec = fQa->get(hist + ".PiRef.rec", -1.);
-   Double_t piRefAcc = fQa->get(hist + ".PiRef.acc", -1.);
-   Double_t piRefEff = fQa->get(hist + ".PiRef.eff", -1.);
+   Double_t allRec = fQa.get(hist + ".All.rec", -1.);
+   Double_t allAcc = fQa.get(hist + ".All.acc", -1.);
+   Double_t allEff = fQa.get(hist + ".All.eff", -1.);
+   Double_t allRefRec = fQa.get(hist + ".AllRef.rec", -1.);
+   Double_t allRefAcc = fQa.get(hist + ".AllRef.acc", -1.);
+   Double_t allRefEff = fQa.get(hist + ".AllRef.eff", -1.);
+   Double_t elRec = fQa.get(hist + ".El.rec", -1.);
+   Double_t elAcc = fQa.get(hist + ".El.acc", -1.);
+   Double_t elEff = fQa.get(hist + ".El.eff", -1.);
+   Double_t elRefRec = fQa.get(hist + ".ElRef.rec", -1.);
+   Double_t elRefAcc = fQa.get(hist + ".ElRef.acc", -1.);
+   Double_t elRefEff = fQa.get(hist + ".ElRef.eff", -1.);
+   Double_t piRec = fQa.get(hist + ".Pi.rec", -1.);
+   Double_t piAcc = fQa.get(hist + ".Pi.acc", -1.);
+   Double_t piEff = fQa.get(hist + ".Pi.eff", -1.);
+   Double_t piRefRec = fQa.get(hist + ".PiRef.rec", -1.);
+   Double_t piRefAcc = fQa.get(hist + ".PiRef.acc", -1.);
+   Double_t piRefEff = fQa.get(hist + ".PiRef.eff", -1.);
 
    stringstream ss1, ss2, ss3, ss4, ss5, ss6;
    ss1.precision(3);
@@ -290,12 +321,12 @@ string CbmLitTrackingQaReport::PrintEfficiencyElId(
       const string& name,
       const string& hist)
 {
-   Double_t elRec = fQa->get(hist + ".el.rec", -1.);
-   Double_t elAcc = fQa->get(hist + ".el.acc", -1.);
-   Double_t elEff = fQa->get(hist + ".el.eff", -1.);
-   Double_t piRec = fQa->get(hist + ".pi.rec", -1.);
-   Double_t piAcc = fQa->get(hist + ".pi.acc", -1.);
-   Double_t piSupp = fQa->get(hist + ".pi.supp", -1.);
+   Double_t elRec = fQa.get(hist + ".el.rec", -1.);
+   Double_t elAcc = fQa.get(hist + ".el.acc", -1.);
+   Double_t elEff = fQa.get(hist + ".el.eff", -1.);
+   Double_t piRec = fQa.get(hist + ".pi.rec", -1.);
+   Double_t piAcc = fQa.get(hist + ".pi.acc", -1.);
+   Double_t piSupp = fQa.get(hist + ".pi.supp", -1.);
 
    stringstream ss1, ss2;
    ss1.precision(3);
@@ -311,12 +342,12 @@ string CbmLitTrackingQaReport::PrintDetAccEl(
       const string& name,
       const string& hist)
 {
-   Double_t acc = fQa->get(hist+".detAccAcc.acc", -1.);
-   Double_t mc = fQa->get(hist+".detAccAcc.mc", -1.);
-   Double_t effAcc = fQa->get(hist+".detAccAcc.eff", -1.);
-   Double_t rec = fQa->get(hist+".detAccRec.rec", -1.);
+   Double_t acc = fQa.get(hist+".detAccAcc.acc", -1.);
+   Double_t mc = fQa.get(hist+".detAccAcc.mc", -1.);
+   Double_t effAcc = fQa.get(hist+".detAccAcc.eff", -1.);
+   Double_t rec = fQa.get(hist+".detAccRec.rec", -1.);
   // Double_t mc = pt->get(hist+".detAccRec.mc", -1.);
-   Double_t effRec = fQa->get(hist+".detAccRec.eff", -1.);
+   Double_t effRec = fQa.get(hist+".detAccRec.eff", -1.);
 
    stringstream ss1, ss2;
    ss1.precision(3);
@@ -331,9 +362,9 @@ string CbmLitTrackingQaReport::PrintDetAccEl(
 string CbmLitTrackingQaReport::PrintPolarAngle(
       const string& hist)
 {
-   Double_t maxAngle = fQa->get("MaxAngle", -1.);
-   Double_t minAngle = fQa->get("MinAngle", -1.);
-   Double_t nofBinsAngle = fQa->get("NofBinsAngle", -1.);
+   Double_t maxAngle = fQa.get("MaxAngle", -1.);
+   Double_t minAngle = fQa.get("MinAngle", -1.);
+   Double_t nofBinsAngle = fQa.get("NofBinsAngle", -1.);
    Double_t step = (maxAngle - minAngle) / nofBinsAngle;
 
    if (maxAngle == -1. || minAngle == -1. || nofBinsAngle == -1.){
@@ -359,24 +390,24 @@ string CbmLitTrackingQaReport::PrintPolarAngle(
       string angle1 = ss8.str();
       ss0 << "(" << angle0 << "-" << angle1 << ")";
 
-      ss1 << fQa->get(hist + ".all.eff." + angle0 + "_" + angle1, -1.)
-          << "(" << fQa->get(hist + ".all.rec." + angle0 + "_" + angle1, -1.)
-          << "/" << fQa->get(hist + ".all.acc." + angle0 + "_" + angle1, -1.) << ")";
-      ss2 << fQa->get(hist + ".ref.eff." + angle0 + "_" + angle1, -1.)
-          << "(" << fQa->get(hist + ".ref.rec." + angle0 + "_" + angle1, -1.) << "/"
-          << fQa->get(hist + ".ref.acc." + angle0 + "_" + angle1, -1.) << ")";
-      ss3 << fQa->get(hist + ".prim.eff." + angle0 + "_" + angle1, -1.)
-          << "(" << fQa->get(hist + ".prim.rec." + angle0 + "_" + angle1, -1.)
-          << "/" << fQa->get(hist + ".prim.acc." + angle0 + "_" + angle1, -1.) << ")";
-      ss4 << fQa->get(hist + ".sec.eff." + angle0 + "_" + angle1, -1.)
-          << "(" << fQa->get(hist + ".sec.rec."+angle0 + "_" + angle1, -1.)
-          << "/" << fQa->get(hist + ".sec.acc."+angle0 + "_" + angle1, -1.) << ")";
-      ss5 << fQa->get(hist + ".el.eff." + angle0 + "_" + angle1, -1.)
-          << "(" << fQa->get(hist + ".el.rec." + angle0 + "_" + angle1, -1.)
-          << "/" << fQa->get(hist + ".el.acc." + angle0 + "_" + angle1, -1.) << ")";
-      ss6 << fQa->get(hist + ".mu.eff." + angle0 + "_" + angle1, -1.)
-          << "(" << fQa->get(hist + ".mu.rec."+ angle0 + "_" + angle1, -1.)
-          << "/" << fQa->get(hist + ".mu.acc."+ angle0 + "_" + angle1, -1.) << ")";
+      ss1 << fQa.get(hist + ".all.eff." + angle0 + "_" + angle1, -1.)
+          << "(" << fQa.get(hist + ".all.rec." + angle0 + "_" + angle1, -1.)
+          << "/" << fQa.get(hist + ".all.acc." + angle0 + "_" + angle1, -1.) << ")";
+      ss2 << fQa.get(hist + ".ref.eff." + angle0 + "_" + angle1, -1.)
+          << "(" << fQa.get(hist + ".ref.rec." + angle0 + "_" + angle1, -1.) << "/"
+          << fQa.get(hist + ".ref.acc." + angle0 + "_" + angle1, -1.) << ")";
+      ss3 << fQa.get(hist + ".prim.eff." + angle0 + "_" + angle1, -1.)
+          << "(" << fQa.get(hist + ".prim.rec." + angle0 + "_" + angle1, -1.)
+          << "/" << fQa.get(hist + ".prim.acc." + angle0 + "_" + angle1, -1.) << ")";
+      ss4 << fQa.get(hist + ".sec.eff." + angle0 + "_" + angle1, -1.)
+          << "(" << fQa.get(hist + ".sec.rec."+angle0 + "_" + angle1, -1.)
+          << "/" << fQa.get(hist + ".sec.acc."+angle0 + "_" + angle1, -1.) << ")";
+      ss5 << fQa.get(hist + ".el.eff." + angle0 + "_" + angle1, -1.)
+          << "(" << fQa.get(hist + ".el.rec." + angle0 + "_" + angle1, -1.)
+          << "/" << fQa.get(hist + ".el.acc." + angle0 + "_" + angle1, -1.) << ")";
+      ss6 << fQa.get(hist + ".mu.eff." + angle0 + "_" + angle1, -1.)
+          << "(" << fQa.get(hist + ".mu.rec."+ angle0 + "_" + angle1, -1.)
+          << "/" << fQa.get(hist + ".mu.acc."+ angle0 + "_" + angle1, -1.) << ")";
       ss << fR->TableRow(list_of(ss0.str())(ss1.str())(ss2.str())(ss3.str())(ss4.str())(ss5.str())(ss6.str()));
    }
    return ss.str();

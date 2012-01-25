@@ -20,10 +20,9 @@ class CbmLitFieldQaReport : public CbmLitSimulationReport
 {
 public:
    /**
-    * \brief Constructor with report type.
-    * \param[in] reportType Type of report to be created.
+    * \brief Constructor.
     */
-   CbmLitFieldQaReport(LitReportType reportType);
+   CbmLitFieldQaReport();
 
    /**
     * \brief Destructor.
@@ -34,12 +33,17 @@ public:
     * \brief Inherited from CbmLitSimulationReport.
     */
    void Create(
-      std::ostream& out,
-      boost::property_tree::ptree* qa,
-      boost::property_tree::ptree* ideal,
-      boost::property_tree::ptree* check);
+      LitReportType reportType,
+      ostream& out,
+      const string& resultDirectory);
 
 private:
+   /**
+    * \brief
+    */
+   void Create(
+      ostream& out);
+
    /**
     * \brief Return  string with summary table for field QA.
     * \return String with summary table for field QA.

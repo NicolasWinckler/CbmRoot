@@ -6,8 +6,7 @@
  */
 #include "CbmLitSimulationReport.h"
 
-CbmLitSimulationReport::CbmLitSimulationReport(LitReportType reportType):
-   CbmLitReport(reportType)
+CbmLitSimulationReport::CbmLitSimulationReport()
 {
 
 }
@@ -20,5 +19,5 @@ CbmLitSimulationReport::~CbmLitSimulationReport()
 bool CbmLitSimulationReport::PropertyExists(
       const std::string& name) const
 {
-   return (fQa->count(name) != 0) ? true : false;
+   return (fQa.count(name) != 0) ? true : false;
 }

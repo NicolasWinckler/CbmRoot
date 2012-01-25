@@ -25,10 +25,9 @@ class CbmLitSimulationReport : public CbmLitReport
 {
 public:
    /**
-    * \brief Constructor with report type.
-    * \param[in] reportType Type of the report to be produced.
+    * \brief Constructor.
     */
-   CbmLitSimulationReport(LitReportType reportType);
+   CbmLitSimulationReport();
 
    /**
     * \brief Destructor.
@@ -37,16 +36,14 @@ public:
 
    /**
     * \brief Main function which creates report file.
-    * \param[in] out Output stream for report file.
-    * \param[in] qa Property tree with results.
-    * \param[in] ideal Property tree with ideal results.
-    * \param[in] check Property tree with checked results.
+    * \param[in] reportType Type of report to be produced.
+    * \param[out] out Output stream for report file.
+    * \param[in] resultDirectory Path to directory eith results.
     */
    virtual void Create(
+         LitReportType reportType,
          ostream& out,
-         ptree* qa,
-         ptree* ideal,
-         ptree* check) = 0;
+         const string& resultDirectory) = 0;
 
    /**
     * \brief Inherited from CbmLitReport.
@@ -55,12 +52,9 @@ public:
          const string& name) const;
 
 protected:
-   // Property tree of Qa results for each study
-   ptree* fQa;
-   // Property with ideal values
-   ptree* fIdeal;
-   // Property tree with checked results for each study
-   ptree* fCheck;
+   ptree fQa; // Property tree of Qa results for each study
+   ptree fIdeal; // Property with ideal values
+   ptree fCheck; // Property tree with checked results for each study
 };
 
 #endif /* CBMLITSIMULATIONREPORT_H_ */

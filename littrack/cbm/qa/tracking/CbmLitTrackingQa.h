@@ -73,10 +73,17 @@ public:
     * \param[in] resultDirectories Paths to directories with resuls.
     * \param[in] studyNames Study names which are displayed in report.
     */
-   void CreateSummaryReport(
+   void CreateStudyReport(
          const string& title,
          const vector<string>& resultDirectories,
          const vector<string>& studyNames);
+
+   /**
+    * \brief Create final simulation report for this tracking QA run.
+    */
+   void CreateSimulationReport(
+         const string& title,
+         const string& resultDirectory);
 
    /**
     * \brief Draw histograms in macro from the specified file.
@@ -86,11 +93,6 @@ public:
          const std::string& fileName);
 
 private:
-   /**
-    * \brief Create final simulation report for this tracking QA run.
-    */
-   void CreateSimulationReport();
-
    CbmLitHistManager* fHM; // Histogram manager
    CbmLitTrackingQaCalculator* fTrackingQa; // Tracking performance calculator
    string fOutputDir; // Output directory for results

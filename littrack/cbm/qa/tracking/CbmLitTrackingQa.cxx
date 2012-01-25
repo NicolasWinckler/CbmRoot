@@ -19,7 +19,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -72,35 +71,49 @@ void CbmLitTrackingQa::Finish()
    CbmLitTrackingQaDraw drawQa;
    drawQa.Draw(fHM, fOutputDir);
 
-   CreateSimulationReport();
-}
+   string qaFile = fOutputDir + "/tracking_qa.json";
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking_qa_ideal.json");
+   string checkFile = fOutputDir + "/tracking_qa_check.json";
 
-void CbmLitTrackingQa::CreateSimulationReport()
-{
    CbmLitTrackingQaPTreeCreator ptc;
-   boost::property_tree::ptree qa = ptc.Create(fHM);
-   if (fOutputDir != "") { write_json(std::string(fOutputDir + "rec_qa.json").c_str(), qa); }
-
-   CbmLitTrackingQaReport report(kLitText);
-   report.Create(cout, &qa, NULL, NULL);
-
-   boost::property_tree::ptree ideal, check;
-   std::string qaIdealFile = std::string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
-   read_json(qaIdealFile.c_str(), ideal);
+   ptree qa = ptc.Create(fHM);
+   if (fOutputDir != "") { write_json(qaFile.c_str(), qa); }
 
    CbmLitResultChecker qaChecker;
-   qaChecker.DoCheck(qa, ideal, check);
-   if (fOutputDir != "") { write_json(std::string(fOutputDir + "rec_qa_check.json").c_str(), check); }
+   qaChecker.DoCheck(qaFile, idealFile, checkFile);
 
-   if (fOutputDir != "") {
-      ofstream foutHtml(string(fOutputDir + "rec_qa.html").c_str());
-      CbmLitTrackingQaReport reportHtml(kLitHtml);
-      reportHtml.Create(foutHtml, &qa, NULL, NULL);
+   CreateSimulationReport("Tracking QA", fOutputDir);
+}
 
-      ofstream foutLatex(string(fOutputDir + "rec_qa.tex").c_str());
-      CbmLitTrackingQaReport reportLatex(kLitLatex);
-      reportLatex.Create(foutLatex, &qa, NULL, NULL);
-   }
+void CbmLitTrackingQa::CreateSimulationReport(
+      const string& title,
+      const string& resultDirectory)
+{
+   CbmLitTrackingQaReport report;
+   report.SetTitle(title);
+   ofstream foutHtml(string(fOutputDir + "/tracking_qa.html").c_str());
+   ofstream foutLatex(string(fOutputDir + "/tracking_qa.tex").c_str());
+   ofstream foutText(string(fOutputDir + "/tracking_qa.txt").c_str());
+   report.Create(kLitText, cout, resultDirectory);
+   report.Create(kLitHtml, foutHtml, resultDirectory);
+   report.Create(kLitLatex, foutLatex, resultDirectory);
+   report.Create(kLitText, foutText, resultDirectory);
+}
+
+void CbmLitTrackingQa::CreateStudyReport(
+      const string& title,
+      const vector<string>& resultDirectories,
+      const vector<string>& studyNames)
+{
+   CbmLitTrackingQaStudyReport report;
+   report.SetTitle(title);
+   ofstream foutHtml(string(fOutputDir + "/tracking_qa_study.html").c_str());
+   ofstream foutLatex(string(fOutputDir + "/tracking_qa_study.tex").c_str());
+   ofstream foutText(string(fOutputDir + "/tracking_qa_study.txt").c_str());
+   report.Create(kLitText, cout, resultDirectories, studyNames);
+   report.Create(kLitHtml, foutHtml, resultDirectories, studyNames);
+   report.Create(kLitLatex, foutLatex, resultDirectories, studyNames);
+   report.Create(kLitText, foutText, resultDirectories, studyNames);
 }
 
 void CbmLitTrackingQa::SetMinNofPointsSts(Int_t minNofPointsSts)
@@ -151,19 +164,6 @@ void CbmLitTrackingQa::SetMinNofHitsMuch(Int_t minNofHitsMuch)
 void CbmLitTrackingQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts)
 {
 //   fTrackingQa->SetUseConsecutivePointsInSts(useConsecutivePointsInSts);
-}
-
-void CbmLitTrackingQa::CreateSummaryReport(
-      const string& title,
-      const vector<string>& resultDirectories,
-      const vector<string>& studyNames)
-{
-   CbmLitTrackingQaStudyReport report(kLitHtml);
-   string fileType = ".html";
-//   if (reportType == kLitHtml) fileType = ".html";
-//   if (reportType == kLitText) fileType = ".txt";
-   ofstream fout(string(fOutputDir + "/rec_qa_study" + fileType).c_str());
-   report.Create(fout, resultDirectories, studyNames);
 }
 
 void CbmLitTrackingQa::DrawHistosFromFile(

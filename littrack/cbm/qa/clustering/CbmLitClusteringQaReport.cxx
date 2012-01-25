@@ -7,14 +7,16 @@
 #include "CbmLitClusteringQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
+#include "TSystem.h"
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
 using std::endl;
 using boost::assign::list_of;
+using boost::property_tree::json_parser_error;
 using lit::ToString;
 
-CbmLitClusteringQaReport::CbmLitClusteringQaReport(
-      LitReportType reportType) : CbmLitSimulationReport(reportType)
+CbmLitClusteringQaReport::CbmLitClusteringQaReport()
 {
 
 }
@@ -25,19 +27,46 @@ CbmLitClusteringQaReport::~CbmLitClusteringQaReport()
 }
 
 void CbmLitClusteringQaReport::Create(
+   LitReportType reportType,
    ostream& out,
-   boost::property_tree::ptree* qa,
-   boost::property_tree::ptree* ideal,
-   boost::property_tree::ptree* check)
+   const string& resultDirectory)
 {
-   fQa = qa;
-   fIdeal = ideal;
-   fCheck = check;
+   CreateReportElement(reportType);
 
+   try {
+      read_json(resultDirectory + "/clustering_qa.json", fQa);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
+
+   try {
+      read_json(resultDirectory + "/clustering_qa_check.json", fCheck);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
+
+   try {
+      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/clustering/clustering_qa_ideal.json");
+      read_json(idealFile.c_str(), fIdeal);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
+
+   Create(out);
+
+   fQa.clear();
+   fCheck.clear();
+   fIdeal.clear();
+
+   DeleteReportElement();
+}
+
+void CbmLitClusteringQaReport::Create(
+   ostream& out)
+{
    out.precision(3);
    out << fR->DocumentBegin();
-
-  // out << "Number of events: " << PrintValue("hEventNo") << endl;
+   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
 
    // Number of objects table
    out << fR->TableBegin("Number of objects statistics", list_of("")("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF"));
@@ -71,12 +100,12 @@ string CbmLitClusteringQaReport::PrintNofStatistics(
         const string& muchS,
         const string& tof)
 {
-   string st1 = (mvd != "" && PropertyExists(mvd)) ? ToString<Int_t>(fQa->get(mvd, -1.)) : "-";
-   string st2 = (sts != "" && PropertyExists(sts)) ? ToString<Int_t>(fQa->get(sts, -1.)) : "-";
-   string st3 = (rich != "" && PropertyExists(rich)) ? ToString<Int_t>(fQa->get(rich, -1.)) : "-";
-   string st4 = (trd != "" && PropertyExists(trd)) ? ToString<Int_t>(fQa->get(trd, -1.)) : "-";
-   string st5 = (muchP != "" && PropertyExists(muchP)) ? ToString<Int_t>(fQa->get(muchP, -1.)) : "-";
-   string st6 = (muchS != "" && PropertyExists(muchS)) ? ToString<Int_t>(fQa->get(muchS, -1.)) : "-";
-   string st7 = (tof!= "" && PropertyExists(tof)) ? ToString<Int_t>(fQa->get(tof, -1.)) : "-";
+   string st1 = (mvd != "" && PropertyExists(mvd)) ? ToString<Int_t>(fQa.get(mvd, -1.)) : "-";
+   string st2 = (sts != "" && PropertyExists(sts)) ? ToString<Int_t>(fQa.get(sts, -1.)) : "-";
+   string st3 = (rich != "" && PropertyExists(rich)) ? ToString<Int_t>(fQa.get(rich, -1.)) : "-";
+   string st4 = (trd != "" && PropertyExists(trd)) ? ToString<Int_t>(fQa.get(trd, -1.)) : "-";
+   string st5 = (muchP != "" && PropertyExists(muchP)) ? ToString<Int_t>(fQa.get(muchP, -1.)) : "-";
+   string st6 = (muchS != "" && PropertyExists(muchS)) ? ToString<Int_t>(fQa.get(muchS, -1.)) : "-";
+   string st7 = (tof!= "" && PropertyExists(tof)) ? ToString<Int_t>(fQa.get(tof, -1.)) : "-";
    return fR->TableRow(list_of(name)(st1)(st2)(st3)(st4)(st5)(st6)(st7));
 }

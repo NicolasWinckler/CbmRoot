@@ -10,7 +10,9 @@
 
 #include "FairTask.h"
 #include <string>
+#include <vector>
 using std::string;
+using std::vector;
 class CbmLitHistManager;
 class CbmLitClusteringQaCalculator;
 
@@ -46,6 +48,23 @@ public:
     /** Setters */
     void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
 
+    /**
+     * \brief Generate summary report out of several different simulation results.
+     * \param[in] title Title of report.
+     * \param[in] resultDirectories Paths to directories with resuls.
+     * \param[in] studyNames Study names which are displayed in report.
+     */
+    void CreateStudyReport(
+          const string& title,
+          const vector<string>& resultDirectories,
+          const vector<string>& studyNames);
+
+    /**
+     * TODO: Add comments
+     */
+    void CreateSimulationReport(
+          const string& title,
+          const string& resultDirectory);
 private:
     CbmLitHistManager* fHM; // Histogram manager
     CbmLitClusteringQaCalculator* fClusteringQa; // Clustering performance calculator

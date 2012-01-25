@@ -681,12 +681,16 @@ void CbmLitFieldQa::CreatePropertyTree()
 
    write_json(std::string(fOutputDir + "field_qa.json").c_str(), qa);
 
-   // Create HTML page
+   // Create report
    // TODO: implement ideal and check property trees
    boost::property_tree::ptree ideal, check;
-   CbmLitFieldQaReport html(kLitHtml);
-   std::ofstream foutHtml(std::string(fOutputDir + "rec_qa.html").c_str());
-   html.Create(foutHtml, &qa, &ideal, &check);
+   CbmLitFieldQaReport html;
+   std::ofstream foutHtml(std::string(fOutputDir + "field_qa.html").c_str());
+   std::ofstream foutLatex(std::string(fOutputDir + "field_qa.tex").c_str());
+   std::ofstream foutText(std::string(fOutputDir + "field_qa.txt").c_str());
+   html.Create(kLitHtml, foutHtml, fOutputDir);
+   html.Create(kLitLatex, foutLatex, fOutputDir);
+   html.Create(kLitText, foutText, fOutputDir);
 }
 
 

@@ -28,10 +28,9 @@ class CbmLitTrackingQaStudyReport : public CbmLitStudyReport
 {
 public:
    /**
-    * \brief Constructor with report type.
-    * \param[in] reportType Type of report to be produced.
+    * \brief Constructor.
     */
-   CbmLitTrackingQaStudyReport(LitReportType reportType);
+   CbmLitTrackingQaStudyReport();
 
    /**
     * \brief Destructor.
@@ -42,6 +41,7 @@ public:
     * \brief Inherited from CbmLitStudyReport.
     */
    void Create(
+         LitReportType reportType,
          ostream& out,
          const vector<string>& resultDirectories,
          const vector<string>& studyNames);

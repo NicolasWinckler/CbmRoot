@@ -30,10 +30,9 @@ enum LitReportType {kLitHtml, kLitLatex, kLitText};
 class CbmLitReport {
 public:
    /**
-    * \brief Constructor with report type.
-    * \param[in] reportType Type of the report to be produced.
+    * \brief Constructor.
     */
-   CbmLitReport(LitReportType reportType);
+   CbmLitReport();
 
    /**
     * \brief Destructor.
@@ -57,6 +56,18 @@ public:
    void SetIsUseChecking(bool isCheck){ fIsUseChecking = isCheck; }
 
 protected:
+   /**
+    * \brief Create concrete CbmLitReportElement instance based on report type.
+    * \param[in] reportType Type of the report to be produced.
+    */
+   void CreateReportElement(
+         LitReportType reportType);
+
+   /**
+    * \brief Delete report element. Normally should be called at the end of Create function.
+    */
+   void DeleteReportElement();
+
    string fTitle; // Title of report
    string fAuthor; // Author of report
 //   string fDate; // Date when report was generated

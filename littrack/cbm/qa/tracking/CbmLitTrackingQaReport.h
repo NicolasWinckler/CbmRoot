@@ -23,10 +23,9 @@ class CbmLitTrackingQaReport : public CbmLitSimulationReport
 {
 public:
    /**
-    * \brief Constructor with report type.
-    * \param[in] reportType Type of report to be produced.
+    * \brief Constructor.
     */
-   CbmLitTrackingQaReport(LitReportType reportType);
+   CbmLitTrackingQaReport();
 
    /**
     * \brief Destructor.
@@ -37,22 +36,26 @@ public:
     * \brief Inherited from CbmLitSimulationReport.
     */
    void Create(
+      LitReportType reportType,
       ostream& out,
-      boost::property_tree::ptree* qa,
-      boost::property_tree::ptree* ideal,
-      boost::property_tree::ptree* check);
+      const string& resultDirectory);
 
 protected:
+   /**
+    * \brief
+    */
+   void Create(
+      ostream& out);
 
    /**
-    * \brief Prints specified value.
+    * \brief Print specified value.
     * \param[in] hist full name of the property in property tree.
     * \return string with table row in specific format.
     */
    string PrintValue(
          const string& hist) {
       stringstream ss;
-      ss << fQa->get(hist, -1.);
+      ss << fQa.get(hist, -1.);
       return ss.str();
    }
 

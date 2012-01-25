@@ -4,8 +4,11 @@
  * \date 2011
  */
 #include "CbmLitResultChecker.h"
-
-#include <map>
+#include <iostream>
+#include <boost/property_tree/json_parser.hpp>
+using boost::property_tree::json_parser_error;
+using std::cout;
+using std::pair;
 
 CbmLitResultChecker::CbmLitResultChecker()
 {
@@ -18,17 +21,45 @@ CbmLitResultChecker::~CbmLitResultChecker()
 }
 
 void CbmLitResultChecker::DoCheck(
-      const boost::property_tree::ptree& qa,
-      const boost::property_tree::ptree& ideal,
-      boost::property_tree::ptree& out)
+      const string& qaFile,
+      const string& idealFile,
+      const string& checkFile)
+{
+   ptree qa, ideal, check;
+
+   try {
+      read_json(qaFile.c_str(), qa);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
+
+   try {
+      read_json(idealFile.c_str(), ideal);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
+
+   DoCheck(qa, ideal, check);
+
+   try {
+      write_json(checkFile.c_str(), check);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
+}
+
+void CbmLitResultChecker::DoCheck(
+      const ptree& qa,
+      const ptree& ideal,
+      ptree& out)
 {
    // Build map out of property tree for convenience.
-   std::map<std::string, float> mymap;
+   map<string, float> mymap;
    PropertyTreeToMap("", qa, mymap);
 
    // Iterate over the map, get each property and compare it to ideal.
-   for (std::map<std::string, float>::const_iterator it = mymap.begin(); it != mymap.end(); it++) {
-      std::map<std::string, float>::value_type v = *it;
+   for (map<string, float>::const_iterator it = mymap.begin(); it != mymap.end(); it++) {
+      map<string, float>::value_type v = *it;
 
       boost::optional<float> vmin = ideal.get_optional<float>(v.first + ".min");
       boost::optional<float> vmax = ideal.get_optional<float>(v.first + ".max");
@@ -53,17 +84,17 @@ void CbmLitResultChecker::DoCheck(
 }
 
 void CbmLitResultChecker::PropertyTreeToMap(
-      const std::string& path,
-      const boost::property_tree::ptree& pt,
-      std::map<std::string, float>& mymap)
+      const string& path,
+      const ptree& pt,
+      map<string, float>& mymap)
 {
    if (pt.size() == 0) {
-      mymap.insert(std::pair<std::string, float>(path, pt.get_value(-1.f)));
+      mymap.insert(pair<string, float>(path, pt.get_value(-1.f)));
       return;
    }
    for (boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {
       boost::property_tree::ptree::value_type v = *it;
-      std::string path1 = (path != "") ? (path + "." + v.first) : v.first;
+      string path1 = (path != "") ? (path + "." + v.first) : v.first;
       PropertyTreeToMap(path1, v.second, mymap);
    }
 }

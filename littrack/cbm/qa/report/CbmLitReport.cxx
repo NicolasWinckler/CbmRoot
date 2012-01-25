@@ -9,7 +9,7 @@
 #include "CbmLitHtmlReportElement.h"
 #include "CbmLitTextReportElement.h"
 
-CbmLitReport::CbmLitReport(LitReportType reportType):
+CbmLitReport::CbmLitReport():
    fTitle(""),
    fAuthor(""),
    fErrorColor(""),
@@ -18,12 +18,23 @@ CbmLitReport::CbmLitReport(LitReportType reportType):
    fIsUseChecking(true),
    fR(NULL)
 {
+}
+
+CbmLitReport::~CbmLitReport()
+{
+   //TODO: Check why it crashes here when trying to delete memory.
+//   DeleteReportElement();
+}
+
+void CbmLitReport::CreateReportElement(
+      LitReportType reportType)
+{
    if (reportType == kLitLatex) fR = new CbmLitLatexReportElement();
    else if (reportType == kLitHtml) fR = new CbmLitHtmlReportElement();
    else if (reportType == kLitText) fR = new CbmLitTextReportElement();
 }
 
-CbmLitReport::~CbmLitReport()
+void CbmLitReport::DeleteReportElement()
 {
-   if (fR) delete fR;
+   if (NULL != fR) delete fR;
 }

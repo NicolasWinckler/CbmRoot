@@ -8,15 +8,12 @@
 
 #include "TSystem.h"
 
-
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
 
-CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport(
-      LitReportType reportType) : CbmLitStudyReport(reportType)
+CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport()
 {
 }
 
@@ -25,10 +22,13 @@ CbmLitTrackingQaStudyReport::~CbmLitTrackingQaStudyReport()
 }
 
 void CbmLitTrackingQaStudyReport::Create(
+      LitReportType reportType,
       ostream& out,
       const vector<string>& resultDirectories,
       const vector<string>& studyNames)
 {
+   CreateReportElement(reportType);
+
    int nofStudies = resultDirectories.size();
 
    fResultDirectories = resultDirectories;
@@ -37,10 +37,10 @@ void CbmLitTrackingQaStudyReport::Create(
    fQa.resize(nofStudies);
    fCheck.resize(nofStudies);
    for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
-      read_json(resultDirectories[iStudy] + "/rec_qa.json", fQa[iStudy]);
-      read_json(resultDirectories[iStudy] + "/rec_qa_check.json", fCheck[iStudy]);
+      read_json(resultDirectories[iStudy] + "/tracking_qa.json", fQa[iStudy]);
+      read_json(resultDirectories[iStudy] + "/tracking_qa_check.json", fCheck[iStudy]);
    }
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/rec_qa_ideal.json");
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking_qa_ideal.json");
    read_json(idealFile.c_str(), fIdeal);
 
    Create(out);
@@ -50,6 +50,8 @@ void CbmLitTrackingQaStudyReport::Create(
    fQa.clear();
    fCheck.clear();
    fIdeal.clear();
+
+   DeleteReportElement();
 }
 
 void CbmLitTrackingQaStudyReport::Create(
@@ -142,13 +144,13 @@ void CbmLitTrackingQaStudyReport::Create(
    out << fR->TableEnd() << endl;
    // For image paths put only file name without type, e.g. ".eps" or ".png".
    // Type will be added automatically.
-   if (isSts) out << PrintImageTable("STS reconstruction efficiency", "rec_qa_sts_efficiency");
-   if (isTrd || isMuch) out << PrintImageTable(recDet + " reconstruction efficiency", "rec_qa_rec_efficiency");
-   if (isTof) out << PrintImageTable("TOF hit matching efficiency", "rec_qa_tof_efficiency");
-   if (isRich) out << PrintImageTable("RICH efficiency electrons", "rec_qa_rich_efficiency_electrons");
-   out << PrintImageTable("Global reconstruction efficiency", "rec_qa_global_efficiency_all");
-   out << PrintImageTable("Global reconstruction efficiency for signal", "rec_qa_global_efficiency_signal");
-   if (isRich) out << PrintImageTable("Global reconstruction efficiency with RICH", "rec_qa_sts_rich_trd_tof_efficiency_electrons");
+   if (isSts) out << PrintImageTable("STS reconstruction efficiency", "tracking_qa_sts_efficiency");
+   if (isTrd || isMuch) out << PrintImageTable(recDet + " reconstruction efficiency", "tracking_qa_rec_efficiency");
+   if (isTof) out << PrintImageTable("TOF hit matching efficiency", "tracking_qa_tof_efficiency");
+   if (isRich) out << PrintImageTable("RICH efficiency electrons", "tracking_qa_rich_efficiency_electrons");
+   out << PrintImageTable("Global reconstruction efficiency", "tracking_qa_global_efficiency_all");
+   out << PrintImageTable("Global reconstruction efficiency for signal", "tracking_qa_global_efficiency_signal");
+   if (isRich) out << PrintImageTable("Global reconstruction efficiency with RICH", "tracking_qa_sts_rich_trd_tof_efficiency_electrons");
 
    out <<  fR->DocumentEnd();
 }

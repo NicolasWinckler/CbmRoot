@@ -54,65 +54,28 @@ public:
     */
    virtual void Finish();
 
-   /**
-    *
-    */
-   void CreateReport();
-
-   /**
-    * \brief Set minimum number of MC points in STS.
-    * \param[in] minNofPointsSts Minimum number of MC points in STS.
-    */
+   /** Setters **/
    void SetMinNofPointsSts(Int_t minNofPointsSts);
-
-   /**
-    * \brief Set minimum number of MC points in TRD.
-    * \param[in] minNofPointsTrd Minimum number of MC points in TRD.
-    */
    void SetMinNofPointsTrd(Int_t minNofPointsTrd);
-
-   /* Sets the minimum number of MC points in MUCH.
-    * @param minNofPointsMuch Minimum number of MC points in MUCH. */
    void SetMinNofPointsMuch(Int_t minNofPointsMuch);
-
-   /* Sets the minimum number of MC points in TOF.
-    * @param minNofPointsTof Minimum number of MC points in TOF. */
    void SetMinNofPointsTof(Int_t minNofPointsTof);
-
-   /* Sets the quota value, which is true/all hits for track to
-    * be considered correctly reconstructed.
-    * @param quota Quota value. */
-   void SetQuota(Double_t quota);
-
-   /* Sets the minimum number of hits in MC RICH ring.
-    * @param minNofHits Minimum number of hits in MC RICH ring. */
    void SetMinNofHitsRich(Int_t minNofHits);
-
-   /* Sets the quota value for RICH
-    * @param quota Quota value. */
+   void SetQuota(Double_t quota);
    void SetQuotaRich(Double_t quota);
-
-   /* Sets the minimum number of hits in TRD track.
-     * @param minNofPointsTrd Minimum number of hits in TRD. */
    void SetMinNofHitsTrd(Int_t minNofHitsTrd);
-
-   /* Sets the minimum number of hits in MUCH track.
-    * @param minNofHitsMuch Minimum number of hits in MUCH track. */
    void SetMinNofHitsMuch(Int_t minNofHitsMuch);
-
-   /* Sets the output directory for images.
-    * @param dir Directory name. */
    void SetOutputDir(const std::string& dir) { fOutputDir = dir; }
-
-   /**
-    * \brief Set if consecute MC points are used for efficiency normalization.
-    * \param[in] param quota Quota value.
-    */
    void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts);
 
-   void CreateReport(
+   /**
+    * \brief Generate summary report out of several different simulation results.
+    * \param[in] title Title of report.
+    * \param[in] resultDirectories Paths to directories with resuls.
+    * \param[in] names Study names which displayed in report.
+    */
+   void CreateSummaryReport(
          const string& title,
-         const vector<string>& results,
+         const vector<string>& resultDirectories,
          const vector<string>& names);
 
    /**
@@ -123,6 +86,11 @@ public:
          const std::string& fileName);
 
 private:
+   /**
+    * \brief Create final simulation report for this tracking QA run.
+    */
+   void CreateSimulationReport();
+
    CbmLitHistManager* fHM; // Histogram manager
    CbmLitTrackingQaCalculator* fTrackingQa; // Tracking performance calculator
    string fOutputDir; // Output directory for results

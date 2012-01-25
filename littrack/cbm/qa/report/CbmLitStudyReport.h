@@ -44,8 +44,9 @@ public:
     * \param[in] ideal Vector of property trees with ideal results.
     * \param[in] check Vector of property trees with checked results.
     */
-   virtual void Create(
+   virtual void Create( // TODO: check if we have to pass ptrees, since directory names are already passed
          ostream& out,
+         const vector<string>& resultDirectories,
          const vector<string>& studyNames,
          const vector<ptree*>& qa,
          ptree* ideal,
@@ -64,6 +65,8 @@ protected:
    ptree* fIdeal;
    // Property tree with checked results for each study
    vector<ptree*> fCheck;
+   // Directory names of study results
+   vector<string> fResultDirectories;
    // Names of studies
    vector<string> fStudyNames;
 };

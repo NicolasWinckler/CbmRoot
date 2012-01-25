@@ -72,10 +72,10 @@ void CbmLitTrackingQa::Finish()
    CbmLitTrackingQaDraw drawQa;
    drawQa.Draw(fHM, fOutputDir);
 
-   CreateReport();
+   CreateSimulationReport();
 }
 
-void CbmLitTrackingQa::CreateReport()
+void CbmLitTrackingQa::CreateSimulationReport()
 {
    CbmLitTrackingQaPTreeCreator ptc;
    boost::property_tree::ptree qa = ptc.Create(fHM);
@@ -153,20 +153,12 @@ void CbmLitTrackingQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsI
 //   fTrackingQa->SetUseConsecutivePointsInSts(useConsecutivePointsInSts);
 }
 
-void CbmLitTrackingQa::CreateReport(
+void CbmLitTrackingQa::CreateSummaryReport(
       const string& title,
       const vector<string>& results,
       const vector<string>& names)
 {
    CbmLitTrackingQaStudyReport report(kLitHtml);
-   //TODO use CBMLitDetectorSetup class
-//   report.SetIsElectronSetup(IsElectronSetup());
-//   report.SetDetectorPresence(kMVD, GetDetectorPresence(kMVD));
-//   report.SetDetectorPresence(kSTS, GetDetectorPresence(kSTS));
-//   report.SetDetectorPresence(kRICH, GetDetectorPresence(kRICH));
-//   report.SetDetectorPresence(kTRD, GetDetectorPresence(kTRD));
-//   report.SetDetectorPresence(kMUCH, GetDetectorPresence(kMUCH));
-//   report.SetDetectorPresence(kTOF, GetDetectorPresence(kTOF));
 
    string fileType = ".html";
 //   if (reportType == kLitHtml) fileType = ".html";
@@ -189,7 +181,7 @@ void CbmLitTrackingQa::CreateReport(
       read_json(results[i] + "/rec_qa_check.json", *(check[i]));
    }
 
-   report.Create(fout, names, qa, &ideal, check);
+   report.Create(fout, results, names, qa, &ideal, check);
 
    for (int i = 0; i < results.size(); i++) {
       delete qa[i];

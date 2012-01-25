@@ -43,6 +43,7 @@ public:
     */
    void Create(
          ostream& out,
+         const vector<string>& resultDirectories,
          const vector<string>& studyNames,
          const vector<boost::property_tree::ptree*>& qa,
          boost::property_tree::ptree* ideal,
@@ -72,12 +73,12 @@ protected:
          const string& name);
 
    /**
-    * \brief Print images with reconstruction performance.
+    * \brief Print table of images with reconstruction performance.
     * \param[in] title Title of the image.
     * \param[in] file Name of the image file.
     * \return string with table which contains images in HTML format.
     */
-   virtual string PrintImage(
+   virtual string PrintImageTable(
          const string& title,
          const string& file);
 

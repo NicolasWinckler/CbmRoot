@@ -30,7 +30,17 @@ CbmLitTrackingQa::CbmLitTrackingQa():
    fTrackingQa(NULL),
    fHM(NULL),
    fOutputDir(""),
-   fDet()
+   fDet(),
+   fMinNofPointsSts(4),
+   fMinNofPointsTrd(8),
+   fMinNofPointsMuch(10),
+   fMinNofPointsTof(1),
+   fMinNofHitsRich(7),
+   fQuota(0.7),
+   fQuotaRich(0.6),
+   fMinNofHitsTrd(8),
+   fMinNofHitsMuch(10),
+   fUseConsecutivePointsInSts(true)
 {
 }
 
@@ -53,6 +63,16 @@ InitStatus CbmLitTrackingQa::Init()
 
    fTrackingQa = new CbmLitTrackingQaCalculator(fHM);
    fTrackingQa->Init();
+   fTrackingQa->SetMinNofPointsSts(fMinNofPointsSts);
+   fTrackingQa->SetMinNofPointsTrd(fMinNofPointsTrd);
+   fTrackingQa->SetMinNofPointsMuch(fMinNofPointsMuch);
+   fTrackingQa->SetMinNofPointsTof(fMinNofPointsTof);
+   fTrackingQa->SetMinNofHitsRich(fMinNofHitsRich);
+   fTrackingQa->SetQuota(fQuota);
+   fTrackingQa->SetQuotaRich(fQuotaRich);
+   fTrackingQa->SetMinNofHitsTrd(fMinNofHitsTrd);
+   fTrackingQa->SetMinNofHitsMuch(fMinNofHitsMuch);
+   fTrackingQa->SetUseConsecutivePointsInSts(fUseConsecutivePointsInSts);
 
    return kSUCCESS;
 }
@@ -114,56 +134,6 @@ void CbmLitTrackingQa::CreateStudyReport(
    report.Create(kLitHtml, foutHtml, resultDirectories, studyNames);
    report.Create(kLitLatex, foutLatex, resultDirectories, studyNames);
    report.Create(kLitText, foutText, resultDirectories, studyNames);
-}
-
-void CbmLitTrackingQa::SetMinNofPointsSts(Int_t minNofPointsSts)
-{
-//   fTrackingQa->SetMinNofPointsSts(minNofPointsSts);
-}
-
-void CbmLitTrackingQa::SetMinNofPointsTrd(Int_t minNofPointsTrd)
-{
-//   fTrackingQa->SetMinNofPointsTrd(minNofPointsTrd);
-}
-
-void CbmLitTrackingQa::SetMinNofPointsMuch(Int_t minNofPointsMuch)
-{
-//   fTrackingQa->SetMinNofPointsMuch(minNofPointsMuch);
-}
-
-void CbmLitTrackingQa::SetMinNofPointsTof(Int_t minNofPointsTof)
-{
-//   fTrackingQa->SetMinNofPointsTof(minNofPointsTof);
-}
-
-void CbmLitTrackingQa::SetQuota(Double_t quota)
-{
-//   fTrackingQa->SetQuota(quota);
-}
-
-void CbmLitTrackingQa::SetMinNofHitsRich(Int_t minNofHits)
-{
-//   fTrackingQa->SetMinNofHitsRich(minNofHits);
-}
-
-void CbmLitTrackingQa::SetQuotaRich(Double_t quota)
-{
-//   fTrackingQa->SetQuotaRich(quota);
-}
-
-void CbmLitTrackingQa::SetMinNofHitsTrd(Int_t minNofHitsTrd)
-{
-//   fTrackingQa->SetMinNofHitsTrd(minNofHitsTrd);
-}
-
-void CbmLitTrackingQa::SetMinNofHitsMuch(Int_t minNofHitsMuch)
-{
-//   fTrackingQa->SetMinNofHitsMuch(minNofHitsMuch);
-}
-
-void CbmLitTrackingQa::SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts)
-{
-//   fTrackingQa->SetUseConsecutivePointsInSts(useConsecutivePointsInSts);
 }
 
 void CbmLitTrackingQa::DrawHistosFromFile(

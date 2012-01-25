@@ -55,17 +55,17 @@ public:
    virtual void Finish();
 
    /** Setters **/
-   void SetMinNofPointsSts(Int_t minNofPointsSts);
-   void SetMinNofPointsTrd(Int_t minNofPointsTrd);
-   void SetMinNofPointsMuch(Int_t minNofPointsMuch);
-   void SetMinNofPointsTof(Int_t minNofPointsTof);
-   void SetMinNofHitsRich(Int_t minNofHits);
-   void SetQuota(Double_t quota);
-   void SetQuotaRich(Double_t quota);
-   void SetMinNofHitsTrd(Int_t minNofHitsTrd);
-   void SetMinNofHitsMuch(Int_t minNofHitsMuch);
+   void SetMinNofPointsSts(Int_t minNofPointsSts) { fMinNofPointsSts = minNofPointsSts; }
+   void SetMinNofPointsTrd(Int_t minNofPointsTrd) { fMinNofPointsTrd = minNofPointsTrd; }
+   void SetMinNofPointsMuch(Int_t minNofPointsMuch) { fMinNofPointsMuch = minNofPointsMuch; }
+   void SetMinNofPointsTof(Int_t minNofPointsTof) { fMinNofPointsTof = minNofPointsTof; }
+   void SetMinNofHitsRich(Int_t minNofHitsRich) { fMinNofHitsRich = minNofHitsRich; }
+   void SetQuota(Double_t quota) { fQuota = quota; }
+   void SetQuotaRich(Double_t quotaRich) { fQuotaRich = quotaRich; }
+   void SetMinNofHitsTrd(Int_t minNofHitsTrd) { fMinNofHitsTrd = minNofHitsTrd; }
+   void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch; }
+   void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts) { fUseConsecutivePointsInSts = useConsecutivePointsInSts; }
    void SetOutputDir(const std::string& dir) { fOutputDir = dir; }
-   void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts);
 
    /**
     * \brief Generate summary report out of several different simulation results.
@@ -97,6 +97,19 @@ private:
    CbmLitTrackingQaCalculator* fTrackingQa; // Tracking performance calculator
    string fOutputDir; // Output directory for results
    CbmLitDetectorSetup fDet; // Detector presence information
+
+   // Variables for temporary storage of QA parameters.
+   // These parameters later used in CbmLitTrackingQaCalculator.
+   Int_t fMinNofPointsSts;
+   Int_t fMinNofPointsTrd;
+   Int_t fMinNofPointsMuch;
+   Int_t fMinNofPointsTof;
+   Int_t fMinNofHitsRich;
+   Double_t fQuota;
+   Double_t fQuotaRich;
+   Int_t fMinNofHitsTrd;
+   Int_t fMinNofHitsMuch;
+   Bool_t fUseConsecutivePointsInSts;
 
    ClassDef(CbmLitTrackingQa, 1);
 };

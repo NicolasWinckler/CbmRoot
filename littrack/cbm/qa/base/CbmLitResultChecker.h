@@ -20,8 +20,8 @@ using std::map;
  *
  * Checking procedure compares two property trees:
  * "quality" property tree obtained from QA procedure vs.
- * "ideal" property tree. Results are
- * stored in the third property tree as "0" - "1"
+ * "ideal" property tree containing predefined limits for each value.
+ * Results are stored in the third property tree as "0" - "1"
  * if value was compared to ideal result
  * or "-1" if value was not compared.
  *
@@ -75,7 +75,7 @@ private:
     */
    void PropertyTreeToMap(
          const string& path,
-         const boost::property_tree::ptree& pt,
+         const ptree& pt,
          map<string, float>& mymap);
 };
 

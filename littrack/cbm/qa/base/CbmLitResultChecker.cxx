@@ -92,8 +92,8 @@ void CbmLitResultChecker::PropertyTreeToMap(
       mymap.insert(pair<string, float>(path, pt.get_value(-1.f)));
       return;
    }
-   for (boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {
-      boost::property_tree::ptree::value_type v = *it;
+   for (ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {
+      ptree::value_type v = *it;
       string path1 = (path != "") ? (path + "." + v.first) : v.first;
       PropertyTreeToMap(path1, v.second, mymap);
    }

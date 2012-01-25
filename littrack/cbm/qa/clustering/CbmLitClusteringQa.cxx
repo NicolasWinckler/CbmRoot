@@ -84,6 +84,7 @@ void CbmLitClusteringQa::CreateSimulationReport(
       const string& resultDirectory)
 {
    CbmLitClusteringQaReport report;
+   report.SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/clustering_qa.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/clustering_qa.tex").c_str());
    ofstream foutText(string(fOutputDir + "/clustering_qa.txt").c_str());

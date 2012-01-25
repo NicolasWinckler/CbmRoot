@@ -25,7 +25,7 @@ void draw_rec_qa()
 
 void DrawEffMethodsMuch()
 {
-	TCanvas *canvas = new TCanvas("rec_qa_eff_methods_signal","rec_qa_eff_methods_signal",600,500);
+	TCanvas *canvas = new TCanvas("tracking_qa_eff_methods_signal","tracking_qa_eff_methods_signal",600,500);
 	canvas->SetGrid();
 
 	std::string names[] = {"hRecMomEffMuon", "hRecMomAccMuon", "hRecMomRecMuon"};
@@ -51,20 +51,20 @@ void DrawEffMethodsMuch()
 	canvas->cd();
 	eff1->SetMinimum(0.);
 	eff1->SetMaximum(100.);
-	DrawHist1D(eff1, eff2, eff3, NULL, hname1, hname2, hname3, "",
+	DrawH1(eff1, eff2, eff3, NULL, hname1, hname2, hname3, "",
 			kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6);
 	lit::SaveCanvasAsImage(canvas, "./test/");
 }
 
 void DrawEffMethodsTrd()
 {
-	TCanvas *canvas = new TCanvas("rec_qa_eff_methods","rec_qa_eff_methods",600,500);
+	TCanvas *canvas = new TCanvas("tracking_qa_eff_methods","tracking_qa_eff_methods",600,500);
 	canvas->SetGrid();
 
-	TCanvas *canvas_all = new TCanvas("rec_qa_eff_all_methods","rec_qa_eff_all_methods",600,500);
+	TCanvas *canvas_all = new TCanvas("tracking_qa_eff_all_methods","tracking_qa_eff_all_methods",600,500);
 	canvas_all->SetGrid();
 
-	TCanvas *canvas_electrons = new TCanvas("rec_qa_eff_electrons_methods","rec_qa_eff_electrons_methods",600,500);
+	TCanvas *canvas_electrons = new TCanvas("tracking_qa_eff_electrons_methods","tracking_qa_eff_electrons_methods",600,500);
 	canvas_electrons->SetGrid();
 
 	TH1* eff1_1 = (TH1*)file1->Get("hRecMomEffAll");
@@ -96,21 +96,21 @@ void DrawEffMethodsTrd()
 	canvas->cd();
 	eff1_1->SetMinimum(0.);
 	eff1_1->SetMaximum(100.);
-	DrawHist1D(eff1_1, eff2_1, eff1_2, eff2_2, hname1, hname2, hname3, hname4,
+	DrawH1(eff1_1, eff2_1, eff1_2, eff2_2, hname1, hname2, hname3, hname4,
 			kLitLinear, kLitLinear, true, 0.2, 0.2, 0.85, 0.6);
 	lit::SaveCanvasAsImage(canvas, "./test/");
 
 	canvas_all->cd();
 	eff1_1->SetMinimum(0.);
 	eff1_1->SetMaximum(1.);
-	DrawHist1D(eff1_1, eff2_1, NULL, NULL, hname1, hname2, "", "",
+	DrawH1(eff1_1, eff2_1, NULL, NULL, hname1, hname2, "", "",
 			kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6);
 	lit::SaveCanvasAsImage(canvas_all, "./test/");
 
 	canvas_electrons->cd();
 	eff1_2->SetMinimum(0.);
 	eff1_2->SetMaximum(1.);
-	DrawHist1D(eff1_2, eff2_2, NULL, NULL, hname3, hname4, "", "",
+	DrawH1(eff1_2, eff2_2, NULL, NULL, hname3, hname4, "", "",
 			kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6);
 	lit::SaveCanvasAsImage(canvas_electrons, "./test/");
 }

@@ -37,27 +37,6 @@ function study_summary()
     export STUDYNAME2=nn
     export STUDYRESULT3=../results_$1_nn_parallel
     export STUDYNAME3=nn_parallel
- 
-    if [ "$1" = "muon" ] ; then    
-        export STUDYELECTRONSETUP=0
-        export STUDYMVD=0
-        export STUDYSTS=1
-        export STUDYRICH=0
-        export STUDYTRD=0
-        export STUDYMUCH=1
-        export STUDYTOF=1
-    else
-    if [ "$1" = "electron" ] ; then
-        export STUDYELECTRONSETUP=1
-        export STUDYMVD=0
-        export STUDYSTS=1
-        export STUDYRICH=1
-        export STUDYTRD=1
-        export STUDYMUCH=0
-        export STUDYTOF=1
-    fi
-    fi
-
     root -b -q -l "$VMCWORKDIR/macro/littrack/qa_study.C"
 }
 

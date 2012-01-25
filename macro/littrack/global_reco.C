@@ -407,6 +407,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		run->AddTask(fitQa);
 
 		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+		clusteringQa->SetOutputDir(std::string(resultDir));
 		run->AddTask(clusteringQa);
 	}
 

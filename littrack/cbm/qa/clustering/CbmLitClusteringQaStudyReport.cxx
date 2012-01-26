@@ -14,6 +14,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
+using boost::property_tree::json_parser_error;
 using lit::ToString;
 
 CbmLitClusteringQaStudyReport::CbmLitClusteringQaStudyReport()
@@ -42,11 +43,19 @@ void CbmLitClusteringQaStudyReport::Create(
    fQa.resize(nofStudies);
    fCheck.resize(nofStudies);
    for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
-      read_json(resultDirectories[iStudy] + "/clustering_qa.json", fQa[iStudy]);
-      read_json(resultDirectories[iStudy] + "/clustering_qa_check.json", fCheck[iStudy]);
+      try {
+         read_json(resultDirectories[iStudy] + "/clustering_qa.json", fQa[iStudy]);
+         read_json(resultDirectories[iStudy] + "/clustering_qa_check.json", fCheck[iStudy]);
+      } catch (json_parser_error error) {
+         cout << error.what();
+      }
    }
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/clustering_qa_ideal.json");
-   read_json(idealFile.c_str(), fIdeal);
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/clustering/clustering_qa_ideal.json");
+   try {
+      read_json(idealFile.c_str(), fIdeal);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
 
    Create(out);
 
@@ -64,7 +73,7 @@ void CbmLitClusteringQaStudyReport::Create(
 {
    out.precision(3);
    out << fR->DocumentBegin();
-   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
+   out << fR->Title(0, fTitle);
 
    out << fR->TableBegin("Number of objects", list_of(string("")).range(fStudyNames));
 

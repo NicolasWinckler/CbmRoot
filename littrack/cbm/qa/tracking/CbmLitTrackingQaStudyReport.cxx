@@ -12,6 +12,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
+using boost::property_tree::json_parser_error;
 
 CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport()
 {
@@ -37,11 +38,19 @@ void CbmLitTrackingQaStudyReport::Create(
    fQa.resize(nofStudies);
    fCheck.resize(nofStudies);
    for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
-      read_json(resultDirectories[iStudy] + "/tracking_qa.json", fQa[iStudy]);
-      read_json(resultDirectories[iStudy] + "/tracking_qa_check.json", fCheck[iStudy]);
+      try {
+         read_json(resultDirectories[iStudy] + "/tracking_qa.json", fQa[iStudy]);
+         read_json(resultDirectories[iStudy] + "/tracking_qa_check.json", fCheck[iStudy]);
+      } catch (json_parser_error error) {
+         cout << error.what();
+      }
    }
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking_qa_ideal.json");
-   read_json(idealFile.c_str(), fIdeal);
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
+   try {
+      read_json(idealFile.c_str(), fIdeal);
+   } catch (json_parser_error error) {
+      cout << error.what();
+   }
 
    Create(out);
 
@@ -66,7 +75,8 @@ void CbmLitTrackingQaStudyReport::Create(
 
    out.precision(3);
    out << fR->DocumentBegin();
-   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
+   //out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
+   out << fR->Title(0, fTitle);
 
    out << fR->TableBegin("Number of events", list_of(string("")).range(fStudyNames));
    if (PropertyExists("hEventNo")) out << PrintRow("hEventNo", "Number of events");

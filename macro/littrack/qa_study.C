@@ -48,7 +48,7 @@ void qa_study()
    trackingQa.SetOutputDir(outputDir);
    trackingQa.CreateStudyReport("Tracking QA", results, names);
 
-//   CbmLitClusteringQa clusteringQa;
-//   clusteringQa.SetOutputDir(outputDir);
-//   clusteringQa.CreateStudyReport("Clustering QA", results, names);
+   CbmLitClusteringQa clusteringQa;
+   clusteringQa.SetOutputDir(outputDir);
+   clusteringQa.CreateStudyReport("Clustering QA", results, names);
 }

@@ -9,18 +9,21 @@
 #define CBMLITFITQA_H_
 
 #include "FairTask.h"
+#include <string>
 
 class CbmLitMCTrackCreator;
 class TH1F;
 class FairTrackParam;
 class CbmLitMCPoint;
+class CbmLitHistManager;
+
+using std::string;
 
 /**
  * \class CbmLitFitQa
- *
  * \brief Track fit QA for track reconstruction.
  *
- * Calculates residual and pull distributions for
+ * Calculate residual and pull distributions for
  * first and last track parameters of MVD/STS, TRD and MUCH
  * for reconstructed tracks.
  *
@@ -66,7 +69,7 @@ public:
    void SetStsMinNofHits(Int_t minNofHits) { fStsMinNofHits = minNofHits; }
    void SetTrdMinNofHits(Int_t minNofHits) { fTrdMinNofHits = minNofHits; }
    void SetMuchMinNofHits(Int_t minNofHits) { fMuchMinNofHits = minNofHits; }
-   void SetOutputDir(const std::string& dir) { fOutputDir = dir; }
+   void SetOutputDir(const string& dir) { fOutputDir = dir; }
 
 private:
 
@@ -91,14 +94,18 @@ private:
    void FillResidualsAndPulls(
       const FairTrackParam* par,
       const CbmLitMCPoint* mcPoint,
-      std::vector<TH1F*>& histos,
-      std::vector<TH1F*>& wrongCov,
+      const string& histName,
+      const string& wrongName,
       Float_t wrongPar);
 
    void DrawHistos(
-         const std::string& name,
-         std::vector<TH1F*>& histos,
-         std::vector<TH1F*>& wrongHistos);
+         const string& name,
+         const string& histName,
+         const string& wrongName);
+
+   void CreateSimulationReport(
+         const string& title,
+         const string& resultDirectory);
 
    // Data branches
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
@@ -114,29 +121,17 @@ private:
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
    TClonesArray* fMuchStripHits; // CbmMuchStripHit array
 
-   // Histograms
+   // Histograms for residuals and pulls. Number of parameters.
    // histogram[parameter]
    // parameters:
    // [0-4] - residuals (x, y, tx, ty, q/p)
    // [5-9] - pulls (x, y, tx, ty, q/p)
    static const Int_t NOF_PARAMS = 10;
-   std::vector<TH1F*> fStsHistosFirst; // STS first track parameter
-   std::vector<TH1F*> fStsHistosLast; // STS last track parameter
-   std::vector<TH1F*> fTrdHistosFirst; // TRD first track parameter
-   std::vector<TH1F*> fTrdHistosLast; // TRD last track parameter
-   std::vector<TH1F*> fMuchHistosFirst; // MUCH first track parameter
-   std::vector<TH1F*> fMuchHistosLast; // MUCH last track parameter
 
-   // Histograms for calculation of number of incorrect diagonal elements
+   // Histograms for number of incorrect diagonal elements
    // histogram[parameter]
-   // [0-4] number of wrong diagona; elements in cov matrix in dependence on number of hits
+   // [0-4] number of wrong diagonal elements in covariance matrix in dependence on number of hits
    static const Int_t NOF_PARAMS_WRONG_COV = 5;
-   std::vector<TH1F*> fStsHistosFirstWrongCov; // STS first track parameter
-   std::vector<TH1F*> fStsHistosLastWrongCov; // STS last track parameter
-   std::vector<TH1F*> fTrdHistosFirstWrongCov; // TRD first track parameter
-   std::vector<TH1F*> fTrdHistosLastWrongCov; // TRD last track parameter
-   std::vector<TH1F*> fMuchHistosFirstWrongCov; // MUCH first track parameter
-   std::vector<TH1F*> fMuchHistosLastWrongCov; // MUCH last track parameter
 
    // MC track creator tool
    CbmLitMCTrackCreator* fMCTrackCreator;
@@ -149,6 +144,8 @@ private:
    Int_t fMuchMinNofHits; // Cut on minimum number of hits in track in MUCH
 
    std::string fOutputDir; // Output directory for images
+
+   CbmLitHistManager* fHM; // Histogram manager
 
    ClassDef(CbmLitFitQa, 1)
 };

@@ -123,6 +123,8 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaCalculator.cxx
+      cbm/qa/propagation/CbmLitFitQaPTreeCreator.cxx
+      cbm/qa/propagation/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/report/CbmLitReport.cxx      
@@ -148,7 +150,6 @@ cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
 cbm/finder/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/propagation/CbmLitPropagationQa.h
-cbm/qa/propagation/CbmLitFitQa.h
 cbm/qa/geo/CbmLitSimpleGeoQa.h 
 cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/material/CbmLitCheckMultipleScattering.h
@@ -178,6 +179,7 @@ If(Boost_FOUND)
       ${LITTRACK_HEADERS}
       cbm/qa/tracking/CbmLitTrackingQa.h
       cbm/qa/clustering/CbmLitClusteringQa.h
+      cbm/qa/propagation/CbmLitFitQa.h      
      )
 EndIf(Boost_FOUND)
 
@@ -192,7 +194,6 @@ cbm/base/CbmLitSimpleGeometryConstructor.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
 cbm/finder/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/propagation/CbmLitPropagationQa.cxx 
-cbm/qa/propagation/CbmLitFitQa.cxx
 cbm/utils/CbmLitConverter.cxx
 )
 
@@ -201,6 +202,7 @@ If(Boost_FOUND)
       ${LITTRACK_SRCS}
       cbm/qa/tracking/CbmLitTrackingQa.cxx
       cbm/qa/clustering/CbmLitClusteringQa.cxx
+      cbm/qa/propagation/CbmLitFitQa.cxx
      )
 EndIf(Boost_FOUND)
 

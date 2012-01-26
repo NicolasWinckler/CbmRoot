@@ -48,7 +48,7 @@ void CbmLitTrackingQaReport::Create(
    }
 
    try {
-      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking_qa_ideal.json");
+      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
       read_json(idealFile.c_str(), fIdeal);
    } catch (json_parser_error error) {
       std::cout << error.what();

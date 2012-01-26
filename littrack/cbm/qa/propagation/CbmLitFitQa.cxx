@@ -4,7 +4,11 @@
  * \date 2011
  */
 #include "CbmLitFitQa.h"
-#include "cbm/qa/mc/CbmLitMCTrackCreator.h"
+#include "CbmLitFitQaPTreeCreator.h"
+#include "CbmLitFitQaReport.h"
+#include "../mc/CbmLitMCTrackCreator.h"
+#include "../base/CbmLitHistManager.h"
+#include "../base/CbmLitResultChecker.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmStsTrack.h"
@@ -23,8 +27,13 @@
 #include "TH1F.h"
 #include "TF1.h"
 #include "TCanvas.h"
+#include "TSystem.h"
 
 #include <boost/assign/list_of.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
+using boost::property_tree::ptree;
 
 CbmLitFitQa::CbmLitFitQa():
    fIsFixedBounds(true),
@@ -44,6 +53,7 @@ CbmLitFitQa::~CbmLitFitQa()
 
 InitStatus CbmLitFitQa::Init()
 {
+   fHM = new CbmLitHistManager();
    ReadDataBranches();
    CreateHistograms();
    fMCTrackCreator = CbmLitMCTrackCreator::Instance();
@@ -63,22 +73,57 @@ void CbmLitFitQa::Exec(
 void CbmLitFitQa::Finish()
 {
    if (NULL != fStsTracks) {
-      DrawHistos("fit_qa_sts_first_param", fStsHistosFirst, fStsHistosFirstWrongCov);
-      DrawHistos("fit_qa_sts_last_param", fStsHistosLast, fStsHistosLastWrongCov);
+      DrawHistos("fit_qa_sts_first_param", "hStsFirst", "hStsFirstWrongCov");
+      DrawHistos("fit_qa_sts_last_param", "hStsLast", "hStsLastWrongCov");
    }
    if (NULL != fTrdTracks) {
-      DrawHistos("fit_qa_trd_first_param", fTrdHistosFirst, fTrdHistosFirstWrongCov);
-      DrawHistos("fit_qa_trd_last_param", fTrdHistosLast, fTrdHistosLastWrongCov);
+      DrawHistos("fit_qa_trd_first_param", "hTrdFirst", "hTrdFirstWrongCov");
+      DrawHistos("fit_qa_trd_last_param", "hTrdLast", "hTrdLastWrongCov");
    }
    if (NULL != fMuchTracks) {
-      DrawHistos("fit_qa_much_first_param", fMuchHistosFirst, fMuchHistosFirstWrongCov);
-      DrawHistos("fit_qa_much_last_param", fMuchHistosLast, fMuchHistosLastWrongCov);
+      DrawHistos("fit_qa_much_first_param", "hMuchFirst", "hMuchFirstWrongCov");
+      DrawHistos("fit_qa_much_last_param", "hMuchLast", "hMuchLastWrongCov");
    }
+
+   fHM->WriteToFile();
+
+//   CbmLitTrackingQaDraw drawQa;
+//   drawQa.Draw(fHM, fOutputDir);
+
+   string qaFile = fOutputDir + "/fit_qa.json";
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/fit_qa_ideal.json");
+   string checkFile = fOutputDir + "/fit_qa_check.json";
+
+   CbmLitFitQaPTreeCreator ptc;
+   ptree qa = ptc.Create(fHM);
+   if (fOutputDir != "") { write_json(qaFile.c_str(), qa); }
+
+   CbmLitResultChecker qaChecker;
+   qaChecker.DoCheck(qaFile, idealFile, checkFile);
+
+   CreateSimulationReport("Fit QA", fOutputDir);
+
+   if (fHM) delete fHM;
 }
 
 void CbmLitFitQa::SetParContainers()
 {
 
+}
+
+void CbmLitFitQa::CreateSimulationReport(
+      const string& title,
+      const string& resultDirectory)
+{
+   CbmLitFitQaReport report;
+   report.SetTitle(title);
+   ofstream foutHtml(string(fOutputDir + "/fit_qa.html").c_str());
+   ofstream foutLatex(string(fOutputDir + "/fit_qa.tex").c_str());
+   ofstream foutText(string(fOutputDir + "/fit_qa.txt").c_str());
+//   report.Create(kLitText, cout, resultDirectory);
+   report.Create(kLitHtml, foutHtml, resultDirectory);
+   report.Create(kLitLatex, foutLatex, resultDirectory);
+   report.Create(kLitText, foutText, resultDirectory);
 }
 
 void CbmLitFitQa::ReadDataBranches()
@@ -102,24 +147,26 @@ void CbmLitFitQa::ReadDataBranches()
 
 void CbmLitFitQa::CreateHistograms()
 {
-   //
-   // Residual and pull histograms
-   //
+   std::string names[] = {
+         "ResX", "ResY", "ResTx", "ResTy", "ResQp",
+         "PullX", "PullY", "PullTx", "PullTy", "PullQp"
+   };
 
-   fStsHistosFirst.resize(NOF_PARAMS);
-   fStsHistosLast.resize(NOF_PARAMS);
-   fTrdHistosFirst.resize(NOF_PARAMS);
-   fTrdHistosLast.resize(NOF_PARAMS);
-   fMuchHistosFirst.resize(NOF_PARAMS);
-   fMuchHistosLast.resize(NOF_PARAMS);
-
-   std::string names[] = { "ResX", "ResY", "ResTx", "ResTy", "ResQp",
-                           "PullX", "PullY", "PullTx", "PullTy", "PullQp" };
-
+   // Axis titles for residual and pull histograms
    std::string xtitles[] = {
-       "Residual X [cm]", "Residual Y [cm]", "Residual Tx",
-       "Residual Ty", "Residual q/p [(GeV/c)^{-1}]",
-       "Pull X", "Pull Y", "Pull Tx", "Pull Ty", "Pull q/p" };
+       "Residual X [cm]", "Residual Y [cm]", "Residual Tx", "Residual Ty", "Residual q/p [(GeV/c)^{-1}]",
+       "Pull X", "Pull Y", "Pull Tx", "Pull Ty", "Pull q/p"
+   };
+
+   // Histogram names for residuals and pulls
+   std::string rpHistNames[] = {
+         "hStsFirst", "hStsLast", "hTrdFirst", "hTrdLast","hMuchFirst", "hMuchLast"
+   };
+
+   // Histogram names for wrong parameters
+   std::string wHistNames[] = {
+         "hStsFirstWrongCov", "hStsLastWrongCov", "hTrdFirstWrongCov", "hTrdLastWrongCov", "hMuchFirstWrongCov", "hMuchLastWrongCov"
+   };
 
    std::vector<Int_t> bins(NOF_PARAMS, 200);
    std::vector<std::pair<Float_t, Float_t> > bounds;
@@ -135,72 +182,24 @@ void CbmLitFitQa::CreateHistograms()
       bounds.assign(NOF_PARAMS, std::make_pair(0.,0.));
    }
 
-   for (Int_t j = 0; j < NOF_PARAMS; j++) {
-      std::string histName1 = "hStsFirst" + names[j];
-      fStsHistosFirst[j] = new TH1F(histName1.c_str(), std::string(histName1 + ";" + xtitles[j] + ";Counter").c_str(),
-            bins[j], bounds[j].first, bounds[j].second);
-
-      std::string histName2 = "hStsLast" + names[j];
-      fStsHistosLast[j] = new TH1F(histName2.c_str(), std::string(histName2 + ";" + xtitles[j] + ";Counter").c_str(),
-            bins[j], bounds[j].first, bounds[j].second);
-
-      std::string histName3 = "hTrdFirst" + names[j];
-      fTrdHistosFirst[j] = new TH1F(histName3.c_str(), std::string(histName3 + ";" + xtitles[j] + ";Counter").c_str(),
-            bins[j], bounds[j].first, bounds[j].second);
-
-      std::string histName4 = "hTrdLast" + names[j];
-      fTrdHistosLast[j] = new TH1F(histName4.c_str(), std::string(histName4 + ";" + xtitles[j] + ";Counter").c_str(),
-            bins[j], bounds[j].first, bounds[j].second);
-
-      std::string histName5 = "hMuchFirst" + names[j];
-      fMuchHistosFirst[j] = new TH1F(histName5.c_str(), std::string(histName5 + ";" + xtitles[j] + ";Counter").c_str(),
-            bins[j], bounds[j].first, bounds[j].second);
-
-      std::string histName6 = "hMuchLast" + names[j];
-      fMuchHistosLast[j] = new TH1F(histName6.c_str(), std::string(histName6 + ";" + xtitles[j] + ";Counter").c_str(),
-            bins[j], bounds[j].first, bounds[j].second);
-   }
-
-   //
-   // Number of wrong fits
-   //
-
-   fStsHistosFirstWrongCov.resize(NOF_PARAMS_WRONG_COV);
-   fStsHistosLastWrongCov.resize(NOF_PARAMS_WRONG_COV);
-   fTrdHistosFirstWrongCov.resize(NOF_PARAMS_WRONG_COV);
-   fTrdHistosLastWrongCov.resize(NOF_PARAMS_WRONG_COV);
-   fMuchHistosFirstWrongCov.resize(NOF_PARAMS_WRONG_COV);
-   fMuchHistosLastWrongCov.resize(NOF_PARAMS_WRONG_COV);
-
    Int_t minNofHits = 0;
    Int_t maxNofHits = 20;
 
-   for (Int_t j = 0; j < NOF_PARAMS_WRONG_COV; j++) {
-      int k = j + 5; // to start with pulls
-       std::string histName1 = "hStsFirstWrongCov" + names[k];
-       fStsHistosFirstWrongCov[j] = new TH1F(histName1.c_str(), std::string(histName1 + ";Number of hits;Counter").c_str(),
-             bins[k], minNofHits, maxNofHits);
+   for (Int_t iHist = 0; iHist < 6; iHist++) {
+      // Residual and pull histograms
+      for (Int_t iPar = 0; iPar < NOF_PARAMS; iPar++) {
+         std::string histName = rpHistNames[iHist] + names[iPar];
+         fHM->Add(histName, new TH1F(histName.c_str(), std::string(histName + ";" + xtitles[iPar] + ";Counter").c_str(),
+               bins[iPar], bounds[iPar].first, bounds[iPar].second));
+      }
 
-       std::string histName2 = "hStsLastWrongCov" + names[k];
-       fStsHistosLastWrongCov[j] = new TH1F(histName2.c_str(), std::string(histName2 + ";Number of hits;Counter").c_str(),
-             bins[k], minNofHits, maxNofHits);
-
-       std::string histName3 = "hTrdFirstWrongCov" + names[k];
-       fTrdHistosFirstWrongCov[j] = new TH1F(histName3.c_str(), std::string(histName3 + ";Number of hits;Counter").c_str(),
-             bins[k], minNofHits, maxNofHits);
-
-       std::string histName4 = "hTrdLastWrongCov" + names[k];
-       fTrdHistosLastWrongCov[j] = new TH1F(histName4.c_str(), std::string(histName4 + ";Number of hits;Counter").c_str(),
-             bins[k], minNofHits, maxNofHits);
-
-       std::string histName5 = "hMuchFirstWrongCov" + names[k];
-       fMuchHistosFirstWrongCov[j] = new TH1F(histName5.c_str(), std::string(histName5 + ";Number of hits;Counter").c_str(),
-             bins[k], minNofHits, maxNofHits);
-
-       std::string histName6 = "hMuchLastWrongCov" + names[k];
-       fMuchHistosLastWrongCov[j] = new TH1F(histName6.c_str(), std::string(histName6 + ";Number of hits;Counter").c_str(),
-             bins[k], minNofHits, maxNofHits);
-    }
+      // Number of wrong parameters histograms
+      for (Int_t iPar = 0; iPar < NOF_PARAMS_WRONG_COV; iPar++) {
+         std::string histName = wHistNames[iHist] + names[iPar];
+         fHM->Add(histName, new TH1F(histName.c_str(), std::string(histName + ";Number of hits;Counter").c_str(),
+               bins[iPar], minNofHits, maxNofHits));
+      }
+   }
 }
 
 void CbmLitFitQa::ProcessGlobalTracks()
@@ -240,14 +239,14 @@ void CbmLitFitQa::ProcessStsTrack(
       Int_t firstStation = firstHit->GetStationNr() - 1; // to start with 0
       if (mcTrack.GetNofPointsAtStation(kMVD, firstStation) > 0) {
          const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kMVD, firstStation, 0);
-         FillResidualsAndPulls(firstParam, &firstPoint, fStsHistosFirst, fStsHistosFirstWrongCov, nofMvdHits + nofStsHits);
+         FillResidualsAndPulls(firstParam, &firstPoint, "hStsFirst", "hStsFirstWrongCov", nofMvdHits + nofStsHits);
       }
    } else { // first track parameters in STS
       const CbmStsHit* firstHit = static_cast<const CbmStsHit*>(fStsHits->At(track->GetStsHitIndex(0)));
       Int_t firstStation = firstHit->GetStationNr() - 1; // to start with 0
       if (mcTrack.GetNofPointsAtStation(kSTS, firstStation) > 0) {
          const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kSTS, firstStation, 0);
-         FillResidualsAndPulls(firstParam, &firstPoint, fStsHistosFirst, fStsHistosFirstWrongCov, nofMvdHits + nofStsHits);
+         FillResidualsAndPulls(firstParam, &firstPoint, "hStsFirst", "hStsFirstWrongCov", nofMvdHits + nofStsHits);
       }
    }
 
@@ -256,7 +255,7 @@ void CbmLitFitQa::ProcessStsTrack(
    Int_t lastStation = lastHit->GetStationNr() - 1; // to start with 0
    if (mcTrack.GetNofPointsAtStation(kSTS, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kSTS, lastStation, 0);
-      FillResidualsAndPulls(lastParam, &lastPoint, fStsHistosLast, fStsHistosLastWrongCov, nofMvdHits + nofStsHits);
+      FillResidualsAndPulls(lastParam, &lastPoint, "hStsLast", "hStsLastWrongCov", nofMvdHits + nofStsHits);
    }
 }
 
@@ -287,7 +286,7 @@ void CbmLitFitQa::ProcessTrdTrack(
    Int_t firstStation = 10 * detInfo[1] + detInfo[2];
    if (mcTrack.GetNofPointsAtStation(kTRD, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kTRD, firstStation, 0);
-      FillResidualsAndPulls(firstParam, &firstPoint, fTrdHistosFirst, fTrdHistosFirstWrongCov, nofHits);
+      FillResidualsAndPulls(firstParam, &firstPoint, "hTrdFirst", "hTrdFirstWrongCov", nofHits);
    }
 
    // Fill histograms for last track parameters
@@ -296,7 +295,7 @@ void CbmLitFitQa::ProcessTrdTrack(
    Int_t lastStation = 10 * detInfo[1] + detInfo[2];
    if (mcTrack.GetNofPointsAtStation(kTRD, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kTRD, lastStation, 0);
-      FillResidualsAndPulls(lastParam, &lastPoint, fTrdHistosLast, fTrdHistosLastWrongCov, nofHits);
+      FillResidualsAndPulls(lastParam, &lastPoint, "hTrdLast", "hTrdLastWrongCov", nofHits);
    }
 }
 
@@ -327,7 +326,7 @@ void CbmLitFitQa::ProcessMuchTrack(
             + CbmMuchGeoScheme::GetLayerSideIndex(firstHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kMUCH, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kMUCH, firstStation, 0);
-      FillResidualsAndPulls(firstParam, &firstPoint, fMuchHistosFirst, fMuchHistosFirstWrongCov, nofHits);
+      FillResidualsAndPulls(firstParam, &firstPoint, "hMuchFirst", "hMuchFirstWrongCov", nofHits);
    }
 
    // Fill histograms for last track parameters
@@ -338,70 +337,72 @@ void CbmLitFitQa::ProcessMuchTrack(
               + CbmMuchGeoScheme::GetLayerSideIndex(lastHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kMUCH, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kMUCH, lastStation, 0);
-      FillResidualsAndPulls(lastParam, &lastPoint, fMuchHistosLast, fMuchHistosLastWrongCov, nofHits);
+      FillResidualsAndPulls(lastParam, &lastPoint, "hMuchLast", "hMuchLastWrongCov", nofHits);
    }
 }
 
 void CbmLitFitQa::FillResidualsAndPulls(
    const FairTrackParam* par,
    const CbmLitMCPoint* mcPoint,
-   std::vector<TH1F*>& histos,
-   std::vector<TH1F*>& wrongCov,
+   const string& histName,
+   const string& wrongName,
    Float_t wrongPar)
 {
    // Residuals
-   Float_t res[5] = {0., 0., 0., 0., 0.}; // [x, y, tx, ty, qp]
-   res[0] = par->GetX() - mcPoint->GetX();
-   res[1] = par->GetY() - mcPoint->GetY();
-   res[2] = par->GetTx() - mcPoint->GetTx();
-   res[3] = par->GetTy() - mcPoint->GetTy();
-   res[4] = par->GetQp() - mcPoint->GetQp();
-   for (Int_t i = 0; i < 5; i++) { histos[i]->Fill(res[i]); }
+   Double_t resX = par->GetX() - mcPoint->GetX();
+   Double_t resY = par->GetY() - mcPoint->GetY();
+   Double_t resTx = par->GetTx() - mcPoint->GetTx();
+   Double_t resTy = par->GetTy() - mcPoint->GetTy();
+   Double_t resQp = par->GetQp() - mcPoint->GetQp();
+   fHM->H1(histName + "ResX")->Fill(resX);
+   fHM->H1(histName + "ResY")->Fill(resY);
+   fHM->H1(histName + "ResTx")->Fill(resTx);
+   fHM->H1(histName + "ResTy")->Fill(resTy);
+   fHM->H1(histName + "ResQp")->Fill(resQp);
 
    // Pulls
    Double_t C[15];
    par->CovMatrix(C);
 
-   Float_t sigma[5] = {0., 0., 0., 0., 0.}; // [x, y, tx, ty, qp]
-   sigma[0] = (C[0] > 0.) ? std::sqrt(C[0]) : -1.;
-   sigma[1] = (C[5] > 0.) ? std::sqrt(C[5]) : -1.;
-   sigma[2] = (C[9] > 0.) ? std::sqrt(C[9]) : -1.;
-   sigma[3] = (C[12] > 0.) ? std::sqrt(C[12]) : -1.;
-   sigma[4] = (C[14] > 0.) ? std::sqrt(C[14]) : -1.;
-   for (Int_t i = 0; i < 5; i++) {
-      if (sigma[i] < 0) { // wrong covariance
-         wrongCov[i]->Fill(wrongPar);
-      } else { // good covariance
-         histos[i + 5]->Fill(res[i] / sigma[i]);
-      }
-   }
+   Double_t sigmaX = (C[0] > 0.) ? std::sqrt(C[0]) : -1.;
+   Double_t sigmaY = (C[5] > 0.) ? std::sqrt(C[5]) : -1.;
+   Double_t sigmaTx = (C[9] > 0.) ? std::sqrt(C[9]) : -1.;
+   Double_t sigmaTy = (C[12] > 0.) ? std::sqrt(C[12]) : -1.;
+   Double_t sigmaQp = (C[14] > 0.) ? std::sqrt(C[14]) : -1.;
+   if (sigmaX < 0) fHM->H1(wrongName + "ResX")->Fill(wrongPar); else fHM->H1(histName + "PullX")->Fill(resX / sigmaX);
+   if (sigmaY < 0) fHM->H1(wrongName + "ResY")->Fill(wrongPar); else fHM->H1(histName + "PullY")->Fill(resY / sigmaY);
+   if (sigmaTx < 0) fHM->H1(wrongName + "ResTx")->Fill(wrongPar); else fHM->H1(histName + "PullTx")->Fill(resTx / sigmaTx);
+   if (sigmaTy < 0) fHM->H1(wrongName + "ResTy")->Fill(wrongPar); else fHM->H1(histName + "PullTy")->Fill(resTy / sigmaTy);
+   if (sigmaQp < 0) fHM->H1(wrongName + "ResQp")->Fill(wrongPar); else fHM->H1(histName + "PullQp")->Fill(resQp / sigmaQp);
 }
 
 void CbmLitFitQa::DrawHistos(
       const std::string& name,
-      std::vector<TH1F*>& histos,
-      std::vector<TH1F*>& wrongHistos)
+      const string& histName,
+      const string& wrongName)
 {
    TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1400, 900);
    canvas->Divide(5, 3);
 
+   std::string names[] = { "ResX", "ResY", "ResTx", "ResTy", "ResQp",
+                           "PullX", "PullY", "PullTx", "PullTy", "PullQp" };
+
    for (int i = 0; i < NOF_PARAMS; i++) {
       canvas->cd(i+1);
-      TH1F* hist = histos[i];
+      TH1* hist = fHM->H1(histName + names[i]);
       hist->Fit("gaus");
       hist->SetMaximum(hist->GetMaximum() * 1.50);
       DrawH1(hist, kLitLinear, kLitLog);
 
       TF1* fit = hist->GetFunction("gaus");
-      Double_t sigma = 0.;
-      if (NULL != fit) { sigma = fit->GetParameter(2);}
+      Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
       Double_t rms = hist->GetRMS();
       DrawHistSigmaRMS(i, sigma, rms);
    }
 
    for (int i = 0; i < NOF_PARAMS_WRONG_COV; i++) {
       canvas->cd(i + 1 + 10);
-      DrawH1(wrongHistos[i], kLitLinear, kLitLog);
+      DrawH1(fHM->H1(wrongName + names[i]), kLitLinear, kLitLog);
    }
 
    lit::SaveCanvasAsImage(canvas, fOutputDir);

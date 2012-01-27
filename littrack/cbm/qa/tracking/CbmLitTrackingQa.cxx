@@ -109,15 +109,16 @@ void CbmLitTrackingQa::CreateSimulationReport(
       const string& title,
       const string& resultDirectory)
 {
-   CbmLitTrackingQaReport report;
-   report.SetTitle(title);
+   CbmLitSimulationReport* report = new CbmLitTrackingQaReport();
+   report->SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/tracking_qa.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/tracking_qa.tex").c_str());
    ofstream foutText(string(fOutputDir + "/tracking_qa.txt").c_str());
-   report.Create(kLitText, cout, resultDirectory);
-   report.Create(kLitHtml, foutHtml, resultDirectory);
-   report.Create(kLitLatex, foutLatex, resultDirectory);
-   report.Create(kLitText, foutText, resultDirectory);
+   report->Create(kLitText, cout, resultDirectory);
+   report->Create(kLitHtml, foutHtml, resultDirectory);
+   report->Create(kLitLatex, foutLatex, resultDirectory);
+   report->Create(kLitText, foutText, resultDirectory);
+   delete report;
 }
 
 void CbmLitTrackingQa::CreateStudyReport(

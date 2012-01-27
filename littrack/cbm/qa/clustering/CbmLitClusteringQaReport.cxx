@@ -7,13 +7,9 @@
 #include "CbmLitClusteringQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
-#include "TSystem.h"
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
-using std::endl;
 using boost::assign::list_of;
-using boost::property_tree::json_parser_error;
 using lit::ToString;
 
 CbmLitClusteringQaReport::CbmLitClusteringQaReport()
@@ -24,41 +20,6 @@ CbmLitClusteringQaReport::CbmLitClusteringQaReport()
 CbmLitClusteringQaReport::~CbmLitClusteringQaReport()
 {
 
-}
-
-void CbmLitClusteringQaReport::Create(
-   LitReportType reportType,
-   ostream& out,
-   const string& resultDirectory)
-{
-   CreateReportElement(reportType);
-
-   try {
-      read_json(resultDirectory + "/clustering_qa.json", fQa);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   try {
-      read_json(resultDirectory + "/clustering_qa_check.json", fCheck);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   try {
-      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/clustering/clustering_qa_ideal.json");
-      read_json(idealFile.c_str(), fIdeal);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   Create(out);
-
-   fQa.clear();
-   fCheck.clear();
-   fIdeal.clear();
-
-   DeleteReportElement();
 }
 
 void CbmLitClusteringQaReport::Create(

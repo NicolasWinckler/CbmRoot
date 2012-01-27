@@ -83,15 +83,16 @@ void CbmLitClusteringQa::CreateSimulationReport(
       const string& title,
       const string& resultDirectory)
 {
-   CbmLitClusteringQaReport report;
-   report.SetTitle(title);
+   CbmLitSimulationReport* report = new CbmLitClusteringQaReport();
+   report->SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/clustering_qa.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/clustering_qa.tex").c_str());
    ofstream foutText(string(fOutputDir + "/clustering_qa.txt").c_str());
-   report.Create(kLitText, cout, fOutputDir);
-   report.Create(kLitHtml, foutHtml, fOutputDir);
-   report.Create(kLitLatex, foutLatex, fOutputDir);
-   report.Create(kLitText, foutText, fOutputDir);
+   report->Create(kLitText, cout, fOutputDir);
+   report->Create(kLitHtml, foutHtml, fOutputDir);
+   report->Create(kLitLatex, foutLatex, fOutputDir);
+   report->Create(kLitText, foutText, fOutputDir);
+   delete report;
 }
 
 void CbmLitClusteringQa::CreateStudyReport(

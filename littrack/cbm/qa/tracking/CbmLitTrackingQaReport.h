@@ -8,6 +8,7 @@
 #define CBMLITTRACKINGQAREPORT_H_
 
 #include "../report/CbmLitSimulationReport.h"
+#include "TSystem.h"
 #include <string>
 #include <sstream>
 using std::string;
@@ -32,20 +33,33 @@ public:
     */
    virtual ~CbmLitTrackingQaReport();
 
+protected:
    /**
     * \brief Inherited from CbmLitSimulationReport.
     */
-   void Create(
-      LitReportType reportType,
-      ostream& out,
-      const string& resultDirectory);
-
-protected:
-   /**
-    * \brief
-    */
-   void Create(
+   virtual void Create(
       ostream& out);
+
+   /**
+    * \brief Inherited from CbmLitSimulationReport.
+    */
+   virtual string GetQaFileName() const {
+      return "tracking_qa.json";
+   }
+
+   /**
+    * \brief Inherited from CbmLitSimulationReport.
+    */
+   virtual string GetIdealFileName() const {
+      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
+   }
+
+   /**
+    * \brief Inherited from CbmLitSimulationReport.
+    */
+   virtual string GetCheckFileName() const {
+      return "tracking_qa_check.json";
+   }
 
    /**
     * \brief Print specified value.

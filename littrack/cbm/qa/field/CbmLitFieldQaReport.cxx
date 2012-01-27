@@ -27,41 +27,6 @@ CbmLitFieldQaReport::~CbmLitFieldQaReport()
 }
 
 void CbmLitFieldQaReport::Create(
-   LitReportType reportType,
-   ostream& out,
-   const string& resultDirectory)
-{
-   CreateReportElement(reportType);
-
-   try {
-      read_json(resultDirectory + "/field_qa.json", fQa);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   try {
-      read_json(resultDirectory + "/field_qa_check.json", fCheck);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   try {
-      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/field_qa_ideal.json");
-      read_json(idealFile.c_str(), fIdeal);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   Create(out);
-
-   fQa.clear();
-   fCheck.clear();
-   fIdeal.clear();
-
-   DeleteReportElement();
-}
-
-void CbmLitFieldQaReport::Create(
    std::ostream& out)
 {
    out << fR->DocumentBegin() << std::endl;

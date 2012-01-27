@@ -8,6 +8,7 @@
 #define CBMLITFITQAREPORT_H_
 
 #include "../report/CbmLitSimulationReport.h"
+#include "TSystem.h"
 
 /**
  * \class CbmLitFitQaReport
@@ -28,20 +29,33 @@ public:
     */
    virtual ~CbmLitFitQaReport();
 
+protected:
    /**
     * \brief Inherited from CbmLitSimulationReport.
     */
-   void Create(
-      LitReportType reportType,
-      ostream& out,
-      const string& resultDirectory);
-
-protected:
-   /**
-    * \brief
-    */
-   void Create(
+   virtual void Create(
       ostream& out);
+
+   /**
+    * \brief Inherited from CbmLitSimulationReport.
+    */
+   virtual string GetQaFileName() const {
+      return "fit_qa.json";
+   }
+
+   /**
+    * \brief Inherited from CbmLitSimulationReport.
+    */
+   virtual string GetIdealFileName() const {
+      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/fit_qa_ideal.json");
+   }
+
+   /**
+    * \brief Inherited from CbmLitSimulationReport.
+    */
+   virtual string GetCheckFileName() const {
+      return "fit_qa_check.json";
+   }
 
    string PrintResAndPullRow(
            const string& rowName,

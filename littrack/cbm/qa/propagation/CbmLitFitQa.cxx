@@ -115,15 +115,16 @@ void CbmLitFitQa::CreateSimulationReport(
       const string& title,
       const string& resultDirectory)
 {
-   CbmLitFitQaReport report;
-   report.SetTitle(title);
+   CbmLitSimulationReport* report = new CbmLitFitQaReport();
+   report->SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/fit_qa.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/fit_qa.tex").c_str());
    ofstream foutText(string(fOutputDir + "/fit_qa.txt").c_str());
 //   report.Create(kLitText, cout, resultDirectory);
-   report.Create(kLitHtml, foutHtml, resultDirectory);
-   report.Create(kLitLatex, foutLatex, resultDirectory);
-   report.Create(kLitText, foutText, resultDirectory);
+   report->Create(kLitHtml, foutHtml, resultDirectory);
+   report->Create(kLitLatex, foutLatex, resultDirectory);
+   report->Create(kLitText, foutText, resultDirectory);
+   delete report;
 }
 
 void CbmLitFitQa::ReadDataBranches()

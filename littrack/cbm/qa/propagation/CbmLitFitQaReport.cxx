@@ -6,13 +6,10 @@
 #include "CbmLitFitQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "std/utils/CbmLitUtils.h"
-#include "TSystem.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 using boost::assign::list_of;
-using boost::property_tree::json_parser_error;
 using lit::ToString;
 
 CbmLitFitQaReport::CbmLitFitQaReport()
@@ -21,41 +18,6 @@ CbmLitFitQaReport::CbmLitFitQaReport()
 
 CbmLitFitQaReport::~CbmLitFitQaReport()
 {
-}
-
-void CbmLitFitQaReport::Create(
-   LitReportType reportType,
-   ostream& out,
-   const string& resultDirectory)
-{
-   CreateReportElement(reportType);
-
-   try {
-      read_json(resultDirectory + "/fit_qa.json", fQa);
-   } catch (json_parser_error error) {
-      std::cout << error.what();
-   }
-
-   try {
-      read_json(resultDirectory + "/fit_qa_check.json", fCheck);
-   } catch (json_parser_error error) {
-      std::cout << error.what();
-   }
-
-   try {
-      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/fit_qa_ideal.json");
-      read_json(idealFile.c_str(), fIdeal);
-   } catch (json_parser_error error) {
-      std::cout << error.what();
-   }
-
-   Create(out);
-
-   fQa.clear();
-   fCheck.clear();
-   fIdeal.clear();
-
-   DeleteReportElement();
 }
 
 void CbmLitFitQaReport::Create(

@@ -6,18 +6,12 @@
 #include "CbmLitTrackingQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
-#include "TSystem.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <iomanip>
 
 using std::vector;
-using std::endl;
-using std::setfill;
-using std::left;
 using boost::assign::list_of;
-using boost::property_tree::json_parser_error;
 using lit::ToString;
 
 CbmLitTrackingQaReport::CbmLitTrackingQaReport()
@@ -29,46 +23,11 @@ CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 }
 
 void CbmLitTrackingQaReport::Create(
-   LitReportType reportType,
-   ostream& out,
-   const string& resultDirectory)
-{
-   CreateReportElement(reportType);
-
-   try {
-      read_json(resultDirectory + "/tracking_qa.json", fQa);
-   } catch (json_parser_error error) {
-      std::cout << error.what();
-   }
-
-   try {
-      read_json(resultDirectory + "/tracking_qa_check.json", fCheck);
-   } catch (json_parser_error error) {
-      std::cout << error.what();
-   }
-
-   try {
-      string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
-      read_json(idealFile.c_str(), fIdeal);
-   } catch (json_parser_error error) {
-      std::cout << error.what();
-   }
-
-   Create(out);
-
-   fQa.clear();
-   fCheck.clear();
-   fIdeal.clear();
-
-   DeleteReportElement();
-}
-
-void CbmLitTrackingQaReport::Create(
    ostream& out)
 {
    out.precision(3);
    out << fR->DocumentBegin();
-   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
+   out << fR->Title(0, fTitle);
 
    out << "Number of events: " << PrintValue("hEventNo") << endl;
 

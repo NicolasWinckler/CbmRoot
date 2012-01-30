@@ -8,19 +8,19 @@
 #ifndef CBMLITTRACKFITTER_H_
 #define CBMLITTRACKFITTER_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitFloat.h"
+#include "base/CbmLitEnums.h"
 
 class CbmLitTrack;
 
-class CbmLitTrackFitter : public CbmLitTool
+class CbmLitTrackFitter
 {
 public:
    /* Constructor */
-   CbmLitTrackFitter() {};
+   CbmLitTrackFitter() {}
 
    /* Destructor */
-   virtual ~CbmLitTrackFitter() {};
+   virtual ~CbmLitTrackFitter() {}
 
    /* Main function to be implemented for the concrete track fitter algorithm
     * @param track Pointer to the track to be fitted

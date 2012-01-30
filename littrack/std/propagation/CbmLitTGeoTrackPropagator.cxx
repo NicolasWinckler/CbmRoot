@@ -21,7 +21,6 @@
 
 CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
    TrackExtrapolatorPtr extrapolator):
-   CbmLitTrackPropagator("CbmLitTGeoTrackPropagator"),
    fExtrapolator(extrapolator)
 {
    fNavigator = GeoNavigatorPtr(new CbmLitTGeoNavigator());
@@ -30,16 +29,6 @@ CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
 
 CbmLitTGeoTrackPropagator::~CbmLitTGeoTrackPropagator()
 {
-}
-
-LitStatus CbmLitTGeoTrackPropagator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTGeoTrackPropagator::Finalize()
-{
-   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTGeoTrackPropagator::Propagate(

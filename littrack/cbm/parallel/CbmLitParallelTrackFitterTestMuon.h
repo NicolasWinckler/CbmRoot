@@ -35,16 +35,6 @@ public:
    virtual ~CbmLitParallelTrackFitterTestMuon();
 
    /**
-    * \brief Inherited from CbmLitTool.
-    */
-   virtual LitStatus Initialize();
-
-   /**
-    * \brief Inherited from CBmLitTool.
-    */
-   virtual LitStatus Finalize();
-
-   /**
     * \brief Inherited from CbmLitTrackFitter.
     */
    virtual LitStatus Fit(

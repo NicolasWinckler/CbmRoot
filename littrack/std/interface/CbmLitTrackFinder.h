@@ -8,17 +8,17 @@
 #ifndef CBMLITTRACKFINDER_H_
 #define CBMLITTRACKFINDER_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
 
-class CbmLitTrackFinder : public CbmLitTool
+class CbmLitTrackFinder
 {
 public:
    /* Constructor */
-   CbmLitTrackFinder() {};
+   CbmLitTrackFinder() {}
 
    /* Destructor */
-   virtual ~CbmLitTrackFinder() {};
+   virtual ~CbmLitTrackFinder() {}
 
    /* Main function to be implemented for the concrete track finder algorithm
     * @param hits Input vector of hits

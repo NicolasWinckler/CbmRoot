@@ -22,16 +22,6 @@ CbmLitWeightCalculatorTukey::~CbmLitWeightCalculatorTukey()
 {
 }
 
-LitStatus CbmLitWeightCalculatorTukey::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitWeightCalculatorTukey::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,

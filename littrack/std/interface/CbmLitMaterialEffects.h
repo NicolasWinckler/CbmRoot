@@ -9,19 +9,19 @@
 #ifndef CBMLITMATERIALEFFECTS_H_
 #define CBMLITMATERIALEFFECTS_H_
 
-#include "base/CbmLitTool.h"
+#include "base/CbmLitEnums.h"
 
 class CbmLitTrackParam;
 class CbmLitMaterialInfo;
 
-class CbmLitMaterialEffects : public CbmLitTool
+class CbmLitMaterialEffects
 {
 public:
    /* Constructor */
-   CbmLitMaterialEffects() {};
+   CbmLitMaterialEffects() {}
 
    /* Destructor */
-   virtual ~CbmLitMaterialEffects() {};
+   virtual ~CbmLitMaterialEffects() {}
 
    /* Main function to be implemented for concrete material effects calculation algorithms.
     * @param par Input/Output track parameters.

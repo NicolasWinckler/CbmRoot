@@ -21,16 +21,6 @@ CbmLitTrackSelectionSameSeed::~CbmLitTrackSelectionSameSeed()
 
 }
 
-LitStatus CbmLitTrackSelectionSameSeed::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionSameSeed::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackSelectionSameSeed::DoSelect(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)

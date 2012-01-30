@@ -16,16 +16,6 @@ CbmLitTrackSelectionEmpty::~CbmLitTrackSelectionEmpty()
 
 }
 
-LitStatus CbmLitTrackSelectionEmpty::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionEmpty::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackSelectionEmpty::DoSelect(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)

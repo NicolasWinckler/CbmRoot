@@ -8,19 +8,19 @@
 #ifndef CBMLITWEIGHTEDHITCALCULATOR_H_
 #define CBMLITWEIGHTEDHITCALCULATOR_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
 
 class CbmLitHit;
 
-class CbmLitWeightedHitCalculator : public CbmLitTool
+class CbmLitWeightedHitCalculator
 {
 public:
    /* Constructor */
-   CbmLitWeightedHitCalculator() {};
+   CbmLitWeightedHitCalculator() {}
 
    /* Destructor */
-   virtual ~CbmLitWeightedHitCalculator() {};
+   virtual ~CbmLitWeightedHitCalculator() {}
 
    /* Main function to be implemented for the concrete weighted hit calculation algorithms
     * @param itBegin Iterator of the first hit

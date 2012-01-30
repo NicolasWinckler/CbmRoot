@@ -22,16 +22,6 @@ CbmLitMyGeoNavigator::~CbmLitMyGeoNavigator()
 {
 }
 
-LitStatus CbmLitMyGeoNavigator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitMyGeoNavigator::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitMyGeoNavigator::FindIntersections(
    const CbmLitTrackParam* par,
    myf zOut,

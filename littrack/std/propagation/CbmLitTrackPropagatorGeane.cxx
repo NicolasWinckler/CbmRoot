@@ -15,8 +15,7 @@
 
 #include <cmath>
 
-CbmLitTrackPropagatorGeane::CbmLitTrackPropagatorGeane():
-   CbmLitTrackPropagator("CbmLitTrackPropagatorGeane")
+CbmLitTrackPropagatorGeane::CbmLitTrackPropagatorGeane()
 {
    fPropagator = new CbmPropagatorGeane();
 }
@@ -24,16 +23,6 @@ CbmLitTrackPropagatorGeane::CbmLitTrackPropagatorGeane():
 CbmLitTrackPropagatorGeane::~CbmLitTrackPropagatorGeane()
 {
    if (fPropagator) { delete fPropagator; }
-}
-
-LitStatus CbmLitTrackPropagatorGeane::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackPropagatorGeane::Finalize()
-{
-   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackPropagatorGeane::Propagate(

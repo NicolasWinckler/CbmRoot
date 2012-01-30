@@ -27,16 +27,6 @@ CbmLitMyTrackPropagator::~CbmLitMyTrackPropagator()
 {
 }
 
-LitStatus CbmLitMyTrackPropagator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitMyTrackPropagator::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitMyTrackPropagator::Propagate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,

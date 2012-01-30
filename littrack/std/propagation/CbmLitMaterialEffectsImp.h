@@ -24,12 +24,6 @@ public:
    /* Destructor */
    virtual ~CbmLitMaterialEffectsImp();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitMaterialEffects */
    LitStatus Update(
       CbmLitTrackParam* par,

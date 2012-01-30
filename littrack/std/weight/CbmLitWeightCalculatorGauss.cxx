@@ -15,16 +15,6 @@ CbmLitWeightCalculatorGauss::~CbmLitWeightCalculatorGauss()
 {
 }
 
-LitStatus CbmLitWeightCalculatorGauss::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitWeightCalculatorGauss::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitWeightCalculatorGauss::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,

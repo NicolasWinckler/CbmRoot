@@ -14,9 +14,6 @@ public:
    CbmLitWeightedHitCalculatorImp();
    virtual ~CbmLitWeightedHitCalculatorImp();
 
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
-
    virtual void DoCalculate(
       HitPtrIterator itBegin,
       HitPtrIterator itEnd,

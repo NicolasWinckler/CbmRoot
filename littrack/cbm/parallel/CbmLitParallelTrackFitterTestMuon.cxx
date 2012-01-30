@@ -34,16 +34,6 @@ CbmLitParallelTrackFitterTestMuon::~CbmLitParallelTrackFitterTestMuon()
 
 }
 
-LitStatus CbmLitParallelTrackFitterTestMuon::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitParallelTrackFitterTestMuon::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitParallelTrackFitterTestMuon::Fit(
    CbmLitTrack* track,
    bool downstream)

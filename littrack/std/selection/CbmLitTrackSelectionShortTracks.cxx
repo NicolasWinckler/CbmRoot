@@ -20,16 +20,6 @@ CbmLitTrackSelectionShortTracks::~CbmLitTrackSelectionShortTracks()
 
 }
 
-LitStatus CbmLitTrackSelectionShortTracks::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionShortTracks::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackSelectionShortTracks::DoSelect(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)

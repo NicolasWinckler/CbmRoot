@@ -26,12 +26,6 @@ public:
    /* Destructor */
    virtual ~CbmLitTrackFitterImp();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitTrackFitter */
    virtual LitStatus Fit(
       CbmLitTrack* track,

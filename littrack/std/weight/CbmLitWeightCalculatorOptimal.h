@@ -8,7 +8,7 @@
 #ifndef CBMLITWEIGHTCALCULATOROPTIMAL_H_
 #define CBMLITWEIGHTCALCULATOROPTIMAL_H_
 
-#include "weight/CbmLitWeightCalculator.h"
+#include "interface/CbmLitWeightCalculator.h"
 
 
 class CbmLitWeightCalculatorOptimal : public CbmLitWeightCalculator
@@ -16,9 +16,6 @@ class CbmLitWeightCalculatorOptimal : public CbmLitWeightCalculator
 public:
    CbmLitWeightCalculatorOptimal();
    virtual ~CbmLitWeightCalculatorOptimal();
-
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
 
    virtual LitStatus DoCalculate(
       const CbmLitTrackParam* par,

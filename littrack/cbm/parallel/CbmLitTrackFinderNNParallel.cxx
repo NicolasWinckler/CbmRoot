@@ -48,16 +48,6 @@ CbmLitTrackFinderNNParallel::~CbmLitTrackFinderNNParallel()
 {
 }
 
-LitStatus CbmLitTrackFinderNNParallel::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFinderNNParallel::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFinderNNParallel::DoFind(
    HitPtrVector& hits,
    TrackPtrVector& trackSeeds,

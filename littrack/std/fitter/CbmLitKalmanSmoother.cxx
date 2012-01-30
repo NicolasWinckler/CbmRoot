@@ -19,16 +19,6 @@ CbmLitKalmanSmoother::~CbmLitKalmanSmoother()
 {
 }
 
-LitStatus CbmLitKalmanSmoother::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitKalmanSmoother::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitKalmanSmoother::Fit(
    CbmLitTrack* track,
    bool downstream)

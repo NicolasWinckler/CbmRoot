@@ -27,16 +27,6 @@ CbmLitNearestHitToTrackMerger::~CbmLitNearestHitToTrackMerger()
 {
 }
 
-LitStatus CbmLitNearestHitToTrackMerger::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitNearestHitToTrackMerger::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitNearestHitToTrackMerger::DoMerge(
    HitPtrVector& hits,
    TrackPtrVector& tracks)

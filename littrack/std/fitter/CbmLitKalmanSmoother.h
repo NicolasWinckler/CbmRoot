@@ -23,12 +23,6 @@ public:
    /* Destructor */
    virtual ~CbmLitKalmanSmoother();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitTrackFitter */
    virtual LitStatus Fit(
       CbmLitTrack* track,

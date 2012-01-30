@@ -24,16 +24,6 @@ CbmLitTGeoNavigator::~CbmLitTGeoNavigator()
 {
 }
 
-LitStatus CbmLitTGeoNavigator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTGeoNavigator::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTGeoNavigator::FindIntersections(
    const CbmLitTrackParam* par,
    myf zOut,

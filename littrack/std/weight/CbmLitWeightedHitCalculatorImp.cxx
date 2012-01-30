@@ -15,16 +15,6 @@ CbmLitWeightedHitCalculatorImp::~CbmLitWeightedHitCalculatorImp()
 {
 }
 
-LitStatus CbmLitWeightedHitCalculatorImp::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitWeightedHitCalculatorImp::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 void CbmLitWeightedHitCalculatorImp::DoCalculate(
    HitPtrIterator itBegin,
    HitPtrIterator itEnd,

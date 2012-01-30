@@ -10,9 +10,6 @@ public:
    CbmLitTrackSelectionMuchRobust();
    virtual ~CbmLitTrackSelectionMuchRobust();
 
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
-
    virtual LitStatus DoSelect(
       TrackPtrIterator itBegin,
       TrackPtrIterator itEnd);

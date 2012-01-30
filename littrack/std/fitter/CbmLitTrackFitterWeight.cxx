@@ -47,16 +47,6 @@ CbmLitTrackFitterWeight::~CbmLitTrackFitterWeight()
 {
 }
 
-LitStatus CbmLitTrackFitterWeight::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFitterWeight::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFitterWeight::Fit(
    CbmLitTrack* track,
    bool downstream)

@@ -33,16 +33,6 @@ CbmLitTrackFinderBranch::~CbmLitTrackFinderBranch()
 {
 }
 
-LitStatus CbmLitTrackFinderBranch::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFinderBranch::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFinderBranch::DoFind(
    HitPtrVector& hits,
    TrackPtrVector& trackSeeds,

@@ -22,9 +22,6 @@ public:
    CbmLitParallelTrackFitterTestElectron();
    virtual ~CbmLitParallelTrackFitterTestElectron();
 
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
-
    virtual LitStatus Fit(
       CbmLitTrack* track,
       bool downstream = true);

@@ -53,17 +53,14 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
 {
    if(name == "line") {
       TrackExtrapolatorPtr extrapolator(new CbmLitLineTrackExtrapolator());
-      extrapolator->Initialize();
       return extrapolator;
    } else if (name == "rk4") {
       CbmLitEnvironment* env = CbmLitEnvironment::Instance();
       CbmLitField* field = new CbmLitMapField(env->GetField());
       TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator(field));
-      extrapolator->Initialize();
       return extrapolator;
    } else if (name == "lit") {
       TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator(""));
-      extrapolator->Initialize();
       return extrapolator;
    }
    return TrackExtrapolatorPtr();
@@ -74,23 +71,18 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
 {
    if(name == "geane") {
       TrackPropagatorPtr propagator(new CbmLitTrackPropagatorGeane());
-      propagator->Initialize();
       return propagator;
    } else if(name == "lit") {
       TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("lit")));
-      propagator->Initialize();
       return propagator;
    } else if(name == "mylit") {
       TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("lit")));
-      propagator->Initialize();
       return propagator;
    } else if(name == "rk4") {
       TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
-      propagator->Initialize();
       return propagator;
    } else if(name == "line") {
       TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("line")));
-      propagator->Initialize();
       return propagator;
    }
    return TrackPropagatorPtr();
@@ -101,7 +93,6 @@ TrackUpdatePtr CbmLitToolFactory::CreateTrackUpdate(
 {
    if(name == "kalman") {
       TrackUpdatePtr update(new CbmLitKalmanFilter());
-      update->Initialize();
       return update;
    }
    return TrackUpdatePtr();
@@ -150,25 +141,21 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 {
    if(name == "empty") {
       TrackSelectionPtr selection(new CbmLitTrackSelectionEmpty());
-      selection->Initialize();
       return selection;
    } else if(name == "momentum") {
       //TrackSelectionPtr selection(new CbmLitTrackSelectionMomentum());
       CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
       momSelection->SetMinMomentum(0.1);
-      momSelection->Initialize();
       TrackSelectionPtr selection(momSelection);
       return selection;
    } else if(name == "momentum_seed") {
       CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
       momSelection->SetMinMomentum(1.0);
-      momSelection->Initialize();
       TrackSelectionPtr selection(momSelection);
       return selection;
    } else if(name == "chi_square") {
       CbmLitTrackSelectionCuts* chiSqSelection = new CbmLitTrackSelectionCuts();
       chiSqSelection->SetMaxChiSq(30.);
-      chiSqSelection->Initialize();
       TrackSelectionPtr selection(chiSqSelection);
       return selection;
    } else if(name == "much_final") {
@@ -176,28 +163,24 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
       muchSelection->SetNofSharedHits(3);
       muchSelection->SetMinNofHits(1);
       muchSelection->SetMinLastPlaneId(0);
-      muchSelection->Initialize();
       TrackSelectionPtr selection(muchSelection);
       return selection;
    } else if(name == "trd_station") {
       CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
       trdSelection->SetNofSharedHits(2);
       trdSelection->SetMinNofHits(0);
-      trdSelection->Initialize();
       TrackSelectionPtr selection(trdSelection);
       return selection;
    } else if(name == "trd_final") {
       CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
       trdSelection->SetNofSharedHits(3);
       trdSelection->SetMinNofHits(0);
-      trdSelection->Initialize();
       TrackSelectionPtr selection(trdSelection);
       return selection;
    } else if(name == "trd_final_iter_1") {
       CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
       trdSelection->SetNofSharedHits(3);
       trdSelection->SetMinNofHits(8);
-      trdSelection->Initialize();
       TrackSelectionPtr selection(trdSelection);
       return selection;
    }
@@ -228,7 +211,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       trdFinderNN->SetSettings(settings);
       trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       trdFinderNN->SetVerbose(1);
-      trdFinderNN->Initialize();
       TrackFinderPtr finder(trdFinderNN);
       return finder;
    } else if(name == "e_branch") {
@@ -254,7 +236,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       trdFinderBranch->SetSettings(settings);
       trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       trdFinderBranch->SetVerbose(1);
-      trdFinderBranch->Initialize();
       TrackFinderPtr finder(trdFinderBranch);
       return finder;
    } else if(name == "e_weight") {
@@ -275,7 +256,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       trdFinderWeight->SetSettings(settings);
       trdFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       trdFinderWeight->SetVerbose(1);
-      trdFinderWeight->Initialize();
       TrackFinderPtr finder(trdFinderWeight);
       return finder;
    } else if(name == "mu_nn") {
@@ -296,17 +276,14 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       muchFinderNN->SetSettings(settings);
       muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       muchFinderNN->SetVerbose(1);
-      muchFinderNN->Initialize();
       TrackFinderPtr finder(muchFinderNN);
       return finder;
    } else if(name == "e_nn_parallel") {
       CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_parallel_electron");
-      finderNN->Initialize();
       TrackFinderPtr finder(finderNN);
       return finder;
    } else if(name == "mu_nn_parallel") {
       CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel("nn_parallel_muon");
-      muchFinderNN->Initialize();
       TrackFinderPtr finder(muchFinderNN);
       return finder;
    } else if(name == "mu_branch") {
@@ -329,7 +306,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       muchFinderBranch->SetSettings(settings);
       muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       muchFinderBranch->SetVerbose(1);
-      muchFinderBranch->Initialize();
       TrackFinderPtr finder(muchFinderBranch);
       return finder;
    } else if(name == "mu_weight") {
@@ -350,7 +326,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       muchFinderWeight->SetSettings(settings);
       muchFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       muchFinderWeight->SetVerbose(1);
-      muchFinderWeight->Initialize();
       TrackFinderPtr finder(muchFinderWeight);
       return finder;
    } else if(name == "mvd_nn") {
@@ -371,7 +346,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       mvdFinderNN->SetSettings(settings);
       mvdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMvdLayout());
       mvdFinderNN->SetVerbose(1);
-      mvdFinderNN->Initialize();
       TrackFinderPtr finder(mvdFinderNN);
       return finder;
    }
@@ -391,7 +365,6 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
       nhMerger->SetChiSqPixelHitCut(50.);//13.86);
       nhMerger->SetChiSqStripHitCut(9.);
       nhMerger->SetStation(CbmLitEnvironment::Instance()->GetTofStation());
-      nhMerger->Initialize();
       HitToTrackMergerPtr merger(nhMerger);
       return merger;
    }

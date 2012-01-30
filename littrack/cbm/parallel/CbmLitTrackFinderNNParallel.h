@@ -45,16 +45,6 @@ public:
       TrackPtrVector& trackSeeds,
       TrackPtrVector& tracks);
 
-   /**
-    * \brief Inherited from CbmLitTool.
-    */
-   virtual LitStatus Initialize();
-
-   /**
-    * \brief Inherited from CbmLitTool.
-    */
-   virtual LitStatus Finalize();
-
 private:
    void ConvertHits(
       HitPtrVector& hits,

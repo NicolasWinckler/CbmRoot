@@ -9,26 +9,21 @@
 #ifndef CBMLITTRACKEXTRAPOLATOR_H_
 #define CBMLITTRACKEXTRAPOLATOR_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitFloat.h"
+#include "base/CbmLitEnums.h"
 
 #include <vector>
 
 class CbmLitTrackParam;
 
-class CbmLitTrackExtrapolator : public CbmLitTool
+class CbmLitTrackExtrapolator
 {
 public:
    /* Constructor */
-   CbmLitTrackExtrapolator() {};
-
-   /* Constructor with name.
-    * @param name Name of the tool. */
-   CbmLitTrackExtrapolator(
-      const std::string& name):CbmLitTool(name) {};
+   CbmLitTrackExtrapolator() {}
 
    /* Destructor */
-   virtual ~CbmLitTrackExtrapolator() {};
+   virtual ~CbmLitTrackExtrapolator() {}
 
    /* Pure virtual function for track parameters extrapolation with calculation of transport matrix.
     * @param parIn Pointer to the initial track parameters.

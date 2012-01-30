@@ -11,23 +11,12 @@
 
 CbmLitRK4TrackExtrapolator::CbmLitRK4TrackExtrapolator(
    CbmLitField* field):
-   CbmLitTrackExtrapolator("CbmLitRK4TrackExtrapolator"),
    fField(field)
 {
 }
 
 CbmLitRK4TrackExtrapolator::~CbmLitRK4TrackExtrapolator()
 {
-}
-
-LitStatus CbmLitRK4TrackExtrapolator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitRK4TrackExtrapolator::Finalize()
-{
-   return kLITSUCCESS;
 }
 
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(

@@ -24,12 +24,6 @@ public:
    /* Destructor */
    virtual ~CbmLitTGeoNavigator();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitGeoNavigator */
    LitStatus FindIntersections(
       const CbmLitTrackParam* par,

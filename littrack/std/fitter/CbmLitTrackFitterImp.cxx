@@ -27,16 +27,6 @@ CbmLitTrackFitterImp::~CbmLitTrackFitterImp()
 {
 }
 
-LitStatus CbmLitTrackFitterImp::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFitterImp::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFitterImp::Fit(
    CbmLitTrack* track,
    bool downstream)

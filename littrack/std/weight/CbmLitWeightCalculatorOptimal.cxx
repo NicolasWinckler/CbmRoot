@@ -23,16 +23,6 @@ CbmLitWeightCalculatorOptimal::~CbmLitWeightCalculatorOptimal()
 {
 }
 
-LitStatus CbmLitWeightCalculatorOptimal::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitWeightCalculatorOptimal::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitWeightCalculatorOptimal::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,

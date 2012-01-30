@@ -8,24 +8,19 @@
 #ifndef CBMLITTRACKUPDATE_H_
 #define CBMLITTRACKUPDATE_H_
 
-#include "base/CbmLitTool.h"
+#include "base/CbmLitEnums.h"
 
 class CbmLitHit;
 class CbmLitTrackParam;
 
-class CbmLitTrackUpdate : public CbmLitTool
+class CbmLitTrackUpdate
 {
 public:
    /* Constructor */
-   CbmLitTrackUpdate() {};
-
-   /* Constructor with name
-    * @param name Name of the tool */
-   CbmLitTrackUpdate(
-      const std::string& name):CbmLitTool(name) {};
+   CbmLitTrackUpdate() {}
 
    /* Destructor */
-   virtual ~CbmLitTrackUpdate() {};
+   virtual ~CbmLitTrackUpdate() {}
 
    /* Main function to be implemented for the concrete track update algorithm
     * @param pParamIn Pointer to input track parameter

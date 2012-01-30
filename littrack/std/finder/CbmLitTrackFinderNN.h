@@ -32,12 +32,6 @@ public:
       TrackPtrVector& trackSeeds,
       TrackPtrVector& tracks);
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Sets seed selection tool.
     * @param seedSelection Pointer to seed selection tool.
     */

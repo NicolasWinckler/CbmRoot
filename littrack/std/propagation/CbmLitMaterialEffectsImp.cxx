@@ -26,16 +26,6 @@ CbmLitMaterialEffectsImp::~CbmLitMaterialEffectsImp()
 {
 }
 
-LitStatus CbmLitMaterialEffectsImp::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitMaterialEffectsImp::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitMaterialEffectsImp::Update(
    CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat,

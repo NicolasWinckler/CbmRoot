@@ -34,16 +34,6 @@ CbmLitTrackSelectionCuts::~CbmLitTrackSelectionCuts()
 
 }
 
-LitStatus CbmLitTrackSelectionCuts::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionCuts::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackSelectionCuts::DoSelect(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)

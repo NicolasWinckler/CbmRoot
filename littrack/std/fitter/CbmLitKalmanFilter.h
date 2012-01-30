@@ -25,12 +25,6 @@ public:
    /* Destructor */
    virtual ~CbmLitKalmanFilter();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitTrackUpdate */
    virtual LitStatus Update(
       const CbmLitTrackParam* parIn,

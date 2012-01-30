@@ -43,16 +43,6 @@ CbmLitParallelTrackFitterTestElectron::~CbmLitParallelTrackFitterTestElectron()
 
 }
 
-LitStatus CbmLitParallelTrackFitterTestElectron::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitParallelTrackFitterTestElectron::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
    CbmLitTrack* track,
    bool downstream)

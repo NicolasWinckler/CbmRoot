@@ -8,23 +8,21 @@
 #ifndef CBMLITGEONAVIGATOR_H_
 #define CBMLITGEONAVIGATOR_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitFloat.h"
+#include "base/CbmLitEnums.h"
 #include "propagation/CbmLitMaterialInfo.h"
-
-
 #include <vector>
 
 class CbmLitTrackParam;
 
-class CbmLitGeoNavigator : public CbmLitTool
+class CbmLitGeoNavigator
 {
 public:
    /* Constructor */
-   CbmLitGeoNavigator() {};
+   CbmLitGeoNavigator() {}
 
    /* Destructor */
-   virtual ~CbmLitGeoNavigator() {};
+   virtual ~CbmLitGeoNavigator() {}
 
    /* Finds intersection points with detector materials on a certain interval.
     * @param par Input track parameters. Defines initial direction and Z position.

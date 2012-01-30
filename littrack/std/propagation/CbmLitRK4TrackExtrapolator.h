@@ -32,12 +32,6 @@ public:
    /* Destructor */
    virtual ~CbmLitRK4TrackExtrapolator();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitTrackExtrapolation */
    virtual LitStatus Extrapolate(
       const CbmLitTrackParam* parIn,

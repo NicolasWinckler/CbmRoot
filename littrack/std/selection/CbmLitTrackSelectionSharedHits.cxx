@@ -21,16 +21,6 @@ CbmLitTrackSelectionSharedHits::~CbmLitTrackSelectionSharedHits()
 {
 }
 
-LitStatus CbmLitTrackSelectionSharedHits::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionSharedHits::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackSelectionSharedHits::DoSelect(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)

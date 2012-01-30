@@ -13,23 +13,12 @@
 #include <iostream>
 #include <cmath>
 
-CbmLitKalmanFilter::CbmLitKalmanFilter():
-   CbmLitTrackUpdate("CbmLitKalmanFilter")
+CbmLitKalmanFilter::CbmLitKalmanFilter()
 {
 }
 
 CbmLitKalmanFilter::~CbmLitKalmanFilter()
 {
-}
-
-LitStatus CbmLitKalmanFilter::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitKalmanFilter::Finalize()
-{
-   return kLITSUCCESS;
 }
 
 LitStatus CbmLitKalmanFilter::Update(

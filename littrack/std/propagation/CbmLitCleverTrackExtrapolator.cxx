@@ -26,16 +26,6 @@ CbmLitCleverTrackExtrapolator::~CbmLitCleverTrackExtrapolator()
 {
 }
 
-LitStatus CbmLitCleverTrackExtrapolator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitCleverTrackExtrapolator::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,

@@ -14,9 +14,6 @@ public:
    CbmLitWeightCalculatorGauss();
    virtual ~CbmLitWeightCalculatorGauss();
 
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
-
    virtual LitStatus DoCalculate(
       const CbmLitTrackParam* par,
       HitPtrIterator itBegin,

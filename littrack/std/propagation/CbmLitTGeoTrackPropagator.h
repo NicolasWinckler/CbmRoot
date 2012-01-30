@@ -27,12 +27,6 @@ public:
    /* Destructor */
    virtual ~CbmLitTGeoTrackPropagator();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitTrackPropagator */
    virtual LitStatus Propagate(
       const CbmLitTrackParam* parIn,

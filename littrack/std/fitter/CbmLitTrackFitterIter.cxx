@@ -25,16 +25,6 @@ CbmLitTrackFitterIter::~CbmLitTrackFitterIter()
 {
 }
 
-LitStatus CbmLitTrackFitterIter::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFitterIter::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFitterIter::Fit(
    CbmLitTrack* track,
    bool downstream)

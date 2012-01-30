@@ -27,16 +27,6 @@ CbmLitTrackFinderWeight::~CbmLitTrackFinderWeight()
 {
 }
 
-LitStatus CbmLitTrackFinderWeight::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFinderWeight::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFinderWeight::DoFind(
    HitPtrVector& hits,
    TrackPtrVector& trackSeeds,

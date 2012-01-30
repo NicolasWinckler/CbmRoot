@@ -29,16 +29,6 @@ CbmLitTrackFinderNN::~CbmLitTrackFinderNN()
 {
 }
 
-LitStatus CbmLitTrackFinderNN::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFinderNN::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackFinderNN::DoFind(
    HitPtrVector& hits,
    TrackPtrVector& trackSeeds,

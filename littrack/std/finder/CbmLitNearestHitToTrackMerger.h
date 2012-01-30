@@ -28,12 +28,6 @@ public:
    /* Destructor */
    virtual ~CbmLitNearestHitToTrackMerger();
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Inherited from CbmLitHitToTrackMerger */
    virtual LitStatus DoMerge(
       HitPtrVector& hits, //TODO: add const here

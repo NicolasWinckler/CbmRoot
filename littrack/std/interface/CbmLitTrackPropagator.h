@@ -10,25 +10,21 @@
 #ifndef CBMLITTRACKPROPAGATOR_H_
 #define CBMLITTRACKPROPAGATOR_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitFloat.h"
+#include "base/CbmLitEnums.h"
 
 #include <vector>
 
 class CbmLitTrackParam;
 
-class CbmLitTrackPropagator : public CbmLitTool
+class CbmLitTrackPropagator
 {
 public:
    /* Constructor */
-   CbmLitTrackPropagator() {};
-
-   /* Constructor with tool name
-    * @param name Name of the tool */
-   CbmLitTrackPropagator(const std::string& name):CbmLitTool(name) {};
+   CbmLitTrackPropagator() {}
 
    /* Destructor */
-   virtual ~CbmLitTrackPropagator() {};
+   virtual ~CbmLitTrackPropagator() {}
 
    /* Pure virtual functions for track parameters propagation.
     * @param parIn Pointer to the initial track parameters.

@@ -18,25 +18,12 @@ CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
    fMinLastPlaneId(0)
 {
    fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
-   fSharedHitsSelection->Initialize();
    fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
-   fCutsSelection->Initialize();
    fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
-   fSameSeedSelection->Initialize();
 }
 
 CbmLitTrackSelectionMuch::~CbmLitTrackSelectionMuch()
 {
-}
-
-LitStatus CbmLitTrackSelectionMuch::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionMuch::Finalize()
-{
-   return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionMuch::DoSelect(

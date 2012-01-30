@@ -8,23 +8,12 @@
 
 #include "data/CbmLitTrackParam.h"
 
-CbmLitLineTrackExtrapolator::CbmLitLineTrackExtrapolator():
-   CbmLitTrackExtrapolator("CbmLitLineTrackExtrapolator")
+CbmLitLineTrackExtrapolator::CbmLitLineTrackExtrapolator()
 {
 }
 
 CbmLitLineTrackExtrapolator::~CbmLitLineTrackExtrapolator()
 {
-}
-
-LitStatus CbmLitLineTrackExtrapolator::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitLineTrackExtrapolator::Finalize()
-{
-   return kLITSUCCESS;
 }
 
 LitStatus CbmLitLineTrackExtrapolator::Extrapolate(

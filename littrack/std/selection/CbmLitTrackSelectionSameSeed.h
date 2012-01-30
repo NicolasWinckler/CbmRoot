@@ -23,12 +23,6 @@ public:
    /* Destructor */
    virtual ~CbmLitTrackSelectionSameSeed();
 
-   /* Derived from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Derived from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Derived from CbmLitTrackSelection */
    virtual LitStatus DoSelect(
       TrackPtrIterator itBegin,

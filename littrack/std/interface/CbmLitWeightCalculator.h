@@ -8,19 +8,19 @@
 #ifndef CBMLITWEIGHTCALCULATOR_H_
 #define CBMLITWEIGHTCALCULATOR_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
 
 class CbmLitTrackParam;
 
-class CbmLitWeightCalculator : public CbmLitTool
+class CbmLitWeightCalculator
 {
 public:
    /* Constructor */
-   CbmLitWeightCalculator() {};
+   CbmLitWeightCalculator() {}
 
    /* Destructor */
-   virtual ~CbmLitWeightCalculator() {};
+   virtual ~CbmLitWeightCalculator() {}
 
    /* Main function to be implemented for the concrete weight calculation algorithm
     * @param par Pointer to the track parameter

@@ -10,16 +10,6 @@ CbmLitWeightCalculatorSimple::~CbmLitWeightCalculatorSimple()
 {
 }
 
-LitStatus CbmLitWeightCalculatorSimple::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitWeightCalculatorSimple::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,

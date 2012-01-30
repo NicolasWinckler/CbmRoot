@@ -28,16 +28,6 @@ CbmLitTrackSelectionMuchRobust::~CbmLitTrackSelectionMuchRobust()
 // if (fSelectionC) delete fSelectionC;
 }
 
-LitStatus CbmLitTrackSelectionMuchRobust::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackSelectionMuchRobust::Finalize()
-{
-   return kLITSUCCESS;
-}
-
 LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)

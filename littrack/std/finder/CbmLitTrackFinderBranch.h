@@ -34,12 +34,6 @@ public:
       TrackPtrVector& trackSeeds,
       TrackPtrVector& tracks);
 
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Initialize();
-
-   /* Inherited from CbmLitTool */
-   virtual LitStatus Finalize();
-
    /* Sets is always create missing hit */
    void IsAlwaysCreateMissingHit(bool isAlwaysCreateMissingHit) {fIsAlwaysCreateMissingHit = isAlwaysCreateMissingHit;}
 

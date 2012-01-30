@@ -8,17 +8,17 @@
 #ifndef CBMLITTRACKSELECTION_H_
 #define CBMLITTRACKSELECTION_H_
 
-#include "base/CbmLitTool.h"
 #include "base/CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
 
-class CbmLitTrackSelection : public CbmLitTool
+class CbmLitTrackSelection
 {
 public:
    /* Constructor */
-   CbmLitTrackSelection() {};
+   CbmLitTrackSelection() {}
 
    /* Destructor */
-   virtual ~CbmLitTrackSelection() {};
+   virtual ~CbmLitTrackSelection() {}
 
    /* Main function to be implemented for the concrete track selection algorithm
     * @param itBegin Iterator to the first track

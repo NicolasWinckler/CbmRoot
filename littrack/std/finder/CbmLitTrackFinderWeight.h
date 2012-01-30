@@ -15,9 +15,6 @@ public:
       TrackPtrVector& trackSeeds,
       TrackPtrVector& tracks);
 
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
-
    void SetSeedSelection(TrackSelectionPtr seedSelection) {fSeedSelection=seedSelection;}
    void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
    void SetFinalSelection(TrackSelectionPtr finalSelection) {fFinalSelection = finalSelection;}

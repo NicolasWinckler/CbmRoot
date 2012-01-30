@@ -34,6 +34,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 using boost::property_tree::ptree;
+using std::make_pair;
 
 CbmLitFitQa::CbmLitFitQa():
    fIsFixedBounds(true),
@@ -41,14 +42,15 @@ CbmLitFitQa::CbmLitFitQa():
    fStsMinNofHits(0),
    fTrdMinNofHits(0),
    fMuchMinNofHits(0),
-   fOutputDir("./test/")
+   fOutputDir("./test/"),
+   fQuota(0.7)
 {
 
 }
 
 CbmLitFitQa::~CbmLitFitQa()
 {
-
+   if (fHM) delete fHM;
 }
 
 InitStatus CbmLitFitQa::Init()
@@ -87,9 +89,6 @@ void CbmLitFitQa::Finish()
 
    fHM->WriteToFile();
 
-//   CbmLitTrackingQaDraw drawQa;
-//   drawQa.Draw(fHM, fOutputDir);
-
    string qaFile = fOutputDir + "/fit_qa.json";
    string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/fit_qa_ideal.json");
    string checkFile = fOutputDir + "/fit_qa_check.json";
@@ -102,8 +101,6 @@ void CbmLitFitQa::Finish()
    qaChecker.DoCheck(qaFile, idealFile, checkFile);
 
    CreateSimulationReport("Fit QA", fOutputDir);
-
-   if (fHM) delete fHM;
 }
 
 void CbmLitFitQa::SetParContainers()
@@ -173,14 +170,18 @@ void CbmLitFitQa::CreateHistograms()
    std::vector<std::pair<Float_t, Float_t> > bounds;
    if (fIsFixedBounds) {
       bounds = boost::assign::list_of
-            (std::make_pair(-1., 1.))(std::make_pair(-1., 1.)) // X, Y residuals
-            (std::make_pair(-.01, .01))(std::make_pair(-.01, .01)) // Tx, Ty residuals
-            (std::make_pair(-.1, .1)) // Qp residual
-            (std::make_pair(-5., 5.))(std::make_pair(-5., 5.)) // X, Y pull
-            (std::make_pair(-5., 5.))(std::make_pair(-5., 5.)) // Tx, Ty pull
-            (std::make_pair(-7., 7.)); // Qp pull
+            (make_pair(-1., 1.)) // X residual
+            (make_pair(-1., 1.)) // Y residual
+            (make_pair(-.01, .01)) // Tx residual
+            (make_pair(-.01, .01)) // Ty residual
+            (make_pair(-.1, .1)) // Qp residual
+            (make_pair(-5., 5.)) // X pull
+            (make_pair(-5., 5.)) // Y pull
+            (make_pair(-5., 5.)) // Tx pull
+            (make_pair(-5., 5.)) // Ty pull
+            (make_pair(-7., 7.)); // Qp pull
    } else {
-      bounds.assign(NOF_PARAMS, std::make_pair(0.,0.));
+      bounds.assign(NOF_PARAMS, make_pair(0.,0.));
    }
 
    Int_t minNofHits = 0;
@@ -222,6 +223,10 @@ void CbmLitFitQa::ProcessStsTrack(
    CbmTrackMatch* match = static_cast<CbmTrackMatch*>(fStsTrackMatches->At(trackId));
    Int_t mcId = match->GetMCTrackId();
    if (mcId < 0) return; // Ghost or fake track
+
+   // Check correctness of reconstructed track
+   Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
+   if ((match->GetNofTrueHits() / allHits) < fQuota) return;
 
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(trackId));
    Int_t nofStsHits = track->GetNStsHits();
@@ -269,6 +274,10 @@ void CbmLitFitQa::ProcessTrdTrack(
    Int_t mcId = match->GetMCTrackId();
    if (mcId < 0) return; // Ghost or fake track
 
+   // Check correctness of reconstructed track
+   Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
+   if ((match->GetNofTrueHits() / allHits) < fQuota) return;
+
    CbmTrack* track = static_cast<CbmTrack*>(fTrdTracks->At(trackId));
    Int_t nofHits = track->GetNofHits();
    if (nofHits < 1) return; // No hits
@@ -308,6 +317,10 @@ void CbmLitFitQa::ProcessMuchTrack(
    CbmTrackMatch* match = static_cast<CbmTrackMatch*>(fMuchTrackMatches->At(trackId));
    Int_t mcId = match->GetMCTrackId();
    if (mcId < 0) return; // Ghost or fake track
+
+   // Check correctness of reconstructed track
+   Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
+   if ((match->GetNofTrueHits() / allHits) < fQuota) return;
 
    CbmTrack* track = static_cast<CbmTrack*>(fMuchTracks->At(trackId));
    Int_t nofHits = track->GetNofHits();

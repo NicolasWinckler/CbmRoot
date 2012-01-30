@@ -143,6 +143,8 @@ private:
    Int_t fTrdMinNofHits; // Cut on minimum number of hits in track in TRD
    Int_t fMuchMinNofHits; // Cut on minimum number of hits in track in MUCH
 
+   Double_t fQuota; // percent of correctly attached hits
+
    std::string fOutputDir; // Output directory for images
 
    CbmLitHistManager* fHM; // Histogram manager

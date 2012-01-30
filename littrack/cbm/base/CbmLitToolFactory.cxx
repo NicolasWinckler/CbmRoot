@@ -23,7 +23,6 @@
 #include "propagation/CbmLitLineTrackExtrapolator.h"
 #include "propagation/CbmLitCleverTrackExtrapolator.h"
 #include "propagation/CbmLitTGeoTrackPropagator.h"
-#include "propagation/CbmLitTrackPropagatorGeane.h"
 #include "selection/CbmLitTrackSelectionEmpty.h"
 #include "selection/CbmLitTrackSelectionCuts.h"
 #include "selection/CbmLitTrackSelectionMuch.h"
@@ -68,10 +67,7 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
 TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
    const std::string& name)
 {
-   if(name == "geane") {
-      TrackPropagatorPtr propagator(new CbmLitTrackPropagatorGeane());
-      return propagator;
-   } else if(name == "lit") {
+   if(name == "lit") {
       TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("lit")));
       return propagator;
    } else if(name == "rk4") {
@@ -100,11 +96,6 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
    if(name == "lit_kalman") {
       TrackPropagatorPtr propagator = CreateTrackPropagator("lit");
       //((CbmLitTGeoTrackPropagator*) propagator)->IsCalcTransportMatrix(true);
-      TrackUpdatePtr update = CreateTrackUpdate("kalman");
-      TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
-      return fitter;
-   } else if(name == "geane_kalman") {
-      TrackPropagatorPtr propagator = CreateTrackPropagator("geane");
       TrackUpdatePtr update = CreateTrackUpdate("kalman");
       TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
       return fitter;

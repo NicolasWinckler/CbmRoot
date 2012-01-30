@@ -100,14 +100,15 @@ void CbmLitClusteringQa::CreateStudyReport(
       const vector<string>& resultDirectories,
       const vector<string>& studyNames)
 {
-   CbmLitClusteringQaStudyReport report;
-   report.SetTitle(title);
+   CbmLitStudyReport* report = new CbmLitClusteringQaStudyReport();
+   report->SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/clustering_qa_study.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/clustering_qa_study.tex").c_str());
    ofstream foutText(string(fOutputDir + "/clustering_qa_study.txt").c_str());
-//   report.Create(kLitText, cout, resultDirectories, studyNames);
-   report.Create(kLitHtml, foutHtml, resultDirectories, studyNames);
-   report.Create(kLitLatex, foutLatex, resultDirectories, studyNames);
-   report.Create(kLitText, foutText, resultDirectories, studyNames);
+//   report->Create(kLitText, cout, resultDirectories, studyNames);
+   report->Create(kLitHtml, foutHtml, resultDirectories, studyNames);
+   report->Create(kLitLatex, foutLatex, resultDirectories, studyNames);
+   report->Create(kLitText, foutText, resultDirectories, studyNames);
+   delete report;
 }
 ClassImp(CbmLitClusteringQa);

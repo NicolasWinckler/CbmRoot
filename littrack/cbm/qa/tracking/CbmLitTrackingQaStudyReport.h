@@ -9,6 +9,7 @@
 
 #include "../report/CbmLitStudyReport.h"
 #include <string>
+#include "TSystem.h"
 using std::string;
 
 /**
@@ -37,29 +38,39 @@ public:
     */
    virtual ~CbmLitTrackingQaStudyReport();
 
-   /**
-    * \brief Inherited from CbmLitStudyReport.
-    */
-   void Create(
-         LitReportType reportType,
-         ostream& out,
-         const vector<string>& resultDirectories,
-         const vector<string>& studyNames);
-
 protected:
     /**
-    * \brief Create and write report text to output stream.
-    * \param[out] out Output stream.
+    * \brief Inherited from CbmLitStudyReport.
     */
    void Create(
          ostream& out);
 
    /**
+     * \brief Inherited from CbmLitSimulationReport.
+     */
+    virtual string GetQaFileName() const {
+       return "tracking_qa.json";
+    }
+
+    /**
+     * \brief Inherited from CbmLitSimulationReport.
+     */
+    virtual string GetIdealFileName() const {
+       return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
+    }
+
+    /**
+     * \brief Inherited from CbmLitSimulationReport.
+     */
+    virtual string GetCheckFileName() const {
+       return "tracking_qa_check.json";
+    }
+
+   /**
     * \brief Print one row in a table.
-    * \param[in] row Row counter. Used to highlight row.
     * \param[in] property Name of the property in property tree.
     * \param[in] name Name of the row.
-    * \return string with table row in HTML format.
+    * \return String with table row.
     */
    virtual string PrintRow(
       const string& property,
@@ -69,7 +80,7 @@ protected:
     * \brief Print one row with efficiencies in a table.
     * \param[in] property Name of the property in property tree.
     * \param[in] name Name of the row.
-    * \return string with table row in HTML format.
+    * \return String with table row.
     */
    virtual string PrintRowEff(
          const string& property,
@@ -79,7 +90,7 @@ protected:
     * \brief Print table of images with reconstruction performance.
     * \param[in] title Title of the image.
     * \param[in] file Name of the image file.
-    * \return string with table which contains images in HTML format.
+    * \return String with table which contains images.
     */
    virtual string PrintImageTable(
          const string& title,

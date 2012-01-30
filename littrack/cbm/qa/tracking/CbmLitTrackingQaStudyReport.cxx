@@ -9,10 +9,8 @@
 #include "TSystem.h"
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
-using boost::property_tree::json_parser_error;
 
 CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport()
 {
@@ -20,47 +18,6 @@ CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport()
 
 CbmLitTrackingQaStudyReport::~CbmLitTrackingQaStudyReport()
 {
-}
-
-void CbmLitTrackingQaStudyReport::Create(
-      LitReportType reportType,
-      ostream& out,
-      const vector<string>& resultDirectories,
-      const vector<string>& studyNames)
-{
-   CreateReportElement(reportType);
-
-   int nofStudies = resultDirectories.size();
-
-   fResultDirectories = resultDirectories;
-   fStudyNames = studyNames;
-
-   fQa.resize(nofStudies);
-   fCheck.resize(nofStudies);
-   for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
-      try {
-         read_json(resultDirectories[iStudy] + "/tracking_qa.json", fQa[iStudy]);
-         read_json(resultDirectories[iStudy] + "/tracking_qa_check.json", fCheck[iStudy]);
-      } catch (json_parser_error error) {
-         cout << error.what();
-      }
-   }
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
-   try {
-      read_json(idealFile.c_str(), fIdeal);
-   } catch (json_parser_error error) {
-      cout << error.what();
-   }
-
-   Create(out);
-
-   fResultDirectories.clear();
-   fStudyNames.clear();
-   fQa.clear();
-   fCheck.clear();
-   fIdeal.clear();
-
-   DeleteReportElement();
 }
 
 void CbmLitTrackingQaStudyReport::Create(

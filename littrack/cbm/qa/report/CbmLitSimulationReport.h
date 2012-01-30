@@ -67,24 +67,6 @@ protected:
    virtual void Create(
          ostream& out) = 0;
 
-   /**
-    * \brief Pure virtual function has to return JSON file name with QA results.
-    * \return JSON file name.
-    */
-   virtual string GetQaFileName() const = 0;
-
-   /**
-    * \brief Pure virtual function has to return JSON file name with ideal results.
-    * \return JSON file name.
-    */
-   virtual string GetIdealFileName() const = 0;
-
-   /**
-    * \brief Pure virtual function has to return JSON file name with checked results.
-    * \return JSON file name.
-    */
-   virtual string GetCheckFileName() const = 0;
-
    ptree fQa; // Property tree of Qa results for each study
    ptree fIdeal; // Property with ideal values
    ptree fCheck; // Property tree with checked results for each study

@@ -68,6 +68,24 @@ protected:
     */
    void DeleteReportElement();
 
+   /**
+    * \brief Pure virtual function has to return JSON file name with QA results.
+    * \return JSON file name.
+    */
+   virtual string GetQaFileName() const = 0;
+
+   /**
+    * \brief Pure virtual function has to return JSON file name with ideal results.
+    * \return JSON file name.
+    */
+   virtual string GetIdealFileName() const = 0;
+
+   /**
+    * \brief Pure virtual function has to return JSON file name with checked results.
+    * \return JSON file name.
+    */
+   virtual string GetCheckFileName() const = 0;
+
    string fTitle; // Title of report
    string fAuthor; // Author of report
 //   string fDate; // Date when report was generated

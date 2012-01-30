@@ -54,8 +54,7 @@ public:
          const string& checkFile);
 
    /**
-    * \brief Checks reconstruction quality results.
-    *
+    * \brief Check reconstruction quality results.
     * \param[in] qa Reconstruction quality results stored as property tree.
     * \param[in] ideal Ideal reconstruction quality results as property tree.
     * \param[out] out Output property tree.
@@ -67,8 +66,7 @@ public:
 
 private:
    /**
-    * \brief Builds recursively map out of property tree.
-    *
+    * \brief Build recursively map out of property tree.
     * \param[in] path Initial path. Must be "".
     * \param[in] pt Input property tree.
     * \param[out] mymap Output map<"property name", "value">.

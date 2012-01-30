@@ -48,8 +48,6 @@ ${STD_DIR}propagation/CbmLitLineTrackExtrapolator.cxx
 ${STD_DIR}propagation/CbmLitTGeoNavigator.cxx
 ##${STD_DIR}propagation/CbmLitMaterialEffectsImp.cxx
 ${STD_DIR}propagation/CbmLitCleverTrackExtrapolator.cxx
-${STD_DIR}propagation/CbmLitMyGeoNavigator.cxx
-${STD_DIR}propagation/CbmLitMyTrackPropagator.cxx 
 
 ${STD_DIR}weight/CbmLitWeightedHitCalculatorImp.cxx
 ${STD_DIR}weight/CbmLitWeightCalculatorSimple.cxx

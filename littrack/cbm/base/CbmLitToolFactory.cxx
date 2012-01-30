@@ -23,7 +23,6 @@
 #include "propagation/CbmLitLineTrackExtrapolator.h"
 #include "propagation/CbmLitCleverTrackExtrapolator.h"
 #include "propagation/CbmLitTGeoTrackPropagator.h"
-#include "propagation/CbmLitMyTrackPropagator.h"
 #include "propagation/CbmLitTrackPropagatorGeane.h"
 #include "selection/CbmLitTrackSelectionEmpty.h"
 #include "selection/CbmLitTrackSelectionCuts.h"
@@ -75,9 +74,6 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
    } else if(name == "lit") {
       TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("lit")));
       return propagator;
-   } else if(name == "mylit") {
-      TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("lit")));
-      return propagator;
    } else if(name == "rk4") {
       TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
       return propagator;
@@ -120,12 +116,6 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
       TrackFitterPtr smoother = CreateTrackFitter("kalman_smoother");
       TrackFitterPtr rfitter(new CbmLitTrackFitterWeight(fitter, smoother));
       return rfitter;
-   } else if (name == "mylit_kalman") {
-      TrackPropagatorPtr propagator = CreateTrackPropagator("mylit");
-      //((CbmLitTGeoTrackPropagator*) propagator)->IsCalcTransportMatrix(true);
-      TrackUpdatePtr update = CreateTrackUpdate("kalman");
-      TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
-      return fitter;
    } else if (name == "kalman_parallel_muon") {
       TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestMuon());
       return fitter;

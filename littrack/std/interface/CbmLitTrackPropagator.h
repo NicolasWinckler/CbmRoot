@@ -36,9 +36,9 @@ public:
    virtual LitStatus Propagate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F = NULL) = 0;
+      std::vector<litfloat>* F = NULL) = 0;
 
    /* Pure virtual functions for track parameters propagation.
     * @param par Pointer to the initial and output track parameters.
@@ -48,9 +48,9 @@ public:
     * @return Propagation status. */
    virtual LitStatus Propagate(
       CbmLitTrackParam* par,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F = NULL) = 0;
+      std::vector<litfloat>* F = NULL) = 0;
 };
 
 #endif //CbmLitTrackPropagator

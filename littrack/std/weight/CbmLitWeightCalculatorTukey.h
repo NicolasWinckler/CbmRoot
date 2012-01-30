@@ -21,18 +21,18 @@ public:
       const CbmLitTrackParam* par,
       HitPtrIterator itBegin,
       HitPtrIterator itEnd,
-      myf T);
+      litfloat T);
 
    virtual LitStatus DoCalculate(
       const CbmLitTrackParam* par,
       HitPtrVector& hits,
-      myf T);
+      litfloat T);
 
 private:
    LitStatus TukeyWeight(
       const CbmLitTrackParam* par,
       CbmLitHit* hit,
-      myf T) const;
+      litfloat T) const;
 
    LitStatus Normalize(
       HitPtrIterator itBegin,

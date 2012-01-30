@@ -31,37 +31,37 @@ public:
    virtual ~CbmLitStripHit() {};
 
    /* Returns U measurement of hit */
-   myf GetU() const { return fU; }
+   litfloat GetU() const { return fU; }
 
    /* Returns U measurement error */
-   myf GetDu() const { return fDu; }
+   litfloat GetDu() const { return fDu; }
 
    /* Returns rotation angle of the strip */
-   myf GetPhi() const { return fPhi; }
+   litfloat GetPhi() const { return fPhi; }
 
    /* Returns cosine of the strip rotation angle */
-   myf GetCosPhi() const { return fCosPhi; }
+   litfloat GetCosPhi() const { return fCosPhi; }
 
    /* Returns sine of the strip rotation angle */
-   myf GetSinPhi() const { return fSinPhi; }
+   litfloat GetSinPhi() const { return fSinPhi; }
 
    /* Returns straw tube segment */
    int GetSegment() const { return fSegment; }
 
    /* Sets U measurement of the hit */
-   void SetU(myf u) { fU = u; }
+   void SetU(litfloat u) { fU = u; }
 
    /* Sets U measurement error */
-   void SetDu(myf du) { fDu = du; }
+   void SetDu(litfloat du) { fDu = du; }
 
    /* Sets rotation angle of the strip */
-   void SetPhi(myf phi) { fPhi = phi; }
+   void SetPhi(litfloat phi) { fPhi = phi; }
 
    /* Sets cosine of strip rotation angle */
-   void SetCosPhi(myf cosPhi) { fCosPhi = cosPhi; }
+   void SetCosPhi(litfloat cosPhi) { fCosPhi = cosPhi; }
 
    /* Sets sine of strip rotation angle */
-   void SetSinPhi(myf sinPhi) { fSinPhi = sinPhi; }
+   void SetSinPhi(litfloat sinPhi) { fSinPhi = sinPhi; }
 
    /* Sets straw tube segment */
    void SetSegment(int segment) { fSegment = segment; }
@@ -82,15 +82,15 @@ public:
 
 protected:
    /* U measurement of the hit in [cm] */
-   myf fU;
+   litfloat fU;
    /* U measurement error in [cm] */
-   myf fDu;
+   litfloat fDu;
    /* Strip rotation angle in [rad] */
-   myf fPhi;
+   litfloat fPhi;
    /* Cosine of the strip rotation angle */
-   myf fCosPhi;
+   litfloat fCosPhi;
    /* Sine of the strip rotation angle */
-   myf fSinPhi;
+   litfloat fSinPhi;
    /* Up or down segment of the straw tube */
    int fSegment;
 };

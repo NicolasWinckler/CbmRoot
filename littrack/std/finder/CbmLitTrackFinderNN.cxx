@@ -146,7 +146,7 @@ bool CbmLitTrackFinderNN::ProcessStation(
    par[0] = *track->GetParamLast();
    HitPtrIteratorPair hits[nofSubstations];
    for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-      myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
+      litfloat z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
       fPropagator->Propagate(&par[iSubstation], z, fPDG);
       if (iSubstation < nofSubstations - 1) { par[iSubstation + 1] = par[iSubstation]; }
       HitPtrIteratorPair bounds = MinMaxIndex(&par[iSubstation], fHitData.GetHits(stationGroup, station, iSubstation),
@@ -171,11 +171,11 @@ bool CbmLitTrackFinderNN::AddNearestHit1(
    bool hitAdded = false;
    CbmLitTrackParam uPar, param;
    HitPtrIterator hit(hits[0].second);
-   myf chiSq = std::numeric_limits<myf>::max();
+   litfloat chiSq = std::numeric_limits<litfloat>::max();
    for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
       for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
          //First update track parameters with KF, than check whether the hit is in the validation gate.
-         myf chi = 0.;
+         litfloat chi = 0.;
          fFilter->Update(&par[iSubstation], &uPar, *iHit, chi);
          if (IsHitInValidationGate(*iHit, chi, &par[iSubstation])) {
             // Check if current hit is closer by statistical distance than the previous ones
@@ -209,10 +209,10 @@ bool CbmLitTrackFinderNN::AddNearestHit2(
    for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
       CbmLitTrackParam uPar, param;
       HitPtrIterator hit(hits[iSubstation].second);
-      myf chiSq = std::numeric_limits<myf>::max();
+      litfloat chiSq = std::numeric_limits<litfloat>::max();
       for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
          //First update track parameters with KF, than check whether the hit is in the validation gate.
-         myf chi = 0.;
+         litfloat chi = 0.;
          fFilter->Update(&par[iSubstation], &uPar, *iHit, chi);
          if (IsHitInValidationGate(*iHit, chi, &par[iSubstation])) {
             // Check if current hit is closer by statistical distance than the previous ones

@@ -19,8 +19,8 @@ CbmLitLineTrackExtrapolator::~CbmLitLineTrackExtrapolator()
 LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,
-   myf zOut,
-   std::vector<myf>* F)
+   litfloat zOut,
+   std::vector<litfloat>* F)
 {
    *parOut = *parIn;
    return Extrapolate(parOut, zOut, F);
@@ -28,15 +28,15 @@ LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
 
 LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
    CbmLitTrackParam* par,
-   myf zOut,
-   std::vector<myf>* F)
+   litfloat zOut,
+   std::vector<litfloat>* F)
 {
-   myf X[5] = { par->GetX(), par->GetY(),
+   litfloat X[5] = { par->GetX(), par->GetY(),
                 par->GetTx(), par->GetTy(),
                 par->GetQp()
               };
 
-   myf dz = zOut - par->GetZ();
+   litfloat dz = zOut - par->GetZ();
 
    //transport state vector F*X*F.T()
    X[0] = X[0] + dz * X[2];
@@ -45,12 +45,12 @@ LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
    par->SetX(X[0]);
    par->SetY(X[1]);
 
-   std::vector<myf> C = par->GetCovMatrix();
+   std::vector<litfloat> C = par->GetCovMatrix();
    //transport covariance matrix F*C*F.T()
-   myf t3 = C[2] + dz * C[9];
-   myf t7 = dz * C[10];
-   myf t8 = C[3] + t7;
-   myf t19 = C[7] + dz * C[12];
+   litfloat t3 = C[2] + dz * C[9];
+   litfloat t7 = dz * C[10];
+   litfloat t8 = C[3] + t7;
+   litfloat t19 = C[7] + dz * C[12];
    C[0] = C[0] + dz * C[2] + t3 * dz;
    C[1] = C[1] + dz * C[6] + t8 * dz;
    C[2] = t3;

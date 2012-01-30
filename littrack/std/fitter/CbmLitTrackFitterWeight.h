@@ -79,8 +79,8 @@ private:
    WeightCalculatorPtr fTukeyWeightCalculator;
 
    int fNofIterations;
-   std::vector<myf> fAnnealing;
-   myf fOutlierCut;
+   std::vector<litfloat> fAnnealing;
+   litfloat fOutlierCut;
 };
 
 #endif /*CBMLITTRACKFITTERROBUST_H_*/

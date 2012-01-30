@@ -32,7 +32,7 @@ public:
       const CbmLitTrackParam* pParamIn,
       CbmLitTrackParam* pParamOut,
       const CbmLitHit* pHit,
-      myf& chiSq) = 0;
+      litfloat& chiSq) = 0;
 
    /* Main function to be implemented for the concrete track update algorithm
     * @param pParam Pointer to input/output track parameter
@@ -42,7 +42,7 @@ public:
    virtual LitStatus Update(
       CbmLitTrackParam* pParam,
       const CbmLitHit* pHit,
-      myf& chiSq) = 0;
+      litfloat& chiSq) = 0;
 };
 
 #endif /* CBMLITTRACKUPDATE_H_ */

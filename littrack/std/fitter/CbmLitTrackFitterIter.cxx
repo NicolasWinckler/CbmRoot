@@ -42,7 +42,7 @@ LitStatus CbmLitTrackFitterIter::Fit(
 
       if (iter < fNofIterations -1) {
          for (int i = 0; i < track->GetNofHits(); i++) {
-            myf chiSq = track->GetFitNode(i)->GetChiSqSmoothed();
+            litfloat chiSq = track->GetFitNode(i)->GetChiSqSmoothed();
             if (chiSq > fChiSqCut) {
                track->RemoveHit(i);
                isRefit = true;

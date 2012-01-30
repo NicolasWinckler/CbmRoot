@@ -18,39 +18,39 @@ public:
       const CbmLitTrackParam* par,
       HitPtrIterator itBegin,
       HitPtrIterator itEnd,
-      myf T);
+      litfloat T);
 
    virtual LitStatus DoCalculate(
       const CbmLitTrackParam* par,
       HitPtrVector& hits,
-      myf T);
+      litfloat T);
 
 private:
    LitStatus MultivariateGaussWeight(
       const CbmLitTrackParam* par,
       CbmLitHit* hit,
-      myf T) const;
+      litfloat T) const;
    LitStatus MultivariateGaussWeight(
       const CbmLitTrackParam* par,
       CbmLitStripHit* hit,
-      myf T) const;
+      litfloat T) const;
    LitStatus MultivariateGaussWeight(
       const CbmLitTrackParam* par,
       CbmLitPixelHit* hit,
-      myf T) const;
+      litfloat T) const;
 
-   myf MultivariateGaussCut(
+   litfloat MultivariateGaussCut(
       const CbmLitHit* hit,
-      myf T,
-      myf cutValue) const;
-   myf MultivariateGaussCut(
+      litfloat T,
+      litfloat cutValue) const;
+   litfloat MultivariateGaussCut(
       const CbmLitStripHit* hit,
-      myf T,
-      myf cutValue) const;
-   myf MultivariateGaussCut(
+      litfloat T,
+      litfloat cutValue) const;
+   litfloat MultivariateGaussCut(
       const CbmLitPixelHit* hit,
-      myf T,
-      myf cutValue) const;
+      litfloat T,
+      litfloat cutValue) const;
 
    LitStatus Normalize(
       HitPtrIterator itBegin,

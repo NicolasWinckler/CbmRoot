@@ -27,7 +27,7 @@ public:
    /* Inherited from CbmLitGeoNavigator */
    LitStatus FindIntersections(
       const CbmLitTrackParam* par,
-      myf zOut,
+      litfloat zOut,
       std::vector<CbmLitMaterialInfo>& inter);
 
 private:
@@ -43,14 +43,14 @@ private:
     * @return Crossed material information
     */
    CbmLitMaterialInfo MakeStep(
-      myf step = 0.) const;
+      litfloat step = 0.) const;
 
    /* Calculates length between current position and the point on the plane at zOut.
     * @param zOut Output Z position [cm]
     * @return Length.
     */
-   myf CalcLength(
-      myf zOut) const;
+   litfloat CalcLength(
+      litfloat zOut) const;
 };
 
 #endif /*CBMLITTGEONAVIGATOR_H_*/

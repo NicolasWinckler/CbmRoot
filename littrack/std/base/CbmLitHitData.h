@@ -111,7 +111,7 @@ public:
     *@param substation Index of the substation in the station
     *@return Pair of hit error and and coordinate ID
     */
-   std::pair<myf, char> GetMaxErr(
+   std::pair<litfloat, char> GetMaxErr(
       int stationGroup,
       int station,
       int substation) const;
@@ -121,7 +121,7 @@ public:
     *@param planeId Index of the detector plane (substation) in the detector
     *@return Pair of hit error and and coordinate ID
     */
-   std::pair<myf, char> GetMaxErr(
+   std::pair<litfloat, char> GetMaxErr(
       int planeId) const;
 
    /* Clears the hit arrays */
@@ -149,7 +149,7 @@ private:
    // Arrays with hits
    std::vector<std::vector<std::vector<HitPtrVector> > > fHits;
    // Arrays with maximum hit position errors for each substation
-   std::vector<std::vector<std::vector<std::pair<myf, char> > > > fMaxErr;
+   std::vector<std::vector<std::vector<std::pair<litfloat, char> > > > fMaxErr;
 };
 
 #endif /*CBMLITHITDATA_H_*/

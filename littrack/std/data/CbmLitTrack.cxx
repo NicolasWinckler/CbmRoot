@@ -127,8 +127,8 @@ bool CbmLitTrack::CheckParams() const
 {
    //TODO improve parameters check for the track
 
-   std::vector<myf> covFirst(fParamFirst.GetCovMatrix());
-   std::vector<myf> covLast(fParamLast.GetCovMatrix());
+   std::vector<litfloat> covFirst(fParamFirst.GetCovMatrix());
+   std::vector<litfloat> covLast(fParamLast.GetCovMatrix());
    for (int i = 0; i < 15; i++) {
       if (std::abs(covFirst[i]) > 10000. ||
             std::abs(covLast[i]) > 10000.) { return false; }

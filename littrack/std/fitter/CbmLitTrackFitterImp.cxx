@@ -36,7 +36,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
    int nofHits = track->GetNofHits();
    FitNodeVector nodes(nofHits);
    CbmLitTrackParam par;
-   std::vector<myf> F(25);
+   std::vector<litfloat> F(25);
 
    if (downstream) {
       track->SetParamLast(track->GetParamFirst());
@@ -48,7 +48,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 
    for (int i = 0; i < nofHits; i++) {
       const CbmLitHit* hit = track->GetHit(i);
-      myf Ze = hit->GetZ();
+      litfloat Ze = hit->GetZ();
       if (fPropagator->Propagate(&par, Ze, track->GetPDG(), &F) == kLITERROR) {
          //std::cout << "-E- CbmLitTrackFitterImp::Fit: propagation failed" << std::endl;
          track->SetQuality(kLITBAD);
@@ -56,7 +56,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
       }
       nodes[i].SetPredictedParam(&par);
       nodes[i].SetF(F);
-      myf chi2Hit = 0.;
+      litfloat chi2Hit = 0.;
       if (fUpdate->Update(&par, hit, chi2Hit) == kLITERROR) {
          //std::cout << "-E- CbmLitTrackFitterImp::Fit: track update failed" << std::endl;
          track->SetQuality(kLITBAD);

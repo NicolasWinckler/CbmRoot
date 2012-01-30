@@ -34,8 +34,8 @@ public:
    virtual LitStatus Extrapolate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
-      std::vector<myf>* F = NULL) = 0;
+      litfloat zOut,
+      std::vector<litfloat>* F = NULL) = 0;
 
    /* Pure virtual function for track parameters extrapolation with calculation of transport matrix.
     * @param par Pointer to the initial and output track parameters.
@@ -44,8 +44,8 @@ public:
     * @return Extrapolation status. */
    virtual LitStatus Extrapolate(
       CbmLitTrackParam* par,
-      myf zOut,
-      std::vector<myf>* F = NULL) = 0;
+      litfloat zOut,
+      std::vector<litfloat>* F = NULL) = 0;
 };
 
 #endif

@@ -30,9 +30,9 @@ CbmLitMyTrackPropagator::~CbmLitMyTrackPropagator()
 LitStatus CbmLitMyTrackPropagator::Propagate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,
-   myf zOut,
+   litfloat zOut,
    int pdg,
-   std::vector<myf>* F)
+   std::vector<litfloat>* F)
 {
    *parOut = *parIn;
    return Propagate(parOut, zOut, pdg, F);
@@ -40,12 +40,12 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 
 LitStatus CbmLitMyTrackPropagator::Propagate(
    CbmLitTrackParam* par,
-   myf zOut,
+   litfloat zOut,
    int pdg,
-   std::vector<myf>* F)
+   std::vector<litfloat>* F)
 {
-   myf zIn = par->GetZ();
-   myf dz = zOut - zIn;
+   litfloat zIn = par->GetZ();
+   litfloat dz = zOut - zIn;
    if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) { return kLITSUCCESS; }
 
    //Check whether upstream or downstream
@@ -61,10 +61,10 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
    }
 
    int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
-   myf stepSize;
+   litfloat stepSize;
    if (nofSteps == 0) { stepSize = dz; }
    else { stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE; }
-   myf z = zIn;
+   litfloat z = zIn;
 
    //Loop over steps + additional step to propagate to virtual plane at zOut
    for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
@@ -86,8 +86,8 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
       for(unsigned int iMat = 0; iMat < inter.size(); iMat++) {
          CbmLitMaterialInfo mat = inter[iMat];
 
-         std::vector<myf>* Fnew = NULL;
-         if (F != NULL) { Fnew = new std::vector<myf>(25, 0.); }
+         std::vector<litfloat>* Fnew = NULL;
+         if (F != NULL) { Fnew = new std::vector<litfloat>(25, 0.); }
          if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
             std::cout << "-E- CbmLitMyTrackPropagator::Propagate extrapolation failed" << std::endl;
             return kLITERROR;
@@ -98,15 +98,15 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
          delete Fnew;
 
          //scale material length
-         myf norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
+         litfloat norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
          mat.SetLength(mat.GetLength() * norm);
          // add material effects
          fMaterial->Update(par, &mat, pdg, downstream);
       }
    } // loop over steps
 
-   std::vector<myf>* Fnew = NULL;
-   if (F != NULL) { Fnew = new std::vector<myf>(25, 0.); }
+   std::vector<litfloat>* Fnew = NULL;
+   if (F != NULL) { Fnew = new std::vector<litfloat>(25, 0.); }
    fExtrapolator->Extrapolate(par, zOut, Fnew);
    if (F != NULL) { UpdateF(*F, *Fnew); }
    delete Fnew;
@@ -116,10 +116,10 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 }
 
 void CbmLitMyTrackPropagator::UpdateF(
-   std::vector<myf>& F,
-   const std::vector<myf>& newF)
+   std::vector<litfloat>& F,
+   const std::vector<litfloat>& newF)
 {
-   std::vector<myf> A(25);
+   std::vector<litfloat> A(25);
    Mult25(newF, F, A);
    F.assign(A.begin(), A.end());
 }

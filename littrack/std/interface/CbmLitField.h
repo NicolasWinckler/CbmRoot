@@ -28,8 +28,8 @@ public:
     * @param Bz Output Bz field value [kGauss]
     */
    virtual void GetFieldValue(
-      myf x, myf y, myf z,
-      myf& Bx, myf& By, myf& Bz) const = 0;
+      litfloat x, litfloat y, litfloat z,
+      litfloat& Bx, litfloat& By, litfloat& Bz) const = 0;
 
    /* @return std::string representation of this class */
    virtual std::string ToString() const {

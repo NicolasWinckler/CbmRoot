@@ -40,7 +40,7 @@ private:
    /* Number of iterations */
    int fNofIterations;
    /* Cut on chi square for single hit */
-   myf fChiSqCut;
+   litfloat fChiSqCut;
    /* Minimum number of hits in track */
    int fMinNofHits;
 };

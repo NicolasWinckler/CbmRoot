@@ -12,11 +12,11 @@
 namespace lit
 {
 
-myf ChiSq(
+litfloat ChiSq(
    const CbmLitTrackParam* par,
    const CbmLitHit* hit)
 {
-   myf chisq = 0.;
+   litfloat chisq = 0.;
    if (hit->GetType() == kLITSTRIPHIT) {
       chisq = ChiSq(par, static_cast<const CbmLitStripHit*>(hit));
    } else if (hit->GetType() == kLITPIXELHIT) {
@@ -25,39 +25,39 @@ myf ChiSq(
    return chisq;
 }
 
-myf ChiSq(
+litfloat ChiSq(
    const CbmLitTrackParam* par,
    const CbmLitStripHit* hit)
 {
-   myf duu = hit->GetDu() * hit->GetDu();
-   myf phiCos = hit->GetCosPhi();
-   myf phiSin = hit->GetSinPhi();
-   myf phiCosSq = phiCos * phiCos;
-   myf phiSinSq = phiSin * phiSin;
-   myf phi2SinCos = 2 * phiCos * phiSin;
-   myf C0 = par->GetCovariance(0);
-   myf C1 = par->GetCovariance(1);
-   myf C5 = par->GetCovariance(5);
+   litfloat duu = hit->GetDu() * hit->GetDu();
+   litfloat phiCos = hit->GetCosPhi();
+   litfloat phiSin = hit->GetSinPhi();
+   litfloat phiCosSq = phiCos * phiCos;
+   litfloat phiSinSq = phiSin * phiSin;
+   litfloat phi2SinCos = 2 * phiCos * phiSin;
+   litfloat C0 = par->GetCovariance(0);
+   litfloat C1 = par->GetCovariance(1);
+   litfloat C5 = par->GetCovariance(5);
 
-   myf ru = hit->GetU() - par->GetX() * phiCos - par->GetY() * phiSin;
+   litfloat ru = hit->GetU() - par->GetX() * phiCos - par->GetY() * phiSin;
 
    return (ru * ru) / (duu - phiCosSq*C0 - phi2SinCos*C1 - phiSinSq*C5);
 }
 
-myf ChiSq(
+litfloat ChiSq(
    const CbmLitTrackParam* par,
    const CbmLitPixelHit* hit)
 {
-   myf dxx = hit->GetDx() * hit->GetDx();
-   myf dxy = hit->GetDxy();
-   myf dyy = hit->GetDy() * hit->GetDy();
-   myf xmx = hit->GetX() - par->GetX();
-   myf ymy = hit->GetY() - par->GetY();
-   myf C0 = par->GetCovariance(0);
-   myf C1 = par->GetCovariance(1);
-   myf C5 = par->GetCovariance(5);
+   litfloat dxx = hit->GetDx() * hit->GetDx();
+   litfloat dxy = hit->GetDxy();
+   litfloat dyy = hit->GetDy() * hit->GetDy();
+   litfloat xmx = hit->GetX() - par->GetX();
+   litfloat ymy = hit->GetY() - par->GetY();
+   litfloat C0 = par->GetCovariance(0);
+   litfloat C1 = par->GetCovariance(1);
+   litfloat C5 = par->GetCovariance(5);
 
-   myf norm = dxx * dyy - dxx * C5 - dyy * C0 + C0 * C5
+   litfloat norm = dxx * dyy - dxx * C5 - dyy * C0 + C0 * C5
               - dxy * dxy + 2 * dxy * C1 - C1 * C1;
    if (norm == 0.) { norm = 1e-10; }
    return ((xmx * (dyy - C5) - ymy * (dxy - C1)) * xmx

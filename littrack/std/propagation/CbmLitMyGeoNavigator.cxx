@@ -24,10 +24,10 @@ CbmLitMyGeoNavigator::~CbmLitMyGeoNavigator()
 
 LitStatus CbmLitMyGeoNavigator::FindIntersections(
    const CbmLitTrackParam* par,
-   myf zOut,
+   litfloat zOut,
    std::vector<CbmLitMaterialInfo>& inter)
 {
-   myf zIn = par->GetZ();
+   litfloat zIn = par->GetZ();
    std::vector<CbmLitMaterialInfo>::iterator it_min, it_max;
    CbmLitMaterialInfo material;
    material.SetZpos(zIn);

@@ -23,10 +23,10 @@ public:
    virtual ~CbmLitSubstation() {};
 
    /* Sets z position of substation */
-   void SetZ(myf z) {fZ = z;}
+   void SetZ(litfloat z) {fZ = z;}
 
    /* Returns Z position of substation */
-   myf GetZ() const {return fZ;}
+   litfloat GetZ() const {return fZ;}
 
    /* Returns std::string representation of the class. */
    virtual std::string ToString() const {
@@ -36,7 +36,7 @@ public:
    }
 
 private:
-   myf fZ; // Z position of substation
+   litfloat fZ; // Z position of substation
 };
 
 #endif /*CBMLITSUBSTATION_H_*/

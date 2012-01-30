@@ -25,7 +25,7 @@ public:
    /* Inherited from CbmLitGeoNavigator */
    LitStatus FindIntersections(
       const CbmLitTrackParam* par,
-      myf zOut,
+      litfloat zOut,
       std::vector<CbmLitMaterialInfo>& inter);
 private:
    // vector with nodes of the simplified geometry

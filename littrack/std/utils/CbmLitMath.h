@@ -15,7 +15,7 @@ namespace lit
  * @param par Pointer to the updated or smoothed track parameter
  * @param hit Pointer to the hit
  * @return chi square contribution for this hit */
-myf ChiSq(
+litfloat ChiSq(
    const CbmLitTrackParam* par,
    const CbmLitHit* hit);
 
@@ -23,7 +23,7 @@ myf ChiSq(
  * @param par Pointer to the updated or smoothed track parameter
  * @param hit Pointer to the strip hit
  * @return chi square contribution for this strip hit */
-myf ChiSq(
+litfloat ChiSq(
    const CbmLitTrackParam* par,
    const CbmLitStripHit* hit);
 
@@ -31,7 +31,7 @@ myf ChiSq(
  * @param par Pointer to the updated or smoothed track parameter
  * @param hit Pointer to the pixel hit
  * @return chi square contribution for this pixel hit */
-myf ChiSq(
+litfloat ChiSq(
    const CbmLitTrackParam* par,
    const CbmLitPixelHit* hit);
 

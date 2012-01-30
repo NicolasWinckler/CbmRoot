@@ -26,7 +26,7 @@ CbmLitTGeoNavigator::~CbmLitTGeoNavigator()
 
 LitStatus CbmLitTGeoNavigator::FindIntersections(
    const CbmLitTrackParam* par,
-   myf zOut,
+   litfloat zOut,
    std::vector<CbmLitMaterialInfo>& inter)
 {
    InitTrack(par);
@@ -55,7 +55,7 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
       // Check if we currently at the output position
       if ((stepInfo.GetZpos() >= zOut)) { //|| gGeoManager->IsNullStep()){
          gGeoManager->PopPoint();
-         myf l = CalcLength(zOut);
+         litfloat l = CalcLength(zOut);
          stepInfo.SetLength(l);
          stepInfo.SetZpos(zOut);
          last = true;
@@ -70,13 +70,13 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 void CbmLitTGeoNavigator::InitTrack(
    const CbmLitTrackParam* par) const
 {
-   myf nx, ny, nz;
+   litfloat nx, ny, nz;
    par->GetDirCos(nx, ny, nz);
    gGeoManager->InitTrack(par->GetX(), par->GetY(), par->GetZ(), nx, ny, nz);
 }
 
 CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
-   myf step) const
+   litfloat step) const
 {
    // fill current material information and then make a step
    CbmLitMaterialInfo matInfo;
@@ -99,20 +99,20 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
    return matInfo;
 }
 
-myf CbmLitTGeoNavigator::CalcLength(
-   myf zOut) const
+litfloat CbmLitTGeoNavigator::CalcLength(
+   litfloat zOut) const
 {
    //find intersection point of straight line with plane
-   myf nx = gGeoManager->GetCurrentDirection()[0];
-   myf ny = gGeoManager->GetCurrentDirection()[1];
-   myf nz = gGeoManager->GetCurrentDirection()[2];
-   myf z = gGeoManager->GetCurrentPoint()[2];
+   litfloat nx = gGeoManager->GetCurrentDirection()[0];
+   litfloat ny = gGeoManager->GetCurrentDirection()[1];
+   litfloat nz = gGeoManager->GetCurrentDirection()[2];
+   litfloat z = gGeoManager->GetCurrentPoint()[2];
 
-   myf t0 = (zOut - z) / nz;
+   litfloat t0 = (zOut - z) / nz;
 
-   myf dx = nx * t0;
-   myf dy = ny * t0;
-   myf dz = (zOut - z);//nz * t0;
+   litfloat dx = nx * t0;
+   litfloat dy = ny * t0;
+   litfloat dz = (zOut - z);//nz * t0;
 
    //calculate distance between two points
    return std::sqrt( dx * dx + dy * dy + dz * dz);

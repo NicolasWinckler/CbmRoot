@@ -20,7 +20,7 @@ CbmLitPDG::~CbmLitPDG()
 {
 }
 
-myf CbmLitPDG::GetMass(
+litfloat CbmLitPDG::GetMass(
    int pdg)
 {
    TDatabasePDG* db = TDatabasePDG::Instance();

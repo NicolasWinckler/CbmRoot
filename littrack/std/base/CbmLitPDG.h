@@ -21,7 +21,7 @@ public:
    virtual ~CbmLitPDG();
 
    /* Returns mass of the particle in [GeV/c]. */
-   static myf GetMass(
+   static litfloat GetMass(
       int pdg);
 
    /* Returns true if particle is electron. */

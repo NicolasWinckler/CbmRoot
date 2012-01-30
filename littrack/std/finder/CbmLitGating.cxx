@@ -32,19 +32,19 @@ CbmLitGating::~CbmLitGating()
 
 bool CbmLitGating::IsHitInValidationGate(
    const CbmLitHit* hit,
-   myf chiSq,
+   litfloat chiSq,
    const CbmLitTrackParam* par) const
 {
    if (hit->GetType() == kLITSTRIPHIT) {
       // Determine straw tube segment
       const CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(hit);
-      myf devX = fSigmaCoef * std::sqrt(par->GetCovariance(0));
-      myf devY = fSigmaCoef * std::sqrt(par->GetCovariance(5));
-      myf vmin = -(par->GetX() - devX) * h->GetSinPhi() + (par->GetY() - devY) * h->GetCosPhi();
-      myf vmax = -(par->GetX() + devX) * h->GetSinPhi() + (par->GetY() + devY) * h->GetCosPhi();
+      litfloat devX = fSigmaCoef * std::sqrt(par->GetCovariance(0));
+      litfloat devY = fSigmaCoef * std::sqrt(par->GetCovariance(5));
+      litfloat vmin = -(par->GetX() - devX) * h->GetSinPhi() + (par->GetY() - devY) * h->GetCosPhi();
+      litfloat vmax = -(par->GetX() + devX) * h->GetSinPhi() + (par->GetY() + devY) * h->GetCosPhi();
 
-      if (lit::Sign<myf>(vmin) != lit::Sign<myf>(vmax)) { return chiSq < fChiSqStripHitCut; }
-      else { return (chiSq < fChiSqStripHitCut && lit::Sign<myf>(vmin) == h->GetSegment()); }
+      if (lit::Sign<litfloat>(vmin) != lit::Sign<litfloat>(vmax)) { return chiSq < fChiSqStripHitCut; }
+      else { return (chiSq < fChiSqStripHitCut && lit::Sign<litfloat>(vmin) == h->GetSegment()); }
 //    return chiSq < fChiSqStripHitCut;
    }
    if (hit->GetType() == kLITPIXELHIT) { return chiSq < fChiSqPixelHitCut; }
@@ -55,7 +55,7 @@ HitPtrIteratorPair CbmLitGating::MinMaxIndex(
    const CbmLitTrackParam* par,
    HitPtrIteratorPair hits,
    const CbmLitStation& station,
-   const std::pair<myf, char>& maxErr) const
+   const std::pair<litfloat, char>& maxErr) const
 {
    HitPtrIteratorPair bounds;
    if (station.GetType() == kLITSTRIPHIT) {
@@ -93,9 +93,9 @@ HitPtrIteratorPair CbmLitGating::MinMaxIndex(
       bounds = HitPtrIteratorPair(hits.first, hits.second);
    } else if (station.GetType() == kLITPIXELHIT) {
       CbmLitPixelHit hit;
-      myf C0 = par->GetCovariance(0);
+      litfloat C0 = par->GetCovariance(0);
       if(C0 > fMaxCovSq || C0 < 0.) { return bounds; }
-      myf devX = fSigmaCoef * (std::sqrt(C0) + maxErr.first);
+      litfloat devX = fSigmaCoef * (std::sqrt(C0) + maxErr.first);
       hit.SetX(par->GetX() - devX);
       bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
       hit.SetX(par->GetX() + devX);

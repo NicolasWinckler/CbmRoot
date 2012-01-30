@@ -18,10 +18,10 @@ public:
 
    /* Constructor */
    CbmLitTrackSelectionCuts(
-      myf maxChiSq,
+      litfloat maxChiSq,
       int minLastPlaneId,
       int minNofHits,
-      myf minMomentum);
+      litfloat minMomentum);
 
    /* Destructor */
    virtual ~CbmLitTrackSelectionCuts();
@@ -36,7 +36,7 @@ public:
       TrackPtrVector& tracks);
 
    /* Return chi square cut */
-   myf GetMaxChiSq() const {return fMaxChiSq;}
+   litfloat GetMaxChiSq() const {return fMaxChiSq;}
 
    /* Returns last plane index cut */
    int GetMinLastPlaneId() const {return fMinLastPlaneId;}
@@ -45,10 +45,10 @@ public:
    int GetMinNofHits() const {return fMinNofHits;}
 
    /* Returns momentum cut */
-   myf GetMinMomentum() const {return fMinMomentum;}
+   litfloat GetMinMomentum() const {return fMinMomentum;}
 
    /* Sets chi square cut */
-   void SetMaxChiSq(myf maxChiSq) {fMaxChiSq = maxChiSq;}
+   void SetMaxChiSq(litfloat maxChiSq) {fMaxChiSq = maxChiSq;}
 
    /* Sets last plane index cut */
    void SetMinLastPlaneId(int minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
@@ -57,17 +57,17 @@ public:
    void SetMinNofHits(int minNofHits) {fMinNofHits = minNofHits;}
 
    /* Sets momentum cut */
-   void SetMinMomentum(myf minMomentum) {fMinMomentum = minMomentum;}
+   void SetMinMomentum(litfloat minMomentum) {fMinMomentum = minMomentum;}
 
 private:
    /* Chi square cut */
-   myf fMaxChiSq;
+   litfloat fMaxChiSq;
    /* Last plane index cut */
    int fMinLastPlaneId;
    /* Number of hits cut */
    int fMinNofHits;
    /* Momentum cut in [GeV/c] */
-   myf fMinMomentum;
+   litfloat fMinMomentum;
 };
 
 #endif /* CBMLITTRACKSELECTIONCUTS_H_ */

@@ -11,7 +11,7 @@
 #include <limits>
 
 CbmLitTrackSelectionCuts::CbmLitTrackSelectionCuts():
-   fMaxChiSq(std::numeric_limits<myf>::max()),
+   fMaxChiSq(std::numeric_limits<litfloat>::max()),
    fMinLastPlaneId(-1),
    fMinNofHits(-1),
    fMinMomentum(0.)
@@ -20,7 +20,7 @@ CbmLitTrackSelectionCuts::CbmLitTrackSelectionCuts():
 }
 
 CbmLitTrackSelectionCuts::CbmLitTrackSelectionCuts(
-   myf maxChiSq, int minLastPlaneId, int minNofHits, myf minMomentum):
+   litfloat maxChiSq, int minLastPlaneId, int minNofHits, litfloat minMomentum):
    fMaxChiSq(maxChiSq),
    fMinLastPlaneId(minLastPlaneId),
    fMinNofHits(minNofHits),
@@ -55,7 +55,7 @@ LitStatus CbmLitTrackSelectionCuts::DoSelect(
             (*iTrack)->SetQuality(kLITBAD);
             continue;
          }
-         myf mom = std::abs(1. / (*iTrack)->GetParamLast()->GetQp());
+         litfloat mom = std::abs(1. / (*iTrack)->GetParamLast()->GetQp());
          if (mom < fMinMomentum) { (*iTrack)->SetQuality(kLITBAD); }
       }
    }

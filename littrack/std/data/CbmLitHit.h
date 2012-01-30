@@ -38,7 +38,7 @@ public:
    int GetRefId() const { return fRefId; }
 
    /* @return Weight of the hit (used in the weighting fitting method)*/
-   myf GetW() const { return fW; }
+   litfloat GetW() const { return fW; }
 
    /* @return If true than the hit is outlier (used in the weighting fitting method)*/
    bool IsOutlier() const { return fIsOutlier; }
@@ -47,10 +47,10 @@ public:
    LitHitType GetType() const { return fHitType; }
 
    /* @return Z position of the hit [cm]*/
-   myf GetZ() const { return fZ; }
+   litfloat GetZ() const { return fZ; }
 
    /* @return Z position error of the hit [cm]*/
-   myf GetDz() const { return fDz; }
+   litfloat GetDz() const { return fDz; }
 
    /* @return Detector identificator (MUCH, TRD, TOF etc.)*/
    LitDetectorId GetDetectorId() const {return fDetectorId;}
@@ -68,7 +68,7 @@ public:
    /* Sets weight of the hit (used in the weighting fitting method
     * @param w Weight of the hit.
     */
-   void SetW(myf w) { fW = w; }
+   void SetW(litfloat w) { fW = w; }
 
    /* Sets If the hit is outlier (used in the weighting fitting method.
     * @param isOutlier If true than hit is outlier.
@@ -83,12 +83,12 @@ public:
    /* Sets Z position of the hit [cm].
     * @param z Z position of the hit [cm].
     */
-   void SetZ(myf z) { fZ = z; }
+   void SetZ(litfloat z) { fZ = z; }
 
    /* Sets Z position error of the hit [cm]
     * @param dz Z position error of the hit [cm]
     */
-   void SetDz(myf dz) { fDz = dz; }
+   void SetDz(litfloat dz) { fDz = dz; }
 
    /* Sets detector identificator (MUCH, TRD, TOF etc.)
     * @param detectorId Detector identificator.
@@ -103,11 +103,11 @@ public:
 private:
    int fPlaneId; // detector plane identificator (usually absolute substation number)
    int fRefId; // reference to MC
-   myf fW; // weight of the hit (used in the weighting fitting method)
+   litfloat fW; // weight of the hit (used in the weighting fitting method)
    bool fIsOutlier; // if true than the hit is outlier (used in the weighting fitting method)
    LitHitType fHitType; // type of the hit (strip, pixel, etc). Used to safely cast to the proper type.
-   myf fZ; // Z position of the hit [cm]
-   myf fDz; // Z position error of the hit [cm]
+   litfloat fZ; // Z position of the hit [cm]
+   litfloat fDz; // Z position error of the hit [cm]
    LitDetectorId fDetectorId; // Detector identificator (MUCH, TRD, TOF etc.)
 };
 

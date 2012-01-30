@@ -30,13 +30,13 @@ public:
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
       const CbmLitHit* hit,
-      myf& chiSq);
+      litfloat& chiSq);
 
    /* Inherited from CbmLitTrackUpdate */
    virtual LitStatus Update(
       CbmLitTrackParam* par,
       const CbmLitHit* hit,
-      myf& chiSq);
+      litfloat& chiSq);
 
 private:
    /* Implements KF update step for pixel hits using gain matrix formalism
@@ -47,7 +47,7 @@ private:
    LitStatus Update(
       CbmLitTrackParam* par,
       const CbmLitPixelHit* hit,
-      myf& chiSq);
+      litfloat& chiSq);
 
    /* Implements KF update step for pixel hits using weighted means formalism
     *@param par Input/Output track parameter
@@ -57,7 +57,7 @@ private:
    LitStatus UpdateWMF(
       CbmLitTrackParam* par,
       const CbmLitPixelHit* hit,
-      myf& chiSq);
+      litfloat& chiSq);
 
    /* Implements KF update step for strip hits using gain matrix formalism
     *@param par Input/Output track parameter
@@ -67,7 +67,7 @@ private:
    LitStatus Update(
       CbmLitTrackParam* par,
       const CbmLitStripHit* hit,
-      myf& chiSq);
+      litfloat& chiSq);
 
    /* Implements KF update step for strip hits using weighted means formalism
     *@param par Input/Output track parameter
@@ -77,7 +77,7 @@ private:
    LitStatus UpdateWMF(
       CbmLitTrackParam* par,
       const CbmLitStripHit* hit,
-      myf& chiSq);
+      litfloat& chiSq);
 };
 
 #endif //CbmLitKalmanFilter

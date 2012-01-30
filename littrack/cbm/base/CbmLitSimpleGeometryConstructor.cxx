@@ -221,7 +221,7 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 
          TGeoMedium* medium = fMedium[med->GetName()];
 
-         myf Z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2];
+         litfloat Z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2];
 
          TGeoVolume* volume = new TGeoVolume(muchNode->GetName(), shape, medium);
          TGeoMatrix* matrix = new TGeoTranslation(0, 0, Z);
@@ -255,7 +255,7 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
                   TGeoMedium* medium = fMedium[med->GetName()];
 
                   TGeoVolume* volume = new TGeoVolume(active->GetName(), shape, medium);
-                  myf z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
+                  litfloat z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
                           + sideNode->GetMatrix()->GetTranslation()[2] + active->GetMatrix()->GetTranslation()[2];
                   std::cout << std::cout.precision(5) << "z station MUCH: " << z << std::endl;
                   TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
@@ -309,7 +309,7 @@ void CbmLitSimpleGeometryConstructor::ConstructTrd()
                TGeoMedium* medium = fMedium[med->GetName()];
 
                TGeoVolume* volume = new TGeoVolume(part->GetName(), shape, medium);
-               myf z = trd->GetMatrix()->GetTranslation()[2] +
+               litfloat z = trd->GetMatrix()->GetTranslation()[2] +
                        module->GetMatrix()->GetTranslation()[2] +
                        part->GetMatrix()->GetTranslation()[2];
 
@@ -354,7 +354,7 @@ void CbmLitSimpleGeometryConstructor::ConstructTof()
    TGeoNode* cel = (TGeoNode*) mod->GetNodes()->FindObject("t1reg1cel_1");
    const double* celPos  = cel->GetMatrix()->GetTranslation();
 
-   myf Z = tofPos[2] + gasPos[2] + modPos[2] + celPos[2];
+   litfloat Z = tofPos[2] + gasPos[2] + modPos[2] + celPos[2];
 
    for (int i = 0; i < cel->GetNodes()->GetEntriesFast(); ++i) {
       TGeoNode* ele = (TGeoNode*) cel->GetNodes()->At(i);
@@ -408,7 +408,7 @@ void CbmLitSimpleGeometryConstructor::ConstructRich()
    TGeoShape* photoShape1 = new TGeoCone(photoShape->GetDZ(), 0., 300.,   0.,   300.);
    TGeoMedium* photoMed1 = fMedium[photoMed->GetName()];
    TGeoVolume* photoVolume1 = new TGeoVolume(photo->GetName(), photoShape1, photoMed1);
-   myf photoZ1 = richPos[2] + gas1Pos[2] + photoPos[2];
+   litfloat photoZ1 = richPos[2] + gas1Pos[2] + photoPos[2];
    TGeoMatrix* photoMatrix1 = new TGeoTranslation(0, 0, photoZ1);
    fSimpleGeo->GetTopVolume()->AddNode(photoVolume1, 0, photoMatrix1);
 
@@ -429,7 +429,7 @@ void CbmLitSimpleGeometryConstructor::ConstructRich()
    TGeoShape* mglShape1 = new TGeoCone(mglDZ, 0., 300.,   0.,   300.);
    TGeoMedium* mglMed1 = fMedium[mglMed->GetName()];
    TGeoVolume* mglVolume1 = new TGeoVolume(mgl->GetName(), mglShape1, mglMed1);
-   myf mglZ1 = richPos[2] + gas3Pos[2];// + mglPos[2];
+   litfloat mglZ1 = richPos[2] + gas3Pos[2];// + mglPos[2];
    TGeoMatrix* mglMatrix1 = new TGeoTranslation(0, 0, mglZ1);
    fSimpleGeo->GetTopVolume()->AddNode(mglVolume1, 0, mglMatrix1);
 
@@ -464,7 +464,7 @@ void CbmLitSimpleGeometryConstructor::ReadRichTRAP(
    TGeoShape* shape1 = new TGeoCone(DZ, 0., 300.,   0.,   300.);
    TGeoMedium* med1 = fMedium[med->GetName()];
    TGeoVolume* volume1 = new TGeoVolume(node->GetName(), shape1, med1);
-   myf Z1 = startZ +  node->GetMatrix()->GetTranslation()[2];
+   litfloat Z1 = startZ +  node->GetMatrix()->GetTranslation()[2];
    TGeoMatrix* matrix1 = new TGeoTranslation(0, 0, Z1);
    fSimpleGeo->GetTopVolume()->AddNode(volume1, 0, matrix1);
 

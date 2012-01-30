@@ -23,20 +23,20 @@ private:
       int testId);
 
    void Convert15To25(
-      const myf* a15,
-      myf* a25);
+      const litfloat* a15,
+      litfloat* a25);
 
    void Convert25To15(
-      const myf* a25,
-      myf* a15);
+      const litfloat* a25,
+      litfloat* a15);
 
    std::string VectorToString(
-      const std::vector<myf>& a);
+      const std::vector<litfloat>& a);
 
    std::string ArrayToString(
-      const myf* a, int n);
+      const litfloat* a, int n);
 
-   myf fEpsilon;
+   litfloat fEpsilon;
 };
 
 #endif /* CBMLITTESTMATRIXMATH_H_ */

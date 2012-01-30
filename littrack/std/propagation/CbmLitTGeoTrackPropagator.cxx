@@ -34,9 +34,9 @@ CbmLitTGeoTrackPropagator::~CbmLitTGeoTrackPropagator()
 LitStatus CbmLitTGeoTrackPropagator::Propagate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,
-   myf zOut,
+   litfloat zOut,
    int pdg,
-   std::vector<myf>* F)
+   std::vector<litfloat>* F)
 {
    *parOut = *parIn;
    return Propagate(parOut, zOut, pdg, F);
@@ -44,15 +44,15 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 LitStatus CbmLitTGeoTrackPropagator::Propagate(
    CbmLitTrackParam* par,
-   myf zOut,
+   litfloat zOut,
    int pdg,
-   std::vector<myf>* F)
+   std::vector<litfloat>* F)
 
 {
    if (!IsParCorrect(par)) { return kLITERROR; }
 
-   myf zIn = par->GetZ();
-   myf dz = zOut - zIn;
+   litfloat zIn = par->GetZ();
+   litfloat dz = zOut - zIn;
 
    if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) { return kLITSUCCESS; }
 
@@ -70,10 +70,10 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
    }
 
    int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
-   myf stepSize;
+   litfloat stepSize;
    if (nofSteps == 0) { stepSize = dz; }
    else { stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE; }
-   myf z = zIn;
+   litfloat z = zIn;
 
 // std::cout << "Propagation: zIn=" << zIn << " zOut=" << zOut << " stepSize=" << stepSize << " nofSteps=" << nofSteps << std::endl;
    //Loop over steps + additional step to propagate to virtual plane at zOut
@@ -105,8 +105,8 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
             return kLITERROR;
          }
 
-         std::vector<myf>* Fnew = NULL;
-         if (F != NULL) { Fnew = new std::vector<myf>(25, 0.); }
+         std::vector<litfloat>* Fnew = NULL;
+         if (F != NULL) { Fnew = new std::vector<litfloat>(25, 0.); }
          // extrapolate to the next boundary
          if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
 //          std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: extrapolation failed" << std::endl;
@@ -133,10 +133,10 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 }
 
 void CbmLitTGeoTrackPropagator::UpdateF(
-   std::vector<myf>& F,
-   const std::vector<myf>& newF)
+   std::vector<litfloat>& F,
+   const std::vector<litfloat>& newF)
 {
-   std::vector<myf> A(25);
+   std::vector<litfloat> A(25);
    Mult25(newF, F, A);
    F.assign(A.begin(), A.end());
 }
@@ -144,9 +144,9 @@ void CbmLitTGeoTrackPropagator::UpdateF(
 bool CbmLitTGeoTrackPropagator::IsParCorrect(
    const CbmLitTrackParam* par)
 {
-   myf maxSlope = 5.;
-   myf minSlope = 1e-6;
-   myf maxQp = 1000.; // p = 10 MeV
+   litfloat maxSlope = 5.;
+   litfloat minSlope = 1e-6;
+   litfloat maxQp = 1000.; // p = 10 MeV
 
    if (std::abs(par->GetTx()) > maxSlope ||
          std::abs(par->GetTy()) > maxSlope ||

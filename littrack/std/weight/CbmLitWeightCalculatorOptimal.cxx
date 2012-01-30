@@ -27,7 +27,7 @@ LitStatus CbmLitWeightCalculatorOptimal::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,
    HitPtrIterator itEnd,
-   myf T)
+   litfloat T)
 {
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       if ((*it)->IsOutlier()) { continue; }
@@ -41,7 +41,7 @@ LitStatus CbmLitWeightCalculatorOptimal::DoCalculate(
 LitStatus CbmLitWeightCalculatorOptimal::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrVector& hits,
-   myf T)
+   litfloat T)
 {
    return DoCalculate(par, hits.begin(), hits.end(), T);
 }
@@ -49,9 +49,9 @@ LitStatus CbmLitWeightCalculatorOptimal::DoCalculate(
 LitStatus CbmLitWeightCalculatorOptimal::OptimalWeight(
    const CbmLitTrackParam* par,
    CbmLitHit* hit,
-   myf T) const
+   litfloat T) const
 {
-   myf chiSq = ChiSq(par, hit);
+   litfloat chiSq = ChiSq(par, hit);
    hit->SetW((1 + T) / (1 + T * std::exp(chiSq)));
    return kLITSUCCESS;
 }
@@ -60,8 +60,8 @@ LitStatus CbmLitWeightCalculatorOptimal::Normalize(
    HitPtrIterator itBegin,
    HitPtrIterator itEnd) const
 {
-   myf sumW = 0.;
-   myf sumCut = 0.;
+   litfloat sumW = 0.;
+   litfloat sumCut = 0.;
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       if ((*it)->IsOutlier()) { continue; }
       sumW += (*it)->GetW();

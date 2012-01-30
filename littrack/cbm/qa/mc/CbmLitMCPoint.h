@@ -38,32 +38,32 @@ public:
    virtual ~CbmLitMCPoint() {}
 
    /* Getters */
-   myf GetX() const { return fX; }
-   myf GetY() const { return fY; }
-   myf GetZ() const { return fZ; }
-   myf GetPx() const { return fPx; }
-   myf GetPy() const { return fPy; }
-   myf GetPz() const { return fPz; }
+   litfloat GetX() const { return fX; }
+   litfloat GetY() const { return fY; }
+   litfloat GetZ() const { return fZ; }
+   litfloat GetPx() const { return fPx; }
+   litfloat GetPy() const { return fPy; }
+   litfloat GetPz() const { return fPz; }
    int GetRefId() const { return fRefId; }
    int GetStationId() const { return fStationId; }
-   myf GetTx() const { return fPx / fPz; }
-   myf GetTy() const { return fPy / fPz; }
-   myf GetP() const { return std::sqrt(fPx*fPx + fPy*fPy + fPz*fPz);}
-   myf GetQp() const {
-      myf p = GetP();
-      myf res = (p != 0.) ? fQ/p : 0.;
+   litfloat GetTx() const { return fPx / fPz; }
+   litfloat GetTy() const { return fPy / fPz; }
+   litfloat GetP() const { return std::sqrt(fPx*fPx + fPy*fPy + fPz*fPz);}
+   litfloat GetQp() const {
+      litfloat p = GetP();
+      litfloat res = (p != 0.) ? fQ/p : 0.;
       return res;
    }
 
 
    /* Setters */
-   void SetX(myf x) { fX = x; }
-   void SetY(myf y) { fY = y; }
-   void SetZ(myf z) { fZ = z; }
-   void SetPx(myf px) { fPx = px; }
-   void SetPy(myf py) { fPy = py; }
-   void SetPz(myf pz) { fPz = pz; }
-   void SetQ(myf q) { fQ = q; }
+   void SetX(litfloat x) { fX = x; }
+   void SetY(litfloat y) { fY = y; }
+   void SetZ(litfloat z) { fZ = z; }
+   void SetPx(litfloat px) { fPx = px; }
+   void SetPy(litfloat py) { fPy = py; }
+   void SetPz(litfloat pz) { fPz = pz; }
+   void SetQ(litfloat q) { fQ = q; }
    void SetRefId(int refId) { fRefId = refId; }
    void SetStationId(int stationId) { fStationId = stationId; }
 
@@ -89,11 +89,11 @@ public:
    }
 
 private:
-   myf fX, fY, fZ; // Space coordinates [cm].
-   myf fPx, fPy, fPz; // Momentum components.
+   litfloat fX, fY, fZ; // Space coordinates [cm].
+   litfloat fPx, fPy, fPz; // Momentum components.
    int fRefId; // Reference index.
    int fStationId; // Station index.
-   myf fQ; // +/-1 - negative or positive charge
+   litfloat fQ; // +/-1 - negative or positive charge
 };
 
 #endif /* CBMLITMCPOINT_H_ */

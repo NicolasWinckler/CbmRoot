@@ -41,18 +41,18 @@ void CbmLitTestMatrixMath::TestInvSym15(
    int testId)
 {
    std::cout << "Test InvSym15 #" << testId << std::endl;
-   std::vector<myf> input1(15);
+   std::vector<litfloat> input1(15);
    for (int i = 0; i < 15; i++) { input1[i] = gRandom->Rndm(); }
 
    std::cout << "Input array: " << VectorToString(input1);
 
-   std::vector<myf> a1(input1);
+   std::vector<litfloat> a1(input1);
    InvSym15(a1);
    std:: cout << "Output InvSym15: " << VectorToString(a1);
 
-   myf rd1[25], rd2[15];
+   litfloat rd1[25], rd2[15];
    Convert15To25(&input1[0], rd1);
-   TMatrixTSym<myf> r1(5, rd1);
+   TMatrixTSym<litfloat> r1(5, rd1);
    r1.InvertFast();
    Convert25To15(r1.GetMatrixArray(), rd2);
    std:: cout << "Output ROOT: " << ArrayToString(rd2, 15);
@@ -73,26 +73,26 @@ void CbmLitTestMatrixMath::TestMult15On5(
    int testId)
 {
    std::cout << "Test Mult15On5 #" << testId << std::endl;
-   std::vector<myf> input1(15);
+   std::vector<litfloat> input1(15);
    for (int i = 0; i < 15; i++) { input1[i] = gRandom->Rndm(); }
-   std::vector<myf> input2(5);
+   std::vector<litfloat> input2(5);
    for (int i = 0; i < 5; i++) { input2[i] = gRandom->Rndm(); }
 
    std::cout << "Input array1: " << VectorToString(input1);
    std::cout << "Input array2: " << VectorToString(input2);
 
-   std::vector<myf> a1(5);
+   std::vector<litfloat> a1(5);
    Mult15On5(input1, input2, a1);
    std:: cout << "Output Mult15On5: " << VectorToString(a1);
 
-   myf rd1[25], rd2[15];
+   litfloat rd1[25], rd2[15];
    Convert15To25(&input1[0], rd1);
-   TMatrixTSym<myf> r1(5, rd1);
-   TMatrixT<myf> v1(5,1, &input2[0]);
-   TMatrixT<myf> u1(5,1);
+   TMatrixTSym<litfloat> r1(5, rd1);
+   TMatrixT<litfloat> v1(5,1, &input2[0]);
+   TMatrixT<litfloat> u1(5,1);
    u1 = r1 * v1;
 
-   myf* ro = u1.GetMatrixArray();
+   litfloat* ro = u1.GetMatrixArray();
 
    std::cout << "Output ROOT: " << ArrayToString(ro, 5);
 
@@ -109,8 +109,8 @@ void CbmLitTestMatrixMath::TestMult15On5(
 }
 
 void CbmLitTestMatrixMath::Convert15To25(
-   const myf* a15,
-   myf* a25)
+   const litfloat* a15,
+   litfloat* a25)
 {
    a25[0] = a15[0];
    a25[1] = a15[1];
@@ -140,8 +140,8 @@ void CbmLitTestMatrixMath::Convert15To25(
 }
 
 void CbmLitTestMatrixMath::Convert25To15(
-   const myf* a25,
-   myf* a15)
+   const litfloat* a25,
+   litfloat* a15)
 {
    a15[0] = a25[0];
    a15[1] = a25[1];
@@ -161,7 +161,7 @@ void CbmLitTestMatrixMath::Convert25To15(
 }
 
 std::string CbmLitTestMatrixMath::VectorToString(
-   const std::vector<myf>& a)
+   const std::vector<litfloat>& a)
 {
    std::stringstream out;
    for (int i = 0; i < a.size(); i++) { out << a[i] << " "; }
@@ -170,7 +170,7 @@ std::string CbmLitTestMatrixMath::VectorToString(
 }
 
 std::string CbmLitTestMatrixMath::ArrayToString(
-   const myf* a, int n)
+   const litfloat* a, int n)
 {
    std::stringstream out;
    for (int i = 0; i < n; i++) { out << a[i] << " "; }

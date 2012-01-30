@@ -34,8 +34,8 @@ private:
       CbmLitPixelHit* hit);
 
    inline void Inverse(
-      myf v00, myf v01, myf v11,
-      myf& u00, myf& u01, myf& u11);
+      litfloat v00, litfloat v01, litfloat v11,
+      litfloat& u00, litfloat& u01, litfloat& u11);
 };
 
 #endif /*CBMLITWEIGHTEDHITCALCULATORIMP_H_*/

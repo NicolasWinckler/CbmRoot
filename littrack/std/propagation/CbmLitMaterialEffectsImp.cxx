@@ -52,24 +52,24 @@ void CbmLitMaterialEffectsImp::AddEnergyLoss(
    const CbmLitMaterialInfo* mat) const
 {
    if (fIsElectron) {
-      myf radLength = mat->GetLength() / mat->GetRL();
-      myf t;
+      litfloat radLength = mat->GetLength() / mat->GetRL();
+      litfloat t;
 
       if (!fDownstream) { t = radLength; }
       else { t = -radLength; }
 
-      myf qp = par->GetQp();
+      litfloat qp = par->GetQp();
       qp *= std::exp(-t);
       par->SetQp(qp);
 
-      myf cov = par->GetCovariance(14);
+      litfloat cov = par->GetCovariance(14);
       cov += CalcSigmaSqQpElectron(par, mat);
       par->SetCovariance(14, cov);
    } else {
-      myf Eloss = EnergyLoss(par, mat);
+      litfloat Eloss = EnergyLoss(par, mat);
       par->SetQp(CalcQpAfterEloss(par->GetQp(), Eloss));
 
-      myf cov = par->GetCovariance(14);
+      litfloat cov = par->GetCovariance(14);
       cov += CalcSigmaSqQp(par, mat);
       par->SetCovariance(14, cov);
    }
@@ -81,23 +81,23 @@ void CbmLitMaterialEffectsImp::AddThickScatter(
 {
    if (mat->GetLength() < 1e-10) { return; }
 
-   myf tx = par->GetTx();
-   myf ty = par->GetTy();
-   myf l = mat->GetLength(); //cm
-   myf thetaSq = CalcThetaSq(par, mat);
+   litfloat tx = par->GetTx();
+   litfloat ty = par->GetTy();
+   litfloat l = mat->GetLength(); //cm
+   litfloat thetaSq = CalcThetaSq(par, mat);
 
-   myf t = 1 + tx * tx + ty * ty;
+   litfloat t = 1 + tx * tx + ty * ty;
 
-   myf Q33 = (1 + tx * tx) * t * thetaSq;
-   myf Q44 = (1 + ty * ty) * t * thetaSq;
-   myf Q34 = tx * ty * t * thetaSq;
+   litfloat Q33 = (1 + tx * tx) * t * thetaSq;
+   litfloat Q44 = (1 + ty * ty) * t * thetaSq;
+   litfloat Q34 = tx * ty * t * thetaSq;
 
-   myf T23 = (l * l) / 3.0;
-   myf T2 = l / 2.0;
+   litfloat T23 = (l * l) / 3.0;
+   litfloat T2 = l / 2.0;
 
-   myf D = (fDownstream) ? 1. : -1.;
+   litfloat D = (fDownstream) ? 1. : -1.;
 
-   std::vector<myf> C = par->GetCovMatrix();
+   std::vector<litfloat> C = par->GetCovMatrix();
 
    C[0] += Q33 * T23;
    C[1] += Q34 * T23;
@@ -121,108 +121,108 @@ void CbmLitMaterialEffectsImp::AddThinScatter(
    const CbmLitMaterialInfo* mat) const
 {
    if (mat->GetLength() < 1e-10) { return; }
-   myf tx = par->GetTx();
-   myf ty = par->GetTy();
-   myf thetaSq = CalcThetaSq(par, mat);
+   litfloat tx = par->GetTx();
+   litfloat ty = par->GetTy();
+   litfloat thetaSq = CalcThetaSq(par, mat);
 
-   myf t = 1 + tx * tx + ty * ty;
+   litfloat t = 1 + tx * tx + ty * ty;
 
-   myf Q33 = (1 + tx * tx) * t * thetaSq;
-   myf Q44 = (1 + ty * ty) * t * thetaSq;
-   myf Q34 = tx * ty * t * thetaSq;
+   litfloat Q33 = (1 + tx * tx) * t * thetaSq;
+   litfloat Q44 = (1 + ty * ty) * t * thetaSq;
+   litfloat Q34 = tx * ty * t * thetaSq;
 
-   std::vector<myf> C = par->GetCovMatrix();
+   std::vector<litfloat> C = par->GetCovMatrix();
    C[9] += Q33;
    C[12] += Q44;
    C[10] += Q34;
    par->SetCovMatrix(C);
 }
 
-myf CbmLitMaterialEffectsImp::CalcThetaSq(
+litfloat CbmLitMaterialEffectsImp::CalcThetaSq(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf p = std::abs(1. / par->GetQp()); //GeV
-   myf E = std::sqrt(fMass * fMass + p * p);
-   myf beta = p / E;
-   myf x = mat->GetLength(); //cm
-   myf X0 = mat->GetRL(); //cm
-   myf bcp = beta * p;
-   myf z = 1.;
+   litfloat p = std::abs(1. / par->GetQp()); //GeV
+   litfloat E = std::sqrt(fMass * fMass + p * p);
+   litfloat beta = p / E;
+   litfloat x = mat->GetLength(); //cm
+   litfloat X0 = mat->GetRL(); //cm
+   litfloat bcp = beta * p;
+   litfloat z = 1.;
 
-   myf theta = 0.0136 * (1./bcp) * z * std::sqrt(x/X0) *
+   litfloat theta = 0.0136 * (1./bcp) * z * std::sqrt(x/X0) *
                (1. + 0.038 * std::log(x/X0));
    return theta * theta;
 }
 
-myf CbmLitMaterialEffectsImp::EnergyLoss(
+litfloat CbmLitMaterialEffectsImp::EnergyLoss(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf length = mat->GetRho() * mat->GetLength();
+   litfloat length = mat->GetRho() * mat->GetLength();
    return dEdx(par, mat) * length;
    //return MPVEnergyLoss(par, mat);
 }
 
-myf CbmLitMaterialEffectsImp::dEdx(
+litfloat CbmLitMaterialEffectsImp::dEdx(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf dedx = BetheBloch(par, mat);
+   litfloat dedx = BetheBloch(par, mat);
 // dedx += BetheHeitler(par, mat);
 // if (fIsMuon) dedx += PairProduction(par, mat);
    return dedx;
 }
 
-myf CbmLitMaterialEffectsImp::BetheBloch(
+litfloat CbmLitMaterialEffectsImp::BetheBloch(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf K = 0.000307075; // GeV * g^-1 * cm^2
-   myf z = (par->GetQp() > 0.) ? 1 : -1.;
-   myf Z = mat->GetZ();
-   myf A = mat->GetA();
+   litfloat K = 0.000307075; // GeV * g^-1 * cm^2
+   litfloat z = (par->GetQp() > 0.) ? 1 : -1.;
+   litfloat Z = mat->GetZ();
+   litfloat A = mat->GetA();
 
-   myf M = fMass;
-   myf p = std::abs(1. / par->GetQp()); //GeV
-   myf E = std::sqrt(M * M + p * p);
-   myf beta = p / E;
-   myf betaSq = beta * beta;
-   myf gamma = E / M;
-   myf gammaSq = gamma * gamma;
+   litfloat M = fMass;
+   litfloat p = std::abs(1. / par->GetQp()); //GeV
+   litfloat E = std::sqrt(M * M + p * p);
+   litfloat beta = p / E;
+   litfloat betaSq = beta * beta;
+   litfloat gamma = E / M;
+   litfloat gammaSq = gamma * gamma;
 
-   myf I = CalcI(Z) * 1e-9; // GeV
+   litfloat I = CalcI(Z) * 1e-9; // GeV
 
-   myf me = 0.000511; // GeV
-   myf ratio = me/M;
-   myf Tmax = (2*me*betaSq*gammaSq) / (1+2*gamma*ratio+ratio*ratio);
+   litfloat me = 0.000511; // GeV
+   litfloat ratio = me/M;
+   litfloat Tmax = (2*me*betaSq*gammaSq) / (1+2*gamma*ratio+ratio*ratio);
 
    // density correction
-   myf dc = 0.;
+   litfloat dc = 0.;
    if (p > 0.5) { // for particles above 1 Gev
-      myf rho = mat->GetRho();
-      myf hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-9 ; // GeV
+      litfloat rho = mat->GetRho();
+      litfloat hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-9 ; // GeV
       dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
    }
 
    return K*z*z*(Z/A)*(1./betaSq) * (0.5*std::log(2*me*betaSq*gammaSq*Tmax/(I*I))-betaSq - dc);
 }
 
-myf CbmLitMaterialEffectsImp::BetheBlochElectron(
+litfloat CbmLitMaterialEffectsImp::BetheBlochElectron(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf K = 0.000307075; // GeV * g^-1 * cm^2
+   litfloat K = 0.000307075; // GeV * g^-1 * cm^2
    //myf z = (par->GetQp() > 0.) ? 1 : -1.;
-   myf Z = mat->GetZ();
-   myf A = mat->GetA();
+   litfloat Z = mat->GetZ();
+   litfloat A = mat->GetA();
 
-   myf me = 0.000511; // GeV;
-   myf p = std::abs(1. / par->GetQp()); //GeV
-   myf E = std::sqrt(me * me + p * p);
-   myf gamma = E / me;
+   litfloat me = 0.000511; // GeV;
+   litfloat p = std::abs(1. / par->GetQp()); //GeV
+   litfloat E = std::sqrt(me * me + p * p);
+   litfloat gamma = E / me;
 
-   myf I = CalcI(Z) * 1e-9; // GeV
+   litfloat I = CalcI(Z) * 1e-9; // GeV
 
    if (par->GetQp() > 0) { // electrons
       return K*(Z/A) * (std::log(2*me/I)+1.5*std::log(gamma) - 0.975);
@@ -231,17 +231,17 @@ myf CbmLitMaterialEffectsImp::BetheBlochElectron(
    }
 }
 
-myf CbmLitMaterialEffectsImp::CalcQpAfterEloss(
-   myf qp,
-   myf eloss) const
+litfloat CbmLitMaterialEffectsImp::CalcQpAfterEloss(
+   litfloat qp,
+   litfloat eloss) const
 {
-   myf massSq = fMass*fMass;
-   myf p = std::abs(1./qp);
-   myf E = std::sqrt(p*p + massSq);
-   myf q = (qp>0) ? 1.: -1.;
+   litfloat massSq = fMass*fMass;
+   litfloat p = std::abs(1./qp);
+   litfloat E = std::sqrt(p*p + massSq);
+   litfloat q = (qp>0) ? 1.: -1.;
    if (!fDownstream) { eloss *= -1.0; } // TODO check this
-   myf Enew = E-eloss;
-   myf pnew = (Enew > fMass) ? std::sqrt(Enew * Enew - massSq) : 0.;
+   litfloat Enew = E-eloss;
+   litfloat pnew = (Enew > fMass) ? std::sqrt(Enew * Enew - massSq) : 0.;
    if (pnew != 0) { return q/pnew; }
    else { return 1e5; }
 
@@ -251,124 +251,124 @@ myf CbmLitMaterialEffectsImp::CalcQpAfterEloss(
    //return 1./p;
 }
 
-myf CbmLitMaterialEffectsImp::CalcSigmaSqQp(
+litfloat CbmLitMaterialEffectsImp::CalcSigmaSqQp(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf P = std::abs(1. / par->GetQp()); // GeV
-   myf XMASS = fMass; // GeV
-   myf E = std::sqrt(P * P + XMASS * XMASS);
-   myf Z = mat->GetZ();
-   myf A = mat->GetA();
-   myf RHO = mat->GetRho();
-   myf STEP = mat->GetLength();
-   myf EMASS = 0.511 * 1e-3; // GeV
+   litfloat P = std::abs(1. / par->GetQp()); // GeV
+   litfloat XMASS = fMass; // GeV
+   litfloat E = std::sqrt(P * P + XMASS * XMASS);
+   litfloat Z = mat->GetZ();
+   litfloat A = mat->GetA();
+   litfloat RHO = mat->GetRho();
+   litfloat STEP = mat->GetLength();
+   litfloat EMASS = 0.511 * 1e-3; // GeV
 
-   myf BETA = P/E;
-   myf GAMMA = E/XMASS;
+   litfloat BETA = P/E;
+   litfloat GAMMA = E/XMASS;
 
    // Calculate xi factor (KeV).
-   myf XI = (153.5*Z*STEP*RHO)/(A*BETA*BETA);
+   litfloat XI = (153.5*Z*STEP*RHO)/(A*BETA*BETA);
 
    // Maximum energy transfer to atomic electron (KeV).
-   myf ETA = BETA*GAMMA;
-   myf ETASQ = ETA*ETA;
-   myf RATIO = EMASS/XMASS;
-   myf F1 = 2.*EMASS*ETASQ;
-   myf F2 = 1.+2.*RATIO*GAMMA+RATIO*RATIO;
-   myf EMAX = 1e6 * F1/F2;
+   litfloat ETA = BETA*GAMMA;
+   litfloat ETASQ = ETA*ETA;
+   litfloat RATIO = EMASS/XMASS;
+   litfloat F1 = 2.*EMASS*ETASQ;
+   litfloat F2 = 1.+2.*RATIO*GAMMA+RATIO*RATIO;
+   litfloat EMAX = 1e6 * F1/F2;
 
-   myf DEDX2 = XI*EMAX*(1.-(BETA*BETA/2.))*1e-12;
+   litfloat DEDX2 = XI*EMAX*(1.-(BETA*BETA/2.))*1e-12;
 
-   myf SDEDX = (E*E*DEDX2) / std::pow(P, 6);
+   litfloat SDEDX = (E*E*DEDX2) / std::pow(P, 6);
 
    return std::abs(SDEDX);
 }
 
-myf CbmLitMaterialEffectsImp::CalcSigmaSqQpElectron(
+litfloat CbmLitMaterialEffectsImp::CalcSigmaSqQpElectron(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf x = mat->GetLength(); //cm
-   myf X0 = mat->GetRL(); //cm
+   litfloat x = mat->GetLength(); //cm
+   litfloat X0 = mat->GetRL(); //cm
    return par->GetQp() * par->GetQp() *
           (std::exp(-x/X0 * std::log(3.0)/std::log(2.0)) -
            std::exp(-2.0 * x/X0));
 }
 
-myf CbmLitMaterialEffectsImp::CalcI(
-   myf Z) const
+litfloat CbmLitMaterialEffectsImp::CalcI(
+   litfloat Z) const
 {
    // mean excitation energy in eV
    if (Z > 16.) { return 10 * Z; }
    else { return 16 * std::pow(Z, 0.9); }
 }
 
-myf CbmLitMaterialEffectsImp::BetheHeitler(
+litfloat CbmLitMaterialEffectsImp::BetheHeitler(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf M = fMass; //GeV
-   myf p = std::abs(1. / par->GetQp());  // GeV
-   myf rho = mat->GetRho();
-   myf X0 = mat->GetRL();
-   myf me = 0.000511; // GeV
-   myf E = std::sqrt(M * M + p * p);
-   myf ratio = me/M;
+   litfloat M = fMass; //GeV
+   litfloat p = std::abs(1. / par->GetQp());  // GeV
+   litfloat rho = mat->GetRho();
+   litfloat X0 = mat->GetRL();
+   litfloat me = 0.000511; // GeV
+   litfloat E = std::sqrt(M * M + p * p);
+   litfloat ratio = me/M;
 
    return (E*ratio*ratio)/(X0*rho);
 }
 
-myf CbmLitMaterialEffectsImp::PairProduction(
+litfloat CbmLitMaterialEffectsImp::PairProduction(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf p = std::abs(1. / par->GetQp());  // GeV
-   myf M = fMass; //GeV
-   myf rho = mat->GetRho();
-   myf X0 = mat->GetRL();
-   myf E = std::sqrt(M * M + p * p);
+   litfloat p = std::abs(1. / par->GetQp());  // GeV
+   litfloat M = fMass; //GeV
+   litfloat rho = mat->GetRho();
+   litfloat X0 = mat->GetRL();
+   litfloat E = std::sqrt(M * M + p * p);
 
    return 7e-5*E/(X0*rho);
 }
 
-myf CbmLitMaterialEffectsImp::BetheBlochSimple(
+litfloat CbmLitMaterialEffectsImp::BetheBlochSimple(
    const CbmLitMaterialInfo* mat) const
 {
    return lit::ENERGY_LOSS_CONST * mat->GetZ() / mat->GetA();
 }
 
-myf CbmLitMaterialEffectsImp::MPVEnergyLoss(
+litfloat CbmLitMaterialEffectsImp::MPVEnergyLoss(
    const CbmLitTrackParam* par,
    const CbmLitMaterialInfo* mat) const
 {
-   myf M = fMass * 1e3; //MeV
-   myf p = std::abs(1. / par->GetQp()) * 1e3;  // MeV
+   litfloat M = fMass * 1e3; //MeV
+   litfloat p = std::abs(1. / par->GetQp()) * 1e3;  // MeV
 
 //   myf rho = mat->GetRho();
-   myf Z = mat->GetZ();
-   myf A = mat->GetA();
-   myf x = mat->GetRho() * mat->GetLength();
+   litfloat Z = mat->GetZ();
+   litfloat A = mat->GetA();
+   litfloat x = mat->GetRho() * mat->GetLength();
 
-   myf I = CalcI(Z) * 1e-6; // MeV
+   litfloat I = CalcI(Z) * 1e-6; // MeV
 
-   myf K = 0.307075; // MeV g^-1 cm^2
-   myf j = 0.200;
+   litfloat K = 0.307075; // MeV g^-1 cm^2
+   litfloat j = 0.200;
 
-   myf E = std::sqrt(M * M + p * p);
-   myf beta = p / E;
-   myf betaSq = beta * beta;
-   myf gamma = E / M;
-   myf gammaSq = gamma * gamma;
+   litfloat E = std::sqrt(M * M + p * p);
+   litfloat beta = p / E;
+   litfloat betaSq = beta * beta;
+   litfloat gamma = E / M;
+   litfloat gammaSq = gamma * gamma;
 
-   myf ksi = (K/2.)*(Z/A)*(x/betaSq); // MeV
+   litfloat ksi = (K/2.)*(Z/A)*(x/betaSq); // MeV
 
 //   myf hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-6 ; // MeV
 //   myf dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
 //   dc *= 2;
-   myf dc = 0.;
+   litfloat dc = 0.;
 
-   myf eloss = ksi * (std::log(2*M*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq - dc);
+   litfloat eloss = ksi * (std::log(2*M*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq - dc);
 
    return eloss * 1e-3; //GeV
 }

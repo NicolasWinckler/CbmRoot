@@ -25,7 +25,7 @@ LitStatus CbmLitKalmanFilter::Update(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,
    const CbmLitHit* hit,
-   myf& chiSq)
+   litfloat& chiSq)
 {
    *parOut = *parIn;
    return Update(parOut, hit, chiSq);
@@ -34,7 +34,7 @@ LitStatus CbmLitKalmanFilter::Update(
 LitStatus CbmLitKalmanFilter::Update(
    CbmLitTrackParam* par,
    const CbmLitHit* hit,
-   myf& chiSq)
+   litfloat& chiSq)
 {
    LitStatus result = kLITSUCCESS;
    if (hit->GetType() == kLITSTRIPHIT) {
@@ -48,41 +48,41 @@ LitStatus CbmLitKalmanFilter::Update(
 LitStatus CbmLitKalmanFilter::Update(
    CbmLitTrackParam* par,
    const CbmLitPixelHit* hit,
-   myf& chiSq)
+   litfloat& chiSq)
 {
-   std::vector<myf> cIn = par->GetCovMatrix();
+   std::vector<litfloat> cIn = par->GetCovMatrix();
 
-   static const myf ONE = 1., TWO = 2.;
+   static const litfloat ONE = 1., TWO = 2.;
 
-   myf dxx = hit->GetDx() * hit->GetDx();
-   myf dxy = hit->GetDxy();
-   myf dyy = hit->GetDy() * hit->GetDy();
+   litfloat dxx = hit->GetDx() * hit->GetDx();
+   litfloat dxy = hit->GetDxy();
+   litfloat dyy = hit->GetDy() * hit->GetDy();
 
    // calculate residuals
-   myf dx = hit->GetX() - par->GetX();
-   myf dy = hit->GetY() - par->GetY();
+   litfloat dx = hit->GetX() - par->GetX();
+   litfloat dy = hit->GetY() - par->GetY();
 
    // Calculate and inverse residual covariance matrix
-   myf t = ONE / (dxx * dyy + dxx * cIn[5] + dyy * cIn[0] + cIn[0] * cIn[5] -
+   litfloat t = ONE / (dxx * dyy + dxx * cIn[5] + dyy * cIn[0] + cIn[0] * cIn[5] -
                   dxy * dxy - TWO * dxy * cIn[1] - cIn[1] * cIn[1]);
-   myf R00 = (dyy + cIn[5]) * t;
-   myf R01 = -(dxy + cIn[1]) * t;
-   myf R11 = (dxx + cIn[0]) * t;
+   litfloat R00 = (dyy + cIn[5]) * t;
+   litfloat R01 = -(dxy + cIn[1]) * t;
+   litfloat R11 = (dxx + cIn[0]) * t;
 
    // Calculate Kalman gain matrix
-   myf K00 = cIn[0] * R00 + cIn[1] * R01;
-   myf K01 = cIn[0] * R01 + cIn[1] * R11;
-   myf K10 = cIn[1] * R00 + cIn[5] * R01;
-   myf K11 = cIn[1] * R01 + cIn[5] * R11;
-   myf K20 = cIn[2] * R00 + cIn[6] * R01;
-   myf K21 = cIn[2] * R01 + cIn[6] * R11;
-   myf K30 = cIn[3] * R00 + cIn[7] * R01;
-   myf K31 = cIn[3] * R01 + cIn[7] * R11;
-   myf K40 = cIn[4] * R00 + cIn[8] * R01;
-   myf K41 = cIn[4] * R01 + cIn[8] * R11;
+   litfloat K00 = cIn[0] * R00 + cIn[1] * R01;
+   litfloat K01 = cIn[0] * R01 + cIn[1] * R11;
+   litfloat K10 = cIn[1] * R00 + cIn[5] * R01;
+   litfloat K11 = cIn[1] * R01 + cIn[5] * R11;
+   litfloat K20 = cIn[2] * R00 + cIn[6] * R01;
+   litfloat K21 = cIn[2] * R01 + cIn[6] * R11;
+   litfloat K30 = cIn[3] * R00 + cIn[7] * R01;
+   litfloat K31 = cIn[3] * R01 + cIn[7] * R11;
+   litfloat K40 = cIn[4] * R00 + cIn[8] * R01;
+   litfloat K41 = cIn[4] * R01 + cIn[8] * R11;
 
    // Calculate filtered state vector
-   myf xOut[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
+   litfloat xOut[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
    xOut[0] += K00 * dx + K01 * dy;
    xOut[1] += K10 * dx + K11 * dy;
    xOut[2] += K20 * dx + K21 * dy;
@@ -90,7 +90,7 @@ LitStatus CbmLitKalmanFilter::Update(
    xOut[4] += K40 * dx + K41 * dy;
 
    // Calculate filtered covariance matrix
-   std::vector<myf> cOut = cIn;
+   std::vector<litfloat> cOut = cIn;
 
    cOut[0]  += -K00 * cIn[0] - K01 * cIn[1];
    cOut[1]  += -K00 * cIn[1] - K01 * cIn[5];
@@ -121,13 +121,13 @@ LitStatus CbmLitKalmanFilter::Update(
    par->SetCovMatrix(cOut);
 
    // Calculate chi-square
-   myf xmx = hit->GetX() - par->GetX();
-   myf ymy = hit->GetY() - par->GetY();
-   myf C0 = cOut[0];
-   myf C1 = cOut[1];
-   myf C5 = cOut[5];
+   litfloat xmx = hit->GetX() - par->GetX();
+   litfloat ymy = hit->GetY() - par->GetY();
+   litfloat C0 = cOut[0];
+   litfloat C1 = cOut[1];
+   litfloat C5 = cOut[5];
 
-   myf norm = dxx * dyy - dxx * C5 - dyy * C0 + C0 * C5
+   litfloat norm = dxx * dyy - dxx * C5 - dyy * C0 + C0 * C5
               - dxy * dxy + 2 * dxy * C1 - C1 * C1;
 
    chiSq = ((xmx * (dyy - C5) - ymy * (dxy - C1)) * xmx
@@ -140,29 +140,29 @@ LitStatus CbmLitKalmanFilter::Update(
 LitStatus CbmLitKalmanFilter::UpdateWMF(
    CbmLitTrackParam* par,
    const CbmLitPixelHit* hit,
-   myf& chiSq)
+   litfloat& chiSq)
 {
-   myf xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
+   litfloat xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
 
-   std::vector<myf> cIn = par->GetCovMatrix();
-   std::vector<myf> cInInv = par->GetCovMatrix();
+   std::vector<litfloat> cIn = par->GetCovMatrix();
+   std::vector<litfloat> cInInv = par->GetCovMatrix();
 
-   myf dxx = hit->GetDx() * hit->GetDx();
-   myf dxy = hit->GetDxy();
-   myf dyy = hit->GetDy() * hit->GetDy();
+   litfloat dxx = hit->GetDx() * hit->GetDx();
+   litfloat dxy = hit->GetDxy();
+   litfloat dyy = hit->GetDy() * hit->GetDy();
 
    // Inverse predicted cov matrix
    InvSym15(cInInv);
    // Calculate C1
-   std::vector<myf> C1 = cInInv;
-   myf det = dxx * dyy - dxy * dxy;
+   std::vector<litfloat> C1 = cInInv;
+   litfloat det = dxx * dyy - dxy * dxy;
    C1[0] += dyy / det;
    C1[1] += -dxy / det;
    C1[5] += dxx / det;
    // Inverse C1 -> output updated covariance matrix
    InvSym15(C1);
 
-   std::vector<myf> t(5);
+   std::vector<litfloat> t(5);
    t[0] = cInInv[0]*par->GetX() + cInInv[1]*par->GetY() + cInInv[2]*par->GetTx()
           + cInInv[3]*par->GetTy() + cInInv[4]*par->GetQp()
           + (dyy * hit->GetX() - dxy * hit->GetY()) / det;
@@ -176,7 +176,7 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
    t[4] = cInInv[4]*par->GetX() + cInInv[8]*par->GetY() + cInInv[11]*par->GetTx()
           + cInInv[13]*par->GetTy() + cInInv[14]*par->GetQp();
 
-   std::vector<myf> xOut(5);
+   std::vector<litfloat> xOut(5);
    Mult15On5(C1, t, xOut);
 
    // Copy filtered state to output
@@ -188,13 +188,13 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
    par->SetCovMatrix(C1);
 
    // Calculate chi square
-   myf dx0 = xOut[0] - xIn[0];
-   myf dx1 = xOut[1] - xIn[1];
-   myf dx2 = xOut[2] - xIn[2];
-   myf dx3 = xOut[3] - xIn[3];
-   myf dx4 = xOut[4] - xIn[4];
-   myf xmx = hit->GetX() - par->GetX();
-   myf ymy = hit->GetY() - par->GetY();
+   litfloat dx0 = xOut[0] - xIn[0];
+   litfloat dx1 = xOut[1] - xIn[1];
+   litfloat dx2 = xOut[2] - xIn[2];
+   litfloat dx3 = xOut[3] - xIn[3];
+   litfloat dx4 = xOut[4] - xIn[4];
+   litfloat xmx = hit->GetX() - par->GetX();
+   litfloat ymy = hit->GetY() - par->GetY();
    chiSq = ((xmx * dyy - ymy * dxy) * xmx + (-xmx * dxy + ymy * dxx) * ymy) / det
            + (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
            + (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1
@@ -208,40 +208,40 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
 LitStatus CbmLitKalmanFilter::Update(
    CbmLitTrackParam* par,
    const CbmLitStripHit* hit,
-   myf& chiSq)
+   litfloat& chiSq)
 {
-   myf xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
-   std::vector<myf> cIn = par->GetCovMatrix();
+   litfloat xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
+   std::vector<litfloat> cIn = par->GetCovMatrix();
 
-   myf u = hit->GetU();
-   myf duu = hit->GetDu() * hit->GetDu();
-   myf phiCos = hit->GetCosPhi();
-   myf phiSin = hit->GetSinPhi();
-   myf phiCosSq = phiCos * phiCos;
-   myf phiSinSq = phiSin * phiSin;
-   myf phi2SinCos = 2 * phiCos * phiSin;
+   litfloat u = hit->GetU();
+   litfloat duu = hit->GetDu() * hit->GetDu();
+   litfloat phiCos = hit->GetCosPhi();
+   litfloat phiSin = hit->GetSinPhi();
+   litfloat phiCosSq = phiCos * phiCos;
+   litfloat phiSinSq = phiSin * phiSin;
+   litfloat phi2SinCos = 2 * phiCos * phiSin;
 
    // Inverted covariance matrix of predicted residual
-   myf R = 1./(duu + cIn[0] * phiCosSq + phi2SinCos * cIn[1] + cIn[5] * phiSinSq);
+   litfloat R = 1./(duu + cIn[0] * phiCosSq + phi2SinCos * cIn[1] + cIn[5] * phiSinSq);
 
    // Calculate Kalman gain matrix
-   myf K0 = cIn[0] * phiCos + cIn[1] * phiSin;
-   myf K1 = cIn[1] * phiCos + cIn[5] * phiSin;
-   myf K2 = cIn[2] * phiCos + cIn[6] * phiSin;
-   myf K3 = cIn[3] * phiCos + cIn[7] * phiSin;
-   myf K4 = cIn[4] * phiCos + cIn[8] * phiSin;
+   litfloat K0 = cIn[0] * phiCos + cIn[1] * phiSin;
+   litfloat K1 = cIn[1] * phiCos + cIn[5] * phiSin;
+   litfloat K2 = cIn[2] * phiCos + cIn[6] * phiSin;
+   litfloat K3 = cIn[3] * phiCos + cIn[7] * phiSin;
+   litfloat K4 = cIn[4] * phiCos + cIn[8] * phiSin;
 
-   myf KR0 = K0 * R;
-   myf KR1 = K1 * R;
-   myf KR2 = K2 * R;
-   myf KR3 = K3 * R;
-   myf KR4 = K4 * R;
+   litfloat KR0 = K0 * R;
+   litfloat KR1 = K1 * R;
+   litfloat KR2 = K2 * R;
+   litfloat KR3 = K3 * R;
+   litfloat KR4 = K4 * R;
 
    // Residual of predictions
-   myf r = u - xIn[0] * phiCos - xIn[1] * phiSin;
+   litfloat r = u - xIn[0] * phiCos - xIn[1] * phiSin;
 
    // Calculate filtered state vector
-   std::vector<myf> xOut(5);
+   std::vector<litfloat> xOut(5);
    xOut[0] = xIn[0] + KR0 * r;
    xOut[1] = xIn[1] + KR1 * r;
    xOut[2] = xIn[2] + KR2 * r;
@@ -249,7 +249,7 @@ LitStatus CbmLitKalmanFilter::Update(
    xOut[4] = xIn[4] + KR4 * r;
 
    // Calculate filtered covariance matrix
-   std::vector<myf> cOut(15);
+   std::vector<litfloat> cOut(15);
    cOut[0] = cIn[0] - KR0 * K0;
    cOut[1] = cIn[1] - KR0 * K1;
    cOut[2] = cIn[2] - KR0 * K2;
@@ -279,7 +279,7 @@ LitStatus CbmLitKalmanFilter::Update(
    par->SetCovMatrix(cOut);
 
    // Filtered resuduals
-   myf ru = u - xOut[0] * phiCos - xOut[1] * phiSin;
+   litfloat ru = u - xOut[0] * phiCos - xOut[1] * phiSin;
 
    // Calculate chi-square
    chiSq = (ru * ru) / (duu - phiCosSq*cOut[0] - phi2SinCos*cOut[1] - phiSinSq*cOut[5]);
@@ -290,28 +290,28 @@ LitStatus CbmLitKalmanFilter::Update(
 LitStatus CbmLitKalmanFilter::UpdateWMF(
    CbmLitTrackParam* par,
    const CbmLitStripHit* hit,
-   myf& chiSq)
+   litfloat& chiSq)
 {
-   myf xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
+   litfloat xIn[5] = { par->GetX(), par->GetY(), par->GetTx(), par->GetTy(), par->GetQp() };
 
-   std::vector<myf> cIn = par->GetCovMatrix();
-   std::vector<myf> cInInv = par->GetCovMatrix();
+   std::vector<litfloat> cIn = par->GetCovMatrix();
+   std::vector<litfloat> cInInv = par->GetCovMatrix();
 
-   myf duu = hit->GetDu() * hit->GetDu();
-   myf phiCos = hit->GetCosPhi();
-   myf phiSin = hit->GetSinPhi();
+   litfloat duu = hit->GetDu() * hit->GetDu();
+   litfloat phiCos = hit->GetCosPhi();
+   litfloat phiSin = hit->GetSinPhi();
 
    // Inverse predicted cov matrix
    InvSym15(cInInv);
    // Calculate C1
-   std::vector<myf> C1 = cInInv;
+   std::vector<litfloat> C1 = cInInv;
    C1[0] += phiCos*phiCos / duu;
    C1[1] += phiCos*phiSin / duu;
    C1[5] += phiSin*phiSin / duu;
    // Inverse C1 -> output updated covariance matrix
    InvSym15(C1);
 
-   std::vector<myf> t(5);
+   std::vector<litfloat> t(5);
    t[0] = cInInv[0]*par->GetX() + cInInv[1]*par->GetY() + cInInv[2]*par->GetTx()
           + cInInv[3]*par->GetTy() + cInInv[4]*par->GetQp()
           + phiCos*hit->GetU()/duu;
@@ -325,7 +325,7 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
    t[4] = cInInv[4]*par->GetX() + cInInv[8]*par->GetY() + cInInv[11]*par->GetTx()
           + cInInv[13]*par->GetTy() + cInInv[14]*par->GetQp();
 
-   std::vector<myf> xOut(5);
+   std::vector<litfloat> xOut(5);
    Mult15On5(C1, t, xOut);
 
    // Copy filtered state to output
@@ -337,12 +337,12 @@ LitStatus CbmLitKalmanFilter::UpdateWMF(
    par->SetCovMatrix(C1);
 
    // Calculate chi square
-   myf zeta = hit->GetU() - phiCos*xOut[0] - phiSin*xOut[1];
-   myf dx0 = xOut[0] - xIn[0];
-   myf dx1 = xOut[1] - xIn[1];
-   myf dx2 = xOut[2] - xIn[2];
-   myf dx3 = xOut[3] - xIn[3];
-   myf dx4 = xOut[4] - xIn[4];
+   litfloat zeta = hit->GetU() - phiCos*xOut[0] - phiSin*xOut[1];
+   litfloat dx0 = xOut[0] - xIn[0];
+   litfloat dx1 = xOut[1] - xIn[1];
+   litfloat dx2 = xOut[2] - xIn[2];
+   litfloat dx3 = xOut[3] - xIn[3];
+   litfloat dx4 = xOut[4] - xIn[4];
    chiSq = zeta * zeta / duu
            + (dx0 * cInInv[0] + dx1 * cInInv[1] + dx2 * cInInv[2 ] + dx3 * cInInv[3 ] + dx4 * cInInv[4 ]) * dx0
            + (dx0 * cInInv[1] + dx1 * cInInv[5] + dx2 * cInInv[6 ] + dx3 * cInInv[7 ] + dx4 * cInInv[8 ]) * dx1

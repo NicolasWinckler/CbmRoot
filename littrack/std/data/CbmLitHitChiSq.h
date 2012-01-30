@@ -31,7 +31,7 @@ public:
    void SetHit(const CbmLitHit* hit) {fHit = hit;}
 
    /* Sets chi-square value */
-   void SetChiSq(myf chiSq) {fChiSq = chiSq;}
+   void SetChiSq(litfloat chiSq) {fChiSq = chiSq;}
 
    /* Set track parameter pointer */
    void SetParam(const CbmLitTrackParam* param) {fParam = *param;}
@@ -40,7 +40,7 @@ public:
    const CbmLitHit* GetHit() const {return fHit;}
 
    /* Returns chi-square value */
-   myf GetChiSq() const {return fChiSq;}
+   litfloat GetChiSq() const {return fChiSq;}
 
    /* Returns track parameters pointer */
    const CbmLitTrackParam* GetParam() const {return &fParam;}
@@ -49,7 +49,7 @@ private:
    /* Pointer to the hit */
    const CbmLitHit* fHit;
    /* Chi-square value */
-   myf fChiSq;
+   litfloat fChiSq;
    /* Pointer to the track parameters */
    CbmLitTrackParam fParam;
 };

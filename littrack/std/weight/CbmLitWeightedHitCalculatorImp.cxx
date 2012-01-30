@@ -40,48 +40,48 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
    CbmLitPixelHit* hit)
 {
    //calculate effective weight matrix G
-   myf eG00 = 0., eG01 = 0., eG11 = 0.;
+   litfloat eG00 = 0., eG01 = 0., eG11 = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitPixelHit* h = static_cast<CbmLitPixelHit*>(*it);
       if (h->IsOutlier()) { continue; }
-      myf dxx = h->GetDx() * h->GetDx();
-      myf dyy = h->GetDy() * h->GetDy();
-      myf dxy = h->GetDxy();
+      litfloat dxx = h->GetDx() * h->GetDx();
+      litfloat dyy = h->GetDy() * h->GetDy();
+      litfloat dxy = h->GetDxy();
 
-      myf G00, G01, G11;
+      litfloat G00, G01, G11;
       Inverse(dxx, dxy, dyy, G00, G01, G11);
 
-      myf w = h->GetW();
+      litfloat w = h->GetW();
       eG00 += w * G00;
       eG01 += w * G01;
       eG11 += w * G11;
    }
 
    //calculate effective cov matrix V
-   myf eV00, eV01, eV11;
+   litfloat eV00, eV01, eV11;
    Inverse(eG00, eG01, eG11, eV00, eV01, eV11);
 
    // calculate effective x and y
-   myf m0 = 0., m1 = 0.;
+   litfloat m0 = 0., m1 = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitPixelHit* h = static_cast<CbmLitPixelHit*>(*it);
       if (h->IsOutlier()) { continue; }
-      myf dxx = h->GetDx() * h->GetDx();
-      myf dyy = h->GetDy() * h->GetDy();
-      myf dxy = h->GetDxy();
-      myf x = h->GetX();
-      myf y = h->GetY();
+      litfloat dxx = h->GetDx() * h->GetDx();
+      litfloat dyy = h->GetDy() * h->GetDy();
+      litfloat dxy = h->GetDxy();
+      litfloat x = h->GetX();
+      litfloat y = h->GetY();
 
-      myf G00, G01, G11;
+      litfloat G00, G01, G11;
       Inverse(dxx, dxy, dyy, G00, G01, G11);
 
-      myf w = h->GetW();
+      litfloat w = h->GetW();
 
       m0 += w * (G00 * x + G01 * y);
       m1 += w * (G11 * y + G01 * x);
    }
-   myf x = eV00 * m0 + eV01 * m1;
-   myf y = eV11 * m1 + eV01 * m0;
+   litfloat x = eV00 * m0 + eV01 * m1;
+   litfloat y = eV11 * m1 + eV01 * m0;
 
    hit->SetX(x);
    hit->SetY(y);
@@ -98,27 +98,27 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
    CbmLitStripHit* hit)
 {
    //calculate effective weight matrix G
-   myf eG = 0.;
+   litfloat eG = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitStripHit* h = static_cast<CbmLitStripHit*>(*it);
       if (h->IsOutlier()) { continue; }
-      myf duu = h->GetDu() * h->GetDu();
-      myf w = h->GetW();
-      myf G = 1./duu;
+      litfloat duu = h->GetDu() * h->GetDu();
+      litfloat w = h->GetW();
+      litfloat G = 1./duu;
       eG += w * G;
    }
-   myf eV = 1./eG;
+   litfloat eV = 1./eG;
 
-   myf m0 = 0.;
+   litfloat m0 = 0.;
    for (HitPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitStripHit* h = static_cast<CbmLitStripHit*>(*it);
       if (h->IsOutlier()) { continue; }
-      myf duu = h->GetDu() * h->GetDu();
-      myf u = h->GetU();
-      myf w = h->GetW();
+      litfloat duu = h->GetDu() * h->GetDu();
+      litfloat u = h->GetU();
+      litfloat w = h->GetW();
       m0 += w * (1./duu) * u;
    }
-   myf eU = eV * m0;
+   litfloat eU = eV * m0;
 
    hit->SetU(eU);
    hit->SetZ((*itBegin)->GetZ());
@@ -127,11 +127,11 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
 }
 
 void CbmLitWeightedHitCalculatorImp::Inverse(
-   myf v00, myf v01, myf v11,
-   myf& u00, myf& u01, myf& u11)
+   litfloat v00, litfloat v01, litfloat v11,
+   litfloat& u00, litfloat& u01, litfloat& u11)
 {
    if (v01 != 0.) {
-      myf norm = v00 * v11 - v01 * v01;
+      litfloat norm = v00 * v11 - v01 * v01;
       u00 = v11 / norm;
       u01 = -v01 / norm;
       u11 = v00 / norm;

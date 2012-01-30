@@ -28,16 +28,16 @@ public:
    virtual LitStatus Propagate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F);
+      std::vector<litfloat>* F);
 
    /* Inherited from CbmLitTrackPropagator */
    virtual LitStatus Propagate(
       CbmLitTrackParam* pParam,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F);
+      std::vector<litfloat>* F);
 
 private:
    CbmPropagator* fPropagator; // FairRoot interface to GEANE

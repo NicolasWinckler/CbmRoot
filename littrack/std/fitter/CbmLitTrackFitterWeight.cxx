@@ -167,7 +167,7 @@ LitStatus CbmLitTrackFitterWeight::CalculateWeights(
    if (iter == 0) {
       fSimpleWeightCalculator->DoCalculate(par, itBegin, itEnd, 0);
    } else {
-      myf T = fAnnealing[iter];
+      litfloat T = fAnnealing[iter];
       fTukeyWeightCalculator->DoCalculate(par, itBegin, itEnd, T);
    }
    return kLITSUCCESS;

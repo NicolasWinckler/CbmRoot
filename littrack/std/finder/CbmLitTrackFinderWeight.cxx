@@ -133,7 +133,7 @@ bool CbmLitTrackFinderWeight::ProcessStation(
    int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
    std::vector<CbmLitHitChiSq> hits;
    for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-      myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
+      litfloat z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
       fPropagator->Propagate(&par, z, fPDG);
       track->SetParamLast(&par);
       HitPtrIteratorPair bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
@@ -167,7 +167,7 @@ bool CbmLitTrackFinderWeight::AddHits(
    bool hitAdded = false;
    CbmLitTrackParam par(*track->GetParamLast()), uPar;
    for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
-      myf chi = 0.;
+      litfloat chi = 0.;
       fFilter->Update(&par, &uPar, *iHit, chi);
       if (IsHitInValidationGate(*iHit, chi, &par)) {
          CbmLitHitChiSq h;

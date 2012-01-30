@@ -36,14 +36,14 @@ public:
    virtual LitStatus Extrapolate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
-      std::vector<myf>* F);
+      litfloat zOut,
+      std::vector<litfloat>* F);
 
    /* Inherited from CbmLitTrackExtrapolation */
    virtual LitStatus Extrapolate(
       CbmLitTrackParam* par,
-      myf zOut,
-      std::vector<myf>* F);
+      litfloat zOut,
+      std::vector<litfloat>* F);
 
 protected:
    /* Calculates output track parameters and derivatives with the 4th order Runge-Kutta method.
@@ -54,16 +54,16 @@ protected:
     * @param derivs Vector with integrated derivatives.
     */
    void RK4Order(
-      const std::vector<myf>& xIn,
-      myf zIn,
-      std::vector<myf>& xOut,
-      myf zOut,
-      std::vector<myf>& derivs) const;
+      const std::vector<litfloat>& xIn,
+      litfloat zIn,
+      std::vector<litfloat>& xOut,
+      litfloat zOut,
+      std::vector<litfloat>& derivs) const;
 
    /* TODO: add comment */
-   myf CalcOut(
-      myf in,
-      const myf k[4]) const;
+   litfloat CalcOut(
+      litfloat in,
+      const litfloat k[4]) const;
 
    /* Transport the covariance matrix, using formula cOut = F*cIn*Ft.
     * @param cIn Input covariance matrix.
@@ -71,9 +71,9 @@ protected:
     * @param cOut Output covariance matrix.
     */
    void TransportC(
-      const std::vector<myf>& cIn,
-      const std::vector<myf>& F,
-      std::vector<myf>& cOut) const;
+      const std::vector<litfloat>& cIn,
+      const std::vector<litfloat>& F,
+      std::vector<litfloat>& cOut) const;
 
 private:
    CbmLitField* fField; // magnetic field

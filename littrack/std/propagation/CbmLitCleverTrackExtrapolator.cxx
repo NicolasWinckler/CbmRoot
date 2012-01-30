@@ -29,8 +29,8 @@ CbmLitCleverTrackExtrapolator::~CbmLitCleverTrackExtrapolator()
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,
-   myf zOut,
-   std::vector<myf>* F)
+   litfloat zOut,
+   std::vector<litfloat>* F)
 {
    *parOut = *parIn;
    return Extrapolate(parOut, zOut, F);
@@ -38,18 +38,18 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
    CbmLitTrackParam* par,
-   myf zOut,
-   std::vector<myf>* F)
+   litfloat zOut,
+   std::vector<litfloat>* F)
 {
-   myf zIn = par->GetZ();
-   myf zStart = lit::LINE_EXTRAPOLATION_START_Z;
+   litfloat zIn = par->GetZ();
+   litfloat zStart = lit::LINE_EXTRAPOLATION_START_Z;
 
    if (zIn >= zStart && zOut >= zStart) {
       return fLineExtrapolator->Extrapolate(par, zOut, F);
    } else if (zIn < zStart && zOut < zStart) {
       return fRK4Extrapolator->Extrapolate(par, zOut, F);
    } else if (zOut > zIn && zIn < zStart && zOut > zStart) {
-      std::vector<myf> F1(25), F2(25);
+      std::vector<litfloat> F1(25), F2(25);
       LitStatus result;
       if (F != NULL) { result = fRK4Extrapolator->Extrapolate(par, zStart, &F1); }
       else { result = fRK4Extrapolator->Extrapolate(par, zStart, NULL); }
@@ -63,7 +63,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
          return result1;
       };
    } else if (zOut < zIn && zIn > zStart && zOut < zStart) {
-      std::vector<myf> F1(25), F2(25);
+      std::vector<litfloat> F1(25), F2(25);
       LitStatus result;
       if (F != NULL) { result = fLineExtrapolator->Extrapolate(par, zStart, &F1); }
       else { result = fLineExtrapolator->Extrapolate(par, zStart, NULL); }

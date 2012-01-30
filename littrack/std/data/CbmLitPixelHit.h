@@ -31,34 +31,34 @@ public:
    virtual ~CbmLitPixelHit() {};
 
    /* Returns X hit position */
-   myf GetX() const { return fX; }
+   litfloat GetX() const { return fX; }
 
    /* Returns Y hit position */
-   myf GetY() const { return fY; }
+   litfloat GetY() const { return fY; }
 
    /* Returns X hit position error */
-   myf GetDx() const { return fDx; }
+   litfloat GetDx() const { return fDx; }
 
    /* Returns Y hit position error */
-   myf GetDy() const { return fDy; }
+   litfloat GetDy() const { return fDy; }
 
    /* Returns XY hit covariance */
-   myf GetDxy() const { return fDxy; }
+   litfloat GetDxy() const { return fDxy; }
 
    /* Sets X hit position */
-   void SetX(myf x) { fX = x; }
+   void SetX(litfloat x) { fX = x; }
 
    /* Sets Y hit position */
-   void SetY(myf y) { fY = y; }
+   void SetY(litfloat y) { fY = y; }
 
    /* Sets X hit position error */
-   void SetDx(myf dx) { fDx = dx; }
+   void SetDx(litfloat dx) { fDx = dx; }
 
    /* Sets Y hit position error */
-   void SetDy(myf dy) { fDy = dy; }
+   void SetDy(litfloat dy) { fDy = dy; }
 
    /* Sets XY hit covariance */
-   void SetDxy(myf dxy) { fDxy = dxy; }
+   void SetDxy(litfloat dxy) { fDxy = dxy; }
 
    /* Returns std::string representation of the class */
    virtual std::string ToString() const {
@@ -75,11 +75,11 @@ public:
 
 private:
    /* X and Y hit positions in [cm] */
-   myf fX, fY;
+   litfloat fX, fY;
    /* X and Y hit position errors in [cm] */
-   myf fDx, fDy;
+   litfloat fDx, fDy;
    /* XY covariance */
-   myf fDxy;
+   litfloat fDxy;
 };
 
 #endif /*CBMLITPIXELHIT_H_*/

@@ -27,23 +27,23 @@ CbmLitTrackParam::~CbmLitTrackParam()
 }
 
 void CbmLitTrackParam::GetDirCos(
-   myf& nx,
-   myf& ny,
-   myf& nz) const
+   litfloat& nx,
+   litfloat& ny,
+   litfloat& nz) const
 {
-   myf p  = (std::abs(fQp) != 0.) ? 1./std::abs(fQp) : 1.e20;
-   myf pz = std::sqrt(p*p / (fTx*fTx + fTy*fTy + 1));
-   myf px = fTx * pz;
-   myf py = fTy * pz;
+   litfloat p  = (std::abs(fQp) != 0.) ? 1./std::abs(fQp) : 1.e20;
+   litfloat pz = std::sqrt(p*p / (fTx*fTx + fTy*fTy + 1));
+   litfloat px = fTx * pz;
+   litfloat py = fTy * pz;
    TVector3 unit = TVector3(px, py, pz).Unit();
    nx = unit.X();
    ny = unit.Y();
    nz = unit.Z();
 }
 
-std::vector<myf> CbmLitTrackParam::GetStateVector() const
+std::vector<litfloat> CbmLitTrackParam::GetStateVector() const
 {
-   std::vector<myf> state(5);
+   std::vector<litfloat> state(5);
    state[0] = GetX();
    state[1] = GetY();
    state[2] = GetTx();
@@ -53,7 +53,7 @@ std::vector<myf> CbmLitTrackParam::GetStateVector() const
 }
 
 void CbmLitTrackParam::SetStateVector(
-   const std::vector<myf>& x)
+   const std::vector<litfloat>& x)
 {
    SetX(x[0]);
    SetY(x[1]);

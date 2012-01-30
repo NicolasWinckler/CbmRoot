@@ -39,112 +39,112 @@
 #define SM44 14
 
 bool InvSym15(
-   std::vector<myf>& a)
+   std::vector<litfloat>& a)
 {
    if (a.size() != 15) {
       std::cout << "-E- InvSym15: size is not correct" << std::endl;
       return false;
    }
 
-   myf* pM = &a[0];
+   litfloat* pM = &a[0];
 
    // Find all NECESSARY 2x2 dets:  (25 of them)
 
-   const myf mDet2_23_01 = pM[SM20]*pM[SM31] - pM[SM21]*pM[SM30];
-   const myf mDet2_23_02 = pM[SM20]*pM[SM32] - pM[SM22]*pM[SM30];
-   const myf mDet2_23_03 = pM[SM20]*pM[SM33] - pM[SM23]*pM[SM30];
-   const myf mDet2_23_12 = pM[SM21]*pM[SM32] - pM[SM22]*pM[SM31];
-   const myf mDet2_23_13 = pM[SM21]*pM[SM33] - pM[SM23]*pM[SM31];
-   const myf mDet2_23_23 = pM[SM22]*pM[SM33] - pM[SM23]*pM[SM32];
-   const myf mDet2_24_01 = pM[SM20]*pM[SM41] - pM[SM21]*pM[SM40];
-   const myf mDet2_24_02 = pM[SM20]*pM[SM42] - pM[SM22]*pM[SM40];
-   const myf mDet2_24_03 = pM[SM20]*pM[SM43] - pM[SM23]*pM[SM40];
-   const myf mDet2_24_04 = pM[SM20]*pM[SM44] - pM[SM24]*pM[SM40];
-   const myf mDet2_24_12 = pM[SM21]*pM[SM42] - pM[SM22]*pM[SM41];
-   const myf mDet2_24_13 = pM[SM21]*pM[SM43] - pM[SM23]*pM[SM41];
-   const myf mDet2_24_14 = pM[SM21]*pM[SM44] - pM[SM24]*pM[SM41];
-   const myf mDet2_24_23 = pM[SM22]*pM[SM43] - pM[SM23]*pM[SM42];
-   const myf mDet2_24_24 = pM[SM22]*pM[SM44] - pM[SM24]*pM[SM42];
-   const myf mDet2_34_01 = pM[SM30]*pM[SM41] - pM[SM31]*pM[SM40];
-   const myf mDet2_34_02 = pM[SM30]*pM[SM42] - pM[SM32]*pM[SM40];
-   const myf mDet2_34_03 = pM[SM30]*pM[SM43] - pM[SM33]*pM[SM40];
-   const myf mDet2_34_04 = pM[SM30]*pM[SM44] - pM[SM34]*pM[SM40];
-   const myf mDet2_34_12 = pM[SM31]*pM[SM42] - pM[SM32]*pM[SM41];
-   const myf mDet2_34_13 = pM[SM31]*pM[SM43] - pM[SM33]*pM[SM41];
-   const myf mDet2_34_14 = pM[SM31]*pM[SM44] - pM[SM34]*pM[SM41];
-   const myf mDet2_34_23 = pM[SM32]*pM[SM43] - pM[SM33]*pM[SM42];
-   const myf mDet2_34_24 = pM[SM32]*pM[SM44] - pM[SM34]*pM[SM42];
-   const myf mDet2_34_34 = pM[SM33]*pM[SM44] - pM[SM34]*pM[SM43];
+   const litfloat mDet2_23_01 = pM[SM20]*pM[SM31] - pM[SM21]*pM[SM30];
+   const litfloat mDet2_23_02 = pM[SM20]*pM[SM32] - pM[SM22]*pM[SM30];
+   const litfloat mDet2_23_03 = pM[SM20]*pM[SM33] - pM[SM23]*pM[SM30];
+   const litfloat mDet2_23_12 = pM[SM21]*pM[SM32] - pM[SM22]*pM[SM31];
+   const litfloat mDet2_23_13 = pM[SM21]*pM[SM33] - pM[SM23]*pM[SM31];
+   const litfloat mDet2_23_23 = pM[SM22]*pM[SM33] - pM[SM23]*pM[SM32];
+   const litfloat mDet2_24_01 = pM[SM20]*pM[SM41] - pM[SM21]*pM[SM40];
+   const litfloat mDet2_24_02 = pM[SM20]*pM[SM42] - pM[SM22]*pM[SM40];
+   const litfloat mDet2_24_03 = pM[SM20]*pM[SM43] - pM[SM23]*pM[SM40];
+   const litfloat mDet2_24_04 = pM[SM20]*pM[SM44] - pM[SM24]*pM[SM40];
+   const litfloat mDet2_24_12 = pM[SM21]*pM[SM42] - pM[SM22]*pM[SM41];
+   const litfloat mDet2_24_13 = pM[SM21]*pM[SM43] - pM[SM23]*pM[SM41];
+   const litfloat mDet2_24_14 = pM[SM21]*pM[SM44] - pM[SM24]*pM[SM41];
+   const litfloat mDet2_24_23 = pM[SM22]*pM[SM43] - pM[SM23]*pM[SM42];
+   const litfloat mDet2_24_24 = pM[SM22]*pM[SM44] - pM[SM24]*pM[SM42];
+   const litfloat mDet2_34_01 = pM[SM30]*pM[SM41] - pM[SM31]*pM[SM40];
+   const litfloat mDet2_34_02 = pM[SM30]*pM[SM42] - pM[SM32]*pM[SM40];
+   const litfloat mDet2_34_03 = pM[SM30]*pM[SM43] - pM[SM33]*pM[SM40];
+   const litfloat mDet2_34_04 = pM[SM30]*pM[SM44] - pM[SM34]*pM[SM40];
+   const litfloat mDet2_34_12 = pM[SM31]*pM[SM42] - pM[SM32]*pM[SM41];
+   const litfloat mDet2_34_13 = pM[SM31]*pM[SM43] - pM[SM33]*pM[SM41];
+   const litfloat mDet2_34_14 = pM[SM31]*pM[SM44] - pM[SM34]*pM[SM41];
+   const litfloat mDet2_34_23 = pM[SM32]*pM[SM43] - pM[SM33]*pM[SM42];
+   const litfloat mDet2_34_24 = pM[SM32]*pM[SM44] - pM[SM34]*pM[SM42];
+   const litfloat mDet2_34_34 = pM[SM33]*pM[SM44] - pM[SM34]*pM[SM43];
 
    // Find all NECESSARY 3x3 dets:   (30 of them)
 
-   const myf mDet3_123_012 = pM[SM10]*mDet2_23_12 - pM[SM11]*mDet2_23_02 + pM[SM12]*mDet2_23_01;
-   const myf mDet3_123_013 = pM[SM10]*mDet2_23_13 - pM[SM11]*mDet2_23_03 + pM[SM13]*mDet2_23_01;
-   const myf mDet3_123_023 = pM[SM10]*mDet2_23_23 - pM[SM12]*mDet2_23_03 + pM[SM13]*mDet2_23_02;
-   const myf mDet3_123_123 = pM[SM11]*mDet2_23_23 - pM[SM12]*mDet2_23_13 + pM[SM13]*mDet2_23_12;
-   const myf mDet3_124_012 = pM[SM10]*mDet2_24_12 - pM[SM11]*mDet2_24_02 + pM[SM12]*mDet2_24_01;
-   const myf mDet3_124_013 = pM[SM10]*mDet2_24_13 - pM[SM11]*mDet2_24_03 + pM[SM13]*mDet2_24_01;
-   const myf mDet3_124_014 = pM[SM10]*mDet2_24_14 - pM[SM11]*mDet2_24_04 + pM[SM14]*mDet2_24_01;
-   const myf mDet3_124_023 = pM[SM10]*mDet2_24_23 - pM[SM12]*mDet2_24_03 + pM[SM13]*mDet2_24_02;
-   const myf mDet3_124_024 = pM[SM10]*mDet2_24_24 - pM[SM12]*mDet2_24_04 + pM[SM14]*mDet2_24_02;
-   const myf mDet3_124_123 = pM[SM11]*mDet2_24_23 - pM[SM12]*mDet2_24_13 + pM[SM13]*mDet2_24_12;
-   const myf mDet3_124_124 = pM[SM11]*mDet2_24_24 - pM[SM12]*mDet2_24_14 + pM[SM14]*mDet2_24_12;
-   const myf mDet3_134_012 = pM[SM10]*mDet2_34_12 - pM[SM11]*mDet2_34_02 + pM[SM12]*mDet2_34_01;
-   const myf mDet3_134_013 = pM[SM10]*mDet2_34_13 - pM[SM11]*mDet2_34_03 + pM[SM13]*mDet2_34_01;
-   const myf mDet3_134_014 = pM[SM10]*mDet2_34_14 - pM[SM11]*mDet2_34_04 + pM[SM14]*mDet2_34_01;
-   const myf mDet3_134_023 = pM[SM10]*mDet2_34_23 - pM[SM12]*mDet2_34_03 + pM[SM13]*mDet2_34_02;
-   const myf mDet3_134_024 = pM[SM10]*mDet2_34_24 - pM[SM12]*mDet2_34_04 + pM[SM14]*mDet2_34_02;
-   const myf mDet3_134_034 = pM[SM10]*mDet2_34_34 - pM[SM13]*mDet2_34_04 + pM[SM14]*mDet2_34_03;
-   const myf mDet3_134_123 = pM[SM11]*mDet2_34_23 - pM[SM12]*mDet2_34_13 + pM[SM13]*mDet2_34_12;
-   const myf mDet3_134_124 = pM[SM11]*mDet2_34_24 - pM[SM12]*mDet2_34_14 + pM[SM14]*mDet2_34_12;
-   const myf mDet3_134_134 = pM[SM11]*mDet2_34_34 - pM[SM13]*mDet2_34_14 + pM[SM14]*mDet2_34_13;
-   const myf mDet3_234_012 = pM[SM20]*mDet2_34_12 - pM[SM21]*mDet2_34_02 + pM[SM22]*mDet2_34_01;
-   const myf mDet3_234_013 = pM[SM20]*mDet2_34_13 - pM[SM21]*mDet2_34_03 + pM[SM23]*mDet2_34_01;
-   const myf mDet3_234_014 = pM[SM20]*mDet2_34_14 - pM[SM21]*mDet2_34_04 + pM[SM24]*mDet2_34_01;
-   const myf mDet3_234_023 = pM[SM20]*mDet2_34_23 - pM[SM22]*mDet2_34_03 + pM[SM23]*mDet2_34_02;
-   const myf mDet3_234_024 = pM[SM20]*mDet2_34_24 - pM[SM22]*mDet2_34_04 + pM[SM24]*mDet2_34_02;
-   const myf mDet3_234_034 = pM[SM20]*mDet2_34_34 - pM[SM23]*mDet2_34_04 + pM[SM24]*mDet2_34_03;
-   const myf mDet3_234_123 = pM[SM21]*mDet2_34_23 - pM[SM22]*mDet2_34_13 + pM[SM23]*mDet2_34_12;
-   const myf mDet3_234_124 = pM[SM21]*mDet2_34_24 - pM[SM22]*mDet2_34_14 + pM[SM24]*mDet2_34_12;
-   const myf mDet3_234_134 = pM[SM21]*mDet2_34_34 - pM[SM23]*mDet2_34_14 + pM[SM24]*mDet2_34_13;
-   const myf mDet3_234_234 = pM[SM22]*mDet2_34_34 - pM[SM23]*mDet2_34_24 + pM[SM24]*mDet2_34_23;
+   const litfloat mDet3_123_012 = pM[SM10]*mDet2_23_12 - pM[SM11]*mDet2_23_02 + pM[SM12]*mDet2_23_01;
+   const litfloat mDet3_123_013 = pM[SM10]*mDet2_23_13 - pM[SM11]*mDet2_23_03 + pM[SM13]*mDet2_23_01;
+   const litfloat mDet3_123_023 = pM[SM10]*mDet2_23_23 - pM[SM12]*mDet2_23_03 + pM[SM13]*mDet2_23_02;
+   const litfloat mDet3_123_123 = pM[SM11]*mDet2_23_23 - pM[SM12]*mDet2_23_13 + pM[SM13]*mDet2_23_12;
+   const litfloat mDet3_124_012 = pM[SM10]*mDet2_24_12 - pM[SM11]*mDet2_24_02 + pM[SM12]*mDet2_24_01;
+   const litfloat mDet3_124_013 = pM[SM10]*mDet2_24_13 - pM[SM11]*mDet2_24_03 + pM[SM13]*mDet2_24_01;
+   const litfloat mDet3_124_014 = pM[SM10]*mDet2_24_14 - pM[SM11]*mDet2_24_04 + pM[SM14]*mDet2_24_01;
+   const litfloat mDet3_124_023 = pM[SM10]*mDet2_24_23 - pM[SM12]*mDet2_24_03 + pM[SM13]*mDet2_24_02;
+   const litfloat mDet3_124_024 = pM[SM10]*mDet2_24_24 - pM[SM12]*mDet2_24_04 + pM[SM14]*mDet2_24_02;
+   const litfloat mDet3_124_123 = pM[SM11]*mDet2_24_23 - pM[SM12]*mDet2_24_13 + pM[SM13]*mDet2_24_12;
+   const litfloat mDet3_124_124 = pM[SM11]*mDet2_24_24 - pM[SM12]*mDet2_24_14 + pM[SM14]*mDet2_24_12;
+   const litfloat mDet3_134_012 = pM[SM10]*mDet2_34_12 - pM[SM11]*mDet2_34_02 + pM[SM12]*mDet2_34_01;
+   const litfloat mDet3_134_013 = pM[SM10]*mDet2_34_13 - pM[SM11]*mDet2_34_03 + pM[SM13]*mDet2_34_01;
+   const litfloat mDet3_134_014 = pM[SM10]*mDet2_34_14 - pM[SM11]*mDet2_34_04 + pM[SM14]*mDet2_34_01;
+   const litfloat mDet3_134_023 = pM[SM10]*mDet2_34_23 - pM[SM12]*mDet2_34_03 + pM[SM13]*mDet2_34_02;
+   const litfloat mDet3_134_024 = pM[SM10]*mDet2_34_24 - pM[SM12]*mDet2_34_04 + pM[SM14]*mDet2_34_02;
+   const litfloat mDet3_134_034 = pM[SM10]*mDet2_34_34 - pM[SM13]*mDet2_34_04 + pM[SM14]*mDet2_34_03;
+   const litfloat mDet3_134_123 = pM[SM11]*mDet2_34_23 - pM[SM12]*mDet2_34_13 + pM[SM13]*mDet2_34_12;
+   const litfloat mDet3_134_124 = pM[SM11]*mDet2_34_24 - pM[SM12]*mDet2_34_14 + pM[SM14]*mDet2_34_12;
+   const litfloat mDet3_134_134 = pM[SM11]*mDet2_34_34 - pM[SM13]*mDet2_34_14 + pM[SM14]*mDet2_34_13;
+   const litfloat mDet3_234_012 = pM[SM20]*mDet2_34_12 - pM[SM21]*mDet2_34_02 + pM[SM22]*mDet2_34_01;
+   const litfloat mDet3_234_013 = pM[SM20]*mDet2_34_13 - pM[SM21]*mDet2_34_03 + pM[SM23]*mDet2_34_01;
+   const litfloat mDet3_234_014 = pM[SM20]*mDet2_34_14 - pM[SM21]*mDet2_34_04 + pM[SM24]*mDet2_34_01;
+   const litfloat mDet3_234_023 = pM[SM20]*mDet2_34_23 - pM[SM22]*mDet2_34_03 + pM[SM23]*mDet2_34_02;
+   const litfloat mDet3_234_024 = pM[SM20]*mDet2_34_24 - pM[SM22]*mDet2_34_04 + pM[SM24]*mDet2_34_02;
+   const litfloat mDet3_234_034 = pM[SM20]*mDet2_34_34 - pM[SM23]*mDet2_34_04 + pM[SM24]*mDet2_34_03;
+   const litfloat mDet3_234_123 = pM[SM21]*mDet2_34_23 - pM[SM22]*mDet2_34_13 + pM[SM23]*mDet2_34_12;
+   const litfloat mDet3_234_124 = pM[SM21]*mDet2_34_24 - pM[SM22]*mDet2_34_14 + pM[SM24]*mDet2_34_12;
+   const litfloat mDet3_234_134 = pM[SM21]*mDet2_34_34 - pM[SM23]*mDet2_34_14 + pM[SM24]*mDet2_34_13;
+   const litfloat mDet3_234_234 = pM[SM22]*mDet2_34_34 - pM[SM23]*mDet2_34_24 + pM[SM24]*mDet2_34_23;
 
    // Find all NECESSARY 4x4 dets:   (15 of them)
 
-   const myf mDet4_0123_0123 = pM[SM00]*mDet3_123_123 - pM[SM01]*mDet3_123_023
+   const litfloat mDet4_0123_0123 = pM[SM00]*mDet3_123_123 - pM[SM01]*mDet3_123_023
                                + pM[SM02]*mDet3_123_013 - pM[SM03]*mDet3_123_012;
-   const myf mDet4_0124_0123 = pM[SM00]*mDet3_124_123 - pM[SM01]*mDet3_124_023
+   const litfloat mDet4_0124_0123 = pM[SM00]*mDet3_124_123 - pM[SM01]*mDet3_124_023
                                + pM[SM02]*mDet3_124_013 - pM[SM03]*mDet3_124_012;
-   const myf mDet4_0124_0124 = pM[SM00]*mDet3_124_124 - pM[SM01]*mDet3_124_024
+   const litfloat mDet4_0124_0124 = pM[SM00]*mDet3_124_124 - pM[SM01]*mDet3_124_024
                                + pM[SM02]*mDet3_124_014 - pM[SM04]*mDet3_124_012;
-   const myf mDet4_0134_0123 = pM[SM00]*mDet3_134_123 - pM[SM01]*mDet3_134_023
+   const litfloat mDet4_0134_0123 = pM[SM00]*mDet3_134_123 - pM[SM01]*mDet3_134_023
                                + pM[SM02]*mDet3_134_013 - pM[SM03]*mDet3_134_012;
-   const myf mDet4_0134_0124 = pM[SM00]*mDet3_134_124 - pM[SM01]*mDet3_134_024
+   const litfloat mDet4_0134_0124 = pM[SM00]*mDet3_134_124 - pM[SM01]*mDet3_134_024
                                + pM[SM02]*mDet3_134_014 - pM[SM04]*mDet3_134_012;
-   const myf mDet4_0134_0134 = pM[SM00]*mDet3_134_134 - pM[SM01]*mDet3_134_034
+   const litfloat mDet4_0134_0134 = pM[SM00]*mDet3_134_134 - pM[SM01]*mDet3_134_034
                                + pM[SM03]*mDet3_134_014 - pM[SM04]*mDet3_134_013;
-   const myf mDet4_0234_0123 = pM[SM00]*mDet3_234_123 - pM[SM01]*mDet3_234_023
+   const litfloat mDet4_0234_0123 = pM[SM00]*mDet3_234_123 - pM[SM01]*mDet3_234_023
                                + pM[SM02]*mDet3_234_013 - pM[SM03]*mDet3_234_012;
-   const myf mDet4_0234_0124 = pM[SM00]*mDet3_234_124 - pM[SM01]*mDet3_234_024
+   const litfloat mDet4_0234_0124 = pM[SM00]*mDet3_234_124 - pM[SM01]*mDet3_234_024
                                + pM[SM02]*mDet3_234_014 - pM[SM04]*mDet3_234_012;
-   const myf mDet4_0234_0134 = pM[SM00]*mDet3_234_134 - pM[SM01]*mDet3_234_034
+   const litfloat mDet4_0234_0134 = pM[SM00]*mDet3_234_134 - pM[SM01]*mDet3_234_034
                                + pM[SM03]*mDet3_234_014 - pM[SM04]*mDet3_234_013;
-   const myf mDet4_0234_0234 = pM[SM00]*mDet3_234_234 - pM[SM02]*mDet3_234_034
+   const litfloat mDet4_0234_0234 = pM[SM00]*mDet3_234_234 - pM[SM02]*mDet3_234_034
                                + pM[SM03]*mDet3_234_024 - pM[SM04]*mDet3_234_023;
-   const myf mDet4_1234_0123 = pM[SM10]*mDet3_234_123 - pM[SM11]*mDet3_234_023
+   const litfloat mDet4_1234_0123 = pM[SM10]*mDet3_234_123 - pM[SM11]*mDet3_234_023
                                + pM[SM12]*mDet3_234_013 - pM[SM13]*mDet3_234_012;
-   const myf mDet4_1234_0124 = pM[SM10]*mDet3_234_124 - pM[SM11]*mDet3_234_024
+   const litfloat mDet4_1234_0124 = pM[SM10]*mDet3_234_124 - pM[SM11]*mDet3_234_024
                                + pM[SM12]*mDet3_234_014 - pM[SM14]*mDet3_234_012;
-   const myf mDet4_1234_0134 = pM[SM10]*mDet3_234_134 - pM[SM11]*mDet3_234_034
+   const litfloat mDet4_1234_0134 = pM[SM10]*mDet3_234_134 - pM[SM11]*mDet3_234_034
                                + pM[SM13]*mDet3_234_014 - pM[SM14]*mDet3_234_013;
-   const myf mDet4_1234_0234 = pM[SM10]*mDet3_234_234 - pM[SM12]*mDet3_234_034
+   const litfloat mDet4_1234_0234 = pM[SM10]*mDet3_234_234 - pM[SM12]*mDet3_234_034
                                + pM[SM13]*mDet3_234_024 - pM[SM14]*mDet3_234_023;
-   const myf mDet4_1234_1234 = pM[SM11]*mDet3_234_234 - pM[SM12]*mDet3_234_134
+   const litfloat mDet4_1234_1234 = pM[SM11]*mDet3_234_234 - pM[SM12]*mDet3_234_134
                                + pM[SM13]*mDet3_234_124 - pM[SM14]*mDet3_234_123;
 
    // Find the 5x5 det:
 
-   const myf det = pM[SM00]*mDet4_1234_1234 - pM[SM01]*mDet4_1234_0234 + pM[SM02]*mDet4_1234_0134
+   const litfloat det = pM[SM00]*mDet4_1234_1234 - pM[SM01]*mDet4_1234_0234 + pM[SM02]*mDet4_1234_0134
                    - pM[SM03]*mDet4_1234_0124 + pM[SM04]*mDet4_1234_0123;
 
    if (det == 0) {
@@ -152,8 +152,8 @@ bool InvSym15(
       return false;
    }
 
-   const myf oneOverDet = 1.0/det;
-   const myf mn1OverDet = - oneOverDet;
+   const litfloat oneOverDet = 1.0/det;
+   const litfloat mn1OverDet = - oneOverDet;
 
    pM[SM00] = mDet4_1234_1234 * oneOverDet;
    pM[SM01] = mDet4_1234_0234 * mn1OverDet;
@@ -180,9 +180,9 @@ bool InvSym15(
 
 
 bool Mult25(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != 25 || b.size() != 25 || c.size() != 25) {
       std::cout << "-E- Mult25: size is not correct" << std::endl;
@@ -220,13 +220,13 @@ bool Mult25(
 
 
 bool Transpose25(
-   std::vector<myf>& a)
+   std::vector<litfloat>& a)
 {
    if (a.size() != 25) {
       std::cout << "-E- Transpose25: size is not correct" << std::endl;
       return true;
    }
-   std::vector<myf> b(a);
+   std::vector<litfloat> b(a);
    a[0] = b[0];
    a[1] = b[5];
    a[2] = b[10];
@@ -257,9 +257,9 @@ bool Transpose25(
 
 
 bool Mult25On5(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != 25 || b.size() != 5 || c.size() != 5) {
       std::cout << "-E- Mult25On5: size is not correct" << std::endl;
@@ -274,9 +274,9 @@ bool Mult25On5(
 }
 
 bool Mult15On5(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != 15 || b.size() != 5 || c.size() != 5) {
       std::cout << "-E- Mult15On5: size is not correct" << std::endl;
@@ -291,9 +291,9 @@ bool Mult15On5(
 }
 
 bool Subtract(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != b.size() || a.size() != c.size()) {
       std::cout << "-E- Subtract: size is not correct" << std::endl;
@@ -306,9 +306,9 @@ bool Subtract(
 
 
 bool Add(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != b.size() || a.size() != c.size()) {
       std::cout << "-E- Add: size is not correct" << std::endl;
@@ -321,38 +321,38 @@ bool Add(
 
 /* a*b*a^T */
 bool Similarity(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != 25 || b.size() != 15 || c.size() != 15) {
       std::cout << "-E- Similarity: size is not correct" << std::endl;
       return false;
    }
 
-   myf A = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3] + a[4] * b[4];
-   myf B = a[0] * b[1] + a[1] * b[5] + a[2] * b[6] + a[3] * b[7] + a[4] * b[8];
-   myf C = a[0] * b[2] + a[1] * b[6] + a[2] * b[9] + a[3] * b[10] + a[4] * b[11];
-   myf D = a[0] * b[3] + a[1] * b[7] + a[2] * b[10] + a[3] * b[12] + a[4] * b[13];
-   myf E = a[0] * b[4] + a[1] * b[8] + a[2] * b[11] + a[3] * b[13] + a[4] * b[14];
+   litfloat A = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3] + a[4] * b[4];
+   litfloat B = a[0] * b[1] + a[1] * b[5] + a[2] * b[6] + a[3] * b[7] + a[4] * b[8];
+   litfloat C = a[0] * b[2] + a[1] * b[6] + a[2] * b[9] + a[3] * b[10] + a[4] * b[11];
+   litfloat D = a[0] * b[3] + a[1] * b[7] + a[2] * b[10] + a[3] * b[12] + a[4] * b[13];
+   litfloat E = a[0] * b[4] + a[1] * b[8] + a[2] * b[11] + a[3] * b[13] + a[4] * b[14];
 
-   myf F = a[5] * b[0] + a[6] * b[1] + a[7] * b[2] + a[8] * b[3] + a[9] * b[4];
-   myf G = a[5] * b[1] + a[6] * b[5] + a[7] * b[6] + a[8] * b[7] + a[9] * b[8];
-   myf H = a[5] * b[2] + a[6] * b[6] + a[7] * b[9] + a[8] * b[10] + a[9] * b[11];
-   myf I = a[5] * b[3] + a[6] * b[7] + a[7] * b[10] + a[8] * b[12] + a[9] * b[13];
-   myf J = a[5] * b[4] + a[6] * b[8] + a[7] * b[11] + a[8] * b[13] + a[9] * b[14];
+   litfloat F = a[5] * b[0] + a[6] * b[1] + a[7] * b[2] + a[8] * b[3] + a[9] * b[4];
+   litfloat G = a[5] * b[1] + a[6] * b[5] + a[7] * b[6] + a[8] * b[7] + a[9] * b[8];
+   litfloat H = a[5] * b[2] + a[6] * b[6] + a[7] * b[9] + a[8] * b[10] + a[9] * b[11];
+   litfloat I = a[5] * b[3] + a[6] * b[7] + a[7] * b[10] + a[8] * b[12] + a[9] * b[13];
+   litfloat J = a[5] * b[4] + a[6] * b[8] + a[7] * b[11] + a[8] * b[13] + a[9] * b[14];
 
-   myf K = a[10] * b[0] + a[11] * b[1] + a[12] * b[2] + a[13] * b[3] + a[14] * b[4];
-   myf L = a[10] * b[1] + a[11] * b[5] + a[12] * b[6] + a[13] * b[7] + a[14] * b[8];
-   myf M = a[10] * b[2] + a[11] * b[6] + a[12] * b[9] + a[13] * b[10] + a[14] * b[11];
-   myf N = a[10] * b[3] + a[11] * b[7] + a[12] * b[10] + a[13] * b[12] + a[14] * b[13];
-   myf O = a[10] * b[4] + a[11] * b[8] + a[12] * b[11] + a[13] * b[13] + a[14] * b[14];
+   litfloat K = a[10] * b[0] + a[11] * b[1] + a[12] * b[2] + a[13] * b[3] + a[14] * b[4];
+   litfloat L = a[10] * b[1] + a[11] * b[5] + a[12] * b[6] + a[13] * b[7] + a[14] * b[8];
+   litfloat M = a[10] * b[2] + a[11] * b[6] + a[12] * b[9] + a[13] * b[10] + a[14] * b[11];
+   litfloat N = a[10] * b[3] + a[11] * b[7] + a[12] * b[10] + a[13] * b[12] + a[14] * b[13];
+   litfloat O = a[10] * b[4] + a[11] * b[8] + a[12] * b[11] + a[13] * b[13] + a[14] * b[14];
 
-   myf P = a[15] * b[0] + a[16] * b[1] + a[17] * b[2] + a[18] * b[3] + a[19] * b[4];
-   myf Q = a[15] * b[1] + a[16] * b[5] + a[17] * b[6] + a[18] * b[7] + a[19] * b[8];
-   myf R = a[15] * b[2] + a[16] * b[6] + a[17] * b[9] + a[18] * b[10] + a[19] * b[11];
-   myf S = a[15] * b[3] + a[16] * b[7] + a[17] * b[10] + a[18] * b[12] + a[19] * b[13];
-   myf T = a[15] * b[4] + a[16] * b[8] + a[17] * b[11] + a[18] * b[13] + a[19] * b[14];
+   litfloat P = a[15] * b[0] + a[16] * b[1] + a[17] * b[2] + a[18] * b[3] + a[19] * b[4];
+   litfloat Q = a[15] * b[1] + a[16] * b[5] + a[17] * b[6] + a[18] * b[7] + a[19] * b[8];
+   litfloat R = a[15] * b[2] + a[16] * b[6] + a[17] * b[9] + a[18] * b[10] + a[19] * b[11];
+   litfloat S = a[15] * b[3] + a[16] * b[7] + a[17] * b[10] + a[18] * b[12] + a[19] * b[13];
+   litfloat T = a[15] * b[4] + a[16] * b[8] + a[17] * b[11] + a[18] * b[13] + a[19] * b[14];
 
    c[0] = A * a[0]  + B * a[1]  + C * a[2]  + D * a[3]  + E * a[4];
    c[1] = A * a[5]  + B * a[6]  + C * a[7]  + D * a[8]  + E * a[9];
@@ -383,9 +383,9 @@ bool Similarity(
 
 
 bool Mult15On25(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != 15 || b.size() != 25 || c.size() != 25) {
       std::cout << "-E- Mult15On25: size is not correct" << std::endl;
@@ -421,9 +421,9 @@ bool Mult15On25(
 }
 
 bool Mult25On15(
-   const std::vector<myf>& a,
-   const std::vector<myf>& b,
-   std::vector<myf>& c)
+   const std::vector<litfloat>& a,
+   const std::vector<litfloat>& b,
+   std::vector<litfloat>& c)
 {
    if (a.size() != 25 || b.size() != 15 || c.size() != 25) {
       std::cout << "-E- Mult15On25: size is not correct" << std::endl;

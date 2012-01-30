@@ -42,7 +42,7 @@ public:
    LitTrackQa GetQuality() const { return fQuality; }
 
    /* Returns chi-square */
-   myf GetChi2() const { return fChi2; }
+   litfloat GetChi2() const { return fChi2; }
 
    /* Returns NDF */
    int GetNDF() const { return fNDF; }
@@ -92,7 +92,7 @@ public:
    void SetQuality(LitTrackQa quality) { fQuality = quality; }
 
    /* Sets chi-square */
-   void SetChi2(myf chi2) { fChi2 = chi2; }
+   void SetChi2(litfloat chi2) { fChi2 = chi2; }
 
    /* Sets NDF */
    void SetNDF(int ndf) { fNDF = ndf; }
@@ -157,7 +157,7 @@ private:
    /* Track quality */
    LitTrackQa fQuality;
    /* Chi-square */
-   myf fChi2;
+   litfloat fChi2;
    /* Number of degrees of freedom */
    int fNDF;
    /* Index of the previous track, i.e. STS */

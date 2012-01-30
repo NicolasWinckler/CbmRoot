@@ -29,7 +29,7 @@ public:
    /* Returns true if hit is in validation gate */
    bool IsHitInValidationGate(
       const CbmLitHit* hit,
-      myf chiSq,
+      litfloat chiSq,
       const CbmLitTrackParam* par) const;
 
    /* Returns pair of hit iterators which define maximum and
@@ -39,43 +39,43 @@ public:
       const CbmLitTrackParam* par,
       HitPtrIteratorPair hits,
       const CbmLitStation& station,
-      const std::pair<myf, char>& maxErr) const;
+      const std::pair<litfloat, char>& maxErr) const;
 
    /* Sets sigma value */
-   void SetSigmaCoef(myf sigmaCoef) { fSigmaCoef = sigmaCoef;}
+   void SetSigmaCoef(litfloat sigmaCoef) { fSigmaCoef = sigmaCoef;}
 
    /* Sets chi-square cut for strip hits */
-   void SetChiSqStripHitCut(myf chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut;}
+   void SetChiSqStripHitCut(litfloat chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut;}
 
    /* Sets chi-square cut for pixel hits */
-   void SetChiSqPixelHitCut(myf chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut;}
+   void SetChiSqPixelHitCut(litfloat chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut;}
 
    /* Set use fast hit search */
    void IsUseFastSearch(bool useFastSearch) { fUseFastSearch = useFastSearch;}
 
    /* Returns sigma value */
-   myf GetSigmaCoef() const { return fSigmaCoef;}
+   litfloat GetSigmaCoef() const { return fSigmaCoef;}
 
    /* Returns chi-square cut for strip hits */
-   myf GetChiSqStripHitCut() const { return fChiSqStripHitCut;}
+   litfloat GetChiSqStripHitCut() const { return fChiSqStripHitCut;}
 
    /* Returns chi-square cut for pixel hits */
-   myf GetChiSqPixelHitCut() const { return fChiSqPixelHitCut;}
+   litfloat GetChiSqPixelHitCut() const { return fChiSqPixelHitCut;}
 
    /* Set use fast hit search */
    bool IsUseFastSearch() const { return fUseFastSearch;}
 
 protected:
    /* Chi-square cut for strip hits */
-   myf fChiSqStripHitCut;
+   litfloat fChiSqStripHitCut;
    /* Chi-square cut for pixel hits */
-   myf fChiSqPixelHitCut;
+   litfloat fChiSqPixelHitCut;
    /* If true than fast search of hits will be used */
    bool fUseFastSearch;
    /* Sigma coefficient for fast hit search */
-   myf fSigmaCoef;
+   litfloat fSigmaCoef;
    /* Maximum squared position error */
-   myf fMaxCovSq;
+   litfloat fMaxCovSq;
 };
 
 #endif /* CBMLITGATING_H_ */

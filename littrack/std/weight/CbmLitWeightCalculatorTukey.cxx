@@ -26,7 +26,7 @@ LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,
    HitPtrIterator itEnd,
-   myf T)
+   litfloat T)
 {
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       if ((*it)->IsOutlier()) { continue; }
@@ -40,7 +40,7 @@ LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
 LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrVector& hits,
-   myf T)
+   litfloat T)
 {
    return DoCalculate(par, hits.begin(), hits.end(), T);
 }
@@ -48,12 +48,12 @@ LitStatus CbmLitWeightCalculatorTukey::DoCalculate(
 LitStatus CbmLitWeightCalculatorTukey::TukeyWeight(
    const CbmLitTrackParam* par,
    CbmLitHit* hit,
-   myf T) const
+   litfloat T) const
 {
    // FIXME:
-   myf chiSq = 0.;//ChiSq(par, hit);
+   litfloat chiSq = 0.;//ChiSq(par, hit);
    if (chiSq < T) {
-      myf t = 1 - (chiSq / T);
+      litfloat t = 1 - (chiSq / T);
       hit->SetW(t * t);
    } else { hit->SetW(0.); }
    return kLITSUCCESS;
@@ -63,7 +63,7 @@ LitStatus CbmLitWeightCalculatorTukey::Normalize(
    HitPtrIterator itBegin,
    HitPtrIterator itEnd) const
 {
-   myf sumW = 0.;
+   litfloat sumW = 0.;
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       if ((*it)->IsOutlier()) { continue; }
       sumW += (*it)->GetW();

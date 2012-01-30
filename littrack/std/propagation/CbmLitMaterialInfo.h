@@ -35,12 +35,12 @@ public:
     * @param zpos Z position of the material
     */
    CbmLitMaterialInfo(
-      myf length,
-      myf rl,
-      myf rho,
-      myf Z,
-      myf A,
-      myf zpos):
+      litfloat length,
+      litfloat rl,
+      litfloat rho,
+      litfloat Z,
+      litfloat A,
+      litfloat zpos):
       fLength(length),
       fRL(rl),
       fRho(rho),
@@ -52,40 +52,40 @@ public:
    virtual ~CbmLitMaterialInfo() {};
 
    /*@return Length of the material */
-   myf GetLength() const { return fLength;}
+   litfloat GetLength() const { return fLength;}
 
    /*@return Radiation length */
-   myf GetRL() const { return fRL;}
+   litfloat GetRL() const { return fRL;}
 
    /*@return Density */
-   myf GetRho() const { return fRho;}
+   litfloat GetRho() const { return fRho;}
 
    /*@return Atomic number */
-   myf GetZ() const { return fZ;}
+   litfloat GetZ() const { return fZ;}
 
    /*@return  Atomic mass */
-   myf GetA() const { return fA;}
+   litfloat GetA() const { return fA;}
 
    /*@return Z position of the material */
-   myf GetZpos() const { return fZpos;}
+   litfloat GetZpos() const { return fZpos;}
 
    /* Sets length of the material */
-   void SetLength(myf length) {fLength = length;}
+   void SetLength(litfloat length) {fLength = length;}
 
    /* Sets radiation length of the material */
-   void SetRL(myf rl) {fRL = rl;}
+   void SetRL(litfloat rl) {fRL = rl;}
 
    /* Sets density */
-   void SetRho(myf rho) {fRho = rho;}
+   void SetRho(litfloat rho) {fRho = rho;}
 
    /* Sets atomic number */
-   void SetZ(myf Z) {fZ = Z;}
+   void SetZ(litfloat Z) {fZ = Z;}
 
    /* Sets atomic mass */
-   void SetA(myf A) {fA = A;}
+   void SetA(litfloat A) {fA = A;}
 
    /* Sets Z position of the material */
-   void SetZpos(myf zpos) {fZpos = zpos;}
+   void SetZpos(litfloat zpos) {fZpos = zpos;}
 
    /* @return String representation of the class */
    virtual std::string ToString() const {
@@ -97,12 +97,12 @@ public:
    }
 
 private:
-   myf fLength; // Length of the material [cm]
-   myf fRL; // Radiation length [cm]
-   myf fRho; // Density [g/cm^3]
-   myf fZ; // Atomic number
-   myf fA; // Atomic mass
-   myf fZpos; // Z position of the material
+   litfloat fLength; // Length of the material [cm]
+   litfloat fRL; // Radiation length [cm]
+   litfloat fRho; // Density [g/cm^3]
+   litfloat fZ; // Atomic number
+   litfloat fA; // Atomic mass
+   litfloat fZpos; // Z position of the material
 };
 
 #endif /*CBMLITMATERIALINFO_H_*/

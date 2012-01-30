@@ -14,10 +14,10 @@ LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrIterator itBegin,
    HitPtrIterator itEnd,
-   myf T)
+   litfloat T)
 {
    int nofHits = itEnd - itBegin;
-   myf w = 1.0 / myf(nofHits);
+   litfloat w = 1.0 / litfloat(nofHits);
 
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       (*it)->SetW(w);
@@ -29,7 +29,7 @@ LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
 LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
    const CbmLitTrackParam* par,
    HitPtrVector& hits,
-   myf T)
+   litfloat T)
 {
    return DoCalculate(par, hits.begin(), hits.end(), T);
 }

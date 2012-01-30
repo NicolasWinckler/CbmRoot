@@ -27,16 +27,16 @@ public:
    virtual LitStatus Propagate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F);
+      std::vector<litfloat>* F);
 
    /* Inherited from CbmLitTrackPropagator */
    virtual LitStatus Propagate(
       CbmLitTrackParam* par,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F);
+      std::vector<litfloat>* F);
 
    /* Calculates updated transport matrix after each track extrapolation,
     * using formula F = newF * F.
@@ -44,8 +44,8 @@ public:
     * @param newF addition to the transport matrix.
     */
    void UpdateF(
-      std::vector<myf>& F,
-      const std::vector<myf>& newF);
+      std::vector<litfloat>& F,
+      const std::vector<litfloat>& newF);
 
 private:
    GeoNavigatorPtr fNavigator; // Geometry navigation tool

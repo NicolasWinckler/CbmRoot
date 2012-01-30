@@ -31,16 +31,16 @@ public:
    virtual LitStatus Propagate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F);
+      std::vector<litfloat>* F);
 
    /* Inherited from CbmLitTrackPropagator */
    virtual LitStatus Propagate(
       CbmLitTrackParam* par,
-      myf zOut,
+      litfloat zOut,
       int pdg,
-      std::vector<myf>* F);
+      std::vector<litfloat>* F);
 
 protected:
    /* Updates the transport matrix F = newF * F.
@@ -48,8 +48,8 @@ protected:
      * @param newF Transport matrix to be included in the current transport matrix.
      */
    void UpdateF(
-      std::vector<myf>& F,
-      const std::vector<myf>& newF);
+      std::vector<litfloat>& F,
+      const std::vector<litfloat>& newF);
 
    /* Checks if the track parameters are correct by checking their maximum acceptable values.
      * @param par Track parameters to be checked.

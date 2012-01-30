@@ -32,7 +32,7 @@ public:
     */
    virtual LitStatus FindIntersections(
       const CbmLitTrackParam* par,
-      myf zOut,
+      litfloat zOut,
       std::vector<CbmLitMaterialInfo>& inter) = 0;
 };
 

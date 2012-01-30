@@ -48,60 +48,60 @@ public:
       CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf CalcThetaSq(
+   litfloat CalcThetaSq(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf BetheBlochSimple(
+   litfloat BetheBlochSimple(
       const CbmLitMaterialInfo* mat) const;
 
-   myf BetheBloch(
+   litfloat BetheBloch(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf BetheBlochElectron(
+   litfloat BetheBlochElectron(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf EnergyLoss(
+   litfloat EnergyLoss(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf dEdx(
+   litfloat dEdx(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf CalcQpAfterEloss(
-      myf qp,
-      myf eloss) const;
+   litfloat CalcQpAfterEloss(
+      litfloat qp,
+      litfloat eloss) const;
 
-   myf CalcSigmaSqQp(
+   litfloat CalcSigmaSqQp(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf CalcSigmaSqQpElectron(
+   litfloat CalcSigmaSqQpElectron(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf MPVEnergyLoss(
+   litfloat MPVEnergyLoss(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf BetheHeitler(
+   litfloat BetheHeitler(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf PairProduction(
+   litfloat PairProduction(
       const CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat) const;
 
-   myf CalcI(
-      myf Z) const;
+   litfloat CalcI(
+      litfloat Z) const;
 private:
    /* Propagation direction */
    bool fDownstream;
    /* Hypothesis on particle mass */
-   myf fMass;
+   litfloat fMass;
    /* True if particle is an electron or positron */
    bool fIsElectron;
    /* True if particle is muon */

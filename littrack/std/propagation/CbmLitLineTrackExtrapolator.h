@@ -25,14 +25,14 @@ public:
    virtual LitStatus Extrapolate(
       const CbmLitTrackParam* parIn,
       CbmLitTrackParam* parOut,
-      myf zOut,
-      std::vector<myf>* F);
+      litfloat zOut,
+      std::vector<litfloat>* F);
 
    /* Inherited from CbmLitTrackExtrapolator */
    virtual LitStatus Extrapolate(
       CbmLitTrackParam* par,
-      myf zOut,
-      std::vector<myf>* F);
+      litfloat zOut,
+      std::vector<litfloat>* F);
 };
 
 #endif //CbmLitLineTrackExtrapolator

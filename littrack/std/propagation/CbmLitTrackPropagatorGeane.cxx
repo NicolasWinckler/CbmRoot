@@ -28,9 +28,9 @@ CbmLitTrackPropagatorGeane::~CbmLitTrackPropagatorGeane()
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
    const CbmLitTrackParam* parIn,
    CbmLitTrackParam* parOut,
-   myf zOut,
+   litfloat zOut,
    int pdg,
-   std::vector<myf>* F)
+   std::vector<litfloat>* F)
 {
    *parOut = *parIn;
    return Propagate(parOut, zOut, pdg, F);
@@ -38,9 +38,9 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
 
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
    CbmLitTrackParam* par,
-   myf zOut,
+   litfloat zOut,
    int pdg,
-   std::vector<myf>* F)
+   std::vector<litfloat>* F)
 {
    FairTrackParam param;
    StatusCode result;

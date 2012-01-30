@@ -229,7 +229,7 @@ bool CbmLitTrackFinderBranch::ProcessStation1(
    std::vector<CbmLitHitChiSq> hits;
    int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
    for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-      myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
+      litfloat z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
       if (fPropagator->Propagate(&par, z, fPDG) == kLITERROR) { return false; }
       bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
                            fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
@@ -274,7 +274,7 @@ bool CbmLitTrackFinderBranch::ProcessStation2(
       HitPtrIteratorPair bounds;
       std::vector<CbmLitHitChiSq> hits;
 
-      myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
+      litfloat z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
       if (fPropagator->Propagate(&par, z, fPDG) == kLITERROR) { return false; }
       bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
                            fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
@@ -316,7 +316,7 @@ void CbmLitTrackFinderBranch::ProcessSubstation(
    CbmLitTrackParam uPar;
    for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
       CbmLitHit* hit = *iHit;
-      myf chi = 0.;
+      litfloat chi = 0.;
       fFilter->Update(par, &uPar, hit, chi);
       if (IsHitInValidationGate(hit, chi, par)) {
          CbmLitHitChiSq h;

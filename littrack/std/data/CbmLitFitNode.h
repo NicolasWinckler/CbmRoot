@@ -30,7 +30,7 @@ public:
    virtual ~CbmLitFitNode() {};
 
    /* @return Pointer to transport matrix.*/
-   const std::vector<myf>& GetF() const { return fF; }
+   const std::vector<litfloat>& GetF() const { return fF; }
 
    /* @return Pointer to predicted track parameters. */
    const CbmLitTrackParam* GetPredictedParam() const { return &fPredictedParam; }
@@ -42,15 +42,15 @@ public:
    const CbmLitTrackParam* GetSmoothedParam() const { return &fSmoothedParam; }
 
    /* @return Contribution to chi-square of the fitted track parameters and the hit. */
-   myf GetChiSqFiltered() const { return fChiSqFiltered; }
+   litfloat GetChiSqFiltered() const { return fChiSqFiltered; }
 
    /* @return Contribution to chi-square of the smoothed track parameters and the hit. */
-   myf GetChiSqSmoothed() const { return fChiSqSmoothed; }
+   litfloat GetChiSqSmoothed() const { return fChiSqSmoothed; }
 
    /* Sets the transport matrix
     * @param F Reference to transport matrix to be set.
     */
-   void SetF(const std::vector<myf>& F) {
+   void SetF(const std::vector<litfloat>& F) {
       fF.assign(F.begin(), F.end());
    }
 
@@ -72,22 +72,22 @@ public:
    /* Sets the contribution to the chi-square of the updated track parameters and the hit.
     * @param chiSq Contribution to chi-square.
     */
-   void SetChiSqFiltered(myf chiSq) { fChiSqFiltered = chiSq; }
+   void SetChiSqFiltered(litfloat chiSq) { fChiSqFiltered = chiSq; }
 
    /* Sets the contribution to the chi-square of the smoothed track parameters and the hit.
     * @param chiSq Contribution to chi-square.
     */
-   void SetChiSqSmoothed(myf chiSq) { fChiSqSmoothed = chiSq; }
+   void SetChiSqSmoothed(litfloat chiSq) { fChiSqSmoothed = chiSq; }
 
 private:
-   std::vector<myf> fF; // transport matrix
+   std::vector<litfloat> fF; // transport matrix
 
    CbmLitTrackParam fPredictedParam; // predicted track parameters
    CbmLitTrackParam fUpdatedParam; // updated with KF track parameters
    CbmLitTrackParam fSmoothedParam; // smoothed track parameters
 
-   myf fChiSqFiltered; // Contribution to the chi-square of the updated track parameters and the hit
-   myf fChiSqSmoothed; // Contribution to the chi-square of the smoothed track parameters and the hit
+   litfloat fChiSqFiltered; // Contribution to the chi-square of the updated track parameters and the hit
+   litfloat fChiSqSmoothed; // Contribution to the chi-square of the smoothed track parameters and the hit
 };
 
 #endif /*CBMLITFITNODE_H_*/

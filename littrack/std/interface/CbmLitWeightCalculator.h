@@ -32,7 +32,7 @@ public:
       const CbmLitTrackParam* par,
       HitPtrIterator itBegin,
       HitPtrIterator itEnd,
-      myf T) = 0;
+      litfloat T) = 0;
 
    /* Main function to be implemented for the concrete weight calculation algorithm
     * @param par Pointer to the track parameter
@@ -42,7 +42,7 @@ public:
    virtual LitStatus DoCalculate(
       const CbmLitTrackParam* par,
       HitPtrVector& hits,
-      myf T) = 0;
+      litfloat T) = 0;
 };
 
 #endif /*CBMLITWEIGHTCALCULATOR_H_*/

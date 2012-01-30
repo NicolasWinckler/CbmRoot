@@ -24,8 +24,8 @@ public:
 
    /* Inherited from CbmLitField */
    void GetFieldValue(
-      myf x, myf y, myf z,
-      myf& Bx, myf& By, myf& Bz) const {
+      litfloat x, litfloat y, litfloat z,
+      litfloat& Bx, litfloat& By, litfloat& Bz) const {
       double pos[3] = {x, y, z};
       double B[3];
       fField->GetFieldValue(pos, B);

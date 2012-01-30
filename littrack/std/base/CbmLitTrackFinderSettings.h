@@ -132,32 +132,32 @@ public:
    }
 
    /* Sets sigma coefficient for iteration iter */
-   void SetSigmaCoef(unsigned int iter, myf sigmaCoef) {
+   void SetSigmaCoef(unsigned int iter, litfloat sigmaCoef) {
       fSigmaCoef[iter] = sigmaCoef;
    }
 
    /* Sets the same sigma coefficient for all iterations */
-   void SetSigmaCoef(myf sigmaCoef) {
+   void SetSigmaCoef(litfloat sigmaCoef) {
       for (unsigned int i = 0; i < fNofIter; i++) { SetSigmaCoef(i, sigmaCoef); }
    }
 
    /* Sets chi square pixel hit cut for iteration iter */
-   void SetChiSqPixelHitCut(unsigned int iter, myf chiSqPixelHitCut) {
+   void SetChiSqPixelHitCut(unsigned int iter, litfloat chiSqPixelHitCut) {
       fChiSqPixelHitCut[iter] = chiSqPixelHitCut;
    }
 
    /* Sets the same chi square pixel hit cut for all iterations */
-   void SetChiSqPixelHitCut(myf chiSqPixelHitCut) {
+   void SetChiSqPixelHitCut(litfloat chiSqPixelHitCut) {
       for (unsigned int i = 0; i < fNofIter; i++) { SetChiSqPixelHitCut(i, chiSqPixelHitCut); }
    }
 
    /* Sets chi square strip hit cut for iteration iter */
-   void SetChiSqStripHitCut(unsigned int iter, myf chiSqStripHitCut) {
+   void SetChiSqStripHitCut(unsigned int iter, litfloat chiSqStripHitCut) {
       fChiSqStripHitCut[iter] = chiSqStripHitCut;
    }
 
    /* Sets the same chi square strip hit cut for all iterations */
-   void SetChiSqStripHitCut(myf chiSqStripHitCut) {
+   void SetChiSqStripHitCut(litfloat chiSqStripHitCut) {
       for (unsigned int i = 0; i < fNofIter; i++) { SetChiSqStripHitCut(i, chiSqStripHitCut); }
    }
 
@@ -238,17 +238,17 @@ public:
    }
 
    /* Returns sigma coefficient for iteration iter */
-   myf GetSigmaCoef(unsigned int iter) const {
+   litfloat GetSigmaCoef(unsigned int iter) const {
       return fSigmaCoef[iter];
    }
 
    /* Returns chi square pixel hit cut for iteration iter */
-   myf GetChiSqPixelHitCut(unsigned int iter) const {
+   litfloat GetChiSqPixelHitCut(unsigned int iter) const {
       return fChiSqPixelHitCut[iter];
    }
 
    /* Returns chi square strip hit cut for iteration iter */
-   myf GetChiSqStripHitCut(unsigned int iter) const {
+   litfloat GetChiSqStripHitCut(unsigned int iter) const {
       return fChiSqStripHitCut[iter];
    }
 
@@ -289,11 +289,11 @@ private:
    /* */
    std::vector<int> fMaxNofMissingHits;
    /* */
-   std::vector<myf> fSigmaCoef;
+   std::vector<litfloat> fSigmaCoef;
    /* */
-   std::vector<myf> fChiSqPixelHitCut;
+   std::vector<litfloat> fChiSqPixelHitCut;
    /* */
-   std::vector<myf> fChiSqStripHitCut;
+   std::vector<litfloat> fChiSqStripHitCut;
 
 
    /* Specific settings for branching tracking */

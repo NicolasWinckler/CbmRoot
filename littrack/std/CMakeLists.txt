@@ -28,7 +28,6 @@ ${STD_DIR}base/CbmLitPDG.cxx
 ${STD_DIR}data/CbmLitTrackParam.cxx
 ${STD_DIR}data/CbmLitTrack.cxx
 
-${STD_DIR}finder/CbmLitTrackFinderWeight.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBase.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBranch.cxx
 ${STD_DIR}finder/CbmLitTrackFinderNN.cxx
@@ -37,7 +36,6 @@ ${STD_DIR}finder/CbmLitGating.cxx
 
 ${STD_DIR}fitter/CbmLitTrackFitterImp.cxx 
 ${STD_DIR}fitter/CbmLitKalmanFilter.cxx
-${STD_DIR}fitter/CbmLitTrackFitterWeight.cxx 
 ${STD_DIR}fitter/CbmLitKalmanSmoother.cxx
 ${STD_DIR}fitter/CbmLitTrackFitterIter.cxx 
 
@@ -49,17 +47,10 @@ ${STD_DIR}propagation/CbmLitTGeoNavigator.cxx
 ##${STD_DIR}propagation/CbmLitMaterialEffectsImp.cxx
 ${STD_DIR}propagation/CbmLitCleverTrackExtrapolator.cxx
 
-${STD_DIR}weight/CbmLitWeightedHitCalculatorImp.cxx
-${STD_DIR}weight/CbmLitWeightCalculatorSimple.cxx
-${STD_DIR}weight/CbmLitWeightCalculatorGauss.cxx
-#${STD_DIR}weight/CbmLitWeightCalculatorOptimal.cxx
-${STD_DIR}weight/CbmLitWeightCalculatorTukey.cxx
-
 ${STD_DIR}selection/CbmLitQualitySort.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionCuts.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionEmpty.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionMuch.cxx
-${STD_DIR}selection/CbmLitTrackSelectionMuchRobust.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionSameSeed.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionSharedHits.cxx 
 ${STD_DIR}selection/CbmLitTrackSelectionShortTracks.cxx 

@@ -11,12 +11,10 @@
 #include "base/CbmLitTrackFinderSettings.h"
 #include "finder/CbmLitTrackFinderNN.h"
 #include "finder/CbmLitTrackFinderBranch.h"
-#include "finder/CbmLitTrackFinderWeight.h"
 #include "finder/CbmLitNearestHitToTrackMerger.h"
 #include "fitter/CbmLitKalmanFilter.h"
 #include "fitter/CbmLitKalmanSmoother.h"
 #include "fitter/CbmLitTrackFitterImp.h"
-#include "fitter/CbmLitTrackFitterWeight.h"
 #include "fitter/CbmLitTrackFitterIter.h"
 #include "interface/CbmLitField.h"
 #include "propagation/CbmLitRK4TrackExtrapolator.h"
@@ -27,7 +25,6 @@
 #include "selection/CbmLitTrackSelectionCuts.h"
 #include "selection/CbmLitTrackSelectionMuch.h"
 #include "selection/CbmLitTrackSelectionTrd.h"
-#include "selection/CbmLitTrackSelectionMuchRobust.h"
 #include "cbm/parallel/CbmLitParallelTrackFitterTestMuon.h"
 #include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
 #include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
@@ -102,11 +99,6 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
    } else if (name == "kalman_smoother") {
       TrackFitterPtr fitter(new CbmLitKalmanSmoother());
       return fitter;
-   } else if (name == "kalman_robust") {
-      TrackFitterPtr fitter = CreateTrackFitter("lit_kalman");
-      TrackFitterPtr smoother = CreateTrackFitter("kalman_smoother");
-      TrackFitterPtr rfitter(new CbmLitTrackFitterWeight(fitter, smoother));
-      return rfitter;
    } else if (name == "kalman_parallel_muon") {
       TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestMuon());
       return fitter;
@@ -219,26 +211,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       trdFinderBranch->SetVerbose(1);
       TrackFinderPtr finder(trdFinderBranch);
       return finder;
-   } else if(name == "e_weight") {
-      CbmLitTrackFinderWeight* trdFinderWeight = new CbmLitTrackFinderWeight();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
-      settings.SetSeedSelection(CreateTrackSelection("momentum"));
-      settings.SetFinalSelection(CreateTrackSelection("empty"));
-      settings.SetFitter(CreateTrackFitter("kalman_robust"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.SetMaxNofMissingHits(3);
-      settings.IsUseFastSearch(true);
-      settings.SetSigmaCoef(5.);
-      settings.SetChiSqPixelHitCut(25.);
-      settings.SetChiSqStripHitCut(9.);
-      settings.SetPDG(11);
-      trdFinderWeight->SetSettings(settings);
-      trdFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-      trdFinderWeight->SetVerbose(1);
-      TrackFinderPtr finder(trdFinderWeight);
-      return finder;
    } else if(name == "mu_nn") {
       CbmLitTrackFinderNN* muchFinderNN = new CbmLitTrackFinderNN();
       CbmLitTrackFinderSettings settings;
@@ -288,26 +260,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
       muchFinderBranch->SetVerbose(1);
       TrackFinderPtr finder(muchFinderBranch);
-      return finder;
-   } else if(name == "mu_weight") {
-      CbmLitTrackFinderWeight* muchFinderWeight = new CbmLitTrackFinderWeight();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
-      settings.SetSeedSelection(CreateTrackSelection("momentum_seed"));
-      settings.SetFinalSelection(CreateTrackSelection("empty"));
-      settings.SetFitter(CreateTrackFitter("kalman_robust"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.SetMaxNofMissingHits(3);
-      settings.IsUseFastSearch(true);
-      settings.SetSigmaCoef(3.5);
-      settings.SetChiSqPixelHitCut(15.);//13.86);
-      settings.SetChiSqStripHitCut(9.);
-      settings.SetPDG(13);
-      muchFinderWeight->SetSettings(settings);
-      muchFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-      muchFinderWeight->SetVerbose(1);
-      TrackFinderPtr finder(muchFinderWeight);
       return finder;
    } else if(name == "mvd_nn") {
       CbmLitTrackFinderNN* mvdFinderNN = new CbmLitTrackFinderNN();

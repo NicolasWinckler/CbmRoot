@@ -14,8 +14,6 @@
 #include "interface/CbmLitTrackFitter.h"
 #include "interface/CbmLitTrackSelection.h"
 #include "interface/CbmLitTrackUpdate.h"
-#include "interface/CbmLitWeightedHitCalculator.h"
-#include "interface/CbmLitWeightCalculator.h"
 #include "interface/CbmLitGeoNavigator.h"
 #include "interface/CbmLitMaterialEffects.h"
 #include "interface/CbmLitTrackFinder.h"
@@ -28,8 +26,6 @@ typedef boost::shared_ptr<CbmLitTrackPropagator> TrackPropagatorPtr;
 typedef boost::shared_ptr<CbmLitTrackFitter> TrackFitterPtr;
 typedef boost::shared_ptr<CbmLitTrackSelection> TrackSelectionPtr;
 typedef boost::shared_ptr<CbmLitTrackUpdate> TrackUpdatePtr;
-typedef boost::shared_ptr<CbmLitWeightedHitCalculator> WeightedHitCalculatorPtr;
-typedef boost::shared_ptr<CbmLitWeightCalculator> WeightCalculatorPtr;
 typedef boost::shared_ptr<CbmLitGeoNavigator> GeoNavigatorPtr;
 typedef boost::shared_ptr<CbmLitMaterialEffects> MaterialEffectsPtr;
 typedef boost::shared_ptr<CbmLitTrackFinder> TrackFinderPtr;
@@ -41,8 +37,6 @@ typedef shared_ptr<CbmLitTrackPropagator> TrackPropagatorPtr;
 typedef shared_ptr<CbmLitTrackFitter> TrackFitterPtr;
 typedef shared_ptr<CbmLitTrackSelection> TrackSelectionPtr;
 typedef shared_ptr<CbmLitTrackUpdate> TrackUpdatePtr;
-typedef shared_ptr<CbmLitWeightedHitCalculator> WeightedHitCalculatorPtr;
-typedef shared_ptr<CbmLitWeightCalculator> WeightCalculatorPtr;
 typedef shared_ptr<CbmLitGeoNavigator> GeoNavigatorPtr;
 typedef shared_ptr<CbmLitMaterialEffects> MaterialEffectsPtr;
 typedef shared_ptr<CbmLitTrackFinder> TrackFinderPtr;

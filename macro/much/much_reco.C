@@ -232,7 +232,7 @@ void much_reco(
 		  trackingQa->SetMinNofHitsTrd(9);
 		  trackingQa->SetMinNofHitsMuch(11);
 		  trackingQa->SetVerbose(1);
-		  trackingQa->SetOutputDir(std::string(imageDir));
+		  trackingQa->SetOutputDir("");
 		  run->AddTask(trackingQa);
                 }
 		// ------------------------------------------------------------------------

@@ -31,11 +31,11 @@ function study_summary()
     export SCRIPT=yes
     export STUDYOUTPUTDIR=./
     export NSTUDIES=3
-    export STUDYRESULT1=../results_$1_branch
+    export STUDYRESULT1=../results_$1_branch/
     export STUDYNAME1=branch
-    export STUDYRESULT2=../results_$1_nn
+    export STUDYRESULT2=../results_$1_nn/
     export STUDYNAME2=nn
-    export STUDYRESULT3=../results_$1_nn_parallel
+    export STUDYRESULT3=../results_$1_nn_parallel/
     export STUDYNAME3=nn_parallel
     root -b -q -l "$VMCWORKDIR/macro/littrack/qa_study.C"
 }

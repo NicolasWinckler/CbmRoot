@@ -195,6 +195,7 @@ private:
 	vector<TH2D*> fhXcYcCircle; // (Xc, Yc) of circle center
 	vector<TH2D*> fhRadiusVsMom; // circle radius vs. MC momentum
    vector<TH1D*> fhChi2Circle; // chi2
+   vector<TH1D*> fhDRCircle; // dR
 
    // R, A, B distribution for different number of hits from 0 to 40
    TH2D* fhRadiusVsNofHits;

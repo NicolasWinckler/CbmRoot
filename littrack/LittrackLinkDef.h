@@ -21,10 +21,10 @@
 #pragma link C++ class CbmLitTrackingQa+;
 #pragma link C++ class CbmLitClusteringQa+;
 #pragma link C++ class CbmLitFieldQa+;
+#pragma link C++ class CbmLitFitQa+;
 #endif
 
 #pragma link C++ class CbmLitPropagationQa+;
-#pragma link C++ class CbmLitFitQa+;
 #pragma link C++ class CbmLitSimpleGeoQa+;
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;

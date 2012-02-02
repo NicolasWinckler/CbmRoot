@@ -9,6 +9,7 @@
 #define CBMLITFITQA_H_
 
 #include "FairTask.h"
+#include "CbmDetectorList.h"
 #include <string>
 
 class CbmLitMCTrackCreator;
@@ -96,7 +97,8 @@ private:
       const CbmLitMCPoint* mcPoint,
       const string& histName,
       const string& wrongName,
-      Float_t wrongPar);
+      Float_t wrongPar,
+      DetectorId detId);
 
    void DrawHistos(
          const string& name,

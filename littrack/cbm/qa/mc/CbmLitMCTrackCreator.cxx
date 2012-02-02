@@ -15,6 +15,10 @@
 #include "CbmMuchGeoScheme.h"
 #include "CbmTrdDetectorId.h"
 #include "CbmMCTrack.h"
+#include "CbmStsPoint.h"
+#include "CbmMvdPoint.h"
+#include "CbmTrdPoint.h"
+#include "CbmMuchPoint.h"
 
 #include "TDatabasePDG.h"
 
@@ -84,12 +88,25 @@ void CbmLitMCTrackCreator::AddPoints(
       FairMCPoint* fairPoint = static_cast<FairMCPoint*>(array->At(iPoint));
       CbmLitMCPoint litPoint;
       int stationId = -1;
-      if (detId == kMVD) stationId = fMvdStationsMap[iPoint]; else
-      if (detId == kSTS) stationId = fStsStationsMap[iPoint]; else
-      if (detId == kTRD) stationId = fTrdStationsMap[iPoint]; else
-      if (detId == kMUCH) stationId = fMuchStationsMap[iPoint]; else
-      if (detId == kTOF) stationId = 0; else
-      if (detId == kRICH) stationId = 0;
+      if (detId == kMVD) {
+         stationId = fMvdStationsMap[iPoint];
+         MvdPointCoordinatesAndMomentumToLitMCPoint(static_cast<CbmMvdPoint*>(fairPoint), &litPoint);
+      } else if (detId == kSTS) {
+         stationId = fStsStationsMap[iPoint];
+         StsPointCoordinatesAndMomentumToLitMCPoint(static_cast<CbmStsPoint*>(fairPoint), &litPoint);
+      } else if (detId == kTRD) {
+         stationId = fTrdStationsMap[iPoint];
+         TrdPointCoordinatesAndMomentumToLitMCPoint(static_cast<CbmTrdPoint*>(fairPoint), &litPoint);
+      } else if (detId == kMUCH) {
+         stationId = fMuchStationsMap[iPoint];
+         MuchPointCoordinatesAndMomentumToLitMCPoint(static_cast<CbmMuchPoint*>(fairPoint), &litPoint);
+      } else if (detId == kTOF) {
+         stationId = 0;
+         FairMCPointCoordinatesAndMomentumToLitMCPoint(fairPoint, &litPoint);
+      } else if (detId == kRICH) {
+         stationId = 0;
+         FairMCPointCoordinatesAndMomentumToLitMCPoint(fairPoint, &litPoint);
+      }
       if (stationId < 0) continue;
       FairMCPointToLitMCPoint(fairPoint, &litPoint, iPoint, stationId);
       if (detId != kRICH) {
@@ -107,12 +124,6 @@ void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
       int refId,
       int stationId)
 {
-   litPoint->SetX(fairPoint->GetX());
-   litPoint->SetY(fairPoint->GetY());
-   litPoint->SetZ(fairPoint->GetZ());
-   litPoint->SetPx(fairPoint->GetPx());
-   litPoint->SetPy(fairPoint->GetPy());
-   litPoint->SetPz(fairPoint->GetPz());
    litPoint->SetRefId(refId);
    litPoint->SetStationId(stationId);
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(fairPoint->GetTrackID()));
@@ -120,6 +131,96 @@ void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
    double charge = (pdgParticle != NULL) ? pdgParticle->Charge() : 0.;
    litfloat q = (charge > 0) ? 1. : -1;
    litPoint->SetQ(q);
+}
+
+void CbmLitMCTrackCreator::FairMCPointCoordinatesAndMomentumToLitMCPoint(
+      const FairMCPoint* fairPoint,
+      CbmLitMCPoint* litPoint)
+{
+   litPoint->SetXIn(fairPoint->GetX());
+   litPoint->SetYIn(fairPoint->GetY());
+   litPoint->SetZIn(fairPoint->GetZ());
+   litPoint->SetPxIn(fairPoint->GetPx());
+   litPoint->SetPyIn(fairPoint->GetPy());
+   litPoint->SetPzIn(fairPoint->GetPz());
+   litPoint->SetXOut(fairPoint->GetX());
+   litPoint->SetYOut(fairPoint->GetY());
+   litPoint->SetZOut(fairPoint->GetZ());
+   litPoint->SetPxOut(fairPoint->GetPx());
+   litPoint->SetPyOut(fairPoint->GetPy());
+   litPoint->SetPzOut(fairPoint->GetPz());
+}
+
+void CbmLitMCTrackCreator::MvdPointCoordinatesAndMomentumToLitMCPoint(
+      const CbmMvdPoint* mvdPoint,
+      CbmLitMCPoint* litPoint)
+{
+   litPoint->SetXIn(mvdPoint->GetX());
+   litPoint->SetYIn(mvdPoint->GetY());
+   litPoint->SetZIn(mvdPoint->GetZ());
+   litPoint->SetPxIn(mvdPoint->GetPx());
+   litPoint->SetPyIn(mvdPoint->GetPy());
+   litPoint->SetPzIn(mvdPoint->GetPz());
+   litPoint->SetXOut(mvdPoint->GetXOut());
+   litPoint->SetYOut(mvdPoint->GetYOut());
+   litPoint->SetZOut(mvdPoint->GetZOut());
+   litPoint->SetPxOut(mvdPoint->GetPxOut());
+   litPoint->SetPyOut(mvdPoint->GetPyOut());
+   litPoint->SetPzOut(mvdPoint->GetPzOut());
+}
+
+void CbmLitMCTrackCreator::StsPointCoordinatesAndMomentumToLitMCPoint(
+      const CbmStsPoint* stsPoint,
+      CbmLitMCPoint* litPoint)
+{
+   litPoint->SetXIn(stsPoint->GetXIn());
+   litPoint->SetYIn(stsPoint->GetYIn());
+   litPoint->SetZIn(stsPoint->GetZIn());
+   litPoint->SetPxIn(stsPoint->GetPx());
+   litPoint->SetPyIn(stsPoint->GetPy());
+   litPoint->SetPzIn(stsPoint->GetPz());
+   litPoint->SetXOut(stsPoint->GetXOut());
+   litPoint->SetYOut(stsPoint->GetYOut());
+   litPoint->SetZOut(stsPoint->GetZOut());
+   litPoint->SetPxOut(stsPoint->GetPxOut());
+   litPoint->SetPyOut(stsPoint->GetPyOut());
+   litPoint->SetPzOut(stsPoint->GetPzOut());
+}
+
+void CbmLitMCTrackCreator::TrdPointCoordinatesAndMomentumToLitMCPoint(
+      const CbmTrdPoint* trdPoint,
+      CbmLitMCPoint* litPoint)
+{
+   litPoint->SetXIn(trdPoint->GetXIn());
+   litPoint->SetYIn(trdPoint->GetYIn());
+   litPoint->SetZIn(trdPoint->GetZIn());
+   litPoint->SetPxIn(trdPoint->GetPxIn());
+   litPoint->SetPyIn(trdPoint->GetPyIn());
+   litPoint->SetPzIn(trdPoint->GetPzIn());
+   litPoint->SetXOut(trdPoint->GetXOut());
+   litPoint->SetYOut(trdPoint->GetYOut());
+   litPoint->SetZOut(trdPoint->GetZOut());
+   litPoint->SetPxOut(trdPoint->GetPxOut());
+   litPoint->SetPyOut(trdPoint->GetPyOut());
+   litPoint->SetPzOut(trdPoint->GetPzOut());
+}
+
+void CbmLitMCTrackCreator::MuchPointCoordinatesAndMomentumToLitMCPoint(
+      const CbmMuchPoint* muchPoint,
+      CbmLitMCPoint* litPoint)
+{
+   litPoint->SetXIn(muchPoint->GetXIn());
+   litPoint->SetYIn(muchPoint->GetYIn());
+   litPoint->SetZIn(muchPoint->GetZIn());
+   litPoint->SetPxIn(muchPoint->GetPx());
+   litPoint->SetPyIn(muchPoint->GetPy());
+   litPoint->SetPzIn(muchPoint->GetPz());
+   litPoint->SetXOut(muchPoint->GetXOut());
+   litPoint->SetYOut(muchPoint->GetYOut());
+   litPoint->SetZOut(muchPoint->GetZOut());
+   litPoint->SetPxOut(muchPoint->GetPxOut());
+   litPoint->SetPyOut(muchPoint->GetPyOut());
+   litPoint->SetPzOut(muchPoint->GetPzOut());
 }
 
 void CbmLitMCTrackCreator::FillStationMaps()

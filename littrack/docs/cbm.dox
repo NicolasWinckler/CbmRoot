@@ -17,7 +17,7 @@ CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
 // Tracking method to be used
 // "branch" - branching tracking
 // "nn" - nearest neighbor tracking
-// "weight" - weighting tracking
+// "nn_parallel" - parallel implementation of nearest neighbor tracking
 finder->SetTrackingType("branch");
 
 // Hit-to-track merger method to be used

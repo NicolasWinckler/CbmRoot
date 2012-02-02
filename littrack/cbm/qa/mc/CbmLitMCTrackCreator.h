@@ -14,6 +14,10 @@
 
 class TClonesArray;
 class FairMCPoint;
+class CbmMvdPoint;
+class CbmStsPoint;
+class CbmTrdPoint;
+class CbmMuchPoint;
 
 /**
  * \class CbmLitMCTrackCreator
@@ -99,6 +103,27 @@ private:
     * \brief Fill maps for MC points to station id.
     */
    void FillStationMaps();
+
+
+   void FairMCPointCoordinatesAndMomentumToLitMCPoint(
+         const FairMCPoint* fairPoint,
+         CbmLitMCPoint* litPoint);
+
+   void MvdPointCoordinatesAndMomentumToLitMCPoint(
+         const CbmMvdPoint* mvdPoint,
+         CbmLitMCPoint* litPoint);
+
+   void StsPointCoordinatesAndMomentumToLitMCPoint(
+         const CbmStsPoint* stsPoint,
+         CbmLitMCPoint* litPoint);
+
+   void TrdPointCoordinatesAndMomentumToLitMCPoint(
+         const CbmTrdPoint* trdPoint,
+         CbmLitMCPoint* litPoint);
+
+   void MuchPointCoordinatesAndMomentumToLitMCPoint(
+         const CbmMuchPoint* muchPoint,
+         CbmLitMCPoint* litPoint);
 
    TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fMvdPoints; // CbmMvdPoint array

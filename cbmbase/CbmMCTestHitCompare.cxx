@@ -25,7 +25,14 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMCTestHitCompare::CbmMCTestHitCompare()
-	: FairTask("Creates CbmMC test")
+  : FairTask("Creates CbmMC test"),
+    fMCMatch(NULL),
+    fStripHit(NULL),
+    fMCPoint(NULL),
+    fhHitPointCorrelation(NULL),
+    fhHitPointSCorrelationSmall(NULL),
+    fhHitPointSCorrelationLarge(NULL),
+    fHistoList(NULL)
 {
 }
 // -------------------------------------------------------------------------

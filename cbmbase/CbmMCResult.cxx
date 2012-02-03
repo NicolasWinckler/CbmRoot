@@ -9,13 +9,20 @@
 
 ClassImp(CbmMCResult);
 
-CbmMCResult::CbmMCResult() {
+CbmMCResult::CbmMCResult() 
+  : CbmMCObject(),
+    fStartType(kUnknown),
+    fStopType(kUnknown)
+{
 }
 
 CbmMCResult::~CbmMCResult() {
 }
 
 CbmMCResult::CbmMCResult(DataType start, DataType stop)
-: fStartType(start), fStopType(stop)
-{}
+  : CbmMCObject(),
+    fStartType(start), 
+    fStopType(stop)
+{
+}
 

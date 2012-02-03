@@ -61,6 +61,8 @@ class CbmMCMatchCreatorTask : public FairTask
 
   void ProduceHits();
 
+  CbmMCMatchCreatorTask(const CbmMCMatchCreatorTask&);
+  CbmMCMatchCreatorTask& operator=(const CbmMCMatchCreatorTask&);
 
   ClassDef(CbmMCMatchCreatorTask,1);
 

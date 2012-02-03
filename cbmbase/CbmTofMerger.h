@@ -16,9 +16,10 @@ protected:
     Int_t fVerbose;    // Verbosity level
 
 public:
-    CbmTofMerger() {};
-    virtual ~CbmTofMerger() {};
-
+ CbmTofMerger() : TObject(), fVerbose(0) {};
+ 
+   virtual ~CbmTofMerger() {};
+    
     virtual void Init() {};
     virtual Int_t DoMerge(TClonesArray* glbTracks,
 			  TClonesArray* tofHits) = 0;

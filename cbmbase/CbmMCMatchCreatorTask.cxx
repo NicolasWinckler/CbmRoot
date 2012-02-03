@@ -21,7 +21,12 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmMCMatchCreatorTask::CbmMCMatchCreatorTask() : FairTask("Creates CbmMCMatch"), fEventNr(0)
+CbmMCMatchCreatorTask::CbmMCMatchCreatorTask() 
+  : FairTask("Creates CbmMCMatch"), 
+    fBranches(),
+    fMCLink(NULL),
+    fEventNr(0),
+    fMCMatch(NULL)
 {
 }
 // -------------------------------------------------------------------------

@@ -16,13 +16,23 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMCMatchSelectorTask::CbmMCMatchSelectorTask()
-	: FairTask("Creates CbmMCMatch"), fStart(kUnknown), fStop(kUnknown)
+  : FairTask("Creates CbmMCMatch"), 
+    fMCMatch(NULL),
+    fStart(kUnknown), 
+    fStop(kUnknown),
+    fStageWeights(),
+    fCommonWeight(0.)
 {
 }
 // -------------------------------------------------------------------------
 
 CbmMCMatchSelectorTask::CbmMCMatchSelectorTask(DataType start, DataType stop)
-	: FairTask("Creates CbmMCMatch"), fStart(start), fStop(stop)
+  : FairTask("Creates CbmMCMatch"), 
+    fMCMatch(NULL),
+    fStart(start), 
+    fStop(stop),
+    fStageWeights(),
+    fCommonWeight(0.)
 {
 }
 

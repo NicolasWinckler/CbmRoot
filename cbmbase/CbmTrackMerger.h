@@ -28,7 +28,7 @@ class CbmTrackMerger : public TObject
  public:
 
   /** Default constructor **/
-  CbmTrackMerger() { };
+ CbmTrackMerger() : TObject(), fVerbose(0) { };
 
 
   /** Destructor **/

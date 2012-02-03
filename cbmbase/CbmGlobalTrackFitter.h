@@ -16,10 +16,10 @@ protected:
     Int_t fVerbose; // Verbosity level
 
 public:
-    CbmGlobalTrackFitter() {}
-    virtual ~CbmGlobalTrackFitter() {}
+ CbmGlobalTrackFitter() : TObject(), fVerbose(0) {};
+    virtual ~CbmGlobalTrackFitter() {};
 
-    virtual void Init() {}
+    virtual void Init() {};
     virtual void DoFit(CbmGlobalTrack* glbTrack) = 0;
 
     inline void SetVerbose(Int_t verbose) {  fVerbose = verbose; }

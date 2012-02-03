@@ -31,10 +31,12 @@ public:
 	DataType GetStartType(void) const {return fStartType;}
 	DataType GetStopType(void) const {return fStopType;}
 
-	void operator=(const CbmMCResult& result){
-		fStartType = result.GetStartType();
-		fStopType = result.GetStopType();
-		SetStage(result.GetEntryVector());
+	CbmMCResult& operator=(const CbmMCResult& result){
+	  CbmMCObject::operator=(result);
+	  fStartType = result.fStartType;
+	  fStopType = result.fStopType;
+	  return *this;
+	  //		SetStage(result.GetEntryVector());
 	}
 
 	virtual void Print(std::ostream& out = std::cout){ out << *this;}

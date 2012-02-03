@@ -28,7 +28,11 @@ using std::setprecision;
 using std::pair;
 
 // -----   Default constructor   -------------------------------------------
-CbmDigiManager::CbmDigiManager() : FairTask("DigiManager") {
+CbmDigiManager::CbmDigiManager() 
+  : FairTask("DigiManager"),
+    fDigiMap(),
+    fTimer()
+{
   for (Int_t iSys=0; iSys<16; iSys++) fDigis[iSys] = NULL;
   fSystem[0] = "";
   fSystem[1] = "MVD";

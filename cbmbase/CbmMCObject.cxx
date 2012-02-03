@@ -9,7 +9,11 @@
 
 ClassImp(CbmMCObject);
 
-CbmMCObject::CbmMCObject() {
+CbmMCObject::CbmMCObject() 
+  : TObject(),
+    fStage(),
+    fStageId()
+{
 	//std::cout << "-I- CbmMCObject::CbmMCObject : Use of default constructor" << std::endl;
 }
 

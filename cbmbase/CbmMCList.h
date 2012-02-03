@@ -18,16 +18,24 @@
 class CbmMCList : public TObject {
 public:
 	CbmMCList();
-	CbmMCList(DataType type, Int_t entry)
+	CbmMCList(DataType type, Int_t entry) 
+	  : TObject(),
+	  fList(),
+	  fEntry(entry),
+	  fType(type)
 	{
-		fType = type;
-		fEntry = entry;
+	  //		fType = type;
+	  //fEntry = entry;
 	}
 	CbmMCList(DataType type, Int_t entry, std::vector<Int_t> list)
+	  : TObject(),
+	  fList(),
+	  fEntry(entry),
+	  fType(type)
 	{
-		fType = type;
-		fEntry = entry;
-		fList = list;
+	  //		fType = type;
+	  //	fEntry = entry;
+	  //	fList = list;
 	}
 
 	virtual ~CbmMCList();

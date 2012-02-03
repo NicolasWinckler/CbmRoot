@@ -9,7 +9,12 @@
 
 ClassImp(CbmMCList);
 
-CbmMCList::CbmMCList() {
+CbmMCList::CbmMCList() 
+  : TObject(),
+    fList(),
+    fEntry(-1),
+    fType(kUnknown) 
+{
 	// TODO Auto-generated constructor stub
 
 }

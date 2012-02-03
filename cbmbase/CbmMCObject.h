@@ -19,16 +19,17 @@
 class FairLinkedData;
 
 class CbmMCObject: public TObject {
-public:
-	CbmMCObject();
-	CbmMCObject(DataType type):fStageId(type){};
-	CbmMCObject(const CbmMCObject& obj):
-		fStageId(obj.GetStageId()),fStage(obj.GetEntryVector())
-	{}
-	CbmMCObject(DataType type, std::vector<CbmMCEntry> stage):
-		fStageId(type)
+ public:
+  CbmMCObject();
+ CbmMCObject(DataType type):TObject(), fStage(), fStageId(type){};
+ CbmMCObject(const CbmMCObject& obj)
+   : TObject(), fStage(obj.GetEntryVector()), fStageId(obj.GetStageId())
+    {};
+ CbmMCObject(DataType type, std::vector<CbmMCEntry> stage)
+   : TObject(),
+    fStage(stage),
+    fStageId(type)
 	{
-		SetStage(stage);
 	};
 	virtual ~CbmMCObject();
 
@@ -70,9 +71,11 @@ public:
 
 	virtual void Print(std::ostream& out = std::cout){out << *this;}
 
-	void operator=(const CbmMCObject& obj){
-		fStageId = obj.GetStageId();
-		fStage = obj.GetEntryVector();
+	CbmMCObject& operator=(const CbmMCObject& obj){
+	  TObject::operator=(obj);
+	  fStageId = obj.GetStageId();
+	  fStage = obj.GetEntryVector();
+          return *this;
 	}
 
 	friend std::ostream& operator<< (std::ostream& out, const CbmMCObject& obj){

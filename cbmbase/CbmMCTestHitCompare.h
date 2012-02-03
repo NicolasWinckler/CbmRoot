@@ -64,6 +64,8 @@ class CbmMCTestHitCompare : public FairTask
 
   void ProduceHits();
 
+  CbmMCTestHitCompare(const CbmMCTestHitCompare&);
+  CbmMCTestHitCompare& operator=(const CbmMCTestHitCompare&);
 
   ClassDef(CbmMCTestHitCompare,1);
 

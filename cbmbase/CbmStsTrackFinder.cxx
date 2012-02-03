@@ -14,4 +14,15 @@
 
 //#include "TClonesArray.h"
 
+CbmStsTrackFinder::CbmStsTrackFinder()
+  : TNamed(),
+    fDigiScheme(NULL), 
+    fField(NULL),     
+    fMvdHits(NULL),  
+    fStsHits(NULL),    
+    fTracks(NULL), 
+    fVerbose(0)
+{
+}
+
 ClassImp(CbmStsTrackFinder)

@@ -61,6 +61,9 @@ class CbmDigiManager : public FairTask
 
  private:
 
+  CbmDigiManager(const CbmDigiManager&);
+  CbmDigiManager& operator=(const CbmDigiManager&);
+
   /**  Initialisation: Get pointers to arrays.  **/
   virtual InitStatus Init();
 

@@ -30,7 +30,8 @@ class CbmMCMatch: public TNamed {
 public:
 	CbmMCMatch();
 	CbmMCMatch(const char* name, const char* title)
-		:TNamed(name, title), fUltimateStage(kMCTrack){};
+	  :TNamed(name, title), fUltimateStage(kMCTrack),
+	  fList(), fFinalStageML() {};
 	virtual ~CbmMCMatch();
 
 	void AddElement(DataType type, int index, FairLink link);

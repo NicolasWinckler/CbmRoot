@@ -33,7 +33,7 @@ class CbmRichRingFitter : public TObject
  public:
 
   /** Default constructor **/
-  CbmRichRingFitter() { };
+ CbmRichRingFitter() : TObject(), fVerbose(0), fHitsArray(NULL) { };
 
 
   /** Destructor **/
@@ -71,7 +71,10 @@ class CbmRichRingFitter : public TObject
 
    TClonesArray* fHitsArray;
 
- public:
+ private:
+
+  CbmRichRingFitter(const CbmRichRingFitter&);
+  CbmRichRingFitter& operator=(const CbmRichRingFitter&);
 
   ClassDef(CbmRichRingFitter,1);
 

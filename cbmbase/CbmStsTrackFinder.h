@@ -31,7 +31,7 @@ class CbmStsTrackFinder : public TNamed
  public:
 
   /** Default constructor **/
-  CbmStsTrackFinder() { }; 
+  CbmStsTrackFinder(); 
 
 
   /** Destructor **/
@@ -77,6 +77,10 @@ class CbmStsTrackFinder : public TNamed
   TClonesArray*     fTracks;      // StsTrack array
   Int_t             fVerbose;     // Verbosity level
 
+ private:
+
+  CbmStsTrackFinder(const CbmStsTrackFinder&);
+  CbmStsTrackFinder& operator=(const CbmStsTrackFinder&);
 
   ClassDef(CbmStsTrackFinder,1);
 

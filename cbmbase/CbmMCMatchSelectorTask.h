@@ -76,6 +76,8 @@ class CbmMCMatchSelectorTask : public FairTask
 
   void ProduceHits();
 
+  CbmMCMatchSelectorTask(const CbmMCMatchSelectorTask&);
+  CbmMCMatchSelectorTask& operator=(const CbmMCMatchSelectorTask&);
 
   ClassDef(CbmMCMatchSelectorTask,1);
 

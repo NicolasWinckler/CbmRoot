@@ -35,7 +35,7 @@ class CbmRichRingFinder : public TObject
  public:
 
   /** Default constructor **/
-  CbmRichRingFinder() { };
+ CbmRichRingFinder() : TObject(), fVerbose(0) { };
 
 
   /** Destructor **/
@@ -71,7 +71,10 @@ class CbmRichRingFinder : public TObject
 
   Int_t fVerbose;      // Verbosity level
 
- public:
+ private:
+
+  CbmRichRingFinder(const CbmRichRingFinder&);
+  CbmRichRingFinder& operator=(const CbmRichRingFinder&);
 
   ClassDef(CbmRichRingFinder,1);
 

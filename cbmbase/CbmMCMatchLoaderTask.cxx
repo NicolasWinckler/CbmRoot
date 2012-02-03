@@ -19,7 +19,11 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmMCMatchLoaderTask::CbmMCMatchLoaderTask() : FairTask("Creates CbmMCMatch"), fEventNr(0)
+CbmMCMatchLoaderTask::CbmMCMatchLoaderTask() 
+  : FairTask("Creates CbmMCMatch"), 
+    fMCLink(NULL),
+    fEventNr(0),
+    fMCMatch(NULL)
 {
 }
 // -------------------------------------------------------------------------

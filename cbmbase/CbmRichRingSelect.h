@@ -33,7 +33,7 @@ class CbmRichRingSelect : public TObject
  public:
 
   /** Default constructor **/
-  CbmRichRingSelect() { };
+ CbmRichRingSelect() : TObject(), fVerbose(0), fHitsArray(NULL) { };
   
   /** Destructor **/
   virtual ~CbmRichRingSelect() { };
@@ -49,7 +49,12 @@ class CbmRichRingSelect : public TObject
  protected:
 
   Int_t fVerbose;      // Verbosity level
-	TClonesArray* fHitsArray;
+  TClonesArray* fHitsArray;
+
+ private:
+ 
+  CbmRichRingSelect(const CbmRichRingSelect&);
+  CbmRichRingSelect& operator=(const CbmRichRingSelect&);
 
   ClassDef(CbmRichRingSelect,1);
 

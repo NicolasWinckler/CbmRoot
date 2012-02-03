@@ -32,7 +32,7 @@ class CbmRichRingTrackAssign : public TObject
  public:
 
   /** Default constructor **/
-  CbmRichRingTrackAssign() { };
+ CbmRichRingTrackAssign() : TObject(), fVerbose(0) { };
 
 
   /** Destructor **/

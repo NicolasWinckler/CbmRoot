@@ -40,12 +40,15 @@ public:
 	Bool_t 		GetLoaded(void)		const {return fLoaded;}
 	Bool_t		GetFill(void)			const {return fFill;}
 
-	void operator=(const CbmMCStage& result){
+	CbmMCStage& operator=(const CbmMCStage& result){
 		CbmMCObject::operator=(result);
 		fBranchName = result.GetBranchName();
 		fFileName = result.GetFileName();
 		fWeight = result.GetWeight();
-		SetStage(result.GetEntryVector());
+		fLoaded = result.fLoaded;
+                fFill = result.fFill;
+                return *this;
+		//		SetStage(result.GetEntryVector());
 	}
 
 	virtual void ClearEntries()

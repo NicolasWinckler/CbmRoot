@@ -49,10 +49,10 @@ class CbmMCMatchLoaderTask : public FairTask
 
  private:
 
-		TClonesArray* fMCLink;
-
-		int fEventNr;
-		CbmMCMatch* fMCMatch;
+  TClonesArray* fMCLink;
+  
+  int fEventNr;
+  CbmMCMatch* fMCMatch;
 
   void Register();
 
@@ -60,6 +60,8 @@ class CbmMCMatchLoaderTask : public FairTask
 
   void ProduceHits();
 
+  CbmMCMatchLoaderTask(const CbmMCMatchLoaderTask&);
+  CbmMCMatchLoaderTask& operator=(const CbmMCMatchLoaderTask&);
 
   ClassDef(CbmMCMatchLoaderTask,1);
 

@@ -12,7 +12,12 @@
 
 ClassImp(CbmMCMatch);
 
-CbmMCMatch::CbmMCMatch():fUltimateStage(kMCTrack) {
+CbmMCMatch::CbmMCMatch()
+  : TNamed(),
+    fUltimateStage(kMCTrack),
+    fList(),
+    fFinalStageML()
+{
 	// TODO Auto-generated constructor stub
 
 }

@@ -28,7 +28,7 @@ class CbmRichMerger : public TObject
  public:
 
   /** Default constructor **/
-  CbmRichMerger() { };
+ CbmRichMerger() : TObject(), fVerbose(0) { };
 
 
   /** Destructor **/

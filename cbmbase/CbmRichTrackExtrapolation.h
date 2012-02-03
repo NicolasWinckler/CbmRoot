@@ -37,7 +37,7 @@ class CbmRichTrackExtrapolation : public TObject
  public:
 
   /** Default constructor **/
-  CbmRichTrackExtrapolation() { };
+ CbmRichTrackExtrapolation() : TObject(), fVerbose(0) { };
 
 
   /** Destructor **/

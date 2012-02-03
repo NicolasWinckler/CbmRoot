@@ -15,6 +15,7 @@
 
 class TFile;
 class TH1;
+class TH1I;
 class TH1F;
 class TH2F;
 class TH3F;
@@ -101,7 +102,7 @@ public:
          std::cout << "H1: " <<  name << std::endl;
       }
       assert(fHistMap.count(name) != 0);
-      return (TH1*)fHistMap.find(name)->second;
+      return fHistMap.find(name)->second;
    }
 
    /**

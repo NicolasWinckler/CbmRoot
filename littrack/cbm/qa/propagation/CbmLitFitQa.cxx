@@ -66,7 +66,7 @@ void CbmLitFitQa::Exec(
    Option_t* opt)
 {
    static Int_t nofEvents = 0;
-   std::cout << "CbmLitFitQa: event=" << nofEvents++ << std::endl;
+   std::cout << "CbmLitFitQa::Exec: event=" << nofEvents++ << std::endl;
 
    fMCTrackCreator->Create();
    ProcessGlobalTracks();
@@ -433,7 +433,7 @@ void CbmLitFitQa::DrawHistos(
       TF1* fit = hist->GetFunction("gaus");
       Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
       Double_t rms = hist->GetRMS();
-      DrawHistSigmaRMS(i, sigma, rms);
+      DrawHistSigmaRMS(sigma, rms);
    }
 
    for (int i = 0; i < NOF_PARAMS_WRONG_COV; i++) {

@@ -10,6 +10,7 @@
 
 class CbmLitHistManager;
 class TClonesArray;
+class TH1;
 
 /**
  * \class CbmLitClusteringQaCalculator
@@ -62,6 +63,17 @@ private:
     *
     */
    void IncreaseCounters();
+
+   /**
+    *
+    */
+   void NormalizeHistograms();
+
+   /**
+    *
+    */
+   void ShrinkEmptyBins(
+         TH1* hist);
 
    // Pointers to data arrays
    TClonesArray* fMvdPoints; // CbmMvdPoint array

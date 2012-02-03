@@ -54,13 +54,17 @@ void CbmLitClusteringQaCalculator::Init()
 
 void CbmLitClusteringQaCalculator::Exec()
 {
+   // Increase event counter
+   fHM->H1F("hEventNo")->Fill(0.5);
+   std::cout << "CbmLitClusteringQaCalculator::Exec: event=" << fHM->H1F("hEventNo")->GetEntries() << std::endl;
+
    ProcessHits();
    IncreaseCounters();
 }
 
 void CbmLitClusteringQaCalculator::Finish()
 {
-
+   NormalizeHistograms();
 }
 
 void CbmLitClusteringQaCalculator::ReadDataBranches()
@@ -101,37 +105,37 @@ void CbmLitClusteringQaCalculator::ProcessHits()
    if (NULL != fMvdHits) {
       for (Int_t i = 0; i < fMvdHits->GetEntriesFast(); i++) {
          const CbmHit* hit = static_cast<const CbmHit*>(fMvdHits->At(i));
-         fHM->H1F("hMvdNofHitsInStation")->Fill(hit->GetStationNr());
+         fHM->H1("hMvdNofHitsInStation")->Fill(hit->GetStationNr());
       }
    }
    if (NULL != fStsHits) {
       for (Int_t i = 0; i < fStsHits->GetEntriesFast(); i++) {
          const CbmHit* hit = static_cast<const CbmHit*>(fStsHits->At(i));
-         fHM->H1F("hStsNofHitsInStation")->Fill(hit->GetStationNr());
+         fHM->H1("hStsNofHitsInStation")->Fill(hit->GetStationNr());
       }
    }
    if (NULL != fTrdHits) {
       for (Int_t i = 0; i < fTrdHits->GetEntriesFast(); i++) {
          const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fTrdHits->At(i));
-         fHM->H1F("hTrdNofHitsInStation")->Fill(hit->GetPlaneId());
+         fHM->H1("hTrdNofHitsInStation")->Fill(hit->GetPlaneId());
       }
    }
    if (NULL != fMuchPixelHits) {
       for (Int_t i = 0; i < fMuchPixelHits->GetEntriesFast(); i++) {
          const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fMuchPixelHits->At(i));
-         fHM->H1F("hMuchNofHitsInStation")->Fill(hit->GetPlaneId());
+         fHM->H1("hMuchNofHitsInStation")->Fill(hit->GetPlaneId());
       }
    }
    if (NULL != fMuchStrawHits) {
       for (Int_t i = 0; i < fMuchStrawHits->GetEntriesFast(); i++) {
          const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fMuchStrawHits->At(i));
-         fHM->H1F("hMuchNofHitsInStation")->Fill(hit->GetPlaneId());
+         fHM->H1("hMuchNofHitsInStation")->Fill(hit->GetPlaneId());
       }
    }
    if (NULL != fTofHits) {
       for (Int_t i = 0; i < fTofHits->GetEntriesFast(); i++) {
          const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fTofHits->At(i));
-         fHM->H1F("hTofNofHitsInStation")->Fill(hit->GetPlaneId());
+         fHM->H1("hTofNofHitsInStation")->Fill(hit->GetPlaneId());
       }
    }
 }
@@ -140,26 +144,51 @@ void CbmLitClusteringQaCalculator::IncreaseCounters()
 {
    if (NULL != fMvdPoints) fHM->H1("hNofMvdPoints")->Fill(fMvdPoints->GetEntriesFast());
    if (NULL != fMvdHits) fHM->H1F("hNofMvdHits")->Fill(fMvdHits->GetEntriesFast());
-
    if (NULL != fStsPoints) fHM->H1F("hNofStsPoints")->Fill(fStsPoints->GetEntriesFast());
    if (NULL != fStsDigis) fHM->H1F("hNofStsDigis")->Fill(fStsDigis->GetEntriesFast());
    if (NULL != fStsClusters) fHM->H1F("hNofStsClusters")->Fill(fStsClusters->GetEntriesFast());
    if (NULL != fStsHits) fHM->H1F("hNofStsHits")->Fill(fStsHits->GetEntriesFast());
-
    if (NULL != fRichHits) fHM->H1("hNofRichHits")->Fill(fRichHits->GetEntriesFast());
    if (NULL != fRichPoints) fHM->H1("hNofRichPoints")->Fill(fRichPoints->GetEntriesFast());
-
    if (NULL != fTrdPoints) fHM->H1F("hNofTrdPoints")->Fill(fTrdPoints->GetEntriesFast());
    if (NULL != fTrdDigis) fHM->H1F("hNofTrdDigis")->Fill(fTrdDigis->GetEntriesFast());
    if (NULL != fTrdClusters) fHM->H1F("hNofTrdClusters")->Fill(fTrdClusters->GetEntriesFast());
    if (NULL != fTrdHits) fHM->H1F("hNofTrdHits")->Fill(fTrdHits->GetEntriesFast());
-
    if (NULL != fMuchPoints) fHM->H1F("hNofMuchPoints")->Fill(fMuchPoints->GetEntriesFast());
    if (NULL != fMuchDigis) fHM->H1F("hNofMuchDigis")->Fill(fMuchDigis->GetEntriesFast());
    if (NULL != fMuchClusters) fHM->H1F("hNofMuchClusters")->Fill(fMuchClusters->GetEntriesFast());
    if (NULL != fMuchPixelHits) fHM->H1F("hNofMuchPixelHits")->Fill(fMuchPixelHits->GetEntriesFast());
    if (NULL != fMuchStrawHits) fHM->H1F("hNofMuchStrawHits")->Fill(fMuchStrawHits->GetEntriesFast());
-
    if (NULL != fTofPoints) fHM->H1F("hNofTofPoints")->Fill(fTofPoints->GetEntriesFast());
    if (NULL != fTofHits) fHM->H1F("hNofTofHits")->Fill(fTofHits->GetEntriesFast());
+}
+
+void CbmLitClusteringQaCalculator::NormalizeHistograms()
+{
+   Int_t nofEvents = fHM->H1("hEventNo")->GetEntries();
+   fHM->H1("hMvdNofHitsInStation")->Scale(1. / nofEvents);
+   fHM->H1("hStsNofHitsInStation")->Scale(1. / nofEvents);
+   fHM->H1("hTrdNofHitsInStation")->Scale(1. / nofEvents);
+   fHM->H1("hMuchNofHitsInStation")->Scale(1. / nofEvents);
+   fHM->H1("hTofNofHitsInStation")->Scale(1. / nofEvents);
+   ShrinkEmptyBins(fHM->H1("hMvdNofHitsInStation"));
+   ShrinkEmptyBins(fHM->H1("hStsNofHitsInStation"));
+   ShrinkEmptyBins(fHM->H1("hTrdNofHitsInStation"));
+   ShrinkEmptyBins(fHM->H1("hMuchNofHitsInStation"));
+   ShrinkEmptyBins(fHM->H1("hTofNofHitsInStation"));
+}
+
+void CbmLitClusteringQaCalculator::ShrinkEmptyBins(
+      TH1* hist)
+{
+   Int_t nofBins = hist->GetNbinsX();
+   Int_t shrinkBin = 0;
+   for (Int_t iBin = nofBins; iBin > 0; iBin--) {
+      Double_t content = hist->GetBinContent(iBin);
+      if (content != 0.) {
+         shrinkBin = iBin;
+         break;
+      }
+   }
+   hist->GetXaxis()->SetRange(1, shrinkBin + 1);
 }

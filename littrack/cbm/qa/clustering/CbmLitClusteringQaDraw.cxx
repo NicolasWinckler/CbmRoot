@@ -36,18 +36,18 @@ void CbmLitClusteringQaDraw::Draw(
 
 void CbmLitClusteringQaDraw::DrawHitsStationHisto(
       const string& name,
-      TH1F* hist)
+      TH1* hist)
 {
-   TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1200, 600);
-   DrawH1(hist, kLitLinear, kLitLinear, "HIST TEXT0");
+   TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 800, 400);
+   DrawH1(hist, kLitLinear, kLitLinear);
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 void CbmLitClusteringQaDraw::DrawHitsStationHistos()
 {
-   DrawHitsStationHisto("clustering_qa_mvd_hits_station", fHM->H1F("hMvdNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_sts_hits_station", fHM->H1F("hStsNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_trd_hits_station", fHM->H1F("hTrdNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_much_hits_station", fHM->H1F("hMuchNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_tof_hits_station", fHM->H1F("hTofNofHitsInStation"));
+   DrawHitsStationHisto("clustering_qa_mvd_hits_station", fHM->H1("hMvdNofHitsInStation"));
+   DrawHitsStationHisto("clustering_qa_sts_hits_station", fHM->H1("hStsNofHitsInStation"));
+   DrawHitsStationHisto("clustering_qa_trd_hits_station", fHM->H1("hTrdNofHitsInStation"));
+   DrawHitsStationHisto("clustering_qa_much_hits_station", fHM->H1("hMuchNofHitsInStation"));
+   DrawHitsStationHisto("clustering_qa_tof_hits_station", fHM->H1("hTofNofHitsInStation"));
 }

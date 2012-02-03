@@ -664,7 +664,7 @@ void CbmLitPropagationQa::DrawHistos(
             fSigma[v][plane][i] = sigma = fit->GetParameter(2);
             fRms[v][plane][i] = rms = hist->GetRMS();
          }
-         DrawHistSigmaRMS(i, sigma, rms);
+         DrawHistSigmaRMS(sigma, rms);
       }
       lit::SaveCanvasAsImage(c[plane], fOutputDir);
       if (fIsCloseCanvas) { c[plane]->Close(); }

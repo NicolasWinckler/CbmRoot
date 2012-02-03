@@ -36,7 +36,6 @@ ptree CbmLitTrackingQaPTreeCreator::Create(
 
    ptree pt;
 
-   //pt.put("IsElectronSetup", fIsElectronSetup);
    pt.put("hEventNo", (Int_t)fHM->H1F("hEventNo")->GetEntries());
 
    // Print NOF statistics

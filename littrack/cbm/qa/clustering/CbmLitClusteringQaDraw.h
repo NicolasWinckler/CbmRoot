@@ -10,7 +10,7 @@
 
 #include <string>
 using std::string;
-class TH1F;
+class TH1;
 class CbmLitHistManager;
 
 /**
@@ -45,7 +45,7 @@ private:
 
    void DrawHitsStationHisto(
          const string& name,
-         TH1F* hist);
+         TH1* hist);
 
    void DrawHitsStationHistos();
 

@@ -146,7 +146,7 @@ void CbmLitTrackingQaCalculator::Exec()
 {
    // Increase event counter
    fHM->H1F("hEventNo")->Fill(0.5);
-   std::cout << "Event: " << fHM->H1F("hEventNo")->GetEntries() << std::endl;
+   std::cout << "CbmLitTrackingQaCalculator::Exec: event=" << fHM->H1F("hEventNo")->GetEntries() << std::endl;
 
    fMCTrackCreator->Create();
    FillNofCrossedStationsHistos();

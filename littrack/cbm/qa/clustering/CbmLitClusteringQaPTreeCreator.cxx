@@ -27,6 +27,8 @@ ptree CbmLitClusteringQaPTreeCreator::Create(
 
    ptree pt;
 
+   pt.put("hEventNo", (Int_t)fHM->H1F("hEventNo")->GetEntries());
+
    NofStatisticsToPTree(pt, "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
          "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
    NofStatisticsToPTree(pt, "hNofMvdDigis", "hNofStsDigis", "",

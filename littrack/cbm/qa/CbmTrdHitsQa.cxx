@@ -245,7 +245,7 @@ void CbmTrdHitsQa::Draw()
          sigma = fit->GetParameter(2);
          rms = hist->GetRMS();
       }
-      DrawHistSigmaRMS(i, sigma, rms);
+      DrawHistSigmaRMS(sigma, rms);
 
       chPullY->cd(i + 1);
       DrawH1(fhPullY[i], kLitLinear, kLitLog);
@@ -257,7 +257,7 @@ void CbmTrdHitsQa::Draw()
          sigma = fit->GetParameter(2);
          rms = hist->GetRMS();
       }
-      DrawHistSigmaRMS(i, sigma, rms);
+      DrawHistSigmaRMS(sigma, rms);
    }
 }
 

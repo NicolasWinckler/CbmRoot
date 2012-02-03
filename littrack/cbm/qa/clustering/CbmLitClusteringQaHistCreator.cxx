@@ -27,7 +27,13 @@ void CbmLitClusteringQaHistCreator::Create(
    assert(histManager != NULL);
    fHM = histManager;
 
-   const int maxNofStations = 30;
+   const int maxNofStations = 100;
+   Create1FHist("hMvdNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
+   Create1FHist("hStsNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
+   Create1FHist("hTrdNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
+   Create1FHist("hMuchNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
+   Create1FHist("hTofNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
+
    Create1FHist("hMvdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
    Create1FHist("hStsNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
    Create1FHist("hTrdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
@@ -63,7 +69,7 @@ void CbmLitClusteringQaHistCreator::Create(
    Create1FHist("hNofTofHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
 
    // Histogram stores number of events
-   //Create1FHist("hEventNo", "", "",1, 0, 1.);
+   Create1FHist("hEventNo", "", "", 1, 0, 1.);
 }
 
 void CbmLitClusteringQaHistCreator::Create1FHist(

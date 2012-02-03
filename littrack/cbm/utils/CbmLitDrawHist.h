@@ -132,12 +132,10 @@ void DrawH1(
 /**
  * \fn DrawHistSigmaRMS
  * \brief Draw sigma and RMS on histogram.
- * \param[in] index Letter index for histogram.
  * \param[in] sigma Sigma value.
  * \param[in] rms RMS value.
  */
 void DrawHistSigmaRMS(
-   Int_t index,
    Double_t sigma,
    Double_t rms);
 

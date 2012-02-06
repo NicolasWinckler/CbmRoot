@@ -358,7 +358,7 @@ void CbmRichGeoTest::FitAndFillHistCircle(
       const vector<Double_t>& x,
       const vector<Double_t>& y)
 {
-   if (x.size() != 0){ fCopFit->DoFit1(ring, x, y);}
+   if (x.size() != 0){ fCopFit->DoFit(ring, x, y);}
    else {fCopFit->DoFit(ring);}
    Double_t radius = ring->GetRadius();
    Double_t xcCircle = ring->GetCenterX();

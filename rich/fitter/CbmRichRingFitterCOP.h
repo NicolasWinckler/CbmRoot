@@ -1,13 +1,13 @@
-/******************************************************************************
-*  Class  : CbmRichRingFitterCOP
-*  Description: This is the header of a particular fitting class.
-*               Here the ring is fitted with theh COP algorithm from A. Ayriyan/ G. Ososkov
+/**
+* \file CbmRichRingFitterCOP.h
 *
-*  Algorithm:  Alexander Ayriyan, Gennadi Ososkov (10.08.2005)
-*  E-mail : C.Hoehne@gsi.de
-*******************************************************************************/
-#ifndef CBM_RICH_RING_FITTER_COP
-#define CBM_RICH_RING_FITTER_COP 1
+* \brief Here the ring is fitted with theh COP algorithm from A. Ayriyan/G. Ososkov.
+*
+* \author Alexander Ayriyan, Gennadi Ososkov, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2005
+**/
+#ifndef CBMRICHRINGFITTERCOP
+#define CBMRICHRINGFITTERCOP
 
 #include <vector>
 
@@ -15,30 +15,70 @@ class TClonesArray;
 class CbmRichRing;
 using namespace std;
 
+/**
+* \class CbmRichRingFitterCOP
+*
+* \brief Here the ring is fitted with theh COP algorithm from A. Ayriyan/G. Ososkov.
+*
+* \author Alexander Ayriyan, Gennadi Ososkov, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2005
+**/
 class CbmRichRingFitterCOP
 {
 public:
-
+   /**
+    * \brief Standard constructor.
+    */
    CbmRichRingFitterCOP();
+
+   /**
+    * \brief Destructor.
+    */
    ~CbmRichRingFitterCOP();
+
+   /**
+    * \brief Initialize TClonesArrays for the Rich hits.
+    */
    void Init();
 
-   void DoFit1(
-         CbmRichRing *pRing,
+   /**
+    * \brief Fit ring using hit coordinates from vectors.
+    * \param[in,out] ring RICH ring to be fitted.
+    * \param[in] hitX Vector of x coordinates of hits.
+    * \param[in] hitY Vector of y coordinates of hits.
+    */
+   void DoFit(
+         CbmRichRing *ring,
          const vector<double>& hitX,
          const vector<double>& hitY);
 
-   void DoFit(CbmRichRing *ring);
+   /**
+    * \brief Fit ring.
+    * \param[in,out] ring RICH ring to be fitted.
+    */
+   void DoFit(
+         CbmRichRing *ring);
 
 private:
-   void FitRing(CbmRichRing* ring);
-   void CalcChi2(CbmRichRing* ring);
+   /**
+    * \brief Execute ring fitting algorithm.
+    * \param[in,out] ring RICH ring to be fitted.
+    */
+   void FitRing(
+         CbmRichRing* ring);
 
-	TClonesArray* fHitsArray;
+   /**
+    * \brief Calculate chi2 value of fitted ring.
+    * \param[in,out] ring Fitted ring.
+    */
+   void CalcChi2(
+         CbmRichRing* ring);
 
-	static const int MAX_NOF_HITS_IN_RING = 400;
-	vector<double> fHitX;
-	vector<double> fHitY;
+	TClonesArray* fRichHits; // Array of RICH hits
+
+	static const int MAX_NOF_HITS_IN_RING = 400; // maximum possible number of hits in ring
+	vector<double> fHitX; // vector of X coordinate
+	vector<double> fHitY; // vector of Y coordinate
 	int fNofHits;
 };
 

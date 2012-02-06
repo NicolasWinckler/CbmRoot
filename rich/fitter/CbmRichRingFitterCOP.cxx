@@ -1,15 +1,22 @@
+/**
+* \file CbmRichRingFitterCOP.cxx
+*
+* \author Alexander Ayriyan, Gennadi Ososkov, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2005
+**/
 #include "CbmRichRingFitterCOP.h"
 #include "FairRootManager.h"
 #include "CbmRichRingLight.h"
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
+
 #include "TClonesArray.h"
+
 #include <iostream>
 #include <cmath>
 
 using namespace std;
 
-// -----   Default constructor   -------------------------------------------
 CbmRichRingFitterCOP::CbmRichRingFitterCOP()
 {
 
@@ -21,49 +28,48 @@ CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 	fHitY.clear();
 }
 
-void CbmRichRingFitterCOP::DoFit1(
-      CbmRichRing *pRing,
+void CbmRichRingFitterCOP::DoFit(
+      CbmRichRing *ring,
       const vector<double>& hitX,
       const vector<double>& hitY)
 {
-  // fHitX.clear();
-  // fHitY.clear();
    fHitX.assign(hitX.begin(), hitX.end());
    fHitY.assign(hitY.begin(), hitY.end());
    fNofHits = fHitX.size();
-   FitRing(pRing);
+   FitRing(ring);
 }
 
 void CbmRichRingFitterCOP::DoFit(
-      CbmRichRing *pRing)
+      CbmRichRing *ring)
 {
-	fNofHits = pRing->GetNofHits();
-	if (fNofHits < 3) {
-		pRing->SetRadius(0.);
-		pRing->SetCenterX(0.);
-		pRing->SetCenterY(0.);
-		return;
-	}
-
-	if (fNofHits >= MAX_NOF_HITS_IN_RING) {
-		cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"<<fNofHits <<endl;
-		pRing->SetRadius(0.);
-		pRing->SetCenterX(0.);
-		pRing->SetCenterY(0.);
-		return;
-	}
-
+   fNofHits = ring->GetNofHits();
 	for (int i = 0; i < fNofHits; i++) {
-		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
+		CbmRichHit* hit = (CbmRichHit*) fRichHits->At(ring->GetHit(i));
 		fHitX[i] = hit->GetX();
 		fHitY[i] = hit->GetY();
 	}
 
-	FitRing(pRing);
+	FitRing(ring);
 }
 
-void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
+void CbmRichRingFitterCOP::FitRing(
+      CbmRichRing* ring)
 {
+   if (fNofHits < 3) {
+      ring->SetRadius(0.);
+      ring->SetCenterX(0.);
+      ring->SetCenterY(0.);
+      return;
+   }
+
+   if (fNofHits >= MAX_NOF_HITS_IN_RING) {
+		cout << "-E- CbmRichRingFitterCOP::DoFit(), too many hits in the ring:" << fNofHits <<endl;
+		ring->SetRadius(0.);
+		ring->SetCenterX(0.);
+		ring->SetCenterY(0.);
+		return;
+	}
+
 	float radius = 0.;
 	float centerX = 0.;
 	float centerY = 0.;
@@ -172,51 +178,48 @@ void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
 
 void CbmRichRingFitterCOP::Init()
 {
-	cout << "CbmRichRingFitterImpl::Init()"<<endl;
-	// Get and check FairRootManager
+	cout << "CbmRichRingFitterImpl::Init"<<endl;
+
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (! ioman) {
-		cout << "-E- CbmRichRingFitterImpl::Init()"
-		<< "RootManager not instantised!" << endl;
+	if (NULL == ioman) {
+		cout << "-E- CbmRichRingFitterCOP::Init, RootManager not instantised" << endl;
 		return;
 	}
 
-	// Get hit Array
-	fHitsArray = (TClonesArray*) ioman->GetObject("RichHit");
-	if ( ! fHitsArray) {
-		cout << "-W- CbmRichRingFitterImpl::Init(): No RichHit array!"<< endl;
+	fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
+	if ( NULL == fRichHits) {
+		cout << "-W- CbmRichRingFitterCOP::Init, No RichHit array!" << endl;
 	}
 	fHitX.resize(MAX_NOF_HITS_IN_RING);
 	fHitY.resize(MAX_NOF_HITS_IN_RING);
 }
 
-// -----   Protected method CalcChi2   ----------------------------------------
-void CbmRichRingFitterCOP::CalcChi2(CbmRichRing* pRing)
+void CbmRichRingFitterCOP::CalcChi2(
+      CbmRichRing* pRing)
 {
-    int fNhits=pRing->GetNofHits();
+   int fNhits=pRing->GetNofHits();
 
-    if (fNhits < 4) {
+   if (fNhits < 4) {
       pRing->SetChi2(-1.);
       return;
-    }
+   }
 
-    float Xd2, Yd2;
-    float chi2 = 0.;
+   float Xd2, Yd2;
+   float chi2 = 0.;
 
-    float Radius  = pRing->GetRadius();
-    float Xcenter = pRing->GetCenterX();
-    float Ycenter = pRing->GetCenterY();
+   float Radius  = pRing->GetRadius();
+   float Xcenter = pRing->GetCenterX();
+   float Ycenter = pRing->GetCenterY();
 
-    for (int i = 0; i < fNhits; i++) {
-    	Xd2 = Xcenter - fHitX[i];
-		Yd2 = Ycenter - fHitY[i];
-		Xd2 *= Xd2;
-		Yd2 *= Yd2;
+   for (int i = 0; i < fNhits; i++) {
+      Xd2 = Xcenter - fHitX[i];
+      Yd2 = Ycenter - fHitY[i];
+      Xd2 *= Xd2;
+      Yd2 *= Yd2;
 
-		float d = sqrt( Xd2 + Yd2 ) - Radius;
-        chi2 += d*d;
-    }
+      float d = sqrt( Xd2 + Yd2 ) - Radius;
+      chi2 += d*d;
+   }
 
-    pRing->SetChi2(chi2);
+   pRing->SetChi2(chi2);
 }
-

@@ -164,7 +164,7 @@ void  DrawHistSigmaRMS(
    Double_t sigma,
    Double_t rms)
 {
-   std::string txt1 = lit::ToString<Double_t>(sigma) + " / " + lit::ToString<Double_t>(rms);
+   std::string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
    TLatex text;
    text.SetTextAlign(21);
    text.SetTextSize(0.08);

@@ -10,7 +10,7 @@
 #include <boost/assign/list_of.hpp>
 
 using boost::assign::list_of;
-using lit::ToString;
+using lit::NumberToString;
 
 CbmLitFitQaReport::CbmLitFitQaReport()
 {
@@ -78,7 +78,8 @@ string CbmLitFitQaReport::PrintResAndPullRow(
    };
    vector<string> properties(10);
    for (unsigned int iPar = 0; iPar < 10; iPar++) {
-      properties[iPar] = ToString<float>(fQa.get(histName + parNames[iPar] + "." + propertyName, -1.));
+      string name = histName + parNames[iPar] + "." + propertyName;
+      properties[iPar] = NumberToString<float>(fQa.get(name, -1.), 2);
    }
    return fR->TableRow(list_of(rowName).range(properties));
 }

@@ -35,6 +35,7 @@
 
 using boost::property_tree::ptree;
 using std::make_pair;
+using lit::NumberToString;
 
 CbmLitFitQa::CbmLitFitQa():
    fIsFixedBounds(true),

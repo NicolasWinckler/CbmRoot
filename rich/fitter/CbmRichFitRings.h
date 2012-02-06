@@ -1,22 +1,15 @@
-/******************************************************************************
-*  $Id: CbmRichFitRings.h,v 1.1 2006/01/19 12:19:27 hoehne Exp $
+/**
+* \file CbmRichFitRings.h
 *
-*  Class  : CbmRichRingFitter
-*  Description: Header for the Task class for Ring Fitting in RICH.
+* \brief FairTask for ring fitting in RICH. Input is TClonesArray of CbmRichRing.
+*  Uses as ring fitting algorithm classes derived from CbmRichRingFitter.
 *
-*  Author : Supriya Das
-*  E-mail : S.Das@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichFitRings.h,v $
-*  Revision 1.1  2006/01/19 12:19:27  hoehne
-*  initial version
-*
-*
-*******************************************************************************/
+* \author Supria Das
+* \date 2006
+**/
 
-#ifndef CBM_RICH_FIT_RINGS
-#define CBM_RICH_FIT_RINGS 1
+#ifndef CBMRICHFITRINGS
+#define CBMRICHFITRINGS
 
 
 #include "FairTask.h"
@@ -24,67 +17,71 @@
 class CbmRichRingFitter;
 class TClonesArray;
 
+/**
+ * \class CbmRichFitRings
+ *
+ * \brief FairTask for ring fitting in RICH.
+ *
+ * \author Supria Das
+ * \date 2006
+ **/
 class CbmRichFitRings : public FairTask
 {
 
- public:
+public:
 
-  /** Default constructor **/
-  CbmRichFitRings();
+   /**
+    * \brief Standard constructor.
+    * \param[in] fitter Pointer to RICH ring fitter concrete class.
+    */
+   CbmRichFitRings(
+        CbmRichRingFitter* fitter);
 
-  /** Standard constructor
-   *@param fitter   Pointer to RICH ring fitter concrete class
-   *@param verbose  Verbosity level
-   **/
-  CbmRichFitRings(CbmRichRingFitter* fitter, Int_t verbose = 1);
-
-
-  /** Standard constructor with name and title
-   **
-   *@param name   Name of class
-   *@param title  Task title
-   *@param ftter  Pointer to RICH ring fitter concrete class
-   *@param verbose  Verbosity level
-   **/
-  CbmRichFitRings(const char* name, const char* title = "FairTask",
-		  CbmRichRingFitter* fitter = NULL, Int_t verbose = 1);
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmRichFitRings();
 
 
-  /** Destructor **/
-  virtual ~CbmRichFitRings();
+   /**
+    * \brief Initialisation at beginning of run.
+    */
+   virtual InitStatus Init();
 
+   /**
+    * \brief Task execution for each event.
+    * \param[in] opt Options.
+    */
+   virtual void Exec(
+         Option_t* opt);
 
-  /** Initialisation at beginning of each event **/
-  virtual InitStatus Init();
+   /**
+    * \brief Finish at the end of run.
+    */
+   virtual void Finish();
 
+   /**
+    * \brief Return pointer to the current fitter algorithm.
+    */
+   CbmRichRingFitter* GetFitter(){
+      return fFitter;
+   };
 
-  /** Task execution **/
-  virtual void Exec(Option_t* opt);
+   /**
+    * \brief Set concrete ring fitter algorithm.
+    * \param[in] fitter Pointer to concrete fitter algorithm.
+    */
+   void UseFitter(
+         CbmRichRingFitter* fitter){
+      fFitter = fitter;
+   };
 
+private:
 
-  /** Finish at the end of each event **/
-  virtual void Finish();
+   CbmRichRingFitter* fFitter; // Pointer to TrackFinder concrete class
+   TClonesArray* fRingArray; // Input array of RICH Rings
 
-
-  /** Accessors **/
-  CbmRichRingFitter* GetFitter() { return fFitter; };
-  Int_t GetNofRings()            { return fNofRings; };
-
-
-  /** Set concrete track finder **/
-  void UseFitter(CbmRichRingFitter* fitter) { fFitter = fitter; };
-
-
-
- private:
-
-  CbmRichRingFitter* fFitter;    /** Pointer to TrackFinder concrete class */
-  TClonesArray* fRingArray;      /** Input array of RICH Rings */
-  Int_t fNofRings;               /** Number of tracks successfully fitted */
-  Int_t fVerbose;                //! Verbosity level
-
-  ClassDef(CbmRichFitRings,1);
-
+   ClassDef(CbmRichFitRings,1);
 };
 
 #endif

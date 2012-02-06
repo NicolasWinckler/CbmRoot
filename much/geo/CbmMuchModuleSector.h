@@ -41,7 +41,7 @@ using std::pair;
 #define SB_CHANNEL 32LL //11
 
 
-class CbmMuchSector;
+class CbmMuchRadialSector;
 
 class CbmMuchModuleSector : public CbmMuchModule
 {
@@ -105,11 +105,9 @@ class CbmMuchModuleSector : public CbmMuchModule
     /** Accessors **/
     Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
     /** Gets sector by the given channel Id. **/
-    CbmMuchSector* GetSector(Long64_t channelId);
-    /** Gets sector by the given numbers of column and row in the grid. **/
-    CbmMuchSector* GetSector(Int_t iGridColumn, Int_t iGridRow);
+    CbmMuchRadialSector* GetSector(Long64_t channelId);
     /** Gets sector by the given coordinates in global c.s. */
-    CbmMuchSector* GetSector(Double_t x, Double_t y);
+    CbmMuchRadialSector* GetSector(Double_t x, Double_t y);
     /** Gets pad by the given Id. */
     CbmMuchPad* GetPad(Long64_t channelId);
     /** Gets array of pads for this module. */
@@ -117,13 +115,13 @@ class CbmMuchModuleSector : public CbmMuchModule
     Int_t GetNPads();
 
     /** Adds a given sector to the array.
-     *@param  sector   CbmMuchSector which should be added to the array.**/
-    void AddSector(CbmMuchSector* sector);
+     *@param  sector   CbmMuchRadialSector which should be added to the array.**/
+    void AddSector(CbmMuchRadialSector* sector);
 
     TClonesArray* GetClusters() const { return fClusters;   }
     void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
 
-    virtual Bool_t InitModule();
+//    virtual Bool_t InitModule();
     virtual void DrawModule(Color_t color);
 
     Int_t GetNSectorChannels() const { return fNSectorChannels; }
@@ -154,16 +152,14 @@ class CbmMuchModuleSector : public CbmMuchModule
     Double_t fDy;
     Double_t fDz;
     
-    Double_t GetGridCellY(Int_t iRow);
-    Double_t GetGridCellX(Int_t iCol);
-    Double_t GetInitX(CbmMuchSector* sector);
-    Double_t GetInitY(CbmMuchSector* sector);
-    /** Grid initialization. **/
-    Bool_t InitGrid(Bool_t useModuleDesign);
-    /** Adds to each sector info about neighbour sectors **/
-    void InitNeighbourSectors();
-    /** Adds to each pad info about neighbour pads **/
-    void InitNeighbourPads();
+//    Double_t GetGridCellY(Int_t iRow);
+//    Double_t GetGridCellX(Int_t iCol);
+//    /** Grid initialization. **/
+//    Bool_t InitGrid(Bool_t useModuleDesign);
+//    /** Adds to each sector info about neighbour sectors **/
+//    void InitNeighbourSectors();
+//    /** Adds to each pad info about neighbour pads **/
+//    void InitNeighbourPads();
 
     ClassDef(CbmMuchModuleSector,1);
 };

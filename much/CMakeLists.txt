@@ -40,7 +40,10 @@ geo/CbmMuchPad.cxx
 geo/CbmMuchSector.cxx
 geo/CbmMuchSegmentAuto.cxx
 geo/CbmMuchSegmentManual.cxx
+geo/CbmMuchSegmentSector.cxx
 geo/CbmMuchStation.cxx
+geo/CbmMuchRadialSector.cxx
+geo/CbmMuchRadialPad.cxx
 
 reco/CbmMuchDigitizeAdvancedGem.cxx
 reco/CbmMuchDigitizeSimpleGem.cxx

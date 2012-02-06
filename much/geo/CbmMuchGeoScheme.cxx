@@ -662,7 +662,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
           pos[1] = (ymin+dy)*sin(phi);
           pos[2] = (isBack ? 1 : -1)*moduleZ + layerGlobalZ0;
           CbmMuchLayerSide* side = layer->GetSide(isBack);
-          side->AddModule(new CbmMuchModuleSector(st, l, 0, side->GetNModules(), pos,size,dx1,dx2,dy,dz,rmin));
+          side->AddModule(new CbmMuchModuleSector(st, l, isBack, side->GetNModules(), pos,size,dx1,dx2,dy,dz,rmin));
         }
         // Set support shape
         layer->SetSupportDx(sqrt(rmax*rmax+dx2*dx2));

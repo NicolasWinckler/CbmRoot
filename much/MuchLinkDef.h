@@ -28,8 +28,11 @@
 #pragma link C++ class  CbmMuchPad+;
 #pragma link C++ class  CbmMuchPointInfo+;
 #pragma link C++ class  CbmMuchSector+;
+#pragma link C++ class  CbmMuchRadialSector+;
+#pragma link C++ class  CbmMuchRadialPad+;
 #pragma link C++ class  CbmMuchSegmentAuto+;
 #pragma link C++ class  CbmMuchSegmentManual+;
+#pragma link C++ class  CbmMuchSegmentSector+;
 #pragma link C++ class  CbmMuchStation+;
 #pragma link C++ class  CbmMuchTrackFinderIdeal+;
 #pragma link C++ class  CbmMuchFindHitsStraws+;

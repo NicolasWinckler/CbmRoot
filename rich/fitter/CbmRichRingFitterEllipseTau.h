@@ -1,67 +1,89 @@
-/**********************************************************************************
-*    Class: CbmRichRingFitterEllipse                                              *
-*    Description: This is the header of a particular ellipse fitting              *
-*                 Here the ring is fitted with Taubin algorithm from              *
-*                 Alexander Ayriyan, G. Ososkov, N. Chernov                       *
-*                                                                                 *
-*    Author : Alexander Ayriyan and Semen Lebedev                                *
-*    E-mail : A.Ayriyan@gsi.de                                                    *
-**********************************************************************************/
+/**
+* \file CbmRichRingFitterEllipseTau.h
+*
+* \brief Here the ring is fitted with Taubin algorithm from
+*  A. Ayriyan, G. Ososkov, N. Chernov
+*
+* \author Alexander Ayriyan and Semen Lebedev <s.lebedev@gsi.de>
+* \date 2011
+**/
 
-#ifndef CBM_RICH_RING_FITTER_ELLIPSE_TAU_H
-#define CBM_RICH_RING_FITTER_ELLIPSE_TAU_H 1
+#ifndef CBMRICHRINGFITTERELLIPSETAUH
+#define CBMRICHRINGFITTERELLIPSETAUH
 
 #include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-//#define fN 6
-#include "TH1D.h"
-#include "TTime.h"
-#include "TMath.h"
-#include "TEllipse.h"
-#include "TVectorD.h"
-#include "TMatrixD.h"
-#include "TMatrixDEigen.h"
 #include "CbmRichRingFitterEllipseBase.h"
 
-using namespace std;
+using std::vector;
 
 #define MAX_NOF_HITS 400
 
+/**
+* \class CbmRichRingFitterEllipseTau
+*
+* \brief Here the ring is fitted with Taubin algorithm from
+*  A. Ayriyan, G. Ososkov, N. Chernov
+*
+* \author Alexander Ayriyan and Semen Lebedev <s.lebedev@gsi.de>
+* \date 2011
+**/
 class CbmRichRingFitterEllipseTau : public CbmRichRingFitterEllipseBase
 {
 public:
 
-   /** Default constructor **/
+   /**
+    *\brief Default constructor.
+    */
    CbmRichRingFitterEllipseTau();
 
-   /** Standard constructor **/
-   CbmRichRingFitterEllipseTau(
-         Int_t verbose,
-         Double_t correction,
-         TString fieldName);
-
-   /** Destructor **/
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmRichRingFitterEllipseTau();
 
-   void DoFit1(
-         CbmRichRing *pRing,
+   /**
+    * \brief Fit ring using hit coordinates from vectors.
+    * \param[in] ring RICH ring to be fitted.
+    * \param[in] hitX Vector of x coordinates of hits.
+    * \param[in] hitY Vector of y coordinates of hits.
+    */
+   void DoFit(
+         CbmRichRing *ring,
          const vector<Double_t>& hitX,
          const vector<Double_t>& hitY);
 
+   /**
+    * \brief Fit ring.
+    * \param[in,out] ring RICH ring to be fitted.
+    */
    void DoFit(
-         CbmRichRing *pRing);
+         CbmRichRing *ring);
 
+   /**
+    * \brief Transform fitted curve to ellipse parameters.
+    * \param[in,out] ring RICH ring.
+    */
 	void TransEllipse(
-	      CbmRichRing *pRing);
+	      CbmRichRing *ring);
 
+	/**
+	 * \brief Initialize all matrices.
+	 */
 	void InitMatrices();
 
+	/**
+	 * \brief Perform Taubin method.
+	 */
 	void Taubin();
 
+	/**
+	 * \brief Invert 5x5 matrix.
+	 */
 	void Inv5x5();
 
+	/**
+	 * \brief Matrices multiplication.
+	 */
 	void AMultB(
 	      const Double_t * const ap,
 	      Int_t na, Int_t ncolsa,
@@ -70,17 +92,22 @@ public:
 	      Int_t ncolsb,
 	      Double_t *cp);
 
+	/**
+	 * \brief Jacobi method.
+	 */
 	void Jacobi(
 	      Double_t a[5][5],
 	      Double_t d[5],
 	      Double_t v[5][5]);
 
+	/**
+	 * \brief Find eigenvalues.
+	 */
 	void Eigsrt(
 	      Double_t d[5],
 	      Double_t v[5][5]);
 
 private:
-
 	Double_t fM[36];
 	Double_t fP[25];
 	Double_t fQ[25];
@@ -88,11 +115,11 @@ private:
 	Double_t fZT[MAX_NOF_HITS*6];
 
 	Double_t fAlgPar[6];
-	vector<Double_t> fX;
-	vector<Double_t> fY;
+
+	vector<Double_t> fX; // vector of X coordinates
+	vector<Double_t> fY; // vector of Y coordinates
 
    ClassDef(CbmRichRingFitterEllipseTau,1);
-
 };
 
 #endif

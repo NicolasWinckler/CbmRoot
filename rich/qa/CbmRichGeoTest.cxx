@@ -331,7 +331,7 @@ void CbmRichGeoTest::FitAndFillHistEllipse(
       const vector<Double_t>& x,
       const vector<Double_t>& y)
 {
-   if (x.size() != 0){ fTauFit->DoFit1(ring, x, y);}
+   if (x.size() != 0){ fTauFit->DoFit(ring, x, y);}
    else {fTauFit->DoFit(ring);}
    Double_t axisA = ring->GetAaxis();
    Double_t axisB = ring->GetBaxis();

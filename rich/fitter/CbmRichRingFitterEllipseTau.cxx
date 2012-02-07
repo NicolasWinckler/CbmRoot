@@ -1,12 +1,9 @@
-/**********************************************************************************
-*    Class: CbmRichRingFitterEllipseTau                                           *
-*    Description: This is the source of a particular ellipse fitting              *
-*                 Here the ring is fitted with Taubin algorithm from              *
-*                 Alexander Ayriyan, G. Ososkov and N. Chernov                    *
-*                                                                                 *
-*    Author : Alexander Ayriyan and Semen Lebedev                                *
-*    E-mail : A.Ayriyan@gsi.de                                                    *
-**********************************************************************************/
+/**
+* \file CbmRichRingFitterEllipseTau.cxx
+*
+* \author Alexander Ayriyan and Semen Lebedev <s.lebedev@gsi.de>
+* \date 2011
+**/
 
 // GMij are indices for a 5x5 matrix.
 #define GM00 0
@@ -88,56 +85,35 @@
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 
-// The following classes are
-// needed for radius correction
-#include "TH1D.h"
-#include "TFile.h"
-#include "TSystem.h"
-#include "TROOT.h"
+#include "TMath.h"
+#include "TVectorD.h"
+#include "TMatrixD.h"
+#include "TMatrixDEigen.h"
 
-#include <cmath>
+#include <iostream>
 
-//using std::vector;
-//using std::endl;
-//using std::cout;
+using std::endl;
+using std::cout;
 
-// -----   Default constructor   -------------------------------------------
 CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
 {
-    fVerbose = 1;
-    fFieldName = "compact";
     InitHistForRadiusCorrection();
 }
 
-// -------------------------------------------------------------------------
-
-// -----   Standard constructor   -------------------------------------------
-CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau(
-      Int_t verbose,
-      Double_t correction,
-      TString fieldName)
-{
-    fVerbose = verbose;
-    fFieldName = fieldName;
-    InitHistForRadiusCorrection();
-}
-// -------------------------------------------------------------------------
-
-// -----   Destructor   ----------------------------------------------------
 CbmRichRingFitterEllipseTau::~CbmRichRingFitterEllipseTau()
 {
     fX.clear();
     fY.clear();
 }
 
-void CbmRichRingFitterEllipseTau::DoFit1(
-      CbmRichRing *pRing,
+void CbmRichRingFitterEllipseTau::DoFit(
+      CbmRichRing *ring,
       const vector<Double_t>& hitX,
 		const vector<Double_t>& hitY)
 {
    if (hitX.size() > MAX_NOF_HITS){
       cout <<endl << endl<<  "-E- MAX_NOF_HITS = " << MAX_NOF_HITS <<
-            ". Please set limits in CbmRichRingFitterEllipseTau.h file." << endl << endl;
+            ". Please set limits in rich/CbmRichRingFitterEllipseTau.h file." << endl << endl;
    }
    fX.clear();
    fY.clear();
@@ -150,42 +126,39 @@ void CbmRichRingFitterEllipseTau::DoFit1(
 	}
 	InitMatrices();
 	Taubin();
-	TransEllipse(pRing);
+	TransEllipse(ring);
 }
 
-// -----   Public method: DoFit   ------------------------------------------
 void CbmRichRingFitterEllipseTau::DoFit(
-      CbmRichRing *pRing)
+      CbmRichRing *ring)
 {
-    Int_t fNumHits = pRing->GetNofHits();
+    Int_t fNumHits = ring->GetNofHits();
 
 	if (fNumHits <= 5) {
-		pRing->SetXYABPhi(-1., -1., -1., -1., -1.);
-		pRing->SetRadius(-1.);
+		ring->SetXYABPhi(-1., -1., -1., -1., -1.);
+		ring->SetRadius(-1.);
 
 		if (fVerbose > 1)
 			cout <<" No way for RingFitter as ellipse: Number of Hits is less then 5 "	<<endl;
 		   return;
 	}
-    fX.clear();
-    fY.clear();
-	CbmRichHit* hit= NULL;
+   fX.clear();
+   fY.clear();
 	for (Int_t i = 0; i < fNumHits; i++) {
-		hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
+		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(ring->GetHit(i));
 		fX.push_back(hit->GetX());
 		fY.push_back(hit->GetY());
 	}
 
 	InitMatrices();
 	Taubin();
-	TransEllipse(pRing);
+	TransEllipse(ring);
 
-	MakeRadiusCorrection(pRing);
+	PerformRadiusCorrection(ring);
 
-	//CalcChi2(pRing);
+	//CalcChi2(ring);
 }
 
-// -----   Public method: Taubin   -----------------------------------------
 void CbmRichRingFitterEllipseTau::Taubin()
 {
 //	TMatrixD PQ(5,5); // fPQ = P^(-1) * Q
@@ -232,8 +205,6 @@ void CbmRichRingFitterEllipseTau::Taubin()
 	fAlgPar[5] = AlgParF;
 }
 
-
-// -----   Public method: InitMatrices   -----------------------------------
 void CbmRichRingFitterEllipseTau::InitMatrices()
 {
 	const UInt_t numHits = fX.size();
@@ -292,8 +263,8 @@ void CbmRichRingFitterEllipseTau::InitMatrices()
 	fQ[GM33] = fQ[GM44] = 1.;
 }
 
-// -----   Public method: TransposeEllipse   -------------------------------
-void CbmRichRingFitterEllipseTau::TransEllipse(CbmRichRing *pRing)
+void CbmRichRingFitterEllipseTau::TransEllipse(
+      CbmRichRing *ring)
 {
 	Double_t Pxx = fAlgPar[0];
 	Double_t Pxy = fAlgPar[1];
@@ -301,13 +272,13 @@ void CbmRichRingFitterEllipseTau::TransEllipse(CbmRichRing *pRing)
 	Double_t Px = fAlgPar[3];
 	Double_t Py = fAlgPar[4];
 	Double_t P = fAlgPar[5];
-	CalcChi2(Pxx, Pxy, Pyy, Px, Py, P, pRing);
-	pRing->SetAPar(Pxx);
-	pRing->SetBPar(Pxy);
-	pRing->SetCPar(Pyy);
-	pRing->SetDPar(Px);
-	pRing->SetEPar(Py);
-	pRing->SetFPar(P);
+	CalcChi2(Pxx, Pxy, Pyy, Px, Py, P, ring);
+	ring->SetAPar(Pxx);
+	ring->SetBPar(Pxy);
+	ring->SetCPar(Pyy);
+	ring->SetDPar(Px);
+	ring->SetEPar(Py);
+	ring->SetFPar(P);
 
 	Double_t alpha;
 	Double_t QQx, QQy, Qxx, Qyy, Qx, Qy, Q;
@@ -340,20 +311,20 @@ void CbmRichRingFitterEllipseTau::TransEllipse(CbmRichRing *pRing)
 	Double_t centerX = -xc * cosa / 2. + yc * sina / 2.;
 	Double_t centerY = -xc * sina / 2. - yc * cosa / 2.;
 
-	pRing->SetXYABPhi(centerX, centerY, axisA, axisB, alpha);
-	pRing->SetRadius( (axisA + axisB) / 2.);
+	ring->SetXYABPhi(centerX, centerY, axisA, axisB, alpha);
+	ring->SetRadius( (axisA + axisB) / 2.);
 
-	if (pRing->GetAaxis() < pRing->GetBaxis()) {
+	if (ring->GetAaxis() < ring->GetBaxis()) {
 
-		Double_t tmp = pRing->GetAaxis();
-		pRing->SetAaxis(pRing->GetBaxis());
-		pRing->SetBaxis(tmp);
+		Double_t tmp = ring->GetAaxis();
+		ring->SetAaxis(ring->GetBaxis());
+		ring->SetBaxis(tmp);
 
-		tmp = pRing->GetPhi();
-		if (pRing->GetPhi() <= 0)
-			pRing->SetPhi(pRing->GetPhi() + 1.57079633);
+		tmp = ring->GetPhi();
+		if (ring->GetPhi() <= 0)
+			ring->SetPhi(ring->GetPhi() + 1.57079633);
 		else
-			pRing->SetPhi(pRing->GetPhi() - 1.57079633);
+			ring->SetPhi(ring->GetPhi() - 1.57079633);
 	}
 }
 
@@ -570,32 +541,39 @@ void CbmRichRingFitterEllipseTau::Inv5x5()
 	fP[GM44] = det4_0123_0123 * oneOverDet;
 }
 
-void CbmRichRingFitterEllipseTau::AMultB(const Double_t * const ap, Int_t na, Int_t ncolsa,
-            const Double_t * const bp, Int_t nb, Int_t ncolsb, Double_t *cp)
+void CbmRichRingFitterEllipseTau::AMultB(
+      const Double_t * const ap,
+      Int_t na, Int_t ncolsa,
+      const Double_t * const bp,
+      Int_t nb,
+      Int_t ncolsb,
+      Double_t *cp)
 {
 // Elementary routine to calculate matrix multiplication A*B
 
-   const Double_t *arp0 = ap;                     // Pointer to  A[i,0];
+   const Double_t *arp0 = ap; // Pointer to  A[i,0];
    while (arp0 < ap+na) {
       for (const Double_t *bcp = bp; bcp < bp+ncolsb; ) { // Pointer to the j-th column of B, Start bcp = B[0,0]
-         const Double_t *arp = arp0;                       // Pointer to the i-th row of A, reset to A[i,0]
+         const Double_t *arp = arp0; // Pointer to the i-th row of A, reset to A[i,0]
          Double_t cij = 0;
-         while (bcp < bp+nb) {                     // Scan the i-th row of A and
-            cij += *arp++ * *bcp;                   // the j-th col of B
+         while (bcp < bp+nb) { // Scan the i-th row of A and
+            cij += *arp++ * *bcp; // the j-th col of B
             bcp += ncolsb;
          }
          *cp++ = cij;
-         bcp -= nb-1;                              // Set bcp to the (j+1)-th col
+         bcp -= nb-1; // Set bcp to the (j+1)-th col
       }
-      arp0 += ncolsa;                             // Set ap to the (i+1)-th row
+      arp0 += ncolsa; // Set ap to the (i+1)-th row
    }
 }
 
 #define ROTATE(a,i,j,k,l)  g=a[i][j];h=a[k][l];a[i][j]=g-s*(h+g*tau);a[k][l]=h+s*(g-h*tau)
 #define MAXSWEEP 50
-void CbmRichRingFitterEllipseTau::Jacobi(Double_t a[5][5], Double_t d[5], Double_t v[5][5])
+void CbmRichRingFitterEllipseTau::Jacobi(
+      Double_t a[5][5],
+      Double_t d[5],
+      Double_t v[5][5])
 {
-
 	Double_t tresh, theta, tau, t, sm, s, h, g, c;
 
 	Double_t b[5], z[5];
@@ -675,7 +653,9 @@ void CbmRichRingFitterEllipseTau::Jacobi(Double_t a[5][5], Double_t d[5], Double
 	}//i rot
 }
 
-void CbmRichRingFitterEllipseTau::Eigsrt(Double_t d[5],  Double_t v[5][5])
+void CbmRichRingFitterEllipseTau::Eigsrt(
+      Double_t d[5],
+      Double_t v[5][5])
 {
 	Double_t p;
 	Int_t i,k,j;
@@ -695,8 +675,5 @@ void CbmRichRingFitterEllipseTau::Eigsrt(Double_t d[5],  Double_t v[5][5])
 		}
 	}
 }
-
-
-
 
 ClassImp(CbmRichRingFitterEllipseTau)

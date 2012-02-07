@@ -10,6 +10,7 @@
 #include "TCanvas.h"
 #include "TMath.h"
 #include "TMatrixD.h"
+#include "TH1D.h"
 
 #include <iostream>
 #include <vector>
@@ -84,7 +85,7 @@ void CbmRichRingFitterQa::GenerateEllipse()
 			hitY.push_back(hitYRot + Y0 + errorY);
 		}
 		// ellipse fit
-		fitEllipse->DoFit1(&ellipse, hitX, hitY);
+		fitEllipse->DoFit(&ellipse, hitX, hitY);
 		fhErrorA->Fill(A - ellipse.GetAaxis());
 		fhErrorB->Fill(B - ellipse.GetBaxis());
 		fhErrorX->Fill(X0 - ellipse.GetCenterX());

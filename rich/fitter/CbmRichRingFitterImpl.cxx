@@ -1,23 +1,9 @@
-/******************************************************************************
-*  $Id: CbmRichRingFitterImpl.cxx,v 1.2 2006/09/13 14:57:15 hoehne Exp $
+/**
+* \file CbmRichRingFitterImpl.cxx
 *
-*  Class  : CbmRichRingFitterImpl
-*  Description: Empty file, just there to please CINT, DoFit is implemented
-*               in the actual algorithm.
-*
-*  Author : Supriya Das
-*  E-mail : S.Das@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichRingFitterImpl.cxx,v $
-*  Revision 1.2  2006/09/13 14:57:15  hoehne
-*  task for calculating Chi2 of ring fit added
-*
-*  Revision 1.1  2006/01/19 11:33:12  hoehne
-*  initial version: base class for RingFitters
-*
-*
-*******************************************************************************/
+* \author Supriya Das
+* \date 2006
+**/
 #include "CbmRichRingFitterImpl.h"
 
 #include "CbmRichRing.h"

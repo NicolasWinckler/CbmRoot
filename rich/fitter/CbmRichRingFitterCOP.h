@@ -43,7 +43,7 @@ public:
 
    /**
     * \brief Fit ring using hit coordinates from vectors.
-    * \param[in,out] ring RICH ring to be fitted.
+    * \param[in] ring RICH ring to be fitted.
     * \param[in] hitX Vector of x coordinates of hits.
     * \param[in] hitY Vector of y coordinates of hits.
     */

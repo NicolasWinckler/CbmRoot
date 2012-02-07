@@ -1,11 +1,11 @@
- /**
- * \file CbmRichGeoTest.h
- *
- * \brief RICH geometry checking and testing.
- *
- * \author Semen Lebedev <s.lebedev@gsi.de>
- * \date 2011
- **/
+/**
+* \file CbmRichGeoTest.h
+*
+* \brief RICH geometry checking and testing.
+*
+* \author Semen Lebedev <s.lebedev@gsi.de>
+* \date 2011
+**/
 
 #ifndef CBMRICHGEOTEST_H
 #define CBMRICHGEOTEST_H

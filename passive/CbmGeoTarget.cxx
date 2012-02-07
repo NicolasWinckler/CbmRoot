@@ -12,7 +12,11 @@
 
 ClassImp(CbmGeoTarget)
 
-CbmGeoTarget::CbmGeoTarget() {
+CbmGeoTarget::CbmGeoTarget() 
+: FairGeoSet(),
+  modName(),
+  eleName()
+{
   // Constructor
   fName="target";
   strcpy(modName,"t");

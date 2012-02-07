@@ -18,6 +18,7 @@ CbmTarget::~CbmTarget()
 {
 }
 CbmTarget::CbmTarget()
+  : FairModule()
 {
 }
 

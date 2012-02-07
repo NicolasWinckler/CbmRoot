@@ -10,7 +10,11 @@
 
 ClassImp(CbmShieldGeo)
 
-CbmShieldGeo::CbmShieldGeo() {
+CbmShieldGeo::CbmShieldGeo() 
+: FairGeoSet(),
+  modName(),
+  eleName()
+{
   // Constructor
   fName="shield";
   strcpy(modName,"m");

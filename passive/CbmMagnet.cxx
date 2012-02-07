@@ -16,15 +16,18 @@
 #include "TObjArray.h"
 
 CbmMagnet::CbmMagnet()
+  : CbmModule("CbmMagnet", "CbmMagnet"),
+    frot(NULL),
+    fposrot(NULL)
 {
 }
 
 CbmMagnet::CbmMagnet(const char *name, const char *title, Double_t px, Double_t py, Double_t pz,
 							Double_t rx, Double_t ry, Double_t rz)
-  : CbmModule(name, title)
+  : CbmModule(name, title),
+    frot(new TGeoRotation("", rx, ry, rz)),
+    fposrot(new TGeoCombiTrans(px, py, pz, frot))
 {
-  frot = new TGeoRotation("", rx, ry, rz);
-  fposrot = new TGeoCombiTrans(px, py, pz, frot);
 }
 
 CbmMagnet::~CbmMagnet()

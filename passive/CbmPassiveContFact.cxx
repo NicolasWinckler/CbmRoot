@@ -22,7 +22,9 @@ ClassImp(CbmPassiveContFact)
 
 static CbmPassiveContFact gCbmPassiveContFact;
 
-CbmPassiveContFact::CbmPassiveContFact() {
+CbmPassiveContFact::CbmPassiveContFact() 
+  : FairContFact()
+{
   // Constructor (called when the library is loaded)
   fName="CbmPassiveContFact";
   fTitle="Factory for parameter containers in libPassive";

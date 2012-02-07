@@ -12,7 +12,11 @@
 
 ClassImp(CbmGeoMagnet)
 
-CbmGeoMagnet::CbmGeoMagnet() {
+CbmGeoMagnet::CbmGeoMagnet() 
+: FairGeoSet(),
+  modName(),
+  eleName()
+{
   // Constructor
   fName="magnet";
   maxSectors=0;

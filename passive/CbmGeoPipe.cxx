@@ -15,7 +15,11 @@
     
 ClassImp(CbmGeoPipe)
 
-CbmGeoPipe::CbmGeoPipe() {
+CbmGeoPipe::CbmGeoPipe() 
+: FairGeoSet(),
+  modName(),
+  eleName()
+{
   // Constructor
   fName="pipe";
   strcpy(modName,"p");

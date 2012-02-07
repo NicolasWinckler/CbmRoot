@@ -12,7 +12,11 @@
 
 ClassImp(CbmGeoStart)
 
-CbmGeoStart::CbmGeoStart() {
+CbmGeoStart::CbmGeoStart() 
+: FairGeoSet(),
+  modName(),
+  eleName()
+{
   // Constructor
   fName="start";
   maxSectors=0;

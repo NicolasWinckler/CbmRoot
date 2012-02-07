@@ -49,7 +49,10 @@ void CbmCave::ConstructGeometry()
         par->setInputVersion(fRun->GetRunId(),1);
 
 }
-CbmCave::CbmCave(){
+CbmCave::CbmCave()
+  : FairModule(),
+    world()
+{
 }
 
 CbmCave::~CbmCave()
@@ -57,7 +60,8 @@ CbmCave::~CbmCave()
 
 }
 CbmCave::CbmCave(const char * name,  const char *Title)
-  : FairModule(name ,Title)
+  : FairModule(name ,Title),
+    world()
 {
     world[0] = 0;
     world[1] = 0;

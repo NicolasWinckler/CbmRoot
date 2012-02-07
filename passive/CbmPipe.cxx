@@ -17,6 +17,7 @@ CbmPipe::~CbmPipe()
 {
 }
 CbmPipe::CbmPipe()
+  : FairModule()
 {
 }
 

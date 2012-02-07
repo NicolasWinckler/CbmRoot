@@ -19,6 +19,7 @@ CbmShield::~CbmShield()
 {
 }
 CbmShield::CbmShield()
+  : FairModule()
 {
 }
 

@@ -21,10 +21,13 @@ using std::ios;
 
 ClassImp(CbmGeoCave)
 
-CbmGeoCave::CbmGeoCave() {
+CbmGeoCave::CbmGeoCave() 
+: FairGeoSet(),
+  name("cave")
+{
   // Constructor
   fName="cave";
-  name="cave";
+  //  name="cave";
   maxModules=1;
 }
 

@@ -17,6 +17,9 @@ class CbmMagnet : public CbmModule {
     TGeoRotation* frot;      //!
     TGeoCombiTrans* fposrot; //!
     
+    CbmMagnet(const CbmMagnet&);
+    CbmMagnet& operator=(const CbmMagnet&);
+
     ClassDef(CbmMagnet,2) //CBMMagnet
 };
 

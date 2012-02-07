@@ -1,4 +1,7 @@
 /** CbmMuchDigitizeAdvancedGem.cxx
+ *@author Evgeny Kryshen <e.kryshen@gsi.de>
+ *@since 01.05.11
+ *@version 2.0
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 19.03.07
  *@version 1.0
@@ -189,6 +192,13 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
     // Calculate number of secondary electrons for each primary electron
     UInt_t nSecElectrons = GasGain(); // number of secondary electrons
+    
+    // if type = 3
+    // determine potential radial sectors (simple)
+    //firedSectors[iSector] = sector;
+    // determine potential azimuthal pads (quite simple)
+    // intersect all potential pads
+    
     Double_t spotL = fSpotRadius * 2.; // diameter of the spot
     Double_t spotArea = spotL * spotL; // spot area
 

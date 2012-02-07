@@ -201,7 +201,10 @@ private:
     void CheckForNeighbours(vector<CbmMvdDigi*>* clusterArray, Int_t clusterDigi, TArrayS* pixelUsed);
     void CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation* station , TVector3& pos, TVector3 &dpos);
 
+ private:
 
+    CbmMvdFindHits(const CbmMvdFindHits&);
+    CbmMvdFindHits& operator=(const CbmMvdFindHits&);
 
     ClassDef(CbmMvdFindHits,1);
 

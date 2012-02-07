@@ -47,21 +47,34 @@ using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMvdHitProducer::CbmMvdHitProducer() 
-  : FairTask("MVDHitProducer") {
-  fMode          = 0;
-  fBranchName    = "MvdPoint";
-  fHits          = new TClonesArray("CbmMvdHit");
-  fMatches       = new TClonesArray("CbmMvdHitMatch");
-  fPileupManager = NULL;
-  fRandGen.SetSeed(2736);
-  fNEvents = 0;
-  fNPoints = fNReal = fNBg = fNFake = fNLost = fNMerged = fTime = 0.;
-  fSigmaX     = 0.0005;
-  fSigmaY     = 0.0005;
-  fEfficiency = 0.99;
-  fMergeDist  = 0.;
-  fFakeRate   = 0.03;
-  fNPileup    = 0;
+  : FairTask("MVDHitProducer"),
+    fMode(0),
+    fSigmaX(0.0005),
+    fSigmaY(0.0005),
+    fEfficiency(0.99),
+    fMergeDist(0.),
+    fFakeRate(0.03),
+    fNPileup(0),
+    fStationMap(),
+    fRadiusMap(),
+    fBranchName("MvdPoint"),
+    fBgFileName(""),
+    fPoints(NULL),
+    fHits(new TClonesArray("CbmMvdHit")),
+    fMatches(new TClonesArray("CbmMvdHitMatch")),
+    fRandGen(2736),
+    fTimer(),
+    fPileupManager(NULL),
+    fGeoPar(NULL),
+    fNEvents(0),
+    fNPoints(0.),
+    fNReal(0.),
+    fNBg(0.),
+    fNFake(0.),
+    fNLost(0.),
+    fNMerged(0.),
+    fTime(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -70,21 +83,34 @@ CbmMvdHitProducer::CbmMvdHitProducer()
 // -----   Standard constructor   ------------------------------------------
 CbmMvdHitProducer::CbmMvdHitProducer(const char* name, Int_t iMode, 
 				     Int_t iVerbose) 
-  : FairTask(name, iVerbose) {
-  fMode          = iMode;
-  fBranchName    = "MvdPoint";
-  fHits          = new TClonesArray("CbmMvdHit");
-  fMatches       = new TClonesArray("CbmMvdHitMatch");
-  fPileupManager = NULL;
-  fRandGen.SetSeed(2736);
-  fNEvents = 0;
-  fNPoints = fNReal = fNBg = fNFake = fNLost = fNMerged = fTime = 0.;
-  fSigmaX     = 0.0005;
-  fSigmaY     = 0.0005;
-  fEfficiency = 0.99;
-  fMergeDist  = 0.;
-  fFakeRate   = 0.03;
-  fNPileup    = 0;
+  : FairTask(name, iVerbose),
+    fMode(iMode),
+    fSigmaX(0.0005),
+    fSigmaY(0.0005),
+    fEfficiency(0.99),
+    fMergeDist(0.),
+    fFakeRate(0.03),
+    fNPileup(0),
+    fStationMap(),
+    fRadiusMap(),
+    fBranchName("MvdPoint"),
+    fBgFileName(""),
+    fPoints(NULL),
+    fHits(new TClonesArray("CbmMvdHit")),
+    fMatches(new TClonesArray("CbmMvdHitMatch")),
+    fRandGen(2736),
+    fTimer(),
+    fPileupManager(NULL),
+    fGeoPar(NULL),
+    fNEvents(0),
+    fNPoints(0.),
+    fNReal(0.),
+    fNBg(0.),
+    fNFake(0.),
+    fNLost(0.),
+    fNMerged(0.),
+    fTime(0.)
+{
 }
 // -------------------------------------------------------------------------
 

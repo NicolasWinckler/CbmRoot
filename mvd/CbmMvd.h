@@ -157,6 +157,9 @@ class CbmMvd : public FairDetector
      **/
     void ResetParameters();
 
+    CbmMvd(const CbmMvd&);
+    CbmMvd& operator=(const CbmMvd&);
+
 
     ClassDef(CbmMvd,1);
 

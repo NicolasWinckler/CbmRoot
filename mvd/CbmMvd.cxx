@@ -35,12 +35,25 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvd::CbmMvd() : FairDetector("MVD", kTRUE, kMVD) {
+CbmMvd::CbmMvd() 
+  : FairDetector("MVD", kTRUE, kMVD), 
+    fTrackID(0),
+    fPdg(0),
+    fVolumeID(0),
+    fPosIn(0.0, 0.0, 0.0, 0.0),
+    fPosOut(0.0, 0.0, 0.0, 0.0),
+    fMomIn(0.0, 0.0, 0.0, 0.0),
+    fMomOut(0.0, 0.0, 0.0, 0.0),
+    fTime(0.),
+    fLength(0.),
+    fELoss(0.),
+    fPosIndex(0),
+    fCollection(new TClonesArray("CbmMvdPoint")),
+    kGeoSaved(kFALSE),
+    fGeoPar(new TList()),
+    fStationMap()
+{
   ResetParameters();
-  fCollection = new TClonesArray("CbmMvdPoint");
-  fPosIndex   = 0;
-  kGeoSaved   = kFALSE;
-  fGeoPar     = new TList();
   fGeoPar->SetName( GetName());
   fVerboseLevel = 1;
 }
@@ -50,12 +63,23 @@ CbmMvd::CbmMvd() : FairDetector("MVD", kTRUE, kMVD) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMvd::CbmMvd(const char* name, Bool_t active) 
-  : FairDetector(name, active, kMVD) {
-  ResetParameters();
-  fCollection = new TClonesArray("CbmMvdPoint");
-  fPosIndex   = 0;
-  kGeoSaved   = kFALSE;
-  fGeoPar     = new TList();
+  : FairDetector(name, active, kMVD),
+    fTrackID(0),
+    fPdg(0),
+    fVolumeID(0),
+    fPosIn(0.0, 0.0, 0.0, 0.0),
+    fPosOut(0.0, 0.0, 0.0, 0.0),
+    fMomIn(0.0, 0.0, 0.0, 0.0),
+    fMomOut(0.0, 0.0, 0.0, 0.0),
+    fTime(0.),
+    fLength(0.),
+    fELoss(0.),
+    fPosIndex(0),
+    fCollection(new TClonesArray("CbmMvdPoint")),
+    kGeoSaved(kFALSE),
+    fGeoPar(new TList()),
+    fStationMap()
+ {
   fGeoPar->SetName( GetName());
   fVerboseLevel = 1;
 }

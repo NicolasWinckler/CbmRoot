@@ -12,17 +12,19 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvdPixelCharge::CbmMvdPixelCharge(){
-    fCharge = -1;
-    fMaxChargeContribution = 0;
-    fDominatingPointX      = 0;
-    fDominatingPointY      = 0;
-    fChannelNrX   = 0;
-    fChannelNrY   = 0;
-    fContributors = 0;
-    fTrackCharge  = 0;
-    fTrackId=-1;
-    fPointId=-1;
+CbmMvdPixelCharge::CbmMvdPixelCharge()
+  : TObject(),
+    fCharge(-1.),
+    fMaxChargeContribution(0.),
+    fDominatingPointX(0.),
+    fDominatingPointY(0.),
+    fContributors(0),
+    fChannelNrX(0),
+    fChannelNrY(0),
+    fTrackCharge(0.),
+    fTrackId(-1),
+    fPointId(-1)
+{
 }
 // -------------------------------------------------------------------------
 Bool_t CbmMvdPixelCharge::TestXY(Int_t channelNrX,Int_t channelNrY)
@@ -38,22 +40,19 @@ Bool_t CbmMvdPixelCharge::TestXY(Int_t channelNrX,Int_t channelNrY)
 }
 
 // -----   Constructor with parameters   -----------------------------------
-CbmMvdPixelCharge::CbmMvdPixelCharge(Float_t charge, Int_t channelNrX, Int_t channelNrY, Int_t pointId, Int_t trackId):TObject()
+CbmMvdPixelCharge::CbmMvdPixelCharge(Float_t charge, Int_t channelNrX, Int_t channelNrY, Int_t pointId, Int_t trackId)
+  : TObject(),
+    fCharge(charge),
+    fMaxChargeContribution(0.),
+    fDominatingPointX(0.),
+    fDominatingPointY(0.),
+    fContributors(0),
+    fChannelNrX(channelNrX),
+    fChannelNrY(channelNrY),
+    fTrackCharge(0.),
+    fTrackId(trackId),
+    fPointId(pointId)
 {
-    fTrackCharge = charge;
-
-    fMaxChargeContribution = 0;
-    fDominatingPointX      = 0;
-    fDominatingPointY      = 0;
-
-    fChannelNrX = channelNrX;
-    fChannelNrY = channelNrY;
-
-    fContributors = 0;
-    fCharge       = 0;
-    fTrackId        = trackId;
-    fPointId	= pointId;
-
 }
 
 // ------- DigestCharge ----------------------------------------------------#

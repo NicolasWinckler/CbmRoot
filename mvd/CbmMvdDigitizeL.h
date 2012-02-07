@@ -301,6 +301,9 @@ private:
   TH2F* h_LengthVsEloss;
   TH2F* h_ElossVsMomIn;
 
+  CbmMvdDigitizeL(const CbmMvdDigitizeL&);
+  CbmMvdDigitizeL& operator=(const CbmMvdDigitizeL&);
+
   ClassDef(CbmMvdDigitizeL,1);
     
 };

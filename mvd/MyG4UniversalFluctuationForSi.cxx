@@ -67,30 +67,28 @@ using namespace CLHEP ;
 // The constructor setups various constants pluc eloss parameters
 // for silicon.   
 MyG4UniversalFluctuationForSi::MyG4UniversalFluctuationForSi()
- :minNumberInteractionsBohr(10.0),
-  theBohrBeta2(50.0*keV/proton_mass_c2),
-  minLoss(0.000001*eV),
-  problim(0.01),
-  alim(10.),
-  nmaxCont1(4),
-  nmaxCont2(16)
+  : particleMass(0.),
+    chargeSquare(1.),     
+    ipotFluct(0.0001736),
+    electronDensity(6.797E+20),
+    f1Fluct(0.8571),
+    f2Fluct(0.1429),
+    e1Fluct(0.000116),
+    e2Fluct(0.00196),
+    rateFluct(0.4),
+    e1LogFluct(-9.063),
+    e2LogFluct(-6.235),
+    ipotLogFluct(-8.659),
+    e0(1.E-5),
+    minNumberInteractionsBohr(10.0),
+    theBohrBeta2(50.0*keV/proton_mass_c2),
+    minLoss(0.000001*eV),
+    problim(0.01),
+    sumalim(-log(problim)),
+    alim(10.),
+    nmaxCont1(4),
+    nmaxCont2(16)
 {
-  sumalim = -log(problim);
-
-  chargeSquare   = 1.;  //Assume all particles have charge 1
-  // Taken from Geant4 printout, HARDWIRED for Silicon.
-  ipotFluct = 0.0001736; //material->GetIonisation()->GetMeanExcitationEnergy();
-  electronDensity = 6.797E+20; // material->GetElectronDensity();
-  f1Fluct      = 0.8571; // material->GetIonisation()->GetF1fluct();
-  f2Fluct      = 0.1429; //material->GetIonisation()->GetF2fluct();
-  e1Fluct      = 0.000116;// material->GetIonisation()->GetEnergy1fluct();
-  e2Fluct      = 0.00196; //material->GetIonisation()->GetEnergy2fluct();
-  e1LogFluct   = -9.063;  //material->GetIonisation()->GetLogEnergy1fluct();
-  e2LogFluct   = -6.235;  //material->GetIonisation()->GetLogEnergy2fluct();
-  rateFluct    = 0.4;     //material->GetIonisation()->GetRateionexcfluct();
-  ipotLogFluct = -8.659;  //material->GetIonisation()->GetLogMeanExcEnergy();
-  e0 = 1.E-5;             //material->GetIonisation()->GetEnergy0fluct();
-
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 MyG4UniversalFluctuationForSi::~MyG4UniversalFluctuationForSi()

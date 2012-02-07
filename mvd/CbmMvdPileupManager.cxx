@@ -16,8 +16,10 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvdPileupManager::CbmMvdPileupManager() {
-  fBuffer     = NULL;
+CbmMvdPileupManager::CbmMvdPileupManager()
+  : TObject(),
+    fBuffer(NULL) 
+{
 }
 // -------------------------------------------------------------------------
 
@@ -26,8 +28,10 @@ CbmMvdPileupManager::CbmMvdPileupManager() {
 // -----   Standard constructor   ------------------------------------------
 CbmMvdPileupManager::CbmMvdPileupManager(TString fileName,
 					 TString branchName,
-					 Int_t nEvents) {
-  fBuffer = new TObjArray(nEvents);
+					 Int_t nEvents) 
+  : TObject(),
+    fBuffer(new TObjArray(nEvents)) 
+{
   if ( ! FillBuffer(fileName, branchName, nEvents) )
     Fatal("CbmMvdPileupManager", "Error in filling buffer");
 }

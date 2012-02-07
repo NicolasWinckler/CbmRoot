@@ -71,6 +71,8 @@ class CbmMvdPileupManager : public TObject
   Int_t FillBuffer(TString fileName, TString branchName, 
 		    Int_t nEvents);
 
+  CbmMvdPileupManager(const CbmMvdPileupManager&);
+  CbmMvdPileupManager& operator=(const CbmMvdPileupManager&);
 
   ClassDef(CbmMvdPileupManager,1);
 

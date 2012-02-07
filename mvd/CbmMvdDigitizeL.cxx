@@ -77,108 +77,98 @@ using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMvdDigitizeL::CbmMvdDigitizeL()
-    : FairTask("MVDDigitizeL")
-{
-    fMode          = 0;
-    fBranchName    = "MvdPoint";
-    fDigis         = new TClonesArray("CbmMvdDigi");
-    fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
-    fPileupManager = NULL;
-    fDeltaManager  = NULL;
-    fRandGen.SetSeed(2736);
-    fEvent       = 0;
-    fTime        = 0.;
-    fSigmaX      = 0.0005;
-    fSigmaY      = 0.0005;
-    fNPileup     = 0;
-    fNDeltaElect = 0;
-    fBgFileName    = "";
-    fDeltaFileName = "";
-    fBgBufferSize    = 1000;
-    fDeltaBufferSize = 10000;
-
-    fPoints=new TRefArray();
-    fFluctuate = new MyG4UniversalFluctuationForSi();
-
-    fEpiTh         = 0.0014;
-    fSegmentLength = 0.0001;
-    fDiffusionCoefficient = 0.0055; // correspondes to the sigma of the gauss with the max drift length
-    fElectronsPerKeV = 276; //3.62 eV for e-h creation
-    fWidthOfCluster  = 3.5; // in sigmas
-    fPixelSizeX = 0.0030; // in cm
-    fPixelSizeY = 0.0030;
-    fCutOnDeltaRays  = 0.00169720;  //MeV
-    fChargeThreshold = 1; //electrons
-    fFanoSilicium    = 0.115;
-    fEsum            = 0;
-    fSegmentDepth    = 0;
-    fCurrentTotalCharge      = 0;
-    fCurrentParticleMass     = 0;
-    fCurrentParticleMomentum = 0;
-    fPixelScanAccelerator    = 0;
-    fLandauRandom=new TRandom3();
-
-    fShowDebugHistos = kFALSE;
-
-    fPixelSize = 0.0010;
-    fPar0 = 3.42157e+02;
-    fPar1 = 7.67981e-01;
-    fPar2 = 0;
-
-    fLandauMPV=1013.;
-    fLandauSigma=159.2;
-    fLandauGain=1.56;
-
-    /*fLorentzY0=-21.74022;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=1.28456;
-    fLorentzA=1008.79877; */
-
-
-
-
-    /*
-    //Mimosa17 - line in cluster
-    fLorentzY0=-1.7;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=1.107;
-    fLorentzA=443.35;
-    */
-
-    /*
-    //Mimosa17 - column in cluster
-    fLorentzY0=-0.16;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=0.905;
-    fLorentzA=357.02;
-    */
-
-    /*
-    //params adjusted from "intermediate" mpv values for mimosa17
-    fLorentzY0=-1.99;
-    fLorentzXc=0.;
-    fLorentzW=1.056;
-    fLorentzA=416.4;
-    */
-
-    /*
-    //mimosa18 - data from column
-    fLorentzY0=-6;
-    fLorentzXc=0.;
-    fLorentzW=0.95;
-    fLorentzA=430.4;
-    */
-
-    //mimosa18 - average column + line
-    fLorentzY0=-6.1;
-    fLorentzXc=0.;
-    fLorentzW=1.03;
-    fLorentzA=477.2;
-
-    //fLorentzNorm=0.00013010281679422413;
-    fLorentzNorm=1;
-    
-    SetPixelSize(18.4);
+  : FairTask("MVDDigitizeL"),
+    fEpiTh(0.0014),
+    fSegmentLength(0.0001),
+    fDiffusionCoefficient(0.0055),
+    fElectronsPerKeV(276.), //3.62 eV for e-h creation
+    fWidthOfCluster(3.5), // in sigmas
+    fPixelSizeX(0.0030), // in cm
+    fPixelSizeY(0.0030),
+    fCutOnDeltaRays(0.00169720),  //MeV
+    fChargeThreshold(1.), //electrons
+    fFanoSilicium(0.115),
+    fEsum(0.),
+    fSegmentDepth(0.),
+    fCurrentTotalCharge(0.),
+    fCurrentParticleMass(0.),
+    fCurrentParticleMomentum(0.),
+    fCurrentParticlePdg(0),
+    fRandomGeneratorTestHisto(NULL),
+    fPosXY(NULL),
+    fpZ(NULL),
+    fPosXinIOut(NULL),
+    fAngle(NULL),
+    fSegResolutionHistoX(NULL),
+    fSegResolutionHistoY(NULL),
+    fSegResolutionHistoZ(NULL),
+    fTotalChargeHisto(NULL),
+    fTotalSegmentChargeHisto(NULL),
+    fLorentzY0(-6.1),
+    fLorentzXc(0.),
+    fLorentzW(1.03),
+    fLorentzA(477.2),
+    fLorentzNorm(1),
+    fLandauMPV(1013.),
+    fLandauSigma(159.2),
+    fLandauGain(1.56),
+    fLandauRandom(new TRandom3()),
+    fPixelSize(0.0010),
+    fPar0(3.42157e+02),
+    fPar1(7.67981e-01),
+    fPar2(0.),
+    fShowDebugHistos(kFALSE),
+    fResolutionHistoX(NULL),
+    fResolutionHistoY(NULL),
+    fNumberOfSegments(0),
+    fCurrentLayer(0),
+    fEvent(0),
+    fVolumeId(0),
+    fFluctuate(new MyG4UniversalFluctuationForSi()),
+    fDigis(new TClonesArray("CbmMvdDigi")),
+    fMCTracks(NULL),
+    fPixelCharge(new TClonesArray("CbmMvdPixelCharge")),
+    fPixelChargeShort(),
+    fPixelScanAccelerator(NULL),
+    fChargeMap(),
+    fChargeMapIt(),
+    fMode(0),
+    fSigmaX(0.0005),
+    fSigmaY(0.0005),
+    fEfficiency(0.99),
+    fMergeDist(0.),
+    fFakeRate(0.03),
+    fNPileup(0),
+    fNDeltaElect(0),
+    fDeltaBufferSize(10000),
+    fBgBufferSize(1000),
+    fStationMap(),
+    fBranchName("MvdPoint"),
+    fBgFileName(""),
+    fDeltaFileName(""),
+    fInputPoints(),
+    fPoints(new TRefArray()),
+    fRandGen(2736), 
+    fTimer(),
+    fPileupManager(NULL),
+    fDeltaManager(NULL),
+    fGeoPar(NULL),
+    fNEvents(0.),
+    fNPoints(0.),
+    fNReal(0.),
+    fNBg(0.),
+    fNFake(0.),
+    fNLost(0.),
+    fNMerged(0.),
+    fTime(0.),
+    fSignalPoints(),
+    h_trackLength(NULL),
+    h_numSegments(NULL),
+    h_LengthVsAngle(NULL),
+    h_LengthVsEloss(NULL),
+    h_ElossVsMomIn(NULL)
+{    
+  SetPixelSize(18.4);
 }
 // -------------------------------------------------------------------------
 
@@ -187,114 +177,100 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
 // -----   Standard constructor   ------------------------------------------
 CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
 				 Int_t iVerbose)
-: FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fEpiTh(0.0014),
+    fSegmentLength(0.0001),
+    fDiffusionCoefficient(0.0055),
+    fElectronsPerKeV(276.), //3.62 eV for e-h creation
+    fWidthOfCluster(3.5), // in sigmas
+    fPixelSizeX(0.0030), // in cm
+    fPixelSizeY(0.0030),
+    fCutOnDeltaRays(0.00169720),  //MeV
+    fChargeThreshold(1.), //electrons
+    fFanoSilicium(0.115),
+    fEsum(0.),
+    fSegmentDepth(0.),
+    fCurrentTotalCharge(0.),
+    fCurrentParticleMass(0.),
+    fCurrentParticleMomentum(0.),
+    fCurrentParticlePdg(0),
+    fRandomGeneratorTestHisto(NULL),
+    fPosXY(NULL),
+    fpZ(NULL),
+    fPosXinIOut(NULL),
+    fAngle(NULL),
+    fSegResolutionHistoX(NULL),
+    fSegResolutionHistoY(NULL),
+    fSegResolutionHistoZ(NULL),
+    fTotalChargeHisto(NULL),
+    fTotalSegmentChargeHisto(NULL),
+    fLorentzY0(-6.1),
+    fLorentzXc(0.),
+    fLorentzW(1.03),
+    fLorentzA(477.2),
+    fLorentzNorm(1),
+    fLandauMPV(1013.),
+    fLandauSigma(159.2),
+    fLandauGain(1.56),
+    fLandauRandom(new TRandom3()),
+    fPixelSize(0.0010),
+    fPar0(3.42157e+02),
+    fPar1(7.67981e-01),
+    fPar2(0.),
+    fShowDebugHistos(kFALSE),
+    fResolutionHistoX(NULL),
+    fResolutionHistoY(NULL),
+    fNumberOfSegments(0),
+    fCurrentLayer(0),
+    fEvent(0),
+    fVolumeId(0),
+    fFluctuate(new MyG4UniversalFluctuationForSi()),
+    fDigis(new TClonesArray("CbmMvdDigi")),
+    fMCTracks(NULL),
+    fPixelCharge(new TClonesArray("CbmMvdPixelCharge")),
+    fPixelChargeShort(),
+    fPixelScanAccelerator(NULL),
+    fChargeMap(),
+    fChargeMapIt(),
+    fMode(iMode),
+    fSigmaX(0.0005),
+    fSigmaY(0.0005),
+    fEfficiency(0.99),
+    fMergeDist(0.),
+    fFakeRate(0.03),
+    fNPileup(0),
+    fNDeltaElect(0),
+    fDeltaBufferSize(10000),
+    fBgBufferSize(1000),
+    fStationMap(),
+    fBranchName("MvdPoint"),
+    fBgFileName(""),
+    fDeltaFileName(""),
+    fInputPoints(),
+    fPoints(new TRefArray()),
+    fRandGen(2736), 
+    fTimer(),
+    fPileupManager(NULL),
+    fDeltaManager(NULL),
+    fGeoPar(NULL),
+    fNEvents(0.),
+    fNPoints(0.),
+    fNReal(0.),
+    fNBg(0.),
+    fNFake(0.),
+    fNLost(0.),
+    fNMerged(0.),
+    fTime(0.),
+    fSignalPoints(),
+    h_trackLength(NULL),
+    h_numSegments(NULL),
+    h_LengthVsAngle(NULL),
+    h_LengthVsEloss(NULL),
+    h_ElossVsMomIn(NULL)
 {
-    cout << "Starting CbmMvdDigitizeL::CbmMvdDigitizeL() "<< endl;
-
-    fMode          = iMode;
-    fBranchName    = "MvdPoint";
-    fDigis         = new TClonesArray("CbmMvdDigi");
-    fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
-    fPileupManager = NULL;
-    fDeltaManager  = NULL;
-    fRandGen.SetSeed(2736);
-    fEvent       = 0;
-    fTime        = 0.;
-    fSigmaX      = 0.0005;
-    fSigmaY      = 0.0005;
-    fNPileup     = 0;
-    fNDeltaElect = 0;
-    fBgFileName    = "";
-    fDeltaFileName = "";
-    fBgBufferSize    = 1000;
-    fDeltaBufferSize = 10000;
-
-    fPoints    = new TRefArray();
-    fFluctuate = new MyG4UniversalFluctuationForSi();
-
-    fEpiTh         = 0.0014;
-    fSegmentLength = 0.0001;
-    fDiffusionCoefficient = 0.0055; // correspondes to the sigma of the gauss with the largest drift length
-    fElectronsPerKeV = 276; //3.62 eV deposited for creation of 1 pair electron/hole
-    fWidthOfCluster  = 3.5; // in sigmas
-    fPixelSizeX      = 0.0030; // in cm
-    fPixelSizeY      = 0.0030;
-    fCutOnDeltaRays  = 0.00169720; //MeV
-    fChargeThreshold = 1; //charge threshold above which the digis are filled
-    fFanoSilicium    = 0.115; //not used for the moment, 02 june 08
-
-    fSegmentDepth        = 0;
-    fCurrentTotalCharge  = 0;
-    fCurrentParticleMass = 0;
-    fCurrentParticleMomentum = 0;
-    fPixelScanAccelerator    = 0;
-    fLandauRandom=new TRandom3();
-    /*fLandauMPV=967.;
-    fLandauSigma=208;*/
-
-    fShowDebugHistos = kFALSE;
-
-    fPixelSize = 0.0010;
-    fPar0 = 3.42157e+02;
-    fPar1 = 7.67981e-01;
-    fPar2 = 0;
-
-
-    fLandauMPV=1013.;
-    fLandauSigma=159.2;
-    fLandauGain=1.56;
-    
-    /*fLorentzY0=-21.74022;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=1.28456;
-    fLorentzA=1008.79877; */
-
-    /*
-    //line in cluster
-    fLorentzY0=-1.7;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=1.107;
-    fLorentzA=443.35;
-    */
-
-    /*
-    //column in cluster
-    fLorentzY0=-0.16;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=0.905;
-    fLorentzA=357.02;
-    */
-
-    /*
-    //params adjusted from "intermediate" mpv values  for mimosa 17
-    fLorentzY0=-1.99;
-    fLorentzXc=0.; // -0.04133
-    fLorentzW=1.056;
-    fLorentzA=416.4;
-    */
-
-    /*
-    //mimosa18 - data from column
-    fLorentzY0=-6;
-    fLorentzXc=0.;
-    fLorentzW=0.95;
-    fLorentzA=430.4;
-    */
-
-    //mimosa18 - average column + line
-    fLorentzY0=-6.1;
-    fLorentzXc=0.;
-    fLorentzW=1.03;
-    fLorentzA=477.2;
-
-
-
-    //fLorentzNorm=0.00013010281679422413;
-    fLorentzNorm=1;
-    
-    SetPixelSize(18.4);
-    
- }
+  cout << "Starting CbmMvdDigitizeL::CbmMvdDigitizeL() "<< endl;    
+  SetPixelSize(18.4);  
+}
 
 
 // -------------------------------------------------------------------------

@@ -198,6 +198,10 @@ class CbmMvdHitProducer : public FairTask
    **/
   Int_t MergeHits();
 
+ private: 
+
+  CbmMvdHitProducer(const CbmMvdHitProducer&);
+  CbmMvdHitProducer& operator=(const CbmMvdHitProducer&);
 
   ClassDef(CbmMvdHitProducer,1);
     

@@ -841,7 +841,7 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
                yRich.push_back(richPoints[i].GetY());
             }
             CbmRichRing* ring = new CbmRichRing();
-            fRichEllipseFitter->DoFit1(ring, xRich, yRich);
+            fRichEllipseFitter->DoFit(ring, xRich, yRich);
             // B/A dependence histograms
             Double_t boa = ring->GetBaxis()/ring->GetAaxis();
             FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichBoA", boa);

@@ -1,6 +1,6 @@
-trd_v12a
-trd_v11d
 trd_v11c
+trd_v11d
+trd_v12a
 
 trd_v10a
 trd_v10b
@@ -9,16 +9,12 @@ trd_v10d
 trd_v10e
 trd_v10f
 
-# trd_muon_setup_jul10_v02
-# trd_squared_modules_jul10_v01
-# trd_squared_modules_jul10_v02
-# trd_squared_modules_jul10_v03
-# trd_squared_modules_jul10_v04
-# trd_squared_modules_jul10_v05
-# trd_standard
-
 #
-#
-# First line defines the geometry for run_sim.C, run_reco.C, run_reco_trd_test.C and run_reco_trd_hitrate_test.C
-#
-#
+# First line defines the geometry for:
+# 
+# run_sim.C
+# run_reco.C
+# run_reco_clusterizer.C
+# run_reco_hitdensitytest.C
+# run_reco_hitratetest.C
+# 

@@ -15,7 +15,7 @@
   TString magnetGeom = "passive/magnet_v09e.geo";
   TString stsGeom    = "sts/sts_v11a.geo";
   TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v10b.geo";
+  TString trdGeom    = "trd/trd_v11c.geo";
   TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
 

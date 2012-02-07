@@ -49,7 +49,7 @@ void run_reco(Int_t nEvents = 2) {
   TObjString stsDigiFile = paramDir + "/sts/sts_v11a.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  TObjString trdDigiFile =  paramDir + "/trd/trd_v10b.digi.par";
+  TObjString trdDigiFile =  paramDir + "/trd/trd_v11c.digi.par";
   parFileList->Add(&trdDigiFile);
 
 

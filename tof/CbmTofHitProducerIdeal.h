@@ -54,6 +54,10 @@ class CbmTofHitProducerIdeal : public FairTask
   /** Output array of CbmTofHits **/
   TClonesArray* fHitArray;  
 
+ private:
+
+  CbmTofHitProducerIdeal(const CbmTofHitProducerIdeal&);
+  CbmTofHitProducerIdeal& operator=(const CbmTofHitProducerIdeal&);
 
   ClassDef(CbmTofHitProducerIdeal,1);
 

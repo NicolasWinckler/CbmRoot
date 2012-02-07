@@ -29,9 +29,18 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTof::CbmTof() : FairDetector("TOF", kTRUE, kTOF) {
-  fTofCollection = new TClonesArray("CbmTofPoint");
-  fPosIndex = 0;
+CbmTof::CbmTof() 
+  : FairDetector("TOF", kTRUE, kTOF),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fELoss(-1.),
+    fPosIndex(0),
+    fTofCollection(new TClonesArray("CbmTofPoint"))
+{
   fVerboseLevel = 1;
 }
 // -------------------------------------------------------------------------
@@ -40,9 +49,17 @@ CbmTof::CbmTof() : FairDetector("TOF", kTRUE, kTOF) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmTof::CbmTof(const char* name, Bool_t active)
-  : FairDetector(name, active, kTOF) {
-  fTofCollection = new TClonesArray("CbmTofPoint");
-  fPosIndex = 0;
+  : FairDetector(name, active, kTOF),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fELoss(-1.),
+    fPosIndex(0),
+    fTofCollection(new TClonesArray("CbmTofPoint"))
+{
   fVerboseLevel = 1;
 }
 // -------------------------------------------------------------------------

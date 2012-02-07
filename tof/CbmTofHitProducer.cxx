@@ -27,27 +27,58 @@ using std::endl;
 // ---- Default constructor -------------------------------------------
 
 CbmTofHitProducer::CbmTofHitProducer()
+  : FairTask(),
+    fVerbose(1),
+    fTofPoints(NULL),
+    fMCTracks(NULL),
+    fHitCollection(NULL),
+    X(),
+    Dx(),
+    Y(),
+    Dy(),
+    type(),
+    tl(),
+    tr(),
+    trackID_left(),
+    trackID_right(),
+    point_left(),
+    point_right(),
+    fSigmaT(0.),
+    fSigmaXY(0.),
+    fSigmaY(0.),
+    fSigmaZ(0.),
+    fVersion(""),
+    fNHits(-1)
 {
-    fVerbose = 1;
-    fSigmaT  = 0.;
-    fSigmaXY = 0.;
-    fSigmaY  = 0.;
-    fSigmaZ  = 0.;
-    fNHits   = -1;
 }
 
 
 // ---- Constructor ----------------------------------------------------
 
 CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose)
-:FairTask(name,verbose)
+  : FairTask(name,verbose),
+    fVerbose(verbose),
+    fTofPoints(NULL),
+    fMCTracks(NULL),
+    fHitCollection(NULL),
+    X(),
+    Dx(),
+    Y(),
+    Dy(),
+    type(),
+    tl(),
+    tr(),
+    trackID_left(),
+    trackID_right(),
+    point_left(),
+    point_right(),
+    fSigmaT(0.),
+    fSigmaXY(0.),
+    fSigmaY(0.),
+    fSigmaZ(0.),
+    fVersion(""),
+    fNHits(-1)
 {
-    fVerbose =  verbose;
-    fSigmaT  =  0.;
-    fSigmaXY =  0.;
-    fSigmaY  =  0.;
-    fSigmaZ  =  0.;
-    fNHits   = -1;
 }
 
 

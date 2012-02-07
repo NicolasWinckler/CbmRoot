@@ -134,6 +134,9 @@ class CbmTof : public FairDetector
    **/
   void ResetParameters();
 
+  CbmTof(const CbmTof&);
+  CbmTof& operator=(const CbmTof&);
+
 
   ClassDef(CbmTof,1) 
 

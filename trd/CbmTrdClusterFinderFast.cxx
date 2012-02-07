@@ -32,9 +32,9 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId()
+   fTrdId(),
+   ClusterSum(-1)
 {
-
 }
 // --------------------------------------------------------------------
 

@@ -34,9 +34,14 @@ class RowCluster
 {
  public:
   RowCluster()
+    : hasBeenVisited(false),
+    minCol(-1),
+    maxCol(-1),
+    row(-1),
+    digis(new MyDigiList),
+    parents(),
+    children()
     {
-      hasBeenVisited = false;
-      digis = new MyDigiList;
     }
   ~RowCluster()
     {
@@ -52,6 +57,9 @@ class RowCluster
   MyDigiList *digis;
   std::list<RowCluster*> parents;
   std::list<RowCluster*> children;
+ private:
+  RowCluster(const RowCluster&);
+  RowCluster& operator=(const RowCluster&);
 };
 
 
@@ -114,6 +122,9 @@ class CbmTrdClusterFinderFast : public FairTask
   //static const Float_t minimumChargeTH = 5e-03;
 
   Int_t ClusterSum;
+
+  CbmTrdClusterFinderFast(const CbmTrdClusterFinderFast&);
+  CbmTrdClusterFinderFast& operator=(const CbmTrdClusterFinderFast&);
 
   ClassDef(CbmTrdClusterFinderFast,1);
 };

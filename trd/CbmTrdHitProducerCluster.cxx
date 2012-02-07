@@ -34,16 +34,41 @@ using std::endl;
 // ---- Default constructor -------------------------------------------
 CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
   :FairTask("CbmTrdHitProducerCluster",1),
+   fTrdPoints(NULL),
    fDigis(NULL),
    fClusters(NULL),
    fClusterHits(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fTrdId(),
+   fPrfSingleRecoCounter(-1.),
+   fPrfDoubleRecoCounter(-1.),
+   fSimpleRecoCounter(-1.),
+   fStation(-1.),
+   fLayer(-1.),
+   fmoduleId(-1.),
+   fxPos(0.),
+   fyPos(0.),
+   fzPos(0.),
+   fnCol(-1.),
+   fnRow(-1.),
+   fNoSectors(-1.),
+   fClusterId(-1.),
+   fSectorSizeX(),
+   fSectorSizeY(),
+   fPadSizeX(),
+   fPadSizeY(),
+   fSecCol(),
+   fSecRow(),
+   fPadSizeXArray(),
+   fPadSizeYArray(),
+   fModuleSize(),
+   fModulePosition(),
+   fPadSizeLongMap(),
+   fLayersBeforeStation(),
    ModuleHitMap(),
-   fLayersBeforeStation()
+   moduleDigiMap()
 {
-
 }
 
 // ---- Destructor ----------------------------------------------------

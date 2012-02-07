@@ -25,12 +25,50 @@ using std::endl;
 // ---- Default constructor -------------------------------------------------
 
 CbmTrdTracksPidQa::CbmTrdTracksPidQa()
+  : FairTask(),
+    fTrdTrackCollection(NULL),
+    fTrdHitCollection(NULL),
+    fMCPointArray(NULL),
+    fMCTrackArray(NULL),
+    PartID(NULL),
+    NrTRDHits(NULL),
+    ELossPI(NULL),
+    ELossEL(NULL),
+    ELossALL(NULL),
+    MomPI(NULL),
+    MomEL(NULL),
+    MomALL(NULL),
+    MOMvsELossEL(NULL),
+    MOMvsELossPI(NULL),
+    MOMvsELossALL(NULL),
+    WknPI(NULL),
+    WknEL(NULL),
+    WknALL(NULL),
+    WknLowPI(NULL),
+    WknLowEL(NULL),
+    WknLowALL(NULL),
+    WknHighPI(NULL),
+    WknHighEL(NULL),
+    WknHighALL(NULL),
+    AnnPI(NULL),
+    AnnEL(NULL),
+    AnnALL(NULL),
+    AnnLowPI(NULL),
+    AnnLowEL(NULL),
+    AnnLowALL(NULL),
+    AnnHighPI(NULL),
+    AnnHighEL(NULL),
+    AnnHighALL(NULL),
+    LikePI(NULL),
+    LikeEL(NULL),
+    LikeALL(NULL),
+    LikeHighPI(NULL),
+    LikeHighEL(NULL),
+    LikeHighALL(NULL),
+    LikeLowPI(NULL),
+    LikeLowEL(NULL),
+    LikeLowALL(NULL)
 {
-    fTrdTrackCollection   = NULL;
-    fTrdHitCollection   = NULL;
-    fMCTrackArray  = NULL;
-    fMCPointArray  = NULL;
-
 }
 // --------------------------------------------------------------------------
 
@@ -38,13 +76,50 @@ CbmTrdTracksPidQa::CbmTrdTracksPidQa()
 // ---- Standard constructor ------------------------------------------------
 CbmTrdTracksPidQa::CbmTrdTracksPidQa(const char* name,
 					 const char* title)
-: FairTask(name)
+  : FairTask(name),
+    fTrdTrackCollection(NULL),
+    fTrdHitCollection(NULL),
+    fMCPointArray(NULL),
+    fMCTrackArray(NULL),
+    PartID(NULL),
+    NrTRDHits(NULL),
+    ELossPI(NULL),
+    ELossEL(NULL),
+    ELossALL(NULL),
+    MomPI(NULL),
+    MomEL(NULL),
+    MomALL(NULL),
+    MOMvsELossEL(NULL),
+    MOMvsELossPI(NULL),
+    MOMvsELossALL(NULL),
+    WknPI(NULL),
+    WknEL(NULL),
+    WknALL(NULL),
+    WknLowPI(NULL),
+    WknLowEL(NULL),
+    WknLowALL(NULL),
+    WknHighPI(NULL),
+    WknHighEL(NULL),
+    WknHighALL(NULL),
+    AnnPI(NULL),
+    AnnEL(NULL),
+    AnnALL(NULL),
+    AnnLowPI(NULL),
+    AnnLowEL(NULL),
+    AnnLowALL(NULL),
+    AnnHighPI(NULL),
+    AnnHighEL(NULL),
+    AnnHighALL(NULL),
+    LikePI(NULL),
+    LikeEL(NULL),
+    LikeALL(NULL),
+    LikeHighPI(NULL),
+    LikeHighEL(NULL),
+    LikeHighALL(NULL),
+    LikeLowPI(NULL),
+    LikeLowEL(NULL),
+    LikeLowALL(NULL)
 {
-    fTrdTrackCollection   = NULL;
-    fTrdHitCollection   = NULL;
-    fMCTrackArray  = NULL;
-    fMCPointArray  = NULL;
-
 }
 // --------------------------------------------------------------------------
 

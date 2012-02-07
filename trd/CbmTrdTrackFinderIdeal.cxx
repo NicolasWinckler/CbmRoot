@@ -31,10 +31,14 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdTrackFinderIdeal::CbmTrdTrackFinderIdeal()
+  : CbmTrdTrackFinder(),
+    fMCTrackArray(NULL),
+    fMCPointArray(NULL),
+    fNoTrdStations(-1),
+    fNoTrdPerStation(-1),
+    fVerbose(-1),
+    fEventNum(-1)
 {
-  fMCTrackArray = NULL;
-  fMCPointArray = NULL;
-  fVerbose = 1;
 }
 // -------------------------------------------------------------------------
 

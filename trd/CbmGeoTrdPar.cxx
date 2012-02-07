@@ -8,10 +8,10 @@
 ClassImp(CbmGeoTrdPar)
 
 CbmGeoTrdPar::CbmGeoTrdPar(const char* name,const char* title,const char* context)
-           : FairParGenericSet(name,title,context) {
-
-               fGeoSensNodes = new TObjArray();
-               fGeoPassNodes = new TObjArray();
+: FairParGenericSet(name,title,context),
+  fGeoSensNodes(new TObjArray()),
+  fGeoPassNodes(new TObjArray())
+{
 }
 
 CbmGeoTrdPar::~CbmGeoTrdPar(void) {

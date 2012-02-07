@@ -90,6 +90,9 @@ class CbmTrdSetTracksPidWkn : public FairTask
 
   Double_t CbmWknStat(Double_t* Y, Int_t k, Int_t n);
 
+  CbmTrdSetTracksPidWkn(const CbmTrdSetTracksPidWkn&);
+  CbmTrdSetTracksPidWkn& operator=(const CbmTrdSetTracksPidWkn&);
+
   ClassDef(CbmTrdSetTracksPidWkn,1);
 
 };

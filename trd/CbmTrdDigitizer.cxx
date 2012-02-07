@@ -38,20 +38,50 @@ using std::setprecision;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdDigitizer::CbmTrdDigitizer()
-    :FairTask("TrdDigitizer",1)
+  : FairTask("TrdDigitizer",1),
+    fCol(-1),
+    fRow(-1),
+    fModuleID(-1),
+    fMCindex(-1),
+    fELoss(-1.),
+    fTime(-1.),
+    fEfficiency(1.),
+    fTrdPoints(NULL),
+    fDigiCollection(NULL),
+    fDigiMatchCollection(NULL),
+    fMCStack(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fRadiator(new CbmTrdRadiator),
+    fTrdId(),
+    fDigiMap(),
+    fDigiMapIt()
 {
- fRadiator = new CbmTrdRadiator();
- fEfficiency = 1;
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title,
                  CbmTrdRadiator *radiator, Int_t iVerbose)
-	:FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fCol(-1),
+    fRow(-1),
+    fModuleID(-1),
+    fMCindex(-1),
+    fELoss(-1.),
+    fTime(-1.),
+    fEfficiency(1.),
+    fTrdPoints(NULL),
+    fDigiCollection(NULL),
+    fDigiMatchCollection(NULL),
+    fMCStack(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fRadiator(radiator),
+    fTrdId(),
+    fDigiMap(),
+    fDigiMapIt()
 {
-  fRadiator = radiator;
-  fEfficiency = 1;
 }
 // --------------------------------------------------------------------
 

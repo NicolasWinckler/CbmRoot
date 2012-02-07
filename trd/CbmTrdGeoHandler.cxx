@@ -18,6 +18,8 @@ using std::cout;
 using std::endl;
 
 CbmTrdGeoHandler::CbmTrdGeoHandler() 
+  : TObject(),
+    fTrdId()
 {
 }
 

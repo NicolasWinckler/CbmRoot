@@ -29,8 +29,10 @@ using std::endl;
 
 // -------------------------------------------------------------------------
 CbmTrdTrackFitterIdeal::CbmTrdTrackFitterIdeal()
+  : CbmTrdTrackFitter(),
+    fArrayTrdPoint(NULL),
+    fArrayTrdHit(NULL)
 {
-    // Default constructor
 }
 // -------------------------------------------------------------------------
 
@@ -38,7 +40,6 @@ CbmTrdTrackFitterIdeal::CbmTrdTrackFitterIdeal()
 // -------------------------------------------------------------------------
 CbmTrdTrackFitterIdeal::~CbmTrdTrackFitterIdeal()
 {
-    // Destructor
 }
 // -------------------------------------------------------------------------
 

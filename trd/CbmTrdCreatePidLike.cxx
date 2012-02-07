@@ -21,10 +21,18 @@ using std::endl;
 
 // ---- Default constructor -------------------------------------------------
 
-CbmTrdCreatePidLike::CbmTrdCreatePidLike() {
-    fTrdHitCollection   = NULL;
-    fTrdPointCollection = NULL;
-
+CbmTrdCreatePidLike::CbmTrdCreatePidLike() 
+  : FairTask(),
+    fTrdHitCollection(NULL),
+    fTrdPointCollection(NULL),
+    fMCTrackArray(NULL),
+    h1dEdxEL(),
+    h1dEdxPI(),
+    h1dEdxKA(),
+    h1dEdxPR(),
+    h1dEdxMU(),
+    h1momentum(NULL)
+{
     PrepareHistograms();
 }
 // --------------------------------------------------------------------------
@@ -33,10 +41,17 @@ CbmTrdCreatePidLike::CbmTrdCreatePidLike() {
 // ---- Standard constructor ------------------------------------------------
 CbmTrdCreatePidLike::CbmTrdCreatePidLike(const char* name,
         const char* title)
-        : FairTask(name) {
-    fTrdHitCollection   = NULL;
-    fTrdPointCollection = NULL;
-
+  : FairTask(name),
+    fTrdHitCollection(NULL),
+    fTrdPointCollection(NULL),
+    fMCTrackArray(NULL),
+    h1dEdxEL(),
+    h1dEdxPI(),
+    h1dEdxKA(),
+    h1dEdxPR(),
+    h1dEdxMU(),
+    h1momentum(NULL)
+{
     PrepareHistograms();
 }
 // --------------------------------------------------------------------------

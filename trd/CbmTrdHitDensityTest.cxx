@@ -34,16 +34,20 @@ using std::endl;
 // ---- Default constructor -------------------------------------------
 CbmTrdHitDensityTest::CbmTrdHitDensityTest()
   :FairTask("CbmTrdHitDensityTest",1),
+   fTrdPoints(NULL),
    fDigis(NULL),
    fClusters(NULL),
    fClusterHits(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fTrdId(),
-   ModulePointMap(),
-   fLayersBeforeStation()
+   fStation(-1),
+   fLayer(-1), 
+   fModuleID(-1),
+   fMCindex(-1),
+   fLayersBeforeStation(),
+   ModulePointMap()
 {
-
 }
 
 // ---- Destructor ----------------------------------------------------

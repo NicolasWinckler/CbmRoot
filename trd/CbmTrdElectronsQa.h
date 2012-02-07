@@ -86,6 +86,9 @@ private:
 
 	Int_t fEventNum;
 
+	CbmTrdElectronsQa(const CbmTrdElectronsQa&);
+	CbmTrdElectronsQa& operator=(const CbmTrdElectronsQa&);
+
 	ClassDef(CbmTrdElectronsQa,1);
 
 };

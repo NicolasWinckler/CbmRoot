@@ -32,9 +32,20 @@ CbmTrdClusterFinder::CbmTrdClusterFinder()
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fTrdId(),
-   fDigiMap()
+   mapIt(),
+   it(),
+   search(),
+   neighbour(),
+   fDigiMap(),
+   fModuleMap(),
+   fNeighbours(),
+   fModDigiMap(),
+   fDigiRow(),
+   fDigiCol(),
+   fDigiCharge(),
+   fClusterBuffer(),
+   fModClusterDigiMap()
 {
-
 }
 // --------------------------------------------------------------------
 

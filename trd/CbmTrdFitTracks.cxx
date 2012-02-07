@@ -20,10 +20,12 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdFitTracks::CbmTrdFitTracks() {
-  fFitter        = NULL;
-  fTrackArray    = NULL;
-  fNofTracks     = 0;
+CbmTrdFitTracks::CbmTrdFitTracks() 
+  : FairTask(),
+    fFitter(NULL),
+    fTrackArray(NULL),
+    fNofTracks(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -33,10 +35,11 @@ CbmTrdFitTracks::CbmTrdFitTracks() {
 CbmTrdFitTracks::CbmTrdFitTracks(const char* name,
 				 const char* title,
 				 CbmTrdTrackFitter* fitter)
-  : FairTask(name) {
-  fFitter        = fitter;
-  fTrackArray    = NULL;
-  fNofTracks     = 0;
+  : FairTask(name),
+    fFitter(fitter),
+    fTrackArray(NULL),
+    fNofTracks(-1)
+{
 }
 // -------------------------------------------------------------------------
 

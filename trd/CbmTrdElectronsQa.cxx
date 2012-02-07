@@ -17,12 +17,42 @@ using std::cout;
 using std::endl;
 
 CbmTrdElectronsQa::CbmTrdElectronsQa()
+  : FairTask(),
+    fEnergyCutForClusters(-1.),
+    fMCTracks(NULL),
+    fTrdPoints(NULL),
+    fTrdTracks(NULL),
+    fTrdTrackMatches(NULL),
+    fTrdHits(NULL),
+    fOutPi(),
+    fOutEl(),
+    fOutFileNamePi(""),
+    fOutFileNameEl(""),
+    fGeoType("st"),
+    fhPiELoss(NULL),
+    fhPiELossSum(NULL),
+    fhEldEdX(NULL),
+    fhElTR(NULL),
+    fhElELoss(NULL),
+    fhElElossSum(NULL),
+    fhElNofZeroTR(NULL),
+    fhElNofClusters(NULL),
+    fhPiNofClusters(NULL),
+    fhElElossRMS(NULL),
+    fhPiElossRMS(NULL),
+    fhElElossMediana(NULL),
+    fhPiElossMediana(NULL),
+    fhNofTrdHitsEl(NULL),
+    fhNofTrdHitsPi(NULL),
+    fhPidANNEl(),
+    fhPidANNPi(),
+    fhElossSortPi(),
+    fhElossSortEl(),
+    fhCumProbSortEl(),
+    fhCumProbSortPi(),  
+    fEventNum(0)
 {
-	fVerbose = 1;
-	fEventNum = 0;
-	fOutFileNamePi = "";
-	fOutFileNameEl = "";
-	fGeoType = "st";
+  fVerbose = 1;
 }
 
 CbmTrdElectronsQa::~CbmTrdElectronsQa()

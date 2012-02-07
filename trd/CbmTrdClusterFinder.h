@@ -96,6 +96,9 @@ class CbmTrdClusterFinder : public FairTask
   std::vector< std::set<Int_t> > fClusterBuffer;
   std::map< Int_t, std::vector< std::set<Int_t> > > fModClusterDigiMap;
 
+  CbmTrdClusterFinder(const CbmTrdClusterFinder&);
+  CbmTrdClusterFinder& operator=(const CbmTrdClusterFinder&);
+
   ClassDef(CbmTrdClusterFinder,1);
   
 };

@@ -80,6 +80,8 @@ class CbmTrdFindTracks : public FairTask
   TClonesArray* fTrackArray;     // Output array of CbmTrdTracks 
   Int_t fNofTracks;              // Number of tracks created
 
+  CbmTrdFindTracks(const CbmTrdFindTracks&);
+  CbmTrdFindTracks& operator=(const CbmTrdFindTracks&);
 
   ClassDef(CbmTrdFindTracks,1);
 

@@ -22,11 +22,12 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdFindTracks::CbmTrdFindTracks()
+  : FairTask(),
+    fFinder(NULL),
+    fTrdHitArray(NULL),
+    fTrackArray(NULL),
+    fNofTracks(-1)
 {
-  fFinder         = NULL;
-  fTrdHitArray    = NULL;
-  fTrackArray     = NULL;
-  fNofTracks      = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -36,12 +37,12 @@ CbmTrdFindTracks::CbmTrdFindTracks()
 CbmTrdFindTracks::CbmTrdFindTracks(const char* name,
 				   const char* title,
 				   CbmTrdTrackFinder* finder)
-: FairTask(name)
+  : FairTask(name),
+    fFinder(finder),
+    fTrdHitArray(NULL),
+    fTrackArray(NULL),
+    fNofTracks(-1)
 {
-  fFinder         = finder;
-  fTrdHitArray    = NULL;
-  fTrackArray     = NULL;
-  fNofTracks      = 0;
 }
 // -------------------------------------------------------------------------
 

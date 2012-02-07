@@ -16,19 +16,21 @@ CbmTrdGas* CbmTrdGas::fgInstance = 0;
 
 
 CbmTrdGas::CbmTrdGas()
+  : TObject(),
+    fDetType(-1),
+    fGasThick(0.),
+    fPercentNobleGas(0.),
+    fPercentCO2(0.),  
+    fNobleGasType(-1),
+    fFileNameLike(""),
+    fFileNameANN("")
 {
-//
   if (fgInstance) {
     Fatal("CbmTrdGas", "Singleton instance already exists.");
     return;
   }
 
-  fDetType=-1;
-  fGasThick=0.;
-  fPercentNobleGas=0.;
-  fPercentCO2=0.;  
   fgInstance = this;
-  fNobleGasType=-1;
 }
 
 void CbmTrdGas::Init() {

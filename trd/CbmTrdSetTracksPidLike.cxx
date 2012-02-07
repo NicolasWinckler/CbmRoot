@@ -24,10 +24,17 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike()
-  :fTrackArray(0), fTrdHitArray(0), fHistdEdx(0), 
-   fNofTracks(0), fTrackMomentum(0), fNBins(0), fBinSize(0)
+  : FairTask(),
+    fTrackArray(NULL), 
+    fTrdHitArray(0), 
+    fglobalTrackArray(NULL),
+    fstsTrackArray(NULL),
+    fHistdEdx(NULL), 
+    fNofTracks(0), 
+    fTrackMomentum(NULL), 
+    fNBins(0), 
+    fBinSize(0)
 {
-  // Default Constructor
 }
 // -------------------------------------------------------------------------
 
@@ -36,10 +43,17 @@ CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike()
 // -----   Standard constructor   ------------------------------------------
 CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike(const char* name,
 				 const char* title)
-  : FairTask(name), fTrackArray(0), fTrdHitArray(0), fHistdEdx(0),
-    fNofTracks(0), fTrackMomentum(0), fNBins(0), fBinSize(0)
+  : FairTask(name), 
+    fTrackArray(NULL), 
+    fTrdHitArray(0), 
+    fglobalTrackArray(NULL),
+    fstsTrackArray(NULL),
+    fHistdEdx(NULL), 
+    fNofTracks(0), 
+    fTrackMomentum(NULL), 
+    fNBins(0), 
+    fBinSize(0)
 {
-
 }
 // -------------------------------------------------------------------------
 

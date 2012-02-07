@@ -135,6 +135,9 @@ class CbmTrdHitProducerCluster : public FairTask
 
   std::map<Int_t, MyDigiList*> moduleDigiMap; //map of <moduleId, List of struct 'MyDigi' pointer>
 
+  CbmTrdHitProducerCluster(const CbmTrdHitProducerCluster&);
+  CbmTrdHitProducerCluster& operator=(const CbmTrdHitProducerCluster&);
+
   ClassDef(CbmTrdHitProducerCluster,1);
 };
 #endif

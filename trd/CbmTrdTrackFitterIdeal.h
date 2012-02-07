@@ -19,6 +19,9 @@ private:
     TClonesArray *fArrayTrdPoint;   // TRD points
     TClonesArray *fArrayTrdHit;     // TRD hits
 
+    CbmTrdTrackFitterIdeal(const CbmTrdTrackFitterIdeal&);
+    CbmTrdTrackFitterIdeal& operator=(const CbmTrdTrackFitterIdeal&);
+
 public:
     CbmTrdTrackFitterIdeal();
     virtual ~CbmTrdTrackFitterIdeal();

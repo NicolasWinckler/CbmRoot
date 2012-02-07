@@ -190,8 +190,11 @@ class CbmTrdHitRateTest : public FairTask {
   /**  iterator over map to store digis for pair of x,y position in module **/
   std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
 
+  CbmTrdHitRateTest(const CbmTrdHitRateTest&);
+  CbmTrdHitRateTest& operator=(const CbmTrdHitRateTest&);
+
   ClassDef(CbmTrdHitRateTest,1)
 
-    };
+};
 
 #endif // CBMTRDHITRATETEST_H

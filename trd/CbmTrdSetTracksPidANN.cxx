@@ -26,23 +26,31 @@ using std::endl;
 //using TMath::LandauI;
 //using TMath::IsNaN;
 // -----   Default constructor   -------------------------------------------
-CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN() {
-
-	fTrackArray = NULL;
-	fTrdHitArray = NULL;
-	fNofTracks = 0;
-	fTRDGeometryType = "st";
+CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN() 
+  : FairTask(),
+    fTrackArray(NULL),
+    fTrdHitArray(NULL),
+    fNofTracks(0),
+    fANNPar1(-1.),
+    fANNPar2(-1.), 
+    fNN(),
+    fTRDGeometryType("st")
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN(const char* name, const char* title) :
-	FairTask(name) {
-	fTrackArray = NULL;
-	fTrdHitArray = NULL;
-	fNofTracks = 0;
-	fTRDGeometryType = "st";
+CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN(const char* name, const char* title) 
+  : FairTask(name),
+    fTrackArray(NULL),
+    fTrdHitArray(NULL),
+    fNofTracks(0),
+    fANNPar1(-1.),
+    fANNPar2(-1.), 
+    fNN(),
+    fTRDGeometryType("st")
+{
 }
 // -------------------------------------------------------------------------
 

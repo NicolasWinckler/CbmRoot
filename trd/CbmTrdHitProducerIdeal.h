@@ -26,6 +26,9 @@ private:
 
     std::vector<Int_t> fLayersBeforeStation; //! 
 
+    CbmTrdHitProducerIdeal(const CbmTrdHitProducerIdeal&);
+    CbmTrdHitProducerIdeal& operator=(const CbmTrdHitProducerIdeal&);
+
 public:
     CbmTrdHitProducerIdeal();
     CbmTrdHitProducerIdeal(const char *name,

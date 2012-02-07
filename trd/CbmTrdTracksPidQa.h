@@ -109,8 +109,10 @@ private:
 
 
     /* Write the QA histograms to file*/
-    void WriteHistograms();
-
+  void WriteHistograms();
+  
+  CbmTrdTracksPidQa(const CbmTrdTracksPidQa&);
+  CbmTrdTracksPidQa& operator=(const CbmTrdTracksPidQa&);
 
     ClassDef(CbmTrdTracksPidQa, 1)
 };

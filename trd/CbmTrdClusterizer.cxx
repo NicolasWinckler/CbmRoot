@@ -43,21 +43,66 @@ using std::fabs;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdClusterizer::CbmTrdClusterizer()
-    :FairTask("TrdCluster")
-	//:fRef(0)
+  : FairTask("TrdCluster"),
+    Digicounter(-1),
+    fLayerZ(),
+    fTime(-1.),
+    fModuleType(-1),
+    fModuleCopy(-1),
+    fModuleID(-1),
+    fMCindex(-1),
+    tempx(0.),
+    tempy(0.),
+    fPadCharge(),
+    fMathieson(),
+    fModuleSize(),
+    fEfficiency(1.),
+    fTrdPoints(NULL),
+    fDigiCollection(new TClonesArray("CbmTrdDigi")),
+    fDigiMatchCollection(NULL),
+    fMCStacks(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fRadiators(NULL),
+    fTrdId(),
+    fDigiMap(),
+    fDigiMapIt(),
+    fModuleParaMap(),
+    fModuleParaMapIt()
 {
-   fDigiCollection = new TClonesArray("CbmTrdDigi");
-  fEfficiency = 1;
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdClusterizer::CbmTrdClusterizer(const char *name, const char *title,
                  CbmTrdRadiator *radiator)
-	:FairTask(name)
+  :FairTask(name),
+    Digicounter(-1),
+    fLayerZ(),
+    fTime(-1.),
+    fModuleType(-1),
+    fModuleCopy(-1),
+    fModuleID(-1),
+    fMCindex(-1),
+    tempx(0.),
+    tempy(0.),
+    fPadCharge(),
+    fMathieson(),
+    fModuleSize(),
+    fEfficiency(1.),
+    fTrdPoints(NULL),
+    fDigiCollection(NULL),
+    fDigiMatchCollection(NULL),
+    fMCStacks(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fRadiators(radiator),
+    fTrdId(),
+    fDigiMap(),
+    fDigiMapIt(),
+    fModuleParaMap(),
+    fModuleParaMapIt()
 {
-  fRadiators = radiator;
-  fEfficiency = 1;
 }
 // --------------------------------------------------------------------
 

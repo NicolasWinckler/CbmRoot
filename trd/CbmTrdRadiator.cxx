@@ -20,67 +20,87 @@ using std::setprecision;
 
 
 // -----   Default constructor   ---------------------------------------
-CbmTrdRadiator::CbmTrdRadiator(){
-  
-  fSpectrum = NULL;
-  fMySpectrum = NULL;
-  fDetSpectrumA = NULL;
-  fDetSpectrum = NULL;
-
+CbmTrdRadiator::CbmTrdRadiator()
+ : fDetType(-1),
+   fFirstPass(kTRUE),
+   fSimpleTR(kTRUE),
+   fNFoils(130),
+   fFoilThick(0.0013),
+   fGapThick(0.02),
+   fGasThick(-1),
+   fFoilDens(-1.),
+   fGapDens(-1.),
+   fFoilOmega(-1.),
+   fGapOmega(-1.),
+   fFoilThickCorr(1.),
+   fGapThickCorr(1.),
+   fGasThickCorr(1.),
+   fnTRprod(-1),
+   fMyDens(-1.),
+   fMyThick(-1.),
+   fCom1(-1.),
+   fCom2(-1.),
+   fSpBinWidth((Float_t)fSpRange / (Float_t)fSpNBins),
+   fSigma(NULL),
+   fSigmaMy(NULL),
+   fSigmaDet(NULL),
+   fSpectrum(NULL),
+   fMySpectrum(NULL),
+   fDetSpectrumA(NULL),
+   fDetSpectrum(NULL),
+   fTrackMomentum(NULL),
+   fFinal(),
+   fnTRabs(),
+   fnTRab(-1.),
+   fELoss(-1.),
+   fMom(-1.)
+{
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
   }
-
-  fSigma     = NULL;
-  fSigmaMy   = NULL;
-  fSigmaDet  = NULL;
-
-  fELoss = - 1.0;
-  fFoilThickCorr = 1.0;
-  fGapThickCorr = 1.0;
-  fGasThickCorr = 1.0;
-
   // Set initial parameters defining the radiator
-  fNFoils = 130;
-  fGapThick   = 0.02;
-  fFoilThick  = 0.0013;
-  fSimpleTR   = kTRUE;
-
   CreateHistograms();
-
 }
 //-----------------------------------------------------------------------------
 // -----  Constructor   --------------------------------------------------
-CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick){
-
-  fSpectrum = NULL;
-  fMySpectrum = NULL;
-  fDetSpectrumA = NULL;
-  fDetSpectrum = NULL;
-
+CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick)
+  : fFirstPass(kTRUE),
+    fSimpleTR(SimpleTR),
+    fNFoils(Nfoils),
+    fFoilThick(FoilThick),
+    fGapThick(GapThick),
+    fGasThick(-1),
+    fFoilDens(-1.),
+    fGapDens(-1.),
+    fFoilOmega(-1.),
+    fGapOmega(-1.),
+    fFoilThickCorr(1.),
+    fGapThickCorr(1.),
+    fGasThickCorr(1.),
+    fnTRprod(-1),
+    fMyDens(-1.),
+    fMyThick(-1.),
+    fCom1(-1.),
+    fCom2(-1.),
+    fSpBinWidth((Float_t)fSpRange / (Float_t)fSpNBins),
+    fSigma(NULL),
+    fSigmaMy(NULL),
+    fSigmaDet(NULL),
+    fSpectrum(NULL),
+    fMySpectrum(NULL),
+    fDetSpectrumA(NULL),
+    fDetSpectrum(NULL),
+    fTrackMomentum(NULL),
+    fFinal(),
+    fnTRabs(),
+    fnTRab(-1.),
+    fELoss(-1.),
+    fMom(-1.)
+{
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
   }
-
-
-  fSigma     = NULL;
-  fSigmaMy   = NULL;
-  fSigmaDet  = NULL;
-
-  fELoss = -1.0;
-  fFoilThickCorr = 1.0;
-  fGapThickCorr = 1.0;
-  fGasThickCorr = 1.0;
-
-
-   // Set initial parameters defining the radiator 
-   fNFoils = Nfoils;
-   fGapThick   = GapThick;
-   fFoilThick  = FoilThick;
-   fSimpleTR   = SimpleTR;
-
   CreateHistograms();
-
 }
 //-----------------------------------------------------------------------------
 // -----   Destructor   ----------------------------------------------------

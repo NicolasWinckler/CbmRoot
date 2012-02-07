@@ -40,6 +40,9 @@ private:
 
     void CreateHistogramms();
 
+    CbmTrdFitTracksQa(const CbmTrdFitTracksQa&);
+    CbmTrdFitTracksQa& operator=(const CbmTrdFitTracksQa&);
+
 public:
     CbmTrdFitTracksQa();
     CbmTrdFitTracksQa(const char* name, Int_t verbose = 1);

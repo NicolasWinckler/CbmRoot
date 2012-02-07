@@ -78,6 +78,9 @@ private:
 
     std::vector<Int_t> fLayersBeforeStation; //! 
  
+    CbmTrdSimpleHitProducerCluster(const CbmTrdSimpleHitProducerCluster&);
+    CbmTrdSimpleHitProducerCluster& operator=(const CbmTrdSimpleHitProducerCluster&);
+
     ClassDef(CbmTrdSimpleHitProducerCluster,2) 
 
 };

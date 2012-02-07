@@ -27,11 +27,28 @@ using std::endl;
 
 // ---- Default constructor -------------------------------------------------
 
-CbmTrdHitProducerQa::CbmTrdHitProducerQa()
+CbmTrdHitProducerQa::CbmTrdHitProducerQa() 
+  : FairTask(),
+    fTrdHitCollection(NULL),
+    fTrdPointCollection(NULL),
+    fMCTrackArray(NULL),
+    fNoTrdStations(-1),
+    fNoTrdPerStation(-1),
+    fHitPoolsX(NULL),
+    fHitPoolsY(NULL),
+    S1L1eTR15(NULL),
+    S1L1edEdx15(NULL),
+    S1L1edE15(NULL),
+    S1L1edEall(NULL),
+    S1L1pidE15(NULL),
+    S1L1pidEall(NULL),
+    S3L4eTR15(NULL),
+    S3L4edEdx15(NULL),
+    S3L4edE15(NULL),
+    S3L4edEall(NULL),
+    S3L4pidE15(NULL),
+    S3L4pidEall(NULL)
 {
-    fTrdHitCollection   = NULL;
-    fTrdPointCollection = NULL;
-
     PrepareHistograms();
 }
 // --------------------------------------------------------------------------
@@ -40,11 +57,27 @@ CbmTrdHitProducerQa::CbmTrdHitProducerQa()
 // ---- Standard constructor ------------------------------------------------
 CbmTrdHitProducerQa::CbmTrdHitProducerQa(const char* name,
 					 const char* title)
-: FairTask(name)
+  : FairTask(name),
+    fTrdHitCollection(NULL),
+    fTrdPointCollection(NULL),
+    fMCTrackArray(NULL),
+    fNoTrdStations(-1),
+    fNoTrdPerStation(-1),
+    fHitPoolsX(NULL),
+    fHitPoolsY(NULL),
+    S1L1eTR15(NULL),
+    S1L1edEdx15(NULL),
+    S1L1edE15(NULL),
+    S1L1edEall(NULL),
+    S1L1pidE15(NULL),
+    S1L1pidEall(NULL),
+    S3L4eTR15(NULL),
+    S3L4edEdx15(NULL),
+    S3L4edE15(NULL),
+    S3L4edEall(NULL),
+    S3L4pidE15(NULL),
+    S3L4pidEall(NULL)
 {
-    fTrdHitCollection   = NULL;
-    fTrdPointCollection = NULL;
-
     PrepareHistograms();
 }
 // --------------------------------------------------------------------------

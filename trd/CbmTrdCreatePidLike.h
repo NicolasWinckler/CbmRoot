@@ -69,6 +69,8 @@ private:
     /* Write test histograms */
     void WriteHistograms();
 
+    CbmTrdCreatePidLike(const CbmTrdCreatePidLike&);
+    CbmTrdCreatePidLike& operator=(const CbmTrdCreatePidLike&);
 
     ClassDef(CbmTrdCreatePidLike, 1)
 };

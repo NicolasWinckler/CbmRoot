@@ -80,6 +80,8 @@ class CbmTrdFitTracks : public FairTask
   TClonesArray* fTrackArray;     // Input array of STS tracks
   Int_t fNofTracks;              // Number of tracks successfully fitted
 
+  CbmTrdFitTracks(const CbmTrdFitTracks&);
+  CbmTrdFitTracks& operator=(const CbmTrdFitTracks&);
 
   ClassDef(CbmTrdFitTracks,1);
 

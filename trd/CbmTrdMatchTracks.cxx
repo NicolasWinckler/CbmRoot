@@ -21,44 +21,44 @@
 #include <map>
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdMatchTracks::CbmTrdMatchTracks() :
-	FairTask("TRD track match", 1),
-	fTracks(NULL),
-	fPoints(NULL),
-	fHits(NULL),
-	fClusters(NULL),
-	fDigiMatches(NULL),
-//	fDigis(NULL),
-	fMatches(NULL),
-	fNofHits(0),
-	fNofTrueHits(0),
-	fNofWrongHits(0),
-	fNofFakeHits(0),
-	fNEvents(0),
-	fUseDigis(kTRUE),
-	fUseClusters(kTRUE)
+CbmTrdMatchTracks::CbmTrdMatchTracks() 
+  : FairTask("TRD track match", 1),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fClusters(NULL),
+    fDigiMatches(NULL),
+    //	fDigis(NULL),
+    fMatches(NULL),
+    fNofHits(0),
+    fNofTrueHits(0),
+    fNofWrongHits(0),
+    fNofFakeHits(0),
+    fNEvents(0),
+    fUseDigis(kTRUE),
+    fUseClusters(kTRUE)
 {
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(
-		Int_t verbose) :
-	FairTask("TRD track match", verbose),
-	fTracks(NULL),
-	fPoints(NULL),
-	fHits(NULL),
-	fClusters(NULL),
-	fDigiMatches(NULL),
-//	fDigis(NULL),
-	fMatches(NULL),
-	fNofHits(0),
-	fNofTrueHits(0),
-	fNofWrongHits(0),
-	fNofFakeHits(0),
-	fNEvents(0),
-	fUseDigis(kTRUE),
-	fUseClusters(kTRUE)
+		Int_t verbose) 
+  : FairTask("TRD track match", verbose),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fClusters(NULL),
+    fDigiMatches(NULL),
+    //	fDigis(NULL),
+    fMatches(NULL),
+    fNofHits(0),
+    fNofTrueHits(0),
+    fNofWrongHits(0),
+    fNofFakeHits(0),
+    fNEvents(0),
+    fUseDigis(kTRUE),
+    fUseClusters(kTRUE)
 {
 }
 // -------------------------------------------------------------------------
@@ -67,22 +67,22 @@ CbmTrdMatchTracks::CbmTrdMatchTracks(
 CbmTrdMatchTracks::CbmTrdMatchTracks(
 		const char* name,
 		const char* title,
-		Int_t verbose) :
-	FairTask(name, verbose),
-	fTracks(NULL),
-	fPoints(NULL),
-	fHits(NULL),
-	fClusters(NULL),
-	fDigiMatches(NULL),
-//	fDigis(NULL),
-	fMatches(NULL),
-	fNofHits(0),
-	fNofTrueHits(0),
-	fNofWrongHits(0),
-	fNofFakeHits(0),
-	fNEvents(0),
-	fUseDigis(kTRUE),
-	fUseClusters(kTRUE)
+		Int_t verbose) 
+  : FairTask(name, verbose),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fClusters(NULL),
+    fDigiMatches(NULL),
+    //	fDigis(NULL),
+    fMatches(NULL),
+    fNofHits(0),
+    fNofTrueHits(0),
+    fNofWrongHits(0),
+    fNofFakeHits(0),
+    fNEvents(0),
+    fUseDigis(kTRUE),
+    fUseClusters(kTRUE)
 {
 }
 // -------------------------------------------------------------------------

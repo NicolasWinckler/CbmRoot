@@ -93,6 +93,9 @@ private:
 
     CbmTrdDetectorId fTrdDetId; // detector ID
 
+    CbmTrdCreateDigiPar(const CbmTrdCreateDigiPar&);
+    CbmTrdCreateDigiPar& operator=(const CbmTrdCreateDigiPar&);
+
     ClassDef(CbmTrdCreateDigiPar,3)
 
     };

@@ -18,12 +18,14 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdSetTracksPidWkn::CbmTrdSetTracksPidWkn() {
-  fTrackArray  = NULL;
-  fTrdHitArray = NULL;
-  fNofTracks   = 0;
-  WknPar1      = 1.279;
-  WknPar2      = 0.61;
+CbmTrdSetTracksPidWkn::CbmTrdSetTracksPidWkn() 
+  : FairTask(),
+    fTrackArray(NULL),
+    fTrdHitArray(NULL),
+    fNofTracks(0),
+    WknPar1(1.279),
+    WknPar2(0.61)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -32,12 +34,14 @@ CbmTrdSetTracksPidWkn::CbmTrdSetTracksPidWkn() {
 // -----   Standard constructor   ------------------------------------------
 CbmTrdSetTracksPidWkn::CbmTrdSetTracksPidWkn(const char* name,
 				 const char* title)
-  : FairTask(name) {
-  fTrackArray  = NULL;
-  fTrdHitArray = NULL;
-  fNofTracks   = 0;
-  WknPar1      = 1.279;
-  WknPar2      = 0.61;
+  : FairTask(name),
+    fTrackArray(NULL),
+    fTrdHitArray(NULL),
+    fNofTracks(0),
+    WknPar1(1.279),
+    WknPar2(0.61)
+ 
+{
 }
 // -------------------------------------------------------------------------
 

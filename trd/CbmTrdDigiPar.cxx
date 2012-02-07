@@ -17,7 +17,12 @@
 CbmTrdDigiPar::CbmTrdDigiPar(const char* name, 
 			     const char* title,
 			     const char* context)
-  : FairParGenericSet(name, title, context) 
+  : FairParGenericSet(name, title, context), 
+    fModuleMap(),
+    fModuleMapIt(),
+    fModuleIdArray(),
+    fNrOfModules(-1),
+    fMaxSectors(-1)
 {
   detName="Trd";
 }

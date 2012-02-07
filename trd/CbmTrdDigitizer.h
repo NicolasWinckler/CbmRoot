@@ -87,6 +87,9 @@ private:
     /**  iterator over map to store digis for pair of x,y position in module **/
     std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
 
+    CbmTrdDigitizer(const CbmTrdDigitizer&);
+    CbmTrdDigitizer& operator=(const CbmTrdDigitizer&);
+
     ClassDef(CbmTrdDigitizer,2)
 
     };

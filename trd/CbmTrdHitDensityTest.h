@@ -69,6 +69,9 @@ class CbmTrdHitDensityTest : public FairTask
 
   std::map<Int_t, MyPointList*> ModulePointMap;
 
+  CbmTrdHitDensityTest(const CbmTrdHitDensityTest&);
+  CbmTrdHitDensityTest& operator=(const CbmTrdHitDensityTest&);
+
   ClassDef(CbmTrdHitDensityTest,1);
 };
 #endif

@@ -144,7 +144,10 @@ private:
     TGraph* fROCGraph;
 
 
-	ClassDef(CbmTrdElectronsTrainAnn,1);
+    CbmTrdElectronsTrainAnn(const CbmTrdElectronsTrainAnn&);
+    CbmTrdElectronsTrainAnn& operator=(const CbmTrdElectronsTrainAnn&);
+
+    ClassDef(CbmTrdElectronsTrainAnn,1);
 
 };
 

@@ -30,16 +30,30 @@ using std::setprecision;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdSimpleHitProducerCluster::CbmTrdSimpleHitProducerCluster()
-    :FairTask("TrdHitProducer",1)
-	//:fRef(0)
+  : FairTask("TrdHitProducer",1),
+    fTrdCluster(NULL),
+    fTrdDigi(NULL),
+    fHitCollection(NULL),
+    fMCStack(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fTrdId(),
+    fLayersBeforeStation()
 {
-
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdSimpleHitProducerCluster::CbmTrdSimpleHitProducerCluster(const char *name, const char *title, Int_t iVerbose)
-	:FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fTrdCluster(NULL),
+    fTrdDigi(NULL),
+    fHitCollection(NULL),
+    fMCStack(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fTrdId(),
+    fLayersBeforeStation()
 {
 
 }

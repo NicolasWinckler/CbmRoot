@@ -89,6 +89,9 @@ private:
 	/** If true than matching will be done using clusters **/
    Bool_t fUseClusters;
 
+   CbmTrdMatchTracks(const CbmTrdMatchTracks&);
+   CbmTrdMatchTracks& operator=(const CbmTrdMatchTracks&);
+
     ClassDef(CbmTrdMatchTracks, 2);
 };
 

@@ -29,9 +29,31 @@ using std::endl;
 
 // -------------------------------------------------------------------
 CbmTrdFitTracksQa::CbmTrdFitTracksQa()
+  : FairTask(),
+    fArrayTrdPoint(NULL),
+    fArrayTrdHit(NULL),
+    fArrayTrdTrack(NULL),
+    fNoEvents(-1),
+    fh_first_resx(NULL),
+    fh_first_resy(NULL),
+    fh_first_restx(NULL),
+    fh_first_resty(NULL),
+    fh_first_resz(NULL),
+    fh_last_resx(NULL),
+    fh_last_resy(NULL),
+    fh_last_restx(NULL),
+    fh_last_resty(NULL),
+    fh_last_resz(NULL),
+    fh_first_pullx(NULL),
+    fh_first_pully(NULL),
+    fh_first_pulltx(NULL),
+    fh_first_pullty(NULL),
+    fh_last_pullx(NULL),
+    fh_last_pully(NULL),
+    fh_last_pulltx(NULL),
+    fh_last_pullty(NULL),
+    fh_chi2ndf(NULL)
 {
-    // Default constructor
-    fArrayTrdPoint = fArrayTrdHit = fArrayTrdTrack = NULL;
     CreateHistogramms();
 }
 // -------------------------------------------------------------------
@@ -39,10 +61,31 @@ CbmTrdFitTracksQa::CbmTrdFitTracksQa()
 
 // -------------------------------------------------------------------
 CbmTrdFitTracksQa::CbmTrdFitTracksQa(const char* name, Int_t verbose)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fArrayTrdPoint(NULL),
+    fArrayTrdHit(NULL),
+    fArrayTrdTrack(NULL),
+    fNoEvents(-1),
+    fh_first_resx(NULL),
+    fh_first_resy(NULL),
+    fh_first_restx(NULL),
+    fh_first_resty(NULL),
+    fh_first_resz(NULL),
+    fh_last_resx(NULL),
+    fh_last_resy(NULL),
+    fh_last_restx(NULL),
+    fh_last_resty(NULL),
+    fh_last_resz(NULL),
+    fh_first_pullx(NULL),
+    fh_first_pully(NULL),
+    fh_first_pulltx(NULL),
+    fh_first_pullty(NULL),
+    fh_last_pullx(NULL),
+    fh_last_pully(NULL),
+    fh_last_pulltx(NULL),
+    fh_last_pullty(NULL),
+    fh_chi2ndf(NULL)
 {
-    // Standard constructor
-    fArrayTrdPoint = fArrayTrdHit = fArrayTrdTrack = NULL;
     CreateHistogramms();
 }
 // -------------------------------------------------------------------

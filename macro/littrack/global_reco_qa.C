@@ -9,9 +9,9 @@
 using std::cout;
 using std::endl;
 
-void global_reco_qa(Int_t nEvents = 500)
+void global_reco_qa(Int_t nEvents = 15)
 {
-	TString dir  = "/data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/events_muon/"; // Output directory
+	TString dir  = "/data.local1/andrey/events/events_electron/"; // Output directory
 	TString resultDir = "./test/"; //Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
@@ -54,18 +54,19 @@ void global_reco_qa(Int_t nEvents = 500)
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir(std::string(resultDir));
-  // run->AddTask(trackingQa);
+   run->AddTask(trackingQa);
 	// ------------------------------------------------------------------------
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();
    fitQa->SetMvdMinNofHits(0);
    fitQa->SetStsMinNofHits(4);
-   fitQa->SetTrdMinNofHits(0);
-   fitQa->SetMuchMinNofHits(16);
-   fitQa->SetOutputDir("./test4/");
+   fitQa->SetTrdMinNofHits(8);
+   fitQa->SetMuchMinNofHits(4);
+   fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+   clusteringQa->SetOutputDir(std::string(resultDir));
    run->AddTask(clusteringQa);
 
 	// -----  Parameter database   --------------------------------------------

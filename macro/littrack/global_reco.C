@@ -350,8 +350,8 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		  //--------------------------------------------------------------------------
 
 		  //-------------------- RICH Ring Fitting -----------------------------------
-		  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose,	1, richGeoType);
-		  CbmRichFitRings* fitRings = new CbmRichFitRings("", "", richFitter);
+		  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau();
+		  CbmRichFitRings* fitRings = new CbmRichFitRings(richFitter);
 		  run->AddTask(fitRings);
 		  //--------------------------------------------------------------------------
 
@@ -404,6 +404,10 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// ------------------------------------------------------------------------
 
 		CbmLitFitQa* fitQa = new CbmLitFitQa();
+		fitQa->SetMvdMinNofHits(0);
+		fitQa->SetStsMinNofHits(normStsPoints);
+		fitQa->SetMuchMinNofHits(normMuchPoints);
+		fitQa->SetTrdMinNofHits(normTrdPoints);
 		fitQa->SetOutputDir(std::string(resultDir));
 		run->AddTask(fitQa);
 

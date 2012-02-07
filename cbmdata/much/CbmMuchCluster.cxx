@@ -10,16 +10,22 @@
 
 
 // ------ Default constructor ----------------------------------------------
-CbmMuchCluster::CbmMuchCluster(){
-   fCharge = 0;
-   fQMax = 0;
+CbmMuchCluster::CbmMuchCluster()
+  : TObject(),
+    fDigiIndices(),
+    fCharge(0),
+    fQMax(0)
+{
 }
 // -------------------------------------------------------------------------
 
 // ------ Standard constructor  --------------------------------------------
-CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge){
-   fCharge = charge;
-   fQMax = 0;
+CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge)
+  : TObject(),
+    fDigiIndices(),
+    fCharge(charge),
+    fQMax(0)
+{
    Int_t nDigis = digiIndices.size();
    Int_t inc = 0;
    fDigiIndices.Set(nDigis);
@@ -30,9 +36,12 @@ CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge){
 // -------------------------------------------------------------------------
 
 // ------ Standard constructor  --------------------------------------------
-CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge , Int_t qMax){
-   fCharge = charge;
-   fQMax = qMax;
+CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge , Int_t qMax)
+  : TObject(),
+    fDigiIndices(),
+    fCharge(charge),
+    fQMax(qMax)
+{
    Int_t nDigis = digiIndices.size();
    Int_t inc = 0;
    fDigiIndices.Set(nDigis);

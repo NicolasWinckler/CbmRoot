@@ -37,7 +37,11 @@ const Long64_t CbmStsDigi::fgkTimeMask = (1 << CbmStsDigi::fgkTimeBits) - 1;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsDigi::CbmStsDigi() : fData(0) {
+CbmStsDigi::CbmStsDigi() 
+  : FairMultiLinkedData(),
+    CbmStsDetectorId(), 
+    fData(0) 
+{
 }
 // -------------------------------------------------------------------------
 
@@ -45,7 +49,11 @@ CbmStsDigi::CbmStsDigi() : fData(0) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsDigi::CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
-		       Int_t channel, Int_t adc, Int_t time) {
+		       Int_t channel, Int_t adc, Int_t time) 
+  : FairMultiLinkedData(),
+    CbmStsDetectorId(), 
+    fData(0) 
+{
   AddIndex(index);
   fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )
     | ( (adc  & fgkCharMask) << fgkCharShift )
@@ -54,12 +62,15 @@ CbmStsDigi::CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, In
 }
 // -------------------------------------------------------------------------
 CbmStsDigi::CbmStsDigi(Int_t index, Int_t station, Int_t sector, Int_t side, 
-		       Int_t channel, Int_t adc, Int_t time) {
+		       Int_t channel, Int_t adc, Int_t time) 
+  : FairMultiLinkedData(),
+    CbmStsDetectorId(), 
+    fData(0) 
+{
   AddIndex(index,adc);
   fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )
     | ( (adc  & fgkCharMask) << fgkCharShift )
-    | ( (time & fgkTimeMask) << fgkTimeShift ) ;
- 
+    | ( (time & fgkTimeMask) << fgkTimeShift ) ; 
 }
 
 

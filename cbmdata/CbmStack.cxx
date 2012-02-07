@@ -23,9 +23,29 @@ using std::pair;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStack::CbmStack(Int_t size) {
-  fParticles = new TClonesArray("TParticle", size);
-  fTracks    = new TClonesArray("CbmMCTrack", size);
+CbmStack::CbmStack(Int_t size) 
+  : FairGenericStack(),
+    fStack(),
+    fParticles(new TClonesArray("TParticle", size)),
+    fTracks(new TClonesArray("CbmMCTrack", size)),
+    fStoreMap(),
+    fStoreIter(),
+    fIndexMap(),
+    fIndexIter(),
+    fPointsMap(),
+    fCurrentTrack(-1),
+    fNPrimaries(0),
+    fNParticles(0),
+    fNTracks(0),
+    fIndex(0),
+    fStoreSecondaries(kTRUE),
+    fMinPoints(1),
+    fEnergyCut(0.),
+    fStoreMothers(kTRUE)
+{
+  /*
+  fParticles = ;
+  fTracks    = ;
   fCurrentTrack = -1;
   fNPrimaries = fNParticles = fNTracks = 0;
   fIndex = 0;
@@ -33,6 +53,7 @@ CbmStack::CbmStack(Int_t size) {
   fMinPoints        = 1;
   fEnergyCut        = 0.;
   fStoreMothers     = kTRUE;
+  */
 }
 
 // -------------------------------------------------------------------------

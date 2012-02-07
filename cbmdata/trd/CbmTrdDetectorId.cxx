@@ -45,6 +45,7 @@ const Int_t CbmTrdDetectorId::bitarray[] = {5,4,3,5,8,7};
 
 
 CbmTrdDetectorId::CbmTrdDetectorId()
+  : modulemask(0)
 {
   Int_t sum=0;
   for (Int_t i=0; i < array_length; i++) {

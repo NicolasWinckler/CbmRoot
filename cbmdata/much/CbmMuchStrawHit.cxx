@@ -6,6 +6,15 @@
 #include "CbmMuchStrawHit.h"
 
 CbmMuchStrawHit::CbmMuchStrawHit()
+  : CbmStripHit(),
+    fX(0.),
+    fY(0.),
+    fDouble(),
+    fInt(),
+    fFlag(0),
+    fPlaneId(0),
+    fTube(0),
+    fSegment(0)   
 {
 	SetType(kMUCHSTRAWHIT);
 }
@@ -24,19 +33,34 @@ CbmMuchStrawHit::CbmMuchStrawHit(
 		Double_t dphi,
 		Double_t dz,
 		Int_t refId,
-		Int_t planeId):
-	CbmStripHit(detectorId, u, phi, z, du, dphi, dz, refId)
+		Int_t planeId)
+  : CbmStripHit(detectorId, u, phi, z, du, dphi, dz, refId),
+    fX(0.),
+    fY(0.),
+    fDouble(),
+    fInt(),
+    fFlag(0),
+    fPlaneId(planeId),
+    fTube(0),
+    fSegment(0)   
 {
 	SetType(kMUCHSTRAWHIT);
-        fPlaneId = planeId;
 }
 
 CbmMuchStrawHit::CbmMuchStrawHit(
 		Int_t detectorId,
 		const TVector3& pos,
 		const TVector3& err,
-		Int_t refId):
-	CbmStripHit(detectorId, pos, err, refId)
+		Int_t refId)
+   : CbmStripHit(detectorId, pos, err, refId),
+    fX(0.),
+    fY(0.),
+    fDouble(),
+    fInt(),
+    fFlag(0),
+    fPlaneId(0),
+    fTube(0),
+    fSegment(0)   
 {
 	SetType(kMUCHSTRAWHIT);
 }

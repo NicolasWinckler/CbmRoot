@@ -5,8 +5,13 @@
  **/
 #include "CbmMuchPixelHit.h"
 
-CbmMuchPixelHit::CbmMuchPixelHit(){
-	SetType(kMUCHPIXELHIT);
+CbmMuchPixelHit::CbmMuchPixelHit()
+  : CbmPixelHit(),
+    fPlaneId(-1),
+    fTime(-1.),
+    fDTime(-1.)
+{
+  SetType(kMUCHPIXELHIT);
 }
 
 CbmMuchPixelHit::~CbmMuchPixelHit(){
@@ -23,10 +28,13 @@ CbmMuchPixelHit::CbmMuchPixelHit(
 		Double_t dz,
 		Double_t dxy,
 		Int_t refId,
-		Int_t planeId):
-	CbmPixelHit(detectorId, x, y, z, dx, dy, dz, dxy, refId){
+		Int_t planeId)
+  : CbmPixelHit(detectorId, x, y, z, dx, dy, dz, dxy, refId),
+    fPlaneId(planeId),
+    fTime(-1.),
+    fDTime(-1.)
+{
 	SetType(kMUCHPIXELHIT);
-	fPlaneId = planeId;
 }
 
 CbmMuchPixelHit::CbmMuchPixelHit(
@@ -35,10 +43,13 @@ CbmMuchPixelHit::CbmMuchPixelHit(
 		const TVector3& err,
 		Double_t dxy,
 		Int_t refId,
-		Int_t planeId):
-	CbmPixelHit(detectorId, pos, err, dxy, refId){
-	SetType(kMUCHPIXELHIT);
-	fPlaneId = planeId;
+		Int_t planeId)
+  : CbmPixelHit(detectorId, pos, err, dxy, refId),
+    fPlaneId(planeId),
+    fTime(-1.),
+    fDTime(-1.)
+{
+  SetType(kMUCHPIXELHIT);
 }
 
 CbmMuchPixelHit::CbmMuchPixelHit(
@@ -49,12 +60,13 @@ CbmMuchPixelHit::CbmMuchPixelHit(
 		Int_t refId,
 		Int_t planeId,
 		Double_t time,
-		Double_t dtime):
-	CbmPixelHit(detectorId, pos, err, dxy, refId){
-	fPlaneId = planeId;
-	SetTime(time);
-	SetDTime(dtime);
-	SetType(kMUCHPIXELHIT);
+		Double_t dtime)
+  : CbmPixelHit(detectorId, pos, err, dxy, refId),
+    fPlaneId(planeId),
+    fTime(time),
+    fDTime(dtime)
+{
+  SetType(kMUCHPIXELHIT);
 }
 
 ClassImp(CbmMuchPixelHit);

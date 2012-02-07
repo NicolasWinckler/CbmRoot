@@ -36,7 +36,7 @@ class CbmStsDetectorId
 
 
   /**    Destructor (empty)   **/
-  ~CbmStsDetectorId() { }
+  virtual ~CbmStsDetectorId() { }
 
 
   /**    Create unique detector ID

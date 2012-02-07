@@ -19,11 +19,19 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMCTrack::CbmMCTrack() {
-  fPdgCode  = fNPoints = 0;
-  fMotherId = -1;
-  fPx = fPy = fPz = 0.;
-  fStartX = fStartY  = fStartZ = fStartT = 0.;
+CbmMCTrack::CbmMCTrack() 
+  : TObject(),
+    fPdgCode(0),
+    fMotherId(-1),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fStartX(0.),
+    fStartY(0.),
+    fStartZ(0.),
+    fStartT(0.),
+    fNPoints(0)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -32,43 +40,60 @@ CbmMCTrack::CbmMCTrack() {
 // -----   Standard constructor   ------------------------------------------
 CbmMCTrack::CbmMCTrack(Int_t pdgCode, Int_t motherId, Double_t px,
 		       Double_t py, Double_t pz, Double_t x, Double_t y,
-		       Double_t z, Double_t t, Int_t nPoints = 0) {
-  fPdgCode  = pdgCode;
-  fMotherId = motherId;
-  fPx = px;
-  fPy = py;
-  fPz = pz;
-  fStartX = x;
-  fStartY = y;
-  fStartZ = z;
-  fStartT = t;
+		       Double_t z, Double_t t, Int_t nPoints = 0) 
+  : TObject(),
+    fPdgCode(pdgCode),
+    fMotherId(motherId),
+    fPx(px),
+    fPy(py),
+    fPz(pz),
+    fStartX(x),
+    fStartY(y),
+    fStartZ(z),
+    fStartT(t),
+    fNPoints(0)
+{
   if (nPoints >= 0) fNPoints = nPoints;
-  else              fNPoints = 0;
+  //  else              fNPoints = 0;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Copy constructor   ----------------------------------------------
-CbmMCTrack::CbmMCTrack(const CbmMCTrack& track) { 
-  *this = track;
+CbmMCTrack::CbmMCTrack(const CbmMCTrack& track) 
+  : TObject(track),
+    fPdgCode(track.fPdgCode),
+    fMotherId(track.fMotherId),
+    fPx(track.fPx),
+    fPy(track.fPy),
+    fPz(track.fPz),
+    fStartX(track.fStartX),
+    fStartY(track.fStartY),
+    fStartZ(track.fStartZ),
+    fStartT(track.fStartT),
+    fNPoints(track.fNPoints)
+{ 
+  //  *this = track;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor from TParticle   ------------------------------------
-CbmMCTrack::CbmMCTrack(TParticle* part) {
-  fPdgCode  = part->GetPdgCode();
-  fMotherId = part->GetMother(0);
-  fPx       = part->Px();
-  fPy       = part->Py();
-  fPz       = part->Pz();
-  fStartX   = part->Vx();
-  fStartY   = part->Vy();
-  fStartZ   = part->Vz();
-  fStartT   = part->T()*1e09;
-  fNPoints  = 0;
+CbmMCTrack::CbmMCTrack(TParticle* part) 
+  : TObject(),
+    fPdgCode(part->GetPdgCode()),
+    fMotherId(part->GetMother(0)),
+    fPx(part->Px()),
+    fPy(part->Py()),
+    fPz(part->Pz()),
+    fStartX(part->Vx()),
+    fStartY(part->Vy()),
+    fStartZ(part->Vz()),
+    fStartT(part->T()*1e09),
+    fNPoints(0)
+{
 }
 // -------------------------------------------------------------------------
 

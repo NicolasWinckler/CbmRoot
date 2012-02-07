@@ -12,37 +12,33 @@
 
 // ------------------------------------------------------------------
 CbmSttHit::CbmSttHit()
+  : CbmHit(),
+    fPlaneID(-1),
+    fChamber(-1),
+    fTube(-1),
+    fSegment(-1),
+    fAlong(0.),
+    fU(0.)
 {
-    // Default constructor
 }
-// ------------------------------------------------------------------
-
-// ------------------------------------------------------------------
-/*
-CbmTrdHit::CbmTrdHit(Int_t detID, TVector3& pos, TVector3& dpos, Int_t index,
-		     Int_t planeID, Double_t eLossTR, Double_t eLossdEdx,
-		     Double_t eLoss)
-: FairHit(detID, pos, dpos, index)
-{
-    // Standard constructor
-    fPlaneID = planeID;
-    fELossTR = eLossTR;
-    fELossdEdx = eLossdEdx;
-    fELoss = eLoss;
-}
-*/
-// ------------------------------------------------------------------
-
 // ------------------------------------------------------------------
 CbmSttHit::CbmSttHit(Int_t detID, TVector3& pos, TVector3& dpos, 
 		     Int_t index, CbmSttPoint *point)
-: CbmHit(detID, pos, dpos, 0., index)
+  : CbmHit(detID, pos, dpos, 0., index),
+    fPlaneID(point->GetLayerNo() + (point->GetStationNo() - 1) * 6),
+    fChamber(point->GetChamberNo()),
+    fTube(0),
+    fSegment(0),
+    fAlong(0.),
+    fU(0.)
 {
   // Standard constructor
-  fPlaneID = point->GetLayerNo() + (point->GetStationNo() - 1) * 6;
+  /*
+  fPlaneID = ;
   fTube = fSegment = 0;
-  fChamber = point->GetChamberNo();
+  fChamber = ;
   fAlong = 0.;
+  */
 }
 // ------------------------------------------------------------------
 

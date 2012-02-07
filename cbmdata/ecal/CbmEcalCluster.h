@@ -38,17 +38,21 @@ class CbmEcalCluster : public TObject
 public:
 
   /** Default constructor **/
-  CbmEcalCluster():fHitMult(0),fX(0),fY(0),fEnergy(0.){};
+ CbmEcalCluster() : TObject(), fHitMult(0), fX(0), fY(0), 
+    fM2x(0.), fM2y(0.), fEnergy(0.), fPosList() {};
 
   /** Constructor which cleans a vector of hits **/
-  CbmEcalCluster( Int_t detId):fHitMult(0),fX(0),fY(0),fEnergy(0.)
+ CbmEcalCluster( Int_t detId): TObject(), fHitMult(0), fX(0), fY(0), 
+    fM2x(0.), fM2y(0.), fEnergy(0.), fPosList()
   {  
     fPosList.clear();
     fPosList.push_back(detId);
   };
 
   // Constructor which fills a vector of hits **/
-  CbmEcalCluster( std::vector<Int_t> myvec, Double32_t energy ):fHitMult(0),fX(0),fY(0),fEnergy(energy)
+  CbmEcalCluster( std::vector<Int_t> myvec, Double32_t energy )
+    : TObject(), fHitMult(0), fX(0), fY(0), fM2x(0.), fM2y(0.), 
+    fEnergy(energy), fPosList() 
   {
     fPosList.clear();
     fPosList = myvec;

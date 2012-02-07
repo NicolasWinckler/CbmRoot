@@ -6,7 +6,13 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmSttPoint::CbmSttPoint() : FairMCPoint() { }
+CbmSttPoint::CbmSttPoint() 
+  : FairMCPoint(),
+    fStation(0),
+    fLayer(0),
+    fChamber(0)
+{ 
+}
 // -------------------------------------------------------------------------
 
 
@@ -18,7 +24,8 @@ CbmSttPoint::CbmSttPoint(Int_t trackID, Int_t detID, TVector3 pos,
     fStation(0),
     fLayer(0),
     fChamber(0)
-{ }
+{ 
+}
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------

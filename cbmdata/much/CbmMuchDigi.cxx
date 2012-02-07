@@ -13,33 +13,47 @@
 #include "CbmMuchDigi.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchDigi::CbmMuchDigi() {
+CbmMuchDigi::CbmMuchDigi() 
+  : TObject(),
+    fDetectorId(0),
+    fChannelId(0),
+    fADCCharge(0),
+    fTime(-1.),
+    fDTime(8e-2),
+    fDeadTime(-1.)
+{
+  /*
   fDetectorId   =  0;
   fChannelId = 0;
   fTime = -1;
   fDTime = 8e-2;
+  */
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime, Double_t deadTime) {
-  fDetectorId = detectorId;
-  fChannelId = channelId;
-  fADCCharge = 0;
-  fDTime = dTime;
-  fTime = time;
-  fDeadTime = deadTime;
+CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime, Double_t deadTime) 
+  : TObject(),
+    fDetectorId(detectorId),
+    fChannelId(channelId),
+    fADCCharge(0),
+    fTime(time),
+    fDTime(dTime),
+    fDeadTime(deadTime)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi){
-  fDetectorId = digi->GetDetectorId();
-  fChannelId  = digi->GetChannelId();
-  fADCCharge  = digi->GetADCCharge();
-  fDTime      = digi->GetDTime();
-  fTime       = digi->GetTime();
-  fDeadTime   = digi->GetDeadTime();
+CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi)
+  : TObject(),
+    fDetectorId(digi->GetDetectorId()),
+    fChannelId(digi->GetChannelId()),
+    fADCCharge(digi->GetADCCharge()),
+    fTime(digi->GetTime()),
+    fDTime(digi->GetDTime()),
+    fDeadTime(digi->GetDeadTime())
+{
 }
 // -------------------------------------------------------------------------
 

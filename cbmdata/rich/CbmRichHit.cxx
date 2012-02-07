@@ -6,10 +6,12 @@
 #include "CbmRichHit.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmRichHit::CbmRichHit(): CbmPixelHit() {
-  fPmtId=0;
-  fNPhotons=0;
-  fAmplitude=0.;
+CbmRichHit::CbmRichHit()
+  : CbmPixelHit(), 
+    fPmtId(0),
+    fNPhotons(0),
+    fAmplitude(0.)
+{
 }
 // -------------------------------------------------------------------------
 

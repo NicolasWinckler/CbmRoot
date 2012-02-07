@@ -6,8 +6,12 @@ ClassImp(CbmZdcEvent)
 
 
 //-------------------------------------------------------------------- 
- CbmZdcEvent::CbmZdcEvent()
- {
+CbmZdcEvent::CbmZdcEvent()
+: TObject(),
+  fImpact(-1.),
+  fNumberOfEvent(-1),
+  fChannel() 
+{
    //  Reset;
  }
 //-------------------------------------------------------------------- 

@@ -15,28 +15,31 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 
 CbmTofHit::CbmTofHit()
+  : CbmPixelHit(),
+    fTime(0.),
+    fFlag(1)
 {
-  fTime = 0.;
-  fFlag = 1;
+  SetType(kTOFHIT);
 }
 
 
 // -----   Standard constructor   ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time, Int_t flag)
-: CbmPixelHit(detID, pos, dpos, 0., index)
+  : CbmPixelHit(detID, pos, dpos, 0., index),
+    fTime(time),
+    fFlag(flag)
 {
-    fTime = time;
-    fFlag = flag;
-    SetType(kTOFHIT);
+  SetType(kTOFHIT);
 }
 
 // -----   Constructor without flag  ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time)
-: CbmPixelHit(detID, pos, dpos, 0., index)
+  : CbmPixelHit(detID, pos, dpos, 0., index),
+    fTime(time),
+    fFlag(1)    
 {
-    fTime = time;
     SetType(kTOFHIT);
 }
 

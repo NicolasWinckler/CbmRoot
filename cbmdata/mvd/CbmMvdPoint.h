@@ -51,7 +51,7 @@ class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId
 
 
   /** Copy constructor **/
-  CbmMvdPoint(const CbmMvdPoint& point) { *this = point; };
+  //  CbmMvdPoint(const CbmMvdPoint& point) { *this = point; };
 
 
   /** Destructor **/

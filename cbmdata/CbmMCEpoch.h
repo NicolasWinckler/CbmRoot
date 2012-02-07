@@ -113,6 +113,8 @@ class CbmMCEpoch : public TNamed
    **/
   void CreateArrays();
 
+  CbmMCEpoch(const CbmMCEpoch&);
+  CbmMCEpoch& operator=(const CbmMCEpoch&);
 
   ClassDef(CbmMCEpoch,1);
 

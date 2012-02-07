@@ -11,9 +11,16 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmVertex::CbmVertex() : TNamed("Vertex", "Global") {
-  fX = fY = fZ = fChi2 = 0.;
-  fNDF = fNTracks = 0;
+CbmVertex::CbmVertex() 
+  : TNamed("Vertex", "Global"),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fChi2(0.),
+    fNDF(0),
+    fNTracks(0),
+    fCovMatrix()
+{
   for(Int_t i=0; i<6; i++) fCovMatrix[i] = 0;
 }
 // -------------------------------------------------------------------------
@@ -22,9 +29,15 @@ CbmVertex::CbmVertex() : TNamed("Vertex", "Global") {
 
 // -----   Constructor with name and title   -------------------------------
 CbmVertex::CbmVertex(const char* name, const char* title) 
-  : TNamed(name, title) {
-  fX = fY = fZ = fChi2 = 0.;
-  fNDF = fNTracks = 0;
+  : TNamed(name, title),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fChi2(0.),
+    fNDF(0),
+    fNTracks(0),
+    fCovMatrix()
+{
   for(Int_t i=0; i<6; i++) fCovMatrix[i] = 0;
 }
 // -------------------------------------------------------------------------
@@ -36,7 +49,16 @@ CbmVertex::CbmVertex(const char* name, const char* title,
 		     Double_t x, Double_t y, Double_t z, Double_t chi2,
 		     Int_t ndf, Int_t nTracks, 
 		     const TMatrixFSym& covMat) 
-  : TNamed(name, title) {
+  : TNamed(name, title),
+    fX(x),
+    fY(y),
+    fZ(z),
+    fChi2(chi2),
+    fNDF(ndf),
+    fNTracks(nTracks),
+    fCovMatrix()
+{
+  /*
   fTitle   = title;
   fX       = x;
   fY       = y;
@@ -44,6 +66,7 @@ CbmVertex::CbmVertex(const char* name, const char* title,
   fChi2    = chi2;
   fNDF     = ndf;
   fNTracks = nTracks;
+  */
   Int_t index = 0;
   for (Int_t i=0; i<3; i++) {
     for (Int_t j=i; j<3; j++) fCovMatrix[index++] = covMat[i][j];

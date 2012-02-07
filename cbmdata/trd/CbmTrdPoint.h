@@ -45,7 +45,7 @@ public:
 
 
     /** Copy constructor **/
-    CbmTrdPoint(const CbmTrdPoint& point) { *this = point; };
+    //    CbmTrdPoint(const CbmTrdPoint& point) { *this = point; };
 
 
     /** Destructor **/

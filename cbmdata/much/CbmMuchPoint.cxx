@@ -16,9 +16,15 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchPoint::CbmMuchPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
+CbmMuchPoint::CbmMuchPoint() 
+  : FairMCPoint(), 
+    fX_out(0.),
+    fY_out(0.),
+    fZ_out(0.),
+    fPx_out(0.),
+    fPy_out(0.),
+    fPz_out(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -29,13 +35,14 @@ CbmMuchPoint::CbmMuchPoint(Int_t trackID, Int_t detID, TVector3 posIn,
 			   TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			   Double_t tof, Double_t length, Double_t eLoss,
 			   Int_t eventId)
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss, eventId) {
-  fX_out  = posOut.X();
-  fY_out  = posOut.Y();
-  fZ_out  = posOut.Z();
-  fPx_out = momOut.Px();
-  fPy_out = momOut.Py();
-  fPz_out = momOut.Pz();
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss, eventId),
+  fX_out(posOut.X()),
+  fY_out(posOut.Y()),
+  fZ_out(posOut.Z()),
+  fPx_out(momOut.Px()),
+  fPy_out(momOut.Py()),
+  fPz_out(momOut.Pz())
+{
 }
 // -------------------------------------------------------------------------
 
@@ -43,8 +50,16 @@ CbmMuchPoint::CbmMuchPoint(Int_t trackID, Int_t detID, TVector3 posIn,
 
 // -----   Copy constructor with event and epoch time   --------------------
 CbmMuchPoint::CbmMuchPoint(const CbmMuchPoint& point, Int_t eventId,
-			   Double_t eventTime, Double_t epochTime) {
-  *this = point;
+			   Double_t eventTime, Double_t epochTime) 
+  : FairMCPoint(point),
+    fX_out(point.fX_out),
+    fY_out(point.fY_out),
+    fZ_out(point.fZ_out),
+    fPx_out(point.fPx_out),
+    fPy_out(point.fPy_out),
+    fPz_out(point.fPz_out)
+{
+  //  *this = point;
   if ( eventId > 0 ) fEventId = eventId; 
   fTime = point.GetTime() + eventTime - epochTime;
 }

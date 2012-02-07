@@ -26,14 +26,15 @@ using std::map;
 using std::pair;
 
 // -----   Default  constructor   ------------------------------------------
-CbmMuchDigiMatch::CbmMuchDigiMatch() {
-  fRefIndex.Set(0);
-  fCharge.Set(0);
-  fRefIndexPerPrimaryElectron.Set(0);
-  fChargePerPrimaryElectron.Set(0);
-  fDriftTimePerPrimaryElectron.Set(0);
-  fSignalShape.Set(0);
-
+CbmMuchDigiMatch::CbmMuchDigiMatch() :
+  TObject(),
+  fRefIndex(0),
+  fCharge(0),
+  fRefIndexPerPrimaryElectron(0),
+  fChargePerPrimaryElectron(0),
+  fDriftTimePerPrimaryElectron(0),
+  fSignalShape(0)
+{
 };
 // -------------------------------------------------------------------------
 // -----   Standard constructor   ------------------------------------------

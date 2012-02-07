@@ -13,11 +13,21 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmGlobalTrack::CbmGlobalTrack() {
-  fStsTrack = fTrdTrack = fMuchTrack = fRichRing = fTofHit = -1;
-  fPidHypo = fFlag = fNDF = 0;
-  fChi2 = 0.;
-  fLength = 0.;
+CbmGlobalTrack::CbmGlobalTrack() 
+  : TObject(),
+    fStsTrack(-1),
+    fTrdTrack(-1),
+    fMuchTrack(-1),
+    fRichRing(-1),
+    fTofHit(-1),
+    fParamFirst(),
+    fParamLast(),
+    fPidHypo(0),
+    fChi2(0.),
+    fNDF(0),
+    fFlag(0),
+    fLength(0.)
+{
 }
 // -------------------------------------------------------------------------
 

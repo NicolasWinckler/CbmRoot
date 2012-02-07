@@ -12,8 +12,16 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsHit::CbmStsHit() {
-  fDigiF = fDigiB = 0;
+CbmStsHit::CbmStsHit() 
+  : CbmHit(),
+    fDigiF(0),
+    fDigiB(0),
+    fPosSX(0),
+    fPosSY(0),
+    fStatLayer(0),
+    fSignalDiv(0.)
+{
+  //  fDigiF = fDigiB = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -22,14 +30,14 @@ CbmStsHit::CbmStsHit() {
 // -----   Standard constructor   ------------------------------------------
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
 		     Double_t covXY, Int_t iDigiF, Int_t iDigiB)
-  : CbmHit(detId, pos, dpos, covXY, -1) {
-  fDigiF = iDigiF;
-  fDigiB = iDigiB;
-  fPosSX = 0;
-  fPosSY = 0;
-  fSignalDiv = 0.;
-
-  fStatLayer = 0;
+  : CbmHit(detId, pos, dpos, covXY, -1),
+    fDigiF(iDigiF),
+    fDigiB(iDigiB),
+    fPosSX(0),
+    fPosSY(0),
+    fStatLayer(0),
+    fSignalDiv(0.)
+{
   AddIndex(iDigiF);
   AddIndex(iDigiB);
 //   AddLink(FairLink(kStsCluster,iDigiF));
@@ -41,7 +49,15 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
                      Double_t covXY, Int_t iDigiF, Int_t iDigiB,
                      Int_t iPosSX, Int_t iPosSY, Int_t iLayer)
-  :CbmHit(detId, pos, dpos, covXY, -1) {
+  :CbmHit(detId, pos, dpos, covXY, -1),
+   fDigiF(iDigiF),
+   fDigiB(iDigiB),
+   fPosSX(iPosSX),
+   fPosSY(iPosSY),
+   fStatLayer(iLayer),
+   fSignalDiv(0.)
+{
+  /*
   fDigiF = iDigiF;
   fDigiB = iDigiB;
   fPosSX = iPosSX;
@@ -49,10 +65,9 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
   fSignalDiv = 0.;
 
   fStatLayer = iLayer;
+  */
   AddIndex(iDigiF);
-  AddIndex(iDigiB);
-
- 
+  AddIndex(iDigiB); 
 //   AddLink(FairLink(kStsCluster,iDigiF));
 //   AddLink(FairLink(kStsCluster,iDigiB));
 }
@@ -61,8 +76,16 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
 // -----   Standard constructor   ------------------------------------------
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
 		     Double_t covXY, Int_t iDigiF, Int_t iDigiB, Double_t dSignalDiv)
-  : CbmHit(detId, pos, dpos, covXY, -1) {
-  
+  : CbmHit(detId, pos, dpos, covXY, -1),
+    fDigiF(iDigiF),
+    fDigiB(iDigiB),
+    fPosSX(0),
+    fPosSY(0),
+    fStatLayer(0),
+    fSignalDiv(dSignalDiv)
+
+{
+  /*
   fDigiF = iDigiF;
   fDigiB = iDigiB;
   fPosSX = 0;
@@ -70,6 +93,7 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
   fSignalDiv = dSignalDiv;
 
   fStatLayer = 0;
+  */
   AddIndex(iDigiF);
   AddIndex(iDigiB);
 //   AddLink(FairLink(kStsCluster,iDigiF));

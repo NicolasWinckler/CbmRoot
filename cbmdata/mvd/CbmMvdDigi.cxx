@@ -15,18 +15,24 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvdDigi::CbmMvdDigi(){
-    fDetectorId   =  0;
-    fChannelNr    =  0;
-    fChannelNrX = 0;
-    fChannelNrY = 0;
-    fCharge     = 0;
-    fDominatingPointX=0;
-    fDominatingPointY=0;
-    fContributors=0;
-    fMaxChargeContribution=0;
-    fTrackID=-1;
-    fPointID=-1;
+CbmMvdDigi::CbmMvdDigi()
+  : CbmDigi(0, 0),
+    CbmMvdDetectorId(),
+    fCharge(0.),
+    fChannelNrX(0),
+    fChannelNrY(0),
+    fTrackID(-1),
+    fPointID(-1),
+    fPixelSizeX(0.),
+    fPixelSizeY(0.),
+    fDigiFlag(0),
+    fMaxChargeContribution(0.),
+    fDominatingPointX(0.),
+    fDominatingPointY(0.),
+    fContributors(0)
+{
+  //    fDetectorId   =  0;
+  //    fChannelNr    =  0;
 }
 // -------------------------------------------------------------------------
 
@@ -35,31 +41,28 @@ CbmMvdDigi::CbmMvdDigi(){
 // -----   Constructor with parameters   -----------------------------------
 CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Float_t charge,
                        Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Float_t maxChargeContribution, Int_t pointID, Int_t trackID)
-:CbmDigi(kMVD, 0)
+  : CbmDigi(kMVD, 0),
+    CbmMvdDetectorId(),
+    fCharge(charge),
+    fChannelNrX(iChannelNrX),
+    fChannelNrY(iChannelNrY),
+    fTrackID(trackID),
+    fPointID(pointID),
+    fPixelSizeX(pixelSizeX),
+    fPixelSizeY(pixelSizeY),
+    fDigiFlag(-1),
+    fMaxChargeContribution(maxChargeContribution),
+    fDominatingPointX(dominatorX),
+    fDominatingPointY(dominatorY),
+    fContributors(contributors)
 {
     // Check range for station
     if ( ! ( iStation >= 0 && iStation <= 255 ) ) {
 	cout << "-E- CbmMvdDigi: Illegal station number " << iStation << endl;
 	Fatal("", "Illegal station number");
     }
-
     fDetectorId = DetectorId(iStation);
-    fChannelNrY = iChannelNrY;
-    fCharge  = charge;
-    fChannelNrX=iChannelNrX;
-    fChannelNrY=iChannelNrY;
-    fPixelSizeX=pixelSizeX;
-    fPixelSizeY=pixelSizeY;
-    fTrackID=trackID;
-    fPointID=pointID;
-   
-
-    fDigiFlag=-1;
-    fDominatingPointX=dominatorX;
-    fDominatingPointY=dominatorY;
-    fContributors=contributors;
-    fMaxChargeContribution=maxChargeContribution;
-
+    //    fChannelNrY = iChannelNrY;
 }
 // -------------------------------------------------------------------------
 

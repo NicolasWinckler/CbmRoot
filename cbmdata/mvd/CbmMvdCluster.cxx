@@ -13,8 +13,16 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvdCluster::CbmMvdCluster() {
-
+CbmMvdCluster::CbmMvdCluster() 
+  : CbmMvdHit(), 
+    fChargeArray(),
+    fPixelSizeX(0.),
+    fPixelSizeY(0.),
+    fPointInfo(),
+    fPointX(),
+    fPointY(),
+    fContributors(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -23,9 +31,17 @@ CbmMvdCluster::CbmMvdCluster() {
 // -----   Standard constructor   ------------------------------------------
 CbmMvdCluster::CbmMvdCluster(Int_t statNr, TVector3& pos, TVector3& dpos, Int_t flag, 
                              Short_t chargeArray[49], Double_t pixelSizeX, Double_t pixelSizeY)
-:CbmMvdHit(statNr, pos, dpos, flag) {
+  : CbmMvdHit(statNr, pos, dpos, flag), 
+    fChargeArray(),
+    fPixelSizeX(pixelSizeX),
+    fPixelSizeY(pixelSizeY),
+    fPointInfo(),
+    fPointX(),
+    fPointY(),
+    fContributors(-1)
+{
 
-    fContributors=-1;
+  //    fContributors=-1;
 
     for (Int_t i=0;i<49;i++){
 	fChargeArray[i] = chargeArray[i];
@@ -38,8 +54,8 @@ CbmMvdCluster::CbmMvdCluster(Int_t statNr, TVector3& pos, TVector3& dpos, Int_t 
 	fPointY[i]=0;
     }
 
-    fPixelSizeX = pixelSizeX;
-    fPixelSizeY = pixelSizeY;
+    //    fPixelSizeX = ;
+    //    fPixelSizeY = ;
 
 
 }

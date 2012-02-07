@@ -11,8 +11,10 @@ using namespace std;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmHit::CbmHit() {
-  fCovXY = 0.;
+CbmHit::CbmHit() 
+  : FairHit(),
+    fCovXY(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -21,8 +23,9 @@ CbmHit::CbmHit() {
 // -----   Standard constructor   ------------------------------------------
 CbmHit::CbmHit(Int_t detId, TVector3& pos, TVector3& dpos, 
 		     Double_t covXY, Int_t index) 
-  : FairHit(detId, pos, dpos, index) {
-  fCovXY = covXY;
+  : FairHit(detId, pos, dpos, index), 
+    fCovXY(covXY)
+{
 }
 // -------------------------------------------------------------------------
 

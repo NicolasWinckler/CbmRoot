@@ -11,9 +11,15 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdPoint::CbmTrdPoint() : FairMCPoint() { 
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
+CbmTrdPoint::CbmTrdPoint() 
+  : FairMCPoint(),
+    fX_out(0.),
+    fY_out(0.),
+    fZ_out(0.),
+    fPx_out(0.),
+    fPy_out(0.),
+    fPz_out(0.)
+{ 
 }
 // -------------------------------------------------------------------------
 
@@ -23,15 +29,15 @@ CbmTrdPoint::CbmTrdPoint() : FairMCPoint() {
 CbmTrdPoint::CbmTrdPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
 			 TVector3 momIn, TVector3 posOut,  TVector3 momOut,
                          Double_t tof, Double_t length, Double_t eLoss)
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) 
-  { 
-        fX_out  = posOut.X();
-        fY_out  = posOut.Y();
-        fZ_out  = posOut.Z();
-        fPx_out = momOut.Px();
-        fPy_out = momOut.Py();
-        fPz_out = momOut.Pz();
-  }
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss),
+  fX_out(posOut.X()),
+  fY_out(posOut.Y()),
+  fZ_out(posOut.Z()),
+  fPx_out(momOut.Px()),
+  fPy_out(momOut.Py()),
+  fPz_out(momOut.Pz())
+{ 
+}
 // -------------------------------------------------------------------------
 
 

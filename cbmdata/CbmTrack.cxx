@@ -11,12 +11,17 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTrack::CbmTrack():
-	fPidHypo(0),
-	fFlag(0),
-	fNDF(0),
-	fChiSq(0.),
-	fPreviousTrackId(-1)
+CbmTrack::CbmTrack()
+  : TObject(),	
+    fHitIndex(),
+    fHitType(),
+    fPidHypo(0),
+    fParamFirst(),
+    fParamLast(),
+    fFlag(0),
+    fChiSq(0.),
+    fNDF(0),
+    fPreviousTrackId(-1)
 {
 }
 // -------------------------------------------------------------------------

@@ -13,20 +13,35 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsCluster::CbmStsCluster() {
-  fDetectorId = 0;
+CbmStsCluster::CbmStsCluster() 
+  : FairMultiLinkedData(),
+    fDetectorId(0),
+    fDigis(),
+    fNofDigis(0),
+    fChannel(0.),
+    fError(0.)
+{
+  //  fDetectorId = 0;
 
   // for now i limit the size to 99...
   for ( Int_t itemp = 100 ; itemp > 0 ; )  fDigis[--itemp] = -1;
   //  fDigis = new Int_t[100];
+  /*
   fNofDigis = 0;
   fChannel  = 0.;
   fError    = 0.;
+  */
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsCluster::CbmStsCluster(Int_t index, Double_t digiSig, Int_t iStation, Int_t iSector, Int_t iSide)
+  : FairMultiLinkedData(),
+    fDetectorId(0),
+    fDigis(),
+    fNofDigis(0),
+    fChannel(0.),
+    fError(0.)
 {
   
   // Check range for station, sector and side
@@ -53,9 +68,11 @@ CbmStsCluster::CbmStsCluster(Int_t index, Double_t digiSig, Int_t iStation, Int_
   //  fDigis = new Int_t[19];
   for ( Int_t itemp = 100 ; itemp > 0 ; )  fDigis[--itemp] = -1;
   //  fDigis = new Int_t[100];
+  /*
   fNofDigis = 0;
   fChannel  = 0.;
   fError    = 0.;
+  */
 }
 // -------------------------------------------------------------------------
 

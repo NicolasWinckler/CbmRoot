@@ -15,12 +15,20 @@ using std::endl;
 using std::map;
 
 // -----   Default constructor   -------------------------------------------
-CbmStsTrack::CbmStsTrack() {
-  fPidHypo = 0;
-  fFlag    = 0;
-  fNDF     = 0;
-  fChi2    = 0.;
-  fB       = 0.;
+CbmStsTrack::CbmStsTrack() 
+  : TObject(),
+    fStsHits(),
+    fMvdHits(),
+    fPidHypo(0),
+    fParamFirst(),
+    fParamLast(),
+    fFlag(0),
+    fChi2(0.),
+    fNDF(0),
+    fB(0.),
+    fStsHitMap(),
+    fMvdHitMap()
+{
 }
 // -------------------------------------------------------------------------
 

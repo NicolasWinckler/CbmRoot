@@ -22,13 +22,15 @@
 
 
 // -----   Default constructor   -------------------------------------------
-CbmRichRingMatch::CbmRichRingMatch() {
-  fMCTrackID    = -1;
-  fNofTrueHits  =  0;
-  fNofWrongHits =  0;
-  fNofFakeHits  =  0;
-  fNofMCHits    =  0;
-  fNofRings     =  0;
+CbmRichRingMatch::CbmRichRingMatch() 
+  : TObject(),
+    fMCTrackID(-1),
+    fNofTrueHits(0),
+    fNofWrongHits(0),
+    fNofFakeHits(0),
+    fNofMCHits(0),
+    fNofRings(0)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -37,13 +39,15 @@ CbmRichRingMatch::CbmRichRingMatch() {
 // -----   Standard constructor   ------------------------------------------
 CbmRichRingMatch::CbmRichRingMatch(Int_t mcTrackID, Int_t nTrue,
 				   Int_t nWrong, Int_t nFake,
-				   Int_t nMCHits, Int_t nRings) {
-  fMCTrackID    = mcTrackID;
-  fNofTrueHits  = nTrue;
-  fNofWrongHits = nWrong;
-  fNofFakeHits  = nFake;
-  fNofMCHits    = nMCHits;
-  fNofRings     = nRings;
+				   Int_t nMCHits, Int_t nRings) 
+  : TObject(),
+    fMCTrackID(mcTrackID),
+    fNofTrueHits(nTrue),
+    fNofWrongHits(nWrong),
+    fNofFakeHits(nFake),
+    fNofMCHits(nMCHits),
+    fNofRings(nRings)
+{
 }
 // -------------------------------------------------------------------------
 

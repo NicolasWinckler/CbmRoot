@@ -6,7 +6,13 @@
 #include "TVector3.h"
 
 CbmTrdHit::CbmTrdHit()
+  : CbmPixelHit(),
+    fPlaneId(-1),
+    fELossTR(-1.),
+    fELossdEdx(-1.),
+    fELoss(-1.)
 {
+  SetType(kTRDHIT);
 }
 
 CbmTrdHit::CbmTrdHit(
@@ -19,13 +25,13 @@ CbmTrdHit::CbmTrdHit(
 		Double_t eLossTR,
 		Double_t eLossdEdx,
 		Double_t eLoss)
-	:CbmPixelHit(detectorId, pos, dpos, dxy, refId),
-	fPlaneId(planeId),
-	fELossTR(eLossTR),
-	fELossdEdx(eLossdEdx),
-	fELoss(eLoss)
+  : CbmPixelHit(detectorId, pos, dpos, dxy, refId),
+    fPlaneId(planeId),
+    fELossTR(eLossTR),
+    fELossdEdx(eLossdEdx),
+    fELoss(eLoss)
 {
-	SetType(kTRDHIT);
+  SetType(kTRDHIT);
 }
 
 CbmTrdHit::~CbmTrdHit()

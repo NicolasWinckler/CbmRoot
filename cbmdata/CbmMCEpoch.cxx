@@ -16,10 +16,13 @@ using namespace std;
 
 
 // -----    Default  constructor   -------------------------------------------
-CbmMCEpoch::CbmMCEpoch() : TNamed("MCEpoch", "MCEpoch") {
-
+CbmMCEpoch::CbmMCEpoch() 
+  : TNamed("MCEpoch", "MCEpoch"),
+    fStartTime(0.),
+    fEpochLength(0.),
+    fPoints()
+{
   CreateArrays();
-
 }
 // ---------------------------------------------------------------------------
 
@@ -27,12 +30,13 @@ CbmMCEpoch::CbmMCEpoch() : TNamed("MCEpoch", "MCEpoch") {
 
 // -----    Standard  constructor   ------------------------------------------
 CbmMCEpoch::CbmMCEpoch(Double_t startTime,
-		       Double_t epochLength) : TNamed("MCEpoch", "MCEpoch"),
-					       fStartTime(startTime),
-					       fEpochLength(epochLength) {
-
+		       Double_t epochLength) 
+  : TNamed("MCEpoch", "MCEpoch"),
+    fStartTime(startTime),
+    fEpochLength(epochLength),
+    fPoints()
+{
   CreateArrays();
-
 }
 // ---------------------------------------------------------------------------
 

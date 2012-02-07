@@ -10,16 +10,22 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmDigi::CbmDigi() {
-  fDetectorId   =  0;
-  fChannelNr    =  0;
+CbmDigi::CbmDigi() 
+  : TObject(),
+    fDetectorId(0),
+    fChannelNr(0)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmDigi::CbmDigi(Int_t iSystem, Int_t iChannel) {
+CbmDigi::CbmDigi(Int_t iSystem, Int_t iChannel) 
+  : TObject(),
+    fDetectorId(0),
+    fChannelNr(0)
+{
 
   // Check range for system ID
   if ( ! ( iSystem >=0 && iSystem <=31 ) ) {

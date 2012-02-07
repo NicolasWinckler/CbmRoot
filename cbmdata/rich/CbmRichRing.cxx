@@ -51,13 +51,30 @@ using std::atan;
 // -----   Default constructor   -------------------------------------------
 CbmRichRing::CbmRichRing()
   : TObject(),
-    fCenterX(), fCenterY(), fRadius(),
-    fTrackID ( -1 ),
-    fDistance ( 99 ),
-    fChi2 ( 0 ),
+    fHitCollection(),
+    fAPar(0.),
+    fBPar(0.),
+    fCPar(0.),
+    fDPar(0.),
+    fEPar(0.),
+    fFPar(0.),
+    fCenterX(), 
+    fCenterY(), 
+    fRadius(0.),
+    fAaxis(0.),
+    fBaxis(0.),
+    fAaxisCor(0.),
+    fBaxisCor(0.),
+    fPhi(0.),
+    fTrackID(-1),
+    fDistance(99.),
+    fChi2(0.),
+    fAngle(0.),
+    fNofHitsOnRing(-1),
+    fSelectionNN(-1.),
     fRecFlag(0)
 {
-    fSelectionNN  = -1.;
+  //    fSelectionNN  = -1.;
     fHitCollection.reserve(40);
 }
 // -------------------------------------------------------------------------
@@ -68,13 +85,30 @@ CbmRichRing::CbmRichRing ( Float_t x,
 			   Float_t y,
 			   Float_t r )
   : TObject(),
-    fCenterX ( x ), fCenterY ( y ), fRadius ( r ),
-    fTrackID ( -1 ),
-    fDistance ( 99 ),
-    fChi2 ( 0 ),
+    fHitCollection(),
+    fAPar(0.),
+    fBPar(0.),
+    fCPar(0.),
+    fDPar(0.),
+    fEPar(0.),
+    fFPar(0.),
+    fCenterX(x), 
+    fCenterY(y), 
+    fRadius(r),
+    fAaxis(0.),
+    fBaxis(0.),
+    fAaxisCor(0.),
+    fBaxisCor(0.),
+    fPhi(0.),
+    fTrackID(-1),
+    fDistance(99.),
+    fChi2(0.),
+    fAngle(0.),
+    fNofHitsOnRing(-1),
+    fSelectionNN(-1.),
     fRecFlag(0)
 {
-    fSelectionNN  = -1.;
+  //    fSelectionNN  = -1.;
     fHitCollection.reserve(40);
 }
 // -------------------------------------------------------------------------

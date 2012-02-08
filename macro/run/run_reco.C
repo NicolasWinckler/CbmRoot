@@ -357,30 +357,16 @@ void run_reco(Int_t nEvents = 2) {
   run->AddTask(richFindRings);
   //--------------------------------------------------------------------------
 
-
-  /*
-   //-------------------- RICH Ring Fitting -----------------------------------
-   Double_t iRingCorr = 1.;      // correction done (default), choose 0 if not
-   CbmRichRingFitter* richFitter = new CbmRichRingFitterTAU(iVerbose,
-   iRingCorr, 2);
-   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
-   run->AddTask(fitRings);
-   //--------------------------------------------------------------------------
-   */
-
   //-------------------- RICH Ring Fitting -----------------------------------
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose,
-  		1, richGeoType);
-  CbmRichFitRings* fitRings = new CbmRichFitRings("", "", richFitter);
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau();
+  CbmRichFitRings* fitRings = new CbmRichFitRings(richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------
-
 
   // ------------------- RICH Ring matching  ---------------------------------
   CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
   run->AddTask(matchRings);
   // -------------------------------------------------------------------------
-
 
   //--------------------- RICH ring-track assignment ------------------------
   Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]

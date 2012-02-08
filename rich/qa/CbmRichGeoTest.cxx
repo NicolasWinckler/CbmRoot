@@ -32,6 +32,8 @@
 #include "TPad.h"
 #include "TLatex.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -39,6 +41,7 @@
 #include <iomanip>
 
 using namespace std;
+using boost::assign::list_of;
 
 CbmRichGeoTest::CbmRichGeoTest()
    :FairTask("RichGeoTestQa")
@@ -603,8 +606,8 @@ void CbmRichGeoTest::DrawHist()
    TCanvas *cFitEff = new TCanvas("rich_geo_fit_eff", "rich_geo_fit_eff", 900, 300);
    cFitEff->Divide(3,1);
    cFitEff->cd(1);
-   DrawH1( (TH1D*)fhNofHitsAll->Clone(), (TH1D*)fhNofHitsCircleFit->Clone(), (TH1D*)fhNofHitsEllipseFit->Clone(),
-         NULL, "All", "Circle fit", "Ellipse fit", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawH1( list_of((TH1D*)fhNofHitsAll->Clone())((TH1D*)fhNofHitsCircleFit->Clone())((TH1D*)fhNofHitsEllipseFit->Clone()),
+         list_of("All")("Circle fit")("Ellipse fit"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
    fhNofHitsCircleFitEff = DivideH1(fhNofHitsCircleFit, fhNofHitsAll, "", "", "Nof hits in ring", "Efficiency");
    fhNofHitsEllipseFitEff = DivideH1(fhNofHitsEllipseFit, fhNofHitsAll, "", "", "Nof hits in ring", "Efficiency");
    cFitEff->cd(2);
@@ -631,11 +634,11 @@ void CbmRichGeoTest::DrawHist()
    TH1D* pzAcc = fhAcc3D->ProjectionZ();
    pzAcc->SetName((string(fhAcc3D->GetName())+"_pz").c_str());
    cAccEff->cd(1);
-   DrawH1((TH1D*)pxMc->Clone(), (TH1D*)pxAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of((TH1D*)pxMc->Clone())((TH1D*)pxAcc->Clone()), list_of("MC")("ACC"), kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
    cAccEff->cd(2);
-   DrawH1((TH1D*)pyMc->Clone(), (TH1D*)pyAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of((TH1D*)pyMc->Clone())((TH1D*)pyAcc->Clone()), list_of("MC")("ACC"), kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
    cAccEff->cd(3);
-   DrawH1((TH1D*)pzMc->Clone(), (TH1D*)pzAcc->Clone(), NULL, NULL, "MC", "ACC", "", "", kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of((TH1D*)pzMc->Clone())((TH1D*)pzAcc->Clone()), list_of("MC")("ACC"), kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
 
    TH1D* pxEff = DivideH1(pxAcc, pxMc, "pxEff", "", "P [GeV/c]", "Efficiency");
    TH1D* pyEff = DivideH1(pyAcc, pyMc, "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
@@ -705,12 +708,11 @@ void CbmRichGeoTest::DrawHist()
    TCanvas *cRABMeanRmsvsNofHits = new TCanvas("rich_geo_rab_mean_rms_vs_nof_hits", "rich_geo_rab_mean_rms_vs_nof_hits", 900, 450);
    cRABMeanRmsvsNofHits->Divide(2, 1);
    cRABMeanRmsvsNofHits->cd(1);
-   DrawH1( prRMean, prAMean, prBMean, NULL,
-         "R", "A", "B", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawH1(list_of(prRMean)(prAMean)(prBMean),
+         list_of("R")("A")("B"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
    cRABMeanRmsvsNofHits->cd(2);
-   DrawH1( prRRms, prARms, prBRms, NULL,
-         "R", "A", "B", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
-
+   DrawH1(list_of(prRRms)(prARms)(prBRms),
+         list_of("R")("A")("B"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
 }
 
 void CbmRichGeoTest::PrintStatisctics()

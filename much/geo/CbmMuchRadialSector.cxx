@@ -60,7 +60,7 @@ Int_t CbmMuchRadialSector::GetChannel(Double_t x, Double_t y) {
 
 // -----   Public method GetChannel   --------------------------------------
 Int_t CbmMuchRadialSector::GetChannel(Double_t phi) {
-  Int_t i = 2*Int_t((phi-fPhi0)/pad_angle);
+  Int_t i = 2*Int_t((phi-fPhi0)/fPadAngle);
   return phi>fPhi0 ? i : i+1;
 }
 // -------------------------------------------------------------------------

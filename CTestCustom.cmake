@@ -54,6 +54,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/boost/exception/exception.hpp:"
         "/include/boost/smart_ptr/detail/sp_convertible.hpp:"
         "/include/boost/smart_ptr/shared_ptr.hpp:"  
+        "/include/boost"
 
         # -- Root warnings which should not show up in the test setup
         "/include/G__ci.h:"
@@ -70,6 +71,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/TFitterMinuit.h:"
         "/include/TGeoMatrix.h:"
         "/include/TGeoPainter.h:"
+        "/include/TGDMLParse.h"
         "/include/TList.h:"
         "/include/TMap.h:"
         "/include/TMatrixT.h:"

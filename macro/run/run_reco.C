@@ -304,9 +304,10 @@ void run_reco(Int_t nEvents = 2) {
   // ----------- TRD track Pid Like ----------------------
   // Since in the newest version of this method depends on the global
   // track the task has to move after the global tracking
-  CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
-  		new CbmTrdSetTracksPidLike("Likelihood", "Likelihood");
-  run->AddTask(trdSetTracksPidLikeTask);
+// FU 08.02.12 Switch the task off since the input file needed for the new geometry has to be generated first.
+//  CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
+//  		new CbmTrdSetTracksPidLike("Likelihood", "Likelihood");
+//  run->AddTask(trdSetTracksPidLikeTask);
   // ----------------------------------------------------
 
 

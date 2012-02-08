@@ -52,7 +52,7 @@ class CbmMuchRadialSector : public TCrown
    *@return    Number of a channel. -1 if the point is outside the sector.
    */
   Int_t GetChannel(Double_t x, Double_t y);
-  
+  Int_t GetChannel(Double_t phi);
   // TODO
   Double_t GetPadAngle() const { return fPadAngle; }
   // TODO
@@ -65,6 +65,7 @@ private:
   TObjArray  fPads;         // Array of pads corresponding to different channels
   TArrayI    fNeighbours;   // Array of indices of neighbour sectors
   Double_t   fPadAngle;     // Pad azimuthal angle in degrees
+  Double_t   fPhi0;         // 
   ClassDef(CbmMuchRadialSector,1);
 };
 

@@ -107,7 +107,7 @@ class CbmMuchModuleSector : public CbmMuchModule
     /** Gets sector by the given channel Id. **/
     CbmMuchRadialSector* GetSector(Long64_t channelId);
     /** Gets sector by the given coordinates in global c.s. */
-    CbmMuchRadialSector* GetSector(Double_t x, Double_t y);
+    CbmMuchRadialSector* GetSectorByRadius(Double_t r);
     /** Gets pad by the given Id. */
     CbmMuchPad* GetPad(Long64_t channelId);
     /** Gets array of pads for this module. */
@@ -146,7 +146,7 @@ class CbmMuchModuleSector : public CbmMuchModule
     TClonesArray*          fClusters;              //!
     multimap<Double_t,Int_t>  fDigis;              //!
     Int_t                  fNSectorChannels;       // Number of channels per "complete" sector
-
+    vector<Double_t>       fSectorRadii;           // vector of radii
     Double_t fDx1;
     Double_t fDx2;
     Double_t fDy;

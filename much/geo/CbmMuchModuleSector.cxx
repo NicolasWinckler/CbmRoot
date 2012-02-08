@@ -78,6 +78,7 @@ CbmMuchModuleSector::~CbmMuchModuleSector() {
 
 // -----   Public method AddSector   ---------------------------------------
 void CbmMuchModuleSector::AddSector(CbmMuchRadialSector* sector) {
+  fSectorRadii.push_back(sector->GetR1());
   fSectors.Add(sector);
 }
 // -------------------------------------------------------------------------
@@ -127,8 +128,12 @@ CbmMuchRadialSector* CbmMuchModuleSector::GetSector(Long64_t channelId) {
 
 
 // -----   Public method GetSector   ---------------------------------------
-CbmMuchRadialSector* CbmMuchModuleSector::GetSector(Double_t x, Double_t y){
-  return 0;
+CbmMuchRadialSector* CbmMuchModuleSector::GetSectorByRadius(Double_t r){
+  vector<Double_t>::iterator i0,ie,i1; 
+  i0 = fSectorRadii.begin();
+  ie = fSectorRadii.end();
+  i1 = upper_bound(i0,ie,r);
+  return (CbmMuchRadialSector*)fSectors.At(i1-i0-1);
 }
 // -------------------------------------------------------------------------
 

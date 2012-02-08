@@ -101,6 +101,16 @@ CbmMuchDigitizeSimpleGem::~CbmMuchDigitizeSimpleGem() {
 
 // ------- Private method ExecSimple ---------------------------------------
 Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
+  // Get entrance and exit coordinates of the point
+  Double_t xIn = point->GetXIn();
+  Double_t yIn = point->GetYIn();
+  Double_t xOut = point->GetXOut();
+  Double_t yOut = point->GetYOut();
+
+  // Get avalanche center position
+  Double_t x0 = (xIn + xOut) / 2;
+  Double_t y0 = (yIn + yOut) / 2;
+
   // Get module for the point
   Int_t detectorId = point->GetDetectorID();
   CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
@@ -113,16 +123,6 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
   TVector3 modSize = module->GetSize();
   Double_t modLx = modSize[0];
   Double_t modLy = modSize[1];
-
-  // Get entrance and exit coordinates of the point
-  Double_t xIn = point->GetXIn();
-  Double_t yIn = point->GetYIn();
-  Double_t xOut = point->GetXOut();
-  Double_t yOut = point->GetYOut();
-
-  // Get avalanche center position
-  Double_t x0 = (xIn + xOut) / 2;
-  Double_t y0 = (yIn + yOut) / 2;
 
   CbmMuchSector* sector = module->GetSector(x0, y0);
   Int_t iChannel = -1;

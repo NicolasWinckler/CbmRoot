@@ -22,6 +22,7 @@ CbmMuchRadialSector::CbmMuchRadialSector():TCrown(){
   fNChannels = 0;
   fNeighbours.Set(0);
   fPadAngle = 0;
+  fPhi0 = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ CbmMuchRadialSector::CbmMuchRadialSector(Int_t detId, Int_t iSector,
   fX1 = 0;
   fY1 = 0;
   fPadAngle = pad_angle;
+  fPhi0 = phi0;
 }
 // -------------------------------------------------------------------------
 
@@ -55,6 +57,14 @@ Int_t CbmMuchRadialSector::GetChannel(Double_t x, Double_t y) {
   return 0;
 }
 // -------------------------------------------------------------------------
+
+// -----   Public method GetChannel   --------------------------------------
+Int_t CbmMuchRadialSector::GetChannel(Double_t phi) {
+  Int_t i = 2*Int_t((phi-fPhi0)/pad_angle);
+  return phi>fPhi0 ? i : i+1;
+}
+// -------------------------------------------------------------------------
+
 
 // -------------------------------------------------------------------------
 void CbmMuchRadialSector::AddPads(){

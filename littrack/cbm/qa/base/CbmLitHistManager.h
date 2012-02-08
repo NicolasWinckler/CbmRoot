@@ -132,6 +132,12 @@ public:
     */
    void Clear();
 
+   /**
+    * \brief Shrinks empty bins in histogram for Xaxis from right side.
+    * \param[in, out] histName Name of histogram.
+    */
+   void ShrinkEmptyBins(
+         const string& histName);
 private:
    // Map of histogram name to its pointer
    map<string, TH1*> fHistMap;

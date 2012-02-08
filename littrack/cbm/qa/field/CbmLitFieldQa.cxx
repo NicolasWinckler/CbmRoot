@@ -37,6 +37,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/assign/list_of.hpp>
+
+using lit::ToString;
+using lit::SaveCanvasAsImage;
+using lit::parallel::LitFieldSlice;
+using lit::parallel::LitFieldValue;
+using lit::parallel::LitFieldGrid;
+using boost::assign::list_of;
 
 CbmLitFieldQa::CbmLitFieldQa():
    fField(NULL),
@@ -205,6 +213,8 @@ void CbmLitFieldQa::CreateHistos()
 
 void CbmLitFieldQa::CreateFieldHistos()
 {
+   string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
+
    // [BX, BY, BZ, MOD] components
    fhBGraph.resize(4);
    for (Int_t i = 0; i < 4; i++) {
@@ -213,6 +223,9 @@ void CbmLitFieldQa::CreateFieldHistos()
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          fhBGraph[v][i] = new TGraph2D();
+         fhBGraph[v][i]->GetXaxis()->SetTitle("X [cm]");
+         fhBGraph[v][i]->GetYaxis()->SetTitle("Y [cm]");
+         fhBGraph[v][i]->GetZaxis()->SetTitle(zTitle[v].c_str());
          fHistoList->Add(fhBGraph[v][i]);
       }
    }
@@ -225,6 +238,8 @@ void CbmLitFieldQa::CreateFieldHistos()
    for (Int_t v = 0; v < 3; v++) {
       for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
          fhBAlongZGraph[v][i] = new TGraph();
+         fhBGraph[v][i]->GetXaxis()->SetTitle("Z [cm]");
+         fhBGraph[v][i]->GetYaxis()->SetTitle(zTitle[v].c_str());
       }
    }
 }
@@ -268,27 +283,34 @@ void CbmLitFieldQa::CreateFitterHistos()
       maxRelErrB = 10.;
    }
 
+   string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
+   string errTitle[] = {"B_{x} error [%]", "B_{y} error [%]", "B_{z} error [%]", "|B| error [%]"};
+   string relErrTitle[] = {"B_{x} relative error [%]", "B_{y} relative error [%]", "B_{z} relative error [%]", "|B| relative error [%]"};
+
    // Create histograms
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          for(Int_t j = 0; j < fNofPolynoms; j++) {
             fhBAprGraph[v][i][j] = new TGraph2D();
+            fhBAprGraph[v][i][j]->GetXaxis()->SetTitle("X [cm]");
+            fhBAprGraph[v][i][j]->GetYaxis()->SetTitle("Y [cm]");
+            fhBAprGraph[v][i][j]->GetZaxis()->SetTitle(zTitle[v].c_str());
             fHistoList->Add(fhBAprGraph[v][i][j]);
 
-            std::string histName = "hBErrH1D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
-            fhBErrH1D[v][i][j] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
+            std::string histName = "hBErrH1D" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            fhBErrH1D[v][i][j] = new TH1D(histName.c_str(), string(histName + ";" + errTitle[v] + ";Counter").c_str(), nofBinsErrB, minErrB, maxErrB);
             fHistoList->Add(fhBErrH1D[v][i][j]);
 
-            histName = "hBErrH2D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
-            fhBErrH2D[v][i][j] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+            histName = "hBErrH2D" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            fhBErrH2D[v][i][j] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + errTitle[v]).c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
             fHistoList->Add(fhBErrH2D[v][i][j]);
 
-            histName = "hBRelErrH1D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
-            fhBRelErrH1D[v][i][j] = new TH1D(histName.c_str(), histName.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
+            histName = "hBRelErrH1D" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            fhBRelErrH1D[v][i][j] = new TH1D(histName.c_str(), string(histName + ";" + relErrTitle[v] + ";Counter").c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
             fHistoList->Add(fhBRelErrH1D[v][i][j]);
 
-            histName = "hBRelErrH2D" + names[v] + lit::ToString<Int_t>(i) + "_" + lit::ToString<Int_t>(j);
-            fhBRelErrH2D[v][i][j] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+            histName = "hBRelErrH2D" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            fhBRelErrH2D[v][i][j] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + relErrTitle[v]).c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
             fHistoList->Add(fhBRelErrH2D[v][i][j]);
          }
       }
@@ -328,26 +350,33 @@ void CbmLitFieldQa::CreateGridHistos()
       maxRelErrB = 10.;
    }
 
+   string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
+   string errTitle[] = {"B_{x} error [%]", "B_{y} error [%]", "B_{z} error [%]", "|B| error [%]"};
+   string relErrTitle[] = {"B_{x} relative error [%]", "B_{y} relative error [%]", "B_{z} relative error [%]", "|B| relative error [%]"};
+
    // Create histograms
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          fhBGridGraph[v][i] = new TGraph2D();
+         fhBGridGraph[v][i]->GetXaxis()->SetTitle("X [cm]");
+         fhBGridGraph[v][i]->GetYaxis()->SetTitle("Y [cm]");
+         fhBGridGraph[v][i]->GetZaxis()->SetTitle(zTitle[v].c_str());
          fHistoList->Add(fhBGridGraph[v][i]);
 
-         std::string histName = "hGridBErrH1D" + names[v] + lit::ToString<Int_t>(i);
-         fhBGridErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsErrB, minErrB, maxErrB);
+         std::string histName = "hGridBErrH1D" + names[v] + ToString<Int_t>(i);
+         fhBGridErrH1D[v][i] = new TH1D(histName.c_str(), string(histName + ";" + errTitle[v] + ";Counter").c_str(), nofBinsErrB, minErrB, maxErrB);
          fHistoList->Add(fhBGridErrH1D[v][i]);
 
-         histName = "hGridBErrH2D" + names[v] + lit::ToString<Int_t>(i);
-         fhBGridErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+         histName = "hGridBErrH2D" + names[v] + ToString<Int_t>(i);
+         fhBGridErrH2D[v][i] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + errTitle[v]).c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
          fHistoList->Add(fhBGridErrH2D[v][i]);
 
-         histName = "hGridBRelErrH1D" + names[v] + lit::ToString<Int_t>(i);
-         fhBGridRelErrH1D[v][i] = new TH1D(histName.c_str(), histName.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
+         histName = "hGridBRelErrH1D" + names[v] + ToString<Int_t>(i);
+         fhBGridRelErrH1D[v][i] = new TH1D(histName.c_str(), string(histName + ";" + relErrTitle[v] + ";Counter").c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
          fHistoList->Add(fhBGridRelErrH1D[v][i]);
 
-         histName = "hGridBRelErrH2D" + names[v] + lit::ToString<Int_t>(i);
-         fhBGridRelErrH2D[v][i] = new TH2D(histName.c_str(), histName.c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
+         histName = "hGridBRelErrH2D" + names[v] + ToString<Int_t>(i);
+         fhBGridRelErrH2D[v][i] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + relErrTitle[v]).c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
          fHistoList->Add(fhBGridRelErrH2D[v][i]);
       }
    }
@@ -446,7 +475,7 @@ void CbmLitFieldQa::FillBHistos()
 
 void CbmLitFieldQa::FillFieldApproximationHistos()
 {
-   std::vector<std::vector<lit::parallel::LitFieldSlice<float> > > slices;
+   std::vector<std::vector<LitFieldSlice<float> > > slices;
    slices.resize(fNofPolynoms);
    for (UInt_t i = 0; i < fNofPolynoms; i++) {slices[i].resize(fNofSlices);}
 
@@ -477,7 +506,7 @@ void CbmLitFieldQa::FillFieldApproximationHistos()
             if (fUseEllipseAcc && el > 1.) { continue; }
 
             for (Int_t p = 0; p < fNofPolynoms; p++) {
-               lit::parallel::LitFieldValue<float> v;
+               LitFieldValue<float> v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
                Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
                fhBAprGraph[BX][iSlice][p]->SetPoint(cnt, X, Y, v.Bx);
@@ -514,7 +543,7 @@ void CbmLitFieldQa::FillFieldApproximationHistos()
             Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
             for (Int_t p = 0; p < fNofPolynoms; p++) {
-               lit::parallel::LitFieldValue<float> v;
+               LitFieldValue<float> v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
                Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 
@@ -556,7 +585,7 @@ void CbmLitFieldQa::FillFieldApproximationHistos()
 
 void CbmLitFieldQa::FillGridCreatorHistos()
 {
-   std::vector<lit::parallel::LitFieldGrid> grids;
+   std::vector<LitFieldGrid> grids;
    grids.resize(fNofSlices);
    for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
       fGridCreator->CreateGrid(fZpos[iSlice], grids[iSlice]);
@@ -572,7 +601,7 @@ void CbmLitFieldQa::FillGridCreatorHistos()
          Double_t X = -fXpos[iSlice] + (iX + 0.5) * HX;
          for (Int_t iY = 0; iY < fNofBinsY; iY++) { // loop over y position
             Double_t Y = -fYpos[iSlice] + (iY + 0.5)  * HY;
-            lit::parallel::LitFieldValue<float> v;
+            LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
             fhBGridGraph[BX][iSlice]->SetPoint(cnt, X, Y, v.Bx);
@@ -603,7 +632,7 @@ void CbmLitFieldQa::FillGridCreatorHistos()
 
             Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-            lit::parallel::LitFieldValue<float> v;
+            LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 
@@ -652,11 +681,11 @@ void CbmLitFieldQa::CreatePropertyTree()
    std::string vnames[4] = {"BX", "BY", "BZ", "MOD"};
 
    for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
-      std::string slice = "slice" + lit::ToString<Int_t>(iSlice);
+      std::string slice = "slice" + ToString<Int_t>(iSlice);
       qa.put(slice + ".Z", fZpos[iSlice]);
       for (Int_t iPolynom = 0; iPolynom < fNofPolynoms; iPolynom++) {
          for (Int_t v = 0; v < 4; v++) {
-            std::string name = slice + ".polynomial" + lit::ToString<Int_t>(iPolynom);
+            std::string name = slice + ".polynomial" + ToString<Int_t>(iPolynom);
             qa.put(name + ".degree", fPolynomDegrees[iPolynom]);
             qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBErrH1D[v][iSlice][iPolynom]->GetMean());
             qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBErrH1D[v][iSlice][iPolynom]->GetRMS());
@@ -700,54 +729,38 @@ void CbmLitFieldQa::DrawSlices(
    std::string names[] = {"field_slice_Bx_", "field_slice_By_", "field_slice_Bz_", "field_slice_Mod_"};
    TCanvas* canvas[fNofSlices];
    for (Int_t s = 0; s < fNofSlices; s++) {
-      std::string ss = names[v] + "z_" + lit::ToString<float>(fZpos[s]) + "_" + opt;
+      std::string ss = names[v] + "z_" + ToString<float>(fZpos[s]) + "_" + opt;
       canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 1200, 800);
       canvas[s]->Divide(3, 2);
    }
 
-   std::string title = "B_{x}";
-   if (v == 1) { title = "B_{y}"; }
-   if (v == 2) { title = "B_{z}"; }
-   if (v == 3) { title = "|B|"; }
    for (Int_t i = 0; i < fNofSlices; i++) {
       canvas[i]->cd(1);
       TGraph2D* graph1 = fhBGraph[v][i];
 
-      DrawGraph2D(graph1, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
-            kLitLinear, kLitLinear, kLitLinear, "TRI1");
+      DrawGraph2D(graph1, kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(2);
       TH1D* hist2 = (opt != "grid") ? fhBErrH1D[v][i][fPolynomDegreeIndex] : fhBGridErrH1D[v][i];
-      hist2->GetXaxis()->SetTitle(string(title + " [kGauss]").c_str());
-      hist2->GetYaxis()->SetTitle("Counter");
       DrawH1(hist2, kLitLinear, kLitLog);
 
       canvas[i]->cd(3);
       TH2D* hist3 = (opt != "grid") ? fhBErrH2D[v][i][fPolynomDegreeIndex] : fhBGridErrH2D[v][i];
-      hist3->GetXaxis()->SetTitle("X [cm]");
-      hist3->GetYaxis()->SetTitle("Y [cm]");
-      hist3->GetXaxis()->SetTitle(string(title + " [kGauss]").c_str());
       DrawH2(hist3, kLitLinear, kLitLinear, kLitLinear, "colz");
 
       canvas[i]->cd(4);
       TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
-      DrawGraph2D(graph2, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
-            kLitLinear, kLitLinear, kLitLinear, "TRI1");
+      DrawGraph2D(graph2, kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(5);
       TH1D* hist4 = (opt != "grid") ? fhBRelErrH1D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1D[v][i];
-      hist4->GetXaxis()->SetTitle(string(title + " relative error [%]").c_str());
-      hist4->GetYaxis()->SetTitle("Counter");
       DrawH1(hist4, kLitLinear, kLitLog);
 
       canvas[i]->cd(6);
       TH2D* hist5 = (opt != "grid") ? fhBRelErrH2D[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2D[v][i];
-      hist5->GetXaxis()->SetTitle("X [cm]");
-      hist5->GetYaxis()->SetTitle("Y [cm]");
-      hist5->GetXaxis()->SetTitle(string(title + " relative error [%]").c_str());
       DrawH2(hist5, kLitLinear, kLitLinear, kLitLinear, "colz");
 
-      lit::SaveCanvasAsImage(canvas[i], fOutputDir);
+      SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
    }
 }
@@ -780,25 +793,9 @@ void CbmLitFieldQa::DrawPoly(
             if (opt == "rel") { hist1 = fhBRelErrH1D[v][i][j]; }
             else { hist1 = fhBErrH1D[v][i][j]; }
             if (max < hist1->GetMaximum()) { max = hist1->GetMaximum(); }
-            std::string title;
-            if (opt == "rel") {
-               if (v == 0) { title = "B_{x} relative error [%]"; }
-               if (v == 1) { title = "B_{y} relative error [%]"; }
-               if (v == 2) { title = "B_{z} relative error [%]"; }
-               if (v == 3) { title = "|B| relative error [%]"; }
-            } else {
-               if (v == 0) { title = "B_{x} [kGauss]"; }
-               if (v == 1) { title = "B_{y} [kGauss]"; }
-               if (v == 2) { title = "B_{z} [kGauss]"; }
-               if (v == 3) { title = "|B| [kGauss]"; }
-            }
-            std::string draw_opt;
-            if (j == 0) { draw_opt = ""; }
-            else { draw_opt = "SAME"; }
-            hist1->GetXaxis()->SetTitle(title.c_str());
-            hist1->GetYaxis()->SetTitle("Counter");
+            string draw_opt = (j == 0) ? "" : "SAME";
             DrawH1(hist1, kLitLinear, kLitLog, draw_opt.c_str(),
-                       1+j, LIT_LINE_WIDTH, 1+j, LIT_MARKER_SIZE, kDot);
+                       1 + j, LitDrawingOptions::LineWidth(), 1 + j, LitDrawingOptions::MarkerSize(), kDot);
 
             if (v == 0) {
                std::stringstream ss;
@@ -806,13 +803,13 @@ void CbmLitFieldQa::DrawPoly(
                l1->AddEntry(hist1, ss.str().c_str(),"lp");
             }
          }
-         firsthist->SetMaximum(1.2*max);
+         firsthist->SetMaximum(1.2 * max);
       }
 
       canvas[i]->cd(1);
       l1->Draw();
 
-      lit::SaveCanvasAsImage(canvas[i], fOutputDir);
+      SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
    }
 }
@@ -821,33 +818,28 @@ void CbmLitFieldQa::DrawFieldSlices()
 {
    TCanvas* canvas[fNofSlices];
    for (Int_t s = 0; s < fNofSlices; s++) {
-      std::string ss = "field_map_at_z_" + lit::ToString<Double_t>(fZpos[s]);
+      std::string ss = "field_map_at_z_" + ToString<Double_t>(fZpos[s]);
       canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 800, 800);
       canvas[s]->Divide(2, 2);
    }
 
    for (Int_t i = 0; i < fNofSlices; i++) {
       canvas[i]->cd(1);
-      TGraph2D* graphBx = fhBGraph[BX][i];
-      DrawGraph2D(graphBx, "X [cm]", "Y [cm]", "B_{x} [kGauss]",
-            kLitLinear, kLitLinear, kLitLinear, "TRI1");
+      DrawGraph2D(fhBGraph[BX][i], kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(2);
       TGraph2D* graphBy = fhBGraph[BY][i];
-      DrawGraph2D(graphBy, "X [cm]", "Y [cm]", "B_{y} [kGauss]",
-            kLitLinear, kLitLinear, kLitLinear, "TRI1");
+      DrawGraph2D(fhBGraph[BY][i], kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(3);
       TGraph2D* graphBz = fhBGraph[BZ][i];
-      DrawGraph2D(graphBz, "X [cm]", "Y [cm]", "B_{z} [kGauss]",
-            kLitLinear, kLitLinear, kLitLinear, "TRI1");
+      DrawGraph2D(fhBGraph[BZ][i], kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
       canvas[i]->cd(4);
       TGraph2D* graphMod = fhBGraph[MOD][i];
-      DrawGraph2D(graphMod, "X [cm]", "Y [cm]", "|B| [kGauss]",
-            kLitLinear, kLitLinear, kLitLinear, "TRI1");
+      DrawGraph2D(fhBGraph[MOD][i], kLitLinear, kLitLinear, kLitLinear, "TRI1");
 
-      lit::SaveCanvasAsImage(canvas[i], fOutputDir);
+      SaveCanvasAsImage(canvas[i], fOutputDir);
       fImageList.push_back(canvas[i]->GetName());
    }
 }
@@ -859,17 +851,10 @@ void CbmLitFieldQa::DrawFieldAlongZ()
 
    for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
       canvas->cd(i+1);
-      TGraph* graphBx = fhBAlongZGraph[BX][i];
-      TGraph* graphBy = fhBAlongZGraph[BY][i];
-      TGraph* graphBz = fhBAlongZGraph[BZ][i];
-
-      DrawGraph(graphBx, graphBy, graphBz,
-                std::string(lit::ToString<Double_t>(fAlongZAngles[i]) + "#circ"),
-                "Z [cm]", "B [kGauss]",
-                "B_{x}", "B_{y}", "B_{z}", kLitLinear, kLitLinear, false,
-                0.7, 0.5, 0.9, 0.3);
+      DrawGraph(list_of(fhBAlongZGraph[BX][i])(fhBAlongZGraph[BY][i])(fhBAlongZGraph[BZ][i]),
+            list_of("B_{x}")("B_{y}")("B_{z}"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
    }
-   lit::SaveCanvasAsImage(canvas, fOutputDir);
+   SaveCanvasAsImage(canvas, fOutputDir);
    fImageList.push_back(canvas->GetName());
 }
 ClassImp(CbmLitFieldQa);

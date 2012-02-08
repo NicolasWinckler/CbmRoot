@@ -69,12 +69,6 @@ private:
     */
    void NormalizeHistograms();
 
-   /**
-    *
-    */
-   void ShrinkEmptyBins(
-         TH1* hist);
-
    // Pointers to data arrays
    TClonesArray* fMvdPoints; // CbmMvdPoint array
    TClonesArray* fMvdDigis; // CbmMvdDigi array

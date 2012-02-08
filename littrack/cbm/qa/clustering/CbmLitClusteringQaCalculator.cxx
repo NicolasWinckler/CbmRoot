@@ -171,24 +171,9 @@ void CbmLitClusteringQaCalculator::NormalizeHistograms()
    fHM->H1("hTrdNofHitsInStation")->Scale(1. / nofEvents);
    fHM->H1("hMuchNofHitsInStation")->Scale(1. / nofEvents);
    fHM->H1("hTofNofHitsInStation")->Scale(1. / nofEvents);
-   ShrinkEmptyBins(fHM->H1("hMvdNofHitsInStation"));
-   ShrinkEmptyBins(fHM->H1("hStsNofHitsInStation"));
-   ShrinkEmptyBins(fHM->H1("hTrdNofHitsInStation"));
-   ShrinkEmptyBins(fHM->H1("hMuchNofHitsInStation"));
-   ShrinkEmptyBins(fHM->H1("hTofNofHitsInStation"));
-}
-
-void CbmLitClusteringQaCalculator::ShrinkEmptyBins(
-      TH1* hist)
-{
-   Int_t nofBins = hist->GetNbinsX();
-   Int_t shrinkBin = 0;
-   for (Int_t iBin = nofBins; iBin > 0; iBin--) {
-      Double_t content = hist->GetBinContent(iBin);
-      if (content != 0.) {
-         shrinkBin = iBin;
-         break;
-      }
-   }
-   hist->GetXaxis()->SetRange(1, shrinkBin + 1);
+   fHM->ShrinkEmptyBins("hMvdNofHitsInStation");
+   fHM->ShrinkEmptyBins("hStsNofHitsInStation");
+   fHM->ShrinkEmptyBins("hTrdNofHitsInStation");
+   fHM->ShrinkEmptyBins("hMuchNofHitsInStation");
+   fHM->ShrinkEmptyBins("hTofNofHitsInStation");
 }

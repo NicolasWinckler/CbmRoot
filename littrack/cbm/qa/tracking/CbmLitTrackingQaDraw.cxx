@@ -16,8 +16,13 @@
 #include "TH1D.h"
 #include "TH3F.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 #include <string>
+
+using boost::assign::list_of;
+using lit::NumberToString;
 
 CbmLitTrackingQaDraw::CbmLitTrackingQaDraw():
    fHM(),
@@ -53,7 +58,6 @@ void CbmLitTrackingQaDraw::Draw(
 
 void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 {
-   //return;
    string sname("STS");
    string rname;
    if (fDet.GetDet(kMUCH) && !fDet.GetDet(kTRD)) { rname = "MUCH"; }
@@ -66,79 +70,78 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
    string cat = fDet.GetDet(kMUCH) ? "Mu" : "El";
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
-   DrawEfficiency("tracking_qa_global_efficiency_all", "hSts3DNormGlobal_All",
-         "hHalfGlobal3DNormGlobal_All", "hGlobal3D_All", "", sname, hgname, gname, "", "", "_px");
+   DrawEfficiency("tracking_qa_global_efficiency_all", list_of("hSts3DNormGlobal_All")
+         ("hHalfGlobal3DNormGlobal_All")("hGlobal3D_All"), list_of(sname)(hgname)(gname), "", "_px");
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for signal tracks
-   DrawEfficiency("tracking_qa_global_efficiency_signal", "hSts3DNormGlobal_" + cat,
-         "hHalfGlobal3DNormGlobal_" + cat, "hGlobal3D_" + cat, "", sname, hgname, gname, "", "", "_px");
+   DrawEfficiency("tracking_qa_global_efficiency_signal", list_of("hSts3DNormGlobal_" + cat)
+         ("hHalfGlobal3DNormGlobal_" + cat)("hGlobal3D_" + cat), list_of(sname)(hgname)(gname), "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-   DrawEfficiency("tracking_qa_half_global_efficiency_all", "hSts3DNormHalfGlobal_All",
-         "hHalfGlobal3D_" + cat, "", "", sname, hgname, "", "", "", "_px");
+   DrawEfficiency("tracking_qa_half_global_efficiency_all", list_of(string("hSts3DNormHalfGlobal_All"))
+         ("hHalfGlobal3D_" + cat), list_of(sname)(hgname), "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
-   DrawEfficiency("tracking_qa_half_global_efficiency_signal", "hSts3DNormHalfGlobal_" + cat,
-         "hHalfGlobal3D_" + cat, "", "", sname, hgname, "", "", "", "_px");
+   DrawEfficiency("tracking_qa_half_global_efficiency_signal", list_of("hSts3DNormHalfGlobal_" + cat)
+         ("hHalfGlobal3D_" + cat), list_of(sname)(hgname), "", "_px");
 
    // Draw efficiency for STS
-   DrawEfficiency("tracking_qa_sts_efficiency", "hSts3D_All", "hSts3D_" + cat,
-         "", "", "STS: all", "STS: " + signal, "", "", "", "_px");
+   DrawEfficiency("tracking_qa_sts_efficiency", list_of(string("hSts3D_All"))("hSts3D_" + cat),
+         list_of(string("STS: all"))("STS: " + signal), "", "_px");
 
    if (fDet.GetDet(kTRD) || fDet.GetDet(kMUCH)) {
       // Draw efficiency for TRD(MUCH)
-      DrawEfficiency("tracking_qa_rec_efficiency", "hRec3D_All", "hRec3D_" + cat,
-            "", "", rname + ": all", rname + ": " + signal, "", "", "", "_px");
+      DrawEfficiency("tracking_qa_rec_efficiency", list_of(string("hRec3D_All"))("hRec3D_" + cat),
+            list_of(rname + ": all")(rname + ": " + signal), "", "_px");
    }
 
    if (fDet.GetDet(kTOF)) {
       // Draw efficiency for TOF
-      DrawEfficiency("tracking_qa_tof_efficiency", "hTof3D_All",
-         "hTof3D_" + cat, "", "", "TOF: all", "TOF: " + signal, "", "", "", "_px");
+      DrawEfficiency("tracking_qa_tof_efficiency", list_of(string("hTof3D_All"))("hTof3D_" + cat),
+            list_of(string("TOF: all"))("TOF: " + signal), "", "_px");
    }
 
    if (fDet.GetDet(kRICH)) {
       // Draw efficiency for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_electrons_mom", "hRich3D_El",
-         "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_px");
+      DrawEfficiency("tracking_qa_rich_efficiency_electrons_mom", list_of("hRich3D_El")
+         ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_px");
 
       // Draw efficiency for RICH for electron set vs. rapidity
-      DrawEfficiency("tracking_qa_rich_efficiency_electrons_rapidity", "hRich3D_El",
-         "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_py");
+      DrawEfficiency("tracking_qa_rich_efficiency_electrons_rapidity", list_of("hRich3D_El")
+         ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_py");
 
       // Draw efficiency for RICH for electron set vs. pt
-      DrawEfficiency("tracking_qa_rich_efficiency_electrons_pt", "hRich3D_El",
-         "hRich3D_ElRef", "", "", "RICH: electrons", "RICH: electrons ref", "", "", "", "_pz");
+      DrawEfficiency("tracking_qa_rich_efficiency_electrons_pt", list_of("hRich3D_El")
+         ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_pz");
 
       // Draw efficiency vs. nof hits in ring for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_vs_nofhits_electrons", "hRichNh_El",
-         "", "", "", "RICH: electrons", "", "", "", "");
+      DrawEfficiency("tracking_qa_rich_efficiency_vs_nofhits_electrons",
+            list_of("hRichNh_El"), list_of("RICH: electrons"));
 
       // Draw efficiency vs. B/A for ellipse fitting for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_vs_boa_electrons", "hRichBoA_El",
-         "", "", "", "RICH: electrons", "", "", "", "");
+      DrawEfficiency("tracking_qa_rich_efficiency_vs_boa_electrons",
+            list_of("hRichBoA_El"), list_of("RICH: electrons"));
 
       // Draw efficiency vs. radial position of the ring for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_vs_radial_position_electrons", "hRichRadPos_El",
-         "", "", "", "RICH: electrons", "", "", "", "");
+      DrawEfficiency("tracking_qa_rich_efficiency_vs_radial_position_electrons",
+            list_of("hRichRadPos_El"), list_of("RICH: electrons"));
 
       // Draw efficiency for STS+RICH for electron set
-      DrawEfficiency("tracking_qa_sts_rich_efficiency_electrons", "hSts3DNormStsRich_El",
-         "hStsRich3D_El", "", "", "STS", "STS+RICH", "", "", "", "_px");
+      DrawEfficiency("tracking_qa_sts_rich_efficiency_electrons", list_of("hSts3DNormStsRich_El")
+         ("hStsRich3D_El"), list_of("STS")("STS+RICH"), "", "_px");
 
       // Draw efficiency for STS+RICH No matching for electron set
-      DrawEfficiency("tracking_qa_sts_rich_no_matching_efficiency_electrons", "hSts3DNormStsRich_El",
-         "hStsRichNoMatching3D_El", "", "", "STS", "STS+RICH (No Matching)", "", "", "", "_px");
+      DrawEfficiency("tracking_qa_sts_rich_no_matching_efficiency_electrons", list_of("hSts3DNormStsRich_El")
+         ("hStsRichNoMatching3D_El"), list_of("STS")("STS+RICH (No Matching)"), "", "_px");
 
       // Draw efficiency for STS+RICH+TRD for electron set
-      DrawEfficiency("tracking_qa_sts_rich_trd_efficiency_electrons", "hSts3DNormStsRichTrd_El",
-         "hStsRich3DNormStsRichTrd_El", "hStsRichTrd3D_El", "",
-         "STS", "STS+RICH", "STS+RICH+TRD", "", "", "_px");
+      DrawEfficiency("tracking_qa_sts_rich_trd_efficiency_electrons", list_of("hSts3DNormStsRichTrd_El")
+         ("hStsRich3DNormStsRichTrd_El")("hStsRichTrd3D_El"), list_of("STS")("STS+RICH")("STS+RICH+TRD"), "", "_px");
 
       // Draw efficiency for STS+RICH+TRD+TOF for electron set
-      DrawEfficiency("tracking_qa_sts_rich_trd_tof_efficiency_electrons", "hSts3DNormStsRichTrdTof_El",
-         "hStsRich3DNormStsRichTrdTof_El", "hStsRichTrd3DNormStsRichTrdTof_El", "hStsRichTrdTof3D_El",
-         "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "", "_px");
+      DrawEfficiency("tracking_qa_sts_rich_trd_tof_efficiency_electrons", list_of("hSts3DNormStsRichTrdTof_El")
+         ("hStsRich3DNormStsRichTrdTof_El")("hStsRichTrd3DNormStsRichTrdTof_El")("hStsRichTrdTof3D_El"),
+         list_of("STS")("STS+RICH")("STS+RICH+TRD")("STS+RICH+TRD+TOF"), "", "_px");
 
 //      TCanvas* canvas = new TCanvas("tracking_qa_sts_rich_trd_tof_momentum_electrons", "tracking_qa_sts_rich_trd_tof_momentum_electrons", 600, 500);
 //      canvas->SetGrid();
@@ -147,13 +150,13 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 //         "Efficiency", "Momentum [GeV/c]", "Efficiency", "STS", "STS+RICH",
 //         "STS+RICH+TRD", "STS+RICH+TRD+TOF", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 
-      DrawEfficiency("tracking_qa_sts_rich_trd_tof_electron_identification", "hStsRich3DElIdNormStsRichTrdTof_ElId",
-         "hStsRichTrd3DElIdNormStsRichTrdTof_ElId", "hStsRichTrdTof3DElId_ElId", "",
-         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "", "_px");
+      DrawEfficiency("tracking_qa_sts_rich_trd_tof_electron_identification", list_of("hStsRich3DElIdNormStsRichTrdTof_ElId")
+         ("hStsRichTrd3DElIdNormStsRichTrdTof_ElId")("hStsRichTrdTof3DElId_ElId"),
+         list_of("RICH")("RICH+TRD")("RICH+TRD+TOF"), "", "_px");
 
-      DrawEfficiency("tracking_qa_sts_rich_trd_tof_pion_suppression", "hStsRich3DElIdNormStsRichTrdTof_PiSupp",
-         "hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp", "hStsRichTrdTof3DElId_PiSupp", "",
-         "RICH", "RICH+TRD", "RICH+TRD+TOF", "", "pisupp", "_px");
+      DrawEfficiency("tracking_qa_sts_rich_trd_tof_pion_suppression", list_of("hStsRich3DElIdNormStsRichTrdTof_PiSupp")
+         ("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp")("hStsRichTrdTof3DElId_PiSupp"),
+         list_of("RICH")("RICH+TRD")("RICH+TRD+TOF"), "pisupp", "_px");
     }
 
    if (fDet.GetDet(kRICH)) {
@@ -167,74 +170,39 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 
 void CbmLitTrackingQaDraw::DrawEfficiency(
       const string& canvasName,
-      const string& hist1,
-      const string& hist2,
-      const string& hist3,
-      const string& hist4,
-      const string& name1,
-      const string& name2,
-      const string& name3,
-      const string& name4,
+      const vector<string>& histNames,
+      const vector<string>& histLabels,
       const string& opt,
       const string& proj)
 {
+   assert(histNames.size() != 0 && histLabels.size() == histNames.size());
 
    TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
    canvas->SetGrid();
    canvas->cd();
 
-   TH1* h1 = (hist1 != "") ? fHM->H1(hist1 + "_Eff" + proj) : NULL;
-   TH1* h2 = (hist2 != "") ? fHM->H1(hist2 + "_Eff" + proj) : NULL;
-   TH1* h3 = (hist3 != "") ? fHM->H1(hist3 + "_Eff" + proj) : NULL;
-   TH1* h4 = (hist4 != "") ? fHM->H1(hist4 + "_Eff" + proj) : NULL;
-
-   float eff1 = (hist1 != "") ? CalcEfficiency(fHM->H1(hist1 + "_Rec" + proj), fHM->H1(hist1 + "_Acc" + proj), opt) : 0.;
-   float eff2 = (hist2 != "") ? CalcEfficiency(fHM->H1(hist2 + "_Rec" + proj), fHM->H1(hist2 + "_Acc" + proj), opt) : 0.;
-   float eff3 = (hist3 != "") ? CalcEfficiency(fHM->H1(hist3 + "_Rec" + proj), fHM->H1(hist3 + "_Acc" + proj), opt) : 0.;
-   float eff4 = (hist4 != "") ? CalcEfficiency(fHM->H1(hist4 + "_Rec" + proj), fHM->H1(hist4 + "_Acc" + proj), opt) : 0.;
-
-   string hname1 = (hist1 != "") ? name1 + "(" + lit::NumberToString<float>(eff1, 1) + ")" : name1;
-   string hname2 = (hist2 != "") ? name2 + "(" + lit::NumberToString<float>(eff2, 1) + ")" : name2;
-   string hname3 = (hist3 != "") ? name3 + "(" + lit::NumberToString<float>(eff3, 1) + ")" : name3;
-   string hname4 = (hist4 != "") ? name4 + "(" + lit::NumberToString<float>(eff4, 1) + ")" : name4;
-
-   if (fRebin > 1) {
-      if (hist1 != "") h1->Rebin(fRebin);
-      if (hist2 != "") h2->Rebin(fRebin);
-      if (hist3 != "") h3->Rebin(fRebin);
-      if (hist4 != "") h4->Rebin(fRebin);
-
-      if (hist1 != "") h1->Scale(1./fRebin);
-      if (hist2 != "") h2->Scale(1./fRebin);
-      if (hist3 != "") h3->Scale(1./fRebin);
-      if (hist4 != "") h4->Scale(1./fRebin);
+   Int_t nofHistos = histNames.size();
+   vector<TH1*> histos(nofHistos);
+   vector<string> labels(nofHistos);
+   vector<Double_t> efficiencies(nofHistos);
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      string name = histNames[iHist];
+      histos[iHist] = fHM->H1(name + "_Eff" + proj);
+      efficiencies[iHist] = CalcEfficiency(fHM->H1(name + "_Rec" + proj), fHM->H1(name + "_Acc" + proj), opt);
+      labels[iHist] = histLabels[iHist] + "(" + NumberToString<Double_t>(efficiencies[iHist], 1) + ")";
+      if (fRebin > 1) {
+         histos[iHist]->Rebin(fRebin);
+         histos[iHist]->Scale(1. / fRebin);
+      }
    }
 
    if (opt != "pisupp"){
-      h1->SetMinimum(0.);
-      h1->SetMaximum(100.);
+      histos[0]->SetMinimum(0.);
+      histos[0]->SetMaximum(100.);
    }
 
-   if (h1 != NULL && h2 != NULL && h3 != NULL && h4 != NULL) {
-      DrawH1(h1, h2, h3, h4, hname1, hname2, hname3, hname4,
-            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
-      DrawMeanEfficiencyLines(h1, eff1, eff2, eff3, eff4);
-
-   } else if (h1 != NULL && h2 != NULL && h3 != NULL && h4 == NULL) {
-      DrawH1(h1, h2, h3, NULL, hname1, hname2, hname3, "",
-            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
-      DrawMeanEfficiencyLines(h1, eff1, eff2, eff3);
-
-   } else if (h1 != NULL && h2 != NULL && h3 == NULL && h4 == NULL){
-      DrawH1(h1, h2, NULL, NULL, hname1, hname2, "", "",
-            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
-      DrawMeanEfficiencyLines(h1, eff1, eff2);
-
-   } else if (h1 != NULL && h2 == NULL && h3 == NULL && h4 == NULL){
-      DrawH1(h1, NULL, NULL, NULL, hname1, "", "", "",
-            kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
-      DrawMeanEfficiencyLines(h1, eff1);
-   }
+   DrawH1(histos, labels, kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
+   DrawMeanEfficiencyLines(histos, efficiencies);
 
    if (opt == "pisupp") gPad->SetLogy(true);
    if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
@@ -254,39 +222,19 @@ float CbmLitTrackingQaDraw::CalcEfficiency(
 }
 
 void CbmLitTrackingQaDraw::DrawMeanEfficiencyLines(
-   TH1* h,
-   float eff1,
-   float eff2,
-   float eff3,
-   float eff4)
+   const vector<TH1*>& histos,
+   const vector<Double_t>& efficiencies)
 {
-   float minY = h->GetXaxis()->GetXmin();
-   float maxY = h->GetXaxis()->GetXmax();
+   assert(histos.size() != 0 && efficiencies.size() == histos.size());
 
-   TLine* line1 = new TLine(minY, eff1, maxY, eff1);
-   line1->SetLineWidth(1);
-   line1->SetLineColor(LIT_COLOR1);
-   line1->Draw();
-
-   if (eff2 != -1){
-      TLine* line2 = new TLine(minY, eff2, maxY, eff2);
-      line2->SetLineWidth(1);
-      line2->SetLineColor(LIT_COLOR2);
-      line2->Draw();
-
-      if(eff3 != -1){
-         TLine* line3 = new TLine(minY, eff3, maxY, eff3);
-         line3->SetLineWidth(1);
-         line3->SetLineColor(LIT_COLOR3);
-         line3->Draw();
-
-         if (eff4 != -1){
-            TLine* line4 = new TLine(minY, eff4, maxY, eff4);
-            line4->SetLineWidth(1);
-            line4->SetLineColor(LIT_COLOR4);
-            line4->Draw();
-         }
-      }
+   Double_t minX = histos[0]->GetXaxis()->GetXmin();
+   Double_t maxX = histos[0]->GetXaxis()->GetXmax();
+   Int_t nofHistos = histos.size();
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      TLine* line = new TLine(minX, efficiencies[iHist], maxX, efficiencies[iHist]);
+      line->SetLineWidth(1);
+      line->SetLineColor(histos[iHist]->GetLineColor());
+      line->Draw();
    }
 }
 
@@ -345,19 +293,19 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
    TH1F* hAll = fHM->H1F(hist + "_All");
    TH1F* hTrue = fHM->H1F(hist + "_True");
    TH1F* hFake = fHM->H1F(hist + "_Fake");
-   DrawH1(hAll, hTrue, hFake, NULL,
-              "all: " + lit::NumberToString<float>(hAll->GetMean(), 1),
-              "true: " + lit::NumberToString<float>(hTrue->GetMean(), 1),
-              "fake: " + lit::NumberToString<float>(hFake->GetMean(), 1),  "",
-              kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
+   DrawH1(list_of(hAll)(hTrue)(hFake),
+      list_of("all: " + NumberToString<float>(hAll->GetMean(), 1))
+             ("true: " + NumberToString<float>(hTrue->GetMean(), 1))
+             ("fake: " + NumberToString<float>(hFake->GetMean(), 1)),
+              kLitLinear, kLitLog, true, 0.25, 0.99, 0.55, 0.75);
 
    c->cd(2);
    TH1F* hTrueOverAll = fHM->H1F(hist+"_TrueOverAll");
    TH1F* hFakeOverAll = fHM->H1F(hist+"_FakeOverAll");
-   DrawH1(hTrueOverAll, hFakeOverAll, NULL, NULL,
-              "true/all: " + lit::NumberToString<float>(hTrueOverAll->GetMean()),
-              "fake/all: " + lit::NumberToString<float>(hFakeOverAll->GetMean()),
-              "", "", kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
+   DrawH1(list_of(hTrueOverAll)(hFakeOverAll),
+      list_of("true/all: " + NumberToString<float>(hTrueOverAll->GetMean()))
+             ("fake/all: " + NumberToString<float>(hFakeOverAll->GetMean())),
+             kLitLinear, kLitLog, true, 0.25,0.99,0.55,0.75);
 
    if (fOutputDir != "") lit::SaveCanvasAsImage(c, fOutputDir);
 }

@@ -67,3 +67,19 @@ void CbmLitHistManager::Clear()
    }
    fHistMap.clear();
 }
+
+void CbmLitHistManager::ShrinkEmptyBins(
+      const string& histName)
+{
+   TH1* hist = H1(histName);
+   Int_t nofBins = hist->GetNbinsX();
+   Int_t shrinkBin = 0;
+   for (Int_t iBin = nofBins; iBin > 0; iBin--) {
+      Double_t content = hist->GetBinContent(iBin);
+      if (content != 0.) {
+         shrinkBin = iBin;
+         break;
+      }
+   }
+   hist->GetXaxis()->SetRange(1, shrinkBin + 1);
+}

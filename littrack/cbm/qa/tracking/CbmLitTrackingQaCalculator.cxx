@@ -161,6 +161,7 @@ void CbmLitTrackingQaCalculator::Exec()
 void CbmLitTrackingQaCalculator::Finish()
 {
    CalculateEfficiencyHistos();
+   ShrinkEmptyBins();
 }
 
 void CbmLitTrackingQaCalculator::ReadDataBranches()
@@ -1383,4 +1384,23 @@ void CbmLitTrackingQaCalculator::IncreaseCounters()
    }
    if (fDet.GetDet(kTRD)) { fHM->H1F("hNofTrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
    if (fDet.GetDet(kMUCH)) { fHM->H1F("hNofMuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
+}
+
+void CbmLitTrackingQaCalculator::ShrinkEmptyBins()
+{
+   fHM->ShrinkEmptyBins("hMvdTrackHits_All");
+   fHM->ShrinkEmptyBins("hMvdTrackHits_True");
+   fHM->ShrinkEmptyBins("hMvdTrackHits_Fake");
+   fHM->ShrinkEmptyBins("hStsTrackHits_All");
+   fHM->ShrinkEmptyBins("hStsTrackHits_True");
+   fHM->ShrinkEmptyBins("hStsTrackHits_Fake");
+   fHM->ShrinkEmptyBins("hTrdTrackHits_All");
+   fHM->ShrinkEmptyBins("hTrdTrackHits_True");
+   fHM->ShrinkEmptyBins("hMuchTrackHits_Fake");
+   fHM->ShrinkEmptyBins("hMuchTrackHits_All");
+   fHM->ShrinkEmptyBins("hMuchTrackHits_True");
+   fHM->ShrinkEmptyBins("hMuchTrackHits_Fake");
+   fHM->ShrinkEmptyBins("hRichRingHits_All");
+   fHM->ShrinkEmptyBins("hRichRingHits_True");
+   fHM->ShrinkEmptyBins("hRichRingHits_Fake");
 }

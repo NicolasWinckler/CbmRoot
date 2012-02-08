@@ -8,7 +8,11 @@
 
 #include "TCanvas.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <cstdlib>
+
+using boost::assign::list_of;
 
 CbmLitCheckEnergyLossMuons::CbmLitCheckEnergyLossMuons():
    fMat("iron"),
@@ -69,51 +73,10 @@ void CbmLitCheckEnergyLossMuons::DrawGraphs()
    fTable[0]->SetMinimum(0.1);
    fTable[0]->SetMaximum(10.);
 
-   DrawGraph(fTable[0], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenCircle, kLitLog, kLitLog, "ALP");
-
-   DrawGraph(fTable[1], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenSquare, kLitLog, kLitLog, "LP");
-
-   DrawGraph(fTable[2], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenTriangleUp, kLitLog, kLitLog, "LP");
-
-   DrawGraph(fTable[3], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-             kOpenDiamond, kLitLog, kLitLog, "LP");
-
-
-   DrawGraph(fCalc[0], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenCircle, kLitLog, kLitLog, "LP");
-
-   DrawGraph(fCalc[1], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenSquare, kLitLog, kLitLog, "LP");
-
-   DrawGraph(fCalc[2], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenTriangleUp, kLitLog, kLitLog, "LP");
-
-   DrawGraph(fCalc[3], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
-             LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-             kOpenDiamond, kLitLog, kLitLog, "LP");
-
-// TLegend* l1 = new TLegend(0.20, 0.97, 0.9, 0.7);
-// l1->SetFillColor(kWhite);
-// l1->SetHeader("Energy losses for muons in iron vs. momentum");
-// l1->AddEntry(fTable[0],"total (table)","lp");
-// l1->AddEntry(fCalc[0],"total (calculation)","lp");
-// l1->AddEntry(fTable[1],"ionization (table)","lp");
-// l1->AddEntry(fCalc[1],"ionization (calculation)","lp");
-// l1->AddEntry(fTable[2],"bremsstrahlung (table)","lp");
-// l1->AddEntry(fCalc[2],"bremsstrahlung (calculation)","lp");
-// l1->AddEntry(fTable[3],"pair production (table)","lp");
-// l1->AddEntry(fCalc[3],"pair production (calculation)","lp");
-// l1->Draw();
+   DrawGraph(list_of(fTable[0])(fTable[1])(fTable[2])(fTable[3])(fCalc[0])(fCalc[1])(fCalc[2])(fCalc[3]),
+         list_of("total (table)")("ionization (table)")("bremsstrahlung (table)")("pair production (table)")
+         ("total (calculation)")("ionization (calculation)")("bremsstrahlung (calculation)")("pair production (calculation)"),
+         kLitLog, kLitLog, true, 0.20, 0.97, 0.9, 0.7);
 
    lit::SaveCanvasAsImage(c1, fOutputDir);
 }
@@ -153,7 +116,11 @@ void CbmLitCheckEnergyLossMuons::CreateGraphs()
 {
    for (int i = 0; i < 4; i++) {
       fTable[i] = new TGraph();
+      fTable[i]->GetXaxis()->SetTitle("Momentum [MeV/c]");
+      fTable[i]->GetYaxis()->SetTitle("Energy loss [Mev*cm^2/g]");
       fCalc[i] = new TGraph();
+      fCalc[i]->GetXaxis()->SetTitle("Momentum [MeV/c]");
+      fCalc[i]->GetYaxis()->SetTitle("Energy loss [Mev*cm^2/g]");
    }
 }
 

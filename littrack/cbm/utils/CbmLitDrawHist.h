@@ -15,24 +15,50 @@
 #include "TGraph.h"
 #include "TGraph2D.h"
 
+#include <string>
+#include <vector>
+using std::string;
+using std::vector;
+
 /**
- * Default settings for drawing.
+ * \class LitDrawingOptions
+ * \brief Default options for drawing.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2012
  */
-const Int_t LIT_COLOR1 = kRed;
-const Int_t LIT_COLOR2 = kBlue;
-const Int_t LIT_COLOR3 = kGreen + 3;
-const Int_t LIT_COLOR4 = kYellow + 2;
-const Int_t LIT_LINE_WIDTH = 2;
-const Int_t LIT_LINE_STYLE1 = 1;
-const Int_t LIT_LINE_STYLE2 = 2;
-const Int_t LIT_LINE_STYLE3 = 3;
-const Int_t LIT_LINE_STYLE4 = 4;
-const Int_t LIT_MARKER_SIZE = 1;
-const Int_t LIT_MARKER_STYLE1 = kOpenCircle;
-const Int_t LIT_MARKER_STYLE2 = kOpenSquare;
-const Int_t LIT_MARKER_STYLE3 = kOpenTriangleUp;
-const Int_t LIT_MARKER_STYLE4 = kOpenDiamond;
-const Double_t LIT_TEXT_SIZE = 0.06;
+class LitDrawingOptions
+{
+public:
+
+   static Int_t Color(Int_t colorIndex) {
+      static const Int_t nofColors = 6;
+      static Int_t colors[nofColors] = {kRed, kBlue + 1, kGreen + 3, kMagenta + 4, kYellow + 2, kViolet};
+      return (colorIndex < nofColors) ? colors[colorIndex] : colorIndex;
+   }
+
+   static Int_t LineWidth() {
+      return 2;
+   }
+
+   static Int_t LineStyle(Int_t lineStyleIndex) {
+      return lineStyleIndex + 1;
+   }
+
+   static Int_t MarkerSize() {
+      return 1;
+   }
+
+   static Int_t MarkerStyle(Int_t markerIndex) {
+      static const Int_t nofMarkers = 8;
+      static Int_t markers[nofMarkers] = {kOpenCircle, kOpenSquare, kOpenTriangleUp, kOpenDiamond,
+                                          kFullCircle, kFullSquare, kFullTriangleUp, kFullDiamond};
+      return (markerIndex < nofMarkers) ? markers[markerIndex] : markerIndex;
+   }
+
+   static Double_t TextSize() {
+      return 0.06;
+   }
+};
 
 /**
  * \enum LitScale
@@ -67,12 +93,12 @@ void DrawH1(
    TH1* hist,
    LitScale logx = kLitLinear,
    LitScale logy = kLitLinear,
-   const std::string& drawOpt = "",
-   Int_t color = LIT_COLOR1,
-   Int_t lineWidth = LIT_LINE_WIDTH,
-   Int_t lineStyle = LIT_LINE_STYLE1,
-   Int_t markerSize = LIT_MARKER_SIZE,
-   Int_t markerStyle = LIT_MARKER_STYLE1);
+   const string& drawOpt = "",
+   Int_t color = LitDrawingOptions::Color(0),
+   Int_t lineWidth = LitDrawingOptions::LineWidth(),
+   Int_t lineStyle = LitDrawingOptions::LineStyle(0),
+   Int_t markerSize = LitDrawingOptions::MarkerSize(),
+   Int_t markerStyle = LitDrawingOptions::MarkerStyle(0));
 
 
 /**
@@ -88,46 +114,98 @@ void DrawH2(
    LitScale logx = kLitLinear,
    LitScale logy = kLitLinear,
    LitScale logz = kLitLinear,
-   const std::string& drawOpt = "COLZ");
+   const string& drawOpt = "COLZ");
 
 
 /**
  * \fn DrawH1
- * \brief Draw up to 4 1D histograms. If hist == NULL than histogram will not be drawn.
- * \param[in] hist1 Pointer to the first histogram.
- * \param[in] hist2 Pointer to the second histogram.
- * \param[in] hist3 Pointer to the third histogram.
- * \param[in] hist4 Pointer to the fourth histogram.
- * \param[in] hist1label[in] Label text for the first histogram.
- * \param[in] hist2label[in] Label text for the second histogram.
- * \param[in] hist3label[in] Label text for the third histogram.
- * \param[in] hist4label[in] Label text for the fourth histogram.
+ * \brief Draw several TH1 histograms.
+ * \param[in] histos Array of histograms.
+ * \param[in] histLabels Array of histogram labels.
  * \param[in] logx Specify logarithmic or linear scale for X axis.
  * \param[in] logy Specify logarithmic or linear scale for Y axis.
  * \param[in] drawLegend If true than legend will be drawn.
- * \param[in] x1 coordinates of the Legend in the current pad
- * \param[in] y1 coordinates of the Legend in the current pad
- * \param[in] x2 coordinates of the Legend in the current pad
- * \param[in] y2 coordinates of the Legend in the current pad
+ * \param[in] x1 X coordinate of legend in current pad.
+ * \param[in] y1 Y coordinate of legend in current pad.
+ * \param[in] x2 X coordinate of legend in current pad.
+ * \param[in] y2 Y coordinate of legend in current pad.
  * \param[in] drawOpt Draw options for TH1->Draw method.
  */
 void DrawH1(
-   TH1* hist1,
-   TH1* hist2,
-   TH1* hist3,
-   TH1* hist4,
-   const std::string& hist1label,
-   const std::string& hist2label,
-   const std::string& hist3label,
-   const std::string& hist4label,
-   LitScale logx,
-   LitScale logy,
-   Bool_t drawLegend,
-   Double_t x1,
-   Double_t y1,
-   Double_t x2,
-   Double_t y2,
-   const std::string& drawOpt = "");
+   const vector<TH1*>& histos,
+   const vector<string>& histLabels,
+   LitScale logx = kLitLinear,
+   LitScale logy = kLitLinear,
+   Bool_t drawLegend = true,
+   Double_t x1 = 0.25,
+   Double_t y1 = 0.99,
+   Double_t x2 = 0.55,
+   Double_t y2 = 0.75,
+   const string& drawOpt = "");
+
+/**
+ * \fn DrawGraph
+ * \brief Draw TGraph.
+ * \param[in] graph Pointer to TGraph.
+ * \param[in] logx Specify logarithmic or linear scale for X axis.
+ * \param[in] logy Specify logarithmic or linear scale for Y axis.
+ * \param[in] drawOpt Other drawing options (see ROOT documentation for details).
+ * \param[in] color Color.
+ * \param[in] lineWidth Line width.
+ * \param[in] lineStyle Line style (see ROOT documentation for details).
+ * \param[in] markerSize Marker size.
+ * \param[in] markerStyle Marker style (see ROOT documentation for details).
+ */
+void DrawGraph(
+   TGraph* graph,
+   LitScale logx = kLitLinear,
+   LitScale logy = kLitLinear,
+   const string& drawOpt = "",
+   Int_t color = LitDrawingOptions::Color(0),
+   Int_t lineWidth = LitDrawingOptions::LineWidth(),
+   Int_t lineStyle = LitDrawingOptions::LineStyle(0),
+   Int_t markerSize = LitDrawingOptions::MarkerSize(),
+   Int_t markerStyle = LitDrawingOptions::MarkerStyle(0));
+
+/**
+ * \fn DrawGraph.
+ * \brief Draw upto 3 TGraphs. If graph == NULL than graph will not be drawn.
+ * \param[in] graphs Vector of TGraphs.
+ * \param[in] graphLabels Vector of graph labels.
+ * \param[in] logx Specify logarithmic or linear scale for X axis.
+ * \param[in] logy Specify logarithmic or linear scale for Y axis.
+ * \param[in] drawLegend If true than legend will be drawn.
+ * \param[in] x1 X coordinate of legend in current pad.
+ * \param[in] y1 Y coordinate of legend in current pad.
+ * \param[in] x2 X coordinate of legend in current pad.
+ * \param[in] y2 Y coordinate of legend in current pad.
+ */
+void DrawGraph(
+   const vector<TGraph*>& graphs,
+   const vector<string>& graphLabels,
+   LitScale logx = kLitLinear,
+   LitScale logy = kLitLinear,
+   Bool_t drawLegend = true,
+   Double_t x1 = 0.25,
+   Double_t y1 = 0.99,
+   Double_t x2 = 0.55,
+   Double_t y2 = 0.75);
+
+/**
+ * \fn DrawGraph2D
+ * \brief Draw 2D graph.
+ * \param[in] graph Pointer to TGraph2D.
+ * \param[in] logx Specify logarithmic or linear scale for X axis.
+ * \param[in] logy Specify logarithmic or linear scale for Y axis.
+ * \param[in] logz Specify logarithmic or linear scale for Z axis.
+ * \param[in] drawOpt Other drawing options (see ROOT documentation for details).
+ */
+void DrawGraph2D(
+   TGraph2D* graph,
+   LitScale logx = kLitLinear,
+   LitScale logy = kLitLinear,
+   LitScale logz = kLitLinear,
+   const string& drawOpt = "");
 
 /**
  * \fn DrawHistSigmaRMS
@@ -138,95 +216,6 @@ void DrawH1(
 void DrawHistSigmaRMS(
    Double_t sigma,
    Double_t rms);
-
-/**
- * \fn DrawGraph // TODO Do not use axis titles.
- * \brief Draw TGraph.
- * \param[in] graph Pointer to TGraph.
- * \param[in] titleX X axis title.
- * \param[in] titleY Y axis title.
- * \param[in] color Color.
- * \param[in] lineWidth Line width.
- * \param[in] lineStyle Line style (see ROOT documentation for details).
- * \param[in] markerSize Marker size.
- * \param[in] markerStyle Marker style (see ROOt documentation for details).
- * \param[in] logx Specify logarithmic or linear scale for X axis.
- * \param[in] logy Specify logarithmic or linear scale for Y axis.
- * \param[in] drawOpt Other drawing options (see ROOT documentation for details).
- */
-void DrawGraph(
-   TGraph* graph,
-   const std::string& titleX,
-   const std::string& titleY,
-   Int_t color,
-   Int_t lineWidth,
-   Int_t lineStyle,
-   Int_t markerSize,
-   Int_t markerStyle,
-   LitScale logx,
-   LitScale logy,
-   const std::string& drawOpt);
-
-
-/**
- * \fn DrawGraph. // TODO Do not use axis titles.
- * \brief Draw upto 3 TGraphs. If graph == NULL than graph will not be drawn.
- * \param[in] graph1 Pointer to the first TGraph.
- * \param[in] graph2 Pointer to the second TGraph.
- * \param[in] graph3 Pointer to the third TGraph.
- * \param[in] legendLabel Legend label text.
- * \param[in] xAxisLabel X axis label text.
- * \param[in] yAxisLabel Y axis label text.
- * \param[in] hist1label Label text for the first TGraph.
- * \param[in] hist2label Label text for the second TGraph.
- * \param[in] hist3label Label text for the third TGraph.
- * \param[in] logx Specify logarithmic or linear scale for X axis.
- * \param[in] logy Specify logarithmic or linear scale for Y axis.
- * \param[in] drawLegend If true than legend will be drawn.
- * \param[in] x1 coordinates of the Legend in the current pad
- * \param[in] y1 coordinates of the Legend in the current pad
- * \param[in] x2 coordinates of the Legend in the current pad
- * \param[in] y2 coordinates of the Legend in the current pad
- */
-void DrawGraph(
-   TGraph* graph1,
-   TGraph* graph2,
-   TGraph* graph3,
-   const std::string& legendLabel,
-   const std::string& xAxisLabel,
-   const std::string& yAxisLabel,
-   const std::string& hist1label,
-   const std::string& hist2label,
-   const std::string& hist3label,
-   LitScale logx,
-   LitScale logy,
-   Bool_t drawLegend,
-   Double_t x1,
-   Double_t y1,
-   Double_t x2,
-   Double_t y2);
-
-/**
- * \fn DrawGraph2D // TODO Do not use axis titles.
- * \brief Draw 2D graph.
- * \param[in] graph Pointer to TGraph2D.
- * \param[in] titleX X axis title.
- * \param[in] titleY Y axis title.
- * \param[in] titleZ Z axis title.
- * \param[in] logx Specify logarithmic or linear scale for X axis.
- * \param[in] logy Specify logarithmic or linear scale for Y axis.
- * \param[in] logz Specify logarithmic or linear scale for Z axis.
- * \param[in] drawOpt Other drawing options (see ROOT documentation for details).
- */
-void DrawGraph2D(
-   TGraph2D* graph,
-   const std::string& titleX,
-   const std::string& titleY,
-   const std::string& titleZ,
-   LitScale logx,
-   LitScale logy,
-   LitScale logz,
-   const std::string& drawOpt);
 
 /**
  * \fn DivideH1
@@ -241,15 +230,14 @@ void DrawGraph2D(
 TH1D* DivideH1(
    TH1D* h1,
    TH1D* h2,
-   const std::string& name,
-   const std::string& title,
-   const std::string& axisX,
-   const std::string& axisY);
+   const string& name,
+   const string& title,
+   const string& axisX,
+   const string& axisY);
 
 
-std::string CalcEfficiency(
+string CalcEfficiency(
    TH1* histRec,
    TH1* histAcc);
-
 
 #endif

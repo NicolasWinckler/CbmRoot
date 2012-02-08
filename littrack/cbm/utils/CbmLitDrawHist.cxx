@@ -1,9 +1,9 @@
-/** CbmLitDrawHist.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
+/**
+ * \file CbmLitDrawHist.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  **/
 #include "CbmLitDrawHist.h"
-//#include "std/utils/CbmLitUtils.h"
 #include "../../std/utils/CbmLitUtils.h"
 
 #include "TH1.h"
@@ -22,6 +22,9 @@
 #include <limits>
 #include <iostream>
 #include <sstream>
+#include <cassert>
+
+using std::stringstream;
 
 /* Set default styles for histograms. */
 void SetStyles()
@@ -39,20 +42,19 @@ void SetStyles()
    gStyle->SetPalette(1);
 }
 
-
-/* Draws 1D histogram.*/
+/* Draw TH1 histogram.*/
 void DrawH1(
    TH1* hist,
    LitScale logx,
    LitScale logy,
-   const std::string& drawOpt,
+   const string& drawOpt,
    Int_t color,
    Int_t lineWidth,
    Int_t lineStyle,
    Int_t markerSize,
    Int_t markerStyle)
 {
-   Double_t textSize = LIT_TEXT_SIZE;
+   Double_t textSize = LitDrawingOptions::TextSize();
    hist->SetLineColor(color);
    hist->SetLineWidth(lineWidth);
    hist->SetLineStyle(lineStyle);
@@ -74,15 +76,15 @@ void DrawH1(
    hist->Draw(drawOpt.c_str());
 }
 
-/* Draws 1D histogram.*/
+/* Draw TH2 histogram.*/
 void DrawH2(
    TH2* hist,
    LitScale logx,
    LitScale logy,
    LitScale logz,
-   const std::string& drawOpt)
+   const string& drawOpt)
 {
-   Double_t textSize = LIT_TEXT_SIZE;
+   Double_t textSize = LitDrawingOptions::TextSize();
    if (logx == kLitLog) { gPad->SetLogx(); }
    if (logy == kLitLog) { gPad->SetLogy(); }
    if (logz == kLitLog) { gPad->SetLogz(); }
@@ -105,16 +107,10 @@ void DrawH2(
    hist->Draw(drawOpt.c_str());
 }
 
-/* Draws up to 4 1D histograms. If hist == NULL than histogram will not be drawn. */
+/* Draw several TH1 histograms. */
 void DrawH1(
-   TH1* hist1,
-   TH1* hist2,
-   TH1* hist3,
-   TH1* hist4,
-   const std::string& hist1label,
-   const std::string& hist2label,
-   const std::string& hist3label,
-   const std::string& hist4label,
+   const vector<TH1*>& histos,
+   const vector<string>& histLabels,
    LitScale logx,
    LitScale logy,
    Bool_t drawLegend,
@@ -122,80 +118,46 @@ void DrawH1(
    Double_t y1,
    Double_t x2,
    Double_t y2,
-   const std::string& drawOpt)
+   const string& drawOpt)
 {
-   Double_t max;
-   if (hist1 != NULL) {
-      DrawH1(hist1, logx, logy, drawOpt,
-            LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE, LIT_MARKER_STYLE1);
-      max = hist1->GetMaximum();
+   assert(histos.size() != 0 && histLabels.size() == histos.size());
+   Double_t max = std::numeric_limits<Double_t>::min();
+   Int_t nofHistos = histos.size();
+   TLegend* legend = new TLegend(x1, y1, x2, y2);
+   legend->SetFillColor(kWhite);
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      TH1* hist = histos[iHist];
+      string opt = (iHist == 0) ? drawOpt : (iHist == nofHistos - 1) ? "SAMEP" + drawOpt : "SAME" + drawOpt;
+      DrawH1(hist, logx, logy, opt, LitDrawingOptions::Color(iHist), LitDrawingOptions::LineWidth(),
+            LitDrawingOptions::LineStyle(iHist), LitDrawingOptions::MarkerSize(), LitDrawingOptions::MarkerStyle(iHist));
+      max = std::max(max, hist->GetMaximum());
+      legend->AddEntry(hist, histLabels[iHist].c_str(), "lp");
    }
-
-   if (hist2 != NULL) {
-      DrawH1(hist2, logx, logy, "SAME"+drawOpt,
-            LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE, LIT_MARKER_STYLE2);
-      if (max < hist2->GetMaximum()) { max = hist2->GetMaximum(); }
-   }
-
-   if (hist3 != NULL) {
-      DrawH1(hist3, logx, logy, "SAME"+drawOpt,
-            LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE, LIT_MARKER_STYLE3);
-      if (max < hist3->GetMaximum()) { max = hist3->GetMaximum(); }
-   }
-
-   if (hist4 != NULL) {
-      DrawH1(hist4, logx, logy, "SAMEP"+drawOpt,
-            LIT_COLOR4, LIT_LINE_WIDTH, LIT_LINE_STYLE4, LIT_MARKER_SIZE, LIT_MARKER_STYLE4);
-      if (max < hist4->GetMaximum()) { max = hist4->GetMaximum(); }
-   }
-
-   if (hist1 != NULL) { hist1->SetMaximum(max * 1.10); }
-
-   TLegend* l1 = new TLegend(x1, y1, x2, y2);
-   l1->SetFillColor(kWhite);
-   if (hist1 != NULL) { l1->AddEntry(hist1,hist1label.c_str(),"lp"); }
-   if (hist2 != NULL) { l1->AddEntry(hist2,hist2label.c_str(),"lp"); }
-   if (hist3 != NULL) { l1->AddEntry(hist3,hist3label.c_str(),"lp"); }
-   if (hist4 != NULL) { l1->AddEntry(hist4,hist4label.c_str(),"lp"); }
-   if (drawLegend) { l1->Draw(); }
-}
-
-void  DrawHistSigmaRMS(
-   Double_t sigma,
-   Double_t rms)
-{
-   std::string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
-   TLatex text;
-   text.SetTextAlign(21);
-   text.SetTextSize(0.08);
-   text.DrawTextNDC(0.5, 0.83, txt1.c_str());
+   histos[0]->SetMaximum(max * 1.10);
+   if (drawLegend) { legend->Draw(); }
 }
 
 void DrawGraph(
    TGraph* graph,
-   const std::string& titleX,
-   const std::string& titleY,
+   LitScale logx,
+   LitScale logy,
+   const string& drawOpt,
    Int_t color,
    Int_t lineWidth,
    Int_t lineStyle,
    Int_t markerSize,
-   Int_t markerStyle,
-   LitScale logx,
-   LitScale logy,
-   const std::string& drawOpt)
+   Int_t markerStyle)
 {
-   Double_t textSize = LIT_TEXT_SIZE;
+   Double_t textSize = LitDrawingOptions::TextSize();
    graph->SetLineColor(color);
    graph->SetLineWidth(lineWidth);
    graph->SetLineStyle(lineStyle);
    graph->SetMarkerColor(color);
    graph->SetMarkerSize(markerSize);
    graph->SetMarkerStyle(markerStyle);
-   if (drawOpt.find("A") != std::string::npos) {
+   if (drawOpt.find("A") != string::npos) {
       if (logx == kLitLog) { gPad->SetLogx(); }
       if (logy == kLitLog) { gPad->SetLogy(); }
-      graph->GetXaxis()->SetTitle(titleX.c_str());
-      graph->GetYaxis()->SetTitle(titleY.c_str());
       graph->GetXaxis()->SetLabelSize(textSize);
       graph->GetXaxis()->SetNdivisions(505, kTRUE);
       graph->GetYaxis()->SetLabelSize(textSize);
@@ -210,17 +172,10 @@ void DrawGraph(
 }
 
 
-/* Draws up to 3 graphs. If graph == NULL than graph will not be drawn. */
+/* Draw several TGraphs. */
 void DrawGraph(
-   TGraph* graph1,
-   TGraph* graph2,
-   TGraph* graph3,
-   const std::string& legendLabel,
-   const std::string& xAxisLabel,
-   const std::string& yAxisLabel,
-   const std::string& hist1label,
-   const std::string& hist2label,
-   const std::string& hist3label,
+   const vector<TGraph*>& graphs,
+   const vector<string>& graphLabels,
    LitScale logx,
    LitScale logy,
    Bool_t drawLegend,
@@ -229,62 +184,36 @@ void DrawGraph(
    Double_t x2,
    Double_t y2)
 {
-   double max = std::numeric_limits<double>::min();
-   double min = std::numeric_limits<double>::max();
+   assert(graphs.size() != 0 && graphs.size() == graphLabels.size());
 
-   if (graph1 != NULL) {
-      DrawGraph(graph1, xAxisLabel, yAxisLabel,
-                LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-                LIT_MARKER_STYLE1, logx, logy, "ACP");
-      max = graph1->GetYaxis()->GetXmax();
-      min = graph1->GetYaxis()->GetXmin();
+   Double_t max = std::numeric_limits<Double_t>::min();
+   Double_t min = std::numeric_limits<Double_t>::max();
+   TLegend* legend = new TLegend(x1, y1, x2, y2);
+   legend->SetFillColor(kWhite);
+   Int_t nofGraphs = graphs.size();
+   for (UInt_t iGraph = 0; iGraph < nofGraphs; iGraph++) {
+      TGraph* graph = graphs[iGraph];
+      string opt = (iGraph == 0) ? "ACP" : "CP";
+      DrawGraph(graph, logx, logy, opt, LitDrawingOptions::Color(iGraph), LitDrawingOptions::LineWidth(),
+            LitDrawingOptions::LineStyle(iGraph), LitDrawingOptions::MarkerSize(), LitDrawingOptions::MarkerStyle(iGraph));
+      max = std::max(graph->GetYaxis()->GetXmax(), max);
+      min = std::min(graph->GetYaxis()->GetXmin(), min);
+      legend->AddEntry(graph, graphLabels[iGraph].c_str(), "lp");
    }
-
-   if (graph2 != NULL) {
-      DrawGraph(graph2, xAxisLabel, yAxisLabel,
-                LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-                LIT_MARKER_STYLE2, logx, logy, "CP");
-      max = std::max(max, graph2->GetYaxis()->GetXmax());
-      min = std::min(min, graph2->GetYaxis()->GetXmin());
-   }
-
-   if (graph3 != NULL) {
-      DrawGraph(graph3, xAxisLabel, yAxisLabel,
-                LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE,
-                LIT_MARKER_STYLE3, logx, logy, "CP");
-      max = std::max(max, graph3->GetYaxis()->GetXmax());
-      min = std::min(min, graph3->GetYaxis()->GetXmin());
-   }
-
-   if (graph1 != NULL) {
-      graph1->SetMaximum(max);
-      graph1->SetMinimum(min);
-   }
-
-   TLegend* l1 = new TLegend(x1, y1, x2, y2);
-   l1->SetFillColor(kWhite);
-   l1->SetHeader(legendLabel.c_str());
-   if (graph1 != NULL) { l1->AddEntry(graph1,hist1label.c_str(),"lp"); }
-   if (graph2 != NULL) { l1->AddEntry(graph2,hist2label.c_str(),"lp"); }
-   if (graph3 != NULL) { l1->AddEntry(graph3,hist3label.c_str(),"lp"); }
-   if (drawLegend) { l1->Draw(); }
+   graphs[0]->SetMaximum(max);
+   graphs[0]->SetMinimum(min);
+   if (drawLegend) { legend->Draw(); }
 }
 
 /* Draws 2D graph.*/
 void DrawGraph2D(
    TGraph2D* graph,
-   const std::string& titleX,
-   const std::string& titleY,
-   const std::string& titleZ,
    LitScale logx,
    LitScale logy,
    LitScale logz,
-   const std::string& drawOpt)
+   const string& drawOpt)
 {
-   Double_t textSize = LIT_TEXT_SIZE;
-   graph->GetXaxis()->SetTitle(titleX.c_str());
-   graph->GetYaxis()->SetTitle(titleY.c_str());
-   graph->GetZaxis()->SetTitle(titleZ.c_str());
+   Double_t textSize = LitDrawingOptions::TextSize();
    if (logx == kLitLog) { gPad->SetLogx(); }
    if (logy == kLitLog) { gPad->SetLogy(); }
    if (logz == kLitLog) { gPad->SetLogz(); }
@@ -307,30 +236,41 @@ void DrawGraph2D(
    graph->Draw(drawOpt.c_str());
 }
 
+void  DrawHistSigmaRMS(
+   Double_t sigma,
+   Double_t rms)
+{
+   string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
+   TLatex text;
+   text.SetTextAlign(21);
+   text.SetTextSize(0.08);
+   text.DrawTextNDC(0.5, 0.83, txt1.c_str());
+}
+
 TH1D* DivideH1(
    TH1D* h1,
    TH1D* h2,
-   const std::string& name,
-   const std::string& title,
-   const std::string& axisX,
-   const std::string& axisY)
+   const string& name,
+   const string& title,
+   const string& axisX,
+   const string& axisY)
 {
    h1->Sumw2();
    h2->Sumw2();
-   TH1D* h3 = new TH1D(name.c_str(), std::string(title +";"+axisX+";"+ axisY).c_str(),
+   TH1D* h3 = new TH1D(name.c_str(), string(title +";"+axisX+";"+ axisY).c_str(),
                        h1->GetNbinsX(), h1->GetXaxis()->GetXmin(),h1->GetXaxis()->GetXmax());
    h3->Divide(h1, h2, 1., 1., "B");
    return h3;
 }
 
-std::string CalcEfficiency(
+string CalcEfficiency(
    TH1* histRec,
    TH1* histAcc)
 {
    if (histAcc->GetEntries() == 0) { return "0.0"; }
    else {
       Double_t eff = Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
-      std::stringstream ss;
+      stringstream ss;
       ss.precision(3);
       ss << eff;
       return ss.str();

@@ -40,12 +40,12 @@ ptree CbmLitFitQaPTreeCreator::Create(
          "hStsFirstWrongCov", "hStsLastWrongCov", "hTrdFirstWrongCov", "hTrdLastWrongCov", "hMuchFirstWrongCov", "hMuchLastWrongCov"
    };
 
-   for (unsigned int iHist = 0; iHist < 6; iHist++) {
-      for (unsigned int iPar = 0; iPar < 10; iPar++) {
+   for (UInt_t iHist = 0; iHist < 6; iHist++) {
+      for (UInt_t iPar = 0; iPar < 10; iPar++) {
          ResAndPullToPtree(pt, rpHistNames[iHist] + parNames[iPar]);
       }
 
-      for (unsigned int iPar = 0; iPar < 5; iPar++) {
+      for (UInt_t iPar = 0; iPar < 5; iPar++) {
          WrongCovToPtree(pt, wHistNames[iHist] + parNames[iPar]);
       }
    }
@@ -61,7 +61,7 @@ void CbmLitFitQaPTreeCreator::ResAndPullToPtree(
    TH1* hist = fHM->H1(histName);
    hist->Fit("gaus");
    TF1* fit = hist->GetFunction("gaus");
-   double sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
+   Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
    pt.put(histName + ".mean", hist->GetMean());
    pt.put(histName + ".rms", hist->GetRMS());
    pt.put(histName + ".sigma", sigma);

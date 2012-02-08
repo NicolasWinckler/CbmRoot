@@ -376,6 +376,11 @@ private:
     */
    void ElectronIdentification();
 
+   /**
+    * \brief Shrinks empty bins for histograms.
+    */
+   void ShrinkEmptyBins();
+
    // Acceptance defined by MC points
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
    Int_t fMinNofPointsTrd; // Minimal number of MCPoints in TRD

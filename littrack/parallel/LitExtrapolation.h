@@ -101,7 +101,7 @@ inline void LitRK4Extrapolation(
    T F[25]; // derivatives, transport matrix
 
    // Field values for each step
-   LitFieldValue<T> B[4];
+   LitFieldValue<T> Bfield[4];
    // Field grid for each step
    const LitFieldGrid* Bgrid[4] = {&field1, &field2, &field2, &field3};
 //   field.GetFieldValue(zIn + coef[0] * h, B[0]);
@@ -115,11 +115,11 @@ inline void LitRK4Extrapolation(
 
    // Calculation for zero step
    {
-      Bgrid[0]->GetFieldValue(x[0], x[1], B[0]);
+      Bgrid[0]->GetFieldValue(x[0], x[1], Bfield[0]);
 
-      T Bx = B[0].Bx;
-      T By = B[0].By;
-      T Bz = B[0].Bz;
+      T Bx = Bfield[0].Bx;
+      T By = Bfield[0].By;
+      T Bz = Bfield[0].Bz;
 
       T tx = x[2];
       T ty = x[3];
@@ -152,11 +152,11 @@ inline void LitRK4Extrapolation(
       x[2] = par.Tx + coef[iStep] * ktx[iStep - 1];
       x[3] = par.Ty + coef[iStep] * kty[iStep - 1];
 
-      Bgrid[iStep]->GetFieldValue(x[0], x[1], B[iStep]);
+      Bgrid[iStep]->GetFieldValue(x[0], x[1], Bfield[iStep]);
 
-      T Bx = B[iStep].Bx;
-      T By = B[iStep].By;
-      T Bz = B[iStep].Bz;
+      T Bx = Bfield[iStep].Bx;
+      T By = Bfield[iStep].By;
+      T Bz = Bfield[iStep].Bz;
 
       T tx = x[2];
       T ty = x[3];
@@ -388,25 +388,25 @@ inline void LitRK4Extrapolation(
    T F[25]; // derivatives, transport matrix
 
    // Field values for each step
-   LitFieldValue<T> B[4];
+   LitFieldValue<T> Bfield[4];
    // Field grid for each step
    //const LitFieldGrid* Bgrid[4] = {&field1, &field2, &field2, &field3};
 //   field.GetFieldValue(zIn + coef[0] * h, B[0]);
 //   field.GetFieldValue(zIn + coef[1] * h, B[1]);
 //   B[2] = B[1];
 //   field.GetFieldValue(zIn + coef[3] * h, B[3]);
-   B[0] = field1;
-   B[1] = field2;
-   B[2] = B[1];
-   B[3] = field3;
+   Bfield[0] = field1;
+   Bfield[1] = field2;
+   Bfield[2] = Bfield[1];
+   Bfield[3] = field3;
 
    // Calculation for zero step
    {
 //      Bgrid[0]->GetFieldValue(x[0], x[1], B[0]);
 
-      T Bx = B[0].Bx;
-      T By = B[0].By;
-      T Bz = B[0].Bz;
+      T Bx = Bfield[0].Bx;
+      T By = Bfield[0].By;
+      T Bz = Bfield[0].Bz;
 
       T tx = x[2];
       T ty = x[3];
@@ -441,9 +441,9 @@ inline void LitRK4Extrapolation(
 
       //Bgrid[iStep]->GetFieldValue(x[0], x[1], B[iStep]);
 
-      T Bx = B[iStep].Bx;
-      T By = B[iStep].By;
-      T Bz = B[iStep].Bz;
+      T Bx = Bfield[iStep].Bx;
+      T By = Bfield[iStep].By;
+      T Bz = Bfield[iStep].Bz;
 
       T tx = x[2];
       T ty = x[3];

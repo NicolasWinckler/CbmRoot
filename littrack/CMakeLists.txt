@@ -123,8 +123,8 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaCalculator.cxx
-      cbm/qa/propagation/CbmLitFitQaPTreeCreator.cxx
-      cbm/qa/propagation/CbmLitFitQaReport.cxx
+      cbm/qa/fit/CbmLitFitQaPTreeCreator.cxx
+      cbm/qa/fit/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/report/CbmLitReport.cxx      
@@ -179,7 +179,7 @@ If(Boost_FOUND)
       ${LITTRACK_HEADERS}
       cbm/qa/tracking/CbmLitTrackingQa.h
       cbm/qa/clustering/CbmLitClusteringQa.h
-      cbm/qa/propagation/CbmLitFitQa.h      
+      cbm/qa/fit/CbmLitFitQa.h      
      )
 EndIf(Boost_FOUND)
 
@@ -202,7 +202,7 @@ If(Boost_FOUND)
       ${LITTRACK_SRCS}
       cbm/qa/tracking/CbmLitTrackingQa.cxx
       cbm/qa/clustering/CbmLitClusteringQa.cxx
-      cbm/qa/propagation/CbmLitFitQa.cxx
+      cbm/qa/fit/CbmLitFitQa.cxx
      )
 EndIf(Boost_FOUND)
 
@@ -213,12 +213,12 @@ endif(RULE_CHECKER_FOUND)
 IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-msse -O3 -w")
+  "-msse -O3")
   Message(STATUS "LitTrack will be compiled with SSE support")
 ELSE (SSE_FOUND)
   Message(STATUS "LitTrack will be compiled without SSE support")
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-O3 -w")
+  "-O3")
 ENDIF (SSE_FOUND)
 
 

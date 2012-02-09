@@ -308,8 +308,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     //    cout << " at station " << stationNr << " ( " << startHit << " - " << finalHit << " )" << endl;
     
     fhEnergyLoss[stationNr-1]->Fill(stsPoint->GetXIn(),stsPoint->GetYIn(),stsPoint->GetEnergyLoss());
-    
-    fhIncAngle[stationNr-1]->Fill(stsPoint->GetXIn(),stsPoint->GetYIn(),TMath::Abs(TMath::ATan2((stsPoint->GetXOut()-stsPoint->GetXIn())/(stsPoint->GetZOut()-stsPoint->GetZIn()))*180./3.14));
+ 
+    fhIncAngle[stationNr-1]->Fill(stsPoint->GetXIn(),stsPoint->GetYIn(),TMath::Abs(TMath::ATan2((stsPoint->GetZOut()-stsPoint->GetZIn()),(stsPoint->GetXOut()-stsPoint->GetXIn()))*180./3.14));
 //     Float_t zP = stsPoint->GetZ();
 //     Float_t xP = stsPoint->GetX(zP);
 //     Float_t yP = stsPoint->GetY(zP);
@@ -342,7 +342,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
       }
 //       cout <<"St "<<stationNr<<" Sens "<<sensor->GetSensorNr()<< " chan "<<sensor->GetFrontChannel(stsHit->GetX(),stsHit->GetY(),stsHit->GetZ())<<" X "<<stsHit->GetX();
     }
-    Int_t incAngle = (Int_t) ( TMath::ATan2((stsPoint->GetXOut()-stsPoint->GetXIn())/(stsPoint->GetZOut()-stsPoint->GetZIn()))*180./3.14);
+    Int_t incAngle = (Int_t) (TMath::ATan2((stsPoint->GetZOut()-stsPoint->GetZIn()),(stsPoint->GetXOut()-stsPoint->GetXIn()))*180./3.14);
+//    Int_t incAngle = (Int_t) ( TMath::ATan((stsPoint->GetXOut()-stsPoint->GetXIn())/(stsPoint->GetZOut()-stsPoint->GetZIn()))*180./3.14);
     fNofPoints    [stationNr-1][sensor->GetSectorNr()-1][sensor->GetSensorNr()-1] += 1;
     fNofPointsIncAng[TMath::Abs((Int_t)(incAngle))] +=1;
     if (TMath::Abs((Int_t)(mom))<1) fNofPointsMom [TMath::Abs((Int_t)(mom))] +=1;

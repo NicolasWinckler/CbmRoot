@@ -135,13 +135,15 @@ void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleSector* module, Bool_t use
   Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(detectorId);
   Int_t iSide    = CbmMuchGeoScheme::GetLayerSideIndex(detectorId);
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
+  Double_t rMin = station->GetRmin();
+  Double_t rMax = station->GetRmax();
   Double_t phi0 = module->GetPosition().Phi()/TMath::Pi()*180.;
   Double_t r0   = module->GetPosition().Perp();
   Double_t dx1  = module->GetDx1();
   Double_t dx2  = module->GetDx2();
   Double_t dy   = module->GetDy();
-  Double_t rMin = sqrt((r0-dy)*(r0-dy)+dx1*dx1);
-  Double_t rMax = r0+dy;
+//  Double_t rMin = sqrt((r0-dy)*(r0-dy)+dx1*dx1);
+//  Double_t rMax = r0+dy;
 
   Double_t t  = 2*dy/(dx2-dx1);
   Double_t b= (r0-dy)-t*dx1;

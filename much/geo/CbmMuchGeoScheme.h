@@ -166,11 +166,13 @@ class CbmMuchGeoScheme: public TObject {
     Double_t   GetAbsorberZ0(Int_t i) {return fMuchZ1+fAbsorberZ1[i]+((TGeoCone*) fAbsorbers->At(i))->GetDz();}
     Char_t     GetAbsorberMat(Int_t i) {return fAbsorberMat[i];}
 
-    Double_t GetActiveLx() {return fActiveLx;}
-    Double_t GetActiveLy() {return fActiveLy;}
-    Double_t GetActiveLz() {return fActiveLz;}
-    Double_t GetSpacerLx() {return fSpacerLx;}
-    Double_t GetSpacerLy() {return fSpacerLy;}
+    Double_t GetActiveLx()  {return fActiveLx;}
+    Double_t GetActiveLy()  {return fActiveLy;}
+    Double_t GetActiveLz()  {return fActiveLz;}
+    Double_t GetSpacerLx()  {return fSpacerLx;}
+    Double_t GetSpacerLy()  {return fSpacerLy;}
+    Double_t GetSpacerR()   {return fSpacerR;}
+    Double_t GetSpacerPhi() {return fSpacerPhi;}
     Double_t GetLayersDz(Int_t st) {return fLayersDz[st];}
 
     void Init(TObjArray* stations);

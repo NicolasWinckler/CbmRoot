@@ -646,7 +646,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
       // Create modules
       if (fDetType[st]==3){ // start sector modules
         Double_t phi0 = TMath::Pi()/fNSectorsPerLayer[st];
-        Double_t ymin = rmin;
+        Double_t ymin = 0;
         Double_t ymax = rmax;
         Double_t dy  = (ymax-ymin)/2.;
         Double_t dx1 = ymin*TMath::Tan(phi0)+fOverlapR/TMath::Cos(phi0); 

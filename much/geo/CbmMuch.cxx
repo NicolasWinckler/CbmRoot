@@ -412,13 +412,37 @@ void CbmMuch::ConstructGeometry() {
             Double_t dy  = ((CbmMuchModuleSector*)module)->GetDy();
             Double_t dz  = ((CbmMuchModuleSector*)module)->GetDz();
             TGeoTrap* shape = new TGeoTrap(dz,0,0,dy,dx1,dx2,0,dy,dx1,dx2,0);
+            shape->SetName(Form("shStation%02iLayer%i%cModule%03iActiveNoHole", iStation, iLayer, cside, iModule));
+
+            translationName = Form("tr%02il%i%cm%03i",iStation+1,iLayer+1,cside,iModule+1);
+            translation = new TGeoTranslation(translationName,0,-pos.Perp(),0.);
+            translation->RegisterYourself();
+            expression = Form("shStation%02iLayer%i%cModule%03iActiveNoHole-", iStation, iLayer, cside, iModule)+moduleHoleName+":"+translationName;
+            TString moduleActiveName = Form("shStation%02iLayer%i%cModule%03iActive", iStation, iLayer, cside, iModule);
+            TGeoCompositeShape* shActive = new TGeoCompositeShape(moduleActiveName,expression);
+
+            Double_t sdx1 = dx1+fGeoScheme->GetSpacerPhi();
+            Double_t sdx2 = dx2+fGeoScheme->GetSpacerPhi(); 
+            Double_t sdy  = dy+fGeoScheme->GetSpacerR();
+            Double_t sdz  = dz;
+            TGeoTrap* shapeSpacer = new TGeoTrap(sdz,0,0,sdy,sdx1,sdx2,0,sdy,sdx1,sdx2,0);
+            shapeSpacer->SetName(Form("shStation%02iLayer%i%cModule%03iFullSpacerNoHole", iStation, iLayer, cside, iModule));
+            TGeoCompositeShape* shSpacerFull1 = new TGeoCompositeShape(Form("shStation%02iLayer%i%cModule%03iSpacerNoHole", iStation, iLayer, cside, iModule),
+                Form("shStation%02iLayer%i%cModule%03iFullSpacerNoHole-shStation%02iLayer%i%cModule%03iActiveNoHole", iStation, iLayer, cside, iModule, iStation, iLayer, cside, iModule));
+            
+            expression = Form("shStation%02iLayer%i%cModule%03iSpacerNoHole-", iStation, iLayer, cside, iModule)+moduleHoleName+":"+translationName;
+            TGeoCompositeShape* shSpacer = new TGeoCompositeShape(Form("shStation%02iLayer%i%cModule%03iSpacer", iStation, iLayer, cside, iModule),expression);
+
             TString activeName = Form("muchstation%02ilayer%i%cactive%03i",iStation+1,iLayer+1,cside,iModule+1);
-            TGeoVolume* voActive = new TGeoVolume(activeName,shape,argon);
+            TString spacerName = Form("muchstation%02ilayer%i%cspacer%03i",iStation+1,iLayer+1,cside,iModule+1);
+            TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
+            TGeoVolume* voSpacer = new TGeoVolume(spacerName,shSpacer,noryl);
             Double_t phi0 = 360./(layer->GetSide(0)->GetNModules()+layer->GetSide(1)->GetNModules());
             Double_t angle =  phi0*(2*iModule+iSide);
             Int_t krot;
             gMC->Matrix(krot,90,angle-90,90,angle,0,0);
             gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),krot,kTRUE,buf,0);
+            gGeoManager->Node(spacerName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),krot,kTRUE,buf,0);
             AddSensitiveVolume(voActive);
             continue;
           }

@@ -99,8 +99,6 @@ class CbmMuchModuleGem : public CbmMuchModule
       return ((Long64_t)iSector << SB_SECTOR) | ((Long64_t)iChannel << SB_CHANNEL);
     }
 
-    /** Accessors **/
-    Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
     /** Gets sector by the given channel Id. **/
     CbmMuchSector* GetSector(Long64_t channelId);
     /** Gets sector by the given numbers of column and row in the grid. **/
@@ -117,9 +115,6 @@ class CbmMuchModuleGem : public CbmMuchModule
      *@param  sector   CbmMuchSector which should be added to the array.**/
     void AddSector(CbmMuchSector* sector);
 
-    TClonesArray* GetClusters() const { return fClusters;   }
-    void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
-
     virtual Bool_t InitModule();
     virtual void DrawModule(Color_t color);
 
@@ -132,13 +127,11 @@ class CbmMuchModuleGem : public CbmMuchModule
     
   private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
-    TObjArray              fSectors;               // Array of sectors within this module
     Double_t               fGridDx, fGridDy;       // Size of the grid cell (for fast search purpose)
     Int_t                  fGridCols;              // Number of columns in the grid
     Int_t                  fGridRows;              // Number of rows in the grid
     vector<vector<Int_t> > fGridIndices;           // 2D-vector of sector numbers
-    TClonesArray*          fClusters;              //!
-    multimap<Double_t,Int_t>  fDigis;                 //!
+    multimap<Double_t,Int_t>  fDigis;              //!
     Int_t                  fNSectorChannels;       // Number of channels per "complete" sector
 
     Double_t GetGridCellY(Int_t iRow);
@@ -152,7 +145,7 @@ class CbmMuchModuleGem : public CbmMuchModule
     /** Adds to each pad info about neighbour pads **/
     void InitNeighbourPads();
 
-    ClassDef(CbmMuchModuleGem,1);
+    ClassDef(CbmMuchModuleGem,2);
 };
 #endif
 

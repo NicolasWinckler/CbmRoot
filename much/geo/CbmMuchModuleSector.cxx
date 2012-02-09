@@ -27,9 +27,6 @@ using std::vector;
 // -----   Default constructor   -------------------------------------------
 CbmMuchModuleSector::CbmMuchModuleSector(): CbmMuchModule(),fDx1(0),fDx2(0),fDy(0),fDz(0) {
   fDetectorType = 3;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
-  fClusters = NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -38,9 +35,6 @@ CbmMuchModuleSector::CbmMuchModuleSector(Int_t detId, TVector3 position, TVector
     Double_t cutRadius)
 : CbmMuchModule(detId, position, size, cutRadius),fDx1(0),fDx2(0),fDy(0),fDz(0) {
   fDetectorType = 3;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
-  fClusters = NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -52,9 +46,6 @@ CbmMuchModuleSector::CbmMuchModuleSector(Int_t iStation, Int_t iLayer, Bool_t iS
 ,fDx1(dx1),fDx2(dx2),fDy(dy),fDz(dz)
 {
   fDetectorType = 3;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
-  fClusters = NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -65,9 +56,6 @@ CbmMuchModuleSector::CbmMuchModuleSector(Int_t iStation, Int_t iLayer, Bool_t iS
 :  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius)
 ,fDx1(0),fDx2(0),fDy(0),fDz(0) {
   fDetectorType = 3;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
-  fClusters = NULL;
 }
 // -------------------------------------------------------------------------
 

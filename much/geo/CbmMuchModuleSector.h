@@ -105,8 +105,6 @@ class CbmMuchModuleSector : public CbmMuchModule
       return ((Long64_t)iSector << SB_SECTOR) | ((Long64_t)iChannel << SB_CHANNEL);
     }
 
-    /** Accessors **/
-    Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
     /** Gets sector by the given channel Id. **/
     CbmMuchRadialSector* GetSector(Long64_t channelId);
     /** Gets sector by the given coordinates in global c.s. */
@@ -117,12 +115,12 @@ class CbmMuchModuleSector : public CbmMuchModule
     vector<CbmMuchPad*> GetPads();
     Int_t GetNPads();
 
+    CbmMuchRadialSector* GetSectorByIndex(Int_t iSector) {return (CbmMuchRadialSector*) fSectors.At(iSector); }
+
+    
     /** Adds a given sector to the array.
      *@param  sector   CbmMuchRadialSector which should be added to the array.**/
     void AddSector(CbmMuchRadialSector* sector);
-
-    TClonesArray* GetClusters() const { return fClusters;   }
-    void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
 
 //    virtual Bool_t InitModule();
     virtual void DrawModule(Color_t color);
@@ -142,30 +140,15 @@ class CbmMuchModuleSector : public CbmMuchModule
     virtual Bool_t InitModule();
   private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
-    TObjArray              fSectors;               // Array of sectors within this module
-    Double_t               fGridDx, fGridDy;       // Size of the grid cell (for fast search purpose)
-    Int_t                  fGridCols;              // Number of columns in the grid
-    Int_t                  fGridRows;              // Number of rows in the grid
-    vector<vector<Int_t> > fGridIndices;           // 2D-vector of sector numbers
-    TClonesArray*          fClusters;              //!
-    multimap<Double_t,Int_t>  fDigis;              //!
     Int_t                  fNSectorChannels;       // Number of channels per "complete" sector
     vector<Double_t>       fSectorRadii;           // vector of radii
+    multimap<Double_t,Int_t>  fDigis;              //!
     Double_t fDx1;
     Double_t fDx2;
     Double_t fDy;
     Double_t fDz;
     
-//    Double_t GetGridCellY(Int_t iRow);
-//    Double_t GetGridCellX(Int_t iCol);
-//    /** Grid initialization. **/
-//    Bool_t InitGrid(Bool_t useModuleDesign);
-//    /** Adds to each sector info about neighbour sectors **/
-//    void InitNeighbourSectors();
-//    /** Adds to each pad info about neighbour pads **/
-//    void InitNeighbourPads();
-
-    ClassDef(CbmMuchModuleSector,1);
+    ClassDef(CbmMuchModuleSector,2);
 };
 #endif
 

@@ -51,17 +51,20 @@ public:
   /** Accessors */
   Int_t    GetDetectorId()    const { return fDetectorId; }
   Double_t GetCutRadius()     const { return fCutRadius; }
-  TVector3 GetSize()           const { return fSize; }
+  TVector3 GetSize()          const { return fSize; }
   TVector3 GetPosition()      const { return fPosition; }
   Int_t    GetDetectorType()  const { return fDetectorType; }
+  Int_t    GetNSectors()      const { return fSectors.GetEntriesFast(); }
   TClonesArray* GetPoints()   const { return fPoints;     }
   TClonesArray* GetHits()     const { return fHits;       }
+  TClonesArray* GetClusters() const { return fClusters;   }
 
   virtual Bool_t InitModule() {return kTRUE;}
   virtual void DrawModule(Color_t color) {}
 
   void SetPoints(TClonesArray* points)     { fPoints   = points;   }
   void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
+  void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
 
 protected:
   Int_t                  fDetectorId;            // Unique detector ID
@@ -69,10 +72,12 @@ protected:
   Double_t               fCutRadius;             // Radius of the cut (if any, otherwise = -1.) [cm]
   TVector3               fSize;                  // Size vector of the module (all dimensions in [cm])
   TVector3               fPosition;              // Location vector of the module center in global c.s. (all dimensions in [cm])
+  TObjArray              fSectors;               // Array of sectors within this module
   TClonesArray*          fPoints;                //!
   TClonesArray*          fHits;                  //!
+  TClonesArray*          fClusters;              //!
 
-  ClassDef(CbmMuchModule,1);
+  ClassDef(CbmMuchModule,2);
 };
 #endif
 

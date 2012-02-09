@@ -17,7 +17,10 @@
 #include "CbmMuchSector.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchModuleGem.h"
+#include "CbmMuchModuleSector.h"
 #include "CbmMuchPad.h"
+#include "CbmMuchRadialSector.h"
+#include "CbmMuchRadialPad.h"
 
 // Includes from base
 #include "FairRootManager.h"
@@ -127,21 +130,51 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
 
 // ------- Private method ExecAdvanced -------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
-  // Get module for the point
-  Int_t detectorId = point->GetDetectorID();
-  CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
-  if (!module) return kFALSE;
-  if (module->GetNSectors() == 0) {
-    fNOutside++;
-    return kFALSE;
-  }
-
   TVector3 posIn,posOut;
   point->PositionIn(posIn);
   point->PositionOut(posOut);
   TVector3 delta = posOut-posIn;
   Double_t lTrack = delta.Mag();
-
+  
+  Double_t rIn    = posIn.Perp();
+  Double_t rOut   = posOut.Perp();
+  Double_t phiIn  = posIn.Phi();
+  Double_t phiOut = posOut.Phi();
+  Double_t rMin   = (rIn>rOut? rOut : rIn) - fSpotRadius;
+  Double_t rMax   = (rIn<rOut? rOut : rIn) + fSpotRadius;
+  Double_t phiMin = (phiIn>phiOut? phiIn : phiOut)-fSpotRadius/rMin;
+  Double_t phiMax = (phiIn<phiOut? phiIn : phiOut)+fSpotRadius/rMin;
+  
+  printf("%i",iPoint);
+  {
+    Int_t detectorId = point->GetDetectorID();
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
+    if (module->GetDetectorType()==3) {
+      printf(" %f-%f\n",rMin,rMax);
+      CbmMuchModuleSector* moduleSector = (CbmMuchModuleSector*) module;
+      CbmMuchRadialSector* secMin = moduleSector->GetSectorByRadius(rMin);
+      CbmMuchRadialSector* secMax = moduleSector->GetSectorByRadius(rMax);
+      if (!secMin || !secMax) { printf("\n"); return 0; }
+      Int_t irMin = secMin->GetSectorIndex();
+      Int_t irMax = secMax->GetSectorIndex();
+      printf(" %i %i\n",irMin,irMax);
+      for (Int_t ir=irMin;ir<=irMax;ir++){
+        CbmMuchRadialSector* sec = moduleSector->GetSectorByIndex(ir);
+        Int_t ipMin = sec->GetChannel(phiMin*180./3.14159);
+        Int_t ipMax = sec->GetChannel(phiMax*180./3.14159);
+        printf(" %i %i\n",ipMin,ipMax);
+        for (Int_t ip=ipMin;ip<=ipMax;ip++){
+          Long64_t channelId = CbmMuchModuleSector::GetChannelId(ir, ip);
+          CbmMuchDigi* digi = new CbmMuchDigi(detectorId, channelId,0,0);
+          digi->SetADCCharge(100);
+          printf("add\n");
+          new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
+          new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch();
+        }
+      }
+    }
+  }
+  return 1;
   //********** Primary electrons from the track (begin) ************************//
   // Get particle's characteristics
   Int_t trackID = point->GetTrackID();
@@ -184,6 +217,16 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
   Double_t time = -1;
   while(time < 0) time = point->GetTime() + gRandom->Gaus(0, fDTime);
+  
+  // Get module for the point
+  Int_t detectorId = point->GetDetectorID();
+  CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
+  if (!module) return kFALSE;
+  if (module->GetNSectors() == 0) {
+    fNOutside++;
+    return kFALSE;
+  }
+
   for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
     // Coordinates of primary electrons along the track
     Double_t aL = gRandom->Rndm();
@@ -192,13 +235,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
     // Calculate number of secondary electrons for each primary electron
     UInt_t nSecElectrons = GasGain(); // number of secondary electrons
-    
-    // if type = 3
-    // determine potential radial sectors (simple)
-    //firedSectors[iSector] = sector;
-    // determine potential azimuthal pads (quite simple)
-    // intersect all potential pads
-    
+
     Double_t spotL = fSpotRadius * 2.; // diameter of the spot
     Double_t spotArea = spotL * spotL; // spot area
 
@@ -206,9 +243,62 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     TPolyLine spotPolygon = GetPolygon(xe, ye, spotL, spotL);
     Double_t* xVertex = spotPolygon.GetX();
     Double_t* yVertex = spotPolygon.GetY();
+    
+    printf("Electron: %i\n",iElectron);
+    
+    if (module->GetDetectorType()==3) {
+      CbmMuchModuleSector* moduleSector = (CbmMuchModuleSector*) module;
+      for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
+        Double_t r = sqrt(xe*xe+ye*ye);
+        Double_t phi = TVector2(xe,ye).Phi();
+        if (phi>120/180.*3.14159) continue;
+        if (phi<60/180.*3.14159) continue;
+        printf("  iVertex=%i",iVertex);
+        printf("r=%f phi=%f",r,phi);
+        CbmMuchRadialSector* sector = moduleSector->GetSectorByRadius(r);
+        printf(" sector=%i",sector);
+        if (!sector) { printf("\n"); continue; }
+        Int_t iChannel = sector->GetChannel(phi*180/3.14159);
+        printf(" iChannel=%i",iChannel);
+        if (iChannel>50) { printf("\n"); continue; }
+//        continue;
+        CbmMuchRadialPad* pad = sector->GetPad(iChannel);
+        if (!pad) { printf("\n"); continue; }
+        Double_t r1 = pad->GetR1();
+        Double_t r2 = pad->GetR2();
+        
+        printf(" r1=%f",r1);
+        printf(" r2=%f",r2);
+        printf(" phi=%f",phi*180/3.14159);
+        Double_t phi1 = pad->GetPhimin()/180.*TMath::Pi();
+        Double_t phi0 = phi1-phi;
+        printf(" phi0=%f",phi0);
+        Double_t l = r2-r1;
+        printf(" l=%f",l);
+        Double_t x = r1*phi0+l/2.;
+        Double_t y = r1+l/2.;
+        printf(" x=%f",x);
+        printf(" y=%f",y);
+        printf(" xe=%f",xe);
+        printf(" ye=%f",ye);
+        printf("\n");
+        TPolyLine padPolygon = GetPolygon(x, y,l,l);
+        TPolyLine spotPolygon2 = GetPolygon(0,r, spotL, spotL);
+        Double_t area;
+        printf("spotArea=%f\n",spotArea);
+        if (!PolygonsIntersect(padPolygon,spotPolygon2,area)) continue; 
+        UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
+        printf("iCharge=%i\n",iCharge);
+      }
+      continue;
+    } 
+
     map<Int_t, CbmMuchSector*> firedSectors; // map from a sector index to a fired sector
+
+    if (module->GetDetectorType()!=1) return kFALSE;
+    CbmMuchModuleGem* moduleGem = (CbmMuchModuleGem*) module;
     for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
-      CbmMuchSector* sector = module->GetSector(xVertex[iVertex], yVertex[iVertex]);
+      CbmMuchSector* sector = moduleGem->GetSector(xVertex[iVertex], yVertex[iVertex]);
       if (!sector) continue;
       Int_t iSector = sector->GetSectorIndex();
       if (firedSectors.find(iSector) != firedSectors.end()) continue;
@@ -268,6 +358,9 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
 
   // Loop over all MuchPoints
   Int_t nPoints = fPoints->GetEntriesFast();
+
+//  for (Int_t iPoint = 70; iPoint < 75; iPoint++) {
+// TODO
   for (Int_t iPoint = 0; iPoint < nPoints; iPoint++) {
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
 
@@ -278,13 +371,13 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
     }
 
     // Get the module the point is in
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(point->GetDetectorID());
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
     if (!module) {
       fNFailed++;
       continue;
     }
     // Process only appropriate module types
-    if(module->GetDetectorType()!=1) continue;
+    if(module->GetDetectorType()!=1 && module->GetDetectorType()!=3) continue;
     // Produce Digis
     ExecAdvanced(point, iPoint);
   } // MuchPoint loop
@@ -292,9 +385,10 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
   // Add remaining digis
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
   for (Int_t im=0;im<modules.size();im++){
-    if (modules[im]->GetDetectorType()!=1) continue;
-    vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
-    for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+    //TODO
+    //if(module->GetDetectorType()!=1 || module->GetDetectorType()!=3) continue;
+//    vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
+//    for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
   }
 
   // Screen output

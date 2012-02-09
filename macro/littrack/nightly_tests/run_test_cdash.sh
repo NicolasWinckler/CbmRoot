@@ -1,8 +1,8 @@
 #!/bin/sh
 
-. /data.local1/andrey/cbm_nightly/Dart.sh Nightly /data.local1/andrey/cbm_nightly/Dart.cfg    
+. /data.local1/andrey/cdash_tests/cbmroot/Dart.sh Nightly /data.local1/andrey/cdash_tests/cbmroot/Dart.cfg    
 
-. /data.local1/andrey/cbm_nightly_build/config.sh
+. /data.local1/andrey/cdash_tests/cbmroot_build_jan12/config.sh
 
 #. ./run_test_electron.sh
 #. ./run_test_muon.sh
@@ -12,13 +12,13 @@ cd /u/andrey/web-docs/tests
 rm -r -f $DAY
 mkdir $DAY
 
-cp -r /data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/results_electron_branch /u/andrey/web-docs/tests/$DAY/results_electron_branch
-cp -r /data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/results_electron_nn /u/andrey/web-docs/tests/$DAY/results_electron_nn
-cp -r /data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/results_electron_nn_parallel /u/andrey/web-docs/tests/$DAY/results_electron_nn_parallel
+cp -r /data.local1/andrey/cdash_tests/cbmroot_build_jan12/macro/littrack/nightly_tests/results_electron_branch /u/andrey/web-docs/tests/$DAY/results_electron_branch
+cp -r /data.local1/andrey/cdash_tests/cbmroot_build_jan12/macro/littrack/nightly_tests/results_electron_nn /u/andrey/web-docs/tests/$DAY/results_electron_nn
+cp -r /data.local1/andrey/cdash_tests/cbmroot_build_jan12/macro/littrack/nightly_tests/results_electron_nn_parallel /u/andrey/web-docs/tests/$DAY/results_electron_nn_parallel
 
-cp -r /data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/results_muon_branch /u/andrey/web-docs/tests/$DAY/results_muon_branch
-cp -r /data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/results_muon_nn /u/andrey/web-docs/tests/$DAY/results_muon_nn
-cp -r /data.local1/andrey/cbm_nightly_build/macro/littrack/nightly_tests/results_muon_nn_parallel /u/andrey/web-docs/tests/$DAY/results_muon_nn_parallel
+cp -r /data.local1/andrey/cdash_tests/cbmroot_build_jan12/macro/littrack/nightly_tests/results_muon_branch /u/andrey/web-docs/tests/$DAY/results_muon_branch
+cp -r /data.local1/andrey/cdash_tests/cbmroot_build_jan12/macro/littrack/nightly_tests/results_muon_nn /u/andrey/web-docs/tests/$DAY/results_muon_nn
+cp -r /data.local1/andrey/cdash_tests/cbmroot_build_jan12/macro/littrack/nightly_tests/results_muon_nn_parallel /u/andrey/web-docs/tests/$DAY/results_muon_nn_parallel
 
 export SCRIPT=yes
 

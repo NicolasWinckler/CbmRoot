@@ -51,7 +51,7 @@ public:
    static Int_t MarkerStyle(Int_t markerIndex) {
       static const Int_t nofMarkers = 8;
       static Int_t markers[nofMarkers] = {kOpenCircle, kOpenSquare, kOpenTriangleUp, kOpenDiamond,
-                                          kFullCircle, kFullSquare, kFullTriangleUp, kFullDiamond};
+                                          kFullCircle, kFullSquare, kFullTriangleUp};
       return (markerIndex < nofMarkers) ? markers[markerIndex] : markerIndex;
    }
 

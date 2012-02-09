@@ -78,7 +78,6 @@ CbmMuchModuleSector::~CbmMuchModuleSector() {
 
 // -----   Public method AddSector   ---------------------------------------
 void CbmMuchModuleSector::AddSector(CbmMuchRadialSector* sector) {
-  fSectorRadii.push_back(sector->GetR1());
   fSectors.Add(sector);
 }
 // -------------------------------------------------------------------------
@@ -100,10 +99,10 @@ vector<CbmMuchPad*> CbmMuchModuleSector::GetPads() {
 // -------------------------------------------------------------------------
 
 // -----   Public method GetPad  -------------------------------------------
-CbmMuchPad* CbmMuchModuleSector::GetPad(Long64_t channelId) {
+CbmMuchRadialPad* CbmMuchModuleSector::GetPad(Long64_t channelId) {
   CbmMuchRadialSector* sector = GetSector(channelId);
   Int_t iChannel = GetChannelIndex(channelId);
-  return 0;//sector ? sector->GetPad(iChannel) : NULL;
+  return sector ? sector->GetPad(iChannel) : NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -130,10 +129,11 @@ CbmMuchRadialSector* CbmMuchModuleSector::GetSector(Long64_t channelId) {
 // -----   Public method GetSector   ---------------------------------------
 CbmMuchRadialSector* CbmMuchModuleSector::GetSectorByRadius(Double_t r){
   vector<Double_t>::iterator i0,ie,i1; 
+//  printf("size=%i\n",fSectorRadii.size());
   i0 = fSectorRadii.begin();
   ie = fSectorRadii.end();
   i1 = upper_bound(i0,ie,r);
-  return (CbmMuchRadialSector*)fSectors.At(i1-i0-1);
+  return i1-i0-1>=0 ? (CbmMuchRadialSector*) fSectors.At(i1-i0-1) : 0;
 }
 // -------------------------------------------------------------------------
 
@@ -145,6 +145,18 @@ void CbmMuchModuleSector::DrawModule(Color_t color) {
     sector->Draw("f");
     sector->Draw();
   }
+}
+
+
+Bool_t CbmMuchModuleSector::InitModule(){
+  for (Int_t s=0;s<GetNSectors();s++){
+    CbmMuchRadialSector* sector = GetSector(s);
+    if (!sector) continue;
+    fSectorRadii.push_back(sector->GetR1());
+    sector->AddPads();
+  }
+
+  return kTRUE;
 }
 
 ClassImp(CbmMuchModuleSector)

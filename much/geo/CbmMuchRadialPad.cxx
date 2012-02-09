@@ -20,17 +20,18 @@ CbmMuchRadialPad::CbmMuchRadialPad(CbmMuchRadialSector* sector, Int_t iChannel):
   // Generate detectorId
   fDetectorId = sector->GetDetectorId();
   Int_t iSector = sector->GetSectorIndex();
-  fChannelId = 0;//TODO CbmMuchModuleSector::GetChannelId(iSector, iChannel);
+  fChannelId = CbmMuchModuleSector::GetChannelId(iSector, iChannel);
   fR1 = sector->GetR1();
   fR2 = sector->GetR2();
   Int_t nPads = sector->GetNChannels();
   Double_t angle = sector->GetPadAngle();
   Double_t phi0 = (sector->GetPhimax()+sector->GetPhimin())/2.;
+  if (fPhimax<fPhimin) printf("Warning!\n");
   fPhimin = (iChannel%2==0) ? phi0+(iChannel/2+0)*angle : phi0 - (iChannel/2+1)*angle;
   fPhimax = (iChannel%2==0) ? phi0+(iChannel/2+1)*angle : phi0 - (iChannel/2+0)*angle;
   fX1 = 0;
   fY1 = 0;
-  printf("Channel: %i %f R:Phi = %f-%f:%f-%f\n",iChannel,angle,fR1,fR2,fPhimin,fPhimax);
+//  printf("Channel: %i %f R:Phi = %f-%f:%f-%f\n",iChannel,angle,fR1,fR2,fPhimin,fPhimax);
   SetFillColor(0);
   SetLineWidth(1);
   SetLineColor(34);

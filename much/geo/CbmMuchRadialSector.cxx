@@ -60,8 +60,13 @@ Int_t CbmMuchRadialSector::GetChannel(Double_t x, Double_t y) {
 
 // -----   Public method GetChannel   --------------------------------------
 Int_t CbmMuchRadialSector::GetChannel(Double_t phi) {
-  Int_t i = 2*Int_t((phi-fPhi0)/fPadAngle);
-  return phi>fPhi0 ? i : i+1;
+  //TODO 
+  if (fPhimin<180 && fPhimax>180 && phi<0) phi+=360;
+  Int_t i = 2*TMath::Floor((phi-fPhi0)/fPadAngle);
+  i = phi>fPhi0 ? i : -i-1;
+  if (i>100) printf("phi0 = %f phi=%f fPhimin=%f fPhimax=%f", fPhi0, phi,fPhimin,fPhimax);
+//  printf("i=%i\n",i);
+  return i;
 }
 // -------------------------------------------------------------------------
 

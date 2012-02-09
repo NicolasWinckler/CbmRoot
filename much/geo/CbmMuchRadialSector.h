@@ -18,7 +18,7 @@
 #include <vector>
 
 
-class CbmMuchPad;
+class CbmMuchRadialPad;
 
 using std::vector;
 
@@ -53,6 +53,9 @@ class CbmMuchRadialSector : public TCrown
    */
   Int_t GetChannel(Double_t x, Double_t y);
   Int_t GetChannel(Double_t phi);
+  
+  CbmMuchRadialPad* GetPad(Int_t iChannel) const { return (CbmMuchRadialPad*)fPads.At(iChannel); }
+
   // TODO
   Double_t GetPadAngle() const { return fPadAngle; }
   // TODO

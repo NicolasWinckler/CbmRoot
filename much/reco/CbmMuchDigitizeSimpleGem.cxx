@@ -14,6 +14,8 @@
 #include "CbmMuchSector.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchModuleGem.h"
+#include "CbmMuchModuleSector.h"
+#include "CbmMuchRadialSector.h"
 
 // Includes from base
 #include "FairRootManager.h"
@@ -120,9 +122,6 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
     fNOutside++;
     return kFALSE;
   }
-  TVector3 modSize = module->GetSize();
-  Double_t modLx = modSize[0];
-  Double_t modLy = modSize[1];
 
   CbmMuchSector* sector = module->GetSector(x0, y0);
   Int_t iChannel = -1;
@@ -188,6 +187,78 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 }
 // -------------------------------------------------------------------------
 
+
+// ------- Private method ExecSimple ---------------------------------------
+Bool_t CbmMuchDigitizeSimpleGem::ExecSimpleSector(CbmMuchPoint* point, Int_t iPoint) {
+  // Get entrance and exit coordinates of the point
+  TVector3 vIn,vOut,v;
+  point->PositionIn(vIn);
+  point->PositionOut(vOut);
+  v = (vIn+vOut)*0.5;
+  Double_t r   = v.Perp();
+  Double_t phi = v.Phi()*180/TMath::Pi();
+//  printf("r=%f phi=%f\n",r,phi);
+  // Get module for the point
+  Int_t detectorId = point->GetDetectorID();
+  CbmMuchModuleSector* module = (CbmMuchModuleSector*)fGeoScheme->GetModuleByDetId(detectorId);
+  if (!module)
+    return kFALSE;
+  if (module->GetNSectors() == 0) {
+    fNOutside++;
+    return kFALSE;
+  }
+
+  CbmMuchRadialSector* sector = module->GetSectorByRadius(r);
+//  printf("sector=%i\n",sector);
+  Int_t iChannel = -1;
+  if (sector) iChannel = sector->GetChannel(phi);
+  if (iChannel>100) printf("Warning\n");
+  if (iChannel<0) return kFALSE;
+  
+  Int_t iSector = sector->GetSectorIndex();                            // Sector index within the module
+  Long64_t channelId = CbmMuchModuleSector::GetChannelId(iSector, iChannel); // Channel id within the module
+  pair<Int_t, Long64_t> uniqueId(detectorId, channelId);                  // Unique id of the channel within the MUCH
+  Int_t iDigi = -1;
+  CbmMuchDigiMatch* match;
+
+  
+  if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
+    // Channel not yet active. Create new Digi and Match.
+    iDigi = fDigis->GetEntriesFast();
+    Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
+    new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, channelId, time, fDTime);
+    new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
+    match = dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
+      if (match){
+        match->AddPoint(iPoint);
+      }
+      // Match channelId to index of the Digi.
+      fChannelMap[uniqueId] = iDigi;
+
+      CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
+
+      // Set ADC charge (for visualization)
+      digi->SetADCCharge(100);
+  } else {
+    // Channel already active.
+    iDigi = fChannelMap[uniqueId];
+    CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
+    Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
+    match = dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
+      if (match) {
+        match->AddPoint(iPoint);
+        fNMulti++;
+      }
+  }
+
+  CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
+  if(digi) digi->SetADCCharge(100);
+
+  return kTRUE;
+}
+// -------------------------------------------------------------------------
+
+
 // -----   Public method Exec   --------------------------------------------
 void CbmMuchDigitizeSimpleGem::Exec(Option_t* opt) {
   // Reset all eventwise counters
@@ -223,16 +294,14 @@ void CbmMuchDigitizeSimpleGem::Exec(Option_t* opt) {
     }
 
     // Get the module the point is in
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
-        point->GetDetectorID());
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
     if (!module) {
       fNFailed++;
       continue;
     }
     // Process only appropriate module types
-    if(module->GetDetectorType()!=1) continue;
-    // Produce Digis
-    ExecSimple(point, iPoint);
+    if(module->GetDetectorType()==1) ExecSimple(point, iPoint);
+    if(module->GetDetectorType()==3) ExecSimpleSector(point, iPoint);
   } // MuchPoint loop
 
   // Screen output

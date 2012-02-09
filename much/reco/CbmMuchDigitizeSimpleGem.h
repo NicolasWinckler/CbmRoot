@@ -96,6 +96,9 @@ private:
   /** Simple digis production without avalanches **/
   Bool_t ExecSimple(CbmMuchPoint* point, Int_t iPoint);
 
+  /** Simple digis production without avalanches **/
+  Bool_t ExecSimpleSector(CbmMuchPoint* point, Int_t iPoint);
+  
   ClassDef(CbmMuchDigitizeSimpleGem,1)
 };
 #endif

@@ -25,6 +25,9 @@
 #include "TClonesArray.h"
 #include "TPave.h"
 
+class CbmMuchRadialSector;
+class CbmMuchRadialPad;
+
 #include <vector>
 #include <map>
 
@@ -109,7 +112,7 @@ class CbmMuchModuleSector : public CbmMuchModule
     /** Gets sector by the given coordinates in global c.s. */
     CbmMuchRadialSector* GetSectorByRadius(Double_t r);
     /** Gets pad by the given Id. */
-    CbmMuchPad* GetPad(Long64_t channelId);
+    CbmMuchRadialPad* GetPad(Long64_t channelId);
     /** Gets array of pads for this module. */
     vector<CbmMuchPad*> GetPads();
     Int_t GetNPads();
@@ -136,6 +139,7 @@ class CbmMuchModuleSector : public CbmMuchModule
     Double_t GetDy()  { return fDy;  }
     Double_t GetDz()  { return fDz;  }
 
+    virtual Bool_t InitModule();
   private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
     TObjArray              fSectors;               // Array of sectors within this module

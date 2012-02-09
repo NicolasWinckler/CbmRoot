@@ -1,1 +1,1 @@
-0 1 * * * `. /data.local1/andrey/cbm_nightly/macro/littrack/nightly_tests/run_test_cdash.sh`
+0 1 * * * `. /data.local1/andrey/cdash_tests/cbmroot/macro/littrack/nightly_tests/run_test_cdash.sh`

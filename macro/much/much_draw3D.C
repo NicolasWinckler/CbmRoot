@@ -20,5 +20,13 @@ void much_draw3D(char* geofile = "geometry.root"){
 
   // Draw much
   TGeoVolume* much = master->FindNode("much_0")->GetVolume();
-  much->Draw("ogl");
+//  much->Draw("ogl");
+  
+  // Draw station
+  TGeoVolume* station = much->FindNode("muchstation01_0")->GetVolume();
+  //station->Draw("ogl");
+
+  TGeoVolume* layer = station->FindNode("muchstation01layer1_0")->GetVolume();
+  layer->Draw("ogl");
+
 }

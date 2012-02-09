@@ -27,6 +27,7 @@ void much_hits_sector(){
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
 
+//  CbmMuchDigitizeSimpleGem* digitize = new CbmMuchDigitizeSimpleGem("MuchDigitizeSimpleGem", digiFile, iVerbose);
   CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem("MuchDigitizeAdvancedGem", digiFile, iVerbose);
   fRun->AddTask(digitize);
 

@@ -11,7 +11,7 @@
 void much_sim_sector(TString inputSignal = "",
               TString inputBgr = "",
               TString outFile = "",
-              Int_t nEvents = 2)
+              Int_t nEvents = 1)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -192,7 +192,7 @@ void much_sim_sector(TString inputSignal = "",
   }
   if ( inputBgr != "" ) {
   	FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inputBgr);
-  	primGen->AddGenerator(urqmdGen);
+//  	primGen->AddGenerator(urqmdGen);
   }
   fRun->SetGenerator(primGen);
   // ------------------------------------------------------------------------

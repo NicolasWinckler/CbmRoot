@@ -43,7 +43,7 @@ void much_sim(TString inputSignal = "",
   // In case you want the additional W shielding around the pipe,
   // use shield_standard.geo or shield_compact.geo, respective to the
   // MUCH geometry. Otherwise, define an empty string.
-  TString muchGeom   = "much/much_v11a.geo";
+  TString muchGeom   = "much/much_v12a.geo";
   TString pipeGeom   = "pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
 
@@ -56,7 +56,7 @@ void much_sim(TString inputSignal = "",
   TString tofGeom    = "";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap   = "field_v09m";   // name of field map
+  TString  fieldMap   = "field_v10e";   // name of field map
   Double_t fieldZ     = 50.;                 // field center z position
   Double_t fieldScale =  1.;                 // field scaling factor
 
@@ -165,7 +165,7 @@ void much_sim(TString inputSignal = "",
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "field_muon_standard" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "field_v09m" )
+  else if (fieldMap == "field_v10e" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "FieldMuonMagnet" )
     CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
@@ -192,7 +192,7 @@ void much_sim(TString inputSignal = "",
   }
   if ( inputBgr != "" ) {
   	FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inputBgr);
-  	primGen->AddGenerator(urqmdGen);
+//  	primGen->AddGenerator(urqmdGen);
   }
   fRun->SetGenerator(primGen);
   // ------------------------------------------------------------------------

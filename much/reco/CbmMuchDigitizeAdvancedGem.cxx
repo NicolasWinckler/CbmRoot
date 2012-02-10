@@ -136,6 +136,14 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
 }
 // -------------------------------------------------------------------------
 
+// -----   Private method Reset   ------------------------------------------
+void CbmMuchDigitizeAdvancedGem::Reset() {
+  fNFailed = fNOutside = fNMulti = 0;
+  if (fDigis) fDigis->Clear();
+  if (fDigiMatches) fDigiMatches->Delete(); // Delete because of memory leaks
+}
+// -------------------------------------------------------------------------
+
 // ------- Private method ExecAdvanced -------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
   TVector3 v1,v2,dv;
@@ -152,40 +160,90 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Int_t detectorId = point->GetDetectorID();
   CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
   if (!module) return kFALSE;
-  if (module->GetDetectorType()!=3)   return kFALSE;
-  CbmMuchModuleSector* module3 = (CbmMuchModuleSector*) module;
-  Double_t rMin = module3->GetSectorByIndex(0)->GetR1();
-  Double_t rMax = module3->GetSectorByIndex(module->GetNSectors()-1)->GetR2();
-
-  for (Int_t i=0;i<nElectrons;i++) {
-    Double_t aL   = gRandom->Rndm();
-    TVector3 ve   = v1 + dv*aL;
-    UInt_t ne     = GasGain();
-    Double_t r    = ve.Perp();
-    Double_t phi  = ve.Phi();
-    Double_t r1   = r-fSpotRadius;
-    Double_t r2   = r+fSpotRadius;
-    Double_t phi1 = phi-fSpotRadius/r;
-    Double_t phi2 = phi+fSpotRadius/r;
-    if (r1<rMin && r2>rMin) {
-      CbmMuchRadialSector* s = module3->GetSectorByIndex(0);
-      AddCharge(s,UInt_t(ne*(r2-rMin)/(r2-r1)),iPoint,time,aL,phi1,phi2);
-      continue;
-    }  
-    if (r1<rMax && r2>rMax) {
-      CbmMuchRadialSector* s = module3->GetSectorByIndex(module->GetNSectors()-1);
-      AddCharge(s,UInt_t(ne*(rMax-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
-      continue;
+  
+  if (module->GetDetectorType()==1) {
+    CbmMuchModuleGem* module1 = (CbmMuchModuleGem*) module;
+    for (Int_t i=0;i<nElectrons;i++) {
+      Double_t aL = gRandom->Rndm();
+      TVector3 ve = v1 + dv*aL;
+      UInt_t ne   = GasGain();
+      Double_t x  = ve.X();
+      Double_t y  = ve.Y();
+      Double_t x1 = x-fSpotRadius;
+      Double_t x2 = x+fSpotRadius;
+      Double_t y1 = y-fSpotRadius;
+      Double_t y2 = y+fSpotRadius;
+      Double_t s  = 4*fSpotRadius*fSpotRadius;
+      CbmMuchSector* s11 = module1->GetSector(x1,y1);
+      CbmMuchSector* s12 = module1->GetSector(x1,y2);
+      CbmMuchSector* s21 = module1->GetSector(x2,y1);
+      CbmMuchSector* s22 = module1->GetSector(x2,y2);
+//      if (s11==s21 && s11==s12 && s11==s22)
+//        AddCharge(s11,ne,iPoint,time,aL);
+//      else {
+//        if (s11==s21) { 
+//          AddCharge(s11,ne*(y-y1)*(x2-x1)/s,iPoint,time,aL);
+//          if   (s12==s22)
+//            AddCharge(s12,ne*(x2-x1)*(y2-y)/s,iPoint,time,aL);
+//          else {
+//            AddCharge(s12,ne*(x-x1)*(y2-y)/s,iPoint,time,aL);
+//            AddCharge(s22,ne*(x2-x)*(y2-y)/s,iPoint,time,aL);
+//          }
+//        } else {
+//          if (s11!=s12) {
+//            AddCharge(s11,ne*(x-x1)*(y-y1)/s,iPoint,time,aL);
+//            AddCharge(s21,ne*(x2-x)*(y-y1)/s,iPoint,time,aL);
+//            if   (s12==s22)
+//              AddCharge(s12,ne*(x2-x1)*(y2-y)/s,iPoint,time,aL);
+//            else {
+//              AddCharge(s12,ne*(x-x1)*(y2-y)/s,iPoint,time,aL);
+//              AddCharge(s22,ne*(x2-x)*(y2-y)/s,iPoint,time,aL);
+//            }
+//          }
+//          else {
+//            
+//          }
+//        }
+//      }
     }
-
-    CbmMuchRadialSector* s1 = module3->GetSectorByRadius(r1);
-    CbmMuchRadialSector* s2 = module3->GetSectorByRadius(r2);
-    if (s1==s2) AddCharge(s1,ne,iPoint,time,aL,phi1,phi2); 
-    else {
-      AddCharge(s1,UInt_t(ne*(s1->GetR2()-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
-      AddCharge(s2,UInt_t(ne*(r2-s2->GetR1())/(r2-r1)),iPoint,time,aL,phi1,phi2);
-    }      
   }
+  
+  if (module->GetDetectorType()==3) {
+    CbmMuchModuleSector* module3 = (CbmMuchModuleSector*) module;
+    Double_t rMin = module3->GetSectorByIndex(0)->GetR1();
+    Double_t rMax = module3->GetSectorByIndex(module->GetNSectors()-1)->GetR2();
+
+    for (Int_t i=0;i<nElectrons;i++) {
+      Double_t aL   = gRandom->Rndm();
+      TVector3 ve   = v1 + dv*aL;
+      UInt_t ne     = GasGain();
+      Double_t r    = ve.Perp();
+      Double_t phi  = ve.Phi();
+      Double_t r1   = r-fSpotRadius;
+      Double_t r2   = r+fSpotRadius;
+      Double_t phi1 = phi-fSpotRadius/r;
+      Double_t phi2 = phi+fSpotRadius/r;
+      if (r1<rMin && r2>rMin) {
+        CbmMuchRadialSector* s = module3->GetSectorByIndex(0);
+        AddCharge(s,UInt_t(ne*(r2-rMin)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+        continue;
+      }  
+      if (r1<rMax && r2>rMax) {
+        CbmMuchRadialSector* s = module3->GetSectorByIndex(module->GetNSectors()-1);
+        AddCharge(s,UInt_t(ne*(rMax-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+        continue;
+      }
+
+      CbmMuchRadialSector* s1 = module3->GetSectorByRadius(r1);
+      CbmMuchRadialSector* s2 = module3->GetSectorByRadius(r2);
+      if (s1==s2) AddCharge(s1,ne,iPoint,time,aL,phi1,phi2); 
+      else {
+        AddCharge(s1,UInt_t(ne*(s1->GetR2()-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+        AddCharge(s2,UInt_t(ne*(r2-s2->GetR1())/(r2-r1)),iPoint,time,aL,phi1,phi2);
+      }      
+    }
+  }
+
   return kTRUE;
 }
 // -------------------------------------------------------------------------
@@ -311,70 +369,6 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
   fEvent = 0;
 
   return kSUCCESS;
-}
-// -------------------------------------------------------------------------
-
-
-// -----   Private method Reset   ------------------------------------------
-void CbmMuchDigitizeAdvancedGem::Reset() {
-  fNFailed = fNOutside = fNMulti = 0;
-  if (fDigis) fDigis->Clear();
-  if (fDigiMatches) fDigiMatches->Delete(); // Delete because of memory leaks
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-TPolyLine CbmMuchDigitizeAdvancedGem::GetPolygon(Double_t x0, Double_t y0, Double_t width,
-    Double_t height) {
-
-  Double_t x[5], y[5];
-  x[1] = -width /2;
-  y[1] = +height/2;
-  x[2] = +width /2;
-  y[2] = +height/2;
-  x[0] = -width /2;
-  y[0] = -height/2;
-  x[3] = +width /2;
-  y[3] = -height/2;
-  x[4] = x[0];
-  y[4] = y[0];
-  for (int i = 0; i < 5; i++) {
-    x[i] += x0;
-    y[i] += y0;
-  }
-  TPolyLine pline(5, x, y);
-  return pline;
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-Bool_t CbmMuchDigitizeAdvancedGem::ProjectionsIntersect(Double_t x11, Double_t x12,
-    Double_t x21, Double_t x22, Double_t& length) {
-  if (x11 > x22 || x12 < x21)
-    return kFALSE;
-  if (x22 < x12) {
-    if (x21 > x11) length = x22 - x21;
-    else           length = x22 - x11;
-  } else {
-    if (x11 > x21) length = x12 - x11;
-    else           length = x12 - x21;
-  }
-  return kTRUE;
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area) {
-  Double_t length, width;
-  Double_t* x1 = polygon1.GetX();
-  Double_t* y1 = polygon1.GetY();
-  Double_t* x2 = polygon2.GetX();
-  Double_t* y2 = polygon2.GetY();
-
-  if (!ProjectionsIntersect(x1[0], x1[3], x2[0], x2[3], width))  return kFALSE;
-  if (!ProjectionsIntersect(y1[0], y1[1], y2[0], y2[1], length)) return kFALSE;
-  area = width * length;
-  return kTRUE;
 }
 // -------------------------------------------------------------------------
 

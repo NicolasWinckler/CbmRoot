@@ -193,24 +193,6 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      *@param width  Width.
      *@param height Height.
      **/
-    TPolyLine GetPolygon(Double_t x0, Double_t y0, Double_t width, Double_t height);
-
-    /** Verifies whether projections with given coordinates are intersected.
-     *@param x11     coordinate of one end of the first projection.
-     *@param x12     coordinate of another end of the first projection.
-     *@param x21     coordinate of one end of the second projection.
-     *@param x22     coordinate of another end of the second projection.
-     *@param length  length of intresection.
-     **/
-    Bool_t ProjectionsIntersect(Double_t x11, Double_t x12, Double_t x21, Double_t x22, Double_t& length);
-
-    /** Determines whether the two given polygons intersect and calculates the
-     *  area of intersection.
-     *@param polygon1  Fisrt polygon.
-     *@param polygon2  Second polygon.
-     *@param area      Intersection area.
-     **/
-    Bool_t PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area);
 
     Bool_t AddDigi(CbmMuchPad* pad);
     Bool_t AddDigi(CbmMuchRadialPad* pad);

@@ -13,6 +13,7 @@
 #include "base/CbmLitEnums.h"
 
 #include <vector>
+#include <cstddef>
 
 class CbmLitTrackParam;
 

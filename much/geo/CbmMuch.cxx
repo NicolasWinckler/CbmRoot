@@ -420,11 +420,13 @@ void CbmMuch::ConstructGeometry() {
             expression = Form("shStation%02iLayer%i%cModule%03iActiveNoHole-", iStation, iLayer, cside, iModule)+moduleHoleName+":"+translationName;
             TString moduleActiveName = Form("shStation%02iLayer%i%cModule%03iActive", iStation, iLayer, cside, iModule);
             TGeoCompositeShape* shActive = new TGeoCompositeShape(moduleActiveName,expression);
-
-            Double_t sdx1 = dx1+fGeoScheme->GetSpacerPhi();
-            Double_t sdx2 = dx2+fGeoScheme->GetSpacerPhi(); 
+            Double_t tg = (dx2-dx1)/2/dy;
+            Double_t dd1 = fGeoScheme->GetSpacerPhi()*tg;
+            Double_t dd2 = fGeoScheme->GetSpacerPhi()*sqrt(1+tg*tg);
+            Double_t sdx1 = dx1+dd2-dd1;
+            Double_t sdx2 = dx2+dd2+dd1; 
             Double_t sdy  = dy+fGeoScheme->GetSpacerR();
-            Double_t sdz  = dz;
+            Double_t sdz  = dz-0.1;
             TGeoTrap* shapeSpacer = new TGeoTrap(sdz,0,0,sdy,sdx1,sdx2,0,sdy,sdx1,sdx2,0);
             shapeSpacer->SetName(Form("shStation%02iLayer%i%cModule%03iFullSpacerNoHole", iStation, iLayer, cside, iModule));
             TGeoCompositeShape* shSpacerFull1 = new TGeoCompositeShape(Form("shStation%02iLayer%i%cModule%03iSpacerNoHole", iStation, iLayer, cside, iModule),

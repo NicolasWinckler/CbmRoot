@@ -145,6 +145,10 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Double_t phiMin = (phiIn>phiOut? phiIn : phiOut)-fSpotRadius/rMin;
   Double_t phiMax = (phiIn<phiOut? phiIn : phiOut)+fSpotRadius/rMin;
   
+  Int_t irMin=-1;
+  Int_t irMax=-1;
+  vector<Int_t> vipMin;
+  vector<Int_t> vipMax;
   printf("%i",iPoint);
   {
     Int_t detectorId = point->GetDetectorID();
@@ -155,26 +159,27 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
       CbmMuchRadialSector* secMin = moduleSector->GetSectorByRadius(rMin);
       CbmMuchRadialSector* secMax = moduleSector->GetSectorByRadius(rMax);
       if (!secMin || !secMax) { printf("\n"); return 0; }
-      Int_t irMin = secMin->GetSectorIndex();
-      Int_t irMax = secMax->GetSectorIndex();
+      irMin = secMin->GetSectorIndex();
+      irMax = secMax->GetSectorIndex();
       printf(" %i %i\n",irMin,irMax);
       for (Int_t ir=irMin;ir<=irMax;ir++){
         CbmMuchRadialSector* sec = moduleSector->GetSectorByIndex(ir);
         Int_t ipMin = sec->GetChannel(phiMin*180./3.14159);
         Int_t ipMax = sec->GetChannel(phiMax*180./3.14159);
         printf(" %i %i\n",ipMin,ipMax);
-        for (Int_t ip=ipMin;ip<=ipMax;ip++){
-          Long64_t channelId = CbmMuchModuleSector::GetChannelId(ir, ip);
-          CbmMuchDigi* digi = new CbmMuchDigi(detectorId, channelId,0,0);
-          digi->SetADCCharge(100);
-          printf("add\n");
-          new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
-          new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch();
-        }
+        vipMin.push_back(ipMin);
+        vipMax.push_back(ipMax);
+//        for (Int_t ip=ipMin;ip<=ipMax;ip++){
+//          Long64_t channelId = CbmMuchModuleSector::GetChannelId(ir, ip);
+//          CbmMuchDigi* digi = new CbmMuchDigi(detectorId, channelId,0,0);
+//          digi->SetADCCharge(100);
+//          printf("add\n");
+//          new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
+//          new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch();
+//        }
       }
     }
   }
-  return 1;
   //********** Primary electrons from the track (begin) ************************//
   // Get particle's characteristics
   Int_t trackID = point->GetTrackID();
@@ -255,10 +260,12 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         if (phi<60/180.*3.14159) continue;
         printf("  iVertex=%i",iVertex);
         printf("r=%f phi=%f",r,phi);
-        CbmMuchRadialSector* sector = moduleSector->GetSectorByRadius(r);
+        CbmMuchRadialSector* sector = moduleSector->GetSectorByRadius(r,irMin,irMax);
         printf(" sector=%i",sector);
         if (!sector) { printf("\n"); continue; }
+        Int_t iSector = sector->GetSectorIndex();
         Int_t iChannel = sector->GetChannel(phi*180/3.14159);
+        if (iChannel<vipMin[iSector] || iChannel>vipMax[iSector]) printf("Error!!!\n");
         printf(" iChannel=%i",iChannel);
         if (iChannel>50) { printf("\n"); continue; }
 //        continue;

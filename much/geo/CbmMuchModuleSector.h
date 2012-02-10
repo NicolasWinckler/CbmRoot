@@ -108,7 +108,7 @@ class CbmMuchModuleSector : public CbmMuchModule
     /** Gets sector by the given channel Id. **/
     CbmMuchRadialSector* GetSector(Long64_t channelId);
     /** Gets sector by the given coordinates in global c.s. */
-    CbmMuchRadialSector* GetSectorByRadius(Double_t r);
+    CbmMuchRadialSector* GetSectorByRadius(Double_t r,Int_t irMin=-1,Int_t irMax=-1);
     /** Gets pad by the given Id. */
     CbmMuchRadialPad* GetPad(Long64_t channelId);
     /** Gets array of pads for this module. */

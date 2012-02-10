@@ -115,11 +115,13 @@ CbmMuchRadialSector* CbmMuchModuleSector::GetSector(Long64_t channelId) {
 
 
 // -----   Public method GetSector   ---------------------------------------
-CbmMuchRadialSector* CbmMuchModuleSector::GetSectorByRadius(Double_t r){
+CbmMuchRadialSector* CbmMuchModuleSector::GetSectorByRadius(Double_t r, Int_t irMin, Int_t irMax){
   vector<Double_t>::iterator i0,ie,i1; 
 //  printf("size=%i\n",fSectorRadii.size());
   i0 = fSectorRadii.begin();
   ie = fSectorRadii.end();
+  if (irMax>=0 && irMax<fSectorRadii.size()) ie=i0+irMax;
+  if (irMin>=0 && irMin<fSectorRadii.size()) i0=i0+irMin;
   i1 = upper_bound(i0,ie,r);
   return i1-i0-1>=0 ? (CbmMuchRadialSector*) fSectors.At(i1-i0-1) : 0;
 }

@@ -280,7 +280,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   printf("Introduction:\n");
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
-  Bool_t Fast = true;//false;
+  Bool_t Fast = false;
   //  Bool_t Fast = false;
   Bool_t firstLayer = false;
   //  fDraw = false;

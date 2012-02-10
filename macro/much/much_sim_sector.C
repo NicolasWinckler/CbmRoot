@@ -24,7 +24,7 @@ void much_sim_sector(TString inputSignal = "",
     inputBgr = inputdir + "/input/urqmd.ftn14";
   }
   if (outFile == "") {
-    outFile = "data/Jpsi.auau.25gev.centr.mc.root";
+    outFile = "data/mc_sector.root";
   }
   TString parFile = "data/params.root";
 
@@ -192,7 +192,7 @@ void much_sim_sector(TString inputSignal = "",
   }
   if ( inputBgr != "" ) {
   	FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inputBgr);
-//  	primGen->AddGenerator(urqmdGen);
+  	primGen->AddGenerator(urqmdGen);
   }
   fRun->SetGenerator(primGen);
   // ------------------------------------------------------------------------

@@ -15,13 +15,13 @@ void much_hits_gem(TString inFile = "",
 {
    TString inputdir = gSystem->Getenv("VMCWORKDIR");
    if (inFile == "") {
-      inFile = "data/Jpsi.auau.25gev.centr.mc.root";
+      inFile = "data/mc.root";
    }
    if (digiFile == "") {
       digiFile = inputdir + "/parameters/much/much_v11a.digi.root";
    }
    if (outFile == "") {
-      outFile = "data/Jpsi.auau.25gev.centr.muchhits.root";
+      outFile = "data/hits_gem.root";
    }
 
    TString parFile = "data/params.root";

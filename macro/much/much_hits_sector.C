@@ -4,9 +4,9 @@
  * Digitization of simulated events in MUCH
  **/
 void much_hits_sector(){
-  TString inFile   = "data/Jpsi.auau.25gev.centr.mc.root";
+  TString inFile   = "data/mc_sector.root";
   TString digiFile = "data/much_digi_sector.root";
-  TString outFile  = "data/Jpsi.auau.25gev.centr.muchhits.root";
+  TString outFile  = "data/hits_sector.root";
   TString parFile  = "data/params.root";
   Int_t nEvents    = 1;
   Int_t iVerbose   = 1;

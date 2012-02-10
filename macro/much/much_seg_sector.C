@@ -15,7 +15,7 @@ void much_seg_sector(const char* mcFile = "",
   //          Adjust this part according to your requirements
 
   if (mcFile == "") {
-    mcFile = "data/Jpsi.auau.25gev.centr.mc.root";
+    mcFile = "data/mc_sector.root";
   }
   if (inDigiFile == "") {
     inDigiFile = "data/much_digi_sector.seg";
@@ -31,43 +31,21 @@ void much_seg_sector(const char* mcFile = "",
   TString outFile  = "data/dummy.root";
   TString parFile = "data/params.root";
 
-  // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-//  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMuch");
-  // ------------------------------------------------------------------------
-
-  // -----   Analysis run   -------------------------------------------------
+  gROOT->LoadMacro("$VMCWORKDIR/macro/much/muchlibs.C");
+  muchlibs();
+  
   FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(mcFile);
   fRun->SetOutputFile(outFile);
-  // ------------------------------------------------------------------------
 
-  // -----  Parameter database   --------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
   parIo1->open(parFile);
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  // ------------------------------------------------------------------------
 
   // -----  Segmentation task  ----------------------------------------------
   CbmMuchSegmentSector* seg = new CbmMuchSegmentSector(inDigiFile, outDigiFile);

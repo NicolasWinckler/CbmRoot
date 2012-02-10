@@ -1,9 +1,9 @@
-/** CbmLitHitToTrackMerger.h
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2008
- *
- * Interface for hit-to-track merging algorithms.
- **/
+/**
+ * \file CbmLitHitToTrackMerger.h
+ * \author A.Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Interface for hit-to-track merging algorithm.
+ */
 
 #ifndef CBMLITHITTOTRACKMERGER_H_
 #define CBMLITHITTOTRACKMERGER_H_
@@ -14,19 +14,31 @@
 class CbmLitHitData;
 class CbmLitDetectorLayout;
 
+/**
+ * \class CbmLitHitToTrackMerger
+ * \author A.Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Interface for hit-to-track merging algorithm.
+ */
 class CbmLitHitToTrackMerger
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitHitToTrackMerger() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitHitToTrackMerger() {}
 
-   /* Main function to be implemented for concrete hit-to-track merging algorithm
-    * @param hits Vector of hits that have to be merged with tracks
-    * @param tracks Vector of tracks that have to be merged with hits
-    * @return Status code */
+   /**
+    * \brief Main function to be implemented for concrete hit-to-track merging algorithm.
+    * \param hits Vector of hits that have to be merged with tracks.
+    * \param tracks Vector of tracks that have to be merged with hits.
+    * \return Status code.
+    */
    virtual LitStatus DoMerge(
       HitPtrVector& hits,
       TrackPtrVector& tracks) = 0;

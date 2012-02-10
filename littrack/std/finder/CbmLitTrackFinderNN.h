@@ -13,7 +13,6 @@
 #ifndef CBMLITTRACKFINDERNN_H_
 #define CBMLITTRACKFINDERNN_H_
 
-#include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitTypes.h"
 #include "finder/CbmLitTrackFinderBase.h"
 

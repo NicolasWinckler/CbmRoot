@@ -1,20 +1,47 @@
-/** CbmLitEnums.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- *
- * Header defines enumerations used in the track reconstruction.
+/**
+ * \file CbmLitEnums.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Define enumerations used in littrack.
  **/
 
 #ifndef CBMLITENUMS_H_
 #define CBMLITENUMS_H_
 
-enum LitHitType { kLITSTRIPHIT = 0, kLITPIXELHIT = 1, kLITMIXHIT = 2};
+/**
+ * \enum Define type of hit on detector station.
+ */
+enum LitHitType {
+   kLITSTRIPHIT = 0, /**< Strip hit. */
+   kLITPIXELHIT = 1, /**< Pixel hit. */
+   kLITMIXHIT = 2 /**< Mixed type of hits, i.e. both strip and pixel hits. **/
+};
 
-enum LitStatus { kLITSUCCESS = 0, kLITERROR = 1};
+/**
+ * \enum Define status code.
+ */
+enum LitStatus {
+   kLITSUCCESS = 0, /**< Success. */
+   kLITERROR = 1 /**< Error. */
+};
 
-enum LitTrackQa { kLITGOOD = 0, kLITBAD = 1, kLITGOODMERGE = 2};
+/**
+ * \enum Define reconstructed track quality.
+ */
+enum LitTrackQa {
+   kLITGOOD = 0, /**< Good track. */
+   kLITBAD = 1, /**< Bad track. */
+   kLITGOODMERGE = 2 /**< Correctly merged track. */
+};
 
-enum LitDetectorId { kLITMUCH = 0, kLITTRD = 1, kLITTOF = 2,  kLITMVD = 3};
+/**
+ * \enum Define detector identificator.
+ */
+enum LitDetectorId {
+   kLITMUCH = 0, /**< MUCH detector. */
+   kLITTRD = 1, /**< TRD detector. */
+   kLITTOF = 2, /**< TOF detector. */
+   kLITMVD = 3 /**< MVD detector. */
+};
 
-#endif /*CBMLITENUMS_H_*/
+#endif /* CBMLITENUMS_H_ */

@@ -91,7 +91,7 @@ void CbmLitFitQa::Finish()
    fHM->WriteToFile();
 
    string qaFile = fOutputDir + "/fit_qa.json";
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/fit_qa_ideal.json");
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/fit/fit_qa_ideal.json");
    string checkFile = fOutputDir + "/fit_qa_check.json";
 
    CbmLitFitQaPTreeCreator ptc;

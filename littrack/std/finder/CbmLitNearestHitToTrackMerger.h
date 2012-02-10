@@ -12,8 +12,8 @@
 
 #include "interface/CbmLitHitToTrackMerger.h"
 #include "finder/CbmLitGating.h"
-#include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitStation.h"
+#include "base/CbmLitPtrTypes.h"
 
 class CbmLitTrackPropagator;
 class CbmLitTrackUpdate;

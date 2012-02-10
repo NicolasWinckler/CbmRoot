@@ -1,9 +1,9 @@
-/** CbmLitTrackFitter.h
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2008
- *
- * Interface for track fitter algorithms
- **/
+/**
+ * \file CbmLitTrackFitter.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Interface for track fitter algorithm.
+ */
 
 #ifndef CBMLITTRACKFITTER_H_
 #define CBMLITTRACKFITTER_H_
@@ -13,19 +13,31 @@
 
 class CbmLitTrack;
 
+/**
+ * \class CbmLitTrackFitter
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Interface for track fitter algorithm.
+ */
 class CbmLitTrackFitter
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitTrackFitter() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackFitter() {}
 
-   /* Main function to be implemented for the concrete track fitter algorithm
-    * @param track Pointer to the track to be fitted
-    * @param downstream Track fit direction
-    * @return Status code */
+   /**
+    * \brief Main function to be implemented for concrete track fitter algorithm.
+    * \param[in,out] track Pointer to track to be fitted.
+    * \param[in] downstream Track fit direction.
+    * \return Status code.
+    */
    virtual LitStatus Fit(
       CbmLitTrack* track,
       bool downstream = true) = 0;

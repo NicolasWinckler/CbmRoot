@@ -1,38 +1,57 @@
-/** CbmLitField.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- ** Interface for accessing the magnetic field.
- **/
+/**
+ * \file CbmLitField.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Interface for accessing the magnetic field.
+ */
 #ifndef CBMLITFIELD_H_
 #define CBMLITFIELD_H_
 
-#include "base/CbmLitTypes.h"
+#include "base/CbmLitFloat.h"
+#include <string>
+using std::string;
 
+/**
+ * \class CbmLitField
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Interface for accessing the magnetic field.
+ */
 class CbmLitField
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitField() {};
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitField() {};
 
-   /* Returns field value at (x,y,z) position
-    * @param x X coordinate [cm].
-    * @param y Y coordinate [cm].
-    * @param z Z coordinate [cm].
-    * @param Bx Output Bx field value [kGauss].
-    * @param By Output By field value [kGauss]
-    * @param Bz Output Bz field value [kGauss]
+   /**
+    * \brief Return field value at (x,y,z) position.
+    * \param[in] x X coordinate [cm].
+    * \param[in] y Y coordinate [cm].
+    * \param[in] z Z coordinate [cm].
+    * \param[out] Bx Output Bx field value [kGauss].
+    * \param[out] By Output By field value [kGauss].
+    * \param[out] Bz Output Bz field value [kGauss].
     */
    virtual void GetFieldValue(
-      litfloat x, litfloat y, litfloat z,
-      litfloat& Bx, litfloat& By, litfloat& Bz) const = 0;
+         litfloat x,
+         litfloat y,
+         litfloat z,
+         litfloat& Bx,
+         litfloat& By,
+         litfloat& Bz) const = 0;
 
-   /* @return std::string representation of this class */
-   virtual std::string ToString() const {
+   /*
+    * \brief Return string representation of class.
+    * \return String representation of this class.
+    */
+   virtual string ToString() const {
       return "CbmLitField::ToString";
    }
 };

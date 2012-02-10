@@ -47,7 +47,7 @@ protected:
     * \brief Inherited from CbmLitSimulationReport.
     */
    virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/fit_qa_ideal.json");
+      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/fit/fit_qa_ideal.json");
    }
 
    /**

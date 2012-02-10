@@ -4,15 +4,17 @@
  **/
 #include "propagation/CbmLitMaterialEffectsImp.h"
 
-#include "base/CbmLitPDG.h"
 #include "base/CbmLitDefaultSettings.h"
 #include "data/CbmLitTrackParam.h"
 #include "propagation/CbmLitMaterialInfo.h"
 
-//#include "parallel/LitAddMaterial.h"
+#include "TDatabasePDG.h"
+#include "TParticlePDG.h"
 
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
+#include <cassert>
 
 CbmLitMaterialEffectsImp::CbmLitMaterialEffectsImp():
    fMass(0.105),
@@ -35,9 +37,12 @@ LitStatus CbmLitMaterialEffectsImp::Update(
    if (mat->GetLength() * mat->GetRho() < 1e-10) { return kLITSUCCESS; }
 
    fDownstream = downstream;
-   fMass = CbmLitPDG::GetMass(pdg);
-   fIsElectron = CbmLitPDG::IsElectron(pdg);
-   fIsMuon = CbmLitPDG::IsMuon(pdg);
+   TDatabasePDG* db = TDatabasePDG::Instance();
+   TParticlePDG* particle = db->GetParticle(pdg);
+   assert(particle != NULL);
+   fMass = particle->Mass();
+   fIsElectron = (std::abs(pdg) == 11) ? true : false;
+   fIsMuon = (std::abs(pdg) == 13) ? true : false;
 
    AddEnergyLoss(par, mat);
 

@@ -1,8 +1,8 @@
-/** CbmLitTrackUpdate.h
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2008
- *
- * Interface for track update algorithms
+/**
+ * \file CbmLitTrackUpdate.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Interface for track update algorithm.
  **/
 
 #ifndef CBMLITTRACKUPDATE_H_
@@ -13,32 +13,46 @@
 class CbmLitHit;
 class CbmLitTrackParam;
 
+/**
+ * \class CbmLitTrackUpdate
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Interface for track update algorithm.
+ **/
 class CbmLitTrackUpdate
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitTrackUpdate() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackUpdate() {}
 
-   /* Main function to be implemented for the concrete track update algorithm
-    * @param pParamIn Pointer to input track parameter
-    * @param pParamOut Pointer to output track parameter
-    * @parma pHit Pointer to hit
-    * @param chiSq Output value of the contribution to the chi-square
-    * @return Status code */
+   /**
+    * \brief Main function to be implemented for concrete track update algorithm.
+    * \param[in] pParamIn Pointer to input track parameter.
+    * \param[out] pParamOut Pointer to output track parameter.
+    * \parma[in] pHit Pointer to hit.
+    * \param[out] chiSq Output value of contribution to chi-square.
+    * \return Status code.
+    */
    virtual LitStatus Update(
       const CbmLitTrackParam* pParamIn,
       CbmLitTrackParam* pParamOut,
       const CbmLitHit* pHit,
       litfloat& chiSq) = 0;
 
-   /* Main function to be implemented for the concrete track update algorithm
-    * @param pParam Pointer to input/output track parameter
-    * @parma pHit Pointer to hit
-    * @param chiSq Output value of the contribution to the chi-square
-    * @return Status code */
+   /**
+    * \brief Main function to be implemented for concrete track update algorithm.
+    * \param[in,out] pParam Pointer to input/output track parameter.
+    * \param[in] pHit Pointer to hit.
+    * \param[out] chiSq Output value of contribution to chi-square.
+    * \return Status code.
+    */
    virtual LitStatus Update(
       CbmLitTrackParam* pParam,
       const CbmLitHit* pHit,

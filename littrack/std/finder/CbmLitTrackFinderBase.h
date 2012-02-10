@@ -14,7 +14,6 @@
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitDetectorLayout.h"
 #include "base/CbmLitHitData.h"
-#include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitTrackFinderSettings.h"
 
 #include <set>

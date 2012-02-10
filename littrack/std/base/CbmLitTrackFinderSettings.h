@@ -8,6 +8,7 @@
 #ifndef CBMLITTRACKFINDERSETTINGS_H_
 #define CBMLITTRACKFINDERSETTINGS_H_
 
+#include "base/CbmLitPtrTypes.h"
 #include <string>
 
 class CbmLitTrackFinderSettings

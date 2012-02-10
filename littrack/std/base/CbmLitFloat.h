@@ -1,11 +1,12 @@
-/** CbmLitFloat.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- ** Header defines type "myf" that is used in the
- ** littrack. This type is either float or double.
- ** This helps easily switch between different floating types.
+/**
+ * \file CbmLitFloat.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Define floating point number type litfloat.
+ *
+ *  Define type for floating point number in littrack.
+ *  litfloat is either float or double.
+ *  This helps easily switch between different floating point number types.
  **/
 
 #ifndef CBMLITFLOAT_H_
@@ -13,4 +14,4 @@
 
 typedef double litfloat;
 
-#endif /*CBMLITFLOAT_H_*/
+#endif /* CBMLITFLOAT_H_ */

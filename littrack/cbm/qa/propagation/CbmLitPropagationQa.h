@@ -3,7 +3,6 @@
  * \brief Track propagation and track fit QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
- *
  **/
 
 #ifndef CBMLITPROPAGATIONQA_H_

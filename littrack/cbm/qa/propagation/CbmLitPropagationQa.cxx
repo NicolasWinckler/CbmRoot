@@ -1,9 +1,7 @@
 /**
  * \file CbmLitPropagationQa.cxx
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2007
- *
  **/
 #include "qa/propagation/CbmLitPropagationQa.h"
 

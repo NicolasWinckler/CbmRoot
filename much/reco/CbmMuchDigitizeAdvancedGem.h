@@ -33,6 +33,8 @@ class CbmMuchSector;
 class CbmMuchPoint;
 class CbmMCEpoch;
 class CbmMuchPad;
+class CbmMuchRadialPad;
+class CbmMuchRadialSector;
 class TChain;
 
 enum DetectorType {kGEM, kMICROMEGAS};
@@ -211,14 +213,15 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t PolygonsIntersect(TPolyLine polygon1, TPolyLine polygon2, Double_t& area);
 
     Bool_t AddDigi(CbmMuchPad* pad);
+    Bool_t AddDigi(CbmMuchRadialPad* pad);
     inline Int_t GasGain();
-    /**
-     * Function returns a random number distributed according
-     * exponential law, which reproduces the gas gain fluctuation.
-     *@author Volodia Nikulin.
-     *@since 14/04/2007.
-     */
 
+    Int_t GetNPrimaryElectrons(CbmMuchPoint* point);
+    Bool_t AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
+    Bool_t AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL,Double_t phi1, Double_t phi2);
+
+    Double_t fTotalDriftTime;
+    
     ClassDef(CbmMuchDigitizeAdvancedGem,1)
 };
 #endif

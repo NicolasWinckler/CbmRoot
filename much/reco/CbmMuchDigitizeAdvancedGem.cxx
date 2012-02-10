@@ -80,6 +80,11 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
 {
     SetQThreshold(3);
     SetSpotRadius();
+//    Double_t spotL = fSpotRadius * 2.; // diameter of the spot
+//    Double_t spotArea = spotL * spotL; // spot area
+   Double_t driftVolumeWidth = 0.4; // cm
+   fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
+
     Reset();
 }
 // -------------------------------------------------------------------------
@@ -107,8 +112,12 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fTimeBinWidth(1),
   fChainEventId(0)
 {
-  SetQThreshold(3),
-  SetSpotRadius(),
+  SetQThreshold(3);
+  SetSpotRadius();
+  //    Double_t spotL = fSpotRadius * 2.; // diameter of the spot
+  //    Double_t spotArea = spotL * spotL; // spot area
+  Double_t driftVolumeWidth = 0.4; // cm
+  fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -123,231 +132,61 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
     fDigiMatches->Delete();
     delete fDigiMatches;
   }
-  SetSpotRadius();
   Reset();
 }
 // -------------------------------------------------------------------------
 
 // ------- Private method ExecAdvanced -------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
-  TVector3 posIn,posOut;
-  point->PositionIn(posIn);
-  point->PositionOut(posOut);
-  TVector3 delta = posOut-posIn;
-  Double_t lTrack = delta.Mag();
+  TVector3 v1,v2,dv;
+  point->PositionIn(v1);
+  point->PositionIn(v2);
+  dv = v2-v1;
+
+  Int_t nElectrons = GetNPrimaryElectrons(point);
+  if (nElectrons<0) return kFALSE;
   
-  Double_t rIn    = posIn.Perp();
-  Double_t rOut   = posOut.Perp();
-  Double_t phiIn  = posIn.Phi();
-  Double_t phiOut = posOut.Phi();
-  Double_t rMin   = (rIn>rOut? rOut : rIn) - fSpotRadius;
-  Double_t rMax   = (rIn<rOut? rOut : rIn) + fSpotRadius;
-  Double_t phiMin = (phiIn>phiOut? phiIn : phiOut)-fSpotRadius/rMin;
-  Double_t phiMax = (phiIn<phiOut? phiIn : phiOut)+fSpotRadius/rMin;
-  
-  Int_t irMin=-1;
-  Int_t irMax=-1;
-  vector<Int_t> vipMin;
-  vector<Int_t> vipMax;
-  printf("%i",iPoint);
-  {
-    Int_t detectorId = point->GetDetectorID();
-    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
-    if (module->GetDetectorType()==3) {
-      printf(" %f-%f\n",rMin,rMax);
-      CbmMuchModuleSector* moduleSector = (CbmMuchModuleSector*) module;
-      CbmMuchRadialSector* secMin = moduleSector->GetSectorByRadius(rMin);
-      CbmMuchRadialSector* secMax = moduleSector->GetSectorByRadius(rMax);
-      if (!secMin || !secMax) { printf("\n"); return 0; }
-      irMin = secMin->GetSectorIndex();
-      irMax = secMax->GetSectorIndex();
-      printf(" %i %i\n",irMin,irMax);
-      for (Int_t ir=irMin;ir<=irMax;ir++){
-        CbmMuchRadialSector* sec = moduleSector->GetSectorByIndex(ir);
-        Int_t ipMin = sec->GetChannel(phiMin*180./3.14159);
-        Int_t ipMax = sec->GetChannel(phiMax*180./3.14159);
-        printf(" %i %i\n",ipMin,ipMax);
-        vipMin.push_back(ipMin);
-        vipMax.push_back(ipMax);
-//        for (Int_t ip=ipMin;ip<=ipMax;ip++){
-//          Long64_t channelId = CbmMuchModuleSector::GetChannelId(ir, ip);
-//          CbmMuchDigi* digi = new CbmMuchDigi(detectorId, channelId,0,0);
-//          digi->SetADCCharge(100);
-//          printf("add\n");
-//          new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
-//          new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch();
-//        }
-      }
-    }
-  }
-  //********** Primary electrons from the track (begin) ************************//
-  // Get particle's characteristics
-  Int_t trackID = point->GetTrackID();
-  if (trackID < 0) return kFALSE;
-
-  CbmMCTrack* mcTrack;
-  if (!fEpoch) {
-    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
-  } else {
-    Int_t eventId = point->GetEventID();
-    if (eventId!=fChainEventId) {
-      fChainEventId=eventId;
-      fMcChain->GetEntry(eventId);
-    }
-    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
-  }
-  if (!mcTrack) return kFALSE;
-  
-  Int_t pdgCode = mcTrack->GetPdgCode();
-  // Debug
-  Bool_t isSignalMuon = TMath::Abs(pdgCode) == 13 && mcTrack->GetMotherId() < 0;
-
-  // Reject funny particles
-  TParticlePDG *particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
-  if (!particle) return kFALSE;
-  if (TMath::Abs(particle->Charge()) < 0.1) return kFALSE;
-
-  Double_t m = particle->Mass();
-  TLorentzVector p;
-  p.SetXYZM(point->GetPx(),point->GetPy(),point->GetPz(),m);
-  Double_t Tkin = p.E()-m; // kinetic energy of the particle
-  Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
-  Double_t mpv   = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
-  UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 3 mm gap
-  while (nElectrons > 50000) nElectrons = (UInt_t) (gRandom->Landau(mpv, sigma));     // restrict Landau tail to increase performance
-  // Number of electrons for current track length
-  if (m < 0.1) nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
-  else         nElectrons = (UInt_t) (nElectrons * lTrack / 0.36);
-  //********** Primary electrons from the track (end)   ***********************//
-
   Double_t time = -1;
   while(time < 0) time = point->GetTime() + gRandom->Gaus(0, fDTime);
   
-  // Get module for the point
   Int_t detectorId = point->GetDetectorID();
   CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
   if (!module) return kFALSE;
-  if (module->GetNSectors() == 0) {
-    fNOutside++;
-    return kFALSE;
-  }
+  if (module->GetDetectorType()!=3)   return kFALSE;
+  CbmMuchModuleSector* module3 = (CbmMuchModuleSector*) module;
+  Double_t rMin = module3->GetSectorByIndex(0)->GetR1();
+  Double_t rMax = module3->GetSectorByIndex(module->GetNSectors()-1)->GetR2();
 
-  for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
-    // Coordinates of primary electrons along the track
-    Double_t aL = gRandom->Rndm();
-    Double_t xe = posIn[0]+aL*delta[0];
-    Double_t ye = posIn[1]+aL*delta[1];
-
-    // Calculate number of secondary electrons for each primary electron
-    UInt_t nSecElectrons = GasGain(); // number of secondary electrons
-
-    Double_t spotL = fSpotRadius * 2.; // diameter of the spot
-    Double_t spotArea = spotL * spotL; // spot area
-
-    // Find intersection of spot with sectors
-    TPolyLine spotPolygon = GetPolygon(xe, ye, spotL, spotL);
-    Double_t* xVertex = spotPolygon.GetX();
-    Double_t* yVertex = spotPolygon.GetY();
-    
-    printf("Electron: %i\n",iElectron);
-    
-    if (module->GetDetectorType()==3) {
-      CbmMuchModuleSector* moduleSector = (CbmMuchModuleSector*) module;
-      for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
-        Double_t r = sqrt(xe*xe+ye*ye);
-        Double_t phi = TVector2(xe,ye).Phi();
-        if (phi>120/180.*3.14159) continue;
-        if (phi<60/180.*3.14159) continue;
-        printf("  iVertex=%i",iVertex);
-        printf("r=%f phi=%f",r,phi);
-        CbmMuchRadialSector* sector = moduleSector->GetSectorByRadius(r,irMin,irMax);
-        printf(" sector=%i",sector);
-        if (!sector) { printf("\n"); continue; }
-        Int_t iSector = sector->GetSectorIndex();
-        Int_t iChannel = sector->GetChannel(phi*180/3.14159);
-        if (iChannel<vipMin[iSector] || iChannel>vipMax[iSector]) printf("Error!!!\n");
-        printf(" iChannel=%i",iChannel);
-        if (iChannel>50) { printf("\n"); continue; }
-//        continue;
-        CbmMuchRadialPad* pad = sector->GetPad(iChannel);
-        if (!pad) { printf("\n"); continue; }
-        Double_t r1 = pad->GetR1();
-        Double_t r2 = pad->GetR2();
-        
-        printf(" r1=%f",r1);
-        printf(" r2=%f",r2);
-        printf(" phi=%f",phi*180/3.14159);
-        Double_t phi1 = pad->GetPhimin()/180.*TMath::Pi();
-        Double_t phi0 = phi1-phi;
-        printf(" phi0=%f",phi0);
-        Double_t l = r2-r1;
-        printf(" l=%f",l);
-        Double_t x = r1*phi0+l/2.;
-        Double_t y = r1+l/2.;
-        printf(" x=%f",x);
-        printf(" y=%f",y);
-        printf(" xe=%f",xe);
-        printf(" ye=%f",ye);
-        printf("\n");
-        TPolyLine padPolygon = GetPolygon(x, y,l,l);
-        TPolyLine spotPolygon2 = GetPolygon(0,r, spotL, spotL);
-        Double_t area;
-        printf("spotArea=%f\n",spotArea);
-        if (!PolygonsIntersect(padPolygon,spotPolygon2,area)) continue; 
-        UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
-        printf("iCharge=%i\n",iCharge);
-      }
+  for (Int_t i=0;i<nElectrons;i++) {
+    Double_t aL   = gRandom->Rndm();
+    TVector3 ve   = v1 + dv*aL;
+    UInt_t ne     = GasGain();
+    Double_t r    = ve.Perp();
+    Double_t phi  = ve.Phi();
+    Double_t r1   = r-fSpotRadius;
+    Double_t r2   = r+fSpotRadius;
+    Double_t phi1 = phi-fSpotRadius/r;
+    Double_t phi2 = phi+fSpotRadius/r;
+    if (r1<rMin && r2>rMin) {
+      CbmMuchRadialSector* s = module3->GetSectorByIndex(0);
+      AddCharge(s,UInt_t(ne*(r2-rMin)/(r2-r1)),iPoint,time,aL,phi1,phi2);
       continue;
-    } 
-
-    map<Int_t, CbmMuchSector*> firedSectors; // map from a sector index to a fired sector
-
-    if (module->GetDetectorType()!=1) return kFALSE;
-    CbmMuchModuleGem* moduleGem = (CbmMuchModuleGem*) module;
-    for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
-      CbmMuchSector* sector = moduleGem->GetSector(xVertex[iVertex], yVertex[iVertex]);
-      if (!sector) continue;
-      Int_t iSector = sector->GetSectorIndex();
-      if (firedSectors.find(iSector) != firedSectors.end()) continue;
-      firedSectors[iSector] = sector;
+    }  
+    if (r1<rMax && r2>rMax) {
+      CbmMuchRadialSector* s = module3->GetSectorByIndex(module->GetNSectors()-1);
+      AddCharge(s,UInt_t(ne*(rMax-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+      continue;
     }
 
-    // Fire pads in intersected sectors
-    for (map<Int_t, CbmMuchSector*>::iterator it = firedSectors.begin(); it!= firedSectors.end(); it++) {
-      // Get sector and its parameters
-      CbmMuchSector* sector  = (*it).second;
-      Double_t padRad = sector->GetPadRadius();
-      
-      for (Int_t iPad=0;iPad<sector->GetNChannels();iPad++){
-        CbmMuchPad* pad = sector->GetPad(iPad);
-        // rough search
-        if (pow(pad->GetX0()-xe,2.)+pow(pad->GetY0()-ye,2.)>pow(padRad+fSpotRadius,2.)) continue; 
-        // detailed search
-        Double_t area;
-        if (!PolygonsIntersect(*pad,spotPolygon,area)) continue; 
-        UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
-        CbmMuchDigi*      digi  = pad->GetDigi();
-        CbmMuchDigiMatch* match = pad->GetMatch();
-        if (match->GetNPoints()==0) {
-          digi->SetTime(time);
-          digi->SetDeadTime(fDeadTime);
-        }
-        if (time>digi->GetTime()+digi->GetDeadTime()) {
-          AddDigi(pad);
-          digi->SetTime(time);
-          digi->SetDeadTime(fDeadTime);
-        }
-        // add drift time info
-        Double_t driftVolumeWidth = 0.4;
-        Double_t driftLengthInUm = (1-aL)*driftVolumeWidth*10000; //[cm]->[um]
-        Double_t driftTime = driftLengthInUm/fDriftVelocity; // [ns]
-        match->AddCharge(iPoint,iCharge,driftTime);
-      }
-    } // loop fired sectors
-    firedSectors.clear();
-  } // loop over electrons
+    CbmMuchRadialSector* s1 = module3->GetSectorByRadius(r1);
+    CbmMuchRadialSector* s2 = module3->GetSectorByRadius(r2);
+    if (s1==s2) AddCharge(s1,ne,iPoint,time,aL,phi1,phi2); 
+    else {
+      AddCharge(s1,UInt_t(ne*(s1->GetR2()-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+      AddCharge(s2,UInt_t(ne*(r2-s2->GetR1())/(r2-r1)),iPoint,time,aL,phi1,phi2);
+    }      
+  }
   return kTRUE;
-  //**************  Simulate avalanche (end) **********************************//
 }
 // -------------------------------------------------------------------------
 
@@ -392,10 +231,15 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
   // Add remaining digis
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
   for (Int_t im=0;im<modules.size();im++){
-    //TODO
-    //if(module->GetDetectorType()!=1 || module->GetDetectorType()!=3) continue;
-//    vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
-//    for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+    CbmMuchModule* module = modules[im];
+    if(module->GetDetectorType()==1){
+      vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
+      for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+    }
+    if(module->GetDetectorType()==3){
+      vector<CbmMuchRadialPad*> pads = ((CbmMuchModuleSector*) modules[im])->GetPads();
+      for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+    }
   }
 
   // Screen output
@@ -532,13 +376,17 @@ Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(TPolyLine polygon1, TPolyLi
   area = width * length;
   return kTRUE;
 }
+// -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
 Int_t CbmMuchDigitizeAdvancedGem::GasGain() {
   Double_t gasGain = -fMeanGasGain * TMath::Log(1 - gRandom->Rndm());
   if (gasGain < 0.) gasGain = 1e6;
   return (Int_t) gasGain;
 }
+// -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
 Double_t CbmMuchDigitizeAdvancedGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
   Double_t logT;
   TF1 fPol6("fPol6","pol6",-5,10);
@@ -559,7 +407,9 @@ Double_t CbmMuchDigitizeAdvancedGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
     return fPol6.EvalPar(&logT,sigma_p);
   }
 }
+// -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
 Double_t CbmMuchDigitizeAdvancedGem::MPV_n_e(Double_t Tkin, Double_t mass) {
   Double_t logT;
   TF1 fPol6("fPol6","pol6",-5,10);
@@ -580,6 +430,7 @@ Double_t CbmMuchDigitizeAdvancedGem::MPV_n_e(Double_t Tkin, Double_t mass) {
     return fPol6.EvalPar(&logT,mpv_p);
   }
 }
+// -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
@@ -605,6 +456,124 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
   new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch(match);
   match->Reset();
   return kTRUE;
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchRadialPad* pad) {
+  CbmMuchDigiMatch* match = pad->GetMatch();
+  CbmMuchDigi* digi = pad->GetDigi();
+  
+  // Add noise
+  if (fMeanNoise){
+    Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
+    UInt_t noiseCharge = (UInt_t) rndGaus;
+    match->AddCharge(-1,noiseCharge);
+  }
+  
+  // Check for threshold 
+  if (match->GetTotalCharge() < fQThreshold) {
+    match->Reset();
+    return kFALSE;
+  }
+  
+  Int_t adc = match->GetTotalCharge() * fNADCChannels/ fQMax;
+  digi->SetADCCharge(adc > fNADCChannels ? fNADCChannels-1 : adc);
+  new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
+  new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch(match);
+  match->Reset();
+  return kTRUE;
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+Int_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectrons(CbmMuchPoint* point){
+  // Get module for the point
+  Int_t detectorId = point->GetDetectorID();
+  CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
+  if (!module) return -1;
+  if (module->GetNSectors() == 0) {
+    fNOutside++;
+    return -1;
+  }
+
+  Int_t trackID = point->GetTrackID();
+  if (trackID < 0) return -1;
+
+  CbmMCTrack* mcTrack;
+  if (!fEpoch) {
+    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
+  } else {
+    Int_t eventId = point->GetEventID();
+    if (eventId!=fChainEventId) {
+      fChainEventId=eventId;
+      fMcChain->GetEntry(eventId);
+    }
+    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
+  }
+  if (!mcTrack) -1;
+  
+  Int_t pdgCode = mcTrack->GetPdgCode();
+  // Debug
+  Bool_t isSignalMuon = TMath::Abs(pdgCode) == 13 && mcTrack->GetMotherId() < 0;
+
+  // Reject funny particles
+  TParticlePDG *particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
+  if (!particle) return -1;
+  if (TMath::Abs(particle->Charge()) < 0.1) return -1;
+
+  Double_t m = particle->Mass();
+  TLorentzVector p;
+  p.SetXYZM(point->GetPx(),point->GetPy(),point->GetPz(),m);
+  Double_t Tkin = p.E()-m; // kinetic energy of the particle
+  Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
+  Double_t mpv   = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
+  UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 3 mm gap
+  while (nElectrons > 50000) nElectrons = (UInt_t) (gRandom->Landau(mpv, sigma));     // restrict Landau tail to increase performance
+  // Number of electrons for current track length
+  TVector3 posIn,posOut;
+  point->PositionIn(posIn);
+  point->PositionOut(posOut);
+  TVector3 delta = posOut-posIn;
+  Double_t lTrack = delta.Mag();
+  if (m < 0.1) nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
+  else         nElectrons = (UInt_t) (nElectrons * lTrack / 0.36);
+  
+  return nElectrons;
+}
+
+
+Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL){
+  CbmMuchDigi*      digi  = pad->GetDigi();
+  CbmMuchDigiMatch* match = pad->GetMatch();
+  if (match->GetNPoints()==0) {
+    digi->SetTime(time);
+    digi->SetDeadTime(fDeadTime);
+  }
+  if (time>digi->GetTime()+digi->GetDeadTime()) {
+    AddDigi(pad);
+    digi->SetTime(time);
+    digi->SetDeadTime(fDeadTime);
+  }
+  match->AddCharge(iPoint,charge,(1-aL)*fTotalDriftTime);
+  return kFALSE;
+}
+
+Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL, 
+    Double_t phi1, Double_t phi2){
+  
+  CbmMuchRadialPad* pad1 = s->GetPadByPhi(phi1);
+  CbmMuchRadialPad* pad2 = s->GetPadByPhi(phi2);
+  if (pad1==pad2) 
+    AddCharge(pad1,ne,iPoint,time,aL);
+  else {
+    UInt_t pad1_ne = UInt_t(ne*(pad1->GetPhimax()/180.*TMath::Pi()-phi1)/(phi2-phi1));
+    AddCharge(pad1,pad1_ne   ,iPoint,time,aL);
+    AddCharge(pad2,ne-pad1_ne,iPoint,time,aL);
+  }
+  return kFALSE;
 }
 
 ClassImp(CbmMuchDigitizeAdvancedGem)

@@ -71,18 +71,18 @@ void CbmMuchModuleSector::AddSector(CbmMuchRadialSector* sector) {
 // -------------------------------------------------------------------------
 
 // -----   Public method GetPads -------------------------------------------
-vector<CbmMuchPad*> CbmMuchModuleSector::GetPads() {
-//  vector<CbmMuchPad*> pads;
-//  for(Int_t iSector = 0; iSector < GetNSectors(); ++iSector){
-//    CbmMuchSector* sector = GetSector(iSector);
-//    if(!sector) continue;
-//    for(Int_t iPad=0; iPad<sector->GetNChannels(); ++iPad){
-//      CbmMuchPad* pad = sector->GetPad(iPad);
-//      if(!pad) continue;
-//      pads.push_back(pad);
-//    }
-//  }
-//  return pads;
+vector<CbmMuchRadialPad*> CbmMuchModuleSector::GetPads() {
+  vector<CbmMuchRadialPad*> pads;
+  for(Int_t iSector = 0; iSector < GetNSectors(); ++iSector){
+    CbmMuchRadialSector* sector = GetSectorByIndex(iSector);
+    if(!sector) continue;
+    for(Int_t iPad=0; iPad<sector->GetNChannels(); ++iPad){
+      CbmMuchRadialPad* pad = sector->GetPad(iPad);
+      if(!pad) continue;
+      pads.push_back(pad);
+    }
+  }
+  return pads;
 }
 // -------------------------------------------------------------------------
 
@@ -115,15 +115,12 @@ CbmMuchRadialSector* CbmMuchModuleSector::GetSector(Long64_t channelId) {
 
 
 // -----   Public method GetSector   ---------------------------------------
-CbmMuchRadialSector* CbmMuchModuleSector::GetSectorByRadius(Double_t r, Int_t irMin, Int_t irMax){
-  vector<Double_t>::iterator i0,ie,i1; 
-//  printf("size=%i\n",fSectorRadii.size());
+CbmMuchRadialSector* CbmMuchModuleSector::GetSectorByRadius(Double_t r){
+  vector<Double_t>::iterator i0,ie,i; 
   i0 = fSectorRadii.begin();
   ie = fSectorRadii.end();
-  if (irMax>=0 && irMax<fSectorRadii.size()) ie=i0+irMax;
-  if (irMin>=0 && irMin<fSectorRadii.size()) i0=i0+irMin;
-  i1 = upper_bound(i0,ie,r);
-  return i1-i0-1>=0 ? (CbmMuchRadialSector*) fSectors.At(i1-i0-1) : 0;
+  i = upper_bound(i0,ie,r);
+  return i-i0-1>=0 ? (CbmMuchRadialSector*) fSectors.At(i-i0-1) : 0;
 }
 // -------------------------------------------------------------------------
 

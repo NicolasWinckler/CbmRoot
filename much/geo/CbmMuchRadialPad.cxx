@@ -10,6 +10,7 @@
 #include "TColor.h"
 #include "CbmMuchModuleSector.h"
 #include "CbmMuchRadialSector.h"
+#include "TMath.h"
 
 // -----  Default constructor  ----------------------------------------------
 CbmMuchRadialPad::CbmMuchRadialPad():TCrown(){}
@@ -24,8 +25,8 @@ CbmMuchRadialPad::CbmMuchRadialPad(CbmMuchRadialSector* sector, Int_t iChannel):
   fR1 = sector->GetR1();
   fR2 = sector->GetR2();
   Int_t nPads = sector->GetNChannels();
-  Double_t angle = sector->GetPadAngle();
-  Double_t phi0 = (sector->GetPhimax()+sector->GetPhimin())/2.;
+  Double_t angle = sector->GetPadAngle()*180./TMath::Pi();
+  Double_t phi0  = sector->GetPhi0()*180./TMath::Pi();
   if (fPhimax<fPhimin) printf("Warning!\n");
   fPhimin = (iChannel%2==0) ? phi0+(iChannel/2+0)*angle : phi0 - (iChannel/2+1)*angle;
   fPhimax = (iChannel%2==0) ? phi0+(iChannel/2+1)*angle : phi0 - (iChannel/2+0)*angle;

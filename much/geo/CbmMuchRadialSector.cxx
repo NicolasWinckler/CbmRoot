@@ -37,12 +37,12 @@ CbmMuchRadialSector::CbmMuchRadialSector(Int_t detId, Int_t iSector,
   fNeighbours.Set(0);
   fR1 = rMin;
   fR2 = rMax;
-  fPhimin = phi0-pad_angle*nPads/2;
-  fPhimax = phi0+pad_angle*nPads/2;
+  fPadAngle = pad_angle;
+  fPhi0     = phi0;
+  fPhimin = (phi0-pad_angle*nPads/2)*180./TMath::Pi();
+  fPhimax = (phi0+pad_angle*nPads/2)*180./TMath::Pi();
   fX1 = 0;
   fY1 = 0;
-  fPadAngle = pad_angle;
-  fPhi0 = phi0;
 }
 // -------------------------------------------------------------------------
 
@@ -60,13 +60,24 @@ Int_t CbmMuchRadialSector::GetChannel(Double_t x, Double_t y) {
 
 // -----   Public method GetChannel   --------------------------------------
 Int_t CbmMuchRadialSector::GetChannel(Double_t phi) {
-  //TODO 
-  if (fPhimin<180 && fPhimax>180 && phi<0) phi+=360;
+  if (fPhimin<180 && fPhimax>180 && phi<0) phi+=2*TMath::Pi();
   Int_t i = 2*TMath::Floor((phi-fPhi0)/fPadAngle);
   i = phi>fPhi0 ? i : -i-1;
-//  if (i>100) printf("phi0 = %f phi=%f fPhimin=%f fPhimax=%f", fPhi0, phi,fPhimin,fPhimax);
-//  printf("i=%i\n",i);
+  if (i>=fPads.GetEntriesFast()) {
+    printf("phi0 = %f phi=%f fPhimin=%f fPhimax=%f ", fPhi0, phi,fPhimin,fPhimax);  
+    printf("i=%i entries=%i\n",i,fPads.GetEntriesFast());
+  }
+
+  
   return i;
+}
+// -------------------------------------------------------------------------
+
+// -----   Public method GetChannel   --------------------------------------
+CbmMuchRadialPad* CbmMuchRadialSector::GetPadByPhi(Double_t phi) {
+  Int_t i = GetChannel(phi);
+  if (i>=fPads.GetEntriesFast()) return GetPad(0); 
+  return GetPad(i);
 }
 // -------------------------------------------------------------------------
 

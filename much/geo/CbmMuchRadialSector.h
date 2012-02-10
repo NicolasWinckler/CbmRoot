@@ -55,12 +55,14 @@ class CbmMuchRadialSector : public TCrown
   Int_t GetChannel(Double_t phi);
   
   CbmMuchRadialPad* GetPad(Int_t iChannel) const { return (CbmMuchRadialPad*)fPads.At(iChannel); }
+  CbmMuchRadialPad* GetPadByPhi(Double_t phi);
 
   // TODO
   Double_t GetPadAngle() const { return fPadAngle; }
   // TODO
   void AddPads();
   void DrawPads();
+  Double_t GetPhi0() const { return fPhi0; }
 private:
   Int_t      fDetectorId;   // Detector ID (including module number)
   Int_t      fSectorIndex;  // Sector index within the module

@@ -137,7 +137,7 @@ void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleSector* module, Bool_t use
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
   Double_t rMin = station->GetRmin();
   Double_t rMax = station->GetRmax();
-  Double_t phi0 = module->GetPosition().Phi()/TMath::Pi()*180.;
+  Double_t phi0 = module->GetPosition().Phi();
   Double_t r0   = module->GetPosition().Perp();
   Double_t dx1  = module->GetDx1();
   Double_t dx2  = module->GetDx2();
@@ -156,11 +156,11 @@ void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleSector* module, Bool_t use
 //  printf("Debug: %i %i %i %i\n",iStation,iLayer,iSide,iModule);
   Int_t iSector=0;
   for (Int_t i=0;i<fNRegions[iStation];i++){
-    Double_t angle = fAngles[iStation][i];
+    Double_t angle = fAngles[iStation][i]/180.*TMath::Pi();
     while (r2<fRadii[iStation][i] && r2<rMax){
-      r2 = r1+r1*angle*TMath::Pi()/180.;
-      Double_t phiMax = 180./TMath::Pi()*TMath::ASin((-bt+sqrt(a*r2*r2-b2))/a/r2); 
-      Int_t nPads = 2*Int_t(phiMax/angle);
+      r2 = r1+r1*angle;
+      Double_t phiMax = TMath::ASin((-bt+sqrt(a*r2*r2-b2))/a/r2); 
+      Int_t nPads = 2*Int_t(phiMax/angle)+2;
       if (iStation==0 && iLayer==0 && iSide==0 && iModule==0) printf("Sector: %f-%f %i phiMax=%f\n",r1,r2,nPads,phiMax);
       module->AddSector(new CbmMuchRadialSector(detectorId,iSector,r1,r2,phi0,angle,nPads));
       r1 = r2;
@@ -272,6 +272,12 @@ void CbmMuchSegmentSector::DrawSegmentation(){
         CbmMuchModuleSector* module = (CbmMuchModuleSector*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
           CbmMuchRadialSector* sector = module->GetSector(iSector);
+          if (iSector==0){
+            printf("  Station: %i",iStation);
+            printf("  Phimin: %f",sector->GetPhimin());
+            printf("  Phimax: %f\n",sector->GetPhimax());
+            printf("  Phi0: %f\n",sector->GetPhi0());
+          }
 //          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
 //          sector->Draw("f");
 //          sector->Draw();

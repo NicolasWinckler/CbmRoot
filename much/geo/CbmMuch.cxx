@@ -127,6 +127,8 @@ Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
     CbmMuchStation* station= (CbmMuchStation*) fPar->GetStations()->At(iStation);
     if (fPosIn.Perp() >station->GetRmax()) {return kFALSE; }
     if (fPosOut.Perp()>station->GetRmax()) {return kFALSE; }
+    if (fPosIn.Perp() <station->GetRmin()) {return kFALSE; }
+    if (fPosOut.Perp()<station->GetRmin()) {return kFALSE; }
 
     if (fELoss == 0. ) return kFALSE;
     AddHit(fTrackID, fDetectorId,

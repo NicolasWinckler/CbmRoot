@@ -191,9 +191,7 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
-  TStopwatch timer;
-  timer.Start();
-  // use lookup table or calculate realtime
+ // use lookup table or calculate realtime
   Bool_t lookup = true;
 
   // use mathieson or gaus function 
@@ -203,7 +201,11 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   Bool_t fast = true; 
 
   // fastes algorithm approximates only allong one pad column
-  Bool_t approx = false;  
+  Bool_t approx = true;//false;  
+
+  TStopwatch timer;
+  timer.Start();
+ 
 
   cout << "================CbmTrdClusterizer=====================" << endl;
 
@@ -425,7 +427,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       if(TMath::Abs(pdgCode) == 11){ 
 	point->ELossTR = fRadiators->GetTR(mom);
       }
-      point->ELossdEdX = pt->GetEnergyLoss();;
+      point->ELossdEdX = pt->GetEnergyLoss();
       point->ELoss = point->ELossTR + point->ELossdEdX;
 
       point->alpha = TMath::ATan(fabs(local_inC[0] - local_outC[0]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
@@ -532,6 +534,9 @@ void CbmTrdClusterizer::FinishEvent()
   // ---- CoordinateTransformation-----------------------------------------------------
 void CbmTrdClusterizer::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate, Double_t* StrucDim)
 {
+
+  //Transform coordinates from module coordinate system with origin in the Lower Left (LL) corner to the
+  //coordinate system with origin in the Center (C) of the module
   for (Int_t idim = 0; idim < 2; idim++)
     {
       CCoordinate[idim] = LLCoordinate[idim] - 0.5 * StrucDim[idim];
@@ -541,6 +546,9 @@ void CbmTrdClusterizer::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordin
   // ---- CoordinateTransformation-----------------------------------------------------
 void CbmTrdClusterizer::TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate, Double_t* StrucDim)
 {
+
+  //Transform the coordinates from coordinate system with origin in the Center (C) of the module 
+  // to the coordinate system with origin in the Lower Left (LL) corner
   for (Int_t idim = 0; idim < 2; idim++)
     {
       LLCoordinate[idim] = CCoordinate[idim] + 0.5 * StrucDim[idim];
@@ -786,6 +794,7 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
   // ---- SplitPathSlices -------------------------------------------------
 void CbmTrdClusterizer::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, Int_t j, Double_t* padW, Double_t* padH)
 {
+  // Split path through chamber volume into equal pices to simulate primary clusters within gas. 1 cluster per 0.2 times short pad size.
   //cout << "SplitPathSlices" << endl;
   Float_t ClusterDistance = 0.2 * fModuleParaMap[fModuleID]->PadSizeX[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
   Int_t DrawTH = Int_t(15 * fModuleParaMap[fModuleID]->PadSizeX[0] / ClusterDistance)/* * 100*/;
@@ -901,8 +910,9 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t looku
   // --------------------------------------------------------------------
 void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 {
+  // drift primary clusters towards next anode wire position.
   //cout << "WireQuantisation" << endl;
-  Float_t wireSpacing = 3; //[mm] anode wire spacing
+  Float_t wireSpacing = 2.5; //[mm] anode wire spacing
   Double_t tempPos = point->clusterPosLL[1];//ClusterMLL[1];
   Int_t iSec = point->Sec_cluster;//GetSector(ClusterMLL[1]);
   Int_t iRow = point->Row_cluster;//GetRow(ClusterMLL[1]);
@@ -928,40 +938,56 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
     // --------------------------------------------------------------------
 Double_t CbmTrdClusterizer::ApproxMathieson(Double_t x, Double_t W)
 {
-  Float_t K3 = 0.525; 
+  Float_t K3 = 0.525;  //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+  //Float_t K3 = (-0.7/1.6 * (h/s) + 0.7) + ((exp(-9.74350e+02 * ra/s) * 5.64791e-01 + 3.32737e-01));// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+  //K3 = 5.25407e-01; // MS 336 fit
+  //K3 = 6.14949e-01; // MS 444 fit
+
   //Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
   //Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
   //Float_t W = 5;
   //Float_t par = 1;
   Float_t h = 3;
+  Double_t SqrtK3 = sqrt(K3);
   /*
     Char_t formula[500];
     sprintf(formula," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,W,par,h,K3,K3,W,par,h);
     TF1* mathiesonPRF = new TF1("mathieson",formula, -15, 15);
   */
-  Double_t mathiesonPRF = 
+  Double_t mathiesonPRF = fabs(
+			       -1. / (2. * atan(SqrtK3)) * (
+							    atan(SqrtK3 * tanh(TMath::Pi() * (-2. + SqrtK3 ) * (W + 2.* x) / (8.* h) )) +  
+							    atan(SqrtK3 * tanh(TMath::Pi() * (-2. + SqrtK3 ) * (W - 2.* x) / (8.* h) )) 
+							    )
+			       );
+  /*
     -1. / (2. * atan(sqrt(K3))) * (
-				   atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W + 2.* x) / (8.* h) )) +
-				   atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W - 2.* x) / (8.* h) )) 
-				   );
+    atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W + 2.* x) / (8.* h) )) +
+    atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W - 2.* x) / (8.* h) )) 
+    );
+  */
   return mathiesonPRF;
 }
 // --------------------------------------------------------------------
 void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
+  // sample pad plane within test area. One step per mm. Uses ApproxMathieson() to calc pad charge.
   Double_t deltaW = 0;
   Double_t deltaH = 0;
-  Double_t x;
-  Double_t y;
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    deltaH -= H[iPadRow];
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] = 0;
-    }
-  }
-  for (Int_t iPadCol = 0; iPadCol < int(fPadNrX/2); iPadCol++) {
+  Double_t x = 0;
+  Double_t y = 0;
+  for (Int_t iPadCol = 0; iPadCol < fPadNrX/2; iPadCol++) {
     deltaW -= W[iPadCol];
   }
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY/2; iPadRow++) {
+    deltaH -= H[iPadRow];
+    /*
+      for (Int_t iPadCol = 0; iPadCol < fPadNrX/2+1; iPadCol++) {
+      fPadCharge[iPadRow][iPadCol] = 1;
+      }
+    */
+  }
+
 
   Double_t deltaWtemp = deltaW;
   //Double_t deltaHtemp = deltaH;
@@ -971,22 +997,26 @@ void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Doub
     //cout << endl;
     for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
 
-      if (iPadCol == int(fPadNrX/2)) {
-	y = -1 * y_mean + deltaH;
-	if (iPadRow == int(fPadNrY/2)) y = y_mean + deltaH;
-	//if (fabs(y) < 35) {
-	  fPadCharge[iPadRow][iPadCol] += ApproxMathieson(y, H[iPadCol]);
-	  //}
-      }
+      //if (iPadCol == int(fPadNrX/2)) {
+      //y += deltaH;
+      //if (iPadRow == int(fPadNrY/2)) y = y_mean + deltaH;
+      //if (fabs(y) < 35) {
+      x = (-x_mean + deltaW);
+      y = (-y_mean + deltaH);
+      fPadCharge[iPadRow][iPadCol] = ApproxMathieson(x, W[iPadCol]) * ApproxMathieson(y, H[iPadRow]);
+ 
+      //printf("(%.2f/%.2f) (%i,%i) %.6E\n",x,y,iPadCol,iPadRow,fPadCharge[iPadRow][iPadCol]);
+      //}
+      //}
 
-      if (iPadRow == int(fPadNrY/2)) {
-	x = -1 * x_mean + deltaW;
-	if (iPadCol == int(fPadNrX/2)) x = x_mean + deltaW;
-	//if (fabs(x) < 35) {
-	  fPadCharge[iPadRow][iPadCol] += ApproxMathieson(x, W[iPadCol]);
-	  //printf(" %.3f",x);
-	  //}
-      }
+      //if (iPadRow == int(fPadNrY/2)) {
+      //x += deltaW;
+      //if (iPadCol == int(fPadNrX/2)) x = x_mean + deltaW;
+      //if (fabs(x) < 35) {
+      //fPadCharge[iPadRow][iPadCol] *= ApproxMathieson(x, W[iPadCol]);
+      //printf(" %.3f",x);
+      //}
+      //}
       /*
 	else {
 	fPadCharge[iPadRow][iPadCol] += 0.0;
@@ -997,21 +1027,49 @@ void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Doub
     deltaH += H[iPadRow];
   }
   //printf("\n");
+
+
+  Double_t sum = 0.0;
   for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
     //printf("\n");
     for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
-      fPadCharge[iPRow][iPCol] *= SliceELoss * 1e6;
-      //if (fPadCharge[iPRow][iPCol] > 0) {
-      //printf (" %.2E",fPadCharge[iPRow][iPCol]);
-      //}
+      sum += fPadCharge[iPRow][iPCol];
+      fPadCharge[iPRow][iPCol] *= SliceELoss;// * 1e6;
     }
-    //cout << endl;
+    // cout << endl;
   }
+
+  /*
+ for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    //printf("\n");
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      if (iPRow == fPadNrY/2)
+	if (iPCol == fPadNrX/2)
+	  printf (
+		  "  %.2E  %.2E  %.2E  %.2E  %.2E\n \
+ %.2E  %.2E  %.2E  %.2E  %.2E\n \
+ %.2E  %.2E  %.2E  %.2E  %.2E\n \
+ %.2E  %.2E  %.2E  %.2E  %.2E\n \
+ %.2E  %.2E  %.2E  %.2E  %.2E\n\n", 
+		  fPadCharge[iPRow+2][iPCol-2], fPadCharge[iPRow+2][iPCol-1], fPadCharge[iPRow+2][iPCol  ], fPadCharge[iPRow+2][iPCol+1], fPadCharge[iPRow+2][iPCol+2],
+		  fPadCharge[iPRow+1][iPCol-2], fPadCharge[iPRow+1][iPCol-1], fPadCharge[iPRow+1][iPCol  ], fPadCharge[iPRow+1][iPCol+1], fPadCharge[iPRow+1][iPCol+2],
+		  fPadCharge[iPRow  ][iPCol-2], fPadCharge[iPRow  ][iPCol-1], fPadCharge[iPRow  ][iPCol  ], fPadCharge[iPRow  ][iPCol+1], fPadCharge[iPRow  ][iPCol+2],
+		  fPadCharge[iPRow-1][iPCol-2], fPadCharge[iPRow-1][iPCol-1], fPadCharge[iPRow-1][iPCol  ], fPadCharge[iPRow-1][iPCol+1], fPadCharge[iPRow-1][iPCol+2],
+		  fPadCharge[iPRow-2][iPCol-2], fPadCharge[iPRow-2][iPCol-1], fPadCharge[iPRow-2][iPCol  ], fPadCharge[iPRow-2][iPCol+1], fPadCharge[iPRow-2][iPCol+2]
+		  );
+      
+    }
+    // cout << endl;
+  }
+  */
+  //if (sum != 1.0)
+  // printf("%.5E\n",sum);
   //cout << endl << endl;
 }
 // --------------------------------------------------------------------
 void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {  
+ // sample pad plane within test area. One step per mm. Uses LookupMathiesonVector() to calc pad charge.
   /*
   x_mean = +0.4 * W[int(fPadNrX/2)];
   y_mean = -0.4 * H[int(fPadNrY/2)];
@@ -1099,6 +1157,7 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
     // --------------------------------------------------------------------
 void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
+// sample pad plane within test area. One step per mm. Uses LookupMathiesonVector() to calc pad charge.
   Int_t rMax = 0;
   Int_t rMin = 0;
   Double_t Q = 0;

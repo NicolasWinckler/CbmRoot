@@ -216,9 +216,9 @@ class CbmTrdClusterizer : public FairTask {
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
   static const Int_t Accuracy = 1000; // fMathieson array accuracy in values per mm
 
-  static const Int_t fPadNrX = 31;//15;//7; // has to be odd
-  static const Int_t fPadNrY = 31;//5;//5; // has to be odd
-    Double_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
+  static const Int_t fPadNrX = 11;//15;//7; // has to be odd
+  static const Int_t fPadNrY = 11;//5;//5; // has to be odd
+  Double_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
   /*
     Int_t fPadNrX;//7; // has to be odd
     Int_t fPadNrY;//5; // has to be odd

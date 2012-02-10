@@ -48,6 +48,8 @@ static double mpv_p[]    = { 4152.73, -3123.98, 1010.85, -178.092, 17.8764, -0.9
 static double min_logT_e  = -3.21888; 
 static double min_logT_mu = -0.916291; 
 static double min_logT_p  =  1.0986; 
+static double l_e         = 0.47;
+static double l_not_e     = 0.36;
 
 class CbmMuchDigitizeAdvancedGem : public FairTask
 {
@@ -198,9 +200,10 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t AddDigi(CbmMuchRadialPad* pad);
     inline Int_t GasGain();
 
-    Int_t GetNPrimaryElectrons(CbmMuchPoint* point);
+    Double_t GetNPrimaryElectronsPerCm(CbmMuchPoint* point);
     Bool_t AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
     Bool_t AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL,Double_t phi1, Double_t phi2);
+    Bool_t AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
 
     Double_t fTotalDriftTime;
     

@@ -78,12 +78,10 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fTimeBinWidth(1),
   fChainEventId(0)
 {
-    SetQThreshold(3);
-    SetSpotRadius();
-//    Double_t spotL = fSpotRadius * 2.; // diameter of the spot
-//    Double_t spotArea = spotL * spotL; // spot area
-   Double_t driftVolumeWidth = 0.4; // cm
-   fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
+  SetQThreshold(3);
+  SetSpotRadius();
+  Double_t driftVolumeWidth = 0.4; // cm // TODO
+  fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
 
     Reset();
 }
@@ -114,9 +112,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
 {
   SetQThreshold(3);
   SetSpotRadius();
-  //    Double_t spotL = fSpotRadius * 2.; // diameter of the spot
-  //    Double_t spotArea = spotL * spotL; // spot area
-  Double_t driftVolumeWidth = 0.4; // cm
+  Double_t driftVolumeWidth = 0.4; // cm // TODO
   fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
   Reset();
 }
@@ -141,177 +137,6 @@ void CbmMuchDigitizeAdvancedGem::Reset() {
   fNFailed = fNOutside = fNMulti = 0;
   if (fDigis) fDigis->Clear();
   if (fDigiMatches) fDigiMatches->Delete(); // Delete because of memory leaks
-}
-// -------------------------------------------------------------------------
-
-// ------- Private method ExecAdvanced -------------------------------------
-Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
-  TVector3 v1,v2,dv;
-  point->PositionIn(v1);
-  point->PositionIn(v2);
-  dv = v2-v1;
-
-  Int_t nElectrons = GetNPrimaryElectrons(point);
-  if (nElectrons<0) return kFALSE;
-  
-  Double_t time = -1;
-  while(time < 0) time = point->GetTime() + gRandom->Gaus(0, fDTime);
-  
-  Int_t detectorId = point->GetDetectorID();
-  CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
-  if (!module) return kFALSE;
-  
-  if (module->GetDetectorType()==1) {
-    CbmMuchModuleGem* module1 = (CbmMuchModuleGem*) module;
-    for (Int_t i=0;i<nElectrons;i++) {
-      Double_t aL = gRandom->Rndm();
-      TVector3 ve = v1 + dv*aL;
-      UInt_t ne   = GasGain();
-      Double_t x  = ve.X();
-      Double_t y  = ve.Y();
-      Double_t x1 = x-fSpotRadius;
-      Double_t x2 = x+fSpotRadius;
-      Double_t y1 = y-fSpotRadius;
-      Double_t y2 = y+fSpotRadius;
-      Double_t s  = 4*fSpotRadius*fSpotRadius;
-      CbmMuchSector* s11 = module1->GetSector(x1,y1);
-      CbmMuchSector* s12 = module1->GetSector(x1,y2);
-      CbmMuchSector* s21 = module1->GetSector(x2,y1);
-      CbmMuchSector* s22 = module1->GetSector(x2,y2);
-//      if (s11==s21 && s11==s12 && s11==s22)
-//        AddCharge(s11,ne,iPoint,time,aL);
-//      else {
-//        if (s11==s21) { 
-//          AddCharge(s11,ne*(y-y1)*(x2-x1)/s,iPoint,time,aL);
-//          if   (s12==s22)
-//            AddCharge(s12,ne*(x2-x1)*(y2-y)/s,iPoint,time,aL);
-//          else {
-//            AddCharge(s12,ne*(x-x1)*(y2-y)/s,iPoint,time,aL);
-//            AddCharge(s22,ne*(x2-x)*(y2-y)/s,iPoint,time,aL);
-//          }
-//        } else {
-//          if (s11!=s12) {
-//            AddCharge(s11,ne*(x-x1)*(y-y1)/s,iPoint,time,aL);
-//            AddCharge(s21,ne*(x2-x)*(y-y1)/s,iPoint,time,aL);
-//            if   (s12==s22)
-//              AddCharge(s12,ne*(x2-x1)*(y2-y)/s,iPoint,time,aL);
-//            else {
-//              AddCharge(s12,ne*(x-x1)*(y2-y)/s,iPoint,time,aL);
-//              AddCharge(s22,ne*(x2-x)*(y2-y)/s,iPoint,time,aL);
-//            }
-//          }
-//          else {
-//            
-//          }
-//        }
-//      }
-    }
-  }
-  
-  if (module->GetDetectorType()==3) {
-    CbmMuchModuleSector* module3 = (CbmMuchModuleSector*) module;
-    Double_t rMin = module3->GetSectorByIndex(0)->GetR1();
-    Double_t rMax = module3->GetSectorByIndex(module->GetNSectors()-1)->GetR2();
-
-    for (Int_t i=0;i<nElectrons;i++) {
-      Double_t aL   = gRandom->Rndm();
-      TVector3 ve   = v1 + dv*aL;
-      UInt_t ne     = GasGain();
-      Double_t r    = ve.Perp();
-      Double_t phi  = ve.Phi();
-      Double_t r1   = r-fSpotRadius;
-      Double_t r2   = r+fSpotRadius;
-      Double_t phi1 = phi-fSpotRadius/r;
-      Double_t phi2 = phi+fSpotRadius/r;
-      if (r1<rMin && r2>rMin) {
-        CbmMuchRadialSector* s = module3->GetSectorByIndex(0);
-        AddCharge(s,UInt_t(ne*(r2-rMin)/(r2-r1)),iPoint,time,aL,phi1,phi2);
-        continue;
-      }  
-      if (r1<rMax && r2>rMax) {
-        CbmMuchRadialSector* s = module3->GetSectorByIndex(module->GetNSectors()-1);
-        AddCharge(s,UInt_t(ne*(rMax-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
-        continue;
-      }
-
-      CbmMuchRadialSector* s1 = module3->GetSectorByRadius(r1);
-      CbmMuchRadialSector* s2 = module3->GetSectorByRadius(r2);
-      if (s1==s2) AddCharge(s1,ne,iPoint,time,aL,phi1,phi2); 
-      else {
-        AddCharge(s1,UInt_t(ne*(s1->GetR2()-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
-        AddCharge(s2,UInt_t(ne*(r2-s2->GetR1())/(r2-r1)),iPoint,time,aL,phi1,phi2);
-      }      
-    }
-  }
-
-  return kTRUE;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method Exec   --------------------------------------------
-void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
-  // Reset all eventwise counters
-  fTimer.Start();
-  Reset();
-  cout << endl;
-  cout << "-I- " << fName << "   :   Event " << ++fEvent << endl;
-
-  if (fEpoch) fPoints = fMcEpoch->GetPoints(kMUCH);
-  
-  Int_t notUsable = 0; // DEBUG: counter for not usable points
-
-  // Loop over all MuchPoints
-  Int_t nPoints = fPoints->GetEntriesFast();
-
-//  for (Int_t iPoint = 70; iPoint < 75; iPoint++) {
-// TODO
-  for (Int_t iPoint = 0; iPoint < nPoints; iPoint++) {
-    CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
-
-    // Take only usable points
-    if (!point || !point->IsUsable()) {
-      notUsable++;
-      continue;
-    }
-
-    // Get the module the point is in
-    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
-    if (!module) {
-      fNFailed++;
-      continue;
-    }
-    // Process only appropriate module types
-    if(module->GetDetectorType()!=1 && module->GetDetectorType()!=3) continue;
-    // Produce Digis
-    ExecAdvanced(point, iPoint);
-  } // MuchPoint loop
-
-  // Add remaining digis
-  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
-  for (Int_t im=0;im<modules.size();im++){
-    CbmMuchModule* module = modules[im];
-    if(module->GetDetectorType()==1){
-      vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
-      for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
-    }
-    if(module->GetDetectorType()==3){
-      vector<CbmMuchRadialPad*> pads = ((CbmMuchModuleSector*) modules[im])->GetPads();
-      for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
-    }
-  }
-
-  // Screen output
-  fTimer.Stop();
-
-  if (!fVerbose)
-    cout << "+ ";
-  else
-    cout << "-I- ";
-  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-  << fixed << right << fTimer.RealTime() << " s, points " << nPoints
-  << ", failed " << fNFailed << ", not usable " << notUsable
-  << ", outside " << fNOutside << ", multihits " << fNMulti
-  << ", digis " << fDigis->GetEntriesFast() << endl;
 }
 // -------------------------------------------------------------------------
 
@@ -369,6 +194,173 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
   fEvent = 0;
 
   return kSUCCESS;
+}
+// -------------------------------------------------------------------------
+
+
+// -----   Public method Exec   --------------------------------------------
+void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
+  // Reset all eventwise counters
+  fTimer.Start();
+  Reset();
+  cout << endl;
+  cout << "-I- " << fName << "   :   Event " << ++fEvent << endl;
+
+  if (fEpoch) fPoints = fMcEpoch->GetPoints(kMUCH);
+  
+  Int_t notUsable = 0; // DEBUG: counter for not usable points
+
+  // Loop over all MuchPoints
+  Int_t nPoints = fPoints->GetEntriesFast();
+
+  for (Int_t iPoint = 0; iPoint < nPoints; iPoint++) {
+    CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
+
+    // Take only usable points
+    if (!point || !point->IsUsable()) {
+      notUsable++;
+      continue;
+    }
+
+    // Get the module the point is in
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
+    if (!module) {
+      fNFailed++;
+      continue;
+    }
+    if (!module->GetNSectors()) {
+      fNOutside++;
+      continue;
+    }
+    
+    ExecAdvanced(point, iPoint);
+  } // MuchPoint loop
+
+  // Add remaining digis
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+  for (Int_t im=0;im<modules.size();im++){
+    CbmMuchModule* module = modules[im];
+    if(module->GetDetectorType()==1){
+      vector<CbmMuchPad*> pads = ((CbmMuchModuleGem*) modules[im])->GetPads();
+      for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+    }
+    if(module->GetDetectorType()==3){
+      vector<CbmMuchRadialPad*> pads = ((CbmMuchModuleSector*) modules[im])->GetPads();
+      for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
+    }
+  }
+
+  // Screen output
+  fTimer.Stop();
+
+  if (!fVerbose)
+    cout << "+ ";
+  else
+    cout << "-I- ";
+  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
+  << fixed << right << fTimer.RealTime() << " s, points " << nPoints
+  << ", failed " << fNFailed << ", not usable " << notUsable
+  << ", outside " << fNOutside << ", multihits " << fNMulti
+  << ", digis " << fDigis->GetEntriesFast() << endl;
+}
+// -------------------------------------------------------------------------
+
+
+// ------- Private method ExecAdvanced -------------------------------------
+Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
+  TVector3 v1,v2,dv;
+  point->PositionIn(v1);
+  point->PositionOut(v2);
+  dv = v2-v1;
+
+  Int_t detectorId = point->GetDetectorID();
+  CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
+
+  Int_t nElectrons = Int_t(GetNPrimaryElectronsPerCm(point)*dv.Mag());
+  if (nElectrons<0) return kFALSE;
+  
+  Double_t time = -1;
+  while(time < 0) time = point->GetTime() + gRandom->Gaus(0, fDTime);
+  
+  if (module->GetDetectorType()==1) {
+    CbmMuchModuleGem* module1 = (CbmMuchModuleGem*) module;
+    map<CbmMuchSector*,Int_t> firedSectors;
+    for (Int_t i=0;i<nElectrons;i++) {
+      Double_t aL = gRandom->Rndm();
+      TVector3 ve = v1 + dv*aL;
+      UInt_t ne   = GasGain();
+      Double_t x  = ve.X();
+      Double_t y  = ve.Y();
+      Double_t x1 = x-fSpotRadius;
+      Double_t x2 = x+fSpotRadius;
+      Double_t y1 = y-fSpotRadius;
+      Double_t y2 = y+fSpotRadius;
+      Double_t s  = 4*fSpotRadius*fSpotRadius;
+      firedSectors[module1->GetSector(x1,y1)]=0;
+      firedSectors[module1->GetSector(x1,y2)]=0;
+      firedSectors[module1->GetSector(x2,y1)]=0;
+      firedSectors[module1->GetSector(x2,y2)]=0;
+      for (map<CbmMuchSector*, Int_t>::iterator it = firedSectors.begin(); it!= firedSectors.end(); it++) {
+        CbmMuchSector* sector  = (*it).first;
+        if (!sector) continue;
+        for (Int_t iPad=0;iPad<sector->GetNChannels();iPad++){
+          CbmMuchPad* pad = sector->GetPad(iPad);
+          Double_t xp0 = pad->GetX0();
+          Double_t xpd = pad->GetLx()/2.;
+          Double_t xp1 = xp0-xpd;
+          Double_t xp2 = xp0+xpd;
+          if (x1>xp2 || x2<xp1) continue;
+          Double_t yp0 = pad->GetY0();
+          Double_t ypd = pad->GetLy()/2.;
+          Double_t yp1 = yp0-ypd;
+          Double_t yp2 = yp0+ypd;
+          if (y1>yp2 || y2<yp1) continue;
+          Double_t lx = x1>xp1 ? (x2<xp2 ? x2-x1 : xp2-x1) : x2-xp1;
+          Double_t ly = y1>yp1 ? (y2<yp2 ? y2-y1 : yp2-y1) : y2-yp1;
+          AddCharge(pad,UInt_t(ne*lx*ly/s),iPoint,time,aL);
+        }
+      } // loop fired sectors
+      firedSectors.clear();
+    }
+  }
+  
+  if (module->GetDetectorType()==3) {
+    CbmMuchModuleSector* module3 = (CbmMuchModuleSector*) module;
+    Double_t rMin = module3->GetSectorByIndex(0)->GetR1();
+    Double_t rMax = module3->GetSectorByIndex(module->GetNSectors()-1)->GetR2();
+
+    for (Int_t i=0;i<nElectrons;i++) {
+      Double_t aL   = gRandom->Rndm();
+      TVector3 ve   = v1 + dv*aL;
+      UInt_t ne     = GasGain();
+      Double_t r    = ve.Perp();
+      Double_t phi  = ve.Phi();
+      Double_t r1   = r-fSpotRadius;
+      Double_t r2   = r+fSpotRadius;
+      Double_t phi1 = phi-fSpotRadius/r;
+      Double_t phi2 = phi+fSpotRadius/r;
+      if (r1<rMin && r2>rMin) {
+        CbmMuchRadialSector* s = module3->GetSectorByIndex(0);
+        AddCharge(s,UInt_t(ne*(r2-rMin)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+        continue;
+      }  
+      if (r1<rMax && r2>rMax) {
+        CbmMuchRadialSector* s = module3->GetSectorByIndex(module->GetNSectors()-1);
+        AddCharge(s,UInt_t(ne*(rMax-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+        continue;
+      }
+
+      CbmMuchRadialSector* s1 = module3->GetSectorByRadius(r1);
+      CbmMuchRadialSector* s2 = module3->GetSectorByRadius(r2);
+      if (s1==s2) AddCharge(s1,ne,iPoint,time,aL,phi1,phi2); 
+      else {
+        AddCharge(s1,UInt_t(ne*(s1->GetR2()-r1)/(r2-r1)),iPoint,time,aL,phi1,phi2);
+        AddCharge(s2,UInt_t(ne*(r2-s2->GetR1())/(r2-r1)),iPoint,time,aL,phi1,phi2);
+      }
+    }
+  }
+
+  return kTRUE;
 }
 // -------------------------------------------------------------------------
 
@@ -453,7 +445,6 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchRadialPad* pad) {
   CbmMuchDigiMatch* match = pad->GetMatch();
@@ -481,18 +472,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchRadialPad* pad) {
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
-Int_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectrons(CbmMuchPoint* point){
-  // Get module for the point
-  Int_t detectorId = point->GetDetectorID();
-  CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
-  if (!module) return -1;
-  if (module->GetNSectors() == 0) {
-    fNOutside++;
-    return -1;
-  }
-
+Double_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectronsPerCm(CbmMuchPoint* point){
   Int_t trackID = point->GetTrackID();
   if (trackID < 0) return -1;
 
@@ -507,11 +488,9 @@ Int_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectrons(CbmMuchPoint* point){
     }
     mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
   }
-  if (!mcTrack) -1;
+  if (!mcTrack) return -1;
   
   Int_t pdgCode = mcTrack->GetPdgCode();
-  // Debug
-  Bool_t isSignalMuon = TMath::Abs(pdgCode) == 13 && mcTrack->GetMotherId() < 0;
 
   // Reject funny particles
   TParticlePDG *particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
@@ -524,18 +503,9 @@ Int_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectrons(CbmMuchPoint* point){
   Double_t Tkin = p.E()-m; // kinetic energy of the particle
   Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
   Double_t mpv   = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
-  UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 3 mm gap
-  while (nElectrons > 50000) nElectrons = (UInt_t) (gRandom->Landau(mpv, sigma));     // restrict Landau tail to increase performance
-  // Number of electrons for current track length
-  TVector3 posIn,posOut;
-  point->PositionIn(posIn);
-  point->PositionOut(posOut);
-  TVector3 delta = posOut-posIn;
-  Double_t lTrack = delta.Mag();
-  if (m < 0.1) nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
-  else         nElectrons = (UInt_t) (nElectrons * lTrack / 0.36);
-  
-  return nElectrons;
+  Double_t n = gRandom->Landau(mpv, sigma);
+  while (n > 5e4) n = gRandom->Landau(mpv, sigma); // restrict Landau tail to increase performance
+  return m<0.1 ? n/l_e : n/l_not_e;
 }
 
 
@@ -567,6 +537,22 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialSector* s,UInt_t ne, I
     AddCharge(pad1,pad1_ne   ,iPoint,time,aL);
     AddCharge(pad2,ne-pad1_ne,iPoint,time,aL);
   }
+  return kFALSE;
+}
+
+Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL){
+  CbmMuchDigi*      digi  = pad->GetDigi();
+  CbmMuchDigiMatch* match = pad->GetMatch();
+  if (match->GetNPoints()==0) {
+    digi->SetTime(time);
+    digi->SetDeadTime(fDeadTime);
+  }
+  if (time>digi->GetTime()+digi->GetDeadTime()) {
+    AddDigi(pad);
+    digi->SetTime(time);
+    digi->SetDeadTime(fDeadTime);
+  }
+  match->AddCharge(iPoint,charge,(1-aL)*fTotalDriftTime);
   return kFALSE;
 }
 

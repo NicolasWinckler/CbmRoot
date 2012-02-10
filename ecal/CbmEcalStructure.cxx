@@ -11,48 +11,13 @@
 
 /* $Id: CbmEcalStructure.cxx,v 1.11 2006/07/19 09:33:34 prokudin Exp $ */
 
-/* History of cvs commits:
- *
- * $Log: CbmEcalStructure.cxx,v $
- * Revision 1.11  2006/07/19 09:33:34  prokudin
- * Modifing for CbmEcalPhotonCalibrator
- *
- * Revision 1.10  2006/07/15 18:31:10  kharlov
- * Compilation warnings and coding conventions are corrected
- *
- * Revision 1.9  2006/07/14 15:09:32  prokudin
- * New functionality added
- *
- * Revision 1.8  2006/07/12 14:22:56  kharlov
- * Adding ClusterFinder
- *
- * Revision 1.7  2006/07/10 07:43:25  kharlov
- * Conversion of cell type from string to a number
- *
- * Revision 1.6  2006/06/30 07:00:15  kharlov
- * Corrections for hit numbering
- *
- * Revision 1.5  2006/06/30 06:17:17  kharlov
- * Optimization, commenting
- *
- * Revision 1.4  2006/06/22 06:52:13  kharlov
- * Compilation warnings removed
- *
- * Revision 1.3  2006/04/02 16:55:23  kharlov
- * Merging full and fast MC
- *
- * Revision 1.2  2006/01/31 17:07:17  kharlov
- * Correction for CbmEcalv1
- *
- * Revision 1.1  2006/01/27 17:26:30  kharlov
- * First adaptation of ECAL detailed geometry to cbmroot2
- *
- */
-
 #include "CbmEcalStructure.h"
 
 #include "CbmEcal.h"
 #include "CbmEcalDetailed.h"
+#include "CbmEcalCellMC.h"
+
+#include "CbmEcalCell.h"
 
 #include <iostream>
 #include <algorithm>
@@ -69,7 +34,12 @@ public:
 CbmEcalCell* CbmEcalStructure::GetCell(Int_t volId, Int_t& ten, Bool_t& isPS)
 {
   UInt_t i;
-  Int_t volidmax = CbmEcal::GetVolIdMax()*2;
+  static Int_t volidmax = 0;
+  if (volidmax==0)
+  {
+    if (fEcalVersion==0) volidmax=CbmEcal::GetVolIdMax()*2;
+    if (fEcalVersion==1) volidmax=10000000;
+  }
 
   if ((Int_t)fHash.size()<volidmax)
   {
@@ -99,6 +69,7 @@ CbmEcalCell* CbmEcalStructure::GetCell(Int_t volId, Int_t& ten, Bool_t& isPS)
   return fHash[volId]->cell;
 }
 
+//-----------------------------------------------------------------------------
 void CbmEcalStructure::Serialize()
 {
   fCells.clear();
@@ -111,6 +82,12 @@ void CbmEcalStructure::Serialize()
 }
 
 //-----------------------------------------------------------------------------
+CbmEcalModule* CbmEcalStructure::CreateModule(char type, Int_t number, Float_t x1, Float_t y1, Float_t x2, Float_t y2)
+{
+  return new CbmEcalModule(type, number, x1, y1, x2, y2, fUseMC);
+}
+//-----------------------------------------------------------------------------
+
 CbmEcalStructure::CbmEcalStructure(CbmEcalInf* ecalinf)
   : TNamed("CbmEcalStructure", "Calorimeter structure"), fEcalInf(ecalinf)
 {
@@ -121,6 +98,7 @@ CbmEcalStructure::CbmEcalStructure(CbmEcalInf* ecalinf)
   fEcalVersion=(Int_t)fEcalInf->GetVariable("ecalversion");
   if (fEcalVersion<0)
     fEcalVersion=0;
+  fUseMC=0;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +130,7 @@ void CbmEcalStructure::Construct()
 	x=x1+i*dx;
 	y=y1+j*dy;
 	number=(i*100+j)*100;
-	fStructure[GetNum(i,j)]=new CbmEcalModule(type,number,x,y,x+dx,y+dy);
+	fStructure[GetNum(i,j)]=CreateModule(type,number,x,y,x+dx,y+dy);
       }
       else
 	fStructure[GetNum(i,j)]=NULL;
@@ -372,9 +350,17 @@ void CbmEcalStructure::CreateNLists(CbmEcalCell* cell)
 //-----------------------------------------------------------------------------
 void CbmEcalStructure::ResetModules()
 {
-  vector<CbmEcalModule*>::const_iterator p;
-  for(p=fStructure.begin();p!=fStructure.end();++p)
-    if (*p) (*p)->ResetModule();
+  list<CbmEcalCell*>::const_iterator p=fCells.begin();
+  if (fUseMC==0)
+  {
+    for(;p!=fCells.end();++p)
+      (*p)->ResetEnergyFast();
+  }
+  else
+  {
+    for(;p!=fCells.end();++p)
+    ((CbmEcalCellMC*)(*p))->ResetEnergy();
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -2,11 +2,13 @@
 
 #include "CbmEcalCell.h"
 
+#include "TMath.h"
+
 #include <list>
 
 using namespace std;
 
-CbmEcalMaximum::CbmEcalMaximum(CbmEcalCell* cell)
+CbmEcalMaximum::CbmEcalMaximum(CbmEcalCell* cell, Double_t z)
   : fCell(cell)
 {
   Double_t me=0;
@@ -40,6 +42,9 @@ CbmEcalMaximum::CbmEcalMaximum(CbmEcalCell* cell)
     fY+=(*p)->GetTotalEnergy()*(*p)->GetCenterY();
   }
   fX/=me; fY/=me;
+  fTanTheta=TMath::Sqrt(fX*fX+fY*fY)/z;
   fMark=0;
+  fRegion=-1111;
 }
+
 ClassImp(CbmEcalMaximum)

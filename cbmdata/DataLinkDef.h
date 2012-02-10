@@ -61,7 +61,12 @@
 #pragma link C++ class CbmEcalHit+;
 #pragma link C++ class CbmEcalHitFastMC+;
 #pragma link C++ class CbmEcalPointLite+;
+#pragma link C++ class CbmEcalCell+;
+#pragma link C++ class CbmEcalMaximum+;
 #pragma link C++ class CbmEcalCluster+;
+#pragma link C++ class CbmEcalRecParticle+;
+#pragma link C++ class CbmEcalIdParticle+;
+
 
 #pragma link C++ class CbmZdcPoint+;
 #pragma link C++ class CbmZdcEvent+;

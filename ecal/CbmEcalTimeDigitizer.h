@@ -8,6 +8,7 @@
 #include <list>
 
 class CbmEcalStructure;
+class CbmEcalCellMC;
 class CbmEcalCell;
 class CbmEcalCalibration;
 class TFormula;
@@ -33,7 +34,7 @@ public:
   virtual ~CbmEcalTimeDigitizer() {};
 private:
   /** Calculate time in given cell **/
-  void CalculateTime(CbmEcalCell* cell);
+  void CalculateTime(CbmEcalCellMC* cell);
   /** Set size of time/energy deposition array **/
   void SetArraySize(Int_t size);
   /** Calorimeter structure **/

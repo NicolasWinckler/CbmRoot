@@ -27,7 +27,7 @@ void CbmEcalAnalysisMaterial::Exec(Option_t* option)
   FairRadLenPoint* p;
   Int_t i;
   Int_t n;
-  Double_t z=150;
+  Double_t z=600;
   TVector3 newp;
   TVector3 oldp(0.0, 0.0, 0.0);
   TVector3 d;
@@ -51,7 +51,7 @@ void CbmEcalAnalysisMaterial::Exec(Option_t* option)
     p=(FairRadLenPoint*)fRadLen->At(i);
     newp=p->GetPositionOut();
 //    cout << d.Mag() << "	" << p->GetRadLength() << "	" << newp.Z() << "	" << fX0 << endl;
-    if (newp.Z()>1200) break;
+    if (newp.Z()>600) break;
     d=newp-oldp;
 //    cout << p->GetLength() << "	" << p->GetRadLength() << "	" << fEvent << "	" <<p->GetXOut() << "	" << p->GetYOut() << "	" << p->GetZOut() << endl;
     fX0+=d.Mag()/p->GetRadLength();

@@ -136,9 +136,15 @@ private:
   /** ECAL geometry parameters **/
   /** x,y,z size of outer ECAL box [cm] **/
   Float_t fEcalSize[3];			//!
+  /** Use simple geometry.
+   ** Try to be as compatible to CbmEcal in physics as possible **/
+  Int_t fSimpleGeo;			//!
   /** Size of the ECAL in modules **/
   Int_t fXSize;				//!
   Int_t fYSize;				//!
+  /** Position of calorimeter center **/
+  Float_t fDX;				//!
+  Float_t fDY;				//!
   /** transverce cell size [cm] **/
   Float_t fCellSize;			//!
   /** Size of calorimeter module [cm] **/
@@ -217,6 +223,13 @@ private:
   void ConstructCell(Int_t type);
   /** Construct a tile with given type **/
   void ConstructTile(Int_t type, Int_t material);
+  /** Next method for simplified geometry **/
+  /** Construct a module with given type **/
+  void ConstructModuleSimple(Int_t type);
+  /** Construct a cell with given type **/
+  void ConstructCellSimple(Int_t type);
+  /** Construct a tile with given type **/
+  void ConstructTileSimple(Int_t type, Int_t material);
   TGeoVolume* fModules[cMaxModuleType];			//! Calorimeter Modules
   TGeoVolume* fCells[cMaxModuleType];			//! Calorimeter Cells
   TGeoVolume* fScTiles[cMaxModuleType];			//! Pb tiles 

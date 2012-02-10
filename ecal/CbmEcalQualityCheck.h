@@ -23,7 +23,6 @@ class CbmEcalStructure;
 class CbmEcalInf;
 class CbmEcalCell;
 class CbmEcalQualityCheckItem;
-class CbmEcalShowerLib;
 class CbmEcalShLib;
 class CbmEcalPoint;
 
@@ -91,7 +90,6 @@ private:
   void DrawTracks();
   void DrawCells();
 
-  CbmEcalShowerLib* fLib;	//!
   CbmEcalShLib* fShLib;		//!
   std::list<CbmEcalQualityCheckItem*> fCells;		//!
   void DrawImage();

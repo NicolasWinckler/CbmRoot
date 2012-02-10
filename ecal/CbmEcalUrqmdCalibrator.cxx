@@ -20,6 +20,8 @@
 #include "CbmEcalPointLite.h"
 #include "CbmEcalStructure.h"
 
+#include "CbmEcalCellMC.h"
+
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairRootManager.h"
@@ -58,7 +60,7 @@ void CbmEcalUrqmdCalibrator::FillStructure()
 {
   CbmEcalPointLite* pt;
   CbmMCTrack* track;
-  CbmEcalCell* cell;
+  CbmEcalCellMC* cell;
   Int_t ten;
   UInt_t n;
   Bool_t isPS;
@@ -74,19 +76,19 @@ void CbmEcalUrqmdCalibrator::FillStructure()
   for(UInt_t j=0; j<n; j++)
   {
     pt=(CbmEcalPointLite*)fLitePoints->At(j);
-    cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
+    cell=(CbmEcalCellMC*)fStr->GetCell(pt->GetDetectorID(), ten, isPS);
     if (pt->GetEnergyLoss()<0)
       cout << "Here" << pt->GetEnergyLoss() << endl;
     if (ten!=0) continue;
     if (isPS)
-      cell->AddPSEnergy(pt->GetEnergyLoss());
+      ; //     cell->AddPSEnergy(pt->GetEnergyLoss()); // No preshower
     else
       cell->AddEnergy(pt->GetEnergyLoss());
 
     track=(CbmMCTrack*)fMCTracks->At(pt->GetTrackID());
     if (track->GetPdgCode()!=fPDGType) continue;
     if (isPS)
-      cell->AddTrackPSEnergy(pt->GetTrackID(), pt->GetEnergyLoss());
+      ;	//     cell->AddTrackPSEnergy(pt->GetTrackID(), pt->GetEnergyLoss()); // No preshower
     else
       cell->AddTrackEnergy(pt->GetTrackID(), pt->GetEnergyLoss());
   } 
@@ -112,11 +114,9 @@ void CbmEcalUrqmdCalibrator::InitTree()
   fTree->Branch("mcpx",&fMCPX,"mcpx/F");
   fTree->Branch("mcpy",&fMCPY,"mcpy/F");
   fTree->Branch("mcpz",&fMCPZ,"mcpz/F");
-  fTree->Branch("pse",&fPSE,"pse/F");
   fTree->Branch("e",&fE,"e/F");
   fTree->Branch("e2",&fE2x2,"e2/F");
   fTree->Branch("e3",&fE3x3,"e3/F");
-  fTree->Branch("trackpse",&fTrackPSE,"trackpse/F");
   fTree->Branch("tracke2",&fTrackE2x2,"tracke2/F");
   fTree->Branch("tracke3",&fTrackE3x3,"tracke3/F");
   fTree->Branch("te",&fTotalTrackEnergy,"te/F");
@@ -277,7 +277,7 @@ void CbmEcalUrqmdCalibrator::FillTotalEnergy(Int_t tracknum)
   fTotalTrackEnergy=0;
   for(p=cells.begin(); p!=cells.end();++p)
   {
-    e=(*p)->GetTrackEnergy(tracknum)+(*p)->GetTrackPSEnergy(tracknum);
+    e=((CbmEcalCellMC*)(*p))->GetTrackEnergy(tracknum);
     if (e>maxe)
     {
       cell=(*p);
@@ -305,17 +305,18 @@ void CbmEcalUrqmdCalibrator::FillEnergies(CbmEcalCell* cell, Int_t trackid)
   Float_t maxe;
   list<CbmEcalCell*> cells;
   list<CbmEcalCell*>::const_iterator p;
+  CbmEcalCellMC* cellmc=(CbmEcalCellMC*)cell;
 
   cells.clear();
 
   cell->GetNeighborsList(0,cells);
   fE=cell->GetEnergy();
   en=cell->GetEnergy();
-  tracken=cell->GetTrackEnergy(trackid);;
+  tracken=cellmc->GetTrackEnergy(trackid);;
   for(p=cells.begin();p!=cells.end();++p) 
   {
     en+=(*p)->GetEnergy();
-    tracken+=(*p)->GetTrackEnergy(trackid);
+    tracken+=((CbmEcalCellMC*)(*p))->GetTrackEnergy(trackid);
   }
   fE3x3=en;
   fTrackE3x3=tracken;
@@ -330,17 +331,14 @@ void CbmEcalUrqmdCalibrator::FillEnergies(CbmEcalCell* cell, Int_t trackid)
     if (maxe<en)
     {
       maxe=en;
-      tracken=cell->GetTrackEnergy(trackid);
+      tracken=cellmc->GetTrackEnergy(trackid);
       for(p=cells.begin();p!=cells.end();++p) 
-	tracken+=(*p)->GetTrackEnergy(trackid);
+	tracken+=((CbmEcalCellMC*)(*p))->GetTrackEnergy(trackid);
      
     }
   }
   fE2x2=maxe;
   fTrackE2x2=tracken;
-
-  fPSE=cell->GetPSEnergy();
-  fTrackPSE=cell->GetTrackPSEnergy(trackid);
 }
 
 /** Finds cell with more energy deposition than given **/

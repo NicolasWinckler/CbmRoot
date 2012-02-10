@@ -5,7 +5,7 @@
 
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
-#include "CbmEcalClusterV1.h"
+#include "CbmEcalCluster.h"
 #include "CbmEcalStructure.h"
 
 #include "TTree.h"
@@ -25,7 +25,7 @@ void CbmEcalAnalysisNeutron::Exec(Option_t* option)
   Int_t i;
   Int_t n=fReco->GetEntriesFast();
   CbmEcalRecParticle* p;
-  CbmEcalClusterV1* cl;
+  CbmEcalCluster* cl;
   CbmMCTrack* mtr;
   Double_t dx;
   Double_t dy;
@@ -47,7 +47,7 @@ void CbmEcalAnalysisNeutron::Exec(Option_t* option)
   {
     p=(CbmEcalRecParticle*)fReco->At(0);
     if (p->MCTrack()<0) continue;
-    cl=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+    cl=(CbmEcalCluster*)fClusters->At(p->ClusterNum());
     fMaxs=cl->Maxs(); 
     fM=cl->Moment();
     fMx=cl->MomentX();

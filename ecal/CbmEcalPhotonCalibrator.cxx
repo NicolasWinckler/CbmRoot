@@ -28,9 +28,7 @@ CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t i
   fGeoFile=fileGeo;
   fStr=NULL;
   fNoise=0;
-  fNoisePS=0;
   fThreshold=0;
-  fThresholdPS=0;
   fInf=CbmEcalInf::GetInstance(fGeoFile);
   fAlgo=0;
 }
@@ -199,16 +197,12 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
     fTree=new TTree("ECALcal","ECAL calibration tree");
     fTree->Branch("fe",&fFullEnergy,"fe/F");
     fTree->Branch("ecale",&fEcalEnergy,"ecale/F");
-    fTree->Branch("pse",&fPSEnergy,"pse/F");
 
     fTree->Branch("ecale2x2",&f2x2EcalEnergy,"ecale2x2/F");
-    fTree->Branch("pse2x2",&f2x2PSEnergy,"pse2x2/F");
 
     fTree->Branch("ecale3x3",&f3x3EcalEnergy,"ecale3x3/F");
-    fTree->Branch("pse3x3",&f3x3PSEnergy,"pse3x3/F");
 
     fTree->Branch("ecale5x5",&f5x5EcalEnergy,"ecale5x5/F");
-    fTree->Branch("pse5x5",&f5x5PSEnergy,"pse5x5/F");
 
     fTree->Branch("e",&fE,"e/F");
     fTree->Branch("px",&fPx,"px/F");
@@ -222,7 +216,7 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
   }
   cout << "--> Event no." << fEvent << endl;
   
-  fStr->ResetModulesFast();
+  fStr->ResetModules();
 
   // Filling structure
   n=fLitePoints->GetEntriesFast();
@@ -236,7 +230,8 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
 //      EcalFullE+=pt->GetEnergyLoss();
       if (isPS)
       {
-	cell->AddPSEnergy(pt->GetEnergyLoss());
+	; 
+//	cell->AddPSEnergy(pt->GetEnergyLoss());
 //	EcalPSE+=pt->GetEnergyLoss();
       }
       else
@@ -255,22 +250,14 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
       energy=cell->GetEnergy()+gRandom->Gaus(0,fNoise);
     else
       energy=cell->GetEnergy();
-    if (fNoisePS>0)
-      psenergy=cell->GetPSEnergy()+gRandom->Gaus(0,fNoisePS);
-    else
-      psenergy=cell->GetPSEnergy();
 
     if (energy<fThreshold) energy=0;
-    if (psenergy<fThresholdPS) psenergy=0;
     cell->SetEnergy(energy);
-    cell->SetPSEnergy(psenergy);
     EcalE+=energy;
-    EcalPSE+=psenergy;
     EcalFullE+=energy+psenergy;
   }
 
   fFullEnergy=EcalFullE;
-  fPSEnergy=EcalPSE;
   fEcalEnergy=EcalE;
 
   n=fEcalPoints->GetEntriesFast();
@@ -330,18 +317,15 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
 
   fType=fStr->GetModule(cell->GetCenterX(), cell->GetCenterY())->GetType();
 
-  cell->GetClusterEnergy(0,f3x3EcalEnergy, f3x3PSEnergy);
-  cell->Get5x5ClusterEnergy(f5x5EcalEnergy, f5x5PSEnergy);
+  cell->GetClusterEnergy(0,f3x3EcalEnergy);
   f2x2EcalEnergy=0;
-  f2x2PSEnergy=0;
   if (fAlgo==0)
     for(Int_t j=1;j<5;j++)
     {
-      cell->GetClusterEnergy(j,EcalE, EcalPSE);
-      if (EcalE+EcalPSE>f2x2EcalEnergy+f2x2PSEnergy)
+      cell->GetClusterEnergy(j,EcalE);
+      if (EcalE>f2x2EcalEnergy)
       {
         f2x2EcalEnergy=EcalE;
-        f2x2PSEnergy=EcalPSE;
       }
     }
   else
@@ -384,7 +368,6 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
     for(pc=cells.begin();pc!=cells.end();++pc)
     {
       f2x2EcalEnergy+=(*pc)->GetEnergy();
-      f2x2PSEnergy+=(*pc)->GetPSEnergy();
     }
   }
   cout << endl;

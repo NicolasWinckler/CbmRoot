@@ -54,7 +54,7 @@ InitStatus CbmEcalShLibTable::Init()
     Fatal("Init", "Can't find IOManager in the system.");
     return kFATAL;
   }
-  fManager->Register("EcalShLib", "ECAL", this, kFALSE);
+  fManager->Register(LibraryName(), "ECAL", this, kFALSE);
   for(list<TString>::const_iterator p=fFiles.begin(); p!=fFiles.end();++p)
     Add((*p).Data());
 

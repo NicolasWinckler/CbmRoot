@@ -7,6 +7,9 @@
 
 #include <list>
 
+class CbmEcalDrawer;
+class CbmEcalStructure;
+
 class CbmEcalAnalysisSimple : public FairTask
 {
 public:
@@ -27,6 +30,8 @@ public:
   /** Destructor **/
   virtual ~CbmEcalAnalysisSimple() {};
 private:
+  CbmEcalDrawer* fDr;
+  CbmEcalStructure* fStr;
   TString fName;
   Int_t fEv;
 

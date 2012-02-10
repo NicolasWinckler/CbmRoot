@@ -23,6 +23,7 @@
 #include "CbmEcalPointLite.h"
 #include "CbmEcalStructure.h"
 #include "CbmEcalSCurveLib.h"
+#include "CbmEcalCellMC.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -59,7 +60,7 @@ void CbmEcalAnalysisDS::FillStructure()
 {
   CbmEcalPointLite* pt;
   CbmMCTrack* track;
-  CbmEcalCell* cell;
+  CbmEcalCellMC* cell;
   Int_t ten;
   UInt_t n;
   Bool_t isPS;
@@ -75,19 +76,19 @@ void CbmEcalAnalysisDS::FillStructure()
   for(UInt_t j=0; j<n; j++)
   {
     pt=(CbmEcalPointLite*)fLitePoints->At(j);
-    cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
+    cell=(CbmEcalCellMC*)fStr->GetCell(pt->GetDetectorID(), ten, isPS);
     if (pt->GetEnergyLoss()<0)
       cout << "Here" << pt->GetEnergyLoss() << endl;
     if (ten!=0) continue;
     if (isPS)
-      cell->AddPSEnergy(pt->GetEnergyLoss());
+      ; // cell->AddPSEnergy(pt->GetEnergyLoss()); preshower removed
     else
       cell->AddEnergy(pt->GetEnergyLoss());
 
     track=(CbmMCTrack*)fMCTracks->At(pt->GetTrackID());
     if (track->GetPdgCode()!=fPDGType) continue;
     if (isPS)
-      cell->AddTrackPSEnergy(pt->GetTrackID(), pt->GetEnergyLoss());
+      ; // cell->AddTrackPSEnergy(pt->GetTrackID(), pt->GetEnergyLoss()); preshower removed
     else
       cell->AddTrackEnergy(pt->GetTrackID(), pt->GetEnergyLoss());
   } 
@@ -255,7 +256,7 @@ void CbmEcalAnalysisDS::FillEnergies(CbmEcalCell* cell)
   fCellX=cell->GetCenterX();
   fCellY=cell->GetCenterY();
   
-  fPSE=cell->GetPSEnergy();
+  fPSE=0;
 
   if (fE2x2<0.05) return; 
   fEReco=GetEnergy(fE2x2+fPSE, cell);

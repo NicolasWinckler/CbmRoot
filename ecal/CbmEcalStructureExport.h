@@ -37,7 +37,6 @@ private:
   Float_t fX;
   Float_t fY;
   Float_t fE;
-  Float_t fPSE;
 
   TTree* fStructureOut;			//!
 

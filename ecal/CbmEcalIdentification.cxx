@@ -8,18 +8,25 @@
 #include "CbmEcalIdParticle.h"
 #include "CbmEcalTrackExtrapolation.h"
 #include "CbmEcalCell.h"
+#include "CbmEcalCellMC.h"
 #include "CbmEcalParam.h"
 #include "CbmMCTrack.h"
 #include "CbmEcalInf.h"
 #include "CbmEcalPoint.h"
+#include "CbmEcalMaximum.h"
+#include "CbmEcalShLibCorr.h"
 
-#include "CbmGlobalTrack.h"
-#include "CbmTrdTrack.h"
+#include "CbmStsTrack.h"
 #include "CbmTrackMatch.h"
 
 #include "TTree.h"
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "TFormula.h"
+#include "TVector2.h"
+#include "TFile.h"
+#include "TDirectory.h"
+#include "TMatrixD.h"
 
 #include <iostream>
 #include <map>
@@ -44,20 +51,25 @@ void CbmEcalIdentification::Exec(Option_t* option)
   {
     if (fTreeOut) InitVar();
     tr=(FairTrackParam*)fTracks->At(i);
+    if (tr==NULL) continue;
     fExtraNum=i;
+    fTrackNum=i;
     oldn=fN;
     Identify(tr);
     if (oldn!=fN&&fTreeOut)
       WriteTree();
   }
+//  gDirectory->Cd("../");
+//  gDirectory->ls();
+//  cout << gDirectory->GetPath() << endl;
+//  if (fTreeOut) fTree->Write();
 }
 
 /** Identify a track **/
 void CbmEcalIdentification::Identify(FairTrackParam* tr)
 {
-  CbmEcalCell* cell;
+  CbmEcalCell* cell=NULL;
   CbmEcalCell* cell2;
-  CbmEcalCell* max=NULL;
   list<CbmEcalCell*> cells;
   list<CbmEcalCell*>::const_iterator p;
   list<CbmEcalCell*> ocells;
@@ -70,35 +82,185 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
   Float_t t;
   CbmEcalInf* fInf=fStr->GetEcalInf();
   TVector3 trackmom;
+  TVector3 tv3;
   Double_t te;
   Double_t me;
   Double_t me1;
+  Double_t sigma;
   Int_t i;
   Int_t mc;
+  Int_t nm=fMaximums->GetEntriesFast();
+  CbmEcalMaximum* mx;
+  CbmEcalMaximum* mxx=NULL;
 
 
   tr->Momentum(trackmom);
+  fTrackP=trackmom.Mag();
+  fPhi=TMath::ATan2(trackmom.Y(), trackmom.X())*TMath::RadToDeg();
+  fTheta=TMath::ATan2(trackmom.Pt(), trackmom.Z())*TMath::RadToDeg();
   fX=tr->GetX();
   fY=tr->GetY();
   fZ=tr->GetZ();
+
   cell=fStr->GetCell(fX, fY);
-  fTrackNum=fExtra->Map()[fExtraNum];
-  if (cell==NULL)
+  if (cell)
+    fCellE=GetEnergy(cell);
+  tv3=trackmom.Unit();
+  x=fX+tv3.X()*2.0;
+  y=fY+tv3.Y()*2.0;
+  cell=fStr->GetCell(x, y);
+  if (cell)
+    fCellE2=GetEnergy(cell);
+  cell=NULL;
+
+  if (fSimpleMaximumLocationAlgo==1)
+    mxx=FindMaximum(tr);
+  else
+  {
+    for(i=0;i<nm;i++)
+    {
+//    cout << fZ << " -----------------------------------------------" << endl;
+      mx=(CbmEcalMaximum*)fMaximums->At(i);
+      if (!mx) continue;
+      if (CheckMaximum(mx))
+      {
+        if (cell&&fVerbose>10)
+	  Info("Identify", "For track %d (%f, %f) more than one maximum located", fExtraNum, fX, fY);
+        cell=mx->Cell();
+        mx->SetMark(mx->Mark()+1);
+        mxx=mx;
+      }
+    }
+  }
+  if (mxx==NULL)
   {
     if (fTreeOut) WriteTreeLight();
     return;
   }
-  cell->GetNeighborsList(0, cells);
-  fCellType=cell->GetType();
-  /** Check cell corresponds to track position for maximum **/
-  e=cell->GetTotalEnergy();
+  cell=mxx->Cell();
+//  cout << "here" << endl;
+  ConstructCluster(mxx);
+  if (fCluster.size()==0)
+  {
+    if (fTreeOut) WriteTreeLight();
+    return;
+  }
+  if (fTreeOut) ShapeAnalysis(mxx);
+  CalculateShape(mxx);
+  if (fShLib) CalculateChi2(mxx);
+  e=0;
+  for(p=fCluster.begin();p!=fCluster.end();++p)
+    e+=GetEnergy(*p);
+//  fShape=-1111
+  fE=fCal->GetEnergy(e, TMath::Tan(TMath::DegToRad()*fTheta), fRegion);
+//  cout << fE << " " << fRegion << endl;
+//  cout << e << "->" << fE << ", theta=" << fTheta << ", region=" << fRegion << endl;
+  fMaxX=cell->GetCenterX();
+  fMaxY=cell->GetCenterY();
+  //TODO: Calculate probability
+  fEProb=1;
+  tracke=trackmom.Mag();
+  fTrackP=tracke;
+//  if (fE<tracke)
+  {
+    sigma=fEResolution->Eval(tracke)*tracke;
+    fEProb*=TMath::Erfc((tracke-fE)/sigma/TMath::Sqrt(2.0));
+  }
+
+  fMCTrackNum=-1111;
+  if (fUseMC==1)
+  {
+    CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(fTrackNum);
+    if (ststr)
+      fMCTrackNum=ststr->GetMCTrackId();
+  }
+  // Use PSE for \chi^2 storage
+  new((*fId)[fN++]) CbmEcalIdParticle(cell, fX, fY, fZ, fE/tracke, fChi2, fShape, fTrackNum, fEProb, fMCTrackNum);
+}
+
+Double_t CbmEcalIdentification::Correlation(CbmEcalCell* c1, CbmEcalCell* c2, Double_t x, Double_t y, Double_t phi, Double_t theta, Double_t e) const
+{
+  if (c1->GetType()==c2->GetType())
+    return fShLib->Correlation(c1->X1()-x, c1->Y1()-y, c2->X1()-x, c2->Y1()-y, phi, theta, e, c1);
+  if (c1->GetType()>c2->GetType())
+    return fShLib->Correlation2(c1->X1()-x, c1->Y1()-y, c2->X1()-x, c2->Y1()-y, phi, theta, e, c1->GetType());
+  else
+    return fShLib->Correlation2(c2->X1()-x, c2->Y1()-y, c1->X1()-x, c1->Y1()-y, phi, theta, e, c2->GetType());
+}
+
+/** Calculate chi2 of the cluster**/
+void CbmEcalIdentification::CalculateChi2(CbmEcalMaximum* mx)
+{
+  // fX, fY --- corrdinates
+  // fTheta, fPhi --- angles
+  // fTrackP --- momenta of the track
+  // fCluster --- list of cluster cell
+  Int_t s=fCluster.size();
+  TMatrixD m(s, s);
+  Int_t i=0;
+  Int_t j;
+  list<CbmEcalCell*>::const_iterator p;
+  CbmEcalCell* cls[10];
+  Double_t de[10];
+  Double_t det[10];
+
+  for(p=fCluster.begin();p!=fCluster.end();++p)
+    cls[i++]=(*p);
+
+  if (fPhi<0) fPhi+=360.0;
+  cout << fPhi << " " << fTheta << " " << fTrackP << endl;
+  // Calculate covariance matrix
+  for(i=0;i<s;i++)
+  for(j=0;j<s;j++)
+    m[i][j]=Correlation(cls[i], cls[j], fX, fY, fPhi, fTheta, fTrackP);
+
+  //Some magic numbers: TODO?
+  for(i=0;i<s;i++)
+    if (m[i][i]<1e-8*fTrackP) m[i][i]=1e-8*fTrackP;
+
+  // Inversion
+  m.Invert(det);
+
+  // Energy difference calculation
+  for(i=0;i<s;i++)
+    de[i]=cls[i]->GetTotalEnergy()-fShLib->GetResponse(cls[i]->X1()-fX, cls[i]->Y1()-fY, fPhi, fTheta, fTrackP, cls[i]);
+
+  // Chi2 calculation
+  fChi2=0.0;
+  for(i=0;i<s;i++)
+  for(j=0;j<s;j++)
+    fChi2+=de[i]*de[j]*m[i][j];
+}
+
+/** Simple maximum location algorithm. Copy/paste from CbmEcalIdentification **/
+CbmEcalMaximum* CbmEcalIdentification::FindMaximum(FairTrackParam* tr)
+{
+  CbmEcalCell* cell=fStr->GetCell(fX, fY);
+  if (cell==NULL) return NULL;
+  Double_t e=cell->GetTotalEnergy();
+  list<CbmEcalCell*> cells;
+  list<CbmEcalCell*> ocells;
+  list<CbmEcalCell*>::const_iterator p;
+  list<CbmEcalCell*>::const_iterator op;
+  CbmEcalCell* max=NULL;
+  Double_t x;
+  Double_t y;
+  Double_t dst;
+  Double_t t;
+ 
+ 
+//  Info("FindMaximum", "E=%f", e);
+  cell->GetNeighborsList(0, cells);  
   for(p=cells.begin();p!=cells.end();++p)
     if ((*p)->GetTotalEnergy()>e)
       break;
   if (p==cells.end())
+  {
     max=cell;
-  cell->GetNeighborsList(0, cells);
-  e=cell->GetTotalEnergy();
+//    Info("FindMaximum", "Found cell is maximum");
+  }
+//  cell->GetNeighborsList(0, cells);
+//  e=cell->GetTotalEnergy();
   if (max==NULL)
   /** Check cells near given for maximums **/
     for(p=cells.begin();p!=cells.end();++p)
@@ -121,92 +283,44 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
         if (max==NULL||max->GetTotalEnergy()<(*p)->GetTotalEnergy())
           max=*p;
     }
+  if (max==NULL) return NULL;
 
-  if (max==NULL)
+  Int_t i;
+  Int_t nm=fMaximums->GetEntriesFast();
+  CbmEcalMaximum* mx;
+  for(i=0;i<nm;i++)
   {
-    if (fTreeOut) WriteTreeLight();
-    return;
+    mx=(CbmEcalMaximum*)fMaximums->At(i);
+    if (!mx) continue;
+    if (mx->Cell()==max) break;
   }
-  max->GetNeighborsList(0, cells); te=0;
-  fCellType=max->GetType();
-  for(p=cells.begin();p!=cells.end();++p)
-    te+=GetEnergy(*p)+GetPSEnergy(*p);
-  me=0; fPSEAll=0;
-  for(i=1;i<5;i++)
+  if (i==nm)
   {
-    e=0;
-    max->GetNeighborsList(i, cells);
-    for(p=cells.begin();p!=cells.end();++p)
-    {
-      fPSEAll+=GetPSEnergy(*p);
-      e+=GetEnergy(*p)+GetPSEnergy(*p);
-    }
-    if (e>me)
-    {
-      me=e;
-      mc=i;
-    }
+//    Info("FindMaximum", "Maximum (%f,%f,%f) not found in the table", fX, fY, max->GetTotalEnergy());
+//    for(i=0;i<nm;i++)
+//    {
+//      mx=(CbmEcalMaximum*)fMaximums->At(i);
+//      if (!mx) continue;
+//      Info("FindMaximum", "Table maximum %d (%f, %f, %f) ", i, mx->X(), mx->Y(), mx->Cell()->GetTotalEnergy());
+//    }
+    return NULL;
   }
-  me1=GetEnergy(max)+GetPSEnergy(max);
-  me+=me1;
-  te+=me1;
-  fShape=me/te;
-  fE=fCal->GetEnergy(me, max);
-  x=fX; x+=trackmom.X()/trackmom.Z()*(fInf->GetPSLead()+fInf->GetPSScin()/2.0);
-  y=fY; y+=trackmom.Y()/trackmom.Z()*(fInf->GetPSLead()+fInf->GetPSScin()/2.0);
-  cell2=fStr->GetCell(x, y);
-  if (cell2)
-    fPSE3=GetPSEnergy(cell2);
-  else
-    fPSE3=-1111;
-  fPSE=GetPSEnergy(max);
-  fPSE2=GetPSEnergy(cell);
-  fPSEAll+=fPSE;
-  fMaxX=max->GetCenterX();
-  fMaxY=max->GetCenterY();
-  fCellX=cell->GetCenterX();
-  fCellY=cell->GetCenterY();
-  //TODO: Calculate probability
-  fEProb=1;
-  tracke=trackmom.Mag();
-  fTrackP=tracke;
-  if (fE<tracke)
-    fEProb*=TMath::Erfc((tracke-fE)/TMath::Sqrt(tracke));
+  mx->SetMark(mx->Mark()+1);
 
-  fMCTrackNum=-1111;
-  if (fUseMC==1)
-  {
-    CbmGlobalTrack* gtr=(CbmGlobalTrack*)fGlobal->At(fTrackNum);
-    Int_t stsn=gtr->GetStsTrackIndex();
-    if (stsn>=0)
-    {
-      CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(stsn);
-      if (ststr)
-	fMCTrackNum=ststr->GetMCTrackId();
-    }
-  }
-  //fEProb=-1111;
-  new((*fId)[fN++]) CbmEcalIdParticle(max, fX, fY, fZ, fE/tracke, TMath::Max(fPSE, fPSE3), fShape, fTrackNum, fEProb, fMCTrackNum);
+  return mx;
 }
-
 /** If identification failed :-( **/
 void CbmEcalIdentification::WriteTreeLight()
 {
   fPDG=-1111;
   fMCPDG=-1111;
-  fTrdELoss=-1111;
   fMotherMCPDG=-1111;
   fMCM=-1111;
   if (fUseMC==1)
   {
-    CbmGlobalTrack* gtr=(CbmGlobalTrack*)fGlobal->At(fTrackNum);
-    Int_t stsn=gtr->GetStsTrackIndex();
-    if (stsn>=0)
-    {
-      CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(stsn);
-      if (ststr)
-	fMCTrackNum=ststr->GetMCTrackId();
-    }
+    CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(fTrackNum);
+    if (ststr)
+      fMCTrackNum=ststr->GetMCTrackId();
   }
   if (fUseMC&&fMCTrackNum>=0)
   {
@@ -242,6 +356,8 @@ void CbmEcalIdentification::WriteTreeLight()
     if (i!=n)
     {
       fMCM=0;
+      fMCX=pt->GetX();
+      fMCY=pt->GetY();
       dx=pt->GetX()-fX;
       dy=pt->GetY()-fY;
       x1=pt->GetX();
@@ -293,30 +409,19 @@ void CbmEcalIdentification::WriteTree()
 {
   fPDG=-1111;
   fMCPDG=-1111;
-  fTrdELoss=-1111;
   fMotherMCPDG=-1111;
   fMCM=-1111;
   if (fTrackNum>=0)
   {
-    CbmGlobalTrack* gtr=(CbmGlobalTrack*)fGlobal->At(fTrackNum);
+    CbmStsTrack* gtr=(CbmStsTrack*)fStsTracks->At(fTrackNum);
     fPDG=gtr->GetPidHypo();
     fTrChi2=gtr->GetChi2();
-    fNTRD=gtr->GetTrdTrackIndex();
-    fNTOF=gtr->GetTofHitIndex();
-    fNRICH=gtr->GetRichRingIndex();
-    if (fNTRD>=0)
-    {
-      CbmTrdTrack* trdtr=(CbmTrdTrack*)fTrdTracks->At(fNTRD);
-      fTrdELoss=trdtr->GetELoss();
-    }
+    fTrNDF=gtr->GetNDF();
   }
   else
   {
     fPDG=-1111;
     fTrChi2=-1111;
-    fNTRD=-1111;
-    fNTOF=-1111;
-    fNRICH=-1111;
   }
   if (fMCTrackNum>=0&&fUseMC==1)
   {
@@ -352,6 +457,8 @@ void CbmEcalIdentification::WriteTree()
     if (i!=n)
     {
       fMCM=0;
+      fMCX=pt->GetX();
+      fMCY=pt->GetY();
       dx=pt->GetX()-fX;
       dy=pt->GetY()-fY;
       x1=pt->GetX();
@@ -405,40 +512,13 @@ Double_t CbmEcalIdentification::GetEnergy(CbmEcalCell* cell)
   if (fUseHack==0)
     return cell->GetEnergy();
 
+  CbmEcalCellMC* cellmc=(CbmEcalCellMC*)cell; //This will fail if no MC info is available
   map<Int_t, Float_t>::const_iterator q;
   Double_t e=0;
   CbmMCTrack* tr;
   Int_t pdg;
 
-  for(q=cell->GetTrackEnergyBegin();q!=cell->GetTrackEnergyEnd();++q)
-  {
-    tr=(CbmMCTrack*)fMC->At((*q).first);
-    if (tr==NULL)
-    {
-      Info("GetEnergy","Can't find MC track with number %d.",(*q).first);
-      continue;
-    }
-    pdg=tr->GetPdgCode();
-    if (pdg==22||pdg==-11||pdg==11||pdg==13||pdg==-13)
-      e+=(*q).second;
-    else
-      e+=(*q).second*fHack;
-  }
-  return e;
-}
-
-/** Get energy in PS  **/
-Double_t CbmEcalIdentification::GetPSEnergy(CbmEcalCell* cell)
-{
-  if (fUseHack==0)
-    return cell->GetPSEnergy();
-
-  map<Int_t, Float_t>::const_iterator q;
-  Double_t e=0;
-  CbmMCTrack* tr;
-  Int_t pdg;
-
-  for(q=cell->GetTrackPSEnergyBegin();q!=cell->GetTrackPSEnergyEnd();++q)
+  for(q=cellmc->GetTrackEnergyBegin();q!=cellmc->GetTrackEnergyEnd();++q)
   {
     tr=(CbmMCTrack*)fMC->At((*q).first);
     if (tr==NULL)
@@ -465,14 +545,12 @@ void CbmEcalIdentification::InitTree()
   fTree->Branch("celly", &fCellY, "celly/D");
   fTree->Branch("maxx", &fMaxX, "maxx/D");
   fTree->Branch("maxy", &fMaxY, "maxy/D");
+  fTree->Branch("mcx", &fMCX, "mcx/D");
+  fTree->Branch("mcy", &fMCY, "mcy/D");
   fTree->Branch("x", &fX, "x/D");
   fTree->Branch("y", &fY, "y/D");
   fTree->Branch("z", &fZ, "z/D");
   fTree->Branch("e", &fE, "e/D");
-  fTree->Branch("pse", &fPSE, "pse/D");
-  fTree->Branch("pse2", &fPSE2, "pse2/D");
-  fTree->Branch("pse3", &fPSE3, "pse3/D");
-  fTree->Branch("pseall", &fPSEAll, "pseall/D");
   fTree->Branch("shape", &fShape, "shape/D");
   fTree->Branch("eprob", &fEProb, "eprob/D");
   fTree->Branch("n", &fN, "n/I");
@@ -488,11 +566,26 @@ void CbmEcalIdentification::InitTree()
   fTree->Branch("r", &fR, "r/D");
   fTree->Branch("mcsurfe", &fMCSurfE, "mcsurfe/D");
   fTree->Branch("mccirce", &fMCCircE, "mccirce/D");
-  fTree->Branch("ntdr", &fNTRD, "ntrd/I");
-  fTree->Branch("nrich", &fNRICH, "nrich/I");
-  fTree->Branch("ntof", &fNTOF, "ntof/I");
   fTree->Branch("trchi2", &fTrChi2, "trchi2/D");
-  fTree->Branch("trdeloss", &fTrdELoss, "trdeloss/D");
+  fTree->Branch("trcndf", &fTrNDF, "trndf/I");
+  fTree->Branch("emax", &fEMax, "emax/D");
+  fTree->Branch("e2", &fE2, "e2/D");
+  fTree->Branch("e3", &fE3, "e3/D");
+  fTree->Branch("ecluster", &fECluster, "ecluster/D");
+  fTree->Branch("se", fSE, "se[5]/D");
+  fTree->Branch("p2", &fP2, "p2/D");
+  fTree->Branch("q2", &fQ2, "q2/D");
+  fTree->Branch("theta", &fTheta, "theta/D");
+  fTree->Branch("celle", &fCellE, "celle/D");
+  fTree->Branch("celle2", &fCellE2, "celle2/D");
+  fTree->Branch("p", &fP, "p/D");
+  fTree->Branch("q", &fQ, "q/D");
+  fTree->Branch("angle", &fAngle, "angle/D");
+  fTree->Branch("ph", &fPH, "ph/D");
+  fTree->Branch("pl", &fPL, "pl/D");
+  fTree->Branch("pc", &fPC, "pc/D");
+  fTree->Branch("pr", &fPR, "pr/D");
+  fTree->Branch("chi2", &fChi2, "chi2/D");
 }
 
 /** Initializes tree **/
@@ -506,10 +599,6 @@ void CbmEcalIdentification::InitVar()
   fY=-1111;
   fZ=-1111;
   fE=-1111;
-  fPSE=-1111;
-  fPSE2=-1111;
-  fPSE3=-1111;
-  fPSEAll=-1111;
   fShape=-1111;
   fEProb=-1111;
   fTrackNum=-1111;
@@ -524,11 +613,28 @@ void CbmEcalIdentification::InitVar()
   fR=-1111;
   fMCSurfE=-1111;
   fMCCircE=-1111;
-  fNTRD=-1111;
-  fNRICH=-1111;
-  fNTOF=-1111;
   fTrChi2=-1111;
-  fTrdELoss=-1111;
+  fTrNDF=-1111;
+  fMCX=-1111;
+  fMCY=-1111;
+  fEMax=-1111;
+  fE2=-1111;
+  fECluster=-1111;
+  for(Int_t i=0;i<5;i++)
+    fSE[i]=-1111;
+  fP2=-1111;
+  fQ2=-1111;
+  fCellE=-1111;
+  fCellE2=-1111;
+  fE3=-1111;
+  fP=-1111;
+  fQ=-1111;
+  fAngle=-1111;
+  fPH=-1111;
+  fPL=-1111;
+  fPC=-1111;
+  fPR=-1111;
+  fChi2=-1111;
 }
 
 
@@ -542,6 +648,11 @@ CbmEcalIdentification::CbmEcalIdentification(const char* name, const Int_t iVerb
 /** Initing routine **/
 InitStatus CbmEcalIdentification::Init()
 {
+  Int_t f;
+  Int_t r;
+  TString nm;
+  TString res;
+
   FairRootManager* fManager=FairRootManager::Instance();
   if (!fManager)
   {
@@ -560,22 +671,28 @@ InitStatus CbmEcalIdentification::Init()
     Fatal("Init()", "Can't find calorimeter structure in the system.");
     return kFATAL;
   }
-  fCal=(CbmEcalCalibration*)fManager->GetObject("EcalCalibration");
+  fCal=(CbmEcalCalibration*)fManager->GetObject("EcalECalibration");
   if (!fCal)
   {
-    Fatal("Init", "Can't find EcalCalibration");
+    Fatal("Init", "Can't find EcalECalibration");
     return kFATAL;
   }
-  fExtra=(CbmEcalTrackExtrapolation*)fManager->GetObject("EcalTrackExtrapolation");
+  fExtra=(CbmEcalTrackExtrapolation*)fManager->GetObject("EcalTrackParam");
   if (!fExtra)
   {
-    Fatal("Init", "Can't find EcalTrackExtrapolation");
+    Fatal("Init", "Can't find EcalTrackParam");
     return kFATAL;
   }
-  fGlobal=(TClonesArray*)fManager->GetObject("GlobalTrack");
-  if (!fGlobal)
+  fStsTracks=(TClonesArray*)fManager->GetObject("StsTrack");
+  if (!fStsTracks)
   {
     Fatal("Init()","Can't find global tracks array");
+    return kFATAL;
+  }
+  fMaximums=(TClonesArray*)fManager->GetObject("EcalMaximums");
+  if (!fMaximums)
+  {
+    Fatal("Init()","Can't find array of calorimeter maximums");
     return kFATAL;
   }
   fId=new TClonesArray("CbmEcalIdParticle", 2000);
@@ -585,7 +702,10 @@ InitStatus CbmEcalIdentification::Init()
   fTreeOut=p->GetInteger("treeout");
   fUseHack=p->GetInteger("usehacks");
   fUseMC=p->GetInteger("usemcinfo");
-  fEResolution=p->GetDouble("eresolution");
+  nm=p->GetString("eresolution");
+  fOldShapeAlgo=p->GetInteger("oldshapealgo");
+  fSimpleMaximumLocationAlgo=p->GetInteger("simplemaximumlocationalgo");
+  fEResolution=new TFormula("calorimeter_energy_resolution", nm);
   if (fUseHack>0)
   {
     Info("Init", "Hack option given in configuration file.");
@@ -620,11 +740,74 @@ InitStatus CbmEcalIdentification::Init()
       Fatal("Init()","Can't find STS track matching information");
       return kFATAL;
     }
-    fTrdTracks=(TClonesArray*)fManager->GetObject("TrdTrack");
-    if (!fTrdTracks)
+  }
+  fF=new Double_t[18];
+  for(f=0;f<6;f++)
+  {
+    nm="f"; nm+=f;
+    res=p->GetString(nm);
+    nm="dist_formula_f"; nm+=f;
+    fForm[f]=new TFormula(nm, res);
+    for(r=0;r<3;r++)
     {
-      Fatal("Init()","Can't find TRD track information in run");
+      nm="f"; nm+=f; nm+="p"; nm+=r;
+      fF[f*3+r]=p->GetDouble(nm);
+      fForm[f]->SetParameter(r, fF[f*3+r]);
     }
+  }
+  fUseShLib=p->GetInteger("useshlib");
+  if (fUseShLib)
+  {
+    fShLib=(CbmEcalShLibCorr*)fManager->GetObject("EcalEShLib");
+    if (!fShLib)
+    {
+      Fatal("Init()", "Can't find EcalEShLib in the system");
+      return kFATAL;
+    }
+  }
+  else
+    fShLib=NULL;
+  fQL=p->GetDouble("ql");
+  fQH=p->GetDouble("qh");
+  if (fOldShapeAlgo==0)
+  {
+    fQCL=p->GetDouble("qcl");
+    fQCH=p->GetDouble("qch");
+  }
+  fCPL=p->GetDouble("cpl");
+  fCPH=p->GetDouble("cph");
+
+  fUseCellType=p->GetInteger("usecelltype");
+  // Clustering stuff
+  fRegions=p->GetInteger("regions");
+  fIntSteps=p->GetInteger("intsteps");
+  fThetaB=new Double_t[fRegions];
+  fAlgo=new Int_t[fRegions];
+  fPar1=new Double_t[fRegions];
+  fPar2=new Double_t[fRegions];
+  fPar3=new Double_t[fRegions];
+  fParI=new Int_t[fRegions];
+  for(r=0;r<fRegions;r++)
+  {
+    nm="theta["; nm+=r; nm+="]";
+    fThetaB[r]=p->GetDouble(nm);
+
+    nm="preclusteralgo["; nm+=r; nm+="]";
+    fAlgo[r]=p->GetDouble(nm);
+    
+    if (fAlgo[r]==0) continue;
+
+    nm="par1["; nm+=r; nm+="]";
+    fPar1[r]=p->GetDouble(nm);
+
+    nm="par2["; nm+=r; nm+="]";
+    fPar2[r]=p->GetDouble(nm);
+
+    nm="par3["; nm+=r; nm+="]";
+    fPar3[r]=p->GetDouble(nm);
+
+    nm="pari["; nm+=r; nm+="]";
+    fParI[r]=p->GetInteger(nm);
   }
   delete p;
 
@@ -636,8 +819,304 @@ InitStatus CbmEcalIdentification::Init()
 /** Finishing routine **/
 void CbmEcalIdentification::Finish()
 {
+//  TFile* f=new TFile("cal.root", "RECREATE");
+//  cout << gFile->GetName() << endl;
   if (fTree)
     fTree->Write();
+//  f->Close();
+}
+
+Double_t CbmEcalIdentification::GetPL(Double_t e, Double_t theta) const
+{
+  Double_t p0=fForm[0]->Eval(e);
+  Double_t p1=fForm[1]->Eval(e);
+  Double_t p2=fForm[2]->Eval(e);
+  return p0+theta*(p1+theta*p2);
+}
+
+Double_t CbmEcalIdentification::GetPH(Double_t e, Double_t theta) const
+{
+  Double_t p0=fForm[3]->Eval(e);
+  Double_t p1=fForm[4]->Eval(e);
+  Double_t p2=fForm[5]->Eval(e);
+  return p0+theta*(p1+theta*p2);
+}
+
+Int_t CbmEcalIdentification::CheckMaximum(CbmEcalMaximum* max)
+{
+  Double_t trpl;
+  Double_t trph;
+  Double_t trdp;
+  Double_t trp;
+  Double_t trq; 
+  Double_t dq=fQH-fQL;
+  Double_t trpm;
+  TVector2 v;
+
+  trpl=GetPL(fTrackP, fTheta); fPL=trpl;
+  trph=GetPH(fTrackP, fTheta); fPH=trph;
+  fPC=(fPL+fPH)/2.0; fPR=(fPH-fPL)/2.0;
+//  cout << "(pl.ph)=(" << trpl << ","<< trph ;
+  trdp=trph-trpl;
+  if (trdp>dq)
+  {
+    trpl-=fCPL*trdp;
+    trph+=fCPH*trdp;
+  }
+  else
+  {
+    trpm=(trph+trpl)/2.0;
+    trpl=trpm-dq/2.0;
+    trph=trpm+dq/2.0;
+  }
+
+  v.Set(fX-max->X(), fY-max->Y());
+  v=v.Rotate(-fPhi*TMath::DegToRad());
+  trp=v.X(); trq=v.Y();
+//  cout << ").(" << fX << "," << fY << "):(" << max->X() << "," << max->Y() << ")"; 
+//  cout << ".(p,q)=(" << trp << "," << trq << ").(pl.ph)=(" << trpl << ","<< trph << "):Phi=" << fPhi;
+  if (trp>trpl&&trp<trph&&trq>fQL&&trq<fQH)
+  {
+//    cout << " <---------" << endl;
+    return 1;
+  }
+
+//  cout << endl;
+  return 0;  
+}
+
+void CbmEcalIdentification::ConstructCluster(CbmEcalMaximum* max)
+{
+  Int_t i;
+  Int_t j;
+  list<CbmEcalCell*> cells;
+  list<CbmEcalCell*>::const_iterator p;
+  CbmEcalCell* cell;
+  CbmEcalCell* cll;
+  Double_t e=1e9;
+  Int_t ix;
+  Int_t iy;
+  Double_t tx;
+  Double_t ty;
+  CbmEcalCell* cls[20];
+  Double_t rc[20];
+  Double_t r;
+
+  fCluster.clear();
+  cell=max->Cell();
+  if (fUseCellType==1)
+    fRegion=cell->GetType();
+  else
+  {
+    for(i=0;i<fRegions;i++)
+      if (fThetaB[i]>fTheta)
+        break;
+    fRegion=i;
+  }
+  if (fRegion>=fRegions||fRegion<0)
+  {
+    Info("ConstructCluster", "Cluster can't be constructed. Theta=%f.", fTheta);
+    return;
+  }
+  if (fAlgo[fRegion]==0)
+  {
+//    cell->GetNeighborsList(0, cells);
+    cell->GetNeighborsList(max->I(), fCluster);
+    fCluster.push_back(cell);
+//    for(p=cells.begin();p!=cells.end();++p)
+//      if ((*p)->GetTotalEnergy()<e)
+//      {
+//	cell=(*p);
+//	e=(*p)->GetTotalEnergy();
+//     }
+//    if (find(fCluster.begin(), fCluster.end(), cell)==fCluster.end())
+//      fCluster.push_back(cell);
+    return;
+  }
+
+  for(i=0;i<fParI[fRegion];i++)
+  {
+    cls[i]=NULL;
+    rc[i]=-1111;
+  }
+
+  for(ix=-4;ix<5;ix++)
+  for(iy=-4;iy<5;iy++)
+  {
+    tx=cell->GetCenterX(); tx+=ix*(cell->X2()-cell->X1());
+    ty=cell->GetCenterY(); ty+=iy*(cell->Y2()-cell->Y1());
+    cll=fStr->GetCell(tx, ty);
+    if (cll==NULL) continue;
+    r=SolveEllipse(cll, max->X(), max->Y(), fRegion);
+    for(i=0;i<fParI[fRegion];i++)
+      if (rc[i]<r)
+	break;
+    if (i==fParI[fRegion]) continue;
+    for(j=fParI[fRegion]-1;j>i;j--)
+    {
+      rc[j]=rc[j-1];
+      cls[j]=cls[j-1];
+    }
+    rc[i]=r;
+    cls[i]=cll;
+  }
+  for(j=0;j<fParI[fRegion];j++)
+    fCluster.push_back(cls[j]);
+}
+
+Double_t CbmEcalIdentification::SolveEllipse(CbmEcalCell* cell, Double_t cx, Double_t cy, Int_t reg)
+{
+  Double_t cRx=fPar2[reg];		//48*1.6
+  Double_t cRy=fPar3[reg];
+  Int_t cSt=fIntSteps;
+  TVector2 centr(cx, cy);
+  TVector2 t(centr);
+  Double_t gm=fPhi;
+  Double_t sgm=TMath::Sin(gm);
+  Double_t cgm=TMath::Cos(gm);
+  Double_t x;
+  Double_t y;
+  Double_t p=sgm*sgm/cRx+cgm*cgm/cRy;
+  Double_t q=cgm*sgm*(1.0/cRx-1.0/cRy);
+  Double_t r=cgm*cgm/cRx+sgm*sgm/cRy;
+  Double_t d;
+  Double_t ex;
+  Double_t ey;
+  Double_t y1;
+  Double_t y2;
+  Double_t inte=0;
+  Double_t step=(cell->X2()-cell->X1())/cSt;
+  Double_t fx=step/2.0+cell->X1();
+  Int_t i;
+  
+// cout << fCurAlgo << " " << reg << " " << fPar1[reg] << " " << cRx << " " << cRy << endl;
+  t/=t.Mod(); centr+=t*TMath::Sqrt(fPar1[reg]);
+  for(i=0;i<cSt;i++)
+  {
+    x=step; x*=i; x+=fx;
+    ex=x; ex-=centr.X();
+    d=q*q*ex*ex-p*(r*ex*ex-1);
+    if (d<0) continue;
+    d=TMath::Sqrt(d);
+    y1=-q*ex/p; y2=y1;
+    y1-=d/p; y2+=d/p;
+    y1+=centr.Y(); y2+=centr.Y();
+    if (y1>cell->Y2()) continue;
+    if (y2<cell->Y1()) continue;
+    if (y1<cell->Y1()) y1=cell->Y1();
+    if (y2>cell->Y2()) y2=cell->Y2();
+    inte+=(y2-y1)*step;
+  }
+
+  return inte;
+}
+
+void CbmEcalIdentification::ShapeAnalysis(CbmEcalMaximum* max)
+{
+  if (!fTreeOut) return;
+
+  CbmEcalCell* cell;
+  list<CbmEcalCell*> cells;
+  list<CbmEcalCell*>::const_iterator p;
+  Int_t i;
+  Int_t j;
+  Double_t cp=0;
+  Double_t cq=0;
+  Double_t dp;
+  Double_t dq;
+  Double_t e;
+  TVector2 v;
+  TVector2 v1;
+  TVector2 v2;
+
+  cell=max->Cell();
+  fEMax=GetEnergy(cell);
+
+  fE2=fEMax; fE3=fEMax;
+  cell->GetNeighborsList(max->I(), cells);
+  for(p=cells.begin();p!=cells.end();++p)
+    fE2+=GetEnergy(*p);
+
+  cell->GetNeighborsList(0, cells);
+  for(p=cells.begin();p!=cells.end();++p)
+    fE3+=GetEnergy(*p);
+
+  fECluster=0;
+  for(p=fCluster.begin();p!=fCluster.end();++p)
+  {
+    //TODO: Should use GetEnergy only once
+    e=GetEnergy(*p);
+    fECluster+=e;
+    for(i=0;i<5;i++)
+      if (fSE[i]<e)
+	break;
+    if (i!=5)
+    {
+      for(j=4;j>i;j--)
+       fSE[j]=fSE[j-1];
+      fSE[i]=e;
+    }
+    v.Set((*p)->GetCenterX(), (*p)->GetCenterY());
+    v=v.Rotate(-fPhi*TMath::DegToRad());
+    cp+=v.X()*e; cq+=v.Y()*e;
+  }
+  for(i=1;i<5;i++)
+    fSE[i]+=fSE[i-1];
+
+  fP2=0; fQ2=0;
+  cp/=fECluster; cq/=fECluster;
+  for(p=fCluster.begin();p!=fCluster.end();++p)
+  {
+    e=GetEnergy(*p);
+    v.Set((*p)->GetCenterX(), (*p)->GetCenterY());
+    v=v.Rotate(-fPhi*TMath::DegToRad());
+    dp=v.X()-cp; dq=v.Y()-cq;
+    fP2=dp*dp*e; fQ2=dq*dq*e;
+  }
+  fP2/=fECluster; fQ2/=fECluster;
+
+  v1.Set(fX, fY);
+  v1=v1.Rotate(-fPhi*TMath::DegToRad());
+  v2.Set(max->X(), max->Y());
+  v2=v2.Rotate(-fPhi*TMath::DegToRad());
+  v=v2; v-=v1;
+  fP=v.X(); fQ=v.Y();
+  fAngle=v.Phi()*TMath::RadToDeg();
+  if (fAngle>180) fAngle-=360;
+}
+
+void CbmEcalIdentification::CalculateShape(CbmEcalMaximum* max)
+{
+  if (fOldShapeAlgo==1)
+  {
+    CbmEcalCell* cell=max->Cell();
+    Double_t e=cell->GetTotalEnergy();
+    list<CbmEcalCell*> cells;
+    cell->GetNeighborsList(max->I(), cells);
+    list<CbmEcalCell*>::const_iterator p=cells.begin();
+    Double_t e2=e;
+    for(;p!=cells.end();++p)
+      e2+=(*p)->GetTotalEnergy();
+
+    cell->GetNeighborsList(0, cells);
+    Double_t e3=e;
+    for(p=cells.begin();p!=cells.end();++p)
+      e3+=(*p)->GetTotalEnergy();
+    fShape=e2/e3;
+
+    return;
+  }
+  TVector2 v1(fX, fY); v1=v1.Rotate(-fPhi*TMath::DegToRad());
+  TVector2 v2(max->X(), max->Y()); v2=v2.Rotate(-fPhi*TMath::DegToRad());
+  v1-=v2;
+  fShape=0;
+//  cerr << v1.X() << ", " << v1.Y() << " : ([" << fPL << ", " << fPH << "], [" << fQCL << ", " << fQCH << "])" << endl;
+  if (v1.Y()<fQCL) return;
+  if (v1.Y()>fQCH) return;
+  if (v1.X()<fPL)  return;
+  if (v1.X()>fPH)  return;
+  fShape=1;
 }
 
 ClassImp(CbmEcalIdentification)
+

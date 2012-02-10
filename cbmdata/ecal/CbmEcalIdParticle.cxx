@@ -10,8 +10,7 @@
  **/
 
 #include "CbmEcalIdParticle.h"
-#include "CbmEcalClusterV1.h"
-#include "CbmEcalIdParticle.h"
+#include "CbmEcalCluster.h"
 
 #include <iostream>
 

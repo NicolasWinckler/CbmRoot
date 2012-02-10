@@ -73,8 +73,12 @@ tof/CbmTofPoint.cxx
 ecal/CbmEcalHit.cxx 
 ecal/CbmEcalPoint.cxx
 ecal/CbmEcalPointLite.cxx 
-ecal/CbmEcalCluster.cxx 
 ecal/CbmEcalHitFastMC.cxx 
+ecal/CbmEcalCell.cxx
+ecal/CbmEcalMaximum.cxx
+ecal/CbmEcalCluster.cxx
+ecal/CbmEcalRecParticle.cxx
+ecal/CbmEcalIdParticle.cxx
 
 zdc/CbmZdcPoint.cxx  
 zdc/CbmZdcEvent.cxx

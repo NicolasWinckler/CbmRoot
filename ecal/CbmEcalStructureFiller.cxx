@@ -1,15 +1,17 @@
 #include "CbmEcalStructureFiller.h"
-#include "FairRootManager.h"
-#include "CbmMCTrack.h"
 #include "CbmEcalPointLite.h"
 #include "CbmEcalHit.h"
-#include "CbmEcal.h"
+#include "CbmEcalCellMC.h"
+
+#include "FairRootManager.h"
+
+#include "TRandom.h"
 #include "TVector3.h"
 #include "TRandom.h"
-#include "CbmEcal.h"
+
 #include <vector>
-#include <TRandom.h>
 #include <iostream>
+
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
@@ -71,6 +73,7 @@ InitStatus CbmEcalStructureFiller::Init()
   //fListStack = (TClonesArray *)fManager->GetObject("MCTrack");
   fInf->CheckVariables();
   fStr=new CbmEcalStructure(fInf);
+  if (fStoreTrackInfo) fStr->SetUseMC(1);
   fStr->Construct();
   
   fManager->Register("EcalStructure", "ECAL", fStr, kFALSE);
@@ -100,7 +103,7 @@ void CbmEcalStructureFiller::LoopForMCPoints()
     cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
     if (ten==0)
       if (isPS)
-	cell->AddPSEnergy(pt->GetEnergyLoss());
+	; // cell->AddPSEnergy(pt->GetEnergyLoss()); preshower removed
       else
 	cell->AddEnergy(pt->GetEnergyLoss());
   }
@@ -108,12 +111,12 @@ void CbmEcalStructureFiller::LoopForMCPoints()
   for(UInt_t j=0; j<n; j++)
   {
     pt=(CbmEcalPointLite*)fListECALpts->At(j);
-    cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
+    CbmEcalCellMC* cellmc=(CbmEcalCellMC*)fStr->GetCell(pt->GetDetectorID(), ten, isPS);
     if (ten==0)
       if (isPS)
-	cell->AddTrackPSEnergy(pt->GetTrackID(),pt->GetEnergyLoss());
+	; // cell->AddTrackPSEnergy(pt->GetTrackID(),pt->GetEnergyLoss()); //preshower removed
       else
-	cell->AddTrackEnergy(pt->GetTrackID(),pt->GetEnergyLoss(), pt->GetTime());
+	cellmc->AddTrackEnergy(pt->GetTrackID(),pt->GetEnergyLoss(), pt->GetTime());
   }
 }
 
@@ -135,15 +138,13 @@ void CbmEcalStructureFiller::LoopForSummableHits()
     pt=(CbmEcalHit*)fListHits->At(j);
     cell=fStr->GetHitCell(pt->GetDetectorId());
     cell->AddEnergy(pt->GetEnergy());
-    cell->AddPSEnergy(pt->GetPSEnergy());
   }
   if (fStoreTrackInfo)
   for(Int_t j=0; j<n; j++)
   {
     pt=(CbmEcalHit*)fListHits->At(j);
-    cell=fStr->GetHitCell(pt->GetDetectorId());
-    cell->AddTrackEnergy(pt->GetTrackId(), pt->GetEnergy(), pt->GetTime());
-    cell->AddTrackPSEnergy(pt->GetTrackId(), pt->GetPSEnergy());
+    CbmEcalCellMC* cellmc=(CbmEcalCellMC*)fStr->GetHitCell(pt->GetDetectorId());
+    cellmc->AddTrackEnergy(pt->GetTrackId(), pt->GetEnergy(), pt->GetTime());
   }
 }
 
@@ -165,7 +166,6 @@ void CbmEcalStructureFiller::LoopForUnSummableHits()
     pt=(CbmEcalHit*)fListUHits->At(j);
     cell=fStr->GetHitCell(pt->GetDetectorId());
     cell->AddEnergy(pt->GetEnergy());
-    cell->AddPSEnergy(pt->GetPSEnergy());
     cell->SetTime(pt->GetTime());
   }
 }
@@ -177,10 +177,7 @@ void CbmEcalStructureFiller::Exec(Option_t* option)
   if (fVerbose>0)
     cout << "--> Event no. " << fEvent;
 
-  if (fStoreTrackInfo==kFALSE)
-    fStr->ResetModulesFast();
-  else
-    fStr->ResetModules();
+  fStr->ResetModules();
   if (fUseMCPoints) LoopForMCPoints();
   if (fUseSummableHits) LoopForSummableHits();
   if (fUseUnSummableHits) LoopForUnSummableHits();

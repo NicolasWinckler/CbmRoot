@@ -5,7 +5,7 @@
 
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
-#include "CbmEcalClusterV1.h"
+#include "CbmEcalCluster.h"
 #include "CbmEcalStructure.h"
 
 #include "TTree.h"
@@ -27,7 +27,7 @@ void CbmEcalAnalysisPair::Exec(Option_t* option)
   Int_t mcn=fMC->GetEntriesFast();
   CbmEcalRecParticle* p1;
   CbmEcalRecParticle* p2;
-  CbmEcalClusterV1* cluster;
+  CbmEcalCluster* cluster;
   CbmEcalCell* cell;
   CbmMCTrack* tr1;
   CbmMCTrack* tr2;
@@ -56,7 +56,7 @@ void CbmEcalAnalysisPair::Exec(Option_t* option)
     cell=fStr->GetHitCell(p1->CellNum());
     fCellX1=cell->GetCenterX();
     fCellY1=cell->GetCenterY();
-    cluster=(CbmEcalClusterV1*)fClusters->At(p1->ClusterNum());
+    cluster=(CbmEcalCluster*)fClusters->At(p1->ClusterNum());
     fCells=cluster->Size();
     fM=cluster->Moment();
     fMx=cluster->MomentX();

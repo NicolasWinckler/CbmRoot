@@ -754,8 +754,17 @@ void CbmEcal::ConstructGeometry()
   par[3] =   2; // N of z-planes
   //BVZ --> outer sensitive wall for control
   par[4] = -(fEcalSize[2]+.01)/2; // z1
-  par[5] =  (fEcalHole[0]-.01)/2; // r1_min
-  par[6] =  fEcalSize[0]/2;             // r1_max
+
+  if (fEcalHole[0]<fEcalHole[1])
+    par[5]=(fEcalHole[0]-.01)/2; // r1_min
+  else
+    par[5]=(fEcalHole[1]-.01)/2; // r1_min
+
+  if (fEcalSize[0]>fEcalSize[1])
+    par[6]=fEcalSize[0]/2;             // r1_max
+  else
+    par[6]=fEcalSize[1]/2;             // r1_max
+
   par[7] =  fEcalSize[2]/2; // z2
   par[8] =  par[5];              // r2_min
   par[9] =  par[6];              // r2_max
@@ -802,8 +811,17 @@ void CbmEcal::ConstructGeometry()
 
 
   par[4] = -fEcalSize[2]/2; // z1
-  par[5] =  fEcalHole[0]/2; // r1_min
-  par[6] =  fEcalSize[0]/2; // r1_max
+  if (fEcalHole[0]<fEcalHole[1])
+    par[5]=fEcalHole[0]/2; // r1_min
+  else
+    par[5]=fEcalHole[1]/2; // r1_min
+
+  if (fEcalSize[0]>fEcalSize[1])
+    par[6]=fEcalSize[0]/2;             // r1_max
+  else
+    par[6]=fEcalSize[1]/2;             // r1_max
+  //par[5] =  fEcalHole[0]/2; // r1_min
+  //par[6] =  fEcalSize[0]/2; // r1_max
   par[7] = -par[4];        // z2
   par[8] =  par[5];        // r2_min
   par[9] =  par[6];        // r2_max

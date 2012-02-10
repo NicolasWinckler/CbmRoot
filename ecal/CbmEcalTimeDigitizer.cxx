@@ -5,7 +5,7 @@
 #include "TFormula.h"
 
 #include "CbmEcalParam.h"
-#include "CbmEcalCell.h"
+#include "CbmEcalCellMC.h"
 #include "CbmEcalStructure.h"
 #include "CbmEcalCalibration.h"
 
@@ -22,11 +22,11 @@ void CbmEcalTimeDigitizer::Exec(Option_t* option)
     fStr->GetCells(fCells);
   list<CbmEcalCell*>::const_iterator p=fCells.begin();
   for(;p!=fCells.end();++p)
-    CalculateTime(*p);
+    CalculateTime((CbmEcalCellMC*)(*p));
 }
 
 /** Calculate time in given cell **/
-void CbmEcalTimeDigitizer::CalculateTime(CbmEcalCell* cell)
+void CbmEcalTimeDigitizer::CalculateTime(CbmEcalCellMC* cell)
 {
   std::map<Int_t, Float_t>::const_iterator p=cell->GetTrackEnergyBegin();
   Int_t n=0;

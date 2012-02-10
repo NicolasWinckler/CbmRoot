@@ -36,13 +36,15 @@
 
 #include "CbmEcalModule.h"
 
+#include "CbmEcalCellMC.h"
+
 #include "TMath.h"
 
 using std::list;
 using std::vector;
 
 //-----------------------------------------------------------------------------
-CbmEcalModule::CbmEcalModule(char type, Int_t cellnumber, Float_t x1, Float_t y1, Float_t x2, Float_t y2, Float_t energy) :
+CbmEcalModule::CbmEcalModule(char type, Int_t cellnumber, Float_t x1, Float_t y1, Float_t x2, Float_t y2, Int_t mc, Float_t energy) :
 	CbmEcalCell(cellnumber, x1,y1,x2,y2, type, energy), fDx(x2-x1), fDy(y2-y1)
 {
   if (GetType()<1) return;
@@ -57,11 +59,14 @@ CbmEcalModule::CbmEcalModule(char type, Int_t cellnumber, Float_t x1, Float_t y1
 
   num=cellnumber/100;
 
-  for(i=0;i<mt;i++)
-    for(j=0;j<mt;j++)
-      fCells[i*mt+j]=new CbmEcalCell((num*10+i+1)*10+j+1, \
-	  x1+j*fDx/mt, y1+i*fDy/mt, x1+(j+1)*fDx/mt, \
-	  y1+(i+1)*fDy/mt, type);
+  if (mc==0)
+    for(i=0;i<mt;i++)
+      for(j=0;j<mt;j++)
+        fCells[i*mt+j]=new CbmEcalCell((num*10+i+1)*10+j+1, x1+j*fDx/mt, y1+i*fDy/mt, x1+(j+1)*fDx/mt, y1+(i+1)*fDy/mt, type);
+  else 
+    for(i=0;i<mt;i++)
+      for(j=0;j<mt;j++)
+        fCells[i*mt+j]=new CbmEcalCellMC((num*10+i+1)*10+j+1, x1+j*fDx/mt, y1+i*fDy/mt, x1+(j+1)*fDx/mt, y1+(i+1)*fDy/mt, type);
 }
 
 //-----------------------------------------------------------------------------

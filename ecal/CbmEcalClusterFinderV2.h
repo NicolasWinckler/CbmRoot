@@ -14,6 +14,7 @@ class CbmEcalCell;
 class CbmEcalInf;
 class CbmEcalCalibration;
 class CbmEcalPreCluster;
+class CbmEcalMaximum;
 class TTree;
 
 class CbmEcalClusterFinderV2 : public FairTask
@@ -40,16 +41,12 @@ private:
   void CreateTree();
   /** Get region number of the cell **/
   Int_t GetRegion(CbmEcalCell* cls);
-  /** Exclude maxima due to charged tracks **/
-  void ExcludeMaximums();
-  /** Locate local maxima **/
-  void FindMaximums();
   /** Build preclusters **/
   void FormPreClusters();
   /** A default algorithm of precluster formation **/
-  void FormPreCluster(CbmEcalCell* cell);
+  void FormPreCluster(CbmEcalMaximum* cell);
   /** A new algorithm of precluster formation **/
-  void FormPreClusterNew(CbmEcalCell* cell);
+  void FormPreClusterNew(CbmEcalMaximum* cell);
   /** Find a common area of ellipse and cell**/
   Double_t SolveEllipse(CbmEcalCell* cell, Double_t cx, Double_t cy, Int_t reg);
 
@@ -71,9 +68,7 @@ private:
   TClonesArray* fTracks;		//!
   /** Array of maximums in calorimeter.
    ** Maximums belong to charged tracks excluded. **/
-  CbmEcalCell** fMaximums;		//!
-  /** Array of maximums belong to charged tracks excluded. **/
-  CbmEcalCell** fExcluded;		//!
+  TClonesArray* fMaximums;		//!
   /** An array of clusters **/
   TClonesArray* fClusters;		//!
 

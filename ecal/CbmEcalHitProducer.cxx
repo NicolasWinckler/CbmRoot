@@ -5,50 +5,10 @@
 
 /* $Id: CbmEcalHitProducer.cxx,v 1.14 2006/07/29 00:33:53 prokudin Exp $ */
 
-/* History of cvs commits:
- *
- * $Log: CbmEcalHitProducer.cxx,v $
- * Revision 1.14  2006/07/29 00:33:53  prokudin
- * Commenting. Bringing code to coding conventions. New way of parameter file processing
- *
- * Revision 1.13  2006/07/24 21:45:02  prokudin
- * Now we write information to parameter file
- *
- * Revision 1.12  2006/07/19 12:31:54  prokudin
- * Commenting
- *
- * Revision 1.11  2006/07/19 11:49:38  prokudin
- * Commenting, optimizing hitproducer
- *
- * Revision 1.10  2006/07/18 20:38:36  prokudin
- * MCPointsToUHits() Added. Corrected for fVerbose
- *
- * Revision 1.9  2006/07/18 13:26:38  prokudin
- * PS and ECAL energy was swaped
- *
- * Revision 1.8  2006/07/15 18:31:10  kharlov
- * Compilation warnings and coding conventions are corrected
- *
- * Revision 1.7  2006/07/14 20:02:15  prokudin
- * Some optimizations. Thanks to Denis for profiler
- *
- * Revision 1.6  2006/07/14 15:10:42  prokudin
- * Some corrections
- *
- * Revision 1.5  2006/07/13 14:42:45  prokudin
- * New version of hit producer
- *
- * Revision 1.4  2006/06/28 06:08:26  kharlov
- * Add hits with non-zero energy only
- *
- * Revision 1.3  2006/04/25 06:52:18  kharlov
- * Remove CbmEcalv[1,2] and leave the only class CbmEcal
- *
- */
-
 #include "CbmEcalHitProducer.h"
 
 #include "CbmEcal.h"
+#include "CbmEcalCellMC.h"
 #include "CbmEcalPointLite.h"
 #include "CbmEcalHit.h"
 
@@ -173,73 +133,67 @@ InitStatus CbmEcalHitProducer::Init()
 /** Loop over MCPoints hits and add them to cells **/
 void CbmEcalHitProducer::LoopForMCPoints()
 {
-	CbmEcalPointLite* pt=NULL;
-	CbmEcalCell* cell;
-	Int_t ten;
-	UInt_t n;
-	Bool_t isPS;
+  CbmEcalPointLite* pt=NULL;
+  CbmEcalCell* cell;
+  Int_t ten;
+  UInt_t n;
+  Bool_t isPS;
 
-	n=fListECALpts->GetEntriesFast();
-	if (fVerbose>0)
-	{
-	  cout << ". Number of input MC points: ";
-          cout << n << flush;
-	}
-
-	if (fProduceSummableHits==kFALSE)
-	for(UInt_t j=0; j<n; j++)
-	{
-	  pt = (CbmEcalPointLite*)fListECALpts->At(j);
-	  cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
-	  if (ten==0)
-	    if (isPS)
-	      cell->AddPSEnergy(pt->GetEnergyLoss());
-	    else
-	      cell->AddEnergy(pt->GetEnergyLoss());
-        } 
-	else
-	for(UInt_t j=0; j<n; j++)
-	{
-	  pt = (CbmEcalPointLite*)fListECALpts->At(j);
-	  cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
-	  if (ten==0)
-	    if (isPS)
-	      cell->AddTrackPSEnergy(pt->GetTrackID(),pt->GetEnergyLoss());
-	    else
-	      cell->AddTrackEnergy(pt->GetTrackID(),pt->GetEnergyLoss());
- 	} 
-
+  n=fListECALpts->GetEntriesFast();
+  if (fVerbose>0)
+  {
+    cout << ". Number of input MC points: ";
+    cout << n << flush;
+  }
+  if (fProduceSummableHits==kFALSE)
+    for(UInt_t j=0; j<n; j++)
+    {
+      pt = (CbmEcalPointLite*)fListECALpts->At(j);
+      cell=fStr->GetCell(pt->GetDetectorID(), ten, isPS);
+      if (ten==0)
+        if (isPS) ; // cell->AddPSEnergy(pt->GetEnergyLoss());  Preshower removed
+        else
+          cell->AddEnergy(pt->GetEnergyLoss());
+    }
+  else
+    for(UInt_t j=0; j<n; j++)
+      {
+        CbmEcalCellMC* cellmc;
+        pt = (CbmEcalPointLite*)fListECALpts->At(j);
+        cellmc=(CbmEcalCellMC*)fStr->GetCell(pt->GetDetectorID(), ten, isPS);
+        if (ten==0)
+          if (isPS) ; // cell->AddTrackPSEnergy(pt->GetTrackID(),pt->GetEnergyLoss()); Preshower removed
+            else cellmc->AddTrackEnergy(pt->GetTrackID(),pt->GetEnergyLoss());
+      } 
 }
 
 /** Loop over summable hits and add them to cells **/
 void CbmEcalHitProducer::LoopForSummableHits()
 {
-	CbmEcalHit* pt=NULL;
-	CbmEcalCell* cell;
-	Int_t n;
+  CbmEcalHit* pt=NULL;
+  CbmEcalCell* cell;
+  Int_t n;
 
-	n=fListHits->GetEntriesFast();
-	if (fVerbose>0)
-	{
-  	  cout << ". Number of input summable hits: ";
-          cout << n << flush;
-	}
-	if (fProduceSummableHits==kFALSE)
-	for(Int_t j=0; j<n; j++)
-	{
-        	pt = (CbmEcalHit*)fListHits->At(j);
-		cell=fStr->GetHitCell(pt->GetDetectorId());
-		cell->AddEnergy(pt->GetEnergy());
-		cell->AddPSEnergy(pt->GetPSEnergy());
-	}  else
-	for(Int_t j=0; j<n; j++)
-	{
-        	pt = (CbmEcalHit*)fListHits->At(j);
-		cell=fStr->GetHitCell(pt->GetDetectorId());
-		cell->AddTrackEnergy(pt->GetTrackId(), pt->GetEnergy());
-		cell->AddTrackPSEnergy(pt->GetTrackId(), pt->GetPSEnergy());
-
-	}
+  n=fListHits->GetEntriesFast();
+  if (fVerbose>0)
+  {
+    cout << ". Number of input summable hits: ";
+    cout << n << flush;
+  }
+  if (fProduceSummableHits==kFALSE)
+  for(Int_t j=0; j<n; j++)
+  {
+    pt = (CbmEcalHit*)fListHits->At(j);
+    cell=fStr->GetHitCell(pt->GetDetectorId());
+    cell->AddEnergy(pt->GetEnergy());
+  } else
+  for(Int_t j=0; j<n; j++)
+  {
+    CbmEcalCellMC* cellmc;
+    pt = (CbmEcalHit*)fListHits->At(j);
+    cellmc=(CbmEcalCellMC*)fStr->GetHitCell(pt->GetDetectorId());
+    cellmc->AddTrackEnergy(pt->GetTrackId(), pt->GetEnergy());
+  }
 }
 
 /** Loop over hits and add them to cells **/
@@ -260,7 +214,7 @@ void CbmEcalHitProducer::LoopForUnSummableHits()
         	pt = (CbmEcalHit*)fListUHits->At(j);
 		cell=fStr->GetHitCell(pt->GetDetectorId());
 		cell->AddEnergy(pt->GetEnergy());
-		cell->AddPSEnergy(pt->GetPSEnergy());
+//		cell->AddPSEnergy(pt->GetPSEnergy());
 
 	}
 }
@@ -270,7 +224,7 @@ void CbmEcalHitProducer::LoopForUnSummableHits()
 void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
 {
   Float_t energy;
-  Float_t psenergy;
+  Float_t psenergy=0;
   Int_t ebins;
   Int_t psbins;
   if (fProduceSummableHits==kFALSE)
@@ -279,10 +233,6 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
       energy=cell->GetEnergy()+gRandom->Gaus(0,fNoise);
     else
       energy=cell->GetEnergy();
-    if (fNoisePS>0)
-      psenergy=cell->GetPSEnergy()+gRandom->Gaus(0,fNoisePS);
-    else
-      psenergy=cell->GetPSEnergy();
 
     if (fEcalBinSize>0)
     {
@@ -290,39 +240,21 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
       if (energy<0) ebins--;
       energy=ebins*fEcalBinSize;
     }
-    if (fPSBinSize>0)
-    {
-      psbins=(Int_t)(psenergy/fPSBinSize);
-      if (psenergy<0) psbins--;
-      psenergy=psbins*fPSBinSize;
-    }
 
     if (energy<fThreshold) energy=0;
-    if (psenergy<fThresholdPS) psenergy=0;
     cell->SetEnergy(energy);
-    cell->SetPSEnergy(psenergy);
     if (fProduceHits)
     if (energy!=0||psenergy!=0)
       AddHit(cell->GetCellNumber(),energy,psenergy, -1, cell->GetTime());
   }
   else
   {
-    map<Int_t, Float_t>::const_iterator p=cell->GetTrackEnergyBegin();
-    for(;p!=cell->GetTrackEnergyEnd();++p)
+    CbmEcalCellMC* cellmc=(CbmEcalCellMC*)cell;
+    map<Int_t, Float_t>::const_iterator p=cellmc->GetTrackEnergyBegin();
+    for(;p!=cellmc->GetTrackEnergyEnd();++p)
     {
-      psenergy=cell->GetTrackPSEnergy(p->first);
       energy=p->second;
-      AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetTrackTime(p->first));
-    }
-    p=cell->GetTrackPSEnergyBegin();
-    for(;p!=cell->GetTrackPSEnergyEnd();++p)
-    {
-      energy=cell->GetTrackEnergy(p->first);
-      if (energy==0)
-      {
-	psenergy=p->second;
-	AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetTrackTime(p->first));
-      }
+      AddHit(cellmc->GetCellNumber(),energy,psenergy, p->first, cellmc->GetTrackTime(p->first));
     }
   }
 }
@@ -345,10 +277,7 @@ void CbmEcalHitProducer::Exec(Option_t* option)
 
   if (fStandAlone)
   {
-    if (fProduceSummableHits==kFALSE)
-      fStr->ResetModulesFast();
-    else
-      fStr->ResetModules();
+    fStr->ResetModules();
     if (fUseMCPoints) LoopForMCPoints();
     if (fUseSummableHits) LoopForSummableHits();
     if (fUseUnSummableHits) LoopForUnSummableHits();

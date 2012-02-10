@@ -10,9 +10,9 @@
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
 #include "CbmEcalPoint.h"
-#include "CbmEcalShowerLib.h"
 #include "CbmEcalShLib.h"
-#include "CbmEcalClusterV1.h"
+#include "CbmEcalCluster.h"
+#include "CbmEcalCellMC.h"
 
 #include "TTree.h"
 #include "TClonesArray.h"
@@ -66,7 +66,7 @@ void CbmEcalQualityCheck::Exec(Option_t* option)
     /** Only photons **/
     if (tr->GetPdgCode()!=22&&TMath::Abs(tr->GetPdgCode())!=2112) continue;
     /** ... prompt and pi0 decay photons ... **/
-    if (tr->GetStartZ()>0.1) continue;
+    //if (tr->GetStartZ()>0.1) continue;
     /** ... energetic enough ... **/
     if (tr->GetEnergy()<0.5) continue;
     /** ... from pi^0 decay ... **/
@@ -459,7 +459,7 @@ void CbmEcalQualityCheck::DrawCells()
   CbmMCTrack* tq;
   Float_t max;
   std::map<Int_t, Float_t>::const_iterator p1;
-  CbmEcalCell* c;
+  CbmEcalCellMC* c;
   CbmEcalRecParticle* r;
   Int_t rn=fReco->GetEntriesFast();
   Int_t i;
@@ -476,31 +476,18 @@ void CbmEcalQualityCheck::DrawCells()
   for(i=0;i<rn;i++)
   {
     r=(CbmEcalRecParticle*)fReco->At(i);
-    CbmEcalClusterV1* cl=(CbmEcalClusterV1*)fClusters->At(r->ClusterNum());
+    CbmEcalCluster* cl=(CbmEcalCluster*)fClusters->At(r->ClusterNum());
     for(j=0;j<cl->Size();j++)
       clusters.push_back(fStr->GetHitCell(cl->CellNum(j)));
   }
 
   for(p=fCells.begin();p!=fCells.end();++p)
   {
-    c=(*p)->fCell;
+    c=(CbmEcalCellMC*)((*p)->fCell);
     (*p)->fG=c->GetTotalEnergy();
     (*p)->fR=0;
     (*p)->fB=0;
     for(p1=c->GetTrackEnergyBegin();p1!=c->GetTrackEnergyEnd();++p1)
-    {
-      tr=(CbmMCTrack*)fMCTracks->At(p1->first);
-      if (tr->GetPdgCode()==22)
-	(*p)->fR+=p1->second;
-      else
-      if (tr->GetMotherId()>=0)
-      {
-	tq=(CbmMCTrack*)fMCTracks->At(tr->GetMotherId());
-	if (tr->GetMotherId()==22)
-	  (*p)->fR+=p1->second;
-      }
-    }
-    for(p1=c->GetTrackPSEnergyBegin();p1!=c->GetTrackPSEnergyEnd();++p1)
     {
       tr=(CbmMCTrack*)fMCTracks->At(p1->first);
       if (tr->GetPdgCode()==22)
@@ -527,10 +514,7 @@ void CbmEcalQualityCheck::DrawCells()
       rad=TMath::Sqrt(x*x+y*y);
       phi=TMath::ACos(x/rad)*TMath::RadToDeg();
       if (y<0) phi=360-phi;
-      if (fLib)
-        (*p)->fB+=fLib->GetSumEThetaPhi(dx, dy, fInf->GetModuleSize()/c->GetType(), r->E(), TMath::ATan(rad/fInf->GetZPos())*TMath::RadToDeg(), phi);
-      else
-	(*p)->fB+=fShLib->GetResponse(dx, dy, phi, TMath::ATan(rad/fInf->GetZPos())*TMath::RadToDeg(), c->GetType());
+      (*p)->fB+=fShLib->GetResponse(dx, dy, phi, TMath::ATan(rad/fInf->GetZPos())*TMath::RadToDeg(), c->GetType());
     }
   }
   /** Normalization **/
@@ -662,19 +646,12 @@ InitStatus CbmEcalQualityCheck::Init()
   fStr->GetCells(cells);
   for(p=cells.begin();p!=cells.end();++p)
     fCells.push_back(new CbmEcalQualityCheckItem((*p), 0.0, 0.0, 0.0));
-  fLib=(CbmEcalShowerLib*)io->GetObject("EcalShowerLib");
-  if (!fLib)
+  fShLib=(CbmEcalShLib*)io->GetObject("EcalShLib");
+  if (!fShLib)
   {
-    fShLib=(CbmEcalShLib*)io->GetObject("EcalShLib");
-    if (!fShLib)
-    {
-      Fatal("Init", "No shower library found in system.");
-      return kFATAL;
-    }
-    Info("Init", "Using a new version of shower library.");
+    Fatal("Init", "No shower library found in system.");
+    return kFATAL;
   }
-  else
-    Info("Init", "Using an old version of shower library.");
   fTxt->SetTextFont(43);
   fTxt->SetTextSizePixels(8);
   fTxt->SetTextAlign(21);

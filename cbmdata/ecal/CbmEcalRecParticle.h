@@ -1,24 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                 CbmEcalRecParticle header file                -----
-// -----                 Created 04.07.2005  by Yu.Kharlov
-// -------------------------------------------------------------------------
-
-  /* $Id: CbmEcalRecParticle.h,v 1.1 2006/06/22 14:02:17 kharlov Exp $ */
-
-  /* History of cvs commits:
-   *
-   * $Log: CbmEcalRecParticle.h,v $
-   * Revision 1.1  2006/06/22 14:02:17  kharlov
-   * First upload of reconstruction classes for Full MC
-   *
-   */
-
-/**  CbmEcalRecParticle.h
- *@author Yu.Kharlov <Y.Kharlov at gsi.de>
- **
- ** Reconstructed particle in ECAL, characterized by reconstructed 4-momentum
- **/
-
+/** A calorimeter reconstructed particle. Momenta and calorimeter impact point
+ ** inside. Chi2 for quality control. TOF information also provided in case
+ ** of time measurements with calorimeter.
+ ** **/
 #ifndef CBMECALRECPARTICLE_H
 #define CBMECALRECPARTICLE_H
 
@@ -26,13 +9,14 @@
 #include "TLorentzVector.h"
 
 
-class CbmEcalClusterV1;
+class CbmEcalCluster;
 class CbmEcalCell;
 
 class CbmEcalRecParticle : public TObject
 {
-friend class CbmEcalRecoSlow;
-friend class CbmEcalRecoSlow2;
+friend class CbmEcalReco;
+friend class CbmEcalReco2;
+friend class CbmEcalRecoCorr;
 public:
 
   /** Default constructor **/
@@ -44,7 +28,7 @@ public:
   CbmEcalRecParticle(Double_t px, Double_t py, 
 		     Double_t pz, Double_t e,
 		     Double_t x=-1111, Double_t y=-1111, Double_t z=-1111,
-		     Int_t id=0, Double_t chi2=-1111, CbmEcalClusterV1* cl=NULL,
+		     Int_t id=0, Double_t chi2=-1111, CbmEcalCluster* cl=NULL,
 		     CbmEcalCell* cell=NULL, Int_t type=0);
 
   CbmEcalRecParticle(Int_t clnum, Int_t cellnum, Double_t px, Double_t py, 

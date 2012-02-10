@@ -1,241 +1,235 @@
-// -------------------------------------------------------------------------
-// -----                  CbmEcalClusterFinder source file             -----
-// -----                 Created 12/07/06  by D.Konstantinov           -----
-// -------------------------------------------------------------------------
-
-/**  CbmEcalClusterFinder.cxx
- *@author D.Konstantinov 
- **
- ** Task for ECAL clusterization, which is a procedure to group the hits with
- ** the common edge into clusters
- **/
-
-/* $Id: CbmEcalClusterFinder.cxx,v 1.3 2006/07/19 15:29:03 kharlov Exp $ */
-
-/* History of cvs commits:
- *
- * $Log: CbmEcalClusterFinder.cxx,v $
- * Revision 1.3  2006/07/19 15:29:03  kharlov
- * Init geometry via constuctor, add cluster hit multiplicity, commenting
- *
- * Revision 1.2  2006/07/19 14:21:38  kharlov
- * Set W0 is included
- *
- * Revision 1.1  2006/07/12 14:22:56  kharlov
- * Adding ClusterFinder
- *
- */
-
 #include "CbmEcalClusterFinder.h"
 
-#include "CbmEcalCluster.h"
-#include "CbmEcalHit.h"
+#include "TClonesArray.h"
 
 #include "FairRootManager.h"
+#include "FairTrackParam.h"
 
-#include "TVector3.h"
+#include "CbmEcalStructure.h"
+#include "CbmEcalCell.h"
+#include "CbmEcalInf.h"
+#include "CbmEcalCluster.h"
+#include "CbmEcalParam.h"
+#include "CbmEcalCalibration.h"
+#include "CbmEcalPreCluster.h"
+#include "CbmEcalMaximum.h"
 
-#include <vector>
+#include <iostream>
+#include <list>
 
-using std::vector;
+using namespace std;
 
-// -----   Default constructor   -------------------------------------------
-CbmEcalClusterFinder::CbmEcalClusterFinder() :
-  FairTask(),fNClusters(0),fEvent(0){}
-// -------------------------------------------------------------------------
-
-CbmEcalClusterFinder::CbmEcalClusterFinder(const char *name, const Int_t iVerbose,
-					   const char *fileGeo) :
-  FairTask(name,iVerbose),fNClusters(0),fEvent(0),fWzero(5.0),
-  fHitThreshold(8.0e-4),fFileGeo(fileGeo)
-{}
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmEcalClusterFinder::~CbmEcalClusterFinder()
-{
-  FairRootManager *fManager =FairRootManager::Instance();
-  fManager->Write();
-}
-// -------------------------------------------------------------------------
-
-/** ------------------------------------------------------------------------
- ** Public method Init()
- ** Activate branch with ECAL hits,
- ** register a new branch with cluster collection
- ** and initialize geometry from the geometry file
- **/
-// -----   Initialization   ------------------------------------------------
-InitStatus CbmEcalClusterFinder::Init()
-{
-  FairRootManager* fManager = FairRootManager::Instance();
-
-  // new list of ECAL hits
-  fHitCollection = (TClonesArray*)fManager->GetObject("EcalHit");
-
-  fClusterCollection = new TClonesArray("CbmEcalCluster",100);
-  fManager->Register("EcalCluster","ECAL",fClusterCollection,kTRUE);
-  
-  fInf=CbmEcalInf::GetInstance(fFileGeo);
-  fStr=new CbmEcalStructure(fInf);
-  fStr->Construct();
-  return kSUCCESS;
-}
-// -------------------------------------------------------------------------
-
-/** ------------------------------------------------------------------------
- ** Public method Exec()
- ** It makes a loop over hits and combine then into clusters
- **/
-// -----   Execution of Task   ---------------------------------------------
+/** Exec a task **/
 void CbmEcalClusterFinder::Exec(Option_t* option)
 {
+  fEv++;
 
-  fClusterCollection->Clear();
-  TClonesArray* fHitCopyCollection;
-  fHitCopyCollection = static_cast<TClonesArray*>(fHitCollection->Clone());  
-
-  Int_t x;
-  Int_t y;
-
-  fEvent++;
-  fNClusters = 0;
-  TIter nextHit(fHitCopyCollection);
-  CbmEcalHit *hit =NULL  ; 
-
-  while ( (hit = (CbmEcalHit*)nextHit() ) ) {
-    // Take new seed hit for cluster
-
-    Double32_t energy  = hit->GetEnergy();
-    if (energy < fHitThreshold ) { 
-      fHitCopyCollection->Remove(hit);
-      continue;
-    }
-
-    // 
-
-    Int_t detId    = hit->GetDetectorId();
-    Int_t seedtype = fStr->GetType(detId);
-    // finding x,y of seed
-    fStr->GetGlobalCellXY(detId  ,  x,  y); 
-    
-    // construct new cluster with index of cell in fHitCopyCollection
-    CbmEcalCluster * cl = new CbmEcalCluster( fHitCopyCollection->IndexOf(hit) );
-    // removing hit from collection
-    fHitCopyCollection->Remove(hit);
-    
-    Int_t ix = 0;
-    
-    while (ix<cl->GetSize()){   
-      
-      // checking neighboring hits and addin to cluster
-      CbmEcalHit* pt = (CbmEcalHit*)fHitCollection->At(cl->GetHitIndex(ix));
-
-      fStr->GetGlobalCellXY(pt->GetDetectorId() ,  x,  y); 
-      //      printf (" Looking around cell %d x = %d y = %d", pt->GetDetectorId() ,  x,  y);
-      TIter nextHit2(fHitCopyCollection);
-      CbmEcalHit* hit2=NULL;
-      
-      while ( (hit2  = (CbmEcalHit*)nextHit2())  ){
-	Int_t x1=0;
-	Int_t y1=0;
-	if (hit2->GetEnergy()<fHitThreshold ) { 
-	  fHitCopyCollection->Remove(hit2);
-	  continue;
-	}
-	detId = hit2 ->GetDetectorId();
-	// checking for same type like seed
-	if ( seedtype != fStr->GetType(detId) )  continue;
-	fStr->GetGlobalCellXY(detId,x1,y1);
-	
-	if ( ( x+1 == x1 && y == y1)|| ( x-1 == x1 && y == y1)
-	     ||( x == x1 && y+1 == y1)|| ( x == x1 && y-1 == y1)) {
-	  energy += (hit2->GetEnergy());
-	  cl->AddHitIndex(fHitCopyCollection->IndexOf(hit2)); 
-	  fHitCopyCollection->Remove(hit2);
-	}      
-      }
-      ix++;
-    }
-    AddCluster(cl, energy);
-  }
-  if (fVerbose!=0)
-    if (fEvent%fVerbose == 0)
-      printf("Event %d has %d clusters\n",fEvent,fNClusters);
+  ClearPreClusters();
+  FormPreClusters();
+  FormClusters();
 }
 
-
-// -----   Finish Task   ---------------------------------------------------
-void CbmEcalClusterFinder::Finish()
-{ }
-
-
-/** -------------------------------------------------------------------------
- ** Add a new cluster to array of clusters
- **/
-void CbmEcalClusterFinder::AddCluster(CbmEcalCluster * cl, Double32_t energy)
-{ 
-  new((*fClusterCollection)[fNClusters++]) CbmEcalCluster(cl->GetVector(),energy);
-  CbmEcalCluster * cluster = (CbmEcalCluster *)fClusterCollection->Last();
-  Calculate(fHitCollection,cluster);
-}
-
-/** -------------------------------------------------------------------------
- ** Public method Calculate()
- ** It evaluates cluster parameters, such as gravity center, 2nd moments
- ** and hit multiplicity
- **/
-
-void CbmEcalClusterFinder::Calculate(TClonesArray * hitsArray, CbmEcalCluster * cl)
+InitStatus CbmEcalClusterFinder::Init()
 {
-    
-  CbmEcalHit* hits=NULL;
-  Double_t weight = 0;
-  Double_t wtot = 0.;
-  Double_t x    = 0.;
-  Double_t y    = 0.;
-  Double_t dxx  = 0.;
-  Double_t dyy  = 0.;
-  Double_t dxy  = 0.;
-  Double_t lambda0 = 0., lambda1=0.;
-  Double_t etot = cl->GetEnergy();
-  Float_t xi = 0.;
-  Float_t yi = 0.;
-  Float_t wzero = fWzero;
-  //  cout << fWzero << endl;
-  vector<Int_t> CluList = cl->GetVector();
-  for (UInt_t j = 0; j < CluList.size();j++){
-
-    hits = (CbmEcalHit*)hitsArray->At(CluList[j]);
-    fStr->GetHitXY( hits->GetDetectorId()  ,  xi,  yi);
-    weight = TMath::Max(0., wzero + log( hits->GetEnergy()/etot) );
-    x += weight * xi;
-    y += weight * yi;
-    dxx += weight * xi * xi;
-    dyy += weight * yi * yi;
-    dxy += weight * xi * yi;
-    wtot += weight;
+  FairRootManager* io=FairRootManager::Instance();
+  if (!io)
+  {
+    Fatal("Init", "Can't find IOManager.");
+    return kFATAL;
+  }
+  fStr=(CbmEcalStructure*)io->GetObject("EcalStructure");
+  if (!fStr) 
+  {
+    Fatal("Init()", "Can't find calorimeter structure in the system.");
+    return kFATAL;
+  }
+  fInf=fStr->GetEcalInf();
+  fMaximums=(TClonesArray*)io->GetObject("EcalMaximums");
+  if (!fMaximums)
+  {
+    Fatal("Init", "Can't find array of calorimeter maximums in the system.");
+    return kFATAL;
+  }
+  fCal=(CbmEcalCalibration*)io->GetObject("EcalCalibration");
+  if (!fCal)
+  {
+    Fatal("Init", "Can't find EcalCalibration");
+    return kFATAL;
   }
 
-  if (wtot>0.) {
-    x /= wtot;
-    y /= wtot;
-    dxx /=wtot;
-    dyy /=wtot;
-    dxy /=wtot;
-    dxx -= x * x;
-    dyy -= y * y;
-    dxy -= x * y;
-
-    lambda0 = 0.5 * (dxx + dyy) + TMath::Sqrt(0.25 * (dxx - dyy) * (dxx - dyy) + dxy * dxy );
-    lambda1 = 0.5 * (dxx + dyy) - TMath::Sqrt(0.25 * (dxx - dyy) * (dxx - dyy) + dxy * dxy ); 
-    lambda1 = TMath::Max(0.,lambda1);
-  }
-  cl->SetXY(x,y);
-  //  cout << " x, y " << x << ", " << y << endl;
-  cl->SetLambdas(lambda0,lambda1);
-  cl->SetSize(cl->GetSize());
+  fClusters=new TClonesArray("CbmEcalCluster", 2000);
+  io->Register("EcalClusters", "ECAL", fClusters, kTRUE);
+  fEv=0;
+  return kSUCCESS;
 }
 
-// -------------------------------------------------------------------------
+/** Finish a task **/
+void CbmEcalClusterFinder::Finish()
+{
+  ;
+}
+
+/** Destructor **/
+CbmEcalClusterFinder::~CbmEcalClusterFinder()
+{
+  if (fClusters)
+  {
+    fClusters->Delete();
+    delete fClusters;
+  }
+}
+
+/** Form a preclusters.
+ ** A precluster --- a group of cells neighbor to maximum cell.
+ ** A cluster is a group of preclusters with common cells. **/
+void CbmEcalClusterFinder::FormPreClusters()
+{
+  Int_t nm=fMaximums->GetEntriesFast();
+  Int_t i=0;
+  CbmEcalMaximum* max;
+  list<CbmEcalCell*> all;
+  list<CbmEcalCell*>::const_iterator p;
+  list<CbmEcalCell*> cls;
+  CbmEcalCell* cell;
+  CbmEcalCell* min;
+  Double_t e;
+  Double_t ecls;
+  CbmEcalPreCluster* precluster;
+ 
+
+  for(;i<nm;i++)
+  {
+    max=(CbmEcalMaximum*)fMaximums->At(i);
+    if (max==NULL) continue;
+    /** Remove maximums matched with charged tracks **/
+    if (max->Mark()!=0) continue;
+    cell=max->Cell();
+    ecls=cell->GetTotalEnergy();
+//    cout << ecls << endl;
+    /** Remove low energy maximums **/
+    if (fCal->GetEnergy(ecls, cell)<fMinMaxE) continue;
+    cell->GetNeighborsList(0, all);
+    cell->GetNeighborsList(max->I(), cls);
+    e=1e10;
+    for(p=all.begin();p!=all.end();++p)
+      if ((*p)->GetTotalEnergy()<e)
+      {
+	e=(*p)->GetTotalEnergy(); min=(*p);
+      }
+    if (find(cls.begin(), cls.end(), min)==cls.end())
+      cls.push_back(min);
+    for(p=cls.begin();p!=cls.end();++p)
+      ecls+=(*p)->GetTotalEnergy();
+//    cout << ":" << ecls << endl;
+    /** Remove low energy clusters **/
+    if (fCal->GetEnergy(ecls, cell)<fMinClusterE) continue;
+    cls.push_back(cell);
+    precluster=new CbmEcalPreCluster(cls, cell, min);
+    fPreClusters.push_back(precluster);
+  }
+}
+
+/** Form clusters from precluster **/
+void CbmEcalClusterFinder::FormClusters()
+{
+  /** CbmEcalCluster needs a destructor call :-( **/
+  fClusters->Delete();
+  Int_t fN=0;
+  list<CbmEcalPreCluster*>::const_iterator p1=fPreClusters.begin();
+  list<CbmEcalPreCluster*>::const_iterator p2;
+  list<CbmEcalCell*> cluster;
+  list<CbmEcalCell*> minimums;
+  list<CbmEcalCell*>::const_iterator pc;
+  list<CbmEcalCell*>::const_iterator pc1;
+  UInt_t oldsize;
+  Int_t MaxSize=0;
+  Int_t Maximums=0;
+  Int_t max;
+  
+  if (fVerbose>9)
+  {
+    Info("FormClusters", "Total %d preclusters found.", fPreClusters.size());
+  }
+  for(;p1!=fPreClusters.end();++p1)
+  if ((*p1)->fMark==0)
+  {
+    cluster.clear(); oldsize=0;
+    minimums.clear();
+    cluster=(*p1)->fCells;
+    if ((*p1)->fMinimum!=NULL)
+      minimums.push_back((*p1)->fMinimum);
+    max=1;
+    while(cluster.size()!=oldsize)
+    {
+      oldsize=cluster.size();
+      p2=p1;
+      for(++p2;p2!=fPreClusters.end();++p2)
+      if ((*p2)->fMark==0)
+      {
+        pc=cluster.begin();
+	for(;pc!=cluster.end();++pc)
+	{
+	  if ((*p2)->fMinimum!=NULL&&(*pc)==(*p2)->fMinimum) continue;
+	  pc1=find((*p2)->fCells.begin(), (*p2)->fCells.end(), (*pc));
+	  if (pc1==(*p2)->fCells.end()) continue;
+	  pc1=find(minimums.begin(), minimums.end(), (*pc));
+	  if (pc1!=minimums.end()) continue;
+	  break;
+	}
+	if (pc!=cluster.end())
+	{
+	  (*p2)->fMark=1;
+	  pc=(*p2)->fCells.begin();
+	  for(;pc!=(*p2)->fCells.end();++pc)
+	    if (find(cluster.begin(), cluster.end(), (*pc))==cluster.end())
+	      cluster.push_back(*pc);
+	  if ((*p2)->fMinimum!=NULL&&find(minimums.begin(), minimums.end(), (*p2)->fMinimum)==minimums.end())
+	    minimums.push_back((*p2)->fMinimum);
+	  max++;
+	}
+      }
+    }
+    (*p1)->fMark=1;
+    if ((Int_t)cluster.size()>MaxSize)
+      MaxSize=cluster.size();
+    if (max>Maximums) Maximums=max;
+    CbmEcalCluster* cls=new ((*fClusters)[fN]) CbmEcalCluster(fN, cluster); fN++;
+    cls->Init(cluster);
+  }
+  if (fVerbose>0)
+  {
+    Info("FormClusters", "Total %d clusters formed.", fN);
+    Info("FormClusters", "Maximum size of cluster is %d cells.",  MaxSize);
+    Info("FormClusters", "Maximum number of photons per cluster is %d.",  Maximums);
+  }
+}
+
+/** Clear a preclusters list **/
+void CbmEcalClusterFinder::ClearPreClusters()
+{
+  list<CbmEcalPreCluster*>::const_iterator p=fPreClusters.begin();
+  for(;p!=fPreClusters.end();++p)
+    delete (*p);
+  fPreClusters.clear();
+}
+
+/** Standard constructor **/
+CbmEcalClusterFinder::CbmEcalClusterFinder(const char* name, const Int_t verbose, const char* cfg)
+  : FairTask(name, verbose)
+{
+  fClusters=NULL;
+  CbmEcalParam* par=new CbmEcalParam("ClusterParam", cfg);
+ 
+  fMinClusterE=par->GetDouble("minclustere");
+  fMinMaxE=par->GetDouble("minmaxe");
+  delete par;
+}
+
+
+/** Only to comply with frame work. **/
+CbmEcalClusterFinder::CbmEcalClusterFinder()
+{
+  ;
+}
+
 ClassImp(CbmEcalClusterFinder)

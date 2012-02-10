@@ -60,6 +60,8 @@ private:
   Int_t fCharge;
   /** Energy in calorimeter **/
   Double_t fCaloE;
+  /** \chi^2 of the cluster **/
+  Double_t fChi2;
   Int_t fCellType;
 
   TClonesArray* fMC;			//!

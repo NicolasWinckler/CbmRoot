@@ -43,7 +43,8 @@ class CbmEcalModule : public CbmEcalCell
 {
 
 public:
-  CbmEcalModule(char type=1, Int_t cellnumber=-1, Float_t x1=0, Float_t y1=0, Float_t x2=0, Float_t y2=0, Float_t energy=0);
+  // Set mc==1 to construct CbmEcalCellMC, not CbmEcalCell 
+  CbmEcalModule(char type=1, Int_t cellnumber=-1, Float_t x1=0, Float_t y1=0, Float_t x2=0, Float_t y2=0, Int_t mc=0,Float_t energy=0);
 	
   CbmEcalCell* Locate(Int_t x, Int_t y) const;
   
@@ -81,7 +82,7 @@ private:
 
 inline void CbmEcalModule::ResetModule()
 {
-  ResetEnergy();
-  for(UInt_t i=0;i<fCells.size();i++) fCells[i]->ResetEnergy();
+  ResetEnergyFast();
+  for(UInt_t i=0;i<fCells.size();i++) fCells[i]->ResetEnergyFast();
 }
 #endif

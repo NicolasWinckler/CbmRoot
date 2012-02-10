@@ -1,11 +1,11 @@
-/** A slow version of reconstruction because of extensive Shower Library usage.
+/** Quate fast version of reconstruction. Faster fitter and shower library are welcome.
  ** Can be used for data production.
  ** The tracks array can be imported from ROOT file. (see CbmEcalTrackExport. )
  ** The output can be exported to tree. 
  ** //Dr.Sys **/
 
-#ifndef CBMECALRECOSLOW2_H
-#define CBMECALRECOSLOW2_H
+#ifndef CBMECALRECO_H
+#define CBMECALRECO_H
 
 #include "FairTask.h"
 #include "TString.h"
@@ -18,20 +18,21 @@ class CbmEcalStructure;
 class CbmEcalCell;
 class CbmEcalSCurveLib;
 class CbmEcalInf;
-class CbmEcalClusterV1;
+class CbmEcalCluster;
 class CbmEcalShLib;
 class CbmEcalCalibration;
 class CbmEcalRecParticle;
+class CbmEcalPosLib;
 class TFormula;
 
-class FCNEcalCluster2 : public ROOT::Minuit2::FCNBase
+class FCNEcalCluster : public ROOT::Minuit2::FCNBase
 {
 public:
-  FCNEcalCluster2(CbmEcalCalibration* cal, CbmEcalShLib* shlib, TFormula** sigma, CbmEcalInf* inf)
+  FCNEcalCluster(CbmEcalCalibration* cal, CbmEcalShLib* shlib, TFormula** sigma, CbmEcalInf* inf)
     : fCal(cal), fShLib(shlib), fSigma(sigma), fInf(inf), fCluster(NULL), fEStep(1e-4), fCStep(1e-4), fErrorDef(1.0) {};
   
-  CbmEcalClusterV1* GetCluster() const {return fCluster;}
-  void SetCluster(CbmEcalClusterV1* cluster);
+  CbmEcalCluster* GetCluster() const {return fCluster;}
+  void SetCluster(CbmEcalCluster* cluster);
   void SetStructure(CbmEcalStructure* str) {fStr=str;}
 
   void SetParticleSeeds(const std::vector<CbmEcalCell*> cells) {fCells=cells;}
@@ -57,7 +58,7 @@ public:
   void SetFixClusterEnergy(Int_t fix) {fFixClusterEnergy=fix;}
   Double_t ClusterEnergy() const {return fClusterEnergy;}
 
-  ~FCNEcalCluster2() {};
+  ~FCNEcalCluster() {};
 private:
   /** A calibration object **/
   CbmEcalCalibration* fCal; 		//!
@@ -70,7 +71,7 @@ private:
   /** Calorimeter structure **/
   CbmEcalStructure* fStr;		//!
   /** Calorimeter cluster **/
-  CbmEcalClusterV1* fCluster;		//!
+  CbmEcalCluster* fCluster;		//!
 
   /** Steps if gradient business **/
   Double_t fEStep;
@@ -91,17 +92,17 @@ private:
   Int_t fNDF;
 };
 
-class CbmEcalRecoSlow2 : public FairTask
+class CbmEcalReco : public FairTask
 {
 public:
   /** Default constructor. Requirement of ROOT system **/
-  CbmEcalRecoSlow2();
+  CbmEcalReco();
 
   /** Standard constructor **/
-  CbmEcalRecoSlow2(const char *name, const Int_t iVerbose=1, const char* configname="none");
+  CbmEcalReco(const char *name, const Int_t iVerbose=1, const char* configname="none");
 
   /** Destructor **/
-  virtual ~CbmEcalRecoSlow2();
+  virtual ~CbmEcalReco();
 
   /** Init **/
   virtual InitStatus Init();
@@ -115,17 +116,19 @@ public:
   void SetStoreClusterInfo(Bool_t store) {fStoreClusterInfo=store;}
 private:
   /** Reconstruct photon from maximum **/
-  void Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr);
+  void Reco(CbmEcalCell* cell, CbmEcalCluster* clstr);
+  /** Reconstruct photon from maximum. PosLib instead of S-curves **/
+  void Reco2(CbmEcalCell* cell, CbmEcalCluster* clstr);
   /** Fit a given cluster. A first approximation should be available **/
-  void FitCluster(CbmEcalClusterV1* clstr);
+  void FitCluster(CbmEcalCluster* clstr);
   /** Write a cluster info **/
-  void WriteClusterInfo(CbmEcalClusterV1* clstr);
+  void WriteClusterInfo(CbmEcalCluster* clstr);
   /** Calculate a chi2 for just reconstructed photons **/
-  Double_t CalculateChi2(CbmEcalClusterV1* cluster);
+  Double_t CalculateChi2(CbmEcalCluster* cluster);
   /** Fit a cluster. A**/
   Double_t FitCluster();
   /** Reconstruct time for particle **/
-  void TimeReco(CbmEcalRecParticle* p, CbmEcalClusterV1* cluster);
+  void TimeReco(CbmEcalRecParticle* p, CbmEcalCluster* cluster);
   /** Number of reconstructed tracks **/
   Int_t fN;
   Int_t fNOld;
@@ -141,6 +144,8 @@ private:
   CbmEcalInf* fInf;		//!
   /** S-curve library **/
   CbmEcalSCurveLib* fLib;	//!
+  /** A position library **/
+  CbmEcalPosLib* fPosLib;	//!
   /** A shower library **/
   CbmEcalShLib* fShLib;		//!
   /** A calibration of the calorimeter **/
@@ -167,7 +172,6 @@ private:
   Double_t fE;
   Double_t fE3x3;
   Double_t fE2x2;
-  Double_t fPSE;
   Double_t fEReco;
   Double_t fXReco;
   Double_t fYReco;
@@ -210,13 +214,19 @@ private:
   /** Fix sum of energies of cluster particles to energy of cluster **/
   Int_t fFixClusterEnergy;
   /** A chi^2 and gradient function for cluster/particles **/
-  FCNEcalCluster2* fFCN;		//!
+  FCNEcalCluster* fFCN;		//!
   /** A fitter **/
   TFitterMinuit* fFitter;	//!
   /** Minimum energy of precluster maximum for consideration **/
   Double_t fMinMaxE;
+  /** Use a position library instead of S-curves **/
+  Int_t fUsePosLib;
 
-  ClassDef(CbmEcalRecoSlow2, 1)
+  /** Energy deposition in precluster **/
+  Double_t fPreE;
+  /** Region **/
+  Int_t fRegion;
+  ClassDef(CbmEcalReco, 1)
 };
 
 #endif

@@ -5,8 +5,9 @@
 #include "CbmEcalInf.h"
 #include "CbmEcalParam.h"
 #include "CbmEcalPreCluster.h"
-#include "CbmEcalClusterV1.h"
+#include "CbmEcalCluster.h"
 #include "CbmEcalCalibration.h"
+#include "CbmEcalMaximum.h"
 
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
@@ -26,84 +27,19 @@ void CbmEcalClusterFinderV2::Exec(Option_t* option)
   if (fCalibration)
     if (!fTree)
       CreateTree();
-  if (fRemoveCharged==1)
-    ExcludeMaximums();
-  FindMaximums();
   FormPreClusters();
 
   if (fCalibration==0)
     FormClusters();
 }
 
-/** Exclude maximums belong to charged tracks **/
-// TODO: An old algorithm. Probably, will not work for calorimeter before much
-
-void CbmEcalClusterFinderV2::ExcludeMaximums()
-{
-  Int_t n=fTracks->GetEntriesFast();
-  Int_t i;
-  Int_t mn=0;
-  FairTrackParam* tr;
-  CbmEcalCell* cell;
-  list<CbmEcalCell*> cells;
-  list<CbmEcalCell*>::const_iterator p;
-  list<CbmEcalCell*> ocells;
-  list<CbmEcalCell*>::const_iterator op;
-  Double_t e;
-  Float_t x;
-  Float_t y;
-  Float_t dst;
-  Float_t t;
-
-  if (fVerbose>1) 
-    Info("ExcludeMaximums", "Find %d charged tracks in event.", n);
-  for(i=0;i<n;i++)
-  {
-    tr=(FairTrackParam*)fTracks->At(i);
-    cell=fStr->GetCell(tr->GetX(), tr->GetY());
-    if (cell==NULL) continue;
-    cell->GetNeighborsList(0, cells);
-    /** Check cell corresponds to track position for maximum **/
-    e=cell->GetTotalEnergy();
-    for(p=cells.begin();p!=cells.end();++p)
-      if ((*p)->GetTotalEnergy()>e)
-	break;
-    if (p==cells.end())
-    {
-      fExcluded[mn++]=cell;
-      continue;
-    }
-    cell->GetNeighborsList(0, cells);
-    e=cell->GetTotalEnergy();
-    /** Check cells near given for maximums **/
-    for(p=cells.begin();p!=cells.end();++p)
-    {
-      x=(*p)->GetCenterX()-tr->GetX();
-      y=(*p)->GetCenterY()-tr->GetY();
-      dst=TMath::Sqrt(x*x+y*y);
-//      if (dst>fInf->GetModuleSize()*TMath::Sqrt(2.0)+0.001) continue;
-      x=tr->GetX(); x*=x; y=tr->GetY(); y*=y;
-      t=TMath::Sqrt(x+y);
-      x=(*p)->GetCenterX()-cell->GetCenterX();
-      y=(*p)->GetCenterY()-cell->GetCenterY();
-      if (x*tr->GetTx()/t+y*tr->GetTy()/t<TMath::Sqrt(2.0)*fInf->GetModuleSize()/cell->GetType()+0.001)
-        if (x*tr->GetTx()/t+y*tr->GetTy()/t<-0.01&&dst>fInf->GetModuleSize()/cell->GetType()+0.001) continue;
-      (*p)->GetNeighborsList(0, ocells);
-      e=(*p)->GetTotalEnergy();
-      for(op=ocells.begin(); op!=ocells.end();++op)
-        if ((*op)->GetTotalEnergy()>e) break;
-      if (op==ocells.end())
-	fExcluded[mn++]=*p;
-    }
-  }
-  fExcluded[mn]=NULL;
-}
 /** Form a preclusters.
  ** A precluster --- a group of cells neighbor to maximum cell.
  ** A cluster is a group of preclusters with common cells. **/
 void CbmEcalClusterFinderV2::FormPreClusters()
 {
   Int_t i;
+  Int_t n;
   Int_t j;
   CbmEcalCell* cell;
   Double_t x;
@@ -111,11 +47,18 @@ void CbmEcalClusterFinderV2::FormPreClusters()
   Double_t r;
   Double_t a;
   static Double_t z=fInf->GetZPos();
+  CbmEcalMaximum* max;
 
   ClearPreClusters();
-  for(i=0;fMaximums[i]!=NULL;i++)
+  n=fMaximums->GetEntriesFast();
+  for(i=0;i<n;i++)
   {
-    cell=fMaximums[i];
+    max=(CbmEcalMaximum*)fMaximums->At(i);
+    /** Don't need empty maximums **/
+    if (max==NULL) continue;
+    /** and maximums due to charged tracks **/
+    if (max->Mark()!=0) continue;
+    cell=max->Cell();
     x=cell->GetCenterX();
     y=cell->GetCenterY();
     x*=x; y*=y;
@@ -124,12 +67,14 @@ void CbmEcalClusterFinderV2::FormPreClusters()
     for(j=0;j<fRegions;j++)
       if (fTheta[j]>a)
 	break;
+//    cout << j << endl;
+    max->SetRegion(j);
     if (fCalibration==0)
     {
       if (fPreClusterAlgo[j]==0)
-        FormPreCluster(cell);
+        FormPreCluster(max);
       if (fPreClusterAlgo[j]==1)
-        FormPreClusterNew(cell);
+        FormPreClusterNew(max);
     }
     else
     {
@@ -143,9 +88,9 @@ void CbmEcalClusterFinderV2::FormPreClusters()
 	fE[j]=-1111;
 	fCurAlgo=j;
         if (fPreClusterAlgo[j]==0)
-          FormPreCluster(cell);
+          FormPreCluster(max);
         if (fPreClusterAlgo[j]==1)
-          FormPreClusterNew(cell);
+          FormPreClusterNew(max);
       }
       fTree->Fill();
     }
@@ -153,15 +98,15 @@ void CbmEcalClusterFinderV2::FormPreClusters()
 }
 
 /** A default algorithm of precluster formation **/
-void CbmEcalClusterFinderV2::FormPreCluster(CbmEcalCell* cell)
+void CbmEcalClusterFinderV2::FormPreCluster(CbmEcalMaximum* max)
 {
+  CbmEcalCell* cell=max->Cell();
   Int_t reg=GetRegion(cell);
   if (fCalibration==1) reg=fCurAlgo;
   Int_t i;
   Int_t j;
-  Int_t max;
-  Double_t mine;
-  Double_t maxe;
+  Double_t mine=cell->GetTotalEnergy();
+  Double_t maxe=-1111;
   Double_t e;
   list<CbmEcalCell*> cells;
   list<CbmEcalCell*> cs;
@@ -169,7 +114,6 @@ void CbmEcalClusterFinderV2::FormPreCluster(CbmEcalCell* cell)
   CbmEcalCell* min;
   
   mine=cell->GetTotalEnergy(); min=cell;
-  maxe=-1.0;
   /** Find minimum cell **/
   cell->GetNeighborsList(0, cells);
   for(p=cells.begin();p!=cells.end();++p)
@@ -178,31 +122,25 @@ void CbmEcalClusterFinderV2::FormPreCluster(CbmEcalCell* cell)
       mine=(*p)->GetTotalEnergy();
       min=(*p);
     }
-  for(j=1;j<5;j++)
-  {
-    cell->GetNeighborsList(j, cells);
-    e=0;
-    for(p=cells.begin();p!=cells.end();++p)
-      e+=(*p)->GetTotalEnergy();
-    if (e>maxe)
-    {
-      maxe=e;
-      max=j;
-    }
-  }
+
+  /** Build a precluster **/
+  j=max->I(); maxe=0;
+  cell->GetNeighborsList(j, cells);
+  for(p=cells.begin();p!=cells.end();++p)
+    maxe+=(*p)->GetTotalEnergy();
   maxe+=cell->GetTotalEnergy();
+  /** Check for calibration **/
   if (fCal)
-    if (fCal->GetEnergy(maxe, cell)<fMinClusterE[reg]) return;
+    if (fCal->GetEnergy(maxe+mine, cell)<fMinClusterE[reg]) return;
   else
     if (maxe<fMinClusterE[reg]) return;
-  cell->GetNeighborsList(max, cells);
   cells.push_back(cell);
   if (fUseMinimumCell==1)
     if (find(cells.begin(), cells.end(), min)==cells.end())
       cells.push_back(min);
   if (fCalibration==0)
   {
-    fPreClusters.push_back(new CbmEcalPreCluster(cells, cell, min)); 
+    fPreClusters.push_back(new CbmEcalPreCluster(cells, max, min, mine+maxe)); 
     return;
   }
   else
@@ -213,8 +151,9 @@ void CbmEcalClusterFinderV2::FormPreCluster(CbmEcalCell* cell)
 }
 
 /** A new algorithm of precluster formation **/
-void CbmEcalClusterFinderV2::FormPreClusterNew(CbmEcalCell* cell)
+void CbmEcalClusterFinderV2::FormPreClusterNew(CbmEcalMaximum* maximum)
 {
+  CbmEcalCell* cell=maximum->Cell();
   Int_t i;
   Double_t e2m;
   Double_t e2=0;
@@ -246,21 +185,11 @@ void CbmEcalClusterFinderV2::FormPreClusterNew(CbmEcalCell* cell)
   x=cell->GetCenterX()*max;
   y=cell->GetCenterY()*max;
 
-  for(i=1;i<5;i++)
-  {
-    cell->GetNeighborsList(i, cells);
-    e2m=max;
-    for(p=cells.begin();p!=cells.end();++p)
-      e2m+=(*p)->GetTotalEnergy();
-    if (e2m>e2)
-    { 
-      e2=e2m;
-      imax=i;
-    }
-  }
-  cell->GetNeighborsList(imax, cells);
+  e2=max;
+  cell->GetNeighborsList(maximum->I(), cells);
   for(p=cells.begin();p!=cells.end();++p)
   {
+    e2+=(*p)->GetTotalEnergy();
     x+=(*p)->GetCenterX()*(*p)->GetTotalEnergy();
     y+=(*p)->GetCenterY()*(*p)->GetTotalEnergy();
   }
@@ -302,7 +231,7 @@ void CbmEcalClusterFinderV2::FormPreClusterNew(CbmEcalCell* cell)
 
   if (fCalibration==0)
   {
-    fPreClusters.push_back(new CbmEcalPreCluster(cls, cCl2Size, cell, NULL)); 
+    fPreClusters.push_back(new CbmEcalPreCluster(cls, cCl2Size, maximum, NULL, e)); 
     return;
   }
   else
@@ -362,15 +291,16 @@ Double_t CbmEcalClusterFinderV2::SolveEllipse(CbmEcalCell* cell, Double_t cx, Do
 /** Form clusters from precluster **/
 void CbmEcalClusterFinderV2::FormClusters()
 {
-  /** CbmEcalClusterV1 needs a destructor call :-( **/
+  /** CbmEcalCluster needs a destructor call :-( **/
   fClusters->Delete();
   Int_t fN=0;
   list<CbmEcalPreCluster*>::const_iterator p1=fPreClusters.begin();
   list<CbmEcalPreCluster*>::const_iterator p2;
   list<CbmEcalCell*> cluster;
-  list<CbmEcalCell*> minimums;
   list<CbmEcalCell*>::const_iterator pc;
   list<CbmEcalCell*>::const_iterator pc1;
+  list<CbmEcalMaximum*> maximums;
+  list<Double_t> energy;
   UInt_t oldsize;
   Int_t MaxSize=0;
   Int_t Maximums=0;
@@ -379,11 +309,10 @@ void CbmEcalClusterFinderV2::FormClusters()
   for(;p1!=fPreClusters.end();++p1)
   if ((*p1)->fMark==0)
   {
-    cluster.clear(); oldsize=0;
-    minimums.clear();
+    cluster.clear(); oldsize=0; maximums.clear(); energy.clear();
     cluster=(*p1)->fCells;
-    if ((*p1)->fMinimum!=NULL)
-      minimums.push_back((*p1)->fMinimum);
+    maximums.push_back((*p1)->fMax);
+    energy.push_back((*p1)->fEnergy);
     max=1;
     while(cluster.size()!=oldsize)
     {
@@ -395,11 +324,9 @@ void CbmEcalClusterFinderV2::FormClusters()
         pc=cluster.begin();
 	for(;pc!=cluster.end();++pc)
 	{
-	  if ((*p2)->fMinimum!=NULL&&(*pc)==(*p2)->fMinimum) continue;
+	  if ((*p2)->fMinimum!=NULL) continue;
 	  pc1=find((*p2)->fCells.begin(), (*p2)->fCells.end(), (*pc));
 	  if (pc1==(*p2)->fCells.end()) continue;
-	  pc1=find(minimums.begin(), minimums.end(), (*pc));
-	  if (pc1!=minimums.end()) continue;
 	  break;
 	}
 	if (pc!=cluster.end())
@@ -409,8 +336,8 @@ void CbmEcalClusterFinderV2::FormClusters()
 	  for(;pc!=(*p2)->fCells.end();++pc)
 	    if (find(cluster.begin(), cluster.end(), (*pc))==cluster.end())
 	      cluster.push_back(*pc);
-	  if ((*p2)->fMinimum!=NULL&&find(minimums.begin(), minimums.end(), (*p2)->fMinimum)==minimums.end())
-	    minimums.push_back((*p2)->fMinimum);
+	  maximums.push_back((*p2)->fMax);
+	  energy.push_back((*p2)->fEnergy);
 	  max++;
 	}
       }
@@ -419,8 +346,8 @@ void CbmEcalClusterFinderV2::FormClusters()
     if ((Int_t)cluster.size()>MaxSize)
       MaxSize=cluster.size();
     if (max>Maximums) Maximums=max;
-    CbmEcalClusterV1* cls=new ((*fClusters)[fN]) CbmEcalClusterV1(fN, cluster); fN++;
-    cls->Init(cluster);
+    CbmEcalCluster* cls=new ((*fClusters)[fN]) CbmEcalCluster(fN, cluster, maximums, energy); fN++;
+ //   cls->Init(cluster);
   }
   if (fVerbose>0)
   {
@@ -447,47 +374,6 @@ Int_t CbmEcalClusterFinderV2::GetRegion(CbmEcalCell* cls)
   return i;
 }
 
-/** Locate clusters not belong to charged tracks **/
-void CbmEcalClusterFinderV2::FindMaximums()
-{
-  list<CbmEcalCell*> cells;
-  list<CbmEcalCell*>::const_iterator p;
-  list<CbmEcalCell*>::const_iterator p1;
-  list<CbmEcalCell*> neib;
-  Int_t n=0;
-  Int_t i;
-  Double_t e;
-
-  fStr->GetCells(cells);
-  p=cells.begin();
-  for(;p!=cells.end();++p)
-  {
-    e=(*p)->GetTotalEnergy();
-    if (fCal)
-    {
-      if (fCal->GetEnergy(e, *p)<fMinMaxE[GetRegion(*p)]) continue;
-    }
-    else
-    {
-      if (e<fMinMaxE[GetRegion(*p)]) continue;
-    }
-//    cout << e << " " << fMinMaxE[GetRegion(*p)] << endl;
-    (*p)->GetNeighborsList(0, neib);
-    p1=neib.begin();
-    for(;p1!=neib.end();++p1)
-      if ((*p1)->GetTotalEnergy()>=e) break;
-    if (p1==neib.end())
-    {
-      for(i=0;fExcluded[i]!=NULL;i++)
-	if (fExcluded[i]==(*p)) break;
-      if (fExcluded[i]==NULL) fMaximums[n++]=(*p);
-    }
-  }
-  if (fVerbose>1)
-    Info("FindMaximums", "%d local maximums found in calorimeter.", n);
-  fMaximums[n++]=NULL;
-}
-
 /** Initialization **/
 InitStatus CbmEcalClusterFinderV2::Init()
 {
@@ -504,17 +390,6 @@ InitStatus CbmEcalClusterFinderV2::Init()
     return kFATAL;
   }
   fInf=fStr->GetEcalInf();
-  if (fRemoveCharged==1)
-  {
-    fTracks=(TClonesArray*)io->GetObject("EcalTrackParam");
-    if (!fTracks)
-    {
-      Fatal("Init", "Can't find EcalTrackParam.");
-      return kFATAL;
-    }
-  }
-  else
-    fTracks=NULL;
   if (fUseCalibration==1)
   {
     fCal=(CbmEcalCalibration*)io->GetObject("EcalCalibration");
@@ -526,13 +401,16 @@ InitStatus CbmEcalClusterFinderV2::Init()
   }
   else
     fCal=NULL;
+  fMaximums=(TClonesArray*)io->GetObject("EcalMaximums");
+  if (fMaximums==NULL)
+  {
+    Fatal("Init", "Cant' find array of calorimeter maximums in the system");
+    return kFATAL;
+  }
 
-  fClusters=new TClonesArray("CbmEcalClusterV1", 2000);
+  fClusters=new TClonesArray("CbmEcalCluster", 2000);
   io->Register("EcalClusters", "ECAL", fClusters, kTRUE);
   fEv=0;
-  fMaximums=new CbmEcalCell*[5000];
-  fExcluded=new CbmEcalCell*[5000];
-  fExcluded[0]=NULL;
   return kSUCCESS;
 }
 
@@ -544,8 +422,6 @@ CbmEcalClusterFinderV2::~CbmEcalClusterFinderV2()
     fClusters->Delete();
     delete fClusters;
   }
-  delete fMaximums;
-  delete fExcluded;
   if (fTree)
     delete fTree;
 }
@@ -570,7 +446,6 @@ CbmEcalClusterFinderV2::CbmEcalClusterFinderV2(const char* name, const Int_t ver
   TString st;
   CbmEcalParam* par=new CbmEcalParam("ClusterParam", cfg);
 
-  fRemoveCharged=par->GetInteger("removecharged");
   fUseCalibration=par->GetInteger("usecalibration");
   fRegions=par->GetInteger("regions");
   if (fRegions<0||fRegions>10)

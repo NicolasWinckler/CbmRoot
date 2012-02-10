@@ -23,22 +23,16 @@
 
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHitFastMC::CbmEcalHitFastMC() 
-  : FairHit(),
-    fAmplitude(-1.) 
-{
-}
+CbmEcalHitFastMC::CbmEcalHitFastMC(): FairHit() {}
 // -------------------------------------------------------------------------
 
 // -----   Constructor   -------------------------------------------
 CbmEcalHitFastMC::CbmEcalHitFastMC(Double_t x, Double_t y, Double_t E)
-  : FairHit(),
-    fAmplitude(E)
 {
   // Fill position and energy of the hit
   fX = x;
   fY = y;
-  //  fAmplitude = E;
+  fAmplitude = E;
 }
 // -------------------------------------------------------------------------
 

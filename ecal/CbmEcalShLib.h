@@ -7,8 +7,8 @@
 class CbmEcalShLib : public FairTask
 {
 public:
-  CbmEcalShLib() {};
-  CbmEcalShLib(const char* nm, Int_t verb) : FairTask(nm, verb) {};
+  CbmEcalShLib() : fLibName("EcalShLib") {};
+  CbmEcalShLib(const char* nm, Int_t verb) : FairTask(nm, verb), fLibName("EcalShLib") {};
   // Response to photon with energy e, polar angle phi (rad), impact angle
   // theta (rad). X, Y are position vs. photons impact point
   // Cell is a size os cell in cm.
@@ -17,8 +17,13 @@ public:
   {
     return GetResponse(x, y, phi, theta, e, cell->GetType());
   }
+  // Several libraries can be inside the system.
+  // Example: one for gamma reconstruction, one for identification
+  void SetLibraryName(const char* name) {fLibName=name;}
+  TString LibraryName() const {return fLibName;}
   virtual ~CbmEcalShLib()=0;
 private:
+  TString fLibName;
   ClassDef(CbmEcalShLib, 1);
 };
 

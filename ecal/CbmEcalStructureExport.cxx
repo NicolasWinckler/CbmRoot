@@ -54,7 +54,6 @@ void CbmEcalStructureExport::Exec(Option_t* opt)
     fStructureOut->Branch("x", &fX, "x/F");
     fStructureOut->Branch("y", &fY, "y/F");
     fStructureOut->Branch("e", &fE, "e/F");
-    fStructureOut->Branch("pse", &fPSE, "pse/F");
   }
  
   Int_t n=0;
@@ -67,7 +66,6 @@ void CbmEcalStructureExport::Exec(Option_t* opt)
     if ((*p)->GetTotalEnergy()>0)
     {
       fE=(*p)->GetEnergy();
-      fPSE=(*p)->GetPSEnergy();
       fX=(*p)->GetCenterX();
       fY=(*p)->GetCenterY();
       n++;

@@ -83,16 +83,16 @@ CbmEcalAnalysisShape::CbmEcalAnalysisShape(const char* name, const Int_t iVerbos
 {
   fEv=0;
   fName=fname;
-  fDX=-5;
-  fDY=-5;
+  fDX=-12;
+  fDY=-12;
   fStep=0.1;
 /*
   fStartX=0.05;
   fStartY=30.05;
 */
   fInf=CbmEcalInf::GetInstance(fName);
-  fXSize=25*7;
-  fYSize=25*7;
+  fXSize=30*12;
+  fYSize=30*12;
   fTree=NULL;
   fWriteEach=kFALSE;
 }
@@ -122,6 +122,9 @@ InitStatus CbmEcalAnalysisShape::Init()
     return kFATAL;
   }
   fStep=fInf->GetCellSize();
+  fXSize=30*12*(0.1+0.000001)/fStep;
+  fYSize=30*12*(0.1+0.000001)/fStep;
+  Info("Init()", "fXSize=%f, fYSize=%f", fXSize, fYSize);
   Info("Init", "Using %f cell size", fStep);
   fSize=fXSize*fYSize;
   fShape=new Double_t[fSize];

@@ -16,8 +16,7 @@
 
 #include <iostream>
 
-using std::vector;
-using std::list;
+using namespace std;
 
 void CbmEcalDrawer::Init()
 {
@@ -104,7 +103,7 @@ void CbmEcalDrawer::InitCanvas(TObjArray* arr)
 		if (cell->GetY1()<y1) y1=cell->GetY1();
 		if (cell->GetY2()>y2) y2=cell->GetY2();
 	}
-	InitCanvas((Int_t)(x2-x1),(Int_t)(y2-y1));
+	InitCanvas((Int_t)(x2-x1)*2,(Int_t)(y2-y1)*2);
 	fCX=(Int_t)(x2-x1);
 	fCY=(Int_t)(y2-y1);
 	fCCX=-((Float_t)(x1))/((Float_t)(x2-x1));
@@ -159,7 +158,7 @@ void CbmEcalDrawer::Prepare()
 {
 	fCX=(Int_t)fEcalStructure->GetEcalInf()->GetEcalSize(0);
 	fCY=(Int_t)fEcalStructure->GetEcalInf()->GetEcalSize(1);
-	InitCanvas(fCX,fCY);
+	InitCanvas(fCX*2,fCY*2);
 }
 
 /** Draws cells from TObjArray
@@ -194,6 +193,7 @@ void CbmEcalDrawer::DrawCell(CbmEcalCell* cell, Int_t color)
 {
 	Int_t lcolor;
 	TLine* line;
+        TBox* rect;
 
 	if (cell==NULL) return;
 
@@ -206,14 +206,20 @@ void CbmEcalDrawer::DrawCell(CbmEcalCell* cell, Int_t color)
 	{
 		TColor c;
 		Double_t e=GetEnergy(cell);
-		Float_t r=fFirstColor.GetRed()  *(1.0-e/fMaxEnergy)+fSecondColor.GetRed()  *e/fMaxEnergy;
+/*		Float_t r=fFirstColor.GetRed()  *(1.0-e/fMaxEnergy)+fSecondColor.GetRed()  *e/fMaxEnergy;
 		Float_t g=fFirstColor.GetGreen()*(1.0-e/fMaxEnergy)+fSecondColor.GetGreen()*e/fMaxEnergy;
 		Float_t b=fFirstColor.GetBlue() *(1.0-e/fMaxEnergy)+fSecondColor.GetBlue() *e/fMaxEnergy;
 		c.SetRGB(r,g,b);
 		lcolor=c.GetColor(r,g,b);
+*/
+		Int_t t=(Int_t)(e/fMaxEnergy*9);
+		if (t==9) t=1; else if (t!=0) t=20-t;
+		lcolor=t;
+//		if (e>fMaxEnergy*0.01) lcolor=1;
 	} else
 	if (color==-3)
 		lcolor=fFirstColor.GetColor(fFirstColor.GetRed(), fFirstColor.GetGreen(), fFirstColor.GetBlue());
+	else
 	if (color==-4)
 	{
 		Double_t e=GetEnergy(cell);
@@ -228,10 +234,11 @@ void CbmEcalDrawer::DrawCell(CbmEcalCell* cell, Int_t color)
 	}
 	else
 		lcolor=color;
-	if (lcolor>=0)
+	if (lcolor>0)
 	{
-		TBox* rect=new TBox(x1,y1,x2,y2);
+		rect=new TBox(x1,y1,x2,y2);
 		rect->SetFillColor(lcolor);
+		rect->SetFillStyle(kSolid);
 		rect->Draw();
 		fBoxes.push_back((void*)rect);
 	}

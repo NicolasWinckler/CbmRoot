@@ -12,7 +12,7 @@ public:
   /** An emtry constructor **/
   CbmEcalMaximum() {};
   /** Simplest constructor **/
-  CbmEcalMaximum(CbmEcalCell* cell);
+  CbmEcalMaximum(CbmEcalCell* cell, Double_t z);
   /** Standard constructor **/
   CbmEcalMaximum(CbmEcalCell* cell, Double_t cx, Double_t cy, Double_t x, Double_t y, Int_t i);
   ~CbmEcalMaximum() {};
@@ -24,8 +24,13 @@ public:
   Double_t Y() const {return fY;}
   Int_t I() const {return fI;}
   Int_t Mark() const {return fMark;}
+  /** Region is used for calibration **/
+  Int_t Region() const {return fRegion;}
+  Double_t TanTheta() const {return fTanTheta;}
 
   void SetMark(Int_t mark) {fMark=mark;}
+  void SetRegion(Int_t region) {fRegion=region;}
+  void SetTanTheta(Double_t tantheta) {fTanTheta=tantheta;}
 private:
   CbmEcalCell* fCell;
   /** Coordinates of cell **/
@@ -34,10 +39,14 @@ private:
   /** Coobdinates of center of mass of maximum subcluster **/
   Double_t fX;
   Double_t fY;
+  /** Sqrt(fX*fX+fY*fY)/Z_calorimeter**/
+  Double_t fTanTheta;
   /** Number maximum subcluster **/
   Int_t fI;
   /** A mark. Used for maximum exclusion. **/
   Int_t fMark;
+  /** A calorimeter region **/
+  Int_t fRegion;
 
   ClassDef(CbmEcalMaximum, 1)
 };

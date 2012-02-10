@@ -117,6 +117,9 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
   fThicknessSteel=fInf->GetVariableStrict("steel");
   fEdging=fInf->GetVariableStrict("tileedging");
   fModuleSize=fInf->GetVariableStrict("modulesize");
+  fSimpleGeo=(Int_t)fInf->GetVariableStrict("usesimplegeo");
+  fDX=fInf->GetVariableStrict("xpos");
+  fDY=fInf->GetVariableStrict("ypos");
 
   fInf->AddVariable("ecalversion", "1"); 
   for(i=kN-1;i>-1;i--)
@@ -282,6 +285,8 @@ Bool_t  CbmEcalDetailed::ProcessHits(FairVolume* vol)
     else
       return kFALSE;
 
+  if (fELoss<=0) return kFALSE;
+
   if (fELoss>0)
   {
     Int_t i;
@@ -300,28 +305,66 @@ Bool_t  CbmEcalDetailed::ProcessHits(FairVolume* vol)
 //    cout << "Id: " << p->GetPdgCode() << " (" << x << ", " << y << ", ";
 //    cout << z << "): ";
 //    cout << endl;
-    gMC->CurrentVolOffID(3, mx); mx--;
-    gMC->CurrentVolOffID(4, my); my--;
-    gMC->CurrentVolOffID(2, cell); cell--;
-    Int_t id=(my*100+mx)*100+cell+1;
-    fVolumeID=id;
-    type=fInf->GetType(mx, my);
-    cx=cell%type;
-    cy=cell/type;
-    // An old version
-    // px=mx*fModuleSize-fEcalSize[0]/2.0+cx*fModuleSize/type;
-    // py=my*fModuleSize-fEcalSize[1]/2.0+cy*fModuleSize/type;
-    // With correction for steel tapes and edging
-    px=mx*fModuleSize-fEcalSize[0]/2.0+fXCell[type]*cx+(2*cx+1)*fEdging+fThicknessSteel;
-    py=my*fModuleSize-fEcalSize[1]/2.0+fYCell[type]*cy+(2*cy+1)*fEdging+fThicknessSteel;
-
-    px=(x-px)/fXCell[type];
-    py=(y-py)/fYCell[type];
-    if (px>=0&&px<1&&py>=0&&py<1)
+/*
+    for(i=0;i<10;i++)
     {
-      fELoss*=fLightMaps[type]->Data(px-0.5, py-0.5);
-      FillLitePoint(0);
+      gMC->CurrentVolOffID(i, mx); cout << i << ":" << mx << ", ";
     }
+    cout << endl;
+*/
+    if (fSimpleGeo==0)
+    {
+      gMC->CurrentVolOffID(3, mx); mx--;
+      gMC->CurrentVolOffID(4, my); my--;
+      gMC->CurrentVolOffID(2, cell); cell--;
+    }
+    else
+    {
+      gMC->CurrentVolOffID(2, mx); mx--;
+      gMC->CurrentVolOffID(3, my); my--;
+      gMC->CurrentVolOffID(1, cell); cell--;
+    }
+    Int_t id=(my*100+mx)*100+cell+1;
+/*   
+    Float_t rx; Float_t ry; Int_t ten;
+    GetCellCoordInf(id, rx, ry, ten); rx--; ry--;
+    type=fInf->GetType(mx, my);
+    Float_t d=fInf->GetVariableStrict("modulesize")/type;
+    if (x>rx-0.001&&x<rx+d+0.001&&y>ry-0.001&&y<ry+d+0.001) 
+    {
+//      cout << "+++ ";
+      ;
+    }
+    else
+    {
+      cout << mx << ", " << my << ", " << cell << endl;
+      cout << "--- ";
+      cout << "(" << x << ", " << y << ") : (" << rx << ", " << ry << ")" << endl; 
+    }
+*/
+    fVolumeID=id;
+    if (fSimpleGeo==0)
+    {
+      type=fInf->GetType(mx, my);
+      cx=cell%type;
+      cy=cell/type;
+      // An old version
+      // px=mx*fModuleSize-fEcalSize[0]/2.0+cx*fModuleSize/type;
+      // py=my*fModuleSize-fEcalSize[1]/2.0+cy*fModuleSize/type;
+      // With correction for steel tapes and edging
+      px=mx*fModuleSize-fEcalSize[0]/2.0+fXCell[type]*cx+(2*cx+1)*fEdging+fThicknessSteel;
+      py=my*fModuleSize-fEcalSize[1]/2.0+fYCell[type]*cy+(2*cy+1)*fEdging+fThicknessSteel;
+
+      px=(x-px)/fXCell[type];
+      py=(y-py)/fYCell[type];
+      if (px>=0&&px<1&&py>=0&&py<1)
+      {
+        fELoss*=fLightMaps[type]->Data(px-0.5, py-0.5);
+        FillLitePoint(0);
+      }
+    }
+    else
+      FillLitePoint(0);
 //    for(i=0;i<8;i++)
 //    {
 //      Int_t t;
@@ -407,6 +450,8 @@ Bool_t CbmEcalDetailed::FillLitePoint(Int_t volnum)
       fTrackID=part->GetFirstMother();
       part =((CbmStack*)gMC->GetStack())->GetParticle(fTrackID);
     }
+//  if (part->Vz()>500)
+//    cout << part->Vx() << ", " << part->Vy() << ", " << part->Vz() << endl;
 #ifdef _DECAL
   if (fTrackID<0) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!fTrackID="<<fTrackID<<endl;
 #endif
@@ -515,8 +560,8 @@ void CbmEcalDetailed::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t off
 // -----   Public method Register   ----------------------------------------
 void CbmEcalDetailed::Register()
 {
-  FairRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
-  FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
+  FairRootManager::Instance()->Register("EcalPoint","Ecal",fEcalCollection,kTRUE);
+  FairRootManager::Instance()->Register("EcalPointLite","EcalLite",fLiteCollection,kTRUE);
   ;
 }
 // -------------------------------------------------------------------------
@@ -547,10 +592,16 @@ void CbmEcalDetailed::ConstructGeometry()
 
   /** Initialize all media **/
   InitMedia();
-
+//TODO!!! 
+//  A temporary increase of sensitive volume size to cover up to 45 degrees of acceptance 
+  par[0]=fZEcal/2.0+0.1;
+  par[1]=fZEcal/2.0+0.1;
+  par[2]=moduleth/2.0+0.1;
+/*
   par[0]=fEcalSize[0]/2.0+0.1;
   par[1]=fEcalSize[1]/2.0+0.1;
   par[2]=moduleth/2.0+0.1;
+*/
   volume=gGeoManager->Volume("Ecal", "BOX",  gGeoManager->GetMedium("SensVacuum")->GetId(), par, 3);
   gGeoManager->Node("Ecal", 1, "cave", 0.0,0.0, fZEcal+par[2]-0.05, 0, kTRUE, buf, 0);
   // An ugly way!!!
@@ -560,7 +611,10 @@ void CbmEcalDetailed::ConstructGeometry()
 
   for(i=1;i<cMaxModuleType;i++)
     if (fModulesWithType[i]>0)
-      ConstructModule(i);
+      if (fSimpleGeo==0)
+	ConstructModule(i);
+      else
+	ConstructModuleSimple(i);
  
   TGeoVolume* vol=new TGeoVolumeAssembly("EcalStructure");
   for(i=0;i<fYSize;i++)
@@ -578,7 +632,9 @@ void CbmEcalDetailed::ConstructGeometry()
     gGeoManager->Node(nm.Data(), i+1, "EcalStructure", 0.0, y, 0.0, 0, kTRUE, buf, 0);
 //    cout << endl << flush;
   }
-  gGeoManager->Node("EcalStructure", 1, "Ecal", 0.0, 0.0, 0.0, 0, kTRUE, buf, 0);
+//TODO:
+//Should move the guarding volume, not structure itself
+  gGeoManager->Node("EcalStructure", 1, "Ecal", fDX, fDY, 0.0, 0, kTRUE, buf, 0);
 }
 // -------------------------------------------------------------------------
 
@@ -707,6 +763,41 @@ void CbmEcalDetailed::ConstructModule(Int_t type)
 }
 // -------------------------------------------------------------------------
 
+// -----   Private method ConstructModuleSimple-----------------------------    
+void CbmEcalDetailed::ConstructModuleSimple(Int_t type)
+{
+  if (fModules[type]!=NULL) return;
+  ConstructCellSimple(type);
+
+  TString nm="EcalModule"; nm+=type;
+  TString nm1;
+  TString cellname="EcalCell"; cellname+=type;
+  Int_t i;
+  Int_t j;
+  Int_t n;
+  Float_t x;
+  Float_t y;
+  Float_t* buf=NULL;
+  Double_t thickness=fThicknessLead+fThicknessScin+fThicknessTyvk*2;
+  Double_t moduleth=thickness*fNLayers;
+  Double_t par[3]={fModuleSize/2.0, fModuleSize/2.0, moduleth/2.0};
+
+//  TGeoVolume* modulev=new TGeoVolumeAssembly(nm);
+  TGeoVolume* modulev=gGeoManager->Volume(nm.Data(), "BOX",  gGeoManager->GetMedium("ECALAir")->GetId(), par, 3);
+
+  //Adding cells into module
+  for(i=0;i<type;i++)
+  for(j=0;j<type;j++)
+  {
+    x=(i-type/2.0+0.5)*(fXCell[type]);
+    y=(j-type/2.0+0.5)*(fYCell[type]);
+    n=i+j*type+1;
+    gGeoManager->Node(cellname.Data(), n, nm.Data(), x, y, 0.0, 0, kTRUE, buf, 0);
+  }
+  fModuleLenght=moduleth;
+}
+// -------------------------------------------------------------------------
+
 // -----   Private method ConstructCell ------------------------------------    
 void CbmEcalDetailed::ConstructCell(Int_t type)
 {
@@ -725,6 +816,37 @@ void CbmEcalDetailed::ConstructCell(Int_t type)
   Double_t* buf=NULL;
   Double_t moduleth=thickness*fNLayers;
   Double_t par[3]={fXCell[type]/2.0+fEdging, fYCell[type]/2.0+fEdging, moduleth/2.0};
+//  TGeoVolume* cellv=new TGeoVolumeAssembly(nm);
+  TGeoVolume* cellv=gGeoManager->Volume(nm.Data(),"BOX", gGeoManager->GetMedium("ECALAir")->GetId(), par, 3);
+  for(i=0;i<fNLayers;i++)
+  {
+    gGeoManager->Node(scin.Data(), i+1, nm.Data(), 0.0, 0.0, -thickness*fNLayers/2.0+fThicknessScin/2.0+i*thickness, 0, kTRUE, buf, 0);
+    gGeoManager->Node(lead.Data(), i+1, nm.Data(), 0.0, 0.0, -thickness*fNLayers/2.0+fThicknessScin+i*thickness+fThicknessTyvk+fThicknessLead/2.0, 0, kTRUE, buf, 0);
+    gGeoManager->Node(tyvek.Data(), 2*i+1, nm.Data(), 0.0, 0.0, -thickness*fNLayers/2.0+fThicknessScin+i*thickness+1.5*fThicknessTyvk+fThicknessLead, 0, kTRUE, buf, 0);
+    gGeoManager->Node(tyvek.Data(), 2*i+2, nm.Data(), 0.0, 0.0, -thickness*fNLayers/2.0+fThicknessScin+i*thickness+0.5*fThicknessTyvk, 0, kTRUE, buf, 0);
+  }
+  fCells[type]=cellv;
+}
+// -------------------------------------------------------------------------
+
+// -----   Private method ConstructCellSimple ------------------------------    
+void CbmEcalDetailed::ConstructCellSimple(Int_t type)
+{
+  if (fCells[type]!=NULL) return;
+
+  ConstructTileSimple(type, 0);
+  ConstructTileSimple(type, 1);
+  if (fThicknessTyvk>0) ConstructTileSimple(type, 2);
+
+  Double_t thickness=fThicknessLead+fThicknessScin+fThicknessTyvk*2;
+  Int_t i;
+  TString nm="EcalCell"; nm+=type;
+  TString scin="ScTile"; scin+=type;
+  TString lead="LeadTile"; lead+=type;
+  TString tyvek="TvTile"; tyvek+=type;
+  Double_t* buf=NULL;
+  Double_t moduleth=thickness*fNLayers;
+  Double_t par[3]={fXCell[type]/2.0, fYCell[type]/2.0, moduleth/2.0};
 //  TGeoVolume* cellv=new TGeoVolumeAssembly(nm);
   TGeoVolume* cellv=gGeoManager->Volume(nm.Data(),"BOX", gGeoManager->GetMedium("ECALAir")->GetId(), par, 3);
   for(i=0;i<fNLayers;i++)
@@ -919,6 +1041,74 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
 }
 // -------------------------------------------------------------------------
 
+// -----   Private method ConstructTileSimple ------------------------------    
+void CbmEcalDetailed::ConstructTileSimple(Int_t type, Int_t material)
+{
+  switch (material)
+  {
+    case 0: if (fScTiles[type]!=NULL) return; break;
+    case 1: if (fPbTiles[type]!=NULL) return; break;
+    case 2: if (fTvTiles[type]!=NULL) return; break;
+    default: Error("ConstructTileSimple", "Can't construct a tile of type %d.", material);
+  }
+  Double_t thickness;
+  TGeoVolume* hole;
+  TGeoVolume* fiber;
+  TGeoTranslation** tr;
+  TGeoTranslation* tm;
+  Int_t nh=fNH[type];
+  Int_t i;
+  Int_t j;
+  TString nm;
+  TString nm1;
+  TString nm2;
+  TString medium;
+  Double_t x;
+  Double_t y;
+  TGeoBBox* tile;
+  TGeoVolume* tilev;
+  TGeoBBox* edging;
+  TGeoVolume* edgingv;
+  Double_t* buf=NULL;
+
+  switch (material)
+  {
+    case 0: thickness=fThicknessScin/2.0; break;
+    case 1: thickness=fThicknessLead/2.0; break;
+    case 2: thickness=fThicknessTyvk/2.0; break;
+    default: Error("ConstructTile", "Can't construct a tile of type %d.", material);
+  }
+
+  /** Building tile **/
+  switch (material)
+  {
+    case 0: nm="ScTile"; medium="Scintillator"; break;
+    case 1: nm="LeadTile"; medium="Lead"; break;
+    case 2: nm="TvTile"; medium="Tyvek"; break;
+    default: Error("ConstructTile", "Can't construct a tile of type %d.", material);
+  }
+
+  nm+=type;
+  tile=new TGeoBBox(fXCell[type]/2.0, fYCell[type]/2.0, thickness);
+  tilev=new TGeoVolume(nm, tile, gGeoManager->GetMedium(medium));
+  /** Adding edging to scintillator **/
+  if (material==0)
+  {
+    AddSensitiveVolume(tilev);
+    fScTiles[cMaxModuleType]=tilev;
+    fTileEdging[cMaxModuleType]=tilev;
+  }
+  else
+  {
+    if (material==1) //Lead
+      fPbTiles[type]=tilev;
+    else
+      fTvTiles[type]=tilev;
+    return;
+  }
+}
+// -------------------------------------------------------------------------
+
 // ----- Public method GetCellCoordInf ----------------------------------------
 Bool_t CbmEcalDetailed::GetCellCoordInf(Int_t fVolID, Float_t &x, Float_t &y, Int_t& tenergy)
 {
@@ -939,13 +1129,17 @@ Bool_t CbmEcalDetailed::GetCellCoordInf(Int_t fVolID, Float_t &x, Float_t &y, In
   Int_t type=inf->GetType(mx, my);
   Int_t cx=cell%type;
   Int_t cy=cell/type;
+//  cout << "->" << mx << ", " << my << ", " << cell << endl;
   static Float_t modulesize=inf->GetVariableStrict("modulesize");
   static Float_t xcalosize=inf->GetEcalSize(0);
   static Float_t ycalosize=inf->GetEcalSize(1);
-  x=mx*modulesize-xcalosize/2.0+cx*modulesize/type+1.0;
-  y=my*modulesize-ycalosize/2.0+cy*modulesize/type+1.0;
+  static Float_t dx=inf->GetVariableStrict("xpos");
+  static Float_t dy=inf->GetVariableStrict("ypos");
+  x=mx*modulesize-xcalosize/2.0+cx*modulesize/type+1.0; x+=dx;
+  y=my*modulesize-ycalosize/2.0+cy*modulesize/type+1.0; y+=dy;
   tenergy=0;
 
+//  cerr << fVolID << " --- " << x << ", " << y << endl;
   return kFALSE;
 }
 

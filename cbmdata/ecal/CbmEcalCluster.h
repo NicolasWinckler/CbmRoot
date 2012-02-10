@@ -1,144 +1,106 @@
-// -------------------------------------------------------------------------
-// -----                  CbmEcalCluster header file                   -----
-// -----                 Created 12/07/06  by D.Konstantinov           -----
-// -------------------------------------------------------------------------
-
-/**  CbmEcalCluster.h
- *@author D.Konstantinov 
- **
- ** ECAL cluster is a group of cells with common edge
- **/
-
-/* $Id: CbmEcalCluster.h,v 1.2 2006/07/19 15:29:03 kharlov Exp $ */
-
-/* History of cvs commits:
- *
- * $Log: CbmEcalCluster.h,v $
- * Revision 1.2  2006/07/19 15:29:03  kharlov
- * Init geometry via constuctor, add cluster hit multiplicity, commenting
- *
- * Revision 1.1  2006/07/12 14:22:56  kharlov
- * Adding ClusterFinder
- *
- */
-
 #ifndef CBMECALCLUSTER_H
 #define CBMECALCLUSTER_H
 
-#include "CbmEcalHit.h"
-
 #include "TObject.h"
-#include "TClonesArray.h"
+#include "TArrayI.h"
+#include "TArrayD.h"
+#include <list>
 
-#include <iostream>
-#include <vector>
+#include "CbmEcalCell.h"
 
+class CbmEcalRecParticle;
+class CbmEcalMaximum;
+
+struct CbmEcalClusterSortProcess : public std::binary_function<CbmEcalCell*, CbmEcalCell*, Bool_t>
+{
+  inline Bool_t operator()(const CbmEcalCell* left, const CbmEcalCell* right) const
+  {
+    if (left->GetTotalEnergy()<right->GetTotalEnergy())
+      return kTRUE;
+    return kFALSE;
+  }
+};
+
+/** A temporary cluster needed for debugging of cluster finder procedure **/
 class CbmEcalCluster : public TObject
 {
+friend class CbmEcalReco;
+friend class CbmEcalReco2;
+friend class CbmEcalRecoCorr;
+friend class CbmEcalClusterFinder;
+friend class CbmEcalClusterFinderV2;
 public:
+  /** An empty constructor **/
+  CbmEcalCluster();
+  /** A standard constructor **/ 
+  CbmEcalCluster(Int_t num, const std::list<CbmEcalCell*>& cluster);
+  /** A more advanced constructor. Should use this. **/
+  CbmEcalCluster(Int_t num, const std::list<CbmEcalCell*>& cluster, const std::list<CbmEcalMaximum*>& maximums, const std::list<Double_t>& energy);
+  /** Number of cluster in event **/
+  inline Int_t Number() const {return fNum;}
+  /** Size of cluster **/
+  inline Int_t Size() const {return fSize;}
+  /** Number of maximums in cluster **/
+  inline Int_t Maxs() const {return fMaxs;}
+  /** Energy of cluster **/
+  inline Double_t Energy() const {return fEnergy;}
+  /** Average type of cells in cluster **/
+  inline Double_t Type() const {return fType;}
+  /** Second moment **/
+  inline Double_t Moment() const {return fMoment;}
+  /** Moment over X axis **/
+  inline Double_t MomentX() const {return fMomentX;}
+  /** Moment over Y axis **/
+  inline Double_t MomentY() const {return fMomentY;}
+  /** Coordinates of cluster centre of gravity **/
+  inline Double_t X() const {return fX;}
+  inline Double_t Y() const {return fY;}
+  /** \chi^2 of cluster after fitting **/
+  inline Double_t Chi2() const {return fChi2;}
 
-  /** Default constructor **/
- CbmEcalCluster() : TObject(), fHitMult(0), fX(0), fY(0), 
-    fM2x(0.), fM2y(0.), fEnergy(0.), fPosList() {};
-
-  /** Constructor which cleans a vector of hits **/
- CbmEcalCluster( Int_t detId): TObject(), fHitMult(0), fX(0), fY(0), 
-    fM2x(0.), fM2y(0.), fEnergy(0.), fPosList()
-  {  
-    fPosList.clear();
-    fPosList.push_back(detId);
-  };
-
-  // Constructor which fills a vector of hits **/
-  CbmEcalCluster( std::vector<Int_t> myvec, Double32_t energy )
-    : TObject(), fHitMult(0), fX(0), fY(0), fM2x(0.), fM2y(0.), 
-    fEnergy(energy), fPosList() 
-  {
-    fPosList.clear();
-    fPosList = myvec;
-  }
-  
-
-  /** Destructor **/
+  /** Getters for cells and peaks **/
+  inline Int_t CellNum(Int_t i) const {return fCellNums[i];}
+  inline Int_t PeakNum(Int_t i) const {return fPeakNums[i];}
+  inline Double_t PreEnergy(Int_t i) const {return fPreEnergy[i];}
+  inline CbmEcalMaximum* Maximum(Int_t i) const {return fMaximums[i];}
+  /** An virtual destructor **/
   virtual ~CbmEcalCluster();
-
-  /** Output to screen **/
-  virtual void Print(const Option_t* opt ="") const
-  {
-    printf(" Cluster :");
-    printf("   %d cells", (Int_t)fPosList.size());
-    printf("  Coordinates X,Y = %f,%f ", fX,fY);
-    printf("  Moments m2x, m2y = %f, %f \n ",fM2x ,  fM2y); 
-  };
-
-
-  /** Add a hit index to a vector of hits **/
-  void AddHitIndex(Int_t hitIndex) {fPosList.push_back(hitIndex);}
-
-  /** Set the cluster energy **/
-  void SetEnergy(Double32_t energy) {fEnergy = energy;}
-
-  /** Set the cluster gravity center **/
-  void SetXY(Float_t xCenter, Float_t yCenter) {fX = xCenter; fY = yCenter;}
-
-  /** Return the cluster gravity center along X **/
-  Float_t GetX() {return fX;}
-
-  /** Return the cluster gravity center along Y **/
-  Float_t GetY() {return fY;}
-
-  /** Set the two second moments of the cluster, M2x and M2y **/
-  void SetLambdas(Float_t lambda0, Float_t lambda1) {fM2x = lambda0; fM2y = lambda1;}
-  
-  /** Return the larger second moment of the cluster **/
-  Float_t GetM2x() {return fM2x;}
-
-  /** Return the smaller second moment of the cluster **/
-  Float_t GetM2y() {return fM2y;}
-
-  /** Return the cluster energy **/
-  Double32_t GetEnergy() {return fEnergy;}
-
-  /** Set the hit multiplicity of a cluster **/
-  void SetSize(Int_t mult) {fHitMult=mult;}
-
-  /** Return the hit multiplicity of a cluster **/
-  Int_t GetSize() {return fPosList.size();}
-
-  /** Return the index in TClonesArray of hits for a hit[pos] of a cluster **/  
-  Int_t GetHitIndex(Int_t pos) {return fPosList[pos];}
-
-  /** Clear the vector of hits of a cluster **/
-  void Clear() {fPosList.clear();}
-
-  /** Return the vectors of hits of a cluster **/
-  std::vector<Int_t> GetVector() {return fPosList;}
-
 private:
+  /** An initialization **/
+  void Init(std::list<CbmEcalCell*>& cls);
+  /** Cluster number **/
+  Int_t fNum;
+  /** Cluster size in cells
+   ** A separate variable. fCells not stored **/
+  Int_t fSize;
+  /** Number of maximums in cluster **/
+  Int_t fMaxs;
+  /** Energy of cluster **/
+  Double_t fEnergy;
+  /** Type is an average of type of cells in cluster **/
+  Double_t fType;
+  /** Second moment **/
+  Double_t fMoment;
+  /** Moment over X axis **/
+  Double_t fMomentX;
+  /** Moment over Y axis **/
+  Double_t fMomentY;
+  /** Coordinates of cluster centre of gravity **/
+  Double_t fX;
+  Double_t fY;
+  /** \chi^2 after fitting **/
+  Double_t fChi2;
+  
+  /** Serial numbers of cells in cluster **/
+  TArrayI fCellNums;
+  /** Serial numbers of peaks in cluster **/
+  TArrayI fPeakNums;
+  /** An energy deposition in peak areas  (preclusters)  **/
+  TArrayD fPreEnergy;
+  /** Serial numbers of maximums in system **/
+  CbmEcalMaximum** fMaximums;		//!
 
-  /** Cluster hit multiplicity **/
-  Float_t fHitMult;  
+  ClassDef(CbmEcalCluster, 1)
+};
 
-  /** X-gravity center of a cluster **/
-  Float_t fX;  
-
-  /** Y-gravity center of a cluster **/
-  Float_t fY;
-
-  /** Larger second moment of a cluster **/
-  Float_t fM2x;
-
-  /** Smaller second moment of a cluster **/
-  Float_t fM2y;
-
-  /** Total detected of a cluster **/
-  Float_t fEnergy;  
-
-  /** Vector of hit indices in TClonesArray of hits **/
-  std::vector<Int_t> fPosList;
-
-  ClassDef(CbmEcalCluster,1)
-
- };
-
-#endif //
+#endif

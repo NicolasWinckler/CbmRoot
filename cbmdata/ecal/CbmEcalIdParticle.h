@@ -15,12 +15,11 @@
 #include "TLorentzVector.h"
 
 
-class CbmEcalClusterV1;
+class CbmEcalCluster;
 class CbmEcalCell;
 
 class CbmEcalIdParticle : public TObject
 {
-friend class CbmEcalRecoSlow;
 public:
 
   /** Default constructor **/

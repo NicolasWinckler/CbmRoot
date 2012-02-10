@@ -425,13 +425,19 @@ void CbmEcalInf::CalculateHoleSize()
 	  hsy=i;
 	}
 	if (j<hsx) {
-	  cerr << "Error: At the moment we can describe only rect hole shapes." << endl;
+	  Info("CalculateHoleSize", "Caorimeter hole is not rectangular.");
+	  AddVariable("xholesize","-1111");
+	  AddVariable("yholesize","-1111");
+//	  cout << "Error: At the moment we can describe only rect hole shapes." << endl;
 	  return;
 	}
 	if (i==hsy)
 	  hex=j;
 	if (j>hex) {
-	  cerr << "Error: At the moment we can describe only rect hole shapes." << endl;
+	  Info("CalculateHoleSize", "Calorimeter hole is not rectangular.");
+	  AddVariable("xholesize","-1111");
+	  AddVariable("yholesize","-1111");
+//	  cerr << "Error: At the moment we can describe only rect hole shapes." << endl;
 	  return;
 	}
 	hey=i;
@@ -460,10 +466,37 @@ void CbmEcalInf::DumpContainer() const
   }
   TObjString* key;
   TIterator* iter=fEcalStr.MakeIterator();
+
+  Int_t modules=0;
+  Int_t channels=0;
+  Int_t i;
+  Int_t j;
+  Int_t m[10];
+  char stri[2]={0, 0};
+  TString st;
+  for(i=0;i<10;i++) m[i]=0;
+
   while((key=(TObjString*)iter->Next())!=NULL)
   {
+    st=key->String();
     cout << key->String() << endl;
+    for(i=0;i<st.Length();i++)
+    {
+      stri[0]=st[i];
+      j=atoi(stri);
+      m[j]++;
+      if (j) modules++;
+      channels+=j*j;
+    }
   }
+  cout << "Total modules:  " << modules << endl;
+  cout << "Total channels: " << channels << endl;
+  for(i=1;i<10;i++)
+  {
+    if (m[i]==0) continue;
+    cout << "	Type " << i << " : modules=" << m[i] << ", channels=" << m[i]*i*i << endl;
+  }
+
 }
 
 void CbmEcalInf::FillGeoPar(CbmGeoEcalPar* par,Int_t write_str) const

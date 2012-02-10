@@ -15,7 +15,7 @@
 #include "CbmEcalStructure.h"
 #include "CbmEcalInf.h"
 #include "CbmEcalPoint.h"
-#include "CbmEcalClusterV1.h"
+#include "CbmEcalCluster.h"
 
 #include <iostream>
 

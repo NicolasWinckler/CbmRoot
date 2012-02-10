@@ -35,31 +35,32 @@ CbmEcalHitProducer.cxx
 CbmGeoEcalPar.cxx CbmEcalDrawer.cxx 
 CbmEcalContFact.cxx CbmGeoEcal.cxx  
 CbmEcalAnalysisDS.cxx CbmEcalAnalysis.cxx 
-CbmEcalCell.cxx CbmEcalModule.cxx CbmEcalStructure.cxx 
-CbmEcalHitProducerFastMC.cxx 
-CbmEcalRecParticle.cxx CbmEcalIdParticle.cxx
-CbmEcalReconstructionFastMC.cxx CbmEcalClusterFinder.cxx 
+CbmEcalModule.cxx CbmEcalStructure.cxx 
+CbmEcalHitProducerFastMC.cxx  CbmEcalCellMC.cxx
+CbmEcalReconstructionFastMC.cxx
 CbmEcalPhotonCalibrator.cxx CbmEcalShowerCalibrator.cxx 
 CbmEcalUrqmdCalibrator.cxx CbmEcalSCurveLib.cxx 
 CbmEcalSCurveLibRecord.cxx CbmEcalOShowerCalibrator.cxx 
-CbmEcalShowerLib.cxx CbmEcalTrackExtrapolation.cxx
+CbmEcalTrackExtrapolation.cxx
 CbmEcalTracking.cxx CbmEcalStructureFiller.cxx
 CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
-CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
-CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx CbmEcalClusterFinderV2.cxx
+CbmEcalQualityCheck.cxx CbmEcalClusterFinderV2.cxx
 CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
-CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
+CbmEcalParam.cxx CbmEcalMatching.cxx
 CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx CbmEcalAnalysisMaterial.cxx
 CbmEcalAnalysisNeutron.cxx CbmEcalTimeDigitizer.cxx
-CbmEcalIdentification.cxx CbmEcalLightMap.cxx CbmEcalDrawer2.cxx
+CbmEcalLightMap.cxx CbmEcalDrawer2.cxx
 CbmEcalAnalysisCluster.cxx CbmEcalAnalysisUniformity.cxx
 CbmEcalAnalysisDst.cxx CbmEcalAnalysisBSh.cxx
-CbmEcalCalibrationV2.cxx CbmEcalAnalysisSimple.cxx CbmEcalIdentification2.cxx
-CbmEcalMaximum.cxx CbmEcalMaximumLocator.cxx CbmEcalAnalysisJPsi.cxx
+CbmEcalCalibrationV2.cxx CbmEcalAnalysisSimple.cxx CbmEcalIdentification.cxx
+CbmEcalMaximumLocator.cxx CbmEcalAnalysisJPsi.cxx
 CbmEcalAnalysisSShape.cxx CbmEcalAnalysisShape.cxx
 CbmEcalShLibRecord.cxx CbmEcalShLib.cxx CbmEcalShLibTable.cxx
-CbmEcalClusterFinderV3.cxx CbmEcalRecoSlow2.cxx
-CbmEcalAnalysisEres.cxx
+CbmEcalClusterFinder.cxx CbmEcalReco.cxx
+CbmEcalAnalysisEres.cxx CbmEcalPosLib.cxx CbmEcalReco2.cxx
+CbmEcalShLibCorr.cxx CbmEcalShLibCorrTable.cxx
+CbmEcalShLibCorrRecord.cxx CbmEcalRecoCorr.cxx
+CbmEcalDigi.cxx CbmEcalPrepare.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

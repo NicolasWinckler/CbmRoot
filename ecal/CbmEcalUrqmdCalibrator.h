@@ -101,7 +101,6 @@ private:
   Float_t fMCPY;
   Float_t fMCPZ;
 
-  Float_t fPSE;
 
   Float_t fE;
 
@@ -109,7 +108,6 @@ private:
   Float_t fE2x2;
   Float_t fE3x3;
 
-  Float_t fTrackPSE;
   Float_t fTrackE2x2;
   Float_t fTrackE3x3;
   /** Total energy deposited by track in calorimeter **/

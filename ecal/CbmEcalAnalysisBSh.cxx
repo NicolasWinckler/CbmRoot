@@ -553,7 +553,7 @@ InitStatus CbmEcalAnalysisBSh::Init()
     Fatal("Init", "Can't find an array of MC tracks");
     return kFATAL;
   }
-  fMC=(TClonesArray*)fManager->GetObject("ECALPoint");
+  fMC=(TClonesArray*)fManager->GetObject("EcalPoint");
   if (!fMC)
   {
     Fatal("Init", "Can't find an array of ECAL points.");

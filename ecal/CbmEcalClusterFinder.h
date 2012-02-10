@@ -1,115 +1,74 @@
-// -------------------------------------------------------------------------
-// -----                  CbmEcalClusterFinder header file             -----
-// -----                 Created 12/07/06  by D.Konstantinov           -----
-// -------------------------------------------------------------------------
-
-/**  CbmEcalClusterFinder.h
- *@author D.Konstantinov 
- **
- ** Task for ECAL clusterization, which is a procedure to group the hits with
- ** the common edge
- **/
-
-/* $Id: CbmEcalClusterFinder.h,v 1.3 2006/07/19 15:29:03 kharlov Exp $ */
-
-/* History of cvs commits:
- *
- * $Log: CbmEcalClusterFinder.h,v $
- * Revision 1.3  2006/07/19 15:29:03  kharlov
- * Init geometry via constuctor, add cluster hit multiplicity, commenting
- *
- * Revision 1.2  2006/07/19 14:21:38  kharlov
- * Set W0 is included
- *
- * Revision 1.1  2006/07/12 14:22:56  kharlov
- * Adding ClusterFinder
- *
- */
+/** A simple and modern version of CbmEcalClusterFinder
+ ** Produces a CbmEcalCluster. **/
 
 #ifndef CBMECALCLUSTERFINDER_H
 #define CBMECALCLUSTERFINDER_H
 
-
-#include "CbmEcalInf.h"
-#include "CbmEcalStructure.h"
-#include "CbmEcal.h"
-#include "CbmEcalHit.h"
-#include "CbmEcalCluster.h"
-
-#include "TClonesArray.h"
-
-#include "CbmStack.h"
 #include "FairTask.h"
+#include <list>
 
-class CbmEcalClusterFinder : public FairTask {
+class TClonesArray;
+class CbmEcalStructure;
+class CbmEcalCell;
+class CbmEcalInf;
+class CbmEcalCalibration;
+class CbmEcalPreCluster;
+class CbmEcalMaximum;
 
-
+class CbmEcalClusterFinder: public FairTask
+{
 public:
- 
-  /** Default constructor **/
-  CbmEcalClusterFinder();
-  
   /** Standard constructor **/
-  CbmEcalClusterFinder(const char *name, const Int_t iVerbose=1, 
-		       const char *fileGeo="ecal_FullMC.geo");
+  CbmEcalClusterFinder(const char* name, const Int_t verbose, const char* cfg);
+  /** Only to comply with frame work. **/
+  CbmEcalClusterFinder();
 
   /** Destructor **/
   virtual ~CbmEcalClusterFinder();
-  
-  /** Initialization of the task **/  
-  virtual InitStatus Init();
 
-  /** Executed task **/ 
-  virtual void Exec(Option_t* option);
-
-  /** Finish task **/ 
+  /** Finish a task **/
   virtual void Finish();
 
-  /** Add a new cluster to array of clusters **/
-  void AddCluster(CbmEcalCluster * cl, Double32_t energy);
+  /** Exec a task **/
+  virtual void Exec(Option_t* option);
 
-  /** Evaluate cluster parameters **/
-  void Calculate(TClonesArray * hitsArray, CbmEcalCluster * cl);
-
-  /** Set logarithmic weight threshold wzero **/
-  void SetWzero(Float_t wzero) {fWzero = wzero;}
-
-  /** Set hit threshold **/
-  void SetHitThreshold(Float_t eMin) {fHitThreshold = eMin;}
+  /** Initialization **/
+  virtual InitStatus Init();
 private:
+  /** Form clusters from precluster **/
+  void FormClusters();
+  /** Form a preclusters **/
+  void FormPreClusters();
+  /** Clear a preclusters list **/
+  void ClearPreClusters();
+  /** Current event **/
+  Int_t fEv;
 
-  /** ECAL structure **/
-  CbmEcalStructure* fStr;
+  /** Array of maximums in calorimeter.
+   ** Maximums belong to charged tracks excluded. **/
+  TClonesArray* fMaximums;		//!
+  /** An array of clusters **/
+  TClonesArray* fClusters;		//!
+  /** A calorimeter structure **/
+  CbmEcalStructure* fStr;		//!
+  /** An information about calorimeter **/
+  CbmEcalInf* fInf;			//!
+  /** A calibration **/
+  CbmEcalCalibration* fCal;		//!
 
-  /** ECAL geometry container **/
-  CbmEcalInf* fInf;
+  /** A list of preclusters
+   ** May be better use TClonesArray? **/
+  std::list<CbmEcalPreCluster*> fPreClusters;		//!
 
-  /** ECAL object **/
-  CbmEcal* fEcal;
+  /** Minimum precluster energy **/
+  Double_t fMinClusterE;
+  /** Minimum cell energy **/
+  Double_t fMinCellE;
+  /** Minimum energy of precluster maximum for consideration **/
+  Double_t fMinMaxE;
 
-  /** Array of hits **/
-  TClonesArray* fHitCollection;
-
-  /** Array of clusters **/
-  TClonesArray*fClusterCollection;
-
-  /** Number of found clusters **/
-  Int_t fNClusters;
-
-  /** Internal event counter **/
-  Int_t fEvent;
-
-  /** logarithmic weight threshold **/
-  Float_t fWzero;
-
-  /** hit energy threshold **/
-  Float_t fHitThreshold;
-
-  /** Geo file to use **/
-  TString fFileGeo;
-
-  ClassDef(CbmEcalClusterFinder,1)
-
+  ClassDef(CbmEcalClusterFinder, 1)
 };
 
 #endif
+

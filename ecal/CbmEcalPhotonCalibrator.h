@@ -55,19 +55,13 @@ public:
 
   /** Set noise for ECAL (GeV) **/
   void SetNoise(Float_t noise);
-  /** Set noise for PS (GeV)**/
-  void SetPSNoise(Float_t noiseps);
 
   Float_t GetNoise() const;
-  Float_t GetPSNoise() const;
 
   /** Set threshold for ECAL (GeV)**/
   void SetThreshold(Float_t threshold);
-  /** Set threshold for PS (GeV)**/
-  void SetPSThreshold(Float_t thresholdps);
 
   Float_t GetThreshold() const;
-  Float_t GetPSThreshold() const;
  
   /** Set PDG code of particles to analize **/
   void SetPDGCode(Int_t code);
@@ -117,12 +111,8 @@ private:
 
   /** Threshold for ECAL **/
   Float_t fThreshold;
-  /** Threshold for PS **/
-  Float_t fThresholdPS;
   /** Noise in ECAL **/
   Float_t fNoise;
-  /** Noise in PS **/
-  Float_t fNoisePS;
 
   CbmEcalInf* fInf;
 
@@ -131,8 +121,6 @@ private:
 
   /** Full energy deposited in ECAL **/
   Float_t fFullEnergy;
-  /** Energy deposited in PS **/
-  Float_t fPSEnergy;
   /** Energy deposited in ECAL, not in PS **/
   Float_t fEcalEnergy;
 
@@ -142,13 +130,6 @@ private:
   Float_t f3x3EcalEnergy;
   /** Energy deposited in ECAL in 5x5 cluster **/
   Float_t f5x5EcalEnergy;
-
-  /** Energy deposited in PS in 2x2 cluster **/
-  Float_t f2x2PSEnergy;
-  /** Energy deposited in PS in 3x3 cluster **/
-  Float_t f3x3PSEnergy;
-  /** Energy deposited in PS in 5x5 cluster **/
-  Float_t f5x5PSEnergy;
 
   /** Type of ECAL cells used in analysis **/
   Int_t fType;
@@ -239,20 +220,9 @@ inline void CbmEcalPhotonCalibrator::SetNoise(Float_t noise)
 	fNoise=noise;
 }
 
-/** Set noise for PS (GeV)**/
-inline void CbmEcalPhotonCalibrator::SetPSNoise(Float_t noiseps)
-{
-	fNoisePS=noiseps;
-}
-
 inline Float_t CbmEcalPhotonCalibrator::GetNoise() const
 {
 	return fNoise;
-}
-
-inline Float_t CbmEcalPhotonCalibrator::GetPSNoise() const
-{
-	return fNoisePS;
 }
 
 /** Set threshold for ECAL (GeV)**/
@@ -260,20 +230,10 @@ inline void CbmEcalPhotonCalibrator::SetThreshold(Float_t threshold)
 {
 	fThreshold=threshold;
 }
-/** Set threshold for PS (GeV)**/
-inline void CbmEcalPhotonCalibrator::SetPSThreshold(Float_t thresholdps)
-{
-	fThresholdPS=thresholdps;
-}
 
 inline Float_t CbmEcalPhotonCalibrator::GetThreshold() const
 {
 	return fThreshold;
-}
-
-inline Float_t CbmEcalPhotonCalibrator::GetPSThreshold() const
-{
-	return fThresholdPS;
 }
 
 #endif

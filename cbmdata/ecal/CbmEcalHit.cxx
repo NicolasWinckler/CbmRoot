@@ -12,15 +12,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHit::CbmEcalHit() 
-  : TObject(),
-    fEnergy(-1.),
-    fPSEnergy(1.),
-    fTime(-1.),
-    fTrackId(-1),
-    fDetectorId(-1)
-{
-}
+CbmEcalHit::CbmEcalHit() {}
 // -------------------------------------------------------------------------
 
 

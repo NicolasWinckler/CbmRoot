@@ -131,7 +131,6 @@ inline Double_t CbmEcalDrawer::GetEnergy(CbmEcalCell* cell) const
 {
 	if (fEnergyType==0) return cell->GetTotalEnergy();
 	if (fEnergyType==1) return cell->GetEnergy();
-	if (fEnergyType==2) return cell->GetPSEnergy();
 	return 0;
 }
 

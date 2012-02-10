@@ -90,6 +90,7 @@ void CbmEcalAnalysisJPsi::Exec(Option_t* option)
       fEProb=ecalid->EProb();
       fShape=ecalid->Shape();
       fCaloE=ecalid->E()*fP;
+      fChi2=ecalid->PSE();
       if (fEProb>0.05&&fShape>0.5)
 	fIsE=1;
       else
@@ -185,6 +186,7 @@ void CbmEcalAnalysisJPsi::InitTree()
   fOut->Branch("charge", &fCharge, "charge/I");
   fOut->Branch("caloe", &fCaloE, "caloe/D");
   fOut->Branch("tcell", &fCellType, "tcell/I");
+  fOut->Branch("chi2", &fChi2, "chi2/D");
 }
 
 void CbmEcalAnalysisJPsi::InitVariables()
@@ -201,6 +203,7 @@ void CbmEcalAnalysisJPsi::InitVariables()
   fMotherMCPDG=-1111;
   fCharge=-1111;
   fCaloE=-1111;
+  fChi2=-1111;
 }
 
 ClassImp(CbmEcalAnalysisJPsi)

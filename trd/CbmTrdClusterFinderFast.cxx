@@ -141,10 +141,13 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
     }
   }
   //optimization ist only usefull if rowClusters are merged !!!
-  Float_t minimumChargeTH = 3e-03;
-  Float_t mChargeTH[57] = { 0.003, 
+  Float_t minimumChargeTH = 1.0e-07;//3e-03;
+  Float_t mChargeTH[84] = { 0.003, 
 			    /*2e-06,*/ //for gausssian distributed charge
 			    0, 
+			    1e-09, 2e-09, 3e-09, 4e-09, 5e-09, 6e-09, 7e-09, 8e-09, 9e-09,
+			    1e-08, 2e-08, 3e-08, 4e-08, 5e-08, 6e-08, 7e-08, 8e-08, 9e-08,
+			    1e-07, 2e-07, 3e-07, 4e-07, 5e-07, 6e-07, 7e-07, 8e-07, 9e-07,
 			    1e-06, 2e-06, 3e-06, 4e-06, 5e-06, 6e-06, 7e-06, 8e-06, 9e-06,
 			    1e-05, 2e-05, 3e-05, 4e-05, 5e-05, 6e-05, 7e-05, 8e-05, 9e-05,
 			    1e-04, 2e-04, 3e-04, 4e-04, 5e-04, 6e-04, 7e-04, 8e-04, 9e-04,
@@ -152,14 +155,14 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 			    1e-02, 2e-02, 3e-02, 4e-02, 5e-02, 6e-02, 7e-02, 8e-02, 9e-02,
 			    1e-01, 2e-01, 3e-01, 4e-01, 5e-01, 6e-01, 7e-01, 8e-01, 9e-01,
 			    1e-00  };
-   Int_t nChargeTH = 1;
+  Int_t nChargeTH = 1;
 
   TH1F* DigiChargeSpectrum = NULL;
   TProfile* OptimalTH = NULL;
 
   if (optimization)
     {
-      nChargeTH = 48;
+      nChargeTH = 84;
       OptimalTH = new TProfile("OptimalTH","Optimization of the minimumChargeTH",Int_t(1/mChargeTH[2]),0,mChargeTH[nChargeTH-1]);
       OptimalTH->SetXTitle("minimumChargeTH value");
       OptimalTH->SetYTitle("Number of found clusters");
@@ -171,7 +174,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       OptimalTH->GetYaxis()->SetTitleSize(0.02);
       OptimalTH->GetYaxis()->SetTitleOffset(2);
       OptimalTH->SetMarkerStyle(4);
-      DigiChargeSpectrum = new TH1F("DigiChargeSpectrum","DigiChargeSpectrum",100000,0,1);
+      DigiChargeSpectrum = new TH1F("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1);
       DigiChargeSpectrum->SetXTitle("Digi charge [a.u.]");
       DigiChargeSpectrum->SetYTitle("Number of Digis");
       DigiChargeSpectrum->SetStats(kFALSE);
@@ -188,7 +191,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
       if (fMultiHit)
-	minimumChargeTH = 0.001;
+	minimumChargeTH = 1.0e-07;
       else
 	minimumChargeTH = mChargeTH[iChargeTH];
       //minimumChargeTH = 0.0;

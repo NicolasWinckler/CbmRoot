@@ -13,6 +13,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <boost/assign/list_of.hpp>
+
 #include "TText.h"
 #include "TH1.h"
 #include "TH1D.h"
@@ -31,6 +33,7 @@ ClassImp(CbmAnaDielectronTaskDraw);
 
 using namespace std;
 using namespace lit;
+using boost::assign::list_of;
 
 void CbmAnaDielectronTaskDraw::DrawHistosFromFile(
       const std::string& fileName,
@@ -515,8 +518,8 @@ void CbmAnaDielectronTaskDraw::DrawMomentumEfficiencyAll()
 void CbmAnaDielectronTaskDraw::DrawMotherPdg()
 {
    TCanvas *c6 = new TCanvas("mother_pdg", "mother_pdg", 500, 500);
-   DrawH1(H1("fh_mc_mother_pdg"), H1("fh_acc_mother_pdg"), NULL, NULL,
-         "MC", "acc", "", "", kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawH1(list_of(H1("fh_mc_mother_pdg"))(H1("fh_acc_mother_pdg")),
+         list_of("MC")("acc"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
@@ -534,7 +537,7 @@ void CbmAnaDielectronTaskDraw::Draw1DCutsForSandBg(
    bg->SetLineWidth(2);
    s->Scale(scaleSig);
    bg->Scale(scaleBg);
-   DrawH1(s, bg, NULL, NULL, "S", "BG", "", "", kLitLinear, kLitLog, true,0.7,0.7,0.99,0.99);
+   DrawH1(list_of(s)(bg), list_of("S")("BG"), kLitLinear, kLitLog, true,0.7,0.7,0.99,0.99);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
@@ -998,19 +1001,19 @@ void CbmAnaDielectronTaskDraw::DrawMinvBothSandBG(
    sbg->Add(s);
    sbg->SetMinimum(1e-8);
 
-   DrawH1(sbg, bg, s, NULL, "","","","", kLitLinear, kLitLog, false, 0,0,0,0);
+   DrawH1(list_of(sbg)(bg)(s), list_of("")("")(""), kLitLinear, kLitLog, false, 0,0,0,0);
    s->SetFillColor(kRed);
    s->SetLineColor(kBlack);
    s->SetLineWidth(1);
-   s->SetLineStyle(LIT_MARKER_STYLE1);
+   s->SetLineStyle(LitDrawingOptions::MarkerStyle(1));
    bg->SetFillColor(kYellow - 10);
    bg->SetLineColor(kBlack);
    bg->SetLineWidth(1);
-   bg->SetLineStyle(LIT_MARKER_STYLE1);
+   bg->SetLineStyle(LitDrawingOptions::MarkerStyle(1));
    sbg->SetFillColor(kBlue);
    sbg->SetLineColor(kBlack);
    sbg->SetLineWidth(1);
-   sbg->SetLineStyle(LIT_MARKER_STYLE1);
+   sbg->SetLineStyle(LitDrawingOptions::MarkerStyle(1));
    s->SetMarkerStyle(1);
    bg->SetMarkerStyle(1);
    sbg->SetMarkerStyle(1);

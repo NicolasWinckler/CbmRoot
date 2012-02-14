@@ -5,8 +5,7 @@
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
 ${CLHEP_INCLUDE_DIR}
-${SIMPATH}/basics/gsl/include
-${SIMPATH}/include/gsl
+${GSL_INCLUDE_DIRS}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -22,8 +21,7 @@ include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
-${SIMPATH}/basics/gsl/lib
-${SIMPATH}/lib
+${GSL_LIBRARY_DIRS}
 )
 
 link_directories( ${LINK_DIRECTORIES})

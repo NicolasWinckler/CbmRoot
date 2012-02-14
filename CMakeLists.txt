@@ -78,8 +78,10 @@ else(CBMROOT_MINIMAL)
 #  set(Boost_DEBUG TRUE)
   If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
     set(BOOST_ROOT ${SIMPATH})
+    set(GSL_DIR ${SIMPATH})
   Else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
     set(BOOST_ROOT ${SIMPATH}/basics/boost)
+    set(GSL_DIR ${SIMPATH}/basics/gsl)
   EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
   Message("-- Looking for Boost ...")
   # If an older version of boost is found both of the variables below are
@@ -95,6 +97,8 @@ else(CBMROOT_MINIMAL)
   Else (Boost_FOUND)
     Set(Boost_Avail 0)
   EndIf (Boost_FOUND)
+  Message("-- Looking for GSL ...")
+  find_package(GSL)
 
 
 

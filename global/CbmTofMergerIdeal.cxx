@@ -32,9 +32,11 @@ using std::map;
 
 // ------------------------------------------------------------------
 CbmTofMergerIdeal::CbmTofMergerIdeal()
+  : CbmTofMerger(),
+    fArrayTofPoint(NULL),
+    fArrayStsTrackMatch(NULL),
+    fArrayTrdTrackMatch(NULL)
 {
-    // Default constructor
-    fVerbose = 1;
 }
 // ------------------------------------------------------------------
 

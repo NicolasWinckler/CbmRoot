@@ -28,8 +28,10 @@ using std::endl;
 
 // ------------------------------------------------------------------
 CbmGlobalTrackFitterIdeal::CbmGlobalTrackFitterIdeal()
+  : CbmGlobalTrackFitter(),
+    fArrayStsTrack(NULL),
+    fArrayTrdTrack(NULL)
 {
-    // Default constructor
 }
 // ------------------------------------------------------------------
 

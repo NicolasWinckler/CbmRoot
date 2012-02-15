@@ -18,7 +18,15 @@ public:
   CbmEcalTrackingMuch(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalTrackingMuch() {};
+  CbmEcalTrackingMuch() 
+    : FairTask(),
+    fStsTracks(NULL),
+    fStr(NULL),
+    fInf(NULL),
+    fCaloZ(0.),
+    fFitter(NULL),
+    fTrackPar(NULL)
+      {}
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -44,6 +52,9 @@ private:
   CbmStsKFTrackFitter* fFitter;			//!
   /** Extrapolated tracks **/
   TClonesArray* fTrackPar;			//!
+
+  CbmEcalTrackingMuch(const CbmEcalTrackingMuch&);
+  CbmEcalTrackingMuch& operator=(const CbmEcalTrackingMuch&);
 
   ClassDef(CbmEcalTrackingMuch,1)
 };

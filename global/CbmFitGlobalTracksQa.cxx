@@ -34,20 +34,71 @@ using std::endl;
 
 // -----------------------------------------------------------------------
 CbmFitGlobalTracksQa::CbmFitGlobalTracksQa()
+  : FairTask(),
+    fArrayStsPoint(NULL),
+    fArrayTrdPoint(NULL),
+    fArrayStsHit(NULL),
+    fArrayTrdHit(NULL),
+    fArrayStsTrack(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayGlbTrack(NULL),
+    fEvents(0),
+    fh_first_resx(NULL),
+    fh_first_resy(NULL),
+    fh_first_restx(NULL),
+    fh_first_resty(NULL),
+    fh_first_resz(NULL),
+    fh_last_resx(NULL),
+    fh_last_resy(NULL),
+    fh_last_restx(NULL),
+    fh_last_resty(NULL),
+    fh_last_resz(NULL),
+    fh_first_pullx(NULL),
+    fh_first_pully(NULL),
+    fh_first_pulltx(NULL),
+    fh_first_pullty(NULL),
+    fh_last_pullx(NULL),
+    fh_last_pully(NULL),
+    fh_last_pulltx(NULL),
+    fh_last_pullty(NULL),
+    fh_chi2ndf(NULL)
 {
-    // Default constructor
-    fEvents = 0;
-    CreateHistogramms();
+  CreateHistogramms();
 }
 // -----------------------------------------------------------------------
 
 
 // -----------------------------------------------------------------------
 CbmFitGlobalTracksQa::CbmFitGlobalTracksQa(const char* name, Int_t verbose)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fArrayStsPoint(NULL),
+    fArrayTrdPoint(NULL),
+    fArrayStsHit(NULL),
+    fArrayTrdHit(NULL),
+    fArrayStsTrack(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayGlbTrack(NULL),
+    fEvents(0),
+    fh_first_resx(NULL),
+    fh_first_resy(NULL),
+    fh_first_restx(NULL),
+    fh_first_resty(NULL),
+    fh_first_resz(NULL),
+    fh_last_resx(NULL),
+    fh_last_resy(NULL),
+    fh_last_restx(NULL),
+    fh_last_resty(NULL),
+    fh_last_resz(NULL),
+    fh_first_pullx(NULL),
+    fh_first_pully(NULL),
+    fh_first_pulltx(NULL),
+    fh_first_pullty(NULL),
+    fh_last_pullx(NULL),
+    fh_last_pully(NULL),
+    fh_last_pulltx(NULL),
+    fh_last_pullty(NULL),
+    fh_chi2ndf(NULL)
 {
-    // Standard constructor
-    fEvents = 0;
     CreateHistogramms();
 }
 // -----------------------------------------------------------------------

@@ -44,6 +44,9 @@ private:
 
     void CreateHistogramms();
 
+    CbmFitGlobalTracksQa(const CbmFitGlobalTracksQa&);
+    CbmFitGlobalTracksQa& operator=(const CbmFitGlobalTracksQa&);
+
 public:
     CbmFitGlobalTracksQa();
     CbmFitGlobalTracksQa(const char* name, Int_t verbose = 1);

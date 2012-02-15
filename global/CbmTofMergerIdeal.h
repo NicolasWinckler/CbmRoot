@@ -15,6 +15,9 @@ private:
     TClonesArray* fArrayStsTrackMatch; // Array of STS track matches
     TClonesArray* fArrayTrdTrackMatch; // Array of TRD track matches
 
+    CbmTofMergerIdeal(const CbmTofMergerIdeal&);
+    CbmTofMergerIdeal& operator=(const CbmTofMergerIdeal&);
+
 public:
     CbmTofMergerIdeal();
     ~CbmTofMergerIdeal();

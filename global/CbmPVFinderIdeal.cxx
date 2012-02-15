@@ -19,8 +19,10 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmPVFinderIdeal::CbmPVFinderIdeal() {
-  fMCTracks = NULL;
+CbmPVFinderIdeal::CbmPVFinderIdeal() 
+  : CbmPrimaryVertexFinder(),
+    fMCTracks(NULL)
+{
 }
 // -------------------------------------------------------------------------
 

@@ -18,6 +18,9 @@ private:
     CbmGlobalTrackFitter *fFitter;         // Fitter algorithm
     TClonesArray         *fArrayGlbTrack;  // Array of global tracks
 
+    CbmFitGlobalTracks(const CbmFitGlobalTracks&);
+    CbmFitGlobalTracks& operator=(const CbmFitGlobalTracks&);
+
 public:
     CbmFitGlobalTracks();
     CbmFitGlobalTracks(const char* name, Int_t verbose = 1,

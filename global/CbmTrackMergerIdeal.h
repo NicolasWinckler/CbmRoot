@@ -51,6 +51,8 @@ class CbmTrackMergerIdeal : public CbmTrackMerger
   TClonesArray* fStsMatch;
   TClonesArray* fTrdMatch;
 
+  CbmTrackMergerIdeal(const CbmTrackMergerIdeal&);
+  CbmTrackMergerIdeal& operator=(const CbmTrackMergerIdeal&);
 
   ClassDef(CbmTrackMergerIdeal,1);
 

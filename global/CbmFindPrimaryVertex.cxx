@@ -17,9 +17,12 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmFindPrimaryVertex::CbmFindPrimaryVertex() {
-  fFinder   = NULL;
-  fTracks   = NULL;
+CbmFindPrimaryVertex::CbmFindPrimaryVertex() 
+  : FairTask(),
+    fFinder(NULL),
+    fTracks(NULL),
+    fPrimVert(NULL)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -27,9 +30,11 @@ CbmFindPrimaryVertex::CbmFindPrimaryVertex() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmFindPrimaryVertex::CbmFindPrimaryVertex(CbmPrimaryVertexFinder* pvFinder)
+  : FairTask(),
+    fFinder(pvFinder),
+    fTracks(NULL),
+    fPrimVert(NULL)
 {
-  fFinder = pvFinder;
-  fTracks = NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -39,9 +44,11 @@ CbmFindPrimaryVertex::CbmFindPrimaryVertex(CbmPrimaryVertexFinder* pvFinder)
 CbmFindPrimaryVertex::CbmFindPrimaryVertex(const char* name, 
 					   const char* title, 
 					   CbmPrimaryVertexFinder* finder) 
-  : FairTask(name) {
-  fFinder = finder;
-  fTracks = NULL;
+  : FairTask(),
+    fFinder(finder),
+    fTracks(NULL),
+    fPrimVert(NULL)
+{
 }
 // -------------------------------------------------------------------------
 

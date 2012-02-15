@@ -20,13 +20,22 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmFindGlobalTracks::CbmFindGlobalTracks() 
-  : FairTask("Global Tracker") {
-  fTrackMerger = NULL;
-  fRichMerger  = NULL;
-  fTofMerger   = NULL;
-  fStsTracks   = fTrdTracks = fRichRings = fTofHits = NULL;
-  fVerbose     = 1;
-  fNAll = fNStsOnly = fNTrdOnly = fNWithRich = fNWithTof = 0;
+  : FairTask("Global Tracker"), 
+    fTrackMerger(NULL),
+    fRichMerger(NULL),
+    fTofMerger(NULL),
+    fStsTracks(NULL),
+    fTrdTracks(NULL),
+    fRichRings(NULL),
+    fTofHits(NULL),
+    fGlobalTracks(NULL),
+    fVerbose(1),
+    fNAll(0),
+    fNStsOnly(0),
+    fNTrdOnly(0),
+    fNWithRich(0),
+    fNWithTof(0)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -37,13 +46,22 @@ CbmFindGlobalTracks::CbmFindGlobalTracks(CbmTrackMerger* trackMerger,
 					 CbmRichMerger* richMerger,
                                          CbmTofMerger* tofMerger,
 					 Int_t iVerbose) 
-  : FairTask("Global Tracker") {
-  fTrackMerger = trackMerger;
-  fRichMerger  = richMerger;
-  fTofMerger   = tofMerger;
-  fStsTracks   = fTrdTracks = fRichRings = fTofHits = NULL;
-  fVerbose     = iVerbose;
-  fNAll = fNStsOnly = fNTrdOnly = fNWithRich = fNWithTof = 0;
+  : FairTask("Global Tracker"),
+    fTrackMerger(trackMerger),
+    fRichMerger(richMerger),
+    fTofMerger(tofMerger),
+    fStsTracks(NULL),
+    fTrdTracks(NULL),
+    fRichRings(NULL),
+    fTofHits(NULL),
+    fGlobalTracks(NULL),
+    fVerbose(iVerbose),
+    fNAll(0),
+    fNStsOnly(0),
+    fNTrdOnly(0),
+    fNWithRich(0),
+    fNWithTof(0)
+{  
 }
 // -------------------------------------------------------------------------
 
@@ -56,13 +74,22 @@ CbmFindGlobalTracks::CbmFindGlobalTracks(const char* name,
 					 CbmRichMerger* richMerger,
                                          CbmTofMerger* tofMerger,
 					 Int_t iVerbose)
-  : FairTask(name) {
-  fTrackMerger = trackMerger;
-  fRichMerger  = richMerger;
-  fTofMerger   = tofMerger;
-  fStsTracks   = fTrdTracks = fRichRings = fTofHits = NULL;
-  fVerbose     = iVerbose;
-  fNAll = fNStsOnly = fNTrdOnly = fNWithRich = fNWithTof = 0;
+  : FairTask(name),
+    fTrackMerger(trackMerger),
+    fRichMerger(richMerger),
+    fTofMerger(tofMerger),
+    fStsTracks(NULL),
+    fTrdTracks(NULL),
+    fRichRings(NULL),
+    fTofHits(NULL),
+    fGlobalTracks(NULL),
+    fVerbose(iVerbose),
+    fNAll(0),
+    fNStsOnly(0),
+    fNTrdOnly(0),
+    fNWithRich(0),
+    fNWithTof(0)
+{
 }
 // -------------------------------------------------------------------------
 

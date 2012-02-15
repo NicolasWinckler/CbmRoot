@@ -50,6 +50,8 @@ class CbmPVFinderIdeal : public CbmPrimaryVertexFinder
   /** Array of MCTracks **/
   TClonesArray* fMCTracks;
 
+  CbmPVFinderIdeal(const CbmPVFinderIdeal&);
+  CbmPVFinderIdeal& operator=(const CbmPVFinderIdeal&);
 
   ClassDef(CbmPVFinderIdeal,1);
 

@@ -28,9 +28,11 @@ using std::endl;
 
 // ------------------------------------------------------------------
 CbmFitGlobalTracks::CbmFitGlobalTracks()
+  : FairTask(),
+    fVerbose(0),
+    fFitter(NULL),
+    fArrayGlbTrack(NULL)
 {
-    // Default constructor
-    fFitter = NULL;
 }
 // ------------------------------------------------------------------
 
@@ -38,10 +40,11 @@ CbmFitGlobalTracks::CbmFitGlobalTracks()
 // ------------------------------------------------------------------
 CbmFitGlobalTracks::CbmFitGlobalTracks(const char* name, Int_t verbose,
 				       CbmGlobalTrackFitter* fitter)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fVerbose(verbose),
+    fFitter(fitter),
+    fArrayGlbTrack(NULL)
 {
-    // Standard constructor
-    fFitter = fitter;
 }
 // ------------------------------------------------------------------
 

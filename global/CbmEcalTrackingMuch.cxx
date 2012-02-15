@@ -38,9 +38,14 @@ void CbmEcalTrackingMuch::Exec(Option_t* option)
 
 
 CbmEcalTrackingMuch::CbmEcalTrackingMuch(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fStsTracks(NULL),
+    fStr(NULL),
+    fInf(NULL),
+    fCaloZ(0.),
+    fFitter(NULL),
+    fTrackPar(NULL)
 {
-  ;
 }
 
 /** Initing routine **/

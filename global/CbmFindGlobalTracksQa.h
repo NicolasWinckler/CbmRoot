@@ -34,6 +34,9 @@ private:
     TH1F         *fh_mom_eff_tof_ghost;      // Efficiency of fake track-TOF merging
     void CreateHistogramms();
 
+    CbmFindGlobalTracksQa(const CbmFindGlobalTracksQa&);
+    CbmFindGlobalTracksQa& operator=(const CbmFindGlobalTracksQa&);
+
 public:
     CbmFindGlobalTracksQa();
     CbmFindGlobalTracksQa(const char* name, Int_t verbose = 1);

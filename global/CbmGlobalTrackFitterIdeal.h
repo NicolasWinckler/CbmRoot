@@ -16,6 +16,9 @@ private:
     TClonesArray *fArrayStsTrack;  // STS tracks
     TClonesArray *fArrayTrdTrack;  // TRD tracks
 
+    CbmGlobalTrackFitterIdeal(const CbmGlobalTrackFitterIdeal&);
+    CbmGlobalTrackFitterIdeal& operator=(const CbmGlobalTrackFitterIdeal&);
+
 public:
     CbmGlobalTrackFitterIdeal();
     virtual ~CbmGlobalTrackFitterIdeal();

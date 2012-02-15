@@ -37,13 +37,25 @@ using std::map;
 
 // ------------------------------------------------------------------
 CbmFindGlobalTracksQa::CbmFindGlobalTracksQa()
+  : FairTask(),
+    fMinStsPoints(4),
+    fMinTrdPoints(12),
+    fRequireTof(kTRUE),
+    fArrayMCTrack(NULL),
+    fArrayTofPoint(NULL),
+    fArrayTofHit(NULL),  
+    fArrayGlbTrack(NULL),
+    fArrayStsTrackMatch(NULL),
+    fArrayTrdTrackMatch(NULL),
+    fh_mom_acc(NULL),        
+    fh_mom_acc2(NULL),       
+    fh_mom_rec(NULL),        
+    fh_mom_ghost(NULL),      
+    fh_mom_eff(NULL),        
+    fh_mom_eff_ghost(NULL),  
+    fh_mom_eff_tof(NULL),    
+    fh_mom_eff_tof_ghost(NULL)
 {
-    // Default constructor
-    fMinStsPoints = 4;
-    fMinTrdPoints = 12;
-    fRequireTof = kTRUE;
-    fArrayMCTrack = fArrayTofPoint = fArrayTofHit = fArrayGlbTrack =
-	fArrayStsTrackMatch = fArrayTrdTrackMatch = NULL;
     CreateHistogramms();
 }
 // ------------------------------------------------------------------
@@ -52,14 +64,25 @@ CbmFindGlobalTracksQa::CbmFindGlobalTracksQa()
 // ------------------------------------------------------------------
 CbmFindGlobalTracksQa::CbmFindGlobalTracksQa(const char* name,
 					     Int_t verbose)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fMinStsPoints(4),
+    fMinTrdPoints(12),
+    fRequireTof(kTRUE),
+    fArrayMCTrack(NULL),
+    fArrayTofPoint(NULL),
+    fArrayTofHit(NULL),  
+    fArrayGlbTrack(NULL),
+    fArrayStsTrackMatch(NULL),
+    fArrayTrdTrackMatch(NULL),
+    fh_mom_acc(NULL),        
+    fh_mom_acc2(NULL),       
+    fh_mom_rec(NULL),        
+    fh_mom_ghost(NULL),      
+    fh_mom_eff(NULL),        
+    fh_mom_eff_ghost(NULL),  
+    fh_mom_eff_tof(NULL),    
+    fh_mom_eff_tof_ghost(NULL)
 {
-    // Standard constructor
-    fMinStsPoints = 4;
-    fMinTrdPoints = 12;
-    fRequireTof = kTRUE;
-    fArrayMCTrack = fArrayTofPoint = fArrayTofHit = fArrayGlbTrack =
-	fArrayStsTrackMatch = fArrayTrdTrackMatch = NULL;
     CreateHistogramms();
 }
 // ------------------------------------------------------------------

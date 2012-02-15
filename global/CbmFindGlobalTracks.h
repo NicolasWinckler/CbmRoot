@@ -95,6 +95,9 @@ class CbmFindGlobalTracks : public FairTask
   Int_t fNWithTof;
 
 
+  CbmFindGlobalTracks(const CbmFindGlobalTracks&);
+  CbmFindGlobalTracks& operator=(const CbmFindGlobalTracks&);
+
   ClassDef(CbmFindGlobalTracks,1);
 
 };

@@ -20,7 +20,11 @@ using std::map;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrackMergerIdeal::CbmTrackMergerIdeal() {
+CbmTrackMergerIdeal::CbmTrackMergerIdeal() 
+  : CbmTrackMerger(),
+    fStsMatch(NULL),
+    fTrdMatch(NULL)
+{
   fVerbose = 1;
 }
 // -------------------------------------------------------------------------

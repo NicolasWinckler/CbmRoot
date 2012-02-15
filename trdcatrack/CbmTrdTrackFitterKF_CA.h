@@ -41,17 +41,20 @@ public:
    //Section added 28.04.2008 by Maciej Krauze
    Double_t FitToVertex( CbmTrdTrack* track, CbmVertex *vtx, FairTrackParam *v_track );
    
-      /** Extrapolate track to any Z position
-       *     *    *
-       *     *    * @param track    already fitted STS track
-       *     *    * @param z        new z-position
-       *     *    * @param e_track  (return value) extrapolated track parameters
-       *     *    */
-        void Extrapolate( CbmTrdTrack* track, Double_t z, FairTrackParam *e_track );
+   /** Extrapolate track to any Z position
+    *     *    *
+    *     *    * @param track    already fitted STS track
+    *     *    * @param z        new z-position
+    *     *    * @param e_track  (return value) extrapolated track parameters
+    *     *    */
+   void Extrapolate( CbmTrdTrack* track, Double_t z, FairTrackParam *e_track );
    
    //end of added section
    
-    ClassDef(CbmTrdTrackFitterKF_CA, 1);
+   CbmTrdTrackFitterKF_CA(const CbmTrdTrackFitterKF_CA&);
+   CbmTrdTrackFitterKF_CA& operator=(const CbmTrdTrackFitterKF_CA&);
+
+   ClassDef(CbmTrdTrackFitterKF_CA, 1);
 };
 
 

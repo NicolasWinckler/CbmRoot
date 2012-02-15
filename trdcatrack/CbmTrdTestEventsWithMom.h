@@ -342,6 +342,9 @@ class CbmTrdTestEventsWithMom : public FairTask
     fNevents,
     fPrimOnly;
 
+  CbmTrdTestEventsWithMom(const CbmTrdTestEventsWithMom&);
+  CbmTrdTestEventsWithMom& operator=(const CbmTrdTestEventsWithMom&);
+
   ClassDef(CbmTrdTestEventsWithMom,1);
 
 };

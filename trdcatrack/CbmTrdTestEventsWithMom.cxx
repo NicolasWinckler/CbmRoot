@@ -31,66 +31,277 @@ using namespace std;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom()
-  : FairTask("TRD track match") {
-    fTracks  = NULL;
-    fPoints  = NULL;
-    fHits    = NULL;
-    fMatches = NULL;
-    fVerbose = 1;
-    fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit"); //mk
-    trdTrackFitter = new CbmTrdTrackFitterKF_CA(1,11); //mk
-    fRF = 0;
-    fChi = 100;
-    fChi2 = 100;
-    fPtThr = 0;
-    fNevents = 1;
-    fPassedEvents = 0;
-    fLowerMassThr = 0;
-    fUpperMassThr = 10;
-
-    for(int i = 0; i < 100; i++){
-      fArr[i] = 0;
-      fArrB[i] = 0;
-    }
-
-    fTrueJPsiEvents = 0;
-    fPassedJpsiEvents = 0;
-
-
+  : FairTask("TRD track match"),
+    fArr(),
+    fArrB(),
+    fRejInvMass(NULL),
+    fNormRejInvMass(NULL),
+    fRejNew(NULL),
+    fEffNew(NULL),
+    fRejInvMass2d(NULL),
+    TrdPar(NULL),
+    fTrueJPsiEvents(0),
+    fPassedJpsiEvents(0),
+    fTrd11_Z(0.),
+    fTrd13_Z(0.),     
+    fTrd14_Z(0.),
+    fTrd21_Z(0.),
+    fTrd24_Z(0.),
+    fTrd31_Z(0.),
+    fTrd34_Z(0.),
+    fMomRes0(NULL),
+    fMomRes05(NULL),
+    fMomRes10(NULL),
+    fMomRes15(NULL),
+    fMomRes20(NULL),
+    fMomRes25(NULL),
+    fMomRes30(NULL),
+    fMomRes35(NULL),
+    fMomRes40(NULL),
+    fMomRes45(NULL),
+    fMomRes50(NULL),
+    fInvMassRes(NULL),
+    fBydlRes(NULL),
+    fBydl(NULL),
+    fPointBydlRes(NULL),
+    fPointBydl(NULL),
+    invMass(NULL),
+    invMassMC(NULL),
+    invMassAfter(NULL),
+    invMassSmeared(NULL),
+    fRvsCentr(NULL),
+    fAllvsCentr(NULL),
+    fMCDistY0(NULL),
+    fRecoDistY0(NULL),
+    fMCDistX1(NULL),
+    fCombDistY0(NULL),
+    fCombDistX1(NULL),
+    fPtVsY(NULL),
+    fPtAngle(NULL),
+    fOpeningAngle(NULL),
+    fdPx(NULL),
+    fdPy(NULL),
+    fdPz(NULL),
+    fTxDist(NULL),
+    fTxPos(NULL),
+    fTxNeg(NULL),
+    fMomDist(NULL),
+    fPull(NULL),
+    fPRecoMc(NULL),
+    fPMc(NULL),
+    fPMC(NULL),
+    fPtMC(NULL),
+    fPReco(NULL),
+    fPtReco(NULL),
+    fPassedPMC(NULL),
+    fPassedPtMC(NULL),
+    fPassedPReco(NULL),
+    fPassedPtReco(NULL),
+    fRes1(NULL),
+    fPull1(NULL),
+    fRes2(NULL),
+    fPull2(NULL),
+    fRes3(NULL),
+    fPull3(NULL),
+    fRes4(NULL),
+    fPull4(NULL),
+    fPtRes(NULL),
+    fPtVsY_Before(NULL),
+    fPtVsY_Pt(NULL),
+    fPtVsY_XZ(NULL),
+    fPtVsY_YZ(NULL),
+    fPtVsY_Angle(NULL),
+    fQvsQ(NULL),
+    fHitsInLayer1(NULL),
+    fNoElecPerEvent(NULL),
+    fNoPositPerEvent(NULL),
+    fNoPPionPerEvent(NULL),
+    fNoNPionPerEvent(NULL),
+    fNoProtonPerEvent(NULL),
+    fNoPosTracks(NULL),
+    fNoNegTracks(NULL),
+    fNoAllPions(NULL),
+    fNoPassedProton(NULL),
+    fNoPassedPPion(NULL),
+    fNoPassedNPion(NULL),
+    fNoPassedPosTracks(NULL),
+    fNoPassedNegTracks(NULL),
+    fNoPassedAllPions(NULL),
+    fNoPassedPosButPositrons(NULL),
+    fNoPassedNegButElectrons(NULL),
+    fPdgCodes(NULL),
+    fChiDist(NULL),
+    fChi2Dist(NULL),
+    noPosPart(0),
+    noNegPart(0),
+    fNoTotCrossedX(0),
+    fNoCrossedX(0),
+    totParticlesSum(),
+    totPassedParticlesSum(),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMCTracks(NULL),
+    fArrayKFTrdHit(new TClonesArray("CbmKFTrdHit")),
+    fMatchMap(),
+    trdTrackFitter(new CbmTrdTrackFitterKF_CA(1,11)),
+    trdTrackFitterKF(NULL),
+    fVerbose(1),
+    fCurrentEvent(0),
+    fPassedEvents(0),
+    fRF(0.),
+    fChi(100.),
+    fChi2(100.),
+    fPtThr(0.),
+    fLowerMassThr(0.),
+    fUpperMassThr(10.),
+    fNevents(0),
+    fPrimOnly(0)
+{
+  for(int i = 0; i < 100; i++){
+    fArr[i] = 0;
+    fArrB[i] = 0;
   }
+}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom(Int_t verbose)
-  : FairTask("TRD track match") {
-    fTracks  = NULL;
-    fPoints  = NULL;
-    fHits    = NULL;
-    fMatches = NULL;
-    fVerbose = verbose;
-
-    fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit"); //mk
-    trdTrackFitter = new CbmTrdTrackFitterKF_CA(1,11); //mk
-
-    fRF = 0;
-    fChi = 100;
-    fChi2 = 100;
-    fPtThr = 0;
-    fNevents = 1;
-    fPassedEvents = 0;
-    fLowerMassThr = 0;
-    fUpperMassThr = 10;
-
-    for(int i = 0; i < 100; i++){
-      fArr[i] = 0;
-      fArrB[i] = 0;
-    }
-
-    fTrueJPsiEvents = 0;
-    fPassedJpsiEvents = 0;
-
+  : FairTask("TRD track match"),
+    fArr(),
+    fArrB(),
+    fRejInvMass(NULL),
+    fNormRejInvMass(NULL),
+    fRejNew(NULL),
+    fEffNew(NULL),
+    fRejInvMass2d(NULL),
+    TrdPar(NULL),
+    fTrueJPsiEvents(0),
+    fPassedJpsiEvents(0),
+    fTrd11_Z(0.),
+    fTrd13_Z(0.),     
+    fTrd14_Z(0.),
+    fTrd21_Z(0.),
+    fTrd24_Z(0.),
+    fTrd31_Z(0.),
+    fTrd34_Z(0.),
+    fMomRes0(NULL),
+    fMomRes05(NULL),
+    fMomRes10(NULL),
+    fMomRes15(NULL),
+    fMomRes20(NULL),
+    fMomRes25(NULL),
+    fMomRes30(NULL),
+    fMomRes35(NULL),
+    fMomRes40(NULL),
+    fMomRes45(NULL),
+    fMomRes50(NULL),
+    fInvMassRes(NULL),
+    fBydlRes(NULL),
+    fBydl(NULL),
+    fPointBydlRes(NULL),
+    fPointBydl(NULL),
+    invMass(NULL),
+    invMassMC(NULL),
+    invMassAfter(NULL),
+    invMassSmeared(NULL),
+    fRvsCentr(NULL),
+    fAllvsCentr(NULL),
+    fMCDistY0(NULL),
+    fRecoDistY0(NULL),
+    fMCDistX1(NULL),
+    fCombDistY0(NULL),
+    fCombDistX1(NULL),
+    fPtVsY(NULL),
+    fPtAngle(NULL),
+    fOpeningAngle(NULL),
+    fdPx(NULL),
+    fdPy(NULL),
+    fdPz(NULL),
+    fTxDist(NULL),
+    fTxPos(NULL),
+    fTxNeg(NULL),
+    fMomDist(NULL),
+    fPull(NULL),
+    fPRecoMc(NULL),
+    fPMc(NULL),
+    fPMC(NULL),
+    fPtMC(NULL),
+    fPReco(NULL),
+    fPtReco(NULL),
+    fPassedPMC(NULL),
+    fPassedPtMC(NULL),
+    fPassedPReco(NULL),
+    fPassedPtReco(NULL),
+    fRes1(NULL),
+    fPull1(NULL),
+    fRes2(NULL),
+    fPull2(NULL),
+    fRes3(NULL),
+    fPull3(NULL),
+    fRes4(NULL),
+    fPull4(NULL),
+    fPtRes(NULL),
+    fPtVsY_Before(NULL),
+    fPtVsY_Pt(NULL),
+    fPtVsY_XZ(NULL),
+    fPtVsY_YZ(NULL),
+    fPtVsY_Angle(NULL),
+    fQvsQ(NULL),
+    fHitsInLayer1(NULL),
+    fNoElecPerEvent(NULL),
+    fNoPositPerEvent(NULL),
+    fNoPPionPerEvent(NULL),
+    fNoNPionPerEvent(NULL),
+    fNoProtonPerEvent(NULL),
+    fNoPosTracks(NULL),
+    fNoNegTracks(NULL),
+    fNoAllPions(NULL),
+    fNoPassedProton(NULL),
+    fNoPassedPPion(NULL),
+    fNoPassedNPion(NULL),
+    fNoPassedPosTracks(NULL),
+    fNoPassedNegTracks(NULL),
+    fNoPassedAllPions(NULL),
+    fNoPassedPosButPositrons(NULL),
+    fNoPassedNegButElectrons(NULL),
+    fPdgCodes(NULL),
+    fChiDist(NULL),
+    fChi2Dist(NULL),
+    noPosPart(0),
+    noNegPart(0),
+    fNoTotCrossedX(0),
+    fNoCrossedX(0),
+    totParticlesSum(),
+    totPassedParticlesSum(),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMCTracks(NULL),
+    fArrayKFTrdHit(new TClonesArray("CbmKFTrdHit")),
+    fMatchMap(),
+    trdTrackFitter(new CbmTrdTrackFitterKF_CA(1,11)),
+    trdTrackFitterKF(NULL),
+    fVerbose(verbose),
+    fCurrentEvent(0),
+    fPassedEvents(0),
+    fRF(0.),
+    fChi(100.),
+    fChi2(100.),
+    fPtThr(0.),
+    fLowerMassThr(0.),
+    fUpperMassThr(10.),
+    fNevents(0),
+    fPrimOnly(0)
+{
+  for(int i = 0; i < 100; i++){
+    fArr[i] = 0;
+    fArrB[i] = 0;
+  }
 }
 // -------------------------------------------------------------------------
 
@@ -100,36 +311,141 @@ CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom(Int_t verbose)
 CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom(const char* name, const char* title,
 						 Int_t verbose, Double_t RF,
 						 Double_t chi, Double_t PtThr)
-  : FairTask(name) {
-
-    cout
-      <<"-I- CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom: constructing...\n";
-
-    fTracks  = NULL;
-    fPoints  = NULL;
-    fHits    = NULL;
-    fMatches = NULL;
-    fVerbose = verbose;
-    fRF      = RF;
-    fChi     = chi;
-    fPtThr   = PtThr;
-
-    fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit"); //mk
-    trdTrackFitter = new CbmTrdTrackFitterKF_CA(1,11); //mk
-
-    fChi2 = 100;
-    fNevents = 1;
-    fPassedEvents = 0;
-    fLowerMassThr = 2;
-    fUpperMassThr = 4;
-
-    for(int i = 0; i < 100; i++) {
-      fArr[i] = 0;
-      fArrB[i] = 0;
-    }
-
-    fTrueJPsiEvents = 0;
-    fPassedJpsiEvents = 0;
+  : FairTask(name),
+    fArr(),
+    fArrB(),
+    fRejInvMass(NULL),
+    fNormRejInvMass(NULL),
+    fRejNew(NULL),
+    fEffNew(NULL),
+    fRejInvMass2d(NULL),
+    TrdPar(NULL),
+    fTrueJPsiEvents(0),
+    fPassedJpsiEvents(0),
+    fTrd11_Z(0.),
+    fTrd13_Z(0.),     
+    fTrd14_Z(0.),
+    fTrd21_Z(0.),
+    fTrd24_Z(0.),
+    fTrd31_Z(0.),
+    fTrd34_Z(0.),
+    fMomRes0(NULL),
+    fMomRes05(NULL),
+    fMomRes10(NULL),
+    fMomRes15(NULL),
+    fMomRes20(NULL),
+    fMomRes25(NULL),
+    fMomRes30(NULL),
+    fMomRes35(NULL),
+    fMomRes40(NULL),
+    fMomRes45(NULL),
+    fMomRes50(NULL),
+    fInvMassRes(NULL),
+    fBydlRes(NULL),
+    fBydl(NULL),
+    fPointBydlRes(NULL),
+    fPointBydl(NULL),
+    invMass(NULL),
+    invMassMC(NULL),
+    invMassAfter(NULL),
+    invMassSmeared(NULL),
+    fRvsCentr(NULL),
+    fAllvsCentr(NULL),
+    fMCDistY0(NULL),
+    fRecoDistY0(NULL),
+    fMCDistX1(NULL),
+    fCombDistY0(NULL),
+    fCombDistX1(NULL),
+    fPtVsY(NULL),
+    fPtAngle(NULL),
+    fOpeningAngle(NULL),
+    fdPx(NULL),
+    fdPy(NULL),
+    fdPz(NULL),
+    fTxDist(NULL),
+    fTxPos(NULL),
+    fTxNeg(NULL),
+    fMomDist(NULL),
+    fPull(NULL),
+    fPRecoMc(NULL),
+    fPMc(NULL),
+    fPMC(NULL),
+    fPtMC(NULL),
+    fPReco(NULL),
+    fPtReco(NULL),
+    fPassedPMC(NULL),
+    fPassedPtMC(NULL),
+    fPassedPReco(NULL),
+    fPassedPtReco(NULL),
+    fRes1(NULL),
+    fPull1(NULL),
+    fRes2(NULL),
+    fPull2(NULL),
+    fRes3(NULL),
+    fPull3(NULL),
+    fRes4(NULL),
+    fPull4(NULL),
+    fPtRes(NULL),
+    fPtVsY_Before(NULL),
+    fPtVsY_Pt(NULL),
+    fPtVsY_XZ(NULL),
+    fPtVsY_YZ(NULL),
+    fPtVsY_Angle(NULL),
+    fQvsQ(NULL),
+    fHitsInLayer1(NULL),
+    fNoElecPerEvent(NULL),
+    fNoPositPerEvent(NULL),
+    fNoPPionPerEvent(NULL),
+    fNoNPionPerEvent(NULL),
+    fNoProtonPerEvent(NULL),
+    fNoPosTracks(NULL),
+    fNoNegTracks(NULL),
+    fNoAllPions(NULL),
+    fNoPassedProton(NULL),
+    fNoPassedPPion(NULL),
+    fNoPassedNPion(NULL),
+    fNoPassedPosTracks(NULL),
+    fNoPassedNegTracks(NULL),
+    fNoPassedAllPions(NULL),
+    fNoPassedPosButPositrons(NULL),
+    fNoPassedNegButElectrons(NULL),
+    fPdgCodes(NULL),
+    fChiDist(NULL),
+    fChi2Dist(NULL),
+    noPosPart(0),
+    noNegPart(0),
+    fNoTotCrossedX(0),
+    fNoCrossedX(0),
+    totParticlesSum(),
+    totPassedParticlesSum(),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMCTracks(NULL),
+    fArrayKFTrdHit(new TClonesArray("CbmKFTrdHit")),
+    fMatchMap(),
+    trdTrackFitter(new CbmTrdTrackFitterKF_CA(1,11)),
+    trdTrackFitterKF(NULL),
+    fVerbose(verbose),
+    fCurrentEvent(0),
+    fPassedEvents(0),
+    fRF(RF),
+    fChi(chi),
+    fChi2(100.),
+    fPtThr(PtThr),
+    fLowerMassThr(2.),
+    fUpperMassThr(4.),
+    fNevents(0),
+    fPrimOnly(0)
+{
+  cout
+    <<"-I- CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom: constructing...\n";
+  
+  for(int i = 0; i < 100; i++) {
+    fArr[i] = 0;
+    fArrB[i] = 0;
+  }
 }
 // -------------------------------------------------------------------------
 

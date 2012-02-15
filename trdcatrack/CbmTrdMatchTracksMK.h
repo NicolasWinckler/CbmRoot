@@ -198,6 +198,8 @@ class CbmTrdMatchTracksMK : public FairTask
 			   Int_t iIndexFirst,
 			   Int_t iIndexSecond);
 
+  CbmTrdMatchTracksMK(const CbmTrdMatchTracksMK&);
+  CbmTrdMatchTracksMK& operator=(const CbmTrdMatchTracksMK&);
 
   ClassDef(CbmTrdMatchTracksMK,1);
 

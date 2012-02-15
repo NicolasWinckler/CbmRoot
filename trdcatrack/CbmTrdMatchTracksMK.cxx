@@ -28,15 +28,93 @@ using namespace std;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracksMK::CbmTrdMatchTracksMK()
-  : FairTask("TRD track match") {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fVerbose = 1;
-  fNoHitsPerTracklet = 2;
+  : FairTask("TRD track match"), 
+    MC_noPrimRefAll(),
+    RECO_noPrimRefAll(),
+    NO_TOTAL_MC_REF_TRACKS(0),
+    NO_TOTAL_RECO_TRACKS(0),
+    NO_TOTAL_CORREC_TRECO_TRACKS(0),
+    NO_TOTAL_GHOST_TRACKS(0),
+    NO_TOTAL_CLONE_TRACKS(0),
+    NO_TOTAL_EVENTS(0),
+    NO_TOTAL_CLONES_PRIM_FAST(0),
+    NO_TOTAL_CLONES_PRIM_SLOW(0),
+    NO_TOTAL_CLONES_FAST(0),
+    NO_TOTAL_CLONES_SLOW(0),
+    RECO_Tot_PrimaryRefFast(0),
+    RECO_Tot_PrimaryRefSlow(0),
+    RECO_Tot_PrimaryRefAll(0),
+    RECO_Tot_AllRefFast(0),
+    RECO_Tot_AllRefSlow(0),
+    RECO_Tot_AllRefAll(0),
+    RECO_Tot_ExtraRefFast(0),
+    RECO_Tot_ExtraRefSlow(0),
+    RECO_Tot_ExtraRefAll(0),
+    MC_Tot_PrimaryRefFast(0),
+    MC_Tot_PrimaryRefSlow(0),
+    MC_Tot_PrimaryRefAll(0),
+    MC_Tot_AllRefFast(0),
+    MC_Tot_AllRefSlow(0),   
+    MC_Tot_AllRefAll(0),
+    MC_Tot_ExtraRefFast(0),
+    MC_Tot_ExtraRefSlow(0),
+    MC_Tot_ExtraRefAll(0),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMCTracks(NULL),
+    fMatchMap(),
+    fVerbose(1),
+    fNoHitsPerTracklet(2),
+    fEffVsMom(NULL),
+    fh_EffVsMom(NULL),
+    fh_mom_trdtrack_good(NULL),
+    fh_mom_mctrack_reco(NULL),
+    fNoHitsPerTrack(NULL),
+    fNoTrueHits(NULL),
+    fNoTracks(NULL),
+    fNoPrimHighMom(NULL),
+    fNoPrimLowMom(NULL),
+    fPartTy(NULL),
+    fGhostTracks_meanZ(NULL),
+    fXDistShort14(NULL),
+    fYDistShort14(NULL),
+    fXDistShortGh14(NULL),
+    fYDistShortGh14(NULL),
+    fXDistLong45(NULL),
+    fYDistLong45(NULL),
+    fXDistLongGh45(NULL),
+    fYDistLongGh45(NULL),
+    fXDistShort58(NULL),
+    fYDistShort58(NULL),
+    fXDistShortGh58(NULL),
+    fYDistShortGh58(NULL),
+    fXDistLong89(NULL),
+    fYDistLong89(NULL),
+    fXDistLongGh89(NULL),
+    fYDistLongGh89(NULL),
+    fXDistShort912(NULL),
+    fYDistShort912(NULL),
+    fXDistShortGh912(NULL),
+    fYDistShortGh912(NULL),
+    fh_Chi2_Ghost(NULL),
+    fh_Chi2_CorrectFast(NULL),
+    fh_Chi2_CorrectSlow(NULL),
+    fh_Tx_Ghost(NULL),
+    fh_Tx_CorrectFast(NULL),
+    fh_Tx_CorrectSlow(NULL),
+    fh_Ty_Ghost(NULL),
+    fh_Ty_CorrectFast(NULL),
+    fh_Ty_CorrectSlow(NULL),
+    fh_Y_Ghost(NULL),
+    fh_Y_CorrectFast(NULL),
+    fh_Y_CorrectSlow(NULL),
+    fh_X_Ghost(NULL),
+    fh_X_CorrectFast(NULL),
+    fh_X_CorrectSlow(NULL)
+{
   CreateHistogramms();
-  MC_Tot_PrimaryRefFast = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -44,42 +122,93 @@ CbmTrdMatchTracksMK::CbmTrdMatchTracksMK()
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdMatchTracksMK::CbmTrdMatchTracksMK(Int_t verbose)
-  : FairTask("TRD track match")
+  : FairTask("TRD track match"),
+    MC_noPrimRefAll(),
+    RECO_noPrimRefAll(),
+    NO_TOTAL_MC_REF_TRACKS(0),
+    NO_TOTAL_RECO_TRACKS(0),
+    NO_TOTAL_CORREC_TRECO_TRACKS(0),
+    NO_TOTAL_GHOST_TRACKS(0),
+    NO_TOTAL_CLONE_TRACKS(0),
+    NO_TOTAL_EVENTS(0),
+    NO_TOTAL_CLONES_PRIM_FAST(0),
+    NO_TOTAL_CLONES_PRIM_SLOW(0),
+    NO_TOTAL_CLONES_FAST(0),
+    NO_TOTAL_CLONES_SLOW(0),
+    RECO_Tot_PrimaryRefFast(0),
+    RECO_Tot_PrimaryRefSlow(0),
+    RECO_Tot_PrimaryRefAll(0),
+    RECO_Tot_AllRefFast(0),
+    RECO_Tot_AllRefSlow(0),
+    RECO_Tot_AllRefAll(0),
+    RECO_Tot_ExtraRefFast(0),
+    RECO_Tot_ExtraRefSlow(0),
+    RECO_Tot_ExtraRefAll(0),
+    MC_Tot_PrimaryRefFast(0),
+    MC_Tot_PrimaryRefSlow(0),
+    MC_Tot_PrimaryRefAll(0),
+    MC_Tot_AllRefFast(0),
+    MC_Tot_AllRefSlow(0),   
+    MC_Tot_AllRefAll(0),
+    MC_Tot_ExtraRefFast(0),
+    MC_Tot_ExtraRefSlow(0),
+    MC_Tot_ExtraRefAll(0),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMCTracks(NULL),
+    fMatchMap(),
+    fVerbose(verbose),
+    fNoHitsPerTracklet(2),
+    fEffVsMom(NULL),
+    fh_EffVsMom(NULL),
+    fh_mom_trdtrack_good(NULL),
+    fh_mom_mctrack_reco(NULL),
+    fNoHitsPerTrack(NULL),
+    fNoTrueHits(NULL),
+    fNoTracks(NULL),
+    fNoPrimHighMom(NULL),
+    fNoPrimLowMom(NULL),
+    fPartTy(NULL),
+    fGhostTracks_meanZ(NULL),
+    fXDistShort14(NULL),
+    fYDistShort14(NULL),
+    fXDistShortGh14(NULL),
+    fYDistShortGh14(NULL),
+    fXDistLong45(NULL),
+    fYDistLong45(NULL),
+    fXDistLongGh45(NULL),
+    fYDistLongGh45(NULL),
+    fXDistShort58(NULL),
+    fYDistShort58(NULL),
+    fXDistShortGh58(NULL),
+    fYDistShortGh58(NULL),
+    fXDistLong89(NULL),
+    fYDistLong89(NULL),
+    fXDistLongGh89(NULL),
+    fYDistLongGh89(NULL),
+    fXDistShort912(NULL),
+    fYDistShort912(NULL),
+    fXDistShortGh912(NULL),
+    fYDistShortGh912(NULL),
+    fh_Chi2_Ghost(NULL),
+    fh_Chi2_CorrectFast(NULL),
+    fh_Chi2_CorrectSlow(NULL),
+    fh_Tx_Ghost(NULL),
+    fh_Tx_CorrectFast(NULL),
+    fh_Tx_CorrectSlow(NULL),
+    fh_Ty_Ghost(NULL),
+    fh_Ty_CorrectFast(NULL),
+    fh_Ty_CorrectSlow(NULL),
+    fh_Y_Ghost(NULL),
+    fh_Y_CorrectFast(NULL),
+    fh_Y_CorrectSlow(NULL),
+    fh_X_Ghost(NULL),
+    fh_X_CorrectFast(NULL),
+    fh_X_CorrectSlow(NULL)
 {
-  //  cout << "CbmTrdMatchTracksMK: constructing...\n";
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-
-  fVerbose = verbose;
   CreateHistogramms();
-  NO_TOTAL_EVENTS = 0;
-  NO_TOTAL_RECO_TRACKS = 0;
-  NO_TOTAL_CORREC_TRECO_TRACKS = 0;
-  NO_TOTAL_MC_REF_TRACKS = 0;
-  NO_TOTAL_GHOST_TRACKS = 0;
-  NO_TOTAL_CLONE_TRACKS = 0;
-
-  MC_Tot_PrimaryRefFast = 0;
-  MC_Tot_PrimaryRefSlow = 0;
-  MC_Tot_PrimaryRefAll = 0;
-  MC_Tot_AllRefFast = 0;
-  MC_Tot_AllRefSlow = 0;
-  MC_Tot_AllRefAll = 0;
-  MC_Tot_ExtraRefFast = 0;
-  MC_Tot_ExtraRefSlow = 0;
-  MC_Tot_ExtraRefAll = 0;
-
-  RECO_Tot_PrimaryRefFast = 0;
-  RECO_Tot_PrimaryRefSlow = 0;
-  RECO_Tot_PrimaryRefAll = 0;
-  RECO_Tot_AllRefFast = 0;
-  RECO_Tot_AllRefSlow = 0;
-  RECO_Tot_AllRefAll = 0;
-  RECO_Tot_ExtraRefFast = 0;
-  RECO_Tot_ExtraRefSlow = 0;
-  RECO_Tot_ExtraRefAll = 0;
 }
 // -------------------------------------------------------------------------
 

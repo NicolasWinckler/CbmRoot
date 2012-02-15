@@ -340,6 +340,8 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
 
 
 
+  CbmL1CATrdTrackFinderSA(const CbmL1CATrdTrackFinderSA&);
+  CbmL1CATrdTrackFinderSA& operator=(const CbmL1CATrdTrackFinderSA&);
 
   ClassDef(CbmL1CATrdTrackFinderSA, 1);
 

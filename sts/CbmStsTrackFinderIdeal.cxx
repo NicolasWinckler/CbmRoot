@@ -30,9 +30,11 @@ using std::left;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsTrackFinderIdeal::CbmStsTrackFinderIdeal() { 
-  fMCTrackArray = NULL;
-  fMCPointArray = NULL;
+CbmStsTrackFinderIdeal::CbmStsTrackFinderIdeal() 
+  : CbmStsTrackFinder(),
+    fMCTrackArray(NULL),
+    fMCPointArray(NULL)
+{ 
   fVerbose      = 1;
   fName         = "STSTrackFinderIdeal";
 }
@@ -41,9 +43,11 @@ CbmStsTrackFinderIdeal::CbmStsTrackFinderIdeal() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsTrackFinderIdeal::CbmStsTrackFinderIdeal(Int_t verbose) { 
-  fMCTrackArray = NULL;
-  fMCPointArray = NULL;
+CbmStsTrackFinderIdeal::CbmStsTrackFinderIdeal(Int_t verbose) 
+  : CbmStsTrackFinder(),
+    fMCTrackArray(NULL),
+    fMCPointArray(NULL)
+{ 
   fVerbose      = verbose;
   fName         = "STSTrackFinderIdeal";
 }

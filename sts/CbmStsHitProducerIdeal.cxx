@@ -17,8 +17,12 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsHitProducerIdeal::CbmStsHitProducerIdeal() :
-  FairTask("Ideal STS Hit Producer") { }
+CbmStsHitProducerIdeal::CbmStsHitProducerIdeal() 
+  : FairTask("Ideal STS Hit Producer"),
+    fPointArray(NULL),
+    fHitArray()
+{ 
+}
 // -------------------------------------------------------------------------
 
 

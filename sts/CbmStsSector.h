@@ -40,7 +40,7 @@
 
 class CbmStsSensor;
 class CbmStsSensorDigiPar;
-
+class FairLogger;
 
 class CbmStsSector : public TNamed
 {
@@ -163,6 +163,8 @@ class CbmStsSector : public TNamed
   /** STL map from the indizes of the fired strips to the 
    ** index of the MCPoint **/
   std::map<std::pair<Int_t,Int_t>, Int_t > fTrueHits;      //!
+
+  FairLogger* fLogger;
 
   CbmStsSector(const CbmStsSector&);
   CbmStsSector operator=(const CbmStsSector&);

@@ -169,7 +169,8 @@ void CbmStsIdealDigitize::Exec(Option_t* opt) {
     CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
     
     if ( !sensor ) 
-      Fatal("Exec",Form("No sensor in DigiScheme with name: \"%s\"",curNode->GetName()));
+      fLogger->Fatal(MESSAGE_ORIGIN,"No sensor in DigiScheme with name: %s",curNode->GetName());
+    //      Fatal("Exec",Form("No sensor in DigiScheme with name: \"%s\"",curNode->GetName()));
 
     Int_t stationNr = sensor->GetStationNr();
     Int_t  sectorNr = sensor->GetSectorNr();

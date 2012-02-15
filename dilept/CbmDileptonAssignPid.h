@@ -170,6 +170,11 @@ public:
     void BookHistograms();
     void SaveHistograms();
 
+ private:
+
+    CbmDileptonAssignPid(const CbmDileptonAssignPid&);
+    CbmDileptonAssignPid& operator=(const CbmDileptonAssignPid&);
+
     ClassDef(CbmDileptonAssignPid,1);
 };
 

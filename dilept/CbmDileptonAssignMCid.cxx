@@ -45,32 +45,156 @@ using std::setw;
 using std::setprecision;
 using std::right;
 
-CbmDileptonAssignMCid::CbmDileptonAssignMCid() : FairTask("DileptonAssignMCid"){
-
-    fTrackSimColl= new CbmDileptonTrackSimCollection();
-
-    fCutChiPrimary = 3.;
-    fCutRadialDistance = 130.;
-    fCutStsHit = 4;
-
-    fVerbose = 0;
-
-    fNEvents = 0;
-    fOutFileName = "pid.mc.hist.root";
+CbmDileptonAssignMCid::CbmDileptonAssignMCid() 
+  : FairTask("DileptonAssignMCid"),
+    fRootManager(NULL),
+    fTrackSimColl(new CbmDileptonTrackSimCollection()),
+    fArrayDileptonTrackReal(NULL),
+    fArrayGlobalTrack(NULL),
+    fArrayStsTrack(NULL),
+    fArrayStsTrackMatch(NULL),
+    fArrayRichRing(NULL),
+    fArrayRichRingMatch(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTofHit(NULL),
+    fArrayTofPoint(NULL),
+    fArrayRichProjection(NULL),
+    fArrayMCTrack(NULL),
+    fFitter(),
+    fPrimVertex(NULL),
+    fCutChiPrimary(3.),
+    fCutRadialDistance(130.),
+    fCutStsHit(4),
+    fVerbose(0),
+    fOutFile(NULL),
+    fOutFileName("pid.mc.hist.root"),
+    fh_momentum_id_rich(NULL),
+    fh_momentum_id_rich_trd(NULL),
+    fh_momentum_id_rich_tof(NULL),
+    fh_momentum_id_rich_trd_tof(NULL),
+    fh_momentum_id_rich_prim(NULL),
+    fh_momentum_id_rich_trd_prim(NULL),
+    fh_momentum_id_rich_tof_prim(NULL),
+    fh_momentum_id_rich_trd_tof_prim(NULL),
+    fh_momentum_projected_e_prim(NULL),
+    fh_momentum_projected_e(NULL),
+    fh_momentum_projected_pi(NULL),
+    fh_momentum_rich_true_e(NULL),
+    fh_momentum_rich_trd_true_e(NULL),
+    fh_momentum_rich_tof_true_e(NULL),
+    fh_momentum_rich_trd_tof_true_e(NULL),
+    fh_momentum_rich_true_e_prim(NULL),
+    fh_momentum_rich_trd_true_e_prim(NULL),
+    fh_momentum_rich_tof_true_e_prim(NULL),
+    fh_momentum_rich_trd_tof_true_e_prim(NULL),
+    fh_momentum_rich_true_pi(NULL),
+    fh_momentum_rich_trd_true_pi(NULL),
+    fh_momentum_rich_tof_true_pi(NULL),
+    fh_momentum_rich_trd_tof_true_pi(NULL),
+    fh_momentum_rich_true_p(NULL),
+    fh_momentum_rich_trd_true_p(NULL),
+    fh_momentum_rich_tof_true_p(NULL),
+    fh_momentum_rich_trd_tof_true_p(NULL),
+    fh_momentum_rich_false_e(NULL),
+    fh_momentum_rich_false_pion(NULL),
+    fh_momentum_rich_false_proton(NULL),
+    fh_momentum_rich_false_others(NULL),
+    fh_momentum_rich_trd_false_e(NULL),
+    fh_momentum_rich_trd_false_pion(NULL),
+    fh_momentum_rich_trd_false_proton(NULL),
+    fh_momentum_rich_trd_false_others(NULL),
+    fh_momentum_rich_tof_false_e(NULL),
+    fh_momentum_rich_tof_false_pion(NULL),
+    fh_momentum_rich_tof_false_proton(NULL),
+    fh_momentum_rich_tof_false_others(NULL),
+    fh_momentum_rich_trd_tof_false_e(NULL),
+    fh_momentum_rich_trd_tof_false_pion(NULL),
+    fh_momentum_rich_trd_tof_false_proton(NULL),
+    fh_momentum_rich_trd_tof_false_others(NULL),
+    fh_momentum_fake_rich(NULL),
+    fh_momentum_fake_rich_trd(NULL),
+    fh_momentum_fake_rich_tof(NULL),
+    fh_momentum_fake_rich_trd_tof(NULL),
+    fTimer(),
+    fNEvents(0),
+    fTime(0.)
+{
 }
 
-CbmDileptonAssignMCid::CbmDileptonAssignMCid(Int_t iVerbose, TString fname, const char* name) : FairTask(name,iVerbose){
-
-    fTrackSimColl= new CbmDileptonTrackSimCollection();
-
-    fCutChiPrimary = 3.;
-    fCutRadialDistance = 130.;
-    fCutStsHit = 4;
-
-    fVerbose = iVerbose;
-
-    fNEvents = 0;
-    fOutFileName = fname;
+CbmDileptonAssignMCid::CbmDileptonAssignMCid(Int_t iVerbose, TString fname, const char* name) 
+  : FairTask(name,iVerbose),
+    fRootManager(NULL),
+    fTrackSimColl(new CbmDileptonTrackSimCollection()),
+    fArrayDileptonTrackReal(NULL),
+    fArrayGlobalTrack(NULL),
+    fArrayStsTrack(NULL),
+    fArrayStsTrackMatch(NULL),
+    fArrayRichRing(NULL),
+    fArrayRichRingMatch(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTofHit(NULL),
+    fArrayTofPoint(NULL),
+    fArrayRichProjection(NULL),
+    fArrayMCTrack(NULL),
+    fFitter(),
+    fPrimVertex(NULL),
+    fCutChiPrimary(3.),
+    fCutRadialDistance(130.),
+    fCutStsHit(4),
+    fVerbose(iVerbose),
+    fOutFile(NULL),
+    fOutFileName(fname),
+    fh_momentum_id_rich(NULL),
+    fh_momentum_id_rich_trd(NULL),
+    fh_momentum_id_rich_tof(NULL),
+    fh_momentum_id_rich_trd_tof(NULL),
+    fh_momentum_id_rich_prim(NULL),
+    fh_momentum_id_rich_trd_prim(NULL),
+    fh_momentum_id_rich_tof_prim(NULL),
+    fh_momentum_id_rich_trd_tof_prim(NULL),
+    fh_momentum_projected_e_prim(NULL),
+    fh_momentum_projected_e(NULL),
+    fh_momentum_projected_pi(NULL),
+    fh_momentum_rich_true_e(NULL),
+    fh_momentum_rich_trd_true_e(NULL),
+    fh_momentum_rich_tof_true_e(NULL),
+    fh_momentum_rich_trd_tof_true_e(NULL),
+    fh_momentum_rich_true_e_prim(NULL),
+    fh_momentum_rich_trd_true_e_prim(NULL),
+    fh_momentum_rich_tof_true_e_prim(NULL),
+    fh_momentum_rich_trd_tof_true_e_prim(NULL),
+    fh_momentum_rich_true_pi(NULL),
+    fh_momentum_rich_trd_true_pi(NULL),
+    fh_momentum_rich_tof_true_pi(NULL),
+    fh_momentum_rich_trd_tof_true_pi(NULL),
+    fh_momentum_rich_true_p(NULL),
+    fh_momentum_rich_trd_true_p(NULL),
+    fh_momentum_rich_tof_true_p(NULL),
+    fh_momentum_rich_trd_tof_true_p(NULL),
+    fh_momentum_rich_false_e(NULL),
+    fh_momentum_rich_false_pion(NULL),
+    fh_momentum_rich_false_proton(NULL),
+    fh_momentum_rich_false_others(NULL),
+    fh_momentum_rich_trd_false_e(NULL),
+    fh_momentum_rich_trd_false_pion(NULL),
+    fh_momentum_rich_trd_false_proton(NULL),
+    fh_momentum_rich_trd_false_others(NULL),
+    fh_momentum_rich_tof_false_e(NULL),
+    fh_momentum_rich_tof_false_pion(NULL),
+    fh_momentum_rich_tof_false_proton(NULL),
+    fh_momentum_rich_tof_false_others(NULL),
+    fh_momentum_rich_trd_tof_false_e(NULL),
+    fh_momentum_rich_trd_tof_false_pion(NULL),
+    fh_momentum_rich_trd_tof_false_proton(NULL),
+    fh_momentum_rich_trd_tof_false_others(NULL),
+    fh_momentum_fake_rich(NULL),
+    fh_momentum_fake_rich_trd(NULL),
+    fh_momentum_fake_rich_tof(NULL),
+    fh_momentum_fake_rich_trd_tof(NULL),
+    fTimer(),
+    fNEvents(0),
+    fTime(0.)
+{
 }
 
 CbmDileptonAssignMCid::~CbmDileptonAssignMCid(){

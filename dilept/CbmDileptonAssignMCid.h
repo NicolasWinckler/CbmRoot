@@ -124,6 +124,9 @@ private:
    Int_t      fNEvents;                   //! Number of events
    Double_t   fTime;                      //! Total real time
 
+   CbmDileptonAssignMCid(const CbmDileptonAssignMCid&);
+   CbmDileptonAssignMCid& operator=(const CbmDileptonAssignMCid&);
+
 public:
 
     CbmDileptonAssignMCid();

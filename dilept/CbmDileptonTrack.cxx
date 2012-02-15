@@ -15,7 +15,10 @@
 
 ClassImp(CbmDileptonTrack)
   
-CbmDileptonTrack::CbmDileptonTrack():TObject()
+CbmDileptonTrack::CbmDileptonTrack() 
+: TObject(),
+  fCharge(0),
+  fMomentum()
 {
 }
 

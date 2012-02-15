@@ -21,9 +21,10 @@
 ClassImp(CbmDileptonTrackRealCollection)
 
 CbmDileptonTrackRealCollection::CbmDileptonTrackRealCollection()
+: TObject(),
+  fNTracks(0),
+  fTracks(new TClonesArray("CbmDileptonTrackReal",1000))
 {
-  fNTracks = 0;
-  fTracks = new TClonesArray("CbmDileptonTrackReal",1000);
 }
 
 CbmDileptonTrackRealCollection::~CbmDileptonTrackRealCollection()

@@ -21,9 +21,10 @@
 ClassImp(CbmDileptonTrackSimCollection)
 
 CbmDileptonTrackSimCollection::CbmDileptonTrackSimCollection()
+: TObject(),
+  fNTracksSim(0),
+  fTracksSim(new TClonesArray("CbmDileptonTrackSim",1000))
 {
-  fNTracksSim = 0;
-  fTracksSim  = new TClonesArray("CbmDileptonTrackSim",1000);
 }
 
 CbmDileptonTrackSimCollection::~CbmDileptonTrackSimCollection()

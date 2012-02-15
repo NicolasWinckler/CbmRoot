@@ -15,18 +15,25 @@
 
 ClassImp(CbmDileptonTrackSim)
   
-  CbmDileptonTrackSim::CbmDileptonTrackSim():CbmDileptonTrack()
+CbmDileptonTrackSim::CbmDileptonTrackSim() 
+: CbmDileptonTrack(),
+  isFakeTrack(kFALSE),
+  isFakeRing(kFALSE),
+  MCPdg(0),
+  MCMotherID(0),
+  MCMotherPdg(0)
 {
 }
 
-CbmDileptonTrackSim::CbmDileptonTrackSim(TVector3 mom,Bool_t a1, Bool_t a2, Int_t a3, Int_t a4, Int_t a5):CbmDileptonTrack()
+CbmDileptonTrackSim::CbmDileptonTrackSim(TVector3 mom,Bool_t a1, Bool_t a2, Int_t a3, Int_t a4, Int_t a5)
+  : CbmDileptonTrack(),
+    isFakeTrack(a1),
+    isFakeRing(a2),
+    MCPdg(a3),
+    MCMotherID(a4),
+    MCMotherPdg(a5)
 {
-    fMomentum   = mom;
-    isFakeTrack = a1;
-    isFakeRing  = a2;
-    MCPdg       = a3;
-    MCMotherID  = a4;
-    MCMotherPdg = a5;
+  fMomentum = mom;
 }
 
 CbmDileptonTrackSim::~CbmDileptonTrackSim()

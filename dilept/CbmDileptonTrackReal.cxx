@@ -14,27 +14,29 @@
 
 ClassImp(CbmDileptonTrackReal)
   
-CbmDileptonTrackReal::CbmDileptonTrackReal():CbmDileptonTrack()
+CbmDileptonTrackReal::CbmDileptonTrackReal() 
+: CbmDileptonTrack(),
+  indexGlobal(-99),
+  fChiPrimary(0.),
+  isRICH(kFALSE),
+  isTRD(kFALSE),
+  isTOF(kFALSE)
 {
-    indexGlobal = -99;
-    fCharge     = -99;
-  //  fMomentum.SetXYZ(0,0,0);
-    fChiPrimary = 0;
-    isRICH      = kFALSE;
-    isTRD       = kFALSE;
-    isTOF       = kFALSE;
+  fCharge     = -99;
 }
 
-CbmDileptonTrackReal::CbmDileptonTrackReal(Int_t i, Short_t charge, TVector3 mom, Double_t chi, Bool_t isRich, Bool_t isTrd, Bool_t isTof):CbmDileptonTrack()
+CbmDileptonTrackReal::CbmDileptonTrackReal(Int_t i, Short_t charge, TVector3 mom, Double_t chi, Bool_t isRich, Bool_t isTrd, Bool_t isTof)
+  : CbmDileptonTrack(),
+    indexGlobal(i),
+    fChiPrimary(chi),
+    isRICH(isRich),
+    isTRD(isTrd),
+    isTOF(isTof)
 {
-    indexGlobal = i;
     fCharge     = charge;
     fMomentum   = mom;
-    fChiPrimary = chi;
-    isRICH      = isRich;
-    isTRD       = isTrd;
-    isTOF       = isTof;
 }
+
 CbmDileptonTrackReal::~CbmDileptonTrackReal()
 {
 

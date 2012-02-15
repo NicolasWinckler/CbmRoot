@@ -28,6 +28,9 @@ class CbmDileptonTrackSimCollection : public TObject{
   Int_t fNTracksSim;
   TClonesArray*  fTracksSim;
   
+  CbmDileptonTrackSimCollection(const CbmDileptonTrackSimCollection&);
+  CbmDileptonTrackSimCollection& operator=(const CbmDileptonTrackSimCollection&);
+
  public:
   
   CbmDileptonTrackSimCollection();

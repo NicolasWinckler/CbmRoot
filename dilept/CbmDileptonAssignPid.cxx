@@ -42,96 +42,141 @@ using std::setw;
 using std::setprecision;
 using std::right;
 
-CbmDileptonAssignPid::CbmDileptonAssignPid() : FairTask("DileptonAssignPid"){
-    fTrackRealColl = new CbmDileptonTrackRealCollection();
-
-    // Initialize the cut values
-
-    //set cuts for RICH
-
-    fswitchRichMom        = kTRUE;
-    fswitchRichSelection  = kTRUE;
-
-    fRichDist      = 1.;
-    fRichNN        = -0.5;
-    fRich2D        = 0.;
-    fRichRadial    = 130.;
-    fRichNHitMean  = 21.85;
-    fRichNHitSigma = 4.35;
-    fRichRmean     = 6.17;
-    fRichRsigma    = 0.14;
-
-    //set cuts for TRD
-    fswitchMom       = kTRUE;
-    fswitchAcceptTrd = kFALSE;
-    fswitchLike      = kTRUE;
-    fswitchWkn       = kFALSE;
-    fswitchAnn       = kFALSE;
-
-    fTrdMom         = 1.5;
-    fTrdPidLikeLow  = 0.95;
-    fTrdPidLikeHigh = 1.1;
-    fTrdPidWkn      = 11. ;
-    fTrdPidAnn      = 0.8;
-
-    //set cuts for TOF
-
-    fswitchTof     = kTRUE;
-    fswitchAcceptTof = kFALSE;
-    fTofMass2     = 0.01;
-
-    fNEvents = 0;
-
-    fOutFileName = "pid.hist.root";
-
-    fVerbose = 0;
+CbmDileptonAssignPid::CbmDileptonAssignPid() 
+  : FairTask("DileptonAssignPid"),
+    fRootManager(NULL),
+    fTrackRealColl(new CbmDileptonTrackRealCollection()),
+    fArrayGlobalTrack(NULL),
+    fArrayStsTrack(NULL),
+    fArrayRichRing(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTofHit(NULL),
+    fFitter(),
+    fPrimVertex(NULL),
+    fswitchRichMom(kTRUE),
+    fswitchRichSelection(kTRUE),
+    fRichDist(1.),
+    fRichNN(-0.5),
+    fRich2D(0.),
+    fRichRadial(130.),
+    fRichNHitMean(21.85),
+    fRichNHitSigma(4.35),
+    fRichRmean(6.17),
+    fRichRsigma(0.14),
+    fswitchMom(kTRUE),
+    fswitchAcceptTrd(kFALSE),
+    fswitchLike(kTRUE),
+    fswitchWkn(kFALSE),
+    fswitchAnn(kFALSE),
+    fTrdMom(1.5),
+    fTrdPidLikeLow(0.95),
+    fTrdPidLikeHigh(1.1),
+    fTrdPidWkn(11.),
+    fTrdPidAnn(0.8),
+    fswitchTof(kTRUE),
+    fswitchAcceptTof(kFALSE),
+    fTofMass2(0.01),
+    fVerbose(0),
+    fOutFileName(""),
+    nElec(0),
+    fh_rich_ring_dist_mom(NULL),
+    fh_rich_ring_dist_mom_after(NULL),
+    fh_rich_selection_NN(NULL),
+    fh_rich_selection_NN_after(NULL),
+    fh_rich_selection_2D(NULL),
+    fh_rich_selection_2D_after(NULL),
+    fh_rich_ring_radial(NULL),
+    fh_rich_ring_radial_after(NULL),
+    fh_rich_ring_xy(NULL),
+    fh_rich_ring_xy_after(NULL),
+    fh_rich_ring_hits_radius(NULL),
+    fh_rich_ring_hits_radius_after(NULL),
+    fh_rich_ring_radius_mom(NULL),
+    fh_rich_ring_radius_mom_after(NULL),
+    fh_trd_like_id(NULL),
+    fh_trd_like_id_after(NULL),
+    fh_trd_wkn_id(NULL),
+    fh_trd_wkn_id_after(NULL),
+    fh_trd_ann_id(NULL),
+    fh_trd_ann_id_after(NULL),
+    fh_tof_m2_mom(NULL),
+    fh_tof_m2_mom_after(NULL),
+    foutFile(NULL),
+    fTimer(),
+    fNEvents(0),
+    fTime(0.)
+{  
 }
-CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const char* name) : FairTask(name,iVerbose){
-    fTrackRealColl = new CbmDileptonTrackRealCollection();
 
-     // Initialize the cut values
+CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const char* name) 
+  : FairTask(name,iVerbose), 
+    fRootManager(NULL),
+    fTrackRealColl(new CbmDileptonTrackRealCollection()),
+    fArrayGlobalTrack(NULL),
+    fArrayStsTrack(NULL),
+    fArrayRichRing(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTofHit(NULL),
+    fFitter(),
+    fPrimVertex(NULL),
+    fswitchRichMom(kTRUE),
+    fswitchRichSelection(kTRUE),
+    fRichDist(1.),
+    fRichNN(-0.5),
+    fRich2D(0.),
+    fRichRadial(130.),
+    fRichNHitMean(21.85),
+    fRichNHitSigma(4.35),
+    fRichRmean(6.17),
+    fRichRsigma(0.14),
+    fswitchMom(kTRUE),
+    fswitchAcceptTrd(kFALSE),
+    fswitchLike(kTRUE),
+    fswitchWkn(kFALSE),
+    fswitchAnn(kFALSE),
+    fTrdMom(1.5),
+    fTrdPidLikeLow(0.95),
+    fTrdPidLikeHigh(1.1),
+    fTrdPidWkn(11.),
+    fTrdPidAnn(0.8),
+    fswitchTof(kTRUE),
+    fswitchAcceptTof(kFALSE),
+    fTofMass2(0.01),
+    fVerbose(iVerbose),
+    fOutFileName(fname),
+    nElec(0),
+    fh_rich_ring_dist_mom(NULL),
+    fh_rich_ring_dist_mom_after(NULL),
+    fh_rich_selection_NN(NULL),
+    fh_rich_selection_NN_after(NULL),
+    fh_rich_selection_2D(NULL),
+    fh_rich_selection_2D_after(NULL),
+    fh_rich_ring_radial(NULL),
+    fh_rich_ring_radial_after(NULL),
+    fh_rich_ring_xy(NULL),
+    fh_rich_ring_xy_after(NULL),
+    fh_rich_ring_hits_radius(NULL),
+    fh_rich_ring_hits_radius_after(NULL),
+    fh_rich_ring_radius_mom(NULL),
+    fh_rich_ring_radius_mom_after(NULL),
+    fh_trd_like_id(NULL),
+    fh_trd_like_id_after(NULL),
+    fh_trd_wkn_id(NULL),
+    fh_trd_wkn_id_after(NULL),
+    fh_trd_ann_id(NULL),
+    fh_trd_ann_id_after(NULL),
+    fh_tof_m2_mom(NULL),
+    fh_tof_m2_mom_after(NULL),
+    foutFile(NULL),
+    fTimer(),
+    fNEvents(0),
+    fTime(0.)
 
-    //set cuts for RICH
-
-    fswitchRichMom       = kTRUE;
-    fswitchRichSelection = kTRUE;
-
-    fRichDist      = 1.;
-    fRichNN        = -0.5;
-    fRich2D        = 0.;
-    fRichRadial    = 130.;
-    fRichNHitMean  = 21.85;
-    fRichNHitSigma = 4.35;
-    fRichRmean     = 6.17;
-    fRichRsigma    = 0.14;
-
-    //set cuts for TRD
-    fswitchMom       = kTRUE;
-    fswitchAcceptTrd = kFALSE;
-    fswitchLike      = kTRUE;
-    fswitchWkn       = kFALSE;
-    fswitchAnn       = kFALSE;
-
-    fTrdMom         = 1.5;
-    fTrdPidLikeLow  = 0.95;
-    fTrdPidLikeHigh = 1.1;
-    fTrdPidWkn      = 11. ;
-    fTrdPidAnn      = 0.8;
-
-    //set cuts for TOF
-
-    fswitchTof       = kTRUE;
-    fswitchAcceptTof = kFALSE;
-    fTofMass2 = 0.01;
-
-    fNEvents = 0;
-
-    fOutFileName = fname;
-
-    fVerbose = iVerbose;;
+{
 }
-CbmDileptonAssignPid::~CbmDileptonAssignPid() {
 
+CbmDileptonAssignPid::~CbmDileptonAssignPid() 
+{
 }
 //--------------------------------------------------------------------------
 InitStatus CbmDileptonAssignPid::Init(){

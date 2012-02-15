@@ -41,6 +41,9 @@ class CbmDileptonTrackRealCollection : public TObject{
   virtual void deleteTrack();
   virtual void clearTrack();
 
+  CbmDileptonTrackRealCollection(const CbmDileptonTrackRealCollection&);
+  CbmDileptonTrackRealCollection& operator=(const CbmDileptonTrackRealCollection&);
+
   ClassDef(CbmDileptonTrackRealCollection,1)
 
     };

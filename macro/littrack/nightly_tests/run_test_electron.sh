@@ -31,15 +31,15 @@ root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"hits\")"
 # Test different global tracking algorithms
 # Branching algorithm
 export GLOBALTRACKINGTYPE=branch
-create_result_dir $TEST_NAME$GLOBALTRACKINGTYPE/
+create_result_dir $TEST_NAME_$GLOBALTRACKINGTYPE/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 # Nearest neighbour algorithm
 export GLOBALTRACKINGTYPE=nn
-create_result_dir $TEST_NAME$GLOBALTRACKINGTYPE/
+create_result_dir $TEST_NAME_$GLOBALTRACKINGTYPE/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 # Nearest neighbour parallel algorithm
 export GLOBALTRACKINGTYPE=nn_parallel
-create_result_dir $TEST_NAME$GLOBALTRACKINGTYPE/
+create_result_dir $TEST_NAME_$GLOBALTRACKINGTYPE/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 
 # Run summary report generator
@@ -48,11 +48,11 @@ rm -rf $STUDYOUTPUTDIR
 mkdir $STUDYOUTPUTDIR
 export NSTUDIES=3
 export STUDYNAME1=branch
-export STUDYRESULT1=$TEST_NAME$STUDYNAME1/
+export STUDYRESULT1=$TEST_NAME_$STUDYNAME1/
 export STUDYNAME2=nn
-export STUDYRESULT2=$TEST_NAME$STUDYNAME2/
+export STUDYRESULT2=$TEST_NAME_$STUDYNAME2/
 export STUDYNAME3=nn_parallel
-export STUDYRESULT3=$TEST_NAME$STUDYNAME3/
+export STUDYRESULT3=$TEST_NAME_$STUDYNAME3/
 root -b -q -l "$VMCWORKDIR/macro/littrack/qa_study.C"
 
 export SCRIPT=no

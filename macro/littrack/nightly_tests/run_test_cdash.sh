@@ -11,9 +11,24 @@ svn co  https://subversion.gsi.de/fairroot/cbmroot/trunk cbmroot
 cp -R /data.local1/andrey/tests/fieldmaps/* $TEST_DIR/cbmroot/input/
 cp /data.local1/andrey/tests/cdash_config/Dart.cfg $TEST_DIR/cbmroot/Dart.cfg
 
-# Run tests
-. $TEST_DIR/cbmroot/Dart.sh Experimental $TEST_DIR/cbmroot/Dart.cfg    
-
+# Run test without CDash
+if [ "$1" = "nocdash" ] ; then
+    # Build CBMROOT
+    export SIMPATH=/data.local1/fairsoft/fairsoft_jan12/install
+    mkdir $BUILD_DIR
+    cd $BUILD_DIR
+    cmake ../cbmroot
+    . ./config.sh
+    make -j6
+    
+    # Run tests
+    cd $TEST_DIR/cbmroot/macro/littrack/nightly_tests/
+    . ./run_test_electron.sh
+    . ./run_test_muon.sh
+else 
+# Run tests with CDash
+    . $TEST_DIR/cbmroot/Dart.sh Experimental $TEST_DIR/cbmroot/Dart.cfg  
+fi
 
 DAY=`date +%y-%m-%d`
 cd /u/andrey/web-docs/tests

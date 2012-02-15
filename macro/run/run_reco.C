@@ -354,7 +354,7 @@ void run_reco(Int_t nEvents = 2) {
   run->AddTask(richReco);
 
   // ------------------- RICH Ring matching  ---------------------------------
-  CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
+  CbmRichMatchRings* matchRings = new CbmRichMatchRings();
   run->AddTask(matchRings);
   // -------------------------------------------------------------------------
 

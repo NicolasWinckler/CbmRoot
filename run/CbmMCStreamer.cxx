@@ -24,7 +24,25 @@ using namespace std;
 
 
 // -----   Default constructor   ---------------------------------------------
-CbmMCStreamer::CbmMCStreamer() { }
+CbmMCStreamer::CbmMCStreamer() 
+  : FairTask(),
+    fEventRate(0.),
+    fEventTau(0.),
+    fBeamProfile(0),
+    fPersistence(kFALSE),
+    fEpochLength(0.),
+    fEventId(-1),
+    fEventTime(0.),
+    fEpoch(NULL),
+    fEpochIsChanged(kFALSE),
+    fMarkNewEpoch(kFALSE),
+    fInMvd(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    stsBuffer(),
+    muchBuffer()
+{ 
+}
 // ---------------------------------------------------------------------------
 
 
@@ -47,7 +65,13 @@ CbmMCStreamer::CbmMCStreamer(Double_t eventRate,
     fEventTime(0.),
     fEpoch(NULL),
     fEpochIsChanged(kFALSE),
-    fMarkNewEpoch(kFALSE) {
+    fMarkNewEpoch(kFALSE),
+    fInMvd(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    stsBuffer(),
+    muchBuffer()
+{
 }
 // ---------------------------------------------------------------------------
 

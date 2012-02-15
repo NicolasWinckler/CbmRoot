@@ -22,10 +22,13 @@
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
-CbmMCStreamerQa::CbmMCStreamerQa():
-fNepoch(0),
-fMcEpoch(NULL),
-fMcChain(NULL)
+CbmMCStreamerQa::CbmMCStreamerQa()
+  : FairTask(),
+    fNepoch(0),
+    fMcEpoch(NULL),
+    fMcChain(NULL),
+    fPointArrays(),
+    fMapPointsInEvents()
 {
   for (Int_t i=kREF;i<kTutDet;i++) fPointArrays[i]=NULL;
 }
@@ -34,10 +37,12 @@ fMcChain(NULL)
 
 // -----   Standard constructor   ------------------------------------------
 CbmMCStreamerQa::CbmMCStreamerQa(const char* name, TChain* mcChain)
-:FairTask(name),
-fNepoch(0),
-fMcEpoch(NULL),
-fMcChain(mcChain)
+  : FairTask(name),
+    fNepoch(0),
+    fMcEpoch(NULL),
+    fMcChain(mcChain),
+    fPointArrays(),
+    fMapPointsInEvents()
 {
   for (Int_t i=kREF;i<kTutDet;i++) fPointArrays[i]=NULL;
 }
@@ -147,7 +152,7 @@ void CbmMCStreamerQa::Finish(){
     Int_t eventIdFirst = fMapPointsInEvents[detId].begin()->first;
     Int_t eventIdLast  = (--fMapPointsInEvents[detId].end())->first;
 
-    printf("Detector: %s size=%i ",detName.Data(),fMapPointsInEvents[detId].size());
+    printf("Detector: %s size=%i ",detName.Data(),(Int_t)fMapPointsInEvents[detId].size());
     printf("  first event = %i",eventIdFirst);
     printf("  last event = %i",eventIdLast);
     printf("\n");

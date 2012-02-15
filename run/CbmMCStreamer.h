@@ -117,10 +117,8 @@ class CbmMCStreamer : public FairTask
    **/
   Int_t ReadEvent();
 
- 
-
-
-
+  CbmMCStreamer(const CbmMCStreamer&);
+  CbmMCStreamer& operator=(const CbmMCStreamer&);
 
   ClassDef(CbmMCStreamer,1);
 

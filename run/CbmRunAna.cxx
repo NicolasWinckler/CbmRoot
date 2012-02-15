@@ -19,8 +19,12 @@ using std::endl;
 
 
 // -----   Constructor   -----------------------------------------------------
-CbmRunAna::CbmRunAna() {
-};
+CbmRunAna::CbmRunAna() 
+  : FairRunAna(),
+    fAsync(kFALSE),
+    fMarkFill(kFALSE)
+{
+}
 // ---------------------------------------------------------------------------
 
 

@@ -52,6 +52,10 @@ private:
   TChain*       fMcChain; //! tree of MC events
   TClonesArray* fPointArrays[kTutDet];       //! Array of MC points per detector
   map<int,int>  fMapPointsInEvents[kTutDet]; //! map of point counters for each event per detector
+
+  CbmMCStreamerQa(const CbmMCStreamerQa&);
+  CbmMCStreamerQa& operator=(const CbmMCStreamerQa&);
+
   ClassDef(CbmMCStreamerQa,1);
 };
 

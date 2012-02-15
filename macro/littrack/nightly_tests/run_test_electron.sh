@@ -4,7 +4,9 @@
 
 export SCRIPT=yes
 
-create_output_dir events_electron/
+TEST_NAME=std_electron_reco
+
+create_output_dir events_$TEST_NAME/
 
 export NEVENTS=10
 export DETECTORSETUP=electron 
@@ -29,15 +31,28 @@ root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"hits\")"
 # Test different global tracking algorithms
 # Branching algorithm
 export GLOBALTRACKINGTYPE=branch
-create_result_dir results_electron_branch/
+create_result_dir $TEST_NAME$GLOBALTRACKINGTYPE/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 # Nearest neighbour algorithm
 export GLOBALTRACKINGTYPE=nn
-create_result_dir results_electron_nn/
+create_result_dir $TEST_NAME$GLOBALTRACKINGTYPE/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
 # Nearest neighbour parallel algorithm
 export GLOBALTRACKINGTYPE=nn_parallel
-create_result_dir results_electron_nn_parallel/
+create_result_dir $TEST_NAME$GLOBALTRACKINGTYPE/
 root -b -q -l "$VMCWORKDIR/macro/littrack/global_reco.C($NEVENTS, \"tracking\")"
+
+# Run summary report generator
+export STUDYOUTPUTDIR=summary_report$TEST_NAME
+rm -rf $STUDYOUTPUTDIR
+mkdir $STUDYOUTPUTDIR
+export NSTUDIES=3
+export STUDYNAME1=branch
+export STUDYRESULT1=$TEST_NAME$STUDYNAME1/
+export STUDYNAME2=nn
+export STUDYRESULT2=$TEST_NAME$STUDYNAME2/
+export STUDYNAME3=nn_parallel
+export STUDYRESULT3=$TEST_NAME$STUDYNAME3/
+root -b -q -l "$VMCWORKDIR/macro/littrack/qa_study.C"
 
 export SCRIPT=no

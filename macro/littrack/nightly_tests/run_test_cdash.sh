@@ -2,18 +2,18 @@
 
 # Pathes and parameters
 TEST_DIR=/data.local1/andrey/tests/cdash_tests
-EXTERNALS=jan12
-BUILD_DIR=$TEST_DIR/cbmroot_build_$EXTERNALS
+BUILD_DIR=$TEST_DIR/cbmroot_build_jan12
 
 # Checkout and configure CBMROOT
 rm -rf $TEST_DIR/*
-export SIMPATH=/data.local1/fairsoft/fairsoft_$EXTERNALS/
 cd $TEST_DIR/
 svn co  https://subversion.gsi.de/fairroot/cbmroot/trunk cbmroot
-cp -R /data.local1/andrey/tests/fieldmaps/ $TEST_DIR/cbmroot/input/
+cp -R /data.local1/andrey/tests/fieldmaps/* $TEST_DIR/cbmroot/input/
 cp /data.local1/andrey/tests/cdash_config/Dart.cfg $TEST_DIR/cbmroot/Dart.cfg
 
+# Run tests
 . $TEST_DIR/cbmroot/Dart.sh Experimental $TEST_DIR/cbmroot/Dart.cfg    
+
 
 DAY=`date +%y-%m-%d`
 cd /u/andrey/web-docs/tests
@@ -49,7 +49,7 @@ function study_summary()
 }
 
 study_summary muon
-study_summary electron
+#study_summary electron
 
 chmod -R u+rwX,g+rx,o+rx /u/andrey/web-docs/tests/$DAY/
 

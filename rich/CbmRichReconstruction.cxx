@@ -72,8 +72,9 @@ InitStatus CbmRichReconstruction::Init()
   // if ( NULL == fRichRingMatches) { Fatal("CbmRichReconstruction::Init","No RichRingMatch array!"); }
 
    fRichProjections = (TClonesArray*) ioman->GetObject("RichProjection");
-   if (NULL == fRichProjections) { Fatal("CbmRichReconstruction::Init","No RichProjection array!"); }
-  // fRichProjections = new TClonesArray("RichProjection", 600);
+   //if (NULL == fRichProjections) { Fatal("CbmRichReconstruction::Init","No RichProjection array!"); }
+
+   // fRichProjections = new TClonesArray("RichProjection", 600);
    //ioman->Register("RichRing", "RICH", fRichProjections, kTRUE);
 
    fRichRings = new TClonesArray("CbmRichRing", 100);

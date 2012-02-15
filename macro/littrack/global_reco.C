@@ -341,18 +341,9 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		  run->AddTask(richProj);
 		  //--------------------------------------------------------------------------
 
-		  //--------------------- RICH Ring Finding ----------------------------------
-		  TString richGeoType = "compact";//choose between compact or large
-		  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose,	richGeoType);
-		  CbmRichFindRings* richFindRings = new CbmRichFindRings();
-		  richFindRings->UseFinder(richFinder);
-		  run->AddTask(richFindRings);
-		  //--------------------------------------------------------------------------
-
-		  //-------------------- RICH Ring Fitting -----------------------------------
-		  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau();
-		  CbmRichFitRings* fitRings = new CbmRichFitRings(richFitter);
-		  run->AddTask(fitRings);
+		  //-------------------------------------------------------------------------
+		  CbmRichReconstruction* richReco = new CbmRichReconstruction();
+		  run->AddTask(richReco);
 		  //--------------------------------------------------------------------------
 
 		  // ------------------- RICH Ring matching  ---------------------------------

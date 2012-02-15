@@ -16,39 +16,25 @@
 #pragma link C++ class CbmRichTrainAnnSelect;
 #pragma link C++ class CbmRichTrainAnnElectrons;
 
-//fitter
-#pragma link C++ class CbmRichRingFitterCircle+;
-#pragma link C++ class CbmRichRingFitterRobustCOP+;
-#pragma link C++ class CbmRichRingFitterTAU+;
-#pragma link C++ class CbmRichFitRings+;
-#pragma link C++ class CbmRichRingFitterImpl+;
-#pragma link C++ class CbmRichRingFitterEllipseTau+;
+//reconstruction
+#pragma link C++ class CbmRichReconstruction+;
 #pragma link C++ class CbmRichRingFitterQa+;
-#pragma link C++ class CbmRichRingFitterEllipseBase+;
-#pragma link C++ class CbmRichRingFitterEllipse+;
-
-//finder
-#pragma link C++ class CbmRichRingFinderHough+;
-#pragma link C++ class CbmRichRingFinderTrack+;
-#pragma link C++ class CbmRichRingFinderIdeal+;
-#pragma link C++ class CbmRichFindRings+;
-//#pragma link C++ class CbmRichRingFinderHoughParallel;
 
 //qa
-#pragma link C++ class  CbmRichTestSim+;
-#pragma link C++ class  CbmRichTestHits+;
+#pragma link C++ class CbmRichTestSim+;
+#pragma link C++ class CbmRichTestHits+;
 #pragma link C++ class CbmRichGeoTest+;
 //#pragma link C++ class CbmRichParallelQa+;
 //selection
 
 //tracks
-#pragma link C++ class  CbmRichProjectionProducer+;
-#pragma link C++ class  CbmRichTrackExtrapolationIdeal+;
-#pragma link C++ class  CbmRichTrackExtrapolationMirrorIdeal+;
-#pragma link C++ class  CbmRichExtrapolateTracks+;
-#pragma link C++ class  CbmRichRingTrackAssignClosestD+;
-#pragma link C++ class  CbmRichRingTrackAssignIdeal+;
-#pragma link C++ class  CbmRichAssignTrack+;
+#pragma link C++ class CbmRichProjectionProducer+;
+#pragma link C++ class CbmRichTrackExtrapolationIdeal+;
+#pragma link C++ class CbmRichTrackExtrapolationMirrorIdeal+;
+#pragma link C++ class CbmRichExtrapolateTracks+;
+#pragma link C++ class CbmRichRingTrackAssignClosestD+;
+#pragma link C++ class CbmRichRingTrackAssignIdeal+;
+#pragma link C++ class CbmRichAssignTrack+;
 
 //#pragma link C++ class LhcbRingFinder;
 

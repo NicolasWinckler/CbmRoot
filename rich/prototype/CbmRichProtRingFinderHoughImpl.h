@@ -17,7 +17,7 @@
 #include <map>
 #include <functional>
 
-class CbmRichRingFitterCOPLight;
+class CbmRichRingFitterCOP;
 
 class CbmRichProtHoughHit {
 public:
@@ -102,7 +102,7 @@ protected:
 
 	std::vector<CbmRichRingLight*> fFoundRings;///collect found rings
 
-	CbmRichRingFitterCOPLight* fFitCOP;
+	CbmRichRingFitterCOP* fFitCOP;
 	CbmRichRingSelectNeuralNet* fANNSelect;
 	//CbmRichRingFitterEllipseTau* fFitEllipse;
 

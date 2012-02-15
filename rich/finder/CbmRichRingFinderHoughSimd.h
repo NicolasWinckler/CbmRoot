@@ -1,9 +1,14 @@
-//--------------------------------------------------------------------------------------
-//CbmRichRingFinderHough source file
-//Implementation: Semen Lebedev (s.lebedev@gsi.de)-----
+/**
+* \file CbmRichRingFinderHoughSimd.h
+*
+* \brief SIMDized ring finder based on Hough Transform method.
+*
+* \author Semen Lebedev
+* \date 2009
+**/
 
-#ifndef CBM_RICH_RING_FINDER_HOUGH_SIMD_H
-#define CBM_RICH_RING_FINDER_HOUGH_SIMD_H
+#ifndef CBM_RICH_RING_FINDER_HOUGH_SIMD
+#define CBM_RICH_RING_FINDER_HOUGH_SIMD
 
 #include "CbmRichRingFinderHoughImpl.h"
 //#include "../L1/L1Algo/L1Types.h"
@@ -18,8 +23,16 @@ public:
 	//Bool_t fIsUsed;
 }  _fvecalignment;
 
-
-class CbmRichRingFinderHoughSimd : public CbmRichRingFinderHoughImpl {
+/**
+* \class CbmRichRingFinderHoughSimd
+*
+* \brief SIMDized ring finder based on Hough Transform method.
+*
+* \author Semen Lebedev
+* \date 2009
+**/
+class CbmRichRingFinderHoughSimd : public CbmRichRingFinderHoughImpl
+{
 
 public:
   	CbmRichRingFinderHoughSimd ();
@@ -35,7 +48,5 @@ public:
 
 	std::vector<CbmRichHoughHitVec> fDataV;
 
-	//ClassDef(CbmRichRingFinderHoughSimd,1)
-
 };
-#endif // CBM_RICH_RING_FINDER_HOUGH_SIMD_H
+#endif

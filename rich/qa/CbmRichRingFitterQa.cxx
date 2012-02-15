@@ -1,7 +1,7 @@
 
 #include "CbmRichRingFitterQa.h"
 #include "CbmRichRingFitterEllipseTau.h"
-#include "CbmRichRingFitterEllipse.h"
+#include "CbmRichRingFitterEllipseMinuit.h"
 #include "CbmRichRingFitterCOP.h"
 
 #include "TRandom.h"
@@ -54,9 +54,7 @@ void CbmRichRingFitterQa::GenerateEllipse()
 	Double_t A = 6.;
 	Double_t B = 6.;
 	Double_t sigmaError = 0.2;
-	vector<Double_t> hitX;
-	vector<Double_t> hitY;
-	CbmRichRing ellipse;
+	CbmRichRingLight ellipse;
 	Int_t nofBadFit = 0;
    Double_t X0 = 0.;//gRandom->Rndm()*(maxX - A);
    Double_t Y0 = 0.;//gRandom->Rndm()* (maxY - A);
@@ -66,9 +64,7 @@ void CbmRichRingFitterQa::GenerateEllipse()
 
 	for (Int_t iR = 0; iR < 50000; iR++){
 		Double_t phi = 0.;//TMath::Pi()*(6./12.); //gRandom->Rndm()*TMath::Pi() - TMath::Pi()/2.;
-		ellipse.SetXYABPhi(X0, Y0, A, B, phi);
-		hitX.clear();
-		hitY.clear();
+		ellipse.SetXYABP(X0, Y0, A, B, phi);
 		for (Int_t iH = 0; iH < nofHits; iH++){
 			Double_t alfa = gRandom->Rndm()*2.*TMath::Pi();
 
@@ -81,11 +77,11 @@ void CbmRichRingFitterQa::GenerateEllipse()
 			Double_t hitXRot = hx * cos(phi) - hy * sin(phi);
 			Double_t hitYRot = hx * sin(phi) + hy * cos(phi);
 
-			hitX.push_back(hitXRot + X0 + errorX);
-			hitY.push_back(hitYRot + Y0 + errorY);
+			CbmRichHitLight hit(hitXRot + X0 + errorX, hitYRot + Y0 + errorY);
+			ellipse.AddHit(hit);
 		}
 		// ellipse fit
-		fitEllipse->DoFit(&ellipse, hitX, hitY);
+		fitEllipse->DoFit(&ellipse);
 		fhErrorA->Fill(A - ellipse.GetAaxis());
 		fhErrorB->Fill(B - ellipse.GetBaxis());
 		fhErrorX->Fill(X0 - ellipse.GetCenterX());
@@ -98,9 +94,9 @@ void CbmRichRingFitterQa::GenerateEllipse()
 		fhPhi->Fill(ellipse.GetPhi());
 
 		// circle fit
-      fitCircle->DoFit(&ellipse, hitX, hitY);
+      fitCircle->DoFit(&ellipse);
 		TMatrixD cov(3,3);
-      CalculateFitErrors(&ellipse, hitX, hitY, sigmaError, cov);
+      CalculateFitErrors(&ellipse, sigmaError, cov);
       Double_t mcR = (A + B) / 2.;
       fhRadiusErr->Fill(mcR - ellipse.GetRadius());
       fhCircleXcErr->Fill(X0 - ellipse.GetCenterX());
@@ -175,9 +171,7 @@ void CbmRichRingFitterQa::Draw()
 }
 
 void CbmRichRingFitterQa::CalculateFitErrors(
-      CbmRichRing* ring,
-      const vector<Double_t>& xh,
-      const vector<Double_t>& yh,
+      CbmRichRingLight* ring,
       Double_t sigma,
       TMatrixD& cov)
 {
@@ -198,9 +192,9 @@ void CbmRichRingFitterQa::CalculateFitErrors(
    Double_t xc = ring->GetCenterX();
    Double_t yc = ring->GetCenterY();
    Double_t R = ring->GetRadius();
-   for (Int_t iHit = 0; iHit < xh.size(); iHit++) {
-      Double_t xi = xh[iHit];
-      Double_t yi = yh[iHit];
+   for (Int_t iHit = 0; iHit < ring->GetNofHits(); iHit++) {
+      Double_t xi = ring->GetHit(iHit).fX;
+      Double_t yi = ring->GetHit(iHit).fY;
       Double_t ri = sqrt((xi - xc) * (xi - xc) + (yi - yc) * (yi - yc));
       Double_t err = sigma;
 

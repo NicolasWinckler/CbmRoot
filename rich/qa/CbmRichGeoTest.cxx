@@ -21,6 +21,7 @@
 #include "FairRuntimeDb.h"
 #include "CbmRichHitProducer.h"
 #include "cbm/utils/CbmLitDrawHist.h"
+#include "CbmRichConverter.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -193,7 +194,7 @@ InitStatus CbmRichGeoTest::Init()
    fPhi = -1.*TMath::ASin(fdetR(2)); // tilting angle around y-axis
 
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
-   if ( !fRichHits) { Fatal("CbmRichGeoTest::Init","No RichHit array!"); }
+   if ( NULL == fRichHits) { Fatal("CbmRichGeoTest::Init","No RichHit array!"); }
 
 	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
 	if ( NULL == fRichRings) { Fatal("CbmRichGeoTest::Init","No RichRing array!"); }
@@ -208,10 +209,7 @@ InitStatus CbmRichGeoTest::Init()
 	if ( NULL == fRichRingMatches) { Fatal("CbmRichGeoTest::Init","No RichRingMatch array!"); }
 
    fCopFit = new CbmRichRingFitterCOP();
-   fCopFit->Init();
-
    fTauFit = new CbmRichRingFitterEllipseTau();
-   fTauFit->Init();
 
 	return kSUCCESS;
 }
@@ -264,55 +262,55 @@ void CbmRichGeoTest::RingParameters()
 		   fhAcc3D->Fill(momentum, pt, rapidity);
 		}
 
-		vector<double> xMc, yMc;
-		Int_t nofRichPoints = fRichPoints->GetEntriesFast();
-		for (Int_t iPoint = 0; iPoint < nofRichPoints; iPoint++){
+		CbmRichRingLight ringPoint;
+		int nofRichPoints = fRichPoints->GetEntriesFast();
+		for (int iPoint = 0; iPoint < nofRichPoints; iPoint++){
 		   CbmRichPoint* richPoint = (CbmRichPoint*) fRichPoints->At(iPoint);
-		   if (richPoint == NULL) continue;
+		   if (NULL == richPoint) continue;
 		   Int_t trackId = richPoint->GetTrackID();
 		   if (trackId < 0) continue;
 	      CbmMCTrack* mcTrackRich = (CbmMCTrack*)fMCTracks->At(trackId);
-	      if (!mcTrackRich) continue;
-	      Int_t motherIdRich = mcTrackRich->GetMotherId();
+	      if (NULL == mcTrackRich) continue;
+	      int motherIdRich = mcTrackRich->GetMotherId();
 		   if (motherIdRich == mcTrackId){
 		      TVector3 posPoint;
 		      richPoint->Position(posPoint);
 		      TVector3 detPoint;
 		      CbmRichHitProducer::TiltPoint(&posPoint, &detPoint, fPhi, fTheta, fDetZOrig);
-		      xMc.push_back(detPoint.X());
-		      yMc.push_back(detPoint.Y());
+		      CbmRichHitLight hit(detPoint.X(), detPoint.Y());
+		      ringPoint.AddHit(hit);
 		   }
 		}
 	   fhNofHitsAll->Fill(ring->GetNofHits());
 
-      vector<Double_t> x, y;
-		CbmRichRing* ringMc = new CbmRichRing();
+	   CbmRichRingLight ringHit;
+	   CbmRichConverter::CopyHitsToRingLight(ring, &ringHit);
 
-      FitAndFillHistCircle(0, ring, momentum, x, y); //hits
-      FitAndFillHistCircle(1, ringMc, momentum, xMc, yMc); // points
-      FillMcVsHitFitCircle(ring, ringMc);
+      FitAndFillHistCircle(0, &ringHit, momentum); //hits
+      FitAndFillHistCircle(1, &ringPoint, momentum); // points
+      FillMcVsHitFitCircle(&ringHit, &ringPoint);
 
-      Double_t r = ringMc->GetRadius();
+      double r = ringPoint.GetRadius();
 
-      if (ring->GetRadius() > fMinRadius && ring->GetRadius() < fMaxRadius){
-         fhNofHitsCircleFit->Fill(ring->GetNofHits());
+      if (ringHit.GetRadius() > fMinRadius && ringHit.GetRadius() < fMaxRadius){
+         fhNofHitsCircleFit->Fill(ringHit.GetNofHits());
       }
-	   if (fNofDrawnRings < 10 && ring->GetNofHits() <= 7 && ring->GetNofHits() >= 7){
-	      DrawRing(ring, xMc, yMc);
+	   if (fNofDrawnRings < 10 && ringHit.GetNofHits() <= 7 && ringHit.GetNofHits() >= 7){
+	      DrawRing(&ringHit, &ringPoint);
 	   }
 
-		FitAndFillHistEllipse(0, ring, momentum, x, y);// hits
-		FitAndFillHistEllipse(1, ringMc, momentum, xMc, yMc); // points
-		FillMcVsHitFitEllipse(ring, ringMc);
-	   if (ring->GetAaxis() > fMinAaxis && ring->GetAaxis() < fMaxAaxis
-	       &&  ring->GetBaxis() > fMinBaxis && ring->GetAaxis() < fMaxBaxis ){
-	      fhNofHitsEllipseFit->Fill(ring->GetNofHits());
+		FitAndFillHistEllipse(0, &ringHit, momentum);// hits
+		FitAndFillHistEllipse(1, &ringPoint, momentum); // points
+		FillMcVsHitFitEllipse(&ringHit, &ringPoint);
+	   if (ringHit.GetAaxis() > fMinAaxis && ringHit.GetAaxis() < fMaxAaxis
+	       &&  ringHit.GetBaxis() > fMinBaxis && ringHit.GetAaxis() < fMaxBaxis ){
+	      fhNofHitsEllipseFit->Fill(ringHit.GetNofHits());
 	   }
-	   Double_t np = xMc.size();
-      Double_t xc = ringMc->GetCenterX();
-      Double_t yc = ringMc->GetCenterY();
-      Double_t a = ringMc->GetAaxis();
-      Double_t b = ringMc->GetBaxis();
+	   Double_t np = ringPoint.GetNofHits();
+      Double_t xc = ringPoint.GetCenterX();
+      Double_t yc = ringPoint.GetCenterY();
+      Double_t a = ringPoint.GetAaxis();
+      Double_t b = ringPoint.GetBaxis();
       Double_t nh = ring->GetNofHits();
 
 	   fhNofHitsXY->Fill(xc, yc, nh);
@@ -322,32 +320,27 @@ void CbmRichGeoTest::RingParameters()
 	   fhAaxisXY->Fill(xc, yc, a);
 	   fhRadiusXY->Fill(xc, yc, r);
 	   fhCounterXY->Fill(xc, yc);
-
-		delete ringMc;
 	}// iR
 }
 
 void CbmRichGeoTest::FitAndFillHistEllipse(
-      Int_t histIndex,
-      CbmRichRing* ring,
-      Double_t momentum,
-      const vector<Double_t>& x,
-      const vector<Double_t>& y)
+      int histIndex,
+      CbmRichRingLight* ring,
+      double momentum)
 {
-   if (x.size() != 0){ fTauFit->DoFit(ring, x, y);}
-   else {fTauFit->DoFit(ring);}
-   Double_t axisA = ring->GetAaxis();
-   Double_t axisB = ring->GetBaxis();
-   Double_t xcEllipse = ring->GetCenterX();
-   Double_t ycEllipse = ring->GetCenterY();
-   Int_t nofHitsRing = ring->GetNofHits();
-   if (x.size() != 0) nofHitsRing = x.size();
+   fTauFit->DoFit(ring);
+   double axisA = ring->GetAaxis();
+   double axisB = ring->GetBaxis();
+   double xcEllipse = ring->GetCenterX();
+   double ycEllipse = ring->GetCenterY();
+   int nofHitsRing = ring->GetNofHits();
+
    fhBoverA[histIndex]->Fill(axisB/axisA);
    fhXcYcEllipse[histIndex]->Fill(xcEllipse, ycEllipse);
    fhNofHits[histIndex]->Fill(nofHitsRing);
    fhBaxisVsMom[histIndex]->Fill(momentum, axisB);
    fhAaxisVsMom[histIndex]->Fill(momentum, axisA);
-   fhChi2Ellipse[histIndex]->Fill(ring->GetChi2()/ring->GetNDF());
+   fhChi2Ellipse[histIndex]->Fill(ring->GetChi2()/ring->GetNofHits());
    if (histIndex == 0){ // only hit fit
       fhAaxisVsNofHits->Fill(nofHitsRing, axisA);
       fhBaxisVsNofHits->Fill(nofHitsRing, axisB);
@@ -355,37 +348,24 @@ void CbmRichGeoTest::FitAndFillHistEllipse(
 }
 
 void CbmRichGeoTest::FitAndFillHistCircle(
-      Int_t histIndex,
-      CbmRichRing* ring,
-      Double_t momentum,
-      const vector<Double_t>& x,
-      const vector<Double_t>& y)
+      int histIndex,
+      CbmRichRingLight* ring,
+      double momentum)
 {
-   if (x.size() != 0){ fCopFit->DoFit(ring, x, y);}
-   else {fCopFit->DoFit(ring);}
-   Double_t radius = ring->GetRadius();
-   Double_t xcCircle = ring->GetCenterX();
-   Double_t ycCircle = ring->GetCenterY();
-   Int_t nofHitsRing = ring->GetNofHits();
+   fCopFit->DoFit(ring);
+   double radius = ring->GetRadius();
+   double xcCircle = ring->GetCenterX();
+   double ycCircle = ring->GetCenterY();
+   int nofHitsRing = ring->GetNofHits();
    fhXcYcCircle[histIndex]->Fill(xcCircle, ycCircle);
    fhRadiusVsMom[histIndex]->Fill(momentum, radius);
-   fhChi2Circle[histIndex]->Fill(ring->GetChi2()/ring->GetNDF());
-   Double_t dr;
-   if (x.size() != 0){
-      for (int iH = 0; iH < x.size(); iH++){
-         dr = radius - sqrt((xcCircle - x[iH])*(xcCircle - x[iH]) + (ycCircle - y[iH])*(ycCircle - y[iH]));
-         fhDRCircle[histIndex]->Fill(dr);
-      }
-   } else {
-      for (int iH = 0; iH < ring->GetNofHits(); iH++){
-         Int_t ind = ring->GetHit(iH);
-         CbmRichHit* hit = (CbmRichHit*)fRichHits->At(ind);
-         if (NULL == hit) continue;
-         Double_t xh = hit->GetX();
-         Double_t yh = hit->GetY();
-         dr = radius - sqrt((xcCircle - xh)*(xcCircle - xh) + (ycCircle - yh)*(ycCircle - yh));
-         fhDRCircle[histIndex]->Fill(dr);
-      }
+   fhChi2Circle[histIndex]->Fill(ring->GetChi2()/ring->GetNofHits());
+
+   for (int iH = 0; iH < ring->GetNofHits(); iH++){
+      double xh = ring->GetHit(iH).fX;
+      double yh = ring->GetHit(iH).fY;
+      double dr = radius - sqrt((xcCircle - xh)*(xcCircle - xh) + (ycCircle - yh)*(ycCircle - yh));
+      fhDRCircle[histIndex]->Fill(dr);
    }
 
    if (histIndex == 0){ // only hit fit
@@ -394,8 +374,8 @@ void CbmRichGeoTest::FitAndFillHistCircle(
 }
 
 void CbmRichGeoTest::FillMcVsHitFitEllipse(
-      CbmRichRing* ring,
-      CbmRichRing* ringMc)
+      CbmRichRingLight* ring,
+      CbmRichRingLight* ringMc)
 {
    fhDiffAaxis->Fill(ring->GetNofHits(), ringMc->GetAaxis() - ring->GetAaxis());
    fhDiffBaxis->Fill(ring->GetNofHits(),ringMc->GetBaxis() - ring->GetBaxis());
@@ -404,8 +384,8 @@ void CbmRichGeoTest::FillMcVsHitFitEllipse(
 }
 
 void CbmRichGeoTest::FillMcVsHitFitCircle(
-      CbmRichRing* ring,
-      CbmRichRing* ringMc)
+      CbmRichRingLight* ring,
+      CbmRichRingLight* ringMc)
 {
    fhDiffXcCircle->Fill(ring->GetNofHits(),ringMc->GetCenterX() - ring->GetCenterX());
    fhDiffYcCircle->Fill(ring->GetNofHits(),ringMc->GetCenterY() - ring->GetCenterY());
@@ -431,9 +411,8 @@ void CbmRichGeoTest::HitsAndPoints()
 }
 
 void CbmRichGeoTest::DrawRing(
-      CbmRichRing* ring,
-      const vector<Double_t>& x,
-      const vector<Double_t>& y)
+      CbmRichRingLight* ringHit,
+      CbmRichRingLight* ringPoint)
 {
    stringstream ss;
    ss << "Event" << fNofDrawnRings;
@@ -447,10 +426,9 @@ void CbmRichGeoTest::DrawRing(
    // find min and max x and y positions of the hits
    // in order to shift drawing
    double xmin = 99999., xmax = -99999., ymin = 99999., ymax = -99999.;
-   for (int i = 0; i < ring->GetNofHits(); i++){
-      CbmRichHit* hit = (CbmRichHit*)fRichHits->At(ring->GetHit(i));
-      double hitX = hit->GetX();
-      double hitY = hit->GetY();
+   for (int i = 0; i < ringHit->GetNofHits(); i++){
+      double hitX = ringHit->GetHit(i).fX;
+      double hitY = ringHit->GetHit(i).fY;
       if (xmin > hitX) xmin = hitX;
       if (xmax < hitX) xmax = hitX;
       if (ymin > hitY) ymin = hitY;
@@ -460,32 +438,31 @@ void CbmRichGeoTest::DrawRing(
    double yCur = (ymin + ymax) / 2.;
 
    //Draw circle and center
-   TEllipse* circle = new TEllipse(ring->GetCenterX() - xCur,
-         ring->GetCenterY() - yCur, ring->GetRadius());
+   TEllipse* circle = new TEllipse(ringHit->GetCenterX() - xCur,
+         ringHit->GetCenterY() - yCur, ringHit->GetRadius());
    circle->SetFillStyle(0);
    circle->SetLineWidth(3);
    circle->Draw();
-   TEllipse* center = new TEllipse(ring->GetCenterX() - xCur, ring->GetCenterY() - yCur, 2.5);
+   TEllipse* center = new TEllipse(ringHit->GetCenterX() - xCur, ringHit->GetCenterY() - yCur, 2.5);
    center->Draw();
 
    // Draw hits
-   for (int i = 0; i < ring->GetNofHits(); i++){
-      CbmRichHit* hit = (CbmRichHit*)fRichHits->At(ring->GetHit(i));
-      TEllipse* hitDr = new TEllipse(hit->GetX() - xCur, hit->GetY() - yCur, 2.5);
+   for (int i = 0; i < ringHit->GetNofHits(); i++){
+      TEllipse* hitDr = new TEllipse(ringHit->GetHit(i).fX - xCur, ringHit->GetHit(i).fY - yCur, 2.5);
       hitDr->SetFillColor(kRed);
       hitDr->Draw();
    }
 
    // Draw MC Points
-   for (int i = 0; i < x.size(); i++){
-      TEllipse* pointDr = new TEllipse(x[i] - xCur, y[i] - yCur, 1);
+   for (int i = 0; i < ringPoint->GetNofHits(); i++){
+      TEllipse* pointDr = new TEllipse(ringPoint->GetHit(i).fX - xCur, ringPoint->GetHit(i).fY - yCur, 1);
       pointDr->SetFillColor(kBlue);
       pointDr->Draw();
    }
 
    //Draw information
    stringstream ss2;
-   ss2 << "(r, n)=(" << setprecision(3) << ring->GetRadius() << ", " << ring->GetNofHits()<<")";
+   ss2 << "(r, n)=(" << setprecision(3) << ringHit->GetRadius() << ", " << ringHit->GetNofHits()<<")";
    TLatex* latex = new TLatex(-8., 8., ss2.str().c_str());
    latex->Draw();
 }

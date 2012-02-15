@@ -82,7 +82,7 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRingLight* ring)
     nnPar[2] =  ring->GetNofHitsOnRing();
     nnPar[3] =  ring->GetRadialPosition();
     nnPar[4] =  ring->GetRadius();
-    nnPar[5] =  ring->GetChi2() / ring->GetNDF();
+    nnPar[5] =  ring->GetChi2() / ring->GetNofHits();
 #ifdef ANN_FILE
     float nnEval = fNN->Evaluate(0,nnPar);
 #endif

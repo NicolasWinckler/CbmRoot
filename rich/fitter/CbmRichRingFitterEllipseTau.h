@@ -8,15 +8,14 @@
 * \date 2011
 **/
 
-#ifndef CBMRICHRINGFITTERELLIPSETAUH
-#define CBMRICHRINGFITTERELLIPSETAUH
+#ifndef CBM_RICH_RING_FITTER_ELLIPSE_TAU
+#define CBM_RICH_RING_FITTER_ELLIPSE_TAU
 
 #include <vector>
 #include "CbmRichRingFitterEllipseBase.h"
 
 using std::vector;
 
-#define MAX_NOF_HITS 400
 
 /**
 * \class CbmRichRingFitterEllipseTau
@@ -42,34 +41,32 @@ public:
    virtual ~CbmRichRingFitterEllipseTau();
 
    /**
-    * \brief Fit ring using hit coordinates from vectors.
-    * \param[in] ring RICH ring to be fitted.
-    * \param[in] hitX Vector of x coordinates of hits.
-    * \param[in] hitY Vector of y coordinates of hits.
+    * \brief Inherited from CbmRichRingFitterBase.
     */
-   void DoFit(
-         CbmRichRing *ring,
-         const vector<Double_t>& hitX,
-         const vector<Double_t>& hitY);
+   virtual void DoFit(
+         CbmRichRingLight *ring);
 
-   /**
-    * \brief Fit ring.
-    * \param[in,out] ring RICH ring to be fitted.
-    */
-   void DoFit(
-         CbmRichRing *ring);
+private:
+
+   double fM[36];
+   double fP[25];
+   double fQ[25];
+   double fZ[MAX_NOF_HITS_IN_RING*6];
+   double fZT[MAX_NOF_HITS_IN_RING*6];
+   double fAlgPar[6];
 
    /**
     * \brief Transform fitted curve to ellipse parameters.
     * \param[in,out] ring RICH ring.
     */
-	void TransEllipse(
-	      CbmRichRing *ring);
+	void TransformEllipse(
+	      CbmRichRingLight* ring);
 
 	/**
 	 * \brief Initialize all matrices.
 	 */
-	void InitMatrices();
+	void InitMatrices(
+	      CbmRichRingLight* ring);
 
 	/**
 	 * \brief Perform Taubin method.
@@ -85,41 +82,28 @@ public:
 	 * \brief Matrices multiplication.
 	 */
 	void AMultB(
-	      const Double_t * const ap,
-	      Int_t na, Int_t ncolsa,
-	      const Double_t * const bp,
-	      Int_t nb,
-	      Int_t ncolsb,
-	      Double_t *cp);
+	      const double * const ap,
+	      int na,
+	      int ncolsa,
+	      const double * const bp,
+	      int nb,
+	      int ncolsb,
+	      double *cp);
 
 	/**
 	 * \brief Jacobi method.
 	 */
 	void Jacobi(
-	      Double_t a[5][5],
-	      Double_t d[5],
-	      Double_t v[5][5]);
+	      double a[5][5],
+	      double d[5],
+	      double v[5][5]);
 
 	/**
 	 * \brief Find eigenvalues.
 	 */
 	void Eigsrt(
-	      Double_t d[5],
-	      Double_t v[5][5]);
-
-private:
-	Double_t fM[36];
-	Double_t fP[25];
-	Double_t fQ[25];
-	Double_t fZ[MAX_NOF_HITS*6];
-	Double_t fZT[MAX_NOF_HITS*6];
-
-	Double_t fAlgPar[6];
-
-	vector<Double_t> fX; // vector of X coordinates
-	vector<Double_t> fY; // vector of Y coordinates
-
-   ClassDef(CbmRichRingFitterEllipseTau,1);
+	      double d[5],
+	      double v[5][5]);
 };
 
 #endif

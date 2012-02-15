@@ -5,7 +5,7 @@
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
 #include "CbmRichProtRingFinderHoughImpl.h"
-#include "CbmRichRingFitterCOPLight.h"
+#include "CbmRichRingFitterCOP.h"
 //#include "CbmRichFuzzyKE.h"
 #include "CbmRichRingLight.h"
 
@@ -57,7 +57,7 @@ void CbmRichProtRingFinderHoughImpl::Init()
     fHistR.resize(fNofBinsR);
 	fHitInd.resize(fNofParts);
 
-    fFitCOP = new CbmRichRingFitterCOPLight();
+    fFitCOP = new CbmRichRingFitterCOP();
 
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
     if (fGeometryType == "large"){

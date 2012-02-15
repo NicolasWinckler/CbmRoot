@@ -1,19 +1,16 @@
 /**
-* \file CbmRichRingFitterEllipse.h
+* \file CbmRichRingFitterEllipseMinuit.h
 *
-* \brief This is the implementation of ellipse fitting
-*    using MINUIT.
+* \brief This is the implementation of ellipse fitting using MINUIT.
 * \author Semen Lebedev <s.lebedev@gsi.de>
 * \date 2011
 **/
 
-#ifndef CBMRICHRINGFITTERELLIPSEH
-#define CBMRICHRINGFITTERELLIPSEH
+#ifndef CBM_RICH_RING_FITTER_ELLIPSE_MINUIT
+#define CBM_RICH_RING_FITTER_ELLIPSE_MINUIT
 
 #include "CbmRichRingFitterEllipseBase.h"
 #include "TFitterMinuit.h"
-//#include "TH2D.h"
-
 #include <vector>
 
 using std::vector;
@@ -31,8 +28,8 @@ public:
     * \brief Default constructor.
     */
    FCNEllipse(
-         const std::vector<Double_t>& x,
-         const std::vector<Double_t>& y) :
+         const vector<Double_t>& x,
+         const vector<Double_t>& y) :
             fX(x),
             fY(y),
             fErrorDef(1.)
@@ -101,64 +98,51 @@ private:
 };
 
 /**
-* \class CbmRichRingFitterEllipse
+* \class CbmRichRingFitterEllipseMinuit
 *
-* \brief This is the implementation of ellipse fitting
-*    using MINUIT.
+* \brief This is the implementation of ellipse fitting using MINUIT.
 * \author Semen Lebedev <s.lebedev@gsi.de>
 * \date 2011
 **/
-class CbmRichRingFitterEllipse : public CbmRichRingFitterEllipseBase
+class CbmRichRingFitterEllipseMinuit : public CbmRichRingFitterEllipseBase
 {
 public:
+
    /**
     * \brief Default constructor.
     */
-   CbmRichRingFitterEllipse();
+   CbmRichRingFitterEllipseMinuit();
 
    /**
     * \brief Standard destructor.
     */
-   virtual ~CbmRichRingFitterEllipse();
+   virtual ~CbmRichRingFitterEllipseMinuit();
 
    /**
-    * \brief Fit ring using hit coordinates from vectors.
-    * \param[in] ring RICH ring to be fitted.
-    * \param[in] hitX Vector of x coordinates of hits.
-    * \param[in] hitY Vector of y coordinates of hits.
+    * \brief Inherited from CbmRichRingFitterBase.
     */
-   void DoFit(
-         CbmRichRing *ring,
-         const vector<Double_t>& hitX,
-         const vector<Double_t>& hitY);
+   virtual void DoFit(
+         CbmRichRingLight *ring);
 
-   /**
-    * \brief Fit ring.
-    * \param[in,out] ring RICH ring to be fitted.
-    */
-   void DoFit(
-         CbmRichRing *ring);
-
+private:
    /**
     * \brief Execute ring fitting algorithm.
     * \param[in] x X coordinates of hits.
     * \param[in] y Y coordinates of hit.
+    * \return Vector of fitted parameters.
     */
-   vector<Double_t> DoFit(
-         const vector<Double_t>& x,
-         const vector<Double_t>& y);
+   vector<double> DoFit(
+         const vector<double>& x,
+         const vector<double>& y);
 
-protected:
    /**
-    * \brief Transform obtained parameters from MINUIT to CbmRichRing.
-    * \param[out] x pointer to the RICH ring.
+    * \brief Transform obtained parameters from MINUIT to CbmRichRingLight.
+    * \param[out] ring Pointer to the RICH ring.
     * \param[in] par Parameters obtained from MINUIT.
     */
    void TransformToRichRing(
-         CbmRichRing* ring,
-         const vector<Double_t>& par);
-
-   ClassDef(CbmRichRingFitterEllipse,1);
+         CbmRichRingLight* ring,
+         const vector<double>& par);
 };
 
 #endif

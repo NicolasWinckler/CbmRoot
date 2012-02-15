@@ -14,15 +14,11 @@
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "CbmRichPoint.h"
-
-// CBM includes
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
 
-// ROOT includes
 #include "TClonesArray.h"
 
-// C++ includes
 #include <iostream>
 #include <map>
 
@@ -31,42 +27,28 @@ using std::endl;
 using std::map;
 
 
-CbmRichRingFinderIdeal::CbmRichRingFinderIdeal()
+CbmRichRingFinderIdeal::CbmRichRingFinderIdeal():
+     fRichPoints(NULL),
+     fMcTracks(NULL)
 {
-   fMCRichPointArray = NULL;
-   fVerbose = 1;
-}
 
-CbmRichRingFinderIdeal::CbmRichRingFinderIdeal(
-      Int_t verbose)
-{
-   fMCRichPointArray = NULL;
-   fVerbose = verbose;
 }
 
 CbmRichRingFinderIdeal::~CbmRichRingFinderIdeal()
 {
+
 }
 
 void CbmRichRingFinderIdeal::Init()
 {
    FairRootManager* ioman = FairRootManager::Instance();
-   if (! ioman) {
-      cout << "-E- CbmRichRingFinderIdeal::Init: " << "RootManager not instantised!" << endl;
-      return;
-   }
+   if (NULL == ioman) {Fatal("CbmRichRingFinderIdeal::Init","RootManager is NULL!");}
 
-   fMCTrackArray  = (TClonesArray*) ioman->GetObject("MCTrack");
-   if (NULL == fMCTrackArray) {
-      cout << "-E- CbmRichRingFinderIdeal::Init: No MCTrack array!" << endl;
-      return;
-   }
+   fMcTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
+   if (NULL == fMcTracks) {Fatal("CbmRichRingFinderIdeal::Init","No MCTrack array!");}
 
-   fMCRichPointArray  = (TClonesArray*) ioman->GetObject("RichPoint");
-   if (NULL == fMCRichPointArray) {
-      cout << "-E- CbmRichRingFinderIdeal::Init: No MCPoint array!" << endl;
-      return;
-   }
+   fRichPoints  = (TClonesArray*) ioman->GetObject("RichPoint");
+   if (NULL == fRichPoints) {Fatal("CbmRichRingFinderIdeal::Init","No RichPoint array!");}
 }
 
 Int_t CbmRichRingFinderIdeal::DoFind(
@@ -74,51 +56,29 @@ Int_t CbmRichRingFinderIdeal::DoFind(
       TClonesArray* projArray,
 		TClonesArray* ringArray)
 {
-   // Check pointers
-   if ( NULL == fMCTrackArray ) {
-      cout << "-E- CbmRichRingFinderIdeal::DoFind: " << "MCTrack array missing! " << endl;
-      return -1;
-   }
-   if ( NULL == fMCRichPointArray ) {
-      cout << "-E- CbmRichRingFinderIdeal::DoFind: " << "MCPoint array missing! " << endl;
-      return -1;
-   }
-
    if ( NULL == hitArray) {
-      cout << "-E- CbmRichRingFinderIdeal::DoFind: " << "Hit array missing! " << hitArray << endl;
+      cout << "-E- CbmRichRingFinderIdeal::DoFind, RichHit array missing!" << endl;
       return -1;
-   }
-
-   if ( NULL == projArray) {
-      cout << "-E- CbmRichRingFinderIdeal::DoFind: "
-            << "Track Projection array missing! --- not needed anyhow for Ideal Finder! "
-            << projArray << endl;
    }
 
    if ( NULL == ringArray ) {
-      cout << "-E- CbmRichRingFinderIdeal::DoFind: " << "Ring array missing! " << endl;
+      cout << "-E- CbmRichRingFinderIdeal::DoFind, Ring array missing!" << endl;
       return -1;
    }
 
-   // Initialise control counters
-   Int_t nNoMCTrack = 0;
-   Int_t nNoRichPoint = 0;
-   Int_t nNoRichHit = 0;
-   Int_t nNoRichRing = 0;
-
    // Create STL map from MCtrack index to number of valid RichHits
    map<Int_t, Int_t> hitMap;
-   Int_t nRichHits   = hitArray->GetEntriesFast();
-   for (Int_t iHit = 0; iHit<nRichHits; iHit++) {
+   Int_t nRichHits = hitArray->GetEntriesFast();
+   for (Int_t iHit = 0; iHit < nRichHits; iHit++) {
       CbmRichHit* pRhit = (CbmRichHit*) hitArray->At(iHit);
       if ( NULL == pRhit ) continue;
       Int_t ptIndex = pRhit->GetRefId();
       if (ptIndex < 0) continue; // fake or background hit
-      CbmRichPoint* pMCpt = (CbmRichPoint*) (fMCRichPointArray->At(ptIndex));
+      CbmRichPoint* pMCpt = (CbmRichPoint*) (fRichPoints->At(ptIndex));
       if ( NULL == pMCpt ) continue;
       Int_t mcTrackIndex = pMCpt->GetTrackID();
       if ( mcTrackIndex < 0 ) continue;
-      CbmMCTrack* pMCtr = (CbmMCTrack*)fMCTrackArray->At(mcTrackIndex);
+      CbmMCTrack* pMCtr = (CbmMCTrack*) fMcTracks->At(mcTrackIndex);
       if ( NULL == pMCtr ) continue;
       if ( pMCtr->GetPdgCode() != 50000050) continue; // select only Cherenkov photons
       Int_t motherId = pMCtr->GetMotherId();
@@ -130,92 +90,46 @@ Int_t CbmRichRingFinderIdeal::DoFind(
 
    // Create RICHRings for MCTracks
    Int_t nRings  = 0; // number of RichRings
-   Int_t nMCTracks = fMCTrackArray->GetEntriesFast();
+   Int_t nMCTracks = fMcTracks->GetEntriesFast();
    for (Int_t iMCTrack = 0; iMCTrack < nMCTracks; iMCTrack++) {
-      CbmMCTrack* pMCtr = (CbmMCTrack*) fMCTrackArray->At(iMCTrack);
+      CbmMCTrack* pMCtr = (CbmMCTrack*) fMcTracks->At(iMCTrack);
       if ( NULL == pMCtr ) continue;
 
       new((*ringArray)[nRings]) CbmRichRing();
       ringMap[iMCTrack] = nRings++;
-      if (fVerbose>1) cout << "-I- CbmRichRingFinderIdeal: RichRing "
-			 << nRings << " created from MCTrack "
-			 << iMCTrack << " with PdgCode "
-			 << pMCtr->GetPdgCode() << " (" << pMCtr->GetNPoints(kRICH)
-			 << " RICHPoints, max=15) and ("
-			 << hitMap[iMCTrack] << " RichHits) ringMap: "
-			 << ringMap[iMCTrack] << endl;
    }
 
-   if (fVerbose > 2) cout << "-I- CbmRichRingIdeal: " << endl;
-
    // Loop over RichHits. Get corresponding MCPoint and MCTrack index
-   for (Int_t iHit = 0; iHit<nRichHits; iHit++) {
+   for (Int_t iHit = 0; iHit < nRichHits; iHit++) {
       CbmRichHit* pRhit = (CbmRichHit*) hitArray->At(iHit);
-      if ( NULL == pRhit ) {
-         cout << "-E- CbmRichRingFinderIdeal::DoFind: Empty slot "
-               << "in RichHitArray at position " << iHit << endl;
-         nNoRichHit++;
-         continue;
-      }
+      if ( NULL == pRhit ) continue;
+
       Int_t ptIndex = pRhit->GetRefId();
 
       if (ptIndex < 0) continue;// fake or background hit
-      CbmRichPoint* pMCpt = (CbmRichPoint*) (fMCRichPointArray->At(ptIndex));
-      if ( NULL == pMCpt ) {
-         nNoRichPoint++;
-         continue;
-      }
+      CbmRichPoint* pMCpt = (CbmRichPoint*) fRichPoints->At(ptIndex);
+      if ( NULL == pMCpt ) continue;
+
       Int_t mcTrackIndex = pMCpt->GetTrackID();
       if ( mcTrackIndex < 0) continue;
-      CbmMCTrack* pMCtr = (CbmMCTrack*)fMCTrackArray->At(mcTrackIndex);
+      CbmMCTrack* pMCtr = (CbmMCTrack*) fMcTracks->At(mcTrackIndex);
       if ( NULL == pMCtr ) continue;
       if ( pMCtr->GetPdgCode() != 50000050) continue;
       Int_t motherId = pMCtr->GetMotherId();
 
-      if (motherId < 0 || motherId > nMCTracks) {
-         cout << "-E- CbmRichRingFinderIdeal::DoFind: "
-               << "MCTrack index out of range. " << motherId << " "
-               << nMCTracks << endl;
-         nNoMCTrack++;
-         continue;
-      }
+      if (motherId < 0 || motherId > nMCTracks) continue;
 
       if (ringMap.find(motherId) == ringMap.end()) continue;
 
       Int_t ringIndex = ringMap[motherId];
 
       CbmRichRing* pRing = (CbmRichRing*) ringArray->At(ringIndex);
-      if ( NULL == pRing ) {
-         cout << "-E- CbmRichRingFinderIdeal::DoFind: "
-               << "No RichRing pointer. " << iHit << " " << ptIndex
-               << " " << mcTrackIndex << " " << ringIndex << endl;
-         nNoRichRing++;
-         continue;
-      }
+      if ( NULL == pRing ) continue;
 
       pRing->AddHit(iHit); // attach the hit to the ring
+   }
 
-      if (fVerbose>2)
-         cout << "Rich Hit " << iHit << " from RICHPoint "
-			    << ptIndex << " (MCTrack "
-			    << motherId << ") added to RICHRing "
-			    << ringIndex << endl;
-   }
-   if (fVerbose) {
-      cout << endl;
-      cout << "-------------------------------------------------------" << endl;
-      cout << "-I-           Ideal RICH Ring finding               -I-" << endl;
-      cout << "RICH hits: " << nRichHits << endl;
-      cout << "MCTracks: total " << nMCTracks << ", reconstructable Rich Rings : " << nRings << endl;
-      if (nNoRichHit)   cout << "Rich Hit not found   : " << nNoRichHit   << endl;
-      if (nNoRichPoint) cout << "RichPoints not found : " << nNoRichPoint << endl;
-      if (nNoMCTrack)  cout << "MCTracks not found  : " << nNoMCTrack  << endl;
-      if (nNoRichRing)    cout << "RichRings not found : " << nNoRichRing    << endl;
-      cout << "-------------------------------------------------------" << endl;
-   } else {
-      cout << "-I- CbmRichRingFinderIdeal: all " << nMCTracks << ", rec. " << nRings << endl;
-   }
+   cout << "-I- CbmRichRingFinderIdeal: all " << nMCTracks << ", rec. " << nRings << endl;
+
    return nRings;
 }
-
-ClassImp(CbmRichRingFinderIdeal)

@@ -8,10 +8,10 @@
 * \date 2006
 **/
 
-#ifndef CBMRICHRINGFITTERCIRCLE
-#define CBMRICHRINGFITTERCIRCLE
+#ifndef CBM_RICH_RING_FITTER_CIRCLE
+#define CBM_RICH_RING_FITTER_CIRCLE
 
-#include "CbmRichRingFitterImpl.h"
+#include "CbmRichRingFitterBase.h"
 
 /**
 * \class CbmRichRingFitterCircle
@@ -22,7 +22,7 @@
 * \author Supriya Das
 * \date 2006
 **/
-class CbmRichRingFitterCircle : public CbmRichRingFitterImpl
+class CbmRichRingFitterCircle : public CbmRichRingFitterBase
 {
 public:
 
@@ -37,13 +37,10 @@ public:
    virtual ~CbmRichRingFitterCircle();
 
    /**
-    * \brief Start ring fitting algorithm.
-    * \param[in,out] ring Pointer to ring to be fitted.
+    * \brief Inherited from CbmRichRingFitterBase.
     */
    void DoFit(
-         CbmRichRing* ring);
-
-   ClassDef(CbmRichRingFitterCircle,1);
+         CbmRichRingLight* ring);
 };
 
 #endif

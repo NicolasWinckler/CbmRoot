@@ -5,7 +5,7 @@
 #include <vector>
 #include "TMatrixD.h"
 class TH1D;
-class CbmRichRing;
+class CbmRichRingLight;
 //class TMatrixD;
 
 using std::vector;
@@ -22,9 +22,7 @@ public:
 private:
 
 	void CalculateFitErrors(
-	      CbmRichRing* ring,
-	      const vector<Double_t>& xh,
-	      const vector<Double_t>& yh,
+	      CbmRichRingLight* ring,
 	      Double_t sigma,
 	      TMatrixD& cov);
 

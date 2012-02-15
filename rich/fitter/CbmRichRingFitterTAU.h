@@ -1,58 +1,48 @@
-/******************************************************************************
-*  $Id: CbmRichRingFitterTAU.h,v 1.3 2006/09/13 14:55:11 hoehne Exp $
+/**
+* \file CbmRichRingFitterTAU.h
 *
-*  Class  : CbmRichRingFitterTAU
-*  Description: This is the header of a particular fitting class.
-*               Here the ring is fitted with the TAU algorithm from A. Ayriyan/ G. Ososkov
+* \brief Here the ring is fitted with the TAU algorithm from A. Ayriyan/ G. Ososkov.
 *
-*  Algorithm:                     Alexander Ayriyan 10.08.2005, Gennadi Ososkov
-*  Adoption to new Fitter Class : Claudia Hoehne
-*  E-mail : C.Hoehne@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichRingFitterTAU.h,v $
-*  Revision 1.3  2006/09/13 14:55:11  hoehne
-*  new optimal weight function added for improved fitting
-*
-*  Revision 1.2  2006/07/17 14:06:25  hoehne
-*  ring radius correction added, see P. Stolpovsky, CBM simulation meeting 14.7.2006
-*
-*  Revision 1.1  2006/01/25 13:33:19  hoehne
-*  initial version: ring fitting routines so far implemented in CbmRichLightSpot
-*
-*  
-*
-*******************************************************************************/
-#ifndef CBM_RICH_RING_FITTER_TAU
-#define CBM_RICH_RING_FITTER_TAU 1
+* \author Alexander Ayriyan, Gennadi Ososkov, Claudia Hoehne, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2012
+**/
 
-#include "CbmRichRingFitterImpl.h"
+#ifndef CBMRICHRINGFITTERTAU
+#define CBMRICHRINGFITTERTAU 1
 
-class CbmRichRingFitterTAU : public CbmRichRingFitterImpl
+#include "CbmRichRingFitterBase.h"
+
+
+/**
+* \class CbmRichRingFitterTAU
+*
+* \brief Here the ring is fitted with the TAU algorithm from A. Ayriyan/ G. Ososkov.
+*
+* \author Alexander Ayriyan, Gennadi Ososkov, Claudia Hoehne, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2012
+**/
+class CbmRichRingFitterTAU : public CbmRichRingFitterBase
 {
+public:
 
-   public:
-
-   /** Default constructor **/
+   /**
+    * \brief Default constructor.
+    */
    CbmRichRingFitterTAU();
 
-   /** Standard constructor **/
-   CbmRichRingFitterTAU(Int_t verbose,Double_t correction,Int_t robust);
-
-   /** Destructor **/
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmRichRingFitterTAU();
 
+   /**
+    * \brief Inherited from CbmRichRingFitterBase.
+    */
+   virtual void DoFit(
+         CbmRichRingLight* ring);
 
-   /** Ring Fitting algorithm **/
-   void DoFit(CbmRichRing* ring);
-
-   private:
-
-   /** Verbosity level **/
-   Int_t fRobust;
-   Int_t fVerbose;
-  Double_t fCorrection;
-  ClassDef(CbmRichRingFitterTAU,1);
+private:
+   int fRobust;
 };
 
 #endif

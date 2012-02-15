@@ -85,6 +85,4 @@ Double_t CbmRichElectronIdAnn::DoSelect(CbmRichRing* ring, Double_t momentum)
 
     return nnEval;
 }
-
-// -------------------------------------------------------------------------
 ClassImp(CbmRichElectronIdAnn)

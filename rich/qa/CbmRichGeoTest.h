@@ -19,6 +19,7 @@ class TClonesArray;
 class CbmRichRingFitterCOP;
 class CbmRichRingFitterEllipseTau;
 class CbmRichRing;
+class CbmRichRingLight;
 class CbmGeoRichPar;
 
 #include <vector>
@@ -85,28 +86,22 @@ private:
     * \param[in] histIndex Fitting type index, 0 - hit fitting, 1 - MC points fitting.
     * \param[in] ring Pointer to CbmRichRing to be fitted and filled in histograms.
     * \param[in] momentum MC momentum of particle produced ring.
-    * \param[in] x,y X and Y coordinates of MC point (is used only in case of MC points fitting).
     */
 	void FitAndFillHistEllipse(
 	      Int_t histIndex,
-	      CbmRichRing* ring,
-	      Double_t momentum,
-	      const vector<Double_t>& x,
-	      const vector<Double_t>& y);
+	      CbmRichRingLight* ring,
+	      Double_t momentum);
 
    /**
     * \brief Fit ring using circle fitter and fill histograms.
     * \param[in] histIndex Fitting type index, 0 - hit fitting, 1 - MC points fitting.
-    * \param[in] ring Pointer to CbmRichRing to be fitted and filled in histograms.
+    * \param[in] ring Pointer to CbmRichRingLight to be fitted and filled in histograms.
     * \param[in] momentum MC momentum of particle produced ring.
-    * \param[in] x,y X and Y coordinates of MC point (is used only in case of MC points fitting).
     */
    void FitAndFillHistCircle(
          Int_t histIndex,
-         CbmRichRing* ring,
-         Double_t momentum,
-         const vector<Double_t>& x,
-         const vector<Double_t>& y);
+         CbmRichRingLight* ring,
+         Double_t momentum);
 
    /**
     * \brief Calculate difference between ellipse parameters
@@ -116,19 +111,19 @@ private:
     * \param[in] ringMc Ring fitted using MC points
     */
    void FillMcVsHitFitEllipse(
-         CbmRichRing* ring,
-         CbmRichRing* ringMc);
+         CbmRichRingLight* ring,
+         CbmRichRingLight* ringMc);
 
    /**
     * \brief Calculate difference between circle parameters
-    *  for two fitting using hits and MC points for fit and fill
+    *  for two fittings using hits and MC points for fit and fill
     *  corresponding histograms.
     * \param[in] ring Ring fitted using hits.
     * \param[in] ringMc Ring fitted using MC points
     */
    void FillMcVsHitFitCircle(
-         CbmRichRing* ring,
-         CbmRichRing* ringMc);
+         CbmRichRingLight* ring,
+         CbmRichRingLight* ringMc);
 
    /**
     * \brief Calculate residuals between hits and MC points and fill histograms.
@@ -148,14 +143,12 @@ private:
 
 	/**
 	 * \brief Draw ring in separate TCanvas.
-	 * \param[in] ring Ring to be drawn.
-	 * \param[in] x MCPoints X coordinates.
-	 * \param[in] y MCPoints Y coordinates.
+	 * \param[in] ring Ring with RICH hits.
+	 * \param[in] ringPoint Ring with MC RICH points.
 	 */
 	void DrawRing(
-	      CbmRichRing* ring,
-	      const vector<Double_t>& x,
-	      const vector<Double_t>& y);
+	      CbmRichRingLight* ringHit,
+	      CbmRichRingLight* ringPoint);
 
    /**
     * \brief Print out final results.

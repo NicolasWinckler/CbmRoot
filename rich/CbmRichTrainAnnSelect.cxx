@@ -15,6 +15,7 @@
 #include "CbmRichRingSelectImpl.h"
 #include "FairRootManager.h"
 #include "cbm/utils/CbmLitDrawHist.h"
+#include "CbmRichConverter.h"
 
 #include "TMultiLayerPerceptron.h"
 #include "TCanvas.h"
@@ -97,7 +98,6 @@ InitStatus CbmRichTrainAnnSelect::Init()
 	if (NULL == fMatches) { Fatal("CbmRichRingQa::Init","No RichRingMatch array!");}
 
 	fFitCOP = new CbmRichRingFitterCOP();
-	fFitCOP->Init();
    fSelectImpl = new CbmRichRingSelectImpl();
    fSelectImpl->Init();
 
@@ -172,7 +172,9 @@ void CbmRichTrainAnnSelect::DiffFakeTrueCircle()
       CbmRichRing* ring = (CbmRichRing*) fRings->At(iMatches);
       if (NULL == ring) continue;
 
-      fFitCOP->DoFit(ring);
+      CbmRichRingLight ringLight;
+      CbmRichConverter::CopyHitsToRingLight(ring, &ringLight);
+      fFitCOP->DoFit(&ringLight);
      
       Int_t recFlag = ring->GetRecFlag();
       Double_t angle = fSelectImpl->GetAngle(ring);

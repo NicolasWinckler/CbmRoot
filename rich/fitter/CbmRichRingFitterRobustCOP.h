@@ -1,53 +1,44 @@
-/******************************************************************************
-*  $Id: CbmRichRingFitterRobustCOP.h,v 1.2 2006/07/17 14:06:25 hoehne Exp $
+/**
+* \file CbmRichRingFitterRobustCOP.h
 *
-*  Class  : CbmRichRingFitterRobustCOP
-*  Description: This is the header of a particular fitting class.
-*               Here the ring is fitted with the RobustCOP algorithm from A. Ayriyan/ G. Ososkov
+* \brief Here the ring is fitted with the RobustCOP algorithm from A. Ayriyan/G. Ososkov.
 *
-*  Algorithm:                     Alexander Ayriyan 10.08.2005, Gennadi Ososkov
-*  Adoption to new Fitter Class : Claudia Hoehne
-*  E-mail : C.Hoehne@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichRingFitterRobustCOP.h,v $
-*  Revision 1.2  2006/07/17 14:06:25  hoehne
-*  ring radius correction added, see P. Stolpovsky, CBM simulation meeting 14.7.2006
-*
-*  Revision 1.1  2006/01/25 13:32:33  hoehne
-*  initial version: ring fitting routines, so far implemented in CbmRichLightSpot
-*
-*  
-*
-*******************************************************************************/
-#ifndef CBM_RICH_RING_FITTER_RobustCOP
-#define CBM_RICH_RING_FITTER_RobustCOP 1
+* \author Alexander Ayriyan, Gennadi Ososkov, Claudia Hoehne, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2012
+**/
+#ifndef CBM_RICH_RING_FITTER_ROBUST_COP
+#define CBM_RICH_RING_FITTER_ROBUST_COP
 
-#include "CbmRichRingFitterImpl.h"
+#include "CbmRichRingFitterBase.h"
 
-class CbmRichRingFitterRobustCOP : public CbmRichRingFitterImpl
+/**
+* \class CbmRichRingFitterRobustCOP
+*
+* \brief Here the ring is fitted with the RobustCOP algorithm from A. Ayriyan/G. Ososkov.
+*
+* \author Alexander Ayriyan, Gennadi Ososkov, Claudia Hoehne, Semen Lebedev <s.lebedev@gsi.de>
+* \date 2012
+**/
+class CbmRichRingFitterRobustCOP : public CbmRichRingFitterBase
 {
+public:
 
-   public:
-
-   /** Default constructor **/
+   /**
+    * \brief Default constructor.
+    */
    CbmRichRingFitterRobustCOP();
 
-   /** Standard constructor **/
-   CbmRichRingFitterRobustCOP(Int_t verbose,Double_t correction);
-
-   /** Destructor **/
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmRichRingFitterRobustCOP();
 
-   /** Ring Fitting algorithm **/
-   void DoFit(CbmRichRing* ring);
+   /**
+    * \brief Inherited from CbmRichRingFitterBase.
+    */
+   virtual void DoFit(
+         CbmRichRingLight* ring);
 
-   private:
-
-   /** Verbosity level **/
-   Int_t fVerbose;
-  Double_t fCorrection;
-  ClassDef(CbmRichRingFitterRobustCOP,1);
 };
 
 #endif

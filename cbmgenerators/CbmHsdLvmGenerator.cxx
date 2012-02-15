@@ -25,7 +25,19 @@ const Double_t kMuonMass     = 0.105658369;
 
 
 // -----   Default constructor   ------------------------------------------
-CbmHsdLvmGenerator::CbmHsdLvmGenerator() { }
+CbmHsdLvmGenerator::CbmHsdLvmGenerator() 
+  : FairGenerator(),
+    fInputFile(NULL),
+    fFileName(NULL),
+    fDecayMode(0),
+    fBetaCm(0.),
+    fGammaCm(0.),
+    fMd(0.),
+    fPid1(0),
+    fPid2(0),
+    fCurrentEvent(-1)
+{ 
+}
 // ------------------------------------------------------------------------
 
 
@@ -34,8 +46,17 @@ CbmHsdLvmGenerator::CbmHsdLvmGenerator() { }
 CbmHsdLvmGenerator::CbmHsdLvmGenerator(const char* fileName, 
 				       Double_t pBeam,
 				       Int_t decayMode) 
-  : fCurrentEvent(0) {
-
+  : FairGenerator(),
+    fInputFile(NULL),
+    fFileName(NULL),
+    fDecayMode(0),
+    fBetaCm(0.),
+    fGammaCm(0.),
+    fMd(0.),
+    fPid1(0),
+    fPid2(0),
+    fCurrentEvent(-1)
+{
   // Lab transformation
   Double_t eBeam = TMath::Sqrt( pBeam*pBeam + kProtonMass*kProtonMass );
   fBetaCm = pBeam / ( eBeam + kProtonMass );

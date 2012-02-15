@@ -16,13 +16,27 @@ using namespace std;
 
 //--------------------------------------------------------------------
 UParticle::UParticle()
+  : TObject(),
+    fIndex(0),
+    fPdg(0),
+    fStatus(0),
+    fParent(0),
+    fParentDecay(0),
+    fMate(0),
+    fDecay(0),
+    fChild(),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fE(0.),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fT(0.),
+    fWeight(0.)
 {
-  // Default constructor
-  fIndex = fPdg = fStatus = fParent = fParentDecay = fMate = fDecay = 0;
-  fChild[0] = fChild[1] = 0;
-  fPx = fPy = fPz = fE = 0.;
-  fX = fY = fZ = fT = 0.;
-  fWeight = 0.;
+  fChild[0] = 0;
+  fChild[1] = 0;
 }
 //--------------------------------------------------------------------
 
@@ -34,26 +48,26 @@ UParticle::UParticle(Int_t index, Int_t pdg, Int_t status,
 		     Double_t px, Double_t py, Double_t pz, Double_t e,
 		     Double_t x, Double_t y, Double_t z, Double_t t,
 		     Double_t weight)
+  : TObject(),
+    fIndex(index),
+    fPdg(pdg),
+    fStatus(status),
+    fParent(parent),
+    fParentDecay(parentDecay),
+    fMate(mate),
+    fDecay(decay),
+    fPx(px),
+    fPy(py),
+    fPz(pz),
+    fE(e),
+    fX(x),
+    fY(y),
+    fZ(z),
+    fT(t),
+    fWeight(weight)
 {
-  // Standard constructor
-  fIndex       = index;
-  fPdg         = pdg;
-  fStatus      = status;
-  fParent      = parent;
-  fParentDecay = parentDecay;
-  fMate        = mate;
-  fDecay       = decay;
   fChild[0]    = child[0];
   fChild[1]    = child[1];
-  fPx          = px;
-  fPy          = py;
-  fPz          = pz;
-  fE           = e;
-  fX           = x;
-  fY           = y;
-  fZ           = z;
-  fT           = t;
-  fWeight      = weight;
 }
 //--------------------------------------------------------------------
 
@@ -64,44 +78,76 @@ UParticle::UParticle(Int_t index, Int_t pdg, Int_t status,
 		     Int_t mate, Int_t decay, Int_t child[2],
 		     TLorentzVector mom, TLorentzVector pos,
 		     Double_t weight)
+  : TObject(),
+    fIndex(index),
+    fPdg(pdg),
+    fStatus(status),
+    fParent(parent),
+    fParentDecay(parentDecay),
+    fMate(mate),
+    fDecay(decay),
+    fPx(mom.Px()),
+    fPy(mom.Py()),
+    fPz(mom.Pz()),
+    fE(mom.E()),
+    fX(pos.X()),
+    fY(pos.Y()),
+    fZ(pos.Z()),
+    fT(pos.T()),
+    fWeight(weight)
 {
-  // Standard constructor
-  fIndex       = index;
-  fPdg         = pdg;
-  fStatus      = status;
-  fParent      = parent;
-  fParentDecay = parentDecay;
-  fMate        = mate;
-  fDecay       = decay;
   fChild[0]    = child[0];
   fChild[1]    = child[1];
-  fPx          = mom.Px();
-  fPy          = mom.Py();
-  fPz          = mom.Pz();
-  fE           = mom.E();
-  fX           = pos.X();
-  fY           = pos.Y();
-  fZ           = pos.Z();
-  fT           = pos.T();
-  fWeight      = weight;
 }
 //--------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------
 UParticle::UParticle(const UParticle& right)
+  : TObject(right),
+    fIndex(right.fIndex),
+    fPdg(right.fPdg),
+    fStatus(right.fStatus),
+    fParent(right.fParent),
+    fParentDecay(right.fParentDecay),
+    fMate(right.fMate),
+    fDecay(right.fDecay),
+    fPx(right.fPx),
+    fPy(right.fPy),
+    fPz(right.fPz),
+    fE(right.fE),
+    fX(right.fX),
+    fY(right.fY),
+    fZ(right.fZ),
+    fT(right.fT),
+    fWeight(right.fWeight)
 {
-  // Copy constructor
-  *this = right;
 }
 //--------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------
 UParticle::UParticle(const TParticle &right)
+  : TObject(),
+    fIndex(0),
+    fPdg(right.GetPdgCode()),
+    fStatus(right.GetStatusCode()),
+    fParent(right.GetFirstMother()),
+    fParentDecay(0),
+    fMate(0),
+    fDecay(0),
+    fPx(right.Px()),
+    fPy(right.Py()),
+    fPz(right.Pz()),
+    fE(right.Energy()),
+    fX(right.Vx()),
+    fY(right.Vy()),
+    fZ(right.Vz()),
+    fT(right.T()),
+    fWeight(right.GetWeight())
 {
-  // Copy constructor from the TParticle
-  *this = right;
+  fChild[0] = right.GetFirstDaughter();
+  fChild[1] = right.GetLastDaughter();
 }
 //--------------------------------------------------------------------
 
@@ -118,6 +164,7 @@ UParticle::~UParticle()
 const UParticle& UParticle::operator = (const UParticle& right)
 {
   // Assignment operator
+  TObject::operator=(right);
   fIndex       = right.fIndex;
   fPdg         = right.fPdg;
   fStatus      = right.fStatus;

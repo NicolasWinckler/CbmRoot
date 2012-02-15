@@ -82,6 +82,9 @@ class CbmShieldGenerator : public FairGenerator
   std::map<TString, FairIon*> fIonMap;       //!
 	
 	
+  CbmShieldGenerator(const CbmShieldGenerator&);
+  CbmShieldGenerator& operator=(const CbmShieldGenerator&);
+
   ClassDef(CbmShieldGenerator,1);
 
 };

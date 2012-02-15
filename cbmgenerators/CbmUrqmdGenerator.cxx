@@ -21,15 +21,30 @@ const Double_t kProtonMass = 0.938271998;
 
 
 // -----   Default constructor   ------------------------------------------
-CbmUrqmdGenerator::CbmUrqmdGenerator() : fEventPlaneSet(kFALSE) { }
+CbmUrqmdGenerator::CbmUrqmdGenerator() 
+  : FairGenerator(),
+    fInputFile(NULL),
+    fParticleTable(),
+    fFileName(NULL),
+    fPhiMin(0.), 
+    fPhiMax(0.),
+    fEventPlaneSet(kFALSE) 
+{ 
+}
 // ------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   -----------------------------------------
-CbmUrqmdGenerator::CbmUrqmdGenerator(const char* fileName) {
-  fFileName = fileName;
-  fEventPlaneSet = kFALSE;
+CbmUrqmdGenerator::CbmUrqmdGenerator(const char* fileName) 
+  : FairGenerator(),
+    fInputFile(NULL),
+    fParticleTable(),
+    fFileName(fileName),
+    fPhiMin(0.), 
+    fPhiMax(0.),
+    fEventPlaneSet(kFALSE) 
+{
   cout << "-I CbmUrqmdGenerator: Opening input file " << fileName << endl;
   fInputFile = fopen(fFileName, "r");
   if ( ! fInputFile ) Fatal("CbmUrqmdgenerator","Cannot open input file.");

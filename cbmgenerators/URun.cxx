@@ -17,14 +17,25 @@ using namespace std;
 
 //--------------------------------------------------------------------
 URun::URun()
-  : TNamed("run","Run Header")
+  : TNamed("run","Run Header"),
+    fGenerator(""),
+    fComment(""),
+    fDecayer(""),
+    fAProj(0),
+    fZProj(0),
+    fPProj(0.),
+    fATarg(0),
+    fZTarg(0),
+    fPTarg(0.),
+    fBMin(0.),
+    fBMax(0.),
+    fBWeight(0),
+    fPhiMin(0.),
+    fPhiMax(0.),
+    fSigma(0.),
+    fNEvents(0)
 {
   // Default constructor. Should not be used
-  fGenerator = "";
-  fComment   = "";
-  fDecayer   = "";
-  fAProj = fZProj = fATarg = fZTarg = fBWeight = fNEvents = 0;
-  fPProj = fPTarg = fBMin = fBMax = fPhiMin = fPhiMax = fSigma = 0.;
   cout << "Warning: Default constructor of URun should not be used!"
        << endl;
 }
@@ -38,24 +49,24 @@ URun::URun(const char* generator, const char* comment, Int_t aProj,
 	   Double_t pTarg, Double_t bMin, Double_t bMax, Int_t bWeight,
 	   Double_t phiMin, Double_t phiMax, Double_t sigma, 
 	   Int_t nEvents)
-  : TNamed("run", "Run Header")
+  : TNamed("run", "Run Header"),
+    fGenerator(generator),
+    fComment(comment),
+    fDecayer(""),
+    fAProj(aProj),
+    fZProj(zProj),
+    fPProj(pProj),
+    fATarg(aTarg),
+    fZTarg(zTarg),
+    fPTarg(pTarg),
+    fBMin(bMin),
+    fBMax(bMax),
+    fBWeight(bWeight),
+    fPhiMin(phiMin),
+    fPhiMax(phiMax),
+    fSigma(sigma),
+    fNEvents(nEvents)
 {
-  // Standard constructor
-  fGenerator = generator;
-  fComment   = comment;
-  fAProj     = aProj;
-  fZProj     = zProj;
-  fPProj     = pProj;
-  fATarg     = aTarg;
-  fZTarg     = zTarg;
-  fPTarg     = pTarg;
-  fBMin      = bMin;
-  fBMax      = bMax;
-  fBWeight   = bWeight;
-  fPhiMin    = phiMin;
-  fPhiMax    = phiMax;
-  fSigma     = sigma;
-  fNEvents   = nEvents;
 }
 //--------------------------------------------------------------------
 

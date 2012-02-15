@@ -47,6 +47,9 @@ private:
   Int_t fEntry;		//!
   Int_t fEntries;	//!
 
+  CbmDirectPhotonGenerator(const CbmDirectPhotonGenerator&);
+  CbmDirectPhotonGenerator& operator=(const CbmDirectPhotonGenerator&);
+
   ClassDef(CbmDirectPhotonGenerator,1);
 };
 

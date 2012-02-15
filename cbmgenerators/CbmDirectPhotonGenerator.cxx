@@ -13,9 +13,17 @@
 using namespace std;
 // -----   Default constructor   ------------------------------------------
 CbmDirectPhotonGenerator::CbmDirectPhotonGenerator()
-  : fNEvent(-2), fInput(NULL)
+  : FairGenerator(),
+    fNEvent(-2),
+    fInput(NULL),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fPDGId(0),
+    fEv(0),
+    fEntry(0),
+    fEntries(0)
 {
-  ;
 }
 // ------------------------------------------------------------------------
 
@@ -23,7 +31,16 @@ CbmDirectPhotonGenerator::CbmDirectPhotonGenerator()
 
 // -----   Standard constructor   -----------------------------------------
 CbmDirectPhotonGenerator::CbmDirectPhotonGenerator(const Char_t* fileName)
-  : fNEvent(-1)
+  : FairGenerator(),
+    fNEvent(-2),
+    fInput(NULL),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fPDGId(0),
+    fEv(0),
+    fEntry(0),
+    fEntries(0)
 {
   fInput=new TChain("dphoton");
   fInput->AddFile(fileName);

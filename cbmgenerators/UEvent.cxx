@@ -18,31 +18,32 @@ using namespace std;
 
 //--------------------------------------------------------------------
 UEvent::UEvent()
+  : TObject(),
+    fEventNr(0),
+    fB(0.),
+    fPhi(0.),
+    fNes(1),
+    fStepNr(0),
+    fStepT(0.),
+    fNpa(0),
+    fParticles(new TClonesArray("UParticle", 100))
 {
-  // Default constructor
-  fEventNr = 0;
-  fB = fPhi = 0.;
-  fNes = 1;
-  fStepNr = 0;
-  fStepT = 0.;
-  fNpa = 0;
-  fParticles = new TClonesArray("UParticle", 100);
 }
 //--------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------
 UEvent::UEvent(const UEvent& right)
+  : TObject(right),
+    fEventNr (right.fEventNr),
+    fB(right.fB),
+    fPhi(right.fPhi),
+    fNes(right.fNes),
+    fStepNr(right.fStepNr),
+    fStepT(right.fStepT),
+    fNpa(right.fNpa),
+    fParticles(new TClonesArray("UParticle", 100))
 {
-  // Copy constructor
-  fEventNr  = right.fEventNr;
-  fB        = right.fB;
-  fPhi      = right.fPhi;
-  fNes      = right.fNes;
-  fStepNr   = right.fStepNr;
-  fStepT    = right.fStepT;
-  fNpa      = right.fNpa;
-  fParticles = new TClonesArray("UParticle", 100);
   UParticle* p;
   for(Int_t i = 0; i < fNpa; i++) {
     p = (UParticle*) right.fParticles->At(i);

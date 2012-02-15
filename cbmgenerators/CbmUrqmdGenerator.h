@@ -84,6 +84,9 @@ class CbmUrqmdGenerator : public FairGenerator
       conversion map. Is called from the constructor. **/
   void ReadConversionTable();
 
+  CbmUrqmdGenerator(const CbmUrqmdGenerator&);
+  CbmUrqmdGenerator& operator=(const CbmUrqmdGenerator&);
+
   ClassDef(CbmUrqmdGenerator,1);
  
 };

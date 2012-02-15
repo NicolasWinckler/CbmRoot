@@ -60,6 +60,9 @@ class CbmHsdLvmGenerator : public FairGenerator
   Int_t fPid2;                        //   PDG ID of daughter 2
   Int_t fCurrentEvent;                //   Current event ID
 
+  CbmHsdLvmGenerator(const CbmHsdLvmGenerator&);
+  CbmHsdLvmGenerator& operator=(const CbmHsdLvmGenerator&);
+
   ClassDef(CbmHsdLvmGenerator,1);
  
 };

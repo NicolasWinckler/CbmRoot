@@ -18,23 +18,33 @@ using namespace std;
 
 // ------------------------------------------------------------------------
 CbmUnigenGenerator::CbmUnigenGenerator()
+  : FairGenerator(),
+    fEvents(0),
+    fInputFile(NULL),
+    fFileName(""),
+    fInTree(NULL),
+    fEvent(NULL),
+    fCM(kFALSE),
+    fBetaCM(0.),
+    fGammaCM(1.)
 {
-    fEvents = 0;
-    fInputFile = NULL;
-    fInTree = NULL;
-    fEvent = NULL;
 }
 // ------------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------------
 CbmUnigenGenerator::CbmUnigenGenerator(TString fileName)
+  : FairGenerator(),
+    fEvents(0),
+    fInputFile(NULL),
+    fFileName(fileName),
+    fInTree(NULL),
+    fEvent(NULL),
+    fCM(kFALSE),
+    fBetaCM(0.),
+    fGammaCM(0.)
+
 {
-    fEvents = 0;
-    fInputFile = NULL;
-    fInTree = NULL;
-    fEvent = NULL;
-    fFileName = fileName;
     cout << "-I- CbmUnigenGenerator: Opening input file " << fileName << endl;
     fInputFile = new TFile(fFileName);
     if (NULL == fInputFile) {

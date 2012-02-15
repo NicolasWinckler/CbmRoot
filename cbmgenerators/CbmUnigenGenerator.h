@@ -28,6 +28,9 @@ private:
 
     void CloseInput();
 
+    CbmUnigenGenerator(const CbmUnigenGenerator&);
+    CbmUnigenGenerator& operator=(const CbmUnigenGenerator&);
+
 public:
     CbmUnigenGenerator();
     CbmUnigenGenerator(TString fileName);

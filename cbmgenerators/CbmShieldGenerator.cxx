@@ -20,16 +20,26 @@ using std::endl;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-CbmShieldGenerator::CbmShieldGenerator() {}
+CbmShieldGenerator::CbmShieldGenerator() 
+  : FairGenerator(),
+    fInputFile(NULL),
+    fFileName(NULL),
+    fPDG(NULL),
+    fIonMap()
+{
+}
 // ------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   -----------------------------------------
-CbmShieldGenerator::CbmShieldGenerator(const char* fileName) {
-
-  fPDG=TDatabasePDG::Instance();
-  fFileName  = fileName;
+CbmShieldGenerator::CbmShieldGenerator(const char* fileName) 
+  : FairGenerator(),
+    fInputFile(NULL),
+    fFileName(fileName),
+    fPDG(TDatabasePDG::Instance()),
+    fIonMap()
+{
   cout << "-I- CbmShieldGenerator: Opening input file " << fileName << endl;
   fInputFile = new ifstream(fFileName);
   if ( ! fInputFile->is_open() ) 
@@ -41,8 +51,7 @@ CbmShieldGenerator::CbmShieldGenerator(const char* fileName) {
   CloseInput();
   cout << "-I- CbmShieldGenerator: Reopening input file " << fileName 
        << endl;
-  fInputFile = new ifstream(fFileName);
-   
+  fInputFile = new ifstream(fFileName);  
 }
 // ------------------------------------------------------------------------
 

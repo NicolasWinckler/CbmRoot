@@ -30,12 +30,19 @@ using std::setprecision;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdDigiDraw::CbmTrdDigiDraw() 
-  :fVerbose(0),
-   fPointList(0),
-   fEventManager(0),
-   fq(0)
+  : FairTask(),
+    fVerbose(0),
+    fPointList(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fEventManager(NULL),
+    fq(NULL),
+    fTrdId(),
+    fColor(),
+    fStyle(),
+    fActiveLayers()
 {
- }
+}
 // -------------------------------------------------------------------------
 
                                       
@@ -44,17 +51,20 @@ CbmTrdDigiDraw::CbmTrdDigiDraw()
 CbmTrdDigiDraw::CbmTrdDigiDraw(const char* name, Color_t color ,Style_t mstyle,Int_t iVerbose) 
   : FairTask(name, iVerbose),
     fVerbose(iVerbose),
-    fPointList(0),
-    fEventManager(0),
-    fq(0),
+    fPointList(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fEventManager(NULL),
+    fq(NULL),
+    fTrdId(),
     fColor(color),
-    fStyle(mstyle)
+    fStyle(mstyle),
+    fActiveLayers()
 {
   for(Int_t i=0; i<3; i++){
     for(Int_t j=0; j<4; j++){
       fActiveLayers[i][j]=kTRUE;
     } 
-
   } 
 }
 // ----  Initialisation  ----------------------------------------------

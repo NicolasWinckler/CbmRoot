@@ -76,6 +76,9 @@ protected:
 
   Bool_t fActiveLayers[3][4];
 
+  CbmTrdDigiDraw(const CbmTrdDigiDraw&);
+  CbmTrdDigiDraw& operator=(const CbmTrdDigiDraw&);
+
   ClassDef(CbmTrdDigiDraw,1);
     
 };

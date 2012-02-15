@@ -106,6 +106,9 @@ class CbmSttHitProducer : public FairTask {
   // Rotation matrices for 3 doublets
   FairGeoRotation fRotat[3]; //!
 
+  CbmSttHitProducer(const CbmSttHitProducer&);
+  CbmSttHitProducer& operator=(const CbmSttHitProducer&);
+
   ClassDef(CbmSttHitProducer,1) //CBMSttHitProducer
 
 };

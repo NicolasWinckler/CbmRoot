@@ -23,35 +23,41 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmSttMatchTracks::CbmSttMatchTracks() 
-  : FairTask("STT track match") {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fVerbose = 1;
+  : FairTask("STT track match"),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMatchMap(),
+    fVerbose(1)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmSttMatchTracks::CbmSttMatchTracks(Int_t verbose) 
-  : FairTask("STT track match") {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fVerbose = verbose;
+  : FairTask("STT track match"),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMatchMap(),
+    fVerbose(verbose)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name, title and verbosity  ---------------------
 CbmSttMatchTracks::CbmSttMatchTracks(const char* name, const char* title,
 				     Int_t verbose) 
-  : FairTask(name) {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fVerbose = verbose;
+  : FairTask(name),
+    fTracks(NULL),
+    fPoints(NULL),
+    fHits(NULL),
+    fMatches(NULL),
+    fMatchMap(),
+    fVerbose(verbose)
+ {
 }
 // -------------------------------------------------------------------------
 

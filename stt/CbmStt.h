@@ -70,6 +70,9 @@ public:
   /** container for data points */
   TClonesArray  *fSttCollection;
 
+  CbmStt(const CbmStt&);
+  CbmStt& operator=(const CbmStt&);
+
   ClassDef(CbmStt,1)
 };
 #endif //CbmSttDET_H

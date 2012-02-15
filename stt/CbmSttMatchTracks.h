@@ -69,6 +69,9 @@ class CbmSttMatchTracks : public FairTask
   /** Verbosity level **/
   Int_t fVerbose;
   
+  CbmSttMatchTracks(const CbmSttMatchTracks&);
+  CbmSttMatchTracks& operator=(const CbmSttMatchTracks&);
+
   ClassDef(CbmSttMatchTracks,1);
 
 };

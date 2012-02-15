@@ -35,26 +35,57 @@ const Int_t CbmSttHitProducer::fgkNSegm[3][2] = {{2,4},{4,6},{6,8}};
 
 // ---- Default constructor -------------------------------------------
 CbmSttHitProducer::CbmSttHitProducer()
-    :FairTask("SttHitProducer")
-	//:fRef(0)
+  : FairTask("SttHitProducer"),
+    fSttPoints(NULL),
+    fHitCollection(new TClonesArray("CbmSttHit")),
+    fListStack(NULL),
+    fDx(0.),
+    fDy(0.),
+    fSigmaX(),
+    fSigmaY(),
+    fTrdPerStation(0),
+    fNlayer(0),
+    fVersion(""),
+    fNHits(0),
+    fGeoPar(NULL),
+    fBasePar(NULL),
+    fNfoils(0),
+    fFoilThick(0.),
+    fGapThick(0.),
+    fSimpleTR(0.),
+    fSizeX(),
+    fSizeY(),
+    fTransl(),
+    fRotat()
 {
-    fHitCollection = new TClonesArray("CbmSttHit");
-
-    // default parameters
-    fGeoPar = NULL;
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmSttHitProducer::CbmSttHitProducer(const char *name, const char *title)
-	:FairTask(name)
+  : FairTask(name),
+    fSttPoints(NULL),
+    fHitCollection(new TClonesArray("CbmSttHit")),
+    fListStack(NULL),
+    fDx(0.),
+    fDy(0.),
+    fSigmaX(),
+    fSigmaY(),
+    fTrdPerStation(0),
+    fNlayer(0),
+    fVersion(""),
+    fNHits(0),
+    fGeoPar(NULL),
+    fBasePar(NULL),
+    fNfoils(0),
+    fFoilThick(0.),
+    fGapThick(0.),
+    fSimpleTR(0.),
+    fSizeX(),
+    fSizeY(),
+    fTransl(),
+    fRotat()
 {
-    // default parameters
-    fHitCollection = new TClonesArray("CbmSttHit");
-
-    fGeoPar = NULL;
-
-    fNHits=0;
 }
 // --------------------------------------------------------------------
 

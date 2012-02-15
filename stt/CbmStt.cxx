@@ -32,22 +32,35 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmStt::CbmStt() : FairDetector("STT", kTRUE, kTRD) {
-
-  /** create your collection for data points */
-  fSttCollection = new TClonesArray("CbmSttPoint");
+CbmStt::CbmStt() 
+  : FairDetector("STT", kTRUE, kTRD),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fELoss(-1.),
+    fTime(-1.),
+    fLength(-1.),
+    fPos(),
+    fMom(),
+    fPosIndex(-0),
+    fSttCollection(new TClonesArray("CbmSttPoint"))
+{
   fVerboseLevel = 1;
-  fPosIndex = 0;
-
- }
+}
 
 // -----   Standard constructor   ------------------------------------------
 CbmStt::CbmStt(const char* name, Bool_t active)
-  : FairDetector(name, active, kTRD) {
-  fSttCollection = new TClonesArray("CbmSttPoint");
+  : FairDetector(name, active, kTRD),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fELoss(-1.),
+    fTime(-1.),
+    fLength(-1.),
+    fPos(),
+    fMom(),
+    fPosIndex(-0),
+    fSttCollection(new TClonesArray("CbmSttPoint"))
+{
   fVerboseLevel = 1;
-  fPosIndex = 0;
- 
 }
  
 CbmStt::~CbmStt() {

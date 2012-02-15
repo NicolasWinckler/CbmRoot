@@ -77,6 +77,9 @@ class CbmMuchSegmentAuto : public FairTask{
   void DrawSegmentation();
   void Print();
 
+  CbmMuchSegmentAuto(const CbmMuchSegmentAuto&);
+  CbmMuchSegmentAuto& operator=(const CbmMuchSegmentAuto&);
+
   ClassDef(CbmMuchSegmentAuto,1)
 };
 

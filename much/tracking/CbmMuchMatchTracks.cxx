@@ -19,20 +19,21 @@
 
 CbmMuchMatchTracks::CbmMuchMatchTracks()
   : FairTask("CbmMuchMatchTracks"),
-	fNofHits(0),
-	fNofTrueHits(0),
-	fNofWrongHits(0),
-	fNofFakeHits(0),
-	fNEvents(0),
-	fPoints(NULL),
-	fPixelHits(NULL),
-	fStrawHits(NULL),
-	fMatches(NULL),
-	fPixelDigiMatches(NULL),
-	fStrawDigiMatches(NULL),
-	fClusters(NULL),
-	fIsEpoch(0),
-	fMcEpoch(NULL)
+    fTracks(NULL),
+    fPoints(NULL),
+    fPixelHits(NULL),
+    fStrawHits(NULL),
+    fMatches(NULL),
+    fPixelDigiMatches(NULL),
+    fStrawDigiMatches(NULL),
+    fClusters(NULL),
+    fMcEpoch(NULL),
+    fNofHits(0),
+    fNofTrueHits(0),
+    fNofWrongHits(0),
+    fNofFakeHits(0),
+    fNEvents(0),
+    fIsEpoch(0)
 {
 }
 

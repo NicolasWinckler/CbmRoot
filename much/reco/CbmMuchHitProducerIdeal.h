@@ -52,6 +52,9 @@ class CbmMuchHitProducerIdeal : public FairTask {
     TString fVersion; //!
     Int_t  fNHits;    //!!
 
+    CbmMuchHitProducerIdeal(const CbmMuchHitProducerIdeal&);
+    CbmMuchHitProducerIdeal& operator=(const CbmMuchHitProducerIdeal&);
+
     ClassDef(CbmMuchHitProducerIdeal,1)
 };
 

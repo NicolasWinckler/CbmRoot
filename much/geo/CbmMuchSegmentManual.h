@@ -253,6 +253,9 @@ class CbmMuchSegmentManual : public FairTask {
     }
     // --------------------------------------------------------------------------------
 
+    CbmMuchSegmentManual(const CbmMuchSegmentManual&);
+    CbmMuchSegmentManual& operator=(const CbmMuchSegmentManual&);
+
     ClassDef(CbmMuchSegmentManual,1)
 };
 

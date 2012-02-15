@@ -61,6 +61,9 @@ private:
 	TClonesArray* fTrackArray;         // Output array of CbmTrdTracks
 	Int_t fNofTracks;                  // Number of tracks created
 
+	CbmMuchFindTracks(const CbmMuchFindTracks&);
+	CbmMuchFindTracks& operator=(const CbmMuchFindTracks&);
+
 	ClassDef(CbmMuchFindTracks,1);
 };
 

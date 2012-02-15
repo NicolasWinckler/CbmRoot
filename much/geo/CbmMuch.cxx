@@ -50,12 +50,24 @@ using std::endl;
 ClassImp(CbmMuch)
 
   // -----   Default constructor   -------------------------------------------
-CbmMuch::CbmMuch() {
+CbmMuch::CbmMuch() 
+: FairDetector(),
+  fTrackID(-1),
+  fVolumeID(-1),
+  fPosIn(),
+  fPosOut(),
+  fMomIn(),
+  fMomOut(),
+  fTime(0.),
+  fLength(0.),
+  fELoss(0.),
+  fPosIndex(0),
+  fMuchCollection(new TClonesArray("CbmMuchPoint")),
+  kGeoSaved(kFALSE),
+  flGeoPar(new TList()),
+  fPar(NULL)
+{
   ResetParameters();
-  fMuchCollection = new TClonesArray("CbmMuchPoint");
-  fPosIndex = 0;
-  kGeoSaved = kFALSE;
-  flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
 }
@@ -65,12 +77,23 @@ CbmMuch::CbmMuch() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuch::CbmMuch(const char* name, Bool_t active)
-  : FairDetector(name, active) {
+  : FairDetector(name, active),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPosIn(),
+    fPosOut(),
+    fMomIn(),
+    fMomOut(),
+    fTime(0.),
+    fLength(0.),
+    fELoss(0.),
+    fPosIndex(0),
+    fMuchCollection(new TClonesArray("CbmMuchPoint")),
+    kGeoSaved(kFALSE),
+    flGeoPar(new TList()),
+    fPar(NULL)
+{
   ResetParameters();
-  fMuchCollection = new TClonesArray("CbmMuchPoint");
-  fPosIndex = 0;
-  kGeoSaved = kFALSE;
-  flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
 }
@@ -543,7 +566,7 @@ TGeoMedium* CbmMuch::CreateMedium(const char* matName){
   FairGeoInterface* geoFace   = geoLoad->getGeoInterface();
   FairGeoMedia*     media     = geoFace->getMedia();
   FairGeoMedium*    medium = media->getMedium(matName);
-  if (!medium) Fatal("CreateGeometry",Form("%s not defined in media file",matName));
+  if (!medium) fLogger->Fatal(MESSAGE_ORIGIN,"%s not defined in media file",matName);
   Int_t kMat = geobuild->createMedium(medium);
   return gGeoManager->GetMedium(kMat);
 }

@@ -30,11 +30,34 @@ ClassImp(CbmMuchStrawHitFinderQa)
 
 // -------------------------------------------------------------------------
 CbmMuchStrawHitFinderQa::CbmMuchStrawHitFinderQa(const char *name, const char* digiFileName, Int_t verbose)
- : FairTask(name,verbose){
-  fVerbose = verbose;
-  fGeoScheme  = CbmMuchGeoScheme::Instance();
-  fDigiFile   = digiFileName;
-  fEvent = fMirror = 0;
+: FairTask(name,verbose),
+  fVerbose(verbose),
+  fEvent(0),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fHits(NULL),
+  fDigiFile(digiFileName),
+  fGeoScheme(CbmMuchGeoScheme::Instance()),
+  fMirror(0),
+  fRadIn(),
+  fhOccup(),
+  fhOccTub(),
+  fhMult(),
+  fhDx(),
+  fhAngTrue(),
+  fhAngWrong(),
+  fhAngMin(),
+  fhAngDif(),
+  fhAngDif2(),
+  fhAngDifW(),
+  fhAngDifW2(),
+  fhDtube(),
+  fhComb(),
+  fhAll(NULL),
+  fhPoolX(NULL),
+  fhPoolY(NULL)
+{
   for (Int_t i = 0; i < 6; ++i) fhOccup[i] = 0x0;
 }
 // -------------------------------------------------------------------------

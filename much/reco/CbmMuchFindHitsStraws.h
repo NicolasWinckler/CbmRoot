@@ -70,6 +70,9 @@ class CbmMuchFindHitsStraws : public FairTask
   Int_t                            fBinary;            // binary flag (binary info - tube center as coord.)
   Double_t                         fPhis[3];           // rotation angles of doublets
 
+  CbmMuchFindHitsStraws(const CbmMuchFindHitsStraws&);
+  CbmMuchFindHitsStraws& operator=(const CbmMuchFindHitsStraws&);
+
   ClassDef(CbmMuchFindHitsStraws,1);
 };
 

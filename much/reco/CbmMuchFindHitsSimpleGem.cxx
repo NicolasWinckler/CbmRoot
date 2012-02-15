@@ -33,28 +33,41 @@ using std::setprecision;
 using std::vector;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem() : FairTask("MuchFindHitsSimpleGem", 1) {
-  fDigiFile    = "";
-  fDigis   = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
+CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem() 
+  : FairTask("MuchFindHitsSimpleGem", 1),
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fHits(NULL),
+    fClusters(NULL),
+    fDigis(NULL),
+    fTimer()
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(Int_t iVerbose)
-  : FairTask("MuchFindHitsSimpleGem", iVerbose) {
-  fDigiFile    = "";
-  fDigis   = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
+  : FairTask("MuchFindHitsSimpleGem", iVerbose),
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fHits(NULL),
+    fClusters(NULL),
+    fDigis(NULL),
+    fTimer()
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(const char* name, const char* digiFileName, Int_t iVerbose)
-  : FairTask(name, iVerbose) {
-  fDigiFile    = digiFileName;
-  fDigis   = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
+  : FairTask(name, iVerbose),
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(digiFileName),
+    fHits(NULL),
+    fClusters(NULL),
+    fDigis(NULL),
+    fTimer()
+{
 }
 // -------------------------------------------------------------------------
 

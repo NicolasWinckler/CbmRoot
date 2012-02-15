@@ -15,10 +15,11 @@
 #include <iostream>
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchFindTracks::CbmMuchFindTracks():
-	fFinder(NULL),
-	fTrackArray(NULL),
-	fNofTracks(0)
+CbmMuchFindTracks::CbmMuchFindTracks()
+  : FairTask(),
+    fFinder(NULL),
+    fTrackArray(NULL),
+    fNofTracks(0)
 {
 }
 // -------------------------------------------------------------------------
@@ -28,10 +29,10 @@ CbmMuchFindTracks::CbmMuchFindTracks(
 		const char* name,
 		const char* title,
 		CbmMuchTrackFinder* finder)
-: FairTask(name),
-	fFinder(finder),
-	fTrackArray(NULL),
-	fNofTracks(0)
+  : FairTask(name),
+    fFinder(finder),
+    fTrackArray(NULL),
+    fNofTracks(0)
 {
 }
 // -------------------------------------------------------------------------

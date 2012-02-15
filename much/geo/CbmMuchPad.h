@@ -63,6 +63,10 @@ private:
   Double_t            fTime;
   CbmMuchDigi*        fDigi;
   CbmMuchDigiMatch*   fMatch;
+
+  CbmMuchPad(const CbmMuchPad&);
+  CbmMuchPad& operator=(const CbmMuchPad&);
+
   ClassDef(CbmMuchPad,1);
 };
 #endif

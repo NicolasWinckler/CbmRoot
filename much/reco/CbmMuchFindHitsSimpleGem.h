@@ -54,6 +54,8 @@ class CbmMuchFindHitsSimpleGem : public FairTask
   /** Reinitialization. */
   virtual InitStatus ReInit();
 
+  CbmMuchFindHitsSimpleGem(const CbmMuchFindHitsSimpleGem&);
+  CbmMuchFindHitsSimpleGem& operator=(const CbmMuchFindHitsSimpleGem&);
 
   ClassDef(CbmMuchFindHitsSimpleGem,1);
 };

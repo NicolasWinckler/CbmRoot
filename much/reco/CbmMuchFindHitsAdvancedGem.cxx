@@ -48,55 +48,94 @@ using std::right;
 using std::multimap;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
-  FairTask("MuchFindHitsAdvancedGem", 1) {
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fHits = NULL;
-  fDigiFile = "";
-  fClusters = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fThresholdRatio = 0.1;
-  fAlgorithm = 3;
-
-  fEvent = 0;
-  fEpoch = 0;
-  fClusterSeparationTime = 0.; // ns
+CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() 
+  : FairTask("MuchFindHitsAdvancedGem", 1) ,
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fNStations(0),
+    fHits(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fClusters(NULL),
+    fPoints(NULL),
+    fMCTracks(NULL),
+    fChannelDigiMap(),
+    fSelectedDigis(),
+    fThresholdRatio(0.1),
+    fThresholdRatios(),
+    fAlgorithm(3),
+    fTimer(),
+    fEpoch(kFALSE),
+    fClusterSeparationTime(0.),
+    fFakes(),
+    fLosts(),
+    fSignalMuonsAll(),
+    fSignalMuons(),
+    fStationEff(),
+    fEvent(0)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
-  FairTask("MuchFindHitsAdvancedGem", iVerbose) {
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDigiFile = "";
-  fClusters = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fThresholdRatio = 0.1;
-  fAlgorithm = 3;
-
-  fEvent = 0;
-  fEpoch = 0;
-  fClusterSeparationTime = 2.; // ns
+CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) 
+  : FairTask("MuchFindHitsAdvancedGem", iVerbose),
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fNStations(0),
+    fHits(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fClusters(NULL),
+    fPoints(NULL),
+    fMCTracks(NULL),
+    fChannelDigiMap(),
+    fSelectedDigis(),
+    fThresholdRatio(0.1),
+    fThresholdRatios(),
+    fAlgorithm(3),
+    fTimer(),
+    fEpoch(kFALSE),
+    fClusterSeparationTime(2.),
+    fFakes(),
+    fLosts(),
+    fSignalMuonsAll(),
+    fSignalMuons(),
+    fStationEff(),
+    fEvent(0)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name,
-    const char* digiFileName, Int_t iVerbose) :
-  FairTask(name, iVerbose) {
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDigiFile = digiFileName;
-  fClusters = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fThresholdRatio = 0.1;
-  fAlgorithm = 3;
+    const char* digiFileName, Int_t iVerbose) 
+  : FairTask(name, iVerbose),
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(digiFileName),
+    fNStations(0),
+    fHits(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fClusters(NULL),
+    fPoints(NULL),
+    fMCTracks(NULL),
+    fChannelDigiMap(),
+    fSelectedDigis(),
+    fThresholdRatio(0.1),
+    fThresholdRatios(),
+    fAlgorithm(3),
+    fTimer(),
+    fEpoch(kFALSE),
+    fClusterSeparationTime(2.),
+    fFakes(),
+    fLosts(),
+    fSignalMuonsAll(),
+    fSignalMuons(),
+    fStationEff(),
+    fEvent(0)
 
-  fEvent = 0;
-  fEpoch = 0;
-  fClusterSeparationTime = 2.; // ns
+{
 }
 // -------------------------------------------------------------------------
 

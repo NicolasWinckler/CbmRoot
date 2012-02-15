@@ -33,13 +33,15 @@ ClassImp(CbmMuchHitProducerIdeal)
 // ---- Constructor ----------------------------------------------------
 CbmMuchHitProducerIdeal::CbmMuchHitProducerIdeal(const char *name, Int_t verbose,
 				       Double_t SigmaXY, Double_t SigmaZ )
-  :FairTask(name,verbose)
+: FairTask(name,verbose),
+  fVerbose(verbose),
+  fMuchPoints(NULL),
+  fHitCollection(new TClonesArray("CbmMuchHit", 100)),
+  fSigmaXY(SigmaXY),
+  fSigmaZ(SigmaZ),
+  fVersion(""),
+  fNHits(0)
 {
-  fVerbose = verbose;
-  fSigmaXY = SigmaXY;
-  fSigmaZ = SigmaZ;
-  fNHits=0;
-  fHitCollection = new TClonesArray("CbmMuchHit", 100);
 }
 // --------------------------------------------------------------------
 

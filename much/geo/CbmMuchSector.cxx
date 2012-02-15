@@ -22,41 +22,46 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchSector::CbmMuchSector():TPolyLine(){
-  fDetectorId = 0;
-  fSectorIndex = 0;
-  fDx = fDy = fPadRadius = 0.;
-  fNCols = fNRows = 0;
-  fNChannels = 0;
-  fSigmaX = fSigmaY = 0.;
-  fNeighbours.Set(0);
+CbmMuchSector::CbmMuchSector() 
+  : TPolyLine(),
+    fDetectorId(0),
+    fSectorIndex(0),
+    fPosition(),
+    fSize(),
+    fNCols(0),
+    fNRows(0),
+    fNChannels(0),
+    fDx(0.),
+    fDy(0.),
+    fPadRadius(0.),
+    fPads(),
+    fNeighbours(0),
+    fSigmaX(0.),
+    fSigmaY(0.)
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -----  Standard constructor  --------------------------------------------
 CbmMuchSector::CbmMuchSector(Int_t detId, Int_t iSector, TVector3 position,  TVector3 size,
-                             Int_t nCols, Int_t nRows):TPolyLine()
+                             Int_t nCols, Int_t nRows)
+  : TPolyLine(),
+    fDetectorId(detId),
+    fSectorIndex(iSector),
+    fPosition(position),
+    fSize(size),
+    fNCols(nCols),
+    fNRows(nRows),
+    fNChannels(nCols*nRows),
+    fDx(size.X()/fNCols),
+    fDy(size.Y()/fNRows),
+    fPadRadius(TMath::Sqrt(fDx*fDx + fDy*fDy)/2.),
+    fPads(),
+    fNeighbours(0),
+    fSigmaX(fDx / TMath::Sqrt(12)),
+    fSigmaY(fDy / TMath::Sqrt(12))
 {
-  fDetectorId  = detId;
-  fSectorIndex = iSector;
-  fPosition    = position;
-  fSize        = size;
-  fNCols       = nCols;
-  fNRows       = nRows;
-
-  fDx          = size.X()/fNCols;
-  fDy          = size.Y()/fNRows;
-  fPadRadius   = TMath::Sqrt(fDx*fDx + fDy*fDy)/2.;
-
-  // Define number of channels
-  fNChannels = nCols*nRows;
-  // calculate errors
-  fSigmaX  = fDx / TMath::Sqrt(12);
-  fSigmaY  = fDy / TMath::Sqrt(12);
-
-  fNeighbours.Set(0);
-
   Double_t x[5];
   Double_t y[5];
   x[0]= position[0]-size[0]/2;    y[0]=position[1]-size[1]/2.;

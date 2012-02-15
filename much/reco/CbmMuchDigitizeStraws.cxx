@@ -24,40 +24,59 @@ using std::right;
 using std::setprecision;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchDigitizeStraws::CbmMuchDigitizeStraws() :
-  FairTask("MuchDigitize", 1) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = "";
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 8e-2;
+CbmMuchDigitizeStraws::CbmMuchDigitizeStraws() 
+  : FairTask("MuchDigitize", 1),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fPoints(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fNFailed(0),
+    fNOutside(0),
+    fNMulti(0),
+    fDTime(8e-2),
+    fEvent(0),
+    fTimer()
+{
   Reset();
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(Int_t iVerbose) :
-  FairTask("MuchDigitize", iVerbose) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = "";
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 8e-2;
+CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(Int_t iVerbose) 
+   : FairTask("MuchDigitize", iVerbose),
+     fGeoScheme(CbmMuchGeoScheme::Instance()),
+     fDigiFile(""),
+     fPoints(NULL),
+     fDigis(NULL),
+     fDigiMatches(NULL),
+     fNFailed(0),
+     fNOutside(0),
+     fNMulti(0),
+     fDTime(8e-2),
+     fEvent(0),
+     fTimer()
+{
   Reset();
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(const char* name, const char* digiFileName,
-    Int_t iVerbose) : FairTask(name, iVerbose) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = digiFileName;
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 8e-2;
+    Int_t iVerbose) 
+  : FairTask(name, iVerbose),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fDigiFile(digiFileName),
+    fPoints(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fNFailed(0),
+    fNOutside(0),
+    fNMulti(0),
+    fDTime(8e-2),
+    fEvent(0),
+    fTimer()
+{
   Reset();
 }
 // -------------------------------------------------------------------------

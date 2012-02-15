@@ -74,6 +74,9 @@ class CbmMuchDigitizeStraws : public FairTask
 
   Bool_t ExecStraws(CbmMuchPoint* point, Int_t iPoint);
 
+  CbmMuchDigitizeStraws(const CbmMuchDigitizeStraws&);
+  CbmMuchDigitizeStraws& operator=(const CbmMuchDigitizeStraws&);
+
   ClassDef(CbmMuchDigitizeStraws,1)
 };
 #endif

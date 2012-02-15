@@ -26,45 +26,55 @@ using std::endl;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchModule::CbmMuchModule() : TPave() {
-  fDetectorId = 0;
-  fCutRadius = 0;
-  fPosition = TVector3();
-  fSize = TVector3();
-  fPoints = NULL;
-  fHits = NULL;
-  fClusters = NULL;
+CbmMuchModule::CbmMuchModule() 
+  : TPave(), 
+    fDetectorId(0),
+    fDetectorType(-1),
+    fCutRadius(0),
+    fSize(TVector3()),
+    fPosition(TVector3()),
+    fSectors(TObjArray()),
+    fPoints(NULL),
+    fHits(NULL),
+    fClusters(NULL)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModule::CbmMuchModule(Int_t detId, TVector3 position, TVector3 size,
         Double_t cutRadius)
-: TPave(position[0] - size[0] / 2, position[1] - size[1] / 2, position[0]
-        + size[0] / 2, position[1] + size[1] / 2, 1) {
-  fDetectorId = detId;
-  fPosition = position;
-  fSize = size;
-  fCutRadius = cutRadius;
-  fPoints = NULL;
-  fHits = NULL;
-  fClusters = NULL;
+  : TPave(position[0] - size[0] / 2, position[1] - size[1] / 2, position[0]
+	  + size[0] / 2, position[1] + size[1] / 2, 1),
+    fDetectorId(detId),
+    fDetectorType(-1),
+    fCutRadius(cutRadius),
+    fSize(size),
+    fPosition(position),
+    fSectors(TObjArray()),
+    fPoints(NULL),
+    fHits(NULL),
+    fClusters(NULL)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModule::CbmMuchModule(Int_t iStation, Int_t iLayer, Bool_t iSide,
         Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius)
-: TPave(position[0] - size[0] / 2, position[1] - size[1] / 2, position[0]
-         + size[0] / 2, position[1] + size[1] / 2, 1) {
-  fDetectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide,
-          iModule);
-  fPosition = position;
-  fSize = size;
-  fCutRadius = cutRadius;
-  fPoints = NULL;
-  fHits = NULL;
-  fClusters = NULL;
+  : TPave(position[0] - size[0] / 2, position[1] - size[1] / 2, position[0]
+	  + size[0] / 2, position[1] + size[1] / 2, 1),
+    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide,
+						iModule)),
+    fDetectorType(-1),
+    fCutRadius(cutRadius),
+    fSize(size),
+    fPosition(position),
+    fSectors(TObjArray()),
+    fPoints(NULL),
+    fHits(NULL),
+    fClusters(NULL)
+{
 }
 // -------------------------------------------------------------------------
 

@@ -57,6 +57,9 @@ private:
 
 	Bool_t fIsEpoch; // = 1 in the epoch approach
 	
+	CbmMuchMatchTracks(const CbmMuchMatchTracks&);
+	CbmMuchMatchTracks& operator=(const CbmMuchMatchTracks&);
+
 	ClassDef(CbmMuchMatchTracks,1);
 };
 

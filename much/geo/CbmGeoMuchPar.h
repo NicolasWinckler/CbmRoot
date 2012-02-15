@@ -35,6 +35,10 @@ public:
   TObjArray             *GetStations(){return fStations;}
   Int_t                  GetNStations() const {return fStations->GetEntriesFast();}
 
+ private:
+  CbmGeoMuchPar(const CbmGeoMuchPar&);
+  CbmGeoMuchPar& operator=(const CbmGeoMuchPar&);
+
   ClassDef(CbmGeoMuchPar,1)
 };
 

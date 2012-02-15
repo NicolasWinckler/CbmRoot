@@ -150,6 +150,9 @@ class CbmMuchSegmentSector : public FairTask {
     }
     // --------------------------------------------------------------------------------
 
+    CbmMuchSegmentSector(const CbmMuchSegmentSector&);
+    CbmMuchSegmentSector& operator=(const CbmMuchSegmentSector&);
+
     ClassDef(CbmMuchSegmentSector,1)
 };
 

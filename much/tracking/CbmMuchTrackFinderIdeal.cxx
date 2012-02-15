@@ -22,17 +22,19 @@
 #include <map>
 #include <cmath>
 
-CbmMuchTrackFinderIdeal::CbmMuchTrackFinderIdeal():
-	fVerbose(1),
-	fEvents(0),
-	fMCTracks(NULL),
-	fMCPoints(NULL),
-	fPixelHits(NULL),
-	fStrawHits(NULL),
-	fTracks(NULL),
-	fPixelDigiMatches(NULL),
-	fStrawDigiMatches(NULL),
-	fClusters(NULL)
+CbmMuchTrackFinderIdeal::CbmMuchTrackFinderIdeal()
+  : CbmMuchTrackFinder(),
+    fMCTracks(NULL),
+    fMCPoints(NULL),
+    fPixelHits(NULL),
+    fStrawHits(NULL),
+    fTracks(NULL),
+    fPixelDigiMatches(NULL),
+    fStrawDigiMatches(NULL),
+    fClusters(NULL),
+    fTrackMap(),
+    fVerbose(1),
+    fEvents(0)
 {
 }
 

@@ -26,12 +26,18 @@ using std::setprecision;
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws() 
   : FairTask("MuchFindHits", 1),
-    fEffic(0),fMerge(0),fMirror(0),fBinary(0)
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fHits(NULL),
+    fTimer(), 
+    fEffic(0),
+    fMerge(0),
+    fMirror(0),
+    fBinary(0),
+    fPhis()
 {
-  fDigiFile    = "";
-  fDigis   = fDigiMatches = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  //SetPhis(0., 90., 45.);
   SetPhis(0., 10., -10.);
 }
 // -------------------------------------------------------------------------
@@ -39,12 +45,18 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws()
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
   : FairTask("MuchFindHits", iVerbose), 
-    fEffic(0),fMerge(0),fMirror(0),fBinary(0)
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fHits(NULL),
+    fTimer(), 
+    fEffic(0),
+    fMerge(0),
+    fMirror(0),
+    fBinary(0),
+    fPhis()
 {
-  fDigiFile    = "";
-  fDigis   = fDigiMatches = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  //SetPhis(0., 90., 45.);
   SetPhis(0., 10., -10.);
 }
 // -------------------------------------------------------------------------
@@ -52,12 +64,18 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiFileName, Int_t iVerbose)
   : FairTask(name, iVerbose),
-    fEffic(0),fMerge(0),fMirror(0),fBinary(0)
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fDigiFile(digiFileName),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fHits(NULL),
+    fTimer(), 
+    fEffic(0),
+    fMerge(0),
+    fMirror(0),
+    fBinary(0),
+    fPhis()
 {
-  fDigiFile    = digiFileName;
-  fDigis   = fDigiMatches = NULL;
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  //SetPhis(0., 90., 45.);
   SetPhis(0., 10, -10.);
 }
 // -------------------------------------------------------------------------

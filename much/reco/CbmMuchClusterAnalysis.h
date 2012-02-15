@@ -88,6 +88,8 @@ class CbmMuchClusterAnalysis: public FairTask {
      */
     vector<Int_t> GetNSignalMuons();
 
+    CbmMuchClusterAnalysis(const CbmMuchClusterAnalysis&);
+    CbmMuchClusterAnalysis& operator=(const CbmMuchClusterAnalysis&);
 
     ClassDef(CbmMuchClusterAnalysis,1)
 };

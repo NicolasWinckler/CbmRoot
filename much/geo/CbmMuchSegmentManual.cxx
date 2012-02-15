@@ -32,17 +32,42 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchSegmentManual::CbmMuchSegmentManual(){
-  fDigiFileName = (char*)"much.digi.root";
-  fDebug = 0;
+CbmMuchSegmentManual::CbmMuchSegmentManual()
+  : FairTask(),
+    fGeoPar(NULL),
+    fNStations(0),
+    fStations(NULL),
+    fInputFileName((char*)"much.digi.root"),
+    fDigiFileName(),
+    fNRegions(),
+    fRadii(),
+    fSecLx(),
+    fSecLy(),
+    fNChannels(),
+    fNCols(),
+    fNRows(),
+    fDebug(0)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchSegmentManual::CbmMuchSegmentManual(char* inputFileName, char* digiFileName){
-  fInputFileName = inputFileName;
-  fDigiFileName = digiFileName;
-  fDebug = 0;
+CbmMuchSegmentManual::CbmMuchSegmentManual(char* inputFileName, char* digiFileName)
+  : FairTask(),
+    fGeoPar(NULL),
+    fNStations(0),
+    fStations(NULL),
+    fInputFileName(inputFileName),
+    fDigiFileName(digiFileName),
+    fNRegions(),
+    fRadii(),
+    fSecLx(),
+    fSecLy(),
+    fNChannels(),
+    fNCols(),
+    fNRows(),
+    fDebug(0)
+{
 }
 // -------------------------------------------------------------------------
 

@@ -183,7 +183,10 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     Bool_t IsCornerBorder(CbmMuchPad *pad, CbmMuchPad *neighbourPad);
     Bool_t CornersNotFired(CbmMuchPad *pad, CbmMuchPad *neighbourPad, Double_t deltaX, Double_t deltaY);
 
-  ClassDef(CbmMuchFindHitsAdvancedGem,1);
+    CbmMuchFindHitsAdvancedGem(const CbmMuchFindHitsAdvancedGem&);
+    CbmMuchFindHitsAdvancedGem& operator=(const CbmMuchFindHitsAdvancedGem&);
+
+    ClassDef(CbmMuchFindHitsAdvancedGem,1);
 };
 
 #endif

@@ -25,7 +25,17 @@ using std::endl;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchModuleSector::CbmMuchModuleSector(): CbmMuchModule(),fDx1(0),fDx2(0),fDy(0),fDz(0) {
+CbmMuchModuleSector::CbmMuchModuleSector() 
+  : CbmMuchModule(),
+    fUseModuleDesign(kFALSE),
+    fNSectorChannels(0),
+    fSectorRadii(),
+    fDigis(),
+    fDx1(0.),
+    fDx2(0.),
+    fDy(0.),
+    fDz(0.)
+{
   fDetectorType = 3;
 }
 // -------------------------------------------------------------------------
@@ -33,7 +43,16 @@ CbmMuchModuleSector::CbmMuchModuleSector(): CbmMuchModule(),fDx1(0),fDx2(0),fDy(
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModuleSector::CbmMuchModuleSector(Int_t detId, TVector3 position, TVector3 size,
     Double_t cutRadius)
-: CbmMuchModule(detId, position, size, cutRadius),fDx1(0),fDx2(0),fDy(0),fDz(0) {
+  : CbmMuchModule(detId, position, size, cutRadius),
+    fUseModuleDesign(kFALSE),
+    fNSectorChannels(0),
+    fSectorRadii(),
+    fDigis(),
+    fDx1(0.),
+    fDx2(0.),
+    fDy(0.),
+    fDz(0.)
+{
   fDetectorType = 3;
 }
 // -------------------------------------------------------------------------
@@ -42,8 +61,15 @@ CbmMuchModuleSector::CbmMuchModuleSector(Int_t detId, TVector3 position, TVector
 // -------------------------------------------------------------------------
 CbmMuchModuleSector::CbmMuchModuleSector(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule, TVector3 position, TVector3 size, 
     Double_t dx1, Double_t dx2, Double_t dy, Double_t dz, Double_t cutRadius)
-:  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius)
-,fDx1(dx1),fDx2(dx2),fDy(dy),fDz(dz)
+  :  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius),
+     fUseModuleDesign(kFALSE),
+     fNSectorChannels(0),
+     fSectorRadii(),
+     fDigis(),
+     fDx1(dx1),
+     fDx2(dx2),
+     fDy(dy),
+     fDz(dz)
 {
   fDetectorType = 3;
 }
@@ -53,8 +79,16 @@ CbmMuchModuleSector::CbmMuchModuleSector(Int_t iStation, Int_t iLayer, Bool_t iS
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModuleSector::CbmMuchModuleSector(Int_t iStation, Int_t iLayer, Bool_t iSide,
     Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius)
-:  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius)
-,fDx1(0),fDx2(0),fDy(0),fDz(0) {
+  : CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius),
+    fUseModuleDesign(kFALSE),
+    fNSectorChannels(0),
+    fSectorRadii(),
+    fDigis(),
+    fDx1(0.),
+    fDx2(0.),
+    fDy(0.),
+    fDz(0.)
+{
   fDetectorType = 3;
 }
 // -------------------------------------------------------------------------

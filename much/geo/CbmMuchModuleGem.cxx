@@ -26,30 +26,52 @@ using std::endl;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchModuleGem::CbmMuchModuleGem(): CbmMuchModule() {
+CbmMuchModuleGem::CbmMuchModuleGem()
+  : CbmMuchModule(),
+    fUseModuleDesign(kFALSE),
+    fGridDx(0.),
+    fGridDy(0.),
+    fGridCols(0),
+    fGridRows(0),
+    fGridIndices(),
+    fDigis(),
+    fNSectorChannels(0)
+{
   fDetectorType = 1;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModuleGem::CbmMuchModuleGem(Int_t detId, TVector3 position, TVector3 size,
     Double_t cutRadius)
-: CbmMuchModule(detId, position, size, cutRadius) {
+  : CbmMuchModule(detId, position, size, cutRadius),
+    fUseModuleDesign(kFALSE),
+    fGridDx(0.),
+    fGridDy(0.),
+    fGridCols(0),
+    fGridRows(0),
+    fGridIndices(),
+    fDigis(),
+    fNSectorChannels(0)
+{
   fDetectorType = 1;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModuleGem::CbmMuchModuleGem(Int_t iStation, Int_t iLayer, Bool_t iSide,
     Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius)
-:  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius) {
+  : CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius),
+    fUseModuleDesign(kFALSE),
+    fGridDx(0.),
+    fGridDy(0.),
+    fGridCols(0),
+    fGridRows(0),
+    fGridIndices(),
+    fDigis(),
+    fNSectorChannels(0)
+{
   fDetectorType = 1;
-  fGridDx = fGridDy = 0.0;
-  fGridCols = fGridRows = 0;
 }
 // -------------------------------------------------------------------------
 

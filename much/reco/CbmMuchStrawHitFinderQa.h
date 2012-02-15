@@ -62,6 +62,9 @@ private:
 
   void CheckMirrors(); // check mirror hits
 
+  CbmMuchStrawHitFinderQa(const CbmMuchStrawHitFinderQa&);
+  CbmMuchStrawHitFinderQa& operator=(const CbmMuchStrawHitFinderQa&);
+
   ClassDef(CbmMuchStrawHitFinderQa,1) 
 };
 

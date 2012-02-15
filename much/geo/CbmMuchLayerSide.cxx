@@ -13,23 +13,32 @@
 #include "CbmMuchSector.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchLayerSide::CbmMuchLayerSide() {
-  fDetectorId = 0;
-  fZ = 0.;
+CbmMuchLayerSide::CbmMuchLayerSide() 
+  : TObject(),
+    fDetectorId(0),
+    fZ(0.),
+    fModules()
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchLayerSide::CbmMuchLayerSide(Int_t detId, Double_t z) {
-  fDetectorId = detId;
-  fZ          = z;
+CbmMuchLayerSide::CbmMuchLayerSide(Int_t detId, Double_t z) 
+  : TObject(),
+    fDetectorId(detId),
+    fZ(z),
+    fModules()
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchLayerSide::CbmMuchLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide, Double_t z) {
-  fDetectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide);
-  fZ          = z;
+CbmMuchLayerSide::CbmMuchLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide, Double_t z) 
+  : TObject(),
+    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide)),
+    fZ(z),
+    fModules()
+{
 }
 // -------------------------------------------------------------------------
 

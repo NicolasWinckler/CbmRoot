@@ -13,11 +13,32 @@
 #include "TMath.h"
 
 // -----  Default constructor  ----------------------------------------------
-CbmMuchRadialPad::CbmMuchRadialPad():TCrown(){}
+CbmMuchRadialPad::CbmMuchRadialPad()
+  : TCrown(),
+    fDetectorId(0),
+    fChannelId(0),
+    fNeighbours(),
+    fDigiIndex(0),
+    fCharge(0.),
+    fTime(0.),
+    fDigi(NULL),
+    fMatch(NULL)
+{
+}
 // -------------------------------------------------------------------------
 
 // -----  Standard constructor  --------------------------------------------
-CbmMuchRadialPad::CbmMuchRadialPad(CbmMuchRadialSector* sector, Int_t iChannel):TCrown(),fCharge(0),fTime(0){
+CbmMuchRadialPad::CbmMuchRadialPad(CbmMuchRadialSector* sector, Int_t iChannel) 
+  : TCrown(),
+    fDetectorId(0),
+    fChannelId(0),
+    fNeighbours(),
+    fDigiIndex(0),
+    fCharge(0.),
+    fTime(0.),
+    fDigi(NULL),
+    fMatch(NULL)
+{
   // Generate detectorId
   fDetectorId = sector->GetDetectorId();
   Int_t iSector = sector->GetSectorIndex();

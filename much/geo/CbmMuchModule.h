@@ -77,6 +77,10 @@ protected:
   TClonesArray*          fHits;                  //!
   TClonesArray*          fClusters;              //!
 
+ private:
+  CbmMuchModule(const CbmMuchModule&);
+  CbmMuchModule& operator=(const CbmMuchModule&);
+
   ClassDef(CbmMuchModule,2);
 };
 #endif

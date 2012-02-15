@@ -55,6 +55,10 @@ private:
   Double_t            fTime;
   CbmMuchDigi*        fDigi;
   CbmMuchDigiMatch*   fMatch;
+
+  CbmMuchRadialPad(const CbmMuchRadialPad&);
+  CbmMuchRadialPad& operator=(const CbmMuchRadialPad&);
+
   ClassDef(CbmMuchRadialPad,1);
 };
 #endif

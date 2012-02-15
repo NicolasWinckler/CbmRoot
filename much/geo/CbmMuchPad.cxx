@@ -13,11 +13,36 @@ using std::cout;
 using std::endl;
 
 // -----  Default constructor  ----------------------------------------------
-CbmMuchPad::CbmMuchPad():TPolyLine(){}
+CbmMuchPad::CbmMuchPad() 
+  : TPolyLine(),
+    fDetectorId(0),
+    fChannelId(0),
+    fX0(0.), 
+    fY0(0.),
+    fNeighbours(),
+    fDigiIndex(0),
+    fCharge(0.),
+    fTime(0.),
+    fDigi(NULL),
+    fMatch(NULL)
+{
+}
 // -------------------------------------------------------------------------
 
 // -----  Standard constructor  --------------------------------------------
-CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(),fCharge(0),fTime(0){
+CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel) 
+  : TPolyLine(), 
+    fDetectorId(0),
+    fChannelId(0),
+    fX0(0.), 
+    fY0(0.),
+    fNeighbours(),
+    fDigiIndex(0),
+    fCharge(0.),
+    fTime(0.),
+    fDigi(new CbmMuchDigi(fDetectorId,fChannelId,0,0,0)),
+    fMatch(new CbmMuchDigiMatch())
+{
   // Generate detectorId
   fDetectorId = sector->GetDetectorId();
   Int_t iSector = sector->GetSectorIndex();
@@ -57,8 +82,6 @@ CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(),fChar
   SetFillColor(0);
   SetLineWidth(1);
   SetLineColor(34);
-  fDigi = new CbmMuchDigi(fDetectorId,fChannelId,0,0,0);
-  fMatch = new CbmMuchDigiMatch();
   
 }
 // -------------------------------------------------------------------------

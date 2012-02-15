@@ -199,7 +199,9 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t AddDigi(CbmMuchPad* pad);
     Bool_t AddDigi(CbmMuchRadialPad* pad);
     inline Int_t GasGain();
-
+    CbmMuchDigitizeAdvancedGem(const CbmMuchDigitizeAdvancedGem&);
+    CbmMuchDigitizeAdvancedGem& operator=(const CbmMuchDigitizeAdvancedGem&);
+        
     Double_t GetNPrimaryElectronsPerCm(CbmMuchPoint* point);
     Bool_t AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
     Bool_t AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL,Double_t phi1, Double_t phi2);

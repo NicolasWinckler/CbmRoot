@@ -250,6 +250,8 @@ class CbmMuchGeoScheme: public TObject {
     TArrayI fModuleDesign; /* 1 - detailed design (modules at two sides)
      * 0 - simple design (1 module per layer)     */
 
+    CbmMuchGeoScheme(const CbmMuchGeoScheme&);
+    CbmMuchGeoScheme& operator=(const CbmMuchGeoScheme&);
 
     ClassDef(CbmMuchGeoScheme,1);
 };

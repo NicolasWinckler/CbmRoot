@@ -155,6 +155,9 @@ private:
   FILE * pointsFile;
   FILE * padsFile;
 
+  CbmMuchHitFinderQa(const CbmMuchHitFinderQa&);
+  CbmMuchHitFinderQa& operator=(const CbmMuchHitFinderQa&);
+
   ClassDef(CbmMuchHitFinderQa,1)
 };
 

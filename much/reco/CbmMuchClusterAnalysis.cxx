@@ -28,11 +28,24 @@
 using std::set;
 
 CbmMuchClusterAnalysis::CbmMuchClusterAnalysis(const char* name, Int_t verbose)
-  :FairTask(name,verbose){
-  fEvent = 0;
-  fGeoScheme   = CbmMuchGeoScheme::Instance();
-  fGeoFileName = "much.digi.root";
-
+  : FairTask(name,verbose),
+    fEvent(0),
+    fPoints(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fClusters(NULL),
+    fHits(NULL),
+    fMCTracks(NULL),
+    fGeoFileName("much.digi.root"),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fChargeTotal(NULL),
+    fClusterSize(),
+    fClusterPoints(),
+    fClusterPadsCharge(),
+    fClusterRadii(),
+    fClusterMeanEuclide(),
+    fSingleMuCluster()
+{
 }
 
 CbmMuchClusterAnalysis::~CbmMuchClusterAnalysis() {
@@ -118,7 +131,7 @@ void CbmMuchClusterAnalysis::SetParContainers() {
 void CbmMuchClusterAnalysis::Exec(Option_t * option){
   ++fEvent;
   if(fEvent%50==0)
-    Info("Exec",Form("Event:%i",fEvent));
+    fLogger->Info(MESSAGE_ORIGIN,"Event: %i",fEvent);
 
   Int_t nStations = fGeoScheme->GetNStations();
   vector<Int_t> nSingleMuClusters(nStations, 0);

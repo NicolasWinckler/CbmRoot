@@ -15,26 +15,34 @@
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchStation::CbmMuchStation() {
-  fDetectorId = 0;
-  fZ = 0.;
-  fRmin=0.;             // Minimum radius of the station [cm]
-  fRmax=0.;             // Maximum radius of the station [cm]
-  fModuleDesign=0;      // No detailed module design
-  fTubeRmin=0.;         // Station tube Rmin
-  fTubeRmax=0.;         // Station tube Rmax
+CbmMuchStation::CbmMuchStation() 
+  : TObject(),
+    fDetectorId(0),
+    fZ(0.),
+    fLayers(),
+    fRmin(0.),
+    fRmax(0.),
+    fModuleDesign(kFALSE),
+    fTubeRmin(0.),
+    fTubeRmax(0.),
+    fTubeZ(0.)
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchStation::CbmMuchStation(Int_t iStation, Double_t z){
-  fDetectorId = CbmMuchGeoScheme::GetDetectorId(iStation);
-  fZ          = z;
-  fRmin=0.;             // Minimum radius of the station [cm]
-  fRmax=0.;             // Maximum radius of the station [cm]
-  fModuleDesign=0;      // No detailed module design
-  fTubeRmin=0.;         // Station tube Rmin
-  fTubeRmax=0.;         // Station tube Rmax
+CbmMuchStation::CbmMuchStation(Int_t iStation, Double_t z)
+  : TObject(),
+    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation)),
+    fZ(z),
+    fLayers(),
+    fRmin(0.),
+    fRmax(0.),
+    fModuleDesign(kFALSE),
+    fTubeRmin(0.),
+    fTubeRmax(0.),
+    fTubeZ(0.)
+{
 }
 // -------------------------------------------------------------------------
 

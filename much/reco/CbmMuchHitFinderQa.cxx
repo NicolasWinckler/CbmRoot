@@ -44,27 +44,85 @@ using std::vector;
 
 // -------------------------------------------------------------------------
 CbmMuchHitFinderQa::CbmMuchHitFinderQa(const char* name, Int_t verbose)
- :FairTask(name,verbose){
-  fGeoScheme   = CbmMuchGeoScheme::Instance();
-  fGeoFileName = "much.digi.root";
-  fFileName = "performance.root";
-  fVerbose = verbose;
-  fEvent = 0;
-  fSignalPoints = fSignalHits = 0;
-  fPointInfos = new TClonesArray("CbmMuchPointInfo",10);
-  fPullsQaOn = 1;
-  fOccupancyQaOn = 1;
-  fDigitizerQaOn = 1;
-  fStatisticsQaOn = 1;
-  fClusterDeconvQaOn =1;
-  fPrintToFileOn =1;
-  fNTimingPulls = 8;
+  :FairTask(name,verbose),
+    fGeoScheme( CbmMuchGeoScheme::Instance()),
+    fGeoFileName("much.digi.root"),
+    fFileName("performance.root"),
+    fSignalPoints(0),
+    fSignalHits(0),
+    fVerbose(verbose),
+    fEvent(0),
+    fPoints(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fClusters(NULL),
+    fHits(NULL),
+    fMCTracks(NULL),
+    fPointInfos(new TClonesArray("CbmMuchPointInfo",10)),
+    fNstations(0),
+    fChargeHistos(NULL),
+    fhChargeEnergyLog(NULL),
+    fhChargeEnergyLogPi(NULL),
+    fhChargeEnergyLogPr(NULL),
+    fhChargeEnergyLogEl(NULL),
+    fhChargeTrackLength(NULL),
+    fhChargeTrackLengthPi(NULL),
+    fhChargeTrackLengthPr(NULL),
+    fhChargeTrackLengthEl(NULL),
+    fhCharge(NULL),
+    fhChargeLog(NULL),
+    fhChargePr_1GeV_3mm(NULL),
+    fhNpadsVsS(NULL),
+    fhOccupancyR(NULL),
+    fhPadsTotalR(NULL),
+    fhPadsFiredR(NULL),
+    fhPullXpads1(NULL),
+    fhPullYpads1(NULL),
+    fhPullXpads2(NULL),
+    fhPullYpads2(NULL),
+    fhPullXpads3(NULL),
+    fhPullYpads3(NULL),
+    fnPadSizesX(0),
+    fnPadSizesY(0),
+    fhPullT(NULL),
+    fNTimingPulls(8),
+    fhPullX(NULL),
+    fhPullY(NULL),
+    fhPointsInCluster(NULL),
+    fhDigisInCluster(NULL),
+    fhHitsInCluster(NULL),
+    fNall(NULL),
+    fNpr(NULL),
+    fNpi(NULL),
+    fNel(NULL),
+    fNmu(NULL),
+    fNka(NULL),
+    fNprimary(NULL),
+    fNsecondary(NULL),
+    fPointsTotal(0),
+    fPointsUnderCounted(0),
+    fPointsOverCounted(0),
+    fOccupancyQaOn(kTRUE),
+    fPullsQaOn(kTRUE),
+    fDigitizerQaOn(kTRUE),
+    fStatisticsQaOn(kTRUE),
+    fClusterDeconvQaOn(kTRUE),
+    fPrintToFileOn(kTRUE),
+    fPadMinLx(0.),
+    fPadMinLy(0.),
+    fPadMaxLx(0.),
+    fPadMaxLy(0.),
+    pointsFile(NULL),
+    padsFile(NULL)
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
-CbmMuchHitFinderQa::~CbmMuchHitFinderQa(){}
+CbmMuchHitFinderQa::~CbmMuchHitFinderQa()
+{
+}
 // -------------------------------------------------------------------------
 
 
@@ -322,7 +380,7 @@ void CbmMuchHitFinderQa::SetParContainers() {
 // -------------------------------------------------------------------------
 void CbmMuchHitFinderQa::Exec(Option_t * option){
   fEvent++;
-  Info("Exec",Form("Event:%i",fEvent));
+  fLogger->Info(MESSAGE_ORIGIN,"Event:%i",fEvent);
   fprintf(pointsFile,"Event %i\n",fEvent);
   fprintf(padsFile,"Event %i\n",fEvent);
   

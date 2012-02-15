@@ -22,39 +22,41 @@ Bool_t CbmMuchGeoScheme::fInitialized = kFALSE;
 Bool_t CbmMuchGeoScheme::fModulesInitialized = kFALSE;
 
 // -------------------------------------------------------------------------
-CbmMuchGeoScheme::CbmMuchGeoScheme() {
-  fMuchZ1 = 0.; // MuchCave Zin position [cm]
-  fAcceptanceTanMin = 0.; // Acceptance tangent min
-  fAcceptanceTanMax = 0.; // Acceptance tangent max
-  fNabs = 0; // Number of absorbers
-  fNst = 0; // Number of stations
-
-  fActiveLx = 0.; // Active volume lx [cm]
-  fActiveLy = 0.; // Active volume ly [cm]
-  fActiveLz = 0.; // Active volume lz [cm]
-  fSpacerLx = 0.; // Spacer lx [cm]
-  fSpacerLy = 0.; // Spacer ly [cm]
-  fOverlapY = 0.; // Overlap along y axis [cm]
-
-  // Create arrays of absorber parameters
-  fAbsorberZ1.Set(0); // Absorber Zin position [cm]
-  fAbsorberLz.Set(0); // Absorber thickness [cm]
-  fAbsorberMat.Set(0); // Absorber material
-  // Create arrays of station parameters
-  fStationZ0.Set(0); // Station Zceneter [cm]
-  fNlayers.Set(0); // Number of layers
-  fDetType.Set(0); // Detector type
-  fLayersDz.Set(0); // Distance between layers [cm]
-  fSupportLz.Set(0); // Support thickness [cm]
-  fModuleDesign.Set(0); // Support thickness [cm]
-  // Sector-type module parameters
-  fNSectorsPerLayer.Set(0); // Number of sectors per layer
-  fActiveLzSector=0;        // Active volume thickness
-  fSpacerR=0;               // Spacer width in R
-  fSpacerPhi=0;             // Spacer width in Phi
-  fOverlapR=0;              // Overlap in R direction
-
-  fAbsorbers = new TObjArray();
+CbmMuchGeoScheme::CbmMuchGeoScheme() 
+  : TObject(),
+    fModules(),
+    fSides(),
+    fMapSides(),
+    fStations(NULL),
+    fAbsorbers(new TObjArray()),
+    fMuchCave(NULL),
+    fMuchZ1(0.),
+    fAcceptanceTanMin(0.),
+    fAcceptanceTanMax(0.),
+    fNabs(0),
+    fNst(0),
+    fActiveLx(0.),
+    fActiveLy(0.),
+    fActiveLz(0.),
+    fSpacerLx(0.),
+    fSpacerLy(0.),
+    fOverlapY(0.),
+    fStrawLz(0.),
+    fNSectorsPerLayer(0),
+    fActiveLzSector(0.),
+    fSpacerR(0.),
+    fSpacerPhi(0),
+    fOverlapR(0.),
+    fAbsorberZ1(0),
+    fAbsorberLz(0),
+    fAbsorberMat(0),
+    fStationZ0(0),
+    fNlayers(0),
+    fDetType(0),
+    fLayersDz(0),
+    fSupportLz(0),
+    fModuleDesign(0)
+{
   Info("CbmMuchGeoScheme", "CbmMuchGeoScheme created");
 }
 // -------------------------------------------------------------------------

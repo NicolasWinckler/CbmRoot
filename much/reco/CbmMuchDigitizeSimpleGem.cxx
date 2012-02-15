@@ -43,41 +43,62 @@ using std::map;
 using std::pair;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem() :
-  FairTask("MuchDigitizeAdvancedGem", 1) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = "";
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 8e-2;
+CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem() 
+  : FairTask("MuchDigitizeAdvancedGem", 1),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fDigiFile(""),
+    fPoints(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fNFailed(0),
+    fNOutside(0),
+    fNMulti(0),
+    fDTime(8e-2),
+    fEvent(0),
+    fTimer(),
+    fChannelMap()
+{
   Reset();
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem(Int_t iVerbose) :
-  FairTask("MuchDigitizeAdvancedGem", iVerbose) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = "";
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 8e-2;
+CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem(Int_t iVerbose) 
+: FairTask("MuchDigitizeAdvancedGem", iVerbose),
+  fGeoScheme(CbmMuchGeoScheme::Instance()),
+  fDigiFile(""),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fNFailed(0),
+  fNOutside(0),
+  fNMulti(0),
+  fDTime(8e-2),
+  fEvent(0),
+  fTimer(),
+  fChannelMap()
+{
   Reset();
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem(const char* name, const char* digiFileName,
-    Int_t iVerbose) :
-      FairTask(name, iVerbose) {
-  fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = digiFileName;
-  fPoints = NULL;
-  fDigis = NULL;
-  fDigiMatches = NULL;
-  fDTime = 8e-2;
+    Int_t iVerbose) 
+  : FairTask(name, iVerbose),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fDigiFile(digiFileName),
+    fPoints(NULL),
+    fDigis(NULL),
+    fDigiMatches(NULL),
+    fNFailed(0),
+    fNOutside(0),
+    fNMulti(0),
+    fDTime(8e-2),
+    fEvent(0),
+    fTimer(),
+    fChannelMap()
+{
   Reset();
 }
 // -------------------------------------------------------------------------

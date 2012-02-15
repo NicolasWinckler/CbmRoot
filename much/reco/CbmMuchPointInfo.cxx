@@ -10,13 +10,34 @@
 ClassImp(CbmMuchPointInfo)
 
 // -------------------------------------------------------------------------
-CbmMuchPointInfo::CbmMuchPointInfo():TObject(){};
+CbmMuchPointInfo::CbmMuchPointInfo()
+: TObject(), 
+  fKine(0.),
+  fLength(0.),
+  fPdgCode(0), 
+  fMotherPdg(0),
+  fCharge(0),
+  fStationId(0),
+  fS(0.),
+  fNPads(0)
+{
+}
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 CbmMuchPointInfo::CbmMuchPointInfo
-    (Int_t pdgCode, Int_t motherPdg, Double_t kine, Double_t length, Int_t stationId):
-     TObject(),fPdgCode(pdgCode),fMotherPdg(motherPdg),fKine(kine),fLength(length),fStationId(stationId),fCharge(0),fS(0),fNPads(0){}
+    (Int_t pdgCode, Int_t motherPdg, Double_t kine, Double_t length, Int_t stationId)
+: TObject(), 
+  fKine(kine),
+  fLength(length),
+  fPdgCode(pdgCode), 
+  fMotherPdg(motherPdg),
+  fCharge(0),
+  fStationId(stationId),
+  fS(0),
+  fNPads(0)
+{
+}
 // -------------------------------------------------------------------------
 
 

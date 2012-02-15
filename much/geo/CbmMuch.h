@@ -153,7 +153,8 @@ private:
   Int_t Intersect(Float_t x, Float_t y, Float_t lx, Float_t ly, Float_t r);
   TGeoMedium* CreateMedium(const char* matName);
 
-public:
+  CbmMuch(const CbmMuch&);
+  CbmMuch& operator=(const CbmMuch&);
 
   ClassDef(CbmMuch,1);
 

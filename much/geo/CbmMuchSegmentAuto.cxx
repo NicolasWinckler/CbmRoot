@@ -37,13 +37,44 @@
 using std::string;
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchSegmentAuto::CbmMuchSegmentAuto(){
+CbmMuchSegmentAuto::CbmMuchSegmentAuto()
+  : FairTask(),
+    fEvents(0),
+    fPoints(NULL),
+    fHistHitDensity(),
+    fNStations(0),
+    fStations(NULL),
+    fDigiFileName(),
+    fGeoPar(NULL),
+    fExp0(),
+    fExp1(),
+    fSigmaXmin(),
+    fSigmaYmin(),
+    fSigmaXmax(),
+    fSigmaYmax(),
+    fOccupancyMax()
+{
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchSegmentAuto::CbmMuchSegmentAuto(char* digiFileName){
-  fDigiFileName = digiFileName;
+CbmMuchSegmentAuto::CbmMuchSegmentAuto(char* digiFileName)
+  : FairTask(),
+    fEvents(0),
+    fPoints(NULL),
+    fHistHitDensity(),
+    fNStations(0),
+    fStations(NULL),
+    fDigiFileName(digiFileName),
+    fGeoPar(NULL),
+    fExp0(),
+    fExp1(),
+    fSigmaXmin(),
+    fSigmaYmin(),
+    fSigmaXmax(),
+    fSigmaYmax(),
+    fOccupancyMax()
+{
 }
 // -------------------------------------------------------------------------
 

@@ -58,6 +58,9 @@ private:
 	Int_t fVerbose;
 	Int_t fEvents;
 
+	CbmMuchTrackFinderIdeal(const CbmMuchTrackFinderIdeal&);
+	CbmMuchTrackFinderIdeal& operator=(const CbmMuchTrackFinderIdeal&);
+
 	ClassDef(CbmMuchTrackFinderIdeal, 1);
 };
 

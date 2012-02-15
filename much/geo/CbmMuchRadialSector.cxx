@@ -16,29 +16,34 @@
 #include "TMath.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchRadialSector::CbmMuchRadialSector():TCrown(){
-  fDetectorId = 0;
-  fSectorIndex = 0;
-  fNChannels = 0;
-  fNeighbours.Set(0);
-  fPadAngle = 0;
-  fPhi0 = 0;
+CbmMuchRadialSector::CbmMuchRadialSector() 
+  : TCrown(),
+    fDetectorId(0),
+    fSectorIndex(0),
+    fNChannels(0),
+    fPads(),
+    fNeighbours(0),
+    fPadAngle(0.),
+    fPhi0(0.)
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -----  Standard constructor  --------------------------------------------
 CbmMuchRadialSector::CbmMuchRadialSector(Int_t detId, Int_t iSector, 
-    Double_t rMin, Double_t rMax, Double_t phi0, Double_t pad_angle, Int_t nPads):TCrown()
+    Double_t rMin, Double_t rMax, Double_t phi0, Double_t pad_angle, Int_t nPads)
+  : TCrown(),
+    fDetectorId(detId),
+    fSectorIndex(iSector),
+    fNChannels(nPads),
+    fPads(),
+    fNeighbours(0),
+    fPadAngle(pad_angle),
+    fPhi0(phi0)
 {
-  fDetectorId  = detId;
-  fSectorIndex = iSector;
-  fNChannels   = nPads;
-  fNeighbours.Set(0);
   fR1 = rMin;
   fR2 = rMax;
-  fPadAngle = pad_angle;
-  fPhi0     = phi0;
   fPhimin = (phi0-pad_angle*nPads/2)*180./TMath::Pi();
   fPhimax = (phi0+pad_angle*nPads/2)*180./TMath::Pi();
   fX1 = 0;

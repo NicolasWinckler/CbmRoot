@@ -13,15 +13,15 @@ void prop_qa(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir = "/data.local1/andrey/events/std_muon_5jpsi/";
+	TString dir = "/data.local1/andrey/events/events_propagation_qa_electrons/";
 	TString mcFile = dir + "mc.0000.root";
-	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
+	TString globalTracksFile = dir + "global.reco.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString propAnaFile = dir + "propagation.qa.0000.root";
 	TString resultDir = "./test/";
 	Int_t nofHits = 10;
-	Int_t pdg = 13;
-	Int_t testFastPropagation = 1;
+	Int_t pdg = 11;
+	Int_t testFastPropagation = 0;
 
 	if(script == "yes") {
 		mcFile = TString(gSystem->Getenv("MCFILE"));

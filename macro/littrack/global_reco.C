@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 void global_reco(Int_t nEvents = 1000, // number of events
-		TString opt = "tracking")
+		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/data.local1/andrey/events/std_electron_5jpsi/"; // Output directory
+   TString dir = "/data.local1/andrey/events/events_propagation_qa_electrons/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -41,7 +41,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
    // Reconstruction parameters
    TString globalTrackingType = "branch"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
-   TString trdHitProducerType = "clustering"; // TRD hit producer type: smearing, digi, clustering
+   TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
 
    // Normalization for efficiency

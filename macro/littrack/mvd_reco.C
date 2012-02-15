@@ -9,12 +9,12 @@
 using std::cout;
 using std::endl;
 
-void mvd_reco(Int_t nEvents = 100)
+void mvd_reco(Int_t nEvents = 20)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "/data.local1/andrey/events/mvd_urqmd_5jpsi/"; // Output directory
+	TString dir = "/data.local1/andrey/events/events_mvd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
   	TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -85,9 +85,9 @@ void mvd_reco(Int_t nEvents = 100)
 	FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
 	run->AddTask(stsMatchTracks);
 
-	CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-	FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
-	run->AddTask(fitTracks);
+//	CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
+//	FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
+//	run->AddTask(fitTracks);
    // ------------------------------------------------------------------------
 
 	CbmLitFindMvdTracks* finder = new CbmLitFindMvdTracks();
@@ -102,17 +102,24 @@ void mvd_reco(Int_t nEvents = 100)
    run->AddTask(findVertex);
    // ------------------------------------------------------------------------
 
-	// -----   Track finding QA check   ------------------------------------
+	// -----   Reconstruction QA tasks   ------------------------------------
 	CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
 	trackingQa->SetMinNofPointsSts(normStsPoints);
 	trackingQa->SetQuota(0.7);
 	trackingQa->SetVerbose(1);
 	trackingQa->SetOutputDir(std::string(resultDir));
 	run->AddTask(trackingQa);
-	// ------------------------------------------------------------------------
 
 	CbmLitFitQa* fitQa = new CbmLitFitQa();
+   fitQa->SetMvdMinNofHits(0);
+   fitQa->SetStsMinNofHits(normStsPoints);
+	fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
+
+   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+   clusteringQa->SetOutputDir(std::string(resultDir));
+   run->AddTask(clusteringQa);
+   // ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
@@ -133,13 +140,10 @@ void mvd_reco(Int_t nEvents = 100)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	cout << endl << endl;
 	cout << "Macro finished successfully." << endl;
 	cout << "Output file is " << mvdRecoFile << endl;
 	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << timer.RealTime() << " s, CPU time "
-			<< timer.CpuTime() << " s" << endl;
-	cout << endl;
+	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	// ------------------------------------------------------------------------
 }
 

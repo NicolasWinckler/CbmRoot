@@ -81,6 +81,11 @@ typedef struct ModulePara
   Float_t ModulePositionX;
   Float_t ModulePositionY;
   Float_t ModulePositionZ;
+
+ModulePara() : Station(-1), Layer(-1), moduleId(-1), xPos(0), yPos(0), zPos(),
+    nCol(0), nRow(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
+    PadSizeY(), SecCol(), SecRow(), ModuleSizeX(0.), ModuleSizeY(0.), 
+    ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
 } ModulePara;
 
 class CbmTrdClusterizer : public FairTask {

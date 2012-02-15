@@ -64,7 +64,8 @@ CbmTrdRadiator::CbmTrdRadiator()
 //-----------------------------------------------------------------------------
 // -----  Constructor   --------------------------------------------------
 CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick)
-  : fFirstPass(kTRUE),
+  : fDetType(-1),
+    fFirstPass(kTRUE),
     fSimpleTR(SimpleTR),
     fNFoils(Nfoils),
     fFoilThick(FoilThick),

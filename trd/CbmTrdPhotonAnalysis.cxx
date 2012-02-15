@@ -73,10 +73,18 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fTrdId(),
     fDigiPar(NULL),
     fModuleInfo(NULL),
+    fMotherDaughterZBirth(NULL),
+    fZBirthAll(NULL),
+    fMotherDaughter(NULL),
+    fZBirthEPfromGamma(NULL),
+    fMCPid(NULL),
     fGTPid(NULL),
-    fMCPid(NULL)
+    fePlusMinusMother(NULL),
+    fgammaMother(NULL),
+    fgammaDaughter(NULL),
+    fZBirth(),
+    fGammaHistory(NULL)
 {
-
 }
 
 CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, Int_t iVerbose)
@@ -92,10 +100,18 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fTrdId(),
     fDigiPar(NULL),
     fModuleInfo(NULL),
+    fMotherDaughterZBirth(NULL),
+    fZBirthAll(NULL),
+    fMotherDaughter(NULL),
+    fZBirthEPfromGamma(NULL),
     fMCPid(NULL),
-    fGTPid(NULL)
+    fGTPid(NULL),
+    fePlusMinusMother(NULL),
+    fgammaMother(NULL),
+    fgammaDaughter(NULL),
+    fZBirth(),
+    fGammaHistory(NULL)
 {
-
 }
 
 CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()

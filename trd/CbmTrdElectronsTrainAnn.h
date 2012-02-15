@@ -31,7 +31,7 @@ public:
 
 	CbmTrdElectronsTrainAnn();
 
-	~CbmTrdElectronsTrainAnn();
+	virtual ~CbmTrdElectronsTrainAnn();
 	void Init();
 	void InitCumHistos();
 	void Run();

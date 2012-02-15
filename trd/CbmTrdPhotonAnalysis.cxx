@@ -224,6 +224,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   CbmMCTrack* mctracke = NULL;
   CbmMCTrack* mctrackp = NULL;
   CbmMCTrack* mother = NULL;
+  CbmMCTrack* grandmother = NULL;
+  CbmMCTrack* daughter = NULL;
   CbmTrdPoint *mcpt = NULL;
   CbmTrdDigi *digi = NULL;
   CbmTrdCluster* cluster = NULL;
@@ -246,28 +248,16 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t posiFromPhot = 0;
   Int_t motherId = 0;
 
+  std::vector<Int_t> electronMotherIds;
+  std::vector<Int_t> positronMotherIds;
   std::vector<Int_t> electronGammaMotherIds;
   std::vector<Int_t> positronGammaMotherIds;
   std::vector<Int_t> electronGammaMotherIdsInMagnet;
   std::vector<Int_t> positronGammaMotherIdsInMagnet;
-
-  std::map<Int_t, MCParticle*> MCParticleMap;
-  for (Int_t iMcTrack = 0; iMcTrack < nMcTracks; iMcTrack++) {
-    mctrack = (CbmMCTrack*) fMCTracks->At(iMcTrack);
-    
-    if (MCParticleMap.find(iMcTrack) == MCParticleMap.end()) {
-      MCParticle* p = new MCParticle;
-      MCParticleMap[iMcTrack] = p;
-    }
-    MCParticleMap[iMcTrack]->motherId = mctrack->GetMotherId();
-    if (mctrack->GetMotherId() >= 0) {
-      if (MCParticleMap.find(mctrack->GetMotherId()) == MCParticleMap.end()) {
-	MCParticle* p = new MCParticle;
-	MCParticleMap[mctrack->GetMotherId()] = p;
-      }
-      MCParticleMap[mctrack->GetMotherId()]->daughterIds.push_back(iMcTrack);
-    }
-  }
+  /*
+    std::map<Int_t, MCParticle*> MCParticleMap;
+    std::map<Int_t, MCParticle*>::iterator it;
+  */
 
   if (fMCTracks)
     nMcTracks = fMCTracks->GetEntries();
@@ -289,11 +279,45 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   */
 
   printf("\n MC Tracks:        %i\n MC TRD Points:    %i\n TRD Digis:        %i\n TRD Cluster:      %i\n TRD Hits:         %i\n TRD Tracks:       %i\n Global Tracks:    %i\n Primary Verticis: %i\n", nMcTracks, nTrdPoints, nTrdDigis, nTrdClusters, nTrdHits, nTrdTracks, nGlobalTracks, nPrimaryVertex);
+  //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  // Filling maps and vectors for later usage
+  for (Int_t iMcTrack = 0; iMcTrack < nMcTracks; iMcTrack++) {
+    mctrack = (CbmMCTrack*) fMCTracks->At(iMcTrack);
+    if (mctrack->GetPdgCode() == 11)
+      fElectronIds.push_back(iMcTrack);
+    if (mctrack->GetPdgCode() == -11)
+      fPositronIds.push_back(iMcTrack);
+    if (mctrack->GetPdgCode() == 22)
+      fGammaIds.push_back(iMcTrack);
+    if (mctrack->GetPdgCode() == 111)
+      fPi0Ids.push_back(iMcTrack);
 
+    if (fMCParticleMap.find(iMcTrack) == fMCParticleMap.end()) {
+      MCParticle* p = new MCParticle;
+      fMCParticleMap[iMcTrack] = p;
+    }
+    fMCParticleMap[iMcTrack]->motherId = mctrack->GetMotherId();
+    fMCParticleMap[iMcTrack]->PID = mctrack->GetPdgCode();
+    if (mctrack->GetMotherId() >= 0) {
+      if (fMCParticleMap.find(mctrack->GetMotherId()) == fMCParticleMap.end()) {
+	MCParticle* p = new MCParticle;
+	fMCParticleMap[mctrack->GetMotherId()] = p;
+      }
+      fMCParticleMap[mctrack->GetMotherId()]->daughterIds.push_back(iMcTrack);
+    }
+  }
+  //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   for (Int_t iMcTrack = 0; iMcTrack < nMcTracks; iMcTrack++) {
     mctrack = (CbmMCTrack*) fMCTracks->At(iMcTrack);
     fMCPid->Fill(PdgToGeant(mctrack->GetPdgCode()));
-
+    if (mctrack->GetPdgCode() == -11) {
+      if (mctrack->GetMotherId() >= 0)
+	positronMotherIds.push_back(mctrack->GetMotherId());
+    }
+    if (mctrack->GetPdgCode() == 11) {
+      if (mctrack->GetMotherId() >= 0)
+	electronMotherIds.push_back(mctrack->GetMotherId());
+    }
     if (mctrack->GetPdgCode() == 22)
       fZBirth[0]->Fill(mctrack->GetStartZ());
     if (mctrack->GetPdgCode() == -11)
@@ -373,14 +397,63 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     }
     
   }
- 
-  //fZBirthEPfromGamma->Fill();
+  Bool_t primary = false;
+  for (Int_t i = 0; i < (Int_t)positronMotherIds.size(); i++) {
+    for (Int_t j = 0; j < (Int_t)electronMotherIds.size(); j++) {
+      if (positronMotherIds[i] == electronMotherIds[j]) {
+	mother = (CbmMCTrack*)fMCTracks->At(positronMotherIds[i]);
+	if (fMCParticleMap[positronMotherIds[i]]->motherId >= 0) {
+	  grandmother = (CbmMCTrack*)fMCTracks->At(fMCParticleMap[positronMotherIds[i]]->motherId);
+	  primary = false;
+	}
+	else {
+	  primary = true;
+	  grandmother = NULL;
+	}
+	//if (fMCParticleMap[positronMotherIds[i]]->daughterIds.size() == 2) { // only e^{+} e^{-} pairs
+	for (Int_t k = 0; k < fMCParticleMap[positronMotherIds[i]]->daughterIds.size(); k++) { // loop over electron and positron
+	  daughter = (CbmMCTrack*)fMCTracks->At(fMCParticleMap[positronMotherIds[i]]->daughterIds[k]);
+	  fPairAllVertex[0]->Fill(daughter->GetStartX());
+	  fPairAllVertex[1]->Fill(daughter->GetStartY());
+	  fPairAllVertex[2]->Fill(daughter->GetStartZ());	  
+	  if (mother->GetPdgCode() == 22 && primary) {//photon	   
+	    fPairGammaVertex[0]->Fill(daughter->GetStartX());
+	    fPairGammaVertex[1]->Fill(daughter->GetStartY());
+	    fPairGammaVertex[2]->Fill(daughter->GetStartZ());
+	  }
+	  if (!primary)
+	    if (mother->GetPdgCode() == 111 || grandmother->GetPdgCode() == 111 ) {//#pi^{0}
+	      fPairPi0Vertex[0]->Fill(daughter->GetStartX());
+	      fPairPi0Vertex[1]->Fill(daughter->GetStartY());
+	      fPairPi0Vertex[2]->Fill(daughter->GetStartZ());
+	    }
+	}
+	//}
+      }
+    }
+  }
 
+  for (it=fMCParticleMap.begin(); it != fMCParticleMap.end(); it++) {
+    mctrack = (CbmMCTrack*)fMCTracks->At((*it).first);
+    fNoDaughters->Fill(PdgToGeant(mctrack->GetPdgCode()), (*it).second->daughterIds.size());
+  }
   for (Int_t i = 0; i < (Int_t)positronGammaMotherIds.size(); i++) {
     for (Int_t j = 0; j < (Int_t)electronGammaMotherIds.size(); j++) {
       //cout << positronGammaMotherIds[i] << " " <<  electronGammaMotherIds[j] << endl;
       if (positronGammaMotherIds[i] == electronGammaMotherIds[j]) {
 	fGammaHistory->Fill(6);
+	
+	for (Int_t k = 0; k < fMCParticleMap[positronGammaMotherIds[i]]->daughterIds.size(); k++) {
+	  mctrackp = (CbmMCTrack*)fMCTracks->At(fMCParticleMap[positronGammaMotherIds[i]]->daughterIds[k]);
+	  if (mctrackp->GetPdgCode() == -11)
+	    fZBirthEPfromGamma->Fill(mctrackp->GetStartZ());
+	}
+	for (Int_t k = 0; k < fMCParticleMap[electronGammaMotherIds[i]]->daughterIds.size(); k++) {
+	  mctracke = (CbmMCTrack*)fMCTracks->At(fMCParticleMap[electronGammaMotherIds[i]]->daughterIds[k]);
+	  if (mctracke->GetPdgCode() == 11)
+	    fZBirthEPfromGamma->Fill(mctracke->GetStartZ());
+	}
+	
       }
     }
   }
@@ -418,15 +491,23 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   }
   SaveHistosToFile();
 }
+  Bool_t CbmTrdPhotonAnalysis::PairFromGamma(Int_t firstId, Int_t secondId)
+  {
+    return true;
+  }
+  Bool_t CbmTrdPhotonAnalysis::PairFromPi0(Int_t firstId, Int_t secondId)
+  {
+    return true;
+  }
   Bool_t CbmTrdPhotonAnalysis::VertexInMagnet(CbmMCTrack* track)
   {
-    if (track->GetStartZ() < 100)
+    if (fabs(track->GetStartX()) < 132/2 && fabs(track->GetStartY()) < 132/2 && track->GetStartZ() < 100 )
       return true;
     return false;
   }
   Bool_t CbmTrdPhotonAnalysis::VertexInTarget(CbmMCTrack* track)
   {
-    if (track->GetStartZ() < 0.1)
+    if (fabs(track->GetStartX()) < 0.1 && fabs(track->GetStartY()) < 0.1 && track->GetStartZ() < 0.1)
       return true;
     return false;
   }
@@ -590,7 +671,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fgammaMother = new TH1I("gammaMother","Mother ID for #gamma",49,0.5,49.5);
     fgammaDaughter = new TH1I("gammaDaughter","Daughter ID for #gamma",49,0.5,49.5);
     fZBirthAll = new TH2I("ZBirth_All","z birth",10000,0,1000,49,0.5,49.5);
-    fZBirthEPfromGamma= new TH1I("ZBirthEPfromGamma","z birth from e^{+} & e^{-} with mother #gamma",10000,0,1000);
+    fZBirthEPfromGamma = new TH1I("ZBirthEPfromGamma","z birth from e^{+} & e^{-} pairs with mother #gamma",10000,0,1000);
+    fNoDaughters = new TH2I("NoDaughters","Number of daughters",49,0.5,49.5,101,-0.5,100.5);
     fMotherDaughter = new TH2I("MotherDaughter","mother / daughter",49,0.5,49.5,49,0.5,49.5);
     fMotherDaughterZBirth = new TH3I("MotherDaughterZBirth","mother / daughter / z-birth",10000,0,1000,49,0.5,49.5,49,0.5,49.5);
     for (Int_t bin = 0; bin < 49; bin++) {
@@ -604,6 +686,18 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fMotherDaughter->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
       fMotherDaughterZBirth->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
       fMotherDaughterZBirth->GetZaxis()->SetBinLabel(bin+1,particleID[bin]);
+      fNoDaughters->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    }
+    TString name[3] = {"x","y","z"};
+    Int_t low[3] = {-50,-50,0};
+    Int_t high[3] = {50,50,100};
+    for (Int_t i = 0; i < 3; i++) {
+      fPairAllVertex[i] = new TH1I("PairAllVertex_" + name[i], "all e^{+} e^{-} pair vertex" + name[i], 200, low[i], high[i]);
+      fPairAllVertex[i]->SetXTitle(name[i]+"-position [cm]");
+      fPairGammaVertex[i] = new TH1I("PairGammaVertex_" + name[i], "e^{+} e^{-} pair from #gamma vertex" + name[i], 200, low[i], high[i]);
+      fPairGammaVertex[i]->SetXTitle(name[i]+"-position [cm]");
+      fPairPi0Vertex[i] = new TH1I("PairPi0Vertex_" + name[i], "e^{+} e^{-} pair from #pi^{0} vertex" + name[i], 200, low[i], high[i]);
+      fPairPi0Vertex[i]->SetXTitle(name[i]+"-position [cm]");
     }
     /*
       fMCPid = new TH1I("MCPid","MC Pid",4501,-1000.5,3500.5);
@@ -614,7 +708,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fZBirth[1] = new TH1I("ZBirth_positron","z birth e^{+}",10000,0,1000);
     fZBirth[2] = new TH1I("ZBirth_electron","z birth e^{-}",10000,0,1000);
     fZBirth[3] = new TH1I("ZBirth_pi0","z birth #pi^{0}",10000,0,1000);
-    fGammaHistory = new TH1I("fGammaHistory","history for #gamma",10,-0.5,9.5);
+    fGammaHistory = new TH1I("GammaHistory","history for #gamma",10,-0.5,9.5);
     fGammaHistory->GetXaxis()->SetBinLabel( 1,"all #gamma");
     fGammaHistory->GetXaxis()->SetBinLabel( 2,"#gamma from z#leq0.1cm");
     fGammaHistory->GetXaxis()->SetBinLabel( 3,"#gamma with mother id#equiv-1");
@@ -671,6 +765,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fMotherDaughter->SetZTitle("Daughter");
     fMotherDaughterZBirth->Write("", TObject::kOverwrite);
     fZBirthEPfromGamma->Write("", TObject::kOverwrite);
+    fNoDaughters->SetYTitle("Number of daughters");
+    fNoDaughters->Write("", TObject::kOverwrite);
+    for (Int_t i = 0; i < 3; i++) {
+      fPairAllVertex[i]->Write("", TObject::kOverwrite);
+      fPairGammaVertex[i]->Write("", TObject::kOverwrite);
+      fPairPi0Vertex[i]->Write("", TObject::kOverwrite);
+    }
     //outFile->Close();
     c->Close();
   }

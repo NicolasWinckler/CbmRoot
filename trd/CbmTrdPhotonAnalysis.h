@@ -33,6 +33,7 @@ class TH2I;
 
 typedef struct MCParticle
 {
+  Int_t PID;
   Int_t motherId;
   std::vector<Int_t> daughterIds;
 MCParticle() : motherId(0), daughterIds() {};
@@ -55,6 +56,9 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   Bool_t VertexInMagnet(CbmMCTrack* track); 
   Bool_t VertexInTarget(CbmMCTrack* track);
+
+  Bool_t PairFromGamma(Int_t firstId, Int_t secondId);
+  Bool_t PairFromPi0(Int_t firstId, Int_t secondId);
 
   /** Executed task **/
   virtual void Exec(Option_t * option);
@@ -99,6 +103,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH2I*  fZBirthAll;
   TH2I*  fMotherDaughter;
 
+  TH2I* fNoDaughters;
+
   TH1I*  fZBirthEPfromGamma;
   TH1I*  fMCPid;
   TH1I*  fGTPid;
@@ -107,6 +113,19 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I*  fgammaDaughter;
   TH1I*  fZBirth[4];
   TH1I*  fGammaHistory;
+
+  TH1I* fPairAllVertex[3];
+  TH1I* fPairGammaVertex[3];
+  TH1I* fPairPi0Vertex[3];
+
+  std::map<Int_t, MCParticle*> fMCParticleMap;
+  std::map<Int_t, MCParticle*>::iterator it;
+
+  std::vector<Int_t> fElectronIds;
+  std::vector<Int_t> fPositronIds;
+  std::vector<Int_t> fGammaIds;
+  std::vector<Int_t> fPi0Ids;
+
   ClassDef(CbmTrdPhotonAnalysis,1)
     };
 

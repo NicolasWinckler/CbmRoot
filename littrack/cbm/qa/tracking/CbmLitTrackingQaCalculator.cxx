@@ -137,7 +137,6 @@ void CbmLitTrackingQaCalculator::Init()
       fElectronId = new CbmLitGlobalElectronId();
       fElectronId->Init();
       fRichEllipseFitter = new CbmRichRingFitterEllipseTau();
-      fRichEllipseFitter->Init();
    }
    fMCTrackCreator = CbmLitMCTrackCreator::Instance();
 }
@@ -836,20 +835,19 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
             const CbmLitMCTrack& track = fMCTrackCreator->GetTrack(iMCTrack);
             Int_t nofPointsRich = track.GetNofPoints(kRICH);
             const vector<CbmLitMCPoint>& richPoints = track.GetPoints(kRICH);
-            vector<Double_t> xRich, yRich;
+            CbmRichRingLight ring;
             for (Int_t i = 0 ; i < nofPointsRich; i++){
-               xRich.push_back(richPoints[i].GetX());
-               yRich.push_back(richPoints[i].GetY());
+               CbmRichHitLight h(richPoints[i].GetX(), richPoints[i].GetY());
+               ring.AddHit(h);
             }
-            CbmRichRing* ring = new CbmRichRing();
-            fRichEllipseFitter->DoFit(ring, xRich, yRich);
+
+            fRichEllipseFitter->DoFit(&ring);
             // B/A dependence histograms
-            Double_t boa = ring->GetBaxis()/ring->GetAaxis();
+            Double_t boa = ring.GetBaxis()/ring.GetAaxis();
             FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichBoA", boa);
             // radial position dependence histograms
-            Double_t radPos = ring->GetRadialPosition();
+            Double_t radPos = ring.GetRadialPosition();
             FillGlobalReconstructionHistosRich(mcTrack, iMCTrack, fMcRichMap, "hRichRadPos", radPos);
-            if (ring != NULL) delete ring;
     	   }
       }
       // acceptance: STS+RICH

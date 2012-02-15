@@ -18,7 +18,7 @@ public:
   CbmEcalAnalysisPair(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisPair() {};
+  CbmEcalAnalysisPair();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -80,6 +80,9 @@ private:
   TClonesArray* fClusters;
   /** Calorimeter structure **/
   CbmEcalStructure* fStr;		//!
+
+  CbmEcalAnalysisPair(const CbmEcalAnalysisPair&);
+  CbmEcalAnalysisPair& operator=(const CbmEcalAnalysisPair&);
 
   ClassDef(CbmEcalAnalysisPair,1)
 };

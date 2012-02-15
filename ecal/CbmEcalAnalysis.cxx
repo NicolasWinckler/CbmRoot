@@ -19,18 +19,78 @@ using std::cout;
 using std::endl;
 
 //------------------------------------------------------------------------------
-CbmEcalAnalysis::CbmEcalAnalysis() :FairTask()
+CbmEcalAnalysis::CbmEcalAnalysis() 
+  : FairTask(),
+    fListStack(NULL),
+    fListECALptsEdep(NULL),
+    fListECALptsWall(NULL),
+    fListECALhits(NULL),
+    fListECALrp(NULL),
+    fEvent(0),
+    fNprimary(0),
+    fKfVectorMeson(0),
+    fhPrimPabs(NULL),
+    fhPrimPt(NULL),
+    fhPrimEta(NULL),
+    fhPrimTheta(NULL),
+    fhPrimPhi(NULL),
+    fhPrimPtEta(NULL),
+    fhMcpPabs(NULL),
+    fhMcpPt(NULL),
+    fhMcpEta(NULL),
+    fhMcpTheta(NULL),
+    fhMcpPhi(NULL),
+    fhMcpPtEta(NULL),
+    fhMcpXY(NULL),
+    fhHitXY(NULL),
+    fhHitE(NULL),
+    fhRecPabs(NULL),
+    fhRecPt(NULL),
+    fhRecYrap(NULL),
+    fhRecPhi(NULL),
+    fhPtYrap(NULL),
+    fhPtYrapSignal(NULL),
+    fhPtYrapAccept(NULL),
+    fDebug("")
 {
 }
 
 //------------------------------------------------------------------------------
 CbmEcalAnalysis::CbmEcalAnalysis(const char *name, const char *title)
-  :FairTask(name)
+  : FairTask(name),
+    fListStack(NULL),
+    fListECALptsEdep(NULL),
+    fListECALptsWall(NULL),
+    fListECALhits(NULL),
+    fListECALrp(NULL),
+    fEvent(0),
+    fNprimary(0),
+    fKfVectorMeson(443),
+    fhPrimPabs(NULL),
+    fhPrimPt(NULL),
+    fhPrimEta(NULL),
+    fhPrimTheta(NULL),
+    fhPrimPhi(NULL),
+    fhPrimPtEta(NULL),
+    fhMcpPabs(NULL),
+    fhMcpPt(NULL),
+    fhMcpEta(NULL),
+    fhMcpTheta(NULL),
+    fhMcpPhi(NULL),
+    fhMcpPtEta(NULL),
+    fhMcpXY(NULL),
+    fhHitXY(NULL),
+    fhHitE(NULL),
+    fhRecPabs(NULL),
+    fhRecPt(NULL),
+    fhRecYrap(NULL),
+    fhRecPhi(NULL),
+    fhPtYrap(NULL),
+    fhPtYrapSignal(NULL),
+    fhPtYrapAccept(NULL),
+    fDebug("")
 {
   SetTitle(title);
-  fEvent = 0;
-  fDebug = "";
-  fKfVectorMeson = 443;
   Double_t pi = TMath::Pi();
 
   // Primary tracks histograms

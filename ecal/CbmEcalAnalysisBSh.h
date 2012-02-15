@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisBSh(const char* name, const Int_t iVerbose=0, const char* cfgname="ana.cfg");
 public:
   /** Default constructor **/
-  CbmEcalAnalysisBSh() {};
+  CbmEcalAnalysisBSh();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -78,6 +78,9 @@ private:
   CbmEcalStructure* fStr;	//!
   CbmEcalCalibration* fCal;	//!
   CbmEcalInf* fInf;
+
+  CbmEcalAnalysisBSh(const CbmEcalAnalysisBSh&);
+  CbmEcalAnalysisBSh& operator=(const CbmEcalAnalysisBSh&);
 
   ClassDef(CbmEcalAnalysisBSh,1)
 };

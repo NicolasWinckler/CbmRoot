@@ -19,9 +19,20 @@ void CbmEcalTrackImport::AddFile(const char* name)
 
 /** Standard constructor **/
 CbmEcalTrackImport::CbmEcalTrackImport(const char* name, const Int_t verbose)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fChain(new TChain("ecaltracks")),
+    fEventN(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fTx(0.),
+    fTy(0.),
+    fQp(0.),
+    fN(0),
+    fEntry(0),
+    fEv(0),
+    fTracks(NULL)
 {
-  fChain=new TChain("ecaltracks");
 }
 
 
@@ -93,8 +104,20 @@ CbmEcalTrackImport::~CbmEcalTrackImport()
   
 /** Only to comply with framework **/
 CbmEcalTrackImport::CbmEcalTrackImport()
+  : FairTask(),
+    fChain(),
+    fEventN(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fTx(0.),
+    fTy(0.),
+    fQp(0.),
+    fN(0),
+    fEntry(0),
+    fEv(0),
+    fTracks(NULL)
 {
-  ;
 }
 
 

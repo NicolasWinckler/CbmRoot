@@ -129,6 +129,9 @@ private:
   /** Distance between this and closest other hit in the calorimeter **/
   Double_t fR;
 
+  CbmEcalQualityCheck(const CbmEcalQualityCheck&);
+  CbmEcalQualityCheck& operator=(const CbmEcalQualityCheck&);
+
   ClassDef(CbmEcalQualityCheck, 1)
 };
 

@@ -62,10 +62,10 @@ Double_t CbmGeoEcalPar::GetVariableStrict(const char* key)
 }
 
 CbmGeoEcalPar::CbmGeoEcalPar(const char* name,const char* title,const char* context)
-           : FairParGenericSet(name,title,context) {
-
-	     fEcalStr=NULL;
-	     fVariables=NULL;
+  : FairParGenericSet(name,title,context), 
+    fEcalStr(NULL),
+    fVariables(NULL)
+{
 }
 
 CbmGeoEcalPar::~CbmGeoEcalPar(void) {

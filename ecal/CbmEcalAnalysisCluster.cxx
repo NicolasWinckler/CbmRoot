@@ -515,14 +515,96 @@ void CbmEcalAnalysisCluster::InitTree()
   n="clsn["; n+=fClsSize; n+="]/I"; fTree->Branch("clsn", fClsN, n);
 }
 
-CbmEcalAnalysisCluster::CbmEcalAnalysisCluster(const char* name, const Int_t iVerbose, const char* cfgname)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisCluster::CbmEcalAnalysisCluster()
+  : FairTask(),
+    fTree(NULL),
+    fEvent(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fEFull(0.),
+    fEMax(0.),
+    fE2(0.),
+    fE3(0.),
+    fE4(0.),
+    fE5(0.),
+    fE5_2(0.),
+    fGX(0.),
+    fGY(0.),
+    fGX2(0.),
+    fGY2(0.),
+    fMX(0.),
+    fMY(0.),
+    fTheta(0.),
+    fPhi(0.),
+    fClsSize(0),
+    fClsX(NULL),
+    fClsY(NULL),
+    fClsP(NULL),
+    fClsQ(NULL),
+    fClsE(NULL),
+    fClsSE(NULL),
+    fClsN(NULL),
+    fClsS(NULL),
+    fCSize(0),
+    fCE(0.),
+    fCE2(0.),
+    fCSize2(0),
+    fCE3(0.),
+    fCSize3(0),
+    fC2ParI(0),
+    fC2Par1(0.),
+    fC2Par2(0.),
+    fC2Par3(0.),
+    fMC(NULL),
+    fStr(NULL)
 {
-  fTree=NULL;
-  fC2Par1=TMath::Sqrt(3);
-  fC2Par2=48.0*1.6;
-  fC2Par3=12.0;
+}
 
+CbmEcalAnalysisCluster::CbmEcalAnalysisCluster(const char* name, const Int_t iVerbose, const char* cfgname)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fEvent(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fEFull(0.),
+    fEMax(0.),
+    fE2(0.),
+    fE3(0.),
+    fE4(0.),
+    fE5(0.),
+    fE5_2(0.),
+    fGX(0.),
+    fGY(0.),
+    fGX2(0.),
+    fGY2(0.),
+    fMX(0.),
+    fMY(0.),
+    fTheta(0.),
+    fPhi(0.),
+    fClsSize(0),
+    fClsX(NULL),
+    fClsY(NULL),
+    fClsP(NULL),
+    fClsQ(NULL),
+    fClsE(NULL),
+    fClsSE(NULL),
+    fClsN(NULL),
+    fClsS(NULL),
+    fCSize(0),
+    fCE(0.),
+    fCE2(0.),
+    fCSize2(0),
+    fCE3(0.),
+    fCSize3(0),
+    fC2ParI(0),
+    fC2Par1(TMath::Sqrt(3)),
+    fC2Par2(48.0*1.6),
+    fC2Par3(12.),
+    fMC(NULL),
+    fStr(NULL)
+{
   CbmEcalParam* par=new CbmEcalParam("ClusterAnalysisParam", cfgname);
   fC2ParI=par->GetInteger("cpari");
   fC2Par1=par->GetDouble("cpar1");

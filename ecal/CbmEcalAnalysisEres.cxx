@@ -71,11 +71,24 @@ void CbmEcalAnalysisEres::InitTree()
   fTree->Branch("e", &fE, "e/D");
 }
 
-CbmEcalAnalysisEres::CbmEcalAnalysisEres(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisEres::CbmEcalAnalysisEres()
+  : FairTask(),
+    fMax(NULL),
+    fTree(NULL),
+    fCellType(0),
+    fE(0.),
+    fEv(0)
 {
-  fEv=0;
-  fTree=NULL;
+}
+
+CbmEcalAnalysisEres::CbmEcalAnalysisEres(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fMax(NULL),
+    fTree(NULL),
+    fCellType(0),
+    fE(0.),
+    fEv(0)
+{
 }
 
 /** Initing routine **/

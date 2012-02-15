@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisUniformity(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisUniformity() {};
+  CbmEcalAnalysisUniformity();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -49,6 +49,9 @@ private:
   CbmEcalStructure* fStr;
   /** An array points before the calorimeter**/
   TClonesArray* fPoints;
+
+  CbmEcalAnalysisUniformity(const CbmEcalAnalysisUniformity&);
+  CbmEcalAnalysisUniformity& operator=(const CbmEcalAnalysisUniformity&);
 
   ClassDef(CbmEcalAnalysisUniformity,1)
 };

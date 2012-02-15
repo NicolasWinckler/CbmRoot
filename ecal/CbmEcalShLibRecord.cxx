@@ -9,6 +9,23 @@
 using namespace std;
 
 CbmEcalShLibRecord::CbmEcalShLibRecord(const char* filename, Int_t verb)
+  : TObject(),
+    fCellSize(0.),
+    fNE(0),
+    fE(NULL),
+    fNTheta(0),
+    fTheta(NULL),
+    fNPhi(0),
+    fPhi(NULL),
+    fNX(0),
+    fStepX(0.),
+    fStartX(0.),
+    fNY(0),
+    fStepY(0.),
+    fStartY(0.),
+    fVerbose(verb),
+    fN(0),
+    fR(NULL)
 {
   TFile* f=new TFile(filename);
   TTree* info;
@@ -16,10 +33,6 @@ CbmEcalShLibRecord::CbmEcalShLibRecord(const char* filename, Int_t verb)
   Float_t t;
   Int_t i;
 
-  fVerbose=verb;
-  fE=NULL;
-  fTheta=NULL;
-  fPhi=NULL;
 
   Info("CbmEcalShLibRecord", "Loading %s...", filename);
   if (f->IsZombie())

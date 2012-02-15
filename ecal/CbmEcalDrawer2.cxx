@@ -22,39 +22,47 @@
 using namespace std;
 
 CbmEcalDrawer2::CbmEcalDrawer2()
-  : FairTask()
+  : FairTask(),
+    fStr(NULL),
+    fC(NULL),
+    fOut(NULL),
+    fEvent(0),
+    fDrawOpt(""),
+    fNamePrefix(""),
+    fMCPoints(NULL),
+    fCluster(),
+    fClusterE(0.),
+    fParI(0),
+    fIntSteps(0),
+    fPar1(0.),
+    fPar2(0.),
+    fPar3(0.)
 {
-  fStr=NULL;
-  fC=NULL;
-  fOut=NULL;
-  fEvent=0;
   SetDrawOpt();
   SetNamePrefix();
-  fMCPoints=NULL;
 }
 	
 CbmEcalDrawer2::CbmEcalDrawer2(const char* name, const char* title)
-  : FairTask(name, 0)
+  : FairTask(name, 0),
+    fStr(NULL),
+    fC(NULL),
+    fOut(NULL),
+    fEvent(0),
+    fDrawOpt(""),
+    fNamePrefix(""),
+    fMCPoints(NULL),
+    fCluster(),
+    fClusterE(0.),
+    fParI(7),
+    fIntSteps(100),
+    fPar1(0.38),
+    fPar2(30.8),
+    fPar3(12.0)
+
+
 {
-  fStr=NULL;
-  fC=NULL;
-  fOut=NULL;
-  fEvent=0;
   SetDrawOpt();
   SetNamePrefix();
-  fMCPoints=NULL;
-
-  fIntSteps=100;
-  fParI=7;
-  fPar1=0.38;
-  fPar2=30.8;
-  fPar3=12.0;
-/*
-  fParI=9;
-  fPar1=1.79;
-  fPar2=44.8;
-  fPar3=12.0;
-*/
 }
 
 InitStatus CbmEcalDrawer2::Init()

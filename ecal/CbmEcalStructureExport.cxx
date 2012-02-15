@@ -13,15 +13,28 @@ using namespace std;
 
 /** Default constructor **/
 CbmEcalStructureExport::CbmEcalStructureExport()
+  : FairTask(),
+    fVerbose(0), 
+    fEventN(0),
+    fX(0.),
+    fY(0.),
+    fE(0.),
+    fStructureOut(NULL),
+    fStr(NULL)
 {
-  ;
 }
 
 /** Standerd constructor **/
 CbmEcalStructureExport::CbmEcalStructureExport(const char* name, const Int_t verbose)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fVerbose(verbose), 
+    fEventN(0),
+    fX(0.),
+    fY(0.),
+    fE(0.),
+    fStructureOut(NULL),
+    fStr(NULL)
 {
-  fVerbose=verbose;
 }
 
 /** Task initialization **/

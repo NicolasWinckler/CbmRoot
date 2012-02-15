@@ -39,6 +39,10 @@ private:
   CbmEcalTrackExtrapolation* fTrE;
   TClonesArray* fGTArray;
   TClonesArray* fTrackPar;
+
+  CbmEcalTracking(const CbmEcalTracking&);
+  CbmEcalTracking& operator=(const CbmEcalTracking&);
+
   ClassDef(CbmEcalTracking, 1)
 };
 

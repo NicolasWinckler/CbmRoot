@@ -23,11 +23,84 @@ using std::endl;
 using std::flush;
 
 
-CbmEcalShowerCalibrator::CbmEcalShowerCalibrator(const char* name, const Int_t iVerbose)
-	: FairTask(name, iVerbose), fZPosition(-2), \
-	fPDGCode(22), fLowEnergy(0.1), fOutCellSize(3.0), fSCurveRun(kFALSE)
+CbmEcalShowerCalibrator::CbmEcalShowerCalibrator()
+  : FairTask(),
+    fZPosition(-2),
+    fPDGCode(22), 
+    fLowEnergy(0.1), 
+    fOutCellSize(3.0), 
+    fSCurveRun(kFALSE),
+    fLitePoints(NULL),
+    fEcalPoints(NULL),
+    fMCTracks(NULL),
+    fTree(NULL),
+    fOutMCX(0.),
+    fOutMCY(0.),
+    fOutDX(0),
+    fOutDY(0),
+    fCellSize(0.),
+    fOutMCE(0.),
+    fOutMCPx(0.),
+    fOutMCPy(0.),
+    fOutMCPz(0.),
+    fOutEnergy(),
+    fOutPSEnergy(),
+    fEvent(0),
+    fLocalEnergy(NULL),
+    fLocalPSEnergy(NULL),
+    fLocalXArr(NULL),
+    fLocalYArr(NULL),
+    fLocalSize(0),
+    fModuleSize(0.),
+    fLocalXSize(0),
+    fLocalYSize(0),
+    fLocalMCX(0.),
+    fLocalMCY(0.),
+    fMCX(0.),
+    fMCY(0.),
+    fCount(0),
+    fPar(NULL)
 {
-  ;
+}
+
+CbmEcalShowerCalibrator::CbmEcalShowerCalibrator(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose), 
+    fZPosition(-2),
+    fPDGCode(22), 
+    fLowEnergy(0.1), 
+    fOutCellSize(3.0), 
+    fSCurveRun(kFALSE),
+    fLitePoints(NULL),
+    fEcalPoints(NULL),
+    fMCTracks(NULL),
+    fTree(NULL),
+    fOutMCX(0.),
+    fOutMCY(0.),
+    fOutDX(0),
+    fOutDY(0),
+    fCellSize(0.),
+    fOutMCE(0.),
+    fOutMCPx(0.),
+    fOutMCPy(0.),
+    fOutMCPz(0.),
+    fOutEnergy(),
+    fOutPSEnergy(),
+    fEvent(0),
+    fLocalEnergy(NULL),
+    fLocalPSEnergy(NULL),
+    fLocalXArr(NULL),
+    fLocalYArr(NULL),
+    fLocalSize(0),
+    fModuleSize(0.),
+    fLocalXSize(0),
+    fLocalYSize(0),
+    fLocalMCX(0.),
+    fLocalMCY(0.),
+    fMCX(0.),
+    fMCY(0.),
+    fCount(0),
+    fPar(NULL)
+{
 }
 
 /** Initing routine **/

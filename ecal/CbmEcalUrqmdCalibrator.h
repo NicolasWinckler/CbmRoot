@@ -136,7 +136,7 @@ private:
   std::list<CbmEcalPoint*> fList; 
 public:
   /** Default constructor **/
-  CbmEcalUrqmdCalibrator() {};
+  CbmEcalUrqmdCalibrator();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -159,6 +159,9 @@ private:
   TClonesArray* fEcalPoints;
   /** MCTracks array **/
   TClonesArray* fMCTracks;
+
+  CbmEcalUrqmdCalibrator(const CbmEcalUrqmdCalibrator&);
+  CbmEcalUrqmdCalibrator& operator=(const CbmEcalUrqmdCalibrator&);
 
   ClassDef(CbmEcalUrqmdCalibrator,1)
 };

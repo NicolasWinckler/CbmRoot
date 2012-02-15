@@ -25,11 +25,22 @@ void CbmEcalAnalysisSimple::Exec(Option_t* option)
 }
 
 
-CbmEcalAnalysisSimple::CbmEcalAnalysisSimple(const char* name, const Int_t iVerbose, const char* fname)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisSimple::CbmEcalAnalysisSimple()
+  : FairTask(),
+    fDr(NULL),
+    fStr(NULL),
+    fName(""),
+    fEv(0)
 {
-  fEv=0;
-  fName=fname;
+}
+
+CbmEcalAnalysisSimple::CbmEcalAnalysisSimple(const char* name, const Int_t iVerbose, const char* fname)
+  : FairTask(name, iVerbose),
+    fDr(NULL),
+    fStr(NULL),
+    fName(fname),
+    fEv(0)
+{
 }
 
 /** Initing routine **/

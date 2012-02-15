@@ -10,6 +10,35 @@
 using namespace std;
 
 CbmEcalShLibCorrRecord::CbmEcalShLibCorrRecord(const char* filename, Int_t verb)
+  : TObject(),
+    fError(0),
+    fCellSize(0.),
+    fNE(0),
+    fE(NULL),
+    fNTheta(0),
+    fTheta(NULL),
+    fNPhi(0),
+    fPhi(NULL),
+    fStep(0.),
+    iCellSize(0),
+    fEndX(0.),
+    fStartX(0.),
+    fEndY(0.),
+    fStartY(0.),
+    fNCells(0),
+    fNCells2(0),
+    fSizeData(0),
+    fSizeCorr(0),
+    fSize(0),
+    fN(0),
+    fVerbose(verb),
+    fData(NULL),
+    fCorr(NULL),
+    fX1(0.),
+    fX2(0.),
+    fY1(0.),
+    fY2(0.),
+    fCEnergy(0)
 {
   TFile* f=new TFile(filename);
   TTree* info;
@@ -19,11 +48,6 @@ CbmEcalShLibCorrRecord::CbmEcalShLibCorrRecord(const char* filename, Int_t verb)
   Int_t j;
   Float_t* dta;
   Float_t* corr;
-
-  fVerbose=verb;
-  fE=NULL;
-  fTheta=NULL;
-  fPhi=NULL;
 
   Info("CbmEcalShLibCorrRecord", "Loading %s...", filename);
   if (f->IsZombie())

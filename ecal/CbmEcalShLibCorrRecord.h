@@ -69,6 +69,9 @@ private:
   Float_t fY2;
   Int_t fCEnergy;
 
+  CbmEcalShLibCorrRecord(const CbmEcalShLibCorrRecord&);
+  CbmEcalShLibCorrRecord& operator=(const CbmEcalShLibCorrRecord&);
+
   ClassDef(CbmEcalShLibCorrRecord, 1);
 };
 

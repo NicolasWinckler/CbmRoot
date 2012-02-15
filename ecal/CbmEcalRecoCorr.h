@@ -29,7 +29,11 @@ class FCNEcalClusterCorr : public ROOT::Minuit2::FCNBase
 {
 public:
   FCNEcalClusterCorr(CbmEcalCalibration* cal, CbmEcalShLibCorr* shlib, CbmEcalInf* inf)
-    : fCal(cal), fShLib(shlib), fInf(inf), fCluster(NULL), fEStep(1e-4), fCStep(1e-4), fErrorDef(1.0) {};
+    : ROOT::Minuit2::FCNBase(), fCal(cal), fShLib(shlib), fInf(inf), fStr(NULL),
+    fCluster(NULL), fEStep(1e-4), fCStep(1e-4), fErrorDef(1.0), 
+    fClusterEnergy(0.), fClusterResp(0.), fN(0), fCells(), fClsCells(),
+    fFixClusterEnergy(0), fNDF(0) 
+    {};
   
   CbmEcalCluster* GetCluster() const {return fCluster;}
   void SetCluster(CbmEcalCluster* cluster);
@@ -92,6 +96,9 @@ private:
   Int_t fFixClusterEnergy;
   /** NDF of fit **/
   Int_t fNDF;
+
+  FCNEcalClusterCorr(const FCNEcalClusterCorr&);
+  FCNEcalClusterCorr& operator=(const FCNEcalClusterCorr&);
 };
 
 class CbmEcalRecoCorr : public FairTask
@@ -219,6 +226,10 @@ private:
   Double_t fPreE;
   /** Region **/
   Int_t fRegion;
+
+  CbmEcalRecoCorr(const CbmEcalRecoCorr&);
+  CbmEcalRecoCorr& operator=(const CbmEcalRecoCorr&);
+
   ClassDef(CbmEcalRecoCorr, 1)
 };
 

@@ -140,6 +140,10 @@ private:
   TString fConfigName;
   /** Type of algorithm to use **/
   Int_t fAlgo;
+
+  CbmEcalMatching(const CbmEcalMatching&);
+  CbmEcalMatching& operator=(const CbmEcalMatching&);
+
   ClassDef(CbmEcalMatching, 1)
 };
 

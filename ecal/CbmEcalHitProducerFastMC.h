@@ -86,6 +86,9 @@ private:
   Int_t fNHits;                 // Number of hits
   Int_t fEvent;                 //! Internal event counter
 
+  CbmEcalHitProducerFastMC(const CbmEcalHitProducerFastMC&);
+  CbmEcalHitProducerFastMC& operator=(const CbmEcalHitProducerFastMC&);
+
   ClassDef(CbmEcalHitProducerFastMC,1)
 
 };

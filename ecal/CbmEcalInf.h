@@ -69,7 +69,12 @@ class CbmEcalInf:public TObject
 {
 public:
   /** This is ROOT requirement **/
-  CbmEcalInf() : fCellSize(0) {};
+ CbmEcalInf() : TObject(), fVariables(NULL), fEcalStr(), fXPos(0.), fYPos(0.),
+    fZPos(0.), fNLayers(0), fXSize(0), fYSize(0), fModuleSize(0.), fPSLead(0.),
+    fPSScin(0.), fPSGap(0.), fLead(0.), fScin(0.), fTyveec(0.), fThicknessLayer(0.),
+    fCellSize(0.), fEcalSize(), fEcalHole(), fECut(0.), fHCut(0.), fFastMC(-1),
+    fSuccess(-1), fFileName("") 
+    {};
 
   static CbmEcalInf* GetInstance(const char* filename);
   /** Getters **/
@@ -205,6 +210,10 @@ private:
   Int_t fSuccess;
 
   TString fFileName;
+
+  CbmEcalInf(const CbmEcalInf&);
+  CbmEcalInf& operator=(const CbmEcalInf&);
+
   ClassDef(CbmEcalInf,2);
 };
 

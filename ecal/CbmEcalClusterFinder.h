@@ -67,6 +67,9 @@ private:
   /** Minimum energy of precluster maximum for consideration **/
   Double_t fMinMaxE;
 
+  CbmEcalClusterFinder(const CbmEcalClusterFinder&);
+  CbmEcalClusterFinder& operator=(const CbmEcalClusterFinder&);
+
   ClassDef(CbmEcalClusterFinder, 1)
 };
 

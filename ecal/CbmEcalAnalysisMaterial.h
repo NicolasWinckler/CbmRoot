@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisMaterial(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisMaterial() {};
+  CbmEcalAnalysisMaterial();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -50,6 +50,9 @@ private:
   TClonesArray* fMC;		//!
   /** Array of radlen points**/
   TClonesArray* fRadLen;	//!
+
+  CbmEcalAnalysisMaterial(const CbmEcalAnalysisMaterial&);
+  CbmEcalAnalysisMaterial& operator=(const CbmEcalAnalysisMaterial&);
 
   ClassDef(CbmEcalAnalysisMaterial,1)
 };

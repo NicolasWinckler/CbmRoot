@@ -30,6 +30,9 @@ private:
   // A map: track at calorimeter surface -> global track
   Short_t* fMap;			//!
 
+  CbmEcalTrackExtrapolation(const CbmEcalTrackExtrapolation&);
+  CbmEcalTrackExtrapolation& operator=(const CbmEcalTrackExtrapolation&);
+
   ClassDef(CbmEcalTrackExtrapolation, 1)
 };
 

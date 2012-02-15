@@ -40,6 +40,9 @@ private:
   Int_t fN;
   Float_t* fR;			//!
 
+  CbmEcalShLibRecord(const CbmEcalShLibRecord&);
+  CbmEcalShLibRecord& operator=(const CbmEcalShLibRecord&);
+
   ClassDef(CbmEcalShLibRecord, 1);
 };
 

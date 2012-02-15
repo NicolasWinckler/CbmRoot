@@ -101,12 +101,63 @@ void CbmEcalAnalysisJPsi::Exec(Option_t* option)
 }
 
 
-CbmEcalAnalysisJPsi::CbmEcalAnalysisJPsi(const char* name, const Int_t iVerbose, const char* fname)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisJPsi::CbmEcalAnalysisJPsi()
+  : FairTask(),
+    fName(),
+    fOut(NULL),
+    fEv(0),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fPT(0.),
+    fP(0.),
+    fEProb(0.),
+    fShape(0.),
+    fIsE(0),
+    fMCPDG(0),
+    fMotherMCPDG(0),
+    fCharge(0),
+    fCaloE(0.),
+    fChi2(0.),
+    fCellType(0),
+    fMC(NULL),
+    fStsTracks(NULL),
+    fStsTracksMatch(NULL),
+    fEcalId(NULL),
+    fPrimVertex(NULL),
+    fFitter(NULL),
+    fStr(NULL)
 {
-  fEv=0;
-  fName=fname;
-  fOut=NULL;
+}
+
+
+CbmEcalAnalysisJPsi::CbmEcalAnalysisJPsi(const char* name, const Int_t iVerbose, const char* fname)
+  : FairTask(name, iVerbose),
+    fName(fname),
+    fOut(NULL),
+    fEv(0),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fPT(0.),
+    fP(0.),
+    fEProb(0.),
+    fShape(0.),
+    fIsE(0),
+    fMCPDG(0),
+    fMotherMCPDG(0),
+    fCharge(0),
+    fCaloE(0.),
+    fChi2(0.),
+    fCellType(0),
+    fMC(NULL),
+    fStsTracks(NULL),
+    fStsTracksMatch(NULL),
+    fEcalId(NULL),
+    fPrimVertex(NULL),
+    fFitter(NULL),
+    fStr(NULL)
+{
 }
 
 /** Initing routine **/

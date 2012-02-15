@@ -22,14 +22,43 @@ using namespace std;
 
 /** Standard constructor **/
 CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose, const char* config)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fReco(NULL),
+    fMCTracks(NULL),
+    fPoints(NULL),
+    fClusters(NULL),
+    fStr(NULL),
+    fShLib(NULL),
+    fThreshold(0.8),
+    fPhotonThr(0.95),
+    fMotherThr(1.05),
+    fEv(0),
+    fPreCluster(),
+    fClusterE(0.),
+    fE(),
+    fEpred(),
+    fEsum(0.),
+    fS(0.),
+    fP(),
+    fCell(NULL),
+    fToTree(kFALSE),
+    fTree(NULL),
+    fMCNum(0),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fRE(0.),
+    fMCPx(0.),
+    fMCPy(0.),
+    fMCPz(0.),
+    fMCE(0.),
+    fPDG(0),
+    fChi2(0.),
+    fNM(0),
+    fNC(0),
+    fConfigName(config),
+    fAlgo(0)
 {
-  fThreshold=0.8;
-  fPhotonThr=0.95;
-  fMotherThr=1.05;
-  fTree=NULL;
-  fConfigName=config;
-
   CbmEcalParam* par=new CbmEcalParam("MatchingParam", config);
 
   fThreshold=par->GetDouble("threshold");
@@ -364,7 +393,7 @@ void  CbmEcalMatching::MatchP2(CbmEcalRecParticle* p)
     remove.clear();
     oldsize=good.size();
     if (fVerbose>100)
-      Info("MatchP2", "Size of matching track list: %d.", good.size());
+      Info("MatchP2", "Size of matching track list: %d.", (Int_t)good.size());
     for(j=good.begin();j!=good.end();j++)
     {
       tr=(CbmMCTrack*)fMCTracks->At((*j).first);
@@ -404,7 +433,7 @@ void  CbmEcalMatching::MatchP2(CbmEcalRecParticle* p)
     {
       if (fVerbose>2)
       {
-	Info("MatchP2","Can't remove any from %d tracks.", good.size());
+	Info("MatchP2","Can't remove any from %d tracks.", (Int_t)good.size());
 	if (fVerbose>100)
         for(j=good.begin();j!=good.end();j++)
         {
@@ -416,7 +445,7 @@ void  CbmEcalMatching::MatchP2(CbmEcalRecParticle* p)
     }
     if (fVerbose>100)
     {
-      Info("MatchP2", "Size of list of tracks to remove: %d.", remove.size());
+      Info("MatchP2", "Size of list of tracks to remove: %d.", (Int_t)remove.size());
       for(j=remove.begin();j!=remove.end();j++)
       {
 	tr=(CbmMCTrack*)fMCTracks->At((*j).first);
@@ -622,7 +651,42 @@ CbmEcalMatching::~CbmEcalMatching()
   
 /** Only to comply with framework **/
 CbmEcalMatching::CbmEcalMatching()
+  : FairTask(),
+    fReco(NULL),
+    fMCTracks(NULL),
+    fPoints(NULL),
+    fClusters(NULL),
+    fStr(NULL),
+    fShLib(NULL),
+    fThreshold(0.8),
+    fPhotonThr(0.95),
+    fMotherThr(1.05),
+    fEv(0),
+    fPreCluster(),
+    fClusterE(0.),
+    fE(),
+    fEpred(),
+    fEsum(0.),
+    fS(0.),
+    fP(),
+    fCell(NULL),
+    fToTree(kFALSE),
+    fTree(NULL),
+    fMCNum(0),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fRE(0.),
+    fMCPx(0.),
+    fMCPy(0.),
+    fMCPz(0.),
+    fMCE(0.),
+    fPDG(0),
+    fChi2(0.),
+    fNM(0),
+    fNC(0),
+    fConfigName(""),
+    fAlgo(0)
 {
-  ;
 }
 ClassImp(CbmEcalMatching)

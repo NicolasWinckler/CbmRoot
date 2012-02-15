@@ -44,6 +44,10 @@ private:
   TTree* fTracksOut;			//!
 
   TClonesArray* fTrackPar;
+
+  CbmEcalTrackExport(const CbmEcalTrackExport&);
+  CbmEcalTrackExport& operator=(const CbmEcalTrackExport&);
+
   ClassDef(CbmEcalTrackExport, 1)
 };
 

@@ -88,6 +88,9 @@ private:
 
   Option_t *fDebug;    //! debug flag
 
+  CbmEcalAnalysis(const CbmEcalAnalysis&);
+  CbmEcalAnalysis& operator=(const CbmEcalAnalysis&);
+
   ClassDef(CbmEcalAnalysis,2)
 
 }; 

@@ -212,6 +212,10 @@ private:
   /** Should we produce hits or just modify calorimter
    ** structure content **/
   Bool_t fProduceHits;
+
+  CbmEcalHitProducer(const CbmEcalHitProducer&);
+  CbmEcalHitProducer& operator=(const CbmEcalHitProducer&);
+
   ClassDef(CbmEcalHitProducer,1)
 
 };

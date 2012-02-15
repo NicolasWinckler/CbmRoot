@@ -45,6 +45,10 @@ private:
   Float_t fADCChannel;
   // Calorimeter structure
   CbmEcalStructure* fStr;	//!
+
+  CbmEcalDigi(const CbmEcalDigi&);
+  CbmEcalDigi& operator=(const CbmEcalDigi&);
+
   ClassDef(CbmEcalDigi, 1);
 };
 

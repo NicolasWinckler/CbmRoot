@@ -172,10 +172,80 @@ void CbmEcalAnalysisPair::InitTree()
   fTree->Branch("my", &fMy, "my/D");
 }
 
-CbmEcalAnalysisPair::CbmEcalAnalysisPair(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisPair::CbmEcalAnalysisPair()
+  : FairTask(),
+    fTree(NULL),
+    fEntries(0),
+    fEvent(0),
+    fE1(0.),
+    fPx1(0.),
+    fPy1(0.),
+    fPz1(0.),
+    fX1(0.),
+    fY1(0.),
+    fCellX1(0.),
+    fCellY1(0.),
+    fCellType1(0),
+    fChi1(0.),
+    fE2(0.),
+    fPx2(0.),
+    fPy2(0.),
+    fPz2(0.),
+    fX2(0.),
+    fY2(0.),
+    fCellX2(0.),
+    fCellY2(0.),
+    fCellType2(0),
+    fChi2(0.),
+    fR(0.),
+    fCellN(0),
+    fCells(0),
+    fM(0.),
+    fMx(0.),
+    fMy(0.),
+    fReco(NULL),
+    fMC(NULL),
+    fClusters(NULL),
+    fStr(NULL)
 {
-  fTree=NULL;
+}
+
+CbmEcalAnalysisPair::CbmEcalAnalysisPair(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fEntries(0),
+    fEvent(0),
+    fE1(0.),
+    fPx1(0.),
+    fPy1(0.),
+    fPz1(0.),
+    fX1(0.),
+    fY1(0.),
+    fCellX1(0.),
+    fCellY1(0.),
+    fCellType1(0),
+    fChi1(0.),
+    fE2(0.),
+    fPx2(0.),
+    fPy2(0.),
+    fPz2(0.),
+    fX2(0.),
+    fY2(0.),
+    fCellX2(0.),
+    fCellY2(0.),
+    fCellType2(0),
+    fChi2(0.),
+    fR(0.),
+    fCellN(0),
+    fCells(0),
+    fM(0.),
+    fMx(0.),
+    fMy(0.),
+    fReco(NULL),
+    fMC(NULL),
+    fClusters(NULL),
+    fStr(NULL)
+{
 }
 
 /** Initing routine **/

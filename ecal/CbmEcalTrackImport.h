@@ -56,6 +56,10 @@ private:
   Int_t fEv;
   /** An output array of tracks **/
   TClonesArray* fTracks;	//!
+
+  CbmEcalTrackImport(const CbmEcalTrackImport&);
+  CbmEcalTrackImport& operator=(const CbmEcalTrackImport&);
+
   ClassDef(CbmEcalTrackImport, 1)
 };
 

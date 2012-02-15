@@ -14,16 +14,24 @@ using namespace std;
 
 /** Default constructor **/
 CbmEcalTracking::CbmEcalTracking()
-  : FairTask(), fStru(NULL), fTrE(NULL)
+  : FairTask(), 
+    fVerbose(0), 
+    fStru(NULL), 
+    fTrE(NULL),
+    fGTArray(NULL),
+    fTrackPar(NULL)
 {
-  ;
 }
 
 /** Standerd constructor **/
 CbmEcalTracking::CbmEcalTracking(const char* name, const Int_t verbose)
-  : FairTask(name, verbose), fStru(NULL), fTrE(NULL)
+  : FairTask(name, verbose), 
+    fVerbose(0), 
+    fStru(NULL), 
+    fTrE(NULL),
+    fGTArray(NULL),
+    fTrackPar(NULL)
 {
-  ;
 }
 
 /** Task initialization **/

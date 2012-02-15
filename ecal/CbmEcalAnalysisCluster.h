@@ -14,7 +14,7 @@ public:
   CbmEcalAnalysisCluster(const char* name, const Int_t iVerbose=0, const char* cfgname="ana.cfg");
 public:
   /** Default constructor **/
-  CbmEcalAnalysisCluster() {};
+  CbmEcalAnalysisCluster();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -85,6 +85,9 @@ private:
   TClonesArray* fMC;		//!
   /** Calorimeter structure **/
   CbmEcalStructure* fStr;	//!
+
+  CbmEcalAnalysisCluster(const CbmEcalAnalysisCluster&);
+  CbmEcalAnalysisCluster& operator=(const CbmEcalAnalysisCluster&);
 
   ClassDef(CbmEcalAnalysisCluster,1)
 };

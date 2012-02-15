@@ -58,10 +58,30 @@ void CbmEcalAnalysisUniformity::InitTree()
   fTree->Branch("e",&fE,"e/D");
 }
 
-CbmEcalAnalysisUniformity::CbmEcalAnalysisUniformity(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisUniformity::CbmEcalAnalysisUniformity()
+  : FairTask(),
+    fTree(NULL),
+    fEntries(0),
+    fN(0),
+    fE(0.),
+    fX(0.),
+    fY(0.),
+    fStr(NULL),
+    fPoints(NULL)
 {
-  fTree=NULL;
+}
+
+CbmEcalAnalysisUniformity::CbmEcalAnalysisUniformity(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fEntries(0),
+    fN(0),
+    fE(0.),
+    fX(0.),
+    fY(0.),
+    fStr(NULL),
+    fPoints(NULL)
+{
 }
 
 /** Initing routine **/

@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisNeutron(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisNeutron() {};
+  CbmEcalAnalysisNeutron();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -69,6 +69,9 @@ private:
   TClonesArray* fClusters;
   /** A calorimeter structure **/
   CbmEcalStructure* fStr;
+
+  CbmEcalAnalysisNeutron(const CbmEcalAnalysisNeutron&);
+  CbmEcalAnalysisNeutron& operator=(const CbmEcalAnalysisNeutron&);
 
   ClassDef(CbmEcalAnalysisNeutron,1)
 };

@@ -47,13 +47,72 @@ using namespace std;
 #define kN kNumberOfECALSensitiveVolumes
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalDetailed::CbmEcalDetailed() : FairDetector("ECAL", kTRUE, kECAL) {
-//  CbmEcalPoint::Class()    ->IgnoreTObjectStreamer();
-//  CbmEcalPointLite::Class()->IgnoreTObjectStreamer();
-//  CbmMCTrack::Class()      ->IgnoreTObjectStreamer();
-  fEcalCollection = new TClonesArray("CbmEcalPoint");
-  fLiteCollection = new TClonesArray("CbmEcalPointLite");
-  fPosIndex = 0;
+CbmEcalDetailed::CbmEcalDetailed() 
+  : FairDetector("ECAL", kTRUE, kECAL),
+    fInf(NULL),
+    fDebug(NULL),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fELoss(-1.),
+    fPosIndex(0),
+    fEcalCollection(new TClonesArray("CbmEcalPoint")),
+    fLiteCollection(new TClonesArray("CbmEcalPointLite")),
+    fEcalSize(),
+    fSimpleGeo(0),
+    fXSize(0),
+    fYSize(0),
+    fDX(0.),
+    fDY(0.),
+    fCellSize(0.),
+    fModuleSize(0.),
+    fZEcal(0.),
+    fThicknessLead(0.),
+    fThicknessScin(0.),
+    fThicknessTyvk(0.),
+    fThicknessLayer(0.),
+    fThicknessSteel(0.),
+    fEdging(0.),
+    fHoleRad(0.),
+    fFiberRad(0.),
+    fXCell(),
+    fYCell(),
+    fNH(),
+    fCF(),
+    fLightMapNames(),
+    fLightMaps(),
+    fNLayers(0),
+    fModuleLenght(0.),
+    fGeoScale(0.),
+    fNColumns1(0),
+    fNRows1(0),
+    fNColumns2(0),
+    fNRows2(0),
+    fThicknessPSlead(0.),
+    fThicknessPSscin(0.),
+    fEcalPSgap(0.),
+    fNColumns(0),
+    fNRows(0),
+    fVolIdMax(0),
+    fFirstNumber(0),
+    fVolArr(),
+    fModules(),
+    fCells(),
+    fScTiles(),
+    fTileEdging(),
+    fPbTiles(),
+    fTvTiles(),
+    fHoleVol(),
+    fFiberVol(),
+    fSteelTapes(),
+    fHolePos(),
+    fModulesWithType(),
+    fRawNumber(),
+    fStructureId()
+{
   fVerboseLevel = 1;
 
   Int_t i;
@@ -67,7 +126,70 @@ CbmEcalDetailed::CbmEcalDetailed() : FairDetector("ECAL", kTRUE, kECAL) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fileGeo)
-  : FairDetector(name, active, kECAL)
+  : FairDetector(name, active, kECAL),
+    fInf(NULL),
+    fDebug(NULL),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fELoss(-1.),
+    fPosIndex(0),
+    fEcalCollection(new TClonesArray("CbmEcalPoint")),
+    fLiteCollection(new TClonesArray("CbmEcalPointLite")),
+    fEcalSize(),
+    fSimpleGeo(0),
+    fXSize(0),
+    fYSize(0),
+    fDX(0.),
+    fDY(0.),
+    fCellSize(0.),
+    fModuleSize(0.),
+    fZEcal(0.),
+    fThicknessLead(0.),
+    fThicknessScin(0.),
+    fThicknessTyvk(0.),
+    fThicknessLayer(0.),
+    fThicknessSteel(0.),
+    fEdging(0.),
+    fHoleRad(0.),
+    fFiberRad(0.),
+    fXCell(),
+    fYCell(),
+    fNH(),
+    fCF(),
+    fLightMapNames(),
+    fLightMaps(),
+    fNLayers(0),
+    fModuleLenght(0.),
+    fGeoScale(0.),
+    fNColumns1(0),
+    fNRows1(0),
+    fNColumns2(0),
+    fNRows2(0),
+    fThicknessPSlead(0.),
+    fThicknessPSscin(0.),
+    fEcalPSgap(0.),
+    fNColumns(0),
+    fNRows(0),
+    fVolIdMax(0),
+    fFirstNumber(0),
+    fVolArr(),
+    fModules(),
+    fCells(),
+    fScTiles(),
+    fTileEdging(),
+    fPbTiles(),
+    fTvTiles(),
+    fHoleVol(),
+    fFiberVol(),
+    fSteelTapes(),
+    fHolePos(),
+    fModulesWithType(),
+    fRawNumber(),
+    fStructureId()
 {
   /** CbmEcalDetailed constructor:
    ** reads geometry parameters from the ascii file <fileGeo>,
@@ -76,8 +198,6 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
    ** TGeo geometry
    **/
 
-  fLiteCollection=new TClonesArray("CbmEcalPointLite");
-  fEcalCollection=new TClonesArray("CbmEcalPoint");
   fVerboseLevel=1;
   Int_t i;
   Int_t j;
@@ -872,7 +992,7 @@ Int_t CbmEcalDetailed::InitMedium(const char* name)
 
   if (!CbmMedium)
   {
-    Fatal("InitMedium","Material %d not defined in media file.", name);
+    Fatal("InitMedium","Material %s not defined in media file.", name);
     return -1111;
   }
   return geoBuild->createMedium(CbmMedium);

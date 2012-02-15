@@ -23,14 +23,16 @@ using std::cerr;
 using std::endl;
 using std::list;
 
-CbmEcalSCurveLib::CbmEcalSCurveLib(const char* name, Int_t verbose) :
-  FairTask(name, verbose), fVerbose(verbose)
+CbmEcalSCurveLib::CbmEcalSCurveLib(const char* name, Int_t verbose) 
+  : FairTask(name, verbose), 
+    fFiles(),
+    fVerbose(verbose),
+    fModuleSize(0.),
+    fSize(10),
+    fRec(new CbmEcalSCurveLibRecord*[fSize])
 {
   Int_t i;
 
-  fModuleSize=0;
-  fSize=10;
-  fRec=new CbmEcalSCurveLibRecord*[fSize];
   for(i=0;i<fSize;i++)
     fRec[i]=NULL;
   fFiles.clear();

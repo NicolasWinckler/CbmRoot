@@ -14,16 +14,26 @@ using namespace std;
 
 /** Standard constructor **/
 CbmEcalCalibrationV2::CbmEcalCalibrationV2(const char *name, const Int_t iVerbose, const  char* parname)
-  : CbmEcalCalibration(name, iVerbose, parname)
+  : CbmEcalCalibration(name, iVerbose, parname),
+    fParName(""),
+    fContName(""),
+    fP(NULL),
+    fMethods(0),
+    fMethodB(NULL),
+    fInf(NULL)   
 {
-  fP=NULL;
 }
 
 /** Default constructor **/
 CbmEcalCalibrationV2::CbmEcalCalibrationV2()
-  : CbmEcalCalibration()
+  : CbmEcalCalibration(),
+    fParName(""),
+    fContName(""),
+    fP(NULL),
+    fMethods(0),
+    fMethodB(NULL),
+    fInf(NULL)   
 {
-//  delete fP;
 }
 
 InitStatus CbmEcalCalibrationV2::Init()

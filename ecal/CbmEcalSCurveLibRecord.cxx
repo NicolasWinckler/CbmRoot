@@ -23,6 +23,20 @@ using std::list;
 // - implementation
 
 CbmEcalSCurveLibRecord::CbmEcalSCurveLibRecord(const char* filename)
+  : fCellSize(0),
+    fPoints(0),
+    fEnergies(0),
+    fE(NULL),
+    fThetas(NULL),
+    fTheta(NULL),
+    fA(NULL),
+    fX(NULL),
+    fSize(0),
+    fTail(10),
+    fXL(NULL),
+    fDXL(NULL),
+    fXR(NULL),
+    fDXR(NULL)
 {
   TFile* file;
   TTree* tree;
@@ -38,16 +52,6 @@ CbmEcalSCurveLibRecord::CbmEcalSCurveLibRecord(const char* filename)
   Int_t j;
   Int_t num;
 
-  fCellSize=0;
-  fE=NULL;
-  fXL=NULL;
-  fXR=NULL;
-  fDXL=NULL;
-  fDXR=NULL;
-  fX=NULL;
-  fTheta=NULL;
-
-  fTail=10;
   file=new TFile(filename);
   if (file->IsZombie())
   {

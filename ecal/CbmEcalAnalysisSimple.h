@@ -16,7 +16,7 @@ public:
   CbmEcalAnalysisSimple(const char* name, const Int_t iVerbose, const char* fname);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisSimple() {};
+  CbmEcalAnalysisSimple();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -34,6 +34,9 @@ private:
   CbmEcalStructure* fStr;
   TString fName;
   Int_t fEv;
+
+  CbmEcalAnalysisSimple(const CbmEcalAnalysisSimple&);
+  CbmEcalAnalysisSimple& operator=(const CbmEcalAnalysisSimple&);
 
   ClassDef(CbmEcalAnalysisSimple,1)
 };

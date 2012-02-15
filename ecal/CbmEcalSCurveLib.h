@@ -53,6 +53,9 @@ private:
   Int_t fSize;
   CbmEcalSCurveLibRecord** fRec; //!
 
+  CbmEcalSCurveLib(const CbmEcalSCurveLib&);
+  CbmEcalSCurveLib& operator=(const CbmEcalSCurveLib&);
+
   ClassDef(CbmEcalSCurveLib, 1)
 };
 

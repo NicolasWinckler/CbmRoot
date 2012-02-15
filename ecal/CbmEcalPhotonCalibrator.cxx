@@ -23,14 +23,44 @@ using std::flush;
 using std::list;
 using std::vector;
 
-CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo) : FairTask(name, iVerbose)
+CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo) 
+  : FairTask(name, iVerbose),
+    fStr(NULL),
+    fEvent(0),
+    fEnergy(0.),
+    fPDGCode(0),
+    fGeoFile(fileGeo),
+    fLitePoints(NULL),
+    fEcalPoints(NULL),
+    fMCTracks(NULL),
+    fBirthX(0.),
+    fBirthY(0.),
+    fBirthZ(0.),
+    fThreshold(0.),
+    fNoise(0.),
+    fInf(CbmEcalInf::GetInstance(fGeoFile)),
+    fTree(NULL),
+    fFullEnergy(0.),
+    fEcalEnergy(0.),
+    f2x2EcalEnergy(0.),
+    f3x3EcalEnergy(0.),
+    f5x5EcalEnergy(0.),
+    fType(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fE(0.),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fSteps(0),
+    fAlgo(0),
+    fLowTheta(),
+    fHighTheta(),
+    fMaxX(),
+    fMaxY()
 {
-  fGeoFile=fileGeo;
-  fStr=NULL;
-  fNoise=0;
-  fThreshold=0;
-  fInf=CbmEcalInf::GetInstance(fGeoFile);
-  fAlgo=0;
+
 }
 
 void CbmEcalPhotonCalibrator::InitArrays(UInt_t size, UInt_t start)

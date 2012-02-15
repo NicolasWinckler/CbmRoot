@@ -148,7 +148,7 @@ void CbmEcalClusterFinder::FormClusters()
   
   if (fVerbose>9)
   {
-    Info("FormClusters", "Total %d preclusters found.", fPreClusters.size());
+    Info("FormClusters", "Total %d preclusters found.", (Int_t)fPreClusters.size());
   }
   for(;p1!=fPreClusters.end();++p1)
   if ((*p1)->fMark==0)
@@ -215,9 +215,18 @@ void CbmEcalClusterFinder::ClearPreClusters()
 
 /** Standard constructor **/
 CbmEcalClusterFinder::CbmEcalClusterFinder(const char* name, const Int_t verbose, const char* cfg)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fEv(0),
+    fMaximums(NULL),
+    fClusters(NULL),
+    fStr(NULL),
+    fInf(NULL),
+    fCal(NULL),
+    fPreClusters(),
+    fMinClusterE(0.),
+    fMinCellE(0.),
+    fMinMaxE(0.)   
 {
-  fClusters=NULL;
   CbmEcalParam* par=new CbmEcalParam("ClusterParam", cfg);
  
   fMinClusterE=par->GetDouble("minclustere");
@@ -228,8 +237,18 @@ CbmEcalClusterFinder::CbmEcalClusterFinder(const char* name, const Int_t verbose
 
 /** Only to comply with frame work. **/
 CbmEcalClusterFinder::CbmEcalClusterFinder()
+  : FairTask(),
+    fEv(0),
+    fMaximums(NULL),
+    fClusters(NULL),
+    fStr(NULL),
+    fInf(NULL),
+    fCal(NULL),
+    fPreClusters(),
+    fMinClusterE(0.),
+    fMinCellE(0.),
+    fMinMaxE(0.)   
 {
-  ;
 }
 
 ClassImp(CbmEcalClusterFinder)

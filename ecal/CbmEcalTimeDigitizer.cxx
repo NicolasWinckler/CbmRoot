@@ -80,15 +80,39 @@ void CbmEcalTimeDigitizer::SetArraySize(Int_t size)
   fI=new Int_t[fSize];
 }
 
-CbmEcalTimeDigitizer::CbmEcalTimeDigitizer(const char* name, const Int_t iVerbose, const char* config)
-  : FairTask(name, iVerbose)
+CbmEcalTimeDigitizer::CbmEcalTimeDigitizer()
+  : FairTask(),
+    fStr(NULL),
+    fCells(),
+    fResponse(NULL),
+    fConfigName(""),
+    fThreshold(0.),
+    fEvent(0),
+    fCal(NULL),
+    fSize(0),
+    fE(NULL),
+    fT(NULL),
+    fI(NULL)
+
 {
-  fStr=NULL;
-  fConfigName=config;
-  fSize=0;
-  fE=NULL;
-  fT=NULL;
-  fI=NULL;
+}
+
+
+CbmEcalTimeDigitizer::CbmEcalTimeDigitizer(const char* name, const Int_t iVerbose, const char* config)
+  : FairTask(name, iVerbose),
+    fStr(NULL),
+    fCells(),
+    fResponse(NULL),
+    fConfigName(config),
+    fThreshold(0.),
+    fEvent(0),
+    fCal(NULL),
+    fSize(0),
+    fE(NULL),
+    fT(NULL),
+    fI(NULL)
+
+{
 }
 
 /** Initing routine **/

@@ -18,7 +18,7 @@ public:
   CbmEcalAnalysisJPsi(const char* name, const Int_t iVerbose, const char* fname);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisJPsi() {};
+  CbmEcalAnalysisJPsi();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -71,6 +71,9 @@ private:
   CbmVertex* fPrimVertex;		//!
   CbmStsKFTrackFitter* fFitter;		//!
   CbmEcalStructure* fStr;		//!
+
+  CbmEcalAnalysisJPsi(const CbmEcalAnalysisJPsi&);
+  CbmEcalAnalysisJPsi& operator=(const CbmEcalAnalysisJPsi&);
 
   ClassDef(CbmEcalAnalysisJPsi,1)
 };

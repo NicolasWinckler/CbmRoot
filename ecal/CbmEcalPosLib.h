@@ -46,6 +46,9 @@ private:
   /** Information container of calorimeter **/
   CbmEcalInf* fInf;		//!
 
+  CbmEcalPosLib(const CbmEcalPosLib&);
+  CbmEcalPosLib& operator=(const CbmEcalPosLib&);
+
   ClassDef(CbmEcalPosLib, 1);
 };
 

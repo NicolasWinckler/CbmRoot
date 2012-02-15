@@ -15,19 +15,21 @@
 using namespace std;
 
 CbmEcalMaximumLocator::CbmEcalMaximumLocator()
-  : FairTask()
+  : FairTask(),
+    fMaximums(NULL),
+    fStr(NULL),
+    fECut(0.005),
+    fEvent(-1)
 {
-  fMaximums=NULL;
-  fStr=NULL;
-  fECut=0.005;
 }
 
 CbmEcalMaximumLocator::CbmEcalMaximumLocator(const char* name, Int_t verbose)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fMaximums(NULL),
+    fStr(NULL),
+    fECut(0.005),
+    fEvent(-1)
 {
-  fMaximums=NULL;
-  fStr=NULL;
-  fECut=0.005;
 }
 
 CbmEcalMaximumLocator::~CbmEcalMaximumLocator()

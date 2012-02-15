@@ -24,7 +24,7 @@ public:
   CbmEcalIdentification(const char* name, const Int_t iVerbose=0, const char* config="$VMCWORKDIR/parameters/ecal/identification.cfg");
 public:
   /** Default constructor **/
-  CbmEcalIdentification() {};
+  CbmEcalIdentification();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -208,6 +208,10 @@ private:
   CbmEcalShLibCorr* fShLib;			//!
   /** Track extrapolation class. Need to map global track <-> track before the calorimeter **/
   CbmEcalTrackExtrapolation* fExtra;
+
+  CbmEcalIdentification(const CbmEcalIdentification&);
+  CbmEcalIdentification& operator=(const CbmEcalIdentification&);
+
   ClassDef(CbmEcalIdentification,1)
 };
 

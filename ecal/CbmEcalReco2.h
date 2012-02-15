@@ -29,8 +29,12 @@ class TFormula;
 class FCNEcalCluster2 : public ROOT::Minuit2::FCNBase
 {
 public:
-  FCNEcalCluster2(CbmEcalCalibration* cal, CbmEcalShLib* shlib, TFormula** sigma, CbmEcalInf* inf)
-    : fCal(cal), fShLib(shlib), fSigma(sigma), fInf(inf), fCluster(NULL), fEStep(1e-4), fCStep(1e-4), fErrorDef(1.0) {};
+ FCNEcalCluster2(CbmEcalCalibration* cal, CbmEcalShLib* shlib, TFormula** sigma, CbmEcalInf* inf)
+   : ROOT::Minuit2::FCNBase(), fCal(cal), fShLib(shlib), fSigma(sigma), 
+    fInf(inf), fStr(NULL), fCluster(NULL), fEStep(1e-4), fCStep(1e-4), 
+    fErrorDef(1.0), fClusterEnergy(0.), fClusterResp(0.), fN(0), fCells(), 
+    fFixClusterEnergy(0), fNDF(0) 
+    {};
   
   CbmEcalCluster* GetCluster() const {return fCluster;}
   void SetCluster(CbmEcalCluster* cluster);
@@ -91,6 +95,9 @@ private:
   Int_t fFixClusterEnergy;
   /** NDF of fit **/
   Int_t fNDF;
+
+  FCNEcalCluster2(const FCNEcalCluster2&);
+  FCNEcalCluster2& operator=(const FCNEcalCluster2&);
 };
 
 class CbmEcalReco2 : public FairTask
@@ -224,6 +231,9 @@ private:
   /** Energy deposition in precluster **/
   Double_t fPreE;
   CbmEcalMaximum* fCurrentMaximum;		//!
+
+  CbmEcalReco2(const CbmEcalReco2&);
+  CbmEcalReco2& operator=(const CbmEcalReco2&);
 
   ClassDef(CbmEcalReco2, 1)
 };

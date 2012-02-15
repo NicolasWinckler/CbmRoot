@@ -213,11 +213,53 @@ Double_t CbmEcalAnalysisSShape::SolveEllipse(CbmEcalCell* cell, Double_t cx, Dou
 }
 
 
-CbmEcalAnalysisSShape::CbmEcalAnalysisSShape(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisSShape::CbmEcalAnalysisSShape()
+  : FairTask(),
+    fTree(NULL),
+    fE(),
+    fX(),
+    fY(),
+    fP(),
+    fQ(),
+    fCls(),
+    fMaxE(0.),
+    fMaxX(0.),
+    fMaxY(0.),
+    fTX(0.),
+    fTY(0.),
+    fCX(0.),
+    fCY(0.),
+    fTTheta(0.),
+    fTPhi(0.),
+    fEv(0),
+    fMCPoints(NULL),
+    fStr(NULL)
 {
-  fEv=0;
-  fTree=NULL;
+}
+
+
+CbmEcalAnalysisSShape::CbmEcalAnalysisSShape(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fE(),
+    fX(),
+    fY(),
+    fP(),
+    fQ(),
+    fCls(),
+    fMaxE(0.),
+    fMaxX(0.),
+    fMaxY(0.),
+    fTX(0.),
+    fTY(0.),
+    fCX(0.),
+    fCY(0.),
+    fTTheta(0.),
+    fTPhi(0.),
+    fEv(0),
+    fMCPoints(NULL),
+    fStr(NULL)
+{
 }
 
 /** Initing routine **/

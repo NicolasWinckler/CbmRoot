@@ -495,8 +495,66 @@ void CbmEcalAnalysisBSh::InitTree()
   fTree->Branch("eres", &fERes, "eres/D");
 }
 
+
+CbmEcalAnalysisBSh::CbmEcalAnalysisBSh()
+  : FairTask(),
+    fTree(NULL),
+    fX(0.),
+    fY(0.),
+    fEMC(0.),
+    fE(0.),
+    fTh(0.),
+    fERes(0.),
+    fCurAlgo(0),
+    fRemoveCharged(0),
+    fUseCalibration(0),
+    fRegions(0),
+    fCalibration(0),
+    fIntSteps(0),
+    fPreClusterAlgo(),
+    fMinClusterE(),
+    fMinMaxE(),
+    fTheta(),
+    fPar1(),
+    fPar2(),
+    fPar3(),
+    fParI(),
+    fMC(NULL),
+    fMCTr(NULL),
+    fStr(NULL),
+    fCal(NULL),
+    fInf(NULL)
+{
+}
+
 CbmEcalAnalysisBSh::CbmEcalAnalysisBSh(const char* name, const Int_t iVerbose, const char* cfgname)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fX(0.),
+    fY(0.),
+    fEMC(0.),
+    fE(0.),
+    fTh(0.),
+    fERes(0.),
+    fCurAlgo(0),
+    fRemoveCharged(0),
+    fUseCalibration(0),
+    fRegions(0),
+    fCalibration(0),
+    fIntSteps(0),
+    fPreClusterAlgo(),
+    fMinClusterE(),
+    fMinMaxE(),
+    fTheta(),
+    fPar1(),
+    fPar2(),
+    fPar3(),
+    fParI(),
+    fMC(NULL),
+    fMCTr(NULL),
+    fStr(NULL),
+    fCal(NULL),
+    fInf(NULL)
 {
   Int_t i;
   TString st;
@@ -534,8 +592,6 @@ CbmEcalAnalysisBSh::CbmEcalAnalysisBSh(const char* name, const Int_t iVerbose, c
     fParI[i]=par->GetInteger(st);
   }
   delete par;
-
-  fTree=NULL;
 }
 
 /** Initing routine **/

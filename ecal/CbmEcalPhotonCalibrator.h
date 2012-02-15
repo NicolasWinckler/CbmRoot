@@ -151,6 +151,10 @@ private:
   std::vector<Float_t> fHighTheta;
   std::vector<Float_t> fMaxX;
   std::vector<Float_t> fMaxY;
+
+  CbmEcalPhotonCalibrator(const CbmEcalPhotonCalibrator&);
+  CbmEcalPhotonCalibrator& operator=(const CbmEcalPhotonCalibrator&);
+
   ClassDef(CbmEcalPhotonCalibrator, 1)
 };
 

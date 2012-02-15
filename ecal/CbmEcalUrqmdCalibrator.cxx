@@ -360,11 +360,76 @@ CbmEcalCell* CbmEcalUrqmdCalibrator::FindNextCell(CbmEcalCell* cell)
   return ret;
 }
 
-CbmEcalUrqmdCalibrator::CbmEcalUrqmdCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo)
-  : FairTask(name, iVerbose), fPDGType(22), fMinEnergy(0.5), fGeoFile(fileGeo)
+CbmEcalUrqmdCalibrator::CbmEcalUrqmdCalibrator()
+  : FairTask(),
+    fLitePoints(NULL),
+    fEcalPoints(NULL),
+    fMCTracks(NULL),
+    fPDGType(22),
+    fMinEnergy(0.5),
+    fGeoFile(""),
+    fTree(NULL),
+    fEvent(0),
+    fSteps(0),
+    fMCX(0.),
+    fMCY(0.),
+    fCellX(0.),
+    fCellY(0.),
+    fMCE(0.),
+    fMCPX(0.),
+    fMCPY(0.),
+    fMCPZ(0.),
+    fE(0.),
+    fE2x2(0.),
+    fE3x3(0.),
+    fTrackE2x2(0.),
+    fTrackE3x3(0.),
+    fTotalTrackEnergy(0.),
+    fMaxCellX(0.),
+    fMaxCellY(0.),
+    fMotherCode(0),
+    fType(0),
+    fStr(NULL),
+    fDiffType(0),
+    fInf(NULL),
+    fList() 
 {
-  fTree=NULL;
-  fInf=CbmEcalInf::GetInstance(fGeoFile);
+}
+
+CbmEcalUrqmdCalibrator::CbmEcalUrqmdCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo)
+  : FairTask(name, iVerbose), 
+    fLitePoints(NULL),
+    fEcalPoints(NULL),
+    fMCTracks(NULL),
+    fPDGType(22),
+    fMinEnergy(0.5),
+    fGeoFile(fileGeo),
+    fTree(NULL),
+    fEvent(0),
+    fSteps(0),
+    fMCX(0.),
+    fMCY(0.),
+    fCellX(0.),
+    fCellY(0.),
+    fMCE(0.),
+    fMCPX(0.),
+    fMCPY(0.),
+    fMCPZ(0.),
+    fE(0.),
+    fE2x2(0.),
+    fE3x3(0.),
+    fTrackE2x2(0.),
+    fTrackE3x3(0.),
+    fTotalTrackEnergy(0.),
+    fMaxCellX(0.),
+    fMaxCellY(0.),
+    fMotherCode(0),
+    fType(0),
+    fStr(NULL),
+    fDiffType(0),
+    fInf(CbmEcalInf::GetInstance(fGeoFile)),
+    fList() 
+{
 }
 
 /** Initing routine **/

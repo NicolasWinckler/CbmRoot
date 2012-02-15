@@ -118,7 +118,7 @@ private:
   Int_t fCount;
 public:
   /** Default constructor **/
-  CbmEcalOShowerCalibrator() {};
+  CbmEcalOShowerCalibrator();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -151,6 +151,10 @@ private:
   void ClearLocal();
 
   CbmGeoEcalPar* fPar;
+
+  CbmEcalOShowerCalibrator(const CbmEcalOShowerCalibrator&);
+  CbmEcalOShowerCalibrator& operator=(const CbmEcalOShowerCalibrator&);
+
   ClassDef(CbmEcalOShowerCalibrator,1)
 
 };

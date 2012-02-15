@@ -113,6 +113,10 @@ private:
   Double_t fX;
   Double_t fY;
   Double_t fThetaOut;
+
+  CbmEcalClusterFinderV2(const CbmEcalClusterFinderV2&);
+  CbmEcalClusterFinderV2& operator=(const CbmEcalClusterFinderV2&);
+
   ClassDef(CbmEcalClusterFinderV2, 1)
 };
 

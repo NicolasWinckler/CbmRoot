@@ -160,7 +160,50 @@ private:
   CbmEcalSCurveLib* fLib;
 public:
   /** Default constructor **/
-  CbmEcalAnalysisDS() {};
+  CbmEcalAnalysisDS() 
+    : FairTask(),
+    fPDGType(0),
+    fMinEnergy(-1.),
+    fGeoFile(""),
+    fTree(NULL),
+    fEvent(-1),
+    fMCX(0.),
+    fMCY(0.),
+    fCellX(0.),
+    fCellY(0.),
+    fP0a(),
+    fP0b(),
+    fP1a(),
+    fP1b(),
+    fMCE(0.),
+    fMCPX(0.),
+    fMCPY(0.),
+    fMCPZ(0.),
+    fPSE(0.),
+    fE(0.),
+    fE2x2(0.),
+    fE3x3(0.),
+    fTotalTrackEnergy(0.),
+    fMaxCellX(0.),
+    fMaxCellY(0.),
+    fEReco(0.),
+    fAX(0.),
+    fAY(0.),
+    fXReco(0.),
+    fYReco(0.),
+    fND(0.),
+    fNCode(-1),
+    fMotherCode(-1),
+    fType(-1),
+    fStr(NULL),
+    fDiffType(-1),
+    fInf(NULL),
+    fList(),
+    fLib(NULL),
+    fLitePoints(NULL),
+    fEcalPoints(NULL),
+    fMCTracks(NULL)
+      {};
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -184,7 +227,9 @@ private:
   /** MCTracks array **/
   TClonesArray* fMCTracks;
 
-  
+  CbmEcalAnalysisDS(const CbmEcalAnalysisDS&);  
+  CbmEcalAnalysisDS& operator=(const CbmEcalAnalysisDS&);  
+
   ClassDef(CbmEcalAnalysisDS,1)
 };
 

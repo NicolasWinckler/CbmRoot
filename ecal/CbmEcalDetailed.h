@@ -249,6 +249,10 @@ private:
   Int_t InitMedium(const char* name);
   /** Initialize all calorimter media **/
   void InitMedia();
+
+  CbmEcalDetailed(const CbmEcalDetailed&);
+  CbmEcalDetailed& operator=(const CbmEcalDetailed&);
+
   ClassDef(CbmEcalDetailed,1)
 
 };

@@ -56,6 +56,9 @@ private:
   /** Information about the calorimeter **/
   CbmEcalInf* fInf;		//!
   
+  CbmEcalCalibrationV2(const CbmEcalCalibrationV2&);
+  CbmEcalCalibrationV2& operator=(const CbmEcalCalibrationV2&);
+
   ClassDef(CbmEcalCalibrationV2, 1)
 };
 

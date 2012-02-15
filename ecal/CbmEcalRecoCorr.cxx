@@ -677,22 +677,128 @@ void CbmEcalRecoCorr::CreateTree()
 
 /** Default constructor. Requirement of ROOT system **/
 CbmEcalRecoCorr::CbmEcalRecoCorr() 
-  : FairTask()
+  : FairTask(),
+    fN(0),
+    fNOld(0),
+    fMaximums(NULL),
+    fExcluded(NULL),
+    fEventN(0),
+    fStr(NULL),
+    fInf(NULL),
+    fLib(NULL),
+    fPosLib(NULL),
+    fShLib(NULL),
+    fCal(NULL),
+    fTracks(NULL),
+    fReco(NULL),
+    fClusters(NULL),
+    fRecoName(""),
+    fToTree(kFALSE),
+    fOutTree(NULL),
+    fStoreClusterInfo(kFALSE),
+    fType(0),
+    fDiffType(0),
+    fE(0.),
+    fE3x3(0.),
+    fE2x2(0.),
+    fEReco(0.),
+    fXReco(0.),
+    fYReco(0.),
+    fECls(0.),
+    fE2Cls(0.),
+    fE3Cls(0.),
+    fECluster(0.),
+    fAX(0.),
+    fAY(0.),
+    fCellX(0.),
+    fCellY(0.),
+    fChi2(0.),
+    fTheta(),
+    fTypes(),
+    fEmeas(),
+    fEpred(),
+    fChi2Fit(),
+    fEfirst(),
+    fChi2First(),
+    fCX(),
+    fCY(),
+    fCMaxs(0),
+    fChi2Th(0.),
+    fEStep(0.),
+    fCStep(0.),
+    fMaxPhotonsPerCluster(0),
+    fMaxIterations(0),
+    fFixClusterEnergy(0),
+    fFCN(NULL),
+    fFitter(NULL),
+    fMinMaxE(0.),
+    fUsePosLib(0),
+    fPreE(0.),
+    fRegion(0)
 {
-  ;
 }
 
 /** Standard constructor **/
 CbmEcalRecoCorr::CbmEcalRecoCorr(const char *name, const Int_t iVerbose, const char* configname)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fN(0),
+    fNOld(0),
+    fMaximums(NULL),
+    fExcluded(NULL),
+    fEventN(0),
+    fStr(NULL),
+    fInf(NULL),
+    fLib(NULL),
+    fPosLib(NULL),
+    fShLib(NULL),
+    fCal(NULL),
+    fTracks(NULL),
+    fReco(NULL),
+    fClusters(NULL),
+    fRecoName("EcalReco"),
+    fToTree(kFALSE),
+    fOutTree(NULL),
+    fStoreClusterInfo(kFALSE),
+    fType(0),
+    fDiffType(0),
+    fE(0.),
+    fE3x3(0.),
+    fE2x2(0.),
+    fEReco(0.),
+    fXReco(0.),
+    fYReco(0.),
+    fECls(0.),
+    fE2Cls(0.),
+    fE3Cls(0.),
+    fECluster(0.),
+    fAX(0.),
+    fAY(0.),
+    fCellX(0.),
+    fCellY(0.),
+    fChi2(0.),
+    fTheta(),
+    fTypes(),
+    fEmeas(),
+    fEpred(),
+    fChi2Fit(),
+    fEfirst(),
+    fChi2First(),
+    fCX(),
+    fCY(),
+    fCMaxs(0),
+    fChi2Th(0.),
+    fEStep(0.),
+    fCStep(0.),
+    fMaxPhotonsPerCluster(0),
+    fMaxIterations(0),
+    fFixClusterEnergy(0),
+    fFCN(NULL),
+    fFitter(NULL),
+    fMinMaxE(0.),
+    fUsePosLib(0),
+    fPreE(0.),
+    fRegion(0)
 {
-  fToTree=kFALSE;
-  fOutTree=NULL;
-  fMaximums=NULL;
-  fExcluded=NULL;
-
-  fRecoName="EcalReco";
-
   Int_t i;
   Int_t j;
   Int_t types;
@@ -711,7 +817,7 @@ CbmEcalRecoCorr::CbmEcalRecoCorr(const char *name, const Int_t iVerbose, const c
   fUsePosLib=par->GetInteger("useposlib");
 
   Info("Constructor", "chi2 threshold is %f, Estep is %f, and Cstep is %f.", fChi2Th, fEStep, fCStep);
-  fStoreClusterInfo=kFALSE;
+
   delete par;
 }
 

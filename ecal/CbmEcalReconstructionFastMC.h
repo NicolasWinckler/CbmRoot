@@ -65,6 +65,9 @@ private:
   Int_t fEvent;                    //! Internal event counter
   Double_t fZEcal;                 // distance from target to ECAL
 
+  CbmEcalReconstructionFastMC(const CbmEcalReconstructionFastMC&);
+  CbmEcalReconstructionFastMC& operator=(const CbmEcalReconstructionFastMC&);
+
   ClassDef(CbmEcalReconstructionFastMC,1)
 
 };

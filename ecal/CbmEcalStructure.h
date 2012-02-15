@@ -94,6 +94,9 @@ private:
   /** Version of the calorimeter class used **/
   Int_t fEcalVersion;
 
+  CbmEcalStructure(const CbmEcalStructure&);
+  CbmEcalStructure& operator=(const CbmEcalStructure&);
+
   ClassDef(CbmEcalStructure,1);
 };
 

@@ -139,10 +139,57 @@ void CbmEcalAnalysisDst::InitTree()
   fTree->Branch("mq",&fMQ,"mq/D");
 }
 
-CbmEcalAnalysisDst::CbmEcalAnalysisDst(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisDst::CbmEcalAnalysisDst()
+  : FairTask(),
+    fTree(NULL),
+    fEntries(0),
+    fEvent(0),
+    fE(0.),
+    fX(0.),
+    fY(0.),
+    fCaloE(0.),
+    fCX(0.),
+    fCY(0.),
+    fP(0.),
+    fQ(0.),
+    fTheta(0.),
+    fPhi(0.),
+    fCTheta(0.),
+    fCPhi(0.),
+    fMX(0.),
+    fMY(0.),
+    fMP(0.),
+    fMQ(0.),
+    fPts(NULL),
+    fStr(NULL)
 {
-  fTree=NULL;
+}
+
+
+CbmEcalAnalysisDst::CbmEcalAnalysisDst(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fEntries(0),
+    fEvent(0),
+    fE(0.),
+    fX(0.),
+    fY(0.),
+    fCaloE(0.),
+    fCX(0.),
+    fCY(0.),
+    fP(0.),
+    fQ(0.),
+    fTheta(0.),
+    fPhi(0.),
+    fCTheta(0.),
+    fCPhi(0.),
+    fMX(0.),
+    fMY(0.),
+    fMP(0.),
+    fMQ(0.),
+    fPts(NULL),
+    fStr(NULL)
+{
 }
 
 /** Initing routine **/

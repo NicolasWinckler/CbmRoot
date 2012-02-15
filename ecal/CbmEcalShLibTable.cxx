@@ -13,7 +13,9 @@
 using namespace std;
 
 CbmEcalShLibTable::CbmEcalShLibTable(const char* name, Int_t verb)
-  : CbmEcalShLib(name, verb)
+  : CbmEcalShLib(name, verb),
+    fFiles(),
+    fRec()
 {
   Int_t i;
 
@@ -40,7 +42,7 @@ void CbmEcalShLibTable::Add(const char* name)
   num=(Int_t)((msize+0.001)/rec->CellSize());
   if (num<0||num>9)
   {
-    Fatal("CbmEcalShLibTable", "Wrong cell number. CellSize is %d.", rec->CellSize());
+    Fatal("CbmEcalShLibTable", "Wrong cell number. CellSize is %f.", rec->CellSize());
     return;
   }
   fRec[num]=rec;

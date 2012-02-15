@@ -23,9 +23,10 @@ using std::list;
 
 //-----------------------------------------------------------------------------
 CbmEcalCellMC::CbmEcalCellMC(Int_t cellnumber, Float_t x1, Float_t y1, Float_t x2, Float_t y2, Char_t type, Float_t energy)
-  : CbmEcalCell(cellnumber, x1, y1, x2, y2, type, energy)
+  : CbmEcalCell(cellnumber, x1, y1, x2, y2, type, energy),
+    fTrackEnergy(),
+    fTrackTime()
 {
-  ;
 }
 //-----------------------------------------------------------------------------
 Float_t CbmEcalCellMC::GetTrackTime(Int_t num) const

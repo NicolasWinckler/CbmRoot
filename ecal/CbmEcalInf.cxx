@@ -187,6 +187,31 @@ void CbmEcalInf::AddVariable(const char* key, const char* value)
 }
 //=============================================================================
 CbmEcalInf::CbmEcalInf(const char* filename)
+  : TObject(), 
+    fVariables(new TMap(200)), 
+    fEcalStr(), 
+    fXPos(0.), 
+    fYPos(0.),
+    fZPos(0.), 
+    fNLayers(0), 
+    fXSize(0), 
+    fYSize(0), 
+    fModuleSize(0.), 
+    fPSLead(0.),
+    fPSScin(0.), 
+    fPSGap(0.), 
+    fLead(0.), 
+    fScin(0.), 
+    fTyveec(0.), 
+    fThicknessLayer(0.),
+    fCellSize(0.), 
+    fEcalSize(), 
+    fEcalHole(), 
+    fECut(0.), 
+    fHCut(0.), 
+    fFastMC(-1),
+    fSuccess(1), 
+    fFileName(filename) 
 {
   /**
    ** Constructor reads and parses the ascii file, and fill 
@@ -211,8 +236,6 @@ CbmEcalInf::CbmEcalInf(const char* filename)
   char winend[2]={13, 0};
   int ssize=-1;
 
-  fSuccess=1;
-  fFastMC=0;
   if (!file) {
     cerr << "CbmEcalInf: Can't open information file " << filename << "!" << endl;
     cerr << "CbmEcalInf: Ecal will not be constructed correctly." << endl;
@@ -220,8 +243,6 @@ CbmEcalInf::CbmEcalInf(const char* filename)
     return;
   }
 
-  fVariables=new TMap(200);
-  fFileName=filename;
   linenum=0;
   while(getline(file,buffer)) {
     linenum++;

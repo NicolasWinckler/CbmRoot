@@ -53,6 +53,9 @@ private:
   Float_t* fXR;		//!
   Float_t* fDXR;	//!
 
+  CbmEcalSCurveLibRecord(const CbmEcalSCurveLibRecord&);
+  CbmEcalSCurveLibRecord& operator=(const CbmEcalSCurveLibRecord&);
+
   ClassDef(CbmEcalSCurveLibRecord, 1)
 };
 

@@ -19,7 +19,7 @@ public:
   CbmEcalTimeDigitizer(const char* name, const Int_t iVerbose=0, const char* config="");
 public:
   /** Default constructor **/
-  CbmEcalTimeDigitizer() {};
+  CbmEcalTimeDigitizer();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -57,6 +57,9 @@ private:
   Double_t* fE;				//!
   Double_t* fT;				//!
   Int_t* fI;				//!
+
+  CbmEcalTimeDigitizer(const CbmEcalTimeDigitizer&);
+  CbmEcalTimeDigitizer& operator=(const CbmEcalTimeDigitizer&);
 
   ClassDef(CbmEcalTimeDigitizer,1)
 };

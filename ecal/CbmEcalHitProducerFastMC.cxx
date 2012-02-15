@@ -39,19 +39,41 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC() :FairTask() {}
+CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC() 
+  : FairTask(), 
+    fA(0.),
+    fB(0.),
+    fC(0.),
+    fCellSize(0.),
+    fEThreshold(0.),
+    fRegionXm(),
+    fRegionYm(),
+    fListECALpts(NULL),
+    fHitCollection(NULL),
+    fListStack(NULL),
+    fNHits(0),
+    fEvent(0)
+{
+}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC(const char *name, const Int_t iVerbose) :FairTask(name,iVerbose)
+CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC(const char *name, const Int_t iVerbose) 
+  : FairTask(name,iVerbose),
+    fA(0.02),
+    fB(0.05),
+    fC(0.005),
+    fCellSize(12.),
+    fEThreshold(0.5),
+    fRegionXm(),
+    fRegionYm(),
+    fListECALpts(NULL),
+    fHitCollection(NULL),
+    fListStack(NULL),
+    fNHits(0),
+    fEvent(0)
 {
   // Set energy resolution parameters, zone sizes, energy threshold
-  fEvent       = 0;
-  fNHits       = 0;
-  fCellSize    = 12;
-  fA           = 0.02;  // 3 parameters for energy resolution
-  fB           = 0.05;
-  fC           = 0.005;
   fRegionXm[0] = 5;     // ECAL hole 5x5 modules
   fRegionYm[0] = 5;
   fRegionXm[1] = 33;    // ECAL inner zone 33x27 modules
@@ -60,7 +82,6 @@ CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC(const char *name, const Int_t
   fRegionYm[2] = 49;
   fRegionXm[3] = 99;    // ECAL outer zone 99x79 modules
   fRegionYm[3] = 79;
-  fEThreshold  = 0.5;   // energy threshold
 }
 // -------------------------------------------------------------------------
 

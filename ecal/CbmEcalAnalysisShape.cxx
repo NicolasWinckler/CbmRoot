@@ -78,23 +78,57 @@ void CbmEcalAnalysisShape::Exec(Option_t* option)
 } 
 
 
-CbmEcalAnalysisShape::CbmEcalAnalysisShape(const char* name, const Int_t iVerbose, const char* fname)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisShape::CbmEcalAnalysisShape()
+  : FairTask(),
+    fName(),
+    fE(0.),
+    fPhi(0.),
+    fTheta(0.),
+    fShape(NULL),
+    fShapeOut(NULL),
+    fXSize(30*12),
+    fYSize(30*12),
+    fSize(0),
+    fDX(-12.),
+    fDY(-12.),
+    fStep(0.1),
+    fStartX(0.),
+    fStartY(0.),
+    fWriteEach(kFALSE),
+    fEv(0),
+    fTree(NULL),
+    fInf(),
+    fMC(NULL),
+    fP(NULL),
+    fMCTracks(NULL)
 {
-  fEv=0;
-  fName=fname;
-  fDX=-12;
-  fDY=-12;
-  fStep=0.1;
-/*
-  fStartX=0.05;
-  fStartY=30.05;
-*/
-  fInf=CbmEcalInf::GetInstance(fName);
-  fXSize=30*12;
-  fYSize=30*12;
-  fTree=NULL;
-  fWriteEach=kFALSE;
+}
+
+
+CbmEcalAnalysisShape::CbmEcalAnalysisShape(const char* name, const Int_t iVerbose, const char* fname)
+  : FairTask(name, iVerbose),
+    fName(fname),
+    fE(0.),
+    fPhi(0.),
+    fTheta(0.),
+    fShape(NULL),
+    fShapeOut(NULL),
+    fXSize(30*12),
+    fYSize(30*12),
+    fSize(0),
+    fDX(-12.),
+    fDY(-12.),
+    fStep(0.1),
+    fStartX(0.),
+    fStartY(0.),
+    fWriteEach(kFALSE),
+    fEv(0),
+    fTree(NULL),
+    fInf(CbmEcalInf::GetInstance(fName)),
+    fMC(NULL),
+    fP(NULL),
+    fMCTracks(NULL)
+{
 }
 
 /** Initing routine **/
@@ -124,7 +158,7 @@ InitStatus CbmEcalAnalysisShape::Init()
   fStep=fInf->GetCellSize();
   fXSize=30*12*(0.1+0.000001)/fStep;
   fYSize=30*12*(0.1+0.000001)/fStep;
-  Info("Init()", "fXSize=%f, fYSize=%f", fXSize, fYSize);
+  Info("Init()", "fXSize=%d, fYSize=%d", fXSize, fYSize);
   Info("Init", "Using %f cell size", fStep);
   fSize=fXSize*fYSize;
   fShape=new Double_t[fSize];

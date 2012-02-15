@@ -15,7 +15,7 @@ class CbmEcalParam : public TNamed
 {
 public:
   /** This is ROOT requirement **/
-  CbmEcalParam() {};
+ CbmEcalParam() : TNamed(), fVariables(), fSuccess(0), fFileName("") {};
   /** Text file constructor **/
   CbmEcalParam(const char* name, const char* filename);	
   virtual ~CbmEcalParam();

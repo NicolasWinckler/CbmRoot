@@ -108,6 +108,9 @@ private:
   /** Geo file to use **/
   TString fFileGeo;
 
+  CbmEcalStructureFiller(const CbmEcalStructureFiller&);
+  CbmEcalStructureFiller& operator=(const CbmEcalStructureFiller&);
+
   ClassDef(CbmEcalStructureFiller,1)
 
 };

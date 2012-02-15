@@ -89,7 +89,15 @@ CbmEcalModule* CbmEcalStructure::CreateModule(char type, Int_t number, Float_t x
 //-----------------------------------------------------------------------------
 
 CbmEcalStructure::CbmEcalStructure(CbmEcalInf* ecalinf)
-  : TNamed("CbmEcalStructure", "Calorimeter structure"), fEcalInf(ecalinf)
+  : TNamed("CbmEcalStructure", "Calorimeter structure"), 
+    fUseMC(0),
+    fX1(0.),
+    fY1(0.),
+    fEcalInf(ecalinf),
+    fStructure(),
+    fCells(),
+    fHash(),
+    fEcalVersion(0)
 {
   fX1=fEcalInf->GetXPos()-\
     fEcalInf->GetModuleSize()*fEcalInf->GetXSize()/2.0;
@@ -98,7 +106,6 @@ CbmEcalStructure::CbmEcalStructure(CbmEcalInf* ecalinf)
   fEcalVersion=(Int_t)fEcalInf->GetVariable("ecalversion");
   if (fEcalVersion<0)
     fEcalVersion=0;
-  fUseMC=0;
 }
 
 //-----------------------------------------------------------------------------

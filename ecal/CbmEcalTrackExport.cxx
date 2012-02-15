@@ -12,15 +12,35 @@ using namespace std;
 
 /** Default constructor **/
 CbmEcalTrackExport::CbmEcalTrackExport()
+  : FairTask(),
+    fVerbose(0), 
+    fEventN(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fTx(0.),
+    fTy(0.),
+    fQp(0.),
+    fTracksOut(NULL),
+    fTrackPar(NULL)
 {
-  ;
 }
 
 /** Standerd constructor **/
 CbmEcalTrackExport::CbmEcalTrackExport(const char* name, const Int_t verbose)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fVerbose(verbose), 
+    fEventN(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fTx(0.),
+    fTy(0.),
+    fQp(0.),
+    fTracksOut(NULL),
+    fTrackPar(NULL)
 {
-  fVerbose=verbose;
+
 }
 
 /** Task initialization **/

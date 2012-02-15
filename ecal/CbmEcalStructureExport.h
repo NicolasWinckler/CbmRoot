@@ -41,6 +41,10 @@ private:
   TTree* fStructureOut;			//!
 
   CbmEcalStructure* fStr;		//!
+
+  CbmEcalStructureExport(const CbmEcalStructureExport&);
+  CbmEcalStructureExport& operator=(const CbmEcalStructureExport&);
+
   ClassDef(CbmEcalStructureExport, 1)
 };
 

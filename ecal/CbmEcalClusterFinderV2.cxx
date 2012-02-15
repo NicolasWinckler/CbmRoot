@@ -428,8 +428,38 @@ CbmEcalClusterFinderV2::~CbmEcalClusterFinderV2()
 
 /** Only to comply with frame work. **/
 CbmEcalClusterFinderV2::CbmEcalClusterFinderV2()
+  : FairTask(),
+    fEv(0),
+    fStr(NULL),
+    fInf(NULL),
+    fCal(NULL),
+    fTracks(NULL),
+    fMaximums(NULL),
+    fClusters(NULL),
+    fPreClusters(),
+    fRemoveCharged(0),
+    fUseCalibration(0),
+    fRegions(0),
+    fPreClusterAlgo(),
+    fMinClusterE(),
+    fMinMaxE(),
+    fTheta(),
+    fCalibration(0),
+    fUseMinimumCell(0),
+    fPar1(),
+    fPar2(),
+    fPar3(),
+    fParI(),
+    fIntSteps(0),
+    fTree(NULL),
+    fE(),
+    fAlgo(0),
+    fAlgoType(0),
+    fCurAlgo(0),
+    fX(0.),
+    fY(0.),
+    fThetaOut(0.)
 {
-  ;
 }
 
 /** Finish a task **/
@@ -440,7 +470,37 @@ void CbmEcalClusterFinderV2::Finish()
 }
 
 CbmEcalClusterFinderV2::CbmEcalClusterFinderV2(const char* name, const Int_t verbose, const char* cfg)
-  : FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fEv(0),
+    fStr(NULL),
+    fInf(NULL),
+    fCal(NULL),
+    fTracks(NULL),
+    fMaximums(NULL),
+    fClusters(NULL),
+    fPreClusters(),
+    fRemoveCharged(0),
+    fUseCalibration(0),
+    fRegions(0),
+    fPreClusterAlgo(),
+    fMinClusterE(),
+    fMinMaxE(),
+    fTheta(),
+    fCalibration(0),
+    fUseMinimumCell(0),
+    fPar1(),
+    fPar2(),
+    fPar3(),
+    fParI(),
+    fIntSteps(0),
+    fTree(NULL),
+    fE(),
+    fAlgo(0),
+    fAlgoType(0),
+    fCurAlgo(0),
+    fX(0.),
+    fY(0.),
+    fThetaOut(0.)
 {
   Int_t i;
   TString st;

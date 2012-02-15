@@ -50,6 +50,9 @@ private:
   /** Array of ECAL variables **/
   TMap* fVariables;
 
+  CbmGeoEcalPar(const CbmGeoEcalPar&);
+  CbmGeoEcalPar& operator=(const CbmGeoEcalPar&);
+
   ClassDef(CbmGeoEcalPar,1)
 };
 

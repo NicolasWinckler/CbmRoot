@@ -47,6 +47,9 @@ private:
   Double_t fPar2;
   Double_t fPar3;
 
+  CbmEcalDrawer2(const CbmEcalDrawer2&);
+  CbmEcalDrawer2& operator=(const CbmEcalDrawer2&);
+
   ClassDef(CbmEcalDrawer2,1);
 };
 

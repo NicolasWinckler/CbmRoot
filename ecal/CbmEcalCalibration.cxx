@@ -14,9 +14,14 @@ using namespace std;
 
 /** Standard constructor **/
 CbmEcalCalibration::CbmEcalCalibration(const char *name, const Int_t iVerbose, const  char* parname)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fParName(parname),
+    fP0a(),
+    fP0b(),
+    fP1a(),
+    fP1b(),
+    fInf(NULL)
 {
-  fParName=parname;
   /**TODO: Need to read parameters from a parname file! **/
   fP0a[1]=0.003145;
   fP0a[2]=0.003143;
@@ -35,9 +40,14 @@ CbmEcalCalibration::CbmEcalCalibration(const char *name, const Int_t iVerbose, c
 
 /** Default constructor **/
 CbmEcalCalibration::CbmEcalCalibration()
-  : FairTask()
+  : FairTask(),
+    fParName(),
+    fP0a(),
+    fP0b(),
+    fP1a(),
+    fP1b(),
+    fInf(NULL)
 {
-  ;
 }
 
 InitStatus CbmEcalCalibration::Init()

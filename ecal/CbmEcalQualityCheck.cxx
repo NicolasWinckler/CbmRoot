@@ -675,25 +675,94 @@ CbmEcalQualityCheck::~CbmEcalQualityCheck()
 
 /** Standard constructor **/
 CbmEcalQualityCheck::CbmEcalQualityCheck(const char *name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fNeedDraw(kFALSE),
+    fNamePrefix("ecal"),
+    fC(NULL),
+    fCellSize(8),
+    fCX(0),
+    fCY(0),
+    fMaxEnergyDep(0.),
+    fStr(NULL),
+    fInf(NULL),
+    fEdging(""),
+    fTxt(new TText()),
+    fShLib(NULL),
+    fCells(),
+    fMCTracks(NULL),
+    fTracks(NULL),
+    fReco(NULL),
+    fPoints(NULL),
+    fClusters(NULL),
+    fInName("EcalReco"),
+    fEventN(0),
+    fOut(NULL),
+    fOutName("EcalQC"),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fMCX(0.),
+    fMCY(0.),
+    fMCZ(0.),
+    fMCMotherTrN(0),
+    fE(0.),
+    fMCE(0.),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fMCPX(0.),
+    fMCPY(0.),
+    fMCPZ(0.),
+    fChi2(0.),
+    fPdgCode(0),
+    fR(0.)
 {
-  fNeedDraw=kFALSE;
-  fInName="EcalReco";
-  fOutName="EcalQC";
-  fOut=NULL;
-  fMCTracks=NULL;
-  fReco=NULL;
-  fPoints=NULL;
-  fNamePrefix="ecal";
-  fCellSize=8;
-  fC=NULL;
-  fTxt=new TText();
 }
 
 /** Default constructor. Requirement of ROOT system **/
 CbmEcalQualityCheck::CbmEcalQualityCheck()
+  : FairTask(),
+    fNeedDraw(kFALSE),
+    fNamePrefix("ecal"),
+    fC(NULL),
+    fCellSize(8),
+    fCX(0),
+    fCY(0),
+    fMaxEnergyDep(0.),
+    fStr(NULL),
+    fInf(NULL),
+    fEdging(""),
+    fTxt(new TText()),
+    fShLib(NULL),
+    fCells(),
+    fMCTracks(NULL),
+    fTracks(NULL),
+    fReco(NULL),
+    fPoints(NULL),
+    fClusters(NULL),
+    fInName("EcalReco"),
+    fEventN(0),
+    fOut(NULL),
+    fOutName("EcalQC"),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fMCX(0.),
+    fMCY(0.),
+    fMCZ(0.),
+    fMCMotherTrN(0),
+    fE(0.),
+    fMCE(0.),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fMCPX(0.),
+    fMCPY(0.),
+    fMCPZ(0.),
+    fChi2(0.),
+    fPdgCode(0),
+    fR(0.)
 {
-  ;
 }
 
 ClassImp(CbmEcalQualityCheck);

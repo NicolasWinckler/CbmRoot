@@ -12,22 +12,23 @@
 using namespace std;
 
 /** --- Default constructor --------------------------------------------------- **/
-CbmEcalPrepare::CbmEcalPrepare() : FairTask()
+CbmEcalPrepare::CbmEcalPrepare() 
+  : FairTask(),
+    fPedestal(80),
+    fADCMax(4096),
+    fADCChannel(0.5e-3),
+    fStr(NULL)
 {
-  fPedestal=80;
-  fADCMax=4096;
-  fADCChannel=0.5e-3;
-  fStr=NULL;
 }
 
 /** --- Standard constructor. Use this ---------------------------------------- **/
 CbmEcalPrepare::CbmEcalPrepare(const char* name, Int_t iVerbose)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fPedestal(80),
+    fADCMax(4096),
+    fADCChannel(0.5e-3),
+    fStr(NULL)
 {
-  fPedestal=80;
-  fADCMax=4096;
-  fADCChannel=0.5e-3;
-  fStr=NULL;
 }
 
 /** --- Initialization of the task -------------------------------------------- **/  

@@ -30,6 +30,9 @@ private:
   std::list<TString> fFiles;
   CbmEcalShLibRecord* fRec[10];
 
+  CbmEcalShLibTable(const CbmEcalShLibTable&);
+  CbmEcalShLibTable& operator=(const CbmEcalShLibTable&);
+
   ClassDef(CbmEcalShLibTable, 1);
 };
 

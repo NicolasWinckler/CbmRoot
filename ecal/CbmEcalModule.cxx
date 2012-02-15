@@ -44,8 +44,11 @@ using std::list;
 using std::vector;
 
 //-----------------------------------------------------------------------------
-CbmEcalModule::CbmEcalModule(char type, Int_t cellnumber, Float_t x1, Float_t y1, Float_t x2, Float_t y2, Int_t mc, Float_t energy) :
-	CbmEcalCell(cellnumber, x1,y1,x2,y2, type, energy), fDx(x2-x1), fDy(y2-y1)
+CbmEcalModule::CbmEcalModule(char type, Int_t cellnumber, Float_t x1, Float_t y1, Float_t x2, Float_t y2, Int_t mc, Float_t energy) 
+  : CbmEcalCell(cellnumber, x1,y1,x2,y2, type, energy), 
+    fDx(x2-x1), 
+    fDy(y2-y1),
+    fCells()
 {
   if (GetType()<1) return;
 	

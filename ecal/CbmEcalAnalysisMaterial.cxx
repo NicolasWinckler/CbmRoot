@@ -74,10 +74,32 @@ void CbmEcalAnalysisMaterial::InitTree()
   fTree->Branch("intl", &fIntL, "intl/D");
 }
 
-CbmEcalAnalysisMaterial::CbmEcalAnalysisMaterial(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisMaterial::CbmEcalAnalysisMaterial()
+  : FairTask(),
+    fTree(NULL),
+    fEvent(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fX0(0.),
+    fIntL(0.),
+    fMC(NULL),
+    fRadLen(NULL)
 {
-  fTree=NULL;
+}
+
+CbmEcalAnalysisMaterial::CbmEcalAnalysisMaterial(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fEvent(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fX0(0.),
+    fIntL(0.),
+    fMC(NULL),
+    fRadLen(NULL)
+{
 }
 
 /** Initing routine **/

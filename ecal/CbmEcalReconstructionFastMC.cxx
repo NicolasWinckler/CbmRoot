@@ -33,15 +33,26 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC() :FairTask() {}
+CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC() 
+  : FairTask(),
+    fListECALhits(NULL),
+    fListRecParticles(NULL),
+    fNRecParticles(0),
+    fEvent(0),
+    fZEcal(1200.)
+{
+}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC(const char *name, const Int_t iVerbose) :FairTask(name,iVerbose)
+CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC(const char *name, const Int_t iVerbose) 
+  : FairTask(name,iVerbose),
+    fListECALhits(NULL),
+    fListRecParticles(NULL),
+    fNRecParticles(0),
+    fEvent(0),
+    fZEcal(1200.)
 {
-  fEvent         = 0;
-  fNRecParticles = 0;
-  fZEcal         = 1200;
 }
 // -------------------------------------------------------------------------
 

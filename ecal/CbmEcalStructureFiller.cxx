@@ -15,20 +15,40 @@
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalStructureFiller::CbmEcalStructureFiller() :FairTask() {}
+CbmEcalStructureFiller::CbmEcalStructureFiller() 
+  : FairTask(), 
+    fStr(NULL),
+    fInf(CbmEcalInf::GetInstance(fFileGeo)),
+    fListECALpts(NULL),
+    fListUHits(NULL),
+    fListHits(NULL),
+    fEvent(0),
+    fInited(kFALSE),
+    fUseMCPoints(kFALSE),
+    fUseSummableHits(kFALSE),
+    fUseUnSummableHits(kFALSE),
+    fStoreTrackInfo(kTRUE),
+    fFileGeo("")
+{
+}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalStructureFiller::CbmEcalStructureFiller(const char *name, const Int_t iVerbose, const char* fileGeo) :FairTask(name,iVerbose)
+CbmEcalStructureFiller::CbmEcalStructureFiller(const char *name, const Int_t iVerbose, const char* fileGeo) 
+  : FairTask(name,iVerbose),
+    fStr(NULL),
+    fInf(CbmEcalInf::GetInstance(fFileGeo)),
+    fListECALpts(NULL),
+    fListUHits(NULL),
+    fListHits(NULL),
+    fEvent(0),
+    fInited(kFALSE),
+    fUseMCPoints(kFALSE),
+    fUseSummableHits(kFALSE),
+    fUseUnSummableHits(kFALSE),
+    fStoreTrackInfo(kTRUE),
+    fFileGeo(fileGeo)
 {
-  fEvent = 0;
-  fInited=kFALSE;
-  fUseMCPoints=kFALSE;
-  fUseSummableHits=kFALSE;
-  fUseUnSummableHits=kFALSE;
-  fStoreTrackInfo=kTRUE;
-  fFileGeo=fileGeo;
-  fInf=CbmEcalInf::GetInstance(fFileGeo);
 }
 // -------------------------------------------------------------------------
 

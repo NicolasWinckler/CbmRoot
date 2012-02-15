@@ -115,10 +115,64 @@ void CbmEcalAnalysisNeutron::InitTree()
   fTree->Branch("my", &fMy, "my/D");
 }
 
-CbmEcalAnalysisNeutron::CbmEcalAnalysisNeutron(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+CbmEcalAnalysisNeutron::CbmEcalAnalysisNeutron()
+  : FairTask(),
+    fTree(NULL),
+    fEntries(0),
+    fN(0),
+    fEvent(0),
+    fE(0.),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fX(0.),
+    fY(0.),
+    fCellType(0),
+    fDiffType(0),
+    fM3(0.),
+    fMx3(0.),
+    fMy3(0.),
+    fChi2(0.),
+    fM(0.),
+    fMx(0.),
+    fMy(0.),
+    fPdg(0),
+    fMaxs(0),
+    fReco(NULL),
+    fMC(NULL),
+    fClusters(NULL),
+    fStr(NULL)
 {
-  fTree=NULL;
+}
+
+CbmEcalAnalysisNeutron::CbmEcalAnalysisNeutron(const char* name, const Int_t iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fEntries(0),
+    fN(0),
+    fEvent(0),
+    fE(0.),
+    fPx(0.),
+    fPy(0.),
+    fPz(0.),
+    fX(0.),
+    fY(0.),
+    fCellType(0),
+    fDiffType(0),
+    fM3(0.),
+    fMx3(0.),
+    fMy3(0.),
+    fChi2(0.),
+    fM(0.),
+    fMx(0.),
+    fMy(0.),
+    fPdg(0),
+    fMaxs(0),
+    fReco(NULL),
+    fMC(NULL),
+    fClusters(NULL),
+    fStr(NULL)
+{
 }
 
 /** Initing routine **/

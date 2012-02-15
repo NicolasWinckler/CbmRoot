@@ -14,7 +14,7 @@ public:
   CbmEcalAnalysisEres(const char* name, const Int_t iVerbose);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisEres() {};
+  CbmEcalAnalysisEres();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -37,6 +37,9 @@ private:
   Double_t fE;
 
   Int_t fEv;
+
+  CbmEcalAnalysisEres(const CbmEcalAnalysisEres&);
+  CbmEcalAnalysisEres& operator=(const CbmEcalAnalysisEres&);
 
   ClassDef(CbmEcalAnalysisEres,1)
 };

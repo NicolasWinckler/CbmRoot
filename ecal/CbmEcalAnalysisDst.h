@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisDst(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisDst() {};
+  CbmEcalAnalysisDst();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -62,6 +62,9 @@ private:
   TClonesArray* fPts;
   /** A calorimeter structure **/
   CbmEcalStructure* fStr;
+
+  CbmEcalAnalysisDst(const CbmEcalAnalysisDst&);
+  CbmEcalAnalysisDst& operator=(const CbmEcalAnalysisDst&);
 
   ClassDef(CbmEcalAnalysisDst,1)
 };

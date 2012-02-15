@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisShape(const char* name, const Int_t iVerbose, const char* fname);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisShape() {};
+  CbmEcalAnalysisShape();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -70,6 +70,9 @@ private:
   TClonesArray* fMC;			//!
   TClonesArray* fP;			//!
   TClonesArray* fMCTracks;		//!
+
+  CbmEcalAnalysisShape(const CbmEcalAnalysisShape&);
+  CbmEcalAnalysisShape& operator=(const CbmEcalAnalysisShape&);
 
   ClassDef(CbmEcalAnalysisShape,1)
 };

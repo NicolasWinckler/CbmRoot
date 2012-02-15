@@ -130,7 +130,10 @@ void CbmEcalParam::AddVariable(const char* key, const char* value)
 
 //=============================================================================
 CbmEcalParam::CbmEcalParam(const char* name, const char* filename)
-  : TNamed(name, filename), fVariables(200)
+  : TNamed(name, filename), 
+    fVariables(200),
+    fSuccess(0), 
+    fFileName(filename)
 {
   TString fname=filename;
   gSystem->ExpandPathName(fname);
@@ -148,7 +151,6 @@ CbmEcalParam::CbmEcalParam(const char* name, const char* filename)
     return;
   }
 
-  fFileName=filename;
   linenum=0;
   file.exceptions(ifstream::goodbit);
   while(getline(file,buffer))

@@ -10,11 +10,10 @@
 
 using namespace std;
 
-CbmEcalLightMap::CbmEcalLightMap(const char* fname, const char* title) : TNamed(fname, title)
+CbmEcalLightMap::CbmEcalLightMap(const char* fname, const char* title) 
+  : TNamed(fname, title),
+    fSSide(-1111.), fS(-1111), fSize(0), fData(NULL)
 {
-  fData=NULL;
-  fSSide=-1111;
-  fSize=-1111;
   Init(fname);
 }
 

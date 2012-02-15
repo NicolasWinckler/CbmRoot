@@ -30,29 +30,62 @@ using std::map;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHitProducer::CbmEcalHitProducer() :FairTask() {}
+CbmEcalHitProducer::CbmEcalHitProducer() 
+  : FairTask(),
+    fStr(NULL),
+    fInf(NULL),
+    fListECALpts(NULL),
+    fListUHits(NULL),
+    fListHits(NULL),
+    fHitCollection(NULL),
+    fListStack(NULL),
+    fNHits(0),
+    fEvent(0),
+    fInited(kFALSE),
+    fUseMCPoints(kFALSE),
+    fUseSummableHits(kFALSE),
+    fUseUnSummableHits(kFALSE),
+    fThreshold(0.),
+    fThresholdPS(0.),
+    fNoise(0.),
+    fNoisePS(0.),
+    fFileGeo(""),
+    fProduceSummableHits(kTRUE),
+    fStandAlone(kTRUE),
+    fEcalBinSize(-1.),
+    fPSBinSize(-1.),
+    fProduceHits(kTRUE)
+{
+}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalHitProducer::CbmEcalHitProducer(const char *name, const Int_t iVerbose, const char* fileGeo) :FairTask(name,iVerbose)
+CbmEcalHitProducer::CbmEcalHitProducer(const char *name, const Int_t iVerbose, const char* fileGeo) 
+  : FairTask(name,iVerbose),
+    fStr(NULL),
+    fInf(CbmEcalInf::GetInstance(fFileGeo)),
+    fListECALpts(NULL),
+    fListUHits(NULL),
+    fListHits(NULL),
+    fHitCollection(NULL),
+    fListStack(NULL),
+    fNHits(0),
+    fEvent(0),
+    fInited(kFALSE),
+    fUseMCPoints(kFALSE),
+    fUseSummableHits(kFALSE),
+    fUseUnSummableHits(kFALSE),
+    fThreshold(0.),
+    fThresholdPS(0.),
+    fNoise(0.),
+    fNoisePS(0.),
+    fFileGeo(fileGeo),
+    fProduceSummableHits(kTRUE),
+    fStandAlone(kTRUE),
+    fEcalBinSize(-1.),
+    fPSBinSize(-1.),
+    fProduceHits(kTRUE)
 {
-  fEvent = 0;
-  fNHits = 0;
-  fInited= kFALSE;
-  fUseMCPoints=kFALSE;
-  fUseSummableHits=kFALSE;
-  fUseUnSummableHits=kFALSE;
-  fProduceSummableHits=kTRUE;
-  fThreshold=0;
-  fThresholdPS=0;
-  fNoise=0;
-  fNoisePS=0;
-  fFileGeo=fileGeo;
-  fInf=CbmEcalInf::GetInstance(fFileGeo);
-  fStandAlone=kTRUE;
-  fEcalBinSize=-1;
-  fPSBinSize=-1;
-  fProduceHits=kTRUE;
 }
 // -------------------------------------------------------------------------
 

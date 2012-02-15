@@ -6,7 +6,7 @@
 class CbmEcalLightMap : public TNamed
 {
 public:
-  CbmEcalLightMap() {fData=NULL;}
+ CbmEcalLightMap() : TNamed(), fSSide(0.), fS(0), fSize(0), fData(NULL) {};
   CbmEcalLightMap(const char* fname, const char* title="Light collection efficiency map");
   Double_t Data(Double_t x, Double_t y)
     {Int_t n=GetNum(x,y); if (n<0) return n; return fData[n];}
@@ -35,6 +35,10 @@ private:
   Int_t fSize;			//!
   /** Light collection efficiency map **/
   Double_t* fData;		//!
+
+  CbmEcalLightMap(const CbmEcalLightMap&);
+  CbmEcalLightMap& operator=(const CbmEcalLightMap&);
+
   ClassDef(CbmEcalLightMap, 1)
 };
 

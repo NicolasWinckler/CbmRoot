@@ -27,9 +27,11 @@ class CbmEcalDrawer: public TAttLine
 {
 public:
 	/** Default constructor **/
-	CbmEcalDrawer(CbmEcalStructure* ecalStructure=NULL)
-		: fEcalStructure(ecalStructure), fC(NULL)
-		{Init();};
+ CbmEcalDrawer(CbmEcalStructure* ecalStructure=NULL)
+   : TAttLine(), fEcalStructure(ecalStructure), fC(NULL), fCX(0), fCY(0),
+    fCCX(0.), fCCY(0.), fMaxEnergy(0.), fFirstColor(), fSecondColor(),
+    fEnergyType(), fLines(), fBoxes()
+    {Init();};
 
 	CbmEcalStructure* GetEcalStructure() const;
 	void SetEcalStructure(CbmEcalStructure* ecalStructure);
@@ -113,6 +115,10 @@ private:
 
 	std::list<void*> fLines;
 	std::list<void*> fBoxes;
+
+	CbmEcalDrawer(const CbmEcalDrawer&);
+	CbmEcalDrawer& operator=(const CbmEcalDrawer&);
+
 	ClassDef(CbmEcalDrawer,1);
 };
 

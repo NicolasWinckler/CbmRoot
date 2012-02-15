@@ -30,6 +30,9 @@ private:
   /** Current event **/
   Int_t fEvent;
 
+  CbmEcalMaximumLocator(const CbmEcalMaximumLocator&);
+  CbmEcalMaximumLocator& operator=(const CbmEcalMaximumLocator&);
+
   ClassDef(CbmEcalMaximumLocator, 1);
 };
 

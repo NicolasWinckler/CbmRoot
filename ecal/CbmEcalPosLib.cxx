@@ -11,16 +11,42 @@
 using namespace std;
 
 CbmEcalPosLib::CbmEcalPosLib()
-  : FairTask()
+  : FairTask(),
+    fX(0.),
+    fY(0.),
+    fParName(""),
+    fContName(""),
+    fF0P0(0.),
+    fF1P0(0.),
+    fF2P0(0.),
+    fF0P1(0.),
+    fF1P1(0.),
+    fF2P1(0.),
+    fF0P2(0.),
+    fF1P2(0.),
+    fF2P2(0.),
+    fInf(NULL)
 {
-  ;
 }
 
 
 CbmEcalPosLib::CbmEcalPosLib(const char* nm, Int_t verb, const char* fname)
-  : FairTask(nm, verb)
+  : FairTask(nm, verb),
+    fX(0.),
+    fY(0.),
+    fParName(fname),
+    fContName(""),
+    fF0P0(0.),
+    fF1P0(0.),
+    fF2P0(0.),
+    fF0P1(0.),
+    fF1P1(0.),
+    fF2P1(0.),
+    fF0P2(0.),
+    fF1P2(0.),
+    fF2P2(0.),
+    fInf(NULL)
 {
-  fParName=fname;
 }
 
 void CbmEcalPosLib::Exec(const Option_t* option)

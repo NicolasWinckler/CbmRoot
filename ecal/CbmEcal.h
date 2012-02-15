@@ -245,6 +245,10 @@ private:
    ** fVolArr[5]==code of scintillator
    **/
   Int_t fVolArr[kNumberOfECALSensitiveVolumes];
+
+  CbmEcal(const CbmEcal&);
+  CbmEcal& operator=(const CbmEcal&);
+
   ClassDef(CbmEcal,1)
 
 };

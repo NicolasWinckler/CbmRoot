@@ -17,7 +17,7 @@ public:
   CbmEcalAnalysisPi0(const char* name, const Int_t iVerbose=0);
 public:
   /** Default constructor **/
-  CbmEcalAnalysisPi0() {};
+  CbmEcalAnalysisPi0();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -117,6 +117,9 @@ private:
   CbmEcalStructure* fStr;		//!
   /** An array of ecal MC points **/
   TClonesArray* fPoints;		//!
+
+  CbmEcalAnalysisPi0(const CbmEcalAnalysisPi0&);
+  CbmEcalAnalysisPi0& operator=(const CbmEcalAnalysisPi0&);
 
   ClassDef(CbmEcalAnalysisPi0,1)
 };

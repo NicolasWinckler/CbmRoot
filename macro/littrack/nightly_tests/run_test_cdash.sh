@@ -8,8 +8,9 @@ BUILD_DIR=$TEST_DIR/cbmroot_build_$EXTERNALS
 # Checkout and configure CBMROOT
 rm -rf $TEST_DIR/*
 export SIMPATH=/data.local1/fairsoft/fairsoft_$EXTERNALS/
+cd $TEST_DIR/
 svn co  https://subversion.gsi.de/fairroot/cbmroot/trunk cbmroot
-cp /data.local1/andrey/tests/fieldmaps/* $TEST_DIR/cbmroot/input/
+cp -R /data.local1/andrey/tests/fieldmaps/ $TEST_DIR/cbmroot/input/
 cp /data.local1/andrey/tests/cdash_config/Dart.cfg $TEST_DIR/cbmroot/Dart.cfg
 
 . $TEST_DIR/cbmroot/Dart.sh Experimental $TEST_DIR/cbmroot/Dart.cfg    

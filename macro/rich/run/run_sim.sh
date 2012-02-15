@@ -63,7 +63,7 @@ for Z in 1; do
    fi
    
    if [ $Z = "1" ] ; then
-      export NEVENTS=20000
+      export NEVENTS=1000
       export URQMD=no
       export ELECTRONS=yes
    fi

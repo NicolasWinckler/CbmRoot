@@ -1,7 +1,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 10){
+void run_reco(Int_t nEvents = 1000){
 
 	Int_t iVerbose = 0;
 
@@ -13,9 +13,9 @@ void run_reco(Int_t nEvents = 10){
 	TString inFile = "", parFile = "", outFile ="";
 
 	if (script != "yes") {
-		TString inFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-		TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-		TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+		TString inFile = "/d/cbm02/slebedev/rich/JUL09/mc.0001.root";
+		TString parFile = "/d/cbm02/slebedev/rich/JUL09/param.0001.root";
+		TString outFile = "/d/cbm02/slebedev/rich/JUL09/reco.0001.root";
 	} else {
 		inFile = TString(gSystem->Getenv("MCFILE"));
 		outFile = TString(gSystem->Getenv("RECOFILE"));
@@ -219,18 +219,8 @@ void run_reco(Int_t nEvents = 10){
 		CbmRichProjectionProducer* richProj = new CbmRichProjectionProducer(iVerbose, richZFlag);
 		run->AddTask(richProj);
 
-		//--------------------- RICH Ring Finding ----------------------------------
-		//CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
-		TString richGeoType = "compact";
-		CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
-		CbmRichFindRings* richFindRings = new CbmRichFindRings();
-		richFindRings->UseFinder(richFinder);
-		run->AddTask(richFindRings);
-
-		//-------------------- RICH Ring Fitting -----------------------------------
-		CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
-		CbmRichFitRings* fitRings = new CbmRichFitRings("CbmRichFitRings","CbmRichFitRings",richFitter);
-		run->AddTask(fitRings);
+		CbmRichReconstruction* richReco = new CbmRichReconstruction();
+		run->AddTask(richReco);
 
 		// ------------------- RICH Ring matching  ---------------------------------
 		CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
@@ -257,9 +247,9 @@ void run_reco(Int_t nEvents = 10){
    trackingQa->SetMinNofHitsTrd(8);
    trackingQa->SetMinNofHitsMuch(10);
    trackingQa->SetVerbose(0);
-   trackingQa->SetMomAxis(0, 12, 120);
-   trackingQa->SetPtAxis(0, 3, 30);
-   trackingQa->SetRapidityAxis(0, 4, 40);
+   //trackingQa->SetMomAxis(0, 12, 120);
+   //trackingQa->SetPtAxis(0, 3, 30);
+  // trackingQa->SetRapidityAxis(0, 4, 40);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir("recqa/");

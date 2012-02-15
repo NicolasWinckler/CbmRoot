@@ -3,7 +3,7 @@ cd $MYBUILDDIR
 . ./config.sh
 cd -
 
-root -b -q "./run_sim.C($NEVENTS)"
+#root -b -q "./run_sim.C($NEVENTS)"
 
 root "./run_reco.C($NEVENTS)"
 

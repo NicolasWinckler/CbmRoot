@@ -1,6 +1,6 @@
 void setphdStyle()
 {
-    gStyle->SetCanvasColor(kWhite);
+   gStyle->SetCanvasColor(kWhite);
 	gStyle->SetFrameFillColor(kWhite);
 	gStyle->SetPadColor(kWhite);
 	gStyle->SetStatColor(kWhite);

@@ -82,6 +82,9 @@ private:
   TString fVersion;       //
   Int_t  fNHits;          //Index of the CbmTofHit TClonesArray
 
+  CbmTofHitProducer(const CbmTofHitProducer&);
+  CbmTofHitProducer& operator=(const CbmTofHitProducer&);
+
   ClassDef(CbmTofHitProducer,1) //CBMTOFHitProducer
 
 };

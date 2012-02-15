@@ -55,10 +55,10 @@
 class CbmEcalCell : public TObject
 {
 public:
-  CbmEcalCell(Int_t cellnumber, Float_t x1=0, Float_t y1=0, Float_t x2=0, Float_t y2=0, Char_t type=0, Float_t energy=0) :
-    fNumber(cellnumber), fX1(x1), fY1(y1), fX2(x2)
-    , fY2(y2), fType(type), fEnergy(energy)
-  {fTime=-1111;};
+  CbmEcalCell(Int_t cellnumber, Float_t x1=0, Float_t y1=0, Float_t x2=0, Float_t y2=0, Char_t type=0, Float_t energy=0) 
+    : TObject(), fNumber(cellnumber), fX1(x1), fY1(y1), fX2(x2),
+    fY2(y2), fType(type), fEnergy(energy), fADC(-1111), fNeighbors(), fTime(-1111)
+  {};
 
   inline Bool_t IsInside(Float_t x, Float_t y) {return x>GetX1()&&x<GetX2()&&y>GetY1()&&y<GetY2();}
   //getters

@@ -12,13 +12,43 @@ using namespace std;
 
 /** An empty constructor **/
 CbmEcalCluster::CbmEcalCluster()
+  : TObject(),
+    fNum(0),
+    fSize(0),
+    fMaxs(0),
+    fEnergy(0.),
+    fType(0.),
+    fMoment(0.),
+    fMomentX(0.),
+    fMomentY(0.),
+    fX(0.),
+    fY(0.),
+    fChi2(0.),
+    fCellNums(),
+    fPeakNums(),
+    fPreEnergy(),
+    fMaximums(NULL)
 {
-  fMaximums=NULL;
 }
 
 /** A standart constructor **/
 CbmEcalCluster::CbmEcalCluster(Int_t num, const std::list<CbmEcalCell*>& cluster)
-  : fNum(num)
+  : TObject(),
+    fNum(num),
+    fSize(0),
+    fMaxs(0),
+    fEnergy(0.),
+    fType(0.),
+    fMoment(0.),
+    fMomentX(0.),
+    fMomentY(0.),
+    fX(0.),
+    fY(0.),
+    fChi2(0.),
+    fCellNums(),
+    fPeakNums(),
+    fPreEnergy(),
+    fMaximums(NULL)
 {
   std::list<CbmEcalCell*> cls;
 
@@ -32,7 +62,22 @@ CbmEcalCluster::CbmEcalCluster(Int_t num, const std::list<CbmEcalCell*>& cluster
 
 /** A more advanced constructor. Should use this. **/
 CbmEcalCluster::CbmEcalCluster(Int_t num, const std::list<CbmEcalCell*>& cluster, const std::list<CbmEcalMaximum*>& maximums, const std::list<Double_t>& energy)
-  : fNum(num)
+  : TObject(),
+    fNum(num),
+    fSize(0),
+    fMaxs(0),
+    fEnergy(0.),
+    fType(0.),
+    fMoment(0.),
+    fMomentX(0.),
+    fMomentY(0.),
+    fX(0.),
+    fY(0.),
+    fChi2(0.),
+    fCellNums(),
+    fPeakNums(),
+    fPreEnergy(),
+    fMaximums(NULL)
 {
   if (maximums.size()!=energy.size())
   {

@@ -25,7 +25,7 @@ public:
   CbmEcalHit();
 
   CbmEcalHit(Int_t id, Float_t energy, Float_t psenergy, Int_t trackid, Double32_t time)
-	  : fEnergy(energy), fPSEnergy(psenergy), fTime(time), fTrackId(trackid), fDetectorId(id)
+    : TObject(), fEnergy(energy), fPSEnergy(psenergy), fTime(time), fTrackId(trackid), fDetectorId(id)
   {};
 
   /** Destructor **/

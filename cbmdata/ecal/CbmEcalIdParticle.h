@@ -38,7 +38,7 @@ public:
 		    Double_t e, Double_t pse, Double_t shape,
                     Int_t tracknum, Double_t prob, Int_t mctrack=-1111); 
   /** Copy constructor **/
-  CbmEcalIdParticle(const CbmEcalIdParticle& obj): TObject(obj) { *this = obj; };
+  CbmEcalIdParticle(const CbmEcalIdParticle& obj);
 
   /** Destructor **/
   virtual ~CbmEcalIdParticle();

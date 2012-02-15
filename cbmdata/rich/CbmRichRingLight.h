@@ -21,10 +21,21 @@ public:
 class CbmRichRingLight
 {
 public:
-    CbmRichRingLight(){
+    CbmRichRingLight()
+      :  fHitCollection(),
+    fHitIdCollection(),
+    fCenterX(0.),
+    fCenterY(0.),
+    fRadius(0.),
+    fChi2(0.),
+    fAngle(0.),
+    fNofHitsOnRing(0),
+    fRecFlag(0),
+    fSelectionNN(0.)
+      {
     	fHitCollection.reserve(30);
     	fHitIdCollection.reserve(30);
-    }
+      }
 
 	~CbmRichRingLight(){
 		fHitCollection.clear();

@@ -26,19 +26,29 @@ using std::map;
 using std::pair;
 
 // -----   Default  constructor   ------------------------------------------
-CbmMuchDigiMatch::CbmMuchDigiMatch() :
-  TObject(),
-  fRefIndex(0),
-  fCharge(0),
-  fRefIndexPerPrimaryElectron(0),
-  fChargePerPrimaryElectron(0),
-  fDriftTimePerPrimaryElectron(0),
-  fSignalShape(0)
+CbmMuchDigiMatch::CbmMuchDigiMatch() 
+  : TObject(),
+    fRefIndex(0),
+    fCharge(0),
+    fRefIndexPerPrimaryElectron(0),
+    fChargePerPrimaryElectron(0),
+    fDriftTimePerPrimaryElectron(0),
+    fSignalShape(0)
 {
 };
 // -------------------------------------------------------------------------
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match){
+
+CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match)
+  : TObject(*match),
+    fRefIndex(match->fRefIndex),
+    fCharge(match->fCharge),
+    fRefIndexPerPrimaryElectron(match->fRefIndexPerPrimaryElectron),
+    fChargePerPrimaryElectron(match->fChargePerPrimaryElectron),
+    fDriftTimePerPrimaryElectron(match->fDriftTimePerPrimaryElectron),
+    fSignalShape(match->fSignalShape)
+{
+  /*
    if(!match){
       cout << "-W- CbmMuchDigiMatch: NULL CbmMuchDigiMatch object " << endl;
    }
@@ -59,7 +69,9 @@ CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match){
         fDriftTimePerPrimaryElectron.AddAt(match->GetDriftTimePerPrimaryElectron(i),i);
       }
    }
+  */
 }
+
 // -------------------------------------------------------------------------
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigiMatch::~CbmMuchDigiMatch() { };

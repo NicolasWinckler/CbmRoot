@@ -41,7 +41,7 @@ class CbmZdcPoint : public FairMCPoint
 
 
   /** Copy constructor **/
-  CbmZdcPoint(const CbmZdcPoint& point) { *this = point; };
+  //  CbmZdcPoint(const CbmZdcPoint& point) { *this = point; };
 
 
   /** Destructor **/

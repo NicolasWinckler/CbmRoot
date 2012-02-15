@@ -9,7 +9,16 @@
 using namespace std;
 
 CbmEcalMaximum::CbmEcalMaximum(CbmEcalCell* cell, Double_t z)
-  : fCell(cell)
+  : TObject(), 
+    fCell(cell), 
+    fCX(0.), 
+    fCY(0.), 
+    fX(0.), 
+    fY(0.), 
+    fTanTheta(0.), 
+    fI(0), 
+    fMark(0), 
+    fRegion(0)
 {
   Double_t me=0;
   Double_t e;

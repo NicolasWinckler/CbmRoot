@@ -100,6 +100,9 @@ private:
   /** Serial numbers of maximums in system **/
   CbmEcalMaximum** fMaximums;		//!
 
+  CbmEcalCluster(const CbmEcalCluster&);
+  CbmEcalCluster& operator=(const CbmEcalCluster&);
+
   ClassDef(CbmEcalCluster, 1)
 };
 

@@ -10,7 +10,9 @@ class CbmEcalMaximum : public TObject
 {
 public:
   /** An emtry constructor **/
-  CbmEcalMaximum() {};
+  CbmEcalMaximum() : TObject(), fCell(NULL), fCX(0.), fCY(0.), fX(0.), fY(0.), 
+    fTanTheta(0.), fI(0), fMark(0), fRegion(0)
+    {};
   /** Simplest constructor **/
   CbmEcalMaximum(CbmEcalCell* cell, Double_t z);
   /** Standard constructor **/
@@ -48,11 +50,16 @@ private:
   /** A calorimeter region **/
   Int_t fRegion;
 
+
+  CbmEcalMaximum(const CbmEcalMaximum&);
+  CbmEcalMaximum& operator=(const CbmEcalMaximum&);
+
   ClassDef(CbmEcalMaximum, 1)
 };
 
 inline CbmEcalMaximum::CbmEcalMaximum(CbmEcalCell* cell, Double_t cx, Double_t cy, Double_t x, Double_t y, Int_t i)
-  : fCell(cell), fCX(cx), fCY(cy), fX(x), fY(y), fI(i), fMark(0)
+		      : TObject(), fCell(cell), fCX(cx), fCY(cy), fX(x), fY(y), 
+		      fTanTheta(0.), fI(i), fMark(0), fRegion(0)
 {
   ;
 }

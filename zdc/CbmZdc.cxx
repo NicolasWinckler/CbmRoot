@@ -28,9 +28,19 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmZdc::CbmZdc() : FairDetector("ZDC", kTRUE, kZDC) {
-  fZdcCollection = new TClonesArray("CbmZdcPoint");
-  fPosIndex = 0;
+CbmZdc::CbmZdc() 
+  : FairDetector("ZDC", kTRUE, kZDC),
+    fDebug(""),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fELoss(-1.),
+    fPosIndex(0),
+    fZdcCollection(new TClonesArray("CbmZdcPoint"))
+{
 }
 // -------------------------------------------------------------------------
 
@@ -38,10 +48,18 @@ CbmZdc::CbmZdc() : FairDetector("ZDC", kTRUE, kZDC) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmZdc::CbmZdc(const char* name, Bool_t active)
-  : FairDetector(name, active, kZDC) {
-  fZdcCollection = new TClonesArray("CbmZdcPoint");
-  fPosIndex = 0;
-  fDebug    = "";
+  : FairDetector(name, active, kZDC), 
+    fDebug(""),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fELoss(-1.),
+    fPosIndex(0),
+    fZdcCollection(new TClonesArray("CbmZdcPoint"))
+{
 }
 
 // -------------------------------------------------------------------------

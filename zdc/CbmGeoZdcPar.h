@@ -22,6 +22,11 @@ public:
   TObjArray             *GetGeoSensitiveNodes(){return fGeoSensNodes;}
   TObjArray             *GetGeoPassiveNodes(){return fGeoPassNodes;}
 
+ private:
+
+  CbmGeoZdcPar(const CbmGeoZdcPar&);
+  CbmGeoZdcPar& operator=(const CbmGeoZdcPar&);
+
   ClassDef(CbmGeoZdcPar,1)
 };
 

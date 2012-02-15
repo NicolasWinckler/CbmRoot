@@ -143,6 +143,8 @@ protected:
    **/
   void ResetParameters();
 
+  CbmZdc(const CbmZdc&);
+  CbmZdc& operator=(const CbmZdc&);
 
   ClassDef(CbmZdc,1)
 

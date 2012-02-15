@@ -84,6 +84,8 @@ class CbmZdcv1 : public CbmZdc
    **/
   void ResetParameters();
 
+  CbmZdcv1(const CbmZdcv1&);
+  CbmZdcv1& operator=(const CbmZdcv1&);
 
   ClassDef(CbmZdcv1,2)
 

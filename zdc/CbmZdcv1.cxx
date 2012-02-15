@@ -21,9 +21,19 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmZdcv1::CbmZdcv1() {
-  fZdcCollection = new TClonesArray("CbmZdcPoint");
-  fPosIndex = 0;
+CbmZdcv1::CbmZdcv1() 
+  : CbmZdc(),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fModuleID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fEloss(-1.),
+    fPosIndex(0),
+    fZdcCollection(new TClonesArray("CbmZdcPoint"))
+{
 }
 // -------------------------------------------------------------------------
 
@@ -31,7 +41,18 @@ CbmZdcv1::CbmZdcv1() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmZdcv1::CbmZdcv1(const char* name, Bool_t active)
-  : CbmZdc(name, active) {
+  : CbmZdc(name, active),
+    fTrackID(-1),
+    fVolumeID(-1),
+    fModuleID(-1),
+    fPos(),
+    fMom(),
+    fTime(-1.),
+    fLength(-1.),
+    fEloss(-1.),
+    fPosIndex(0),
+    fZdcCollection(new TClonesArray("CbmZdcPoint"))
+{
 }
 
 // -------------------------------------------------------------------------

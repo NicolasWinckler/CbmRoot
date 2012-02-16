@@ -58,9 +58,9 @@ void CbmLitGlobalElectronId::Init()
 	if ( !fTofHits) {Fatal("CbmLitGlobalElectronId::Init","No TOFHit array!");}
 
     if (fRichUseAnn){
-        TString richANNFile = gSystem->Getenv("VMCWORKDIR");
+        string richANNFile(gSystem->Getenv("VMCWORKDIR"));
         richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-        fRichElIdAnn = new CbmRichElectronIdAnn(0, richANNFile);
+        fRichElIdAnn = new CbmRichElectronIdAnn(richANNFile);
         fRichElIdAnn->Init();
     }
 }

@@ -30,6 +30,7 @@ class TH2;
 class TH2I;
 //class TH2F;
 //class TH2D;
+class vector;
 
 typedef struct MCParticle
 {
@@ -99,6 +100,9 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   //Histos
   TH3I*  fMotherDaughterZBirth;
+  TH3I*  fBirthGamma;
+  TH3I*  fBirthPi0;
+  TH3I*  fBirthPair;
 
   TH2I*  fZBirthAll;
   TH2I*  fMotherDaughter;
@@ -109,10 +113,13 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I*  fMCPid;
   TH1I*  fGTPid;
   TH1I*  fePlusMinusMother;
+  TH1I*  fePlusAndMinusMother;
   TH1I*  fgammaMother;
+  TH1I*  fgammaAndGammaMother;
+  TH1I*  fDalizMother;
   TH1I*  fgammaDaughter;
   TH1I*  fZBirth[4];
-  TH1I*  fGammaHistory;
+  TH1I*  fPairHistory;
 
   TH1I* fPairAllVertex[3];
   TH1I* fPairGammaVertex[3];

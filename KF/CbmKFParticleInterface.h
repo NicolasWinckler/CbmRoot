@@ -5,10 +5,10 @@
 #include "CbmKFParticle_simd.h"
 #include "CbmKFTrackInterface.h"
 
-#include "CbmKF.h"
 #include "CbmKFVertexInterface.h"
 #include "CbmKFVertex.h"
-#include "TMath.h"
+
+class L1FieldRegion;
 
 class CbmKFParticleInterface
 {
@@ -16,6 +16,8 @@ class CbmKFParticleInterface
 
   CbmKFParticleInterface();
   CbmKFParticleInterface(CbmKFTrackInterface* Track[]);
+
+  void SetField(const L1FieldRegion &field, bool isOneEntry=0, const int iVec=0) { KFPart->SetField(field, isOneEntry, iVec);}
 
   ~CbmKFParticleInterface();
 
@@ -49,7 +51,7 @@ class CbmKFParticleInterface
   fvec GetNDF  ()  const { return KFPart->GetNDF();  }
   fvec *GetParameters()  { return KFPart->GetParameters(); }
   fvec *GetCovMatrix()   { return KFPart->GetCovMatrix(); }
-  
+
   fvec GetParameter ( Int_t i )          const { return KFPart->r[i]; }
   fvec GetCovariance( Int_t i )          const { return KFPart->C[i]; }
   fvec GetCovariance( Int_t i, Int_t j ) const { return KFPart->C[IJ(i,j)]; }
@@ -57,7 +59,7 @@ class CbmKFParticleInterface
   //*
   //*  MODIFIERS
   //*
-  
+
   fvec & rX    () { return KFPart->rX(); }
   fvec & rY    () { return KFPart->rY(); }
   fvec & rZ    () { return KFPart->rZ(); }
@@ -89,17 +91,17 @@ class CbmKFParticleInterface
   void GetKFParticle( CbmKFParticle &Part, int iPart = 0);
   CbmKFVertex GetKFVertexJ(int j);
 
-void GetKFVertexJ(int j, CbmKFVertex *vtx);
-
+  void GetKFVertexJ(int j, CbmKFVertex *vtx);
 
   void SetPDG ( fvec pdg ) { KFPart->SetPDG( pdg ); }
   const fvec& GetPDG () const { return KFPart->GetPDG(); }
-  
+
  protected:
 
   fvec& Cij( Int_t i, Int_t j ){ 
     return KFPart->C[( j<=i ) ? i*(i+1)/2+j :j*(j+1)/2+i];
   }
+ public:
   static Int_t IJ( Int_t i, Int_t j ){ 
     return ( j<=i ) ? i*(i+1)/2+j :j*(j+1)/2+i;
   }

@@ -138,6 +138,7 @@ class CbmL1 : public FairTask
     /// Input Performance
    void HitMatch();         // Procedure for match hits and MCPoints.
    void FieldApproxCheck(); // Build histos with difference between Field map and approximated field
+   void FieldIntegralCheck(); // Build 2D histo: dependence of the field integral on phi and theta
    void InputPerformance(); // Build histos about input data, like hit pulls, etc.
   
     /// Reconstruction Performance
@@ -158,6 +159,8 @@ class CbmL1 : public FairTask
    void ReadSTAPGeoData(void *geo, int &size);
    void ReadSTAPAlgoData();
    void ReadSTAPPerfData();
+      /// SIMD KF Banchmark service-functions
+   void WriteSIMDKFData();
 
    static istream& eatwhite(istream& is); // skip spaces
    static void writedir2current( TObject *obj ); // help procedure

@@ -13,6 +13,7 @@
 #include "CbmKFTrack.h"
 #include "CbmStsKFTrackFitter.h"
 #include "TMath.h"
+#include "TDatabasePDG.h"
 
 #include <cmath>
 #include <vector>
@@ -21,16 +22,13 @@ using namespace std;
 
 ClassImp(CbmKFParticle)
 
-CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *qHypo):
+CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *qHypo, Int_t *pdg):
   fId(-1),
   fDaughtersIds(),
-
   fPDG(-1),
-
   NDF(0),
   Chi2(0), Q(0),
   AtProductionVertex(0)
-
 {
 
   fDaughtersIds.push_back( Track->Id() );
@@ -48,6 +46,13 @@ CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *
   
   //* convert the track to (x,y,px,py,pz,e,t/p) parameterization
 
+  double Mass = Tr.GetMass();
+  if(pdg)
+  {
+    Mass=TDatabasePDG::Instance()->GetParticle(*pdg)->Mass();
+  }
+
+
   double c2 = 1./(1. + a*a + b*b);
   double pq = 1./qp;
   if(qHypo) pq *= *qHypo;
@@ -55,7 +60,7 @@ CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *
   double pz = sqrt(p2*c2);
   double px = a*pz;
   double py = b*pz;
-  double E = sqrt( Tr.GetMass()*Tr.GetMass() + p2 );
+  double E = sqrt( Mass*Mass + p2 );
     
   double H[3] = { -px*c2, -py*c2, -pz*pq };
   double HE = -pq*p2/E;

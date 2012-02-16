@@ -22,8 +22,8 @@
 #include "CbmKFVertex.h"
 #include "CbmKFPrimaryVertexFinder.h"
 
-#include "ParticleFinder/CbmL1PFMCParticle.h"
-#include "ParticleFinder/CbmL1PFFitter.h"
+#include "CbmL1PFMCParticle.h"
+#include "CbmL1PFFitter.h"
 
 #include "TClonesArray.h"
 
@@ -40,35 +40,23 @@ class CbmL1ParticlesFinder
   void FindParticles(vector<CbmL1Track> &vRTracks);
 
   vector<CbmKFParticle>& GetParticles()  {return fParticles;}
-  
+  CbmKFVertex* GetPV() {return &fPrimVtx;}
+
  private:
 
   double GetChiToVertex( CbmKFTrackInterface &track );
 
-  void SelectCandidates(vector<CbmL1Track> &vRTracks);
+  void Find2PDecay(vector<CbmL1Track> &vRTracks);
   void FindPV(vector<CbmL1Track> &vRTracks);
-  void FindKs();
-  void FindLambda();
 
- private:
-
- CbmL1PFFitter fitter;
+  CbmL1PFFitter fitter;
 //for primary vertex
   CbmKFPrimaryVertexFinder fPVFinder;
   CbmKFVertex fPrimVtx;
 
-//input data
-  vector<CbmL1Track> fPionPlus;
-  vector<CbmL1Track> fPionMinus;
-
-  vector<CbmL1Track> fPPlus;    // proton
-  vector<CbmL1Track> fPMinus;
-
-  vector<CbmL1Track> fKPlus;
-  vector<CbmL1Track> fKMinus;
-
-  vector<CbmL1Track> fElectron;
-  vector<CbmL1Track> fPozitron;
+  //selected tracks
+  vector<CbmL1Track> fPos;
+  vector<CbmL1Track> fNeg;
 
   vector<CbmKFParticle> fParticles;
 };

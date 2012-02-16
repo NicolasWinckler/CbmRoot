@@ -17,25 +17,16 @@
 
 #include "CbmKFHit.h"
 #include "CbmStsHit.h"
+#include "TDatabasePDG.h"
 
 //#include "CbmKFField.h"
 
 #include "TStopwatch.h"
-//#include "MySimdTest.h"
 
 #include <cmath>
 #include <vector>
 
 #define cnst static const fvec
-
-#include <new>
-namespace new_obj { 
-    //template<typename T> static T *allocate(size_t n=1) { return static_cast<T*>(_mm_malloc(sizeof(T)*n, 16)); }
-    //template<class T> static T *allocate(size_t n=1) { return static_cast<T*>(_mm_malloc(sizeof(T)*n, 16)); }
-    //template<typename T> static void liberate(T *p) { _mm_free(p); }
-    //template<typename T> static T *construct(size_t n=1) { return n > 1 ? new (allocate<T>(n)) T[n] : new (allocate<T>(n)) T; }
-    // etc...
-}
 
 using namespace std;
 
@@ -65,6 +56,8 @@ CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part): fId(part.Id()), fD
     r[i] = part.GetParameters()[i];
   for( int i = 0; i < 36; ++i )
     C[i] = part.GetCovMatrix()[i];
+
+  fField = L1FieldRegion(part.fieldRegion);
 }
 
 
@@ -110,7 +103,7 @@ void CbmKFParticle_simd::Create(CbmKFParticle *parts[], int N) {
   }
 }
 
-CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(1), fIsVtxGuess(0), fIsVtxErrGuess(0)
+CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track, Int_t *qHypo, const Int_t *pdg): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(1), fIsVtxGuess(0), fIsVtxErrGuess(0)
 {
   fDaughterIds.push_back( Track.Id() );
   
@@ -123,7 +116,7 @@ CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track): fId(-1), fDa
     m[i] = Tr.GetTrack()[i];
   for(unsigned int i=0; i<15; i++)
     V[i] = Tr.GetCovMatrix()[i];
-  TrMass = Tr.GetMass();
+  TrMass = pdg ? TDatabasePDG::Instance()->GetParticle(*pdg)->Mass() :Tr.GetMass();
   NDF  = Tr.GetRefNDF();
   Chi2 = Tr.GetRefChi2();
 
@@ -192,19 +185,14 @@ CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track): fId(-1), fDa
 
   for(int j=0; j<fvecLen; j++)
     Q[j] = (qp[j]>0.) ?1 :( (qp[j]<0) ?-1 :0);
-
-
-//  SetField(Track);
-//  SetField();
-
 }
 
-CbmKFParticle_simd::CbmKFParticle_simd( CbmKFTrackInterface* Track[]): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0)
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFTrackInterface* Track[], Int_t *qHypo, const Int_t *pdg): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0)
 {
-  Create(Track);
+  Create(Track,fvecLen,qHypo,pdg);
 }
 
-void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks)
+void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks, Int_t *qHypo, const Int_t *pdg)
 {
   fvec m[6];
   fvec V[15];
@@ -217,23 +205,17 @@ void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks)
   for (int j=0; j<NTracks; j++)
   {
     fDaughterIds.back()[j] =  Track[j]->Id();
-      
-//cout << "rrrrrrrrrrrrrrrr   " << Track[j].GetTrack()[0] << endl;
 
-    //CbmKFTrackInterface tr_temp = *Track[j];
- ///   Tr[j] = (CbmKFTrack*) _mm_malloc(sizeof(CbmKFTrack), 16);
     Tr[j] = new CbmKFTrack(*Track[j]);
-//cout << "rrrrrrrrrrrrrrrr   " << Tr[j]->GetTrack()[0] << endl;
     m1[j] = Tr[j]->GetTrack();
     V1[j] = Tr[j]->GetCovMatrix();
-    TrMass[j] = Tr[j]->GetMass();
+    TrMass[j] = pdg ? TDatabasePDG::Instance()->GetParticle(*pdg)->Mass() : Tr[j]->GetMass();
     NDF[j] = Tr[j]->GetRefNDF();
     Chi2[j] = Tr[j]->GetRefChi2();
 
     for(int i = 0; i < 6; i++) m[i][j] = m1[j][i];
     for(int i = 0; i < 15; i++) V[i][j] = V1[j][i];
 
-  ///  _mm_free(Tr[j]);
   }
 
   fvec a = m[2], b = m[3], qp = m[4];
@@ -305,140 +287,17 @@ void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks)
   fIsVtxGuess = false;
   fIsVtxErrGuess = false;
 
-//  SetField(Track);
-//  SetField();
-
   for(int j=0; j<NTracks; j++)
     if(Tr[j]) delete Tr[j];
 
 }
 
-void CbmKFParticle_simd::SetField(CbmKFTrackInterface *Track[])
+void CbmKFParticle_simd::SetField(const L1FieldRegion &field, bool isOneEntry, const int iVec)
 {
-/*  fvec r1[3], r2[3], r3[3];
-
-  for(int j=0; j<fvecLen; j++)
-  {
-    CbmKFHit *kfhit1 = Track[j]->GetHit(0);
-    CbmKFHit *kfhit2 = Track[j]->GetHit(1);
-    CbmKFHit *kfhit3 = Track[j]->GetHit(2);
-
-    r1[0][j] = ((CbmKFStsHit*)kfhit1)->FitPoint.x;
-    r2[0][j] = ((CbmKFStsHit*)kfhit2)->FitPoint.x;
-    r3[0][j] = ((CbmKFStsHit*)kfhit3)->FitPoint.x;
-
-    r1[1][j] = ((CbmKFStsHit*)kfhit1)->FitPoint.y;
-    r2[1][j] = ((CbmKFStsHit*)kfhit2)->FitPoint.y;
-    r3[1][j] = ((CbmKFStsHit*)kfhit3)->FitPoint.y;
-
-    r1[2][j] = ((CbmKFStsHit*)kfhit1)->FitPoint.z;
-    r2[2][j] = ((CbmKFStsHit*)kfhit2)->FitPoint.z;
-    r3[2][j] = ((CbmKFStsHit*)kfhit3)->FitPoint.z;
-
-//cout <<"opana!"<<endl;
-//cout << "WWWWWWWWWWWWWWWWW  "<< r1[2][j] << endl;
-//cout << "WWWWWWWWWWWWWWWWW  "<< r2[2][j] << endl;
-//cout << "WWWWWWWWWWWWWWWWW  "<< r3[2][j] << endl;
-//    cout << r1[2][j] << "  ";
-  }
-//cout << "kaka"<<endl;
-
-//cout << r1[2] << endl;
-
-  fvec x1 = r1[2];
-  fvec x2 = r2[2];
-  fvec x3 = r3[2];
-
-  fvec Y1[3],Y2[3],Y3[3]; //y = B
-
-  CbmKFField *KFF = CbmKF::Instance()->GetKFMagneticField();
-  KFF->GetField(r1,Y1);
-  KFF->GetField(r2,Y2);
-  KFF->GetField(r3,Y3);
-
-//cout << "Nhits "<<Track[0]->GetNOfHits()<<"  "<<Track[1]->GetNOfHits()<<"  "<<Track[2]->GetNOfHits()<<"  "<<Track[3]->GetNOfHits()<<endl;
-//cout <<"r   "<< r1[0] <<"           "<< r1[1]<< "          "<< r1[2]<< endl;
-//cout <<"B   "<< Y1[0] <<"           "<< Y1[1]<< "          "<< Y1[2]<< endl;
-
-  fvec ndr;
-
-  for(int i=0; i<3; i++)
-  {
-    ndr = x3*(Y2[i] - Y1[i]) + x2*Y1[i] - x1*Y2[i];
-    ndr = Y3[i] - ndr/(x2-x1);
-
-    aB[i] = ndr/(x3*(x3-x1-x2)+x1*x2);
-    bB[i] = (Y2[i] - Y1[i])/(x2 - x1) - aB[i]*(x1+x2);
-    cB[i] = (x2*Y1[i] - x1*Y2[i])/(x2-x1) + aB[i]*x1*x2;
-  }
-
- // fvec B2X = aB[0] * x2*x2 + bB[0] * x2 + cB[0];
- // cout << "!!!!!!!!!!!!!!!!!  P->z = " << GetZ() << " x2 = " << x2 << endl;
- // cout << "!!!!!!!!!!!!!!!!!  B2X  = " << Y2[0] <<"      "<< B2X << endl;*/
-}
-
-
-void CbmKFParticle_simd::SetField()
-{
-  fvec Tx = GetTx();
-  fvec Ty = GetTy();
-
-  fvec r1[3], r2[3], r3[3];
-
-  r1[2] = GetZ() - 1.;
-  r2[2] = GetZ();
-  r3[2] = GetZ() + 1.;
-
-  r1[0] = GetX() - Tx*1.;
-  r2[0] = GetX();
-  r3[0] = GetX() + Tx*1.;
-
-  r1[1] = GetY() - Ty*1.;
-  r2[1] = GetY();
-  r3[1] = GetY() + Ty*1.;
-
-  fvec x1 = r1[2];
-  fvec x2 = r2[2];
-  fvec x3 = r3[2];
-
-  fvec Y1[3],Y2[3],Y3[3]; //y = B
-  FairField *MF = CbmKF::Instance()->GetMagneticField();
-  {
-    double BB[3], r01[8];
-    for(int j = 0; j<fvecLen; j++)
-    {
-      for(int i = 0; i<8; i++)
-        r01[i] = r1[i][j];
-      MF->GetFieldValue( r01, BB );
-      for(int i = 0; i<3; i++) Y1[i][j] = BB[i];
-
-      for(int i = 0; i<8; i++)
-        r01[i] = r2[i][j];
-      MF->GetFieldValue( r01, BB );
-      for(int i = 0; i<3; i++) Y2[i][j] = BB[i];
-
-      for(int i = 0; i<8; i++)
-        r01[i] = r3[i][j];
-      MF->GetFieldValue( r01, BB );
-      for(int i = 0; i<3; i++) Y3[i][j] = BB[i];
-    }
-  }
-
-  fvec ndr;
-
-  for(int i=0; i<3; i++)
-  {
-    ndr = x3*(Y2[i] - Y1[i]) + x2*Y1[i] - x1*Y2[i];
-    ndr = Y3[i] - ndr/(x2-x1);
-
-    aB[i] = ndr/(x3*(x3-x1-x2)+x1*x2);
-    bB[i] = (Y2[i] - Y1[i])/(x2 - x1) - aB[i]*(x1+x2);
-    cB[i] = (x2*Y1[i] - x1*Y2[i])/(x2-x1) + aB[i]*x1*x2;
-  }
-
-  fvec B2X = aB[0] * x2*x2 + bB[0] * x2 + cB[0];
-//  cout << "!!!!!!!!!!!!!!!!!  P->z = " << GetZ() << " x2 = " << x2 << endl;
-//  cout << "!!!!!!!!!!!!!!!!!  B2X  = " << Y2[0] <<"      "<< B2X << endl;
+  if(!isOneEntry)
+    fField = field;
+  else
+    fField.SetOneEntry(field,iVec);
 }
 
 void CbmKFParticle_simd::GetKFTrack( CbmKFTrackInterface** Track)
@@ -567,265 +426,6 @@ void CbmKFParticle_simd::SetVtxErrGuess( fvec &dx, fvec &dy, fvec &dz )
   fVtxErrGuess[1] = dy;
   fVtxErrGuess[2] = dz;
   fIsVtxErrGuess = 1;
-}
-
-///*                      16.09.2009
-void CbmKFParticle_simd::DecayVtxAprox(vector<CbmKFParticle_simd*> vPart, fvec &XX, fvec &YY, fvec &ZZ)
-{
-/*
-  fvec fR[(int) vPart.size()][3];
-  fvec fP[(int) vPart.size()][3];
-  fvec fdR[(int) vPart.size()][3];
-  fvec fdP[(int) vPart.size()][3];
-  fvec qb[(int) vPart.size()];
-
-
-
-  fvec vert_x=0,vert_y=0,vert_z=0;
-  fvec weight_x=0,weight_y=0,weight_z=0;
-
-  Int_t Nvect=0;
-  Int_t Nel=0;
-  Int_t nv=0;
-
-  fvec www;
-  fvec Z_min[3]={0.,0.,1000.};
-  Int_t nPart_min=-1;
-  
-  const fvec c_light =  0.000299792458;
-
-  for( vector<CbmKFParticle_simd*>::iterator tr=vPart.begin(); tr!=vPart.end(); ++tr )
-  {
-    CbmKFParticle_simd Part(**tr);
-    if(Part.GetZ()<Z_min[2])
-    {
-       Z_min[2] = Part.GetZ();
-       nPart_min = nv;
-    }
-    nv++;
-  }
-  
-  for( vector<CbmKFParticle_simd*>::iterator tr=vPart.begin(); tr!=vPart.end(); ++tr )
-  {
-    CbmKFParticle_simd Part(**tr);
-//cout << "Zstart  " << Part.GetZ();
-    Part.Extrapolate(Part.r , Part.GetDStoPoint(Z_min));
-
-    fR[Nvect][0]  = Part.GetX();
-    fR[Nvect][1]  = Part.GetY();
-    fR[Nvect][2]  = Part.GetZ();
-    fP[Nvect][0]  = Part.GetPx();
-    fP[Nvect][1]  = Part.GetPy();
-    fP[Nvect][2]  = Part.GetPz();
-    fdR[Nvect][0] = Part.GetCovariance(0);
-    fdR[Nvect][1] = Part.GetCovariance(2);
-    fdR[Nvect][2] = Part.GetCovariance(5);
-    fdP[Nvect][0] = Part.GetCovariance(9);
-    fdP[Nvect][1] = Part.GetCovariance(14);
-    fdP[Nvect][2] = Part.GetCovariance(20);
-    
-    fvec B[3];
-
-      double B1[3], r01[8];
-      for(int i = 0; i<8; i++) r01[i] = fR[Nvect][i];
-      FairField *MF = CbmKF::Instance()->GetMagneticField();
-      MF->GetFieldValue( r01, B1 );
-      for(int i = 0; i<3; i++) B[i] = B1[i];
-    
-    qb[Nvect]     = Part.GetQ()*B[1]*c_light;
-    Nvect++;
-//cout << "  Zend  " << Part.GetZ()<<endl;
-cout << "Bx  " << B[0]<< "By  " << B[1] << "Bz  " << B[2] << endl;
-  }
-
-  fvec t[Nvect];
-  fvec d_t[Nvect];
-  for(Int_t iPart = 0; iPart < Nvect-1; iPart++)
-  {
-    t[iPart] = 0.;
-    d_t[iPart] = 0.;
-  }
-  fvec weight_t=0.;
-  fvec weight_t_temp=0.;
-  
-  Int_t nCross=0;
-  fvec T[Nvect][(int) Nvect*(Nvect-1)/2];
-  fvec d_T[Nvect][(int) Nvect*(Nvect-1)/2];
-
-  for(Int_t iPart = 0; iPart < Nvect-1; iPart++)
-  for(Int_t jPart = iPart+1; jPart < Nvect; jPart++)
-  { 
-    fvec Dpy   = fP[iPart][1] - fP[jPart][1];
-    fvec d_Dpy = sqrt(fdP[iPart][1]*fdP[iPart][1] + fdP[jPart][1]*fdP[jPart][1]);
-
-    fvec DY   = fR[iPart][1] - fR[jPart][1];
-    fvec d_DY = sqrt(fdR[iPart][1]*fdR[iPart][1] + fdR[jPart][1]*fdR[jPart][1]);
-
-    fvec Dpx   = fP[iPart][0] - fP[jPart][0];
-    fvec d_Dpx = sqrt(fdP[iPart][0]*fdP[iPart][0] + fdP[jPart][0]*fdP[jPart][0]);
-
-    fvec DX   = fR[iPart][0] - fR[jPart][0];
-    fvec d_DX = sqrt(fdR[iPart][0]*fdR[iPart][0] + fdR[jPart][0]*fdR[jPart][0]);
-
-    fvec Dpz   = fP[iPart][2] - fP[jPart][2];
-    fvec d_Dpz = sqrt(fdP[iPart][2]*fdP[iPart][2] + fdP[jPart][2]*fdP[jPart][2]);
-
-    fvec DZ   = fR[iPart][2] - fR[jPart][2];
-    fvec d_DZ = sqrt(fdR[iPart][2]*fdR[iPart][2] + fdR[jPart][2]*fdR[jPart][2]);
-
-////
-    fvec tij[2][3];
-    fvec d_tij[2][3];
-    fvec wt[2][3];
-    
-    fvec txy11   = fP[jPart][0]*(fR[jPart][1]-fR[iPart][1]) + fP[jPart][1]*(fR[jPart][0]-fR[jPart][0]);
-    fvec txy12   = (fP[jPart][1]*fP[iPart][0] - fP[jPart][0]*fP[iPart][1]);
-    fvec d_txy11 = sqrt(fdP[jPart][0]*fdP[jPart][0]*(fR[jPart][1]-fR[iPart][1])*(fR[jPart][1]-fR[iPart][1])
-                          +fdP[jPart][1]*fdP[jPart][1]*(fR[jPart][0]-fR[jPart][0])*(fR[jPart][0]-fR[jPart][0])
-			  +fP[jPart][0]*fP[jPart][0]*(fdR[jPart][1]*fdR[jPart][1]+fdR[iPart][1]*fdR[iPart][1])
-			  +fP[jPart][1]*fP[jPart][1]*(fdR[jPart][0]*fdR[jPart][0]+fdR[iPart][0]*fdR[iPart][0]));
-    fvec d_txy12 = sqrt(fdP[jPart][1]*fdP[jPart][1]*fP[iPart][0]*fP[iPart][0]
-                          +fP[jPart][1]*fP[jPart][1]*fdP[iPart][0]*fdP[iPart][0]
-			  +fdP[jPart][0]*fdP[jPart][0]*fP[iPart][1]*fP[iPart][1]
-			  +fP[jPart][0]*fP[jPart][0]*fdP[iPart][1]*fdP[iPart][1]);
-    tij[0][0]    = txy11/txy12;
-    d_tij[0][0]  = sqrt(d_txy11*d_txy11/(txy12*txy12) + tij[0][0]*tij[0][0]*d_txy12*d_txy12/(txy12*txy12));
-
-    fvec txy21   = fP[iPart][0]*(fR[jPart][1]-fR[iPart][1]) + fP[iPart][1]*(fR[jPart][0]-fR[jPart][0]);
-    fvec txy22   = (fP[jPart][1]*fP[iPart][0] - fP[jPart][0]*fP[iPart][1]);
-    fvec d_txy21 = sqrt(fdP[iPart][0]*fdP[iPart][0]*(fR[jPart][1]-fR[iPart][1])*(fR[jPart][1]-fR[iPart][1])
-                          +fdP[iPart][1]*fdP[iPart][1]*(fR[jPart][0]-fR[jPart][0])*(fR[jPart][0]-fR[jPart][0])
-			  +fP[iPart][0]*fP[iPart][0]*(fdR[jPart][1]*fdR[jPart][1]+fdR[iPart][1]*fdR[iPart][1])
-			  +fP[iPart][1]*fP[iPart][1]*(fdR[jPart][0]*fdR[jPart][0]+fdR[iPart][0]*fdR[iPart][0]));
-    fvec d_txy22 = sqrt(fdP[jPart][1]*fdP[jPart][1]*fP[iPart][0]*fP[iPart][0]
-                          +fP[jPart][1]*fP[jPart][1]*fdP[iPart][0]*fdP[iPart][0]
-			  +fdP[jPart][0]*fdP[jPart][0]*fP[iPart][1]*fP[iPart][1]
-			  +fP[jPart][0]*fP[jPart][0]*fdP[iPart][1]*fdP[iPart][1]);
-    tij[1][0]    = txy21/txy22;
-    d_tij[1][0]  = sqrt(d_txy21*d_txy21/(txy22*txy22) + tij[1][0]*tij[1][0]*d_txy22*d_txy22/(txy22*txy22));
-    
-    
-    fvec txz11   = fP[jPart][0]*(fR[jPart][2]-fR[iPart][2]) + fP[jPart][2]*(fR[jPart][0]-fR[jPart][0]);
-    fvec txz12   = (fP[jPart][2]*fP[iPart][0] - fP[jPart][0]*fP[iPart][2]);
-    fvec d_txz11 = sqrt(fdP[jPart][0]*fdP[jPart][0]*(fR[jPart][2]-fR[iPart][2])*(fR[jPart][2]-fR[iPart][2])
-                          +fdP[jPart][2]*fdP[jPart][2]*(fR[jPart][0]-fR[jPart][0])*(fR[jPart][0]-fR[jPart][0])
-			  +fP[jPart][0]*fP[jPart][0]*(fdR[jPart][2]*fdR[jPart][2]+fdR[iPart][2]*fdR[iPart][2])
-			  +fP[jPart][2]*fP[jPart][2]*(fdR[jPart][0]*fdR[jPart][0]+fdR[iPart][0]*fdR[iPart][0]));
-    fvec d_txz12 = sqrt(fdP[jPart][2]*fdP[jPart][2]*fP[iPart][0]*fP[iPart][0]
-                          +fP[jPart][2]*fP[jPart][2]*fdP[iPart][0]*fdP[iPart][0]
-			  +fdP[jPart][0]*fdP[jPart][0]*fP[iPart][2]*fP[iPart][2]
-			  +fP[jPart][0]*fP[jPart][0]*fdP[iPart][2]*fdP[iPart][2]);
-    tij[0][1]  = txz11/txz12;
-    d_tij[0][1] = sqrt(d_txz11*d_txz11/(txz12*txz12) + tij[0][1]*tij[0][1]*d_txz12*d_txz12/(txz12*txz12));
-
-    fvec txz21   = fP[iPart][0]*(fR[jPart][2]-fR[iPart][2]) + fP[iPart][2]*(fR[jPart][0]-fR[jPart][0]);
-    fvec txz22   = (fP[jPart][2]*fP[iPart][0] - fP[jPart][0]*fP[iPart][2]);
-    fvec d_txz21 = sqrt(fdP[iPart][0]*fdP[iPart][0]*(fR[jPart][2]-fR[iPart][2])*(fR[jPart][2]-fR[iPart][2])
-                          +fdP[iPart][2]*fdP[iPart][2]*(fR[jPart][0]-fR[jPart][0])*(fR[jPart][0]-fR[jPart][0])
-			  +fP[iPart][0]*fP[iPart][0]*(fdR[jPart][2]*fdR[jPart][2]+fdR[iPart][2]*fdR[iPart][2])
-			  +fP[iPart][2]*fP[iPart][2]*(fdR[jPart][0]*fdR[jPart][0]+fdR[iPart][0]*fdR[iPart][0]));
-    fvec d_txz22 = sqrt(fdP[jPart][2]*fdP[jPart][2]*fP[iPart][0]*fP[iPart][0]
-                          +fP[jPart][2]*fP[jPart][2]*fdP[iPart][0]*fdP[iPart][0]
-			  +fdP[jPart][0]*fdP[jPart][0]*fP[iPart][2]*fP[iPart][2]
-			  +fP[jPart][0]*fP[jPart][0]*fdP[iPart][2]*fdP[iPart][2]);
-    tij[1][1]    = txz21/txz22;
-    d_tij[1][1]  = sqrt(d_txz21*d_txz21/(txz22*txz22) + tij[1][1]*tij[1][1]*d_txz22*d_txz22/(txz22*txz22));
-    
-    fvec tzy11   = fP[jPart][2]*(fR[jPart][1]-fR[iPart][1]) - fP[jPart][1]*(fR[jPart][2]-fR[jPart][2]);
-    fvec tzy12   = (fP[jPart][1]*fP[iPart][2] - fP[jPart][2]*fP[iPart][1]);
-    fvec d_tzy11 = sqrt(fdP[jPart][2]*fdP[jPart][2]*(fR[jPart][1]-fR[iPart][1])*(fR[jPart][1]-fR[iPart][1])
-                          +fdP[jPart][1]*fdP[jPart][1]*(fR[jPart][2]-fR[jPart][2])*(fR[jPart][2]-fR[jPart][2])
-			  +fP[jPart][2]*fP[jPart][2]*(fdR[jPart][1]*fdR[jPart][1]+fdR[iPart][1]*fdR[iPart][1])
-			  +fP[jPart][1]*fP[jPart][1]*(fdR[jPart][2]*fdR[jPart][2]+fdR[iPart][2]*fdR[iPart][2]));
-    fvec d_tzy12 = sqrt(fdP[jPart][1]*fdP[jPart][1]*fP[iPart][2]*fP[iPart][2]
-                          +fP[jPart][1]*fP[jPart][1]*fdP[iPart][2]*fdP[iPart][2]
-			  +fdP[jPart][2]*fdP[jPart][2]*fP[iPart][1]*fP[iPart][1]
-			  +fP[jPart][2]*fP[jPart][2]*fdP[iPart][1]*fdP[iPart][1]);
-    tij[0][2]    = tzy11/tzy12;
-    d_tij[0][2]  = sqrt(d_tzy11*d_tzy11/(tzy12*tzy12) + tij[0][2]*tij[0][2]*d_tzy12*d_tzy12/(tzy12*tzy12));
-
-    fvec tzy21   = fP[iPart][2]*(fR[jPart][1]-fR[iPart][1]) - fP[iPart][1]*(fR[jPart][2]-fR[jPart][2]);
-    fvec tzy22   = (fP[jPart][1]*fP[iPart][2] - fP[jPart][2]*fP[iPart][1]);
-    fvec d_tzy21 = sqrt(fdP[iPart][2]*fdP[iPart][2]*(fR[jPart][1]-fR[iPart][1])*(fR[jPart][1]-fR[iPart][1])
-                          +fdP[iPart][1]*fdP[iPart][1]*(fR[jPart][2]-fR[jPart][2])*(fR[jPart][2]-fR[jPart][2])
-			  +fP[iPart][2]*fP[iPart][2]*(fdR[jPart][1]*fdR[jPart][1]+fdR[iPart][1]*fdR[iPart][1])
-			  +fP[iPart][1]*fP[iPart][1]*(fdR[jPart][2]*fdR[jPart][2]+fdR[iPart][2]*fdR[iPart][2]));
-    fvec d_tzy22 = sqrt(fdP[jPart][1]*fdP[jPart][1]*fP[iPart][2]*fP[iPart][2]
-                          +fP[jPart][1]*fP[jPart][1]*fdP[iPart][2]*fdP[iPart][2]
-			  +fdP[jPart][2]*fdP[jPart][2]*fP[iPart][1]*fP[iPart][1]
-			  +fP[jPart][2]*fP[jPart][2]*fdP[iPart][1]*fdP[iPart][1]);
-    tij[1][2]    = tzy21/tzy22;
-    d_tij[1][2]  = sqrt(d_tzy21*d_tzy21/(tzy22*tzy22) + tij[1][2]*tij[1][2]*d_tzy22*d_tzy22/(tzy22*tzy22));
-
-    fvec a = fP[iPart][0]*fP[iPart][0] + fP[iPart][1]*fP[iPart][1] + fP[iPart][2]*fP[iPart][2];
-    fvec b = fP[iPart][0]*fP[iPart][0] + fP[iPart][1]*fP[iPart][1] + fP[iPart][2]*fP[iPart][2];
-
-    nCross++;
-  }
-
-  for(Int_t iPart = 0; iPart < Nvect; iPart++)
-  {
-    for(Int_t iCross = 0; iCross < nCross; iCross++)
-    {
-      weight_t_temp = 1./(d_T[iPart][iCross]*d_T[iPart][iCross]);
-      t[iPart]   += T[iPart][iCross]*weight_t_temp;
-      d_t[iPart] += d_T[iPart][iCross]*weight_t_temp*d_T[iPart][iCross]*weight_t_temp;
-      weight_t += weight_t_temp;
-    }
-    t[iPart] /= weight_t;
-    d_t[iPart] = sqrt(d_t[iPart])/weight_t;
-
-    cout << Form("t[%i] = ",iPart) << t[iPart] << " +- " << d_t[iPart] << endl;
-  }
-
-  for(Int_t iPart = 0; iPart < Nvect; iPart++)
-  {
-    fvec P2 = fP[iPart][0]*fP[iPart][0] + fP[iPart][1]*fP[iPart][1] + fP[iPart][2]*fP[iPart][2];
-    
-    fvec fX   = fR[iPart][0] - fP[iPart][2]/qb[iPart]*(cos(qb[iPart]*t[iPart]) - 1) + fP[iPart][0]/qb[iPart]*sin(qb[iPart]*t[iPart]);
-//    fvec fX   = fR[iPart][0] + fP[iPart][0]*t;
-    fvec d_fX = sqrt(fdR[iPart][0]*fdR[iPart][0]
-                         +fdP[iPart][2]*fdP[iPart][2]/qb[iPart]*(cos(qb[iPart]*t[iPart]) - 1)/qb[iPart]*(cos(qb[iPart]*t[iPart]) - 1)
-                         +fdP[iPart][0]*fdP[iPart][0]/qb[iPart]*sin(qb[iPart]*t[iPart])/qb[iPart]*sin(qb[iPart]*t[iPart])
-                         +d_t[iPart]*d_t[iPart]*(fP[iPart][0]*cos(qb[iPart]*t[iPart])+fP[iPart][2]*sin(qb[iPart]*t[iPart]))
-                                               *(fP[iPart][0]*cos(qb[iPart]*t[iPart])+fP[iPart][2]*sin(qb[iPart]*t[iPart])));
-
-    fvec fZ   = fR[iPart][2] - fP[iPart][0]/qb[iPart]*(cos(qb[iPart]*t[iPart]) - 1) - fP[iPart][2]/qb[iPart]*sin(qb[iPart]*t[iPart]);
-//    fvec fZ   = fR[iPart][2] - fP[iPart][2]*t;
-    fvec d_fZ = sqrt(fdR[iPart][2]*fdR[iPart][2]
-                         +fdP[iPart][0]*fdP[iPart][0]/qb[iPart]*(cos(qb[iPart]*t[iPart]) - 1)/qb[iPart]*(cos(qb[iPart]*t[iPart]) - 1)
-                         +fdP[iPart][2]*fdP[iPart][2]/qb[iPart]*sin(qb[iPart]*t[iPart])/qb[iPart]*sin(qb[iPart]*t[iPart])
-                         +d_t[iPart]*d_t[iPart]*(fP[iPart][2]*cos(qb[iPart]*t[iPart])-fP[iPart][0]*sin(qb[iPart]*t[iPart]))
-                                               *(fP[iPart][2]*cos(qb[iPart]*t[iPart])-fP[iPart][0]*sin(qb[iPart]*t[iPart])));
-
-    fvec fY   = fR[iPart][1] - fP[iPart][1]*t[iPart];
-    fvec d_fY = sqrt(fdR[iPart][1]*fdR[iPart][1] + fdP[iPart][1]*fdP[iPart][1]*t[iPart]*t[iPart] + fP[iPart][1]*fP[iPart][1]*d_t[iPart]*d_t[iPart]);
-    
-///cout << "x0  " << fR[iPart][0]<< "  y0  " << fR[iPart][1]<< "  z0  " << fR[iPart][2]<<endl;
-///cout << "fX  " << fX << "  fY  " << fY << "  fZ  "<<fZ << endl;
-
-    vert_x += fX*fabs(fX/d_fX);
-    vert_y += fY*fabs(fY/d_fY);
-    vert_z += fZ*fabs(fZ/d_fZ);
-
-    weight_x += fabs(fX/d_fX);
-    weight_y += fabs(fY/d_fY);
-    weight_z += fabs(fZ/d_fZ);
-  }
- //       cout << "X1  "<<fX1 << "  Y1  " << fY1 << "  Z1  " << fZ1<<endl;
- //     cout << "X10 "<<x0[iPart] << "  Y10 " << y0[iPart] << "  Z10 " << z0[iPart]<<endl;
- //     cout << "p1y/qb[iPart] "<< fP[iPart][1]/qb[iPart] << "  p1x/qb[iPart] "<< fP[iPart][0]/qb[iPart] <<endl;
- //     cout << "det3  " << det3 << endl;
-//      cout << "dX  "<<fX1-x01 << "  dY  " << fY1-y01 << "  dZ  " << fZ1-z01<<endl;
-  vert_x /= weight_x;
-  vert_y /= weight_y;
-  vert_z /= weight_z;
-
-  XX = vert_x;
-  YY = vert_y;
-  ZZ = vert_z;
-*/
-//  cout << "  vx  "<<vert_x<<"  vy  "<<vert_y<<"  vz  "<<vert_z<<endl;
 }
 
 #undef cnst

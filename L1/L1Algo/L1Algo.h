@@ -117,6 +117,9 @@ class L1Algo{
   double CATime; // time of trackfinding
 
   friend class CbmL1;
+
+  L1FieldValue GetvtxFieldValue() {return vtxFieldValue;}
+
  private:
 
         /// =================================  FUNCTIONAL PART  =================================

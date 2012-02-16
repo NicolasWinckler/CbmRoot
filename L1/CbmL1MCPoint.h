@@ -30,6 +30,8 @@ iStation(0),hitIds()
   {}
   
   double x, y, z, px, py, pz;
+  double xIn,  yIn,  zIn,  pxIn,  pyIn,  pzIn;
+  double xOut, yOut, zOut, pxOut, pyOut, pzOut;
   double p, q, mass;
   int pdg, ID, mother_ID;
   int iStation;

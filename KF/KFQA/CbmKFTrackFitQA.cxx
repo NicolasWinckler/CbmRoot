@@ -25,6 +25,7 @@
 #include "FairMCPoint.h"
 
 #include "TFile.h"
+#include "TDirectory.h"
 #include "TTree.h"
 #include "TBranch.h"
 
@@ -49,7 +50,7 @@ CbmKFTrackFitQA::CbmKFTrackFitQA():
 
 
 // Names of files
-  outfileName(),
+  outfileName("outCbmTrackError.root"),
 
   vStsHitMatch(),
 
@@ -95,6 +96,9 @@ CbmKFTrackFitQA::CbmKFTrackFitQA():
 
   Nback(0)
 {
+  TDirectory *currentDir = gDirectory;
+  gDirectory->cd(outfileName.Data());
+
   ggg = new TH1F("ggg", "ggg", 6, -0.5, 5.5);
   q_QA = new TProfile("q_QA", "q quality", 100, 0.0, 1.0, 0.0, 100.0);
   q_QA -> GetXaxis() -> SetTitle ("p, GeV/c");
@@ -136,9 +140,9 @@ CbmKFTrackFitQA::CbmKFTrackFitQA():
   pull_AtPV_ty  = new TH1F("pull_AtPV_ty", "pull_AtPV_ty", 100, -5., 5.);
   pull_AtPV_qp  = new TH1F("pull_AtPV_qp", "pull_AtPV_qp", 100, -5., 5.);
 
-  res_AtFP_x  = new TH1F("residual_AtFP_x", "residual_AtFP_x", 200, -100., 100.);
+  res_AtFP_x  = new TH1F("residual_AtFP_x", "residual_AtFP_x", 200, -50., 50.);
   res_AtFP_x  -> GetXaxis() -> SetTitle ("dX, cm");
-  res_AtFP_y  = new TH1F("residual_AtFP_y", "residual_AtFP_y", 200, -100., 100.);
+  res_AtFP_y  = new TH1F("residual_AtFP_y", "residual_AtFP_y", 200, -400., 400.);
   res_AtFP_y  -> GetXaxis() -> SetTitle ("dY, cm");
   res_AtFP_tx = new TH1F("residual_AtFP_tx", "residual_AtFP_tx", 200, -0.004, 0.004);
   res_AtFP_tx -> GetXaxis() -> SetTitle ("dtx, GeV/c");
@@ -152,6 +156,8 @@ CbmKFTrackFitQA::CbmKFTrackFitQA():
   pull_AtFP_tx  = new TH1F("pull_AtFP_tx", "pull_AtFP_tx", 100, -5., 5.);
   pull_AtFP_ty  = new TH1F("pull_AtFP_ty", "pull_AtFP_ty", 100, -5., 5.);
   pull_AtFP_qp  = new TH1F("pull_AtFP_qp", "pull_AtFP_qp", 100, -5., 5.);
+
+  gDirectory = currentDir;
 }
 
 CbmKFTrackFitQA::~CbmKFTrackFitQA()
@@ -165,13 +171,6 @@ CbmKFTrackFitQA::~CbmKFTrackFitQA()
   if(res_MVDhit_y) delete res_MVDhit_y;
   if(pull_MVDhit_x) delete pull_MVDhit_x;
   if(pull_MVDhit_y) delete pull_MVDhit_y;
-
-  res_MVDhit_x  = new TH1F("residual_MVDhit_x", "residual_MVDhit_x", 200, -100., 100.);
-  res_MVDhit_x  -> GetXaxis() -> SetTitle ("dX, um");
-  res_MVDhit_y  = new TH1F("residual_MVDhit_y", "residual_MVDhit_y", 200, -100., 100.);
-  res_MVDhit_y  -> GetXaxis() -> SetTitle ("dY, um");
-  pull_MVDhit_x   = new TH1F("pull_MVDhit_x", "pull_MVDhit_x", 100, -15., 15.);
-  pull_MVDhit_y   = new TH1F("pull_MVDhit_y", "pull_MVDhit_y", 100, -15., 15.);
 
   if(res_AtPV_x)  delete res_AtPV_x;
   if(res_AtPV_y)  delete res_AtPV_y;
@@ -420,8 +419,8 @@ void CbmKFTrackFitQA::FillHistoAtFirstPoint(CbmKFTrErrMCPoints *mc_points, CbmMC
 void CbmKFTrackFitQA::Write()
 {
   //This function writes obtained histograms to the root file
-  if (outfileName.IsNull()) outfileName = "outCbmTrackError.root";
-
+  TDirectory *curr = gDirectory;
+  TFile *currentFile = gFile;
   TFile* fout = new TFile(outfileName.Data(),"Recreate");
 
   //differences of the KF track and MC track parameters
@@ -465,6 +464,9 @@ void CbmKFTrackFitQA::Write()
   dp_p->Write();
 
   fout -> Close();
+  fout -> Delete();
+  gFile = currentFile;
+  gDirectory = curr;
 }
 
 void CbmKFTrackFitQA::Save()

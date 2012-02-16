@@ -91,6 +91,13 @@ class L1FieldRegion{
       z0(0)
     {}
 
+    L1FieldRegion(float reg[10]):
+      cx0(reg[0]), cx1(reg[1]), cx2(reg[2]),
+      cy0(reg[3]), cy1(reg[4]), cy2(reg[5]),
+      cz0(reg[6]), cz1(reg[7]), cz2(reg[8]),
+      z0(reg[9])
+    {}
+
     fvec cx0, cx1, cx2 ; // Bx(z) = cx0 + cx1*(z-z0) + cx2*(z-z0)^2
     fvec cy0, cy1, cy2 ; // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2
     fvec cz0, cz1, cz2 ; // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2
@@ -110,7 +117,7 @@ class L1FieldRegion{
               const L1FieldValue &B1, const fvec B1z,
               const L1FieldValue &B2, const fvec B2z )
     {
-      z0 = B0z[0];
+      z0 = B0z;
       fvec dz1 = B1z-B0z, dz2 = B2z-B0z;
       fvec det = rcp(fvec(dz1*dz2*(dz2-dz1)));
       fvec w21 = -dz2*det;
@@ -178,6 +185,34 @@ class L1FieldRegion{
       cz1[i0] = f1.cz1[i1];
       cz2[i0] = f1.cz2[i1];
       z0[i0] = f1.z0[i1];
+    }
+
+    void SetOneEntry( const L1FieldRegion &f1, const int i1 )
+    {
+      cx0 = f1.cx0[i1];
+      cx1 = f1.cx1[i1];
+      cx2 = f1.cx2[i1];
+      cy0 = f1.cy0[i1];
+      cy1 = f1.cy1[i1];
+      cy2 = f1.cy2[i1];
+      cz0 = f1.cz0[i1];
+      cz1 = f1.cz1[i1];
+      cz2 = f1.cz2[i1];
+      z0 = f1.z0[i1];
+    }
+
+    void GetOneEntry(float reg[10], const int iVec)
+    {
+      reg[0] = cx0[iVec];
+      reg[1] = cx1[iVec];
+      reg[2] = cx2[iVec];
+      reg[3] = cy0[iVec];
+      reg[4] = cy1[iVec];
+      reg[5] = cy2[iVec];
+      reg[6] = cz0[iVec];
+      reg[7] = cz1[iVec];
+      reg[8] = cz2[iVec];
+      reg[9] = z0[iVec];
     }
 }  _fvecalignment;
 

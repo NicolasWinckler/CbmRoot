@@ -12,14 +12,10 @@
 
 #include "CbmKFTrackInterface.h"
 #include "CbmKFVertexInterface.h"
-//#include "CbmKFParticle.h"
 class CbmKFParticle;
 
-//#include "../L1/L1Algo/vectors/PSEUDO_F32vec1.h"
-//#include "../L1/L1Algo/vectors/PSEUDO_F32vec4.h"
-#include "../L1/CbmL1Def.h"
-
-//#include "SimdTest.h"
+#include "CbmL1Def.h"
+#include "L1Field.h"
 
 #include <vector>
 
@@ -46,15 +42,15 @@ class CbmKFParticle_simd {
  public:
 
   CbmKFParticle_simd();
-  CbmKFParticle_simd( CbmKFTrackInterface *Track[]);
-  CbmKFParticle_simd( CbmKFTrackInterface &Track);
+  CbmKFParticle_simd( CbmKFTrackInterface *Track[], Int_t *qHypo=0, const Int_t *pdg=0);
+  CbmKFParticle_simd( CbmKFTrackInterface &Track, Int_t *qHypo=0, const Int_t *pdg=0);
   CbmKFParticle_simd( CbmKFParticle *part[] );
   CbmKFParticle_simd( CbmKFParticle &part );
   
   ~CbmKFParticle_simd(){};
 
   // Construction
-  void Create(CbmKFTrackInterface* Track[],int Ntracks = fvecLen);
+  void Create(CbmKFTrackInterface* Track[],int Ntracks = fvecLen, Int_t *qHypo=0, const Int_t *pdg=0);
   void Create(CbmKFParticle *part[],int N = fvecLen);
   
   // Accessors ?
@@ -118,10 +114,9 @@ class CbmKFParticle_simd {
   void SetVtxGuess(fvec &x, fvec &y, fvec &z);
   void SetVtxErrGuess(fvec &d_x, fvec &d_y, fvec &d_z);
 
-  void DecayVtxAprox(vector<CbmKFParticle_simd*> vPart, fvec &XX, fvec &YY, fvec &ZZ);
-
   void SetField();
   void SetField(CbmKFTrackInterface** Track);
+  void SetField(const L1FieldRegion &field, bool isOneEntry=0, const int iVec=0);
 
   void SetPDG ( fvec pdg ) { fPDG = pdg; }
   const fvec& GetPDG () const { return fPDG; }
@@ -142,7 +137,7 @@ class CbmKFParticle_simd {
   bool fIsVtxGuess;
   bool fIsVtxErrGuess;
 
-  fvec aB[3],bB[3],cB[3];
+  L1FieldRegion fField;
 
 } _fvecalignment;
 #endif /* !CBMKFPARTICLE_H */

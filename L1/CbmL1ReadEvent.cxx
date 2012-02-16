@@ -629,6 +629,18 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
   MC->px = P.X();
   MC->py = P.Y();
   MC->pz = P.Z();
+  MC->xIn  = xyzI.X();
+  MC->yIn  = xyzI.Y();
+  MC->zIn  = xyzI.Z();
+  MC->pxIn = PI.X();
+  MC->pyIn = PI.Y();
+  MC->pzIn = PI.Z();
+  MC->xOut  = xyzO.X();
+  MC->yOut  = xyzO.Y();
+  MC->zOut  = xyzO.Z();
+  MC->pxOut = PO.X();
+  MC->pyOut = PO.Y();
+  MC->pzOut = PO.Z();
   MC->p = sqrt( fabs( MC->px*MC->px + MC->py*MC->py + MC->pz*MC->pz ) );
   MC->ID = mcID;
 

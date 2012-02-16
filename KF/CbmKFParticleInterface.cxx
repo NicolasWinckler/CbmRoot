@@ -2,7 +2,6 @@
 
 #define cnst static const fvec
 
-
 CbmKFParticleInterface::CbmKFParticleInterface():KFPart(0){
   //KFPart = (CbmKFParticle_simd*) _mm_malloc(sizeof(CbmKFParticle_simd), 16);
   KFPart = new CbmKFParticle_simd();
@@ -17,7 +16,7 @@ CbmKFParticleInterface::CbmKFParticleInterface(CbmKFTrackInterface* Track[]):KFP
 CbmKFParticleInterface::~CbmKFParticleInterface()
 {
   //_mm_free(KFPart);
-  delete KFPart;
+  if(KFPart) delete KFPart;
 }
 
 void CbmKFParticleInterface::Construct(CbmKFTrackInterface* vDaughters[][fvecLen],int NDaughters,CbmKFVertexInterface *Parent[],float Mass,float CutChi2)
@@ -58,17 +57,18 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
     r0[1] = 0.;
     r0[2] = (Ty[0]*Z[0]-Ty[1]*Z[1] + Y[1] -Y[0])/(Ty[0]-Ty[1]);
 
-    Extrapolate( &vDaughters[0], vDaughters[0].r , GetDStoPoint(&vDaughters[0], r0) );
+    CbmKFParticle_simd Daughter0 = vDaughters[0];
+    Extrapolate( &Daughter0, Daughter0.r , GetDStoPoint(&Daughter0, r0) );
 
-    KFPart->fVtxGuess[0] = vDaughters[0].GetX();
-    KFPart->fVtxGuess[1] = vDaughters[0].GetY();
-    KFPart->fVtxGuess[2] = vDaughters[0].GetZ();
+    KFPart->fVtxGuess[0] = Daughter0.GetX();
+    KFPart->fVtxGuess[1] = Daughter0.GetY();
+    KFPart->fVtxGuess[2] = Daughter0.GetZ();
 
     if(!(KFPart->fIsVtxErrGuess))
     {
-      KFPart->fVtxErrGuess[0] = 10.*sqrt(vDaughters[0].C[0] );
-      KFPart->fVtxErrGuess[1] = 10.*sqrt(vDaughters[0].C[2] );
-      KFPart->fVtxErrGuess[2] = 10.*sqrt(vDaughters[0].C[5] );
+      KFPart->fVtxErrGuess[0] = 10.*sqrt(Daughter0.C[0] );
+      KFPart->fVtxErrGuess[1] = 10.*sqrt(Daughter0.C[2] );
+      KFPart->fVtxErrGuess[2] = 10.*sqrt(Daughter0.C[5] );
     }
  //   KFPart->fVtxErrGuess[0] = 0.01*KFPart->fVtxGuess[0];
  //   KFPart->fVtxErrGuess[1] = 0.01*KFPart->fVtxGuess[1];
@@ -126,19 +126,10 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 
     KFPart->C[35] = ONE;
 
-    fvec B[3];
-    {
-      double B1[3], r01[8];
-      for(int j = 0; j<fvecLen; j++)
-      {
-        for(int i = 0; i<8; i++)
-          r01[i] = r0[i][j];
-        FairField *MF = CbmKF::Instance()->GetMagneticField();
-        MF->GetFieldValue( r01, B1 );
-        const float c_light =  0.000299792458;
-        for(int i = 0; i<3; i++) B[i][j] = B1[i]*c_light;
-      }
-    }
+    L1FieldValue B = vDaughters[0].fField.Get(r0[2]);
+    B.x *= 0.000299792458; //multiply by c
+    B.y *= 0.000299792458;
+    B.z *= 0.000299792458;
 
     KFPart->NDF  =  -3.;
     KFPart->Chi2 =  ZERO;
@@ -161,9 +152,9 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 	h[0] = m[3]*SigmaS;
 	h[1] = m[4]*SigmaS;
 	h[2] = m[5]*SigmaS; 
-	h[3] = ( h[1]*B[2]-h[2]*B[1] )*Daughter.Q;
-	h[4] = ( h[2]*B[0]-h[0]*B[2] )*Daughter.Q;
-	h[5] = ( h[0]*B[1]-h[1]*B[0] )*Daughter.Q;
+	h[3] = ( h[1]*B.z-h[2]*B.y )*Daughter.Q;
+	h[4] = ( h[2]*B.x-h[0]*B.z )*Daughter.Q;
+	h[5] = ( h[0]*B.y-h[1]*B.x )*Daughter.Q;
 
 	//* Fit of daughter momentum (x,y,z) to r0[0,1,2] vertex
 	{
@@ -206,8 +197,10 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 	
 	  fvec s = ( Vv[0]*S[0] + Vv[1]*S[1] + Vv[3]*S[3] );
 
-          for(int j = 0; j<fvecLen; j++)
-	    s[j] = ( s[j] > 1.E-20 )  ?1./s[j] :0;
+          fvec init = fvec(s > 1.E-20);
+          s = rcp(s) & init;
+//          for(int j = 0; j<fvecLen; j++)
+//	    s[j] = ( s[j] > 1.E-20 )  ?1./s[j] :0;
 
 	  S[0]*=s; S[1]*=s; S[2]*=s; S[3]*=s; S[4]*=s; S[5]*=s;
 
@@ -222,9 +215,9 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 	  h[0] = x*SigmaS;
 	  h[1] = y*SigmaS;
 	  h[2] = z*SigmaS; 
-	  h[3] = ( h[1]*B[2]-h[2]*B[1] )*Daughter.Q;
-	  h[4] = ( h[2]*B[0]-h[0]*B[2] )*Daughter.Q;
-	  h[5] = ( h[0]*B[1]-h[1]*B[0] )*Daughter.Q;
+	  h[3] = ( h[1]*B.z-h[2]*B.y )*Daughter.Q;
+	  h[4] = ( h[2]*B.x-h[0]*B.z )*Daughter.Q;
+	  h[5] = ( h[0]*B.y-h[1]*B.x )*Daughter.Q;
 	}
 	
 	fvec V[28];
@@ -282,8 +275,11 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 	  S[5] = Si[0]*Si[2] - Si[1]*Si[1];	 
 	
 	  fvec s = ( Si[0]*S[0] + Si[1]*S[1] + Si[3]*S[3] );
-          for(int j=0; j<fvecLen; j++)
-	    s[j] = ( s[j] > 1.E-20 )  ?1./s[j] :0;	  
+
+          fvec init = fvec(s > 1.E-20);
+          s = rcp(s) & init;
+//          for(int j=0; j<fvecLen; j++)
+//	    s[j] = ( s[j] > 1.E-20 )  ?1./s[j] :0;	  
 
 	  S[0]*=s;
 	  S[1]*=s;
@@ -381,10 +377,29 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
       MeasureMass( KFPart, r0, vMass );
     }
     if( Parent ) MeasureProductionVertex( KFPart, r0, Parent );
-    
   }// iterations
 
-   KFPart->AtProductionVertex = 0;
+  // calculate a field region for the constructed particle
+  L1FieldValue field[3];
+  fvec zField[3] = {0, KFPart->r[2]/2, KFPart->r[2]};
+
+  for(int iPoint=0; iPoint<3; iPoint++)
+  {
+    for(int iD=0; iD<NDaughters; ++iD)
+    {
+      L1FieldValue b = vDaughters[iD].fField.Get(zField[iPoint]);
+      field[iPoint].x += b.x;
+      field[iPoint].y += b.y;
+      field[iPoint].z += b.z;
+    }
+    field[iPoint].x /= NDaughters;
+    field[iPoint].y /= NDaughters;
+    field[iPoint].z /= NDaughters;
+  }
+
+  KFPart->fField.Set( field[2], zField[2], field[1], zField[1], field[0], zField[0] );
+
+  KFPart->AtProductionVertex = 0;
 }
 
 void CbmKFParticleInterface::MeasureMass(CbmKFParticle_simd*  Particle,  fvec r0[], fvec Mass )
@@ -392,7 +407,7 @@ void CbmKFParticleInterface::MeasureMass(CbmKFParticle_simd*  Particle,  fvec r0
   fvec *r    = Particle->GetParameters();
   fvec *C    = Particle->GetCovMatrix();
 
-  fvec H[8];
+  fvec H[8] = {0};
   H[0] = H[1] = H[2] = 0.;
   H[3] = -2*r0[3]; 
   H[4] = -2*r0[4]; 
@@ -412,17 +427,15 @@ void CbmKFParticleInterface::MeasureMass(CbmKFParticle_simd*  Particle,  fvec r0
     S += H[i]*CHt[i];
   }
     
-  for (int gg=0; gg<fvecLen; gg++)
-  {
-    if( S[gg]<1.e-20 ) continue;
-    S[gg] = 1./S[gg];
-    Particle->Chi2[gg] += zeta[gg]*zeta[gg]*S[gg];
-    Particle->NDF[gg]  += 1.;
-    for( Int_t i=0, ii=0; i<8; ++i ){
-      float Ki = CHt[i][gg]*S[gg];
-      r[i][gg] += Ki*zeta[gg];
-      for(Int_t j=0;j<=i;++j) C[ii++] -= Ki*CHt[j];    
-    }
+  fvec init = fvec(S > 1.E-20);
+  S = rcp(S) & init;
+
+  Particle->Chi2 += zeta*zeta*S;
+  Particle->NDF  += (fvec(1.) & init);
+  for( Int_t i=0, ii=0; i<8; ++i ){
+    fvec Ki = CHt[i]*S;
+    r[i] += Ki*zeta;
+    for(Int_t j=0;j<=i;++j) C[ii++] -= Ki*CHt[j];
   }
 }
 
@@ -583,19 +596,10 @@ void CbmKFParticleInterface::Convert( CbmKFParticle_simd*  Particle, fvec r0[], 
 {
   fvec *C = Particle->GetCovMatrix();
 
-    fvec B[3];
-    {
-      double B1[3], r01[8];
-      for(int j = 0; j<fvecLen; j++)
-      {
-        for(int i = 0; i<8; i++)
-          r01[i] = r0[i][j];
-        FairField *MF = CbmKF::Instance()->GetMagneticField();
-        MF->GetFieldValue( r01, B1 );
-        const float c_light =  0.000299792458;
-        for(int i = 0; i<3; i++) B[i][j] = B1[i]*c_light;
-      }
-    }
+  L1FieldValue B = KFPart->fField.Get(r0[2]);
+  B.x *= 0.000299792458; //multiply by c
+  B.y *= 0.000299792458;
+  B.z *= 0.000299792458;
 
   fvec h[6];
   
@@ -603,9 +607,12 @@ void CbmKFParticleInterface::Convert( CbmKFParticle_simd*  Particle, fvec r0[], 
   h[1] = r0[4];
   h[2] = r0[5];
   if( ToProduction ){ h[0]=-h[0]; h[1]=-h[1]; h[2]=-h[2]; } 
-  h[3] = h[1]*B[2]-h[2]*B[1];
-  h[4] = h[2]*B[0]-h[0]*B[2];
-  h[5] = h[0]*B[1]-h[1]*B[0];
+//   h[3] = h[1]*B[2]-h[2]*B[1];
+//   h[4] = h[2]*B[0]-h[0]*B[2];
+//   h[5] = h[0]*B[1]-h[1]*B[0];
+  h[3] = h[1]*B.z-h[2]*B.y;
+  h[4] = h[2]*B.x-h[0]*B.z;
+  h[5] = h[0]*B.y-h[1]*B.x;
   
   fvec c;
 
@@ -716,7 +723,6 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
   fvec *C = Particle->GetCovMatrix();
 
   const float c_light = 0.000299792458;
-  FairField *MF = CbmKF::Instance()->GetMagneticField();
 
   fvec c = Particle->Q*c_light;
 
@@ -731,7 +737,7 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
 
   { // get field integrals
 
-    fvec B[3][3];   
+    L1FieldValue B[3];
     fvec p0[3], p1[3], p2[3];
 
     // line track approximation
@@ -748,90 +754,61 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
     p1[1] = 0.5*(p0[1]+p2[1]);
     p1[2] = 0.5*(p0[2]+p2[2]);
 
+    B[0] = Particle->fField.Get(p0[2]);
+    B[1] = Particle->fField.Get(p1[2]);
+    B[2] = Particle->fField.Get(p2[2]);
+
     // first order track approximation
-    double p01[3], p11[3], p21[3], B1[3][3];
-    for(int gg=0; gg<fvecLen; gg++)
-    {
-      for(int i=0; i<3; i++)
-      {
-        p01[i] = p0[i][gg];
-        p11[i] = p1[i][gg];
-        p21[i] = p2[i][gg];
-      }
 
-      MF->GetFieldValue( p01, B1[0] );
-      MF->GetFieldValue( p11, B1[1] );
-      MF->GetFieldValue( p21, B1[2] );
+    fvec Sy1 = ( 7*B[0].y + 6*B[1].y-B[2].y  )*c*dS*dS/96.;
+    fvec Sy2 = (   B[0].y + 2*B[1].y         )*c*dS*dS/6.;
 
-      for(int i=0; i<3; i++)
-        for(int j=0; j<3; j++)
-          B[i][j][gg] = B1[i][j];
-    }
+    p1[0] -= Sy1*pz;
+    p1[2] += Sy1*px;
+    p2[0] -= Sy2*pz;
+    p2[2] += Sy2*px;
 
-      fvec Sy1 = ( 7*B[0][1] + 6*B[1][1]-B[2][1] )*c*dS*dS/96.;
-      fvec Sy2 = (   B[0][1] + 2*B[1][1]         )*c*dS*dS/6.;
+    B[0] = Particle->fField.Get(p0[2]);
+    B[1] = Particle->fField.Get(p1[2]);
+    B[2] = Particle->fField.Get(p2[2]);
 
-      p1[0] -= Sy1*pz;
-      p1[2] += Sy1*px;
-      p2[0] -= Sy2*pz;
-      p2[2] += Sy2*px;
+    sx = c*( B[0].x + 4*B[1].x + B[2].x )*dS/6.;
+    sy = c*( B[0].y + 4*B[1].y + B[2].y )*dS/6.;
+    sz = c*( B[0].z + 4*B[1].z + B[2].z )*dS/6.;
 
-    for(int gg=0; gg<fvecLen; gg++)
-    {
-      for(int i=0; i<3; i++)
-      {
-        p01[i] = p0[i][gg];
-        p11[i] = p1[i][gg];
-        p21[i] = p2[i][gg];
-      }
-
-      MF->GetFieldValue( p01, B1[0] );
-      MF->GetFieldValue( p11, B1[1] );
-      MF->GetFieldValue( p21, B1[2] );
-
-      for(int i=0; i<3; i++)
-        for(int j=0; j<3; j++)
-          B[i][j][gg] = B1[i][j];
-    }
-    
-    sx = c*( B[0][0] + 4*B[1][0] + B[2][0] )*dS/6.;
-    sy = c*( B[0][1] + 4*B[1][1] + B[2][1] )*dS/6.;
-    sz = c*( B[0][2] + 4*B[1][2] + B[2][2] )*dS/6.;
-
-    Sx = c*( B[0][0] + 2*B[1][0])*dS*dS/6.;
-    Sy = c*( B[0][1] + 2*B[1][1])*dS*dS/6.;
-    Sz = c*( B[0][2] + 2*B[1][2])*dS*dS/6.;
+    Sx = c*( B[0].x + 2*B[1].x)*dS*dS/6.;
+    Sy = c*( B[0].y + 2*B[1].y)*dS*dS/6.;
+    Sz = c*( B[0].z + 2*B[1].z)*dS*dS/6.;
 
     fvec c2[3][3]    =   { {  5, -4, -1},{  44,  80,  -4},{ 11, 44, 5} }; // /=360.    
     fvec C2[3][3]    =   { { 38,  8, -4},{ 148, 208, -20},{  3, 36, 3} }; // /=2520.
     for(Int_t n=0; n<3; n++)
       for(Int_t m=0; m<3; m++) 
 	{
-	  syz += c2[n][m]*B[n][1]*B[m][2];
-	  Syz += C2[n][m]*B[n][1]*B[m][2];
+	  syz += c2[n][m]*B[n].y*B[m].z;
+	  Syz += C2[n][m]*B[n].y*B[m].z;
 	}
  
     syz  *= c*c*dS*dS/360.;
     Syz  *= c*c*dS*dS*dS/2520.;
     
-    syy  = c*( B[0][1] + 4*B[1][1] + B[2][1] )*dS;
+    syy  = c*( B[0].y + 4*B[1].y + B[2].y )*dS;
     syyy = syy*syy*syy / 1296;
     syy  = syy*syy/72;
 
-    Syy = ( B[0][1]*( 38*B[0][1] + 156*B[1][1]  -   B[2][1] )+
-	    B[1][1]*(              208*B[1][1]  +16*B[2][1] )+
-	    B[2][1]*(                             3*B[2][1] )  
+    Syy = ( B[0].y*( 38*B[0].y + 156*B[1].y  -   B[2].y )+
+	    B[1].y*(             208*B[1].y  +16*B[2].y )+
+	    B[2].y*(                           3*B[2].y )
 	    )*dS*dS*dS*c*c/2520.;
     Syyy = 
       (
-       B[0][1]*( B[0][1]*( 85*B[0][1] + 526*B[1][1]  - 7*B[2][1] )+
-		 B[1][1]*(             1376*B[1][1]  +84*B[2][1] )+
-		 B[2][1]*(                            19*B[2][1] )  )+
-       B[1][1]*( B[1][1]*(             1376*B[1][1] +256*B[2][1] )+
-		 B[2][1]*(                            62*B[2][1] )  )+
-       B[2][1]*B[2][1]  *(                             3*B[2][1] )       
-       )*dS*dS*dS*dS*c*c*c/90720.;    
- 
+       B[0].y*( B[0].y*( 85*B[0].y + 526*B[1].y  - 7*B[2].y )+
+                B[1].y*(            1376*B[1].y  +84*B[2].y )+
+                B[2].y*(                          19*B[2].y )  )+
+       B[1].y*( B[1].y*(             1376*B[1].y +256*B[2].y )+
+                B[2].y*(                           62*B[2].y )  )+
+       B[2].y*B[2].y  *(                            3*B[2].y )
+       )*dS*dS*dS*dS*c*c*c/90720.;
   }
 
   fvec J[8][8];
@@ -933,39 +910,34 @@ fvec CbmKFParticleInterface::GetDStoPoint( CbmKFParticle_simd*  Particle, const 
   //if (Q == 0 && r[2] < xyz[2]) return sqrt((dx*dx+dy*dy+dz*dz)/p2);
   //if (Q == 0 && r[2] >= xyz[2]) return -sqrt((dx*dx+dy*dy+dz*dz)/p2);
 
-  fvec B[3];
-  {
-    double B1[3], r01[8];
-    for(int j = 0; j<fvecLen; j++)
-    {
-      for(int i = 0; i<8; i++)
-        r01[i] = r[i][j];
-      FairField *MF = CbmKF::Instance()->GetMagneticField();
-      MF->GetFieldValue( r01, B1 );
-      const float c_light =  0.000299792458;
-      for(int i = 0; i<3; i++) B[i][j] = B1[i]*c_light;
-    }
-  }
-  fvec bq1 = B[0]*Particle->Q;
-  fvec bq2 = B[1]*Particle->Q;
-  fvec bq3 = B[2]*Particle->Q;
+  L1FieldValue B = Particle->fField.Get(r[2]);
+  B.x *= 0.000299792458; //multiply by c
+  B.y *= 0.000299792458;
+  B.z *= 0.000299792458;
+
+  fvec bq1 = B.x*Particle->Q;
+  fvec bq2 = B.y*Particle->Q;
+  fvec bq3 = B.z*Particle->Q;
   fvec a = dx*r[3]+dy*r[4]+dz*r[5];
-  fvec B2 = B[0]*B[0]+B[1]*B[1]+B[2]*B[2];
+  fvec B2 = B.x*B.x+B.y*B.y+B.z*B.z;
   fvec bq = Particle->Q*sqrt(B2);
-  fvec pB = r[3]*B[0]+r[4]*B[1]+r[5]*B[2];
-  fvec rB = dx*B[0]+dy*B[1]+dz*B[2];
-  for(int i=0; i<fvecLen; i++) B2[i] = (fabs(B2[i])<0.0001) ? 0.0001 : B2[i];
+  fvec pB = r[3]*B.x+r[4]*B.y+r[5]*B.z;
+  fvec rB = dx*B.x+dy*B.y+dz*B.z;
+
+  fvec small = 0.0001;
+  fvec init = fvec(B2 > 0.0001);
+  B2 = (init & B2) + (fvec(!init) & small);
   fvec pt2 = p2 - pB*pB/B2;
   a = a - pB*rB/B2;
 
-  fvec dS;
+  fvec dS = atan2(bq*a, pt2 + bq1*(dz*r[4]-dy*r[5]) - bq2*(dz*r[3]-dx*r[5])+bq3*(dy*r[3]-dx*r[4]))/bq;
+  fvec dS2 = a/pt2;
+  fvec smallBq = 1.e-8;
+  fvec initBq = fvec(fabs(bq) > smallBq);
+  dS = (initBq & dS) + (fvec(!initBq) & dS2);
+  fvec initPt2 = fvec(pt2 > small);
+  dS = (initPt2 & dS) + (fvec(!initPt2) & fvec(0));
 
-  for(int j=0; j<fvecLen; j++)
-  {
-    if( pt2[j] < 1.e-4 ) dS[j]=0.;
-    if( TMath::Abs(bq[j]) < 1.e-8 ) dS[j] = a[j]/pt2[j];
-    else dS[j] =  TMath::ATan2( bq[j]*a[j], pt2[j] + bq1[j]*(dz[j]*r[4][j]-dy[j]*r[5][j]) - bq2[j]*(dz[j]*r[3][j]-dx[j]*r[5][j])+bq3[j]*(dy[j]*r[3][j]-dx[j]*r[4][j]))/bq[j];
-  }
   //fvec dSm = rB/pB;
 
 //  cout <<"normalnyj S  " <<  dS << endl;
@@ -973,7 +945,6 @@ fvec CbmKFParticleInterface::GetDStoPoint( CbmKFParticle_simd*  Particle, const 
 //  cout <<"S            " <<  sqrt(dx*dx+dy*dy+dz*dz) << endl;
 
   return dS;
-  //return sqrt(dx*dx+dy*dy+dz*dz);
 }
 
 fvec CbmKFParticleInterface::GetDStoPoint( const fvec xyz[] ) const
@@ -1043,6 +1014,17 @@ void CbmKFParticleInterface::GetKFParticle(CbmKFParticle &Part, int iPart)
   Part.Chi2 = KFPart->GetChi2()[iPart];
   Part.Q    = KFPart->GetQ()[iPart];
   Part.AtProductionVertex = KFPart->AtProductionVertex;
+
+  Part.fieldRegion[0] = KFPart->fField.cx0[iPart];
+  Part.fieldRegion[1] = KFPart->fField.cx1[iPart];
+  Part.fieldRegion[2] = KFPart->fField.cx2[iPart];
+  Part.fieldRegion[3] = KFPart->fField.cy0[iPart];
+  Part.fieldRegion[4] = KFPart->fField.cy1[iPart];
+  Part.fieldRegion[5] = KFPart->fField.cy2[iPart];
+  Part.fieldRegion[6] = KFPart->fField.cz0[iPart];
+  Part.fieldRegion[7] = KFPart->fField.cz1[iPart];
+  Part.fieldRegion[8] = KFPart->fField.cz2[iPart];
+  Part.fieldRegion[9] = KFPart->fField.z0[iPart];
 }
 
 void CbmKFParticleInterface::SetVtxGuess( fvec &x, fvec &y, fvec &z )

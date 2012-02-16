@@ -722,14 +722,30 @@ void CbmL1::PartEffPerformance()
       // cout<<"CA Track Finder: " << L1_CATIME/L1_NEVENTS << " s/ev" << endl << endl;
   }
 }
-  
+#include "CbmKFParticle_simd.h"
+#include "CbmKFParticleInterface.h"
 void CbmL1::PartHistoPerformance()
 {
   static const int NParticles = 2; //Ks, Lambda
-  static TH1F *h_part_mass[NParticles];
-  
+
+  static const int nFitQA = 16;
+  static TH1F *hFitDaughtersQA[NParticles][nFitQA];
+  static TH1F *hFitQA[NParticles][nFitQA];
+
+  static const int nHistoPartParam = 5;
+  static TH1F *hPartParam[NParticles][nHistoPartParam]; // mass, decay length, c*tau, chi/ndf, prob ...
+  static TH1F *hPartParamBG[NParticles][nHistoPartParam];
+  static TH1F *hPartParamSignal[NParticles][nHistoPartParam];
+  static const int nHistoPartParamQA = 3;
+  static TH1F *hPartParamQA[NParticles][nHistoPartParamQA*2]; // residuals and pulls of these parameters
+
+  static const int nHistosPV = 6;
+  static TH1F *hPVFitQa[nHistosPV];
+
+  TString patName[NParticles] = {"K0s","Lambda"};
+
   static bool first_call = 1;
-  
+
   if ( first_call )
   {
     first_call = 0;
@@ -739,18 +755,125 @@ void CbmL1::PartHistoPerformance()
     gDirectory->mkdir("Particles");
     gDirectory->cd("Particles");
     {
+      for(int iPart=0; iPart<NParticles; ++iPart)
+      {
+        gDirectory->mkdir(patName[iPart].Data());
+        gDirectory->cd(patName[iPart].Data());
+        {
+          TString res = "res";
+          TString pull = "pull";
+
+          gDirectory->mkdir("DaughtersQA");
+          gDirectory->cd("DaughtersQA");
+          {
+            TString parName[nFitQA/2] = {"X","Y","Z","Px","Py","Pz","E","M"};
+            int nBins = 100;
+            float xMax[nFitQA/2] = {0.15,0.15,0.03,0.01,0.01,0.06,0.06,0.01};
+
+            for( int iH=0; iH<nFitQA/2; iH++ ){
+              hFitDaughtersQA[iPart][iH]   = new TH1F((res+parName[iH]).Data(),
+                                                      (res+parName[iH]).Data(), 
+                                                      nBins, -xMax[iH],xMax[iH]);
+              hFitDaughtersQA[iPart][iH+8] = new TH1F((pull+parName[iH]).Data(),
+                                                      (pull+parName[iH]).Data(), 
+                                                      nBins, -6,6);
+            }
+          }
+          gDirectory->cd(".."); //particle directory
+
+          gDirectory->mkdir("FitQA");
+          gDirectory->cd("FitQA");
+          {
+            TString parName[nFitQA/2] = {"X","Y","Z","Px","Py","Pz","E","M"};
+            int nBins = 50;
+            float xMax[nFitQA/2] = {0.15,0.15,1.2,0.02,0.02,0.15,0.15,0.006};
+
+            for( int iH=0; iH<nFitQA/2; iH++ ){
+              hFitQA[iPart][iH]   = new TH1F((res+parName[iH]).Data(),
+                                             (res+parName[iH]).Data(), 
+                                             nBins, -xMax[iH],xMax[iH]);
+              hFitQA[iPart][iH+8] = new TH1F((pull+parName[iH]).Data(),
+                                             (pull+parName[iH]).Data(), 
+                                             nBins, -6,6);
+            }
+          }
+          gDirectory->cd(".."); //particle directory
+
+          gDirectory->mkdir("Parameters");
+          gDirectory->cd("Parameters");
+          {
+            TString parName[nHistoPartParam] = {"M","DL","c#tau","chi2ndf","prob"};
+            int nBins[nHistoPartParam] = {1000,100,100,100,100};
+            float xMin[nHistoPartParam] = {0.3f,0. , 0.,  0.,0.};
+            float xMax[nHistoPartParam] = {1.3f,30.,30.,20.,1.};
+            if(iPart == 1)
+            {
+              xMin[0] = 1.0; 
+              xMax[0] = 2.0; 
+            }
+
+            for(int iH=0; iH<nHistoPartParam; iH++)
+              hPartParam[iPart][iH]       = new TH1F(parName[iH].Data(),parName[iH].Data(),
+                                              nBins[iH],xMin[iH],xMax[iH]);
+
+            gDirectory->mkdir("Signal");
+            gDirectory->cd("Signal");
+            {
+              for(int iH=0; iH<nHistoPartParam; iH++)
+                hPartParamSignal[iPart][iH] = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
+                                              nBins[iH],xMin[iH],xMax[iH]);
+
+              gDirectory->mkdir("QA");
+              gDirectory->cd("QA");
+              {
+                int nBinsQA = 50;
+                float xMaxQA[nHistoPartParamQA] = {0.01,0.001,0.001};
+                for( int iH=0; iH<nHistoPartParamQA; iH++ ){
+                  hPartParamQA[iPart][iH] = 
+                    new TH1F((res+parName[iH]).Data(), (res+parName[iH]).Data(), nBinsQA, -xMaxQA[iH],xMaxQA[iH]);
+                  hPartParamQA[iPart][iH+nHistoPartParamQA] = 
+                    new TH1F((pull+parName[iH]).Data(), (pull+parName[iH]).Data(), nBinsQA, -6,6);
+                }
+              }
+              gDirectory->cd(".."); // particle directory / Parameters / Signal
+
+            }
+            gDirectory->cd(".."); // particle directory / Parameters
+            gDirectory->mkdir("Background");
+            gDirectory->cd("Background");
+            {
+              for(int iH=0; iH<nHistoPartParam; iH++)
+                hPartParamBG[iPart][iH]     = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
+                                              nBins[iH],xMin[iH],xMax[iH]);
+            }
+            gDirectory->cd(".."); // particle directory
+          }
+          gDirectory->cd(".."); //particle directory
+        }
+        gDirectory->cd(".."); //L1
+      }
+    }
+    gDirectory->cd(".."); //L1
+    gDirectory->mkdir("PrimaryVertexQA");
+    gDirectory->cd("PrimaryVertexQA");
+    {
       struct {
         string name;
         string title;
         Int_t n;
         Double_t l,r;
-      } Table[NParticles]=
+      } Table[nHistosPV]=
       {
-        {"Ks",     "Ks Mass, GeV",     1000, 0.3f, 1.3f},
-        {"Lambda", "Lambda Mass, GeV", 1000, 1.0f, 2.0f},
+        {"PVResX", "x_{rec}-x_{mc}, cm",     100, -0.006f, 0.006f},
+        {"PVResY", "y_{rec}-y_{mc}, cm",     100, -0.006f, 0.006f},
+        {"PVResZ", "z_{rec}-z_{mc}, cm",     100, -0.06f, 0.06f},
+        {"PVPullX", "Pull X",     100, -6.f, 6.f},
+        {"PVPullY", "Pull Y",     100, -6.f, 6.f},
+        {"PVPullZ", "Pull Z",     100, -6.f, 6.f}
       };
-      for( int iPart=0; iPart<NParticles; iPart++ ){
-        h_part_mass[iPart] = new TH1F(Table[iPart].name.data(),Table[iPart].title.data(), Table[iPart].n, Table[iPart].l, Table[iPart].r);
+      for(int iHPV=0; iHPV<nHistosPV; ++iHPV){
+        hPVFitQa[iHPV] = new TH1F(Table[iHPV].name.data(),Table[iHPV].title.data(),
+                                  Table[iHPV].n, Table[iHPV].l, Table[iHPV].r);
       }
     }
     gDirectory = currentDir;
@@ -758,24 +881,199 @@ void CbmL1::PartHistoPerformance()
 
   for(unsigned int iP=0; iP < vRParticles.size(); iP++)
   {
+    int iParticle = -1;
     switch( vRParticles[iP].GetPDG() ) {
       case 310:
       {
-        Double_t M, ErrM;
-        CbmKFParticle TempPart = vRParticles[iP];
-        TempPart.GetMass(M,ErrM);
-        h_part_mass[0]->Fill(M);
+        iParticle = 0;
       }
       break;
       case 3122:
       {
-        Double_t M, ErrM;
-        CbmKFParticle TempPart = vRParticles[iP];
-        TempPart.GetMass(M,ErrM);
-        h_part_mass[1]->Fill(M);
+        iParticle = 1;
       }
     }
+    if(iParticle < 0) continue;
+
+    Double_t M, ErrM;
+    Double_t dL, ErrdL; // decay length
+    Double_t cT, ErrcT; // c*tau
+    CbmKFParticle TempPart = vRParticles[iP];
+    TempPart.GetMass(M,ErrM);
+    TempPart.GetDecayLength(dL,ErrdL);
+    TempPart.GetLifeTime(cT,ErrcT);
+    Double_t chi2 = TempPart.GetChi2();
+    Int_t ndf = TempPart.GetNDF();
+    Double_t prob = TMath::Prob(chi2,ndf);
+
+    hPartParam[iParticle][0]->Fill(M);
+    hPartParam[iParticle][1]->Fill(dL);
+    hPartParam[iParticle][2]->Fill(cT);
+    hPartParam[iParticle][3]->Fill(chi2/ndf);
+    hPartParam[iParticle][4]->Fill(prob);
+
+    if(!RtoMCParticleId[iP].IsMatchedWithPdg()) //background
+    {
+      hPartParamBG[iParticle][0]->Fill(M);
+      hPartParamBG[iParticle][1]->Fill(dL);
+      hPartParamBG[iParticle][2]->Fill(cT);
+      hPartParamBG[iParticle][3]->Fill(chi2/ndf);
+      hPartParamBG[iParticle][4]->Fill(prob);
+      continue;
+    }
+    hPartParamSignal[iParticle][0]->Fill(M);
+    hPartParamSignal[iParticle][1]->Fill(dL);
+    hPartParamSignal[iParticle][2]->Fill(cT);
+    hPartParamSignal[iParticle][3]->Fill(chi2/ndf);
+    hPartParamSignal[iParticle][4]->Fill(prob);
+
+    int iMCPart = RtoMCParticleId[iP].GetBestMatchWithPdg();
+    CbmL1PFMCParticle &mcPart = vMCParticles[iMCPart];
+    // Fit quality of the mother particle
+    {
+      int iMCTrack = mcPart.GetMCTrackID();
+      CbmMCTrack &mcTrack = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(iMCTrack)));
+      int mcDaughterId = mcPart.GetDaughterIds()[0];
+      CbmMCTrack &mcDaughter = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(mcDaughterId)));
+
+      Double_t decayVtx[3] = { mcDaughter.GetStartX(), mcDaughter.GetStartY(), mcDaughter.GetStartZ() };
+      Double_t recParam[8] = { 0 };
+      Double_t errParam[8] = { 0 };
+
+      for(int iPar=0; iPar<3; iPar++)
+      {
+        recParam[iPar] = TempPart.GetParameter(iPar);
+        Double_t error = TempPart.GetCovariance(iPar,iPar);
+        if(error < 0.) { error = 1.e20;}
+        errParam[iPar] = TMath::Sqrt(error);
+      }
+      TempPart.Extrapolate(TempPart.r , TempPart.GetDStoPoint(decayVtx));
+      for(int iPar=3; iPar<7; iPar++)
+      {
+        recParam[iPar] = TempPart.GetParameter(iPar);
+        Double_t error = TempPart.GetCovariance(iPar,iPar);
+        if(error < 0.) { error = 1.e20;}
+        errParam[iPar] = TMath::Sqrt(error);
+      }
+
+      Double_t Emc = sqrt(mcTrack.GetP()*mcTrack.GetP() + mcTrack.GetMass()*mcTrack.GetMass());
+      Double_t res[8] = {0}, 
+               pull[8] = {0}, 
+               mcParam[8] = { decayVtx[0], decayVtx[1], decayVtx[2],
+                              mcTrack.GetPx(), mcTrack.GetPy(), mcTrack.GetPz(), Emc, mcTrack.GetMass() };
+      for(int iPar=0; iPar < 7; iPar++ )
+      {
+        res[iPar]  = recParam[iPar] - mcParam[iPar];
+        if(fabs(errParam[iPar]) > 1.e-20) pull[iPar] = res[iPar]/errParam[iPar];
+      }
+      res[7] = M - mcParam[7];
+      if(fabs(ErrM) > 1.e-20) pull[7] = res[7]/ErrM;
+
+      for(int iPar=0; iPar < 8; iPar++ )
+      {
+        hFitQA[iParticle][iPar]->Fill(res[iPar]);
+        hFitQA[iParticle][iPar+8]->Fill(pull[iPar]);
+      }
+
+//      Double_t mcT = mcDaughter.GetStartT() - mcTrack.GetStartT();
+      
+    }
+    // Fit quality of daughters
+    for(int iD=0; iD<mcPart.NDaughters(); ++iD)
+    {
+      int mcDaughterId = mcPart.GetDaughterIds()[iD];
+      if(!MCtoRParticleId[mcDaughterId].IsMatchedWithPdg()) continue;
+      CbmMCTrack &mcTrack = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(mcDaughterId)));
+      int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatchWithPdg();
+      CbmKFParticle Daughter = vRParticles[recDaughterId];
+      Daughter.GetMass(M,ErrM);
+
+      Double_t decayVtx[3] = {mcTrack.GetStartX(), mcTrack.GetStartY(), mcTrack.GetStartZ()};
+      Daughter.Extrapolate(Daughter.r , Daughter.GetDStoPoint(decayVtx));
+
+      Double_t Emc = sqrt(mcTrack.GetP()*mcTrack.GetP() + mcTrack.GetMass()*mcTrack.GetMass());
+      Double_t res[8] = {0}, 
+               pull[8] = {0}, 
+               mcParam[8] = { mcTrack.GetStartX(), mcTrack.GetStartY(), mcTrack.GetStartZ(),
+                            mcTrack.GetPx(), mcTrack.GetPy(), mcTrack.GetPz(), Emc, mcTrack.GetMass() };
+      for(int iPar=0; iPar < 7; iPar++ )
+      {
+        Double_t error = Daughter.GetCovariance(iPar,iPar);
+        if(error < 0.) { error = 1.e20;}
+        error = TMath::Sqrt(error);
+        res[iPar]  = Daughter.GetParameter(iPar) - mcParam[iPar];
+        if(fabs(error) > 1.e-20) pull[iPar] = res[iPar]/error;
+      }
+      res[7] = M - mcParam[7];
+      if(fabs(ErrM) > 1.e-20) pull[7] = res[7]/ErrM;
+
+      for(int iPar=0; iPar < 8; iPar++ )
+      {
+        hFitDaughtersQA[iParticle][iPar]->Fill(res[iPar]);
+        hFitDaughtersQA[iParticle][iPar+8]->Fill(pull[iPar]);
+      }
+    }
+//     for(int iD=0; iD<mcPart.NDaughters(); ++iD)
+//     {
+//       int mcDaughterId = mcPart.GetDaughterIds()[iD];
+//       if(!MCtoRParticleId[mcDaughterId].IsMatchedWithPdg()) continue;
+//       CbmMCTrack &mcTrack = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(mcDaughterId)));
+//       int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatchWithPdg();
+// 
+//       CbmKFParticleInterface Daughter1;
+//       CbmKFParticle_simd Daughter = vRParticles[recDaughterId];
+//       fvec M,ErrM;
+//       Daughter.GetMass(M,ErrM);
+// 
+//       fvec decayVtx[3] = {mcTrack.GetStartX(), mcTrack.GetStartY(), mcTrack.GetStartZ()};
+//       Daughter1.Extrapolate(&Daughter, Daughter.r , Daughter1.GetDStoPoint(&Daughter,decayVtx));
+// 
+//       fvec Emc = sqrt(mcTrack.GetP()*mcTrack.GetP() + mcTrack.GetMass()*mcTrack.GetMass());
+//       fvec res[8] = {0}, 
+//            pull[8] = {0}, 
+//            mcParam[8] = { mcTrack.GetStartX(), mcTrack.GetStartY(), mcTrack.GetStartZ(),
+//                           mcTrack.GetPx(), mcTrack.GetPy(), mcTrack.GetPz(), Emc, mcTrack.GetMass() };
+//       for(int iPar=0; iPar < 7; iPar++ )
+//       {
+//         fvec error = Daughter.C[Daughter1.IJ(iPar, iPar)];
+//         if(error[0] < 0.) { error = 1.e20;}
+//         error = TMath::Sqrt(error[0]);
+//         res[iPar]  = Daughter.r[iPar] - mcParam[iPar];
+//         if(fabs(error)[0] > 1.e-20) pull[iPar] = res[iPar]/error;
+//       }
+//       res[7] = M - mcParam[7];
+//       if(fabs(ErrM)[0] > 1.e-20) pull[7] = res[7]/ErrM;
+// 
+//       for(int iPar=0; iPar < 8; iPar++ )
+//       {
+//         hFitDaughtersQA[iParticle][iPar]->Fill(res[iPar][0]);
+//         hFitDaughtersQA[iParticle][iPar+8]->Fill(pull[iPar][0]);
+//       }
+//     }
   }
+  //Find MC parameters of the primary vertex 
+  float mcPVx[3]={0.f};
+  for(unsigned iMC=0; iMC<vMCTracks.size(); ++iMC)
+  {
+    if(vMCTracks[iMC].IsPrimary())
+    {
+      mcPVx[0]=vMCTracks[iMC].x;
+      mcPVx[1]=vMCTracks[iMC].y;
+      mcPVx[2]=vMCTracks[iMC].z;
+      break;
+    }
+  }
+  float dRPVr[3] = {PF->GetPV()->GetRefX()-mcPVx[0],
+                    PF->GetPV()->GetRefY()-mcPVx[1],
+                    PF->GetPV()->GetRefZ()-mcPVx[2]};
+  float dRPVp[3] = {dRPVr[0]/sqrt(PF->GetPV()->GetCovMatrix()[0]),
+                    dRPVr[1]/sqrt(PF->GetPV()->GetCovMatrix()[2]),
+                    dRPVr[2]/sqrt(PF->GetPV()->GetCovMatrix()[5])};
+  for(unsigned int iHPV=0; iHPV<3; ++iHPV)
+    hPVFitQa[iHPV]->Fill(dRPVr[iHPV]);
+  for(unsigned int iHPV=3; iHPV<6; ++iHPV)
+    hPVFitQa[iHPV]->Fill(dRPVp[iHPV-3]);
+
 } // void CbmL1::ParticlesEfficienciesPerformance()
 
 void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef on match data in CbmL1**Track classes
@@ -984,7 +1282,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   //
   for (vector<CbmL1Track>::iterator rtraIt = vRTracks.begin(); rtraIt != vRTracks.end(); ++rtraIt){
     CbmL1Track* prtra = &(*rtraIt);
-
+    if((prtra->StsHits).size() < 1) continue;
     {  // fill histos
       if( fabs(prtra->T[4])>1.e-10 ) h_reco_mom->Fill(fabs(1.0/prtra->T[4]));
       h_reco_nhits->Fill((prtra->StsHits).size());
@@ -1254,6 +1552,28 @@ void CbmL1::TrackFitPerformance()
         {"QPreco","Reco Q/P ", 100,  -10.,  10.},
         {"QPmc","MC Q/P ", 100,  -10.,  10.}
       };
+
+      struct Tab{
+        const char *name;
+        const char *title;
+        Int_t n;
+        Double_t l,r;
+      };
+      Tab TableVertex[Nh_fit]=
+      {
+        {"x",  "Residual X [cm]",                   2000, -1., 1.},
+        {"y",  "Residual Y [cm]",                   2000, -1., 1.},
+        {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
+        {"ty", "Residual Ty [mrad]",                  100,   -2.,   2.},
+        {"P",  "Resolution P/Q [100%]",               100,   -0.1,  0.1 },
+        {"px", "Pull X [residual/estimated_error]",   100,  -6.,  6.},
+        {"py", "Pull Y [residual/estimated_error]",   100,  -6.,  6.},
+        {"ptx","Pull Tx [residual/estimated_error]",  100,  -6.,  6.},
+        {"pty","Pull Ty [residual/estimated_error]",  100,  -6.,  6.},
+        {"pQP","Pull Q/P [residual/estimated_error]", 100,  -6.,  6.},
+        {"QPreco","Reco Q/P ", 100,  -10.,  10.},
+        {"QPmc","MC Q/P ", 100,  -10.,  10.}
+      };
       
       for( int i=0; i<Nh_fit; i++ ){
         char n[225], t[255];
@@ -1263,12 +1583,12 @@ void CbmL1::TrackFitPerformance()
         sprintf(n,"lst_%s",Table[i].name);
         sprintf(t,"Last point %s",Table[i].title);
         h_fitL[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
-        sprintf(n,"svrt_%s",Table[i].name);
-        sprintf(t,"Secondary vertex point %s",Table[i].title);
-        h_fitSV[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
-        sprintf(n,"pvrt_%s",Table[i].name);
-        sprintf(t,"Primary vertex point %s",Table[i].title);
-        h_fitPV[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
+        sprintf(n,"svrt_%s",TableVertex[i].name);
+        sprintf(t,"Secondary vertex point %s",TableVertex[i].title);
+        h_fitSV[i] = new TH1F(n,t, TableVertex[i].n, TableVertex[i].l, TableVertex[i].r);
+        sprintf(n,"pvrt_%s",TableVertex[i].name);
+        sprintf(t,"Primary vertex point %s",TableVertex[i].title);
+        h_fitPV[i] = new TH1F(n,t, TableVertex[i].n, TableVertex[i].l, TableVertex[i].r);
       }
       h_fit_chi2 = new TH1F("h_fit_chi2", "Chi2/NDF", 50, -0.5, 10.0);
     }
@@ -1356,8 +1676,10 @@ void CbmL1::TrackFitPerformance()
   //       cout << "bad\\good" << bad << " " << good << endl;
         
         // calculate pulls
-        h_fitSV[0]->Fill( (mc.x-trPar.x[0]) *1.e4);
-        h_fitSV[1]->Fill( (mc.y-trPar.y[0]) *1.e4);
+        //h_fitSV[0]->Fill( (mc.x-trPar.x[0]) *1.e4);
+        //h_fitSV[1]->Fill( (mc.y-trPar.y[0]) *1.e4);
+        h_fitSV[0]->Fill( (mc.x-trPar.x[0]) );
+        h_fitSV[1]->Fill( (mc.y-trPar.y[0]) );
         h_fitSV[2]->Fill((mc.px/mc.pz-trPar.tx[0])*1.e3);
         h_fitSV[3]->Fill((mc.py/mc.pz-trPar.ty[0])*1.e3);
         h_fitSV[4]->Fill(trPar.qp[0]/mc.q*mc.p-1);
@@ -1416,8 +1738,10 @@ void CbmL1::TrackFitPerformance()
   //       cout << "bad\\good" << bad << " " << good << endl;
 
         // calculate pulls
-        h_fitPV[0]->Fill( (mc.x-trPar.x[0]) *1.e4);
-        h_fitPV[1]->Fill( (mc.y-trPar.y[0]) *1.e4);
+        //h_fitPV[0]->Fill( (mc.x-trPar.x[0]) *1.e4);
+        //h_fitPV[1]->Fill( (mc.y-trPar.y[0]) *1.e4);
+        h_fitPV[0]->Fill( (mc.x-trPar.x[0]) );
+        h_fitPV[1]->Fill( (mc.y-trPar.y[0]) );
         h_fitPV[2]->Fill((mc.px/mc.pz-trPar.tx[0])*1.e3);
         h_fitPV[3]->Fill((mc.py/mc.pz-trPar.ty[0])*1.e3);
         h_fitPV[4]->Fill(trPar.qp[0]/mc.q*mc.p-1);
@@ -1430,38 +1754,23 @@ void CbmL1::TrackFitPerformance()
         h_fitPV[11]->Fill(mc.q/mc.p);
 #else
         FairTrackParam fTP;
-        fTP.SetX(it->T[0]);
-        fTP.SetY(it->T[1]);
-        fTP.SetZ(it->T[5]);
-        fTP.SetTx(it->T[2]);
-        fTP.SetTy(it->T[3]);
-        fTP.SetQp(it->T[4]);
-        fTP.SetCovariance(0,0, trPar.C00[0]);
-        fTP.SetCovariance(1,0, trPar.C10[0]);
-        fTP.SetCovariance(1,1, trPar.C11[0]);
-        fTP.SetCovariance(2,0, trPar.C20[0]);
-        fTP.SetCovariance(2,1, trPar.C21[0]);
-        fTP.SetCovariance(2,2, trPar.C22[0]);
-        fTP.SetCovariance(3,0, trPar.C30[0]);
-        fTP.SetCovariance(3,1, trPar.C31[0]);
-        fTP.SetCovariance(3,2, trPar.C32[0]);
-        fTP.SetCovariance(3,3, trPar.C33[0]);
-        fTP.SetCovariance(4,0, trPar.C40[0]);
-        fTP.SetCovariance(4,1, trPar.C41[0]);
-        fTP.SetCovariance(4,2, trPar.C42[0]);
-        fTP.SetCovariance(4,3, trPar.C43[0]);
-        fTP.SetCovariance(4,4, trPar.C44[0]);
+
+        CbmKFMath::CopyTC2TrackParam( &fTP, it->T, it->C );
+
         CbmKFTrack kfTr;
         kfTr.SetTrackParam(fTP);
-        kfTr.Propagate(mc.z);
+
+        kfTr.Extrapolate(mc.z);
         CbmL1Track it2;
         for (int ipar = 0; ipar < 6; ipar++) it2.T[ipar] = kfTr.GetTrack()[ipar];
         for (int ipar = 0; ipar < 15; ipar++) it2.C[ipar] = kfTr.GetCovMatrix()[ipar];
 
 
         // calculate pulls
-        h_fitPV[0]->Fill( (mc.x-it2.T[0]) *1.e4);
-        h_fitPV[1]->Fill( (mc.y-it2.T[1]) *1.e4);
+//        h_fitPV[0]->Fill( (mc.x-it2.T[0]) *1.e4);
+//        h_fitPV[1]->Fill( (mc.y-it2.T[1]) *1.e4);
+        h_fitPV[0]->Fill( (mc.x-it2.T[0]) );
+        h_fitPV[1]->Fill( (mc.y-it2.T[1]) );
         h_fitPV[2]->Fill((mc.px/mc.pz-it2.T[2])*1.e3);
         h_fitPV[3]->Fill((mc.py/mc.pz-it2.T[3])*1.e3);
         h_fitPV[4]->Fill(it2.T[4]/mc.q*mc.p-1);
@@ -1520,10 +1829,10 @@ void CbmL1::FieldApproxCheck()
     } // if mvd
 
 
-    float step = 1.;
+//    float step = 1.;
 
-    int NbinsX = static_cast<int>(2*Xmax/step);
-    int NbinsY = static_cast<int>(2*Ymax/step);
+    int NbinsX = 100; //static_cast<int>(2*Xmax/step);
+    int NbinsY = 100; //static_cast<int>(2*Ymax/step);
     float ddx = 2*Xmax/NbinsX;
     float ddy = 2*Ymax/NbinsY;
 
@@ -1613,6 +1922,71 @@ void CbmL1::FieldApproxCheck()
     stBz -> Write();
     
   } // for ista
+
+  fout->Close();
+  fout->Delete();
+  gFile = currentFile;
+  gDirectory = curr;
+} // void CbmL1::FieldApproxCheck()
+
+#include "TMath.h"
+void CbmL1::FieldIntegralCheck()
+{
+  TDirectory *curr = gDirectory;
+  TFile *currentFile = gFile;
+  TFile* fout = new TFile("FieldApprox.root","RECREATE");
+  fout->cd();
+
+  FairField *MF = CbmKF::Instance()->GetMagneticField();
+
+  int nPointsZ = 1000;
+  int nPointsPhi = 100;
+  int nPointsTheta = 100;
+  double startZ=0, endZ=100.;
+  double startPhi=0, endPhi=2*TMath::Pi();
+  double startTheta=-30./180.*TMath::Pi(), endTheta=30./180.*TMath::Pi();
+
+  double DZ=endZ-startZ;
+  double DP=endPhi-startPhi;
+  double DT=endTheta-startTheta;
+
+  float ddp = endPhi/nPointsPhi;
+  float ddt = 2*endTheta/nPointsTheta;
+
+  TH2F *hSb  = new TH2F("Field Integral", "Field Integral" , static_cast<int>(nPointsPhi),-(startPhi+ddp/2.),(endPhi+ddp/2.), static_cast<int>(nPointsTheta),(startTheta-ddt/2.),(endTheta+ddt/2.));
+
+  for(int iP=0; iP<nPointsPhi; iP++)
+  {
+    double phi=startPhi+iP*DP/nPointsPhi;
+    for(int iT=0; iT<nPointsTheta; iT++)
+    {
+      double theta=startTheta+iT*DT/nPointsTheta;
+
+      double Sb=0;
+      for(int iZ=1; iZ<nPointsZ; iZ++)
+      {
+        double z = startZ+ DZ*iZ/nPointsZ;
+        double x = z*TMath::Tan(theta)*TMath::Cos(phi);
+        double y = z*TMath::Tan(theta)*TMath::Sin(phi);
+        double r[3] = {x,y,z};
+        double b[3];
+        MF->GetFieldValue( r, b );
+        double B=sqrt(b[0]*b[0]+b[1]*b[1]+b[2]*b[2]);
+        Sb += B*DZ/nPointsZ/100./10.;
+      }
+      hSb->SetBinContent(iP+1,iT+1,Sb);
+    }
+  }
+
+  hSb  ->GetXaxis()->SetTitle("#phi [rad]");
+  hSb  ->GetYaxis()->SetTitle("#theta [rad]");
+  hSb  ->GetXaxis()->SetTitleOffset(1);
+  hSb  ->GetYaxis()->SetTitleOffset(1);
+  hSb  ->GetZaxis()->SetTitle("Field Integral [T#dotm]");
+  hSb  ->GetZaxis()->SetTitleOffset(1.3);
+
+  hSb -> Write();
+
 
   fout->Close();
   fout->Delete();

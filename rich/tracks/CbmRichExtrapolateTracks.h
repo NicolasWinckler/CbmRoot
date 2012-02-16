@@ -99,6 +99,15 @@ class CbmRichExtrapolateTracks : public FairTask
   Int_t fVerbose;                  //! Verbosity level
   Int_t fNofTracks;
 
+  /**
+   * \brief Copy constructor.
+   */
+  CbmRichExtrapolateTracks(const CbmRichExtrapolateTracks&);
+
+  /**
+   * \brief Assignment operator.
+   */
+  CbmRichExtrapolateTracks& operator=(const CbmRichExtrapolateTracks&);
 
   ClassDef(CbmRichExtrapolateTracks,1);
 

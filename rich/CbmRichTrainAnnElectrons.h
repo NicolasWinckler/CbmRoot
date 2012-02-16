@@ -11,10 +11,11 @@
 #define CbmRichTrainAnnElectrons_H
 
 #include "FairTask.h"
+#include "TH2D.h"
 
-class TH1;
-class TH1D;
-class TH2D;
+//class TH1;
+//class TH1D;
+//class TH2D;
 class TClonesArray;
 
 #include <vector>
@@ -140,6 +141,16 @@ private:
    vector<TH2D*> fhPhiVsRadAng;
 
    vector<TH1*> fHists; // Store pointer for all histograms
+
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichTrainAnnElectrons(const CbmRichTrainAnnElectrons&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichTrainAnnElectrons& operator=(const CbmRichTrainAnnElectrons&);
 
    ClassDef(CbmRichTrainAnnElectrons,1)
 };

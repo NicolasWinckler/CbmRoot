@@ -1,26 +1,65 @@
-#ifndef CBMGEORICHPAR_H
-#define CBMGEORICHPAR_H
+/**
+* \file CbmGeoRichPar.h
+*
+* \brief
+*
+* \author Denis Bertini
+* \date 2005
+**/
+
+#ifndef CBM_GEO_RICH_PAR
+#define CBM_GEO_RICH_PAR
 
 #include "FairParGenericSet.h"
 
-#include "TObjArray.h"
+class TObjArray;
 
-class CbmGeoRichPar : public FairParGenericSet {
+/**
+* \class CbmGeoRichPar
+*
+* \brief
+*
+* \author Denis Bertini
+* \date 2005
+**/
+class CbmGeoRichPar : public FairParGenericSet
+{
 public:
-  TObjArray      *fGeoSensNodes; /** List of FairGeoNodes for sensitive  volumes */
-  TObjArray      *fGeoPassNodes; /** List of FairGeoNodes for sensitive  volumes */
 
-  CbmGeoRichPar(const char* name="CbmGeoRichPar",
-             const char* title="Rich Geometry Parameters",
-             const char* context="TestDefaultContext");
-  ~CbmGeoRichPar(void);
-  void clear(void);
-  void putParams(FairParamList*);
-  Bool_t getParams(FairParamList*);
-  TObjArray             *GetGeoSensitiveNodes(){return fGeoSensNodes;}
-  TObjArray             *GetGeoPassiveNodes(){return fGeoPassNodes;}
+   TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive  volumes
+   TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive  volumes
 
-  ClassDef(CbmGeoRichPar,1)
+   CbmGeoRichPar(
+         const char* name="CbmGeoRichPar",
+         const char* title="Rich Geometry Parameters",
+         const char* context="TestDefaultContext");
+
+   ~CbmGeoRichPar(void);
+
+   void clear(void);
+
+   void putParams(
+         FairParamList*);
+
+   Bool_t getParams(
+         FairParamList*);
+
+   TObjArray* GetGeoSensitiveNodes(){return fGeoSensNodes;}
+
+   TObjArray* GetGeoPassiveNodes(){return fGeoPassNodes;}
+
+private:
+   /**
+    * \brief Copy constructor.
+    */
+   CbmGeoRichPar(const CbmGeoRichPar&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmGeoRichPar& operator=(const CbmGeoRichPar&);
+
+   ClassDef(CbmGeoRichPar,1)
 };
 
-#endif /* !CBMGEORICHPAR_H */
+#endif

@@ -1,28 +1,17 @@
-/******************************************************************************
-*  $Id: CbmRichMatchRings.h,v 1.2 2006/02/22 09:15:46 hoehne Exp $
+/**
+* \file CbmRichMatchRings.h
 *
-*  Class  : CbmRichMatchRings
-*  Description: Task class for matching a reconstructed CbmRichRings with a simulated
-*               CbmMCTrack. The matching criterion is a maximal number of common
-*               hits/points. The task fills the data class CbmRichRingMatch for
-*               each CbmRichRing.
+* \brief Task class for matching a reconstructed CbmRichRings with a simulated
+*  CbmMCTrack. The matching criterion is a maximal number of common
+*  hits/points. The task fills the data class CbmRichRingMatch for
+*  each CbmRichRing.
 *
-*  Author : Supriya Das (following CbmStsMatchTracks)
-*  E-mail : S.Das@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichMatchRings.h,v $
-*  Revision 1.2  2006/02/22 09:15:46  hoehne
-*  store also number of MC hits for each ring (Simeon Lebedev)
-*
-*  Revision 1.1  2006/01/23 11:42:44  hoehne
-*  initial version: task to match reconstructed to MC rings
-*
-*
-*******************************************************************************/
+* \author Supriya Das
+* \date 2006
+**/
 
-#ifndef CBM_RICH_MATCH_RINGS_H
-#define CBM_RICH_MATCH_RINGS_H 1
+#ifndef CBM_RICH_MATCH_RINGS
+#define CBM_RICH_MATCH_RINGS
 
 #include "FairTask.h"
 
@@ -31,64 +20,71 @@
 class TClonesArray;
 
 
-
+/**
+* \class CbmRichMatchRings
+*
+* \brief Task class for matching a reconstructed CbmRichRings with a simulated
+*  CbmMCTrack. The matching criterion is a maximal number of common
+*  hits/points. The task fills the data class CbmRichRingMatch for
+*  each CbmRichRing.
+*
+* \author Supriya Das
+* \date 2006
+**/
 class CbmRichMatchRings : public FairTask
 {
 
- public:
+public:
 
-  /** Default constructor **/
-  CbmRichMatchRings();
+   /**
+    * \brief Default constructor.
+    */
+   CbmRichMatchRings();
 
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmRichMatchRings();
 
-  /** Constructor with verbosity level **/
-  CbmRichMatchRings(Int_t verbose);
+   /**
+    * \brief Inherited from FairTask.
+    */
+   virtual InitStatus Init();
 
+   /**
+    * \brief Inherited from FairTask.
+    */
+   virtual void Exec(
+         Option_t* opt);
 
-  /** Constructor with name, title and verbosity
-   **
-   *@param name     Name of taks
-   *@param title    Title of task   (default FairTask)
-   *@param verbose  Verbosity level (default 1)
-   **/
-  CbmRichMatchRings(const char* name, const char* title = "FairTask",
-		    Int_t verbose = 1);
-
-
-  /** Destructor **/
-  virtual ~CbmRichMatchRings();
-
-
-  /** Intialisation at beginning of each event **/
-  virtual InitStatus Init();
-
-
-  /** Execution **/
-  virtual void Exec(Option_t* opt);
+   /**
+    * \brief Inherited from FairTask.
+    */
+   virtual void Finish();
 
 
-  /** Finishing */
-  virtual void Finish();
+private:
 
+   TClonesArray* fRings; // Array of CbmRichRings
+   TClonesArray* fPoints; // Array of FairMCPoints
+   TClonesArray* fTracks; // Array of CbmMCTracks
+   TClonesArray* fHits; // Array of CbmRichHits
+   TClonesArray* fMatches; // Array of CbmRichRingMatch
 
- private:
+   std::map<Int_t, Int_t> fMatchMap; // Map from MCTrackID to number of common hits
+   std::map<Int_t, Int_t> fMatchMCMap; // Map from MCTrackID to number of common hits for MC rings
 
-  TClonesArray* fRings;        // Array of CbmRichRings
-  TClonesArray* fPoints;       // Array of FairMCPoints
-  TClonesArray* fTracks;       // Array of CbmMCTracks
-  TClonesArray* fHits;         // Array of CbmRichHits
-  TClonesArray* fMatches;      // Array of CbmRichRingMatch
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichMatchRings(const CbmRichMatchRings&);
 
-  /** Map from MCTrackID to number of common hits **/
-  std::map<Int_t, Int_t> fMatchMap;
-  std::map<Int_t, Int_t> fMatchMCMap;
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichMatchRings& operator=(const CbmRichMatchRings&);
 
-  /** Verbosity level **/
-  Int_t fVerbose;
-
-
-  ClassDef(CbmRichMatchRings,1);
-
+   ClassDef(CbmRichMatchRings,1);
 };
 
 #endif

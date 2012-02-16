@@ -19,7 +19,7 @@
 using std::vector;
 
 class CbmRichRingFitterCOP;
-class CbmRichRingSelectNeuralNet;
+class CbmRichRingSelectAnn;
 
 /**
 * \class CbmRichHoughHit
@@ -31,6 +31,16 @@ class CbmRichRingSelectNeuralNet;
 **/
 class CbmRichHoughHit {
 public:
+   /**
+    * \brief Standard constructor.
+    */
+   CbmRichHoughHit():
+      fHit(),
+      fX2plusY2(0.f),
+      fId(0),
+      fIsUsed(false)
+   { }
+
 	CbmRichHitLight fHit;
 	float fX2plusY2;
    unsigned short fId;
@@ -141,7 +151,7 @@ protected:
 	vector< vector<unsigned short> > fHitInd; // store hit indexes for different group of hits
 	vector<CbmRichRingLight*> fFoundRings; // collect found rings
 	CbmRichRingFitterCOP* fFitCOP; // COP ring fitter
-	CbmRichRingSelectNeuralNet* fANNSelect; // ANN selection criteria
+	CbmRichRingSelectAnn* fANNSelect; // ANN selection criteria
 
 public:
 	/**
@@ -281,5 +291,16 @@ public:
 	{
 		return fFoundRings;
 	}
+
+private:
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichRingFinderHoughImpl(const CbmRichRingFinderHoughImpl&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichRingFinderHoughImpl& operator=(const CbmRichRingFinderHoughImpl&);
 };
 #endif

@@ -100,6 +100,16 @@ private:
   /** Set the parameters to the default values. **/
   void SetDefaultParameters();
 
+  /**
+   * \brief Copy constructor.
+   */
+  CbmRichProjectionProducer(const CbmRichProjectionProducer&);
+
+  /**
+   * \brief Assignment operator.
+   */
+  CbmRichProjectionProducer& operator=(const CbmRichProjectionProducer&);
+
   ClassDef(CbmRichProjectionProducer,1)
 
 };

@@ -7,18 +7,18 @@
  * \date 2005
  **/
 
-#ifndef CbmRichTrainAnnSelect_H
-#define CbmRichTrainAnnSelect_H
+#ifndef CBM_RICH_TRAIN_ANN_SELECT
+#define CBM_RICH_TRAIN_ANN_SELECT
 
 #include "FairTask.h"
 #include <vector>
 #include "CbmRichRingFitterCOP.h"
 #include "CbmRichRingSelectImpl.h"
-
+#include "TH1D.h"
 using std::vector;
 
-class TH1D;
-class TH1;
+//class TH1D;
+//class TH1;
 //class CbmRichRingFitterCOP;
 //class CbmRichRingSelectImpl;
 class CbmRichRing;
@@ -134,6 +134,16 @@ private:
    CbmRichRingSelectImpl* fSelectImpl; // Pointer to ellipse fitter
 
    vector<TH1*> fHists; // Store pointer for all histograms
+
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichTrainAnnSelect(const CbmRichTrainAnnSelect&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichTrainAnnSelect& operator=(const CbmRichTrainAnnSelect&);
 
    ClassDef(CbmRichTrainAnnSelect,1)
 };

@@ -1,46 +1,48 @@
-// -------------------------------------------------------------------------
-// -----                  CbmRichHitProducer header file               -----
-// -----               Created 21/05/04  by B. Polichtchouk            -----
-// -----                  modified 13/07/04  by C. Hoehne              -----
-// -------------------------------------------------------------------------
+/**
+* \file CbmRichHitProducer.h
+*
+* \brief Class for producing RICH hits directly from MCPoints.
+*
+* \author B. Polichtchouk
+* \date 2004
+**/
 
-
-/**  CbmRichHitProducer.h
- *@author B. Polichtchouk
- **
- ** Class for producing RICH hits directly from MCPoints
- ** See also macro/rich/CbmRichHitsProd.C
- **/
-
-
-#ifndef CBMRICHHITPRODUCER_H
-#define CBMRICHHITPRODUCER_H
-
-#include "CbmRichHit.h"
-#include "CbmGeoRichPar.h"
+#ifndef CBM_RICH_HIT_PRODUCER
+#define CBM_RICH_HIT_PRODUCER
 
 #include "FairTask.h"
-#include "CbmStack.h"
-#include "FairBaseParSet.h"
 
-#include "TClonesArray.h"
-#include "TString.h"
+class CbmGeoRichPar;
+class TClonesArray;
+class TVector3;
 
-class CbmRichHitProducer : public FairTask {
-
+/**
+* \class CbmRichHitProducer
+*
+* \brief Class for producing RICH hits directly from MCPoints.
+*
+* \author B. Polichtchouk
+* \date 2004
+**/
+class CbmRichHitProducer : public FairTask
+{
 public:
 
-   /* Default constructor */
+   /**
+    * \brief Default constructor.
+    */
    CbmRichHitProducer();
 
-   /* Standard constructor
-   *@param pmt_rad Radius of photomultiplier [cm]
-   *@param pmt_dis Distance between PMT tubel [cm]
-   *@param det_type Detector type (choose: 1=Protvino, 2=CsI, 3=Hamamatsu
-   *@param noise Number of noise hits
-   *@param verbose Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-   *@param colleff Collection efficiency for photoelectrons in PMT optics
-   *@param s_mirror Additional scattering in mirror: results in smeared point in PMT plane*/
+   /**
+    * \brief Standard constructor.
+    * \param[in] pmt_rad Radius of photomultiplier [cm].
+    * \param[in] pmt_dis Distance between PMT tubel [cm].
+    * \param[in] det_type Detector type (choose: 1=Protvino, 2=CsI, 3=Hamamatsu.
+    * \param[in] noise Number of noise hits.
+    * \param[in] verbose Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug).
+    * \param[in] colleff Collection efficiency for photoelectrons in PMT optics.
+    * \param[in] s_mirror Additional scattering in mirror: results in smeared point in PMT plane.
+    */
    CbmRichHitProducer(
          Double_t pmt_rad,
          Double_t pmt_dist,
@@ -50,45 +52,54 @@ public:
          Double_t colleff,
          Double_t s_mirror);
 
-   /* Constructor with name and title. Puts default parameter values.*/
-   CbmRichHitProducer(
-         const char *name,
-         const char *title);
-
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmRichHitProducer();
 
-   /* Initialization of the task */
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void SetParContainers();
 
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual InitStatus Init();
 
-   /* Executed task
-   * @param option*/
+   /**
+    * \brief Inherited from FairTask.
+    */
    virtual void Exec(
         Option_t* option);
 
-   /* Add cross talk hits
-   * @param x X position of the central hit
-   * @param y Y position of the central hit
-   * @param pointInd Index of the Rich Point of the central hit
-   * @param RichDetID ID of the RICH detector*/
+   /**
+    * \brief Inherited from FairTask.
+    */
+   virtual void Finish();
+
+   /**
+    * \brief Add cross talk hits.
+    * \param[in] x X position of the central hit.
+    * \param[in] y Y position of the central hit.
+    * \param[in] pointInd Index of the Rich Point of the central hit.
+    * \param[in] RichDetID ID of the RICH detector.
+    */
    void AddCrossTalkHits(
          Double_t x,
          Double_t y,
          Int_t pointInd,
          Int_t RichDetID);
 
-   /* Finish task */
-   virtual void Finish();
-
-   /* Adds a RichHit to the HitCollection
-   * @param posHit
-   * @param posHitErr
-   * @param detID
-   * @param pmtID
-   * @param ampl
-   * @param index*/
+   /**
+    * \brief Adds a RichHit to the HitCollection.
+    * \param posHit Hit position.
+    * \param posHitErr Hit errors.
+    * \param detID Detector ID.
+    * \param pmtID PMT ID.
+    * \param ampl Hit amplitude.
+    * \param index Index.
+    */
    void AddHit(
          TVector3 &posHit,
          TVector3 &posHitErr,
@@ -97,12 +108,14 @@ public:
          Double_t ampl,
          Int_t index);
 
-   /* Finds hit position in PMT plane
-   * @param xPoint
-   * @param yPoint
-   * @param xHit
-   * @param yHit
-   * @param pmtID*/
+   /**
+    * \brief Finds hit position in PMT plane.
+    * \param xPoint
+    * \param yPoint
+    * \param xHit
+    * \param yHit
+    * \param pmtID
+    */
    void FindRichHitPositionSinglePMT(
          Double_t xPoint,
          Double_t yPoint,
@@ -110,13 +123,15 @@ public:
          Double_t& yHit,
          Int_t& pmtID);
 
-   /* Finds hit position in MAMPT plane]
-   * @param sigma
-   * @param xPoint
-   * @param yPoint
-   * @param xHit
-   * @param yHit
-   * @param pmtID*/
+   /**
+    * \brief Finds hit position in MAMPT plane.
+    * \param sigma
+    * \param xPoint
+    * \param yPoint
+    * \param xHit
+    * \param yHit
+    * \param pmtID
+    */
    void FindRichHitPositionMAPMT(
          Double_t sigma,
          Double_t xPoint,
@@ -125,12 +140,14 @@ public:
          Double_t& yHit,
          Int_t & pmtID);
 
-   /* Finds hit position in MAMPT plane
-   * @param xPoint
-   * @param yPoint
-   * @param xHit
-   * @param yHit
-   * @param pmtID*/
+   /**
+    * \brief Finds hit position in MAMPT plane.
+    * \param xPoint
+    * \param yPoint
+    * \param xHit
+    * \param yHit
+    * \param pmtID
+    */
    void FindRichHitPositionCsI(
          Double_t xPoint,
          Double_t yPoint,
@@ -138,11 +155,26 @@ public:
          Double_t& yHit,
          Int_t& pmtID);
 
+   /**
+    * \brief Spectrum of the PMT response to one photo-electron.
+    */
    Double_t OnePhotonAmplitude(
         Double_t x);
 
+   /**
+    * \brief Generate randomly PMT amplitude according to probability density
+    * provided by OnePhotonAmplitude(x).
+    */
    Double_t GetAmplitude();
 
+   /**
+    * \brief Set parameters of the photodetector.
+    * \param[in] det_type Type of the photodetector.
+    * \param[out] lambda_min Minimum lambda for quantum efficiency table.
+    * \param[out] lambda_max Maximum lambda for quantum efficiency table.
+    * \param[out] lambda_step Step of the lambda for quantum efficiency table.
+    * \param[out] efficiency[] Quantum efficiencies.
+    */
    void SetPhotoDetPar(
          Int_t det_type,
          Double_t& lambda_min,
@@ -150,16 +182,18 @@ public:
          Double_t& lambda_step,
          Double_t efficiency[]);
 
-   /* Set the parameters to the default values. */
+   /**
+    * \brief Set the parameters to the default values.
+    */
    void SetDefaultParameters();
 
-   /*
+   /**
     * Tilt points by
     * -theta, -phi for x>0, y>0
     * theta, -phi for x>0, y<0
     * theta,  phi for x<0, y<0
     * -theta,  phi for x<0, y>0
-    * and shift x position in order to avoid overlap
+    * and shift x position in order to avoid overlap.
     * \param[in] inPos points position to be tilted.
     * \param[out] outPos point position after tilting.
     * \param[in] phi Angle by which photodetector was tilted around y-axis
@@ -183,12 +217,13 @@ private:
    Int_t fNHits; // Number of hits
    Int_t fNDoubleHits; // Number of double hits
 
-   Double_t c; // speed of light
-   Double_t h; // Planck constant
-   Double_t e; // elementary charge
-   Double_t nrefrac; // refraction index
-   Int_t detection; // flag for detection
-   Int_t nevents;
+   static const Double_t c = 2.998E8; // speed of light
+   static const Double_t h = 6.626E-34; // Planck constant
+   static const Double_t e = 1.6022E-19; // elementary charge
+
+   Double_t fNRefrac; // refraction index
+   Int_t fDetection; // flag for detection
+   Int_t fNEvents;
 
    Double_t fDetX; // X-coordinate of photodetector
    Double_t fDetY; // Y-coordinate of photodetector
@@ -216,6 +251,16 @@ private:
 
    Double_t fCrossTalkHitProb;// probability of cross talk hit
    Int_t fNofCrossTalkHits; // Number of cross talk hits
+
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichHitProducer(const CbmRichHitProducer&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichHitProducer& operator=(const CbmRichHitProducer&);
 
    ClassDef(CbmRichHitProducer,1)
 };

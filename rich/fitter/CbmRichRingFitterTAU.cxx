@@ -18,7 +18,7 @@ using std::fabs;
 using std::sqrt;
 
 CbmRichRingFitterTAU::CbmRichRingFitterTAU():
-fRobust(0)
+      fRobust(0)
 {
 
 }

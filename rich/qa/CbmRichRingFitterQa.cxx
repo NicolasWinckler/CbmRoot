@@ -1,3 +1,9 @@
+/**
+* \file CbmRichRingFitterQa.cxx
+*
+* \author Semen Lebedev <s.lebedev@gsi.de>
+* \date 2009
+**/
 
 #include "CbmRichRingFitterQa.h"
 #include "CbmRichRingFitterEllipseTau.h"
@@ -19,7 +25,30 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-CbmRichRingFitterQa::CbmRichRingFitterQa()
+CbmRichRingFitterQa::CbmRichRingFitterQa():
+   fhErrorA(NULL),
+   fhErrorB(NULL),
+   fhErrorX(NULL),
+   fhErrorY(NULL),
+   fhErrorPhi(NULL),
+
+   fhA(NULL),
+   fhB(NULL),
+   fhX(NULL),
+   fhY(NULL),
+   fhPhi(NULL),
+
+   fhRadiusErr(NULL),
+   fhCircleXcErr(NULL),
+   fhCircleYcErr(NULL),
+
+   fhRadius(NULL),
+   fhCircleXc(NULL),
+   fhCircleYc(NULL),
+
+   fhRadiusPool(NULL),
+   fhCircleXcPool(NULL),
+   fhCircleYcPool(NULL)
 {
 	fhErrorA = new TH1D("fhErrorA","fhErrorA;dA [cm];Counter", 100, -2., 2.);
 	fhErrorB = new TH1D("fhErrorB","fhErrorB;B [cm];Counter", 100, -2., 2.);
@@ -44,6 +73,11 @@ CbmRichRingFitterQa::CbmRichRingFitterQa()
    fhRadiusPool = new TH1D("fhRadiusPool","fhRadiusPool;Pool R;Counter", 100, -5., 5.);
    fhCircleXcPool = new TH1D("fhCircleXcPool","fhCircleXcPool;Pool Xc;Counter", 100, -5., 5.);
    fhCircleYcPool = new TH1D("fhCircleYcPool","fhCircleYcPool;Pool Yc;Counter", 100, -5., 5.);
+}
+
+CbmRichRingFitterQa::~CbmRichRingFitterQa()
+{
+
 }
 
 void CbmRichRingFitterQa::GenerateEllipse()
@@ -240,6 +274,5 @@ void CbmRichRingFitterQa::CalculateFitErrors(
 
 
 }
-
 
 ClassImp(CbmRichRingFitterQa);

@@ -10,7 +10,6 @@
 #pragma link C++ class CbmRichHitProducer+;
 #pragma link C++ class CbmGeoRich+;
 #pragma link C++ class CbmRichMatchRings+;
-#pragma link C++ class CbmRichElectronIdAnn+;
 #pragma link C++ class CbmRichContFact;
 #pragma link C++ class CbmGeoRichPar;
 #pragma link C++ class CbmRichTrainAnnSelect;
@@ -18,14 +17,13 @@
 
 //reconstruction
 #pragma link C++ class CbmRichReconstruction+;
-#pragma link C++ class CbmRichRingFitterQa+;
 
 //qa
 #pragma link C++ class CbmRichTestSim+;
 #pragma link C++ class CbmRichTestHits+;
 #pragma link C++ class CbmRichGeoTest+;
+#pragma link C++ class CbmRichRingFitterQa+;
 //#pragma link C++ class CbmRichParallelQa+;
-//selection
 
 //tracks
 #pragma link C++ class CbmRichProjectionProducer+;

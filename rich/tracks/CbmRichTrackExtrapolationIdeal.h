@@ -80,6 +80,16 @@ class CbmRichTrackExtrapolationIdeal : public CbmRichTrackExtrapolation
   Int_t    fMinNsts;       /** number of STS hits required for extrapolated track */
   Int_t    iEx;            /** number of extrapolated tracks */
 
+  /**
+   * \brief Copy constructor.
+   */
+  CbmRichTrackExtrapolationIdeal(const CbmRichTrackExtrapolationIdeal&);
+
+  /**
+   * \brief Assignment operator.
+   */
+  CbmRichTrackExtrapolationIdeal& operator=(const CbmRichTrackExtrapolationIdeal&);
+
   ClassDef(CbmRichTrackExtrapolationIdeal,1);
 
 };

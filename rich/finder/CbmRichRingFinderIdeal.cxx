@@ -28,8 +28,8 @@ using std::map;
 
 
 CbmRichRingFinderIdeal::CbmRichRingFinderIdeal():
-     fRichPoints(NULL),
-     fMcTracks(NULL)
+   fRichPoints(NULL),
+   fMcTracks(NULL)
 {
 
 }

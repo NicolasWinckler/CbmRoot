@@ -10,7 +10,7 @@
 
 #include "../../littrack/std/utils/CbmLitMemoryManagment.h"
 #include "CbmRichRingFitterCOP.h"
-#include "CbmRichRingSelectNeuralNet.h"
+#include "CbmRichRingSelectAnn.h"
 
 #include "TSystem.h"
 
@@ -26,15 +26,57 @@ using std::vector;
 using std::set;
 using std::sort;
 
-CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
+CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl():
+   fNofParts(0),
+
+   fMaxDistance(0.f),
+   fMinDistance(0.f),
+   fMinDistanceSq(0.f),
+   fMaxDistanceSq(0.f),
+
+   fMinRadius(0.f),
+   fMaxRadius(0.f),
+
+   fDx(0.f),
+   fDy(0.f),
+   fDr(0.f),
+   fNofBinsX(0),
+   fNofBinsY(0),
+   fNofBinsXY(0),
+
+   fHTCut(0),
+
+   fNofBinsR(0),
+   fHTCutR(0),
+
+   fMinNofHitsInArea(0),
+
+   fRmsCoeffEl(0.f),
+   fMaxCutEl(0.f),
+   fRmsCoeffCOP(0.f),
+   fMaxCutCOP(0.f),
+
+   fAnnCut(0.f),
+   fUsedHitsAllCut(0.f),
+
+   fCurMinX(0.f),
+   fCurMinY(0.f),
+
+   fData(),
+   fHist(),
+   fHistR(),
+   fHitInd(),
+   fFoundRings(),
+   fFitCOP(NULL),
+   fANNSelect(NULL)
 {
 
 }
 
 CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 {
-	delete fFitCOP;
-	delete fANNSelect;
+	if (NULL != fFitCOP) delete fFitCOP;
+	if (NULL != fANNSelect) delete fANNSelect;
 }
 
 void CbmRichRingFinderHoughImpl::Init()
@@ -47,9 +89,9 @@ void CbmRichRingFinderHoughImpl::Init()
 
     fFitCOP = new CbmRichRingFitterCOP();
 
-    TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
+    std::string richSelectNNFile(gSystem->Getenv("VMCWORKDIR"));
     richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
-    fANNSelect = new CbmRichRingSelectNeuralNet(richSelectNNFile);
+    fANNSelect = new CbmRichRingSelectAnn(richSelectNNFile);
     fANNSelect->Init();
 }
 

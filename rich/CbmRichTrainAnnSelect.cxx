@@ -99,7 +99,6 @@ InitStatus CbmRichTrainAnnSelect::Init()
 
 	fFitCOP = new CbmRichRingFitterCOP();
    fSelectImpl = new CbmRichRingSelectImpl();
-   fSelectImpl->Init();
 
    return kSUCCESS;
 }
@@ -177,12 +176,12 @@ void CbmRichTrainAnnSelect::DiffFakeTrueCircle()
       fFitCOP->DoFit(&ringLight);
      
       Int_t recFlag = ring->GetRecFlag();
-      Double_t angle = fSelectImpl->GetAngle(ring);
-      Int_t hitsOnRing = fSelectImpl->GetNofHitsOnRingCircle(ring);
-      Double_t chi2 = ring->GetChi2() / ring->GetNDF();
-      Int_t nHits = ring->GetNofHits();
-      Double_t radPos = ring->GetRadialPosition();
-      Double_t radius = ring->GetRadius();
+      Double_t angle = fSelectImpl->GetAngle(&ringLight);
+      Int_t hitsOnRing = fSelectImpl->GetNofHitsOnRingCircle(&ringLight);
+      Double_t chi2 = ringLight.GetChi2() / ringLight.GetNofHits();
+      Int_t nHits = ringLight.GetNofHits();
+      Double_t radPos = ringLight.GetRadialPosition();
+      Double_t radius = ringLight.GetRadius();
       
       RingSelectParam p;
       p.fAngle = angle;

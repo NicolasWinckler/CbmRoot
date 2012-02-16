@@ -142,6 +142,16 @@ private:
     */
    void RunTrackMatch();
 
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichReconstruction(const CbmRichReconstruction&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichReconstruction& operator=(const CbmRichReconstruction&);
+
    ClassDef(CbmRichReconstruction,1);
 };
 

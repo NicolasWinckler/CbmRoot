@@ -9,7 +9,7 @@
 #include "CbmRichRingLight.h"
 #include "CbmRichRing.h"
 //#include "CbmRichRingFitterEllipseTau.h"
-#include "CbmRichRingSelectNeuralNet.h"
+#include "CbmRichRingSelectAnn.h"
 #include "TClonesArray.h"
 #include "TString.h"
 
@@ -103,7 +103,7 @@ protected:
 	std::vector<CbmRichRingLight*> fFoundRings;///collect found rings
 
 	CbmRichRingFitterCOP* fFitCOP;
-	CbmRichRingSelectNeuralNet* fANNSelect;
+	CbmRichRingSelectAnn* fANNSelect;
 	//CbmRichRingFitterEllipseTau* fFitEllipse;
 
 	TString fGeometryType;

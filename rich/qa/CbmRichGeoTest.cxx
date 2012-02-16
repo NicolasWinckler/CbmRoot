@@ -44,8 +44,80 @@
 using namespace std;
 using boost::assign::list_of;
 
-CbmRichGeoTest::CbmRichGeoTest()
-   :FairTask("RichGeoTestQa")
+CbmRichGeoTest::CbmRichGeoTest():
+   FairTask("RichGeoTestQa"),
+   fRichHits(NULL),
+   fRichRings(NULL),
+   fRichPoints(NULL),
+   fMCTracks(NULL),
+   fRichRingMatches(NULL),
+
+   fDetZOrig(0.),
+   fTheta(0.),
+   fPhi(0.),
+   fSensNodes(NULL),
+   fPassNodes(NULL),
+   fPar(NULL),
+
+   fCopFit(NULL),
+   fTauFit(NULL),
+
+   fEventNum(0),
+   fMinNofHits(0),
+
+   fhNofHits(),
+   fhAaxisVsMom(),
+   fhBaxisVsMom(),
+   fhBoverA(),
+   fhXcYcEllipse(),
+   fhChi2Ellipse(),
+   fhXcYcCircle(),
+   fhRadiusVsMom(),
+   fhChi2Circle(),
+   fhDRCircle(),
+
+   fhRadiusVsNofHits(NULL),
+   fhAaxisVsNofHits(NULL),
+   fhBaxisVsNofHits(NULL),
+   fhDiffAaxis(NULL),
+   fhDiffBaxis(NULL),
+   fhDiffXcEllipse(NULL),
+   fhDiffYcEllipse(NULL),
+   fhDiffXcCircle(NULL),
+   fhDiffYcCircle(NULL),
+   fhDiffRadius(NULL),
+
+   fhDiffXhit(NULL),
+   fhDiffYhit(NULL),
+
+   fMinAaxis(0.),
+   fMaxAaxis(0.),
+   fMinBaxis(0.),
+   fMaxBaxis(0.),
+   fMinRadius(0.),
+   fMaxRadius(0.),
+
+   fhNofHitsAll(NULL),
+   fhNofHitsCircleFit(NULL),
+   fhNofHitsEllipseFit(NULL),
+   fhNofHitsCircleFitEff(NULL),
+   fhNofHitsEllipseFitEff(NULL),
+
+   fhMc3D(NULL),
+   fhAcc3D(NULL),
+
+   fhNofHitsXY(NULL),
+   fhNofPointsXY(NULL),
+   fhBoverAXY(NULL),
+   fhBaxisXY(NULL),
+   fhAaxisXY(NULL),
+   fhRadiusXY(NULL),
+   fhCounterXY(NULL),
+
+   fHists(),
+
+   fNofDrawnRings(0)
+
 {
 	fEventNum = 0;
 	fNofDrawnRings = 0;

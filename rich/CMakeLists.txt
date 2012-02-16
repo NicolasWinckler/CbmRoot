@@ -82,8 +82,7 @@ qa/CbmRichTestHits.cxx
 qa/CbmRichGeoTest.cxx 
 qa/CbmRichRingFitterQa.cxx
 #qa/CbmRichParallelQa.cxx 
-selection/CbmRichRingSelectImpl.cxx
-selection/CbmRichRingSelectNeuralNet.cxx  
+selection/CbmRichRingSelectAnn.cxx  
 selection/NNfunction.cxx 
 #LhcbRingFinder.cxx  
 prototype/CbmRichProt.cxx
@@ -108,7 +107,6 @@ CbmRichHitProducer.h
 CbmGeoRichPar.h
 CbmRichContFact.h
 CbmRichMatchRings.h
-CbmRichElectronIdAnn.h
 CbmRichTrainAnnSelect.h
 CbmRichTrainAnnElectrons.h
 CbmRichReconstruction.h

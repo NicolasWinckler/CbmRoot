@@ -80,9 +80,7 @@ class CbmRichAssignTrack : public FairTask
      { fAssign = assign;
      };
 
-
-
- private:
+private:
 
   CbmRichRingTrackAssign* fAssign;    //! Pointer to RingTrackAssign concrete class
   TClonesArray* fTrackArray;       //! Input array of extrapolated tracks
@@ -90,6 +88,15 @@ class CbmRichAssignTrack : public FairTask
   TClonesArray* gTrackArray;       //! Input array of global tracks
   Int_t fVerbose;                  //! Verbosity level
 
+  /**
+   * \brief Copy constructor.
+   */
+  CbmRichAssignTrack(const CbmRichAssignTrack&);
+
+  /**
+   * \brief Assignment operator.
+   */
+  CbmRichAssignTrack& operator=(const CbmRichAssignTrack&);
 
   ClassDef(CbmRichAssignTrack,1);
 

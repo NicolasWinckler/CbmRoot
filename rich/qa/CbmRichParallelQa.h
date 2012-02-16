@@ -10,7 +10,6 @@
 #include "CbmRichRing.h"
 #include "FairTask.h"
 #include "CbmRichRingFinderHough.h"
-#include "CbmRichRingFinderHoughParallel.h"
 #include "../../L1/OffLineInterface/CbmL1RichENNRingFinder.h"
 
 #include <vector>
@@ -46,6 +45,16 @@ public:
     void SetNofTasks(int n){fNofTasks = n;}
 
     void SetNofEvents(int n){fNofEvents = n;}
+
+    /**
+     * \brief Copy constructor.
+     */
+    CbmRichParallelQa(const CbmRichParallelQa&);
+
+    /**
+     * \brief Assignment operator.
+     */
+    CbmRichParallelQa& operator=(const CbmRichParallelQa&);
 
     ClassDef(CbmRichParallelQa,1)
 };

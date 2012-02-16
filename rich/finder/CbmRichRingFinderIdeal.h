@@ -17,6 +17,10 @@ class TClonesArray;
 
 class CbmRichRingFinderIdeal : public CbmRichRingFinder
 {
+private:
+   TClonesArray* fRichPoints; // CbmRichPoint array
+   TClonesArray* fMcTracks; // CbmMCTrackArray
+
 public:
    /**
     * \brief Default constructor.
@@ -41,10 +45,17 @@ public:
        TClonesArray* projArray,
 		 TClonesArray* ringArray);
 
-
 private:
-   TClonesArray* fRichPoints; // CbmRichPoint array
-   TClonesArray* fMcTracks; // CbmMCTrackArray
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichRingFinderIdeal(const CbmRichRingFinderIdeal&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichRingFinderIdeal& operator=(const CbmRichRingFinderIdeal&);
+
 };
 
 #endif

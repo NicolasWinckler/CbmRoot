@@ -71,6 +71,7 @@ public:
 	 		TClonesArray* rProjArray,
 		   TClonesArray* rRingArray);
 
+private:
 	/**
 	 * \brief Add found rings to the output TClonesArray.
 	 * \param[out] rRingArray Output array of CbmRichRing.
@@ -79,6 +80,16 @@ public:
 	void AddRingsToOutputArray(
 	      TClonesArray *rRingArray,
 	      const vector<CbmRichRingLight*>& rings);
+
+	/**
+	 * \brief Copy constructor.
+	 */
+	CbmRichRingFinderHough(const CbmRichRingFinderHough&);
+
+   /**
+    * \brief Assignment operator.
+    */
+	CbmRichRingFinderHough& operator=(const CbmRichRingFinderHough&);
 };
 
 #endif

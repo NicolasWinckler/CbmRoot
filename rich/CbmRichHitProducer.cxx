@@ -1,8 +1,9 @@
-// -------------------------------------------------------------------------
-// -----                   CbmRichHitProducer source file              -----
-// -----               Created 21/05/04  by B. Polichtchouk            -----
-// -----                  modified 13/07/04  by C. Hoehne              -----
-// -------------------------------------------------------------------------
+/**
+* \file CbmRichHitProducer.cxx
+*
+* \author B. Polichtchouk
+* \date 2004
+**/
 #include "CbmRichHitProducer.h"
 
 #include "CbmRichPoint.h"
@@ -30,7 +31,43 @@
 using std::cout;
 using std::endl;
 
-CbmRichHitProducer::CbmRichHitProducer() :FairTask("RichHitProducer")
+CbmRichHitProducer::CbmRichHitProducer():
+   FairTask("CbmRichHitProducer"),
+   fListRICHpts(NULL),
+   fHitCollection(NULL),
+   fListStack(NULL),
+   fNHits(0),
+   fNDoubleHits(0),
+
+   fNRefrac(0.),
+   fDetection(0),
+   fNEvents(0),
+
+   fDetX(0.),
+   fDetY(0.),
+   fDetZ(0.),
+   fDetZ_org(0.),
+   fDetWidthX(0.),
+   fDetWidthY(0.),
+
+   fSensNodes(NULL),
+   fPassNodes(NULL),
+   fPar(NULL),
+
+   fVerbose(0),
+
+   fPhotomulRadius(0.),
+   fPhotomulDist(0.),
+   fDetType(0),
+   fNoise(0),
+   fColl(0.),
+   fSMirror(0.),
+
+   fTheta(0.),
+   fPhi(0.),
+
+   fCrossTalkHitProb(0.),
+   fNofCrossTalkHits(0)
 {
    SetDefaultParameters();
 }
@@ -42,8 +79,8 @@ CbmRichHitProducer::CbmRichHitProducer(
 		Int_t noise,
 		Int_t verbose,
 		Double_t colleff,
-		Double_t s_mirror)
-  :FairTask("RichHitProducer")
+		Double_t s_mirror):
+   FairTask("RichHitProducer")
 {
    fPhotomulRadius = pmt_rad;
    fPhotomulDist = pmt_dist;
@@ -53,20 +90,10 @@ CbmRichHitProducer::CbmRichHitProducer(
    fColl = colleff;
    fSMirror = s_mirror;
 
-   c = 2.998E8; // speed of light
-   h = 6.626E-34; // Plancks constant
-   e = 1.6022E-19; // Eulers constant
-
-   nevents = 0;
-   fNHits  = 0;
+   fNEvents = 0;
+   fNHits = 0;
    fNDoubleHits = 0;
    fNofCrossTalkHits = 0;
-}
-
-CbmRichHitProducer::CbmRichHitProducer(const char *name, const char *title)
-  : FairTask(name)
-{
-
 }
 
 CbmRichHitProducer::~CbmRichHitProducer()
@@ -166,9 +193,9 @@ InitStatus CbmRichHitProducer::Init()
 //      if (i==3) cout << " refractive index (n-1)*10000 " << (cerpar[3]-1.)*10000. << endl;
 //   }
 
-   nrefrac = cerpar[3];
+   fNRefrac = cerpar[3];
    delete cerpar;
-   if (fVerbose) cout << " refractive index for lowest photon energies (n-1)*10000  " << (nrefrac-1.0)*10000.0 << endl;
+   if (fVerbose) cout << " refractive index for lowest photon energies (n-1)*10000  " << (fNRefrac-1.0)*10000.0 << endl;
 
    // transform nominal detector position (for tilted photodetector), x>0, y>0:
    Double_t fDetY_org, fDetX_org;
@@ -250,8 +277,8 @@ void CbmRichHitProducer::Exec(
 {
    Int_t RichDetID = 0;
 
-   nevents++;
-   cout << "-I- CbmRichHitProducer, event no " << nevents << endl;
+   fNEvents++;
+   cout << "-I- CbmRichHitProducer, event no " << fNEvents << endl;
 
    Double_t lambda_min,lambda_max,lambda_step;
    Double_t efficiency[40];
@@ -377,16 +404,16 @@ void CbmRichHitProducer::Exec(
             TVector3 mom;
             pt->Momentum(mom);
             Double_t etot = sqrt(mom.Px()*mom.Px() + mom.Py()*mom.Py() + mom.Pz()*mom.Pz());
-            Double_t lambda=c/nrefrac*h/e/etot;// wavelength in nm
-            detection=0;
+            Double_t lambda=c/fNRefrac*h/e/etot;// wavelength in nm
+            fDetection=0;
             if (lambda >= lambda_min && lambda < lambda_max) {
                Int_t ilambda=(Int_t)((lambda-lambda_min)/lambda_step);
                Double_t rand = gRandom->Rndm();
-               detection = 0;
+               fDetection = 0;
                if (fDetType == 5 && lambda < 300.) {// smear Hit position for lambda < 300 nm (WLS film!)
                   FindRichHitPositionMAPMT(sigma,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
                }
-               if (efficiency[ilambda]*fColl > rand ) detection = 1;
+               if (efficiency[ilambda]*fColl > rand ) fDetection = 1;
             } // min <= lambda < max
          }// if photon
 
@@ -397,12 +424,12 @@ void CbmRichHitProducer::Exec(
          else { // if not photon
             // worst case: assume that all charged particles crossing
             // the PMTplane leave Cherenkov light in the PMTglass which will be detected
-            detection=1;
+            fDetection=1;
          }
 
          TVector3 posHit(xHit,yHit,zHit);
 
-         if (detection == 1){
+         if (fDetection == 1){
             Int_t detID = pt->GetDetectorID();
             if (RichDetID == 0) RichDetID = detID;
             if (RichDetID != detID)
@@ -417,7 +444,7 @@ void CbmRichHitProducer::Exec(
       if (fVerbose > 2) {
          cout << " iHit, Point-x, Point-y, Hit-x, Hiy-y, detected, PMT? " << j << " "
                << posPoint.X() << " " << posPoint.Y() << " " << xHit << " "
-               << yHit << " " << detection << " " << pmtID << endl;
+               << yHit << " " << fDetection << " " << pmtID << endl;
       }
    } // loop over RICH points
 
@@ -469,7 +496,7 @@ void CbmRichHitProducer::Exec(
       cout << endl;
    }
    cout << "nof cross section hits = " << fNofCrossTalkHits << ", per event = " <<
-         (Double_t) fNofCrossTalkHits / nevents << endl;
+         (Double_t) fNofCrossTalkHits / fNEvents << endl;
 }
 
 void CbmRichHitProducer::TiltPoint(

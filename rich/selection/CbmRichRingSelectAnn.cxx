@@ -1,6 +1,6 @@
-#include "CbmRichRingSelectNeuralNet.h"
+#include "CbmRichRingSelectAnn.h"
 #include "CbmRichRingLight.h"
-#include "CbmRichRingSelectImplLight.h"
+#include "CbmRichRingSelectImpl.h"
 
 #ifdef ANN_FILE
 #include "TTree.h"
@@ -16,21 +16,24 @@
 using std::cout;
 using std::endl;
 
-// -----   Standard constructor   ------------------------------------------
-CbmRichRingSelectNeuralNet::CbmRichRingSelectNeuralNet (const char* NNFile )
+CbmRichRingSelectAnn::CbmRichRingSelectAnn (
+      const std::string& annFile ):
+   fNeuralNetWeights(annFile),
+   fNN(NULL),
+   fNNfunction(NULL),
+   fSelectImpl(NULL)
 {
-    fNeuralNetWeights = NNFile;
+
 }
 
-// -----   Destructor   ----------------------------------------------------
-CbmRichRingSelectNeuralNet::~CbmRichRingSelectNeuralNet()
-{}
-
-// -----   Initialization   ----------------------------------------------------
-void CbmRichRingSelectNeuralNet::Init ()
+CbmRichRingSelectAnn::~CbmRichRingSelectAnn()
 {
-    fSelectImpl = new CbmRichRingSelectImplLight();
-    //fSelectImpl->Init();
+
+}
+
+void CbmRichRingSelectAnn::Init ()
+{
+    fSelectImpl = new CbmRichRingSelectImpl();
 
 #ifdef ANN_FILE
     TTree *simu = new TTree ("MonteCarlo","MontecarloData");
@@ -55,7 +58,7 @@ void CbmRichRingSelectNeuralNet::Init ()
 }
 
 // -----   Exec   ----------------------------------------------------
-void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRingLight* ring)
+void CbmRichRingSelectAnn::DoSelect(CbmRichRingLight* ring)
 {
     if (ring->GetRadius() >= 10.f || ring->GetRadius() <= 0.f ||
         ring->GetNofHits() <= 5.f ||
@@ -77,12 +80,12 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRingLight* ring)
     }
 
     double nnPar[10];
-    nnPar[0] =  ring->GetNofHits();
-    nnPar[1] =  ring->GetAngle();
-    nnPar[2] =  ring->GetNofHitsOnRing();
-    nnPar[3] =  ring->GetRadialPosition();
-    nnPar[4] =  ring->GetRadius();
-    nnPar[5] =  ring->GetChi2() / ring->GetNofHits();
+    nnPar[0] = ring->GetNofHits();
+    nnPar[1] = ring->GetAngle();
+    nnPar[2] = ring->GetNofHitsOnRing();
+    nnPar[3] = ring->GetRadialPosition();
+    nnPar[4] = ring->GetRadius();
+    nnPar[5] = ring->GetChi2() / ring->GetNofHits();
 #ifdef ANN_FILE
     float nnEval = fNN->Evaluate(0,nnPar);
 #endif

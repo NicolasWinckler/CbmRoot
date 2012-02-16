@@ -78,6 +78,16 @@ class CbmRichTrackExtrapolationMirrorIdeal : public CbmRichTrackExtrapolation
   Int_t    fMinNsts;       /** number of STS hits required for extrapolated track */
   Int_t    iEx;            /** number of extrapolated tracks */
 
+  /**
+   * \brief Copy constructor.
+   */
+  CbmRichTrackExtrapolationMirrorIdeal(const CbmRichTrackExtrapolationMirrorIdeal&);
+
+  /**
+   * \brief Assignment operator.
+   */
+  CbmRichTrackExtrapolationMirrorIdeal& operator=(const CbmRichTrackExtrapolationMirrorIdeal&);
+
   ClassDef(CbmRichTrackExtrapolationMirrorIdeal,1);
 
 };

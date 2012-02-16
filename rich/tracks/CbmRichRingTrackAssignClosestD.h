@@ -77,6 +77,17 @@ private:
 	Double_t fDistance; /** max. distance between ring center and track extrapolation */
 	Int_t fNpoints; /** min number of points per ring */
 
+  /**
+   * \brief Copy constructor.
+   */
+	CbmRichRingTrackAssignClosestD(const CbmRichRingTrackAssignClosestD&);
+
+  /**
+   * \brief Assignment operator.
+   */
+	CbmRichRingTrackAssignClosestD& operator=(const CbmRichRingTrackAssignClosestD&);
+
+
 	ClassDef(CbmRichRingTrackAssignClosestD, 1);
 
 };

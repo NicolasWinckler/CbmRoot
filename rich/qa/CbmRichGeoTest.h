@@ -7,8 +7,8 @@
 * \date 2011
 **/
 
-#ifndef CBMRICHGEOTEST_H
-#define CBMRICHGEOTEST_H
+#ifndef CBMRICHGEOTEST
+#define CBMRICHGEOTEST
 
 #include "FairTask.h"
 
@@ -154,6 +154,16 @@ private:
     * \brief Print out final results.
     */
 	void PrintStatisctics();
+
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichGeoTest(const CbmRichGeoTest&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichGeoTest& operator=(const CbmRichGeoTest&);
 
 	TClonesArray* fRichHits;
 	TClonesArray* fRichRings;

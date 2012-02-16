@@ -1,28 +1,75 @@
+/**
+* \file CbmRichElectronIdAnn.h
+*
+* \brief Implementation of the electron identification algorithm in the RICH detector using
+* Artificial Neural Network(ANN).
+*
+* \author Semen Lebedev
+* \date 2008
+**/
 
-#ifndef CBM_RICH_ELECTRONID_ANN_H
-#define CBM_RICH_ELECTRONID_ANN_H
+#ifndef CBM_RICH_ELECTRONID_ANN
+#define CBM_RICH_ELECTRONID_ANN
 
-#include "TClonesArray.h"
-#include "CbmRichRing.h"
-#include "CbmRichRingSelect.h"
-#include "TMultiLayerPerceptron.h"
+#include <string>
 
+class CbmRichRing;
 class TMultiLayerPerceptron;
 
-class CbmRichElectronIdAnn{
-    const char* fNeuralNetWeights;
+using std::string;
 
+/**
+* \class CbmRichElectronIdAnn
+*
+* \brief Implementation of the electron identification algorithm in the RICH detector using
+* Artificial Neural Network(ANN).
+*
+* \author Semen Lebedev
+* \date 2008
+**/
+class CbmRichElectronIdAnn
+{
+private:
+   string fNeuralNetWeights; // file name with weights for ANN
+   TMultiLayerPerceptron* fNN;
 public:
-    CbmRichElectronIdAnn();// Default constructor
-    CbmRichElectronIdAnn ( Int_t verbose, const char* NNFile);// Standard constructor
-    ~CbmRichElectronIdAnn();
 
-    void Init();
-    Double_t DoSelect(CbmRichRing* ring, Double_t momentum);
+   /**
+    * \brief Standard constructor.
+    */
+   CbmRichElectronIdAnn(
+         const string& annFile);
 
-    TMultiLayerPerceptron* fNN;
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmRichElectronIdAnn();
 
-    ClassDef(CbmRichElectronIdAnn,1);
+   /**
+    * \brief Initialize ANN before use.
+    */
+   void Init();
+
+   /**
+    * \brief Calculate output value of the ANN.
+    * \param[in] ring Found and fitted ring.
+    * \param[in] momentum Momentum of the track attached to this ring.
+    * \return ANN output value.
+    */
+   double DoSelect(
+         CbmRichRing* ring,
+         double momentum);
+
+private:
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichElectronIdAnn(const CbmRichElectronIdAnn&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichElectronIdAnn& operator=(const CbmRichElectronIdAnn&);
 };
 
 #endif

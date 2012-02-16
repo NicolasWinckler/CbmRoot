@@ -22,6 +22,7 @@
 #include "CbmGlobalTrack.h"
 #include "CbmVertex.h"
 
+#include "TStopwatch.h"
 #include "TLegend.h"
 #include "TCanvas.h"
 #include "TH1.h"
@@ -91,7 +92,11 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fPairPi0Vertex(),
     fBirthGamma(NULL),
     fBirthPi0(NULL),
-    fBirthPair(NULL)
+    fBirthPair(NULL),
+    fPi0SpectrumGammaTruePairs(NULL),
+    fPi0SpectrumGammaAllPairs(NULL),
+    fGammaSpectrumTrueEPPairs(NULL),
+    fGammaSpectrumAllEPPairs(NULL)
 {
 }
 
@@ -124,12 +129,20 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fPairPi0Vertex(),
     fBirthGamma(NULL),
     fBirthPi0(NULL),
-    fBirthPair(NULL)
+    fBirthPair(NULL),
+    fPi0SpectrumGammaTruePairs(NULL),
+    fPi0SpectrumGammaAllPairs(NULL),
+    fGammaSpectrumTrueEPPairs(NULL),
+    fGammaSpectrumAllEPPairs(NULL)
 {
 }
 
 CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()
 {
+  //TODO::
+  // Clear TClonesArrays
+
+  // Delete global pointer
 
 }
 
@@ -229,7 +242,8 @@ void CbmTrdPhotonAnalysis::SetParContainers()
 
 void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 {
-
+  TStopwatch timer;
+  timer.Start();
   cout << endl << "================CbmTrdPhotonAnalysis=====================" << endl;
   InitHistos();
   
@@ -255,25 +269,12 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     nGlobalTracks(0),
     nPrimaryVertex(0);
 
-  Int_t elecFromPhot = 0;
-  Int_t posiFromPhot = 0;
   Int_t motherId = 0;
-
-  std::vector<Int_t> electronMotherIds;
-  std::vector<Int_t> positronMotherIds;
-  std::vector<Int_t> electronGammaMotherIds;
-  std::vector<Int_t> positronGammaMotherIds;
-  std::vector<Int_t> electronGammaMotherIdsInMagnet;
-  std::vector<Int_t> positronGammaMotherIdsInMagnet;
 
   std::vector<std::vector<Int_t> > dalizTriplets;
   std::vector<std::pair<Int_t,Int_t> > electronPositronPairs;
   std::vector<std::pair<Int_t,Int_t> > gammaGammaPairs;
-  /*
-    std::map<Int_t, MCParticle*> MCParticleMap;
-    std::map<Int_t, MCParticle*>::iterator it;
-  */
-
+ 
   if (fMCTracks)
     nMcTracks = fMCTracks->GetEntries();
   if (fTrdPoints)
@@ -363,11 +364,19 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   //=========================================================================
   // Find Particle of Interest Candidates
+  CbmMCTrack* etrack;
+  CbmMCTrack* ptrack;
+  CbmMCTrack* gtrack1;
+  CbmMCTrack* gtrack2;
 
   // Find Electron Positron Pairs
   for (Int_t iElectron = 0; iElectron < fElectronIds.size(); iElectron++) {
     for (Int_t iPositron = 0; iPositron < fPositronIds.size(); iPositron++) {
+      etrack = (CbmMCTrack*)fMCTracks->At(fElectronIds[iElectron]);
+      ptrack = (CbmMCTrack*)fMCTracks->At(fPositronIds[iPositron]);
+      fGammaSpectrumAllEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
       if (fMCParticleMap[fElectronIds[iElectron]]->motherId == fMCParticleMap[fPositronIds[iPositron]]->motherId) {
+	fGammaSpectrumTrueEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
 	std::pair<Int_t,Int_t> epPair (fElectronIds[iElectron], fPositronIds[iPositron]);
 	//epPair = make_pair (fElectronIds[iElectron], fPositronIds[iPositron]);
 	electronPositronPairs.push_back(epPair);
@@ -378,7 +387,15 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   // Find Gamma Gamma Pairs
   for (Int_t iGamma = 0; iGamma < fGammaIds.size(); iGamma++) {
     for (Int_t jGamma = iGamma+1; jGamma < fGammaIds.size(); jGamma++) {
-      if ((fMCParticleMap[fGammaIds[iGamma]]->motherId == fMCParticleMap[fGammaIds[jGamma]]->motherId) && (fMCParticleMap[fGammaIds[iGamma]]->motherId != -1)) {
+      gtrack1 = (CbmMCTrack*)fMCTracks->At(fGammaIds[iGamma]);
+      gtrack2 = (CbmMCTrack*)fMCTracks->At(fGammaIds[jGamma]); 
+     
+      fPi0SpectrumGammaAllPairs->Fill(CalcInvariantMass(gtrack1, gtrack2));
+      if ((fMCParticleMap[fGammaIds[iGamma]]->motherId == fMCParticleMap[fGammaIds[jGamma]]->motherId) 
+	  && 
+	  (fMCParticleMap[fGammaIds[iGamma]]->motherId != -1)
+	  ) { 
+	fPi0SpectrumGammaTruePairs->Fill(CalcInvariantMass(gtrack1, gtrack2));
 	std::pair<Int_t,Int_t> ggPair (fGammaIds[iGamma], fGammaIds[jGamma]);
 	//ggPair = make_pair (fGammaIds[iGamma], fGammaIds[jGamma]);
 	gammaGammaPairs.push_back(ggPair);
@@ -401,9 +418,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   }
   //=========================================================================
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
   // Vertizes of real electron positron pairs
   for (Int_t iPair = 0; iPair < electronPositronPairs.size(); iPair++ ) {
-    CbmMCTrack* etrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].first);
+    etrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].first);
+    ptrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].second);
+
     fPairAllVertex[0]->Fill(etrack->GetStartX());
     fPairAllVertex[1]->Fill(etrack->GetStartY());
     fPairAllVertex[2]->Fill(etrack->GetStartZ());
@@ -434,7 +455,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       if (VertexInTarget(etrack))
 	fPairHistory->Fill(8);
     }
-    delete etrack;
+ 
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -445,8 +466,6 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-
-  printf("electron from photon = %i\npositron from photon = %i\n", elecFromPhot, posiFromPhot);
   for (Int_t iTrdTrack = 0; iTrdTrack < nTrdTracks; iTrdTrack++) {
     track = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
     /*
@@ -469,7 +488,65 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     //printf("PidHypo:%.2i\n",gtrack->GetPidHypo());
   }
   SaveHistosToFile();
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+
+  printf("\n\n******************** Reading Test  **********************\n");
+  printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+  printf("*********************************************************\n\n");
+  /*
+    if(gtrack1 != NULL)
+    delete gtrack1;
+    if(gtrack2 != NULL)
+    delete gtrack2;
+    if(etrack != NULL)
+    delete etrack;
+    if(ptrack != NULL)
+    delete ptrack;
+    if(mctrack != NULL)
+    delete mctrack;
+    if(track != NULL)
+    delete track;
+    if(mother != NULL)
+    delete mother;
+    if(grandmother != NULL)
+    delete grandmother;
+    if(daughter != NULL)
+    delete daughter;
+    if(mcpt != NULL)
+    delete mcpt;
+    if(digi != NULL)
+    delete digi;
+    if(cluster != NULL)
+    delete cluster;
+    if(hit != NULL)
+    delete hit;
+    if(track != NULL)
+    delete track;
+    if(gtrack != NULL)
+    delete gtrack;
+    if(pvertex != NULL)
+    delete pvertex;
+  */
+  // TODO:: clear all global data container
 }
+Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB)
+{
+  Double_t energyA = TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
+  Double_t energyB = TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
+  Double_t energyAB = energyA + energyB;
+  //Double_t ptAB = trackA->GetPt() + trackB->GetPt();
+  Double_t invariantMass = TMath::Sqrt(
+			      pow(energyAB,2) 
+			      - pow((trackA->GetPx() + trackB->GetPx()),2) 
+			      - pow((trackA->GetPy() + trackB->GetPy()),2) 
+			      - pow((trackA->GetPz() + trackB->GetPz()),2)
+			      );
+  return invariantMass;
+
+}
+
   Bool_t CbmTrdPhotonAnalysis::PairFromGamma(Int_t firstId, Int_t secondId)
   {
     return true;
@@ -685,6 +762,9 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fPairGammaVertex[i]->SetXTitle(name[i]+"-position [cm]");
     fPairPi0Vertex[i] = new TH1I("PairPi0Vertex_" + name[i], "e^{+} e^{-} pair from #pi^{0} vertex " + name[i], 200, low[i], high[i]);
     fPairPi0Vertex[i]->SetXTitle(name[i]+"-position [cm]");
+    NiceHisto1(fPairAllVertex[i],1,0,0);
+    NiceHisto1(fPairGammaVertex[i],2,0,0);
+    NiceHisto1(fPairPi0Vertex[i],3,0,0);
   }
   /*
     fMCPid = new TH1I("MCPid","MC Pid",4501,-1000.5,3500.5);
@@ -695,10 +775,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fZBirth[1] = new TH1I("ZBirth_positron","z birth e^{+}",10000,0,1000);
   fZBirth[2] = new TH1I("ZBirth_electron","z birth e^{-}",10000,0,1000);
   fZBirth[3] = new TH1I("ZBirth_pi0","z birth #pi^{0}",10000,0,1000);
-  fBirthPi0 = new TH3I("BirthPi0","z birth #pi^{0}"           ,100,-50,50,100,-50,50,100,0,100);
-  fBirthPair = new TH3I("BirthPair","z birth e^{-}e^{+} pairs",100,-50,50,100,-50,50,100,0,100);
-  fBirthGamma = new TH3I("BirthGamma","z birth #gamma"        ,100,-50,50,100,-50,50,100,0,100);
-  fPairHistory = new TH1I("GammaHistory","history for #gamma",10,-0.5,9.5);
+  fBirthPi0 = new TH3I("BirthPi0","#pi^{0} vertex"           ,100,-500,500,100,-500,500,100,0,1000);
+  fBirthPair = new TH3I("BirthPair","e^{-}e^{+} pairs vertex",100,-500,500,100,-500,500,100,0,1000);
+  fBirthGamma = new TH3I("BirthGamma","#gamma vertex"        ,100,-500,500,100,-500,500,100,0,1000);
+  fPairHistory = new TH1I("PairHistory","history for #gamma",10,-0.5,9.5);
   fPairHistory->GetXaxis()->SetBinLabel( 1,"all e^{-} e^{+} pairs");
   fPairHistory->GetXaxis()->SetBinLabel( 2,"pairs from #gamma");
   fPairHistory->GetXaxis()->SetBinLabel( 3,"pairs from #pi^{0}#rightarrow e^{+}+e^{-}+#gamma");
@@ -709,31 +789,47 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fPairHistory->GetXaxis()->SetBinLabel( 8,"pairs from #gamma within target");
   fPairHistory->GetXaxis()->SetBinLabel( 9,"pairs from #pi^{0} within target");
   fPairHistory->GetXaxis()->SetBinLabel(10,"");
+
+  fPi0SpectrumGammaTruePairs = new TH1I("Pi0SpectrumGammaTruePairs","#pi^{0} spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
+  fPi0SpectrumGammaAllPairs  = new TH1I("Pi0SpectrumGammaAllPairs","#pi^{0} spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
+  fGammaSpectrumTrueEPPairs  = new TH1I("GammaSpectrumTrueEPPairs","#gamma spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
+  fGammaSpectrumAllEPPairs   = new TH1I("GammaSpectrumAllEPPairs","#gamma spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
+
   NiceHisto1(fMCPid,1,20,1);
   NiceHisto1(fGTPid,1,20,1);
   NiceHisto1(fePlusMinusMother,1,20,1);
   NiceHisto1(fgammaMother,1,20,1);
   NiceHisto1(fgammaDaughter,1,20,1);
   NiceHisto1(fZBirth[0],1,20,1);
-  NiceHisto1(fZBirth[1],1,20,1);
-  NiceHisto1(fZBirth[2],1,20,1);
-  NiceHisto1(fZBirth[3],1,20,1);
+  NiceHisto1(fZBirth[1],2,20,1);
+  NiceHisto1(fZBirth[2],3,20,1);
+  NiceHisto1(fZBirth[3],4,20,1);
   NiceHisto1(fPairHistory,1,20,1);
   NiceHisto2(fZBirthAll,1,1,1);
   NiceHisto2(fMotherDaughter,1,1,1);
+  NiceHisto3(fBirthPi0,1,7,1);
+  NiceHisto3(fBirthGamma,2,7,1);
+  NiceHisto3(fBirthPair,3,7,1);
+  NiceHisto1(fPi0SpectrumGammaTruePairs,1,1,1);
+  NiceHisto1(fPi0SpectrumGammaAllPairs,2,1,1);
+  NiceHisto1(fGammaSpectrumTrueEPPairs,1,1,1);
+  NiceHisto1(fGammaSpectrumAllEPPairs,2,1,1);
+
 }
 
 void CbmTrdPhotonAnalysis::SaveHistosToFile()
 {
-
-  TCanvas *c = new TCanvas("CbmTrdPhotonAnalysis","CbmTrdPhotonAnalysis",800,600);
-  c->Divide(2,1);
-  c->cd(1);
-  fMCPid->Draw();
-  c->cd(2);
-  fGTPid->Draw();
-  c->SaveAs("data/CbmTrdPhotonAnalysis.pdf");
-  TFile *outFile = new TFile("data/CbmTrdPhotonAnalysis.root","RECREATE","output of CbmTrdPhotonAnalysis");
+  //TODO:: undate histos instead of overwriting for each event. find a way to get event number from run task
+  /*
+    TCanvas *c = new TCanvas("CbmTrdPhotonAnalysis","CbmTrdPhotonAnalysis",800,600);
+    c->Divide(2,1);
+    c->cd(1);
+    fMCPid->Draw();
+    c->cd(2);
+    fGTPid->Draw();
+    c->SaveAs("data/CbmTrdPhotonAnalysis.pdf");
+  */
+  TFile *outFile = new TFile("data/CbmTrdPhotonAnalysis.root","UPDATE","output of CbmTrdPhotonAnalysis");
   outFile->cd();
   fMCPid->Write("", TObject::kOverwrite);
   fGTPid->Write("", TObject::kOverwrite);
@@ -779,8 +875,19 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     fPairGammaVertex[i]->Write("", TObject::kOverwrite);
     fPairPi0Vertex[i]->Write("", TObject::kOverwrite);
   }
+
+  fPi0SpectrumGammaTruePairs->SetXTitle("Invariant mass [GeV/c^{2}]");
+  fPi0SpectrumGammaAllPairs->SetXTitle("Invariant mass [GeV/c^{2}]");
+  fGammaSpectrumTrueEPPairs->SetXTitle("Invariant mass [GeV/c^{2}]");
+  fGammaSpectrumAllEPPairs->SetXTitle("Invariant mass [GeV/c^{2}]");
+ 
+  fPi0SpectrumGammaTruePairs->Write("", TObject::kOverwrite);
+  fPi0SpectrumGammaAllPairs->Write("", TObject::kOverwrite);
+  fGammaSpectrumTrueEPPairs->Write("", TObject::kOverwrite);
+  fGammaSpectrumAllEPPairs->Write("", TObject::kOverwrite);
+
   //outFile->Close();
-  c->Close();
+  //c->Close();
 }
 
   void CbmTrdPhotonAnalysis::FinishEvent()
@@ -825,11 +932,27 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     h->GetYaxis()->SetLabelSize(0.03);
     h->GetZaxis()->SetLabelSize(0.03);
     h->GetXaxis()->SetTitleSize(0.035);
+    h->GetXaxis()->SetTitleOffset(1.5);
+    h->GetYaxis()->SetTitleSize(0.035);
+    h->GetYaxis()->SetTitleOffset(1.5);
+    h->GetZaxis()->SetTitleSize(0.035);
+    h->GetZaxis()->SetTitleOffset(1.25);
+  }
+  void CbmTrdPhotonAnalysis::NiceHisto3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize) 
+  {
+    h->SetMarkerStyle(mStyle);
+    h->SetMarkerSize(mSize);  
+    h->SetMarkerColor(color);
+    h->SetLineColor(color);  
+    h->GetXaxis()->SetLabelSize(0.03);
+    h->GetYaxis()->SetLabelSize(0.03);
+    h->GetZaxis()->SetLabelSize(0.03);
+    h->GetXaxis()->SetTitleSize(0.035);
     h->GetXaxis()->SetTitleOffset(1.25);
     h->GetYaxis()->SetTitleSize(0.035);
     h->GetYaxis()->SetTitleOffset(1.25);
     h->GetZaxis()->SetTitleSize(0.035);
-    h->GetZaxis()->SetTitleOffset(-2);
+    h->GetZaxis()->SetTitleOffset(1.25);
   }
   void CbmTrdPhotonAnalysis::NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize) 
   {

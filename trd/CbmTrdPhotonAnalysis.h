@@ -13,6 +13,7 @@
 #include "TH2I.h"
 #include "TH3I.h"
 #include <vector>
+#include "CbmMCTrack.h"
 
 class TClonesArray;
 
@@ -61,6 +62,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Bool_t PairFromGamma(Int_t firstId, Int_t secondId);
   Bool_t PairFromPi0(Int_t firstId, Int_t secondId);
 
+  Double_t CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB);
+
   /** Executed task **/
   virtual void Exec(Option_t * option);
 
@@ -77,6 +80,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
   //void NiceHisto(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize);
   void NiceHisto1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize);
   void NiceHisto2(TH2 *h, Int_t color, Int_t mStyle, Int_t mSize);
+  void NiceHisto3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize);
   void NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize);
   void NiceLegend(TLegend *l);
 
@@ -99,31 +103,41 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
 
   //Histos
+
+  // Vertex
   TH3I*  fMotherDaughterZBirth;
   TH3I*  fBirthGamma;
   TH3I*  fBirthPi0;
   TH3I*  fBirthPair;
-
   TH2I*  fZBirthAll;
-  TH2I*  fMotherDaughter;
-
-  TH2I* fNoDaughters;
-
   TH1I*  fZBirthEPfromGamma;
-  TH1I*  fMCPid;
-  TH1I*  fGTPid;
+  TH1I*  fZBirth[4];
+  TH1I* fPairAllVertex[3];
+  TH1I* fPairGammaVertex[3];
+  TH1I* fPairPi0Vertex[3];
+
+  // Mother Daughter
+  TH2I*  fMotherDaughter;
+  TH2I* fNoDaughters;
   TH1I*  fePlusMinusMother;
   TH1I*  fePlusAndMinusMother;
   TH1I*  fgammaMother;
   TH1I*  fgammaAndGammaMother;
   TH1I*  fDalizMother;
   TH1I*  fgammaDaughter;
-  TH1I*  fZBirth[4];
+
+  // Global PID
+  TH1I*  fMCPid;
+  TH1I*  fGTPid;
+
+
   TH1I*  fPairHistory;
 
-  TH1I* fPairAllVertex[3];
-  TH1I* fPairGammaVertex[3];
-  TH1I* fPairPi0Vertex[3];
+  // Spectra
+  TH1I* fPi0SpectrumGammaTruePairs;
+  TH1I* fPi0SpectrumGammaAllPairs;
+  TH1I* fGammaSpectrumTrueEPPairs;
+  TH1I* fGammaSpectrumAllEPPairs;
 
   std::map<Int_t, MCParticle*> fMCParticleMap;
   std::map<Int_t, MCParticle*>::iterator it;
@@ -132,6 +146,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
   std::vector<Int_t> fPositronIds;
   std::vector<Int_t> fGammaIds;
   std::vector<Int_t> fPi0Ids;
+
+  std::vector<CbmMCTrack*> fGammaFromPairs;
 
   ClassDef(CbmTrdPhotonAnalysis,1)
     };

@@ -309,10 +309,10 @@ void draw_analysis_all()
    gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
    cbmlibs();
 
-   TString fnRho0 = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/rho0/analysis.delta.all.root";
-   TString fnOmega = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omega/analysis.delta.all.root";
-   TString fnPhi = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/phi/analysis.delta.all.root";
-   TString fnOmegaD = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omegadalitz/analysis.delta.all.root";
+   TString fnRho0 = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/nomvd/rho0/analysis.all.root";
+   TString fnOmega = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/nomvd/omega/analysis.all.root";
+   TString fnPhi = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/nomvd/phi/analysis.all.root";
+   TString fnOmegaD = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/nomvd/omegadalitz/analysis.all.root";
 
    TFile *fileRho0 = new TFile(fnRho0);
    Int_t nofEvents = fh_event_number->GetEntries();

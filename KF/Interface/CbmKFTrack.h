@@ -33,11 +33,11 @@ class CbmKFTrack : public CbmKFTrackInterface{
   CbmKFTrack();
   ~CbmKFTrack(){ }
 
-  CbmKFTrack( CbmKFTrackInterface &track ){ SetTrack( track ); }
+  CbmKFTrack( CbmKFTrackInterface &track ): fMass(0), fChi2(0), fIsElectron(0), fNDF(0), fHits() { SetTrack( track ); }
 
-  CbmKFTrack( FairTrackParam &track ){    SetTrackParam( track ); }
+  CbmKFTrack( FairTrackParam &track ): fMass(0), fChi2(0), fIsElectron(0), fNDF(0), fHits() {    SetTrackParam( track ); }
 
-  CbmKFTrack( CbmStsTrack &track, bool first=1 ){ SetStsTrack( track, first ); }
+  CbmKFTrack( CbmStsTrack &track, bool first=1 ): fMass(0), fChi2(0), fIsElectron(0), fNDF(0), fHits() { SetStsTrack( track, first ); }
 
   void SetTrack( CbmKFTrackInterface &track );
   void SetTrackParam( FairTrackParam &track );

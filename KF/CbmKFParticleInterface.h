@@ -106,6 +106,10 @@ void GetKFVertexJ(int j, CbmKFVertex *vtx);
 
  public:
   CbmKFParticle_simd *KFPart;
+
+ private:
+  CbmKFParticleInterface(const CbmKFParticleInterface&);
+  void operator=(const CbmKFParticleInterface&);
 };
 
 #endif /* !CbmKFParticleInterface_h */

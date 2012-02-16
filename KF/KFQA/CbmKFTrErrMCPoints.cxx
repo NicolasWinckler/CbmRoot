@@ -17,7 +17,14 @@
 
 ClassImp(CbmKFTrErrMCPoints)
 
-CbmKFTrErrMCPoints::CbmKFTrErrMCPoints()
+CbmKFTrErrMCPoints::CbmKFTrErrMCPoints():
+
+StsArray(),
+MvdArray(),
+
+StsArrayIndex(),
+MvdArrayIndex()
+
 {
   //MvdArray = new TClonesArray("CbmMvdPoint");
   //StsArray = new TClonesArray("CbmStsPoint");

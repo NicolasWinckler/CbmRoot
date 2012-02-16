@@ -27,7 +27,7 @@ class CbmKFTrackInterface :public TObject{
   
  public:  
 
-  CbmKFTrackInterface(){}
+  CbmKFTrackInterface():fId(){}
   virtual ~CbmKFTrackInterface(){}
 
   /** Information not to be changed

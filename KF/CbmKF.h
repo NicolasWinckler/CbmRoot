@@ -106,6 +106,9 @@ class CbmKF :public FairTask {
   Int_t ReadTube( CbmKFTube &tube, FairGeoNode *node);
   CbmKFMaterial *ReadPassive( FairGeoNode *node);
 
+ private:
+  CbmKF(const CbmKF&);
+  void operator=(const CbmKF&);
  public: 
   
   ClassDef( CbmKF, 1 );

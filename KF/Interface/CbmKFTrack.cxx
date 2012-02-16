@@ -11,13 +11,9 @@
 
 ClassImp(CbmKFTrack)
 
-CbmKFTrack::CbmKFTrack(){
+CbmKFTrack::CbmKFTrack(): fMass(0), fChi2(0), fIsElectron(kFALSE), fNDF(0), fHits(){
   for (Int_t i=0; i<6; i++) fT[i]=0.;
   for (Int_t i=0; i<15; i++) fC[i]=0.;
-  fMass=0.;
-  fChi2=0.;
-  fIsElectron=kFALSE;
-  fNDF=0;
 }
 
 

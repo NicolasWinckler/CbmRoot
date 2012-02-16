@@ -76,6 +76,9 @@ class CbmStsKFTrackFitter : public CbmStsTrackFitter{
  public:
   
   ClassDef( CbmStsKFTrackFitter, 1 );
+ private:
+  CbmStsKFTrackFitter(const CbmStsKFTrackFitter&);
+  void operator=(const CbmStsKFTrackFitter&);
 };
 
 #endif

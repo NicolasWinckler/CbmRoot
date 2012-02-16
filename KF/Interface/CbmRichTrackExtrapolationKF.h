@@ -82,6 +82,9 @@ class CbmRichTrackExtrapolationKF : public CbmRichTrackExtrapolation
 
   ClassDef(CbmRichTrackExtrapolationKF,1);
 
+ private:
+  CbmRichTrackExtrapolationKF(const CbmRichTrackExtrapolationKF&);
+  void operator=(const CbmRichTrackExtrapolationKF&);
 };
 
 #endif

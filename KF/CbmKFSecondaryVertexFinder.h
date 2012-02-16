@@ -31,7 +31,7 @@ class CbmKFSecondaryVertexFinder:public TObject {
 
  public:
 
-  CbmKFSecondaryVertexFinder(){ Clear(); };
+  CbmKFSecondaryVertexFinder(): vTracks(), NDF(0), Chi2(0), MassConstraint(0), VParent(0), VGuess(0) { Clear(); };
   ~CbmKFSecondaryVertexFinder(){};
 
   void Clear();
@@ -49,5 +49,9 @@ class CbmKFSecondaryVertexFinder:public TObject {
   void Extrapolate( double T );
 
   ClassDef( CbmKFSecondaryVertexFinder, 1 );
+
+ private:
+  CbmKFSecondaryVertexFinder(const CbmKFSecondaryVertexFinder&);
+  void operator=(const CbmKFSecondaryVertexFinder&);
 };
 #endif /* !CBMKFSECONDARYVERTEXFINDER_H */

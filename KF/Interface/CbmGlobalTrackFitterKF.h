@@ -29,6 +29,10 @@ public:
     void DoFit(CbmGlobalTrack* glbTrack);
 
     ClassDef(CbmGlobalTrackFitterKF, 1);
+
+ private:
+  CbmGlobalTrackFitterKF(const CbmGlobalTrackFitterKF&);
+  void operator=(const CbmGlobalTrackFitterKF&);
 };
 
 

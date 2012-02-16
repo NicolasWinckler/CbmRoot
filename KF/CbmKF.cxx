@@ -37,9 +37,36 @@ ClassImp(CbmKF)
 
 CbmKF *CbmKF::fInstance = 0;
 
-CbmKF::CbmKF(const char *name, Int_t iVerbose ):FairTask(name,iVerbose){
-  fMethod = 1;
-  fMagneticField = 0;
+CbmKF::CbmKF(const char *name, Int_t iVerbose ):
+  FairTask(name,iVerbose),
+  vMaterial(), 
+  
+  vMvdMaterial(),
+  vStsMaterial(),
+  vMuchMaterial(),
+  vMuchDetectors(),
+  vRichMaterial(),
+  vTrdMaterial(),
+  vSttMaterial(),
+  vTargets(),
+  vPipe(),
+
+  vPassiveTube(),
+  vPassiveWall(),
+  vPassiveBox(),
+
+  MvdStationIDMap(),
+  StsStationIDMap(),
+  TrdStationIDMap(),
+  SttStationIDMap(),
+  MuchMCID2StationMap(),
+  MuchStation2MCIDMap(),
+
+  StsDigi(),
+  fMagneticField(0),
+  fMethod(1),
+  fMaterialID2IndexMap()
+{
   if( !fInstance ) fInstance = this;
 }
 
@@ -101,14 +128,14 @@ InitStatus CbmKF::Init()
   FairRuntimeDb *RunDB = Run->GetRuntimeDb();
 
   {
-    CbmGeoStsPar* StsPar = (CbmGeoStsPar*) (RunDB->findContainer("CbmGeoStsPar"));
-    CbmStsDigiPar *digiPar = (CbmStsDigiPar*)(RunDB->findContainer("CbmStsDigiPar"));
+    CbmGeoStsPar* StsPar = reinterpret_cast<CbmGeoStsPar*>(RunDB->findContainer("CbmGeoStsPar"));
+    CbmStsDigiPar *digiPar = reinterpret_cast<CbmStsDigiPar*>(RunDB->findContainer("CbmStsDigiPar"));
     StsDigi.Init(StsPar, digiPar);
   }
 
   if( fVerbose ) cout<<"KALMAN FILTER : === INIT MAGNETIC FIELD ==="<<endl;
 
-  fMagneticField = (FairField*)Run->GetField();
+  fMagneticField = reinterpret_cast<FairField*>(Run->GetField());
   if( fVerbose && fMagneticField ) cout << "Magnetic field done" << endl;
 
   if( !fMagneticField ) cout<<"No Magnetic Field Found"<<endl;
@@ -119,7 +146,7 @@ InitStatus CbmKF::Init()
     
   //=== Mvd ===
   
-  CbmMvdGeoPar* MvdPar = (CbmMvdGeoPar*)(RunDB->findContainer("CbmMvdGeoPar"));
+  CbmMvdGeoPar* MvdPar = reinterpret_cast<CbmMvdGeoPar*>(RunDB->findContainer("CbmMvdGeoPar"));
   
   if( MvdPar ){ //=== Mvd stations ===
     
@@ -138,7 +165,7 @@ InitStatus CbmKF::Init()
     NMvdStations = mvdNodes->GetEntries();
     
     for ( Int_t ist = 0 ; ist < NMvdStations ; ist++ ) {
-      FairGeoNode* mvdNode = (FairGeoNode*)mvdNodes->At(ist);
+      FairGeoNode* mvdNode = reinterpret_cast<FairGeoNode*>(mvdNodes->At(ist));
       if ( ! mvdNode ) {
 	cout << "-W- CbmKF::Init: station#" << ist
 	     << " not found among sensitive nodes " << endl;
@@ -156,7 +183,7 @@ InitStatus CbmKF::Init()
   }
 
 
-  CbmGeoStsPar* StsPar = (CbmGeoStsPar*) (RunDB->findContainer("CbmGeoStsPar"));
+  CbmGeoStsPar* StsPar = reinterpret_cast<CbmGeoStsPar*>(RunDB->findContainer("CbmGeoStsPar"));
 
   if( StsPar ){ //=== Sts stations ===
     
@@ -194,7 +221,7 @@ InitStatus CbmKF::Init()
   
   //=== Rich ===
   
-  CbmGeoRichPar *RichPar = (CbmGeoRichPar*) (RunDB->findContainer("CbmGeoRichPar"));
+  CbmGeoRichPar *RichPar = reinterpret_cast<CbmGeoRichPar*>(RunDB->findContainer("CbmGeoRichPar"));
  
   if( RichPar ) {
 
@@ -284,7 +311,7 @@ InitStatus CbmKF::Init()
 
   //=== Trd stations ===
     
-  CbmGeoTrdPar *TrdPar = (CbmGeoTrdPar*) (RunDB->findContainer("CbmGeoTrdPar"));
+  CbmGeoTrdPar *TrdPar = reinterpret_cast<CbmGeoTrdPar*>(RunDB->findContainer("CbmGeoTrdPar"));
  
   if( TrdPar ){
 
@@ -336,7 +363,7 @@ InitStatus CbmKF::Init()
 
   //=== Stt stations ===
     
-  CbmGeoSttPar *sttPar = (CbmGeoSttPar*) (RunDB->findContainer("CbmGeoSttPar"));
+  CbmGeoSttPar *sttPar = reinterpret_cast<CbmGeoSttPar*>(RunDB->findContainer("CbmGeoSttPar"));
  
   if( sttPar ){
 
@@ -404,7 +431,7 @@ InitStatus CbmKF::Init()
 
   //=== MUon CHambers ===
     
-  CbmGeoMuchPar *MuchPar = (CbmGeoMuchPar*) (RunDB->findContainer("CbmGeoMuchPar"));
+  CbmGeoMuchPar *MuchPar = reinterpret_cast<CbmGeoMuchPar*>(RunDB->findContainer("CbmGeoMuchPar"));
  
   if( MuchPar ){
 
@@ -446,7 +473,7 @@ InitStatus CbmKF::Init()
 
   //=== Tof material ===
     
-  CbmGeoTofPar *TofPar = (CbmGeoTofPar*) (RunDB->findContainer("CbmGeoTofPar"));
+  CbmGeoTofPar *TofPar = reinterpret_cast<CbmGeoTofPar*>(RunDB->findContainer("CbmGeoTofPar"));
  
   if( TofPar ){
 
@@ -481,7 +508,7 @@ InitStatus CbmKF::Init()
   // === Passive Material ===
 
     
-  CbmGeoPassivePar* PassivePar=(CbmGeoPassivePar*)(RunDB->findContainer("CbmGeoPassivePar"));
+  CbmGeoPassivePar* PassivePar=reinterpret_cast<CbmGeoPassivePar*>(RunDB->findContainer("CbmGeoPassivePar"));
   
   if( PassivePar ){
     

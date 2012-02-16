@@ -17,7 +17,7 @@ class CbmKFHit :public TObject {
   
  public:
 
-  CbmKFHit(){MaterialIndex = 0; }
+  CbmKFHit():MaterialIndex(0) {};
   virtual ~CbmKFHit(){ }
 
   Int_t MaterialIndex;

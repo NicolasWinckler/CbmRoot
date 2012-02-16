@@ -16,7 +16,17 @@
 class CbmKFUMeasurement :public TObject
 {
  public:
-  CbmKFUMeasurement(){}
+  CbmKFUMeasurement():
+    z(),
+    u(),
+    sigma2(),
+    phi(),
+    phi_s(),
+    phi_c(),
+    phi_ss(),
+    phi_cc(),
+    phi_2sc()
+  {}
   ~CbmKFUMeasurement(){}
 
   Double_t z;

@@ -35,7 +35,65 @@ using std::vector;
 
 ClassImp(CbmKFTrackFitQA)
 
-CbmKFTrackFitQA::CbmKFTrackFitQA()
+CbmKFTrackFitQA::CbmKFTrackFitQA():
+  listStsPts(0),
+  listMvdPts(0),
+  listMCTracks(0),
+  listStsTracksMatch(0),
+  listStsTracks(0),
+  listStsHits(0),
+  listMvdHits(0),
+  listMvdHitMatches(0),
+  listStsClusters(0),
+  listStsDigi(0),
+
+
+// Names of files
+  outfileName(),
+
+  vStsHitMatch(),
+
+  res_STShit_x(0),
+  res_STShit_y(0),
+  pull_STShit_x(0),
+  pull_STShit_y(0),
+
+  res_MVDhit_x(0),
+  res_MVDhit_y(0),
+  pull_MVDhit_x(0),
+  pull_MVDhit_y(0),
+
+  res_AtPV_x(0),
+  res_AtPV_y(0),
+  res_AtPV_tx(0),
+  res_AtPV_ty(0),
+  res_AtPV_qp(0),
+
+  pull_AtPV_x(0),
+  pull_AtPV_y(0),
+  pull_AtPV_tx(0),
+  pull_AtPV_ty(0),
+  pull_AtPV_qp(0),
+
+
+  res_AtFP_x(0),
+  res_AtFP_y(0),
+  res_AtFP_tx(0),
+  res_AtFP_ty(0),
+  res_AtFP_qp(0),
+
+  pull_AtFP_x(0),
+  pull_AtFP_y(0),
+  pull_AtFP_tx(0),
+  pull_AtFP_ty(0),
+  pull_AtFP_qp(0),
+
+  q_QA(0),
+  dp_p(0),
+
+  ggg(0),
+
+  Nback(0)
 {
   ggg = new TH1F("ggg", "ggg", 6, -0.5, 5.5);
   q_QA = new TProfile("q_QA", "q quality", 100, 0.0, 1.0, 0.0, 100.0);

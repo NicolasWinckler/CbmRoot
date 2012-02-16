@@ -50,11 +50,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmRichTrackExtrapolationKF::CbmRichTrackExtrapolationKF() {
-  fTrackParamArray = NULL;
-  fSTSArray = NULL;
-  fMinNsts       = 6;    // minimum number of STS stations to be crossed
-  fVerbose       = 1;
+CbmRichTrackExtrapolationKF::CbmRichTrackExtrapolationKF(): fTrackParamArray(0), fSTSArray(0), fVerbose(1), fMinNsts(6), iEx(-1) {
 }
 // -------------------------------------------------------------------------
 
@@ -62,11 +58,7 @@ CbmRichTrackExtrapolationKF::CbmRichTrackExtrapolationKF() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmRichTrackExtrapolationKF::CbmRichTrackExtrapolationKF(Int_t MinNsts,
-                                                                   Int_t verbose) {
-  fTrackParamArray = NULL;
-  fSTSArray = NULL;
-  fMinNsts          = MinNsts;
-  fVerbose          = verbose;
+                                                                   Int_t verbose): fTrackParamArray(0), fSTSArray(0), fVerbose(verbose), fMinNsts(MinNsts), iEx(-1) {
 }
 // -------------------------------------------------------------------------
 

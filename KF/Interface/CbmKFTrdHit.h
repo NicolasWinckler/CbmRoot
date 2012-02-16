@@ -25,7 +25,7 @@ class CbmKFTrdHit : public CbmKFHit {
 public:
 
     /** Default constructor **/
-    CbmKFTrdHit() {};
+    CbmKFTrdHit(): FitPoint(), wall(0) {};
 
     /** Destructor **/
     ~CbmKFTrdHit() {};
@@ -43,7 +43,18 @@ public:
     /** Filter **/
     Int_t Filter(CbmKFTrackInterface& track, Bool_t downstream, Double_t& QP0);
 
-    ClassDef(CbmKFTrdHit, 1);
+  const CbmKFTrdHit& operator=(const CbmKFTrdHit& a) {
+    wall = a.wall;
+    FitPoint = a.FitPoint;
+    return *this;
+  };
+
+  CbmKFTrdHit(const CbmKFTrdHit& a):
+    FitPoint(a.FitPoint),
+    wall(a.wall)    
+  {};
+  
+  ClassDef(CbmKFTrdHit, 1);
 
 };
 

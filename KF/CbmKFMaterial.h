@@ -18,8 +18,15 @@ class CbmKFMaterial :public TObject
 {
  public:
 
-  CbmKFMaterial(){ F = 1; Fe = 0.02145;}
-  virtual ~CbmKFMaterial(){ }
+  CbmKFMaterial():
+    ID(-1),
+    ZReference(-1),
+    ZThickness(-1),
+    RadLength(-1),
+    F(1),
+    Fe(0.02145)
+  {}
+  virtual ~CbmKFMaterial(){};
 
   Int_t ID;
   Double_t ZReference ;
@@ -104,7 +111,7 @@ class CbmKFBox: public CbmKFMaterial{
 
 class CbmKFCone :public CbmKFMaterial{
  public:
-  CbmKFCone(){}
+  CbmKFCone(): z1(0), z2(0), r1(0), R1(0), r2(0), R2(0) {};
   ~CbmKFCone(){}
 
   Double_t z1, z2;

@@ -28,20 +28,24 @@ using std::vector;
 //
 
 
-// -----------------------------------------------------------------------
-CbmTrdTrackFitterKF::CbmTrdTrackFitterKF()
+  // -----------------------------------------------------------------------
+CbmTrdTrackFitterKF::CbmTrdTrackFitterKF():
+  fArrayTrdHit(0),
+  fVerbose(1),
+  fPid(211),
+  fKfTrack(0)
 {
-    // Default constructor
-    fArrayTrdHit = NULL;
-    fVerbose = 1;
-    fPid = 211;
     fKfTrack = new CbmKFTrack();
 }
 // -----------------------------------------------------------------------
 
 
 // -----------------------------------------------------------------------
-CbmTrdTrackFitterKF::CbmTrdTrackFitterKF(Int_t verbose, Int_t pid)
+CbmTrdTrackFitterKF::CbmTrdTrackFitterKF(Int_t verbose, Int_t pid):
+  fArrayTrdHit(0),
+  fVerbose(verbose),
+  fPid(pid),
+  fKfTrack(0)
 {
     // Standard constructor
     fArrayTrdHit = NULL;

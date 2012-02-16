@@ -3,12 +3,12 @@
 #define cnst static const fvec
 
 
-CbmKFParticleInterface::CbmKFParticleInterface(){
+CbmKFParticleInterface::CbmKFParticleInterface():KFPart(0){
   //KFPart = (CbmKFParticle_simd*) _mm_malloc(sizeof(CbmKFParticle_simd), 16);
   KFPart = new CbmKFParticle_simd();
 }
 
-CbmKFParticleInterface::CbmKFParticleInterface(CbmKFTrackInterface* Track[]){
+CbmKFParticleInterface::CbmKFParticleInterface(CbmKFTrackInterface* Track[]):KFPart(0){
   KFPart = new CbmKFParticle_simd();
   KFPart->Create(Track);
 //  KFPart -> SetField();
@@ -1028,11 +1028,11 @@ void CbmKFParticleInterface::GetKFVertexJ(int j, CbmKFVertex *vtx)
 
 void CbmKFParticleInterface::GetKFParticle(CbmKFParticle &Part, int iPart)
 {
-  Part.SetId(KFPart->Id()[iPart]);
+  Part.SetId(static_cast<int>(KFPart->Id()[iPart]));
   for( unsigned int i = 0; i < KFPart->DaughterIds().size(); i++ )
-    Part.AddDaughter(KFPart->DaughterIds()[i][iPart]);
+    Part.AddDaughter(static_cast<int>(KFPart->DaughterIds()[i][iPart]));
 
-  Part.SetPDG( KFPart->GetPDG()[iPart] );
+  Part.SetPDG( static_cast<int>(KFPart->GetPDG()[iPart]) );
   
   for(int iP=0; iP<8; iP++)
     Part.GetParameters()[iP] = KFPart->GetParameters()[iP][iPart];

@@ -132,7 +132,9 @@ public:
   CbmStsKFTrackFitter fFitter;
 
   ClassDef(CbmStsFitPerformanceTask,1);
-
+ private:
+  CbmStsFitPerformanceTask(const CbmStsFitPerformanceTask&);
+  void operator=(const CbmStsFitPerformanceTask&);
 };
 
 #endif

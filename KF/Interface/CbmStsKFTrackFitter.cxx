@@ -22,11 +22,12 @@ using std::endl;
 
 ClassImp(CbmStsKFTrackFitter);
 
-CbmStsKFTrackFitter::CbmStsKFTrackFitter(){ 
-  fStsHitsArray = 0;
-  fMvdHitsArray = 0;
-  fIsInitialised = 0;
-}
+CbmStsKFTrackFitter::CbmStsKFTrackFitter():
+  fHits(),
+  fMvdHitsArray(0),
+  fStsHitsArray(0),
+  fIsInitialised(0)
+{}
 
 void CbmStsKFTrackFitter::Init(){ 
   // Initialisation

@@ -27,7 +27,7 @@ class CbmStsKFSecondaryVertexFinder:public TObject {
 
  public:
 
-  CbmStsKFSecondaryVertexFinder(){ Clear(); };
+  CbmStsKFSecondaryVertexFinder(): vStsTracks(), vKFTracks(), VParent(), VGuess(), Finder() { Clear(); };
   ~CbmStsKFSecondaryVertexFinder(){};
 
   void Clear();

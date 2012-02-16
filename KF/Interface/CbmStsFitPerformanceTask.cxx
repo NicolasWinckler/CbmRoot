@@ -149,10 +149,50 @@ void CbmStsFitPerformanceTask::CreateD0Histo(TH1D* hist[15], const char* name, c
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFitPerformanceTask::CbmStsFitPerformanceTask(const char* name, Int_t iVerbose )
-                 :FairTask(name,iVerbose){
-  fTrackAnalysis=1;
-  fVertexAnalysis=0;
-  fD0Analysis=0;
+                 :FairTask(name,iVerbose),
+                  fEvent(0),
+                  fVertexAnalysis(0), fD0Analysis(0), fTrackAnalysis(1),
+
+                  fMCTrackArray(0),      ///< MCTracks
+                  fStsPointArray(0),     ///< StsPoints
+                  fMvdPointArray(0),     ///< StsPoints
+                  fRecStsTrackArray(0),  ///< Reconstructed StsTracks
+                  fStsHitArray(0),          ///< Sts hits
+                  fMvdHitArray(0),          ///< Sts hits
+                  fPrimaryVertex(0),     ///< Primary vertex
+                  fSTSTrackMatch(0),  ///< Related MC tracks
+
+                  fhChi2(0),      // x=chi2(), y=entries for all
+                  fhProb(0),      // x=Prob function(), y=entries for all
+                  fhDP(0),
+                  fhDP2(0),
+                  fhDsP(0),
+                  fhDsP2(0),
+
+                  fhZMCf(0), fhZMCl(0),  // z first/last of MC track
+                  fhZRecof(0), fhZRecol(0),  // z first/last of Reco track
+  
+                  fhRes_vs_Mom_f(0), fhRes_vs_Mom_l(0),      // resolution vs momentum
+                  fhExtraTracks2ndMVD(0), // extra tracks not detected in the second mvd chamber
+
+                    // TH1D* fhFrst[10](), 
+                    // TH1D* fhMid[10](),
+                    // TH1D* fhLast[10](),
+                    // TH1D* fhImp[10](),
+                    // TH1D* fhImpPi[10](),
+                    // TH1D* fhVfit[10](),
+                    // TH1D* fhVtx[9](),
+                    // TH1D* fhV[13][9](),
+                  fhPq(),
+                    // fhD0[4][14](),
+
+                    // fhHitDensity[10](),
+                    // fhTrackDensity[8](),
+                  fhTrackDensity0L(0),
+
+                  histodir(0),
+                  fFitter()
+{
 }
 // -------------------------------------------------------------------------
 

@@ -19,7 +19,7 @@ using namespace std;
 
 // -----   Default constructor   -------------------------------------------
 CbmEcalTrackExtrapolationKF::CbmEcalTrackExtrapolationKF()
-  : CbmEcalTrackExtrapolation(1), fTrackParamArray(NULL), fSTSArray(NULL)
+  : CbmEcalTrackExtrapolation(1), fTrackParamArray(NULL), fSTSArray(NULL), iEx(-1)
 {
   ;
 }
@@ -29,7 +29,7 @@ CbmEcalTrackExtrapolationKF::CbmEcalTrackExtrapolationKF()
 
 // -----   Standard constructor   ------------------------------------------
 CbmEcalTrackExtrapolationKF::CbmEcalTrackExtrapolationKF(Int_t verbose)
-  : CbmEcalTrackExtrapolation(verbose), fTrackParamArray(NULL), fSTSArray(NULL)
+  : CbmEcalTrackExtrapolation(verbose), fTrackParamArray(NULL), fSTSArray(NULL), iEx(-1)
 {
   ;
 }

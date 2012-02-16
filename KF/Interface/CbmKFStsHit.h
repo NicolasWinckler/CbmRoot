@@ -12,8 +12,8 @@ class CbmKFStsHit : public CbmKFHit {
 
  public:
 
-  CbmKFStsHit(){}
-  ~CbmKFStsHit(){}
+  CbmKFStsHit():FitPoint(),tube(0){};
+  ~CbmKFStsHit(){};
 
   CbmKFPixelMeasurement FitPoint;
   CbmKFTube *tube;
@@ -28,6 +28,19 @@ class CbmKFStsHit : public CbmKFHit {
 			  Bool_t downstream, Double_t *QP0,
 			  double gateX, double gateY, int &best_hit_idx );
 
+  
+  const CbmKFStsHit& operator=(const CbmKFStsHit& a) {
+    tube = a.tube;
+    FitPoint = a.FitPoint;
+    return *this;
+  };
+
+  CbmKFStsHit(const CbmKFStsHit& a):
+    FitPoint(a.FitPoint),
+    tube(a.tube)    
+  {};
+
+  
   ClassDef(CbmKFStsHit, 1);
 };
 

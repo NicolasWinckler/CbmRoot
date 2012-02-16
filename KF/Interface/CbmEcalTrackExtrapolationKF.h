@@ -61,6 +61,10 @@ private:
 
   Int_t    iEx;            /** number of extrapolated tracks */
   ClassDef(CbmEcalTrackExtrapolationKF,1);
+
+ private:
+  CbmEcalTrackExtrapolationKF(const CbmEcalTrackExtrapolationKF&);
+  void operator=(const CbmEcalTrackExtrapolationKF&);
 };
 
 #endif

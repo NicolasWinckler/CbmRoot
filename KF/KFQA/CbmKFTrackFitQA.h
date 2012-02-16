@@ -133,6 +133,9 @@ class CbmKFTrackFitQA :public FairTask
   //FILE *fBack;
 
   ClassDef(CbmKFTrackFitQA,1);
+ private:
+  CbmKFTrackFitQA(const CbmKFTrackFitQA&);
+  void operator=(const CbmKFTrackFitQA&);
 };
 
 #endif // _CbmKFTrackFitQA_h_

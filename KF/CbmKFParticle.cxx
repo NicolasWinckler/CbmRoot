@@ -21,7 +21,17 @@ using namespace std;
 
 ClassImp(CbmKFParticle)
 
-CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *qHypo){
+CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *qHypo):
+  fId(-1),
+  fDaughtersIds(),
+
+  fPDG(-1),
+
+  NDF(0),
+  Chi2(0), Q(0),
+  AtProductionVertex(0)
+
+{
 
   fDaughtersIds.push_back( Track->Id() );
 

@@ -21,7 +21,7 @@ class CbmKFPrimaryVertexFinder:public TObject {
 
  public:
 
-  CbmKFPrimaryVertexFinder(){ Clear(); };
+  CbmKFPrimaryVertexFinder():Tracks() { Clear(); };
   ~CbmKFPrimaryVertexFinder(){};
 
   void Clear();

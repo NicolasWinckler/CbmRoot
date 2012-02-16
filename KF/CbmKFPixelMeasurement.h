@@ -17,7 +17,7 @@
 
 class CbmKFPixelMeasurement :public TObject{
  public:
-  CbmKFPixelMeasurement(){}
+  CbmKFPixelMeasurement():z(0),x(0),y(0){}
   ~CbmKFPixelMeasurement(){}
 
   Double_t z;

@@ -36,6 +36,9 @@ public:
 
 
     ClassDef(CbmTrdTrackFitterKF, 1);
+ private:
+  CbmTrdTrackFitterKF(const CbmTrdTrackFitterKF&);
+  void operator=(const CbmTrdTrackFitterKF&);
 };
 
 

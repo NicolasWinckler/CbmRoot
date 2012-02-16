@@ -35,11 +35,16 @@ using std::vector;
 
 
 // ------------------------------------------------------------------
-CbmGlobalTrackFitterKF::CbmGlobalTrackFitterKF()
+CbmGlobalTrackFitterKF::CbmGlobalTrackFitterKF():
+fArrayStsHit(0),       // Array of STS hits
+fArrayTrdHit(0),       // Array of TRD hits
+fArrayTofHit(0),       // Array of TOF hits
+fArrayStsTrack(0),     // Array of STS tracks
+fArrayTrdTrack(0),     // Array of TRD tracks
+fKfTrack(0)           // KF track
 {
     // Default constructor
-    fArrayStsHit = fArrayTrdHit = fArrayTofHit
-	= fArrayStsTrack = fArrayTrdTrack = NULL;
+
     fKfTrack = new CbmKFTrack();
     // Set mass hypothesis
     fKfTrack->SetPID(211);

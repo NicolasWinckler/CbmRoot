@@ -17,7 +17,7 @@
 #include "CbmL1MCTrack.h"
 
 
-CbmL1PFMCParticle::CbmL1PFMCParticle() :fMCTrackID(-1),fPDG(0),fIsReconstructable(0)
+CbmL1PFMCParticle::CbmL1PFMCParticle() :fDaughterIds(), fMCTrackID(-1), fMotherId(-1), fPDG(0), fIsReconstructable(0)
 {
 }
 

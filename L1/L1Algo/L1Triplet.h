@@ -20,7 +20,9 @@ class L1Triplet
 
   std::vector<unsigned int> neighbours;
 
-  L1Triplet(){ neighbours.clear(); };
+  L1Triplet(): w0(0), w1(0), w2(0), b0(0), bl(0), b1(0), st(0), Cqp(0), neighbours() {
+    neighbours.clear();
+  };
   
   void Set( unsigned int iHitL, unsigned int iHitM, unsigned int iHitR,
             unsigned int iStaL, unsigned int iStaM, unsigned int iStaR,

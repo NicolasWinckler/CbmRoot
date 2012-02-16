@@ -463,7 +463,7 @@ void L1Algo::L1KFTrackFitter()
       t[iVec]->CFirst[14] = T.C44[iVec];
 
       t[iVec]->chi2 = T.chi2[iVec];
-      t[iVec]->NDF = (int)T.NDF[iVec];
+      t[iVec]->NDF = static_cast<int>(T.NDF[iVec]);
     }
 
     // fit forward
@@ -534,7 +534,7 @@ void L1Algo::L1KFTrackFitter()
       t[iVec]->CLast[14] = T.C44[iVec];
 
       t[iVec]->chi2 = T.chi2[iVec];
-      t[iVec]->NDF = (int)T.NDF[iVec];
+      t[iVec]->NDF = static_cast<int>(T.NDF[iVec]);
     }
   }
 }

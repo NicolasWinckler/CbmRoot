@@ -53,6 +53,10 @@ class L1Algo{
     vStsHits(),     // hits as a combination of front-, backstrips and z-position
     vSFlag(),  // information of hits station & using hits in tracks(),
     vSFlagB(),
+    isec(-1), // iteration
+    vStsHitsUnused(0),
+    vStsHitPointsUnused(0),
+    RealIHit(0), // index in vStsHits indexed by index in vStsHitsUnusde
     vTracks(), // reconstructed tracks
     vRecoHits(), // packed hits of reconstructed tracks
     CATime(0), // time of trackfinding
@@ -411,7 +415,10 @@ class L1Algo{
 #ifdef DRAW
   friend class L1AlgoDraw;
 #endif
-  
+
+private:
+  L1Algo(const L1Algo&);
+  void operator=(const L1Algo&);
 } _fvecalignment;
 
 

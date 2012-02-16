@@ -59,6 +59,7 @@ CbmL1 *CbmL1::fInstance = 0;
 
 CbmL1::CbmL1():
     algo(0), // for access to L1 Algorithm from L1::Instance
+    PF(0),
 vRTracks(), // reconstructed tracks
 vHitStore(),
 NStation(0), NMvdStations(0), NStsStations(0), // number of detector stations (all\sts\mvd)
@@ -87,6 +88,10 @@ vStsHits(),
 vMCPoints(),
 vMCTracks(),
 vHitMCRef(),
+vRParticles(),
+vMCParticles(),
+MCtoRParticleId(),
+RtoMCParticleId(),
 histodir(0),
     fFindParticlesMode()
 {
@@ -96,7 +101,8 @@ histodir(0),
 
 CbmL1::CbmL1(const char *name, Int_t iVerbose, Int_t _fPerformance, int fSTAPDataMode_, TString fSTAPDataDir_, int findParticleMode_):FairTask(name,iVerbose),
 algo(0), // for access to L1 Algorithm from L1::Instance
-
+PF(0),
+                                                                                                                                      
 vRTracks(), // reconstructed tracks
 vHitStore(),
 NStation(0), NMvdStations(0), NStsStations(0), // number of detector stations (all\sts\mvd)
@@ -125,6 +131,10 @@ vStsHits(),
 vMCPoints(),
 vMCTracks(),
 vHitMCRef(),
+vRParticles(),
+vMCParticles(),
+MCtoRParticleId(),
+RtoMCParticleId(),
 histodir(0),
     fFindParticlesMode(findParticleMode_)
 {

@@ -25,7 +25,24 @@
 #include "TStopwatch.h"
 
 #include <iostream>
-CbmL1ParticlesFinder::CbmL1ParticlesFinder()
+CbmL1ParticlesFinder::CbmL1ParticlesFinder():
+  fitter(),
+  fPVFinder(),
+  fPrimVtx(),
+
+  fPionPlus(),
+  fPionMinus(),
+
+  fPPlus(),    // proton
+  fPMinus(),
+
+  fKPlus(),
+  fKMinus(),
+
+  fElectron(),
+  fPozitron(),
+
+  fParticles()
 {
 }
 

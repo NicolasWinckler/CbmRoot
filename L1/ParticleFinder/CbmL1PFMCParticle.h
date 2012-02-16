@@ -67,6 +67,8 @@ class CbmL1PFMCParticle
 
 struct CbmL1TrackMatch // used for Reco to MC match as well as for MC to Reco
 {
+  CbmL1TrackMatch():ids(),idsMI(){};
+  
   bool IsMatched() const { return ids.size() != 0 || idsMI.size() != 0; };
   int  GetBestMatch() const { 
     if      (ids.size()   != 0) return ids[0];

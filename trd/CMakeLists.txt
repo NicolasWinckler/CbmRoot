@@ -4,6 +4,7 @@
 
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
+${Boost_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base
@@ -40,7 +41,7 @@ CbmTrdHitProducerSmearing.cxx
 CbmTrdClusterizer.cxx 
 CbmTrdHitRateTest.cxx
 CbmTrdHitDensityTest.cxx
-CbmTrdPhotonAnalysis.cxx
+#CbmTrdPhotonAnalysis.cxx
 # CbmTrdCluster.cxx 
 CbmTrdHitProducerQa.cxx  
 CbmTrdRadiator.cxx  

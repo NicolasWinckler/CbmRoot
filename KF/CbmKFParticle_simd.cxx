@@ -30,7 +30,7 @@
 
 using namespace std;
 
-CbmKFParticle_simd::CbmKFParticle_simd(): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0)
+CbmKFParticle_simd::CbmKFParticle_simd(): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0), fField()
 {
   cnst ZERO = 0.0, ONE = 1.;
 
@@ -47,7 +47,7 @@ CbmKFParticle_simd::CbmKFParticle_simd(): fId(-1), fDaughterIds(), NDF(0), Chi2(
 }
 
 
-CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part): fId(part.Id()), fDaughterIds(), NDF(part.GetNDF()), Chi2(part.GetChi2()), Q(part.GetQ()), fPDG(part.GetPDG()), AtProductionVertex(part.GetAtProductionVertex()), fIsVtxGuess(0), fIsVtxErrGuess(0) {
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part): fId(part.Id()), fDaughterIds(), NDF(part.GetNDF()), Chi2(part.GetChi2()), Q(part.GetQ()), fPDG(part.GetPDG()), AtProductionVertex(part.GetAtProductionVertex()), fIsVtxGuess(0), fIsVtxErrGuess(0), fField() {
   for( int i = 0; i < part.NDaughters(); ++i ) {
     fDaughterIds.push_back( part.DaughterIds()[i] );
   }
@@ -61,7 +61,7 @@ CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part): fId(part.Id()), fD
 }
 
 
-CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle *part[]): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0){
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle *part[]): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0), fField(){
   Create(part);
 }
 
@@ -103,7 +103,7 @@ void CbmKFParticle_simd::Create(CbmKFParticle *parts[], int N) {
   }
 }
 
-CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track, Int_t *qHypo, const Int_t *pdg): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(1), fIsVtxGuess(0), fIsVtxErrGuess(0)
+CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track, Int_t *qHypo, const Int_t *pdg): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(1), fIsVtxGuess(0), fIsVtxErrGuess(0), fField()
 {
   fDaughterIds.push_back( Track.Id() );
   
@@ -187,7 +187,7 @@ CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track, Int_t *qHypo,
     Q[j] = (qp[j]>0.) ?1 :( (qp[j]<0) ?-1 :0);
 }
 
-CbmKFParticle_simd::CbmKFParticle_simd( CbmKFTrackInterface* Track[], Int_t *qHypo, const Int_t *pdg): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0)
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFTrackInterface* Track[], Int_t *qHypo, const Int_t *pdg): fId(-1), fDaughterIds(), NDF(0), Chi2(0), Q(0), fPDG(0), AtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0), fField()
 {
   Create(Track,fvecLen,qHypo,pdg);
 }

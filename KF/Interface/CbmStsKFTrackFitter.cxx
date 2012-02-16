@@ -37,13 +37,13 @@ void CbmStsKFTrackFitter::Init(){
 	 << "ROOT manager is not instantiated!" << endl;
     return;
   }
-  fStsHitsArray      = (TClonesArray*) rootMgr->GetObject("StsHit");
+  fStsHitsArray      = reinterpret_cast<TClonesArray*>(rootMgr->GetObject("StsHit"));
   if ( !fStsHitsArray ) {
     cout << "-W- CbmStsKFTrackFitter::Init: "
 	 << "no STS hits array" << endl;
     //return;
   }
-  fMvdHitsArray   = (TClonesArray*) rootMgr->GetObject("MvdHit");
+  fMvdHitsArray   = reinterpret_cast<TClonesArray*>(rootMgr->GetObject("MvdHit"));
   if( !fMvdHitsArray ) {
     cout << "-W- CbmStsKFTrackFitter::Init: "
   	 << "no MVD hits array" << endl;
@@ -65,14 +65,14 @@ void CbmStsKFTrackFitter::SetKFHits(CbmKFTrack &T, CbmStsTrack* track){
   if ( NMvdHits > 0 ){
     for (Int_t i=0; i<NMvdHits;i++){
       Int_t j = track->GetMvdHitIndex(i);
-      fHits[i].Create((CbmMvdHit*) fMvdHitsArray->At(j));
+      fHits[i].Create( reinterpret_cast<CbmMvdHit*>(fMvdHitsArray->At(j)) );
       T.fHits.push_back(&(fHits[i]));
     }
   }  
   if( NStsHits>0 && fStsHitsArray ){  
     for (Int_t i=0; i<NStsHits;i++){
       Int_t j = track->GetStsHitIndex(i);
-      fHits[NMvdHits+i].Create((CbmStsHit*) fStsHitsArray->At(j));
+      fHits[NMvdHits+i].Create( reinterpret_cast<CbmStsHit*>(fStsHitsArray->At(j)) );
       T.fHits.push_back(&(fHits[NMvdHits+i]));
     }
   }
@@ -158,7 +158,7 @@ Double_t  CbmStsKFTrackFitter::GetChiToVertex( CbmStsTrack* track,  CbmVertex *v
 {
   if( !vtx ){  
     FairRootManager *fManger = FairRootManager::Instance();
-    vtx = (CbmVertex *)  fManger->GetObject("PrimaryVertex");
+    vtx = reinterpret_cast<CbmVertex *>(fManger->GetObject("PrimaryVertex"));
     if( !vtx ){
       cout<< "-W- CbmStsKFTrackFitter::GetChiToVertex: No Primary Vertex found!"<<endl;
       return 100.;

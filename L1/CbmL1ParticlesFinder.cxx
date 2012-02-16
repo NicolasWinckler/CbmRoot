@@ -26,7 +26,16 @@
 #include "L1Field.h"
 
 #include <iostream>
-CbmL1ParticlesFinder::CbmL1ParticlesFinder()
+CbmL1ParticlesFinder::CbmL1ParticlesFinder():
+  fitter(),
+
+  fPVFinder(),
+  fPrimVtx(),
+
+  fPos(),
+  fNeg(),
+
+  fParticles()
 {
 }
 

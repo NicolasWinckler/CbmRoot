@@ -336,14 +336,14 @@ InitStatus CbmStsFitPerformanceTask::Init(){
 InitStatus CbmStsFitPerformanceTask::ReInit(){
 
   FairRootManager* fManger =FairRootManager::Instance();
-  fMCTrackArray     = (TClonesArray*) fManger->GetObject("MCTrack");
-  fStsPointArray    = (TClonesArray*) fManger->GetObject("StsPoint");
-  fMvdPointArray    = (TClonesArray*) fManger->GetObject("MvdPoint");
-  fRecStsTrackArray = (TClonesArray*) fManger->GetObject("StsTrack");
-  fStsHitArray = (TClonesArray*) fManger->GetObject("StsHit");
-  fMvdHitArray = (TClonesArray*) fManger->GetObject("MvdHit");
-  fPrimaryVertex = (CbmVertex*) fManger->GetObject("PrimaryVertex");
-  fSTSTrackMatch = (TClonesArray*) fManger->GetObject("StsTrackMatch");
+  fMCTrackArray     = reinterpret_cast<TClonesArray*>(fManger->GetObject("MCTrack"));
+  fStsPointArray    = reinterpret_cast<TClonesArray*>(fManger->GetObject("StsPoint"));
+  fMvdPointArray    = reinterpret_cast<TClonesArray*>(fManger->GetObject("MvdPoint"));
+  fRecStsTrackArray = reinterpret_cast<TClonesArray*>(fManger->GetObject("StsTrack"));
+  fStsHitArray = reinterpret_cast<TClonesArray*>(fManger->GetObject("StsHit"));
+  fMvdHitArray = reinterpret_cast<TClonesArray*>(fManger->GetObject("MvdHit"));
+  fPrimaryVertex = reinterpret_cast<CbmVertex*>(fManger->GetObject("PrimaryVertex"));
+  fSTSTrackMatch = reinterpret_cast<TClonesArray*>(fManger->GetObject("StsTrackMatch"));
   fFitter.Init();
 
   return kSUCCESS;

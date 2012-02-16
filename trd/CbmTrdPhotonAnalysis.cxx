@@ -59,7 +59,6 @@
 #include <math.h>
 #include <iostream>
 #include <iomanip>
-#include <cmath>
 using std::cout;
 using std::endl;
 
@@ -79,7 +78,6 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fMotherDaughterZBirth(NULL),
     fZBirthAll(NULL),
     fMotherDaughter(NULL),
-    fNoDaughters(NULL),
     fZBirthEPfromGamma(NULL),
     fMCPid(NULL),
     fGTPid(NULL),
@@ -87,13 +85,13 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fgammaMother(NULL),
     fgammaDaughter(NULL),
     fZBirth(),
-    fGammaHistory(NULL),
-    fMCParticleMap(),
-    it(),
-    fElectronIds(),
-    fPositronIds(),
-    fGammaIds(),
-    fPi0Ids()
+    fPairHistory(NULL),
+    fPairAllVertex(),
+    fPairGammaVertex(),
+    fPairPi0Vertex(),
+    fBirthGamma(NULL),
+    fBirthPi0(NULL),
+    fBirthPair(NULL)
 {
 }
 
@@ -113,7 +111,6 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fMotherDaughterZBirth(NULL),
     fZBirthAll(NULL),
     fMotherDaughter(NULL),
-    fNoDaughters(NULL),
     fZBirthEPfromGamma(NULL),
     fMCPid(NULL),
     fGTPid(NULL),
@@ -121,13 +118,13 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fgammaMother(NULL),
     fgammaDaughter(NULL),
     fZBirth(),
-    fGammaHistory(NULL),
-    fMCParticleMap(),
-    it(),
-    fElectronIds(),
-    fPositronIds(),
-    fGammaIds(),
-    fPi0Ids()
+    fPairHistory(NULL),
+    fPairAllVertex(),
+    fPairGammaVertex(),
+    fPairPi0Vertex(),
+    fBirthGamma(NULL),
+    fBirthPi0(NULL),
+    fBirthPair(NULL)
 {
 }
 

@@ -34,9 +34,9 @@ class vector;
 
 typedef struct MCParticle
 {
-  Int_t PID;
-  Int_t motherId;
-  std::vector<Int_t> daughterIds;
+  Int_t PID; // PDG Code
+  Int_t motherId; // TConeArray ID of the mother 
+  std::vector<Int_t> daughterIds; // TConeArray IDs of all daughters
 MCParticle() : PID(0), motherId(0), daughterIds() {};
 } MCParticle;
 

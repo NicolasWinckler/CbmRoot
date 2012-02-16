@@ -478,9 +478,9 @@ InitStatus CbmAnaDielectronTask::Init()
    fKFFitter.Init();
 
    if (fUseRichAnn){
-      TString richANNFile = gSystem->Getenv("VMCWORKDIR");
+      string richANNFile(gSystem->Getenv("VMCWORKDIR"));
       richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-      fElIdAnn = new CbmRichElectronIdAnn(0, richANNFile);
+      fElIdAnn = new CbmRichElectronIdAnn(richANNFile);
       fElIdAnn->Init();
    }
 

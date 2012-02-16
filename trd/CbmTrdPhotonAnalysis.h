@@ -36,7 +36,7 @@ typedef struct MCParticle
   Int_t PID;
   Int_t motherId;
   std::vector<Int_t> daughterIds;
-MCParticle() : motherId(0), daughterIds() {};
+MCParticle() : PID(0), motherId(0), daughterIds() {};
 } MCParticle;
 
 class CbmTrdPhotonAnalysis : public FairTask {

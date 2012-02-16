@@ -246,7 +246,7 @@ void CbmL1::ReadEvent()
       if(!(isUsedMvdPoint[iMC])) {
         CbmL1MCPoint MC;
         if( ! ReadMCPoint( &MC, iMC, 1 ) ){
-          MC.iStation = (L1_DYNAMIC_CAST<CbmMvdPoint*>((listMvdPts->At(iMC)))->GetStationNr() - 1;
+          MC.iStation = (L1_DYNAMIC_CAST<CbmMvdPoint*>(listMvdPts->At(iMC)))->GetStationNr() - 1;
           isUsedMvdPoint[iMC] = 1;
           vMCPoints.push_back( MC );
         }

@@ -761,7 +761,7 @@ CbmKFMaterial *CbmKF::ReadPassive( FairGeoNode *node){
 
   FairGeoTransform trans( *node->getLabTransform() );
   FairGeoNode *nxt = node;
-  while( nxt=nxt->getMotherNode() ){
+  while( (nxt=nxt->getMotherNode()) ){
     FairGeoTransform* tm=nxt->getLabTransform();
     if( !tm ) break;
     trans.transFrom(*tm);
@@ -780,7 +780,7 @@ CbmKFMaterial *CbmKF::ReadPassive( FairGeoNode *node){
 
   Int_t ID = node->getMCid();
   Double_t RadLength = material->getRadiationLength();
-  Double_t F = 1.;
+  // Double_t F = 1.;
   Double_t x0  = centerV.X();
   Double_t y0  = centerV.Y();
   Double_t z0  = centerV.Z();

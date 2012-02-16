@@ -347,7 +347,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
   }
 
   if(0){
-    CbmKF &KF = *CbmKF::Instance();
+//    CbmKF &KF = *CbmKF::Instance();
     int nStsHits = fStsHitArray->GetEntries();
     int nMvdHits = fMvdHitArray->GetEntries();
     cout<<"Mvd hit density..."<<endl;
@@ -425,7 +425,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       }
     }
     for (Int_t iTrack=0;iTrack<nTracks;iTrack++){
-      CbmStsTrack*   trackI= (CbmStsTrack*) fRecStsTrackArray->At(iTrack);
+
       if( iTrack%10==0 ) cout<<iTrack<<endl;
       if (!flag[iTrack]) continue;
       double Chi2[8];
@@ -435,7 +435,6 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       for (Int_t jTrack=0;jTrack<nTracks;jTrack++){
 	if( jTrack==iTrack ) continue;
 	if (!flag[jTrack]) continue;
-	CbmStsTrack*   trackJ= (CbmStsTrack*) fRecStsTrackArray->At(jTrack);
 
 	for( int iz=0; iz<8; iz++ ){
 	  Double_t C[15], d[5];

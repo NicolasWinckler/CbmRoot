@@ -1413,8 +1413,7 @@ Double_t CbmKFParticle::GetDStoPoint( const Double_t xyz[] ) const
   if( TMath::Abs(bq)<1.e-8 ) dS = a/pt2;
   else dS =  TMath::ATan2( bq*a, pt2 + bq1*(dz*r[4]-dy*r[5]) - bq2*(dz*r[3]-dx*r[5]) + bq3*(dy*r[3]-dx*r[4]) )/bq;
 
-  Double_t dSm = rB/pB;
-
+  // Double_t dSm = rB/pB;
 //  cout <<"normalnyj S  " <<  dS << endl;
 //  cout <<"moj       S  " << dSm << endl;
 

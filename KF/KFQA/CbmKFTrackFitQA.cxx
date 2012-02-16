@@ -195,7 +195,6 @@ void CbmKFTrackFitQA::Exec(Option_t * option)
   {
      CbmStsTrack* StsTrack = (CbmStsTrack*)listStsTracks->At(itrack);
      CbmTrackMatch* StsTrackMatch = (CbmTrackMatch*)listStsTracksMatch->At(itrack);
-     Int_t NofMC = StsTrackMatch -> GetNofMCTracks();
      if(StsTrackMatch -> GetNofMCTracks() == 0) continue;
      CbmMCTrack* MCTrack = (CbmMCTrack*)listMCTracks->At(StsTrackMatch->GetMCTrackId());
      CbmKFTrack KFTrack(*StsTrack);
@@ -503,7 +502,6 @@ void CbmKFTrackFitQA::StsHitMatch()
     int gggi=0;
     if (useLinks){
       if (listStsClusters){
-        const int NLinks = stsHit->GetNLinks();
   //      if ( NLinks != 2 ) cout << "HitMatch: Error. Hit wasn't matched with 2 clusters." << endl;
           // 1-st cluster
         vector<int> stsPointIds; // save here all mc-points matched with first cluster
@@ -542,7 +540,7 @@ void CbmKFTrackFitQA::StsHitMatch()
 //            if ( !MCTrack ) continue;
 //            if ( abs(MCTrack->GetPdgCode()) >= 10000 ) continue;
             bool save = 1;
-            for(int iP=0; iP < stsPointIds_hit.size(); iP ++) if(vStsHitMatch[iH] == stsPointIds_hit[iP]) save=0;
+            for(unsigned int iP=0; iP < stsPointIds_hit.size(); iP ++) if(vStsHitMatch[iH] == stsPointIds_hit[iP]) save=0;
             stsPointIds_hit.push_back(stsPointId);
             vStsHitMatch[iH] = stsPointId;
             gggi++;

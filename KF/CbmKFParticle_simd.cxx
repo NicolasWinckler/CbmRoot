@@ -91,7 +91,7 @@ void CbmKFParticle_simd::Create(CbmKFParticle *parts[], int N) {
     const int nD = (parts[0])->NDaughters();
     for ( int ie = 1; ie < N; ie++ ) {
       const CbmKFParticle &part = *(parts[ie]);
-      ok &= (parts[ie])->NDaughters() == nD;
+      ok &= part.NDaughters() == nD;
     }
 //    assert(ok);
     if (!ok) {

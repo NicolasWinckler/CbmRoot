@@ -581,7 +581,6 @@ void CbmKFParticleInterface::MeasureProductionVertex( CbmKFParticle_simd*  Parti
 
 void CbmKFParticleInterface::Convert( CbmKFParticle_simd*  Particle, fvec r0[], bool ToProduction )
 {
-  fvec *r = Particle->GetParameters();
   fvec *C = Particle->GetCovMatrix();
 
     fvec B[3];
@@ -979,7 +978,7 @@ fvec CbmKFParticleInterface::GetDStoPoint( CbmKFParticle_simd*  Particle, const 
 
 fvec CbmKFParticleInterface::GetDStoPoint( const fvec xyz[] ) const
 {
-  GetDStoPoint( KFPart, xyz );
+  return GetDStoPoint( KFPart, xyz );
 }
 
 void CbmKFParticleInterface::GetKFVertex( CbmKFVertex vtx[]  )
@@ -1030,7 +1029,7 @@ void CbmKFParticleInterface::GetKFVertexJ(int j, CbmKFVertex *vtx)
 void CbmKFParticleInterface::GetKFParticle(CbmKFParticle &Part, int iPart)
 {
   Part.SetId(KFPart->Id()[iPart]);
-  for( int i = 0; i < KFPart->DaughterIds().size(); i++ )
+  for( unsigned int i = 0; i < KFPart->DaughterIds().size(); i++ )
     Part.AddDaughter(KFPart->DaughterIds()[i][iPart]);
 
   Part.SetPDG( KFPart->GetPDG()[iPart] );

@@ -107,6 +107,8 @@ KFQA/CbmKFTrErrMCPoints.h
 KFQA/CbmKFTrackFitQA.h
 )
 
+	ADD_DEFINITIONS(-Wall -Wabi -Wsign-promo  -Wno-pmf-conversions -Wctor-dtor-privacy -Wreorder -Wno-deprecated -Wstrict-null-sentinel -Wno-non-template-friend ) #   -Weffc++ -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast : wait for other parts of cbmroot\root.
+
 IF (SSE_FOUND)
   Message(STATUS "KF will be compiled with SSE support")
   ADD_DEFINITIONS(-DHAVE_SSE)

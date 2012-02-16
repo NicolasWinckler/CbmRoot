@@ -534,6 +534,7 @@ void CbmKFSecondaryVertexFinder::AddTopoConstraint()
     AVi[2] = AV[3]*AV[3] - AV[0]*AV[5] ;
     AVi[3] = AV[2]*AV[3] - AV[1]*AV[4];
     AVi[4] = AV[0]*AV[4] - AV[1]*AV[3] ;
+    AVi[5] = -123; // FIXME assing correct value
     det = ( AV[0]*AVi[0] + AV[1]*AVi[1] + AV[3]*AVi[3] );
     det = (det>1.e-8) ?1./det :0;
     NDF  += 2;

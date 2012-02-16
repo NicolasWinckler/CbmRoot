@@ -18,7 +18,6 @@ void CbmKFUMeasurement::Set( Double_t z_, Double_t u_, Double_t phi_, Double_t s
 
 Int_t CbmKFUMeasurement::Filter( CbmKFTrackInterface &track ){
   
-  Bool_t err = 0;
   Double_t *T = track.GetTrack();
   Double_t *C = track.GetCovMatrix();  
 

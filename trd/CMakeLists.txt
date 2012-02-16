@@ -13,6 +13,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
+${CBMROOT_SOURCE_DIR}/littrack
 
 ${CBMROOT_SOURCE_DIR}/trd
 ${CBMROOT_SOURCE_DIR}/passive

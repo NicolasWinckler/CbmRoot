@@ -37,7 +37,7 @@ void run_reco_geotest(Int_t nEvents = 10000)
    richReco->SetFinderName("ideal");
    run->AddTask(richReco);
 
-   CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
+   CbmRichMatchRings* matchRings = new CbmRichMatchRings();
    run->AddTask(matchRings);
 
    CbmRichGeoTest* geoTest = new CbmRichGeoTest();

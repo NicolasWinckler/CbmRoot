@@ -223,7 +223,7 @@ void run_reco(Int_t nEvents = 1000){
 		run->AddTask(richReco);
 
 		// ------------------- RICH Ring matching  ---------------------------------
-		CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
+		CbmRichMatchRings* matchRings = new CbmRichMatchRings();
 		run->AddTask(matchRings);
 
 	    //--------------------- RICH ring-track assignment ------------------------

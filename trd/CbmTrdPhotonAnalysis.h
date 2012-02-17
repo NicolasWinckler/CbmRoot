@@ -61,6 +61,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   Bool_t VertexInMagnet(CbmMCTrack* track); 
   Bool_t VertexInTarget(CbmMCTrack* track);
+  Bool_t CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* trackB);
 
   Bool_t PairFromGamma(Int_t firstId, Int_t secondId);
   Bool_t PairFromPi0(Int_t firstId, Int_t secondId);
@@ -83,10 +84,10 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Int_t PdgToGeant(Int_t PdgCode);
 
   //void NiceHisto(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize);
-  void NiceHisto1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize);
-  void NiceHisto2(TH2 *h, Int_t color, Int_t mStyle, Int_t mSize);
-  void NiceHisto3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize);
-  void NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize);
+  void NiceHisto1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle);
+  void NiceHisto2(TH2 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle);
+  void NiceHisto3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle);
+  void NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle);
   void NiceLegend(TLegend *l);
 
  private:
@@ -142,11 +143,21 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I* fPi0SpectrumGammaTruePairs;
   TH1I* fPi0SpectrumGammaAllPairs;
   TH1I* fPi0SpectrumGammaEPPairs;
+  //TH1I* fPi0SpectrumGammaEPPairsSameMother;
+  TH1I* fPi0SpectrumGammaEPPairsInTarget;
+  TH1I* fPi0SpectrumGammaEPPairsInMagnet;
   TH1I* fGammaSpectrumTrueEPPairs;
   TH1I* fGammaSpectrumAllEPPairs;
+  TH1I* fGammaSpectrumEPPairsInTarget;
+  TH1I* fGammaSpectrumEPPairsInMagnet;
 
   // Cuts
   TH1I* fEPPairOpeningAngle;
+  TH1I* fEPPairOpeningAngleGamma;
+  TH1I* fEPPairOpeningAnglePi0;
+  TH1I* fEPPairOpeningAngleSameMother;
+  TH1I* fEPPairOpeningAngleInTarget;
+  TH1I* fEPPairOpeningAngleInMagnet;
 
   std::map<Int_t, MCParticle*> fMCParticleMap;
   std::map<Int_t, MCParticle*>::iterator it;

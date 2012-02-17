@@ -316,16 +316,11 @@ void run_reco(Int_t nEvents = 2) {
   // =========================================================================
 
   // ---------------------RICH Hit Producer ----------------------------------
-  Double_t richPmtRad = 0.4; // PMT radius [cm]
-  Double_t richPmtDist = 0.; // Distance between PMTs [cm]
-  Int_t richDetType = 4; // Detector type Hamamatsu H8500-03 (no WLS)
-  Int_t richNoise = 220; // Number of noise points per event
-  Double_t richCollEff = 1.0; // Collection Efficiency of PMT electron optics
-  Double_t richSMirror = 0.06; // Sigma for additional point smearing due to light scattering in mirror
-
-  CbmRichHitProducer* richHitProd = new CbmRichHitProducer(richPmtRad,
-  		richPmtDist, richDetType, richNoise, iVerbose, richCollEff,
-  		richSMirror);
+  CbmRichHitProducer* richHitProd  = new CbmRichHitProducer();
+  richHitProd->SetDetectorType(4);
+  richHitProd->SetNofNoiseHits(220);
+  richHitProd->SetCollectionEfficiency(1.0);
+  richHitProd->SetSigmaMirror(0.06);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 
@@ -361,8 +356,7 @@ void run_reco(Int_t nEvents = 2) {
   //--------------------- RICH ring-track assignment ------------------------
   Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
   Int_t richNPoints = 5; // Minmum number of hits on ring
-  CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD(
-  		richDistance, richNPoints, iVerbose);
+  CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD();
   CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
   assignTrack->UseAssign(richAssign);
   run->AddTask(assignTrack);

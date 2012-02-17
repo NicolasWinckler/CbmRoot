@@ -181,6 +181,7 @@ add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial2/src)
 add_subdirectory (cbmgenerators)
 add_subdirectory (run)
+add_subdirectory (hadron)
 
 FIND_PATH(TEvePath NAMES TEveEventManager.h PATHS
   ${SIMPATH}/tools/root/include

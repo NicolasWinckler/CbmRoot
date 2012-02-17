@@ -9,6 +9,7 @@
 
 class TClonesArray;
 class CbmKFTrack;
+class CbmVertex;
 
 
 class CbmGlobalTrackFitterKF : public CbmGlobalTrackFitter {
@@ -19,6 +20,7 @@ private:
     TClonesArray *fArrayTofHit;       // Array of TOF hits
     TClonesArray *fArrayStsTrack;     // Array of STS tracks
     TClonesArray *fArrayTrdTrack;     // Array of TRD tracks
+    CbmVertex    *fPrimVertex;        // Primary vertex
     CbmKFTrack   *fKfTrack;           // KF track
 
 public:

@@ -26,7 +26,7 @@ void much_reco(
 		// Output directory
 		dir  = "data/";
 		// MC transport file
-		mcFile = dir + "Jpsi.auau.25gev.centr.mc.root";
+		mcFile = dir + "mc.root";
 		// Parameters file
 		parFile = dir + "params.root";
 		// Output file with reconstructed tracks and hits
@@ -222,6 +222,7 @@ void much_reco(
                 TString bla = gSystem->Getenv("BOOST");
                 Int_t boost=bla.Atoi();
 
+/*
                 if (boost) {
   		  CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
 		  trackingQa->SetMinNofPointsSts(4);
@@ -235,6 +236,7 @@ void much_reco(
 		  trackingQa->SetOutputDir("");
 		  run->AddTask(trackingQa);
                 }
+*/
 		// ------------------------------------------------------------------------
 	}
 

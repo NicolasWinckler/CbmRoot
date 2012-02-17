@@ -15,7 +15,7 @@ void much_seg_auto(const char* mcFile = "",
   //          Adjust this part according to your requirements
 
   if (mcFile == "") {
-    mcFile = "data/Jpsi.auau.25gev.centr.mc.root";
+    mcFile = "data/mc.root";
   }
   if (digiFile == "") {
     digiFile = "data/much_digi.root";

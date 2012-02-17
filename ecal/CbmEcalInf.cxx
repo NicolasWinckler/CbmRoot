@@ -86,7 +86,7 @@ CbmEcalInf* CbmEcalInf::GetInstance(const char* filename)
 			fRefCount++;
 		return fInf;
 	}
-	string newname=gSystem->Getenv("VMCWORKDIR");
+	TString newname=gSystem->Getenv("VMCWORKDIR");
 	newname+="/geometry/";
 	newname+=filename;
 	if (fInf!=NULL)
@@ -104,7 +104,7 @@ CbmEcalInf* CbmEcalInf::GetInstance(const char* filename)
 		  cerr << fInf->fFileName << "." << endl;
 		  return NULL;
 		}
-	fInf=new CbmEcalInf(newname.c_str());
+	fInf=new CbmEcalInf(newname);
 	//Is something wrong?
 	if (fInf->fSuccess==0)
 	{

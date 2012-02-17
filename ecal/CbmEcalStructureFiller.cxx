@@ -18,7 +18,7 @@ using namespace std;
 CbmEcalStructureFiller::CbmEcalStructureFiller() 
   : FairTask(), 
     fStr(NULL),
-    fInf(CbmEcalInf::GetInstance(fFileGeo)),
+    fInf(NULL),
     fListECALpts(NULL),
     fListUHits(NULL),
     fListHits(NULL),
@@ -37,7 +37,7 @@ CbmEcalStructureFiller::CbmEcalStructureFiller()
 CbmEcalStructureFiller::CbmEcalStructureFiller(const char *name, const Int_t iVerbose, const char* fileGeo) 
   : FairTask(name,iVerbose),
     fStr(NULL),
-    fInf(CbmEcalInf::GetInstance(fFileGeo)),
+    fInf(CbmEcalInf::GetInstance(fileGeo)),
     fListECALpts(NULL),
     fListUHits(NULL),
     fListHits(NULL),

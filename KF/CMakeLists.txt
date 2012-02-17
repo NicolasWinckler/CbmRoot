@@ -63,7 +63,6 @@ Interface/CbmKFStsHit.cxx
 Interface/CbmKFTrack.cxx 
 Interface/CbmKFTrdHit.cxx 
 Interface/CbmPVFinderKF.cxx 
-Interface/CbmRichTrackExtrapolationKF.cxx 
 Interface/CbmStsFitPerformanceTask.cxx 
 Interface/CbmStsKFTrackFitter.cxx 
 Interface/CbmStsKFSecondaryVertexFinder.cxx 
@@ -101,7 +100,6 @@ Interface/CbmKFStsHit.h
 Interface/CbmKFTrack.h 
 Interface/CbmKFTrdHit.h 
 Interface/CbmPVFinderKF.h
-Interface/CbmRichTrackExtrapolationKF.h
 Interface/CbmStsFitPerformanceTask.h
 Interface/CbmStsKFTrackFitter.h
 Interface/CbmStsKFSecondaryVertexFinder.h

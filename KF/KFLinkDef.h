@@ -27,7 +27,6 @@
 #pragma link C++ class  CbmStsKFSecondaryVertexFinder+;
 #pragma link C++ class  CbmPVFinderKF+;
 #pragma link C++ class  CbmStsFitPerformanceTask+;
-#pragma link C++ class  CbmRichTrackExtrapolationKF+;
 #pragma link C++ class  CbmEcalTrackExtrapolationKF+;
 #pragma link C++ class  CbmTrdTrackFitterKF+;
 #pragma link C++ class  CbmGlobalTrackFitterKF+;

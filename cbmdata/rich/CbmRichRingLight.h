@@ -24,17 +24,21 @@ public:
       fY(0.){}
 
    /**
+    * \brief Distructor.
+    */
+   virtual ~CbmRichHitLight(){}
+
+   /**
     * \brief Constructor with initialization.
     * \param x X coordinate of hit.
     * \param y Y coordinate of hit.
     */
    CbmRichHitLight(
          float x,
-         float y)
-   {
-      fX = x;
-      fY = y;
-   }
+         float y):
+      fX(x),
+      fY(y) {}
+
 	float fX; // x coordinate of the hit
 	float fY; // y coordinate of the hit
 };
@@ -80,7 +84,7 @@ public:
    /**
     * \brief Destructor.
     */
-   ~CbmRichRingLight()
+   virtual ~CbmRichRingLight()
    {
       fHits.clear();
       fHitIds.clear();

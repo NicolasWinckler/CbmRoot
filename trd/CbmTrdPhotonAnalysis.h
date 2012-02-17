@@ -38,7 +38,10 @@ typedef struct MCParticle
   Int_t PID; // PDG Code
   Int_t motherId; // TConeArray ID of the mother 
   std::vector<Int_t> daughterIds; // TConeArray IDs of all daughters
-MCParticle() : PID(0), motherId(0), daughterIds() {};
+  Double_t Px;
+  Double_t Py;
+  Double_t Pz;
+MCParticle() : PID(0), motherId(0), daughterIds(), Px(0), Py(0), Pz(0) {};
 } MCParticle;
 
 class CbmTrdPhotonAnalysis : public FairTask {
@@ -63,6 +66,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Bool_t PairFromPi0(Int_t firstId, Int_t secondId);
 
   Double_t CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB);
+  Double_t CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB);
+
 
   /** Executed task **/
   virtual void Exec(Option_t * option);
@@ -136,8 +141,12 @@ class CbmTrdPhotonAnalysis : public FairTask {
   // Spectra
   TH1I* fPi0SpectrumGammaTruePairs;
   TH1I* fPi0SpectrumGammaAllPairs;
+  TH1I* fPi0SpectrumGammaEPPairs;
   TH1I* fGammaSpectrumTrueEPPairs;
   TH1I* fGammaSpectrumAllEPPairs;
+
+  // Cuts
+  TH1I* fEPPairOpeningAngle;
 
   std::map<Int_t, MCParticle*> fMCParticleMap;
   std::map<Int_t, MCParticle*>::iterator it;

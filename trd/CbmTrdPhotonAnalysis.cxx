@@ -42,6 +42,7 @@
 #include "TRandom.h"
 #include "TMath.h"
 #include "TVector3.h"
+#include "TParticle.h"
 #include "TClonesArray.h"
 #include "TGeoManager.h"
 #include "TGeoVolume.h"
@@ -96,7 +97,9 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fPi0SpectrumGammaTruePairs(NULL),
     fPi0SpectrumGammaAllPairs(NULL),
     fGammaSpectrumTrueEPPairs(NULL),
-    fGammaSpectrumAllEPPairs(NULL)
+    fGammaSpectrumAllEPPairs(NULL),
+    fPi0SpectrumGammaEPPairs(NULL),
+    fEPPairOpeningAngle(NULL)
 {
 }
 
@@ -133,7 +136,9 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fPi0SpectrumGammaTruePairs(NULL),
     fPi0SpectrumGammaAllPairs(NULL),
     fGammaSpectrumTrueEPPairs(NULL),
-    fGammaSpectrumAllEPPairs(NULL)
+    fGammaSpectrumAllEPPairs(NULL),
+    fPi0SpectrumGammaEPPairs(NULL),
+    fEPPairOpeningAngle(NULL)
 {
 }
 
@@ -275,6 +280,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::vector<std::pair<Int_t,Int_t> > electronPositronPairs;
   std::vector<std::pair<Int_t,Int_t> > gammaGammaPairs;
  
+  std::vector<CbmMCTrack *> gammaFromEPPairs;
+
   if (fMCTracks)
     nMcTracks = fMCTracks->GetEntries();
   if (fTrdPoints)
@@ -374,16 +381,48 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     for (Int_t iPositron = 0; iPositron < fPositronIds.size(); iPositron++) {
       etrack = (CbmMCTrack*)fMCTracks->At(fElectronIds[iElectron]);
       ptrack = (CbmMCTrack*)fMCTracks->At(fPositronIds[iPositron]);
-      fGammaSpectrumAllEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
-      if (fMCParticleMap[fElectronIds[iElectron]]->motherId == fMCParticleMap[fPositronIds[iPositron]]->motherId) {
-	fGammaSpectrumTrueEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
-	std::pair<Int_t,Int_t> epPair (fElectronIds[iElectron], fPositronIds[iPositron]);
-	//epPair = make_pair (fElectronIds[iElectron], fPositronIds[iPositron]);
-	electronPositronPairs.push_back(epPair);
-	fePlusAndMinusMother->Fill(PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+      CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
+					       etrack->GetPx() + ptrack->GetPx(),
+					       etrack->GetPy() + ptrack->GetPy(),
+					       etrack->GetPz() + ptrack->GetPz(),
+					       0,
+					       0,
+					       0,
+					       0,
+					       0);
+      /*
+	gamma->PID = 22;
+	gamma->daughterIds.push_back(fElectronIds[iElectron]);
+	gamma->daughterIds.push_back(fPositronIds[iPositron]);
+	gamma->Px = etrack->GetPx() + ptrack->GetPx();
+	gamma->Py = etrack->GetPy() + ptrack->GetPy();
+	gamma->Pz = etrack->GetPz() + ptrack->GetPz();
+      */
+      gammaFromEPPairs.push_back(gamma);
+      //cout << iElectron << " " << iPositron << endl;
+      Double_t openingAngle = CalcOpeningAngle(etrack, ptrack);
+      fEPPairOpeningAngle->Fill(openingAngle);
+      if(VertexInTarget(etrack) && VertexInTarget(ptrack) /*&& openingAngle < 1.0*/) {
+	fGammaSpectrumAllEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
+	if (fMCParticleMap[fElectronIds[iElectron]]->motherId == fMCParticleMap[fPositronIds[iPositron]]->motherId) {
+	  fGammaSpectrumTrueEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
+	  std::pair<Int_t,Int_t> epPair (fElectronIds[iElectron], fPositronIds[iPositron]);
+	  //epPair = make_pair (fElectronIds[iElectron], fPositronIds[iPositron]);
+	  electronPositronPairs.push_back(epPair);
+	  fePlusAndMinusMother->Fill(PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+	}
       }
     }
   }
+
+
+  for (Int_t iGamma = 0; iGamma < gammaFromEPPairs.size(); iGamma++) {
+    for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairs.size(); jGamma++) {
+      //cout << iGamma << " " << jGamma << endl;
+      fPi0SpectrumGammaEPPairs->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+    }
+  }
+
   // Find Gamma Gamma Pairs
   for (Int_t iGamma = 0; iGamma < fGammaIds.size(); iGamma++) {
     for (Int_t jGamma = iGamma+1; jGamma < fGammaIds.size(); jGamma++) {
@@ -544,131 +583,140 @@ Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack*
 			      - pow((trackA->GetPz() + trackB->GetPz()),2)
 			      );
   return invariantMass;
-
+}
+Double_t CbmTrdPhotonAnalysis::CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB) {
+  Double_t energyA = TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
+  Double_t energyB = TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
+ 
+  Double_t openingAngle = TMath::ACos(0.5 * pow(CalcInvariantMass(trackA, trackB),2) - pow(0.000510998928,2) - energyA * energyB
+				      + (trackA->GetPx() * trackB->GetPx() + trackA->GetPy() * trackB->GetPy() + trackA->GetPz() * trackB->GetPz())
+				      ) / TMath::Pi() * 180;
+  return openingAngle;
 }
 
-  Bool_t CbmTrdPhotonAnalysis::PairFromGamma(Int_t firstId, Int_t secondId)
-  {
-    return true;
-  }
-  Bool_t CbmTrdPhotonAnalysis::PairFromPi0(Int_t firstId, Int_t secondId)
-  {
-    return true;
-  }
-  Bool_t CbmTrdPhotonAnalysis::VertexInMagnet(CbmMCTrack* track)
-  {
-    if (fabs(track->GetStartX()) < 132/2 && fabs(track->GetStartY()) < 132/2 && track->GetStartZ() < 100 )
-      return true;
-    return false;
-  }
-  Bool_t CbmTrdPhotonAnalysis::VertexInTarget(CbmMCTrack* track)
-  {
-    if (fabs(track->GetStartX()) < 0.1 && fabs(track->GetStartY()) < 0.1 && track->GetStartZ() < 0.1)
-      return true;
-    return false;
-  }
 
-  Int_t CbmTrdPhotonAnalysis::PdgToGeant(Int_t PdgCode) 
-  {
-    if (PdgCode == 22)
-      return 1;
-    if (PdgCode == -11)
-      return 2;
-    if (PdgCode == 11)
-      return 3;
-    if (PdgCode == 12 || PdgCode == 14 || PdgCode == 16)
-      return 4;
-    if (PdgCode == -13)
-      return 5;
-    if (PdgCode == 13)
-      return 6;
-    if (PdgCode == 111)
-      return 7;
-    if (PdgCode == 211)
-      return 8;
-    if (PdgCode == -211)
-      return 9;
-    if (PdgCode == 130)
-      return 10;
-    if (PdgCode == 321)
-      return 11;
-    if (PdgCode == -321)
-      return 12;
-    if (PdgCode == 2112)
-      return 13;
-    if (PdgCode == 2212)
-      return 14;
-    if (PdgCode == -2212)
-      return 15;
-    if (PdgCode == 310)
-      return 16;
-    if (PdgCode == 221)
-      return 17;
-    if (PdgCode == 3122)
-      return 18;
-    if (PdgCode == 3222)
-      return 19;
-    if (PdgCode == 3212)
-      return 20;
-    if (PdgCode == 3112)
-      return 21;
-    if (PdgCode == 3322)
-      return 22;
-    if (PdgCode == 3312)
-      return 23;
-    if (PdgCode == 3332)
-      return 24;
-    if (PdgCode == -2112)
-      return 25;
-    if (PdgCode == -3122)
-      return 26;
-    if (PdgCode == -3112)
-      return 27;
-    if (PdgCode == -3212)
-      return 28;
-    if (PdgCode == -3322)
-      return 30;
-    if (PdgCode == -3312)
-      return 31;
-    if (PdgCode == -3332)
-      return 32;
-    if (PdgCode == -15)
-      return 33;
-    if (PdgCode == 15)
-      return 34;
-    if (PdgCode == 411)
-      return 35;
-    if (PdgCode == -411)
-      return 36;
-    if (PdgCode == 421)
-      return 37;
-    if (PdgCode == -412)
-      return 38;
-    if (PdgCode == 431)
-      return 39;
-    if (PdgCode == -431)
-      return 40;
-    if (PdgCode == 4122)
-      return 41;
-    if (PdgCode == 24)
-      return 42;
-    if (PdgCode == -24)
-      return 43;  
-    if (PdgCode == 23)
-      return 44;
-    if (PdgCode == 50000050)
-      return 45;
-    if (PdgCode == 1000010020)
-      return 46;
-    if (PdgCode == 1000010030)
-      return 47;
-    if (PdgCode == 1000020040)
-      return 48;
-    //if (PdgCode == -1)
-    //return 49;
-    cout << PdgCode << endl;
-    return 49;
-  }
+Bool_t CbmTrdPhotonAnalysis::PairFromGamma(Int_t firstId, Int_t secondId)
+{
+  return true;
+}
+Bool_t CbmTrdPhotonAnalysis::PairFromPi0(Int_t firstId, Int_t secondId)
+{
+  return true;
+}
+Bool_t CbmTrdPhotonAnalysis::VertexInMagnet(CbmMCTrack* track)
+{
+  if (fabs(track->GetStartX()) < 132/2 && fabs(track->GetStartY()) < 132/2 && track->GetStartZ() < 100 )
+    return true;
+  return false;
+}
+Bool_t CbmTrdPhotonAnalysis::VertexInTarget(CbmMCTrack* track)
+{
+  if (fabs(track->GetStartX()) < 0.1 && fabs(track->GetStartY()) < 0.1 && track->GetStartZ() < 0.1)
+    return true;
+  return false;
+}
+
+Int_t CbmTrdPhotonAnalysis::PdgToGeant(Int_t PdgCode) 
+{
+  if (PdgCode == 22)
+    return 1;
+  if (PdgCode == -11)
+    return 2;
+  if (PdgCode == 11)
+    return 3;
+  if (PdgCode == 12 || PdgCode == 14 || PdgCode == 16)
+    return 4;
+  if (PdgCode == -13)
+    return 5;
+  if (PdgCode == 13)
+    return 6;
+  if (PdgCode == 111)
+    return 7;
+  if (PdgCode == 211)
+    return 8;
+  if (PdgCode == -211)
+    return 9;
+  if (PdgCode == 130)
+    return 10;
+  if (PdgCode == 321)
+    return 11;
+  if (PdgCode == -321)
+    return 12;
+  if (PdgCode == 2112)
+    return 13;
+  if (PdgCode == 2212)
+    return 14;
+  if (PdgCode == -2212)
+    return 15;
+  if (PdgCode == 310)
+    return 16;
+  if (PdgCode == 221)
+    return 17;
+  if (PdgCode == 3122)
+    return 18;
+  if (PdgCode == 3222)
+    return 19;
+  if (PdgCode == 3212)
+    return 20;
+  if (PdgCode == 3112)
+    return 21;
+  if (PdgCode == 3322)
+    return 22;
+  if (PdgCode == 3312)
+    return 23;
+  if (PdgCode == 3332)
+    return 24;
+  if (PdgCode == -2112)
+    return 25;
+  if (PdgCode == -3122)
+    return 26;
+  if (PdgCode == -3112)
+    return 27;
+  if (PdgCode == -3212)
+    return 28;
+  if (PdgCode == -3322)
+    return 30;
+  if (PdgCode == -3312)
+    return 31;
+  if (PdgCode == -3332)
+    return 32;
+  if (PdgCode == -15)
+    return 33;
+  if (PdgCode == 15)
+    return 34;
+  if (PdgCode == 411)
+    return 35;
+  if (PdgCode == -411)
+    return 36;
+  if (PdgCode == 421)
+    return 37;
+  if (PdgCode == -412)
+    return 38;
+  if (PdgCode == 431)
+    return 39;
+  if (PdgCode == -431)
+    return 40;
+  if (PdgCode == 4122)
+    return 41;
+  if (PdgCode == 24)
+    return 42;
+  if (PdgCode == -24)
+    return 43;  
+  if (PdgCode == 23)
+    return 44;
+  if (PdgCode == 50000050)
+    return 45;
+  if (PdgCode == 1000010020)
+    return 46;
+  if (PdgCode == 1000010030)
+    return 47;
+  if (PdgCode == 1000020040)
+    return 48;
+  //if (PdgCode == -1)
+  //return 49;
+  cout << PdgCode << endl;
+  return 49;
+}
 
 void CbmTrdPhotonAnalysis::InitHistos()
 {
@@ -794,6 +842,8 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fPi0SpectrumGammaAllPairs  = new TH1I("Pi0SpectrumGammaAllPairs","#pi^{0} spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
   fGammaSpectrumTrueEPPairs  = new TH1I("GammaSpectrumTrueEPPairs","#gamma spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
   fGammaSpectrumAllEPPairs   = new TH1I("GammaSpectrumAllEPPairs","#gamma spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
+  fPi0SpectrumGammaEPPairs   = new TH1I("Pi0SpectrumGammaEPPairs","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs",2000,0,2);
+  fEPPairOpeningAngle   = new TH1I("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
 
   NiceHisto1(fMCPid,1,20,1);
   NiceHisto1(fGTPid,1,20,1);
@@ -814,7 +864,8 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fPi0SpectrumGammaAllPairs,2,1,1);
   NiceHisto1(fGammaSpectrumTrueEPPairs,1,1,1);
   NiceHisto1(fGammaSpectrumAllEPPairs,2,1,1);
-
+  NiceHisto1(fPi0SpectrumGammaEPPairs,3,1,1);
+  NiceHisto1(fEPPairOpeningAngle,1,1,1);
 }
 
 void CbmTrdPhotonAnalysis::SaveHistosToFile()
@@ -885,7 +936,10 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fPi0SpectrumGammaAllPairs->Write("", TObject::kOverwrite);
   fGammaSpectrumTrueEPPairs->Write("", TObject::kOverwrite);
   fGammaSpectrumAllEPPairs->Write("", TObject::kOverwrite);
+  fPi0SpectrumGammaEPPairs->Write("", TObject::kOverwrite);
 
+  fEPPairOpeningAngle->SetXTitle("opening angle #tetha [#circ]");
+  fEPPairOpeningAngle->Write("", TObject::kOverwrite);
   //outFile->Close();
   //c->Close();
 }

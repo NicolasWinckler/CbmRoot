@@ -41,6 +41,8 @@ public:
       fIsUsed(false)
    { }
 
+   virtual ~CbmRichHoughHit(){}
+
 	CbmRichHitLight fHit;
 	float fX2plusY2;
    unsigned short fId;

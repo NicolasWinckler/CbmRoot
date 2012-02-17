@@ -1,56 +1,61 @@
-/******************************************************************************
-* $Id: CbmRichTrackExtrapolationMirrorIdeal.h,v 1.1 2006/06/21 13:53:38 hoehne Exp $
+/**
+* \file CbmRichTrackExtrapolationMirrorIdeal.h
 *
-*  Class  : CbmRichTrackExtrapolationMirrorIdeal
-*  Description: "TrackExtrapolation" from MC points - acts on points stored in Rich Mirror!
-*               It reads the PointArray with MirrorPoint from MC and selects those to
-*               be projected to the Rich Photodetector
+* \brief This is the implementation of the TrackExtrapolation from MC points -
+* operating on points in the RICH mirror!
+* It reads the STS track array, gets the corresponding MC MirrorPoint
+* and selects those to be projected to the Rich Photodetector
+* points will be stored on mirror surface again
 *
-*  Author : Claudia Hoehne
-*  E-mail : c.hoehne@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichTrackExtrapolationMirrorIdeal.h,v $
-*  Revision 1.1  2006/06/21 13:53:38  hoehne
-*  for extrapolation from MirrorPoint:
-*  store mirror point with STS track selection and track ID as chosen in RichExtrapolate in mirror
-*
-*
-*
-*******************************************************************************/
+* \author Claudia Hoehne
+* \date 2006
+**/
 
-#ifndef CBM_RICH_TARCK_EXTRAPOLATION_Ideal
-#define CBM_RICH_TRACK_EXTRAPOLATION_Ideal 1
+#ifndef CBM_RICH_TARCK_EXTRAPOLATION_MIRROR_IDEAL
+#define CBM_RICH_TARCK_EXTRAPOLATION_MIRROR_IDEAL
 
 #include "CbmRichTrackExtrapolation.h"
 
 class TClonesArray;
 class CbmGlobalTrack;
 
+/**
+* \class CbmRichTrackExtrapolationMirrorIdeal
+*
+* \brief This is the implementation of the TrackExtrapolation from MC points -
+* operating on points in the RICH mirror!
+* It reads the STS track array, gets the corresponding MC MirrorPoint
+* and selects those to be projected to the Rich Photodetector
+* points will be stored on mirror surface again
+*
+* \author Claudia Hoehne
+* \date 2006
+**/
 class CbmRichTrackExtrapolationMirrorIdeal : public CbmRichTrackExtrapolation
 {
+public:
 
- public:
+   /**
+   * \brief Default constructor.
+   */
+   CbmRichTrackExtrapolationMirrorIdeal();
 
-  /** Default constructor **/
-  CbmRichTrackExtrapolationMirrorIdeal();
+   /**
+   * \brief Destructor.
+   */
+   virtual ~CbmRichTrackExtrapolationMirrorIdeal();
 
+   /**
+   * \brief Initialisation.
+   */
+   virtual void Init();
 
-  /** Standard constructor **/
-  CbmRichTrackExtrapolationMirrorIdeal(Int_t MinNsts, Int_t verbose);
+   /**
+   * \brief Finish.
+   */
+   virtual void Finish();
 
-
-  /** Destructor **/
-  virtual ~CbmRichTrackExtrapolationMirrorIdeal();
-
-
-  /** Initialisation **/
-  virtual void Init();
-
-  /** Finish **/
-  virtual void Finish();
-
-/** Method DoExtrapolate.
+   /** Method DoExtrapolate.
    ** Task: Read the track array and fill the point array in RICH mirror
    ** pointers to which are given as argument
    **
@@ -58,25 +63,18 @@ class CbmRichTrackExtrapolationMirrorIdeal : public CbmRichTrackExtrapolation
    *@param rTrackParamArray  Array of FairTrackParam
    *@value Number of tracks extrapolated
    **/
-  virtual Int_t DoExtrapolate(TClonesArray* gTrackArray, Double_t fZ, TClonesArray *fTrackParamArray);
+   virtual Int_t DoExtrapolate(
+        TClonesArray* gTrackArray,
+        Double_t fZ,
+        TClonesArray *fTrackParamArray);
 
-
-
-
- private:
-
-  /** Arrays of MC information **/
-  TClonesArray* fTrackParamArray;
-  TClonesArray* fMCPointArray;
-  TClonesArray* fMCTrackArray;
+private:
+  TClonesArray* fRichMirrorPoints;
+  TClonesArray* fMcTracks;
   TClonesArray* fSTSArray;
   TClonesArray* fTrackMatchArray;
 
-  /** Verbosity level **/
-  Int_t fVerbose;
-
-  Int_t    fMinNsts;       /** number of STS hits required for extrapolated track */
-  Int_t    iEx;            /** number of extrapolated tracks */
+  Int_t fMinNofStsHits; // number of STS hits required for extrapolated track
 
   /**
    * \brief Copy constructor.

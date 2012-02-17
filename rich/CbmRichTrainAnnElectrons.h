@@ -84,21 +84,6 @@ public:
 	virtual void FinishTask();
 
 private:
-   /**
-    * \brief Fill input parameters for ANN in array and histograms.
-    */
-   void DiffElandPi();
-
-   /**
-    * \brief Train and test ANN.
-    */
-   void TrainAndTestAnn();
-
-   /**
-    * \brief Draw results.
-    */
-   void Draw();
-
    Int_t fEventNum;
    TClonesArray* fRichHits;
    TClonesArray* fRichRings;
@@ -128,19 +113,34 @@ private:
 
    // difference between electrons and pions
    // [0] = is electron; [1] = is pion
-   vector<TH1D*> fhAaxis;
-   vector<TH1D*> fhBaxis;
-   vector<TH1D*> fhAaxisCor;
-   vector<TH1D*> fhBaxisCor;
-   vector<TH1D*> fhDist;
-   vector<TH1D*> fhNofHits;
-   vector<TH1D*> fhChi2;
-   vector<TH1D*> fhRadPos;
-   vector<TH2D*> fhAaxisVsMom;
-   vector<TH2D*> fhBaxisVsMom;
-   vector<TH2D*> fhPhiVsRadAng;
+   vector<TH1D*> fhAaxis; //major half axis
+   vector<TH1D*> fhBaxis; //minor half axis
+   vector<TH1D*> fhAaxisCor; // major half axis after correction
+   vector<TH1D*> fhBaxisCor; //minor half axis after correction
+   vector<TH1D*> fhDist; // distance between ring center and track projection
+   vector<TH1D*> fhNofHits; // number of hits in ring
+   vector<TH1D*> fhChi2; // chi2 of the fit
+   vector<TH1D*> fhRadPos; // radial position of a ring onto the photodetector plane
+   vector<TH2D*> fhAaxisVsMom; // major half axis vs. momentum
+   vector<TH2D*> fhBaxisVsMom; // minor half axis vs. momentum
+   vector<TH2D*> fhPhiVsRadAng; // ellipse rotation angle vs. radial angle
 
    vector<TH1*> fHists; // Store pointer for all histograms
+
+   /**
+    * \brief Fill input parameters for ANN in array and histograms.
+    */
+   void DiffElandPi();
+
+   /**
+    * \brief Train and test ANN.
+    */
+   void TrainAndTestAnn();
+
+   /**
+    * \brief Draw results.
+    */
+   void Draw();
 
    /**
     * \brief Copy constructor.

@@ -175,6 +175,16 @@ private:
          Double_t length,
          Double_t eLoss);
 
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRich(const CbmRich&);
+
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRich& operator=(const CbmRich&);
+
    ClassDef(CbmRich,2)
 };
 

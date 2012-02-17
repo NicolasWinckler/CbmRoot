@@ -81,29 +81,9 @@ public:
    virtual void FinishTask();
 
 private:
-   /**
-    * \brief Set recFlag weather ring was found correctly or not.
-    */
-   void SetRecFlag();
-
-   /**
-    * \brief Fill ring selection parameters in array and histograms.
-    */
-   void DiffFakeTrueCircle();
-
-   /**
-    * \brief Train and test ANN.
-    */
-   void TrainAndTestAnn();
-
-   /**
-    * \brief Draw results.
-    */
-   void Draw();
-
-   TClonesArray* fRings; // Array of CbmRichRings
-   TClonesArray* fTracks; // Array of CbmMCTracks
-   TClonesArray* fMatches; // Array of CbmRichRingMatch
+   TClonesArray* fRichRings; // Array of CbmRichRings
+   TClonesArray* fMcTracks; // Array of CbmMCTracks
+   TClonesArray* fRichRingMatches; // Array of CbmRichRingMatch
 
    Int_t fEventNumber;
    Double_t fQuota; // Quality quota for reconstructed ring
@@ -134,6 +114,26 @@ private:
    CbmRichRingSelectImpl* fSelectImpl; // Pointer to ellipse fitter
 
    vector<TH1*> fHists; // Store pointer for all histograms
+
+   /**
+    * \brief Set recFlag weather ring was found correctly or not.
+    */
+   void SetRecFlag();
+
+   /**
+    * \brief Fill ring selection parameters in array and histograms.
+    */
+   void DiffFakeTrueCircle();
+
+   /**
+    * \brief Train and test ANN.
+    */
+   void TrainAndTestAnn();
+
+   /**
+    * \brief Draw results.
+    */
+   void Draw();
 
    /**
     * \brief Copy constructor.

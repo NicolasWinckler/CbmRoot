@@ -41,15 +41,46 @@ using std::fabs;
 using std::string;
 using boost::assign::list_of;
 
-CbmRichTrainAnnElectrons::CbmRichTrainAnnElectrons()
+CbmRichTrainAnnElectrons::CbmRichTrainAnnElectrons():
+   fEventNum(0),
+
+   fRichHits(NULL),
+   fRichRings(NULL),
+   fRichPoints(NULL),
+   fMCTracks(NULL),
+   fRichRingMatches(NULL),
+   fRichProj(NULL),
+   fStsTrackMatches(NULL),
+   fGlobalTracks(NULL),
+   fStsTracks(NULL),
+
+   fMinNofHitsInRichRing(5),
+   fQuota(0.6),
+   fMaxNofTrainSamples(1500),
+
+   fNofPiLikeEl(0),
+   fNofElLikePi(0),
+   fAnnCut(-0.5),
+
+   fhAnnOutput(),
+   fhCumProb(),
+
+   fRElIdParams(),
+
+   fhAaxis(),
+   fhBaxis(),
+   fhAaxisCor(),
+   fhBaxisCor(),
+   fhDist(),
+   fhNofHits(),
+   fhChi2(),
+   fhRadPos(),
+   fhAaxisVsMom(),
+   fhBaxisVsMom(),
+   fhPhiVsRadAng(),
+
+   fHists()
 {
-	fEventNum = 1;
-
-	fMinNofHitsInRichRing = 5;
-	fQuota = 0.6;
-   fMaxNofTrainSamples = 1500;
-   fAnnCut = -0.5;
-
    fhAaxis.resize(2);
    fhBaxis.resize(2);
    fhAaxisCor.resize(2);

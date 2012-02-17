@@ -33,15 +33,35 @@ using std::endl;
 using std::vector;
 using boost::assign::list_of;
 
-CbmRichTrainAnnSelect::CbmRichTrainAnnSelect()
+CbmRichTrainAnnSelect::CbmRichTrainAnnSelect():
+   fRichRings(NULL),
+   fMcTracks(NULL),
+   fRichRingMatches(NULL),
+
+   fEventNumber(0),
+   fQuota(0.6),
+   fMaxNofTrainSamples(1500),
+   fNofFakeLikeTrue(0),
+   fNofTrueLikeFake(0),
+   fAnnCut(-0.5),
+
+   fhNofHits(),
+   fhAngle(),
+   fhNofHitsOnRing(),
+   fhChi2(),
+   fhRadPos(),
+   fhRadius(),
+
+   fhAnnOutput(),
+   fhCumProb(),
+
+   fRSParams(),
+
+   fFitCOP(NULL),
+   fSelectImpl(NULL),
+
+   fHists()
 {
-   fQuota = 0.6;
-
-   fEventNumber = 0;
-
-   fMaxNofTrainSamples = 1500;
-   fAnnCut = -.5;
-
    fhNofHits.resize(2);
    fhAngle.resize(2);
    fhNofHitsOnRing.resize(2);
@@ -84,18 +104,18 @@ CbmRichTrainAnnSelect::~CbmRichTrainAnnSelect()
 
 InitStatus CbmRichTrainAnnSelect::Init()
 {
-   cout << "InitStatus CbmRichRingQa::Init()" << endl;
+   cout << "InitStatus CbmRichTrainAnnSelect::Init()" << endl;
 	FairRootManager* ioman = FairRootManager::Instance();
 	if (NULL == ioman) { Fatal("CbmRichRingQa::Init","CbmRootManager is not instantiated"); }
 
-	fRings = (TClonesArray*) ioman->GetObject("RichRing");
-	if (NULL == fRings) { Fatal("CbmRichRingQa::Init","No RichRing array!"); }
+	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
+	if (NULL == fRichRings) { Fatal("CbmRichTrainAnnSelect::Init","No RichRing array!"); }
 
-	fTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-	if (NULL == fTracks) { Fatal("CbmRichRingQa::Init","No MCTrack array!");}
+	fMcTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+	if (NULL == fMcTracks) { Fatal("CbmRichTrainAnnSelect::Init","No MCTrack array!");}
 
-	fMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
-	if (NULL == fMatches) { Fatal("CbmRichRingQa::Init","No RichRingMatch array!");}
+	fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
+	if (NULL == fRichRingMatches) { Fatal("CbmRichTrainAnnSelect::Init","No RichRingMatch array!");}
 
 	fFitCOP = new CbmRichRingFitterCOP();
    fSelectImpl = new CbmRichRingSelectImpl();
@@ -118,15 +138,15 @@ void CbmRichTrainAnnSelect::Exec(
 
 void CbmRichTrainAnnSelect::SetRecFlag()
 {
-   Int_t nMatches = fMatches->GetEntriesFast();
+   Int_t nMatches = fRichRingMatches->GetEntriesFast();
    vector<Int_t> clone;
    clone.clear();
 
    for (Int_t iMatches = 0; iMatches < nMatches; iMatches++){
-      CbmRichRingMatch* match = (CbmRichRingMatch*)fMatches->At(iMatches);
+      CbmRichRingMatch* match = (CbmRichRingMatch*)fRichRingMatches->At(iMatches);
       if (NULL == match) continue;
 
-      CbmRichRing* ring = (CbmRichRing*)fRings->At(iMatches);
+      CbmRichRing* ring = (CbmRichRing*)fRichRings->At(iMatches);
       if (NULL == ring) continue;
 
       Int_t lTrueHits = match->GetNofTrueHits();
@@ -140,8 +160,8 @@ void CbmRichTrainAnnSelect::SetRecFlag()
       }
 
       Int_t trackID = match->GetMCTrackID();
-      if (trackID > fTracks->GetEntriesFast() || trackID < 0) continue;
-      CbmMCTrack* track = (CbmMCTrack*) fTracks->At(trackID);
+      if (trackID > fMcTracks->GetEntriesFast() || trackID < 0) continue;
+      CbmMCTrack* track = (CbmMCTrack*) fMcTracks->At(trackID);
       if (NULL == track) continue;
 
       Int_t gcode = TMath::Abs(track->GetPdgCode());
@@ -162,13 +182,13 @@ void CbmRichTrainAnnSelect::SetRecFlag()
 
 void CbmRichTrainAnnSelect::DiffFakeTrueCircle()
 {
-   Int_t nMatches = fMatches->GetEntriesFast();
+   Int_t nMatches = fRichRingMatches->GetEntriesFast();
 
    for (Int_t iMatches = 0; iMatches < nMatches; iMatches++) {
-      CbmRichRingMatch* match = (CbmRichRingMatch*) fMatches->At(iMatches);
+      CbmRichRingMatch* match = (CbmRichRingMatch*) fRichRingMatches->At(iMatches);
       if (NULL == match) continue;
 
-      CbmRichRing* ring = (CbmRichRing*) fRings->At(iMatches);
+      CbmRichRing* ring = (CbmRichRing*) fRichRings->At(iMatches);
       if (NULL == ring) continue;
 
       CbmRichRingLight ringLight;

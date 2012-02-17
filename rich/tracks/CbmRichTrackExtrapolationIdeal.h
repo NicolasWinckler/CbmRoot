@@ -1,58 +1,56 @@
-/******************************************************************************
-* $Id: CbmRichTrackExtrapolationIdeal.h,v 1.2 2006/01/30 11:00:55 hoehne Exp $
+/**
+* \file CbmRichTrackExtrapolationIdeal.h
 *
-*  Class  : CbmRichTrackExtrapolationIdeal
-*  Description: "TrackExtrapolation" from MC points.
-*               It reads the PointArray with ImPlanePoints from MC and selects those to
-*               be projected to the Rich Photodetector
+* \brief This is the implementation of the TrackExtrapolation from MC points.
+* It reads the STS track array, gets the corresponding MC RefPlanePoint
+* and selects those to be projected to the Rich Photodetector.
 *
-*  Author : Claudia Hoehne
-*  E-mail : c.hoehne@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichTrackExtrapolationIdeal.h,v $
-*  Revision 1.2  2006/01/30 11:00:55  hoehne
-*  bug fix: Point Array at z-plane was not filled correctly (counters not correct)
-*
-*  Revision 1.1  2006/01/26 09:53:22  hoehne
-*  initial version for track extrapolation (base class + concrete implementations + task) to z-plane in RICH
-*
-*
-*
-*******************************************************************************/
+* \author Claudia Hoehne
+* \date 2006
+**/
 
-#ifndef CBM_RICH_TARCK_EXTRAPOLATION_Ideal
-#define CBM_RICH_TRACK_EXTRAPOLATION_Ideal 1
+#ifndef CBM_RICH_TARCK_EXTRAPOLATION_IDEAL
+#define CBM_RICH_TRACK_EXTRAPOLATION_IDEAL
 
 #include "CbmRichTrackExtrapolation.h"
 
 class TClonesArray;
 class CbmGlobalTrack;
 
+/**
+* \class CbmRichTrackExtrapolationIdeal
+*
+* \brief "TrackExtrapolation" from MC points. It reads the PointArray with ImPlanePoints
+* from MC and selects those to be projected to the Rich Photodetector.
+*
+* \author Claudia Hoehne
+* \date 2006
+**/
 class CbmRichTrackExtrapolationIdeal : public CbmRichTrackExtrapolation
 {
+public:
 
- public:
+   /**
+   * \brief Default constructor.
+   */
+   CbmRichTrackExtrapolationIdeal();
 
-  /** Default constructor **/
-  CbmRichTrackExtrapolationIdeal();
+   /**
+   * \brief Destructor.
+   */
+   virtual ~CbmRichTrackExtrapolationIdeal();
 
+   /**
+   * \brief Initialisation.
+   */
+   virtual void Init();
 
-  /** Standard constructor **/
-  CbmRichTrackExtrapolationIdeal(Int_t MinNsts, Int_t verbose);
+   /**
+   * \brief Finish.
+   */
+   virtual void Finish();
 
-
-  /** Destructor **/
-  virtual ~CbmRichTrackExtrapolationIdeal();
-
-
-  /** Initialisation **/
-  virtual void Init();
-
-  /** Finish **/
-  virtual void Finish();
-
-/** Method DoExtrapolate.
+   /** Method DoExtrapolate.
    ** Task: Read the track array and fill the point array at given z-Plane in RICH detector
    ** pointers to which are given as argument
    **
@@ -60,38 +58,30 @@ class CbmRichTrackExtrapolationIdeal : public CbmRichTrackExtrapolation
    *@param rTrackParamArray  Array of FairTrackParam
    *@value Number of tracks extrapolated
    **/
-  virtual Int_t DoExtrapolate(TClonesArray* gTrackArray, Double_t fZ, TClonesArray *fTrackParamArray);
+   virtual Int_t DoExtrapolate(
+        TClonesArray* gTrackArray,
+        Double_t fZ,
+        TClonesArray *fTrackParamArray);
 
+private:
+   TClonesArray* fRefPlanePoints;
+   TClonesArray* fMcTracks;
+   TClonesArray* fStsTracks;
+   TClonesArray* fStsTrackMatches;
 
+   Int_t fMinNofStsHits; // number of STS hits required for extrapolated track
 
-
- private:
-
-  /** Arrays of MC information **/
-  TClonesArray* fTrackParamArray;
-  TClonesArray* fMCPointArray;
-  TClonesArray* fMCTrackArray;
-  TClonesArray* fSTSArray;
-  TClonesArray* fTrackMatchArray;
-
-  /** Verbosity level **/
-  Int_t fVerbose;
-
-  Int_t    fMinNsts;       /** number of STS hits required for extrapolated track */
-  Int_t    iEx;            /** number of extrapolated tracks */
-
-  /**
+   /**
    * \brief Copy constructor.
    */
-  CbmRichTrackExtrapolationIdeal(const CbmRichTrackExtrapolationIdeal&);
+   CbmRichTrackExtrapolationIdeal(const CbmRichTrackExtrapolationIdeal&);
 
-  /**
+   /**
    * \brief Assignment operator.
    */
-  CbmRichTrackExtrapolationIdeal& operator=(const CbmRichTrackExtrapolationIdeal&);
+   CbmRichTrackExtrapolationIdeal& operator=(const CbmRichTrackExtrapolationIdeal&);
 
-  ClassDef(CbmRichTrackExtrapolationIdeal,1);
-
+   ClassDef(CbmRichTrackExtrapolationIdeal,1);
 };
 
 #endif

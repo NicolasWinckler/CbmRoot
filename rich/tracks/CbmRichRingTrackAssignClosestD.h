@@ -22,39 +22,28 @@
 #define CBMRichRingTrackAssignClosestD_H
 
 #include "CbmRichRingTrackAssign.h"
-#include "CbmRichRing.h"
 
-#include "CbmStack.h"
+class TClonesArray;
 
-#include "TClonesArray.h"
-
-
-class CbmRichRingTrackAssignClosestD : public CbmRichRingTrackAssign {
+class CbmRichRingTrackAssignClosestD : public CbmRichRingTrackAssign
+{
 
 public:
 
-  /** Default constructor **/
+  /**
+   * \brief Default constructor.
+   */
 	CbmRichRingTrackAssignClosestD();
 
-	/** Standard constructor
-	 *@param distance         max. distance between ring center and projected track [cm]
-	 *@param npoints         min number of points on ring
-	 *@param verbose          verbosity level
+	/**
+	 * \brief Destructor.
 	 */
-	CbmRichRingTrackAssignClosestD(Double_t distance, Int_t npoints,
-			Int_t verbose);
-
-	/** Standard Constructor with name and title **/
-	CbmRichRingTrackAssignClosestD(const char *name, const char *title,
-			Double_t distance, Int_t npoints, Int_t verbose);
-
-	/** Destructor **/
 	virtual ~CbmRichRingTrackAssignClosestD();
 
-	/** Initialisation **/
+	/**
+	 * \brief Initialisation.
+	 */
 	void Init();
-
-	Bool_t IsTrdElectron(Int_t iTrack);
 
 	/** Method DoAssign.
 	 ** Task: Read the extrapolated Tracks, read the found rings, assign according to closest distance criterium
@@ -63,19 +52,23 @@ public:
 	 *@param pTrack    pointer to extrapolated track
 	 *@param pRing     pointer to found ring
 	 **/
-	void DoAssign(TClonesArray* pRing, TClonesArray* pTrack);
+	void DoAssign(
+	      TClonesArray* pRing,
+	      TClonesArray* pTrack);
 
 private:
-
-	/** Arrays of track information **/
-	TClonesArray* gTrackArray;
+	TClonesArray* fGlobalTracks;
 	TClonesArray* fTrdTracks;
 
-	/** Verbosity level **/
-	Int_t fVerbose;
+	Double_t fMaxDistance; // max. distance between ring center and track extrapolation
+	Int_t fMinNofHitsInRing; // min number of hits per ring
 
-	Double_t fDistance; /** max. distance between ring center and track extrapolation */
-	Int_t fNpoints; /** min number of points per ring */
+   /*
+    * \brief Check if global track was identified as electron in the TRD detector.
+    * \param iTrack Index of global track.
+    */
+   Bool_t IsTrdElectron(
+         Int_t iTrack);
 
   /**
    * \brief Copy constructor.

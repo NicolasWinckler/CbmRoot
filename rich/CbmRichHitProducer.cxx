@@ -33,9 +33,9 @@ using std::endl;
 
 CbmRichHitProducer::CbmRichHitProducer():
    FairTask("CbmRichHitProducer"),
-   fListRICHpts(NULL),
-   fHitCollection(NULL),
-   fListStack(NULL),
+   fRichPoints(NULL),
+   fRichHits(NULL),
+   fMcTracks(NULL),
    fNHits(0),
    fNDoubleHits(0),
 
@@ -54,14 +54,12 @@ CbmRichHitProducer::CbmRichHitProducer():
    fPassNodes(NULL),
    fPar(NULL),
 
-   fVerbose(0),
-
-   fPhotomulRadius(0.),
+   fPhotomulRadius(0.0),
    fPhotomulDist(0.),
-   fDetType(0),
-   fNoise(0),
-   fColl(0.),
-   fSMirror(0.),
+   fDetType(4),
+   fNofNoiseHits(220),
+   fCollectionEfficiency(1.),
+   fSigmaMirror(0.06),
 
    fTheta(0.),
    fPhi(0.),
@@ -69,48 +67,13 @@ CbmRichHitProducer::CbmRichHitProducer():
    fCrossTalkHitProb(0.),
    fNofCrossTalkHits(0)
 {
-   SetDefaultParameters();
-}
 
-CbmRichHitProducer::CbmRichHitProducer(
-      Double_t pmt_rad,
-      Double_t pmt_dist,
-		Int_t det_type,
-		Int_t noise,
-		Int_t verbose,
-		Double_t colleff,
-		Double_t s_mirror):
-   FairTask("RichHitProducer")
-{
-   fPhotomulRadius = pmt_rad;
-   fPhotomulDist = pmt_dist;
-   fDetType = det_type;
-   fNoise = noise;
-   fVerbose = verbose;
-   fColl = colleff;
-   fSMirror = s_mirror;
-
-   fNEvents = 0;
-   fNHits = 0;
-   fNDoubleHits = 0;
-   fNofCrossTalkHits = 0;
 }
 
 CbmRichHitProducer::~CbmRichHitProducer()
 {
-   FairRootManager *fManager =FairRootManager::Instance();
-   fManager->Write();
-}
-
-void CbmRichHitProducer::SetDefaultParameters()
-{
-   fPhotomulRadius = 0.3;
-   fPhotomulDist = 0.;
-   fDetType = 4;
-   fNoise = 220;
-   fVerbose = 1;
-   fColl = 0.7;
-   fSMirror = 0.06;
+   FairRootManager *manager =FairRootManager::Instance();
+   manager->Write();
 }
 
 void CbmRichHitProducer::SetParContainers()
@@ -219,7 +182,7 @@ InitStatus CbmRichHitProducer::Init()
       cout << "   detector type: CSI with pad size = " << fPhotomulRadius << " cm, distance between panels = " << fPhotomulDist << " cm" << endl;
       if (fDetType==2 || fDetType == 4)
       cout << "   detector type: Hamamatsu H8500 with pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
-      cout << "   number of noise hits (to be reduced by geometrical efficiency) " << fNoise << endl;
+      cout << "   number of noise hits (to be reduced by geometrical efficiency) " << fNofNoiseHits << endl;
       cout << "--------------------------------------------------------------------------------" << endl;
    }
 
@@ -257,14 +220,14 @@ InitStatus CbmRichHitProducer::Init()
      cout << " tX: " << trans.X() << " tY: " << trans.Y() << " tZ: " << trans.Z() << endl;
 */
 
-   fListRICHpts = (TClonesArray*)fManager->GetObject("RichPoint");
-   if (NULL == fListRICHpts) { Fatal("CbmRichHitProducer::Init","No RichPoint array!"); }
+   fRichPoints = (TClonesArray*)fManager->GetObject("RichPoint");
+   if (NULL == fRichPoints) { Fatal("CbmRichHitProducer::Init","No RichPoint array!"); }
 
-   fListStack = (TClonesArray *)fManager->GetObject("MCTrack");
-   if (NULL == fListStack) { Fatal("CbmRichHitProducer::Init","No MCTrack array!"); }
+   fMcTracks = (TClonesArray *)fManager->GetObject("MCTrack");
+   if (NULL == fMcTracks) { Fatal("CbmRichHitProducer::Init","No MCTrack array!"); }
 
-   fHitCollection = new TClonesArray("CbmRichHit");
-   fManager->Register("RichHit","RICH",fHitCollection, kTRUE);
+   fRichHits = new TClonesArray("CbmRichHit");
+   fManager->Register("RichHit","RICH", fRichHits, kTRUE);
    //fPar->print();
    // setting the parameter class on static mode.
    //fPar->setStatic();
@@ -331,14 +294,12 @@ void CbmRichHitProducer::Exec(
       }
    }
 
-   if (fVerbose > 0) cout << "   Number of input MC points: " << fListRICHpts->GetEntries() << endl;
-
-   fHitCollection->Clear();
+   fRichHits->Clear();
    fNHits = 0;
    fNDoubleHits = 0;
 
-   for(Int_t j = 0; j < fListRICHpts->GetEntries(); j++){
-      CbmRichPoint* pt = (CbmRichPoint*)fListRICHpts->At(j);
+   for(Int_t j = 0; j < fRichPoints->GetEntries(); j++){
+      CbmRichPoint* pt = (CbmRichPoint*) fRichPoints->At(j);
 
       TVector3 posPoint;
       pt->Position(posPoint);
@@ -349,7 +310,7 @@ void CbmRichHitProducer::Exec(
       if (fVerbose > 1) cout << " tilted position in Labsystem " << detPoint.X() << " " << detPoint.Y() << " " << detPoint.Z() << endl;
 
       Int_t trackID = pt->GetTrackID();
-      CbmMCTrack* p = (CbmMCTrack*) fListStack->At(trackID);
+      CbmMCTrack* p = (CbmMCTrack*) fMcTracks->At(trackID);
       Int_t gcode = TMath::Abs(p->GetPdgCode());
 
       if ((fVerbose) && ((detPoint.Z() < (fDetZ-0.25)) || (detPoint.Z() > (fDetZ+0.25)))) {
@@ -413,7 +374,7 @@ void CbmRichHitProducer::Exec(
                if (fDetType == 5 && lambda < 300.) {// smear Hit position for lambda < 300 nm (WLS film!)
                   FindRichHitPositionMAPMT(sigma,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
                }
-               if (efficiency[ilambda]*fColl > rand ) fDetection = 1;
+               if (efficiency[ilambda]*fCollectionEfficiency > rand ) fDetection = 1;
             } // min <= lambda < max
          }// if photon
 
@@ -448,11 +409,8 @@ void CbmRichHitProducer::Exec(
       }
    } // loop over RICH points
 
-   // for (Int_t iHit=0; iHit<fNHits; iHit++)
-   // ((CbmRichHit*)fHitCollection->At(iHit))->Print();
-
    // add noise hits
-   for(Int_t j = 0; j < fNoise; j++) {
+   for(Int_t j = 0; j < fNofNoiseHits; j++) {
       Double_t rand = gRandom->Rndm();
       Double_t xRand = (fDetX-fDetZ_org*TMath::Sin(fPhi))-fDetWidthX + rand*2.*fDetWidthX;
       rand = gRandom->Rndm();
@@ -489,14 +447,9 @@ void CbmRichHitProducer::Exec(
       }
    }
 
-   if (fVerbose > 0) {
-      cout <<"  --->  Number of hits: "<<fHitCollection->GetEntries()<<endl;
-      cout <<"  --->  Fraction of double hits: "<<(Double_t)(fNDoubleHits)/(Double_t)(fNHits) <<endl;
-      cout <<"-------------------------------------------------------------------"<<endl;
-      cout << endl;
-   }
-   cout << "nof cross section hits = " << fNofCrossTalkHits << ", per event = " <<
-         (Double_t) fNofCrossTalkHits / fNEvents << endl;
+   cout << "Nof hits: "<< fRichHits->GetEntries()<< endl;
+   cout << "Fraction of double hits: "<<(Double_t)(fNDoubleHits)/(Double_t)(fNHits) << endl;
+   cout << "Nof cross section hits: " << (Double_t) fNofCrossTalkHits / fNEvents << endl;
 }
 
 void CbmRichHitProducer::TiltPoint(
@@ -551,7 +504,7 @@ void CbmRichHitProducer::AddHit(
    CbmRichHit *hit;
    // Check if there was any hit in the same PMT
    for (Int_t iHit = 0; iHit < fNHits; iHit++) {
-      hit = (CbmRichHit*) fHitCollection->At(iHit);
+      hit = (CbmRichHit*) fRichHits->At(iHit);
       if (pmtID == hit->GetPmtId() && detID==hit->GetDetectorId()) {
          hit->SetNPhotons(hit->GetNPhotons()+1);
          hit->SetAmplitude(GetAmplitude()+ampl);
@@ -563,8 +516,8 @@ void CbmRichHitProducer::AddHit(
 
    // If no hits found in this PMT, add a new one
    if (!hitMerged) {
-      new((*fHitCollection)[fNHits]) CbmRichHit();
-      hit = (CbmRichHit*)fHitCollection->At(fNHits);
+      new((*fRichHits)[fNHits]) CbmRichHit();
+      hit = (CbmRichHit*)fRichHits->At(fNHits);
       hit->SetPosition(posHit);
       hit->SetPositionError(posHitErr);
       hit->SetDetectorId(detID);
@@ -638,7 +591,7 @@ void CbmRichHitProducer::AddCrossTalkHits(
 
 void CbmRichHitProducer::Finish()
 {
-  fHitCollection->Clear();
+  fRichHits->Clear();
 }
 
 void CbmRichHitProducer::SetPhotoDetPar(
@@ -882,8 +835,8 @@ void CbmRichHitProducer::FindRichHitPositionSinglePMT(
    Double_t distance;
 
    // smear points due to light scattering in mirror
-   xPoint = xPoint + gRandom->Gaus(0,fSMirror);
-   yPoint = yPoint + gRandom->Gaus(0,fSMirror);
+   xPoint = xPoint + gRandom->Gaus(0,fSigmaMirror);
+   yPoint = yPoint + gRandom->Gaus(0,fSigmaMirror);
 
    uPoint = 2.*fDetWidthX - (fPhotomulRadius+fPhotomulDist) + xPoint;
    if (yPoint > 0)
@@ -942,8 +895,8 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(
    Double_t uPMT, vPMT, uPMTs, vPMTs;
 
    // smear points due to light scattering in mirror
-   xPoint = xPoint + gRandom->Gaus(0, fSMirror);
-   yPoint = yPoint + gRandom->Gaus(0, fSMirror);
+   xPoint = xPoint + gRandom->Gaus(0, fSigmaMirror);
+   yPoint = yPoint + gRandom->Gaus(0, fSigmaMirror);
 
    // smear Point if photon is converted via WLS film:
    if (sigma > 0.) {
@@ -1016,8 +969,8 @@ void CbmRichHitProducer::FindRichHitPositionCsI(
    Double_t uPMT, vPMT, uPMTs, vPMTs;
 
    // smear points due to light scattering in mirror
-   xPoint = xPoint + gRandom->Gaus(0,fSMirror);
-   yPoint = yPoint + gRandom->Gaus(0,fSMirror);
+   xPoint = xPoint + gRandom->Gaus(0,fSigmaMirror);
+   yPoint = yPoint + gRandom->Gaus(0,fSigmaMirror);
 
    uPoint = 2.*fDetWidthX + xPoint;
    if (yPoint > 0) vPoint = - fDetY + fDetWidthY + yPoint;

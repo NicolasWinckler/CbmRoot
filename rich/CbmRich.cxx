@@ -62,7 +62,17 @@ CbmRich::CbmRich() :
 CbmRich::CbmRich(
       const char* name,
       Bool_t active):
-   FairDetector(name, active, kRICH)
+   FairDetector(name, active, kRICH),
+   fPosIndex(0),
+   volDetector(0),
+   volRefPlane(0),
+   volMir(0),
+   volMir1(0),
+   volMir2(0),
+
+   fRichCollection(NULL),
+   fRichRefPlaneCollection(NULL),
+   fRichMirrorCollection(NULL)
 {
    fRichCollection = new TClonesArray("CbmRichPoint");
    fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");

@@ -33,65 +33,54 @@ class CbmRichRingTrackAssignIdeal : public CbmRichRingTrackAssign {
 
 public:
 
-  /** Default constructor **/
-  CbmRichRingTrackAssignIdeal();
-
-  /** Standard constructor
-   *@param distance         max. distance between ring center and projected track [cm]
-   *@param npoints         min number of points on ring
-   *@param verbose          verbosity level
+   /**
+   * \brief Default constructor.
    */
-  CbmRichRingTrackAssignIdeal(Double_t distance, Int_t npoints, Int_t verbose);
+   CbmRichRingTrackAssignIdeal();
 
-  /** Standard Constructor with name and title **/
-  CbmRichRingTrackAssignIdeal(const char *name, const char *title,
-   				    Double_t distance, Int_t npoints, Int_t verbose);
+   /**
+   * \brief Destructor.
+   */
+   virtual ~CbmRichRingTrackAssignIdeal();
 
-  /** Destructor **/
-  virtual ~CbmRichRingTrackAssignIdeal();
-
-  /** Initialisation **/
-  void Init();
-
-
-  /** Method DoAssign.
-  ** Task: Read the extrapolated Tracks, read the found rings, assign according to closest distance criterium
-   ** pointers to both Rings are given as argument
-   **
-   *@param pTrack    pointer to extrapolated track
-   *@param pRing     pointer to found ring
-   **/
-   void DoAssign(TClonesArray* pRing, TClonesArray* pTrack);
+   /**
+    * \brief Initialisation.
+    */
+   void Init();
 
 
+  /**
+   * \brief Read the extrapolated Tracks, read the found rings, assign according
+   * to closest distance criterium
+   * pointers to both Rings are given as argument
+   *
+   * \param[in] pTrack ointer to extrapolated track
+   * \param[in] pRing     pointer to found ring
+   */
+   virtual void DoAssign(
+         TClonesArray* rings,
+         TClonesArray* richProj);
 
 private:
+   TClonesArray* fMcTracks;
+   TClonesArray* fGlobalTracks;
+   TClonesArray* fRingMatches;
+   TClonesArray* fStsTrackMatches;
 
-  /** Arrays of track information **/
-  TClonesArray* fMCTrackArray;
-  TClonesArray* gTrackArray;
-  TClonesArray* fRingMatchArray;
-  TClonesArray* fTrackMatchArray;
+   Double_t fMaxDistance;  // max. distance between ring center and track extrapolation */
+   Int_t fMinNofHitsInRing; // min number of hits per ring */
 
+   /**
+    * \brief Copy constructor.
+    */
+   CbmRichRingTrackAssignIdeal(const CbmRichRingTrackAssignIdeal&);
 
-  /** Verbosity level **/
-  Int_t fVerbose;
+   /**
+    * \brief Assignment operator.
+    */
+   CbmRichRingTrackAssignIdeal& operator=(const CbmRichRingTrackAssignIdeal&);
 
-  Double_t fDistance;  /** max. distance between ring center and track extrapolation */
-  Int_t    fNpoints;   /** min number of points per ring */
-
-  /**
-   * \brief Copy constructor.
-   */
-  CbmRichRingTrackAssignIdeal(const CbmRichRingTrackAssignIdeal&);
-
-  /**
-   * \brief Assignment operator.
-   */
-  CbmRichRingTrackAssignIdeal& operator=(const CbmRichRingTrackAssignIdeal&);
-
-  ClassDef(CbmRichRingTrackAssignIdeal,1);
-
+   ClassDef(CbmRichRingTrackAssignIdeal,1);
 };
 
 #endif

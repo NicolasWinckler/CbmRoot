@@ -27,30 +27,10 @@ class TVector3;
 class CbmRichHitProducer : public FairTask
 {
 public:
-
    /**
     * \brief Default constructor.
     */
    CbmRichHitProducer();
-
-   /**
-    * \brief Standard constructor.
-    * \param[in] pmt_rad Radius of photomultiplier [cm].
-    * \param[in] pmt_dis Distance between PMT tubel [cm].
-    * \param[in] det_type Detector type (choose: 1=Protvino, 2=CsI, 3=Hamamatsu.
-    * \param[in] noise Number of noise hits.
-    * \param[in] verbose Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug).
-    * \param[in] colleff Collection efficiency for photoelectrons in PMT optics.
-    * \param[in] s_mirror Additional scattering in mirror: results in smeared point in PMT plane.
-    */
-   CbmRichHitProducer(
-         Double_t pmt_rad,
-         Double_t pmt_dist,
-         Int_t det_type,
-         Int_t noise,
-         Int_t verbose,
-         Double_t colleff,
-         Double_t s_mirror);
 
    /**
     * \brief Destructor.
@@ -77,6 +57,26 @@ public:
     * \brief Inherited from FairTask.
     */
    virtual void Finish();
+
+   /**
+    * \brief Set detector type (choose: 1=Protvino, 2=CsI, 3=Hamamatsu, 4=Hamamatsu H8500-03)
+    */
+   void SetDetectorType(Int_t detType){ fDetType = detType;}
+
+   /**
+    * \brief Set number of noise hits to be added.
+    */
+   void SetNofNoiseHits(Int_t noise) {fNofNoiseHits = noise;}
+
+   /**
+    * \brief Set collection efficiency for photoelectrons in PMT optics.
+    */
+   void SetCollectionEfficiency(Double_t collEff){fCollectionEfficiency = collEff;}
+
+   /**
+    * \brief Set additional smearing of MC Points due to light scattering in mirror.
+    */
+   void SetSigmaMirror(Double_t sigMirror) {fSigmaMirror = sigMirror;}
 
    /**
     * \brief Add cross talk hits.
@@ -183,11 +183,6 @@ public:
          Double_t efficiency[]);
 
    /**
-    * \brief Set the parameters to the default values.
-    */
-   void SetDefaultParameters();
-
-   /**
     * Tilt points by
     * -theta, -phi for x>0, y>0
     * theta, -phi for x>0, y<0
@@ -211,9 +206,10 @@ public:
 
 private:
 
-   TClonesArray* fListRICHpts; // RICH MC points
-   TClonesArray* fHitCollection; // RICH hits
-   TClonesArray* fListStack; // Tracks
+   TClonesArray* fRichPoints; // RICH MC points
+   TClonesArray* fRichHits; // RICH hits
+   TClonesArray* fMcTracks; // Tracks
+
    Int_t fNHits; // Number of hits
    Int_t fNDoubleHits; // Number of double hits
 
@@ -236,15 +232,13 @@ private:
    TObjArray *fPassNodes;
    CbmGeoRichPar *fPar;
 
-   Int_t fVerbose; // Verbosity level
-
    // Parameters of photodetector
-   Double_t fPhotomulRadius; // radius of photomultiplier
-   Double_t fPhotomulDist; // radius of photomultiplier
+   Double_t fPhotomulRadius; // radius of photomultiplier [cm], set according to detector type
+   Double_t fPhotomulDist; // distance between PMT tube [cm], set according to detector type
    Int_t fDetType; // detector type
-   Int_t fNoise; // number of noise hits
-   Double_t fColl; // collection efficiency for photoelectrons in PMT optics
-   Double_t fSMirror; // additinal smearing of MC Points due to light scattering in mirror
+   Int_t fNofNoiseHits; // number of noise hits
+   Double_t fCollectionEfficiency; // collection efficiency for photoelectrons in PMT optics
+   Double_t fSigmaMirror; // additinal smearing of MC Points due to light scattering in mirror
 
    Double_t fTheta; // angle by which photodetector was tilted around x-axis
    Double_t fPhi; // angle by which photodetector was tilted around y-axis

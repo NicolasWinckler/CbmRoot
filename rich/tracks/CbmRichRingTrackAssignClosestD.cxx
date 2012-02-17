@@ -33,6 +33,7 @@
 #include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
 
+#include "TClonesArray.h"
 #include "TParticle.h"
 #include "TArrayD.h"
 #include "TVector3.h"
@@ -46,83 +47,34 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-// -----   Default constructor   -------------------------------------------
 CbmRichRingTrackAssignClosestD::CbmRichRingTrackAssignClosestD()
 {
-fDistance = 1.;  /** max. distance between projected track and ring center [cm] */
-fNpoints  = 5;   /** min. number of points per ring */
-fVerbose  = 1;   /** verbosity level */
+   fMaxDistance = 100.;
+   fMinNofHitsInRing = 5;
 }
 
-// -----   Standard constructor   -------------------------------------------
-CbmRichRingTrackAssignClosestD::CbmRichRingTrackAssignClosestD(Double_t distance, Int_t npoints, Int_t verbose)
-{
-fDistance = distance;  /** max. distance between projected track and ring center [cm] */
-fNpoints  = npoints;   /** min. number of points per ring */
-fVerbose  = verbose;   /** verbosity level */
-}
-
-// -------------------------------------------------------------------------
-
-
-//---------- Standard constructor with name and title  --------------------------
-CbmRichRingTrackAssignClosestD::CbmRichRingTrackAssignClosestD(const char *name, const char *title,
-					Double_t distance, Int_t npoints, Int_t verbose)
-{
-fDistance = distance;  /** max. distance between projected track and ring center [cm] */
-fNpoints  = npoints;   /** min. number of points per ring */
-fVerbose  = verbose;   /** verbosity level */
-}
-
-//------------Destructor -----------------------------------------------------
 CbmRichRingTrackAssignClosestD::~CbmRichRingTrackAssignClosestD()
 {
 }
-//------------------------------------------------------------------------------
 
-// -----   Public method Init   --------------------------------------------
 void CbmRichRingTrackAssignClosestD::Init()
 {
-	// Get and check FairRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (!ioman) {
-		cout << "-E- CbmRichRingTrackAssignClosestD:Init: "
-				<< "RootManager not instantised!" << endl;
-		return;
-	}
+	if (NULL == ioman) {Fatal("CbmRichRingTrackAssignClosestD::Init", "RootManager not instantised!");}
 
-	// Get global track array
-	gTrackArray = (TClonesArray*) ioman->GetObject("GlobalTrack");
-	if ( !gTrackArray) {
-		cout
-				<< "-W- CbmRichRingTrackAssignClosestD::Init: No global track array!"
-				<< endl;
-		return;
-	}
+	fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
+	if (NULL == fGlobalTracks) {Fatal("CbmRichRingTrackAssignClosestD::Init", "No GlobalTrack array!");}
 
 	fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
-	if ( !fTrdTracks) {
-		cout << "-W- CbmRichElectronsQa::Init: No TrdTrack array!" << endl;
-		return;
-	}
-
+	if (NULL == fTrdTracks) {Fatal("CbmRichRingTrackAssignClosestD::Init", "No TrdTrack array!");}
 }
 
-// -----   Public method DoAssign   ------------------------------------------
-void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesArray* pTringArray)
+void CbmRichRingTrackAssignClosestD::DoAssign(
+      TClonesArray *pRingArray,
+      TClonesArray* pTringArray)
 {
-    Int_t fNTracks = pTringArray->GetEntriesFast();
+   Int_t fNTracks = pTringArray->GetEntriesFast();
 	Int_t fNRings = pRingArray->GetEntriesFast();
-
-	FairTrackParam *pTrack;
-	CbmRichRing *pRing;
-
-	CbmGlobalTrack *gTrack;
-
-	Double_t xRing, yRing;
-	Double_t xTrack, yTrack;
-	Double_t dist_RingTrack, rMin;
-	Int_t iTrackMin;
 
 	vector<Int_t> trackIndex;
 	vector<Double_t> trackDist;
@@ -136,33 +88,34 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 		for (Int_t iRing=0; iRing < fNRings; iRing++) {
 			if (trackIndex[iRing] != -1) continue;
 
-			pRing = (CbmRichRing*)pRingArray->At(iRing);
+			CbmRichRing* pRing = (CbmRichRing*)pRingArray->At(iRing);
 
-			if (pRing->GetNofHits() < fNpoints) continue;
+			if (pRing->GetNofHits() < fMinNofHitsInRing) continue;
 
-			xRing = pRing->GetCenterX();
-			yRing = pRing->GetCenterY();
+			Double_t xRing = pRing->GetCenterX();
+			Double_t yRing = pRing->GetCenterY();
 
-			rMin = 999.;
-			iTrackMin = -1;
+			Double_t rMin = 999.;
+			Int_t iTrackMin = -1;
 
 			for (Int_t iTrack=0; iTrack < fNTracks; iTrack++) {
 				vector<Int_t>::iterator it = find(trackIndex.begin(), trackIndex.end(), iTrack);
 				if (it != trackIndex.end()) continue;
 
-				pTrack = (FairTrackParam*)pTringArray->At(iTrack);
-				xTrack = pTrack->GetX();
-				yTrack = pTrack->GetY();
+				FairTrackParam* pTrack = (FairTrackParam*)pTringArray->At(iTrack);
+				Double_t xTrack = pTrack->GetX();
+				Double_t yTrack = pTrack->GetY();
 
-				if (xTrack == 0 && yTrack == 0) continue; // no projection to photodetector plane
+				// no projection to photodetector plane
+				if (xTrack == 0 && yTrack == 0) continue;
 
 				//if (!IsTrdElectron(iTrack)) continue;
 
-				dist_RingTrack = TMath::Sqrt( (xRing-xTrack)*(xRing-xTrack) +
+				Double_t dist = TMath::Sqrt( (xRing-xTrack)*(xRing-xTrack) +
 						(yRing-yTrack)*(yRing-yTrack) );
 
-				if (dist_RingTrack < rMin) {
-					rMin = dist_RingTrack;
+				if (dist < rMin) {
+					rMin = dist;
 					iTrackMin = iTrack;
 				}
 			} // loop tracks
@@ -188,18 +141,19 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 
 	// fill global tracks
 	for (UInt_t i = 0; i < trackIndex.size(); i++){
-		pRing = (CbmRichRing*)pRingArray->At(i);
+		CbmRichRing* pRing = (CbmRichRing*)pRingArray->At(i);
 		pRing->SetTrackID(trackIndex[i]);
 		pRing->SetDistance(trackDist[i]);
 		if (trackIndex[i] == -1) continue;
-		gTrack = (CbmGlobalTrack*)gTrackArray->At(trackIndex[i]);
+		CbmGlobalTrack* gTrack = (CbmGlobalTrack*) fGlobalTracks->At(trackIndex[i]);
 		gTrack->SetRichRingIndex(i);
 	}
 }
 
-Bool_t CbmRichRingTrackAssignClosestD::IsTrdElectron(Int_t iTrack)
+Bool_t CbmRichRingTrackAssignClosestD::IsTrdElectron(
+      Int_t iTrack)
 {
-	CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
+	CbmGlobalTrack* gTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
 	Int_t trdIndex = gTrack->GetTrdTrackIndex();
 	if (trdIndex == -1) return false;
 

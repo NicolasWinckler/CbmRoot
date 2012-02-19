@@ -32,8 +32,8 @@ CbmMuchPad::CbmMuchPad()
 // -----  Standard constructor  --------------------------------------------
 CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel) 
   : TPolyLine(), 
-    fDetectorId(0),
-    fChannelId(0),
+    fDetectorId(sector->GetDetectorId()),
+    fChannelId(CbmMuchModuleGem::GetChannelId(sector->GetSectorIndex(), iChannel)),
     fX0(0.), 
     fY0(0.),
     fNeighbours(),
@@ -43,11 +43,6 @@ CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel)
     fDigi(new CbmMuchDigi(fDetectorId,fChannelId,0,0,0)),
     fMatch(new CbmMuchDigiMatch())
 {
-  // Generate detectorId
-  fDetectorId = sector->GetDetectorId();
-  Int_t iSector = sector->GetSectorIndex();
-  fChannelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel);
-
   TVector3 secPos = sector->GetPosition();
   TVector3 secSize = sector->GetSize();
   Double_t secX0 = secPos[0];

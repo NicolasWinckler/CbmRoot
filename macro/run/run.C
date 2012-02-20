@@ -32,11 +32,12 @@
   gSystem->Load("libCbmData");
   gSystem->Load("libField");
   gSystem->Load("libPassive");
+  gSystem->Load("libEcal");
+  gSystem->Load("libKF");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  //  gSystem->Load("libEcal");
 
   FairLogger *logger = FairLogger::GetLogger();
   logger->SetLogFileName("MyLog.log");

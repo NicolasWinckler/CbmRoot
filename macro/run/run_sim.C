@@ -66,12 +66,13 @@ void run_sim(Int_t nEvents = 2)
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
+  gSystem->Load("libEcal");
+  gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-//  gSystem->Load("libEcal");
   // -----------------------------------------------------------------------
 
  

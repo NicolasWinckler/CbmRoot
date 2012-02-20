@@ -49,22 +49,9 @@ void run_reco_rich(Int_t nEvents = 100) {
    richHitProd->SetSigmaMirror(0.06);
    run->AddTask(richHitProd);
 
-	if(isRichTrackingOn){
-		 //----------------------RICH Track Extrapolation ---------------------------
-		 Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
-		 Double_t richZPos = 300.;  // z position for extrapolation [cm]
-		 CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
-		 CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-		 richExtrapolate->UseExtrapolation(richExtra,richZPos);
-		 run->AddTask(richExtrapolate);
-
-		 Int_t richZFlag = 1;       // Projection from IM plane (default)
-		 CbmRichProjectionProducer* richProj =
-		 new CbmRichProjectionProducer(iVerbose, richZFlag);
-		 run->AddTask(richProj);
-	}
-
 	CbmRichReconstruction* richReco = new CbmRichReconstruction();
+	richReco->SetRunExtrapolation(isRichTrackingOn);
+	richReco->SetRunProjection(isRichTrackingOn);
    run->AddTask(richReco);
 
 	// ------------------- RICH Ring matching  ---------------------------------

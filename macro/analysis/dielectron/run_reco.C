@@ -213,56 +213,19 @@ void run_reco(Int_t nEvents = 700){
     // ===                        RICH reconstruction                        ===
     // =========================================================================
 	if (IsRich(parFile)){
-	//if (false){
-		// ---------------------RICH Hit Producer ----------------------------------
-		Double_t richPmtRad = 0.4; // PMT radius [cm]
-		Double_t richPmtDist = 0.; // Distance between PMTs [cm]
-		Int_t richDetType = 4; // Detector type Hamamatsu H8500-03
-		Int_t richNoise = 220; // Number of noise points per event
-		Double_t collectionEff = 1.0;
-		Double_t richSMirror = 0.06; // Sigma for additional point smearing due to light scattering in mirror
-		CbmRichHitProducer* richHitProd	= new CbmRichHitProducer(richPmtRad, richPmtDist,
-				richDetType, richNoise, iVerbose, collectionEff,richSMirror);
-		run->AddTask(richHitProd);
+      CbmRichHitProducer* richHitProd  = new CbmRichHitProducer();
+      richHitProd->SetDetectorType(4);
+      richHitProd->SetNofNoiseHits(220);
+      richHitProd->SetCollectionEfficiency(1.0);
+      richHitProd->SetSigmaMirror(0.06);
+      run->AddTask(richHitProd);
 
-		//----------------------RICH Track Extrapolation ---------------------------
-		Int_t richNSts = 4; // minimum number of STS hits for extrapolation
-		Double_t richZPos = 300.; // z position for extrapolation [cm]
-		CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
-		CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-		richExtrapolate->UseExtrapolation(richExtra,richZPos);
-		run->AddTask(richExtrapolate);
+      CbmRichReconstruction* richReco = new CbmRichReconstruction();
+      run->AddTask(richReco);
 
-		//--------------------- Rich Track Projection to photodetector -------------
-		Int_t richZFlag = 1; // Projection from IM plane (default)
-		CbmRichProjectionProducer* richProj = new CbmRichProjectionProducer(iVerbose, richZFlag);
-		run->AddTask(richProj);
-
-		//--------------------- RICH Ring Finding ----------------------------------
-		//CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
-		TString richGeoType = "compact";
-		CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
-		CbmRichFindRings* richFindRings = new CbmRichFindRings();
-		richFindRings->UseFinder(richFinder);
-		run->AddTask(richFindRings);
-
-		//-------------------- RICH Ring Fitting -----------------------------------
-		CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
-		CbmRichFitRings* fitRings = new CbmRichFitRings("CbmRichFitRings","CbmRichFitRings",richFitter);
-		run->AddTask(fitRings);
-
-		// ------------------- RICH Ring matching  ---------------------------------
-		CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
-		run->AddTask(matchRings);
-
-	    //--------------------- RICH ring-track assignment ------------------------
-		Double_t richDistance = 10.; // Max. dist. ring center to track [cm]
-		Int_t richNPoints  = 5;   // Minimum number of hits on ring
-		CbmRichRingTrackAssign* richAssign   =
-				new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
-		CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-		assignTrack->UseAssign(richAssign);
-		run->AddTask(assignTrack);
+      // ------------------- RICH Ring matching  ---------------------------------
+      CbmRichMatchRings* matchRings = new CbmRichMatchRings();
+      run->AddTask(matchRings);
 
 	}//isRich
 
@@ -277,9 +240,6 @@ void run_reco(Int_t nEvents = 700){
    trackingQa->SetMinNofHitsTrd(8);
    trackingQa->SetMinNofHitsMuch(10);
    trackingQa->SetVerbose(0);
-   trackingQa->SetMomAxis(0, 12, 120);
-   trackingQa->SetPtAxis(0, 3, 30);
-   trackingQa->SetRapidityAxis(0, 4, 40);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir("recqa/");

@@ -89,6 +89,9 @@ class CbmKF :public FairTask {
 
   CbmStsDigiScheme StsDigi;
 
+  int GetNMvdStations() const { return CbmKF::Instance()->vMvdMaterial.size(); }
+  int GetNStsStations() const { return const_cast<CbmStsDigiScheme*>(&StsDigi)->GetNStations();}
+
  private:
   
   static CbmKF *fInstance;

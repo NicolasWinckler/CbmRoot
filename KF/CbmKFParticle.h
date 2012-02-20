@@ -116,6 +116,11 @@ class CbmKFParticle: public TObject {
   void GetDecayLength( Double_t &L, Double_t &Error );
   void GetLifeTime( Double_t &T, Double_t &Error );
 
+  Double_t GetRapidity() const;
+  Double_t GetPt()       const;
+  Double_t GetTheta()    const;
+  Double_t GetPhi()      const;
+
   void Extrapolate( Double_t r0[], double T );
   void ExtrapolateLine( Double_t r0[], double T );
 

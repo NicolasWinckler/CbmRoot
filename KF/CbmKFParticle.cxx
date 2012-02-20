@@ -1394,6 +1394,24 @@ void CbmKFParticle::GetLifeTime( Double_t &TauC, Double_t &Error_ ){
   Error_ = sqrt( m*m*C[35] + 2*r[7]*cTM + r[7]*r[7]*dm*dm);
 }
 
+Double_t CbmKFParticle::GetRapidity() const 
+{ 
+  return 0.5*TMath::Log((r[6] + r[5])/(r[6] - r[5])); 
+}
+Double_t CbmKFParticle::GetPt()       const 
+{ 
+  return TMath::Sqrt(r[3]*r[3] + r[4]*r[4]);
+}
+Double_t CbmKFParticle::GetTheta()    const 
+{ 
+  return TMath::ATan2(GetPt(),r[5]);
+}
+Double_t CbmKFParticle::GetPhi()      const 
+{ 
+  return TMath::ATan2(r[4],r[5]);
+}
+
+
 Double_t CbmKFParticle::GetDStoPoint( const Double_t xyz[] ) const
 {
   //TODO check the method!

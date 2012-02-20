@@ -613,9 +613,10 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
   FairRootManager *fManger = FairRootManager::Instance();
   TClonesArray *listStsHits = (TClonesArray *)  fManger->GetObject("StsHit");
-  TClonesArray *listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
-
   int NMvdStations = CbmL1::Instance()->algo->NMvdStations;
+  TClonesArray *listMvdHits=0;
+  if(NMvdStations>0.)
+    listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
 
   static int nHits = CbmL1::Instance()->algo->NStations;
   int iVec=0, i=0;
@@ -706,7 +707,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr();
+          ista = hit->GetStationNr() - 1 + NMvdStations;
         }
 
         w[ista][iVec] = 1.f;
@@ -959,7 +960,10 @@ void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1F
 
   FairRootManager *fManger = FairRootManager::Instance();
   TClonesArray *listStsHits = (TClonesArray *)  fManger->GetObject("StsHit");
-  TClonesArray *listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
+  TClonesArray *listMvdHits=0;
+  int NMvdStations = CbmL1::Instance()->algo->NMvdStations;
+  if(NMvdStations>0.)
+    listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
 
   int nTracks_SIMD = fvecLen;
   L1TrackPar T; // fitting parametr coresponding to current track
@@ -1008,7 +1012,7 @@ void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1F
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr();
+          ista = hit->GetStationNr()-1+NMvdStations;
         }
 
         sta[ista].fieldSlice.GetFieldValue( posx, posy, fB_temp );

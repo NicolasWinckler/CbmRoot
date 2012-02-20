@@ -111,6 +111,11 @@ class CbmKFParticle_simd {
   void GetDecayLength( fvec &L, fvec &Error );
   void GetLifeTime( fvec &T, fvec &Error );
 
+  fvec GetRapidity() const { return 0.5*log((r[6] + r[5])/(r[6] - r[5])); }
+  fvec GetPt()       const { return sqrt(r[3]*r[3] + r[4]*r[4]); }
+  fvec GetTheta()    const { return atan2(GetPt(),r[5]); }
+  fvec GetPhi()      const { return atan2(r[4],r[5]); }
+  
   void SetVtxGuess(fvec &x, fvec &y, fvec &z);
   void SetVtxErrGuess(fvec &d_x, fvec &d_y, fvec &d_z);
 

@@ -19,10 +19,14 @@
 
 #include <CbmMvdPoint.h>
 #include <CbmStsPoint.h>
+#include <CbmMvdHit.h>
+#include <CbmStsHit.h>
 #include <FairMCPoint.h>
 
 #include "TClonesArray.h"
 #include <vector>
+
+class CbmMCTrack;
 
 using std::vector;
 
@@ -35,19 +39,23 @@ class CbmKFTrErrMCPoints : public TObject {
 
   CbmMvdPoint* GetMvdPoint(Int_t i) {return MvdArray[i];}
   CbmStsPoint* GetStsPoint(Int_t i) {return StsArray[i];}
+  
+  CbmMvdHit* GetMvdHit(Int_t i) {return MvdHitsArray[i];}
+  CbmStsHit* GetStsHit(Int_t i) {return StsHitsArray[i];}
 
   void SetMvdPoint(CbmMvdPoint* mp) { MvdArray.push_back(mp); }
   void SetStsPoint(CbmStsPoint* sp) { StsArray.push_back(sp); }
 
-  void SetMvdPoint(int imp) { MvdArrayIndex.push_back(imp); }
-  void SetStsPoint(int isp) { StsArrayIndex.push_back(isp); }
-
-  int GetNMvdPoints() {return MvdArrayIndex.size();}
-  int GetNStsPoints() {return StsArrayIndex.size();}
-
-  int GetMvdPointIndex(Int_t i) {return MvdArrayIndex[i];}
-  int GetStsPointIndex(Int_t i) {return StsArrayIndex[i];}
-
+  int GetNMvdPoints() const { return MvdArray.size(); }
+  int GetNStsPoints() const { return StsArray.size(); }
+  int GetNMvdHits() const { return MvdHitsArray.size(); }
+  int GetNStsHits() const { return StsHitsArray.size(); }
+  int GetNConsMCStations();
+  int GetNConsHitStations();
+  int GetNHitStations();
+  int GetNMaxMCPointsOnStation();
+  Bool_t IsReconstructable(CbmMCTrack* mcTr, int MinNStations, int PerformanceMode, float MinRecoMom);
+  
   double GetMvdPointX(int i) {return MvdArray[i]->FairMCPoint::GetX();}
   double GetMvdPointY(int i) {return MvdArray[i]->FairMCPoint::GetY();}
   double GetMvdPointZ(int i) {return MvdArray[i]->GetZ();}
@@ -64,15 +72,11 @@ class CbmKFTrErrMCPoints : public TObject {
 
   vector<CbmStsPoint*> StsArray;
   vector<CbmMvdPoint*> MvdArray;
-
-  vector<int> StsArrayIndex;
-  vector<int> MvdArrayIndex;
-
- private:
-  //TClonesArray *StsArray;
-  //TClonesArray *MvdArray;
-
- ClassDef(CbmKFTrErrMCPoints,1);
+  
+  vector<CbmStsHit*> StsHitsArray;
+  vector<CbmMvdHit*> MvdHitsArray;
+  
+  ClassDef(CbmKFTrErrMCPoints,1);
 };
 
 #endif // _CbmKFTrErrMCPoints_h_ 

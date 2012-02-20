@@ -2,20 +2,26 @@
 
 #define cnst static const fvec
 
-CbmKFParticleInterface::CbmKFParticleInterface():KFPart(0){
-  //KFPart = (CbmKFParticle_simd*) _mm_malloc(sizeof(CbmKFParticle_simd), 16);
+//for particle finding
+#include "CbmL1PFFitter.h"
+#include "CbmL1Track.h"
+#include "CbmStsTrack.h"
+#include "CbmKFTrack.h"
+
+const float CbmKFParticleInterface::DefaultCuts[2][3]  = {{3.,3.,-100.},{3.,3.,-100.}};
+
+CbmKFParticleInterface::CbmKFParticleInterface():KFPart(0)
+{
   KFPart = new CbmKFParticle_simd();
 }
 
-CbmKFParticleInterface::CbmKFParticleInterface(CbmKFTrackInterface* Track[]):KFPart(0){
+CbmKFParticleInterface::CbmKFParticleInterface(CbmKFTrackInterface* Track[]):KFPart(0)                             {
   KFPart = new CbmKFParticle_simd();
   KFPart->Create(Track);
-//  KFPart -> SetField();
 }
 
 CbmKFParticleInterface::~CbmKFParticleInterface()
 {
-  //_mm_free(KFPart);
   if(KFPart) delete KFPart;
 }
 
@@ -33,14 +39,11 @@ void CbmKFParticleInterface::Construct(CbmKFTrackInterface* vDaughters[][fvecLen
 
 void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDaughters, CbmKFVertexInterface *Parent[], float Mass, float CutChi2 )
 {
-  //fvec *r = KFPart->GetParameters();
-  //fvec *C = KFPart->GetCovMatrix();
-
   for( int tr=0; tr<NDaughters; tr++ )
   {
     KFPart->AddDaughterId( vDaughters[tr].Id() );
   }
-  
+
   if(!(KFPart->fIsVtxGuess))
   {
     fvec Ty[NDaughters],Y[NDaughters],Z[NDaughters];
@@ -117,7 +120,7 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
     KFPart->r[4] = ZERO;
     KFPart->r[5] = ZERO;
     KFPart->r[6] = ZERO;
-   
+
     for(Int_t i=0;i<36;++i) KFPart->C[i]=ZERO;
 
     KFPart->C[0] = KFPart->fVtxErrGuess[0]*KFPart->fVtxErrGuess[0];
@@ -245,8 +248,8 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 	V[17] = Cd[17] + h[5]*h[2];
 	V[18] = Cd[18] + h[5]*h[3];
 	V[19] = Cd[19] + h[5]*h[4];
-	V[20] = Cd[20] + h[5]*h[5];	  
-      
+	V[20] = Cd[20] + h[5]*h[5];
+
 	V[21] = Cd[21];
 	V[22] = Cd[22];
 	V[23] = Cd[23];
@@ -337,7 +340,7 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 
 	for(Int_t i=0;i<7;++i) 
 	  KFPart->r[i] += K0[i]*zeta[0] + K1[i]*zeta[1] + K2[i]*zeta[2];
-      
+
 	//* New covariance matrix C -= K*(CH')'
 
 	for(Int_t i=0, k=0;i<7;++i){
@@ -418,7 +421,7 @@ void CbmKFParticleInterface::MeasureMass(CbmKFParticle_simd*  Particle,  fvec r0
 
   fvec zeta = Mass*Mass - m2;
   for(Int_t i=0;i<8;++i) zeta -= H[i]*(r[i]-r0[i]);
-  
+
   fvec S = 0.;
   fvec CHt[8];
   for (Int_t i=0;i<8;++i ){
@@ -426,7 +429,7 @@ void CbmKFParticleInterface::MeasureMass(CbmKFParticle_simd*  Particle,  fvec r0
     for (Int_t j=0;j<8;++j) CHt[i] += Cij(i,j)*H[j];
     S += H[i]*CHt[i];
   }
-    
+
   fvec init = fvec(S > 1.E-20);
   S = rcp(S) & init;
 
@@ -513,7 +516,7 @@ void CbmKFParticleInterface::MeasureProductionVertex( CbmKFParticle_simd*  Parti
 	+(AVi[1]*z[0] + AVi[2]*z[1] + AVi[4]*z[2])*z[1]
 	+(AVi[3]*z[0] + AVi[4]*z[1] + AVi[5]*z[2])*z[2] )*det;
   }
-  
+
   r[0] = m[0];
   r[1] = m[1];
   r[2] = m[2];
@@ -522,7 +525,7 @@ void CbmKFParticleInterface::MeasureProductionVertex( CbmKFParticle_simd*  Parti
   r[5]+= B[2][0]*z[0] + B[2][1]*z[1] + B[2][2]*z[2];
   r[6]+= B[3][0]*z[0] + B[3][1]*z[1] + B[3][2]*z[2];
   r[7]+= B[4][0]*z[0] + B[4][1]*z[1] + B[4][2]*z[2];
-  
+
   fvec d0, d1, d2;
 
   C[0] = V[0];
@@ -586,7 +589,7 @@ void CbmKFParticleInterface::MeasureProductionVertex( CbmKFParticle_simd*  Parti
   C[33]+= d0*B[2][0] + d1*B[2][1] + d2*B[2][2];
   C[34]+= d0*B[3][0] + d1*B[3][1] + d2*B[3][2];
   C[35]+= d0*B[4][0] + d1*B[4][1] + d2*B[4][2];
-  
+
   Extrapolate(Particle, r0, r[7]);
   Convert(Particle, r0, 0);
 }
@@ -602,18 +605,15 @@ void CbmKFParticleInterface::Convert( CbmKFParticle_simd*  Particle, fvec r0[], 
   B.z *= 0.000299792458;
 
   fvec h[6];
-  
+
   h[0] = r0[3];
   h[1] = r0[4];
   h[2] = r0[5];
   if( ToProduction ){ h[0]=-h[0]; h[1]=-h[1]; h[2]=-h[2]; } 
-//   h[3] = h[1]*B[2]-h[2]*B[1];
-//   h[4] = h[2]*B[0]-h[0]*B[2];
-//   h[5] = h[0]*B[1]-h[1]*B[0];
   h[3] = h[1]*B.z-h[2]*B.y;
   h[4] = h[2]*B.x-h[0]*B.z;
   h[5] = h[0]*B.y-h[1]*B.x;
-  
+
   fvec c;
 
   c = C[28]+h[0]*C[35];
@@ -637,7 +637,7 @@ void CbmKFParticleInterface::Convert( CbmKFParticle_simd*  Particle, fvec r0[], 
   c = C[31]+h[3]*C[35];
   C[ 9]+= h[3]*(c+C[31]);
   C[31] = c;
-  
+
   C[10]+= h[4]*C[28] + h[0]*C[32];
   C[11]+= h[4]*C[29] + h[1]*C[32];
   C[12]+= h[4]*C[30] + h[2]*C[32];
@@ -645,7 +645,7 @@ void CbmKFParticleInterface::Convert( CbmKFParticle_simd*  Particle, fvec r0[], 
   c = C[32]+h[4]*C[35];
   C[14]+= h[4]*(c+C[32]);
   C[32] = c;
-  
+
   C[15]+= h[5]*C[28] + h[0]*C[33];
   C[16]+= h[5]*C[29] + h[1]*C[33];
   C[17]+= h[5]*C[30] + h[2]*C[33];
@@ -696,14 +696,14 @@ void CbmKFParticleInterface::ExtrapolateLine(CbmKFParticle_simd*  Particle, fvec
   C[ 1] += dS*( C[10] + C[ 7] );
   C[ 3] += dS*( C[15] + C[ 8] );
   C[ 4] += dS*( C[16] + C[12] );
- 
+
   C[ 6]  = C6;
   C[10] += SC13;
   C[11]  = C11;
   C[15] += SC18;
   C[16] += SC19;
   C[17]  = C17;
-  
+
   C[21] += dS*C[24];
   C[22] += dS*C[25];
   C[23] += dS*C[26];
@@ -732,7 +732,7 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
     px   = r[3],
     py   = r[4],
     pz   = r[5];
-      
+
   fvec sx=0, sy=0, sz=0, syy=0, syz=0, syyy=0, Sx=0, Sy=0, Sz=0, Syy=0, Syz=0, Syyy=0;
 
   { // get field integrals
@@ -745,11 +745,11 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
     p0[0] = r[0];
     p0[1] = r[1];
     p0[2] = r[2];
-  
+
     p2[0] = r[0] + px*dS;
     p2[1] = r[1] + py*dS;
     p2[2] = r[2] + pz*dS;
-  
+
     p1[0] = 0.5*(p0[0]+p2[0]);
     p1[1] = 0.5*(p0[1]+p2[1]);
     p1[2] = 0.5*(p0[2]+p2[2]);
@@ -791,7 +791,7 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
  
     syz  *= c*c*dS*dS/360.;
     Syz  *= c*c*dS*dS*dS/2520.;
-    
+
     syy  = c*( B[0].y + 4*B[1].y + B[2].y )*dS;
     syyy = syy*syy*syy / 1296;
     syy  = syy*syy/72;
@@ -817,12 +817,12 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
   J[0][0]=1; J[0][1]=0; J[0][2]=0; J[0][3]=dS-Syy;  J[0][4]=Sx;  J[0][5]=Syyy-Sy;
   J[1][0]=0; J[1][1]=1; J[1][2]=0; J[1][3]=-Sz;     J[1][4]=dS;  J[1][5]=Sx+Syz;
   J[2][0]=0; J[2][1]=0; J[2][2]=1; J[2][3]=Sy-Syyy; J[2][4]=-Sx; J[2][5]=dS-Syy;
-  
+
   J[3][0]=0; J[3][1]=0; J[3][2]=0; J[3][3]=1-syy;   J[3][4]=sx;  J[3][5]=syyy-sy;
   J[4][0]=0; J[4][1]=0; J[4][2]=0; J[4][3]=-sz;     J[4][4]=1;   J[4][5]=sx+syz;
   J[5][0]=0; J[5][1]=0; J[5][2]=0; J[5][3]=sy-syyy; J[5][4]=-sx; J[5][5]=1-syy;
   J[6][6] = J[7][7] = 1;
-  
+
   r[0]+= J[0][3]*px + J[0][4]*py + J[0][5]*pz;
   r[1]+= J[1][3]*px + J[1][4]*py + J[1][5]*pz;
   r[2]+= J[2][3]*px + J[2][4]*py + J[2][5]*pz;
@@ -834,7 +834,7 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
     px   = r0[3];
     py   = r0[4];
     pz   = r0[5];
-    
+
     r0[0]+= J[0][3]*px + J[0][4]*py + J[0][5]*pz;
     r0[1]+= J[1][3]*px + J[1][4]*py + J[1][5]*pz;
     r0[2]+= J[2][3]*px + J[2][4]*py + J[2][5]*pz;
@@ -860,7 +860,7 @@ void CbmKFParticleInterface::multQSQt( int N, const fvec Q[], const fvec S[], fv
       }
    }
  }
-    
+
  {for( Int_t i=0; i<N; i++ )
    {
      for( Int_t j=0; j<=i; j++ )
@@ -907,9 +907,6 @@ fvec CbmKFParticleInterface::GetDStoPoint( CbmKFParticle_simd*  Particle, const 
   fvec dz = xyz[2] - r[2];
   fvec p2 = r[3]*r[3] + r[4]*r[4]+r[5]*r[5];
 
-  //if (Q == 0 && r[2] < xyz[2]) return sqrt((dx*dx+dy*dy+dz*dz)/p2);
-  //if (Q == 0 && r[2] >= xyz[2]) return -sqrt((dx*dx+dy*dy+dz*dz)/p2);
-
   L1FieldValue B = Particle->fField.Get(r[2]);
   B.x *= 0.000299792458; //multiply by c
   B.y *= 0.000299792458;
@@ -939,10 +936,6 @@ fvec CbmKFParticleInterface::GetDStoPoint( CbmKFParticle_simd*  Particle, const 
   dS = (initPt2 & dS) + (fvec(!initPt2) & fvec(0));
 
   //fvec dSm = rB/pB;
-
-//  cout <<"normalnyj S  " <<  dS << endl;
-//  cout <<"moj       S  " << dSm << endl;
-//  cout <<"S            " <<  sqrt(dx*dx+dy*dy+dz*dz) << endl;
 
   return dS;
 }
@@ -1004,7 +997,7 @@ void CbmKFParticleInterface::GetKFParticle(CbmKFParticle &Part, int iPart)
     Part.AddDaughter(static_cast<int>(KFPart->DaughterIds()[i][iPart]));
 
   Part.SetPDG( static_cast<int>(KFPart->GetPDG()[iPart]) );
-  
+
   for(int iP=0; iP<8; iP++)
     Part.GetParameters()[iP] = KFPart->GetParameters()[iP][iPart];
   for(int iC=0; iC<36; iC++)
@@ -1045,6 +1038,191 @@ void CbmKFParticleInterface::GetMomentum( fvec &P, fvec &Error )
 void CbmKFParticleInterface::GetMass( fvec &M, fvec &Error )
 {
   KFPart->GetMass ( M, Error );
+}
+
+template<class T> 
+void CbmKFParticleInterface::Find2PDecayT(vector<T> &vRTracks, vector<CbmKFParticle>& Particles, 
+                                          CbmKFVertex& PrimVtx, const float cuts[2][3])
+{
+  //* Finds particles (K0s and Lambda) from a given set of tracks
+
+  CbmL1PFFitter fitter;
+
+  vector<T> fPos;
+  vector<T> fNeg;
+
+  vector<short> idPos;
+  vector<short> idNeg;
+
+  fitter.Fit(vRTracks);
+
+  vector<float> ChiToPrimVtx;
+  fitter.GetChiToVertex(vRTracks,ChiToPrimVtx,PrimVtx);
+
+  for(unsigned short iTr=0; iTr < vRTracks.size(); iTr++)
+  {
+    CbmKFTrack kfTrack(vRTracks[iTr]);
+    bool ok = 1;
+    for(unsigned short iT=0; iT<5; iT++)
+      ok = ok && finite(kfTrack.GetTrack()[iT]);
+    for(unsigned short iC=0; iC<15; iC++)
+      ok = ok && finite(kfTrack.GetCovMatrix()[iC]);
+      ok = ok && (kfTrack.GetCovMatrix()[0] < 1. && kfTrack.GetCovMatrix()[0] > 0.)
+              && (kfTrack.GetCovMatrix()[2] < 1. && kfTrack.GetCovMatrix()[2] > 0.)
+              && (kfTrack.GetCovMatrix()[5] < 1. && kfTrack.GetCovMatrix()[5] > 0.)
+              && (kfTrack.GetCovMatrix()[9] < 1. && kfTrack.GetCovMatrix()[9] > 0.)
+              && (kfTrack.GetCovMatrix()[14] < 1. && kfTrack.GetCovMatrix()[14] > 0.);
+      ok = ok && kfTrack.GetRefChi2() < 10*kfTrack.GetRefNDF();
+    if(!ok) continue;
+
+    if( ChiToPrimVtx[iTr] < cuts[0][0] ) continue;
+
+    if(kfTrack.GetTrack()[4] >= 0.)
+    {
+      fPos.push_back(vRTracks[iTr]);
+      idPos.push_back(iTr);
+    }
+    if(kfTrack.GetTrack()[4] < 0.)
+    {
+      fNeg.push_back(vRTracks[iTr]);
+      idNeg.push_back(iTr);
+    }
+  }
+
+  const Int_t PiPlusPDG = 211;
+  const Int_t PiMinusPDG =-211;
+
+  const Int_t PPlusPDG = 2212;
+//  const Int_t PMinusPDG =-2212;
+
+  vector<L1FieldRegion> posB;
+  vector<L1FieldRegion> negB;
+
+  fitter.CalculateFieldRegion(fPos,posB);
+  fitter.CalculateFieldRegion(fNeg,negB);
+
+  for(unsigned short iTrP=0; iTrP < fPos.size(); iTrP++) {
+    CbmKFTrack kfTrack(fPos[iTrP]);
+    kfTrack.SetId(idPos[iTrP]);
+    CbmKFParticle tmp(&kfTrack);
+    tmp.SetPDG(211);
+    tmp.SetId(Particles.size());
+    int entrSIMD = iTrP % fvecLen;
+    int entrVec  = iTrP / fvecLen;
+    posB[entrVec].GetOneEntry(tmp.fieldRegion,entrSIMD);
+    Particles.push_back(tmp);
+  }
+  for(unsigned short iTrN=0; iTrN < fNeg.size(); iTrN++) {
+    CbmKFTrack kfTrack(fNeg[iTrN]);
+     kfTrack.SetId(idNeg[iTrN]);
+    CbmKFParticle tmp(&kfTrack);
+    tmp.SetPDG(-211);
+    tmp.SetId(Particles.size());
+    int entrSIMD = iTrN % fvecLen;
+    int entrVec  = iTrN / fvecLen;
+    negB[entrVec].GetOneEntry(tmp.fieldRegion,entrSIMD);
+    Particles.push_back(tmp);
+  }
+  unsigned short NPositive = fPos.size();
+  for(unsigned short iTrN=0; iTrN < fNeg.size(); iTrN++)
+  {
+    CbmKFTrack kfTrackNeg(fNeg[iTrN]);
+    CbmKFParticle_simd vDaughters[2] = {CbmKFParticle_simd(kfTrackNeg,0,&PiMinusPDG),
+                                        CbmKFParticle_simd()};
+    int entrSIMD = iTrN % fvecLen;
+    int entrVec  = iTrN / fvecLen;
+    vDaughters[0].SetField(negB[entrVec],1,entrSIMD);
+    vDaughters[0].SetId(iTrN+NPositive);
+
+    CbmKFTrack kfTrackPos[fvecLen];
+    CbmKFTrackInterface* vfPos[fvecLen];
+
+    for(unsigned short iTrP=0; iTrP < NPositive; iTrP += fvecLen)
+    {
+      int NTracks = (iTrP + fvecLen < NPositive) ? fvecLen : (NPositive - iTrP);
+
+      for(unsigned short iv=0; iv<NTracks; iv++)
+      {
+        kfTrackPos[iv] = CbmKFTrack(fPos[iTrP+iv]);
+        vfPos[iv] = &kfTrackPos[iv];
+      }
+      vDaughters[1].Create(vfPos,NTracks,0,&PiPlusPDG);
+      vDaughters[1].SetField(posB[iTrP/fvecLen]);
+      fvec posId(iTrP,iTrP+1,iTrP+2,iTrP+3);
+      vDaughters[1].SetId(posId);
+
+      CbmKFParticleInterface Ks;
+      Ks.SetPDG( 310 );
+      Ks.Construct(vDaughters, 2, 0);
+
+      for(int iv=0; iv<NTracks; iv++)
+      {
+        if(!finite(Ks.GetChi2()[iv])) continue;
+        if(!(Ks.GetChi2()[iv] > 0.0f)) continue;
+        if(!(Ks.GetChi2()[iv]==Ks.GetChi2()[iv])) continue;
+        if(Ks.GetZ()[iv] < cuts[0][2]) continue;
+
+        if( Ks.GetChi2()[iv]/Ks.GetNDF()[iv] < cuts[0][1] )
+        {
+          CbmKFParticle Ks_temp;
+          Ks.GetKFParticle(Ks_temp, iv);
+          Ks_temp.SetId( Particles.size() );
+          Particles.push_back(Ks_temp);
+        }
+      }
+
+      vDaughters[1].Create(vfPos,NTracks,0,&PPlusPDG);
+      vDaughters[1].SetId(posId);
+
+      CbmKFParticleInterface Lambda;
+      Lambda.SetPDG(3122);
+      Lambda.Construct(vDaughters, 2, 0);
+
+      for(int iv=0; iv<NTracks; iv++)
+      {
+        if(!finite(Lambda.GetChi2()[iv])) continue;
+        if(!(Lambda.GetChi2()[iv] > 0.0f)) continue;
+        if(!(Lambda.GetChi2()[iv]==Lambda.GetChi2()[iv])) continue;
+        if(Lambda.GetZ()[iv] < cuts[1][2]) continue;
+
+        if( Lambda.GetChi2()[iv]/Lambda.GetNDF()[iv] < cuts[1][1])
+        {
+          CbmKFParticle Lambda_temp;
+          Lambda.GetKFParticle(Lambda_temp, iv);
+          Lambda_temp.SetId( Particles.size() );
+          Particles.push_back(Lambda_temp);
+        }
+      }
+    }
+  }
+}
+
+void CbmKFParticleInterface::Find2PDecay(vector<CbmL1Track>& vRTracks, vector<CbmKFParticle>& Particles,
+                                         CbmKFVertex& PrimVtx, const float cuts[2][3])
+{
+  Find2PDecayT(vRTracks, Particles, PrimVtx, cuts);
+}
+
+void CbmKFParticleInterface::Find2PDecay(vector<CbmStsTrack>& vRTracks, vector<CbmKFParticle>& Particles,
+                                         CbmKFVertex& PrimVtx, const float cuts[2][3])
+{
+  Find2PDecayT(vRTracks, Particles, PrimVtx, cuts);
+}
+
+template<class T> 
+void CbmKFParticleInterface::ConstructPVT(vector<T>& vRTracks)
+{
+
+}
+
+void CbmKFParticleInterface::ConstructPV(vector<CbmL1Track>& vRTracks)
+{
+  ConstructPVT(vRTracks);
+}
+
+void CbmKFParticleInterface::ConstructPV(vector<CbmStsTrack>& vRTracks)
+{
+  ConstructPVT(vRTracks);
 }
 
 #undef cnst

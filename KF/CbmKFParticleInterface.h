@@ -9,6 +9,8 @@
 #include "CbmKFVertex.h"
 
 class L1FieldRegion;
+class CbmL1Track;
+class CbmStsTrack;
 
 class CbmKFParticleInterface
 {
@@ -16,14 +18,13 @@ class CbmKFParticleInterface
 
   CbmKFParticleInterface();
   CbmKFParticleInterface(CbmKFTrackInterface* Track[]);
+  ~CbmKFParticleInterface();
 
   void SetField(const L1FieldRegion &field, bool isOneEntry=0, const int iVec=0) { KFPart->SetField(field, isOneEntry, iVec);}
 
-  ~CbmKFParticleInterface();
-
   void Construct(CbmKFTrackInterface* vDaughters[][fvecLen], int NDaughters, CbmKFVertexInterface *Parent[] = 0, float Mass=-1, float CutChi2=-1);
   void Construct(CbmKFParticle_simd  vDaughters[],          int NDaughters, CbmKFVertexInterface *Parent[] = 0, float Mass=-1, float CutChi2=-1);
-  
+
   void TransportToProductionVertex();
   void TransportToDecayVertex();
 
@@ -96,6 +97,33 @@ class CbmKFParticleInterface
   void SetPDG ( fvec pdg ) { KFPart->SetPDG( pdg ); }
   const fvec& GetPDG () const { return KFPart->GetPDG(); }
 
+  // functions for particle finding
+
+  /// Find particles with 2-body decay channel from input tracks vRTracks with primary vertex PrimVtx:
+  /// 1. K0s->pi+ pi-
+  /// 2. Lambda->p pi-
+  /// All particles are put into the Particles array. 3 cuts for each particle are required.
+  /// First index in the cuts array sets a particle number (see table above), second index - a cut number:
+  /// cut[0][0] - chi to a primary vertex of a track (sqare root from a normalized on a total error of 
+  ///             the track and the vertex distance between the track and the primary vertex), only
+  ///             element cut[0][0] is used to select tracks, all other elements cut[*][0] are not used;
+  /// cut[*][1] - chi2/ndf of the reconstructed particle;
+  /// cut[*][2] - z coordinate of the reconstructed particle.
+  template<class T> 
+    static void Find2PDecayT(vector<T>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
+                             const float cuts[2][3]);
+
+  static void Find2PDecay(vector<CbmL1Track>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
+                          const float cuts[2][3] = DefaultCuts);
+  static void Find2PDecay(vector<CbmStsTrack>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
+                          const float cuts[2][3] = DefaultCuts);
+
+  template<class T> 
+    void ConstructPVT(vector<T>& vRTracks);
+
+  void ConstructPV(vector<CbmL1Track>& vRTracks);
+  void ConstructPV(vector<CbmStsTrack>& vRTracks);
+
  protected:
 
   fvec& Cij( Int_t i, Int_t j ){ 
@@ -110,6 +138,9 @@ class CbmKFParticleInterface
   CbmKFParticle_simd *KFPart;
 
  private:
+
+  static const float DefaultCuts[2][3];
+
   CbmKFParticleInterface(const CbmKFParticleInterface&);
   void operator=(const CbmKFParticleInterface&);
 };

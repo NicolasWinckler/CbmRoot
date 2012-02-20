@@ -80,6 +80,8 @@ public:
 
    /**
     * \brief Create final simulation report for this tracking QA run.
+    * \param[in] title Report title.
+    * \param[in] resultDirectory Directory with results.
     */
    void CreateSimulationReport(
          const string& title,

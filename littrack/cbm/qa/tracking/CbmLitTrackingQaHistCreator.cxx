@@ -4,9 +4,9 @@
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "qa/tracking/CbmLitTrackingQaHistCreator.h"
-#include "qa/tracking/CbmLitTrackingQaHistNames.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "CbmLitTrackingQaHistCreator.h"
+#include "CbmLitTrackingQaHistNames.h"
+#include "../base/CbmLitHistManager.h"
 
 #include "TH1.h"
 #include "TH1F.h"

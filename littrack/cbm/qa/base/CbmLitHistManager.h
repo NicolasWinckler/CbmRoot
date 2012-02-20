@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
 #include <assert.h>
 
 class TFile;
@@ -23,6 +24,7 @@ class TH3F;
 using std::map;
 using std::pair;
 using std::string;
+using std::vector;
 
 /**
  * \class CbmLitHistManager
@@ -104,6 +106,14 @@ public:
       assert(fHistMap.count(name) != 0);
       return fHistMap.find(name)->second;
    }
+
+   /**
+    * \brief Return vector of pointers to TH1 histogram.
+    * \param[in] pattern Pattern for histogram name.
+    * \return Vector of pointers to TH1 histogram.
+    */
+   vector<TH1*> H1Vector(
+         const string& pattern) const;
 
    /**
     * \brief Check existence of histogram in manager.

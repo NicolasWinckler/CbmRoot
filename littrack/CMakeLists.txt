@@ -123,6 +123,11 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaCalculator.cxx
+      cbm/qa/propagation/CbmLitPropagationQaPTreeCreator.cxx
+      cbm/qa/propagation/CbmLitPropagationQaReport.cxx
+      cbm/qa/propagation/CbmLitPropagationQaDraw.cxx
+      cbm/qa/propagation/CbmLitPropagationQaHistCreator.cxx
+      cbm/qa/propagation/CbmLitPropagationQaCalculator.cxx
       cbm/qa/fit/CbmLitFitQaPTreeCreator.cxx
       cbm/qa/fit/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx

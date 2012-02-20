@@ -11,6 +11,7 @@
 #include "TDirectory.h"
 #include "TKey.h"
 #include "TClass.h"
+#include <vector>
 #include <map>
 #include <string>
 #include <assert.h>
@@ -19,6 +20,7 @@ using std::string;
 using std::map;
 using std::cout;
 using std::endl;
+using std::vector;
 
 CbmLitHistManager::CbmLitHistManager():
       fHistMap()
@@ -29,6 +31,17 @@ CbmLitHistManager::CbmLitHistManager():
 CbmLitHistManager::~CbmLitHistManager()
 {
 
+}
+
+vector<TH1*> CbmLitHistManager::H1Vector(
+      const string& pattern) const
+{
+   vector<TH1*> histos;
+   map<string, TH1*>::const_iterator it;
+   for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
+      if (it->first.find(pattern) != string::npos) histos.push_back(it->second);
+   }
+   return histos;
 }
 
 void CbmLitHistManager::WriteToFile()
@@ -45,7 +58,7 @@ void CbmLitHistManager::ReadFromFile(
    assert(file != NULL);
    cout << "-I- CbmLitHistManager::ReadFromFile" << endl;
    TDirectory* dir = gDirectory;
-   TIter nextkey( dir->GetListOfKeys());
+   TIter nextkey(dir->GetListOfKeys());
    TKey *key;
    int c = 0;
    while (key = (TKey*) nextkey()) {

@@ -78,8 +78,8 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
          ("hHalfGlobal3DNormGlobal_" + cat)("hGlobal3D_" + cat), list_of(sname)(hgname)(gname), "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for all tracks
-   DrawEfficiency("tracking_qa_half_global_efficiency_all", list_of(string("hSts3DNormHalfGlobal_All"))
-         ("hHalfGlobal3D_" + cat), list_of(sname)(hgname), "", "_px");
+   DrawEfficiency("tracking_qa_half_global_efficiency_all", list_of("hSts3DNormHalfGlobal_All")
+         ("hHalfGlobal3D_All"), list_of(sname)(hgname), "", "_px");
 
    // Draw half global tracking efficiency STS+TRD(MUCH) for signal tracks
    DrawEfficiency("tracking_qa_half_global_efficiency_signal", list_of("hSts3DNormHalfGlobal_" + cat)
@@ -142,13 +142,6 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
       DrawEfficiency("tracking_qa_sts_rich_trd_tof_efficiency_electrons", list_of("hSts3DNormStsRichTrdTof_El")
          ("hStsRich3DNormStsRichTrdTof_El")("hStsRichTrd3DNormStsRichTrdTof_El")("hStsRichTrdTof3D_El"),
          list_of("STS")("STS+RICH")("STS+RICH+TRD")("STS+RICH+TRD+TOF"), "", "_px");
-
-//      TCanvas* canvas = new TCanvas("tracking_qa_sts_rich_trd_tof_momentum_electrons", "tracking_qa_sts_rich_trd_tof_momentum_electrons", 600, 500);
-//      canvas->SetGrid();
-//      DrawHist1D(H1("hSts3DNormStsRichTrdTof_El_Rec"), H1("hStsRich3DNormStsRichTrdTof_El_Rec"),
-//         H1("hStsRichTrd3DNormStsRichTrdTof_El_Rec"), H1("hStsRichTrdTof3D_El_Rec"),
-//         "Efficiency", "Momentum [GeV/c]", "Efficiency", "STS", "STS+RICH",
-//         "STS+RICH+TRD", "STS+RICH+TRD+TOF", kLitLinearScale, kLitLinearScale, true, 0.3,0.3,0.85,0.6);
 
       DrawEfficiency("tracking_qa_sts_rich_trd_tof_electron_identification", list_of("hStsRich3DElIdNormStsRichTrdTof_ElId")
          ("hStsRichTrd3DElIdNormStsRichTrdTof_ElId")("hStsRichTrdTof3DElId_ElId"),

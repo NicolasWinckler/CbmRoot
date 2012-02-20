@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $VMCWORKDIR/macro/littrack/common.sh
+. $VMCWORKDIR/macro/littrack/scripts/common.sh
 
 export SCRIPT=yes
 

@@ -123,9 +123,6 @@ private:
    /* Returns true if straw tube detector is simulated. */
    bool IsStraw() const;
 
-   /* Returns true if segmented TRD is simulated. */
-   bool IsTrdSegmented() const;
-
    CbmLitDetectorLayout fLayout; // current detector layout
    CbmLitDetectorLayout fMuchTrdLayout; // MUCH+TRD detector layout
    CbmLitDetectorLayout fMuchLayout; // MUCH detector layout

@@ -39,6 +39,10 @@
 #include <functional>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
+
+using std::cout;
+using std::endl;
 
 CbmLitEnvironment::CbmLitEnvironment():
    fField(NULL)
@@ -58,29 +62,17 @@ CbmLitEnvironment* CbmLitEnvironment::Instance()
 FairField* CbmLitEnvironment::GetField()
 {
    if (fField == NULL) {
-      FairRunAna* Run = FairRunAna::Instance();
-
-      if(NULL == Run) {
-         std::cout << "-E- CbmLitEnvironment::GetField : "
-                   << "Run Ana is not instantiated" << std::endl;
-         return NULL;
-      }
-
-      std::cout << "-I- CbmLitEnvironment::GetField : "
-                << "Reading Magnetic Field " << std::endl;
-
-      fField = (FairField*) Run->GetField();
+      FairRunAna* run = FairRunAna::Instance();
+      assert(run != NULL);
+      fField = static_cast<FairField*>(run->GetField());
    }
    return fField;
 }
 
 const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 {
-   std::cout << "-I- CbmLitEnvironment::GetLayout : "
-             << "Getting layout... " << std::endl;
-
+   cout << "-I- CbmLitEnvironment::GetLayout : " << "Getting layout... " << endl;
    static Bool_t layoutCreated = false;
-
    if (!layoutCreated) {
       CbmLitDetectorSetup det;
       det.DetermineSetup();
@@ -95,25 +87,20 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
          CombineMuchAndTrd();
          fLayout = fMuchTrdLayout;
       }
-      std::cout << fLayout.ToString();
+      cout << fLayout.ToString();
       layoutCreated = true;
    }
-
-   std::cout << "-I- CbmLitEnvironment::GetLayout : "
-             << "Finish getting layout" << std::endl;
-
+   cout << "-I- CbmLitEnvironment::GetLayout : " << "Finish getting layout" << endl;
    return fLayout;
 }
 
 const CbmLitDetectorLayout& CbmLitEnvironment::GetMvdLayout()
 {
-   std::cout << "-I- CbmLitEnvironment::GetMvdLayout : "
-             << "Getting layout... " << std::endl;
-
+   cout << "-I- CbmLitEnvironment::GetMvdLayout : " << "Getting layout... " << endl;
    static Bool_t layoutCreated = false;
    if (!layoutCreated) {
       MvdLayout();
-      std::cout << fMvdLayout.ToString();
+      cout << fMvdLayout.ToString();
       layoutCreated = true;
    }
    return fMvdLayout;
@@ -122,9 +109,7 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetMvdLayout()
 void CbmLitEnvironment::MuchLayout()
 {
    static Bool_t layoutCreated = false;
-
    if (!layoutCreated) {
-
       CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
       FairRuntimeDb* db = FairRuntimeDb::instance();
       CbmGeoMuchPar* geoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
@@ -159,7 +144,7 @@ void CbmLitEnvironment::MuchLayout()
          }
          fMuchLayout.AddStationGroup(LitStationGroupMuon);
       }
-//    std::cout << fMuchLayout.ToString();
+//    cout << fMuchLayout.ToString();
       layoutCreated = true;
    }
 }
@@ -167,90 +152,43 @@ void CbmLitEnvironment::MuchLayout()
 void CbmLitEnvironment::TrdLayout()
 {
    static Bool_t layoutCreated = false;
-
    if (!layoutCreated) {
-      std::set<CbmLitStation, CompareStationZLess> stationSet;
-      TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
-      for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-
-         TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-         if (TString(node->GetName()).Contains("trd")) {
-
-            TGeoNode* station = node;
+      std::set<Double_t> stationZPos;
+      TObjArray* topNodes = gGeoManager->GetTopNode()->GetNodes();
+      for (Int_t iTopNode = 0; iTopNode < topNodes->GetEntriesFast(); iTopNode++) {
+         TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
+         if (TString(topNode->GetName()).Contains("trd")) {
+            CbmLitStationGroup stg;
+            TGeoNode* station = topNode;
             const Double_t* stationPos = station->GetMatrix()->GetTranslation();
-
-            TObjArray* layers = station->GetNodes();
-            TGeoNode* t = (TGeoNode*) layers->At(0);
-
-            // OLD TRD GEOMETRY
-            if (TString(t->GetName()).Contains("layer")) {
-               for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
-
-                  TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
-                  const Double_t* layerPos = layer->GetMatrix()->GetTranslation();
-
-                  Double_t Zmodule = 0.;
-                  TObjArray* layerParts;
-                  if (IsTrdSegmented()) {
-                     TGeoNode* module = (TGeoNode*) layer->GetNodes()->At(0);
-                     layerParts = module->GetNodes();
-                     const Double_t* modPos = module->GetMatrix()->GetTranslation();
-                     Zmodule = modPos[2];
-                  } else {
-                     layerParts = layer->GetNodes();
-                  }
-                  for (Int_t iLayerPart = 0; iLayerPart < layerParts->GetEntriesFast(); iLayerPart++) {
-
-                     TGeoNode* layerPart = (TGeoNode*) layerParts->At(iLayerPart);
-
-                     if (TString(layerPart->GetName()).Contains("gas")) {
-                        const Double_t* pos = layerPart->GetMatrix()->GetTranslation();
-                        TGeoPgon* shape = (TGeoPgon*) layerPart->GetVolume()->GetShape();
-                        CbmLitStation sta;
+            TObjArray* modules = station->GetNodes();
+            for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
+               TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
+               const Double_t* modulePos = module->GetMatrix()->GetTranslation();
+               TObjArray* moduleParts = module->GetNodes();
+               for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
+                  TGeoNode* modulePart = static_cast<TGeoNode*>(moduleParts->At(iModulePart));
+                  if (TString(modulePart->GetName()).Contains("gas")) {
+                     const Double_t* pos = modulePart->GetMatrix()->GetTranslation();
+//                     TGeoPgon* shape = static_cast<TGeoPgon*>(modulePart->GetVolume()->GetShape());
+                     TGeoBBox* shape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
+                     Double_t zPos = stationPos[2] + modulePos[2] + pos[2] + shape->GetDZ();
+                     if (stationZPos.find(zPos) == stationZPos.end()) {
+                        stationZPos.insert(zPos);
                         CbmLitSubstation substation;
-                        substation.SetZ(stationPos[2] + layerPos[2] + pos[2] + shape->GetDZ() + Zmodule);
+                        substation.SetZ(zPos);
+                        CbmLitStation sta;
                         sta.SetType(kLITPIXELHIT);
                         sta.AddSubstation(substation);
-                        stationSet.insert(sta);
+                        stg.AddStation(sta);
                      }
                   }
                }
-               // END: OLD TRD GEOMETRY
-            } else {
-
-               // NEW TRD GEOMETRY
-               for (Int_t iModule = 0; iModule < layers->GetEntriesFast(); iModule++) {
-
-                  TGeoNode* module = (TGeoNode*) layers->At(iModule);
-                  const Double_t* modulePos = module->GetMatrix()->GetTranslation();
-
-                  TObjArray* moduleParts = module->GetNodes();
-                  for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
-
-                     TGeoNode* modulePart = (TGeoNode*) moduleParts->At(iModulePart);
-
-                     if (TString(modulePart->GetName()).Contains("gas")) {
-                        const Double_t* pos = modulePart->GetMatrix()->GetTranslation();
-                        TGeoPgon* shape = (TGeoPgon*) modulePart->GetVolume()->GetShape();
-                        CbmLitStation sta;
-                        CbmLitSubstation substation;
-                        substation.SetZ(stationPos[2] + modulePos[2] + pos[2] + shape->GetDZ());
-                        sta.SetType(kLITPIXELHIT);
-                        sta.AddSubstation(substation);
-                        stationSet.insert(sta);
-                     }
-                  }
-               }
-
-               // END: NEW TRD GEOMETRY
-
             }
+            fTrdLayout.AddStationGroup(stg);
          }
       }
-
-      std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
-      DetermineLayout(stationVec, fTrdLayout);
-//    std::cout << fTrdLayout.ToString();
+      // cout << fTrdLayout.ToString();
       layoutCreated = true;
    }
 }
@@ -282,7 +220,7 @@ void CbmLitEnvironment::TrdLayoutSimple()
 
       std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
       DetermineLayout(stationVec, fTrdLayout);
-//    std::cout << fTrdLayout.ToString();
+//    cout << fTrdLayout.ToString();
       layoutCreated = true;
    }
 }
@@ -290,18 +228,14 @@ void CbmLitEnvironment::TrdLayoutSimple()
 void CbmLitEnvironment::CombineMuchAndTrd()
 {
    static Bool_t layoutCreated = false;
-
    if (!layoutCreated) {
       MuchLayout();
       TrdLayout();
-
       fMuchTrdLayout = fMuchLayout;
-
       for(Int_t i = 0; i < fTrdLayout.GetNofStationGroups(); i++) {
          fMuchTrdLayout.AddStationGroup(fTrdLayout.GetStationGroup(i));
       }
-
-//    std::cout << fLayout.ToString();
+//    cout << fLayout.ToString();
       layoutCreated = true;
    }
 }
@@ -337,7 +271,7 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetTofLayout()
       CbmLitStationGroup stationGroup;
       stationGroup.AddStation(station);
       fTofLayout.AddStationGroup(stationGroup);
-      std::cout << fTofLayout.ToString();
+      cout << fTofLayout.ToString();
       layoutCreated = true;
    }
 
@@ -371,7 +305,7 @@ const CbmLitStation& CbmLitEnvironment::GetTofStation()
          }
       }
       fTofStation = station;
-      std::cout << fTofStation.ToString();
+      cout << fTofStation.ToString();
       layoutCreated = true;
    }
    return fTofStation;
@@ -406,7 +340,7 @@ void CbmLitEnvironment::MvdLayout()
          sg.AddStation(*i);
       }
       fMvdLayout.AddStationGroup(sg);
-//    std::cout << fMvdLayout.ToString();
+//    cout << fMvdLayout.ToString();
       layoutCreated = true;
    }
 }
@@ -427,7 +361,7 @@ template<class T>
 void CbmLitEnvironment::GetMuchLayout(
    lit::parallel::LitDetectorLayoutMuon<T>& layout)
 {
-   std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
+   cout << "Getting MUCH layout for parallel version of tracking..." << endl;
 //#if LIT_POLYNOM_DEGREE==3
 //   CbmLitFieldFitter fieldFitter(3); // set polynom degree
 //   static const unsigned int N = 10; // set number of coefficients
@@ -447,17 +381,17 @@ void CbmLitEnvironment::GetMuchLayout(
 //#endif
 //#endif
 //#endif
-//   std::cout << "Field fitter initialized" << std::endl;
+//   cout << "Field fitter initialized" << endl;
 
    CbmLitFieldGridCreator gridCreator;
 
    CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
-   std::cout << "Simple geometry constructor initialized" << std::endl;
+   cout << "Simple geometry constructor initialized" << endl;
    std::vector<CbmLitMaterialInfo> muchMaterial = geoConstructor->GetMyMuchGeoNodes();
 
    MuchLayout();
    const CbmLitDetectorLayout& muchLayout = GetMuchLayout();
-   std::cout << muchLayout.ToString();
+   cout << muchLayout.ToString();
    for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
       const CbmLitStationGroup& stationGroup = muchLayout.GetStationGroup(isg);
       lit::parallel::LitStationGroupMuon<T> sg;
@@ -569,7 +503,7 @@ template<class T>
 void CbmLitEnvironment::GetTrdLayout(
    lit::parallel::LitDetectorLayoutElectron<T>& layout)
 {
-   std::cout << "Getting TRD layout for parallel version of tracking..." << std::endl;
+   cout << "Getting TRD layout for parallel version of tracking..." << endl;
 
    CbmLitFieldGridCreator gridCreator;
    CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
@@ -578,7 +512,7 @@ void CbmLitEnvironment::GetTrdLayout(
 
    TrdLayout();
    const CbmLitDetectorLayout& trdLayout = GetTrdLayout();
-   std::cout << trdLayout.ToString();
+   cout << trdLayout.ToString();
 
    // Add virtual planes
    int richMatCnt = 0;
@@ -653,8 +587,8 @@ void CbmLitEnvironment::GetTrdLayout(
       } // loop over stations
       layout.AddStationGroup(sg);
    } // loop over station groups
-   std::cout << layout;
-   std::cout << "Finish getting TRD layout for parallel version of tracking..." << std::endl;
+   cout << layout;
+   cout << "Finish getting TRD layout for parallel version of tracking..." << endl;
 }
 
 int CbmLitEnvironment::MaterialId(
@@ -676,8 +610,8 @@ int CbmLitEnvironment::MaterialId(
    }
    counter += substation;
 
-   std::cout << "MaterialId: " << stationGroup << " " << station << " " << substation
-             << " " << counter << std::endl;
+   cout << "MaterialId: " << stationGroup << " " << station << " " << substation
+             << " " << counter << endl;
    return counter;
 }
 
@@ -698,8 +632,8 @@ int CbmLitEnvironment::TrdMaterialId(
       counter += nofMaterialsInLayer;
    }
 
-   std::cout << "TrdMaterialId: " << stationGroup << " "
-             << station << " " << counter << std::endl;
+   cout << "TrdMaterialId: " << stationGroup << " "
+             << station << " " << counter << endl;
    return counter;
 }
 
@@ -712,7 +646,7 @@ void CbmLitEnvironment::DetermineLayout(
    Int_t groupBegin = 0;
    for (Int_t i = 0; i <= nofStations; i++) {
       if ( i == nofStations ||
-            std::abs(stations[i].GetSubstation(0).GetZ() - prev) > 20.) { // new station group
+            std::abs(stations[i].GetSubstation(0).GetZ() - prev) > 60.) { // new station group
          CbmLitStationGroup stationGroup;
 
          std::vector<CbmLitStation> subst;
@@ -763,24 +697,9 @@ bool CbmLitEnvironment::IsStraw() const
    FairDetector* much = (FairDetector*) detList->FindObject("MUCH");
    TString name = much->GetGeometryFileName();
    if(name.Contains("straw")) {
-      //std::cout << "-I- TrdLayout :" << "STRAWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << std::endl;
+      //cout << "-I- TrdLayout :" << "STRAWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << endl;
       return true;
    } else {
       return false;
-   }
-}
-
-bool CbmLitEnvironment::IsTrdSegmented() const
-{
-   FairRunAna* ana = FairRunAna::Instance();
-   FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-   FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
-   TObjArray* detList = baseParSet->GetDetList();
-   FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
-   TString name = trd->GetGeometryFileName();
-   if(name.Contains("monolithic") && !name.Contains("monolithic_new")) {
-      return false;
-   } else {
-      return true;
    }
 }

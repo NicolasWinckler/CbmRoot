@@ -23,15 +23,6 @@
 #pragma link C++ class CbmRichTestHits+;
 #pragma link C++ class CbmRichGeoTest+;
 #pragma link C++ class CbmRichRingFitterQa+;
-//#pragma link C++ class CbmRichParallelQa+;
-
-//tracks
-#pragma link C++ class CbmRichProjectionProducer+;
-#pragma link C++ class CbmRichRingTrackAssignClosestD+;
-#pragma link C++ class CbmRichRingTrackAssignIdeal+;
-#pragma link C++ class CbmRichAssignTrack+;
-
-//#pragma link C++ class LhcbRingFinder;
 
 #pragma link C++ class CbmRichProt+;
 #pragma link C++ class CbmRichProtHitProducer+;

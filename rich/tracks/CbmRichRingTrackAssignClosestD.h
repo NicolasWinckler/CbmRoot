@@ -1,33 +1,29 @@
-/******************************************************************************
-* $Id: CbmRichRingTrackAssignClosestD.h,v 1.1 2006/01/26 09:54:27 hoehne Exp $
+/**
+* \file CbmRichRingTrackAssignClosestD.h
 *
-*  Class  : CbmRichRingTrackAssignClosestD
-*  Description: Ring-Track Assignement according to the closest distance criterion
+* \brief Ring-Track Assignment according to the closest distance criterion.
 *
-*  Author : Claudia Hoehne
-*  E-mail : c.hoehne@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichRingTrackAssignClosestD.h,v $
-*  Revision 1.1  2006/01/26 09:54:27  hoehne
-*  initial version: assignement of Rich rings and extrapolated tracks (base class, concrete implementation, Task)
-*
-*
-*
-*******************************************************************************/
+* \author Claudia Hoehne and Semen Lebedev
+* \date 2007
+**/
 
+#ifndef CBM_RICH_RING_TRACK_ASSIGN_CLOSEST_D
+#define CBM_RICH_RING_TRACK_ASSIGN_CLOSEST_D
 
-
-#ifndef CBMRichRingTrackAssignClosestD_H
-#define CBMRichRingTrackAssignClosestD_H
-
-#include "CbmRichRingTrackAssign.h"
+#include "CbmRichRingTrackAssignBase.h"
 
 class TClonesArray;
 
-class CbmRichRingTrackAssignClosestD : public CbmRichRingTrackAssign
+/**
+* \class CbmRichRingTrackAssignClosestD
+*
+* \brief Ring-Track Assignment according to the closest distance criterion.
+*
+* \author Claudia Hoehne and Semen Lebedev
+* \date 2007
+**/
+class CbmRichRingTrackAssignClosestD : public CbmRichRingTrackAssignBase
 {
-
 public:
 
   /**
@@ -41,34 +37,33 @@ public:
 	virtual ~CbmRichRingTrackAssignClosestD();
 
 	/**
-	 * \brief Initialisation.
+	 * \brief Inherited from CbmRichRingTrackAssignBase.
 	 */
 	void Init();
 
-	/** Method DoAssign.
-	 ** Task: Read the extrapolated Tracks, read the found rings, assign according to closest distance criterium
-	 ** pointers to both Rings are given as argument
-	 **
-	 *@param pTrack    pointer to extrapolated track
-	 *@param pRing     pointer to found ring
-	 **/
+	/**
+	 * \brief Inherited from CbmRichRingTrackAssignBase.
+	 */
 	void DoAssign(
-	      TClonesArray* pRing,
-	      TClonesArray* pTrack);
+	      TClonesArray* rings,
+	      TClonesArray* richProj);
 
 private:
 	TClonesArray* fGlobalTracks;
 	TClonesArray* fTrdTracks;
 
-	Double_t fMaxDistance; // max. distance between ring center and track extrapolation
-	Int_t fMinNofHitsInRing; // min number of hits per ring
+	double fMaxDistance; // max. distance between ring center and track projection
+	int fMinNofHitsInRing; // min number of hits per ring
+	double fTrdAnnCut; // ANN cut for electron identification in TRD
+	bool fUseTrd; // if true electron identification in TRD will be performed
 
-   /*
+   /**
     * \brief Check if global track was identified as electron in the TRD detector.
-    * \param iTrack Index of global track.
+    * \param[in] iTrack Index of global track.
+    * \return true if track is identified as electron, else return false.
     */
-   Bool_t IsTrdElectron(
-         Int_t iTrack);
+   bool IsTrdElectron(
+         int iTrack);
 
   /**
    * \brief Copy constructor.
@@ -79,10 +74,6 @@ private:
    * \brief Assignment operator.
    */
 	CbmRichRingTrackAssignClosestD& operator=(const CbmRichRingTrackAssignClosestD&);
-
-
-	ClassDef(CbmRichRingTrackAssignClosestD, 1);
-
 };
 
 #endif

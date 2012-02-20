@@ -25,7 +25,10 @@
 #include "CbmRichRingFitterEllipseTau.h"
 #include "CbmRichRingFitterEllipseMinuit.h"
 
+#include "CbmRichRingTrackAssignClosestD.h"
+
 #include "FairHit.h"
+#include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
 #include "CbmRichConverter.h"
 #include "TClonesArray.h"
@@ -47,18 +50,19 @@ CbmRichReconstruction::CbmRichReconstruction()
    fRingFitter(NULL),
    fTrackExtrapolation(NULL),
    fProjectionProducer(NULL),
+   fRingTrackAssign(NULL),
 
    fRunExtrapolation(true),
    fRunProjection(true),
    fRunFinder(true),
    fRunFitter(true),
-   fRunTrackMatch(true),
+   fRunTrackAssign(true),
 
    fExtrapolationName("kf"),
    fProjectionName(""),
    fFinderName("hough"),
    fFitterName("ellipse_tau"),
-   fTrackMatchName(""),
+   fTrackAssignName("closest_distance"),
 
    fZTrackExtrapolation(300.)
 {
@@ -93,14 +97,8 @@ InitStatus CbmRichReconstruction::Init()
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
    if ( NULL == fRichHits) { Fatal("CbmRichReconstruction::Init","No RichHit array!"); }
 
-  // fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
-  // if ( NULL == fRichRingMatches) { Fatal("CbmRichReconstruction::Init","No RichRingMatch array!"); }
-
-   //fRichProjections = (TClonesArray*) ioman->GetObject("RichProjection");
-   //if (NULL == fRichProjections) { Fatal("CbmRichReconstruction::Init","No RichProjection array!"); }
-
-   // fRichProjections = new TClonesArray("RichProjection", 600);
-   //ioman->Register("RichRing", "RICH", fRichProjections, kTRUE);
+   fRichProjections = new TClonesArray("FairTrackParam");
+   ioman->Register("RichProjection", "RICH", fRichProjections, kTRUE);
 
    fRichRings = new TClonesArray("CbmRichRing", 100);
    ioman->Register("RichRing", "RICH", fRichRings, kTRUE);
@@ -109,7 +107,7 @@ InitStatus CbmRichReconstruction::Init()
    InitProjection();
    InitFinder();
    InitFitter();
-   InitTrackMatch();
+   InitTrackAssign();
 
    return kSUCCESS;
 }
@@ -121,7 +119,7 @@ void CbmRichReconstruction::Exec(
    if (fRunProjection) RunProjection();
    if (fRunFinder) RunFinder();
    if (fRunFitter) RunFitter();
-   if (fRunTrackMatch) RunTrackMatch();
+   if (fRunTrackAssign) RunTrackAssign();
 }
 
 void CbmRichReconstruction::InitExtrapolation()
@@ -133,6 +131,9 @@ void CbmRichReconstruction::InitExtrapolation()
       fProjectionProducer->SetZFlag(2);
    } else if (fExtrapolationName == "kf" || fExtrapolationName == "KF"){
       fTrackExtrapolation = new CbmRichTrackExtrapolationKF();
+   } else {
+      Fatal("CbmRichReconstruction::InitExtrapolation",
+           (fExtrapolationName + " is not correct name for extrapolation algorithm.").c_str());
    }
    fTrackExtrapolation->Init();
 }
@@ -149,7 +150,8 @@ void CbmRichReconstruction::InitFinder()
    } else if (fFinderName == "ideal"){
       fRingFinder = new CbmRichRingFinderIdeal();
    } else {
-      fRingFinder = new CbmRichRingFinderHough();
+      Fatal("CbmRichReconstruction::InitFinder",
+            (fFinderName + " is not correct name for ring finder algorithm.").c_str());
    }
 
    fRingFinder->Init();
@@ -170,13 +172,20 @@ void CbmRichReconstruction::InitFitter()
    } else if (fFitterName == "ellipse_minuit") {
       fRingFitter = new CbmRichRingFitterEllipseMinuit();
    } else {
-      fRingFitter = new CbmRichRingFitterCOP();
+      Fatal("CbmRichReconstruction::InitFitter",
+            (fFitterName + " is not correct name for ring fitter algorithm.").c_str());
    }
 }
 
-void CbmRichReconstruction::InitTrackMatch()
+void CbmRichReconstruction::InitTrackAssign()
 {
-
+   if (fTrackAssignName == "closest_distance"){
+      fRingTrackAssign = new CbmRichRingTrackAssignClosestD();
+   } else {
+      Fatal("CbmRichReconstruction::InitTrackAssign",
+            (fTrackAssignName + " is not correct name for ring-track assignment algorithm.").c_str());
+   }
+   fRingTrackAssign->Init();
 }
 
 void CbmRichReconstruction::RunExtrapolation()
@@ -187,7 +196,7 @@ void CbmRichReconstruction::RunExtrapolation()
 
 void CbmRichReconstruction::RunProjection()
 {
-   fProjectionProducer->DoProjection();
+   fProjectionProducer->DoProjection(fRichProjections);
 }
 
 void CbmRichReconstruction::RunFinder()
@@ -209,11 +218,18 @@ void CbmRichReconstruction::RunFitter()
    }
 }
 
-void CbmRichReconstruction::RunTrackMatch()
+void CbmRichReconstruction::RunTrackAssign()
 {
+   // check whether track were assigned to rings.
+   Int_t nTracks = fGlobalTracks->GetEntriesFast();
+   for (Int_t iTrack = 0; iTrack < nTracks; iTrack++){
+     CbmGlobalTrack* gTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
+     Int_t iRing = gTrack->GetRichRingIndex();
+     if (iRing != -1) return;
+   }
 
+   fRingTrackAssign->DoAssign(fRichRings, fRichProjections);
 }
-
 
 void CbmRichReconstruction::Finish()
 {

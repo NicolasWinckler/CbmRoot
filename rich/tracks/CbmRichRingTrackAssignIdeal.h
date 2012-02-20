@@ -1,35 +1,29 @@
-/******************************************************************************
-* $Id: CbmRichRingTrackAssignIdeal.h,v 1.1 2006/02/23 14:56:00 hoehne Exp $
+/**
+* \file CbmRichRingTrackAssignIdeal.h
 *
-*  Class  : CbmRichRingTrackAssignIdeal
-*  Description: Ideal Ring-Track Assignement
+* \brief Ideal Ring-Track Assignment.
+* CbmRichRingMatch must be run prior to this procedure.
 *
-*  Author : Claudia Hoehne
-*  E-mail : c.hoehne@gsi.de
+* \author Claudia Hoehne and Semen Lebedev
+* \date 2007
+**/
+
+
+#ifndef CBM_RICH_RING_TRACK_ASSIGN_IDEAL
+#define CBM_RICH_RING_TRACK_ASSIGN_IDEAL
+
+#include "CbmRichRingTrackAssignBase.h"
+
+/**
+* \class CbmRichRingTrackAssignIdeal
 *
-*******************************************************************************
-*  $Log: CbmRichRingTrackAssignIdeal.h,v $
-*  Revision 1.1  2006/02/23 14:56:00  hoehne
-*  initial version: Ideal ring-track assignement
+* \brief Ideal Ring-Track Assignment.
+* CbmRichRingMatch must be run prior to this procedure.
 *
-*  
-*
-*******************************************************************************/
-
-
-
-#ifndef CBMRichRingTrackAssignIdeal_H
-#define CBMRichRingTrackAssignIdeal_H
-
-#include "CbmRichRing.h"
-#include "CbmRichRingTrackAssign.h"
-
-#include "CbmStack.h"
-
-#include "TClonesArray.h"
-
-
-class CbmRichRingTrackAssignIdeal : public CbmRichRingTrackAssign {
+* \author Claudia Hoehne and Semen Lebedev
+* \date 2007
+**/
+class CbmRichRingTrackAssignIdeal : public CbmRichRingTrackAssignBase {
 
 public:
 
@@ -44,18 +38,12 @@ public:
    virtual ~CbmRichRingTrackAssignIdeal();
 
    /**
-    * \brief Initialisation.
+    * \brief Inherited from CbmRichRingTrackAssignBase.
     */
    void Init();
 
-
   /**
-   * \brief Read the extrapolated Tracks, read the found rings, assign according
-   * to closest distance criterium
-   * pointers to both Rings are given as argument
-   *
-   * \param[in] pTrack ointer to extrapolated track
-   * \param[in] pRing     pointer to found ring
+   * \brief Inherited from CbmRichRingTrackAssignBase.
    */
    virtual void DoAssign(
          TClonesArray* rings,
@@ -67,8 +55,8 @@ private:
    TClonesArray* fRingMatches;
    TClonesArray* fStsTrackMatches;
 
-   Double_t fMaxDistance;  // max. distance between ring center and track extrapolation */
-   Int_t fMinNofHitsInRing; // min number of hits per ring */
+   double fMaxDistance;  // max. distance between ring center and track extrapolation
+   int fMinNofHitsInRing; // min number of hits per ring
 
    /**
     * \brief Copy constructor.
@@ -79,8 +67,6 @@ private:
     * \brief Assignment operator.
     */
    CbmRichRingTrackAssignIdeal& operator=(const CbmRichRingTrackAssignIdeal&);
-
-   ClassDef(CbmRichRingTrackAssignIdeal,1);
 };
 
 #endif

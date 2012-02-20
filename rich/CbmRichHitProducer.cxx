@@ -81,7 +81,7 @@ void CbmRichHitProducer::SetParContainers()
   // Get Base Container
   FairRunAna* ana = FairRunAna::Instance();
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-  fPar=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+  fPar = (CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
   // fPar1=(FairBaseParSet*)(rtdb->getContainer("FairBaseParSet"));
   // fPar->print();
 //  fPar->setStatic();    // setting the parameters on static mode: <explanation>

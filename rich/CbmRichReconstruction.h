@@ -19,6 +19,7 @@ class CbmRichRingFinder;
 class CbmRichRingFitterBase;
 class CbmRichTrackExtrapolationBase;
 class CbmRichProjectionProducer;
+class CbmRichRingTrackAssignBase;
 
 using std::string;
 
@@ -68,14 +69,18 @@ public:
    void SetRunProjection(bool b){fRunProjection = b;}
    void SetRunFinder(bool b){fRunFinder = b;}
    void SetRunFitter(bool b){fRunFitter = b;}
-   void SetRunTrackMatch(bool b){fRunTrackMatch = b;}
+   void SetRunTrackAssign(bool b){fRunTrackAssign = b;}
 
    void SetExtrapolationName(const string& n){fExtrapolationName = n;}
    void SetProjectionName(const string& n){fProjectionName = n;}
    void SetFinderName(const string& n){fFinderName = n;}
    void SetFitterName(const string& n){fFitterName = n;}
-   void SetTrackMatchName(const string& n){fTrackMatchName = n;}
+   void SetTrackAssignName(const string& n){fTrackAssignName = n;}
 
+   /**
+    * \brief Set Z coordinate where STS tracks will be extrapolated.
+    * \param[in] z Z coordinate.
+    */
    void SetZTrackExtrapolation(Double_t z){fZTrackExtrapolation = z;}
 
 private:
@@ -88,21 +93,22 @@ private:
    CbmRichRingFinder* fRingFinder; // pointer to ring finder algorithm
    CbmRichRingFitterBase* fRingFitter; // pointer to ring fitting algorithm
    CbmRichTrackExtrapolationBase* fTrackExtrapolation; // pointer to track extrapolation algorithm
-   CbmRichProjectionProducer* fProjectionProducer;
+   CbmRichProjectionProducer* fProjectionProducer; // pointer to projection producer
+   CbmRichRingTrackAssignBase* fRingTrackAssign; // pointer to track assignment algorithm
 
    // What do you wan to run.
    bool fRunExtrapolation;
    bool fRunProjection;
    bool fRunFinder;
    bool fRunFitter;
-   bool fRunTrackMatch;
+   bool fRunTrackAssign;
 
    // Algorithm names for each step of reconstruction.
    string fExtrapolationName; // name of extrapolation algorithm
    string fProjectionName; // name of track projection algorithm
    string fFinderName; // name of ring finder algorithm
    string fFitterName; // name of ring fitter algorithm
-   string fTrackMatchName; // name of track-ring matching algorithm
+   string fTrackAssignName; // name of track-ring matching algorithm
 
    Double_t fZTrackExtrapolation; // Z coordinate to which one wants to extrapolate STS tracks
 
@@ -129,7 +135,7 @@ private:
    /**
     * \brief
     */
-   void InitTrackMatch();
+   void InitTrackAssign();
 
    /**
     * \brief
@@ -154,7 +160,7 @@ private:
    /**
     * \brief
     */
-   void RunTrackMatch();
+   void RunTrackAssign();
 
    /**
     * \brief Copy constructor.

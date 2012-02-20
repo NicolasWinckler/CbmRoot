@@ -75,7 +75,6 @@ fitter/CbmRichRingFitterEllipseTau.cxx
 tracks/CbmRichProjectionProducer.cxx 
 tracks/CbmRichRingTrackAssignClosestD.cxx
 tracks/CbmRichRingTrackAssignIdeal.cxx  
-tracks/CbmRichAssignTrack.cxx
 tracks/CbmRichTrackExtrapolationIdeal.cxx
 tracks/CbmRichTrackExtrapolationKF.cxx
 tracks/CbmRichTrackExtrapolationMirrorIdeal.cxx
@@ -86,7 +85,6 @@ qa/CbmRichRingFitterQa.cxx
 #qa/CbmRichParallelQa.cxx 
 selection/CbmRichRingSelectAnn.cxx  
 selection/NNfunction.cxx 
-#LhcbRingFinder.cxx  
 prototype/CbmRichProt.cxx
 prototype/CbmRichProtHitProducer.cxx
 prototype/CbmRichProtPrepareExtrapolation.cxx
@@ -112,17 +110,11 @@ CbmRichMatchRings.h
 CbmRichTrainAnnSelect.h
 CbmRichTrainAnnElectrons.h
 CbmRichReconstruction.h
-finder/CbmRichRingFinderIdeal.h
-tracks/CbmRichProjectionProducer.h
-tracks/CbmRichRingTrackAssignClosestD.h
-tracks/CbmRichRingTrackAssignIdeal.h 
-tracks/CbmRichAssignTrack.h
 qa/CbmRichTestSim.h 
 qa/CbmRichTestHits.h 
 qa/CbmRichGeoTest.h 
 qa/CbmRichRingFitterQa.h 
 #qa/CbmRichParallelQa.h  
-#LhcbRingFinder.h  
 prototype/CbmRichProt.h
 prototype/CbmRichProtHitProducer.h
 prototype/CbmRichProtPrepareExtrapolation.h

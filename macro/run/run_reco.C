@@ -324,27 +324,7 @@ void run_reco(Int_t nEvents = 2) {
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 
-
-  //----------------------RICH Track Extrapolation ---------------------------
-  Int_t richNSts = 4; // minimum number of STS hits for extrapolation
-  Double_t richZPos = 300.; // z position for extrapolation [cm]
-  CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(
-  		richNSts, iVerbose);
-  CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-  richExtrapolate->UseExtrapolation(richExtra, richZPos);
-  run->AddTask(richExtrapolate);
-  //--------------------------------------------------------------------------
-
-
-  //--------------------- Rich Track Projection to photodetector -------------
-  Int_t richZFlag = 1; // Projetion from IM plane (default)
-  CbmRichProjectionProducer* richProj = new CbmRichProjectionProducer(
-  		iVerbose, richZFlag);
-  run->AddTask(richProj);
-  //--------------------------------------------------------------------------
-
-
-  //--------------------- RICH Ring Finding ----------------------------------
+  //--------------------- RICH Reconstruction ----------------------------------
   CbmRichReconstruction* richReco = new CbmRichReconstruction();
   run->AddTask(richReco);
 
@@ -352,17 +332,6 @@ void run_reco(Int_t nEvents = 2) {
   CbmRichMatchRings* matchRings = new CbmRichMatchRings();
   run->AddTask(matchRings);
   // -------------------------------------------------------------------------
-
-  //--------------------- RICH ring-track assignment ------------------------
-  Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-  Int_t richNPoints = 5; // Minmum number of hits on ring
-  CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD();
-  CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-  assignTrack->UseAssign(richAssign);
-  run->AddTask(assignTrack);
-  // ------------------------------------------------------------------------
-
-
   // ===                 End of RICH local reconstruction                  ===
   // =========================================================================
 

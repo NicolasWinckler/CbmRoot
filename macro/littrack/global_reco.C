@@ -12,8 +12,8 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 1000, // number of events
-		TString opt = "all")
+void global_reco(Int_t nEvents = 100, // number of events
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/data.local1/andrey/events/events_propagation_qa_electrons/"; // Output directory
+   TString dir = "/data.local1/andrey/events/trd_v12a_urqmd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -87,11 +87,8 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	TStopwatch timer;
 	timer.Start();
 
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
-	cbmrootlibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+	loadlibs();
 
 	FairRunAna *run = new FairRunAna();
 	if (opt == "all") {
@@ -284,7 +281,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// Tracking method to be used
 		// "branch" - branching tracking
 		// "nn" - nearest neighbor tracking
-		// "weight" - weighting tracking
+		// "nn_parallel" - nearest neighbor parallel tracking
 		finder->SetTrackingType(std::string(globalTrackingType));
 
 		// Hit-to-track merger method to be used
@@ -312,54 +309,15 @@ void global_reco(Int_t nEvents = 1000, // number of events
 	        FairTask* l1 = new CbmL1();
 	        run->AddTask(l1);
 	     }
-		  // ---------------------RICH Hit Producer ----------------------------------
-		  Double_t richPmtRad = 0.4; // PMT radius [cm]
-		  Double_t richPmtDist = 0.; // Distance between PMTs [cm]
-		  Int_t richDetType = 4; // Detector type Hamamatsu H8500-03 (no WLS)
-		  Int_t richNoise = 220; // Number of noise points per event
-		  Double_t richCollEff = 1.0; // Collection Efficiency of PMT electron optics
-		  Double_t richSMirror = 0.06; // Sigma for additional point smearing due to light scattering in mirror
 
-		  CbmRichHitProducer* richHitProd = new CbmRichHitProducer(richPmtRad,
-				richPmtDist, richDetType, richNoise, iVerbose, richCollEff, richSMirror);
-		  run->AddTask(richHitProd);
-		  //--------------------------------------------------------------------------
+	     CbmRichHitProducer* richHitProd  = new CbmRichHitProducer();
+	     run->AddTask(richHitProd);
 
-		  //----------------------RICH Track Extrapolation ---------------------------
-		  Int_t richNSts = 4; // minimum number of STS hits for extrapolation
-		  Double_t richZPos = 300.; // z position for extrapolation [cm]
-		  CbmRichTrackExtrapolation* richExtra = new CbmRichTrackExtrapolationKF(
-				richNSts, iVerbose);
-		  CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-		  richExtrapolate->UseExtrapolation(richExtra, richZPos);
-		  run->AddTask(richExtrapolate);
-		  //--------------------------------------------------------------------------
-
-		  //--------------------- Rich Track Projection to photodetector -------------
-		  Int_t richZFlag = 1; // Projetion from IM plane (default)
-		  CbmRichProjectionProducer* richProj = new CbmRichProjectionProducer(iVerbose, richZFlag);
-		  run->AddTask(richProj);
-		  //--------------------------------------------------------------------------
-
-		  //-------------------------------------------------------------------------
 		  CbmRichReconstruction* richReco = new CbmRichReconstruction();
 		  run->AddTask(richReco);
-		  //--------------------------------------------------------------------------
 
-		  // ------------------- RICH Ring matching  ---------------------------------
-		  CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
+		  CbmRichMatchRings* matchRings = new CbmRichMatchRings();
 		  run->AddTask(matchRings);
-		  // -------------------------------------------------------------------------
-
-		  //--------------------- RICH ring-track assignment ------------------------
-		  Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-		  Int_t richNPoints = 5; // Minmum number of hits on ring
-		  CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD(
-				richDistance, richNPoints, iVerbose);
-		  CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-		  assignTrack->UseAssign(richAssign);
-		  run->AddTask(assignTrack);
-		  // ------------------------------------------------------------------------
 	   }
     }
 

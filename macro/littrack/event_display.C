@@ -7,11 +7,9 @@
 
 void event_display()
 {
-	TString dir  = "/d/cbm02/andrey/events/std_electron_10pi/";
-	// MC transport file
-	TString mcFile = dir + "mc.0000.root";
-	// Parameter file
-	TString parFile = dir + "param.0000.root";
+   TString dir = "/data.local1/andrey/events/trd_v12a_electrons/";
+	TString mcFile = dir + "mc.0000.root"; // MC transport file
+	TString parFile = dir + "param.0000.root"; // Parameter file
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -25,24 +23,24 @@ void event_display()
 	run->SetInputFile(mcFile);
 	run->SetOutputFile("test.root");
 
-	FairEventManager *fMan= new FairEventManager();
-	FairMCTracks *Track = new FairMCTracks ("Monte-Carlo Tracks");
-	FairMCPointDraw *RichPoint = new FairMCPointDraw ("RichPoint",kOrange,  kFullSquare);
-	FairMCPointDraw *TofPoint = new FairMCPointDraw ("TofPoint",kBlue,  kFullSquare);
-	FairMCPointDraw *TrdPoint = new FairMCPointDraw ("TrdPoint",kTeal,  kFullSquare);
-	FairMCPointDraw *MuchPoint = new FairMCPointDraw ("MuchPoint",kRed,  kFullSquare);
-	FairMCPointDraw *ECalPoint = new FairMCPointDraw ("EcalPoint",kYellow,  kFullSquare);
-	FairMCPointDraw *RefPlanePoint = new FairMCPointDraw ("RefPlanePoint",kPink,  kFullSquare);
-	FairMCPointDraw *STSPoint = new FairMCPointDraw ("StsPoint",kCyan,  kFullSquare);
+	FairEventManager* eventManager= new FairEventManager();
+	FairMCTracks* mcTracks = new FairMCTracks("Monte-Carlo Tracks");
+	FairMCPointDraw* richPoints = new FairMCPointDraw("RichPoint", kOrange, kFullSquare);
+	FairMCPointDraw* tofPoints = new FairMCPointDraw("TofPoint", kBlue, kFullSquare);
+	FairMCPointDraw* trdPoints = new FairMCPointDraw("TrdPoint", kTeal, kFullSquare);
+	FairMCPointDraw* muchPoints = new FairMCPointDraw("MuchPoint", kRed, kFullSquare);
+	FairMCPointDraw* ecalPoints = new FairMCPointDraw("EcalPoint", kYellow, kFullSquare);
+	FairMCPointDraw* refPlanePoints = new FairMCPointDraw("RefPlanePoint", kPink, kFullSquare);
+	FairMCPointDraw* stsPoints = new FairMCPointDraw("StsPoint", kCyan, kFullSquare);
 
-	fMan->AddTask(Track);
-	fMan->AddTask(RichPoint);
-	fMan->AddTask(ECalPoint);
-	fMan->AddTask(TofPoint);
-	fMan->AddTask(TrdPoint);
-	fMan->AddTask(MuchPoint);
-	fMan->AddTask(RefPlanePoint);
-	fMan->AddTask(STSPoint);
+	eventManager->AddTask(mcTracks);
+	eventManager->AddTask(richPoints);
+	eventManager->AddTask(ecalPoints);
+	eventManager->AddTask(tofPoints);
+	eventManager->AddTask(trdPoints);
+	eventManager->AddTask(muchPoints);
+	eventManager->AddTask(refPlanePoints);
+	eventManager->AddTask(stsPoints);
 
 
 	// -----  Parameter database   --------------------------------------------
@@ -54,5 +52,5 @@ void event_display()
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------
 
-	fMan->Init();
+	eventManager->Init();
 }

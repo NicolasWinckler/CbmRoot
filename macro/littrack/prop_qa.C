@@ -49,15 +49,12 @@ void prop_qa(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationQa* propQa = new CbmLitPropagationQa();
-	propQa->SetMinNofHits(nofHits);
-	propQa->SetPDGCode(pdg);
-	propQa->SetTestFastPropagation(testFastPropagation);
+	propQa->SetNofPlanes(13);
+//	propQa->SetMinNofHits(nofHits);
+//	propQa->SetPDGCode(pdg);
+//	propQa->SetTestFastPropagation(testFastPropagation);
 	propQa->SetOutputDir(std::string(resultDir));
-	propQa->IsDrawPropagation(true);
-	propQa->IsDrawFilter(false);
-	propQa->IsDrawSmoother(false);
-	propQa->IsCloseCanvas(false);
-	propQa->IsFixedBounds(true);
+	propQa->SetFixedBounds(true);
 	run->AddTask(propQa);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");

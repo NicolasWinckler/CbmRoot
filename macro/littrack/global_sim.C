@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 1000)
+void global_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -31,7 +31,7 @@ void global_sim(Int_t nEvents = 1000)
 
 	// Files
 	TString urqmdFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/data.local1/andrey/events/events_propagation_qa_electrons/"; //directory for output simulation files
+	TString dir = "/data.local1/andrey/events/trd_v10b_electrons/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -103,10 +103,8 @@ void global_sim(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
-	cbmrootlibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+	loadlibs();
 
 	FairRunSim* fRun = new FairRunSim();
 	fRun->SetName("TGeant3"); // Transport engine

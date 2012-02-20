@@ -7,9 +7,7 @@
 
 void draw3D()
 {
-	//Input directory
-	TString dir = "/d/cbm02/andrey/mvd/std_10e/";
-	//Input parameter file with TGeo
+   TString dir = "/data.local1/andrey/events/trd_v12a_electrons/";
 	TString parFile = dir + "param.0000.root";
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -26,5 +24,5 @@ void draw3D()
 //	gGeoManager->PrintOverlaps();
 
 	TGeoVolume* master = gGeoManager->GetMasterVolume();
-	master->Draw("ogl");
+	master->Draw();//"ogl");
 }

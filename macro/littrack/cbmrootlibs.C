@@ -18,16 +18,21 @@ void cbmrootlibs()
    gSystem->Load("libPassive");
    gSystem->Load("libTrkBase");
    gSystem->Load("libGeane");
-   gSystem->Load("libMvd");
+
    gSystem->Load("libSts");
-   gSystem->Load("libRich");
-   gSystem->Load("libMuch");
    gSystem->Load("libTrd");
-   gSystem->Load("libTof");
    gSystem->Load("libEcal");
-   gSystem->Load("libGlobal");
+
    gSystem->Load("libKF");
    gSystem->Load("libL1");
+   gSystem->Load("libMvd");
+
+   gSystem->Load("libRich");
+   gSystem->Load("libMuch");
+
+   gSystem->Load("libTof");
+
+   gSystem->Load("libGlobal");
 //   gSystem->Load("libcudalittrack");
    gSystem->Load("libLittrack");
    gSystem->Load("libLittrackparallel");

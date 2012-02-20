@@ -208,12 +208,6 @@ void run_reco(Int_t nEvents = 1000){
 		// ------------------- RICH Ring matching  ---------------------------------
 		CbmRichMatchRings* matchRings = new CbmRichMatchRings();
 		run->AddTask(matchRings);
-
-	    //--------------------- RICH ring-track assignment ------------------------
-		CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD();
-		CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-		assignTrack->UseAssign(richAssign);
-		run->AddTask(assignTrack);
 	}//isRich
 
 	// Reconstruction Qa

@@ -27,9 +27,6 @@
 
 //tracks
 #pragma link C++ class CbmRichProjectionProducer+;
-#pragma link C++ class CbmRichTrackExtrapolationIdeal+;
-#pragma link C++ class CbmRichTrackExtrapolationMirrorIdeal+;
-#pragma link C++ class CbmRichExtrapolateTracks+;
 #pragma link C++ class CbmRichRingTrackAssignClosestD+;
 #pragma link C++ class CbmRichRingTrackAssignIdeal+;
 #pragma link C++ class CbmRichAssignTrack+;

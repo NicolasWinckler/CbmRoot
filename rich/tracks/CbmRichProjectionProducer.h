@@ -1,104 +1,103 @@
-// -------------------------------------------------------------------------
-// -----             CbmRichProjectionProducer header file             -----
-// -----   Created 23/06/05  by P.Stolpovsky(P.Stolpovsky at gsi.de)   -----
-// ----- Project track by straight line from imaginary plane           -----
-// ----- to the mirror and reflect it to the photodetector plane       -----
-// -------------------------------------------------------------------------
+/**
+* \file CbmRichProjectionProducer.h
+*
+* \brief Project track by straight line from imaginary plane
+* to the mirror and reflect it to the photodetector plane.
+*
+* \author P.Stolpovsky
+* \date 2005
+**/
 
+#ifndef CBM_RICH_PROJECTION_PRODUCER
+#define CBM_RICH_PROJECTION_PRODUCER
 
-
-#ifndef CBMRICHPROJECTIONPRODUCER_H
-#define CBMRICHPROJECTIONPRODUCER_H
-
-#include "FairTask.h"
-#include "TClonesArray.h"
-#include "CbmRichRing.h"
-#include "FairTrackParam.h"
-#include "CbmStack.h"
-#include "TVector3.h"
-#include "TString.h"
-
+class TClonesArray;
 class CbmGeoRichPar;
+class TObjArray;
 
-class CbmRichProjectionProducer : public FairTask {
-
+/**
+* \class CbmRichProjectionProducer
+*
+* \brief Project track by straight line from imaginary plane
+* to the mirror and reflect it to the photodetector plane.
+*
+* \author P.Stolpovsky
+* \date 2005
+**/
+class CbmRichProjectionProducer
+{
 public:
 
-   /** Default constructor */
-   CbmRichProjectionProducer();
-
-   /** Standard constructor
-    *@param verbose Verbosity level
-    *@param zflag Flag whether to use point in imaginary plane (zflag=1) or mirror point (zflag=2) for extrapolation
+   /**
+    * \brief Standard constructor.
+    * \param[in] zflag Flag whether to use point in imaginary plane (zflag=1) or mirror point (zflag=2) for extrapolation.
     */
    CbmRichProjectionProducer(
-         Int_t verbose,
-         Int_t zflag);
+         int zflag);
 
-   /** Constructor with name and title. Puts default parameter values. */
-   CbmRichProjectionProducer(
-         const char *name,
-         const char *title);
-
-   /** Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmRichProjectionProducer();
 
-   /** Initialization of the task */
-   virtual InitStatus Init();
+   /**
+    * \brief Initialization of the task.
+    */
+   virtual void Init();
 
-   /**  Initialization  of Parameter Containers */
+   /**
+    * \brief Initialization  of Parameter Containers.
+    */
    virtual void SetParContainers();
 
-   /** Executed task */
-   virtual void Exec(
-         Option_t* option);
+   /**
+    * \brief Executed task.
+    */
+   virtual void DoProjection();
 
-   /** Finish task */
-   virtual void Finish();
+   /**
+    * \brief Set flag whether to use point in imaginary plane (zflag=1)
+    * or mirror point (zflag=2) for extrapolation.
+    * \param[in] flag Flag.
+    */
+   void SetZFlag(int flag) {fZflag = flag;}
 
 protected:
-
-   Int_t    fVerbose;// Verbosity level
-   Int_t    fZflag; // Flag for extrapolation
+   int fZflag; //Flag whether to use point in imaginary plane (zflag=1) or mirror point (zflag=2) for extrapolation.
 
 private:
-
    TClonesArray* fListRICHImPlanePoint; // Starting points&directions
-   TClonesArray* fListStack; // for checking workability
    TClonesArray* fProjectionTrackParam; // RICH projections as FairTrackParam
 
-   Int_t fNHits; // Number of hits
-   Int_t fEvent; // number of events
+   int fNHits; // Number of hits
+   int fEvent; // number of events
 
-  Double_t fDetX; // X-coordinate of photodetector
-  Double_t fDetY; // Y-coordinate of photodetector
-  Double_t fDetZ; // Z-coordinate of photodetector
-  Double_t fDetWidthX; // width of photodetector in x
-  Double_t fDetWidthY; // width of photodetector in y
-  Double_t fThetaDet; // tilting angle of photodetector (around x-axis)
-  Double_t fPhiDet; // tilting angle of photodetector (around y-axis)
+   double fDetX; // X-coordinate of photodetector
+   double fDetY; // Y-coordinate of photodetector
+   double fDetZ; // Z-coordinate of photodetector
+   double fDetWidthX; // width of photodetector in x
+   double fDetWidthY; // width of photodetector in y
+   double fThetaDet; // tilting angle of photodetector (around x-axis)
+   double fPhiDet; // tilting angle of photodetector (around y-axis)
   
-  Double_t fDetX_transf; // X-coordinate of photodetector (transformed system)
-  Double_t fDetY_transf; // Y-coordinate of photodetector (transformed system)
-  Double_t fDetZ_transf; // Z-coordinate of photodetector (transformed system)
+   double fDetX_transf; // X-coordinate of photodetector (transformed system)
+   double fDetY_transf; // Y-coordinate of photodetector (transformed system)
+   double fDetZ_transf; // Z-coordinate of photodetector (transformed system)
 
-  Double_t fZm; // Z-coordinate of mirror center
-  Double_t fYm; // Y-coordinate of mirror center
-  Double_t fXm; // X-coordinate of mirror center
-  Double_t fR; // mirror radius
-  Double_t fThetaM; // mirror tilting angle
-  Double_t fSPHE_theta; // theta angle for SPHE
-  Double_t fSPHE_phi; // phi angle for SPHE
+   double fZm; // Z-coordinate of mirror center
+   double fYm; // Y-coordinate of mirror center
+   double fXm; // X-coordinate of mirror center
+   double fR; // mirror radius
+   double fThetaM; // mirror tilting angle
+   double fSPHE_theta; // theta angle for SPHE
+   double fSPHE_phi; // phi angle for SPHE
   
-  Double_t fmax_x; // reasonable max x value for track extrapolation
-  Double_t fmax_y; // reasonable max y value for track extrapolation
+   double fmax_x; // reasonable max x value for track extrapolation
+   double fmax_y; // reasonable max y value for track extrapolation
 
-  TObjArray *fSensNodes;
-  TObjArray *fPassNodes;
-  CbmGeoRichPar *par;
-
-  /** Set the parameters to the default values. **/
-  void SetDefaultParameters();
+   TObjArray* fSensNodes;
+   TObjArray* fPassNodes;
+   CbmGeoRichPar* fPar;
 
   /**
    * \brief Copy constructor.
@@ -109,9 +108,6 @@ private:
    * \brief Assignment operator.
    */
   CbmRichProjectionProducer& operator=(const CbmRichProjectionProducer&);
-
-  ClassDef(CbmRichProjectionProducer,1)
-
 };
 
 #endif

@@ -5,7 +5,8 @@
 * operating on points in the RICH mirror!
 * It reads the STS track array, gets the corresponding MC MirrorPoint
 * and selects those to be projected to the Rich Photodetector
-* points will be stored on mirror surface again
+* points will be stored on mirror surface again.
+* WARNING!!!: ProjectionProducer needs to be run with zflag==2!!!
 *
 * \author Claudia Hoehne
 * \date 2006
@@ -14,10 +15,9 @@
 #ifndef CBM_RICH_TARCK_EXTRAPOLATION_MIRROR_IDEAL
 #define CBM_RICH_TARCK_EXTRAPOLATION_MIRROR_IDEAL
 
-#include "CbmRichTrackExtrapolation.h"
+#include "CbmRichTrackExtrapolationBase.h"
 
 class TClonesArray;
-class CbmGlobalTrack;
 
 /**
 * \class CbmRichTrackExtrapolationMirrorIdeal
@@ -26,12 +26,13 @@ class CbmGlobalTrack;
 * operating on points in the RICH mirror!
 * It reads the STS track array, gets the corresponding MC MirrorPoint
 * and selects those to be projected to the Rich Photodetector
-* points will be stored on mirror surface again
+* points will be stored on mirror surface again.
+* WARNING!!!: ProjectionProducer needs to be run with zflag==2!!!
 *
 * \author Claudia Hoehne
 * \date 2006
 **/
-class CbmRichTrackExtrapolationMirrorIdeal : public CbmRichTrackExtrapolation
+class CbmRichTrackExtrapolationMirrorIdeal : public CbmRichTrackExtrapolationBase
 {
 public:
 
@@ -46,27 +47,17 @@ public:
    virtual ~CbmRichTrackExtrapolationMirrorIdeal();
 
    /**
-   * \brief Initialisation.
-   */
+    * \brief Inherited from CbmRichTrackExtrapolationBase.
+    */
    virtual void Init();
 
    /**
-   * \brief Finish.
-   */
-   virtual void Finish();
-
-   /** Method DoExtrapolate.
-   ** Task: Read the track array and fill the point array in RICH mirror
-   ** pointers to which are given as argument
-   **
-   *@param rTrackArray  Array of tracks
-   *@param rTrackParamArray  Array of FairTrackParam
-   *@value Number of tracks extrapolated
-   **/
-   virtual Int_t DoExtrapolate(
-        TClonesArray* gTrackArray,
-        Double_t fZ,
-        TClonesArray *fTrackParamArray);
+    * \brief Inherited from CbmRichTrackExtrapolationBase.
+    */
+   virtual void DoExtrapolation(
+         TClonesArray* globalTracks,
+         TClonesArray* extrapolatedTrackParams,
+         double z);
 
 private:
   TClonesArray* fRichMirrorPoints;
@@ -74,7 +65,7 @@ private:
   TClonesArray* fSTSArray;
   TClonesArray* fTrackMatchArray;
 
-  Int_t fMinNofStsHits; // number of STS hits required for extrapolated track
+  int fMinNofStsHits; // number of STS hits required for extrapolated track
 
   /**
    * \brief Copy constructor.
@@ -85,8 +76,6 @@ private:
    * \brief Assignment operator.
    */
   CbmRichTrackExtrapolationMirrorIdeal& operator=(const CbmRichTrackExtrapolationMirrorIdeal&);
-
-  ClassDef(CbmRichTrackExtrapolationMirrorIdeal,1);
 
 };
 

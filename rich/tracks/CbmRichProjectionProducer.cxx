@@ -1,14 +1,12 @@
-// -------------------------------------------------------------------------
-// -----              CbmRichProjectionProducer source file            -----
-// -----   Created 23/06/05  by P.Stolpovsky(P.Stolpovsky at gsi.de)   -----
-// ----- Project track by strate line from imagiry plane to the mirror -----
-// -----           and reflect it to the photodetector plane           -----
-// -------------------------------------------------------------------------
+/**
+* \file CbmRichProjectionProducer.cxx
+*
+* \author P.Stolpovsky
+* \date 2005
+**/
 
 #include "CbmRichProjectionProducer.h"
 #include "CbmRichHitProducer.h"
-#include "CbmRichRing.h"
-#include "CbmRichPoint.h"
 
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
@@ -21,12 +19,8 @@
 #include "FairGeoVector.h"
 #include "FairRunAna.h"
 
-#include "TObjArray.h"
 #include "TVector3.h"
-#include "TLorentzVector.h"
-#include "TRandom.h"
-#include "TFormula.h"
-#include "TMath.h"
+#include "TClonesArray.h"
 
 #include <iostream>
 
@@ -34,88 +28,50 @@ using std::cout;
 using std::endl;
 
 
-// -----   Default constructor   -------------------------------------------
-CbmRichProjectionProducer::CbmRichProjectionProducer() :
-FairTask("RichProjectionProducer")
+CbmRichProjectionProducer::CbmRichProjectionProducer(
+      Int_t zflag):
+   fZflag(zflag)
 {
-SetDefaultParameters();
-}
-// -------------------------------------------------------------------------
-
-// -----   Standard constructor   -------------------------------------------
-CbmRichProjectionProducer::CbmRichProjectionProducer(Int_t verbose, Int_t zflag)
-  :FairTask("RichProjectionProducer")
-{
-fVerbose = verbose;
-fZflag = zflag;     // 1 - use imaginary plane; 2 - use mirror point for extrapolation
 }
 
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-/** Constructor with name and title */
-CbmRichProjectionProducer::CbmRichProjectionProducer(const char *name,
-					             const char *title)
-  : FairTask(name) {}
-// -------------------------------------------------------------------------
-
-
-// -----   Destructor   ----------------------------------------------------
 CbmRichProjectionProducer::~CbmRichProjectionProducer()
 {
-  FairRootManager *fManager =FairRootManager::Instance();
-  fManager->Write();
+   FairRootManager *fManager =FairRootManager::Instance();
+   fManager->Write();
 }
-// -------------------------------------------------------------------------
 
-// -------------------------------------------------------------------------
-/** Private method SetDefaultParameters */
-void CbmRichProjectionProducer::SetDefaultParameters() {
-  fVerbose  = 1;
-  fZflag = 1;
-}
-// -------------------------------------------------------------------------
-
-
-//-----   Initialization  of Parameter Containers -------------------------
 void CbmRichProjectionProducer::SetParContainers()
 {
+   FairRunAna* sim = FairRunAna::Instance();
+   FairRuntimeDb* rtdb=sim->GetRuntimeDb();
+   fPar = (CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+}
 
-  FairRunAna* sim = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=sim->GetRuntimeDb();
-  par=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
-
-  }
-
-// -----   Initialization   ------------------------------------------------
-InitStatus CbmRichProjectionProducer::Init()
+void CbmRichProjectionProducer::Init()
 {
-  FairRootManager* fManager = FairRootManager::Instance();
+   FairRootManager* fManager = FairRootManager::Instance();
 
-  fSensNodes = par->GetGeoSensitiveNodes();
-  fPassNodes = par->GetGeoPassiveNodes();
-//  par->printParams();
-//  fSensNodes->Dump();
-//  fPassNodes->Dump();
+   fSensNodes = fPar->GetGeoSensitiveNodes();
+   fPassNodes = fPar->GetGeoPassiveNodes();
 
-  // get detector position:
-  FairGeoNode *det= (FairGeoNode *) fSensNodes->FindObject("rich1d#1");
-  FairGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
-  FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
-  FairGeoTransform detCen=det->getCenterPosition();  // center in Detector system
-  FairGeoVector detPosCen=detCen.getTranslation();
-  fDetZ = detPosLab.Z() + detPosCen.Z();   /** z coordinate of photodetector (Labsystem, cm) */
-  fDetY = detPosLab.Y() + detPosCen.Y();   /** y coordinate of photodetector (Labsystem, cm) */
-  fDetX = detPosLab.X() + detPosCen.X();   /** x coordinate of photodetector (Labsystem, cm) */
+   // get detector position:
+   FairGeoNode *det= (FairGeoNode *) fSensNodes->FindObject("rich1d#1");
+   FairGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
+   FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
+   FairGeoTransform detCen=det->getCenterPosition();  // center in Detector system
+   FairGeoVector detPosCen=detCen.getTranslation();
+   fDetZ = detPosLab.Z() + detPosCen.Z(); // z coordinate of photodetector (Labsystem, cm)
+   fDetY = detPosLab.Y() + detPosCen.Y(); // y coordinate of photodetector (Labsystem, cm)
+   fDetX = detPosLab.X() + detPosCen.X(); // x coordinate of photodetector (Labsystem, cm)
 
-  TArrayD *fdetA=det->getParameters();  // get other geometry parameters: width in x, width in y, thickness
-  fDetWidthX = fdetA->At(0);
-  fDetWidthY = fdetA->At(1);
+   TArrayD *fdetA=det->getParameters();
+   fDetWidthX = fdetA->At(0);
+   fDetWidthY = fdetA->At(1);
 //  for(Int_t i=0;i<fdetA->GetSize();i++) cout << "Array detector " << fdetA->At(i)<< endl;
-  // detector might be rotated by theta around x-axis:
-  FairGeoRotation fdetR=detTr->getRotMatrix();
+   // detector might be rotated by theta around x-axis:
+   FairGeoRotation fdetR=detTr->getRotMatrix();
 
-  // possible tilting around x-axis (theta) and y-axis (phi)
+   // possible tilting around x-axis (theta) and y-axis (phi)
    // fdetR(0) = cos(phi)
    // fdetR(1) = 0
    // fdetR(2) = -sin(phi)
@@ -126,97 +82,73 @@ InitStatus CbmRichProjectionProducer::Init()
    // fdetR(7) = sin(theta)
    // fdetR(8) = cos(theta)cos(phi)
    
-  // theta = tilting angle around x-axis
-  fThetaDet = TMath::ASin(fdetR(7));
-  // phi = tilting angle around y-axis
-  fPhiDet = -1.*TMath::ASin(fdetR(2));
+   // theta = tilting angle around x-axis
+   fThetaDet = TMath::ASin(fdetR(7));
+   // phi = tilting angle around y-axis
+   fPhiDet = -1.*TMath::ASin(fdetR(2));
 
-
-  if (fVerbose) {
-    cout << "---------------------- RICH Projection Producer ---------------------------------------" << endl;
-    cout << "   detector position in (x,y,z): " << fDetX << "  " << fDetY << "  " << fDetZ << endl;
-    cout << "   detector size in x and y: " << fDetWidthX << "  " << fDetWidthY << endl;
-    cout << "   detector tilting angle (around x): " << fThetaDet*180./TMath::Pi() << " degrees" << endl;
-    cout << "   detector tilting angle (around y): " << fPhiDet*180./TMath::Pi() << " degrees" << endl;
-  }
+   cout << "---------------------- RICH Projection Producer ---------------------------------------" << endl;
+   cout << "   detector position in (x,y,z): " << fDetX << "  " << fDetY << "  " << fDetZ << endl;
+   cout << "   detector size in x and y: " << fDetWidthX << "  " << fDetWidthY << endl;
+   cout << "   detector tilting angle (around x): " << fThetaDet*180./TMath::Pi() << " degrees" << endl;
+   cout << "   detector tilting angle (around y): " << fPhiDet*180./TMath::Pi() << " degrees" << endl;
   
-    // transform nominal detector position (for tilted photodetector):
-    // shift x back by fDetZ_org*TMath::Sin(phi) in order to avoid overlap
-    fDetX_transf = fDetX*TMath::Cos(fPhiDet)+fDetZ*TMath::Sin(fPhiDet)-fDetZ*TMath::Sin(fPhiDet);
-    fDetY_transf = -fDetX*TMath::Sin(fThetaDet)*TMath::Sin(fPhiDet) + fDetY*TMath::Cos(fThetaDet) + fDetZ*TMath::Sin(fThetaDet)*TMath::Cos(fPhiDet);
-    fDetZ_transf = -fDetX*TMath::Cos(fThetaDet)*TMath::Sin(fPhiDet) - fDetY*TMath::Sin(fThetaDet) + fDetZ*TMath::Cos(fThetaDet)*TMath::Cos(fPhiDet);
+   // transform nominal detector position (for tilted photodetector):
+   // shift x back by fDetZ_org*TMath::Sin(phi) in order to avoid overlap
+   fDetX_transf = fDetX*TMath::Cos(fPhiDet)+fDetZ*TMath::Sin(fPhiDet)-fDetZ*TMath::Sin(fPhiDet);
+   fDetY_transf = -fDetX*TMath::Sin(fThetaDet)*TMath::Sin(fPhiDet) + fDetY*TMath::Cos(fThetaDet) + fDetZ*TMath::Sin(fThetaDet)*TMath::Cos(fPhiDet);
+   fDetZ_transf = -fDetX*TMath::Cos(fThetaDet)*TMath::Sin(fPhiDet) - fDetY*TMath::Sin(fThetaDet) + fDetZ*TMath::Cos(fThetaDet)*TMath::Cos(fPhiDet);
   
+   // get mirror position:
+   //FairGeoNode *mir= (FairGeoNode *) fPassNodes->FindObject("rich1mgl#1");
+   FairGeoNode *mir= (FairGeoNode *) fSensNodes->FindObject("rich1mgl#1");
+   FairGeoTransform* mirTr=mir->getLabTransform();  // position of mirror center in labsystem
+   FairGeoVector mirPosLab=mirTr->getTranslation(); // ... in cm
+   fZm = mirPosLab.Z();
+   fYm = mirPosLab.Y();
+   fXm = mirPosLab.X();
 
-  // get mirror position:
-  //FairGeoNode *mir= (FairGeoNode *) fPassNodes->FindObject("rich1mgl#1");
-  FairGeoNode *mir= (FairGeoNode *) fSensNodes->FindObject("rich1mgl#1");
-  FairGeoTransform* mirTr=mir->getLabTransform();  // position of mirror center in labsystem
-  FairGeoVector mirPosLab=mirTr->getTranslation(); // ... in cm
-  fZm = mirPosLab.Z();
-  fYm = mirPosLab.Y();
-  fXm = mirPosLab.X();
-
-  TArrayD *fmirA=mir->getParameters();  // get other geometry parameters: radius,
-  fR = fmirA->At(0);                    // mirror radius
-  fSPHE_theta = TMath::Abs(90. - fmirA->At(2));   // opening angle for SPHERE in theta (90 degree +- theta)
-  fSPHE_phi = TMath::Abs(90. - fmirA->At(4));   // opening angle for SPHERE in phi (90 degree +- phi)
-  // from that calculate (with safety factor 1.3) maximum x-y positions for track extrapolation:
-  fmax_x = 1.3*(fR*TMath::Tan(fSPHE_phi*TMath::Pi()/180.));
-  fmax_y = 1.3*(TMath::Abs(fYm) + fR*TMath::Tan(fSPHE_theta*TMath::Pi()/180.));
-  if (fVerbose) for(Int_t i=0;i<fmirA->GetSize();i++) cout << "Array mirror " << fmirA->At(i) << endl;
+   TArrayD *fmirA=mir->getParameters();  // get other geometry parameters: radius,
+   fR = fmirA->At(0);                    // mirror radius
+   fSPHE_theta = TMath::Abs(90. - fmirA->At(2));   // opening angle for SPHERE in theta (90 degree +- theta)
+   fSPHE_phi = TMath::Abs(90. - fmirA->At(4));   // opening angle for SPHERE in phi (90 degree +- phi)
+   // from that calculate (with safety factor 1.3) maximum x-y positions for track extrapolation:
+   fmax_x = 1.3*(fR*TMath::Tan(fSPHE_phi*TMath::Pi()/180.));
+   fmax_y = 1.3*(TMath::Abs(fYm) + fR*TMath::Tan(fSPHE_theta*TMath::Pi()/180.));
   
-  // mirror might be rotated by theta around x-axis:
-  FairGeoRotation fmirR=mirTr->getRotMatrix();
-  fThetaM = -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2 ;
-  if (fVerbose) {
-    cout << "Rotation matrix of mirror" << endl;
-    for (Int_t i=0;i<9;i++) cout << "Rot(" << i << ") = " << fmirR(i) << endl;
-    }
-  // note that mirror is by default tilted by 90 degrees in order to get the necessary shape in GEANT
-  // the "extra" tilting angle is then: fThetaM =  -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2.
+   // mirror might be rotated by theta around x-axis:
+   FairGeoRotation fmirR=mirTr->getRotMatrix();
+   fThetaM = -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2 ;
 
-  if (fVerbose){
-    cout << "   mirror center (x,y,z): " << fXm << "  " << fYm << "  " << fZm << endl;
-    cout << "   mirror radius: " << fR << endl;
-    cout << "   mirror tilting angle: " << fThetaM*180./TMath::Pi() << " degrees" << endl;
-    cout << "   maximum x-y positions for track extrapolation: " << fmax_x << " " << fmax_y << endl;
-    }
+   // note that mirror is by default tilted by 90 degrees in order to get the necessary shape in GEANT
+   // the "extra" tilting angle is then: fThetaM =  -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2.
+   cout << "Mirror center (x,y,z): " << fXm << " " << fYm << " " << fZm << endl;
+   cout << "Mirror radius: " << fR << endl;
+   cout << "Mirror tilting angle: " << fThetaM*180./TMath::Pi() << " degrees" << endl;
+   cout << "Maximum x-y positions for track extrapolation: " << fmax_x << " " << fmax_y << endl;
 
-  fEvent = 0;
+   fEvent = 0;
 
+   fListRICHImPlanePoint = (TClonesArray*)fManager->GetObject("RichTrackParamZ");
+   if (fZflag == 1) cout << "   use tracks in imaginary plane for projection to photodetector plane" << endl;
+   if (fZflag == 2) cout << "   use tracks in RICH mirror for projection to photodetector plane" << endl;
+   if ( ! fListRICHImPlanePoint) {
+      cout << "-W- CbmRichProjectionProducer::Init: No Rich Z-Point array!" << endl;
+	}
 
-  fListRICHImPlanePoint = (TClonesArray*)fManager->GetObject("RichTrackParamZ"); // imaginary plane in Rich detector for track extrapolation
-  if (fVerbose && fZflag == 1) cout << "   use tracks in imaginary plane for projection to photodetector plane" << endl;
-  if (fVerbose && fZflag == 2) cout << "   use tracks in RICH mirror for projection to photodetector plane" << endl;
-  cout << "--------------------------------------------------------------------------------" << endl;
-  
-  if ( ! fListRICHImPlanePoint) {
-    cout << "-W- CbmRichProjectionProducer::Init: No Rich Z-Point array!"
-	 << endl;
-	 }
-
-
-  fListStack = (TClonesArray*)fManager->GetObject("MCTrack"); //   for checking workability
-
-  fProjectionTrackParam = new TClonesArray("FairTrackParam"); // coordinates of projected tracks to photodetectors plane
-  fManager->Register("RichProjection","RICH",fProjectionTrackParam, kTRUE);
-
-
-  return kSUCCESS;
+   fProjectionTrackParam = new TClonesArray("FairTrackParam");
+   fManager->Register("RichProjection","RICH",fProjectionTrackParam, kTRUE);
 }
-// -------------------------------------------------------------------------
 
-// -----   Execution of Task   ---------------------------------------------
-void CbmRichProjectionProducer::Exec(Option_t* option)
+void CbmRichProjectionProducer::DoProjection()
 {
    fEvent++;
-   printf("\n\n=====> Event no. %d\n",fEvent);
+   cout << "CbmRichProjectionProducer: event " << fEvent << endl;
 
    fProjectionTrackParam->Clear();
 
    FairTrackParam* point=NULL;
- 
-   // some default variables
+
    TMatrixFSym covMat(5);
    for(Int_t i = 0; i < 5; i++){
       for(Int_t j=0; j<=i; j++){
@@ -232,16 +164,10 @@ void CbmRichProjectionProducer::Exec(Option_t* option)
    Double_t normP2,RxP,dist;
    Double_t crossPx,crossPy,crossPz;
   
-  if (fVerbose > 1) cout << "Number of tracks in Imaginary z-Plane: " << fListRICHImPlanePoint->GetEntriesFast() << endl;
-
   for(Int_t j=0; j<fListRICHImPlanePoint->GetEntriesFast(); j++) {
      point = (FairTrackParam*)fListRICHImPlanePoint->At(j);
      new((*fProjectionTrackParam)[j]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
     
-     if (fVerbose > 1) cout << "Data in Imaginary z-Plane: " <<  j << " " <<
-        point->GetX() << " " << point->GetY() << " " << point->GetZ() << " " <<
-        point->GetTx() << " " << point->GetTy() << " " << point->GetQp() << endl;
-
      // check if Array was filled
      if (point->GetX() == 0 && point->GetY() == 0 && point->GetZ() == 0 &&
            point->GetTx() == 0 && point->GetTy() ==0) continue;
@@ -249,8 +175,8 @@ void CbmRichProjectionProducer::Exec(Option_t* option)
     
      // check that x and y value make sense (sometimes strange extrapolations may appear)
      if (TMath::Abs(point->GetX()) > fmax_x || TMath::Abs(point->GetY()) > fmax_y){
-        if (fVerbose) cout << " -W- RichProjectionProducer: strange (x,y) values for track extrapolation: " <<
-              point->GetX() << " " << point->GetY() << endl;
+        cout << " -W- RichProjectionProducer: strange (x,y) values for track extrapolation: " <<
+             point->GetX() << " " << point->GetY() << endl;
 		      continue;
      }
 
@@ -278,9 +204,6 @@ void CbmRichProjectionProducer::Exec(Option_t* option)
         momP.SetXYZ(px,py,pz);
         point->Position(startP);
         if ((fYm*startP.y())<0) fYm = -fYm; // check that mirror center and startP are in same hemisphere
-      
-        if (fVerbose > 1) cout << " --> position: " << startP.x() << " " << startP.y() << " " << startP.z() << endl;
-        if (fVerbose > 1) cout << " --> momentum: " << momP.x() << " " << momP.y() << " " << momP.z() << endl;
 
         // calculation of intersection of track with selected mirror
         // corresponds to calculation of intersection between a straight line and a sphere:
@@ -290,7 +213,6 @@ void CbmRichProjectionProducer::Exec(Option_t* option)
         // dist = r^2 - fR^2
         // -> rho1 = (-RxP+sqrt(RxP^2-normP2*dist))/normP2  extrapolation factor for:
         // intersection point crossP = startP + rho1 * momP
-
         RxP=(momP.x()*(startP.x()-fXm)+momP.y()*(startP.y()-fYm)+momP.z()*(startP.z()-fZm));
         normP2=(momP.x()*momP.x()+momP.y()*momP.y()+momP.z()*momP.z());
         dist=(startP.x()*startP.x()+fXm*fXm+startP.y()*startP.y()+fYm*fYm+startP.z()*startP.z()+fZm*fZm-2*startP.x()*fXm-2*startP.y()*fYm-2*startP.z()*fZm-fR*fR);
@@ -413,7 +335,6 @@ void CbmRichProjectionProducer::Exec(Option_t* option)
            zZ = crossP.z() + refZ * rho2;
         }
       
-      
         // Transform intersection point in same way as MCPoints were
         // transformed in HitProducer before stored as Hit:
          TVector3 inPos(xX, yY, zZ);
@@ -426,24 +347,10 @@ void CbmRichProjectionProducer::Exec(Option_t* option)
         //check that crosspoint inside the plane
         if( xDet > (-fDetX-fDetWidthX) && xDet < (fDetX+fDetWidthX)){
            if(TMath::Abs(yDet) > (fDetY_transf-fDetWidthY) && TMath::Abs(yDet) < (fDetY_transf+fDetWidthY)){
-	   
-              FairTrackParam richtrack(xDet,yDet,zDet,0.,0.,0.,covMat);
+	                 FairTrackParam richtrack(xDet,yDet,zDet,0.,0.,0.,covMat);
               * (FairTrackParam*)(fProjectionTrackParam->At(j)) = richtrack;
-
-              if (fVerbose > 1) cout << "-I- RichProjectionProducer: track extrapolated to photodetector plane: iTrack "
-	                           << j << endl;
-
            }
         }
      }// if (refZ!=0.)
   }// j
 }
-
-void CbmRichProjectionProducer::Finish()
-{
-  fProjectionTrackParam->Clear();
-  fListRICHImPlanePoint->Clear();
-  fListStack->Clear();
-}
-
-ClassImp(CbmRichProjectionProducer)

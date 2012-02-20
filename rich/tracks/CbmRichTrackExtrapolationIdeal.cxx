@@ -54,19 +54,19 @@ void CbmRichTrackExtrapolationIdeal::Init()
   if ( NULL == fStsTrackMatches) { Fatal("CbmRichTrackExtrapolationIdeal::Init", "No StsTrackMatch array!");}
 }
 
-Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(
-      TClonesArray *gTrackArray,
-      Double_t z,
-      TClonesArray *trackParamArray)
+void CbmRichTrackExtrapolationIdeal::DoExtrapolation(
+      TClonesArray* globalTracks,
+      TClonesArray* extrapolatedTrackParams,
+      double z)
 {
-   if ( NULL == trackParamArray ) {
+   if ( NULL == extrapolatedTrackParams ) {
       cout << "-E- CbmRichTrackExtrapolationIdeal::DoExtrapolate: TrackParam Array missing!" << endl;
-      return -1;
+      return;
    }
 
-   if ( NULL == gTrackArray ) {
+   if ( NULL == globalTracks ) {
       cout << "-E- CbmRichTrackExtrapolationIdeal::DoExtrapolate: Global Track Array missing! " << endl;
-      return -1;
+      return;
    }
 
    // some default variables
@@ -77,10 +77,10 @@ Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(
    covMat(0,0) = covMat(1,1) = covMat(2,2) = covMat(3,3) = covMat(4,4) = 1.e-4;
 
    TVector3 pos, mom;
-   Int_t nTracks = gTrackArray->GetEntriesFast();
+   Int_t nTracks = globalTracks->GetEntriesFast();
    for (Int_t iTrack=0; iTrack < nTracks; iTrack++){
-      CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-      new((*trackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
+      CbmGlobalTrack* gTrack = (CbmGlobalTrack*) globalTracks->At(iTrack);
+      new((*extrapolatedTrackParams)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
       Int_t idSTS = gTrack->GetStsTrackIndex();
       if (idSTS < 0 ) continue;
       CbmStsTrack* pSTStr = (CbmStsTrack*) fStsTracks->At(idSTS);
@@ -100,17 +100,9 @@ Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(
                ty = mom.Py()/mom.Pz();
                qp = charge/mom.Mag();
                FairTrackParam richtrack(pos.X(),pos.Y(),pos.Z(),tx,ty,qp,covMat);
-               *(FairTrackParam*)(trackParamArray->At(iTrack)) = richtrack;
+               *(FairTrackParam*)(extrapolatedTrackParams->At(iTrack)) = richtrack;
             }  // select MCPoint to that track
          }  // loop MCPoints
      }  // require fMinNsts
    } // loop tracks
-   return nTracks;
 }
-
-void CbmRichTrackExtrapolationIdeal::Finish()
-{
-
-}
-
-ClassImp(CbmRichTrackExtrapolationIdeal)

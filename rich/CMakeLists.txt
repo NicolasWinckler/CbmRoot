@@ -22,6 +22,8 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/littrack
+${CBMROOT_SOURCE_DIR}/KF
+${CBMROOT_SOURCE_DIR}/KF/Interface
 #/u/slebedev/Baykal/tbb21_017oss/include
 #/u/andrey/soft/tbb/tbb22_009oss/include
 )
@@ -71,12 +73,12 @@ fitter/CbmRichRingFitterTAU.cxx
 fitter/CbmRichRingFitterEllipseMinuit.cxx
 fitter/CbmRichRingFitterEllipseTau.cxx
 tracks/CbmRichProjectionProducer.cxx 
-tracks/CbmRichTrackExtrapolationIdeal.cxx
-tracks/CbmRichTrackExtrapolationMirrorIdeal.cxx
-tracks/CbmRichExtrapolateTracks.cxx
 tracks/CbmRichRingTrackAssignClosestD.cxx
 tracks/CbmRichRingTrackAssignIdeal.cxx  
 tracks/CbmRichAssignTrack.cxx
+tracks/CbmRichTrackExtrapolationIdeal.cxx
+tracks/CbmRichTrackExtrapolationKF.cxx
+tracks/CbmRichTrackExtrapolationMirrorIdeal.cxx
 qa/CbmRichTestSim.cxx  
 qa/CbmRichTestHits.cxx 
 qa/CbmRichGeoTest.cxx 
@@ -112,9 +114,6 @@ CbmRichTrainAnnElectrons.h
 CbmRichReconstruction.h
 finder/CbmRichRingFinderIdeal.h
 tracks/CbmRichProjectionProducer.h
-tracks/CbmRichTrackExtrapolationIdeal.h
-tracks/CbmRichTrackExtrapolationMirrorIdeal.h
-tracks/CbmRichExtrapolateTracks.h
 tracks/CbmRichRingTrackAssignClosestD.h
 tracks/CbmRichRingTrackAssignIdeal.h 
 tracks/CbmRichAssignTrack.h

@@ -17,6 +17,8 @@
 class TClonesArray;
 class CbmRichRingFinder;
 class CbmRichRingFitterBase;
+class CbmRichTrackExtrapolationBase;
+class CbmRichProjectionProducer;
 
 using std::string;
 
@@ -40,6 +42,11 @@ public:
     * \brief Destructor.
     */
    virtual ~CbmRichReconstruction();
+
+   /**
+    * \brief Inherited from FairTask.
+    */
+   void SetParContainers();
 
    /**
     * \brief Inherited from FairTask.
@@ -69,14 +76,19 @@ public:
    void SetFitterName(const string& n){fFitterName = n;}
    void SetTrackMatchName(const string& n){fTrackMatchName = n;}
 
+   void SetZTrackExtrapolation(Double_t z){fZTrackExtrapolation = z;}
+
 private:
    TClonesArray* fRichHits;
    TClonesArray* fRichRings;
    TClonesArray* fRichProjections;
- //  TClonesArray* fRichRingMatches;
+   TClonesArray* fRichTrackParamZ;
+   TClonesArray* fGlobalTracks;
 
    CbmRichRingFinder* fRingFinder; // pointer to ring finder algorithm
    CbmRichRingFitterBase* fRingFitter; // pointer to ring fitting algorithm
+   CbmRichTrackExtrapolationBase* fTrackExtrapolation; // pointer to track extrapolation algorithm
+   CbmRichProjectionProducer* fProjectionProducer;
 
    // What do you wan to run.
    bool fRunExtrapolation;
@@ -91,6 +103,8 @@ private:
    string fFinderName; // name of ring finder algorithm
    string fFitterName; // name of ring fitter algorithm
    string fTrackMatchName; // name of track-ring matching algorithm
+
+   Double_t fZTrackExtrapolation; // Z coordinate to which one wants to extrapolate STS tracks
 
    /**
     * \brief

@@ -8,6 +8,13 @@
 #include "CbmRichReconstruction.h"
 #include "CbmRichRing.h"
 
+#include "CbmRichProjectionProducer.h"
+
+#include "CbmRichTrackExtrapolationBase.h"
+#include "CbmRichTrackExtrapolationIdeal.h"
+#include "CbmRichTrackExtrapolationMirrorIdeal.h"
+#include "CbmRichTrackExtrapolationKF.h"
+
 #include "CbmRichRingFinderHough.h"
 #include "CbmRichRingFinderIdeal.h"
 
@@ -30,33 +37,45 @@ using std::endl;
 
 CbmRichReconstruction::CbmRichReconstruction()
 : FairTask("CbmRichReconstruction"),
-fRichHits(NULL),
-fRichRings(NULL),
-fRichProjections(NULL),
-//fRichRingMatches(NULL),
+   fRichHits(NULL),
+   fRichRings(NULL),
+   fRichProjections(NULL),
+   fRichTrackParamZ(NULL),
+   fGlobalTracks(NULL),
 
-fRingFinder(NULL),
-fRingFitter(NULL),
+   fRingFinder(NULL),
+   fRingFitter(NULL),
+   fTrackExtrapolation(NULL),
+   fProjectionProducer(NULL),
 
-fRunExtrapolation(true),
-fRunProjection(true),
-fRunFinder(true),
-fRunFitter(true),
-fRunTrackMatch(true),
+   fRunExtrapolation(true),
+   fRunProjection(true),
+   fRunFinder(true),
+   fRunFitter(true),
+   fRunTrackMatch(true),
 
-fExtrapolationName(""),
-fProjectionName(""),
-fFinderName("hough"),
-fFitterName("ellipse_tau"),
-fTrackMatchName("")
+   fExtrapolationName("kf"),
+   fProjectionName(""),
+   fFinderName("hough"),
+   fFitterName("ellipse_tau"),
+   fTrackMatchName(""),
+
+   fZTrackExtrapolation(300.)
 {
-
+   fProjectionProducer = new CbmRichProjectionProducer(1);
 }
 
 CbmRichReconstruction::~CbmRichReconstruction()
 {
    if (NULL != fRingFinder) delete fRingFinder;
    if (NULL != fRingFitter) delete fRingFitter;
+   if (NULL != fTrackExtrapolation) delete fTrackExtrapolation;
+   if (NULL != fProjectionProducer) delete fProjectionProducer;
+}
+
+void CbmRichReconstruction::SetParContainers()
+{
+   fProjectionProducer->SetParContainers();
 }
 
 InitStatus CbmRichReconstruction::Init()
@@ -65,13 +84,19 @@ InitStatus CbmRichReconstruction::Init()
    FairRootManager* ioman = FairRootManager::Instance();
    if (NULL == ioman) { Fatal("CbmRichReconstruction::Init","RootManager not instantised!"); }
 
+   fRichTrackParamZ = new TClonesArray("FairTrackParam",100);
+   ioman->Register("RichTrackParamZ", "RICH", fRichTrackParamZ, kFALSE);
+
+   fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
+   if ( NULL == fGlobalTracks) { Fatal("CbmRichReconstruction::Init", "No GlobalTrack array!");}
+
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
    if ( NULL == fRichHits) { Fatal("CbmRichReconstruction::Init","No RichHit array!"); }
 
   // fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
   // if ( NULL == fRichRingMatches) { Fatal("CbmRichReconstruction::Init","No RichRingMatch array!"); }
 
-   fRichProjections = (TClonesArray*) ioman->GetObject("RichProjection");
+   //fRichProjections = (TClonesArray*) ioman->GetObject("RichProjection");
    //if (NULL == fRichProjections) { Fatal("CbmRichReconstruction::Init","No RichProjection array!"); }
 
    // fRichProjections = new TClonesArray("RichProjection", 600);
@@ -92,21 +117,29 @@ InitStatus CbmRichReconstruction::Init()
 void CbmRichReconstruction::Exec(
       Option_t* opt)
 {
-   RunExtrapolation();
-   RunProjection();
-   RunFinder();
-   RunFitter();
-   RunTrackMatch();
+   if (fRunExtrapolation) RunExtrapolation();
+   if (fRunProjection) RunProjection();
+   if (fRunFinder) RunFinder();
+   if (fRunFitter) RunFitter();
+   if (fRunTrackMatch) RunTrackMatch();
 }
 
 void CbmRichReconstruction::InitExtrapolation()
 {
-
+   if (fExtrapolationName == "ideal"){
+      fTrackExtrapolation = new CbmRichTrackExtrapolationIdeal();
+   } else if (fExtrapolationName == "mirror_ideal"){
+      fTrackExtrapolation = new CbmRichTrackExtrapolationMirrorIdeal();
+      fProjectionProducer->SetZFlag(2);
+   } else if (fExtrapolationName == "kf" || fExtrapolationName == "KF"){
+      fTrackExtrapolation = new CbmRichTrackExtrapolationKF();
+   }
+   fTrackExtrapolation->Init();
 }
 
 void CbmRichReconstruction::InitProjection()
 {
-
+   fProjectionProducer->Init();
 }
 
 void CbmRichReconstruction::InitFinder()
@@ -148,12 +181,13 @@ void CbmRichReconstruction::InitTrackMatch()
 
 void CbmRichReconstruction::RunExtrapolation()
 {
-
+   fRichTrackParamZ->Clear();
+   fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ, fZTrackExtrapolation);
 }
 
 void CbmRichReconstruction::RunProjection()
 {
-
+   fProjectionProducer->DoProjection();
 }
 
 void CbmRichReconstruction::RunFinder()

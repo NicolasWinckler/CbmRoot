@@ -54,25 +54,21 @@ void CbmRichTrackExtrapolationMirrorIdeal::Init()
 
    fTrackMatchArray = (TClonesArray*) ioman->GetObject("StsTrackMatch");
    if ( NULL == fTrackMatchArray) {Fatal("CbmRichTrackExtrapolationMirrorIdeal::Init", "No StsTrackMatch array!");}
-
-   cout << "---------------------- RICH Track Extrapolation Mirror Ideal ---------------------------------------" << endl;
-   cout <<"-W- RichMirror Point selected for extrapolation --> ProjectionProducer needs to be run with zflag==2!!!" << endl;
-   cout << "----------------------------------------------------------------------------------------------------" << endl;
 }
 
-Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(
-      TClonesArray *gTrackArray,
-		Double_t z,
-		TClonesArray *trackParamArray)
+void CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolation(
+      TClonesArray* globalTracks,
+      TClonesArray* extrapolatedTrackParams,
+      double z)
 {
-   if ( NULL == trackParamArray ) {
+   if ( NULL == extrapolatedTrackParams ) {
       cout << "-E- CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate: TrackParam Array missing!" << endl;
-      return -1;
+      return;
    }
 
-   if ( NULL == gTrackArray ) {
+   if ( NULL == globalTracks ) {
       cout << "-E- CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate: Global Track Array missing!" << endl;
-      return -1;
+      return;
    }
 
    Double_t tx,ty,qp;
@@ -82,10 +78,10 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(
    covMat(0,0) = covMat(1,1) = covMat(2,2) = covMat(3,3) = covMat(4,4) = 1.e-4;
 
    TVector3 pos, mom;
-   Int_t nTracks = gTrackArray->GetEntriesFast();
+   Int_t nTracks = globalTracks->GetEntriesFast();
    for (Int_t iTrack=0; iTrack < nTracks; iTrack++){
-      CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-      new((*trackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
+      CbmGlobalTrack* gTrack = (CbmGlobalTrack*) globalTracks->At(iTrack);
+      new((*extrapolatedTrackParams)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
       Int_t idSTS = gTrack->GetStsTrackIndex();
 
       if (idSTS < 0 ) continue;
@@ -105,16 +101,9 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(
                ty = mom.Py()/mom.Pz();
                qp = charge/mom.Mag();
                FairTrackParam richtrack(pos.X(),pos.Y(),pos.Z(),tx,ty,qp,covMat);
-               *(FairTrackParam*)(trackParamArray->At(iTrack)) = richtrack;
+               *(FairTrackParam*)(extrapolatedTrackParams->At(iTrack)) = richtrack;
             }
          }
       }
    }
-   return nTracks;
 }
-
-void CbmRichTrackExtrapolationMirrorIdeal::Finish()
-{
-}
-
-ClassImp(CbmRichTrackExtrapolationMirrorIdeal)

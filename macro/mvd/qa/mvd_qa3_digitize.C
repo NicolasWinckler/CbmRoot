@@ -61,15 +61,15 @@
     gSystem->Load("libParBase");
     gSystem->Load("libBase");
     gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
+    gSystem->Load("libCbmData");
     gSystem->Load("libField");
     gSystem->Load("libGen");
     gSystem->Load("libPassive");
     gSystem->Load("libMvd");
     gSystem->Load("libSts");
-    gSystem->Load("libRich");
+//    gSystem->Load("libRich");
     gSystem->Load("libTrd");
-    gSystem->Load("libTof");
+//    gSystem->Load("libTof");
     gSystem->Load("libGlobal");
     gSystem->Load("libEcal");
     gSystem->Load("libKF");

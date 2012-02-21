@@ -58,6 +58,9 @@ class CbmHsdGenerator : public FairGenerator
   const Char_t * fFileName;             //!  Input file name
   Int_t fPid, fPdg;                     //!  pID of signal particle: fPid - HSD, fPdg - MC
 
+  CbmHsdGenerator(const CbmHsdGenerator&);
+  CbmHsdGenerator& operator=(const CbmHsdGenerator&);
+
   ClassDef(CbmHsdGenerator,1);
  
 };

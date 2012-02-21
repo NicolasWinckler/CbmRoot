@@ -25,15 +25,28 @@ using std::endl;
 const Double_t kProtonMass = 0.938271998;
 
 // -----   Default constructor   ------------------------------------------
-CbmHsdGenerator::CbmHsdGenerator() { }
+CbmHsdGenerator::CbmHsdGenerator() 
+: FairGenerator(),
+  fInputFile(NULL),
+  fFileName(NULL),
+  fPid(0), 
+  fPdg(0)
+{ 
+}
 // ------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   -----------------------------------------
-CbmHsdGenerator::CbmHsdGenerator(const char* fileName, TString particle) {
-  fFileName = fileName;
+CbmHsdGenerator::CbmHsdGenerator(const char* fileName, TString particle) 
+: FairGenerator(),
+  fInputFile(NULL),
+  fFileName(fileName),
+  fPid(0), 
+  fPdg(0)
+{
   cout << "-I CbmHsdGenerator: Opening input file " << fileName << endl;
+
   fInputFile = fopen(fFileName, "r");
   if ( ! fInputFile ) Fatal("CbmHsdgenerator","Cannot open input file.");
   

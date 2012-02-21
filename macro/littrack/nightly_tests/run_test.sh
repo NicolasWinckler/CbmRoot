@@ -41,14 +41,13 @@ function copy_results_to_web
 # Run test without CDash
 if [ "$1" = "build" ] ; then
     checkout_cbmroot ${TEST_DIR}
-    build_cbmroot ${TEST_DIR}/cbmroot ${TEST_DIR} /data.local1/fairsoft/fairsoft_jan12/install
+    build_cbmroot ${TEST_DIR}/cbmroot ${BUILD_DIR} /data.local1/fairsoft/fairsoft_jan12/install
 
     # Run tests
-    cd ${TEST_DIR}/cbmroot/macro/littrack/nightly_tests/
-    . ./run_test_electron.sh
-    . ./run_test_muon.sh
+    . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_electron.sh
+    . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_muon.sh
     
-    copy_results_to_web "${BUILD_DIR}/macro/littrack/nightly_tests/std_reco*"
+    copy_results_to_web "${TEST_DIR}/cbmroot/macro/littrack/nightly_tests/std_reco*"
 elif [ "$1" = "cdash" ] ; then 
     checkout_cbmroot ${TEST_DIR}
     # Run tests with CDash

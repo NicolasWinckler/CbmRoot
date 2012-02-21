@@ -21,7 +21,8 @@ function build_cbmroot
     simpath=$3
     export SIMPATH=${simpath} #/data.local1/fairsoft/fairsoft_jan12/install
     mkdir ${build_dir}
-    ( cd ${build_dir}; cmake ${src_dir} )
+    cd ${build_dir}
+    cmake ${src_dir}
     . ${build_dir}/config.sh
     make -j8
 }

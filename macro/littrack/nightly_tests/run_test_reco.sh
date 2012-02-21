@@ -8,7 +8,7 @@ TEST_NAME=$1
 
 create_output_dir events_${TEST_NAME}/
 
-export NEVENTS=2
+export NEVENTS=500
 export DETECTORSETUP=$2
 
 if [ "${DETECTORSETUP}" = "electron" ] ; then

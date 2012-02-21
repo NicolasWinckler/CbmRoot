@@ -58,6 +58,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   void InitHistos();
   void SaveHistosToFile();
+  void NormalizeHistos(TH1* h);
 
   Bool_t VertexInMagnet(CbmMCTrack* track); 
   Bool_t VertexInTarget(CbmMCTrack* track);
@@ -68,7 +69,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   Double_t CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB);
-
+  Double_t CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB);
 
   /** Executed task **/
   virtual void Exec(Option_t * option);
@@ -110,7 +111,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   //Histos
 
-  // Vertex
+  // Birth Vertex
   TH3I*  fMotherDaughterZBirth;
   TH3I*  fBirthGamma;
   TH3I*  fBirthPi0;
@@ -122,15 +123,23 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I* fPairGammaVertex[3];
   TH1I* fPairPi0Vertex[3];
 
+  // Death Vertex
+  TH1I* fpi02GammaVertex[3];
+  TH1I* fgamma2PairVertex[3];
+
   // Mother Daughter
   TH2I*  fMotherDaughter;
-  TH2I* fNoDaughters;
+  TH2I*  fNoDaughters;
   TH1I*  fePlusMinusMother;
   TH1I*  fePlusAndMinusMother;
   TH1I*  fgammaMother;
   TH1I*  fgammaAndGammaMother;
   TH1I*  fDalizMother;
   TH1I*  fgammaDaughter;
+
+  TH2I* fInvMPairMother;
+  TH2I* fPtPairMother;
+  TH2I* fOpenAnglePairMother;
 
   // Global PID
   TH1I*  fMCPid;
@@ -140,24 +149,28 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I*  fPairHistory;
 
   // Spectra
-  TH1I* fPi0SpectrumGammaTruePairs;
-  TH1I* fPi0SpectrumGammaAllPairs;
-  TH1I* fPi0SpectrumGammaEPPairs;
+  //TH1F* fInvMSpectra[20];
+  //TH1F* fEPPairOpenAngle[20];
+
+  TH1F* fPi0SpectrumGammaTruePairs;
+  TH1F* fPi0SpectrumGammaAllPairs;
+  TH1F* fPi0SpectrumGammaEPPairs;
   //TH1I* fPi0SpectrumGammaEPPairsSameMother;
-  TH1I* fPi0SpectrumGammaEPPairsInTarget;
-  TH1I* fPi0SpectrumGammaEPPairsInMagnet;
-  TH1I* fGammaSpectrumTrueEPPairs;
-  TH1I* fGammaSpectrumAllEPPairs;
-  TH1I* fGammaSpectrumEPPairsInTarget;
-  TH1I* fGammaSpectrumEPPairsInMagnet;
+  TH1F* fPi0SpectrumGammaEPPairsInTarget;
+  TH1F* fPi0SpectrumGammaEPPairsInMagnet;
+  TH1F* fPi0SpectrumGammaEPPairsOpenAngle;
+  TH1F* fGammaSpectrumTrueEPPairs;
+  TH1F* fGammaSpectrumAllEPPairs;
+  TH1F* fGammaSpectrumEPPairsInTarget;
+  TH1F* fGammaSpectrumEPPairsInMagnet;
 
   // Cuts
-  TH1I* fEPPairOpeningAngle;
-  TH1I* fEPPairOpeningAngleGamma;
-  TH1I* fEPPairOpeningAnglePi0;
-  TH1I* fEPPairOpeningAngleSameMother;
-  TH1I* fEPPairOpeningAngleInTarget;
-  TH1I* fEPPairOpeningAngleInMagnet;
+  TH1F* fEPPairOpeningAngle;
+  TH1F* fEPPairOpeningAngleGamma;
+  TH1F* fEPPairOpeningAnglePi0;
+  TH1F* fEPPairOpeningAngleSameMother;
+  TH1F* fEPPairOpeningAngleInTarget;
+  TH1F* fEPPairOpeningAngleInMagnet;
 
   std::map<Int_t, MCParticle*> fMCParticleMap;
   std::map<Int_t, MCParticle*>::iterator it;

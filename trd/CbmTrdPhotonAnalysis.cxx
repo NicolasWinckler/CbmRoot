@@ -301,6 +301,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::vector<CbmMCTrack *> gammaFromEPPairs;
   std::vector<CbmMCTrack *> gammaFromEPPairsInMagnet;
   std::vector<CbmMCTrack *> gammaFromEPPairsInTarget;
+  std::vector<CbmMCTrack *> gammaFromEPPairsOpeningAngle;
   std::vector<CbmMCTrack *> gammaFromTrueEPPairs;
 
   if (fMCTracks)
@@ -428,21 +429,32 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	gammaFromEPPairs.push_back(gamma);
 	//cout << iElectron << " " << iPositron << endl;
 	Double_t openingAngle = CalcOpeningAngle(etrack, ptrack);
+	Double_t invariantMass = CalcInvariantMass(etrack, ptrack);
+	Double_t pt = CalcPt(etrack, ptrack);
 	fEPPairOpeningAngle->Fill(openingAngle);
-	fGammaSpectrumAllEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
+	fGammaSpectrumAllEPPairs->Fill(invariantMass);
+	fInvMPairMother->Fill(invariantMass, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+	fPtPairMother->Fill(pt, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+	fOpenAnglePairMother->Fill(openingAngle, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+
+	fInvMPairMother->Fill(invariantMass, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+	fPtPairMother->Fill(pt, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+	fOpenAnglePairMother->Fill(openingAngle, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+
 	if (VertexInMagnet(etrack) && VertexInMagnet(ptrack)) {
 	  gammaFromEPPairsInMagnet.push_back(gamma);
 	  fEPPairOpeningAngleInMagnet->Fill(openingAngle);
-	  fGammaSpectrumEPPairsInMagnet->Fill(CalcInvariantMass(etrack, ptrack));
+	  fGammaSpectrumEPPairsInMagnet->Fill(invariantMass);
 	  if(VertexInTarget(etrack) && VertexInTarget(ptrack)) {
 	    gammaFromEPPairsInTarget.push_back(gamma);
 	    fEPPairOpeningAngleInTarget->Fill(openingAngle);
-	    fGammaSpectrumEPPairsInTarget->Fill(CalcInvariantMass(etrack, ptrack));	  
-	    if (openingAngle < 1.0){	    
+	    fGammaSpectrumEPPairsInTarget->Fill(invariantMass);	  
+	    if (openingAngle < 1.0){
+	      gammaFromEPPairsOpeningAngle.push_back(gamma);
 	      if (fMCParticleMap[fElectronIds[iElectron]]->motherId == fMCParticleMap[fPositronIds[iPositron]]->motherId) {
 		gammaFromTrueEPPairs.push_back(gamma);
 		fEPPairOpeningAngleSameMother->Fill(openingAngle);
-		fGammaSpectrumTrueEPPairs->Fill(CalcInvariantMass(etrack, ptrack));
+		fGammaSpectrumTrueEPPairs->Fill(invariantMass);
 		
 		//epPair = make_pair (fElectronIds[iElectron], fPositronIds[iPositron]);
 		
@@ -459,19 +471,25 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     }
   }
   printf ("\n--- Found\n---      %7i Gammas\n---      %7i Electrons\n---      %7i Positrons\n---      %7i Electron & Positron Pairs\n---      %7i Pi0\n\n", (Int_t)fGammaIds.size(), (Int_t)fElectronIds.size(), (Int_t)fPositronIds.size(), (Int_t)electronPositronPairs.size(), (Int_t)fPi0Ids.size());
-
+  cout << "fPi0SpectrumGammaEPPairsOpenAngle: " << gammaFromEPPairsOpeningAngle.size() << endl;
+  for (Int_t iGamma = 0; iGamma < gammaFromEPPairsOpeningAngle.size(); iGamma++) {
+    for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairsOpeningAngle.size(); jGamma++) {
+      //cout << iGamma << " " << jGamma << endl;
+      fPi0SpectrumGammaEPPairsOpenAngle->Fill(CalcInvariantMass(gammaFromEPPairsOpeningAngle[iGamma], gammaFromEPPairsOpeningAngle[jGamma]));
+    }
+  }
   cout << "fPi0SpectrumGammaEPPairsInTarget: " << gammaFromEPPairsInTarget.size() << endl;
   for (Int_t iGamma = 0; iGamma < gammaFromEPPairsInTarget.size(); iGamma++) {
     for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairsInTarget.size(); jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
-      fPi0SpectrumGammaEPPairsInTarget->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+      fPi0SpectrumGammaEPPairsInTarget->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
     }
   }
   cout << "fgammaFromEPPairsInMagnet: " << gammaFromEPPairsInMagnet.size() << endl;
   for (Int_t iGamma = 0; iGamma < gammaFromEPPairsInMagnet.size(); iGamma++) {
     for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairsInMagnet.size(); jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
-      fPi0SpectrumGammaEPPairsInMagnet->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+      fPi0SpectrumGammaEPPairsInMagnet->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
     }
   }
   cout << "fPi0SpectrumGammaEPPairs: " << gammaFromEPPairs.size() <<  endl;  
@@ -639,6 +657,15 @@ Bool_t CbmTrdPhotonAnalysis::CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* track
     return true;
   else
     return false;
+}
+
+Double_t CbmTrdPhotonAnalysis::CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB)
+{
+  Double_t Px = trackA->GetPx() + trackB->GetPx();
+  Double_t Py = trackA->GetPy() + trackB->GetPy();
+  Double_t Pt = TMath::Sqrt(pow(Px,2) + pow(Py,2));
+
+  return Pt;
 }
 
 Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB)
@@ -872,7 +899,13 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fNoDaughters = new TH2I("NoDaughters","Number of daughters",49,0.5,49.5,101,-0.5,100.5);
   fMotherDaughter = new TH2I("MotherDaughter","mother / daughter",49,0.5,49.5,49,0.5,49.5);
   fMotherDaughterZBirth = new TH3I("MotherDaughterZBirth","mother / daughter / z-birth",10000,0,1000,49,0.5,49.5,49,0.5,49.5);
+  fInvMPairMother = new TH2I("InvMPairMother","Invariant Mass of e^{+} & e^{-} pairs vs. mother id",2000,0,2,49,0.5,49.5);
+  fPtPairMother = new TH2I("PtPairMother","p_{T} of e^{+} & e^{-} pairs vs. mother id",200,0,2,49,0.5,49.5);
+  fOpenAnglePairMother = new TH2I("OpenAnglePairMother","Opening Angle of e^{+} & e^{-} pairs vs. mother id",1800,0,180,49,0.5,49.5);
   for (Int_t bin = 0; bin < 49; bin++) {
+    fInvMPairMother->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fPtPairMother->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fOpenAnglePairMother->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fMCPid->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fGTPid->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fDalizMother->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
@@ -888,6 +921,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fMotherDaughterZBirth->GetZaxis()->SetBinLabel(bin+1,particleID[bin]);
     fNoDaughters->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
   }
+
   TString name[3] = {"x","y","z"};
   Int_t low[3] = {-50,-50,0};
   Int_t high[3] = {50,50,100};
@@ -896,15 +930,22 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fPairGammaVertex[i] = new TH1I("PairGammaVertex_" + name[i], "e^{+} e^{-} pair from #gamma vertex " + name[i], 200, low[i], high[i]);
     fPairPi0Vertex[i] = new TH1I("PairPi0Vertex_" + name[i], "e^{+} e^{-} pair from #pi^{0} vertex " + name[i], 200, low[i], high[i]);
 
+    fpi02GammaVertex[i] = new TH1I("pi02GammaVertexpi02GammaVertex_" + name[i], "decay vertex of #pi^{0} to #gamma" + name[i], 200, low[i], high[i]);
+    fgamma2PairVertex[i] = new TH1I("gamma2PairVertex_" + name[i], "decay vertex of #gamma to e^{+} e^{-} pair" + name[i], 200, low[i], high[i]);
+
     NiceHisto1(fPairAllVertex[i],1,0,0,TString(name[i]+"-position [cm]"),"");
     NiceHisto1(fPairGammaVertex[i],2,0,0,TString(name[i]+"-position [cm]"),"");
     NiceHisto1(fPairPi0Vertex[i],3,0,0,TString(name[i]+"-position [cm]"),"");
+
+    NiceHisto1(fpi02GammaVertex[i],1,0,0,TString(name[i]+"-position [cm]"),"");
+    NiceHisto1( fgamma2PairVertex[i],2,0,0,TString(name[i]+"-position [cm]"),"");
   }
   /*
     fMCPid = new TH1I("MCPid","MC Pid",4501,-1000.5,3500.5);
     fGTPid = new TH1I("GTPid","GT Pid",4501,-1000.5,3500.5);
     fePlusMinusMother = new TH1I("fePlusMinusMother","Mother ID for e^{+}/e^{-}",4501,-1000.5,3500.5);
   */
+
   fZBirth[0] = new TH1I("ZBirth_gamma","z birth #gamma",10000,0,1000);
   fZBirth[1] = new TH1I("ZBirth_positron","z birth e^{+}",10000,0,1000);
   fZBirth[2] = new TH1I("ZBirth_electron","z birth e^{-}",10000,0,1000);
@@ -924,23 +965,39 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fPairHistory->GetXaxis()->SetBinLabel( 9,"pairs from #pi^{0} within target");
   fPairHistory->GetXaxis()->SetBinLabel(10,"");
 
-  fPi0SpectrumGammaTruePairs = new TH1I("Pi0SpectrumGammaTruePairs","#pi^{0} spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
-  fPi0SpectrumGammaAllPairs  = new TH1I("Pi0SpectrumGammaAllPairs","#pi^{0} spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
-  fPi0SpectrumGammaEPPairs   = new TH1I("Pi0SpectrumGammaEPPairs","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs",2000,0,2);
-  fPi0SpectrumGammaEPPairsInTarget   = new TH1I("Pi0SpectrumGammaEPPairsInTarget","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
-  fPi0SpectrumGammaEPPairsInMagnet   = new TH1I("Pi0SpectrumGammaEPPairsInMagnet","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fPi0SpectrumGammaTruePairs = new TH1F("Pi0SpectrumGammaTruePairs","#pi^{0} spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
+  fPi0SpectrumGammaAllPairs  = new TH1F("Pi0SpectrumGammaAllPairs","#pi^{0} spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
+  fPi0SpectrumGammaEPPairs   = new TH1F("Pi0SpectrumGammaEPPairs","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs",2000,0,2);
+  fPi0SpectrumGammaEPPairsInTarget   = new TH1F("Pi0SpectrumGammaEPPairsInTarget","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
+  fPi0SpectrumGammaEPPairsInMagnet   = new TH1F("Pi0SpectrumGammaEPPairsInMagnet","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fPi0SpectrumGammaEPPairsOpenAngle   = new TH1F("Pi0SpectrumGammaEPPairsOpenAngle","#pi^{0} spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs oping angle cut",2000,0,2);
 
-  fGammaSpectrumTrueEPPairs  = new TH1I("GammaSpectrumTrueEPPairs","#gamma spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
-  fGammaSpectrumAllEPPairs   = new TH1I("GammaSpectrumAllEPPairs","#gamma spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
-  fGammaSpectrumEPPairsInTarget   = new TH1I("GammaSpectrumAllEPPairsInTarget","#gamma spectrum from all MC-e^{+}e^{-} pairs in target",2000,0,2);
-  fGammaSpectrumEPPairsInMagnet   = new TH1I("GammaSpectrumAllEPPairsInMagnet","#gamma spectrum from all MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fGammaSpectrumTrueEPPairs  = new TH1F("GammaSpectrumTrueEPPairs","#gamma spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
+  fGammaSpectrumAllEPPairs   = new TH1F("GammaSpectrumAllEPPairs","#gamma spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
+  fGammaSpectrumEPPairsInTarget   = new TH1F("GammaSpectrumAllEPPairsInTarget","#gamma spectrum from all MC-e^{+}e^{-} pairs in target",2000,0,2);
+  fGammaSpectrumEPPairsInMagnet   = new TH1F("GammaSpectrumAllEPPairsInMagnet","#gamma spectrum from all MC-e^{+}e^{-} pairs in magnet",2000,0,2);
 
-  fEPPairOpeningAngle   = new TH1I("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
-  fEPPairOpeningAngleGamma   = new TH1I("EPPairOpeningAngleGamma ","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
-  fEPPairOpeningAnglePi0   = new TH1I("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
-  fEPPairOpeningAngleSameMother   = new TH1I("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
-  fEPPairOpeningAngleInTarget   = new TH1I("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
-  fEPPairOpeningAngleInMagnet   = new TH1I("EPPairOpeningAngleInMagnet","opening angle #theta of MC-e^{+}e^{-} pairs in magnet",1800,0,180);
+  fEPPairOpeningAngle   = new TH1F("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
+  fEPPairOpeningAngleGamma   = new TH1F("EPPairOpeningAngleGamma ","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
+  fEPPairOpeningAnglePi0   = new TH1F("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
+  fEPPairOpeningAngleSameMother   = new TH1F("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
+  fEPPairOpeningAngleInTarget   = new TH1F("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
+  fEPPairOpeningAngleInMagnet   = new TH1F("EPPairOpeningAngleInMagnet","opening angle #theta of MC-e^{+}e^{-} pairs in magnet",1800,0,180);
+  /*
+    TString nameInvM[20] = {"",
+    "",
+    ""
+    };
+    TString titleInvM[20] = {"",
+    "",
+    ""
+    };
+    for (Int_t i = 0; i < 20; i++) {
+    fInvMSpectra[i] = new TH1F(nameInvM[i], titleInvM[i], 2000, 0, 2);
+
+    }
+
+  */
 
   NiceHisto1(fMCPid,1,20,1,"","");
   NiceHisto1(fGTPid,1,20,1,"","");
@@ -960,6 +1017,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto3(fBirthPair,3,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
   NiceHisto3(fMotherDaughterZBirth,1,1,1,"z-position [cm]","","");
 
+  NiceHisto2(fInvMPairMother,1,1,1,"Invariant mass [GeV/c^{2}]","Mother","");
+  NiceHisto2(fPtPairMother,1,1,1,"p_{T} [Gev/c]","Mother","");
+  NiceHisto2(fOpenAnglePairMother,1,1,1,"opening angle #theta [#circ]","Mother","");
+
   NiceHisto1(fPi0SpectrumGammaAllPairs,1,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fPi0SpectrumGammaTruePairs,2,1,1,"Invariant mass [GeV/c^{2}]","");
 
@@ -971,6 +1032,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fPi0SpectrumGammaEPPairs,1,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fPi0SpectrumGammaEPPairsInMagnet,2,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fPi0SpectrumGammaEPPairsInTarget,3,1,1,"Invariant mass [GeV/c^{2}]","");
+  NiceHisto1(fPi0SpectrumGammaEPPairsOpenAngle,4,1,1,"Invariant mass [GeV/c^{2}]","");
 
   NiceHisto1(fEPPairOpeningAngle,1,1,1,"opening angle #theta [#circ]","");
   NiceHisto1(fEPPairOpeningAngleInMagnet,2,1,1,"opening angle #theta [#circ]","");
@@ -980,6 +1042,11 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fEPPairOpeningAnglePi0,7,1,1,"opening angle #theta [#circ]","");
 
 }
+void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)
+{
+  h->Scale(1./ h->GetEntries());
+}
+
 
 void CbmTrdPhotonAnalysis::SaveHistosToFile()
 {
@@ -1002,6 +1069,9 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fgammaMother->Write("", TObject::kOverwrite);
   fgammaAndGammaMother->Write("", TObject::kOverwrite);
   fgammaDaughter->Write("", TObject::kOverwrite);
+  fInvMPairMother->Write("", TObject::kOverwrite);
+  fPtPairMother->Write("", TObject::kOverwrite);
+  fOpenAnglePairMother->Write("", TObject::kOverwrite);
   fPairHistory->Write("", TObject::kOverwrite);
   for (Int_t i = 0; i < 4; i++) {
     fZBirth[i]->Write("", TObject::kOverwrite);
@@ -1023,25 +1093,45 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     fPairAllVertex[i]->Write("", TObject::kOverwrite);
     fPairGammaVertex[i]->Write("", TObject::kOverwrite);
     fPairPi0Vertex[i]->Write("", TObject::kOverwrite);
+
+    fpi02GammaVertex[i]->Write("", TObject::kOverwrite);
+    fgamma2PairVertex[i]->Write("", TObject::kOverwrite);
   }
-
+  NormalizeHistos(fPi0SpectrumGammaEPPairs);
   fPi0SpectrumGammaEPPairs->Write("", TObject::kOverwrite);
+  NormalizeHistos(fPi0SpectrumGammaEPPairsInMagnet);
   fPi0SpectrumGammaEPPairsInMagnet->Write("", TObject::kOverwrite);
+  NormalizeHistos(fPi0SpectrumGammaEPPairsInTarget);
   fPi0SpectrumGammaEPPairsInTarget->Write("", TObject::kOverwrite);
+  NormalizeHistos(fPi0SpectrumGammaEPPairsOpenAngle);
+  fPi0SpectrumGammaEPPairsOpenAngle->Write("", TObject::kOverwrite);
+  NormalizeHistos(fPi0SpectrumGammaAllPairs);
   fPi0SpectrumGammaAllPairs->Write("", TObject::kOverwrite);
+  NormalizeHistos(fPi0SpectrumGammaTruePairs);
   fPi0SpectrumGammaTruePairs->Write("", TObject::kOverwrite);
+  
 
+  NormalizeHistos(fGammaSpectrumAllEPPairs);
   fGammaSpectrumAllEPPairs->Write("", TObject::kOverwrite);
+  NormalizeHistos(fGammaSpectrumEPPairsInTarget);
   fGammaSpectrumEPPairsInTarget->Write("", TObject::kOverwrite);
+  NormalizeHistos(fGammaSpectrumEPPairsInMagnet);
   fGammaSpectrumEPPairsInMagnet->Write("", TObject::kOverwrite);
+  NormalizeHistos(fGammaSpectrumTrueEPPairs);
   fGammaSpectrumTrueEPPairs->Write("", TObject::kOverwrite);
 
+  NormalizeHistos(fEPPairOpeningAngle);
   fEPPairOpeningAngle->Write("", TObject::kOverwrite);
  
+  NormalizeHistos(fEPPairOpeningAngleInMagnet);
   fEPPairOpeningAngleInMagnet->Write("", TObject::kOverwrite);
+  NormalizeHistos(fEPPairOpeningAngleInTarget);
   fEPPairOpeningAngleInTarget->Write("", TObject::kOverwrite);
+  NormalizeHistos(fEPPairOpeningAngleSameMother);
   fEPPairOpeningAngleSameMother->Write("", TObject::kOverwrite);
+  NormalizeHistos(fEPPairOpeningAngleGamma);
   fEPPairOpeningAngleGamma->Write("", TObject::kOverwrite);
+  NormalizeHistos(fEPPairOpeningAnglePi0);
   fEPPairOpeningAnglePi0->Write("", TObject::kOverwrite);
   //outFile->Close();
   //c->Close();

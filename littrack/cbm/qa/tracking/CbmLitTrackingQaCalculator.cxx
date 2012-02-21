@@ -558,23 +558,23 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
 		  }
     	  // select STS+RICH tracks
     	  if (sts && rich) {
-    		  fMcStsRichMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
+    		  fMcStsRichMap.insert(make_pair<Int_t, Int_t>(stsMCId, iTrack));
     	  }
         // select STS+RICH tracks no matching
          if (sts && richNoMatching) {
-            fMcStsRichNoMatchingMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
+            fMcStsRichNoMatchingMap.insert(make_pair<Int_t, Int_t>(stsMCId, iTrack));
          }
     	  // select STS+RICH+TRD tracks
     	  if (sts && rich && trd) {
-			  fMcStsRichTrdMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
+			  fMcStsRichTrdMap.insert(make_pair<Int_t, Int_t>(stsMCId, iTrack));
 		  }
     	  if (fDet.GetDet(kTRD)) { // select STS+RICH+TRD+TOF tracks
 			  if (sts && rich && trd && tof) {
-				  fMcStsRichTrdTofMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
+				  fMcStsRichTrdTofMap.insert(make_pair<Int_t, Int_t>(stsMCId, iTrack));
 			  }
     	  } else { // select STS+RICH+TOF tracks
     		  if (sts && rich && tof) {
-				  fMcStsRichTrdTofMap.insert(pair<Int_t, Int_t>(stsMCId, iTrack));
+				  fMcStsRichTrdTofMap.insert(make_pair<Int_t, Int_t>(stsMCId, iTrack));
 			  }
     	  }
       }

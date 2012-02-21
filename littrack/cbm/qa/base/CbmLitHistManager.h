@@ -22,7 +22,7 @@ class TH2F;
 class TH3F;
 
 using std::map;
-using std::pair;
+using std::make_pair;
 using std::string;
 using std::vector;
 
@@ -54,7 +54,7 @@ public:
    void Add(
          const string& name,
          TH1* histo) {
-      fHistMap.insert(pair<string, TH1*>(name, histo));
+      fHistMap.insert(make_pair<string, TH1*>(name, histo));
    }
 
    /**
@@ -96,7 +96,7 @@ public:
    /**
     * \brief Return pointer to TH1 histogram.
     * \param[in] name Name of histogram.
-    * \return pointe to TH1 histogram.
+    * \return pointer to TH1 histogram.
     */
    TH1* H1(
          const string& name) const {
@@ -122,7 +122,7 @@ public:
     */
    bool Exists(
          const string& name) const {
-      return fHistMap.count(name);
+      return (fHistMap.count(name) == 0) ? false : true;
    }
 
    /**

@@ -21,7 +21,7 @@ void run_sim(Int_t nEvents = 2)
   TString outFile = outDir + "/test.mc.root";
   TString parFile = outDir + "/params.root";
  
-  TString HsdFile = "./jpsiHsd.auau25gev.000"
+  TString HsdFile = "./jpsiHsd.auau25gev.000";
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";

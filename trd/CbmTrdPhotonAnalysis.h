@@ -166,6 +166,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1F* fInvMassSpectrumGammaEPPairsInTarget;
   TH1F* fInvMassSpectrumGammaEPPairsInMagnet;
   TH1F* fInvMassSpectrumGammaEPPairsOpenAngle;
+  TH1F* fInvMassSpectrumGammaEPPairsGamma;
+  TH1F* fInvMassSpectrumGammaEPPairsPi0;
   TH1F* fInvMassSpectrumTrueEPPairs;
   TH1F* fInvMassSpectrumAllEPPairs;
   TH1F* fInvMassSpectrumEPPairsInTarget;

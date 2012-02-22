@@ -119,6 +119,8 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fInvMassSpectrumGammaEPPairsInTarget(NULL),
     fInvMassSpectrumGammaEPPairsInMagnet(NULL),
     fInvMassSpectrumGammaEPPairsOpenAngle(NULL),
+    fInvMassSpectrumGammaEPPairsGamma(NULL),
+    fInvMassSpectrumGammaEPPairsPi0(NULL),
     fInvMassSpectrumTrueEPPairs(NULL),
     fInvMassSpectrumAllEPPairs(NULL),
     fInvMassSpectrumEPPairsInTarget(NULL),
@@ -193,6 +195,8 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fInvMassSpectrumGammaEPPairsInTarget(NULL),
     fInvMassSpectrumGammaEPPairsInMagnet(NULL),
     fInvMassSpectrumGammaEPPairsOpenAngle(NULL),
+    fInvMassSpectrumGammaEPPairsGamma(NULL),
+    fInvMassSpectrumGammaEPPairsPi0(NULL),
     fInvMassSpectrumTrueEPPairs(NULL),
     fInvMassSpectrumAllEPPairs(NULL),
     fInvMassSpectrumEPPairsInTarget(NULL),
@@ -306,6 +310,8 @@ CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()
   delete fInvMassSpectrumGammaEPPairsInTarget;
   delete fInvMassSpectrumGammaEPPairsInMagnet;
   delete fInvMassSpectrumGammaEPPairsOpenAngle;
+  delete fInvMassSpectrumGammaEPPairsGamma;
+  delete fInvMassSpectrumGammaEPPairsPi0;
   delete fInvMassSpectrumTrueEPPairs;
   delete fInvMassSpectrumAllEPPairs;
   delete fInvMassSpectrumEPPairsInTarget;
@@ -646,10 +652,14 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	    fEPPairOpeningAngleInTarget->Fill(openingAngle);
 	    fInvMassSpectrumEPPairsInTarget->Fill(invariantMass);	
 
-	    if (fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID == 22)
+	    if (fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID == 22  && fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID == 22) {
 	      fEPPairOpeningAngleGamma->Fill(openingAngle);
-	    if (fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID == 111)
+	      fInvMassSpectrumGammaEPPairsGamma->Fill(invariantMass);
+	    }
+	    if (fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID == 111 && fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID == 111) {
 	      fEPPairOpeningAnglePi0->Fill(openingAngle);
+	      fInvMassSpectrumGammaEPPairsPi0->Fill(invariantMass);
+	    }
 	    
 	    if (openingAngle < 1.0){
 	      gammaFromEPPairsOpeningAngle.push_back(gamma);
@@ -1247,9 +1257,11 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fInvMassSpectrumGammaTruePairs = new TH1F("InvMassSpectrumGammaTruePairs","Invariant mass spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
   fInvMassSpectrumGammaAllPairs  = new TH1F("InvMassSpectrumGammaAllPairs","Invariant mass spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
   fInvMassSpectrumGammaEPPairs   = new TH1F("InvMassSpectrumGammaEPPairs","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs",2000,0,2);
-  fInvMassSpectrumGammaEPPairsInTarget   = new TH1F("InvMassSpectrumGammaEPPairsInTarget","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
-  fInvMassSpectrumGammaEPPairsInMagnet   = new TH1F("InvMassSpectrumGammaEPPairsInMagnet","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fInvMassSpectrumGammaEPPairsInTarget    = new TH1F("InvMassSpectrumGammaEPPairsInTarget","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
+  fInvMassSpectrumGammaEPPairsInMagnet    = new TH1F("InvMassSpectrumGammaEPPairsInMagnet","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
   fInvMassSpectrumGammaEPPairsOpenAngle   = new TH1F("InvMassSpectrumGammaEPPairsOpenAngle","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs oping angle cut",2000,0,2);
+  fInvMassSpectrumGammaEPPairsGamma       = new TH1F("InvMassSpectrumGammaEPPairsGamma","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#gamma",2000,0,2);
+  fInvMassSpectrumGammaEPPairsPi0         = new TH1F("InvMassSpectrumGammaEPPairsPi0","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#pi^{0}",2000,0,2);
 
   fInvMassSpectrumTrueEPPairs  = new TH1F("InvMassSpectrumTrueEPPairs","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
   fInvMassSpectrumAllEPPairs   = new TH1F("InvMassSpectrumAllEPPairs","Invariant mass spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
@@ -1323,6 +1335,8 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fInvMassSpectrumGammaEPPairsInMagnet,2,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fInvMassSpectrumGammaEPPairsInTarget,3,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fInvMassSpectrumGammaEPPairsOpenAngle,4,1,1,"Invariant mass [GeV/c^{2}]","");
+  NiceHisto1(fInvMassSpectrumGammaEPPairsGamma,6,1,1,"Invariant mass [GeV/c^{2}]","");
+  NiceHisto1(fInvMassSpectrumGammaEPPairsPi0,7,1,1,"Invariant mass [GeV/c^{2}]","");
 
   NiceHisto1(fEPPairOpeningAngle,1,1,1,"opening angle #theta [#circ]","");
   NiceHisto1(fEPPairOpeningAngleInMagnet,2,1,1,"opening angle #theta [#circ]","");
@@ -1422,6 +1436,8 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fInvMassSpectrumGammaEPPairsInTarget->Write("", TObject::kOverwrite);
   //NormalizeHistos(fInvMassSpectrumGammaEPPairsOpenAngle);
   fInvMassSpectrumGammaEPPairsOpenAngle->Write("", TObject::kOverwrite);
+  fInvMassSpectrumGammaEPPairsGamma->Write("", TObject::kOverwrite);
+  fInvMassSpectrumGammaEPPairsPi0->Write("", TObject::kOverwrite);
   //NormalizeHistos(fInvMassSpectrumGammaAllPairs);
   fInvMassSpectrumGammaAllPairs->Write("", TObject::kOverwrite);
   //NormalizeHistos(fInvMassSpectrumGammaTruePairs);

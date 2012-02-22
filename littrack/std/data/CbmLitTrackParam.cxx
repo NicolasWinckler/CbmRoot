@@ -31,8 +31,8 @@ void CbmLitTrackParam::GetDirCos(
    litfloat& ny,
    litfloat& nz) const
 {
-   litfloat p  = (std::abs(fQp) != 0.) ? 1./std::abs(fQp) : 1.e20;
-   litfloat pz = std::sqrt(p*p / (fTx*fTx + fTy*fTy + 1));
+   litfloat p  = (std::abs(fQp) != 0.) ? 1. / std::abs(fQp) : 1.e20;
+   litfloat pz = std::sqrt(p * p / (fTx * fTx + fTy * fTy + 1));
    litfloat px = fTx * pz;
    litfloat py = fTy * pz;
    TVector3 unit = TVector3(px, py, pz).Unit();

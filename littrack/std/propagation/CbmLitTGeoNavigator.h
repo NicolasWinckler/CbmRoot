@@ -8,6 +8,7 @@
 #ifndef CBMLITTGEONAVIGATOR_H_
 #define CBMLITTGEONAVIGATOR_H_
 
+#include "TObject.h"
 #include "interface/CbmLitGeoNavigator.h"
 #include "propagation/CbmLitMaterialInfo.h"
 
@@ -35,7 +36,8 @@ private:
     * @param par Track parameter from which the current position and direction will be initialized.
     */
    void InitTrack(
-      const CbmLitTrackParam* par) const;
+      const CbmLitTrackParam* par,
+      Bool_t downstream) const;
 
    /* Make a step: if step=0 than to the next crossing boundary, else
     * make a step of length step.

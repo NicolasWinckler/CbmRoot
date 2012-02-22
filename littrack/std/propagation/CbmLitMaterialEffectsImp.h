@@ -1,10 +1,9 @@
-/** CbmLitMaterialEffectsImp.h
- *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
- **
- ** Class performs calculation of the material effects (multiple
- ** scattering and energy loss).
- **/
+/**
+ * \file CbmLitMaterialEffectsImp.h
+ * \brief Calculation of multiple scattering and energy loss.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ */
 
 #ifndef CBMLITMATERIALEFFECTSIMP_H_
 #define CBMLITMATERIALEFFECTSIMP_H_
@@ -15,16 +14,28 @@
 class CbmLitTrackParam;
 class CbmLitMaterialInfo;
 
+/**
+ * \class CbmLitMaterialEffectsImp
+ * \brief Calculation of multiple scattering and energy loss.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ */
 class CbmLitMaterialEffectsImp : public CbmLitMaterialEffects
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitMaterialEffectsImp();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitMaterialEffectsImp();
 
-   /* Inherited from CbmLitMaterialEffects */
+   /**
+    * \brief Inherited from CbmLitMaterialEffects.
+    */
    LitStatus Update(
       CbmLitTrackParam* par,
       const CbmLitMaterialInfo* mat,
@@ -98,14 +109,10 @@ public:
    litfloat CalcI(
       litfloat Z) const;
 private:
-   /* Propagation direction */
-   bool fDownstream;
-   /* Hypothesis on particle mass */
-   litfloat fMass;
-   /* True if particle is an electron or positron */
-   bool fIsElectron;
-   /* True if particle is muon */
-   bool fIsMuon;
+   bool fDownstream; // Propagation direction
+   litfloat fMass; // Hypothesis on particle mass
+   bool fIsElectron; // True if particle is an electron or positron
+   bool fIsMuon; // True if particle is muon
 };
 
 #endif /*CBMLITMATERIALEFFECTSIMP_H_*/

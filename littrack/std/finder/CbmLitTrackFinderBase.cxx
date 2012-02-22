@@ -45,7 +45,8 @@ void CbmLitTrackFinderBase::ArrangeHits(
       fHitData.AddHit(hit->GetPlaneId(), hit);
    }
 
-//    if (fVerbose > 1) std::cout << fHitData.ToString();
+//   std::cout << "CbmLitTrackFinderBase::ArrangeHits:\n" << fHitData.ToString();
+//   std::cout << "CbmLitTrackFinderBase::ArrangeHits:\n" << fLayout.ToString();
 
    for (int i = 0; i < fLayout.GetNofStationGroups(); i++) {
       for (int j = 0; j < fLayout.GetNofStations(i); j++) {

@@ -272,7 +272,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.IsUseFastSearch(true);
       settings.SetMaxNofMissingHits(1);
       settings.SetSigmaCoef(3.5);
-      settings.SetChiSqPixelHitCut(15.);//13.86);
+      settings.SetChiSqPixelHitCut(15.);
       settings.SetChiSqStripHitCut(9.);
       settings.SetPDG(211);
       settings.IsProcessSubstationsTogether(true);

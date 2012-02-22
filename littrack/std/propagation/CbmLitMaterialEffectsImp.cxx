@@ -46,7 +46,7 @@ LitStatus CbmLitMaterialEffectsImp::Update(
 
    AddEnergyLoss(par, mat);
 
-// AddThinScatter(par, mat);
+//   AddThinScatter(par, mat);
    AddThickScatter(par, mat);
 
    return kLITSUCCESS;
@@ -88,7 +88,7 @@ void CbmLitMaterialEffectsImp::AddThickScatter(
 
    litfloat tx = par->GetTx();
    litfloat ty = par->GetTy();
-   litfloat l = mat->GetLength(); //cm
+   litfloat thickness = mat->GetLength(); //cm
    litfloat thetaSq = CalcThetaSq(par, mat);
 
    litfloat t = 1 + tx * tx + ty * ty;
@@ -97,8 +97,8 @@ void CbmLitMaterialEffectsImp::AddThickScatter(
    litfloat Q44 = (1 + ty * ty) * t * thetaSq;
    litfloat Q34 = tx * ty * t * thetaSq;
 
-   litfloat T23 = (l * l) / 3.0;
-   litfloat T2 = l / 2.0;
+   litfloat T23 = (thickness * thickness) / 3.0;
+   litfloat T2 = thickness / 2.0;
 
    litfloat D = (fDownstream) ? 1. : -1.;
 
@@ -377,149 +377,3 @@ litfloat CbmLitMaterialEffectsImp::MPVEnergyLoss(
 
    return eloss * 1e-3; //GeV
 }
-
-//LitStatus CbmLitMaterialEffectsImp::Update2(
-//    CbmLitTrackParam* par,
-//        const CbmLitMaterialInfo* mat)
-//{
-// static const myf ZERO = 0.0, ONE = 1., TWO = 2., THREE = 3., INF = 1.e5;
-// static const myf mass = fMass; //0.105658369; // muon mass [GeV/c]
-// static const myf massSq = fMass * fMass; //0.105658369 * 0.105658369; // muon mass squared
-// static const myf C1_2 = 0.5, C1_3 = 1./3.;
-// static const myf me = 0.000511; // Electron mass [GeV/c]
-// static const myf ratio = me / mass;
-//
-// myf p = std::abs(1. / par->GetQp()); // Momentum [GeV/c]
-// myf E = std::sqrt(massSq + p * p);
-// myf beta = p / E;
-// myf betaSq = beta * beta;
-// myf gamma = E / mass;
-// myf gammaSq = gamma * gamma;
-//
-// //scale material thickness
-////  myf norm = std::sqrt(ONE + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
-// myf thickness = mat->GetLength();//norm * mat->GetLength();
-// myf radThick = thickness / mat->GetRL();
-// myf sqrtRadThick = std::sqrt(radThick);//mat.SqrtRadThick;
-// myf logRadThick = std::log(radThick);//mat.LogRadThick;
-//
-// /*
-//  * Energy loss corrections
-//  */
-//
-// // Bethe-Block
-// static const myf K = 0.000307075; // GeV * g^-1 * cm^2
-// myf Tmax = (2 * me * betaSq * gammaSq) / (ONE + TWO * gamma * ratio + ratio * ratio);
-//
-//
-// myf I = (mat->GetZ() > 16)? 10 * mat->GetZ() * 1e-9 :
-//          16 * std::pow(mat->GetZ(), 0.9) * 1e-9;
-// // density correction
-// myf dc = ZERO;
-// if (p > 0.5) { // for particles above 1 Gev
-//    static const myf c7 = 28.816;
-//    static const myf c8 = 1e-9;
-//    myf hwp = c7 * std::sqrt(mat->GetRho() * mat->GetZ() / mat->GetA()) * c8; // GeV
-//    dc = std::log(hwp/I) + std::log(beta*gamma) - C1_2;
-// }
-//
-// myf bbLoss = K * (mat->GetZ() / mat->GetA()) * (1./betaSq) *
-//       (C1_2 * std::log(TWO * me * betaSq * gammaSq * Tmax / (I * I)) - betaSq - dc);
-//
-// // Bethe-Heitler
-////  myf bhLoss = (E * ratio * ratio)/(mat->GetRL() * mat->GetRho());
-// myf bhLoss = ZERO;
-//
-// // Pair production approximation
-////  static const myf c3 = 7e-5;
-////  myf ppLoss = c3 * E / (mat.X0 * mat.Rho);
-// myf ppLoss = ZERO;
-//
-// // Integrated value of the energy loss
-// myf energyLoss = (bbLoss + bhLoss + ppLoss) * mat->GetRho() * thickness;
-//
-// // Correct Q/p value due to energy loss
-// myf Enew = E - energyLoss;
-// myf q = (par->GetQp() > 0) ? 1.: -1.;
-// myf pnew = std::sqrt(Enew * Enew - massSq);
-////  par->SetQp(sgn(par.Qp) * rcp(pnew));
-// myf qpnew = q / pnew;
-////  copysignf(qpnew, par->GetQp());
-// par->SetQp(qpnew);
-//
-////  // Calculate Q/p correction in the covariance matrix
-// myf betanew = pnew / Enew;
-// myf betaSqnew = betanew * betanew;
-// myf gammanew = Enew / mass;
-////  myf gammaSqnew = gammanew * gammanew;
-//
-// // Calculate xi factor (KeV).
-// static const myf c4 = 153.5;
-// myf XI = (c4 * mat->GetZ() * thickness * mat->GetRho())/(mat->GetA() * betaSqnew);
-//
-// // Maximum energy transfer to atomic electron (KeV).
-// myf etanew = betanew * gammanew;
-// myf etaSqnew = etanew * etanew;
-// myf F1 = TWO * me * etaSqnew;
-// myf F2 = ONE + TWO * ratio * gammanew + ratio * ratio;
-// static const myf c5 = 1e6;
-// myf emax = c5 * F1/F2;
-//
-// static const myf c6 = 1e-12;
-// myf dedxSq = XI * emax * (ONE - C1_2 * betaSqnew) * c6;
-//
-// myf p2 = pnew * pnew;
-// myf p6 = p2 * p2 * p2;
-// myf qpCorr = (Enew * Enew * dedxSq) / p6;
-////  par.C14 += qpCorr;
-// myf C14 = par->GetCovariance(14) + qpCorr;
-// par->SetCovariance(14, C14);
-// // end calculate Q/p correction in the covariance matrix
-//
-// /*
-//  * End energy loss corrections
-//  */
-//
-// /*
-//  * Multiple scattering corrections
-//  */
-// myf tx = par->GetTx();
-// myf ty = par->GetTy();
-// myf bcp = betanew * pnew;
-// static const myf c1 = 0.0136, c2 = 0.038;
-// myf theta = c1 * (1./bcp) * sqrtRadThick * (ONE + c2 * logRadThick);
-// myf thetaSq = theta * theta;
-//
-// myf t = ONE + tx * tx + ty * ty;
-//
-// myf Q33 = (1 + tx * tx) * t * thetaSq;
-// myf Q44 = (1 + ty * ty) * t * thetaSq;
-// myf Q34 = tx * ty * t * thetaSq;
-//
-// myf T23 = thickness * thickness * C1_3;
-// myf T2 = thickness * C1_2;
-//
-// std::vector<myf> C = par->GetCovMatrix();
-//
-// C[0] += Q33 * T23;
-// C[1] += Q34 * T23;
-// C[2] += Q33 * T2;
-// C[3] += Q34 * T2;
-//
-// C[5] += Q44 * T23;
-// C[6] += Q34 * T2;
-// C[7] += Q44 * T2;
-//
-// C[9] += Q33;
-// C[10] += Q34;
-//
-// C[12] += Q44;
-//
-// par->SetCovMatrix(C);
-//
-// /*
-//  * End multiple scattering corrections
-//  */
-//}
-
-

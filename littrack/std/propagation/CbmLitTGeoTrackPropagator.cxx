@@ -19,6 +19,9 @@
 #include <cmath>
 #include <iostream>
 
+using std::cout;
+using std::endl;
+
 CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
    TrackExtrapolatorPtr extrapolator):
    fExtrapolator(extrapolator)
@@ -49,6 +52,7 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
    std::vector<litfloat>* F)
 
 {
+//   std::cout << "PAR=" << par->ToString();
    if (!IsParCorrect(par)) { return kLITERROR; }
 
    litfloat zIn = par->GetZ();
@@ -56,8 +60,8 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
    if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) { return kLITSUCCESS; }
 
-   //Check whether upstream or downstream
-   //TODO check upstream/downstream
+   // Check whether upstream or downstream
+   // TODO check upstream/downstream
    bool downstream = dz > 0;
 
    if (F != NULL) {
@@ -71,62 +75,57 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
    int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
    litfloat stepSize;
-   if (nofSteps == 0) { stepSize = dz; }
+   if (nofSteps == 0) { stepSize = std::abs(dz); }
    else { stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE; }
    litfloat z = zIn;
+//   cout << "zIn=" << zIn << " zOut=" << zOut << " dz=" << dz << " nofSteps=" << nofSteps
+//         << " stepSize=" << stepSize << endl;
 
-// std::cout << "Propagation: zIn=" << zIn << " zOut=" << zOut << " stepSize=" << stepSize << " nofSteps=" << nofSteps << std::endl;
-   //Loop over steps + additional step to propagate to virtual plane at zOut
+   // Loop over steps + additional step to propagate to virtual plane at zOut
    for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
       if (!IsParCorrect(par)) {
-//       std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
          return kLITERROR;
       }
+      // Check if already at exit position
+      if (z == zOut) break;
 
-      // update current z position
-      if (iStep != nofSteps) { z += stepSize; }
+      // Update current z position
+      if (iStep != nofSteps) { z = (downstream) ? z + stepSize : z - stepSize; }
       else { z = zOut; }
 
-      //Get intersections with the materials for this step
+      // Get intersections with materials for this step
       std::vector<CbmLitMaterialInfo> inter;
       if (fNavigator->FindIntersections(par, z, inter) == kLITERROR) {
-//       std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: navigation failed" << std::endl;
          return kLITERROR;
       }
-//    std::cout << iStep << " z0=" << par->GetZ() << " z1=" << z << " nofInt=" << inter.size() << std::endl;
 
-      //Loop over the materials
+//      cout << "iStep=" << iStep << " z=" << z << " inter.size()=" << inter.size() << endl;
+      // Loop over material layers
       for(unsigned int  iMat = 0; iMat < inter.size() ; iMat++) {
          CbmLitMaterialInfo mat = inter[iMat];
 
-         // check if track parameters are correct
+         // Check if track parameters are correct
          if (!IsParCorrect(par)) {
-//          std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
             return kLITERROR;
          }
 
          std::vector<litfloat>* Fnew = NULL;
          if (F != NULL) { Fnew = new std::vector<litfloat>(25, 0.); }
-         // extrapolate to the next boundary
+         // Extrapolate to the next boundary
          if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
-//          std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: extrapolation failed" << std::endl;
             return kLITERROR;
          }
 
-         // update transport matrix
+         // Update transport matrix
          if (F != NULL) { UpdateF(*F, *Fnew); }
-         delete Fnew;
+         if (Fnew != NULL) delete Fnew;
 
-         // add material effects
-//       if (mat.GetRL() < 2000)
+         // Add material effects
          fMaterial->Update(par, &mat, pdg, downstream);
 
-//       std::cout << "    " << iStep << " " << iMat << " " << mat.ToString();
-//       std::cout << "    " << iStep << " " << iMat << " " << par->ToString();
+//         cout << "iMat=" << iMat << " mat=" << mat.ToString();
       }
    }
-
-// std::cout << "OUT " << par->ToString();
 
    if (!IsParCorrect(par)) { return kLITERROR; }
    else { return kLITSUCCESS; }

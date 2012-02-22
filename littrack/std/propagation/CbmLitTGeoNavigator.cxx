@@ -29,7 +29,10 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
    litfloat zOut,
    std::vector<CbmLitMaterialInfo>& inter)
 {
-   InitTrack(par);
+   Bool_t downstream = zOut >= par->GetZ();
+  // std::cout << "zOut=" << zOut << " Z=" << par->GetZ() << " downstream=" << downstream << std::endl;
+
+   InitTrack(par, downstream);
    if(gGeoManager->IsOutside()) { return kLITERROR; }
 
    CbmLitMaterialInfo stepInfo;
@@ -40,8 +43,10 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
    do {
       gGeoManager->PushPoint();
       stepInfo = MakeStep();
+//      std::cout << "stepInfo=" << stepInfo.ToString();
       // Check if outside of the geometry
       if(gGeoManager->IsOutside()) {
+//         std::cout << "Error! CbmLitTGeoNavigator::FindIntersections: Outside geometry.\n";
          gGeoManager->PopDummy();
          return kLITERROR;
       }
@@ -49,11 +54,13 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
       if (std::isnan(gGeoManager->GetCurrentPoint()[0]) ||
             std::isnan(gGeoManager->GetCurrentPoint()[1]) ||
             std::isnan(gGeoManager->GetCurrentPoint()[2]) ) {
+//         std::cout << "Error! CbmLitTGeoNavigator::FindIntersections: NaN values.\n";
          gGeoManager->PopDummy();
          return kLITERROR;
       }
       // Check if we currently at the output position
-      if ((stepInfo.GetZpos() >= zOut)) { //|| gGeoManager->IsNullStep()){
+      Bool_t away = (downstream) ? stepInfo.GetZpos() >= zOut : stepInfo.GetZpos() <= zOut;
+      if (away) { //|| gGeoManager->IsNullStep()){
          gGeoManager->PopPoint();
          litfloat l = CalcLength(zOut);
          stepInfo.SetLength(l);
@@ -68,10 +75,17 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 }
 
 void CbmLitTGeoNavigator::InitTrack(
-   const CbmLitTrackParam* par) const
+   const CbmLitTrackParam* par,
+   Bool_t downstream) const
 {
    litfloat nx, ny, nz;
    par->GetDirCos(nx, ny, nz);
+   // Change track direction for upstream
+   if (!downstream) {
+      nx = -nx;
+      ny = -ny;
+      nz = -nz;
+   }
    gGeoManager->InitTrack(par->GetX(), par->GetY(), par->GetZ(), nx, ny, nz);
 }
 
@@ -85,6 +99,7 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
    matInfo.SetRho(mat->GetDensity());
    matInfo.SetZ(mat->GetZ());
    matInfo.SetA(mat->GetA());
+   matInfo.SetName(gGeoManager->GetCurrentNode()->GetName());
 
    if (step == 0.) {
       gGeoManager->FindNextBoundaryAndStep(lit::MAXIMUM_TGEO_NAVIGATION_DISTANCE);

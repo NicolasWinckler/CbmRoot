@@ -144,11 +144,14 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   TH2I* fInvMPairMother;
   TH2I* fPtPairMother;
+  TH2I* fPPairMother;
   TH2I* fOpenAnglePairMother;
 
   // Global PID
   TH1I*  fMCPid;
   TH1I*  fGTPid;
+  TH2I*  fPt;
+  TH2I*  fP;
 
   TH1I*  fPairHistory;
 

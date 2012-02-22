@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 100)
+void global_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -22,16 +22,16 @@ void global_sim(Int_t nEvents = 100)
 	Int_t nofMuonsMinus = 0; // number of embedded muons from FairBoxGenerator
 	Int_t nofElectrons = 0; // number of embedded electrons from FairBoxGenerator
 	Int_t nofPositrons = 0; // number of embedded positrons from FairBoxGenerator
-	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
-	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
+	Int_t nofPionsPlus = 20; // number of embedded pions from FairBoxGenerator
+	Int_t nofPionsMinus = 20; // number of embedded pions from FairBoxGenerator
 	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
-	Int_t nofJPsiToElectrons = 5; // number of embedded J/Psi particles decaying to e+ and e-
+	Int_t nofJPsiToElectrons = 0; // number of embedded J/Psi particles decaying to e+ and e-
 	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
    TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString urqmdFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/data.local1/andrey/events/trd_v10b_electrons/"; //directory for output simulation files
+	TString dir = "/data.local1/andrey/events/events_mvd_pions/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -57,9 +57,9 @@ void global_sim(Int_t nEvents = 100)
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
-		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v10b.geo";
-		tofGeom    = "tof/tof_v07a.geo";
+		richGeom   = "";//"rich/rich_v08a.geo";
+		trdGeom    = "";//"trd/trd_v10b.geo";
+		tofGeom    = "";//"tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";
 		magnetGeom = "passive/magnet_v09e.geo";
@@ -290,7 +290,7 @@ void global_sim(Int_t nEvents = 100)
 	if (nofPionsPlus > 0) {
 		FairBoxGenerator* boxGen = new FairBoxGenerator(211, nofPionsPlus);
 //		boxGen1->SetPtRange(0.,3.);
-		boxGen->SetPRange(0., 10.);
+		boxGen->SetPRange(1., 2.);
 		boxGen->SetPhiRange(0.,360.);
 		boxGen->SetThetaRange(2.5,25.);
 		boxGen->SetCosTheta();
@@ -301,7 +301,7 @@ void global_sim(Int_t nEvents = 100)
 	if (nofPionsMinus > 0) {
 		FairBoxGenerator* boxGen = new FairBoxGenerator(-211, nofPionsMinus);
 //		boxGen->SetPtRange(0.,3.);
-		boxGen->SetPRange(0.3, 1.);
+		boxGen->SetPRange(1, 2.);
 		boxGen->SetPhiRange(0.,360.);
 		boxGen->SetThetaRange(2.5,25.);
 		boxGen->SetCosTheta();

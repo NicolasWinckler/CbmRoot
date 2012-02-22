@@ -37,6 +37,7 @@ function set_default_file_names() {
     export GLOBALHITSFILE=$DIR/global.hits.$XXXX.root
     export GLOBALTRACKSFILE=$DIR/global.tracks.$XXXX.root
     export GLOBALTRACKSIDEALFILE=$DIR/global.tracks.ideal.$XXXX.root
+    export MVDRECOFILE=$DIR/mvd.reco.$XXXX.root
     export PROPANAFILE=$DIR/propagation.ana.$XXXX.root
     export RICHFILE=$DIR/rich.reco.$XXXX.root
     export ELIDFILE=$DIR/elid.qa.$XXXX.root
@@ -100,6 +101,36 @@ function set_default_electron_geometry() {
     export NORMTRDHITS=8
     export NORMMUCHHITS=0
     export NORMTOFHITS=1
+}
+
+
+
+# Function set default mvd geometry
+function set_default_mvd_geometry() {
+    export CAVEGEOM=cave.geo
+    export TARGETGEOM=target_au_250mu.geo
+    export PIPEGEOM=pipe_much.geo
+    export SHIELDGEOM=shield_standard.geo
+    export MVDGEOM=mvd/mvd_v07a.geo
+    export STSGEOM=sts/sts_v11a.geo
+    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_v11a.digi.par
+    export MUCHGEOM=
+    export MUCHDIGI=
+    export RICHGEOM=
+    export TRDGEOM=
+    export TRDDIGI=
+    export TOFGEOM=
+    export ECALGEOM=
+    export FIELDMAP=field_v10e
+    export MAGNETGEOM=passive/magnet_v09m.geo
+    
+    export NORMSTSPOINTS=4
+    export NORMTRDPOINTS=0
+    export NORMMUCHPOINTS=0
+    export NORMTOFPOINTS=0
+    export NORMTRDHITS=0
+    export NORMMUCHHITS=0
+    export NORMTOFHITS=0
 }
 
 

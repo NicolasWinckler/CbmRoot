@@ -7,7 +7,7 @@ export SCRIPT=yes
 create_output_dir events_electron/
 create_result_dir results_electron/
 
-export NEVENTS=2
+export NEVENTS=5
 export DETECTORSETUP=electron
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN

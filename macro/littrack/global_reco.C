@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 void global_reco(Int_t nEvents = 100, // number of events
-		TString opt = "tracking")
+		TString opt = "hits")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/data.local1/andrey/events/trd_v12a_urqmd/"; // Output directory
+   TString dir = "/data.local1/andrey/events/events_mvd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits

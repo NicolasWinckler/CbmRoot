@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void mvd_reco(Int_t nEvents = 20)
+void mvd_reco(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -25,12 +25,13 @@ void mvd_reco(Int_t nEvents = 20)
    TString resultDir = "./test/"; // Directory for output results
 
    Int_t normStsPoints = 4; // STS normalization for efficiency
+   TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		mvdRecoFile = TString(gSystem->Getenv("MVDRECOFILE"));
-		resultDir = TString(gSystem->Getenv("IMAGEDIR"));
+		resultDir = TString(gSystem->Getenv("RESULTDIR"));
 		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
 		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
 	}
@@ -50,28 +51,60 @@ void mvd_reco(Int_t nEvents = 20)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(mvdRecoFile);
 
-	if (IsMvd(parFile)) {
-		// ----- MVD reconstruction    --------------------------------------------
-		CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
-		run->AddTask(mvdDigi);
+   if (IsMvd(parFile)) {
+      // ----- MVD reconstruction    --------------------------------------------
+      CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
+      run->AddTask(mvdDigi);
 
-		CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
-		run->AddTask(mvdHitFinder);
-		// -------------------------------------------------------------------------
-	}
+      CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
+      run->AddTask(mvdHitFinder);
+      // -------------------------------------------------------------------------
+   }
 
-	// ----- STS reconstruction   ---------------------------------------------
-	FairTask* stsDigitize =	new CbmStsIdealDigitize("STSDigitize", iVerbose);
-	run->AddTask(stsDigitize);
+   if (stsHitProducerType == "real") {
+   // ----- STS REAL reconstruction -----------------------------------------------
+      Double_t threshold  =  4;
+      Double_t noiseWidth =  0.01;
+      Int_t    nofBits    = 20;
+      Double_t minStep    =  0.01;
+      Double_t StripDeadTime = 0.1;
+      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+      stsDigitize->SetRealisticResponse();
+      stsDigitize->SetFrontThreshold (threshold);
+      stsDigitize->SetBackThreshold  (threshold);
+      stsDigitize->SetFrontNoiseWidth(noiseWidth);
+      stsDigitize->SetBackNoiseWidth (noiseWidth);
+      stsDigitize->SetFrontNofBits   (nofBits);
+      stsDigitize->SetBackNofBits    (nofBits);
+      stsDigitize->SetFrontMinStep   (minStep);
+      stsDigitize->SetBackMinStep    (minStep);
+      stsDigitize->SetStripDeadTime  (StripDeadTime);
+      run->AddTask(stsDigitize);
 
-	FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
-	run->AddTask(stsClusterFinder);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+      run->AddTask(stsClusterFinder);
 
-	FairTask* stsFindHits =	new CbmStsIdealFindHits("STSFindHits", iVerbose);
-	run->AddTask(stsFindHits);
+      FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
+      run->AddTask(stsFindHits);
 
-	FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
-	run->AddTask(stsMatchHits);
+      FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+      run->AddTask(stsMatchHits);
+
+   } else if (stsHitProducerType == "ideal") {
+
+      // ----- STS IDEAL reconstruction   ---------------------------------------------
+      FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
+      run->AddTask(stsDigitize);
+
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+      run->AddTask(stsClusterFinder);
+
+      FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
+      run->AddTask(stsFindHits);
+
+      FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
+      run->AddTask(stsMatchHits);
+   }
 
 	FairTask* kalman = new CbmKF();
 	run->AddTask(kalman);
@@ -90,8 +123,8 @@ void mvd_reco(Int_t nEvents = 20)
 //	run->AddTask(fitTracks);
    // ------------------------------------------------------------------------
 
-	CbmLitFindMvdTracks* finder = new CbmLitFindMvdTracks();
-	run->AddTask(finder);
+	CbmLitFindMvdTracks* mvdFinder = new CbmLitFindMvdTracks();
+	run->AddTask(mvdFinder);
 
 	CbmLitFindGlobalTracks* globalFinder = new CbmLitFindGlobalTracks();
 	run->AddTask(globalFinder);
@@ -111,7 +144,7 @@ void mvd_reco(Int_t nEvents = 20)
 	run->AddTask(trackingQa);
 
 	CbmLitFitQa* fitQa = new CbmLitFitQa();
-   fitQa->SetMvdMinNofHits(0);
+   fitQa->SetMvdMinNofHits(1);
    fitQa->SetStsMinNofHits(normStsPoints);
 	fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
@@ -144,6 +177,8 @@ void mvd_reco(Int_t nEvents = 20)
 	cout << "Output file is " << mvdRecoFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
+   cout << "Test passed"<< endl;
+   cout << " All ok " << endl;
 	// ------------------------------------------------------------------------
 }
 

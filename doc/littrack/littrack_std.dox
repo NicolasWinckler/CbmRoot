@@ -1,8 +1,8 @@
 /**
 
-\page std std
+\page littrack_std Standard tracking implementation
 
-\section stdsection1 Interfaces
+\section littrack_stdsection1 Interfaces
 For flexibility littrack has a set of abstract interfaces for all main track reconstruction tools. They are:
 
 \li \c CbmLitField: access to the magnetic field map.
@@ -33,7 +33,7 @@ TrackFitterPtr smoother = factory->CreateTrackFitter("kalman_smoother");
 \endcode
 
 
-\section stdsection2 Detector layout classes
+\section littrack_stdsection2 Detector layout classes
 The detector layout classes are used in the tracking for a simplified 
 description of the detector layout like positions of different detection 
 elements. NOTE that they do not describe detector material which is needed 
@@ -71,7 +71,7 @@ const CbmLitDetectorLayout& muchLayout = env->GetMuchLayout(); // Returns MUCH l
 const CbmLitDetectorLayout& trdLayout = env->GetTrdLayout(); // Returns TRD layout
 \endcode
 
-\section stdsection3 Data classes
+\section littrack_stdsection3 Data classes
 
 Data classes provide access to hit, track, track parameters and other information. 
 They optimize for faster and more convenient dynamic access unlike CBMROOT
@@ -84,7 +84,7 @@ data classes mainly optimize for storage.
 \li \c CbmLitTrack - track
 \li \c CbmLitFitNode - fit node stores predicted, updated and smoothed track parameters during track fit for each station
 
-\section stdsection4 Track propagation
+\section littrack_stdsection4 Track propagation
 
 The track propagation algorithm estimates the trajectory and its errors in a 
 covariance matrix while taking into account three physics effects which influence 
@@ -120,7 +120,7 @@ by the geometry navigation algorithm which finds intersection points with detect
 in a certain interval (z1 , z2 ) along a straight line. The implementation of the navigation 
 is based on the ROOT geometry package TGeo in the \c CbmLitTGeoNavigator. 
 
-\section stdsection5 Track fit
+\section littrack_stdsection5 Track fit
 
 All track fitter algorithms has to implement \c CbmLitTrackFitter interface. Kalman filter based 
 track fitting algorithms may use track propagation within \c CbmLitTrackPropagator interface and 
@@ -132,11 +132,11 @@ Currently all implemented track fitter algorithms are based on Kalman filter met
 \li \c CbmLitTrackFitterIter - iterative Kalman Filter consisting of forward and backward track fit and outliers removing.
 \li \c CbmLitTrackFitterWeight - iterative Kalman filter using weight calculation. Similar to DAF but can use different weight functions.
 
-\section stdsection6 Track finding
+\section littrack_stdsection6 Track finding
 
 <b>UNDER CONSTRUCTION</b>
 
-\section stdsection7 Track selection
+\section littrack_stdsection7 Track selection
 
 All track selection algorithms implement \c CbmLitTrackSelection interface. 
 The input to the track selection is an array of tracks which algorithm has to classify as "good" or "bad".

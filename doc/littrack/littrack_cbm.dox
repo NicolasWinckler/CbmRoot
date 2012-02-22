@@ -1,8 +1,8 @@
 /**
 
-\page cbm cbm
+\page littrack_cbm Interface to CBMROOT of littrack
 
-\section cbmsection1 main() function
+\section littrack_cbmsection1 main() function
 
 \c CbmLitFindGlobalTracks is a main task to be called from macro in order
 to execute littrack tracking routines. The task automatically determines 
@@ -28,7 +28,7 @@ run->AddTask(finder);
 \endcode
 
 
-\section cbmsection2 Field approximation
+\section littrack_cbmsection2 Field approximation
 
 Polynomial field approximation is used in parallel tracking algorithm. 
 Calculation of the polynomial coefficients for a specified field slice 

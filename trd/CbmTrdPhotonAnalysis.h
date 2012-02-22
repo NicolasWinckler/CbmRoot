@@ -62,7 +62,9 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   Bool_t VertexInMagnet(CbmMCTrack* track); 
   Bool_t VertexInTarget(CbmMCTrack* track);
-  Bool_t CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* trackB);
+  Bool_t CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* trackB, Double_t minimumDistance /*[cm]*/);
+
+  Double_t CalcVertexDistance(CbmMCTrack* trackA, CbmMCTrack* trackB);
 
   Bool_t PairFromGamma(Int_t firstId, Int_t secondId);
   Bool_t PairFromPi0(Int_t firstId, Int_t secondId);
@@ -70,6 +72,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Double_t CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB);
+
+  void StatisticHistos();
 
   /** Executed task **/
   virtual void Exec(Option_t * option);
@@ -122,6 +126,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I* fPairAllVertex[3];
   TH1I* fPairGammaVertex[3];
   TH1I* fPairPi0Vertex[3];
+  TH1I* fEPPairVertexDistance;
 
   // Death Vertex
   TH1I* fpi02GammaVertex[3];
@@ -145,24 +150,23 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I*  fMCPid;
   TH1I*  fGTPid;
 
-
   TH1I*  fPairHistory;
 
   // Spectra
   //TH1F* fInvMSpectra[20];
   //TH1F* fEPPairOpenAngle[20];
 
-  TH1F* fPi0SpectrumGammaTruePairs;
-  TH1F* fPi0SpectrumGammaAllPairs;
-  TH1F* fPi0SpectrumGammaEPPairs;
-  //TH1I* fPi0SpectrumGammaEPPairsSameMother;
-  TH1F* fPi0SpectrumGammaEPPairsInTarget;
-  TH1F* fPi0SpectrumGammaEPPairsInMagnet;
-  TH1F* fPi0SpectrumGammaEPPairsOpenAngle;
-  TH1F* fGammaSpectrumTrueEPPairs;
-  TH1F* fGammaSpectrumAllEPPairs;
-  TH1F* fGammaSpectrumEPPairsInTarget;
-  TH1F* fGammaSpectrumEPPairsInMagnet;
+  TH1F* fInvMassSpectrumGammaTruePairs;
+  TH1F* fInvMassSpectrumGammaAllPairs;
+  TH1F* fInvMassSpectrumGammaEPPairs;
+  //TH1I* fInvMassSpectrumGammaEPPairsSameMother;
+  TH1F* fInvMassSpectrumGammaEPPairsInTarget;
+  TH1F* fInvMassSpectrumGammaEPPairsInMagnet;
+  TH1F* fInvMassSpectrumGammaEPPairsOpenAngle;
+  TH1F* fInvMassSpectrumTrueEPPairs;
+  TH1F* fInvMassSpectrumAllEPPairs;
+  TH1F* fInvMassSpectrumEPPairsInTarget;
+  TH1F* fInvMassSpectrumEPPairsInMagnet;
 
   // Cuts
   TH1F* fEPPairOpeningAngle;
@@ -172,6 +176,11 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1F* fEPPairOpeningAngleInTarget;
   TH1F* fEPPairOpeningAngleInMagnet;
 
+  TH1F* fPairOpeningAngleAll;
+  TH1F* fPairOpeningAngleGamma;
+  TH1F* fPairOpeningAnglePi0;
+  TH1F* fPairOpeningAngleGammaWoPi0;
+  /*
   std::map<Int_t, MCParticle*> fMCParticleMap;
   std::map<Int_t, MCParticle*>::iterator it;
 
@@ -181,7 +190,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
   std::vector<Int_t> fPi0Ids;
 
   std::vector<CbmMCTrack*> fGammaFromPairs;
-
+  */
   ClassDef(CbmTrdPhotonAnalysis,1)
     };
 

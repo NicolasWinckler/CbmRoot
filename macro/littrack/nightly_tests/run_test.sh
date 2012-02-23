@@ -48,17 +48,20 @@ if [ "$1" = "build" ] ; then
     . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_muon.sh
     
     copy_results_to_web "${TEST_DIR}/cbmroot/macro/littrack/nightly_tests/std_reco*"
+    copy_results_to_web "${TEST_DIR}/cbmroot/macro/littrack/nightly_tests/littrack*"
 elif [ "$1" = "cdash" ] ; then 
     checkout_cbmroot ${TEST_DIR}
     # Run tests with CDash
     . ${TEST_DIR}/cbmroot/Dart.sh Experimental ${TEST_DIR}/cbmroot/Dart.cfg
     
     copy_results_to_web "${BUILD_DIR}/macro/littrack/nightly_tests/std_reco*"
+    copy_results_to_web "${BUILD_DIR}/macro/littrack/nightly_tests/littrack*"
 elif [ "$1" = "local" ] ; then
     . ./run_test_electron.sh
     . ./run_test_muon.sh
     
     copy_results_to_web "./std_reco*"
+    copy_results_to_web "./littrack*"
 else
     echo 'Error! Option $1 does not supported!'
     exit 2

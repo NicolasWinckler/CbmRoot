@@ -23,17 +23,17 @@ void run_reco_geotest(Int_t nEvents = 10000)
    run->SetInputFile(inFile);
    run->SetOutputFile(outFile);
 
-   Double_t richPmtRad = 0.4; // PMT radius [cm]
-   Double_t richPmtDist = 0.; // Distance between PMTs [cm]
-   Int_t richDetType = 4; // Detector type Hamamatsu H8500-03
-   Int_t richNoise = 220; // Number of noise points per event
-   Double_t collectionEff = 1.; //collection efficiency of the photodetector
-   Double_t richSMirror = 0.00001; // Sigma for additional point smearing due to light scattering in mirror
-   CbmRichHitProducer* richHitProd = new CbmRichHitProducer(richPmtRad, richPmtDist,
-         richDetType, richNoise, iVerbose, collectionEff, richSMirror);
+   CbmRichHitProducer* richHitProd  = new CbmRichHitProducer();
+   richHitProd->SetDetectorType(4);
+   richHitProd->SetNofNoiseHits(220);
+   richHitProd->SetCollectionEfficiency(1.0);
+   richHitProd->SetSigmaMirror(0.06);
    run->AddTask(richHitProd);
 
    CbmRichReconstruction* richReco = new CbmRichReconstruction();
+   richReco->SetRunExtrapolation(false);
+   richReco->SetRunProjection(false);
+   richReco->SetRunTrackAssign(false);
    richReco->SetFinderName("ideal");
    run->AddTask(richReco);
 

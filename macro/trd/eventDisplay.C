@@ -1,4 +1,4 @@
-eventDisplay()
+eventDisplay(TString inputFriend = "data/test.esd.root")
 {
 
   // ========================================================================
@@ -24,12 +24,29 @@ eventDisplay()
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
   gSystem->Load("libMvd");
+  //  gSystem->Load("libSts");
+  //gSystem->Load("libRich");
+  gSystem->Load("libTrd");
+  gSystem->Load("libTof");
+  gSystem->Load("libEcal");
+  gSystem->Load("libEve");
+  /*
+  gSystem->Load("libGeoBase");
+  gSystem->Load("libParBase");
+  gSystem->Load("libBase");
+  gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
+  gSystem->Load("libField");
+  gSystem->Load("libGen");
+  gSystem->Load("libPassive");
+  gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
   gSystem->Load("libEcal");
   gSystem->Load("libEve");
+  */
   gSystem->Load("libEventDisplay");
   gSystem->Load("libCbmDisplay");
 
@@ -37,7 +54,7 @@ eventDisplay()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile("data/test.mc.root");
-  fRun->AddFriend("data/test.esd.root");
+  fRun->AddFriend(inputFriend);
   
   fRun->SetOutputFile("data/test.root");
 

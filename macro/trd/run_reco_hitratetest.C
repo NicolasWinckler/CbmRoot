@@ -95,14 +95,14 @@ void run_reco_hitratetest()
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
+  gSystem->Load("libEcal");
+  gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  gSystem->Load("libEcal");
   gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
   gSystem->Load("libL1");
   gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
@@ -117,7 +117,7 @@ void run_reco_hitratetest()
   // ------------------------------------------------------------------------
 
 
- 
+  
   // =========================================================================
   // ===                     TRD local reconstruction                      ===
   // =========================================================================

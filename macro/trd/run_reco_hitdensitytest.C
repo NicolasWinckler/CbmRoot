@@ -93,21 +93,17 @@ void run_reco_hitdensitytest(Int_t nEvents)
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  /*
+  gSystem->Load("libEcal");
+  gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
-  */
   gSystem->Load("libTrd");
-  /*
   gSystem->Load("libTof");
-  gSystem->Load("libEcal");
   gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
   gSystem->Load("libL1");
   gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
-  */
   // ------------------------------------------------------------------------
 
 
@@ -123,7 +119,7 @@ void run_reco_hitdensitytest(Int_t nEvents)
   // =========================================================================
   // ===                     TRD local reconstruction                      ===
   // =========================================================================
-
+  /*
   // Update of the values for the radiator F.U. 17.08.07
   Int_t trdNFoils    = 130;      // number of polyetylene foils
   Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
@@ -149,7 +145,7 @@ void run_reco_hitdensitytest(Int_t nEvents)
 
   run->AddTask(trdHitProd);
 
- 
+  */
   // -----   TRD clusterizer     ----------------------------------------------
   /*
   CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);

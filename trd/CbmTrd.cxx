@@ -375,23 +375,24 @@ void CbmTrd::ConstructGeometry() {
 
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  CbmGeoTrd*       trdGeo  = new CbmGeoTrd();
+  CbmGeoTrd*        trdGeo  = new CbmGeoTrd();
   trdGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(trdGeo);
 
   Bool_t rc = geoFace->readSet(trdGeo);
   if (rc) trdGeo->create(geoLoad->getGeoBuilder());
   TList* volList = trdGeo->getListOfVolumes();
- // store TRD geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
+
+  // store TRD geo parameter
+  FairRun *fRun       = FairRun::Instance();
+  FairRuntimeDb *rtdb = FairRun::Instance()->GetRuntimeDb();
+  CbmGeoTrdPar* par   = (CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
   FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
+  FairGeoVolume *aVol = NULL;
 
   while( (node = (FairGeoNode*)iter.Next()) ) {
       aVol = dynamic_cast<FairGeoVolume*> ( node );
@@ -403,14 +404,38 @@ void CbmTrd::ConstructGeometry() {
   }
   par->setChanged();
   par->setInputVersion(fRun->GetRunId(),1);
+
   ProcessNodes( volList );
+
+//  // add structures a la RICH
+//  TGeoMaterial * matAl = new TGeoMaterial("Al", 26.98, 13, 2.7);
+//  TGeoMedium * Al      = new TGeoMedium("Al",1, matAl);
+//  TGeoVolume * volume  = gGeoManager->MakeTube("grid", Al, 1.3, 1.5, 180);
+//
+//  gGeoManager->Matrix(123456, 180,   0,  90,  90,  90,   0); // z rotation
+//  gGeoManager->Matrix(123457,  90,   0, 180,   0,  90,  90); // y rotation
+//   
+//  Double_t * buf = 0;
+//  for (Int_t i = 0; i< 11; i++) {
+//    if (i == 5) continue;
+//    gGeoManager->Node("grid", 2*i+1, "trd3", 36*i - 180, 0, 40, 123457, kTRUE, buf, 0);
+//    gGeoManager->Node("grid", 2*i+2, "trd3", 0, 36*i - 180, 48, 123456, kTRUE, buf, 0);
+//  }
+
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method AddHit   -----------------------------------------
-CbmTrdPoint* CbmTrd::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
-			    TVector3 momIn, TVector3 posOut, TVector3 momOut, 
-                            Double_t time, Double_t length, Double_t eLoss) {
+CbmTrdPoint* CbmTrd::AddHit(
+      Int_t trackID,
+      Int_t detID, 
+      TVector3 posIn,
+      TVector3 momIn, 
+      TVector3 posOut, 
+      TVector3 momOut, 
+      Double_t time, 
+      Double_t length, 
+      Double_t eLoss) {
   TClonesArray& clref = *fTrdCollection;
   Int_t size = clref.GetEntriesFast();
   return new(clref[size]) CbmTrdPoint(trackID, detID, posIn, momIn, posOut,

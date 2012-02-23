@@ -7,7 +7,7 @@
 //
 // --------------------------------------------------------------------------
 
-void run_sim(Int_t nEvents = 2)
+void run_sim(Int_t nEvents = 1)
 {
 
   // ========================================================================
@@ -26,8 +26,8 @@ void run_sim(Int_t nEvents = 2)
 
   // ----- Paths and file names  --------------------------------------------
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
-  TString inFile  = inDir + "/input/urqmd.ftn14";
-  //  TString inFile  = inDir + "/input/urqmd.auau.25gev.centr.0000.ftn14";
+  //TString inFile  = inDir + "/input/urqmd.ftn14";
+  TString inFile  = inDir + "/input/urqmd.auau.25gev.centr.0000.ftn14";
   TString outDir  = "data";
   TString outFile = outDir + "/test.mc.root";
   TString parFile = outDir + "/params.root";
@@ -80,12 +80,13 @@ void run_sim(Int_t nEvents = 2)
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
+  gSystem->Load("libEcal");
+  gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  //gSystem->Load("libEcal");
   // -----------------------------------------------------------------------
 
  

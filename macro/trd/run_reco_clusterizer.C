@@ -21,6 +21,10 @@
 void run_reco_clusterizer(Int_t nEvents = 1)
 {
 
+  gStyle->SetPalette(1,0);
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadTickX(1);                        
+  gStyle->SetPadTickY(1); 
   // ========================================================================
   // geometry selection for sim + reco  by Cyrano                            
   // ========================================================================
@@ -34,9 +38,7 @@ void run_reco_clusterizer(Int_t nEvents = 1)
 
   // ========================================================================
   //          Adjust this part according to your requirements
-
-  gStyle->SetPalette(1,0);
-  gROOT->SetStyle("Plain");
+ 
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
@@ -59,13 +61,15 @@ void run_reco_clusterizer(Int_t nEvents = 1)
     TString trdDigiDir = gSystem->Getenv("VMCWORKDIR");
     trdDigiDir += "/macro/run/";
   */
-TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
-// TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
+  TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
+  // TObjString trdDigiFile = paramDir + "/trd/trd_standard.digi.par";
   parFileList->Add(&trdDigiFile);
 
 
   // Output file
-  TString outFile = "data/test.esd.root";
+  TString statistic;
+  statistic.Form(".%03ievents",nEvents);
+  TString outFile = "data/test.esd." + digipar + statistic + ".root";
 
 
   // In general, the following parts need not be touched
@@ -242,7 +246,6 @@ TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
   
   CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
   run->AddTask(trdClustering);
-  printf("Init ClusterfinderFast\n");
   /*
     CbmTrdClusterFinder* trdClusterfinding = new CbmTrdClusterFinder();
     run->AddTask(trdClusterfinding);
@@ -256,7 +259,7 @@ TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
   
   CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
   run->AddTask(trdClusterHitProducer);
-   printf("Finished Hit Producer\n");
+  printf("Finished Hit Producer\n");
   
   // -------------------------------------------------------------------------
 

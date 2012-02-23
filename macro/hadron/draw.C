@@ -6,7 +6,7 @@
 #define M2KAON 0.243716980329
 #define M2PROT 0.880354345984
 
-#include "/home/kresan/tools/drawStyle.C"
+#include "drawStyle.C"
 
 #define C1 0.3989422804014327
 

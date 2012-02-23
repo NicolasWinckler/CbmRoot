@@ -1,4 +1,4 @@
-#include "/misc/kresan/tools/drawStyle.C"
+#include "drawStyle.C"
 
 
 void plot_sts()

@@ -1,4 +1,4 @@
-#include "/misc/kresan/tools/drawStyle.C"
+#include "drawStyle.C"
 
 void plot()
 {
@@ -10,8 +10,6 @@ void plot()
     char *ver = getenv("CBMVER");
 
     char str[1000];
-//    sprintf(str, "/lustre_alpha/cbm/user/kresan/mc/%s/urqmd/auau/2gev/centr/\
-//urqmd.auau.2gev.centr.0000.mc.root", ver);
     sprintf(str, "/misc/kresan/mc/%s/urqmd/auau/2gev/centr/\
 urqmd.auau.2gev.centr.0000.mc.root", ver);
     TFile *file = new TFile(str);

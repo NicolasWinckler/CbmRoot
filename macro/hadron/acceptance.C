@@ -1,6 +1,6 @@
 
-#include "/misc/kresan/tools/drawStyle.C"
-#include "/misc/kresan/cbm/head/cbmroot/cbmbase/CbmDetectorList.h"
+#include "drawStyle.C"
+#include "/u/kresan/cbm/trunk_feb12/cbmroot/cbmbase/CbmDetectorList.h"
 
 
 

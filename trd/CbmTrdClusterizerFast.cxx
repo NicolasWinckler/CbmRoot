@@ -196,7 +196,15 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
   CbmTrdPoint *pt=NULL;
   MyPoint* point = new MyPoint;
   delete point;
-
+  /*
+  // Module infos are stored to ModuleClusterMap whenever a module is used for the first time in each event
+  // Digis are buffered in the ModuleClusterMap until the end of event and than copied to die digicollection
+  // Digis are only calculated for three central pads in x and y (start up version)
+  // Afterwards can be extended to n-pad (worse, easier to implement) cluster for x and y or a maximum distance to cluster center (better, more flexible)
+  // Dont forget to erase the ModuleClusterMap after each event!!!
+  // First step: digis are estmated using prf for the position coresponding to center between entrance and exit point
+  // Second step: path between entrance and exit is splitted into slithes
+  */
 
   timer.Stop();
   Double_t rtime = timer.RealTime();

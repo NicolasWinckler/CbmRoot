@@ -88,26 +88,49 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fPairAllVertex(),
     fPairGammaVertex(),
     fPairPi0Vertex(),
-    fEPPairVertexDistance(NULL),
+    fEPPairVertexDistance_global(NULL),
+    fEPPairVertexDistance_inMagnet(NULL),
+    fEPPairVertexDistance_inTarget(NULL),
     // Death Vertex
     fpi02GammaVertex(),
     fgamma2PairVertex(),
     // Mother Daughter
-    fMotherDaughter(NULL),
-    fNoDaughters(NULL),
+    fMotherDaughter_global(NULL),
+    fMotherDaughter_inMagnet(NULL),
+    fMotherDaughter_inTarget(NULL),
+    fNoDaughters_global(NULL),
+    fNoDaughters_inMagnet(NULL),
+    fNoDaughters_inTarget(NULL),
     fePlusMinusMother(NULL),
     fePlusAndMinusMother(NULL),
     fgammaMother(NULL),
     fgammaAndGammaMother(NULL),
     fDalizMother(NULL),
     fgammaDaughter(NULL),
+    fmotherGrani_gamma_global(NULL),
+    fmotherGrani_posi_global(NULL),
+    fmotherGrani_elec_global(NULL),
+    fmotherGrani_gamma_inMagnet(NULL),
+    fmotherGrani_posi_inMagnet(NULL),
+    fmotherGrani_elec_inMagnet(NULL),
+    fmotherGrani_gamma_inTarget(NULL),
+    fmotherGrani_posi_inTarget(NULL),
+    fmotherGrani_elec_inTarget(NULL),
     fInvMPairMother(NULL),
     fPtPairMother(NULL),
     fPPairMother(NULL),
     fOpenAnglePairMother(NULL),
     // Global PID
-    fMCPid(NULL),
+    fMCPid_global(NULL),
+    fMCPid_inMagnet(NULL),
+    fMCPid_inTarget(NULL),
     fGTPid(NULL),
+    fPt_global(NULL),
+    fPt_inMagnet(NULL),
+    fPt_inTarget(NULL),
+    fP_global(NULL),
+    fP_inMagnet(NULL),
+    fP_inTarget(NULL),
     fPairHistory(NULL),
     // Spectra
     //TH1F* fInvMSpectra[20];
@@ -164,26 +187,49 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fPairAllVertex(),
     fPairGammaVertex(),
     fPairPi0Vertex(),
-    fEPPairVertexDistance(NULL),
+    fEPPairVertexDistance_global(NULL),
+    fEPPairVertexDistance_inMagnet(NULL),
+    fEPPairVertexDistance_inTarget(NULL),
     // Death Vertex
     fpi02GammaVertex(),
     fgamma2PairVertex(),
     // Mother Daughter
-    fMotherDaughter(NULL),
-    fNoDaughters(NULL),
+    fMotherDaughter_global(NULL),
+    fMotherDaughter_inMagnet(NULL),
+    fMotherDaughter_inTarget(NULL),
+    fNoDaughters_global(NULL),
+    fNoDaughters_inMagnet(NULL),
+    fNoDaughters_inTarget(NULL),
     fePlusMinusMother(NULL),
     fePlusAndMinusMother(NULL),
     fgammaMother(NULL),
     fgammaAndGammaMother(NULL),
     fDalizMother(NULL),
     fgammaDaughter(NULL),
+    fmotherGrani_gamma_global(NULL),
+    fmotherGrani_posi_global(NULL),
+    fmotherGrani_elec_global(NULL),
+    fmotherGrani_gamma_inMagnet(NULL),
+    fmotherGrani_posi_inMagnet(NULL),
+    fmotherGrani_elec_inMagnet(NULL),
+    fmotherGrani_gamma_inTarget(NULL),
+    fmotherGrani_posi_inTarget(NULL),
+    fmotherGrani_elec_inTarget(NULL),
     fInvMPairMother(NULL),
     fPtPairMother(NULL),
     fPPairMother(NULL),
     fOpenAnglePairMother(NULL),
     // Global PID
-    fMCPid(NULL),
+    fMCPid_global(NULL),
+    fMCPid_inMagnet(NULL),
+    fMCPid_inTarget(NULL),
     fGTPid(NULL),
+    fPt_global(NULL),
+    fPt_inMagnet(NULL),
+    fPt_inTarget(NULL),
+    fP_global(NULL),
+    fP_inMagnet(NULL),
+    fP_inTarget(NULL),
     fPairHistory(NULL),
     // Spectra
     //TH1F* fInvMSpectra[20];
@@ -271,7 +317,9 @@ CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()
   delete fBirthPair;
   delete fZBirthAll;
   delete fZBirthEPfromGamma;
-  delete fEPPairVertexDistance;
+  delete fEPPairVertexDistance_global;
+  delete fEPPairVertexDistance_inMagnet;
+  delete fEPPairVertexDistance_inTarget;
   for (Int_t i = 0; i < 4; i++)
     delete fZBirth[i];
   for (Int_t i = 0; i < 3; i++){
@@ -284,21 +332,42 @@ CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()
     delete fgamma2PairVertex[i];
   }
   // Mother Daughter
-  delete fMotherDaughter;
-  delete fNoDaughters;
+  delete fMotherDaughter_global;
+  delete fMotherDaughter_inMagnet;
+  delete fMotherDaughter_inTarget;
+  delete fNoDaughters_global;
+  delete fNoDaughters_inMagnet;
+  delete fNoDaughters_inTarget;
   delete fePlusMinusMother;
   delete fePlusAndMinusMother;
   delete fgammaMother;
   delete fgammaAndGammaMother;
   delete fDalizMother;
   delete fgammaDaughter;
+  delete fmotherGrani_gamma_global;
+  delete fmotherGrani_posi_global;
+  delete fmotherGrani_elec_global;
+  delete fmotherGrani_gamma_inMagnet;
+  delete fmotherGrani_posi_inMagnet;
+  delete fmotherGrani_elec_inMagnet;
+  delete fmotherGrani_gamma_inTarget;
+  delete fmotherGrani_posi_inTarget;
+  delete fmotherGrani_elec_inTarget;
   delete fInvMPairMother;
   delete fPtPairMother;
   delete fPPairMother;
   delete fOpenAnglePairMother;
   // Global PID
-  delete fMCPid;
+  delete fMCPid_global;
+  delete fMCPid_inMagnet;
+  delete fMCPid_inTarget;
   delete fGTPid;
+  delete fPt_global;
+  delete fPt_inMagnet;
+  delete fPt_inTarget;
+  delete fP_global;
+  delete fP_inMagnet;
+  delete fP_inTarget;
   delete fPairHistory;
   // Spectra
   //TH1F* fInvMSpectra[20];
@@ -437,6 +506,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   //InitHistos();
   
   CbmMCTrack* mctrack = NULL;
+  CbmMCTrack* grandmother = NULL;
   CbmMCTrack* mother = NULL;
   CbmMCTrack* daughter = NULL;
   CbmMCTrack* etrack = NULL;
@@ -448,7 +518,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   CbmTrdTrack* track = NULL;
   CbmGlobalTrack* gtrack = NULL;
 
-  //CbmMCTrack* grandmother = NULL;
+
   /*
     CbmTrdPoint *mcpt = NULL;
     CbmTrdDigi *digi = NULL;
@@ -468,6 +538,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     nPrimaryVertex(0);
 
   Int_t motherId = 0;
+  Int_t grandmotherId = 0;
 
   std::map<Int_t, MCParticle*> fMCParticleMap;
   std::map<Int_t, MCParticle*>::iterator it;
@@ -478,6 +549,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::vector<Int_t> fPositronIds;
   std::vector<Int_t> fGammaIds;
   std::vector<Int_t> fPi0Ids;
+  Int_t nPi0_global(0), nPi0_inMagnet(0), nPi0_inTarget(0);
 
   std::vector<std::vector<Int_t> > dalizTriplets;
   std::vector<std::pair<Int_t,Int_t> > electronPositronPairs;
@@ -517,11 +589,20 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (motherId != -1)
       mother = (CbmMCTrack*)fMCTracks->At(motherId);
    
-    fMCPid->Fill(PdgToGeant(mctrack->GetPdgCode()));
-    fPt->Fill(mctrack->GetPt(), PdgToGeant(mctrack->GetPdgCode()));
-    fP ->Fill(mctrack->GetP(),  PdgToGeant(mctrack->GetPdgCode()));
+    fMCPid_global->Fill(PdgToGeant(mctrack->GetPdgCode()));
+    fPt_global->Fill(mctrack->GetPt(), PdgToGeant(mctrack->GetPdgCode()));
+    fP_global ->Fill(mctrack->GetP(),  PdgToGeant(mctrack->GetPdgCode()));
     fZBirthAll->Fill(mctrack->GetStartZ(),PdgToGeant(mctrack->GetPdgCode()));
-
+    if (VertexInMagnet(mctrack)){
+      fMCPid_inMagnet->Fill(PdgToGeant(mctrack->GetPdgCode()));
+      fPt_inMagnet->Fill(mctrack->GetPt(), PdgToGeant(mctrack->GetPdgCode()));
+      fP_inMagnet ->Fill(mctrack->GetP(),  PdgToGeant(mctrack->GetPdgCode()));
+    }
+    if(VertexInTarget(mctrack)){
+      fMCPid_inTarget->Fill(PdgToGeant(mctrack->GetPdgCode()));
+      fPt_inTarget->Fill(mctrack->GetPt(), PdgToGeant(mctrack->GetPdgCode()));
+      fP_inTarget->Fill(mctrack->GetP(),  PdgToGeant(mctrack->GetPdgCode()));    
+    }
     if (mctrack->GetPdgCode() ==  22) { // Gamma
       fZBirth[0]->Fill(mctrack->GetStartZ());
       fBirthGamma->Fill(mctrack->GetStartX(), mctrack->GetStartY(), mctrack->GetStartZ());
@@ -548,7 +629,70 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     
     if (motherId >= 0) {    
       mother = (CbmMCTrack*)fMCTracks->At(motherId);
-      fMotherDaughter->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(mctrack->GetPdgCode()));
+      grandmotherId = mother->GetMotherId();
+      if (grandmotherId != -1) {
+	grandmother = (CbmMCTrack*)fMCTracks->At(grandmotherId);
+	if (grandmother->GetPdgCode() == 111 || mother->GetPdgCode() == 111) { // pi0
+	  nPi0_global++;
+	  if (VertexInMagnet(mctrack))
+	    nPi0_inMagnet++;
+	  if(VertexInTarget(mctrack))
+	    nPi0_inTarget++;
+	}
+	if (mctrack->GetPdgCode() ==  22){
+	  fmotherGrani_gamma_global->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	  if (VertexInMagnet(mctrack))
+	    fmotherGrani_gamma_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	  if(VertexInTarget(mctrack))
+	    fmotherGrani_gamma_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	}
+	if (mctrack->GetPdgCode() == -11){
+	  fmotherGrani_posi_global->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	  if (VertexInMagnet(mctrack))
+	    fmotherGrani_posi_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	  if(VertexInTarget(mctrack))
+	    fmotherGrani_posi_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	}
+	if (mctrack->GetPdgCode() ==  11){
+	  fmotherGrani_elec_global->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	  if (VertexInMagnet(mctrack))
+	    fmotherGrani_elec_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	  if(VertexInTarget(mctrack))
+	    fmotherGrani_elec_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(grandmother->GetPdgCode()));
+	}
+      }
+      else {
+	if (mctrack->GetPdgCode() ==  22){
+	  fmotherGrani_gamma_global->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	  if (VertexInMagnet(mctrack))
+	    fmotherGrani_gamma_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	  if(VertexInTarget(mctrack))
+	    fmotherGrani_gamma_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	}
+	if (mctrack->GetPdgCode() == -11){
+	  fmotherGrani_posi_global->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	  if (VertexInMagnet(mctrack))
+	    fmotherGrani_posi_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	  if(VertexInTarget(mctrack))
+	    fmotherGrani_posi_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	}
+	if (mctrack->GetPdgCode() ==  11){
+	  fmotherGrani_elec_global->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	  if (VertexInMagnet(mctrack))
+	    fmotherGrani_elec_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	  if(VertexInTarget(mctrack))
+	    fmotherGrani_elec_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), 49);
+	}
+
+      }
+  
+
+      fMotherDaughter_global->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(mctrack->GetPdgCode()));
+   
+      if (VertexInMagnet(mctrack))
+	fMotherDaughter_inMagnet->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(mctrack->GetPdgCode()));
+      if(VertexInTarget(mctrack))
+	fMotherDaughter_inTarget->Fill(PdgToGeant(mother->GetPdgCode()), PdgToGeant(mctrack->GetPdgCode()));
       fMotherDaughterZBirth->Fill(mctrack->GetStartZ(), PdgToGeant(mother->GetPdgCode()), PdgToGeant(mctrack->GetPdgCode()));
       if (mother->GetPdgCode() == 22)
 	fgammaDaughter->Fill(PdgToGeant(mctrack->GetPdgCode()));
@@ -557,7 +701,34 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 			
     }
     else {
-      fMotherDaughter->Fill(49,PdgToGeant(mctrack->GetPdgCode()));
+      fMotherDaughter_global->Fill(49,PdgToGeant(mctrack->GetPdgCode()));
+      /*
+	if (VertexInMagnet(mother))
+	fMotherDaughter_inMagnet->Fill(49, PdgToGeant(mctrack->GetPdgCode()));
+	if(VertexInTarget(mother))
+	fMotherDaughter_inTarget->Fill(49, PdgToGeant(mctrack->GetPdgCode()));
+      */
+      if (mctrack->GetPdgCode() ==  22){
+	fmotherGrani_gamma_global->Fill(49, 49);
+	if (VertexInMagnet(mctrack))
+	  fmotherGrani_gamma_inMagnet->Fill(49, 49);
+	if(VertexInTarget(mctrack))
+	  fmotherGrani_gamma_inTarget->Fill(49, 49);
+      }
+      if (mctrack->GetPdgCode() == -11){
+	fmotherGrani_posi_global->Fill(49, 49);
+	if (VertexInMagnet(mctrack))
+	  fmotherGrani_posi_inMagnet->Fill(49, 49);
+	if(VertexInTarget(mctrack))
+	  fmotherGrani_posi_inTarget->Fill(49, 49);
+      }
+      if (mctrack->GetPdgCode() ==  11){
+	fmotherGrani_elec_global->Fill(49, 49);
+	if (VertexInMagnet(mctrack))
+	  fmotherGrani_elec_inMagnet->Fill(49, 49);
+	if(VertexInTarget(mctrack))
+	  fmotherGrani_elec_inTarget->Fill(49, 49);
+      }
       fMotherDaughterZBirth->Fill(mctrack->GetStartZ(),49,PdgToGeant(mctrack->GetPdgCode()));
     }
 
@@ -569,10 +740,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fMCParticleMap[iMcTrack]->PID = mctrack->GetPdgCode();
     if (mctrack->GetMotherId() >= 0) {
       if (fMCParticleMap.find(mctrack->GetMotherId()) == fMCParticleMap.end()) {
+	//mother = (CbmMCTrack*)fMCTracks->At(mctrack->GetMotherId());
 	MCParticle* p = new MCParticle;
 	fMCParticleMap[mctrack->GetMotherId()] = p;
+	//fMCParticleMap[mctrack->GetMotherId()]->motherPid = mother->GetPdgCode();
       }
       fMCParticleMap[mctrack->GetMotherId()]->daughterIds.push_back(iMcTrack);
+      //fMCParticleMap[mctrack->GetMotherId()]->daughterPids.push_back(mctrack->GetPdgCode());
     }
   }
 
@@ -614,7 +788,12 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
  
 
       Double_t vertexDistance = CalcVertexDistance(etrack, ptrack);
-      fEPPairVertexDistance->Fill(vertexDistance);
+      fEPPairVertexDistance_global->Fill(vertexDistance);
+      if (VertexInMagnet(etrack) && VertexInMagnet(ptrack))
+	fEPPairVertexDistance_inMagnet->Fill(vertexDistance);
+      if (VertexInTarget(etrack) && VertexInTarget(ptrack))
+	fEPPairVertexDistance_inTarget->Fill(vertexDistance);
+
       if (CloseByVertex(etrack, ptrack, 0.1)) {
 	std::pair<Int_t,Int_t> epPair (fElectronIds[iElectron], fPositronIds[iPositron]);
 	electronPositronPairs.push_back(epPair);
@@ -682,17 +861,21 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       }
     }
   }
+
   printf (
 	  "\n--- Found\n\
----      %7i Gammas\n\
----      %7i Electrons\n\
----      %7i Positrons\n\
----      %7i Electron & Positron Pairs (after vertex distance cut)\n\
+---      %7i Gammas    (global)\n\
+---      %7i Electrons (global)\n\
+---      %7i Positrons (global)\n\
+---      %7i Electron & Positron Pairs (global after vertex distance cut)\n\
 ---      %7i Electron & Positron Pairs (in magnet volume)\n\
 ---      %7i Electron & Positron Pairs (in target volume)\n\
 ---      %7i Electron & Positron Pairs (opening angle cut)\n\
 ---      %7i Electron & Positron Pairs (same mother id)\n\
----      %7i Pi0\n\n", 
+---      %7i Pi0 (MC global)\n\
+---      %7i particle with grandmother or mother Pi0 (global)\n\
+---      %7i particle with grandmother or mother Pi0 (in magnet volume)\n\
+---      %7i particle with grandmother or mother Pi0 (in target volume)\n\n", 
 	  (Int_t)fGammaIds.size(), 
 	  (Int_t)fElectronIds.size(), 
 	  (Int_t)fPositronIds.size(), 
@@ -701,29 +884,33 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	  (Int_t)gammaFromEPPairsInTarget.size(),
 	  (Int_t)gammaFromEPPairsOpeningAngle.size(),
 	  (Int_t)gammaFromTrueEPPairs.size(),
-	  (Int_t)fPi0Ids.size());
-  cout << "fInvMassSpectrumGammaEPPairsOpenAngle: " << gammaFromEPPairsOpeningAngle.size() << endl;
+	  (Int_t)fPi0Ids.size(),
+	  nPi0_global,
+	  nPi0_inMagnet,
+	  nPi0_inTarget
+);
+ 
   for (Int_t iGamma = 0; iGamma < gammaFromEPPairsOpeningAngle.size(); iGamma++) {
     for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairsOpeningAngle.size(); jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       fInvMassSpectrumGammaEPPairsOpenAngle->Fill(CalcInvariantMass(gammaFromEPPairsOpeningAngle[iGamma], gammaFromEPPairsOpeningAngle[jGamma]));
     }
   }
-  cout << "fInvMassSpectrumGammaEPPairsInTarget: " << gammaFromEPPairsInTarget.size() << endl;
+ 
   for (Int_t iGamma = 0; iGamma < gammaFromEPPairsInTarget.size(); iGamma++) {
     for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairsInTarget.size(); jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       fInvMassSpectrumGammaEPPairsInTarget->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
     }
   }
-  cout << "fgammaFromEPPairsInMagnet: " << gammaFromEPPairsInMagnet.size() << endl;
+ 
   for (Int_t iGamma = 0; iGamma < gammaFromEPPairsInMagnet.size(); iGamma++) {
     for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairsInMagnet.size(); jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       fInvMassSpectrumGammaEPPairsInMagnet->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
     }
   }
-  cout << "fInvMassSpectrumGammaEPPairs: " << gammaFromEPPairs.size() <<  endl;  
+ 
   for (Int_t iGamma = 0; iGamma < gammaFromEPPairs.size(); iGamma++) {
     for (Int_t jGamma = iGamma + 1; jGamma < gammaFromEPPairs.size(); jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
@@ -809,7 +996,11 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 
   for (it=fMCParticleMap.begin(); it != fMCParticleMap.end(); it++) {
     mctrack = (CbmMCTrack*)fMCTracks->At((*it).first);
-    fNoDaughters->Fill(PdgToGeant(mctrack->GetPdgCode()), (*it).second->daughterIds.size());
+    fNoDaughters_global->Fill(PdgToGeant(mctrack->GetPdgCode()), (*it).second->daughterIds.size());
+    if (VertexInMagnet(mctrack))
+      fNoDaughters_inMagnet->Fill(PdgToGeant(mctrack->GetPdgCode()), (*it).second->daughterIds.size());
+    if(VertexInTarget(mctrack))
+      fNoDaughters_inTarget->Fill(PdgToGeant(mctrack->GetPdgCode()), (*it).second->daughterIds.size());
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -908,212 +1099,212 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   //delete mother;
 }
 
-Bool_t CbmTrdPhotonAnalysis::CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* trackB, Double_t minimumDistance)
-{
-  Double_t vertexDistance = CalcVertexDistance(trackA, trackB);
-  if (vertexDistance < minimumDistance)
-    return true;
-  else
-    return false;
-}
+  Bool_t CbmTrdPhotonAnalysis::CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* trackB, Double_t minimumDistance)
+  {
+    Double_t vertexDistance = CalcVertexDistance(trackA, trackB);
+    if (vertexDistance < minimumDistance)
+      return true;
+    else
+      return false;
+  }
 
-Double_t CbmTrdPhotonAnalysis::CalcVertexDistance(CbmMCTrack* trackA, CbmMCTrack* trackB)
-{
- Double_t vertexDistance = TMath::Sqrt(pow(trackA->GetStartX() - trackB->GetStartX(),2) + pow(trackA->GetStartY() - trackB->GetStartY(),2) + pow(trackA->GetStartZ() - trackB->GetStartZ(),2));
- return vertexDistance;
-}
+  Double_t CbmTrdPhotonAnalysis::CalcVertexDistance(CbmMCTrack* trackA, CbmMCTrack* trackB)
+  {
+    Double_t vertexDistance = TMath::Sqrt(pow(trackA->GetStartX() - trackB->GetStartX(),2) + pow(trackA->GetStartY() - trackB->GetStartY(),2) + pow(trackA->GetStartZ() - trackB->GetStartZ(),2));
+    return vertexDistance;
+  }
 
-Double_t CbmTrdPhotonAnalysis::CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB)
-{
-  Double_t Px = trackA->GetPx() + trackB->GetPx();
-  Double_t Py = trackA->GetPy() + trackB->GetPy();
-  Double_t Pt = TMath::Sqrt(pow(Px,2) + pow(Py,2));
+  Double_t CbmTrdPhotonAnalysis::CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB)
+  {
+    Double_t Px = trackA->GetPx() + trackB->GetPx();
+    Double_t Py = trackA->GetPy() + trackB->GetPy();
+    Double_t Pt = TMath::Sqrt(pow(Px,2) + pow(Py,2));
 
-  return Pt;
-}
+    return Pt;
+  }
 
-Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB)
-{
-  //Double_t energyA = TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
-  //Double_t energyB = TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
-  //if (energyA != trackA->GetEnergy() || energyB != trackB->GetEnergy())
-  //printf ("A: %.8f != %.8f Delta = %E  B: %.8f != %.8f Delta = %E\n", energyA, trackA->GetEnergy(), energyA-trackA->GetEnergy(), energyB, trackB->GetEnergy(), energyB - trackB->GetEnergy());
-  Double_t energyAB = trackA->GetEnergy() + trackB->GetEnergy();//energyA + energyB;
-  //Double_t ptAB = trackA->GetPt() + trackB->GetPt();
-  Double_t invariantMass = TMath::Sqrt(
-			      pow(energyAB,2) 
-			      - pow((trackA->GetPx() + trackB->GetPx()),2) 
-			      - pow((trackA->GetPy() + trackB->GetPy()),2) 
-			      - pow((trackA->GetPz() + trackB->GetPz()),2)
-			      );
-  return invariantMass;
-}
-Double_t CbmTrdPhotonAnalysis::CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB) {
-  //Double_t energyA = trackA->GetEnergy();//TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
-  //Double_t energyB = trackB->GetEnergy();//TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
-  /*
-    Double_t openingAngle = TMath::ACos(0.5 * pow(CalcInvariantMass(trackA, trackB),2) - pow(0.000510998928,2) - energyA * energyB
-    + (trackA->GetPx() * trackB->GetPx() + trackA->GetPy() * trackB->GetPy() + trackA->GetPz() * trackB->GetPz())
-    ) / TMath::Pi() * 180.;
-  */
-  Double_t openingAngle = TMath::ACos(
-				      (
-				       0.5 * 
-				       (pow(CalcInvariantMass(trackA, trackB),2) - pow(trackA->GetMass(),2) - pow(trackB->GetMass(),2))
-				       - (trackA->GetEnergy() * trackB->GetEnergy())
-				       ) 
-				      // / (-1. * (trackA->GetPx() * trackB->GetPx() + trackA->GetPy() * trackB->GetPy() + trackA->GetPz() * trackB->GetPz()))
+  Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB)
+  {
+    //Double_t energyA = TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
+    //Double_t energyB = TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
+    //if (energyA != trackA->GetEnergy() || energyB != trackB->GetEnergy())
+    //printf ("A: %.8f != %.8f Delta = %E  B: %.8f != %.8f Delta = %E\n", energyA, trackA->GetEnergy(), energyA-trackA->GetEnergy(), energyB, trackB->GetEnergy(), energyB - trackB->GetEnergy());
+    Double_t energyAB = trackA->GetEnergy() + trackB->GetEnergy();//energyA + energyB;
+    //Double_t ptAB = trackA->GetPt() + trackB->GetPt();
+    Double_t invariantMass = TMath::Sqrt(
+					 pow(energyAB,2) 
+					 - pow((trackA->GetPx() + trackB->GetPx()),2) 
+					 - pow((trackA->GetPy() + trackB->GetPy()),2) 
+					 - pow((trackA->GetPz() + trackB->GetPz()),2)
+					 );
+    return invariantMass;
+  }
+  Double_t CbmTrdPhotonAnalysis::CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB) {
+    //Double_t energyA = trackA->GetEnergy();//TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
+    //Double_t energyB = trackB->GetEnergy();//TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
+    /*
+      Double_t openingAngle = TMath::ACos(0.5 * pow(CalcInvariantMass(trackA, trackB),2) - pow(0.000510998928,2) - energyA * energyB
+      + (trackA->GetPx() * trackB->GetPx() + trackA->GetPy() * trackB->GetPy() + trackA->GetPz() * trackB->GetPz())
+      ) / TMath::Pi() * 180.;
+    */
+    Double_t openingAngle = TMath::ACos(
+					(
+					 0.5 * 
+					 (pow(CalcInvariantMass(trackA, trackB),2) - pow(trackA->GetMass(),2) - pow(trackB->GetMass(),2))
+					 - (trackA->GetEnergy() * trackB->GetEnergy())
+					 ) 
+					// / (-1. * (trackA->GetPx() * trackB->GetPx() + trackA->GetPy() * trackB->GetPy() + trackA->GetPz() * trackB->GetPz()))
 				      
 					/ ( -1. * 
-					TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2)) 
-					* TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2))
-					)
+					    TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2)) 
+					    * TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2))
+					    )
 				      
-				      ) * 180.0 / TMath::Pi();
-  return openingAngle;
-}
-void CbmTrdPhotonAnalysis::StatisticHistos()
-{
-  Int_t allPairs = 0;
-  Int_t gammaPairs = 0;
-  Int_t pi0Pairs = 0;
-  Int_t gammaWoPi0 = 0;
-  for (Int_t bin = 1; bin < fEPPairOpeningAngleInTarget->GetNbinsX(); bin++) {
-    //for (Int_t bin = 1; bin < maxbin; bin++) {
-    allPairs += fEPPairOpeningAngleInTarget->GetBinContent(bin);
-    gammaPairs += fEPPairOpeningAngleGamma->GetBinContent(bin);
-    pi0Pairs += fEPPairOpeningAnglePi0->GetBinContent(bin);
-    gammaWoPi0 = gammaPairs - pi0Pairs;
-    fPairOpeningAngleAll->SetBinContent(bin,allPairs / (Float_t)fEPPairOpeningAngleInTarget->GetEntries());
-    fPairOpeningAngleGamma->SetBinContent(bin,gammaPairs / (Float_t)fEPPairOpeningAngleInTarget/*fEPPairOpeningAngleGamma*/->GetEntries());
-    fPairOpeningAnglePi0->SetBinContent(bin,pi0Pairs / (Float_t)fEPPairOpeningAngleInTarget/*fEPPairOpeningAnglePi0*/->GetEntries());
-    fPairOpeningAngleGammaWoPi0->SetBinContent(bin,gammaWoPi0 / (Float_t)(fEPPairOpeningAngleInTarget/*fEPPairOpeningAngleGamma->GetEntries() - fEPPairOpeningAnglePi0*/->GetEntries()));
-    //}
+					) * 180.0 / TMath::Pi();
+    return openingAngle;
   }
-}
+  void CbmTrdPhotonAnalysis::StatisticHistos()
+  {
+    Int_t allPairs = 0;
+    Int_t gammaPairs = 0;
+    Int_t pi0Pairs = 0;
+    Int_t gammaWoPi0 = 0;
+    for (Int_t bin = 1; bin < fEPPairOpeningAngleInTarget->GetNbinsX(); bin++) {
+      //for (Int_t bin = 1; bin < maxbin; bin++) {
+      allPairs += fEPPairOpeningAngleInTarget->GetBinContent(bin);
+      gammaPairs += fEPPairOpeningAngleGamma->GetBinContent(bin);
+      pi0Pairs += fEPPairOpeningAnglePi0->GetBinContent(bin);
+      gammaWoPi0 = gammaPairs - pi0Pairs;
+      fPairOpeningAngleAll->SetBinContent(bin,allPairs / (Float_t)fEPPairOpeningAngleInTarget->GetEntries());
+      fPairOpeningAngleGamma->SetBinContent(bin,gammaPairs / (Float_t)fEPPairOpeningAngleInTarget/*fEPPairOpeningAngleGamma*/->GetEntries());
+      fPairOpeningAnglePi0->SetBinContent(bin,pi0Pairs / (Float_t)fEPPairOpeningAngleInTarget/*fEPPairOpeningAnglePi0*/->GetEntries());
+      fPairOpeningAngleGammaWoPi0->SetBinContent(bin,gammaWoPi0 / (Float_t)(fEPPairOpeningAngleInTarget/*fEPPairOpeningAngleGamma->GetEntries() - fEPPairOpeningAnglePi0*/->GetEntries()));
+      //}
+    }
+  }
 
-Bool_t CbmTrdPhotonAnalysis::PairFromGamma(Int_t firstId, Int_t secondId)
-{
-  return true;
-}
-Bool_t CbmTrdPhotonAnalysis::PairFromPi0(Int_t firstId, Int_t secondId)
-{
-  return true;
-}
-Bool_t CbmTrdPhotonAnalysis::VertexInMagnet(CbmMCTrack* track)
-{
-  if (fabs(track->GetStartX()) < 132/2 && fabs(track->GetStartY()) < 132/2 && track->GetStartZ() < 100 )
+  Bool_t CbmTrdPhotonAnalysis::PairFromGamma(Int_t firstId, Int_t secondId)
+  {
     return true;
-  return false;
-}
-Bool_t CbmTrdPhotonAnalysis::VertexInTarget(CbmMCTrack* track)
-{
-  if (fabs(track->GetStartX()) < 0.1 && fabs(track->GetStartY()) < 0.1 && track->GetStartZ() < 0.1)
+  }
+  Bool_t CbmTrdPhotonAnalysis::PairFromPi0(Int_t firstId, Int_t secondId)
+  {
     return true;
-  return false;
-}
+  }
+  Bool_t CbmTrdPhotonAnalysis::VertexInMagnet(CbmMCTrack* track)
+  {
+    if (fabs(track->GetStartX()) < 132/2 && fabs(track->GetStartY()) < 132/2 && track->GetStartZ() < 100 )
+      return true;
+    return false;
+  }
+  Bool_t CbmTrdPhotonAnalysis::VertexInTarget(CbmMCTrack* track)
+  {
+    if (fabs(track->GetStartX()) < 0.1 && fabs(track->GetStartY()) < 0.1 && track->GetStartZ() < 0.1)
+      return true;
+    return false;
+  }
 
-Int_t CbmTrdPhotonAnalysis::PdgToGeant(Int_t PdgCode) 
-{
-  if (PdgCode == 22)
-    return 1;
-  if (PdgCode == -11)
-    return 2;
-  if (PdgCode == 11)
-    return 3;
-  if (PdgCode == 12 || PdgCode == 14 || PdgCode == 16)
-    return 4;
-  if (PdgCode == -13)
-    return 5;
-  if (PdgCode == 13)
-    return 6;
-  if (PdgCode == 111)
-    return 7;
-  if (PdgCode == 211)
-    return 8;
-  if (PdgCode == -211)
-    return 9;
-  if (PdgCode == 130)
-    return 10;
-  if (PdgCode == 321)
-    return 11;
-  if (PdgCode == -321)
-    return 12;
-  if (PdgCode == 2112)
-    return 13;
-  if (PdgCode == 2212)
-    return 14;
-  if (PdgCode == -2212)
-    return 15;
-  if (PdgCode == 310)
-    return 16;
-  if (PdgCode == 221)
-    return 17;
-  if (PdgCode == 3122)
-    return 18;
-  if (PdgCode == 3222)
-    return 19;
-  if (PdgCode == 3212)
-    return 20;
-  if (PdgCode == 3112)
-    return 21;
-  if (PdgCode == 3322)
-    return 22;
-  if (PdgCode == 3312)
-    return 23;
-  if (PdgCode == 3332)
-    return 24;
-  if (PdgCode == -2112)
-    return 25;
-  if (PdgCode == -3122)
-    return 26;
-  if (PdgCode == -3112)
-    return 27;
-  if (PdgCode == -3212)
-    return 28;
-  if (PdgCode == -3322)
-    return 30;
-  if (PdgCode == -3312)
-    return 31;
-  if (PdgCode == -3332)
-    return 32;
-  if (PdgCode == -15)
-    return 33;
-  if (PdgCode == 15)
-    return 34;
-  if (PdgCode == 411)
-    return 35;
-  if (PdgCode == -411)
-    return 36;
-  if (PdgCode == 421)
-    return 37;
-  if (PdgCode == -412)
-    return 38;
-  if (PdgCode == 431)
-    return 39;
-  if (PdgCode == -431)
-    return 40;
-  if (PdgCode == 4122)
-    return 41;
-  if (PdgCode == 24)
-    return 42;
-  if (PdgCode == -24)
-    return 43;  
-  if (PdgCode == 23)
-    return 44;
-  if (PdgCode == 50000050)
-    return 45;
-  if (PdgCode == 1000010020)
-    return 46;
-  if (PdgCode == 1000010030)
-    return 47;
-  if (PdgCode == 1000020040)
-    return 48;
-  //if (PdgCode == -1)
-  //return 49;
-  cout << PdgCode << endl;
-  return 49;
-}
+  Int_t CbmTrdPhotonAnalysis::PdgToGeant(Int_t PdgCode) 
+  {
+    if (PdgCode == 22)
+      return 1;
+    if (PdgCode == -11)
+      return 2;
+    if (PdgCode == 11)
+      return 3;
+    if (PdgCode == 12 || PdgCode == 14 || PdgCode == 16)
+      return 4;
+    if (PdgCode == -13)
+      return 5;
+    if (PdgCode == 13)
+      return 6;
+    if (PdgCode == 111)
+      return 7;
+    if (PdgCode == 211)
+      return 8;
+    if (PdgCode == -211)
+      return 9;
+    if (PdgCode == 130)
+      return 10;
+    if (PdgCode == 321)
+      return 11;
+    if (PdgCode == -321)
+      return 12;
+    if (PdgCode == 2112)
+      return 13;
+    if (PdgCode == 2212)
+      return 14;
+    if (PdgCode == -2212)
+      return 15;
+    if (PdgCode == 310)
+      return 16;
+    if (PdgCode == 221)
+      return 17;
+    if (PdgCode == 3122)
+      return 18;
+    if (PdgCode == 3222)
+      return 19;
+    if (PdgCode == 3212)
+      return 20;
+    if (PdgCode == 3112)
+      return 21;
+    if (PdgCode == 3322)
+      return 22;
+    if (PdgCode == 3312)
+      return 23;
+    if (PdgCode == 3332)
+      return 24;
+    if (PdgCode == -2112)
+      return 25;
+    if (PdgCode == -3122)
+      return 26;
+    if (PdgCode == -3112)
+      return 27;
+    if (PdgCode == -3212)
+      return 28;
+    if (PdgCode == -3322)
+      return 30;
+    if (PdgCode == -3312)
+      return 31;
+    if (PdgCode == -3332)
+      return 32;
+    if (PdgCode == -15)
+      return 33;
+    if (PdgCode == 15)
+      return 34;
+    if (PdgCode == 411)
+      return 35;
+    if (PdgCode == -411)
+      return 36;
+    if (PdgCode == 421)
+      return 37;
+    if (PdgCode == -412)
+      return 38;
+    if (PdgCode == 431)
+      return 39;
+    if (PdgCode == -431)
+      return 40;
+    if (PdgCode == 4122)
+      return 41;
+    if (PdgCode == 24)
+      return 42;
+    if (PdgCode == -24)
+      return 43;  
+    if (PdgCode == 23)
+      return 44;
+    if (PdgCode == 50000050)
+      return 45;
+    if (PdgCode == 1000010020)
+      return 46;
+    if (PdgCode == 1000010030)
+      return 47;
+    if (PdgCode == 1000020040)
+      return 48;
+    //if (PdgCode == -1)
+    //return 49;
+    cout << PdgCode << endl;
+    return 49;
+  }
 
 void CbmTrdPhotonAnalysis::InitHistos()
 {
@@ -1168,10 +1359,17 @@ void CbmTrdPhotonAnalysis::InitHistos()
     "#gamma_{RICH}",
     "#gamma_{primary}"
   };
-  fMCPid = new TH1I("MCPid","MC Pid",49,0.5,49.5);
+  fMCPid_global = new TH1I("MCPid_global","MC Pid global",49,0.5,49.5);
+  fMCPid_inMagnet = new TH1I("MCPid_inMagnet","MC Pid in magnet",49,0.5,49.5);
+  fMCPid_inTarget = new TH1I("MCPid_inTarget","MC Pid in target",49,0.5,49.5);
   fGTPid = new TH1I("GTPid","GT Pid",49,0.5,49.5);
-  fPt = new TH2I("Pt","p_{T} vs PID",200,0,2,49,0.5,49.5);
-  fP = new TH2I("P","p vs PID",200,0,2,49,0.5,49.5);
+  fPt_global = new TH2I("Pt_global","p_{T} vs PID global",200,0,2,49,0.5,49.5);
+  fPt_inMagnet = new TH2I("Pt_inMagnet","p_{T} vs PID in magnet",200,0,2,49,0.5,49.5);
+  fPt_inTarget = new TH2I("Pt_inTarget","p_{T} vs PID in target",200,0,2,49,0.5,49.5);
+  fP_global = new TH2I("P_global","p vs PID global",200,0,2,49,0.5,49.5);
+  fP_inMagnet = new TH2I("P_inMagnet","p vs PID in magnet",200,0,2,49,0.5,49.5);
+  fP_inTarget = new TH2I("P_inTarget","p vs PID in target",200,0,2,49,0.5,49.5);
+
   fDalizMother = new TH1I("DalizMother","Mother ID for e^{+} & e^{-} & #gamma",49,0.5,49.5);
   fePlusMinusMother = new TH1I("ePlusMinusMother","Mother ID for e^{+}/e^{-}",49,0.5,49.5);
   fePlusAndMinusMother = new TH1I("ePlusAndMinusMother","Mother ID for e^{+} & e^{-}",49,0.5,49.5);
@@ -1180,9 +1378,23 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fgammaDaughter = new TH1I("gammaDaughter","Daughter ID for #gamma",49,0.5,49.5);
   fZBirthAll = new TH2I("ZBirth_All","z birth",10000,0,1000,49,0.5,49.5);
   fZBirthEPfromGamma = new TH1I("ZBirthEPfromGamma","z birth from e^{+} & e^{-} pairs with mother #gamma",10000,0,1000);
-  fNoDaughters = new TH2I("NoDaughters","Number of daughters",49,0.5,49.5,101,-0.5,100.5);
-  fMotherDaughter = new TH2I("MotherDaughter","mother / daughter",49,0.5,49.5,49,0.5,49.5);
+  fNoDaughters_global = new TH2I("NoDaughters_global","Number of daughters global",49,0.5,49.5,101,-0.5,100.5);
+  fNoDaughters_inMagnet = new TH2I("NoDaughters_inMagnet","Number of daughters in magnet",49,0.5,49.5,101,-0.5,100.5);
+  fNoDaughters_inTarget = new TH2I("NoDaughters_inTarget","Number of daughters in target",49,0.5,49.5,101,-0.5,100.5);
+  fMotherDaughter_global = new TH2I("MotherDaughter_global","mother / daughter decay global",49,0.5,49.5,49,0.5,49.5);
+  fMotherDaughter_inMagnet = new TH2I("MotherDaughter_inMagnet","mother / daughter decay in magnet",49,0.5,49.5,49,0.5,49.5);
+  fMotherDaughter_inTarget = new TH2I("MotherDaughter_inTarget","mother / daughter decay in target",49,0.5,49.5,49,0.5,49.5);
   fMotherDaughterZBirth = new TH3I("MotherDaughterZBirth","mother / daughter / z-birth",10000,0,1000,49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_gamma_global = new TH2I("motherGrani_gamma_global","mother / grandmother of #gamma decay global",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_posi_global = new TH2I("motherGrani_posi_global","mother / grandmother of e^{+} decay global",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_elec_global = new TH2I("motherGrani_elec_global","mother / grandmother of e^{-} decay global",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_gamma_inMagnet = new TH2I("motherGrani_gamma_inMagnet","mother / grandmother of #gamma decay in magnet",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_posi_inMagnet = new TH2I("motherGrani_posi_inMagnet","mother / grandmother of e^{+} decay in magnet",49,0.5,49.5,49,0.5,49.5); 
+  fmotherGrani_elec_inMagnet = new TH2I("motherGrani_elec_inMagnet","mother / grandmother of e^{-} decay in magnet",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_gamma_inTarget = new TH2I("motherGrani_gamma_inTarget","mother / grandmother of #gamma decay in target",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_posi_inTarget = new TH2I("motherGrani_posi_inTarget","mother / grandmother of e^{+} decay in target",49,0.5,49.5,49,0.5,49.5);
+  fmotherGrani_elec_inTarget = new TH2I("motherGrani_elec_inTarget","mother / grandmother of e^{-} decay in target",49,0.5,49.5,49,0.5,49.5);
+
   fInvMPairMother = new TH2I("InvMPairMother","Invariant Mass of e^{+} & e^{-} pairs vs. mother id",2000,0,2,49,0.5,49.5);
   fPtPairMother = new TH2I("PtPairMother","p_{T} of e^{+} & e^{-} pairs vs. mother id",200,0,2,49,0.5,49.5);
   fPPairMother  = new TH2I("PPairMother","p of e^{+} & e^{-} pairs vs. mother id",200,0,2,49,0.5,49.5);
@@ -1193,10 +1405,16 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fPtPairMother->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fPPairMother->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fOpenAnglePairMother->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
-    fMCPid->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMCPid_global->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMCPid_inMagnet->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMCPid_inTarget->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fGTPid->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
-    fPt->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
-    fP->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fPt_global->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fPt_inMagnet->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fPt_inTarget->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fP_global->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fP_inMagnet->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fP_inTarget->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fDalizMother->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fePlusMinusMother->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fePlusAndMinusMother->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
@@ -1204,11 +1422,36 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fgammaMother->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fgammaDaughter->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fZBirthAll->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
-    fMotherDaughter->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
-    fMotherDaughter->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMotherDaughter_global->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMotherDaughter_global->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMotherDaughter_inMagnet->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMotherDaughter_inMagnet->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMotherDaughter_inTarget->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fMotherDaughter_inTarget->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fMotherDaughterZBirth->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fMotherDaughterZBirth->GetZaxis()->SetBinLabel(bin+1,particleID[bin]);
-    fNoDaughters->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fNoDaughters_global->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fNoDaughters_inMagnet->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fNoDaughters_inTarget->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_gamma_global->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_gamma_global->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_posi_global->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_posi_global->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_elec_global->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_elec_global->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_gamma_inMagnet->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_gamma_inMagnet->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_posi_inMagnet->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_posi_inMagnet->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_elec_inMagnet->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_elec_inMagnet->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_gamma_inTarget->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_gamma_inTarget->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_posi_inTarget->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_posi_inTarget->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fmotherGrani_elec_inTarget->GetXaxis()->SetBinLabel(bin+1,particleID[bin]); 
+    fmotherGrani_elec_inTarget->GetYaxis()->SetBinLabel(bin+1,particleID[bin]); 
+
   }
 
   TString name[3] = {"x","y","z"};
@@ -1234,7 +1477,9 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fGTPid = new TH1I("GTPid","GT Pid",4501,-1000.5,3500.5);
     fePlusMinusMother = new TH1I("fePlusMinusMother","Mother ID for e^{+}/e^{-}",4501,-1000.5,3500.5);
   */
-  fEPPairVertexDistance = new TH1I("EPPairVertexDistance","Vertex distance for e^{+}e^{-} pairs",250000,0,2500);
+  fEPPairVertexDistance_global = new TH1I("EPPairVertexDistance_global","Vertex distance for e^{+}e^{-} pairs global",2500000,0,2500);
+  fEPPairVertexDistance_inMagnet = new TH1I("EPPairVertexDistance_inMagnet","Vertex distance for e^{+}e^{-} pairs in Magnet",1e7,0,1);
+  fEPPairVertexDistance_inTarget = new TH1I("EPPairVertexDistance_inTarget","Vertex distance for e^{+}e^{-} pairs in Target",1e7,0,1);
   fZBirth[0] = new TH1I("ZBirth_gamma","z birth #gamma",10000,0,1000);
   fZBirth[1] = new TH1I("ZBirth_positron","z birth e^{+}",10000,0,1000);
   fZBirth[2] = new TH1I("ZBirth_electron","z birth e^{-}",10000,0,1000);
@@ -1295,10 +1540,16 @@ void CbmTrdPhotonAnalysis::InitHistos()
 
   */
 
-  NiceHisto1(fMCPid,1,20,1,"","");
+  NiceHisto1(fMCPid_global,1,20,1,"","");
+  NiceHisto1(fMCPid_inMagnet,2,20,1,"","");
+  NiceHisto1(fMCPid_inTarget,3,20,1,"","");
   NiceHisto1(fGTPid,1,20,1,"","");
-  NiceHisto2(fPt,1,1,1,"p_{T} [Gev/c]","","");
-  NiceHisto2(fP,1,1,1,"p [Gev/c]","","");
+  NiceHisto2(fPt_global,1,1,1,"p_{T} [Gev/c]","","");
+  NiceHisto2(fP_global,1,1,1,"p [Gev/c]","","");
+  NiceHisto2(fPt_inMagnet,1,1,1,"p_{T} [Gev/c]","","");
+  NiceHisto2(fP_inMagnet,1,1,1,"p [Gev/c]","","");
+  NiceHisto2(fPt_inTarget,1,1,1,"p_{T} [Gev/c]","","");
+  NiceHisto2(fP_inTarget,1,1,1,"p [Gev/c]","","");
   NiceHisto1(fePlusMinusMother,1,20,1,"","");
   NiceHisto1(fgammaMother,1,20,1,"","");
   NiceHisto1(fgammaDaughter,1,20,1,"","");
@@ -1307,16 +1558,30 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fZBirth[2],3,20,1,"z-position [cm]","");
   NiceHisto1(fZBirth[3],4,20,1,"z-position [cm]","");
   NiceHisto1(fPairHistory,1,20,1,"","");
-  NiceHisto2(fNoDaughters,1,1,1,"","Number of daughters","");
+  NiceHisto2(fNoDaughters_global,1,1,1,"","Number of daughters","");
+  NiceHisto2(fNoDaughters_inMagnet,1,1,1,"","Number of daughters","");
+  NiceHisto2(fNoDaughters_inTarget,1,1,1,"","Number of daughters","");
   NiceHisto2(fZBirthAll,1,1,1,"z-position [cm]","","#");
-  NiceHisto2(fMotherDaughter,1,1,1,"Mother","Daughter","#");
+  NiceHisto2(fMotherDaughter_global,1,1,1,"Mother","Daughter","#");
+  NiceHisto2(fMotherDaughter_inMagnet,1,1,1,"Mother","Daughter","#");
+  NiceHisto2(fMotherDaughter_inTarget,1,1,1,"Mother","Daughter","#");
+  NiceHisto2(fmotherGrani_gamma_global,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_posi_global,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_elec_global,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_gamma_inMagnet,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_posi_inMagnet,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_elec_inMagnet,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_gamma_inTarget,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_posi_inTarget,1,1,1,"Mother","Grandmother","#");
+  NiceHisto2(fmotherGrani_elec_inTarget,1,1,1,"Mother","Grandmother","#");
   NiceHisto3(fBirthPi0,1,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
   NiceHisto3(fBirthGamma,2,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
   NiceHisto3(fBirthPair,3,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
   NiceHisto3(fMotherDaughterZBirth,1,1,1,"z-position [cm]","","");
 
-  NiceHisto1(fEPPairVertexDistance,1,1,1,"vertex distance [cm]","");
-
+  NiceHisto1(fEPPairVertexDistance_global,1,1,1,"vertex distance [cm]","");
+  NiceHisto1(fEPPairVertexDistance_inMagnet,2,1,1,"vertex distance [cm]","");
+  NiceHisto1(fEPPairVertexDistance_inTarget,3,1,1,"vertex distance [cm]","");
 
   NiceHisto2(fInvMPairMother,1,1,1,"Invariant mass [GeV/c^{2}]","Mother","");
   NiceHisto2(fPtPairMother,1,1,1,"p_{T} [Gev/c]","Mother","");
@@ -1350,10 +1615,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fPairOpeningAnglePi0,3,1,1,"opening angle #theta cut [#circ]","pair fraction");
   NiceHisto1(fPairOpeningAngleGammaWoPi0,4,1,1,"opening angle #theta cut [#circ]","pair fraction");
 }
-void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)
-{
-  h->Scale(1./ h->GetEntries());
-}
+  void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)
+  {
+    h->Scale(1./ h->GetEntries());
+  }
 
 
 void CbmTrdPhotonAnalysis::SaveHistosToFile()
@@ -1371,47 +1636,73 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   //TFile *outFile = new TFile("data/CbmTrdPhotonAnalysis.root","RECREATE","output of CbmTrdPhotonAnalysis");
   //outFile->Cd();
   gDirectory->pwd();
-  gDirectory->Cd("data/test.esd.pa.root:");
+  gDirectory->Cd("..");
   gDirectory->pwd();
   if (!gDirectory->Cd("PhotonAnalysis")) 
     gDirectory->mkdir("PhotonAnalysis");
   gDirectory->Cd("PhotonAnalysis");
   gDirectory->pwd();
-
+  //==================================================================MC_Statistic
   if (!gDirectory->Cd("MC_Statistic")) 
     gDirectory->mkdir("MC_Statistic");
   gDirectory->Cd("MC_Statistic");
   gDirectory->pwd();
-  fMCPid->Write("", TObject::kOverwrite);
+  fMCPid_global->Write("", TObject::kOverwrite);
+  fMCPid_inMagnet->Write("", TObject::kOverwrite);
+  fMCPid_inTarget->Write("", TObject::kOverwrite);
   fGTPid->Write("", TObject::kOverwrite);
-  fPt->Write("", TObject::kOverwrite);
-  fP->Write("", TObject::kOverwrite);
-  fePlusMinusMother->Write("", TObject::kOverwrite);
-  fePlusAndMinusMother->Write("", TObject::kOverwrite);
-  fgammaMother->Write("", TObject::kOverwrite);
-  fgammaAndGammaMother->Write("", TObject::kOverwrite);
-  fgammaDaughter->Write("", TObject::kOverwrite);
+  fPt_global->Write("", TObject::kOverwrite);
+  fP_global->Write("", TObject::kOverwrite);
+  fPt_inMagnet->Write("", TObject::kOverwrite);
+  fP_inMagnet->Write("", TObject::kOverwrite);
+  fPt_inTarget->Write("", TObject::kOverwrite);
+  fP_inTarget->Write("", TObject::kOverwrite);  
   fInvMPairMother->Write("", TObject::kOverwrite);
   fPtPairMother->Write("", TObject::kOverwrite);
   fPPairMother->Write("", TObject::kOverwrite);
   fOpenAnglePairMother->Write("", TObject::kOverwrite);
   fPairHistory->Write("", TObject::kOverwrite);
+  //==================================================================Relationships
+  if (!gDirectory->Cd("Relationships")) 
+    gDirectory->mkdir("Relationships");
+  gDirectory->Cd("Relationships");
+  gDirectory->pwd(); 
+  fePlusMinusMother->Write("", TObject::kOverwrite);
+  fePlusAndMinusMother->Write("", TObject::kOverwrite);
+  fgammaMother->Write("", TObject::kOverwrite);
+  fgammaAndGammaMother->Write("", TObject::kOverwrite);
+  fgammaDaughter->Write("", TObject::kOverwrite);
+  fDalizMother->Write("", TObject::kOverwrite);
+  fMotherDaughter_global->Write("", TObject::kOverwrite);
+  fMotherDaughter_inMagnet->Write("", TObject::kOverwrite);
+  fMotherDaughter_inTarget->Write("", TObject::kOverwrite);
+  fNoDaughters_global->Write("", TObject::kOverwrite);
+  fNoDaughters_inMagnet->Write("", TObject::kOverwrite);
+  fNoDaughters_inTarget->Write("", TObject::kOverwrite);
+  fmotherGrani_gamma_global->Write("", TObject::kOverwrite);
+  fmotherGrani_posi_global->Write("", TObject::kOverwrite);
+  fmotherGrani_elec_global->Write("", TObject::kOverwrite);
+  fmotherGrani_gamma_inMagnet->Write("", TObject::kOverwrite);
+  fmotherGrani_posi_inMagnet->Write("", TObject::kOverwrite); 
+  fmotherGrani_elec_inMagnet->Write("", TObject::kOverwrite);
+  fmotherGrani_gamma_inTarget->Write("", TObject::kOverwrite);
+  fmotherGrani_posi_inTarget->Write("", TObject::kOverwrite);
+  fmotherGrani_elec_inTarget->Write("", TObject::kOverwrite);
+  gDirectory->Cd("..");
+  //==================================================================Vertizes
+  if (!gDirectory->Cd("Vertizes")) 
+    gDirectory->mkdir("Vertizes");
+  gDirectory->Cd("Vertizes");
+  gDirectory->pwd();
+  fZBirthAll->Write("", TObject::kOverwrite);
+  fMotherDaughterZBirth->Write("", TObject::kOverwrite);
+  fZBirthEPfromGamma->Write("", TObject::kOverwrite);
   for (Int_t i = 0; i < 4; i++) {
     fZBirth[i]->Write("", TObject::kOverwrite);
   }
-
-  fZBirthAll->Write("", TObject::kOverwrite);
-  fDalizMother->Write("", TObject::kOverwrite);
-  fMotherDaughter->Write("", TObject::kOverwrite);
-  
-  fMotherDaughterZBirth->Write("", TObject::kOverwrite);
-  fZBirthEPfromGamma->Write("", TObject::kOverwrite);
-  fNoDaughters->Write("", TObject::kOverwrite);
-
   fBirthGamma->Write("", TObject::kOverwrite);
   fBirthPi0->Write("", TObject::kOverwrite);
   fBirthPair->Write("", TObject::kOverwrite);
-
   for (Int_t i = 0; i < 3; i++) {
     fPairAllVertex[i]->Write("", TObject::kOverwrite);
     fPairGammaVertex[i]->Write("", TObject::kOverwrite);
@@ -1420,13 +1711,30 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     fpi02GammaVertex[i]->Write("", TObject::kOverwrite);
     fgamma2PairVertex[i]->Write("", TObject::kOverwrite);
   }
-  fEPPairVertexDistance->Write("", TObject::kOverwrite);
-
+  fEPPairVertexDistance_global->Write("", TObject::kOverwrite);
+  fEPPairVertexDistance_inMagnet->Write("", TObject::kOverwrite);
+  fEPPairVertexDistance_inTarget->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
 
+  gDirectory->Cd("..");
+  //==================================================================InvMassSpectrum
   if (!gDirectory->Cd("InvMassSpectrum_GammaPairs")) 
     gDirectory->mkdir("InvMassSpectrum_GammaPairs");
   gDirectory->Cd("InvMassSpectrum_GammaPairs");
+  gDirectory->pwd();
+  //==================================================================GammaPairs
+  if (!gDirectory->Cd("GammaPairs")) 
+    gDirectory->mkdir("GammaPairs");
+  gDirectory->Cd("GammaPairs");
+  gDirectory->pwd();
+  //NormalizeHistos(fInvMassSpectrumGammaAllPairs);
+  fInvMassSpectrumGammaAllPairs->Write("", TObject::kOverwrite);
+  //NormalizeHistos(fInvMassSpectrumGammaTruePairs);
+  fInvMassSpectrumGammaTruePairs->Write("", TObject::kOverwrite);
+  //==================================================================FromEPPairs
+  if (!gDirectory->Cd("FromEPPairs")) 
+    gDirectory->mkdir("FromEPPairs");
+  gDirectory->Cd("FromEPPairs");
   gDirectory->pwd();
   //NormalizeHistos(fInvMassSpectrumGammaEPPairs);
   fInvMassSpectrumGammaEPPairs->Write("", TObject::kOverwrite);
@@ -1438,15 +1746,14 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fInvMassSpectrumGammaEPPairsOpenAngle->Write("", TObject::kOverwrite);
   fInvMassSpectrumGammaEPPairsGamma->Write("", TObject::kOverwrite);
   fInvMassSpectrumGammaEPPairsPi0->Write("", TObject::kOverwrite);
-  //NormalizeHistos(fInvMassSpectrumGammaAllPairs);
-  fInvMassSpectrumGammaAllPairs->Write("", TObject::kOverwrite);
-  //NormalizeHistos(fInvMassSpectrumGammaTruePairs);
-  fInvMassSpectrumGammaTruePairs->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
 
-  if (!gDirectory->Cd("InvMassSpectrum_EPPairs")) 
-    gDirectory->mkdir("InvMassSpectrum_EPPairs");
-  gDirectory->Cd("InvMassSpectrum_EPPairs");
+  gDirectory->Cd("..");
+ 
+  //==================================================================EPPairs
+  if (!gDirectory->Cd("EPPairs")) 
+    gDirectory->mkdir("EPPairs");
+  gDirectory->Cd("EPPairs");
   gDirectory->pwd();
   //NormalizeHistos(fInvMassSpectrumAllEPPairs);
   fInvMassSpectrumAllEPPairs->Write("", TObject::kOverwrite);
@@ -1458,6 +1765,8 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fInvMassSpectrumTrueEPPairs->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
 
+  gDirectory->Cd("..");
+  //==================================================================OpeningAngle_EPPairs
   if (!gDirectory->Cd("OpeningAngle_EPPairs")) 
     gDirectory->mkdir("OpeningAngle_EPPairs");
   gDirectory->Cd("OpeningAngle_EPPairs");
@@ -1502,85 +1811,85 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   }
 
 
-void CbmTrdPhotonAnalysis::NiceHisto1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) 
-{
-  h->SetMarkerStyle(mStyle);
-  h->SetMarkerSize(mSize);  
-  h->SetMarkerColor(color);
-  h->SetLineColor(color);  
-  h->GetXaxis()->SetLabelSize(0.03);
-  h->GetYaxis()->SetLabelSize(0.03);
-  //h->GetZaxis()->SetLabelSize(0.03);
-  h->GetXaxis()->SetTitleSize(0.035);
-  h->GetXaxis()->SetTitleOffset(1.25);
-  h->GetYaxis()->SetTitleSize(0.035);
-  h->GetYaxis()->SetTitleOffset(1.25);
-  //h->GetZaxis()->SetTitleSize(0.035);
-  //h->GetZaxis()->SetTitleOffset(-2);
-  h->SetXTitle(xTitle);
-  h->SetYTitle(yTitle);
-}
-void CbmTrdPhotonAnalysis::NiceHisto2(TH2 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle) 
-{
-  h->SetMarkerStyle(mStyle);
-  h->SetMarkerSize(mSize);  
-  h->SetMarkerColor(color);
-  h->SetLineColor(color);  
-  h->GetXaxis()->SetLabelSize(0.03);
-  h->GetYaxis()->SetLabelSize(0.03);
-  h->GetZaxis()->SetLabelSize(0.03);
-  h->GetXaxis()->SetTitleSize(0.035);
-  h->GetXaxis()->SetTitleOffset(1.5);
-  h->GetYaxis()->SetTitleSize(0.035);
-  h->GetYaxis()->SetTitleOffset(1.5);
-  h->GetZaxis()->SetTitleSize(0.035);
-  h->GetZaxis()->SetTitleOffset(1.25);
-  h->SetXTitle(xTitle);
-  h->SetYTitle(yTitle);
-  h->SetZTitle(zTitle);
-}
-void CbmTrdPhotonAnalysis::NiceHisto3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle) 
-{
-  h->SetMarkerStyle(mStyle);
-  h->SetMarkerSize(mSize);  
-  h->SetMarkerColor(color);
-  h->SetLineColor(color);  
-  h->GetXaxis()->SetLabelSize(0.03);
-  h->GetYaxis()->SetLabelSize(0.03);
-  h->GetZaxis()->SetLabelSize(0.03);
-  h->GetXaxis()->SetTitleSize(0.035);
-  h->GetXaxis()->SetTitleOffset(1.25);
-  h->GetYaxis()->SetTitleSize(0.035);
-  h->GetYaxis()->SetTitleOffset(1.25);
-  h->GetZaxis()->SetTitleSize(0.035);
-  h->GetZaxis()->SetTitleOffset(1.25);
-  h->SetXTitle(xTitle);
-  h->SetYTitle(yTitle);
-  h->SetZTitle(zTitle);
-}
-void CbmTrdPhotonAnalysis::NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) 
-{
-  h->SetMarkerStyle(mStyle);
-  h->SetMarkerSize(mSize);  
-  h->SetMarkerColor(color);
-  h->SetLineColor(color);  
-  h->GetXaxis()->SetLabelSize(0.03);
-  h->GetYaxis()->SetLabelSize(0.03);
-  //h->GetZaxis()->SetLabelSize(0.03);
-  h->GetXaxis()->SetTitleSize(0.035);
-  h->GetXaxis()->SetTitleOffset(1.25);
-  h->GetYaxis()->SetTitleSize(0.035);
-  h->GetYaxis()->SetTitleOffset(1.25);
-  //h->GetZaxis()->SetTitleSize(0.035);
-  //h->GetZaxis()->SetTitleOffset(-2);
-  h->SetXTitle(xTitle);
-  h->SetYTitle(yTitle);
-}
+  void CbmTrdPhotonAnalysis::NiceHisto1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) 
+  {
+    h->SetMarkerStyle(mStyle);
+    h->SetMarkerSize(mSize);  
+    h->SetMarkerColor(color);
+    h->SetLineColor(color);  
+    h->GetXaxis()->SetLabelSize(0.03);
+    h->GetYaxis()->SetLabelSize(0.03);
+    //h->GetZaxis()->SetLabelSize(0.03);
+    h->GetXaxis()->SetTitleSize(0.035);
+    h->GetXaxis()->SetTitleOffset(1.25);
+    h->GetYaxis()->SetTitleSize(0.035);
+    h->GetYaxis()->SetTitleOffset(1.25);
+    //h->GetZaxis()->SetTitleSize(0.035);
+    //h->GetZaxis()->SetTitleOffset(-2);
+    h->SetXTitle(xTitle);
+    h->SetYTitle(yTitle);
+  }
+  void CbmTrdPhotonAnalysis::NiceHisto2(TH2 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle) 
+  {
+    h->SetMarkerStyle(mStyle);
+    h->SetMarkerSize(mSize);  
+    h->SetMarkerColor(color);
+    h->SetLineColor(color);  
+    h->GetXaxis()->SetLabelSize(0.03);
+    h->GetYaxis()->SetLabelSize(0.03);
+    h->GetZaxis()->SetLabelSize(0.03);
+    h->GetXaxis()->SetTitleSize(0.035);
+    h->GetXaxis()->SetTitleOffset(1.5);
+    h->GetYaxis()->SetTitleSize(0.035);
+    h->GetYaxis()->SetTitleOffset(1.5);
+    h->GetZaxis()->SetTitleSize(0.035);
+    h->GetZaxis()->SetTitleOffset(1.25);
+    h->SetXTitle(xTitle);
+    h->SetYTitle(yTitle);
+    h->SetZTitle(zTitle);
+  }
+  void CbmTrdPhotonAnalysis::NiceHisto3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle) 
+  {
+    h->SetMarkerStyle(mStyle);
+    h->SetMarkerSize(mSize);  
+    h->SetMarkerColor(color);
+    h->SetLineColor(color);  
+    h->GetXaxis()->SetLabelSize(0.03);
+    h->GetYaxis()->SetLabelSize(0.03);
+    h->GetZaxis()->SetLabelSize(0.03);
+    h->GetXaxis()->SetTitleSize(0.035);
+    h->GetXaxis()->SetTitleOffset(1.25);
+    h->GetYaxis()->SetTitleSize(0.035);
+    h->GetYaxis()->SetTitleOffset(1.25);
+    h->GetZaxis()->SetTitleSize(0.035);
+    h->GetZaxis()->SetTitleOffset(1.25);
+    h->SetXTitle(xTitle);
+    h->SetYTitle(yTitle);
+    h->SetZTitle(zTitle);
+  }
+  void CbmTrdPhotonAnalysis::NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) 
+  {
+    h->SetMarkerStyle(mStyle);
+    h->SetMarkerSize(mSize);  
+    h->SetMarkerColor(color);
+    h->SetLineColor(color);  
+    h->GetXaxis()->SetLabelSize(0.03);
+    h->GetYaxis()->SetLabelSize(0.03);
+    //h->GetZaxis()->SetLabelSize(0.03);
+    h->GetXaxis()->SetTitleSize(0.035);
+    h->GetXaxis()->SetTitleOffset(1.25);
+    h->GetYaxis()->SetTitleSize(0.035);
+    h->GetYaxis()->SetTitleOffset(1.25);
+    //h->GetZaxis()->SetTitleSize(0.035);
+    //h->GetZaxis()->SetTitleOffset(-2);
+    h->SetXTitle(xTitle);
+    h->SetYTitle(yTitle);
+  }
 
-void CbmTrdPhotonAnalysis::NiceLegend(TLegend *l)
-{
-  l->SetLineColor(0);
-  l->SetLineStyle(0);
-  l->SetFillStyle(0);
-  l->SetTextSize(0.03);
-}
+  void CbmTrdPhotonAnalysis::NiceLegend(TLegend *l)
+  {
+    l->SetLineColor(0);
+    l->SetLineStyle(0);
+    l->SetFillStyle(0);
+    l->SetTextSize(0.03);
+  }

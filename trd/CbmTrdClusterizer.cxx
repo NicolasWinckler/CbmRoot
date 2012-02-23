@@ -115,7 +115,16 @@ CbmTrdClusterizer::~CbmTrdClusterizer()
   delete fDigiCollection;
   fDigiMatchCollection->Clear("C");
   delete fDigiMatchCollection;
-
+  fTrdPoints->Clear("C");
+  fTrdPoints->Delete();
+  delete fTrdPoints;
+  fMCStacks->Clear("C");
+  fMCStacks->Delete();
+  delete fMCStacks;
+  if(fDigiPar)
+    delete fDigiPar;
+  if(fModuleInfo)
+    delete fModuleInfo;
 }
 // --------------------------------------------------------------------
 
@@ -522,6 +531,13 @@ void CbmTrdClusterizer::FinishEvent()
 
   for (fModuleParaMapIt = fModuleParaMap.begin();
        fModuleParaMapIt != fModuleParaMap.end(); ++fModuleParaMapIt) {
+    fModuleParaMapIt->second->SectorSizeX.clear();
+    fModuleParaMapIt->second->SectorSizeX.clear();
+    fModuleParaMapIt->second->SectorSizeY.clear();
+    fModuleParaMapIt->second->PadSizeX.clear();
+    fModuleParaMapIt->second->PadSizeY.clear();
+    fModuleParaMapIt->second->SecCol.clear();
+    fModuleParaMapIt->second->SecRow.clear();
     delete fModuleParaMapIt->second;
   }
   fModuleParaMap.clear();
@@ -832,7 +848,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t looku
       point->Row_cluster = GetRow(point->clusterPosLL[1]);
       point->Col_cluster = GetCol(point->clusterPosLL[0]);
 
-      WireQuantisation(point);
+      //WireQuantisation(point);
 
       point->Row_cluster = GetRow(point->clusterPosLL[1]);
       point->Col_cluster = GetCol(point->clusterPosLL[0]);
@@ -919,8 +935,11 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   Int_t NoWires = Int_t(fModuleParaMap[fModuleID]->PadSizeY[point->Sec_cluster] / wireSpacing);
   for (Int_t i = 0; i < iSec; i++)
     {
-      tempPos -= fModuleParaMap[fModuleID]->SectorSizeY[i];
-    }
+      if (fModuleParaMap[fModuleID])
+	tempPos -= fModuleParaMap[fModuleID]->SectorSizeY[i];
+      else
+	cout << "WireQuantisation" << fModuleID << endl;
+	}
   tempPos -= fModuleParaMap[fModuleID]->PadSizeY[point->Sec_cluster] * (tempPos / Int_t(fModuleParaMap[fModuleID]->PadSizeY[point->Sec_cluster]));
   Int_t nextWire;
   Int_t wireBelow = Int_t(tempPos / wireSpacing);

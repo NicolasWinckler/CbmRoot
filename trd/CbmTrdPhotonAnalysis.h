@@ -37,11 +37,13 @@ typedef struct MCParticle
 {
   Int_t PID; // PDG Code
   Int_t motherId; // TConeArray ID of the mother 
+  //Int_t motherPid; // PDG Code
   std::vector<Int_t> daughterIds; // TConeArray IDs of all daughters
+  //std::vector<Int_t> daughterPids; // PDG Code
   Double_t Px;
   Double_t Py;
   Double_t Pz;
-MCParticle() : PID(0), motherId(0), daughterIds(), Px(0), Py(0), Pz(0) {};
+MCParticle() : PID(0), motherId(0), /*motherPid(0),*/ daughterIds(), /*daughterPids(),*/ Px(0), Py(0), Pz(0) {};
 } MCParticle;
 
 class CbmTrdPhotonAnalysis : public FairTask {
@@ -126,21 +128,35 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1I* fPairAllVertex[3];
   TH1I* fPairGammaVertex[3];
   TH1I* fPairPi0Vertex[3];
-  TH1I* fEPPairVertexDistance;
-
+  TH1I* fEPPairVertexDistance_global;
+  TH1I* fEPPairVertexDistance_inMagnet;
+  TH1I* fEPPairVertexDistance_inTarget;
   // Death Vertex
   TH1I* fpi02GammaVertex[3];
   TH1I* fgamma2PairVertex[3];
 
   // Mother Daughter
-  TH2I*  fMotherDaughter;
-  TH2I*  fNoDaughters;
+  TH2I*  fMotherDaughter_global;
+  TH2I*  fMotherDaughter_inMagnet;
+  TH2I*  fMotherDaughter_inTarget;
+  TH2I*  fNoDaughters_global;
+  TH2I*  fNoDaughters_inMagnet;
+  TH2I*  fNoDaughters_inTarget;
   TH1I*  fePlusMinusMother;
   TH1I*  fePlusAndMinusMother;
   TH1I*  fgammaMother;
   TH1I*  fgammaAndGammaMother;
   TH1I*  fDalizMother;
   TH1I*  fgammaDaughter;
+  TH2I*  fmotherGrani_gamma_global;
+  TH2I*  fmotherGrani_posi_global;
+  TH2I*  fmotherGrani_elec_global;
+  TH2I*  fmotherGrani_gamma_inMagnet;
+  TH2I*  fmotherGrani_posi_inMagnet; 
+  TH2I*  fmotherGrani_elec_inMagnet;
+  TH2I*  fmotherGrani_gamma_inTarget;
+  TH2I*  fmotherGrani_posi_inTarget;
+  TH2I*  fmotherGrani_elec_inTarget; 
 
   TH2I* fInvMPairMother;
   TH2I* fPtPairMother;
@@ -148,10 +164,16 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH2I* fOpenAnglePairMother;
 
   // Global PID
-  TH1I*  fMCPid;
+  TH1I*  fMCPid_global;
+  TH1I*  fMCPid_inMagnet;
+  TH1I*  fMCPid_inTarget;
   TH1I*  fGTPid;
-  TH2I*  fPt;
-  TH2I*  fP;
+  TH2I*  fPt_global;
+  TH2I*  fPt_inMagnet;
+  TH2I*  fPt_inTarget;
+  TH2I*  fP_global;
+  TH2I*  fP_inMagnet;
+  TH2I*  fP_inTarget;
 
   TH1I*  fPairHistory;
 
@@ -186,15 +208,15 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TH1F* fPairOpeningAnglePi0;
   TH1F* fPairOpeningAngleGammaWoPi0;
   /*
-  std::map<Int_t, MCParticle*> fMCParticleMap;
-  std::map<Int_t, MCParticle*>::iterator it;
+    std::map<Int_t, MCParticle*> fMCParticleMap;
+    std::map<Int_t, MCParticle*>::iterator it;
 
-  std::vector<Int_t> fElectronIds;
-  std::vector<Int_t> fPositronIds;
-  std::vector<Int_t> fGammaIds;
-  std::vector<Int_t> fPi0Ids;
+    std::vector<Int_t> fElectronIds;
+    std::vector<Int_t> fPositronIds;
+    std::vector<Int_t> fGammaIds;
+    std::vector<Int_t> fPi0Ids;
 
-  std::vector<CbmMCTrack*> fGammaFromPairs;
+    std::vector<CbmMCTrack*> fGammaFromPairs;
   */
   ClassDef(CbmTrdPhotonAnalysis,1)
     };

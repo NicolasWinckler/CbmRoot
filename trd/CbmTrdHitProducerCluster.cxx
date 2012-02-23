@@ -74,20 +74,27 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
 // ---- Destructor ----------------------------------------------------
 CbmTrdHitProducerCluster::~CbmTrdHitProducerCluster()
 {
+  if(fTrdPoints){
+    fTrdPoints->Clear("C");
+    fTrdPoints->Delete();
+    delete fTrdPoints;
+  }
   if(fClusters){
     fClusters->Clear("C");
     fClusters->Delete();
     delete fClusters;
   }
   if(fDigis){
+    fDigis->Clear("C");
     fDigis->Delete();
     delete fDigis;
   }    
-    if(fClusterHits){
+  if(fClusterHits){
+    fClusterHits->Clear("C");
     fClusterHits->Delete();
     delete fClusterHits;
   }    
-    if(fDigiPar){
+  if(fDigiPar){
     delete fDigiPar;
   }
   if(fModuleInfo){

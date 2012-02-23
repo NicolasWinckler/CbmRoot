@@ -163,7 +163,7 @@ CbmRichGeoTest::CbmRichGeoTest():
       fHists.push_back(fhXcYcCircle[i]);
       fhRadiusVsMom[i] = new TH2D(("fhRadiusVsMom"+t).c_str(), ("fhRadiusVsMom"+t+";P [GeV/c];Radius [cm];Counter").c_str(), 100, 0., 12, 100, 0., 10.);
       fHists.push_back(fhRadiusVsMom[i]);
-      fhChi2Circle[i] = new TH1D(("fhChi2Circle"+t).c_str(), ("fhChi2Circle"+t+";#Chi^{2};Counter").c_str(), 50, 0., 0.5);
+      fhChi2Circle[i] = new TH1D(("fhChi2Circle"+t).c_str(), ("fhChi2Circle"+t+";#Chi^{2};Counter").c_str(), 50, 0., .5);
       fHists.push_back(fhChi2Circle[i]);
       fhDRCircle[i] = new TH1D(("fhDRCircle"+t).c_str(), ("fhDRCircle"+t+";dR [cm];Counter").c_str(), 100, -1., 1.);
       fHists.push_back(fhDRCircle[i]);
@@ -491,7 +491,7 @@ void CbmRichGeoTest::DrawRing(
    fNofDrawnRings++;
    TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 500, 500);
    c->SetGrid(true, true);
-   TH2D* pad = new TH2D("pad", ";X [cm];Y [cm]", 1, -150., 150., 1, -150., 150);
+   TH2D* pad = new TH2D("pad", ";X [cm];Y [cm]", 1, -15., 15., 1, -15., 15);
    pad->SetStats(false);
    pad->Draw();
 
@@ -515,19 +515,19 @@ void CbmRichGeoTest::DrawRing(
    circle->SetFillStyle(0);
    circle->SetLineWidth(3);
    circle->Draw();
-   TEllipse* center = new TEllipse(ringHit->GetCenterX() - xCur, ringHit->GetCenterY() - yCur, 2.5);
+   TEllipse* center = new TEllipse(ringHit->GetCenterX() - xCur, ringHit->GetCenterY() - yCur, .5);
    center->Draw();
 
    // Draw hits
    for (int i = 0; i < ringHit->GetNofHits(); i++){
-      TEllipse* hitDr = new TEllipse(ringHit->GetHit(i).fX - xCur, ringHit->GetHit(i).fY - yCur, 2.5);
+      TEllipse* hitDr = new TEllipse(ringHit->GetHit(i).fX - xCur, ringHit->GetHit(i).fY - yCur, .5);
       hitDr->SetFillColor(kRed);
       hitDr->Draw();
    }
 
    // Draw MC Points
    for (int i = 0; i < ringPoint->GetNofHits(); i++){
-      TEllipse* pointDr = new TEllipse(ringPoint->GetHit(i).fX - xCur, ringPoint->GetHit(i).fY - yCur, 1);
+      TEllipse* pointDr = new TEllipse(ringPoint->GetHit(i).fX - xCur, ringPoint->GetHit(i).fY - yCur, 0.5);
       pointDr->SetFillColor(kBlue);
       pointDr->Draw();
    }

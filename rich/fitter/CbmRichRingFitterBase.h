@@ -11,7 +11,6 @@
 #define CBM_RICH_RING_FITTER_BASE
 
 #include "CbmRichRingLight.h"
-
 /**
 * \class CbmRichRingFitterBase
 *
@@ -65,12 +64,10 @@ protected:
       float yc = ring->GetCenterY();
 
       for (int i = 0; i < nofHits; i++) {
-         float xd2 = xc - ring->GetHit(i).fX;
-         float yd2 = yc - ring->GetHit(i).fY;
-         xd2 *= xd2;
-         yd2 *= yd2;
+         float xh = ring->GetHit(i).fX;
+         float yh = ring->GetHit(i).fY;
+         float d = r - sqrt((xc - xh)*(xc - xh) + (yc - yh)*(yc - yh));
 
-         float d = sqrt( xd2 + xd2 ) - r;
          chi2 += d*d;
       }
       ring->SetChi2(chi2);

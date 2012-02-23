@@ -88,26 +88,27 @@ InitStatus CbmRichReconstruction::Init()
    FairRootManager* ioman = FairRootManager::Instance();
    if (NULL == ioman) { Fatal("CbmRichReconstruction::Init","RootManager not instantised!"); }
 
-   fRichTrackParamZ = new TClonesArray("FairTrackParam",100);
-   ioman->Register("RichTrackParamZ", "RICH", fRichTrackParamZ, kFALSE);
+   if (fRunExtrapolation && fRunProjection && fRunTrackAssign) {
+      fRichTrackParamZ = new TClonesArray("FairTrackParam",100);
+      ioman->Register("RichTrackParamZ", "RICH", fRichTrackParamZ, kFALSE);
 
-   fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
-   if ( NULL == fGlobalTracks) { Fatal("CbmRichReconstruction::Init", "No GlobalTrack array!");}
+      fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
+      if ( NULL == fGlobalTracks) { Fatal("CbmRichReconstruction::Init", "No GlobalTrack array!");}
 
+      fRichProjections = new TClonesArray("FairTrackParam");
+      ioman->Register("RichProjection", "RICH", fRichProjections, kTRUE);
+   }
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
    if ( NULL == fRichHits) { Fatal("CbmRichReconstruction::Init","No RichHit array!"); }
-
-   fRichProjections = new TClonesArray("FairTrackParam");
-   ioman->Register("RichProjection", "RICH", fRichProjections, kTRUE);
 
    fRichRings = new TClonesArray("CbmRichRing", 100);
    ioman->Register("RichRing", "RICH", fRichRings, kTRUE);
 
-   InitExtrapolation();
-   InitProjection();
-   InitFinder();
-   InitFitter();
-   InitTrackAssign();
+   if (fRunExtrapolation) InitExtrapolation();
+   if (fRunProjection) InitProjection();
+   if (fRunFinder) InitFinder();
+   if (fRunFitter) InitFitter();
+   if (fRunTrackAssign) InitTrackAssign();
 
    return kSUCCESS;
 }

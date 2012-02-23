@@ -13,6 +13,12 @@
 
 #include <vector>
 #include "CbmRichRingFitterEllipseBase.h"
+#include "TMath.h"
+#include "TVectorD.h"
+#include "TMatrixD.h"
+#include "TMatrixDEigen.h"
+
+#include <iostream>
 
 using std::vector;
 

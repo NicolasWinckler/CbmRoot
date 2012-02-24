@@ -194,7 +194,7 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
   cout << "================CbmTrdClusterizerFast=====================" << endl;
   Digicounter = 0;
   CbmTrdPoint *pt = NULL;
-  fDebug = true;
+  fDebug = false;//true;
   /*
   // Module infos are stored to ModuleClusterMap whenever a module is used for the first time in each event
   // Digis are buffered in the ModuleClusterMap until the end of event and than copied to die digicollection
@@ -323,21 +323,38 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
   }
   Int_t iDigi = 0;
   for (fModuleClusterMapIt = fModuleClusterMap.begin(); fModuleClusterMapIt != fModuleClusterMap.end(); fModuleClusterMapIt++) {
-    /*
-    new ((*fDigiCollection)[iDigi]) CbmTrdDigi();
-    (*fDigiCollection)[iDigi] = fDigiMapIt->second;
+    for (Int_t xPad = 0; xPad < (*fModuleClusterMapIt).second->PadPlane.size(); xPad++) {
+      for (Int_t yPad = 0; yPad < (*fModuleClusterMapIt).second->PadPlane[xPad].size(); yPad++) {
+	if ((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge > 0.0) {
+	  CbmTrdDigi* digi = new CbmTrdDigi(
+					    (*fModuleClusterMapIt).first, 
+					    xPad, 
+					    yPad, 
+					    (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge, 
+					    fTime, 
+					    iDigi // ?????????????????
+					    );
+	  
+	  new ((*fDigiCollection)[iDigi]) CbmTrdDigi();
+	  (*fDigiCollection)[iDigi] = digi;
 
-    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
-    std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
-    std::vector<int>::iterator it;
+	  CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
+	  /*
+	    std::vector<Int_t> mci=(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex;
+	    std::vector<Int_t>::iterator it;
 
-    for (it=arr.begin() ; it <arr.end(); it++  ) {
-      Int_t bla = p->AddPoint((Int_t)*it);
+	    for (it=mci.begin() ; it <mci.end(); it++  ) {
+	    Int_t bla = p->AddPoint((Int_t)*it);
+	    }
+	  */
+	  for (Int_t i = 0; i < (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex.size(); i++)
+	    Int_t bla = p->AddPoint((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[i]);
+	  iDigi++;
+	}
+      }
     }
-    */
-    iDigi++;
   }
-
+  printf(" Added %d TRD Digis to Collection\n  (Including multiple fired digis by differend particles in the same event)\n\n",iDigi);
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();

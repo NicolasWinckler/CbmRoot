@@ -2,7 +2,7 @@
 #define CBMTRDCLUSTERIZERFAST_H
 
 #include "CbmTrdDetectorId.h"
-
+#include "CbmTrdDigiMatch.h"
 #include "FairTask.h"
 
 #include <map>
@@ -19,6 +19,7 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class TProfile;
+class CbmTrdDigiMatch;
 
 typedef struct ClusterPad
 {
@@ -106,7 +107,7 @@ class CbmTrdClusterizerFast : public FairTask {
 
   void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge); 
 
-  void CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss);
+  void CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss, Int_t pointId);
 
   void SplitPathSlices();
 
@@ -143,6 +144,10 @@ class CbmTrdClusterizerFast : public FairTask {
   static const Int_t endOfMathiesonArray = 35; //+- mm
 
   Float_t fEfficiency; // Digi production efficiency (0-100%)
+
+  CbmTrdDigi* fdigi;
+  CbmTrdDigiMatch *fdigiMatch;
+
 
   TClonesArray *fTrdPoints; //! Trd MC points
   TClonesArray *fDigiCollection; //! TRD digis

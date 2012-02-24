@@ -43,14 +43,14 @@ using std::fabs;
 // ---- Default constructor -------------------------------------------
 CbmTrdClusterizerFast::CbmTrdClusterizerFast()
   : FairTask("TrdCluster"),
-   Digicounter(-1),
+    Digicounter(-1),
     fLayerZ(),
     fTime(-1.),
     fModuleType(-1),
     fModuleCopy(-1),
     fModuleID(-1),
     fMCindex(-1),
-       fEfficiency(1.),
+    fEfficiency(1.),
     fTrdPoints(NULL),
     fDigiCollection(new TClonesArray("CbmTrdDigi")),
     fDigiMatchCollection(NULL),
@@ -62,35 +62,41 @@ CbmTrdClusterizerFast::CbmTrdClusterizerFast()
     //fDigiMap(),
     //fDigiMapIt(),
     fModuleClusterMap(),
-    fModuleClusterMapIt()
+    fModuleClusterMapIt(),
+    fdigi(NULL),
+    fdigiMatch(NULL),
+    fDebug(false)
 {
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdClusterizerFast::CbmTrdClusterizerFast(const char *name, const char *title,
-                 CbmTrdRadiator *radiator)
+					     CbmTrdRadiator *radiator)
   :FairTask(name),
-  Digicounter(-1),
-    fLayerZ(),
-    fTime(-1.),
-    fModuleType(-1),
-    fModuleCopy(-1),
-    fModuleID(-1),
-    fMCindex(-1),
-       fEfficiency(1.),
-    fTrdPoints(NULL),
-    fDigiCollection(NULL),
-    fDigiMatchCollection(NULL),
-    fMCStacks(NULL),
-    fDigiPar(NULL),
-    fModuleInfo(NULL),
-    fRadiators(radiator),
-    fTrdId(),
+   Digicounter(-1),
+   fLayerZ(),
+   fTime(-1.),
+   fModuleType(-1),
+   fModuleCopy(-1),
+   fModuleID(-1),
+   fMCindex(-1),
+   fEfficiency(1.),
+   fTrdPoints(NULL),
+   fDigiCollection(NULL),
+   fDigiMatchCollection(NULL),
+   fMCStacks(NULL),
+   fDigiPar(NULL),
+   fModuleInfo(NULL),
+   fRadiators(radiator),
+   fTrdId(),
    //fDigiMap(),
    //fDigiMapIt(),
-    fModuleClusterMap(),
-    fModuleClusterMapIt()
+   fModuleClusterMap(),
+   fModuleClusterMapIt(),
+   fdigi(NULL),
+   fdigiMatch(NULL),
+   fDebug(false)
 {
 }
 // --------------------------------------------------------------------
@@ -101,8 +107,10 @@ CbmTrdClusterizerFast::~CbmTrdClusterizerFast()
   FairRootManager *ioman =FairRootManager::Instance();
   ioman->Write();
   fDigiCollection->Clear("C");
+  fDigiCollection->Delete();
   delete fDigiCollection;
   fDigiMatchCollection->Clear("C");
+  fDigiMatchCollection->Delete();
   delete fDigiMatchCollection;
   fTrdPoints->Clear("C");
   fTrdPoints->Delete();
@@ -114,6 +122,8 @@ CbmTrdClusterizerFast::~CbmTrdClusterizerFast()
     delete fDigiPar;
   if(fModuleInfo)
     delete fModuleInfo;
+  delete fdigi;
+  delete fdigiMatch;
 }
 // --------------------------------------------------------------------
 
@@ -310,51 +320,47 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
     TransformC2LL(local_outC,  local_outLL);
 
     Double_t padDisplacementLL[2] = {0, 0};
-    Int_t PadMax[2];
+    Int_t PadMax[2] = {-1, -1};
     GetClusterDisplacement(local_meanLL, padDisplacementLL, PadMax);
     if(fDebug)
       printf ("(%6.2f,%6.2f)  (%6.2f,%6.2f)  (%3i,%3i)\n",local_meanLL[0],local_meanLL[1],padDisplacementLL[0],padDisplacementLL[1],PadMax[0],PadMax[1]);
 
-    CalcDigisOnPadPlane(padDisplacementLL, PadMax, ELoss);
-
-
-
+    CalcDigisOnPadPlane(padDisplacementLL, PadMax, ELoss, j);
 
   }
+  
   Int_t iDigi = 0;
   for (fModuleClusterMapIt = fModuleClusterMap.begin(); fModuleClusterMapIt != fModuleClusterMap.end(); fModuleClusterMapIt++) {
     for (Int_t xPad = 0; xPad < (*fModuleClusterMapIt).second->PadPlane.size(); xPad++) {
       for (Int_t yPad = 0; yPad < (*fModuleClusterMapIt).second->PadPlane[xPad].size(); yPad++) {
 	if ((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge > 0.0) {
-	  CbmTrdDigi* digi = new CbmTrdDigi(
-					    (*fModuleClusterMapIt).first, 
-					    xPad, 
-					    yPad, 
-					    (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge, 
-					    fTime, 
-					    iDigi // ?????????????????
-					    );
-	  
+	  fdigi = new CbmTrdDigi(
+				(*fModuleClusterMapIt).first, 
+				xPad, 
+				yPad, 
+				(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge, 
+				fTime, 
+				(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[0]//iDigi // ?????????????????
+				);
+	  for (Int_t i = 1; i < (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex.size(); i++)
+	    fdigi->AddMCIndex((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[i]);
+
 	  new ((*fDigiCollection)[iDigi]) CbmTrdDigi();
-	  (*fDigiCollection)[iDigi] = digi;
+	  (*fDigiCollection)[iDigi] = fdigi;
 
-	  CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
-	  /*
-	    std::vector<Int_t> mci=(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex;
-	    std::vector<Int_t>::iterator it;
+	  fdigiMatch = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
 
-	    for (it=mci.begin() ; it <mci.end(); it++  ) {
-	    Int_t bla = p->AddPoint((Int_t)*it);
-	    }
-	  */
 	  for (Int_t i = 0; i < (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex.size(); i++)
-	    Int_t bla = p->AddPoint((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[i]);
+	    Int_t bla = fdigiMatch->AddPoint((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[i]);
 	  iDigi++;
+
 	}
       }
     }
   }
-  printf(" Added %d TRD Digis to Collection\n  (Including multiple fired digis by differend particles in the same event)\n\n",iDigi);
+  //delete digi;
+  //delete p;
+  printf(" Added %d Digis to Collection of TRD\n\n",iDigi);
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -366,56 +372,69 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
   //fIntegralTest->Draw();
 }
   // --------------------------------------------------------------------
-  void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss)
-  {
-    const Int_t nPadCluster = 3; // has to be odd
-    Int_t xStart = PadMax[0] - nPadCluster / 2;
-    Int_t xStop  = PadMax[0] + nPadCluster / 2 + 1;
-    Int_t yStart = PadMax[1] - nPadCluster / 2;
-    Int_t yStop  = PadMax[1] + nPadCluster / 2 + 1;
-    Double_t xPosC = -clusterPosInPadLL[0] + 0.5 * fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][PadMax[1]]->SizeX;
-    Double_t yPosC = -clusterPosInPadLL[1] + 0.5 * fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][PadMax[1]]->SizeY;
-
-    if (xStart < 0)
-      xStart = 0;
-    if (xStart > fModuleClusterMap[fModuleID]->nCol)
-      xStart = fModuleClusterMap[fModuleID]->nCol;
-    if (xStop < 0)
-      xStop = 0;
-    if (xStop > fModuleClusterMap[fModuleID]->nCol)
-      xStop = fModuleClusterMap[fModuleID]->nCol;
-    if (yStart < 0)
-      yStart = 0;
-    if (yStart > fModuleClusterMap[fModuleID]->nRow)
-      yStart = fModuleClusterMap[fModuleID]->nRow;
-    if (yStop < 0)
-      yStop = 0;
-    if (yStop > fModuleClusterMap[fModuleID]->nRow)
-      yStop = fModuleClusterMap[fModuleID]->nRow;
-
+void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss, Int_t pointId)
+{
+  if (PadMax[0] >= (Int_t)fModuleClusterMap[fModuleID]->PadPlane.size() || PadMax[1] >= (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size()) {
+    printf("\n\n ERROR: CalcDigisOnPadPlane: PadMax out of module.\n Module size: (%3i,%3i)  PadMax(%3i,%3i)\n\n",(Int_t)fModuleClusterMap[fModuleID]->PadPlane.size(), (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size(),PadMax[0],PadMax[1]);
+  }
+  else
+    {
+      const Int_t nPadCluster = 3; // has to be odd
+      Int_t xStart = PadMax[0] - nPadCluster / 2;
+      Int_t xStop  = PadMax[0] + nPadCluster / 2 + 1;
+      Int_t yStart = PadMax[1] - nPadCluster / 2;
+      Int_t yStop  = PadMax[1] + nPadCluster / 2 + 1;
+      if(fDebug)
+	printf("PadPlane(%3i,%3i)  PadMax(%3i,%3i)     ",(Int_t)fModuleClusterMap[fModuleID]->PadPlane.size(), (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size(),PadMax[0],PadMax[1]);
+      Double_t xPosC = -clusterPosInPadLL[0] + 0.5 * fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][PadMax[1]]->SizeX;
+      Double_t yPosC = -clusterPosInPadLL[1] + 0.5 * fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][PadMax[1]]->SizeY;
+      if(fDebug)
+	printf ("x(%3i,%3i) y(%3i,%3i)      ",xStart,xStop,yStart,yStop);
+      if (xStart < 0)
+	xStart = 0;
+      if (xStart > fModuleClusterMap[fModuleID]->nCol)
+	xStart = fModuleClusterMap[fModuleID]->nCol;
+      if (xStop < 0)
+	xStop = 0;
+      if (xStop > fModuleClusterMap[fModuleID]->nCol)
+	xStop = fModuleClusterMap[fModuleID]->nCol;
+      if (yStart < 0)
+	yStart = 0;
+      if (yStart > fModuleClusterMap[fModuleID]->nRow)
+	yStart = fModuleClusterMap[fModuleID]->nRow;
+      if (yStop < 0)
+	yStop = 0;
+      if (yStop > fModuleClusterMap[fModuleID]->nRow)
+	yStop = fModuleClusterMap[fModuleID]->nRow;
+      if(fDebug)
+	printf ("x(%3i,%3i) y(%3i,%3i)\n",xStart,xStop,yStart,yStop);
  
 
-    for (Int_t ix = xStart; ix < PadMax[0]; ix++)
-      xPosC -= fModuleClusterMap[fModuleID]->PadPlane[ix][PadMax[1]]->SizeX;
-    for (Int_t iy = yStart; iy < PadMax[1]; iy++)
-      yPosC -= fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][iy]->SizeY;
+      for (Int_t ix = xStart; ix < PadMax[0]; ix++)
+	xPosC -= fModuleClusterMap[fModuleID]->PadPlane[ix][PadMax[1]]->SizeX;
+      for (Int_t iy = yStart; iy < PadMax[1]; iy++)
+	yPosC -= fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][iy]->SizeY;
 
-    Double_t xPosCStart = xPosC;
-    Double_t yPosCStart = yPosC;
+      Double_t xPosCStart = xPosC;
+      Double_t yPosCStart = yPosC;
 
-    for (Int_t x = xStart; x < xStop; x++) {
       for (Int_t y = yStart; y < yStop; y++) {
-	fModuleClusterMap[fModuleID]->PadPlane[x][y]->Charge += 
-	  CalcMathieson(xPosC, fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX) * 
-	  CalcMathieson(yPosC, fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeY) *
-	  ELoss;
-	fModuleClusterMap[fModuleID]->PadPlane[x][y]->MCIndex.push_back(fMCindex);
-	yPosC += fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeY;
+	//printf("%3i: ",y);
+	for (Int_t x = xStart; x < xStop; x++) {
+	  //printf("%3i, ",x);
+	  fModuleClusterMap[fModuleID]->PadPlane[x][y]->Charge += 
+	    CalcMathieson(xPosC, fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX) * 
+	    CalcMathieson(yPosC, fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeY) *
+	    ELoss;
+	  fModuleClusterMap[fModuleID]->PadPlane[x][y]->MCIndex.push_back(/*fMCindex*/pointId);
+	  xPosC += fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX;      
+	}
+	//printf("\n");
+	xPosC = xPosCStart;
+	yPosC += fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][y]->SizeY;
       }
-      yPosC = yPosCStart;
-      xPosC += fModuleClusterMap[fModuleID]->PadPlane[x][PadMax[1]]->SizeX;
     }
-  }
+}
 
   // --------------------------------------------------------------------
   void CbmTrdClusterizerFast::InitPadPlane(ClusterModule* mCluster)

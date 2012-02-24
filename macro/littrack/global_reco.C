@@ -18,7 +18,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
@@ -54,30 +54,30 @@ void global_reco(Int_t nEvents = 100, // number of events
    Int_t normTofHits = 1;
 
 	if (script == "yes") {
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
-		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
-		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
+		parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
+		globalRecoFile = TString(gSystem->Getenv("LIT_GLOBAL_RECO_FILE"));
+		globalHitsFile = TString(gSystem->Getenv("LIT_GLOBAL_HITS_FILE"));
+		globalTracksFile = TString(gSystem->Getenv("LIT_GLOBAL_TRACKS_FILE"));
 
-		resultDir = TString(gSystem->Getenv("RESULTDIR"));
+		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 
-		globalTrackingType = TString(gSystem->Getenv("GLOBALTRACKINGTYPE"));
-		stsHitProducerType = TString(gSystem->Getenv("STSHITPRODUCERTYPE"));
-		trdHitProducerType = TString(gSystem->Getenv("TRDHITPRODUCERTYPE"));
-		muchHitProducerType = TString(gSystem->Getenv("MUCHHITPRODUCERTYPE"));
+		globalTrackingType = TString(gSystem->Getenv("LIT_GLOBAL_TRACKING_TYPE"));
+		stsHitProducerType = TString(gSystem->Getenv("LIT_STS_HITPRODUCER_TYPE"));
+		trdHitProducerType = TString(gSystem->Getenv("LIT_TRD_HITPRODUCER_TYPE"));
+		muchHitProducerType = TString(gSystem->Getenv("LIT_MUCH_HITPRODUCER_TYPE"));
 
-		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
-		trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
-		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
+		stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
+		trdDigiFile = TString(gSystem->Getenv("LIT_TRD_DIGI"));
+		muchDigiFile = TString(gSystem->Getenv("LIT_MUCH_DIGI"));
 
-		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
-		normTrdPoints = TString(gSystem->Getenv("NORMTRDPOINTS")).Atoi();
-		normMuchPoints = TString(gSystem->Getenv("NORMMUCHPOINTS")).Atoi();
-		normTofPoints = TString(gSystem->Getenv("NORMTOFPOINTS")).Atoi();
-		normTrdHits = TString(gSystem->Getenv("NORMTRDHITS")).Atoi();
-		normMuchHits = TString(gSystem->Getenv("NORMMUCHHITS")).Atoi();
-		normTofHits = TString(gSystem->Getenv("NORMTOFHITS")).Atoi();
+		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
+		normTrdPoints = TString(gSystem->Getenv("LIT_NORM_TRD_POINTS")).Atoi();
+		normMuchPoints = TString(gSystem->Getenv("LIT_NORM_MUCH_POINTS")).Atoi();
+		normTofPoints = TString(gSystem->Getenv("LIT_NORM_TOF_POINTS")).Atoi();
+		normTrdHits = TString(gSystem->Getenv("LIT_NORM_TRD_HITS")).Atoi();
+		normMuchHits = TString(gSystem->Getenv("LIT_NORM_MUCH_HITS")).Atoi();
+		normTofHits = TString(gSystem->Getenv("LIT_NORM_TOF_HITS")).Atoi();
 	}
 
    parFileList->Add(&stsDigiFile);

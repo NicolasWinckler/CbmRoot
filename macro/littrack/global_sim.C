@@ -11,7 +11,7 @@ using std::endl;
 
 void global_sim(Int_t nEvents = 1000)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
 	// Specify "electron" or "muon" setup of CBM
 //	TString setup = "muon";
@@ -67,34 +67,34 @@ void global_sim(Int_t nEvents = 1000)
 
 	// If SCRIPT environment variable is set to "yes", i.e. macro is run via script
 	if (script == "yes") {
-		urqmdFile  = TString(gSystem->Getenv("URQMDFILE"));
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
+		urqmdFile  = TString(gSystem->Getenv("LIT_URQMD_FILE"));
+		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
+		parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
 
-		nofMuonsPlus = TString(gSystem->Getenv("NMUONSPLUS")).Atoi();
-		nofMuonsMinus = TString(gSystem->Getenv("NMUONSMINUS")).Atoi();
-		nofElectrons = TString(gSystem->Getenv("NELECTRONS")).Atoi();
-		nofPositrons = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
-		nofPionsPlus = TString(gSystem->Getenv("NPIONSPLUS")).Atoi();
-		nofPionsMinus = TString(gSystem->Getenv("NPIONSMINUS")).Atoi();
-		nofJPsiToMuons = TString(gSystem->Getenv("NJPSITOMUONS")).Atoi();
-		nofJPsiToElectrons = TString(gSystem->Getenv("NJPSITOELECTRONS")).Atoi();
-		urqmd = TString(gSystem->Getenv("URQMD"));
-      unigen = TString(gSystem->Getenv("UNIGEN"));
+		nofMuonsPlus = TString(gSystem->Getenv("LIT_NOF_MUONS_PLUS")).Atoi();
+		nofMuonsMinus = TString(gSystem->Getenv("LIT_NOF_MUONS_MINUS")).Atoi();
+		nofElectrons = TString(gSystem->Getenv("LIT_NOF_ELECTRONS")).Atoi();
+		nofPositrons = TString(gSystem->Getenv("LIT_NOF_POSITRONS")).Atoi();
+		nofPionsPlus = TString(gSystem->Getenv("LIT_NOF_PIONS_PLUS")).Atoi();
+		nofPionsMinus = TString(gSystem->Getenv("LIT_NOF_PIONS_MINUS")).Atoi();
+		nofJPsiToMuons = TString(gSystem->Getenv("LIT_NOF_JPSI_TO_MUONS")).Atoi();
+		nofJPsiToElectrons = TString(gSystem->Getenv("LIT_NOF_JPSI_TO_ELECTRONS")).Atoi();
+		urqmd = TString(gSystem->Getenv("LIT_URQMD"));
+      unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
 
-		caveGeom = TString(gSystem->Getenv("CAVEGEOM"));
-		targetGeom = TString(gSystem->Getenv("TARGETGEOM"));
-		pipeGeom = TString(gSystem->Getenv("PIPEGEOM"));
-		shieldGeom = TString(gSystem->Getenv("SHIELDGEOM"));
-		mvdGeom = TString(gSystem->Getenv("MVDGEOM"));
-		stsGeom = TString(gSystem->Getenv("STSGEOM"));
-		muchGeom = TString(gSystem->Getenv("MUCHGEOM"));
-		richGeom = TString(gSystem->Getenv("RICHGEOM"));
-		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
-		tofGeom = TString(gSystem->Getenv("TOFGEOM"));
-		ecalGeom = TString(gSystem->Getenv("ECALGEOM"));
-		fieldMap = TString(gSystem->Getenv("FIELDMAP"));
-		magnetGeom = TString(gSystem->Getenv("MAGNETGEOM"));
+		caveGeom = TString(gSystem->Getenv("LIT_CAVE_GEOM"));
+		targetGeom = TString(gSystem->Getenv("LIT_TARGET_GEOM"));
+		pipeGeom = TString(gSystem->Getenv("LIT_PIPE_GEOM"));
+		shieldGeom = TString(gSystem->Getenv("LIT_SHIELD_GEOM"));
+		mvdGeom = TString(gSystem->Getenv("LIT_MVD_GEOM"));
+		stsGeom = TString(gSystem->Getenv("LIT_STS_GEOM"));
+		muchGeom = TString(gSystem->Getenv("LIT_MUCH_GEOM"));
+		richGeom = TString(gSystem->Getenv("LIT_RICH_GEOM"));
+		trdGeom = TString(gSystem->Getenv("LIT_TRD_GEOM"));
+		tofGeom = TString(gSystem->Getenv("LIT_TOF_GEOM"));
+		ecalGeom = TString(gSystem->Getenv("LIT_ECAL_GEOM"));
+		fieldMap = TString(gSystem->Getenv("LIT_FIELD_MAP"));
+		magnetGeom = TString(gSystem->Getenv("LIT_MAGNET_GEOM"));
 	}
 	// -----   Magnetic field   -----------------------------------------------
 	Double_t fieldZ = 50.; // field center z position

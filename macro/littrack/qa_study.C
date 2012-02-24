@@ -14,20 +14,20 @@ void qa_study()
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
    cbmrootlibs();
 
-   TString script = TString(gSystem->Getenv("SCRIPT"));
+   TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
    std::vector<std::string> results, names;
    std::string outputDir;
    if (script == "yes") {
-      Int_t nofStudies = TString(gSystem->Getenv("NSTUDIES")).Atoi();
+      Int_t nofStudies = TString(gSystem->Getenv("LIT_NOF_STUDIES")).Atoi();
       for (Int_t i = 0; i < nofStudies; i++) {
          std::ostringstream ssresult, ssname;
-         ssresult << "STUDYRESULT" << i+1;
-         ssname << "STUDYNAME" << i+1;
+         ssresult << "LIT_STUDY_RESULT" << i+1;
+         ssname << "LIT_STUDY_NAME" << i+1;
          results.push_back(gSystem->Getenv(ssresult.str().c_str()));
          names.push_back(gSystem->Getenv(ssname.str().c_str()));
       }
-      outputDir = std::string(gSystem->Getenv("STUDYOUTPUTDIR"));
+      outputDir = std::string(gSystem->Getenv("LIT_STUDY_OUTPUT_DIR"));
    } else {
       results.push_back("/u/andrey/cbm/results/trd_test_jan12/results_trd_v10b_clustering/");
       results.push_back("/u/andrey/cbm/results/trd_test_jan12/results_trd_v10b_smearing/");

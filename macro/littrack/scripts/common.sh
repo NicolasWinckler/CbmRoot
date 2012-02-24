@@ -4,152 +4,152 @@
 function set_simulation_parameters() {
     pars=$1
     # number of embedded muons from FairBoxGenerator
-    export NMUONSPLUS=${pars[0]}
+    export LIT_NOF_MUONS_PLUS=${pars[0]}
     # number of embedded muons from FairBoxGenerator
-    export NMUONSMINUS=${pars[1]}
+    export LIT_NOF_MUONS_MINUS=${pars[1]}
     # number of embedded electrons from FairBoxGenerator
-    export NELECTRONS=${pars[2]}
+    export LIT_NOF_ELECTRONS=${pars[2]}
     # number of embedded positrons from FairBoxGenerator
-    export NPOSITRONS=${pars[3]}
+    export LIT_NOF_POSITRONS=${pars[3]}
     # number of embedded pions from FairBoxGenerator
-    export NPIONSPLUS=${pars[4]}
+    export LIT_NOF_PIONS_PLUS=${pars[4]}
     # number of embedded pions from FairBoxGenerator
-    export NPIONSMINUS=${pars[5]}
+    export LIT_NOF_PIONS_MINUS=${pars[5]}
     # number of embedded J/Psi decayed to mu+ and mu- 
-    export NJPSITOMUONS=${pars[6]}
+    export LIT_NOF_JPSI_TO_MUONS=${pars[6]}
     # number of embedded J/Psi decayed to e+ and e- 
-    export NJPSITOELECTRONS=${pars[7]}
+    export LIT_NOF_JPSI_TO_ELECTRONS=${pars[7]}
     # If "yes" than UrQMD will be used as background
-    export URQMD=${pars[8]}
+    export LIT_URQMD=${pars[8]}
     # If "yes" than CbmUnigenGenerator will be useed instead of FairUrqmdGenerator
-    export UNIGEN=${pars[9]}
+    export LIT_UNIGEN=${pars[9]}
 }
 
 
 
 # Function sets default file names using a specified DIR and file number
 function set_default_file_names() {
-    DIR=$1
+    dir=$1
     XXXX=$2
-    export MCFILE=$DIR/mc.$XXXX.root
-    export PARFILE=$DIR/param.$XXXX.root
-    export GLOBALRECOFILE=$DIR/global.reco.$XXXX.root
-    export GLOBALHITSFILE=$DIR/global.hits.$XXXX.root
-    export GLOBALTRACKSFILE=$DIR/global.tracks.$XXXX.root
-    export GLOBALTRACKSIDEALFILE=$DIR/global.tracks.ideal.$XXXX.root
-    export MVDRECOFILE=$DIR/mvd.reco.$XXXX.root
-    export PROPANAFILE=$DIR/propagation.ana.$XXXX.root
-    export RICHFILE=$DIR/rich.reco.$XXXX.root
-    export ELIDFILE=$DIR/elid.qa.$XXXX.root
+    export LIT_MC_FILE=${dir}/mc.${XXXX}.root
+    export LIT_PAR_FILE=${dir}/param.${XXXX}.root
+    export LIT_GLOBAL_RECO_FILE=${dir}/global.reco.${XXXX}.root
+    export LIT_GLOBAL_HITS_FILE=${dir}/global.hits.${XXXX}.root
+    export LIT_GLOBAL_TRACKS_FILE=${dir}/global.tracks.${XXXX}.root
+    export LIT_GLOBAL_TRACKS_IDEAL_FILE=${dir}/global.tracks.ideal.${XXXX}.root
+    export LIT_MVD_RECO_FILE=${dir}/mvd.reco.${XXXX}.root
+    export LIT_PROP_ANA_FILE=${dir}/propagation.ana.${XXXX}.root
+    export LIT_RICH_FILE=${dir}/rich.reco.${XXXX}.root
+    export LIT_ELID_FILE=${dir}/elid.qa.${XXXX}.root
 }
 
 
 
 # Function sets the default muon geometry
 function set_default_muon_geometry() {
-    export CAVEGEOM=cave.geo
-    export TARGETGEOM=target_au_250mu.geo
-    export PIPEGEOM=pipe_much.geo
-    export SHIELDGEOM=shield_standard.geo
-    export MVDGEOM=
-    export STSGEOM=sts/sts_v11a.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_v11a.digi.par
-    export MUCHGEOM=much/much_v11a.geo
-    export MUCHDIGI=$VMCWORKDIR/parameters/much/much_v11a.digi.root
-    export RICHGEOM=
-    export TRDGEOM=
-    export TRDDIGI=
-    export TOFGEOM=tof/tof_v07a.geo
-    export ECALGEOM=
-    export FIELDMAP=field_v10e
-    export MAGNETGEOM=passive/magnet_v09m.geo
+    export LIT_CAVE_GEOM=cave.geo
+    export LIT_TARGET_GEOM=target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe_much.geo
+    export LIT_SHIELD_GEOM=shield_standard.geo
+    export LIT_MVD_GEOM=
+    export LIT_STS_GEOM=sts/sts_v11a.geo
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v11a.digi.par
+    export LIT_MUCH_GEOM=much/much_v11a.geo
+    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v11a.digi.root
+    export LIT_RICH_GEOM=
+    export LIT_TRD_GEOM=
+    export LIT_TRD_DIGI=
+    export LIT_TOF_GEOM=tof/tof_v07a.geo
+    export LIT_ECAL_GEOM=
+    export LIT_FIELD_MAP=field_v10e
+    export LIT_MAGNET_GEOM=passive/magnet_v09m.geo
     
-    export NORMSTSPOINTS=4
-    export NORMTRDPOINTS=0
-    export NORMMUCHPOINTS=16
-    export NORMTOFPOINTS=1
-    export NORMTRDHITS=0
-    export NORMMUCHHITS=15
-    export NORMTOFHITS=1
+    export LIT_NORM_STS_POINTS=4
+    export LIT_NORM_TRD_POINTS=0
+    export LIT_NORM_MUCH_POINTS=16
+    export LIT_NORM_TOF_POINTS=1
+    export LIT_NORM_TRD_HITS=0
+    export LIT_NORM_MUCH_HITS=15
+    export LIT_NORM_TOF_HITS=1
 }
 
 
 
 # Function sets the default electron geometry
 function set_default_electron_geometry() {
-    export CAVEGEOM=cave.geo
-    export TARGETGEOM=target_au_250mu.geo
-    export PIPEGEOM=pipe_standard.geo
-    export SHIELDGEOM=
-    export MVDGEOM=
-    export STSGEOM=sts/sts_v11a.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_v11a.digi.par
-    export MUCHGEOM=
-    export MUCHDIGI=
-    export RICHGEOM=rich/rich_v08a.geo
-    export TRDGEOM=trd/trd_v10b.geo
-    export TRDDIGI=$VMCWORKDIR/parameters/trd/trd_v10b.digi.par
-    export TOFGEOM=tof/tof_v07a.geo
-    export ECALGEOM=
-    export FIELDMAP=field_v10e
-    export MAGNETGEOM=passive/magnet_v09e.geo
+    export LIT_CAVE_GEOM=cave.geo
+    export LIT_TARGET_GEOM=target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe_standard.geo
+    export LIT_SHIELD_GEOM=
+    export LIT_MVD_GEOM=
+    export LIT_STS_GEOM=sts/sts_v11a.geo
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v11a.digi.par
+    export LIT_MUCH_GEOM=
+    export LIT_MUCH_DIGI=
+    export LIT_RICH_GEOM=rich/rich_v08a.geo
+    export LIT_TRD_GEOM=trd/trd_v10b.geo
+    export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v10b.digi.par
+    export LIT_TOF_GEOM=tof/tof_v07a.geo
+    export LIT_ECAL_GEOM=
+    export LIT_FIELD_MAP=field_v10e
+    export LIT_MAGNET_GEOM=passive/magnet_v09e.geo
     
-    export NORMSTSPOINTS=4
-    export NORMTRDPOINTS=8
-    export NORMMUCHPOINTS=0
-    export NORMTOFPOINTS=1
-    export NORMTRDHITS=8
-    export NORMMUCHHITS=0
-    export NORMTOFHITS=1
+    export LIT_NORM_STS_POINTS=4
+    export LIT_NORM_TRD_POINTS=8
+    export LIT_NORM_MUCH_POINTS=0
+    export LIT_NORM_TOF_POINTS=1
+    export LIT_NORM_TRD_HITS=8
+    export LIT_NORM_MUCH_HITS=0
+    export LIT_NORM_TOF_HITS=1
 }
 
 
 
 # Function set default mvd geometry
 function set_default_mvd_geometry() {
-    export CAVEGEOM=cave.geo
-    export TARGETGEOM=target_au_250mu.geo
-    export PIPEGEOM=pipe_much.geo
-    export SHIELDGEOM=shield_standard.geo
-    export MVDGEOM=mvd/mvd_v07a.geo
-    export STSGEOM=sts/sts_v11a.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_v11a.digi.par
-    export MUCHGEOM=
-    export MUCHDIGI=
-    export RICHGEOM=
-    export TRDGEOM=
-    export TRDDIGI=
-    export TOFGEOM=
-    export ECALGEOM=
-    export FIELDMAP=field_v10e
-    export MAGNETGEOM=passive/magnet_v09m.geo
+    export LIT_CAVE_GEOM=cave.geo
+    export LIT_TARGET_GEOM=target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe_much.geo
+    export LIT_SHIELD_GEOM=shield_standard.geo
+    export LIT_MVD_GEOM=mvd/mvd_v07a.geo
+    export LIT_STS_GEOM=sts/sts_v11a.geo
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v11a.digi.par
+    export LIT_MUCH_GEOM=
+    export LIT_MUCH_DIGI=
+    export LIT_RICH_GEOM=
+    export LIT_TRD_GEOM=
+    export LIT_TRD_DIGI=
+    export LIT_TOF_GEOM=
+    export LIT_ECAL_GEOM=
+    export LIT_FIELD_MAP=field_v10e
+    export LIT_MAGNET_GEOM=passive/magnet_v09m.geo
     
-    export NORMSTSPOINTS=4
-    export NORMTRDPOINTS=0
-    export NORMMUCHPOINTS=0
-    export NORMTOFPOINTS=0
-    export NORMTRDHITS=0
-    export NORMMUCHHITS=0
-    export NORMTOFHITS=0
+    export LIT_NORM_STS_POINTS=4
+    export LIT_NORM_TRD_POINTS=0
+    export LIT_NORM_MUCH_POINTS=0
+    export LIT_NORM_TOF_POINTS=0
+    export LIT_NORM_TRD_HITS=0
+    export LIT_NORM_MUCH_HITS=0
+    export LIT_NORM_TOF_HITS=0
 }
 
 
 
-# Function exports and creates output directories for DIR
+# Function exports and creates output directories for LIT_DIR
 function create_output_dir()
 {
-    export DIR=$1
-    rm -r -f $DIR
-    mkdir $DIR
+    export LIT_DIR=$1
+    rm -r -f ${LIT_DIR}
+    mkdir ${LIT_DIR}
 }
 
 
 
-# Function exports and creates output directories for RESULTDIR
+# Function exports and creates output directories for LIT_RESULT_DIR
 function create_result_dir()
 {
-    export RESULTDIR=$1
-    rm -r -f $RESULTDIR
-    mkdir $RESULTDIR
+    export LIT_RESULT_DIR=$1
+    rm -r -f ${LIT_RESULT_DIR}
+    mkdir ${LIT_RESULT_DIR}
 }
 

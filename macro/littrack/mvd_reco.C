@@ -11,7 +11,7 @@ using std::endl;
 
 void mvd_reco(Int_t nEvents = 100)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	TString dir = "/data.local1/andrey/events/events_mvd/"; // Output directory
@@ -28,12 +28,12 @@ void mvd_reco(Int_t nEvents = 100)
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
 
 	if (script == "yes") {
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-		mvdRecoFile = TString(gSystem->Getenv("MVDRECOFILE"));
-		resultDir = TString(gSystem->Getenv("RESULTDIR"));
-		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
-		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS")).Atoi();
+		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
+		parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
+		mvdRecoFile = TString(gSystem->Getenv("LIT_MVD_RECO_FILE"));
+		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
+		stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
+		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
 	}
    parFileList->Add(&stsDigiFile);
 
@@ -41,11 +41,8 @@ void mvd_reco(Int_t nEvents = 100)
 	TStopwatch timer;
 	timer.Start();
 
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
-	cbmrootlibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+	loadlibs();
 
 	FairRunAna *run = new FairRunAna();
 	run->SetInputFile(mcFile);

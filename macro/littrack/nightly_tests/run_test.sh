@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Pathes and parameters
-TEST_DIR=/data.local1/andrey/tests/cdash_tests
-BUILD_DIR=${TEST_DIR}/cbmroot_build_jan12
+test_dir=/data.local1/andrey/tests/cdash_tests
+build_dir=${test_dir}/cbmroot_build_jan12
 
 function checkout_cbmroot
 {
@@ -19,7 +19,7 @@ function build_cbmroot
     src_dir=$1
     build_dir=$2
     simpath=$3
-    export SIMPATH=${simpath} #/data.local1/fairsoft/fairsoft_jan12/install
+    export SIMPATH=${simpath}
     mkdir ${build_dir}
     cd ${build_dir}
     cmake ${src_dir}
@@ -40,20 +40,20 @@ function copy_results_to_web
 
 # Run test without CDash
 if [ "$1" = "build" ] ; then
-    checkout_cbmroot ${TEST_DIR}
-    build_cbmroot ${TEST_DIR}/cbmroot ${BUILD_DIR} /data.local1/fairsoft/fairsoft_jan12/install
+    checkout_cbmroot ${test_dir}
+    build_cbmroot ${test_dir}/cbmroot ${build_dir} /data.local1/fairsoft/fairsoft_jan12/install
 
     # Run tests
     . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_electron.sh
     . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_muon.sh
     
-    copy_results_to_web "${TEST_DIR}/cbmroot/macro/littrack/nightly_tests/littrack*"
+    copy_results_to_web "${test_dir}/cbmroot/macro/littrack/nightly_tests/littrack*"
 elif [ "$1" = "cdash" ] ; then 
-    checkout_cbmroot ${TEST_DIR}
+    checkout_cbmroot ${test_dir}
     # Run tests with CDash
-    . ${TEST_DIR}/cbmroot/Dart.sh Experimental ${TEST_DIR}/cbmroot/Dart.cfg
+    . ${test_dir}/cbmroot/Dart.sh Experimental ${test_dir}/cbmroot/Dart.cfg
     
-    copy_results_to_web "${BUILD_DIR}/macro/littrack/nightly_tests/littrack*"
+    copy_results_to_web "${build_dir}/macro/littrack/nightly_tests/littrack*"
 elif [ "$1" = "local" ] ; then
     . ./run_test_electron.sh
     . ./run_test_muon.sh

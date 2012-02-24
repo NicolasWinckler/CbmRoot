@@ -11,7 +11,7 @@ using std::endl;
 
 void prop_qa(Int_t nEvents = 1000)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
 	TString dir = "/data.local1/andrey/events/events_propagation_qa_electrons/";
 	TString mcFile = dir + "mc.0000.root";
@@ -24,14 +24,14 @@ void prop_qa(Int_t nEvents = 1000)
 	Int_t testFastPropagation = 0;
 
 	if(script == "yes") {
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSIDEALFILE"));
-		resultDir = TString(gSystem->Getenv("RESULTDIR"));
-		propAnaFile = TString(gSystem->Getenv("PROPANAFILE"));
-		nofHits = TString(gSystem->Getenv("NOFHITS")).Atoi();
-		pdg = TString(gSystem->Getenv("PDG")).Atoi();
-		testFastPropagation = TString(gSystem->Getenv("TESTFASTPROPAGATION")).Atoi();
+		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
+		parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
+		globalTracksFile = TString(gSystem->Getenv("LIT_GLOBAL_TRACKS_IDEAL_FILE"));
+		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
+		propAnaFile = TString(gSystem->Getenv("LIT_PROP_ANA_FILE"));
+		nofHits = TString(gSystem->Getenv("LIT_NOF_HITS")).Atoi();
+		pdg = TString(gSystem->Getenv("LIT_PDG")).Atoi();
+		testFastPropagation = TString(gSystem->Getenv("LIT_TEST_FAST_PROPAGATION")).Atoi();
 	}
 
 	TStopwatch timer;

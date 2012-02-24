@@ -55,9 +55,6 @@ private:
    TClonesArray* fRingMatches;
    TClonesArray* fStsTrackMatches;
 
-   double fMaxDistance;  // max. distance between ring center and track extrapolation
-   int fMinNofHitsInRing; // min number of hits per ring
-
    /**
     * \brief Copy constructor.
     */

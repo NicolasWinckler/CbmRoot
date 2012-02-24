@@ -23,10 +23,13 @@
 using std::cout;
 using std::endl;
 
-CbmRichRingTrackAssignIdeal::CbmRichRingTrackAssignIdeal()
+CbmRichRingTrackAssignIdeal::CbmRichRingTrackAssignIdeal():
+   fMcTracks(NULL),
+   fGlobalTracks(NULL),
+   fRingMatches(NULL),
+   fStsTrackMatches(NULL)
 {
-   fMaxDistance = 100.;
-   fMinNofHitsInRing  = 5;
+
 }
 
 CbmRichRingTrackAssignIdeal::~CbmRichRingTrackAssignIdeal()

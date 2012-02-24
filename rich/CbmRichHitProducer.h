@@ -208,7 +208,7 @@ private:
 
    TClonesArray* fRichPoints; // RICH MC points
    TClonesArray* fRichHits; // RICH hits
-   TClonesArray* fMcTracks; // Tracks
+   TClonesArray* fMcTracks; // Monte-Carlo tracks
 
    Int_t fNHits; // Number of hits
    Int_t fNDoubleHits; // Number of double hits
@@ -219,7 +219,7 @@ private:
 
    Double_t fNRefrac; // refraction index
    Int_t fDetection; // flag for detection
-   Int_t fNEvents;
+   Int_t fNEvents; // event number
 
    Double_t fDetX; // X-coordinate of photodetector
    Double_t fDetY; // Y-coordinate of photodetector

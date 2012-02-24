@@ -11,7 +11,7 @@
 #define CBM_RICH_RADIUS_CORRECTION
 
 #include "CbmRichRingLight.h"
-
+#include "TROOT.h"
 #include "TDirectory.h"
 #include "TFile.h"
 #include "TH2D.h"
@@ -53,8 +53,8 @@ public:
       double axisA = ring->GetAaxis() + fhMapAaxisXY->GetBinContent(fhMapAaxisXY->FindBin(centerX,centerY));
       double axisB = ring->GetBaxis() + fhMapBaxisXY->GetBinContent(fhMapBaxisXY->FindBin(centerX,centerY));
 
-      ring->SetAaxisCor(axisA);
-      ring->SetBaxisCor(axisB);
+      ring->SetAaxis(axisA);
+      ring->SetBaxis(axisB);
    }
 
 private:
@@ -88,8 +88,9 @@ private:
       delete file;
       current->cd();
    }
-   static TH2D* fhMapAaxisXY = NULL;
-   static TH2D* fhMapBaxisXY = NULL;
+
+   static TH2D* fhMapAaxisXY;
+   static TH2D* fhMapBaxisXY;
 };
 
 #endif

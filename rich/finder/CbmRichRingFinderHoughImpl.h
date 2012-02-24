@@ -64,6 +64,9 @@ class CbmRichHoughHitCmpUp:
 	          bool>
 {
 public:
+
+   virtual ~CbmRichHoughHitCmpUp(){}
+
 	bool operator()(
 	      const CbmRichHoughHit &m1,
 	      const CbmRichHoughHit &m2) const
@@ -88,6 +91,9 @@ class CbmRichRingComparatorMore:
 	          bool>
 {
 public:
+
+   virtual ~CbmRichRingComparatorMore(){}
+
 	bool operator()(
 	      const CbmRichRingLight* ring1,
 	      const CbmRichRingLight* ring2) const

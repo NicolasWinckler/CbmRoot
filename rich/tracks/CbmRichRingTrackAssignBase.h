@@ -26,7 +26,12 @@ public:
    /**
     * brief Standard constructor.
     */
-   CbmRichRingTrackAssignBase() { }
+   CbmRichRingTrackAssignBase():
+      fMaxDistance(100.),
+      fMinNofHitsInRing(5)
+   {
+
+   }
 
    /**
     * \brief Destructor.
@@ -48,7 +53,13 @@ public:
          TClonesArray* rings,
          TClonesArray* richProj) = 0;
 
+protected:
+
+   double fMaxDistance;  // max. distance between ring center and track extrapolation
+   int fMinNofHitsInRing; // min number of hits per ring
+
 private:
+
    /**
     * \brief Copy constructor.
     */

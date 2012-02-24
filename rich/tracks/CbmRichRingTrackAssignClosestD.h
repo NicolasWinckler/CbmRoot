@@ -52,8 +52,6 @@ private:
 	TClonesArray* fGlobalTracks;
 	TClonesArray* fTrdTracks;
 
-	double fMaxDistance; // max. distance between ring center and track projection
-	int fMinNofHitsInRing; // min number of hits per ring
 	double fTrdAnnCut; // ANN cut for electron identification in TRD
 	bool fUseTrd; // if true electron identification in TRD will be performed
 

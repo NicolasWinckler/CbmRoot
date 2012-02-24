@@ -30,8 +30,6 @@ CbmRichRingTrackAssignClosestD::CbmRichRingTrackAssignClosestD():
    fGlobalTracks(NULL),
    fTrdTracks(NULL),
 
-   fMaxDistance(100.),
-   fMinNofHitsInRing(5),
    fTrdAnnCut(-0.5),
    fUseTrd(false)
 {

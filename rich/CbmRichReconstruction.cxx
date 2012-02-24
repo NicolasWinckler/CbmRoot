@@ -134,7 +134,7 @@ void CbmRichReconstruction::InitExtrapolation()
       fTrackExtrapolation = new CbmRichTrackExtrapolationKF();
    } else {
       Fatal("CbmRichReconstruction::InitExtrapolation",
-           (fExtrapolationName + " is not correct name for extrapolation algorithm.").c_str());
+           (fExtrapolationName + string(" is not correct name for extrapolation algorithm.")).c_str());
    }
    fTrackExtrapolation->Init();
 }
@@ -152,7 +152,7 @@ void CbmRichReconstruction::InitFinder()
       fRingFinder = new CbmRichRingFinderIdeal();
    } else {
       Fatal("CbmRichReconstruction::InitFinder",
-            (fFinderName + " is not correct name for ring finder algorithm.").c_str());
+            (fFinderName + string(" is not correct name for ring finder algorithm.")).c_str());
    }
 
    fRingFinder->Init();
@@ -174,7 +174,7 @@ void CbmRichReconstruction::InitFitter()
       fRingFitter = new CbmRichRingFitterEllipseMinuit();
    } else {
       Fatal("CbmRichReconstruction::InitFitter",
-            (fFitterName + " is not correct name for ring fitter algorithm.").c_str());
+            (fFitterName + string(" is not correct name for ring fitter algorithm.")).c_str());
    }
 }
 
@@ -184,7 +184,7 @@ void CbmRichReconstruction::InitTrackAssign()
       fRingTrackAssign = new CbmRichRingTrackAssignClosestD();
    } else {
       Fatal("CbmRichReconstruction::InitTrackAssign",
-            (fTrackAssignName + " is not correct name for ring-track assignment algorithm.").c_str());
+            (fTrackAssignName + string(" is not correct name for ring-track assignment algorithm.")).c_str());
    }
    fRingTrackAssign->Init();
 }

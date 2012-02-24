@@ -1,6 +1,3 @@
-// -------------------------------------------------------------------------
-// -----                       CbmRichProt source file                     -----
-// -------------------------------------------------------------------------
 
 #include "CbmRichProt.h"
 
@@ -35,65 +32,64 @@
 using std::cout;
 using std::endl;
 
-// -----   Default constructor   -------------------------------------------
-CbmRichProt::CbmRichProt() : FairDetector("RICH", kTRUE, kRICH) {
-  fRichCollection        = new TClonesArray("CbmRichPoint");
+CbmRichProt::CbmRichProt() :
+   FairDetector("RICH", kTRUE, kRICH),
+   fPosIndex(0),
+   volDetector(0),
+   volRefPlane(0),
+   volMir(0),
+   volMir1(0),
+   volMir2(0),
+   fRichCollection(NULL),
+   fRichRefPlaneCollection(NULL),
+   fRichMirrorCollection(NULL)
+{
+  fRichCollection = new TClonesArray("CbmRichPoint");
   fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");
   fRichMirrorCollection  = new TClonesArray("CbmRichPoint");
-  fPosIndex   = 0;
-  volRefPlane  = 0;
-  volDetector = 0;
-  volMir      = 0;
-  volMir1     = 0;
-  volMir2     = 0;
   
   fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Standard constructor   ------------------------------------------
-CbmRichProt::CbmRichProt(const char* name, Bool_t active)
-  : FairDetector(name, active, kRICH) {
-  fRichCollection        = new TClonesArray("CbmRichPoint");
-  fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");
-  fRichMirrorCollection  = new TClonesArray("CbmRichPoint");
-  fPosIndex   = 0;
-  volRefPlane  = 0;
-  volDetector = 0;
-  volMir      = 0;
-  volMir1     = 0;
-  volMir2     = 0;
+CbmRichProt::CbmRichProt(
+      const char* name,
+      Bool_t active):
+   FairDetector(name, active, kRICH),
+   fPosIndex(0),
+   volDetector(0),
+   volRefPlane(0),
+   volMir(0),
+   volMir1(0),
+   volMir2(0),
+   fRichCollection(NULL),
+   fRichRefPlaneCollection(NULL),
+   fRichMirrorCollection(NULL)
+{
+   fRichCollection = new TClonesArray("CbmRichPoint");
+   fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");
+   fRichMirrorCollection  = new TClonesArray("CbmRichPoint");
   
-  fVerboseLevel = 1;
-
+   fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmRichProt::~CbmRichProt() {
-  if (fRichCollection) {
-    fRichCollection->Delete();
-    delete fRichCollection;
-  }
-  if (fRichRefPlaneCollection) {
-    fRichRefPlaneCollection->Delete();
-    delete fRichRefPlaneCollection;
- }
- if (fRichMirrorCollection) {
-    fRichMirrorCollection->Delete();
-    delete fRichMirrorCollection;
- }
+CbmRichProt::~CbmRichProt()
+{
+   if (NULL != fRichCollection) {
+      fRichCollection->Delete();
+      delete fRichCollection;
+   }
+   if (NULL != fRichRefPlaneCollection) {
+      fRichRefPlaneCollection->Delete();
+      delete fRichRefPlaneCollection;
+   }
+   if (NULL != fRichMirrorCollection) {
+      fRichMirrorCollection->Delete();
+      delete fRichMirrorCollection;
+   }
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Public method Intialize   ---------------------------------------
-void CbmRichProt::Initialize() {
+void CbmRichProt::Initialize()
+{
   FairDetector::Initialize();
   FairRun* sim = FairRun::Instance();
   FairRuntimeDb* rtdb=sim->GetRuntimeDb();
@@ -125,13 +121,10 @@ void CbmRichProt::Initialize() {
 //    Fatal("","");
 //  }
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Public method ProcessHits  --------------------------------------
-Bool_t CbmRichProt::ProcessHits(FairVolume* vol) {
-   
+Bool_t CbmRichProt::ProcessHits(
+      FairVolume* vol)
+{
   // Get track information
   // gMC is of type TVirtualMC
  
@@ -321,20 +314,13 @@ Bool_t CbmRichProt::ProcessHits(FairVolume* vol) {
 */
   return kFALSE;
 }
-// ----------------------------------------------------------------------------
 
-
-
-// -----   Public method EndOfEvent   -----------------------------------------
-void CbmRichProt::EndOfEvent() {
+void CbmRichProt::EndOfEvent()
+{
   if (fVerboseLevel)  Print();
   Reset();
 }
-// ----------------------------------------------------------------------------
 
-
-
-// -----   Public method Register   -------------------------------------------
 void CbmRichProt::Register() {
   FairRootManager::Instance()->Register("RichPoint","Rich", fRichCollection, kTRUE);
   FairRootManager::Instance()->Register("RefPlanePoint","RichRefPlane",
@@ -342,169 +328,134 @@ void CbmRichProt::Register() {
   FairRootManager::Instance()->Register("RichMirrorPoint","RichMirror",
   				       fRichMirrorCollection, kFALSE);  // fFALSE -> MirrorPoint not saved
 }
-// ----------------------------------------------------------------------------
 
-
-
-// -----   Public method GetCollection   --------------------------------------
-TClonesArray* CbmRichProt::GetCollection(Int_t iColl) const {
+TClonesArray* CbmRichProt::GetCollection(
+      Int_t iColl) const
+{
   if (iColl == 0) return fRichCollection;
   if (iColl == 1) return fRichRefPlaneCollection;
   if (iColl == 2) return fRichMirrorCollection;
   return NULL;
 }
-// ----------------------------------------------------------------------------
 
-
-
-
-// -----   Public method Print   ----------------------------------------------
-void CbmRichProt::Print() const {
+void CbmRichProt::Print() const
+{
    Int_t nHits = fRichCollection->GetEntriesFast();
-   cout << "-I- CbmRichProt: " << nHits << " points registered in this event."
-	<< endl;
+   cout << "-I- CbmRichProt: " << nHits << " points registered in this event." << endl;
 	
    if (fVerboseLevel>1)
      for (Int_t i=0; i<nHits; i++) (*fRichCollection)[i]->Print();
 }
-// ----------------------------------------------------------------------------
 
-
-
-// -----   Public method Reset   ----------------------------------------------
-void CbmRichProt::Reset() {
-  fRichCollection->Clear();
-  fRichRefPlaneCollection->Clear();
-  fRichMirrorCollection->Clear();
-  fPosIndex = 0;
+void CbmRichProt::Reset()
+{
+   fRichCollection->Clear();
+   fRichRefPlaneCollection->Clear();
+   fRichMirrorCollection->Clear();
+   fPosIndex = 0;
 }
-// ----------------------------------------------------------------------------
 
-
-
-// -----   Public method CopyClones   -----------------------------------------
-void CbmRichProt::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset ) {
-  Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- CbmRichProt: " << nEntries << " entries to add." << endl;
-  TClonesArray& clref = *cl2;
-  CbmRichPoint* oldpoint = NULL;
-  for (Int_t i=0; i< nEntries ; i++ ) {
-    oldpoint = (CbmRichPoint*) cl1->At(i);
-    Int_t index =  oldpoint->GetTrackID() + offset;
-    oldpoint->SetTrackID(index);
-    new (clref[fPosIndex]) CbmRichPoint(*oldpoint);     
-    fPosIndex++;
-  }
-  cout << "-I- CbmRichProt: " << cl2->GetEntriesFast() << " merged entries."
-       << endl;
+void CbmRichProt::CopyClones(
+      TClonesArray* cl1,
+      TClonesArray* cl2,
+      Int_t offset )
+{
+   Int_t nEntries = cl1->GetEntriesFast();
+   cout << "-I- CbmRichProt: " << nEntries << " entries to add." << endl;
+   TClonesArray& clref = *cl2;
+   CbmRichPoint* oldpoint = NULL;
+   for (Int_t i=0; i< nEntries ; i++ ) {
+      oldpoint = (CbmRichPoint*) cl1->At(i);
+      Int_t index =  oldpoint->GetTrackID() + offset;
+      oldpoint->SetTrackID(index);
+      new (clref[fPosIndex]) CbmRichPoint(*oldpoint);
+      fPosIndex++;
+   }
+   cout << "-I- CbmRichProt: " << cl2->GetEntriesFast() << " merged entries." << endl;
 }
-// ----------------------------------------------------------------------------
 
 void CbmRichProt::ConstructOpGeometry() 
 {
 
-	cout<< "CbmRichProt::ConstructOpGeometry() " <<endl;
-
 }
 
-// -----   Public method ConstructGeometry   ----------------------------------
-void CbmRichProt::ConstructGeometry() {
+void CbmRichProt::ConstructGeometry()
+{
+   FairGeoLoader* geoLoad = FairGeoLoader::Instance();
+   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
+   CbmGeoRich* richGeo = new CbmGeoRich();
+   richGeo->setGeomFile(GetGeometryFileName());
+   geoFace->addGeoModule(richGeo);
 
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  CbmGeoRich*      richGeo = new CbmGeoRich();
-  richGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(richGeo);
+   Bool_t rc = geoFace->readSet(richGeo);
+   if (rc) richGeo->create(geoLoad->getGeoBuilder());
+   TList* volList = richGeo->getListOfVolumes();
 
-  Bool_t rc = geoFace->readSet(richGeo);
-  if (rc) richGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = richGeo->getListOfVolumes();
+   // store geo parameter
+   FairRun *fRun = FairRun::Instance();
+   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+   CbmGeoRichPar* par=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
+   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  CbmGeoRichPar* par=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
+   TListIter iter(volList);
+   FairGeoNode* node   = NULL;
+   FairGeoVolume *aVol=NULL;
 
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
+   while( (node = (FairGeoNode*)iter.Next()) ) {
+      aVol = dynamic_cast<FairGeoVolume*> ( node );
+      if ( node->isSensitive()  ) {
+         fSensNodes->AddLast( aVol );
+      }else{
+         fPassNodes->AddLast( aVol );
+      }
+   }
+   par->setChanged();
+   par->setInputVersion(fRun->GetRunId(),1);
 
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-    aVol = dynamic_cast<FairGeoVolume*> ( node );
-    if ( node->isSensitive()  ) {
-      fSensNodes->AddLast( aVol );
-    }else{
-      fPassNodes->AddLast( aVol );
-    }
-  }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-
-  ProcessNodes ( volList );
-  
-
-
-// support structure for mirror
-/*
-  TGeoMaterial * matAl = new TGeoMaterial("Al", 26.98, 13, 2.7);
-  TGeoMedium * Al = new TGeoMedium("Al",1, matAl);
-  TGeoVolume * volume = gGeoManager->MakeTube("grid", Al, 1.3, 1.5, 180);
-
-   
-    
-    gGeoManager->Matrix(123456, 180, 0, 90, 90 , 90 , 0);//z rotation
-    gGeoManager->Matrix(123457, 90, 0, 180, 0, 90, 90);// y rotation
-  
-    Double_t * buf = 0;    
-    for (Int_t i = 0; i< 11; i++) {
-        if (i == 5) continue;
-        gGeoManager->Node("grid", 2*i+1, "rich1gas3", 36*i - 180, 0, 40, 123457, kTRUE, buf, 0);
-        gGeoManager->Node("grid", 2*i+2, "rich1gas3", 0, 36*i - 180, 48, 123456, kTRUE, buf, 0);
-    }
-    */
-
+   ProcessNodes ( volList );
 }
-// ----------------------------------------------------------------------------
 
-
-
-// -----   Private method AddHit   --------------------------------------------
-CbmRichPoint* CbmRichProt::AddHit(Int_t trackID, Int_t detID, TVector3 pos,
-			      TVector3 mom, Double_t time, Double_t length, 
-			      Double_t eLoss) {
+CbmRichPoint* CbmRichProt::AddHit(
+      Int_t trackID,
+      Int_t detID,
+      TVector3 pos,
+		TVector3 mom,
+		Double_t time,
+		Double_t length,
+		Double_t eLoss)
+{
   TClonesArray& clref = *fRichCollection;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) CbmRichPoint(trackID, detID, pos, mom, time,
-				       length, eLoss);
+  return new(clref[size]) CbmRichPoint(trackID, detID, pos, mom, time,length, eLoss);
 }
-// ----------------------------------------------------------------------------
 
-// -----   Private method AddRefPlaneHit   -------------------------------------
-CbmRichPoint* CbmRichProt::AddRefPlaneHit(Int_t trackID, Int_t detID,
-				     TVector3 pos, TVector3 mom,
-				     Double_t time, Double_t length,
-				     Double_t eLoss) {
-  TClonesArray& clref = *fRichRefPlaneCollection;
-  Int_t tsize = clref.GetEntriesFast();
-  return new(clref[tsize]) CbmRichPoint(trackID, detID, pos, mom, time,
-					      length, eLoss);
+CbmRichPoint* CbmRichProt::AddRefPlaneHit(
+      Int_t trackID,
+      Int_t detID,
+		TVector3 pos,
+		TVector3 mom,
+		Double_t time,
+		Double_t length,
+		Double_t eLoss)
+{
+   TClonesArray& clref = *fRichRefPlaneCollection;
+   Int_t tsize = clref.GetEntriesFast();
+   return new(clref[tsize]) CbmRichPoint(trackID, detID, pos, mom, time, length, eLoss);
 }
-// ----------------------------------------------------------------------------
 
-
-// -----   Private method AddMirrorHit   -------------------------------------
-CbmRichPoint* CbmRichProt::AddMirrorHit(Int_t trackID, Int_t detID,
-				     TVector3 pos, TVector3 mom,
-				     Double_t time, Double_t length,
-				     Double_t eLoss) {
-  TClonesArray& clref = *fRichMirrorCollection;
-  Int_t tsize = clref.GetEntriesFast();
-  return new(clref[tsize]) CbmRichPoint(trackID, detID, pos, mom, time,
-					      length, eLoss);
+CbmRichPoint* CbmRichProt::AddMirrorHit(
+      Int_t trackID,
+      Int_t detID,
+		TVector3 pos,
+		TVector3 mom,
+		Double_t time,
+		Double_t length,
+		Double_t eLoss)
+{
+   TClonesArray& clref = *fRichMirrorCollection;
+   Int_t tsize = clref.GetEntriesFast();
+   return new(clref[tsize]) CbmRichPoint(trackID, detID, pos, mom, time,length, eLoss);
 }
-// ----------------------------------------------------------------------------
-
 
 ClassImp(CbmRichProt)

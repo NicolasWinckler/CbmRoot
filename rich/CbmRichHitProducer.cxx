@@ -228,25 +228,8 @@ InitStatus CbmRichHitProducer::Init()
 
    fRichHits = new TClonesArray("CbmRichHit");
    fManager->Register("RichHit","RICH", fRichHits, kTRUE);
-   //fPar->print();
-   // setting the parameter class on static mode.
-   //fPar->setStatic();
 
-   return kSUCCESS;
-}
-
-void CbmRichHitProducer::Exec(
-      Option_t* option)
-{
-   Int_t RichDetID = 0;
-
-   fNEvents++;
-   cout << "-I- CbmRichHitProducer, event no " << fNEvents << endl;
-
-   Double_t lambda_min,lambda_max,lambda_step;
-   Double_t efficiency[40];
-   SetPhotoDetPar(fDetType,lambda_min,lambda_max,lambda_step,efficiency);
-
+   // Set photodetector parameters according to its type
    if (fDetType == 0){
       fPhotomulRadius = 0.;
       fPhotomulDist = 0.;
@@ -261,38 +244,21 @@ void CbmRichHitProducer::Exec(
       fPhotomulDist = 0.5;
    }
 
-   if (fVerbose > 0){
-      cout << " --------------------- RICH Hit Producer ---------------------------------------" << endl;
-      cout << "   Settings chosen for PMT plane (fDetType = " << fDetType << ")" << endl;
-      cout << " -------------------------------------------------------------------------------" << endl;
-      if (fDetType == 0) {
-         cout << "   ideal detector " << endl;
-      }
-      if (fDetType == 1) {
-         cout << "   single PMTs (Protvino q.e.) chosen with: " << endl;
-         cout << "   PMT radius and distance between tubes (cm)" << fPhotomulRadius << " " << fPhotomulDist << endl;
-      }
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5) {
-         cout << "   Hamamatsu MAPMT H8500 (8x8 pixel): " << endl;
-         cout << "   pixel length and height " << fPhotomulRadius << " cm" << endl;
-         cout << "   effective distance between units " << 2*fPhotomulDist << " cm" << endl;
-      }
-      if (fDetType == 3) {
-         cout << "   Gasdetector with CsI photocathode: " << endl;
-         cout << "   pixel length and height " << fPhotomulRadius << " cm" << endl;
-         cout << "   effective distance between units " << 2*fPhotomulDist << " cm" << endl;
-      }
-      cout << "   maximum wavelength  " << lambda_max << endl;
-      cout << "   minimum wavelength  " << lambda_min << endl;
-      cout << "   stepsize            " << lambda_step << endl;
-   }
+   return kSUCCESS;
+}
 
-   if (fVerbose > 2) {
-      Int_t Neff=(Int_t)((lambda_max-lambda_min)/lambda_step);
-      for (Int_t ii=0; ii < Neff ; ii++){
-         cout << efficiency[ii] << endl;
-      }
-   }
+void CbmRichHitProducer::Exec(
+      Option_t* option)
+{
+   Int_t RichDetID = 0;
+
+   fNEvents++;
+   cout << "-I- CbmRichHitProducer, event no " << fNEvents << endl;
+
+   // Set photodetector quantum efficiency
+   Double_t lambda_min,lambda_max,lambda_step;
+   Double_t efficiency[40];
+   SetPhotoDetPar(fDetType,lambda_min,lambda_max,lambda_step,efficiency);
 
    fRichHits->Clear();
    fNHits = 0;

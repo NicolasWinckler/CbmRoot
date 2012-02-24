@@ -699,8 +699,8 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
 	{
 	  PadMax[0] += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector]));
 	  clusterPosInPadLL[0] = tempPosX - Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector])) * fModuleClusterMap[fModuleID]->PadSizeX[ixSector];
-	  printf("x ready\n")
-	    break;
+	  printf("x ready\n");
+	  break;
 	}
     }  
   for (iySector = 0; iySector < fModuleClusterMap[fModuleID]->NoSectors; iySector++)
@@ -714,8 +714,8 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
 	{
 	  PadMax[1] += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector]));
 	  clusterPosInPadLL[1] = tempPosY - Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector])) * fModuleClusterMap[fModuleID]->PadSizeY[iySector];
-	  printf("y ready\n")
-	    break;
+	  printf("y ready\n");
+	  break;
 	}
     }
   if ( PadMax[0] == 0 || PadMax[1] == 0 )

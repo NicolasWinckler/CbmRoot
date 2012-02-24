@@ -25,7 +25,8 @@ typedef struct ClusterPad
   Double_t SizeX;
   Double_t SizeY;
   Double_t Charge;
-ClusterPad() : SizeX(0), SizeY(0), Charge(0) {}
+  std::vector<Int_t> MCIndex;
+ClusterPad() : SizeX(0), SizeY(0), Charge(0), MCIndex() {}
 } ClusterPad;
 
 
@@ -52,7 +53,7 @@ typedef struct ClusterModule
   Float_t ModulePositionY;
   Float_t ModulePositionZ;
 
-ModulePara() : Station(-1), Layer(-1), moduleId(-1), PadPlane(),
+  ClusterModule () : Station(-1), Layer(-1), moduleId(-1), PadPlane(),
     nCol(0), nRow(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
     PadSizeY(), SecCol(), SecRow(), ModuleSizeX(0.), ModuleSizeY(0.), 
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
@@ -67,7 +68,7 @@ class CbmTrdClusterizerFast : public FairTask {
 
   /** Standard constructor **/
   CbmTrdClusterizerFast(const char *name, const char *title="CBM Task",
-		    CbmTrdRadiator *radiator=NULL);
+			CbmTrdRadiator *radiator=NULL);
 
   /** Destructor **/
   virtual ~CbmTrdClusterizerFast();
@@ -100,9 +101,12 @@ class CbmTrdClusterizerFast : public FairTask {
   CbmTrdClusterizerFast(const CbmTrdClusterizerFast&);
 
   void GetModuleInformationFromDigiPar(Int_t VolumeID);
+  void InitPadPlane(ClusterModule* mCluster);
   void GetModuleInformation();
 
   void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge); 
+
+  void CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss);
 
   void SplitPathSlices();
 
@@ -112,9 +116,17 @@ class CbmTrdClusterizerFast : public FairTask {
 
   Double_t CalcMathieson(Double_t x, Double_t W);
 
-  void TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate, Double_t* StrucDim);
+  void TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate);
  
-  void TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate, Double_t* StrucDim);
+  void TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate);
+
+  void GetClusterDisplacement(Double_t* clusterPosInModuleLL, Double_t* clusterPosInPadLL, Int_t* PadMax);
+
+  Int_t GetRow(Double_t tempPosY);
+
+  Int_t GetCol(Double_t tempPosX);
+
+  Bool_t fDebug;
 
   Int_t Digicounter;
   Double_t fLayerZ[12];
@@ -130,8 +142,6 @@ class CbmTrdClusterizerFast : public FairTask {
   //static const Int_t fNoSectors = 3;
   static const Int_t endOfMathiesonArray = 35; //+- mm
 
- 
- 
   Float_t fEfficiency; // Digi production efficiency (0-100%)
 
   TClonesArray *fTrdPoints; //! Trd MC points

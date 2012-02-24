@@ -694,13 +694,13 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
 	{
 	  tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[ixSector];
 	  PadMax[0] += fModuleClusterMap[fModuleID]->SecxPad[ixSector];
-	  printf(" %.2f i% |",tempPosX,PadMax[0]);
+	  printf(" %.2f %i |",tempPosX,PadMax[0]);
 	}
       else
 	{
 	  PadMax[0] += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector]));
 	  clusterPosInPadLL[0] = tempPosX - Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector])) * fModuleClusterMap[fModuleID]->PadSizeX[ixSector];
-	  printf(" %.2f i% ||\n",tempPosX,PadMax[0]);
+	  printf(" %.2f %i || X\n",tempPosX,PadMax[0]);
 	  //printf("x ready\n");
 	  break;
 	}
@@ -711,13 +711,13 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
 	{
 	  tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iySector];
 	  PadMax[1] += fModuleClusterMap[fModuleID]->SecyPad[iySector];
-	  printf(" %.2f i% |",tempPosY,PadMax[1]);
+	  printf(" %.2f %i |",tempPosY,PadMax[1]);
 	}
       else
 	{
 	  PadMax[1] += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector]));
 	  clusterPosInPadLL[1] = tempPosY - Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector])) * fModuleClusterMap[fModuleID]->PadSizeY[iySector];
-	  printf(" %.2f i% ||\n",tempPosY,PadMax[1]);
+	  printf(" %.2f %i || Y\n",tempPosY,PadMax[1]);
 	  //printf("y ready\n");
 	  break;
 	}

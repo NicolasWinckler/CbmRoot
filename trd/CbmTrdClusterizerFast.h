@@ -36,8 +36,8 @@ typedef struct ClusterModule
   Int_t Station;
   Int_t Layer;
   Int_t moduleId;
-  Int_t nCol;
-  Int_t nRow;
+  Int_t nxPad;
+  Int_t nyPad;
   Int_t NoSectors;
   std::vector<std::vector<ClusterPad*> > PadPlane;
   
@@ -45,8 +45,8 @@ typedef struct ClusterModule
   std::vector<Float_t> SectorSizeY;
   std::vector<Float_t> PadSizeX;
   std::vector<Float_t> PadSizeY;
-  std::vector<Int_t> SecCol;
-  std::vector<Int_t> SecRow;
+  std::vector<Int_t> SecxPad;
+  std::vector<Int_t> SecyPad;
  
   Float_t ModuleSizeX;
   Float_t ModuleSizeY;
@@ -55,8 +55,8 @@ typedef struct ClusterModule
   Float_t ModulePositionZ;
 
   ClusterModule () : Station(-1), Layer(-1), moduleId(-1), PadPlane(),
-    nCol(0), nRow(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
-    PadSizeY(), SecCol(), SecRow(), ModuleSizeX(0.), ModuleSizeY(0.), 
+    nxPad(0), nyPad(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
+    PadSizeY(), SecxPad(), SecyPad(), ModuleSizeX(0.), ModuleSizeY(0.), 
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
 } ClusterModule;
 
@@ -105,7 +105,7 @@ class CbmTrdClusterizerFast : public FairTask {
   void InitPadPlane(ClusterModule* mCluster);
   void GetModuleInformation();
 
-  void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge); 
+  void AddDigi(const Int_t pointID, Int_t ixPad, Int_t iyPad, Int_t nxPad, Int_t nyPad, Double_t iCharge); 
 
   void CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss, Int_t pointId);
 
@@ -123,9 +123,9 @@ class CbmTrdClusterizerFast : public FairTask {
 
   void GetClusterDisplacement(Double_t* clusterPosInModuleLL, Double_t* clusterPosInPadLL, Int_t* PadMax);
 
-  Int_t GetRow(Double_t tempPosY);
+  Int_t GetyPad(Double_t tempPosY);
 
-  Int_t GetCol(Double_t tempPosX);
+  Int_t GetxPad(Double_t tempPosX);
 
   Bool_t fDebug;
 

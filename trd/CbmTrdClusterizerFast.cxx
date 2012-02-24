@@ -401,20 +401,20 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 	printf ("x(%3i,%3i) y(%3i,%3i)      ",xStart,xStop,yStart,yStop);
       if (xStart < 0)
 	xStart = 0;
-      if (xStart > fModuleClusterMap[fModuleID]->nCol)
-	xStart = fModuleClusterMap[fModuleID]->nCol;
+      if (xStart > fModuleClusterMap[fModuleID]->nxPad)
+	xStart = fModuleClusterMap[fModuleID]->nxPad;
       if (xStop < 0)
 	xStop = 0;
-      if (xStop > fModuleClusterMap[fModuleID]->nCol)
-	xStop = fModuleClusterMap[fModuleID]->nCol;
+      if (xStop > fModuleClusterMap[fModuleID]->nxPad)
+	xStop = fModuleClusterMap[fModuleID]->nxPad;
       if (yStart < 0)
 	yStart = 0;
-      if (yStart > fModuleClusterMap[fModuleID]->nRow)
-	yStart = fModuleClusterMap[fModuleID]->nRow;
+      if (yStart > fModuleClusterMap[fModuleID]->nyPad)
+	yStart = fModuleClusterMap[fModuleID]->nyPad;
       if (yStop < 0)
 	yStop = 0;
-      if (yStop > fModuleClusterMap[fModuleID]->nRow)
-	yStop = fModuleClusterMap[fModuleID]->nRow;
+      if (yStop > fModuleClusterMap[fModuleID]->nyPad)
+	yStop = fModuleClusterMap[fModuleID]->nyPad;
       if(fDebug)
 	printf ("x(%3i,%3i) y(%3i,%3i)\n",xStart,xStop,yStart,yStop);
  
@@ -453,19 +453,19 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
     Int_t secXPad = 0;
     Int_t secYPad = 0;
 
-    //printf("    (%3i,%3i) %3i\n",mCluster->nCol,mCluster->nRow,(Int_t)mCluster->PadPlane.size());
-    mCluster->PadPlane.resize(mCluster->nCol);
-    for (Int_t xPads = 0; xPads < mCluster->nCol; xPads++){
-      mCluster->PadPlane[xPads].resize(mCluster->nRow);
+    //printf("    (%3i,%3i) %3i\n",mCluster->nxPad,mCluster->nyPad,(Int_t)mCluster->PadPlane.size());
+    mCluster->PadPlane.resize(mCluster->nxPad);
+    for (Int_t xPads = 0; xPads < mCluster->nxPad; xPads++){
+      mCluster->PadPlane[xPads].resize(mCluster->nyPad);
     
-      if (xPads == mCluster->SecCol[iXSector]){
+      if (xPads == mCluster->SecxPad[iXSector]){
 	iXSector++;
 	secXPad = 0;
       }
     
-      for (Int_t yPads = 0; yPads < mCluster->nRow; yPads++){
+      for (Int_t yPads = 0; yPads < mCluster->nyPad; yPads++){
       
-	if (yPads == mCluster->SecRow[iYSector]){
+	if (yPads == mCluster->SecyPad[iYSector]){
 	  iYSector++;
 	  secYPad = 0;
 	}
@@ -482,7 +482,7 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 
       secXPad++;
     }
-    //printf("    (%3i,%3i) (%3i,%3i)\n",mCluster->nCol,mCluster->nRow,(Int_t)mCluster->PadPlane.size(),(Int_t)mCluster->PadPlane[0].size());
+    //printf("    (%3i,%3i) (%3i,%3i)\n",mCluster->nxPad,mCluster->nyPad,(Int_t)mCluster->PadPlane.size(),(Int_t)mCluster->PadPlane[0].size());
   }
   // --------------------------------------------------------------------
 
@@ -528,8 +528,8 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 	  mCluster -> ModulePositionZ = (Int_t)(10 * fModuleInfo->GetZ());
 	  mCluster -> ModuleSizeX = (fModuleInfo->GetSizex()) * 10. * 2;
 	  mCluster -> ModuleSizeY = (fModuleInfo->GetSizey()) * 10. * 2;
-	  mCluster -> nCol = fModuleInfo->GetnCol();
-	  mCluster -> nRow = fModuleInfo->GetnRow();
+	  mCluster -> nxPad = fModuleInfo->GetnxPad();
+	  mCluster -> nyPad = fModuleInfo->GetnyPad();
 	  mCluster -> NoSectors = fModuleInfo->GetNoSectors();
 
 	  const Int_t NoSectors = fModuleInfo->GetNoSectors();
@@ -537,8 +537,8 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 	  mCluster -> SectorSizeY.resize(NoSectors);
 	  mCluster -> PadSizeX.resize(NoSectors);
 	  mCluster -> PadSizeY.resize(NoSectors);
-	  mCluster -> SecRow.resize(NoSectors);
-	  mCluster -> SecCol.resize(NoSectors);      
+	  mCluster -> SecyPad.resize(NoSectors);
+	  mCluster -> SecxPad.resize(NoSectors);      
 
 	  for (Int_t i = 0; i < NoSectors; i++) {
 	    mCluster -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
@@ -548,8 +548,8 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 	  }
 
 	  for (Int_t i = 0; i < NoSectors; i++) {
-	    mCluster -> SecRow[i]      = Int_t(mCluster->SectorSizeY[i] / mCluster->PadSizeY[i]);
-	    mCluster -> SecCol[i]      = Int_t(mCluster->SectorSizeX[i] / mCluster->PadSizeX[i]);
+	    mCluster -> SecyPad[i]      = Int_t(mCluster->SectorSizeY[i] / mCluster->PadSizeY[i]);
+	    mCluster -> SecxPad[i]      = Int_t(mCluster->SectorSizeX[i] / mCluster->PadSizeX[i]);
 	  }
 	  averagePadSizeX /= NoSectors;
 	  averagePadSizeY /= NoSectors;
@@ -608,7 +608,7 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
     }
   }
   // --------------------------------------------------------------------
-  void CbmTrdClusterizerFast::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge)
+  void CbmTrdClusterizerFast::AddDigi(const Int_t pointID, Int_t ixPad, Int_t iyPad, Int_t nxPad, Int_t nyPad, Double_t iCharge)
   {
 
   }
@@ -686,75 +686,78 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
     PadMax[1] = 0; // "      "   " y-direction
     Double_t tempPosX = clusterPosInModuleLL[0];
     Double_t tempPosY = clusterPosInModuleLL[1];
-   
-    for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
+    Int_t ixSector;
+    Int_t iySector;
+    for (ixSector = 0; ixSector < fModuleClusterMap[fModuleID]->NoSectors; ixSector++)
       {
-	if (tempPosX > fModuleClusterMap[fModuleID]->SectorSizeX[iSector])
+	if (tempPosX > fModuleClusterMap[fModuleID]->SectorSizeX[ixSector])
 	  {
-	    tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[iSector];
-	    PadMax[0] += fModuleClusterMap[fModuleID]->SecCol[iSector];
+	    tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[ixSector];
+	    PadMax[0] += fModuleClusterMap[fModuleID]->SecxPad[ixSector];
 	  }
 	else
 	  {
-	    PadMax[0] += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[iSector]));
-	    clusterPosInPadLL[0] = tempPosX - Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[iSector])) * fModuleClusterMap[fModuleID]->PadSizeX[iSector];
+	    PadMax[0] += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector]));
+	    clusterPosInPadLL[0] = tempPosX - Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector])) * fModuleClusterMap[fModuleID]->PadSizeX[ixSector];
 	    break;
 	  }
       }  
-    for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
+    for (iySector = 0; iySector < fModuleClusterMap[fModuleID]->NoSectors; iySector++)
       {
-	if (tempPosY > fModuleClusterMap[fModuleID]->SectorSizeY[iSector])
+	if (tempPosY > fModuleClusterMap[fModuleID]->SectorSizeY[iySector])
 	  {
-	    tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iSector];
-	    PadMax[1] += fModuleClusterMap[fModuleID]->SecRow[iSector];
+	    tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iySector];
+	    PadMax[1] += fModuleClusterMap[fModuleID]->SecyPad[iySector];
 	  }
 	else
 	  {
-	    PadMax[1] += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iSector]));
-	    clusterPosInPadLL[1] = tempPosY - Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iSector])) * fModuleClusterMap[fModuleID]->PadSizeY[iSector];
+	    PadMax[1] += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector]));
+	    clusterPosInPadLL[1] = tempPosY - Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector])) * fModuleClusterMap[fModuleID]->PadSizeY[iySector];
 	    break;
 	  }
       }
+    if ( PadMax[0] == 0 || PadMax[1] == 0 )
+      printf("(%.2f,%.2f) (%i,%i)\n",clusterPosInModuleLL[0],clusterPosInModuleLL[1],ixSector,iySector);
   }
   // --------------------------------------------------------------------
-  Int_t CbmTrdClusterizerFast::GetCol(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
+  Int_t CbmTrdClusterizerFast::GetxPad(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
   {
-    Int_t iCol = 0;
+    Int_t ixPad = 0;
     for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
       {
 	if (tempPosX > fModuleClusterMap[fModuleID]->SectorSizeX[iSector])
 	  {
 	    tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[iSector];
-	    iCol += fModuleClusterMap[fModuleID]->SecCol[iSector];
+	    ixPad += fModuleClusterMap[fModuleID]->SecxPad[iSector];
 	  }
 	else
 	  {
-	    iCol += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[iSector]));
+	    ixPad += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[iSector]));
 	    break;
 	  }
       }
-    return iCol;
+    return ixPad;
   }
 
   // --------------------------------------------------------------------
-  Int_t CbmTrdClusterizerFast::GetRow(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
+  Int_t CbmTrdClusterizerFast::GetyPad(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
   {
-    //cout << "GetRow" << endl;
-    Int_t iRow = 0;
+    //cout << "GetyPad" << endl;
+    Int_t iyPad = 0;
     for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
       {
 	if (tempPosY > fModuleClusterMap[fModuleID]->SectorSizeY[iSector])
 	  {
 	    tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iSector];
-	    iRow += fModuleClusterMap[fModuleID]->SecRow[iSector];
+	    iyPad += fModuleClusterMap[fModuleID]->SecyPad[iSector];
 	  }
 	else
 	  {
-	    iRow += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iSector]));
+	    iyPad += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iSector]));
 	    break;
 	  }
       }
-    return iRow;
+    return iyPad;
   }
 
   // ---- FinishTask-----------------------------------------------------
@@ -767,8 +770,8 @@ void CbmTrdClusterizerFast::FinishEvent()
     fModuleClusterMapIt->second->SectorSizeY.clear();
     fModuleClusterMapIt->second->PadSizeX.clear();
     fModuleClusterMapIt->second->PadSizeY.clear();
-    fModuleClusterMapIt->second->SecCol.clear();
-    fModuleClusterMapIt->second->SecRow.clear();
+    fModuleClusterMapIt->second->SecxPad.clear();
+    fModuleClusterMapIt->second->SecyPad.clear();
     for (Int_t x = 0; x < fModuleClusterMapIt->second->PadPlane.size(); x++) {
       for(Int_t y = 0; y < fModuleClusterMapIt->second->PadPlane[x].size(); y++) {
 	fModuleClusterMapIt->second->PadPlane[x][y]->MCIndex.clear();

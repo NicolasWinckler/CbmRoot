@@ -528,8 +528,8 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 	  mCluster -> ModulePositionZ = (Int_t)(10 * fModuleInfo->GetZ());
 	  mCluster -> ModuleSizeX = (fModuleInfo->GetSizex()) * 10. * 2;
 	  mCluster -> ModuleSizeY = (fModuleInfo->GetSizey()) * 10. * 2;
-	  mCluster -> nxPad = fModuleInfo->GetnxPad();
-	  mCluster -> nyPad = fModuleInfo->GetnyPad();
+	  mCluster -> nxPad = fModuleInfo->GetnCol();
+	  mCluster -> nyPad = fModuleInfo->GetnRow();
 	  mCluster -> NoSectors = fModuleInfo->GetNoSectors();
 
 	  const Int_t NoSectors = fModuleInfo->GetNoSectors();

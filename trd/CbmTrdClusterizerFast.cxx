@@ -724,7 +724,7 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
     }
   if ( PadMax[0] == 0 || PadMax[1] == 0 )
     printf("-------------------> ");
-    printf("(%.2f,%.2f) (%.2f,%.2f) (%i,%i)\n",clusterPosInModuleLL[0],clusterPosInModuleLL[1],clusterPosInPadLL[0],clusterPosInPadLL[1],ixSector,iySector);
+    printf("(%.2f,%.2f) (%.2f,%.2f) (%i,%i) (%i,%i)\n",clusterPosInModuleLL[0],clusterPosInModuleLL[1],clusterPosInPadLL[0],clusterPosInPadLL[1],PadMax[0],PadMax[1],ixSector,iySector);
 }
   // --------------------------------------------------------------------
   Int_t CbmTrdClusterizerFast::GetxPad(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/

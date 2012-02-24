@@ -145,8 +145,7 @@ class CbmTrdClusterizerFast : public FairTask {
 
   Float_t fEfficiency; // Digi production efficiency (0-100%)
 
-  CbmTrdDigi* fdigi;
-  CbmTrdDigiMatch *fdigiMatch;
+  
 
 
   TClonesArray *fTrdPoints; //! Trd MC points

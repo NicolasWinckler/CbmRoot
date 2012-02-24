@@ -63,8 +63,8 @@ CbmTrdClusterizerFast::CbmTrdClusterizerFast()
     //fDigiMapIt(),
     fModuleClusterMap(),
     fModuleClusterMapIt(),
-    fdigi(NULL),
-    fdigiMatch(NULL),
+    //fdigi(NULL),
+    //fdigiMatch(NULL),
     fDebug(false)
 {
 }
@@ -94,8 +94,8 @@ CbmTrdClusterizerFast::CbmTrdClusterizerFast(const char *name, const char *title
    //fDigiMapIt(),
    fModuleClusterMap(),
    fModuleClusterMapIt(),
-   fdigi(NULL),
-   fdigiMatch(NULL),
+   //fdigi(NULL),
+   //fdigiMatch(NULL),
    fDebug(false)
 {
 }
@@ -106,6 +106,9 @@ CbmTrdClusterizerFast::~CbmTrdClusterizerFast()
 {
   FairRootManager *ioman =FairRootManager::Instance();
   ioman->Write();
+
+ 
+
   fDigiCollection->Clear("C");
   fDigiCollection->Delete();
   delete fDigiCollection;
@@ -122,8 +125,8 @@ CbmTrdClusterizerFast::~CbmTrdClusterizerFast()
     delete fDigiPar;
   if(fModuleInfo)
     delete fModuleInfo;
-  delete fdigi;
-  delete fdigiMatch;
+  //delete fdigi;
+  //delete fdigiMatch;
 }
 // --------------------------------------------------------------------
 
@@ -330,11 +333,15 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
   }
   
   Int_t iDigi = 0;
+  //CbmTrdDigi* fdigi;
+  //CbmTrdDigiMatch *fdigiMatch;
   for (fModuleClusterMapIt = fModuleClusterMap.begin(); fModuleClusterMapIt != fModuleClusterMap.end(); fModuleClusterMapIt++) {
     for (Int_t xPad = 0; xPad < (*fModuleClusterMapIt).second->PadPlane.size(); xPad++) {
+      //printf("\n");
       for (Int_t yPad = 0; yPad < (*fModuleClusterMapIt).second->PadPlane[xPad].size(); yPad++) {
+	//printf("%.1e ",(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge);
 	if ((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge > 0.0) {
-	  fdigi = new CbmTrdDigi(
+	  CbmTrdDigi* fdigi = new CbmTrdDigi(
 				(*fModuleClusterMapIt).first, 
 				xPad, 
 				yPad, 
@@ -347,19 +354,21 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
 
 	  new ((*fDigiCollection)[iDigi]) CbmTrdDigi();
 	  (*fDigiCollection)[iDigi] = fdigi;
-
-	  fdigiMatch = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
+	  
+	  CbmTrdDigiMatch *fdigiMatch = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
 
 	  for (Int_t i = 0; i < (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex.size(); i++)
 	    Int_t bla = fdigiMatch->AddPoint((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[i]);
+	  
 	  iDigi++;
-
+	  //delete fdigi;
+	  //delete fdigiMatch;
 	}
       }
     }
   }
-  //delete digi;
-  //delete p;
+  //delete fdigi;
+  //delete fdigiMatch;
   printf(" Added %d Digis to Collection of TRD\n\n",iDigi);
   timer.Stop();
   Double_t rtime = timer.RealTime();
@@ -379,7 +388,7 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
   }
   else
     {
-      const Int_t nPadCluster = 3; // has to be odd
+      const Int_t nPadCluster = 11; // has to be odd
       Int_t xStart = PadMax[0] - nPadCluster / 2;
       Int_t xStop  = PadMax[0] + nPadCluster / 2 + 1;
       Int_t yStart = PadMax[1] - nPadCluster / 2;
@@ -749,32 +758,41 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
   }
 
   // ---- FinishTask-----------------------------------------------------
-  void CbmTrdClusterizerFast::FinishEvent()
-  {
- 
-    for (fModuleClusterMapIt = fModuleClusterMap.begin();
-	 fModuleClusterMapIt != fModuleClusterMap.end(); ++fModuleClusterMapIt) {
-      fModuleClusterMapIt->second->SectorSizeX.clear();
-      fModuleClusterMapIt->second->SectorSizeX.clear();
-      fModuleClusterMapIt->second->SectorSizeY.clear();
-      fModuleClusterMapIt->second->PadSizeX.clear();
-      fModuleClusterMapIt->second->PadSizeY.clear();
-      fModuleClusterMapIt->second->SecCol.clear();
-      fModuleClusterMapIt->second->SecRow.clear();
-      for (Int_t x = 0; x < fModuleClusterMapIt->second->PadPlane.size(); x++) {
-	for(Int_t y = 0; y < fModuleClusterMapIt->second->PadPlane[x].size(); y++) {
-	  delete fModuleClusterMapIt->second->PadPlane[x][y];
-	}
-	fModuleClusterMapIt->second->PadPlane[x].clear();
-      }
-      fModuleClusterMapIt->second->PadPlane.clear();
-      delete fModuleClusterMapIt->second;
-    }
-    fModuleClusterMap.clear();
+void CbmTrdClusterizerFast::FinishEvent()
+{
 
-    if ( fDigiCollection ) fDigiCollection->Clear();
-    if ( fDigiMatchCollection ) fDigiMatchCollection->Clear();
+  for (fModuleClusterMapIt = fModuleClusterMap.begin();
+       fModuleClusterMapIt != fModuleClusterMap.end(); ++fModuleClusterMapIt) {
+    fModuleClusterMapIt->second->SectorSizeX.clear();
+    fModuleClusterMapIt->second->SectorSizeY.clear();
+    fModuleClusterMapIt->second->PadSizeX.clear();
+    fModuleClusterMapIt->second->PadSizeY.clear();
+    fModuleClusterMapIt->second->SecCol.clear();
+    fModuleClusterMapIt->second->SecRow.clear();
+    for (Int_t x = 0; x < fModuleClusterMapIt->second->PadPlane.size(); x++) {
+      for(Int_t y = 0; y < fModuleClusterMapIt->second->PadPlane[x].size(); y++) {
+	fModuleClusterMapIt->second->PadPlane[x][y]->MCIndex.clear();
+	delete fModuleClusterMapIt->second->PadPlane[x][y];
+      }
+      fModuleClusterMapIt->second->PadPlane[x].clear();
+    }
+    fModuleClusterMapIt->second->PadPlane.clear();
+
+    delete fModuleClusterMapIt->second;
   }
+  fModuleClusterMap.clear();
+
+  if ( fDigiCollection ) fDigiCollection->Clear();
+  if ( fDigiMatchCollection ) fDigiMatchCollection->Clear();
+  fTrdPoints->Clear();
+  fMCStacks->Clear();
+  /*
+    fDigiCollection->Delete();
+    fDigiMatchCollection->Delete();
+    fTrdPoints->Delete();
+    fMCStacks->Delete();
+  */
+}
 
   // ---- Register ------------------------------------------------------
   void CbmTrdClusterizerFast::Register()

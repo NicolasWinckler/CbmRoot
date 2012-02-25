@@ -418,8 +418,8 @@ void CbmTrd::ConstructGeometry() {
 //  Double_t * buf = 0;
 //  for (Int_t i = 0; i< 11; i++) {
 //    if (i == 5) continue;
-//    gGeoManager->Node("grid", 2*i+1, "trd3", 36*i - 180, 0, 40, 123457, kTRUE, buf, 0);
-//    gGeoManager->Node("grid", 2*i+2, "trd3", 0, 36*i - 180, 48, 123456, kTRUE, buf, 0);
+//    gGeoManager->Node("grid", 2*i+1, "trd1", 36*i - 180,              350, 40, 123457, kTRUE, buf, 0);
+//    gGeoManager->Node("grid", 2*i+2, "trd1", 0         , 36*i - 180 + 350, 48, 123456, kTRUE, buf, 0);
 //  }
 
 }

@@ -56,6 +56,8 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/boost/smart_ptr/shared_ptr.hpp:"  
         "/include/boost"
 
+        # -- Root warnings when installed in installation dir
+        "/include/root/"
         # -- Root warnings which should not show up in the test setup
         "/include/G__ci.h:"
         "/include/TAttImage.h:"

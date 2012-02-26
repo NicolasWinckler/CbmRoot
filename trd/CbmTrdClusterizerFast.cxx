@@ -72,7 +72,7 @@ CbmTrdClusterizerFast::CbmTrdClusterizerFast()
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdClusterizerFast::CbmTrdClusterizerFast(const char *name, const char *title,
-					     CbmTrdRadiator *radiator)
+					     CbmTrdRadiator *radiator/*, Bool_t oneClusterPerPoint, Bool_t wireQuantisation*/)
   :FairTask(name),
    Digicounter(-1),
    fLayerZ(),
@@ -336,19 +336,23 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
   //CbmTrdDigi* fdigi;
   //CbmTrdDigiMatch *fdigiMatch;
   for (fModuleClusterMapIt = fModuleClusterMap.begin(); fModuleClusterMapIt != fModuleClusterMap.end(); fModuleClusterMapIt++) {
+    if (fDebug)
+      printf("L%i M%i\n    (%3i,%3i) ",(*fModuleClusterMapIt).second->Layer,(*fModuleClusterMapIt).first,(Int_t)(*fModuleClusterMapIt).second->PadPlane.size(),(Int_t)(*fModuleClusterMapIt).second->PadPlane[Int_t((*fModuleClusterMapIt).second->PadPlane.size()) -1].size());
     for (Int_t xPad = 0; xPad < (*fModuleClusterMapIt).second->PadPlane.size(); xPad++) {
       //printf("\n");
       for (Int_t yPad = 0; yPad < (*fModuleClusterMapIt).second->PadPlane[xPad].size(); yPad++) {
 	//printf("%.1e ",(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge);
 	if ((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge > 0.0) {
+	  if (fDebug)
+	    printf("xPad%i yPad%i  ",xPad,yPad);
 	  CbmTrdDigi* fdigi = new CbmTrdDigi(
-				(*fModuleClusterMapIt).first, 
-				xPad, 
-				yPad, 
-				(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge, 
-				fTime, 
-				(*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[0]//iDigi // ?????????????????
-				);
+					     (*fModuleClusterMapIt).first, 
+					     xPad, 
+					     yPad, 
+					     (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->Charge, 
+					     fTime, 
+					     (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[0]//iDigi // ?????????????????
+					     );
 	  for (Int_t i = 1; i < (*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex.size(); i++)
 	    fdigi->AddMCIndex((*fModuleClusterMapIt).second->PadPlane[xPad][yPad]->MCIndex[i]);
 
@@ -366,6 +370,8 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
 	}
       }
     }
+    if (fDebug)
+      printf("\n");
   }
   //delete fdigi;
   //delete fdigiMatch;
@@ -384,7 +390,7 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
 void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss, Int_t pointId)
 {
   if (PadMax[0] >= (Int_t)fModuleClusterMap[fModuleID]->PadPlane.size() || PadMax[1] >= (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size()) {
-    printf("\n\n ERROR: CalcDigisOnPadPlane: PadMax out of module.\n Module size: (%3i,%3i)  PadMax(%3i,%3i)\n\n",(Int_t)fModuleClusterMap[fModuleID]->PadPlane.size(), (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size(),PadMax[0],PadMax[1]);
+    printf("\n\n ------  ERROR: CalcDigisOnPadPlane: PadMax out of module.\n Module size: (%3i,%3i)  PadMax(%3i,%3i)   ------\n\n",(Int_t)fModuleClusterMap[fModuleID]->PadPlane.size(), (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size(),PadMax[0],PadMax[1]);
   }
   else
     {
@@ -393,12 +399,15 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
       Int_t xStop  = PadMax[0] + nPadCluster / 2 + 1;
       Int_t yStart = PadMax[1] - nPadCluster / 2;
       Int_t yStop  = PadMax[1] + nPadCluster / 2 + 1;
-      if(fDebug)
-	printf("PadPlane(%3i,%3i)  PadMax(%3i,%3i)     ",(Int_t)fModuleClusterMap[fModuleID]->PadPlane.size(), (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size(),PadMax[0],PadMax[1]);
+      if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	printf("L%i M%i\n   ",fModuleClusterMap[fModuleID]->Layer,fModuleID);
+
+      if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	printf("PadPlane(%3i,%3i)(%3i,%3i)  PadMax(%3i,%3i)     ",(Int_t)fModuleClusterMap[fModuleID]->PadPlane.size(), (Int_t)fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]].size(),fModuleClusterMap[fModuleID]->nxPad,fModuleClusterMap[fModuleID]->nyPad,PadMax[0],PadMax[1]);
       Double_t xPosC = -clusterPosInPadLL[0] + 0.5 * fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][PadMax[1]]->SizeX;
       Double_t yPosC = -clusterPosInPadLL[1] + 0.5 * fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][PadMax[1]]->SizeY;
-      if(fDebug)
-	printf ("x(%3i,%3i) y(%3i,%3i)      ",xStart,xStop,yStart,yStop);
+      //if(fDebug || fModuleClusterMap[fModuleID]->Layer%2 > 0)
+      //printf ("x(%3i,%3i) y(%3i,%3i)      ",xStart,xStop,yStart,yStop);
       if (xStart < 0)
 	xStart = 0;
       if (xStart > fModuleClusterMap[fModuleID]->nxPad)
@@ -415,30 +424,42 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 	yStop = 0;
       if (yStop > fModuleClusterMap[fModuleID]->nyPad)
 	yStop = fModuleClusterMap[fModuleID]->nyPad;
-      if(fDebug)
+      if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
 	printf ("x(%3i,%3i) y(%3i,%3i)\n",xStart,xStop,yStart,yStop);
- 
+
+      if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	printf("LL%.2f,%.2f C:%.2f,%.2f ",clusterPosInPadLL[0],clusterPosInPadLL[1],xPosC,yPosC);
 
       for (Int_t ix = xStart; ix < PadMax[0]; ix++)
 	xPosC -= fModuleClusterMap[fModuleID]->PadPlane[ix][PadMax[1]]->SizeX;
       for (Int_t iy = yStart; iy < PadMax[1]; iy++)
 	yPosC -= fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][iy]->SizeY;
 
+      if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	printf("C:%.2f,%.2f ",xPosC,yPosC);
+
       Double_t xPosCStart = xPosC;
       Double_t yPosCStart = yPosC;
 
       for (Int_t y = yStart; y < yStop; y++) {
-	//printf("%3i: ",y);
+	if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	  printf("y%3i: ",y);
 	for (Int_t x = xStart; x < xStop; x++) {
-	  //printf("%3i, ",x);
+	  if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	    printf("x%3i, ",x);
+	  if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	    printf("C:%.2f,%.2f [%.2f,%.2f] ",xPosC,yPosC,fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX,fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeY);
 	  fModuleClusterMap[fModuleID]->PadPlane[x][y]->Charge += 
 	    CalcMathieson(xPosC, fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX) * 
 	    CalcMathieson(yPosC, fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeY) *
 	    ELoss;
 	  fModuleClusterMap[fModuleID]->PadPlane[x][y]->MCIndex.push_back(/*fMCindex*/pointId);
-	  xPosC += fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX;      
+	  xPosC += fModuleClusterMap[fModuleID]->PadPlane[x][y]->SizeX; 
+	  if(fDebug /*|| fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	    printf("c%.0e ",fModuleClusterMap[fModuleID]->PadPlane[x][y]->Charge);
 	}
-	//printf("\n");
+	if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	  printf("\n");
 	xPosC = xPosCStart;
 	yPosC += fModuleClusterMap[fModuleID]->PadPlane[PadMax[0]][y]->SizeY;
       }
@@ -446,167 +467,188 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 }
 
   // --------------------------------------------------------------------
-  void CbmTrdClusterizerFast::InitPadPlane(ClusterModule* mCluster)
-  {
-    Int_t iXSector = 0;
-    Int_t iYSector = 0;
-    Int_t secXPad = 0;
-    Int_t secYPad = 0;
-
-    //printf("    (%3i,%3i) %3i\n",mCluster->nxPad,mCluster->nyPad,(Int_t)mCluster->PadPlane.size());
-    mCluster->PadPlane.resize(mCluster->nxPad);
-    for (Int_t xPads = 0; xPads < mCluster->nxPad; xPads++){
-      mCluster->PadPlane[xPads].resize(mCluster->nyPad);
-    
-      if (xPads == mCluster->SecxPad[iXSector]){
-	iXSector++;
-	secXPad = 0;
-      }
-    
-      for (Int_t yPads = 0; yPads < mCluster->nyPad; yPads++){
-      
-	if (yPads == mCluster->SecyPad[iYSector]){
-	  iYSector++;
-	  secYPad = 0;
-	}
-      
-	ClusterPad* pad = new ClusterPad;    
-	mCluster->PadPlane[xPads][yPads] = pad;
-      
-	mCluster->PadPlane[xPads][yPads]->SizeX  = mCluster->PadSizeX[iXSector];
-	mCluster->PadPlane[xPads][yPads]->SizeY  = mCluster->PadSizeY[iYSector];
-	mCluster->PadPlane[xPads][yPads]->Charge = 0.0;
-      
-	secYPad++;
-      }
-
-      secXPad++;
+void CbmTrdClusterizerFast::InitPadPlane(ClusterModule* mCluster)
+{
+  Int_t iXSector = 0;
+  Int_t iYSector = 0;
+  Int_t secXPad = 0;
+  Int_t secYPad = 0;
+  if(fDebug)
+    printf("    (%3i,%3i) %3i\n",mCluster->nxPad,mCluster->nyPad,(Int_t)mCluster->PadPlane.size());
+  mCluster->PadPlane.resize(mCluster->nxPad);
+  for (Int_t xPads = 0; xPads < mCluster->nxPad; xPads++){
+    mCluster->PadPlane[xPads].resize(mCluster->nyPad);
+    iYSector = 0;
+    if (xPads == mCluster->SecxPad[iXSector]){
+      iXSector++;
+      secXPad = 0;
     }
-    //printf("    (%3i,%3i) (%3i,%3i)\n",mCluster->nxPad,mCluster->nyPad,(Int_t)mCluster->PadPlane.size(),(Int_t)mCluster->PadPlane[0].size());
+    
+    for (Int_t yPads = 0; yPads < mCluster->nyPad; yPads++){
+      
+      if (yPads == mCluster->SecyPad[iYSector]){
+	iYSector++;
+	secYPad = 0;
+      }   
+
+      ClusterPad* pad = new ClusterPad;    
+      mCluster->PadPlane[xPads][yPads] = pad;
+      
+      mCluster->PadPlane[xPads][yPads]->SizeX  = mCluster->PadSizeX[iXSector];
+      mCluster->PadPlane[xPads][yPads]->SizeY  = mCluster->PadSizeY[iYSector];
+      mCluster->PadPlane[xPads][yPads]->Charge = 0.0;
+
+      if(fDebug /*|| fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
+	printf("xS%i yS%i xP%i yP%i nxP%i nyP%i sxP%i syP%i pxS%.2f pyS%.2f\n",iXSector,iYSector,xPads,yPads,mCluster->nxPad,mCluster->nyPad,secXPad,secYPad,mCluster->PadSizeX[iXSector],mCluster->PadSizeY[iYSector]);
+      secYPad++;
+    }
+
+    secXPad++;
   }
+  if(fDebug)
+    printf("    (%3i,%3i) (%3i,%3i)\n",mCluster->nxPad,mCluster->nyPad,(Int_t)mCluster->PadPlane.size(),(Int_t)mCluster->PadPlane[0].size());
+}
   // --------------------------------------------------------------------
 
-  void CbmTrdClusterizerFast::GetModuleInformationFromDigiPar(Int_t VolumeID)
-  {
-    //cout << "GetModuleInformationFromDigiPar" << endl;
-    // fPos is >0 for x and y and not rotated
-    // origin of the local coordinate system in 
-    // the lower left corner of the chamber, 
-    // x to the right (small side of the pads), y up  
+void CbmTrdClusterizerFast::GetModuleInformationFromDigiPar(Int_t VolumeID)
+{
+  //cout << "GetModuleInformationFromDigiPar" << endl;
+  // fPos is >0 for x and y and not rotated
+  // origin of the local coordinate system in 
+  // the lower left corner of the chamber, 
+  // x to the right (small side of the pads), y up  
 
-    //cout << "---ModuleID: " << VolumeID << endl;
+  //cout << "---ModuleID: " << VolumeID << endl;
 
-    fModuleInfo = fDigiPar->GetModule(VolumeID);
-    if (fModuleInfo != NULL)
-      {
-	Int_t detID = fModuleInfo->GetDetectorId();
+  fModuleInfo = fDigiPar->GetModule(VolumeID);
+  if (fModuleInfo != NULL)
+    {
+      Int_t detID = fModuleInfo->GetDetectorId();
 
-	if (detID != VolumeID ){
-	  cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
-	}
+      if (detID != VolumeID ){
+	cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
+      }
 
-	Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
-	fModuleType = detInfo[3];
-	fModuleCopy = detInfo[4];
-	//---------------------------------------------------------------------------------------------------
-	std::map<Int_t, ClusterModule* >::iterator it = fModuleClusterMap.find(detID);
-	if (it == fModuleClusterMap.end()) {
-	  //cout << "------new ModuleID: " << VolumeID << endl;
-	  ClusterModule *mCluster = new ClusterModule;
-	  fModuleClusterMap[detID] = mCluster;
-	  /*
-	    add a matrix 0 -> nrow and ncol for pad width and height of each pad to get wride of the padsizematrix !!!! 
-	  */
-	  Float_t averagePadSizeX;
-	  Float_t averagePadSizeY;
-	  mCluster -> Station = detInfo[1];
-	  mCluster -> Layer = detInfo[2];
-	  mCluster -> moduleId = detID;//moduleId;
+      Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
+      fModuleType = detInfo[3];
+      fModuleCopy = detInfo[4];
+      //---------------------------------------------------------------------------------------------------
+      std::map<Int_t, ClusterModule* >::iterator it = fModuleClusterMap.find(detID);
+      if (it == fModuleClusterMap.end()) {
+	//cout << "------new ModuleID: " << VolumeID << endl;
+	ClusterModule *mCluster = new ClusterModule;
+	fModuleClusterMap[detID] = mCluster;
+	/*
+	  add a matrix 0 -> nrow and ncol for pad width and height of each pad to get wride of the padsizematrix !!!! 
+	*/
+	Float_t averagePadSizeX;
+	Float_t averagePadSizeY;
+	mCluster -> Station = detInfo[1];
+	mCluster -> Layer = detInfo[2];
+	mCluster -> moduleId = detID;//moduleId;
 	
-	  mCluster -> ModulePositionX = (Int_t)(10 * fModuleInfo->GetX());
-	  mCluster -> ModulePositionY = (Int_t)(10 * fModuleInfo->GetY());
-	  mCluster -> ModulePositionZ = (Int_t)(10 * fModuleInfo->GetZ());
-	  mCluster -> ModuleSizeX = (fModuleInfo->GetSizex()) * 10. * 2;
-	  mCluster -> ModuleSizeY = (fModuleInfo->GetSizey()) * 10. * 2;
-	  mCluster -> nxPad = fModuleInfo->GetnCol();
-	  mCluster -> nyPad = fModuleInfo->GetnRow();
-	  mCluster -> NoSectors = fModuleInfo->GetNoSectors();
+	mCluster -> ModulePositionX = (Int_t)(10 * fModuleInfo->GetX());
+	mCluster -> ModulePositionY = (Int_t)(10 * fModuleInfo->GetY());
+	mCluster -> ModulePositionZ = (Int_t)(10 * fModuleInfo->GetZ());
+	mCluster -> ModuleSizeX = (fModuleInfo->GetSizex()) * 10. * 2;
+	mCluster -> ModuleSizeY = (fModuleInfo->GetSizey()) * 10. * 2;
+	mCluster -> nxPad = fModuleInfo->GetnCol();
+	mCluster -> nyPad = fModuleInfo->GetnRow();
+	mCluster -> NoSectors = fModuleInfo->GetNoSectors();
+	if(fDebug)
+	  printf("S%i L%i M%i Msx%.2f Msy%.2f\n",mCluster -> Station,mCluster -> Layer,mCluster -> moduleId,mCluster -> ModuleSizeX,mCluster -> ModuleSizeY);
 
-	  const Int_t NoSectors = fModuleInfo->GetNoSectors();
-	  mCluster -> SectorSizeX.resize(NoSectors);
-	  mCluster -> SectorSizeY.resize(NoSectors);
-	  mCluster -> PadSizeX.resize(NoSectors);
-	  mCluster -> PadSizeY.resize(NoSectors);
-	  mCluster -> SecyPad.resize(NoSectors);
-	  mCluster -> SecxPad.resize(NoSectors);      
+	const Int_t NoSectors = fModuleInfo->GetNoSectors();
+	mCluster -> SectorSizeX.resize(NoSectors);
+	mCluster -> SectorSizeY.resize(NoSectors);
+	mCluster -> PadSizeX.resize(NoSectors);
+	mCluster -> PadSizeY.resize(NoSectors);
+	mCluster -> SecyPad.resize(NoSectors);
+	mCluster -> SecxPad.resize(NoSectors);      
 
-	  for (Int_t i = 0; i < NoSectors; i++) {
-	    mCluster -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
-	    mCluster -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);
-	    mCluster -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
-	    mCluster -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
+	for (Int_t i = 0; i < NoSectors; i++) {
+	  mCluster -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
+	  mCluster -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);	
+	  mCluster -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
+	  mCluster -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
+	  //}
+
+	  //for (Int_t i = 0; i < NoSectors; i++) {
+	  mCluster -> SecyPad[i]      = Int_t(mCluster->SectorSizeY[i] / mCluster->PadSizeY[i]);
+	  mCluster -> SecxPad[i]      = Int_t(mCluster->SectorSizeX[i] / mCluster->PadSizeX[i]);
+	  if (i > 0) {
+	    if (mCluster -> SectorSizeX[i] == mCluster -> ModuleSizeX){
+	      mCluster -> SectorSizeX[i] = 0.0;
+	      mCluster -> SecxPad[i] = 0;
+	      mCluster -> PadSizeX[i] = 0.0;
+	    }
+	    if (mCluster -> SectorSizeY[i] == mCluster -> ModuleSizeY){
+	      mCluster -> SectorSizeY[i] = 0.0;
+	      mCluster -> SecyPad[i] = 0;
+	      mCluster -> PadSizeY[i] = 0.0;
+	    }
 	  }
-
-	  for (Int_t i = 0; i < NoSectors; i++) {
-	    mCluster -> SecyPad[i]      = Int_t(mCluster->SectorSizeY[i] / mCluster->PadSizeY[i]);
-	    mCluster -> SecxPad[i]      = Int_t(mCluster->SectorSizeX[i] / mCluster->PadSizeX[i]);
-	  }
-	  averagePadSizeX /= NoSectors;
-	  averagePadSizeY /= NoSectors;
-
-	  InitPadPlane(mCluster);
+	  if(fDebug)
+	    printf("       S%i Ssx%.2f Ssy%.2f Psx%.2f Psy%.2f nPx%i nPy%i\n" ,i,mCluster -> SectorSizeX[i],mCluster -> SectorSizeY[i],mCluster -> PadSizeX[i],mCluster -> PadSizeY[i],mCluster -> SecxPad[i],mCluster -> SecyPad[i]);
 	}
-      }
-    else
-      {
-	printf("fModuleInfo == NULL\n");
-      }
-  }
-  // --------------------------------------------------------------------
-  void CbmTrdClusterizerFast::GetModuleInformation(){
-    //cout << "GetModuleInformation" << endl;
-    // Extract the information about station, layer, module type
-    // and cpoy number of the module from the full path to the
-    // node.
-    // The full path is tokenized at the "/" which diide the different
-    // levels of the geometry.
-    // Knowing the nameing scheme of the volumes one gets the required
-    // information with simple string manipulation.
-    // This is probably not the fastes way, but the speed has to be checked.
-    // The methode works only for versions of Root > 5.20.0, before the
-    // class TStringTocken is not implemented
 
-    TString path = gGeoManager->GetPath();
-    cout<<"Path: "<<path<<endl;
+	 
+	averagePadSizeX /= NoSectors;
+	averagePadSizeY /= NoSectors;
+
+	InitPadPlane(mCluster);
+      }
+    }
+  else
+    {
+      printf("fModuleInfo == NULL\n");
+    }
+}
+  // --------------------------------------------------------------------
+void CbmTrdClusterizerFast::GetModuleInformation(){
+  //cout << "GetModuleInformation" << endl;
+  // Extract the information about station, layer, module type
+  // and cpoy number of the module from the full path to the
+  // node.
+  // The full path is tokenized at the "/" which diide the different
+  // levels of the geometry.
+  // Knowing the nameing scheme of the volumes one gets the required
+  // information with simple string manipulation.
+  // This is probably not the fastes way, but the speed has to be checked.
+  // The methode works only for versions of Root > 5.20.0, before the
+  // class TStringTocken is not implemented
+
+  TString path = gGeoManager->GetPath();
+  cout<<"Path: "<<path<<endl;
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,20,0)
-    TStringToken* bla = new TStringToken(path,"/");
+  TStringToken* bla = new TStringToken(path,"/");
 #else
-    CbmTrdStringToken* bla = new CbmTrdStringToken(path,"/");
+  CbmTrdStringToken* bla = new CbmTrdStringToken(path,"/");
 #endif
 
-    while (bla->NextToken()) {
-      if (bla->Contains("layer")) {
-	TString bla3 = (TString) *bla;
-	Ssiz_t pos = bla3.Last('_');
-	Ssiz_t substringLength=bla3.Length()-pos-1;
-	TString bla2 = bla3((bla3.Last('_')+1),substringLength);
-	TString bla1 = bla3(3,1);
-	fModuleClusterMap[fModuleID]->Station=bla1.Atoi();
-	fModuleClusterMap[fModuleID]->Layer=bla2.Atoi();
-      }
-      if (bla->Contains("mod")){
-	TString bla3 = (TString) *bla;
-	Ssiz_t pos = bla3.Last('_');
-	Ssiz_t substringLength=bla3.Length()-pos-1;
-	TString bla2 = bla3(pos+1,substringLength);
-	substringLength=pos-7;
-	TString bla1 = bla3(7,substringLength);     
-	fModuleType = bla1.Atoi();
-	fModuleCopy = bla2.Atoi();
-	break;
-      } 
+  while (bla->NextToken()) {
+    if (bla->Contains("layer")) {
+      TString bla3 = (TString) *bla;
+      Ssiz_t pos = bla3.Last('_');
+      Ssiz_t substringLength=bla3.Length()-pos-1;
+      TString bla2 = bla3((bla3.Last('_')+1),substringLength);
+      TString bla1 = bla3(3,1);
+      fModuleClusterMap[fModuleID]->Station=bla1.Atoi();
+      fModuleClusterMap[fModuleID]->Layer=bla2.Atoi();
     }
+    if (bla->Contains("mod")){
+      TString bla3 = (TString) *bla;
+      Ssiz_t pos = bla3.Last('_');
+      Ssiz_t substringLength=bla3.Length()-pos-1;
+      TString bla2 = bla3(pos+1,substringLength);
+      substringLength=pos-7;
+      TString bla1 = bla3(7,substringLength);     
+      fModuleType = bla1.Atoi();
+      fModuleCopy = bla2.Atoi();
+      break;
+    } 
   }
+}
   // --------------------------------------------------------------------
   void CbmTrdClusterizerFast::AddDigi(const Int_t pointID, Int_t ixPad, Int_t iyPad, Int_t nxPad, Int_t nyPad, Double_t iCharge)
   {
@@ -628,38 +670,38 @@ void CbmTrdClusterizerFast::CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int
 
   }
   // --------------------------------------------------------------------
-  Double_t CbmTrdClusterizerFast::CalcMathieson(Double_t x, Double_t W)
-  {
-    Float_t K3 = 0.525;  //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
-    //Float_t K3 = (-0.7/1.6 * (h/s) + 0.7) + ((exp(-9.74350e+02 * ra/s) * 5.64791e-01 + 3.32737e-01));// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
-    //K3 = 5.25407e-01; // MS 336 fit
-    //K3 = 6.14949e-01; // MS 444 fit
+Double_t CbmTrdClusterizerFast::CalcMathieson(Double_t x, Double_t W)
+{
+  Float_t K3 = 0.525;  //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+  //Float_t K3 = (-0.7/1.6 * (h/s) + 0.7) + ((exp(-9.74350e+02 * ra/s) * 5.64791e-01 + 3.32737e-01));// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+  //K3 = 5.25407e-01; // MS 336 fit
+  //K3 = 6.14949e-01; // MS 444 fit
 
-    //Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
-    //Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
-    //Float_t W = 5;
-    //Float_t par = 1;
-    Float_t h = 3;
-    Double_t SqrtK3 = sqrt(K3);
-    /*
-      Char_t formula[500];
-      sprintf(formula," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,W,par,h,K3,K3,W,par,h);
-      TF1* mathiesonPRF = new TF1("mathieson",formula, -15, 15);
-    */
-    Double_t mathiesonPRF = fabs(
-				 -1. / (2. * atan(SqrtK3)) * (
-							      atan(SqrtK3 * tanh(TMath::Pi() * (-2. + SqrtK3 ) * (W + 2.* x) / (8.* h) )) +  
-							      atan(SqrtK3 * tanh(TMath::Pi() * (-2. + SqrtK3 ) * (W - 2.* x) / (8.* h) )) 
-							      )
-				 );
-    /*
-      -1. / (2. * atan(sqrt(K3))) * (
-      atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W + 2.* x) / (8.* h) )) +
-      atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W - 2.* x) / (8.* h) )) 
-      );
-    */
-    return mathiesonPRF;
-  }
+  //Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
+  //Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
+  //Float_t W = 5;
+  //Float_t par = 1;
+  Float_t h = 3;
+  Double_t SqrtK3 = sqrt(K3);
+  /*
+    Char_t formula[500];
+    sprintf(formula," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,W,par,h,K3,K3,W,par,h);
+    TF1* mathiesonPRF = new TF1("mathieson",formula, -15, 15);
+  */
+  Double_t mathiesonPRF = fabs(
+			       -1. / (2. * atan(SqrtK3)) * (
+							    atan(SqrtK3 * tanh(TMath::Pi() * (-2. + SqrtK3 ) * (W + 2.* x) / (8.* h) )) +  
+							    atan(SqrtK3 * tanh(TMath::Pi() * (-2. + SqrtK3 ) * (W - 2.* x) / (8.* h) )) 
+							    )
+			       );
+  /*
+    -1. / (2. * atan(sqrt(K3))) * (
+    atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W + 2.* x) / (8.* h) )) +
+    atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W - 2.* x) / (8.* h) )) 
+    );
+  */
+  return mathiesonPRF;
+}
   // --------------------------------------------------------------------
   void CbmTrdClusterizerFast::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate)
   {
@@ -694,13 +736,15 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
 	{
 	  tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[ixSector];
 	  PadMax[0] += fModuleClusterMap[fModuleID]->SecxPad[ixSector];
-	  printf(" %.2f %i |",tempPosX,PadMax[0]);
+	  if (fDebug)
+	    printf(" %.2f %i |",tempPosX,PadMax[0]);
 	}
       else
 	{
 	  PadMax[0] += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector]));
-	  clusterPosInPadLL[0] = tempPosX - Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector])) * fModuleClusterMap[fModuleID]->PadSizeX[ixSector];
-	  printf(" %.2f %i || X\n",tempPosX,PadMax[0]);
+	  tempPosX -= Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector])) * fModuleClusterMap[fModuleID]->PadSizeX[ixSector];
+	  if (fDebug)
+	    printf(" %.2f %i || X\n",tempPosX,PadMax[0]);
 	  //printf("x ready\n");
 	  break;
 	}
@@ -711,61 +755,68 @@ void CbmTrdClusterizerFast::GetClusterDisplacement(Double_t* clusterPosInModuleL
 	{
 	  tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iySector];
 	  PadMax[1] += fModuleClusterMap[fModuleID]->SecyPad[iySector];
-	  printf(" %.2f %i |",tempPosY,PadMax[1]);
+	  if (fDebug)
+	    printf(" %.2f %i |",tempPosY,PadMax[1]);
 	}
       else
 	{
 	  PadMax[1] += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector]));
-	  clusterPosInPadLL[1] = tempPosY - Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector])) * fModuleClusterMap[fModuleID]->PadSizeY[iySector];
-	  printf(" %.2f %i || Y\n",tempPosY,PadMax[1]);
+	  tempPosY -= Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector])) * fModuleClusterMap[fModuleID]->PadSizeY[iySector];	  
+	  if (fDebug)
+	    printf(" %.2f %i || Y\n",tempPosY,PadMax[1]);
 	  //printf("y ready\n");
 	  break;
 	}
     }
-  if ( PadMax[0] == 0 || PadMax[1] == 0 )
-    printf("-------------------> ");
+
+  clusterPosInPadLL[0] = tempPosX;// - Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[ixSector])) * fModuleClusterMap[fModuleID]->PadSizeX[ixSector];
+  clusterPosInPadLL[1] = tempPosY;// - Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iySector])) * fModuleClusterMap[fModuleID]->PadSizeY[iySector];
+  if (fDebug){
+    if ( PadMax[0] == 0 || PadMax[1] == 0 )
+      printf("-------------------> ");
     printf("(%.2f,%.2f) (%.2f,%.2f) (%i,%i) (%i,%i)\n",clusterPosInModuleLL[0],clusterPosInModuleLL[1],clusterPosInPadLL[0],clusterPosInPadLL[1],PadMax[0],PadMax[1],ixSector,iySector);
+  }
 }
   // --------------------------------------------------------------------
-  Int_t CbmTrdClusterizerFast::GetxPad(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
-  {
-    Int_t ixPad = 0;
-    for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
-      {
-	if (tempPosX > fModuleClusterMap[fModuleID]->SectorSizeX[iSector])
-	  {
-	    tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[iSector];
-	    ixPad += fModuleClusterMap[fModuleID]->SecxPad[iSector];
-	  }
-	else
-	  {
-	    ixPad += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[iSector]));
-	    break;
-	  }
-      }
-    return ixPad;
-  }
+Int_t CbmTrdClusterizerFast::GetxPad(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
+{
+  Int_t ixPad = 0;
+  for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
+    {
+      if (tempPosX > fModuleClusterMap[fModuleID]->SectorSizeX[iSector])
+	{
+	  tempPosX -= fModuleClusterMap[fModuleID]->SectorSizeX[iSector];
+	  ixPad += fModuleClusterMap[fModuleID]->SecxPad[iSector];
+	}
+      else
+	{
+	  ixPad += Int_t(tempPosX / Float_t(fModuleClusterMap[fModuleID]->PadSizeX[iSector]));
+	  break;
+	}
+    }
+  return ixPad;
+}
 
   // --------------------------------------------------------------------
-  Int_t CbmTrdClusterizerFast::GetyPad(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
-  {
-    //cout << "GetyPad" << endl;
-    Int_t iyPad = 0;
-    for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
-      {
-	if (tempPosY > fModuleClusterMap[fModuleID]->SectorSizeY[iSector])
-	  {
-	    tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iSector];
-	    iyPad += fModuleClusterMap[fModuleID]->SecyPad[iSector];
-	  }
-	else
-	  {
-	    iyPad += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iSector]));
-	    break;
-	  }
-      }
-    return iyPad;
-  }
+Int_t CbmTrdClusterizerFast::GetyPad(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
+{
+  //cout << "GetyPad" << endl;
+  Int_t iyPad = 0;
+  for (Int_t iSector = 0; iSector < fModuleClusterMap[fModuleID]->NoSectors; iSector++)
+    {
+      if (tempPosY > fModuleClusterMap[fModuleID]->SectorSizeY[iSector])
+	{
+	  tempPosY -= fModuleClusterMap[fModuleID]->SectorSizeY[iSector];
+	  iyPad += fModuleClusterMap[fModuleID]->SecyPad[iSector];
+	}
+      else
+	{
+	  iyPad += Int_t(tempPosY / Float_t(fModuleClusterMap[fModuleID]->PadSizeY[iSector]));
+	  break;
+	}
+    }
+  return iyPad;
+}
 
   // ---- FinishTask-----------------------------------------------------
 void CbmTrdClusterizerFast::FinishEvent()
@@ -805,11 +856,11 @@ void CbmTrdClusterizerFast::FinishEvent()
 }
 
   // ---- Register ------------------------------------------------------
-  void CbmTrdClusterizerFast::Register()
-  {
-    FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
-    FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
-  }
+void CbmTrdClusterizerFast::Register()
+{
+  FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
+  FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
+}
   // --------------------------------------------------------------------
 
-  ClassImp(CbmTrdClusterizerFast)
+ClassImp(CbmTrdClusterizerFast)

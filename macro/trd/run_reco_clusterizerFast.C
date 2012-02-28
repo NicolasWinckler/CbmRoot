@@ -244,15 +244,15 @@ void run_reco_clusterizerFast(Int_t nEvents = 1)
  
   // -----   TRD clusterizer     ----------------------------------------------
   
-  CbmTrdClusterizerFast* trdClustering = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator);
+  CbmTrdClusterizerFast* trdClustering = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator,false,false);
   run->AddTask(trdClustering);
-  /*
+  
   CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
   run->AddTask(trdClusterfindingfast);
   
   CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
   run->AddTask(trdClusterHitProducer);
-  */
+  
   
   // -------------------------------------------------------------------------
 

@@ -69,7 +69,11 @@ class CbmTrdClusterizerFast : public FairTask {
 
   /** Standard constructor **/
   CbmTrdClusterizerFast(const char *name, const char *title="CBM Task",
-			CbmTrdRadiator *radiator=NULL);
+			CbmTrdRadiator *radiator=NULL, Bool_t oneClusterPerPoint=false, Bool_t wireQuantisation=false);
+  /*
+    oneClusterPerPoint: produces just one cluster per MC-track if true -> less ghost hits
+    produces n cluster per track depending on the path length within the detector volume -> leads to at least one hit per crossed pad row -> high number of ghost hits
+*/
 
   /** Destructor **/
   virtual ~CbmTrdClusterizerFast();
@@ -109,7 +113,7 @@ class CbmTrdClusterizerFast : public FairTask {
 
   void CalcDigisOnPadPlane(Double_t* clusterPosInPadLL, Int_t* PadMax, Double_t ELoss, Int_t pointId);
 
-  void SplitPathSlices();
+  void SplitPathSlices(Double_t* local_inLL, Double_t* local_outLL, Double_t ELoss, Int_t pointId);
 
   void WireQuantisation();
 
@@ -128,6 +132,8 @@ class CbmTrdClusterizerFast : public FairTask {
   Int_t GetxPad(Double_t tempPosX);
 
   Bool_t fDebug;
+  Bool_t fOneClusterPerPoint;
+  Bool_t fWireQuantisation;
 
   Int_t Digicounter;
   Double_t fLayerZ[12];

@@ -62,6 +62,7 @@
 #pragma link C++ class  CbmEcalShLibRecord;
 #pragma link C++ class  CbmEcalShLib;
 #pragma link C++ class  CbmEcalShLibTable;
+#pragma link C++ class  CbmEcalShLibNN;
 #pragma link C++ class  CbmEcalReco;
 #pragma link C++ class  CbmEcalPosLib;
 #pragma link C++ class  CbmEcalReco2;

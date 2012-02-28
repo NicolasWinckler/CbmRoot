@@ -56,7 +56,7 @@ CbmEcalCalibrationV2.cxx CbmEcalAnalysisSimple.cxx CbmEcalIdentification.cxx
 CbmEcalMaximumLocator.cxx CbmEcalAnalysisJPsi.cxx
 CbmEcalAnalysisSShape.cxx CbmEcalAnalysisShape.cxx
 CbmEcalShLibRecord.cxx CbmEcalShLib.cxx CbmEcalShLibTable.cxx
-CbmEcalClusterFinder.cxx CbmEcalReco.cxx
+CbmEcalClusterFinder.cxx CbmEcalReco.cxx CbmEcalShLibNN.cxx
 CbmEcalAnalysisEres.cxx CbmEcalPosLib.cxx CbmEcalReco2.cxx
 CbmEcalShLibCorr.cxx CbmEcalShLibCorrTable.cxx
 CbmEcalShLibCorrRecord.cxx CbmEcalRecoCorr.cxx

@@ -183,16 +183,18 @@ add_subdirectory (cbmgenerators)
 add_subdirectory (run)
 add_subdirectory (hadron)
 
-FIND_PATH(TEvePath NAMES TEveEventManager.h PATHS
-  ${SIMPATH}/tools/root/include
-  NO_DEFAULT_PATH
-)
- 
-If(TEvePath)
-  Message("Found TEveEventManager.h")
+Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
+                OUTPUT_VARIABLE EveIsBuild
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+               )
+
+If(${EveIsBuild} STREQUAL yes)
+  Message("Build the eventdisplay.")
   add_subdirectory (eventdisplay)
   add_subdirectory (cbmdisplay)
-EndIf(TEvePath)
+Else(${EveIsBuild} STREQUAL yes)
+  Message("The eventdisplay is not build, there is no OpenGL support.")
+EndIf(${EveIsBuild} STREQUAL yes)
 
 set(BUILD_ROCLIB FALSE CACHE BOOL "Build DABC and RocLib which are needed
     to read testbeam data.")

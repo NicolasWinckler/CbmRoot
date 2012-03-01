@@ -122,6 +122,7 @@ class CbmL1 : public FairTask
 
   vector<CbmL1HitStore> vHitStore; // diff hit information
 
+  void Reconstruct();
   
   friend class L1AlgoDraw;
   friend class L1AlgoPulls;

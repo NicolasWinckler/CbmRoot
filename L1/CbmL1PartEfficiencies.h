@@ -16,33 +16,36 @@ struct CbmL1PartEfficiencies
     ghost(),
     bg()
   {
+    const int nParticles = 6;
+    TString partName[nParticles] = {"ks","lambda","ksi-","ksi+","omega-","Hdb"};
+    TString partTitle[nParticles] = {"KShort","Lambda","Ksi-  ","Ksi+  ","Omega-","Hdb   "};
           // add total efficiency
     // AddCounter("piPlus"  ,"PiPlus  efficiency");
     // AddCounter("piMinus" ,"PiMinus efficiency");
-    AddCounter("ks"           ,"KShort     ");
-    AddCounter("ks_prim"      ,"KShortPrim ");
-    AddCounter("ks_sec"       ,"KShortSec  ");
-    AddCounter("lambda"       ,"Lambda     ");
-    AddCounter("lambda_prim"  ,"LambdaPrim ");
-    AddCounter("lambda_sec"   ,"LambdaSec  ");
+    for(int iP=0; iP<nParticles; iP++)
+    {
+      AddCounter(Form("%s",partName[iP].Data()),      Form("%-*s",11,partTitle[iP].Data()));
+      AddCounter(Form("%s_prim",partName[iP].Data()), Form("%s Prim",partTitle[iP].Data()));
+      AddCounter(Form("%s_sec",partName[iP].Data()),  Form("%s Sec ",partTitle[iP].Data()));
+    }
   }
-  
+
   virtual ~CbmL1PartEfficiencies(){};
 
   virtual void AddCounter(TString shortname, TString name){
     indices[shortname] = names.size();
     names.push_back(name);
-    
+
     ratio_reco.AddCounter();
     mc.AddCounter();
     reco.AddCounter();
-    
+
     ratio_ghost.AddCounter();
     ratio_bg.AddCounter();
     ghost.AddCounter();
     bg.AddCounter();
   };
-  
+
   CbmL1PartEfficiencies& operator+=(CbmL1PartEfficiencies& a){
     mc += a.mc; reco += a.reco;
     ghost += a.ghost; bg += a.bg;

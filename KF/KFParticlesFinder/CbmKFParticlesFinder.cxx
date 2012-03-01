@@ -88,9 +88,10 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   for(int iTr=0; iTr<nTracks; iTr++)
     vRTracks[iTr] = *( (CbmStsTrack*) flistStsTracks->At(iTr));
 
-  CbmKFVertex kfVertex(*fPrimVtx);
+//  CbmKFVertex kfVertex(*fPrimVtx);
+  CbmKFVertex kfVertex;
 
-  CbmKFParticleInterface::Find2PDecay(vRTracks,fParticles, kfVertex, fCuts);
+  CbmKFParticleInterface::FindParticles(vRTracks,fParticles, kfVertex, fCuts);
 
   timerSelect.Stop();
 

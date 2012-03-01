@@ -22,19 +22,7 @@ class CbmKFParticle;
 using namespace std;
 
 class CbmKFParticle_simd {
-  
- public: // TODO private
-  fvec Id() const { return fId; };
-  int NDaughters() const { return fDaughterIds.size(); };
-  vector<fvec>& DaughterIds() { return fDaughterIds; };
-  
-  void SetId( fvec id ){ fId = id; };
-  void AddDaughterId( fvec id ){ fDaughterIds.push_back(id); };
-  
- private:
-  fvec fId;                   // id of particle
-  vector<fvec> fDaughterIds; // id of particles it created from. if size == 1 then this is id of track.
-  
+
  public:
   void *operator new(size_t bytes) {return _mm_malloc(bytes, 16);}
   void operator delete(void *p) {_mm_free(p);}
@@ -46,14 +34,14 @@ class CbmKFParticle_simd {
   CbmKFParticle_simd( CbmKFTrackInterface &Track, Int_t *qHypo=0, const Int_t *pdg=0);
   CbmKFParticle_simd( CbmKFParticle *part[] );
   CbmKFParticle_simd( CbmKFParticle &part );
-  
+
   ~CbmKFParticle_simd(){};
 
   // Construction
   void Create(CbmKFTrackInterface* Track[],int Ntracks = fvecLen, Int_t *qHypo=0, const Int_t *pdg=0);
   void Create(CbmKFParticle *part[],int N = fvecLen);
-  
-  // Accessors ?
+
+  // Accessors
 
   //* Simple accessors 
   fvec GetX    ()  const { return r[0]; }
@@ -125,7 +113,18 @@ class CbmKFParticle_simd {
 
   void SetPDG ( fvec pdg ) { fPDG = pdg; }
   const fvec& GetPDG () const { return fPDG; }
-  
+
+  void SetId( fvec id ){ fId = id; };
+  void AddDaughterId( fvec id ){ fDaughterIds.push_back(id); };
+
+  fvec Id() const { return fId; };
+  int NDaughters() const { return fDaughterIds.size(); };
+  vector<fvec>& DaughterIds() { return fDaughterIds; };
+
+ private:
+  fvec fId;                   // id of particle
+  vector<fvec> fDaughterIds; // id of particles it created from. if size == 1 then this is id of track.
+
  public:
 
   fvec r[8];

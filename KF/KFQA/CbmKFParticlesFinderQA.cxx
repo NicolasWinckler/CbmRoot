@@ -315,11 +315,32 @@ void CbmKFParticlesFinderQA::FindReconstructableMCParticles()
 void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
 {
   if ( part.IsReconstructable() ) return;
-  
+  const int nParticles = 5;
+  int partPDG[nParticles] = {310,3122,3312,-3312,3334};
+  vector<int> partDaughterPdg[nParticles];
+
+  partDaughterPdg[0].push_back( 211);
+  partDaughterPdg[0].push_back(-211);
+
+  partDaughterPdg[1].push_back(2212);
+  partDaughterPdg[1].push_back(-211);
+
+  partDaughterPdg[2].push_back(3122);
+  partDaughterPdg[2].push_back(-211);
+
+  partDaughterPdg[3].push_back(3122);
+  partDaughterPdg[3].push_back( 211);
+
+  partDaughterPdg[4].push_back(3122);
+  partDaughterPdg[4].push_back(-321);
+
+
     // tracks
   if ( /*part.NDaughters() == 0*/ part.GetPDG() == -211 ||
                                   part.GetPDG() ==  211 ||
-                                  part.GetPDG() == 2212 ) { // TODO other particles
+                                  part.GetPDG() == 2212 ||
+                                  part.GetPDG() ==  321 ||
+                                  part.GetPDG() == -321 ) { // TODO other particles
 
     switch ( fFindParticlesMode ) {
       case 1:
@@ -345,32 +366,35 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
     };
   }
     //  mother particles
-  else if ( part.GetPDG() == 310 ||
-            part.GetPDG() == 3122 ) { // TODO other particles
-      // check whether all products are in MC data
-    
-    if ( part.GetPDG() == 310 ) {
-      if ( part.NDaughters() != 2 ) // reco-able Ks decay only on pi+ (211) + pi- (-211). non reco-able on pi0 (111) + pi0 (111)
-        return;
-      else {
-        const int pdg[2] = { vMCParticles[part.GetDaughterIds()[0]].GetPDG(),
-                             vMCParticles[part.GetDaughterIds()[1]].GetPDG() };
-        if ( pdg[0] != - pdg[1]  )
-          return;
+  else
+  {
+    for(int iPart=0; iPart<nParticles; iPart++)
+    {
+      if(part.GetPDG() == partPDG[iPart])
+      {
+        const unsigned int nDaughters = partDaughterPdg[iPart].size();
+        if( part.GetDaughterIds().size() != nDaughters ) return;
+        int pdg[nDaughters];
+
+        for(unsigned int iD=0; iD<nDaughters; iD++)
+          pdg[iD] = vMCParticles[part.GetDaughterIds()[iD]].GetPDG();
+
+        bool isDaughterFound[nDaughters];
+        for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
+          isDaughterFound[iDMC] = 0;
+
+        bool isReco = 1;
+        for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
+          for(unsigned int iD=0; iD<nDaughters; iD++)
+            if(pdg[iD] == partDaughterPdg[iPart][iDMC]) isDaughterFound[iDMC] = 1;
+
+        for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
+          isReco = isReco && isDaughterFound[iDMC];
+
+        if(!isReco) return;
       }
     }
-    
-    else if ( part.GetPDG() == 3122 ) {
-      if ( part.NDaughters() != 2 )   // reco-able Lambda0 decay only on p (2212) + pi- (-211). non reco - on n + pi0
-        return;
-      else {
-        const int pdg[2] = { vMCParticles[part.GetDaughterIds()[0]].GetPDG(),
-                             vMCParticles[part.GetDaughterIds()[1]].GetPDG() };
-        if (!( (pdg[0] == -211 && pdg[1] == 2212) ||
-               (pdg[0] == 2212 && pdg[1] == -211) ))
-          return;
-      }
-    }
+
 
     const vector<int>& dIds = part.GetDaughterIds();
     const unsigned int nD = dIds.size();
@@ -453,7 +477,6 @@ void CbmKFParticlesFinderQA::MatchParticles()
       }
     }
   }
-  
 }
 
 void CbmKFParticlesFinderQA::PartEffPerformance()
@@ -464,6 +487,10 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
 
   CbmL1PartEfficiencies partEff; // efficiencies for current event
 
+  const int nParticles = 6;
+  int partPDG[nParticles] = {310,3122,3312,-3312,3334,3000};
+  TString partName[nParticles] = {"ks","lambda","ksi-","ksi+","omega-","Hdb"};
+
   const int NRP = fPF->GetParticles().size();
   for ( int iP = 0; iP < NRP; ++iP ) {
     const CbmKFParticle &part = fPF->GetParticles()[iP];
@@ -471,14 +498,10 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
       
     const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
     const bool isGhost = !RtoMCParticleId[iP].IsMatched();
-      // if ( pdg == 211 )
-      //   partEff.IncReco(isGhost, isBG, "piPlus");
-      // if ( pdg == -211 )
-      //   partEff.IncReco(isGhost, isBG, "piMinus");
-    if ( pdg == 310 )
-      partEff.IncReco(isGhost, isBG, "ks");
-    else if ( pdg == 3122 )
-      partEff.IncReco(isGhost, isBG, "lambda");
+
+    for(int iPart=0; iPart<nParticles; iPart++)
+      if ( pdg == partPDG[iPart] )
+        partEff.IncReco(isGhost, isBG, partName[iPart].Data());
   }
 
     
@@ -491,25 +514,16 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
       
     const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
 
-      // if ( pdg == 211 )
-      //   partEff.Inc(isReco, "piPlus");
-      // if ( pdg == -211 )
-      //   partEff.Inc(isReco, "piMinus");
-    if ( pdg == 310 ) {
-      partEff.Inc(isReco, "ks");
-      if ( mId == -1 )
-        partEff.Inc(isReco, "ks_prim");
-      else
-        partEff.Inc(isReco, "ks_sec");
+    for(int iPart=0; iPart<nParticles; iPart++)
+    {
+      if ( pdg == partPDG[iPart] ) {
+        partEff.Inc(isReco, partName[iPart].Data());
+        if ( mId == -1 )
+          partEff.Inc(isReco, (partName[iPart]+"_prim").Data());
+        else
+          partEff.Inc(isReco, (partName[iPart]+"_sec").Data());
+      }
     }
-    else if ( pdg == 3122 ) {
-      partEff.Inc(isReco, "lambda");
-      if ( mId == -1 )
-        partEff.Inc(isReco, "lambda_prim");
-      else
-        partEff.Inc(isReco, "lambda_sec");
-    }
-
   }
 
   NEVENTS++;
@@ -535,7 +549,7 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
 
 void CbmKFParticlesFinderQA::PartHistoPerformance()
 {
-  static const int NParticles = 2; //Ks, Lambda
+  static const int NParticles = 6; //Ks, Lambda
 
   static const int nFitQA = 16;
   static TH1F *hFitDaughtersQA[NParticles][nFitQA];
@@ -556,7 +570,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
   static const int nHistosPV = 6;
   static TH1F *hPVFitQa[nHistosPV];
 
-  TString patName[NParticles] = {"K0s","Lambda"};
+  TString patName[NParticles] = {"K0s","Lambda","Ksi-","Ksi+","Omega-","Hdb"};
 
   static bool first_call = 1;
 
@@ -565,8 +579,8 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     first_call = 0;
 
     TDirectory *currentDir = gDirectory;
-    gDirectory->mkdir("KFParticlesFinder");    
-    gDirectory->cd("KFParticlesFinder");    
+    gDirectory->mkdir("KFParticlesFinder");
+    gDirectory->cd("KFParticlesFinder");
     histodir = gDirectory;
     gDirectory->mkdir("Particles");
     gDirectory->cd("Particles");
@@ -629,7 +643,22 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
             if(iPart == 1)
             {
               xMin[0] = 1.0; 
-              xMax[0] = 2.0; 
+              xMax[0] = 2.0;
+            }
+            if(iPart == 2)
+            {
+              xMin[0] = 1.0; 
+              xMax[0] = 3.0;
+            }
+            if(iPart == 4)
+            {
+              xMin[0] = 1.0; 
+              xMax[0] = 3.0;
+            }
+            if(iPart == 5)
+            {
+              xMin[0] = 1.5; 
+              xMax[0] = 3.5;
             }
 
             for(int iH=0; iH<nHistoPartParam; iH++)
@@ -644,7 +673,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
                                               nBins[2],xMin[2],xMax[2]);
             hPartParam2D[iPart][0]->GetXaxis()->SetTitle("y");
             hPartParam2D[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
-            
+
             gDirectory->mkdir("Signal");
             gDirectory->cd("Signal");
             {
@@ -660,7 +689,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
                                                       nBins[2],xMin[2],xMax[2]);
               hPartParam2DSignal[iPart][0]->GetXaxis()->SetTitle("y");
               hPartParam2DSignal[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
-            
+
               gDirectory->mkdir("QA");
               gDirectory->cd("QA");
               {
@@ -739,6 +768,27 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
       {
         iParticle = 1;
       }
+      break;
+      case 3312:
+      {
+        iParticle = 2;
+      }
+      break;
+      case -3312:
+      {
+        iParticle = 3;
+      }
+      break;
+      case 3334:
+      {
+        iParticle = 4;
+      }
+      break;
+      case 3000:
+      {
+        iParticle = 5;
+      }
+      break;
     }
     if(iParticle < 0) continue;
 

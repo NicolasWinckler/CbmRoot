@@ -20,10 +20,13 @@ class CbmKFParticleInterface
   CbmKFParticleInterface(CbmKFTrackInterface* Track[]);
   ~CbmKFParticleInterface();
 
+  CbmKFParticleInterface(const CbmKFParticleInterface& c);
+  CbmKFParticleInterface operator=(const CbmKFParticleInterface& c);
+
   void SetField(const L1FieldRegion &field, bool isOneEntry=0, const int iVec=0) { KFPart->SetField(field, isOneEntry, iVec);}
 
-  void Construct(CbmKFTrackInterface* vDaughters[][fvecLen], int NDaughters, CbmKFVertexInterface *Parent[] = 0, float Mass=-1, float CutChi2=-1);
-  void Construct(CbmKFParticle_simd  vDaughters[],          int NDaughters, CbmKFVertexInterface *Parent[] = 0, float Mass=-1, float CutChi2=-1);
+  void Construct(CbmKFTrackInterface* vDaughters[][fvecLen], int NDaughters, CbmKFVertexInterface *Parent = 0, float Mass=-1, float CutChi2=-1);
+  void Construct(CbmKFParticle_simd  vDaughters[],          int NDaughters, CbmKFVertexInterface *Parent = 0, float Mass=-1, float CutChi2=-1);
 
   void TransportToProductionVertex();
   void TransportToDecayVertex();
@@ -84,7 +87,7 @@ class CbmKFParticleInterface
   fvec GetTy    ()  const { return KFPart->GetTy(); }
 
   void MeasureMass(CbmKFParticle_simd*  Particle, fvec r0[], fvec Mass );
-  void MeasureProductionVertex(CbmKFParticle_simd*  Particle, fvec r0[], CbmKFVertexInterface **Parent);
+  void MeasureProductionVertex(CbmKFParticle_simd*  Particle, fvec r0[], CbmKFVertexInterface *Parent);
   void Convert(CbmKFParticle_simd*  Particle, fvec r0[], bool ToProduction );
   void multQSQt( int N, const fvec Q[], const fvec S[], fvec S_out[] );
 
@@ -110,13 +113,22 @@ class CbmKFParticleInterface
   /// cut[*][1] - chi2/ndf of the reconstructed particle;
   /// cut[*][2] - z coordinate of the reconstructed particle.
   template<class T> 
-    static void Find2PDecayT(vector<T>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
-                             const float cuts[2][3]);
+    static void FindParticlesT(vector<T>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
+                               const float cuts[2][3]);
 
-  static void Find2PDecay(vector<CbmL1Track>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
-                          const float cuts[2][3] = DefaultCuts);
-  static void Find2PDecay(vector<CbmStsTrack>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
-                          const float cuts[2][3] = DefaultCuts);
+  static void FindParticles(vector<CbmL1Track>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
+                            const float cuts[2][3] = DefaultCuts);
+  static void FindParticles(vector<CbmStsTrack>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
+                            const float cuts[2][3] = DefaultCuts);
+
+  static void FindHyperons(int PDG,
+                           CbmKFParticle_simd vDaughters[2],
+                           vector<int>& daughterIds,
+                           vector<CbmKFParticle>& vLambdaSec,
+                           vector<CbmKFParticle>& vHyperon,
+                           CbmKFVertex& PrimVtx,
+                           const float *cuts = 0,
+                           int startIndex=0);
 
   template<class T> 
     void ConstructPVT(vector<T>& vRTracks);
@@ -140,9 +152,6 @@ class CbmKFParticleInterface
  private:
 
   static const float DefaultCuts[2][3];
-
-  CbmKFParticleInterface(const CbmKFParticleInterface&);
-  void operator=(const CbmKFParticleInterface&);
 };
 
 #endif /* !CbmKFParticleInterface_h */

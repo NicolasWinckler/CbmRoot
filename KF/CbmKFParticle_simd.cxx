@@ -100,6 +100,9 @@ void CbmKFParticle_simd::Create(CbmKFParticle *parts[], int N) {
     Chi2[ie] = part.GetChi2();
     Q[ie] = part.GetQ();
     AtProductionVertex = part.GetAtProductionVertex(); // CHECKME
+
+    L1FieldRegion field(part.fieldRegion);
+    fField.SetOneEntry( ie, field, 0 );
   }
 }
 

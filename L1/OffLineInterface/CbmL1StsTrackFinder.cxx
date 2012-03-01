@@ -76,6 +76,8 @@ Int_t CbmL1StsTrackFinder::DoFind() {
   CbmL1 *L1 = CbmL1::Instance();
   if( !L1 ) return 0;
 
+  L1->Reconstruct();
+
   for (vector<CbmL1Track>::iterator it = L1->vRTracks.begin(); it != L1->vRTracks.end(); ++it)
     {
       CbmL1Track &T = *it;

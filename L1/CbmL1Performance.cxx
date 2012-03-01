@@ -387,12 +387,33 @@ void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
 {
 
   if ( part.IsReconstructable() ) return;
-  
+
+  const int nParticles = 5;
+  int partPDG[nParticles] = {310,3122,3312,-3312,3334};
+  vector<int> partDaughterPdg[nParticles];
+
+  partDaughterPdg[0].push_back( 211);
+  partDaughterPdg[0].push_back(-211);
+
+  partDaughterPdg[1].push_back(2212);
+  partDaughterPdg[1].push_back(-211);
+
+  partDaughterPdg[2].push_back(3122);
+  partDaughterPdg[2].push_back(-211);
+
+  partDaughterPdg[3].push_back(3122);
+  partDaughterPdg[3].push_back( 211);
+
+  partDaughterPdg[4].push_back(3122);
+  partDaughterPdg[4].push_back(-321);
+
     // tracks
   if ( /*part.NDaughters() == 0*/ part.GetPDG() == -211 ||
                                   part.GetPDG() ==  211 ||
-                                  part.GetPDG() == 2212 ) { // TODO other particles
-    
+                                  part.GetPDG() == 2212 ||
+                                  part.GetPDG() ==  321 ||
+                                  part.GetPDG() == -321 ) { // TODO other particles
+
     switch ( fFindParticlesMode ) {
       case 1:
         part.SetAsReconstructable();
@@ -417,35 +438,37 @@ void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
         L1_assert(0);
     };
   }
-    //  mother particles
-  else if ( part.GetPDG() == 310 ||
-            part.GetPDG() == 3122 ) { // TODO other particles
-      // check whether all products are in MC data
-    
-    if ( part.GetPDG() == 310 ) {
-      if ( part.NDaughters() != 2 ) // reco-able Ks decay only on pi+ (211) + pi- (-211). non reco-able on pi0 (111) + pi0 (111)
-        return;
-      else {
-        const int pdg[2] = { vMCParticles[part.GetDaughterIds()[0]].GetPDG(),
-                             vMCParticles[part.GetDaughterIds()[1]].GetPDG() };
-        if ( pdg[0] != - pdg[1]  )
-          return;
+
+  //  mother particles
+  else
+  {
+    for(int iPart=0; iPart<nParticles; iPart++)
+    {
+      if(part.GetPDG() == partPDG[iPart])
+      {
+        const unsigned int nDaughters = partDaughterPdg[iPart].size();
+        if( part.GetDaughterIds().size() != nDaughters ) return;
+        int pdg[nDaughters];
+
+        for(unsigned int iD=0; iD<nDaughters; iD++)
+          pdg[iD] = vMCParticles[part.GetDaughterIds()[iD]].GetPDG();
+
+        bool isDaughterFound[nDaughters];
+        for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
+          isDaughterFound[iDMC] = 0;
+
+        bool isReco = 1;
+        for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
+          for(unsigned int iD=0; iD<nDaughters; iD++)
+            if(pdg[iD] == partDaughterPdg[iPart][iDMC]) isDaughterFound[iDMC] = 1;
+
+        for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
+          isReco = isReco && isDaughterFound[iDMC];
+
+        if(!isReco) return;
       }
     }
-    
-    else if ( part.GetPDG() == 3122 ) {
-      if ( part.NDaughters() != 2 )   // reco-able Lambda0 decay only on p (2212) + pi- (-211). non reco - on n + pi0
-        return;
-      else {
-        const int pdg[2] = { vMCParticles[part.GetDaughterIds()[0]].GetPDG(),
-                             vMCParticles[part.GetDaughterIds()[1]].GetPDG() };
-        if (!( (pdg[0] == -211 && pdg[1] == 2212) ||
-               (pdg[0] == 2212 && pdg[1] == -211) ))
-          return;
-      }
-    }
-         
-         
+
     const vector<int>& dIds = part.GetDaughterIds();
     const unsigned int nD = dIds.size();
     bool reco = 1;
@@ -542,6 +565,10 @@ void CbmL1::PartEffPerformance()
 
   CbmL1PartEfficiencies partEff; // efficiencies for current event
 
+  const int nParticles = 5;
+  int partPDG[nParticles] = {310,3122,3312,-3312,3334};
+  TString partName[nParticles] = {"ks","lambda","ksi-","ksi+","omega-"};
+
   const int NRP = vRParticles.size();
   for ( int iP = 0; iP < NRP; ++iP ) {
     const CbmKFParticle &part = vRParticles[iP];
@@ -549,14 +576,10 @@ void CbmL1::PartEffPerformance()
       
     const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
     const bool isGhost = !RtoMCParticleId[iP].IsMatched();
-      // if ( pdg == 211 )
-      //   partEff.IncReco(isGhost, isBG, "piPlus");
-      // if ( pdg == -211 )
-      //   partEff.IncReco(isGhost, isBG, "piMinus");
-    if ( pdg == 310 )
-      partEff.IncReco(isGhost, isBG, "ks");
-    else if ( pdg == 3122 )
-      partEff.IncReco(isGhost, isBG, "lambda");
+
+    for(int iPart=0; iPart<nParticles; iPart++)
+      if ( pdg == partPDG[iPart] )
+        partEff.IncReco(isGhost, isBG, partName[iPart].Data());
   }
 
     
@@ -569,25 +592,16 @@ void CbmL1::PartEffPerformance()
       
     const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
 
-      // if ( pdg == 211 )
-      //   partEff.Inc(isReco, "piPlus");
-      // if ( pdg == -211 )
-      //   partEff.Inc(isReco, "piMinus");
-    if ( pdg == 310 ) {
-      partEff.Inc(isReco, "ks");
-      if ( mId == -1 )
-        partEff.Inc(isReco, "ks_prim");
-      else
-        partEff.Inc(isReco, "ks_sec");
+    for(int iPart=0; iPart<nParticles; iPart++)
+    {
+      if ( pdg == partPDG[iPart] ) {
+        partEff.Inc(isReco, partName[iPart].Data());
+        if ( mId == -1 )
+          partEff.Inc(isReco, (partName[iPart]+"_prim").Data());
+        else
+          partEff.Inc(isReco, (partName[iPart]+"_sec").Data());
+      }
     }
-    else if ( pdg == 3122 ) {
-      partEff.Inc(isReco, "lambda");
-      if ( mId == -1 )
-        partEff.Inc(isReco, "lambda_prim");
-      else
-        partEff.Inc(isReco, "lambda_sec");
-    }
-
   }
 
   NEVENTS++;

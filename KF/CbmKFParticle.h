@@ -40,7 +40,6 @@ class CbmKFParticle: public TObject {
   Double_t Chi2, Q;
   Bool_t AtProductionVertex;
 
-
   float fieldRegion[10];
 
   CbmKFParticle():fId(-1), fDaughtersIds(), fPDG(0), NDF(0), Chi2(0), Q(0), AtProductionVertex(0) {};

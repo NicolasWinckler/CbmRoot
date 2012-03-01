@@ -337,6 +337,9 @@ void CbmKFTrackFitQA::FillHistoAtFirstPoint(CbmKFTrErrMCPoints *mc_points, CbmMC
 //  if (fabs(track_mc->GetPz()) < 0.0001) return;
   //if (fT[4]<0.) return;
 
+  if(!mc_points) return;
+  if( (mc_points->MvdArray.size()==0) && (mc_points->StsArray.size()==0) ) return;
+
   if(mc_points->MvdArray.size() > 0)
     MCFirstPoint = *mc_points->MvdArray.begin();
   else
@@ -540,6 +543,7 @@ void CbmKFTrackFitQA::FillHitHistos()
       if(MvdHitMatch->GetPointId() > -1) 
       {
         CbmMvdPoint* MvdP = (CbmMvdPoint*) listMvdPts->At(MvdHitMatch->GetPointId());
+        if(!MvdP) continue;
         Double_t dx = (MvdHit->GetX() - 0.5*(MvdP->GetX() + MvdP->GetXOut()));
         Double_t dy = (MvdHit->GetY() - 0.5*(MvdP->GetY() + MvdP->GetYOut()));
         res_MVDhit_x -> Fill( dx*10000. );

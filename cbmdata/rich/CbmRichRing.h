@@ -40,7 +40,7 @@ public:
 	/** to obtain the number of hits associated to the ring */
 	Int_t GetNofHits() const { return fHitCollection.size(); }
 	/** to obtain the rich hit at a particular index */
-	UShort_t GetHit(Int_t i) {return fHitCollection[i];}
+	UShort_t GetHit(Int_t i) const {return fHitCollection[i];}
 	/** to print ring parameters **/
 	void Print();
 

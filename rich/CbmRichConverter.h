@@ -44,12 +44,13 @@ public:
          CbmRichRingLight* ring2)
    {
       if (NULL == fRichHits) {
-         Init();
+         //Init();
       }
       if (NULL == fRichHits) return;
       int nofHits = ring1->GetNofHits();
       for (int i = 0; i < nofHits; i++){
-         CbmRichHit* hit = (CbmRichHit*) fRichHits->At(i);
+         Int_t hitInd = ring1->GetHit(i);
+         CbmRichHit* hit = (CbmRichHit*) fRichHits->At(hitInd);
          if (NULL == hit) continue;
          CbmRichHitLight hl(hit->GetX(), hit->GetY());
          ring2->AddHit(hl);
@@ -83,14 +84,18 @@ public:
          const CbmRichRingLight* ring1,
          CbmRichRing* ring2)
    {
-      int i = 99;
-      int r = 8;
-      i = r+i;
+      ring2->SetCenterX(ring1->GetCenterX());
+      ring2->SetCenterY(ring1->GetCenterY());
+      ring2->SetChi2(ring1->GetChi2());
+      ring2->SetAaxis(ring1->GetAaxis());
+      ring2->SetBaxis(ring1->GetBaxis());
+      ring2->SetRadius(ring1->GetRadius());
+      ring2->SetPhi(ring1->GetPhi());
    }
 
    static TClonesArray* fRichHits;
 
-private:
+public:
    /**
     * \brief Initialize array of RICH hits.
     */

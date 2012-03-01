@@ -67,6 +67,9 @@ void CbmRichRingTrackAssignClosestD::DoAssign(
 		trackIndex[i] = -1;
 		trackDist[i] = 999.;
 	}
+	cout << "nofRings:" << nofRings << endl;
+	cout << "nofTracks:" << nofTracks << endl;
+
 	for (Int_t iIter = 0; iIter < 4; iIter++){
 		for (Int_t iRing=0; iRing < nofRings; iRing++) {
 			if (trackIndex[iRing] != -1) continue;
@@ -76,7 +79,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(
 
 			Double_t xRing = pRing->GetCenterX();
 			Double_t yRing = pRing->GetCenterY();
-
+			cout << "xR:" << xRing << " yR:" << yRing << " R:"<<pRing->GetRadius() << endl;
 			Double_t rMin = 999.;
 			Int_t iTrackMin = -1;
 
@@ -87,7 +90,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(
 				FairTrackParam* pTrack = (FairTrackParam*)richProj->At(iTrack);
 				Double_t xTrack = pTrack->GetX();
 				Double_t yTrack = pTrack->GetY();
-
+	         //cout << "xT:" << xTrack << " yT:" << yTrack << endl;
 				// no projection onto the photodetector plane
 				if (xTrack == 0 && yTrack == 0) continue;
 
@@ -102,6 +105,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(
 				}
 			} // loop tracks
 			trackIndex[iRing] = iTrackMin;
+			cout << rMin << endl;
 			trackDist[iRing] = rMin;
 		}//loop rings
 

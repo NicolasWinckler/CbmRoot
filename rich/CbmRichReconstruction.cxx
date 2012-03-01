@@ -176,6 +176,7 @@ void CbmRichReconstruction::InitFitter()
       Fatal("CbmRichReconstruction::InitFitter",
             (fFitterName + string(" is not correct name for ring fitter algorithm.")).c_str());
    }
+   CbmRichConverter::Init();
 }
 
 void CbmRichReconstruction::InitTrackAssign()
@@ -191,6 +192,7 @@ void CbmRichReconstruction::InitTrackAssign()
 
 void CbmRichReconstruction::RunExtrapolation()
 {
+
    fRichTrackParamZ->Clear();
    fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ, fZTrackExtrapolation);
 }
@@ -213,6 +215,7 @@ void CbmRichReconstruction::RunFitter()
       CbmRichRing* ring = (CbmRichRing*)fRichRings->At(iRing);
       if (NULL == ring) continue;
       CbmRichRingLight ringL;
+
       CbmRichConverter::CopyHitsToRingLight(ring, &ringL);
       fRingFitter->DoFit(&ringL);
       CbmRichConverter::CopyParamsToRing(&ringL, ring);
@@ -222,12 +225,12 @@ void CbmRichReconstruction::RunFitter()
 void CbmRichReconstruction::RunTrackAssign()
 {
    // check whether track were assigned to rings.
-   Int_t nTracks = fGlobalTracks->GetEntriesFast();
+ /*  Int_t nTracks = fGlobalTracks->GetEntriesFast();
    for (Int_t iTrack = 0; iTrack < nTracks; iTrack++){
      CbmGlobalTrack* gTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
      Int_t iRing = gTrack->GetRichRingIndex();
      if (iRing != -1) return;
-   }
+   }*/
 
    fRingTrackAssign->DoAssign(fRichRings, fRichProjections);
 }

@@ -189,11 +189,11 @@ void CbmRichProjectionProducer::DoProjection(
       if (point->GetQp()==0) continue;
     
       // check that x and y value make sense (sometimes strange extrapolations may appear)
-      if (TMath::Abs(point->GetX()) > fMaxXTrackExtr || TMath::Abs(point->GetY()) > fMaxYTrackExtr){
-         cout << " -W- RichProjectionProducer: strange (x,y) values for track extrapolation: " <<
-               point->GetX() << " " << point->GetY() << endl;
-		   continue;
-      }
+      //if (TMath::Abs(point->GetX()) > fMaxXTrackExtr || TMath::Abs(point->GetY()) > fMaxYTrackExtr){
+      //   cout << " -W- RichProjectionProducer: strange (x,y) values for track extrapolation: " <<
+      //         point->GetX() << " " << point->GetY() << endl;
+		//   continue;
+      //}
 
       Double_t rho1 = 0.;
       Double_t rho2 = 0.;

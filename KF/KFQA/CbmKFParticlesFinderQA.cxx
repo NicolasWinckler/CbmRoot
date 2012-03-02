@@ -104,7 +104,7 @@ InitStatus CbmKFParticlesFinderQA::Init()
   flistStsDigi = dynamic_cast<TClonesArray*>(  fManger->GetObject("StsDigi") );
   fPrimVtx = (CbmVertex*) fManger->GetObject("PrimaryVertex");
 
-  if( CbmKF::Instance()->vMvdMaterial.size() == 0 ) 
+  if( CbmKF::Instance()->GetNMvdStations() == 0 ) 
   {
     flistMvdPts = 0;
     flistMvdHits = 0;
@@ -137,7 +137,7 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
     vMvdPointMatch[iP] = -1;
   for(unsigned int iTr=0; iTr<vMCTrackMatch.size(); iTr++)
     vMCTrackMatch[iTr] = -1;
-    
+
   if(flistMvdHits)
   {
     for(int iH=0; iH<flistMvdHits->GetEntriesFast(); iH++)
@@ -145,6 +145,7 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
       CbmMvdHitMatch *match = static_cast<CbmMvdHitMatch*>( flistMvdHitMatches->At(iH) );
       if( match){
         int iMC = match->GetPointId();
+        if(iMC < 0) continue;
         vMvdPointMatch[iMC] = iH;
       }
     }
@@ -162,14 +163,16 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
   
   fMCTrackPoints.clear();
   fMCTrackPoints.resize(flistMCTracks->GetEntriesFast());
-  if(CbmKF::Instance()->vMvdMaterial.size() != 0)
+  if(CbmKF::Instance()->GetNMvdStations() > 0)
     for (Int_t iMvd=0; iMvd<flistMvdPts->GetEntriesFast(); iMvd++)
     {
       CbmMvdPoint* MvdPoint = (CbmMvdPoint*)flistMvdPts->At(iMvd);
+      if(!MvdPoint) continue;
       fMCTrackPoints[MvdPoint->GetTrackID()].MvdArray.push_back(MvdPoint);
       int iHit = vMvdPointMatch[iMvd];
       if(iHit<0) continue;
       CbmMvdHit* MvdHit = (CbmMvdHit*)flistStsHits->At(iHit);
+      if(!MvdHit) continue;
       fMCTrackPoints[MvdPoint->GetTrackID()].MvdHitsArray.push_back(MvdHit);
     }
   for (Int_t iSts=0; iSts<flistStsPts->GetEntriesFast(); iSts++)
@@ -181,7 +184,7 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
     CbmStsHit* StsHit = (CbmStsHit*)flistStsHits->At(iHit);
     fMCTrackPoints[StsPoint->GetTrackID()].StsHitsArray.push_back(StsHit);
   }
-  
+
   GetMCParticles();
   FindReconstructableMCParticles();
   MatchParticles();

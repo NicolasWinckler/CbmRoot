@@ -8,7 +8,7 @@ test_name=$1
 system=$2
 energy=$3
 collision_type=$4
-nevents=5
+nevents=500
 
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/

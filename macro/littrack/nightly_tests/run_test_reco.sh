@@ -12,7 +12,7 @@ collision_type=$5
 
 create_output_dir events_${test_name}/
 
-nevents=5
+nevents=500
 export LIT_DETECTOR_SETUP=${detector_setup}
 
 if [ "${LIT_DETECTOR_SETUP}" = "electron" ] ; then

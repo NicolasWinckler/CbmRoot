@@ -5,11 +5,15 @@
 export LIT_SCRIPT=yes
 
 test_name=$1
+detector_setup=$2
+system=$3
+energy=$4
+collision_type=$5
 
 create_output_dir events_${test_name}/
 
 nevents=5
-export LIT_DETECTOR_SETUP=$2
+export LIT_DETECTOR_SETUP=${detector_setup}
 
 if [ "${LIT_DETECTOR_SETUP}" = "electron" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN
@@ -32,7 +36,7 @@ export LIT_MUCH_HITPRODUCER_TYPE=advanced
 
 set_default_file_names ${LIT_DIR} 0000
 
-export LIT_URQMD_FILE=/data.local1/andrey/tests/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0001.ftn14
+export LIT_URQMD_FILE=/data.local1/andrey/tests/urqmd/${system}/${energy}/${collision_type}/urqmd.${system}.${energy}.${collision_type}.0001.ftn14
 
 $ROOTSYS/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
 $ROOTSYS/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"hits\")"

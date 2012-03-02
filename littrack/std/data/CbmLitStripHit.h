@@ -1,9 +1,8 @@
-/** CbmLitStripHit.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- **
- ** Base data class for strip hit.
+/**
+ * \file CbmLitStripHit.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Base data class for strip hits.
  **/
 
 #ifndef CBMLITSTRIPHIT_H_
@@ -11,12 +10,21 @@
 
 #include "data/CbmLitHit.h"
 
+#include <string>
 #include <sstream>
 
+/**
+ * \class CbmLitStripHit
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Base data class for strip hits.
+ **/
 class CbmLitStripHit : public CbmLitHit
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitStripHit():
       fU(0.),
       fDu(0.),
@@ -27,46 +35,31 @@ public:
       SetHitType(kLITSTRIPHIT);
    }
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitStripHit() {};
 
-   /* Returns U measurement of hit */
+   /* Getters */
    litfloat GetU() const { return fU; }
-
-   /* Returns U measurement error */
    litfloat GetDu() const { return fDu; }
-
-   /* Returns rotation angle of the strip */
    litfloat GetPhi() const { return fPhi; }
-
-   /* Returns cosine of the strip rotation angle */
    litfloat GetCosPhi() const { return fCosPhi; }
-
-   /* Returns sine of the strip rotation angle */
    litfloat GetSinPhi() const { return fSinPhi; }
-
-   /* Returns straw tube segment */
    int GetSegment() const { return fSegment; }
 
-   /* Sets U measurement of the hit */
+   /* Setters */
    void SetU(litfloat u) { fU = u; }
-
-   /* Sets U measurement error */
    void SetDu(litfloat du) { fDu = du; }
-
-   /* Sets rotation angle of the strip */
    void SetPhi(litfloat phi) { fPhi = phi; }
-
-   /* Sets cosine of strip rotation angle */
    void SetCosPhi(litfloat cosPhi) { fCosPhi = cosPhi; }
-
-   /* Sets sine of strip rotation angle */
    void SetSinPhi(litfloat sinPhi) { fSinPhi = sinPhi; }
-
-   /* Sets straw tube segment */
    void SetSegment(int segment) { fSegment = segment; }
 
-   /* Returns string representation of the class */
+   /**
+    * \brief Return string representation of class.
+    * \return String representation of class.
+    */
    virtual std::string ToString() const {
       std::stringstream ss;
       ss << "StripHit: pos=(" << GetU() << "," << GetZ()
@@ -74,25 +67,18 @@ public:
          << " phi=" << GetPhi()
          << " cosPhi=" << GetCosPhi() << " sinPhi=" << GetSinPhi()
          << " planeId=" << GetPlaneId()
-         << " refId=" << GetRefId() << " w=" << GetW()
-         << " isOutlier=" << IsOutlier()
+         << " refId=" << GetRefId()
          << " hitType=" << GetType() << std::endl;
       return ss.str();
    }
 
 protected:
-   /* U measurement of the hit in [cm] */
-   litfloat fU;
-   /* U measurement error in [cm] */
-   litfloat fDu;
-   /* Strip rotation angle in [rad] */
-   litfloat fPhi;
-   /* Cosine of the strip rotation angle */
-   litfloat fCosPhi;
-   /* Sine of the strip rotation angle */
-   litfloat fSinPhi;
-   /* Up or down segment of the straw tube */
-   int fSegment;
+   litfloat fU; // U measurement of the hit in [cm].
+   litfloat fDu; // U measurement error in [cm].
+   litfloat fPhi; // Strip rotation angle in [rad].
+   litfloat fCosPhi; // Cosine of strip rotation angle.
+   litfloat fSinPhi; // Sine of strip rotation angle.
+   int fSegment; // Up or down segment of straw tube.
 };
 
 #endif /*CBMLITSTRIPHIT_H_*/

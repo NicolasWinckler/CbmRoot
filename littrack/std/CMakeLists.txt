@@ -24,9 +24,6 @@ set(LITTRACKSTD_SRCS_RULECHECKER
 ${STD_DIR}base/CbmLitDetectorLayout.cxx
 ${STD_DIR}base/CbmLitHitData.cxx
 
-${STD_DIR}data/CbmLitTrackParam.cxx
-${STD_DIR}data/CbmLitTrack.cxx
-
 ${STD_DIR}finder/CbmLitTrackFinderBase.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBranch.cxx
 ${STD_DIR}finder/CbmLitTrackFinderNN.cxx

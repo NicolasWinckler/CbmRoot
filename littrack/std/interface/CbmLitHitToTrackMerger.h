@@ -11,9 +11,6 @@
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitEnums.h"
 
-class CbmLitHitData;
-class CbmLitDetectorLayout;
-
 /**
  * \class CbmLitHitToTrackMerger
  * \author A.Lebedev <andrey.lebedev@gsi.de>

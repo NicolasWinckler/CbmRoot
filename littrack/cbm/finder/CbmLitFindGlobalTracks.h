@@ -22,10 +22,12 @@
 #include "base/CbmLitTypes.h"
 #include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitDetectorSetup.h"
+#include "data/CbmLitHit.h"
 
 #include "TStopwatch.h"
 
 #include <string>
+#include <vector>
 
 class TClonesArray;
 

@@ -3,7 +3,6 @@
  * \brief MVD tracking based on littrack package.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
- *
  */
 #include "finder/CbmLitFindMvdTracks.h"
 #include "base/CbmLitEnvironment.h"

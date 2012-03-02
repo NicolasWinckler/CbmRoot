@@ -6,6 +6,7 @@
 #include "data/CbmLitStripHit.h"
 #include "data/CbmLitTrack.h"
 #include "data/CbmLitTrackParam.h"
+#include "data/CbmLitFitNode.h"
 
 #include "CbmTrack.h"
 #include "CbmBaseHit.h"

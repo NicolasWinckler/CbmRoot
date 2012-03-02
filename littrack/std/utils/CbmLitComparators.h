@@ -5,7 +5,7 @@
 #include "data/CbmLitHit.h"
 #include "data/CbmLitStripHit.h"
 #include "data/CbmLitPixelHit.h"
-#include "data/CbmLitTrack.h"
+//#include "data/CbmLitTrack.h"
 #include "data/CbmLitTrackParam.h"
 #include "propagation/CbmLitMaterialInfo.h"
 
@@ -28,31 +28,31 @@ public:
 
 
 
-class CompareHitPtrZLess:
-   public std::binary_function<
-   const CbmLitHit*,
-   const CbmLitHit*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
-      return hit1->GetZ() < hit2->GetZ();
-   }
-};
-
-
-
-class CompareHitPtrZMore:
-   public std::binary_function<
-   const CbmLitHit*,
-   const CbmLitHit*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
-      return hit1->GetZ() > hit2->GetZ();
-   }
-};
+//class CompareHitPtrZLess:
+//   public std::binary_function<
+//   const CbmLitHit*,
+//   const CbmLitHit*,
+//   bool>
+//{
+//public:
+//   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+//      return hit1->GetZ() < hit2->GetZ();
+//   }
+//};
+//
+//
+//
+//class CompareHitPtrZMore:
+//   public std::binary_function<
+//   const CbmLitHit*,
+//   const CbmLitHit*,
+//   bool>
+//{
+//public:
+//   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+//      return hit1->GetZ() > hit2->GetZ();
+//   }
+//};
 
 
 
@@ -70,17 +70,17 @@ public:
 
 
 
-class CompareHitPtrWLess:
-   public std::binary_function<
-   const CbmLitHit*,
-   const CbmLitHit*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
-      return hit1->GetW() < hit2->GetW();
-   }
-};
+//class CompareHitPtrWLess:
+//   public std::binary_function<
+//   const CbmLitHit*,
+//   const CbmLitHit*,
+//   bool>
+//{
+//public:
+//   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+//      return hit1->GetW() < hit2->GetW();
+//   }
+//};
 
 
 
@@ -219,71 +219,7 @@ public:
 
 
 
-class CompareTrackPtrChi2OverNdfLess :
-   public std::binary_function<
-   const CbmLitTrack*,
-   const CbmLitTrack*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
-      return ( (track1->GetChi2() / track1->GetNDF()) < (track2->GetChi2() / track2->GetNDF()) );
-   }
-};
 
-
-
-class CompareTrackPtrPrevTrackIdLess :
-   public std::binary_function<
-   const CbmLitTrack*,
-   const CbmLitTrack*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
-      return track1->GetPreviousTrackId() < track2->GetPreviousTrackId();
-   }
-};
-
-
-
-class CompareTrackPtrNofHitsMore :
-   public std::binary_function<
-   const CbmLitTrack*,
-   const CbmLitTrack*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
-      return track1->GetNofHits() > track2->GetNofHits();
-   }
-};
-
-
-class CompareTrackPtrNofHitsLess :
-   public std::binary_function<
-   const CbmLitTrack*,
-   const CbmLitTrack*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
-      return track1->GetNofHits() < track2->GetNofHits();
-   }
-};
-
-
-class CompareTrackPtrLastPlaneIdMore :
-   public std::binary_function<
-   const CbmLitTrack*,
-   const CbmLitTrack*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
-      return track1->GetLastPlaneId() > track2->GetLastPlaneId();
-   }
-};
 
 
 class CompareStationZLess :

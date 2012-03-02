@@ -1,9 +1,8 @@
-/** CbmLitPixelHit.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- **
- ** Base data class for pixel hit.
+/**
+ * \file CbmLitPixelHit.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Base data class for pixel hits.
  **/
 
 #ifndef CBMLITPIXELHIT_H_
@@ -14,10 +13,18 @@
 #include <string>
 #include <sstream>
 
+/**
+ * \class CbmLitPixelHit
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Base data class for pixel hits.
+ **/
 class CbmLitPixelHit : public CbmLitHit
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitPixelHit():
       fX(0.),
       fY(0.),
@@ -27,59 +34,44 @@ public:
       SetHitType(kLITPIXELHIT);
    }
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitPixelHit() {};
 
-   /* Returns X hit position */
+   /* Getters */
    litfloat GetX() const { return fX; }
-
-   /* Returns Y hit position */
    litfloat GetY() const { return fY; }
-
-   /* Returns X hit position error */
    litfloat GetDx() const { return fDx; }
-
-   /* Returns Y hit position error */
    litfloat GetDy() const { return fDy; }
-
-   /* Returns XY hit covariance */
    litfloat GetDxy() const { return fDxy; }
 
-   /* Sets X hit position */
+   /* Setters */
    void SetX(litfloat x) { fX = x; }
-
-   /* Sets Y hit position */
    void SetY(litfloat y) { fY = y; }
-
-   /* Sets X hit position error */
    void SetDx(litfloat dx) { fDx = dx; }
-
-   /* Sets Y hit position error */
    void SetDy(litfloat dy) { fDy = dy; }
-
-   /* Sets XY hit covariance */
    void SetDxy(litfloat dxy) { fDxy = dxy; }
 
-   /* Returns std::string representation of the class */
+   /**
+    * \brief Return string representation of class.
+    * \return String representation of class.
+    */
    virtual std::string ToString() const {
       std::stringstream ss;
       ss << "PixelHit: pos=(" << GetX() << "," << GetY() << "," << GetZ()
          << ") err=(" << GetDx() << "," << GetDy() << "," << GetDz() << ") "
          << " dxy=" << GetDxy() << " planeId=" << GetPlaneId()
-         << " refId=" << GetRefId() << " w=" << GetW()
-         << " isOutlier=" << IsOutlier()
+         << " refId=" << GetRefId()
          << " hitType=" << GetType()
          << " detId=" << GetDetectorId() << std::endl;
       return ss.str();
    }
 
 private:
-   /* X and Y hit positions in [cm] */
-   litfloat fX, fY;
-   /* X and Y hit position errors in [cm] */
-   litfloat fDx, fDy;
-   /* XY covariance */
-   litfloat fDxy;
+   litfloat fX, fY; // X and Y hit positions in [cm].
+   litfloat fDx, fDy; // X and Y hit position errors in [cm].
+   litfloat fDxy; // XY covariance.
 };
 
 #endif /*CBMLITPIXELHIT_H_*/

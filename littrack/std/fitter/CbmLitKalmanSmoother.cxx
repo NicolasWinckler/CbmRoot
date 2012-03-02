@@ -1,8 +1,8 @@
-/** CbmLitKalmanSmoother.cxx
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2007
+/**
+ * \file CbmLitKalmanSmoother.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
  **/
-
 #include "fitter/CbmLitKalmanSmoother.h"
 
 #include "data/CbmLitTrack.h"
@@ -25,7 +25,7 @@ LitStatus CbmLitKalmanSmoother::Fit(
 {
    int n = track->GetNofHits();
 
-   std::vector<CbmLitFitNode> nodes = track->GetFitNodes();
+   FitNodeVector nodes = track->GetFitNodes();
    nodes[n-1].SetSmoothedParam(nodes[n-1].GetUpdatedParam());
 
    // start with the before the last detector plane

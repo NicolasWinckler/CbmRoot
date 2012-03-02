@@ -9,6 +9,7 @@
 #define CBMLITTRACKUPDATE_H_
 
 #include "base/CbmLitEnums.h"
+#include "base/CbmLitFloat.h"
 
 class CbmLitHit;
 class CbmLitTrackParam;

@@ -1,14 +1,15 @@
-/** CbmLitTrackFitterImp.cxx
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2007
+/**
+ * \file CbmLitTrackFitterImp.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
  **/
-
 #include "fitter/CbmLitTrackFitterImp.h"
 
 #include "data/CbmLitTrackParam.h"
 #include "data/CbmLitTrack.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitStripHit.h"
+#include "data/CbmLitFitNode.h"
 #include "interface/CbmLitTrackPropagator.h"
 #include "interface/CbmLitTrackUpdate.h"
 #include "utils/CbmLitMath.h"
@@ -50,7 +51,6 @@ LitStatus CbmLitTrackFitterImp::Fit(
       const CbmLitHit* hit = track->GetHit(i);
       litfloat Ze = hit->GetZ();
       if (fPropagator->Propagate(&par, Ze, track->GetPDG(), &F) == kLITERROR) {
-         //std::cout << "-E- CbmLitTrackFitterImp::Fit: propagation failed" << std::endl;
          track->SetQuality(kLITBAD);
          return kLITERROR;
       }
@@ -58,7 +58,6 @@ LitStatus CbmLitTrackFitterImp::Fit(
       nodes[i].SetF(F);
       litfloat chi2Hit = 0.;
       if (fUpdate->Update(&par, hit, chi2Hit) == kLITERROR) {
-         //std::cout << "-E- CbmLitTrackFitterImp::Fit: track update failed" << std::endl;
          track->SetQuality(kLITBAD);
          return kLITERROR;
       }

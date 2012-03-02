@@ -5,8 +5,7 @@
  */
 
 #include "selection/CbmLitTrackSelectionShortTracks.h"
-
-#include "utils/CbmLitComparators.h"
+#include "data/CbmLitTrack.h"
 
 #include <algorithm>
 

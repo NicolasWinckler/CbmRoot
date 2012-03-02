@@ -1,36 +1,48 @@
-/** CbmLitKalmanSmoother.h
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2007
- **
- ** Class implements Kalman smoother algorithm.
+/**
+ * \file CbmLitKalmanSmoother.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ * \brief Implementation of Kalman smoother algorithm.
  **/
 
 #ifndef CBMLITKALMANSMOOTHER_H_
 #define CBMLITKALMANSMOOTHER_H_
 
 #include "interface/CbmLitTrackFitter.h"
-
-#include <vector>
-
 class CbmLitFitNode;
 
+/**
+ * \class CbmLitKalmanSmoother
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ * \brief Implementation of Kalman smoother algorithm.
+ **/
 class CbmLitKalmanSmoother : public CbmLitTrackFitter
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitKalmanSmoother();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitKalmanSmoother();
 
-   /* Inherited from CbmLitTrackFitter */
+   /**
+    * \brief Inherited from CbmLitTrackFitter.
+    */
    virtual LitStatus Fit(
       CbmLitTrack* track,
       bool downstream = false);
+
 private:
-   /* Smoothes one fit node
-    *@param thisNode Current fit node to be smoothed
-    *@param prevNode Previous fit node */
+   /**
+    * \brief Smooth one fit node.
+    * \param[out] thisNode Current fit node to be smoothed.
+    * \param[in] prevNode Previous fit node.
+    */
    void Smooth(
       CbmLitFitNode* thisNode,
       const CbmLitFitNode* prevNode);

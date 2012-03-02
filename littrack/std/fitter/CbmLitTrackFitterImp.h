@@ -1,40 +1,49 @@
-/** CbmLitTrackFitterImp.h
- *@author A.Lebedev <alebedev@jinr.ru>
- *@since 2007
- **
- ** Class implements Kalman Filter track fit.
+/**
+ * \file CbmLitTrackFitterImp.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ * \brief Implementation of Kalman Filter track fit.
  **/
 
 #ifndef CBMLITTRACKFITTERIMP_H_
 #define CBMLITTRACKFITTERIMP_H_
 
-#include "base/CbmLitPtrTypes.h"
 #include "interface/CbmLitTrackFitter.h"
+#include "base/CbmLitPtrTypes.h"
 
-class CbmLitTrack;
-
+/**
+ * \class CbmLitTrackFitterImp
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ * \brief Implementation of Kalman Filter track fit.
+ **/
 class CbmLitTrackFitterImp : public CbmLitTrackFitter
 {
 public:
-   /* Constructor
-    *@param propagator Track propagation tool
-    *@param update Track update tool */
+   /**
+    * \brief Constructor.
+    * \param[in] propagator Track propagation tool.
+    * \param[in] update Track update tool.
+    */
    CbmLitTrackFitterImp(
       TrackPropagatorPtr propagator,
       TrackUpdatePtr update);
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackFitterImp();
 
-   /* Inherited from CbmLitTrackFitter */
+   /**
+    * \brief Inherited from CbmLitTrackFitter.
+    */
    virtual LitStatus Fit(
       CbmLitTrack* track,
       bool downstream = true);
+
 private:
-   /* Track propagation tool */
-   TrackPropagatorPtr fPropagator;
-   /* Track update tool */
-   TrackUpdatePtr fUpdate;
+   TrackPropagatorPtr fPropagator; // Track propagation tool
+   TrackUpdatePtr fUpdate; // Track update tool
 };
 
 #endif /*CBMLITTRACKFITTERIMP_H_*/

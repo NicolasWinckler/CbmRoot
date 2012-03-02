@@ -1,101 +1,135 @@
-/** CbmLitTrackParam.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- **
- ** Base data class for track parameters.
+/**
+ * \file CbmLitTrackParam.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Data class for track parameters.
  **/
 
 #ifndef CBMLITTRACKPARAM_H_
 #define CBMLITTRACKPARAM_H_
 
 #include "base/CbmLitFloat.h"
-
+#include "TVector3.h"
+#include <sstream>
+#include <cmath>
 #include <vector>
 #include <string>
 
+/**
+ * \class CbmLitTrackParam
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Data class for track parameters.
+ **/
 class CbmLitTrackParam
 {
 public:
-   /* Constructor */
-   CbmLitTrackParam();
+   /**
+    * \brief Constructor.
+    */
+   CbmLitTrackParam():
+      fX(0.),
+      fY(0.),
+      fZ(0.),
+      fTx(0.),
+      fTy(0.),
+      fQp(0.),
+      fCovMatrix(15, 0.) { }
 
-   /* Destructor */
-   virtual ~CbmLitTrackParam();
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmLitTrackParam() { }
 
-   /* Returns X position */
+   /* Getters */
    litfloat GetX() const { return fX; }
-
-   /* Returns Y position */
    litfloat GetY() const { return fY; }
-
-   /* Returns Z position */
    litfloat GetZ() const { return fZ; }
-
-   /* Returns Tx slope */
    litfloat GetTx() const { return fTx; }
-
-   /* Returns Ty slope */
    litfloat GetTy() const { return fTy; }
-
-   /* Returns Q/p */
    litfloat GetQp() const { return fQp; }
-
-   /* Returns direction cosines */
-   void GetDirCos(litfloat& nx, litfloat& ny, litfloat& nz) const;
-
-   /* Returns state vector as std::vector */
-   std::vector<litfloat> GetStateVector() const;
-
-   /* Returns covariance matrix as std::vector */
+   litfloat GetCovariance(int index) const { return fCovMatrix[index]; }
    const std::vector<litfloat>& GetCovMatrix() const { return fCovMatrix; }
 
-   /* Returns covariance specified by index */
-   litfloat GetCovariance(int index) const { return fCovMatrix[index]; }
-
-   /* Sets X position */
+   /* Setters */
    void SetX(litfloat x) { fX  = x; }
-
-   /* Sets Y position */
    void SetY(litfloat y) { fY  = y; }
-
-   /* Sets Z position */
    void SetZ(litfloat z) { fZ  = z; }
-
-   /* Sets Tx slope */
    void SetTx(litfloat tx) { fTx = tx; }
-
-   /* Sets Ty slope */
    void SetTy(litfloat ty) { fTy = ty; }
-
-   /* Sets Q/p */
    void SetQp(litfloat qp) { fQp = qp; }
-
-   /* Sets state vector */
-   void SetStateVector(const std::vector<litfloat>& x);
-
-   /* Sets covariance matrix */
-   void SetCovMatrix(const std::vector<litfloat>& C) {
-      fCovMatrix.assign(C.begin(), C.end());
-   }
-
-   /* Sets covariance at position index with value cov */
+   void SetCovMatrix(const std::vector<litfloat>& C) { fCovMatrix.assign(C.begin(), C.end()); }
    void SetCovariance(int index, litfloat cov) { fCovMatrix[index] = cov; }
 
-   /* Returns std::string representation of the class */
-   std::string ToString() const;
+   /**
+    * \brief Return direction cosines.
+    * \param[out] nx Output direction cosine for OX axis.
+    * \param[out] ny Output direction cosine for OY axis.
+    * \param[out] nz Output direction cosine for OZ axis.
+    */
+   void GetDirCos(litfloat& nx, litfloat& ny, litfloat& nz) const {
+      litfloat p  = (std::abs(fQp) != 0.) ? 1. / std::abs(fQp) : 1.e20;
+      litfloat pz = std::sqrt(p * p / (fTx * fTx + fTy * fTy + 1));
+      litfloat px = fTx * pz;
+      litfloat py = fTy * pz;
+      TVector3 unit = TVector3(px, py, pz).Unit();
+      nx = unit.X();
+      ny = unit.Y();
+      nz = unit.Z();
+   }
+
+   /**
+    * \brief Return state vector as std::vector.
+    * \return State vector as std::vector.
+    */
+   std::vector<litfloat> GetStateVector() const {
+      std::vector<litfloat> state(5, 0.);
+      state[0] = GetX();
+      state[1] = GetY();
+      state[2] = GetTx();
+      state[3] = GetTy();
+      state[4] = GetQp();
+      return state;
+   }
+
+   /**
+    * \brief Set parameters from std::vector.
+    * \param[in] x State vector.
+    */
+   void SetStateVector(const std::vector<litfloat>& x) {
+      SetX(x[0]);
+      SetY(x[1]);
+      SetTx(x[2]);
+      SetTy(x[3]);
+      SetQp(x[4]);
+   }
+
+   /**
+    * \brief Return string representation of class.
+    * \return String representation of class.
+    */
+   std::string ToString() const {
+      std::stringstream ss;
+      ss << "TrackParam: pos=(" << fX << "," << fY << "," << fZ
+         << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp;// << std::endl;
+   // ss << "cov: ";
+   // for (Int_t i = 0; i < 15; i++) ss << fCovMatrix[i] << " ";
+   // ss << std::endl;
+      ss.precision(3);
+      ss << " cov: x=" << fCovMatrix[0] <<  " y=" << fCovMatrix[5]
+         <<  " tx=" << fCovMatrix[9] <<  " ty=" << fCovMatrix[12]
+         <<  " q/p=" << fCovMatrix[14] << std::endl;
+      return ss.str();
+   }
 
 private:
-   /* X, Y, Z coordinates in [cm] */
-   litfloat fX, fY, fZ;
-   /* Slopes: tx=dx/dz, ty=dy/dz */
-   litfloat fTx, fTy;
-   /* Q/p: Q is a charge (+/-1), p is momentum in [GeV/c] */
-   litfloat fQp;
+   litfloat fX, fY, fZ; // X, Y, Z coordinates in [cm]
+   litfloat fTx, fTy; // Slopes: tx=dx/dz, ty=dy/dz
+   litfloat fQp; // Q/p: Q is a charge (+/-1), p is momentum in [GeV/c]
 
-   /* Covariance matrix
-    * Upper triangle symmetric matrix
-     * a[0,0..4], a[1,1..4], a[2,2..4], a[3,3..4], a[4,4] */
+   /* Covariance matrix.
+    * Upper triangle symmetric matrix.
+    * a[0,0..4], a[1,1..4], a[2,2..4], a[3,3..4], a[4,4] */
    std::vector<litfloat> fCovMatrix;
 };
 

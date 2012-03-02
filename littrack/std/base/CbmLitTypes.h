@@ -10,15 +10,23 @@
 
 #include "data/CbmLitFitNode.h"
 #include <vector>
+using std::vector;
+using std::pair;
 class CbmLitHit;
 class CbmLitTrack;
 
-typedef std::vector<CbmLitHit*> HitPtrVector;
-typedef std::vector<CbmLitHit*>::iterator HitPtrIterator;
-typedef std::pair<HitPtrIterator, HitPtrIterator> HitPtrIteratorPair;
-typedef std::vector<CbmLitTrack*>::iterator TrackPtrIterator;
-typedef std::vector<CbmLitTrack*> TrackPtrVector;
-typedef std::vector<CbmLitFitNode> FitNodeVector;
-typedef std::vector<CbmLitFitNode>::iterator FitNodeIterator;
+typedef vector<CbmLitHit*> HitPtrVector;
+typedef vector<CbmLitHit*>::iterator HitPtrIterator;
+typedef pair<HitPtrIterator, HitPtrIterator> HitPtrIteratorPair;
+
+//typedef vector<const CbmLitHit*> HitCnstPtrVector;
+//typedef vector<const CbmLitHit*>::iterator HitCnstPtrIterator;
+//typedef pair<HitCnstPtrIterator, HitCnstPtrIterator> HitCnstPtrIteratorPair;
+
+typedef vector<CbmLitTrack*>::iterator TrackPtrIterator;
+typedef vector<CbmLitTrack*> TrackPtrVector;
+
+typedef vector<CbmLitFitNode> FitNodeVector;
+typedef vector<CbmLitFitNode>::iterator FitNodeIterator;
 
 #endif /* CBMLITTYPES_H_ */

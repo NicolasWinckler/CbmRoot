@@ -5,8 +5,7 @@
  */
 
 #include "selection/CbmLitQualitySort.h"
-
-#include "utils/CbmLitComparators.h"
+#include "data/CbmLitTrack.h"
 
 #include <algorithm>
 

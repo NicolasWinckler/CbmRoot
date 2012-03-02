@@ -8,9 +8,7 @@
 #ifndef CBMLITTRACKFITTER_H_
 #define CBMLITTRACKFITTER_H_
 
-#include "base/CbmLitFloat.h"
 #include "base/CbmLitEnums.h"
-
 class CbmLitTrack;
 
 /**

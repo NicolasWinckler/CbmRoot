@@ -8,9 +8,9 @@
 #ifndef CBMLITFINDMVDTRACKS_H_
 #define CBMLITFINDMVDTRACKS_H_
 
-#include "base/CbmLitTypes.h"
 #include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitDetectorSetup.h"
+#include "data/CbmLitHit.h"
 #include "FairTask.h"
 
 /**

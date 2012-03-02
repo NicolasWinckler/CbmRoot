@@ -8,7 +8,7 @@ test_name=$1
 
 create_output_dir events_${test_name}/
 
-nevents=500
+nevents=5
 export LIT_DETECTOR_SETUP=$2
 
 if [ "${LIT_DETECTOR_SETUP}" = "electron" ] ; then

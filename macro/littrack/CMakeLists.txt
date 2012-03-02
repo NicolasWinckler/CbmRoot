@@ -1,5 +1,5 @@
 GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test_electron.sh)
-ADD_TEST(littrack_electron "${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_electron.sh par")
+ADD_TEST(littrack_electron "${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_electron.sh")
 SET_TESTS_PROPERTIES(littrack_electron PROPERTIES TIMEOUT "900")
 SET_TESTS_PROPERTIES(littrack_electron PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 

@@ -422,6 +422,39 @@ void CbmTrd::ConstructGeometry() {
 //    gGeoManager->Node("grid", 2*i+2, "trd1", 0         , 36*i - 180 + 350, 48, 123456, kTRUE, buf, 0);
 //  }
 
+// // add TRD support structure
+// 
+//   TGeoMaterial *matAl = new TGeoMaterial("Al", 26.98, 13, 2.7);
+//   TGeoMedium *Al      = new TGeoMedium("Al", 1, matAl);                                                                                                   // 
+// //  TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX(90.); // rotate  90 deg around x-axis                                  
+// //  TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY(90.); // rotate  90 deg around y-axis                                  
+// 
+//   TGeoVolume *vol1 = gGeoManager->MakeXtru("hbar1", Al, 2);
+//   vol1->SetLineColor(kRed);
+//   TGeoXtru *hbar1 = (TGeoXtru*)vol1->GetShape();
+// 
+//   TGeoVolume *vol2 = gGeoManager->MakeXtru("hbar2", Al, 2);
+//   vol2->SetLineColor(kOrange);
+//   TGeoXtru *hbar2 = (TGeoXtru*)vol2->GetShape();
+// 
+//   Double_t x[12] = { -10,-10, -1, -1,-10,-10, 10, 10,  1,  1, 10, 10 };
+//   Double_t y[12] = { -10, -8, -8,  8,  8, 10, 10,  8,  8, -8, -8,-10 };
+//   hbar1->DefinePolygon(12,x,y);
+//   hbar1->DefineSection( 0,-400, 0, 0, 1.0);
+//   hbar1->DefineSection( 1, 400, 0, 0, 1.0);
+// 
+//   hbar2->DefinePolygon(12,x,y);
+//   hbar2->DefineSection( 0,-290, 0, 0, 1.0);
+//   hbar2->DefineSection( 1, 290, 0, 0, 1.0);
+// 
+//   // matrices are not tested
+//   gGeoManager->Matrix(123456,  90,  0,  0,   0, 90, 270); // x rotation                                                                         
+//   gGeoManager->Matrix(123457, 180,  0, 90,  90, 90,   0); // y rotation                                                                         
+//   gGeoManager->Matrix(123458,  90, 90, 90, 180,  0,   0); // z rotation                                                                         
+// 
+//   Double_t *buf = 0;
+//   gGeoManager->Node("vol1", 1, "trd1", 0, 300, 500, 123457, kTRUE, buf, 0);
+
 }
 // -------------------------------------------------------------------------
 

@@ -18,6 +18,7 @@
 #define _CbmKFParticlesFinderQA_h_
 
 #include "CbmL1PFMCParticle.h"
+#include "CbmKFPartEfficiencies.h"
 #include "CbmKFTrErrMCPoints.h"
 #include "FairTask.h"
 #include <vector>
@@ -88,6 +89,10 @@ class CbmKFParticlesFinderQA :public FairTask
   std::vector<int> vStsPointMatch;
   std::vector<int> vMvdPointMatch;
   std::vector<int> vMCTrackMatch;
+
+// efficiencies
+  CbmKFPartEfficiencies fParteff;
+  int fNEvents;
 
   ClassDef(CbmKFParticlesFinderQA,1);
  private:

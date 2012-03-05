@@ -32,9 +32,6 @@
 #include "CbmMvdHitMatch.h"
 #include "CbmStsPoint.h"
 
-#include "CbmL1Counters.h"
-#include "CbmL1PartEfficiencies.h"
-
 #include "TClonesArray.h"
 #include "TFile.h"
 #include "TDirectory.h"
@@ -43,6 +40,7 @@
 #include "TAxis.h"
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <map>
 #include <cmath>
@@ -78,7 +76,9 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   vStsHitMatch(),
   vStsPointMatch(),
   vMvdPointMatch(),
-  vMCTrackMatch()
+  vMCTrackMatch(),
+  fParteff(),
+  fNEvents(0)
 {
 }
 
@@ -204,6 +204,10 @@ void CbmKFParticlesFinderQA::Finish()
   outfile->Delete();
   gFile = currentFile;
   gDirectory = curr;
+
+  std::fstream eff("Efficiency.txt",fstream::out);
+  eff << fParteff;
+  eff.close();
 }
 
 void CbmKFParticlesFinderQA::WriteHistos( TObject *obj ){
@@ -292,10 +296,10 @@ void CbmKFParticlesFinderQA::GetMCParticles()
     vMCParticles.push_back( part );
   }
     // find relations
-  const unsigned int nParticles = vMCParticles.size();
-  for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
+  const unsigned int nMCParticles = vMCParticles.size();
+  for ( unsigned int iP = 0; iP < nMCParticles; iP++ ) {
     CbmL1PFMCParticle &part = vMCParticles[iP];
-    for(unsigned int iP2 = 0; iP2 < nParticles; iP2++) {
+    for(unsigned int iP2 = 0; iP2 < nMCParticles; iP2++) {
       CbmL1PFMCParticle &part2 = vMCParticles[iP2];
 
       if(part.GetMotherId() == part2.GetMCTrackID()) {
@@ -307,9 +311,9 @@ void CbmKFParticlesFinderQA::GetMCParticles()
 
 void CbmKFParticlesFinderQA::FindReconstructableMCParticles()
 {
-  const unsigned int nParticles = vMCParticles.size();
+  const unsigned int nMCParticles = vMCParticles.size();
 
-  for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
+  for ( unsigned int iP = 0; iP < nMCParticles; iP++ ) {
     CbmL1PFMCParticle &part = vMCParticles[iP];
     CheckMCParticleIsReconstructable(part);
   }
@@ -318,9 +322,8 @@ void CbmKFParticlesFinderQA::FindReconstructableMCParticles()
 void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
 {
   if ( part.IsReconstructable() ) return;
-  const int nParticles = 5;
-  int partPDG[nParticles] = {310,3122,3312,-3312,3334};
-  vector<int> partDaughterPdg[nParticles];
+
+  vector<int> partDaughterPdg[fParteff.nParticles];
 
   partDaughterPdg[0].push_back( 211);
   partDaughterPdg[0].push_back(-211);
@@ -337,13 +340,16 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
   partDaughterPdg[4].push_back(3122);
   partDaughterPdg[4].push_back(-321);
 
+  partDaughterPdg[5].push_back(3122);
+  partDaughterPdg[5].push_back(3122);
 
     // tracks
-  if ( /*part.NDaughters() == 0*/ part.GetPDG() == -211 ||
-                                  part.GetPDG() ==  211 ||
-                                  part.GetPDG() == 2212 ||
-                                  part.GetPDG() ==  321 ||
-                                  part.GetPDG() == -321 ) { // TODO other particles
+  if ( /*part.NDaughters() == 0*/ part.GetPDG() ==  -211 ||
+                                  part.GetPDG() ==   211 ||
+                                  part.GetPDG() ==  2212 ||
+                                  part.GetPDG() == -2212 ||
+                                  part.GetPDG() ==   321 ||
+                                  part.GetPDG() ==  -321 ) { // TODO other particles
 
     switch ( fFindParticlesMode ) {
       case 1:
@@ -371,9 +377,9 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
     //  mother particles
   else
   {
-    for(int iPart=0; iPart<nParticles; iPart++)
+    for(int iPart=0; iPart<fParteff.nParticles; iPart++)
     {
-      if(part.GetPDG() == partPDG[iPart])
+      if(part.GetPDG() == fParteff.partPDG[iPart])
       {
         const unsigned int nDaughters = partDaughterPdg[iPart].size();
         if( part.GetDaughterIds().size() != nDaughters ) return;
@@ -484,15 +490,7 @@ void CbmKFParticlesFinderQA::MatchParticles()
 
 void CbmKFParticlesFinderQA::PartEffPerformance()
 {
-  static CbmL1PartEfficiencies PARTEFF; // average efficiencies
-
-  static int NEVENTS               = 0;
-
-  CbmL1PartEfficiencies partEff; // efficiencies for current event
-
-  const int nParticles = 6;
-  int partPDG[nParticles] = {310,3122,3312,-3312,3334,3000};
-  TString partName[nParticles] = {"ks","lambda","ksi-","ksi+","omega-","Hdb"};
+  CbmKFPartEfficiencies partEff; // efficiencies for current event
 
   const int NRP = fPF->GetParticles().size();
   for ( int iP = 0; iP < NRP; ++iP ) {
@@ -502,9 +500,9 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
     const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
     const bool isGhost = !RtoMCParticleId[iP].IsMatched();
 
-    for(int iPart=0; iPart<nParticles; iPart++)
-      if ( pdg == partPDG[iPart] )
-        partEff.IncReco(isGhost, isBG, partName[iPart].Data());
+    for(int iPart=0; iPart<fParteff.nParticles; iPart++)
+      if ( pdg == fParteff.partPDG[iPart] )
+        partEff.IncReco(isGhost, isBG, fParteff.partName[iPart].Data());
   }
 
     
@@ -517,63 +515,59 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
       
     const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
 
-    for(int iPart=0; iPart<nParticles; iPart++)
+    for(int iPart=0; iPart<fParteff.nParticles; iPart++)
     {
-      if ( pdg == partPDG[iPart] ) {
-        partEff.Inc(isReco, partName[iPart].Data());
+      if ( pdg == fParteff.partPDG[iPart] ) {
+        partEff.Inc(isReco, fParteff.partName[iPart].Data());
         if ( mId == -1 )
-          partEff.Inc(isReco, (partName[iPart]+"_prim").Data());
+          partEff.Inc(isReco, (fParteff.partName[iPart]+"_prim").Data());
         else
-          partEff.Inc(isReco, (partName[iPart]+"_sec").Data());
+          partEff.Inc(isReco, (fParteff.partName[iPart]+"_sec").Data());
       }
     }
   }
 
-  NEVENTS++;
+  fNEvents++;
 
-  PARTEFF += partEff;
+  fParteff += partEff;
 
   partEff.CalcEff();
-  PARTEFF.CalcEff();
+  fParteff.CalcEff();
 
     //   cout.precision(3);
   if( fVerbose ){
     cout << " ---- KF Particle finder --- " << endl;
-      // cout << "L1 STAT    : " << NEVENTS << " EVENT "               << endl << endl;
+      // cout << "L1 STAT    : " << fNEvents << " EVENT "               << endl << endl;
       // partEff.PrintEff();
       // cout << endl;
-    cout << "ACCUMULATED STAT    : " << NEVENTS << " EVENTS "               << endl << endl;
-    PARTEFF.PrintEff();
+    cout << "ACCUMULATED STAT    : " << fNEvents << " EVENTS "               << endl << endl;
+    fParteff.PrintEff();
 
     cout<<endl;
-      // cout<<"CA Track Finder: " << L1_CATIME/L1_NEVENTS << " s/ev" << endl << endl;
+      // cout<<"CA Track Finder: " << L1_CATIME/L1_fNEvents << " s/ev" << endl << endl;
   }
 }
 
 void CbmKFParticlesFinderQA::PartHistoPerformance()
 {
-  static const int NParticles = 6; //Ks, Lambda
-
   static const int nFitQA = 16;
-  static TH1F *hFitDaughtersQA[NParticles][nFitQA];
-  static TH1F *hFitQA[NParticles][nFitQA];
+  static TH1F *hFitDaughtersQA[fParteff.nParticles][nFitQA];
+  static TH1F *hFitQA[fParteff.nParticles][nFitQA];
 
   static const int nHistoPartParam = 11;
-  static TH1F *hPartParam[NParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
-  static TH1F *hPartParamBG[NParticles][nHistoPartParam];
-  static TH1F *hPartParamSignal[NParticles][nHistoPartParam];
+  static TH1F *hPartParam[fParteff.nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
+  static TH1F *hPartParamBG[fParteff.nParticles][nHistoPartParam];
+  static TH1F *hPartParamSignal[fParteff.nParticles][nHistoPartParam];
   static const int nHistoPartParamQA = 3;
-  static TH1F *hPartParamQA[NParticles][nHistoPartParamQA*2]; // residuals and pulls of these parameters
+  static TH1F *hPartParamQA[fParteff.nParticles][nHistoPartParamQA*2]; // residuals and pulls of these parameters
 
   static const int nHistoPartParam2D = 1;
-  static TH2F *hPartParam2D[NParticles][nHistoPartParam2D]; // y-pt,
-  static TH2F *hPartParam2DBG[NParticles][nHistoPartParam2D];
-  static TH2F *hPartParam2DSignal[NParticles][nHistoPartParam2D];
+  static TH2F *hPartParam2D[fParteff.nParticles][nHistoPartParam2D]; // y-pt,
+  static TH2F *hPartParam2DBG[fParteff.nParticles][nHistoPartParam2D];
+  static TH2F *hPartParam2DSignal[fParteff.nParticles][nHistoPartParam2D];
   
   static const int nHistosPV = 6;
   static TH1F *hPVFitQa[nHistosPV];
-
-  TString patName[NParticles] = {"K0s","Lambda","Ksi-","Ksi+","Omega-","Hdb"};
 
   static bool first_call = 1;
 
@@ -588,10 +582,10 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     gDirectory->mkdir("Particles");
     gDirectory->cd("Particles");
     {
-      for(int iPart=0; iPart<NParticles; ++iPart)
+      for(int iPart=0; iPart<fParteff.nParticles; ++iPart)
       {
-        gDirectory->mkdir(patName[iPart].Data());
-        gDirectory->cd(patName[iPart].Data());
+        gDirectory->mkdir(fParteff.partName[iPart].Data());
+        gDirectory->cd(fParteff.partName[iPart].Data());
         {
           TString res = "res";
           TString pull = "pull";

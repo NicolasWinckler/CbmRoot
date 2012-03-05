@@ -1,7 +1,9 @@
 #ifndef CbmL1Counters_H
 #define CbmL1Counters_H
 
+#include "TString.h"
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <vector>
 #include <map>
@@ -14,10 +16,6 @@ using std::map;
 template <typename T>
 struct TL1TracksCatCounters // counters for different tracks categories
 {
-  int NCounters;
-  
-  vector<T> counters;
-
   TL1TracksCatCounters():NCounters(0),counters(){ counters.clear(); };
   TL1TracksCatCounters(int nCounters):NCounters(nCounters),counters(){ counters.resize( NCounters, T(0)); };
 
@@ -26,7 +24,7 @@ struct TL1TracksCatCounters // counters for different tracks categories
   
   TL1TracksCatCounters& operator+=(TL1TracksCatCounters& a){
     if (NCounters != a.NCounters){
-      cout << " TL1TracksCatCounters: Error. Addition of counters of different sizes: " << NCounters << " " << a.NCounters << endl;
+      std::cout << " TL1TracksCatCounters: Error. Addition of counters of different sizes: " << NCounters << " " << a.NCounters << std::endl;
     }
     else{
       for (int iC = 0; iC < NCounters; iC++){
@@ -46,7 +44,7 @@ struct TL1TracksCatCounters // counters for different tracks categories
   TL1TracksCatCounters<double> operator/(TL1TracksCatCounters<T2>& a){
     TL1TracksCatCounters<double> b(NCounters);
     if (NCounters != a.NCounters){
-      cout << " TL1TracksCatCounters: Error. Addition of counters of different sizes: " << NCounters << " " << a.NCounters << endl;
+      std::cout << " TL1TracksCatCounters: Error. Addition of counters of different sizes: " << NCounters << " " << a.NCounters << std::endl;
     }
     else{
       for (int iC = 0; iC < NCounters; iC++){
@@ -65,8 +63,44 @@ struct TL1TracksCatCounters // counters for different tracks categories
     return b;
   };
 
-  private:
-    double Div(double a, double b){return (b > 0) ? a/b : -1.;};
+  friend std::fstream & operator<<(std::fstream &strm, const TL1TracksCatCounters<T> &a ){
+    strm << a.NCounters << " " << a.counters.size() << " ";
+    for(unsigned int iV=0; iV<a.counters.size(); iV++)
+      strm << a.counters[iV] << " ";
+    strm << std::endl;
+    return strm;
+  }
+
+  friend std::ostream & operator<<(std::ostream &strm, const TL1TracksCatCounters<T> &a ){
+    strm << a.NCounters << " " << a.counters.size() << " ";
+    for(unsigned int iV=0; iV<a.counters.size(); iV++)
+      strm << a.counters[iV] << " ";
+    strm << std::endl;
+    return strm;
+  }
+
+  friend std::fstream & operator>>(std::fstream &strm, TL1TracksCatCounters<T> &a ){
+    int tmp;
+    strm >> tmp;
+    a.NCounters = tmp;
+    strm >> tmp;
+    a.counters.resize(tmp,T(0));
+    for(int iV=0; iV<tmp; iV++)
+    {
+      T tmp1;
+      strm >> tmp1;
+      a.counters[iV] = tmp1;
+    }
+    return strm;
+  }
+
+ private:
+  double Div(double a, double b){return (b > 0) ? a/b : -1.;};
+
+ public:
+
+  int NCounters;
+  vector<T> counters;
 };
 
 struct TL1Efficiencies
@@ -142,20 +176,20 @@ inline void TL1Efficiencies::Inc(bool isReco, TString name)
 };
 
 inline void TL1Efficiencies::PrintEff(){
-  cout.setf(ios::fixed);
-  cout.setf(ios::showpoint);
-  cout.precision(3);
-  cout << "Track category         : " << " Eff "        <<" | "<< "All MC"  << endl;
+  std::cout.setf(ios::fixed);
+  std::cout.setf(ios::showpoint);
+  std::cout.precision(3);
+  std::cout << "Track category         : " << " Eff "        <<" | "<< "All MC"  << std::endl;
 
   int NCounters = mc.NCounters;
   for (int iC = 0; iC < NCounters; iC++){
-    cout << names[iC]  << "   : "
+    std::cout << names[iC]  << "   : "
         << ratio_reco.counters[iC]
-        << "  | " << mc.counters[iC]  << endl;
+        << "  | " << mc.counters[iC]  << std::endl;
   }
 
-  cout << "Clone     probability  : " << ratio_clones <<" | "<< clones << endl;
-  cout << "Ghost     probability  : " << ratio_ghosts <<" | "<< ghosts << endl;
+  std::cout << "Clone     probability  : " << ratio_clones <<" | "<< clones << std::endl;
+  std::cout << "Ghost     probability  : " << ratio_ghosts <<" | "<< ghosts << std::endl;
 };
 
 #endif

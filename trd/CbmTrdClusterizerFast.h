@@ -165,8 +165,8 @@ class CbmTrdClusterizerFast : public FairTask {
 
   CbmTrdDetectorId fTrdId; //!
  
-  std::map<Int_t, ClusterModule*> fModuleClusterMap;
-  std::map<Int_t, ClusterModule*>::iterator fModuleClusterMapIt;
+  std::map<Int_t, ClusterModule*> fModuleClusterMap; //!
+  std::map<Int_t, ClusterModule*>::iterator fModuleClusterMapIt; //!
 
   ClassDef(CbmTrdClusterizerFast,1)
 

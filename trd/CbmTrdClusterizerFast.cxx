@@ -132,10 +132,10 @@ CbmTrdClusterizerFast::~CbmTrdClusterizerFast()
   }
   fModuleClusterMap.clear();
 
-  fDigiCollection->Clear("C");
+  //fDigiCollection->Clear("C");
   fDigiCollection->Delete();
   delete fDigiCollection;
-  fDigiMatchCollection->Clear("C");
+  //fDigiMatchCollection->Clear("C");
   fDigiMatchCollection->Delete();
   delete fDigiMatchCollection;
   fTrdPoints->Clear("C");
@@ -909,8 +909,8 @@ void CbmTrdClusterizerFast::SplitPathSlices(Double_t* local_inLL, Double_t* loca
     }
     fModuleClusterMap.clear();
 
-    fDigiCollection->Clear();
-    fDigiMatchCollection->Clear();
+    fDigiCollection->Delete();
+    fDigiMatchCollection->Delete();
     fTrdPoints->Clear();
     fMCStacks->Clear();
     /*

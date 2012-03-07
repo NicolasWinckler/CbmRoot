@@ -32,6 +32,7 @@
 
 #include "../include/histogramCellSignatures.h"
 #include <math.h>
+#include <cstdlib>
 
 #ifdef __APPLE__
 #include <malloc/malloc.h>

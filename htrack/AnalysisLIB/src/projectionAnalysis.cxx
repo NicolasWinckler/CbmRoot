@@ -34,8 +34,11 @@
 #include "../../MiscLIB/include/globalWarningMsg.h"
 #include "../include/analysisError.h"
 #include "../include/projectionAnalysis.h"
+
 #include "TStyle.h"
 #include "TFile.h"
+
+#include <cstdlib>
 
 #ifdef __APPLE__
 #include <malloc/malloc.h>

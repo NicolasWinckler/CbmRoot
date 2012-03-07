@@ -15,6 +15,11 @@
 #include <vector>
 #include <string>
 
+using std::vector;
+using std::string;
+using std::stringstream;
+using std::endl;
+
 /**
  * \class CbmLitTrackParam
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
@@ -49,7 +54,7 @@ public:
    litfloat GetTy() const { return fTy; }
    litfloat GetQp() const { return fQp; }
    litfloat GetCovariance(int index) const { return fCovMatrix[index]; }
-   const std::vector<litfloat>& GetCovMatrix() const { return fCovMatrix; }
+   const vector<litfloat>& GetCovMatrix() const { return fCovMatrix; }
 
    /* Setters */
    void SetX(litfloat x) { fX  = x; }
@@ -58,7 +63,7 @@ public:
    void SetTx(litfloat tx) { fTx = tx; }
    void SetTy(litfloat ty) { fTy = ty; }
    void SetQp(litfloat qp) { fQp = qp; }
-   void SetCovMatrix(const std::vector<litfloat>& C) { fCovMatrix.assign(C.begin(), C.end()); }
+   void SetCovMatrix(const vector<litfloat>& C) { fCovMatrix.assign(C.begin(), C.end()); }
    void SetCovariance(int index, litfloat cov) { fCovMatrix[index] = cov; }
 
    /**
@@ -79,11 +84,11 @@ public:
    }
 
    /**
-    * \brief Return state vector as std::vector.
-    * \return State vector as std::vector.
+    * \brief Return state vector as vector.
+    * \return State vector as vector.
     */
-   std::vector<litfloat> GetStateVector() const {
-      std::vector<litfloat> state(5, 0.);
+   vector<litfloat> GetStateVector() const {
+      vector<litfloat> state(5, 0.);
       state[0] = GetX();
       state[1] = GetY();
       state[2] = GetTx();
@@ -93,10 +98,10 @@ public:
    }
 
    /**
-    * \brief Set parameters from std::vector.
+    * \brief Set parameters from vector.
     * \param[in] x State vector.
     */
-   void SetStateVector(const std::vector<litfloat>& x) {
+   void SetStateVector(const vector<litfloat>& x) {
       SetX(x[0]);
       SetY(x[1]);
       SetTx(x[2]);
@@ -108,17 +113,17 @@ public:
     * \brief Return string representation of class.
     * \return String representation of class.
     */
-   std::string ToString() const {
-      std::stringstream ss;
+   string ToString() const {
+      stringstream ss;
       ss << "TrackParam: pos=(" << fX << "," << fY << "," << fZ
          << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp;// << std::endl;
    // ss << "cov: ";
    // for (Int_t i = 0; i < 15; i++) ss << fCovMatrix[i] << " ";
-   // ss << std::endl;
+   // ss << endl;
       ss.precision(3);
       ss << " cov: x=" << fCovMatrix[0] <<  " y=" << fCovMatrix[5]
          <<  " tx=" << fCovMatrix[9] <<  " ty=" << fCovMatrix[12]
-         <<  " q/p=" << fCovMatrix[14] << std::endl;
+         <<  " q/p=" << fCovMatrix[14] << endl;
       return ss.str();
    }
 
@@ -130,7 +135,7 @@ private:
    /* Covariance matrix.
     * Upper triangle symmetric matrix.
     * a[0,0..4], a[1,1..4], a[2,2..4], a[3,3..4], a[4,4] */
-   std::vector<litfloat> fCovMatrix;
+   vector<litfloat> fCovMatrix;
 };
 
 #endif /*CBMLITTRACKPARAM_H_*/

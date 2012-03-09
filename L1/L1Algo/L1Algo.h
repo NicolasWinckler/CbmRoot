@@ -88,7 +88,7 @@ class L1Algo{
     /// ----- Input data ----- 
       // filled in CbmL1::ReadEvent();
 
-  enum{ MaxNStations = 10 };
+  enum{ MaxNStations = 15 };
   int NStations,    // number of all detector stations
       NMvdStations; // number of mvd stations
   L1Station vStations[MaxNStations] _fvecalignment; // station info

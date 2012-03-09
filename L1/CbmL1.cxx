@@ -55,8 +55,6 @@ static L1Algo algo_static _fvecalignment;
 
 CbmL1 *CbmL1::fInstance = 0;
 
-
-
 CbmL1::CbmL1():
     algo(0), // for access to L1 Algorithm from L1::Instance
     PF(0),

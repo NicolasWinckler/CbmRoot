@@ -219,11 +219,16 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
 
   int ista;
   L1Station *sta = CbmL1::Instance()->algo->vStations;
-  fvec u[nHits], x[nHits], v[nHits], y[nHits], z[nHits];
-  fvec w[nHits];
+  fvec* x = new fvec[nHits];
+  fvec* u = new fvec[nHits];
+  fvec* v = new fvec[nHits];
+  fvec* y = new fvec[nHits];
+  fvec* z = new fvec[nHits];
+  fvec* w = new fvec[nHits];
   fvec y_temp;
   fvec fz0, fz1, fz2, dz, z_start, z_end;
-  L1FieldValue fB[nHits], fB_temp _fvecalignment;
+  L1FieldValue* fB = new L1FieldValue[nHits];
+  L1FieldValue fB_temp _fvecalignment;
 
   unsigned short N_vTracks = Tracks.size();
 
@@ -451,6 +456,14 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
       t[iVec]->NDF = static_cast<int>(T.NDF[iVec]);
     }
   }
+
+  delete[] x;
+  delete[] u;
+  delete[] v;
+  delete[] y;
+  delete[] z;
+  delete[] w;
+  delete[] fB;
 }
 
 void CbmL1PFFitter::GetChiToVertex(vector<CbmL1Track> &Tracks, vector<float> &chiToVtx, CbmKFVertex &primVtx)
@@ -466,7 +479,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmL1Track> &Tracks, vector<float> &ch
   int nStations = CbmL1::Instance()->algo->NStations;
   int NMvdStations = CbmL1::Instance()->algo->NMvdStations;
   L1Station *sta = CbmL1::Instance()->algo->vStations;
-  fvec zSta[nStations];
+  fvec* zSta = new fvec[nStations];
   for(int iSta=0; iSta<nStations; iSta++)
     zSta[iSta] = sta[iSta].z;
 
@@ -535,6 +548,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmL1Track> &Tracks, vector<float> &ch
     for(int iVec=0; iVec<nTracks_SIMD; iVec++)
       chiToVtx.push_back(chi[iVec]);
   }
+  delete[] zSta;
 }
 
 void CbmL1PFFitter::CalculateFieldRegion(vector<CbmL1Track> &Tracks, vector<L1FieldRegion> &field)
@@ -627,11 +641,16 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
   int ista;
   L1Station *sta = CbmL1::Instance()->algo->vStations;
-  fvec u[nHits], x[nHits], v[nHits], y[nHits], z[nHits];
-  fvec w[nHits];
+  fvec* x = new fvec[nHits];
+  fvec* u = new fvec[nHits];
+  fvec* v = new fvec[nHits];
+  fvec* y = new fvec[nHits];
+  fvec* z = new fvec[nHits];
+  fvec* w = new fvec[nHits];
   fvec y_temp;
   fvec fz0, fz1, fz2, dz, z_start, z_end;
-  L1FieldValue fB[nHits], fB_temp _fvecalignment;
+  L1FieldValue* fB = new L1FieldValue[nHits];
+  L1FieldValue fB_temp _fvecalignment;
 
   unsigned short N_vTracks = Tracks.size();
 
@@ -867,6 +886,14 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
       t[iVec]->GetParamLast()->SetCovariance(4,4,T.C44[iVec]);
     }
   }
+
+  delete[] x;
+  delete[] u;
+  delete[] v;
+  delete[] y;
+  delete[] z;
+  delete[] w;
+  delete[] fB;
 }
 
 void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &chiToVtx, CbmKFVertex &primVtx)
@@ -882,7 +909,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &c
   int nStations = CbmL1::Instance()->algo->NStations;
   int NMvdStations = CbmL1::Instance()->algo->NMvdStations;
   L1Station *sta = CbmL1::Instance()->algo->vStations;
-  fvec zSta[nStations];
+  fvec* zSta = new fvec[nStations];
   for(int iSta=0; iSta<nStations; iSta++)
     zSta[iSta] = sta[iSta].z;
 
@@ -952,6 +979,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &c
     for(int iVec=0; iVec<nTracks_SIMD; iVec++)
       chiToVtx.push_back(chi[iVec]);
   }
+  delete[] zSta;
 }
 
 void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1FieldRegion> &field)

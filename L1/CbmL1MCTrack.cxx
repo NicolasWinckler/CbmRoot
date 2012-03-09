@@ -16,6 +16,7 @@
  
 #include "CbmL1.h"
 #include "CbmL1MCTrack.h"
+#include "CbmL1Constants.h"
 #include "L1Algo/L1Algo.h"
 
 CbmL1MCTrack::CbmL1MCTrack(double mass_, double q_, TVector3 vr, TLorentzVector vp, int _ID, int _mother_ID, int _pdg):
@@ -185,13 +186,13 @@ void CbmL1MCTrack::CalculateIsReconstructable()
   bool f = 1;
   
     // reject very slow tracks from analysis
-  f &= (p > L1->MinRecoMom);
+  f &= (p > CbmL1Constants::MinRecoMom);
     // detected at least in 4 stations
 //   f &= (nMCContStations >= 4);
 
-  if (L1->fPerformance == 3) f &= (nMCContStations  >= L1->MinNStations); // L1-MC
-  if (L1->fPerformance == 2) f &= (nStations        >= L1->MinNStations); // QA definition
-  if (L1->fPerformance == 1) f &= (nHitContStations >= L1->MinNStations); // L1 definition
+  if (L1->fPerformance == 3) f &= (nMCContStations  >= CbmL1Constants::MinNStations); // L1-MC
+  if (L1->fPerformance == 2) f &= (nStations        >= CbmL1Constants::MinNStations); // QA definition
+  if (L1->fPerformance == 1) f &= (nHitContStations >= CbmL1Constants::MinNStations); // L1 definition
 
     // maximul 4 layers for a station.
 //   f &= (maxNStaHits <= 4);

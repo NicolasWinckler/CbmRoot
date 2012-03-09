@@ -15,6 +15,7 @@
  */
 #include "CbmL1.h"
 
+#include "CbmL1Constants.h"
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1StsHit.h"
 #include "L1Algo/L1Extrapolation.h" // for vertex pulls
@@ -95,7 +96,7 @@ void CbmL1::TrackMatch(){
         max_percent = double(posIt->second)/double(hitsum);
       
         // set relation to the mcTrack
-      if ( double(posIt->second) > MinPurity * double(hitsum) ){ // found correspondent MCTrack
+      if ( double(posIt->second) > CbmL1Constants::MinPurity * double(hitsum) ){ // found correspondent MCTrack
         if (pMCTrackMap.find(posIt->first) == pMCTrackMap.end()) continue;
         CbmL1MCTrack* pmtra = pMCTrackMap[posIt->first];
 
@@ -280,7 +281,7 @@ void CbmL1::EfficienciesPerformance()
       ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, "d0");
     }
 
-    if ( mtra.p > MinRefMom ){                        // reference tracks
+    if ( mtra.p > CbmL1Constants::MinRefMom ){                        // reference tracks
       ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, "fast");
       
       if ( mtra.IsPrimary() ){                         // reference primary

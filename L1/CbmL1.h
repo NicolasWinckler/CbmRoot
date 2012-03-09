@@ -166,13 +166,6 @@ class CbmL1 : public FairTask
    static istream& eatwhite(istream& is); // skip spaces
    static void writedir2current( TObject *obj ); // help procedure
 
-   
-       /// Performance constants
-   static const double MinRecoMom = 0.1;   // Extra set of tracks = (MinRecoMom, MinRefMom)
-   static const double MinRefMom = 1.;     // Primary set of tracks = (MinRefMom, +inf)  //All reco tracks = (MinRecoMom, +inf)
-   static const double MinPurity = 0.7;    // min NStationInRecoTrack/NStationInMCTrack
-   static const double MinNStations = 4.;  // min number of stations in track to be reconstructable
-
    int NStation, NMvdStations, NStsStations; // number of detector stations (all\sts\mvd)
    Int_t fPerformance; // 0 - w\o perf. 1 - L1-Efficiency definition. 2 - QA-Eff.definition
    int fSTAPDataMode; // way to work with file for standalone package. 0 (off) , 1 (write), 2 (read data and work only with it), 3 (debug - write and read)

@@ -234,7 +234,7 @@ void CbmKFTrackFitQA::Exec(Option_t * option)
 {
   FillHitHistos();
 
-  CbmKFTrErrMCPoints MCTrackSortedArray[listMCTracks->GetEntriesFast()+1];
+  CbmKFTrErrMCPoints* MCTrackSortedArray = new CbmKFTrErrMCPoints[listMCTracks->GetEntriesFast()+1];
   if(CbmKF::Instance()->vMvdMaterial.size() != 0)
     for (Int_t iMvd=0; iMvd<listMvdPts->GetEntriesFast(); iMvd++)
     {
@@ -261,6 +261,7 @@ void CbmKFTrackFitQA::Exec(Option_t * option)
        FillHistoAtParticleVertex(MCTrack, &KFTrack);
      }
   }
+  delete[] MCTrackSortedArray;
 }
 void CbmKFTrackFitQA::Finish()
 {

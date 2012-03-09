@@ -17,7 +17,7 @@ Int_t CbmPVFinderKF::FindPrimaryVertex(TClonesArray* tracks, CbmVertex* vertex )
   Int_t NTracks = tracks->GetEntries();
 
   CbmKFPrimaryVertexFinder Finder;
-  CbmKFTrack CloneArray[NTracks];
+  CbmKFTrack* CloneArray = new CbmKFTrack[NTracks];
   for( Int_t i=0; i<NTracks; i++ ){    
     CbmStsTrack* st = (CbmStsTrack*) tracks->At(i);
     Int_t NHits = st->GetNStsHits();
@@ -32,5 +32,6 @@ Int_t CbmPVFinderKF::FindPrimaryVertex(TClonesArray* tracks, CbmVertex* vertex )
   CbmKFVertex v;
   Finder.Fit( v );
   v.GetVertex(*vertex);
+  delete[] CloneArray;
   return 0;
 }

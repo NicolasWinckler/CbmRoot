@@ -48,12 +48,13 @@ void CbmKFParticleInterface::Construct(CbmKFTrackInterface* vDaughters[][fvecLen
 {
   const int ND = NDaughters;
 
-  CbmKFParticle_simd vDaughters_part[ND];
+  CbmKFParticle_simd* vDaughters_part = new CbmKFParticle_simd[ND];
 
   for( int tr=0; tr<NDaughters; ++tr )
     vDaughters_part[tr].Create(vDaughters[tr]);
 
   Construct( vDaughters_part, NDaughters, Parent, Mass, CutChi2 );
+  delete[] vDaughters_part;
 }
 
 void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDaughters, CbmKFVertexInterface *Parent, float Mass, float CutChi2 )
@@ -65,7 +66,9 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
 
   if(!(KFPart->fIsVtxGuess))
   {
-    fvec Ty[NDaughters],Y[NDaughters],Z[NDaughters];
+    fvec* Ty = new fvec[NDaughters];
+    fvec* Y = new fvec[NDaughters];
+    fvec* Z = new fvec[NDaughters];
 
     for( int tr=0; tr<NDaughters; tr++ )
     {
@@ -95,6 +98,9 @@ void CbmKFParticleInterface::Construct( CbmKFParticle_simd* vDaughters, int NDau
  //   KFPart->fVtxErrGuess[0] = 0.01*KFPart->fVtxGuess[0];
  //   KFPart->fVtxErrGuess[1] = 0.01*KFPart->fVtxGuess[1];
  //   KFPart->fVtxErrGuess[2] = 0.01*KFPart->fVtxGuess[2];
+    delete[] Ty;
+    delete[] Y;
+    delete[] Z;
   }
 
   const Int_t MaxIter=3;
@@ -865,7 +871,7 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
 
 void CbmKFParticleInterface::multQSQt( int N, const fvec Q[], const fvec S[], fvec S_out[] )
 {
- fvec A[N*N];
+ fvec* A = new fvec[N*N];
 
  {for( Int_t i=0, n=0; i<N; i++ )
    {
@@ -887,6 +893,7 @@ void CbmKFParticleInterface::multQSQt( int N, const fvec Q[], const fvec S[], fv
       }
    }
  }
+ delete[] A;
 }
 
 void CbmKFParticleInterface::Extrapolate( fvec r0[], fvec dS )

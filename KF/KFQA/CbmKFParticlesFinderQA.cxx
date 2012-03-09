@@ -323,7 +323,8 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
 {
   if ( part.IsReconstructable() ) return;
 
-  vector<int> partDaughterPdg[fParteff.nParticles];
+ // vector<int> partDaughterPdg[fParteff.nParticles];
+  vector<vector<int> > partDaughterPdg(fParteff.nParticles);
 
   partDaughterPdg[0].push_back( 211);
   partDaughterPdg[0].push_back(-211);

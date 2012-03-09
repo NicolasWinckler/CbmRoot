@@ -155,7 +155,8 @@ void CbmLitEnvironment::TrdLayout()
    if (!layoutCreated) {
       std::set<Double_t> stationZPos;
       TObjArray* topNodes = gGeoManager->GetTopNode()->GetNodes();
-      for (Int_t iTopNode = 0; iTopNode < topNodes->GetEntriesFast(); iTopNode++) {
+      Int_t nofTopNodes = topNodes->GetEntriesFast();
+      for (Int_t iTopNode = 0; iTopNode < nofTopNodes; iTopNode++) {
          TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
          if (TString(topNode->GetName()).Contains("trd")) {
             CbmLitStationGroup stg;
@@ -170,9 +171,10 @@ void CbmLitEnvironment::TrdLayout()
                   TGeoNode* modulePart = static_cast<TGeoNode*>(moduleParts->At(iModulePart));
                   if (TString(modulePart->GetName()).Contains("gas")) {
                      const Double_t* pos = modulePart->GetMatrix()->GetTranslation();
-//                     TGeoPgon* shape = static_cast<TGeoPgon*>(modulePart->GetVolume()->GetShape());
-                     TGeoBBox* shape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
+                     TGeoPgon* shape = static_cast<TGeoPgon*>(modulePart->GetVolume()->GetShape());
+//                     TGeoBBox* shape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
                      Double_t zPos = stationPos[2] + modulePos[2] + pos[2] + shape->GetDZ();
+
                      if (stationZPos.find(zPos) == stationZPos.end()) {
                         stationZPos.insert(zPos);
                         CbmLitSubstation substation;
@@ -188,7 +190,7 @@ void CbmLitEnvironment::TrdLayout()
             fTrdLayout.AddStationGroup(stg);
          }
       }
-      // cout << fTrdLayout.ToString();
+      cout << fTrdLayout.ToString();
       layoutCreated = true;
    }
 }

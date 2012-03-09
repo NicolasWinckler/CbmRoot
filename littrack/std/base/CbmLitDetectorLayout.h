@@ -1,12 +1,8 @@
-/** CbmLitDetectorLayout.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- **
- ** Class represents the detector layout used in the track reconstruction.
- ** The tracking detector consists of station groups.
- ** Each station group consists of stations.
- ** Each station consists of substations.
+/**
+ * \file CbmLitDetectorLayout.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Detector layout used in track reconstruction.
  **/
 
 #ifndef CBMLITDETECTORLAYOUT_H_
@@ -17,107 +13,144 @@
 #include "base/CbmLitSubstation.h"
 #include "base/CbmLitEnums.h"
 
+#include "TObject.h"
+
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
 
+/**
+ * \class CbmLitDetectorLayout
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Detector layout used in track reconstruction.
+ *
+ * Detector layout consists of station groups.
+ * Each station group consists of stations.
+ * Each station consists of substations.
+ **/
 class CbmLitDetectorLayout
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitDetectorLayout();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitDetectorLayout();
 
-   /* Set the vector with station groups
-    *@param stationGroups Vector with station groups
+   /**
+    * \brief Set vector of station groups.
+    * \param[in] stationGroups Vector of station groups.
     */
    void SetStationGroups(
       const std::vector<CbmLitStationGroup>& stationGroups) {
       fStationGroups = stationGroups;
    }
 
-   /* Adds a station group to the list
-    *@param stationGroup Station group to be added
+   /**
+    * \brief Add station group to vector.
+    * \param[in] stationGroup Station group to be added.
     */
    void AddStationGroup(
       const CbmLitStationGroup& stationGroup) {
       fStationGroups.push_back(stationGroup);
    }
 
-   /* Returns number of station groups in the detector */
-   int GetNofStationGroups() const {
+   /**
+    * \brief Return number of station groups in detector.
+    * \return Number of station groups in detector.
+    */
+   Int_t GetNofStationGroups() const {
       return fStationGroups.size();
    }
 
-   /* Returns i-th station group
-    *@param i Index of the station group in the detector
+   /**
+    * \brief Return i-th station group.
+    * \param[in] i Index of station group in detector.
+    * \return Station group.
     */
-   const CbmLitStationGroup& GetStationGroup(int i) const {
+   const CbmLitStationGroup& GetStationGroup(Int_t i) const {
       return fStationGroups[i];
    }
 
-   /* Returns number of station in the concrete station group
-    *@param stationGroup Index of the station group
+   /**
+    * \brief Return number of station in concrete station group.
+    * \param[in] stationGroup Index of station group.
+    * \return Number of station groups in concrete station group.
     */
-   int GetNofStations(int stationGroup) const {
+   Int_t GetNofStations(Int_t stationGroup) const {
       return GetStationGroup(stationGroup).GetNofStations();
    }
 
-   /* Returns station
-    *@param stationGroup Index of the station group
-    *@param station Index of the station in the station group
+   /**
+    * \brief Return station.
+    * \param[in] stationGroup Index of station group.
+    * \param[in] station Index of station in station group.
+    * \return Station.
     */
-   const CbmLitStation& GetStation(int stationGroup, int station) const {
+   const CbmLitStation& GetStation(Int_t stationGroup, Int_t station) const {
       return GetStationGroup(stationGroup).GetStation(station);
    }
 
-   /* Returns number of substations in the station
-    *@param stationGroup Index of the station group
-    *@param station Index of the station in the station group
+   /**
+    * \brief Return number of substations in station.
+    * \param[in] stationGroup Index of station group.
+    * \param[in] station Index of station in station group.
+    * \return Number of substations in station.
     */
-   int GetNofSubstations(int stationGroup, int station) const {
+   Int_t GetNofSubstations(Int_t stationGroup, Int_t station) const {
       return GetStationGroup(stationGroup).GetStation(station).GetNofSubstations();
    }
 
-   /* Returns the substations in the station
-    *@param stationGroup Index of the station group
-    *@param station Index of the station in the station group
-    *@param substation Index of the substation in the station
+   /**
+    * \brief Return substations in station.
+    * \param[in] stationGroup Index of station group.
+    * \param[in] station Index of station in station group.
+    * \param[in] substation Index of substation in station.
+    * \return Substation in station.
     */
-   const CbmLitSubstation& GetSubstation(int stationGroup, int station, int substation) const {
+   const CbmLitSubstation& GetSubstation(Int_t stationGroup, Int_t station, Int_t substation) const {
       return GetStationGroup(stationGroup).GetStation(station).GetSubstation(substation);
    }
 
-   /* Returns total number of substations (detector planes) in the detector */
-   int GetNofPlanes() const {
-      int nofPlanes = 0;
-      for (int i = 0; i < GetNofStationGroups(); i++) {
+   /**
+    * \brief Return total number of substations (detector planes) in detector.
+    * \return Total number of substations (detector planes) in detector.
+    */
+   Int_t GetNofPlanes() const {
+      Int_t nofPlanes = 0;
+      for (Int_t i = 0; i < GetNofStationGroups(); i++) {
          nofPlanes += GetNofPlanes(i);
       }
       return nofPlanes;
    }
 
-   /* Returns total number of substations (detector planes) in the station group
-    *@param stationGroup Index of the station group
+   /**
+    * \brief Return total number of substations (detector planes) in station group.
+    * \param[in] stationGroup Index of station group.
+    * \return Total number of substations (detector planes) in station group.
     */
-   int GetNofPlanes(int stationGroup) const {
-      int counter = 0;
-      for (int i = 0; i < GetNofStations(stationGroup); i++) {
+   Int_t GetNofPlanes(Int_t stationGroup) const {
+      Int_t counter = 0;
+      for (Int_t i = 0; i < GetNofStations(stationGroup); i++) {
          counter += GetNofSubstations(stationGroup, i);
       }
       return counter;
    }
 
-   /*
-    * Returns std::string representation of the class.
+   /**
+    * \brief Return string representation of class.
+    * \return String representation of class.
     */
    std::string ToString() const;
 
 private:
-   // vector with station groups
-   std::vector<CbmLitStationGroup> fStationGroups;
+   std::vector<CbmLitStationGroup> fStationGroups; // Vector of station groups
 };
 
 #endif /*CBMLITDETECTORLAYOUT_H_*/

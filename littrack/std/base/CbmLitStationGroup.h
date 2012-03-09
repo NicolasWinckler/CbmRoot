@@ -18,10 +18,10 @@ class CbmLitStationGroup
 {
 public:
    /* Constructor */
-   CbmLitStationGroup():fStations() {};
+   CbmLitStationGroup():fStations() {}
 
    /* Destructor */
-   virtual ~CbmLitStationGroup() {};
+   virtual ~CbmLitStationGroup() {}
 
    /* Sets vector of stations. */
    void SetStations(const std::vector<CbmLitStation>& stations) {
@@ -34,10 +34,10 @@ public:
    }
 
    /* Returns i-th station. */
-   const CbmLitStation& GetStation(int i) const {return fStations[i];}
+   const CbmLitStation& GetStation(Int_t i) const { return fStations[i]; }
 
    /* Returns number of stations. */
-   int GetNofStations() const {return fStations.size();}
+   Int_t GetNofStations() const { return fStations.size(); }
 
    /* Returns std::string representation of the class. */
    virtual std::string ToString() const {

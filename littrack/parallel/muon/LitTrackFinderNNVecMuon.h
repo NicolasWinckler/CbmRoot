@@ -80,7 +80,7 @@ private:
      * TODO Add comments
      */
     void CollectHits(
-       LitTrackParamScal* par,
+       std::vector<LitTrackParamScal>& par,
        LitScalTrack* track,
        unsigned char stationGroup,
        unsigned char station,

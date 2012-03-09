@@ -148,7 +148,7 @@ void lit::parallel::LitTrackFinderNNVecMuon::PropagateThroughAbsorber(
    // Propagate remaining dTracks through the absorber
    if (dTracks > 0) {
       std::vector<LitScalTrack*> tracks(fvecLen);
-      LitScalTrack dummyTracks[fvecLen - dTracks];
+      std::vector<LitScalTrack> dummyTracks(fvecLen - dTracks);
       unsigned int start = fvecLen * nofTracksVec;
       for(unsigned int i = 0; i < dTracks; i++) { tracks[i] = fTracks[tracksId1[start + i]]; }
       // Check if the number of remaining tracks is less than fvecLen.
@@ -205,7 +205,7 @@ void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
    // Propagate remaining dTracks
    if (dTracks > 0) {
       std::vector<LitScalTrack*> tracks(fvecLen);
-      LitScalTrack dummyTracks[fvecLen - dTracks];
+      std::vector<LitScalTrack> dummyTracks(fvecLen - dTracks);
       unsigned int start = fvecLen * nofTracksVec;
       for(unsigned int i = 0; i < dTracks; i++) { tracks[i] = fTracks[tracksId1[start + i]]; }
       // Check if the number of remaining tracks is less than fvecLen.
@@ -226,10 +226,10 @@ void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
    unsigned char nofSubstations = sta.GetNofSubstations();
 
    // Pack track parameters
-   LitTrackParamScal par[nofSubstations][fvecLen];
+   std::vector< std::vector<LitTrackParamScal> > par(nofSubstations, std::vector<LitTrackParamScal>(fvecLen));
    for(unsigned int i = 0; i < fvecLen; i++) { par[0][i] = tracks[i]->GetParamLast(); }
-   LitTrackParam<fvec> lpar[nofSubstations];
-   PackTrackParam(par[0], lpar[0]);
+   std::vector<LitTrackParam<fvec> > lpar(nofSubstations);
+   PackTrackParam(&par[0][0], lpar[0]);
 
    //Approximate the field between the absorbers
    // TODO: Do not need to recalculate it for each station??
@@ -247,10 +247,10 @@ void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
    } // loop over substations
 
    for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-      UnpackTrackParam(lpar[iSubstation], par[iSubstation]);
+      UnpackTrackParam(lpar[iSubstation], &par[iSubstation][0]);
    }
    for(unsigned int i = 0; i < fvecLen; i++) {
-      LitTrackParamScal spar[nofSubstations];
+      std::vector<LitTrackParamScal> spar(nofSubstations);
       for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
          spar[iSubstation] = par[iSubstation][i];
       }
@@ -260,13 +260,13 @@ void lit::parallel::LitTrackFinderNNVecMuon::ProcessStation(
 }
 
 void lit::parallel::LitTrackFinderNNVecMuon::CollectHits(
-   LitTrackParamScal* par,
+   std::vector<LitTrackParamScal>& par,
    LitScalTrack* track,
    unsigned char stationGroup,
    unsigned char station,
    unsigned char nofSubstations)
 {
-   PixelHitConstIteratorPair hits[nofSubstations];
+   std::vector<PixelHitConstIteratorPair> hits(nofSubstations);
    unsigned int nofHits = 0;
 
    // TODO implement multithreading for this loop

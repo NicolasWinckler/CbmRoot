@@ -15,6 +15,7 @@
 
 #include "base/CbmLitTypes.h"
 #include "finder/CbmLitTrackFinderBase.h"
+#include <vector>
 
 class CbmLitTrackFinderNN : public CbmLitTrackFinderBase
 {
@@ -124,8 +125,8 @@ protected:
     */
    bool AddNearestHit1(
       CbmLitTrack* track,
-      HitPtrIteratorPair hits[],
-      const CbmLitTrackParam par[],
+      std::vector<HitPtrIteratorPair>& hits,
+      const std::vector<CbmLitTrackParam>& par,
       int nofSubstations);
 
    /* Adds the nearest hit to the track when fIsProcessSubstationsTogether == false.
@@ -135,8 +136,8 @@ protected:
     */
    bool AddNearestHit2(
       CbmLitTrack* track,
-      HitPtrIteratorPair hits[],
-      const CbmLitTrackParam par[],
+      std::vector<HitPtrIteratorPair>& hits,
+      const std::vector<CbmLitTrackParam>& par,
       int nofSubstations);
 private:
    TrackPtrVector fTracks; // local copy of tracks

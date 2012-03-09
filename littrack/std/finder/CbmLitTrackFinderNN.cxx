@@ -142,9 +142,9 @@ bool CbmLitTrackFinderNN::ProcessStation(
 {
    bool hitAdded = false;
    int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
-   CbmLitTrackParam par[nofSubstations];
+   std::vector<CbmLitTrackParam> par(nofSubstations);
    par[0] = *track->GetParamLast();
-   HitPtrIteratorPair hits[nofSubstations];
+   std::vector<HitPtrIteratorPair> hits(nofSubstations);
    for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
       litfloat z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
       fPropagator->Propagate(&par[iSubstation], z, fPDG);
@@ -163,8 +163,8 @@ bool CbmLitTrackFinderNN::ProcessStation(
 
 bool CbmLitTrackFinderNN::AddNearestHit1(
    CbmLitTrack* track,
-   HitPtrIteratorPair hits[],
-   const CbmLitTrackParam par[],
+   std::vector<HitPtrIteratorPair>& hits,
+   const std::vector<CbmLitTrackParam>& par,
    int nofSubstations)
 {
    //fIsProcessSubstationsTogether == true
@@ -200,8 +200,8 @@ bool CbmLitTrackFinderNN::AddNearestHit1(
 
 bool CbmLitTrackFinderNN::AddNearestHit2(
    CbmLitTrack* track,
-   HitPtrIteratorPair hits[],
-   const CbmLitTrackParam par[],
+   std::vector<HitPtrIteratorPair>& hits,
+   const std::vector<CbmLitTrackParam>& par,
    int nofSubstations)
 {
    //fIsProcessSubstationsTogether == false

@@ -5,8 +5,8 @@
  **/
 
 #include "base/CbmLitDetectorLayout.h"
-
-#include <sstream>
+#include "utils/CbmLitUtils.h"
+#include <iostream>
 
 CbmLitDetectorLayout::CbmLitDetectorLayout():
    fStationGroups()
@@ -19,21 +19,21 @@ CbmLitDetectorLayout::~CbmLitDetectorLayout()
 
 std::string CbmLitDetectorLayout::ToString() const
 {
-   std::stringstream ss;
-   ss.precision(7);
-   ss << "Detector Layout:" << std::endl
-      << "-number of station groups: " << GetNofStationGroups() << std::endl
-      << "-number of detector planes: " << GetNofPlanes() << std::endl
-      << "-station groups: " << std::endl;
-   for (int i = 0; i < GetNofStationGroups(); i++) {
-      ss << " " << GetStationGroup(i).ToString();
-      for (int j = 0; j < GetNofStations(i); j++) {
-         ss << "  " << GetStation(i, j).ToString();
-         for (int k = 0; k < GetNofSubstations(i, j); k++) {
-            ss << "   " << GetSubstation(i, j, k).ToString();
+   std::string str = std::string("Detector Layout:\n") +
+		   std::string("-number of station groups: ") + lit::ToString<Int_t>(GetNofStationGroups()) + std::string("\n") +
+		   std::string("-number of detector planes: ") + lit::ToString<Int_t>(GetNofPlanes()) + std::string("\n") + "-station groups: \n";
+   Int_t nofStationGroups = GetNofStationGroups();
+   for (Int_t iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) {
+      str += " " + GetStationGroup(iStationGroup).ToString();
+      Int_t nofStations = GetNofStations(iStationGroup);
+      for (Int_t iStation = 0; iStation < nofStations; iStation++) {
+         str += "  " + GetStation(iStationGroup, iStation).ToString();
+         Int_t nofSubstations = GetNofSubstations(iStationGroup, iStation);
+         for (Int_t iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
+            str += "   " + GetSubstation(iStationGroup, iStation, iSubstation).ToString();
          }
       }
    }
-   ss << std::endl;
-   return ss.str();
+   str += "\n";
+   return str;
 }

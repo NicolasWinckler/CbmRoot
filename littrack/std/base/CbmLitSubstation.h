@@ -1,38 +1,56 @@
-/** CbmLitSubstation.h
- *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
- *
- * Class represents detector substation.
+/**
+ * \file CbmLitSubstation.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Detector substation.
  **/
 
 #ifndef CBMLITSUBSTATION_H_
 #define CBMLITSUBSTATION_H_
 
 #include "base/CbmLitFloat.h"
+#include "utils/CbmLitUtils.h"
 
 #include <string>
-#include <sstream>
 
+/**
+ * \class CbmLitSubstation
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Detector substation.
+ **/
 class CbmLitSubstation
 {
 public:
-   /* Constructor */
-   CbmLitSubstation(): fZ(0.) {};
+   /**
+    * \brief Constructor.
+    */
+   CbmLitSubstation(): fZ(0.) {}
 
-   /* Destructor */
-   virtual ~CbmLitSubstation() {};
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmLitSubstation() {}
 
-   /* Sets z position of substation */
-   void SetZ(litfloat z) {fZ = z;}
+   /**
+    * \brief Set Z position of substation.
+    * \param[in] z Z position.
+    */
+   void SetZ(litfloat z) { fZ = z; }
 
-   /* Returns Z position of substation */
-   litfloat GetZ() const {return fZ;}
+   /**
+    * \brief Return Z position of substation.
+    * \return Z position of station.
+    */
+   litfloat GetZ() const { return fZ; }
 
-   /* Returns std::string representation of the class. */
+   /**
+    * \brief Return string representation of class.
+    * \return String representation of class.
+    */
    virtual std::string ToString() const {
-      std::stringstream ss;
-      ss << "Substation: z=" << GetZ() << std::endl;
-      return ss.str();
+      std::string str = std::string("Substation: z=") + lit::ToString<litfloat>(GetZ()) + "\n";
+      return str;
    }
 
 private:

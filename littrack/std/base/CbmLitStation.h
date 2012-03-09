@@ -1,8 +1,8 @@
-/** CbmLitStation.h
- *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
- *
- * Class represents detector station.
+/**
+ * \file CbmLitStation.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Detector station.
  **/
 
 #ifndef CBMLITSTATION_H_
@@ -11,44 +11,78 @@
 #include "base/CbmLitEnums.h"
 #include "base/CbmLitSubstation.h"
 
+#include "TObject.h"
+
 #include <string>
 #include <vector>
 #include <sstream>
 
+/**
+ * \class CbmLitStation
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Detector station.
+ **/
 class CbmLitStation
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitStation():
       fType(kLITPIXELHIT),
-      fSubstations() {};
+      fSubstations() {}
 
-   /* Destructor */
-   virtual ~CbmLitStation() {};
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmLitStation() {}
 
-   /* Sets type of the station. */
-   void SetType(LitHitType type) {fType = type;}
+   /**
+    * \brief Set station type.
+    * \param[in] type Station type.
+    */
+   void SetType(LitHitType type) { fType = type; }
 
-   /* Sets vector of substations. */
+   /**
+    * \brief Set vector of substations.
+    * \param[in] substations Vector of substations.
+    */
    void SetSubstations(const std::vector<CbmLitSubstation>& substations) {
       fSubstations = substations;
    }
 
-   /* Adds substation to the station. */
+   /**
+    * \brief Add substation to tation.
+    * \param[in] substation Substation to be added.
+    */
    void AddSubstation(const CbmLitSubstation& substation) {
       fSubstations.push_back(substation);
    }
 
-   /* Returns station type. */
-   LitHitType GetType() const {return fType;}
+   /**
+    * \brief Return station type.
+    * \return Station type.
+    */
+   LitHitType GetType() const { return fType; }
 
-   /* Returns i-th substation. */
-   const CbmLitSubstation& GetSubstation(int i) const {return fSubstations[i];}
+   /**
+    * \brief Return i-th substation.
+    * \param[in] i Substation index.
+    * \return Substation.
+    */
+   const CbmLitSubstation& GetSubstation(Int_t i) const { return fSubstations[i]; }
 
-   /* Returns number of substations. */
-   int GetNofSubstations() const {return fSubstations.size();}
+   /**
+    * \brief Return number of substations.
+    * \return Number of substations.
+    */
+   Int_t GetNofSubstations() const { return fSubstations.size(); }
 
-   /* Returns std::string representation of the class. */
+   /**
+    * \brief Return string representation of class.
+    * \return String representation of class.
+    */
    virtual std::string ToString() const {
       std::stringstream ss;
       ss << "Station: type=" << GetType()

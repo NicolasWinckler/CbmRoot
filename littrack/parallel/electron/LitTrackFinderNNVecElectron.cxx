@@ -115,7 +115,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::FollowTracks()
    // Propagate remaining dTracks to the first station
    if (dTracks > 0) {
       LitScalTrack* tracks[fvecLen];
-      LitScalTrack dummyTracks[fvecLen - dTracks];
+      std::vector<LitScalTrack> dummyTracks(fvecLen - dTracks);
       unsigned int start = fvecLen * nofTracksVec;
       for(unsigned int i = 0; i < dTracks; i++) { tracks[i] = fTracks[tracksId1[start + i]]; }
       // Check if the number of remaining tracks is less than fvecLen.
@@ -156,7 +156,7 @@ void lit::parallel::LitTrackFinderNNVecElectron::FollowTracks()
          if (dTracks > 0) {
 //          std::cout << "Process remaining dTracks=" << dTracks << " " << (int) iStation << ":" << (int) iStationGroup << std::endl;
             LitScalTrack* tracks[fvecLen];
-            LitScalTrack dummyTracks[fvecLen - dTracks];
+            std::vector<LitScalTrack> dummyTracks(fvecLen - dTracks);
             unsigned int start = fvecLen * nofTracksVec;
             for(unsigned int i = 0; i < dTracks; i++) { tracks[i] = fTracks[tracksId1[start + i]]; }
             // Check if the number of remaining tracks is less than fvecLen.

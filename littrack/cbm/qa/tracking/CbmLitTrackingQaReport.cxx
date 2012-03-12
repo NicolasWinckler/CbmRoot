@@ -150,7 +150,7 @@ void CbmLitTrackingQaReport::Create(
    out << fR->Image("TRD(MUCH) efficiency", "tracking_qa_rec_efficiency");
    out << fR->Image("TOF matching efficiency", "tracking_qa_tof_efficiency");
    // TODO: Check for RICH detector
-   out << fR->Image("RICH efficiency electrons", "tracking_qa_rich_efficiency_electrons");
+   out << fR->Image("RICH efficiency electrons", "tracking_qa_rich_efficiency_electrons_mom");
    out << fR->Image("STS+RICH efficiency electrons", "tracking_qa_sts_rich_efficiency_electrons");
    out << fR->Image("STS+RICH+TRD efficiency electrons", "tracking_qa_sts_rich_trd_efficiency_electrons");
    out << fR->Image("STS+RICH+TRD+TOF efficiency electrons", "tracking_qa_sts_rich_trd_tof_efficiency_electrons");

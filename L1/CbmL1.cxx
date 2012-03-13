@@ -712,15 +712,10 @@ void CbmL1::WriteSTAPAlgoData()  // must be called after ReadEvent
       // write vStsHits
     n = algo->vStsHits.size();
     fadata << n << endl;
-    unsigned short int element2;
-    char element3;
     for (int i = 0; i < n; i++){
-      element2 = algo->vStsHits[i].f;
-      fadata  << static_cast<int>(element2) << " ";
-      element2 = algo->vStsHits[i].b;
-      fadata  << static_cast<int>(element2) << " ";
-      element3 = algo->vStsHits[i].iz;
-      fadata  << static_cast<int>(element3) << endl;
+      fadata  << static_cast<int>(algo->vStsHits[i].f) << " ";
+      fadata  << static_cast<int>(algo->vStsHits[i].b) << " ";
+      fadata  << static_cast<int>(algo->vStsHits[i].iz) << endl;
     };
     if (fVerbose >= 4) cout << "vStsHits[" << n << "]" << " have been written." << endl;
       // write StsHitsStartIndex and StsHitsStopIndex

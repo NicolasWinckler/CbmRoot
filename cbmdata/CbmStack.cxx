@@ -307,6 +307,7 @@ void CbmStack::UpdateTrackIndex(TRefArray* detList) {
 		"Particle index not found in map");
 	}
 	point->SetTrackID((*fIndexIter).second);
+	point->SetLink(FairLink("MCTrack", (*fIndexIter).second));
       }
 
     }   // Collections of this detector

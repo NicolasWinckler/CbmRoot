@@ -1,7 +1,9 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 700){
+void run_reco(Int_t nEvents = 1000)
+{
+   TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -244,6 +246,18 @@ void run_reco(Int_t nEvents = 700){
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir("recqa/");
    run->AddTask(trackingQa);
+
+//   CbmLitFitQa* fitQa = new CbmLitFitQa();
+//   fitQa->SetMvdMinNofHits(0);
+//   fitQa->SetStsMinNofHits(4);
+//   fitQa->SetMuchMinNofHits(10);
+//   fitQa->SetTrdMinNofHits(8);
+//   //fitQa->SetOutputDir(std::string(resultDir));
+//   run->AddTask(fitQa);
+
+   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+   clusteringQa->SetOutputDir("recqa/");
+   run->AddTask(clusteringQa);
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===

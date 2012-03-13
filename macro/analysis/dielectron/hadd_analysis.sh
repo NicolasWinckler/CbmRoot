@@ -1,8 +1,8 @@
 #!/bin/sh
 
-DIR=/lustre/cbm/user/ebelolap/aug11/25gev/100field/mvd/omega
+DIR=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/100field/nomvd/phi
 
-OUTPUTFILE=$DIR/analysis.delta.all.root
-INPUTFILES=$DIR/analysis.delta.0*.root
+OUTPUTFILE=$DIR/analysis.all.root
+INPUTFILES=$DIR/analysis.0*.root
 
-hadd -T -f $OUTPUTFILE $INPUTFILES
+hadd  -T -f $OUTPUTFILE $INPUTFILES

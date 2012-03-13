@@ -14,10 +14,10 @@ void run_sim_delta(Int_t nEvents = 20000)
 
 	// Magnetic field
 	Double_t fieldZ = 50.; // field centre z position
-	Double_t fieldScale = 1.0; // field scaling factor
+	Double_t fieldScale = 0.7; // field scaling factor
 
-	parFile = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/deltasource/param.delta.root";
-	outFile = "/lustre/cbm/user/ebelolap/aug11/25gev/100field/deltasource/mc.delta.root";
+	parFile = "/lustre/cbm/user/ebelolap/aug11/mar12/25gev/70field/deltasource/param.delta.root";
+	outFile = "/lustre/cbm/user/ebelolap/aug11/mar12/25gev/70field/deltasource/mc.delta.root";
 
    caveGeom = "cave.geo";
    targetGeom = "target_au_025mu.geo";
@@ -73,14 +73,14 @@ void run_sim_delta(Int_t nEvents = 20000)
 		mvd->SetGeometryFileName(mvdGeom);
 		fRun->AddModule(mvd);
 	}
-
+	CbmFieldMap* magField = NULL;
    // -----   Create magnetic field   ----------------------------------------
    if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
-      CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+      magField = new CbmFieldMapSym2(fieldMap);
    else if (fieldMap == "field_muon_standard" )
-      CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+      magField = new CbmFieldMapSym2(fieldMap);
    else if (fieldMap == "FieldMuonMagnet" )
-      CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
+      magField = new CbmFieldMapSym3(fieldMap);
    else {
       cout << "===> ERROR: Unknown field map " << fieldMap << endl;
       exit;

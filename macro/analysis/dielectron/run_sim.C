@@ -1,5 +1,6 @@
-void run_sim(Int_t nEvents = 700)
+void run_sim(Int_t nEvents = 1000)
 {
+   TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -155,19 +156,20 @@ void run_sim(Int_t nEvents = 700)
 	// }
 
 	// -----   Create magnetic field   ----------------------------------------
-	if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
-		CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-	else if (fieldMap == "field_muon_standard" )
-		CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-	else if (fieldMap == "FieldMuonMagnet" )
-		CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
-	else {
-		cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-		exit;
-	}
-	magField->SetPosition(0., 0., fieldZ);
-	magField->SetScale(fieldScale);
-	fRun->SetField(magField);
+   CbmFieldMap* magField = NULL;
+   if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
+      magField = new CbmFieldMapSym2(fieldMap);
+   else if (fieldMap == "field_muon_standard" )
+      magField = new CbmFieldMapSym2(fieldMap);
+   else if (fieldMap == "FieldMuonMagnet" )
+      magField = new CbmFieldMapSym3(fieldMap);
+   else {
+      cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+      exit;
+   }
+   magField->SetPosition(0., 0., fieldZ);
+   magField->SetScale(fieldScale);
+   fRun->SetField(magField);
 
 	// -----   Create PrimaryGenerator   --------------------------------------
 	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();

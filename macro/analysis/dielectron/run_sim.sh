@@ -36,8 +36,7 @@ export ENERGY=25gev
 	export TARGETGEOM=target_au_025mu.geo
 	export PIPEGEOM=pipe_standard.geo
 	export SHIELDGEOM=
-	export MVDGEOM=
-	#mvd/mvd_v08a.geo
+	export MVDGEOM=mvd/mvd_v08a.geo
 	export STSGEOM=sts/sts_v11a.geo
 	export MUCHGEOM=
 	export RICHGEOM=rich/rich_v08a.geo
@@ -46,19 +45,18 @@ export ENERGY=25gev
 	export ECALGEOM=
 	export FIELDMAP=field_v10e
 	export MAGNETGEOM=passive/magnet_v09e.geo
-	export FIELDMAPSCALE=1.0
+	export FIELDMAPSCALE=0.7
 
-export FIELDDIR=100field
-export MVDDIR=nomvd
+export FIELDDIR=70field
+export MVDDIR=mvd
 	
 	
 #If "yes" DELTA electrons will be embedded
-export DELTA=no
-export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/25gev/$MVDDIR/deltasource/mc.delta.root	
-
+export DELTA=yes
+export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/$FIELDDIR/deltasource/mc.delta.root
 
 #number of events for each thread
-export NEVENTS=600
+export NEVENTS=1000
 
 C=0
 
@@ -70,19 +68,19 @@ for Z in 1 2 3 4; do
     fi
 	if [ $Z = "1" ] ; then 
 		export PLUTOPARTICLE=rho0 
-		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/rho0
+		export DIR=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/$FIELDDIR/$MVDDIR/rho0
 	fi	
 	if [ $Z = "2" ] ; then 
 		export PLUTOPARTICLE=omegaepem
-		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/omega
+		export DIR=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/$FIELDDIR/$MVDDIR/omega
 	fi	
 	if [ $Z = "3" ] ; then 
 		export PLUTOPARTICLE=omegadalitz
-		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/omegadalitz
+		export DIR=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/$FIELDDIR/$MVDDIR/omegadalitz
 	fi	
 	if [ $Z = "4" ] ; then 
 		export PLUTOPARTICLE=phi
-		export DIR=/lustre/cbm/user/ebelolap/aug11/25gev/$FIELDDIR/$MVDDIR/phi
+		export DIR=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/$FIELDDIR/$MVDDIR/phi
 	fi
     if [ $Z = "5" ] ; then 
 		export PLUTOPARTICLE=pi0 
@@ -90,21 +88,21 @@ for Z in 1 2 3 4; do
 	fi	
 
   # for K in 0; do
-  # for Y in 0 ; do
-   # for X in 1 ; do
+   #for Y in 0 ; do
+    #for X in 1 ; do
 
-  for K in 0; do
-	for Y in 0 1 2 3 4 5 6 7 8 9 ; do
-     for X in 0 1 2 3 4 5 6 7 8 9 ; do
+  for K in 0 1; do
+	for Y in 0 1 2 3 4 5 6 7 8 9; do
+    for X in 0 1 2 3 4 5 6 7 8 9 ; do
 
 	  export XXXX=0$K$Y$X
 	  #echo batch $XXXX submitted
 	  export INFILE=/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
 	  export MCFILE=$DIR/mc.$XXXX.root
 	  export PARFILE=$DIR/param.$XXXX.root
-      export RECOFILE=$DIR/reco.$XXXX.root
+      export RECOFILE=$DIR/reco.delta.$XXXX.root
       export RECOQAFILE=$DIR/reco.litqa.$XXXX.root
-	  export DILEPANALYSISFILE=$DIR/analysis.$XXXX.root
+	  export DILEPANALYSISFILE=$DIR/analysis.delta.$XXXX.root
 
 	  if [ $Z = "1" ] ; then 
 		export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/rho0/epem/pluto.auau.25gev.rho0.epem.$XXXX.root
@@ -121,7 +119,7 @@ for Z in 1 2 3 4; do
  	  if [ $Z = "5" ] ; then 
 		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/pi0/gammaepem/pluto.auau.25gev.pi0.gammaepem.10k.$XXXX.root
 	  fi	  
-       	# . ./sim.sh
+      # 	. ./sim.sh
 	 	# xterm -hold -e ". ./sim.sh $number"&
      	 bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
      	

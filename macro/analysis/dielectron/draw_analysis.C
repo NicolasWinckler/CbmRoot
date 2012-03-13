@@ -17,7 +17,7 @@ void draw_analysis(){
     Bool_t useMvd = true;
     Bool_t drawSignificance = true;
 
-    std::string fileName = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/analysis.delta.all.root";
+    std::string fileName = "/lustre/cbm/user/ebelolap/aug11/mar12/25gev/70field/nomvd/rho0/analysis.all.root";
 
     CbmAnaDielectronTaskDraw *draw = new CbmAnaDielectronTaskDraw();
     draw->DrawHistosFromFile(fileName, useMvd);//, drawSignificance);

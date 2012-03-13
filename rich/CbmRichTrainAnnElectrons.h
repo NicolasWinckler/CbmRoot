@@ -103,20 +103,20 @@ private:
    Int_t fNofElLikePi;
    Double_t fAnnCut;
    // ANN outputs
-   // [0] = is true; [1] = is fake
+   // [0] = electrons; [1] = pions
    vector<TH1D*> fhAnnOutput;
    vector<TH1D*> fhCumProb;
 
    // Data for ANN input
-   // [0] = true, [1] = fake
+   // [0] = electrons, [1] = pions
    vector<vector<RingElectronParam> > fRElIdParams;
 
    // difference between electrons and pions
    // [0] = is electron; [1] = is pion
    vector<TH1D*> fhAaxis; //major half axis
    vector<TH1D*> fhBaxis; //minor half axis
-   vector<TH1D*> fhAaxisCor; // major half axis after correction
-   vector<TH1D*> fhBaxisCor; //minor half axis after correction
+  // vector<TH1D*> fhAaxisCor; // major half axis after correction
+  // vector<TH1D*> fhBaxisCor; //minor half axis after correction
    vector<TH1D*> fhDist; // distance between ring center and track projection
    vector<TH1D*> fhNofHits; // number of hits in ring
    vector<TH1D*> fhChi2; // chi2 of the fit

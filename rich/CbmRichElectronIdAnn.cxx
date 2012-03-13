@@ -32,20 +32,21 @@ CbmRichElectronIdAnn::~CbmRichElectronIdAnn()
 void CbmRichElectronIdAnn::Init()
 {
    TTree *simu = new TTree ("MonteCarlo","MontecarloData");
-   Float_t x1,x2,x3,x4,x5,x6,x7,x8, x9, x10;
+   Double_t x[9];
+   Double_t xOut;
 
-   simu->Branch("x1", &x1,"x1/F");
-   simu->Branch("x2", &x2,"x2/F");
-   simu->Branch("x3", &x3,"x3/F");
-   simu->Branch("x4", &x4,"x4/F");
-   simu->Branch("x5", &x5,"x5/F");
-   simu->Branch("x6", &x6,"x6/F");
-   simu->Branch("x7", &x7,"x7/F");
-   simu->Branch("x8", &x8,"x8/F");
-   simu->Branch("x9", &x9,"x9/F");
-   simu->Branch("x10", &x10,"x10/F");
+   simu->Branch("x0", &x[0],"x0/D");
+   simu->Branch("x1", &x[1],"x1/D");
+   simu->Branch("x2", &x[2],"x2/D");
+   simu->Branch("x3", &x[3],"x3/D");
+   simu->Branch("x4", &x[4],"x4/D");
+   simu->Branch("x5", &x[5],"x5/D");
+   simu->Branch("x6", &x[6],"x6/D");
+   simu->Branch("x7", &x[7],"x7/D");
+   simu->Branch("x8", &x[8],"x8/D");
+   simu->Branch("xOut", &xOut,"xOut/D");
 
-   fNN = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9:20:x10",simu);
+   fNN = new TMultiLayerPerceptron("x0,x1,x2,x3,x4,x5,x6,x7,x8:9:xOut",simu);
    cout << "-I- CbmRichElIdAnn: get NeuralNet weight parameters from: " << fNeuralNetWeights << endl;
    fNN->LoadWeights(fNeuralNetWeights.c_str());
 }
@@ -78,7 +79,7 @@ double CbmRichElectronIdAnn::DoSelect(
     double nnEval = fNN->Evaluate(0,nnPar);
 
     if (TMath::IsNaN(nnEval) == 1) {
-        cout << " -W- RingSelectNN: nnEval nan " << endl;
+        cout << " -W- CbmRichElectronIdAnn: nnEval nan " << endl;
         nnEval = -1.;
     }
 

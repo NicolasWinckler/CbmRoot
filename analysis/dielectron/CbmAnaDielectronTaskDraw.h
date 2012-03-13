@@ -20,7 +20,7 @@ class TCanvas;
 
 using namespace std;
 
-class CbmAnaDielectronTaskDraw {
+class CbmAnaDielectronTaskDraw: public TObject {
 
 public:
 
@@ -50,44 +50,44 @@ private:
     map<string, TH1*> fHistoMap; // map which connects histogram's name and pointer to the histogram
 
     /**
-     * Read all histograms from file to map fHistoMap.
+     * \brief Read all histograms from file to map fHistoMap.
      */
     void ReadAllHistosToMap(
           TFile* file);
 
     /**
-     * Scale all histograms on the value 1./nofEvents.
+     * \brief Scale all histograms on the value 1./nofEvents.
      */
     void ScaleAllHistos(
           Int_t nofEvents);
 
     /**
-     * Rebin minv histograms for better drawing. Should be called after
+     * \brief Rebin minv histograms for better drawing. Should be called after
      * calculation of S/BG ratios.
      */
     void RebinMinvHistos();
 
     /**
-     * Return TH1D* pointer to the specified histogram.
+     * \brief Return TH1D* pointer to the specified histogram.
      * \param name Histogram name.
      */
     TH1D* H1(
           const string& name);
 
     /**
-     * Return TH2D* pointer to the specified histogram.
-     * \param name Histogram name
+     * \brief Return TH2D* pointer to the specified histogram.
+     * \param[in] name Histogram name
      */
     TH2D* H2(
           const string& name);
 
     /**
-     * Draw an integrated efficiency on a histogram (100.*h1->GetEntries()/h2->GetEntries()).
+     * \brief Draw an integrated efficiency on a histogram (100.*h1->GetEntries()/h2->GetEntries()).
      * Histogram must be drawn in advance.
-     * \param h1 Pointer to the first histogram
-     * \param h2 Pointer to the second histogram
-     * \param xPos X position of the text in absolut coordinates
-     * \param yPos Y position of the text in absolute coordinates
+     * \param[in] h1 Pointer to the first histogram.
+     * \param[in] h2 Pointer to the second histogram.
+     * \param[in] xPos X position of the text in absolute coordinates.
+     * \param[in] yPos Y position of the text in absolute coordinates.
      */
     void DrawEfficiencyOnHist(
           TH1* h1,
@@ -308,6 +308,7 @@ private:
 
     void DrawCumulativeProbabilitiesAll();
 
+   ClassDef(CbmAnaDielectronTaskDraw, 1);
 };
 
 #endif

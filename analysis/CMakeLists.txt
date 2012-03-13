@@ -52,7 +52,7 @@ hyperon/CbmAnaHypRecCascade.cxx
 hyperon/CbmAnaHypMix.cxx
 
 #CbmD0Analysis.cxx
-V0/CbmV0Analysis.cxx
+#V0/CbmV0Analysis.cxx
 
 much/CbmAnaMuch.cxx
 much/CbmAnaMuchJpsiPolarization.cxx
@@ -72,6 +72,7 @@ much/CbmAnaAngularAcceptance.cxx
 
 dielectron/CbmAnaDielectronTask.cxx
 dielectron/CbmAnaDielectronTaskDraw.cxx
+dielectron/CbmAnaDielectronTaskDrawAll.cxx
 )
 
 

@@ -214,9 +214,8 @@ TH1D* CbmAnaDielectronTaskDraw::DivideHisto1D(
     Int_t nBins = h1->GetNbinsX();
     Double_t min = h1->GetXaxis()->GetXmin();
     Double_t max = h1->GetXaxis()->GetXmax();
-    //h1->Sumw2();
-    //h2->Sumw2();
     TH1D* h3 = new TH1D(h1->GetName(), h1->GetTitle(), nBins, min, max);
+    h3->Sumw2();
     h3->Divide(h1, h2, 100.,1., "B");
     return h3;
 }
@@ -477,7 +476,7 @@ void CbmAnaDielectronTaskDraw::DrawMomentumDistributionAll()
     Draw1DHistoAfterEachCut(
           H1("fh_mc_signal_mom"),
           H1("fh_acc_signal_mom"),
-          H1("fh_rec_signal_mom"),
+          NULL,//H1("fh_rec_signal_mom"),
           H1("fh_chi_prim_signal_mom"),
           H1("fh_el_id_signal_mom"),
           H1("fh_gammacut_signal_mom"),
@@ -663,6 +662,7 @@ void CbmAnaDielectronTaskDraw::DrawSourcesBgPairsAll()
    DrawSourcesBgPairs(H2("fh_source_pair_ttcut"), "TT");
    c->cd(hi++);
    DrawSourcesBgPairs(H2("fh_source_pair_ptcut"), "p_{t}");
+
    //c->cd(hi++);
    //DrawSourcesBgPairs(H2("fh_source_pair_anglecut"), "#Theta_{1,2}");
    //c->cd(hi++);
@@ -1076,6 +1076,12 @@ void CbmAnaDielectronTaskDraw::DrawInvariantMassPi0andEta()
          H1("fh_anglecut_pi0_minv"),
          H1("fh_apmcut_pi0_minv"),
          true);
+
+   cout <<  "fh_el_id_pi0_minv = " << H1("fh_el_id_pi0_minv")->GetEntries() << endl;
+   cout <<  "fh_gammacut_pi0_minv = " << H1("fh_gammacut_pi0_minv")->GetEntries() << endl;
+   cout <<  "fh_stcut_pi0_minv = " << H1("fh_stcut_pi0_minv")->GetEntries() << endl;
+   cout <<  "fh_ttcut_pi0_minv = " << H1("fh_ttcut_pi0_minv")->GetEntries() << endl;
+   cout <<  "fh_ptcut_pi0_minv = " << H1("fh_ptcut_pi0_minv")->GetEntries() << endl;
 
    c17->cd(2);
    Draw1DHistoAfterEachCut(

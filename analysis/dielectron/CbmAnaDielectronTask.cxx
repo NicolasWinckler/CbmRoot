@@ -246,9 +246,9 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
    fh_chi2sts_bg = new TH1D("fh_chi2sts_bg","fh_chi2sts_bg;#chi^{2};Yield", 200, 0., 20.);
    fHistoList.push_back(fh_chi2sts_bg);
    // TT cut
-   fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{+}} p_{e^{-}}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
+   fh_ttcut_signal = new TH2D("fh_ttcut_signal", "fh_ttcut_signal;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
    fHistoList.push_back(fh_ttcut_signal);
-   fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{+}} p_{e^{-}}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
+   fh_ttcut_bg = new TH2D("fh_ttcut_bg","fh_ttcut_bg;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{+},e^{-}} [deg]", 100, 0., 5., 100, 0., 5.);
    fHistoList.push_back(fh_ttcut_bg);
    fh_ttcut_pi0 = new TH2D("fh_ttcut_pi0","fh_ttcut_pi0;#sqrt{p_{e^{#pm}} p_{rec}} [GeV/c];#theta_{e^{#pm},rec} [deg]", 100, 0., 5., 100, 0., 5.);
    fHistoList.push_back(fh_ttcut_pi0);
@@ -341,9 +341,9 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(
    fHistoList.push_back(fh_trd_ann_signal);
    fh_trd_ann_bg = new TH1D("fh_trd_ann_bg", "fh_trd_ann_bg;ann output;Yield", 100, -1.1, 1.1);
    fHistoList.push_back(fh_trd_ann_bg);
-   fh_tof_m2_signal = new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
+   fh_tof_m2_signal = new TH2D("fh_tof_m2_signal","fh_tof_m2_signal;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, -0.2, 1.2);
    fHistoList.push_back(fh_tof_m2_signal);
-   fh_tof_m2_bg = new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, 0., 1.2);
+   fh_tof_m2_bg = new TH2D("fh_tof_m2_bg","fh_tof_m2_bg;p [GeV/c]; m^{2} [GeV/c^{2}]^{2}", 100, 0., 4., 600, -0.2, 1.2);
    fHistoList.push_back(fh_tof_m2_bg);
 
    // Event number counter
@@ -400,7 +400,7 @@ void CbmAnaDielectronTask::SetDefaultIdParameters()
    // analysis cuts
    fPtCut = 0.2;
    fAngleCut = 1.;
-   fChiPrimCut = 2.;
+   fChiPrimCut = 3.;
    fGammaCut = 0.025;
    fSTCutAngle = 1.5;
    fSTCutPP = 1.5;
@@ -487,8 +487,8 @@ InitStatus CbmAnaDielectronTask::Init()
    return kSUCCESS;
 }
 
-
-void CbmAnaDielectronTask::Exec(Option_t *option)
+void CbmAnaDielectronTask::Exec(
+      Option_t *option)
 {
     fh_event_number->Fill(0.5);
 
@@ -589,7 +589,6 @@ void CbmAnaDielectronTask::MCPairs()
 
 } //MC Pairs
 
-
 void CbmAnaDielectronTask::SingleParticleAcceptance()
 {
     Int_t nMcTracks = fMCTracks->GetEntries();
@@ -674,7 +673,7 @@ void CbmAnaDielectronTask::FillSegmentCandidatesArray()
         CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
         if(!gTrack) continue;
 
-//choose tracks which are ONLY in STS - SEGMENT
+        //choose tracks which are ONLY in STS -> SEGMENT
         cand.stsInd = gTrack->GetStsTrackIndex();
         if (cand.stsInd < 0) continue;
         CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(cand.stsInd);
@@ -745,7 +744,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 	    CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMCTrackId);
 	    if (mcTrack1 == NULL) continue;
 
-        fKFFitter.DoFit(stsTrack,11);
+       fKFFitter.DoFit(stsTrack,11);
 	    cand.chi2sts = stsTrack->GetChi2() / stsTrack->GetNDF();
 	    cand.chiPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
         // Fit tracks to the primary vertex
@@ -778,7 +777,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 	    CbmMCTrack* mcTrack2 = (CbmMCTrack*) fMCTracks->At(cand.richMCTrackId);
 	    if (mcTrack2 == NULL) continue;
 // check RICH ring - STS track matches
-	   if ( cand.stsMCTrackId == cand.richMCTrackId){
+//	   if ( cand.stsMCTrackId == cand.richMCTrackId){
 	        Int_t pdg = TMath::Abs( mcTrack1->GetPdgCode() );
 	        Int_t motherId = mcTrack1->GetMotherId();
 	        cand.MCMotherId = motherId;
@@ -796,7 +795,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
 					cand.isMCEtaElectron = true;
 				}
 			}
-	    }
+//	    }
 //        IsRichElectron(richRing, cand.momentum.Mag(), &cand);
 
 // TRD
@@ -1066,7 +1065,9 @@ void CbmAnaDielectronTask::SignalAndBgReco()
     } // iP
 }
 
-Bool_t CbmAnaDielectronTask::CheckArmPod(Double_t alfa, Double_t pt)
+Bool_t CbmAnaDielectronTask::CheckArmPod(
+      Double_t alfa,
+      Double_t pt)
 {
     Double_t a = 1.;
     Double_t b = 0.41;

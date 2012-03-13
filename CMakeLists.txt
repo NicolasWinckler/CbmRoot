@@ -149,6 +149,7 @@ endif(Subversion_FOUND)
 
 add_subdirectory (fairtools)
 add_subdirectory (base)
+add_subdirectory (dbase)
 add_subdirectory (geobase)
 add_subdirectory (parbase) 
 add_subdirectory (cbmbase)

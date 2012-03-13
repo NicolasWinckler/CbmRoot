@@ -16,4 +16,5 @@ void basiclibs()
   gSystem->Load("libMinuit");
   gSystem->Load("libMLP");
   gSystem->Load("libFairTools");
+  gSystem->Load("libFairDB");
 }  

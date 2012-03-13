@@ -57,11 +57,6 @@ public:
       fRebin = (rebin >= 1) ? rebin : 1;
    }
 
-   void SetDetectorSetup(
-         const CbmLitDetectorSetup& detectorSetup) {
-      fDet = detectorSetup;
-   }
-
 private:
    /**
     * \brief Draw efficiency histograms.
@@ -69,7 +64,8 @@ private:
    void DrawEfficiencyHistos();
 
    /**
-    * \brief Draw efficiency plots. TODO ADD COMMENTS
+    * \brief Draw efficiency plots. This function automatically
+    * check the existence of histograms. TODO ADD COMMENTS
     * \param[in] canvasName Name of canvas.
     * \param[in] histNames Vector of histogram names.
     * \param[in] histLabels Vector of histogram labels.
@@ -112,7 +108,8 @@ private:
    void DrawHitsHistos();
 
    /**
-    * \brief Draw histograms for hits.
+    * \brief Draw histograms for hits. This function automatically
+    * check the existence of histograms.
     * \param[in] canvasName Name of canvas.
     * \param[in] hist main name of hits histograms.
     */
@@ -132,7 +129,6 @@ private:
 
    CbmLitHistManager* fHM; // histogram manager
    int fRebin; // Rebining factor for histograms
-   CbmLitDetectorSetup fDet; // Detector setup
    string fOutputDir; // Output directory for images
 };
 

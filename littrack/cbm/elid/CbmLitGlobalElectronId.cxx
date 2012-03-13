@@ -21,7 +21,7 @@
 
 CbmLitGlobalElectronId::CbmLitGlobalElectronId():
    fTrdAnnCut(0.85),
-   fRichAnnCut(-0.5),
+   fRichAnnCut(0.0),
    fRichUseAnn(true),
    fRichMeanA(-1.),
    fRichMeanB(-1.),

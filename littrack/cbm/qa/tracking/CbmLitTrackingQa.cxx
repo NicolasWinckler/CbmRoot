@@ -141,10 +141,16 @@ void CbmLitTrackingQa::CreateStudyReport(
 void CbmLitTrackingQa::DrawHistosFromFile(
       const std::string& fileName)
 {
-//   TFile* file = new TFile(fileName.c_str());
-//   CreateHistos(file);
-//   CalculateEfficiencyHistos();
-//   Draw();
+   // read histograms from file
+   fHM = new CbmLitHistManager();
+   TFile* file = new TFile(fileName.c_str());
+   fHM->ReadFromFile(file);
+   // recalculate efficiency histograms
+   fTrackingQa = new CbmLitTrackingQaCalculator(fHM);
+   fTrackingQa->CalculateEfficiencyHistos();
+   // draw histograms
+   CbmLitTrackingQaDraw drawQa;
+   drawQa.Draw(fHM, "");
 }
 
 ClassImp(CbmLitTrackingQa);

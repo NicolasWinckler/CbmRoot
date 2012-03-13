@@ -135,6 +135,12 @@ public:
     */
    void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch;}
 
+   /**
+    * \brief Calculate efficiency histograms.
+    */
+   void CalculateEfficiencyHistos();
+
+
 private:
 
    /**
@@ -360,11 +366,6 @@ private:
       const string& hist,
       LitQaNameOption opt,
       Bool_t addProjections = false);
-
-   /**
-    * \brief Calculate efficiency histograms.
-    */
-   void CalculateEfficiencyHistos();
 
    /**
     * \brief Increase number of tracks counters.

@@ -17,14 +17,14 @@
 
 CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
    fMinMom(0.),
-   fMaxMom(12.),
-   fNofBinsMom(12),
+   fMaxMom(6.),
+   fNofBinsMom(60),
    fMinPt(0.),
    fMaxPt(3.),
-   fNofBinsPt(3),
+   fNofBinsPt(30),
    fMinY(0.),
    fMaxY(4.),
-   fNofBinsY(4),
+   fNofBinsY(40),
    fMinAngle(0.),
    fMaxAngle(25.),
    fNofBinsAngle(3),

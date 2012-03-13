@@ -27,7 +27,6 @@ using lit::NumberToString;
 CbmLitTrackingQaDraw::CbmLitTrackingQaDraw():
    fHM(),
    fRebin(1),
-   fDet(),
    fOutputDir("")
 {
 
@@ -46,8 +45,6 @@ void CbmLitTrackingQaDraw::Draw(
    fHM = histManager;
    fOutputDir = outputDir;
 
-   fDet.DetermineSetup();
-
    SetStyles();
    DrawEfficiencyHistos();
    DrawHitsHistos();
@@ -59,15 +56,15 @@ void CbmLitTrackingQaDraw::Draw(
 void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 {
    string sname("STS");
-   string rname;
-   if (fDet.GetDet(kMUCH) && !fDet.GetDet(kTRD)) { rname = "MUCH"; }
-   else if (fDet.GetDet(kTRD) && !fDet.GetDet(kMUCH)) { rname = "TRD"; }
-   else if (fDet.GetDet(kTRD) && fDet.GetDet(kMUCH)) { rname = "MUCH+TRD"; }
+   string rname = "TRD";
+//   if (fDet.GetDet(kMUCH) && !fDet.GetDet(kTRD)) { rname = "MUCH"; }
+//   else if (fDet.GetDet(kTRD) && !fDet.GetDet(kMUCH)) { rname = "TRD"; }
+//   else if (fDet.GetDet(kTRD) && fDet.GetDet(kMUCH)) { rname = "MUCH+TRD"; }
    string hgname(sname + "+" + rname);
    string gname = hgname + "+TOF";
 
-   string signal = fDet.GetDet(kMUCH) ? "muons" : "electrons";
-   string cat = fDet.GetDet(kMUCH) ? "Mu" : "El";
+   string signal = "electrons"; //fDet.GetDet(kMUCH) ? "muons" : "electrons";
+   string cat = "El"; //fDet.GetDet(kMUCH) ? "Mu" : "El";
 
    // Draw global tracking efficiency STS+TRD(MUCH)+TOF for all tracks
    DrawEfficiency("tracking_qa_global_efficiency_all", list_of("hSts3DNormGlobal_All")
@@ -89,76 +86,68 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
    DrawEfficiency("tracking_qa_sts_efficiency", list_of(string("hSts3D_All"))("hSts3D_" + cat),
          list_of(string("STS: all"))("STS: " + signal), "", "_px");
 
-   if (fDet.GetDet(kTRD) || fDet.GetDet(kMUCH)) {
-      // Draw efficiency for TRD(MUCH)
-      DrawEfficiency("tracking_qa_rec_efficiency", list_of(string("hRec3D_All"))("hRec3D_" + cat),
-            list_of(rname + ": all")(rname + ": " + signal), "", "_px");
-   }
+   // Draw efficiency for TRD(MUCH)
+   DrawEfficiency("tracking_qa_rec_efficiency", list_of(string("hRec3D_All"))("hRec3D_" + cat),
+         list_of(rname + ": all")(rname + ": " + signal), "", "_px");
 
-   if (fDet.GetDet(kTOF)) {
-      // Draw efficiency for TOF
-      DrawEfficiency("tracking_qa_tof_efficiency", list_of(string("hTof3D_All"))("hTof3D_" + cat),
-            list_of(string("TOF: all"))("TOF: " + signal), "", "_px");
-   }
+   // Draw efficiency for TOF
+   DrawEfficiency("tracking_qa_tof_efficiency", list_of(string("hTof3D_All"))("hTof3D_" + cat),
+         list_of(string("TOF: all"))("TOF: " + signal), "", "_px");
 
-   if (fDet.GetDet(kRICH)) {
-      // Draw efficiency for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_electrons_mom", list_of("hRich3D_El")
-         ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_px");
+   // Draw efficiency for RICH for electron set
+   DrawEfficiency("tracking_qa_rich_efficiency_electrons_mom", list_of("hRich3D_El")
+      ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_px");
 
-      // Draw efficiency for RICH for electron set vs. rapidity
-      DrawEfficiency("tracking_qa_rich_efficiency_electrons_rapidity", list_of("hRich3D_El")
-         ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_py");
+   // Draw efficiency for RICH for electron set vs. rapidity
+   DrawEfficiency("tracking_qa_rich_efficiency_electrons_rapidity", list_of("hRich3D_El")
+      ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_py");
 
-      // Draw efficiency for RICH for electron set vs. pt
-      DrawEfficiency("tracking_qa_rich_efficiency_electrons_pt", list_of("hRich3D_El")
-         ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_pz");
+   // Draw efficiency for RICH for electron set vs. pt
+   DrawEfficiency("tracking_qa_rich_efficiency_electrons_pt", list_of("hRich3D_El")
+      ("hRich3D_ElRef"), list_of("RICH: electrons")("RICH: electrons ref"), "", "_pz");
 
-      // Draw efficiency vs. nof hits in ring for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_vs_nofhits_electrons",
-            list_of("hRichNh_El"), list_of("RICH: electrons"));
+   // Draw efficiency vs. nof hits in ring for RICH for electron set
+   DrawEfficiency("tracking_qa_rich_efficiency_vs_nofhits_electrons",
+         list_of("hRichNh_El"), list_of("RICH: electrons"));
 
-      // Draw efficiency vs. B/A for ellipse fitting for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_vs_boa_electrons",
-            list_of("hRichBoA_El"), list_of("RICH: electrons"));
+   // Draw efficiency vs. B/A for ellipse fitting for RICH for electron set
+   DrawEfficiency("tracking_qa_rich_efficiency_vs_boa_electrons",
+         list_of("hRichBoA_El"), list_of("RICH: electrons"));
 
-      // Draw efficiency vs. radial position of the ring for RICH for electron set
-      DrawEfficiency("tracking_qa_rich_efficiency_vs_radial_position_electrons",
-            list_of("hRichRadPos_El"), list_of("RICH: electrons"));
+   // Draw efficiency vs. radial position of the ring for RICH for electron set
+   DrawEfficiency("tracking_qa_rich_efficiency_vs_radial_position_electrons",
+         list_of("hRichRadPos_El"), list_of("RICH: electrons"));
 
-      // Draw efficiency for STS+RICH for electron set
-      DrawEfficiency("tracking_qa_sts_rich_efficiency_electrons", list_of("hSts3DNormStsRich_El")
-         ("hStsRich3D_El"), list_of("STS")("STS+RICH"), "", "_px");
+   // Draw efficiency for STS+RICH for electron set
+   DrawEfficiency("tracking_qa_sts_rich_efficiency_electrons", list_of("hSts3DNormStsRich_El")
+      ("hStsRich3D_El"), list_of("STS")("STS+RICH"), "", "_px");
 
-      // Draw efficiency for STS+RICH No matching for electron set
-      DrawEfficiency("tracking_qa_sts_rich_no_matching_efficiency_electrons", list_of("hSts3DNormStsRich_El")
-         ("hStsRichNoMatching3D_El"), list_of("STS")("STS+RICH (No Matching)"), "", "_px");
+   // Draw efficiency for STS+RICH No matching for electron set
+   DrawEfficiency("tracking_qa_sts_rich_no_matching_efficiency_electrons", list_of("hSts3DNormStsRich_El")
+      ("hStsRichNoMatching3D_El"), list_of("STS")("STS+RICH (No Matching)"), "", "_px");
 
-      // Draw efficiency for STS+RICH+TRD for electron set
-      DrawEfficiency("tracking_qa_sts_rich_trd_efficiency_electrons", list_of("hSts3DNormStsRichTrd_El")
-         ("hStsRich3DNormStsRichTrd_El")("hStsRichTrd3D_El"), list_of("STS")("STS+RICH")("STS+RICH+TRD"), "", "_px");
+   // Draw efficiency for STS+RICH+TRD for electron set
+   DrawEfficiency("tracking_qa_sts_rich_trd_efficiency_electrons", list_of("hSts3DNormStsRichTrd_El")
+      ("hStsRich3DNormStsRichTrd_El")("hStsRichTrd3D_El"), list_of("STS")("STS+RICH")("STS+RICH+TRD"), "", "_px");
 
-      // Draw efficiency for STS+RICH+TRD+TOF for electron set
-      DrawEfficiency("tracking_qa_sts_rich_trd_tof_efficiency_electrons", list_of("hSts3DNormStsRichTrdTof_El")
-         ("hStsRich3DNormStsRichTrdTof_El")("hStsRichTrd3DNormStsRichTrdTof_El")("hStsRichTrdTof3D_El"),
-         list_of("STS")("STS+RICH")("STS+RICH+TRD")("STS+RICH+TRD+TOF"), "", "_px");
+   // Draw efficiency for STS+RICH+TRD+TOF for electron set
+   DrawEfficiency("tracking_qa_sts_rich_trd_tof_efficiency_electrons", list_of("hSts3DNormStsRichTrdTof_El")
+      ("hStsRich3DNormStsRichTrdTof_El")("hStsRichTrd3DNormStsRichTrdTof_El")("hStsRichTrdTof3D_El"),
+      list_of("STS")("STS+RICH")("STS+RICH+TRD")("STS+RICH+TRD+TOF"), "", "_px");
 
-      DrawEfficiency("tracking_qa_sts_rich_trd_tof_electron_identification", list_of("hStsRich3DElIdNormStsRichTrdTof_ElId")
-         ("hStsRichTrd3DElIdNormStsRichTrdTof_ElId")("hStsRichTrdTof3DElId_ElId"),
-         list_of("RICH")("RICH+TRD")("RICH+TRD+TOF"), "", "_px");
+   DrawEfficiency("tracking_qa_sts_rich_trd_tof_electron_identification", list_of("hStsRich3DElIdNormStsRichTrdTof_ElId")
+      ("hStsRichTrd3DElIdNormStsRichTrdTof_ElId")("hStsRichTrdTof3DElId_ElId"),
+      list_of("RICH")("RICH+TRD")("RICH+TRD+TOF"), "", "_px");
 
-      DrawEfficiency("tracking_qa_sts_rich_trd_tof_pion_suppression", list_of("hStsRich3DElIdNormStsRichTrdTof_PiSupp")
-         ("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp")("hStsRichTrdTof3DElId_PiSupp"),
-         list_of("RICH")("RICH+TRD")("RICH+TRD+TOF"), "pisupp", "_px");
-    }
+   DrawEfficiency("tracking_qa_sts_rich_trd_tof_pion_suppression", list_of("hStsRich3DElIdNormStsRichTrdTof_PiSupp")
+      ("hStsRichTrd3DElIdNormStsRichTrdTof_PiSupp")("hStsRichTrdTof3DElId_PiSupp"),
+      list_of("RICH")("RICH+TRD")("RICH+TRD+TOF"), "pisupp", "_px");
 
-   if (fDet.GetDet(kRICH)) {
-      // Draw detector acceptance
-      //DrawEfficiency("tracking_qa_sts_rich_trd_tof_detector_acceptance", "hStsDetAcc3D_El_px",
-      //      "hStsRichDetAcc3D_El_px", "hStsRichTrdDetAcc3D_El_px", "hStsRichTrdTofDetAcc3D_El_px",
-      //     "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
+   // Draw detector acceptance
+   //DrawEfficiency("tracking_qa_sts_rich_trd_tof_detector_acceptance", "hStsDetAcc3D_El_px",
+   //      "hStsRichDetAcc3D_El_px", "hStsRichTrdDetAcc3D_El_px", "hStsRichTrdTofDetAcc3D_El_px",
+   //     "STS", "STS+RICH", "STS+RICH+TRD", "STS+RICH+TRD+TOF", "");
 
-   }
 }
 
 void CbmLitTrackingQaDraw::DrawEfficiency(
@@ -168,13 +157,20 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
       const string& opt,
       const string& proj)
 {
+   Int_t nofHistos = histNames.size();
+   // check existence of the histograms
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      string name = histNames[iHist];
+      if ( !fHM->Exists(name + "_Eff" + proj) || !fHM->Exists(name + "_Rec" + proj) ||
+            !fHM->Exists(name + "_Acc" + proj)) return;
+   }
+
    assert(histNames.size() != 0 && histLabels.size() == histNames.size());
 
    TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
    canvas->SetGrid();
    canvas->cd();
 
-   Int_t nofHistos = histNames.size();
    vector<TH1*> histos(nofHistos);
    vector<string> labels(nofHistos);
    vector<Double_t> efficiencies(nofHistos);
@@ -267,17 +263,21 @@ void CbmLitTrackingQaDraw::DrawMcEfficiencyGraph()
 
 void CbmLitTrackingQaDraw::DrawHitsHistos()
 {
-   if (fDet.GetDet(kMVD)) { DrawHitsHistos("tracking_qa_mvd_hits", "hMvdTrackHits"); }
-   if (fDet.GetDet(kSTS)) { DrawHitsHistos("tracking_qa_sts_hits", "hStsTrackHits"); }
-   if (fDet.GetDet(kTRD)) { DrawHitsHistos("tracking_qa_trd_hits", "hTrdTrackHits"); }
-   if (fDet.GetDet(kMUCH)) { DrawHitsHistos("tracking_qa_much_hits", "hMuchTrackHits"); }
-   if (fDet.GetDet(kRICH)) { DrawHitsHistos("tracking_qa_rich_ring_hits", "hRichRingHits"); }
+   DrawHitsHistos("tracking_qa_mvd_hits", "hMvdTrackHits");
+   DrawHitsHistos("tracking_qa_sts_hits", "hStsTrackHits");
+   DrawHitsHistos("tracking_qa_trd_hits", "hTrdTrackHits");
+   DrawHitsHistos("tracking_qa_much_hits", "hMuchTrackHits");
+   DrawHitsHistos("tracking_qa_rich_ring_hits", "hRichRingHits");
 }
 
 void CbmLitTrackingQaDraw::DrawHitsHistos(
    const string& canvasName,
    const string& hist)
 {
+   if ( !fHM->Exists(hist + "_All") || !fHM->Exists(hist + "_True") ||
+         !fHM->Exists(hist + "_Fake") || !fHM->Exists(hist+"_TrueOverAll") ||
+         !fHM->Exists(hist+"_FakeOverAll")) return;
+
    TCanvas* c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 600);
    c->Divide(2,1);
    c->SetGrid();

@@ -66,7 +66,7 @@ void CbmLitHistManager::ReadFromFile(
       if (obj->IsA()->InheritsFrom (TH1::Class())) {
          TH1* h = (TH1*) obj;
          TH1* h1 = (TH1*)file->Get(h->GetName());
-         Add(h->GetName(), h1);
+         Add(string(h->GetName()), h1);
          cout << c++ << " " << h->GetName()<< endl;
       }
    }

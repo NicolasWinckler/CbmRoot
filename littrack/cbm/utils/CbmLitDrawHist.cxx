@@ -127,7 +127,7 @@ void DrawH1(
    legend->SetFillColor(kWhite);
    for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
       TH1* hist = histos[iHist];
-      string opt = (iHist == 0) ? drawOpt : (iHist == nofHistos - 1) ? "SAMEP" + drawOpt : "SAME" + drawOpt;
+      string opt = (iHist == 0) ? drawOpt : (iHist == nofHistos - 1) ? "SAME" + drawOpt : "SAME" + drawOpt;
       DrawH1(hist, logx, logy, opt, LitDrawingOptions::Color(iHist), LitDrawingOptions::LineWidth(),
             LitDrawingOptions::LineStyle(iHist), LitDrawingOptions::MarkerSize(), LitDrawingOptions::MarkerStyle(iHist));
       max = std::max(max, hist->GetMaximum());

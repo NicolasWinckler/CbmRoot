@@ -53,7 +53,8 @@ public:
     */
    void Add(
          const string& name,
-         TH1* histo) {
+         TH1* histo)
+   {
       fHistMap.insert(make_pair<string, TH1*>(name, histo));
    }
 

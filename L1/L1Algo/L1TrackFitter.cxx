@@ -327,7 +327,7 @@ void L1Algo::L1KFTrackFitter()
   static L1FieldValue fB0, fB1, fB2 _fvecalignment;
   static L1FieldRegion fld _fvecalignment;
 
-  static int nHits = NStations;
+  static int nHits = MaxNStations;
   int iVec=0, i=0;
   int nTracks_SIMD = fvecLen;
   L1TrackPar T; // fitting parametr coresponding to current track
@@ -336,18 +336,17 @@ void L1Algo::L1KFTrackFitter()
 
   int ista;
   L1Station *sta = vStations;
-  fvec* x = new fvec[nHits];
-  fvec* u = new fvec[nHits];
-  fvec* v = new fvec[nHits];
-  fvec* y = new fvec[nHits];
-  fvec* z = new fvec[nHits];
-  fvec* w = new fvec[nHits];
+  fvec x[nHits];
+  fvec u[nHits];
+  fvec v[nHits];
+  fvec y[nHits];
+  fvec z[nHits];
+  fvec w[nHits];
   fvec y_temp, x_temp;
   fvec fz0, fz1, fz2, dz, z_start, z_end;
-  L1FieldValue* fB = new L1FieldValue[nHits];
-  L1FieldValue fB_temp _fvecalignment;
+  L1FieldValue fB[nHits], fB_temp _fvecalignment;
 
-  fvec* ZSta = new fvec[nHits];
+  fvec ZSta[nHits];
   for(int iHit = 0; iHit<nHits; iHit++)
   {
     ZSta[iHit] = sta[iHit].z;
@@ -542,15 +541,6 @@ void L1Algo::L1KFTrackFitter()
       t[iVec]->NDF = static_cast<int>(T.NDF[iVec]);
     }
   }
-
-  delete[] x;
-  delete[] u;
-  delete[] v;
-  delete[] y;
-  delete[] z;
-  delete[] w;
-  delete[] fB;
-  delete[] ZSta;
 }
 /*
 void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.

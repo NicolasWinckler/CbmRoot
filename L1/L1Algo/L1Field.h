@@ -26,13 +26,6 @@ class L1FieldValue{
     friend ostream& operator<<(ostream& out, L1FieldValue &B){
       return out << B.x[0] << " | " << B.y[0] << " | " << B.z[0];
     };
-
-  void *operator new(size_t size, void *ptr) { return ::operator new(size, ptr);}
-  void *operator new[](size_t size, void *ptr) { return ::operator new(size, ptr);}
-  void *operator new(size_t size) { return _mm_malloc(size, 16); }
-  void *operator new[](size_t size) { return _mm_malloc(size, 16); }
-  void operator delete(void *ptr, size_t) { _mm_free(ptr); }
-  void operator delete[](void *ptr, size_t) { _mm_free(ptr); }
   
 } _fvecalignment;
 

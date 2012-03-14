@@ -183,9 +183,9 @@ void run_sim_pi0(Int_t nEvents = 1)
   pi0->SetPDGType(111);
   pi0->SetMultiplicity(10000);
   pi0->SetBoxXYZ(-0.1,-0.1,0.1,0.1,0.);
-  pi0->SetPRange(0.,4.);
+  //pi0->SetPRange(0.,4.);
   pi0->SetPtRange(0.,3.);
-  pi0->SetThetaRange(0.,3.);
+  //pi0->SetThetaRange(0.,3.);
   pi0->Init();
   primGen->AddGenerator(pi0);
   fRun->SetGenerator(primGen);       

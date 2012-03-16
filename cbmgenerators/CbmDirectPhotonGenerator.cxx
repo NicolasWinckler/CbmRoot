@@ -32,7 +32,7 @@ CbmDirectPhotonGenerator::CbmDirectPhotonGenerator()
 // -----   Standard constructor   -----------------------------------------
 CbmDirectPhotonGenerator::CbmDirectPhotonGenerator(const Char_t* fileName)
   : FairGenerator(),
-    fNEvent(-2),
+    fNEvent(-1),
     fInput(NULL),
     fPX(0.),
     fPY(0.),

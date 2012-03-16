@@ -30,11 +30,11 @@ CbmLitTrackFitterImp::~CbmLitTrackFitterImp()
 
 LitStatus CbmLitTrackFitterImp::Fit(
    CbmLitTrack* track,
-   bool downstream)
+   Bool_t downstream)
 {
    track->SortHits(downstream);
    track->SetChi2(0.0);
-   int nofHits = track->GetNofHits();
+   Int_t nofHits = track->GetNofHits();
    FitNodeVector nodes(nofHits);
    CbmLitTrackParam par;
    std::vector<litfloat> F(25);
@@ -47,22 +47,26 @@ LitStatus CbmLitTrackFitterImp::Fit(
       par = *track->GetParamFirst();
    }
 
-   for (int i = 0; i < nofHits; i++) {
-      const CbmLitHit* hit = track->GetHit(i);
+   litfloat totalLength = 0.;
+
+   for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+      const CbmLitHit* hit = track->GetHit(iHit);
       litfloat Ze = hit->GetZ();
-      if (fPropagator->Propagate(&par, Ze, track->GetPDG(), &F) == kLITERROR) {
+      litfloat length = 0;
+      if (fPropagator->Propagate(&par, Ze, track->GetPDG(), &F, &length) == kLITERROR) {
          track->SetQuality(kLITBAD);
          return kLITERROR;
       }
-      nodes[i].SetPredictedParam(&par);
-      nodes[i].SetF(F);
+      totalLength += length;
+      nodes[iHit].SetPredictedParam(&par);
+      nodes[iHit].SetF(F);
       litfloat chi2Hit = 0.;
       if (fUpdate->Update(&par, hit, chi2Hit) == kLITERROR) {
          track->SetQuality(kLITBAD);
          return kLITERROR;
       }
-      nodes[i].SetUpdatedParam(&par);
-      nodes[i].SetChiSqFiltered(chi2Hit);
+      nodes[iHit].SetUpdatedParam(&par);
+      nodes[iHit].SetChiSqFiltered(chi2Hit);
       track->SetChi2(track->GetChi2() + chi2Hit);
    }
    if (downstream) { track->SetParamLast(&par); }
@@ -70,6 +74,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 
    track->SetFitNodes(nodes);
    track->SetNDF(lit::NDF(track));
+   track->SetLength(totalLength);
 
    return kLITSUCCESS;
 }

@@ -4,7 +4,7 @@
  * @version 1.0
  **/
 
-#include "propagation/CbmLitTGeoTrackPropagator.h"
+#include "CbmLitTGeoTrackPropagator.h"
 
 #include "base/CbmLitDefaultSettings.h"
 #include "data/CbmLitTrackParam.h"
@@ -21,6 +21,9 @@
 
 using std::cout;
 using std::endl;
+
+
+litfloat CbmLitTGeoTrackPropagator::MAXIMUM_PROPAGATION_STEP_SIZE = 10.;
 
 CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
    TrackExtrapolatorPtr extrapolator):
@@ -39,17 +42,19 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
    CbmLitTrackParam* parOut,
    litfloat zOut,
    int pdg,
-   std::vector<litfloat>* F)
+   std::vector<litfloat>* F,
+   litfloat* length)
 {
    *parOut = *parIn;
-   return Propagate(parOut, zOut, pdg, F);
+   return Propagate(parOut, zOut, pdg, F, length);
 }
 
 LitStatus CbmLitTGeoTrackPropagator::Propagate(
    CbmLitTrackParam* par,
    litfloat zOut,
    int pdg,
-   std::vector<litfloat>* F)
+   std::vector<litfloat>* F,
+   litfloat* length)
 
 {
 //   std::cout << "PAR=" << par->ToString();
@@ -58,7 +63,7 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
    litfloat zIn = par->GetZ();
    litfloat dz = zOut - zIn;
 
-   if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) { return kLITSUCCESS; }
+   if(std::fabs(dz) < lit::CbmLitDefaultSettings::MINIMUM_PROPAGATION_DISTANCE) { return kLITSUCCESS; }
 
    // Check whether upstream or downstream
    // TODO check upstream/downstream
@@ -73,13 +78,15 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
       (*F)[24] = 1.;
    }
 
-   int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
+   int nofSteps = int(std::abs(dz) / CbmLitTGeoTrackPropagator::MAXIMUM_PROPAGATION_STEP_SIZE);
    litfloat stepSize;
    if (nofSteps == 0) { stepSize = std::abs(dz); }
-   else { stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE; }
+   else { stepSize = CbmLitTGeoTrackPropagator::MAXIMUM_PROPAGATION_STEP_SIZE; }
    litfloat z = zIn;
 //   cout << "zIn=" << zIn << " zOut=" << zOut << " dz=" << dz << " nofSteps=" << nofSteps
 //         << " stepSize=" << stepSize << endl;
+
+   if (length) *length = 0;
 
    // Loop over steps + additional step to propagate to virtual plane at zOut
    for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
@@ -122,6 +129,8 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
          // Add material effects
          fMaterial->Update(par, &mat, pdg, downstream);
+
+         if (length) *length += mat.GetLength();
 
 //         cout << "iMat=" << iMat << " mat=" << mat.ToString();
       }

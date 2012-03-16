@@ -42,7 +42,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
    std::vector<litfloat>* F)
 {
    litfloat zIn = par->GetZ();
-   litfloat zStart = lit::LINE_EXTRAPOLATION_START_Z;
+   litfloat zStart = lit::CbmLitDefaultSettings::LINE_EXTRAPOLATION_START_Z;
 
    if (zIn >= zStart && zOut >= zStart) {
       return fLineExtrapolator->Extrapolate(par, zOut, F);

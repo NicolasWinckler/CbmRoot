@@ -135,6 +135,7 @@ private:
    CbmLitDetectorSetup fDet;
 
    // Pointers to data arrays
+   TClonesArray* fMvdHits; // CbmMvdHit array
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsHits; // CbmStsHit
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array

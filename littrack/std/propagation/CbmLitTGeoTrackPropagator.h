@@ -33,14 +33,18 @@ public:
       CbmLitTrackParam* parOut,
       litfloat zOut,
       int pdg,
-      std::vector<litfloat>* F);
+      std::vector<litfloat>* F,
+      litfloat* length);
 
    /* Inherited from CbmLitTrackPropagator */
    virtual LitStatus Propagate(
       CbmLitTrackParam* par,
       litfloat zOut,
       int pdg,
-      std::vector<litfloat>* F);
+      std::vector<litfloat>* F,
+      litfloat* length);
+
+	static litfloat MAXIMUM_PROPAGATION_STEP_SIZE; // maximum step size in the TGeo track propagation
 
 protected:
    /* Updates the transport matrix F = newF * F.

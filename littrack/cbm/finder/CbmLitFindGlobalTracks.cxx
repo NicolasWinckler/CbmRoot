@@ -14,6 +14,7 @@
 #include "data/CbmLitTrack.h"
 #include "utils/CbmLitConverter.h"
 #include "utils/CbmLitMemoryManagment.h"
+#include "propagation/CbmLitTGeoTrackPropagator.h"
 
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
@@ -36,6 +37,7 @@ CbmLitFindGlobalTracks::CbmLitFindGlobalTracks():
    fDet(),
 
    fStsTracks(NULL),
+   fMvdHits(NULL),
    fStsHits(NULL),
    fMuchPixelHits(NULL),
    fMuchStrawHits(NULL),
@@ -122,9 +124,14 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
    FairRootManager* ioman = FairRootManager::Instance();
    if (NULL == ioman) { Fatal("Init","CbmRootManager is not instantiated"); }
 
+   if (fDet.GetDet(kMVD)) {
+	   fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
+	   if (NULL == fMvdHits) { Fatal("Init","No MvdHit array!"); }
+   }
+
    //STS data
    fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
-   if (NULL == fStsTracks) { Fatal("Init","No STSTrack array!"); }
+   if (NULL == fStsTracks) { Fatal("Init","No StsTrack array!"); }
    fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
    if (NULL == fStsHits) { Fatal("Init","No StsHit array!"); }
 
@@ -264,78 +271,38 @@ void CbmLitFindGlobalTracks::CalculateLength()
     * distances between hits
     */
 
-   for(Int_t igt = 0; igt < fGlobalTracks->GetEntriesFast(); igt++) {
+	// Reduce step to calculate track length more accurately
+	CbmLitTGeoTrackPropagator::MAXIMUM_PROPAGATION_STEP_SIZE = 1.0;
 
-      // First collect hits from the global track
-      CbmGlobalTrack* globalTrack = (CbmGlobalTrack*) fGlobalTracks->At(igt);
-      if (globalTrack == NULL) { continue; }
+	TrackPtrVector litTracks;
+	CbmLitConverter::GlobalTrackArrayToLitTrackVector(fGlobalTracks, fStsTracks, fTrdTracks, fMuchTracks, fMvdHits, fStsHits, fTrdHits, fMuchStrawHits, fMuchPixelHits, fTofHits, litTracks);
+	Int_t nofTracks = litTracks.size();
+	for (UInt_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+		CbmGlobalTrack* globalTrack = static_cast<CbmGlobalTrack*>(fGlobalTracks->At(iTrack));
+		if (globalTrack->GetStsTrackIndex() >= 0 && globalTrack->GetTofHitIndex() >= 0) {
+			CbmLitTrack* track = litTracks[iTrack];
+			CbmLitTrackParam par = *track->GetParamFirst();
+			LitStatus propStatus = fPropagator->Propagate(&par, 0.0, 211, NULL);
+			track->SetParamFirst(&par);
+			fFitter->Fit(track);
+			globalTrack->SetLength(track->GetLength());
+		} else {
+			globalTrack->SetLength(-1.);
+		}
+	}
 
-      std::vector<Double_t> X, Y, Z;
-      X.push_back(0.);
-      Y.push_back(0.);
-      Z.push_back(0.);
+	CbmLitTGeoTrackPropagator::MAXIMUM_PROPAGATION_STEP_SIZE = 10.;
 
-      // get track segments indices
-      Int_t stsId = globalTrack->GetStsTrackIndex();
-      Int_t trdId = globalTrack->GetTrdTrackIndex();
-      Int_t muchId = globalTrack->GetMuchTrackIndex();
-      Int_t tofId = globalTrack->GetTofHitIndex();
-
-      if (stsId > -1) {
-         CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsId);
-         Int_t nofStsHits = stsTrack->GetNStsHits();
-         for(Int_t ih = 0; ih < nofStsHits; ih++) {
-            CbmStsHit* hit = (CbmStsHit*) fStsHits->At(stsTrack->GetStsHitIndex(ih));
-            X.push_back(hit->GetX());
-            Y.push_back(hit->GetY());
-            Z.push_back(hit->GetZ());
-         }
-      }
-
-      if (muchId > -1) {
-         CbmTrack* muchTrack = (CbmTrack*) fMuchTracks->At(muchId);
-         Int_t nofMuchHits = muchTrack->GetNofHits();
-         for(Int_t ih = 0; ih < nofMuchHits; ih++) {
-            HitType hitType = muchTrack->GetHitType(ih);
-            if (hitType == kMUCHPIXELHIT) {
-               CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(muchTrack->GetHitIndex(ih));
-               X.push_back(hit->GetX());
-               Y.push_back(hit->GetY());
-               Z.push_back(hit->GetZ());
-            } else if (hitType == kMUCHSTRAWHIT) {
-
-            }
-         }
-      }
-
-      if (trdId > -1) {
-         CbmTrack* trdTrack = (CbmTrack*) fTrdTracks->At(trdId);
-         Int_t nofTrdHits = trdTrack->GetNofHits();
-         for(Int_t ih = 0; ih < nofTrdHits; ih++) {
-            CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(trdTrack->GetHitIndex(ih));
-            X.push_back(hit->GetX());
-            Y.push_back(hit->GetY());
-            Z.push_back(hit->GetZ());
-         }
-      }
-
-      if (tofId > -1) {
-         CbmPixelHit* hit = (CbmPixelHit*) fTofHits->At(tofId);
-         X.push_back(hit->GetX());
-         Y.push_back(hit->GetY());
-         Z.push_back(hit->GetZ());
-      }
-
-      // Calculate distances between hits
-      Double_t length = 0.;
-      for (Int_t i = 0; i < X.size() - 1; i++) {
-         Double_t dX = X[i] - X[i+1];
-         Double_t dY = Y[i] - Y[i+1];
-         Double_t dZ = Z[i] - Z[i+1];
-         length += std::sqrt(dX*dX + dY*dY + dZ*dZ);
-      }
-      globalTrack->SetLength(length);
-   }
+	// free memory
+	for (UInt_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+		CbmLitTrack* track = litTracks[iTrack];
+		Int_t nofHits = track->GetNofHits();
+		for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+			delete track->GetHit(iHit);
+		}
+		track->ClearHits();
+	}
+	for_each(litTracks.begin(), litTracks.end(), DeleteObject());
 }
 
 void CbmLitFindGlobalTracks::ClearArrays()

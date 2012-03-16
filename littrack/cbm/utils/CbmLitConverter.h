@@ -60,15 +60,18 @@ public:
       const CbmLitTrack* litTrack,
       CbmTrack* track);
 
-// static void GlobalTrackArrayToLitTrackVector(
-//       const TClonesArray* globalTracks,
-//       const TClonesArray* stsTracks,
-//       const TClonesArray* trdTracks,
-//       const TClonesArray* muchTracks,
-//       const TClonesArray* tofHits,
-//       const TClonesArray* trdHits,
-//       const TClonesArray* muchHits,
-//       TrackPtrVector& litTracks);
+	static void GlobalTrackArrayToLitTrackVector(
+	   const TClonesArray* globalTracks,
+	   const TClonesArray* stsTracks,
+	   const TClonesArray* trdTracks,
+	   const TClonesArray* muchTracks,
+	   const TClonesArray* mvdHits,
+	   const TClonesArray* stsHits,
+	   const TClonesArray* trdHits,
+	   const TClonesArray* muchStrawHits,
+	   const TClonesArray* muchPixelHits,
+	   const TClonesArray* tofHits,
+	   TrackPtrVector& litTracks);
 
    static void LitTrackVectorToGlobalTrackArray(
       const TrackPtrVector& litTracks,

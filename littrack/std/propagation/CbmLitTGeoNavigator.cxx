@@ -102,7 +102,7 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
    matInfo.SetName(gGeoManager->GetCurrentNode()->GetName());
 
    if (step == 0.) {
-      gGeoManager->FindNextBoundaryAndStep(lit::MAXIMUM_TGEO_NAVIGATION_DISTANCE);
+      gGeoManager->FindNextBoundaryAndStep(lit::CbmLitDefaultSettings::MAXIMUM_TGEO_NAVIGATION_DISTANCE);
    } else {
       gGeoManager->SetStep(step);
       gGeoManager->Step(kFALSE);

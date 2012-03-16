@@ -340,7 +340,7 @@ litfloat CbmLitMaterialEffectsImp::PairProduction(
 litfloat CbmLitMaterialEffectsImp::BetheBlochSimple(
    const CbmLitMaterialInfo* mat) const
 {
-   return lit::ENERGY_LOSS_CONST * mat->GetZ() / mat->GetA();
+   return lit::CbmLitDefaultSettings::ENERGY_LOSS_CONST * mat->GetZ() / mat->GetA();
 }
 
 litfloat CbmLitMaterialEffectsImp::MPVEnergyLoss(

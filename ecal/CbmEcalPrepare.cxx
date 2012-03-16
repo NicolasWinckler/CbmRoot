@@ -64,7 +64,7 @@ void CbmEcalPrepare::Exec(Option_t* option)
   {
     cell=(*p);
     adc=cell->GetADC();
-    adc-=fPedestal;
+    adc-=fPedestal; if (adc<0) adc=0;
     cell->SetEnergy(adc*fADCChannel);
   }
 }

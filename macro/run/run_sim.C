@@ -63,6 +63,7 @@ void run_sim(Int_t nEvents = 2)
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
   gSystem->Load("libCbmData");
+  gSystem->Load("libCbmGenerators");
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
@@ -164,10 +165,13 @@ void run_sim(Int_t nEvents = 2)
   // ------------------------------------------------------------------------
 
 
+  CbmMCEventHeader* mcHeader = new CbmMCEventHeader();
+  fRun->SetMCEventHeader(mcHeader);
 
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  urqmdGen->SetEventPlane(0. , 360.);
   primGen->AddGenerator(urqmdGen);
   fRun->SetGenerator(primGen);       
   // ------------------------------------------------------------------------

@@ -164,12 +164,15 @@ void run_sim(Int_t nEvents = 2)
   fRun->SetField(magField);
   // ------------------------------------------------------------------------
 
-
+  // Use theexperiment specific MC Event header instead of the default one
+  // This one stores additional information about the reaction plane
   CbmMCEventHeader* mcHeader = new CbmMCEventHeader();
   fRun->SetMCEventHeader(mcHeader);
 
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  // Use the CbmUrqmdGenrator which calculates a reaction plane and
+  // rotate all particles accordingly
   CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
   urqmdGen->SetEventPlane(0. , 360.);
   primGen->AddGenerator(urqmdGen);

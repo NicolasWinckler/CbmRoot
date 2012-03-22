@@ -29,11 +29,11 @@
 #define CBMTRDHITPRODUCERSMEARING_H
 
 #include "CbmTrdDetectorId.h"
-
+#include "CbmTrdDigiPar.h"
+#include "CbmTrdModule.h"
 #include "FairTask.h"
 
 //#include "TVector3.h"
-
 #include <vector>
 
 class TClonesArray;
@@ -42,78 +42,90 @@ class CbmTrdHit;
 class CbmTrdRadiator;
 
 class CbmTrdHitProducerSmearing : public FairTask {
-  public:
+ public:
 
     
 
-    /** Default constructor **/
-    CbmTrdHitProducerSmearing();
+  /** Default constructor **/
+  CbmTrdHitProducerSmearing();
 
-    /** Standard constructor **/
-    CbmTrdHitProducerSmearing(const char *name, const char *title, 
-                              CbmTrdRadiator *radiator=NULL);
+  /** Standard constructor **/
+  CbmTrdHitProducerSmearing(const char *name, const char *title, 
+			    CbmTrdRadiator *radiator=NULL);
 
-    /** Constructor **/
-    CbmTrdHitProducerSmearing(const char *name);
+  /** Constructor **/
+  CbmTrdHitProducerSmearing(const char *name);
 
-    /** Destructor **/
-    virtual ~CbmTrdHitProducerSmearing();
+  /** Destructor **/
+  virtual ~CbmTrdHitProducerSmearing();
 
-    /** Initialisation **/
-    virtual InitStatus ReInit();
-    virtual InitStatus Init();
-    virtual void SetParContainers();
+  /** Initialisation **/
+  virtual InitStatus ReInit();
+  virtual InitStatus Init();
+  virtual void SetParContainers();
 
-    /** Executed task **/
-    virtual void Exec(Option_t * option);
+  /** Executed task **/
+  virtual void Exec(Option_t * option);
 
-    /** Finish task **/
-    virtual void Finish();
+  /** Finish task **/
+  virtual void Finish();
 
-    void Register();
+  void Register();
 
-    void AddHit(Int_t trdId, TVector3 &posHit, 
-                TVector3 &posHitErr,
-		Int_t ref, Int_t Plane, 
-		Double_t ELoss, Double_t ELossTR,
-		Double_t ELossdEdX);
+  void AddHit(Int_t trdId, TVector3 &posHit, 
+	      TVector3 &posHitErr,
+	      Int_t ref, Int_t Plane, 
+	      Double_t ELoss, Double_t ELossTR,
+	      Double_t ELossdEdX);
 
-    void SetSigmaX(Double_t sigma[]) ;
-    void SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[]);
+  void SetSigmaX(Double_t sigma[]) ;
+  void SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[]);
 
-    void SetEfficency(Float_t eff) {fEfficency=eff;}
-    void SmearingXY( Double_t dx , Double_t dy ) { fDx = dx; fDy=dy ;}
-    void SmearingX(Double_t dx) {fDx = dx;}
-    void SmearingY(Double_t dy) {fDy = dy;}
+  void SetEfficency(Float_t eff) {fEfficency=eff;}
+  void SetMinimumHitDistance(Float_t dist) {fMinDist=dist;} //cm
+  void SetGhostRate(Float_t ghost) {fGhostRate=ghost;}
+  void SetGhostDistance(Float_t ghostDistance){fGhostDistance=ghostDistance*10000;}	// cm -> µm
+  void SmearingXY( Double_t dx , Double_t dy ) { fDx = dx; fDy=dy ;}
+  void SmearingX(Double_t dx) {fDx = dx;}
+  void SmearingY(Double_t dy) {fDy = dy;}
 
-    Double_t GetSigmaX (Int_t stack) const;
-    Double_t GetSigmaY (Double_t teta, Int_t stack ) const;
+  Double_t GetSigmaX (Int_t stack) const;
+  Double_t GetSigmaY (Double_t teta, Int_t stack ) const;
 
-    Float_t  GetEfficency() const { return fEfficency;}
+  Float_t  GetEfficency() const { return fEfficency;}
 
-private:
+ private:
 
-    TClonesArray *fTrdPoints;     //! TRD MC points
-    TClonesArray *fHitCollection; //! TRD hits
-    TClonesArray *fListStack;     //!Tracks
+  TClonesArray *fTrdPoints;     //! TRD MC points
+  TClonesArray *fHitCollection; //! TRD hits
+  TClonesArray *fListStack;     //!Tracks
 
-    Double_t fDx;               //!
-    Double_t fDy;               //!
-    Double_t fSigmaX[3];        //!
-    Double_t fSigmaY[3] [7];    //!
-    Int_t    fNHits;            //!
-    Float_t  fEfficency;        //! Hit finding efficency (0-100%)
+  Int_t   fModuleID;//Unique number for detector module
+  CbmTrdDigiPar  *fDigiPar;
+  CbmTrdModule   *fModuleInfo;
 
-    CbmTrdRadiator*  fRadiator; //!
+  Double_t fDx;               //!
+  Double_t fDy;               //!
+  Double_t fSigmaX[3];        //!
+  Double_t fSigmaY[3] [7];    //!
+  Int_t    fNHits;            //!
+  Float_t  fEfficency;        //! Hit finding efficency (0-100%)
+  Float_t fGhostRate;         //! Rate to produce ghost hits per real hit
+  Float_t fMinDist;           //! Minimum distance between hit which can be separated [cm]. corresponds to 2 pad width dimensions. if == 0 all hits can be separted
+  Float_t fGhostDistance;     //! average distance between real hit and ghost hit [cm]
+  CbmTrdRadiator*  fRadiator; //!
 
-    CbmTrdDetectorId fDetId;  //!
+  CbmTrdDetectorId fDetId;  //!
 
-    std::vector<Int_t> fLayersBeforeStation; //! 
+  std::vector<Int_t> fLayersBeforeStation; //! 
 
-    CbmTrdHitProducerSmearing(const CbmTrdHitProducerSmearing&);
-    CbmTrdHitProducerSmearing operator=(const CbmTrdHitProducerSmearing&);
+  CbmTrdHitProducerSmearing(const CbmTrdHitProducerSmearing&);
+  CbmTrdHitProducerSmearing operator=(const CbmTrdHitProducerSmearing&);
 
-    ClassDef(CbmTrdHitProducerSmearing,2) //CBMTRDHitProducer
+  std::map<Int_t, std::vector<CbmTrdHit*> > fModuleHitBufferMap; //!
+  std::map<Int_t, std::vector<CbmTrdHit*> >::iterator fModuleHitBufferMapIt; //!
 
-};
+  ClassDef(CbmTrdHitProducerSmearing,2) //CBMTRDHitProducer
+
+    };
 #endif //CBMTRDHITPRODUCERSMEARING_H

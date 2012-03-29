@@ -1941,30 +1941,32 @@ void CbmL1::InputPerformance()
   if( listStsPts ){
     nMC = listStsPts->GetEntries();
   }
-  if( 0 && listStsHits ){
-    Int_t nEnt = listStsHits->GetEntries();
-//     Int_t nMC = listStsPts->GetEntries();
-    for (int j=0; j < nEnt; j++ ){
-      CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(j) );
-      
-        // strip - MC correspondence
+  if( listStsHits ){
+    for (unsigned int iH=0; iH < vStsHits.size(); iH++ ){
+    
+      const CbmL1StsHit &h = vStsHits[iH];
+      const CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(h.extIndex) );
+              // strip - MC correspondence
       int iStripF = sh->GetDigi(0);
       int iStripB = sh->GetDigi(1);
       if ( iStripF >= 0 ) stripFToNHitMap[iStripF]++;
       if ( iStripB >= 0 ) stripBToNHitMap[iStripB]++;
-      int iMC = sh->GetRefIndex();  // TODO: adapt to linking
-      if( iMC>=0 && iMC<nMC){
-        if ( iStripF >= 0 ) stripFToNMCMap[iStripF]++;
-        if ( iStripB >= 0 ) stripBToNMCMap[iStripB]++;
-      }
-
+      
+      if ( h.mcPointIds.size() == 0 ) continue; // fake
+      int iMC = vMCPoints[h.mcPointIds[0]].pointId;  // TODO: adapt to linking
+      if( !( iMC>=0 && iMC < nMC) )
+        continue;
+      
+      if ( iStripF >= 0 ) stripFToNMCMap[iStripF]++;
+      if ( iStripB >= 0 ) stripBToNMCMap[iStripB]++;
+        
         // hit pulls and residuals
 
       TVector3 hitPos, mcPos, hitErr;
       sh->Position(hitPos);
       sh->PositionError(hitErr);
       CbmStsPoint *pt = 0;
-      if( iMC>=0 && iMC<nMC) pt = L1_DYNAMIC_CAST<CbmStsPoint*>( listStsPts->At(iMC) );
+      pt = L1_DYNAMIC_CAST<CbmStsPoint*>( listStsPts->At(iMC) );
       if ( !pt ){
 //         cout << " No MC points! " << "iMC=" << iMC << endl;
         continue;
@@ -1973,14 +1975,18 @@ void CbmL1::InputPerformance()
       mcPos.SetX( pt->GetX( hitPos.Z() ) );
       mcPos.SetY( pt->GetY( hitPos.Z() ) );
       mcPos.SetZ( hitPos.Z() );
-      
-//       if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / hitErr.X() ); // standard errors
-//       if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / hitErr.Y() );
-//       if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / sh->GetDx() ); // qa errors
-//       if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / sh->GetDy() );
-      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / sqrt(algo->vStations[NMvdStations].XYInfo.C00[0]) );  // errors used in TF
-      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / sqrt(algo->vStations[NMvdStations].XYInfo.C11[0]) );
 
+#if 0 // standard errors
+      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / hitErr.X() ); // standard errors
+      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / hitErr.Y() );
+#elif 1 // qa errors
+      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / sh->GetDx() ); // qa errors
+      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / sh->GetDy() );
+#else // errors used in TF
+      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / sqrt(algo->vStations[NMvdStations].XYInfo.C00[0]) ); 
+      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / sqrt(algo->vStations[NMvdStations].XYInfo.C11[0]) );
+#endif
+      
       resX->Fill((hitPos.X() - mcPos.X())*10*1000);
       resY->Fill((hitPos.Y() - mcPos.Y())*10*1000);
       

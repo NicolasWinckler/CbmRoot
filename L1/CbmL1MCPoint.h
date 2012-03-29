@@ -28,7 +28,7 @@ xIn(0),  yIn(0),  zIn(0),  pxIn(0),  pyIn(0),  pzIn(0),
 xOut(0), yOut(0), zOut(0), pxOut(0), pyOut(0), pzOut(0),
 p(0), q(0), mass(0),
 pdg(0), ID(0), mother_ID(0),
-iStation(0), hitIds()
+iStation(0), pointId(-1), hitIds()
   {}
   
   double x, y, z, px, py, pz;
@@ -37,6 +37,7 @@ iStation(0), hitIds()
   double p, q, mass;
   int pdg, ID, mother_ID;
   int iStation;
+  int pointId;
 
   static bool compareIDz( const CbmL1MCPoint &a, const CbmL1MCPoint &b )
   {

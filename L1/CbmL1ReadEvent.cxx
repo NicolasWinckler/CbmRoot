@@ -643,7 +643,8 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
   MC->pzOut = PO.Z();
   MC->p = sqrt( fabs( MC->px*MC->px + MC->py*MC->py + MC->pz*MC->pz ) );
   MC->ID = mcID;
-
+  MC->pointId = iPoint;
+  
   CbmMCTrack *MCTrack = L1_DYNAMIC_CAST<CbmMCTrack*>( listMCTracks->At( MC->ID ) );
   if ( !MCTrack ) return 1;
   MC->pdg  = MCTrack->GetPdgCode();

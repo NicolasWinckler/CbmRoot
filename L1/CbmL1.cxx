@@ -510,8 +510,8 @@ void CbmL1::Reconstruct()
   algo->CATrackFinder();
 //  IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-  algo->L1KFTrackFitter();
-//  algo->KFTrackFitter_simple();
+//  algo->L1KFTrackFitter();
+  algo->KFTrackFitter_simple();
   if( fVerbose>1 ) cout<<"L1 Track fitter  ok"<<endl;
   
     // save recontstructed tracks
@@ -739,7 +739,8 @@ void CbmL1::WriteSTAPAlgoData()  // must be called after ReadEvent
 void CbmL1::WriteSTAPPerfData()  // must be called after ReadEvent
 {
   fstream fpdata;
-
+  fpdata << setprecision(8);
+  
   static int vNEvent = 1;
 
   TString fpdata_name = fSTAPDataDir + "data_perfo.txt";
@@ -758,12 +759,19 @@ void CbmL1::WriteSTAPPerfData()  // must be called after ReadEvent
     Int_t n = vMCPoints.size();  // number of elements
     fpdata << n << endl;
     for (int i = 0; i < n; i++){
-      fpdata << vMCPoints[i].x << " ";
-      fpdata << vMCPoints[i].y << " ";
-      fpdata << vMCPoints[i].z << "  ";
-      fpdata << vMCPoints[i].px << " ";
-      fpdata << vMCPoints[i].py << " ";
-      fpdata << vMCPoints[i].pz << " ";
+      fpdata << vMCPoints[i].xIn << " ";
+      fpdata << vMCPoints[i].yIn << " ";
+      fpdata << vMCPoints[i].zIn << "  ";
+      fpdata << vMCPoints[i].pxIn << " ";
+      fpdata << vMCPoints[i].pyIn << " ";
+      fpdata << vMCPoints[i].pzIn << " " << endl;
+      fpdata << vMCPoints[i].xOut << " ";
+      fpdata << vMCPoints[i].yOut << " ";
+      fpdata << vMCPoints[i].zOut << "  ";
+      fpdata << vMCPoints[i].pxOut << " ";
+      fpdata << vMCPoints[i].pyOut << " ";
+      fpdata << vMCPoints[i].pzOut << " " << endl;
+      
       fpdata << vMCPoints[i].p << "  ";
       fpdata << vMCPoints[i].q << " ";
       fpdata << vMCPoints[i].mass << "   ";
@@ -1024,12 +1032,20 @@ void CbmL1::ReadSTAPPerfData()
     for (int i = 0; i < n; i++){
       CbmL1MCPoint element;
       
-      fpdata >> element.x;
-      fpdata >> element.y;
-      fpdata >> element.z;
-      fpdata >> element.px;
-      fpdata >> element.py;
-      fpdata >> element.pz;
+      fpdata >> element.xIn;
+      fpdata >> element.yIn;
+      fpdata >> element.zIn;
+      fpdata >> element.pxIn;
+      fpdata >> element.pyIn;
+      fpdata >> element.pzIn;
+            
+      fpdata >> element.xOut;
+      fpdata >> element.yOut;
+      fpdata >> element.zOut;
+      fpdata >> element.pxOut;
+      fpdata >> element.pyOut;
+      fpdata >> element.pzOut;
+      
       fpdata >> element.p;
       fpdata >> element.q;
       fpdata >> element.mass;

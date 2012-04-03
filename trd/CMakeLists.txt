@@ -71,9 +71,9 @@ CbmTrdClusterFinderFast.cxx
 CbmTrdHitProducerCluster.cxx
 CbmTrdSimpleHitProducerCluster.cxx
 CbmTrdGeoHandler.cxx
-CbmTrdDigiWriteoutBuffer.cxx
-CbmTrdDigiSorterTask.cxx
-CbmTrdDigiRingSorter.cxx
+#CbmTrdDigiWriteoutBuffer.cxx
+#CbmTrdDigiSorterTask.cxx
+#CbmTrdDigiRingSorter.cxx
 )
 
 if(RULE_CHECKER_FOUND)

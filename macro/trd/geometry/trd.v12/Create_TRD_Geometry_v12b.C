@@ -28,164 +28,69 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
 void Create_TRD_Geometry_v12b() {
 
-  // Create the GeoManager and the top volume 
-  gSystem->Load("libGeom");
-  TGeoManager* gGeoMan = new TGeoManager("TRDGeom", "TRD geometry"); 
+  // Load the necessary FairRoot libraries 
+  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+  basiclibs();
+  gSystem->Load("libGeoBase");
+  gSystem->Load("libParBase");
+  gSystem->Load("libBase");
+
+  // Use the FairRoot geometry interface to load the media which are
+  // already defined 
+  FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
+  TString geoPath = gSystem->Getenv("VMCWORKDIR");
+  TString geoFile = geoPath + "/geometry/media.geo";
+  geoFace->setMediaFile(geoFile);
+  geoFace->readMedia();
+  //  geoFace->print();
+
+  // Read the required media and create them in the GeoManager
+  FairGeoMedia*   geoMedia = geoFace->getMedia();
+  FairGeoBuilder* geoBuild = geoLoad->getGeoBuilder();
+
+  FairGeoMedium* FairMediumAir      = geoMedia->getMedium("air");
+  FairGeoMedium* FairMediumPolyPropylene   = 
+    geoMedia->getMedium("polypropylene");
+  FairGeoMedium* FairMediumTrdGas = geoMedia->getMedium("TRDgas");
+  FairGeoMedium* FairMediumGoldCoatedCopper  = 
+    geoMedia->getMedium("goldcoatedcopper");
+  FairGeoMedium* FairMediumMylar   = geoMedia->getMedium("mylar");
+  FairGeoMedium* FairMediumG10   = geoMedia->getMedium("G10");
+
+  geoBuild->createMedium(FairMediumAir);
+  geoBuild->createMedium(FairMediumPolyPropylene);
+  geoBuild->createMedium(FairMediumTrdGas);
+  geoBuild->createMedium(FairMediumGoldCoatedCopper);
+  geoBuild->createMedium(FairMediumMylar);
+  geoBuild->createMedium(FairMediumG10);
+
+  // Get the GeoManager for later usage
+  TGeoManager* gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
+  
+  // Create the top volume 
   TGeoVolume* top = new TGeoVolumeAssembly("TRD");
   gGeoMan->SetTopVolume(top);
   
+  // Some debug output (if needed)
 
-  // Define all media and materials needed for the TRD detector.
-  // The code is taken from a dump of an already existing GeoManager
-  // A material in ROOT is a real material together with some special
-  // settings for simulation (e.g. Is the volume sensitive, maximum 
-  // field etc. In principle the materials and mixtures are not so
-  // important here, because the materials are taken from the CbmRoot
-  // framework and not from the produced geometry file. 
-  // Only the names must correspond to the names defined in CbmRoot    
-  Int_t nel, numed;
-  Double_t density, a, z, w;
-  Double_t par[8];
-  
-  // Mixture: air
-  nel     = 3;
-  density = 0.001205;
-  TGeoMixture* pMat1 = new TGeoMixture("air", nel,density);
-  a = 14.010000;   z = 7.000000;   w = 0.780000;  // N
-  pMat1->DefineElement(0,a,z,w);
-  a = 16.000000;   z = 8.000000;   w = 0.210000;  // O
-  pMat1->DefineElement(1,a,z,w);
-  a = 39.950000;   z = 18.000000;   w = 0.010000;  // AR
-  pMat1->DefineElement(2,a,z,w);
-  pMat1->SetIndex(0);
-  // Medium: air
-  numed   = 1;  // medium number
-  par[0]  = 0.000000; // isvol
-  par[1]  = 1.000000; // ifield
-  par[2]  = 20.000000; // fieldm
-  par[3]  = -1.000000; // tmaxfd
-  par[4]  = -1.000000; // stemax
-  par[5]  = -1.000000; // deemax
-  par[6]  = 0.001000; // epsil
-  par[7]  = -1.000000; // stmin
-  TGeoMedium* air = new TGeoMedium("air", numed,pMat1, par);
+  //  gGeoManager->Dump();
+  //
+  //  TList* matList = gGeoMan->GetListOfMaterials();  
+  //  TIter next(matList);
+  //  TGeoMaterial* mat;
+  //  while (( mat = (TGeoMaterial*)next() ))
+  //    mat->Print();
+  //
+  //  TList* media_ptr = gGeoMan->GetListOfMedia();
+  //  Int_t entries = media_ptr->GetEntries();
+  //  cout <<"Entries: "<<entries<<endl;
+  //  TIter next(media_ptr);
+  //  TGeoMedium* med;
+  //  while (( med = (TGeoMedium*)next() ))
+  //    med->Print();
 
-  // Mixture: polypropylene
-  nel     = 2;
-  density = 0.074000;
-  TGeoMixture*  pMat16 = new TGeoMixture("polypropylene", nel,density);
-  a = 12.010000;   z = 6.000000;   w = 0.856267;  // C
-  pMat16->DefineElement(0,a,z,w);
-  a = 1.008000;   z = 1.000000;   w = 0.143733;  // H
-  pMat16->DefineElement(1,a,z,w);
-  pMat16->SetIndex(1);
-  // Medium: polypropylene
-  numed   = 2;  // medium number
-  par[0]  = 0.000000; // isvol
-  par[1]  = 0.000000; // ifield
-  par[2]  = 20.000000; // fieldm
-  par[3]  = -1.000000; // tmaxfd
-  par[4]  = -1.000000; // stemax
-  par[5]  = -1.000000; // deemax
-  par[6]  = 0.001000; // epsil
-  par[7]  = -1.000000; // stmin
-  TGeoMedium* polypropylene = new TGeoMedium("polypropylene", numed,pMat16, par);
-  // Mixture: TRDgas
-  nel     = 3;
-  density = 0.004944;
-  TGeoMixture*  pMat17 = new TGeoMixture("TRDgas", nel,density);
-  a = 12.011000;   z = 6.000000;   w = 0.015243;  // C
-  pMat17->DefineElement(0,a,z,w);
-  a = 15.994000;   z = 8.000000;   w = 0.040595;  // O
-  pMat17->DefineElement(1,a,z,w);
-  a = 131.290000;   z = 54.000000;   w = 0.944162;  // XE
-  pMat17->DefineElement(2,a,z,w);
-  pMat17->SetIndex(2);
-  // Medium: TRDgas
-  numed   = 3;  // medium number
-  par[0]  = 1.000000; // isvol
-  par[1]  = 0.000000; // ifield
-  par[2]  = 20.000000; // fieldm
-  par[3]  = -1.000000; // tmaxfd
-  par[4]  = -1.000000; // stemax
-  par[5]  = -1.000000; // deemax
-  par[6]  = 0.000100; // epsil
-  par[7]  = -1.000000; // stmin
-  TGeoMedium* TRDgas = new TGeoMedium("TRDgas", numed,pMat17, par);
-  
-  // Mixture: goldcoatedcopper
-  nel     = 2;
-  density = 9.063400;
-  TGeoMixture* pMat18 = new TGeoMixture("goldcoatedcopper", nel,density);
-  a = 63.540000;   z = 29.000000;   w = 0.990000;  // CU
-  pMat18->DefineElement(0,a,z,w);
-  a = 196.970000;   z = 79.000000;   w = 0.010000;  // AU
-  pMat18->DefineElement(1,a,z,w);
-  pMat18->SetIndex(3);
-  // Medium: goldcoatedcopper
-  numed   = 4;  // medium number
-  par[0]  = 0.000000; // isvol
-  par[1]  = 0.000000; // ifield
-  par[2]  = 20.000000; // fieldm
-  par[3]  = -1.000000; // tmaxfd
-  par[4]  = -1.000000; // stemax
-  par[5]  = -1.000000; // deemax
-  par[6]  = 0.001000; // epsil
-  par[7]  = -1.000000; // stmin
-  TGeoMedium* goldcoatedcopper = new TGeoMedium("goldcoatedcopper", numed,pMat18, par);
-  
-  // Mixture: mylar
-  nel     = 3;
-  density = 1.390000;
-  TGeoMixture*  pMat19 = new TGeoMixture("mylar", nel,density);
-  a = 1.008000;   z = 1.000000;   w = 0.041964;  // H
-  pMat19->DefineElement(0,a,z,w);
-  a = 12.010000;   z = 6.000000;   w = 0.624987;  // C
-  pMat19->DefineElement(1,a,z,w);
-  a = 16.000000;   z = 8.000000;   w = 0.333049;  // O
-  pMat19->DefineElement(2,a,z,w);
-  pMat19->SetIndex(4);
-  // Medium: mylar
-  numed   = 5;  // medium number
-  par[0]  = 0.000000; // isvol
-  par[1]  = 0.000000; // ifield
-  par[2]  = 20.000000; // fieldm
-  par[3]  = -1.000000; // tmaxfd
-  par[4]  = -1.000000; // stemax
-  par[5]  = -1.000000; // deemax
-  par[6]  = 0.001000; // epsil
-  par[7]  = -1.000000; // stmin
-  TGeoMedium* mylar = new TGeoMedium("mylar", numed,pMat19, par);
-  
-  // Mixture: G10
-  nel     = 4;
-  density = 1.700000;
-  TGeoMixture* pMat20 = new TGeoMixture("G10", nel,density);
-  a = 12.010000;   z = 6.000000;   w = 0.259000;  // C
-  pMat20->DefineElement(0,a,z,w);
-  a = 1.008000;   z = 1.000000;   w = 0.288000;  // H
-  pMat20->DefineElement(1,a,z,w);
-  a = 16.000000;   z = 8.000000;   w = 0.248000;  // O
-  pMat20->DefineElement(2,a,z,w);
-  a = 28.090000;   z = 14.000000;   w = 0.205000;  // SI
-  pMat20->DefineElement(3,a,z,w);
-  pMat20->SetIndex(5);
-  // Medium: G10
-  numed   = 6;  // medium number
-  par[0]  = 0.000000; // isvol
-  par[1]  = 0.000000; // ifield
-  par[2]  = 20.000000; // fieldm
-  par[3]  = -1.000000; // tmaxfd
-  par[4]  = -1.000000; // stemax
-  par[5]  = -1.000000; // deemax
-  par[6]  = 0.001000; // epsil
-  par[7]  = -1.000000; // stmin
-  TGeoMedium* G10 = new TGeoMedium("G10", numed,pMat20, par);
-
-  TList* media_ptr = gGeoMan->GetListOfMedia();
-  Int_t entries = media_ptr->GetEntries();
-  cout <<"Entries: "<<entries<<endl;
-
+  //  exit(0);
   // Here comes now the creation of needed TRD modules.
 
   // Add the keeping volumes for each trd station to the top
@@ -253,7 +158,7 @@ void Create_TRD_Geometry_v12b() {
 
   create_keeping_volumes("trd1", 1, first_layer, second_layer, 
 			 Inner_radius, Outer_radius, Distance, 
-			 Station_thickness, top, air);
+			 Station_thickness, top, gGeoMan->GetMedium("air"));
 
   first_layer[0]=-180.;
   first_layer[1]=620.;
@@ -265,7 +170,7 @@ void Create_TRD_Geometry_v12b() {
 
   create_keeping_volumes("trd2", 2, first_layer, second_layer, 
 			 Inner_radius, Outer_radius, Distance, 
-			 Station_thickness, top, air);
+			 Station_thickness, top, gGeoMan->GetMedium("air"));
 
   first_layer[0]=-230.;
   first_layer[1]=810.;
@@ -277,7 +182,7 @@ void Create_TRD_Geometry_v12b() {
 
   create_keeping_volumes("trd3", 3, first_layer, second_layer, 
 			 Inner_radius, Outer_radius, Distance, 
-			 Station_thickness, top, air);
+			 Station_thickness, top, gGeoMan->GetMedium("air"));
 
   Int_t Chambers_per_station = 1;
   Float_t x101 = Detector_size_x[0] * 1;
@@ -324,10 +229,11 @@ void Create_TRD_Geometry_v12b() {
 
    gGeoMan->CloseGeometry();
    TFile* outfile = new TFile("TRD_geom_v12b.root","RECREATE");
-   //   top->Write();
-   gGeoMan->Write();
+   top->Write();
+   //gGeoMan->Write();
    outfile->Close();
    top->Draw("ogl");
+   //top->Raytrace();
 
 }
 

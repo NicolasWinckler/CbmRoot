@@ -35,7 +35,7 @@ CbmStsCluster::CbmStsCluster()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsCluster::CbmStsCluster(Int_t index, Double_t digiSig, Int_t iStation, Int_t iSector, Int_t iSide)
+CbmStsCluster::CbmStsCluster(Double_t digiSig, Int_t iStation, Int_t iSector, Int_t iSide)
   : FairMultiLinkedData(),
     fDetectorId(0),
     fDigis(),
@@ -57,7 +57,7 @@ CbmStsCluster::CbmStsCluster(Int_t index, Double_t digiSig, Int_t iStation, Int_
     cout << "-E- CbmStsCluster: Illegal side number " << iSide <<  endl;
     Fatal("", "Illegal side number");
   }
-  AddIndex(index, digiSig);
+//   AddIndex(index, digiSig);
   // System id is set by the base class constructor on bits 0-4
   fDetectorId  =         2 << 24 ;  // station nr. on bits  5-12
   fDetectorId |= (iStation << 16);  // station nr. on bits  5-12

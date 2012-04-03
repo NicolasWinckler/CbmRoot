@@ -47,9 +47,9 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
    **@param adc      Charge ADC channel (0 - 4095)
    **@param time     Time within event [ns]
    **/
-  CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
-	     Int_t channel, Int_t adc, Int_t time);
-  CbmStsDigi(Int_t index, Int_t station, Int_t sector, Int_t side, 
+//   CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
+// 	     Int_t channel, Int_t adc, Int_t time);
+  CbmStsDigi(Int_t station, Int_t sector, Int_t side, 
 	     Int_t channel, Int_t adc, Int_t time);
 
 
@@ -59,12 +59,12 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 
   /**   Add charge   **/
   void AddAdc(Int_t adc);
-  void AddIndex(int index, int adc){
-			AddLink(FairLink(kStsPoint, index, adc));
-		}
-  void AddIndex(std::vector<Int_t> index){
-			SetLinks(FairMultiLinkedData(kStsPoint, index));
-		}
+//   void AddIndex(int index, int adc){
+// 			AddLink(FairLink(kStsPoint, index, adc));
+// 		}
+//   void AddIndex(std::vector<Int_t> index){
+// 			SetLinks(FairMultiLinkedData(kStsPoint, index));
+// 		}
 
   /**   Station number   **/
   Int_t GetStationNr() const { return StationNr(GetDetectorId()); }

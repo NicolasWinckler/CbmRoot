@@ -291,10 +291,10 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
 // 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
 // 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
-	fStripSignalF[--iChannel] = 0.;
-	fStripSignalB[  iChannel] = 0.;
-// 	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
-// 	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
+// 	fStripSignalF[--iChannel] = 0.;
+// 	fStripSignalB[  iChannel] = 0.;
+	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
+	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
       }
       
       for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {
@@ -323,17 +323,14 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	
 	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr]-fFThreshold)/fFMinStep);
 	if ( digiFSignal >= fFNofSteps ) digiFSignal = fFNofSteps-1;
-
-// 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-// 						  0, ifstr, 
-// 						  digiFSignal, 0);
+	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+						  0, ifstr, 
+						  digiFSignal, 0);
 	//						  fStripSignalF[ifstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fFChannelPointsMap[ifstr];
 	Int_t pnt;
 	CbmStsDigiMatch* match;
-        CbmStsPoint* point = NULL;
-        CbmStsDigi* digi;
 	if ( chPnt.size() == 0 ) {
 // 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
 // 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
@@ -342,38 +339,11 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	else {
 	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
 	    pnt = (*it1);
-	    point  = (CbmStsPoint*) fPoints->At(pnt);
-
- 	    Double_t xin = point->GetXIn();
-  	    Double_t yin = point->GetYIn();
- 	    Double_t zin = point->GetZIn();
-    
- 	    Double_t xvec = point->GetXOut()-xin;
-       	    Double_t yvec = point->GetYOut()-yin;
- 	    Double_t zvec = point->GetZOut()-zin;
-            Int_t MynofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
-    
-            Int_t MystepEL = (Int_t) (fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1));
-            xvec = xvec/((Double_t)MynofSteps);  
-            yvec = yvec/((Double_t)MynofSteps);  
-            zvec = zvec/((Double_t)MynofSteps);  
-
-            for ( Int_t istep = 0 ; istep <= MynofSteps ; istep++ ) {
-    	      xin+=xvec;
-              yin+=yvec;
-       	      zin+=zvec;
-   	    }
-
-	    if ( it1==chPnt.begin() ) {
+	    if ( it1==chPnt.begin() ) 
 	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
-	      digi  = new ((      *fDigis)[fNDigis]) CbmStsDigi(pnt, stationNr, sectorNr,
-						  0, ifstr, 
-						  digiFSignal, 0);
-	    }
 	    else {
 	      match->AddPoint(pnt);
 	      fNMulti++;
-	      digi->AddIndex(pnt,MystepEL);
 	    }
 	  }
 	}
@@ -394,16 +364,14 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 
 	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr]-fBThreshold)/fBMinStep);
 	if ( digiBSignal >= fBNofSteps ) digiBSignal = fBNofSteps-1;
-// 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-// 						  1, ibstr, 
-// 						  digiBSignal, 0);
+	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+						  1, ibstr, 
+						  digiBSignal, 0);
 	//						  fStripSignalB[ibstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fBChannelPointsMap[ibstr];
 	Int_t pnt;
-        CbmStsPoint* point = NULL;
 	CbmStsDigiMatch* match;
-        CbmStsDigi* digi;
 	if ( chPnt.size() == 0 ) {
 // 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
 // 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
@@ -412,39 +380,11 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	else {
 	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
 	    pnt = (*it1);
-            point  = (CbmStsPoint*) fPoints->At(pnt);
-
- 	    Double_t xin = point->GetXIn();
-  	    Double_t yin = point->GetYIn();
- 	    Double_t zin = point->GetZIn();
-    
- 	    Double_t xvec = point->GetXOut()-xin;
-       	    Double_t yvec = point->GetYOut()-yin;
- 	    Double_t zvec = point->GetZOut()-zin;
-            Int_t MynofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
-    
-            Int_t MystepEL = (Int_t) (fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1));
-            xvec = xvec/((Double_t)MynofSteps);  
-            yvec = yvec/((Double_t)MynofSteps);  
-            zvec = zvec/((Double_t)MynofSteps);  
-
-            for ( Int_t istep = 0 ; istep <= MynofSteps ; istep++ ) {
-    	      xin+=xvec;
-              yin+=yvec;
-       	      zin+=zvec;
-   	    }
-
-
-	    if ( it1==chPnt.begin() ) {
-	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
-	      digi  = new ((      *fDigis)[fNDigis]) CbmStsDigi(pnt, stationNr, sectorNr,
-						  1, ibstr, 
-						  digiBSignal, 0);
-	    }
+	    if ( it1==chPnt.begin() ) 
+	    match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
 	    else {
 	      match->AddPoint(pnt);
 	      fNMulti++;
-	      digi->AddIndex(pnt,MystepEL);
 	    }
 	  }
 	}

@@ -6,6 +6,7 @@
 #include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
+#include "CbmTrdDigiWriteoutBuffer.h"
 
 #include "CbmMCTrack.h"
 
@@ -13,6 +14,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairBaseParSet.h"
+#include "FairEventHeader.h"
 
 #include "TRandom.h"
 #include "TMath.h"
@@ -46,6 +48,9 @@ CbmTrdDigitizer::CbmTrdDigitizer()
     fELoss(-1.),
     fTime(-1.),
     fEfficiency(1.),
+    fTimeOrderedDigi(kFALSE),
+    fDigiChanged(kFALSE),
+    fDigiWriteoutBuffer(NULL),
     fTrdPoints(NULL),
     fDigiCollection(NULL),
     fDigiMatchCollection(NULL),
@@ -71,6 +76,9 @@ CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title,
     fELoss(-1.),
     fTime(-1.),
     fEfficiency(1.),
+    fTimeOrderedDigi(kFALSE),
+    fDigiChanged(kFALSE),
+    fDigiWriteoutBuffer(NULL),
     fTrdPoints(NULL),
     fDigiCollection(NULL),
     fDigiMatchCollection(NULL),
@@ -150,8 +158,10 @@ InitStatus CbmTrdDigitizer::Init()
 
     fMCStack = (TClonesArray*)ioman->GetObject("MCTrack");
 
-    fDigiCollection = new TClonesArray("CbmTrdDigi", 100);
-    ioman->Register("TrdDigi","TRD Digis",fDigiCollection,kTRUE);
+    fDigiWriteoutBuffer = new CbmTrdDigiWriteoutBuffer("TrdDigi","TRD",kTRUE);
+    fDigiWriteoutBuffer = (CbmTrdDigiWriteoutBuffer*)FairRootManager::Instance()->RegisterWriteoutBuffer("TrdDigi", fDigiWriteoutBuffer);
+    fLogger->Debug(MESSAGE_ORIGIN, "Time ordered digitization is: %i",fTimeOrderedDigi);
+    fDigiWriteoutBuffer->ActivateBuffering(fTimeOrderedDigi);   
 
     fDigiMatchCollection = new TClonesArray("CbmTrdDigiMatch", 100);
     ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchCollection,kTRUE);
@@ -175,6 +185,15 @@ void CbmTrdDigitizer::Exec(Option_t * option)
   Double_t ELossTR;     // TR energy loss for e- & e+
   Double_t ELossdEdX;   // ionization energy loss
   
+  Double_t eventTime = FairRootManager::Instance()->GetEventTime();
+  Double_t trdDeadTime = 280.; // a fired trd pixel is inactive for 280 ns??
+
+  
+  FairRootManager *ioman = FairRootManager::Instance();
+  FairEventHeader* evtHeader = (FairEventHeader*)ioman->GetObject("EventHeader.");
+  Int_t fileID = evtHeader->GetInputFileId();
+  Int_t eventID =  evtHeader->GetMCEntryNumber();
+  Int_t inBranchID = ioman->GetBranchId("TrdPoint");
   for (int j=0; j <  fTrdPoints->GetEntriesFast() ; j++ ) {
 
     // if random value above fEfficency reject point
@@ -220,24 +239,56 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     fModuleID = fTrdId.SetSector(pt->GetDetectorID(), Sector);
 
     AddDigi(j);
+    CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol, fRow, fELoss, 
+				      eventTime+fTime, j);
+    digi->AddLink(FairLink(fileID, eventID, inBranchID, j));
 
+    /*
+    if ( fDigiChanged == kTRUE) {
+      fLogger->Debug(MESSAGE_ORIGIN,"Before FillNewData: ");
+      std::cout<<"Digi before: "<< digi <<std::endl;
+      digi->Print();
+    }
+    */
+
+    // TODO: Setup the links for the digi    
+    fDigiWriteoutBuffer->FillNewData(digi, eventTime + trdDeadTime );
+
+    /*
+    if ( fDigiChanged == kTRUE) {
+      fLogger->Debug(MESSAGE_ORIGIN,"After FillNewData: ");
+      std::cout<<"Digi after: "<< digi <<std::endl;
+      digi->Print();
+    }
+    */
   }
 
+  /*
   // Fill data from internaly used stl map into output TClonesArray
   // Fill also the DigiMatch output which holds for each digi the MC indexes
   // which give a contribution to the digi
   Int_t iDigi=0; 
+  Double_t eventTime = FairRootManager::Instance()->GetEventTime();
+  Double_t trdDeadTime = 280; // a fired trd pixel is inactive for 280 ns??
   for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); 
         fDigiMapIt++ ) {
-    new ((*fDigiCollection)[iDigi]) 
-        CbmTrdDigi(fDigiMapIt->second->GetDetId(), 
-        fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), 
-        fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
 
-    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
+    CbmTrdDigi* tmpdigi = new CbmTrdDigi(fDigiMapIt->second->GetDetId(), 
+					 fDigiMapIt->second->GetCol(), 
+					 fDigiMapIt->second->GetRow(), 
+					 fDigiMapIt->second->GetCharge(),
+					 fDigiMapIt->second->GetTime());
 
     std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
     std::vector<int>::iterator it;
+
+    for (it=arr.begin() ; it <arr.end(); it++  ) {
+      tmpdigi->AddMCIndex((Int_t)*it);
+    }
+
+    fDigiWriteoutBuffer->FillNewData(tmpdigi, eventTime + trdDeadTime );
+
+    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
 
     for (it=arr.begin() ; it <arr.end(); it++  ) {
       Int_t bla = p->AddPoint((Int_t)*it);
@@ -246,7 +297,7 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     iDigi++;
 
   }
-
+  */
 
 }
 // --------------------------------------------------------------------
@@ -272,6 +323,7 @@ void CbmTrdDigitizer::AddDigi(const Int_t pointID) {
   // pixel is added. Also the additional energy loss is added to the pixel.
 
 
+  fDigiChanged = kFALSE;
     // Look for pixel in charge map
     pair<Int_t, Int_t> a(fCol, fRow);
     pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
@@ -290,9 +342,13 @@ void CbmTrdDigitizer::AddDigi(const Int_t pointID) {
     else {
         CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
         if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
+        fLogger->Debug(MESSAGE_ORIGIN,"Change digi (AddDigi): ");
+	digi->Print();
         digi->AddCharge(fELoss);
-        digi->AddMCIndex(pointID);
+	digi->AddMCIndex(pointID);
         if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
+	digi->Print();
+	fDigiChanged = kTRUE;
     }
 
 }

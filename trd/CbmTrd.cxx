@@ -93,28 +93,10 @@ CbmTrd::~CbmTrd() {
 void CbmTrd::Initialize()
 {
   FairDetector::Initialize();
-  
-  FairLogger *logger = FairLogger::GetLogger();
-  const char* bla = "DEBUG";
-  int number =1;
-
-  logger->Debug4(MESSAGE_ORIGIN, "Dies ist ein %s Test", bla);
-  logger->Debug3(MESSAGE_ORIGIN, "Dies ist ein DEBUG3 Test");
-  logger->Debug2(MESSAGE_ORIGIN, "Dies ist ein DEBUG2 Test");
-  logger->Debug1(MESSAGE_ORIGIN, "Dies ist ein DEBUG1 Test");
-  logger->Debug(MESSAGE_ORIGIN, "Dies ist ein DEBUG Test");
-  logger->Info(MESSAGE_ORIGIN, "Dies ist ein INFO Test");
-  logger->Warning(MESSAGE_ORIGIN, "Dies ist ein WARNING Test");
-  logger->Error(MESSAGE_ORIGIN, "Dies ist ein '%d' Test", 1);
-  logger->Error(MESSAGE_ORIGIN, "Dies ist ein '%d' Test", number);
-  logger->Error(MESSAGE_ORIGIN, "Dies ist ein %s Test\n", bla);
-  logger->Error(MESSAGE_ORIGIN,"\033[5m\033[31m invalid time function, Event time is not SET \033[0m");
-
-  //  logger->Fatal(MESSAGE_ORIGIN, "Dies ist ein FATAL Test");
-
+ 
   // Extract geometry information from gGeoManager instead of
   // CbmGeoTrdPar. All such geometry handling is done now in the
-  //separate utility class CbmTrdGeoHandler
+  // separate utility class CbmTrdGeoHandler
 
   fGeoVersion = fGeoHandler->CheckGeometryVersion();
   
@@ -283,7 +265,7 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
       // Get the unique detector ID from helper class
       fVolumeID = fGeoHandler->GetUniqueDetectorId(fGeoVersion, fStationId,
 						   fModuleId);
-            
+
       CbmTrdPoint *fPoint= AddHit(fTrackID, fVolumeID, 
 			    TVector3(fPosIn.X(),  fPosIn.Y(),  fPosIn.Z()),
 	       		    TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
@@ -370,10 +352,21 @@ void CbmTrd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
 }
 // -------------------------------------------------------------------------
 
+void CbmTrd::ConstructGeometry()
+{
+  TString fileName=GetGeometryFileName();
+  if (fileName.EndsWith(".geo")) {	
+    ConstructASCIIGeometry();
+  } else if (fileName.EndsWith(".root")) {
+    ConstructRootGeometry();
+  } else {
+    std::cout << "Geometry format not supported." << std::endl;
+  }
+}
 
 
 // -----   Public method ConstructGeometry   -------------------------------
-void CbmTrd::ConstructGeometry() {
+void CbmTrd::ConstructASCIIGeometry() {
 
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -532,6 +525,16 @@ void CbmTrd::ConstructGeometry() {
 */
 }
 // -------------------------------------------------------------------------
+
+Bool_t CbmTrd::CheckIfSensitive(std::string name)
+{
+  TString tsname = name; 
+  if (tsname.Contains("gas")){
+    fLogger->Info(MESSAGE_ORIGIN, "*** Register %s as active volume.",tsname.Data());
+    return kTRUE;
+  }
+  return kFALSE;
+}
 
 // -----   Private method AddHit   -----------------------------------------
 CbmTrdPoint* CbmTrd::AddHit(

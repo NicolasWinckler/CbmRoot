@@ -25,6 +25,7 @@ class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+class CbmTrdDigiWriteoutBuffer;
 
 class CbmTrdDigitizer : public FairTask {
 
@@ -56,6 +57,8 @@ class CbmTrdDigitizer : public FairTask {
 
     void Register();
 
+    void RunTimeBased() { fTimeOrderedDigi = kTRUE; }
+
 private:
    
     void AddDigi(const Int_t pointID);
@@ -69,7 +72,10 @@ private:
     Float_t fEfficiency; // Digi production efficiency (0-100%)
     //    Double_t fthreshold; //pixel threshold in electrons
     //    Double_t fnoise; //pixel noise in electrons
+    Bool_t fTimeOrderedDigi;
+    Bool_t fDigiChanged;
 
+    CbmTrdDigiWriteoutBuffer* fDigiWriteoutBuffer;//!
     TClonesArray *fTrdPoints; //! Trd MC points
     TClonesArray *fDigiCollection; //! TRD digis
     TClonesArray *fDigiMatchCollection; //! Corresponding MCPoints to TRD digis
@@ -90,7 +96,7 @@ private:
     CbmTrdDigitizer(const CbmTrdDigitizer&);
     CbmTrdDigitizer& operator=(const CbmTrdDigitizer&);
 
-    ClassDef(CbmTrdDigitizer,2)
+    ClassDef(CbmTrdDigitizer,3)
 
     };
 #endif //CBMTRDDIGITIZER_H

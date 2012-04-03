@@ -106,10 +106,12 @@ class CbmTrd : public FairDetector
 
   /** Virtual method Construct geometry
    **
-   ** Constructs the STS geometry
+   ** Constructs the TRD geometry
    **/
   virtual void ConstructGeometry();
+  virtual void ConstructASCIIGeometry();
 
+  Bool_t CheckIfSensitive(std::string name);
 
  private:
 

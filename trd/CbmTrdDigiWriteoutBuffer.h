@@ -25,7 +25,6 @@ class CbmTrdDigiWriteoutBuffer : public FairWriteoutBuffer
     //    std::vector<std::pair<double, CbmTrdDigi*> > Modify(std::pair<double, CbmTrdDigi*> oldData, std::pair<double, CbmTrdDigi*> newData)
     std::vector<std::pair<double, FairTimeStamp*> > Modify(std::pair<double, FairTimeStamp*> oldData, std::pair<double, FairTimeStamp*> newData)
       {
-	FairLogger* fLogger = FairLogger::GetLogger();
 	fLogger->Debug(MESSAGE_ORIGIN,"Inside Modify:");
 	fLogger->Debug(MESSAGE_ORIGIN,"oldData.first %f", oldData.first);
 	fLogger->Debug(MESSAGE_ORIGIN,"newData.first: %f", newData.first);
@@ -45,6 +44,7 @@ class CbmTrdDigiWriteoutBuffer : public FairWriteoutBuffer
 	  singleResult.first = oldData.first;
 //	}
 	combinedDigiData->AddCharge(newDigiData->GetCharge());
+	combinedDigiData->AddLink(newDigiData->GetLink(0));
         fLogger->Debug(MESSAGE_ORIGIN,"New Charge: %f", newDigiData->GetCharge());
         fLogger->Debug(MESSAGE_ORIGIN,"Combined Charge: %f", combinedDigiData->GetCharge());
 	singleResult.second = (FairTimeStamp*)combinedDigiData;

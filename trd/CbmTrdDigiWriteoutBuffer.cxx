@@ -69,7 +69,6 @@ void CbmTrdDigiWriteoutBuffer::AddNewDataToTClonesArray(FairTimeStamp* data)
 {
   FairRootManager* ioman = FairRootManager::Instance();
   TClonesArray* myArray = ioman->GetTClonesArray(fBranchName);
-  FairLogger* fLogger = FairLogger::GetLogger();
   fLogger->Debug(MESSAGE_ORIGIN,"Data Inserted: ");
   CbmTrdDigi* bla =(CbmTrdDigi*)(data);
   bla->Print();

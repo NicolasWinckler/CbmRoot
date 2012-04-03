@@ -177,17 +177,51 @@ void run_sim_pi0(Int_t nEvents = 1)
 
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
-  primGen->AddGenerator(urqmdGen);
+  //FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+  //primGen->AddGenerator(urqmdGen);
   FairBoxGenerator *pi0 = new FairBoxGenerator();
   pi0->SetPDGType(111);
-  pi0->SetMultiplicity(10000);
+  pi0->SetMultiplicity(1e5);
   pi0->SetBoxXYZ(-0.1,-0.1,0.1,0.1,0.);
   //pi0->SetPRange(0.,4.);
+  pi0->SetPhiRange(0,360);
+  pi0->SetThetaRange(2.5,25);
   pi0->SetPtRange(0.,3.);
-  //pi0->SetThetaRange(0.,3.);
   pi0->Init();
   primGen->AddGenerator(pi0);
+  /*
+    FairBoxGenerator *electron = new FairBoxGenerator();
+    electron->SetPDGType(11);
+    electron->SetMultiplicity(1);
+    electron->SetBoxXYZ(-0.1,-0.1,0.1,0.1,0.);
+    //electron->SetPRange(0.,4.);
+    electron->SetPtRange(0.,3.);
+    //electron->SetThetaRange(0.,3.);
+    electron->Init();
+    primGen->AddGenerator(electron);
+  
+    FairBoxGenerator *positron = new FairBoxGenerator();
+    positron->SetPDGType(-11);
+    positron->SetMultiplicity(1);
+    positron->SetBoxXYZ(-0.1,-0.1,0.1,0.1,0.);
+    //positron->SetPRange(0.,4.);
+    positron->SetPtRange(0.,3.);
+    //positron->SetThetaRange(0.,3.);
+    positron->Init();
+    primGen->AddGenerator(positron);
+  
+    FairBoxGenerator *gamma = new FairBoxGenerator();
+    gamma->SetPDGType(22);
+    gamma->SetMultiplicity(1);
+    gamma->SetBoxXYZ(-0.1,-0.1,0.1,0.1,0.);
+    //gamma->SetPRange(0.,4.);
+    gamma->SetPtRange(0.,3.);
+    gamma->SetPhiRange(0,360);
+    gamma->SetThetaRange(2.5,25);
+    //gamma->SetThetaRange(0.,3.);
+    gamma->Init();
+    primGen->AddGenerator(gamma);
+  */
   fRun->SetGenerator(primGen);       
   // ------------------------------------------------------------------------
 

@@ -149,6 +149,7 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fInvMassSpectrumAllEPPairs(NULL),
     fInvMassSpectrumEPPairsInTarget(NULL),
     fInvMassSpectrumEPPairsInMagnet(NULL),
+    fInvMassSpectrumGammaEPPairsInMagnetBackground(NULL),
     // Cuts
     fEPPairOpeningAngle(NULL),
     fEPPairOpeningAngleGamma(NULL),
@@ -159,8 +160,19 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fPairOpeningAngleAll(NULL),
     fPairOpeningAngleGamma(NULL),
     fPairOpeningAnglePi0(NULL),
-    fPairOpeningAngleGammaWoPi0(NULL)
-
+    fPairOpeningAngleGammaWoPi0(NULL),
+    fInvMassSpectrumGammaEPPairsInTargetPt(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetPt(NULL), // new
+    fInvMassSpectrumGammaEPPairsPt(NULL), // new
+    fInvMassSpectrumGammaEPPairsInTargetP(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetP(NULL), // new
+    fInvMassSpectrumGammaEPPairsP(NULL), // new
+    fInvMassSpectrumGammaEPPairsInTargetOA(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetOA(NULL), // new
+    fInvMassSpectrumGammaEPPairsOA(NULL), // new
+    fInvMassSpectrumGammaEPPairsInTargetVD(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetVD(NULL), // new
+    fInvMassSpectrumGammaEPPairsVD(NULL) 
 {
 }
 
@@ -248,6 +260,7 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fInvMassSpectrumAllEPPairs(NULL),
     fInvMassSpectrumEPPairsInTarget(NULL),
     fInvMassSpectrumEPPairsInMagnet(NULL),
+    fInvMassSpectrumGammaEPPairsInMagnetBackground(NULL),
     // Cuts
     fEPPairOpeningAngle(NULL),
     fEPPairOpeningAngleGamma(NULL),
@@ -258,7 +271,19 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fPairOpeningAngleAll(NULL),
     fPairOpeningAngleGamma(NULL),
     fPairOpeningAnglePi0(NULL),
-    fPairOpeningAngleGammaWoPi0(NULL)
+    fPairOpeningAngleGammaWoPi0(NULL),
+    fInvMassSpectrumGammaEPPairsInTargetPt(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetPt(NULL), // new
+    fInvMassSpectrumGammaEPPairsPt(NULL), // new
+    fInvMassSpectrumGammaEPPairsInTargetP(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetP(NULL), // new
+    fInvMassSpectrumGammaEPPairsP(NULL), // new
+    fInvMassSpectrumGammaEPPairsInTargetOA(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetOA(NULL), // new
+    fInvMassSpectrumGammaEPPairsOA(NULL), // new
+    fInvMassSpectrumGammaEPPairsInTargetVD(NULL), // new
+    fInvMassSpectrumGammaEPPairsInMagnetVD(NULL), // new
+    fInvMassSpectrumGammaEPPairsVD(NULL) 
 {
 }
 
@@ -386,6 +411,7 @@ CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()
   delete fInvMassSpectrumAllEPPairs;
   delete fInvMassSpectrumEPPairsInTarget;
   delete fInvMassSpectrumEPPairsInMagnet;
+  delete fInvMassSpectrumGammaEPPairsInMagnetBackground;
   // Cuts
   delete fEPPairOpeningAngle;
   delete fEPPairOpeningAngleGamma;
@@ -398,7 +424,18 @@ CbmTrdPhotonAnalysis::~CbmTrdPhotonAnalysis()
   delete fPairOpeningAngleGamma;
   delete fPairOpeningAnglePi0;
   delete fPairOpeningAngleGammaWoPi0;
-
+  delete fInvMassSpectrumGammaEPPairsInTargetPt; // new
+  delete fInvMassSpectrumGammaEPPairsInMagnetPt; // new
+  delete fInvMassSpectrumGammaEPPairsPt; // new
+  delete fInvMassSpectrumGammaEPPairsInTargetP; // new
+  delete fInvMassSpectrumGammaEPPairsInMagnetP; // new
+  delete fInvMassSpectrumGammaEPPairsP; // new
+  delete fInvMassSpectrumGammaEPPairsInTargetOA; // new
+  delete fInvMassSpectrumGammaEPPairsInMagnetOA; // new
+  delete fInvMassSpectrumGammaEPPairsOA; // new
+  delete fInvMassSpectrumGammaEPPairsInTargetVD; // new
+  delete fInvMassSpectrumGammaEPPairsInMagnetVD; // new
+  delete fInvMassSpectrumGammaEPPairsVD;
 
 }
 
@@ -515,6 +552,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   CbmMCTrack* gtrack1 = NULL;
   CbmMCTrack* gtrack2 = NULL;
 
+  const Double_t minDistance = 1e-4;
 
   CbmTrdTrack* track = NULL;
   CbmGlobalTrack* gtrack = NULL;
@@ -545,7 +583,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::map<Int_t, MCParticle*>::iterator it;
 
   std::vector<CbmMCTrack*> fGammaFromPairs;
-
+  std::vector<Int_t> fElectronPositronIds;
   std::vector<Int_t> fElectronIds;
   std::vector<Int_t> fPositronIds;
   std::vector<Int_t> fGammaIds;
@@ -557,6 +595,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::vector<std::pair<Int_t,Int_t> > gammaGammaPairs;
  
   std::vector<CbmMCTrack *> gammaFromEPPairs;
+  std::vector<CbmMCTrack *> gammaFromEPPairsInMagnetBackground;
   std::vector<CbmMCTrack *> gammaFromEPPairsInMagnet;
   std::vector<CbmMCTrack *> gammaFromEPPairsInTarget;
   std::vector<CbmMCTrack *> gammaFromEPPairsOpeningAngle;
@@ -584,7 +623,9 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   printf("\n MC Tracks:        %i\n MC TRD Points:    %i\n TRD Digis:        %i\n TRD Cluster:      %i\n TRD Hits:         %i\n TRD Tracks:       %i\n Global Tracks:    %i\n Primary Verticis: %i\n", nMcTracks, nTrdPoints, nTrdDigis, nTrdClusters, nTrdHits, nTrdTracks, nGlobalTracks, nPrimaryVertex);
   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   //Overview histograms and filling vectors for all electrons, positrons, gamma, and pi0
+  printf("Searching electrons, positrons and photons\n");
   for (Int_t iMcTrack = 0; iMcTrack < nMcTracks; iMcTrack++) {
+    Statusbar(iMcTrack,nMcTracks);
     mctrack = (CbmMCTrack*) fMCTracks->At(iMcTrack);
     motherId = mctrack->GetMotherId();
     if (motherId != -1)
@@ -611,20 +652,28 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	fgammaMother->Fill(PdgToGeant(mother->GetPdgCode()));
       else
 	fgammaMother->Fill(49);
-      fGammaIds.push_back(iMcTrack);
+      if (VertexInMagnet(mctrack)) 
+	fGammaIds.push_back(iMcTrack);
     }
     if (mctrack->GetPdgCode() == -11) { // Positron
       fZBirth[1]->Fill(mctrack->GetStartZ());
-      fPositronIds.push_back(iMcTrack);
+      if (VertexInMagnet(mctrack)) 
+	fPositronIds.push_back(iMcTrack);
+      else
+	fElectronPositronIds.push_back(iMcTrack);
     }
     if (mctrack->GetPdgCode() ==  11) { // Electron
       fZBirth[2]->Fill(mctrack->GetStartZ());
-      fElectronIds.push_back(iMcTrack);
+      if (VertexInMagnet(mctrack)) 
+	fElectronIds.push_back(iMcTrack);
+      else
+	fElectronPositronIds.push_back(iMcTrack);
     }
     if (mctrack->GetPdgCode() == 111) { //Pi^0
       fZBirth[3]->Fill(mctrack->GetStartZ());
       fBirthPi0->Fill(mctrack->GetStartX(), mctrack->GetStartY(), mctrack->GetStartZ());
-      fPi0Ids.push_back(iMcTrack);
+      if (VertexInMagnet(mctrack)) 
+	fPi0Ids.push_back(iMcTrack);
     }
 
     
@@ -750,7 +799,16 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       //fMCParticleMap[mctrack->GetMotherId()]->daughterPids.push_back(mctrack->GetPdgCode());
     }
   }
-
+  printf ("\n--- Found\n\
+---      %7i Photons   (in magnet)\n\
+---      %7i Electrons (in magnet)\n\
+---      %7i Positrons (in magnet)\n\
+---      %7i Electrons + Positrons (outside magnet)\n\n", 
+	  (Int_t)fGammaIds.size(), 
+	  (Int_t)fElectronIds.size(), 
+	  (Int_t)fPositronIds.size(),
+	  (Int_t)fElectronPositronIds.size()
+	  );
  
   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   //=========================================================================
@@ -780,10 +838,39 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       }
     }
   }
-
+  /*
   // Find Electron Positron Pairs
-  for (Int_t iElectron = 0; iElectron < fElectronIds.size(); iElectron++) {
-    for (Int_t iPositron = 0; iPositron < fPositronIds.size(); iPositron++) {
+  printf("Searching electron positron pairs\n");
+  Int_t nElPos = fElectronPositronIds.size();
+  for (Int_t iElPos = 0; iElPos < nElPos; iElPos++) {
+  Statusbar(iElPos,nElPos);
+  for (Int_t jElPos = iElPos+1; jElPos < nElPos; jElPos++) {
+  etrack = (CbmMCTrack*)fMCTracks->At(fElectronPositronIds[iElPos]);
+  ptrack = (CbmMCTrack*)fMCTracks->At(fElectronPositronIds[jElPos]);
+  if (CloseByVertex(etrack, ptrack, minDistance)) {
+  if (CalcOpeningAngle(etrack, ptrack) < 1.0){
+  CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
+  etrack->GetPx() + ptrack->GetPx(),
+  etrack->GetPy() + ptrack->GetPy(),
+  etrack->GetPz() + ptrack->GetPz(),
+  0,
+  0,
+  0,
+  0,//invariantMass,
+  0);
+
+  gammaFromEPPairs.push_back(gamma);
+  }
+  }
+  }
+  }
+
+  */
+  Int_t nElectrons = fElectronIds.size();
+  Int_t nPositrons = fPositronIds.size();
+  for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
+    Statusbar(iElectron,nElectrons);
+    for (Int_t iPositron = 0; iPositron < nPositrons; iPositron++) {
       etrack = (CbmMCTrack*)fMCTracks->At(fElectronIds[iElectron]);
       ptrack = (CbmMCTrack*)fMCTracks->At(fPositronIds[iPositron]);
  
@@ -795,12 +882,25 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       if (VertexInTarget(etrack) && VertexInTarget(ptrack))
 	fEPPairVertexDistance_inTarget->Fill(vertexDistance);
 
-      if (CloseByVertex(etrack, ptrack, 0.01)) {
+      Double_t openingAngle = CalcOpeningAngle(etrack, ptrack);
+      Double_t invariantMass = CalcInvariantMass(etrack, ptrack);
+      Double_t pt = CalcPt(etrack, ptrack);
+
+      fEPPairOpeningAngle->Fill(openingAngle);
+      fInvMassSpectrumAllEPPairs->Fill(invariantMass);
+      fInvMPairMother->Fill(invariantMass, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+      fPtPairMother->Fill(pt, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+      fPPairMother->Fill(TMath::Sqrt(pow(etrack->GetPx() + ptrack->GetPx(),2) + pow(etrack->GetPy() + ptrack->GetPy(),2) + pow(etrack->GetPz() + ptrack->GetPz(),2)), PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+      fOpenAnglePairMother->Fill(openingAngle, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+
+      fInvMPairMother->Fill(invariantMass, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+      fPtPairMother->Fill(pt, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+      fOpenAnglePairMother->Fill(openingAngle, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+
+      if (CloseByVertex(etrack, ptrack, minDistance /*cm*/)) {
 	std::pair<Int_t,Int_t> epPair (fElectronIds[iElectron], fPositronIds[iPositron]);
 	electronPositronPairs.push_back(epPair);
-	Double_t openingAngle = CalcOpeningAngle(etrack, ptrack);
-	Double_t invariantMass = CalcInvariantMass(etrack, ptrack);
-	Double_t pt = CalcPt(etrack, ptrack);
+
 	CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
 					   etrack->GetPx() + ptrack->GetPx(),
 					   etrack->GetPy() + ptrack->GetPy(),
@@ -810,23 +910,17 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 					   0,
 					   0,//invariantMass,
 					   0);
-	gammaFromEPPairs.push_back(gamma);
-	//cout << iElectron << " " << iPositron << endl;
 
-	fEPPairOpeningAngle->Fill(openingAngle);
-	fInvMassSpectrumAllEPPairs->Fill(invariantMass);
-	fInvMPairMother->Fill(invariantMass, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
-	fPtPairMother->Fill(pt, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
-	fPPairMother->Fill(TMath::Sqrt(pow(etrack->GetPx() + ptrack->GetPx(),2) + pow(etrack->GetPy() + ptrack->GetPy(),2) + pow(etrack->GetPz() + ptrack->GetPz(),2)), PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
-	fOpenAnglePairMother->Fill(openingAngle, PdgToGeant(fMCParticleMap[fMCParticleMap[fElectronIds[iElectron]]->motherId]->PID));
+	//gammaFromEPPairs.push_back(gamma);
 
-	fInvMPairMother->Fill(invariantMass, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
-	fPtPairMother->Fill(pt, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
-	fOpenAnglePairMother->Fill(openingAngle, PdgToGeant(fMCParticleMap[fMCParticleMap[fPositronIds[iPositron]]->motherId]->PID));
+
 
 	if (VertexInMagnet(etrack) && VertexInMagnet(ptrack)) {
 	  gammaFromEPPairsInMagnet.push_back(gamma);
 	  fEPPairOpeningAngleInMagnet->Fill(openingAngle);
+	  //if (fMCParticleMap[fElectronIds[iElectron]]->motherId != fMCParticleMap[fPositronIds[iPositron]]->motherId) 
+	  //gammaFromEPPairsInMagnetBackground.push_back(gamma);
+	  
 	  fInvMassSpectrumEPPairsInMagnet->Fill(invariantMass);
 	  if(VertexInTarget(etrack) && VertexInTarget(ptrack)) {
 	    gammaFromEPPairsInTarget.push_back(gamma);
@@ -861,16 +955,36 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	  }
 	}
       }
+      else {
+	/*
+	  if (fMCParticleMap[fElectronIds[iElectron]]->motherId != fMCParticleMap[fPositronIds[iPositron]]->motherId)
+	  if (VertexInMagnet(etrack) && VertexInMagnet(ptrack)) {
+	  CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
+	  etrack->GetPx() + ptrack->GetPx(),
+	  etrack->GetPy() + ptrack->GetPy(),
+	  etrack->GetPz() + ptrack->GetPz(),
+	  0,
+	  0,
+	  0,
+	  0,//invariantMass,
+	  0);
+	  gammaFromEPPairsInMagnetBackground.push_back(gamma);
+	
+	  }
+	*/
+      }
     }
   }
 
   printf (
 	  "\n--- Found\n\
----      %7i Gammas    (global)\n\
+---      %7i Photons   (global)\n\
 ---      %7i Electrons (global)\n\
 ---      %7i Positrons (global)\n\
 ---      %7i Electron & Positron Pairs (global after vertex distance cut)\n\
+---      %7i Electron & Positron Pairs (outside magnet volume)\n\
 ---      %7i Electron & Positron Pairs (in magnet volume)\n\
+---      %7i Electron & Positron Pairs (in magnet volume) background\n\
 ---      %7i Electron & Positron Pairs (in target volume)\n\
 ---      %7i Electron & Positron Pairs (opening angle cut)\n\
 ---      %7i Electron & Positron Pairs (same mother id)\n\
@@ -882,7 +996,9 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	  (Int_t)fElectronIds.size(), 
 	  (Int_t)fPositronIds.size(), 
 	  (Int_t)electronPositronPairs.size(),
+	  (Int_t)gammaFromEPPairs.size(),
 	  (Int_t)gammaFromEPPairsInMagnet.size(),
+	  (Int_t)gammaFromEPPairsInMagnetBackground.size(),
 	  (Int_t)gammaFromEPPairsInTarget.size(),
 	  (Int_t)gammaFromEPPairsOpeningAngle.size(),
 	  (Int_t)gammaFromTrueEPPairs.size(),
@@ -897,16 +1013,35 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
-      fInvMassSpectrumGammaEPPairsOpenAngle->Fill(CalcInvariantMass(gammaFromEPPairsOpeningAngle[iGamma], gammaFromEPPairsOpeningAngle[jGamma]));
+      if (CloseByVertex(gammaFromEPPairsOpeningAngle[iGamma], gammaFromEPPairsOpeningAngle[jGamma], minDistance /*cm*/)) // up to now now vertex calculated
+	fInvMassSpectrumGammaEPPairsOpenAngle->Fill(CalcInvariantMass(gammaFromEPPairsOpeningAngle[iGamma], gammaFromEPPairsOpeningAngle[jGamma]));
     }
   }
+  /*
+    printf("fInvMassSpectrumGammaEPPairsInMagnetBackground\n");
+    nGamma = gammaFromEPPairsInMagnetBackground.size() * 1e-2;
+    for (Int_t iGamma = 0; iGamma < nGamma; iGamma++) {
+    Statusbar(iGamma,nGamma);
+    for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
+    //cout << iGamma << " " << jGamma << endl;
+    if (CloseByVertex(gammaFromEPPairsInMagnetBackground[iGamma], gammaFromEPPairsInMagnetBackground[jGamma], minDistance))
+    fInvMassSpectrumGammaEPPairsInMagnetBackground->Fill(CalcInvariantMass(gammaFromEPPairsInMagnetBackground[iGamma], gammaFromEPPairsInMagnetBackground[jGamma]));
+    }
+    }
+  */
   printf("fInvMassSpectrumGammaEPPairsInTarget\n");
   nGamma = gammaFromEPPairsInTarget.size();
   for (Int_t iGamma = 0; iGamma < nGamma; iGamma++) {
     Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
-      fInvMassSpectrumGammaEPPairsInTarget->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
+      if (CloseByVertex(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma], minDistance /*cm*/)){ // up to now now vertex calculated
+	fInvMassSpectrumGammaEPPairsInTarget->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
+	fInvMassSpectrumGammaEPPairsInTargetPt->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]), CalcPt(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
+	fInvMassSpectrumGammaEPPairsInTargetP->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]), CalcP(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
+	fInvMassSpectrumGammaEPPairsInTargetVD->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]), CalcVertexDistance(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
+	fInvMassSpectrumGammaEPPairsInTargetOA->Fill(CalcInvariantMass(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]), CalcOpeningAngle(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma]));
+      }
     }
   }
   printf("fInvMassSpectrumGammaEPPairsInMagnet\n");
@@ -915,7 +1050,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
-      fInvMassSpectrumGammaEPPairsInMagnet->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
+      if (CloseByVertex(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma], minDistance /*cm*/)){ // up to now now vertex calculated
+	fInvMassSpectrumGammaEPPairsInMagnet->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
+	fInvMassSpectrumGammaEPPairsInMagnetPt->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]), CalcPt(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
+	fInvMassSpectrumGammaEPPairsInMagnetP->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]), CalcP(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
+	fInvMassSpectrumGammaEPPairsInMagnetVD->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]), CalcVertexDistance(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
+	fInvMassSpectrumGammaEPPairsInMagnetOA->Fill(CalcInvariantMass(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]), CalcOpeningAngle(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma]));
+      }
     }
   }
   
@@ -925,8 +1066,14 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
-      fInvMassSpectrumGammaEPPairs->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
-      //fInvMassSpectrumGammaEPPairs->Fill(gammaFromEPPairs[iGamma]->GetStartT() + gammaFromEPPairs[jGamma]->GetStartT());
+      if (CloseByVertex(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma], minDistance /*cm*/)){ // up to now now vertex calculated
+	fInvMassSpectrumGammaEPPairs->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+	fInvMassSpectrumGammaEPPairsPt->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]), CalcPt(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+	fInvMassSpectrumGammaEPPairsP->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]), CalcP(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+	fInvMassSpectrumGammaEPPairsVD->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]), CalcVertexDistance(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+	fInvMassSpectrumGammaEPPairsOA->Fill(CalcInvariantMass(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]), CalcOpeningAngle(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma]));
+	//fInvMassSpectrumGammaEPPairs->Fill(gammaFromEPPairs[iGamma]->GetStartT() + gammaFromEPPairs[jGamma]->GetStartT());
+      }
     }
   }
   
@@ -938,7 +1085,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     for (Int_t jGamma = iGamma+1; jGamma < nGamma; jGamma++) {
       gtrack1 = (CbmMCTrack*)fMCTracks->At(fGammaIds[iGamma]);
       gtrack2 = (CbmMCTrack*)fMCTracks->At(fGammaIds[jGamma]); 
-      //if (CloseByVertex(gtrack1, gtrack2, 0.01)) 
+      if (CloseByVertex(gtrack1, gtrack2, minDistance))  
 	{
 	  fInvMassSpectrumGammaAllPairs->Fill(CalcInvariantMass(gtrack1, gtrack2));
 	  if ((fMCParticleMap[fGammaIds[iGamma]]->motherId == fMCParticleMap[fGammaIds[jGamma]]->motherId) 
@@ -949,30 +1096,39 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	    std::pair<Int_t,Int_t> ggPair (fGammaIds[iGamma], fGammaIds[jGamma]);
 	    //ggPair = make_pair (fGammaIds[iGamma], fGammaIds[jGamma]);
 	    gammaGammaPairs.push_back(ggPair);
-	    fgammaAndGammaMother->Fill(PdgToGeant(fMCParticleMap[fMCParticleMap[fGammaIds[iGamma]]->motherId]->PID));
+	    if (fMCParticleMap[fGammaIds[iGamma]]->motherId > 0)
+	      fgammaAndGammaMother->Fill(PdgToGeant(fMCParticleMap[fMCParticleMap[fGammaIds[iGamma]]->motherId]->PID));
 	  }
 	}
     }
   }
+  Int_t nPairs = electronPositronPairs.size();
+  /*
   // Find Daliz Triplets
-  for (Int_t iGamma = 0; iGamma < fGammaIds.size(); iGamma++) {
-    for (Int_t iPair = 0; iPair < electronPositronPairs.size(); iPair++) {
-      if (fMCParticleMap[fGammaIds[iGamma]]->motherId == fMCParticleMap[electronPositronPairs[iPair].first]->motherId) {
-	std::vector<Int_t> triplet;
-	triplet.push_back(electronPositronPairs[iPair].first);
-	triplet.push_back(electronPositronPairs[iPair].second);
-	triplet.push_back(fGammaIds[iGamma]);
-	dalizTriplets.push_back(triplet);
-	fDalizMother->Fill(PdgToGeant(fMCParticleMap[fMCParticleMap[fGammaIds[iGamma]]->motherId]->PID));
-      }
-    }
+  printf("Find Daliz Triplets\n");
+  nGamma = fGammaIds.size();
+  for (Int_t iGamma = 0; iGamma < nGamma; iGamma++) {
+  Statusbar(iGamma,nGamma);
+  for (Int_t iPair = 0; iPair < nPairs; iPair++) {
+  if (fMCParticleMap[fGammaIds[iGamma]]->motherId == fMCParticleMap[electronPositronPairs[iPair].first]->motherId) {
+  std::vector<Int_t> triplet;
+  triplet.push_back(electronPositronPairs[iPair].first);
+  triplet.push_back(electronPositronPairs[iPair].second);
+  triplet.push_back(fGammaIds[iGamma]);
+  dalizTriplets.push_back(triplet);
+  fDalizMother->Fill(PdgToGeant(fMCParticleMap[fMCParticleMap[fGammaIds[iGamma]]->motherId]->PID));
   }
+  }
+  }
+  */
   //=========================================================================
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+  fInvMassSpectrumGammaEPPairsInMagnetBackground->Scale(fInvMassSpectrumGammaEPPairsInMagnet->GetEntries()/(Float_t)fInvMassSpectrumGammaEPPairsInMagnetBackground->GetEntries());
 
   // Vertizes of real electron positron pairs
-  for (Int_t iPair = 0; iPair < electronPositronPairs.size(); iPair++ ) {
+  printf("Vertizes of real electron positron pairs\n");
+  for (Int_t iPair = 0; iPair < nPairs; iPair++ ) {
+    Statusbar(iPair,nPairs);
     etrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].first);
     ptrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].second);
 
@@ -1093,17 +1249,27 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   for (Int_t i = 0; i < fMCParticleMap.size(); i++)
     delete fMCParticleMap[i];
   for (Int_t i = 0; i < gammaFromEPPairs.size(); i++)
-    delete gammaFromEPPairs[i];
+    delete gammaFromEPPairs[i]; 
+  
+  for (Int_t i = 0; i < gammaFromEPPairsInMagnet.size(); i++)
+    if (NULL != gammaFromEPPairsInMagnet[i])
+      delete gammaFromEPPairsInMagnet[i];
   /*
-    for (Int_t i = 0; i < gammaFromEPPairsInMagnet.size(); i++)
-    delete gammaFromEPPairsInMagnet[i];
+    for (Int_t i = 0; i < gammaFromEPPairsInMagnetBackground.size(); i++)
+    if (NULL != gammaFromEPPairsInMagnetBackground[i])
+    delete gammaFromEPPairsInMagnetBackground[i];
+  
     for (Int_t i = 0; i < gammaFromEPPairsInTarget.size(); i++)
+    if (NULL != gammaFromEPPairsInTarget[i])
     delete gammaFromEPPairsInTarget[i];
     for (Int_t i = 0; i < gammaFromEPPairsOpeningAngle.size(); i++)
+    if (NULL != gammaFromEPPairsOpeningAngle[i])
     delete gammaFromEPPairsOpeningAngle[i];
     for (Int_t i = 0; i < gammaFromTrueEPPairs.size(); i++)
+    if (NULL != gammaFromTrueEPPairs[i])
     delete gammaFromTrueEPPairs[i];
   */
+
 
   //delete track;
   //delete gtrack;
@@ -1139,27 +1305,37 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     return Pt;
   }
 
-Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB)
+Double_t CbmTrdPhotonAnalysis::CalcP(CbmMCTrack* trackA, CbmMCTrack* trackB)
 {
-  Double_t energyA = TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
-  Double_t energyB = TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
-  //if (energyA != trackA->GetEnergy() || energyB != trackB->GetEnergy())
-  //printf ("A: %.8f != %.8f Delta = %E  B: %.8f != %.8f Delta = %E\n", energyA, trackA->GetEnergy(), energyA-trackA->GetEnergy(), energyB, trackB->GetEnergy(), energyB - trackB->GetEnergy());
-  Double_t energyAB = trackA->GetEnergy() + trackB->GetEnergy();//energyA + energyB;
-  //if (energyAB != energyA + energyB)
-  // printf ("A: %.8f != %.8f Delta = %E  B: %.8f != %.8f Delta = %E\n", energyA, trackA->GetEnergy(), energyA-trackA->GetEnergy(), energyB, trackB->GetEnergy(), energyB - trackB->GetEnergy());
-  energyAB = energyA + energyB;
-  //Double_t ptAB = trackA->GetPt() + trackB->GetPt();
-  Double_t invariantMass = TMath::Sqrt(
-				       pow(energyAB,2) 
-				       - (
-					  pow((trackA->GetPx() + trackB->GetPx()),2) 
-					  + pow((trackA->GetPy() + trackB->GetPy()),2) 
-					  + pow((trackA->GetPz() + trackB->GetPz()),2)
-					  )
-				       );
-  return invariantMass;
+  Double_t Px = trackA->GetPx() + trackB->GetPx();
+  Double_t Py = trackA->GetPy() + trackB->GetPy();
+  Double_t Pz = trackA->GetPz() + trackB->GetPz();
+  Double_t P = TMath::Sqrt(pow(Px,2) + pow(Py,2) + pow(Pz,2));
+
+  return P;
 }
+
+  Double_t CbmTrdPhotonAnalysis::CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB)
+  {
+    Double_t energyA = TMath::Sqrt(pow(trackA->GetPx(),2) + pow(trackA->GetPy(),2) + pow(trackA->GetPz(),2));
+    Double_t energyB = TMath::Sqrt(pow(trackB->GetPx(),2) + pow(trackB->GetPy(),2) + pow(trackB->GetPz(),2));
+    //if (energyA != trackA->GetEnergy() || energyB != trackB->GetEnergy())
+    //printf ("A: %.8f != %.8f Delta = %E  B: %.8f != %.8f Delta = %E\n", energyA, trackA->GetEnergy(), energyA-trackA->GetEnergy(), energyB, trackB->GetEnergy(), energyB - trackB->GetEnergy());
+    Double_t energyAB = trackA->GetEnergy() + trackB->GetEnergy();//energyA + energyB;
+    //if (energyAB != energyA + energyB)
+    // printf ("A: %.8f != %.8f Delta = %E  B: %.8f != %.8f Delta = %E\n", energyA, trackA->GetEnergy(), energyA-trackA->GetEnergy(), energyB, trackB->GetEnergy(), energyB - trackB->GetEnergy());
+    energyAB = energyA + energyB;
+    //Double_t ptAB = trackA->GetPt() + trackB->GetPt();
+    Double_t invariantMass = TMath::Sqrt(
+					 pow(energyAB,2) 
+					 - (
+					    pow((trackA->GetPx() + trackB->GetPx()),2) 
+					    + pow((trackA->GetPy() + trackB->GetPy()),2) 
+					    + pow((trackA->GetPz() + trackB->GetPz()),2)
+					    )
+					 );
+    return invariantMass;
+  }
 
 
   Double_t CbmTrdPhotonAnalysis::CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB) {
@@ -1522,31 +1698,46 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fPairHistory->GetXaxis()->SetBinLabel( 9,"pairs from #pi^{0} within target");
   fPairHistory->GetXaxis()->SetBinLabel(10,"");
 
-  fInvMassSpectrumGammaTruePairs = new TH1D("InvMassSpectrumGammaTruePairs","Invariant mass spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
-  fInvMassSpectrumGammaAllPairs  = new TH1D("InvMassSpectrumGammaAllPairs","Invariant mass spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
-  fInvMassSpectrumGammaEPPairs   = new TH1D("InvMassSpectrumGammaEPPairs","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs",2000,0,2);
-  fInvMassSpectrumGammaEPPairsInTarget    = new TH1D("InvMassSpectrumGammaEPPairsInTarget","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
-  fInvMassSpectrumGammaEPPairsInMagnet    = new TH1D("InvMassSpectrumGammaEPPairsInMagnet","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
-  fInvMassSpectrumGammaEPPairsOpenAngle   = new TH1D("InvMassSpectrumGammaEPPairsOpenAngle","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs oping angle cut",2000,0,2);
-  fInvMassSpectrumGammaEPPairsGamma       = new TH1D("InvMassSpectrumGammaEPPairsGamma","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#gamma",2000,0,2);
-  fInvMassSpectrumGammaEPPairsPi0         = new TH1D("InvMassSpectrumGammaEPPairsPi0","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#pi^{0}",2000,0,2);
+  fInvMassSpectrumGammaTruePairs = new TH1I("InvMassSpectrumGammaTruePairs","Invariant mass spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
+  fInvMassSpectrumGammaAllPairs  = new TH1I("InvMassSpectrumGammaAllPairs","Invariant mass spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
+  fInvMassSpectrumGammaEPPairs   = new TH1I("InvMassSpectrumGammaEPPairs","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+/-}e^{-/+} pairs outside magnet",2000,0,2);
+  fInvMassSpectrumGammaEPPairsInTarget    = new TH1I("InvMassSpectrumGammaEPPairsInTarget","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
+  fInvMassSpectrumGammaEPPairsInMagnet    = new TH1I("InvMassSpectrumGammaEPPairsInMagnet","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fInvMassSpectrumGammaEPPairsOpenAngle   = new TH1I("InvMassSpectrumGammaEPPairsOpenAngle","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs oping angle cut",2000,0,2);
+  fInvMassSpectrumGammaEPPairsGamma       = new TH1I("InvMassSpectrumGammaEPPairsGamma","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#gamma",2000,0,2);
+  fInvMassSpectrumGammaEPPairsPi0         = new TH1I("InvMassSpectrumGammaEPPairsPi0","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#pi^{0}",2000,0,2);
 
-  fInvMassSpectrumTrueEPPairs  = new TH1D("InvMassSpectrumTrueEPPairs","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
-  fInvMassSpectrumAllEPPairs   = new TH1D("InvMassSpectrumAllEPPairs","Invariant mass spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
-  fInvMassSpectrumEPPairsInTarget   = new TH1D("InvMassSpectrumAllEPPairsInTarget","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in target",2000,0,2);
-  fInvMassSpectrumEPPairsInMagnet   = new TH1D("InvMassSpectrumAllEPPairsInMagnet","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fInvMassSpectrumTrueEPPairs  = new TH1I("InvMassSpectrumTrueEPPairs","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
+  fInvMassSpectrumAllEPPairs   = new TH1I("InvMassSpectrumAllEPPairs","Invariant mass spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
+  fInvMassSpectrumEPPairsInTarget   = new TH1I("InvMassSpectrumAllEPPairsInTarget","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in target",2000,0,2);
+  fInvMassSpectrumEPPairsInMagnet   = new TH1I("InvMassSpectrumAllEPPairsInMagnet","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+  fInvMassSpectrumGammaEPPairsInMagnetBackground   = new TH1D("InvMassSpectrumAllEPPairsInMagnetBackground","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet background",2000,0,2);
 
-  fEPPairOpeningAngle   = new TH1D("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
-  fEPPairOpeningAngleGamma   = new TH1D("EPPairOpeningAngleGamma ","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
-  fEPPairOpeningAnglePi0   = new TH1D("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
-  fEPPairOpeningAngleSameMother   = new TH1D("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
-  fEPPairOpeningAngleInTarget   = new TH1D("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
-  fEPPairOpeningAngleInMagnet   = new TH1D("EPPairOpeningAngleInMagnet","opening angle #theta of MC-e^{+}e^{-} pairs in magnet",1800,0,180);
+  fEPPairOpeningAngle   = new TH1I("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
+  fEPPairOpeningAngleGamma   = new TH1I("EPPairOpeningAngleGamma ","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
+  fEPPairOpeningAnglePi0   = new TH1I("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
+  fEPPairOpeningAngleSameMother   = new TH1I("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
+  fEPPairOpeningAngleInTarget   = new TH1I("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
+  fEPPairOpeningAngleInMagnet   = new TH1I("EPPairOpeningAngleInMagnet","opening angle #theta of MC-e^{+}e^{-} pairs in magnet",1800,0,180);
 
-  fPairOpeningAngleAll  = new TH1D("PairOpeningAngleAll","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
-  fPairOpeningAngleGamma  = new TH1D("PairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma",1800,0,180);
-  fPairOpeningAnglePi0  = new TH1D("PairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs from #pi^{0}",1800,0,180);
-  fPairOpeningAngleGammaWoPi0  = new TH1D("PairOpeningAngleGammaWoPi0","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma - pairs from #pi^{0}",1800,0,180);
+  fPairOpeningAngleAll  = new TH1I("PairOpeningAngleAll","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
+  fPairOpeningAngleGamma  = new TH1I("PairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma",1800,0,180);
+  fPairOpeningAnglePi0  = new TH1I("PairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs from #pi^{0}",1800,0,180);
+  fPairOpeningAngleGammaWoPi0  = new TH1I("PairOpeningAngleGammaWoPi0","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma - pairs from #pi^{0}",1800,0,180);
+
+  fInvMassSpectrumGammaEPPairsInTargetPt = new TH2I("InvMassSpectrumGammaEPPairsInTargetPt","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,500,0,5); // new
+  fInvMassSpectrumGammaEPPairsInMagnetPt = new TH2I("InvMassSpectrumGammaEPPairsInMagnetPt","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,500,0,5); // new
+  fInvMassSpectrumGammaEPPairsPt = new TH2I("InvMassSpectrumGammaEPPairsPt","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,500,0,5); // new
+  fInvMassSpectrumGammaEPPairsInTargetP = new TH2I("InvMassSpectrumGammaEPPairsInTargetP","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,10); // new
+  fInvMassSpectrumGammaEPPairsInMagnetP = new TH2I("InvMassSpectrumGammaEPPairsInMagnetP","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,10); // new
+  fInvMassSpectrumGammaEPPairsP = new TH2I("InvMassSpectrumGammaEPPairsP","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,10); // new
+  fInvMassSpectrumGammaEPPairsInTargetOA = new TH2I("InvMassSpectrumGammaEPPairsInTargetOA","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1800,0,180); // new
+  fInvMassSpectrumGammaEPPairsInMagnetOA = new TH2I("InvMassSpectrumGammaEPPairsInMagnetOA","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1800,0,180); // new
+  fInvMassSpectrumGammaEPPairsOA = new TH2I("InvMassSpectrumGammaEPPairsOA","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1800,0,180); // new
+  fInvMassSpectrumGammaEPPairsInTargetVD = new TH2I("InvMassSpectrumGammaEPPairsInTargetVD","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,1e-7); // new
+  fInvMassSpectrumGammaEPPairsInMagnetVD = new TH2I("InvMassSpectrumGammaEPPairsInMagnetVD","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,1e-7); // new
+  fInvMassSpectrumGammaEPPairsVD = new TH2I("InvMassSpectrumGammaEPPairsVD","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,1e-7);
+
   /*
     TString nameInvM[20] = {"",
     "",
@@ -1611,11 +1802,26 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto2(fPPairMother,1,1,1,"p [Gev/c]","Mother","");
   NiceHisto2(fOpenAnglePairMother,1,1,1,"opening angle #theta [#circ]","Mother","");
 
+
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInTargetPt,1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInMagnetPt,1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsPt,1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInTargetP,1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInMagnetP,1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsP,1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInTargetOA,1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair opening angle #theta [#circ]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInMagnetOA,1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair opening angle #theta [#circ]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsOA,1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair opening angle #theta [#circ]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInTargetVD,1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsInMagnetVD,1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]",""); // new
+  NiceHisto2(fInvMassSpectrumGammaEPPairsVD,1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]","");
+
   NiceHisto1(fInvMassSpectrumGammaAllPairs,1,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fInvMassSpectrumGammaTruePairs,2,1,1,"Invariant mass [GeV/c^{2}]","");
 
   NiceHisto1(fInvMassSpectrumAllEPPairs,1,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fInvMassSpectrumEPPairsInMagnet,2,1,1,"Invariant mass [GeV/c^{2}]","");
+  NiceHisto1(fInvMassSpectrumGammaEPPairsInMagnetBackground,800,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fInvMassSpectrumEPPairsInTarget,3,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fInvMassSpectrumTrueEPPairs,4,1,1,"Invariant mass [GeV/c^{2}]","");
 
@@ -1665,7 +1871,12 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     gDirectory->mkdir("PhotonAnalysis");
   gDirectory->Cd("PhotonAnalysis");
   gDirectory->pwd();
-  //==================================================================MC_Statistic
+
+  if (!gDirectory->Cd("MC")) 
+    gDirectory->mkdir("MC");
+  gDirectory->Cd("MC");
+  gDirectory->pwd();
+  //===============================================================MC_Statistic
   if (!gDirectory->Cd("MC_Statistic")) 
     gDirectory->mkdir("MC_Statistic");
   gDirectory->Cd("MC_Statistic");
@@ -1712,6 +1923,7 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fmotherGrani_posi_inTarget->Write("", TObject::kOverwrite);
   fmotherGrani_elec_inTarget->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
+  //==================================================================Relationships
   //==================================================================Vertizes
   if (!gDirectory->Cd("Vertizes")) 
     gDirectory->mkdir("Vertizes");
@@ -1738,8 +1950,9 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fEPPairVertexDistance_inMagnet->Write("", TObject::kOverwrite);
   fEPPairVertexDistance_inTarget->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
-
+  //==================================================================Vertizes
   gDirectory->Cd("..");
+  //===============================================================MC_Statistic
   //==================================================================InvMassSpectrum
   if (!gDirectory->Cd("InvMassSpectrum_GammaPairs")) 
     gDirectory->mkdir("InvMassSpectrum_GammaPairs");
@@ -1763,16 +1976,36 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fInvMassSpectrumGammaEPPairs->Write("", TObject::kOverwrite);
   //NormalizeHistos(fInvMassSpectrumGammaEPPairsInMagnet);
   fInvMassSpectrumGammaEPPairsInMagnet->Write("", TObject::kOverwrite);
+  //fInvMassSpectrumGammaEPPairsInMagnetBackground->Write("", TObject::kOverwrite);
   //NormalizeHistos(fInvMassSpectrumGammaEPPairsInTarget);
   fInvMassSpectrumGammaEPPairsInTarget->Write("", TObject::kOverwrite);
   //NormalizeHistos(fInvMassSpectrumGammaEPPairsOpenAngle);
   fInvMassSpectrumGammaEPPairsOpenAngle->Write("", TObject::kOverwrite);
   fInvMassSpectrumGammaEPPairsGamma->Write("", TObject::kOverwrite);
   fInvMassSpectrumGammaEPPairsPi0->Write("", TObject::kOverwrite);
+  //==================================================================Cuts
+  if (!gDirectory->Cd("Cuts")) 
+    gDirectory->mkdir("Cuts");
+  gDirectory->Cd("Cuts");
+  gDirectory->pwd();
+  fInvMassSpectrumGammaEPPairsInTargetPt->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInMagnetPt->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsPt->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInTargetP->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInMagnetP->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsP->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInTargetOA->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInMagnetOA->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsOA->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInTargetVD->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsInMagnetVD->Write("", TObject::kOverwrite); // new
+  fInvMassSpectrumGammaEPPairsVD->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
-
+  //==================================================================Cuts
   gDirectory->Cd("..");
- 
+  //==================================================================FromEPPairs
+  gDirectory->Cd("..");
+  //==================================================================GammaPairs
   //==================================================================EPPairs
   if (!gDirectory->Cd("EPPairs")) 
     gDirectory->mkdir("EPPairs");
@@ -1787,8 +2020,9 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   //NormalizeHistos(fInvMassSpectrumTrueEPPairs);
   fInvMassSpectrumTrueEPPairs->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
-
+  //==================================================================EPPairs
   gDirectory->Cd("..");
+  //==================================================================InvMassSpectrum
   //==================================================================OpeningAngle_EPPairs
   if (!gDirectory->Cd("OpeningAngle_EPPairs")) 
     gDirectory->mkdir("OpeningAngle_EPPairs");
@@ -1812,8 +2046,87 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fPairOpeningAngleGamma->Write("", TObject::kOverwrite);
   fPairOpeningAnglePi0->Write("", TObject::kOverwrite);
   fPairOpeningAngleGammaWoPi0->Write("", TObject::kOverwrite);
+  gDirectory->Cd("..");
+  //==================================================================OpeningAngle_EPPairs
+  gDirectory->Cd("..");
+
+  if (!gDirectory->Cd("Reco")) 
+    gDirectory->mkdir("Reco");
+  gDirectory->Cd("Reco");
+  gDirectory->pwd();
+  //===============================================================MC_Statistic
+  if (!gDirectory->Cd("MC_Statistic")) 
+    gDirectory->mkdir("MC_Statistic");
+  gDirectory->Cd("MC_Statistic");
+  gDirectory->pwd();
+
+  //==================================================================Relationships
+  if (!gDirectory->Cd("Relationships")) 
+    gDirectory->mkdir("Relationships");
+  gDirectory->Cd("Relationships");
+  gDirectory->pwd(); 
 
   gDirectory->Cd("..");
+  //==================================================================Relationships
+  //==================================================================Vertizes
+  if (!gDirectory->Cd("Vertizes")) 
+    gDirectory->mkdir("Vertizes");
+  gDirectory->Cd("Vertizes");
+  gDirectory->pwd();
+
+  gDirectory->Cd("..");
+  //==================================================================Vertizes
+  gDirectory->Cd("..");
+  //===============================================================MC_Statistic
+  //==================================================================InvMassSpectrum
+  if (!gDirectory->Cd("InvMassSpectrum_GammaPairs")) 
+    gDirectory->mkdir("InvMassSpectrum_GammaPairs");
+  gDirectory->Cd("InvMassSpectrum_GammaPairs");
+  gDirectory->pwd();
+  //==================================================================GammaPairs
+  if (!gDirectory->Cd("GammaPairs")) 
+    gDirectory->mkdir("GammaPairs");
+  gDirectory->Cd("GammaPairs");
+  gDirectory->pwd();
+
+  //==================================================================FromEPPairs
+  if (!gDirectory->Cd("FromEPPairs")) 
+    gDirectory->mkdir("FromEPPairs");
+  gDirectory->Cd("FromEPPairs");
+  gDirectory->pwd();
+
+  //==================================================================Cuts
+  if (!gDirectory->Cd("Cuts")) 
+    gDirectory->mkdir("Cuts");
+  gDirectory->Cd("Cuts");
+  gDirectory->pwd();
+ 
+  gDirectory->Cd("..");
+  //==================================================================Cuts
+  gDirectory->Cd("..");
+  //==================================================================FromEPPairs
+  gDirectory->Cd("..");
+  //==================================================================GammaPairs
+  //==================================================================EPPairs
+  if (!gDirectory->Cd("EPPairs")) 
+    gDirectory->mkdir("EPPairs");
+  gDirectory->Cd("EPPairs");
+  gDirectory->pwd();
+
+  gDirectory->Cd("..");
+  //==================================================================EPPairs
+  gDirectory->Cd("..");
+  //==================================================================InvMassSpectrum
+  //==================================================================OpeningAngle_EPPairs
+  if (!gDirectory->Cd("OpeningAngle_EPPairs")) 
+    gDirectory->mkdir("OpeningAngle_EPPairs");
+  gDirectory->Cd("OpeningAngle_EPPairs");
+  gDirectory->pwd();
+
+  gDirectory->Cd("..");
+  //==================================================================OpeningAngle_EPPairs
+
+
   //outFile->Close();
   //c->Close();
 }
@@ -1916,14 +2229,14 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     l->SetFillStyle(0);
     l->SetTextSize(0.03);
   }
-void CbmTrdPhotonAnalysis::Statusbar(Int_t i, Int_t n) {
-  if (int(i * 100 / float(n)) - int((i-1) * 100 / float(n)) >= 1) {
-    if (int(i * 100 / float(n)) == 1 || i == 1 || i == 0) 
-      cout << "[" << flush;
-    cout << "-" << flush;
-    if (int(i * 10 / float(n)) - int((i-1) * 10 / float(n)) >= 1) 
-      cout << "|";
-    if (int(i * 100 / float(n)) >=99) 
-      cout << "]" <<endl;
+  void CbmTrdPhotonAnalysis::Statusbar(Int_t i, Int_t n) {
+    if (int(i * 100 / float(n)) - int((i-1) * 100 / float(n)) >= 1) {
+      if (int(i * 100 / float(n)) == 1 || i == 1 || i == 0) 
+	cout << "[" << flush;
+      cout << "-" << flush;
+      if (int(i * 10 / float(n)) - int((i-1) * 10 / float(n)) >= 1) 
+	cout << "|";
+      if (int(i * 100 / float(n)) >=99) 
+	cout << "]" <<endl;
+    }
   }
-}

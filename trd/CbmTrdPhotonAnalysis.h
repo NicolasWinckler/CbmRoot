@@ -74,6 +74,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Double_t CalcInvariantMass(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB);
+  Double_t CalcP(CbmMCTrack* trackA, CbmMCTrack* trackB);
 
   void StatisticHistos();
 
@@ -181,32 +182,46 @@ class CbmTrdPhotonAnalysis : public FairTask {
   //TH1D* fInvMSpectra[20];
   //TH1D* fEPPairOpenAngle[20];
 
-  TH1D* fInvMassSpectrumGammaTruePairs;
-  TH1D* fInvMassSpectrumGammaAllPairs;
-  TH1D* fInvMassSpectrumGammaEPPairs;
+  TH1I* fInvMassSpectrumGammaTruePairs;
+  TH1I* fInvMassSpectrumGammaAllPairs;
+  TH1I* fInvMassSpectrumGammaEPPairs; 
   //TH1I* fInvMassSpectrumGammaEPPairsSameMother;
-  TH1D* fInvMassSpectrumGammaEPPairsInTarget;
-  TH1D* fInvMassSpectrumGammaEPPairsInMagnet;
-  TH1D* fInvMassSpectrumGammaEPPairsOpenAngle;
-  TH1D* fInvMassSpectrumGammaEPPairsGamma;
-  TH1D* fInvMassSpectrumGammaEPPairsPi0;
-  TH1D* fInvMassSpectrumTrueEPPairs;
-  TH1D* fInvMassSpectrumAllEPPairs;
-  TH1D* fInvMassSpectrumEPPairsInTarget;
-  TH1D* fInvMassSpectrumEPPairsInMagnet;
+  TH1I* fInvMassSpectrumGammaEPPairsInTarget;
+  TH1I* fInvMassSpectrumGammaEPPairsInMagnet;
+  TH1I* fInvMassSpectrumGammaEPPairsOpenAngle;
+  TH1I* fInvMassSpectrumGammaEPPairsGamma;
+  TH1I* fInvMassSpectrumGammaEPPairsPi0;
+  TH1I* fInvMassSpectrumTrueEPPairs;
+  TH1I* fInvMassSpectrumAllEPPairs;
+  TH1I* fInvMassSpectrumEPPairsInTarget;
+  TH1I* fInvMassSpectrumEPPairsInMagnet;
+  TH2I* fInvMassSpectrumGammaEPPairsInTargetPt; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInMagnetPt; // new
+  TH2I* fInvMassSpectrumGammaEPPairsPt; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInTargetP; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInMagnetP; // new
+  TH2I* fInvMassSpectrumGammaEPPairsP; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInTargetOA; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInMagnetOA; // new
+  TH2I* fInvMassSpectrumGammaEPPairsOA; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInTargetVD; // new
+  TH2I* fInvMassSpectrumGammaEPPairsInMagnetVD; // new
+  TH2I* fInvMassSpectrumGammaEPPairsVD; // new
+
+  TH1D* fInvMassSpectrumGammaEPPairsInMagnetBackground;
 
   // Cuts
-  TH1D* fEPPairOpeningAngle;
-  TH1D* fEPPairOpeningAngleGamma;
-  TH1D* fEPPairOpeningAnglePi0;
-  TH1D* fEPPairOpeningAngleSameMother;
-  TH1D* fEPPairOpeningAngleInTarget;
-  TH1D* fEPPairOpeningAngleInMagnet;
+  TH1I* fEPPairOpeningAngle;
+  TH1I* fEPPairOpeningAngleGamma;
+  TH1I* fEPPairOpeningAnglePi0;
+  TH1I* fEPPairOpeningAngleSameMother;
+  TH1I* fEPPairOpeningAngleInTarget;
+  TH1I* fEPPairOpeningAngleInMagnet;
 
-  TH1D* fPairOpeningAngleAll;
-  TH1D* fPairOpeningAngleGamma;
-  TH1D* fPairOpeningAnglePi0;
-  TH1D* fPairOpeningAngleGammaWoPi0;
+  TH1I* fPairOpeningAngleAll;
+  TH1I* fPairOpeningAngleGamma;
+  TH1I* fPairOpeningAnglePi0;
+  TH1I* fPairOpeningAngleGammaWoPi0;
   /*
     std::map<Int_t, MCParticle*> fMCParticleMap;
     std::map<Int_t, MCParticle*>::iterator it;

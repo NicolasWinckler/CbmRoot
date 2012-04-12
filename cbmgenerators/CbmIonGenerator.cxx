@@ -187,7 +187,7 @@ Bool_t CbmIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	}
 
 	int pdgType = thisPart->PdgCode();
-/*
+//*
 	cout << "-I- CbmIonGenerator: Generating " << fMult << " ions of type "
 		<< fIon->GetName() << " (PDG code " << pdgType << ")" << endl;
 	cout << "    Momentum " << fP << " GeV/c from spatial distribution center ("
@@ -217,7 +217,7 @@ Bool_t CbmIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 		     << " with momentum (" << fPx << ", " << fPy << ", " << fPz
 		     << ") GeV/c from (" << fVx << ", " << fVy<< ", " << fVz << ") cm" << endl;
 		//*/
-		cout<< fPx/fP <<" "<< fPy/fP <<" "<< fVx <<" "<< fVy << endl;
+//		cout<< fPx/fP <<" "<< fPy/fP <<" "<< fVx <<" "<< fVy << endl;
 
 		primGen->AddTrack(pdgType, fPx, fPy, fPz, fVx, fVy, fVz);
 

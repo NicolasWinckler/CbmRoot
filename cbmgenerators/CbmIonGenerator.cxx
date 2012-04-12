@@ -28,6 +28,25 @@ using std::endl;
 Int_t CbmIonGenerator::fgNIon = 0;
 // ------------------------------------------------------------------------
 
+CbmIonGenerator::CbmIonGenerator()
+  : FairGenerator(),
+    fMult(-1),
+    fP(0.),
+    fVz(0.),
+    fIon(NULL),
+    fcollimationFlag(0),
+    fmeanX(0.),
+    fsigmaX(0.),
+    fx(),
+    fmeanY(0.),
+    fsigmaY(0.),
+    fy(),
+    fsigmaPxdivP(0.),
+    fPxdivPa(),
+    fsigmaPydivP(0.),
+    fPydivPa()
+{
+}
 // -----   Default constructor + vertex position  -------------------------
 CbmIonGenerator::CbmIonGenerator(Int_t z,
 				 Int_t a,

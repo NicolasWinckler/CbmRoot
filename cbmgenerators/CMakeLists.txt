@@ -30,6 +30,7 @@ CbmUrqmdGenerator.cxx
 URun.cxx
 UEvent.cxx
 UParticle.cxx
+CbmIonGenerator.cxx
 )
 
 if(RULE_CHECKER_FOUND)

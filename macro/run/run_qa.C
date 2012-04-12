@@ -16,10 +16,10 @@
   Int_t iVerbose = 1;
 
   // MC file
-  TString simFile = "data/test.sts_allStrips_full.mc.root";
+  TString simFile = "data/test.mc.root";
 
   // Reco file
-  TString recFile = "data/test.sts_allStrips_full.eds.root";
+  TString recFile = "data/test.eds.root";
 
   // Number of events to process
   Int_t nEvents = 1;
@@ -32,7 +32,7 @@
   
   
   // STS digitisation file
-  TString stsDigiFile = "sts_allstrips_full.digi.par";
+  TString stsDigiFile = "sts_standard.digi.par";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -106,8 +106,8 @@
  // ------  Rich ring finder QA ---------------------------------------------
    Int_t normType = 1; //0 - normalize by number of MC hits
                       //1 - normalize by number of found hits;
-  CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", iVerbose,normType);
-  fRun->AddTask(richQa);
+//  CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", iVerbose,normType);
+//  fRun->AddTask(richQa);
 
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();

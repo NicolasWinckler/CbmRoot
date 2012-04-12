@@ -386,6 +386,8 @@ void run_reco(Int_t nEvents = 2) {
   cout << endl;
   // ------------------------------------------------------------------------
 
+//  delete run;
+
   cout << " Test passed" << endl;
 	cout << " All ok " << endl;
 }

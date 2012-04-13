@@ -13,6 +13,8 @@ class CbmMagnet : public CbmModule {
     virtual void ConstructGeometry();
     virtual void ConstructASCIIGeometry();
 
+    Bool_t CheckIfSensitive(std::string name);
+  
  private:
     TGeoRotation* frot;      //!
     TGeoCombiTrans* fposrot; //!

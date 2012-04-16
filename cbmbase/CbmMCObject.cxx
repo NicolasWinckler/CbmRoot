@@ -40,7 +40,7 @@ void CbmMCObject::SetEntry(std::vector<Int_t> type, std::vector<Int_t> link, int
 	SetEntry(myEntry);
 }
 
-void CbmMCObject::SetEntry(FairLinkedData* data, int index)
+void CbmMCObject::SetEntry(FairMultiLinkedData* data, int index)
 {
 	AdoptSize(index);
 	fStage[index].SetLinks(data->GetLinks());

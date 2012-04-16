@@ -10,7 +10,7 @@
 
 // framework includes
 #include "FairRootManager.h"
-#include "FairLinkedData.h"
+#include "FairMultiLinkedData.h"
 
 // Root includes
 #include "TClonesArray.h"
@@ -125,7 +125,7 @@ void CbmMCMatchCreatorTask::Exec(Option_t* opt)
 			cout << "BranchName: " << fMCMatch->GetMCStage(i)->GetBranchName() << endl;
 			TClonesArray* clArray = fBranches[fMCMatch->GetMCStage(i)->GetBranchName()];
 			for (int j = 0; j < clArray->GetEntries(); j++){
-				FairLinkedData* myData = (FairLinkedData*)clArray->At(j);
+				FairMultiLinkedData* myData = (FairMultiLinkedData*)clArray->At(j);
 				fMCMatch->SetElements(fMCMatch->GetMCStage(i)->GetStageId(), j, myData);
 			}
 			if (fMCMatch->GetMCStage(i)->GetNEntries() > 0)

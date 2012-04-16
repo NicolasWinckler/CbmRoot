@@ -41,7 +41,7 @@ void CbmMCMatch::AddElement(DataType type, int index, FairLink link){
 
 
 
-void CbmMCMatch::SetElements(DataType sourceType, int index, FairLinkedData* links){
+void CbmMCMatch::SetElements(DataType sourceType, int index, FairMultiLinkedData* links){
 	fList[sourceType]->SetEntry(links, index);
 }
 

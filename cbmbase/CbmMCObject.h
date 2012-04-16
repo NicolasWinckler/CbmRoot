@@ -16,7 +16,7 @@
 #include <vector>
 #include <iostream>
 
-class FairLinkedData;
+class FairMultiLinkedData;
 
 class CbmMCObject: public TObject {
  public:
@@ -36,7 +36,7 @@ class CbmMCObject: public TObject {
 	void SetStageId(DataType type){fStageId = type;}
 
 	void SetEntry(std::vector<Int_t> type, std::vector<Int_t> link, int index);
-	void SetEntry(FairLinkedData* data, int index);
+	void SetEntry(FairMultiLinkedData* data, int index);
 	void SetEntry(CbmMCEntry link);
 
 	void SetStage(std::vector<CbmMCEntry> stage) {fStage = stage;}

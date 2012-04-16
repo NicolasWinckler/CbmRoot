@@ -21,7 +21,7 @@
 
 #include <map>
 
-class FairLinkedData;
+class FairMultiLinkedData;
 
 typedef std::map<DataType, CbmMCStage*>::iterator TListIterator;
 typedef std::map<DataType, CbmMCStage*>::const_iterator TListIteratorConst;
@@ -36,7 +36,7 @@ public:
 
 	void AddElement(DataType type, int index, FairLink link);
 	void AddElement(DataType sourceType, int index, DataType targetType, int link);
-	void SetElements(DataType sourceType, int index, FairLinkedData* links);
+	void SetElements(DataType sourceType, int index, FairMultiLinkedData* links);
 	void InitStage(DataType type, std::string fileName, std::string branchName);
 	void RemoveStage(DataType type);
 	void LoadInMCLists(TClonesArray* myLinkArray);

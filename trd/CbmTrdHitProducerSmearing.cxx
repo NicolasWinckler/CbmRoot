@@ -112,6 +112,11 @@ CbmTrdHitProducerSmearing::~CbmTrdHitProducerSmearing()
     delete fHitCollection;
 
     if(fRadiator) delete fRadiator;
+
+    for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
+      for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
+	delete (*fModuleHitBufferMapIt).second[i];
+    }
 }
 // --------------------------------------------------------------------
 
@@ -380,26 +385,28 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	fModuleHitBufferMapIt != fModuleHitBufferMap.end(); ++fModuleHitBufferMapIt) {
     Double_t deltar(0.0);
     //printf("%7i hits per module befor merging\n",(*fModuleHitBufferMapIt).second.size());
-    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size()-1; i++) {
-      for (Int_t j = i+1; j < (*fModuleHitBufferMapIt).second.size(); j++) {
-	deltar =  sqrt(
-		       pow((*fModuleHitBufferMapIt).second[i]->GetX() - (*fModuleHitBufferMapIt).second[j]->GetX(),2) +
-		       pow((*fModuleHitBufferMapIt).second[i]->GetY() - (*fModuleHitBufferMapIt).second[j]->GetY(),2) 
-		       );
-	if (deltar < fMinDist) {
-	  lostCoungter++;
-	  // move merged new hit to center between mother hits
-	  (*fModuleHitBufferMapIt).second[i]->SetX((*fModuleHitBufferMapIt).second[i]->GetX() + 
-						   0.5 * ((*fModuleHitBufferMapIt).second[j]->GetX() - (*fModuleHitBufferMapIt).second[i]->GetX()));
-	  (*fModuleHitBufferMapIt).second[i]->SetY((*fModuleHitBufferMapIt).second[i]->GetY() + 
-						   0.5 * ((*fModuleHitBufferMapIt).second[j]->GetY() - (*fModuleHitBufferMapIt).second[i]->GetY()));
-	  (*fModuleHitBufferMapIt).second[i]->SetZ((*fModuleHitBufferMapIt).second[i]->GetZ() + 
-						   0.5 * ((*fModuleHitBufferMapIt).second[j]->GetZ() - (*fModuleHitBufferMapIt).second[i]->GetZ()));
-	  //Sum ELoss ELossTR ELossdEdX
-	  (*fModuleHitBufferMapIt).second[i]->SetELossdEdx((*fModuleHitBufferMapIt).second[i]->GetELossdEdX() + (*fModuleHitBufferMapIt).second[j]->GetELossdEdX());
-	  (*fModuleHitBufferMapIt).second[i]->SetELoss((*fModuleHitBufferMapIt).second[i]->GetELoss() + (*fModuleHitBufferMapIt).second[j]->GetELoss());
-	  (*fModuleHitBufferMapIt).second[i]->SetELossTR((*fModuleHitBufferMapIt).second[i]->GetELossTR() + (*fModuleHitBufferMapIt).second[j]->GetELossTR());
-	  (*fModuleHitBufferMapIt).second.erase((*fModuleHitBufferMapIt).second.begin()+j);
+    if (fMinDist > 0.0) {
+      for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size()-1; i++) {
+	for (Int_t j = i+1; j < (*fModuleHitBufferMapIt).second.size(); j++) {
+	  deltar =  sqrt(
+			 pow((*fModuleHitBufferMapIt).second[i]->GetX() - (*fModuleHitBufferMapIt).second[j]->GetX(),2) +
+			 pow((*fModuleHitBufferMapIt).second[i]->GetY() - (*fModuleHitBufferMapIt).second[j]->GetY(),2) 
+			 );
+	  if (deltar < fMinDist) {
+	    lostCoungter++;
+	    // move merged new hit to center between mother hits
+	    (*fModuleHitBufferMapIt).second[i]->SetX((*fModuleHitBufferMapIt).second[i]->GetX() + 
+						     0.5 * ((*fModuleHitBufferMapIt).second[j]->GetX() - (*fModuleHitBufferMapIt).second[i]->GetX()));
+	    (*fModuleHitBufferMapIt).second[i]->SetY((*fModuleHitBufferMapIt).second[i]->GetY() + 
+						     0.5 * ((*fModuleHitBufferMapIt).second[j]->GetY() - (*fModuleHitBufferMapIt).second[i]->GetY()));
+	    (*fModuleHitBufferMapIt).second[i]->SetZ((*fModuleHitBufferMapIt).second[i]->GetZ() + 
+						     0.5 * ((*fModuleHitBufferMapIt).second[j]->GetZ() - (*fModuleHitBufferMapIt).second[i]->GetZ()));
+	    //Sum ELoss ELossTR ELossdEdX
+	    (*fModuleHitBufferMapIt).second[i]->SetELossdEdx((*fModuleHitBufferMapIt).second[i]->GetELossdEdX() + (*fModuleHitBufferMapIt).second[j]->GetELossdEdX());
+	    (*fModuleHitBufferMapIt).second[i]->SetELoss((*fModuleHitBufferMapIt).second[i]->GetELoss() + (*fModuleHitBufferMapIt).second[j]->GetELoss());
+	    (*fModuleHitBufferMapIt).second[i]->SetELossTR((*fModuleHitBufferMapIt).second[i]->GetELossTR() + (*fModuleHitBufferMapIt).second[j]->GetELossTR());
+	    (*fModuleHitBufferMapIt).second.erase((*fModuleHitBufferMapIt).second.begin()+j);
+	  }
 	}
       }
     }
@@ -407,11 +414,16 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
     for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++) {
       TVector3 posHit((*fModuleHitBufferMapIt).second[i]->GetX(), (*fModuleHitBufferMapIt).second[i]->GetY(), (*fModuleHitBufferMapIt).second[i]->GetZ());
       TVector3 posHitErr((*fModuleHitBufferMapIt).second[i]->GetDx(), (*fModuleHitBufferMapIt).second[i]->GetDy(), (*fModuleHitBufferMapIt).second[i]->GetDz());
-      AddHit((*fModuleHitBufferMapIt).first, posHit, posHitErr, i, plane , (*fModuleHitBufferMapIt).second[i]->GetELoss(), (*fModuleHitBufferMapIt).second[i]->GetELossTR(), (*fModuleHitBufferMapIt).second[i]->GetELossdEdX());
+      AddHit((*fModuleHitBufferMapIt).first, posHit, posHitErr, i, (*fModuleHitBufferMapIt).second[i]->GetPlaneId(), (*fModuleHitBufferMapIt).second[i]->GetELoss(), (*fModuleHitBufferMapIt).second[i]->GetELossTR(), (*fModuleHitBufferMapIt).second[i]->GetELossdEdX());
       outputCounter++;
+    
     }
   }
   printf("\n   %7i (%5.1f%%) input points\n   %7i (%5.1f%%) lost points\n   %7i (%5.1f%%) ghost hits\n   %7i (%5.1f%%) output hits\n",nentries,nentries*100./nentries,lostCoungter,lostCoungter*100./nentries,ghostCounter,ghostCounter*100./nentries,outputCounter,outputCounter*100./nentries);
+  for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
+    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
+      (*fModuleHitBufferMapIt).second.clear();
+  }
 }
 
 

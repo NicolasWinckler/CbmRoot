@@ -117,6 +117,7 @@ CbmTrdHitProducerSmearing::~CbmTrdHitProducerSmearing()
       for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
 	delete (*fModuleHitBufferMapIt).second[i];
     }
+    (*fModuleHitBufferMapIt).second.clear();
 }
 // --------------------------------------------------------------------
 
@@ -414,7 +415,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
     for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++) {
       TVector3 posHit((*fModuleHitBufferMapIt).second[i]->GetX(), (*fModuleHitBufferMapIt).second[i]->GetY(), (*fModuleHitBufferMapIt).second[i]->GetZ());
       TVector3 posHitErr((*fModuleHitBufferMapIt).second[i]->GetDx(), (*fModuleHitBufferMapIt).second[i]->GetDy(), (*fModuleHitBufferMapIt).second[i]->GetDz());
-      AddHit((*fModuleHitBufferMapIt).first, posHit, posHitErr, i, (*fModuleHitBufferMapIt).second[i]->GetPlaneId(), (*fModuleHitBufferMapIt).second[i]->GetELoss(), (*fModuleHitBufferMapIt).second[i]->GetELossTR(), (*fModuleHitBufferMapIt).second[i]->GetELossdEdX());
+      AddHit((*fModuleHitBufferMapIt).first, posHit, posHitErr, (*fModuleHitBufferMapIt).second[i]->GetRefId(), (*fModuleHitBufferMapIt).second[i]->GetPlaneId(), (*fModuleHitBufferMapIt).second[i]->GetELoss(), (*fModuleHitBufferMapIt).second[i]->GetELossTR(), (*fModuleHitBufferMapIt).second[i]->GetELossdEdX());
       outputCounter++;
     
     }
@@ -451,6 +452,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
       for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
 	delete (*fModuleHitBufferMapIt).second[i];
     }
+    (*fModuleHitBufferMapIt).second.clear();
   }
   // --------------------------------------------------------------------
 

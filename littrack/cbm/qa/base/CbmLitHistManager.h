@@ -149,6 +149,13 @@ public:
     */
    void ShrinkEmptyBins(
          const string& histName);
+
+   /**
+    * \brief Return string representation of class.
+    * \return string representation of class.
+    */
+   string ToString() const;
+
 private:
    // Map of histogram name to its pointer
    map<string, TH1*> fHistMap;

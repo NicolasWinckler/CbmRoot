@@ -96,3 +96,13 @@ void CbmLitHistManager::ShrinkEmptyBins(
    }
    hist->GetXaxis()->SetRange(1, shrinkBin + 1);
 }
+
+string CbmLitHistManager::ToString() const
+{
+	string str = "CbmLitHistManager list of histograms:\n";
+	map<string, TH1*>::const_iterator it;
+	for (it = fHistMap.begin(); it != fHistMap.end(); it++){
+		str += it->first + "\n";
+	}
+	return str;
+}

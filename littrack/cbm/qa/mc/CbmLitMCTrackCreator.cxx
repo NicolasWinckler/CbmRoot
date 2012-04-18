@@ -60,7 +60,7 @@ void CbmLitMCTrackCreator::Create()
    AddPoints(kRICH, fRichPoints);
 
 //   std::cout << "CbmLitMCTrackCreator: nof MC tracks=" << fLitMCTracks.size() << std::endl;
-//   std::map<int, CbmLitMCTrack>::iterator it;
+//   std::map<Int_t, CbmLitMCTrack>::iterator it;
 //   for (it = fLitMCTracks.begin(); it != fLitMCTracks.end(); it++)
 //       std::cout << (*it).first << " => " << (*it).second;
 }
@@ -83,11 +83,11 @@ void CbmLitMCTrackCreator::AddPoints(
       const TClonesArray* array)
 {
    if (!array) return;
-   int nofPoints = array->GetEntriesFast();
-   for (int iPoint = 0; iPoint < nofPoints; iPoint++) {
+   Int_t nofPoints = array->GetEntriesFast();
+   for (Int_t iPoint = 0; iPoint < nofPoints; iPoint++) {
       FairMCPoint* fairPoint = static_cast<FairMCPoint*>(array->At(iPoint));
       CbmLitMCPoint litPoint;
-      int stationId = -1;
+      Int_t stationId = -1;
       if (detId == kMVD) {
          stationId = fMvdStationsMap[iPoint];
          MvdPointCoordinatesAndMomentumToLitMCPoint(static_cast<CbmMvdPoint*>(fairPoint), &litPoint);
@@ -121,15 +121,15 @@ void CbmLitMCTrackCreator::AddPoints(
 void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(
       const FairMCPoint* fairPoint,
       CbmLitMCPoint* litPoint,
-      int refId,
-      int stationId)
+      Int_t refId,
+      Int_t stationId)
 {
    litPoint->SetRefId(refId);
    litPoint->SetStationId(stationId);
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(fairPoint->GetTrackID()));
    TParticlePDG* pdgParticle = TDatabasePDG::Instance()->GetParticle(mcTrack->GetPdgCode());
    double charge = (pdgParticle != NULL) ? pdgParticle->Charge() : 0.;
-   litfloat q = (charge > 0) ? 1. : -1;
+   Double_t q = (charge > 0) ? 1. : -1.;
    litPoint->SetQ(q);
 }
 
@@ -252,7 +252,7 @@ void CbmLitMCTrackCreator::FillStationMaps()
         FairGeoNode* stsNode = (FairGeoNode*) stsNodes->At(ist);
         std::string stsNodeName(stsNode->GetName());
         std::string stsStationNr = stsNodeName.substr(10, 2);
-        int stationNr = atoi(stsStationNr.c_str());
+        Int_t stationNr = atoi(stsStationNr.c_str());
         stsStationNrFromMcId[stsNode->getMCid()] = stationNr - 1;
       }
 

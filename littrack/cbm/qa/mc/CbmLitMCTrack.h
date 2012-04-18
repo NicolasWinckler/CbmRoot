@@ -1,8 +1,6 @@
 /**
  * \file CbmLitMCTrack.h
- *
  * \brief Monte-Carlo track.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
@@ -17,9 +15,7 @@
 
 /**
  * \class CbmLitMCTrack
- *
  * \brief Monte-Carlo track.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/

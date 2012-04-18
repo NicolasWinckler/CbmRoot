@@ -1,24 +1,20 @@
 /**
  * \file CbmLitMCPoint.h
- *
  * \brief Monte-Carlo point.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
 #ifndef CBMLITMCPOINT_H_
 #define CBMLITMCPOINT_H_
 
-#include "std/base/CbmLitFloat.h"
+#include "TObject.h"
 #include <string>
 #include <sstream>
 #include <cmath>
 
 /**
  * \class CbmLitMCPoint
- *
  * \brief Monte-Carlo point.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  **/
@@ -40,69 +36,69 @@ public:
    virtual ~CbmLitMCPoint() {}
 
    /* Getters */
-   litfloat GetX() const { return (fXIn + fXOut) / 2.; }
-   litfloat GetY() const { return (fYIn + fYOut) / 2.; }
-   litfloat GetZ() const { return (fZIn + fZOut) / 2.; }
-   litfloat GetPx() const { return (fPxIn + fPxOut) / 2.; }
-   litfloat GetPy() const { return (fPyIn + fPyOut) / 2.; }
-   litfloat GetPz() const { return (fPzIn + fPzOut) / 2.; }
-   litfloat GetTx() const { return GetPx() / GetPz(); }
-   litfloat GetTy() const { return GetPy() / GetPz(); }
-   litfloat GetP() const { return std::sqrt(GetPx() * GetPx() + GetPy() * GetPy() + GetPz() * GetPz()); }
-   litfloat GetQp() const {
-      litfloat p = GetP();
-      litfloat res = (p != 0.) ? fQ / p : 0.;
+   Double_t GetX() const { return (fXIn + fXOut) / 2.; }
+   Double_t GetY() const { return (fYIn + fYOut) / 2.; }
+   Double_t GetZ() const { return (fZIn + fZOut) / 2.; }
+   Double_t GetPx() const { return (fPxIn + fPxOut) / 2.; }
+   Double_t GetPy() const { return (fPyIn + fPyOut) / 2.; }
+   Double_t GetPz() const { return (fPzIn + fPzOut) / 2.; }
+   Double_t GetTx() const { return GetPx() / GetPz(); }
+   Double_t GetTy() const { return GetPy() / GetPz(); }
+   Double_t GetP() const { return std::sqrt(GetPx() * GetPx() + GetPy() * GetPy() + GetPz() * GetPz()); }
+   Double_t GetQp() const {
+      Double_t p = GetP();
+      Double_t res = (p != 0.) ? fQ / p : 0.;
       return res;
    }
-   litfloat GetXIn() const { return fXIn; }
-   litfloat GetYIn() const { return fYIn; }
-   litfloat GetZIn() const { return fZIn; }
-   litfloat GetPxIn() const { return fPxIn; }
-   litfloat GetPyIn() const { return fPyIn; }
-   litfloat GetPzIn() const { return fPzIn; }
-   litfloat GetTxIn() const { return fPxIn / fPzIn; }
-   litfloat GetTyIn() const { return fPyIn / fPzIn; }
-   litfloat GetPIn() const { return std::sqrt(fPxIn * fPxIn + fPyIn * fPyIn + fPzIn * fPzIn); }
-   litfloat GetQpIn() const {
-      litfloat p = GetPIn();
-      litfloat res = (p != 0.) ? fQ / p : 0.;
+   Double_t GetXIn() const { return fXIn; }
+   Double_t GetYIn() const { return fYIn; }
+   Double_t GetZIn() const { return fZIn; }
+   Double_t GetPxIn() const { return fPxIn; }
+   Double_t GetPyIn() const { return fPyIn; }
+   Double_t GetPzIn() const { return fPzIn; }
+   Double_t GetTxIn() const { return fPxIn / fPzIn; }
+   Double_t GetTyIn() const { return fPyIn / fPzIn; }
+   Double_t GetPIn() const { return std::sqrt(fPxIn * fPxIn + fPyIn * fPyIn + fPzIn * fPzIn); }
+   Double_t GetQpIn() const {
+      Double_t p = GetPIn();
+      Double_t res = (p != 0.) ? fQ / p : 0.;
       return res;
    }
-   litfloat GetXOut() const { return fXOut; }
-   litfloat GetYOut() const { return fYOut; }
-   litfloat GetZOut() const { return fZOut; }
-   litfloat GetPxOut() const { return fPxOut; }
-   litfloat GetPyOut() const { return fPyOut; }
-   litfloat GetPzOut() const { return fPzOut; }
-   litfloat GetTxOut() const { return fPxOut / fPzOut; }
-   litfloat GetTyOut() const { return fPyOut / fPzOut; }
-   litfloat GetPOut() const { return std::sqrt(fPxOut * fPxOut + fPyOut * fPyOut + fPzOut * fPzOut); }
-   litfloat GetQpOut() const {
-      litfloat p = GetPOut();
-      litfloat res = (p != 0.) ? fQ / p : 0.;
+   Double_t GetXOut() const { return fXOut; }
+   Double_t GetYOut() const { return fYOut; }
+   Double_t GetZOut() const { return fZOut; }
+   Double_t GetPxOut() const { return fPxOut; }
+   Double_t GetPyOut() const { return fPyOut; }
+   Double_t GetPzOut() const { return fPzOut; }
+   Double_t GetTxOut() const { return fPxOut / fPzOut; }
+   Double_t GetTyOut() const { return fPyOut / fPzOut; }
+   Double_t GetPOut() const { return std::sqrt(fPxOut * fPxOut + fPyOut * fPyOut + fPzOut * fPzOut); }
+   Double_t GetQpOut() const {
+      Double_t p = GetPOut();
+      Double_t res = (p != 0.) ? fQ / p : 0.;
       return res;
    }
-   int GetRefId() const { return fRefId; }
-   int GetStationId() const { return fStationId; }
+   Int_t GetRefId() const { return fRefId; }
+   Int_t GetStationId() const { return fStationId; }
 
 
 
    /* Setters */
-   void SetXIn(litfloat x) { fXIn = x; }
-   void SetYIn(litfloat y) { fYIn = y; }
-   void SetZIn(litfloat z) { fZIn = z; }
-   void SetPxIn(litfloat px) { fPxIn = px; }
-   void SetPyIn(litfloat py) { fPyIn = py; }
-   void SetPzIn(litfloat pz) { fPzIn = pz; }
-   void SetXOut(litfloat x) { fXOut = x; }
-   void SetYOut(litfloat y) { fYOut = y; }
-   void SetZOut(litfloat z) { fZOut = z; }
-   void SetPxOut(litfloat px) { fPxOut = px; }
-   void SetPyOut(litfloat py) { fPyOut = py; }
-   void SetPzOut(litfloat pz) { fPzOut = pz; }
-   void SetQ(litfloat q) { fQ = q; }
-   void SetRefId(int refId) { fRefId = refId; }
-   void SetStationId(int stationId) { fStationId = stationId; }
+   void SetXIn(Double_t x) { fXIn = x; }
+   void SetYIn(Double_t y) { fYIn = y; }
+   void SetZIn(Double_t z) { fZIn = z; }
+   void SetPxIn(Double_t px) { fPxIn = px; }
+   void SetPyIn(Double_t py) { fPyIn = py; }
+   void SetPzIn(Double_t pz) { fPzIn = pz; }
+   void SetXOut(Double_t x) { fXOut = x; }
+   void SetYOut(Double_t y) { fYOut = y; }
+   void SetZOut(Double_t z) { fZOut = z; }
+   void SetPxOut(Double_t px) { fPxOut = px; }
+   void SetPyOut(Double_t py) { fPyOut = py; }
+   void SetPzOut(Double_t pz) { fPzOut = pz; }
+   void SetQ(Double_t q) { fQ = q; }
+   void SetRefId(Int_t refId) { fRefId = refId; }
+   void SetStationId(Int_t stationId) { fStationId = stationId; }
 
    /**
     * \brief Returns std::string representation of the class.
@@ -126,13 +122,13 @@ public:
    }
 
 private:
-   litfloat fXIn, fYIn, fZIn; // Space coordinates on entrance plane [cm].
-   litfloat fPxIn, fPyIn, fPzIn; // Momentum components on entrance plane. [GeV/c]
-   litfloat fXOut, fYOut, fZOut; // Space coordinates on exit plane [cm].
-   litfloat fPxOut, fPyOut, fPzOut; // Momentum components on exit plane. [GeV/c]
-   int fRefId; // Reference index.
-   int fStationId; // Station index.
-   litfloat fQ; // +/-1 - negative or positive charge
+   Double_t fXIn, fYIn, fZIn; // Space coordinates on entrance plane [cm].
+   Double_t fPxIn, fPyIn, fPzIn; // Momentum components on entrance plane. [GeV/c]
+   Double_t fXOut, fYOut, fZOut; // Space coordinates on exit plane [cm].
+   Double_t fPxOut, fPyOut, fPzOut; // Momentum components on exit plane. [GeV/c]
+   Int_t fRefId; // Reference index.
+   Int_t fStationId; // Station index.
+   Double_t fQ; // +/-1 - negative or positive charge
 };
 
 #endif /* CBMLITMCPOINT_H_ */

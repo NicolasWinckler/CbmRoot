@@ -42,10 +42,7 @@ bool CbmLitDetectorSetup::GetDet(
 bool CbmLitDetectorSetup::CheckDetectorPresence(
    const std::string& name) const
 {
-   if (NULL == gGeoManager) {
-      std::cout << "-W- CbmLitDetectorSetup::CheckDetectorPresence: gGeoManager == NULL.\n";
-      return false;
-   }
+   assert(gGeoManager != NULL);
 
    TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
    for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
@@ -63,7 +60,7 @@ bool CbmLitDetectorSetup::CheckDetectorPresence(
 
 void CbmLitDetectorSetup::DetermineSetup()
 {
-   fIsElectronSetup = CheckDetectorPresence("rich");
+   fIsElectronSetup = !CheckDetectorPresence("much");
    fIsMuonSetup = CheckDetectorPresence("much");
    fDet[kMVD] = CheckDetectorPresence("mvd");
    fDet[kSTS] = CheckDetectorPresence("sts");

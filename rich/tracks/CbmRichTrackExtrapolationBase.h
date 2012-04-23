@@ -42,11 +42,13 @@ public:
     * \param[in] globalTracks Global tracks.
     * \param[out] extrapolatedTrackParams Output array of track parameters.
     * \param[in] z Z coordinate to which track will be extrapolated.
+    * \param[in] minNofStsHits number of STS hits required for extrapolated track
     */
    virtual void DoExtrapolation(
          TClonesArray* globalTracks,
          TClonesArray* extrapolatedTrackParams,
-         double z) = 0;
+         double z,
+         int minNofStsHits) = 0;
 
 private:
    /**

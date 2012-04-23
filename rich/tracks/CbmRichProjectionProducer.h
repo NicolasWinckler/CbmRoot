@@ -11,6 +11,8 @@
 #ifndef CBM_RICH_PROJECTION_PRODUCER
 #define CBM_RICH_PROJECTION_PRODUCER
 
+#include "CbmRichProjectionProducerBase.h"
+
 class TClonesArray;
 class CbmGeoRichPar;
 class TObjArray;
@@ -24,7 +26,7 @@ class TObjArray;
 * \author P.Stolpovsky
 * \date 2005
 **/
-class CbmRichProjectionProducer
+class CbmRichProjectionProducer : public CbmRichProjectionProducerBase
 {
 public:
 
@@ -56,17 +58,6 @@ public:
     */
    virtual void DoProjection(
          TClonesArray* richProj);
-
-   /**
-    * \brief Set flag whether to use point in imaginary plane (zflag=1)
-    * or mirror point (zflag=2) for extrapolation.
-    * \param[in] flag Flag.
-    */
-   void SetZFlag(int flag) {fZflag = flag;}
-
-protected:
-   int fZflag; // Flag whether to use point in imaginary plane (zflag=1) or
-               // mirror point (zflag=2) for extrapolation.
 
 private:
    TClonesArray* fListRICHImPlanePoint; // Starting points&directions

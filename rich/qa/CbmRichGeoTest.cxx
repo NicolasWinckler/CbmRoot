@@ -208,9 +208,9 @@ CbmRichGeoTest::CbmRichGeoTest():
    fHists.push_back(fhNofHitsEllipseFitEff);
 
    // Detector acceptance efficiency vs. pt, y, p
-   fhMc3D = new TH3D("fhMc3D", "fhMc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30, 0., 3., 40, 0., 4.);
+   fhMc3D = new TH3D("fhMc3D", "fhMc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 50, 0., 10., 30, 0., 3., 40, 0., 4.);
    fHists.push_back(fhMc3D);
-   fhAcc3D = new TH3D("fhAcc3D", "fhAcc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 100, 0., 10., 30, 0., 3., 40, 0., 4.);;
+   fhAcc3D = new TH3D("fhAcc3D", "fhAcc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 50, 0., 10., 30, 0., 3., 40, 0., 4.);;
    fHists.push_back(fhAcc3D);
 
    // numbers in dependence on XY position onto the photodetector

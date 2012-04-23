@@ -51,12 +51,11 @@ public:
    virtual void DoExtrapolation(
          TClonesArray* globalTracks,
          TClonesArray* extrapolatedTrackParams,
-         double z);
+         double z,
+         int minNofStsHits);
 
 private:
    TClonesArray* fStsTracks;
-
-   int fMinNofStsHits; // number of STS hits required for extrapolated track
 
 private:
    /**

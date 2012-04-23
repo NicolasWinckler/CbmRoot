@@ -26,8 +26,7 @@ CbmRichTrackExtrapolationIdeal::CbmRichTrackExtrapolationIdeal():
    fRefPlanePoints(NULL),
    fMcTracks(NULL),
    fStsTracks(NULL),
-   fStsTrackMatches(NULL),
-   fMinNofStsHits(4)
+   fStsTrackMatches(NULL)
 {
 
 }
@@ -57,7 +56,8 @@ void CbmRichTrackExtrapolationIdeal::Init()
 void CbmRichTrackExtrapolationIdeal::DoExtrapolation(
       TClonesArray* globalTracks,
       TClonesArray* extrapolatedTrackParams,
-      double z)
+      double z,
+      int minNofStsHits)
 {
    if ( NULL == extrapolatedTrackParams ) {
       cout << "-E- CbmRichTrackExtrapolationIdeal::DoExtrapolate: TrackParam Array missing!" << endl;
@@ -87,7 +87,7 @@ void CbmRichTrackExtrapolationIdeal::DoExtrapolation(
       if ( NULL == pSTStr ) continue;
 
       Int_t Nsts = pSTStr->GetNStsHits() + pSTStr->GetNMvdHits();
-      if ( Nsts >= fMinNofStsHits) {
+      if ( Nsts >= minNofStsHits) {
          CbmTrackMatch* pTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(idSTS);
          if ( NULL == pTrackMatch) continue;
          Int_t iMCmatch = pTrackMatch->GetMCTrackId();

@@ -30,7 +30,7 @@ using std::endl;
 
 CbmRichProjectionProducer::CbmRichProjectionProducer(
       Int_t zflag):
-   fZflag(zflag),
+   CbmRichProjectionProducerBase(zflag),
    fListRICHImPlanePoint(NULL),
 
    fNHits(0),

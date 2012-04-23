@@ -9,6 +9,7 @@
 #include "CbmRichRing.h"
 
 #include "CbmRichProjectionProducer.h"
+#include "prototype/CbmRichProtProjectionProducer.h"
 
 #include "CbmRichTrackExtrapolationBase.h"
 #include "CbmRichTrackExtrapolationIdeal.h"
@@ -59,14 +60,15 @@ CbmRichReconstruction::CbmRichReconstruction()
    fRunTrackAssign(true),
 
    fExtrapolationName("kf"),
-   fProjectionName(""),
+   fProjectionName("standard"),
    fFinderName("hough"),
    fFitterName("ellipse_tau"),
    fTrackAssignName("closest_distance"),
 
-   fZTrackExtrapolation(300.)
+   fZTrackExtrapolation(300.),
+   fMinNofStsHits(4)
 {
-   fProjectionProducer = new CbmRichProjectionProducer(1);
+
 }
 
 CbmRichReconstruction::~CbmRichReconstruction()
@@ -79,6 +81,11 @@ CbmRichReconstruction::~CbmRichReconstruction()
 
 void CbmRichReconstruction::SetParContainers()
 {
+   if (fProjectionName == "standard") fProjectionProducer = new CbmRichProjectionProducer(1);
+   else if (fProjectionName == "prototype") fProjectionProducer = new CbmRichProtProjectionProducer(1);
+   else {
+      Fatal("CbmRichReconstruction::",(fProjectionName + string(" is not correct name for projection algorithm.")).c_str());
+   }
    fProjectionProducer->SetParContainers();
 }
 
@@ -88,7 +95,7 @@ InitStatus CbmRichReconstruction::Init()
    FairRootManager* ioman = FairRootManager::Instance();
    if (NULL == ioman) { Fatal("CbmRichReconstruction::Init","RootManager not instantised!"); }
 
-   if (fRunExtrapolation && fRunProjection && fRunTrackAssign) {
+   if (fRunExtrapolation && fRunProjection) {
       fRichTrackParamZ = new TClonesArray("FairTrackParam",100);
       ioman->Register("RichTrackParamZ", "RICH", fRichTrackParamZ, kFALSE);
 
@@ -192,9 +199,9 @@ void CbmRichReconstruction::InitTrackAssign()
 
 void CbmRichReconstruction::RunExtrapolation()
 {
-
    fRichTrackParamZ->Clear();
-   fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ, fZTrackExtrapolation);
+   fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ,
+         fZTrackExtrapolation, fMinNofStsHits);
 }
 
 void CbmRichReconstruction::RunProjection()

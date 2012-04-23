@@ -21,8 +21,7 @@ using std::cout;
 using std::endl;
 
 CbmRichTrackExtrapolationKF::CbmRichTrackExtrapolationKF():
-   fStsTracks(0),
-   fMinNofStsHits(4)
+   fStsTracks(0)
 {
 }
 
@@ -42,7 +41,8 @@ void CbmRichTrackExtrapolationKF::Init()
 void CbmRichTrackExtrapolationKF::DoExtrapolation(
       TClonesArray* globalTracks,
       TClonesArray* extrapolatedTrackParams,
-      double z)
+      double z,
+      int minNofStsHits)
 {
    if ( NULL == extrapolatedTrackParams ) {
       cout << "-E- CbmRichTrackExtrapolationKF::DoExtrapolate: TrackParamArray missing!" << endl;
@@ -75,7 +75,7 @@ void CbmRichTrackExtrapolationKF::DoExtrapolation(
 
       Int_t Nsts = pSTStr->GetNStsHits();
 
-      if ( Nsts >= fMinNofStsHits) {
+      if ( Nsts >= minNofStsHits) {
          *(FairTrackParam*)(extrapolatedTrackParams->At(iTrack)) = ExTrack;
       }
    }

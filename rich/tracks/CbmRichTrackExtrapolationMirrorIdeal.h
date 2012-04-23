@@ -57,15 +57,14 @@ public:
    virtual void DoExtrapolation(
          TClonesArray* globalTracks,
          TClonesArray* extrapolatedTrackParams,
-         double z);
+         double z,
+         int minNofStsHits);
 
 private:
   TClonesArray* fRichMirrorPoints;
   TClonesArray* fMcTracks;
   TClonesArray* fSTSArray;
   TClonesArray* fTrackMatchArray;
-
-  int fMinNofStsHits; // number of STS hits required for extrapolated track
 
   /**
    * \brief Copy constructor.

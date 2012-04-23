@@ -54,9 +54,9 @@ CbmRichTrainAnnElectrons::CbmRichTrainAnnElectrons():
    fGlobalTracks(NULL),
    fStsTracks(NULL),
 
-   fMinNofHitsInRichRing(5),
+   fMinNofHitsInRichRing(7),
    fQuota(0.6),
-   fMaxNofTrainSamples(1500),
+   fMaxNofTrainSamples(2500),
 
    fNofPiLikeEl(0),
    fNofElLikePi(0),
@@ -307,7 +307,7 @@ void CbmRichTrainAnnElectrons::TrainAndTestAnn()
 
    TMultiLayerPerceptron network("x0,x1,x2,x3,x4,x5,x6,x7,x8:9:xOut",simu,"Entry$+1");
    //network.LoadWeights("");
-   network.Train(200,"text,update=1");
+   network.Train(300,"text,update=10");
    network.DumpWeights("rich_elid_ann_weights.txt");
    //network.Export();
 

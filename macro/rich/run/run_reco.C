@@ -1,7 +1,9 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 1000){
+void run_reco(Int_t nEvents = 2)
+{
+   TTree::SetMaxTreeSize(90000000000);
 
 	Int_t iVerbose = 0;
 
@@ -11,19 +13,27 @@ void run_reco(Int_t nEvents = 1000){
 	gRandom->SetSeed(10);
 
 	TString inFile = "", parFile = "", outFile ="";
-
+	std::string resultDir = "recqa/";
 	if (script != "yes") {
-		TString inFile = "/d/cbm02/slebedev/rich/JUL09/mc.0001.root";
-		TString parFile = "/d/cbm02/slebedev/rich/JUL09/param.0001.root";
-		TString outFile = "/d/cbm02/slebedev/rich/JUL09/reco.0001.root";
+		TString inFile = "/d/cbm02/slebedev/rich/JUL09/test.mc.root";
+		TString parFile = "/d/cbm02/slebedev/rich/JUL09/test.params.root";
+		TString outFile = "/d/cbm02/slebedev/rich/JUL09/test.reco.root";
 	} else {
 		inFile = TString(gSystem->Getenv("MCFILE"));
 		outFile = TString(gSystem->Getenv("RECOFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
+		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 	}
 
-    TString stsDigiFile = "sts_v11a.digi.par";
-    gDebug = 0;
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TList *parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+   parFileList->Add(&stsDigiFile);
+   parFileList->Add(&trdDigiFile);
+   gDebug = 0;
+
+
 
     TStopwatch timer;
     timer.Start();
@@ -186,9 +196,9 @@ void run_reco(Int_t nEvents = 1000){
 				new	CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
 		run->AddTask(trdSetTracksPidAnnTask);
 
-		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
-				new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
-		run->AddTask(trdSetTracksPidLikeTask);
+		//CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
+		//		new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
+		//run->AddTask(trdSetTracksPidLikeTask);
 	}//isTrd
 
     // =========================================================================
@@ -221,13 +231,22 @@ void run_reco(Int_t nEvents = 1000){
    trackingQa->SetMinNofHitsTrd(8);
    trackingQa->SetMinNofHitsMuch(10);
    trackingQa->SetVerbose(0);
-   //trackingQa->SetMomAxis(0, 12, 120);
-   //trackingQa->SetPtAxis(0, 3, 30);
-  // trackingQa->SetRapidityAxis(0, 4, 40);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
-   trackingQa->SetOutputDir("recqa/");
+   trackingQa->SetOutputDir(resultDir);
    run->AddTask(trackingQa);
+
+//   CbmLitFitQa* fitQa = new CbmLitFitQa();
+//   fitQa->SetMvdMinNofHits(0);
+//   fitQa->SetStsMinNofHits(4);
+//   fitQa->SetMuchMinNofHits(10);
+//   fitQa->SetTrdMinNofHits(8);
+//   //fitQa->SetOutputDir(std::string(resultDir));
+//   run->AddTask(fitQa);
+
+   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+   clusteringQa->SetOutputDir(resultDir);
+   run->AddTask(clusteringQa);
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===
@@ -239,14 +258,11 @@ void run_reco(Int_t nEvents = 1000){
 //  run->AddTask(ecalHitProd);
 
     // -----  Parameter database   --------------------------------------------
-    TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-    stsDigi += "/parameters/sts/";
-    stsDigi += stsDigiFile;
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
     FairParRootFileIo* parIo1 = new FairParRootFileIo();
     FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
     parIo1->open(parFile.Data());
-    parIo2->open(stsDigi.Data(),"in");
+    parIo2->open(parFileList, "in");
     rtdb->setFirstInput(parIo1);
     rtdb->setSecondInput(parIo2);
     rtdb->setOutput(parIo1);

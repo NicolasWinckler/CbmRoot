@@ -1,5 +1,6 @@
-void run_sim(Int_t nEvents = 700)
+void run_sim(Int_t nEvents = 2)
 {
+   TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -26,8 +27,8 @@ void run_sim(Int_t nEvents = 700)
 
 	if (script != "yes") {
 		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
-		parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-		outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+		parFile = "/d/cbm02/slebedev/rich/JUL09/test.params.root";
+		outFile = "/d/cbm02/slebedev/rich/JUL09/test.mc.root";
 
 	   caveGeom = "cave.geo";
 	   targetGeom = "target_au_250mu.geo";
@@ -38,7 +39,8 @@ void run_sim(Int_t nEvents = 700)
 	   trdGeom = "trd/trd_v10b.geo";
 	   tofGeom = "tof/tof_v07a.geo";
 	   ecalGeom = "";//"ecal_FastMC.geo";
-	   fieldMap = "field_v10e";
+	   //fieldMap = "field_v10e";
+	   fieldMap = "FieldShieldBox";
 	   magnetGeom = "passive/magnet_v09e.geo";
 
 		electrons = "yes";
@@ -154,7 +156,7 @@ void run_sim(Int_t nEvents = 700)
 
 	// -----   Create magnetic field   ----------------------------------------
 	CbmFieldMap* magField = NULL;
-	if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
+	if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e" || fieldMap == "FieldShieldBox" )
 	   magField = new CbmFieldMapSym2(fieldMap);
 	else if (fieldMap == "field_muon_standard" )
 		magField = new CbmFieldMapSym2(fieldMap);

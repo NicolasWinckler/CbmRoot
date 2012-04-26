@@ -1,16 +1,27 @@
 
-void run_reco_geotest(Int_t nEvents = 10000)
+void run_reco_geotest(Int_t nEvents = 10)
 {
-   Int_t iVerbose = 0;
+   TTree::SetMaxTreeSize(90000000000);
+   TString script = TString(gSystem->Getenv("SCRIPT"));
+   gRandom->SetSeed(10);
 
-   TString inFile = "/d/cbm02/slebedev/rich/JUL09/geotest/mc.0000.root";
-   TString parFile = "/d/cbm02/slebedev/rich/JUL09/geotest/params.0000.root";
-   TString outFile = "/d/cbm02/slebedev/rich/JUL09/geotest/reco.0000.root";
+   TString inFile = "", parFile = "", outFile ="";
+   std::string resultDir = "";
 
-   TString stsDigiFile = "sts_standard.digi.par";
+   if (script != "yes") {
+      TString outDir = "/d/cbm06/user/slebedev/rich/new_rich_geo/";
+      inFile = outDir + "test.mc.0004.root";
+      parFile = outDir + "test.params.0004.root";
+      outFile = outDir + "test.reco.0004.root";
+      resultDir = "results/";
+   } else {
+      inFile = TString(gSystem->Getenv("MCFILE"));
+      outFile = TString(gSystem->Getenv("RECOFILE"));
+      parFile = TString(gSystem->Getenv("PARFILE"));
+      resultDir = TString(gSystem->Getenv("RICH_GEO_TEST_RESULT_DIR"));
+   }
 
    gDebug = 0;
-
    TStopwatch timer;
    timer.Start();
 
@@ -41,19 +52,14 @@ void run_reco_geotest(Int_t nEvents = 10000)
    run->AddTask(matchRings);
 
    CbmRichGeoTest* geoTest = new CbmRichGeoTest();
+   geoTest->SetOutputDir(resultDir);
    run->AddTask(geoTest);
 
    // -----  Parameter database   --------------------------------------------
-   TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-   stsDigi += "/parameters/sts/";
-   stsDigi += stsDigiFile;
    FairRuntimeDb* rtdb = run->GetRuntimeDb();
    FairParRootFileIo* parIo1 = new FairParRootFileIo();
-   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
    parIo1->open(parFile.Data());
-   parIo2->open(stsDigi.Data(),"in");
    rtdb->setFirstInput(parIo1);
-   rtdb->setSecondInput(parIo2);
    rtdb->setOutput(parIo1);
    rtdb->saveOutput();
 

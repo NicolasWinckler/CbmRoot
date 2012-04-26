@@ -69,6 +69,26 @@ public:
     */
    virtual void Finish();
 
+   /**
+    * \brief Creates summary report for different simulations. This is just an
+    * interface. All functionality is implemented in CbmRichGeoTestStudyReport class.
+    * \param[in] title Report title.
+    * \param[in] resultDirectories Paths to directories with results for each simulation.
+    * \param[in] studyNames Name of each study.
+    * \param[in] outputDir Path to the output directory.
+    */
+   void CreateStudyReport(
+         const string& title,
+         const vector<string>& resultDirectories,
+         const vector<string>& studyNames,
+         const string& outputDir);
+
+   /**
+    * \brief Set output directory where you want to write results (figures and json).
+    * \param[in] dir Path to the output directory.
+    */
+   void SetOutputDir(const string& dir) {fOutputDir = dir;}
+
 private:
 
    /**
@@ -150,10 +170,10 @@ private:
 	      CbmRichRingLight* ringHit,
 	      CbmRichRingLight* ringPoint);
 
-   /**
-    * \brief Print out final results.
-    */
-	void PrintStatisctics();
+	/**
+	 * \brief Create property tree an store different statistics there.
+	 */
+	void CreatePTree();
 
    /**
     * \brief Copy constructor.
@@ -164,6 +184,8 @@ private:
     * \brief Assignment operator.
     */
    CbmRichGeoTest& operator=(const CbmRichGeoTest&);
+
+   string fOutputDir; // output dir for results
 
 	TClonesArray* fRichHits;
 	TClonesArray* fRichRings;
@@ -184,6 +206,10 @@ private:
 
 	Int_t fEventNum;
 	Int_t fMinNofHits; // Min number of hits in ring for detector acceptance calculation.
+
+	TH2D* fhHitsXY; // distribution of X and Y position of hits
+	TH2D* fhPointsXY; // distribution of X and Y position of points
+
 
    // fitting parameters
 	// [0] = hits fit, [1] = MC points fit
@@ -240,13 +266,13 @@ private:
    TH3D* fhAcc3D;
 
    // numbers in dependence on XY position onto the photodetector
-   TH2D* fhNofHitsXY;
-   TH2D* fhNofPointsXY;
-   TH2D* fhBoverAXY;
-   TH2D* fhBaxisXY;
-   TH2D* fhAaxisXY;
-   TH2D* fhRadiusXY;
-   TH2D* fhCounterXY;
+   TH2D* fhNofHitsXY; // number of hits
+   TH2D* fhNofPointsXY; // number of points
+   TH2D* fhBoverAXY; // B/A ratio
+   TH2D* fhBaxisXY; // B axis
+   TH2D* fhAaxisXY; // A axis
+   TH2D* fhRadiusXY; // Radius
+   TH2D* fhCounterXY; // counter for mean value calculation
 
 	vector<TH1*> fHists; // store all TH1 pointers of the histogram
 

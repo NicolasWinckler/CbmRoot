@@ -80,7 +80,6 @@ tracks/CbmRichTrackExtrapolationKF.cxx
 tracks/CbmRichTrackExtrapolationMirrorIdeal.cxx
 qa/CbmRichTestSim.cxx  
 qa/CbmRichTestHits.cxx 
-qa/CbmRichGeoTest.cxx 
 qa/CbmRichRingFitterQa.cxx
 #qa/CbmRichParallelQa.cxx 
 selection/CbmRichRingSelectAnn.cxx  
@@ -91,6 +90,8 @@ prototype/CbmRichProtPrepareExtrapolation.cxx
 prototype/CbmRichProtProjectionProducer.cxx
 prototype/CbmRichProtRingFinderHough.cxx
 prototype/CbmRichProtRingFinderHoughImpl.cxx
+qa/CbmRichGeoTest.cxx 
+qa/CbmRichGeoTestStudyReport.cxx 
 )
 
 If(TBB_FOUND)
@@ -99,6 +100,7 @@ If(TBB_FOUND)
       finder/CbmRichRingFinderHoughParallel.cxx
      )
 EndIf(TBB_FOUND)
+
 
 set(RICH_HEADERS
 CbmGeoRich.h
@@ -112,7 +114,6 @@ CbmRichTrainAnnElectrons.h
 CbmRichReconstruction.h
 qa/CbmRichTestSim.h 
 qa/CbmRichTestHits.h 
-qa/CbmRichGeoTest.h 
 qa/CbmRichRingFitterQa.h 
 #qa/CbmRichParallelQa.h  
 prototype/CbmRichProt.h
@@ -121,6 +122,7 @@ prototype/CbmRichProtPrepareExtrapolation.h
 prototype/CbmRichProtProjectionProducer.h
 prototype/CbmRichProtRingFinderHough.h
 prototype/CbmRichProtRingFinderHoughImpl.h
+qa/CbmRichGeoTest.h 
 )
 
 If(TBB_FOUND)
@@ -129,6 +131,7 @@ If(TBB_FOUND)
       finder/CbmRichRingFinderHoughParallel.h
      )
 EndIf(TBB_FOUND)
+
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${RICH_SRCS}" "${INCLUDE_DIRECTORIES}" RICH_RULES)
@@ -148,7 +151,6 @@ ELSE (SSE_FOUND)
 ENDIF (SSE_FOUND)
 
 # END SSE
-
 
 If(TBB_FOUND)
   set(RICH_LINKDEF  RichLinkDef_tbb.h)

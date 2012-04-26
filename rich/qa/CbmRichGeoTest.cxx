@@ -6,6 +6,7 @@
  **/
 
 #include "CbmRichGeoTest.h"
+#include "CbmRichGeoTestStudyReport.h"
 #include "FairRootManager.h"
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
@@ -21,7 +22,10 @@
 #include "FairRuntimeDb.h"
 #include "CbmRichHitProducer.h"
 #include "cbm/utils/CbmLitDrawHist.h"
+#include "std/utils/CbmLitUtils.h"
 #include "CbmRichConverter.h"
+#include "cbm/qa/report/CbmLitReport.h"
+#include "cbm/qa/report/CbmLitStudyReport.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -32,8 +36,7 @@
 #include "TMath.h"
 #include "TPad.h"
 #include "TLatex.h"
-
-#include <boost/assign/list_of.hpp>
+#include "TSystem.h"
 
 #include <iostream>
 #include <vector>
@@ -41,11 +44,19 @@
 #include <sstream>
 #include <iomanip>
 
+#include <boost/assign/list_of.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 using namespace std;
 using boost::assign::list_of;
+using boost::property_tree::ptree;
 
 CbmRichGeoTest::CbmRichGeoTest():
    FairTask("RichGeoTestQa"),
+
+   fOutputDir(""),
+
    fRichHits(NULL),
    fRichRings(NULL),
    fRichPoints(NULL),
@@ -64,6 +75,9 @@ CbmRichGeoTest::CbmRichGeoTest():
 
    fEventNum(0),
    fMinNofHits(0),
+
+   fhHitsXY(NULL),
+   fhPointsXY(NULL),
 
    fhNofHits(),
    fhAaxisVsMom(),
@@ -129,6 +143,11 @@ CbmRichGeoTest::CbmRichGeoTest():
    fMaxBaxis = 6.1;
    fMinRadius = 3.7;
    fMaxRadius = 6.1;
+
+   fhHitsXY = new TH2D("fhHitsXY", "fhHitsXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
+   fHists.push_back(fhHitsXY);
+   fhPointsXY = new TH2D("fhPointsXY", "fhPointsXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
+   fHists.push_back(fhPointsXY);
 
    fhNofHits.resize(2);
    fhBoverA.resize(2);
@@ -214,19 +233,19 @@ CbmRichGeoTest::CbmRichGeoTest():
    fHists.push_back(fhAcc3D);
 
    // numbers in dependence on XY position onto the photodetector
-   fhNofHitsXY = new TH2D("fhNofHitsXY", "fhNofHitsXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhNofHitsXY = new TH2D("fhNofHitsXY", "fhNofHitsXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhNofHitsXY);
-   fhNofPointsXY = new TH2D("fhNofPointsXY", "fhNofPointsXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhNofPointsXY = new TH2D("fhNofPointsXY", "fhNofPointsXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhNofPointsXY);
-   fhBoverAXY = new TH2D("fhBoverAXY", "fhBoverAXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhBoverAXY = new TH2D("fhBoverAXY", "fhBoverAXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhBoverAXY);
-   fhBaxisXY = new TH2D("fhBaxisXY", "fhBaxisXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhBaxisXY = new TH2D("fhBaxisXY", "fhBaxisXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhBaxisXY);
-   fhAaxisXY = new TH2D("fhAaxisXY", "fhAaxisXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhAaxisXY = new TH2D("fhAaxisXY", "fhAaxisXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhAaxisXY);
-   fhRadiusXY = new TH2D("fhRadiusXY", "fhRadiusXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhRadiusXY = new TH2D("fhRadiusXY", "fhRadiusXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhRadiusXY);
-   fhCounterXY = new TH2D("fhCounterXY", "fhCounterXY;X [cm];Y [cm];Counter", 50, -200., 200., 50, -200, 200);
+   fhCounterXY = new TH2D("fhCounterXY", "fhCounterXY;X [cm];Y [cm];Counter", 100, -200., 200., 150, -300, 300);
    fHists.push_back(fhCounterXY);
 }
 
@@ -477,8 +496,19 @@ void CbmRichGeoTest::HitsAndPoints()
       TVector3 inPos(point->GetX(), point->GetY(), point->GetZ());
       TVector3 outPos;
       CbmRichHitProducer::TiltPoint(&inPos, &outPos, fPhi, fTheta, fDetZOrig);
+      fhHitsXY->Fill(hit->GetX(), hit->GetY());
       fhDiffXhit->Fill(hit->GetX() - outPos.X());
       fhDiffYhit->Fill(hit->GetY() - outPos.Y());
+   }
+
+   Int_t nofPoints = fRichPoints->GetEntriesFast();
+   for (Int_t iP = 0; iP < nofPoints; iP++){
+      CbmRichPoint *point = (CbmRichPoint*) fRichPoints->At(iP);
+      if ( point == NULL ) continue;
+      TVector3 inPos(point->GetX(), point->GetY(), point->GetZ());
+      TVector3 outPos;
+      CbmRichHitProducer::TiltPoint(&inPos, &outPos, fPhi, fTheta, fDetZOrig);
+      fhPointsXY->Fill(outPos.X(), outPos.Y());
    }
 }
 
@@ -555,7 +585,17 @@ TH1D* CbmRichGeoTest::CreateAccVsMinNofHitsHist()
 
 void CbmRichGeoTest::DrawHist()
 {
+   if (fOutputDir != "") gSystem->mkdir(fOutputDir.c_str(), true);
    //SetStyles();
+
+   TCanvas *cHitsXY = new TCanvas("rich_geo_hits_xy", "rich_geo_hits_xy", 600, 600);
+   DrawH2(fhHitsXY);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cHitsXY, fOutputDir);
+
+   TCanvas *cPointsXY = new TCanvas("rich_geo_points_xy", "rich_geo_points_xy", 600, 600);
+   DrawH2(fhPointsXY);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cPointsXY, fOutputDir);
+
    for (int i = 0; i < 2; i++){
       stringstream ss;
       if (i == 0) ss << "rich_geo_hits_fit";
@@ -579,6 +619,7 @@ void CbmRichGeoTest::DrawHist()
       DrawH2(fhAaxisVsMom[i]);
       cEllipse->cd(7);
       DrawH1(fhChi2Ellipse[i]);
+      if (fOutputDir != "") lit::SaveCanvasAsImage(cEllipse, fOutputDir);
 
       TCanvas *cCircle = new TCanvas((ss.str()+"_circle").c_str(), (ss.str()+"_circle").c_str(), 900, 600);
       cCircle->Divide(3,2);
@@ -596,6 +637,7 @@ void CbmRichGeoTest::DrawHist()
       DrawH1(fhChi2Circle[i]);
       cCircle->cd(6);
       DrawH1(fhDRCircle[i]);
+      if (fOutputDir != "") lit::SaveCanvasAsImage(cCircle, fOutputDir);
    }
 
    TCanvas *cDiff2DEllipse = new TCanvas("rich_geo_diff2d_ellipse", "rich_geo_diff2d_ellipse", 600, 600);
@@ -608,6 +650,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhDiffXcEllipse);
    cDiff2DEllipse->cd(4);
    DrawH2(fhDiffYcEllipse);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff2DEllipse, fOutputDir);
 
    TCanvas *cDiff2DCircle = new TCanvas("rich_geo_diff2d_circle", "rich_geo_diff2d_circle", 900, 300);
    cDiff2DCircle->Divide(3,1);
@@ -617,6 +660,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhDiffYcCircle);
    cDiff2DCircle->cd(3);
    DrawH2(fhDiffRadius);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff2DCircle, fOutputDir);
 
    TCanvas *cDiff1DEllipse = new TCanvas("rich_geo_diff1d_ellipse", "rich_geo_diff1d_ellipse", 600, 600);
    cDiff1DEllipse->Divide(2,2);
@@ -632,6 +676,7 @@ void CbmRichGeoTest::DrawHist()
    cDiff1DEllipse->cd(4);
    DrawH1(fhDiffYcEllipse->ProjectionY());
    gPad->SetLogy(true);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff1DEllipse, fOutputDir);
 
    TCanvas *cDiff1DCircle = new TCanvas("rich_geo_diff1d_circle", "rich_geo_diff1d_circle", 900, 300);
    cDiff1DCircle->Divide(3,1);
@@ -644,6 +689,7 @@ void CbmRichGeoTest::DrawHist()
    cDiff1DCircle->cd(3);
    DrawH1(fhDiffRadius->ProjectionY());
    gPad->SetLogy(true);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff1DCircle, fOutputDir);
 
    TCanvas *cHits = new TCanvas("rich_geo_hits", "rich_geo_hits", 600, 300);
    cHits->Divide(2,1);
@@ -651,6 +697,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(fhDiffXhit);
    cHits->cd(2);
    DrawH1(fhDiffYhit);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cHits, fOutputDir);
 
    TCanvas *cFitEff = new TCanvas("rich_geo_fit_eff", "rich_geo_fit_eff", 900, 300);
    cFitEff->Divide(3,1);
@@ -667,6 +714,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(fhNofHitsEllipseFitEff);
    TLatex* ellipseFitEffTxt = new TLatex(15, 0.5, CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll).c_str());
    ellipseFitEffTxt->Draw();
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cFitEff, fOutputDir);
 
    TCanvas *cAccEff = new TCanvas("rich_geo_acc_eff", "rich_geo_acc_eff", 900, 600);
    cAccEff->Divide(3,2);
@@ -700,6 +748,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(pyEff);
    cAccEff->cd(6);
    DrawH1(pzEff);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cAccEff, fOutputDir);
 
    TCanvas *cNumbersVsXY = new TCanvas("rich_geo_numbers_vs_xy", "rich_geo_numbers_vs_xy", 900, 600);
    cNumbersVsXY->Divide(3,2);
@@ -721,10 +770,12 @@ void CbmRichGeoTest::DrawHist()
    cNumbersVsXY->cd(6);
    fhRadiusXY->Divide(fhCounterXY);
    fhRadiusXY->Draw("COLZ");
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cNumbersVsXY, fOutputDir);
 
    TCanvas *cAccVsMinNofHits = new TCanvas("rich_geo_acc_vs_min_nof_hits", "rich_geo_acc_vs_min_nof_hits", 600, 600);
    TH1D* h = CreateAccVsMinNofHitsHist();
    DrawH1(h);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cAccVsMinNofHits, fOutputDir);
 
    TCanvas *cRABvsNofHits = new TCanvas("rich_geo_rab_vs_nof_hits", "rich_geo_rab_vs_nof_hits", 900, 300);
    cRABvsNofHits->Divide(3, 1);
@@ -734,6 +785,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhAaxisVsNofHits);
    cRABvsNofHits->cd(3);
    DrawH2(fhBaxisVsNofHits);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cRABvsNofHits, fOutputDir);
 
    stringstream ss;
    TH1D* prRMean = fhRadiusVsNofHits->ProjectionX("fhRadiusVsNofHits_mean");
@@ -762,53 +814,81 @@ void CbmRichGeoTest::DrawHist()
    cRABMeanRmsvsNofHits->cd(2);
    DrawH1(list_of(prRRms)(prARms)(prBRms),
          list_of("R")("A")("B"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+   if (fOutputDir != "") lit::SaveCanvasAsImage(cRABMeanRmsvsNofHits, fOutputDir);
 }
 
-void CbmRichGeoTest::PrintStatisctics()
+void CbmRichGeoTest::CreatePTree()
 {
-   cout << endl;
-   cout << "-I- CbmRichGeoTest final statistics:" << endl;
-   cout << "Detector Acceptance = " << CalcEfficiency(fhAcc3D, fhMc3D) << endl;
-   cout << "Circle fit efficiency = " << CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll) << endl;
-   cout << "Ellipse fit efficiency = " << CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll) << endl;
-   cout << endl;
+   ptree pt;
+   pt.put("acc_mean", CalcEfficiency(fhAcc3D, fhMc3D));
+   pt.put("circle_fit_eff_mean", CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll));
+   pt.put("ellipse_fit_eff_mean", CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll));
+   pt.put("nof_points_in_ring_mean", fhNofHits[1]->GetMean());
+   pt.put("nof_points_in_ring_rms", fhNofHits[1]->GetRMS());
+   pt.put("nof_hits_in_ring_mean", fhNofHits[0]->GetMean());
+   pt.put("nof_hits_in_ring_rms", fhNofHits[0]->GetRMS());
+   pt.put("points_fit_a_axis_mean", fhAaxisVsMom[1]->GetMean(2));
+   pt.put("points_fit_a_axis_rms", fhAaxisVsMom[1]->GetRMS(2));
+   pt.put("points_fit_b_axis_mean", fhBaxisVsMom[1]->GetMean(2));
+   pt.put("points_fit_b_axis_rms", fhBaxisVsMom[1]->GetRMS(2));
+   pt.put("points_fit_boa_mean", fhBoverA[1]->GetMean());
+   pt.put("points_fit_boa_rms", fhBoverA[1]->GetRMS());
+   pt.put("points_fit_r_mean", fhRadiusVsMom[1]->GetMean(2));
+   pt.put("points_fit_r_rms", fhRadiusVsMom[1]->GetRMS(2));
+   pt.put("hits_fit_a_axis_mean", fhAaxisVsMom[0]->GetMean(2));
+   pt.put("hits_fit_a_axis_rms", fhAaxisVsMom[0]->GetRMS(2));
+   pt.put("hits_fit_b_axis_mean", fhBaxisVsMom[0]->GetMean(2));
+   pt.put("hits_fit_b_axis_rms", fhBaxisVsMom[0]->GetRMS(2));
+   pt.put("hits_fit_boa_mean", fhBoverA[0]->GetMean());
+   pt.put("hits_fit_boa_rms", fhBoverA[0]->GetRMS());
+   pt.put("hits_fit_r_mean", fhRadiusVsMom[0]->GetMean(2));
+   pt.put("hits_fit_r_rms", fhRadiusVsMom[0]->GetRMS(2));
+   pt.put("diff_ellipse_da_mean", fhDiffAaxis->GetMean(2));
+   pt.put("diff_ellipse_da_rms", fhDiffAaxis->GetRMS(2));
+   pt.put("diff_ellipse_db_mean", fhDiffBaxis->GetMean(2));
+   pt.put("diff_ellipse_db_rms", fhDiffBaxis->GetRMS(2));
+   pt.put("diff_ellipse_dx_mean", fhDiffXcEllipse->GetMean(2));
+   pt.put("diff_ellipse_dx_rms", fhDiffXcEllipse->GetRMS(2));
+   pt.put("diff_ellipse_dy_mean", fhDiffYcEllipse->GetMean(2));
+   pt.put("diff_ellipse_dy_rms", fhDiffYcEllipse->GetRMS(2));
+   pt.put("diff_circle_dr_mean", fhDiffRadius->GetMean(2));
+   pt.put("diff_circle_dr_rms", fhDiffRadius->GetRMS(2));
+   pt.put("diff_circle_dx_mean", fhDiffXcCircle->GetMean(2));
+   pt.put("diff_circle_dx_rms", fhDiffXcCircle->GetRMS(2));
+   pt.put("diff_circle_dy_mean", fhDiffYcCircle->GetMean(2));
+   pt.put("diff_circle_dy_rms", fhDiffYcCircle->GetRMS(2));
 
-   cout << "Nof Points per ring, mean = " << fhNofHits[1]->GetMean() << " rms = " << fhNofHits[1]->GetRMS() << endl;
-   cout << "Nof Hits per ring, mean = " << fhNofHits[0]->GetMean() << " rms = " << fhNofHits[0]->GetRMS() << endl;
+   string qaFile = fOutputDir + "rich_geo_test.json";
+   if (fOutputDir != "") {
+      gSystem->mkdir(fOutputDir.c_str(), true);
+      write_json(qaFile.c_str(), pt);
+   }
+}
 
+void CbmRichGeoTest::CreateStudyReport(
+      const string& title,
+      const vector<string>& resultDirectories,
+      const vector<string>& studyNames,
+      const string& outputDir)
+{
+   if (outputDir != "") gSystem->mkdir(outputDir.c_str(), true);
 
-   cout << endl << "McPoint fitting" << endl;
-   cout << "Ellipse fitting" << endl;
-   cout << "A, mean = " << fhAaxisVsMom[1]->GetMean(2) << " rms = " << fhAaxisVsMom[1]->GetRMS(2) << endl;
-   cout << "B, mean = " << fhBaxisVsMom[1]->GetMean(2) << " rms = " << fhBaxisVsMom[1]->GetRMS(2) << endl;
-   cout << "B/A, mean = " << fhBoverA[1]->GetMean() << " rms = " << fhBoverA[1]->GetRMS() << endl;
-   cout << "Circle fitting" << endl;
-   cout << "R, mean = " << fhRadiusVsMom[1]->GetMean(2) << " rms = " << fhRadiusVsMom[1]->GetRMS(2) << endl;
-
-   cout << endl << "Hit fitting" << endl;
-   cout << "Ellipse fitting" << endl;
-   cout << "A, mean = " << fhAaxisVsMom[0]->GetMean(2) << " rms = " << fhAaxisVsMom[0]->GetRMS(2) << endl;
-   cout << "B, mean = " << fhBaxisVsMom[0]->GetMean(2) << " rms = " << fhBaxisVsMom[0]->GetRMS(2) << endl;
-   cout << "B/A, mean = " << fhBoverA[0]->GetMean() << " rms = " << fhBoverA[0]->GetRMS() << endl;
-   cout << "Circle fitting" << endl;
-   cout << "R, mean = " << fhRadiusVsMom[0]->GetMean(2) << " rms = " << fhRadiusVsMom[0]->GetRMS(2) << endl;
-
-   cout << endl << "McPoint fit vs. hit fit" << endl;
-   cout << "Ellipse fitting" << endl;
-   cout << "dA, mean = " << fhDiffAaxis->GetMean(2) << " rms = " << fhDiffAaxis->GetRMS(2) << endl;
-   cout << "dB, mean = " << fhDiffBaxis->GetMean(2) << " rms = " << fhDiffBaxis->GetRMS(2) << endl;
-   cout << "dX, mean = " << fhDiffXcEllipse->GetMean(2) << " rms = " << fhDiffXcEllipse->GetRMS(2) << endl;
-   cout << "dY, mean = " << fhDiffYcEllipse->GetMean(2) << " rms = " << fhDiffYcEllipse->GetRMS(2) << endl;
-   cout << "Circle fitting" << endl;
-   cout << "dR, mean = " << fhDiffRadius->GetMean(2) << " rms = " << fhDiffRadius->GetRMS(2) << endl;
-   cout << "dX, mean = " << fhDiffXcCircle->GetMean(2) << " rms = " << fhDiffXcCircle->GetRMS(2) << endl;
-   cout << "dY, mean = " << fhDiffYcCircle->GetMean(2) << " rms = " << fhDiffYcCircle->GetRMS(2) << endl;
+   CbmLitStudyReport* report = new CbmRichGeoTestStudyReport();
+   report->SetTitle(title);
+   cout << "Report can be found here: " << outputDir << endl;
+   ofstream foutHtml(string(outputDir + "rich_geo_test_study.html").c_str());
+   ofstream foutLatex(string(outputDir + "rich_geo_test_study.tex").c_str());
+   ofstream foutText(string(outputDir + "rich_geo_test_study.txt").c_str());
+   report->Create(kLitHtml, foutHtml, resultDirectories, studyNames);
+   report->Create(kLitLatex, foutLatex, resultDirectories, studyNames);
+   report->Create(kLitText, foutText, resultDirectories, studyNames);
+   delete report;
 }
 
 void CbmRichGeoTest::Finish()
 {
    DrawHist();
-   PrintStatisctics();
+   CreatePTree();
    for (Int_t i = 0; i < fHists.size(); i++){
       fHists[i]->Write();
    }

@@ -20,7 +20,6 @@
 #include <boost/property_tree/ptree.hpp>
 
 class CbmTrackMatch;
-class CbmRichRingMatch;
 class CbmVertex;
 class CbmStsKFTrackFitter;
 class CbmMCTrack;
@@ -182,7 +181,7 @@ private:
     * \return True if ring is correctly reconstructed.
     */
    Bool_t CheckRingQuality(
-      const CbmRichRingMatch* ringMatch);
+      const CbmTrackMatch* ringMatch);
 
    /**
     * \brief Loop over the MC tracks. Check track acceptance for different cases.

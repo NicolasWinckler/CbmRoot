@@ -17,7 +17,6 @@
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmMvdHitMatch.h"
-#include "CbmRichRingMatch.h"
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
@@ -286,9 +285,9 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
             isMuchOk = false;
          }
       }
-      const CbmRichRingMatch* richRingMatch;
+      const CbmTrackMatch* richRingMatch;
       if (isRichOk) {
-         richRingMatch = static_cast<const CbmRichRingMatch*>(fRichRingMatches->At(richId));
+         richRingMatch = static_cast<const CbmTrackMatch*>(fRichRingMatches->At(richId));
          if (richRingMatch == NULL) { continue; }
          Int_t nofHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits() + richRingMatch->GetNofFakeHits();
          isRichOk = CheckRingQuality(richRingMatch);
@@ -321,7 +320,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          const FairMCPoint* tofPoint = static_cast<const FairMCPoint*>(fTofPoints->At(tofHit->GetRefId()));
          if (tofPoint != NULL) tofMCId = tofPoint->GetTrackID();
       }
-      if (isRichOk) { richMCId = richRingMatch->GetMCTrackID(); }
+      if (isRichOk) { richMCId = richRingMatch->GetMCTrackId(); }
 
       map<string, multimap<Int_t, Int_t> >::iterator it;
       for (it = fMcToRecoMap.begin(); it != fMcToRecoMap.end(); it++) {
@@ -345,9 +344,9 @@ void CbmLitTrackingQaCalculator::ProcessRichRings()
    if (!fDet.GetDet(kRICH)) return;
    Int_t nofRings = fRichRings->GetEntriesFast();
    for(Int_t iRing = 0; iRing < nofRings; iRing++) {
-	  const CbmRichRingMatch* richRingMatch = static_cast<const CbmRichRingMatch*>(fRichRingMatches->At(iRing));
+	  const CbmTrackMatch* richRingMatch = static_cast<const CbmTrackMatch*>(fRichRingMatches->At(iRing));
 	  Bool_t isRichOk = CheckRingQuality(richRingMatch);
-	  Int_t richMCId = (isRichOk) ? richRingMatch->GetMCTrackID() : -1;
+	  Int_t richMCId = (isRichOk) ? richRingMatch->GetMCTrackId() : -1;
 	  if (isRichOk && -1 != richMCId) {
          fMcToRecoMap["Rich"].insert(make_pair<Int_t, Int_t>(richMCId, iRing));
 	  }
@@ -416,9 +415,9 @@ Bool_t CbmLitTrackingQaCalculator::CheckTrackQuality(
 }
 
 Bool_t CbmLitTrackingQaCalculator::CheckRingQuality(
-   const CbmRichRingMatch* ringMatch)
+   const CbmTrackMatch* ringMatch)
 {
-   Int_t mcId = ringMatch->GetMCTrackID();
+   Int_t mcId = ringMatch->GetMCTrackId();
    if(mcId < 0) { return false; }
 
    Int_t nofTrue = ringMatch->GetNofTrueHits();

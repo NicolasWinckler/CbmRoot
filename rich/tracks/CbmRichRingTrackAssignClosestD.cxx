@@ -13,7 +13,6 @@
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
-#include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
 
 #include "TClonesArray.h"

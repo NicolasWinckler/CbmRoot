@@ -9,7 +9,7 @@
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingMatch.h"
+#include "CbmTrackMatch.h"
 
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
@@ -32,8 +32,8 @@ CbmRichMatchRings::CbmRichMatchRings():
    fHits(NULL),
    fMatches(NULL),
 
-   fMatchMap(),
-   fMatchMCMap()
+   fMatchMap()//,
+//   fMatchMCMap()
 {
 
 }
@@ -61,7 +61,7 @@ InitStatus CbmRichMatchRings::Init()
    if (NULL == fTracks ) {Fatal("CbmRichMatchRings::Init", "No MCTrack array!");}
 
    // Create and register RichRingMatch array
-   fMatches = new TClonesArray("CbmRichRingMatch",100);
+   fMatches = new TClonesArray("CbmTrackMatch",100);
    ioman->Register("RichRingMatch", "RICH", fMatches, kTRUE);
 
    return kSUCCESS;
@@ -73,29 +73,29 @@ void CbmRichMatchRings::Exec(
    // Clear output array
    fMatches->Clear();
    map<Int_t, Int_t>::iterator it ;
-   fMatchMCMap.clear();
+//   fMatchMCMap.clear();
 
-   // Loop over Rich hits
-   Int_t nRichHits = fHits->GetEntriesFast();
-   for (Int_t iHit=0; iHit < nRichHits; iHit++) {
-      CbmRichHit* hit = (CbmRichHit*) fHits->At(iHit);
-      if ( NULL == hit ) continue;
-
-      Int_t iPoint = hit->GetRefId();
-      if ( iPoint < 0 ) { // Fake or background hit
-         continue;
-      }
-      //Get the MC Point corresponding to the hit
-      FairMCPoint* point = (FairMCPoint*) fPoints->At(iPoint);
-      if ( NULL == point ) continue;
-      //Get the MC Track ID corresponding to the MC Point
-      Int_t iMCTrack = point->GetTrackID();
-      // Get the MC Track corresponding to the ID
-      CbmMCTrack* track = (CbmMCTrack*)fTracks->At(iMCTrack);
-      if (NULL == track) continue;
-      Int_t iMother = track->GetMotherId();
-      fMatchMCMap[iMother]++;
-   }
+//   // Loop over Rich hits
+//   Int_t nRichHits = fHits->GetEntriesFast();
+//   for (Int_t iHit=0; iHit < nRichHits; iHit++) {
+//      CbmRichHit* hit = (CbmRichHit*) fHits->At(iHit);
+//      if ( NULL == hit ) continue;
+//
+//      Int_t iPoint = hit->GetRefId();
+//      if ( iPoint < 0 ) { // Fake or background hit
+//         continue;
+//      }
+//      //Get the MC Point corresponding to the hit
+//      FairMCPoint* point = (FairMCPoint*) fPoints->At(iPoint);
+//      if ( NULL == point ) continue;
+//      //Get the MC Track ID corresponding to the MC Point
+//      Int_t iMCTrack = point->GetTrackID();
+//      // Get the MC Track corresponding to the ID
+//      CbmMCTrack* track = (CbmMCTrack*)fTracks->At(iMCTrack);
+//      if (NULL == track) continue;
+//      Int_t iMother = track->GetMotherId();
+//      fMatchMCMap[iMother]++;
+//   }
 
    // Loop over RichRings
    Int_t nRings = fRings->GetEntriesFast();
@@ -145,12 +145,11 @@ void CbmRichMatchRings::Exec(
          }
       }
 
-      Int_t nMCHits = fMatchMCMap[iMCTrack]; //number of hits in MC ring
+//      Int_t nMCHits = fMatchMCMap[iMCTrack]; //number of hits in MC ring
       nWrong = nAll - nTrue;
 
       // Create RichRingMatch
-      new ((*fMatches)[iRing]) CbmRichRingMatch(iMCTrack, nTrue,
-                     nWrong, nFake, nMCHits, nMCTracks);
+      new ((*fMatches)[iRing]) CbmTrackMatch(iMCTrack, nTrue, nWrong, nFake, nMCTracks);
    }// Ring loop
 }
 

@@ -10,7 +10,7 @@
 #include "FairRootManager.h"
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
 #include "CbmRichPoint.h"
 #include "CbmRichRingFitterCOP.h"
@@ -335,10 +335,10 @@ void CbmRichGeoTest::RingParameters()
 	for (Int_t iR = 0; iR < nofRings; iR++){
 		CbmRichRing *ring = (CbmRichRing*) fRichRings->At(iR);
 		if (NULL == ring) continue;
-		CbmRichRingMatch* ringMatch = (CbmRichRingMatch*) fRichRingMatches->At(iR);
+		CbmTrackMatch* ringMatch = (CbmTrackMatch*) fRichRingMatches->At(iR);
 		if (NULL == ringMatch) continue;
 
-		Int_t mcTrackId = ringMatch->GetMCTrackID();
+		Int_t mcTrackId = ringMatch->GetMCTrackId();
 		if (mcTrackId < 0) continue;
 		CbmMCTrack* mcTrack = (CbmMCTrack*)fMCTracks->At(mcTrackId);
 		if (!mcTrack) continue;

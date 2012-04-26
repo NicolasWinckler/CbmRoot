@@ -16,7 +16,7 @@
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
-#include "CbmRichRingMatch.h"
+#include "CbmTrackMatch.h"
 
 #include <iostream>
 
@@ -66,9 +66,9 @@ void CbmRichRingTrackAssignIdeal::DoAssign(
       if (NULL == pRing) continue;
       if (pRing->GetNofHits() < fMinNofHitsInRing) continue;
 
-      CbmRichRingMatch* pRingMatch = (CbmRichRingMatch*) fRingMatches->At(iRing);
+      CbmTrackMatch* pRingMatch = (CbmTrackMatch*) fRingMatches->At(iRing);
       if (NULL == pRingMatch) continue;
-      Int_t ringID = pRingMatch->GetMCTrackID();
+      Int_t ringID = pRingMatch->GetMCTrackId();
       Double_t xRing = pRing->GetCenterX();
       Double_t yRing = pRing->GetCenterY();
 

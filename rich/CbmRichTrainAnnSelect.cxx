@@ -9,7 +9,7 @@
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
 #include "CbmRichRingFitterCOP.h"
 #include "CbmRichRingSelectImpl.h"
@@ -143,7 +143,7 @@ void CbmRichTrainAnnSelect::SetRecFlag()
    clone.clear();
 
    for (Int_t iMatches = 0; iMatches < nMatches; iMatches++){
-      CbmRichRingMatch* match = (CbmRichRingMatch*)fRichRingMatches->At(iMatches);
+      CbmTrackMatch* match = (CbmTrackMatch*)fRichRingMatches->At(iMatches);
       if (NULL == match) continue;
 
       CbmRichRing* ring = (CbmRichRing*)fRichRings->At(iMatches);
@@ -152,14 +152,14 @@ void CbmRichTrainAnnSelect::SetRecFlag()
       Int_t lTrueHits = match->GetNofTrueHits();
       Int_t lWrongHits = match->GetNofWrongHits();
       Int_t lFakeHits = match->GetNofFakeHits();
-      Int_t lMCHits = match->GetNofMCHits();
+//      Int_t lMCHits = match->GetNofMCHits();
       Int_t lFoundHits = lTrueHits + lWrongHits + lFakeHits;
       Double_t lPercTrue = 0.;
       if (lFoundHits >= 1){
          lPercTrue = (Double_t)lTrueHits / (Double_t)lFoundHits;
       }
 
-      Int_t trackID = match->GetMCTrackID();
+      Int_t trackID = match->GetMCTrackId();
       if (trackID > fMcTracks->GetEntriesFast() || trackID < 0) continue;
       CbmMCTrack* track = (CbmMCTrack*) fMcTracks->At(trackID);
       if (NULL == track) continue;
@@ -185,7 +185,7 @@ void CbmRichTrainAnnSelect::DiffFakeTrueCircle()
    Int_t nMatches = fRichRingMatches->GetEntriesFast();
 
    for (Int_t iMatches = 0; iMatches < nMatches; iMatches++) {
-      CbmRichRingMatch* match = (CbmRichRingMatch*) fRichRingMatches->At(iMatches);
+      CbmTrackMatch* match = (CbmTrackMatch*) fRichRingMatches->At(iMatches);
       if (NULL == match) continue;
 
       CbmRichRing* ring = (CbmRichRing*) fRichRings->At(iMatches);

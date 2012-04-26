@@ -10,7 +10,7 @@
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmTrackMatch.h"
 #include "FairRootManager.h"
 #include "FairMCPoint.h"
@@ -201,9 +201,9 @@ void CbmRichTrainAnnElectrons::DiffElandPi()
       if (richIndex == -1) continue;
       CbmRichRing* ring = (CbmRichRing*)fRichRings->At(richIndex);
       if (NULL == ring) continue;
-      CbmRichRingMatch* richRingMatch = (CbmRichRingMatch*)fRichRingMatches->At(richIndex);
+      CbmTrackMatch* richRingMatch = (CbmTrackMatch*)fRichRingMatches->At(richIndex);
       if (NULL == richRingMatch) continue;
-      Int_t mcIdRich = richRingMatch->GetMCTrackID();
+      Int_t mcIdRich = richRingMatch->GetMCTrackId();
 
       CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(mcIdSts);
       if (NULL == track) continue;

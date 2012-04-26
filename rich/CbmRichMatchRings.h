@@ -72,7 +72,7 @@ private:
    TClonesArray* fMatches; // Array of CbmRichRingMatch
 
    std::map<Int_t, Int_t> fMatchMap; // Map from MCTrackID to number of common hits
-   std::map<Int_t, Int_t> fMatchMCMap; // Map from MCTrackID to number of common hits for MC rings
+//   std::map<Int_t, Int_t> fMatchMCMap; // Map from MCTrackID to number of common hits for MC rings
 
    /**
     * \brief Copy constructor.

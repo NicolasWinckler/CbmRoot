@@ -7,7 +7,7 @@
 
 void event_display()
 {
-   TString dir = "/data.local1/andrey/events/trd_v12a_electrons/";
+	TString dir = "/Users/andrey/Development/cbm/d/events/rich/v08a/";
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
 

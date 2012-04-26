@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 1000)
+void global_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
@@ -22,16 +22,16 @@ void global_sim(Int_t nEvents = 1000)
 	Int_t nofMuonsMinus = 0; // number of embedded muons from FairBoxGenerator
 	Int_t nofElectrons = 0; // number of embedded electrons from FairBoxGenerator
 	Int_t nofPositrons = 0; // number of embedded positrons from FairBoxGenerator
-	Int_t nofPionsPlus = 20; // number of embedded pions from FairBoxGenerator
-	Int_t nofPionsMinus = 20; // number of embedded pions from FairBoxGenerator
-	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
+	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
+	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
+	Int_t nofJPsiToMuons = 5; // number of embedded J/Psi particles decaying to mu+ and mu-
 	Int_t nofJPsiToElectrons = 0; // number of embedded J/Psi particles decaying to e+ and e-
 	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
-   TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
+    TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
-	TString urqmdFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/data.local1/andrey/events/events_mvd_pions/"; //directory for output simulation files
+	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
+	TString dir = "/Users/andrey/Development/cbm/d/events/std_electrons_jpsi/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -55,11 +55,11 @@ void global_sim(Int_t nEvents = 1000)
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
-		mvdGeom    = "mvd/mvd_v07a.geo";
+		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
-		richGeom   = "";//"rich/rich_v08a.geo";
-		trdGeom    = "";//"trd/trd_v10b.geo";
-		tofGeom    = "";//"tof/tof_v07a.geo";
+		richGeom   = "rich/rich_v08a.geo";
+		trdGeom    = "trd/trd_v11c.geo";
+		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";
 		magnetGeom = "passive/magnet_v09e.geo";
@@ -80,7 +80,7 @@ void global_sim(Int_t nEvents = 1000)
 		nofJPsiToMuons = TString(gSystem->Getenv("LIT_NOF_JPSI_TO_MUONS")).Atoi();
 		nofJPsiToElectrons = TString(gSystem->Getenv("LIT_NOF_JPSI_TO_ELECTRONS")).Atoi();
 		urqmd = TString(gSystem->Getenv("LIT_URQMD"));
-      unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
+        unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
 
 		caveGeom = TString(gSystem->Getenv("LIT_CAVE_GEOM"));
 		targetGeom = TString(gSystem->Getenv("LIT_TARGET_GEOM"));
@@ -112,7 +112,7 @@ void global_sim(Int_t nEvents = 1000)
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
 	fRun->SetMaterials("media.geo"); // Materials
-//	fRun->SetStoreTraj(kTRUE);
+	fRun->SetStoreTraj(kTRUE);
 
 	if ( caveGeom != "" ) {
 		FairModule* cave = new CbmCave("CAVE");

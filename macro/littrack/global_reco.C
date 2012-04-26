@@ -12,8 +12,8 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 100, // number of events
-		TString opt = "hits")
+void global_reco(Int_t nEvents = 5, // number of events
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/data.local1/andrey/events/events_mvd/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/std_electrons/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -32,7 +32,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    // Digi files
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v11c.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
 
    // Directory for output results
@@ -230,46 +230,44 @@ void global_reco(Int_t nEvents = 100, // number of events
 			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
 			if (trdHitProducerType == "smearing") {
-            // ----- TRD hit smearing -----
-            Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
-            // Resolutions in y - station and angle dependent [mum]
-            Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
-            Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
-            Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+				// ----- TRD hit smearing -----
+				Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
+				// Resolutions in y - station and angle dependent [mum]
+				Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
+				Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
+				Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-            CbmTrdHitProducerSmearing* trdHitProd =
-                  new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-            trdHitProd->SetSigmaX(trdSigmaX);
-            trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-            run->AddTask(trdHitProd);
-            // ----- End TRD hit smearing -----
+				CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+				trdHitProd->SetSigmaX(trdSigmaX);
+				trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+				run->AddTask(trdHitProd);
+				// ----- End TRD hit smearing -----
 			} else if (trdHitProducerType == "digi") {
-            // ----- TRD Digitizer -----
-            CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer", "TRD task", radiator);
-            run->AddTask(trdDigitizer);
+				// ----- TRD Digitizer -----
+				CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer", "TRD task", radiator);
+				run->AddTask(trdDigitizer);
 
-            CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi("TRD Hit Producer", "TRD task");
-            run->AddTask(trdHitProd);
-            // ----- End TRD Digitizer -----
+				CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi("TRD Hit Producer", "TRD task");
+				run->AddTask(trdHitProd);
+				// ----- End TRD Digitizer -----
 			} else if (trdHitProducerType == "clustering") {
-            // ----- TRD clustering -----
-            CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
-            run->AddTask(trdClustering);
+				// ----- TRD clustering -----
+				CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
+				run->AddTask(trdClustering);
 
-            CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
-            run->AddTask(trdClusterfindingfast);
+				CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
+				run->AddTask(trdClusterfindingfast);
 
-            CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
-            run->AddTask(trdClusterHitProducer);
-            // ----- End TRD Clustering -----
+				CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
+				run->AddTask(trdClusterHitProducer);
+				// ----- End TRD Clustering -----
 			}
 			// ------------------------------------------------------------------------
 		}
 
 		if (IsTof(parFile)) {
 			// ------ TOF hits --------------------------------------------------------
-			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer(
-					"TOF HitProducer", 1);
+			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
 			run->AddTask(tofHitProd);
 			// ------------------------------------------------------------------------
 		}
@@ -352,17 +350,17 @@ void global_reco(Int_t nEvents = 100, // number of events
 		run->AddTask(trackingQa);
 		// ------------------------------------------------------------------------
 
-		CbmLitFitQa* fitQa = new CbmLitFitQa();
-		fitQa->SetMvdMinNofHits(0);
-		fitQa->SetStsMinNofHits(normStsPoints);
-		fitQa->SetMuchMinNofHits(normMuchPoints);
-		fitQa->SetTrdMinNofHits(normTrdPoints);
-		fitQa->SetOutputDir(std::string(resultDir));
-		run->AddTask(fitQa);
-
-		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-		clusteringQa->SetOutputDir(std::string(resultDir));
-		run->AddTask(clusteringQa);
+//		CbmLitFitQa* fitQa = new CbmLitFitQa();
+//		fitQa->SetMvdMinNofHits(0);
+//		fitQa->SetStsMinNofHits(normStsPoints);
+//		fitQa->SetMuchMinNofHits(normMuchPoints);
+//		fitQa->SetTrdMinNofHits(normTrdPoints);
+//		fitQa->SetOutputDir(std::string(resultDir));
+//		run->AddTask(fitQa);
+//
+//		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+//		clusteringQa->SetOutputDir(std::string(resultDir));
+//		run->AddTask(clusteringQa);
 	}
 
 	// -----  Parameter database   --------------------------------------------

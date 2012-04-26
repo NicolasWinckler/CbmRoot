@@ -7,6 +7,8 @@
 
 void cbmrootlibs()
 {
+   gSystem->Load("${SIMPATH}/basics/boost/lib/libboost_regex");
+
    gSystem->Load("libGeoBase");
    gSystem->Load("libParBase");
    gSystem->Load("libBase");
@@ -27,6 +29,8 @@ void cbmrootlibs()
    gSystem->Load("libL1");
    gSystem->Load("libMvd");
 
+   gSystem->Load("libLittrack");
+
    gSystem->Load("libRich");
    gSystem->Load("libMuch");
 
@@ -34,7 +38,7 @@ void cbmrootlibs()
 
    gSystem->Load("libGlobal");
 //   gSystem->Load("libcudalittrack");
-   gSystem->Load("libLittrack");
+
    gSystem->Load("libLittrackparallel");
    gSystem->Load("libMinuit2"); // Needed for field fitter
 }

@@ -9,14 +9,14 @@
 using std::cout;
 using std::endl;
 
-void global_reco_qa(Int_t nEvents = 15)
+void global_reco_qa(Int_t nEvents = 2)
 {
-	TString dir  = "/data.local1/andrey/events/events_electron/"; // Output directory
-	TString resultDir = "./test/"; //Output directory for results
+	TString dir = "/Users/andrey/Development/cbm/d/events/std_electrons/"; // Output directory
+	TString resultDir = "./test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
-   TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed event
-   TString globalTracksFile = dir + "global.tracks.0000.root"; // File with global tracks
+    TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed event
+    TString globalTracksFile = dir + "global.tracks.0000.root"; // File with global tracks
 	TString recoQaFile = dir + "reco.qa.0000.root"; // Output file with histograms
 
 	TStopwatch timer;
@@ -28,7 +28,7 @@ void global_reco_qa(Int_t nEvents = 15)
 	cbmrootlibs();
 
 	// -----   Reconstruction run   -------------------------------------------
-	FairRunAna *run= new FairRunAna();
+	FairRunAna *run = new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->AddFriend(globalHitsFile);
 	run->AddFriend(globalTracksFile);
@@ -63,11 +63,11 @@ void global_reco_qa(Int_t nEvents = 15)
    fitQa->SetTrdMinNofHits(8);
    fitQa->SetMuchMinNofHits(4);
    fitQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(fitQa);
+   //run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);
+   //run->AddTask(clusteringQa);
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

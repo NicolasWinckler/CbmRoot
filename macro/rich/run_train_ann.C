@@ -5,21 +5,19 @@
     E-mail : S.Lebedev@gsi.de
 */
 void run_train_ann(
-      Int_t nEvents = 100)
+      Int_t nEvents = 1000)
 {
    gRandom->SetSeed(10);
 
-   TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/mc.0000.root";
-   TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/reco.0000.root";
-   TString parFile ="/d/cbm02/slebedev/rich/JUL09/param.0000.root";
-   TString outFile ="/d/cbm02/slebedev/rich/JUL09/richannselect.0000.root";
+   TString inFile1 ="/d/cbm06/user/slebedev/rich/mc.0004.root";
+   TString inFile2 ="/d/cbm06/user/slebedev/rich/reco.0004.root";
+   TString parFile ="/d/cbm06/user/slebedev/rich/param.0004.root";
+   TString outFile ="/d/cbm06/user/slebedev/rich/richannselect.0004.root";
 
    // please specify what you want to run
    // select = train ANN for fake rejection algorithm
    // electron = train ANN for electron identification algorithm
-   TString option = "select"; // or electron
-
-   TString stsDigiFile = "sts_standard.digi.par";
+   TString option = "electron"; // or electron
 
    gDebug = 0;
 
@@ -39,16 +37,10 @@ void run_train_ann(
    run->AddTask(richAnn);
 
    // -----  Parameter database   --------------------------------------------
-   TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-   stsDigi += "/parameters/sts/";
-   stsDigi += stsDigiFile;
    FairRuntimeDb* rtdb = run->GetRuntimeDb();
    FairParRootFileIo* parIo1 = new FairParRootFileIo();
-   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
    parIo1->open(parFile.Data());
-   parIo2->open(stsDigi.Data(), "in");
    rtdb->setFirstInput(parIo1);
-   rtdb->setSecondInput(parIo2);
    rtdb->setOutput(parIo1);
    rtdb->saveOutput();
 

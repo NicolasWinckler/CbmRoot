@@ -17,13 +17,13 @@ void cbmlibs()
 	  gSystem->Load("libSts");
 	  gSystem->Load("libKF");
 	  gSystem->Load("libMvd");
-
+     gSystem->Load("libLittrack");
 	  gSystem->Load("libRich");
 	  gSystem->Load("libTrd");
 	  gSystem->Load("libTof");
 	  gSystem->Load("libGlobal");
 	  gSystem->Load("libL1");
-	  gSystem->Load("libLittrack");
+	  //gSystem->Load("libLittrack");
      gSystem->Load("libMuch");
 
 	  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter

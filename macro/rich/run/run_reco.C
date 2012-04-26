@@ -15,9 +15,9 @@ void run_reco(Int_t nEvents = 2)
 	TString inFile = "", parFile = "", outFile ="";
 	std::string resultDir = "recqa/";
 	if (script != "yes") {
-		TString inFile = "/d/cbm02/slebedev/rich/JUL09/test.mc.root";
-		TString parFile = "/d/cbm02/slebedev/rich/JUL09/test.params.root";
-		TString outFile = "/d/cbm02/slebedev/rich/JUL09/test.reco.root";
+		inFile = "/d/cbm02/slebedev/rich/JUL09/test.mc.root";
+		parFile = "/d/cbm02/slebedev/rich/JUL09/test.params.root";
+		outFile = "/d/cbm02/slebedev/rich/JUL09/test.reco.root";
 	} else {
 		inFile = TString(gSystem->Getenv("MCFILE"));
 		outFile = TString(gSystem->Getenv("RECOFILE"));
@@ -196,9 +196,9 @@ void run_reco(Int_t nEvents = 2)
 				new	CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
 		run->AddTask(trdSetTracksPidAnnTask);
 
-		//CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
-		//		new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
-		//run->AddTask(trdSetTracksPidLikeTask);
+		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
+				new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
+		run->AddTask(trdSetTracksPidLikeTask);
 	}//isTrd
 
     // =========================================================================

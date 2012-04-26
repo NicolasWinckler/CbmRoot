@@ -19,6 +19,7 @@
 #include "CbmMvdPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmMuchPoint.h"
+#include "CbmBaseHit.h"
 
 #include "TDatabasePDG.h"
 
@@ -30,6 +31,7 @@ CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fMuchPoints(NULL),
    fTofPoints(NULL),
    fRichPoints(NULL),
+   fRichHits(NULL),
    fLitMCTracks()
 {
    ReadDataBranches();
@@ -58,6 +60,11 @@ void CbmLitMCTrackCreator::Create()
    AddPoints(kMUCH, fMuchPoints);
    AddPoints(kTOF, fTofPoints);
    AddPoints(kRICH, fRichPoints);
+   AddRichHits();
+
+   std::map<Int_t, CbmLitMCTrack>::iterator it;
+   for (it = fLitMCTracks.begin(); it != fLitMCTracks.end(); it++)
+          it->second.CalculateNofConsecutivePoints();
 
 //   std::cout << "CbmLitMCTrackCreator: nof MC tracks=" << fLitMCTracks.size() << std::endl;
 //   std::map<Int_t, CbmLitMCTrack>::iterator it;
@@ -68,7 +75,6 @@ void CbmLitMCTrackCreator::Create()
 void CbmLitMCTrackCreator::ReadDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
-
    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
    fMvdPoints = (TClonesArray*) ioman->GetObject("MvdPoint");
    fStsPoints = (TClonesArray*) ioman->GetObject("StsPoint");
@@ -76,6 +82,7 @@ void CbmLitMCTrackCreator::ReadDataBranches()
    fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
    fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
    fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
+   fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
 }
 
 void CbmLitMCTrackCreator::AddPoints(
@@ -115,6 +122,30 @@ void CbmLitMCTrackCreator::AddPoints(
          const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(fairPoint->GetTrackID()));
          fLitMCTracks[mcTrack->GetMotherId()].AddPoint(detId, litPoint);
       }
+   }
+}
+
+void CbmLitMCTrackCreator::AddRichHits()
+{
+	if (!fRichHits) return;
+   map<Int_t, Int_t> nofHitsInRing;
+   Int_t nofRichHits = fRichHits->GetEntriesFast();
+   for (Int_t iHit = 0; iHit < nofRichHits; iHit++) {
+      const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fRichHits->At(iHit));
+      Int_t pointIndex = hit->GetRefId();
+      if (pointIndex < 0) continue;
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(fRichPoints->At(pointIndex));
+      Int_t mcTrackIndex = point->GetTrackID();
+      if (mcTrackIndex < 0) continue;
+      const CbmMCTrack* track = static_cast<const CbmMCTrack*>(fMCTracks->At(mcTrackIndex));
+      Int_t mcMotherIndex = track->GetMotherId();
+      if (mcMotherIndex == -1) continue;
+      nofHitsInRing[mcMotherIndex]++;
+   }
+
+   map<Int_t, Int_t>::const_iterator it;
+   for (it = nofHitsInRing.begin(); it != nofHitsInRing.end(); it++) {
+	   fLitMCTracks[it->first].SetNofRichHits(it->second);
    }
 }
 
@@ -259,7 +290,7 @@ void CbmLitMCTrackCreator::FillStationMaps()
       CbmStsDetectorId stsDetectorId;
       Int_t nofStsPoints = fStsPoints->GetEntriesFast();
       for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
-         FairMCPoint* point = static_cast<FairMCPoint*>(fStsPoints->At(iPoint));
+         const FairMCPoint* point = static_cast<const FairMCPoint*>(fStsPoints->At(iPoint));
          Int_t stationId = stsStationNrFromMcId[point->GetDetectorID()];
          fStsStationsMap[iPoint] = stationId;
       }
@@ -270,7 +301,7 @@ void CbmLitMCTrackCreator::FillStationMaps()
    if (NULL != fMuchPoints) {
       Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
       for (Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++) {
-         FairMCPoint* point = static_cast<FairMCPoint*>(fMuchPoints->At(iPoint));
+         const FairMCPoint* point = static_cast<const FairMCPoint*>(fMuchPoints->At(iPoint));
          Int_t stationId = 100 * CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID())
             + 10 * CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID())
             + CbmMuchGeoScheme::GetLayerSideIndex(point->GetDetectorID());
@@ -285,7 +316,7 @@ void CbmLitMCTrackCreator::FillStationMaps()
       CbmTrdDetectorId trdDetectorId;
       Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
       for (Int_t iPoint = 0; iPoint < nofTrdPoints; iPoint++) {
-         FairMCPoint* point = static_cast<FairMCPoint*>(fTrdPoints->At(iPoint));
+         const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(iPoint));
          Int_t* detInfo = trdDetectorId.GetDetectorInfo(point->GetDetectorID());
          Int_t stationId = 10 * detInfo[1] + detInfo[2];
          fTrdStationsMap[iPoint] = stationId;

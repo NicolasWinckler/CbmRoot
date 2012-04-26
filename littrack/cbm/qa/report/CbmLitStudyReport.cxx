@@ -35,25 +35,25 @@ void CbmLitStudyReport::Create(
 {
    CreateReportElement(reportType);
 
-   int nofStudies = resultDirectories.size();
+   Int_t nofStudies = resultDirectories.size();
 
    fResultDirectories = resultDirectories;
    fStudyNames = studyNames;
 
    fQa.resize(nofStudies);
    fCheck.resize(nofStudies);
-   for(int iStudy = 0; iStudy < nofStudies; iStudy++) {
+   for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
       try {
          read_json(resultDirectories[iStudy] + GetQaFileName(), fQa[iStudy]);
          read_json(resultDirectories[iStudy] + GetCheckFileName(), fCheck[iStudy]);
-      } catch (json_parser_error error) {
+      } catch (json_parser_error& error) {
          cout << error.what();
       }
    }
 
    try {
       read_json(GetIdealFileName(), fIdeal);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 

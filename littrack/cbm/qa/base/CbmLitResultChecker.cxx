@@ -29,13 +29,13 @@ void CbmLitResultChecker::DoCheck(
 
    try {
       read_json(qaFile.c_str(), qa);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 
    try {
       read_json(idealFile.c_str(), ideal);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 
@@ -43,7 +43,7 @@ void CbmLitResultChecker::DoCheck(
 
    try {
       write_json(checkFile.c_str(), check);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 }
@@ -54,15 +54,15 @@ void CbmLitResultChecker::DoCheck(
       ptree& out)
 {
    // Build map out of property tree for convenience.
-   map<string, float> mymap;
+   map<string, Double_t> mymap;
    PropertyTreeToMap("", qa, mymap);
 
    // Iterate over the map, get each property and compare it to ideal.
-   for (map<string, float>::const_iterator it = mymap.begin(); it != mymap.end(); it++) {
-      map<string, float>::value_type v = *it;
+   for (map<string, Double_t>::const_iterator it = mymap.begin(); it != mymap.end(); it++) {
+      map<string, Double_t>::value_type v = *it;
 
-      boost::optional<float> vmin = ideal.get_optional<float>(v.first + ".min");
-      boost::optional<float> vmax = ideal.get_optional<float>(v.first + ".max");
+      boost::optional<Double_t> vmin = ideal.get_optional<Double_t>(v.first + ".min");
+      boost::optional<Double_t> vmax = ideal.get_optional<Double_t>(v.first + ".max");
 
       // Check if value exists in ideal
       if (!vmin || !vmax) {
@@ -86,10 +86,10 @@ void CbmLitResultChecker::DoCheck(
 void CbmLitResultChecker::PropertyTreeToMap(
       const string& path,
       const ptree& pt,
-      map<string, float>& mymap)
+      map<string, Double_t>& mymap) const
 {
    if (pt.size() == 0) {
-      mymap.insert(pair<string, float>(path, pt.get_value(-1.f)));
+      mymap.insert(pair<string, Double_t>(path, pt.get_value(-1.f)));
       return;
    }
    for (ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {

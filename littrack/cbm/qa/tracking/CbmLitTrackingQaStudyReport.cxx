@@ -54,8 +54,8 @@ void CbmLitTrackingQaStudyReport::Create(
          (isTrd && isMuch) ? "MUCH+TRD" : "";
 
    out << fR->TableBegin("Reconstruction efficiency", list_of(string("")).range(fStudyNames));
-   out << PrintRowEff("hSts3D.all", "STS all");
-   out << PrintRowEff("hSts3D." + signal, "STS " + signal);
+   out << PrintRowEff("hStsNormSts3D.all", "STS all");
+   out << PrintRowEff("hStsNormSts3D." + signal, "STS " + signal);
    out << PrintRowEff("hRec3D.all", recDet + " all");
    out << PrintRowEff("hRec3D." + signal, recDet + " " + signal);
    out << PrintRowEff("hTof3D.all", "TOF all");

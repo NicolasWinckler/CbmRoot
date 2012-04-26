@@ -48,14 +48,14 @@ public:
     */
    void Draw(
          CbmLitHistManager* histManager,
-         const std::string& outputDir = "");
+         const string& outputDir = "");
 
-   /**
-    * \brief Set rebining factor for histograms.
-    */
-   void SetRebin(int rebin = 1) {
-      fRebin = (rebin >= 1) ? rebin : 1;
-   }
+//   /**
+//    * \brief Set rebining factor for histograms.
+//    */
+//   void SetRebin(Int_t rebin = 1) {
+//      fRebin = (rebin >= 1) ? rebin : 1;
+//   }
 
 private:
    /**
@@ -63,30 +63,30 @@ private:
     */
    void DrawEfficiencyHistos();
 
-   /**
-    * \brief Draw efficiency plots. This function automatically
-    * check the existence of histograms. TODO ADD COMMENTS
-    * \param[in] canvasName Name of canvas.
-    * \param[in] histNames Vector of histogram names.
-    * \param[in] histLabels Vector of histogram labels.
-    * \param[in] opt Additional options. "pisupp" for pion suppression drawing.
-    * \param[in] projName Projection name: "p", "y", "pt".
-    */
-   void DrawEfficiency(
-         const string& canvasName,
-         const vector<string>& histNames,
-         const vector<string>& histLabels,
-         const string& opt = "",
-         const string& proj = "");
+//   /**
+//    * \brief Draw efficiency plots. This function automatically
+//    * check the existence of histograms. TODO ADD COMMENTS
+//    * \param[in] canvasName Name of canvas.
+//    * \param[in] histNames Vector of histogram names.
+//    * \param[in] histLabels Vector of histogram labels.
+//    * \param[in] opt Additional options. "pisupp" for pion suppression drawing.
+//    * \param[in] projName Projection name: "p", "y", "pt".
+//    */
+//   void DrawEfficiency(
+//         const string& canvasName,
+//         const vector<string>& histNames,
+//         const vector<string>& histLabels,
+//         const string& opt = "",
+//         const string& proj = "");
 
    /**
     * \brief Calculate efficiency for two histograms.
     * TODO: Add comments
     */
-   float CalcEfficiency(
+   Double_t CalcEfficiency(
       TH1* histRec,
       TH1* histAcc,
-      const std::string& opt);
+      Double_t scale = 1.);
 
    /**
     * \brief Draw mean efficiency lines on histogramm.
@@ -97,15 +97,19 @@ private:
       const vector<TH1*>& histos,
       const vector<Double_t>& efficiencies);
 
-   /**
-    * \brief Draw ACC and REC efficiency graphs normalized to MC.
-    */
-   void DrawMcEfficiencyGraph();
+//   /**
+//    * \brief Draw ACC and REC efficiency graphs normalized to MC.
+//    */
+//   void DrawMcEfficiencyGraph();
 
    /**
     * \brief Draw histograms for hits.
     */
    void DrawHitsHistos();
+
+   void DrawEfficiency(
+         const string& canvasName,
+         const string& histNamePattern);
 
    /**
     * \brief Draw histograms for hits. This function automatically
@@ -117,18 +121,18 @@ private:
       const string& canvasName,
       const string& hist);
 
-   /**
-    * \brief Draw histograms of Sts tracks Qa.
-    */
-   void DrawStsTracksQaHistos();
-
-   /**
-    * \brief Draw MC momentum vs. angle histogram.
-    */
-   void DrawMCMomVsAngle();
+//   /**
+//    * \brief Draw histograms of Sts tracks Qa.
+//    */
+//   void DrawStsTracksQaHistos();
+//
+//   /**
+//    * \brief Draw MC momentum vs. angle histogram.
+//    */
+//   void DrawMCMomVsAngle();
 
    CbmLitHistManager* fHM; // histogram manager
-   int fRebin; // Rebining factor for histograms
+//   Int_t fRebin; // Rebining factor for histograms
    string fOutputDir; // Output directory for images
 };
 

@@ -8,10 +8,16 @@
 #ifndef CBMLITTRACKINGQAHISTCREATOR_H_
 #define CBMLITTRACKINGQAHISTCREATOR_H_
 
-#include "qa/tracking/CbmLitTrackingQaHistNames.h"
+#include "base/CbmLitDetectorSetup.h"
+#include "TObject.h"
 #include <string>
+#include <boost/function.hpp>
 class CbmLitHistManager;
 using std::string;
+using std::vector;
+
+typedef boost::function<Bool_t (TClonesArray* mcTracks, Int_t index)> LitTrackAcceptanceFunction;
+typedef boost::function<Bool_t (TClonesArray* mcTracks, Int_t index, Int_t nofHitsInRing)> LitRingAcceptanceFunction;
 
 /**
  * \class CbmLitTrackingQaHistCreator
@@ -46,9 +52,9 @@ public:
     * \param[in] nofBins Number of bins.
     */
    void SetMomAxis(
-         float min,
-         float max,
-         int nofBins) {
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
       fMinMom = min;
       fMaxMom = max;
       fNofBinsMom = nofBins;
@@ -61,9 +67,9 @@ public:
     * \param[in] nofBins Number of bins.
     */
    void SetPtAxis(
-         float min,
-         float max,
-         int nofBins) {
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
       fMinPt = min;
       fMaxPt = max;
       fNofBinsPt = nofBins;
@@ -76,9 +82,9 @@ public:
     * \param[in] nofBins Number of bins.
     */
    void SetRapidityAxis(
-         float min,
-         float max,
-         int nofBins) {
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
       fMinY = min;
       fMaxY = max;
       fNofBinsY = nofBins;
@@ -91,64 +97,92 @@ public:
     * \param[in] nofBins Number of bins.
     */
    void SetAngleAxis(
-         float min,
-         float max,
-         int nofBins) {
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
       fMinAngle = min;
       fMaxAngle = max;
       fNofBinsAngle = nofBins;
    }
 
+   static vector<string> GlobalTrackVariants();
+
+   /* Getters */
+   static const vector<string>& GetTrackCategories() { return fTrackCategories; }
+   static const map<string, LitTrackAcceptanceFunction>& GetTrackAcceptanceFunctions() { return fTrackAcceptanceFunctions; }
+   static const vector<string>& GetRingCategories() { return fRingCategories; }
+   static const map<string, LitRingAcceptanceFunction>& GetRingAcceptanceFunctions() { return fRingAcceptanceFunctions; }
+
 private:
 
-   void CreateEffHist(
+   void CreateEfficiencyHistogram(
          const string& name,
+         const string& parameter,
          const string& xTitle,
-         int nofBins,
-         float minBin,
-         float maxBin,
-         LitQaNameOption opt);
-
-   void CreateEffHist3D(
-         const string& name,
-         LitQaNameOption opt);
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin,
+         const string& opt);
 
    void Create1DHist(
          const string& name,
          const string& xTitle,
          const string& yTitle,
-         int nofBins,
-         float minBin,
-         float maxBin);
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin);
 
    void Create2DHist(
          const string& name,
          const string& xTitle,
          const string& yTitle,
          const string& zTitle,
-         int nofBinsX,
-         float minBinX,
-         float maxBinX,
-         int nofBinsY,
-         float minBinY,
-         float maxBinY);
+         Int_t nofBinsX,
+         Double_t minBinX,
+         Double_t maxBinX,
+         Int_t nofBinsY,
+         Double_t minBinY,
+         Double_t maxBinY);
+
+   void CreateTrackHitsHistogram(
+   		const string& detName);
+
+   vector<string> CreateGlobalTrackingHistogramNames(
+   		const vector<string>& detectors);
+
+   vector<string> CreateGlobalTrackingHistogramNames();
+
+   static vector<string> GetDefaultTrackCategories();
+   static map<string, LitTrackAcceptanceFunction> GetDefaultTrackAcceptanceFunctions();
+   static vector<string> GetDefaultRingCategories();
+   static map<string, LitRingAcceptanceFunction> GetDefaultRingAcceptanceFunctions();
+
+   string LocalEfficiencyNormalization(
+   		const string& detName);
 
 private:
 
-   float fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
-   float fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
-   int fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
-   float fMinPt; // Minimum Pt for tracks for efficiency calculation [GeV/c]
-   float fMaxPt; // Maximum Pt for tracks for efficiency calculation [GeV/c]
-   int fNofBinsPt; // Number of bins for efficiency vs. Pt histogram
-   float fMinY; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
-   float fMaxY; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
-   int fNofBinsY; // Number of bins for efficiency vs. rapidity histogram
-   float fMinAngle; // Minimum polar angle [grad]
-   float fMaxAngle; // Maximum polar angle [grad]
-   int fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
+   Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
+   Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
+   Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
+   Double_t fMinPt; // Minimum Pt for tracks for efficiency calculation [GeV/c]
+   Double_t fMaxPt; // Maximum Pt for tracks for efficiency calculation [GeV/c]
+   Int_t fNofBinsPt; // Number of bins for efficiency vs. Pt histogram
+   Double_t fMinY; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
+   Double_t fMaxY; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
+   Int_t fNofBinsY; // Number of bins for efficiency vs. rapidity histogram
+   Double_t fMinAngle; // Minimum polar angle [grad]
+   Double_t fMaxAngle; // Maximum polar angle [grad]
+   Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
 
    CbmLitHistManager* fHM; // Histogram manager for created histograms
+
+   static vector<string> fTrackCategories; // Vector of track category names
+   static vector<string> fRingCategories; // Vector of ring category names
+   static map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
+   static map<string, LitRingAcceptanceFunction> fRingAcceptanceFunctions; // maps ring category name to ring acceptance function
+
+   CbmLitDetectorSetup fDet;
 };
 
-#endif /* CBMLITQAHISTCREATOR_H_ */
+#endif /* CBMLITTRACKINGQAHISTCREATOR_H_ */

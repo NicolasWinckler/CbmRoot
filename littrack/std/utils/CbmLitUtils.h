@@ -3,15 +3,19 @@
 
 class TCanvas;
 
+#include <vector>
 #include <string>
 #include <sstream>
 #include <iostream>
+
+using std::string;
+using std::vector;
 
 namespace lit
 {
 
 template <class T>
-std::string ToString(
+string ToString(
    const T& value)
 {
    std::stringstream ss;
@@ -20,11 +24,11 @@ std::string ToString(
 }
 
 template <class T>
-std::string NumberToString(
+string NumberToString(
    const T& value, int precision = 1)
 {
    // First determine number of digits in float
-   std::string digis = ToString<int>(value);
+   string digis = ToString<int>(value);
    int ndigis = digis.size();
 
    std::stringstream ss;
@@ -46,6 +50,14 @@ void SaveCanvasAsImage(
    TCanvas* c,
    const std::string& dir);
 
+string FindAndReplace(
+		const string& name,
+		const string& oldSubstr,
+		const string& newSubstr);
+
+vector<string> Split(
+		const string& name,
+		char delimiter);
 }
 
 #endif /* CBMLITUTILS_H_ */

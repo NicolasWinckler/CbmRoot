@@ -9,9 +9,17 @@
 
 #include "CbmLitMCPoint.h"
 #include "CbmDetectorList.h"
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <vector>
+#include <set>
+
+using std::vector;
+using std::map;
+using std::set;
+using std::stringstream;
+using std::string;
+using std::endl;
 
 /**
  * \class CbmLitMCTrack
@@ -25,7 +33,8 @@ public:
    /**
     * \brief Constructor.
     */
-   CbmLitMCTrack() {
+   CbmLitMCTrack():
+   	   fNofRichHits(0) {
       // Initialize all maps
       fPoints[kMVD];
       fPoints[kSTS];
@@ -38,6 +47,12 @@ public:
       fStationPoints[kTRD];
       fStationPoints[kMUCH];
       fStationPoints[kTOF];
+      fStationIds[kMVD];
+      fStationIds[kSTS];
+      fStationIds[kTRD];
+      fStationIds[kMUCH];
+      fStationIds[kTOF];
+      fMaxConsecutivePoints[kSTS] = -1;
    }
 
    /**
@@ -52,7 +67,10 @@ public:
     */
    void AddPoint(DetectorId detId, const CbmLitMCPoint& point) {
       fPoints[detId].push_back(point);
-      if (detId != kRICH) fStationPoints[detId][point.GetStationId()].push_back(point);
+      if (detId != kRICH) {
+    	  fStationPoints[detId][point.GetStationId()].push_back(point);
+    	  fStationIds[detId].insert(point.GetStationId());
+      }
    }
 
    /**
@@ -60,7 +78,7 @@ public:
     * \param[in] detId Detector identificator.
     * \return Array of MC points.
     */
-   const std::vector<CbmLitMCPoint>& GetPoints(DetectorId detId) const {
+   const vector<CbmLitMCPoint>& GetPoints(DetectorId detId) const {
       return fPoints.find(detId)->second;
    }
 
@@ -70,7 +88,7 @@ public:
     * \param[in] index Index of MC point.
     * \return MC point.
     */
-   const CbmLitMCPoint& GetPoint(DetectorId detId, int index) const {
+   const CbmLitMCPoint& GetPoint(DetectorId detId, Int_t index) const {
       assert(GetNofPoints(detId) != 0);
       return fPoints.find(detId)->second[index];
    }
@@ -80,8 +98,54 @@ public:
     * \param[in] detId Detector identificator.
     * \return Number of MC points.
     */
-   unsigned int GetNofPoints(DetectorId detId) const {
+   UInt_t GetNofPoints(DetectorId detId) const {
       return fPoints.find(detId)->second.size();
+   }
+
+   /**
+    * \brief Return number of MC points in different stations for specified detector id.
+    * \param[in] detId Detector identificator.
+    * \return Number of MC points.
+    */
+   UInt_t GetNofPointsInDifferentStations(DetectorId detId) const {
+	  assert(detId != kRICH);
+      return fStationPoints.find(detId)->second.size();
+   }
+
+   /**
+    * \brief Return number of consecutive MC points for specified detector id. Currently works only for STS.
+    * \param[in] detId Detector identificator.
+    * \return Number of MC points.
+    */
+   Int_t GetNofConsecutivePoints(DetectorId detId) const {
+	  //assert(detId == kSTS);
+//      return fMaxConsecutivePoints.find(detId)->second;
+	   return (detId == kSTS) ? fMaxConsecutivePoints.find(detId)->second : -1;
+   }
+
+   /**
+    * \brief Calculates number of consecutive MC points for specified detector id. Currently works only for STS.
+    * \param[in] detId Detector identificator.
+    * \return Number of MC points.
+    */
+   void CalculateNofConsecutivePoints() {
+	  fMaxConsecutivePoints[kSTS] = MaxConsecutiveNumbers(fStationIds.find(kSTS)->second);
+   }
+
+   /**
+    * \brief Return number of RICH hits in ring.
+    * \return Number of RICH hits in ring.
+    */
+   Int_t GetNofRichHits() const {
+	   return fNofRichHits;
+   }
+
+   /**
+    * \brief SetNumber of RICH hits in ring.
+    * \param[in] nofRIchHits Number of hits in RICH.
+    */
+   void SetNofRichHits(Int_t nofRichHits) {
+	   fNofRichHits = nofRichHits;
    }
 
    /**
@@ -97,8 +161,8 @@ public:
     */
    const CbmLitMCPoint& GetPointAtStation(
          DetectorId detId,
-         int stationId,
-         int index) const {
+         Int_t stationId,
+         Int_t index) const {
       assert((detId != kRICH) && (GetNofPointsAtStation(detId, stationId) != 0));
       return fStationPoints.find(detId)->second.find(stationId)->second[index];
    }
@@ -109,9 +173,9 @@ public:
     *  \param[in] stationId Station id.
     * \return Number of MC points.
     */
-   unsigned int GetNofPointsAtStation(
+   UInt_t GetNofPointsAtStation(
          DetectorId detId,
-         int stationId) const {
+         Int_t stationId) const {
       assert(detId != kRICH);
       if (fStationPoints.find(detId)->second.count(stationId) > 0) {
          return fStationPoints.find(detId)->second.find(stationId)->second.size();
@@ -119,22 +183,54 @@ public:
    }
 
 private:
-   // std::map<detector id, std::vector of MC points>
-   std::map<int, std::vector<CbmLitMCPoint> > fPoints;
+   // map<detector id, vector of MC points>
+   map<Int_t, vector<CbmLitMCPoint> > fPoints;
 
-   // std::map<detector id, std::map<station id, std::vector of MC points> >
-   std::map<int, std::map<int, std::vector<CbmLitMCPoint> > > fStationPoints;
+   // map<detector id, map<station id, vector of MC points> >
+   map<Int_t, map<Int_t, vector<CbmLitMCPoint> > > fStationPoints;
+
+   // Temporary set to store unique station indices for fast access
+   // map<detector id, set<station index>>
+   map<Int_t, set<Int_t> > fStationIds;
+
+   // temporary storage for maximum number of consecutive MC points
+   // map<detector id, number of MC points>
+   map<Int_t, Int_t> fMaxConsecutivePoints;
+
+   Int_t fNofRichHits; // Number of hits in RICH ring
 
 private:
 
-   std::string PointsToString(
+   Int_t MaxConsecutiveNumbers(
+         const set<Int_t>& numbers) const {
+      if (numbers.size() == 0) return 0;
+      if (numbers.size() == 1) return 1;
+
+      vector<Int_t> a(numbers.begin(), numbers.end());
+
+      int maxCnt = 0;
+      int cnt = 1;
+      for (Int_t i = 0; i < a.size() - 1; i++) {
+         if (a[i] == (a[i + 1] - 1)) {
+            cnt++;
+         } else {
+            maxCnt = std::max(cnt, maxCnt);
+            cnt = 1;
+         }
+      }
+      maxCnt = std::max(cnt, maxCnt);
+      return maxCnt;
+   }
+
+   string PointsToString(
          DetectorId detId,
-         const std::string& detName) const {
-      std::stringstream ss;
-      ss << detName << " npoints=" << GetNofPoints(detId) << " points=(";
-      for (int i = 0; i < GetNofPoints(detId); i++) {
-         //ss << GetPoint(detId, i).GetRefId() << ",";
-         ss << GetPoint(detId, i);
+         const string& detName) const {
+      stringstream ss;
+      ss << detName << " np=" << GetNofPoints(detId) << " npds=" << GetNofPointsInDifferentStations(detId)
+    		  << " ncp=" << GetNofConsecutivePoints(detId) << " points=(";
+      for (Int_t i = 0; i < GetNofPoints(detId); i++) {
+         ss << ":" << GetPoint(detId, i).GetRefId() << ":" << GetPoint(detId, i).GetStationId() << ",";
+         //ss << GetPoint(detId, i);
       }
       ss << ") ";
       return ss.str();
@@ -143,26 +239,26 @@ private:
 public:
 
    /**
-    * \brief Returns std::string representation of the class.
-    * \return Class representation as std::string.
+    * \brief Returns string representation of the class.
+    * \return Class representation as string.
     */
-   virtual std::string ToString() const {
-      std::stringstream ss;
+   virtual string ToString() const {
+      stringstream ss;
       ss << "MCTrack: ";
       ss << PointsToString(kMVD, "MVD") << "|";
       ss << PointsToString(kSTS, "STS") << "|";
       ss << PointsToString(kTRD, "TRD") << "|";
       ss << PointsToString(kMUCH, "MUCH") << "|";
       ss << PointsToString(kTOF, "TOF") << "|";
-      ss << std::endl;
+      ss << endl;
       return ss.str();
    }
 
    /**
-    * \brief Operator << for convenient output to std::ostream.
+    * \brief Operator << for convenient output to ostream.
     * \return Insertion stream in order to be able to call a succession of insertion operations.
     */
-   friend std::ostream& operator<<(std::ostream& strm, const CbmLitMCTrack& track) {
+   friend ostream& operator<<(ostream& strm, const CbmLitMCTrack& track) {
       strm << track.ToString();
       return strm;
    }

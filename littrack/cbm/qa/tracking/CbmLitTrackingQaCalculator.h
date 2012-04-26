@@ -10,7 +10,6 @@
 
 #include "CbmDetectorList.h"
 #include "CbmStsKFTrackFitter.h"
-#include "CbmLitTrackingQaHistNames.h"
 #include "cbm/base/CbmLitDetectorSetup.h"
 
 #include <map>
@@ -27,9 +26,6 @@ class CbmStsKFTrackFitter;
 class CbmMCTrack;
 class TClonesArray;
 class TH1;
-class TH2F;
-class TH3F;
-class TH1F;
 class CbmLitGlobalElectronId;
 class CbmLitHistManager;
 class CbmRichRingFitterEllipseTau;
@@ -149,24 +145,6 @@ private:
    void ReadDataBranches();
 
    /**
-    * \brief Fill histogram with number of crossed stations by MC track.
-    */
-   void FillNofCrossedStationsHistos();
-
-   /**
-    * \brief Return maximum number of consecutive numbers in std:set.
-    * \param[in] numbers Set with numbers.
-    * \return Maximum number.
-    */
-   Int_t MaxConsecutiveNumbers(
-         const std::set<Int_t>& numbers);
-
-   /**
-    * \brief Fill map with number of hits in MC RICH ring.
-    */
-   void FillRichRingNofHits();
-
-   /**
     * \brief Loop over the reconstructed global tracks.
     *
     * Check if track is correct and fill
@@ -195,7 +173,7 @@ private:
     * \return True if track is correctly reconstructed.
     */
    Bool_t CheckTrackQuality(
-      CbmTrackMatch* trackMatch,
+      const CbmTrackMatch* trackMatch,
       DetectorId detId);
 
    /**
@@ -204,18 +182,7 @@ private:
     * \return True if ring is correctly reconstructed.
     */
    Bool_t CheckRingQuality(
-      CbmRichRingMatch* ringMatch);
-
-   /**
-    * \brief Add MC momentum to histograms for detector acceptance calculation.
-    * \param[in] p Momentum of MC track.
-    * \param[in] y Rapidity of Mc track.
-    * \param[in] pt Transverse momentum of MC track.
-    */
-   void FillMcHistoForDetAcc(
-         Double_t p,
-         Double_t y,
-         Double_t pt);
+      const CbmRichRingMatch* ringMatch);
 
    /**
     * \brief Loop over the MC tracks. Check track acceptance for different cases.
@@ -232,11 +199,11 @@ private:
     * \param[in] par Value that will be added in histogram (momentum or number of points).
     */
    void FillGlobalReconstructionHistos(
-      const CbmMCTrack* mcTrack,
       Int_t mcId,
       const multimap<Int_t, Int_t>& mcMap,
-      const string& hist,
-      Double_t par = -1.);
+      const string& histName,
+      const string& accName,
+      Double_t par);
 
    /**
     * \brief ADD COMMENTS.
@@ -257,118 +224,43 @@ private:
      * \param[in] par Value that will be added in histogram (momentum or number of points)
      */
    void FillGlobalReconstructionHistosRich(
-      const CbmMCTrack* mcTrack,
       Int_t mcId,
       const multimap<Int_t, Int_t>& mcMap,
-      const string& hist,
-      Double_t par = -1.);
+      const string& histName,
+      const string& accName,
+      Double_t par);
 
-   /**
-    * \brief Fill pion suppression histogramms.
-    */
-   void PionSuppression3D();
+//   /**
+//    * \brief Fill pion suppression histogramms.
+//    */
+//   void PionSuppression3D();
 
-   /**
-    * \brief Fill histograms: momentum resolution vs. momentum and chi2Vertex.
-    */
-   void StsTracksQa();
+//   /**
+//    * \brief Fill histograms: momentum resolution vs. momentum and chi2Vertex.
+//    */
+//   void StsTracksQa();
 
-   /**
-    * \brief Fill MC momentum vs. polar angle histogram.
-    */
-   void FillMCMomVsAngle(
-         const CbmMCTrack* mcTrack);
-
-   /**
-    * \brief Create efficiency histograms using specified parameters.
-    * \param[out] hist 2D vector of histograms.
-    * \param[in] name Histogram name.
-    * \param[in] nofBins Number of bins in histograms.
-    * \param[in] minBin Minimum value of histograms.
-    * \param[in] maxBin Maximum value of histograms.
-    * \param[in] opt "tracking" for STS, TRD and TOF or "rich" for RICH.
-    * \param[in] file If file==NULL then create histograms else read histograms from file.
-    */
-   void CreateEffHisto(
-   		std::vector<std::vector<TH1F*> >& hist,
-   		const std::string& name,
-   		Int_t nofBins,
-   		Double_t minBin,
-   		Double_t maxBin,
-   		const std::string& opt,
-   		TFile* file);
-
-   /**
-    * \brief Create electron identification histograms using specified parameters.
-    * \param[out] hist 2D vector of histograms.
-    * \param[in] name Histogram name.
-    * \param[in] nofBins Number of bins in histograms.
-    * \param[in] minBin Minimum value of histograms.
-    * \param[in] maxBin Maximum value of histograms.
-    * \param[in] file If file==NULL then create histograms else read histograms from file.
-    */
-   void CreateEffHistoElId(
-         std::vector<std::vector<TH1F*> >& hist,
-         const std::string& name,
-         Int_t nofBins,
-         Double_t minBin,
-         Double_t maxBin,
-         TFile* file);
-
-   /**
-    * \brief Create histograms for detector acceptance using specified parameters.
-    * \param[out] hist vector of histograms.
-    * \param[in] name Histogram name.
-    * \param[in] nofBins Number of bins in histograms.
-    * \param[in] minBin Minimum value of histograms.
-    * \param[in] maxBin Maximum value of histograms.
-    * \param[in] file If file==NULL then create histograms else read histograms from file.
-    */
-   void CreateEffHistoDetAcc(
-         std::vector<TH1F*>& hist,
-         const std::string& name,
-         Int_t nofBins,
-         Double_t minBin,
-         Double_t maxBin,
-         TFile* file);
-
-   /**
-    * \brief Create histograms.
-    * \param[in] file If file==NULL then create histograms else read histograms from file.
-    */
-   void CreateHistos(
-        TFile* file);
-
-   /**
-    * \brief Create x,y,z projections from 3D histogram. New histograms
-    * will be added to histogram manager (fHM) with names hist+"px", "py", "pz"
-    * \hist[in] Name of the histogram.
-    * \opt Options.
-    */
-   void CreateProjections3D(
-         const string& hist,
-         LitQaNameOption opt);
+//   /**
+//    * \brief Fill MC momentum vs. polar angle histogram.
+//    */
+//   void FillMCMomVsAngle(
+//         const CbmMCTrack* mcTrack);
 
    /**
     * \brief Divide two histograms.
     * \param[in] histo1 Numerator.
     * \param[in] histo2 Denominator.
     * \param[out] histo3 Output histogram.
-    * \param[in] c Coefficient.
+    * \param[in] scale Scaling factor.
     */
    void DivideHistos(
       TH1* histo1,
       TH1* histo2,
       TH1* histo3,
-      Double_t c);
-
-   void DivideHistos(
-      const string& hist,
-      LitQaNameOption opt,
-      Bool_t addProjections = false);
+      Double_t scale);
 
    /**
-    * \brief Increase number of tracks counters.
+    * \brief Increase number of objects counters.
     */
    void IncreaseCounters();
 
@@ -376,11 +268,6 @@ private:
     * \brief Calculate electron Identification.
     */
    void ElectronIdentification();
-
-   /**
-    * \brief Shrinks empty bins for histograms.
-    */
-   void ShrinkEmptyBins();
 
    // Acceptance defined by MC points
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
@@ -411,51 +298,21 @@ private:
    Double_t fRefMomentum; // Momentum cut for reference tracks
    Int_t fRefMinNofHitsRich; // Minimum number of hits in RICH ring to be considered as reference
 
-   // Maps for reconstructed tracks
-   // <MC track index, reconstructed track index>
-   std::multimap<Int_t, Int_t> fMcStsMap; // STS
-   std::multimap<Int_t, Int_t> fMcHalfGlobalMap; // STS+TRD(MUCH)
-   std::multimap<Int_t, Int_t> fMcGlobalMap; // STS+TRD(MUCH)+TOF
-
-   std::multimap<Int_t, Int_t> fMcRichMap; // RICH
-   std::multimap<Int_t, Int_t> fMcStsRichMap; // STS+RICH
-   std::multimap<Int_t, Int_t> fMcStsRichNoMatchingMap; // STS+RICH
-   std::multimap<Int_t, Int_t> fMcStsRichTrdMap; // STS+RICH+TRD
-   std::multimap<Int_t, Int_t> fMcStsRichTrdTofMap; // STS+RICH+TRD+TOF
-
-   // Number of hits in the MC RICH ring
-   std::map<Int_t, Int_t> fNofHitsInRingMap;
-
-   // Number of crossed stations
-   // <MC track index, number of crossed stations>
-   std::map<Int_t, Int_t> fNofStsStationsMap;
-   std::map<Int_t, Int_t> fNofStsConsecutiveStationsMap;
-   std::map<Int_t, Int_t> fNofTrdStationsMap;
-   std::map<Int_t, Int_t> fNofMuchStationsMap;
+   // Global track segment name maps to multimap <MC track index, reconstructed track index>
+   map<string, multimap<Int_t, Int_t> > fMcToRecoMap;
 
    // Pointers to data arrays
    TClonesArray* fMCTracks; // CbmMCTrack array
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
-
    TClonesArray* fMvdPoints; // CbmMvdPoint array
    TClonesArray* fMvdHitMatches; // CbmMvdHitMatch array
-
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
-   TClonesArray* fStsPoints; // CbmStsPoint array
-
-   TClonesArray* fRichHits; // CbmRichHits array
    TClonesArray* fRichRings; // CbmRichRing array
    TClonesArray* fRichProjections; // CbmRichProjection array
    TClonesArray* fRichRingMatches; // CbmRichProjection array
-   TClonesArray* fRichPoints; // CbmRichPoint array
-
    TClonesArray* fMuchMatches; // CbmTrackMatch array
-   TClonesArray* fMuchPoints; // CbmMuchPoint array
-
    TClonesArray* fTrdMatches; // CbmTrackMatch array
-   TClonesArray* fTrdPoints; // CbmTrdPoint array
-
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 

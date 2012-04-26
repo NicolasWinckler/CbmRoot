@@ -8,6 +8,7 @@
 #ifndef CBMLITHISTMANAGER_H_
 #define CBMLITHISTMANAGER_H_
 
+#include "TObject.h"
 #include <iostream>
 #include <map>
 #include <string>
@@ -110,7 +111,7 @@ public:
 
    /**
     * \brief Return vector of pointers to TH1 histogram.
-    * \param[in] pattern Pattern for histogram name.
+    * \param[in] pattern Regex for histogram name.
     * \return Vector of pointers to TH1 histogram.
     */
    vector<TH1*> H1Vector(
@@ -149,6 +150,45 @@ public:
     */
    void ShrinkEmptyBins(
          const string& histName);
+
+   /**
+    * \brief Shrinks empty bins in histograms for Xaxis from right side.
+    * \param[in, out] histPatternName Regular expression for histogram name.
+    */
+   void ShrinkEmptyBinsByPattern(
+         const string& pattern);
+
+   /**
+    * \brief Scale histogram.
+    * \param[in, out] histName Name of histogram.
+    */
+   void Scale(
+         const string& histName,
+         Double_t scale);
+
+   /**
+    * \brief Scale histograms which name matches specified pattern.
+    * \param[in, out] histPatternName Regular expression for histogram name.
+    */
+   void ScaleByPattern(
+         const string& pattern,
+         Double_t scale);
+
+   /**
+    * \brief Rebin histogram.
+    * \param[in, out] histName Name of histogram.
+    */
+   void Rebin(
+         const string& histName,
+         Int_t ngroup);
+
+   /**
+    * \brief Rebin histograms which name matches specified pattern.
+    * \param[in, out] histPatternName Regular expression for histogram name.
+    */
+   void RebinByPattern(
+         const string& pattern,
+         Int_t ngroup);
 
    /**
     * \brief Return string representation of class.

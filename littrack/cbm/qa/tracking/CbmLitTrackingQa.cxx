@@ -1,16 +1,16 @@
-/** CbmLitTrackingQa.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2007
- * @version 3.0
- **/
+/**
+ * \file CbmLitTrackingQa.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2007
+ */
 
-#include "qa/tracking/CbmLitTrackingQa.h"
-#include "qa/tracking/CbmLitTrackingQaHistCreator.h"
-#include "qa/tracking/CbmLitTrackingQaCalculator.h"
-#include "qa/tracking/CbmLitTrackingQaStudyReport.h"
-#include "qa/tracking/CbmLitTrackingQaDraw.h"
-#include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
-#include "qa/tracking/CbmLitTrackingQaReport.h"
+#include "CbmLitTrackingQa.h"
+#include "CbmLitTrackingQaHistCreator.h"
+#include "CbmLitTrackingQaCalculator.h"
+#include "CbmLitTrackingQaStudyReport.h"
+#include "CbmLitTrackingQaDraw.h"
+#include "CbmLitTrackingQaPTreeCreator.h"
+#include "CbmLitTrackingQaReport.h"
 #include "qa/base/CbmLitResultChecker.h"
 #include "qa/base/CbmLitHistManager.h"
 
@@ -92,7 +92,7 @@ void CbmLitTrackingQa::Finish()
    drawQa.Draw(fHM, fOutputDir);
 
    string qaFile = fOutputDir + "/tracking_qa.json";
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking_qa_ideal.json");
+   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
    string checkFile = fOutputDir + "/tracking_qa_check.json";
 
    CbmLitTrackingQaPTreeCreator ptc;

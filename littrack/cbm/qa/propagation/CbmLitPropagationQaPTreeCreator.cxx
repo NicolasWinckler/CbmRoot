@@ -35,7 +35,7 @@ ptree CbmLitPropagationQaPTreeCreator::Create(
    };
 
    for (UInt_t iPar = 0; iPar < 10; iPar++) {
-      vector<TH1*> histos = fHM->H1Vector(parNames[iPar]);
+      vector<TH1*> histos = fHM->H1Vector(".*" + parNames[iPar] + ".*");
       for (UInt_t iHist = 0; iHist < histos.size(); iHist++) {
          TH1* hist = histos[iHist];
          ResAndPullToPtree(pt, hist->GetName());

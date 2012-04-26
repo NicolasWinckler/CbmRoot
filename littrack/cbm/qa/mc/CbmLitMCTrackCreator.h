@@ -71,6 +71,14 @@ public:
       return fLitMCTracks.find(mcId)->second;
    }
 
+   /**
+    * \brief Return number of tracks.
+    * \return Number of tracks.
+    */
+   Int_t GetNofTracks() const {
+	   return fLitMCTracks.size();
+   }
+
 private:
 
    /**
@@ -86,6 +94,11 @@ private:
    void AddPoints(
          DetectorId detId,
          const TClonesArray* array);
+
+   /**
+    * \brief Calculate and set number of RICH hits for MC track.
+    */
+   void AddRichHits();
 
    /**
     * \brief Convert FairMCPoint to CbmLitMCPoint.
@@ -132,6 +145,7 @@ private:
    TClonesArray* fMuchPoints; // CbmMuchPoint array
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fRichPoints; // CbmRichPoint array
+   TClonesArray* fRichHits; // CbmRichHit array
 
    // Stores created CbmLitMCTrack objects.
    // std::map<MC track index, CbmLitMCTrack object>.

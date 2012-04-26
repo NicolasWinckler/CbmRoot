@@ -35,19 +35,19 @@ void CbmLitSimulationReport::Create(
 
    try {
       read_json(resultDirectory + GetQaFileName(), fQa);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 
    try {
       read_json(resultDirectory + GetCheckFileName(), fCheck);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 
    try {
       read_json(GetIdealFileName(), fIdeal);
-   } catch (json_parser_error error) {
+   } catch (json_parser_error& error) {
       cout << error.what();
    }
 

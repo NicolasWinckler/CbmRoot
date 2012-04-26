@@ -7,6 +7,7 @@
 #ifndef CBMLITRESULTCHECKER_H_
 #define CBMLITRESULTCHECKER_H_
 
+#include "TObject.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <map>
@@ -74,7 +75,7 @@ private:
    void PropertyTreeToMap(
          const string& path,
          const ptree& pt,
-         map<string, float>& mymap);
+         map<string, Double_t>& mymap) const;
 };
 
 #endif /* CBMLITRESULTCHECKER_H_ */

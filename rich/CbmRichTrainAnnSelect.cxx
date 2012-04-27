@@ -14,7 +14,7 @@
 #include "CbmRichRingFitterCOP.h"
 #include "CbmRichRingSelectImpl.h"
 #include "FairRootManager.h"
-#include "cbm/utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "CbmRichConverter.h"
 
 #include "TMultiLayerPerceptron.h"

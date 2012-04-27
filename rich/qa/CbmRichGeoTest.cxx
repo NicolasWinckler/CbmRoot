@@ -21,7 +21,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "CbmRichHitProducer.h"
-#include "cbm/utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "std/utils/CbmLitUtils.h"
 #include "CbmRichConverter.h"
 #include "cbm/qa/report/CbmLitReport.h"
@@ -894,5 +894,35 @@ void CbmRichGeoTest::Finish()
    }
 }
 
+string CbmRichGeoTest::CalcEfficiency(
+   TH1* histRec,
+   TH1* histAcc)
+{
+   if (histAcc->GetEntries() == 0) { return "0.0"; }
+   else {
+      Double_t eff = Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+      stringstream ss;
+      ss.precision(3);
+      ss << eff;
+      return ss.str();
+   }
+}
+
+
+TH1D* CbmRichGeoTest::DivideH1(
+   TH1D* h1,
+   TH1D* h2,
+   const string& name,
+   const string& title,
+   const string& axisX,
+   const string& axisY)
+{
+   h1->Sumw2();
+   h2->Sumw2();
+   TH1D* h3 = new TH1D(name.c_str(), string(title +";"+axisX+";"+ axisY).c_str(),
+                       h1->GetNbinsX(), h1->GetXaxis()->GetXmin(),h1->GetXaxis()->GetXmax());
+   h3->Divide(h1, h2, 1., 1., "B");
+   return h3;
+}
 ClassImp(CbmRichGeoTest)
 

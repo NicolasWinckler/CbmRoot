@@ -49,7 +49,6 @@ sts/CbmStsTrack.cxx
 rich/CbmRichRing.cxx	
 rich/CbmRichHit.cxx 
 rich/CbmRichPoint.cxx
-rich/CbmRichRingMatch.cxx 
 
 much/CbmMuchPixelHit.cxx 
 much/CbmMuchPoint.cxx

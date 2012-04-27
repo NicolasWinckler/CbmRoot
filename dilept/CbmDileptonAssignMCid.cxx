@@ -23,7 +23,7 @@
 #include "CbmStsTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
 
 #include "FairTrackParam.h"
@@ -353,7 +353,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 
 	Int_t richMCid = -99;
 	CbmRichRing *richRing =  NULL;
-	CbmRichRingMatch *richMatch = NULL;
+	CbmTrackMatch *richMatch = NULL;
 
 
 	stsTrack = (CbmStsTrack*)fArrayStsTrack->At(stsTrackIndex);
@@ -384,9 +384,9 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	richRing = (CbmRichRing*)fArrayRichRing->At(richRingIndex);
 	if(!richRing) goto add;
 
-	richMatch = (CbmRichRingMatch*)fArrayRichRingMatch->At(richRingIndex);
+	richMatch = (CbmTrackMatch*)fArrayRichRingMatch->At(richRingIndex);
 	if (!richMatch) goto add;
-	richMCid = richMatch->GetMCTrackID();
+	richMCid = richMatch->GetMCTrackId();
 	if(richMCid == -1) goto add;
 
 	if (fVerbose>0)  cout<<" -I-  CbmDileptonAssignMCid::Exec() : stsMCid, richMCid : "<<stsMCid << " "<<richMCid <<endl;

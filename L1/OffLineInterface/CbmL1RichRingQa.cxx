@@ -9,7 +9,6 @@
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "CbmMCTrack.h"
-#include "CbmRichRingMatch.h"
 #include "CbmRichRingLight.h"
 #include "CbmRichRingFitterEllipseTau.h"
 

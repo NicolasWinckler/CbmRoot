@@ -36,7 +36,6 @@
 #pragma link C++ class CbmRichPoint+;
 #pragma link C++ class CbmRichHit+;
 #pragma link C++ class CbmRichRing+;
-#pragma link C++ class CbmRichRingMatch+;
 
 #pragma link C++ class CbmMuchCluster+;
 #pragma link C++ class CbmMuchPixelHit+;

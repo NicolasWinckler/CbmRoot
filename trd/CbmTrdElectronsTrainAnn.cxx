@@ -17,7 +17,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmMCTrack.h"
 
-#include "cbm/utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 
 #include <boost/assign/list_of.hpp>
 

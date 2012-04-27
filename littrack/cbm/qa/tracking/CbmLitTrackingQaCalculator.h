@@ -176,14 +176,6 @@ private:
       DetectorId detId);
 
    /**
-    * \brief Check ring quality based on fQuota value.
-    * \param[in] ringMatch Ring match.
-    * \return True if ring is correctly reconstructed.
-    */
-   Bool_t CheckRingQuality(
-      const CbmTrackMatch* ringMatch);
-
-   /**
     * \brief Loop over the MC tracks. Check track acceptance for different cases.
     * Fill histograms of accepted and reconstructed tracks.
     */

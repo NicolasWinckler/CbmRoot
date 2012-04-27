@@ -91,8 +91,6 @@ cbm/qa/CbmTrdHitsQa.cxx
 cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
 
-cbm/utils/CbmLitDrawHist.cxx
-
 cbm/parallel/CbmLitTrackFinderNNParallel.cxx
 cbm/parallel/CbmLitParallelTrackFitterTestMuon.cxx 
 cbm/parallel/CbmLitParallelTrackFitterTestElectron.cxx 
@@ -138,6 +136,7 @@ If(Boost_FOUND)
       cbm/qa/report/CbmLitTextReportElement.cxx
       cbm/qa/report/CbmLitHtmlReportElement.cxx       
       cbm/qa/report/CbmLitLatexReportElement.cxx  
+      cbm/qa/draw/CbmLitDrawHist.cxx
   )  
 EndIf(Boost_FOUND)
 
@@ -162,7 +161,7 @@ cbm/qa/material/CbmLitCheckBrem.h
 cbm/qa/CbmTrdHitsQa.h
 cbm/qa/CbmLitCreateStandaloneData.h
 cbm/qa/CbmLitTestMatrixMath.h
-cbm/utils/CbmLitDrawHist.h
+cbm/qa/draw/CbmLitDrawHist.h
 )
 
 If(Boost_FOUND)

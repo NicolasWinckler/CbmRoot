@@ -6,7 +6,7 @@
 
 #include "qa/CbmTrdHitsQa.h"
 #include "utils/CbmLitUtils.h"
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 
 #include "FairRootManager.h"
 #include "CbmTrdHit.h"

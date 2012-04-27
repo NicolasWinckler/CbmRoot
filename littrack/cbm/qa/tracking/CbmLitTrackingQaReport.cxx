@@ -113,7 +113,7 @@ void CbmLitTrackingQaReport::Create(
 
 string CbmLitTrackingQaReport::PrintNofObjects()
 {
-   	map<string, Double_t> properties = fPT->PropertyByPattern("hno_NofObjects_.+");
+   	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hno_NofObjects_.+");
    	map<string, Double_t>::const_iterator it;
    	string str = fR->TableBegin("Number of objects per event", list_of("Name")("Value"));
    	for (it = properties.begin(); it != properties.end(); it++) {
@@ -127,7 +127,7 @@ string CbmLitTrackingQaReport::PrintTrackHits()
 {
     string str = fR->TableBegin("Number of all, true and fake hits in tracks and rings",
    	         list_of("")("all")("true")("fake")("true/all")("fake/all"));
-  	map<string, Double_t> properties = fPT->PropertyByPattern("hth_.+_TrackHits_All.*");
+  	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hth_.+_TrackHits_All.*");
   	map<string, Double_t>::const_iterator it;
   	for (it = properties.begin(); it != properties.end(); it++) {
   		string name = it->first;
@@ -144,7 +144,7 @@ string CbmLitTrackingQaReport::PrintTrackHits()
 
 string CbmLitTrackingQaReport::PrintNofGhosts()
 {
-	map<string, Double_t> properties = fPT->PropertyByPattern("hng_NofGhosts_.+");
+	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hng_NofGhosts_.+");
 	map<string, Double_t>::const_iterator it;
 	string str = fR->TableBegin("Number of ghosts per event", list_of("Name")("Value"));
 	for (it = properties.begin(); it != properties.end(); it++) {
@@ -160,10 +160,10 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
 	// If includeRich == true than search for tracking efficiency histograms which contain "Rich"
 	// otherwise search for tracking efficiency histograms excluding those which contain "Rich"
 	string effRegex = (includeRich) ? "hte_.*Rich.*_Eff_p" : "hte_((?!Rich).)*_Eff_p";
-    map<string, Double_t> properties = fPT->PropertyByPattern(effRegex);
+    map<string, Double_t> properties = fPT->GetByPattern<Double_t>(effRegex);
 	if (properties.size() == 0) return "";
 
-	const vector<string>& cat = (includeRich) ? CbmLitTrackingQaHistCreator::GetRingCategories() : CbmLitTrackingQaHistCreator::GetTrackCategories();
+	const vector<string>& cat = (includeRich) ? CbmLitTrackingQaHistCreator::Instance()->GetRingCategories() : CbmLitTrackingQaHistCreator::Instance()->GetTrackCategories();
 	Int_t nofCats = cat.size();
 	Int_t nofRows = properties.size() / nofCats;
 

@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/regex.hpp>
 
 using std::string;
 using std::map;
@@ -39,7 +40,19 @@ public:
 	 */
 	virtual ~CbmLitPropertyTree();
 
-	map<string, Double_t> PropertyByPattern(
+	template <class T> void Put(
+			const string& path,
+			const T& value) {};
+
+	template <class T> T Get(
+			const string& path,
+			const T& defaultValue) const { return defaultValue; };
+
+	string GetNumberAsString(
+			const string& path,
+			Double_t defaultValue) const { return ""; };
+
+	template <class T> map<string, T> GetByPattern(
 	      const string& pattern) const;
 
 private:
@@ -54,7 +67,27 @@ private:
          const ptree& pt,
          map<string, Double_t>& mymap) const;
 
-   map<string, Double_t> fPM; // Property map
+   map<string, Double_t> fPM; // Property map, used to store property tree as a map
+   ptree fPT; // Property tree
 };
+
+
+template <class T>
+map<string, T> CbmLitPropertyTree::GetByPattern(
+      const string& pattern) const
+{
+   map<string, Double_t> properties;
+   map<string, Double_t>::const_iterator it;
+
+   try {
+		const boost::regex e(pattern);
+		for (it = fPM.begin(); it != fPM.end(); it++) {
+			if (boost::regex_match(it->first, e)) properties.insert(*it);
+		}
+   } catch (std::exception& ex) {
+	   std::cout << "Exception in CbmLitPropertyTree::PropertyByPattern: " << ex.what() << std::endl;
+   }
+   return properties;
+}
 
 #endif /* CBMLITPROPERTYTREE_H_ */

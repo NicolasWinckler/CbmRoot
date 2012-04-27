@@ -10,7 +10,7 @@
 #include "base/CbmLitFieldFitter.h"
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "../field/CbmLitFieldQaReport.h"
 
 #include "../../../parallel/LitField.h"

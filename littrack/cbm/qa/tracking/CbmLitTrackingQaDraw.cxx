@@ -12,10 +12,8 @@
 #include "TLine.h"
 #include "TDirectory.h"
 
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
-#include "TH1D.h"
-#include "TH3F.h"
 
 #include <boost/assign/list_of.hpp>
 
@@ -71,7 +69,7 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 	vector<string> localTrackVariants = list_of("Sts")("Trd")("Much")("Rich")("Tof");
 	for (UInt_t i = 0; i < localTrackVariants.size(); i++) {
 		string variant = localTrackVariants[i];
-		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Electron)_Eff_p" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff_p";
+		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_Eff_p" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff_p";
 		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re);
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_pt");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");
@@ -137,7 +135,7 @@ void CbmLitTrackingQaDraw::DrawMeanEfficiencyLines(
 //{
 // /*  boost::property_tree::ptree pt = PrintPTree();
 //
-//   TH1F* hAcc = new TH1F("hMcAccEfficiencyGraph", "hMcAccEfficiencyGraph;Detector;Efficiency [%]", 4, 0, 4);
+//   TH1* hAcc = new TH1("hMcAccEfficiencyGraph", "hMcAccEfficiencyGraph;Detector;Efficiency [%]", 4, 0, 4);
 //   hAcc->SetMaximum(100.);
 //   hAcc->SetMinimum(0.);
 //   hAcc->SetBinContent(1, pt.get("hStsDetAccEl.detAccAcc.eff", 0.0));
@@ -149,7 +147,7 @@ void CbmLitTrackingQaDraw::DrawMeanEfficiencyLines(
 //   hAcc->SetBinContent(4, pt.get("hStsRichTrdTofDetAccEl.detAccAcc.eff", 0.0));
 //   hAcc->GetXaxis()->SetBinLabel(4, "TOF");
 //
-//   TH1F* hRec = new TH1F("hMcRecEfficiencyGraph", "hMcRecEfficiencyGraph", 4, 0, 4);
+//   TH1* hRec = new TH1("hMcRecEfficiencyGraph", "hMcRecEfficiencyGraph", 4, 0, 4);
 //   hRec->SetBinContent(1, pt.get("hStsDetAccEl.detAccRec.eff", 0.0));
 //   //hRec->SetBinLabel(1, "STS");
 //   hRec->SetBinContent(2, pt.get("hStsRichDetAccEl.detAccRec.eff", 0.0));
@@ -189,9 +187,9 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
    canvas->SetGrid();
 
    canvas->cd(1);
-   TH1F* hAll = fHM->H1F(hist + "_All");
-   TH1F* hTrue = fHM->H1F(hist + "_True");
-   TH1F* hFake = fHM->H1F(hist + "_Fake");
+   TH1* hAll = fHM->H1(hist + "_All");
+   TH1* hTrue = fHM->H1(hist + "_True");
+   TH1* hFake = fHM->H1(hist + "_Fake");
    DrawH1(list_of(hAll)(hTrue)(hFake),
       list_of("all: " + NumberToString<Double_t>(hAll->GetMean(), 1))
              ("true: " + NumberToString<Double_t>(hTrue->GetMean(), 1))
@@ -199,8 +197,8 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
               kLitLinear, kLitLog, true, 0.25, 0.99, 0.55, 0.75);
 
    canvas->cd(2);
-   TH1F* hTrueOverAll = fHM->H1F(hist + "_TrueOverAll");
-   TH1F* hFakeOverAll = fHM->H1F(hist + "_FakeOverAll");
+   TH1* hTrueOverAll = fHM->H1(hist + "_TrueOverAll");
+   TH1* hFakeOverAll = fHM->H1(hist + "_FakeOverAll");
    DrawH1(list_of(hTrueOverAll)(hFakeOverAll),
       list_of("true/all: " + NumberToString<Double_t>(hTrueOverAll->GetMean()))
              ("fake/all: " + NumberToString<Double_t>(hFakeOverAll->GetMean())),
@@ -214,7 +212,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
 //   TCanvas* canvas1 = new TCanvas("tracking_qa_sts_tracks_qa", "tracking_qa_sts_tracks_qa", 900, 900);
 //   canvas1->Divide(2,2);
 //   canvas1->cd(1);
-//   TH1F* hChiprim = fHM->H1F("hStsChiprim");
+//   TH1* hChiprim = fHM->H1("hStsChiprim");
 //   hChiprim->Scale(1. / hChiprim->Integral());
 //   DrawH1(hChiprim, kLitLinear, kLitLog);
 //   gPad->SetGridx(true);
@@ -260,7 +258,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
 //   gPad->SetGridy(true);
 //
 //   TCanvas* canvas2 = new TCanvas("tracking_qa_track_length", "tracking_qa_track_length", 500, 500);
-//   TH1F* hLength = fHM->H1F("hTrackLength");
+//   TH1* hLength = fHM->H1("hTrackLength");
 //   hLength->Scale(1. / hLength->Integral());
 //   DrawH1(hLength, kLitLinear, kLitLinear);
 //   gPad->SetGridx(true);

@@ -16,7 +16,7 @@
 #include "CbmMuchTrack.h"
 #include "CbmStsHit.h"
 #include "CbmMvdHit.h"
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include "FairRootManager.h"

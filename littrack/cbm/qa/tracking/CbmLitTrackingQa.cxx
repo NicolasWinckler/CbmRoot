@@ -58,8 +58,7 @@ InitStatus CbmLitTrackingQa::Init()
    fDet.DetermineSetup();
 
    // Create histograms
-   CbmLitTrackingQaHistCreator histCreator;
-   histCreator.Create(fHM);
+   CbmLitTrackingQaHistCreator::Instance()->Create(fHM);
 
    fTrackingQa = new CbmLitTrackingQaCalculator(fHM);
    fTrackingQa->Init();

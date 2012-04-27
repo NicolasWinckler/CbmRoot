@@ -123,11 +123,6 @@ Bool_t PionReferenceRingAcceptanceFunction(
     return (std::abs(mcTrack->GetPdgCode()) == 211) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
 }
 
-vector<string> CbmLitTrackingQaHistCreator::fTrackCategories = CbmLitTrackingQaHistCreator::GetDefaultTrackCategories();
-map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::fTrackAcceptanceFunctions = CbmLitTrackingQaHistCreator::GetDefaultTrackAcceptanceFunctions();
-vector<string> CbmLitTrackingQaHistCreator::fRingCategories = CbmLitTrackingQaHistCreator::GetDefaultRingCategories();
-map<string, LitRingAcceptanceFunction> CbmLitTrackingQaHistCreator::fRingAcceptanceFunctions = CbmLitTrackingQaHistCreator::GetDefaultRingAcceptanceFunctions();
-
 CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
    fMinMom(0.),
    fMaxMom(12.),
@@ -142,18 +137,33 @@ CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
    fMaxAngle(25.),
    fNofBinsAngle(5),
    fHM(NULL),
+   fTrackCategories(),
+   fRingCategories(),
+   fTrackAcceptanceFunctions(),
+   fRingAcceptanceFunctions(),
    fDet()
 {
-
+	fTrackCategories = GetDefaultTrackCategories();
+	fTrackAcceptanceFunctions = GetDefaultTrackAcceptanceFunctions();
+	fRingCategories = GetDefaultRingCategories();
+	fRingAcceptanceFunctions = GetDefaultRingAcceptanceFunctions();
 }
 
 CbmLitTrackingQaHistCreator::~CbmLitTrackingQaHistCreator()
 {
 }
 
+CbmLitTrackingQaHistCreator* CbmLitTrackingQaHistCreator::Instance()
+{
+   static CbmLitTrackingQaHistCreator instance;
+   return &instance;
+}
+
 vector<string> CbmLitTrackingQaHistCreator::GetDefaultTrackCategories()
 {
-	return list_of("All")("Primary")("Secondary")("Reference")("Electron")("Muon");
+	CbmLitDetectorSetup det;
+	det.DetermineSetup();
+	return list_of("All")("Primary")("Secondary")("Reference")(det.GetElectronSetup() ? "Electron" : "Muon");
 }
 
 map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultTrackAcceptanceFunctions()
@@ -163,8 +173,10 @@ map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultT
 	cat["Primary"] = PrimaryTrackAcceptanceFunction;
 	cat["Secondary"] = SecondaryTrackAcceptanceFunction;
 	cat["Reference"] = ReferenceTrackAcceptanceFunction;
-	cat["Electron"] = PrimaryElectronTrackAcceptanceFunction;
-	cat["Muon"] = PrimaryMuonTrackAcceptanceFunction;
+	CbmLitDetectorSetup det;
+	det.DetermineSetup();
+	if (det.GetElectronSetup()) cat["Electron"] = PrimaryElectronTrackAcceptanceFunction;
+	else cat["Muon"] = PrimaryMuonTrackAcceptanceFunction;
 	return cat;
 }
 
@@ -246,7 +258,7 @@ void CbmLitTrackingQaHistCreator::CreateTrackHitsHistogram(
 	for(Int_t i = 0; i < 5; i++) {
 	   string xTitle = (i == 3 || i == 4) ? "Ratio" : "Number of hits";
 	   string histName = "hth_" + detName + "_TrackHits_" + type[i];
-	   Create1DHist(histName.c_str(), xTitle, "Counter", bins[i], min[i], max[i]);
+	   Create1DHist(histName.c_str(), xTitle, "Yeild", bins[i], min[i], max[i]);
 	}
 }
 

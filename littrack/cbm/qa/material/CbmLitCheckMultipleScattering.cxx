@@ -1,7 +1,7 @@
 #include "qa/material/CbmLitCheckMultipleScattering.h"
 
 #include "geo/CbmLitDetPoint.h"
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include "FairRootManager.h"

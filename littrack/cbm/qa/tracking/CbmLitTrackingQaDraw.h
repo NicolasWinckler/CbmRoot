@@ -14,9 +14,6 @@
 
 class CbmLitHistManager;
 class TH1;
-class TH1F;
-class TH2F;
-class TH3F;
 
 using std::vector;
 using std::string;
@@ -62,22 +59,6 @@ private:
     * \brief Draw efficiency histograms.
     */
    void DrawEfficiencyHistos();
-
-//   /**
-//    * \brief Draw efficiency plots. This function automatically
-//    * check the existence of histograms. TODO ADD COMMENTS
-//    * \param[in] canvasName Name of canvas.
-//    * \param[in] histNames Vector of histogram names.
-//    * \param[in] histLabels Vector of histogram labels.
-//    * \param[in] opt Additional options. "pisupp" for pion suppression drawing.
-//    * \param[in] projName Projection name: "p", "y", "pt".
-//    */
-//   void DrawEfficiency(
-//         const string& canvasName,
-//         const vector<string>& histNames,
-//         const vector<string>& histLabels,
-//         const string& opt = "",
-//         const string& proj = "");
 
    /**
     * \brief Calculate efficiency for two histograms.

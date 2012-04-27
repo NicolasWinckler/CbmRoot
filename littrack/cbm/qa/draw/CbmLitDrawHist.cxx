@@ -4,7 +4,7 @@
  * \date 2008
  **/
 #include "CbmLitDrawHist.h"
-#include "../../std/utils/CbmLitUtils.h"
+#include "std/utils/CbmLitUtils.h"
 
 #include "TH1.h"
 #include "TH2.h"
@@ -245,34 +245,4 @@ void  DrawHistSigmaRMS(
    text.SetTextAlign(21);
    text.SetTextSize(0.08);
    text.DrawTextNDC(0.5, 0.83, txt1.c_str());
-}
-
-TH1D* DivideH1(
-   TH1D* h1,
-   TH1D* h2,
-   const string& name,
-   const string& title,
-   const string& axisX,
-   const string& axisY)
-{
-   h1->Sumw2();
-   h2->Sumw2();
-   TH1D* h3 = new TH1D(name.c_str(), string(title +";"+axisX+";"+ axisY).c_str(),
-                       h1->GetNbinsX(), h1->GetXaxis()->GetXmin(),h1->GetXaxis()->GetXmax());
-   h3->Divide(h1, h2, 1., 1., "B");
-   return h3;
-}
-
-string CalcEfficiency(
-   TH1* histRec,
-   TH1* histAcc)
-{
-   if (histAcc->GetEntries() == 0) { return "0.0"; }
-   else {
-      Double_t eff = Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
-      stringstream ss;
-      ss.precision(3);
-      ss << eff;
-      return ss.str();
-   }
 }

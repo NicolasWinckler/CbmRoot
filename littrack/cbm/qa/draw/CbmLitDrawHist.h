@@ -217,27 +217,4 @@ void DrawHistSigmaRMS(
    Double_t sigma,
    Double_t rms);
 
-/**
- * \fn DivideH1
- * \brief Divide two histograms.
- * \param[in] h1 Pointer to the first histogram.
- * \param[in] h2 Pointer to the second histogram.
- * \param[in] name Name of a new histogram.
- * \param[in] title Histogram title.
- * \param[in] axisX X axis title.
- * \param[in] axisY Y axis title.
- */
-TH1D* DivideH1(
-   TH1D* h1,
-   TH1D* h2,
-   const string& name,
-   const string& title,
-   const string& axisX,
-   const string& axisY);
-
-
-string CalcEfficiency(
-   TH1* histRec,
-   TH1* histAcc);
-
 #endif

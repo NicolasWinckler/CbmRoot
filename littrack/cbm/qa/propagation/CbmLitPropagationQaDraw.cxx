@@ -7,7 +7,7 @@
 #include "CbmLitPropagationQaHistCreator.h"
 #include "../base/CbmLitHistManager.h"
 #include "std/utils/CbmLitUtils.h"
-#include "cbm/utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "TCanvas.h"
 #include "TH1F.h"
 #include "TF1.h"

@@ -28,15 +28,12 @@ typedef boost::function<Bool_t (TClonesArray* mcTracks, Int_t index, Int_t nofHi
 class CbmLitTrackingQaHistCreator
 {
 public:
-   /**
-    * \brief Constructor.
-    */
-   CbmLitTrackingQaHistCreator();
 
    /**
-    * \brief Destructor.
+    * \brief Return pointer to singleton instance.
+    * \return Pointer to singleton instance.
     */
-   virtual ~CbmLitTrackingQaHistCreator();
+   static CbmLitTrackingQaHistCreator* Instance();
 
    /**
     * \brief Create histograms for tracking QA.
@@ -108,12 +105,22 @@ public:
    static vector<string> GlobalTrackVariants();
 
    /* Getters */
-   static const vector<string>& GetTrackCategories() { return fTrackCategories; }
-   static const map<string, LitTrackAcceptanceFunction>& GetTrackAcceptanceFunctions() { return fTrackAcceptanceFunctions; }
-   static const vector<string>& GetRingCategories() { return fRingCategories; }
-   static const map<string, LitRingAcceptanceFunction>& GetRingAcceptanceFunctions() { return fRingAcceptanceFunctions; }
+   const vector<string>& GetTrackCategories() { return fTrackCategories; }
+   const map<string, LitTrackAcceptanceFunction>& GetTrackAcceptanceFunctions() { return fTrackAcceptanceFunctions; }
+   const vector<string>& GetRingCategories() { return fRingCategories; }
+   const map<string, LitRingAcceptanceFunction>& GetRingAcceptanceFunctions() { return fRingAcceptanceFunctions; }
 
 private:
+
+   /**
+    * \brief Constructor.
+    */
+   CbmLitTrackingQaHistCreator();
+
+   /**
+    * \brief Destructor.
+    */
+   virtual ~CbmLitTrackingQaHistCreator();
 
    void CreateEfficiencyHistogram(
          const string& name,
@@ -152,10 +159,10 @@ private:
 
    vector<string> CreateGlobalTrackingHistogramNames();
 
-   static vector<string> GetDefaultTrackCategories();
-   static map<string, LitTrackAcceptanceFunction> GetDefaultTrackAcceptanceFunctions();
-   static vector<string> GetDefaultRingCategories();
-   static map<string, LitRingAcceptanceFunction> GetDefaultRingAcceptanceFunctions();
+   vector<string> GetDefaultTrackCategories();
+   map<string, LitTrackAcceptanceFunction> GetDefaultTrackAcceptanceFunctions();
+   vector<string> GetDefaultRingCategories();
+   map<string, LitRingAcceptanceFunction> GetDefaultRingAcceptanceFunctions();
 
    string LocalEfficiencyNormalization(
    		const string& detName);
@@ -177,10 +184,10 @@ private:
 
    CbmLitHistManager* fHM; // Histogram manager for created histograms
 
-   static vector<string> fTrackCategories; // Vector of track category names
-   static vector<string> fRingCategories; // Vector of ring category names
-   static map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
-   static map<string, LitRingAcceptanceFunction> fRingAcceptanceFunctions; // maps ring category name to ring acceptance function
+   vector<string> fTrackCategories; // Vector of track category names
+   vector<string> fRingCategories; // Vector of ring category names
+   map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
+   map<string, LitRingAcceptanceFunction> fRingAcceptanceFunctions; // maps ring category name to ring acceptance function
 
    CbmLitDetectorSetup fDet;
 };

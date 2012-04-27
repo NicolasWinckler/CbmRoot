@@ -6,7 +6,7 @@
  */
 #include "CbmLitClusteringQaDraw.h"
 #include "qa/base/CbmLitHistManager.h"
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include "TCanvas.h"

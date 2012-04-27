@@ -4,7 +4,6 @@
  * \since 2012
  */
 #include "CbmLitPropertyTree.h"
-#include <boost/regex.hpp>
 using std::pair;
 
 CbmLitPropertyTree::CbmLitPropertyTree(
@@ -34,19 +33,6 @@ void CbmLitPropertyTree::PropertyTreeToMap(
    }
 }
 
-map<string, Double_t> CbmLitPropertyTree::PropertyByPattern(
-      const string& pattern) const
-{
-   map<string, Double_t> properties;
-   map<string, Double_t>::const_iterator it;
 
-   try {
-		const boost::regex e(pattern);
-		for (it = fPM.begin(); it != fPM.end(); it++) {
-			if (boost::regex_match(it->first, e)) properties.insert(*it);
-		}
-   } catch (std::exception& ex) {
-	   std::cout << "Exception in CbmLitPropertyTree::PropertyByPattern: " << ex.what() << std::endl;
-   }
-   return properties;
-}
+//template int X<int>::v(int);
+//template map<string, Double_t> CbmLitPropertyTree<Double_t>::GetByPattern(const& string);

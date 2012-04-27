@@ -4,7 +4,7 @@
 #include "propagation/CbmLitMaterialInfo.h"
 #include "propagation/CbmLitMaterialEffectsImp.h"
 #include "utils/CbmLitUtils.h"
-#include "utils/CbmLitDrawHist.h"
+#include "cbm/qa/draw/CbmLitDrawHist.h"
 
 #include "TCanvas.h"
 

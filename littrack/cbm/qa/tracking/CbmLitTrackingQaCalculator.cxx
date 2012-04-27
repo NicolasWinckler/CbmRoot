@@ -129,8 +129,8 @@ void CbmLitTrackingQaCalculator::Init()
 void CbmLitTrackingQaCalculator::Exec()
 {
    // Increase event counter
-   fHM->H1F("hen_EventNo_TrackingQa")->Fill(0.5);
-   std::cout << "CbmLitTrackingQaCalculator::Exec: event=" << fHM->H1F("hen_EventNo_TrackingQa")->GetEntries() << std::endl;
+   fHM->H1("hen_EventNo_TrackingQa")->Fill(0.5);
+   std::cout << "CbmLitTrackingQaCalculator::Exec: event=" << fHM->H1("hen_EventNo_TrackingQa")->GetEntries() << std::endl;
 
    fMCTrackCreator->Create();
 //   Int_t nofTracks = fMCTracks->GetEntriesFast();
@@ -246,13 +246,13 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          isStsOk = CheckTrackQuality(stsTrackMatch, kSTS);
          if (!isStsOk) { // ghost track
             Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
-            fHM->H1F("hng_NofGhosts_Sts_Nh")->Fill(nofHits);
+            fHM->H1("hng_NofGhosts_Sts_Nh")->Fill(nofHits);
 
             // calculate number of ghost after RICH matching
             if (isRichOk){
                const CbmRichRing* ring = static_cast<const CbmRichRing*>(fRichRings->At(richId));
                if (NULL != ring){
-                  if (ring->GetDistance() < 1.) fHM->H1F("hng_NofGhosts_StsRichMatching_Nh")->Fill(nofHits);
+                  if (ring->GetDistance() < 1.) fHM->H1("hng_NofGhosts_StsRichMatching_Nh")->Fill(nofHits);
                }
             }
          } else {
@@ -266,7 +266,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          if (nofHits >= fMinNofHitsTrd) {
             isTrdOk = CheckTrackQuality(trdTrackMatch, kTRD);
             if (!isTrdOk) { // ghost track
-               fHM->H1F("hng_NofGhosts_Trd_Nh")->Fill(nofHits);
+               fHM->H1("hng_NofGhosts_Trd_Nh")->Fill(nofHits);
             }
          } else {
             isTrdOk = false;
@@ -279,7 +279,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          if (nofHits >= fMinNofHitsMuch) {
             isMuchOk = CheckTrackQuality(muchTrackMatch, kMUCH);
             if (!isMuchOk) { // ghost track
-               fHM->H1F("hng_NofGhosts_Much_Nh")->Fill(nofHits);
+               fHM->H1("hng_NofGhosts_Much_Nh")->Fill(nofHits);
             }
          } else {
             isMuchOk = false;
@@ -290,14 +290,14 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
          richRingMatch = static_cast<const CbmTrackMatch*>(fRichRingMatches->At(richId));
          if (richRingMatch == NULL) { continue; }
          Int_t nofHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits() + richRingMatch->GetNofFakeHits();
-         isRichOk = CheckRingQuality(richRingMatch);
+         isRichOk = CheckTrackQuality(richRingMatch, kRICH);
          if (!isRichOk) { // ghost ring
-            fHM->H1F("hng_NofGhosts_Rich_Nh")->Fill(nofHits);
+            fHM->H1("hng_NofGhosts_Rich_Nh")->Fill(nofHits);
 
             // calculate number of ghost after STS matching and electron identification
             const CbmRichRing* ring = static_cast<const CbmRichRing*>(fRichRings->At(richId));
             if (NULL != ring) {
-               if (ring->GetDistance() < 1.) fHM->H1F("hng_NofGhosts_RichStsMatching_Nh")->Fill(nofHits);
+               if (ring->GetDistance() < 1.) fHM->H1("hng_NofGhosts_RichStsMatching_Nh")->Fill(nofHits);
 
                Double_t momentumMc = 0.;
                if (stsTrackMatch != NULL) {
@@ -305,7 +305,7 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
                   if (mcTrack != NULL) momentumMc = mcTrack->GetP();
                 }
                 if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
-                   fHM->H1F("hng_NofGhosts_RichElId_Nh")->Fill(nofHits);
+                   fHM->H1("hng_NofGhosts_RichElId_Nh")->Fill(nofHits);
             }
          }
       }
@@ -345,7 +345,7 @@ void CbmLitTrackingQaCalculator::ProcessRichRings()
    Int_t nofRings = fRichRings->GetEntriesFast();
    for(Int_t iRing = 0; iRing < nofRings; iRing++) {
 	  const CbmTrackMatch* richRingMatch = static_cast<const CbmTrackMatch*>(fRichRingMatches->At(iRing));
-	  Bool_t isRichOk = CheckRingQuality(richRingMatch);
+	  Bool_t isRichOk = CheckTrackQuality(richRingMatch, kRICH);
 	  Int_t richMCId = (isRichOk) ? richRingMatch->GetMCTrackId() : -1;
 	  if (isRichOk && -1 != richMCId) {
          fMcToRecoMap["Rich"].insert(make_pair<Int_t, Int_t>(richMCId, iRing));
@@ -359,7 +359,7 @@ void CbmLitTrackingQaCalculator::ProcessMvd(
    if (!fDet.GetDet(kMVD)) return;
    const CbmStsTrack* track = static_cast<const CbmStsTrack*>(fStsTracks->At(stsId));
    Int_t nofHits = track->GetNMvdHits();
-   fHM->H1F("hth_Mvd_TrackHits_All")->Fill(nofHits);
+   fHM->H1("hth_Mvd_TrackHits_All")->Fill(nofHits);
 
    const CbmTrackMatch* stsTrackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsId));
    Int_t stsMcTrackId = stsTrackMatch->GetMCTrackId();
@@ -379,11 +379,11 @@ void CbmLitTrackingQaCalculator::ProcessMvd(
          nofFakeHits++;
       }
    }
-   fHM->H1F("hth_Mvd_TrackHits_True")->Fill(nofTrueHits);
-   fHM->H1F("hth_Mvd_TrackHits_Fake")->Fill(nofFakeHits);
+   fHM->H1("hth_Mvd_TrackHits_True")->Fill(nofTrueHits);
+   fHM->H1("hth_Mvd_TrackHits_Fake")->Fill(nofFakeHits);
    if (nofHits != 0) {
-      fHM->H1F("hth_Mvd_TrackHits_TrueOverAll")->Fill(Double_t(nofTrueHits) / Double_t(nofHits));
-      fHM->H1F("hth_Mvd_TrackHits_FakeOverAll")->Fill(Double_t(nofFakeHits) / Double_t(nofHits));
+      fHM->H1("hth_Mvd_TrackHits_TrueOverAll")->Fill(Double_t(nofTrueHits) / Double_t(nofHits));
+      fHM->H1("hth_Mvd_TrackHits_FakeOverAll")->Fill(Double_t(nofFakeHits) / Double_t(nofHits));
    }
 }
 
@@ -401,54 +401,19 @@ Bool_t CbmLitTrackingQaCalculator::CheckTrackQuality(
    Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
    Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
 
-   string detName = (detId == kSTS) ? "Sts" : (detId == kTRD) ? "Trd" : (detId == kMUCH) ? "Much" : "";
+   string detName = (detId == kSTS) ? "Sts" : (detId == kTRD) ? "Trd" : (detId == kMUCH) ? "Much" : (detId == kRICH) ? "Rich" : "";
+   assert(detName != "");
 
    if (detName != "") {
 	  string histName = "hth_" + detName + "_TrackHits";
-      fHM->H1F(histName + "_All")->Fill(nofHits);
-      fHM->H1F(histName + "_True")->Fill(nofTrue);
-      fHM->H1F(histName + "_Fake")->Fill(nofFake + nofWrong);
-      fHM->H1F(histName + "_TrueOverAll")->Fill(quali);
-      fHM->H1F(histName + "_FakeOverAll")->Fill(fakequali);
+      fHM->H1(histName + "_All")->Fill(nofHits);
+      fHM->H1(histName + "_True")->Fill(nofTrue);
+      fHM->H1(histName + "_Fake")->Fill(nofFake + nofWrong);
+      fHM->H1(histName + "_TrueOverAll")->Fill(quali);
+      fHM->H1(histName + "_FakeOverAll")->Fill(fakequali);
    }
-   return (quali < fQuota) ? false : true;
+   return (detId == kRICH) ? quali >= fQuotaRich : quali >= fQuota;
 }
-
-Bool_t CbmLitTrackingQaCalculator::CheckRingQuality(
-   const CbmTrackMatch* ringMatch)
-{
-   Int_t mcId = ringMatch->GetMCTrackId();
-   if(mcId < 0) { return false; }
-
-   Int_t nofTrue = ringMatch->GetNofTrueHits();
-   Int_t nofWrong = ringMatch->GetNofWrongHits();
-   Int_t nofFake = ringMatch->GetNofFakeHits();
-   Int_t nofHits = nofTrue + nofWrong + nofFake;
-   Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
-   Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
-
-   fHM->H1F("hth_Rich_TrackHits_All")->Fill(nofHits);
-   fHM->H1F("hth_Rich_TrackHits_True")->Fill(nofTrue);
-   fHM->H1F("hth_Rich_TrackHits_Fake")->Fill(nofFake + nofWrong);
-   fHM->H1F("hth_Rich_TrackHits_TrueOverAll")->Fill(quali);
-   fHM->H1F("hth_Rich_TrackHits_FakeOverAll")->Fill(fakequali);
-
-   return (quali < fQuotaRich) ? false : true;
-}
-
-//void CbmLitTrackingQaCalculator::FillMcHistoForDetAcc(
-//      Double_t p,
-//      Double_t y,
-//      Double_t pt)
-//{
-////   fHM->H3F("hStsDetAcc3D_El_Mc")->Fill(p, y, pt);
-////   fHM->H3F("hStsRichDetAcc3D_El_Mc")->Fill(p, y, pt);
-////   fHM->H3F("hStsTrdDetAcc3D_El_Mc")->Fill(p, y, pt);
-////   fHM->H3F("hStsTofDetAcc3D_El_Mc")->Fill(p, y, pt);
-////   fHM->H3F("hStsRichTrdDetAcc3D_El_Mc")->Fill(p, y, pt);
-////   fHM->H3F("hStsRichTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
-////   fHM->H3F("hStsTrdTofDetAcc3D_El_Mc")->Fill(p, y, pt);
-//}
 
 void CbmLitTrackingQaCalculator::ProcessMcTracks()
 {
@@ -552,10 +517,10 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistos(
 {
 	string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
 	string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
-	LitTrackAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::GetTrackAcceptanceFunctions().find(accName)).second;
+	LitTrackAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::Instance()->GetTrackAcceptanceFunctions().find(accName)).second;
 	Bool_t accOk = function(fMCTracks, mcId);
-	if (accOk) { fHM->H1F(accHistName)->Fill(par); }
-	if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1F(recHistName)->Fill(par); }
+	if (accOk) { fHM->H1(accHistName)->Fill(par); }
+	if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par); }
 }
 
 void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
@@ -568,10 +533,10 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
     Int_t nofHitsInRing = fMCTrackCreator->GetTrack(mcId).GetNofRichHits();
 	string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
 	string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
-	LitRingAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::GetRingAcceptanceFunctions().find(accName)).second;
+	LitRingAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::Instance()->GetRingAcceptanceFunctions().find(accName)).second;
 	Bool_t accOk = function(fMCTracks, mcId, nofHitsInRing);
-	if (accOk) { fHM->H1F(accHistName)->Fill(par); }
-	if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1F(recHistName)->Fill(par); }
+	if (accOk) { fHM->H1(accHistName)->Fill(par); }
+	if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par); }
 }
 
 //void CbmLitTrackingQaCalculator::FillGlobalElIdHistos3D(
@@ -708,7 +673,7 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
 //      mcTrack->GetMomentum(momMC);
 //      //fKFFitter.DoFit(stsTrack,11);
 //      Double_t chiPrimary = fKFFitter->GetChiToVertex(stsTrack, fPrimVertex);
-//      fHM->H1F("hStsChiprim")->Fill(chiPrimary);
+//      fHM->H1("hStsChiprim")->Fill(chiPrimary);
 //
 //      FairTrackParam vtxTrack;
 //      fKFFitter->FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
@@ -747,7 +712,7 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
 //         if (NULL == tofPoint) continue;
 //         if (tofPoint->GetTrackID() == stsMCTrackId) {
 //            Double_t dll = 100. * (tofPoint->GetLength() - trackLength) / tofPoint->GetLength();
-//            fHM->H1F("hTrackLength")->Fill(dll);
+//            fHM->H1("hTrackLength")->Fill(dll);
 //            break;
 //         }
 //      }
@@ -805,12 +770,12 @@ void CbmLitTrackingQaCalculator::CalculateEfficiencyHistos()
 
 void CbmLitTrackingQaCalculator::IncreaseCounters()
 {
-   fHM->H1F("hno_NofObjects_GlobalTracks")->Fill(fGlobalTracks->GetEntriesFast());
-   if (fDet.GetDet(kSTS)) { fHM->H1F("hno_NofObjects_StsTracks")->Fill(fStsTracks->GetEntriesFast()); }
+   fHM->H1("hno_NofObjects_GlobalTracks")->Fill(fGlobalTracks->GetEntriesFast());
+   if (fDet.GetDet(kSTS)) { fHM->H1("hno_NofObjects_StsTracks")->Fill(fStsTracks->GetEntriesFast()); }
    if (fDet.GetDet(kRICH)) {
-      fHM->H1F("hno_NofObjects_RichRings")->Fill(fRichRings->GetEntriesFast());
-      fHM->H1F("hno_NofObjects_RichProjections")->Fill(fRichProjections->GetEntriesFast());
+      fHM->H1("hno_NofObjects_RichRings")->Fill(fRichRings->GetEntriesFast());
+      fHM->H1("hno_NofObjects_RichProjections")->Fill(fRichProjections->GetEntriesFast());
    }
-   if (fDet.GetDet(kTRD)) { fHM->H1F("hno_NofObjects_TrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
-   if (fDet.GetDet(kMUCH)) { fHM->H1F("hno_NofObjects_MuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
+   if (fDet.GetDet(kTRD)) { fHM->H1("hno_NofObjects_TrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
+   if (fDet.GetDet(kMUCH)) { fHM->H1("hno_NofObjects_MuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
 }

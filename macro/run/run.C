@@ -35,6 +35,7 @@
   gSystem->Load("libEcal");
   gSystem->Load("libKF");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");

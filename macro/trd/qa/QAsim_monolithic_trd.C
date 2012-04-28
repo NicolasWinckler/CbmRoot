@@ -76,6 +76,7 @@ void QAsim_monolithic_trd(Int_t nEvents = 2)
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");

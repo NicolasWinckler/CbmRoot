@@ -77,6 +77,7 @@ void QAsim_squared_segmented_trd(Int_t nEvents = 2)
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");

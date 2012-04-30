@@ -35,7 +35,7 @@ void QAsim_squared_segmented_trd(Int_t nEvents = 2)
   TString mvdGeom    = "mvd/mvd_v07a.geo";
   TString stsGeom    = "sts/sts_v11a.geo";
   TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v10b.geo";
+  TString trdGeom    = "trd/trd_v12a.geo";
   TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   

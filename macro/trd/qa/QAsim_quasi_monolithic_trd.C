@@ -34,7 +34,7 @@ void QAsim_quasi_monolithic_trd(Int_t nEvents = 2)
   TString mvdGeom    = "mvd/mvd_v07a.geo";
   TString stsGeom    = "sts/sts_v11a.geo";
   TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v10b.geo";
+  TString trdGeom    = "trd/old/trd_quasi_monolithic.geo";
   TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
@@ -215,7 +215,7 @@ void QAsim_quasi_monolithic_trd(Int_t nEvents = 2)
   // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
-  fRun->CreateGeometryFile("data/trd_monolithic_geometry.root");
+  fRun->CreateGeometryFile("data/trd_quasi_monolithic_geometry.root");
 
 
   // -----   Finish   -------------------------------------------------------

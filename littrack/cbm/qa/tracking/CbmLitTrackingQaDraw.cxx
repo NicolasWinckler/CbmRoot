@@ -92,7 +92,7 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
 	vector<Double_t> efficiencies(nofHistos);
 	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
 		string name = histos[iHist]->GetName();
-		efficiencies[iHist] = CalcEfficiency(fHM->H1(FindAndReplace(name, "_Eff_", "_Rec_")), fHM->H1(FindAndReplace(name, "_Eff_", "_Acc_")));
+		efficiencies[iHist] = CalcEfficiency(fHM->H1(FindAndReplace(name, "_Eff_", "_Rec_")), fHM->H1(FindAndReplace(name, "_Eff_", "_Acc_")), 100.);
 		vector<string> split = Split(name, '_');
 		labels[iHist] = split[1] + ":" + split[3] + "(" + NumberToString<Double_t>(efficiencies[iHist], 1) + ")";
 	}

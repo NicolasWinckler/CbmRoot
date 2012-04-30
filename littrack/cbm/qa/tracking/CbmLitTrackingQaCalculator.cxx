@@ -764,7 +764,9 @@ void CbmLitTrackingQaCalculator::CalculateEfficiencyHistos()
         string effHistName = effHist->GetName();
     	string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
     	string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
-    	DivideHistos(fHM->H1(recHistName), fHM->H1(accHistName), effHist, 1.);
+    	DivideHistos(fHM->H1(recHistName), fHM->H1(accHistName), effHist, 100.);
+    	effHist->SetMinimum(0.);
+    	effHist->SetMaximum(100.);
     }
 }
 

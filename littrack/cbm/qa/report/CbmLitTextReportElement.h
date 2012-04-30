@@ -8,6 +8,7 @@
 #define CBMLITTEXTREPORTELEMENT_H_
 
 #include "CbmLitReportElement.h"
+#include "TObject.h"
 #include <string>
 
 using std::string;
@@ -48,7 +49,7 @@ public:
     * \brief Inherited from CbmLitReportElement.
     */
    virtual string TableEmptyRow(
-         int nofCols,
+         Int_t nofCols,
          const string& name) const;
 
    /**
@@ -78,11 +79,14 @@ public:
     * \brief Inherited from CbmLitReportElement.
     */
    virtual string Title(
-         int size,
+         Int_t size,
          const string& title) const;
 
 private:
-   int fColW; // column width
+   string FormatCell(
+         const string& cell) const;
+
+   Int_t fColW; // column width
 };
 
 #endif /* CBMLITTEXTREPORTELEMENT_H_ */

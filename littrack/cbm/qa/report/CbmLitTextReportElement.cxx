@@ -8,7 +8,7 @@
 #include <iomanip>
 
 CbmLitTextReportElement::CbmLitTextReportElement():
-   fColW(17)
+   fColW(25)
 {
 }
 
@@ -26,8 +26,8 @@ string CbmLitTextReportElement::TableBegin(
    ss << right;
    ss << setfill('_') << setw(colNames.size() * fColW) << "_"<< endl;
    ss << setfill(' ');
-   for (int i = 0; i < colNames.size(); i++){
-      ss << setw(fColW) << colNames[i];
+   for (Int_t i = 0; i < colNames.size(); i++) {
+      ss << FormatCell(colNames[i]); //setw(fColW) << colNames[i];
    }
    ss << endl;
    ss << setfill('_') << setw(colNames.size() * fColW) << "_"<< endl;
@@ -42,7 +42,7 @@ string CbmLitTextReportElement::TableEnd() const
 }
 
 string CbmLitTextReportElement::TableEmptyRow(
-      int nofCols,
+      Int_t nofCols,
       const string& name) const
 {
    stringstream ss;
@@ -57,8 +57,8 @@ string CbmLitTextReportElement::TableRow(
 {
    stringstream ss;
    ss << right;
-   for (int i = 0; i < row.size(); i++) {
-      ss << setw(fColW) << row[i];
+   for (Int_t i = 0; i < row.size(); i++) {
+      ss << FormatCell(row[i]); //setw(fColW) << row[i];
    }
    ss << endl;
    return ss.str();
@@ -84,8 +84,23 @@ string CbmLitTextReportElement::DocumentEnd() const
 }
 
 string CbmLitTextReportElement::Title(
-      int size,
+      Int_t size,
       const string& title) const
 {
    return title;
+}
+
+string CbmLitTextReportElement::FormatCell(
+      const string& cell) const
+{
+	if (cell.size() <= fColW) {
+		stringstream ss;
+		ss << setw(fColW) << cell;
+		return ss.str();
+	} else {
+		string str = cell;
+		str.resize(fColW - 3);
+		str.insert(fColW - 3, "...");
+		return str;
+	}
 }

@@ -11,6 +11,7 @@
 #include "TObject.h"
 #include <string>
 #include <map>
+#include <iostream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/regex.hpp>
 

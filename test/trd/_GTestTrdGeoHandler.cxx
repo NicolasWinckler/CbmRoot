@@ -6,8 +6,8 @@
 #include "TSystem.h"
 #include "TList.h"
 #include "TKey.h"
-#include "TVirtualMC.h"
-//#include "TVirtualMCApplication.h"
+
+#include "FairMockVirtualMC.h"
 
 #include "gtest/gtest.h"
 #include "gtest/gtest-spi.h"
@@ -40,6 +40,7 @@ template <class T> class _TestTrdGeoHandlerBase : public T
   TString fFileName;
   CbmTrdGeoHandler* fGeoHandler;
   int result;
+  FairMockVirtualMC* fMockVMC;
 
   virtual void SetUp() {
 
@@ -75,8 +76,8 @@ template <class T> class _TestTrdGeoHandlerBase : public T
       gGeoManager = (TGeoManager*)key->ReadObj();
     }
     gGeoManager->CloseGeometry();   // close geometry
-//    gMC = new TVirtualMCApplication();
-//    gMC->SetRootGeometry();         // notify VMC about Root geometry
+    fMockVMC = new FairMockVirtualMC("Mock implementation of VMC interface");
+    gMC->SetRootGeometry();         // notify VMC about Root geometry
   }
 };
 
@@ -112,19 +113,21 @@ TEST_F(TrdGeoHandlerTest, CheckDefaultSettings)
   cout << "Geo Version: " << retVal <<endl;
 }
 
-//TEST_F(TrdGeoHandlerTest, CheckExtractingMCVolumeId)
-//{
-//  char volumeName[10];
-//  int stationNr=1; 
-//  std::vector<int> fStationId;     //! MC IDs of TRD stations
-//  do {
-//    sprintf(volumeName, "trd%d", stationNr);
-//    result = fGeoHandler->GetMCId(volumeName, fStationId);
-//    cout << "Result: "<< result << endl;
-//    stationNr++;
-//  }
-//  while (result); 
-//}
+TEST_F(TrdGeoHandlerTest, CheckExtractingMCVolumeId)
+{
+  char volumeName[10];
+  int stationNr=1; 
+  std::vector<int> fStationId;     //! MC IDs of TRD stations
+  do {
+    sprintf(volumeName, "trd%d", stationNr);
+    result = fGeoHandler->GetMCId(volumeName, fStationId);
+    cout << "Result: "<< result << endl;
+    cout << "StationId: " << fStationId[stationNr-1] << endl;
+    stationNr++;
+  }
+  while (result); 
+  
+}
 
 TEST_P(TrdGeoHandlerParamTest, checkAllDifferentGeometries)
 {

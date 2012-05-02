@@ -4,6 +4,8 @@ set(INCLUDE_DIRECTORIES
  ${CMAKE_SOURCE_DIR}/trd
  ${CMAKE_SOURCE_DIR}/cbmdata/trd
  ${CMAKE_SOURCE_DIR}/cbmbase
+ ${CMAKE_SOURCE_DIR}/fairtools
+ ${CMAKE_SOURCE_DIR}/test/mock
 )
 
 # Boost is needed for the regular expression handling
@@ -30,7 +32,7 @@ link_directories( ${LINK_DIRECTORIES})
 ############### build the test #####################
 If(Boost_FOUND)
   add_executable(_GTestTrdGeoHandler ${Sources})
-  target_link_libraries(_GTestTrdGeoHandler ${ROOT_LIBRARIES} Geom GeomPainter VMC  ${GTEST_BOTH_LIBRARIES} FairTools FairDB GeoBase ParBase Base CbmBase CbmData Trd)
+  target_link_libraries(_GTestTrdGeoHandler ${ROOT_LIBRARIES} Geom GeomPainter VMC ${GTEST_BOTH_LIBRARIES} FairTools FairDB FairMock GeoBase ParBase Base CbmBase CbmData Trd)
   add_test(_GTesTrdGeoHandler ${PROJECT_BINARY_DIR}/bin/_GTestTrdGeoHandler)
 Else(Boost_FOUND)
   Message(STATUS "Could not build the test executable, because the Boost libraries are misssing.")

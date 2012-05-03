@@ -91,12 +91,13 @@ void run_reco(Int_t nEvents = 2)
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
   gSystem->Load("libGlobal");
   gSystem->Load("libL1");
-  gSystem->Load("libLittrack");
+  //  gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------
 

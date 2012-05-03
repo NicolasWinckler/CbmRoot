@@ -14,12 +14,12 @@ void run_sim(Int_t nEvents = 1)
   // geometry selection for sim + reco  by Cyrano
   // ========================================================================
   ifstream whichTrdGeo;
-//  whichTrdGeo.open("whichTrdGeo",ios::in);
-//  TString digipar;
-//  if (whichTrdGeo) whichTrdGeo >> digipar;
-//  cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
-//    whichTrdGeo.close();
-//  if (digipar.Length() == 0) digipar = "trd_standard";
+  whichTrdGeo.open("whichTrdGeo",ios::in);
+  TString digipar;
+  if (whichTrdGeo) whichTrdGeo >> digipar;
+  cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
+    whichTrdGeo.close();
+  if (digipar.Length() == 0) digipar = "trd_standard";
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -42,9 +42,8 @@ void run_sim(Int_t nEvents = 1)
   TString richGeom   = "rich/rich_v08a.geo";
 //  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
 //  TString trdGeom    = "trd/trd_v10b.geo";
-//  TString trdGeom    = "trd/trd_v10b.geo";
-  TString trdGeom    = "trd/TRD_geom_v12b.root";
-  TString tofGeom = "";
+  TString trdGeom    = "trd/" + digipar + ".geo";
+  TString tofGeom    = "tof/tof_v07a.geo";
   //  TString ecalGeom   = "ecal/ecal_v08a.geo";
  
   // -----   Magnetic field   -----------------------------------------------
@@ -85,6 +84,7 @@ void run_sim(Int_t nEvents = 1)
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
@@ -219,7 +219,7 @@ void run_sim(Int_t nEvents = 1)
   // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
-  fRun->CreateGeometryFile("data/geofile_full.root");
+
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

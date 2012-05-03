@@ -35,7 +35,15 @@ set(Sources ${Sources} ${DICTIONARY}
 ############### build the test #####################
   add_executable(_GTestTrdGeoHandler ${Sources})
   target_link_libraries(_GTestTrdGeoHandler ${ROOT_LIBRARIES} Geom GeomPainter VMC ${GTEST_BOTH_LIBRARIES} FairTools FairMock)
-  add_test(_GTesTrdGeoHandler ${PROJECT_BINARY_DIR}/bin/_GTestTrdGeoHandler)
+
+  Generate_Exe_Script(${CMAKE_CURRENT_SOURCE_DIR} _GTestTrdGeoHandler)
+  add_test(_GTestTrdGeoHandler ${PROJECT_CURRENT_BINARY_DIR}/_GTestTrdGeoHandler.sh)
+#  add_test(run ${CBMROOT_BINARY_DIR}/macro/run/run.sh)
+#SET_TESTS_PROPERTIES(run PROPERTIES TIMEOUT "300")
+#SET_TESTS_PROPERTIES(run PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All
+
+
+
 
 
 

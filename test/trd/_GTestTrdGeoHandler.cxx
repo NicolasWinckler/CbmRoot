@@ -16,7 +16,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
-//#include <boost/regex.hpp>
+
 using std::cout;
 using std::endl;
 
@@ -57,6 +57,8 @@ template <class T> class _TestTrdGeoHandlerBase : public T
     delete fGeoHandler;
     fInputFile->Close();
     delete fInputFile;
+    //    delete fMockVMC;
+    
   }
 
   virtual void CreateFileName(TString name) {
@@ -65,6 +67,7 @@ template <class T> class _TestTrdGeoHandlerBase : public T
   }
 
   virtual void GetGeoManager() {
+    gGeoManager->SetVerboseLevel(0);
     TList* l= fInputFile->GetListOfKeys();  
     TKey* key;
     TIter next( l);
@@ -75,9 +78,7 @@ template <class T> class _TestTrdGeoHandlerBase : public T
       if (strcmp(key->GetClassName(),"TGeoManager") != 0) { continue; }
       gGeoManager = (TGeoManager*)key->ReadObj();
     }
-    gGeoManager->CloseGeometry();   // close geometry
     fMockVMC = new FairMockVirtualMC("Mock implementation of VMC interface");
-    gMC->SetRootGeometry();         // notify VMC about Root geometry
   }
 };
 
@@ -107,10 +108,8 @@ class TrdGeoHandlerParamTest : public _TestTrdGeoHandlerBase<
 
 TEST_F(TrdGeoHandlerTest, CheckDefaultSettings)
 {
-  cout << "Filename: " << fFileName << endl;
-  fInputFile->Print();  
   Int_t retVal = fGeoHandler->CheckGeometryVersion();
-  cout << "Geo Version: " << retVal <<endl;
+  EXPECT_EQ(4, retVal);
 }
 
 TEST_F(TrdGeoHandlerTest, CheckExtractingMCVolumeId)
@@ -131,11 +130,7 @@ TEST_F(TrdGeoHandlerTest, CheckExtractingMCVolumeId)
 
 TEST_P(TrdGeoHandlerParamTest, checkAllDifferentGeometries)
 {
-  cout << "Filename: " << fFileName << endl;
-  //  fInputFile->Print();  
-  cout<< "Expected result: "<< result << endl;
   Int_t retVal = fGeoHandler->CheckGeometryVersion();
-  cout << "Geo Version: " << retVal <<endl;
   EXPECT_EQ(result, retVal);
 }
 
@@ -147,3 +142,4 @@ InOutStructure val4= {"squared_segmented", 4};
 INSTANTIATE_TEST_CASE_P(TestAllGeometries,
                         TrdGeoHandlerParamTest,
 			::testing::Values(val1, val2, val3, val4));		
+

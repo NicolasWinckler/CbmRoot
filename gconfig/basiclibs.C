@@ -15,6 +15,10 @@ void basiclibs()
   gSystem->Load("libPluto");  
   gSystem->Load("libMinuit");
   gSystem->Load("libMLP");
+
+  gSystem->Load("libProof");
+  gSystem->Load("libProofPlayer");
+
   gSystem->Load("libFairTools");
   gSystem->Load("libFairDB");
 }  

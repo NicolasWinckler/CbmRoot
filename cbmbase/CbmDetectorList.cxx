@@ -27,7 +27,7 @@ void CbmDetectorList::GetSystemName(DetectorId det, TString& name) {
   case kTRD:  name = "trd";  break;
   case kTOF:  name = "tof";  break;
   case kECAL: name = "ecal"; break;
-  name = "unknown"; break;
+  default: name = "unknown"; break;
 
   }
 

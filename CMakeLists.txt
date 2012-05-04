@@ -100,9 +100,6 @@ else(CBMROOT_MINIMAL)
   Message("-- Looking for GSL ...")
   find_package(GSL)
 
-
-
-
 endif(CBMROOT_MINIMAL)
 
 
@@ -118,7 +115,7 @@ SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
 )
 
 SET(CBMLIBDIR ${CMAKE_BINARY_DIR}/lib)  
-SET(LD_LIBRARY_PATH  ${CBMLIBDIR} ${LD_LIBRARY_PATH})
+SET(LD_LIBRARY_PATH  ${CBMLIBDIR} ${Boost_LIBRARY_DIRS} ${LD_LIBRARY_PATH})
 
 Set(INCLUDE_DIRECTORIES 
   ${ROOT_INCLUDE_DIR}
@@ -167,6 +164,20 @@ add_subdirectory (trdcatrack)
 add_subdirectory (cbmgenerators)
 add_subdirectory (run)
 add_subdirectory (hadron)
+
+Option(BUILD_UNITTESTS "Build all unittests and add them as new tests" OFF)
+If(BUILD_UNITTESTS)
+
+  Message("Build the unit tests.")
+
+  Set(GTEST_ROOT ${SIMPATH})
+  Find_Package(GTest)
+
+  If(GTEST_FOUND)
+    Message("Add tests library and tests.")
+    Add_Subdirectory(test)
+  EndIf(GTEST_FOUND)
+EndIf(BUILD_UNITTESTS)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
                 OUTPUT_VARIABLE EveIsBuild

@@ -7,7 +7,7 @@
 
 void cbmrootlibs()
 {
-   gSystem->Load("${SIMPATH}/basics/boost/lib/libboost_regex");
+   gSystem->Load("libboost_regex");
 
    gSystem->Load("libGeoBase");
    gSystem->Load("libParBase");

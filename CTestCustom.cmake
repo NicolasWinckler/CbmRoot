@@ -56,6 +56,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/boost/smart_ptr/detail/sp_convertible.hpp:"
         "/include/boost/smart_ptr/shared_ptr.hpp:"  
         "/include/boost"
+        "/boost/include"
 
         # -- Root warnings when installed in installation dir
         "/include/root/"

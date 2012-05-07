@@ -16,6 +16,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 using std::cout;
 using std::endl;
@@ -25,6 +26,15 @@ using std::endl;
 struct InOutStructure {
   TString name;
   int result;
+} ;
+
+struct ParamStructure2 {
+  TString name;
+  int result;
+  Int_t stationIdLength;
+  Int_t* stationId;
+  Int_t moduleIdLength;
+  Int_t* moduleId;
 } ;
 
 // Base class to use the same basic setup for parameterized and
@@ -85,31 +95,75 @@ template <class T> class _TestTrdGeoHandlerBase : public T
 // This is the derived class for the non-parameterized test cases.
 class  TrdGeoHandlerTest : public _TestTrdGeoHandlerBase<testing::Test> {};
 
-// This is the derived class for the parameterized test cases.
-class TrdGeoHandlerParamTest : public _TestTrdGeoHandlerBase<
-  testing::TestWithParam<InOutStructure> >
+TEST_F(TrdGeoHandlerTest, CheckUniqueIdCreation)
 {
- protected:
+  //  fGeoHandler->CheckGeometryVersion();
+  //  fGeoHandler->FillInternalStructures();
+  fGeoHandler->Init();
 
+  TString TopNode = gGeoManager->GetTopNode()->GetName();
+  cout <<"TopNode: "<<TopNode<<endl;
+  const char* path = "/cave_1/trd1_0/trd1mod1_1001/trd1mod1gas_0";
+  gGeoManager->cd(path);
+  const char* path1 = gGeoManager->GetPath();
+
+  cout << "Path: "<<path1<<endl;
+
+  TGeoNode *node = gGeoManager->GetCurrentNode();
+  Int_t copy = node->GetNumber();
+  Int_t id = node->GetVolume()->GetNumber();
+  cout << "Id: "<<id<<" , "<<copy<<endl;
   
-  virtual void SetUp() {
-    InOutStructure const& p = GetParam();
+  Int_t uniqueId = fGeoHandler->GetUniqueDetectorId();
+  
+  cout <<"UniqueId: "<<uniqueId<<endl;
+  EXPECT_EQ(135717, uniqueId);
 
-    geomToTest = p.name;
-    result = p.result;
- 
-    CreateFileName(geomToTest);
-    fInputFile = new TFile(fFileName,"READ");
-    
-    GetGeoManager();
-    fGeoHandler = new CbmTrdGeoHandler();
-  }
-};
+}
 
 TEST_F(TrdGeoHandlerTest, CheckDefaultSettings)
 {
+  // Fill vector with expected volume ids for this geometry.
+  std::vector<Int_t>  expStationId;
+  expStationId.push_back(218);
+  expStationId.push_back(243);
+  expStationId.push_back(268);
+
+  std::vector<Int_t>  expModuleId;
+  expModuleId.push_back(219);
+  expModuleId.push_back(227);
+  expModuleId.push_back(235);
+  expModuleId.push_back(244);
+  expModuleId.push_back(252);
+  expModuleId.push_back(260);
+  expModuleId.push_back(0);
+  expModuleId.push_back(0);
+  expModuleId.push_back(269);
+
   Int_t retVal = fGeoHandler->CheckGeometryVersion();
   EXPECT_EQ(4, retVal);
+  EXPECT_EQ(4, fGeoHandler->GetGeoVersion());
+
+  fGeoHandler->FillInternalStructures();
+
+  std::vector<Int_t> stationId = fGeoHandler->GetStationId();
+  std::vector<Int_t>::iterator vecIt;
+  Int_t counter=0;
+  for(vecIt = stationId.begin(); vecIt < stationId.end(); vecIt++){
+    EXPECT_EQ(expStationId[counter], *vecIt);
+    counter++;
+  }
+
+  std::vector< std::vector <Int_t> > moduleId = fGeoHandler->GetModuleId();
+  std::vector< std::vector <Int_t> >::iterator vecIt1;
+  counter=0;
+  for(vecIt1 = moduleId.begin(); vecIt1 < moduleId.end(); vecIt1++){
+    std::vector<Int_t> modInfo = *vecIt1;
+    for(vecIt = modInfo.begin(); vecIt < modInfo.end(); vecIt++){
+      EXPECT_EQ(expModuleId[counter], *vecIt);
+      counter++;
+    } 
+  }
 }
 
 TEST_F(TrdGeoHandlerTest, CheckExtractingMCVolumeId)
@@ -128,18 +182,74 @@ TEST_F(TrdGeoHandlerTest, CheckExtractingMCVolumeId)
   
 }
 
-TEST_P(TrdGeoHandlerParamTest, checkAllDifferentGeometries)
+// This is the derived class for the parameterized test cases.
+class TrdGeoHandlerParamTest2 : public _TestTrdGeoHandlerBase<
+  testing::TestWithParam<ParamStructure2> >
 {
-  Int_t retVal = fGeoHandler->CheckGeometryVersion();
+ protected:
+
+  std::vector<Int_t> expStationId; 
+  std::vector<Int_t> expModuleId; 
+  
+  virtual void SetUp() {
+    ParamStructure2 const& p = GetParam();
+
+    geomToTest = p.name;
+    result = p.result;
+    for (Int_t i=0; i< p.stationIdLength; i++) {
+      expStationId.push_back(p.stationId[i]);
+    }
+    for (Int_t i=0; i< p.moduleIdLength; i++) {
+      expModuleId.push_back(p.moduleId[i]);
+    }
+
+    CreateFileName(geomToTest);
+    fInputFile = new TFile(fFileName,"READ");
+    
+    GetGeoManager();
+    fGeoHandler = new CbmTrdGeoHandler();
+  }
+};
+
+
+TEST_P(TrdGeoHandlerParamTest2, checkAllDifferentGeometries)
+{
+  Int_t retVal = fGeoHandler->Init();
   EXPECT_EQ(result, retVal);
+  EXPECT_EQ(result, fGeoHandler->GetGeoVersion());
+
+  std::vector<Int_t> stationId = fGeoHandler->GetStationId();
+  std::vector<Int_t>::iterator vecIt;
+  Int_t counter=0;
+  for(vecIt = stationId.begin(); vecIt < stationId.end(); vecIt++){
+    EXPECT_EQ(expStationId[counter], *vecIt);
+    counter++;
+  }
+
+  std::vector< std::vector <Int_t> > moduleId = fGeoHandler->GetModuleId();
+  std::vector< std::vector <Int_t> >::iterator vecIt1;
+  counter=0;
+  for(vecIt1 = moduleId.begin(); vecIt1 < moduleId.end(); vecIt1++){
+    std::vector<Int_t> modInfo = *vecIt1;
+    for(vecIt = modInfo.begin(); vecIt < modInfo.end(); vecIt++){
+      EXPECT_EQ(expModuleId[counter], *vecIt);
+      counter++;
+    } 
+  }
 }
 
-InOutStructure val1= {"monolithic", 1};
-InOutStructure val2= {"quasi_monolithic", 2};
-InOutStructure val3= {"rectangular_segmented", 3};
-InOutStructure val4= {"squared_segmented", 4};
+// Fill vector with expected volume ids for this geometry.
+Int_t stationIdLength=3;
+Int_t stationId[3]={218, 243, 268};
+Int_t moduleIdLength=9;
+Int_t moduleId[9]={219, 227, 235, 244, 252, 260, 0, 0, 269};
+
+ParamStructure2 val1= {"squared_segmented", 4, stationIdLength, 
+		       stationId, moduleIdLength, moduleId};
+
+
 
 INSTANTIATE_TEST_CASE_P(TestAllGeometries,
-                        TrdGeoHandlerParamTest,
-			::testing::Values(val1, val2, val3, val4));		
+                        TrdGeoHandlerParamTest2,
+			::testing::Values(val1));		
 

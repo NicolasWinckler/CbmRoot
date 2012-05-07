@@ -66,6 +66,7 @@ class CbmTrdDetectorIdParamTest : public _TestCbmTrdDetectorIdBase<
  protected:
   
   Int_t detInfo_array[6];
+  Int_t modInfo_array[6]; 
   Int_t result;
 
   virtual void SetUp() {
@@ -78,14 +79,35 @@ class CbmTrdDetectorIdParamTest : public _TestCbmTrdDetectorIdBase<
     detInfo_array[4] = p.copynr;
     detInfo_array[5] = p.sector; 
     result=p.result;
+
+    modInfo_array[0] = detInfo_array[0];
+    modInfo_array[1] = detInfo_array[1];
+    modInfo_array[2] = detInfo_array[2];
+    modInfo_array[3] = detInfo_array[3];
+    modInfo_array[4] = detInfo_array[4];
+    modInfo_array[5] = 0;
+
   }
 };
 
 
 TEST_P(CbmTrdDetectorIdParamTest, checkUniqueIdCreation)
 {
-  Int_t retVal = fTrdId.SetDetectorInfo(detInfo_array);
-  EXPECT_EQ(result, retVal);
+  Int_t uniqueId = fTrdId.SetDetectorInfo(detInfo_array);
+  EXPECT_EQ(result, uniqueId);
+
+  Int_t systemId = fTrdId.GetSystemId(uniqueId);
+  EXPECT_EQ(detInfo_array[0], systemId);
+
+  Int_t sectorNr = fTrdId.GetSector(uniqueId);
+  EXPECT_EQ(detInfo_array[5], sectorNr);
+
+  Int_t modId = fTrdId.SetDetectorInfo(modInfo_array);
+  Int_t newUniqueId = fTrdId.SetSector(modId, detInfo_array[5]);
+  EXPECT_EQ(result, newUniqueId);
+
+  Int_t newModId = fTrdId.GetModuleId(newUniqueId);
+  EXPECT_EQ(modId, newModId);
 }
 
 InOutStructure val1 = {0, 0, 0, 0, 0, 0, 0};

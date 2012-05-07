@@ -3,8 +3,8 @@
 //
 // ToDo 20120504 - David Emschermann 
 // - put all modules in trd1 volume
-// - use only 2 modul sizes
-// - check tiling in new keeping volume
+// - use only 2 module sizes
+// - check tilting in new keeping volume
 // - introduce layer offsets in z
 // - introduce new module naming:
 //   trd1mod1# pad type [1-4] - layer type [1-3] - layer number [1-4] - serial number [001 - 999]
@@ -255,9 +255,6 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
   // radiator, mylar foil, gas, pad plane which have a size of 'Active_area_x[0] x Active_area_y[0]'  
   // the frames which have a width of 'frame_width' and are at the outer edges of the box
 
-  bool four_digits = true;    // use 4-digit copy notation encoding the layer
-  //  bool four_digits = false;   // use 4-digit copy notation encoding the layer
-
   bool first_time_Module1 = true;
   bool first_time_Module2 = true;
   bool first_time_Module3 = true;
@@ -373,27 +370,27 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
 
   for (int i=0; i< Chamber_number; i++){
 
-    int   module_number = (int)Position_Station1[i][2];
+    int   module_type = (int)Position_Station1[i][2];
     int   j = (int)Position_Station1[i][2]-1;
-    float frame_width =  frame_width_array[module_number-1];
+    float frame_width =  frame_width_array[module_type-1];
 
 // define modules only for first layer per station
 // requires 4-digit notation
-    if ( (first_time_Module1 && ( module_number == 1 ) && ( Layer_number == 0 )) ||
-         (first_time_Module2 && ( module_number == 2 ) && ( Layer_number == 0 )) ||
-         (first_time_Module3 && ( module_number == 3 ) && ( Layer_number == 0 ))) {
+    if ( (first_time_Module1 && ( module_type == 1 ) && ( Layer_number == 0 )) ||
+         (first_time_Module2 && ( module_type == 2 ) && ( Layer_number == 0 )) ||
+         (first_time_Module3 && ( module_type == 3 ) && ( Layer_number == 0 ))) {
 
-//    if ( (first_time_Module1 && ( module_number == 1 )) ||
-//         (first_time_Module2 && ( module_number == 2 )) ||
-//         (first_time_Module3 && ( module_number == 3 ))) {
+//    if ( (first_time_Module1 && ( module_type == 1 )) ||
+//         (first_time_Module2 && ( module_type == 2 )) ||
+//         (first_time_Module3 && ( module_type == 3 ))) {
 
-      if (first_time_Module1 && ( module_number == 1 ) ) {
+      if (first_time_Module1 && ( module_type == 1 ) ) {
         copy_number = Copy_number_Module1;
       }
-      if (first_time_Module2 && ( module_number == 2 ) ) {
+      if (first_time_Module2 && ( module_type == 2 ) ) {
         copy_number = Copy_number_Module2;
       }
-      if (first_time_Module3 && ( module_number == 3 ) ) {
+      if (first_time_Module3 && ( module_type == 3 ) ) {
         copy_number = Copy_number_Module3;
       }
   
@@ -401,16 +398,10 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
 
       fprintf(geofile,"//*********************************\n");
 
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%d\n", Station_number);
 
-      fprintf(geofile,"trd%d\n",Station_number);
-      // do not use layers anymore
-      //      fprintf(geofile,"trd%dlayer#%d\n",Station_number, Layer_number+1);
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"air\n");
       fprintf(geofile,"%f %f %f\n", Detector_size_x[j] /2 ,-Detector_size_y[j] /2 , -Layer_thickness/2);
@@ -429,14 +420,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
   
   
       fprintf(geofile,"//*********************************\n");
-      fprintf(geofile,"trd%dmod%dradiator\n",Station_number, module_number);
-
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%dmod%dradiator\n", Station_number, module_type);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
       fprintf(geofile,"BOX\n");
       //      fprintf(geofile,"polypropylene\n");
@@ -461,14 +447,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
       fprintf(geofile,"//*********************************\n");
   
       fprintf(geofile,"//*********************************\n");
-      fprintf(geofile,"trd%dmod%dgas\n",Station_number, module_number);
-
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%dmod%dgas\n", Station_number, module_type);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"TRDgas\n");
@@ -492,14 +473,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
       fprintf(geofile,"//*********************************\n");
   
       fprintf(geofile,"//*********************************\n");
-      fprintf(geofile,"trd%dmod%dpadplane\n",Station_number, module_number);
-
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%dmod%dpadplane\n", Station_number, module_type);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"goldcoatedcopper\n");
@@ -523,14 +499,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
       fprintf(geofile,"//*********************************\n");
   
       fprintf(geofile,"//*********************************\n");
-      fprintf(geofile,"trd%dmod%dmylar\n",Station_number, module_number);
-
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%dmod%dmylar\n", Station_number, module_type);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"mylar\n");
@@ -554,14 +525,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
       fprintf(geofile,"//*********************************\n");
   
       fprintf(geofile,"//*********************************\n");
-      fprintf(geofile,"trd%dmod%delectronics\n",Station_number, module_number);
-
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%dmod%delectronics\n", Station_number, module_type);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"goldcoatedcopper\n");
@@ -586,14 +552,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
   
       if ( frame_width > 0.) {
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dframe1#1\n",Station_number, module_number);
-
-      if (four_digits)
+        fprintf(geofile,"trd%dmod%dframe1#1\n", Station_number, module_type);
         // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+        fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
         fprintf(geofile,"BOX\n");
         fprintf(geofile,"G10\n");
@@ -618,14 +579,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
         fprintf(geofile,"//*********************************\n");
   
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dframe1#2\n",Station_number, module_number);
-
-      if (four_digits)
+        fprintf(geofile,"trd%dmod%dframe1#2\n", Station_number, module_type);
         // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+        fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
         fprintf(geofile,"%f %f %f\n", 0., -(Active_area_y[j] + frame_width / 2 ), frame_position);
         if (Position_Station1[i][3] == 0) {
@@ -640,14 +596,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
   
   
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dframe2#1\n",Station_number, module_number);
-
-      if (four_digits)
+        fprintf(geofile,"trd%dmod%dframe2#1\n", Station_number, module_type);
         // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+        fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
         fprintf(geofile,"BOX\n");
         fprintf(geofile,"G10\n");
@@ -671,14 +622,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
         fprintf(geofile,"//*********************************\n");
   
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dframe2#2\n",Station_number, module_number);
-
-      if (four_digits)
+        fprintf(geofile,"trd%dmod%dframe2#2\n", Station_number, module_type);
         // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
+        fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
 
         fprintf(geofile,"%f %f %f\n", -(Active_area_x[j] + frame_width / 2 ), 0., frame_position);
         if (Position_Station1[i][3] == 0) {
@@ -693,15 +639,15 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
         fprintf(geofile,"//*********************************\n");
       }
 
-      if (first_time_Module1 && ( module_number == 1 )) {
+      if (first_time_Module1 && ( module_type == 1 )) {
         first_time_Module1=false;
         Copy_number_Module1 = copy_number+1 ;
       }
-      if (first_time_Module2 && ( module_number == 2 ) ) {
+      if (first_time_Module2 && ( module_type == 2 ) ) {
         first_time_Module2=false;
         Copy_number_Module2 = copy_number+1 ;
       }
-      if (first_time_Module3 && ( module_number == 3 ) ) {
+      if (first_time_Module3 && ( module_type == 3 ) ) {
         first_time_Module3=false;
         Copy_number_Module3 = copy_number+1 ;
       }
@@ -709,13 +655,13 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
     }
     else {
 
-      if ( module_number == 1 ) {
+      if ( module_type == 1 ) {
         copy_number = Copy_number_Module1;
       } 
-      else if ( module_number == 2 ) {
+      else if ( module_type == 2 ) {
         copy_number = Copy_number_Module2;
       } 
-      else if ( module_number == 3 ) {
+      else if ( module_type == 3 ) {
         copy_number = Copy_number_Module3;
       } 
       else {
@@ -727,28 +673,23 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
 
       fprintf(geofile,"//*********************************\n");
 
-      if (four_digits)
-        // module numbering by 4-digit copy number
-        fprintf(geofile,"trd%dmod%d#%d%03d\n",Station_number, module_number, Layer_number+1, copy_number);
-      else
-        // module numbering by layer digit in module name
-        fprintf(geofile,"trd%dmod%dl%d#%d\n",Station_number, module_number, Layer_number+1, copy_number);
-
-      fprintf(geofile,"trd%d\n",Station_number);
+      // module numbering by 4-digit copy number
+      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
+      fprintf(geofile,"trd%d\n", Station_number);
       // do not use layers anymore
-      //      fprintf(geofile,"trd%dlayer#%d\n",Station_number, Layer_number+1);
+      //      fprintf(geofile,"trd%dlayer#%d\n", Station_number, Layer_number+1);
 
       Tiltandshift(Station_number, Layer_number, Layer_thickness, Layer_pitch, Position_Station1, i);
 
       fprintf(geofile,"//*********************************\n");
   
-      if ( module_number == 1 ) {
+      if ( module_type == 1 ) {
         Copy_number_Module1 = copy_number+1 ;
       }
-      if ( module_number == 2 ) {
+      if ( module_type == 2 ) {
         Copy_number_Module2 = copy_number+1 ;
       }
-      if ( module_number == 3 ) {
+      if ( module_type == 3 ) {
         Copy_number_Module3 = copy_number+1 ;
       }
   
@@ -859,7 +800,7 @@ int main(void)
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"// This is the geometry file of the following configuration\n");
-  fprintf(geofile,"// Number of stations: %d\n",Station_number);
+  fprintf(geofile,"// Number of stations: %d\n", Station_number);
   fprintf(geofile,"// Number of layers per station: %d\n",Layer_number);
   fprintf(geofile,"//*********************************************************\n");
 
@@ -875,42 +816,13 @@ int main(void)
   //  Outer_radius[2] = 8600.;  // 8500 + 100
 
   for(int i = 0; i < Station_number; i++) {
-//    float bla=Inner_acceptance[i]/1000.;
-//    float bla1=Outer_acceptance[i]/1000.;
-//
-//    // F.U. 20.02.07
-//    // Outer radius increased by factor 1.5 to keep all modules in th
-//    // keeping volume since the size in y-direction
-//    // was increased by a factor of 1.5
-//    // There is also a problem with the inner radius of station 2 which is
-//    // to large at the standard distance from the target. this has to be lower
-//    // by 12 cm
-//    Inner_radius[i] = Distance[i]*tan(bla);
-//    if ( i== 1 ) {
-//      Inner_radius[i] = 250.;
-//    }
-//
-//   //Outer_radius[i] = Distance[i]*tan(bla1);
-//    Outer_radius[i] = Distance[i]*tan(bla1)*1.6;
-//
-//    float radius_beampipe = 200.5; // constant radius after RICH
-//    if (Inner_radius[i] <= radius_beampipe) {
-//      printf("radius beampipe: %f\n",radius_beampipe);
-//      printf("inner radius trd: %f\n",Inner_radius[i]);
-//      Inner_radius[i]=radius_beampipe + 5;
-//      printf("Inner radius of trd station %d was inside the beam pipe. Increased radius to %f\n",
-//              i+1, Inner_radius[i]);
-//    }
-
     printf("DE inner radius trd%d:  %f\n", i+1, Inner_radius[i]);
     printf("DE outer radius trd%d: %f\n",  i+1, Outer_radius[i]);
 
     fprintf(geofile,"// Inner Radius of station %d: %f\n", i+1, Inner_radius[i]);
     fprintf(geofile,"// Outer Radius of station %d: %f\n", i+1, Outer_radius[i]);
-    fprintf(geofile,"// z-position at the middle of the station %d: %f\n",i+1,
-            Distance[i]+(Station_thickness/2));
+    fprintf(geofile,"// z-position at the middle of the station %d: %f\n", i+1, Distance[i]+(Station_thickness/2));
     fprintf(geofile,"//*********************************************************\n");
-
   }
 
 //  // Calculate the sizes of all three detector modules. All sizes depend on the radius
@@ -1168,7 +1080,7 @@ int main(void)
 // ### definition of common TRD keeping volume
 
     fprintf(geofile,"//*********************************\n");
-//    fprintf(geofile,"trd%d\n",counter+1);
+//    fprintf(geofile,"trd%d\n",istation+1);
     fprintf(geofile,"trd%d\n",10);
     fprintf(geofile,"cave\n");
     fprintf(geofile,"PGON\n");
@@ -1203,22 +1115,22 @@ int main(void)
   //------------------------------------------------------------------
   //------------------------------------------------------------------
 
-  for ( int counter = 0; counter < Station_number; counter++) {
+  for ( int istation = 0; istation < Station_number; istation++) {
 
     printf("Distance, Inner_radius, Outer_radius, Station_thickness: %f, %f, %f, %f \n",
-            Distance[counter], Inner_radius[counter], Outer_radius[counter], Station_thickness);
+            Distance[istation], Inner_radius[istation], Outer_radius[istation], Station_thickness);
     printf("Layer_number, Layer_thickness, layer_pitch, frame_width: %d, %f, %f, %f, %f, %f \n",
 	   Layer_number, Layer_thickness, Layer_pitch, Frame_width[0], Frame_width[1], Frame_width[2]);
-    printf("Detector_size_x %d: %f\n",counter,Detector_size_x[counter]);
+    printf("Detector_size_x %d: %f\n",istation,Detector_size_x[istation]);
   
     // The distance is measured to the start of the station. In GEANT the
     // volumes are defined from the center of the volume with half thickness
     // to either side. This has to corrected here
   
-    float Distance_center = Distance[counter] + Station_thickness/2;
+    float Distance_center = Distance[istation] + Station_thickness/2;
   
     fprintf(geofile,"//*********************************\n");
-    fprintf(geofile,"trd%d\n",counter+1);
+    fprintf(geofile,"trd%d\n",istation+1);
     fprintf(geofile,"cave\n");
     fprintf(geofile,"PGON\n");
     fprintf(geofile,"air\n");
@@ -1228,21 +1140,21 @@ int main(void)
 //    fprintf(geofile,"4\n");
 //    fprintf(geofile,"45 360 4\n");
 //    // hardcoded
-//    if (counter+1 == 1) {
+//    if (istation+1 == 1) {
 //    fprintf(geofile,"%f %f %f \n",-1300., 4300., 4600.);   // station 1
 //    fprintf(geofile,"%f %f %f \n", -300., 1500., 4600.);   // station 1
 //    }
-//    if (counter+1 == 2) {
+//    if (istation+1 == 2) {
 //    fprintf(geofile,"%f %f %f \n",-1800., 6200., 6600.);   // station 2
 //    fprintf(geofile,"%f %f %f \n", -300., 2500., 6600.);   // station 2
 //    }
-//    if (counter+1 == 3) {
+//    if (istation+1 == 3) {
 //    fprintf(geofile,"%f %f %f \n",-2300., 8100., 8600.);   // station 3
 //    fprintf(geofile,"%f %f %f \n", -300., 3500., 8600.);   // station 3
 //    }
 //    // same keeping volume size in x and y for stations and their layers
-//    fprintf(geofile,"-%f %f %f \n",Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
-//    fprintf(geofile,"%f %f %f \n", Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
+//    fprintf(geofile,"-%f %f %f \n", Station_thickness/2, Inner_radius[istation], Outer_radius[istation]);
+//    fprintf(geofile,"%f %f %f \n", Station_thickness/2, Inner_radius[istation], Outer_radius[istation]);
 //    fprintf(geofile,"0. 0. %4.1f\n",Distance_center);
 //    fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
 //    fprintf(geofile,"//*********************************\n");
@@ -1251,61 +1163,61 @@ int main(void)
     fprintf(geofile,"2\n");
     fprintf(geofile,"45 360 4\n");
     // same keeping volume size in x and y for stations and their layers
-    if (counter < 2)
+    if (istation < 2)
      {
-      fprintf(geofile,"-%f %f %f \n",Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
-      fprintf(geofile,"%f %f %f \n", Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
+      fprintf(geofile,"-%f %f %f \n", Station_thickness/2, Inner_radius[istation], Outer_radius[istation]);
+      fprintf(geofile,"%f %f %f \n", Station_thickness/2, Inner_radius[istation], Outer_radius[istation]);
      }
     else
      {
-      fprintf(geofile,"-%f %f %f \n",Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
-      fprintf(geofile,"%f %f %f \n",                  0., Inner_radius[counter], Outer_radius[counter]);
+      fprintf(geofile,"-%f %f %f \n", Station_thickness/2, Inner_radius[istation], Outer_radius[istation]);
+      fprintf(geofile,"%f %f %f \n",                  0., Inner_radius[istation], Outer_radius[istation]);
      }
     fprintf(geofile,"0. 0. %4.1f\n",Distance_center);
     fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
     fprintf(geofile,"//*********************************\n");
       
-    for (int i = 0; i < Layer_number; i++){
+    for (int ilayer = 0; ilayer < Layer_number; ilayer++){
 
 // for all 4 layers
-//      if (i == 0){
+//      if (ilayer == 0){
 
 // do not use layers anymore
 //        fprintf(geofile,"//*********************************\n");
-//        fprintf(geofile,"trd%dlayer#%d\n",counter+1, i+1);
-//        fprintf(geofile,"trd%d\n",counter+1);
+//        fprintf(geofile,"trd%dlayer#%d\n",istation+1, ilayer+1);
+//        fprintf(geofile,"trd%d\n",istation+1);
 //        fprintf(geofile,"PGON\n");
 //        fprintf(geofile,"air\n");
 //        fprintf(geofile,"2\n");
 //        fprintf(geofile,"45 360 4\n");
-////      fprintf(geofile,"-%f %f %f \n",Layer_thickness/2,(Inner_radius[counter]-0.5),(Outer_radius[counter]+500));
-////      fprintf(geofile,"%f %f %f \n", Layer_thickness/2,(Inner_radius[counter]-0.5),(Outer_radius[counter]+500));
+////      fprintf(geofile,"-%f %f %f \n",Layer_thickness/2,(Inner_radius[istation]-0.5),(Outer_radius[istation]+500));
+////      fprintf(geofile,"%f %f %f \n", Layer_thickness/2,(Inner_radius[istation]-0.5),(Outer_radius[istation]+500));
 //    // same keeping volume size in x and y for stations and their layers
-//    fprintf(geofile,"-%f %f %f \n",Layer_thickness/2, Inner_radius[counter], Outer_radius[counter]);
-//    fprintf(geofile,"%f %f %f \n", Layer_thickness/2, Inner_radius[counter], Outer_radius[counter]);
+//    fprintf(geofile,"-%f %f %f \n",Layer_thickness/2, Inner_radius[istation], Outer_radius[istation]);
+//    fprintf(geofile,"%f %f %f \n", Layer_thickness/2, Inner_radius[istation], Outer_radius[istation]);
 //	// allow variable size in calculation of layer position
-//        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_pitch*i));
+//        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_pitch*ilayer));
 //        fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
 //        fprintf(geofile,"//*********************************\n");
   
         
-        if ( counter == 0 ) {
-	  if ((TrdModules1(counter+1, i , Frame_width, Layer_thickness, Layer_pitch, Chamber_number_Station1, Position_Station1, Detector_size_x, Detector_size_y ))) {
+        if ( istation+1 == 1 ) {
+	  if ((TrdModules1(istation+1, ilayer , Frame_width, Layer_thickness, Layer_pitch, Chamber_number_Station1, Position_Station1, Detector_size_x, Detector_size_y ))) {
             printf("There was an error in TrdModules1\n");
             printf("Stop program\n");            
             return 1;
           }
         }
-        else if ( counter == 1 ) {
-	  if ((TrdModules1(counter+1, i , Frame_width, Layer_thickness, Layer_pitch, Chamber_number_Station2, Position_Station2, Detector_size_x, Detector_size_y ))) {
+        else if ( istation+1 == 2 ) {
+	  if ((TrdModules1(istation+1, ilayer , Frame_width, Layer_thickness, Layer_pitch, Chamber_number_Station2, Position_Station2, Detector_size_x, Detector_size_y ))) {
             printf("There was an error in TrdModules1\n");
             printf("Stop program\n");            
             return 1;
           }
 	}
-        else if ( counter == 2 ) {
-          if (i >= 2) printf("skipping TRD3 Layer %d\n", i+1);
-	  else if ((TrdModules1(counter+1, i , Frame_width, Layer_thickness, Layer_pitch, Chamber_number_Station3, Position_Station3, Detector_size_x, Detector_size_y ))) {
+        else if ( istation+1 == 3 ) {
+          if (ilayer+1 >= 3) printf("skipping TRD3 Layer %d\n", ilayer+1);
+	  else if ((TrdModules1(istation+1, ilayer , Frame_width, Layer_thickness, Layer_pitch, Chamber_number_Station3, Position_Station3, Detector_size_x, Detector_size_y ))) {
             printf("There was an error in TrdModules1\n");
             printf("Stop program\n");            
             return 1;
@@ -1320,10 +1232,10 @@ int main(void)
 //      else {
 //        // copy only the first layer and shift to the right positions
 //        fprintf(geofile,"//*********************************\n");
-//        fprintf(geofile,"trd%dlayer#%d\n",counter+1, i+1);
-//        fprintf(geofile,"trd%d\n",counter+1);
+//        fprintf(geofile,"trd%dlayer#%d\n",istation+1, ilayer+1);
+//        fprintf(geofile,"trd%d\n",istation+1);
 //	// allow variable size in calculation of layer position
-//        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_pitch*i));
+//        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_pitch*ilayer));
 //        fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
 //        fprintf(geofile,"//*********************************\n");
 //      }

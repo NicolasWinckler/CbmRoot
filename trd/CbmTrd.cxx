@@ -45,7 +45,7 @@ CbmTrd::CbmTrd()
     fPosIndex(0),
     fGeoVersion(0),
     fTrdCollection(new TClonesArray("CbmTrdPoint")),
-    fGeoHandler(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     fStationId(),
     fModuleId()
 {
@@ -68,7 +68,7 @@ CbmTrd::CbmTrd(const char* name, Bool_t active)
     fPosIndex(0),
     fGeoVersion(0),
     fTrdCollection(new TClonesArray("CbmTrdPoint")),
-    fGeoHandler(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     fStationId(),
     fModuleId()
 {

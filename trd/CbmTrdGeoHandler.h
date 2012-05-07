@@ -44,18 +44,34 @@ class CbmTrdGeoHandler : public TObject {
 
   Bool_t GetMCId(const char* volumeName, std::vector<Int_t> &Id);
 
-  Int_t GetUniqueDetectorId(Int_t fGeoVersion, std::vector<Int_t> &fStationId,
-			    std::vector< std::vector<Int_t> > &fModuleId);
+  Int_t GetUniqueDetectorId(Int_t geoVersion, 
+                            std::vector<Int_t> &stationId,
+			    std::vector< std::vector<Int_t> > &moduleId);
 
-
+  Int_t GetUniqueDetectorId();
+  
+  void FillInternalStructures();
+    
+  std::vector<Int_t> GetStationId() {return fStationId;}
+  std::vector< std::vector<Int_t> > GetModuleId() {return fModuleId;}
+  Int_t GetGeoVersion() {return fGeoVersion;}  
+          
+  Int_t Init();
+            
  private:
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersBeforStation);
 
   CbmTrdDetectorId fTrdId;
+  Int_t            fGeoVersion;
 
-  ClassDef(CbmTrdGeoHandler,1) 
+  std::vector<Int_t> fStationId;     //! MC IDs of TRD stations
+  std::vector< std::vector<Int_t> > fModuleId;//! MC IDs of gas volumes
+                                                  //! in all stations
+                                                  
+
+ ClassDef(CbmTrdGeoHandler,1) 
 
 };
 

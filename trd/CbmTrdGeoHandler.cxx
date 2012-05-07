@@ -19,8 +19,18 @@ using std::endl;
 
 CbmTrdGeoHandler::CbmTrdGeoHandler() 
   : TObject(),
-    fTrdId()
+    fTrdId(),
+    fGeoVersion(-1),
+    fStationId(),
+    fModuleId()
 {
+}
+
+Int_t CbmTrdGeoHandler::Init()
+{
+  Int_t geoVersion = CheckGeometryVersion();
+  FillInternalStructures();
+  return geoVersion;
 }
 
 Int_t CbmTrdGeoHandler::CheckGeometryVersion() 
@@ -61,14 +71,16 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd11");
   if (fm) {
     cout<<"-II- Found old monolithic TRD geometry."<<endl;
-    return kOldMonolithic;
+    fGeoVersion = kOldMonolithic; 
+    return fGeoVersion;
   }
 
   // Only the new monolithic geometry has a volume trd1gas
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1gas");
   if (fm) {
     cout<<"-II- Found new monolithic TRD geometry."<<endl;
-    return kNewMonolithic;
+    fGeoVersion = kNewMonolithic; 
+    return fGeoVersion;
   }
 
   // all modular (segmented) geometries have the volume trd1mod1gas
@@ -81,17 +93,21 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
       fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1mod1carbon1");
       if (fm){
 	cout<<"-II- Found rectangular segmented TRD geometry."<<endl;
-	return kSegmentedRectangular;
+	fGeoVersion = kSegmentedRectangular; 
+	return fGeoVersion;
       } else {
 	cout<<"-II- Found quasi monolithic TRD geometry."<<endl;
-	return kQuasiMonolithic;
+	fGeoVersion = kQuasiMonolithic; 
+	return fGeoVersion;
       }
     } else {
       cout<<"-II- Found squared segmented TRD geometry."<<endl;
-      return kSegmentedSquared;
+      fGeoVersion = kSegmentedSquared; 
+      return fGeoVersion;
     }
   }
-  return -1;  
+  fGeoVersion = -1; 
+  return fGeoVersion;  
 }
 
 Bool_t CbmTrdGeoHandler::GetMCId(const char* volumeName, 
@@ -189,6 +205,11 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion,
     Int_t sector=0;
     Int_t detInfo_array[6]={kTRD, station,layer,modtype,modnumber,sector};         
     return fTrdId.SetDetectorInfo(detInfo_array);
+}
+
+Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
+{
+  return GetUniqueDetectorId(fGeoVersion, fStationId, fModuleId);
 }
 
 
@@ -353,5 +374,72 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersB
     return kTRUE;
 
 }
+
+
+void CbmTrdGeoHandler::FillInternalStructures()
+{
+  // Extract geometry information from gGeoManager instead of
+  // CbmGeoTrdPar. All such geometry handling is done now in the
+  // separate utility class CbmTrdGeoHandler
+
+  //  Int_t geoVersion = CheckGeometryVersion();
+  
+  if (-1 == fGeoVersion) {
+    Fatal("Initialize","unknown TRD geometry");
+  }
+  if (fGeoVersion == kOldMonolithic) {
+    cout<<"-EE- CbmTrd: Old implementation of simple TRD geometry ('PGON')" <<endl;
+    cout<<"-EE- This version does not work with newer ROOT versions and is obsolete."<<endl;
+    cout<<"-EE- If you see this version you're using a rather old version of CbmRoot. Please update to a new version."<<endl;
+    cout<<"-EE- Stop execution at this point."<<endl;
+    Fatal("Initialize","See error message above.");
+  }  
+  
+  Int_t stationNr = 1;
+  char volumeName[10];
+  Bool_t result;
+  
+  if (fGeoVersion == kNewMonolithic) {
+    
+    fStationId.clear();
+    do {
+      sprintf(volumeName, "trd%dgas", stationNr);
+      result = GetMCId(volumeName, fStationId);
+      stationNr++;
+    }
+    while (result);
+    
+  } else {
+    
+    fStationId.clear();
+    do {
+      sprintf(volumeName, "trd%d", stationNr);
+      result = GetMCId(volumeName, fStationId);
+      stationNr++;
+    }
+    while (result); 
+    Int_t maxStationNr = --stationNr; 
+    cout<<"Max Station: "<<maxStationNr<<endl;
+    
+    Int_t layerNr = 1;
+    
+    fModuleId.clear();
+    std::vector<Int_t> temp;
+    Int_t maxModuleTypes = 3;
+    for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
+      temp.clear();
+      for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
+	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
+	Int_t fMCid = gMC->VolId(volumeName);
+	temp.push_back(fMCid);      
+      }
+      fModuleId.push_back(temp);
+    }
+  }
+  
+}
+
+
+
 
 ClassImp(CbmTrdGeoHandler)

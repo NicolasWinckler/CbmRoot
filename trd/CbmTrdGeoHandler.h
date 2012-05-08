@@ -45,20 +45,9 @@ class CbmTrdGeoHandler : public TObject {
    ** In the moment there are four different version which are defined
    ** in the enumarator TrdGeometryVersions.
    **/   
-  Int_t CheckGeometryVersion(); 
-
-  Bool_t GetMCId(const char* volumeName, std::vector<Int_t> &Id);
-
-  Int_t GetUniqueDetectorId(Int_t geoVersion, 
-                            std::vector<Int_t> &stationId,
-			    std::vector< std::vector<Int_t> > &moduleId);
 
   Int_t GetUniqueDetectorId();
   
-  void FillInternalStructures();
-    
-  std::vector<Int_t> GetStationId() {return fStationId;}
-  std::vector< std::vector<Int_t> > GetModuleId() {return fModuleId;}
   std::map<Int_t, Int_t> GetStationMap() {return fStationMap;}
   std::map<Int_t, Int_t> GetModuleMap() {return fModuleTypeMap;}
   Int_t GetGeoVersion() {return fGeoVersion;}  
@@ -70,14 +59,20 @@ class CbmTrdGeoHandler : public TObject {
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersBeforStation);
 
+  Int_t CheckGeometryVersion(); 
+  void FillInternalStructures();
+  /*
+  Int_t GetUniqueDetectorId(Int_t geoVersion, 
+                            std::vector<Int_t> &stationId,
+			    std::vector< std::vector<Int_t> > &moduleId);
+  */
+
   CbmTrdDetectorId fTrdId; //!
   Int_t            fGeoVersion; //!
 
   std::map<Int_t, Int_t> fStationMap; //!
   std::map<Int_t, Int_t> fModuleTypeMap; //1
-  std::vector<Int_t> fStationId;     //! MC IDs of TRD stations
-  std::vector< std::vector<Int_t> > fModuleId;//! MC IDs of gas volumes
-                                                  //! in all stations
+
   FairLogger* fLogger; //!                                                  
 
 

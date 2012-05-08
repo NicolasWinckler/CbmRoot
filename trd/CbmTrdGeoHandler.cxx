@@ -26,8 +26,8 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
   : TObject(),
     fTrdId(),
     fGeoVersion(-1),
-    fStationId(),
-    fModuleId(),
+    fStationMap(),
+    fModuleTypeMap(),
     fLogger(FairLogger::GetLogger())
 {
 }
@@ -119,10 +119,7 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
   return fGeoVersion;  
 }
 
-Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion, 
-					    std::vector<Int_t>& stationId,
-					    std::vector< std::vector<Int_t> >&
-					    moduleId)
+Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
 {
   Int_t temp_station;
   Int_t temp_layer;
@@ -133,13 +130,13 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion,
   Int_t layer;	
   Int_t station;
 
-  if (geoVersion != kNewMonolithic) {
+  if (fGeoVersion != kNewMonolithic) {
     
     Int_t id2; 
 
     Int_t id1 = gMC->CurrentVolOffID(1, temp_mod);
         
-    if (kSegmentedSquared == geoVersion) {
+    if (kSegmentedSquared == fGeoVersion) {
       id2 = gMC->CurrentVolOffID(2, temp_station);
       layer=temp_mod/1000;
       modnumber=temp_mod%1000;
@@ -175,12 +172,6 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion,
     Int_t detInfo_array[6]={kTRD, station,layer,modtype,modnumber,sector};         
     return fTrdId.SetDetectorInfo(detInfo_array);
 }
-
-Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
-{
-  return GetUniqueDetectorId(fGeoVersion, fStationId, fModuleId);
-}
-
 
 Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
 {
@@ -344,24 +335,6 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersB
 
 }
 
-Bool_t CbmTrdGeoHandler::GetMCId(const char* volumeName, 
-				 std::vector<Int_t> &Id) 
-{
-
-  // Use information from the Virtual Monte Carlo, which is used
-  // in the simulation. This should make this function independent 
-  // from the actaul MC engine.
-  Int_t fMCid = gMC->VolId(volumeName);
-
-  if ( 0 != fMCid) {
-    Id.push_back(fMCid);
-    return kTRUE;
-  }
-
-  return kFALSE;
-}
-
-
 void CbmTrdGeoHandler::FillInternalStructures()
 {
   // Extract geometry information from Virtual MC.
@@ -371,73 +344,44 @@ void CbmTrdGeoHandler::FillInternalStructures()
   Int_t stationNr = 1;
   char volumeName[10];
   Bool_t result;
+  Int_t MCid;
   
   if (fGeoVersion == kNewMonolithic) {
     
-    fStationId.clear();
     do {
       sprintf(volumeName, "trd%dgas", stationNr);
-      result = GetMCId(volumeName, fStationId);
+      MCid = gMC->VolId(volumeName);
+      if ( 0 != MCid) {
+	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
+      }
       stationNr++;
-    }
-    while (result);
-    
+    } while ( 0 != MCid); 
+
   } else {
 
-    Int_t MCid;
     do {
       sprintf(volumeName, "trd%d", stationNr);
       MCid = gMC->VolId(volumeName);
-      fLogger->Info(MESSAGE_ORIGIN,"MCID: %i",MCid);
       if ( 0 != MCid) {
 	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
       }
       stationNr++;
     }
     while ( 0 != MCid); 
-
-    stationNr=1;
-    fStationId.clear();
-    do {
-      sprintf(volumeName, "trd%d", stationNr);
-      result = GetMCId(volumeName, fStationId);
-      stationNr++;
-    }
-    while (result); 
     Int_t maxStationNr = --stationNr; 
-    cout<<"Max Station: "<<maxStationNr<<endl;
-    
-    Int_t layerNr = 1;
-    
-    fModuleId.clear();
-    std::vector<Int_t> temp;
+
     Int_t maxModuleTypes = 3;
-    for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
-      temp.clear();
-      for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
-	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
-	Int_t fMCid = gMC->VolId(volumeName);
-	temp.push_back(fMCid);      
-      }
-      fModuleId.push_back(temp);
-    }
 
     for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
       for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
 	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
-	Int_t fMCid = gMC->VolId(volumeName);
-        if ( 0 != fMCid ) { 
-	  fModuleTypeMap.insert(pair<Int_t,Int_t>(fMCid,iModule));
+	MCid = gMC->VolId(volumeName);
+        if ( 0 != MCid ) { 
+	  fModuleTypeMap.insert(pair<Int_t,Int_t>(MCid,iModule));
 	}
       }
     }
-
-
-  }
-
-
-
-  
+  } 
 }
 
 

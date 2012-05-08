@@ -399,7 +399,7 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
          (first_time_Module3 && ( module_type == 3 ) && ( Layer_number == 0 ) && ( Station_number == 1 )) ||
          (first_time_Module4 && ( module_type == 4 ) && ( Layer_number == 0 ) && ( Station_number == 1 )) ||
          (first_time_Module5 && ( module_type == 5 ) && ( Layer_number == 0 ) && ( Station_number == 3 )) ||
-         (first_time_Module6 && ( module_type == 6 ) && ( Layer_number == 0 ) && ( Station_number == 3 )) ||
+         (first_time_Module6 && ( module_type == 6 ) && ( Layer_number == 0 ) && ( Station_number == 2 )) ||
          (first_time_Module7 && ( module_type == 7 ) && ( Layer_number == 0 ) && ( Station_number == 1 )) ||
          (first_time_Module8 && ( module_type == 8 ) && ( Layer_number == 0 ) && ( Station_number == 1 ))) {
 

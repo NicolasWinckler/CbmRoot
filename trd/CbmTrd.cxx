@@ -43,11 +43,8 @@ CbmTrd::CbmTrd()
     fLength(0),
     fELoss(0),
     fPosIndex(0),
-    fGeoVersion(0),
     fTrdCollection(new TClonesArray("CbmTrdPoint")),
-    fGeoHandler(new CbmTrdGeoHandler()),
-    fStationId(),
-    fModuleId()
+    fGeoHandler(new CbmTrdGeoHandler())
 {
   fVerboseLevel = 1;
 }
@@ -66,11 +63,8 @@ CbmTrd::CbmTrd(const char* name, Bool_t active)
     fLength(0),
     fELoss(0),
     fPosIndex(0),
-    fGeoVersion(0),
     fTrdCollection(new TClonesArray("CbmTrdPoint")),
-    fGeoHandler(new CbmTrdGeoHandler()),
-    fStationId(),
-    fModuleId()
+    fGeoHandler(new CbmTrdGeoHandler())
 {
   fVerboseLevel = 1;
 }
@@ -94,64 +88,9 @@ void CbmTrd::Initialize()
 {
   FairDetector::Initialize();
  
-  // Extract geometry information from gGeoManager instead of
-  // CbmGeoTrdPar. All such geometry handling is done now in the
-  // separate utility class CbmTrdGeoHandler
-
-  fGeoVersion = fGeoHandler->CheckGeometryVersion();
-  
-  if (-1 == fGeoVersion) {
-    Fatal("Initialize","unknown TRD geometry");
-  }
-  if (fGeoVersion == kOldMonolithic) {
-    cout<<"-EE- CbmTrd: Old implementation of simple TRD geometry ('PGON')" <<endl;
-    cout<<"-EE- This version does not work with newer ROOT versions and is obsolete."<<endl;
-    cout<<"-EE- If you see this version you're using a rather old version of CbmRoot. Please update to a new version."<<endl;
-    cout<<"-EE- Stop execution at this point."<<endl;
-    Fatal("Initialize","See error message above.");
-  }  
-  
-  Int_t stationNr = 1;
-  char volumeName[10];
-  Bool_t result;
-  
-  if (fGeoVersion == kNewMonolithic) {
-    
-    fStationId.clear();
-    do {
-      sprintf(volumeName, "trd%dgas", stationNr);
-      result = fGeoHandler->GetMCId(volumeName, fStationId);
-      stationNr++;
-    }
-    while (result);
-    
-  } else {
-    
-    fStationId.clear();
-    do {
-      sprintf(volumeName, "trd%d", stationNr);
-      result = fGeoHandler->GetMCId(volumeName, fStationId);
-      stationNr++;
-    }
-    while (result); 
-    Int_t maxStationNr = --stationNr; 
-    cout<<"Max Station: "<<maxStationNr<<endl;
-    
-    Int_t layerNr = 1;
-    
-    fModuleId.clear();
-    std::vector<Int_t> temp;
-    Int_t maxModuleTypes = 3;
-    for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
-      temp.clear();
-      for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
-	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
-	Int_t fMCid = gMC->VolId(volumeName);
-	temp.push_back(fMCid);      
-      }
-      fModuleId.push_back(temp);
-    }
-  }
+  // Initialize the CbmTrdGeoHandler helper class from the
+  // TVirtualMC interface
+  fGeoHandler->Init();
   
 }
 
@@ -262,9 +201,7 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
       
       fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
     
-      // Get the unique detector ID from helper class
-      fVolumeID = fGeoHandler->GetUniqueDetectorId(fGeoVersion, fStationId,
-						   fModuleId);
+      fVolumeID = fGeoHandler->GetUniqueDetectorId();
 
       CbmTrdPoint *fPoint= AddHit(fTrackID, fVolumeID, 
 			    TVector3(fPosIn.X(),  fPosIn.Y(),  fPosIn.Z()),

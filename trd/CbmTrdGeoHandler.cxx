@@ -7,6 +7,8 @@
 #include "CbmTrdGeoHandler.h"
 #include "CbmDetectorList.h"
 
+#include "FairLogger.h"
+
 #include "TGeoVolume.h"
 #include "TGeoNode.h"
 #include "TGeoManager.h"
@@ -14,6 +16,9 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
+using std::map;
+using std::pair;
 using std::cout;
 using std::endl;
 
@@ -22,7 +27,8 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fTrdId(),
     fGeoVersion(-1),
     fStationId(),
-    fModuleId()
+    fModuleId(),
+    fLogger(FairLogger::GetLogger())
 {
 }
 
@@ -64,21 +70,23 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
   //     complete detector module is the active area.
 
   TGeoVolume *fm=NULL;
-  //  gGeoManager->GetListOfVolumes()->Print();
-  //  fm = (TGeoVolume*)gGeoManager->GetListOfVolumes()->FindObject("trd1");
-  //  fm->GetNodes()->Print();
+
   // Only the old monolithic geometry version has a volume trd11
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd11");
   if (fm) {
-    cout<<"-II- Found old monolithic TRD geometry."<<endl;
+    fLogger->Error(MESSAGE_ORIGIN,"Old implementation of simple TRD geometry ('PGON') found");
+    fLogger->Error(MESSAGE_ORIGIN,"This version does not work with newer ROOT versions and is obsolete.");
+    fLogger->Error(MESSAGE_ORIGIN,"If you see this version you're using a rather old version of CbmRoot. Please update to a new version.");
+    fLogger->Error(MESSAGE_ORIGIN,"Stop execution at this point.");
+    fLogger->Fatal(MESSAGE_ORIGIN,"See error message above.");
     fGeoVersion = kOldMonolithic; 
     return fGeoVersion;
-  }
+  }  
 
   // Only the new monolithic geometry has a volume trd1gas
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1gas");
   if (fm) {
-    cout<<"-II- Found new monolithic TRD geometry."<<endl;
+    fLogger->Debug(MESSAGE_ORIGIN,"Found new monolithic TRD geometry.");
     fGeoVersion = kNewMonolithic; 
     return fGeoVersion;
   }
@@ -92,39 +100,23 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
       // Only the normal rectangular geometry has frames     
       fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1mod1carbon1");
       if (fm){
-	cout<<"-II- Found rectangular segmented TRD geometry."<<endl;
+	fLogger->Debug(MESSAGE_ORIGIN,"Found rectangular segmented TRD geometry.");
 	fGeoVersion = kSegmentedRectangular; 
 	return fGeoVersion;
       } else {
-	cout<<"-II- Found quasi monolithic TRD geometry."<<endl;
+	fLogger->Debug(MESSAGE_ORIGIN,"Found quasi monolithic TRD geometry.");
 	fGeoVersion = kQuasiMonolithic; 
 	return fGeoVersion;
       }
     } else {
-      cout<<"-II- Found squared segmented TRD geometry."<<endl;
+      fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
       fGeoVersion = kSegmentedSquared; 
       return fGeoVersion;
     }
   }
+  fLogger->Fatal(MESSAGE_ORIGIN,"Found an unknown TRD geometry.");
   fGeoVersion = -1; 
   return fGeoVersion;  
-}
-
-Bool_t CbmTrdGeoHandler::GetMCId(const char* volumeName, 
-				 std::vector<Int_t> &Id) 
-{
-
-  // Use information from the Virtual Monte Carlo, which is used
-  // in the simulation. This should make this function independent 
-  // from the actaul MC engine.
-  Int_t fMCid = gMC->VolId(volumeName);
-
-  if ( 0 != fMCid) {
-    Id.push_back(fMCid);
-    return kTRUE;
-  }
-
-  return kFALSE;
 }
 
 Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion, 
@@ -154,45 +146,22 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion,
     } else {
       gMC->CurrentVolOffID(2, layer);
       id2 = gMC->CurrentVolOffID(3, temp_station);
-      //      layer=ilayer;
       modnumber=temp_mod;
     }
-    
-    // Get the station number from the position in the vector
-    // where the current VolumeId equals the stored Id 
-    std::vector<Int_t>::iterator vecIt;
-    vecIt = find(stationId.begin(), stationId.end(), id2);
-    
-    if (vecIt!=stationId.end()) {
-      station = Int_t(vecIt-stationId.begin())+1;          
-    } else {
-      station=-1;
-    }
-    
-    vecIt = find(moduleId[station-1].begin(), moduleId[station-1].end(), id1);
-    
-    if (vecIt!=moduleId[station-1].end()) {
-      modtype = Int_t(vecIt-moduleId[station-1].begin())+1;          
-    } else {
-      modtype=0;
-    }
-            
+
+    station = fStationMap.find(id2)->second;
+   
+    modtype = fModuleTypeMap.find(id1)->second;
+
   } else {            
     
     // Get the VolumeId of the volume we are in
     Int_t volumeID = gMC->CurrentVolID(temp_mod);
     
-    // Get the station number from the position in the vector
-    // where the current VolumeId equals the stored Id 
-    std::vector<Int_t>::iterator vecIt;
-    vecIt = find (stationId.begin(), stationId.end(), volumeID);
-    
-    if (vecIt!=stationId.end()) {
-      station = Int_t(vecIt-stationId.begin())+1;          
-    } else {
-      station=-1;
-    }
-    
+    // Get the station number from map with help of the
+    // VolumeID
+    station = fStationMap.find(volumeID)->second;
+   
     // get the copy number of the volume one level upward in the
     // geometrical tree. This is the layer number.
     gMC->CurrentVolOffID(1, layer);
@@ -375,26 +344,30 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersB
 
 }
 
+Bool_t CbmTrdGeoHandler::GetMCId(const char* volumeName, 
+				 std::vector<Int_t> &Id) 
+{
+
+  // Use information from the Virtual Monte Carlo, which is used
+  // in the simulation. This should make this function independent 
+  // from the actaul MC engine.
+  Int_t fMCid = gMC->VolId(volumeName);
+
+  if ( 0 != fMCid) {
+    Id.push_back(fMCid);
+    return kTRUE;
+  }
+
+  return kFALSE;
+}
+
 
 void CbmTrdGeoHandler::FillInternalStructures()
 {
-  // Extract geometry information from gGeoManager instead of
-  // CbmGeoTrdPar. All such geometry handling is done now in the
+  // Extract geometry information from Virtual MC.
+  // All geometry handling should be done now in the
   // separate utility class CbmTrdGeoHandler
 
-  //  Int_t geoVersion = CheckGeometryVersion();
-  
-  if (-1 == fGeoVersion) {
-    Fatal("Initialize","unknown TRD geometry");
-  }
-  if (fGeoVersion == kOldMonolithic) {
-    cout<<"-EE- CbmTrd: Old implementation of simple TRD geometry ('PGON')" <<endl;
-    cout<<"-EE- This version does not work with newer ROOT versions and is obsolete."<<endl;
-    cout<<"-EE- If you see this version you're using a rather old version of CbmRoot. Please update to a new version."<<endl;
-    cout<<"-EE- Stop execution at this point."<<endl;
-    Fatal("Initialize","See error message above.");
-  }  
-  
   Int_t stationNr = 1;
   char volumeName[10];
   Bool_t result;
@@ -410,7 +383,20 @@ void CbmTrdGeoHandler::FillInternalStructures()
     while (result);
     
   } else {
-    
+
+    Int_t MCid;
+    do {
+      sprintf(volumeName, "trd%d", stationNr);
+      MCid = gMC->VolId(volumeName);
+      fLogger->Info(MESSAGE_ORIGIN,"MCID: %i",MCid);
+      if ( 0 != MCid) {
+	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
+      }
+      stationNr++;
+    }
+    while ( 0 != MCid); 
+
+    stationNr=1;
     fStationId.clear();
     do {
       sprintf(volumeName, "trd%d", stationNr);
@@ -435,7 +421,22 @@ void CbmTrdGeoHandler::FillInternalStructures()
       }
       fModuleId.push_back(temp);
     }
+
+    for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
+      for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
+	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
+	Int_t fMCid = gMC->VolId(volumeName);
+        if ( 0 != fMCid ) { 
+	  fModuleTypeMap.insert(pair<Int_t,Int_t>(fMCid,iModule));
+	}
+      }
+    }
+
+
   }
+
+
+
   
 }
 

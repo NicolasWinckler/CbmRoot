@@ -127,16 +127,9 @@ class CbmTrd : public FairDetector
   Double32_t     fLength;            //! length
   Double32_t     fELoss;             //! energy loss
   Int_t          fPosIndex;          //! position index
-  Int_t          fGeoVersion;        //! Used geometry version
 
   TClonesArray*  fTrdCollection;     //! Hit collection
   CbmTrdGeoHandler *fGeoHandler;      //! Interface to gMC and gGeoManager
-
-
-  std::vector<Int_t> fStationId;     //! MC IDs of TRD stations
-  std::vector< std::vector<Int_t> > fModuleId;//! MC IDs of gas volumes
-                                              //! in all stations
-
 
   /** Private method AddHit
    **
@@ -157,7 +150,7 @@ class CbmTrd : public FairDetector
   CbmTrd(const CbmTrd&);
   CbmTrd operator=(const CbmTrd&);
 
-  ClassDef(CbmTrd,6)
+  ClassDef(CbmTrd,7)
 
 };
 

@@ -90,7 +90,8 @@ void CbmTrd::Initialize()
  
   // Initialize the CbmTrdGeoHandler helper class from the
   // TVirtualMC interface
-  fGeoHandler->Init();
+  Bool_t isSimulation=kTRUE;
+  fGeoHandler->Init(isSimulation);
   
 }
 

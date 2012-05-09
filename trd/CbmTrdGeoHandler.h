@@ -53,20 +53,22 @@ class CbmTrdGeoHandler : public TObject {
   std::map<Int_t, Int_t> GetModuleMap() {return fModuleTypeMap;}
   Int_t GetGeoVersion() {return fGeoVersion;}  
           
-  Int_t Init();
+  Int_t Init(Bool_t isSimulation=kFALSE);
             
  private:
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersBeforStation);
 
+  // Implement Interface functions to the TGeoManager to be 
+  // the same as for the VMC
+  Int_t CurrentVolOffID(Int_t off, Int_t& copy) const;
+  Int_t CurrentVolID(Int_t& copy) const;
+  Int_t VolId(const Text_t* name) const;
+  Int_t VolIdGeo(const char *name) const;
+
   Int_t CheckGeometryVersion(); 
   void FillInternalStructures();
-  /*
-  Int_t GetUniqueDetectorId(Int_t geoVersion, 
-                            std::vector<Int_t> &stationId,
-			    std::vector< std::vector<Int_t> > &moduleId);
-  */
 
   CbmTrdDetectorId fTrdId; //!
   Int_t            fGeoVersion; //!
@@ -75,7 +77,7 @@ class CbmTrdGeoHandler : public TObject {
   std::map<Int_t, Int_t> fModuleTypeMap; //1
 
   FairLogger* fLogger; //!                                                  
-
+  Bool_t fIsSimulation; 
 
  ClassDef(CbmTrdGeoHandler,2) 
 

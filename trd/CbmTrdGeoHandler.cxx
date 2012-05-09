@@ -28,14 +28,16 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fGeoVersion(-1),
     fStationMap(),
     fModuleTypeMap(),
-    fLogger(FairLogger::GetLogger())
+    fLogger(FairLogger::GetLogger()),
+    fIsSimulation(kFALSE)
 {
 }
 
-Int_t CbmTrdGeoHandler::Init()
+Int_t CbmTrdGeoHandler::Init(Bool_t isSimulation)
 {
   Int_t geoVersion = CheckGeometryVersion();
   FillInternalStructures();
+  fIsSimulation=isSimulation;
   return geoVersion;
 }
 
@@ -119,7 +121,7 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
       } else {
         // The new squared geometry has only one keeping volume
         // for all layers    
-        fLogger->Info(MESSAGE_ORIGIN,"Found squared segmented TRD geometry with only one keeping volume.");
+        fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry with only one keeping volume.");
         fGeoVersion = kSegmentedSquaredOneKeepingVolume; 
         return fGeoVersion;
       }
@@ -145,10 +147,10 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
     
     Int_t id2; 
 
-    Int_t id1 = gMC->CurrentVolOffID(1, temp_mod);
+    Int_t id1 = CurrentVolOffID(1, temp_mod);
         
     if (kSegmentedSquared == fGeoVersion) {
-      id2 = gMC->CurrentVolOffID(2, temp_station);
+      id2 = CurrentVolOffID(2, temp_station);
       layer=temp_mod/1000;
       modnumber=temp_mod%1000;
       station = fStationMap.find(id2)->second;
@@ -157,8 +159,8 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
       layer=(temp_mod%10000)/1000;
       modnumber=(temp_mod%10000)%1000;
     } else {
-      gMC->CurrentVolOffID(2, layer);
-      id2 = gMC->CurrentVolOffID(3, temp_station);
+      CurrentVolOffID(2, layer);
+      id2 = CurrentVolOffID(3, temp_station);
       modnumber=temp_mod;
       station = fStationMap.find(id2)->second;
     }
@@ -167,7 +169,7 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
   } else {            
     
     // Get the VolumeId of the volume we are in
-    Int_t volumeID = gMC->CurrentVolID(temp_mod);
+    Int_t volumeID = CurrentVolID(temp_mod);
     
     // Get the station number from map with help of the
     // VolumeID
@@ -175,7 +177,7 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
    
     // get the copy number of the volume one level upward in the
     // geometrical tree. This is the layer number.
-    gMC->CurrentVolOffID(1, layer);
+    CurrentVolOffID(1, layer);
     
     // There are no modules in the monolithic geometry
     modtype=0;
@@ -197,11 +199,9 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1layer");
   if (fm) {
     cout<<"Found old TRD geometry version."<<endl;
-    //    return kTRUE;     
     return GetLayerInfoFromOldGeometry(layersBeforeStation);
   } else {
     cout<<"Found new TRD geometry version."<<endl;
-    //    return kTRUE;     
     return GetLayerInfoFromNewGeometry(layersBeforeStation);
   }
 }
@@ -360,11 +360,14 @@ void CbmTrdGeoHandler::FillInternalStructures()
   Bool_t result;
   Int_t MCid;
   
+  fStationMap.clear();
+  fModuleTypeMap.clear();
+
   if (fGeoVersion == kNewMonolithic) {
     
     do {
       sprintf(volumeName, "trd%dgas", stationNr);
-      MCid = gMC->VolId(volumeName);
+      MCid = VolId(volumeName);
       if ( 0 != MCid) {
 	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
       }
@@ -375,7 +378,7 @@ void CbmTrdGeoHandler::FillInternalStructures()
 
     do {
       sprintf(volumeName, "trd%d", stationNr);
-      MCid = gMC->VolId(volumeName);
+      MCid = VolId(volumeName);
       if ( 0 != MCid) {
 	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
       }
@@ -395,7 +398,7 @@ void CbmTrdGeoHandler::FillInternalStructures()
     for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
       for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
 	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
-	MCid = gMC->VolId(volumeName);
+	MCid = VolId(volumeName);
         if ( 0 != MCid ) { 
 	  fModuleTypeMap.insert(pair<Int_t,Int_t>(MCid,iModule));
 	}
@@ -404,6 +407,71 @@ void CbmTrdGeoHandler::FillInternalStructures()
   } 
 }
 
+Int_t CbmTrdGeoHandler::VolIdGeo(const char *name) const
+{
+  //
+  // Return the unique numeric identifier for volume name
+  //
+
+   Int_t uid = gGeoManager->GetUID(name);
+   if (uid<0) {
+      printf("VolId: Volume %s not found\n",name);
+      return 0;
+   }
+   return uid;
+}
+
+Int_t CbmTrdGeoHandler::VolId(const Text_t* name) const
+{
+  if (fIsSimulation) {
+    return gMC->VolId(name);
+  } else {
+    //
+    // Return the unique numeric identifier for volume name
+    //
+    char sname[20];
+    Int_t len = strlen(name)-1;
+    if (name[len] != ' ') { return VolIdGeo(name); }
+    strncpy(sname, name, len);
+    sname[len] = 0;
+    return VolIdGeo(sname);
+  }
+}
+
+Int_t CbmTrdGeoHandler::CurrentVolID(Int_t& copy) const
+{
+  if (fIsSimulation) {
+    return gMC->CurrentVolID(copy);
+  } else {
+    //
+    // Returns the current volume ID and copy number
+    //
+    if (gGeoManager->IsOutside()) { return 0; }
+    TGeoNode* node = gGeoManager->GetCurrentNode();
+    copy = node->GetNumber();
+    Int_t id = node->GetVolume()->GetNumber();
+    return id;
+  }
+}
+
+//_____________________________________________________________________________
+Int_t CbmTrdGeoHandler::CurrentVolOffID(Int_t off, Int_t& copy) const
+{
+  if (fIsSimulation) {
+    return gMC->CurrentVolOffID(off, copy);
+  } else {
+    //
+    // Return the current volume "off" upward in the geometrical tree
+    // ID and copy number
+    //
+    if (off<0 || off>gGeoManager->GetLevel()) { return 0; }
+    if (off==0) { return CurrentVolID(copy); }
+    TGeoNode* node = gGeoManager->GetMother(off);
+    if (!node) { return 0; }
+    copy = node->GetNumber();
+    return node->GetVolume()->GetNumber();
+  }
+}
 
 
 

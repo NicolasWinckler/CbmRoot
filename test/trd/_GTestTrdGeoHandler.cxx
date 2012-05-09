@@ -101,24 +101,41 @@ class  TrdGeoHandlerTest : public _TestTrdGeoHandlerBase<testing::Test> {};
 TEST_F(TrdGeoHandlerTest, CheckUniqueIdCreation)
 {
 
-  fGeoHandler->Init();
+  // check for usage of gMC
+  fGeoHandler->Init(kTRUE);
 
   TString TopNode = gGeoManager->GetTopNode()->GetName();
-  cout <<"TopNode: "<<TopNode<<endl;
+  //  cout <<"TopNode: "<<TopNode<<endl;
   const char* path = "/cave_1/trd1_0/trd1mod1_1001/trd1mod1gas_0";
   gGeoManager->cd(path);
   const char* path1 = gGeoManager->GetPath();
 
-  cout << "Path: "<<path1<<endl;
+  //  cout << "Path: "<<path1<<endl;
 
   TGeoNode *node = gGeoManager->GetCurrentNode();
   Int_t copy = node->GetNumber();
   Int_t id = node->GetVolume()->GetNumber();
-  cout << "Id: "<<id<<" , "<<copy<<endl;
+  //  cout << "Id: "<<id<<" , "<<copy<<endl;
   
   Int_t uniqueId = fGeoHandler->GetUniqueDetectorId();
   
-  cout <<"UniqueId: "<<uniqueId<<endl;
+  //  cout <<"UniqueId: "<<uniqueId<<endl;
+  EXPECT_EQ(135717, uniqueId);
+
+  // check for usage of gMC
+  fGeoHandler->Init(kFALSE);
+
+  TopNode = gGeoManager->GetTopNode()->GetName();
+  path = "/cave_1/trd1_0/trd1mod1_1001/trd1mod1gas_0";
+  gGeoManager->cd(path);
+  path1 = gGeoManager->GetPath();
+
+  node = gGeoManager->GetCurrentNode();
+  copy = node->GetNumber();
+  id = node->GetVolume()->GetNumber();
+
+  uniqueId = fGeoHandler->GetUniqueDetectorId();
+  
   EXPECT_EQ(135717, uniqueId);
 
 }
@@ -140,7 +157,8 @@ TEST_F(TrdGeoHandlerTest, CheckDefaultSettings)
   expModuleMap.insert( std::pair<Int_t, Int_t>(260,3) );
   expModuleMap.insert( std::pair<Int_t, Int_t>(269,3) );
 
-  Int_t retVal = fGeoHandler->Init();
+  // check for usage of gMC
+  Int_t retVal = fGeoHandler->Init(kTRUE);
   EXPECT_EQ(4, retVal);
   EXPECT_EQ(4, fGeoHandler->GetGeoVersion());
 
@@ -148,6 +166,17 @@ TEST_F(TrdGeoHandlerTest, CheckDefaultSettings)
   EXPECT_TRUE( stationMap == expStationMap) <<"Maps differ.";
 
   std::map<Int_t, Int_t> moduleMap = fGeoHandler->GetModuleMap();
+  EXPECT_TRUE( moduleMap == expModuleMap) <<"Maps differ.";
+
+  // check for usage of gGeoManager
+  retVal = fGeoHandler->Init(kFALSE);
+  EXPECT_EQ(4, retVal);
+  EXPECT_EQ(4, fGeoHandler->GetGeoVersion());
+
+  stationMap = fGeoHandler->GetStationMap();
+  EXPECT_TRUE( stationMap == expStationMap) <<"Maps differ.";
+
+  moduleMap = fGeoHandler->GetModuleMap();
   EXPECT_TRUE( moduleMap == expModuleMap) <<"Maps differ.";
 
 }
@@ -191,7 +220,8 @@ class TrdGeoHandlerParamTest2 : public _TestTrdGeoHandlerBase<
 
 TEST_P(TrdGeoHandlerParamTest2, checkAllDifferentGeometries)
 {
-  Int_t retVal = fGeoHandler->Init();
+  // check for usage of gMC 
+  Int_t retVal = fGeoHandler->Init(kTRUE);
   EXPECT_EQ(result, retVal);
   EXPECT_EQ(result, fGeoHandler->GetGeoVersion());
 
@@ -199,6 +229,17 @@ TEST_P(TrdGeoHandlerParamTest2, checkAllDifferentGeometries)
   EXPECT_TRUE( stationMap == expStationMap) <<"Maps differ.";
 
   std::map<Int_t, Int_t> moduleMap = fGeoHandler->GetModuleMap();
+  EXPECT_TRUE( moduleMap == expModuleMap) <<"Maps differ.";
+
+  // check for usage of gGeoManager
+  retVal = fGeoHandler->Init(kFALSE);
+  EXPECT_EQ(result, retVal);
+  EXPECT_EQ(result, fGeoHandler->GetGeoVersion());
+
+  stationMap = fGeoHandler->GetStationMap();
+  EXPECT_TRUE( stationMap == expStationMap) <<"Maps differ.";
+
+  moduleMap = fGeoHandler->GetModuleMap();
   EXPECT_TRUE( moduleMap == expModuleMap) <<"Maps differ.";
 
 }

@@ -228,7 +228,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
   // Reset all eventwise counters
   fTimer.Start();
   Reset();
-//   TF1* digiGausDist = new TF1("digiGausDist","gaus",-5.,5.);
+   TF1* digiGausDist = new TF1("digiGausDist","gaus",-5.,5.);
 
   // Verbose screen output
   if ( fVerbose > 2 ) {

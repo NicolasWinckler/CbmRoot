@@ -109,9 +109,20 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
 	return fGeoVersion;
       }
     } else {
-      fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
-      fGeoVersion = kSegmentedSquared; 
-      return fGeoVersion;
+      fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd2");
+      if (fm) {
+        // Only the normal old squared geometry has a separate keeping volume
+        // for the second station    
+        fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
+        fGeoVersion = kSegmentedSquared; 
+        return fGeoVersion;
+      } else {
+        // The new squared geometry has only one keeping volume
+        // for all layers    
+        fLogger->Info(MESSAGE_ORIGIN,"Found squared segmented TRD geometry with only one keeping volume.");
+        fGeoVersion = kSegmentedSquaredOneKeepingVolume; 
+        return fGeoVersion;
+      }
     }
   }
   fLogger->Fatal(MESSAGE_ORIGIN,"Found an unknown TRD geometry.");
@@ -140,16 +151,19 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
       id2 = gMC->CurrentVolOffID(2, temp_station);
       layer=temp_mod/1000;
       modnumber=temp_mod%1000;
+      station = fStationMap.find(id2)->second;
+    } else if (kSegmentedSquaredOneKeepingVolume == fGeoVersion) {
+      station=temp_mod/10000;
+      layer=(temp_mod%10000)/1000;
+      modnumber=(temp_mod%10000)%1000;
     } else {
       gMC->CurrentVolOffID(2, layer);
       id2 = gMC->CurrentVolOffID(3, temp_station);
       modnumber=temp_mod;
+      station = fStationMap.find(id2)->second;
     }
-
-    station = fStationMap.find(id2)->second;
    
     modtype = fModuleTypeMap.find(id1)->second;
-
   } else {            
     
     // Get the VolumeId of the volume we are in
@@ -368,9 +382,15 @@ void CbmTrdGeoHandler::FillInternalStructures()
       stationNr++;
     }
     while ( 0 != MCid); 
+
     Int_t maxStationNr = --stationNr; 
 
-    Int_t maxModuleTypes = 3;
+    Int_t maxModuleTypes;
+    if (fGeoVersion == kSegmentedSquaredOneKeepingVolume) { 
+      maxModuleTypes = 8;
+    } else {
+      maxModuleTypes = 3;
+    }
 
     for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
       for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {

@@ -18,7 +18,8 @@ enum TrdGeometryVersions {kOldMonolithic,
                           kNewMonolithic,
                           kQuasiMonolithic,
                           kSegmentedRectangular,
-                          kSegmentedSquared };
+                          kSegmentedSquared,
+                          kSegmentedSquaredOneKeepingVolume };
 
 #include "CbmTrdDetectorId.h"
 

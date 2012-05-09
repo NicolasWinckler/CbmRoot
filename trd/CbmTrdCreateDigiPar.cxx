@@ -220,47 +220,21 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
                                  ModuleNode + "/" + PartNode;
 
 
-              fModuleID = fGeoHandler->GetUniqueDetectorId(FullPath);	      
-
-	      fStation = fGeoHandler->GetStation(fModuleID);
-	      fLayer = fGeoHandler->GetLayer(fModuleID);
-	      fModuleType = fGeoHandler->GetModuleType(fModuleID);
-	      fModuleCopy = fGeoHandler->GetModuleCopyNr(fModuleID);
-	    
-              Float_t sizex = fGeoHandler->GetSizeX(FullPath);
-              Float_t sizey = fGeoHandler->GetSizeY(FullPath);
-              Float_t sizez = fGeoHandler->GetSizeZ(FullPath);
-
-              Float_t x = fGeoHandler->GetX(FullPath);
-              Float_t y = fGeoHandler->GetY(FullPath);
-              Float_t z = fGeoHandler->GetZ(FullPath);
+              FillModuleInfoFromGeoHandler(FullPath);
 
               // Get Information about the padstructure for a
               // given trd module defined by the station and
               // layer numbers, the module type and the copy
               // number
               FillPadInfoSegmentedSquared();
+ 
+              CorrectOrientationOfPadPlane();
 
-              //Orientation of the detector layers
-              //Layer 1 and 3 have resolution in x-direction (Orientation=1)
-              //Layer 2 and 4 have resolution in y-direction (Orientation=0)
-              Int_t Orientation=fLayer%2;
-              if( 0 == Orientation) {  // flip pads for even layers
-		Double_t copybuf;
-                for ( Int_t i=0; i<fMaxSectors; i++) {
-		  copybuf = fpadsizex.At(i);
-		  fpadsizex.AddAt(fpadsizey.At(i),i);
-		  fpadsizey.AddAt(copybuf,i);
-		  copybuf = fSectorSizex.At(i);
-		  fSectorSizex.AddAt(fSectorSizey.At(i),i);
-		  fSectorSizey.AddAt(copybuf,i);
-                }
-              }
               nmodules++;
 
               // Create new CbmTrdModule and add it to the map
 	      fModuleMap[fModuleID] = 
-                new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, sizez,
+                new CbmTrdModule(fModuleID, fX, fY, fZ, fSizex, fSizey, fSizez,
 				 fMaxSectors, fSectorSizex, fSectorSizey, 
 				 fpadsizex, fpadsizey);
 	    }
@@ -269,13 +243,54 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
     }
   }
 
+  FillDigiPar();
+}
 
+void CbmTrdCreateDigiPar::FillModuleInfoFromGeoHandler(TString FullPath) 
+{
+  fModuleID = fGeoHandler->GetUniqueDetectorId(FullPath);	      
+  
+  fStation = fGeoHandler->GetStation(fModuleID);
+  fLayer = fGeoHandler->GetLayer(fModuleID);
+  fModuleType = fGeoHandler->GetModuleType(fModuleID);
+  fModuleCopy = fGeoHandler->GetModuleCopyNr(fModuleID);
+	    
+  fSizex = fGeoHandler->GetSizeX(FullPath);
+  fSizey = fGeoHandler->GetSizeY(FullPath);
+  fSizez = fGeoHandler->GetSizeZ(FullPath);
+
+  fX = fGeoHandler->GetX(FullPath);
+  fY = fGeoHandler->GetY(FullPath);
+  fZ = fGeoHandler->GetZ(FullPath);
+}
+
+void CbmTrdCreateDigiPar::CorrectOrientationOfPadPlane()
+{
+  //Orientation of the detector layers
+  //Layer 1 and 3 have resolution in x-direction (Orientation=1)
+  //Layer 2 and 4 have resolution in y-direction (Orientation=0)
+  Int_t Orientation=fLayer%2;
+  if( 0 == Orientation) {  // flip pads for even layers
+    Double_t copybuf;
+    for ( Int_t i=0; i<fMaxSectors; i++) {
+      copybuf = fpadsizex.At(i);
+      fpadsizex.AddAt(fpadsizey.At(i),i);
+      fpadsizey.AddAt(copybuf,i);
+      copybuf = fSectorSizex.At(i);
+      fSectorSizex.AddAt(fSectorSizey.At(i),i);
+      fSectorSizey.AddAt(copybuf,i);
+    }
+  }
+}
+
+void CbmTrdCreateDigiPar::FillDigiPar()
+{
   Int_t Nrmodules = (Int_t)fModuleMap.size();
   cout <<"Nr. of modules: "<<Nrmodules<<endl;
-
+  
   fDigiPar->SetNrOfModules(Nrmodules);
   fDigiPar->SetMaxSectors(fMaxSectors);
-
+  
   TArrayI *ModuleId  = new TArrayI(Nrmodules);
   
   Int_t iDigi=0; 
@@ -283,11 +298,11 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
     ModuleId->AddAt(fModuleMapIt->second->GetDetectorId(),iDigi);
     iDigi++;
   }  
-
+  
   fDigiPar->SetModuleIdArray(*ModuleId);
   fDigiPar->SetModuleMap(fModuleMap);
-
 }
+
 // --------------------------------------------------------------------
 void CbmTrdCreateDigiPar::FillPadInfoSegmentedSquared(){
   
@@ -501,20 +516,7 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedRectangular(){
               TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
                                  ModuleNode + "/" + PartNode;
 
-              fModuleID = fGeoHandler->GetUniqueDetectorId(FullPath);	      
-
-	      fStation = fGeoHandler->GetStation(fModuleID);
-	      fLayer = fGeoHandler->GetLayer(fModuleID);
-	      fModuleType = fGeoHandler->GetModuleType(fModuleID);
-	      fModuleCopy = fGeoHandler->GetModuleCopyNr(fModuleID);
-	    
-              Float_t sizex = fGeoHandler->GetSizeX(FullPath);
-              Float_t sizey = fGeoHandler->GetSizeY(FullPath);
-              Float_t sizez = fGeoHandler->GetSizeZ(FullPath);
-
-              Float_t x = fGeoHandler->GetX(FullPath);
-              Float_t y = fGeoHandler->GetY(FullPath);
-              Float_t z = fGeoHandler->GetZ(FullPath);
+	      FillModuleInfoFromGeoHandler(FullPath);
 
               // Get Information about the padstructure for a
               // given trd module defined by the station and
@@ -522,26 +524,12 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedRectangular(){
               // number
               FillPadInfoSegmentedRectangular();
 
-              //Orientation of the detector layers
-              //Layer 1 and 3 have resolution in x-direction (Orientation=1)
-              //Layer 2 and 4 have resolution in y-direction (Orientation=0)
-              Int_t Orientation=fLayer%2;
-              if( 0 == Orientation) {  // flip pads for even layers
-		Double_t copybuf;
-                for ( Int_t i=0; i<fMaxSectors; i++) {
-		  copybuf = fpadsizex.At(i);
-		  fpadsizex.AddAt(fpadsizey.At(i),i);
-		  fpadsizey.AddAt(copybuf,i);
-		  copybuf = fSectorSizex.At(i);
-		  fSectorSizex.AddAt(fSectorSizey.At(i),i);
-		  fSectorSizey.AddAt(copybuf,i);
-                }
-              }
+	      CorrectOrientationOfPadPlane();
               nmodules++;
 
               // Create new CbmTrdModule and add it to the map
 	      fModuleMap[fModuleID] = 
-                new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, sizez,
+                new CbmTrdModule(fModuleID, fX, fY, fZ, fSizex, fSizey, fSizez,
 				 fMaxSectors, fSectorSizex, fSectorSizey, 
 				 fpadsizex, fpadsizey);
 	    }
@@ -554,23 +542,7 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedRectangular(){
     }
   }
 
-
-  Int_t Nrmodules = (Int_t)fModuleMap.size();
-  cout <<"Nr. of modules: "<<Nrmodules<<endl;
-
-  fDigiPar->SetNrOfModules(Nrmodules);
-  fDigiPar->SetMaxSectors(fMaxSectors);
-
-  TArrayI *ModuleId  = new TArrayI(Nrmodules);
-  
-  Int_t iDigi=0; 
-  for ( fModuleMapIt=fModuleMap.begin() ; fModuleMapIt != fModuleMap.end(); fModuleMapIt++ ){
-    ModuleId->AddAt(fModuleMapIt->second->GetDetectorId(),iDigi);
-    iDigi++;
-  }  
-
-  fDigiPar->SetModuleIdArray(*ModuleId);
-  fDigiPar->SetModuleMap(fModuleMap);
+  FillDigiPar();
 
 }
 // --------------------------------------------------------------------

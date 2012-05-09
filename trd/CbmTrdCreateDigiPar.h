@@ -48,6 +48,10 @@ class CbmTrdCreateDigiPar : public FairTask {
 
 private:
 
+    void FillModuleInfoFromGeoHandler(TString FullPath);
+    void CorrectOrientationOfPadPlane();
+    void FillDigiPar();
+
     void FillModuleMapSegmentedSquared();
     void FillPadInfoSegmentedSquared();
 
@@ -56,9 +60,16 @@ private:
 
     Int_t fStation;    //station number
     Int_t fLayer;      //layer number
-    Int_t fModuleType; //module type [1,2,3]
+    Int_t fModuleType; //module type [1-8]
     Int_t fModuleCopy; //module copy number
     Int_t fSector;     //sector number
+
+    Double_t fSizex;
+    Double_t fSizey;
+    Double_t fSizez;
+    Double_t fX;
+    Double_t fY;
+    Double_t fZ;
 
     TArrayD fpadsizex; //pixel width in x;
     TArrayD fpadsizey; //pixel width in y;

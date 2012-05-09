@@ -52,6 +52,8 @@ private:
     void CorrectOrientationOfPadPlane();
     void FillDigiPar();
 
+    void FillModuleMapSegmentedOneKeepingVolume();
+
     void FillModuleMapSegmentedSquared();
     void FillPadInfoSegmentedSquared();
 

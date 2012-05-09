@@ -10,8 +10,10 @@
 #include "FairLogger.h"
 
 #include "TGeoVolume.h"
+#include "TGeoBBox.h"
 #include "TGeoNode.h"
 #include "TGeoManager.h"
+#include "TGeoMatrix.h"
 #include "TVirtualMC.h"
 
 #include <iostream>
@@ -29,7 +31,10 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fStationMap(),
     fModuleTypeMap(),
     fLogger(FairLogger::GetLogger()),
-    fIsSimulation(kFALSE)
+    fIsSimulation(kFALSE),
+    fLastUsedDetectorID(0),
+    fDetectorInfoArray(),
+    fGeoPathHash(0)
 {
 }
 
@@ -131,6 +136,15 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
   fGeoVersion = -1; 
   return fGeoVersion;  
 }
+
+Int_t CbmTrdGeoHandler::GetUniqueDetectorId(TString volName)
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  return GetUniqueDetectorId();
+}
+
 
 Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
 {
@@ -473,6 +487,104 @@ Int_t CbmTrdGeoHandler::CurrentVolOffID(Int_t off, Int_t& copy) const
   }
 }
 
+void CbmTrdGeoHandler::FillDetectorInfoArray(Int_t uniqueId) 
+{
+  fDetectorInfoArray = fTrdId.GetDetectorInfo(uniqueId);
+}
+Int_t CbmTrdGeoHandler::GetStation(Int_t uniqueId)
+{
+  if (fLastUsedDetectorID != uniqueId) {
+    FillDetectorInfoArray(uniqueId);
+  }
+  return fDetectorInfoArray[1];
+}
+Int_t CbmTrdGeoHandler::GetLayer(Int_t uniqueId)
+{
+  if (fLastUsedDetectorID != uniqueId) {
+    FillDetectorInfoArray(uniqueId);
+  }
+  return fDetectorInfoArray[2];
+}
+Int_t CbmTrdGeoHandler::GetModuleType(Int_t uniqueId)
+{
+  if (fLastUsedDetectorID != uniqueId) {
+    FillDetectorInfoArray(uniqueId);
+  }
+  return fDetectorInfoArray[3];
+}
+Int_t CbmTrdGeoHandler::GetModuleCopyNr(Int_t uniqueId)
+{
+  if (fLastUsedDetectorID != uniqueId) {
+    FillDetectorInfoArray(uniqueId);
+  }
+  return fDetectorInfoArray[4];
+}
 
+Float_t CbmTrdGeoHandler::GetSizeX(TString volName) 
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  Float_t sizex = fVolumeShape->GetDX();
+  return sizex;
+}
 
-ClassImp(CbmTrdGeoHandler)
+Float_t CbmTrdGeoHandler::GetSizeY(TString volName) 
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  Float_t sizey = fVolumeShape->GetDY();
+  return sizey;
+}
+
+Float_t CbmTrdGeoHandler::GetSizeZ(TString volName) 
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  Float_t sizez = fVolumeShape->GetDZ();
+  return sizez;
+}
+
+Float_t CbmTrdGeoHandler::GetZ(TString volName) 
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  return fGlobal[2];
+}
+
+Float_t CbmTrdGeoHandler::GetY(TString volName) 
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  return fGlobal[1];
+}
+
+Float_t CbmTrdGeoHandler::GetX(TString volName) 
+{
+  if (fGeoPathHash != volName.Hash()) {
+    NavigateTo(volName);
+  }
+  return fGlobal[0];
+}
+
+void CbmTrdGeoHandler::NavigateTo(TString volName) 
+{
+  if (fIsSimulation) {
+    fLogger->Fatal(MESSAGE_ORIGIN,"This methode is not supported in simulation mode");
+  } else {
+    gGeoManager->cd(volName.Data());
+    fGeoPathHash = volName.Hash();
+    fCurrentVolume = gGeoManager->GetCurrentVolume();
+    fVolumeShape = (TGeoBBox*)fCurrentVolume->GetShape(); 
+    Double_t local[3] = {0., 0., 0.};  // Local centre of volume
+    gGeoManager->LocalToMaster(local, fGlobal);
+    cout<<"Pos: "<<fGlobal[0]<<" , "<<fGlobal[1]<<" , "<<fGlobal[2]<<" , "<<endl;
+    fGlobalMatrix = gGeoManager->GetCurrentMatrix(); 
+  }	      
+}
+ 
+ ClassImp(CbmTrdGeoHandler)

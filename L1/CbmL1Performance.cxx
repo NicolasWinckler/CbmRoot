@@ -559,16 +559,11 @@ void CbmL1::MatchParticles()
 
 void CbmL1::PartEffPerformance()
 {
-    
-  static CbmL1PartEfficiencies PARTEFF; // average efficiencies
-
   static int NEVENTS               = 0;
 
-  CbmL1PartEfficiencies partEff; // efficiencies for current event
+  static CbmL1PartEfficiencies PARTEFF; // average efficiencies
 
-  const int nParticles = 5;
-  int partPDG[nParticles] = {310,3122,3312,-3312,3334};
-  TString partName[nParticles] = {"ks","lambda","ksi-","ksi+","omega-"};
+  CbmKFPartEfficiencies partEff; // efficiencies for current event
 
   const int NRP = vRParticles.size();
   for ( int iP = 0; iP < NRP; ++iP ) {
@@ -578,9 +573,9 @@ void CbmL1::PartEffPerformance()
     const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
     const bool isGhost = !RtoMCParticleId[iP].IsMatched();
 
-    for(int iPart=0; iPart<nParticles; iPart++)
-      if ( pdg == partPDG[iPart] )
-        partEff.IncReco(isGhost, isBG, partName[iPart].Data());
+    for(int iPart=0; iPart<PARTEFF.nParticles; iPart++)
+      if ( pdg == PARTEFF.partPDG[iPart] )
+        partEff.IncReco(isGhost, isBG, PARTEFF.partName[iPart].Data());
   }
 
     
@@ -590,17 +585,18 @@ void CbmL1::PartEffPerformance()
     if ( !part.IsReconstructable() ) continue;
     const int pdg = part.GetPDG();
     const int mId = part.GetMotherId();
-      
-    const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
 
-    for(int iPart=0; iPart<nParticles; iPart++)
+    const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
+    const int nClones = MCtoRParticleId[iP].ids.size() - 1;
+
+    for(int iPart=0; iPart<PARTEFF.nParticles; iPart++)
     {
-      if ( pdg == partPDG[iPart] ) {
-        partEff.Inc(isReco, partName[iPart].Data());
+      if ( pdg == PARTEFF.partPDG[iPart] ) {
+        partEff.Inc(isReco, nClones, PARTEFF.partName[iPart].Data());
         if ( mId == -1 )
-          partEff.Inc(isReco, (partName[iPart]+"_prim").Data());
+          partEff.Inc(isReco, nClones, (PARTEFF.partName[iPart]+"_prim").Data());
         else
-          partEff.Inc(isReco, (partName[iPart]+"_sec").Data());
+          partEff.Inc(isReco, nClones, (PARTEFF.partName[iPart]+"_sec").Data());
       }
     }
   }
@@ -614,15 +610,18 @@ void CbmL1::PartEffPerformance()
 
     //   cout.precision(3);
   if( fVerbose ){
-    cout << " ---- Particle finder --- " << endl;
-      // cout << "L1 STAT    : " << NEVENTS << " EVENT "               << endl << endl;
-      // partEff.PrintEff();
+    if(NEVENTS%500 == 0)
+    {
+      cout << " ---- KF Particle finder --- " << endl;
+      // cout << "L1 STAT    : " << fNEvents << " EVENT "               << endl << endl;
+      //partEff.PrintEff();
       // cout << endl;
-    cout << "L1 ACCUMULATED STAT    : " << NEVENTS << " EVENTS "               << endl << endl;
-    PARTEFF.PrintEff();
+      cout << "ACCUMULATED STAT    : " << NEVENTS << " EVENTS "               << endl << endl;
+      PARTEFF.PrintEff();
 
-    cout<<endl;
-      // cout<<"CA Track Finder: " << L1_CATIME/L1_NEVENTS << " s/ev" << endl << endl;
+      cout<<endl;
+      // cout<<"CA Track Finder: " << L1_CATIME/L1_fNEvents << " s/ev" << endl << endl;
+    }
   }
 }
 

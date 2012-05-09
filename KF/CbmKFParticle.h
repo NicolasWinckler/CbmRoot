@@ -23,8 +23,9 @@ class CbmKFParticle: public TObject {
   int NDaughters() const { return fDaughtersIds.size(); };
   const vector<int>& DaughterIds() const { return fDaughtersIds; };
   
-  void SetId( int id ){ fId = id; }; // should be always used (manualy)
-  void AddDaughter( int id ){ fDaughtersIds.push_back(id); };
+  void SetId( int id ){ fId = id; } // should be always used (manualy)
+  void AddDaughter( int id ){ fDaughtersIds.push_back(id); }
+  void CleanDaughtersId() { fDaughtersIds.clear(); }
 
  private:
   

@@ -60,7 +60,8 @@ void CbmL1ParticlesFinder::FindParticles(vector<CbmL1Track> &vRTracks)
   timerPV.Stop();
   timerSelect.Start();
 
-  CbmKFParticleInterface::FindParticles(vRTracks,fParticles,fPrimVtx);
+  vector<int> vTrackPDG(vRTracks.size(), 211);
+  CbmKFParticleInterface::FindParticles(vRTracks, fParticles, fPrimVtx, vTrackPDG);
 
   timerSelect.Stop();
   timerAll.Stop();

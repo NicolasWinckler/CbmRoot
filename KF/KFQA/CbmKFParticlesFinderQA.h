@@ -22,11 +22,15 @@
 #include "CbmKFTrErrMCPoints.h"
 #include "FairTask.h"
 #include <vector>
+#include <map>
+#include <cstring>
 
 class CbmKFParticlesFinder;
 class TClonesArray;
 class CbmVertex;
 class TDirectory;
+class TH1F;
+class TH2F;
 
 class CbmKFParticlesFinderQA :public FairTask
 {
@@ -94,7 +98,44 @@ class CbmKFParticlesFinderQA :public FairTask
   CbmKFPartEfficiencies fParteff;
   int fNEvents;
 
+//histos
+  static const int nFitQA = 16;
+  TH1F *hFitDaughtersQA[CbmKFPartEfficiencies::nParticles][nFitQA];
+  TH1F *hFitQA[CbmKFPartEfficiencies::nParticles][nFitQA];
+
+  static const int nHistoPartParam = 11;
+  TH1F *hPartParam[CbmKFPartEfficiencies::nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
+  TH1F *hPartParamBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
+  TH1F *hPartParamGhost[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
+  TH1F *hPartParamSignal[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
+  static const int nHistoPartParamQA = 3;
+  TH1F *hPartParamQA[CbmKFPartEfficiencies::nParticles][nHistoPartParamQA*2]; // residuals and pulls of these parameters
+
+  static const int nHistoPartParam2D = 1;
+  TH2F *hPartParam2D[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D]; // y-pt,
+  TH2F *hPartParam2DBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
+  TH2F *hPartParam2DGhost[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
+  TH2F *hPartParam2DSignal[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
+  
+  static const int nHistosPV = 6;
+  TH1F *hPVFitQa[nHistosPV];
+
+  static const int nHistoMotherPdg = 17;
+  std::map<int,int> fMotherPdgToIndex;
+  TH1F *hMotherPdg[nHistoMotherPdg];
+  int GetMotherPdgIndex(int pdg)
+  {
+    std::map<int, int>::iterator it;
+    it=fMotherPdgToIndex.find(pdg);
+    if(it != fMotherPdgToIndex.end()) return it->second;
+    else return -1;
+  }
+
+  static const int nHistosTP = 1;
+  TH1F *hTrackParameters[nHistosTP];
+
   ClassDef(CbmKFParticlesFinderQA,1);
+
  private:
   CbmKFParticlesFinderQA(const CbmKFParticlesFinderQA&);
   void operator=(const CbmKFParticlesFinderQA&);

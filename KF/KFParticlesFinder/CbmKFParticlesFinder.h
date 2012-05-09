@@ -28,6 +28,7 @@ class CbmKFParticlesFinder: public FairTask
 {
  public:
   CbmKFParticlesFinder(float cuts[2][3] = 0,
+                       Bool_t useMCPID = 0,
                        const char *name ="CbmKFParticlesFinder",
                        const char *title="Cbm KF Particles Finder",
                        Int_t iVerbose = 1);
@@ -46,10 +47,16 @@ class CbmKFParticlesFinder: public FairTask
  private:
 
   float fCuts[2][3];
+  Bool_t fUseMCPID;
+
   TClonesArray* flistStsTracks;
   CbmVertex* fPrimVtx;
 
   vector<CbmKFParticle> fParticles;
+
+// for the particle id
+  TClonesArray* flistStsTracksMatch;
+  TClonesArray* flistMCTracks;
 };
 
 #endif

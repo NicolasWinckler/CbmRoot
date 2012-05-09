@@ -22,6 +22,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
 ${CBMROOT_SOURCE_DIR}/KF/KFParticlesFinder
+${CBMROOT_SOURCE_DIR}/KF/KFQA
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/mvd 
 ${CBMROOT_SOURCE_DIR}/sts 
@@ -113,7 +114,7 @@ KFParticlesFinder/CbmKFParticlesFinder.h
 KFQA/CbmKFTrErrMCPoints.h
 KFQA/CbmKFTrackFitQA.h
 KFQA/CbmKFParticlesFinderQA.h
-CbmKFPartEfficiencies.h
+KFQA/CbmKFPartEfficiencies.h
 )
 
 ADD_DEFINITIONS(-Wall -Wabi -Wsign-promo  -Wno-pmf-conversions -Wctor-dtor-privacy -Wreorder -Wno-deprecated -Wstrict-null-sentinel -Wno-non-template-friend ) # -Weffc++ -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast   : wait for other parts of cbmroot\root.

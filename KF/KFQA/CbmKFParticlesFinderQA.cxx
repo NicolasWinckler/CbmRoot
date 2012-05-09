@@ -39,6 +39,8 @@
 #include "TH2F.h"
 #include "TAxis.h"
 
+#include "CbmL1PFFitter.h"
+
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -78,8 +80,229 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   vMvdPointMatch(),
   vMCTrackMatch(),
   fParteff(),
-  fNEvents(0)
+  fNEvents(0),
+  hFitDaughtersQA(),
+  hFitQA(),
+  hPartParam(),
+  hPartParamBG(),
+  hPartParamGhost(),
+  hPartParamSignal(),
+  hPartParamQA(),
+  hPartParam2D(),
+  hPartParam2DBG(),
+  hPartParam2DGhost(),
+  hPartParam2DSignal(),
+  hPVFitQa(),
+  fMotherPdgToIndex(),
+  hMotherPdg(),
+  hTrackParameters()
 {
+  TString partNames[nHistoMotherPdg] = {"e+","e-",
+                                             "#mu+","#mu-",
+                                             "#pi+","#pi-",
+                                             "K+","K-",
+                                             "p+","p-",
+                                             "K0s",
+                                             "#Lambda","#Lambda_bar",
+                                             "#Xi+","#Xi-",
+                                             "#Omega+","#Omega-" };
+  int partPdg[nHistoMotherPdg] = {  -11,   11,
+                                    -13,   13,
+                                    211, -211,
+                                    321, -321,
+                                   2212,-2212,
+                                    310,
+                                   3122,-3122,
+                                   3312,-3312,
+                                   3334,-3334 };
+  for(int iMP=0; iMP<nHistoMotherPdg; iMP++)
+    fMotherPdgToIndex[partPdg[iMP]] = iMP;
+
+  TDirectory *currentDir = gDirectory;
+  gDirectory->mkdir("KFParticlesFinder");
+  gDirectory->cd("KFParticlesFinder");
+  histodir = gDirectory;
+  gDirectory->mkdir("Particles");
+  gDirectory->cd("Particles");
+  {
+    for(int iPart=0; iPart<fParteff.nParticles; ++iPart)
+    {
+      gDirectory->mkdir(fParteff.partName[iPart].Data());
+      gDirectory->cd(fParteff.partName[iPart].Data());
+      {
+        TString res = "res";
+        TString pull = "pull";
+
+        gDirectory->mkdir("DaughtersQA");
+        gDirectory->cd("DaughtersQA");
+        {
+          TString parName[nFitQA/2] = {"X","Y","Z","Px","Py","Pz","E","M"};
+          int nBins = 100;
+          float xMax[nFitQA/2] = {0.15,0.15,0.03,0.01,0.01,0.06,0.06,0.01};
+
+          for( int iH=0; iH<nFitQA/2; iH++ ){
+            hFitDaughtersQA[iPart][iH]   = new TH1F((res+parName[iH]).Data(),
+                                                    (res+parName[iH]).Data(), 
+                                                    nBins, -xMax[iH],xMax[iH]);
+            hFitDaughtersQA[iPart][iH+8] = new TH1F((pull+parName[iH]).Data(),
+                                                    (pull+parName[iH]).Data(), 
+                                                    nBins, -6,6);
+          }
+        }
+        gDirectory->cd(".."); //particle directory
+
+        gDirectory->mkdir("FitQA");
+        gDirectory->cd("FitQA");
+        {
+          TString parName[nFitQA/2] = {"X","Y","Z","Px","Py","Pz","E","M"};
+          int nBins = 50;
+          float xMax[nFitQA/2] = {0.15,0.15,1.2,0.02,0.02,0.15,0.15,0.006};
+
+          for( int iH=0; iH<nFitQA/2; iH++ ){
+            hFitQA[iPart][iH]   = new TH1F((res+parName[iH]).Data(),
+                                           (res+parName[iH]).Data(), 
+                                           nBins, -xMax[iH],xMax[iH]);
+            hFitQA[iPart][iH+8] = new TH1F((pull+parName[iH]).Data(),
+                                           (pull+parName[iH]).Data(), 
+                                           nBins, -6,6);
+          }
+        }
+        gDirectory->cd(".."); //particle directory
+
+        gDirectory->mkdir("Parameters");
+        gDirectory->cd("Parameters");
+        {
+          TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","prob","#theta","phi","z"};
+          TString parAxisName[nHistoPartParam] = {"m [GeV/c^{2}]","p [GeV/c]","p_{t} [GeV/c]",
+                                                  "y","Decay length [cm]","Life time c#tau [cm]",
+                                                  "chi2/ndf","prob","#theta [rad]",
+                                                  "phi [rad]","z [cm]"};
+          int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100};
+          float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0.,  0.,  0.,  0., 0., -2., -2., -5.};
+          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 30., 30., 20., 1.,  2.,  2., 55.};
+
+          for(int iH=0; iH<nHistoPartParam; iH++)
+          {
+            hPartParam[iPart][iH]       = new TH1F(parName[iH].Data(),parName[iH].Data(),
+                                            nBins[iH],xMin[iH],xMax[iH]);
+            hPartParam[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
+          }
+
+          hPartParam2D[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
+                                            nBins[3],xMin[3],xMax[3],
+                                            nBins[2],xMin[2],xMax[2]);
+          hPartParam2D[iPart][0]->GetXaxis()->SetTitle("y");
+          hPartParam2D[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
+
+          gDirectory->mkdir("Signal");
+          gDirectory->cd("Signal");
+          {
+            for(int iH=0; iH<nHistoPartParam; iH++)
+            {
+              hPartParamSignal[iPart][iH] = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
+                                            nBins[iH],xMin[iH],xMax[iH]);
+              hPartParamSignal[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
+            }
+
+            hPartParam2DSignal[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
+                                                    nBins[3],xMin[3],xMax[3],
+                                                    nBins[2],xMin[2],xMax[2]);
+            hPartParam2DSignal[iPart][0]->GetXaxis()->SetTitle("y");
+            hPartParam2DSignal[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
+
+            gDirectory->mkdir("QA");
+            gDirectory->cd("QA");
+            {
+              int nBinsQA = 50;
+              float xMaxQA[nHistoPartParamQA] = {0.01,0.001,0.001};
+              for( int iH=0; iH<nHistoPartParamQA; iH++ ){
+                hPartParamQA[iPart][iH] = 
+                  new TH1F((res+parName[iH]).Data(), (res+parName[iH]).Data(), nBinsQA, -xMaxQA[iH],xMaxQA[iH]);
+                hPartParamQA[iPart][iH+nHistoPartParamQA] = 
+                  new TH1F((pull+parName[iH]).Data(), (pull+parName[iH]).Data(), nBinsQA, -6,6);
+              }
+            }
+            gDirectory->cd(".."); // particle directory / Parameters / Signal
+          }
+          gDirectory->cd(".."); // particle directory / Parameters
+          gDirectory->mkdir("Background");
+          gDirectory->cd("Background");
+          {
+            for(int iH=0; iH<nHistoPartParam; iH++)
+            {
+              hPartParamBG[iPart][iH]     = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
+                                            nBins[iH],xMin[iH],xMax[iH]);
+              hPartParamBG[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
+            }
+
+            hPartParam2DBG[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
+                                                nBins[3],xMin[3],xMax[3],
+                                                nBins[2],xMin[2],xMax[2]);
+            hPartParam2DBG[iPart][0]->GetXaxis()->SetTitle("y");
+            hPartParam2DBG[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
+          }
+          gDirectory->cd(".."); // particle directory
+          gDirectory->mkdir("Ghost");
+          gDirectory->cd("Ghost");
+          {
+            for(int iH=0; iH<nHistoPartParam; iH++)
+            {
+              hPartParamGhost[iPart][iH]     = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
+                                            nBins[iH],xMin[iH],xMax[iH]);
+              hPartParamGhost[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
+            }
+
+            hPartParam2DGhost[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
+                                                nBins[3],xMin[3],xMax[3],
+                                                nBins[2],xMin[2],xMax[2]);
+            hPartParam2DGhost[iPart][0]->GetXaxis()->SetTitle("y");
+            hPartParam2DGhost[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
+          }
+          gDirectory->cd(".."); // particle directory
+        }
+        gDirectory->cd(".."); //particle directory
+      }
+      gDirectory->cd(".."); //Particles
+    }
+  }
+  gDirectory->cd(".."); //L1
+  gDirectory->mkdir("PrimaryVertexQA");
+  gDirectory->cd("PrimaryVertexQA");
+  {
+    struct {
+      string name;
+      string title;
+      Int_t n;
+      Double_t l,r;
+    } Table[nHistosPV]=
+    {
+      {"PVResX", "x_{rec}-x_{mc}, cm",     100, -0.006f, 0.006f},
+      {"PVResY", "y_{rec}-y_{mc}, cm",     100, -0.006f, 0.006f},
+      {"PVResZ", "z_{rec}-z_{mc}, cm",     100, -0.06f, 0.06f},
+      {"PVPullX", "Pull X",     100, -6.f, 6.f},
+      {"PVPullY", "Pull Y",     100, -6.f, 6.f},
+      {"PVPullZ", "Pull Z",     100, -6.f, 6.f}
+    };
+    for(int iHPV=0; iHPV<nHistosPV; ++iHPV){
+      hPVFitQa[iHPV] = new TH1F(Table[iHPV].name.data(),Table[iHPV].title.data(),
+                                Table[iHPV].n, Table[iHPV].l, Table[iHPV].r);
+    }
+  }
+  gDirectory->cd(".."); //L1
+  gDirectory->mkdir("MotherPDG");
+  gDirectory->cd("MotherPDG");
+  {
+    for(int iMP=0; iMP<nHistoMotherPdg; iMP++)
+      hMotherPdg[iMP] = new TH1F(partNames[iMP].Data(), partNames[iMP].Data(), 10000, -5000, 5000);
+  }
+
+  gDirectory->cd(".."); //L1
+  gDirectory->mkdir("TrackParameters");
+  gDirectory->cd("TrackParameters");
+  {
+    hTrackParameters[0] = new TH1F("Chi2Prim", "Chi2Prim", 1000, 0, 100);
+  }
+  gDirectory = currentDir;
 }
 
 CbmKFParticlesFinderQA::~CbmKFParticlesFinderQA()
@@ -323,34 +546,17 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
 {
   if ( part.IsReconstructable() ) return;
 
- // vector<int> partDaughterPdg[fParteff.nParticles];
-  vector<vector<int> > partDaughterPdg(fParteff.nParticles);
-
-  partDaughterPdg[0].push_back( 211);
-  partDaughterPdg[0].push_back(-211);
-
-  partDaughterPdg[1].push_back(2212);
-  partDaughterPdg[1].push_back(-211);
-
-  partDaughterPdg[2].push_back(3122);
-  partDaughterPdg[2].push_back(-211);
-
-  partDaughterPdg[3].push_back(3122);
-  partDaughterPdg[3].push_back( 211);
-
-  partDaughterPdg[4].push_back(3122);
-  partDaughterPdg[4].push_back(-321);
-
-  partDaughterPdg[5].push_back(3122);
-  partDaughterPdg[5].push_back(3122);
-
     // tracks
   if ( /*part.NDaughters() == 0*/ part.GetPDG() ==  -211 ||
                                   part.GetPDG() ==   211 ||
                                   part.GetPDG() ==  2212 ||
                                   part.GetPDG() == -2212 ||
                                   part.GetPDG() ==   321 ||
-                                  part.GetPDG() ==  -321 ) { // TODO other particles
+                                  part.GetPDG() ==  -321 ||
+                                  part.GetPDG() ==    11 ||
+                                  part.GetPDG() ==   -11 ||
+                                  part.GetPDG() ==    13 ||
+                                  part.GetPDG() ==   -13 ) { // TODO other particles
 
     switch ( fFindParticlesMode ) {
       case 1:
@@ -382,7 +588,7 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
     {
       if(part.GetPDG() == fParteff.partPDG[iPart])
       {
-        const unsigned int nDaughters = partDaughterPdg[iPart].size();
+        const unsigned int nDaughters = fParteff.partDaughterPdg[iPart].size();
         if( part.GetDaughterIds().size() != nDaughters ) return;
         int pdg[nDaughters];
 
@@ -396,7 +602,7 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
         bool isReco = 1;
         for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
           for(unsigned int iD=0; iD<nDaughters; iD++)
-            if(pdg[iD] == partDaughterPdg[iPart][iDMC]) isDaughterFound[iDMC] = 1;
+            if(pdg[iD] == fParteff.partDaughterPdg[iPart][iDMC]) isDaughterFound[iDMC] = 1;
 
         for(unsigned int iDMC=0; iDMC<nDaughters; iDMC++)
           isReco = isReco && isDaughterFound[iDMC];
@@ -513,17 +719,18 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
     if ( !part.IsReconstructable() ) continue;
     const int pdg = part.GetPDG();
     const int mId = part.GetMotherId();
-      
+
     const bool isReco = MCtoRParticleId[iP].ids.size() != 0;
+    const int nClones = MCtoRParticleId[iP].ids.size() - 1;
 
     for(int iPart=0; iPart<fParteff.nParticles; iPart++)
     {
       if ( pdg == fParteff.partPDG[iPart] ) {
-        partEff.Inc(isReco, fParteff.partName[iPart].Data());
+        partEff.Inc(isReco, nClones, fParteff.partName[iPart].Data());
         if ( mId == -1 )
-          partEff.Inc(isReco, (fParteff.partName[iPart]+"_prim").Data());
+          partEff.Inc(isReco, nClones, (fParteff.partName[iPart]+"_prim").Data());
         else
-          partEff.Inc(isReco, (fParteff.partName[iPart]+"_sec").Data());
+          partEff.Inc(isReco, nClones, (fParteff.partName[iPart]+"_sec").Data());
       }
     }
   }
@@ -537,257 +744,26 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
 
     //   cout.precision(3);
   if( fVerbose ){
-    cout << " ---- KF Particle finder --- " << endl;
+    if(fNEvents%500 == 0)
+    {
+      cout << " ---- KF Particle finder --- " << endl;
       // cout << "L1 STAT    : " << fNEvents << " EVENT "               << endl << endl;
-      // partEff.PrintEff();
+      //partEff.PrintEff();
       // cout << endl;
-    cout << "ACCUMULATED STAT    : " << fNEvents << " EVENTS "               << endl << endl;
-    fParteff.PrintEff();
+      cout << "ACCUMULATED STAT    : " << fNEvents << " EVENTS "               << endl << endl;
+      fParteff.PrintEff();
 
-    cout<<endl;
+      cout<<endl;
       // cout<<"CA Track Finder: " << L1_CATIME/L1_fNEvents << " s/ev" << endl << endl;
+    }
   }
 }
 
 void CbmKFParticlesFinderQA::PartHistoPerformance()
 {
-  static const int nFitQA = 16;
-  static TH1F *hFitDaughtersQA[fParteff.nParticles][nFitQA];
-  static TH1F *hFitQA[fParteff.nParticles][nFitQA];
-
-  static const int nHistoPartParam = 11;
-  static TH1F *hPartParam[fParteff.nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
-  static TH1F *hPartParamBG[fParteff.nParticles][nHistoPartParam];
-  static TH1F *hPartParamSignal[fParteff.nParticles][nHistoPartParam];
-  static const int nHistoPartParamQA = 3;
-  static TH1F *hPartParamQA[fParteff.nParticles][nHistoPartParamQA*2]; // residuals and pulls of these parameters
-
-  static const int nHistoPartParam2D = 1;
-  static TH2F *hPartParam2D[fParteff.nParticles][nHistoPartParam2D]; // y-pt,
-  static TH2F *hPartParam2DBG[fParteff.nParticles][nHistoPartParam2D];
-  static TH2F *hPartParam2DSignal[fParteff.nParticles][nHistoPartParam2D];
-  
-  static const int nHistosPV = 6;
-  static TH1F *hPVFitQa[nHistosPV];
-
-  static bool first_call = 1;
-
-  if ( first_call )
-  {
-    first_call = 0;
-
-    TDirectory *currentDir = gDirectory;
-    gDirectory->mkdir("KFParticlesFinder");
-    gDirectory->cd("KFParticlesFinder");
-    histodir = gDirectory;
-    gDirectory->mkdir("Particles");
-    gDirectory->cd("Particles");
-    {
-      for(int iPart=0; iPart<fParteff.nParticles; ++iPart)
-      {
-        gDirectory->mkdir(fParteff.partName[iPart].Data());
-        gDirectory->cd(fParteff.partName[iPart].Data());
-        {
-          TString res = "res";
-          TString pull = "pull";
-
-          gDirectory->mkdir("DaughtersQA");
-          gDirectory->cd("DaughtersQA");
-          {
-            TString parName[nFitQA/2] = {"X","Y","Z","Px","Py","Pz","E","M"};
-            int nBins = 100;
-            float xMax[nFitQA/2] = {0.15,0.15,0.03,0.01,0.01,0.06,0.06,0.01};
-
-            for( int iH=0; iH<nFitQA/2; iH++ ){
-              hFitDaughtersQA[iPart][iH]   = new TH1F((res+parName[iH]).Data(),
-                                                      (res+parName[iH]).Data(), 
-                                                      nBins, -xMax[iH],xMax[iH]);
-              hFitDaughtersQA[iPart][iH+8] = new TH1F((pull+parName[iH]).Data(),
-                                                      (pull+parName[iH]).Data(), 
-                                                      nBins, -6,6);
-            }
-          }
-          gDirectory->cd(".."); //particle directory
-
-          gDirectory->mkdir("FitQA");
-          gDirectory->cd("FitQA");
-          {
-            TString parName[nFitQA/2] = {"X","Y","Z","Px","Py","Pz","E","M"};
-            int nBins = 50;
-            float xMax[nFitQA/2] = {0.15,0.15,1.2,0.02,0.02,0.15,0.15,0.006};
-
-            for( int iH=0; iH<nFitQA/2; iH++ ){
-              hFitQA[iPart][iH]   = new TH1F((res+parName[iH]).Data(),
-                                             (res+parName[iH]).Data(), 
-                                             nBins, -xMax[iH],xMax[iH]);
-              hFitQA[iPart][iH+8] = new TH1F((pull+parName[iH]).Data(),
-                                             (pull+parName[iH]).Data(), 
-                                             nBins, -6,6);
-            }
-          }
-          gDirectory->cd(".."); //particle directory
-
-          gDirectory->mkdir("Parameters");
-          gDirectory->cd("Parameters");
-          {
-            TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","prob","#theta","phi","z"};
-            TString parAxisName[nHistoPartParam] = {"m [GeV/c^{2}]","p [GeV/c]","p_{t} [GeV/c]",
-                                                    "y","Decay length [cm]","Life time c#tau [cm]",
-                                                    "chi2/ndf","prob","#theta [rad]",
-                                                    "phi [rad]","z [cm]"};
-            int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100};
-            float xMin[nHistoPartParam] = {0.3f,  0., 0., 0.,  0.,  0.,  0., 0., -2., -2., -5.};
-            float xMax[nHistoPartParam] = {1.3f, 10., 3., 6., 30., 30., 20., 1.,  2.,  2., 55.};
-            if(iPart == 1)
-            {
-              xMin[0] = 1.0; 
-              xMax[0] = 2.0;
-            }
-            if(iPart == 2)
-            {
-              xMin[0] = 1.0; 
-              xMax[0] = 3.0;
-            }
-            if(iPart == 4)
-            {
-              xMin[0] = 1.0; 
-              xMax[0] = 3.0;
-            }
-            if(iPart == 5)
-            {
-              xMin[0] = 1.5; 
-              xMax[0] = 3.5;
-            }
-
-            for(int iH=0; iH<nHistoPartParam; iH++)
-            {
-              hPartParam[iPart][iH]       = new TH1F(parName[iH].Data(),parName[iH].Data(),
-                                              nBins[iH],xMin[iH],xMax[iH]);
-              hPartParam[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
-            }
-
-            hPartParam2D[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
-                                              nBins[3],xMin[3],xMax[3],
-                                              nBins[2],xMin[2],xMax[2]);
-            hPartParam2D[iPart][0]->GetXaxis()->SetTitle("y");
-            hPartParam2D[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
-
-            gDirectory->mkdir("Signal");
-            gDirectory->cd("Signal");
-            {
-              for(int iH=0; iH<nHistoPartParam; iH++)
-              {
-                hPartParamSignal[iPart][iH] = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
-                                              nBins[iH],xMin[iH],xMax[iH]);
-                hPartParamSignal[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
-              }
-
-              hPartParam2DSignal[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
-                                                      nBins[3],xMin[3],xMax[3],
-                                                      nBins[2],xMin[2],xMax[2]);
-              hPartParam2DSignal[iPart][0]->GetXaxis()->SetTitle("y");
-              hPartParam2DSignal[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
-
-              gDirectory->mkdir("QA");
-              gDirectory->cd("QA");
-              {
-                int nBinsQA = 50;
-                float xMaxQA[nHistoPartParamQA] = {0.01,0.001,0.001};
-                for( int iH=0; iH<nHistoPartParamQA; iH++ ){
-                  hPartParamQA[iPart][iH] = 
-                    new TH1F((res+parName[iH]).Data(), (res+parName[iH]).Data(), nBinsQA, -xMaxQA[iH],xMaxQA[iH]);
-                  hPartParamQA[iPart][iH+nHistoPartParamQA] = 
-                    new TH1F((pull+parName[iH]).Data(), (pull+parName[iH]).Data(), nBinsQA, -6,6);
-                }
-              }
-              gDirectory->cd(".."); // particle directory / Parameters / Signal
-
-            }
-            gDirectory->cd(".."); // particle directory / Parameters
-            gDirectory->mkdir("Background");
-            gDirectory->cd("Background");
-            {
-              for(int iH=0; iH<nHistoPartParam; iH++)
-              {
-                hPartParamBG[iPart][iH]     = new TH1F((parName[iH]).Data(),(parName[iH]).Data(),
-                                              nBins[iH],xMin[iH],xMax[iH]);
-                hPartParamBG[iPart][iH]->GetXaxis()->SetTitle(parAxisName[iH].Data());
-              }
-
-              hPartParam2DBG[iPart][0] = new TH2F("y-p_{t}","y-p_{t}",
-                                                  nBins[3],xMin[3],xMax[3],
-                                                  nBins[2],xMin[2],xMax[2]);
-              hPartParam2DBG[iPart][0]->GetXaxis()->SetTitle("y");
-              hPartParam2DBG[iPart][0]->GetYaxis()->SetTitle("p_{t} [GeV/c]");
-            }
-            gDirectory->cd(".."); // particle directory
-          }
-          gDirectory->cd(".."); //particle directory
-        }
-        gDirectory->cd(".."); //L1
-      }
-    }
-    gDirectory->cd(".."); //L1
-    gDirectory->mkdir("PrimaryVertexQA");
-    gDirectory->cd("PrimaryVertexQA");
-    {
-      struct {
-        string name;
-        string title;
-        Int_t n;
-        Double_t l,r;
-      } Table[nHistosPV]=
-      {
-        {"PVResX", "x_{rec}-x_{mc}, cm",     100, -0.006f, 0.006f},
-        {"PVResY", "y_{rec}-y_{mc}, cm",     100, -0.006f, 0.006f},
-        {"PVResZ", "z_{rec}-z_{mc}, cm",     100, -0.06f, 0.06f},
-        {"PVPullX", "Pull X",     100, -6.f, 6.f},
-        {"PVPullY", "Pull Y",     100, -6.f, 6.f},
-        {"PVPullZ", "Pull Z",     100, -6.f, 6.f}
-      };
-      for(int iHPV=0; iHPV<nHistosPV; ++iHPV){
-        hPVFitQa[iHPV] = new TH1F(Table[iHPV].name.data(),Table[iHPV].title.data(),
-                                  Table[iHPV].n, Table[iHPV].l, Table[iHPV].r);
-      }
-    }
-    gDirectory = currentDir;
-  }
-
   for(unsigned int iP=0; iP < fPF->GetParticles().size(); iP++)
   {
-    int iParticle = -1;
-    switch( fPF->GetParticles()[iP].GetPDG() ) {
-      case 310:
-      {
-        iParticle = 0;
-      }
-      break;
-      case 3122:
-      {
-        iParticle = 1;
-      }
-      break;
-      case 3312:
-      {
-        iParticle = 2;
-      }
-      break;
-      case -3312:
-      {
-        iParticle = 3;
-      }
-      break;
-      case 3334:
-      {
-        iParticle = 4;
-      }
-      break;
-      case 3000:
-      {
-        iParticle = 5;
-      }
-      break;
-    }
+    int iParticle = fParteff.GetParticleIndex(fPF->GetParticles()[iP].GetPDG());
     if(iParticle < 0) continue;
 
     Double_t M, ErrM;
@@ -813,47 +789,66 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     Phi = TempPart.GetPhi();
     Z = TempPart.GetZ();
 
-    hPartParam[iParticle][0]->Fill(M);
-    hPartParam[iParticle][1]->Fill(P);
-    hPartParam[iParticle][2]->Fill(Pt);
-    hPartParam[iParticle][3]->Fill(Rapidity);
-    hPartParam[iParticle][4]->Fill(dL);
-    hPartParam[iParticle][5]->Fill(cT);
-    hPartParam[iParticle][6]->Fill(chi2/ndf);
-    hPartParam[iParticle][7]->Fill(prob);
-    hPartParam[iParticle][8]->Fill(Theta);
-    hPartParam[iParticle][9]->Fill(Phi);
+    hPartParam[iParticle][ 0]->Fill(M);
+    hPartParam[iParticle][ 1]->Fill(P);
+    hPartParam[iParticle][ 2]->Fill(Pt);
+    hPartParam[iParticle][ 3]->Fill(Rapidity);
+    hPartParam[iParticle][ 4]->Fill(dL);
+    hPartParam[iParticle][ 5]->Fill(cT);
+    hPartParam[iParticle][ 6]->Fill(chi2/ndf);
+    hPartParam[iParticle][ 7]->Fill(prob);
+    hPartParam[iParticle][ 8]->Fill(Theta);
+    hPartParam[iParticle][ 9]->Fill(Phi);
     hPartParam[iParticle][10]->Fill(Z);
 
     hPartParam2D[iParticle][0]->Fill(Rapidity,Pt,1);
 
     if(!RtoMCParticleId[iP].IsMatchedWithPdg()) //background
     {
-      hPartParamBG[iParticle][0]->Fill(M);
-      hPartParamBG[iParticle][1]->Fill(P);
-      hPartParamBG[iParticle][2]->Fill(Pt);
-      hPartParamBG[iParticle][3]->Fill(Rapidity);
-      hPartParamBG[iParticle][4]->Fill(dL);
-      hPartParamBG[iParticle][5]->Fill(cT);
-      hPartParamBG[iParticle][6]->Fill(chi2/ndf);
-      hPartParamBG[iParticle][7]->Fill(prob);
-      hPartParamBG[iParticle][8]->Fill(Theta);
-      hPartParamBG[iParticle][9]->Fill(Phi);
-      hPartParamBG[iParticle][10]->Fill(Z);
-      
-      hPartParam2DBG[iParticle][0]->Fill(Rapidity,Pt,1);
+      if(!RtoMCParticleId[iP].IsMatched())
+      {
+        hPartParamGhost[iParticle][ 0]->Fill(M);
+        hPartParamGhost[iParticle][ 1]->Fill(P);
+        hPartParamGhost[iParticle][ 2]->Fill(Pt);
+        hPartParamGhost[iParticle][ 3]->Fill(Rapidity);
+        hPartParamGhost[iParticle][ 4]->Fill(dL);
+        hPartParamGhost[iParticle][ 5]->Fill(cT);
+        hPartParamGhost[iParticle][ 6]->Fill(chi2/ndf);
+        hPartParamGhost[iParticle][ 7]->Fill(prob);
+        hPartParamGhost[iParticle][ 8]->Fill(Theta);
+        hPartParamGhost[iParticle][ 9]->Fill(Phi);
+        hPartParamGhost[iParticle][10]->Fill(Z);
+
+        hPartParam2DGhost[iParticle][0]->Fill(Rapidity,Pt,1);
+      }
+      else
+      {
+        hPartParamBG[iParticle][ 0]->Fill(M);
+        hPartParamBG[iParticle][ 1]->Fill(P);
+        hPartParamBG[iParticle][ 2]->Fill(Pt);
+        hPartParamBG[iParticle][ 3]->Fill(Rapidity);
+        hPartParamBG[iParticle][ 4]->Fill(dL);
+        hPartParamBG[iParticle][ 5]->Fill(cT);
+        hPartParamBG[iParticle][ 6]->Fill(chi2/ndf);
+        hPartParamBG[iParticle][ 7]->Fill(prob);
+        hPartParamBG[iParticle][ 8]->Fill(Theta);
+        hPartParamBG[iParticle][ 9]->Fill(Phi);
+        hPartParamBG[iParticle][10]->Fill(Z);
+
+        hPartParam2DBG[iParticle][0]->Fill(Rapidity,Pt,1);
+      }
       continue;
     }
-    hPartParamSignal[iParticle][0]->Fill(M);
-    hPartParamSignal[iParticle][1]->Fill(P);
-    hPartParamSignal[iParticle][2]->Fill(Pt);
-    hPartParamSignal[iParticle][3]->Fill(Rapidity);
-    hPartParamSignal[iParticle][4]->Fill(dL);
-    hPartParamSignal[iParticle][5]->Fill(cT);
-    hPartParamSignal[iParticle][6]->Fill(chi2/ndf);
-    hPartParamSignal[iParticle][7]->Fill(prob);
-    hPartParamSignal[iParticle][8]->Fill(Theta);
-    hPartParamSignal[iParticle][9]->Fill(Phi);
+    hPartParamSignal[iParticle][ 0]->Fill(M);
+    hPartParamSignal[iParticle][ 1]->Fill(P);
+    hPartParamSignal[iParticle][ 2]->Fill(Pt);
+    hPartParamSignal[iParticle][ 3]->Fill(Rapidity);
+    hPartParamSignal[iParticle][ 4]->Fill(dL);
+    hPartParamSignal[iParticle][ 5]->Fill(cT);
+    hPartParamSignal[iParticle][ 6]->Fill(chi2/ndf);
+    hPartParamSignal[iParticle][ 7]->Fill(prob);
+    hPartParamSignal[iParticle][ 8]->Fill(Theta);
+    hPartParamSignal[iParticle][ 9]->Fill(Phi);
     hPartParamSignal[iParticle][10]->Fill(Z);
 
     hPartParam2DSignal[iParticle][0]->Fill(Rapidity,Pt,1);
@@ -913,9 +908,11 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     for(int iD=0; iD<mcPart.NDaughters(); ++iD)
     {
       int mcDaughterId = mcPart.GetDaughterIds()[iD];
-      if(!MCtoRParticleId[mcDaughterId].IsMatchedWithPdg()) continue;
+//      if(!MCtoRParticleId[mcDaughterId].IsMatchedWithPdg()) continue;
+      if(!MCtoRParticleId[mcDaughterId].IsMatched()) continue;
       CbmMCTrack &mcTrack = *(static_cast<CbmMCTrack*>(flistMCTracks->At(mcDaughterId)));
-      int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatchWithPdg();
+//      int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatchWithPdg();
+      int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatch();
       CbmKFParticle Daughter = fPF->GetParticles()[recDaughterId];
       Daughter.GetMass(M,ErrM);
 
@@ -958,7 +955,9 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
       break;
     }
   }
-  CbmKFVertex vtx(*fPrimVtx);
+  CbmKFVertex vtx;
+  if(fPrimVtx)
+    vtx = CbmKFVertex(*fPrimVtx);
   float dRPVr[3] = {vtx.GetRefX()-mcPVx[0],
                     vtx.GetRefY()-mcPVx[1],
                     vtx.GetRefZ()-mcPVx[2]};
@@ -970,4 +969,42 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
   for(unsigned int iHPV=3; iHPV<6; ++iHPV)
     hPVFitQa[iHPV]->Fill(dRPVp[iHPV-3]);
 
+  //fill mother pdg histo
+  for(int i=0; i < flistMCTracks->GetEntriesFast(); i++)
+  {
+    CbmMCTrack &mtra = *(static_cast<CbmMCTrack*>(flistMCTracks->At(i)));
+    int motherId = mtra.GetMotherId();
+    int pdg = mtra.GetPdgCode();
+    int histoIndex = GetMotherPdgIndex(pdg);
+    if(histoIndex != -1)
+    {
+      if(motherId > -1)
+      {
+        CbmMCTrack &mother = *(static_cast<CbmMCTrack*>(flistMCTracks->At(mtra.GetMotherId())));
+        int motherPdg = mother.GetPdgCode();
+        hMotherPdg[histoIndex]->Fill(motherPdg);
+      }
+      else
+        hMotherPdg[histoIndex]->Fill(-1);
+    }
+  }
+
+  //fill histo with chi2_prim
+  {
+    vector<CbmStsTrack> vRTracks;
+    int nTracks = flistStsTracks->GetEntries();
+    vRTracks.resize(nTracks);
+    for(int iTr=0; iTr<nTracks; iTr++)
+      vRTracks[iTr] = *( (CbmStsTrack*) flistStsTracks->At(iTr));
+
+    CbmKFVertex kfVertex;
+    CbmL1PFFitter fitter;
+    fitter.Fit(vRTracks);
+
+    vector<float> ChiToPrimVtx;
+    fitter.GetChiToVertex(vRTracks,ChiToPrimVtx,kfVertex);
+
+    for(unsigned int i=0; i<vRTracks.size(); i++)
+      hTrackParameters[0]->Fill(ChiToPrimVtx[i]);
+  }
 } // void CbmKFParticlesFinderQA::ParticlesEfficienciesPerformance()

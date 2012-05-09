@@ -24,11 +24,15 @@
 #include "TStopwatch.h"
 #include <iostream>
 
+#include "CbmTrackMatch.h"
+#include "CbmMCTrack.h"
+
 ClassImp(CbmKFParticlesFinder)
 
-CbmKFParticlesFinder::CbmKFParticlesFinder(float cuts[2][3], const char *name, const char *title, Int_t iVerbose):
+CbmKFParticlesFinder::CbmKFParticlesFinder(float cuts[2][3], Bool_t useMCPID, const char *name, const char *title, Int_t iVerbose):
   FairTask(name,iVerbose),
   fCuts(),
+  fUseMCPID(useMCPID),
   flistStsTracks(0),
   fPrimVtx(0),
   fParticles()
@@ -64,6 +68,9 @@ InitStatus CbmKFParticlesFinder::ReInit()
 
   flistStsTracks = (TClonesArray *)  fManger->GetObject("StsTrack");
   fPrimVtx = (CbmVertex*) fManger->GetObject("PrimaryVertex");
+  //for the particle id
+  flistStsTracksMatch = dynamic_cast<TClonesArray*>(  fManger->GetObject("StsTrackMatch") );
+  flistMCTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("MCTrack") );
 
   return kSUCCESS;
 }
@@ -76,7 +83,10 @@ InitStatus CbmKFParticlesFinder::Init()
 void CbmKFParticlesFinder::Exec(Option_t * option)
 {
   if(!flistStsTracks) return;
-  if(!fPrimVtx) return;
+//   if(!fPrimVtx) return;
+
+  if(!flistStsTracksMatch) return;
+  if(!flistMCTracks) return;
 
   TStopwatch timerSelect;
 
@@ -88,10 +98,29 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   for(int iTr=0; iTr<nTracks; iTr++)
     vRTracks[iTr] = *( (CbmStsTrack*) flistStsTracks->At(iTr));
 
-//  CbmKFVertex kfVertex(*fPrimVtx);
   CbmKFVertex kfVertex;
+  if(fPrimVtx)
+    kfVertex = CbmKFVertex(*fPrimVtx);
 
-  CbmKFParticleInterface::FindParticles(vRTracks,fParticles, kfVertex, fCuts);
+  vector<int> vTrackPDG(vRTracks.size(), -1);
+  if(fUseMCPID)
+  {
+    for(int iTr=0; iTr<nTracks; iTr++)
+    {
+      CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)flistStsTracksMatch->At(iTr);
+      if(stsTrackMatch -> GetNofMCTracks() == 0) continue;
+      const int mcTrackId = stsTrackMatch->GetMCTrackId();
+      CbmMCTrack* mcTrack = (CbmMCTrack*)flistMCTracks->At(mcTrackId);
+      vTrackPDG[iTr] = mcTrack->GetPdgCode();
+    }
+  }
+/*
+  for(int iTr=0; iTr<nTracks; iTr++)
+  {
+    if(vRTracks[iTr].GetParamFirst()->GetQp()<0) vTrackPDG[iTr] *= -1;
+  }*/
+
+  CbmKFParticleInterface::FindParticles(vRTracks, fParticles, kfVertex, vTrackPDG, fCuts);
 
   timerSelect.Stop();
 
@@ -103,8 +132,15 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   timeSelectCPU += timerSelect.CpuTime();
   timeSelectReal += timerSelect.RealTime();
 
-  std::cout << " ---- Particle finder --- " << std::endl;
-  std::cout << "KF Particle Finder Times:" <<" Real - "<< timeSelectReal/NEv << "   CPU - "<< timeSelectCPU/NEv << std::endl << std::endl;
+  if(NEv%500==0)
+  {
+    std::cout.setf(ios::fixed);
+    std::cout.setf(ios::showpoint);
+    std::cout.precision(9);
+    std::cout << " ---- Particle finder --- " << std::endl;
+    std::cout << "KF Particle Finder Times:" <<" Real - "<< timeSelectReal/NEv 
+                                            << "   CPU - "<< timeSelectCPU/NEv << std::endl << std::endl;
+  }
 }
 
 void CbmKFParticlesFinder::Finish(){

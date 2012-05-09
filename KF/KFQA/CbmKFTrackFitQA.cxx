@@ -256,10 +256,10 @@ void CbmKFTrackFitQA::Exec(Option_t * option)
      CbmMCTrack* MCTrack = (CbmMCTrack*)listMCTracks->At(StsTrackMatch->GetMCTrackId());
      CbmKFTrack KFTrack(*StsTrack);
      FillHistoAtFirstPoint(&MCTrackSortedArray[StsTrackMatch->GetMCTrackId()], MCTrack, &KFTrack);
-     if(MCTrack->GetP() >= 1 && MCTrack->GetMotherId()==-1 && MCTrackSortedArray[StsTrackMatch->GetMCTrackId()].MvdArray.size()>1)
-     {
+//      if(MCTrack->GetP() >= 1 && MCTrack->GetMotherId()==-1 && MCTrackSortedArray[StsTrackMatch->GetMCTrackId()].MvdArray.size()>1)
+//      {
        FillHistoAtParticleVertex(MCTrack, &KFTrack);
-     }
+//      }
   }
   delete[] MCTrackSortedArray;
 }

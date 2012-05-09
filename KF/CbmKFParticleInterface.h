@@ -18,6 +18,7 @@ class CbmKFParticleInterface
 
   CbmKFParticleInterface();
   CbmKFParticleInterface(CbmKFTrackInterface* Track[]);
+  CbmKFParticleInterface(CbmKFParticle* part[], const int nPart = 0);
   ~CbmKFParticleInterface();
 
   CbmKFParticleInterface(const CbmKFParticleInterface& c);
@@ -112,14 +113,63 @@ class CbmKFParticleInterface
   ///             element cut[0][0] is used to select tracks, all other elements cut[*][0] are not used;
   /// cut[*][1] - chi2/ndf of the reconstructed particle;
   /// cut[*][2] - z coordinate of the reconstructed particle.
+  /// cut[*][3] - chi2/ndf of the reconstructed particle fitted to the PV;
+
   template<class T> 
     static void FindParticlesT(vector<T>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
-                               const float cuts[2][3]);
+                               const vector<int>& vTrackPDG, const float cuts[2][3]);
 
   static void FindParticles(vector<CbmL1Track>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
-                            const float cuts[2][3] = DefaultCuts);
+                            const vector<int>& vTrackPDG, const float cuts[2][3] = DefaultCuts);
   static void FindParticles(vector<CbmStsTrack>& vRTracks, vector<CbmKFParticle>& Particles, CbmKFVertex& PrimVtx,
-                            const float cuts[2][3] = DefaultCuts);
+                            const vector<int>& vTrackPDG, const float cuts[2][3] = DefaultCuts);
+
+  template<class T>
+    static void Find2DaughterDecay(vector<T>& vTracks,
+                                   const vector<L1FieldRegion>& vField,
+                                   vector<CbmKFParticle>& Particles,
+                                   const int DaughterNegPDG,
+                                   const int DaughterPosPDG,
+                                   const int MotherPDG,
+                                   vector<short>& idNeg,
+                                   vector<short>& idPos,
+                                   CbmKFVertex& PrimVtx,
+                                   const float* cuts = 0,
+                                   vector<float>* vMotherTopoChi2Ndf = 0,
+                                   const float* secCuts = 0,
+                                   const float massMotherPDG = 0,
+                                   const float massMotherPDGSigma = 0,
+                                   vector<CbmKFParticle>* vMotherPrim = 0,
+                                   vector<CbmKFParticle>* vMotherSec = 0);
+  template<class T>
+    static void Find2DaughterDecay(vector<T>& vTracks,
+                                   const vector<L1FieldRegion>& vField,
+                                   vector<CbmKFParticle>& Particles,
+                                   const int DaughterNegPDG,
+                                   const int DaughterPosPDG,
+                                   const int MotherPDG,
+                                   vector<short>& idNeg,
+                                   vector<short>& idPos,
+                                   CbmKFVertex& PrimVtx,
+                                   const float* cuts,
+                                   const float PtCut,
+                                   const float Chi2PrimCut = -100.f,
+                                   vector<float>* ChiToPrimVtx = 0,
+                                   const float* PCut = 0);
+  template<class T>
+  static void FindTrackV0Decay(const int MotherPDG,
+                               vector<CbmKFParticle>& Particles,
+                               vector<CbmKFParticle>& vV0,
+                               vector<T>& vTracks,
+                               const vector<L1FieldRegion>& field,
+                               const int DaughterPDG,
+                               vector<short>& idTrack,
+                               CbmKFVertex& PrimVtx,
+                               const float* cuts = 0,
+                               vector<float>* ChiToPrimVtx = 0,
+                               vector<CbmKFParticle>* vHyperon = 0,
+                               float hyperonPrimMass = 0,
+                               float hyperonPrimMassErr = 0);
 
   static void FindHyperons(int PDG,
                            CbmKFParticle_simd vDaughters[2],
@@ -129,6 +179,34 @@ class CbmKFParticleInterface
                            CbmKFVertex& PrimVtx,
                            const float *cuts = 0,
                            int startIndex=0);
+
+  template<class T>
+    static void FindDMesLambdac(vector<T>& vTracks,
+                                const vector<L1FieldRegion>& vField,
+                                vector<CbmKFParticle>& Particles,
+                                const int DaughterPDG[5], //pi, K_b, pi_b, K, p
+                                const int MotherPDG[8],
+                                vector<short>* idTrack[5], //pi, K_b, pi_b, K, p
+                                CbmKFVertex& PrimVtx,
+                                const float cuts[8][8],
+                                vector<float> ChiToPrimVtx);
+
+  template<class T>
+    static void CombineTrackPart(vector<T>& vTracks,
+                                 const vector<L1FieldRegion>& vField,
+                                 vector<CbmKFParticle>& Particles,
+                                 CbmKFParticle& part,
+                                 const int DaughterPDG,
+                                 const int MotherPDG,
+                                 vector<short>& id,
+                                 const float* cuts,
+                                 const unsigned short startIndex = 0,
+                                 const bool IsSamePart = 0);
+
+  static void SelectParticleCandidates(vector<CbmKFParticle>& Particles,
+                                       vector<CbmKFParticle>& vCandidates,
+                                       CbmKFVertex& PrimVtx,
+                                       const float cuts[5]);
 
   template<class T> 
     void ConstructPVT(vector<T>& vRTracks);

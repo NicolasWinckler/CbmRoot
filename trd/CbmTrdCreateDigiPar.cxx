@@ -2,25 +2,13 @@
 
 #include "CbmTrdPads.h"
 #include "CbmTrdModule.h"
+#include "CbmTrdGeoHandler.h"
 #include "CbmTrdDigiPar.h"
-#include "CbmDetectorList.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairBaseParSet.h"
-
-#include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMaterial.h"
-#include "TGeoNode.h"
-#include "TGeoMatrix.h"
-#include "TGeoBBox.h"
-#include "TMath.h"
-#include "TPRegexp.h"
-#if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
-#include "CbmTrdStringToken.h"
-#endif
 
 #include <iostream>
 using std::cout;
@@ -49,7 +37,7 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
    fModuleMap(), 
    fModuleMapIt(),
    fDigiPar(NULL),
-   fTrdDetId()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
   // Get the maximum number of sectors. All arrays will have
   // this number of entries.  
@@ -86,7 +74,7 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
    fModuleMap(), 
    fModuleMapIt(),
    fDigiPar(NULL),
-   fTrdDetId()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
   // Get the maximum number of sectors. All arrays will have
   // this number of entries.  
@@ -141,88 +129,325 @@ InitStatus CbmTrdCreateDigiPar::ReInit(){
 // ---- Init ----------------------------------------------------------
 InitStatus CbmTrdCreateDigiPar::Init(){
 
+  Int_t geoVersion = fGeoHandler->Init();
+
   cout<<" * CbmTrdCreateDigiPar * :: Init() "<<endl;
 
   FairRootManager *ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
   
-  FillModuleMap();
+
+  if (kNewMonolithic == geoVersion) {
+    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+  }
+  if (kQuasiMonolithic == geoVersion) {
+    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+  }
+  if (kSegmentedRectangular == geoVersion) {
+    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+  }
+  if (kSegmentedSquaredOneKeepingVolume == geoVersion) {
+    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+  }
+  if (kSegmentedSquared == geoVersion) {
+    FillModuleMapSegmentedSquared();
+  }
 
   return kSUCCESS;
 }
 // --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FinishTask(){
 
+  cout<<" * CbmTrdCreateDigiPar * :: FinishTask() "<<endl;
+
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+
+  fDigiPar = (CbmTrdDigiPar*)
+             (rtdb->getContainer("CbmTrdDigiPar"));
+
+  fDigiPar->print();
+}
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdCreateDigiPar::Exec(Option_t * option){
-
+void CbmTrdCreateDigiPar::Exec(Option_t * option)
+{
 }
+
 // --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
+ 
+  // The geometry structure is treelike with cave as
+  // the top node. For the TRD there are keeping volumes
+  // trd1-trd4 for each station which are only containers 
+  // for the different layers of one station. The trdlayer
+  // is again only a container for all volumes of this layer.   
+  // Loop over all nodes below the top node (cave). If one of
+  // the nodes containes a string trd it must be one of the
+  // stations. Now loop over the layers of this station and 
+  // then over all modules of the layer to extract in the end
+  // all active regions (gas) of the complete TRD. For each
+  // of the gas volumes get the information about size and
+  // position from the geomanager and the sizes of the sectors
+  // and pads from the definitions in CbmTrdPads. This info
+  // is then stored in a TrdModule object for each of the
+  // TRD modules.
+
+  Int_t nmodules = 0;
+  TString TopNode = gGeoManager->GetTopNode()->GetName();
+  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+    TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+    if (TString(node->GetName()).Contains("trd")) {
+      TString StationNode = node->GetName();
+      TGeoNode* station = node;
+	TObjArray* modules = station->GetNodes();
+	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
+          TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
+          TString ModuleNode = module->GetName();
+          TObjArray* parts = module->GetNodes();
+	  for (Int_t iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
+            TGeoNode* part = (TGeoNode*) parts->At(iPart);
+            if (TString(part->GetName()).Contains("gas")) {
+              TString PartNode = part->GetName();
+
+              // Put together the full path to the interesting volume, which
+	      // is needed to navigate with the geomanager to this volume.
+              // Extract the geometry information (size, global position)
+              // from this volume.;
+
+              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
+                                 ModuleNode + "/" + PartNode;
 
 
-void CbmTrdCreateDigiPar::GetModuleInformation(){
+              fModuleID = fGeoHandler->GetUniqueDetectorId(FullPath);	      
 
-  // Extract the information about station, layer, module type
-  // and cpoy number of the module from the full path to the
-  // node.
-  // The full path is tokenized at the "/" which diide the different
-  // levels of the geometry.
-  // Knowing the nameing scheme of the volumes one gets the required
-  // information with simple string manipulation.
-  // This is probably not the fastest way, but the speed has to be checked.
-  // The methode works only for versions of Root > 5.20.0, before the
-  // class TStringTocken is not implemented
+	      fStation = fGeoHandler->GetStation(fModuleID);
+	      fLayer = fGeoHandler->GetLayer(fModuleID);
+	      fModuleType = fGeoHandler->GetModuleType(fModuleID);
+	      fModuleCopy = fGeoHandler->GetModuleCopyNr(fModuleID);
+	    
+              Float_t sizex = fGeoHandler->GetSizeX(FullPath);
+              Float_t sizey = fGeoHandler->GetSizeY(FullPath);
+              Float_t sizez = fGeoHandler->GetSizeZ(FullPath);
 
-  TString path = gGeoManager->GetPath();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,20,0)
-  TStringToken* bla = new TStringToken(path,"/");
-#else
-  CbmTrdStringToken* bla = new CbmTrdStringToken(path,"/");
-#endif
-  
-  //put here as an example the full path string and the substrings
+              Float_t x = fGeoHandler->GetX(FullPath);
+              Float_t y = fGeoHandler->GetY(FullPath);
+              Float_t z = fGeoHandler->GetZ(FullPath);
 
-  while (bla->NextToken()) {
-    if (bla->Contains("mod")) {
-      TString bla3 = (TString) *bla;
-      Ssiz_t pos = bla3.Last('_');
-      Ssiz_t substringLength=bla3.Length()-pos-1;
-      TString bla2 = bla3((bla3.Last('_')+1),substringLength);
-      TString bla1 = bla3(3,1);
-      fStation=bla1.Atoi();
-// no layers in Jul10  
-      //      fLayer=bla2.Atoi();
+              // Get Information about the padstructure for a
+              // given trd module defined by the station and
+              // layer numbers, the module type and the copy
+              // number
+              FillPadInfoSegmentedSquared();
+
+              //Orientation of the detector layers
+              //Layer 1 and 3 have resolution in x-direction (Orientation=1)
+              //Layer 2 and 4 have resolution in y-direction (Orientation=0)
+              Int_t Orientation=fLayer%2;
+              if( 0 == Orientation) {  // flip pads for even layers
+		Double_t copybuf;
+                for ( Int_t i=0; i<fMaxSectors; i++) {
+		  copybuf = fpadsizex.At(i);
+		  fpadsizex.AddAt(fpadsizey.At(i),i);
+		  fpadsizey.AddAt(copybuf,i);
+		  copybuf = fSectorSizex.At(i);
+		  fSectorSizex.AddAt(fSectorSizey.At(i),i);
+		  fSectorSizey.AddAt(copybuf,i);
+                }
+              }
+              nmodules++;
+
+              // Create new CbmTrdModule and add it to the map
+	      fModuleMap[fModuleID] = 
+                new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, sizez,
+				 fMaxSectors, fSectorSizex, fSectorSizey, 
+				 fpadsizex, fpadsizey);
+	    }
+	  }
+      }
     }
-    if (bla->Contains("mod")){
-      TString bla3 = (TString) *bla;
-      Ssiz_t pos = bla3.Last('_');
-      Ssiz_t substringLength=bla3.Length()-pos-1;
-      TString bla2 = bla3(pos+1,substringLength);
-      substringLength=pos-7;
-      TString bla1 = bla3(7,substringLength);     
-
-      fModuleType = bla1.Atoi();
-      fModuleCopy = bla2.Atoi();
-      fLayer = fModuleCopy / 1000;
-      fModuleCopy = fModuleCopy % 1000;
-      break; // Don't know why this is here
-    } 
   }
+
+
+  Int_t Nrmodules = (Int_t)fModuleMap.size();
+  cout <<"Nr. of modules: "<<Nrmodules<<endl;
+
+  fDigiPar->SetNrOfModules(Nrmodules);
+  fDigiPar->SetMaxSectors(fMaxSectors);
+
+  TArrayI *ModuleId  = new TArrayI(Nrmodules);
+  
+  Int_t iDigi=0; 
+  for ( fModuleMapIt=fModuleMap.begin() ; fModuleMapIt != fModuleMap.end(); fModuleMapIt++ ){
+    ModuleId->AddAt(fModuleMapIt->second->GetDetectorId(),iDigi);
+    iDigi++;
+  }  
+
+  fDigiPar->SetModuleIdArray(*ModuleId);
+  fDigiPar->SetModuleMap(fModuleMap);
+
+}
+// --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FillPadInfoSegmentedSquared(){
+  
+  // Reset the Array in case we have different sector sizes for
+  // different detector modules
+
+  for (Int_t i=0; i < fMaxSectors; i++ ) {
+    fSectorSizex.AddAt(0.,i);
+    fSectorSizey.AddAt(0.,i);
+    fpadsizex.AddAt(   0.,i);
+    fpadsizey.AddAt(   0.,i);
+  }
+
+  Int_t moduleType;
+
+  //-----------------------------------------------------------------------
+  // station 1
+  // v12x:  8 + X + X +16 + X + X +26 +  X +  X  -- number of detector sizes
+  // v12x:  4 + 4 + 0 + 4 + 8 + 4 +12 + 14 +  0  -- number of pad plane types
+  // v12x:  4   8   8  12  20  24  36   50   50  -- sum of modules for this station
+  //
+  // v11x:  8 + X +16 + X +26 +  X   -- number of detector sizes
+  // v11x:  8 + 0 +12 + 4 + 6 + 20   -- number of pad plane types
+  // v11x:  8   8  20  24  30   50   -- sum of modules for this station
+
+  if (fStation==1) {
+
+    if (fModuleType==1) 
+    {
+      if (fModuleCopy <= 4) 
+      {
+	moduleType=0;
+      } else if (fModuleCopy <= 8) 
+      {
+	moduleType=1;
+      } else
+      {
+	moduleType=2;
+      }
+    }
+    
+    if (fModuleType==2) 
+    {
+      if (fModuleCopy <= 4) 
+      {
+	moduleType=3;
+      } else if (fModuleCopy <= 12) 
+      {
+	moduleType=4;
+      } else
+      {
+	moduleType=5;
+      }
+    }
+    
+    if (fModuleType==3) 
+    {
+      if (fModuleCopy <= 12) 
+      {
+	moduleType=6;
+      } else if (fModuleCopy <= 26) 
+      {
+	moduleType=7;
+      } else
+      {
+	moduleType=8;
+      }
+    }
+
+    for (Int_t i=0; i < fst1_sect_count; i++ ) {
+      fSectorSizex.AddAt(fst1_pad_type[moduleType][i][0],i);
+      fSectorSizey.AddAt(fst1_pad_type[moduleType][i][1],i);
+      fpadsizex.AddAt(   fst1_pad_type[moduleType][i][2],i);
+      fpadsizey.AddAt(   fst1_pad_type[moduleType][i][3],i);
+    }
+  }
+
+  //-------------------------------------------------------------------------
+  // station 2
+  // v12x:  8 + X +16 + X +54 + X   -- number of detector sizes
+  // v12x:  4 + 4 +12 + 4 +12 +42   -- number of pad plane types
+  // v12x:  4   8  20  24  36  78   -- sum of modules for this station
+  //
+  // v11x:  8 + X +16 + X +54 + X   -- number of detector sizes
+  // v11x:  4 + 4 +12 + 4 +54 + X   -- number of pad plane types
+  // v11x:  4   8  20  24  78   X   -- sum of modules for this station
+   
+  if (fStation==2) {
+
+    if (fModuleType==1) {
+      if (fModuleCopy <= 4) {
+	moduleType=0;
+      } else {
+	moduleType=1;
+      }
+    }
+
+    if (fModuleType==2) {
+      if (fModuleCopy <= 12) {
+	moduleType=2;
+      } else {
+	moduleType=3;
+      }
+    }
+
+    if (fModuleType==3) {
+      if (fModuleCopy <= 12) {
+ 	moduleType=4;
+      } else {
+	moduleType=5;
+      }
+    }
+
+    for (Int_t i=0; i < fst2_sect_count; i++ ) {
+      fSectorSizex.AddAt(fst2_pad_type[moduleType][i][0],i);
+      fSectorSizey.AddAt(fst2_pad_type[moduleType][i][1],i);
+      fpadsizex.AddAt(   fst2_pad_type[moduleType][i][2],i);
+      fpadsizey.AddAt(   fst2_pad_type[moduleType][i][3],i);
+    }
+  }
+  //------------------------------------------------------------------------
+  // station 3
+  // v12x:  98 +  X +  X +  X   -- number of detector sizes
+  // v12x:   8 + 12 + 24 + 54   -- number of pad plane types
+  // v12x:   8   20   44   98   -- sum of modules for this station
+  //
+  // v11x:  98 +  X   -- number of detector sizes
+  // v11x:   8 + 90   -- number of pad plane types
+  // v11x:   8   98   -- sum of modules for this station
+  
+  if (fStation==3) {
+    if (fModuleType==3)
+    {
+      if (fModuleCopy <= 8) 
+      {
+	moduleType=0;
+      } else if (fModuleCopy <= 20) 
+      {
+	moduleType=1;
+      } else if (fModuleCopy <= 44) 
+      {
+	moduleType=2;
+      } else
+      {
+	moduleType=3;
+      }
+    }
+
+    for (Int_t i=0; i < fst3_sect_count; i++ ) {
+      fSectorSizex.AddAt(fst3_pad_type[moduleType][i][0],i);
+      fSectorSizey.AddAt(fst3_pad_type[moduleType][i][1],i);
+      fpadsizex.AddAt(   fst3_pad_type[moduleType][i][2],i);
+      fpadsizey.AddAt(   fst3_pad_type[moduleType][i][3],i);
+    }
+  }
+  //-------------------------------------------------------------------------
 }
 
 // --------------------------------------------------------------------
-
-void CbmTrdCreateDigiPar::CalculateModuleId(){
-
-  Int_t detInfo_array[6]={kTRD, fStation, fLayer, fModuleType, 
-                          fModuleCopy, 0};      
-  fModuleID = fTrdDetId.SetDetectorInfo(detInfo_array);
-
-}
-
-// --------------------------------------------------------------------
-
-void CbmTrdCreateDigiPar::FillModuleMap(){
+void CbmTrdCreateDigiPar::FillModuleMapSegmentedRectangular(){
  
   // The geometry structure is treelike with cave as
   // the top node. For the TRD there are keeping volumes
@@ -249,14 +474,13 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
       TString StationNode = node->GetName();
       TGeoNode* station = node;
 
-// no layers in Jul10  
 //      TObjArray* layers = station->GetNodes();
 //      for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
 //        TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
 //        TString LayerNode = layer->GetName();
 //	TObjArray* modules = layer->GetNodes();
 
-	TObjArray* modules = station->GetNodes();
+ 	TObjArray* modules = station->GetNodes();
 	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
           TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
           TString ModuleNode = module->GetName();
@@ -276,34 +500,27 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 
               TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
                                  ModuleNode + "/" + PartNode;
-              gGeoManager->cd(FullPath.Data());
 
-              TGeoVolume *curvol = gGeoManager->GetCurrentVolume();
-              TGeoBBox *shape = (TGeoBBox*)curvol->GetShape(); 
-              Float_t sizex = shape->GetDX();
-              Float_t sizey = shape->GetDY();
-              Float_t sizez = shape->GetDZ();
+              fModuleID = fGeoHandler->GetUniqueDetectorId(FullPath);	      
 
-              // Fill fStation, fLayer, fModuleType
-	      // and fModuleCopy                   
-	      GetModuleInformation(); 
-                                      
-              // Calculate unique id for each module
-              CalculateModuleId(); 
+	      fStation = fGeoHandler->GetStation(fModuleID);
+	      fLayer = fGeoHandler->GetLayer(fModuleID);
+	      fModuleType = fGeoHandler->GetModuleType(fModuleID);
+	      fModuleCopy = fGeoHandler->GetModuleCopyNr(fModuleID);
+	    
+              Float_t sizex = fGeoHandler->GetSizeX(FullPath);
+              Float_t sizey = fGeoHandler->GetSizeY(FullPath);
+              Float_t sizez = fGeoHandler->GetSizeZ(FullPath);
 
-	      Double_t local[3] = {0., 0., 0.};  // Local centre of volume
-              Double_t global[3];                // Global centre of volume
-              gGeoManager->LocalToMaster(local, global);
-              TGeoHMatrix *matrix = gGeoManager->GetCurrentMatrix(); 
-              Double_t x = global[0];
-              Double_t y = global[1];
-              Double_t z = global[2]; 
+              Float_t x = fGeoHandler->GetX(FullPath);
+              Float_t y = fGeoHandler->GetY(FullPath);
+              Float_t z = fGeoHandler->GetZ(FullPath);
 
               // Get Information about the padstructure for a
               // given trd module defined by the station and
               // layer numbers, the module type and the copy
               // number
-              FillPadInfo();
+              FillPadInfoSegmentedRectangular();
 
               //Orientation of the detector layers
               //Layer 1 and 3 have resolution in x-direction (Orientation=1)
@@ -356,21 +573,8 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
   fDigiPar->SetModuleMap(fModuleMap);
 
 }
-
-void CbmTrdCreateDigiPar::FinishTask(){
-
-  cout<<" * CbmTrdCreateDigiPar * :: FinishTask() "<<endl;
-
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-  fDigiPar = (CbmTrdDigiPar*)
-             (rtdb->getContainer("CbmTrdDigiPar"));
-
-  fDigiPar->print();
-}
-
-void CbmTrdCreateDigiPar::FillPadInfo(){
+// --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FillPadInfoSegmentedRectangular(){
   
   // Reset the Array in case we have different sector sizes for
   // different detector modules

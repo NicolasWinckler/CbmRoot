@@ -8,24 +8,15 @@
 #ifndef CBMTRDCREATEDIGIPAR_H
 #define CBMTRDCREATEDIGIPAR_H
 
-#include "CbmTrdDetectorId.h"
-
 #include "FairTask.h"
 
 #include "TArrayD.h"
 
 #include <map>
-#include <list>
-//#include <utility>
-
-
-class TClonesArray;
-class TArrayI;
 
 class CbmTrdDigiPar;
-class CbmTrdDigi;
 class CbmTrdModule;
-class CbmTrdDigiPar;
+class CbmTrdGeoHandler;
 
 class CbmTrdCreateDigiPar : public FairTask {
 
@@ -57,11 +48,11 @@ class CbmTrdCreateDigiPar : public FairTask {
 
 private:
 
-    void GetModuleInformation();
-    void CalculateModuleId();
+    void FillModuleMapSegmentedSquared();
+    void FillPadInfoSegmentedSquared();
 
-    void FillModuleMap();
-    void FillPadInfo();
+    void FillModuleMapSegmentedRectangular();
+    void FillPadInfoSegmentedRectangular();
 
     Int_t fStation;    //station number
     Int_t fLayer;      //layer number
@@ -89,14 +80,14 @@ private:
     std::map<Int_t, CbmTrdModule*> fModuleMap;                  //!   
     std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;      //!   
 
-    CbmTrdDigiPar *fDigiPar;    // pointer to digi parameters
+    CbmTrdDigiPar *fDigiPar;    //! pointer to digi parameters
 
-    CbmTrdDetectorId fTrdDetId; // detector ID
+    CbmTrdGeoHandler* fGeoHandler;
 
     CbmTrdCreateDigiPar(const CbmTrdCreateDigiPar&);
     CbmTrdCreateDigiPar& operator=(const CbmTrdCreateDigiPar&);
 
-    ClassDef(CbmTrdCreateDigiPar,3)
+    ClassDef(CbmTrdCreateDigiPar,4)
 
     };
 #endif //CBMTRDCREATEDIGIPAR_H

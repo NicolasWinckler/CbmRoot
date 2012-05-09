@@ -167,14 +167,17 @@ class TrdGeoHandlerParamTest2 : public _TestTrdGeoHandlerBase<
     geomToTest = p.name;
     result = p.result;
     for (Int_t i=0; i< p.stationIdLength; i++) {
-      expStationMap.insert(std::pair<Int_t, Int_t> 
-			   (p.stationId[i], p.stationIdVal[i]));
+      if ( 0 != p.stationId[i] ) {
+	expStationMap.insert(std::pair<Int_t, Int_t> 
+			     (p.stationId[i], p.stationIdVal[i]));
+      }
     }
 
     for (Int_t i=0; i< p.moduleIdLength; i++) {
-      if ( 0 != p.moduleId[i] )
-      expModuleMap.insert(std::pair<Int_t, Int_t>
-			  (p.moduleId[i], p.moduleIdVal[i]));
+      if ( 0 != p.moduleId[i] ) {
+	expModuleMap.insert(std::pair<Int_t, Int_t>
+			    (p.moduleId[i], p.moduleIdVal[i]));
+      }
     }
 
     CreateFileName(geomToTest);
@@ -237,7 +240,16 @@ ParamStructure2 val4= {"squared_segmented", 4, stationIdLength,
 		       stationId4, stationIdVal4, 
 		       moduleIdLength, moduleId4, moduleIdVal4};
 
+Int_t stationId5[3]={218, 0, 0};
+Int_t stationIdVal5[3]={1, 0, 0};
+Int_t moduleId5[9]={219, 227, 235, 243, 275, 267, 251, 259, 0};
+Int_t moduleIdVal5[9]={1, 2, 3, 4, 5, 6, 7, 8, 0};
+ParamStructure2 val5= {"one_keeping_volume", 5, stationIdLength, 
+		       stationId5, stationIdVal5, 
+		       moduleIdLength, moduleId5, moduleIdVal5};
+
+
 INSTANTIATE_TEST_CASE_P(TestAllGeometries,
                         TrdGeoHandlerParamTest2,
-			::testing::Values(val1, val2, val3, val4));		
+			::testing::Values(val1, val2, val3, val4, val5));		
 

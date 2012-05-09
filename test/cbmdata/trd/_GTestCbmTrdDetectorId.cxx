@@ -120,12 +120,15 @@ InOutStructure val7 = {0, 0, 0, 0, 0, 1, 33554432};
 InOutStructure val8 = {kTRD, 1, 1, 1, 1, 1, 33690149};
 InOutStructure val9 = {kTRD, 3, 3, 2, 34, 3, 105129573};
 InOutStructure val10 = {kTRD, 2, 3, 3, 17, 2, 69350981};
+InOutStructure val11 = {0, 0, 0, 8, 0, 0, 32768};
+InOutStructure val12 = {kTRD, 2, 3, 5, 17, 2, 69359173};
 
 
 INSTANTIATE_TEST_CASE_P(TestAllParameters,
                         CbmTrdDetectorIdParamTest,
 			::testing::Values(val1, val2, val3, val4, val5,
-					  val6, val7, val8, val9, val10));
+					  val6, val7, val8, val9, val10,
+					  val11, val12));
 
 // This is the derived class for the parameterized test cases.
 class CbmTrdDetectorIdParamTest1 : public _TestCbmTrdDetectorIdBase<
@@ -161,5 +164,6 @@ TEST_P(CbmTrdDetectorIdParamTest1, checkExtractInfoFromUniqueId)
 INSTANTIATE_TEST_CASE_P(TestAllParameters,
                         CbmTrdDetectorIdParamTest1,
 			::testing::Values(val1, val2, val3, val4, val5,
-					  val6, val7, val8, val9, val10));
+					  val6, val7, val8, val9, val10,
+					  val11, val12));
 

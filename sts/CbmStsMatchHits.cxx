@@ -518,7 +518,6 @@ void CbmStsMatchHits::SetParContainers() {
   fPassGeo = (CbmGeoPassivePar*) db->getContainer("CbmGeoPassivePar");
   fGeoPar  = (CbmGeoStsPar*)  db->getContainer("CbmGeoStsPar");
   fDigiPar = (CbmStsDigiPar*) db->getContainer("CbmStsDigiPar");
-
 }
 // -------------------------------------------------------------------------
 
@@ -564,7 +563,9 @@ InitStatus CbmStsMatchHits::Init() {
   }
 
   // Build digitisation scheme
+
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {
+
     if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
     else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
     cout << "-I- " << fName << "::Init: "
@@ -605,7 +606,7 @@ InitStatus CbmStsMatchHits::ReInit() {
 
 // -----   Private method GetGeometry   ------------------------------------
 InitStatus CbmStsMatchHits::GetGeometry() {
-
+cout << "-W- " << endl;
   // Get target geometry
   if ( ! fPassGeo ) {
     cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
@@ -654,7 +655,7 @@ InitStatus CbmStsMatchHits::GetGeometry() {
 
   TString geoNodeName;
   fNStations = 0;
-  TString stationNames[100];
+  TString stationNames[1000];
   for ( Int_t ist = 0 ; ist < tempNofStations ; ist++ ) {
     FairGeoNode* stsNode = (FairGeoNode*)stsNodes->At(ist);
     if ( ! stsNode ) {

@@ -245,6 +245,7 @@ InitStatus CbmStsFindHits::Init() {
   MakeSets();
 
   // Control output
+
   if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
   else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
   cout << "-I- " << fName << "::Init: "

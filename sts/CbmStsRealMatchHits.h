@@ -107,7 +107,7 @@ class CbmStsRealMatchHits : public FairTask
   CbmGeoPassivePar* fPassGeo;             // Passive geometry parameters
   TVector3 fTargetPos;                    // Target centre position
   Int_t fNStations;                       // Number of STS stations
-  Int_t fStationNrFromMcId[1000];         // station number from mc id
+  Int_t fStationNrFromMcId[10000];         // station number from mc id
 
   Bool_t fRealistic;
 

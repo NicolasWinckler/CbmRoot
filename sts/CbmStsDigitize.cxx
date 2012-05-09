@@ -228,7 +228,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
   // Reset all eventwise counters
   fTimer.Start();
   Reset();
-  TF1* digiGausDist = new TF1("digiGausDist","gaus",-5.,5.);
+//   TF1* digiGausDist = new TF1("digiGausDist","gaus",-5.,5.);
 
   // Verbose screen output
   if ( fVerbose > 2 ) {
@@ -291,10 +291,10 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
 // 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
 // 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
-// 	fStripSignalF[--iChannel] = 0.;
-// 	fStripSignalB[  iChannel] = 0.;
-	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
-	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
+ 	fStripSignalF[--iChannel] = 0.;
+ 	fStripSignalB[  iChannel] = 0.;
+// 	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
+// 	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
       }
       
       for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {

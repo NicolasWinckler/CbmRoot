@@ -94,7 +94,7 @@ class CbmStsSimulationQa : public FairTask
   TVector3 fTargetPos;                    // Target centre position
   Int_t fNStations;                       // Number of STS stations
   Int_t fStationsMCId[10];                // MC ID of the STS stations
-  Int_t fStationNrFromMcId[1000];         // station number from mc id
+  Int_t fStationNrFromMcId[10000];         // station number from mc id
   Float_t fStationRadius[10];
   Int_t fNSectors[10];                    // Number of STS sectors per station
 

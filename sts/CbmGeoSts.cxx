@@ -22,7 +22,7 @@ CbmGeoSts::CbmGeoSts() {
   // Constructor
   fName="sts";
   maxSectors=0;
-  maxModules=99;
+  maxModules=200;
 }
 
 const char* CbmGeoSts::getModuleName(Int_t m) {

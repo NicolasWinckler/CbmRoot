@@ -34,7 +34,7 @@ using std::pair;
 // -----   Constructor   ---------------------------------------------------
 CbmStsDigiScheme::CbmStsDigiScheme() 
   : 
-  fStations(new TObjArray(10)),
+  fStations(new TObjArray(100)),
   fNSectors(0),
   fNSensors(0),
   fNChannels(0),
@@ -42,7 +42,7 @@ CbmStsDigiScheme::CbmStsDigiScheme()
   fDetIdByName(),
   fSensorByName()
 {
-  fStations = new TObjArray(10);
+  fStations = new TObjArray(100);
   fNSectors = fNSensors = fNChannels = 0;
 }
 // -------------------------------------------------------------------------
@@ -127,8 +127,10 @@ Bool_t CbmStsDigiScheme::Init(CbmGeoStsPar*  geoPar,
 	if ( sensorByIndex ) geoSensor = (FairGeoNode*) (sensNodes->At(sensorByIndex++));
 	else {
 	  Int_t nofNodes = sensNodes->GetEntries();
+
 	  TString tempLookName = Form("stsstation%02isensor1#1",statNr);
 	  for (Int_t it=0; it<nofNodes; it++) {
+
 	    geoSensor = (FairGeoNode*) (sensNodes->At(it));
 	    TString tempNodeName = geoSensor->getName();
 	    if ( tempNodeName.Contains(tempLookName.Data()) ) {
@@ -137,10 +139,10 @@ Bool_t CbmStsDigiScheme::Init(CbmGeoStsPar*  geoPar,
 	    }
 	  }
 	}
+// cout <<"111"<<geoSensor->GetName()<<endl;
 	fDetIdByName.insert(pair<TString, Int_t> (geoSensor->GetName(), detId));
-
 	sensorPar = (CbmStsSensorDigiPar*) sectorPar->GetSensor(iSensor);
-
+// cout <<"222"<<endl;
 	Int_t    sensorType   = sensorPar->GetType();
 	Double_t sensorX      = sensorPar->GetX0();
 	Double_t sensorY      = sensorPar->GetY0();

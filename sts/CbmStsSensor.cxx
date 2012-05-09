@@ -617,7 +617,7 @@ Int_t CbmStsSensor::GetFrontChannel(Double_t x, Double_t y, Double_t z) {
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
   
   Double_t xf = xint + fFrontStripShift + yint * TMath::Tan(fStereoF);
-  xf = xf - TMath::Floor(xf/fLx) * fLx;
+ xf = xf - TMath::Floor(xf/fLx) * fLx;
   
   iChan = (Int_t)(xf/fDx);
  
@@ -648,12 +648,12 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
   if (fStereoB*180/TMath::Pi()>80) {
     Double_t xp = yint;
-    xp = xp - TMath::Floor(xp/fLy) * fLy;
+   xp = xp - TMath::Floor(xp/fLy) * fLy;
     iChan = (Int_t)(xp/fDy);
   }
   else {
     Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
-    xp = xp - TMath::Floor(xp/fLx) * fLx;
+   xp = xp - TMath::Floor(xp/fLx) * fLx;
     iChan = (Int_t)(xp/fDx);
   }
   

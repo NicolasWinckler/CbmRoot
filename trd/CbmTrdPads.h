@@ -31,6 +31,12 @@
 #ifndef CBMTRDPADS_H
 #define CBMTRDPADS_H
 
+#include <map>
+#include <vector>
+using std::vector;
+using std::map;
+using std::pair;
+
 // v2.1
   Int_t fst1_sect_count = 3;
   Float_t fst1_pad_type[9][3][4] =   // array of pad sizes in station 1
@@ -141,6 +147,102 @@
         { 96., 32., .75, 16.0 } } };
         // 12.0 cm2
         //  2 x 160 mm +  2 x 160 mm +  2 x 160 mm,  128 *  6 =  768 pads
+
+typedef map<Int_t, vector<Int_t> > VectorMap;
+typedef map<Int_t, VectorMap > MapOfVectorMap;
+
+MapOfVectorMap GetModuleInfoMap()
+{
+
+  vector<Int_t> moduleType1Station1;
+  for( Int_t i=0; i<4; i++) {
+    moduleType1Station1.push_back(0);
+  }
+  for( Int_t i=0; i<4; i++) {
+    moduleType1Station1.push_back(1);
+  }
+
+  vector<Int_t> moduleType2Station1;
+  for( Int_t i=0; i<4; i++) {
+    moduleType2Station1.push_back(3);
+  }
+  for( Int_t i=0; i<8; i++) {
+    moduleType2Station1.push_back(4);
+  }
+  for( Int_t i=0; i<4; i++) {
+    moduleType2Station1.push_back(5);
+  }
+ 
+  vector<Int_t> moduleType3Station1;
+  for( Int_t i=0; i<12; i++) {
+    moduleType3Station1.push_back(6);
+  }
+  for( Int_t i=0; i<14; i++) {
+    moduleType3Station1.push_back(7);
+  }
+
+  //  map<Int_t, vector<Int_t> > moduleTypeMapStation1;
+  VectorMap moduleTypeMapStation1;
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(1, moduleType1Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(2, moduleType2Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(3, moduleType3Station1));
+
+  vector<Int_t> moduleType1Station2;
+  for( Int_t i=0; i<4; i++) {
+    moduleType1Station2.push_back(0);
+  }
+  for( Int_t i=0; i<4; i++) {
+    moduleType1Station2.push_back(1);
+  }
+
+  vector<Int_t> moduleType2Station2;
+  for( Int_t i=0; i<12; i++) {
+    moduleType2Station2.push_back(2);
+  }
+  for( Int_t i=0; i<4; i++) {
+    moduleType2Station2.push_back(3);
+  }
+
+  vector<Int_t> moduleType3Station2;
+  for( Int_t i=0; i<12; i++) {
+    moduleType3Station2.push_back(4);
+  }
+  for( Int_t i=0; i<42; i++) {
+    moduleType3Station2.push_back(5);
+  }
+
+  //  map<Int_t, vector<Int_t> > moduleTypeMapStation2;
+  VectorMap moduleTypeMapStation2;
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(1, moduleType1Station2));
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(2, moduleType2Station2));
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(3, moduleType3Station2));
+  
+  vector<Int_t> moduleType3Station3;
+  for( Int_t i=0; i<8; i++) {
+    moduleType3Station3.push_back(0);
+  }
+  for( Int_t i=0; i<12; i++) {
+    moduleType3Station3.push_back(1);
+  }
+  for( Int_t i=0; i<24; i++) {
+    moduleType3Station3.push_back(2);
+  }
+  for( Int_t i=0; i<54; i++) {
+    moduleType3Station3.push_back(3);
+  }
+
+  VectorMap moduleTypeMapStation3;
+  //  map<Int_t, vector<Int_t> > moduleTypeMapStation3;
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(3, moduleType3Station3));
+
+  map<Int_t, VectorMap > moduleTypeStationMap;
+
+  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(1, moduleTypeMapStation1) );
+  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(2, moduleTypeMapStation2));
+  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(3, moduleTypeMapStation3));
+
+  return moduleTypeStationMap;
+}
 
 #endif
 

@@ -52,8 +52,6 @@ private:
     void CorrectOrientationOfPadPlane();
     void FillDigiPar();
 
-    void FillModuleMapSegmentedOneKeepingVolume();
-
     void FillModuleMapSegmentedSquared();
     void FillPadInfoSegmentedSquared();
 
@@ -96,6 +94,10 @@ private:
     CbmTrdDigiPar *fDigiPar;    //! pointer to digi parameters
 
     CbmTrdGeoHandler* fGeoHandler;
+  
+    std::map<Int_t, std::map<Int_t, std::vector<Int_t> > > fModInfoMap;
+    std::map<Int_t, std::vector<Int_t> >  fModTypeMap;
+    std::vector<Int_t> fModuleTypeVector;
 
     CbmTrdCreateDigiPar(const CbmTrdCreateDigiPar&);
     CbmTrdCreateDigiPar& operator=(const CbmTrdCreateDigiPar&);

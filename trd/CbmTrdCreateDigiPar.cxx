@@ -1,6 +1,6 @@
 #include "CbmTrdCreateDigiPar.h"
 
-//#include "CbmTrdPads.h"
+#include "CbmTrdPads.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdGeoHandler.h"
 #include "CbmTrdDigiPar.h"
@@ -13,8 +13,6 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-
-#include "CbmTrdPads.h"
 
 // ---- Default constructor -------------------------------------------
 CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()

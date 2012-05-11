@@ -90,7 +90,9 @@ class CbmKFParticleInterface
   void MeasureMass(CbmKFParticle_simd*  Particle, fvec r0[], fvec Mass );
   void MeasureProductionVertex(CbmKFParticle_simd*  Particle, fvec r0[], CbmKFVertexInterface *Parent);
   void Convert(CbmKFParticle_simd*  Particle, fvec r0[], bool ToProduction );
-  void multQSQt( int N, const fvec Q[], const fvec S[], fvec S_out[] );
+  void multQSQt( const fvec Q[], fvec S[] );
+
+  void multQSQt1( const fvec J[8][8], fvec S[] );
 
   void GetKFVertex( CbmKFVertex *vtx);
   void GetKFParticle( CbmKFParticle &Part, int iPart = 0);

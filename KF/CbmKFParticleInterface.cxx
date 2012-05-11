@@ -878,35 +878,138 @@ void CbmKFParticleInterface::Extrapolate(CbmKFParticle_simd*  Particle, fvec r0[
     r0[5] = J[5][3]*px + J[5][4]*py + J[5][5]*pz;
   }
 
-  multQSQt( 8, J[0], C, C);
+// fvec kC[36];
+// for(int i=0; i<36; i++) kC[i] = C[i];
+
+//   multQSQt( J[0], C);
+
+  multQSQt1( J, C);
+
+// for(int i=0; i<36; i++ )
+//   std::cout << (C[i]-kC[i]) << "    " << C[i] << "    " << kC[i] << std::endl;
+// 
+// int ui;
+// std::cin >>ui;
 
 }
 
-void CbmKFParticleInterface::multQSQt( int N, const fvec Q[], const fvec S[], fvec S_out[] )
+void CbmKFParticleInterface::multQSQt( const fvec Q[], fvec S[] )
 {
- fvec* A = new fvec[N*N];
+  fvec A[64]={0};
 
- {for( Int_t i=0, n=0; i<N; i++ )
-   {
-     for( Int_t j=0; j<N; j++, ++n )
-      {
-        A[n] = 0 ;
-        for( Int_t k=0; k<N; ++k ) A[n]+= S[IJ(i,k)] * Q[ j*N+k];
-      }
-   }
- }
+  for( Int_t i=0, n=0; i<8; i++ )
+    for( Int_t j=0; j<8; j++, ++n )
+      for( Int_t k=0; k<8; ++k ) A[n]+= S[IJ(i,k)] * Q[ j*8+k];
 
- {for( Int_t i=0; i<N; i++ )
-   {
-     for( Int_t j=0; j<=i; j++ )
-      {
-        Int_t n = IJ(i,j);
-        S_out[n] = 0 ;
-        for( Int_t k=0; k<N; k++ )  S_out[n] += Q[ i*N+k ] * A[ k*N+j ];
-      }
-   }
- }
- delete[] A;
+  for( Int_t i=0; i<8; i++ )
+  {
+    for( Int_t j=0; j<=i; j++ )
+    {
+      Int_t n = IJ(i,j);
+      S[n] = 0 ;
+      for( Int_t k=0; k<8; k++ )  S[n] += Q[ i*8+k ] * A[ k*8+j ];
+    }
+  }
+}
+
+void CbmKFParticleInterface::multQSQt1( const fvec J[8][8], fvec S[] )
+{
+  const fvec A00 = S[0 ]+S[6 ]*J[0][3]+S[10]*J[0][4]+S[15]*J[0][5];
+  const fvec A10 = S[1 ]+S[7 ]*J[0][3]+S[11]*J[0][4]+S[16]*J[0][5];
+  const fvec A20 = S[3 ]+S[8 ]*J[0][3]+S[12]*J[0][4]+S[17]*J[0][5];
+  const fvec A30 = S[6 ]+S[9 ]*J[0][3]+S[13]*J[0][4]+S[18]*J[0][5];
+  const fvec A40 = S[10]+S[13]*J[0][3]+S[14]*J[0][4]+S[19]*J[0][5];
+  const fvec A50 = S[15]+S[18]*J[0][3]+S[19]*J[0][4]+S[20]*J[0][5];
+  const fvec A60 = S[21]+S[24]*J[0][3]+S[25]*J[0][4]+S[26]*J[0][5];
+  const fvec A70 = S[28]+S[31]*J[0][3]+S[32]*J[0][4]+S[33]*J[0][5];
+
+  S[0 ] = A00+J[0][3]*A30+J[0][4]*A40+J[0][5]*A50;
+  S[1 ] = A10+J[1][3]*A30+J[1][4]*A40+J[1][5]*A50;
+  S[3 ] = A20+J[2][3]*A30+J[2][4]*A40+J[2][5]*A50;
+  S[6 ] = J[3][3]*A30+J[3][4]*A40+J[3][5]*A50;
+  S[10] = J[4][3]*A30+J[4][4]*A40+J[4][5]*A50;
+  S[15] = J[5][3]*A30+J[5][4]*A40+J[5][5]*A50;
+  S[21] = A60;
+  S[28] = A70;
+
+//  const fvec A01 = S[1 ]+S[6 ]*J[1][3]+S[10]*J[1][4]+S[15]*J[1][5];
+  const fvec A11 = S[2 ]+S[7 ]*J[1][3]+S[11]*J[1][4]+S[16]*J[1][5];
+  const fvec A21 = S[4 ]+S[8 ]*J[1][3]+S[12]*J[1][4]+S[17]*J[1][5];
+  const fvec A31 = S[7 ]+S[9 ]*J[1][3]+S[13]*J[1][4]+S[18]*J[1][5];
+  const fvec A41 = S[11]+S[13]*J[1][3]+S[14]*J[1][4]+S[19]*J[1][5];
+  const fvec A51 = S[16]+S[18]*J[1][3]+S[19]*J[1][4]+S[20]*J[1][5];
+  const fvec A61 = S[22]+S[24]*J[1][3]+S[25]*J[1][4]+S[26]*J[1][5];
+  const fvec A71 = S[29]+S[31]*J[1][3]+S[32]*J[1][4]+S[33]*J[1][5];
+
+  S[2 ] = A11+J[1][3]*A31+J[1][4]*A41+J[1][5]*A51;
+  S[4 ] = A21+J[2][3]*A31+J[2][4]*A41+J[2][5]*A51;
+  S[7 ] = J[3][3]*A31+J[3][4]*A41+J[3][5]*A51;
+  S[11] = J[4][3]*A31+J[4][4]*A41+J[4][5]*A51;
+  S[16] = J[5][3]*A31+J[5][4]*A41+J[5][5]*A51;
+  S[22] = A61;
+  S[29] = A71;
+
+//  const fvec A02 = S[3 ]+S[6 ]*J[2][3]+S[10]*J[2][4]+S[15]*J[2][5];
+//  const fvec A12 = S[4 ]+S[7 ]*J[2][3]+S[11]*J[2][4]+S[16]*J[2][5];
+  const fvec A22 = S[5 ]+S[8 ]*J[2][3]+S[12]*J[2][4]+S[17]*J[2][5];
+  const fvec A32 = S[8 ]+S[9 ]*J[2][3]+S[13]*J[2][4]+S[18]*J[2][5];
+  const fvec A42 = S[12]+S[13]*J[2][3]+S[14]*J[2][4]+S[19]*J[2][5];
+  const fvec A52 = S[17]+S[18]*J[2][3]+S[19]*J[2][4]+S[20]*J[2][5];
+  const fvec A62 = S[23]+S[24]*J[2][3]+S[25]*J[2][4]+S[26]*J[2][5];
+  const fvec A72 = S[30]+S[31]*J[2][3]+S[32]*J[2][4]+S[33]*J[2][5];
+
+  S[5 ] = A22+J[2][3]*A32+J[2][4]*A42+J[2][5]*A52;
+  S[8 ] = J[3][3]*A32+J[3][4]*A42+J[3][5]*A52;
+  S[12] = J[4][3]*A32+J[4][4]*A42+J[4][5]*A52;
+  S[17] = J[5][3]*A32+J[5][4]*A42+J[5][5]*A52;
+  S[23] = A62;
+  S[30] = A72;
+
+//  const fvec A03 = S[6] *J[3][3]+S[10]*J[3][4]+S[15]*J[3][5];
+//  const fvec A13 = S[7] *J[3][3]+S[11]*J[3][4]+S[16]*J[3][5];
+//  const fvec A23 = S[8] *J[3][3]+S[12]*J[3][4]+S[17]*J[3][5];
+  const fvec A33 = S[9] *J[3][3]+S[13]*J[3][4]+S[18]*J[3][5];
+  const fvec A43 = S[13]*J[3][3]+S[14]*J[3][4]+S[19]*J[3][5];
+  const fvec A53 = S[18]*J[3][3]+S[19]*J[3][4]+S[20]*J[3][5];
+  const fvec A63 = S[24]*J[3][3]+S[25]*J[3][4]+S[26]*J[3][5];
+  const fvec A73 = S[31]*J[3][3]+S[32]*J[3][4]+S[33]*J[3][5];
+
+  S[9 ] = J[3][3]*A33+J[3][4]*A43+J[3][5]*A53;
+  S[13] = J[4][3]*A33+J[4][4]*A43+J[4][5]*A53;
+  S[18] = J[5][3]*A33+J[5][4]*A43+J[5][5]*A53;
+  S[24] = A63;
+  S[31] = A73;
+
+//  const fvec A04 = S[6] *J[4][3]+S[10]*J[4][4]+S[15]*J[4][5];
+//  const fvec A14 = S[7] *J[4][3]+S[11]*J[4][4]+S[16]*J[4][5];
+//  const fvec A24 = S[8] *J[4][3]+S[12]*J[4][4]+S[17]*J[4][5];
+  const fvec A34 = S[9] *J[4][3]+S[13]*J[4][4]+S[18]*J[4][5];
+  const fvec A44 = S[13]*J[4][3]+S[14]*J[4][4]+S[19]*J[4][5];
+  const fvec A54 = S[18]*J[4][3]+S[19]*J[4][4]+S[20]*J[4][5];
+  const fvec A64 = S[24]*J[4][3]+S[25]*J[4][4]+S[26]*J[4][5];
+  const fvec A74 = S[31]*J[4][3]+S[32]*J[4][4]+S[33]*J[4][5];
+
+  S[14] = J[4][3]*A34+J[4][4]*A44+J[4][5]*A54;
+  S[19] = J[5][3]*A34+J[5][4]*A44+J[5][5]*A54;
+  S[25] = A64;
+  S[32] = A74;
+
+//  const fvec A05 = S[6] *J[5][3]+S[10]*J[5][4]+S[15]*J[5][5];
+//  const fvec A15 = S[7] *J[5][3]+S[11]*J[5][4]+S[16]*J[5][5];
+//  const fvec A25 = S[8] *J[5][3]+S[12]*J[5][4]+S[17]*J[5][5];
+  const fvec A35 = S[9] *J[5][3]+S[13]*J[5][4]+S[18]*J[5][5];
+  const fvec A45 = S[13]*J[5][3]+S[14]*J[5][4]+S[19]*J[5][5];
+  const fvec A55 = S[18]*J[5][3]+S[19]*J[5][4]+S[20]*J[5][5];
+  const fvec A65 = S[24]*J[5][3]+S[25]*J[5][4]+S[26]*J[5][5];
+  const fvec A75 = S[31]*J[5][3]+S[32]*J[5][4]+S[33]*J[5][5];
+
+  S[20] = J[5][3]*A35+J[5][4]*A45+J[5][5]*A55;
+  S[26] = A65;
+  S[33] = A75;
+
+//S[27] = S27;
+//S[34] = S34;
+//S[35] = S35;
 }
 
 void CbmKFParticleInterface::Extrapolate( fvec r0[], fvec dS )
@@ -1119,7 +1222,7 @@ void CbmKFParticleInterface::FindParticlesT(vector<T> &vRTracks, vector<CbmKFPar
       ok = ok && kfTrack.GetRefChi2() < 10*kfTrack.GetRefNDF();
     if(!ok) continue;
 
-    const int pdg = fabs(vTrackPDG[iTr]);
+    const int pdg = abs(vTrackPDG[iTr]);
 
     short pdgIndex = -1;
     switch (pdg)

@@ -1017,7 +1017,7 @@ int main(void)
 
 // ### Station 1
 
-  // v12x - module types in the inner sector of station1
+  // v12x - module types in the inner sector of station1 - looking upstream
   int station1i[5][5] = { { 4,  3,  2,  3,  4 },
                           { 3,  1,  1,  1,  3 },
                           { 2,  1,  0,  1,  2 },
@@ -1025,25 +1025,26 @@ int main(void)
                           { 4,  3,  2,  3,  4 } };
   // number of modules 1x0, 8x1, 4x2, 8x3, 4x4
 
-  // v12x - module types in the outer sector of station1
+  // v12x - module types in the outer sector of station1 - looking upstream
   int station1o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                          { 0,  0,  4,  4,  3,  3,  3,  4,  4,  0,  0 },
-                          { 0,  0,  4,  3,  0,  0,  0,  3,  4,  0,  0 },
-                          { 0,  0,  4,  3,  0,  0,  0,  3,  4,  0,  0 },
-                          { 0,  0,  4,  3,  0,  0,  0,  3,  4,  0,  0 },
-                          { 0,  0,  4,  4,  3,  3,  3,  4,  4,  0,  0 },
+                          { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
+                          { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
+                          { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
+                          { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
+                          { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
   // number of modules 73x0, 0x1, 0x2, 12x3, 14x4
+  // Station1 =  24 + 26;   // v12x
 
-  int Chamber_number_Station1 =  24 + 26;   // v12x
+  int a;
+  int Chamber_number_Station1 =  0;
   float Position_Station1[100][4];
 
-  int a = 0;
-
-  for ( int type = 1; type <=4; type++)
-    for ( int j = 0; j < 5; j++) 
+  a=0;
+  for ( int type = 1; type <= 4; type++)
+    for ( int j = 4; j >= 0; j--)  // start from the bottom 
       for ( int i = 0; i < 5; i++) 
 	if (station1i[j][i]==type)
           {
@@ -1053,13 +1054,13 @@ int main(void)
             Position_Station1[a][0] = Detector_size_x[0] * x;
             Position_Station1[a][1] = Detector_size_y[0] * y;
 
-            Position_Station1[a][2] = 0 + type;  // small + pad plane type
+            Position_Station1[a][2] = type;  // pad plane type
             Position_Station1[a][3] = 0;
             a++;
           }
 
-  for ( int type = 1; type <=4; type++)
-    for ( int j = 0; j < 9; j++) 
+  for ( int type = 5; type <= 8; type++)
+    for ( int j = 8; j >= 0; j--)  // start from the bottom 
       for ( int i = 0; i < 11; i++) 
 	if (station1o[j][i]==type)
           {
@@ -1069,19 +1070,20 @@ int main(void)
             Position_Station1[a][0] = Detector_size_x[1] * x;
             Position_Station1[a][1] = Detector_size_y[1] * y;
 
-            Position_Station1[a][2] = 4 + type;  // large + pad plane type
+            Position_Station1[a][2] = type;  // pad plane type
             Position_Station1[a][3] = 0;
             a++;
           }
 
-  printf("station 1: declared %2d out of %2d TRD modules\n", a, Chamber_number_Station1);
+  Chamber_number_Station1 = a;
+  printf("station 1: declared %2d TRD modules\n", Chamber_number_Station1);
 
   //------------------------------------------------------------------
   //------------------------------------------------------------------
 
 // ### Station 2
 
-  // v12x - module types in the inner sector of station2
+  // v12x - module types in the inner sector of station2 - looking upstream
   int station2i[5][5] = { { 4,  3,  3,  3,  4 },
                           { 3,  2,  2,  2,  3 },
                           { 3,  2,  0,  2,  3 },
@@ -1089,26 +1091,25 @@ int main(void)
                           { 4,  3,  3,  3,  4 } };
   // number of modules 1x0, 0x1, 8x2, 12x3, 4x4
 
-  // v12x - module types in the outer sector of station2
+  // v12x - module types in the outer sector of station2 - looking upstream
   int station2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                          { 0,  4,  4,  4,  4,  4,  4,  4,  4,  4,  0 },
-                          { 0,  4,  4,  4,  2,  2,  2,  4,  4,  4,  0 },
-                          { 0,  4,  4,  2,  0,  0,  0,  2,  4,  4,  0 },
-                          { 0,  4,  4,  2,  0,  0,  0,  2,  4,  4,  0 },
-                          { 0,  4,  4,  2,  0,  0,  0,  2,  4,  4,  0 },
-                          { 0,  4,  4,  4,  2,  2,  2,  4,  4,  4,  0 },
-                          { 0,  4,  4,  4,  4,  4,  4,  4,  4,  4,  0 },
+                          { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
+                          { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
+                          { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                          { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                          { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                          { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
+                          { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
   // number of modules 45x0, 0x1, 12x2, 0x3, 42x4
+  // Station2 =  78;   // v12x
 
-  int Chamber_number_Station2 =  78;   // v12x
+  int Chamber_number_Station2 =  0;
   float Position_Station2[100][4];
 
-  //int a = 0;
-  a = 0;
-
-  for ( int type = 1; type <=4; type++)
-    for ( int j = 0; j < 5; j++) 
+  a=0;
+  for ( int type = 1; type <= 4; type++)
+    for ( int j = 4; j >= 0; j--)  // start from the bottom 
       for ( int i = 0; i < 5; i++) 
 	if (station2i[j][i]==type)
           {
@@ -1119,13 +1120,13 @@ int main(void)
             Position_Station2[a][0] = Detector_size_x[0] * x;
             Position_Station2[a][1] = Detector_size_y[0] * y;
 
-            Position_Station2[a][2] = 0 + type;  // small + pad plane type
+            Position_Station2[a][2] = type;  // pad plane type
             Position_Station2[a][3] = 0;
             a++;
           }
 
-  for ( int type = 1; type <=4; type++)
-    for ( int j = 0; j < 9; j++) 
+  for ( int type = 5; type <= 8; type++)
+    for ( int j = 8; j >= 0; j--)  // start from the bottom 
       for ( int i = 0; i < 11; i++) 
 	if (station2o[j][i]==type)
           {
@@ -1136,38 +1137,38 @@ int main(void)
             Position_Station2[a][0] = Detector_size_x[1] * x;
             Position_Station2[a][1] = Detector_size_y[1] * y;
 
-            Position_Station2[a][2] = 4 + type;  // large + pad plane type
+            Position_Station2[a][2] = type;  // pad plane type
             Position_Station2[a][3] = 0;
             a++;
           }
 
-  printf("station 2: declared %2d out of %2d TRD modules\n", a, Chamber_number_Station2);
+  Chamber_number_Station2 = a;
+  printf("station 2: declared %2d TRD modules\n", Chamber_number_Station2);
 
   //------------------------------------------------------------------
   //------------------------------------------------------------------
 
 // ### Station 3
 
-  // v12x - module types in the outer sector of station3
-  int station3[9][11] = { { 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4 },
-                          { 4,  4,  4,  3,  3,  3,  3,  3,  4,  4,  4 },
-                          { 4,  4,  3,  3,  2,  2,  2,  3,  3,  4,  4 },
-                          { 4,  4,  3,  2,  1,  1,  1,  2,  3,  4,  4 },
-                          { 4,  4,  3,  2,  1,  0,  1,  2,  3,  4,  4 },
-                          { 4,  4,  3,  2,  1,  1,  1,  2,  3,  4,  4 },
-                          { 4,  4,  3,  3,  2,  2,  2,  3,  3,  4,  4 },
-                          { 4,  4,  4,  3,  3,  3,  3,  3,  4,  4,  4 },
-                          { 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4 } };
+  // v12x - module types in the outer sector of station3 - looking upstream
+  int station3[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
+                          { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+                          { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+                          { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+                          { 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
+                          { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+                          { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+                          { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+                          { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
   // number of modules 1x0, 8x1, 12x2, 24x3, 54x4
+  // Station3 = 98;   // v12x
 
-  int Chamber_number_Station3 = 98;   // v12x
+  int Chamber_number_Station3 = 0;
   float Position_Station3[100][4];
 
-  //int a = 0;
-  a = 0;
-
-  for ( int type = 1; type <=4; type++)
-    for ( int j = 0; j < 9; j++) 
+  a=0;
+  for ( int type = 5; type <= 8; type++)
+    for ( int j = 8; j >= 0; j--)  // start from the bottom 
       for ( int i = 0; i < 11; i++) 
 	if (station3[j][i]==type)
           {
@@ -1178,12 +1179,13 @@ int main(void)
             Position_Station3[a][0] = Detector_size_x[1] * x;
             Position_Station3[a][1] = Detector_size_y[1] * y;
 
-            Position_Station3[a][2] = 4 + type;  // large + pad plane type
+            Position_Station3[a][2] = type;  // pad plane type
             Position_Station3[a][3] = 0;
             a++;
           }
 
-  printf("station 3: declared %2d out of %2d TRD modules\n", a, Chamber_number_Station3);
+  Chamber_number_Station3 = a;
+  printf("station 3: declared %2d TRD modules\n", Chamber_number_Station3);
 
   //------------------------------------------------------------------
   //------------------------------------------------------------------

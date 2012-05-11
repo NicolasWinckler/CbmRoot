@@ -3,8 +3,8 @@
 #
 
 echo \# copy geometries
-cp -v geometry/trd.v12/trd_v12b.geo ../../geometry/trd
-cp -v ../../parameters/trd/trd_v12a.digi.par ../../parameters/trd/trd_v12b.digi.par
+cp -v geometry/trd.v12/trd_v12[b-d].geo ../../geometry/trd
+cp -v geometry/trd.v12/trd_v12[b-d].digi.par ../../parameters/trd
 #cp -v geometry/trd.v12/trd_v12a.geo ../../geometry/trd
 #cp -v geometry/trd.v12/media.geo    ../../geometry
 #cp -v geometry/trd.v11/v11?/*.geo* ../../geometry/trd

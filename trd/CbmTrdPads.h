@@ -3,6 +3,8 @@
 // -----               Created 03/12/2009 by D. Emschermann            -----
 // -------------------------------------------------------------------------
 //
+// v2.3 - 20120511 DE - v12c mod5 decrease pad size to 3.0 cm2 from 4.5 cm2
+// v2.2 - 20120511 DE - v12[b-x] - define layout for trd1mod[1-8] in common station1
 // v2.1 - 20120117 DE - v11x/v12x - even number of rows
 // v2.0 - 20120116 DE - v11x/v12x - 7.5mm width, variable size, max 10^7 Hz/pad
 // v1.9 - 20110914 DE - v11x - 7.5 mm pad width -10 cm2
@@ -37,116 +39,64 @@ using std::vector;
 using std::map;
 using std::pair;
 
-// v2.1
+// v2.3
   Int_t fst1_sect_count = 3;
-  Float_t fst1_pad_type[9][3][4] =   // array of pad sizes in station 1
+  Float_t fst1_pad_type[8][3][4] =   // array of pad geometries in the TRD (trd1mod[1-8])
     { { { 57., 21., .75,  1.5 }, 
         { 57., 15., .75,  1.5 }, 
         { 57., 21., .75,  1.5 } },     
+        // mod1
         //  1.1 cm2
         // 14 x  15 mm + 10 x  15 mm + 14 x  15 mm,   76 * 38 = 2888 pads
-      { { 57., 21., .75,  1.5 }, 					 
-        { 57., 15., .75,  1.5 }, 					 
-        { 57., 21., .75,  1.5 } },     					 
-        //  1.1 cm2							 
-        // 14 x  15 mm + 10 x  15 mm + 14 x  15 mm,   76 * 38 = 2888 pads
-      { { 57., 21., .75,  1.5 }, 					 
-        { 57., 15., .75,  1.5 }, 					 
-        { 57., 21., .75,  1.5 } },     					 
-        //  1.1 cm2							 
-        // 14 x  15 mm + 10 x  15 mm + 14 x  15 mm,   76 * 38 = 2888 pads
-//---
       { { 57., 21., .75,  3.0 }, 
         { 57., 15., .75,  2.5 }, 
         { 57., 21., .75,  3.0 } },     
+        // mod2
         // 2.1 cm2
         //  7 x  30 mm +  6 x  25 mm +  7 x  30 mm,   76 * 20 = 1520 pads
       { { 57., 12., .75,  6.0 }, 
         { 57., 33., .75,  5.5 }, 
         { 57., 12., .75,  6.0 } },     
+        // mod3
         //  4.5 cm2
         //  2 x  60 mm +  6 x  55 mm +  2 x  60 mm,   76 * 10 =  760 pads
       { { 57., 19., .75,  9.5 }, 
         { 57., 19., .75,  9.5 }, 
         { 57., 19., .75,  9.5 } },     
+        // mod4
         //  7.1 cm2
         //  2 x  95 mm +  2 x  95 mm +  2 x  95 mm,   76 *  6 =  456 pads
 //---
-      { { 96., 36., .75, 12.0 }, 
-        { 96., 24., .75, 12.0 }, 
-        { 96., 36., .75, 12.0 } },
-        //  9.0 cm2
-        //  3 x 120 mm +  2 x 120 mm +  3 x 120 mm,  128 *  8 = 1024 pads
-      { { 96., 32., .75, 16.0 },  
-        { 96., 32., .75, 16.0 },  
-        { 96., 32., .75, 16.0 } },
-        // 12.0 cm2
-        //  2 x 160 mm +  2 x 160 mm +  2 x 160 mm,  128 *  6 =  768 pads
-      { { 96., 32., .75, 16.0 },  
-        { 96., 32., .75, 16.0 },  
-        { 96., 32., .75, 16.0 } } };
-        // 12.0 cm2
-        //  2 x 160 mm +  2 x 160 mm +  2 x 160 mm,  128 *  6 =  768 pads
-
-
-  Int_t fst2_sect_count = 3;
-  Float_t fst2_pad_type[6][3][4] =   // array of pad sizes in station 2
-    { { { 57., 21., .75,  3.0 }, 
-        { 57., 15., .75,  2.5 }, 
-        { 57., 21., .75,  3.0 } },     
-        // 2.1 cm2
-        //  7 x  30 mm +  6 x  25 mm +  7 x  30 mm,   76 * 20 = 1520 pads
-      { { 57., 21., .75,  3.0 }, 
-        { 57., 15., .75,  2.5 }, 
-        { 57., 21., .75,  3.0 } },     
-        // 2.1 cm2
-        //  7 x  30 mm +  6 x  25 mm +  7 x  30 mm,   76 * 20 = 1520 pads
-//---
-      { { 57., 12., .75,  6.0 }, 
-        { 57., 33., .75,  5.5 }, 
-        { 57., 12., .75,  6.0 } },     
-        //  4.5 cm2
-        //  2 x  60 mm +  6 x  55 mm +  2 x  60 mm,   76 * 10 =  760 pads
-      { { 57., 19., .75,  9.5 }, 
-        { 57., 19., .75,  9.5 }, 
-        { 57., 19., .75,  9.5 } },     
-        //  7.1 cm2
-        //  2 x  95 mm +  2 x  95 mm +  2 x  95 mm,   76 *  6 =  456 pads
-//---
+      { { 96., 44., .75,  4.0 },  
+        { 96.,  8., .75,  4.0 },  
+        { 96., 44., .75,  4.0 } },
+        // mod5
+        //  3.0 cm2
+        // 11 x  40 mm +  2 x  40 mm + 11 x  40 mm,  128 * 24 = 3072 pads
       { { 96., 40., .75,  8.0 },  
         { 96., 16., .75,  8.0 },  
         { 96., 40., .75,  8.0 } },
-        //  6.0 cm2
-        //  5 x  80 mm +  2 x  80 mm +  5 x  80 mm,  128 * 12 = 1536 pads
-      { { 96., 32., .75, 16.0 },  
-        { 96., 32., .75, 16.0 },  
-        { 96., 32., .75, 16.0 } } };
-        // 12.0 cm2
-        //  2 x 160 mm +  2 x 160 mm +  2 x 160 mm,  128 *  6 =  768 pads
-
-
-  Int_t fst3_sect_count = 3;
-  Float_t fst3_pad_type[4][3][4] =   // array of pad sizes in station 3
-    { { { 96., 36., .75,  6.0 },  
-        { 96., 24., .75,  6.0 },  
-        { 96., 36., .75,  6.0 } },
-        //  4.5 cm2
-        //  6 x  60 mm +  4 x  60 mm +  6 x  60 mm,  128 * 16 = 2048 pads
-      { { 96., 40., .75,  8.0 },  
-        { 96., 16., .75,  8.0 },  
-        { 96., 40., .75,  8.0 } },
+        // mod6
         //  6.0 cm2
         //  5 x  80 mm +  2 x  80 mm +  5 x  80 mm,  128 * 12 = 1536 pads
       { { 96., 36., .75, 12.0 },  
         { 96., 24., .75, 12.0 },  
         { 96., 36., .75, 12.0 } },
+        // mod7
         //  9.0 cm2
         //  3 x 120 mm +  2 x 120 mm +  3 x 120 mm,  128 *  8 = 1024 pads
       { { 96., 32., .75, 16.0 },  
         { 96., 32., .75, 16.0 },  
         { 96., 32., .75, 16.0 } } };
+        // mod8
         // 12.0 cm2
         //  2 x 160 mm +  2 x 160 mm +  2 x 160 mm,  128 *  6 =  768 pads
+
+  Int_t fst2_sect_count = 3;        // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
+  Float_t fst2_pad_type[1][1][4];   // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
+  Int_t fst3_sect_count = 3;	    // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
+  Float_t fst3_pad_type[1][1][4];   // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
+
 
 typedef map<Int_t, vector<Int_t> > VectorMap;
 typedef map<Int_t, VectorMap > MapOfVectorMap;
@@ -154,90 +104,66 @@ typedef map<Int_t, VectorMap > MapOfVectorMap;
 MapOfVectorMap GetModuleInfoMap()
 {
 
-  vector<Int_t> moduleType1Station1;
-  for( Int_t i=0; i<4; i++) {
-    moduleType1Station1.push_back(0);
-  }
-  for( Int_t i=0; i<4; i++) {
-    moduleType1Station1.push_back(1);
-  }
+  vector<Int_t> moduleType1Station1(100, 0);
+  vector<Int_t> moduleType2Station1(100, 1);
+  vector<Int_t> moduleType3Station1(100, 2);
+  vector<Int_t> moduleType4Station1(100, 3);
+  vector<Int_t> moduleType5Station1(100, 4);
+  vector<Int_t> moduleType6Station1(100, 5);
+  vector<Int_t> moduleType7Station1(100, 6);
+  vector<Int_t> moduleType8Station1(100, 7);
 
-  vector<Int_t> moduleType2Station1;
-  for( Int_t i=0; i<4; i++) {
-    moduleType2Station1.push_back(3);
-  }
-  for( Int_t i=0; i<8; i++) {
-    moduleType2Station1.push_back(4);
-  }
-  for( Int_t i=0; i<4; i++) {
-    moduleType2Station1.push_back(5);
-  }
- 
-  vector<Int_t> moduleType3Station1;
-  for( Int_t i=0; i<12; i++) {
-    moduleType3Station1.push_back(6);
-  }
-  for( Int_t i=0; i<14; i++) {
-    moduleType3Station1.push_back(7);
-  }
-
-  //  map<Int_t, vector<Int_t> > moduleTypeMapStation1;
   VectorMap moduleTypeMapStation1;
   moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(1, moduleType1Station1));
   moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(2, moduleType2Station1));
   moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(3, moduleType3Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(4, moduleType4Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(5, moduleType5Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(6, moduleType6Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(7, moduleType7Station1));
+  moduleTypeMapStation1.insert( pair<Int_t, vector<Int_t> >(8, moduleType8Station1));
 
-  vector<Int_t> moduleType1Station2;
-  for( Int_t i=0; i<4; i++) {
-    moduleType1Station2.push_back(0);
-  }
-  for( Int_t i=0; i<4; i++) {
-    moduleType1Station2.push_back(1);
-  }
+  vector<Int_t> moduleType1Station2(100, 0);
+  vector<Int_t> moduleType2Station2(100, 1);
+  vector<Int_t> moduleType3Station2(100, 2);
+  vector<Int_t> moduleType4Station2(100, 3);
+  vector<Int_t> moduleType5Station2(100, 4);
+  vector<Int_t> moduleType6Station2(100, 5);
+  vector<Int_t> moduleType7Station2(100, 6);
+  vector<Int_t> moduleType8Station2(100, 7);
 
-  vector<Int_t> moduleType2Station2;
-  for( Int_t i=0; i<12; i++) {
-    moduleType2Station2.push_back(2);
-  }
-  for( Int_t i=0; i<4; i++) {
-    moduleType2Station2.push_back(3);
-  }
-
-  vector<Int_t> moduleType3Station2;
-  for( Int_t i=0; i<12; i++) {
-    moduleType3Station2.push_back(4);
-  }
-  for( Int_t i=0; i<42; i++) {
-    moduleType3Station2.push_back(5);
-  }
-
-  //  map<Int_t, vector<Int_t> > moduleTypeMapStation2;
   VectorMap moduleTypeMapStation2;
   moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(1, moduleType1Station2));
   moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(2, moduleType2Station2));
   moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(3, moduleType3Station2));
-  
-  vector<Int_t> moduleType3Station3;
-  for( Int_t i=0; i<8; i++) {
-    moduleType3Station3.push_back(0);
-  }
-  for( Int_t i=0; i<12; i++) {
-    moduleType3Station3.push_back(1);
-  }
-  for( Int_t i=0; i<24; i++) {
-    moduleType3Station3.push_back(2);
-  }
-  for( Int_t i=0; i<54; i++) {
-    moduleType3Station3.push_back(3);
-  }
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(4, moduleType4Station2));
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(5, moduleType5Station2));
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(6, moduleType6Station2));
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(7, moduleType7Station2));
+  moduleTypeMapStation2.insert( pair<Int_t, vector<Int_t> >(8, moduleType8Station2));
+
+  vector<Int_t> moduleType1Station3(100, 0);
+  vector<Int_t> moduleType2Station3(100, 1);
+  vector<Int_t> moduleType3Station3(100, 2);
+  vector<Int_t> moduleType4Station3(100, 3);
+  vector<Int_t> moduleType5Station3(100, 4);
+  vector<Int_t> moduleType6Station3(100, 5);
+  vector<Int_t> moduleType7Station3(100, 6);
+  vector<Int_t> moduleType8Station3(100, 7);
 
   VectorMap moduleTypeMapStation3;
-  //  map<Int_t, vector<Int_t> > moduleTypeMapStation3;
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(1, moduleType1Station3));
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(2, moduleType2Station3));
   moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(3, moduleType3Station3));
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(4, moduleType4Station3));
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(5, moduleType5Station3));
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(6, moduleType6Station3));
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(7, moduleType7Station3));
+  moduleTypeMapStation3.insert( pair<Int_t, vector<Int_t> >(8, moduleType8Station3));
 
   map<Int_t, VectorMap > moduleTypeStationMap;
 
-  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(1, moduleTypeMapStation1) );
+  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(1, moduleTypeMapStation1));
   moduleTypeStationMap.insert( pair<Int_t, VectorMap >(2, moduleTypeMapStation2));
   moduleTypeStationMap.insert( pair<Int_t, VectorMap >(3, moduleTypeMapStation3));
 
@@ -246,11 +172,3 @@ MapOfVectorMap GetModuleInfoMap()
 
 #endif
 
-//-------------------------
-// even number of rows - 57
-//-------------------------
-//      { { 57., 18., .75,  3.0 }, 
-//        { 57., 21., .75,  3.5 }, 
-//        { 57., 18., .75,  3.0 } },     
-//        //  2.5 cm2
-//        //  6 x  30 mm +  6 x  35 mm +  6 x  30 mm,   76 * 18 = 1368 pads

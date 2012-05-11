@@ -39,7 +39,7 @@ using std::vector;
 using std::map;
 using std::pair;
 
-// v2.3
+// v2.2
   Int_t fst1_sect_count = 3;
   Float_t fst1_pad_type[8][3][4] =   // array of pad geometries in the TRD (trd1mod[1-8])
     { { { 57., 21., .75,  1.5 }, 
@@ -67,12 +67,12 @@ using std::pair;
         //  7.1 cm2
         //  2 x  95 mm +  2 x  95 mm +  2 x  95 mm,   76 *  6 =  456 pads
 //---
-      { { 96., 44., .75,  4.0 },  
-        { 96.,  8., .75,  4.0 },  
-        { 96., 44., .75,  4.0 } },
+      { { 96., 36., .75,  6.0 },
+        { 96., 24., .75,  6.0 },
+        { 96., 36., .75,  6.0 } },
         // mod5
-        //  3.0 cm2
-        // 11 x  40 mm +  2 x  40 mm + 11 x  40 mm,  128 * 24 = 3072 pads
+        //  4.5 cm2
+        //  6 x  60 mm +  4 x  60 mm +  6 x  60 mm,  128 * 16 = 2048 pads
       { { 96., 40., .75,  8.0 },  
         { 96., 16., .75,  8.0 },  
         { 96., 40., .75,  8.0 } },

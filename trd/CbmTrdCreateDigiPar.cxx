@@ -148,10 +148,11 @@ InitStatus CbmTrdCreateDigiPar::Init(){
     fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
   }
   if (kSegmentedSquaredOneKeepingVolume == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
-    FillModuleMapSegmentedSquared();
+    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
+    FillModuleMapSegmentedSquaredOneKeepingVolume();
   }
   if (kSegmentedSquared == geoVersion) {
+    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
     FillModuleMapSegmentedSquared();
   }
 
@@ -177,6 +178,80 @@ void CbmTrdCreateDigiPar::Exec(Option_t * option)
 }
 
 // --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquaredOneKeepingVolume(){
+ 
+  // The geometry structure is treelike with cave as
+  // the top node. For the TRD there are keeping volumes
+  // trd1-trd4 for each station which are only containers 
+  // for the different layers of one station. The trdlayer
+  // is again only a container for all volumes of this layer.   
+  // Loop over all nodes below the top node (cave). If one of
+  // the nodes containes a string trd it must be one of the
+  // stations. Now loop over the layers of this station and 
+  // then over all modules of the layer to extract in the end
+  // all active regions (gas) of the complete TRD. For each
+  // of the gas volumes get the information about size and
+  // position from the geomanager and the sizes of the sectors
+  // and pads from the definitions in CbmTrdPads. This info
+  // is then stored in a TrdModule object for each of the
+  // TRD modules.
+
+  Int_t nmodules = 0;
+  TString TopNode = gGeoManager->GetTopNode()->GetName();
+
+  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+    TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+    if (TString(node->GetName()).Contains("trd")) {
+      TString StationNode = node->GetName();
+      TGeoNode* station = node;
+
+	TObjArray* modules = station->GetNodes();
+	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
+          TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
+          TString ModuleNode = module->GetName();
+
+          TObjArray* parts = module->GetNodes();
+	  for (Int_t iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
+            TGeoNode* part = (TGeoNode*) parts->At(iPart);
+            if (TString(part->GetName()).Contains("gas")) {
+              TString PartNode = part->GetName();
+
+              // Put together the full path to the interesting volume, which
+	      // is needed to navigate with the geomanager to this volume.
+              // Extract the geometry information (size, global position)
+              // from this volume.;
+
+              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
+                                 ModuleNode + "/" + PartNode;
+
+              FillModuleInfoFromGeoHandler(FullPath);
+
+              // Get Information about the padstructure for a
+              // given trd module defined by the station and
+              // layer numbers, the module type and the copy
+              // number
+              FillPadInfoSegmentedSquaredOneKeepingVolume();
+
+              CorrectOrientationOfPadPlane();
+
+              nmodules++;
+
+              // Create new CbmTrdModule and add it to the map
+	      fModuleMap[fModuleID] = 
+                new CbmTrdModule(fModuleID, fX, fY, fZ, fSizex, fSizey, fSizez,
+				 fMaxSectors, fSectorSizex, fSectorSizey, 
+				 fpadsizex, fpadsizey);
+	    }
+	  }
+      }
+    }
+  }
+
+  FillDigiPar();
+}
+
+// --------------------------------------------------------------------
 void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
  
   // The geometry structure is treelike with cave as
@@ -197,16 +272,19 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
 
   Int_t nmodules = 0;
   TString TopNode = gGeoManager->GetTopNode()->GetName();
+
   TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
   for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
     TGeoNode* node = (TGeoNode*) nodes->At(iNode);
     if (TString(node->GetName()).Contains("trd")) {
       TString StationNode = node->GetName();
       TGeoNode* station = node;
+
 	TObjArray* modules = station->GetNodes();
 	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
           TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
           TString ModuleNode = module->GetName();
+
           TObjArray* parts = module->GetNodes();
 	  for (Int_t iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
             TGeoNode* part = (TGeoNode*) parts->At(iPart);
@@ -220,7 +298,6 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquared(){
 
               TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
                                  ModuleNode + "/" + PartNode;
-
 
               FillModuleInfoFromGeoHandler(FullPath);
 
@@ -306,6 +383,34 @@ void CbmTrdCreateDigiPar::FillDigiPar()
 }
 
 // --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FillPadInfoSegmentedSquaredOneKeepingVolume(){
+
+  // Reset the Array in case we have different sector sizes for
+  // different detector modules
+
+  for (Int_t i=0; i < fMaxSectors; i++ ) {
+    fSectorSizex.AddAt(0.,i);
+    fSectorSizey.AddAt(0.,i);
+    fpadsizex.AddAt(   0.,i);
+    fpadsizey.AddAt(   0.,i);
+  }
+
+  Int_t moduleType;
+
+  fModTypeMap = fModInfoMap.find(fStation)->second;
+  fModuleTypeVector = fModTypeMap.find(fModuleType)->second;
+  moduleType=fModuleTypeVector[fModuleCopy-1];
+
+  // copy pad plane layout
+  for (Int_t i=0; i < fst1_sect_count; i++ ) {
+    fSectorSizex.AddAt(fst1_pad_type[moduleType][i][0],i);
+    fSectorSizey.AddAt(fst1_pad_type[moduleType][i][1],i);
+    fpadsizex.AddAt(   fst1_pad_type[moduleType][i][2],i);
+    fpadsizey.AddAt(   fst1_pad_type[moduleType][i][3],i);
+  }
+}
+
+// --------------------------------------------------------------------
 void CbmTrdCreateDigiPar::FillPadInfoSegmentedSquared(){
   
   // Reset the Array in case we have different sector sizes for
@@ -332,7 +437,6 @@ void CbmTrdCreateDigiPar::FillPadInfoSegmentedSquared(){
       fpadsizey.AddAt(   fst1_pad_type[moduleType][i][3],i);
     }
   }
-
   if (fStation==2) {
     for (Int_t i=0; i < fst2_sect_count; i++ ) {
       fSectorSizex.AddAt(fst2_pad_type[moduleType][i][0],i);
@@ -415,6 +519,7 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedRectangular(){
               FillPadInfoSegmentedRectangular();
 
 	      CorrectOrientationOfPadPlane();
+
               nmodules++;
 
               // Create new CbmTrdModule and add it to the map

@@ -40,7 +40,7 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
    fClusterHits(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId(),
+   fGeoHandler(new CbmTrdGeoHandler()),
    fPrfSingleRecoCounter(-1.),
    fPrfDoubleRecoCounter(-1.),
    fSimpleRecoCounter(-1.),
@@ -65,7 +65,6 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
    fModuleSize(),
    fModulePosition(),
    fPadSizeLongMap(),
-   fLayersBeforeStation(),
    ModuleHitMap(),
    moduleDigiMap()
 {
@@ -100,7 +99,6 @@ CbmTrdHitProducerCluster::~CbmTrdHitProducerCluster()
   if(fModuleInfo){
     delete fModuleInfo;
   }
-  fLayersBeforeStation.clear();
 }
 
 // ----  Initialisation  ----------------------------------------------
@@ -157,11 +155,8 @@ InitStatus CbmTrdHitProducerCluster::Init()
   // first layer of the first station at a later stage by only adding 
   // the layer number in the station to the number of layers in 
   // previous stations 
-  CbmTrdGeoHandler trdGeoInfo;
-  
-  Bool_t result = trdGeoInfo.GetLayerInfo(fLayersBeforeStation);
-  
-  if (!result) return kFATAL;
+
+  fGeoHandler->Init();
 
   return kSUCCESS;
   
@@ -268,9 +263,9 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
     
     Int_t moduleId = digi->GetDetId();
-    Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-    Int_t Station  = detInfo[1];
-    Int_t Layer    = detInfo[2];
+
+    Int_t Station  = fGeoHandler->GetStation(moduleId);
+    Int_t Layer    = fGeoHandler->GetLayer(moduleId);
     MyDigi *d = new MyDigi;
 	    
     fModuleInfo = fDigiPar->GetModule(moduleId);
@@ -580,14 +575,9 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*&
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);  
   Int_t moduleId = digi->GetDetId();
   fModuleInfo = fDigiPar->GetModule(moduleId);
-  Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-  /*
-    mPara -> Station = detInfo[1];  
-    mPara -> Layer = detInfo[2]; 
-    mPara -> moduleId = moduleId;
-  */
-  fStation = detInfo[1];
-  fLayer = detInfo[2];
+
+  fStation  = fGeoHandler->GetStation(moduleId);
+  fLayer    = fGeoHandler->GetLayer(moduleId);
   fmoduleId = moduleId;
   //cout << detInfo[1] << "  " << detInfo[2] << endl;
   //-----------rotated----------------------
@@ -1015,7 +1005,7 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, Modul
   Double_t eLossdEdx = 0;
   Double_t eLoss = qCluster;
 
-  planeId=fLayersBeforeStation[(fStation)-1]+(fLayer);
+  planeId=fGeoHandler->GetPlane(fmoduleId);
       
   AddHit( qMaxIndex, fmoduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
   
@@ -1656,9 +1646,8 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   std::vector<int> MCIndex = digi->GetMCIndex();
 
   Int_t moduleId = digi->GetDetId();
-  Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId);   
-  Int_t Station = detInfo[1];
-  Int_t Layer   = detInfo[2];
+  Int_t Station = fGeoHandler->GetStation(moduleId);
+  Int_t Layer   = fGeoHandler->GetLayer(moduleId);
   fModuleInfo = fDigiPar->GetModule(moduleId);
   Int_t NoSectors = fModuleInfo->GetNoSectors();
   Float_t pSizeLong = 0;

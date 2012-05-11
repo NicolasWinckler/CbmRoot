@@ -2,7 +2,6 @@
 #define CBMTRDHITPRODUCERCLUSTER_H 
 
 #include "FairTask.h"
-#include "CbmTrdDetectorId.h"
 
 #include "CbmTrdClusterizer.h"
 #include "CbmTrdClusterFinderFast.h"
@@ -15,6 +14,7 @@
 
 class CbmTrdDigiPar;
 class CbmTrdModule;
+class CbmTrdGeoHandler;
 class TClonesArray;
 
 typedef struct MyHit
@@ -94,7 +94,7 @@ class CbmTrdHitProducerCluster : public FairTask
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!
   
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
 
   Int_t fPrfSingleRecoCounter;
   Int_t fPrfDoubleRecoCounter;
@@ -129,8 +129,6 @@ class CbmTrdHitProducerCluster : public FairTask
 
   std::map<Int_t,Int_t> fPadSizeLongMap;
 
-  std::vector<Int_t> fLayersBeforeStation; //! 
-
   std::map<Int_t, MyHitList*> ModuleHitMap;
 
   std::map<Int_t, MyDigiList*> moduleDigiMap; //map of <moduleId, List of struct 'MyDigi' pointer>
@@ -138,6 +136,6 @@ class CbmTrdHitProducerCluster : public FairTask
   CbmTrdHitProducerCluster(const CbmTrdHitProducerCluster&);
   CbmTrdHitProducerCluster& operator=(const CbmTrdHitProducerCluster&);
 
-  ClassDef(CbmTrdHitProducerCluster,1);
+  ClassDef(CbmTrdHitProducerCluster,2);
 };
 #endif

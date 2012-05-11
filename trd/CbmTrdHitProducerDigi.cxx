@@ -35,8 +35,7 @@ CbmTrdHitProducerDigi::CbmTrdHitProducerDigi()
    fMCStack(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId(),
-   fLayersBeforeStation()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
 }
 // --------------------------------------------------------------------
@@ -50,8 +49,7 @@ CbmTrdHitProducerDigi::CbmTrdHitProducerDigi(const char *name, const char *title
    fMCStack(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId(),
-   fLayersBeforeStation()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
 }
 // --------------------------------------------------------------------
@@ -124,23 +122,19 @@ InitStatus CbmTrdHitProducerDigi::Init()
 
     ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
 
-  // Extract information about the number of TRD stations and
-  // the number of layers per TRD station from the geomanager.
-  // Store the information about the number of layers at the entrance
-  // of subsequent stations in a vector. 
-  // This allows to calculate the layer number starting with 1 for the
-  // first layer of the first station at a later stage by only adding 
-  // the layer number in the station to the number of layers in 
-  // previous stations 
-  CbmTrdGeoHandler trdGeoInfo;
+    // Extract information about the number of TRD stations and
+    // the number of layers per TRD station from the geomanager.
+    // Store the information about the number of layers at the entrance
+    // of subsequent stations in a vector. 
+    // This allows to calculate the layer number starting with 1 for the
+    // first layer of the first station at a later stage by only adding 
+    // the layer number in the station to the number of layers in 
+    // previous stations 
+    fGeoHandler->Init();
   
-  Bool_t result = trdGeoInfo.GetLayerInfo(fLayersBeforeStation);
-  
-  if (!result) return kFATAL;
-  
-  cout<<"********** End of TRD Hitproducer init ********"<<endl;
-
-  return kSUCCESS;
+    cout<<"********** End of TRD Hitproducer init ********"<<endl;
+    
+    return kSUCCESS;
 
 
 }
@@ -180,15 +174,14 @@ void CbmTrdHitProducerDigi::Exec(Option_t * option)
     // module with arrays holding the information about the sectors.
     // So we have to extract the information about the module Id and
     // the sector from the detector Id.
-    Int_t* bla = fTrdId.GetDetectorInfo(DetId);
-    Station = bla[1];
-    Layer = bla[2];
-    ModuleType = bla[3];
-    ModuleCopy = bla[4];
-    Sector = bla[5];
-    moduleId= fTrdId.GetModuleId(DetId);
 
-    Plane=fLayersBeforeStation[Station-1]+Layer;
+    Station = fGeoHandler->GetStation(DetId);
+    Layer = fGeoHandler->GetLayer(DetId);
+    ModuleType = fGeoHandler->GetModuleType(DetId);
+    ModuleCopy = fGeoHandler->GetModuleCopyNr(DetId);
+    Sector = fGeoHandler->GetSector(DetId);
+    moduleId = fGeoHandler->GetModuleId(DetId);
+    Plane = fGeoHandler->GetPlane(DetId);
 
     fModuleInfo = fDigiPar->GetModule(moduleId);
     fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);

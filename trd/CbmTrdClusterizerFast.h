@@ -1,7 +1,6 @@
 #ifndef CBMTRDCLUSTERIZERFAST_H
 #define CBMTRDCLUSTERIZERFAST_H
 
-#include "CbmTrdDetectorId.h"
 #include "CbmTrdDigiMatch.h"
 #include "FairTask.h"
 
@@ -11,9 +10,9 @@
 #include "CbmTrdDigi.h"
 
 class CbmTrdDigiPar;
-//class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+class CbmTrdGeoHandler;
 
 class TClonesArray;
 class TH1F;
@@ -163,12 +162,12 @@ class CbmTrdClusterizerFast : public FairTask {
   CbmTrdModule   *fModuleInfo; //!
   CbmTrdRadiator *fRadiators;  //!
 
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
  
   std::map<Int_t, ClusterModule*> fModuleClusterMap; //!
   std::map<Int_t, ClusterModule*>::iterator fModuleClusterMapIt; //!
 
-  ClassDef(CbmTrdClusterizerFast,1)
+  ClassDef(CbmTrdClusterizerFast,2)
 
     };
 #endif // CBMTRDCLUSTERIZERFAST_H

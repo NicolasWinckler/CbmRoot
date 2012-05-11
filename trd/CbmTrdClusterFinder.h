@@ -19,13 +19,14 @@
 #define CBMTRDCLUSTERFINDER_H 
 
 #include "FairTask.h"
-#include "CbmTrdDetectorId.h"
+
 #include <map>
 #include <vector>
 #include <set>
 
 class CbmTrdDigiPar;
 class CbmTrdModule;
+class CbmTrdGeoHandler;
 class TClonesArray;
 
 class CbmTrdClusterFinder : public FairTask
@@ -74,7 +75,7 @@ class CbmTrdClusterFinder : public FairTask
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!
   
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
 
   static const Float_t ChargeTH = 0;// 5e-03;
 
@@ -99,7 +100,7 @@ class CbmTrdClusterFinder : public FairTask
   CbmTrdClusterFinder(const CbmTrdClusterFinder&);
   CbmTrdClusterFinder& operator=(const CbmTrdClusterFinder&);
 
-  ClassDef(CbmTrdClusterFinder,1);
+  ClassDef(CbmTrdClusterFinder,2);
   
 };
 #endif

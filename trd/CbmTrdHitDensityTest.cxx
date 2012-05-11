@@ -40,12 +40,11 @@ CbmTrdHitDensityTest::CbmTrdHitDensityTest()
    fClusterHits(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId(),
+   fGeoHandler(new CbmTrdGeoHandler()),
    fStation(-1),
    fLayer(-1), 
    fModuleID(-1),
    fMCindex(-1),
-   fLayersBeforeStation(),
    ModulePointMap()
 {
 }
@@ -72,7 +71,6 @@ CbmTrdHitDensityTest::~CbmTrdHitDensityTest()
   if(fModuleInfo){
     delete fModuleInfo;
   }
-  fLayersBeforeStation.clear();
 }
 
 // ----  Initialisation  ----------------------------------------------
@@ -130,11 +128,8 @@ InitStatus CbmTrdHitDensityTest::Init()
   // first layer of the first station at a later stage by only adding 
   // the layer number in the station to the number of layers in 
   // previous stations 
-  CbmTrdGeoHandler trdGeoInfo;
-  
-  Bool_t result = trdGeoInfo.GetLayerInfo(fLayersBeforeStation);
-  
-  if (!result) return kFATAL;
+
+  fGeoHandler->Init();
 
   return kSUCCESS;
   
@@ -251,9 +246,8 @@ void CbmTrdHitDensityTest::Exec(Option_t * option)
   std::map<Int_t, MyPointList* >::iterator it;
   for ( it = ModulePointMap.begin(); it != ModulePointMap.end(); it++) {
     fModuleInfo     = fDigiPar->GetModule((*it).first);
-    Int_t* detInfo = fTrdId.GetDetectorInfo((*it).first); 
-    fStation = detInfo[1];
-    fLayer = detInfo[2];
+    fStation = fGeoHandler->GetStation((*it).first);
+    fLayer = fGeoHandler->GetLayer((*it).first);
     Float_t xPos1(0), yPos1(0), r1(0), xPos2(0), yPos2(0), r2(0), dr(0);
     MyPointList::iterator listIt1;
     MyPointList::iterator listIt2;

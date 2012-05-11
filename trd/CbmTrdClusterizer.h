@@ -1,8 +1,6 @@
 #ifndef CBMTRDCLUSTERIZER_H
 #define CBMTRDCLUSTERIZER_H
 
-#include "CbmTrdDetectorId.h"
-
 #include "FairTask.h"
 
 #include <map>
@@ -11,9 +9,9 @@
 #include "CbmTrdDigi.h"
 
 class CbmTrdDigiPar;
-//class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+class CbmTrdGeoHandler;
 
 class TClonesArray;
 class TH1F;
@@ -246,7 +244,7 @@ class CbmTrdClusterizer : public FairTask {
   CbmTrdModule   *fModuleInfo; //!
   CbmTrdRadiator *fRadiators;  //!
 
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
     
   /**  map to store digis for pair of x,y position in module **/
   // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
@@ -259,7 +257,7 @@ class CbmTrdClusterizer : public FairTask {
 
   //TH1F* fIntegralTest;
 
-  ClassDef(CbmTrdClusterizer,1)
+  ClassDef(CbmTrdClusterizer,2)
 
     };
 #endif // CBMTRDCLUSTERIZER_H

@@ -75,7 +75,6 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis()
     fTrdTracks(NULL),
     fGlobalTracks(NULL),
     fPrimaryVertex(NULL),
-    fTrdId(),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     // Birth Vertex
@@ -186,7 +185,6 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fTrdTracks(NULL),
     fGlobalTracks(NULL),
     fPrimaryVertex(NULL),
-    fTrdId(),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     // Birth Vertex

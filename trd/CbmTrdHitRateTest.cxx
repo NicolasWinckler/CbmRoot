@@ -3,6 +3,7 @@
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -102,7 +103,7 @@ CbmTrdHitRateTest::CbmTrdHitRateTest()
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiators(NULL),
-    fTrdId(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt()
 {
@@ -176,7 +177,7 @@ CbmTrdHitRateTest::CbmTrdHitRateTest(const char *name, const char *title,
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiators(radiator),
-    fTrdId(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt()
 {
@@ -256,6 +257,8 @@ InitStatus CbmTrdHitRateTest::Init()
 
     fDigiMatchCollection = new TClonesArray("CbmTrdDigiMatch", 100);
     ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchCollection,kTRUE);
+
+    fGeoHandler->Init();
 
     fRadiators->Init();
 
@@ -584,12 +587,10 @@ void CbmTrdHitRateTest::FinishEvent()
   }
 void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
 {
-      Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
-      fStation    = detInfo[1];
-      fLayer      = detInfo[2];     
-      fModuleType = detInfo[3];
-      fModuleCopy = detInfo[4];
-      //printf(" (S%d L%d)  ",fStation,fLayer);
+      fStation    = fGeoHandler->GetStation(VolumeID);
+      fLayer      = fGeoHandler->GetLayer(VolumeID);     
+      fModuleType = fGeoHandler->GetModuleType(VolumeID);
+      fModuleCopy = fGeoHandler->GetModuleCopyNr(VolumeID);
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
@@ -636,14 +637,13 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
 	  Psize[2+i*NoSectors] = 0;
 	}
 
-      Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
-      fStation    = detInfo[1];
-      fLayer      = detInfo[2];     
-      fModuleType = detInfo[3];
-      fModuleCopy = detInfo[4];
+      fStation    = fGeoHandler->GetStation(VolumeID);
+      fLayer      = fGeoHandler->GetLayer(VolumeID);     
+      fModuleType = fGeoHandler->GetModuleType(VolumeID);
+      fModuleCopy = fGeoHandler->GetModuleCopyNr(VolumeID);
       GeoPara->moduleId  = VolumeID;
-      GeoPara->layerId   = detInfo[2];
-      GeoPara->stationId = detInfo[1];
+      GeoPara->layerId   = fLayer;
+      GeoPara->stationId = fStation;
       
       //nCol = (Int_t)(2*Msize[0] / (int(Psize[0] * 100) / 100.0));   
       Int_t tempY = 0;

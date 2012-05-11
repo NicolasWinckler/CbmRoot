@@ -28,7 +28,6 @@
 #ifndef CBMTRDHITPRODUCERSMEARING_H
 #define CBMTRDHITPRODUCERSMEARING_H
 
-#include "CbmTrdDetectorId.h"
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdModule.h"
 #include "FairTask.h"
@@ -40,6 +39,7 @@ class TClonesArray;
 class TVector3;
 class CbmTrdHit;
 class CbmTrdRadiator;
+class CbmTrdGeoHandler;
 
 class CbmTrdHitProducerSmearing : public FairTask {
  public:
@@ -115,9 +115,7 @@ class CbmTrdHitProducerSmearing : public FairTask {
   Float_t fGhostDistance;     //! average distance between real hit and ghost hit [cm]
   CbmTrdRadiator*  fRadiator; //!
 
-  CbmTrdDetectorId fDetId;  //!
-
-  std::vector<Int_t> fLayersBeforeStation; //! 
+  CbmTrdGeoHandler* fGeoHandler; //!
 
   CbmTrdHitProducerSmearing(const CbmTrdHitProducerSmearing&);
   CbmTrdHitProducerSmearing operator=(const CbmTrdHitProducerSmearing&);
@@ -125,7 +123,7 @@ class CbmTrdHitProducerSmearing : public FairTask {
   std::map<Int_t, std::vector<CbmTrdHit*> > fModuleHitBufferMap; //!
   std::map<Int_t, std::vector<CbmTrdHit*> >::iterator fModuleHitBufferMapIt; //!
 
-  ClassDef(CbmTrdHitProducerSmearing,2) //CBMTRDHitProducer
+  ClassDef(CbmTrdHitProducerSmearing,3) 
 
     };
 #endif //CBMTRDHITPRODUCERSMEARING_H

@@ -18,20 +18,18 @@
 #ifndef CBMTRDHITPRODUCERDIGI_H
 #define CBMTRDHITPRODUCERDIGI_H
 
-#include "CbmTrdDetectorId.h"
-
 #include "FairTask.h"
-
-//#include "TVector3.h"
 
 #include <vector>
 
-class TClonesArray;
 class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdDigiMatch;
 class CbmTrdModule;
+class CbmTrdGeoHandler;
+
 class TVector3;
+class TClonesArray;
 
 class CbmTrdHitProducerDigi : public FairTask {
  public:
@@ -77,11 +75,9 @@ private:
     CbmTrdDigiPar *fDigiPar;   //!
     CbmTrdModule  *fModuleInfo; //!
 
-    CbmTrdDetectorId fTrdId; //!
+    CbmTrdGeoHandler* fGeoHandler; //!
 
-    std::vector<Int_t> fLayersBeforeStation; //! 
- 
-    ClassDef(CbmTrdHitProducerDigi,2) 
+    ClassDef(CbmTrdHitProducerDigi,3) 
 
 };
 #endif //CBMTRDHITPRODUCERDIGI_H

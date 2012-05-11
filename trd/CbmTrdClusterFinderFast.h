@@ -8,7 +8,6 @@
 #define CBMTRDCLUSTERFINDERFAST_H 
 
 #include "FairTask.h"
-#include "CbmTrdDetectorId.h"
 
 #include <vector>
 #include <list>
@@ -16,6 +15,7 @@
 
 class CbmTrdDigiPar;
 class CbmTrdModule;
+class CbmTrdGeoHandler;
 class TClonesArray;
 
 typedef struct MyDigi
@@ -117,7 +117,7 @@ class CbmTrdClusterFinderFast : public FairTask
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!
   
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
 
   //static const Float_t minimumChargeTH = 5e-03;
 
@@ -126,6 +126,6 @@ class CbmTrdClusterFinderFast : public FairTask
   CbmTrdClusterFinderFast(const CbmTrdClusterFinderFast&);
   CbmTrdClusterFinderFast& operator=(const CbmTrdClusterFinderFast&);
 
-  ClassDef(CbmTrdClusterFinderFast,1);
+  ClassDef(CbmTrdClusterFinderFast,2);
 };
 #endif

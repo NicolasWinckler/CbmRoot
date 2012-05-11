@@ -6,16 +6,10 @@
 #ifndef CBMTRDDIGITIZER_H
 #define CBMTRDDIGITIZER_H
 
-#include "CbmTrdDetectorId.h"
-
 #include "FairTask.h"
-
-//#include "TVector3.h"
 
 #include <map>
 #include <list>
-//#include <utility>
-
 
 class TClonesArray;
 
@@ -23,6 +17,7 @@ class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+class CbmTrdGeoHandler;
 
 class CbmTrdDigitizer : public FairTask {
 
@@ -77,7 +72,7 @@ private:
     CbmTrdModule   *fModuleInfo;
     CbmTrdRadiator *fRadiator; 
 
-    CbmTrdDetectorId fTrdId; //!
+    CbmTrdGeoHandler* fGeoHandler; //!
     
     /**  map to store digis for pair of x,y position in module **/
     // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
@@ -88,7 +83,7 @@ private:
     CbmTrdDigitizer(const CbmTrdDigitizer&);
     CbmTrdDigitizer& operator=(const CbmTrdDigitizer&);
 
-    ClassDef(CbmTrdDigitizer,2)
+    ClassDef(CbmTrdDigitizer,3)
 
     };
 #endif //CBMTRDDIGITIZER_H

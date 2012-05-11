@@ -2,10 +2,8 @@
 #define CBMTRDHITDENSITYTEST_H 
 
 #include "FairTask.h"
-#include "CbmTrdDetectorId.h"
 
 #include "CbmTrdClusterizer.h"
-//#include "CbmTrdClusterFinderFast.h"
 #include "CbmTrdHitProducerCluster.h"
 #include "TLegend.h"
 #include "TClonesArray.h"
@@ -17,6 +15,8 @@
 
 class CbmTrdDigiPar;
 class CbmTrdModule;
+class CbmTrdGeoHandler;
+
 class TClonesArray;
 
 typedef std::list<MyPoint*> MyPointList;
@@ -57,7 +57,7 @@ class CbmTrdHitDensityTest : public FairTask
 
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!  
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
 
   Int_t fStation;
   Int_t fLayer;
@@ -65,13 +65,11 @@ class CbmTrdHitDensityTest : public FairTask
 
   Int_t fMCindex;
 
-  std::vector<Int_t> fLayersBeforeStation; //! 
-
   std::map<Int_t, MyPointList*> ModulePointMap;
 
   CbmTrdHitDensityTest(const CbmTrdHitDensityTest&);
   CbmTrdHitDensityTest& operator=(const CbmTrdHitDensityTest&);
 
-  ClassDef(CbmTrdHitDensityTest,1);
+  ClassDef(CbmTrdHitDensityTest,2);
 };
 #endif

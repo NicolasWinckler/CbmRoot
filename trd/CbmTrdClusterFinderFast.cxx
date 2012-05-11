@@ -4,6 +4,7 @@
 #include "CbmTrdDigi.h"
 #include "CbmTrdCluster.h"
 #include "CbmTrdModule.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -32,7 +33,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId(),
+   fGeoHandler(new CbmTrdGeoHandler()),
    ClusterSum(-1)
 {
 }
@@ -99,6 +100,8 @@ InitStatus CbmTrdClusterFinderFast::Init()
   fClusters = new TClonesArray("CbmTrdCluster", 100);
   ioman->Register("TrdCluster","Trd Cluster",fClusters,kTRUE);
   
+  fGeoHandler->Init();
+
   return kSUCCESS;
   
 } 
@@ -235,9 +238,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	 *unrotate rotated modules in x- and y-direction (row <-> col)
 	 */
 	Int_t moduleId = digi->GetDetId();
-	Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-	Int_t Station  = detInfo[1];
-	Int_t Layer    = detInfo[2];
+	Int_t Station  = fGeoHandler->GetStation(moduleId);
+	Int_t Layer    = fGeoHandler->GetLayer(moduleId);
 
 	MyDigi *d = new MyDigi;
 	//d = new MyDigi;

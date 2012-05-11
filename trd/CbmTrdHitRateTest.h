@@ -3,8 +3,6 @@
 
 #include "FairTask.h"
 
-#include "CbmTrdDetectorId.h"
-
 #include <map>
 #include <list>
 #include <vector>
@@ -13,6 +11,7 @@ class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+class CbmTrdGeoHandler;
 
 class TClonesArray;
 class TCanvas;
@@ -182,7 +181,7 @@ class CbmTrdHitRateTest : public FairTask {
   CbmTrdModule   *fModuleInfo;
   CbmTrdRadiator *fRadiators; 
 
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdGeoHandler* fGeoHandler; //!
     
   /**  map to store digis for pair of x,y position in module **/
   // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
@@ -193,7 +192,7 @@ class CbmTrdHitRateTest : public FairTask {
   CbmTrdHitRateTest(const CbmTrdHitRateTest&);
   CbmTrdHitRateTest& operator=(const CbmTrdHitRateTest&);
 
-  ClassDef(CbmTrdHitRateTest,1)
+  ClassDef(CbmTrdHitRateTest,2)
 
 };
 

@@ -16,22 +16,22 @@
 #ifndef CBMTRDSIMPLEHITPRODUCERCLUSTER_H
 #define CBMTRDSIMPLEHITPRODUCERCLUSTER_H
 
-#include "CbmTrdDetectorId.h"
-
 #include "FairTask.h"
 
 #include "TVector3.h"
 
 #include <vector>
 
-class TClonesArray;
 class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdDigiMatch;
 class CbmTrdModule;
+class CbmTrdGeoHandler;
 
-    class CbmTrdSimpleHitProducerCluster : public FairTask {
-public:
+class TClonesArray;
+
+class CbmTrdSimpleHitProducerCluster : public FairTask {
+ public:
 
     
 
@@ -74,14 +74,12 @@ private:
     CbmTrdDigiPar *fDigiPar;   //!
     CbmTrdModule  *fModuleInfo; //!
 
-    CbmTrdDetectorId fTrdId; //!
+    CbmTrdGeoHandler* fGeoHandler; //!
 
-    std::vector<Int_t> fLayersBeforeStation; //! 
- 
     CbmTrdSimpleHitProducerCluster(const CbmTrdSimpleHitProducerCluster&);
     CbmTrdSimpleHitProducerCluster& operator=(const CbmTrdSimpleHitProducerCluster&);
 
-    ClassDef(CbmTrdSimpleHitProducerCluster,2) 
+    ClassDef(CbmTrdSimpleHitProducerCluster,3) 
 
 };
 #endif //CBMTRDHITPRODUCERDIGI_H

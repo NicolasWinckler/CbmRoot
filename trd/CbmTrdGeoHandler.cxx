@@ -30,6 +30,7 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fGeoVersion(-1),
     fStationMap(),
     fModuleTypeMap(),
+    fLayersBeforeStation(),
     fLogger(FairLogger::GetLogger()),
     fIsSimulation(kFALSE),
     fLastUsedDetectorID(0),
@@ -41,8 +42,13 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
 Int_t CbmTrdGeoHandler::Init(Bool_t isSimulation)
 {
   Int_t geoVersion = CheckGeometryVersion();
-  FillInternalStructures();
+
   fIsSimulation=isSimulation;
+
+  FillInternalStructures();
+
+  GetLayerInfo(fLayersBeforeStation);
+  
   return geoVersion;
 }
 
@@ -120,7 +126,7 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
       if (fm) {
         // Only the normal old squared geometry has a separate keeping volume
         // for the second station    
-        fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
+	fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
         fGeoVersion = kSegmentedSquared; 
         return fGeoVersion;
       } else {
@@ -518,6 +524,24 @@ Int_t CbmTrdGeoHandler::GetModuleCopyNr(Int_t uniqueId)
     FillDetectorInfoArray(uniqueId);
   }
   return fDetectorInfoArray[4];
+}
+Int_t CbmTrdGeoHandler::GetSector(Int_t uniqueId)
+{
+  if (fLastUsedDetectorID != uniqueId) {
+    FillDetectorInfoArray(uniqueId);
+  }
+  return fDetectorInfoArray[5];
+}
+Int_t CbmTrdGeoHandler::GetPlane(Int_t uniqueId)
+{
+  if (fLastUsedDetectorID != uniqueId) {
+    FillDetectorInfoArray(uniqueId);
+  }
+  return fLayersBeforeStation[(fDetectorInfoArray[1]-1)]+fDetectorInfoArray[2];
+}
+Int_t CbmTrdGeoHandler::GetModuleId(Int_t uniqueId)
+{
+  return  fTrdId.GetModuleId(uniqueId);
 }
 
 Float_t CbmTrdGeoHandler::GetSizeX(TString volName) 

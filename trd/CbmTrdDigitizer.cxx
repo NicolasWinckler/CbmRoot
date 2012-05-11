@@ -6,6 +6,7 @@
 #include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "CbmMCTrack.h"
 
@@ -54,7 +55,7 @@ CbmTrdDigitizer::CbmTrdDigitizer()
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiator(new CbmTrdRadiator),
-    fTrdId(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt()
 {
@@ -79,7 +80,7 @@ CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title,
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiator(radiator),
-    fTrdId(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt()
 {
@@ -157,6 +158,8 @@ InitStatus CbmTrdDigitizer::Init()
     fDigiMatchCollection = new TClonesArray("CbmTrdDigiMatch", 100);
     ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchCollection,kTRUE);
 
+    fGeoHandler->Init();
+
     fRadiator->Init();
 
     return kSUCCESS;
@@ -218,7 +221,7 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     // finally add the digi to the map
     fModuleInfo = fDigiPar->GetModule(pt->GetDetectorID());
     fModuleInfo->GetPadInfo(pt, fCol, fRow, Sector);
-    fModuleID = fTrdId.SetSector(pt->GetDetectorID(), Sector);
+    fModuleID = fGeoHandler->SetSector(pt->GetDetectorID(), Sector);
 
     AddDigi(j);
 

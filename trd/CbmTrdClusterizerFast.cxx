@@ -6,6 +6,7 @@
 #include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
+#include "cbmTrdGeoHandler.h"
 
 #include "CbmMCTrack.h"
 
@@ -58,7 +59,7 @@ CbmTrdClusterizerFast::CbmTrdClusterizerFast()
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiators(NULL),
-    fTrdId(),
+    fGeoHandler(new CbmTrdGeoHandler()),
     //fDigiMap(),
     //fDigiMapIt(),
     fModuleClusterMap(),
@@ -91,7 +92,7 @@ CbmTrdClusterizerFast::CbmTrdClusterizerFast(const char *name, const char *title
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fRadiators(radiator),
-   fTrdId(),
+   fGeoHandler(new CbmTrdGeoHandler()),
    //fDigiMap(),
    //fDigiMapIt(),
    fModuleClusterMap(),
@@ -213,6 +214,8 @@ InitStatus CbmTrdClusterizerFast::Init()
 
   fDigiMatchCollection = new TClonesArray("CbmTrdDigiMatch", 100);
   ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchCollection,kTRUE);
+
+  fGeoHandler->Init();
 
   fRadiators->Init();
 
@@ -571,9 +574,8 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
 	  cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
 	}
 
-	Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
-	fModuleType = detInfo[3];
-	fModuleCopy = detInfo[4];
+	fModuleType = fGeoHandler->GetModuleType(detID);
+	fModuleCopy = fGeoHandler->GetModuleCopyNr(detID);
 	//---------------------------------------------------------------------------------------------------
 	std::map<Int_t, ClusterModule* >::iterator it = fModuleClusterMap.find(detID);
 	if (it == fModuleClusterMap.end()) {
@@ -585,8 +587,8 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
 	  */
 	  Float_t averagePadSizeX;
 	  Float_t averagePadSizeY;
-	  mCluster -> Station = detInfo[1];
-	  mCluster -> Layer = detInfo[2];
+	  mPara -> Station = fGeoHandler->GetStation(detID);
+	  mPara -> Layer = fGeoHandler->GetLayer(detID);
 	  mCluster -> moduleId = detID;//moduleId;
 	
 	  mCluster -> ModulePositionX = (Int_t)(10 * fModuleInfo->GetX());

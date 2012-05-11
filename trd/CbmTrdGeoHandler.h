@@ -63,6 +63,9 @@ class CbmTrdGeoHandler : public TObject {
   Int_t GetLayer(Int_t uniqueId);
   Int_t GetModuleType(Int_t uniqueId);
   Int_t GetModuleCopyNr(Int_t uniqueId);
+  Int_t GetPlane(Int_t uniqueId);
+  Int_t GetModuleId(Int_t uniqueId);
+  Int_t GetSector(Int_t uniqueId);
 
   Float_t GetSizeX(TString volName);        
   Float_t GetSizeY(TString volName);        
@@ -70,7 +73,8 @@ class CbmTrdGeoHandler : public TObject {
   Float_t GetX(TString volName);        
   Float_t GetY(TString volName);        
   Float_t GetZ(TString volName);        
-    
+
+  Int_t SetSector(Int_t moduleId, Int_t sectorId) {return fTrdId.SetSector(moduleId, sectorId);}
  private:
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
@@ -88,24 +92,25 @@ class CbmTrdGeoHandler : public TObject {
   Int_t CheckGeometryVersion(); 
   void FillInternalStructures();
 
-  CbmTrdDetectorId fTrdId; //!
+  CbmTrdDetectorId fTrdId;      //!
   Int_t            fGeoVersion; //!
 
-  std::map<Int_t, Int_t> fStationMap; //!
-  std::map<Int_t, Int_t> fModuleTypeMap; //1
+  std::map<Int_t, Int_t> fStationMap;     //!
+  std::map<Int_t, Int_t> fModuleTypeMap;  //!
+  std::vector<Int_t> fLayersBeforeStation; //!
 
-  FairLogger* fLogger; //!                                                  
+  FairLogger* fLogger;  //!                                                  
   Bool_t fIsSimulation; //!
 
-  Int_t fLastUsedDetectorID; //!
-  Int_t* fDetectorInfoArray; //!
-  UInt_t fGeoPathHash;       //!
-  TGeoVolume* fCurrentVolume;//! 
-  TGeoBBox* fVolumeShape;    //!
-  Double_t fGlobal[3];       //! Global centre of volume
+  Int_t fLastUsedDetectorID;  //!
+  Int_t* fDetectorInfoArray;  //!
+  UInt_t fGeoPathHash;        //!
+  TGeoVolume* fCurrentVolume; //! 
+  TGeoBBox* fVolumeShape;     //!
+  Double_t fGlobal[3];        //! Global centre of volume
   TGeoHMatrix* fGlobalMatrix; //!
 
- ClassDef(CbmTrdGeoHandler,2) 
+ ClassDef(CbmTrdGeoHandler,3) 
 
 };
 

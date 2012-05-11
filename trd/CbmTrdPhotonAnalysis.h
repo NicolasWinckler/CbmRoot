@@ -8,7 +8,6 @@
 #ifndef CBMTRDPHOTONANALYSIS_H
 #define CBMTRDPHOTONANALYSIS_H
 
-#include "CbmTrdDetectorId.h"
 #include "FairTask.h"
 #include "TH2I.h"
 #include "TH3I.h"
@@ -113,8 +112,6 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   CbmTrdDigiPar  *fDigiPar;
   CbmTrdModule   *fModuleInfo;
-  CbmTrdDetectorId fTrdId; 
-
 
   //Histos
 
@@ -233,7 +230,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
     std::vector<CbmMCTrack*> fGammaFromPairs;
   */
-  ClassDef(CbmTrdPhotonAnalysis,1)
+  ClassDef(CbmTrdPhotonAnalysis,2)
     };
 
 

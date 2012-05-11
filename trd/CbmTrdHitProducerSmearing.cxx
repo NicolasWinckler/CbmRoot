@@ -3,7 +3,6 @@
 #include "CbmTrdRadiator.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
-//#include "CbmTrdDetectorId.h"
 #include "CbmTrdGeoHandler.h"
 
 #include "CbmMCTrack.h"
@@ -39,8 +38,7 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
    fGhostDistance(0.0),
    fMinDist(0.0),
    fRadiator(new CbmTrdRadiator()),
-   fDetId(),
-   fLayersBeforeStation()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
   for (Int_t i=0; i<3; i++) {
     fSigmaX[i]=0.0;
@@ -65,8 +63,7 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name)
    fGhostDistance(0.0),
    fMinDist(0.0),
    fRadiator(new CbmTrdRadiator()),
-   fDetId(),
-   fLayersBeforeStation()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
   for (Int_t i=0; i<3; i++) {
     fSigmaX[i]=0.0;
@@ -91,8 +88,7 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const cha
    fGhostDistance(0.0),
    fMinDist(0.0),
    fRadiator(radiator),
-   fDetId(),
-   fLayersBeforeStation()
+   fGeoHandler(new CbmTrdGeoHandler())
 {
   for (Int_t i=0; i<3; i++) {
     fSigmaX[i]=0.0;
@@ -170,12 +166,9 @@ InitStatus CbmTrdHitProducerSmearing::Init()
   // first layer of the first station at a later stage by only adding 
   // the layer number in the station to the number of layers in 
   // previous stations 
-  CbmTrdGeoHandler trdGeoInfo;
   
-  Bool_t result = trdGeoInfo.GetLayerInfo(fLayersBeforeStation);
-  
-  if (!result) return kFATAL;
-  
+  fGeoHandler->Init();  
+
   fRadiator->Init();
   
   cout<<"********** End of TRD Hitproducer init ********"<<endl;
@@ -246,17 +239,17 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
     Int_t pdgCode = p->GetPdgCode();
     
     trdId = pt->GetDetectorID();
-    Int_t* detInfo = fDetId.GetDetectorInfo(trdId); 
-    station = detInfo[1];
-    layer = detInfo[2];
+    station = fGeoHandler->GetStation(trdId);
+    layer = fGeoHandler->GetLayer(trdId);
+    plane = fGeoHandler->GetPlane(trdId);
+
     
     fModuleInfo = fDigiPar->GetModule(trdId);
     Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizex();
     Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizex();
     Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizey();
     Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizey();
-    plane=fLayersBeforeStation[station-1]+layer;
-    
+
     ELossTR = 0.0;
     ELossdEdX = pt->GetEnergyLoss();
     ELoss = ELossdEdX;

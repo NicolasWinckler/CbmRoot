@@ -4,6 +4,7 @@
 #include "CbmTrdDigi.h"
 #include "CbmTrdCluster.h"
 #include "CbmTrdModule.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -31,7 +32,7 @@ CbmTrdClusterFinder::CbmTrdClusterFinder()
    fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId(),
+   fGeoHandler(new CbmTrdGeoHandler()),
    mapIt(),
    it(),
    search(),
@@ -111,6 +112,8 @@ InitStatus CbmTrdClusterFinder::Init()
   
   fClusters = new TClonesArray("CbmTrdCluster", 100);
   ioman->Register("TrdCluster","TRD",fClusters,kTRUE);
+
+  fGeoHandler->Init();
   
   return kSUCCESS;
   
@@ -342,7 +345,8 @@ void CbmTrdClusterFinder::SortDigis()
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//Get the sectorId 
 	sectorId = digi->GetDetId();
-	moduleId = fTrdId.GetModuleId(sectorId);
+	moduleId = fGeoHandler->GetModuleId(sectorId);
+
 	//cout << moduleId << endl;
 	iRow = digi->GetRow();
 	iCol = digi->GetCol();

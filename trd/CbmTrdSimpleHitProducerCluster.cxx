@@ -8,6 +8,7 @@
 #include "CbmTrdDigi.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdDigiMatch.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
@@ -37,8 +38,7 @@ CbmTrdSimpleHitProducerCluster::CbmTrdSimpleHitProducerCluster()
     fMCStack(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
-    fTrdId(),
-    fLayersBeforeStation()
+    fGeoHandler(new CbmTrdGeoHandler())
 {
 }
 // --------------------------------------------------------------------
@@ -52,8 +52,7 @@ CbmTrdSimpleHitProducerCluster::CbmTrdSimpleHitProducerCluster(const char *name,
     fMCStack(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
-    fTrdId(),
-    fLayersBeforeStation()
+    fGeoHandler(new CbmTrdGeoHandler())
 {
 
 }
@@ -124,45 +123,7 @@ InitStatus CbmTrdSimpleHitProducerCluster::Init()
     fHitCollection = new TClonesArray("CbmTrdHit", 100);
     ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
 
-    // Extract information about the number of TRD stations and
-    // the number of layers per TRD station from the geomanager.
-    // Store the information about the number of layers at the entrance
-    // of subsequent stations in a vector. 
-    // This allows to calculate the layer number starting with 1 for the
-    // first layer of the first station at a later stage by only adding 
-    // the layer number in the station to the number of layers in 
-    // previous stations 
-    TGeoVolume *fm=NULL;
-    Int_t stationNr = 1;
-    Int_t totalNrOfLayers = 0;
-    fLayersBeforeStation.push_back(totalNrOfLayers);
-    char volumeName[10];
-    sprintf(volumeName, "trd%d", stationNr);
-    fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
-    if (fm){
-      Int_t nrOfLayers = fm->GetNdaughters();
-      totalNrOfLayers += nrOfLayers;
-      fLayersBeforeStation.push_back(totalNrOfLayers);
-      do {
-	stationNr++;
-        sprintf(volumeName, "trd%d", stationNr);
-	fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
-        if (fm) {
-          nrOfLayers = fm->GetNdaughters();
-	  totalNrOfLayers += nrOfLayers;
-	  fLayersBeforeStation.push_back(totalNrOfLayers);
-	}
-      } while (fm);
-    } else {
-      cout << "***************************************" <<endl;
-      cout << "                                       " <<endl;
-      cout << " - FATAL ERROR Unknown geometry version" <<endl;
-      cout << "   in CbmTrdHitProducerSmearing        " <<endl;
-      cout << " No TRD stations found in the geometry " <<endl;
-      cout << "                                       " <<endl;
-      cout << "***************************************" <<endl;
-      return kFATAL;
-    }
+    fGeoHandler->Init();
 
     return kSUCCESS;
 
@@ -214,19 +175,14 @@ void CbmTrdSimpleHitProducerCluster::Exec(Option_t * option)
       // module with arrays holding the information about the sectors.
       // So we have to extract the information about the module Id and
       // the sector from the detector Id.
-      Int_t* bla = fTrdId.GetDetectorInfo(DetId);
-      Station = bla[1];
-      Layer = bla[2];
-      ModuleType = bla[3];
-      ModuleCopy = bla[4];
-      Sector = bla[5];
-      moduleId= fTrdId.GetModuleId(DetId);
+      Station = fGeoHandler->GetStation(DetId);
+      Layer = fGeoHandler->GetLayer(DetId);
+      ModuleType = fGeoHandler->GetModuleType(DetId);
+      ModuleCopy = fGeoHandler->GetModuleCopyNr(DetId);
+      Sector = fGeoHandler->GetSector(DetId);
+      moduleId = fGeoHandler->GetModuleId(DetId);
 
-      //TODO: This has to be done in a correct way. In the moment
-      //      it is assumed that all stations have 4 layers which
-      //      has not to be true for each geometry.
-      //      Plane=fLayersBeforeStation[Station-1]+Layer;
-      Plane= ((Station-1)*4) + Layer;
+      Plane = fGeoHandler->GetPlane(DetId);
 
       fModuleInfo = fDigiPar->GetModule(moduleId);
       fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);

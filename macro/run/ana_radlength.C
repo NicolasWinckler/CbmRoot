@@ -1,15 +1,36 @@
-Int_t ana_radlength(Int_t nEvents=1)
-{
-//#include <map>
-//#include <vector>
+#if !defined(__CINT__) || defined(__MAKECINT__)
+#include "TString.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TClonesArray.h"
+#include "TH1.h"
+#include "TVector3.h"
+#include "TCanvas.h"
+#include "TSystem.h"
+#include "TStyle.h"
+#include "TROOT.h"
 
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
+#include "../../base/FairRadLenPoint.h"
+
+#include <iostream>
+#include <vector>
+using std::cout;
+using std::endl;
+using std::vector;
+#endif
+
+Int_t ana_radlength(Int_t nEvents=100)
+{
+
+  TString dir = gSystem->Getenv("VMCWORKDIR");
+  TString file = dir + "/gconfig/basiclibs.C";
+  gROOT->LoadMacro(file);
+//  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+  gROOT->ProcessLine("basiclibs()");
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
-
 
   TString inFile = "data/test.mc.root";
   TFile* f = new TFile(inFile);
@@ -64,4 +85,5 @@ Int_t ana_radlength(Int_t nEvents=1)
   can1->cd(1);
   hisRadLen->DrawCopy();
 
+  return 0;
 }

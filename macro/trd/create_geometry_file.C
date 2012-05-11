@@ -133,6 +133,7 @@ void create_geometry_file(TString geomFile="trd_standard.geo")
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
+  // fix segfault - 11.05.2012
+  //  exit(0);
 }
 

@@ -784,10 +784,16 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
       z = (GeoPara->lambda - (x * GeoPara->vN[0] + y * GeoPara->vN[1])) / GeoPara->vN[2];
       r = sqrt( pow(x, 2) + pow(y,2));
       alpha = atan(r/z)*1000.;
-      
+      /* //Fit without errors
       HitRate += 
 	exp(4.54156e00 + -8.47377e-03 * alpha) + 
 	exp(2.40005e01 + -1.19541e-02 * alpha) /
+	(z * z)
+	;
+      */
+      HitRate += 
+	exp(4.536355e00 + -8.393716e-03 * alpha) + 
+	exp(2.400547e01 + -1.208306e-02 * alpha) /
 	(z * z)
 	;
       

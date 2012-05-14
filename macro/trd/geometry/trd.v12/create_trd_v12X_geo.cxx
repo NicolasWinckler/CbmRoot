@@ -1,8 +1,19 @@
 //
 //   Generator for CbmTrd Geometry
 //
+//  order of colors
+//  1) blue
+//  2) yellow
+//  3) magenta
+//  4) cyan
+//  5) red
+//  6) green
+//  7) blue
+//
 // ToDo 20120504 - David Emschermann 
 // - check tilting in new keeping volume
+// - declare febmaterial in media.geo
+// - check pad maps in rotated FEB goemetries
 //
 // Update 20120508 - David Emschermann 
 // - introduce new module naming:
@@ -118,20 +129,20 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 //  		      { 3500., 0., z_offset - Layer_thickness/2. + (Layer_pitch * Layer_number) } };
 
   // v01, v02 // no tilting
-  float rot[12][4]={ { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-                     { 1500., 0., 0., 0. }, 
-		       	     	       	       	     
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-                     { 2500., 0., 0., 0. }, 
-		       	     	       	       	     
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. }, 
-                     { 3500., 0., 0., 0. } };
+  float rot[12][4]={ { 3500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 3500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 3500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 3500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+		       	     	       	         // tilt every 2nd layer for FEB orientation  	     
+                     { 4500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 4500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 4500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 4500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+		       	     	       	         // tilt every 2nd layer for FEB orientation  	     
+                     { 5500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 5500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 5500., 0., 0., 0. },      // tilt every 2nd layer for FEB orientation
+                     { 5500., 0., 0., 0. } };    // tilt every 2nd layer for FEB orientation
 
 //  // hardcoded tilt position for the layers in stations 1, 2, 3 - kink position, angle
 //  // v03 // tilt around each layer front
@@ -234,20 +245,21 @@ int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, fl
 
     fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
     fprintf(geofile,"%f %f %f %f %f %f %f %f %f\n", 
-   	     cos(phi), 0.,  sin(phi), 0., 1., 0., -sin(phi), 0.,  cos(phi) );
+	    cos(phi), 0.,  sin(phi), 0., 1., 0., -sin(phi), 0.,  cos(phi) );   // check FEB orientation in tilted geometries
 
   }
-  else if (Position_Station[i][3] == 0) {
+//  else if (Position_Station[i][3] == 0) {
+  else if ((Layer_number + 1)%2) { // tilt every 2nd layer for FEB orientation
     //horizontal position
     fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
-    //    fprintf(geofile,"%f %f %f\n", Position_Station[i][0], Position_Station[i][1], 0.);
     fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+    //    fprintf(geofile,"%f %f %f\n", Position_Station[i][0], Position_Station[i][1], 0.);
   } 
   else {
     // vertical position
     fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
-    //    fprintf(geofile,"%f %f %f\n", Position_Station[i][0], Position_Station[i][1], 0.);
     fprintf(geofile,"0.  1.  0.  -1.  0.  0.  0.  0.  1.\n");
+    //    fprintf(geofile,"%f %f %f\n", Position_Station[i][0], Position_Station[i][1], 0.);
   }
 
 }
@@ -311,8 +323,13 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
   float mylar_position        =  padplane_position + padplane_thickness + mylar_thickness;
   float electronics_thickness =   0.070 /2.;
   float electronics_position  =  mylar_position + mylar_thickness + electronics_thickness;
+ 
   float frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
   float frame_position        =  frame_thickness - Layer_thickness /2.;
+
+  float feebox_thickness      =  100.000 /2.;
+  float feebox_position       =  electronics_position + electronics_thickness + feebox_thickness;
+  float feb_thickness         =  5./2;
 
 //  // 12 mm gas (Jun10)
 //  float radiator_thickness    =  29. /2.;
@@ -493,7 +510,7 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
       fprintf(geofile,"%f %f %f\n", Active_area_x[j] , Active_area_y[j] ,  radiator_thickness);
       fprintf(geofile,"%f %f %f\n",-Active_area_x[j] , Active_area_y[j] ,  radiator_thickness);
       fprintf(geofile,"%f %f %f\n",-Active_area_x[j] ,-Active_area_y[j] ,  radiator_thickness);
-      fprintf(geofile,"%f %f %f\n",0. ,0. ,radiator_position);
+      fprintf(geofile,"%f %f %f\n", 0. ,0. ,radiator_position);
       if (Position_Station[i][3] == 0) {
         //horizontal position
         fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
@@ -541,9 +558,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
 
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"goldcoatedcopper\n");
-      fprintf(geofile,"%f %f %f\n", Active_area_x[j] ,-Active_area_y[j] ,- padplane_thickness);
+      fprintf(geofile,"%f %f %f\n", Active_area_x[j] ,-Active_area_y[j] , -padplane_thickness);
       fprintf(geofile,"%f %f %f\n", Active_area_x[j] , Active_area_y[j] , -padplane_thickness);
-      fprintf(geofile,"%f %f %f\n",-Active_area_x[j] , Active_area_y[j] ,- padplane_thickness);
+      fprintf(geofile,"%f %f %f\n",-Active_area_x[j] , Active_area_y[j] , -padplane_thickness);
       fprintf(geofile,"%f %f %f\n",-Active_area_x[j] ,-Active_area_y[j] , -padplane_thickness);
       fprintf(geofile,"%f %f %f\n", Active_area_x[j] ,-Active_area_y[j] ,  padplane_thickness);
       fprintf(geofile,"%f %f %f\n", Active_area_x[j] , Active_area_y[j] ,  padplane_thickness);
@@ -597,6 +614,9 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
 
       fprintf(geofile,"BOX\n");
       fprintf(geofile,"goldcoatedcopper\n");
+      //      fprintf(geofile,"mylar\n");
+      //      fprintf(geofile,"febmaterial\n");
+      //      fprintf(geofile,"carbon\n");  // remove material
       fprintf(geofile,"%f %f %f\n", Active_area_x[j] ,-Active_area_y[j] , -electronics_thickness);
       fprintf(geofile,"%f %f %f\n", Active_area_x[j] , Active_area_y[j] , -electronics_thickness);
       fprintf(geofile,"%f %f %f\n",-Active_area_x[j] , Active_area_y[j] , -electronics_thickness);
@@ -713,6 +733,64 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
         fprintf(geofile,"//*********************************\n");
       }
 
+// FEEBOX
+      fprintf(geofile,"//*********************************\n");
+
+      fprintf(geofile,"trd%dmod%dfeebox\n", trd_number, module_type);
+      fprintf(geofile,"trd%dmod%d#%d%d%03d\n", trd_number, module_type, Station_number, Layer_number+1, copy_number);
+      fprintf(geofile,"BOX\n");
+      fprintf(geofile,"air\n");
+      fprintf(geofile,"%f %f %f\n",  Active_area_x[j], -Active_area_y[j], -feebox_thickness);
+      fprintf(geofile,"%f %f %f\n",  Active_area_x[j],  Active_area_y[j], -feebox_thickness);
+      fprintf(geofile,"%f %f %f\n", -Active_area_x[j],  Active_area_y[j], -feebox_thickness);
+      fprintf(geofile,"%f %f %f\n", -Active_area_x[j], -Active_area_y[j], -feebox_thickness);
+      fprintf(geofile,"%f %f %f\n",  Active_area_x[j], -Active_area_y[j],  feebox_thickness);
+      fprintf(geofile,"%f %f %f\n",  Active_area_x[j],  Active_area_y[j],  feebox_thickness);
+      fprintf(geofile,"%f %f %f\n", -Active_area_x[j],  Active_area_y[j],  feebox_thickness);
+      fprintf(geofile,"%f %f %f\n", -Active_area_x[j], -Active_area_y[j],  feebox_thickness);
+      fprintf(geofile,"%f %f %f\n", 0., 0., feebox_position);
+      fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+      fprintf(geofile,"//*********************************\n");
+
+// FEB
+      int febs_per_module[9] = { 8, 19, 10, 5, 3, 12, 6, 4, 3 };  // v12c // number of module types, nfeb mod1,  nfeb mod2,  nfeb mod3, ...
+//      int febs_per_module[9] = { 8,  2, 4, 6, 8, 10, 12, 14, 16 };  // initial test
+
+      float feb_pos   = 0;
+      float feb_pos_y = 0;
+      printf("FEB *********************************\n");
+      for (int ifeb = 0; ifeb < febs_per_module[module_type]; ifeb++)
+	{
+          feb_pos   = (2. * ifeb + 1) / (2 * febs_per_module[module_type]) - 0.5;
+          feb_pos_y = feb_pos * 2 * Active_area_y[j];
+          printf("FEB %d %02d: %9.3f %9.3f mm %9.3f mm\n",  module_type, ifeb, feb_pos, feb_pos_y, 2 * Active_area_y[j]);
+//          feb_pos_y = ((2. * ifeb + 1) / (2 * febs_per_module[module_type]) -0.5) * Active_area_y[j];
+//          printf("FEB %d %02d: %f %f mm\n",  module_type, ifeb, feb_pos_y, Active_area_y[j]);
+
+
+          fprintf(geofile,"//*********************************\n");
+          fprintf(geofile,"trd%dmod%dfeb#%d\n", trd_number, module_type, ifeb+1);
+          fprintf(geofile,"trd%dmod%dfeebox\n", trd_number, module_type);
+          fprintf(geofile,"BOX\n");
+	  //          fprintf(geofile,"febmaterial\n");
+          fprintf(geofile,"pefoam20\n");  // blue
+	  //	  fprintf(geofile,"gold\n");  // blue
+          //      fprintf(geofile,"G10\n");
+          fprintf(geofile,"%f %f %f\n",  Active_area_x[j], -feb_thickness, -feebox_thickness);
+          fprintf(geofile,"%f %f %f\n",  Active_area_x[j],  feb_thickness, -feebox_thickness);
+          fprintf(geofile,"%f %f %f\n", -Active_area_x[j],  feb_thickness, -feebox_thickness);
+          fprintf(geofile,"%f %f %f\n", -Active_area_x[j], -feb_thickness, -feebox_thickness);
+          fprintf(geofile,"%f %f %f\n",  Active_area_x[j], -feb_thickness,  feebox_thickness);
+          fprintf(geofile,"%f %f %f\n",  Active_area_x[j],  feb_thickness,  feebox_thickness);
+          fprintf(geofile,"%f %f %f\n", -Active_area_x[j],  feb_thickness,  feebox_thickness);
+          fprintf(geofile,"%f %f %f\n", -Active_area_x[j], -feb_thickness,  feebox_thickness);
+          fprintf(geofile,"%f %f %f\n", 0., feb_pos_y, 0.);
+          fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+          fprintf(geofile,"//*********************************\n");
+        }
+      printf("FEB *********************************\n");
+
+
       if (first_time_Module1 && ( module_type == 1 )) {
         first_time_Module1=false;
         Copy_number_Module1 = copy_number+1 ;
@@ -784,10 +862,11 @@ int TrdModules1(int Station_number, int Layer_number, float* frame_width_array, 
 
       // module numbering by 4-digit copy number
       //      fprintf(geofile,"trd%dmod%d#%d%03d\n", Station_number, module_type, Layer_number+1, copy_number);
-      fprintf(geofile,"trd%dmod%d#%d%d%03d\n", trd_number, module_type, Station_number, Layer_number+1, copy_number);
-
       //      fprintf(geofile,"trd%d\n", Station_number);
+
+      fprintf(geofile,"trd%dmod%d#%d%d%03d\n", trd_number, module_type, Station_number, Layer_number+1, copy_number);
       fprintf(geofile,"trd%d\n", trd_number);
+
       // do not use layers anymore
       //      fprintf(geofile,"trd%dlayer#%d\n", Station_number, Layer_number+1);
 

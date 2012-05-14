@@ -18,14 +18,17 @@
 #include "CbmMuchTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchStrawHit.h"
+#include "CbmMuchGeoScheme.h"
 
 #include "CbmGlobalTrack.h"
+#include "CbmTrdDetectorId.h"
 
 #include "TClonesArray.h"
 
 #include <iostream>
 #include <cmath>
 #include <set>
+#include <cassert>
 
 CbmLitConverter::CbmLitConverter()
 {
@@ -75,6 +78,8 @@ void CbmLitConverter::PixelHitToLitPixelHit(
    Int_t index,
    CbmLitPixelHit* litHit)
 {
+   assert(hit->GetType() == kTRDHIT || hit->GetType() == kMUCHPIXELHIT || hit->GetType() == kTOFHIT);
+
    litHit->SetX(hit->GetX());
    litHit->SetY(hit->GetY());
    litHit->SetZ(hit->GetZ());
@@ -82,8 +87,18 @@ void CbmLitConverter::PixelHitToLitPixelHit(
    litHit->SetDy(hit->GetDy());
    litHit->SetDz(hit->GetDz());
    litHit->SetDxy(hit->GetDxy());
-   litHit->SetPlaneId(hit->GetPlaneId() - 1);
    litHit->SetRefId(index);
+
+   if (hit->GetType() == kTRDHIT) {
+	   CbmTrdDetectorId trdDetId;
+	   Int_t* info =  trdDetId.GetDetectorInfo(hit->GetDetectorId());
+	   litHit->SetDetectorId(kLITTRD, info[1] - 1, info[2] - 1, 0, info[3] * 1000 + info[4] - 1);
+   } else if (hit->GetType() == kMUCHPIXELHIT) {
+	   Int_t detId = hit->GetDetectorId();
+	   litHit->SetDetectorId(kLITMUCH, CbmMuchGeoScheme::GetStationIndex(detId), CbmMuchGeoScheme::GetLayerIndex(detId), CbmMuchGeoScheme::GetLayerSideIndex(detId), 0);
+   } else if (hit->GetType() == kTOFHIT) {
+	   litHit->SetDetectorId(kLITTOF, 0, 0, 0, 0);
+   }
 }
 
 void CbmLitConverter::StripHitToLitStripHit(
@@ -91,6 +106,8 @@ void CbmLitConverter::StripHitToLitStripHit(
    Int_t index,
    CbmLitStripHit* litHit)
 {
+   assert(hit->GetType() == kMUCHSTRAWHIT);
+
    litHit->SetU(hit->GetU());
    litHit->SetDu(hit->GetDu());
    litHit->SetZ(hit->GetZ());
@@ -98,18 +115,23 @@ void CbmLitConverter::StripHitToLitStripHit(
    litHit->SetPhi(hit->GetPhi());
    litHit->SetCosPhi(std::cos(litHit->GetPhi()));
    litHit->SetSinPhi(std::sin(litHit->GetPhi()));
-   litHit->SetPlaneId(hit->GetPlaneId() - 1);
    litHit->SetRefId(index);
+
    if (hit->GetType() == kMUCHSTRAWHIT) {
-      litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
+        litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
+        Int_t detId = hit->GetDetectorId();
+ 	    litHit->SetDetectorId(kLITMUCH, CbmMuchGeoScheme::GetStationIndex(detId), CbmMuchGeoScheme::GetLayerIndex(detId), CbmMuchGeoScheme::GetLayerSideIndex(detId), CbmMuchGeoScheme::GetModuleIndex(detId));
    }
 }
 
 void CbmLitConverter::CbmHitToLitPixelHit(
    const CbmHit* hit,
    Int_t index,
-   CbmLitPixelHit* litHit)
+   CbmLitPixelHit* litHit,
+   LitSystemId sysId)
 {
+   assert(sysId == kLITMVD || sysId == kLITSTS);
+
    litHit->SetX(hit->GetX());
    litHit->SetY(hit->GetY());
    litHit->SetZ(hit->GetZ());
@@ -117,8 +139,9 @@ void CbmLitConverter::CbmHitToLitPixelHit(
    litHit->SetDy(hit->GetDy());
    litHit->SetDz(hit->GetDz());
    litHit->SetDxy(hit->GetCovXY());
-   litHit->SetPlaneId(hit->GetStationNr()-1);
    litHit->SetRefId(index);
+
+   litHit->SetDetectorId(sysId, 0, hit->GetStationNr() - 1, 0, 0);
 }
 
 void CbmLitConverter::StsTrackToLitTrack(
@@ -181,7 +204,7 @@ void CbmLitConverter::LitTrackToTrack(
    for (Int_t iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
       const CbmLitHit* hit = litTrack->GetHit(iHit);
       LitHitType type = hit->GetType();
-      LitDetectorId det = hit->GetDetectorId();
+      LitSystemId det = hit->GetSystem();
       if (det == kLITMUCH && type == kLITPIXELHIT) { track->AddHit(hit->GetRefId(), kMUCHPIXELHIT); }
       else if (det == kLITMUCH && type == kLITSTRIPHIT) { track->AddHit(hit->GetRefId(), kMUCHSTRAWHIT); }
       else if (det == kLITTRD) { track->AddHit(hit->GetRefId(), kTRDHIT); }
@@ -233,7 +256,7 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 			  Int_t index = stsTrack->GetMvdHitIndex(iHit);
 		      CbmHit* hit = static_cast<CbmHit*>(mvdHits->At(iHit));
 		      CbmLitPixelHit* litHit = new CbmLitPixelHit();
-		      CbmHitToLitPixelHit(hit, iHit, litHit);
+		      CbmHitToLitPixelHit(hit, iHit, litHit, kLITMVD);
 			  litTrack->AddHit(litHit);
 		   }
 
@@ -241,7 +264,7 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 			  Int_t index = stsTrack->GetStsHitIndex(iHit);
 		      CbmHit* hit = static_cast<CbmHit*>(stsHits->At(iHit));
 		      CbmLitPixelHit* litHit = new CbmLitPixelHit();
-		      CbmHitToLitPixelHit(hit, iHit, litHit);
+		      CbmHitToLitPixelHit(hit, iHit, litHit, kLITSTS);
 			  litTrack->AddHit(litHit);
 		   }
 		}
@@ -321,16 +344,16 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
       Bool_t isCreateMuchTrack = false, isCreateTrdTrack = false;
       for (Int_t iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
          const CbmLitHit* thisHit = litTrack->GetHit(iHit);
-         LitDetectorId thisDetId = thisHit->GetDetectorId();
+         LitSystemId thisDetId = thisHit->GetSystem();
          if (thisDetId == kLITMUCH && muchTracks != NULL) { isCreateMuchTrack = true; }
          if (thisDetId == kLITTRD && trdTracks != NULL) { isCreateTrdTrack = true; }
       }
 
-      std::vector<std::pair<LitDetectorId, Int_t> > vDetId;
-      vDetId.push_back(std::make_pair(litTrack->GetHit(0)->GetDetectorId(), 0));
+      std::vector<std::pair<LitSystemId, Int_t> > vDetId;
+      vDetId.push_back(std::make_pair(litTrack->GetHit(0)->GetSystem(), 0));
       for (Int_t iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
          const CbmLitHit* thisHit = litTrack->GetHit(iHit);
-         LitDetectorId thisDetId = thisHit->GetDetectorId();
+         LitSystemId thisDetId = thisHit->GetSystem();
          if (vDetId.back().first != thisDetId) {
             vDetId.push_back(std::make_pair(thisDetId, iHit));
          }
@@ -359,7 +382,7 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
       for (Int_t iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
          const CbmLitHit* hit = litTrack->GetHit(iHit);
          const CbmLitFitNode* node = litTrack->GetFitNode(iHit);
-         LitDetectorId detId = hit->GetDetectorId();
+         LitSystemId detId = hit->GetSystem();
          if (detId == kLITTRD && isCreateTrdTrack) {
             trdTrack->AddHit(hit->GetRefId(), kTRDHIT);
             chiSqTrd += node->GetChiSqFiltered();
@@ -435,15 +458,11 @@ void CbmLitConverter::HitArrayToHitVector(
          CbmLitStripHit* litHit = new CbmLitStripHit();
          CbmStripHit* stripHit = static_cast<CbmStripHit*>(hit);
          StripHitToLitStripHit(stripHit, iHit, litHit);
-         litHit->SetDetectorId(kLITMUCH);
          litHits.push_back(litHit);
       } else {
          CbmLitPixelHit* litHit = new CbmLitPixelHit();
          CbmPixelHit* pixelHit = static_cast<CbmPixelHit*>(hit);
          PixelHitToLitPixelHit(pixelHit, iHit, litHit);
-         if (hit->GetType() == kMUCHPIXELHIT) { litHit->SetDetectorId(kLITMUCH); }
-         if (hit->GetType() == kTRDHIT) { litHit->SetDetectorId(kLITTRD); }
-         if (hit->GetType() == kTOFHIT) { litHit->SetDetectorId(kLITTOF); }
          litHits.push_back(litHit);
       }
    }
@@ -458,8 +477,7 @@ void CbmLitConverter::MvdHitArrayToHitVector(
       CbmHit* hit = static_cast<CbmHit*>(hits->At(iHit));
       if(NULL == hit) { continue; }
       CbmLitPixelHit* litHit = new CbmLitPixelHit();
-      CbmHitToLitPixelHit(hit, iHit, litHit);
-      litHit->SetDetectorId(kLITMVD);
+      CbmHitToLitPixelHit(hit, iHit, litHit, kLITMVD);
       litHits.push_back(litHit);
    }
 }

@@ -124,31 +124,31 @@ public:
 
 
 
-class CompareHitPtrPlaneIdLess:
-   public std::binary_function<
-   const CbmLitHit*,
-   const CbmLitHit*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
-      return hit1->GetPlaneId() < hit2->GetPlaneId();
-   }
-};
-
-
-
-class CompareHitPtrPlaneIdMore:
-   public std::binary_function<
-   const CbmLitHit*,
-   const CbmLitHit*,
-   bool>
-{
-public:
-   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
-      return hit1->GetPlaneId() > hit2->GetPlaneId();
-   }
-};
+//class CompareHitPtrPlaneIdLess:
+//   public std::binary_function<
+//   const CbmLitHit*,
+//   const CbmLitHit*,
+//   bool>
+//{
+//public:
+//   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+//      return hit1->GetPlaneId() < hit2->GetPlaneId();
+//   }
+//};
+//
+//
+//
+//class CompareHitPtrPlaneIdMore:
+//   public std::binary_function<
+//   const CbmLitHit*,
+//   const CbmLitHit*,
+//   bool>
+//{
+//public:
+//   bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+//      return hit1->GetPlaneId() > hit2->GetPlaneId();
+//   }
+//};
 
 
 

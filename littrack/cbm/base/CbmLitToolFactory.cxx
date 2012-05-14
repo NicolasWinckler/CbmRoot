@@ -163,54 +163,56 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
    const std::string& name)
 {
-   if(name == "e_nn") {
-      CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
-      settings.SetSeedSelection(CreateTrackSelection("momentum"));
-//      settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
-      settings.SetFinalSelection(0, CreateTrackSelection("trd_final"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.IsUseFastSearch(true);
-      settings.SetMaxNofMissingHits(4);
-      settings.SetSigmaCoef(5.);
-      settings.SetChiSqPixelHitCut(0, 15.);
-//      settings.SetChiSqPixelHitCut(1, 25.);
-      settings.SetChiSqStripHitCut(9.);
-      settings.SetPDG(0, 211);
-//      settings.SetPDG(1, 11);
-      settings.IsProcessSubstationsTogether(true);
-      trdFinderNN->SetSettings(settings);
-      trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-      trdFinderNN->SetVerbose(1);
-      TrackFinderPtr finder(trdFinderNN);
-      return finder;
-   } else if(name == "e_branch") {
-      CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(2);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
-      settings.SetSeedSelection(CreateTrackSelection("momentum"));
-      settings.SetStationGroupSelection(CreateTrackSelection("trd_station"));
-      settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
-      settings.SetFinalSelection(1, CreateTrackSelection("trd_final"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.IsUseFastSearch(true);
-      settings.SetPDG(0, 211);
-      settings.SetPDG(1, 11);
-      settings.IsProcessSubstationsTogether(true);
-      settings.SetMaxNofMissingHits(4);
-      settings.IsAlwaysCreateMissingHit(false);
-      settings.SetSigmaCoef(5.);
-      settings.SetChiSqPixelHitCut(0, 15.);
-      settings.SetChiSqPixelHitCut(1, 50.);
-      settings.SetChiSqStripHitCut(9.);
-      trdFinderBranch->SetSettings(settings);
-      trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-      trdFinderBranch->SetVerbose(1);
-      TrackFinderPtr finder(trdFinderBranch);
-      return finder;
+	if(name == "e_nn") {
+		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
+		CbmLitTrackFinderSettings settings;
+		settings.SetNofIter(1);
+		settings.SetPropagator(CreateTrackPropagator("lit"));
+		settings.SetSeedSelection(CreateTrackSelection("momentum"));
+		//      settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
+		settings.SetFinalSelection(0, CreateTrackSelection("trd_final"));
+		settings.SetFilter(CreateTrackUpdate("kalman"));
+		settings.IsUseFastSearch(true);
+		settings.SetMaxNofMissingHits(4);
+		settings.SetSigmaCoef(5.);
+		settings.SetChiSqPixelHitCut(0, 15.);
+		//      settings.SetChiSqPixelHitCut(1, 25.);
+		settings.SetChiSqStripHitCut(9.);
+		settings.SetPDG(0, 211);
+		//      settings.SetPDG(1, 11);
+		settings.IsProcessSubstationsTogether(true);
+		trdFinderNN->SetSettings(settings);
+		trdFinderNN->SetZPropagationForTrackSeeds(400.);
+		trdFinderNN->SetUseTGeo(true);
+		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+		TrackFinderPtr finder(trdFinderNN);
+		return finder;
+	} else if(name == "e_branch") {
+		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
+		CbmLitTrackFinderSettings settings;
+		settings.SetNofIter(2);
+		settings.SetPropagator(CreateTrackPropagator("lit"));
+		settings.SetSeedSelection(CreateTrackSelection("momentum"));
+		settings.SetStationGroupSelection(CreateTrackSelection("trd_station"));
+		settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
+		settings.SetFinalSelection(1, CreateTrackSelection("trd_final"));
+		settings.SetFilter(CreateTrackUpdate("kalman"));
+		settings.IsUseFastSearch(true);
+		settings.SetPDG(0, 211);
+		settings.SetPDG(1, 11);
+		settings.IsProcessSubstationsTogether(true);
+		settings.SetMaxNofMissingHits(4);
+		settings.IsAlwaysCreateMissingHit(false);
+		settings.SetSigmaCoef(5.);
+		settings.SetChiSqPixelHitCut(0, 15.);
+		settings.SetChiSqPixelHitCut(1, 50.);
+		settings.SetChiSqStripHitCut(9.);
+		trdFinderBranch->SetSettings(settings);
+		trdFinderBranch->SetZPropagationForTrackSeeds(400.);
+		trdFinderBranch->SetUseTGeo(true);
+		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+		TrackFinderPtr finder(trdFinderBranch);
+		return finder;
    } else if(name == "mu_nn") {
       CbmLitTrackFinderNN* muchFinderNN = new CbmLitTrackFinderNN();
       CbmLitTrackFinderSettings settings;
@@ -227,8 +229,9 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.SetPDG(13);
       settings.IsProcessSubstationsTogether(true);
       muchFinderNN->SetSettings(settings);
+      muchFinderNN->SetZPropagationForTrackSeeds(-1.);
+	  muchFinderNN->SetUseTGeo(false);
       muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-      muchFinderNN->SetVerbose(1);
       TrackFinderPtr finder(muchFinderNN);
       return finder;
    } else if(name == "e_nn_parallel") {
@@ -258,7 +261,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.SetChiSqStripHitCut(11.);
       muchFinderBranch->SetSettings(settings);
       muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-      muchFinderBranch->SetVerbose(1);
       TrackFinderPtr finder(muchFinderBranch);
       return finder;
    } else if(name == "mvd_nn") {
@@ -278,7 +280,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.IsProcessSubstationsTogether(true);
       mvdFinderNN->SetSettings(settings);
       mvdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMvdLayout());
-      mvdFinderNN->SetVerbose(1);
       TrackFinderPtr finder(mvdFinderNN);
       return finder;
    }

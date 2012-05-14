@@ -37,92 +37,70 @@ public:
     *@param stationGroup Index of the station group in the detector
     *@param station Index of the station in the station group
     *@param substation Index of the substation in the station
+    *@param
     *@param hit Pointer to the hit to be added
     */
    void AddHit(
-      int stationGroup,
-      int station,
-      int substation,
-      CbmLitHit* hit);
-
-   /*Adds the hit using absolute detector plane (substation) index in the detector
-    *@param planeId Index of the detector plane (substation) in the detector
-    *@param hit Pointer to the hit to be added
-    */
-   void AddHit(
-      int planeId,
+      Int_t stationGroup,
+      Int_t station,
+      Int_t substation,
+      Int_t moduleRotation,
       CbmLitHit* hit);
 
    /* Returns the hit using station group, station and substation indices
     *@param stationGroup Index of the station group in the detector
     *@param station Index of the station in the station group
     *@param substation Index of the substation in the station
+    *@param moduleRotation
     *@param hitId Hit index in the array of hits for the specified substation
     *@return Hit pointer
     */
    const CbmLitHit* GetHit(
-      int stationGroup,
-      int station,
-      int substation,
-      int hitId) const;
-
-   /* Returns the hit using absolute detector plane (substation) index in the detector
-    *@param planeId Index of the detector plane (substation) in the detector
-    *@param hitId Hit index in the array of hits for the specified substation
-    *@return Hit pointer
-    */
-   const CbmLitHit* GetHit(
-      int planeId,
-      int hitId) const;
+      Int_t stationGroup,
+      Int_t station,
+      Int_t substation,
+      Int_t moduleRotation,
+      Int_t hitId) const;
 
    /* Returns hit iterators using station group, station and substation indices
     *@param stationGroup Index of the station group in the detector
     *@param station Index of the station in the station group
     *@param substation Index of the substation in the station
+    *@param moduleRotation
     *@return Hit iterators
     */
    HitPtrIteratorPair GetHits(
-      int stationGroup,
-      int station,
-      int substation);
-
-   /* Returns hits iterators using absolute detector plane (substation) index in the detector
-    *@param planeId Index of the detector plane (substation) in the detector
-    *@return Hit iterators
-    */
-   HitPtrIteratorPair GetHits(
-      int planeId);
+      Int_t stationGroup,
+      Int_t station,
+      Int_t substation,
+      Int_t moduleRotation);
 
    /* Returns number of hits for the specified substation
     *@param stationGroup Index of the station group in the detector
     *@param station Index of the station in the station group
     *@param substation Index of the substation in the station
+    *@param moduleRotation
     *@return Number of hits
     */
-   int GetNofHits(
-      int stationGroup,
-      int station,
-      int substation) const;
+   Int_t GetNofHits(
+      Int_t stationGroup,
+      Int_t station,
+      Int_t substation,
+      Int_t moduleRotation) const;
 
    /* Returns maximum hit error in [cm] and the name of the coordinate
     * ("X", "Y", "U") for the specified substation.
     *@param stationGroup Index of the station group in the detector
     *@param station Index of the station in the station group
     *@param substation Index of the substation in the station
+    *@param moduleRotation
     *@return Pair of hit error and and coordinate ID
     */
    std::pair<litfloat, char> GetMaxErr(
-      int stationGroup,
-      int station,
-      int substation) const;
-
-   /* Returns maximum hit error in [cm] and the name of the coordinate
-    * ("X", "Y", "U")for the specified substation.
-    *@param planeId Index of the detector plane (substation) in the detector
-    *@return Pair of hit error and and coordinate ID
-    */
-   std::pair<litfloat, char> GetMaxErr(
-      int planeId) const;
+      Int_t stationGroup,
+      Int_t station,
+      Int_t substation,
+      Int_t moduleRotation) const;
 
    /* Clears the hit arrays */
    void Clear();
@@ -133,23 +111,12 @@ public:
    virtual std::string ToString() const;
 
 private:
-   /* Calculates station group, station and substation indices using the
-    * detector plane number.
-    *@param planeId [in] Detector plane index
-    *@param stationGroup [out] Index of the station group in the detector
-    *@param station [out] Index of the station in the station group
-    *@param subsattion [out] Index of the substation in the station
-    */
-   void StationByPlaneId(
-      int planeId,
-      int& stationGroup,
-      int& station,
-      int& substation) const;
-
    // Arrays with hits
-   std::vector<std::vector<std::vector<HitPtrVector> > > fHits;
+   // [station group][station][substation][module rotation]
+   std::vector<std::vector<std::vector<std::vector<HitPtrVector> > > > fHits;
    // Arrays with maximum hit position errors for each substation
-   std::vector<std::vector<std::vector<std::pair<litfloat, char> > > > fMaxErr;
+   // [station group][station][substation][module rotation]
+   std::vector<std::vector<std::vector<std::vector<std::pair<litfloat, char> > > > > fMaxErr;
 };
 
 #endif /*CBMLITHITDATA_H_*/

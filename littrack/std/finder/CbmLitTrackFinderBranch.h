@@ -67,7 +67,7 @@ protected:
 
    /* Inherited from CbmLitTrackFinderBase */
    virtual void SetIterationParameters(
-      int iter);
+      Int_t iter);
 
    /* Initializes track seeds
     * @param itBegin Iterator to the first track seed.
@@ -84,7 +84,7 @@ protected:
     * @param stationGroup Station group index */
    void ProcessStationGroup(
       const CbmLitTrack* track,
-      int stationGroup);
+      Int_t stationGroup);
 
    /* Follows track through station
     * @param track Track to be followed
@@ -94,8 +94,8 @@ protected:
     * @return True if branch was created */
    bool ProcessStation(
       const CbmLitTrack* track,
-      int stationGroup,
-      int station,
+      Int_t stationGroup,
+      Int_t station,
       TrackPtrVector& tracksOut);
 
    /* Processes station if fIsProcessSubstationsTogether == true
@@ -106,8 +106,8 @@ protected:
     * @return True if branch was created */
    bool ProcessStation1(
       const CbmLitTrack* track,
-      int stationGroup,
-      int station,
+      Int_t stationGroup,
+      Int_t station,
       TrackPtrVector& tracksOut);
 
    /* Processes station if fIsProcessSubstationsTogether == false
@@ -118,8 +118,8 @@ protected:
     * @return True if branch was created */
    bool ProcessStation2(
       const CbmLitTrack* track,
-      int stationGroup,
-      int station,
+      Int_t stationGroup,
+      Int_t station,
       TrackPtrVector& tracksOut);
 
    /* Processes substation
@@ -137,7 +137,7 @@ protected:
     * @return True if OK */
    bool AddTrackCandidate(
       TrackPtrVector& tracks,
-      int stationGroup);
+      Int_t stationGroup);
 
    /* Copies track candidates to local output array for final comparison */
    void CopyToOutputArray();
@@ -163,10 +163,10 @@ private:
 
    /* Maximum number of hits in the validation
       gate for which a separate branch is created */
-   int fMaxNofHitsInValidationGate;
+   Int_t fMaxNofHitsInValidationGate;
    /* Maximum number of branches for one input track seed
       which can be created in a station group */
-   int fMaxNofBranchesStationGroup;
+   Int_t fMaxNofBranchesStationGroup;
    /* If true than a separate branch for a missing hit is always created
       if false than it is created only if there are no hits in the validation gate */
    bool fIsAlwaysCreateMissingHit;
@@ -174,12 +174,12 @@ private:
       hit selection is done over all this hits at a time */
    bool fIsProcessSubstationsTogether;
    /* Counter for number of branches */
-   int fNofBranchesStationGroup;
+   Int_t fNofBranchesStationGroup;
    /* Maximum number of branches for one input track seed */
-   int fMaxNofBranches;
+   Int_t fMaxNofBranches;
    /* Map for monitoring of number of branches for each input track seed
       map<previousTrackId, nofBranches> */
-   std::map<int, int> fNofBranches;
+   std::map<Int_t, Int_t> fNofBranches;
 };
 
 #endif /*CBMLITTRACKFINDERBASEBRANCH_H_*/

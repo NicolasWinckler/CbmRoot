@@ -221,7 +221,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
    // Temporary solution
    // Propagate STS tracks to the last STS station for
    // parallel tracking!!!
-   for (int iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
+   for (Int_t iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
       CbmLitTrack* track = fLitStsTracks[iTrack];
       CbmLitTrackParam par = *track->GetParamLast();
 //      std::cout << "Zin=" << par.GetZ() << " ";
@@ -247,7 +247,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
          Int_t nofPlanes = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
          for (Int_t i = 0; i < fLitHits.size(); i++) {
             CbmLitHit* hit = fLitHits[i];
-            if (hit->GetDetectorId() == kLITTRD) { hit->SetPlaneId(hit->GetPlaneId() + nofPlanes); }
+//            if (hit->GetDetectorId() == kLITTRD) { hit->SetPlaneId(hit->GetPlaneId() + nofPlanes); } TODO No planeIDs now
          }
       }
    }
@@ -440,16 +440,13 @@ void CbmLitFindGlobalTracks::SelectTracksForTofMerging()
    // with TOF hits.
 
    const CbmLitDetectorLayout& layout = CbmLitEnvironment::Instance()->GetLayout();
-   int nofStationGroups = layout.GetNofStationGroups();
-   int nofPlanes = layout.GetNofPlanes();
-   int nofPlanesLast = layout.GetNofPlanes(nofStationGroups - 1);
-   int planeCut = nofPlanes - nofPlanesLast;
+   Int_t stationGroupCut = layout.GetNofStationGroups() - 1;
 
    for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++) {
       CbmLitTrack* track = *it;
       if (track->GetQuality() == kLITBAD) { continue; }
       const CbmLitHit* hit = track->GetHit(track->GetNofHits() - 1);
-      if (hit->GetPlaneId() >= planeCut) {
+      if (hit->GetStationGroup() >= stationGroupCut) {
          // OK select this track for further merging with TOF
          track->SetQuality(kLITGOODMERGE);
       }

@@ -35,13 +35,14 @@ enum LitTrackQa {
 };
 
 /**
- * \enum Define detector identificator.
+ * \enum Define system identificator.
  */
-enum LitDetectorId {
+enum LitSystemId {
    kLITMUCH = 0, /**< MUCH detector. */
    kLITTRD = 1, /**< TRD detector. */
    kLITTOF = 2, /**< TOF detector. */
-   kLITMVD = 3 /**< MVD detector. */
+   kLITMVD = 3, /**< MVD detector. */
+   kLITSTS = 4 /**< STS detector. */
 };
 
 #endif /* CBMLITENUMS_H_ */

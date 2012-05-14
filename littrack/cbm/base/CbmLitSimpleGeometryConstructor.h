@@ -12,6 +12,7 @@
 
 #include "propagation/CbmLitMaterialInfo.h"
 #include "base/CbmLitDetectorSetup.h"
+#include "base/CbmLitDetectorLayout.h"
 
 #include <string>
 #include <map>
@@ -60,6 +61,9 @@ public:
     */
    void Draw();
 
+   TGeoManager* GetTrdTrackingGeo() const { return fTrdTrackingGeo; }
+   const CbmLitDetectorLayout& GetTrdLayout() const { return fTrdLayout; }
+
 private:
    /**
     * \brief Constructor.
@@ -88,10 +92,6 @@ private:
     * \brief Main function for simplified geometry construction.
     */
    void ConstructGeometry();
-
-   /* */
-   TGeoMedium* CreateMedium(
-      const std::string& matName);
 
    /* */
    void CreateMediumList();
@@ -148,6 +148,9 @@ private:
    std::vector<CbmLitMaterialInfo> fMyRichGeoNodes; // Vector of materials for the RICH simplified geometry
 
    CbmLitDetectorSetup fDet;
+
+   TGeoManager* fTrdTrackingGeo;
+   CbmLitDetectorLayout fTrdLayout;
 };
 
 #endif /* CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_ */

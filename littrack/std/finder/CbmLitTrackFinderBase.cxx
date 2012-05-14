@@ -26,8 +26,9 @@ CbmLitTrackFinderBase::CbmLitTrackFinderBase():
    fNofIter(0),
    fMaxNofMissingHits(0),
    fPDG(),
-   fVerbose(1),
-   fEventNo(0)
+   fEventNo(0),
+   fZPropagationForTrackSeeds(-1.),
+   fUseTGeo(false)
 {
 }
 
@@ -42,32 +43,40 @@ void CbmLitTrackFinderBase::ArrangeHits(
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitHit* hit = *it;
       if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) { continue; }
-      fHitData.AddHit(hit->GetPlaneId(), hit);
+      Int_t stationGroup = hit->GetStationGroup();
+      Int_t station = hit->GetStation();
+      Int_t substation = hit->GetSubstation();
+      Int_t moduleRotation = fLayout.GetSubstation(stationGroup, station, substation).GetModuleRotationId(hit->GetModule());
+//      std::cout << ">>>> sg=" << stationGroup << " st=" << station << " ss=" << substation << " module=" << hit->GetModule() << " moduleRotation=" << moduleRotation << " " << hit->ToString();
+      fHitData.AddHit(stationGroup, station, substation, moduleRotation, hit);
    }
 
 //   std::cout << "CbmLitTrackFinderBase::ArrangeHits:\n" << fHitData.ToString();
 //   std::cout << "CbmLitTrackFinderBase::ArrangeHits:\n" << fLayout.ToString();
 
-   for (int i = 0; i < fLayout.GetNofStationGroups(); i++) {
-      for (int j = 0; j < fLayout.GetNofStations(i); j++) {
+   for (Int_t i = 0; i < fLayout.GetNofStationGroups(); i++) {
+      for (Int_t j = 0; j < fLayout.GetNofStations(i); j++) {
          CbmLitStation station = fLayout.GetStation(i, j);
          if (station.GetType() == kLITPIXELHIT) {
-            for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
-               HitPtrIteratorPair hits = fHitData.GetHits(i, j, k);
-               std::sort(hits.first, hits.second, CompareHitPtrXULess());
-//                std::cout << "station group " << i << " station " << j
-//                   << " substation " << k << std::endl;
-//                for(HitPtrIterator it = hits.first; it != hits.second; it++)
-//                   std::cout << (*it)->ToString();
+            for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
+            	for (Int_t l = 0; l < fLayout.GetNofModuleRotations(i, j, k); l++) {
+				   HitPtrIteratorPair hits = fHitData.GetHits(i, j, k, l);
+				   std::sort(hits.first, hits.second, CompareHitPtrXULess());
+//	               std::cout << "station group " << i << " station " << j << " substation " << k << " moduleRotation " << l << std::endl;
+//	               for(HitPtrIterator it = hits.first; it != hits.second; it++)
+//	                   std::cout << (*it)->ToString();
+				}
             }
          } else {
-            for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
-               HitPtrIteratorPair hits = fHitData.GetHits(i, j, k);
-               std::sort(hits.first, hits.second, CompareHitPtrXULess());
-//             std::cout << "station group " << i << " station " << j
-//                << " substation " << k << std::endl;
-//             for(HitPtrIterator it = hits.first; it != hits.second; it++)
-//                std::cout << (*it)->ToString();
+            for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
+            	for (Int_t l = 0; l < fLayout.GetNofModuleRotations(i, j, k); l++) {
+				   HitPtrIteratorPair hits = fHitData.GetHits(i, j, k, l);
+				   std::sort(hits.first, hits.second, CompareHitPtrXULess());
+	//             std::cout << "station group " << i << " station " << j
+	//                << " substation " << k << std::endl;
+	//             for(HitPtrIterator it = hits.first; it != hits.second; it++)
+	//                std::cout << (*it)->ToString();
+				}
             }
          }
       }
@@ -81,7 +90,7 @@ void CbmLitTrackFinderBase::RemoveHits(
    for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitTrack* track = *it;
       if(track->GetQuality() == kLITBAD) { continue; }
-      for (int hit = 0; hit < track->GetNofHits(); hit++) {
+      for (Int_t hit = 0; hit < track->GetNofHits(); hit++) {
          fUsedHitsSet.insert(track->GetHit(hit)->GetRefId());
       }
    }

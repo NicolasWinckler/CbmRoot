@@ -33,7 +33,7 @@ inline void CbmLitPixelHitToLitScalPixelHit(
    lhit->Dx = hit->GetDx();
    lhit->Dy = hit->GetDy();
    lhit->Dxy = hit->GetDxy();
-   lhit->planeId = hit->GetPlaneId();
+//   lhit->planeId = hit->GetPlaneId(); // TODO: NO plane IDs now
    lhit->refId = hit->GetRefId();
    lhit->Z = hit->GetZ();
 }
@@ -125,7 +125,7 @@ inline void LitTrackParamScalToCbmLitTrackParam(
 inline void LitScalTrackToCbmLitTrack(
    lit::parallel::LitScalTrack* ltrack,
    CbmLitTrack* track,
-   LitDetectorId detId)
+   LitSystemId detId)
 {
    // Convert track parameters
    CbmLitTrackParam parFirst, parLast;
@@ -150,9 +150,9 @@ inline void LitScalTrackToCbmLitTrack(
       newHit->SetDx(lhit->Dx);
       newHit->SetDy(lhit->Dy);
       newHit->SetDxy(lhit->Dxy);
-      newHit->SetPlaneId(lhit->planeId);
+      //newHit->SetPlaneId(lhit->planeId); // TODO No planeIDs now
       newHit->SetHitType(kLITPIXELHIT);
-      newHit->SetDetectorId(detId);
+//      newHit->SetSystem(detId); // TODO No planeIDs now
       newHit->SetRefId(lhit->refId);
       newHit->SetZ(lhit->Z);
 //    std::cout << ltrack->hits[i];

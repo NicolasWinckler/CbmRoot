@@ -110,6 +110,7 @@ void CbmLitEnvironment::MuchLayout()
 {
    static Bool_t layoutCreated = false;
    if (!layoutCreated) {
+	  TGeoMatrix* matrix = new TGeoRotation(); // needed to define rotation matrix for module
       CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
       FairRuntimeDb* db = FairRuntimeDb::instance();
       CbmGeoMuchPar* geoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
@@ -123,11 +124,16 @@ void CbmLitEnvironment::MuchLayout()
          CbmLitStationGroup LitStationGroupMuon;
          for (Int_t iLayer = 0; iLayer < nofLayers; iLayer++) {
             CbmMuchLayer* layer = station->GetLayer(iLayer);
-            Double_t zFront = layer->GetSideF()->GetZ();
-            Double_t zBack = layer->GetSideB()->GetZ();
+            Double_t zFront = layer->GetSideF()->GetZ();// - geoScheme->GetGetActiveLz();
+            Double_t zBack = layer->GetSideB()->GetZ();// - layer->GetSupportDz();
+            std::cout << ">> sideF=" << layer->GetSideF()->GetZ() << " sideB=" << layer->GetSideB()->GetZ()
+            		<< " moduleF=" << layer->GetSide(false)->GetModule(0)->GetPosition()[2]
+            		<< " moduleB=" << layer->GetSide(true)->GetModule(0)->GetPosition()[2] << "\n";
 
             CbmLitSubstation litSubstationFront, litSubstationBack;
+            litSubstationFront.AddModule(0, matrix);
             litSubstationFront.SetZ(zFront);
+            litSubstationBack.AddModule(0, matrix);
             litSubstationBack.SetZ(zBack);
 
             CbmLitStation LitStationMuon;
@@ -153,44 +159,9 @@ void CbmLitEnvironment::TrdLayout()
 {
    static Bool_t layoutCreated = false;
    if (!layoutCreated) {
-      std::set<Double_t> stationZPos;
-      TObjArray* topNodes = gGeoManager->GetTopNode()->GetNodes();
-      Int_t nofTopNodes = topNodes->GetEntriesFast();
-      for (Int_t iTopNode = 0; iTopNode < nofTopNodes; iTopNode++) {
-         TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
-         if (TString(topNode->GetName()).Contains("trd")) {
-            CbmLitStationGroup stg;
-            TGeoNode* station = topNode;
-            const Double_t* stationPos = station->GetMatrix()->GetTranslation();
-            TObjArray* modules = station->GetNodes();
-            for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
-               TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
-               const Double_t* modulePos = module->GetMatrix()->GetTranslation();
-               TObjArray* moduleParts = module->GetNodes();
-               for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
-                  TGeoNode* modulePart = static_cast<TGeoNode*>(moduleParts->At(iModulePart));
-                  if (TString(modulePart->GetName()).Contains("gas")) {
-                     const Double_t* pos = modulePart->GetMatrix()->GetTranslation();
-                     TGeoPgon* shape = static_cast<TGeoPgon*>(modulePart->GetVolume()->GetShape());
-//                     TGeoBBox* shape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
-                     Double_t zPos = stationPos[2] + modulePos[2] + pos[2] + shape->GetDZ();
-
-                     if (stationZPos.find(zPos) == stationZPos.end()) {
-                        stationZPos.insert(zPos);
-                        CbmLitSubstation substation;
-                        substation.SetZ(zPos);
-                        CbmLitStation sta;
-                        sta.SetType(kLITPIXELHIT);
-                        sta.AddSubstation(substation);
-                        stg.AddStation(sta);
-                     }
-                  }
-               }
-            }
-            fTrdLayout.AddStationGroup(stg);
-         }
-      }
-      cout << fTrdLayout.ToString();
+	  fTrdLayout = CbmLitSimpleGeometryConstructor::Instance()->GetTrdLayout();
+      fTrdLayout.SetGeo(CbmLitSimpleGeometryConstructor::Instance()->GetTrdTrackingGeo());
+      //cout << fTrdLayout.ToString();
       layoutCreated = true;
    }
 }

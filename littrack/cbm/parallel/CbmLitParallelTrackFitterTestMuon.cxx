@@ -146,7 +146,7 @@ bool CbmLitParallelTrackFitterTestMuon::CheckHit(
    unsigned char planeId = PlaneId(stationGroup, station, substation, layout);
    for (int i = 0; i < track->GetNofHits(); i++) {
       const CbmLitHit* hit = track->GetHit(i);
-      if (hit->GetPlaneId() == planeId) { return true; }
+     // if (hit->GetPlaneId() == planeId) { return true; } // TODO No planeIDs now
    }
    return false;
 }

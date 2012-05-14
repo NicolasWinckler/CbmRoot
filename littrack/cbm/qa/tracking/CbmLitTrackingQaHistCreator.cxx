@@ -510,7 +510,7 @@ void CbmLitTrackingQaHistCreator::Create(
    // Histogram stores number of events
    Create1DHist("hen_EventNo_TrackingQa", "", "", 1, 0, 1.);
 
-   cout << fHM->ToString();
+//   cout << fHM->ToString();
 
 //   vector<TH1*> histos = fHM->H1Vector("hte_.*_All_.*");
 //   for (Int_t i = 0; i < histos.size(); i++) {

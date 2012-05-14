@@ -66,9 +66,12 @@ public:
          << ") err=(" << GetDu() << "," << GetDz() << ") "
          << " phi=" << GetPhi()
          << " cosPhi=" << GetCosPhi() << " sinPhi=" << GetSinPhi()
-         << " planeId=" << GetPlaneId()
          << " refId=" << GetRefId()
-         << " hitType=" << GetType() << std::endl;
+         << " hitType=" << GetType()
+         << " stationGroup=" << GetStationGroup()
+         << " station=" << GetStation()
+         << " substation=" << GetSubstation()
+         << " module=" << GetModule() << std::endl;
       return ss.str();
    }
 

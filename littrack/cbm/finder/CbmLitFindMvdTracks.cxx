@@ -98,7 +98,7 @@ void CbmLitFindMvdTracks::ConvertInputData()
 {
    CbmLitConverter::StsTrackArrayToTrackVector(fStsTracks, fLitStsTracks);
    // Change last and first parameters of the track seeds
-   for(int iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
+   for(Int_t iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
       CbmLitTrack* track = fLitStsTracks[iTrack];
       const CbmLitTrackParam* parFirst = track->GetParamFirst();
       track->SetParamLast(parFirst);
@@ -108,23 +108,23 @@ void CbmLitFindMvdTracks::ConvertInputData()
    CbmLitConverter::MvdHitArrayToHitVector(fMvdHits, fLitMvdHits);
    // Make reverse order of the hits
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   int nofPlanes = env->GetMvdLayout().GetNofPlanes();
-   for(int iHit = 0; iHit < fLitMvdHits.size(); iHit++) {
+   Int_t nofStations = env->GetMvdLayout().GetStationGroup(0).GetNofStations();
+   for(Int_t iHit = 0; iHit < fLitMvdHits.size(); iHit++) {
       CbmLitHit* hit = fLitMvdHits[iHit];
-      hit->SetPlaneId(nofPlanes - hit->GetPlaneId() - 1);
+      hit->SetDetectorId(kLITMVD, hit->GetStationGroup(), nofStations - hit->GetStation() - 1, hit->GetSubstation(), hit->GetModule());
    }
    std::cout << "-I- Number of MVD hits: " << fLitMvdHits.size() << std::endl;
 }
 
 void CbmLitFindMvdTracks::ConvertOutputData()
 {
-   for(int iTrack = 0; iTrack < fLitOutputTracks.size(); iTrack++) {
+   for(Int_t iTrack = 0; iTrack < fLitOutputTracks.size(); iTrack++) {
       CbmLitTrack* litTrack = fLitOutputTracks[iTrack];
-      int trackId = litTrack->GetPreviousTrackId();
+      Int_t trackId = litTrack->GetPreviousTrackId();
       CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(trackId));
-      for (int iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
+      for (Int_t iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
          const CbmLitHit* litHit = litTrack->GetHit(iHit);
-         int refId = litHit->GetRefId();
+         Int_t refId = litHit->GetRefId();
          FairHit* hit = static_cast<FairHit*>(fMvdHits->At(refId));
          track->AddMvdHit(refId, hit);
       }

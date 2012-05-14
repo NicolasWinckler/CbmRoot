@@ -183,7 +183,7 @@ bool CbmLitParallelTrackFitterTestElectron::CheckHit(
    unsigned char planeId = PlaneId(stationGroup, station, layout);
    for (unsigned int i = 0; i < track->GetNofHits(); i++) {
       const CbmLitHit* hit = track->GetHit(i);
-      if (hit->GetPlaneId() == planeId) { return true; }
+      //if (hit->GetPlaneId() == planeId) { return true; } // TODO no planeIDs now
    }
    return false;
 }

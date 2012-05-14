@@ -162,13 +162,11 @@ void CbmLitPropagationQaCalculator::GlobalTrackToLitTrack(
             CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(index);
             CbmLitPixelHit litHit;
             CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
-            litHit.SetDetectorId(kLITMUCH);
             litTrack->AddHit(&litHit);
          } else if (type == kMUCHSTRAWHIT) {
             CbmStripHit* hit = (CbmStripHit*) fMuchStrawHits->At(index);
             CbmLitStripHit litHit;
             CbmLitConverter::StripHitToLitStripHit(hit, index, &litHit);
-            litHit.SetDetectorId(kLITMUCH);
             litTrack->AddHit(&litHit);
          }
       }
@@ -181,7 +179,6 @@ void CbmLitPropagationQaCalculator::GlobalTrackToLitTrack(
          CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(index);
          CbmLitPixelHit litHit;
          CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
-         litHit.SetDetectorId(kLITTRD);
          litTrack->AddHit(&litHit);
       }
    }
@@ -190,8 +187,7 @@ void CbmLitPropagationQaCalculator::GlobalTrackToLitTrack(
       CbmPixelHit* tofHit = (CbmPixelHit*) fTofHits->At(tofId);
       CbmLitPixelHit litHit;
       CbmLitConverter::PixelHitToLitPixelHit(tofHit, tofId, &litHit);
-      litHit.SetDetectorId(kLITTOF);
-      litHit.SetPlaneId(fNofPlanes - 1);
+//      litHit.SetPlaneId(fNofPlanes - 1); TODO No planeIDs now
       litTrack->AddHit(&litHit);
    }
 }
@@ -230,7 +226,7 @@ void CbmLitPropagationQaCalculator::TestPropagation(
       if (fMCTrackCreator->TrackExists(mcTrackId)) {
          CbmLitMCTrack mcTrack = fMCTrackCreator->GetTrack(mcTrackId);
          CbmLitMCPoint mcPoint = GetMcPointByHit(hit, &mcTrack);
-         FillHistosPropagation(&par, &mcPoint, hit->GetPlaneId());
+//         FillHistosPropagation(&par, &mcPoint, hit->GetPlaneId()); TODO No planeIDs now
       }
 //    if (fFilter->Update(&par, track->GetHit(i)) == kLITERROR) continue;
    }
@@ -269,8 +265,8 @@ void CbmLitPropagationQaCalculator::TestFastPropagation(
             const CbmLitHit* hit = track->GetHit(i);
             const CbmLitFitNode* node = track->GetFitNode(i);
             CbmLitMCPoint mcPoint = GetMcPointByHit(hit, &mcTrack);
-            FillHistosPropagation(node->GetPredictedParam(), &mcPoint, hit->GetPlaneId());
-            FillHistosFilter(node->GetUpdatedParam(), &mcPoint, hit->GetPlaneId(), node->GetChiSqFiltered());
+//            FillHistosPropagation(node->GetPredictedParam(), &mcPoint, hit->GetPlaneId()); TODO No planeIDs now
+//            FillHistosFilter(node->GetUpdatedParam(), &mcPoint, hit->GetPlaneId(), node->GetChiSqFiltered()); TODO No planeIDs now
          }
       }
    }
@@ -313,8 +309,8 @@ void CbmLitPropagationQaCalculator::FillHistosFitter(
       vector<Double_t> rFilter = CalcResidualsAndPulls(node->GetUpdatedParam(), &mcPoint);
       vector<Double_t> rSmoother = CalcResidualsAndPulls(node->GetSmoothedParam(), &mcPoint);
       for (Int_t iParam = 0; iParam < CbmLitPropagationQaHistCreator::NofQaParameters; iParam++) {
-         fHM->H1(CbmLitPropagationQaHistCreator::HistName(iParam, 1, hit->GetPlaneId()))->Fill(rFilter[iParam]);
-         fHM->H1(CbmLitPropagationQaHistCreator::HistName(iParam, 2, hit->GetPlaneId()))->Fill(rSmoother[iParam]);
+//         fHM->H1(CbmLitPropagationQaHistCreator::HistName(iParam, 1, hit->GetPlaneId()))->Fill(rFilter[iParam]); TODO No planeIDs now
+//         fHM->H1(CbmLitPropagationQaHistCreator::HistName(iParam, 2, hit->GetPlaneId()))->Fill(rSmoother[iParam]); TODO No planeIDs now
       }
 //      fHM->H1(HistName(11, 1, hit->GetPlaneId()))->Fill(node->GetChiSqFiltered());
 //      fHM->H1(HistName(11, 2, hit->GetPlaneId()))->Fill(node->GetChiSqSmoothed());
@@ -384,7 +380,7 @@ CbmLitMCPoint CbmLitPropagationQaCalculator::GetMcPointByHit(
       const CbmLitHit* hit,
       const CbmLitMCTrack* mcTrack)
 {
-   if (hit->GetDetectorId() == kLITTRD) {
+   if (hit->GetSystem() == kLITTRD) {
       CbmTrdDetectorId trdDetectorId;
       const CbmBaseHit* trdHit = static_cast<const CbmBaseHit*>(fTrdHits->At(hit->GetRefId()));
       Int_t* detInfo = trdDetectorId.GetDetectorInfo(trdHit->GetDetectorId());
@@ -392,7 +388,7 @@ CbmLitMCPoint CbmLitPropagationQaCalculator::GetMcPointByHit(
       if (mcTrack->GetNofPointsAtStation(kTRD, trdStationId) > 0) {
          return mcTrack->GetPointAtStation(kTRD, trdStationId, 0);
       }
-   } else if (hit->GetDetectorId() == kLITMUCH) {
+   } else if (hit->GetSystem() == kLITMUCH) {
      // Int_t muchStationId = hit->GetPlaneId();
       const CbmBaseHit* muchHit = (hit->GetType() == kLITPIXELHIT) ?
             static_cast<const CbmBaseHit*>(fMuchPixelHits->At(hit->GetRefId())):
@@ -403,7 +399,7 @@ CbmLitMCPoint CbmLitPropagationQaCalculator::GetMcPointByHit(
       if (mcTrack->GetNofPointsAtStation(kMUCH, muchStationId) > 0) {
          return mcTrack->GetPointAtStation(kMUCH, muchStationId, 0);
       }
-   } else if (hit->GetDetectorId() == kLITTOF) {
+   } else if (hit->GetSystem() == kLITTOF) {
       if (mcTrack->GetNofPointsAtStation(kTOF, 0) > 0) {
          return mcTrack->GetPointAtStation(kTOF, 0, 0);
       }

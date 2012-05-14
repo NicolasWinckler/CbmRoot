@@ -58,9 +58,9 @@ void CbmLitTrackSelectionSharedHits::CheckSharedHits(
       for(int iHit = 0; iHit < nofHits; iHit++) {
          int hitId = track->GetHit(iHit)->GetRefId();
          LitHitType type = track->GetHit(iHit)->GetType();
-         LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
+         LitSystemId sysId = track->GetHit(iHit)->GetSystem();
          if (type == kLITSTRIPHIT) { hitId += STRIPSTART; }
-         if (detId == kLITTRD) { hitId += TRDSTART; }
+         if (sysId == kLITTRD) { hitId += TRDSTART; }
          if(hitsId.find(hitId) != hitsId.end()) {
             nofSharedHits++;
             if (nofSharedHits > fNofSharedHits) {
@@ -75,7 +75,7 @@ void CbmLitTrackSelectionSharedHits::CheckSharedHits(
       for(int iHit = 0; iHit < nofHits; iHit++) {
          int hitId = track->GetHit(iHit)->GetRefId();
          LitHitType type = track->GetHit(iHit)->GetType();
-         LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
+         LitSystemId detId = track->GetHit(iHit)->GetSystem();
          if (type == kLITSTRIPHIT) { hitId += STRIPSTART; }
          if (detId == kLITTRD) { hitId += TRDSTART; }
          hitsId.insert(hitId);

@@ -2,6 +2,7 @@
 #define CBMLITCONVERTER_H_
 
 #include "base/CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
 
 class CbmLitPixelHit;
 class CbmLitStripHit;
@@ -44,7 +45,8 @@ public:
    static void CbmHitToLitPixelHit(
       const CbmHit* hit,
       int index,
-      CbmLitPixelHit* litHit);
+      CbmLitPixelHit* litHit,
+      LitSystemId sysId);
 
    static void StsTrackToLitTrack(
       const CbmStsTrack* stsTrack,

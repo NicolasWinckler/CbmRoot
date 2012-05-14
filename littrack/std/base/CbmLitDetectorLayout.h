@@ -20,6 +20,9 @@
 #include <sstream>
 #include <iostream>
 
+class TGeoManager;
+class CbmLitTrackParam;
+
 /**
  * \class CbmLitDetectorLayout
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
@@ -119,6 +122,17 @@ public:
    }
 
    /**
+    * \brief Return number of module rotations.
+    * \param[in] stationGroup Index of station group.
+    * \param[in] station Index of station in station group.
+    * \param[in] substation Index of substation in station.
+    * \return Number of module rotations.
+    */
+   Int_t GetNofModuleRotations(Int_t stationGroup, Int_t station, Int_t substation) const {
+      return GetStationGroup(stationGroup).GetStation(station).GetSubstation(substation).GetNofModuleRotations();
+   }
+
+   /**
     * \brief Return total number of substations (detector planes) in detector.
     * \return Total number of substations (detector planes) in detector.
     */
@@ -144,13 +158,40 @@ public:
    }
 
    /**
+    * \brief Set TGeoManager based tracking geometry.
+    * \param[in] geo Pointer to TGeoManager.
+    */
+   void SetGeo(TGeoManager* geo) { fGeo = geo; }
+
+   /**
+    * \brief Return TGeoManager.
+    */
+   TGeoManager* GetGeo() const { return fGeo; }
+
+   LitStatus FindBoundary(
+      const CbmLitTrackParam* par,
+      Int_t stationGroup,
+      Int_t station,
+      Int_t substation,
+      bool downstream,
+      litfloat& zOut,
+      Int_t& moduleId) const;
+
+   /**
     * \brief Return string representation of class.
     * \return String representation of class.
     */
    std::string ToString() const;
 
 private:
+   void InitTrack(
+      const CbmLitTrackParam* par,
+      Bool_t downstream) const;
+
+   Bool_t CheckGeoFailure() const;
+
    std::vector<CbmLitStationGroup> fStationGroups; // Vector of station groups
+   TGeoManager* fGeo; // Tracking geometry based on TGeo
 };
 
 #endif /*CBMLITDETECTORLAYOUT_H_*/

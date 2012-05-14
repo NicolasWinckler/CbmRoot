@@ -61,10 +61,14 @@ public:
       std::stringstream ss;
       ss << "PixelHit: pos=(" << GetX() << "," << GetY() << "," << GetZ()
          << ") err=(" << GetDx() << "," << GetDy() << "," << GetDz() << ") "
-         << " dxy=" << GetDxy() << " planeId=" << GetPlaneId()
+         << " dxy=" << GetDxy()
          << " refId=" << GetRefId()
          << " hitType=" << GetType()
-         << " detId=" << GetDetectorId() << std::endl;
+         << " detId=" << GetSystem()
+         << " stationGroup=" << GetStationGroup()
+         << " station=" << GetStation()
+         << " substation=" << GetSubstation()
+         << " module=" << GetModule() << std::endl;
       return ss.str();
    }
 

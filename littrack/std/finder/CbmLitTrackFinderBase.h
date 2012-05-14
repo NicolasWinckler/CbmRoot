@@ -34,24 +34,25 @@ public:
    /* Sets settings for tracking */
    void SetSettings(const CbmLitTrackFinderSettings& settings) { fSettings = settings; }
 
-   /* Sets verbosity level */
-   void SetVerbose(int verbose) {fVerbose = verbose;}
+   void SetZPropagationForTrackSeeds(Double_t zPropagationForTrackSeeds) { fZPropagationForTrackSeeds = zPropagationForTrackSeeds; }
+
+   void SetUseTGeo(Bool_t useTGeo) { fUseTGeo = useTGeo; }
 
 protected:
    /* Sets number of iterations for tracking */
-   void SetNofIter(int nofIter) { fNofIter = nofIter; }
+   void SetNofIter(Int_t nofIter) { fNofIter = nofIter; }
 
    /* Sets maximum acceptable number of missing hits */
-   void SetMaxNofMissingHits(int maxNofMissingHits) { fMaxNofMissingHits = maxNofMissingHits;}
+   void SetMaxNofMissingHits(Int_t maxNofMissingHits) { fMaxNofMissingHits = maxNofMissingHits;}
 
    /* Sets particle hypothesis for tracking */
-   void SetPDG(int pdg) { fPDG = pdg; }
+   void SetPDG(Int_t pdg) { fPDG = pdg; }
 
 protected:
    /* Parameters for each tracking iteration has to be set in this function
     * @param iter Iteration number */
    virtual void SetIterationParameters(
-      int iter) {}
+      Int_t iter) {}
 
    /* Arranges hits by stations
     * @param itBegin Iterator of the first hit
@@ -77,26 +78,20 @@ protected:
       TrackPtrVector& tracks);
 
 protected:
-   /* Detector layout */
-   CbmLitDetectorLayout fLayout;
-   /* Hit storage */
-   CbmLitHitData fHitData;
-   /* Sets with hits that have been used */
-   std::set<int> fUsedHitsSet;
-   /* Set with track seeds that have been used */
-   std::set<int> fUsedSeedsSet;
-   /* Settings for the track finder */
-   CbmLitTrackFinderSettings fSettings;
-   /* Number of iterations for tracking */
-   int fNofIter;
-   /* Maximum number of acceptable missing hits */
-   int fMaxNofMissingHits;
-   /* Particle hypothesis for tracking */
-   int fPDG;
-   /* Verbosity level */
-   int fVerbose;
-   /* Event counter */
-   int fEventNo;
+   CbmLitDetectorLayout fLayout; // Detector layout.
+   CbmLitHitData fHitData; // Hit storage.
+   std::set<Int_t> fUsedHitsSet; // Sets with hits that have been used.
+   std::set<Int_t> fUsedSeedsSet; // Set with track seeds that have been used.
+   CbmLitTrackFinderSettings fSettings; // Settings for the track finder.
+   Int_t fNofIter; // Number of iterations for tracking.
+   Int_t fMaxNofMissingHits; // Maximum number of acceptable missing hits.
+   Int_t fPDG; // Particle hypothesis for tracking.
+   Int_t fEventNo; // Event counter.
+   Double_t fZPropagationForTrackSeeds; // Z position for propagation of track seeds.
+   Bool_t fUseTGeo; // If true than TGeoManager is used for navigation in tracking.
+                    // Attention! This method works only in magnetic free regions.
+                    // Track seed propagation also has to be done to magnetic
+                    // field free region in order to make this method work correctly.
 };
 
 #endif /*CBMLITTRACKFINDERBASE_H_*/

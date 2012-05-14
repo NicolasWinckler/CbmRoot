@@ -9,6 +9,7 @@
 
 #include "base/CbmLitEnvironment.h"
 #include "utils/CbmLitComparators.h"
+#include "utils/CbmLitUtils.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -25,10 +26,17 @@
 #include "TGeoCone.h"
 #include "TGeoSphere.h"
 #include "TGeoArb8.h"
+#include "TGeoPgon.h"
 
+#include "TRandom.h"
+
+#include <set>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+
+using std::set;
+using lit::ToString;
 
 CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
    fGeo(NULL),
@@ -37,7 +45,8 @@ CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
    fMyGeoNodes(),
    fMyMuchGeoNodes(),
    fMyTrdGeoNodes(),
-   fDet()
+   fDet(),
+   fTrdTrackingGeo(NULL)
 {
    ConstructGeometry();
 }
@@ -54,51 +63,54 @@ CbmLitSimpleGeometryConstructor* CbmLitSimpleGeometryConstructor::Instance()
 
 void CbmLitSimpleGeometryConstructor::Draw()
 {
-   fSimpleGeo->SetVisLevel(0);
-   TGeoVolume* master = fSimpleGeo->GetMasterVolume();
-   master->Draw("ogl");
+//   fSimpleGeo->SetVisLevel(0);
+//   TGeoVolume* master = fSimpleGeo->GetMasterVolume();
+//   master->Draw("ogl");
+
+   fTrdTrackingGeo->SetVisLevel(0);
+   TGeoVolume* trdGeoMaster = fTrdTrackingGeo->GetMasterVolume();
+   trdGeoMaster->Draw("ogl");
 }
 
 void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 {
    std::cout << "-I- Simple geometry construction started" << std::endl;
+
    fGeo = gGeoManager;
-   fGeo->Print();
-
    fDet.DetermineSetup();
-
    CreateMediumList();
-   std::cout << "Medium list created" << std::endl;
-
-   gGeoManager = 0;
-
-   // Create new simplified geometry
-   fSimpleGeo = new TGeoManager("FAIRSimpleGeom", "Simplified geometry");
-   TGeoVolume* topVolume = fSimpleGeo->MakeBox("cave", fMedium["air"], 20000., 20000., 20000.);
-   fSimpleGeo->SetTopVolume(topVolume);
 
 
-   ConstructSts();
-   if (fDet.GetDet(kMUCH)) { ConstructMuch(); }
+//
+//   gGeoManager = 0;
+//
+//   // Create new simplified geometry
+//   fSimpleGeo = new TGeoManager("FAIRSimpleGeom", "Simplified geometry");
+//   TGeoVolume* topVolume = fSimpleGeo->MakeBox("cave", fMedium["air"], 20000., 20000., 20000.);
+//   fSimpleGeo->SetTopVolume(topVolume);
+
+
+//   ConstructSts();
+//   if (fDet.GetDet(kMUCH)) { ConstructMuch(); }
    if (fDet.GetDet(kTRD)) { ConstructTrd(); }
-   if (fDet.GetDet(kTOF)) { ConstructTof(); }
-   if (fDet.GetDet(kRICH)) { ConstructRich(); }
+//   if (fDet.GetDet(kTOF)) { ConstructTof(); }
+//   if (fDet.GetDet(kRICH)) { ConstructRich(); }
 
-   fSimpleGeo->CloseGeometry();
-   fSimpleGeo->Print();
-   fSimpleGeo->CheckOverlaps(1e-7,"SAME");
-   fSimpleGeo->PrintOverlaps();
-   fSimpleGeo->Write();
+//   fSimpleGeo->CloseGeometry();
+//   fSimpleGeo->Print();
+//   fSimpleGeo->CheckOverlaps(1e-7,"SAME");
+//   fSimpleGeo->PrintOverlaps();
+//   fSimpleGeo->Write();
 
-   std::sort(fMyGeoNodes.begin(), fMyGeoNodes.end(), CompareMaterialInfoZLess());
-   std::sort(fMyMuchGeoNodes.begin(), fMyMuchGeoNodes.end(), CompareMaterialInfoZLess());
-   std::sort(fMyTrdGeoNodes.begin(), fMyTrdGeoNodes.end(), CompareMaterialInfoZLess());
-   std::sort(fMyRichGeoNodes.begin(), fMyRichGeoNodes.end(), CompareMaterialInfoZLess());
+//   std::sort(fMyGeoNodes.begin(), fMyGeoNodes.end(), CompareMaterialInfoZLess());
+//   std::sort(fMyMuchGeoNodes.begin(), fMyMuchGeoNodes.end(), CompareMaterialInfoZLess());
+//   std::sort(fMyTrdGeoNodes.begin(), fMyTrdGeoNodes.end(), CompareMaterialInfoZLess());
+//   std::sort(fMyRichGeoNodes.begin(), fMyRichGeoNodes.end(), CompareMaterialInfoZLess());
 
-   std::cout << "My Simple Geometry:" << std::endl;
-   for (size_t i = 0; i < fMyGeoNodes.size(); ++i) {
-      std::cout << i << " " << fMyGeoNodes[i].ToString();
-   }
+//   std::cout << "My Simple Geometry:" << std::endl;
+//   for (size_t i = 0; i < fMyGeoNodes.size(); ++i) {
+//      std::cout << i << " " << fMyGeoNodes[i].ToString();
+//   }
 
 // std::cout << "My MUCH Simple Geometry:" << std::endl;
 //    for (size_t i = 0; i < fMyMuchGeoNodes.size(); ++i)
@@ -108,22 +120,12 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 //   for (size_t i = 0; i < fMyTrdGeoNodes.size(); ++i)
 //      std::cout << i << " " << fMyTrdGeoNodes[i].ToString();
 
-   std::cout << "My RICH Simple Geometry:" << std::endl;
-   for (size_t i = 0; i < fMyRichGeoNodes.size(); ++i)
-      std::cout << i << " " << fMyRichGeoNodes[i].ToString();
+//   std::cout << "My RICH Simple Geometry:" << std::endl;
+//   for (size_t i = 0; i < fMyRichGeoNodes.size(); ++i)
+//      std::cout << i << " " << fMyRichGeoNodes[i].ToString();
 
-   gGeoManager = fGeo;
+//   gGeoManager = fGeo;
    std::cout << "-I- Simple geometry construction finished" << std::endl;
-}
-
-TGeoMedium* CbmLitSimpleGeometryConstructor::CreateMedium(
-   const std::string& name)
-{
-   TGeoMedium* med = fGeo->GetMedium(name.c_str());
-   TGeoMaterial* mat = med->GetMaterial();
-   TGeoMaterial* newmat = new TGeoMaterial(mat->GetName(), mat->GetA(), mat->GetZ(), mat->GetDensity(), mat->GetRadLen(), mat->GetIntLen());
-   TGeoMedium* newmed = new TGeoMedium(med->GetName(), med->GetId(), newmat);
-   return newmed;
 }
 
 void CbmLitSimpleGeometryConstructor::GeoMediumToMaterialInfo(
@@ -139,34 +141,15 @@ void CbmLitSimpleGeometryConstructor::GeoMediumToMaterialInfo(
 
 void CbmLitSimpleGeometryConstructor::CreateMediumList()
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-
-   fMedium["air"] = CreateMedium("air");
-   fMedium["silicon"] = CreateMedium("silicon");
-
-   if (fDet.GetDet(kMUCH)) {
-      fMedium["MUCHiron"] = CreateMedium("MUCHiron");
-      fMedium["MUCHargon"] = CreateMedium("MUCHargon");
-   }
-   if (fDet.GetDet(kTRD)) {
-      fMedium["polypropylene"] = CreateMedium("polypropylene");
-      fMedium["TRDgas"] = CreateMedium("TRDgas");
-      fMedium["goldcoatedcopper"] = CreateMedium("goldcoatedcopper");
-      fMedium["mylar"] = CreateMedium("mylar");
-      fMedium["carbon"] = CreateMedium("carbon");
-   }
-   if (fDet.GetDet(kTOF)) {
-      fMedium["aluminium"] = CreateMedium("aluminium");
-      fMedium["RPCgas"] = CreateMedium("RPCgas");
-      fMedium["RPCglass"] = CreateMedium("RPCglass");
-   }
-   if (fDet.GetDet(kRICH)) {
-      fMedium["aluminium"] = CreateMedium("aluminium");
-      fMedium["CsI"] = CreateMedium("CsI");
-      fMedium["RICHglass"] = CreateMedium("RICHglass");
-      fMedium["kapton"] = CreateMedium("kapton");
-      fMedium["RICHgas_CO2_dis"] = CreateMedium("RICHgas_CO2_dis");
-   }
+	TList* mediumList = fGeo->GetListOfMedia();
+	Int_t nofMedium = mediumList->GetEntries();
+	for (Int_t iMedium = 0; iMedium < nofMedium; iMedium++) {
+		TGeoMedium* medium = static_cast<TGeoMedium*>(mediumList->At(iMedium));
+		TGeoMaterial* material = medium->GetMaterial();
+		TGeoMaterial* newMaterial = new TGeoMaterial(material->GetName(), material->GetA(), material->GetZ(), material->GetDensity(), material->GetRadLen(), material->GetIntLen());
+		TGeoMedium* newMedium = new TGeoMedium(medium->GetName(), medium->GetId(), newMaterial);
+		fMedium[newMedium->GetName()] = newMedium;
+	}
 }
 
 void CbmLitSimpleGeometryConstructor::ConstructSts()
@@ -282,65 +265,143 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 
 void CbmLitSimpleGeometryConstructor::ConstructTrd()
 {
-   // NEW TRD GEOMETRY (w/o layers)
+	std::cout << "-I- Construction of the TRD geometry started" << std::endl;
 
-   std::cout << "-I- Construction of the TRD geometry started" << std::endl;
-   std::string trds[] = {"trd1_0", "trd2_0", "trd3_0"};
-   std::string mods[][4] = {
-      "trd1mod1_1001", "trd1mod1_2001", "trd1mod1_3001", "trd1mod1_4001",
-      "trd2mod2_1001", "trd2mod2_2001", "trd2mod2_3001", "trd2mod2_4001",
-      "trd3mod3_1001", "trd3mod3_2001", "trd3mod3_3001", "trd3mod3_4001"
-   };
+	// Saved pointer to gGeoManager which will point to a new object after creation of new TGeoManager
+	TGeoManager* savedGeo = gGeoManager;
+	gGeoManager = 0;
+	// Create new TGeomanager for TRD tracking geometry
+	fTrdTrackingGeo = new TGeoManager("TrdTrackingGeo", "CBM TRD tracking geometry");
+	TGeoVolume* topVolume = fTrdTrackingGeo->MakeBox("cave", fMedium["air"], 20000., 20000., 20000.);
+	fTrdTrackingGeo->SetTopVolume(topVolume);
 
-   for (int iTrds = 0; iTrds < 3; iTrds++) {
-      TGeoNode* trd = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject(trds[iTrds].c_str());
+	TObjArray* topNodes = fGeo->GetTopNode()->GetNodes();
+	Int_t nofTopNodes = topNodes->GetEntriesFast();
+	for (Int_t iTopNode = 0; iTopNode < nofTopNodes; iTopNode++) {
+		TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
+		if (TString(topNode->GetName()).Contains("trd")) {
+			map<Int_t, CbmLitSubstation> ss;
+			TGeoNode* station = topNode;
+			TObjArray* modules = station->GetNodes();
+			for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
+			   TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
+			   Int_t stationId = std::atoi(string(1, *(module->GetName() + 3)).c_str()) - 1; // 4th element is station number
+			   Int_t layerId = std::atoi(string(1, *(module->GetName() + 9)).c_str()) - 1; // 10th element is layer number
+			   Int_t copyId = std::atoi(string(module->GetName()).erase(0, 10).c_str()) - 1; // copy id are the last 3 symbols
+			   Int_t moduleType = std::atoi(string(1, *(module->GetName() + 7)).c_str()); // 8th symbol is module type
+			   Int_t moduleId = moduleType * 1000 + copyId;
 
-      for (int iTrdModule = 0; iTrdModule < 4; iTrdModule++) {
-         TGeoNode* module = (TGeoNode*) trd->GetNodes()->FindObject(mods[iTrds][iTrdModule].c_str());
-         TObjArray* parts = module->GetNodes();
-         for (int iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
-            TGeoNode* part = (TGeoNode*) parts->At(iPart);
-            if (!TString(part->GetName()).Contains("frame")) {
+			   TObjArray* moduleParts = module->GetNodes();
+			   for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
+				  TGeoNode* modulePart = static_cast<TGeoNode*>(moduleParts->At(iModulePart));
+				  if (TString(modulePart->GetName()).Contains("gas")) {
+					  TGeoBBox* moduleShape = static_cast<TGeoBBox*>(module->GetVolume()->GetShape());
+					  TGeoBBox* modulePartShape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
+				      TGeoShape* newShape = new TGeoBBox(moduleShape->GetDX(), moduleShape->GetDY(), modulePartShape->GetDZ());
+				      TGeoMedium* newMedium = fMedium["air"];
+				      string moduleName = ToString<Int_t>(stationId) + "_" + ToString<Int_t>(layerId) + "_" + ToString<Int_t>(0) + "_" + ToString<Int_t>(moduleId);
+				      TGeoVolume* newVolume = new TGeoVolume(moduleName.c_str(), newShape, newMedium);
+				      TGeoHMatrix* newMatrix = new TGeoHMatrix((*station->GetMatrix()) * (*module->GetMatrix()) * (*modulePart->GetMatrix()));
+				      newVolume->SetLineColor(gRandom->Uniform(0, 100));
+				      fTrdTrackingGeo->GetTopVolume()->AddNode(newVolume, 0, newMatrix);
 
-               TGeoBBox* sh = (TGeoBBox*) part->GetVolume()->GetShape();
-               TGeoMedium* med = part->GetVolume()->GetMedium();
+				      ss[layerId].AddModule(moduleId, newMatrix);
 
-               TGeoShape* shape = new TGeoCone(sh->GetDZ(), 0., 500.,   0.,   500.);
-               TGeoMedium* medium = fMedium[med->GetName()];
+				      // Get Z position for substation only works for perpendicular stations
+				      // Does not work for tilted stations
+				      Double_t stationZ = station->GetMatrix()->GetTranslation()[2];
+				      Double_t moduleZ = module->GetMatrix()->GetTranslation()[2];
+				      Double_t modulePartZ = modulePart->GetMatrix()->GetTranslation()[2];
+				      Double_t additionalZ = modulePartShape->GetDZ();
+				      ss[layerId].SetZ(stationZ + moduleZ + modulePartZ + additionalZ);
+				  }
+			   }
+			}
+			CbmLitStationGroup sg;
+			map<Int_t, CbmLitSubstation>::iterator it;
+			for (it = ss.begin(); it != ss.end(); it++) {
+				CbmLitStation st;
+				st.SetType(kLITPIXELHIT);
+				st.AddSubstation(it->second);
+				sg.AddStation(st);
+			}
+			fTrdLayout.AddStationGroup(sg);
+		}
+	}
 
-               TGeoVolume* volume = new TGeoVolume(part->GetName(), shape, medium);
-               litfloat z = trd->GetMatrix()->GetTranslation()[2] +
-                       module->GetMatrix()->GetTranslation()[2] +
-                       part->GetMatrix()->GetTranslation()[2];
+//	fTrdTrackingGeo->CloseGeometry();
+	fTrdTrackingGeo->Print();
+	fTrdTrackingGeo->CheckOverlaps(1e-7,"SAME");
+	fTrdTrackingGeo->PrintOverlaps();
+//	fTrdTrackingGeo->Write();
 
-               TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
-               fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
+	gGeoManager = savedGeo;
 
-               CbmLitMaterialInfo litMaterial;
-               litMaterial.SetLength(2. * sh->GetDZ());
-               litMaterial.SetZpos(z);
-               GeoMediumToMaterialInfo(medium, litMaterial);
-//             std::cout << "mm: " << litMaterial.ToString();
-//             std::cout << medium->GetName() << std::endl;
-               fMyGeoNodes.push_back(litMaterial);
-               fMyTrdGeoNodes.push_back(litMaterial);
-            }
-         }
-         // add air
-         CbmLitMaterialInfo litMaterial;
-         float ml = (iTrdModule == 3)? 150. : 10.;
-//       if (iTrdModule == 3) litMaterial.SetLength(200.);
-//       else litMaterial.SetLength(10.);
-         litMaterial.SetLength(ml);
-         CbmLitMaterialInfo lastmat = fMyGeoNodes.back();
-         litMaterial.SetZpos(lastmat.GetZpos() + lastmat.GetLength() + ml);
-         GeoMediumToMaterialInfo(fMedium["air"], litMaterial);
-         fMyGeoNodes.push_back(litMaterial);
-         fMyTrdGeoNodes.push_back(litMaterial);
-      }
-   }
-   std::cout << "-I- Construction of the TRD geometry finished" << std::endl;
+	std::cout << fTrdLayout.ToString();
+    std::cout << "-I- Construction of the TRD geometry finished" << std::endl;
 }
+
+//void CbmLitSimpleGeometryConstructor::ConstructTrd()
+//{
+//   // NEW TRD GEOMETRY (w/o layers)
+//
+//   std::cout << "-I- Construction of the TRD geometry started" << std::endl;
+//   std::string trds[] = {"trd1_0", "trd2_0", "trd3_0"};
+//   std::string mods[][4] = {
+//      "trd1mod1_1001", "trd1mod1_2001", "trd1mod1_3001", "trd1mod1_4001",
+//      "trd2mod2_1001", "trd2mod2_2001", "trd2mod2_3001", "trd2mod2_4001",
+//      "trd3mod3_1001", "trd3mod3_2001", "trd3mod3_3001", "trd3mod3_4001"
+//   };
+//
+//   for (int iTrds = 0; iTrds < 3; iTrds++) {
+//      TGeoNode* trd = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject(trds[iTrds].c_str());
+//
+//      for (int iTrdModule = 0; iTrdModule < 4; iTrdModule++) {
+//         TGeoNode* module = (TGeoNode*) trd->GetNodes()->FindObject(mods[iTrds][iTrdModule].c_str());
+//         TObjArray* parts = module->GetNodes();
+//         for (int iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
+//            TGeoNode* part = (TGeoNode*) parts->At(iPart);
+//            if (!TString(part->GetName()).Contains("frame")) {
+//
+//               TGeoBBox* sh = (TGeoBBox*) part->GetVolume()->GetShape();
+//               TGeoMedium* med = part->GetVolume()->GetMedium();
+//
+//               TGeoShape* shape = new TGeoCone(sh->GetDZ(), 0., 500.,   0.,   500.);
+//               TGeoMedium* medium = fMedium[med->GetName()];
+//
+//               TGeoVolume* volume = new TGeoVolume(part->GetName(), shape, medium);
+//               litfloat z = trd->GetMatrix()->GetTranslation()[2] +
+//                       module->GetMatrix()->GetTranslation()[2] +
+//                       part->GetMatrix()->GetTranslation()[2];
+//
+//               TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
+//               fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
+//
+//               CbmLitMaterialInfo litMaterial;
+//               litMaterial.SetLength(2. * sh->GetDZ());
+//               litMaterial.SetZpos(z);
+//               GeoMediumToMaterialInfo(medium, litMaterial);
+////             std::cout << "mm: " << litMaterial.ToString();
+////             std::cout << medium->GetName() << std::endl;
+//               fMyGeoNodes.push_back(litMaterial);
+//               fMyTrdGeoNodes.push_back(litMaterial);
+//            }
+//         }
+//         // add air
+//         CbmLitMaterialInfo litMaterial;
+//         float ml = (iTrdModule == 3)? 150. : 10.;
+////       if (iTrdModule == 3) litMaterial.SetLength(200.);
+////       else litMaterial.SetLength(10.);
+//         litMaterial.SetLength(ml);
+//         CbmLitMaterialInfo lastmat = fMyGeoNodes.back();
+//         litMaterial.SetZpos(lastmat.GetZpos() + lastmat.GetLength() + ml);
+//         GeoMediumToMaterialInfo(fMedium["air"], litMaterial);
+//         fMyGeoNodes.push_back(litMaterial);
+//         fMyTrdGeoNodes.push_back(litMaterial);
+//      }
+//   }
+//   std::cout << "-I- Construction of the TRD geometry finished" << std::endl;
+//}
 
 void CbmLitSimpleGeometryConstructor::ConstructTof()
 {

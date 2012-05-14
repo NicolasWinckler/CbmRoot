@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 100)
+void global_sim(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
@@ -24,14 +24,14 @@ void global_sim(Int_t nEvents = 100)
 	Int_t nofPositrons = 0; // number of embedded positrons from FairBoxGenerator
 	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
-	Int_t nofJPsiToMuons = 5; // number of embedded J/Psi particles decaying to mu+ and mu-
-	Int_t nofJPsiToElectrons = 0; // number of embedded J/Psi particles decaying to e+ and e-
-	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
+	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
+	Int_t nofJPsiToElectrons = 10; // number of embedded J/Psi particles decaying to e+ and e-
+	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
     TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/Users/andrey/Development/cbm/d/events/std_electrons_jpsi/"; // Directory for output simulation files
+	TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v12b/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -58,7 +58,7 @@ void global_sim(Int_t nEvents = 100)
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
 		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v11c.geo";
+		trdGeom    = "trd/trd_v11d.geo";
 		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";
@@ -112,7 +112,7 @@ void global_sim(Int_t nEvents = 100)
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
 	fRun->SetMaterials("media.geo"); // Materials
-	fRun->SetStoreTraj(kTRUE);
+	//fRun->SetStoreTraj(kTRUE);
 
 	if ( caveGeom != "" ) {
 		FairModule* cave = new CbmCave("CAVE");

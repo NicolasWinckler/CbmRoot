@@ -8,13 +8,13 @@ test_name=$1
 system=$2
 energy=$3
 collision_type=$4
-nevents=500
+nevents=5
 
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN
-pars=(0    0    0   0   0    0    0       5      yes   no)
+pars=(0    0    0   0   0    0    0       10     yes   no)
 set_simulation_parameters ${pars} 
 set_default_mvd_geometry
 

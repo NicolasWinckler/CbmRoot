@@ -12,16 +12,16 @@ collision_type=$5
 
 create_output_dir events_${test_name}/
 
-nevents=500
+nevents=5
 export LIT_DETECTOR_SETUP=${detector_setup}
 
 if [ "${LIT_DETECTOR_SETUP}" = "electron" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN
-    pars=(0    0    0   0   0    0    0       5      yes   no)
+    pars=(0    0    0   0   0    0    0       10     yes   no)
     set_default_electron_geometry
 elif [ "${LIT_DETECTOR_SETUP}" = "muon" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN
-    pars=(0    0    0   0   0    0    5       0      yes   no)
+    pars=(0    0    0   0   0    0    10       0     yes   no)
     set_default_electron_geometry
 else
     echo "Error! Detector setup unknown! Must be electron or muon!"

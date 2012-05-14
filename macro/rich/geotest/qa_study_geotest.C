@@ -14,23 +14,23 @@ void qa_study_geotest()
 
    std::vector<std::string> results, names;
    std::string outputDir;
-   //results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0000/");
-   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0001/");
-   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0002/");
-//   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0003/");
-//   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0004/");
-//   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0005/");
+   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0000/");
+  // results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0001/");
+  // results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0002/");
+  // results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0003/");
+   //results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0004/");
+  // results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0005/");
 //   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0006/");
 //   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0007/");
 //   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0008/");
 //   results.push_back("/u/slebedev/JUL09/trunk/macro/rich/geotest/results0009/");
 
-  // names.push_back("0000");
-   names.push_back("0001");
-   names.push_back("0002");
-//   names.push_back("0003");
-//   names.push_back("0004");
-//   names.push_back("0005");
+   names.push_back("0000");
+ //  names.push_back("0001");
+ //  names.push_back("0002");
+ //  names.push_back("0003");
+  // names.push_back("0004");
+ //  names.push_back("0005");
 //   names.push_back("0006");
 //   names.push_back("0007");
 //   names.push_back("0008");

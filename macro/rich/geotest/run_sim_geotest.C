@@ -9,6 +9,7 @@ void run_sim_geotest(Int_t nEvents = 10)
    TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "",
          stsGeom = "", richGeom= "";
    TString fieldMap = "";
+   TString richDetectorType = ""; // "standard" or "prototype"
 
    // Magnetic field
    Double_t fieldZ = 50.; // field center z position
@@ -26,6 +27,8 @@ void run_sim_geotest(Int_t nEvents = 10)
       richGeom = "rich/rich_v08a.geo";
       fieldMap = "field_v10e";
       magnetGeom = "passive/magnet_v09e.geo";
+
+      richDetectorType = "standard";
    } else {
       outFile = TString(gSystem->Getenv("MCFILE"));
       parFile = TString(gSystem->Getenv("PARFILE"));
@@ -36,6 +39,7 @@ void run_sim_geotest(Int_t nEvents = 10)
       richGeom = TString(gSystem->Getenv("RICHGEOM"));
       fieldMap = TString(gSystem->Getenv("FIELDMAP"));
       magnetGeom = TString(gSystem->Getenv("MAGNETGEOM"));
+      richDetectorType = TString(gSystem->Getenv("RICH_DETECTOR_TYPE"));
    }
 
    gDebug = 0;
@@ -55,88 +59,96 @@ void run_sim_geotest(Int_t nEvents = 10)
 
    fRun->SetMaterials("media.geo"); // Materials
 
-
    if ( caveGeom != "" ) {
       FairModule* cave = new CbmCave("CAVE");
       cave->SetGeometryFileName(caveGeom);
       fRun->AddModule(cave);
    }
 
-   if ( pipeGeom != "" ) {
+   if ( pipeGeom != "" && richDetectorType == "standard") {
       FairModule* pipe = new CbmPipe("PIPE");
       pipe->SetGeometryFileName(pipeGeom);
       fRun->AddModule(pipe);
    }
 
-   if ( targetGeom != "" ) {
+   if ( targetGeom != "" && richDetectorType == "standard") {
       FairModule* target = new CbmTarget("Target");
       target->SetGeometryFileName(targetGeom);
       fRun->AddModule(target);
    }
 
-   if ( magnetGeom != "" ) {
+   if ( magnetGeom != "" && richDetectorType == "standard") {
       FairModule* magnet = new CbmMagnet("MAGNET");
       magnet->SetGeometryFileName(magnetGeom);
       fRun->AddModule(magnet);
    }
 
-   if ( stsGeom != "" ) {
+   if ( stsGeom != "" && richDetectorType == "standard") {
       FairDetector* sts = new CbmSts("STS", kTRUE);
       sts->SetGeometryFileName(stsGeom);
       fRun->AddModule(sts);
    }
 
-   if ( richGeom != "" ) {
-      FairDetector* rich = new CbmRich("RICH", kTRUE);
+   if ( richGeom != "") {
+      FairDetector* rich = NULL;
+      if (richDetectorType == "standard"){
+         rich = new CbmRich("RICH", kTRUE);
+      } else if (richDetectorType == "prototype"){
+         rich = new CbmRichProt("RICH", kTRUE);
+      }
       rich->SetGeometryFileName(richGeom);
       fRun->AddModule(rich);
    }
 
-   // -----   Create magnetic field   ----------------------------------------
    CbmFieldMap* magField = NULL;
-   if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
-      magField = new CbmFieldMapSym2(fieldMap);
-   else if (fieldMap == "field_muon_standard" )
-      magField = new CbmFieldMapSym2(fieldMap);
-   else if (fieldMap == "FieldMuonMagnet" )
-      magField = new CbmFieldMapSym3(fieldMap);
-   else {
-      cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-      exit;
+   if (richDetectorType == "standard"){
+      if (fieldMap == "field_v10e")
+         magField = new CbmFieldMapSym2(fieldMap);
+      else if (fieldMap == "field_muon_standard" )
+         magField = new CbmFieldMapSym2(fieldMap);
+      else if (fieldMap == "FieldMuonMagnet" )
+         magField = new CbmFieldMapSym3(fieldMap);
+      else {
+         cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+         exit;
+      }
+      magField->SetPosition(0., 0., fieldZ);
+      magField->SetScale(fieldScale);
+      fRun->SetField(magField);
    }
-   magField->SetPosition(0., 0., fieldZ);
-   magField->SetScale(fieldScale);
-   fRun->SetField(magField);
 
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
-   Int_t kfCode1=11; // electrons
-   Int_t kfCode2=-11; // positrons
+   if (richDetectorType == "prototype"){
+      FairAsciiGenerator* asciiGen = new FairAsciiGenerator("/d/cbm02/kresan/rich_prot/may11/epi.CERNPST9.dat");
+      primGen->AddGenerator(asciiGen);
+   } else if (richDetectorType == "standard"){
+      FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 1);
+      boxGen1->SetPtRange(0.,3.);
+      boxGen1->SetPhiRange(0.,360.);
+      boxGen1->SetThetaRange(2.5,25.);
+      boxGen1->SetCosTheta();
+      boxGen1->Init();
+      primGen->AddGenerator(boxGen1);
 
-   FairBoxGenerator* boxGen1 = new FairBoxGenerator(kfCode1, 100);
-   boxGen1->SetPtRange(0.,3.);
-   boxGen1->SetPhiRange(0.,360.);
-   boxGen1->SetThetaRange(2.5,25.);
-   boxGen1->SetCosTheta();
-   boxGen1->Init();
-   primGen->AddGenerator(boxGen1);
-
-   FairBoxGenerator* boxGen2 = new FairBoxGenerator(kfCode2, 100);
-   boxGen2->SetPtRange(0.,3.);
-   boxGen2->SetPhiRange(0.,360.);
-   boxGen2->SetThetaRange(2.5,25.);
-   boxGen2->SetCosTheta();
-   boxGen2->Init();
-   primGen->AddGenerator(boxGen2);
+      FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 1);
+      boxGen2->SetPtRange(0.,3.);
+      boxGen2->SetPhiRange(0.,360.);
+      boxGen2->SetThetaRange(2.5,25.);
+      boxGen2->SetCosTheta();
+      boxGen2->Init();
+      primGen->AddGenerator(boxGen2);
+   }
 
    fRun->SetGenerator(primGen);
    fRun->Init();
 
-   // -----   Runtime database   ---------------------------------------------
-   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
-   fieldPar->SetParameters(magField);
-   fieldPar->setChanged();
-   fieldPar->setInputVersion(fRun->GetRunId(),1);
+   if (richDetectorType == "standard"){
+      CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
+      fieldPar->SetParameters(magField);
+      fieldPar->setChanged();
+      fieldPar->setInputVersion(fRun->GetRunId(),1);
+   }
    Bool_t kParameterMerged = kTRUE;
    FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
    parOut->open(parFile.Data());

@@ -8,6 +8,9 @@ export MYBUILDDIR=/u/slebedev/JUL09/buildSC
 
 export RICH_GEO_TEST_RESULT_DIR=results/
 
+#prototype or standard
+export RICH_DETECTOR_TYPE=prototype
+
 # Geometries
 	export CAVEGEOM=cave.geo
 	export TARGETGEOM=target_au_025mu.geo
@@ -19,13 +22,13 @@ export RICH_GEO_TEST_RESULT_DIR=results/
 	export FIELDMAPSCALE=1.0
 
 #number of events for each thread
-export NEVENTS=5
+export NEVENTS=1000
 
-for Z in 0 1 2 3; do
+for Z in 0 ; do
 
    export DIR=/d/cbm06/user/slebedev/geotest
    export XXXX=000$Z
-   export RICHGEOM=rich/newgeo/rich_geometry$XXXX.geo
+   export RICHGEOM=rich/rich_prototype_standard.geo
       
    export RICH_GEO_TEST_RESULT_DIR=results$XXXX/
 
@@ -33,8 +36,8 @@ for Z in 0 1 2 3; do
    export PARFILE=$DIR/param.$XXXX.root
    export RECOFILE=$DIR/reco.$XXXX.root  
    
- # . ./sim.sh
-   xterm -hold -e ". ./sim.sh"&
+  . ./sim.sh
+  # xterm -hold -e ". ./sim.sh"&
  #  bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
    
 

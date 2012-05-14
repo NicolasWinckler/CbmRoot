@@ -441,11 +441,13 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
   // ---- Finish --------------------------------------------------------
   void CbmTrdHitProducerSmearing::Finish()
   {
+    /*
     for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
       for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
 	delete (*fModuleHitBufferMapIt).second[i];
     }
     (*fModuleHitBufferMapIt).second.clear();
+    */
   }
   // --------------------------------------------------------------------
 

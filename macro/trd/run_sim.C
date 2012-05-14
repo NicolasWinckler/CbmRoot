@@ -18,7 +18,7 @@ void run_sim(Int_t nEvents = 1)
   TString digipar;
   if (whichTrdGeo) whichTrdGeo >> digipar;
   cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
-    whichTrdGeo.close();
+  whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_standard";
 
   // ========================================================================
@@ -40,10 +40,12 @@ void run_sim(Int_t nEvents = 1)
   TString mvdGeom    = "mvd/mvd_v07a.geo";
   TString stsGeom    = "sts/sts_v11a.geo";
   TString richGeom   = "rich/rich_v08a.geo";
-//  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
+  //  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
+  //  TString trdGeom    = "trd/trd_v10b.geo";
 //  TString trdGeom    = "trd/trd_v10b.geo";
+  //TString trdGeom    = "trd/TRD_geom_v12b.root";
   TString trdGeom    = "trd/" + digipar + ".geo";
-  TString tofGeom    = "tof/tof_v07a.geo";
+  TString tofGeom = "";
   //  TString ecalGeom   = "ecal/ecal_v08a.geo";
  
   // -----   Magnetic field   -----------------------------------------------
@@ -161,10 +163,10 @@ void run_sim(Int_t nEvents = 1)
     fRun->AddModule(tof);
   }
   /*
-  if ( ecalGeom != "" ) {
+    if ( ecalGeom != "" ) {
     FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
-  }
+    }
   */
   // ------------------------------------------------------------------------
 
@@ -183,22 +185,22 @@ void run_sim(Int_t nEvents = 1)
   fRun->SetGenerator(primGen);       
   // ------------------------------------------------------------------------
 
-// -Trajectories Visualization (TGeoManager Only )
-   fRun->SetStoreTraj(kTRUE);
+  // -Trajectories Visualization (TGeoManager Only )
+  fRun->SetStoreTraj(kTRUE);
 
  
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
   // ------------------------------------------------------------------------
 
-// Set cuts for storing the trajectpries
-   FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-     trajFilter->SetStepSizeCut(0.01); // 1 cm
-     trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
-     trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
-     trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
-     trajFilter->SetStorePrimaries(kTRUE);
-     trajFilter->SetStoreSecondaries(kTRUE);
+  // Set cuts for storing the trajectpries
+  FairTrajFilter* trajFilter = FairTrajFilter::Instance();
+  trajFilter->SetStepSizeCut(0.01); // 1 cm
+  trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
+  trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
+  trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
+  trajFilter->SetStorePrimaries(kTRUE);
+  trajFilter->SetStoreSecondaries(kTRUE);
    
   
   

@@ -18,7 +18,7 @@
 // --------------------------------------------------------------------------
 
 
-void run_reco_photon(Int_t nEvents = 1)
+void run_reco_photon(Int_t nEvents = 1, Int_t urqmd = 0)
 {
 
   // ========================================================================
@@ -44,8 +44,8 @@ void run_reco_photon(Int_t nEvents = 1)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "data/test.mc.root";
-
+  TString inFile;// = "data/test.mc.root";
+  inFile.Form("data/test.mc.%04i.root",urqmd);
   // Parameter file
   TString parFile = "data/params.root";
 
@@ -69,8 +69,8 @@ void run_reco_photon(Int_t nEvents = 1)
   // Output file
   TString statistic;
   statistic.Form(".%03ievents",nEvents);
-  TString outFile = "data/test.pa." + digipar + statistic + ".root";
-
+  TString outFile;// = "data/test.pa." + digipar + statistic + ".root";
+  outFile.Form("data/test.pa.%s.%04i.%03ievents.root",digipar.Data(),urqmd,nEvents);
 
   // In general, the following parts need not be touched
   // ========================================================================

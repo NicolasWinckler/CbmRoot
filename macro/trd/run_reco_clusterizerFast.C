@@ -105,12 +105,13 @@ void run_reco_clusterizerFast(Int_t nEvents = 1)
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
   gSystem->Load("libGlobal");
   gSystem->Load("libL1");
-  gSystem->Load("libLittrack");
+  //gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
 
   // ------------------------------------------------------------------------
@@ -246,13 +247,13 @@ void run_reco_clusterizerFast(Int_t nEvents = 1)
   
   CbmTrdClusterizerFast* trdClustering = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator,false,false);
   run->AddTask(trdClustering);
-  
+  /*
   CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
   run->AddTask(trdClusterfindingfast);
   
   CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
   run->AddTask(trdClusterHitProducer);
-  
+  */
   
   // -------------------------------------------------------------------------
 

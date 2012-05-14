@@ -89,7 +89,18 @@ public:
     */
    void SetOutputDir(const string& dir) {fOutputDir = dir;}
 
+   /**
+    * \brief Set detector type ("standard" or "prototype").
+    * \param[in] type Detector type.
+    */
+   void SetRichDetectorType(const string& type) {fRichDetectorType = type;}
+
 private:
+
+   /**
+    * \brief Initialize histograms.
+    */
+   void InitHistograms();
 
    /**
     * \brief Fill MC histogram for detector acceptance calculation.
@@ -175,6 +186,26 @@ private:
 	 */
 	void CreatePTree();
 
+	/**
+	 * \brief Calculate efficiency.
+	 * \param[in] histRec
+	 * \param[in] histAcc
+	 */
+	string CalcEfficiency(
+	   TH1* histRec,
+	   TH1* histAcc);
+
+	/**
+	 * \brief Divide two histograms and create third one.
+	 */
+	TH1D* DivideH1(
+	   TH1D* h1,
+	   TH1D* h2,
+	   const string& name,
+	   const string& title,
+	   const string& axisX,
+	   const string& axisY);
+
    /**
     * \brief Copy constructor.
     */
@@ -185,30 +216,7 @@ private:
     */
    CbmRichGeoTest& operator=(const CbmRichGeoTest&);
 
-   /**
-    * \brief Calculate efficiency.
-    */
-   string CalcEfficiency(
-      TH1* histRec,
-      TH1* histAcc);
-
-   /**
-    * \fn DivideH1
-    * \brief Divide two histograms.
-    * \param[in] h1 Pointer to the first histogram.
-    * \param[in] h2 Pointer to the second histogram.
-    * \param[in] name Name of a new histogram.
-    * \param[in] title Histogram title.
-    * \param[in] axisX X axis title.
-    * \param[in] axisY Y axis title.
-    */
-   TH1D* DivideH1(
-      TH1D* h1,
-      TH1D* h2,
-      const string& name,
-      const string& title,
-      const string& axisX,
-      const string& axisY);
+   string fRichDetectorType; // "standard" or prototype
 
    string fOutputDir; // output dir for results
 

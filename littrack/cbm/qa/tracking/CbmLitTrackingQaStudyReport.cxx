@@ -5,14 +5,51 @@
  */
 #include "CbmLitTrackingQaStudyReport.h"
 #include "../report/CbmLitReportElement.h"
+#include "../base/CbmLitPropertyTree.h"
+#include "../std/utils/CbmLitUtils.h"
 
-#include "TSystem.h"
-
+#include <map>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
+using std::map;
+using lit::Split;
+using lit::NumberToString;
+using lit::FindAndReplace;
 
-CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport()
+string DefaultRowNameFormatter(
+		const string& name)
+{
+	return name;
+}
+
+string EventNoRowNameFormatter(
+		const string& name)
+{
+	return Split(name, '_')[1];
+}
+
+string NofObjectsRowNameFormatter(
+		const string& name)
+{
+	return Split(name, '_')[2];
+}
+
+string TrackHitsRowNameFormatter(
+		const string& name)
+{
+	vector<string> split = Split(name, '_');
+	return split[1] + ":" + split[3];
+}
+
+string NofGhostsRowNameFormatter(
+		const string& name)
+{
+	return Split(name, '_')[2];
+}
+
+CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport():
+		fPT()
 {
 }
 
@@ -23,135 +60,80 @@ CbmLitTrackingQaStudyReport::~CbmLitTrackingQaStudyReport()
 void CbmLitTrackingQaStudyReport::Create(
       ostream& out)
 {
-   // TODO: Correct detector presence.
-   bool isSts = PropertyExists("hNofStsTracks");
-   bool isRich = PropertyExists("hNofRichRings");
-   bool isTrd = PropertyExists("hNofTrdTracks");
-   bool isMuch = PropertyExists("hNofMuchTracks");
-   bool isTof = true;
+   fPT.resize(fQa.size());
+   for (Int_t i = 0; i < fQa.size(); i++) fPT[i] = new CbmLitPropertyTree(fQa[i]);
 
    out.precision(3);
    out << fR->DocumentBegin();
-   //out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
    out << fR->Title(0, fTitle);
 
-   out << fR->TableBegin("Number of events", list_of(string("")).range(fStudyNames));
-   if (PropertyExists("hEventNo")) out << PrintRow("hEventNo", "Number of events");
-   out << fR->TableEnd() << endl;
-
-   out << fR->TableBegin("Number of objects", list_of(string("")).range(fStudyNames));
-   if (PropertyExists("hNofStsTracks")) out << PrintRow("hNofStsTracks", "STS tracks");
-   if (PropertyExists("hNofRichProjections"))out << PrintRow("hNofRichProjections", "RICH projections");
-   if (PropertyExists("hNofRichRings"))out << PrintRow("hNofRichRings", "RICH rings");
-   if (PropertyExists("hNofTrdTracks"))out << PrintRow("hNofTrdTracks", "TRD tracks");
-   if (PropertyExists("hNofMuchTracks"))out << PrintRow("hNofMuchTracks", "MUCH tracks");
-   if (PropertyExists("hNofGlobalTracks"))out << PrintRow("hNofGlobalTracks", "Global tracks");
-   out << fR->TableEnd() << endl;
-
-   string signal = "el";
-   if (!isRich) signal = "mu";
-   string recDet = (isTrd) ? "TRD" : (isMuch) ? "MUCH" :
-         (isTrd && isMuch) ? "MUCH+TRD" : "";
-
-   out << fR->TableBegin("Reconstruction efficiency", list_of(string("")).range(fStudyNames));
-   out << PrintRowEff("hStsNormSts3D.all", "STS all");
-   out << PrintRowEff("hStsNormSts3D." + signal, "STS " + signal);
-   out << PrintRowEff("hRec3D.all", recDet + " all");
-   out << PrintRowEff("hRec3D." + signal, recDet + " " + signal);
-   out << PrintRowEff("hTof3D.all", "TOF all");
-   out << PrintRowEff("hTof3D." + signal, "TOF " + signal);
-
-   out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+" + recDet);
-   out << PrintRowEff("hSts3DNormHalfGlobal.all", "STS all");
-   out << PrintRowEff("hSts3DNormHalfGlobal." + signal, "STS " + signal);
-   out << PrintRowEff("hHalfGlobal3D.all", "STS+" + recDet + " all");
-   out << PrintRowEff("hHalfGlobal3D." + signal, "STS+" + recDet + " " + signal);
-
-   out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+" + recDet + "+TOF");
-   out << PrintRowEff("hSts3DNormGlobal.all", "STS all");
-   out << PrintRowEff("hSts3DNormGlobal." + signal, "STS " + signal);
-   out << PrintRowEff("hHalfGlobal3DNormGlobal.all", "STS+" + recDet + " all");
-   out << PrintRowEff("hHalfGlobal3DNormGlobal." + signal, "STS+" + recDet + " " + signal);
-   out << PrintRowEff("hGlobal3D.all", "STS+" + recDet + "+TOF all");
-   out << PrintRowEff("hGlobal3D.all", "STS+" + recDet + "+TOF " + signal);
-
-   if (isRich) {
-      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Efficiency with RICH");
-      out << PrintRowEff("hRich3D.El", "RICH el");
-      out << PrintRowEff("hRich3D.ElRef", "RICH el ref");
-
-      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+RICH");
-      out << PrintRowEff("hSts3DNormStsRich.El", "STS el");
-      out << PrintRowEff("hStsRich3D.El", "STS+RICH el");
-
-      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+RICH+TRD");
-      out << PrintRowEff("hSts3DNormStsRichTrd.El", "STS el");
-      out << PrintRowEff("hStsRich3DNormStsRichTrd.El", "STS+RICH el");
-      out << PrintRowEff("hStsRichTrd3D.El", "STS+RICH+TRD el");
-
-      out << fR->TableEmptyRow(fStudyNames.size() + 1, "Normalization STS+RICH+TRD+TOF");
-      out << PrintRowEff("hSts3DNormStsRichTrdTof.El", "STS el");
-      out << PrintRowEff("hStsRich3DNormStsRichTrdTof.El", "STS+RICH el");
-      out << PrintRowEff("hStsRichTrd3DNormStsRichTrdTof.El", "STS+RICH+TRD el");
-      out << PrintRowEff("hStsRichTrdTof3D.El", "STS+RICH+TRD+TOF el");
-   }
-   out << fR->TableEnd() << endl;
-
-   out << fR->TableBegin("Ghost rate", list_of(string("")).range(fStudyNames));
-   out << PrintRow("fhStsGhostNh", "STS");
-   out << PrintRow("fhRecGhostNh", recDet);
-   if (isRich) {
-      out << PrintRow("fhRichGhostNh", "RICH");
-      out << fR->TableEmptyRow(fStudyNames.size() + 1, "after STS-RICH matching");
-      out << PrintRow("fhStsGhostRichMatchingNh", "STS");
-      out << PrintRow("fhRichGhostStsMatchingNh", "RICH");
-      out << fR->TableEmptyRow(fStudyNames.size() + 1, "after STS-RICH matching and el identification");
-      out << PrintRow("fhRichGhostElIdNh", "RICH");
-   }
-   out << fR->TableEnd() << endl;
-   // For image paths put only file name without type, e.g. ".eps" or ".png".
-   // Type will be added automatically.
-   if (isSts) out << PrintImageTable("STS reconstruction efficiency", "tracking_qa_sts_efficiency");
-   if (isTrd || isMuch) out << PrintImageTable(recDet + " reconstruction efficiency", "tracking_qa_rec_efficiency");
-   if (isTof) out << PrintImageTable("TOF hit matching efficiency", "tracking_qa_tof_efficiency");
-   if (isRich) out << PrintImageTable("RICH efficiency electrons", "tracking_qa_rich_efficiency_electrons");
-   out << PrintImageTable("Global reconstruction efficiency", "tracking_qa_global_efficiency_all");
-   out << PrintImageTable("Global reconstruction efficiency for signal", "tracking_qa_global_efficiency_signal");
-   if (isRich) out << PrintImageTable("Global reconstruction efficiency with RICH", "tracking_qa_sts_rich_trd_tof_efficiency_electrons");
+   out << PrintTable("Number of events", "hen_EventNo_TrackingQa.entries", EventNoRowNameFormatter);
+   out << PrintTable("Number of objects per event", "hno_NofObjects_.+", NofObjectsRowNameFormatter);
+   out << PrintTable("Number of all, true and fake hits in tracks and rings", "hth_.+_TrackHits_.*", TrackHitsRowNameFormatter);
+   out << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter);
+   out << PrintEfficiencyTable("Tracking efficiency with RICH", "hte_.*Rich.*_Eff_p");
+   out << PrintEfficiencyTable("Tracking efficiency w/o RICH", "hte_((?!Rich).)*_Eff_p");
 
    out <<  fR->DocumentEnd();
 }
 
-string CbmLitTrackingQaStudyReport::PrintRow(
-      const string& property,
-      const string& name)
+string CbmLitTrackingQaStudyReport::PrintTable(
+		const string& tableName,
+		const string& pattern,
+		const boost::function<string (const string&)>& rowNameFormatter) const
 {
-   vector<string> n(fStudyNames.size(), "");
-   for (int i = 0; i < fStudyNames.size(); i++) {
-      n[i] = PrintValue(i, property);
-   }
-   return fR->TableRow(list_of(name).range(n));
+   	Int_t nofStudies = fPT.size();
+   	vector<map<string, Double_t> > properties(nofStudies);
+   	for (Int_t i = 0; i < nofStudies; i++) {
+   		properties[i] = fPT[i]->GetByPattern<Double_t>(pattern);
+   	}
+   	map<string, Double_t>::const_iterator it;
+   	string str = fR->TableBegin(tableName, list_of(string("")).range(fStudyNames));
+   	for (it = properties[0].begin(); it != properties[0].end(); it++) {
+   		string cellName = rowNameFormatter(it->first);//Split(it->first, '_')[0];
+   		vector<string> cells(nofStudies);
+   		for (Int_t i = 0; i < nofStudies; i++) {
+   			cells[i] = NumberToString<Double_t>(properties[i][it->first]);
+   		}
+   		str += fR->TableRow(list_of(cellName).range(cells));
+   	}
+   	str += fR->TableEnd();
+   	return str;
 }
 
-string CbmLitTrackingQaStudyReport::PrintRowEff(
-      const string& property,
-      const string& name)
+string CbmLitTrackingQaStudyReport::PrintEfficiencyTable(
+		const string& tableName,
+		const string& pattern) const
 {
-   vector<string> n(fStudyNames.size(), "");
-   for (int i = 0; i < fStudyNames.size(); i++) {
-      stringstream ss;
-      string eff = PrintValue(i, property + ".eff");
-      string acc = PrintValue(i, property + ".acc");
-      string rec = PrintValue(i, property + ".rec");
-      ss << eff << " ("<< rec << "/" << acc << ")";
-      n[i] = ss.str();
-   }
-   return fR->TableRow(list_of(name).range(n));
+   	Int_t nofStudies = fPT.size();
+   	vector<map<string, Double_t> > properties(nofStudies);
+   	for (Int_t i = 0; i < nofStudies; i++) {
+   		properties[i] = fPT[i]->GetByPattern<Double_t>(pattern);
+   	}
+   	map<string, Double_t>::const_iterator it;
+   	string str = fR->TableBegin(tableName, list_of(string("")).range(fStudyNames));
+   	for (it = properties[0].begin(); it != properties[0].end(); it++) {
+   		vector<string> split = Split(it->first, '_');
+   		string cellName = split[1] + "(" + split[2] + "):" + split[3];
+   		vector<string> cells(nofStudies);
+   		for (Int_t i = 0; i < nofStudies; i++) {
+   			string effName = it->first;
+			string accName = FindAndReplace(effName, "_Eff_", "_Acc_") + ".entries";
+			string recName = FindAndReplace(effName, "_Eff_", "_Rec_") + ".entries";
+			string eff = NumberToString<Double_t>(fQa[i].get(effName, -1.));
+			string acc = NumberToString<Double_t>(fQa[i].get(accName, -1.));
+			string rec = NumberToString<Double_t>(fQa[i].get(recName, -1.));
+			cells[i] = eff + "(" + rec + "/" + acc + ")";
+   		}
+   		str += fR->TableRow(list_of(cellName).range(cells));
+   	}
+   	str += fR->TableEnd();
+   	return str;
 }
 
 string CbmLitTrackingQaStudyReport::PrintImageTable(
       const string& title,
-      const string& file)
+      const string& file) const
 {
    int nofStudies = fStudyNames.size();
    int nofCols = 2;
@@ -169,14 +151,5 @@ string CbmLitTrackingQaStudyReport::PrintImageTable(
       ss << fR->TableRow(images);
    }
    ss << fR->TableEnd();
-   return ss.str();
-}
-
-string CbmLitTrackingQaStudyReport::PrintValue(
-      int studyId,
-      const string& valueName)
-{
-   stringstream ss;
-   ss << fQa[studyId].get(valueName, -1.);
    return ss.str();
 }

@@ -62,56 +62,43 @@ protected:
       return "tracking_qa_check.json";
    }
 
-   string PrintNofObjects();
-
    /**
     * \brief Print specified value.
     * \param[in] hist full name of the property in property tree.
     * \return string with table row in specific format.
     */
    string PrintValue(
-         const string& hist) {
+         const string& hist) const {
       stringstream ss;
       ss << fQa.get(hist, -1.);
       return ss.str();
    }
 
    /**
-    * \brief Print hits histogram statistics (nof all, true, fake hits in track/ring).
+    * \brief Return string with number of objects statistics.
+    * \return String with number of objects statistics.
     */
-   string PrintTrackHits();
+   string PrintNofObjects() const;
 
+   /**
+    * \brief Return string with hits histogram statistics (nof all, true, fake hits in track/ring).
+    * \return String with hits histogram statistics (nof all, true, fake hits in track/ring).
+    */
+   string PrintTrackHits() const;
+
+   /**
+    * \brief Return string with tracking efficiency.
+    * \param[in] includeRich True if RICH detector is included in the tracking efficiency table.
+    * \return String with tracking efficiency.
+    */
    string PrintTrackingEfficiency(
-		   Bool_t includeRich);
+		   Bool_t includeRich) const;
 
-   string PrintNofGhosts();
-
-//
-//   /**
-//    * \brief Print integrated efficiencies and forms string with electron identification statistic information.
-//    * \param[in] name string of the first column in the table.
-//    * \param[in] hist histogram name.
-//    */
-//   virtual string PrintEfficiencyElId(
-//         const string& name,
-//         const string& hist);
-//
-//   /**
-//    * \brief Print detector acceptance efficiencies.
-//    * \param[in] name string of the first column in the table.
-//    * \param[in] hist histogram name.
-//    */
-//   virtual string PrintDetAccEl(
-//         const string& name,
-//         const string& hist);
-//
-//   /**
-//    * \brief Calculate integrated efficiencies for different polar angles and returns a string with statistics.
-//    * \param[in] name string of the first column in the table.
-//    * \param[in] hist histogram name.
-//    */
-//   virtual string PrintPolarAngle(
-//         const string& hist);
+   /**
+    * \brief Return string with number of ghosts statistics.
+    * \return String with number of ghosts statistics.
+    */
+   string PrintNofGhosts() const;
 
    CbmLitPropertyTree* fPT;
 };

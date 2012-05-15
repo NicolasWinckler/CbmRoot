@@ -1,6 +1,6 @@
 /**
  * \file CbmLitTrackingQaStudyReport.h
- * \brief Creates study report for reconstruction.
+ * \brief Creates study report for tracking QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
@@ -9,14 +9,18 @@
 
 #include "../report/CbmLitStudyReport.h"
 #include <string>
+#include <vector>
 #include "TSystem.h"
+#include <boost/function.hpp>
 using std::string;
+using std::vector;
+class CbmLitPropertyTree;
 
 /**
  * \class CbmLitTrackingQaStudyReport
- * \brief Creates study report for reconstruction.
+ * \brief Creates study report for tracking QA.
  *
- * Generates report from a number of results of different
+ * Generates tracking QA report from a number of results of different
  * simulations and reconstructions. Creates comparison tables.
  * Very useful for studies since all numbers are automatically
  * put in the comparison tables.
@@ -66,42 +70,39 @@ protected:
        return "tracking_qa_check.json";
     }
 
-   /**
-    * \brief Print one row in a table.
-    * \param[in] property Name of the property in property tree.
-    * \param[in] name Name of the row.
-    * \return String with table row.
-    */
-   virtual string PrintRow(
-      const string& property,
-      const string& name);
+    /**
+     * \brief Return formated string with table of numbers.
+     * \param[in] tableName Table name.
+     * \param[in] pattern Pattern of histogram name.
+     * \param[in] rowNameFormatter Function which formats row name.
+     * \return Formated string with table of numbers.
+     */
+    string PrintTable(
+    		const string& tableName,
+    		const string& pattern,
+    		const boost::function<string (const string&)>& rowNameFormatter) const;
+
+    /**
+     * \brief Return formated string with table of efficiency numbers.
+     * \param[in] tableName Table name.
+     * \param[in] pattern Pattern of histogram name.
+     * \return Formated string with table of efficiency numbers.
+     */
+    string PrintEfficiencyTable(
+    		const string& tableName,
+    		const string& pattern) const;
 
    /**
-    * \brief Print one row with efficiencies in a table.
-    * \param[in] property Name of the property in property tree.
-    * \param[in] name Name of the row.
-    * \return String with table row.
+    * \brief Return formated string with table of images.
+    * \param[in] tableName Table name.
+    * \param[in] fileName File name of image.
+    * \return Formated string with table of images.
     */
-   virtual string PrintRowEff(
-         const string& property,
-         const string& name);
+   string PrintImageTable(
+         const string& tableName,
+         const string& fileName) const;
 
-   /**
-    * \brief Print table of images with reconstruction performance.
-    * \param[in] title Title of the image.
-    * \param[in] file Name of the image file.
-    * \return String with table which contains images.
-    */
-   virtual string PrintImageTable(
-         const string& title,
-         const string& file);
-
-   /**
-    * \brief
-    */
-   virtual string PrintValue(
-         int studyId,
-         const string& valueTitle);
+   vector<CbmLitPropertyTree*> fPT;
 };
 
 #endif /* CBMLITTRACKINGQASTUDYREPORT_H_ */

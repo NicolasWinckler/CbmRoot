@@ -102,6 +102,9 @@ protected:
          const string& tableName,
          const string& fileName) const;
 
+
+   string PrintImages() const;
+
    vector<CbmLitPropertyTree*> fPT;
 };
 

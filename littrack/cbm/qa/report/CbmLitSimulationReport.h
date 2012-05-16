@@ -45,7 +45,7 @@ public:
     *
     * \param[in] reportType Type of report to be produced.
     * \param[out] out Output stream for report file.
-    * \param[in] resultDirectory Path to directory eith results.
+    * \param[in] resultDirectory Path to directory with results.
     */
    void Create(
          LitReportType reportType,
@@ -70,6 +70,7 @@ protected:
    ptree fQa; // Property tree of Qa results for each study
    ptree fIdeal; // Property with ideal values
    ptree fCheck; // Property tree with checked results for each study
+   string fResultDirectory; // Directory with simulation results
 };
 
 #endif /* CBMLITSIMULATIONREPORT_H_ */

@@ -105,14 +105,15 @@ void CbmLitTrackingQaPTreeCreator::TrackHitsToPTree(
 void CbmLitTrackingQaPTreeCreator::TrackingEfficiencyToPTree(
 		ptree& pt)
 {
+	Int_t nofEvents = fHM->H1("hen_EventNo_TrackingQa")->GetEntries();
 	vector<TH1*> histos = fHM->H1Vector("hte_.+_Eff_.+");
 	Int_t nofHistos = histos.size();
 	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
 		string effHistName = histos[iHist]->GetName();
 		string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
 		string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
-		Double_t acc = fHM->H1(accHistName)->GetEntries();
-		Double_t rec = fHM->H1(recHistName)->GetEntries();
+		Double_t acc = fHM->H1(accHistName)->GetEntries() / nofEvents;
+		Double_t rec = fHM->H1(recHistName)->GetEntries() / nofEvents;
 		Double_t eff = (acc != 0.) ? 100. * rec / acc : 0.;
 		pt.put(accHistName + ".entries", acc);
 		pt.put(recHistName + ".entries", rec);

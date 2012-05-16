@@ -12,6 +12,7 @@
 #include <string>
 class CbmLitReportElement;
 using std::string;
+using std::vector;
 
 /**
  * \enumeration LitReportType
@@ -85,6 +86,15 @@ protected:
     * \return JSON file name.
     */
    virtual string GetCheckFileName() const = 0;
+
+   /**
+    * \brief Returns list of images in specified directory.
+    * \param[in] dir Directory name.
+    * \param[in] pattern File name pattern.
+    */
+   vector<string> GetImageList(
+		   const string& dir,
+		   const string& pattern) const;
 
    string fTitle; // Title of report
    string fAuthor; // Author of report

@@ -99,7 +99,7 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
 
 	DrawH1(histos, labels, kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
 	DrawMeanEfficiencyLines(histos, efficiencies);
-	if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
+	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 Double_t CbmLitTrackingQaDraw::CalcEfficiency(
@@ -204,7 +204,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
              ("fake/all: " + NumberToString<Double_t>(hFakeOverAll->GetMean())),
              kLitLinear, kLitLog, true, 0.25, 0.99, 0.55, 0.75);
 
-   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
+   lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 //void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()

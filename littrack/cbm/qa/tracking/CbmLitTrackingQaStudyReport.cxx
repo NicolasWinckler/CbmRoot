@@ -73,7 +73,7 @@ void CbmLitTrackingQaStudyReport::Create(
    out << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter);
    out << PrintEfficiencyTable("Tracking efficiency with RICH", "hte_.*Rich.*_Eff_p");
    out << PrintEfficiencyTable("Tracking efficiency w/o RICH", "hte_((?!Rich).)*_Eff_p");
-
+   out << PrintImages();
    out <<  fR->DocumentEnd();
 }
 
@@ -152,4 +152,15 @@ string CbmLitTrackingQaStudyReport::PrintImageTable(
    }
    ss << fR->TableEnd();
    return ss.str();
+}
+
+string CbmLitTrackingQaStudyReport::PrintImages() const
+{
+	string str = "";
+	vector<string> images = GetImageList(fResultDirectories[0], ".*tracking_qa_.*png");
+	vector<string>::const_iterator it;
+	for(it = images.begin(); it != images.end(); it++) {
+		str += PrintImageTable(*it, *it);
+	}
+	return str;
 }

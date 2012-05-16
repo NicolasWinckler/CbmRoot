@@ -100,6 +100,12 @@ protected:
     */
    string PrintNofGhosts() const;
 
+   /**
+    * \brief Return formated string with images.
+    * \return Formated string with images.
+    */
+   string PrintImages() const;
+
    CbmLitPropertyTree* fPT;
 };
 

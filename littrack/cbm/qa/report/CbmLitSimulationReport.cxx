@@ -10,7 +10,11 @@
 using boost::property_tree::json_parser_error;
 using std::cout;
 
-CbmLitSimulationReport::CbmLitSimulationReport()
+CbmLitSimulationReport::CbmLitSimulationReport():
+	fQa(),
+	fIdeal(),
+	fCheck(),
+	fResultDirectory("")
 {
 
 }
@@ -32,6 +36,7 @@ void CbmLitSimulationReport::Create(
       const string& resultDirectory)
 {
    CreateReportElement(reportType);
+   fResultDirectory = resultDirectory;
 
    try {
       read_json(resultDirectory + GetQaFileName(), fQa);

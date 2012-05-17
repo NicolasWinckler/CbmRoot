@@ -31,7 +31,7 @@ void global_sim(Int_t nEvents = 10)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v12b/"; // Directory for output simulation files
+	TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v12d/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -58,7 +58,7 @@ void global_sim(Int_t nEvents = 10)
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
 		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v11d.geo";
+		trdGeom    = "trd/trd_v12d.geo";
 		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";
@@ -112,7 +112,7 @@ void global_sim(Int_t nEvents = 10)
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
 	fRun->SetMaterials("media.geo"); // Materials
-	//fRun->SetStoreTraj(kTRUE);
+//	fRun->SetStoreTraj(kTRUE);
 
 	if ( caveGeom != "" ) {
 		FairModule* cave = new CbmCave("CAVE");

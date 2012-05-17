@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v11c/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v12b/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -32,7 +32,7 @@ void global_reco(Int_t nEvents = 10, // number of events
    // Digi files
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v11d.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
 
    // Directory for output results
@@ -46,10 +46,10 @@ void global_reco(Int_t nEvents = 10, // number of events
 
    // Normalization for efficiency
    Int_t normStsPoints = 4;
-   Int_t normTrdPoints = 8;
+   Int_t normTrdPoints = 6;
    Int_t normMuchPoints = 16;
    Int_t normTofPoints = 1;
-   Int_t normTrdHits = 8;
+   Int_t normTrdHits = 6;
    Int_t normMuchHits = 16;
    Int_t normTofHits = 1;
 

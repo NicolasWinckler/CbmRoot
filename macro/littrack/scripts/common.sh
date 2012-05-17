@@ -95,10 +95,10 @@ function set_default_electron_geometry() {
     export LIT_MAGNET_GEOM=passive/magnet_v09e.geo
     
     export LIT_NORM_STS_POINTS=4
-    export LIT_NORM_TRD_POINTS=8
+    export LIT_NORM_TRD_POINTS=6
     export LIT_NORM_MUCH_POINTS=0
     export LIT_NORM_TOF_POINTS=1
-    export LIT_NORM_TRD_HITS=8
+    export LIT_NORM_TRD_HITS=6
     export LIT_NORM_MUCH_HITS=0
     export LIT_NORM_TOF_HITS=1
 }

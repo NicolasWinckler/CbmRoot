@@ -125,6 +125,10 @@ private:
     */
    void ConstructTrd();
 
+   void ConstructTrdWitDifferentKeepingVolumes();
+
+   void ConstructTrdWithSameKeepingVolume();
+
    /**
     * \brief Construct simplified RICH geometry.
     */

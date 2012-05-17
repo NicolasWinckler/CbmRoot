@@ -265,6 +265,17 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 
 void CbmLitSimpleGeometryConstructor::ConstructTrd()
 {
+	TObject* trd1 = fGeo->GetTopNode()->GetNodes()->FindObject("trd1_0");
+	TObject* trd2 = fGeo->GetTopNode()->GetNodes()->FindObject("trd2_0");
+	if (trd1 != NULL && trd2 != NULL) {
+		ConstructTrdWitDifferentKeepingVolumes();
+	} else {
+		ConstructTrdWithSameKeepingVolume();
+	}
+}
+
+void CbmLitSimpleGeometryConstructor::ConstructTrdWitDifferentKeepingVolumes()
+{
 	std::cout << "-I- Construction of the TRD geometry started" << std::endl;
 
 	// Saved pointer to gGeoManager which will point to a new object after creation of new TGeoManager
@@ -341,6 +352,84 @@ void CbmLitSimpleGeometryConstructor::ConstructTrd()
     std::cout << "-I- Construction of the TRD geometry finished" << std::endl;
 }
 
+
+void CbmLitSimpleGeometryConstructor::ConstructTrdWithSameKeepingVolume()
+{
+	std::cout << "-I- Construction of the TRD geometry with same keeping volume started" << std::endl;
+
+	// Saved pointer to gGeoManager which will point to a new object after creation of new TGeoManager
+	TGeoManager* savedGeo = gGeoManager;
+	gGeoManager = 0;
+	// Create new TGeomanager for TRD tracking geometry
+	fTrdTrackingGeo = new TGeoManager("TrdTrackingGeo", "CBM TRD tracking geometry");
+	TGeoVolume* topVolume = fTrdTrackingGeo->MakeBox("cave", fMedium["air"], 20000., 20000., 20000.);
+	fTrdTrackingGeo->SetTopVolume(topVolume);
+
+	TGeoNode* trd = static_cast<TGeoNode*>(fGeo->GetTopNode()->GetNodes()->FindObject("trd1_0"));
+	map<Int_t, map<Int_t, CbmLitSubstation> > ss; // First index is station group ID, second is station(substation) ID
+	TObjArray* modules = trd->GetNodes();
+	for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
+	   TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
+	   Int_t stationId = std::atoi(string(1, *(module->GetName() + 9)).c_str()) - 1; // 10th element is station number
+	   Int_t layerId = std::atoi(string(1, *(module->GetName() + 10)).c_str()) - 1; // 11th element is layer number
+	   Int_t copyId = std::atoi(string(module->GetName()).erase(0, 11).c_str()) - 1; // copy id are the last 3 symbols
+	   Int_t moduleType = std::atoi(string(1, *(module->GetName() + 7)).c_str()); // 8th symbol is module type
+	   Int_t moduleId = moduleType * 1000 + copyId;
+
+	   std::cout << ">>> stationId=" << stationId << " layerId=" << layerId << " copyId=" << copyId
+			   << " moduleType=" << moduleType << " moduleId=" << moduleId << "\n";
+
+	   TObjArray* moduleParts = module->GetNodes();
+	   for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
+		  TGeoNode* modulePart = static_cast<TGeoNode*>(moduleParts->At(iModulePart));
+		  if (TString(modulePart->GetName()).Contains("gas")) {
+			  TGeoBBox* moduleShape = static_cast<TGeoBBox*>(module->GetVolume()->GetShape());
+			  TGeoBBox* modulePartShape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
+			  TGeoShape* newShape = new TGeoBBox(moduleShape->GetDX(), moduleShape->GetDY(), modulePartShape->GetDZ());
+			  TGeoMedium* newMedium = fMedium["air"];
+			  string moduleName = ToString<Int_t>(stationId) + "_" + ToString<Int_t>(layerId) + "_" + ToString<Int_t>(0) + "_" + ToString<Int_t>(moduleId);
+			  TGeoVolume* newVolume = new TGeoVolume(moduleName.c_str(), newShape, newMedium);
+			  TGeoHMatrix* newMatrix = new TGeoHMatrix((*trd->GetMatrix()) * (*module->GetMatrix()) * (*modulePart->GetMatrix()));
+			  newVolume->SetLineColor(gRandom->Uniform(0, 100));
+			  fTrdTrackingGeo->GetTopVolume()->AddNode(newVolume, 0, newMatrix);
+
+			  ss[stationId][layerId].AddModule(moduleId, newMatrix);
+
+			  // Get Z position for substation only works for perpendicular stations
+			  // Does not work for tilted stations
+			  Double_t stationZ = trd->GetMatrix()->GetTranslation()[2];
+			  Double_t moduleZ = module->GetMatrix()->GetTranslation()[2];
+			  Double_t modulePartZ = modulePart->GetMatrix()->GetTranslation()[2];
+			  Double_t additionalZ = modulePartShape->GetDZ();
+			  ss[stationId][layerId].SetZ(stationZ + moduleZ + modulePartZ + additionalZ);
+		  }
+	   }
+	}
+
+	map<Int_t, map<Int_t, CbmLitSubstation> >::iterator itsg;
+	map<Int_t, CbmLitSubstation>::iterator itss;
+	for (itsg = ss.begin(); itsg != ss.end(); itsg++) {
+		CbmLitStationGroup sg;
+		for (itss = itsg->second.begin(); itss != itsg->second.end(); itss++) {
+			CbmLitStation st;
+			st.SetType(kLITPIXELHIT);
+			st.AddSubstation(itss->second);
+			sg.AddStation(st);
+		}
+		fTrdLayout.AddStationGroup(sg);
+	}
+
+//	fTrdTrackingGeo->CloseGeometry();
+	fTrdTrackingGeo->Print();
+	fTrdTrackingGeo->CheckOverlaps(1e-7,"SAME");
+	fTrdTrackingGeo->PrintOverlaps();
+//	fTrdTrackingGeo->Write();
+
+	gGeoManager = savedGeo;
+
+	std::cout << fTrdLayout.ToString();
+    std::cout << "-I- Construction of the TRD geometry with same keeping volume finished" << std::endl;
+}
 //void CbmLitSimpleGeometryConstructor::ConstructTrd()
 //{
 //   // NEW TRD GEOMETRY (w/o layers)

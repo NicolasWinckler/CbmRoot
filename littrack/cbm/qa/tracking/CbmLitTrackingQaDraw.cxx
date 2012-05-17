@@ -74,6 +74,14 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_pt");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");
 	}
+
+	// Draw local accapted and reconstructed tracks vs number of points
+	vector<string> accRecTracks = list_of("Sts")("Trd")("Much")("Tof");
+	for (UInt_t i = 0; i < accRecTracks.size(); i++) {
+		string variant = accRecTracks[i];
+		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_(Acc|Rec)_Np" : "hte_" + variant + "_.*_(All|Muon|Electron)_(Acc|Rec)_Np";
+		DrawAccAndRec("tracking_qa_local_acc_and_rec_" + variant + "_Np", re);
+	}
 }
 
 void CbmLitTrackingQaDraw::DrawEfficiency(
@@ -131,6 +139,31 @@ void CbmLitTrackingQaDraw::DrawMeanEfficiencyLines(
    }
 }
 
+void CbmLitTrackingQaDraw::DrawAccAndRec(
+      const string& canvasName,
+      const string& histNamePattern)
+{
+	vector<TH1*> histos = fHM->H1Vector(histNamePattern);
+	if (histos.size() == 0) return;
+
+	TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+	canvas->SetGrid();
+	canvas->cd();
+
+	Int_t nofEvents = fHM->H1("hen_EventNo_TrackingQa")->GetEntries();
+	Int_t nofHistos = histos.size();
+	vector<string> labels(nofHistos);
+	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+		TH1* hist = histos[iHist];
+		hist->Scale(1./nofEvents);
+		string name = hist->GetName();
+		vector<string> split = Split(name, '_');
+		labels[iHist] = split[4] + ":" + split[3] + "(" + NumberToString<Double_t>(hist->GetEntries() / nofEvents, 1) + ")";
+	}
+
+	DrawH1(histos, labels, kLitLinear, kLitLog, true, 0.2, 0.6, 0.5, 0.85, "PE1");
+	lit::SaveCanvasAsImage(canvas, fOutputDir);
+}
 //void CbmLitTrackingQaDraw::DrawMcEfficiencyGraph()
 //{
 // /*  boost::property_tree::ptree pt = PrintPTree();

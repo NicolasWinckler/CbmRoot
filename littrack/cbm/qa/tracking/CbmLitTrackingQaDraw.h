@@ -102,6 +102,10 @@ private:
       const string& canvasName,
       const string& hist);
 
+   void DrawAccAndRec(
+         const string& canvasName,
+         const string& histNamePattern);
+
 //   /**
 //    * \brief Draw histograms of Sts tracks Qa.
 //    */

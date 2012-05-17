@@ -376,9 +376,6 @@ void CbmLitSimpleGeometryConstructor::ConstructTrdWithSameKeepingVolume()
 	   Int_t moduleType = std::atoi(string(1, *(module->GetName() + 7)).c_str()); // 8th symbol is module type
 	   Int_t moduleId = moduleType * 1000 + copyId;
 
-	   std::cout << ">>> stationId=" << stationId << " layerId=" << layerId << " copyId=" << copyId
-			   << " moduleType=" << moduleType << " moduleId=" << moduleId << "\n";
-
 	   TObjArray* moduleParts = module->GetNodes();
 	   for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
 		  TGeoNode* modulePart = static_cast<TGeoNode*>(moduleParts->At(iModulePart));

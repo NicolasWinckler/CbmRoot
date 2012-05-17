@@ -151,6 +151,7 @@ void CbmLitTrackingQaCalculator::Finish()
 {
    CalculateEfficiencyHistos();
    fHM->ShrinkEmptyBinsByPattern("hth_.*(_All|_True|_Fake)");
+   fHM->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
 }
 
 void CbmLitTrackingQaCalculator::ReadDataBranches()
@@ -465,7 +466,8 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
       parMap["y"] = mcY;
       parMap["pt"] = mcPt;
       parMap["Angle"] = angle;
-      parMap["Np"] = nofPointsSts; // FIXME : correct to number of points in concrete detector!
+      parMap["Np"] = 0; // FIXME : correct to number of points in concrete detector!
+                        // Currently as a  temporary solution it is reassigned later
       parMap["BoA"] = 1;
       parMap["Nh"] = 1;
       parMap["RadPos"] = 1;
@@ -479,7 +481,13 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
   		string accName = split[3];
   		string parName = split[5];
   		assert(parMap.count(parName) != 0);
-  		Double_t par = parMap[parName];
+
+  		Double_t par = 0;
+  		if (parName == "Np") {
+  			par = (effName == "Sts") ? nofPointsSts : (effName == "Trd") ? nofPointsTrd : (effName == "Much") ? nofPointsMuch : (effName == "Tof") ? nofPointsTof : 0;
+  		} else {
+  			parMap[parName];
+  		}
 
 		Bool_t sts = (normName.find("Sts") != string::npos) ? isStsOk : true;
 		Bool_t trd = (normName.find("Trd") != string::npos) ? isTrdOk : true;

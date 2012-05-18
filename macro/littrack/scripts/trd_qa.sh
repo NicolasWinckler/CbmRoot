@@ -10,11 +10,11 @@ trd_digi=$3
 
 create_output_dir events_${test_name}/
 
-nevents=5
+nevents=500
 export LIT_DETECTOR_SETUP=electron
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN
-pars=(0    0    0   0   0    0    0       10     yes   no)
+#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
+pars=(0    0    0   0   0    0    0       10     0  yes   no)
 set_simulation_parameters ${pars}    
 
 set_default_electron_geometry

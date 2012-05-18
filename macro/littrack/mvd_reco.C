@@ -11,13 +11,14 @@ using std::endl;
 
 void mvd_reco(Int_t nEvents = 100)
 {
-	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "/data.local1/andrey/events/events_mvd/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/mvd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
-  	TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
+   TString mvdDeltaFile = dir + "mc.delta.0000.root"; // Delta files for MVD
+   TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
 
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // Digi scheme for STS
@@ -26,14 +27,17 @@ void mvd_reco(Int_t nEvents = 100)
 
    Int_t normStsPoints = 4; // STS normalization for efficiency
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
+   Int_t nofMvdDeltaEvents = 10;
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
 		parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
+		mvdDeltaFile = TString(gSystem->Getenv("LIT_MVD_DELTA_FILE"));
 		mvdRecoFile = TString(gSystem->Getenv("LIT_MVD_RECO_FILE"));
 		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 		stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
 		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
+		nofMvdDeltaEvents = TString(gSystem->Getenv("LIT_NOF_MVD_DELTA_EVENTS")).Atoi();
 	}
    parFileList->Add(&stsDigiFile);
 
@@ -51,6 +55,10 @@ void mvd_reco(Int_t nEvents = 100)
    if (IsMvd(parFile)) {
       // ----- MVD reconstruction    --------------------------------------------
       CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
+  	  if (nofMvdDeltaEvents > 0) {
+  		  mvdDigi->SetDeltaName(mvdDeltaFile);
+  		  mvdDigi->SetDeltaEvents(nofMvdDeltaEvents);
+  	  }
       run->AddTask(mvdDigi);
 
       CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);

@@ -8,10 +8,9 @@ create_output_dir events_muon/
 create_result_dir results_muon/
 
 nevents=5
-export LIT_DETECTOR_SETUP=muon
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE URQMD UNIGEN
-pars=(0    0    0   0   0    0    5       0      yes   yes)
+#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
+pars=(0    0    0   0   0    0    5       0      0  yes   yes)
 set_simulation_parameters ${pars}
 
 set_default_muon_geometry

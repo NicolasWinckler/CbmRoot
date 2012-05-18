@@ -19,10 +19,12 @@ function set_simulation_parameters() {
     export LIT_NOF_JPSI_TO_MUONS=${pars[6]}
     # number of embedded J/Psi decayed to e+ and e- 
     export LIT_NOF_JPSI_TO_ELECTRONS=${pars[7]}
+    # number of generated Au ions
+    export LIT_NOF_AU_IONS=${pars[8]}
     # If "yes" than UrQMD will be used as background
-    export LIT_URQMD=${pars[8]}
+    export LIT_URQMD=${pars[9]}
     # If "yes" than CbmUnigenGenerator will be useed instead of FairUrqmdGenerator
-    export LIT_UNIGEN=${pars[9]}
+    export LIT_UNIGEN=${pars[10]}
 }
 
 
@@ -33,6 +35,7 @@ function set_default_file_names() {
     XXXX=$2
     export LIT_MC_FILE=${dir}/mc.${XXXX}.root
     export LIT_PAR_FILE=${dir}/param.${XXXX}.root
+    export LIT_MVD_DELTA_FILE=${dir}/mc.delta.${XXXX}.root
     export LIT_GLOBAL_RECO_FILE=${dir}/global.reco.${XXXX}.root
     export LIT_GLOBAL_HITS_FILE=${dir}/global.hits.${XXXX}.root
     export LIT_GLOBAL_TRACKS_FILE=${dir}/global.tracks.${XXXX}.root

@@ -57,12 +57,7 @@ void CbmLitFitQaReport::Create(
    out << PrintResAndPullRow("MUCH last", "hMuchLast", "mean");
    out << fR->TableEnd();
 
-   out << fR->Image("STS first track parameter", "fit_qa_sts_first_param");
-   out << fR->Image("STS last track parameter", "fit_qa_sts_last_param");
-   out << fR->Image("TRD first track parameter", "fit_qa_trd_first_param");
-   out << fR->Image("TRD last track parameter", "fit_qa_trd_last_param");
-   out << fR->Image("MUCH first track parameter", "fit_qa_much_first_param");
-   out << fR->Image("MUCH last track parameter", "fit_qa_much_last_param");
+   out << PrintImages(".*fit_qa_.*png");
 
    out <<  fR->DocumentEnd();
 }

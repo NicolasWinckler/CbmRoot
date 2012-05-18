@@ -67,6 +67,14 @@ protected:
    virtual void Create(
          ostream& out) = 0;
 
+   /**
+    * \brief Return formatted string with printed images based on specified pattern.
+    * \param[in] pattern Regular expression.
+    * \return Formatted string with printed images based on specified pattern.
+    */
+   string PrintImages(
+   		const string& pattern) const;
+
    ptree fQa; // Property tree of Qa results for each study
    ptree fIdeal; // Property with ideal values
    ptree fCheck; // Property tree with checked results for each study

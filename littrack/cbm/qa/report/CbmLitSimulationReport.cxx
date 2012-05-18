@@ -4,6 +4,7 @@
  * \date 2011
  */
 #include "CbmLitSimulationReport.h"
+#include "CbmLitReportElement.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
@@ -64,4 +65,16 @@ void CbmLitSimulationReport::Create(
    fIdeal.clear();
 
    DeleteReportElement();
+}
+
+string CbmLitSimulationReport::PrintImages(
+		const string& pattern) const
+{
+	string str = "";
+	vector<string> images = GetImages(fResultDirectory, pattern);
+	vector<string>::const_iterator it;
+	for(it = images.begin(); it != images.end(); it++) {
+		str += fR->Image(*it, *it);
+	}
+	return str;
 }

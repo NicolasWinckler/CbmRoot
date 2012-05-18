@@ -88,11 +88,11 @@ protected:
    virtual string GetCheckFileName() const = 0;
 
    /**
-    * \brief Returns list of images in specified directory.
+    * \brief Returns list of image names without extension and without path in specified directory.
     * \param[in] dir Directory name.
     * \param[in] pattern File name pattern.
     */
-   vector<string> GetImageList(
+   vector<string> GetImages(
 		   const string& dir,
 		   const string& pattern) const;
 

@@ -69,6 +69,24 @@ protected:
    virtual void Create(
          ostream& out) = 0;
 
+   /**
+    * \brief Return formated string with table of images.
+    * \param[in] tableName Table name.
+    * \param[in] fileName File name of image.
+    * \return Formated string with table of images.
+    */
+   string PrintImageTable(
+         const string& tableName,
+         const string& fileName) const;
+
+   /**
+    * \brief Return formatted string with image tables.
+    * \param[in] pattern Regular expression.
+    * \return Formatted string with image tables.
+    */
+   string PrintImages(
+		   const string& pattern) const;
+
    vector<ptree> fQa; // Property tree of Qa results for each study
    ptree fIdeal; // Property with ideal values
    vector<ptree> fCheck; // Property tree with checked results for each study

@@ -42,7 +42,7 @@ void CbmLitTrackingQaReport::Create(
    out << PrintTrackingEfficiency(false);
    out << PrintTrackingEfficiency(true);
    out << PrintNofGhosts();
-   out << PrintImages();
+   out << PrintImages(".*tracking_qa_.*png");
 
    out <<  fR->DocumentEnd();
 
@@ -133,15 +133,4 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
 	}
   	str += fR->TableEnd();
   	return str;
-}
-
-string CbmLitTrackingQaReport::PrintImages() const
-{
-	string str = "";
-	vector<string> images = GetImageList(fResultDirectory, ".*tracking_qa_.*png");
-	vector<string>::const_iterator it;
-	for(it = images.begin(); it != images.end(); it++) {
-		str += fR->Image(*it, *it);
-	}
-	return str;
 }

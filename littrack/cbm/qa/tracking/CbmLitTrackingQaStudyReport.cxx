@@ -73,7 +73,7 @@ void CbmLitTrackingQaStudyReport::Create(
    out << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter);
    out << PrintEfficiencyTable("Tracking efficiency with RICH", "hte_.*Rich.*_Eff_p");
    out << PrintEfficiencyTable("Tracking efficiency w/o RICH", "hte_((?!Rich).)*_Eff_p");
-   out << PrintImages();
+   out << PrintImages(".*tracking_qa_.*png");
    out <<  fR->DocumentEnd();
 }
 
@@ -129,38 +129,4 @@ string CbmLitTrackingQaStudyReport::PrintEfficiencyTable(
    	}
    	str += fR->TableEnd();
    	return str;
-}
-
-string CbmLitTrackingQaStudyReport::PrintImageTable(
-      const string& title,
-      const string& file) const
-{
-   int nofStudies = fStudyNames.size();
-   int nofCols = 2;
-   int nofLoops = ((nofStudies % nofCols) == 0) ? nofStudies / nofCols : nofStudies / nofCols + 1;
-   stringstream ss;
-   ss << fR->TableBegin(title, list_of(string("")).repeat(nofCols - 1, string("")));
-   for (int iL = 0; iL < nofLoops; iL++) {
-      std::vector<string> images;
-      for (int iC = 0; iC < nofCols; iC++) {
-         int index = nofCols * iL + iC;
-         if (index >= nofStudies) continue;
-         string fileName = fResultDirectories[index] + "/" + file;
-         images.push_back(fR->Image(fStudyNames[index], fileName));
-      }
-      ss << fR->TableRow(images);
-   }
-   ss << fR->TableEnd();
-   return ss.str();
-}
-
-string CbmLitTrackingQaStudyReport::PrintImages() const
-{
-	string str = "";
-	vector<string> images = GetImageList(fResultDirectories[0], ".*tracking_qa_.*png");
-	vector<string>::const_iterator it;
-	for(it = images.begin(); it != images.end(); it++) {
-		str += PrintImageTable(*it, *it);
-	}
-	return str;
 }

@@ -60,6 +60,8 @@ void CbmLitClusteringQaStudyReport::Create(
    if (PropertyExists("hNofTofHits")) out << PrintRow("hNofTofHits", "TOF hits");
    out << fR->TableEnd();
 
+   out << PrintImages(".*clustering_qa_.*png");
+
    out <<  fR->DocumentEnd();
 }
 

@@ -41,12 +41,7 @@ void CbmLitClusteringQaReport::Create(
          "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
    out << fR->TableEnd();
 
-   // Images
-   out << fR->Image("MVD hits per station", "clustering_qa_mvd_hits_station");
-   out << fR->Image("STS hits per station", "clustering_qa_sts_hits_station");
-   out << fR->Image("TRD hits per station", "clustering_qa_trd_hits_station");
-   out << fR->Image("MUCH hits per station", "clustering_qa_much_hits_station");
-   out << fR->Image("TOF hits per station", "clustering_qa_tof_hits_station");
+   out << PrintImages(".*clustering_qa_.*png");
 
    out <<  fR->DocumentEnd();
 }

@@ -49,7 +49,7 @@ void CbmLitReport::DeleteReportElement()
    if (NULL != fR) delete fR;
 }
 
-vector<string> CbmLitReport::GetImageList(
+vector<string> CbmLitReport::GetImages(
 		   const string& dir,
 		   const string& pattern) const
 {

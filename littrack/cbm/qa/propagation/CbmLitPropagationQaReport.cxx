@@ -40,13 +40,7 @@ void CbmLitPropagationQaReport::Create(
    out << PrintTable("Smoother: residuals and pulls (RMS)", 2, "rms");
    out << PrintTable("Smoother: residuals and pulls (mean)", 2, "mean");
 
-   string algorithms[] = { "propagator", "fitter", "smoother" };
-   for (UInt_t iAlgorithm = 0; iAlgorithm < 3; iAlgorithm++) {
-      for (UInt_t iPlane = 0; iPlane < fNofPlanes; iPlane++) {
-         string imageName = "propagation_qa_" + algorithms[iAlgorithm] + "_" + ToString<Int_t>(iPlane);
-         out << fR->Image(imageName, imageName);
-      }
-   }
+   out << PrintImages(".*propagation_qa_.*png");
 
    out <<  fR->DocumentEnd();
 }

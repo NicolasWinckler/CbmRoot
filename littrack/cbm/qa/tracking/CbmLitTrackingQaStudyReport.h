@@ -92,19 +92,6 @@ protected:
     		const string& tableName,
     		const string& pattern) const;
 
-   /**
-    * \brief Return formated string with table of images.
-    * \param[in] tableName Table name.
-    * \param[in] fileName File name of image.
-    * \return Formated string with table of images.
-    */
-   string PrintImageTable(
-         const string& tableName,
-         const string& fileName) const;
-
-
-   string PrintImages() const;
-
    vector<CbmLitPropertyTree*> fPT;
 };
 

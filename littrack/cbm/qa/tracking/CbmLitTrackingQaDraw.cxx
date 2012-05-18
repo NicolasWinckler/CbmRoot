@@ -76,6 +76,7 @@ void CbmLitTrackingQaDraw::DrawEfficiencyHistos()
 	}
 
 	// Draw local accapted and reconstructed tracks vs number of points
+	fHM->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
 	vector<string> accRecTracks = list_of("Sts")("Trd")("Much")("Tof");
 	for (UInt_t i = 0; i < accRecTracks.size(); i++) {
 		string variant = accRecTracks[i];
@@ -161,7 +162,7 @@ void CbmLitTrackingQaDraw::DrawAccAndRec(
 		labels[iHist] = split[4] + ":" + split[3] + "(" + NumberToString<Double_t>(hist->GetEntries() / nofEvents, 1) + ")";
 	}
 
-	DrawH1(histos, labels, kLitLinear, kLitLog, true, 0.2, 0.6, 0.5, 0.85, "PE1");
+	DrawH1(histos, labels, kLitLinear, kLitLog, true, 0.2, 0.75, 0.5, 0.99);
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 //void CbmLitTrackingQaDraw::DrawMcEfficiencyGraph()
@@ -200,6 +201,7 @@ void CbmLitTrackingQaDraw::DrawAccAndRec(
 
 void CbmLitTrackingQaDraw::DrawHitsHistos()
 {
+   fHM->ShrinkEmptyBinsByPattern("hth_.*(_All|_True|_Fake)");
    DrawHitsHistos("tracking_qa_mvd_hits", "hth_Mvd_TrackHits");
    DrawHitsHistos("tracking_qa_sts_hits", "hth_Sts_TrackHits");
    DrawHitsHistos("tracking_qa_trd_hits", "hth_Trd_TrackHits");

@@ -150,8 +150,6 @@ void CbmLitTrackingQaCalculator::Exec()
 void CbmLitTrackingQaCalculator::Finish()
 {
    CalculateEfficiencyHistos();
-   fHM->ShrinkEmptyBinsByPattern("hth_.*(_All|_True|_Fake)");
-   fHM->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
 }
 
 void CbmLitTrackingQaCalculator::ReadDataBranches()
@@ -486,7 +484,7 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
   		if (parName == "Np") {
   			par = (effName == "Sts") ? nofPointsSts : (effName == "Trd") ? nofPointsTrd : (effName == "Much") ? nofPointsMuch : (effName == "Tof") ? nofPointsTof : 0;
   		} else {
-  			parMap[parName];
+  			par = parMap[parName];
   		}
 
 		Bool_t sts = (normName.find("Sts") != string::npos) ? isStsOk : true;

@@ -8,7 +8,7 @@
 #include "qa/base/CbmLitHistManager.h"
 #include "qa/mc/CbmLitMCTrackCreator.h"
 #include "utils/CbmLitUtils.h"
-#include "elid/CbmLitGlobalElectronId.h"
+//#include "elid/CbmLitGlobalElectronId.h"
 
 #include "CbmBaseHit.h"
 #include "FairMCPoint.h"
@@ -85,10 +85,10 @@ CbmLitTrackingQaCalculator::CbmLitTrackingQaCalculator(
    fTofPoints(NULL),
    fTofHits(NULL),
 
-   fPrimVertex(NULL),
-   fKFFitter(NULL),
+//   fPrimVertex(NULL),
+//   fKFFitter(NULL),
 
-   fElectronId(NULL),
+//   fElectronId(NULL),
 
    fHM(histManager)
 {
@@ -106,11 +106,11 @@ void CbmLitTrackingQaCalculator::Init()
 
    ReadDataBranches();
 
-   if (fDet.GetElectronSetup()) {
-      fElectronId = new CbmLitGlobalElectronId();
-      fElectronId->Init();
-      fRichEllipseFitter = new CbmRichRingFitterEllipseTau();
-   }
+//   if (fDet.GetElectronSetup()) {
+//      fElectronId = new CbmLitGlobalElectronId();
+//      fElectronId->Init();
+//      fRichEllipseFitter = new CbmRichRingFitterEllipseTau();
+//   }
 
    fMCTrackCreator = CbmLitMCTrackCreator::Instance();
 
@@ -203,11 +203,11 @@ void CbmLitTrackingQaCalculator::ReadDataBranches()
       if (NULL == fTofHits) { Fatal("Init", "No TofHit array!"); }
    }
 
-   fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
-   if (NULL == fPrimVertex) {Fatal("CbmAnaElectronsQa::Init", "No Primary Vertex!");}
-
-   fKFFitter = new CbmStsKFTrackFitter();
-   fKFFitter->Init();
+//   fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
+//   if (NULL == fPrimVertex) {Fatal("Init", "No Primary Vertex!");}
+//
+//   fKFFitter = new CbmStsKFTrackFitter();
+//   fKFFitter->Init();
 }
 
 void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
@@ -303,8 +303,8 @@ void CbmLitTrackingQaCalculator::ProcessGlobalTracks()
                   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(stsTrackMatch->GetMCTrackId()));
                   if (mcTrack != NULL) momentumMc = mcTrack->GetP();
                 }
-                if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
-                   fHM->H1("hng_NofGhosts_RichElId_Nh")->Fill(nofHits);
+//                if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
+//                   fHM->H1("hng_NofGhosts_RichElId_Nh")->Fill(nofHits);
             }
          }
       }

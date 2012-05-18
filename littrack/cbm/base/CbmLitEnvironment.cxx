@@ -126,9 +126,9 @@ void CbmLitEnvironment::MuchLayout()
             CbmMuchLayer* layer = station->GetLayer(iLayer);
             Double_t zFront = layer->GetSideF()->GetZ();// - geoScheme->GetGetActiveLz();
             Double_t zBack = layer->GetSideB()->GetZ();// - layer->GetSupportDz();
-            std::cout << ">> sideF=" << layer->GetSideF()->GetZ() << " sideB=" << layer->GetSideB()->GetZ()
-            		<< " moduleF=" << layer->GetSide(false)->GetModule(0)->GetPosition()[2]
-            		<< " moduleB=" << layer->GetSide(true)->GetModule(0)->GetPosition()[2] << "\n";
+//            std::cout << ">> sideF=" << layer->GetSideF()->GetZ() << " sideB=" << layer->GetSideB()->GetZ()
+//            		<< " moduleF=" << layer->GetSide(false)->GetModule(0)->GetPosition()[2]
+//            		<< " moduleB=" << layer->GetSide(true)->GetModule(0)->GetPosition()[2] << "\n";
 
             CbmLitSubstation litSubstationFront, litSubstationBack;
             litSubstationFront.AddModule(0, matrix);
@@ -291,6 +291,7 @@ void CbmLitEnvironment::MvdLayout()
    if (!layoutCreated) {
 
       std::set<CbmLitStation, CompareStationZLess> stationSet;
+      TGeoRotation* matrix = new TGeoRotation();
       TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
       TObjArray* nodes = node1->GetNodes();
       for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
@@ -302,6 +303,7 @@ void CbmLitEnvironment::MvdLayout()
 
             CbmLitStation sta;
             CbmLitSubstation substation;
+            substation.AddModule(0, matrix);
             substation.SetZ(stationPos[2]);
             sta.SetType(kLITPIXELHIT);
             sta.AddSubstation(substation);
@@ -313,7 +315,7 @@ void CbmLitEnvironment::MvdLayout()
          sg.AddStation(*i);
       }
       fMvdLayout.AddStationGroup(sg);
-//    cout << fMvdLayout.ToString();
+      cout << fMvdLayout.ToString();
       layoutCreated = true;
    }
 }

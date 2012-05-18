@@ -25,7 +25,7 @@ class CbmStsKFTrackFitter;
 class CbmMCTrack;
 class TClonesArray;
 class TH1;
-class CbmLitGlobalElectronId;
+//class CbmLitGlobalElectronId;
 class CbmLitHistManager;
 class CbmRichRingFitterEllipseTau;
 class CbmLitMCTrackCreator;
@@ -255,10 +255,10 @@ private:
     */
    void IncreaseCounters();
 
-   /**
-    * \brief Calculate electron Identification.
-    */
-   void ElectronIdentification();
+//   /**
+//    * \brief Calculate electron Identification.
+//    */
+//   void ElectronIdentification();
 
    // Acceptance defined by MC points
    Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
@@ -307,11 +307,11 @@ private:
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 
-   CbmVertex *fPrimVertex; // Pointer to the primary vertex
-   CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
+//   CbmVertex *fPrimVertex; // Pointer to the primary vertex
+//   CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
-   CbmLitGlobalElectronId* fElectronId; // Electron identification tool
-   CbmRichRingFitterEllipseTau* fRichEllipseFitter; // ellipse fitter
+//   CbmLitGlobalElectronId* fElectronId; // Electron identification tool
+//   CbmRichRingFitterEllipseTau* fRichEllipseFitter; // ellipse fitter
 
    CbmLitMCTrackCreator* fMCTrackCreator;
    CbmLitHistManager* fHM; // histogram manager

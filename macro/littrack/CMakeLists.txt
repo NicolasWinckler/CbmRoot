@@ -40,19 +40,19 @@ SET_TESTS_PROPERTIES(littrack_muon_auau_25gev_mbias PROPERTIES PASS_REGULAR_EXPR
 
 GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh)
 
-ADD_TEST(littrack_mvd_auau_25gev_centr_nodelta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_centr" "auau" "25gev" "centr" "nodelta")
+ADD_TEST(littrack_mvd_auau_25gev_centr_nodelta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_centr_nodelta" "auau" "25gev" "centr" "nodelta")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_centr_nodelta PROPERTIES TIMEOUT "36000")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_centr_nodelta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
-ADD_TEST(littrack_mvd_auau_25gev_mbias_nodelta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_mbias" "auau" "25gev" "mbias" "nodelta")
+ADD_TEST(littrack_mvd_auau_25gev_mbias_nodelta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_mbias_nodelta" "auau" "25gev" "mbias" "nodelta")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_mbias_nodelta PROPERTIES TIMEOUT "36000")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_mbias_nodelta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
-ADD_TEST(littrack_mvd_auau_25gev_centr_delta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_centr" "auau" "25gev" "centr" "delta")
+ADD_TEST(littrack_mvd_auau_25gev_centr_delta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_centr_delta" "auau" "25gev" "centr" "delta")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_centr_delta PROPERTIES TIMEOUT "36000")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_centr_delta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
-ADD_TEST(littrack_mvd_auau_25gev_mbias_delta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_mbias" "auau" "25gev" "mbias" "delta")
+ADD_TEST(littrack_mvd_auau_25gev_mbias_delta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_mbias_delta" "auau" "25gev" "mbias" "delta")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_mbias_delta PROPERTIES TIMEOUT "36000")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_mbias_delta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 

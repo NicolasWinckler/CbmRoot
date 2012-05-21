@@ -815,6 +815,8 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   name.Form("Module%d",GeoPara->moduleId);
   TH2F *Module = new TH2F(name,name,1500/mm2bin,-750,750,1500/mm2bin,-750,750);
   Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
+  name.Form("Module%dHitPad",GeoPara->moduleId);
+  TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
   //cout << "Histo" << endl;
   //cout << Mpos[2] << endl;
   const Int_t nR = nRow;
@@ -860,6 +862,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 	    {
 	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
 	      HitPad->Fill(HiteRate);
+	      HitPadModule->Fill(HiteRate);
 	    }
 	  Int_t mStepY = Int_t((planeStartY-Mpos[1]));
 	  Int_t mStepX = Int_t((planeStartX-Mpos[0]));
@@ -927,7 +930,9 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   Layer->Write("", TObject::kOverwrite);
   HitPad->Write("", TObject::kOverwrite);
   Module->Write("", TObject::kOverwrite);
+  HitPadModule->Write("", TObject::kOverwrite);
   delete Module;
+  delete HitPadModule;
   for (Int_t i = 0; i < 3; i++)
     Topview[i]->Write("", TObject::kOverwrite);
 

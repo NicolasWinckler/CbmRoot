@@ -15,6 +15,10 @@
 // - declare febmaterial in media.geo
 // - check pad maps in rotated FEB goemetries
 //
+// Update 20120522 - David Emschermann 
+// - v12f derived from v12b (no febs)
+// - more granularity in the inner part of station2 
+//
 // Update 20120508 - David Emschermann 
 // - introduce new module naming:
 //   trd1mod[1-8]# layer type [1-3] - layer number [1-4] - serial number [001 - 999]
@@ -101,6 +105,22 @@ FILE *infofile;
 //FILE *parameterfile;
 using namespace std;
 
+typedef struct {
+  int number;
+  int type[12];
+  float position[12];
+  float front;
+  float thickness;
+  float pitch;
+} trdlayer;
+
+trdlayer layer = { 12, 
+                   {    1,    1,    1,    1,    2,    2,    2,    2,    3,    3,    0,    0 },
+		   { 4500, 5000, 5500, 6000, 6750, 7250, 7750, 8250, 9000, 9500, 6500, 8500 },
+                   4500,  // front of TRD keeping volume
+                   495,   // adapt layer thickness to TRD prototypes (Jun10)
+                   500    // Distance between 2 adjacent layers of a TRD station
+                 };
 
 int Tiltandshift(int, int, float, float, float, int);
 int TrdModules1(int, int, float, float, float, int, float, float*, float*);
@@ -1114,7 +1134,7 @@ int main(void)
                           { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
-  // number of modules 73x0, 0x1, 0x2, 12x3, 14x4
+  // number of modules 73x0, 0x5, 0x6, 12x7, 14x8
   // Station1 =  24 + 26;   // v12x
 
   int a;
@@ -1163,12 +1183,12 @@ int main(void)
 // ### Station 2
 
   // v12x - module types in the inner sector of station2 - looking upstream
-  int station2i[5][5] = { { 4,  3,  3,  3,  4 },
-                          { 3,  2,  2,  2,  3 },
-                          { 3,  2,  0,  2,  3 },
-                          { 3,  2,  2,  2,  3 },
-                          { 4,  3,  3,  3,  4 } };
-  // number of modules 1x0, 0x1, 8x2, 12x3, 4x4
+  int station2i[5][5] = { { 4,  3,  3,  3,  4 },     // { 4,  3,  3,  3,  4 },  
+                          { 3,  2,  1,  2,  3 },     // { 3,  2,  2,  2,  3 },  
+                          { 3,  1,  0,  1,  3 },     // { 3,  2,  0,  2,  3 },  
+                          { 3,  2,  1,  2,  3 },     // { 3,  2,  2,  2,  3 },  
+                          { 4,  3,  3,  3,  4 } };   // { 4,  3,  3,  3,  4 } };
+  // number of modules 1x0, 4x1, 4x2, 12x3, 4x4
 
   // v12x - module types in the outer sector of station2 - looking upstream
   int station2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
@@ -1180,7 +1200,7 @@ int main(void)
                           { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
                           { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
                           { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
-  // number of modules 45x0, 0x1, 12x2, 0x3, 42x4
+  // number of modules 45x0, 0x5, 12x6, 0x7, 42x8
   // Station2 =  78;   // v12x
 
   int Chamber_number_Station2 =  0;
@@ -1239,7 +1259,7 @@ int main(void)
                           { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
                           { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
                           { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
-  // number of modules 1x0, 8x1, 12x2, 24x3, 54x4
+  // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
   // Station3 = 98;   // v12x
 
   int Chamber_number_Station3 = 0;
@@ -1444,5 +1464,23 @@ int main(void)
   fclose(infofile);
   //  fclose(parameterfile);
 
-}
+//----------------------------------------------------------------------------------------
+  // check the trd struct
+  trdlayer *llayer;
+  llayer=&layer;
 
+  int ii;
+  printf("\nlayer number   : %4d\n", llayer->number);
+  printf("layer types    :");
+  for (ii = 0; ii < llayer-> number; ii++)
+    printf(" %4d", llayer->type[ii]);
+  printf("\n");
+  printf("layer positions:");
+  for (ii = 0; ii < llayer-> number; ii++)
+    printf(" %.f", llayer->position[ii]);
+  printf("\n");
+  printf("layer front    : %4.f\n", llayer->front);
+  printf("layer thickness: %4.f\n", llayer->thickness);
+  printf("layer pitch    : %4.f\n", llayer->pitch);
+
+}

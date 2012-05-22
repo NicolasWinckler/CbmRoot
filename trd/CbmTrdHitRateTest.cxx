@@ -480,7 +480,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
 
   sprintf(name,"S%d_L%d",fStation,fLayer);
   sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
+  printf("\n%s\n",title);
   //sprintf(Canfile1,"pics/Station%dLayer%d.png",fStation,fLayer);
   //sprintf(Canfile2,"pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
   Layer = new TH2F(name,title,int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
@@ -791,7 +791,7 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
 	(z * z)
 	;
       */
-      HitRate += 
+      HitRate += // fit including errors
 	exp(4.536355e00 + -8.393716e-03 * alpha) + 
 	exp(2.400547e01 + -1.208306e-02 * alpha) /
 	(z * z)
@@ -812,11 +812,13 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
   TString name;
-  name.Form("Module%d",GeoPara->moduleId);
-  TH2F *Module = new TH2F(name,name,1500/mm2bin,-750,750,1500/mm2bin,-750,750);
+  name.Form("Module%d",GeoPara->moduleId);  
+  TH2F *Module = new TH2F(name,name,1500/mm2bin+1,-750.5,750.5,1500/mm2bin+1,-750.5,750.5);
   Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
   name.Form("Module%dHitPad",GeoPara->moduleId);
   TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
+  name.Form("   Module %d",GeoPara->moduleId);
+  cout << "   " << name << "\r" << flush;
   //cout << "Histo" << endl;
   //cout << Mpos[2] << endl;
   const Int_t nR = nRow;

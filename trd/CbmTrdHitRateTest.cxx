@@ -10,7 +10,7 @@
 #include "FairRuntimeDb.h"
 
 #include "TColor.h"
-
+#include "TBox.h"
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TImage.h"
@@ -749,7 +749,7 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
       //cout << nRow << " " << nCol << endl;
       if(Lines)
 	{
-	  DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1, Topview, c0);
+	  DrawLines( VolumeID, Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1, Topview, c0);
 	}
       else
 	{
@@ -1033,7 +1033,7 @@ void CbmTrdHitRateTest::FillVector(Bool_t firstLayer, Int_t VolumeID,
       }
     }
 }
-void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
+void CbmTrdHitRateTest::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
 {
   /*
   //----------------------Pad--------------------------------------
@@ -1141,6 +1141,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
   
   
   //----------------------Module--------------------------------------
+  /*
   TLine* Ma = new TLine(Mpos[0]-Msize[0],
 			Mpos[1]-Msize[1],
 			Mpos[0]+Msize[0],
@@ -1157,12 +1158,18 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
 			Mpos[1]-Msize[1],
 			Mpos[0]+Msize[0],
 			Mpos[1]+Msize[1]);
+  */
+  TBox *M = new TBox(Mpos[0]-Msize[0],Mpos[1]-Msize[1],Mpos[0]+Msize[0],Mpos[1]+Msize[1]);
+  M->SetUniqueID(Mid);
   if(fDraw){
     c1->cd(1);
+    /*
     Ma->Draw("same");
     Mb->Draw("same");
     Mc->Draw("same");
     Md->Draw("same");
+    */
+    M->Draw("same");
     //c1->Update();
     c1->Write("", TObject::kOverwrite);
   }

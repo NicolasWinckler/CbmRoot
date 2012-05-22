@@ -812,15 +812,27 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
   TString name;
+
   name.Form("Module%d",GeoPara->moduleId);  
   TH2F *Module = new TH2F(name,name,1500/mm2bin+1,-750.5,750.5,1500/mm2bin+1,-750.5,750.5);
   Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
+
   name.Form("Module%dHitPad",GeoPara->moduleId);
-  TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
-  name.Form("   Module %d",GeoPara->moduleId);
-  cout << "   " << name << "\r" << flush;
+  TH1F* HitPadModule = new TH1F(name,name,1200,0,120000);
+  //  TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
+
+  // show only current module name
+  //  name.Form("Module %d",GeoPara->moduleId);
+  //  cout << "      " << name << "\r" << flush;
+
+  // show all module names
+  //  cout << "Modules" << endl;
+  name.Form("%10d",GeoPara->moduleId);
+  cout << name << flush;
+
   //cout << "Histo" << endl;
   //cout << Mpos[2] << endl;
+
   const Int_t nR = nRow;
   const Int_t nC = nCol;
   Float_t HiteRate = 0;

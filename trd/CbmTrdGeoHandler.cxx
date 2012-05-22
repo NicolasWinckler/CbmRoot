@@ -177,7 +177,7 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
     } else if (kSegmentedSquaredOneKeepingVolume == fGeoVersion) {
       station=temp_mod/10000;
       layer=(temp_mod%10000)/1000;
-      modnumber=(temp_mod%10000)%1000;
+      modnumber=temp_mod%1000;
     } else {
       CurrentVolOffID(2, layer);
       id2 = CurrentVolOffID(3, temp_station);

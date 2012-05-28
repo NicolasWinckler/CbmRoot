@@ -338,8 +338,12 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
          continue;
       }
 
-
       CbmGlobalTrack* globalTrack = new ((*globalTracks)[globalTrackNo++]) CbmGlobalTrack();
+
+      // Set last parameter of the CbmGlobal track to be last parameter of CbmLitTrack
+      FairTrackParam parLast;
+      CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parLast);
+      globalTrack->SetParamLast(&parLast);
 
       Bool_t isCreateMuchTrack = false, isCreateTrdTrack = false;
       for (Int_t iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {

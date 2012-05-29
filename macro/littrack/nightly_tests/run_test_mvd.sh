@@ -33,6 +33,8 @@ if [ "${mvd_delta}" = "delta" ] ; then
     export LIT_PAR_FILE=${dir}/param.delta.0000.root
     ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(600)"
     export LIT_NOF_MVD_DELTA_EVENTS=300
+    export LIT_MC_FILE=${dir}/mc.0000.root
+    export LIT_PAR_FILE=${dir}/param.0000.root
 fi
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN

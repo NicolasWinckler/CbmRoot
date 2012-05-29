@@ -81,6 +81,8 @@ private:
   Int_t fExtraNum;
   /** Number of global track, produce the particle **/
   Int_t fTrackNum;
+  /** STS  extrapolation **/
+  Int_t fStsTrackNum;
   /** P of the track **/
   Double_t fTrackP;
   /** Number of MC track, produce the particle. **/
@@ -192,6 +194,8 @@ private:
   TClonesArray* fTracks;
   /** Array of MC tracks. Used only for tree output and hack procedure (if any).**/
   TClonesArray* fMC;
+  /** Global tracks array **/
+  TClonesArray* fGlobal;
   /** Sts tracks for energy loss information **/
   TClonesArray* fStsTracks;
   /** Sts info for track matching **/

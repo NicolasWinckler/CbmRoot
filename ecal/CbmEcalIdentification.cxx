@@ -16,6 +16,7 @@
 #include "CbmEcalMaximum.h"
 #include "CbmEcalShLibCorr.h"
 
+#include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmTrackMatch.h"
 
@@ -45,6 +46,7 @@ void CbmEcalIdentification::Exec(Option_t* option)
   Int_t oldn;
   fN=0;
   FairTrackParam* tr;
+  CbmGlobalTrack* gtr;
   if (fVerbose>9)
     Info("Exec", "Total %d tracks before the calorimeter", n);
   for(i=0;i<n;i++)
@@ -54,6 +56,14 @@ void CbmEcalIdentification::Exec(Option_t* option)
     if (tr==NULL) continue;
     fExtraNum=i;
     fTrackNum=i;
+    if (fExtra)
+    {
+      fTrackNum=fExtra->Map()[fExtraNum];
+      gtr=(CbmGlobalTrack*)fGlobal->At(fTrackNum);
+      fStsTrackNum=gtr->GetStsTrackIndex();
+    }
+    else
+      fStsTrackNum=i;
     oldn=fN;
     Identify(tr);
     if (oldn!=fN&&fTreeOut)
@@ -101,6 +111,7 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
   fX=tr->GetX();
   fY=tr->GetY();
   fZ=tr->GetZ();
+//  Info("Identify", "Track %d (%f, %f).", fExtraNum, fX, fY);
 
   cell=fStr->GetCell(fX, fY);
   if (cell)
@@ -125,7 +136,7 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
       if (CheckMaximum(mx))
       {
         if (cell&&fVerbose>10)
-	  Info("Identify", "For track %d (%f, %f) more than one maximum located", fExtraNum, fX, fY);
+	  Info("Identify", "For track %d (%f, %f) more than one maximum located", fTrackNum, fX, fY);
         cell=mx->Cell();
         mx->SetMark(mx->Mark()+1);
         mxx=mx;
@@ -170,7 +181,7 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
   fMCTrackNum=-1111;
   if (fUseMC==1)
   {
-    CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(fTrackNum);
+    CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(fStsTrackNum);
     if (ststr)
       fMCTrackNum=ststr->GetMCTrackId();
   }
@@ -208,7 +219,7 @@ void CbmEcalIdentification::CalculateChi2(CbmEcalMaximum* mx)
     cls[i++]=(*p);
 
   if (fPhi<0) fPhi+=360.0;
-  cout << fPhi << " " << fTheta << " " << fTrackP << endl;
+//  cout << fPhi << " " << fTheta << " " << fTrackP << endl;
   // Calculate covariance matrix
   for(i=0;i<s;i++)
   for(j=0;j<s;j++)
@@ -318,7 +329,7 @@ void CbmEcalIdentification::WriteTreeLight()
   fMCM=-1111;
   if (fUseMC==1)
   {
-    CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(fTrackNum);
+    CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(fStsTrackNum);
     if (ststr)
       fMCTrackNum=ststr->GetMCTrackId();
   }
@@ -411,9 +422,9 @@ void CbmEcalIdentification::WriteTree()
   fMCPDG=-1111;
   fMotherMCPDG=-1111;
   fMCM=-1111;
-  if (fTrackNum>=0)
+  if (fStsTrackNum>=0)
   {
-    CbmStsTrack* gtr=(CbmStsTrack*)fStsTracks->At(fTrackNum);
+    CbmStsTrack* gtr=(CbmStsTrack*)fStsTracks->At(fStsTrackNum);
     fPDG=gtr->GetPidHypo();
     fTrChi2=gtr->GetChi2();
     fTrNDF=gtr->GetNDF();
@@ -602,6 +613,7 @@ void CbmEcalIdentification::InitVar()
   fShape=-1111;
   fEProb=-1111;
   fTrackNum=-1111;
+  fStsTrackNum=-1111;
   fMCTrackNum=-1111;
   fPDG=-1111;
   fCellType=-1111;
@@ -656,8 +668,9 @@ CbmEcalIdentification::CbmEcalIdentification()
     fE(0.),
     fShape(0.),
     fEProb(0.),
-    fExtraNum(0),
-    fTrackNum(0),
+    fExtraNum(-1111),
+    fTrackNum(-1111),
+    fStsTrackNum(-1111),
     fTrackP(0.),
     fMCTrackNum(0),
     fTreeOut(0),
@@ -721,6 +734,7 @@ CbmEcalIdentification::CbmEcalIdentification()
     fId(NULL),
     fTracks(NULL),
     fMC(NULL),
+    fGlobal(NULL),
     fStsTracks(NULL),
     fStsTracksMatch(NULL),
     fMCPoints(NULL),
@@ -751,8 +765,9 @@ CbmEcalIdentification::CbmEcalIdentification(const char* name, const Int_t iVerb
     fE(0.),
     fShape(0.),
     fEProb(0.),
-    fExtraNum(0),
-    fTrackNum(0),
+    fExtraNum(-1111),
+    fTrackNum(-1111),
+    fStsTrackNum(-1111),
     fTrackP(0.),
     fMCTrackNum(0),
     fTreeOut(0),
@@ -816,6 +831,7 @@ CbmEcalIdentification::CbmEcalIdentification(const char* name, const Int_t iVerb
     fId(NULL),
     fTracks(NULL),
     fMC(NULL),
+    fGlobal(NULL),
     fStsTracks(NULL),
     fStsTracksMatch(NULL),
     fMCPoints(NULL),
@@ -859,16 +875,22 @@ InitStatus CbmEcalIdentification::Init()
     Fatal("Init", "Can't find EcalECalibration");
     return kFATAL;
   }
-  fExtra=(CbmEcalTrackExtrapolation*)fManager->GetObject("EcalTrackParam");
+  fExtra=(CbmEcalTrackExtrapolation*)fManager->GetObject("EcalTrackExtrapolation");
   if (!fExtra)
+    Info("Init", "Can't find EcalTrackParam. Will use STS tracks.");
+  else // Need an array of global tracks
   {
-    Fatal("Init", "Can't find EcalTrackParam");
-    return kFATAL;
+    fGlobal=(TClonesArray*)fManager->GetObject("GlobalTrack");
+    if (!fGlobal)
+    {
+      Fatal("Init()","Can't find global tracks array");
+      return kFATAL;
+    }
   }
   fStsTracks=(TClonesArray*)fManager->GetObject("StsTrack");
   if (!fStsTracks)
   {
-    Fatal("Init()","Can't find global tracks array");
+    Fatal("Init()","Can't find STS tracks array");
     return kFATAL;
   }
   fMaximums=(TClonesArray*)fManager->GetObject("EcalMaximums");

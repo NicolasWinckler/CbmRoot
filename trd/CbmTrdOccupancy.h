@@ -39,25 +39,29 @@ typedef struct OccupancyModule
   Int_t nPad;
   Int_t nxPad;
   Int_t nyPad;
-  Int_t NoSectors;
-  std::vector<std::vector<Pad*> > PadPlane;
+  /*
+    Int_t NoSectors;
+    std::vector<std::vector<Pad*> > PadPlane;
   
-  std::vector<Float_t> SectorSizeX;
-  std::vector<Float_t> SectorSizeY;
-  std::vector<Float_t> PadSizeX;
-  std::vector<Float_t> PadSizeY;
-  std::vector<Int_t> SecxPad;
-  std::vector<Int_t> SecyPad;
- 
+    std::vector<Float_t> SectorSizeX;
+    std::vector<Float_t> SectorSizeY;
+    std::vector<Float_t> PadSizeX;
+    std::vector<Float_t> PadSizeY;
+    std::vector<Int_t> SecxPad;
+    std::vector<Int_t> SecyPad;
+  */
   Float_t ModuleSizeX;
   Float_t ModuleSizeY;
   Float_t ModulePositionX;
   Float_t ModulePositionY;
   Float_t ModulePositionZ;
 
-  OccupancyModule () : Station(-1), Layer(-1), moduleId(-1), PadPlane(), nPad(0),
-    nxPad(0), nyPad(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
-    PadSizeY(), SecxPad(), SecyPad(), ModuleSizeX(0.), ModuleSizeY(0.), 
+  OccupancyModule () : Station(-1), Layer(-1), moduleId(-1), //PadPlane(), 
+    nPad(0),
+    nxPad(0), nyPad(0),
+		       /* NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
+			  PadSizeY(), SecxPad(), SecyPad(), */
+    ModuleSizeX(0.), ModuleSizeY(0.), 
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
 } OccupancyModule;
 
@@ -87,10 +91,11 @@ class CbmTrdOccupancy : public FairTask {
   TH2I *fLayerDummy;
   
   std::map<Int_t, OccupancyModule*> fModuleMap; //!
-  std::map<Int_t, OccupancyModule*>::iterator fModuleMapIt; //!
-  
+  std::map<Int_t, OccupancyModule*>::iterator fModuleMapIt; //!  
   std::map<Int_t, TH2F*> fModuleOccupancyMap; //!
   std::map<Int_t, TH2F*>::iterator fModuleOccupancyMapIt; //!
+  std::map<Int_t, TH1F*> fModuleOccupancyMemoryMap; //!
+  std::map<Int_t, TH1F*>::iterator fModuleOccupancyMemoryMapIt; //!
   std::map<Int_t, TCanvas*> fLayerOccupancyMap; //!
   std::map<Int_t, TCanvas*>::iterator fLayerOccupancyMapIt; //!
   ClassDef(CbmTrdOccupancy,2)

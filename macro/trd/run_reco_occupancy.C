@@ -25,6 +25,8 @@ void run_reco_occupancy(Int_t nEvents = 100)
   gROOT->SetStyle("Plain");
   gStyle->SetPadTickX(1);                        
   gStyle->SetPadTickY(1); 
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetOptTitle(kFALSE);
   // ========================================================================
   // geometry selection for sim + reco  by Cyrano                            
   // ========================================================================
@@ -247,7 +249,7 @@ void run_reco_occupancy(Int_t nEvents = 100)
   
   CbmTrdClusterizerFast* trdClustering = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator,false,false);
   run->AddTask(trdClustering);
-  CbmTrdOccupancy* trdOccupancy = new CbmTrdOccupancy("TRD Occupancy", "TRD task");
+  CbmTrdOccupancy* trdOccupancy = new CbmTrdOccupancy("TRD Occupancy", "TRD task", digipar);
   run->AddTask(trdOccupancy);
 
   /*

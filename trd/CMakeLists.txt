@@ -39,9 +39,11 @@ CbmTrd.cxx
 CbmTrdHitProducerIdeal.cxx    
 CbmTrdHitProducerSmearing.cxx
 CbmTrdClusterizer.cxx 
+CbmTrdClusterizerFast.cxx
 CbmTrdHitRateTest.cxx
 CbmTrdHitDensityTest.cxx
-#CbmTrdPhotonAnalysis.cxx
+CbmTrdPhotonAnalysis.cxx
+CbmTrdOccupancy.cxx
 # CbmTrdCluster.cxx 
 CbmTrdHitProducerQa.cxx  
 CbmTrdRadiator.cxx  

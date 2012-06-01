@@ -18,8 +18,6 @@
 #include "TStopwatch.h"
 #include "TBox.h"
 #include "TPaveText.h"
-
-
 #include <iostream>
 #include <cmath>
 using std::cout;
@@ -42,10 +40,11 @@ CbmTrdOccupancy::CbmTrdOccupancy()
     fModuleOccupancyMapIt(),
     fDigiChargeSpectrum(NULL),
     fTriggerThreshold(1e-6),
-    fNeigbourReadout(true)
+    fNeigbourReadout(true),
+    fGeo()
 {
 }
-CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title)
+CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, TString geo)
   : FairTask(name),
     fDigis(NULL),
     fDigiPar(NULL),
@@ -59,7 +58,8 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title)
     fModuleOccupancyMapIt(),
     fDigiChargeSpectrum(NULL),
     fTriggerThreshold(1e-6),
-    fNeigbourReadout(true)
+    fNeigbourReadout(true),
+    fGeo(geo)
 {
 }
 CbmTrdOccupancy::~CbmTrdOccupancy()
@@ -362,8 +362,8 @@ void CbmTrdOccupancy::CreateLayerView()
   for (fLayerOccupancyMapIt = fLayerOccupancyMap.begin();
        fLayerOccupancyMapIt != fLayerOccupancyMap.end(); ++fLayerOccupancyMapIt) {
     fLayerOccupancyMapIt->second->Write("", TObject::kOverwrite);
-    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+".pdf");
-    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+".png");
+    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+fGeo+".pdf");
+    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+fGeo+".png");
   }
   
 }

@@ -69,7 +69,7 @@ class CbmTrdOccupancy : public FairTask {
 
  public:
   CbmTrdOccupancy();
-  CbmTrdOccupancy(const char *name, const char *title="CBM Task");
+  CbmTrdOccupancy(const char *name, const char *title="CBM Task", TString geo="");
   virtual ~CbmTrdOccupancy();
   virtual InitStatus ReInit();
   virtual InitStatus Init();
@@ -104,6 +104,7 @@ class CbmTrdOccupancy : public FairTask {
   std::map<Int_t, TCanvas*>::iterator fLayerOccupancyMapIt; //!
   Double_t fTriggerThreshold;
   Bool_t fNeigbourReadout;
+  TString fGeo;
 
   ClassDef(CbmTrdOccupancy,2)
 

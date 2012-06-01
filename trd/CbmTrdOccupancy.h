@@ -76,9 +76,13 @@ class CbmTrdOccupancy : public FairTask {
   virtual void SetParContainers();
   virtual void Exec(Option_t * option);
   virtual void FinishEvent();
-  virtual void FinishTask(){;}
+  virtual void FinishTask();
   void Register();
   void SaveHistos2File();
+  void CreateLayerView();
+  void CopyEvent2MemoryMap();
+  void SetNeighbourReadout(Bool_t neighbourReadout);
+  void SetTriggerThreshold(Double_t triggerthreshold);
 
  private:
   CbmTrdOccupancy& operator=(const CbmTrdOccupancy&);
@@ -98,6 +102,9 @@ class CbmTrdOccupancy : public FairTask {
   std::map<Int_t, TH1F*>::iterator fModuleOccupancyMemoryMapIt; //!
   std::map<Int_t, TCanvas*> fLayerOccupancyMap; //!
   std::map<Int_t, TCanvas*>::iterator fLayerOccupancyMapIt; //!
+  Double_t fTriggerThreshold;
+  Bool_t fNeigbourReadout;
+
   ClassDef(CbmTrdOccupancy,2)
 
     };

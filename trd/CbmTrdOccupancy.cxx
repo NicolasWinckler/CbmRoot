@@ -113,7 +113,7 @@ InitStatus CbmTrdOccupancy::ReInit()
   fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
-  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1e-3);
+  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     //delete fModuleOccupancyMapIt->second;
@@ -137,7 +137,17 @@ InitStatus CbmTrdOccupancy::Init()
   fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
-  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1e-3);
+  fLayerDummy->GetXaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetYaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetZaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleOffset(1.5);
+  fLayerDummy->GetYaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetYaxis()->SetTitleOffset(2);
+  fLayerDummy->GetZaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+
+  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     //delete fModuleOccupancyMapIt->second;
@@ -201,7 +211,7 @@ void CbmTrdOccupancy::Exec(Option_t * option)
 	fModuleMap[moduleId]->moduleId = moduleId;
       }
       if (fLayerOccupancyMap.find(combiId) == fLayerOccupancyMap.end()){
-	title.Form("Station_%i__Layer_%i",Station,Layer);
+	title.Form("S%i_L%i",Station,Layer);
 	//fLayerOccupancyMap[combiId] = new TH2F(title,title,1200,-600,600,1000,-500,500);
 	fLayerOccupancyMap[combiId] = new TCanvas(title,title,800,800);
 	fLayerOccupancyMap[combiId]->cd();
@@ -313,25 +323,29 @@ void CbmTrdOccupancy::CreateLayerView()
     text->SetFillStyle(1001);
     text->SetLineColor(1);
     Int_t maxCol = 4;
-    if (occupancy > 0 && occupancy <= 6)
+    if (occupancy > 0 && occupancy <= 5)
       text->SetFillColor(kViolet
 			 //+Int_t((occupancy-0)/6.*maxCol)
 			 );
-    if (occupancy > 6 && occupancy <= 12){
+    if (occupancy > 5 && occupancy <= 10){
       text->SetFillColor(kAzure
 			 //+Int_t((occupancy-6)/6.*maxCol)
 			 );
       text->SetTextColor(kWhite);
     }
-    if (occupancy > 12 && occupancy <= 18)
+    if (occupancy > 10 && occupancy <= 15)
       text->SetFillColor(kTeal
 			 //+Int_t((occupancy-12)/6.*maxCol)
 			 );
-    if (occupancy > 18 && occupancy <= 24)
+    if (occupancy > 15 && occupancy <= 20)
       text->SetFillColor(kSpring
 			 //+Int_t((occupancy-18)/6.*maxCol)
 			 );
-    if (occupancy > 24 && occupancy <= 30)
+    if (occupancy > 20 && occupancy <= 25)
+      text->SetFillColor(kYellow
+			 //+Int_t((occupancy-24)/6.*maxCol)
+			 );
+    if (occupancy > 25 && occupancy <= 30)
       text->SetFillColor(kOrange
 			 //+Int_t((occupancy-24)/6.*maxCol)
 			 );
@@ -348,12 +362,13 @@ void CbmTrdOccupancy::CreateLayerView()
   for (fLayerOccupancyMapIt = fLayerOccupancyMap.begin();
        fLayerOccupancyMapIt != fLayerOccupancyMap.end(); ++fLayerOccupancyMapIt) {
     fLayerOccupancyMapIt->second->Write("", TObject::kOverwrite);
+    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+".pdf");
+    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+".png");
   }
   
 }
 void CbmTrdOccupancy::SetNeighbourReadout(Bool_t neighbourReadout){fNeigbourReadout=neighbourReadout;}
 void CbmTrdOccupancy::SetTriggerThreshold(Double_t triggerthreshold){fTriggerThreshold=triggerthreshold;}
-
 void CbmTrdOccupancy::SaveHistos2File() 
 {
   cout << "SaveHistos2File" << endl;

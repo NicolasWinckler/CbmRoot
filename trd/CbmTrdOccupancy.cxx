@@ -219,7 +219,8 @@ void CbmTrdOccupancy::Exec(Option_t * option)
     
       }
       Int_t iCol(digi->GetCol()), iRow(digi->GetRow()), ixBin(iCol+1), iyBin(iRow+1);
-      fModuleOccupancyMap[moduleId]->Fill(iCol,iRow);
+      if (fModuleOccupancyMap[moduleId]->GetBinContent(ixBin,iyBin) == 0)
+	fModuleOccupancyMap[moduleId]->Fill(iCol,iRow);
       if(fNeigbourReadout) {
 	if (nCols > nRows) { // Neigbour readout only along the short pad size direction
 	  if (ixBin > 1 && fModuleOccupancyMap[moduleId]->GetBinContent(ixBin-1,iyBin) == 0){//left

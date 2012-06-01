@@ -899,21 +899,31 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	std::pair<Int_t,Int_t> epPair (fElectronIds[iElectron], fPositronIds[iPositron]);
 	electronPositronPairs.push_back(epPair);
 
-	CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
-					   etrack->GetPx() + ptrack->GetPx(),
-					   etrack->GetPy() + ptrack->GetPy(),
-					   etrack->GetPz() + ptrack->GetPz(),
-					   0,
-					   0,
-					   0,
-					   0,//invariantMass,
-					   0);
-
-	//gammaFromEPPairs.push_back(gamma);
-
+	/*
+	  CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
+	  etrack->GetPx() + ptrack->GetPx(),
+	  etrack->GetPy() + ptrack->GetPy(),
+	  etrack->GetPz() + ptrack->GetPz(),
+	  0,
+	  0,
+	  0,
+	  0,//invariantMass,
+	  0);
+	  gammaFromEPPairs.push_back(gamma);
+	*/
 
 
 	if (VertexInMagnet(etrack) && VertexInMagnet(ptrack)) {
+	  CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
+					     etrack->GetPx() + ptrack->GetPx(),
+					     etrack->GetPy() + ptrack->GetPy(),
+					     etrack->GetPz() + ptrack->GetPz(),
+					     0,
+					     0,
+					     0,
+					     0,//invariantMass,
+					     0);
+
 	  gammaFromEPPairsInMagnet.push_back(gamma);
 	  fEPPairOpeningAngleInMagnet->Fill(openingAngle);
 	  //if (fMCParticleMap[fElectronIds[iElectron]]->motherId != fMCParticleMap[fPositronIds[iPositron]]->motherId) 
@@ -1882,7 +1892,7 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fMCPid_global->Write("", TObject::kOverwrite);
   fMCPid_inMagnet->Write("", TObject::kOverwrite);
   fMCPid_inTarget->Write("", TObject::kOverwrite);
-  fGTPid->Write("", TObject::kOverwrite);
+
   fPt_global->Write("", TObject::kOverwrite);
   fP_global->Write("", TObject::kOverwrite);
   fPt_inMagnet->Write("", TObject::kOverwrite);
@@ -2057,7 +2067,7 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     gDirectory->mkdir("MC_Statistic");
   gDirectory->Cd("MC_Statistic");
   gDirectory->pwd();
-
+  fGTPid->Write("", TObject::kOverwrite);
   //==================================================================Relationships
   if (!gDirectory->Cd("Relationships")) 
     gDirectory->mkdir("Relationships");
@@ -2123,7 +2133,7 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
 
   gDirectory->Cd("..");
   //==================================================================OpeningAngle_EPPairs
-
+gDirectory->Cd("..");
 
   //outFile->Close();
   //c->Close();

@@ -1,6 +1,7 @@
 #include "CbmLitUtils.h"
 
 #include "TCanvas.h"
+#include "TSystem.h"
 
 namespace lit
 {
@@ -10,6 +11,7 @@ void SaveCanvasAsImage(
    const std::string& dir)
 {
    if (dir == "") return;
+   gSystem->mkdir(dir.c_str(), true); // create directory if it does not exist
    c->SaveAs(std::string(dir + std::string(c->GetTitle()) + ".eps").c_str());
    c->SaveAs(std::string(dir + std::string(c->GetTitle()) + ".png").c_str());
 }

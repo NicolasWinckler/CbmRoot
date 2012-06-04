@@ -175,6 +175,13 @@ public:
          Double_t scale);
 
    /**
+    * \brief Scale all histograms.
+    * \param[in] scale Scale value.
+    */
+   void ScaleAll(
+         Double_t scale);
+
+   /**
     * \brief Rebin histogram.
     * \param[in, out] histName Name of histogram.
     */

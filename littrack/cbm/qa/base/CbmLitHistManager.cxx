@@ -147,6 +147,16 @@ void CbmLitHistManager::ScaleByPattern(
 	}
 }
 
+void CbmLitHistManager::ScaleAll(
+      Double_t scale)
+{
+   map<string, TH1*>::iterator it;
+   Int_t c = 0;
+   for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
+      (it->second)->Scale(1./(Double_t)scale);
+   }
+}
+
 void CbmLitHistManager::Rebin(
       const string& histName,
       Int_t ngroup)
@@ -154,7 +164,7 @@ void CbmLitHistManager::Rebin(
 	TH1* hist = H1(histName);
 	if (ngroup > 1) {
 		hist->Rebin(ngroup);
-		hist->Scale(1. / ngroup);
+		hist->Scale(1. / (double)ngroup);
 	}
 }
 

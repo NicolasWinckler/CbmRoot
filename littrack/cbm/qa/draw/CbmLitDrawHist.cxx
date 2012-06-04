@@ -74,6 +74,7 @@ void DrawH1(
    gPad->SetBottomMargin(0.15);
    gPad->SetTicks(1, 1);
    hist->Draw(drawOpt.c_str());
+   gPad->SetGrid(true, true);
 }
 
 /* Draw TH2 histogram.*/
@@ -105,6 +106,7 @@ void DrawH2(
    gPad->SetBottomMargin(0.15);
    gPad->SetTicks(1, 1);
    hist->Draw(drawOpt.c_str());
+   gPad->SetGrid(true, true);
 }
 
 /* Draw several TH1 histograms. */

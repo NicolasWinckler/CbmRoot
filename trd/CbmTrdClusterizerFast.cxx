@@ -6,7 +6,7 @@
 #include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
-#include "cbmTrdGeoHandler.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "CbmMCTrack.h"
 

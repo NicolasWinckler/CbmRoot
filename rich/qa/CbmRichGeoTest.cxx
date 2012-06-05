@@ -544,7 +544,7 @@ void CbmRichGeoTest::DrawRing(
    stringstream ss;
    ss << "Event" << fNofDrawnRings;
    fNofDrawnRings++;
-   TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 500, 500);
+   TCanvas *c = CreateCanvas(ss.str().c_str(), ss.str().c_str(), 500, 500);
    c->SetGrid(true, true);
    TH2D* pad = new TH2D("pad", ";X [cm];Y [cm]", 1, -15., 15., 1, -15., 15);
    pad->SetStats(false);
@@ -610,22 +610,17 @@ TH1D* CbmRichGeoTest::CreateAccVsMinNofHitsHist()
 
 void CbmRichGeoTest::DrawHist()
 {
-   if (fOutputDir != "") gSystem->mkdir(fOutputDir.c_str(), true);
-   //SetStyles();
-
-   TCanvas *cHitsXY = new TCanvas("rich_geo_hits_xy", "rich_geo_hits_xy", 600, 600);
+   TCanvas *cHitsXY = CreateCanvas("rich_geo_hits_xy", "rich_geo_hits_xy", 600, 600);
    DrawH2(fhHitsXY);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cHitsXY, fOutputDir);
 
-   TCanvas *cPointsXY = new TCanvas("rich_geo_points_xy", "rich_geo_points_xy", 600, 600);
+   TCanvas *cPointsXY = CreateCanvas("rich_geo_points_xy", "rich_geo_points_xy", 600, 600);
    DrawH2(fhPointsXY);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cPointsXY, fOutputDir);
 
    for (int i = 0; i < 2; i++){
       stringstream ss;
       if (i == 0) ss << "rich_geo_hits_fit";
       if (i == 1) ss << "rich_geo_points_fit";
-      TCanvas *cEllipse = new TCanvas((ss.str()+"_ellipse").c_str(), (ss.str()+"_ellipse").c_str(), 1200, 600);
+      TCanvas *cEllipse = CreateCanvas((ss.str()+"_ellipse").c_str(), (ss.str()+"_ellipse").c_str(), 1200, 600);
       cEllipse->Divide(4, 2);
       cEllipse->cd(1);
       DrawH1(fhBoverA[i]);
@@ -644,9 +639,8 @@ void CbmRichGeoTest::DrawHist()
       DrawH2(fhAaxisVsMom[i]);
       cEllipse->cd(7);
       DrawH1(fhChi2Ellipse[i]);
-      if (fOutputDir != "") lit::SaveCanvasAsImage(cEllipse, fOutputDir);
 
-      TCanvas *cCircle = new TCanvas((ss.str()+"_circle").c_str(), (ss.str()+"_circle").c_str(), 900, 600);
+      TCanvas *cCircle = CreateCanvas((ss.str()+"_circle").c_str(), (ss.str()+"_circle").c_str(), 900, 600);
       cCircle->Divide(3,2);
       cCircle->cd(1);
       DrawH1(fhNofHits[i]);
@@ -662,10 +656,9 @@ void CbmRichGeoTest::DrawHist()
       DrawH1(fhChi2Circle[i]);
       cCircle->cd(6);
       DrawH1(fhDRCircle[i]);
-      if (fOutputDir != "") lit::SaveCanvasAsImage(cCircle, fOutputDir);
    }
 
-   TCanvas *cDiff2DEllipse = new TCanvas("rich_geo_diff2d_ellipse", "rich_geo_diff2d_ellipse", 600, 600);
+   TCanvas *cDiff2DEllipse = CreateCanvas("rich_geo_diff2d_ellipse", "rich_geo_diff2d_ellipse", 600, 600);
    cDiff2DEllipse->Divide(2,2);
    cDiff2DEllipse->cd(1);
    DrawH2(fhDiffAaxis);
@@ -675,9 +668,8 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhDiffXcEllipse);
    cDiff2DEllipse->cd(4);
    DrawH2(fhDiffYcEllipse);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff2DEllipse, fOutputDir);
 
-   TCanvas *cDiff2DCircle = new TCanvas("rich_geo_diff2d_circle", "rich_geo_diff2d_circle", 900, 300);
+   TCanvas *cDiff2DCircle = CreateCanvas("rich_geo_diff2d_circle", "rich_geo_diff2d_circle", 900, 300);
    cDiff2DCircle->Divide(3,1);
    cDiff2DCircle->cd(1);
    DrawH2(fhDiffXcCircle);
@@ -685,9 +677,8 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhDiffYcCircle);
    cDiff2DCircle->cd(3);
    DrawH2(fhDiffRadius);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff2DCircle, fOutputDir);
 
-   TCanvas *cDiff1DEllipse = new TCanvas("rich_geo_diff1d_ellipse", "rich_geo_diff1d_ellipse", 600, 600);
+   TCanvas *cDiff1DEllipse = CreateCanvas("rich_geo_diff1d_ellipse", "rich_geo_diff1d_ellipse", 600, 600);
    cDiff1DEllipse->Divide(2,2);
    cDiff1DEllipse->cd(1);
    DrawH1(fhDiffAaxis->ProjectionY());
@@ -701,9 +692,8 @@ void CbmRichGeoTest::DrawHist()
    cDiff1DEllipse->cd(4);
    DrawH1(fhDiffYcEllipse->ProjectionY());
    gPad->SetLogy(true);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff1DEllipse, fOutputDir);
 
-   TCanvas *cDiff1DCircle = new TCanvas("rich_geo_diff1d_circle", "rich_geo_diff1d_circle", 900, 300);
+   TCanvas *cDiff1DCircle = CreateCanvas("rich_geo_diff1d_circle", "rich_geo_diff1d_circle", 900, 300);
    cDiff1DCircle->Divide(3,1);
    cDiff1DCircle->cd(1);
    DrawH1(fhDiffXcCircle->ProjectionY());
@@ -714,17 +704,15 @@ void CbmRichGeoTest::DrawHist()
    cDiff1DCircle->cd(3);
    DrawH1(fhDiffRadius->ProjectionY());
    gPad->SetLogy(true);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cDiff1DCircle, fOutputDir);
 
-   TCanvas *cHits = new TCanvas("rich_geo_hits", "rich_geo_hits", 600, 300);
+   TCanvas *cHits = CreateCanvas("rich_geo_hits", "rich_geo_hits", 600, 300);
    cHits->Divide(2,1);
    cHits->cd(1);
    DrawH1(fhDiffXhit);
    cHits->cd(2);
    DrawH1(fhDiffYhit);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cHits, fOutputDir);
 
-   TCanvas *cFitEff = new TCanvas("rich_geo_fit_eff", "rich_geo_fit_eff", 900, 300);
+   TCanvas *cFitEff = CreateCanvas("rich_geo_fit_eff", "rich_geo_fit_eff", 900, 300);
    cFitEff->Divide(3,1);
    cFitEff->cd(1);
    DrawH1( list_of((TH1D*)fhNofHitsAll->Clone())((TH1D*)fhNofHitsCircleFit->Clone())((TH1D*)fhNofHitsEllipseFit->Clone()),
@@ -739,9 +727,8 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(fhNofHitsEllipseFitEff);
    TLatex* ellipseFitEffTxt = new TLatex(15, 0.5, CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll).c_str());
    ellipseFitEffTxt->Draw();
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cFitEff, fOutputDir);
 
-   TCanvas *cAccEff = new TCanvas("rich_geo_acc_eff", "rich_geo_acc_eff", 900, 600);
+   TCanvas *cAccEff = CreateCanvas("rich_geo_acc_eff", "rich_geo_acc_eff", 900, 600);
    cAccEff->Divide(3,2);
    TH1D* pxMc = fhMc3D->ProjectionX();
    pxMc->SetName((string(fhMc3D->GetName())+"_px").c_str());
@@ -773,9 +760,8 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(pyEff);
    cAccEff->cd(6);
    DrawH1(pzEff);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cAccEff, fOutputDir);
 
-   TCanvas *cNumbersVsXY = new TCanvas("rich_geo_numbers_vs_xy", "rich_geo_numbers_vs_xy", 900, 600);
+   TCanvas *cNumbersVsXY = CreateCanvas("rich_geo_numbers_vs_xy", "rich_geo_numbers_vs_xy", 900, 600);
    cNumbersVsXY->Divide(3,2);
    cNumbersVsXY->cd(1);
    fhNofHitsXY->Divide(fhCounterXY);
@@ -795,14 +781,12 @@ void CbmRichGeoTest::DrawHist()
    cNumbersVsXY->cd(6);
    fhRadiusXY->Divide(fhCounterXY);
    fhRadiusXY->Draw("COLZ");
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cNumbersVsXY, fOutputDir);
 
-   TCanvas *cAccVsMinNofHits = new TCanvas("rich_geo_acc_vs_min_nof_hits", "rich_geo_acc_vs_min_nof_hits", 600, 600);
+   TCanvas *cAccVsMinNofHits = CreateCanvas("rich_geo_acc_vs_min_nof_hits", "rich_geo_acc_vs_min_nof_hits", 600, 600);
    TH1D* h = CreateAccVsMinNofHitsHist();
    DrawH1(h);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cAccVsMinNofHits, fOutputDir);
 
-   TCanvas *cRABvsNofHits = new TCanvas("rich_geo_rab_vs_nof_hits", "rich_geo_rab_vs_nof_hits", 900, 300);
+   TCanvas *cRABvsNofHits = CreateCanvas("rich_geo_rab_vs_nof_hits", "rich_geo_rab_vs_nof_hits", 900, 300);
    cRABvsNofHits->Divide(3, 1);
    cRABvsNofHits->cd(1);
    DrawH2(fhRadiusVsNofHits);
@@ -810,7 +794,6 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhAaxisVsNofHits);
    cRABvsNofHits->cd(3);
    DrawH2(fhBaxisVsNofHits);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cRABvsNofHits, fOutputDir);
 
    stringstream ss;
    TH1D* prRMean = fhRadiusVsNofHits->ProjectionX("fhRadiusVsNofHits_mean");
@@ -831,7 +814,7 @@ void CbmRichGeoTest::DrawHist()
       prBMean->SetBinContent(i, pr->GetMean());
       prBRms->SetBinContent(i, pr->GetRMS());
    }
-   TCanvas *cRABMeanRmsvsNofHits = new TCanvas("rich_geo_rab_mean_rms_vs_nof_hits", "rich_geo_rab_mean_rms_vs_nof_hits", 900, 450);
+   TCanvas *cRABMeanRmsvsNofHits = CreateCanvas("rich_geo_rab_mean_rms_vs_nof_hits", "rich_geo_rab_mean_rms_vs_nof_hits", 900, 450);
    cRABMeanRmsvsNofHits->Divide(2, 1);
    cRABMeanRmsvsNofHits->cd(1);
    DrawH1(list_of(prRMean)(prAMean)(prBMean),
@@ -839,7 +822,6 @@ void CbmRichGeoTest::DrawHist()
    cRABMeanRmsvsNofHits->cd(2);
    DrawH1(list_of(prRRms)(prARms)(prBRms),
          list_of("R")("A")("B"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(cRABMeanRmsvsNofHits, fOutputDir);
 }
 
 void CbmRichGeoTest::CreatePTree()
@@ -917,6 +899,7 @@ void CbmRichGeoTest::Finish()
    for (Int_t i = 0; i < fHists.size(); i++){
       fHists[i]->Write();
    }
+   SaveCanvasToImage();
 }
 
 string CbmRichGeoTest::CalcEfficiency(
@@ -948,6 +931,25 @@ TH1D* CbmRichGeoTest::DivideH1(
                        h1->GetNbinsX(), h1->GetXaxis()->GetXmin(),h1->GetXaxis()->GetXmax());
    h3->Divide(h1, h2, 1., 1., "B");
    return h3;
+}
+
+TCanvas* CbmRichGeoTest::CreateCanvas(
+      const string& name,
+      const string& title,
+      int width,
+      int height)
+{
+   TCanvas* c = new TCanvas(name.c_str(), title.c_str(), width, height);
+   fCanvas.push_back(c);
+   return c;
+}
+
+void CbmRichGeoTest::SaveCanvasToImage()
+{
+   for (int i = 0; i < fCanvas.size(); i++)
+   {
+      lit::SaveCanvasAsImage(fCanvas[i], fOutputDir);
+   }
 }
 
 ClassImp(CbmRichGeoTest)

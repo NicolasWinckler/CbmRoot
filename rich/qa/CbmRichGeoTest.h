@@ -21,6 +21,7 @@ class CbmRichRingFitterEllipseTau;
 class CbmRichRing;
 class CbmRichRingLight;
 class CbmGeoRichPar;
+class TCanvas;
 
 #include <vector>
 
@@ -206,6 +207,14 @@ private:
 	   const string& axisX,
 	   const string& axisY);
 
+	TCanvas* CreateCanvas(
+	      const string& name,
+	      const string& title,
+	      int width,
+	      int height);
+
+	void SaveCanvasToImage();
+
    /**
     * \brief Copy constructor.
     */
@@ -236,6 +245,8 @@ private:
    // rings will be fitted on a fly
 	CbmRichRingFitterCOP* fCopFit;
 	CbmRichRingFitterEllipseTau* fTauFit;
+
+	vector<TCanvas*> fCanvas;
 
 	Int_t fEventNum;
 	Int_t fMinNofHits; // Min number of hits in ring for detector acceptance calculation.

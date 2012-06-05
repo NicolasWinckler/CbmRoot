@@ -587,8 +587,8 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
 	  */
 	  Float_t averagePadSizeX;
 	  Float_t averagePadSizeY;
-	  mPara -> Station = fGeoHandler->GetStation(detID);
-	  mPara -> Layer = fGeoHandler->GetLayer(detID);
+	  mCluster -> Station = fGeoHandler->GetStation(detID);
+	  mCluster -> Layer = fGeoHandler->GetLayer(detID);
 	  mCluster -> moduleId = detID;//moduleId;
 	
 	  mCluster -> ModulePositionX = (Int_t)(10 * fModuleInfo->GetX());

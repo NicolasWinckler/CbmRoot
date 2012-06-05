@@ -39,7 +39,7 @@ string CbmLitHtmlReportElement::TableEmptyRow(
       const string& name) const
 {
    stringstream ss;
-   ss << "<td colspan=\"" << nofCols << "\">" << name << "</td></tr>" << endl;
+   ss << "<td colspan=\"" << nofCols << "\"><center><b>" << name << "</b></center></td></tr>" << endl;
    return ss.str();
 }
 

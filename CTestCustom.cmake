@@ -19,6 +19,12 @@ set(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS   "50" )
 # -- Warning execptions
 # -----------------------------------------------------------
 
+Set(CTEST_CUSTOM_ERROR_EXCEPTION
+    ${CTEST_CUSTOM_ERROR_EXCEPTION}
+    "/include/boost"
+    "/boost/include"
+)
+
 set(CTEST_CUSTOM_WARNING_EXCEPTION
 	${CTEST_CUSTOM_WARNING_EXCEPTION}
 

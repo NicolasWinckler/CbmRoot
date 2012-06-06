@@ -105,7 +105,7 @@ public:
 
   /** Get 2x2 subcluster with maximum energy deposition of 3x3 cluster**/
   void IvansProcedure(Float_t &clusterE, Float_t &ivansE, Float_t &shape);
-  void TrackIvansProcedure(Int_t num, Float_t &clusterE, Float_t &ivansE, Float_t &shape);
+  void TrackIvansProcedure(Int_t num, Float_t &clusterE, Float_t &ivansE, Float_t &shape) {};
 
   inline void SetCoord(Float_t x1, Float_t y1, Float_t x2, Float_t y2)
     { fX1=x1; fY1=y1; fX2=x2; fY2=y2; }

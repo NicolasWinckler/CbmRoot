@@ -43,6 +43,13 @@ class CbmTrdModule : public TNamed
                TArrayD sectorSizeX, TArrayD sectorSizeY,
                TArrayD padSizeX, TArrayD padSizeY);
 
+  CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
+	       Double_t sizex, Double_t sizey, Double_t sizez, 
+	       Double_t anodeWireOffset, Double_t anodeWireSpacing, Double_t h,
+	       Int_t nSectors, 
+	       TArrayD sectorX, TArrayD sectorY, TArrayD sectorZ,
+	       TArrayD sectorSizeX, TArrayD sectorSizeY,
+	       TArrayD padSizeX, TArrayD padSizeY);
 
   /** Destructor **/
   virtual ~CbmTrdModule();
@@ -65,6 +72,10 @@ class CbmTrdModule : public TNamed
   Double_t GetSectorSizex(Int_t i)   const { return fSectorSizex.At(i); }
   Double_t GetSectorSizey(Int_t i)   const { return fSectorSizey.At(i); }
 
+  Double_t GetAnodeWireToPadPlaneDistance() const { return fAnodeWireToPadPlaneDistance; }
+  Double_t GetAnodeWireOffset() const { return fAnodeWireOffset; }
+  Double_t GetAnodeWireSpacing() const { return fAnodeWireSpacing; }
+
   Int_t GetNoSectors()    const { return fNoSectors; }
 
 
@@ -86,7 +97,11 @@ class CbmTrdModule : public TNamed
   Double_t fSizex;        // module size in x [cm]
   Double_t fSizey;        // module size in y [cm]
   Double_t fSizez;        // module size in y [cm]
-	      
+
+  Double_t fAnodeWireOffset; // [cm]
+  Double_t fAnodeWireSpacing;// [cm]
+  Double_t fAnodeWireToPadPlaneDistance; // [cm]	      
+
   Int_t    fNoSectors;    // Number sectors for this Module
   TArrayD  fSectorX;      // center of sectors local c.s. [cm]
   TArrayD  fSectorY;      // center of sectors local c.s. [cm]
@@ -115,6 +130,8 @@ class CbmTrdModule : public TNamed
 			      Double_t &posY);
 
   Int_t    GetSector(Double_t *local_point);
+
+  void ProjectPositionToNextAnodeWire(Double_t *local_point);
 
   ClassDef(CbmTrdModule,3);
 

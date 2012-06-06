@@ -35,6 +35,9 @@ typedef struct ClusterModule
   Int_t Station;
   Int_t Layer;
   Int_t moduleId;
+  Double_t h; // [mm]
+  Double_t AnodeWireOffset; // [mm]
+  Double_t AnodeWireSpacing;// [mm]
   Int_t nxPad;
   Int_t nyPad;
   Int_t NoSectors;
@@ -53,7 +56,7 @@ typedef struct ClusterModule
   Float_t ModulePositionY;
   Float_t ModulePositionZ;
 
-  ClusterModule () : Station(-1), Layer(-1), moduleId(-1), PadPlane(),
+  ClusterModule () : Station(-1), Layer(-1), moduleId(-1), h(0), PadPlane(),
     nxPad(0), nyPad(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
     PadSizeY(), SecxPad(), SecyPad(), ModuleSizeX(0.), ModuleSizeY(0.), 
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
@@ -114,11 +117,11 @@ class CbmTrdClusterizerFast : public FairTask {
 
   void SplitPathSlices(Double_t* local_inLL, Double_t* local_outLL, Double_t ELoss, Int_t pointId);
 
-  void WireQuantisation();
+  void WireQuantisation(Double_t* local_point, Double_t AnodeWireOffset, Double_t AnodeWireSpacing, Double_t PadSizex, Double_t PadSizey);
 
   void ChargeConservation();
 
-  Double_t CalcMathieson(Double_t x, Double_t W);
+  Double_t CalcMathieson(Double_t x, Double_t W, Double_t h);
 
   void TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate);
  

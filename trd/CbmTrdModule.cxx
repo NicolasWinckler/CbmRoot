@@ -20,6 +20,9 @@ CbmTrdModule::CbmTrdModule()
   fSizex(-666.),
   fSizey(-666.),
   fSizez(-666.),
+  fAnodeWireOffset(0),
+  fAnodeWireSpacing(0),
+  fAnodeWireToPadPlaneDistance(0),
   fNoSectors(0),  
   fSectorX(0),    
   fSectorY(0),    
@@ -47,6 +50,9 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fSizex(sizex),
   fSizey(sizey),
   fSizez(sizez),
+  fAnodeWireOffset(0.375),
+  fAnodeWireSpacing(0.25),
+  fAnodeWireToPadPlaneDistance(0.35),
   fNoSectors(0),  
   fSectorX(0),    
   fSectorY(0),    
@@ -76,6 +82,42 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fSizex(sizex),
   fSizey(sizey),
   fSizez(sizez),
+  fAnodeWireOffset(0.375),
+  fAnodeWireSpacing(0.25),
+  fAnodeWireToPadPlaneDistance(0.35),
+  fNoSectors(nSectors),  
+  fSectorX(sectorX),    
+  fSectorY(sectorY),    
+  fSectorZ(sectorZ),    
+  fSectorBeginX(nSectors),
+  fSectorBeginY(nSectors),
+  fSectorEndX(nSectors),
+  fSectorEndY(nSectors),
+  fSectorSizex(sectorSizeX),
+  fSectorSizey(sectorSizeY),
+  fPadSizex(padSizeX),   
+  fPadSizey(padSizeY)   
+{
+}
+// -----   Standard constructor   ------------------------------------------
+CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
+                           Double_t sizex, Double_t sizey, Double_t sizez, 
+			   Double_t anodeWireOffset, Double_t anodeWireSpacing, Double_t h,
+                           Int_t nSectors, 
+                           TArrayD sectorX, TArrayD sectorY, TArrayD sectorZ,
+                           TArrayD sectorSizeX, TArrayD sectorSizeY,
+                           TArrayD padSizeX, TArrayD padSizeY)      
+  :
+  fDetectorId(detId),
+  fX(x),
+  fY(y),
+  fZ(z),
+  fSizex(sizex),
+  fSizey(sizey),
+  fSizez(sizez),
+  fAnodeWireOffset(anodeWireOffset),
+  fAnodeWireSpacing(anodeWireSpacing),
+  fAnodeWireToPadPlaneDistance(h),
   fNoSectors(nSectors),  
   fSectorX(sectorX),    
   fSectorY(sectorY),    
@@ -104,6 +146,9 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fSizex(sizex),
   fSizey(sizey),
   fSizez(sizez),
+  fAnodeWireOffset(0.375),
+  fAnodeWireSpacing(0.25),
+  fAnodeWireToPadPlaneDistance(0.35),
   fNoSectors(nSectors),  
   fSectorX(nSectors),    
   fSectorY(nSectors),    
@@ -186,6 +231,22 @@ CbmTrdModule::~CbmTrdModule()
 {
 }
 
+void CbmTrdModule::ProjectPositionToNextAnodeWire(Double_t *local_point)
+{
+  // Move the local point to the next anode wire position. 
+  Double_t local_point_temp[2] = {local_point[0], local_point[1]};
+  if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {
+    if (fPadSizex.At(0) < fPadSizey.At(0)) {
+      local_point[1] = Int_t(((local_point_temp[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
+    }
+    else {
+      local_point[0] = Int_t(((local_point_temp[0] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
+    }
+  }
+  else {
+    printf("  ERROR:: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used.\n");
+  }
+}
 Int_t CbmTrdModule::GetSector(Double_t *local_point)
 {
   // Calculate the position in the chamber with the origin of
@@ -201,12 +262,12 @@ Int_t CbmTrdModule::GetSector(Double_t *local_point)
 
   for(Int_t i=0; i<fNoSectors; i++){
     if (posx >= fSectorBeginX.GetAt(i) &&
-        posx <  fSectorEndX.GetAt(i)   &&
-        posy >= fSectorBeginY.GetAt(i) &&
-        posy <  fSectorEndY.GetAt(i) ) 
-    {
-      return i;
-    } 
+	posx <  fSectorEndX.GetAt(i)   &&
+	posy >= fSectorBeginY.GetAt(i) &&
+	posy <  fSectorEndY.GetAt(i) ) 
+      {
+	return i;
+      } 
   }
 
   Error("CbmTrdModule::GetSector","Could not find local point in any of the sectors");
@@ -231,58 +292,58 @@ Int_t CbmTrdModule::GetnCol()
   return nCol;
 }
 
-Int_t CbmTrdModule::GetnRow()
-{
-  Int_t nRow = 0;
-  if (fSectorSizey.At(0) < fSizey)
-    {
-      for (Int_t i = 0; i < fNoSectors; i++)
-	{
-	  nRow += (Int_t)(fSectorSizey.At(i) / fPadSizey.At(i));
-	}
-    } 
-  else
-    {
-      nRow = (Int_t)(fSectorSizey.At(0) / fPadSizey.At(0));
-    }
-  return nRow;
-}
+  Int_t CbmTrdModule::GetnRow()
+  {
+    Int_t nRow = 0;
+    if (fSectorSizey.At(0) < fSizey)
+      {
+	for (Int_t i = 0; i < fNoSectors; i++)
+	  {
+	    nRow += (Int_t)(fSectorSizey.At(i) / fPadSizey.At(i));
+	  }
+      } 
+    else
+      {
+	nRow = (Int_t)(fSectorSizey.At(0) / fPadSizey.At(0));
+      }
+    return nRow;
+  }
 
 void CbmTrdModule::GetPadInfo(CbmTrdPoint *trdPoint, Int_t &Col, 
-                              Int_t &Row, Int_t &Sector)
+			      Int_t &Row, Int_t &Sector)
 {
 
-    // Calculate point in the middle of the detector. This is
-    // for safety reasons, because the point at exit is slightly
-    // outside of the active volume. If one does not use a point
-    // in the detector one will get a wrong volume from the
-    // geomanager. Navigate to the correct volume to get all
-    // necessary information about this volume
+  // Calculate point in the middle of the detector. This is
+  // for safety reasons, because the point at exit is slightly
+  // outside of the active volume. If one does not use a point
+  // in the detector one will get a wrong volume from the
+  // geomanager. Navigate to the correct volume to get all
+  // necessary information about this volume
 
-    Double_t x_mean = (trdPoint->GetXIn()+trdPoint->GetXOut())/2.;
-    Double_t y_mean = (trdPoint->GetYIn()+trdPoint->GetYOut())/2.;
-    Double_t z_mean = (trdPoint->GetZIn()+trdPoint->GetZOut())/2.;
-    gGeoManager->FindNode(x_mean, y_mean, z_mean);
+  Double_t x_mean = (trdPoint->GetXIn()+trdPoint->GetXOut())/2.;
+  Double_t y_mean = (trdPoint->GetYIn()+trdPoint->GetYOut())/2.;
+  Double_t z_mean = (trdPoint->GetZIn()+trdPoint->GetZOut())/2.;
+  gGeoManager->FindNode(x_mean, y_mean, z_mean);
 
-    // Get the local point in local MC coordinates from
-    // the geomanager. This coordinate system is rotated
-    // if the chamber is rotated. This is corrected in 
-    // GetModuleInformation to have a
-    // the same local coordinate system in all the chambers
-    const Double_t *global_point = gGeoManager->GetCurrentPoint();
-    Double_t local_point[3];  // global_point[3];
-    gGeoManager->MasterToLocal(global_point, local_point);
+  // Get the local point in local MC coordinates from
+  // the geomanager. This coordinate system is rotated
+  // if the chamber is rotated. This is corrected in 
+  // GetModuleInformation to have a
+  // the same local coordinate system in all the chambers
+  const Double_t *global_point = gGeoManager->GetCurrentPoint();
+  Double_t local_point[3];  // global_point[3];
+  gGeoManager->MasterToLocal(global_point, local_point);
 
-    Int_t ModuleID = trdPoint->GetDetectorID();
+  Int_t ModuleID = trdPoint->GetDetectorID();
 
-    GetModuleInformation(ModuleID, local_point, Col, Row, Sector);
+  GetModuleInformation(ModuleID, local_point, Col, Row, Sector);
 
 }
 
-// --------------------------------------------------------------------
+  // --------------------------------------------------------------------
 
 void CbmTrdModule::TransformToLocalCorner(Double_t *local_point, Double_t &posX,
-                                          Double_t &posY)
+					  Double_t &posY)
 {
   // Transformation from local coordinate system with origin in
   // the middle of the module into a system with origin in the
@@ -294,8 +355,8 @@ void CbmTrdModule::TransformToLocalCorner(Double_t *local_point, Double_t &posX,
 }
 
 void CbmTrdModule::TransformToLocalSector(Double_t *local_point, 
-                                          const Int_t &sector,
-                                          Double_t &posX, Double_t &posY)
+					  const Int_t &sector,
+					  Double_t &posX, Double_t &posY)
 {
   // Transformation of the module coordinate system with origin
   // in the middle of the chamber into a system with 
@@ -330,7 +391,7 @@ void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, I
 }
 
 
-// ---- CalculateHitPosition ------------------------------------------
+  // ---- CalculateHitPosition ------------------------------------------
 void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row, 
 			       const Int_t VolumeId, const Int_t sector,
 			       TVector3 &posHit, TVector3 &padSize) {
@@ -388,5 +449,5 @@ void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row,
 }
 
 
-// -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
 ClassImp(CbmTrdModule)

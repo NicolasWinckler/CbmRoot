@@ -6,7 +6,7 @@
 
 #include <map>
 #include <list>
-#include <vector>
+//#include <vector>
 #include "CbmTrdDigi.h"
 
 class CbmTrdDigiPar;
@@ -109,4 +109,4 @@ class CbmTrdOccupancy : public FairTask {
   ClassDef(CbmTrdOccupancy,2)
 
     };
-#endif // CBMTRDCLUSTERIZERFAST_H
+#endif // 

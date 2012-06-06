@@ -30,7 +30,7 @@ class TH2;
 class TH2I;
 //class TH2F;
 //class TH2D;
-class vector;
+//class vector;
 
 typedef struct MCParticle
 {

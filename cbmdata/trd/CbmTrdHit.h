@@ -41,7 +41,7 @@ public:
 			Double_t eLoss);
 
 	virtual ~CbmTrdHit();
-
+	Int_t GetDetId() const { return fDetId; }
 	Int_t GetPlaneId() const { return fPlaneId; }
 	Double_t GetELoss() const { return fELoss; }
 	Double_t GetELossdEdX() const { return fELossdEdx; }
@@ -52,12 +52,13 @@ public:
 	void SetELossdEdx(Double_t loss) { fELossdEdx = loss; }
 
 private:
+    Int_t           fDetId;
     Int_t           fPlaneId;   // unique ID of TRD plane in the setup 
     Double32_t      fELossTR;   // energy losses of electron via TR
     Double32_t      fELossdEdx; // energy deposition in the detector without TR
     Double32_t      fELoss;     // TR + dEdx
 
-    ClassDef(CbmTrdHit, 1);
+    ClassDef(CbmTrdHit, 2);
 };
 
 #endif

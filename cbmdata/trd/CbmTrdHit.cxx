@@ -7,6 +7,7 @@
 
 CbmTrdHit::CbmTrdHit()
   : CbmPixelHit(),
+    fDetId(-1),
     fPlaneId(-1),
     fELossTR(-1.),
     fELossdEdx(-1.),
@@ -26,6 +27,7 @@ CbmTrdHit::CbmTrdHit(
 		Double_t eLossdEdx,
 		Double_t eLoss)
   : CbmPixelHit(detectorId, pos, dpos, dxy, refId),
+    fDetId(detectorId),
     fPlaneId(planeId),
     fELossTR(eLossTR),
     fELossdEdx(eLossdEdx),

@@ -75,6 +75,8 @@ else(CBMROOT_MINIMAL)
   find_package(TBB)
   find_package(SSE)
 
+  Set(Boost_NO_SYSTEM_PATHS TRUE)
+  Set(Boost_NO_BOOST_CMAKE TRUE)
 #  set(Boost_DEBUG TRUE)
   If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
     set(BOOST_ROOT ${SIMPATH})

@@ -12,8 +12,12 @@ class CbmTrdPoint;
 class CbmTrdDigi;
 class CbmTrdCluster;
 class CbmTrdHit;
+class TProfile;
+class TProfile2D;
+class TH1F;
 class TH1I;
 class TH2I;
+class TH2F;
 class TCanvas;
 
 class CbmTrdQa : public FairTask {
@@ -28,6 +32,7 @@ class CbmTrdQa : public FairTask {
   virtual void Exec(Option_t * option);
   void SaveHistos();
   void CreateLayerView();
+  void GetPadInfos(Int_t moduleId, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY);
   virtual void FinishEvent();
   virtual void FinishTask();
   void Register();
@@ -55,25 +60,33 @@ class CbmTrdQa : public FairTask {
   std::map<Int_t, std::vector<Int_t> > fModuleHitMap; //!
   std::map<Int_t, std::vector<Int_t> >::iterator fModuleHitMapIt; //!  
 
-  std::map<Int_t, TH1I*> fModuleGhostMap; //!
-  std::map<Int_t, TH1I*>::iterator fModuleGhostMapIt; //!  
-  std::map<Int_t, TH1I*> fModuleLostMap; //!
-  std::map<Int_t, TH1I*>::iterator fModuleLostMapIt; //!  
+  std::map<Int_t, TH1F*> fModuleGhostMap; //!
+  std::map<Int_t, TH1F*>::iterator fModuleGhostMapIt; //!  
+  std::map<Int_t, TH1F*> fModuleLostMap; //!
+  std::map<Int_t, TH1F*>::iterator fModuleLostMapIt; //!  
 
   Double_t fTriggerThreshold;
   TString fGeo;
 
   //histos
 
+  Bool_t fD;
+  Bool_t fT;
+  Bool_t fP;
+  Bool_t fC;
+  Bool_t fH;
+
   TH2I *fLayerDummy;
 
   TH1I *fDistanceMcToHit;
+  TH1I *fDistanceMcToHitAll;
+
   TH1I *fdEdxPionMc;
   TH1I *fdEdxPionHit;
   TH1I *fdEdxElectronMc;
   TH1I *fdEdxElectronHit;
-  TH1I *fGhostHitVsR;
-  TH1I *fLostPointVsR;
+  TProfile *fGhostHitVsR;
+  TProfile *fLostPointVsR;
 
   //LayerView
 

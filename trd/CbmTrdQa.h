@@ -49,7 +49,11 @@ class CbmTrdQa : public FairTask {
   CbmTrdModule   *fModuleInfo; //!
   CbmTrdGeoHandler *fGeoHandler; //!
   std::map<Int_t, TCanvas*> fLayerMap; //!
-  std::map<Int_t, TCanvas*>::iterator fLayerMapIt; //!  
+  std::map<Int_t, TCanvas*>::iterator fLayerMapIt; //! 
+  std::map<Int_t, TH2I*> fLayerPointMap; 
+  std::map<Int_t, TH2I*>::iterator fLayerPointMapIt; //! 
+  std::map<Int_t, TH2I*> fLayerHitMap; 
+  std::map<Int_t, TH2I*>::iterator fLayerHitMapIt; //! 
 
   std::map<Int_t, std::vector<Int_t> > fModulePointMap; //!
   std::map<Int_t, std::vector<Int_t> >::iterator fModulePointMapIt; //!  
@@ -63,7 +67,9 @@ class CbmTrdQa : public FairTask {
   std::map<Int_t, TH1F*> fModuleGhostMap; //!
   std::map<Int_t, TH1F*>::iterator fModuleGhostMapIt; //!  
   std::map<Int_t, TH1F*> fModuleLostMap; //!
-  std::map<Int_t, TH1F*>::iterator fModuleLostMapIt; //!  
+  std::map<Int_t, TH1F*>::iterator fModuleLostMapIt; //!
+  std::map<Int_t, TH1F*> fModuleEfficiencyMap; //!
+  std::map<Int_t, TH1F*>::iterator fModuleEfficiencyMapIt; //!
 
   Double_t fTriggerThreshold;
   TString fGeo;
@@ -81,13 +87,16 @@ class CbmTrdQa : public FairTask {
   TH1I *fDistanceMcToHit;
   TH1I *fDistanceMcToHitAll;
 
+  TH1I *fPositionResolutionShort;
+  TH1I *fPositionResolutionLong;
+
   TH1I *fdEdxPionMc;
   TH1I *fdEdxPionHit;
   TH1I *fdEdxElectronMc;
   TH1I *fdEdxElectronHit;
   TProfile *fGhostHitVsR;
   TProfile *fLostPointVsR;
-
+  TProfile *fHitToPointEfficiencyVsR;
   //LayerView
 
   ClassDef(CbmTrdQa,1);

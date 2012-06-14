@@ -38,12 +38,23 @@ const Float_t electronics_position  =  mylar_position + mylar_thickness + electr
 const Float_t frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
 const Float_t frame_position        =  frame_thickness - Layer_thickness /2.;
 
+const TString keepingVolumeMedium ="air";
+const TString radiatorVolumeMedium ="polypropylene";
+const TString gasVolumeMedium ="TRDgas";
+const TString padVolumeMedium ="goldcoatedcopper";
+const TString mylarVolumeMedium ="mylar";
+const TString electronicsVolumeMedium ="goldcoatedcopper";
+const TString frameVolumeMedium ="G10";
+
 // squared detectors
 const Float_t Detector_size_x[2]={60., 100.};
 const Float_t Detector_size_y[2]={60., 100.};
 
 const Int_t NrModuleTypes=8;
-const Int_t moduleTypeSize[NrModuleTypes]={0,0,0,0,1,1,1,1}
+const Int_t moduleTypeSize[NrModuleTypes]={0,0,0,0,1,1,1,1};
+
+TGeoVolume* trd_mod[NrModuleTypes];
+
 
 void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 		     Float_t Layer_thickness, Float_t Layer_pitch,
@@ -58,7 +69,7 @@ void create_materials_from_media_file();
 //void create_trd_feb();
 //void create_trd_module();
 
-void Create_TRD_Geometry_v12b() {
+void Create_TRD_Geometry_v12xxx() {
 
   // Load the necessary FairRoot libraries 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -83,8 +94,8 @@ void Create_TRD_Geometry_v12b() {
   top->AddNode(trd_v_12a, 1);
 
   create_trd_module(1);
-  TGeoVolume* trd_mod1 = gGeoMan->GetVolume("trd_mod1");
-  trd_v_12a->AddNode(trd_mod1, 1);
+  //  TGeoVolume* trd_mod1 = gGeoMan->GetVolume("trd_mod1");
+  trd_v_12a->AddNode(trd_mod[0], 1);
    
 
   gGeoMan->CloseGeometry();
@@ -109,14 +120,23 @@ void create_trd_module(Int_t moduleType)
   cout<<"Active size X: "<<Active_area_x<<endl;
   cout<<"Active size Y: "<<Active_area_y<<endl;
 
+  TGeoMedium* keepVolMed = gGeoMan->GetMedium(keepingVolumeMedium);
+  TGeoMedium* radVolMed = gGeoMan->GetMedium(radiatorVolumeMedium);
+  TGeoMedium* gasVolMed = gGeoMan->GetMedium(gasVolumeMedium);
+  TGeoMedium* padVolMed = gGeoMan->GetMedium(padVolumeMedium);
+  TGeoMedium* mylarVolMed = gGeoMan->GetMedium(mylarVolumeMedium);
+  TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(electronicsVolumeMedium);
+  TGeoMedium* frameVolMed = gGeoMan->GetMedium(frameVolumeMedium);
+
+
   TGeoBBox *trd_box = new TGeoBBox("", ModuleSizeX/2, ModuleSizeY/2, Layer_thickness/2);
   TString name = Form("trd_mod%d", moduleType);
   cout<<"Name: "<<name<<endl;
-  new TGeoVolume(name, trd_box, gGeoMan->GetMedium("air"));
+  trd_mod[moduleType-1] = new TGeoVolume(name, trd_box, keepVolMed);
    
    // Radiator
    TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, Active_area_y/2, radiator_thickness);
-   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd_mod%d_radiator", moduleType), trd_radiator, gGeoMan->GetMedium("polypropylene"));
+   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd_mod%d_radiator", moduleType), trd_radiator, radVolMed);
    trdmod1_radvol->SetLineColor(kBlue);
    TGeoTranslation *trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
@@ -124,28 +144,28 @@ void create_trd_module(Int_t moduleType)
 
    // Gas
    TGeoBBox *trd_gas = new TGeoBBox("", Active_area_x/2, Active_area_y/2, gas_thickness);
-   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd_mod%d_gas", moduleType), trd_gas, gGeoMan->GetMedium("TRDgas"));
+   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd_mod%d_gas", moduleType), trd_gas, gasVolMed);
    TGeoTranslation *trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
 
 
    // Pad Plane
    TGeoBBox *trd_pad = new TGeoBBox("", Active_area_x/2, Active_area_y/2, padplane_thickness);
-   TGeoVolume* trdmod1_padvol = new TGeoVolume(Form("trd_mod%d_padplane", moduleType), trd_pad, gGeoMan->GetMedium("goldcoatedcopper"));
+   TGeoVolume* trdmod1_padvol = new TGeoVolume(Form("trd_mod%d_padplane", moduleType), trd_pad, padVolMed);
    TGeoTranslation *trd_pad_trans = new TGeoTranslation("", 0., 0., padplane_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_padvol, 0, trd_pad_trans);
 
 
    // mylar
    TGeoBBox *trd_mylar = new TGeoBBox("", Active_area_x/2, Active_area_y/2, mylar_thickness);
-   TGeoVolume* trdmod1_mylarvol = new TGeoVolume(Form("trd_mod%d_mylar", moduleType), trd_mylar, gGeoMan->GetMedium("mylar"));
+   TGeoVolume* trdmod1_mylarvol = new TGeoVolume(Form("trd_mod%d_mylar", moduleType), trd_mylar, mylarVolMed);
    TGeoTranslation *trd_mylar_trans = new TGeoTranslation("", 0., 0., mylar_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_mylarvol, 0, trd_mylar_trans);
 
 
    // electronics
    TGeoBBox *trd_el = new TGeoBBox("", Active_area_x/2, Active_area_y/2, electronics_thickness);
-   TGeoVolume* trdmod1_elvol = new TGeoVolume(Form("trd_mod%d_electronics", moduleType), trd_el, gGeoMan->GetMedium("goldcoatedcopper"));
+   TGeoVolume* trdmod1_elvol = new TGeoVolume(Form("trd_mod%d_electronics", moduleType), trd_el, electronicsVolMed);
    trdmod1_elvol->SetLineColor(kGreen);
    TGeoTranslation *trd_el_trans = new TGeoTranslation("", 0., 0., electronics_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_elvol, 0, trd_el_trans);
@@ -153,7 +173,7 @@ void create_trd_module(Int_t moduleType)
 
    // frame1
    TGeoBBox *trd_frame1 = new TGeoBBox("", ModuleSizeX/2, Frame_width/2, frame_thickness);
-   TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("trd_mod%d_frame1", moduleType), trd_frame1, gGeoMan->GetMedium("G10"));
+   TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("trd_mod%d_frame1", moduleType), trd_frame1, frameVolMed);
    trdmod1_frame1vol->SetLineColor(kRed);
 
    // translations 
@@ -165,7 +185,7 @@ void create_trd_module(Int_t moduleType)
 
    // frame2
    TGeoBBox *trd_frame2 = new TGeoBBox("", Frame_width/2, Active_area_y/2, frame_thickness);
-   TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd_mod%d_frame2", moduleType), trd_frame2, gGeoMan->GetMedium("G10"));
+   TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd_mod%d_frame2", moduleType), trd_frame2, frameVolMed);
    trdmod1_frame2vol->SetLineColor(kRed);
 
    // translations 

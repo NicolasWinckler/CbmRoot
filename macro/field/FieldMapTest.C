@@ -9,11 +9,8 @@
 //
 // --------------------------------------------------------------------------
 
-   
-
-//void FieldMapTest()
-void FieldMapTest(TString fieldMap = "field_electron_standard",
-		  Bool_t create_file = kFALSE)
+void FieldMapTest(TString fieldMap = "field_v09e",
+		      Bool_t create_file = kFALSE)
 {
   
   // -----   Load libraries   ---------------------------------------------
@@ -30,29 +27,15 @@ void FieldMapTest(TString fieldMap = "field_electron_standard",
   // -------  Get magnetic field  -----------------------------------------
   // Somehow this information should be extracted from the map itself
   CbmFieldMap* magField = NULL;
-  /*  
-      CbmFieldMap* magField = new CbmFieldMap(fieldMap,"R");
-      Int_t magFieldType = magField->GetType();
-      delete magField;
-      
-      cout<<" The type of the field is "<<magFieldType<<endl;
-  */
-  
-  CbmFieldMap* magField = NULL;
-  
-  /*  
-      if ( 2 == magFieldType ) 
-      magField = new CbmFieldMapSym2(fieldMap);
-      else if ( 3 == magFieldType ) 
-      magField = new CbmFieldMapSym3(fieldMap);
-      else {
-      cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-      exit;
-      }
-  */
-  
-  
-  if (fieldMap == "field_electron_standard" ) 
+
+  if (fieldMap == "field_v09e" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_v09m" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_v10e" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  // old magnetic field maps
+  else if (fieldMap == "field_electron_standard" ) 
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "field_muon_standard" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);

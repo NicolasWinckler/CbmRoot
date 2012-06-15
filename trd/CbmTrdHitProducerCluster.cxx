@@ -66,7 +66,8 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
    fModulePosition(),
    fPadSizeLongMap(),
    ModuleHitMap(),
-   moduleDigiMap()
+   moduleDigiMap(),
+   fHitOutOfModuleCounter(0)
 {
 }
 
@@ -118,7 +119,9 @@ InitStatus CbmTrdHitProducerCluster::ReInit()
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   
   fDigiPar = (CbmTrdDigiPar*)(rtdb->getContainer("CbmTrdDigiPar"));
+
   
+
   return kSUCCESS;
 }
 // ---- Init ----------------------------------------------------------
@@ -171,7 +174,9 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 { 
   TStopwatch timer;
   timer.Start();
+  fHitOutOfModuleCounter = 0;
   Bool_t drawing = false;//true;
+  Bool_t meanPosition(false),  drawMCPoints(false),  drawDigis(false),  drawClusters(false),  drawHits(false);
   Bool_t pr = true;//false;//true;
   Bool_t combinatoric = false;//true;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
@@ -314,30 +319,29 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   Int_t nCluster = fClusters->GetEntries(); // Number of clusters found by CbmTrdClusterFinderFast
   cout << " Found " << nCluster << " Cluster in Collection" << endl;
 
-  for (Int_t iCluster = 0; iCluster < nCluster; iCluster++)
-    {
-      //cout << iCluster << endl;
-      CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
-      fClusterId = iCluster;
-      //cout << "NoDigis:" << cluster->GetNDigis() << endl;
-      nDigi = cluster->GetNDigis();
-      qMax = 0;
-      for (Int_t iDigi = 0; iDigi < nDigi; iDigi++)
-	{
-	  DigiIndex = cluster->GetDigiIndex(iDigi);
-	  CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(DigiIndex);
-	  DigiCharge = digi->GetCharge();
-	  //-----------unrotated--------------------
-	  DigiCol    = digi->GetCol();
-	  DigiRow    = digi->GetRow();
-	  //-----------unrotated--------------------
-	  //cout << "   ID:" << DigiIndex << "  Col:" << DigiCol << "  Row:" << DigiRow << "  Charge:" << DigiCharge << endl;
-	  if (DigiCharge > qMax)
-	    {
-	      qMax = DigiCharge;
-	      qMaxIndex = DigiIndex;
-	    }
-	}
+  for (Int_t iCluster = 0; iCluster < nCluster; iCluster++) {
+    //cout << iCluster << endl;
+    CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
+    fClusterId = iCluster;
+    //cout << "NoDigis:" << cluster->GetNDigis() << endl;
+    nDigi = cluster->GetNDigis();
+    qMax = 0;
+    qMaxIndex = -1;
+    for (Int_t iDigi = 0; iDigi < nDigi; iDigi++) {
+      DigiIndex = cluster->GetDigiIndex(iDigi);
+      CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(DigiIndex);
+      DigiCharge = digi->GetCharge();
+      //-----------unrotated--------------------
+      DigiCol    = digi->GetCol();
+      DigiRow    = digi->GetRow();
+      //-----------unrotated--------------------
+      //cout << "   ID:" << DigiIndex << "  Col:" << DigiCol << "  Row:" << DigiRow << "  Charge:" << DigiCharge << endl;
+      if (DigiCharge > qMax) {
+	qMax = DigiCharge;
+	qMaxIndex = DigiIndex;
+      }
+    }
+    if (qMaxIndex > -1 && qMax > 0.0) {
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       //qMaxMcIdList.push_back(qMaxIndex);
       CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);
@@ -358,23 +362,24 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       }
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       MyHit* hit = new MyHit;
-      GetModuleInfo(qMaxIndex, hit, PRF);
+      GetModuleInfo(qMaxIndex, qMax, hit, PRF);
       if (pr) {
 	CalcPR(combinatoric, qMaxIndex, shortPR, longPR, legend, PRF, hit, fDeltaRR, fMCPHR, fDeltaRMCPH, MCs);
       }
       if (!drawing)
 	delete hit;
     }
+  }
 
   std::map<Int_t, MyHitList* >::iterator it;
   for ( it = ModuleHitMap.begin(); it != ModuleHitMap.end(); it++)
     {
       iHit += Int_t((*it).second->size());
     }
-  cout << " Found " << iHit << " Hits" << endl << endl;
+  cout << " Found " << iHit << " Hits, " << fHitOutOfModuleCounter << " Hits out of module reconstructed and not stored" << endl << endl;
   cout << "======================================================" << endl;
   if (drawing) {
-    DrawHits();
+    DrawHits( meanPosition,  drawMCPoints,  drawDigis,  drawClusters,  drawHits);
   }
   if (pr) {
     cout << "position resolution" << endl;
@@ -504,7 +509,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     Float_t K3 = 0.525; 
     Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
     Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
-    Float_t W = 5;
+    Float_t W = 7.5;
     Float_t par = 1;
     Float_t h = 3;
     Char_t formula[500];
@@ -519,14 +524,14 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     c2->cd(2)->SetTicky(1);
     PRF->DrawCopy("colz");
     Mathieson->DrawCopy("same");
-    c2->SaveAs("MC2hit.png");
-    delete Mathieson;
-    if(!drawing)
-      delete c2;
+    c2->SaveAs("MC2hit.pdf");
+    delete Mathieson;    
+    delete hit2Mc;
+    delete c2;
   }
   delete PRF;
   if (pr) {
-   
+    delete legend;
     delete shortPR;
     for (Int_t l = 0; l < 20; l++) {
       delete longPR[l];
@@ -566,7 +571,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 
 
   // --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*& PRF)
+void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, Double_t qMax, MyHit* hit, TH2F*& PRF)
 {
   //cout << "GetModuleInfo" << endl;
   //ModulePara* mPara = new ModulePara;
@@ -664,16 +669,16 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit, TH2F*&
   hit -> secIdY = GetSector(false, digi->GetRow()/*, mPara*/);
  
   Int_t neighbourIds[4] = {-1, -1, -1, -1};
-  SearchNeighbours(qMaxIndex, neighbourIds/*, mPara*/, moduleDigiMap[fmoduleId], hit, PRF);
+  SearchNeighbours(qMaxIndex, qMax, neighbourIds/*, mPara*/, moduleDigiMap[fmoduleId], hit, PRF);
   //delete mPara;
 }// --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds/*, ModulePara* mPara*/, MyDigiList *neighbours, MyHit* hit, TH2F*& PRF)
+void CbmTrdHitProducerCluster::SearchNeighbours(Int_t qMaxIndex, Double_t qMax, Int_t *neighbourIds/*, ModulePara* mPara*/, MyDigiList *neighbours, MyHit* hit, TH2F*& PRF)
   {
     // cout << "SearchNeighbours |->" << endl;
     Int_t counterX = 0;
     Int_t counterY = 0;
 
-    Float_t qMax = 0;
+    //Float_t qMax = 0;
     Int_t hitCombiId   = hit-> rowId     * (fnCol + 1) + hit->colId;
     Int_t leftCombiId  = hitCombiId - 1;
     Int_t rightCombiId = hitCombiId + 1;
@@ -781,13 +786,15 @@ Float_t CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax/*, Modul
   Float_t padWidth;
   Float_t qLeft = 0;
   Float_t qRight = 0;
-  Float_t qSum = 0;
+  Float_t qSum = qMax;
   Int_t left  = neighbourIds[0];
   Int_t right = neighbourIds[1];
   Int_t up    = neighbourIds[3];
   Int_t down  = neighbourIds[2];
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);
-  qMax = digi->GetCharge();
+  //if (qMax != digi->GetCharge())
+  //printf("%.2e   %.2e\n",qMax,digi->GetCharge());
+  //qMax = digi->GetCharge();
 
   if (left >= 0 && right >= 0) {
     digi = (CbmTrdDigi*) fDigis->At(left);
@@ -830,7 +837,7 @@ Float_t CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax/*, Modul
   //cout << " 3" << endl;
   if (PRF){
     if (qLeft > 0 && qRight > 0) {
-      qSum = qMax + qLeft + qRight; 
+      qSum += qLeft + qRight; 
       if (qMax/qSum < 1) {
 	//cout << qLeft << " " << qMax << " " << qRight << "     " << qSum << endl; 
 	/*
@@ -959,11 +966,11 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, Modul
   Int_t DigiRow = hit-> rowId;
   hit->dyPos = 0.5 * fPadSizeY[iSec];
   hit->eyPos = hit->dyPos;
-    if (DigiRow == 0)
-      {
-	//hit->yPos += 0.5 * mPara->PadSizeY[iSec];
-	hit->dyPos = 0.5 * fPadSizeY[iSec];
-      }
+  if (DigiRow == 0)
+    {
+      //hit->yPos += 0.5 * mPara->PadSizeY[iSec];
+      hit->dyPos = 0.5 * fPadSizeY[iSec];
+    }
   /*
     while (DigiRow > 0)
     {
@@ -991,7 +998,7 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, Modul
     //cout << "  " << iSec << "   " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;  
     }
   */
-  Float_t qCluster = PrfReco(qMaxIndex, qMax/*, mPara*/, neighbourIds, hit, PRF);
+  Double_t qCluster = PrfReco(qMaxIndex, qMax/*, mPara*/, neighbourIds, hit, PRF);
   
   //cout << "layer " << Layer << "  col " << nCol << "  row " << nRow << endl;
   //cout << "      " << Layer << "  col " << DigiCol << "  row " << DigiRow << endl;
@@ -1004,11 +1011,26 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, Modul
   Double_t eLossTR = 0;
   Double_t eLossdEdx = 0;
   Double_t eLoss = qCluster;
+  if (eLoss == 0.0)
+    printf("%i  %.2e  %.2e\n",qMaxIndex,eLoss,qMax);
 
-  planeId=fGeoHandler->GetPlane(fmoduleId);
-      
-  AddHit( qMaxIndex, fmoduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
-  
+  planeId=fGeoHandler->GetPlane(hit->moduleId);
+  // if (hit within module) else printf()
+ 
+  if (hit->xPos/10. <= fModuleInfo->GetX()+fModuleInfo->GetSizex() && hit->xPos/10. >= fModuleInfo->GetX()-fModuleInfo->GetSizex()
+      && 
+      hit->yPos/10. <= fModuleInfo->GetY()+fModuleInfo->GetSizey() && hit->yPos/10. >= fModuleInfo->GetY()-fModuleInfo->GetSizey())
+       AddHit( qMaxIndex, hit->moduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
+  else {
+    fHitOutOfModuleCounter++;
+    /*
+      printf("hit out of module (%.2f, %.2f) (%.2f - %.2f, %.2f - %.2f)\n",hit->xPos/10.,hit->yPos/10.,
+      fModuleInfo->GetX()-fModuleInfo->GetSizex(),
+      fModuleInfo->GetX()+fModuleInfo->GetSizex(),
+      fModuleInfo->GetY()-fModuleInfo->GetSizey(),
+      fModuleInfo->GetY()+fModuleInfo->GetSizey());
+    */
+  }
   std::map<Int_t, MyHitList* >::iterator it = ModuleHitMap.find(fmoduleId);
   if (it == ModuleHitMap.end())
     {
@@ -1021,30 +1043,31 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, Modul
 }
 
   // --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::DrawHits()
+void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t drawDigis, Bool_t drawClusters, Bool_t drawHits)
 {  
   Char_t tracer[5] = "";
-  Bool_t picPdf = true;//false;
+  Bool_t picPdf = false;
   Bool_t picPng = true;
   if (picPdf) {
     picPng = false;
   }
   Double_t DigiMax = 0;//0.1;
-  Bool_t mean = false;
-  //Bool_t mean = true;
+  /*
+  //Bool_t mean = false;
+  Bool_t mean = true;
 
-  //Bool_t drawMCPoints = false;
-  Bool_t drawMCPoints = true;
+  Bool_t drawMCPoints = false;
+  //Bool_t drawMCPoints = true;
 
-  //Bool_t drawDigis = false;
-  Bool_t drawDigis = true;
+  Bool_t drawDigis = false;
+  //Bool_t drawDigis = true;
 
-  //Bool_t drawClusters = false;
-  Bool_t drawClusters = true;
+  Bool_t drawClusters = false;
+  //Bool_t drawClusters = true;
 
-  //Bool_t drawHits = false;
-  Bool_t drawHits = true;
-
+ Bool_t drawHits = false;
+ //Bool_t drawHits = true;
+ */
   cout << "  Drawing ";
   if(drawMCPoints) {
     cout << "MC-Points ";
@@ -1780,6 +1803,8 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   // --------------------------------------------------------------------
   void CbmTrdHitProducerCluster::AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss)
   {
+    if (eLoss == 0.0)
+      printf("%i\n",iHit);
     /** HitParameter
      *@param detectorId Unique detector ID
      *@param pos Position in global c.s. [cm]
@@ -1791,7 +1816,7 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
      *@param eLossdEdx Energy deposition in the detector without TR
      *@param eLoss TR + dEdx
      **/  
-
+    //printf ("det: %i   plane: %i\n",detectorId,planeId);
     TClonesArray& clref = *fClusterHits;
     Int_t size = clref.GetEntriesFast();
 
@@ -1825,6 +1850,15 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
 void CbmTrdHitProducerCluster::FinishEvent() {
   //  cout<<"In CbmTrdHitProducerCluster::FinishEvent()"<<endl;
   if (fClusterHits) fClusterHits->Clear();
+  fSectorSizeX.clear();
+  fSectorSizeY.clear();
+  fPadSizeX.clear();
+  fPadSizeY.clear();
+  fSecCol.clear();
+  fSecRow.clear();
+  fPadSizeXArray.clear();
+  fPadSizeYArray.clear();
+  fPadSizeLongMap.clear();
 }
 // -------------------------------------------------------------------------
 

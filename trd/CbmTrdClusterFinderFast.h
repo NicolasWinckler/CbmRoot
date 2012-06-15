@@ -72,7 +72,7 @@ class CbmTrdClusterFinderFast : public FairTask
    * Default constructor.
    */
   CbmTrdClusterFinderFast();
-  
+  CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t NeighbourReadout, Bool_t RowClusterMerger, Double_t MinimumChargeTH);
   /**
    * Default destructor.
    */
@@ -98,9 +98,9 @@ class CbmTrdClusterFinderFast : public FairTask
   void Register();
 
  private:
-  static const Bool_t fMultiHit = true;
+  //static const Bool_t fMultiHit = true;
 
-  ClusterList *clusterModule(Bool_t rowClusterMerger, MyDigiList *digis, MyDigiList *neighbours);  
+  ClusterList *clusterModule(MyDigiList *digis, MyDigiList *neighbours);  
   void mergeRowCluster(RowCluster *currentCluster,
 		       std::list<RowCluster*> *openList);
   ClusterList *findCluster(std::list<RowCluster*> *rowClusterList);
@@ -122,6 +122,10 @@ class CbmTrdClusterFinderFast : public FairTask
   //static const Float_t minimumChargeTH = 5e-03;
 
   Int_t ClusterSum;
+  Double_t fMinimumChargeTH;
+  Bool_t fNeighbourReadout;
+  Bool_t fRowClusterMerger;
+  Bool_t fMultiHit;
 
   CbmTrdClusterFinderFast(const CbmTrdClusterFinderFast&);
   CbmTrdClusterFinderFast& operator=(const CbmTrdClusterFinderFast&);

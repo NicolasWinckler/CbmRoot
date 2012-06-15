@@ -34,7 +34,25 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
-   ClusterSum(-1)
+   ClusterSum(-1),
+   fMinimumChargeTH(1.0e-08),
+   fMultiHit(true),
+   fRowClusterMerger(false),
+   fNeighbourReadout(true)
+{
+}
+CbmTrdClusterFinderFast::CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t NeighbourReadout, Bool_t RowClusterMerger, Double_t MinimumChargeTH)
+  :FairTask("TrdClusterFinderFast",1),
+   fDigis(NULL),
+   fClusters(NULL),
+   fDigiPar(NULL),
+   fModuleInfo(NULL),
+   fGeoHandler(new CbmTrdGeoHandler()),
+   ClusterSum(-1),
+   fMinimumChargeTH(MinimumChargeTH),
+   fMultiHit(MultiHit),
+   fRowClusterMerger(RowClusterMerger),
+   fNeighbourReadout(NeighbourReadout)
 {
 }
 // --------------------------------------------------------------------
@@ -118,11 +136,10 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   Float_t mRMax = 7500;
   Bool_t dynamic = true;
   Bool_t optimization = false;//true;//false;//
-  Bool_t rowClusterMerger = false;
   if (optimization) {
     dynamic = false;
-    rowClusterMerger = true;
-    cout << "  minimum charge threshold optimization run" << endl <<"  rowClusterMerger: on" << endl;
+    fRowClusterMerger = true;
+    cout << "  minimum charge threshold optimization run" << endl <<"  fRowClusterMerger: on" << endl;
   }
   else {
     if (fMultiHit){
@@ -131,20 +148,20 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
     else {
       cout << "  multi hit detection: off" << endl;
       if (dynamic) {
-	cout << "  rowClusterMerger: on (as function of module distance (r_min = " << mRMax <<" mm) from beam pipe)"<< endl;
+	cout << "  fRowClusterMerger: on (as function of module distance (r_min = " << mRMax <<" mm) from beam pipe)"<< endl;
       }
       else {
-	if (rowClusterMerger) {
-	  cout << "  rowClusterMerger: on" << endl;
+	if (fRowClusterMerger) {
+	  cout << "  fRowClusterMerger: on" << endl;
 	}
 	else {
-	  cout << "  rowClusterMerger: off" << endl;
+	  cout << "  fRowClusterMerger: off" << endl;
 	}
       }
     }
   }
   //optimization ist only usefull if rowClusters are merged !!!
-  Float_t minimumChargeTH = 1.0e-08;//3e-03;
+ 
   Float_t mChargeTH[84] = { 0.003, 
 			    /*2e-06,*/ //for gausssian distributed charge
 			    0, 
@@ -166,8 +183,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   if (optimization)
     {
       nChargeTH = 84;
-      OptimalTH = new TProfile("OptimalTH","Optimization of the minimumChargeTH",Int_t(1/mChargeTH[2]),0,mChargeTH[nChargeTH-1]);
-      OptimalTH->SetXTitle("minimumChargeTH value");
+      OptimalTH = new TProfile("OptimalTH","Optimization of the fMinimumChargeTH",Int_t(1/mChargeTH[2]),0,mChargeTH[nChargeTH-1]);
+      OptimalTH->SetXTitle("fMinimumChargeTH value");
       OptimalTH->SetYTitle("Number of found clusters");
       OptimalTH->SetStats(kFALSE);
       OptimalTH->GetXaxis()->SetLabelSize(0.02);
@@ -193,11 +210,13 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
+      /*
       if (fMultiHit)
-	minimumChargeTH = 1.0e-08;
+	fMinimumChargeTH = 1.0e-08;
       else
-	minimumChargeTH = mChargeTH[iChargeTH];
-      //minimumChargeTH = 0.0;
+	fMinimumChargeTH = mChargeTH[iChargeTH];
+      */
+      //fMinimumChargeTH = 0.0;
       /*
        * Digis are sorted according to the moduleId. A combiId is calculted based 
        * on the rowId and the colId to have a neighbouring criterion for digis within 
@@ -231,7 +250,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 	*/
 	/*
-	  if (digi->GetCharge() > minimumChargeTH)
+	  if (digi->GetCharge() > fMinimumChargeTH)
 	  {
 	*/
 	/*
@@ -261,7 +280,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	}
 	d->charge = digi->GetCharge();
 
-	if (optimization && minimumChargeTH == 0)
+	if (optimization && fMinimumChargeTH == 0)
 	  {
 	    DigiChargeSpectrum->Fill(digi->GetCharge());
 	  }
@@ -271,7 +290,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	  ModuleNeighbourDigiMap[moduleId] = new MyDigiList;
 	} 
 	ModuleNeighbourDigiMap[moduleId]->push_back(d);
-	if (digi->GetCharge() > minimumChargeTH)
+	if (digi->GetCharge() > fMinimumChargeTH)
 	  {
 	    digiCounter++;
 	    if (modules.find(moduleId) == modules.end()) {
@@ -288,7 +307,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	d = NULL;
 	//	delete d;
       }
-      cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
+      cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << fMinimumChargeTH << ")" << endl;
       std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
       for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
 	if (dynamic) {
@@ -301,16 +320,16 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	  Float_t mR = sqrt(pow(mPosXC,2) + pow(mPosYC,2));
 	  counterJ++;
 	  if (mR > mRMax) {
-	    rowClusterMerger = true;
+	    fRowClusterMerger = true;
 	    counterI++;
 	    //cout << it->first << "   "<< mR << endl;
 	  }
 	  else {
-	    rowClusterMerger = false;
+	    fRowClusterMerger = false;
 	    //cout << "  " << it->first << "   " << mR <<endl;
 	  }
 	}
-	fModClusterMap[it->first] = clusterModule(rowClusterMerger, it->second, ModuleNeighbourDigiMap[it->first]);
+	fModClusterMap[it->first] = clusterModule(it->second, ModuleNeighbourDigiMap[it->first]);
 	//drawCluster(it->first, fModClusterMap[it->first]);
       }
       addCluster(fModClusterMap);
@@ -376,8 +395,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       delete OptimalTH;
       delete DigiChargeSpectrum;
     }
-  //cout << "  " << counterI << " (" << counterI*100.0/Float_t(counterJ) << "%)" <<  " are reconstructed with rowClusterMerger" << endl;
-  printf("   %4d modules (%6.3f%%) are reconstructed with rowClusterMerger\n",counterI,counterI*100/Float_t(counterJ));
+  //cout << "  " << counterI << " (" << counterI*100.0/Float_t(counterJ) << "%)" <<  " are reconstructed with fRowClusterMerger" << endl;
+  printf("   %4d modules (%6.3f%%) are reconstructed with fRowClusterMerger\n",counterI,counterI*100/Float_t(counterJ));
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -393,7 +412,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   { return (a->combiId < b->combiId); }
 
   //----------------------------------------------------------------------
-  ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyDigiList *digis, MyDigiList *neighbours)
+  ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis, MyDigiList *neighbours)
   {
     /*
      *  3 new Lists are initialized: 
@@ -430,7 +449,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	 * (and merged to the clusters of the previous row) 
 	 * if a break between the activ digi and the currentCluster is found.
 	 */
-	if (rowClusterMerger) {
+	if (fRowClusterMerger) {
 	  mergeRowCluster(currentCluster, &openList);
 	}
 	currentList.push_back(currentCluster);
@@ -628,7 +647,7 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		if (nextDigi != (*iCluster)->end()) {
 		  //cout << (*iDigi)->charge << " " << (*nextDigi)->charge << "    ";
 		  deltaCharge = (*nextDigi)->charge - (*iDigi)->charge;
-		  if (preDelta >= 0 && deltaCharge <= 0) {
+		  if (preDelta >= 0 && deltaCharge <= 0) { // local maximum in charge distribution
 		    //cout << "pre" << preDelta << " delta" << deltaCharge << endl;
 		    //cout << (*lastDigi)->charge << " " << (*iDigi)->charge << " " << (*nextDigi)->charge << endl;
 		    i = 1;

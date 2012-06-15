@@ -44,7 +44,8 @@ CbmTrdOccupancy::CbmTrdOccupancy()
     fGeo()
 {
 }
-CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, TString geo)
+/*
+CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char *geo)
   : FairTask(name),
     fDigis(NULL),
     fDigiPar(NULL),
@@ -57,11 +58,31 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, TString ge
     fModuleOccupancyMap(),
     fModuleOccupancyMapIt(),
     fDigiChargeSpectrum(NULL),
-    fTriggerThreshold(1e-6),
+    fTriggerThreshold(1.0e-6),
     fNeigbourReadout(true),
     fGeo(geo)
 {
 }
+*/
+CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char *geo, Double_t triggerThreshold)
+  : FairTask(name),
+    fDigis(NULL),
+    fDigiPar(NULL),
+    fModuleInfo(NULL),
+    fGeoHandler(new CbmTrdGeoHandler()),
+    fModuleMap(),
+    fModuleMapIt(),
+    fModuleOccupancyMemoryMap(),
+    fModuleOccupancyMemoryMapIt(),
+    fModuleOccupancyMap(),
+    fModuleOccupancyMapIt(),
+    fDigiChargeSpectrum(NULL),
+    fTriggerThreshold(triggerThreshold),
+    fNeigbourReadout(true),
+    fGeo(geo)
+{
+}
+
 CbmTrdOccupancy::~CbmTrdOccupancy()
 {
   
@@ -96,7 +117,7 @@ CbmTrdOccupancy::~CbmTrdOccupancy()
 }
 void CbmTrdOccupancy::SetParContainers()
 {
-    cout<<" * CbmTrdCbmTrdOccupancy * :: SetParContainers() "<<endl;
+    cout<<" * CbmTrdOccupancy * :: SetParContainers() "<<endl;
     // Get Base Container
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb=ana->GetRuntimeDb();
@@ -213,10 +234,13 @@ void CbmTrdOccupancy::Exec(Option_t * option)
       if (fLayerOccupancyMap.find(combiId) == fLayerOccupancyMap.end()){
 	title.Form("S%i_L%i",Station,Layer);
 	//fLayerOccupancyMap[combiId] = new TH2F(title,title,1200,-600,600,1000,-500,500);
-	fLayerOccupancyMap[combiId] = new TCanvas(title,title,800,800);
+	fLayerOccupancyMap[combiId] = new TCanvas(title,title,1200,1000);
 	fLayerOccupancyMap[combiId]->cd();
 	fLayerDummy->DrawCopy("");
-    
+	title.Form("Station%i_Layer%i",Station,Layer);
+	fLayerAverageOccupancyMap[combiId] = new TProfile(title,title,1e6,0,1.0e-3);
+	fLayerAverageOccupancyMap[combiId]->SetYTitle("Average layer occupancy [%]");
+	fLayerAverageOccupancyMap[combiId]->SetXTitle("Trigger threshold");
       }
       Int_t iCol(digi->GetCol()), iRow(digi->GetRow()), ixBin(iCol+1), iyBin(iRow+1);
       if (fModuleOccupancyMap[moduleId]->GetBinContent(ixBin,iyBin) == 0)
@@ -285,6 +309,7 @@ void CbmTrdOccupancy::CopyEvent2MemoryMap()
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     fModuleOccupancyMemoryMap[fModuleOccupancyMapIt->first]->Fill(Float_t(fModuleOccupancyMapIt->second->Integral()) / Float_t(fModuleOccupancyMapIt->second->GetNbinsX() * fModuleOccupancyMapIt->second->GetNbinsY()) * 100.);
+    fLayerAverageOccupancyMap[10 * (fModuleMap[fModuleOccupancyMapIt->first]->Station) + (fModuleMap[fModuleOccupancyMapIt->first]->Layer)]->Fill(fTriggerThreshold, Float_t(fModuleOccupancyMapIt->second->Integral()) / Float_t(fModuleOccupancyMapIt->second->GetNbinsX() * fModuleOccupancyMapIt->second->GetNbinsY()) * 100.);
   }
 }
 
@@ -310,9 +335,10 @@ void CbmTrdOccupancy::CreateLayerView()
       fModuleOccupancyMemoryMap[fModuleOccupancyMapIt->first]->Fill(occupancy);
     */
     Float_t occupancy = fModuleOccupancyMemoryMapIt->second->GetMean(1);
+    Float_t occupancyE = fModuleOccupancyMemoryMapIt->second->GetRMS(1);
     if (debug)
       printf(" <O>:%6.2f  ",occupancy);
-    title.Form("%.2f%%",occupancy);
+    title.Form("%.1f#pm%.1f%%",occupancy,occupancyE);
     if (debug)
       printf("%s\n",title.Data());
     TPaveText *text = new TPaveText(
@@ -358,15 +384,51 @@ void CbmTrdOccupancy::CreateLayerView()
     text->AddText(title);
     text->Draw("same");
   }
-  
+  gDirectory->pwd();
+  if (!gDirectory->Cd("Occupancy")) 
+    gDirectory->mkdir("Occupancy");
+  gDirectory->Cd("Occupancy");
+  gDirectory->pwd();
+  title.Form("TH%.2E",fTriggerThreshold);
+  if (!gDirectory->Cd(title)) 
+    gDirectory->mkdir(title);
+  gDirectory->Cd(title);
   gDirectory->pwd();
   for (fLayerOccupancyMapIt = fLayerOccupancyMap.begin();
        fLayerOccupancyMapIt != fLayerOccupancyMap.end(); ++fLayerOccupancyMapIt) {
     fLayerOccupancyMapIt->second->Write("", TObject::kOverwrite);
-    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+fGeo+".pdf");
-    fLayerOccupancyMapIt->second->SaveAs("pics/Occupancy_"+TString(fLayerOccupancyMapIt->second->GetTitle())+fGeo+".png");
+    title.Form("pics/Occupancy_%.2E_%s_%s.pdf", fTriggerThreshold, TString(fLayerOccupancyMapIt->second->GetTitle()).Data(), fGeo.Data());
+    fLayerOccupancyMapIt->second->SaveAs(title);
+    title.Form("pics/Occupancy_%.2E_%s_%s.png", fTriggerThreshold, TString(fLayerOccupancyMapIt->second->GetTitle()).Data(), fGeo.Data());
+    fLayerOccupancyMapIt->second->SaveAs(title);
   }
+  gDirectory->Cd("..");
+  TCanvas *c = new TCanvas("c","c",800,600);
+  Int_t counter = 0;
+  for (fLayerAverageOccupancyMapIt = fLayerAverageOccupancyMap.begin();
+       fLayerAverageOccupancyMapIt != fLayerAverageOccupancyMap.end(); ++fLayerAverageOccupancyMapIt) {
+    fLayerAverageOccupancyMapIt->second->Write("", TObject::kOverwrite);
   
+    counter++;
+    fLayerAverageOccupancyMapIt->second->SetLineColor(counter);
+    fLayerAverageOccupancyMapIt->second->SetMarkerColor(counter);
+    fLayerAverageOccupancyMapIt->second->SetMarkerStyle(20);
+    c->cd()->SetLogy(1);
+    c->cd()->SetLogx(1);
+    if (fLayerAverageOccupancyMapIt == fLayerAverageOccupancyMap.begin()){
+      fLayerAverageOccupancyMapIt->second->GetXaxis()->SetRangeUser(1.0e-10,1.0e-3);
+      fLayerAverageOccupancyMapIt->second->GetYaxis()->SetRangeUser(0.1,100);
+      fLayerAverageOccupancyMapIt->second->DrawCopy();
+    }
+    else
+      fLayerAverageOccupancyMapIt->second->DrawCopy("same");
+  }
+  title.Form("pics/Occupancy_%.2E_%s.pdf", fTriggerThreshold, fGeo.Data());
+  c->SaveAs(title);
+  title.Form("pics/Occupancy_%.2E_%s.png", fTriggerThreshold, fGeo.Data());
+  c->SaveAs(title);
+  gDirectory->Cd("..");
+  c->Close();
 }
 void CbmTrdOccupancy::SetNeighbourReadout(Bool_t neighbourReadout){fNeigbourReadout=neighbourReadout;}
 void CbmTrdOccupancy::SetTriggerThreshold(Double_t triggerthreshold){fTriggerThreshold=triggerthreshold;}

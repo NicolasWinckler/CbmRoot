@@ -31,6 +31,7 @@ class CbmTrdQa : public FairTask {
   virtual void SetParContainers();
   virtual void Exec(Option_t * option);
   void SaveHistos();
+  void NormalizeHistos();
   void CreateLayerView();
   void GetPadInfos(Int_t moduleId, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY);
   virtual void FinishEvent();
@@ -90,13 +91,26 @@ class CbmTrdQa : public FairTask {
   TH1I *fPositionResolutionShort;
   TH1I *fPositionResolutionLong;
 
+  TH1I *fdEdxPoint;
+  TH1I *fdEdxDigi;
+  TH1I *fdEdxCluster;
+  TH1I *fdEdxHit;
+
   TH1I *fdEdxPionMc;
   TH1I *fdEdxPionHit;
   TH1I *fdEdxElectronMc;
   TH1I *fdEdxElectronHit;
+
+  TProfile *fMultiPointssVsR;
+  TProfile *fGhostPointsVsR;
+  TProfile *fMultiHitsVsR;
   TProfile *fGhostHitVsR;
   TProfile *fLostPointVsR;
   TProfile *fHitToPointEfficiencyVsR;
+  TProfile *fMultiHitsVsAlpha;
+  TProfile *fGhostHitVsAlpha;
+  TProfile *fLostPointVsAlpha;
+  TProfile *fHitToPointEfficiencyVsAlpha;
   //LayerView
 
   ClassDef(CbmTrdQa,1);

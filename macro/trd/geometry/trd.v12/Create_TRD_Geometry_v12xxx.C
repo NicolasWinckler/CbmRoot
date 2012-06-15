@@ -19,17 +19,24 @@ TGeoManager* gGeoMan = NULL;  // Pointer to TGeoManager instance
 
 //const Int_t   Station_number=3; // Number of TRD stations in the setup
 //const Int_t   Layer_number=4;   // Number of detector layers per station
-const Float_t Layer_pitch=50.0; // Distance between 2 adjacent layers of a TRD station
+//tation
 //const Float_t Station_thickness=Layer_number * Layer_pitch; // Thickness of one TRD station
 
-// Parameters defining the layout of the different detector modules
 
+//Parameters defing the layout of the complete detector build out of different 
+// detector layers.
+const Int_t NrOfLayers = 12;
+const Int_t layerType[NrOfLayers] = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 0, 0 };
+const Float_t layerPosition[NrOfLayers] = { 4500, 5000, 5500, 6000, 6750, 7250, 7750, 8250, 9000, 9500, 6500, 8500 };
 const Float_t Layer_thickness=49.5; // Thickness of one layer of a TRD station
+const Float_t Layer_pitch=50.0; // Distance between 2 adjacent layers of a TRD s
+
+// Parameters defining the layout of the different detector modules
 const Float_t Frame_width[2]={ 1.5, 2. };         // Width of detector frames in cm
 const Float_t Detector_size_x[2] = { 60., 100.};
 const Float_t Detector_size_y[2] = { 60., 100.};
 
-const Float_t radiator_thickness    =  2.9000 /2.;
+const Float_t radiator_thickness    =  36.0 /2.;
 const Float_t radiator_position     =  - Layer_thickness /2. + radiator_thickness;
 const Float_t gas_thickness         =  1.2000 /2.;
 const Float_t gas_position          =  radiator_position + radiator_thickness + gas_thickness;
@@ -42,6 +49,10 @@ const Float_t electronics_position  =  mylar_position + mylar_thickness + electr
 const Float_t frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
 const Float_t frame_position        =  frame_thickness - Layer_thickness /2.;
 
+const  Float_t febbox_thickness      =  10.000 /2.;
+const  Float_t febbox_position       =  electronics_position + electronics_thickness;// + febbox_thickness;
+const  Float_t feb_thickness         =  .5/2;
+
 const TString keepingVolumeMedium ="air";
 const TString radiatorVolumeMedium ="polypropylene";
 const TString gasVolumeMedium ="TRDgas";
@@ -49,23 +60,19 @@ const TString padVolumeMedium ="goldcoatedcopper";
 const TString mylarVolumeMedium ="mylar";
 const TString electronicsVolumeMedium ="goldcoatedcopper";
 const TString frameVolumeMedium ="G10";
+const TString febVolumeMedium ="pefoam20";
 
 
 const Int_t NrModuleTypes=8;
 const Int_t TypeOfModule[NrModuleTypes]={0,0,0,0,1,1,1,1};
 const Int_t febs_per_module[NrModuleTypes] ={ 19, 10, 5, 3, 12, 6, 4, 3 }; 
 
-//Parameters defing the layout of the complete detector build out of different 
-// detector layers.
-const Int_t NrOfLayers = 12;
-const Int_t layerType[NrOfLayers] = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 0, 0 };
-const Float_t layerPosition[NrOfLayers] = { 4500, 5000, 5500, 6000, 6750, 7250, 7750, 8250, 9000, 9500, 6500, 8500 };
-
 
 TGeoVolume* trd_mod[NrModuleTypes];
 
-void create_trd_module(Int_t moduleType);
 
+// Forward declarations
+void create_trd_module(Int_t moduleType);
 void create_materials_from_media_file();
 
 //void create_trd_feb();
@@ -95,9 +102,13 @@ void Create_TRD_Geometry_v12xxx() {
   TGeoTranslation *no_trans = new TGeoTranslation("", 0., 0., 0.);
   top->AddNode(trd_v_12a, 1);
 
-  create_trd_module(1);
-  //  TGeoVolume* trd_mod1 = gGeoMan->GetVolume("trd_mod1");
-  trd_v_12a->AddNode(trd_mod[0], 1);
+  TGeoTranslation *glob_trans;
+  for (Int_t iModule; iModule < NrModuleTypes; iModule++) {
+    create_trd_module(iModule+1);
+    //  TGeoVolume* trd_mod1 = gGeoMan->GetVolume("trd_mod1");
+    glob_trans = new TGeoTranslation("", 0., 0., layerPosition[iModule]);
+    trd_v_12a->AddNode(trd_mod[iModule], 1, glob_trans);
+  }
    
 
   gGeoMan->CloseGeometry();
@@ -119,6 +130,9 @@ void create_trd_module(Int_t moduleType)
 
   Float_t frameWidth = Frame_width[ typeOfModule ];
 
+  Int_t nrOfFebs = febs_per_module[ moduleType - 1 ];
+
+  cout<<"Nr. Of FEBs: "<< nrOfFebs<<endl;
   Float_t Active_area_x = ModuleSizeX - 2 * frameWidth;
   Float_t Active_area_y = ModuleSizeY - 2 * frameWidth;
 
@@ -136,11 +150,13 @@ void create_trd_module(Int_t moduleType)
   TGeoMedium* mylarVolMed = gGeoMan->GetMedium(mylarVolumeMedium);
   TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(electronicsVolumeMedium);
   TGeoMedium* frameVolMed = gGeoMan->GetMedium(frameVolumeMedium);
+  TGeoMedium* febVolMed = gGeoMan->GetMedium(febVolumeMedium);
 
   TString name = Form("trd_mod%d", moduleType);
   TGeoBBox *trd_box = new TGeoBBox("", ModuleSizeX/2, 
 				   ModuleSizeY/2, Layer_thickness/2);
-  trd_mod[moduleType-1] = new TGeoVolume(name, trd_box, keepVolMed);
+  //  trd_mod[moduleType-1] = new TGeoVolume(name, trd_box, keepVolMed);
+  trd_mod[moduleType-1] = new TGeoVolumeAssembly(name);
    
    // Radiator
    TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, 
@@ -222,6 +238,37 @@ void create_trd_module(Int_t moduleType)
    trd_frame2_trans = new TGeoTranslation("", -(Active_area_x/2+frameWidth/2), 0., 
 					  frame_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_frame2vol, 2, trd_frame2_trans);
+
+
+   // Create all FEBs and place them in an assembly which will added 
+   // to the trd module
+   TGeoVolumeAssembly* trd_feb_box = 
+     new TGeoVolumeAssembly(Form("trd_mod%d_febbox", moduleType));
+
+   TGeoBBox *trd_feb = 
+     new TGeoBBox("", Active_area_x/2, feb_thickness/2, 
+		  febbox_thickness/2);
+   TGeoVolume* trdmod1_feb = 
+     new TGeoVolume(Form("trd_mod%d_feb", moduleType), 
+		    trd_feb, febVolMed);
+
+   //   trdmod1_feb->SetLineColor(kBlack);
+
+   // translations 
+   TGeoTranslation *trd_feb_trans;
+   Float_t feb_pos;
+   Float_t feb_pos_y;
+   for (Int_t iFeb = 0; iFeb < nrOfFebs; iFeb++) {
+     feb_pos   = (2. * iFeb + 1) / (2 * nrOfFebs) - 0.5;
+     feb_pos_y = feb_pos * Active_area_y;
+
+     trd_feb_trans = new TGeoTranslation("", 0., feb_pos_y, 0.);
+     trdmod1_feb->SetLineColor(kBlack);
+     trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_trans);
+   }
+   trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);
+   gGeoMan->GetVolume(name)->AddNode(trd_feb_box, 1, trd_febbox_trans);
+   
 }
 
 void create_materials_from_media_file()

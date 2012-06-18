@@ -167,10 +167,11 @@ void Create_TRD_Geometry_v12xxx() {
 
   // Load needed material definition from media.geo file
   create_materials_from_media_file();
-  
+
   // Get the GeoManager for later usage
   //  TGeoManager* gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
   gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
+  gGeoMan->SetVisLevel(10);  
   
   // Create the top volume 
   TGeoBBox *topbox= new TGeoBBox("", 10000., 

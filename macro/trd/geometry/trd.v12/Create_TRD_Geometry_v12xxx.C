@@ -26,7 +26,7 @@ const Float_t Layer_pitch=50.0; // Distance between 2 adjacent layers of a TRD s
 const Int_t layerNrOfSectors[NrOfDifferentLayerTypes] = { 2, 2, 1 };
 const Int_t layerArraySize[3][4] =  { { 5, 5, 9, 11 },
 				      { 5, 5, 9, 11 },
-				      { 9, 11, 0, 0 } };
+				      { 5, 5, 9, 11 } };
 // ### Layer Type 1
 // v12x - module types in the inner sector of layer1 - looking upstream
 const Int_t layer1i[5][5] = { { 4,  3,  2,  3,  4 },
@@ -75,24 +75,36 @@ Int_t layer2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
 // number of modules 45x0, 0x5, 12x6, 0x7, 42x8
 // Layer2 =  78;   // v12x
 
-// ### Layer Type 12 is Layer Type 2 with detector modules rotated by 90°
+// ### Layer Type 21 is Layer Type 2 with detector modules rotated by 90°
 // In the subroutine creating the layers this is recognized automatically 
 
-// ### Station 3
+// ### Layer Type 3
+
+// v12x - module types in the inner sector of layer2 - looking upstream
+Int_t layer3i[5][5] = { { 0,  0,  0,  0, 0 },     
+			{ 0,  0,  0,  0, 0 },     
+			{ 0,  0,  0,  0, 0 },     
+			{ 0,  0,  0,  0, 0 },     
+			{ 0,  0,  0,  0, 0 } };   
+// number of modules 25x0 
+// Only for convinience in the function needed
+
 
 // v12x - module types in the outer sector of layer3 - looking upstream
-Int_t layer3[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
-			{ 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
-			{ 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
-			{ 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
-			{ 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
-			{ 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
-			{ 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
-			{ 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
-			{ 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
+Int_t layer3o[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
+			 { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+			 { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+			 { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+			 { 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
+			 { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+			 { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+			 { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+			 { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
 // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
 // Layer3 = 98;   // v12x
 
+// ### Layer Type 31 is Layer Type 3 with detector modules rotated by 90°
+// In the subroutine creating the layers this is recognized automatically 
 
 // Parameters defining the layout of the different detector modules
 const Int_t NrModuleTypes=8;
@@ -161,7 +173,12 @@ void Create_TRD_Geometry_v12xxx() {
   gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
   
   // Create the top volume 
-  TGeoVolume* top = new TGeoVolumeAssembly("TRD");
+  TGeoBBox *topbox= new TGeoBBox("", 10000., 
+					 10000., 10000.);
+  TGeoVolume* top = new TGeoVolume("top", 
+				   topbox, gGeoMan->GetMedium("air"));
+
+  //   TGeoVolume* top = new TGeoVolumeAssembly("TRD");
   gGeoMan->SetTopVolume(top);
   TGeoVolume* trd_v_12a = new TGeoVolumeAssembly("trd_v_12a");
 
@@ -174,15 +191,21 @@ void Create_TRD_Geometry_v12xxx() {
     //trd_v_12a->AddNode(trd_mod[iModule], 1, glob_trans);
   }
   
+  
   for (Int_t iLayer = 0; iLayer < NrOfLayers; iLayer++) {
     create_detector_layers(iLayer+1);
     glob_trans = new TGeoTranslation("", 0., 0., layerPosition[iLayer]);
     trd_v_12a->AddNode(trd_layer[iLayer], 1, glob_trans);
   }
+  
 
   gGeoMan->CloseGeometry();
+  gGeoMan->CheckOverlaps(0.001);
+  gGeoMan->PrintOverlaps();
+  gGeoMan->Test();
+
   TFile* outfile = new TFile("TRD_geom_v12b.root","RECREATE");
-  //  top->Write();
+  //top->Write();
   gGeoMan->Write();
   outfile->Close();
   //top->Draw("ogl");
@@ -365,7 +388,7 @@ void create_trd_module(Int_t moduleType)
      new TGeoVolume(Form("trd_mod%d_feb", moduleType), 
 		    trd_feb, febVolMed);
 
-   //   trdmod1_feb->SetLineColor(kBlack);
+   trdmod1_feb->SetLineColor(kBlack);
 
    // translations 
    TGeoTranslation *trd_feb_trans;
@@ -389,12 +412,12 @@ void create_detector_layers(Int_t layer)
 
   TString name = Form("trd_layer%d", layer);
   cout<<"Creating "<<name<<endl;
-  //  TGeoAssembly* layerVolume = new TGeoAssembly("layer");
   trd_layer[layer-1] = new TGeoVolumeAssembly(name);
 
   Int_t typeOfLayer = layerType[ layer-1 ]/10;
   Int_t isRotated = layerType[ layer-1 ]%10;
   TGeoRotation* module_rotation;
+
   if ( 1 == isRotated) {
     module_rotation = new TGeoRotation();
     module_rotation->RotateZ(90.);
@@ -402,126 +425,67 @@ void create_detector_layers(Int_t layer)
     module_rotation = new TGeoRotation();
     module_rotation->RotateZ(0.);
   }
-
+  
   TGeoCombiTrans* module_placement;
-  Int_t array_size1 = layerArraySize[typeOfLayer-1][0];
-  Int_t array_size2 = layerArraySize[typeOfLayer-1][1];
-
+  
+  Int_t innerarray_size1 = layerArraySize[typeOfLayer-1][0];
+  Int_t innerarray_size2 = layerArraySize[typeOfLayer-1][1];
+  Int_t* innerLayer;
+  
+  Int_t outerarray_size1 = layerArraySize[typeOfLayer-1][2];
+  Int_t outerarray_size2 = layerArraySize[typeOfLayer-1][3];
+  Int_t* outerLayer;
+  
   if ( 1 == typeOfLayer ) {
-    Int_t a = 0;
-    for ( Int_t type = 1; type <= 4; type++) {
-      for ( Int_t j = (array_size1-1); j >= 0; j--)  { // start from the bottom 
-	for ( Int_t i = 0; i < array_size2; i++) {
-	  if (layer1i[j][i]==type) {          
-	    Int_t y = -(j-2);
-	    Int_t x =   i-2;
-	    Int_t xPos = Detector_size_x[0] * x;
-	    Int_t yPos = Detector_size_y[0] * y;	    
-	    a++;
-	    module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
-						  module_rotation);
-	    //            cout<<"Position: "<<xPos<<" , "<<yPos<<endl;
-	    gGeoMan->GetVolume(name)->
-	      AddNode(trd_mod[type-1], a, module_placement);
-
-	  }
-	}
-      }
-    }
-
-    array_size1 = layerArraySize[typeOfLayer-1][2];
-    array_size2 = layerArraySize[typeOfLayer-1][3];
- 
-    for ( Int_t type = 5; type <= 8; type++) {
-      for ( Int_t j = (array_size1-1); j >= 0; j--)  { // start from the bottom 
-	for ( Int_t i = 0; i < array_size2; i++) {
-	  if (layer1o[j][i]==type) {
-	    Int_t y = -(j-4);
-	    Int_t x =   i-5;
-	    Int_t xPos = Detector_size_x[1] * x;
-	    Int_t yPos = Detector_size_y[1] * y;	    
-	    a++;
-	    module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
-						  module_rotation);
-	    //	    cout<<"Position: "<<xPos<<" , "<<yPos<<endl;
-	    gGeoMan->GetVolume(name)->
-	      AddNode(trd_mod[type-1], a, module_placement);
-	    
-	  }
-	}
-      }
-    } 
+    innerLayer = layer1i;      
+    outerLayer = layer1o; 
   } elseif ( 2 == typeOfLayer ) {
-    Int_t a = 0;
-    for ( Int_t type = 1; type <= 4; type++) {
-      for ( Int_t j = (array_size1-1); j >= 0; j--)  { // start from the bottom 
-	for ( Int_t i = 0; i < array_size2; i++) {
-	  if (layer2i[j][i]==type) {          
-	    Int_t y = -(j-2);
-	    Int_t x =   i-2;
-	    Int_t xPos = Detector_size_x[0] * x;
-	    Int_t yPos = Detector_size_y[0] * y;	    
-	    a++;
-	    module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
-						  module_rotation);
-	    //            cout<<"Position: "<<xPos<<" , "<<yPos<<endl;
-	    gGeoMan->GetVolume(name)->
-	      AddNode(trd_mod[type-1], a, module_placement);
-
-	  }
-	}
-      }
-    }
-
-    array_size1 = layerArraySize[typeOfLayer-1][2];
-    array_size2 = layerArraySize[typeOfLayer-1][3];
- 
-    for ( Int_t type = 5; type <= 8; type++) {
-      for ( Int_t j = (array_size1-1); j >= 0; j--)  { // start from the bottom 
-	for ( Int_t i = 0; i < array_size2; i++) {
-	  if (layer2o[j][i]==type) {
-	    Int_t y = -(j-4);
-	    Int_t x =   i-5;
-	    Int_t xPos = Detector_size_x[1] * x;
-	    Int_t yPos = Detector_size_y[1] * y;	    
-	    a++;
-	    module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
-						  module_rotation);
-	    //	    cout<<"Position: "<<xPos<<" , "<<yPos<<endl;
-	    gGeoMan->GetVolume(name)->
-	      AddNode(trd_mod[type-1], a, module_placement);
-	    
-	  }
-	}
-      }
-    } 
-  } elseif ( 3 == typeOfLayer) {
-    Int_t a = 0;
-    for ( Int_t type = 5; type <= 8; type++) {
-      for ( Int_t j = (array_size1-1); j >= 0; j--)  { // start from the bottom 
-	for ( Int_t i = 0; i < array_size2; i++) {
-	  if (layer3[j][i]==type) {          
-	    Int_t y = -(j-4);
-	    Int_t x =   i-5;
-	    Int_t xPos = Detector_size_x[1] * x;
-	    Int_t yPos = Detector_size_y[1] * y;	    
-	    a++;
-	    module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
-						  module_rotation);
-	    //            cout<<"Position: "<<xPos<<" , "<<yPos<<endl;
-	    gGeoMan->GetVolume(name)->
-	      AddNode(trd_mod[type-1], a, module_placement);
-
-	  }
-	}
-      }
-    }
-
+    innerLayer = layer2i;      
+    outerLayer = layer2o; 
+  } elseif ( 3 == typeOfLayer ) {
+    innerLayer = layer3i;      
+    outerLayer = layer3o; 
   } else {
     cout<<"Type of layer not known"<<endl;
   } 
-
-
+  
+  Int_t a = 0;
+  for ( Int_t type = 1; type <= 4; type++) {
+    for ( Int_t j = (innerarray_size1-1); j >= 0; j--)  { // start from the bottom 
+      for ( Int_t i = 0; i < innerarray_size2; i++) {
+	if ( *(innerLayer + (j * innerarray_size2 + i)) == type) {          
+	  Int_t y = -(j-2);
+	  Int_t x =   i-2;
+	  Int_t xPos = Detector_size_x[0] * x;
+	  Int_t yPos = Detector_size_y[0] * y;	    
+	  a++;
+	  module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
+						module_rotation);
+	  gGeoMan->GetVolume(name)->
+	    AddNode(trd_mod[type-1], a, module_placement);
+	  
+	}
+      }
+    }
+  }
   
   
+  for ( Int_t type = 5; type <= 8; type++) {
+    for ( Int_t j = (outerarray_size1-1); j >= 0; j--)  { // start from the bottom 
+      for ( Int_t i = 0; i < outerarray_size2; i++) {
+	if ( *(outerLayer + (j * outerarray_size2 + i)) == type) {          
+	  Int_t y = -(j-4);
+	  Int_t x =   i-5;
+	  Int_t xPos = Detector_size_x[1] * x;
+	  Int_t yPos = Detector_size_y[1] * y;	    
+	  a++;
+	  module_placement = new TGeoCombiTrans(xPos, yPos, 0.,  
+						module_rotation);
+	  gGeoMan->GetVolume(name)->
+	    AddNode(trd_mod[type-1], a, module_placement);
+	  
+	}
+      }
+    }
+  }  
 }

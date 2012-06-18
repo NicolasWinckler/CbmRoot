@@ -18,7 +18,7 @@
 // detector layers.
 const Int_t NrOfLayers = 10;
 const Int_t NrOfDifferentLayerTypes = 3;
-const Int_t layerType[NrOfLayers] = { 1, 11, 1, 11, 2, 12, 2, 12, 3, 13};//, 3, 13 };
+const Int_t layerType[NrOfLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31};//, 3, 13 };
 const Float_t layerPosition[NrOfLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950.};//, 6500, 8500 };
 const Float_t Layer_thickness=49.5; // Thickness of one layer of a TRD station
 const Float_t Layer_pitch=50.0; // Distance between 2 adjacent layers of a TRD s
@@ -392,11 +392,10 @@ void create_detector_layers(Int_t layer)
   //  TGeoAssembly* layerVolume = new TGeoAssembly("layer");
   trd_layer[layer-1] = new TGeoVolumeAssembly(name);
 
-  Int_t typeOfLayer = layerType[ layer-1 ];
+  Int_t typeOfLayer = layerType[ layer-1 ]/10;
+  Int_t isRotated = layerType[ layer-1 ]%10;
   TGeoRotation* module_rotation;
-  if ( typeOfLayer >  10) {
-    // this is one of the layers with rotated chambers;
-    typeOfLayer -= 10;
+  if ( 1 == isRotated) {
     module_rotation = new TGeoRotation();
     module_rotation->RotateZ(90.);
   } else {

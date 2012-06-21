@@ -116,33 +116,42 @@ const Float_t Frame_width[2]={ 1.5, 2. };         // Width of detector frames in
 const Float_t Detector_size_x[2] = { 60., 100.};
 const Float_t Detector_size_y[2] = { 60., 100.};
 
-const Float_t radiator_thickness    =  36.0 /2.;
-const Float_t radiator_position     =  - Layer_thickness /2. + radiator_thickness;
-const Float_t gas_thickness         =  1.2000 /2.;
-const Float_t gas_position          =  radiator_position + radiator_thickness + gas_thickness;
-const Float_t padplane_thickness    =   0.0030 /2.;
-const Float_t padplane_position     =  gas_position + gas_thickness + padplane_thickness;
-const Float_t mylar_thickness       =   0.1500 /2.;
-const Float_t mylar_position        =  padplane_position + padplane_thickness + mylar_thickness;
-const Float_t electronics_thickness =   0.0070 /2.;
-const Float_t electronics_position  =  mylar_position + mylar_thickness + electronics_thickness;
-const Float_t frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
-const Float_t frame_position        =  frame_thickness - Layer_thickness /2.;
+const Float_t radiator_thickness     =  36.0;    //  36 cm thickness of radiator
+const Float_t radiator_position      =  - Layer_thickness/2. + radiator_thickness/2.;
+				     
+const Float_t gas_thickness          =   1.2;    //  12 mm thickness of gas
+const Float_t gas_position           =  radiator_position + radiator_thickness/2. + gas_thickness/2.;
+				     
+// todo - put realistic thickness of padplane
+const Float_t padplane_thickness     =   0.0030; //  30 micron thickness of padplane
+const Float_t padplane_position      =  gas_position + gas_thickness/2. + padplane_thickness/2.;
+				     
+// todo - replace by backpanel
+const Float_t mylar_thickness        =   0.1500; //  1.5 mm thickness of mylar
+const Float_t mylar_position         =  padplane_position + padplane_thickness/2. + mylar_thickness/2.;
+				     
+// todo - skip, we have FEBs now
+const Float_t electronics_thickness  =   0.0070; //  70 micron thickness of padplane
+const Float_t electronics_position   =  mylar_position + mylar_thickness/2. + electronics_thickness/2.;
 
-const  Float_t febbox_thickness      =  10.0;   // 10 cm length of FEBs
-const  Float_t febbox_position       =  electronics_position + electronics_thickness + febbox_thickness/2.;
-const  Float_t feb_thickness         =  0.5;    //  5 mm thickness of FEBs
+const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
+const  Float_t febbox_position       =  electronics_position + electronics_thickness/2. + febbox_thickness/2.;
+const  Float_t feb_thickness         =   0.5;    //  5 mm thickness of FEBs
+
+const Float_t frame_thickness        =  radiator_thickness + gas_thickness + padplane_thickness 
+                                        + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
+const Float_t frame_position         =  - Layer_thickness /2. + frame_thickness/2.; 
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
-const TString keepingVolumeMedium ="air";
-const TString radiatorVolumeMedium ="polypropylene";
-const TString gasVolumeMedium ="TRDgas";
-const TString padVolumeMedium ="goldcoatedcopper";
-const TString mylarVolumeMedium ="mylar";
-const TString electronicsVolumeMedium ="goldcoatedcopper";
-const TString frameVolumeMedium ="G10";
-const TString febVolumeMedium ="pefoam20";
+const TString keepingVolumeMedium     = "air";
+const TString radiatorVolumeMedium    = "polypropylene";
+const TString gasVolumeMedium         = "TRDgas";
+const TString padVolumeMedium         = "goldcoatedcopper";
+const TString mylarVolumeMedium       = "mylar";
+const TString electronicsVolumeMedium = "goldcoatedcopper";
+const TString febVolumeMedium         = "pefoam20";  // todo - put correct FEB material here
+const TString frameVolumeMedium       = "G10";
 
 
 // some global variables
@@ -175,10 +184,8 @@ void Create_TRD_Geometry_v12xxx() {
   gGeoMan->SetVisLevel(10);  
   
   // Create the top volume 
-  TGeoBBox *topbox= new TGeoBBox("", 10000., 
-					 10000., 10000.);
-  TGeoVolume* top = new TGeoVolume("top", 
-				   topbox, gGeoMan->GetMedium("air"));
+  TGeoBBox *topbox= new TGeoBBox("", 10000., 10000., 10000.);
+  TGeoVolume* top = new TGeoVolume("top", topbox, gGeoMan->GetMedium("air"));
 
   //   TGeoVolume* top = new TGeoVolumeAssembly("TRD");
   gGeoMan->SetTopVolume(top);
@@ -193,7 +200,7 @@ void Create_TRD_Geometry_v12xxx() {
     //trd_v_12a->AddNode(trd_mod[iModule], 1, glob_trans);
   }
   
-  
+
   for (Int_t iLayer = 0; iLayer < NrOfLayers; iLayer++) {
     create_detector_layers(iLayer+1);
     glob_trans = new TGeoTranslation("", 0., 0., layerPosition[iLayer]);
@@ -297,29 +304,25 @@ void create_trd_module(Int_t moduleType)
   trd_mod[moduleType-1] = new TGeoVolumeAssembly(name);
    
    // Radiator
-   TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, 
-					 Active_area_y/2, radiator_thickness);
-   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd_mod%d_radiator", 
-					       moduleType), trd_radiator, 
-					       radVolMed);
+   TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, Active_area_y/2, radiator_thickness/2.);
+   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd_mod%d_radiator", moduleType), 
+                                               trd_radiator, radVolMed);
    trdmod1_radvol->SetLineColor(kBlue);
-   TGeoTranslation *trd_radiator_trans = new TGeoTranslation("", 0., 0., 
-							     radiator_position);
+   TGeoTranslation *trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 
 
    // Gas
-   TGeoBBox *trd_gas = new TGeoBBox("", Active_area_x/2, Active_area_y/2, 
-				    gas_thickness);
+   TGeoBBox *trd_gas = new TGeoBBox("", Active_area_x/2, Active_area_y/2, gas_thickness/2.);
    TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd_mod%d_gas", moduleType), 
 					       trd_gas, gasVolMed);
+   trdmod1_gasvol->SetLineColor(kYellow);
    TGeoTranslation *trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    gGeoMan->GetVolume(name)->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
 
 
    // Pad Plane
-   TGeoBBox *trd_pad = new TGeoBBox("", Active_area_x/2, Active_area_y/2, 
-				    padplane_thickness);
+   TGeoBBox *trd_pad = new TGeoBBox("", Active_area_x/2, Active_area_y/2, padplane_thickness/2.);
    TGeoVolume* trdmod1_padvol = new TGeoVolume(Form("trd_mod%d_padplane", moduleType), 
 					       trd_pad, padVolMed);
    TGeoTranslation *trd_pad_trans = new TGeoTranslation("", 0., 0., padplane_position);
@@ -327,8 +330,7 @@ void create_trd_module(Int_t moduleType)
 
 
    // mylar
-   TGeoBBox *trd_mylar = new TGeoBBox("", Active_area_x/2, Active_area_y/2, 
-				      mylar_thickness);
+   TGeoBBox *trd_mylar = new TGeoBBox("", Active_area_x/2, Active_area_y/2, mylar_thickness/2.);
    TGeoVolume* trdmod1_mylarvol = new TGeoVolume(Form("trd_mod%d_mylar", moduleType), 
 						 trd_mylar, mylarVolMed);
    TGeoTranslation *trd_mylar_trans = new TGeoTranslation("", 0., 0., mylar_position);
@@ -336,8 +338,7 @@ void create_trd_module(Int_t moduleType)
 
 
    // electronics
-   TGeoBBox *trd_el = new TGeoBBox("", Active_area_x/2, Active_area_y/2, 
-				   electronics_thickness);
+   TGeoBBox *trd_el = new TGeoBBox("", Active_area_x/2, Active_area_y/2, electronics_thickness/2.);
    TGeoVolume* trdmod1_elvol = new TGeoVolume(Form("trd_mod%d_electronics", moduleType), 
 					      trd_el, electronicsVolMed);
    trdmod1_elvol->SetLineColor(kGreen);
@@ -346,7 +347,7 @@ void create_trd_module(Int_t moduleType)
 
 
    // frame1
-   TGeoBBox *trd_frame1 = new TGeoBBox("", ModuleSizeX/2, frameWidth/2, frame_thickness);
+   TGeoBBox *trd_frame1 = new TGeoBBox("", ModuleSizeX/2, frameWidth/2, frame_thickness/2.);
    TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("trd_mod%d_frame1", moduleType), 
 						  trd_frame1, frameVolMed);
    trdmod1_frame1vol->SetLineColor(kRed);
@@ -362,8 +363,7 @@ void create_trd_module(Int_t moduleType)
 
 
    // frame2
-   TGeoBBox *trd_frame2 = new TGeoBBox("", frameWidth/2, Active_area_y/2, 
-				       frame_thickness);
+   TGeoBBox *trd_frame2 = new TGeoBBox("", frameWidth/2, Active_area_y/2, frame_thickness/2.);
    TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd_mod%d_frame2", moduleType), 
 						  trd_frame2, frameVolMed);
    trdmod1_frame2vol->SetLineColor(kRed);
@@ -416,7 +416,7 @@ void create_detector_layers(Int_t layer)
   trd_layer[layer-1] = new TGeoVolumeAssembly(name);
 
   Int_t typeOfLayer = layerType[ layer-1 ]/10;
-  Int_t isRotated = layerType[ layer-1 ]%10;
+  Int_t isRotated   = layerType[ layer-1 ]%10;
   TGeoRotation* module_rotation;
 
   if ( 1 == isRotated) {
@@ -424,7 +424,7 @@ void create_detector_layers(Int_t layer)
     module_rotation->RotateZ(90.);
   } else {
     module_rotation = new TGeoRotation();
-    module_rotation->RotateZ(0.);
+    module_rotation->RotateZ( 0.);
   }
   
   TGeoCombiTrans* module_placement;

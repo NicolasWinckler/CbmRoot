@@ -75,6 +75,7 @@ CbmUnigenGenerator::CbmUnigenGenerator(TString fileName)
         cout << "-I- CbmUnigenGenerator: we are in LAB frame" << endl;
     }
 
+    delete run;
     fInTree = (TTree*) fInputFile->Get("events");
     if(NULL == fInTree) {
 	Fatal("CbmUnigenGenerator","No event tree in input file.");

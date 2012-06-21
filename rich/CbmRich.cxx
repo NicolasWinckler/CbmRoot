@@ -344,9 +344,9 @@ void CbmRich::Print() const
 
 void CbmRich::Reset()
 {
-   fRichCollection->Clear();
-   fRichRefPlaneCollection->Clear();
-   fRichMirrorCollection->Clear();
+   fRichCollection->Delete();
+   fRichRefPlaneCollection->Delete();
+   fRichMirrorCollection->Delete();
    fPosIndex = 0;
 }
 

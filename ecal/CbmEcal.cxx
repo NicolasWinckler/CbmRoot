@@ -678,10 +678,10 @@ Bool_t CbmEcal::FillLitePoint(Int_t volnum)
 // -----   Public method EndOfEvent   --------------------------------------
 void CbmEcal::EndOfEvent() {
   if (fVerboseLevel) Print();
-  fEcalCollection->Clear();
+  fEcalCollection->Delete();
 
   if (fInf->GetFastMC()==0)
-    fLiteCollection->Clear();
+    fLiteCollection->Delete();
   fPosIndex = 0;
   fFirstNumber=0;
 }
@@ -700,9 +700,9 @@ TClonesArray* CbmEcal::GetCollection(Int_t iColl) const
 // -----   Public method Reset   -------------------------------------------
 void CbmEcal::Reset()
 {
-  fEcalCollection->Clear();
+  fEcalCollection->Delete();
   if (fInf->GetFastMC()==0)
-    fLiteCollection->Clear();
+    fLiteCollection->Delete();
   ResetParameters();
   fFirstNumber=0;
 }

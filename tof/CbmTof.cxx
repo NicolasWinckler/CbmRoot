@@ -132,7 +132,7 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
 // -----   Public method EndOfEvent   --------------------------------------
 void CbmTof::EndOfEvent() {
   if (fVerboseLevel) Print();
-  fTofCollection->Clear();
+  fTofCollection->Delete();
   fPosIndex = 0;
 }
 // -------------------------------------------------------------------------
@@ -170,7 +170,7 @@ void CbmTof::Print() const {
 
 // -----   Public method Reset   -------------------------------------------
 void CbmTof::Reset() {
-  fTofCollection->Clear();
+  fTofCollection->Delete();
   ResetParameters();
 }
 // -------------------------------------------------------------------------

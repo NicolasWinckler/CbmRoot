@@ -227,7 +227,7 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
 // -----   Public method EndOfEvent   --------------------------------------
 void CbmTrd::EndOfEvent() {
   if (fVerboseLevel) Print();
-  fTrdCollection->Clear();
+  fTrdCollection->Delete();
   fPosIndex = 0;
 }
 // -------------------------------------------------------------------------
@@ -265,7 +265,7 @@ void CbmTrd::Print() const {
 
 // -----   Public method Reset   -------------------------------------------
 void CbmTrd::Reset() {
-  fTrdCollection->Clear();
+  fTrdCollection->Delete();
   ResetParameters();
 }
 // -------------------------------------------------------------------------

@@ -313,6 +313,7 @@ void CbmStack::UpdateTrackIndex(TRefArray* detList) {
     }   // Collections of this detector
   }     // List of active detectors
 
+  delete detIter;
   cout << "...stack and " << nColl << " collections updated." << endl;
 
 }

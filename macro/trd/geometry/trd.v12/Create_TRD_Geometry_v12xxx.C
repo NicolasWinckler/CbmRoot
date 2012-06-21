@@ -411,7 +411,7 @@ void create_trd_module(Int_t moduleType)
 void create_detector_layers(Int_t layer)
 {
 
-  TString name = Form("trd_layer%d", layer);
+  TString name = Form("trd_layer%02d", layer);
   cout<<"Creating "<<name<<endl;
   trd_layer[layer-1] = new TGeoVolumeAssembly(name);
 

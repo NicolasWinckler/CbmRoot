@@ -109,7 +109,8 @@ Int_t layer3o[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
 // Parameters defining the layout of the different detector modules
 const Int_t NrModuleTypes=8;
 const Int_t TypeOfModule[NrModuleTypes]={0,0,0,0,1,1,1,1};
-const Int_t febs_per_module[NrModuleTypes] ={ 19, 10, 5, 3, 12, 6, 4, 3 }; 
+//const Int_t febs_per_module[NrModuleTypes] ={ 19, 10, 5, 3, 12, 6, 4, 3 }; 
+const Int_t febs_per_module[NrModuleTypes] ={ 19, 10, 5, 5, 12, 6, 4, 3 }; // mod4 = mod3
 
 const Float_t Frame_width[2]={ 1.5, 2. };         // Width of detector frames in cm
 const Float_t Detector_size_x[2] = { 60., 100.};
@@ -128,9 +129,9 @@ const Float_t electronics_position  =  mylar_position + mylar_thickness + electr
 const Float_t frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
 const Float_t frame_position        =  frame_thickness - Layer_thickness /2.;
 
-const  Float_t febbox_thickness      =  10.000 /2.;
-const  Float_t febbox_position       =  electronics_position + electronics_thickness + febbox_thickness/2;
-const  Float_t feb_thickness         =  .5/2;
+const  Float_t febbox_thickness      =  10.0;   // 10 cm length of FEBs
+const  Float_t febbox_position       =  electronics_position + electronics_thickness + febbox_thickness/2.;
+const  Float_t feb_thickness         =  0.5;    //  5 mm thickness of FEBs
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
@@ -181,7 +182,7 @@ void Create_TRD_Geometry_v12xxx() {
 
   //   TGeoVolume* top = new TGeoVolumeAssembly("TRD");
   gGeoMan->SetTopVolume(top);
-  TGeoVolume* trd_v_12a = new TGeoVolumeAssembly("trd_v_12a");
+  TGeoVolume* trd_v_12a = new TGeoVolumeAssembly("trd_v12g");
 
   TGeoTranslation *no_trans = new TGeoTranslation("", 0., 0., 0.);
   top->AddNode(trd_v_12a, 1);
@@ -205,7 +206,7 @@ void Create_TRD_Geometry_v12xxx() {
   gGeoMan->PrintOverlaps();
   gGeoMan->Test();
 
-  TFile* outfile = new TFile("TRD_geom_v12b.root","RECREATE");
+  TFile* outfile = new TFile("TRD_geom_v12g.root","RECREATE");
   //top->Write();
   gGeoMan->Write();
   outfile->Close();
@@ -389,8 +390,6 @@ void create_trd_module(Int_t moduleType)
      new TGeoVolume(Form("trd_mod%d_feb", moduleType), 
 		    trd_feb, febVolMed);
 
-   trdmod1_feb->SetLineColor(kBlack);
-
    // translations 
    TGeoTranslation *trd_feb_trans;
    Float_t feb_pos;
@@ -400,7 +399,8 @@ void create_trd_module(Int_t moduleType)
      feb_pos_y = feb_pos * Active_area_y;
 
      trd_feb_trans = new TGeoTranslation("", 0., feb_pos_y, 0.);
-     trdmod1_feb->SetLineColor(kBlack);
+     //     trdmod1_feb->SetLineColor(kBlack);   // set black
+     trdmod1_feb->SetLineColor(kBlue);    // set blue
      trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_trans);
    }
    trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);

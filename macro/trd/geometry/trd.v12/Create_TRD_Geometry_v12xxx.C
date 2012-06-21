@@ -209,8 +209,8 @@ void Create_TRD_Geometry_v12xxx() {
   
 
   gGeoMan->CloseGeometry();
-  gGeoMan->CheckOverlaps(0.001);
-  gGeoMan->PrintOverlaps();
+//  gGeoMan->CheckOverlaps(0.001);
+//  gGeoMan->PrintOverlaps();
   gGeoMan->Test();
 
   TFile* outfile = new TFile("TRD_geom_v12g.root","RECREATE");
@@ -392,16 +392,34 @@ void create_trd_module(Int_t moduleType)
 
    // translations 
    TGeoTranslation *trd_feb_trans;
+   TGeoRotation    *trd_feb_rotation;
+   TGeoCombiTrans  *trd_feb_placement;
    Float_t feb_pos;
    Float_t feb_pos_y;
+
+   Float_t feb_rotation_angle = 70.;   // 0.;   // 60.;
+   Float_t yback, zback;
+
+   trd_feb_rotation = new TGeoRotation();
+   trd_feb_rotation->RotateX(feb_rotation_angle);
+
+   // fix zback offset 0.3 at some point
+   yback = -    sin(feb_rotation_angle/180*3.141)  * febbox_thickness / 2.;
+   zback = - (1-cos(feb_rotation_angle/180*3.141)) * febbox_thickness / 2. + 0.3;
+
    for (Int_t iFeb = 0; iFeb < nrOfFebs; iFeb++) {
      feb_pos   = (2. * iFeb + 1) / (2 * nrOfFebs) - 0.5;
      feb_pos_y = feb_pos * Active_area_y;
 
-     trd_feb_trans = new TGeoTranslation("", 0., feb_pos_y, 0.);
      //     trdmod1_feb->SetLineColor(kBlack);   // set black
      trdmod1_feb->SetLineColor(kBlue);    // set blue
-     trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_trans);
+
+//     trd_feb_trans = new TGeoTranslation("", 0., feb_pos_y, 0.);
+//     trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_trans);
+
+//     trd_feb_placement = new TGeoCombiTrans(0., feb_pos_y, 0., trd_feb_rotation);
+     trd_feb_placement = new TGeoCombiTrans(0, feb_pos_y + yback, zback, trd_feb_rotation);
+     trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_placement);
    }
    trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);
    gGeoMan->GetVolume(name)->AddNode(trd_feb_box, 1, trd_febbox_trans);

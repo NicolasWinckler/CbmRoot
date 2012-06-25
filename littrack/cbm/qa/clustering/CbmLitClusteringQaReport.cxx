@@ -5,12 +5,15 @@
  * \date 2011
  */
 #include "CbmLitClusteringQaReport.h"
+#include "../base/CbmLitPropertyTree.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
+using std::endl;
 using boost::assign::list_of;
-using lit::ToString;
+using lit::NumberToString;
+using lit::Split;
 
 CbmLitClusteringQaReport::CbmLitClusteringQaReport()
 {
@@ -25,43 +28,30 @@ CbmLitClusteringQaReport::~CbmLitClusteringQaReport()
 void CbmLitClusteringQaReport::Create(
    ostream& out)
 {
+   fPT = new CbmLitPropertyTree(fQa);
+
    out.precision(3);
    out << fR->DocumentBegin();
-   out << (fTitle != "") ? fR->Title(0, fTitle) : string("");
+   out << fR->Title(0, fTitle);
 
-   // Number of objects table
-   out << fR->TableBegin("Number of objects statistics", list_of("")("MVD")("STS")("RICH")("TRD")("MUCH pix")("MUCH st")("TOF"));
-   out << PrintNofStatistics("Points", "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
-         "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
-   out << PrintNofStatistics("Digis", "hNofMvdDigis", "hNofStsDigis", "",
-         "hNofTrdDigis", "hNofMuchDigis", "", "");
-   out << PrintNofStatistics("Clusters", "hNofMvdClusters", "hNofStsClusters", "",
-         "hNofTrdClusters", "hNofMuchClusters", "", "");
-   out << PrintNofStatistics("Hits","hNofMvdHits", "hNofStsHits", "hNofRichHits",
-         "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
-   out << fR->TableEnd();
+   out << "Number of events: " << PrintValue("hen_EventNo_ClusteringQa.entries") << endl;
 
+   out << PrintNofObjects();
    out << PrintImages(".*clustering_qa_.*png");
-
    out <<  fR->DocumentEnd();
+
+   delete fPT;
 }
 
-string CbmLitClusteringQaReport::PrintNofStatistics(
-        const string& name,
-        const string& mvd,
-        const string& sts,
-        const string& rich,
-        const string& trd,
-        const string& muchP,
-        const string& muchS,
-        const string& tof)
+string CbmLitClusteringQaReport::PrintNofObjects() const
 {
-   string st1 = (mvd != "" && PropertyExists(mvd)) ? ToString<Int_t>(fQa.get(mvd, -1.)) : "-";
-   string st2 = (sts != "" && PropertyExists(sts)) ? ToString<Int_t>(fQa.get(sts, -1.)) : "-";
-   string st3 = (rich != "" && PropertyExists(rich)) ? ToString<Int_t>(fQa.get(rich, -1.)) : "-";
-   string st4 = (trd != "" && PropertyExists(trd)) ? ToString<Int_t>(fQa.get(trd, -1.)) : "-";
-   string st5 = (muchP != "" && PropertyExists(muchP)) ? ToString<Int_t>(fQa.get(muchP, -1.)) : "-";
-   string st6 = (muchS != "" && PropertyExists(muchS)) ? ToString<Int_t>(fQa.get(muchS, -1.)) : "-";
-   string st7 = (tof!= "" && PropertyExists(tof)) ? ToString<Int_t>(fQa.get(tof, -1.)) : "-";
-   return fR->TableRow(list_of(name)(st1)(st2)(st3)(st4)(st5)(st6)(st7));
+   	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hno_NofObjects_.+mean");
+   	map<string, Double_t>::const_iterator it;
+   	string str = fR->TableBegin("Number of objects per event", list_of("Name")("Value"));
+   	for (it = properties.begin(); it != properties.end(); it++) {
+   		string cellName = Split(it->first, '_')[2];
+   		str += fR->TableRow(list_of(cellName)(NumberToString<Int_t>(it->second)));
+   	}
+   	str += fR->TableEnd();
+   	return str;
 }

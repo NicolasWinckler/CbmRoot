@@ -11,7 +11,11 @@
 #include "../report/CbmLitSimulationReport.h"
 #include "TSystem.h"
 #include <string>
+#include <sstream>
 using std::string;
+using std::stringstream;
+
+class CbmLitPropertyTree;
 
 /**
  * \class CbmLitClusteringQaReport
@@ -63,15 +67,21 @@ private:
    /**
     *
     */
-   string PrintNofStatistics(
-           const string& name,
-           const string& mvd,
-           const string& sts,
-           const string& rich,
-           const string& trd,
-           const string& muchP,
-           const string& muchS,
-           const string& tof);
+   string PrintNofObjects() const;
+
+   /**
+    * \brief Print specified value.
+    * \param[in] hist full name of the property in property tree.
+    * \return string with table row in specific format.
+    */
+   string PrintValue(
+         const string& hist) const {
+      stringstream ss;
+      ss << fQa.get(hist, -1.);
+      return ss.str();
+   }
+
+   CbmLitPropertyTree* fPT;
 };
 
 #endif /* CBMLITCLUSTERINGQAREPORT_H_ */

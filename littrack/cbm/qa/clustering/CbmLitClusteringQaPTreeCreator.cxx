@@ -27,35 +27,20 @@ ptree CbmLitClusteringQaPTreeCreator::Create(
 
    ptree pt;
 
-   pt.put("hEventNo", (Int_t)fHM->H1F("hEventNo")->GetEntries());
+   pt.put("hen_EventNo_ClusteringQa.entries", (Int_t)fHM->H1F("hen_EventNo_ClusteringQa")->GetEntries());
 
-   NofStatisticsToPTree(pt, "hNofMvdPoints", "hNofStsPoints", "hNofRichPoints",
-         "hNofTrdPoints", "hNofMuchPoints", "hNofMuchPoints", "hNofTofPoints");
-   NofStatisticsToPTree(pt, "hNofMvdDigis", "hNofStsDigis", "",
-         "hNofTrdDigis", "hNofMuchDigis", "", "");
-   NofStatisticsToPTree(pt, "hNofMvdClusters", "hNofStsClusters", "",
-         "hNofTrdClusters", "hNofMuchClusters", "", "");
-   NofStatisticsToPTree(pt, "hNofMvdHits", "hNofStsHits", "hNofRichHits",
-         "hNofTrdHits", "hNofMuchPixelHits", "hNofMuchStrawHits", "hNofTofHits");
+   NofObjectsToPTree(pt);
 
    return pt;
 }
 
-void CbmLitClusteringQaPTreeCreator::NofStatisticsToPTree(
-   ptree& pt,
-   const string& mvd,
-   const string& sts,
-   const string& rich,
-   const string& trd,
-   const string& muchP,
-   const string& muchS,
-   const string& tof) const
+void CbmLitClusteringQaPTreeCreator::NofObjectsToPTree(
+   ptree& pt)
 {
-   if (mvd != "") { pt.put(mvd, (int)fHM->H1F(mvd)->GetMean()); }
-   if (sts != "") { pt.put(sts, (int)fHM->H1F(sts)->GetMean()); }
-   if (rich != "") { pt.put(rich, (int)fHM->H1F(rich)->GetMean()); }
-   if (trd != "") { pt.put(trd, (int)fHM->H1F(trd)->GetMean()); }
-   if (muchP != "") { pt.put(muchP, (int)fHM->H1F(muchP)->GetMean()); }
-   if (muchS != "") { pt.put(muchS, (int)fHM->H1F(muchS)->GetMean()); }
-   if (tof != "") { pt.put(tof, (int)fHM->H1F(tof)->GetMean()); }
+	vector<TH1*> histos = fHM->H1Vector("hno_NofObjects_.+");
+	Int_t nofHistos = histos.size();
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		string name = string(histos[iHist]->GetName()) + ".mean";
+		pt.put(name, histos[iHist]->GetMean());
+	}
 }

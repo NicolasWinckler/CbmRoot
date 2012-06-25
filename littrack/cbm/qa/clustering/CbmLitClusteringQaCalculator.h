@@ -64,11 +64,6 @@ private:
     */
    void IncreaseCounters();
 
-   /**
-    *
-    */
-   void NormalizeHistograms();
-
    // Pointers to data arrays
    TClonesArray* fMvdPoints; // CbmMvdPoint array
    TClonesArray* fMvdDigis; // CbmMvdDigi array

@@ -42,15 +42,8 @@ public:
 
 private:
 
-   void NofStatisticsToPTree(
-      ptree& pt,
-      const string& mvd,
-      const string& sts,
-      const string& rich,
-      const string& trd,
-      const string& muchP,
-      const string& muchS,
-      const string& tof) const;
+   void NofObjectsToPTree(
+      ptree& pt);
 
    // Pointer to histogram manager
    CbmLitHistManager* fHM;

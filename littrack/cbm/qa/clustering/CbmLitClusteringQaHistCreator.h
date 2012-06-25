@@ -8,6 +8,8 @@
 #ifndef CBMLITCLUSTERINGQAHISTCREATOR_H_
 #define CBMLITCLUSTERINGQAHISTCREATOR_H_
 
+#include "TObject.h"
+#include "cbm/base/CbmLitDetectorSetup.h"
 #include <string>
 class CbmLitHistManager;
 using std::string;
@@ -43,15 +45,32 @@ private:
    /**
     *
     */
-   void Create1FHist(
+   void CreateH1F(
          const string& name,
          const string& xTitle,
          const string& yTitle,
-         int nofBins,
-         float minBin,
-         float maxBin);
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin);
+
+   /**
+    *
+    */
+   void CreateNofObjectsHistograms(
+   		DetectorId detId,
+   		const string& detName);
+
+   /**
+    *
+    */
+   void CreateNofObjectsHistograms(
+   		DetectorId detId,
+   		const string& detName,
+   		const string& parameter,
+   		const string& xTitle);
 
    CbmLitHistManager* fHM; // Histogram manager for created histograms
+   CbmLitDetectorSetup fDet; // For detector setup determination
 };
 
 #endif /* CBMLITCLUSTERINGQAHISTCREATOR_H_ */

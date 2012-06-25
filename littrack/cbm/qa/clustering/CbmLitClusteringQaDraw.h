@@ -43,11 +43,8 @@ public:
 
 private:
 
-   void DrawHitsStationHisto(
-         const string& name,
-         TH1* hist);
-
-   void DrawHitsStationHistos();
+   void DrawHistogramsByPattern(
+         const string& histNamePattern);
 
    CbmLitHistManager* fHM; // Pointer to histogram manager
    string fOutputDir; // Output directory for images

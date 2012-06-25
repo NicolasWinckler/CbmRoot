@@ -31,23 +31,21 @@ void CbmLitClusteringQaDraw::Draw(
    fHM = histManager;
    fOutputDir = outputDir;
 
-   DrawHitsStationHistos();
+   DrawHistogramsByPattern("hno_NofObjects_.*_Station");
 }
 
-void CbmLitClusteringQaDraw::DrawHitsStationHisto(
-      const string& name,
-      TH1* hist)
+void CbmLitClusteringQaDraw::DrawHistogramsByPattern(
+      const string& histNamePattern)
 {
-   TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 800, 400);
-   DrawH1(hist, kLitLinear, kLitLinear);
-   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
-}
+	vector<TH1*> histos = fHM->H1Vector(histNamePattern);
+	if (histos.size() == 0) return;
+	Int_t nofHistos = histos.size();
+	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+		TH1* hist = histos[iHist];
+		string canvasName = string("clustering_qa_") + hist->GetName();
+		TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
+		DrawH1(hist, kLitLinear, kLitLinear);
+		if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
+	}
 
-void CbmLitClusteringQaDraw::DrawHitsStationHistos()
-{
-   DrawHitsStationHisto("clustering_qa_mvd_hits_station", fHM->H1("hMvdNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_sts_hits_station", fHM->H1("hStsNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_trd_hits_station", fHM->H1("hTrdNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_much_hits_station", fHM->H1("hMuchNofHitsInStation"));
-   DrawHitsStationHisto("clustering_qa_tof_hits_station", fHM->H1("hTofNofHitsInStation"));
 }

@@ -8,10 +8,11 @@
 #include "CbmLitClusteringQaHistCreator.h"
 #include "qa/base/CbmLitHistManager.h"
 #include "TH1F.h"
-#include <assert.h>
+#include <cassert>
 
 CbmLitClusteringQaHistCreator::CbmLitClusteringQaHistCreator():
-   fHM(NULL)
+   fHM(NULL),
+   fDet()
 {
 
 }
@@ -27,60 +28,74 @@ void CbmLitClusteringQaHistCreator::Create(
    assert(histManager != NULL);
    fHM = histManager;
 
-   const int maxNofStations = 100;
-   Create1FHist("hMvdNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
-   Create1FHist("hStsNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
-   Create1FHist("hTrdNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
-   Create1FHist("hMuchNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
-   Create1FHist("hTofNofPointsInStation", "Station number", "Number of points", maxNofStations, 0, maxNofStations);
+   fDet.DetermineSetup();
 
-   Create1FHist("hMvdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1FHist("hStsNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1FHist("hTrdNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1FHist("hMuchNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
-   Create1FHist("hTofNofHitsInStation", "Station number", "Number of hits", maxNofStations, 0, maxNofStations);
+   CreateNofObjectsHistograms(kMVD, "Mvd", "Station", "Station number");
+   CreateNofObjectsHistograms(kSTS, "Sts", "Station", "Station number");
+   CreateNofObjectsHistograms(kTRD, "Trd", "Station", "Station number");
+   CreateNofObjectsHistograms(kMUCH, "Much", "Station", "Station number");
+   CreateNofObjectsHistograms(kTOF, "Tof", "Station", "Station number");
 
-   int nofBinsC = 1000;
-   float maxXC = 50000.;
-
-   Create1FHist("hNofMvdPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofStsPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofRichPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofTrdPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofMuchPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofTofPoints", "Points per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1FHist("hNofMvdDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofStsDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofMuchDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofTrdDigis", "Digis per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1FHist("hNofMvdClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofStsClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofMuchClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofTrdClusters", "Clusters per event", "Counter", nofBinsC, 1., maxXC);
-
-   Create1FHist("hNofMvdHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofStsHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofRichHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofTrdHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofMuchPixelHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofMuchStrawHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
-   Create1FHist("hNofTofHits", "Hits per event", "Counter", nofBinsC, 1., maxXC);
+   CreateNofObjectsHistograms(kMVD, "Mvd");
+   CreateNofObjectsHistograms(kSTS, "Sts");
+   CreateNofObjectsHistograms(kTRD, "Trd");
+   CreateNofObjectsHistograms(kMUCH, "Much");
+   CreateNofObjectsHistograms(kTOF, "Tof");
+   CreateNofObjectsHistograms(kRICH, "Rich");
 
    // Histogram stores number of events
-   Create1FHist("hEventNo", "", "", 1, 0, 1.);
+   CreateH1F("hen_EventNo_ClusteringQa", "", "", 1, 0, 1.);
 }
 
-void CbmLitClusteringQaHistCreator::Create1FHist(
+void CbmLitClusteringQaHistCreator::CreateH1F(
       const string& name,
       const string& xTitle,
       const string& yTitle,
-      int nofBins,
-      float minBin,
-      float maxBin)
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin)
 {
-   TH1F* h = new TH1F(name.c_str(),
-         (name+";"+xTitle+";"+yTitle).c_str(), nofBins, minBin, maxBin);
+   TH1F* h = new TH1F(name.c_str(), (name + ";" + xTitle + ";" + yTitle).c_str(), nofBins, minBin, maxBin);
    fHM->Add(name, h);
+}
+
+void CbmLitClusteringQaHistCreator::CreateNofObjectsHistograms(
+		DetectorId detId,
+		const string& detName)
+{
+	assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
+	Int_t nofBins = 100000;
+	Double_t minX = 0.;
+	Double_t maxX = 100000.;
+	if (fDet.GetDet(detId)) {
+	   string name = "hno_NofObjects_" + detName;
+	   CreateH1F(name + "Points", "Points per event", "Counter", nofBins, minX, maxX);
+	   CreateH1F(name + "Digis", "Digis per event", "Counter", nofBins, minX, maxX);
+	   CreateH1F(name + "Clusters", "Clusters per event", "Counter", nofBins, minX, maxX);
+	   if (detId == kMUCH) {
+		   CreateH1F(name + "PixelHits", "Hits per event", "Counter", nofBins, minX, maxX);
+		   CreateH1F(name + "StrawHits", "Hits per event", "Counter", nofBins, minX, maxX);
+	   } else {
+		   CreateH1F(name + "Hits", "Hits per event", "Counter", nofBins, minX, maxX);
+	   }
+	}
+}
+
+void CbmLitClusteringQaHistCreator::CreateNofObjectsHistograms(
+		DetectorId detId,
+		const string& detName,
+		const string& parameter,
+		const string& xTitle)
+{
+	assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
+	Int_t nofBins = 100;
+	Double_t minX = 0.;
+	Double_t maxX = 100.;
+	if (fDet.GetDet(detId)) {
+	   string name = "hno_NofObjects_" + detName;
+	   CreateH1F(name + "Points_" + parameter, xTitle, "Points per event", nofBins, minX, maxX);
+	   CreateH1F(name + "Digis_" + parameter, xTitle, "Digis per event", nofBins, minX, maxX);
+	   CreateH1F(name + "Clusters_" + parameter, xTitle, "Clusters per event", nofBins, minX, maxX);
+	   CreateH1F(name + "Hits_" + parameter, xTitle, "Hits per event", nofBins, minX, maxX);
+	}
 }

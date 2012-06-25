@@ -66,7 +66,7 @@ public:
     */
    TH1F* H1F(
          const string& name) const {
-      if (fHistMap.count(name) == 0) {
+      if (fHistMap.count(name) == 0) { // Temporarily used for degugging
          std::cout << "fHistMap.count(name) == 0: name=" << name << std::endl;
       }
       assert(fHistMap.count(name) != 0);
@@ -102,7 +102,7 @@ public:
     */
    TH1* H1(
          const string& name) const {
-      if (fHistMap.count(name) == 0) {
+      if (fHistMap.count(name) == 0) { // Temporarily used for debugging
          std::cout << "H1: " <<  name << std::endl;
       }
       assert(fHistMap.count(name) != 0);
@@ -172,13 +172,6 @@ public:
     */
    void ScaleByPattern(
          const string& pattern,
-         Double_t scale);
-
-   /**
-    * \brief Scale all histograms.
-    * \param[in] scale Scale value.
-    */
-   void ScaleAll(
          Double_t scale);
 
    /**

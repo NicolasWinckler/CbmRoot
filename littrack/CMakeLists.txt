@@ -126,6 +126,9 @@ If(Boost_FOUND)
       cbm/qa/propagation/CbmLitPropagationQaDraw.cxx
       cbm/qa/propagation/CbmLitPropagationQaHistCreator.cxx
       cbm/qa/propagation/CbmLitPropagationQaCalculator.cxx
+      cbm/qa/fit/CbmLitFitQaCalculator.cxx
+      cbm/qa/fit/CbmLitFitQaHistCreator.cxx
+      cbm/qa/fit/CbmLitFitQaDraw.cxx
       cbm/qa/fit/CbmLitFitQaPTreeCreator.cxx
       cbm/qa/fit/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx

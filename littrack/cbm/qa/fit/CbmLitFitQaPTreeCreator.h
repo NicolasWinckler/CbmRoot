@@ -36,13 +36,11 @@ public:
          CbmLitHistManager* histManager);
 
 private:
-   void ResAndPullToPtree(
-         ptree& pt,
-         const string& histName);
+   void ResidualAndPullToPtree(
+         ptree& pt) const;
 
    void WrongCovToPtree(
-         ptree& pt,
-         const string& histName);
+         ptree& pt) const;
 
    CbmLitHistManager* fHM; // Histogram manager
 };

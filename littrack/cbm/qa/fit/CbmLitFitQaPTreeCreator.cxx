@@ -8,10 +8,10 @@
 #include "../base/CbmLitHistManager.h"
 #include "TH1.h"
 #include "TF1.h"
-
 #include <cassert>
 
-CbmLitFitQaPTreeCreator::CbmLitFitQaPTreeCreator()
+CbmLitFitQaPTreeCreator::CbmLitFitQaPTreeCreator():
+	fHM(NULL)
 {
 
 }
@@ -26,52 +26,36 @@ ptree CbmLitFitQaPTreeCreator::Create(
 {
    assert(histManager != NULL);
    fHM = histManager;
-
    ptree pt;
-
-   string parNames[] = {
-         "ResX", "ResY", "ResTx", "ResTy", "ResQp",
-         "PullX", "PullY", "PullTx", "PullTy", "PullQp"
-   };
-   string rpHistNames[] = {
-         "hStsFirst", "hStsLast", "hTrdFirst", "hTrdLast","hMuchFirst", "hMuchLast"
-   };
-   string wHistNames[] = {
-         "hStsFirstWrongCov", "hStsLastWrongCov", "hTrdFirstWrongCov", "hTrdLastWrongCov", "hMuchFirstWrongCov", "hMuchLastWrongCov"
-   };
-
-   for (UInt_t iHist = 0; iHist < 6; iHist++) {
-      for (UInt_t iPar = 0; iPar < 10; iPar++) {
-         ResAndPullToPtree(pt, rpHistNames[iHist] + parNames[iPar]);
-      }
-
-      for (UInt_t iPar = 0; iPar < 5; iPar++) {
-         WrongCovToPtree(pt, wHistNames[iHist] + parNames[iPar]);
-      }
-   }
-
+   ResidualAndPullToPtree(pt);
+   WrongCovToPtree(pt);
    return pt;
 }
 
-void CbmLitFitQaPTreeCreator::ResAndPullToPtree(
-      ptree& pt,
-      const string& histName)
+void CbmLitFitQaPTreeCreator::ResidualAndPullToPtree(
+      ptree& pt) const
 {
-   if (!fHM->Exists(histName)) return;
-   TH1* hist = fHM->H1(histName);
-   hist->Fit("gaus");
-   TF1* fit = hist->GetFunction("gaus");
-   Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
-   pt.put(histName + ".mean", hist->GetMean());
-   pt.put(histName + ".rms", hist->GetRMS());
-   pt.put(histName + ".sigma", sigma);
+	vector<TH1*> histos = fHM->H1Vector("htf_.+_.+_(Res|Pull)_.*");
+	Int_t nofHistos = histos.size();
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		TH1* hist = histos[iHist];
+		hist->Fit("gaus");
+		TF1* fit = hist->GetFunction("gaus");
+		Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
+		string histName = hist->GetName();
+		pt.put(histName + ".mean", hist->GetMean());
+		pt.put(histName + ".rms", hist->GetRMS());
+		pt.put(histName + ".sigma", sigma);
+	}
 }
 
 void CbmLitFitQaPTreeCreator::WrongCovToPtree(
-      ptree& pt,
-      const string& histName)
+      ptree& pt) const
 {
-   if (!fHM->Exists(histName)) return;
-   TH1* hist = fHM->H1(histName);
-   pt.put(histName + ".entries", hist->GetEntries());
+	vector<TH1*> histos = fHM->H1Vector("htf_.+_.+_WrongCov_.*");
+	Int_t nofHistos = histos.size();
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		string name = string(histos[iHist]->GetName()) + ".entries";
+		pt.put(name, histos[iHist]->GetEntries());
+	}
 }

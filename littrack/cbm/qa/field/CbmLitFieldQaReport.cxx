@@ -6,12 +6,9 @@
 #include "CbmLitFieldQaReport.h"
 #include "../report/CbmLitReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
-#include "TSystem.h"
 #include <cassert>
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/assign/list_inserter.hpp>
-using boost::property_tree::json_parser_error;
 using boost::assign::list_of;
 using boost::assign::push_back;
 using lit::ToString;
@@ -32,7 +29,7 @@ void CbmLitFieldQaReport::Create(
    out << fR->DocumentBegin() << std::endl;
    out << fR->Title(0, "Magnetic field QA") << std::endl;
    out << PrintSummaryTable();
-   out << PrintListOfImages();
+   out << PrintImages(".*field_qa_.*png");
    out << fR->DocumentEnd();
 }
 
@@ -89,18 +86,5 @@ std::string CbmLitFieldQaReport::PrintSummaryTable()
    }
    ss << fR->TableEnd();
 
-   return ss.str();
-}
-
-std::string CbmLitFieldQaReport::PrintListOfImages()
-{
-   stringstream ss;
-   ss << fR->Title(1, "List of images");
-   boost::property_tree::ptree pt = fQa.get_child("images.png");
-   for (boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++) {
-      boost::property_tree::ptree::value_type v = *it;
-      std::string imageName = pt.get(v.first, "");
-      ss << fR->Image(imageName, imageName);
-   }
    return ss.str();
 }

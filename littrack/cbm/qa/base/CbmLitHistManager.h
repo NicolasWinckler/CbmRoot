@@ -13,7 +13,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 class TFile;
 class TH1;
@@ -67,7 +67,7 @@ public:
    TH1F* H1F(
          const string& name) const {
       if (fHistMap.count(name) == 0) { // Temporarily used for degugging
-         std::cout << "fHistMap.count(name) == 0: name=" << name << std::endl;
+         std::cout << "Error: CbmHistManager::H1F(name): name=" << name << std::endl;
       }
       assert(fHistMap.count(name) != 0);
       return (TH1F*)fHistMap.find(name)->second;
@@ -103,7 +103,7 @@ public:
    TH1* H1(
          const string& name) const {
       if (fHistMap.count(name) == 0) { // Temporarily used for debugging
-         std::cout << "H1: " <<  name << std::endl;
+    	  std::cout << "Error: CbmHistManager::H1(name): name=" << name << std::endl;
       }
       assert(fHistMap.count(name) != 0);
       return fHistMap.find(name)->second;
@@ -140,27 +140,28 @@ public:
          TFile* file);
 
    /**
-    * \brief Clears memory. Removes all histograms.
+    * \brief Clear memory. Remove all histograms.
     */
    void Clear();
 
    /**
-    * \brief Shrinks empty bins in histogram for Xaxis from right side.
-    * \param[in, out] histName Name of histogram.
+    * \brief Shrink empty bins in histogram for Xaxis from right side.
+    * \param[in] histName Name of histogram.
     */
    void ShrinkEmptyBins(
          const string& histName);
 
    /**
-    * \brief Shrinks empty bins in histograms for Xaxis from right side.
-    * \param[in, out] histPatternName Regular expression for histogram name.
+    * \brief Shrink empty bins in histograms for Xaxis from right side.
+    * \param[in] histPatternName Regular expression for histogram name.
     */
    void ShrinkEmptyBinsByPattern(
          const string& pattern);
 
    /**
     * \brief Scale histogram.
-    * \param[in, out] histName Name of histogram.
+    * \param[in] histName Name of histogram.
+    * \param[in] scale Scaling factor.
     */
    void Scale(
          const string& histName,
@@ -168,7 +169,8 @@ public:
 
    /**
     * \brief Scale histograms which name matches specified pattern.
-    * \param[in, out] histPatternName Regular expression for histogram name.
+    * \param[in] histPatternName Regular expression for histogram name.
+    * \param[in] scale Scaling factor.
     */
    void ScaleByPattern(
          const string& pattern,
@@ -176,7 +178,8 @@ public:
 
    /**
     * \brief Rebin histogram.
-    * \param[in, out] histName Name of histogram.
+    * \param[in] histName Name of histogram.
+    * \param[in] ngroup Rebining factor.
     */
    void Rebin(
          const string& histName,
@@ -184,7 +187,8 @@ public:
 
    /**
     * \brief Rebin histograms which name matches specified pattern.
-    * \param[in, out] histPatternName Regular expression for histogram name.
+    * \param[in] histPatternName Regular expression for histogram name.
+    * \param[in] ngroup Rebining factor.
     */
    void RebinByPattern(
          const string& pattern,

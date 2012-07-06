@@ -12,16 +12,15 @@
 #include <vector>
 
 class FairField;
-class TH1D;
-class TH2D;
-class TGraph;
-class TGraph2D;
+class TH1;
+class TH2;
 class TList;
-class TF1;
-class TF2;
 class CbmLitFieldFitter;
 class CbmLitFieldGridCreator;
 class CBmLitPolynom;
+
+using std::vector;
+using std::string;
 
 /**
  * \class CbmLitFieldQa
@@ -69,8 +68,8 @@ public:
    virtual void SetParContainers();
 
    /* Setters */
-   void SetSliceZPosition(const std::vector<Double_t>& zPos) { fZpos = zPos; }
-   void SetPolynomDegrees(const std::vector<UInt_t>& degrees) { fPolynomDegrees = degrees; }
+   void SetSliceZPosition(const vector<Double_t>& zPos) { fZpos = zPos; }
+   void SetPolynomDegrees(const vector<UInt_t>& degrees) { fPolynomDegrees = degrees; }
    void SetCheckFieldMap(Bool_t checkFieldMap) { fCheckFieldMap = checkFieldMap; }
    void SetCheckFieldApproximation(Bool_t checkFieldApproximation) { fCheckFieldApproximation = checkFieldApproximation; }
    void SetCheckGridCreator(Bool_t isCheckGridCreator) { fCheckGridCreator = isCheckGridCreator; }
@@ -89,7 +88,7 @@ public:
    void SetNofBinsX(int nofBinsX) {fNofBinsX = nofBinsX;}
    void SetNofBinsY(int nofBinsY) {fNofBinsY = nofBinsY;}
    void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
-   void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
+   void SetOutputDir(const string& dir) {fOutputDir = dir;}
    void SetPolynomDegreeIndex(unsigned int degreeIndex) {fPolynomDegreeIndex = degreeIndex;}
 
 private:
@@ -142,14 +141,14 @@ private:
     */
    void DrawSlices(
          Int_t v,
-         const std::string& opt);
+         const string& opt);
 
    /**
     * \brief Draw comparison for different polynomial orders for each slice.
     * \param[in] opt "rel" for relative errors or "abs" for absolute errors.
     */
    void DrawPoly(
-         const std::string& opt);
+         const string& opt);
 
    /**
     * \brief Draw field map components for each slice.
@@ -160,6 +159,20 @@ private:
     * \brief Draw field map components along Z coordinate.
     */
    void DrawFieldAlongZ();
+
+   void DivideHistos(
+      TH1* histo1,
+      TH1* histo2,
+      TH1* histo3);
+
+   void SubtructHistos(
+      TH1* histo1,
+      TH1* histo2,
+      TH1* histo3);
+
+   void ConvertH2ToH1(
+      const TH2* h2,
+      TH1* h1);
 
    // Pointer to the magnetic field map
    FairField* fField;
@@ -173,12 +186,12 @@ private:
    // and lower right corner coordinate equals to [X, Y].
    // Z, X, Y coordinates for each slice.
    // [slice number]
-   std::vector<Double_t> fZpos; // Z position of the slice
-   std::vector<Double_t> fXpos; // X coordinate
-   std::vector<Double_t> fYpos; // Y coordinate
+   vector<Double_t> fZpos; // Z position of the slice
+   vector<Double_t> fXpos; // X coordinate
+   vector<Double_t> fYpos; // Y coordinate
 
    // Output directory for images
-   std::string fOutputDir;
+   string fOutputDir;
 
    //
    // Field approximation variables
@@ -198,9 +211,9 @@ private:
    // Number of polynoms for tests
    UInt_t fNofPolynoms;
    // Array with polynom degrees to be analyzed
-   std::vector<UInt_t> fPolynomDegrees;
+   vector<UInt_t> fPolynomDegrees;
    // Field fitter tool for each polynom degree
-   std::vector<CbmLitFieldFitter*> fFitter;
+   vector<CbmLitFieldFitter*> fFitter;
 
    //
    // Field grid
@@ -211,41 +224,38 @@ private:
    //
    // Field map along Z axis
    //
-   std::vector<Double_t> fAlongZAngles; // Polar angles [grad]
+   vector<Double_t> fAlongZAngles; // Polar angles [grad]
    Double_t fZMin; // Minimum Z position [cm]
    Double_t fZMax; // Maximum Z position [cm]
    Double_t fZStep; // Step size [cm]
 
-   //
-   // Histograms and graphs
-   //
-   // Field map graph for each component and each slice
+   // Field map for each component and each slice
    // [BX, BY, BZ, MOD][slice number]
-   std::vector<std::vector<TGraph2D*> >fhBGraph;
-   // Approximated field graph for each component, each slice and each polynom order
-   // [BX, BY, BZ, MOD][slice number][polynom order]
-   std::vector<std::vector<std::vector<TGraph2D*> > >fhBAprGraph;
-   // Grid field graph for each component and each slice
+   vector<vector<TH2*> >fhB;
+   // Polynomial approximation for each component, each slice and each polynomial order
+   // [BX, BY, BZ, MOD][slice number][polynomial order]
+   vector<vector<vector<TH2*> > >fhBPolynomial;
+   // Grid approximation for each component and each slice
    // [BX, BY, BZ][slice number]
-   std::vector<std::vector<TGraph2D*> > fhBGridGraph;
+   vector<vector<TH2*> > fhBGrid;
 
    // Error histograms for polynomial approximation
    // [BX, BY, BZ, MOD][slice number][polynom number]
-   std::vector<std::vector<std::vector<TH2D*> > >fhBErrH2D; // 2D absolute error error distribution in (X, Y)
-   std::vector<std::vector<std::vector<TH1D*> > >fhBErrH1D; // Absolute error
-   std::vector<std::vector<std::vector<TH1D*> > >fhBRelErrH1D; // Relative error
-   std::vector<std::vector<std::vector<TH2D*> > >fhBRelErrH2D; // 2D relative error distribution in (X, Y)
+   vector<vector<vector<TH2*> > >fhBPolynomialErrH2; // 2D absolute error error distribution in (X, Y)
+   vector<vector<vector<TH1*> > >fhBPolynomialErrH1; // Absolute error
+   vector<vector<vector<TH1*> > >fhBPolynomialRelErrH1; // Relative error
+   vector<vector<vector<TH2*> > >fhBPolynomialRelErrH2; // 2D relative error distribution in (X, Y)
 
-   // Error histograms for grid creator tool
+   // Error histograms for grid approximation
    // [BX, BY, BZ, MOD][slice number]
-   std::vector<std::vector<TH2D*> > fhBGridErrH2D; // 2D absolute error error distribution in (X, Y)
-   std::vector<std::vector<TH1D*> > fhBGridErrH1D; // Absolute error
-   std::vector<std::vector<TH1D*> > fhBGridRelErrH1D; // Relative error
-   std::vector<std::vector<TH2D*> > fhBGridRelErrH2D; // 2D relative error distribution in (X, Y)
+   vector<vector<TH2*> > fhBGridErrH2; // 2D absolute error error distribution in (X, Y)
+   vector<vector<TH1*> > fhBGridErrH1; // Absolute error
+   vector<vector<TH1*> > fhBGridRelErrH1; // Relative error
+   vector<vector<TH2*> > fhBGridRelErrH2; // 2D relative error distribution in (X, Y)
 
    // Field map values histograms along Z
    // [BX, BY, BZ][polar angle]
-   std::vector<std::vector<TGraph*> >fhBAlongZGraph;
+   vector<vector<TH1*> >fhBAlongZGraph;
 
    Bool_t fCheckFieldMap; // If true than field map is checked
    Bool_t fCheckFieldApproximation; // If true than field approximation is checked
@@ -267,9 +277,6 @@ private:
    static const Int_t BY = 1; // By
    static const Int_t BZ = 2; // Bz
    static const Int_t MOD = 3; // Mod = std::sqrt(Bx*Bx + By*By + Bz*Bz)
-
-   // Store image names
-   std::vector<std::string> fImageList;
 
    ClassDef(CbmLitFieldQa, 1);
 };

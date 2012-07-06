@@ -63,12 +63,6 @@ private:
     * \return String with summary table for field QA.
     */
    std::string PrintSummaryTable();
-
-   /**
-    * \brief Return string with images for field QA.
-    * \return  Return string with images for field QA.
-    */
-   std::string PrintListOfImages();
 };
 
 #endif /* CBMLITFIELDQAREPORT_H_ */

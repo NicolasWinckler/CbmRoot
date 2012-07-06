@@ -122,7 +122,7 @@ public:
     * \param[in] name Name of histogram.
     * \return True if histogram exists in manager.
     */
-   bool Exists(
+   Bool_t Exists(
          const string& name) const {
       return (fHistMap.count(name) == 0) ? false : true;
    }

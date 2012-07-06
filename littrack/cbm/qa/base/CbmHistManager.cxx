@@ -23,15 +23,17 @@ using std::map;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::exception;
+using std::sort;
 
 class CompareH1NameMore:
    public std::binary_function<
    const TH1*,
    const TH1*,
-   bool>
+   Bool_t>
 {
 public:
-   bool operator()(const TH1* hist1, const TH1* hist2) const {
+   Bool_t operator()(const TH1* hist1, const TH1* hist2) const {
       return string(hist1->GetName()) > string(hist2->GetName());
    }
 };
@@ -58,11 +60,11 @@ vector<TH1*> CbmHistManager::H1Vector(
 		for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
 			if (boost::regex_match(it->first, e)) histos.push_back(it->second);
 		}
-   } catch (std::exception& ex) {
-	   std::cout << "Exception in CbmHistManager::H1Vector: " << ex.what() << std::endl;
+   } catch (exception& ex) {
+	   cout << "Exception in CbmHistManager::H1Vector: " << ex.what() << endl;
    }
 
-   std::sort(histos.begin(), histos.end(), CompareH1NameMore());
+   sort(histos.begin(), histos.end(), CompareH1NameMore());
    return histos;
 }
 
@@ -82,7 +84,7 @@ void CbmHistManager::ReadFromFile(
    TDirectory* dir = gDirectory;
    TIter nextkey(dir->GetListOfKeys());
    TKey *key;
-   int c = 0;
+   Int_t c = 0;
    while (key = (TKey*) nextkey()) {
       TObject* obj = key->ReadObj();
       if (obj->IsA()->InheritsFrom (TH1::Class())) {
@@ -154,7 +156,7 @@ void CbmHistManager::Rebin(
 	TH1* hist = H1(histName);
 	if (ngroup > 1) {
 		hist->Rebin(ngroup);
-		hist->Scale(1. / (double)ngroup);
+		hist->Scale(1. / (Double_t)ngroup);
 	}
 }
 

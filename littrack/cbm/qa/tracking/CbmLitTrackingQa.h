@@ -13,7 +13,7 @@
 #include "../report/CbmLitReport.h"
 #include "cbm/base/CbmLitDetectorSetup.h"
 
-class CbmLitHistManager;
+class CbmHistManager;
 class CbmLitTrackingQaCalculator;
 
 using std::string;
@@ -95,7 +95,7 @@ public:
          const std::string& fileName);
 
 private:
-   CbmLitHistManager* fHM; // Histogram manager
+   CbmHistManager* fHM; // Histogram manager
    CbmLitTrackingQaCalculator* fTrackingQa; // Tracking performance calculator
    string fOutputDir; // Output directory for results
    CbmLitDetectorSetup fDet; // Detector presence information

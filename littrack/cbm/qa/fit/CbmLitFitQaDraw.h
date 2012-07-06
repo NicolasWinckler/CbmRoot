@@ -10,7 +10,7 @@
 
 #include <string>
 #include "TObject.h"
-class CbmLitHistManager;
+class CbmHistManager;
 using std::string;
 
 class CbmLitFitQaDraw {
@@ -31,14 +31,14 @@ public:
 	* \param[in] outputDir Output directory for images. If not specified images are not saved.
 	*/
 	void Draw(
-		 CbmLitHistManager* histManager,
+		 CbmHistManager* histManager,
 		 const string& outputDir = "");
 
 private:
 	void DrawResidualAndPullHistograms(
 	      const string& detName);
 
-	CbmLitHistManager* fHM; // Pointer to histogram manager
+	CbmHistManager* fHM; // Pointer to histogram manager
 	string fOutputDir; // Output directory for images
 };
 

@@ -5,7 +5,7 @@
  */
 #include "CbmLitPropagationQaCalculator.h"
 #include "CbmLitPropagationQaHistCreator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "../mc/CbmLitMCTrackCreator.h"
 #include "../mc/CbmLitMCPoint.h"
 #include "data/CbmLitTrack.h"
@@ -34,7 +34,7 @@
 using std::for_each;
 
 CbmLitPropagationQaCalculator::CbmLitPropagationQaCalculator(
-      CbmLitHistManager* histManager):
+      CbmHistManager* histManager):
    fGlobalTracks(NULL),
    fStsTracks(NULL),
    fStsTrackMatches(NULL),

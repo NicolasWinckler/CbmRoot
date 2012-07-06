@@ -5,7 +5,7 @@
  */
 
 #include "CbmLitFitQaHistCreator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "TH1F.h"
 #include <boost/assign/list_of.hpp>
 #include <cassert>
@@ -28,7 +28,7 @@ CbmLitFitQaHistCreator::~CbmLitFitQaHistCreator()
 }
 
 void CbmLitFitQaHistCreator::Create(
-      CbmLitHistManager* histManager)
+      CbmHistManager* histManager)
 {
    assert(histManager != NULL);
    fHM = histManager;

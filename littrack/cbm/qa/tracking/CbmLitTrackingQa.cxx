@@ -12,7 +12,7 @@
 #include "CbmLitTrackingQaPTreeCreator.h"
 #include "CbmLitTrackingQaReport.h"
 #include "qa/base/CbmLitResultChecker.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "qa/base/CbmHistManager.h"
 
 #include "TSystem.h"
 
@@ -53,7 +53,7 @@ CbmLitTrackingQa::~CbmLitTrackingQa()
 InitStatus CbmLitTrackingQa::Init()
 {
    // Create histogram manager which is used throughout the program
-   fHM = new CbmLitHistManager();
+   fHM = new CbmHistManager();
 
    fDet.DetermineSetup();
 
@@ -141,7 +141,7 @@ void CbmLitTrackingQa::DrawHistosFromFile(
       const std::string& fileName)
 {
    // read histograms from file
-   fHM = new CbmLitHistManager();
+   fHM = new CbmHistManager();
    TFile* file = new TFile(fileName.c_str());
    fHM->ReadFromFile(file);
    // recalculate efficiency histograms

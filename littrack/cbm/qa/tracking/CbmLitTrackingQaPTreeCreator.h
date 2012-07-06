@@ -11,7 +11,7 @@
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 
-class CbmLitHistManager;
+class CbmHistManager;
 
 using std::string;
 using boost::property_tree::ptree;
@@ -39,7 +39,7 @@ public:
     * \brief Print statistics to property tree and return property tree.
     */
    ptree Create(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
 private:
 
@@ -55,7 +55,7 @@ private:
    void NofGhostsToPTree(
    		ptree& pt);
 
-   CbmLitHistManager* fHM; // Pointer to histogram manager
+   CbmHistManager* fHM; // Pointer to histogram manager
 };
 
 #endif /* CBMLITTRACKINGQAPTREECREATOR_H_ */

@@ -6,7 +6,7 @@
 
 #include "CbmLitFitQaCalculator.h"
 #include "../mc/CbmLitMCTrackCreator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmTrack.h"
@@ -20,7 +20,7 @@
 #include "TH1.h"
 
 CbmLitFitQaCalculator::CbmLitFitQaCalculator(
-		CbmLitHistManager* histManager):
+		CbmHistManager* histManager):
 		fGlobalTracks(NULL),
 		fStsTracks(NULL),
 		fStsTrackMatches(NULL),

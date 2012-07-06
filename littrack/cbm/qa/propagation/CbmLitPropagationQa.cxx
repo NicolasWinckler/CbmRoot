@@ -9,7 +9,7 @@
 #include "CbmLitPropagationQaHistCreator.h"
 #include "CbmLitPropagationQaDraw.h"
 #include "CbmLitPropagationQaCalculator.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "qa/base/CbmHistManager.h"
 #include "qa/base/CbmLitResultChecker.h"
 
 #include "FairRunAna.h"
@@ -40,7 +40,7 @@ CbmLitPropagationQa::~CbmLitPropagationQa()
 
 InitStatus CbmLitPropagationQa::Init()
 {
-   fHM = new CbmLitHistManager();
+   fHM = new CbmHistManager();
 
    CbmLitPropagationQaHistCreator histCreator;
    histCreator.SetFixedBounds(fFixedBounds);

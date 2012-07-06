@@ -6,7 +6,7 @@
  */
 
 #include "CbmLitClusteringQaCalculator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "CbmHit.h"
 #include "CbmBaseHit.h"
 #include "FairRootManager.h"
@@ -15,7 +15,7 @@
 #include <assert.h>
 
 CbmLitClusteringQaCalculator::CbmLitClusteringQaCalculator(
-      CbmLitHistManager* histManager):
+      CbmHistManager* histManager):
       fMvdPoints(NULL),
       fMvdDigis(NULL),
       fMvdClusters(NULL),

@@ -26,7 +26,7 @@ class CbmMCTrack;
 class TClonesArray;
 class TH1;
 //class CbmLitGlobalElectronId;
-class CbmLitHistManager;
+class CbmHistManager;
 class CbmRichRingFitterEllipseTau;
 class CbmLitMCTrackCreator;
 class TFile;
@@ -48,7 +48,7 @@ public:
     * \brief Constructor.
     */
    CbmLitTrackingQaCalculator(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
    /**
     * \brief Destructor.
@@ -314,7 +314,7 @@ private:
 //   CbmRichRingFitterEllipseTau* fRichEllipseFitter; // ellipse fitter
 
    CbmLitMCTrackCreator* fMCTrackCreator;
-   CbmLitHistManager* fHM; // histogram manager
+   CbmHistManager* fHM; // histogram manager
 };
 
 #endif /* CBMLITTRACKINGQACALCULATOR_H_ */

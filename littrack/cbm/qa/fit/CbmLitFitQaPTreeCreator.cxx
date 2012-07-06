@@ -5,7 +5,7 @@
  */
 
 #include "CbmLitFitQaPTreeCreator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "TH1.h"
 #include "TF1.h"
 #include <cassert>
@@ -22,7 +22,7 @@ CbmLitFitQaPTreeCreator::~CbmLitFitQaPTreeCreator()
 }
 
 ptree CbmLitFitQaPTreeCreator::Create(
-      CbmLitHistManager* histManager)
+      CbmHistManager* histManager)
 {
    assert(histManager != NULL);
    fHM = histManager;

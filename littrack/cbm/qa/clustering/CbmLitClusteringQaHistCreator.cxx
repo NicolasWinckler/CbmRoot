@@ -6,7 +6,7 @@
  */
 
 #include "CbmLitClusteringQaHistCreator.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "qa/base/CbmHistManager.h"
 #include "TH1F.h"
 #include <cassert>
 
@@ -23,7 +23,7 @@ CbmLitClusteringQaHistCreator::~CbmLitClusteringQaHistCreator()
 }
 
 void CbmLitClusteringQaHistCreator::Create(
-      CbmLitHistManager* histManager)
+      CbmHistManager* histManager)
 {
    assert(histManager != NULL);
    fHM = histManager;

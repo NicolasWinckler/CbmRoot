@@ -11,7 +11,7 @@
 #include <string>
 using std::string;
 class TH1;
-class CbmLitHistManager;
+class CbmHistManager;
 
 /**
  * \class CbmLitClusteringQaDraw.h
@@ -38,7 +38,7 @@ public:
     * \param[in] outputDir Output directory for images. If not specified images are not saved.
     */
    void Draw(
-         CbmLitHistManager* histManager,
+         CbmHistManager* histManager,
          const string& outputDir = "");
 
 private:
@@ -46,7 +46,7 @@ private:
    void DrawHistogramsByPattern(
          const string& histNamePattern);
 
-   CbmLitHistManager* fHM; // Pointer to histogram manager
+   CbmHistManager* fHM; // Pointer to histogram manager
    string fOutputDir; // Output directory for images
 };
 

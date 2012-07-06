@@ -11,7 +11,7 @@
 #include "FairTask.h"
 #include <string>
 
-class CbmLitHistManager;
+class CbmHistManager;
 class CbmLitFitQaCalculator;
 
 using std::string;
@@ -78,7 +78,7 @@ private:
 
    string fOutputDir; // Output directory for images
 
-   CbmLitHistManager* fHM; // Histogram manager
+   CbmHistManager* fHM; // Histogram manager
    CbmLitFitQaCalculator* fFitQa; // Implementation of track fit QA
 
    ClassDef(CbmLitFitQa, 1)

@@ -8,7 +8,7 @@
 #ifndef CBMLITCLUSTERINGQACALCULATOR_H_
 #define CBMLITCLUSTERINGQACALCULATOR_H_
 
-class CbmLitHistManager;
+class CbmHistManager;
 class TClonesArray;
 class TH1;
 
@@ -25,7 +25,7 @@ public:
     * \brief Constructor
     */
    CbmLitClusteringQaCalculator(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
    /**
     * \brief Destructor.
@@ -92,7 +92,7 @@ private:
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 
-   CbmLitHistManager* fHM; // Pointer to histogram manager
+   CbmHistManager* fHM; // Pointer to histogram manager
 };
 
 #endif /* CBMLITCLUSTERINGQACALCULATOR_H_ */

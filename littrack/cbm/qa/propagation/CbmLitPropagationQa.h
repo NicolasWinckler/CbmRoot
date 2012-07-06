@@ -12,7 +12,7 @@
 
 #include "FairTask.h"
 
-class CbmLitHistManager;
+class CbmHistManager;
 class CbmLitPropagationQaCalculator;
 
 /**
@@ -72,7 +72,7 @@ private:
          const string& title,
          const string& resultDirectory);
 
-   CbmLitHistManager* fHM; // Histogram manager
+   CbmHistManager* fHM; // Histogram manager
    string fOutputDir; // Output directory for image files
    Bool_t fFixedBounds; // If true than fixed bounds are used for histograms
    Int_t fNofPlanes; // Number of planes in detector

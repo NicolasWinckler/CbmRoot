@@ -13,7 +13,7 @@
 #include <vector>
 using std::string;
 using std::vector;
-class CbmLitHistManager;
+class CbmHistManager;
 class CbmLitClusteringQaCalculator;
 
 class CbmLitClusteringQa : public FairTask
@@ -66,7 +66,7 @@ public:
           const string& title,
           const string& resultDirectory);
 private:
-    CbmLitHistManager* fHM; // Histogram manager
+    CbmHistManager* fHM; // Histogram manager
     CbmLitClusteringQaCalculator* fClusteringQa; // Clustering performance calculator
     string fOutputDir; // Output directory for results
 

@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "CbmLitTrackingQaHistCreator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "CbmMCTrack.h"
 
 #include "TH1.h"
@@ -368,7 +368,7 @@ string CbmLitTrackingQaHistCreator::LocalEfficiencyNormalization(
 }
 
 void CbmLitTrackingQaHistCreator::Create(
-      CbmLitHistManager* histManager)
+      CbmHistManager* histManager)
 {
    assert(histManager != NULL);
    fHM = histManager;

@@ -8,7 +8,7 @@
 #define CBMLITPROPAGATIONQAHISTCREATOR_H_
 
 #include "TObject.h"
-class CbmLitHistManager;
+class CbmHistManager;
 #include <string>
 using std::string;
 
@@ -53,14 +53,14 @@ public:
     * \param[in] histManager CbmLitQaHistManager to be filled with created histograms.
     */
    void Create(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
    /** Setters **/
    void SetFixedBounds(Bool_t fixedBounds) { fFixedBounds = fixedBounds; }
    void SetNofPlanes(Int_t nofPlanes) { fNofPlanes = nofPlanes; }
 
 private:
-   CbmLitHistManager* fHM; // Histogram manager for created histograms
+   CbmHistManager* fHM; // Histogram manager for created histograms
    Bool_t fFixedBounds; // True if use fixed bounds for histograms
    Int_t fNofPlanes; // Number of planes
 };

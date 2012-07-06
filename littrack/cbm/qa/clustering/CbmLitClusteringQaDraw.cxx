@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "CbmLitClusteringQaDraw.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "qa/base/CbmHistManager.h"
 #include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
@@ -24,7 +24,7 @@ CbmLitClusteringQaDraw::~CbmLitClusteringQaDraw()
 }
 
 void CbmLitClusteringQaDraw::Draw(
-      CbmLitHistManager* histManager,
+      CbmHistManager* histManager,
       const string& outputDir)
 {
    assert(histManager != NULL);

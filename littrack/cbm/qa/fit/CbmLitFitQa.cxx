@@ -9,7 +9,7 @@
 #include "CbmLitFitQaDraw.h"
 #include "CbmLitFitQaReport.h"
 #include "CbmLitFitQaCalculator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "../base/CbmLitResultChecker.h"
 
 #include <boost/property_tree/ptree.hpp>
@@ -38,7 +38,7 @@ CbmLitFitQa::~CbmLitFitQa()
 
 InitStatus CbmLitFitQa::Init()
 {
-   fHM = new CbmLitHistManager();
+   fHM = new CbmHistManager();
 
    // Create histograms
    CbmLitFitQaHistCreator histCreator;

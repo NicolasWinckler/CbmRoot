@@ -9,7 +9,7 @@
 
 #include "TObject.h"
 #include <string>
-class CbmLitHistManager;
+class CbmHistManager;
 using std::string;
 
 /**
@@ -37,7 +37,7 @@ public:
     * \param[in] outputDir Output directory for images. If not specified images are not saved.
     */
    void Draw(
-         CbmLitHistManager* histManager,
+         CbmHistManager* histManager,
          const string& outputDir = "");
 
    /** Setters **/
@@ -53,7 +53,7 @@ private:
       Int_t algorithmIndex,
       Int_t planeIndex);
 
-   CbmLitHistManager* fHM; // Histogram manager
+   CbmHistManager* fHM; // Histogram manager
    string fOutputDir; // Output directory for images
    Int_t fNofPlanes; // Number of planes
 };

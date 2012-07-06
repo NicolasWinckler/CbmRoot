@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "qa/base/CbmHistManager.h"
 #include "std/utils/CbmLitUtils.h"
 
 #include "TH1.h"
@@ -29,7 +29,7 @@ CbmLitTrackingQaPTreeCreator::~CbmLitTrackingQaPTreeCreator()
 }
 
 ptree CbmLitTrackingQaPTreeCreator::Create(
-      CbmLitHistManager* histManager)
+      CbmHistManager* histManager)
 {
    assert(histManager != NULL);
    fHM = histManager;

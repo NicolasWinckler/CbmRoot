@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "CbmLitClusteringQaPTreeCreator.h"
-#include "qa/base/CbmLitHistManager.h"
+#include "qa/base/CbmHistManager.h"
 #include "TH1F.h"
 
 CbmLitClusteringQaPTreeCreator::CbmLitClusteringQaPTreeCreator():
@@ -20,7 +20,7 @@ CbmLitClusteringQaPTreeCreator::~CbmLitClusteringQaPTreeCreator()
 }
 
 ptree CbmLitClusteringQaPTreeCreator::Create(
-      CbmLitHistManager* histManager)
+      CbmHistManager* histManager)
 {
    assert(histManager != NULL);
    fHM = histManager;

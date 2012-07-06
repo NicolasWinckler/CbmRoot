@@ -12,7 +12,7 @@
 #include "TObject.h"
 #include <string>
 #include <boost/function.hpp>
-class CbmLitHistManager;
+class CbmHistManager;
 using std::string;
 using std::vector;
 
@@ -40,7 +40,7 @@ public:
     * \param[in] histManager CbmLitQaHistManager to be filled with created histograms.
     */
    void Create(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
    /**
     * \brief Set properties of momentum axis in histograms.
@@ -182,7 +182,7 @@ private:
    Double_t fMaxAngle; // Maximum polar angle [grad]
    Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
 
-   CbmLitHistManager* fHM; // Histogram manager for created histograms
+   CbmHistManager* fHM; // Histogram manager for created histograms
 
    vector<string> fTrackCategories; // Vector of track category names
    vector<string> fRingCategories; // Vector of ring category names

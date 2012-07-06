@@ -5,7 +5,7 @@
  */
 #include "CbmLitPropagationQaDraw.h"
 #include "CbmLitPropagationQaHistCreator.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "std/utils/CbmLitUtils.h"
 #include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "TCanvas.h"
@@ -29,7 +29,7 @@ CbmLitPropagationQaDraw::~CbmLitPropagationQaDraw()
 }
 
 void CbmLitPropagationQaDraw::Draw(
-      CbmLitHistManager* histManager,
+      CbmHistManager* histManager,
       const std::string& outputDir)
 {
    assert(histManager != NULL);

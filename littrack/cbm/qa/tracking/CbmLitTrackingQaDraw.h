@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-class CbmLitHistManager;
+class CbmHistManager;
 class TH1;
 
 using std::vector;
@@ -44,7 +44,7 @@ public:
     * \param[in] outputDir Output directory for images. If not specified images are not saved.
     */
    void Draw(
-         CbmLitHistManager* histManager,
+         CbmHistManager* histManager,
          const string& outputDir = "");
 
 //   /**
@@ -116,7 +116,7 @@ private:
 //    */
 //   void DrawMCMomVsAngle();
 
-   CbmLitHistManager* fHM; // histogram manager
+   CbmHistManager* fHM; // histogram manager
 //   Int_t fRebin; // Rebining factor for histograms
    string fOutputDir; // Output directory for images
 };

@@ -14,7 +14,7 @@ class TClonesArray;
 class CbmLitTrack;
 class CbmGlobalTrack;
 class CbmLitMCTrackCreator;
-class CbmLitHistManager;
+class CbmHistManager;
 class CbmLitMCPoint;
 class CbmLitMCTrack;
 
@@ -31,7 +31,7 @@ public:
     * \brief Constructor.
     */
    CbmLitPropagationQaCalculator(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
    /**
     * \brief Destructor.
@@ -189,7 +189,7 @@ private:
    Int_t fNofPlanes; // Number of planes in detector
    Int_t fPDGCode; // PDG code for track propagation and fit
    Int_t fMinNofHits; // Cut on number of hits in track
-   CbmLitHistManager* fHM; // Histogram manager
+   CbmHistManager* fHM; // Histogram manager
 };
 
 #endif /* CBMLITPROPAGATIONQACALCULATOR_H_ */

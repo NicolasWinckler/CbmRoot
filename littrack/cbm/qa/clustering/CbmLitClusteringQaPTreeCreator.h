@@ -12,7 +12,7 @@
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
 using std::string;
-class CbmLitHistManager;
+class CbmHistManager;
 
 /**
  * \file CbmLitClusteringQaPTreeCreator.h
@@ -38,7 +38,7 @@ public:
     * \return property tree.
     */
    ptree Create(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
 private:
 
@@ -46,7 +46,7 @@ private:
       ptree& pt);
 
    // Pointer to histogram manager
-   CbmLitHistManager* fHM;
+   CbmHistManager* fHM;
 };
 
 #endif /* CBMLITCLUSTERINGQAPTREECREATOR_H_ */

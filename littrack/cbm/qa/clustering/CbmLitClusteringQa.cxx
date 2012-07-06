@@ -12,7 +12,7 @@
 #include "CbmLitClusteringQaReport.h"
 #include "CbmLitClusteringQaStudyReport.h"
 #include "CbmLitClusteringQaDraw.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "../base/CbmLitResultChecker.h"
 
 #include "TSystem.h"
@@ -39,7 +39,7 @@ CbmLitClusteringQa::~CbmLitClusteringQa()
 InitStatus CbmLitClusteringQa::Init()
 {
    // Create histogram manager which is used throughout the program
-   fHM = new CbmLitHistManager();
+   fHM = new CbmHistManager();
 
    // Create histograms
    CbmLitClusteringQaHistCreator histCreator;

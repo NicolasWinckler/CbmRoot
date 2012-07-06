@@ -12,7 +12,7 @@
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
 using std::string;
-class CbmLitHistManager;
+class CbmHistManager;
 
 class CbmLitFitQaPTreeCreator
 {
@@ -33,7 +33,7 @@ public:
     * \return Created property tree.
     */
    ptree Create(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
 private:
    void ResidualAndPullToPtree(
@@ -42,7 +42,7 @@ private:
    void WrongCovToPtree(
          ptree& pt) const;
 
-   CbmLitHistManager* fHM; // Histogram manager
+   CbmHistManager* fHM; // Histogram manager
 };
 
 #endif /* CBMLITFITQAPTREECREATOR_H_ */

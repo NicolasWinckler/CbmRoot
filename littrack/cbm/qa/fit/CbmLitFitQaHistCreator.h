@@ -9,7 +9,7 @@
 #define CBMLITFITQAHISTCREATOR_H_
 
 #include "cbm/base/CbmLitDetectorSetup.h"
-class CbmLitHistManager;
+class CbmHistManager;
 
 class CbmLitFitQaHistCreator {
 public:
@@ -28,7 +28,7 @@ public:
 	* \param[in] histManager CbmLitQaHistManager to be filled with created histograms.
 	*/
 	void Create(
-		 CbmLitHistManager* histManager);
+		 CbmHistManager* histManager);
 
 private:
 
@@ -37,7 +37,7 @@ private:
 			const string& detName);
 
 	Bool_t fIsFixedBounds; // if true than fixed bounds are used for histograms
-	CbmLitHistManager* fHM; // Histogram manager for created histograms
+	CbmHistManager* fHM; // Histogram manager for created histograms
 	CbmLitDetectorSetup fDet; // For detector setup determination
 };
 

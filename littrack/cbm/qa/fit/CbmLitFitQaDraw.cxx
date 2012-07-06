@@ -5,7 +5,7 @@
  */
 
 #include "CbmLitFitQaDraw.h"
-#include "../base/CbmLitHistManager.h"
+#include "../base/CbmHistManager.h"
 #include "../draw/CbmLitDrawHist.h"
 #include "utils/CbmLitUtils.h"
 #include "TCanvas.h"
@@ -26,7 +26,7 @@ CbmLitFitQaDraw::~CbmLitFitQaDraw()
 }
 
 void CbmLitFitQaDraw::Draw(
-      CbmLitHistManager* histManager,
+      CbmHistManager* histManager,
       const string& outputDir)
 {
    assert(histManager != NULL);

@@ -12,7 +12,7 @@
 #include <string>
 #include "TObject.h"
 using std::string;
-class CbmLitHistManager;
+class CbmHistManager;
 class TClonesArray;
 class FairTrackParam;
 class CbmLitMCPoint;
@@ -25,7 +25,7 @@ public:
 	 * \brief Constructor.
 	 */
 	CbmLitFitQaCalculator(
-			CbmLitHistManager* histManager);
+			CbmHistManager* histManager);
 
 	/**
 	 * \brief Destructor.
@@ -98,7 +98,7 @@ private:
 
 	Double_t fQuota; // percent of correctly attached hits
 
-	CbmLitHistManager* fHM; // Histogram manager
+	CbmHistManager* fHM; // Histogram manager
 	CbmLitMCTrackCreator* fMCTrackCreator; // MC track creator tool
 };
 

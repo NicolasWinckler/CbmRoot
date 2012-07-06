@@ -11,7 +11,7 @@
 #include "TObject.h"
 #include "cbm/base/CbmLitDetectorSetup.h"
 #include <string>
-class CbmLitHistManager;
+class CbmHistManager;
 using std::string;
 
 /**
@@ -38,7 +38,7 @@ public:
     * \param[in] histManager CbmLitQaHistManager to be filled with created histograms.
     */
    void Create(
-         CbmLitHistManager* histManager);
+         CbmHistManager* histManager);
 
 private:
 
@@ -69,7 +69,7 @@ private:
    		const string& parameter,
    		const string& xTitle);
 
-   CbmLitHistManager* fHM; // Histogram manager for created histograms
+   CbmHistManager* fHM; // Histogram manager for created histograms
    CbmLitDetectorSetup fDet; // For detector setup determination
 };
 

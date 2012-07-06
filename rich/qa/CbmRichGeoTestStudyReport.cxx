@@ -4,13 +4,15 @@
  * \date 2012
  */
 #include "CbmRichGeoTestStudyReport.h"
-#include "cbm/qa/report/CbmLitReportElement.h"
+#include "cbm/qa/report/CbmReportElement.h"
 
 #include "TSystem.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
+using std::endl;
+using std::stringstream;
 
 CbmRichGeoTestStudyReport::CbmRichGeoTestStudyReport()
 {

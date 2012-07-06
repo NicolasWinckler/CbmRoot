@@ -7,7 +7,7 @@
 #ifndef CBM_RICH_GEO_TEST_STUDY_REPORT
 #define CBM_RICH_GEO_TEST_STUDY_REPORT
 
-#include "cbm/qa/report/CbmLitStudyReport.h"
+#include "cbm/qa/report/CbmStudyReport.h"
 #include <string>
 #include "TSystem.h"
 using std::string;
@@ -25,7 +25,7 @@ using std::string;
  * \date 2012
  *
  */
-class CbmRichGeoTestStudyReport : public CbmLitStudyReport
+class CbmRichGeoTestStudyReport : public CbmStudyReport
 {
 public:
    /**

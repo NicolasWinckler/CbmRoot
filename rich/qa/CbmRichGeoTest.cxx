@@ -24,8 +24,8 @@
 #include "cbm/qa/draw/CbmLitDrawHist.h"
 #include "std/utils/CbmLitUtils.h"
 #include "CbmRichConverter.h"
-#include "cbm/qa/report/CbmLitReport.h"
-#include "cbm/qa/report/CbmLitStudyReport.h"
+//#include "cbm/qa/report/CbmReport.h"
+//#include "cbm/qa/report/CbmStudyReport.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -880,15 +880,15 @@ void CbmRichGeoTest::CreateStudyReport(
 {
    if (outputDir != "") gSystem->mkdir(outputDir.c_str(), true);
 
-   CbmLitStudyReport* report = new CbmRichGeoTestStudyReport();
+   CbmStudyReport* report = new CbmRichGeoTestStudyReport();
    report->SetTitle(title);
    cout << "Report can be found here: " << outputDir << endl;
    ofstream foutHtml(string(outputDir + "rich_geo_test_study.html").c_str());
    ofstream foutLatex(string(outputDir + "rich_geo_test_study.tex").c_str());
    ofstream foutText(string(outputDir + "rich_geo_test_study.txt").c_str());
-   report->Create(kLitHtml, foutHtml, resultDirectories, studyNames);
-   report->Create(kLitLatex, foutLatex, resultDirectories, studyNames);
-   report->Create(kLitText, foutText, resultDirectories, studyNames);
+   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
+   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
+   report->Create(kTextReport, foutText, resultDirectories, studyNames);
    delete report;
 }
 

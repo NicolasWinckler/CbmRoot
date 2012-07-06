@@ -11,7 +11,7 @@ using std::endl;
 
 void simple_geo_qa(Int_t nEvents = 1)
 {
-	TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v12a/"; // Output directory
+	TString dir = "/Users/andrey/Development/cbm/d/events/trd_test/v11d/"; // Output directory
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "simple.geo.qa.0000.root";

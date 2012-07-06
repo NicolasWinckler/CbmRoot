@@ -14,7 +14,7 @@ void field_qa(Int_t nEvents = 1)
 
 	TString dir, mcFile, parFile, outFile;
 	// Output directory
-	dir = "/data.local1/andrey/events/std_electron/";
+	dir = "./commit_tests/events_electron/";
 	// MC transport file
 	mcFile = dir + "mc.0000.root";
 	// Parameter file
@@ -45,9 +45,13 @@ void field_qa(Int_t nEvents = 1)
 	std::vector<Double_t> zPos;
 //   zPos.push_back(30.);
 //   zPos.push_back(50.);
-   zPos.push_back(100.);
-//   zPos.push_back(150.);
+   zPos.push_back(170.);
+   zPos.push_back(180.);
+   zPos.push_back(190.);
    zPos.push_back(200.);
+   zPos.push_back(210.);
+//   zPos.push_back(150.);
+//   zPos.push_back(200.);
 //   zPos.push_back(300.);
 //   zPos.push_back(400.);
    fieldQa->SetSliceZPosition(zPos);
@@ -61,12 +65,12 @@ void field_qa(Int_t nEvents = 1)
 
 	fieldQa->SetXangle(35.);
 	fieldQa->SetYangle(35.);
-	fieldQa->SetNofBinsX(30);
-	fieldQa->SetNofBinsY(30);
+	fieldQa->SetNofBinsX(100);
+	fieldQa->SetNofBinsY(100);
 
 	fieldQa->SetDrawFieldMap(true);
 	fieldQa->SetDrawFieldApproximation(true);
-   fieldQa->SetDrawGridCreator(true);
+    fieldQa->SetDrawGridCreator(true);
 	fieldQa->SetDrawBx(true);
 	fieldQa->SetDrawBy(true);
 	fieldQa->SetDrawBz(true);
@@ -74,7 +78,7 @@ void field_qa(Int_t nEvents = 1)
 	fieldQa->IsFixedBounds(false);
 	fieldQa->SetUseEllipseAcc(false);
 	fieldQa->SetPolynomDegreeIndex(0);
-	fieldQa->SetOutputDir("/u/andrey/cbm/trunk/cbmroot/macro/littrack/test3/");
+	fieldQa->SetOutputDir("./test/");
 	run->AddTask(fieldQa);
 
 	// -----  Parameter database   --------------------------------------------

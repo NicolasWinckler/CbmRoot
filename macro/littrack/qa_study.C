@@ -29,18 +29,18 @@ void qa_study()
       }
       outputDir = std::string(gSystem->Getenv("LIT_STUDY_OUTPUT_DIR"));
    } else {
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v10b_smearing_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v11c_smearing_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v11d_smearing_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12a_smearing_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12b_smearing_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12c_smearing_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12d_smearing_branch/");
+      //results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v10b_smearing_nn/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v11c_clustering_branch/");
+     // results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v11d_smearing_nn/");
+     // results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12a_smearing_nn/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12b_clustering_branch/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12c_clustering_branch/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12d_clustering_branch/");
 
-      names.push_back("v10b");
+     // names.push_back("v10b");
       names.push_back("v11c");
-      names.push_back("v11d");
-      names.push_back("v12a");
+    //  names.push_back("v11d");
+    //  names.push_back("v12a");
       names.push_back("v12b");
       names.push_back("v12c");
       names.push_back("v12d");

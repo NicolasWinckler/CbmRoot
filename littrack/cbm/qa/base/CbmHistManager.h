@@ -200,6 +200,15 @@ public:
     */
    string ToString() const;
 
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return Insertion stream in order to be able to call a succession of insertion operations.
+    */
+   friend std::ostream& operator<<(std::ostream& strm, const CbmHistManager& histManager) {
+      strm << histManager.ToString();
+      return strm;
+   }
+
 private:
    // Map of histogram name to its pointer
    map<string, TH1*> fHistMap;

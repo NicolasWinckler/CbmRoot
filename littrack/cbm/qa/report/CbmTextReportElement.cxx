@@ -1,23 +1,31 @@
 /**
- * \file CbmLitTextReportElement.cxx
+ * \file CbmTextReportElement.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitTextReportElement.h"
+#include "CbmTextReportElement.h"
 #include <sstream>
 #include <iomanip>
 
-CbmLitTextReportElement::CbmLitTextReportElement():
+using std::stringstream;
+using std::endl;
+using std::right;
+using std::setfill;
+using std::endl;
+using std::setw;
+using std::left;
+
+CbmTextReportElement::CbmTextReportElement():
    fColW(25)
 {
 }
 
-CbmLitTextReportElement::~CbmLitTextReportElement()
+CbmTextReportElement::~CbmTextReportElement()
 {
 
 }
 
-string CbmLitTextReportElement::TableBegin(
+string CbmTextReportElement::TableBegin(
       const string& caption,
       const vector<string>& colNames) const
 {
@@ -34,14 +42,14 @@ string CbmLitTextReportElement::TableBegin(
    return ss.str();
 }
 
-string CbmLitTextReportElement::TableEnd() const
+string CbmTextReportElement::TableEnd() const
 {
    stringstream ss;
    ss << endl;
    return ss.str();
 }
 
-string CbmLitTextReportElement::TableEmptyRow(
+string CbmTextReportElement::TableEmptyRow(
       Int_t nofCols,
       const string& name) const
 {
@@ -52,7 +60,7 @@ string CbmLitTextReportElement::TableEmptyRow(
    return ss.str();
 }
 
-string CbmLitTextReportElement::TableRow(
+string CbmTextReportElement::TableRow(
       const vector<string>& row) const
 {
    stringstream ss;
@@ -64,33 +72,33 @@ string CbmLitTextReportElement::TableRow(
    return ss.str();
 }
 
-string CbmLitTextReportElement::Image(
+string CbmTextReportElement::Image(
       const string& title,
       const string& file) const
 {
    return "";
 }
 
-string CbmLitTextReportElement::DocumentBegin() const
+string CbmTextReportElement::DocumentBegin() const
 {
    stringstream ss;
    ss << "------------------------------------------------" << endl;
    return ss.str();
 }
 
-string CbmLitTextReportElement::DocumentEnd() const
+string CbmTextReportElement::DocumentEnd() const
 {
    return "";
 }
 
-string CbmLitTextReportElement::Title(
+string CbmTextReportElement::Title(
       Int_t size,
       const string& title) const
 {
    return title;
 }
 
-string CbmLitTextReportElement::FormatCell(
+string CbmTextReportElement::FormatCell(
       const string& cell) const
 {
 	if (cell.size() <= fColW) {

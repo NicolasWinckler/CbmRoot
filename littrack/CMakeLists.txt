@@ -133,12 +133,12 @@ If(Boost_FOUND)
       cbm/qa/fit/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
-      cbm/qa/report/CbmLitReport.cxx      
-      cbm/qa/report/CbmLitStudyReport.cxx
-      cbm/qa/report/CbmLitSimulationReport.cxx
-      cbm/qa/report/CbmLitTextReportElement.cxx
-      cbm/qa/report/CbmLitHtmlReportElement.cxx       
-      cbm/qa/report/CbmLitLatexReportElement.cxx  
+      cbm/qa/report/CbmReport.cxx      
+      cbm/qa/report/CbmStudyReport.cxx
+      cbm/qa/report/CbmSimulationReport.cxx
+      cbm/qa/report/CbmTextReportElement.cxx
+      cbm/qa/report/CbmHtmlReportElement.cxx       
+      cbm/qa/report/CbmLatexReportElement.cxx  
       cbm/qa/draw/CbmLitDrawHist.cxx
   )  
 EndIf(Boost_FOUND)

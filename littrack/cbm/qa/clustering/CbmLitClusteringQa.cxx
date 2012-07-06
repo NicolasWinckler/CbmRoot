@@ -83,15 +83,15 @@ void CbmLitClusteringQa::CreateSimulationReport(
       const string& title,
       const string& resultDirectory)
 {
-   CbmLitSimulationReport* report = new CbmLitClusteringQaReport();
+   CbmSimulationReport* report = new CbmLitClusteringQaReport();
    report->SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/clustering_qa.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/clustering_qa.tex").c_str());
    ofstream foutText(string(fOutputDir + "/clustering_qa.txt").c_str());
-   report->Create(kLitText, cout, fOutputDir);
-   report->Create(kLitHtml, foutHtml, fOutputDir);
-   report->Create(kLitLatex, foutLatex, fOutputDir);
-   report->Create(kLitText, foutText, fOutputDir);
+   report->Create(kTextReport, cout, fOutputDir);
+   report->Create(kHtmlReport, foutHtml, fOutputDir);
+   report->Create(kLatexReport, foutLatex, fOutputDir);
+   report->Create(kTextReport, foutText, fOutputDir);
    delete report;
 }
 
@@ -100,15 +100,15 @@ void CbmLitClusteringQa::CreateStudyReport(
       const vector<string>& resultDirectories,
       const vector<string>& studyNames)
 {
-   CbmLitStudyReport* report = new CbmLitClusteringQaStudyReport();
+   CbmStudyReport* report = new CbmLitClusteringQaStudyReport();
    report->SetTitle(title);
    ofstream foutHtml(string(fOutputDir + "/clustering_qa_study.html").c_str());
    ofstream foutLatex(string(fOutputDir + "/clustering_qa_study.tex").c_str());
    ofstream foutText(string(fOutputDir + "/clustering_qa_study.txt").c_str());
 //   report->Create(kLitText, cout, resultDirectories, studyNames);
-   report->Create(kLitHtml, foutHtml, resultDirectories, studyNames);
-   report->Create(kLitLatex, foutLatex, resultDirectories, studyNames);
-   report->Create(kLitText, foutText, resultDirectories, studyNames);
+   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
+   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
+   report->Create(kTextReport, foutText, resultDirectories, studyNames);
    delete report;
 }
 ClassImp(CbmLitClusteringQa);

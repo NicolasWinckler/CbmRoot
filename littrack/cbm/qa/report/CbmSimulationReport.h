@@ -1,13 +1,13 @@
 /**
- * \file CbmLitSimulationReport.h
+ * \file CbmSimulationReport.h
  * \brief Base class for simulation reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITSIMULATIONREPORT_H_
-#define CBMLITSIMULATIONREPORT_H_
+#ifndef CBMSIMULATIONREPORT_H_
+#define CBMSIMULATIONREPORT_H_
 
-#include "CbmLitReport.h"
+#include "CbmReport.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 
@@ -16,23 +16,23 @@ using std::string;
 using boost::property_tree::ptree;
 
 /**
- * \class CbmLitSimulationReport
+ * \class CbmSimulationReport
  * \brief Base class for simulation reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitSimulationReport : public CbmLitReport
+class CbmSimulationReport : public CbmReport
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitSimulationReport();
+   CbmSimulationReport();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitSimulationReport();
+   virtual ~CbmSimulationReport();
 
    /**
     * \brief Main function which creates report file.
@@ -48,7 +48,7 @@ public:
     * \param[in] resultDirectory Path to directory with results.
     */
    void Create(
-         LitReportType reportType,
+         ReportType reportType,
          ostream& out,
          const string& resultDirectory);
 
@@ -81,4 +81,4 @@ protected:
    string fResultDirectory; // Directory with simulation results
 };
 
-#endif /* CBMLITSIMULATIONREPORT_H_ */
+#endif /* CBMSIMULATIONREPORT_H_ */

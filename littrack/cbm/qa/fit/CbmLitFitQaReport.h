@@ -7,7 +7,7 @@
 #ifndef CBMLITFITQAREPORT_H_
 #define CBMLITFITQAREPORT_H_
 
-#include "../report/CbmLitSimulationReport.h"
+#include "../report/CbmSimulationReport.h"
 #include "TSystem.h"
 
 /**
@@ -16,7 +16,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2012
  */
-class CbmLitFitQaReport : public CbmLitSimulationReport
+class CbmLitFitQaReport : public CbmSimulationReport
 {
 public:
    /**

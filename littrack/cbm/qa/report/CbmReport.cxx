@@ -1,13 +1,13 @@
 /**
- * \file CbmLitReport.cxx
+ * \file CbmReport.cxx
  * \brief Base class for reports.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitReport.h"
-#include "CbmLitLatexReportElement.h"
-#include "CbmLitHtmlReportElement.h"
-#include "CbmLitTextReportElement.h"
+#include "CbmReport.h"
+#include "CbmLatexReportElement.h"
+#include "CbmHtmlReportElement.h"
+#include "CbmTextReportElement.h"
 #include "std/utils/CbmLitUtils.h"
 
 #include "TSystem.h"
@@ -21,7 +21,7 @@ using std::ifstream;
 //using boost::filesystem::filesystem_error;
 //using boost::filesystem::directory_iterator;
 
-CbmLitReport::CbmLitReport():
+CbmReport::CbmReport():
    fTitle(""),
    fAuthor(""),
    fErrorColor(""),
@@ -32,24 +32,24 @@ CbmLitReport::CbmLitReport():
 {
 }
 
-CbmLitReport::~CbmLitReport()
+CbmReport::~CbmReport()
 {
 }
 
-void CbmLitReport::CreateReportElement(
-      LitReportType reportType)
+void CbmReport::CreateReportElement(
+      ReportType reportType)
 {
-   if (reportType == kLitLatex) fR = new CbmLitLatexReportElement();
-   else if (reportType == kLitHtml) fR = new CbmLitHtmlReportElement();
-   else if (reportType == kLitText) fR = new CbmLitTextReportElement();
+   if (reportType == kLatexReport) fR = new CbmLatexReportElement();
+   else if (reportType == kHtmlReport) fR = new CbmHtmlReportElement();
+   else if (reportType == kTextReport) fR = new CbmTextReportElement();
 }
 
-void CbmLitReport::DeleteReportElement()
+void CbmReport::DeleteReportElement()
 {
    if (NULL != fR) delete fR;
 }
 
-vector<string> CbmLitReport::GetImages(
+vector<string> CbmReport::GetImages(
 		   const string& dir,
 		   const string& pattern) const
 {
@@ -59,7 +59,7 @@ vector<string> CbmLitReport::GetImages(
 //	try {
 //		if (exists(p)) {
 //			if (is_regular_file(p)) {
-//				cout << "CbmLitReport::GetImageList: " << p << " is a regular file not a directory!" << '\n';
+//				cout << "CbmReport::GetImageList: " << p << " is a regular file not a directory!" << '\n';
 //			} else if (is_directory(p)) {
 //				vector<path> v;
 //		        copy(directory_iterator(p), directory_iterator(), back_inserter(v));
@@ -71,15 +71,15 @@ vector<string> CbmLitReport::GetImages(
 //				}
 //				return images;
 //			} else {
-//				cout << "CbmLitReport::GetImageList: " << p << " exists, but is neither a regular file nor a directory!\n";
+//				cout << "CbmReport::GetImageList: " << p << " exists, but is neither a regular file nor a directory!\n";
 //			}
 //		} else {
-//			cout << "CbmLitReport::GetImageList: " << p << " does not exist\n";
+//			cout << "CbmReport::GetImageList: " << p << " does not exist\n";
 //		}
 //	} catch (const filesystem_error& ex) {
-//		cout << "CbmLitReport::GetImageList: " << ex.what() << '\n';
+//		cout << "CbmReport::GetImageList: " << ex.what() << '\n';
 //	} catch (const exception& ex) {
-//		cout << "CbmLitReport::GetImageList: " << ex.what() << '\n';
+//		cout << "CbmReport::GetImageList: " << ex.what() << '\n';
 //	}
 //	return vector<string>();
 

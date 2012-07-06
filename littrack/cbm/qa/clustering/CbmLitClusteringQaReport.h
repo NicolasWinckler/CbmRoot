@@ -8,7 +8,7 @@
 #ifndef CBMLITCLUSTERINGQAREPORT_H_
 #define CBMLITCLUSTERINGQAREPORT_H_
 
-#include "../report/CbmLitSimulationReport.h"
+#include "../report/CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 #include <sstream>
@@ -23,7 +23,7 @@ class CbmLitPropertyTree;
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitClusteringQaReport : public CbmLitSimulationReport
+class CbmLitClusteringQaReport : public CbmSimulationReport
 {
 public:
    /**

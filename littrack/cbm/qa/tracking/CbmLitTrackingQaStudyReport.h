@@ -7,7 +7,7 @@
 #ifndef CBMLITTRACKINGQASTUDYREPORT_H_
 #define CBMLITTRACKINGQASTUDYREPORT_H_
 
-#include "../report/CbmLitStudyReport.h"
+#include "../report/CbmStudyReport.h"
 #include <string>
 #include <vector>
 #include "TSystem.h"
@@ -29,7 +29,7 @@ class CbmLitPropertyTree;
  * \date 2011
  *
  */
-class CbmLitTrackingQaStudyReport : public CbmLitStudyReport
+class CbmLitTrackingQaStudyReport : public CbmStudyReport
 {
 public:
    /**

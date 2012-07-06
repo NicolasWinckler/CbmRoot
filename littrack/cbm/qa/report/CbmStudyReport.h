@@ -1,13 +1,13 @@
 /**
- * \file CbmLitStudyReport.h
+ * \file CbmStudyReport.h
  * \brief Base class for study reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITSTUDYREPORT_H_
-#define CBMLITSTUDYREPORT_H_
+#ifndef CBMSTUDYREPORT_H_
+#define CBMSTUDYREPORT_H_
 
-#include "CbmLitReport.h"
+#include "CbmReport.h"
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 
@@ -17,23 +17,23 @@ using std::ostream;
 using boost::property_tree::ptree;
 
 /**
- * \class CbmLitStudyReport
+ * \class CbmStudyReport
  * \brief Base class for study reports.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitStudyReport : public CbmLitReport
+class CbmStudyReport : public CbmReport
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitStudyReport();
+   CbmStudyReport();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitStudyReport();
+   virtual ~CbmStudyReport();
 
    /**
     * \brief Main function which creates report file.
@@ -50,7 +50,7 @@ public:
     * \param[in] studyNames Names of studies.
     */
    void Create(
-         LitReportType reportType,
+         ReportType reportType,
          ostream& out,
          const vector<string>& resultDirectories,
          const vector<string>& studyNames);
@@ -94,4 +94,4 @@ protected:
    vector<string> fStudyNames; // Names of studies
 };
 
-#endif /* CBMLITSTUDYREPORT_H_ */
+#endif /* CBMSTUDYREPORT_H_ */

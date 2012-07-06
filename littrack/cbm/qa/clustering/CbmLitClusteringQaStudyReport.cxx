@@ -5,13 +5,14 @@
  * \date 2011
  */
 #include "CbmLitClusteringQaStudyReport.h"
-#include "../report/CbmLitReportElement.h"
+#include "../report/CbmReportElement.h"
 #include "../std/utils/CbmLitUtils.h"
 
 #include "TSystem.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
+using std::endl;
 using boost::assign::list_of;
 using lit::ToString;
 

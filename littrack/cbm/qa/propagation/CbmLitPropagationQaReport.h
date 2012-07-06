@@ -7,7 +7,7 @@
 #ifndef CBMLITPROPAGATIONQAREPORT_H_
 #define CBMLITPROPAGATIONQAREPORT_H_
 
-#include "../report/CbmLitSimulationReport.h"
+#include "../report/CbmSimulationReport.h"
 #include "TSystem.h"
 
 /**
@@ -16,7 +16,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2012
  */
-class CbmLitPropagationQaReport : public CbmLitSimulationReport
+class CbmLitPropagationQaReport : public CbmSimulationReport
 {
 public:
    /**

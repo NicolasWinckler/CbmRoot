@@ -1,85 +1,85 @@
 /**
- * \file CbmLitHtmlReportElement.h
- * \brief Implementation of CbmLitReportElement for HTML output.
+ * \file CbmHtmlReportElement.h
+ * \brief Implementation of CbmReportElement for HTML output.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITHTMLREPORTELEMENT_H_
-#define CBMLITHTMLREPORTELEMENT_H_
+#ifndef CBMHTMLREPORTELEMENT_H_
+#define CBMHTMLREPORTELEMENT_H_
 
-#include "CbmLitReportElement.h"
+#include "CbmReportElement.h"
 #include <string>
 
 using std::string;
 using std::vector;
 
 /**
- * \class CbmLitHtmlReportElement
- * \brief Implementation of CbmLitReportElement for text output.
+ * \class CbmHtmlReportElement
+ * \brief Implementation of CbmReportElement for text output.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitHtmlReportElement: public CbmLitReportElement
+class CbmHtmlReportElement: public CbmReportElement
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitHtmlReportElement();
+   CbmHtmlReportElement();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitHtmlReportElement();
+   virtual ~CbmHtmlReportElement();
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string TableBegin(
          const string& caption,
          const vector<string>& colNames) const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string TableEnd() const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string TableEmptyRow(
          int nofCols,
          const string& name) const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string TableRow(
          const vector<string>& row) const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string Image(
          const string& title,
          const string& file) const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string DocumentBegin() const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string DocumentEnd() const;
 
    /**
-    * \brief Inherited from CbmLitReportElement.
+    * \brief Inherited from CbmReportElement.
     */
    virtual string Title(
          int size,
          const string& title) const;
 };
 
-#endif /* CBMLITHTMLREPORTELEMENT_H_ */
+#endif /* CBMHTMLREPORTELEMENT_H_ */

@@ -4,7 +4,7 @@
  * \date 2012
  */
 #include "CbmLitFitQaReport.h"
-#include "../report/CbmLitReportElement.h"
+#include "../report/CbmReportElement.h"
 #include "std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>

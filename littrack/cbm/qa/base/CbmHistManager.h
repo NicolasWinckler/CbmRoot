@@ -1,12 +1,12 @@
 /**
- * \file CbmLitHistManager.h
+ * \file CbmHistManager.h
  * \brief Histogram manager.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
 
-#ifndef CBMLITHISTMANAGER_H_
-#define CBMLITHISTMANAGER_H_
+#ifndef CBMHISTMANAGER_H_
+#define CBMHISTMANAGER_H_
 
 #include "TObject.h"
 #include <iostream>
@@ -28,24 +28,24 @@ using std::string;
 using std::vector;
 
 /**
- * \class CbmLitHistManager
+ * \class CbmHistManager
  * \brief Histogram manager.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitHistManager
+class CbmHistManager
 {
 public:
 
    /**
     * \brief Constructor.
     */
-   CbmLitHistManager();
+   CbmHistManager();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitHistManager();
+   virtual ~CbmHistManager();
 
    /**
     * \brief Add new histogram to manager.
@@ -205,4 +205,4 @@ private:
    map<string, TH1*> fHistMap;
 };
 
-#endif /* CBMLITHISTMANAGER_H_ */
+#endif /* CBMHISTMANAGER_H_ */

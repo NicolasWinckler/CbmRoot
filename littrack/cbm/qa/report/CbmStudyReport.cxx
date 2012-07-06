@@ -1,10 +1,10 @@
 /**
- * \file CbmLitStudyReport.cxx
+ * \file CbmStudyReport.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitStudyReport.h"
-#include "CbmLitReportElement.h"
+#include "CbmStudyReport.h"
+#include "CbmReportElement.h"
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 #include <cassert>
@@ -15,25 +15,25 @@ using boost::assign::list_of;
 using std::cout;
 using std::stringstream;
 
-CbmLitStudyReport::CbmLitStudyReport()
+CbmStudyReport::CbmStudyReport()
 {
 
 }
 
-CbmLitStudyReport::~CbmLitStudyReport()
+CbmStudyReport::~CbmStudyReport()
 {
 
 }
 
-bool CbmLitStudyReport::PropertyExists(
+bool CbmStudyReport::PropertyExists(
       const std::string& name) const
 {
    assert(fQa.size() != 0);
    return (fQa[0].count(name) != 0) ? true : false;
 }
 
-void CbmLitStudyReport::Create(
-      LitReportType reportType,
+void CbmStudyReport::Create(
+      ReportType reportType,
       ostream& out,
       const vector<string>& resultDirectories,
       const vector<string>& studyNames)
@@ -74,7 +74,7 @@ void CbmLitStudyReport::Create(
    DeleteReportElement();
 }
 
-string CbmLitStudyReport::PrintImageTable(
+string CbmStudyReport::PrintImageTable(
       const string& title,
       const string& file) const
 {
@@ -97,7 +97,7 @@ string CbmLitStudyReport::PrintImageTable(
    return ss.str();
 }
 
-string CbmLitStudyReport::PrintImages(
+string CbmStudyReport::PrintImages(
 		const string& pattern) const
 {
 	string str = "";

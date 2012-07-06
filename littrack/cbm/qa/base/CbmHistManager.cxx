@@ -1,11 +1,11 @@
 /**
- * \file CbmLitHistManager.cxx
+ * \file CbmHistManager.cxx
  * \brief Histogram manager.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
 
-#include "CbmLitHistManager.h"
+#include "CbmHistManager.h"
 #include "TH1.h"
 #include "TFile.h"
 #include "TDirectory.h"
@@ -36,18 +36,18 @@ public:
    }
 };
 
-CbmLitHistManager::CbmLitHistManager():
+CbmHistManager::CbmHistManager():
       fHistMap()
 {
 
 }
 
-CbmLitHistManager::~CbmLitHistManager()
+CbmHistManager::~CbmHistManager()
 {
 
 }
 
-vector<TH1*> CbmLitHistManager::H1Vector(
+vector<TH1*> CbmHistManager::H1Vector(
       const string& pattern) const
 {
    vector<TH1*> histos;
@@ -59,14 +59,14 @@ vector<TH1*> CbmLitHistManager::H1Vector(
 			if (boost::regex_match(it->first, e)) histos.push_back(it->second);
 		}
    } catch (std::exception& ex) {
-	   std::cout << "Exception in CbmLitHistManager::H1Vector: " << ex.what() << std::endl;
+	   std::cout << "Exception in CbmHistManager::H1Vector: " << ex.what() << std::endl;
    }
 
    std::sort(histos.begin(), histos.end(), CompareH1NameMore());
    return histos;
 }
 
-void CbmLitHistManager::WriteToFile()
+void CbmHistManager::WriteToFile()
 {
    map<string, TH1*>::iterator it;
    for (it = fHistMap.begin(); it != fHistMap.end(); it++){
@@ -74,11 +74,11 @@ void CbmLitHistManager::WriteToFile()
    }
 }
 
-void CbmLitHistManager::ReadFromFile(
+void CbmHistManager::ReadFromFile(
       TFile* file)
 {
    assert(file != NULL);
-   cout << "-I- CbmLitHistManager::ReadFromFile" << endl;
+   cout << "-I- CbmHistManager::ReadFromFile" << endl;
    TDirectory* dir = gDirectory;
    TIter nextkey(dir->GetListOfKeys());
    TKey *key;
@@ -94,7 +94,7 @@ void CbmLitHistManager::ReadFromFile(
    }
 }
 
-void CbmLitHistManager::Clear()
+void CbmHistManager::Clear()
 {
    map<string, TH1*>::iterator it;
    for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
@@ -103,7 +103,7 @@ void CbmLitHistManager::Clear()
    fHistMap.clear();
 }
 
-void CbmLitHistManager::ShrinkEmptyBins(
+void CbmHistManager::ShrinkEmptyBins(
       const string& histName)
 {
    TH1* hist = H1(histName);
@@ -119,7 +119,7 @@ void CbmLitHistManager::ShrinkEmptyBins(
    hist->GetXaxis()->SetRange(1, shrinkBin + 1);
 }
 
-void CbmLitHistManager::ShrinkEmptyBinsByPattern(
+void CbmHistManager::ShrinkEmptyBinsByPattern(
       const string& pattern)
 {
 	vector<TH1*> effHistos = H1Vector(pattern);
@@ -129,14 +129,14 @@ void CbmLitHistManager::ShrinkEmptyBinsByPattern(
 	}
 }
 
-void CbmLitHistManager::Scale(
+void CbmHistManager::Scale(
       const string& histName,
       Double_t scale)
 {
 	H1(histName)->Scale(scale);
 }
 
-void CbmLitHistManager::ScaleByPattern(
+void CbmHistManager::ScaleByPattern(
       const string& pattern,
       Double_t scale)
 {
@@ -147,7 +147,7 @@ void CbmLitHistManager::ScaleByPattern(
 	}
 }
 
-void CbmLitHistManager::Rebin(
+void CbmHistManager::Rebin(
       const string& histName,
       Int_t ngroup)
 {
@@ -158,7 +158,7 @@ void CbmLitHistManager::Rebin(
 	}
 }
 
-void CbmLitHistManager::RebinByPattern(
+void CbmHistManager::RebinByPattern(
       const string& pattern,
       Int_t ngroup)
 {
@@ -169,9 +169,9 @@ void CbmLitHistManager::RebinByPattern(
 	}
 }
 
-string CbmLitHistManager::ToString() const
+string CbmHistManager::ToString() const
 {
-	string str = "CbmLitHistManager list of histograms:\n";
+	string str = "CbmHistManager list of histograms:\n";
 	map<string, TH1*>::const_iterator it;
 	for (it = fHistMap.begin(); it != fHistMap.end(); it++){
 		str += it->first + "\n";

@@ -1,19 +1,21 @@
 /**
- * \file CbmLitReportElement.h
+ * \file CbmReportElement.h
  * \brief Abstract class for basic report elements (headers, tables, images etc.).
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#ifndef CBMLITREPORTELEMENT_H_
-#define CBMLITREPORTELEMENT_H_
+#ifndef CBMREPORTELEMENT_H_
+#define CBMREPORTELEMENT_H_
 
 #include <vector>
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 
-using namespace std;
+using std::string;
+using std::vector;
+
 /**
- * \class CbmLitReportElement
+ * \class CbmReportElement
  *
  * \brief Abstract class for basic report elements (headers, tables, images etc.).
  *
@@ -27,18 +29,18 @@ using namespace std;
  * \date 2011
  *
  */
-class CbmLitReportElement
+class CbmReportElement
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitReportElement(){}
+   CbmReportElement(){}
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitReportElement(){}
+   virtual ~CbmReportElement(){}
 
    /**
     * \brief Return string with table open tag.
@@ -107,4 +109,4 @@ public:
          const string& title) const = 0;
 };
 
-#endif /* CBMLITREPORTELEMENT_H_ */
+#endif /* CBMREPORTELEMENT_H_ */

@@ -7,7 +7,7 @@
 #ifndef CBMLITFIELDQAREPORT_H_
 #define CBMLITFIELDQAREPORT_H_
 
-#include "../report/CbmLitSimulationReport.h"
+#include "../report/CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 
@@ -17,7 +17,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitFieldQaReport : public CbmLitSimulationReport
+class CbmLitFieldQaReport : public CbmSimulationReport
 {
 public:
    /**

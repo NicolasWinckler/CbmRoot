@@ -594,13 +594,13 @@ void CbmLitFieldQa::CreatePropertyTree()
    write_json(string(fOutputDir + "field_qa.json").c_str(), qa);
 
    // Create report
-   CbmLitSimulationReport* report = new CbmLitFieldQaReport();
+   CbmSimulationReport* report = new CbmLitFieldQaReport();
    ofstream foutHtml(string(fOutputDir + "field_qa.html").c_str());
    ofstream foutLatex(string(fOutputDir + "field_qa.tex").c_str());
    ofstream foutText(string(fOutputDir + "field_qa.txt").c_str());
-   report->Create(kLitHtml, foutHtml, fOutputDir);
-   report->Create(kLitLatex, foutLatex, fOutputDir);
-   report->Create(kLitText, foutText, fOutputDir);
+   report->Create(kHtmlReport, foutHtml, fOutputDir);
+   report->Create(kLatexReport, foutLatex, fOutputDir);
+   report->Create(kTextReport, foutText, fOutputDir);
    delete report;
 }
 

@@ -8,7 +8,7 @@
 #ifndef CBMLITCLUSTERINGQASTUDYREPORT_H_
 #define CBMLITCLUSTERINGQASTUDYREPORT_H_
 
-#include "../report/CbmLitStudyReport.h"
+#include "../report/CbmStudyReport.h"
 #include "TSystem.h"
 
 /**
@@ -17,7 +17,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitClusteringQaStudyReport : public CbmLitStudyReport
+class CbmLitClusteringQaStudyReport : public CbmStudyReport
 {
 public:
    /**

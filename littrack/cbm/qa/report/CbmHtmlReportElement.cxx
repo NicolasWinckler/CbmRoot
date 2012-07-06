@@ -1,20 +1,23 @@
 /**
- * \file CbmLitHtmlReportElement.cxx
+ * \file CbmHtmlReportElement.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitHtmlReportElement.h"
+#include "CbmHtmlReportElement.h"
 
-CbmLitHtmlReportElement::CbmLitHtmlReportElement()
+using std::stringstream;
+using std::endl;
+
+CbmHtmlReportElement::CbmHtmlReportElement()
 {
 }
 
-CbmLitHtmlReportElement::~CbmLitHtmlReportElement()
+CbmHtmlReportElement::~CbmHtmlReportElement()
 {
 
 }
 
-string CbmLitHtmlReportElement::TableBegin(
+string CbmHtmlReportElement::TableBegin(
       const string& caption,
       const vector<string>& colNames) const
 {
@@ -29,12 +32,12 @@ string CbmLitHtmlReportElement::TableBegin(
    return ss.str();
 }
 
-string CbmLitHtmlReportElement::TableEnd() const
+string CbmHtmlReportElement::TableEnd() const
 {
    return "</table>";
 }
 
-string CbmLitHtmlReportElement::TableEmptyRow(
+string CbmHtmlReportElement::TableEmptyRow(
       int nofCols,
       const string& name) const
 {
@@ -43,7 +46,7 @@ string CbmLitHtmlReportElement::TableEmptyRow(
    return ss.str();
 }
 
-string CbmLitHtmlReportElement::TableRow(
+string CbmHtmlReportElement::TableRow(
       const vector<string>& row) const
 {
    string st = "<tr>";
@@ -54,7 +57,7 @@ string CbmLitHtmlReportElement::TableRow(
    return st;
 }
 
-string CbmLitHtmlReportElement::Image(
+string CbmHtmlReportElement::Image(
       const string& title,
       const string& file) const
 {
@@ -65,7 +68,7 @@ string CbmLitHtmlReportElement::Image(
    return ss.str();
 }
 
-string CbmLitHtmlReportElement::DocumentBegin() const
+string CbmHtmlReportElement::DocumentBegin() const
 {
    string str = "<html><body><head><style type=\"text/css\">";
    str += "#efficiency";
@@ -98,12 +101,12 @@ string CbmLitHtmlReportElement::DocumentBegin() const
    return str;
 }
 
-string CbmLitHtmlReportElement::DocumentEnd() const
+string CbmHtmlReportElement::DocumentEnd() const
 {
    return "</body></html>";
 }
 
-string CbmLitHtmlReportElement::Title(
+string CbmHtmlReportElement::Title(
       int size,
       const string& title) const
 {

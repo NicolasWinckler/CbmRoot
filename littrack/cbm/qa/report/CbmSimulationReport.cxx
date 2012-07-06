@@ -1,17 +1,17 @@
 /**
- * \file CbmLitSimulationReport.cxx
+ * \file CbmSimulationReport.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitSimulationReport.h"
-#include "CbmLitReportElement.h"
+#include "CbmSimulationReport.h"
+#include "CbmReportElement.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
 using boost::property_tree::json_parser_error;
 using std::cout;
 
-CbmLitSimulationReport::CbmLitSimulationReport():
+CbmSimulationReport::CbmSimulationReport():
 	fQa(),
 	fIdeal(),
 	fCheck(),
@@ -20,19 +20,19 @@ CbmLitSimulationReport::CbmLitSimulationReport():
 
 }
 
-CbmLitSimulationReport::~CbmLitSimulationReport()
+CbmSimulationReport::~CbmSimulationReport()
 {
 
 }
 
-bool CbmLitSimulationReport::PropertyExists(
+bool CbmSimulationReport::PropertyExists(
       const std::string& name) const
 {
    return (fQa.count(name) != 0) ? true : false;
 }
 
-void CbmLitSimulationReport::Create(
-      LitReportType reportType,
+void CbmSimulationReport::Create(
+      ReportType reportType,
       ostream& out,
       const string& resultDirectory)
 {
@@ -67,7 +67,7 @@ void CbmLitSimulationReport::Create(
    DeleteReportElement();
 }
 
-string CbmLitSimulationReport::PrintImages(
+string CbmSimulationReport::PrintImages(
 		const string& pattern) const
 {
 	string str = "";

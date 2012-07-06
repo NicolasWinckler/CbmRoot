@@ -1,21 +1,23 @@
 /**
- * \file CbmLitLatexReportElement.cxx
+ * \file CbmLatexReportElement.cxx
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-#include "CbmLitLatexReportElement.h"
+#include "CbmLatexReportElement.h"
+using std::stringstream;
+using std::endl;
 
-CbmLitLatexReportElement::CbmLitLatexReportElement()
+CbmLatexReportElement::CbmLatexReportElement()
 {
 
 }
 
-CbmLitLatexReportElement::~CbmLitLatexReportElement()
+CbmLatexReportElement::~CbmLatexReportElement()
 {
 
 }
 
-string CbmLitLatexReportElement::TableBegin(
+string CbmLatexReportElement::TableBegin(
       const string& caption,
       const vector<string>& colNames) const
 {
@@ -35,12 +37,12 @@ string CbmLitLatexReportElement::TableBegin(
    return st;
 }
 
-string CbmLitLatexReportElement::TableEnd() const
+string CbmLatexReportElement::TableEnd() const
 {
    return "\\end{tabular} \\end{table}";
 }
 
-string CbmLitLatexReportElement::TableEmptyRow(
+string CbmLatexReportElement::TableEmptyRow(
       int nofCols,
       const string& name) const
 {
@@ -49,7 +51,7 @@ string CbmLitLatexReportElement::TableEmptyRow(
    return ss.str();
 }
 
-string CbmLitLatexReportElement::TableRow(
+string CbmLatexReportElement::TableRow(
       const vector<string>& row) const
 {
    string st;
@@ -60,7 +62,7 @@ string CbmLitLatexReportElement::TableRow(
    return st;
 }
 
-string CbmLitLatexReportElement::Image(
+string CbmLatexReportElement::Image(
       const string& title,
       const string& file) const
 {
@@ -74,7 +76,7 @@ string CbmLitLatexReportElement::Image(
    return ss.str();
 }
 
-string CbmLitLatexReportElement::DocumentBegin() const
+string CbmLatexReportElement::DocumentBegin() const
 {
    string str = "\\documentclass[a4paper,14pt]{article}";
    str += "\\usepackage{amssymb}";
@@ -88,12 +90,12 @@ string CbmLitLatexReportElement::DocumentBegin() const
    return str;
 }
 
-string CbmLitLatexReportElement::DocumentEnd() const
+string CbmLatexReportElement::DocumentEnd() const
 {
    return "\\end{document}";
 }
 
-string CbmLitLatexReportElement::Title(
+string CbmLatexReportElement::Title(
       int size,
       const string& title) const
 {

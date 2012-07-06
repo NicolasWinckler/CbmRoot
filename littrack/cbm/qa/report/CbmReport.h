@@ -5,40 +5,40 @@
  * \date 2011
  */
 
-#ifndef CBMLITREPORT_H_
-#define CBMLITREPORT_H_
+#ifndef CBMREPORT_H_
+#define CBMREPORT_H_
 
 #include "CbmDetectorList.h"
 #include <string>
-class CbmLitReportElement;
+class CbmReportElement;
 using std::string;
 using std::vector;
 
 /**
- * \enumeration LitReportType
+ * \enumeration ReportType
  * \brief Enumeration defines different report types.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-enum LitReportType {kLitHtml, kLitLatex, kLitText};
+enum ReportType {kHtmlReport, kLatexReport, kTextReport};
 
 /**
- * \class CbmLitReport
+ * \class CbmReport
  * \brief Base class for reports.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitReport {
+class CbmReport {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitReport();
+   CbmReport();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitReport();
+   virtual ~CbmReport();
 
    /**
     * \brief Check if the property with name name exists in the QA property tree.
@@ -58,11 +58,11 @@ public:
 
 protected:
    /**
-    * \brief Create concrete CbmLitReportElement instance based on report type.
+    * \brief Create concrete CbmReportElement instance based on report type.
     * \param[in] reportType Type of the report to be produced.
     */
    void CreateReportElement(
-         LitReportType reportType);
+         ReportType reportType);
 
    /**
     * \brief Delete report element. Normally should be called at the end of Create function.
@@ -108,7 +108,7 @@ protected:
    // If TRUE than results are highlighted depending on the results of checking procedure
    bool fIsUseChecking;
 
-   CbmLitReportElement* fR; // Report element tool
+   CbmReportElement* fR; // Report element tool
 };
 
-#endif /* CBMLITREPORT_H_ */
+#endif /* CBMREPORT_H_ */

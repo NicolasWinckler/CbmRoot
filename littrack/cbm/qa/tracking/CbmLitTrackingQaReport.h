@@ -7,7 +7,7 @@
 #ifndef CBMLITTRACKINGQAREPORT_H_
 #define CBMLITTRACKINGQAREPORT_H_
 
-#include "../report/CbmLitSimulationReport.h"
+#include "../report/CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 #include <sstream>
@@ -21,7 +21,7 @@ class CbmLitPropertyTree;
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmLitTrackingQaReport : public CbmLitSimulationReport
+class CbmLitTrackingQaReport : public CbmSimulationReport
 {
 public:
    /**

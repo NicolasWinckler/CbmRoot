@@ -6,12 +6,14 @@
 #include "CbmLitTrackingQaReport.h"
 #include "CbmLitTrackingQaHistCreator.h"
 #include "../base/CbmLitPropertyTree.h"
-#include "../report/CbmLitReportElement.h"
+#include "../report/CbmReportElement.h"
 #include "std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
 
+using std::endl;
 using std::vector;
+using std::make_pair;
 using boost::assign::list_of;
 using lit::NumberToString;
 using lit::FindAndReplace;

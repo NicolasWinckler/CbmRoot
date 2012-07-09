@@ -10,6 +10,7 @@
 
 #include "FairTask.h"
 #include <vector>
+#include <utility>
 #include <string>
 
 class FairField;
@@ -118,27 +119,22 @@ private:
    Int_t fNofBinsY;
 
    vector<Double_t> fAlongZAngles; // Polar angles [grad]
-   vector<Double_t> fAlongZXPosition; // X position for plotting field along Z
-   vector<Double_t> fAlongZYPosition; // Y position for plotting field along Z
+   vector<std::pair<Double_t,Double_t> > fAlongZXY; // XY position for plotting field along Z
    Double_t fZMin; // Minimum Z position [cm]
    Double_t fZMax; // Maximum Z position [cm]
    Double_t fZStep; // Step size [cm]
 
    // Field map graph for each component and each slice
    // [BX, BY, BZ, MOD][slice number]
-   vector<vector<TGraph2D*> >fgB;
+   vector<vector<TGraph2D*> > fgB;
 
    // Field map values histograms along Z
    // [BX, BY, BZ][polar angle]
-   vector<vector<TGraph*> >fgBAlongZAngle;
+   vector<vector<TGraph*> > fgBAlongZAngle;
 
    // Field map values histograms along Z
-   // [BX, BY, BZ][x position]
-   vector<vector<TGraph*> >fgBAlongZXPosition;
-
-   // Field map values histograms along Z
-   // [BX, BY, BZ][y position]
-   vector<vector<TGraph*> >fgBAlongZYPosition;
+   // [BX, BY, BZ][xy position]
+   vector<vector<TGraph*> > fgBAlongZXY;
 
    // Output directory for images
    string fOutputDir;

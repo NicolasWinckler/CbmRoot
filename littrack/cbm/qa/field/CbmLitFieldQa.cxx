@@ -38,11 +38,9 @@ CbmLitFieldQa::CbmLitFieldQa():
    fYSlicePosition(),
    fgB(),
    fgBAlongZAngle(),
-   fgBAlongZXPosition(),
-   fgBAlongZYPosition(),
+   fgBAlongZXY(),
    fAlongZAngles(),
-   fAlongZXPosition(),
-   fAlongZYPosition(),
+   fAlongZXY(),
    fZMin(-10.),
    fZMax(300.),
    fZStep(5.),
@@ -77,8 +75,9 @@ InitStatus CbmLitFieldQa::Init()
    }
 
    fAlongZAngles = list_of(0.)(10.)(20.)(30.);
-   fAlongZXPosition = list_of(0.)(50.)(100.)(150.);
-   fAlongZYPosition = list_of(0.)(50.)(100.)(150.);
+   fAlongZXY.push_back(std::make_pair(0., 0.));
+   fAlongZXY.push_back(std::make_pair(100., 0.));
+   fAlongZXY.push_back(std::make_pair(0., 100.));
 
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    fField = env->GetField();
@@ -127,25 +126,19 @@ void CbmLitFieldQa::CreateHistos()
 
    // [BX, BY, BZ, MOD]
    fgBAlongZAngle.resize(4);
-   fgBAlongZXPosition.resize(4);
-   fgBAlongZYPosition.resize(4);
+   fgBAlongZXY.resize(4);
    for (Int_t i = 0; i < 4; i++) {
       fgBAlongZAngle[i].resize(fAlongZAngles.size());
-      fgBAlongZXPosition[i].resize(fAlongZXPosition.size());
-      fgBAlongZYPosition[i].resize(fAlongZYPosition.size());
+      fgBAlongZXY[i].resize(fAlongZXY.size());
    }
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
          fgBAlongZAngle[v][i] = new TGraph();
          fgBAlongZAngle[v][i]->SetNameTitle("fhBAlongZGraph", "fhBAlongZGraph;Z [cm];B [kGauss]");
       }
-      for (Int_t i = 0; i < fAlongZXPosition.size(); i++) {
-         fgBAlongZXPosition[v][i] = new TGraph();
-         fgBAlongZXPosition[v][i]->SetNameTitle("fgBAlongZXPosition", "fgBAlongZXPosition;Z [cm];B [kGauss]");
-      }
-      for (Int_t i = 0; i < fAlongZYPosition.size(); i++) {
-         fgBAlongZYPosition[v][i] = new TGraph();
-         fgBAlongZYPosition[v][i]->SetNameTitle("fgBAlongZYPosition", "fgBAlongZYPosition;Z [cm];B [kGauss]");
+      for (Int_t i = 0; i < fAlongZXY.size(); i++) {
+         fgBAlongZXY[v][i] = new TGraph();
+         fgBAlongZXY[v][i]->SetNameTitle("fgBAlongZXY", "fgBAlongZXY;Z [cm];B [kGauss]");
       }
    }
 }
@@ -205,12 +198,12 @@ void CbmLitFieldQa::FillBHistos()
    }
 
    // Fill histograms for magnetic field along Z for different X position
-   for (Int_t i = 0; i < fAlongZXPosition.size(); i++) {
+   for (Int_t i = 0; i < fAlongZXY.size(); i++) {
       Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
       for (Int_t istep = 0; istep < nofSteps; istep++) {
          Double_t Z = fZMin + istep * fZStep;
-         Double_t X = fAlongZXPosition[i];
-         Double_t Y = 0;
+         Double_t X = fAlongZXY[i].first;
+         Double_t Y = fAlongZXY[i].second;
 
          // Get field value
          Double_t pos[3] = {X, Y, Z};
@@ -219,32 +212,10 @@ void CbmLitFieldQa::FillBHistos()
 
          Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-         fgBAlongZXPosition[BX][i]->SetPoint(istep, Z, B[0]);
-         fgBAlongZXPosition[BY][i]->SetPoint(istep, Z, B[1]);
-         fgBAlongZXPosition[BZ][i]->SetPoint(istep, Z, B[2]);
-         fgBAlongZXPosition[MOD][i]->SetPoint(istep, Z, Bmod);
-      }
-   }
-
-   // Fill histograms for magnetic field along Z for different Y position
-   for (Int_t i = 0; i < fAlongZYPosition.size(); i++) {
-      Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
-      for (Int_t istep = 0; istep < nofSteps; istep++) {
-         Double_t Z = fZMin + istep * fZStep;
-         Double_t X = 0;
-         Double_t Y = fAlongZYPosition[i];
-
-         // Get field value
-         Double_t pos[3] = {X, Y, Z};
-         Double_t B[3];
-         fField->GetFieldValue(pos, B);
-
-         Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
-
-         fgBAlongZYPosition[BX][i]->SetPoint(istep, Z, B[0]);
-         fgBAlongZYPosition[BY][i]->SetPoint(istep, Z, B[1]);
-         fgBAlongZYPosition[BZ][i]->SetPoint(istep, Z, B[2]);
-         fgBAlongZYPosition[MOD][i]->SetPoint(istep, Z, Bmod);
+         fgBAlongZXY[BX][i]->SetPoint(istep, Z, B[0]);
+         fgBAlongZXY[BY][i]->SetPoint(istep, Z, B[1]);
+         fgBAlongZXY[BZ][i]->SetPoint(istep, Z, B[2]);
+         fgBAlongZXY[MOD][i]->SetPoint(istep, Z, Bmod);
       }
    }
 }
@@ -312,33 +283,24 @@ void CbmLitFieldQa::DrawFieldSlices()
 void CbmLitFieldQa::DrawFieldAlongZ()
 {
 	// Draw for different angles
-   TCanvas* canvas = new TCanvas("field_qa_map_along_z_angle", "field_qa_map_along_z_angle", 1000, 1000);
-   canvas->Divide(2, 2);
-   for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
-      canvas->cd(i+1);
+   for (int i = 0; i < fAlongZAngles.size(); i++) {
+      std::stringstream ss;
+      ss << "field_qa_map_along_z_angle_" << (int)fAlongZAngles[i];
+      TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
       DrawGraph(list_of(fgBAlongZAngle[BX][i])(fgBAlongZAngle[BY][i])(fgBAlongZAngle[BZ][i])(fgBAlongZAngle[MOD][i]),
             list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+      gPad->SetGrid(true, true);
+      SaveCanvasAsImage(c, fOutputDir);
    }
-   SaveCanvasAsImage(canvas, fOutputDir);
-
-   // Draw for different X positions
-   TCanvas* canvasX = new TCanvas("field_qa_map_along_z_x_position", "field_qa_map_along_z_x_position", 1000, 1000);
-   canvasX->Divide(2, 2);
-   for (Int_t i = 0; i < fAlongZXPosition.size(); i++) {
-      canvasX->cd(i+1);
-      DrawGraph(list_of(fgBAlongZXPosition[BX][i])(fgBAlongZXPosition[BY][i])(fgBAlongZXPosition[BZ][i])(fgBAlongZXPosition[MOD][i]),
-            list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+   // Draw for different XY positions
+   for (int i = 0; i < fAlongZXY.size(); i++){
+      std::stringstream ss;
+      ss << "field_qa_map_along_z_xy_" << (int)fAlongZXY[i].first << "_" << (int)fAlongZXY[i].second;
+      TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
+      DrawGraph(list_of(fgBAlongZXY[BX][i])(fgBAlongZXY[BY][i])(fgBAlongZXY[BZ][i])(fgBAlongZXY[MOD][i]),
+         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+      gPad->SetGrid(true, true);
+      SaveCanvasAsImage(c, fOutputDir);
    }
-   SaveCanvasAsImage(canvasX, fOutputDir);
-
-   // Draw for different Y positions
-   TCanvas* canvasY = new TCanvas("field_qa_map_along_z_y_position", "field_qa_map_along_z_y_position", 1000, 1000);
-   canvasY->Divide(2, 2);
-   for (Int_t i = 0; i < fAlongZYPosition.size(); i++) {
-      canvasY->cd(i+1);
-      DrawGraph(list_of(fgBAlongZYPosition[BX][i])(fgBAlongZYPosition[BY][i])(fgBAlongZYPosition[BZ][i])(fgBAlongZYPosition[MOD][i]),
-            list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
-   }
-   SaveCanvasAsImage(canvasY, fOutputDir);
 }
 ClassImp(CbmLitFieldQa);

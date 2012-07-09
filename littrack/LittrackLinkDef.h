@@ -21,6 +21,7 @@
 #pragma link C++ class CbmLitTrackingQa+;
 #pragma link C++ class CbmLitClusteringQa+;
 #pragma link C++ class CbmLitFieldQa+;
+#pragma link C++ class CbmLitFieldApproximationQa+;
 #pragma link C++ class CbmLitFitQa+;
 #endif
 

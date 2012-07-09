@@ -133,6 +133,8 @@ If(Boost_FOUND)
       cbm/qa/fit/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
+      cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
+      cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
       cbm/qa/report/CbmReport.cxx      
       cbm/qa/report/CbmStudyReport.cxx
       cbm/qa/report/CbmSimulationReport.cxx
@@ -171,6 +173,7 @@ If(Boost_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
       cbm/qa/field/CbmLitFieldQa.h
+      cbm/qa/fieldapr/CbmLitFieldApproximationQa.h
      )
 EndIf(Boost_FOUND)
 

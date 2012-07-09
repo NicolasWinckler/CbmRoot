@@ -6,7 +6,7 @@
  */
 #include "CbmLitClusteringQaPTreeCreator.h"
 #include "qa/base/CbmHistManager.h"
-#include "TH1F.h"
+#include "TH1.h"
 
 CbmLitClusteringQaPTreeCreator::CbmLitClusteringQaPTreeCreator():
    fHM(NULL)
@@ -27,7 +27,7 @@ ptree CbmLitClusteringQaPTreeCreator::Create(
 
    ptree pt;
 
-   pt.put("hen_EventNo_ClusteringQa.entries", (Int_t)fHM->H1F("hen_EventNo_ClusteringQa")->GetEntries());
+   pt.put("hen_EventNo_ClusteringQa.entries", (Int_t)fHM->H1("hen_EventNo_ClusteringQa")->GetEntries());
 
    NofObjectsToPTree(pt);
 

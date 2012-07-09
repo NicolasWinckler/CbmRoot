@@ -11,7 +11,7 @@
 #include "CbmBaseHit.h"
 #include "FairRootManager.h"
 #include "TClonesArray.h"
-#include "TH1F.h"
+#include "TH1.h"
 #include <assert.h>
 
 CbmLitClusteringQaCalculator::CbmLitClusteringQaCalculator(
@@ -55,8 +55,8 @@ void CbmLitClusteringQaCalculator::Init()
 void CbmLitClusteringQaCalculator::Exec()
 {
    // Increase event counter
-   fHM->H1F("hen_EventNo_ClusteringQa")->Fill(0.5);
-   std::cout << "CbmLitClusteringQaCalculator::Exec: event=" << fHM->H1F("hen_EventNo_ClusteringQa")->GetEntries() << std::endl;
+   fHM->H1("hen_EventNo_ClusteringQa")->Fill(0.5);
+   std::cout << "CbmLitClusteringQaCalculator::Exec: event=" << fHM->H1("hen_EventNo_ClusteringQa")->GetEntries() << std::endl;
 
    ProcessHits();
    IncreaseCounters();
@@ -145,29 +145,29 @@ void CbmLitClusteringQaCalculator::ProcessHits()
 void CbmLitClusteringQaCalculator::IncreaseCounters()
 {
    if (NULL != fMvdPoints && fHM->Exists("hno_NofObjects_MvdPoints")) fHM->H1("hno_NofObjects_MvdPoints")->Fill(fMvdPoints->GetEntriesFast());
-   if (NULL != fMvdDigis && fHM->Exists("hno_NofObjects_MvdDigis")) fHM->H1F("hno_NofObjects_MvdDigis")->Fill(fMvdDigis->GetEntriesFast());
-   if (NULL != fMvdClusters && fHM->Exists("hno_NofObjects_MvdClusters")) fHM->H1F("hno_NofObjects_MvdClusters")->Fill(fMvdClusters->GetEntriesFast());
-   if (NULL != fMvdHits && fHM->Exists("hno_NofObjects_MvdHits")) fHM->H1F("hno_NofObjects_MvdHits")->Fill(fMvdHits->GetEntriesFast());
+   if (NULL != fMvdDigis && fHM->Exists("hno_NofObjects_MvdDigis")) fHM->H1("hno_NofObjects_MvdDigis")->Fill(fMvdDigis->GetEntriesFast());
+   if (NULL != fMvdClusters && fHM->Exists("hno_NofObjects_MvdClusters")) fHM->H1("hno_NofObjects_MvdClusters")->Fill(fMvdClusters->GetEntriesFast());
+   if (NULL != fMvdHits && fHM->Exists("hno_NofObjects_MvdHits")) fHM->H1("hno_NofObjects_MvdHits")->Fill(fMvdHits->GetEntriesFast());
 
-   if (NULL != fStsPoints && fHM->Exists("hno_NofObjects_StsPoints")) fHM->H1F("hno_NofObjects_StsPoints")->Fill(fStsPoints->GetEntriesFast());
-   if (NULL != fStsDigis && fHM->Exists("hno_NofObjects_StsDigis")) fHM->H1F("hno_NofObjects_StsDigis")->Fill(fStsDigis->GetEntriesFast());
-   if (NULL != fStsClusters && fHM->Exists("hno_NofObjects_StsClusters")) fHM->H1F("hno_NofObjects_StsClusters")->Fill(fStsClusters->GetEntriesFast());
-   if (NULL != fStsHits && fHM->Exists("hno_NofObjects_StsHits")) fHM->H1F("hno_NofObjects_StsHits")->Fill(fStsHits->GetEntriesFast());
+   if (NULL != fStsPoints && fHM->Exists("hno_NofObjects_StsPoints")) fHM->H1("hno_NofObjects_StsPoints")->Fill(fStsPoints->GetEntriesFast());
+   if (NULL != fStsDigis && fHM->Exists("hno_NofObjects_StsDigis")) fHM->H1("hno_NofObjects_StsDigis")->Fill(fStsDigis->GetEntriesFast());
+   if (NULL != fStsClusters && fHM->Exists("hno_NofObjects_StsClusters")) fHM->H1("hno_NofObjects_StsClusters")->Fill(fStsClusters->GetEntriesFast());
+   if (NULL != fStsHits && fHM->Exists("hno_NofObjects_StsHits")) fHM->H1("hno_NofObjects_StsHits")->Fill(fStsHits->GetEntriesFast());
 
    if (NULL != fRichHits && fHM->Exists("hno_NofObjects_RichHits")) fHM->H1("hno_NofObjects_RichHits")->Fill(fRichHits->GetEntriesFast());
    if (NULL != fRichPoints && fHM->Exists("hno_NofObjects_RichPoints")) fHM->H1("hno_NofObjects_RichPoints")->Fill(fRichPoints->GetEntriesFast());
 
-   if (NULL != fTrdPoints && fHM->Exists("hno_NofObjects_TrdPoints")) fHM->H1F("hno_NofObjects_TrdPoints")->Fill(fTrdPoints->GetEntriesFast());
-   if (NULL != fTrdDigis && fHM->Exists("hno_NofObjects_TrdDigis")) fHM->H1F("hno_NofObjects_TrdDigis")->Fill(fTrdDigis->GetEntriesFast());
-   if (NULL != fTrdClusters && fHM->Exists("hno_NofObjects_TrdClusters")) fHM->H1F("hno_NofObjects_TrdClusters")->Fill(fTrdClusters->GetEntriesFast());
-   if (NULL != fTrdHits && fHM->Exists("hno_NofObjects_TrdHits")) fHM->H1F("hno_NofObjects_TrdHits")->Fill(fTrdHits->GetEntriesFast());
+   if (NULL != fTrdPoints && fHM->Exists("hno_NofObjects_TrdPoints")) fHM->H1("hno_NofObjects_TrdPoints")->Fill(fTrdPoints->GetEntriesFast());
+   if (NULL != fTrdDigis && fHM->Exists("hno_NofObjects_TrdDigis")) fHM->H1("hno_NofObjects_TrdDigis")->Fill(fTrdDigis->GetEntriesFast());
+   if (NULL != fTrdClusters && fHM->Exists("hno_NofObjects_TrdClusters")) fHM->H1("hno_NofObjects_TrdClusters")->Fill(fTrdClusters->GetEntriesFast());
+   if (NULL != fTrdHits && fHM->Exists("hno_NofObjects_TrdHits")) fHM->H1("hno_NofObjects_TrdHits")->Fill(fTrdHits->GetEntriesFast());
 
-   if (NULL != fMuchPoints && fHM->Exists("hno_NofObjects_MuchPoints")) fHM->H1F("hno_NofObjects_MuchPoints")->Fill(fMuchPoints->GetEntriesFast());
-   if (NULL != fMuchDigis && fHM->Exists("hno_NofObjects_MuchDigis")) fHM->H1F("hno_NofObjects_MuchDigis")->Fill(fMuchDigis->GetEntriesFast());
-   if (NULL != fMuchClusters && fHM->Exists("hno_NofObjects_MuchClusters")) fHM->H1F("hno_NofObjects_MuchClusters")->Fill(fMuchClusters->GetEntriesFast());
-   if (NULL != fMuchPixelHits && fHM->Exists("hno_NofObjects_MuchPixelHits")) fHM->H1F("hno_NofObjects_MuchPixelHits")->Fill(fMuchPixelHits->GetEntriesFast());
-   if (NULL != fMuchStrawHits && fHM->Exists("hno_NofObjects_MuchStrawHits")) fHM->H1F("hno_NofObjects_MuchStrawHits")->Fill(fMuchStrawHits->GetEntriesFast());
+   if (NULL != fMuchPoints && fHM->Exists("hno_NofObjects_MuchPoints")) fHM->H1("hno_NofObjects_MuchPoints")->Fill(fMuchPoints->GetEntriesFast());
+   if (NULL != fMuchDigis && fHM->Exists("hno_NofObjects_MuchDigis")) fHM->H1("hno_NofObjects_MuchDigis")->Fill(fMuchDigis->GetEntriesFast());
+   if (NULL != fMuchClusters && fHM->Exists("hno_NofObjects_MuchClusters")) fHM->H1("hno_NofObjects_MuchClusters")->Fill(fMuchClusters->GetEntriesFast());
+   if (NULL != fMuchPixelHits && fHM->Exists("hno_NofObjects_MuchPixelHits")) fHM->H1("hno_NofObjects_MuchPixelHits")->Fill(fMuchPixelHits->GetEntriesFast());
+   if (NULL != fMuchStrawHits && fHM->Exists("hno_NofObjects_MuchStrawHits")) fHM->H1("hno_NofObjects_MuchStrawHits")->Fill(fMuchStrawHits->GetEntriesFast());
 
-   if (NULL != fTofPoints && fHM->Exists("hno_NofObjects_TofPoints")) fHM->H1F("hno_NofObjects_TofPoints")->Fill(fTofPoints->GetEntriesFast());
-   if (NULL != fTofHits && fHM->Exists("hno_NofObjects_TofHits")) fHM->H1F("hno_NofObjects_TofHits")->Fill(fTofHits->GetEntriesFast());
+   if (NULL != fTofPoints && fHM->Exists("hno_NofObjects_TofPoints")) fHM->H1("hno_NofObjects_TofPoints")->Fill(fTofPoints->GetEntriesFast());
+   if (NULL != fTofHits && fHM->Exists("hno_NofObjects_TofHits")) fHM->H1("hno_NofObjects_TofHits")->Fill(fTofHits->GetEntriesFast());
 }

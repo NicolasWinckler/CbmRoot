@@ -60,42 +60,6 @@ public:
    }
 
    /**
-    * \brief Return pointer to TH1F histogram.
-    * \param[in] name Name of histogram.
-    * \return pointer to TH1F histogram.
-    */
-   TH1F* H1F(
-         const string& name) const {
-      if (fHistMap.count(name) == 0) { // Temporarily used for degugging
-         std::cout << "Error: CbmHistManager::H1F(name): name=" << name << std::endl;
-      }
-      assert(fHistMap.count(name) != 0);
-      return (TH1F*)fHistMap.find(name)->second;
-   }
-
-   /**
-    * \brief Return pointer to TH2F histogram.
-    * \param[in] name Name of histogram.
-    * \return pointer to TH2F histogram.
-    */
-   TH2F* H2F(
-         const string& name) const {
-      assert(fHistMap.count(name) != 0);
-      return (TH2F*)fHistMap.find(name)->second;
-   }
-
-   /**
-    * \brief Return pointer to TH3F histogram.
-    * \param[in] name Name of histogram.
-    * \return pointer to TH3F histogram.
-    */
-   TH3F* H3F(
-         const string& name) const {
-      assert(fHistMap.count(name) != 0);
-      return (TH3F*)fHistMap.find(name)->second;
-   }
-
-   /**
     * \brief Return pointer to TH1 histogram.
     * \param[in] name Name of histogram.
     * \return pointer to TH1 histogram.

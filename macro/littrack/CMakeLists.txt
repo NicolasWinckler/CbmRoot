@@ -56,4 +56,9 @@ ADD_TEST(littrack_mvd_auau_25gev_mbias_delta "${CBMROOT_BINARY_DIR}/macro/littra
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_mbias_delta PROPERTIES TIMEOUT "36000")
 SET_TESTS_PROPERTIES(littrack_mvd_auau_25gev_mbias_delta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
+GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_field.sh)
+ADD_TEST(littrack_field "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_field.sh")
+SET_TESTS_PROPERTIES(littrack_field PROPERTIES TIMEOUT "36000")
+SET_TESTS_PROPERTIES(littrack_field PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+
 EndIf($ENV{ctest_model} MATCHES Experimental)

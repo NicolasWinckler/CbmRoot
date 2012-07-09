@@ -1,6 +1,6 @@
 /**
- * \file field_qa.C
- * \brief Macro runs CbmLitFieldQa task which checks field map and its approximation.
+ * \file fieldapr_qa.C
+ * \brief Macro runs CbmLitFieldApproximationQa task which checks field map and its approximation.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  *
@@ -8,22 +8,22 @@
 
 #include <iostream>
 
-void field_qa(Int_t nEvents = 1)
+void fieldapr_qa(Int_t nEvents = 1)
 {
-	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
+   TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-	TString dir = "./commit_tests/events_electron/"; // Output directory
-	TString mcFile = dir + "mc.0000.root"; // MC transport file
-	TString parFile = dir + "param.0000.root"; // Parameter file
-	TString fieldQaFile = dir + "field.qa.0000.root";// Output file
-	TString resultDir = "./test";
+   TString dir = "./commit_tests/events_electron/"; // Output directory
+   TString mcFile = dir + "mc.0000.root"; // MC transport file
+   TString parFile = dir + "param.0000.root"; // Parameter file
+   TString fieldaprQaFile = dir + "fieldapr.qa.0000.root";// Output file
+   TString resultDir = "./test";
 
-	if (script == "yes") {
+   if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
       parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
-      fieldQaFile = TString(gSystem->Getenv("LIT_FIELD_QA_FILE"));
+      fieldaprQaFile = TString(gSystem->Getenv("LIT_FIELDAPR_QA_FILE"));
       resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
-	}
+   }
 
 	TStopwatch timer;
 	timer.Start();
@@ -36,26 +36,34 @@ void field_qa(Int_t nEvents = 1)
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->SetOutputFile(fieldQaFile);
+	run->SetOutputFile(fieldaprQaFile);
 	// ------------------------------------------------------------------------
 
-	CbmLitFieldQa* fieldQa = new CbmLitFieldQa();
+	CbmLitFieldApproximationQa* fieldQa = new CbmLitFieldApproximationQa();
 
 	std::vector<Double_t> zPos;
-    zPos.push_back(170.);
-    zPos.push_back(180.);
-    zPos.push_back(190.);
-    zPos.push_back(200.);
-    zPos.push_back(210.);
-    fieldQa->SetSliceZPosition(zPos);
+   zPos.push_back(170.);
+   zPos.push_back(180.);
+   zPos.push_back(190.);
+   zPos.push_back(200.);
+   zPos.push_back(210.);
+   fieldQa->SetSliceZPosition(zPos);
+
+   std::vector<UInt_t> degrees;
+// degrees.push_back(3);
+//   degrees.push_back(5);
+   degrees.push_back(7);
+// degrees.push_back(9);
+   fieldQa->SetPolynomDegrees(degrees);
+
 	fieldQa->SetAcceptanceAngleX(35.);
 	fieldQa->SetAcceptanceAngleY(35.);
 	fieldQa->SetNofBinsX(30);
 	fieldQa->SetNofBinsY(30);
-	fieldQa->SetZMin(-10);
-	fieldQa->SetZMax(300);
-	fieldQa->SetZStep(5);
 
+	fieldQa->IsFixedBounds(false);
+	fieldQa->SetUseEllipseAcc(false);
+	fieldQa->SetPolynomDegreeIndex(0);
 	fieldQa->SetOutputDir(std::string(resultDir));
 	run->AddTask(fieldQa);
 
@@ -76,7 +84,7 @@ void field_qa(Int_t nEvents = 1)
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
    std::cout << "Macro finished successfully." << std::endl;
-   std::cout << "Output file is " << fieldQaFile << std::endl;
+   std::cout << "Output file is " << fieldaprQaFile << std::endl;
    std::cout << "Parameter file is " << parFile << std::endl;
    std::cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << std::endl;
 	// ------------------------------------------------------------------------

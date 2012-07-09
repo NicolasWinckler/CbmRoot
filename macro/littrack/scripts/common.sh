@@ -44,6 +44,8 @@ function set_default_file_names() {
     export LIT_PROP_ANA_FILE=${dir}/propagation.ana.${XXXX}.root
     export LIT_RICH_FILE=${dir}/rich.reco.${XXXX}.root
     export LIT_ELID_FILE=${dir}/elid.qa.${XXXX}.root
+    export LIT_FIELD_QA_FILE=${dir}/field.qa.${XXXX}.root
+    export LIT_FIELDAPR_QA_FILE=${dir}/fieldapr.qa.${XXXX}.root
 }
 
 

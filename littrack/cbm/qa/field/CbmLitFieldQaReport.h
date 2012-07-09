@@ -58,11 +58,11 @@ private:
       return "field_qa_check.json";
    }
 
-   /**
-    * \brief Return  string with summary table for field QA.
-    * \return String with summary table for field QA.
-    */
-   std::string PrintSummaryTable();
+//   /**
+//    * \brief Return  string with summary table for field QA.
+//    * \return String with summary table for field QA.
+//    */
+//   std::string PrintSummaryTable();
 };
 
 #endif /* CBMLITFIELDQAREPORT_H_ */

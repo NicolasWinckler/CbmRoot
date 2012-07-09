@@ -38,46 +38,22 @@ void field_qa(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitFieldQa* fieldQa = new CbmLitFieldQa();
-	fieldQa->SetCheckFieldMap(true);
-	fieldQa->SetCheckFieldApproximation(true);
-	fieldQa->SetCheckGridCreator(true);
 
 	std::vector<Double_t> zPos;
-//   zPos.push_back(30.);
-//   zPos.push_back(50.);
-   zPos.push_back(170.);
-   zPos.push_back(180.);
-   zPos.push_back(190.);
-   zPos.push_back(200.);
-   zPos.push_back(210.);
-//   zPos.push_back(150.);
-//   zPos.push_back(200.);
-//   zPos.push_back(300.);
-//   zPos.push_back(400.);
-   fieldQa->SetSliceZPosition(zPos);
+    zPos.push_back(170.);
+    zPos.push_back(180.);
+    zPos.push_back(190.);
+    zPos.push_back(200.);
+    zPos.push_back(210.);
+    fieldQa->SetSliceZPosition(zPos);
+	fieldQa->SetAcceptanceAngleX(35.);
+	fieldQa->SetAcceptanceAngleY(35.);
+	fieldQa->SetNofBinsX(30);
+	fieldQa->SetNofBinsY(30);
+	fieldQa->SetZMin(-10);
+	fieldQa->SetZMax(300);
+	fieldQa->SetZStep(5);
 
-   std::vector<UInt_t> degrees;
-// degrees.push_back(3);
-//   degrees.push_back(5);
-   degrees.push_back(7);
-// degrees.push_back(9);
-   fieldQa->SetPolynomDegrees(degrees);
-
-	fieldQa->SetXangle(35.);
-	fieldQa->SetYangle(35.);
-	fieldQa->SetNofBinsX(100);
-	fieldQa->SetNofBinsY(100);
-
-	fieldQa->SetDrawFieldMap(true);
-	fieldQa->SetDrawFieldApproximation(true);
-    fieldQa->SetDrawGridCreator(true);
-	fieldQa->SetDrawBx(true);
-	fieldQa->SetDrawBy(true);
-	fieldQa->SetDrawBz(true);
-	fieldQa->SetDrawMod(true);
-	fieldQa->IsFixedBounds(false);
-	fieldQa->SetUseEllipseAcc(false);
-	fieldQa->SetPolynomDegreeIndex(0);
 	fieldQa->SetOutputDir("./test/");
 	run->AddTask(fieldQa);
 

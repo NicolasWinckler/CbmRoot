@@ -224,18 +224,19 @@ void DrawGraph2D(
    graph->GetYaxis()->SetLabelSize(textSize);
    graph->GetYaxis()->SetNdivisions(505, kTRUE);
    graph->GetZaxis()->SetLabelSize(textSize);
-   graph->GetZaxis()->SetNdivisions(505, kTRUE);
+//   graph->GetZaxis()->SetNdivisions(505, kTRUE);
    graph->GetXaxis()->SetTitleSize(textSize);
    graph->GetYaxis()->SetTitleSize(textSize);
    graph->GetZaxis()->SetTitleSize(textSize);
-   graph->GetXaxis()->SetTitleOffset(1.7);
-   graph->GetYaxis()->SetTitleOffset(2.0);
-   graph->GetZaxis()->SetTitleOffset(1.7);
-   gPad->SetLeftMargin(0.22);
-// gPad->SetRightMargin(0.17);
-// gPad->SetBottomMargin(0.15);
-
+   graph->GetXaxis()->SetTitleOffset(1.0);
+   graph->GetYaxis()->SetTitleOffset(1.3);
+   graph->GetZaxis()->SetTitleOffset(1.5);
+   gPad->SetLeftMargin(0.17);
+   gPad->SetRightMargin(0.30);
+   gPad->SetBottomMargin(0.15);
+   gPad->SetTicks(1, 1);
    graph->Draw(drawOpt.c_str());
+   gPad->SetGrid(true, true);
 }
 
 void  DrawHistSigmaRMS(

@@ -39,6 +39,7 @@ CbmLitFieldQa::CbmLitFieldQa():
    fgB(),
    fgBAlongZAngle(),
    fgBAlongZXY(),
+   fgBAlongZXYIntegral(),
    fAlongZAngles(),
    fAlongZXY(),
    fZMin(-10.),
@@ -48,6 +49,8 @@ CbmLitFieldQa::CbmLitFieldQa():
    fAcceptanceAngleY(35.),
    fNofBinsX(30),
    fNofBinsY(30),
+   fMinZFieldInt(160.),
+   fMaxZFieldInt(330.),
    fOutputDir("./field/")
 {
 
@@ -75,6 +78,7 @@ InitStatus CbmLitFieldQa::Init()
    }
 
    fAlongZAngles = list_of(0.)(10.)(20.)(30.);
+
    fAlongZXY.push_back(std::make_pair(0., 0.));
    fAlongZXY.push_back(std::make_pair(100., 0.));
    fAlongZXY.push_back(std::make_pair(0., 100.));
@@ -127,9 +131,11 @@ void CbmLitFieldQa::CreateHistos()
    // [BX, BY, BZ, MOD]
    fgBAlongZAngle.resize(4);
    fgBAlongZXY.resize(4);
+   fgBAlongZXYIntegral.resize(4);
    for (Int_t i = 0; i < 4; i++) {
       fgBAlongZAngle[i].resize(fAlongZAngles.size());
       fgBAlongZXY[i].resize(fAlongZXY.size());
+      fgBAlongZXYIntegral[i].resize(fAlongZXY.size());
    }
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
@@ -140,6 +146,11 @@ void CbmLitFieldQa::CreateHistos()
          fgBAlongZXY[v][i] = new TGraph();
          fgBAlongZXY[v][i]->SetNameTitle("fgBAlongZXY", "fgBAlongZXY;Z [cm];B [kGauss]");
       }
+      for (Int_t i = 0; i < fgBAlongZXYIntegral.size(); i++) {
+         fgBAlongZXYIntegral[v][i] = new TGraph();
+         fgBAlongZXYIntegral[v][i]->SetNameTitle("fgBAlongZXYIntegral", "fgBAlongZXYIntegral;Z [cm];B_{int} [kGauss*m]");
+      }
+
    }
 }
 
@@ -159,15 +170,14 @@ void CbmLitFieldQa::FillBHistos()
 
             // Get field value
             Double_t pos[3] = {X, Y, Z};
-            Double_t B[3];
+            Double_t B[4];
             fField->GetFieldValue(pos, B);
 
-            Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+            B[3] = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-            fgB[BX][iSlice]->SetPoint(cnt, X, Y, B[BX]);
-            fgB[BY][iSlice]->SetPoint(cnt, X, Y, B[BY]);
-            fgB[BZ][iSlice]->SetPoint(cnt, X, Y, B[BZ]);
-            fgB[MOD][iSlice]->SetPoint(cnt, X, Y, Bmod);
+            for (int iB = 0; iB < 4; iB++){
+               fgB[iB][iSlice]->SetPoint(cnt, X, Y, B[iB]);
+            }
             cnt++;
          }
       }
@@ -185,21 +195,20 @@ void CbmLitFieldQa::FillBHistos()
 
          // Get field value
          Double_t pos[3] = {X, Y, Z};
-         Double_t B[3];
+         Double_t B[4];
          fField->GetFieldValue(pos, B);
 
-         Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+         B[3] = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-         fgBAlongZAngle[BX][i]->SetPoint(istep, Z, B[0]);
-         fgBAlongZAngle[BY][i]->SetPoint(istep, Z, B[1]);
-         fgBAlongZAngle[BZ][i]->SetPoint(istep, Z, B[2]);
-         fgBAlongZAngle[MOD][i]->SetPoint(istep, Z, Bmod);
+         for (int iB = 0; iB < 4; iB++){
+            fgBAlongZAngle[iB][i]->SetPoint(istep, Z, B[iB]);
+         }
       }
    }
-
    // Fill histograms for magnetic field along Z for different X position
    for (Int_t i = 0; i < fAlongZXY.size(); i++) {
       Int_t nofSteps = Int_t((fZMax - fZMin) / fZStep);
+      Double_t integralB[4] = {0., 0., 0., 0.};
       for (Int_t istep = 0; istep < nofSteps; istep++) {
          Double_t Z = fZMin + istep * fZStep;
          Double_t X = fAlongZXY[i].first;
@@ -207,15 +216,20 @@ void CbmLitFieldQa::FillBHistos()
 
          // Get field value
          Double_t pos[3] = {X, Y, Z};
-         Double_t B[3];
+         Double_t B[4];
          fField->GetFieldValue(pos, B);
 
-         Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+         B[3] = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-         fgBAlongZXY[BX][i]->SetPoint(istep, Z, B[0]);
-         fgBAlongZXY[BY][i]->SetPoint(istep, Z, B[1]);
-         fgBAlongZXY[BZ][i]->SetPoint(istep, Z, B[2]);
-         fgBAlongZXY[MOD][i]->SetPoint(istep, Z, Bmod);
+         for (int iB = 0; iB < 4; iB++){
+            fgBAlongZXY[iB][i]->SetPoint(istep, Z, B[iB]);
+            // Calculate field integral in the RICH detector
+            if (Z >= fMinZFieldInt && Z <= fMaxZFieldInt){
+               integralB[iB] += 0.01*fZStep*fabs(B[iB]); // in kGauss * meter
+               fgBAlongZXYIntegral[iB][i]->SetPoint(istep, Z, integralB[iB]);
+               fgBAlongZXYIntegral[iB][i]->SetMaximum(1.1*integralB[iB]);
+            }
+         }
       }
    }
 }
@@ -299,6 +313,19 @@ void CbmLitFieldQa::DrawFieldAlongZ()
       TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
       DrawGraph(list_of(fgBAlongZXY[BX][i])(fgBAlongZXY[BY][i])(fgBAlongZXY[BZ][i])(fgBAlongZXY[MOD][i]),
          list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+      gPad->SetGrid(true, true);
+      SaveCanvasAsImage(c, fOutputDir);
+   }
+
+   for (int i = 0; i < fAlongZXY.size(); i++){
+      std::stringstream ss;
+      ss << "field_qa_map_along_z_xy_" << (int)fAlongZXY[i].first << "_" << (int)fAlongZXY[i].second<<"_integral";
+      TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
+      fgBAlongZXYIntegral[BX][i]->GetXaxis()->SetRangeUser(fMinZFieldInt - 2., fMaxZFieldInt + 2);
+      DrawGraph(list_of(fgBAlongZXYIntegral[BX][i])(fgBAlongZXYIntegral[BY][i])(fgBAlongZXYIntegral[BZ][i])(fgBAlongZXYIntegral[MOD][i]),
+         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+      std::cout << i << " " << fgBAlongZXYIntegral[BX][i]->GetMaximum() << std::endl;
+
       gPad->SetGrid(true, true);
       SaveCanvasAsImage(c, fOutputDir);
    }

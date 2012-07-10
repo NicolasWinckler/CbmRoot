@@ -117,6 +117,10 @@ private:
    Int_t fNofBinsX;
    // Number of bins for Y
    Int_t fNofBinsY;
+   // start Z position for field integral
+   Int_t fMinZFieldInt;
+   // end Z position for field integral
+   Int_t fMaxZFieldInt;
 
    vector<Double_t> fAlongZAngles; // Polar angles [grad]
    vector<std::pair<Double_t,Double_t> > fAlongZXY; // XY position for plotting field along Z
@@ -135,6 +139,10 @@ private:
    // Field map values histograms along Z
    // [BX, BY, BZ][xy position]
    vector<vector<TGraph*> > fgBAlongZXY;
+
+   // Field integral along Z for specified X and Y
+   // [BX, BY, BZ][xy position]
+   vector<vector<TGraph*> > fgBAlongZXYIntegral;
 
    // Output directory for images
    string fOutputDir;

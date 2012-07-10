@@ -5,7 +5,7 @@
 export LIT_SCRIPT=yes
 
 create_output_dir events_field/
-create_result_dir results_field/
+create_result_dir littrack_field/
 
 nevents=1
 

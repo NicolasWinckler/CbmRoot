@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "CbmLitClusteringQaDraw.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "CbmDrawHist.h"
 #include "utils/CbmLitUtils.h"
 

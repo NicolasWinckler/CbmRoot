@@ -5,7 +5,7 @@
  */
 #include "CbmLitTrackingQaCalculator.h"
 #include "CbmLitTrackingQaHistCreator.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "qa/mc/CbmLitMCTrackCreator.h"
 #include "utils/CbmLitUtils.h"
 //#include "elid/CbmLitGlobalElectronId.h"

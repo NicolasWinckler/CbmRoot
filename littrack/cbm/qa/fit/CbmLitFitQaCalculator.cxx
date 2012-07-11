@@ -6,7 +6,7 @@
 
 #include "CbmLitFitQaCalculator.h"
 #include "../mc/CbmLitMCTrackCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmTrack.h"

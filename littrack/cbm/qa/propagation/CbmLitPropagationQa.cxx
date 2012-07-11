@@ -9,7 +9,7 @@
 #include "CbmLitPropagationQaHistCreator.h"
 #include "CbmLitPropagationQaDraw.h"
 #include "CbmLitPropagationQaCalculator.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "qa/base/CbmLitResultChecker.h"
 
 #include "FairRunAna.h"

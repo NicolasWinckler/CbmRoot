@@ -5,7 +5,7 @@
  */
 #include "CbmLitPropagationQaCalculator.h"
 #include "CbmLitPropagationQaHistCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "../mc/CbmLitMCTrackCreator.h"
 #include "../mc/CbmLitMCPoint.h"
 #include "data/CbmLitTrack.h"

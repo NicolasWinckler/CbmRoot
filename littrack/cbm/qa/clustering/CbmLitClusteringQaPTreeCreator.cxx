@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "CbmLitClusteringQaPTreeCreator.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "TH1.h"
 
 CbmLitClusteringQaPTreeCreator::CbmLitClusteringQaPTreeCreator():

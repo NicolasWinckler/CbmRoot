@@ -11,7 +11,6 @@ ${Boost_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/std
 ${CBMROOT_SOURCE_DIR}/littrack/cbm
-
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
@@ -109,7 +108,6 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/base/CbmLitResultChecker.cxx
-      cbm/qa/base/CbmHistManager.cxx
       cbm/qa/base/CbmLitPropertyTree.cxx
       cbm/qa/tracking/CbmLitTrackingQaCalculator.cxx
       cbm/qa/tracking/CbmLitTrackingQaHistCreator.cxx      

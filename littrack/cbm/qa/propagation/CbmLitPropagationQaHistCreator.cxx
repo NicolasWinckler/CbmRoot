@@ -4,7 +4,7 @@
  * \date 2012
  */
 #include "CbmLitPropagationQaHistCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "std/utils/CbmLitUtils.h"
 #include "TH1F.h"
 #include <boost/tuple/tuple.hpp>

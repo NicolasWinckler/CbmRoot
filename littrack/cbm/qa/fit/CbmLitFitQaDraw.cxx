@@ -5,7 +5,7 @@
  */
 
 #include "CbmLitFitQaDraw.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "CbmDrawHist.h"
 #include "utils/CbmLitUtils.h"
 #include "TCanvas.h"

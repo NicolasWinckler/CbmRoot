@@ -12,7 +12,7 @@
 #include "CbmLitClusteringQaReport.h"
 #include "CbmLitClusteringQaStudyReport.h"
 #include "CbmLitClusteringQaDraw.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "../base/CbmLitResultChecker.h"
 
 #include "TSystem.h"

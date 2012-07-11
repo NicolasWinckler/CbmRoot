@@ -12,7 +12,7 @@
 #include "CbmLitTrackingQaPTreeCreator.h"
 #include "CbmLitTrackingQaReport.h"
 #include "qa/base/CbmLitResultChecker.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 
 #include "TSystem.h"
 

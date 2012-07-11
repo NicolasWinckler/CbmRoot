@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "qa/tracking/CbmLitTrackingQaPTreeCreator.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "std/utils/CbmLitUtils.h"
 
 #include "TH1.h"

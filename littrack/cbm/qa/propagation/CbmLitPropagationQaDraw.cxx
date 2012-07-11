@@ -5,7 +5,7 @@
  */
 #include "CbmLitPropagationQaDraw.h"
 #include "CbmLitPropagationQaHistCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "std/utils/CbmLitUtils.h"
 #include "CbmDrawHist.h"
 #include "TCanvas.h"

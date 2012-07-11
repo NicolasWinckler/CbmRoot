@@ -9,7 +9,7 @@
 #include "CbmLitFitQaDraw.h"
 #include "CbmLitFitQaReport.h"
 #include "CbmLitFitQaCalculator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "../base/CbmLitResultChecker.h"
 
 #include <boost/property_tree/ptree.hpp>

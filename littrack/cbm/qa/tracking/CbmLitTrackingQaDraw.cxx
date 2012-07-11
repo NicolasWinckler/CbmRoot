@@ -6,7 +6,7 @@
  */
 #include "CbmLitTrackingQaDraw.h"
 #include "CbmLitTrackingQaHistCreator.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 
 #include "TCanvas.h"
 #include "TLine.h"

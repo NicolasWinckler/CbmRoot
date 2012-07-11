@@ -5,7 +5,7 @@
  */
 
 #include "CbmLitPropagationQaPTreeCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "TH1.h"
 #include "TF1.h"
 

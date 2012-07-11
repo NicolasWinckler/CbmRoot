@@ -68,6 +68,7 @@ CbmMCList.cxx
 CbmModule.cxx
 
 draw/CbmDrawHist.cxx
+CbmHistManager.cxx
 )
 
 If(Boost_FOUND)

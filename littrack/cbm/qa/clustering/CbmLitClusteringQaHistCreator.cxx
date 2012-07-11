@@ -6,7 +6,7 @@
  */
 
 #include "CbmLitClusteringQaHistCreator.h"
-#include "qa/base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "TH1F.h"
 #include <cassert>
 

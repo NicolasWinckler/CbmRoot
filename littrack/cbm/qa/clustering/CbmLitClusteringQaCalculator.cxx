@@ -6,7 +6,7 @@
  */
 
 #include "CbmLitClusteringQaCalculator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "CbmHit.h"
 #include "CbmBaseHit.h"
 #include "FairRootManager.h"

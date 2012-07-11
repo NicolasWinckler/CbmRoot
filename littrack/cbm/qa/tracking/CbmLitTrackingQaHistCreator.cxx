@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "CbmLitTrackingQaHistCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "CbmMCTrack.h"
 
 #include "TH1.h"

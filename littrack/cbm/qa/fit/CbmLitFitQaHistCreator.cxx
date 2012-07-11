@@ -5,7 +5,7 @@
  */
 
 #include "CbmLitFitQaHistCreator.h"
-#include "../base/CbmHistManager.h"
+#include "CbmHistManager.h"
 #include "TH1F.h"
 #include <boost/assign/list_of.hpp>
 #include <cassert>

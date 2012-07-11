@@ -4,7 +4,7 @@
  * \date 2011
  */
 #include "CbmLitTrackingQaStudyReport.h"
-#include "../report/CbmReportElement.h"
+#include "CbmReportElement.h"
 #include "../base/CbmLitPropertyTree.h"
 #include "../std/utils/CbmLitUtils.h"
 

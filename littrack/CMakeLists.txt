@@ -16,6 +16,7 @@ ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/cbmbase/report
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
@@ -135,12 +136,6 @@ If(Boost_FOUND)
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
-      cbm/qa/report/CbmReport.cxx      
-      cbm/qa/report/CbmStudyReport.cxx
-      cbm/qa/report/CbmSimulationReport.cxx
-      cbm/qa/report/CbmTextReportElement.cxx
-      cbm/qa/report/CbmHtmlReportElement.cxx       
-      cbm/qa/report/CbmLatexReportElement.cxx  
       cbm/qa/draw/CbmLitDrawHist.cxx
   )  
 EndIf(Boost_FOUND)

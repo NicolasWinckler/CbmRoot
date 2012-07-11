@@ -4,7 +4,7 @@
  * \date 2011
  */
 #include "CbmLitFieldQaReport.h"
-#include "../report/CbmReportElement.h"
+#include "CbmReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
 #include <cassert>
 #include <boost/assign/list_of.hpp>

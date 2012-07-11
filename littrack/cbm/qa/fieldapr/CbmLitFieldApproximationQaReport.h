@@ -7,7 +7,7 @@
 #ifndef CBMLITFIELDAPPROXIMATIONQAREPORT_H_
 #define CBMLITFIELDAPPROXIMATIONQAREPORT_H_
 
-#include "../report/CbmSimulationReport.h"
+#include "CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 

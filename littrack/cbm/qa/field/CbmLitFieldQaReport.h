@@ -7,7 +7,7 @@
 #ifndef CBMLITFIELDQAREPORT_H_
 #define CBMLITFIELDQAREPORT_H_
 
-#include "../report/CbmSimulationReport.h"
+#include "CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 

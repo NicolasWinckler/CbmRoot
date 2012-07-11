@@ -8,11 +8,12 @@
 #include "CbmLatexReportElement.h"
 #include "CbmHtmlReportElement.h"
 #include "CbmTextReportElement.h"
-#include "std/utils/CbmLitUtils.h"
 
 #include "TSystem.h"
 #include <fstream>
+#include <sstream>
 using std::ifstream;
+using std::stringstream;
 
 //#include <boost/filesystem.hpp>
 //#include <boost/regex.hpp>
@@ -84,10 +85,11 @@ vector<string> CbmReport::GetImages(
 //	return vector<string>();
 
 	// Implementation base on C++ system call.
-	string tmpFileName(string("qa_tmp_file_") + lit::ToString<Int_t>(gSystem->GetPid()) + ".tmp");
-	string findCommand("find " + dir + " -type f -regex \"" + pattern + "\" -print  | awk -F/ '{print $NF}' > " + tmpFileName);
+   stringstream tmpFileName;
+   tmpFileName << "qa_tmp_file_" << gSystem->GetPid() << ".tmp";
+	string findCommand("find " + dir + " -type f -regex \"" + pattern + "\" -print  | awk -F/ '{print $NF}' > " + tmpFileName.str());
 	system(findCommand.c_str());
-	ifstream tmpFile(tmpFileName.c_str(), ifstream::in);
+	ifstream tmpFile(tmpFileName.str().c_str(), ifstream::in);
 	vector<string> images;
 	string image;
 	while (tmpFile.good())  {
@@ -101,7 +103,7 @@ vector<string> CbmReport::GetImages(
 	    }
 	 }
 	tmpFile.close();
-	system(string("rm -rf " + tmpFileName).c_str());
+	system(string("rm -rf " + tmpFileName.str()).c_str());
 
 	for (Int_t i = 0; i < images.size(); i++) {
 		images[i].erase(images[i].size() - 4, 4);

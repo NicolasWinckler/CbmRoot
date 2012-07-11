@@ -7,7 +7,7 @@
 #ifndef CBMLITTRACKINGQASTUDYREPORT_H_
 #define CBMLITTRACKINGQASTUDYREPORT_H_
 
-#include "../report/CbmStudyReport.h"
+#include "CbmStudyReport.h"
 #include <string>
 #include <vector>
 #include "TSystem.h"

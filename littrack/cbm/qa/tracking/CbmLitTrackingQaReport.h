@@ -7,7 +7,7 @@
 #ifndef CBMLITTRACKINGQAREPORT_H_
 #define CBMLITTRACKINGQAREPORT_H_
 
-#include "../report/CbmSimulationReport.h"
+#include "CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 #include <sstream>

@@ -4,6 +4,7 @@
 
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
+${Boost_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -67,6 +68,59 @@ CbmMCList.cxx
 CbmModule.cxx
 )
 
+If(Boost_FOUND)
+  Set(CBMBASE_SRCS 
+    ${CBMBASE_SRCS}
+    report/CbmReport.cxx      
+    report/CbmStudyReport.cxx
+    report/CbmSimulationReport.cxx
+    report/CbmTextReportElement.cxx
+    report/CbmHtmlReportElement.cxx       
+    report/CbmLatexReportElement.cxx  
+  )
+EndIf(Boost_FOUND)
+
+set(CBMBASE_HEADERS
+CbmDetectorList.h
+
+CbmDigiManager.h
+CbmPropagator.h
+
+CbmTrdTrackFinder.h
+CbmTrdTrackFitter.h  
+
+CbmStsTrackFinder.h 
+CbmStsTrackFitter.h 
+
+CbmMuchTrackFinder.h
+
+CbmRichRingFinder.h
+CbmRichRingFitter.h 
+CbmRichTrackExtrapolation.h
+CbmRichRingTrackAssign.h
+CbmRichRingSelect.h
+
+CbmGlobalTrackFitter.h
+CbmPrimaryVertexFinder.h
+CbmRichMerger.h
+CbmTofMerger.h
+CbmTrackMerger.h
+
+CbmMCMatch.h
+CbmMCMatchCreatorTask.h
+CbmMCMatchLoaderTask.h
+CbmMCMatchSelectorTask.h
+CbmMCObject.h
+CbmMCStage.h
+CbmMCResult.h
+#CbmMCTestMomentumCompare.h
+CbmMCTestHitCompare.h
+CbmMCEntry.h
+CbmMCList.h
+
+CbmModule.h
+)
+
 EXEC_PROGRAM( ${ROOT_CONFIG_EXECUTABLE} 
     ARGS "--has-gdml"
     OUTPUT_VARIABLE ROOT_HAS_GDML )
@@ -82,7 +136,7 @@ endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h CBMBASE_HEADERS "${CBMBASE_SRCS}")
+#CHANGE_FILE_EXTENSION(*.cxx *.h CBMBASE_HEADERS "${CBMBASE_SRCS}")
 
 set(CBMBASE_LINKDEF  CbmBaseLinkDef.h)
 set(CBMBASE_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmBaseDict.cxx) 

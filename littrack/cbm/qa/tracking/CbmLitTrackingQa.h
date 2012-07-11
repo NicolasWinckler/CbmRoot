@@ -10,7 +10,6 @@
 
 #include "FairTask.h"
 #include "CbmDetectorList.h"
-#include "../report/CbmReport.h"
 #include "cbm/base/CbmLitDetectorSetup.h"
 
 class CbmHistManager;

@@ -6,7 +6,7 @@
  */
 #include "CbmLitClusteringQaReport.h"
 #include "../base/CbmLitPropertyTree.h"
-#include "../report/CbmReportElement.h"
+#include "CbmReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>

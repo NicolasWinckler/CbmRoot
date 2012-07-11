@@ -7,7 +7,7 @@
 #ifndef CBMLITPROPAGATIONQAREPORT_H_
 #define CBMLITPROPAGATIONQAREPORT_H_
 
-#include "../report/CbmSimulationReport.h"
+#include "CbmSimulationReport.h"
 #include "TSystem.h"
 
 /**

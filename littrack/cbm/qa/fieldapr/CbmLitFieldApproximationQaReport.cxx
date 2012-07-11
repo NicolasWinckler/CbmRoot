@@ -4,7 +4,7 @@
  * \date 2011
  */
 #include "CbmLitFieldApproximationQaReport.h"
-#include "../report/CbmReportElement.h"
+#include "CbmReportElement.h"
 #include "../../../std/utils/CbmLitUtils.h"
 #include <cassert>
 #include <boost/assign/list_of.hpp>

@@ -8,7 +8,7 @@
 #ifndef CBMLITCLUSTERINGQAREPORT_H_
 #define CBMLITCLUSTERINGQAREPORT_H_
 
-#include "../report/CbmSimulationReport.h"
+#include "CbmSimulationReport.h"
 #include "TSystem.h"
 #include <string>
 #include <sstream>

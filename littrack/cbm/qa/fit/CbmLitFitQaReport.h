@@ -7,7 +7,7 @@
 #ifndef CBMLITFITQAREPORT_H_
 #define CBMLITFITQAREPORT_H_
 
-#include "../report/CbmSimulationReport.h"
+#include "CbmSimulationReport.h"
 #include "TSystem.h"
 
 /**

@@ -1,17 +1,15 @@
 /**
- * \file CbmLitDrawHist.cxx
+ * \file CbmDrawHist.cxx
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
  **/
-#include "CbmLitDrawHist.h"
-#include "std/utils/CbmLitUtils.h"
+#include "CbmDrawHist.h"
 
 #include "TH1.h"
 #include "TH2.h"
 #include "TH1D.h"
 #include "TPad.h"
 #include "TLegend.h"
-#include "TLatex.h"
 #include "TStyle.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
@@ -27,7 +25,7 @@
 using std::stringstream;
 
 /* Set default styles for histograms. */
-void SetStyles()
+void SetDefaultDrawStyle()
 {
    gStyle->SetOptStat("");
    gStyle->SetOptFit(0);
@@ -45,8 +43,8 @@ void SetStyles()
 /* Draw TH1 histogram.*/
 void DrawH1(
    TH1* hist,
-   LitScale logx,
-   LitScale logy,
+   HistScale logx,
+   HistScale logy,
    const string& drawOpt,
    Int_t color,
    Int_t lineWidth,
@@ -54,15 +52,15 @@ void DrawH1(
    Int_t markerSize,
    Int_t markerStyle)
 {
-   Double_t textSize = LitDrawingOptions::TextSize();
+   Double_t textSize = CbmDrawingOptions::TextSize();
    hist->SetLineColor(color);
    hist->SetLineWidth(lineWidth);
    hist->SetLineStyle(lineStyle);
    hist->SetMarkerColor(color);
    hist->SetMarkerSize(markerSize);
    hist->SetMarkerStyle(markerStyle);
-   if (logx == kLitLog) { gPad->SetLogx(); }
-   if (logy == kLitLog) { gPad->SetLogy(); }
+   if (logx == kLog) { gPad->SetLogx(); }
+   if (logy == kLog) { gPad->SetLogy(); }
    hist->GetXaxis()->SetLabelSize(textSize);
    hist->GetXaxis()->SetNdivisions(505, kTRUE);
    hist->GetYaxis()->SetLabelSize(textSize);
@@ -80,15 +78,15 @@ void DrawH1(
 /* Draw TH2 histogram.*/
 void DrawH2(
    TH2* hist,
-   LitScale logx,
-   LitScale logy,
-   LitScale logz,
+   HistScale logx,
+   HistScale logy,
+   HistScale logz,
    const string& drawOpt)
 {
-   Double_t textSize = LitDrawingOptions::TextSize();
-   if (logx == kLitLog) { gPad->SetLogx(); }
-   if (logy == kLitLog) { gPad->SetLogy(); }
-   if (logz == kLitLog) { gPad->SetLogz(); }
+   Double_t textSize = CbmDrawingOptions::TextSize();
+   if (logx == kLog) { gPad->SetLogx(); }
+   if (logy == kLog) { gPad->SetLogy(); }
+   if (logz == kLog) { gPad->SetLogz(); }
    hist->GetXaxis()->SetLabelSize(textSize);
    hist->GetXaxis()->SetNdivisions(505, kTRUE);
    hist->GetYaxis()->SetLabelSize(textSize);
@@ -113,8 +111,8 @@ void DrawH2(
 void DrawH1(
    const vector<TH1*>& histos,
    const vector<string>& histLabels,
-   LitScale logx,
-   LitScale logy,
+   HistScale logx,
+   HistScale logy,
    Bool_t drawLegend,
    Double_t x1,
    Double_t y1,
@@ -130,8 +128,8 @@ void DrawH1(
    for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
       TH1* hist = histos[iHist];
       string opt = (iHist == 0) ? drawOpt : (iHist == nofHistos - 1) ? "SAME" + drawOpt : "SAME" + drawOpt;
-      DrawH1(hist, logx, logy, opt, LitDrawingOptions::Color(iHist), LitDrawingOptions::LineWidth(),
-            LitDrawingOptions::LineStyle(iHist), LitDrawingOptions::MarkerSize(), LitDrawingOptions::MarkerStyle(iHist));
+      DrawH1(hist, logx, logy, opt, CbmDrawingOptions::Color(iHist), CbmDrawingOptions::LineWidth(),
+            CbmDrawingOptions::LineStyle(iHist), CbmDrawingOptions::MarkerSize(), CbmDrawingOptions::MarkerStyle(iHist));
       max = std::max(max, hist->GetMaximum());
       legend->AddEntry(hist, histLabels[iHist].c_str(), "lp");
    }
@@ -141,8 +139,8 @@ void DrawH1(
 
 void DrawGraph(
    TGraph* graph,
-   LitScale logx,
-   LitScale logy,
+   HistScale logx,
+   HistScale logy,
    const string& drawOpt,
    Int_t color,
    Int_t lineWidth,
@@ -150,7 +148,7 @@ void DrawGraph(
    Int_t markerSize,
    Int_t markerStyle)
 {
-   Double_t textSize = LitDrawingOptions::TextSize();
+   Double_t textSize = CbmDrawingOptions::TextSize();
    graph->SetLineColor(color);
    graph->SetLineWidth(lineWidth);
    graph->SetLineStyle(lineStyle);
@@ -158,8 +156,8 @@ void DrawGraph(
    graph->SetMarkerSize(markerSize);
    graph->SetMarkerStyle(markerStyle);
    if (drawOpt.find("A") != string::npos) {
-      if (logx == kLitLog) { gPad->SetLogx(); }
-      if (logy == kLitLog) { gPad->SetLogy(); }
+      if (logx == kLog) { gPad->SetLogx(); }
+      if (logy == kLog) { gPad->SetLogy(); }
       graph->GetXaxis()->SetLabelSize(textSize);
       graph->GetXaxis()->SetNdivisions(505, kTRUE);
       graph->GetYaxis()->SetLabelSize(textSize);
@@ -178,8 +176,8 @@ void DrawGraph(
 void DrawGraph(
    const vector<TGraph*>& graphs,
    const vector<string>& graphLabels,
-   LitScale logx,
-   LitScale logy,
+   HistScale logx,
+   HistScale logy,
    Bool_t drawLegend,
    Double_t x1,
    Double_t y1,
@@ -196,8 +194,8 @@ void DrawGraph(
    for (UInt_t iGraph = 0; iGraph < nofGraphs; iGraph++) {
       TGraph* graph = graphs[iGraph];
       string opt = (iGraph == 0) ? "ACP" : "CP";
-      DrawGraph(graph, logx, logy, opt, LitDrawingOptions::Color(iGraph), LitDrawingOptions::LineWidth(),
-            LitDrawingOptions::LineStyle(iGraph), LitDrawingOptions::MarkerSize(), LitDrawingOptions::MarkerStyle(iGraph));
+      DrawGraph(graph, logx, logy, opt, CbmDrawingOptions::Color(iGraph), CbmDrawingOptions::LineWidth(),
+            CbmDrawingOptions::LineStyle(iGraph), CbmDrawingOptions::MarkerSize(), CbmDrawingOptions::MarkerStyle(iGraph));
       max = std::max(graph->GetYaxis()->GetXmax(), max);
       min = std::min(graph->GetYaxis()->GetXmin(), min);
       legend->AddEntry(graph, graphLabels[iGraph].c_str(), "lp");
@@ -210,15 +208,15 @@ void DrawGraph(
 /* Draws 2D graph.*/
 void DrawGraph2D(
    TGraph2D* graph,
-   LitScale logx,
-   LitScale logy,
-   LitScale logz,
+   HistScale logx,
+   HistScale logy,
+   HistScale logz,
    const string& drawOpt)
 {
-   Double_t textSize = LitDrawingOptions::TextSize();
-   if (logx == kLitLog) { gPad->SetLogx(); }
-   if (logy == kLitLog) { gPad->SetLogy(); }
-   if (logz == kLitLog) { gPad->SetLogz(); }
+   Double_t textSize = CbmDrawingOptions::TextSize();
+   if (logx == kLog) { gPad->SetLogx(); }
+   if (logy == kLog) { gPad->SetLogy(); }
+   if (logz == kLog) { gPad->SetLogz(); }
    graph->GetXaxis()->SetLabelSize(textSize);
    graph->GetXaxis()->SetNdivisions(505, kTRUE);
    graph->GetYaxis()->SetLabelSize(textSize);
@@ -237,15 +235,4 @@ void DrawGraph2D(
    gPad->SetTicks(1, 1);
    graph->Draw(drawOpt.c_str());
    gPad->SetGrid(true, true);
-}
-
-void  DrawHistSigmaRMS(
-   Double_t sigma,
-   Double_t rms)
-{
-   string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
-   TLatex text;
-   text.SetTextAlign(21);
-   text.SetTextSize(0.08);
-   text.DrawTextNDC(0.5, 0.83, txt1.c_str());
 }

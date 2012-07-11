@@ -17,6 +17,7 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmbase/report
+${CBMROOT_SOURCE_DIR}/cbmbase/draw
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
@@ -136,7 +137,6 @@ If(Boost_FOUND)
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
-      cbm/qa/draw/CbmLitDrawHist.cxx
   )  
 EndIf(Boost_FOUND)
 
@@ -161,7 +161,6 @@ cbm/qa/material/CbmLitCheckBrem.h
 cbm/qa/CbmTrdHitsQa.h
 cbm/qa/CbmLitCreateStandaloneData.h
 cbm/qa/CbmLitTestMatrixMath.h
-cbm/qa/draw/CbmLitDrawHist.h
 )
 
 If(Boost_FOUND)

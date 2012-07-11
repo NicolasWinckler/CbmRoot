@@ -16,6 +16,7 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmbase/report
+${CBMROOT_SOURCE_DIR}/cbmbase/draw
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd

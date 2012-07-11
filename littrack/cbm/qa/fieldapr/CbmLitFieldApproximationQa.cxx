@@ -10,7 +10,7 @@
 #include "base/CbmLitFieldFitter.h"
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 
 #include "../../../parallel/LitField.h"
 
@@ -86,7 +86,7 @@ CbmLitFieldApproximationQa::~CbmLitFieldApproximationQa()
 InitStatus CbmLitFieldApproximationQa::Init()
 {
    // Set draw styles
-   SetStyles();
+   SetDefaultDrawStyle();
 
    fNofSlices = fZSlicePosition.size();
    fNofPolynoms = fPolynomDegrees.size();
@@ -609,27 +609,27 @@ void CbmLitFieldApproximationQa::DrawSlices(
       canvas[i]->cd(1);
       TGraph2D* graph1 = fhBGraph[v][i];
 
-      DrawGraph2D(graph1, kLitLinear, kLitLinear, kLitLinear, "colz");
+      DrawGraph2D(graph1, kLinear, kLinear, kLinear, "colz");
 
       canvas[i]->cd(2);
       TH1* hist2 = (opt != "grid") ? fhBPolynomialErrH1[v][i][fPolynomDegreeIndex] : fhBGridErrH1[v][i];
-      DrawH1(hist2, kLitLinear, kLitLog);
+      DrawH1(hist2, kLinear, kLog);
 
       canvas[i]->cd(3);
       TH2* hist3 = (opt != "grid") ? fhBPolynomialErrH2[v][i][fPolynomDegreeIndex] : fhBGridErrH2[v][i];
-      DrawH2(hist3, kLitLinear, kLitLinear, kLitLinear, "colz");
+      DrawH2(hist3, kLinear, kLinear, kLinear, "colz");
 
       canvas[i]->cd(4);
       TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
-      DrawGraph2D(graph2, kLitLinear, kLitLinear, kLitLinear, "colz");
+      DrawGraph2D(graph2, kLinear, kLinear, kLinear, "colz");
 
       canvas[i]->cd(5);
       TH1* hist4 = (opt != "grid") ? fhBPolynomialRelErrH1[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1[v][i];
-      DrawH1(hist4, kLitLinear, kLitLog);
+      DrawH1(hist4, kLinear, kLog);
 
       canvas[i]->cd(6);
       TH2* hist5 = (opt != "grid") ? fhBPolynomialRelErrH2[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2[v][i];
-      DrawH2(hist5, kLitLinear, kLitLinear, kLitLinear, "colz");
+      DrawH2(hist5, kLinear, kLinear, kLinear, "colz");
 
       SaveCanvasAsImage(canvas[i], fOutputDir);
    }
@@ -660,7 +660,7 @@ void CbmLitFieldApproximationQa::DrawPoly(
             TH1* hist1 = (opt == "rel") ? fhBPolynomialRelErrH1[v][i][j] : fhBPolynomialErrH1[v][i][j];
             if (max < hist1->GetMaximum()) { max = hist1->GetMaximum(); }
             string draw_opt = (j == 0) ? "" : "SAME";
-            DrawH1(hist1, kLitLinear, kLitLog, draw_opt.c_str(), 1 + j, LitDrawingOptions::LineWidth(), 1 + j, LitDrawingOptions::MarkerSize(), kDot);
+            DrawH1(hist1, kLinear, kLog, draw_opt.c_str(), 1 + j, CbmDrawingOptions::LineWidth(), 1 + j, CbmDrawingOptions::MarkerSize(), kDot);
 
             if (v == 0) {
                string str = lit::ToString<Int_t>(fPolynomDegrees[j]);

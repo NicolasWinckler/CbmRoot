@@ -6,7 +6,7 @@
  */
 #include "CbmLitClusteringQaDraw.h"
 #include "qa/base/CbmHistManager.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include "TCanvas.h"
@@ -44,7 +44,7 @@ void CbmLitClusteringQaDraw::DrawHistogramsByPattern(
 		TH1* hist = histos[iHist];
 		string canvasName = string("clustering_qa_") + hist->GetName();
 		TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
-		DrawH1(hist, kLitLinear, kLitLinear);
+		DrawH1(hist, kLinear, kLinear);
 		if (fOutputDir != "") lit::SaveCanvasAsImage(canvas, fOutputDir);
 	}
 

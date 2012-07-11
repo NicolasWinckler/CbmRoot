@@ -7,10 +7,11 @@
 #include "CbmLitPropagationQaHistCreator.h"
 #include "../base/CbmHistManager.h"
 #include "std/utils/CbmLitUtils.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "TCanvas.h"
 #include "TH1F.h"
 #include "TF1.h"
+#include "TLatex.h"
 #include <cassert>
 using lit::SaveCanvasAsImage;
 using lit::ToString;
@@ -36,13 +37,24 @@ void CbmLitPropagationQaDraw::Draw(
    fHM = histManager;
    fOutputDir = outputDir;
 
-   SetStyles();
+   SetDefaultDrawStyle();
 
    for (Int_t iAlgorithm = 0; iAlgorithm < 3; iAlgorithm++) {
       for (Int_t iPlane = 0; iPlane < fNofPlanes; iPlane++) {
          DrawHistos(iAlgorithm, iPlane);
       }
    }
+}
+
+void CbmLitPropagationQaDraw::DrawHistSigmaRMS(
+   Double_t sigma,
+   Double_t rms)
+{
+   string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
+   TLatex text;
+   text.SetTextAlign(21);
+   text.SetTextSize(0.08);
+   text.DrawTextNDC(0.5, 0.83, txt1.c_str());
 }
 
 void CbmLitPropagationQaDraw::DrawHistos(
@@ -59,7 +71,7 @@ void CbmLitPropagationQaDraw::DrawHistos(
       TH1* hist = fHM->H1(CbmLitPropagationQaHistCreator::HistName(iParam, algorithmIndex, planeIndex));
       hist->Fit("gaus");
       hist->SetMaximum(hist->GetMaximum() * 1.50);
-      DrawH1(hist, kLitLinear, kLitLog);
+      DrawH1(hist, kLinear, kLog);
 
       TF1* fit = hist->GetFunction("gaus");
       Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;

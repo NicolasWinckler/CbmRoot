@@ -4,7 +4,7 @@
 #include "propagation/CbmLitMaterialInfo.h"
 #include "propagation/CbmLitMaterialEffectsImp.h"
 #include "utils/CbmLitUtils.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 
 #include "TCanvas.h"
 
@@ -52,7 +52,7 @@ CbmLitCheckEnergyLossMuons::~CbmLitCheckEnergyLossMuons()
 
 void CbmLitCheckEnergyLossMuons::Check()
 {
-   SetStyles();
+   SetDefaultDrawStyle();
 
    CreateGraphs();
 
@@ -76,7 +76,7 @@ void CbmLitCheckEnergyLossMuons::DrawGraphs()
    DrawGraph(list_of(fTable[0])(fTable[1])(fTable[2])(fTable[3])(fCalc[0])(fCalc[1])(fCalc[2])(fCalc[3]),
          list_of("total (table)")("ionization (table)")("bremsstrahlung (table)")("pair production (table)")
          ("total (calculation)")("ionization (calculation)")("bremsstrahlung (calculation)")("pair production (calculation)"),
-         kLitLog, kLitLog, true, 0.20, 0.97, 0.9, 0.7);
+         kLog, kLog, true, 0.20, 0.97, 0.9, 0.7);
 
    lit::SaveCanvasAsImage(c1, fOutputDir);
 }

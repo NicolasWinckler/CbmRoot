@@ -1,7 +1,7 @@
 #include "qa/material/CbmLitCheckMultipleScattering.h"
 
 #include "geo/CbmLitDetPoint.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include "FairRootManager.h"
@@ -141,11 +141,11 @@ void CbmLitCheckMultipleScattering::Finish()
 
 void CbmLitCheckMultipleScattering::Draw()
 {
-   SetStyles();
+   SetDefaultDrawStyle();
 
    TCanvas* canvas1 = new TCanvas("multiple_scattering_theta", "multiple_scattering_theta", 700, 500);
    canvas1->cd(1);
-   DrawH1(fh_theta_mc, kLitLinear, kLitLog, "", kBlue, 2, 1, 1, kDot);
+   DrawH1(fh_theta_mc, kLinear, kLog, "", kBlue, 2, 1, 1, kDot);
 
    fh_theta_mc->Fit("gaus");
    TF1* fit1 = fh_theta_mc->GetFunction("gaus");
@@ -166,7 +166,7 @@ void CbmLitCheckMultipleScattering::Draw()
    std::string eloss_mc = "MC(" + lit::ToString<Double_t>(fh_eloss_mc->GetMean()) + ")";
    std::string eloss_rec = "Reco(" + lit::ToString<Double_t>(fh_eloss_rec->GetMean()) + ")";
    DrawH1(list_of(fh_eloss_mc)(fh_eloss_rec), list_of(eloss_mc)(eloss_rec),
-         kLitLog, kLitLog, true, 0.6, 0.6, 0.9, 0.9);
+         kLog, kLog, true, 0.6, 0.6, 0.9, 0.9);
    lit::SaveCanvasAsImage(canvas2, fOutputDir);
 }
 

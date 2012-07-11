@@ -7,7 +7,7 @@
 #include "CbmLitFieldQaReport.h"
 #include "cbm/base/CbmLitEnvironment.h"
 #include "utils/CbmLitUtils.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -63,7 +63,7 @@ CbmLitFieldQa::~CbmLitFieldQa()
 InitStatus CbmLitFieldQa::Init()
 {
    // Set draw styles
-   SetStyles();
+   SetDefaultDrawStyle();
 
    fNofSlices = fZSlicePosition.size();
 
@@ -288,7 +288,7 @@ void CbmLitFieldQa::DrawFieldSlices()
    for (Int_t i = 0; i < fNofSlices; i++) {
 	   for (Int_t v = 0; v < 4; v++) {
 		  canvas[i]->cd(v + 1);
-		  DrawGraph2D(fgB[v][i], kLitLinear, kLitLinear, kLitLinear, "colz");
+		  DrawGraph2D(fgB[v][i], kLinear, kLinear, kLinear, "colz");
 	   }
        SaveCanvasAsImage(canvas[i], fOutputDir);
    }
@@ -302,7 +302,7 @@ void CbmLitFieldQa::DrawFieldAlongZ()
       ss << "field_qa_map_along_z_angle_" << (int)fAlongZAngles[i];
       TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
       DrawGraph(list_of(fgBAlongZAngle[BX][i])(fgBAlongZAngle[BY][i])(fgBAlongZAngle[BZ][i])(fgBAlongZAngle[MOD][i]),
-            list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+            list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
       gPad->SetGrid(true, true);
       SaveCanvasAsImage(c, fOutputDir);
    }
@@ -312,7 +312,7 @@ void CbmLitFieldQa::DrawFieldAlongZ()
       ss << "field_qa_map_along_z_xy_" << (int)fAlongZXY[i].first << "_" << (int)fAlongZXY[i].second;
       TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
       DrawGraph(list_of(fgBAlongZXY[BX][i])(fgBAlongZXY[BY][i])(fgBAlongZXY[BZ][i])(fgBAlongZXY[MOD][i]),
-         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
       gPad->SetGrid(true, true);
       SaveCanvasAsImage(c, fOutputDir);
    }
@@ -323,7 +323,7 @@ void CbmLitFieldQa::DrawFieldAlongZ()
       TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
       fgBAlongZXYIntegral[BX][i]->GetXaxis()->SetRangeUser(fMinZFieldInt - 2., fMaxZFieldInt + 2);
       DrawGraph(list_of(fgBAlongZXYIntegral[BX][i])(fgBAlongZXYIntegral[BY][i])(fgBAlongZXYIntegral[BZ][i])(fgBAlongZXYIntegral[MOD][i]),
-         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLitLinear, kLitLinear, true, 0.7, 0.5, 0.9, 0.3);
+         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
       std::cout << i << " " << fgBAlongZXYIntegral[BX][i]->GetMaximum() << std::endl;
 
       gPad->SetGrid(true, true);

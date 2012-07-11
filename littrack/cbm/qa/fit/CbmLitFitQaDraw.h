@@ -38,6 +38,16 @@ private:
 	void DrawResidualAndPullHistograms(
 	      const string& detName);
 
+	/**
+	 * \fn DrawHistSigmaRMS
+	 * \brief Draw sigma and RMS on histogram.
+	 * \param[in] sigma Sigma value.
+	 * \param[in] rms RMS value.
+	 */
+	void DrawHistSigmaRMS(
+	   Double_t sigma,
+	   Double_t rms);
+
 	CbmHistManager* fHM; // Pointer to histogram manager
 	string fOutputDir; // Output directory for images
 };

@@ -6,9 +6,10 @@
 
 #include "CbmLitFitQaDraw.h"
 #include "../base/CbmHistManager.h"
-#include "../draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "utils/CbmLitUtils.h"
 #include "TCanvas.h"
+#include "TLatex.h"
 #include "TH1.h"
 #include "TF1.h"
 #include <cassert>
@@ -38,6 +39,17 @@ void CbmLitFitQaDraw::Draw(
    DrawResidualAndPullHistograms("Much");
 }
 
+void CbmLitFitQaDraw::DrawHistSigmaRMS(
+   Double_t sigma,
+   Double_t rms)
+{
+   string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
+   TLatex text;
+   text.SetTextAlign(21);
+   text.SetTextSize(0.08);
+   text.DrawTextNDC(0.5, 0.83, txt1.c_str());
+}
+
 void CbmLitFitQaDraw::DrawResidualAndPullHistograms(
       const string& detName)
 {
@@ -60,7 +72,7 @@ void CbmLitFitQaDraw::DrawResidualAndPullHistograms(
 			   Int_t histId = iCat * 5 + iPar;
 			   canvas->cd(histId + 1);
 			   TH1* hist = fHM->H1(histName);
-			   DrawH1(hist, kLitLinear, kLitLog);
+			   DrawH1(hist, kLinear, kLog);
 
 			   if (histId < 10) { // Fit only residual and pull histograms
 				   hist->Fit("gaus");

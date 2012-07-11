@@ -1,11 +1,11 @@
 /**
- * \file CbmLitDrawHist.h
+ * \file CbmDrawHist.h
  * \brief Helper functions for drawing 1D and 2D histograms and graphs.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
  **/
-#ifndef CBMLITDRAWHIST_H_
-#define CBMLITDRAWHIST_H_
+#ifndef CBMDRAWHIST_H_
+#define CBMDRAWHIST_H_
 
 #include "TH1.h"
 #include "TH1D.h"
@@ -21,12 +21,12 @@ using std::string;
 using std::vector;
 
 /**
- * \class LitDrawingOptions
+ * \class CbmDrawingOptions
  * \brief Default options for drawing.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2012
  */
-class LitDrawingOptions
+class CbmDrawingOptions
 {
 public:
 
@@ -61,12 +61,12 @@ public:
 };
 
 /**
- * \enum LitScale
+ * \enum HistScale
  * \brief Define linear or logarithmic scale for drawing.
  */
-enum LitScale {
-   kLitLog = 0, /**> Linear scale. */
-   kLitLinear = 1 /**> Logarithmic scale */
+enum HistScale {
+   kLog = 0, /**> Linear scale. */
+   kLinear = 1 /**> Logarithmic scale */
 };
 
 
@@ -74,7 +74,7 @@ enum LitScale {
  * \fn SetStyles
  * \brief Set default styles for histograms.
  */
-void SetStyles();
+void SetDefaultDrawStyle();
 
 /**
  * \fn DrawH1
@@ -91,14 +91,14 @@ void SetStyles();
  */
 void DrawH1(
    TH1* hist,
-   LitScale logx = kLitLinear,
-   LitScale logy = kLitLinear,
+   HistScale logx = kLinear,
+   HistScale logy = kLinear,
    const string& drawOpt = "",
-   Int_t color = LitDrawingOptions::Color(0),
-   Int_t lineWidth = LitDrawingOptions::LineWidth(),
-   Int_t lineStyle = LitDrawingOptions::LineStyle(0),
-   Int_t markerSize = LitDrawingOptions::MarkerSize(),
-   Int_t markerStyle = LitDrawingOptions::MarkerStyle(0));
+   Int_t color = CbmDrawingOptions::Color(0),
+   Int_t lineWidth = CbmDrawingOptions::LineWidth(),
+   Int_t lineStyle = CbmDrawingOptions::LineStyle(0),
+   Int_t markerSize = CbmDrawingOptions::MarkerSize(),
+   Int_t markerStyle = CbmDrawingOptions::MarkerStyle(0));
 
 
 /**
@@ -111,9 +111,9 @@ void DrawH1(
  */
 void DrawH2(
    TH2* hist,
-   LitScale logx = kLitLinear,
-   LitScale logy = kLitLinear,
-   LitScale logz = kLitLinear,
+   HistScale logx = kLinear,
+   HistScale logy = kLinear,
+   HistScale logz = kLinear,
    const string& drawOpt = "COLZ");
 
 
@@ -134,8 +134,8 @@ void DrawH2(
 void DrawH1(
    const vector<TH1*>& histos,
    const vector<string>& histLabels,
-   LitScale logx = kLitLinear,
-   LitScale logy = kLitLinear,
+   HistScale logx = kLinear,
+   HistScale logy = kLinear,
    Bool_t drawLegend = true,
    Double_t x1 = 0.25,
    Double_t y1 = 0.99,
@@ -158,14 +158,14 @@ void DrawH1(
  */
 void DrawGraph(
    TGraph* graph,
-   LitScale logx = kLitLinear,
-   LitScale logy = kLitLinear,
+   HistScale logx = kLinear,
+   HistScale logy = kLinear,
    const string& drawOpt = "",
-   Int_t color = LitDrawingOptions::Color(0),
-   Int_t lineWidth = LitDrawingOptions::LineWidth(),
-   Int_t lineStyle = LitDrawingOptions::LineStyle(0),
-   Int_t markerSize = LitDrawingOptions::MarkerSize(),
-   Int_t markerStyle = LitDrawingOptions::MarkerStyle(0));
+   Int_t color = CbmDrawingOptions::Color(0),
+   Int_t lineWidth = CbmDrawingOptions::LineWidth(),
+   Int_t lineStyle = CbmDrawingOptions::LineStyle(0),
+   Int_t markerSize = CbmDrawingOptions::MarkerSize(),
+   Int_t markerStyle = CbmDrawingOptions::MarkerStyle(0));
 
 /**
  * \fn DrawGraph.
@@ -183,8 +183,8 @@ void DrawGraph(
 void DrawGraph(
    const vector<TGraph*>& graphs,
    const vector<string>& graphLabels,
-   LitScale logx = kLitLinear,
-   LitScale logy = kLitLinear,
+   HistScale logx = kLinear,
+   HistScale logy = kLinear,
    Bool_t drawLegend = true,
    Double_t x1 = 0.25,
    Double_t y1 = 0.99,
@@ -202,19 +202,9 @@ void DrawGraph(
  */
 void DrawGraph2D(
    TGraph2D* graph,
-   LitScale logx = kLitLinear,
-   LitScale logy = kLitLinear,
-   LitScale logz = kLitLinear,
+   HistScale logx = kLinear,
+   HistScale logy = kLinear,
+   HistScale logz = kLinear,
    const string& drawOpt = "");
-
-/**
- * \fn DrawHistSigmaRMS
- * \brief Draw sigma and RMS on histogram.
- * \param[in] sigma Sigma value.
- * \param[in] rms RMS value.
- */
-void DrawHistSigmaRMS(
-   Double_t sigma,
-   Double_t rms);
 
 #endif

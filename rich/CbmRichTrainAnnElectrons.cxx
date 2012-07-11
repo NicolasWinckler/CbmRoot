@@ -15,7 +15,7 @@
 #include "FairRootManager.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 
 #include "TString.h"
 #include "TSystem.h"
@@ -362,39 +362,39 @@ void CbmRichTrainAnnElectrons::Draw()
 
    TCanvas* c1 = new TCanvas("ann_electrons_ann_output", "ann_electrons_ann_output", 500, 500);
    DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_electrons_cum_prob", "ann_electrons_cum_prob", 500, 500);
    DrawH1(list_of(fhCumProb[0])(fhCumProb[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLinear, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    int c = 1;
    TCanvas* c3 = new TCanvas("ann_electrons_params", "ann_electrons_params", 900, 600);
    c3->Divide(3, 2);
    c3->cd(c++);
    DrawH1(list_of(fhAaxis[0])(fhAaxis[1]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
    DrawH1(list_of(fhBaxis[0])(fhBaxis[1]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 //   c3->cd(c++);
 //   DrawH1(list_of(fhAaxisCor[0])(fhAaxisCor[1]), list_of("El")("Pi"),
-//            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+//            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 //   c3->cd(c++);
 //   DrawH1(list_of(fhBaxisCor[0])(fhBaxisCor[1]), list_of("El")("Pi"),
-//            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+//            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
    DrawH1(list_of(fhDist[0])(fhDist[1]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
    DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
    DrawH1(list_of(fhChi2[0])(fhChi2[1]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
    DrawH1(list_of(fhRadPos[0])(fhRadPos[1]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    c = 1;
    TCanvas* c4 = new TCanvas("ann_electrons_params_2d", "ann_electrons_params_2d", 600, 900);

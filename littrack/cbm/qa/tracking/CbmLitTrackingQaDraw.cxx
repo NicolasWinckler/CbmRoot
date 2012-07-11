@@ -12,7 +12,7 @@
 #include "TLine.h"
 #include "TDirectory.h"
 
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "utils/CbmLitUtils.h"
 
 #include <boost/assign/list_of.hpp>
@@ -46,7 +46,7 @@ void CbmLitTrackingQaDraw::Draw(
    fHM = histManager;
    fOutputDir = outputDir;
 
-   SetStyles();
+   SetDefaultDrawStyle();
    DrawEfficiencyHistos();
    DrawHitsHistos();
 //   DrawStsTracksQaHistos();
@@ -106,7 +106,7 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
 		labels[iHist] = split[1] + ":" + split[3] + "(" + NumberToString<Double_t>(efficiencies[iHist], 1) + ")";
 	}
 
-	DrawH1(histos, labels, kLitLinear, kLitLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
+	DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
 	DrawMeanEfficiencyLines(histos, efficiencies);
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
@@ -162,7 +162,7 @@ void CbmLitTrackingQaDraw::DrawAccAndRec(
 		labels[iHist] = split[4] + ":" + split[3] + "(" + NumberToString<Double_t>(hist->GetEntries() / nofEvents, 1) + ")";
 	}
 
-	DrawH1(histos, labels, kLitLinear, kLitLog, true, 0.2, 0.75, 0.5, 0.99);
+	DrawH1(histos, labels, kLinear, kLog, true, 0.2, 0.75, 0.5, 0.99);
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 //void CbmLitTrackingQaDraw::DrawMcEfficiencyGraph()
@@ -229,7 +229,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
       list_of("all: " + NumberToString<Double_t>(hAll->GetMean(), 1))
              ("true: " + NumberToString<Double_t>(hTrue->GetMean(), 1))
              ("fake: " + NumberToString<Double_t>(hFake->GetMean(), 1)),
-              kLitLinear, kLitLog, true, 0.25, 0.99, 0.55, 0.75);
+              kLinear, kLog, true, 0.25, 0.99, 0.55, 0.75);
 
    canvas->cd(2);
    TH1* hTrueOverAll = fHM->H1(hist + "_TrueOverAll");
@@ -237,7 +237,7 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
    DrawH1(list_of(hTrueOverAll)(hFakeOverAll),
       list_of("true/all: " + NumberToString<Double_t>(hTrueOverAll->GetMean()))
              ("fake/all: " + NumberToString<Double_t>(hFakeOverAll->GetMean())),
-             kLitLinear, kLitLog, true, 0.25, 0.99, 0.55, 0.75);
+             kLinear, kLog, true, 0.25, 0.99, 0.55, 0.75);
 
    lit::SaveCanvasAsImage(canvas, fOutputDir);
 }

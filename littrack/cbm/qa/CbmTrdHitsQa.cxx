@@ -6,7 +6,7 @@
 
 #include "qa/CbmTrdHitsQa.h"
 #include "utils/CbmLitUtils.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 
 #include "FairRootManager.h"
 #include "CbmTrdHit.h"
@@ -174,7 +174,7 @@ void CbmTrdHitsQa::WriteToFile()
 
 void CbmTrdHitsQa::Draw()
 {
-   SetStyles();
+   SetDefaultDrawStyle();
 
    TCanvas* chX = new TCanvas("trd_hits_qa_x","trd_hits_qa_x", 1200, 800);
    chX->Divide(4,3);
@@ -206,35 +206,35 @@ void CbmTrdHitsQa::Draw()
 
    for (Int_t i = 0; i < fNofPlanes; i++) {
       chX->cd(i + 1);
-      DrawH1(fhX[i], kLitLinear, kLitLog);
+      DrawH1(fhX[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chX, fOutputDir);
 
       chY->cd(i + 1);
-      DrawH1(fhY[i], kLitLinear, kLitLog);
+      DrawH1(fhY[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chY, fOutputDir);
 
       chDx->cd(i + 1);
-      DrawH1(fhDx[i], kLitLinear, kLitLog);
+      DrawH1(fhDx[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chDx, fOutputDir);
 
       chDy->cd(i + 1);
-      DrawH1(fhDy[i], kLitLinear, kLitLog);
+      DrawH1(fhDy[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chDy, fOutputDir);
 
       chXY->cd(i + 1);
-      DrawH2(fhXY[i], kLitLinear, kLitLinear, kLitLog, "colz");
+      DrawH2(fhXY[i], kLinear, kLinear, kLog, "colz");
       lit::SaveCanvasAsImage(chXY, fOutputDir);
 
       chResX->cd(i + 1);
-      DrawH1(fhResX[i], kLitLinear, kLitLog);
+      DrawH1(fhResX[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chResX, fOutputDir);
 
       chResY->cd(i + 1);
-      DrawH1(fhResY[i], kLitLinear, kLitLog);
+      DrawH1(fhResY[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chResY, fOutputDir);
 
       chPullX->cd(i + 1);
-      DrawH1(fhPullX[i], kLitLinear, kLitLog);
+      DrawH1(fhPullX[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chPullX, fOutputDir);
 
       TH1F* hist = fhPullX[i];
@@ -245,10 +245,10 @@ void CbmTrdHitsQa::Draw()
          sigma = fit->GetParameter(2);
          rms = hist->GetRMS();
       }
-      DrawHistSigmaRMS(sigma, rms);
+      //DrawHistSigmaRMS(sigma, rms);
 
       chPullY->cd(i + 1);
-      DrawH1(fhPullY[i], kLitLinear, kLitLog);
+      DrawH1(fhPullY[i], kLinear, kLog);
       lit::SaveCanvasAsImage(chPullY, fOutputDir);
       hist = fhPullY[i];
       hist->Fit("gaus");
@@ -257,7 +257,7 @@ void CbmTrdHitsQa::Draw()
          sigma = fit->GetParameter(2);
          rms = hist->GetRMS();
       }
-      DrawHistSigmaRMS(sigma, rms);
+      //DrawHistSigmaRMS(sigma, rms);
    }
 }
 

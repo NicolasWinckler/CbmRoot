@@ -14,7 +14,7 @@
 #include "CbmRichRingFitterCOP.h"
 #include "CbmRichRingSelectImpl.h"
 #include "FairRootManager.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "CbmRichConverter.h"
 
 #include "TMultiLayerPerceptron.h"
@@ -317,32 +317,32 @@ void CbmRichTrainAnnSelect::Draw()
 
    TCanvas* c1 = new TCanvas("ann_select_ann_output", "ann_select_ann_output", 500, 500);
    DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("True")("Fake"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_select_cum_prob", "ann_select_cum_prob", 500, 500);
    DrawH1(list_of(fhCumProb[0])(fhCumProb[1]), list_of("True")("Fake"),
-         kLitLinear, kLitLinear, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c3 = new TCanvas("ann_select_params", "ann_select_params", 900, 600);
    c3->Divide(3, 2);
    c3->cd(1);
    DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("True")("Fake"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(2);
    DrawH1(list_of(fhAngle[0])(fhAngle[1]), list_of("True")("Fake"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(3);
    DrawH1(list_of(fhNofHitsOnRing[0])(fhNofHitsOnRing[1]), list_of("True")("Fake"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(4);
    DrawH1(list_of(fhRadPos[0])(fhRadPos[1]), list_of("True")("Fake"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(5);
    DrawH1(list_of(fhChi2[0])(fhChi2[1]), list_of("True")("Fake"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(6);
    DrawH1(list_of(fhRadius[0])(fhRadius[1]), list_of("True")("Fake"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 }
 
 void CbmRichTrainAnnSelect::FinishTask()

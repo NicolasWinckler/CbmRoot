@@ -21,7 +21,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "CbmRichHitProducer.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 #include "std/utils/CbmLitUtils.h"
 #include "CbmRichConverter.h"
 //#include "cbm/qa/report/CbmReport.h"
@@ -716,7 +716,7 @@ void CbmRichGeoTest::DrawHist()
    cFitEff->Divide(3,1);
    cFitEff->cd(1);
    DrawH1( list_of((TH1D*)fhNofHitsAll->Clone())((TH1D*)fhNofHitsCircleFit->Clone())((TH1D*)fhNofHitsEllipseFit->Clone()),
-         list_of("All")("Circle fit")("Ellipse fit"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+         list_of("All")("Circle fit")("Ellipse fit"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
    fhNofHitsCircleFitEff = DivideH1(fhNofHitsCircleFit, fhNofHitsAll, "", "", "Nof hits in ring", "Efficiency");
    fhNofHitsEllipseFitEff = DivideH1(fhNofHitsEllipseFit, fhNofHitsAll, "", "", "Nof hits in ring", "Efficiency");
    cFitEff->cd(2);
@@ -743,11 +743,11 @@ void CbmRichGeoTest::DrawHist()
    TH1D* pzAcc = fhAcc3D->ProjectionZ();
    pzAcc->SetName((string(fhAcc3D->GetName())+"_pz").c_str());
    cAccEff->cd(1);
-   DrawH1(list_of((TH1D*)pxMc->Clone())((TH1D*)pxAcc->Clone()), list_of("MC")("ACC"), kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of((TH1D*)pxMc->Clone())((TH1D*)pxAcc->Clone()), list_of("MC")("ACC"), kLinear, kLog, true, 0.7, 0.75, 0.99, 0.99);
    cAccEff->cd(2);
-   DrawH1(list_of((TH1D*)pyMc->Clone())((TH1D*)pyAcc->Clone()), list_of("MC")("ACC"), kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of((TH1D*)pyMc->Clone())((TH1D*)pyAcc->Clone()), list_of("MC")("ACC"), kLinear, kLog, true, 0.7, 0.75, 0.99, 0.99);
    cAccEff->cd(3);
-   DrawH1(list_of((TH1D*)pzMc->Clone())((TH1D*)pzAcc->Clone()), list_of("MC")("ACC"), kLitLinear, kLitLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of((TH1D*)pzMc->Clone())((TH1D*)pzAcc->Clone()), list_of("MC")("ACC"), kLinear, kLog, true, 0.7, 0.75, 0.99, 0.99);
 
    TH1D* pxEff = DivideH1(pxAcc, pxMc, "pxEff", "", "P [GeV/c]", "Efficiency");
    TH1D* pyEff = DivideH1(pyAcc, pyMc, "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
@@ -818,10 +818,10 @@ void CbmRichGeoTest::DrawHist()
    cRABMeanRmsvsNofHits->Divide(2, 1);
    cRABMeanRmsvsNofHits->cd(1);
    DrawH1(list_of(prRMean)(prAMean)(prBMean),
-         list_of("R")("A")("B"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+         list_of("R")("A")("B"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
    cRABMeanRmsvsNofHits->cd(2);
    DrawH1(list_of(prRRms)(prARms)(prBRms),
-         list_of("R")("A")("B"), kLitLinear, kLitLog, true, 0.7, 0.7, 0.99, 0.99);
+         list_of("R")("A")("B"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
 }
 
 void CbmRichGeoTest::CreatePTree()

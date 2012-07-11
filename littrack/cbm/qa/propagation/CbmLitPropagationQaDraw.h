@@ -53,6 +53,16 @@ private:
       Int_t algorithmIndex,
       Int_t planeIndex);
 
+   /**
+    * \fn DrawHistSigmaRMS
+    * \brief Draw sigma and RMS on histogram.
+    * \param[in] sigma Sigma value.
+    * \param[in] rms RMS value.
+    */
+   void DrawHistSigmaRMS(
+      Double_t sigma,
+      Double_t rms);
+
    CbmHistManager* fHM; // Histogram manager
    string fOutputDir; // Output directory for images
    Int_t fNofPlanes; // Number of planes

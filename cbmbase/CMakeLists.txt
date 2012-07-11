@@ -66,6 +66,8 @@ CbmMCEntry.cxx
 CbmMCList.cxx
 
 CbmModule.cxx
+
+draw/CbmDrawHist.cxx
 )
 
 If(Boost_FOUND)
@@ -119,6 +121,8 @@ CbmMCEntry.h
 CbmMCList.h
 
 CbmModule.h
+
+draw/CbmDrawHist.h
 )
 
 EXEC_PROGRAM( ${ROOT_CONFIG_EXECUTABLE} 

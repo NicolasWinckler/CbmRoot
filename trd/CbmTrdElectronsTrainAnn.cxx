@@ -17,7 +17,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmMCTrack.h"
 
-#include "cbm/qa/draw/CbmLitDrawHist.h"
+#include "CbmDrawHist.h"
 
 #include <boost/assign/list_of.hpp>
 
@@ -684,29 +684,29 @@ void CbmTrdElectronsTrainAnn::Draw()
    cEloss->Divide(3, 2);
    cEloss->cd(1);
    DrawH1(list_of(fhSumEloss[0])(fhSumEloss[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(2);
    DrawH1(list_of(fhEloss[0])(fhEloss[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(3);
    DrawH1(list_of(fhdEdX[0])(fhdEdX[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(4);
    DrawH1(list_of(fhTR[0])(fhTR[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(5);
    DrawH1(list_of(fhNofTRLayers[0])(fhNofTRLayers[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(6);
    DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* cElossSort = new TCanvas("trd_elid_eloss_sort", "trd_elid_eloss_sort", 1200, 900);
    cElossSort->Divide(4, 3);
    for (int iL = 0; iL < 12; iL++){
       cElossSort->cd(iL+1);
       DrawH1(list_of(fhElossSort[0][iL])(fhElossSort[1][iL]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    }
 
    TCanvas* cCumProbSort = new TCanvas("trd_elid_eloss_cum_prob", "trd_elid_eloss_cum_prob", 1200, 900);
@@ -714,18 +714,18 @@ void CbmTrdElectronsTrainAnn::Draw()
    for (int iL = 0; iL < 12; iL++){
       cCumProbSort->cd(iL+1);
       DrawH1(list_of(fhCumProbSort[0][iL])(fhCumProbSort[1][iL]), list_of("El")("Pi"),
-            kLitLinear, kLitLinear, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
    }
 
 	TCanvas* c1_1 = new TCanvas("trd_elid_classifier_output","trd_elid_classifier_output", 500,500);
-   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("El")("Pi"), kLitLinear, kLitLog,
+   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("El")("Pi"), kLinear, kLog,
          true, 0.8, 0.8, 0.99, 0.99);
 	fhAnnOutput[0]->Scale(1./fhAnnOutput[0]->Integral());
 	fhAnnOutput[1]->Scale(1./fhAnnOutput[1]->Integral());
 
 	TCanvas* c1_2 = new TCanvas("trd_elid_cum_prob","trd_elid_cum_prob", 500,500);
    DrawH1(list_of(fhCumProbAnnOutput[0])(fhCumProbAnnOutput[1]), list_of("El")("Pi"),
-         kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
 	TCanvas* c1_3 = new TCanvas("trd_elid_roc","trd_elid_roc", 500,500);
 
@@ -743,7 +743,7 @@ void CbmTrdElectronsTrainAnn::Draw()
 	for (int i = 0; i < 12; i++) {
 		c9->cd(i + 1);
       DrawH1(list_of(fhAnnInput[0][i])(fhAnnInput[1][i]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 	}
 
 	TCanvas* c10 = new TCanvas("c10", "c10", 10, 10, 800, 800);
@@ -751,7 +751,7 @@ void CbmTrdElectronsTrainAnn::Draw()
 	for (int i = 0; i < 12; i++) {
 		c10->cd(i + 1);
       DrawH1(list_of(fhElossPdfSort[0][i])(fhElossPdfSort[1][i]), list_of("El")("Pi"),
-            kLitLinear, kLitLog, true, 0.8, 0.8, 0.99, 0.99);
+            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 	}
 }
 

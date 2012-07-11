@@ -15,7 +15,6 @@
 #include "CbmMCTrack.h"
 
 #include "FairRootManager.h"
-#include "cbm/qa/draw/CbmLitDrawHist.h"
 
 #include "TClonesArray.h"
 #include "TCanvas.h"

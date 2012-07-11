@@ -4,7 +4,7 @@
  * \date 2012
  */
 #include "CbmRichGeoTestStudyReport.h"
-#include "cbm/qa/report/CbmReportElement.h"
+#include "CbmReportElement.h"
 
 #include "TSystem.h"
 

@@ -7,7 +7,7 @@
 #ifndef CBM_RICH_GEO_TEST_STUDY_REPORT
 #define CBM_RICH_GEO_TEST_STUDY_REPORT
 
-#include "cbm/qa/report/CbmStudyReport.h"
+#include "CbmStudyReport.h"
 #include <string>
 #include "TSystem.h"
 using std::string;

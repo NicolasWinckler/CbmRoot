@@ -11,10 +11,10 @@
 #define CBMRICHGEOTEST
 
 #include "FairTask.h"
-
+class TH1;
+class TH2;
 class TH1D;
 class TH2D;
-class TH3D;
 class TClonesArray;
 class CbmRichRingFitterCOP;
 class CbmRichRingFitterEllipseTau;
@@ -181,6 +181,21 @@ private:
 	void DrawRing(
 	      CbmRichRingLight* ringHit,
 	      CbmRichRingLight* ringPoint);
+	/**
+	 * \brief Creates two histogram. First is mean value vs. x axis,
+	 * errors represents RMS. Second is RMS value vs. x axis.
+	 * \param[in] hist Input 2D histogram.
+	 * \param[out] meanHist Histogram of mean values.
+	 * \param[out] rmsHist Histogram of RMS values.
+	 */
+	void CreateH2MeanRms(
+	      TH2D* hist,
+	      TH1D** meanHist,
+	      TH1D** rmsHist);
+
+	void DrawH2MeanRms(
+	      TH2D* hist,
+	      const string& canvasName);
 
 	/**
 	 * \brief Create property tree an store different statistics there.
@@ -268,7 +283,7 @@ private:
 	vector<TH2D*> fhXcYcCircle; // (Xc, Yc) of circle center
 	vector<TH2D*> fhRadiusVsMom; // circle radius vs. MC momentum
    vector<TH1D*> fhChi2Circle; // chi2
-   vector<TH1D*> fhDRCircle; // dR
+   vector<TH2D*> fhDRVsMom; // dR
 
    // R, A, B distribution for different number of hits from 0 to 40
    TH2D* fhRadiusVsNofHits;
@@ -306,8 +321,13 @@ private:
    TH1D* fhNofHitsEllipseFitEff;
 
    // Detector acceptance vs pt, y, p
-   TH3D* fhMc3D;
-   TH3D* fhAcc3D;
+   TH1D* fh_mc_mom;
+   TH1D* fh_mc_pt;
+   TH1D* fh_mc_y;
+   TH1D* fh_acc_mom;
+   TH1D* fh_acc_pt;
+   TH1D* fh_acc_y;
+
 
    // numbers in dependence on XY position onto the photodetector
    TH2D* fhNofHitsXY; // number of hits

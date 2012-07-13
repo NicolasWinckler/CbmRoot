@@ -24,8 +24,8 @@
 #include "CbmDrawHist.h"
 #include "std/utils/CbmLitUtils.h"
 #include "CbmRichConverter.h"
-//#include "cbm/qa/report/CbmReport.h"
-//#include "cbm/qa/report/CbmStudyReport.h"
+#include "CbmReport.h"
+#include "CbmStudyReport.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -37,12 +37,14 @@
 #include "TPad.h"
 #include "TLatex.h"
 #include "TSystem.h"
+#include "TStyle.h"
 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -90,7 +92,7 @@ CbmRichGeoTest::CbmRichGeoTest():
    fhXcYcCircle(),
    fhRadiusVsMom(),
    fhChi2Circle(),
-   fhDRCircle(),
+   fhDRVsMom(),
 
    fhRadiusVsNofHits(NULL),
    fhAaxisVsNofHits(NULL),
@@ -119,8 +121,13 @@ CbmRichGeoTest::CbmRichGeoTest():
    fhNofHitsCircleFitEff(NULL),
    fhNofHitsEllipseFitEff(NULL),
 
-   fhMc3D(NULL),
-   fhAcc3D(NULL),
+   fh_mc_mom(NULL),
+   fh_mc_pt(NULL),
+   fh_mc_y(NULL),
+   fh_acc_mom(NULL),
+   fh_acc_pt(NULL),
+   fh_acc_y(NULL),
+
 
    fhNofHitsXY(NULL),
    fhNofPointsXY(NULL),
@@ -222,10 +229,10 @@ void CbmRichGeoTest::InitHistograms()
 {
    double xMin = -200.;
    double xMax = 200.;
-   int nBinsX = 100;
+   int nBinsX = 67;
    double yMin = -300;
    double yMax = 300.;
-   int nBinsY = 150;
+   int nBinsY = 100;
    if (fRichDetectorType == "prototype"){
       xMin = -10.;
       xMax = 10.;
@@ -249,11 +256,11 @@ void CbmRichGeoTest::InitHistograms()
    fhRadiusVsMom.resize(2);
    fhChi2Ellipse.resize(2);
    fhChi2Circle.resize(2);
-   fhDRCircle.resize(2);
+   fhDRVsMom.resize(2);
    for (Int_t i = 0; i < 2; i++){
       stringstream ss;
-      if (i == 0) ss << "_Hits";
-      if (i == 1) ss << "_Points";
+      if (i == 0) ss << "_hits";
+      if (i == 1) ss << "_points";
       string t = ss.str();
       fhNofHits[i] = new TH1D(("fhNofHits"+t).c_str(), ("fhNofHits"+t+";Nof hits in ring;Counter").c_str(), 300, 0, 300);
       fHists.push_back(fhNofHits[i]);
@@ -262,21 +269,21 @@ void CbmRichGeoTest::InitHistograms()
       fHists.push_back(fhBoverA[i]);
       fhXcYcEllipse[i] = new TH2D(("fhXcYcEllipse"+t).c_str(), ("fhXcYcEllipse"+t+";X [cm];Y [cm];Counter").c_str(), nBinsX, xMin, xMax, nBinsY, yMin, yMax);
       fHists.push_back(fhXcYcEllipse[i]);
-      fhBaxisVsMom[i] = new TH2D(("fhBaxisVsMom"+t).c_str(), ("fhBaxisVsMom"+t+";P [GeV/c];B axis [cm];Counter").c_str(), 100, 0., 12, 200, 0., 10.);
+      fhBaxisVsMom[i] = new TH2D(("fhBaxisVsMom"+t).c_str(), ("fhBaxisVsMom"+t+";P [GeV/c];B axis [cm];Counter").c_str(), 100, 0., 10, 200, 0., 10.);
       fHists.push_back(fhBaxisVsMom[i]);
-      fhAaxisVsMom[i] = new TH2D(("fhAaxisVsMom"+t).c_str(), ("fhAaxisVsMom"+t+";P [GeV/c];A axis [cm];Counter").c_str(), 100, 0., 12, 200, 0., 10.);
+      fhAaxisVsMom[i] = new TH2D(("fhAaxisVsMom"+t).c_str(), ("fhAaxisVsMom"+t+";P [GeV/c];A axis [cm];Counter").c_str(), 100, 0., 10, 200, 0., 10.);
       fHists.push_back(fhAaxisVsMom[i]);
       fhChi2Ellipse[i] = new TH1D(("fhChi2Ellipse"+t).c_str(), ("fhChi2Ellipse"+t+";#Chi^{2};Counter").c_str(), 50, 0., 0.5);
       fHists.push_back(fhChi2Ellipse[i]);
       // circle fitting parameters
       fhXcYcCircle[i] = new TH2D(("fhXcYcCircle"+t).c_str(), ("fhXcYcCircle"+t+";X [cm];Y [cm];Counter").c_str(), nBinsX, xMin, xMax, nBinsY, yMin, yMax);
       fHists.push_back(fhXcYcCircle[i]);
-      fhRadiusVsMom[i] = new TH2D(("fhRadiusVsMom"+t).c_str(), ("fhRadiusVsMom"+t+";P [GeV/c];Radius [cm];Counter").c_str(), 100, 0., 12, 200, 0., 10.);
+      fhRadiusVsMom[i] = new TH2D(("fhRadiusVsMom"+t).c_str(), ("fhRadiusVsMom"+t+";P [GeV/c];Radius [cm];Counter").c_str(), 100, 0., 10, 200, 0., 10.);
       fHists.push_back(fhRadiusVsMom[i]);
       fhChi2Circle[i] = new TH1D(("fhChi2Circle"+t).c_str(), ("fhChi2Circle"+t+";#Chi^{2};Counter").c_str(), 50, 0., .5);
       fHists.push_back(fhChi2Circle[i]);
-      fhDRCircle[i] = new TH1D(("fhDRCircle"+t).c_str(), ("fhDRCircle"+t+";dR [cm];Counter").c_str(), 100, -1., 1.);
-      fHists.push_back(fhDRCircle[i]);
+      fhDRVsMom[i] = new TH2D(("fhDRVsMom"+t).c_str(), ("fhDRVsMom"+t+";P [GeV/c];dR [cm];Counter").c_str(), 100, 0, 10, 100, -1., 1.);
+      fHists.push_back(fhDRVsMom[i]);
    }
    // Difference between Mc Points and Hits fitting.
    fhDiffAaxis = new TH2D("fhDiffAaxis", "fhDiffAaxis;Nof hits in ring;A_{point}-A_{hit} [cm];Counter", 40, 0., 40., 100, -1.5, 1.5);
@@ -318,23 +325,31 @@ void CbmRichGeoTest::InitHistograms()
    fHists.push_back(fhNofHitsEllipseFitEff);
 
    // Detector acceptance efficiency vs. pt, y, p.
-   fhMc3D = new TH3D("fhMc3D", "fhMc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 50, 0., 10., 30, 0., 3., 40, 0., 4.);
-   fHists.push_back(fhMc3D);
-   fhAcc3D = new TH3D("fhAcc3D", "fhAcc3D;P [GeV/c];P_{t} [GeV/c];Rapidity", 50, 0., 10., 30, 0., 3., 40, 0., 4.);;
-   fHists.push_back(fhAcc3D);
+   fh_mc_mom = new TH1D("fh_mc_mom", "fh_mc_mom;P [GeV/c];Counter", 100, 0., 10.);
+   fHists.push_back(fh_mc_mom);
+   fh_mc_pt = new TH1D("fh_mc_pt", "fh_mc_pt;P_{t} [GeV/c];Counter", 30, 0., 3.);
+   fHists.push_back(fh_mc_pt);
+   fh_mc_y = new TH1D("fh_mc_y", "fh_mc_y;Rapidity;Counter", 40, 0., 4.);
+   fHists.push_back(fh_mc_y);
+   fh_acc_mom = new TH1D("fh_acc_mom", "fh_acc_mom;P [GeV/c];Counter", 100, 0., 10.);
+   fHists.push_back(fh_acc_mom);
+   fh_acc_pt = new TH1D("fh_acc_pt", "fh_acc_pt;P_{t} [GeV/c];Counter", 30, 0., 3.);
+   fHists.push_back(fh_acc_pt);
+   fh_acc_y = new TH1D("fh_acc_y", "fh_acc_y;Rapidity;Counter", 40, 0., 4.);
+   fHists.push_back(fh_acc_y);
 
    // Numbers in dependence on XY position onto the photodetector.
-   fhNofHitsXY = new TH2D("fhNofHitsXY", "fhNofHitsXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+   fhNofHitsXY = new TH2D("fhNofHitsXY", "fhNofHitsXY;X [cm];Y [cm];Nof hits in ring", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhNofHitsXY);
-   fhNofPointsXY = new TH2D("fhNofPointsXY", "fhNofPointsXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+   fhNofPointsXY = new TH2D("fhNofPointsXY", "fhNofPointsXY;X [cm];Y [cm];Nof points in ring", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhNofPointsXY);
-   fhBoverAXY = new TH2D("fhBoverAXY", "fhBoverAXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+   fhBoverAXY = new TH2D("fhBoverAXY", "fhBoverAXY;X [cm];Y [cm];B/A", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhBoverAXY);
-   fhBaxisXY = new TH2D("fhBaxisXY", "fhBaxisXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+   fhBaxisXY = new TH2D("fhBaxisXY", "fhBaxisXY;X [cm];Y [cm];B axis [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhBaxisXY);
-   fhAaxisXY = new TH2D("fhAaxisXY", "fhAaxisXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+   fhAaxisXY = new TH2D("fhAaxisXY", "fhAaxisXY;X [cm];Y [cm];A axis [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhAaxisXY);
-   fhRadiusXY = new TH2D("fhRadiusXY", "fhRadiusXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+   fhRadiusXY = new TH2D("fhRadiusXY", "fhRadiusXY;X [cm];Y [cm];Radius [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhRadiusXY);
    fhCounterXY = new TH2D("fhCounterXY", "fhCounterXY;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhCounterXY);
@@ -350,7 +365,9 @@ void CbmRichGeoTest::FillMcHist()
 
       if (pdg != 11 || motherId != -1) continue; // only primary electrons
 
-      fhMc3D->Fill(mcTrack->GetP(), mcTrack->GetPt(), mcTrack->GetRapidity());
+      fh_mc_mom->Fill(mcTrack->GetP());
+      fh_mc_pt->Fill(mcTrack->GetPt());
+      fh_mc_y->Fill(mcTrack->GetRapidity());
    }
 }
 
@@ -375,7 +392,9 @@ void CbmRichGeoTest::RingParameters()
 
 		if (pdg != 11 || motherId != -1) continue; // only primary electrons
 		if (ring->GetNofHits() >= fMinNofHits){
-		   fhAcc3D->Fill(momentum, pt, rapidity);
+	      fh_acc_mom->Fill(momentum);
+	      fh_acc_pt->Fill(pt);
+	      fh_acc_y->Fill(rapidity);
 		}
 
 		CbmRichRingLight ringPoint;
@@ -431,7 +450,7 @@ void CbmRichGeoTest::RingParameters()
 
 	   fhNofHitsXY->Fill(xc, yc, nh);
 	   fhNofPointsXY->Fill(xc, yc, np);
-	   fhBoverAXY->Fill(xc, yc, a/b);
+	   fhBoverAXY->Fill(xc, yc, b/a);
 	   fhBaxisXY->Fill(xc, yc, b);
 	   fhAaxisXY->Fill(xc, yc, a);
 	   fhRadiusXY->Fill(xc, yc, r);
@@ -481,7 +500,7 @@ void CbmRichGeoTest::FitAndFillHistCircle(
       double xh = ring->GetHit(iH).fX;
       double yh = ring->GetHit(iH).fY;
       double dr = radius - sqrt((xcCircle - xh)*(xcCircle - xh) + (ycCircle - yh)*(ycCircle - yh));
-      fhDRCircle[histIndex]->Fill(dr);
+      fhDRVsMom[histIndex]->Fill(momentum, dr);
    }
 
    if (histIndex == 0){ // only hit fit
@@ -596,7 +615,7 @@ void CbmRichGeoTest::DrawRing(
 
 TH1D* CbmRichGeoTest::CreateAccVsMinNofHitsHist()
 {
-   Int_t nofMc = (Int_t)fhMc3D->GetEntries();
+   Int_t nofMc = (Int_t)fh_mc_mom->GetEntries();
    TH1D* hist = (TH1D*)fhNofHits[0]->Clone("fhAccVsMinNofHitsHist");
    hist->GetXaxis()->SetTitle("Required min nof hits in ring");
    hist->GetYaxis()->SetTitle("Detector acceptance [%]");
@@ -608,57 +627,95 @@ TH1D* CbmRichGeoTest::CreateAccVsMinNofHitsHist()
    return hist;
 }
 
+void CbmRichGeoTest::CreateH2MeanRms(
+      TH2D* hist,
+      TH1D** meanHist,
+      TH1D** rmsHist)
+{
+   *meanHist = hist->ProjectionX( (string(hist->GetName()) + "_mean").c_str() );
+   (*meanHist)->GetYaxis()->SetTitle( ("Mean and RMS. " + string(hist->GetYaxis()->GetTitle()) ).c_str());
+   *rmsHist = hist->ProjectionX((string(hist->GetName()) + "_rms").c_str() );
+   (*rmsHist)->GetYaxis()->SetTitle( ("RMS. "+ string(hist->GetYaxis()->GetTitle()) ).c_str());
+   for (Int_t i = 1; i <= hist->GetXaxis()->GetNbins(); i++){
+      stringstream ss;
+      ss << string(hist->GetName()) << "_py" << i;
+      TH1D* pr = hist->ProjectionY(ss.str().c_str(), i, i);
+      if (*meanHist == NULL || pr == NULL) continue;
+      (*meanHist)->SetBinContent(i, pr->GetMean());
+      (*meanHist)->SetBinError(i, pr->GetRMS());
+      (*rmsHist)->SetBinContent(i, pr->GetRMS());
+   }
+}
+
+void CbmRichGeoTest::DrawH2MeanRms(
+      TH2D* hist,
+      const string& canvasName)
+{
+   TH1D* mean, *rms;
+   CreateH2MeanRms(hist, &mean, &rms);
+   TCanvas *c = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 900, 900);
+   c->Divide(2, 2);
+   c->cd(1);
+   DrawH2(hist);
+   c->cd(2);
+   TH1D* py = hist->ProjectionY( (string(hist->GetName())+ "_py" ).c_str() );
+   py->GetYaxis()->SetTitle("Counter");
+   DrawH1(py);
+   string txt1 = lit::NumberToString<Double_t>(py->GetMean(), 2) + " / "
+         + lit::NumberToString<Double_t>(py->GetRMS(), 2);
+   TLatex text;
+   text.SetTextAlign(21);
+   text.SetTextSize(0.05);
+   text.DrawTextNDC(0.5, 0.92, txt1.c_str());
+   gPad->SetLogy(true);
+   c->cd(3);
+   DrawH1(mean);
+   c->cd(4);
+   DrawH1(rms);
+}
+
 void CbmRichGeoTest::DrawHist()
 {
-   TCanvas *cHitsXY = CreateCanvas("rich_geo_hits_xy", "rich_geo_hits_xy", 600, 600);
+   SetDefaultDrawStyle();
+
+   TCanvas *cHitsXY = CreateCanvas("richgeo_hits_xy", "richgeo_hits_xy", 800, 800);
    DrawH2(fhHitsXY);
 
-   TCanvas *cPointsXY = CreateCanvas("rich_geo_points_xy", "rich_geo_points_xy", 600, 600);
+   TCanvas *cPointsXY = CreateCanvas("richgeo_points_xy", "richgeo_points_xy", 800, 800);
    DrawH2(fhPointsXY);
 
    for (int i = 0; i < 2; i++){
       stringstream ss;
-      if (i == 0) ss << "rich_geo_hits_fit";
-      if (i == 1) ss << "rich_geo_points_fit";
-      TCanvas *cEllipse = CreateCanvas((ss.str()+"_ellipse").c_str(), (ss.str()+"_ellipse").c_str(), 1200, 600);
-      cEllipse->Divide(4, 2);
+      if (i == 0) ss << "richgeo_hits_";
+      if (i == 1) ss << "richgeo_points_";
+      TCanvas *cEllipse = CreateCanvas((ss.str()+"_ellipse").c_str(), (ss.str()+"_ellipse").c_str(), 1200, 400);
+      cEllipse->Divide(3, 1);
       cEllipse->cd(1);
       DrawH1(fhBoverA[i]);
       gPad->SetLogy(true);
       cEllipse->cd(2);
       DrawH2(fhXcYcEllipse[i]);
       cEllipse->cd(3);
-      DrawH1(fhAaxisVsMom[i]->ProjectionY());
-      gPad->SetLogy(true);
-      cEllipse->cd(4);
-      DrawH1(fhBaxisVsMom[i]->ProjectionY());
-      gPad->SetLogy(true);
-      cEllipse->cd(5);
-      DrawH2(fhBaxisVsMom[i]);
-      cEllipse->cd(6);
-      DrawH2(fhAaxisVsMom[i]);
-      cEllipse->cd(7);
       DrawH1(fhChi2Ellipse[i]);
 
-      TCanvas *cCircle = CreateCanvas((ss.str()+"_circle").c_str(), (ss.str()+"_circle").c_str(), 900, 600);
-      cCircle->Divide(3,2);
+      DrawH2MeanRms(fhAaxisVsMom[i], ss.str() + "a_vs_mom");
+      DrawH2MeanRms(fhBaxisVsMom[i], ss.str() + "b_vs_mom");
+
+      TCanvas *cCircle = CreateCanvas((ss.str()+"_circle").c_str(), (ss.str()+"_circle").c_str(), 1200, 400);
+      cCircle->Divide(3,1);
       cCircle->cd(1);
       DrawH1(fhNofHits[i]);
       gPad->SetLogy(true);
       cCircle->cd(2);
       DrawH2(fhXcYcCircle[i]);
       cCircle->cd(3);
-      DrawH1(fhRadiusVsMom[i]->ProjectionY());
-      gPad->SetLogy(true);
-      cCircle->cd(4);
-      DrawH2(fhRadiusVsMom[i]);
-      cCircle->cd(5);
       DrawH1(fhChi2Circle[i]);
-      cCircle->cd(6);
-      DrawH1(fhDRCircle[i]);
+
+      DrawH2MeanRms(fhRadiusVsMom[i], ss.str() + "r_vs_mom");
+      DrawH2MeanRms(fhDRVsMom[i], ss.str() + "dr_vs_mom");
    }
 
-   TCanvas *cDiff2DEllipse = CreateCanvas("rich_geo_diff2d_ellipse", "rich_geo_diff2d_ellipse", 600, 600);
+   TCanvas *cDiff2DEllipse = CreateCanvas("richgeo_diff2d_ellipse", "richgeo_diff2d_ellipse", 800, 800);
    cDiff2DEllipse->Divide(2,2);
    cDiff2DEllipse->cd(1);
    DrawH2(fhDiffAaxis);
@@ -669,7 +726,7 @@ void CbmRichGeoTest::DrawHist()
    cDiff2DEllipse->cd(4);
    DrawH2(fhDiffYcEllipse);
 
-   TCanvas *cDiff2DCircle = CreateCanvas("rich_geo_diff2d_circle", "rich_geo_diff2d_circle", 900, 300);
+   TCanvas *cDiff2DCircle = CreateCanvas("richgeo_diff2d_circle", "richgeo_diff2d_circle", 1200, 400);
    cDiff2DCircle->Divide(3,1);
    cDiff2DCircle->cd(1);
    DrawH2(fhDiffXcCircle);
@@ -678,7 +735,7 @@ void CbmRichGeoTest::DrawHist()
    cDiff2DCircle->cd(3);
    DrawH2(fhDiffRadius);
 
-   TCanvas *cDiff1DEllipse = CreateCanvas("rich_geo_diff1d_ellipse", "rich_geo_diff1d_ellipse", 600, 600);
+   TCanvas *cDiff1DEllipse = CreateCanvas("richgeo_diff1d_ellipse", "richgeo_diff1d_ellipse", 800, 800);
    cDiff1DEllipse->Divide(2,2);
    cDiff1DEllipse->cd(1);
    DrawH1(fhDiffAaxis->ProjectionY());
@@ -693,7 +750,7 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(fhDiffYcEllipse->ProjectionY());
    gPad->SetLogy(true);
 
-   TCanvas *cDiff1DCircle = CreateCanvas("rich_geo_diff1d_circle", "rich_geo_diff1d_circle", 900, 300);
+   TCanvas *cDiff1DCircle = CreateCanvas("richgeo_diff1d_circle", "richgeo_diff1d_circle", 1200, 400);
    cDiff1DCircle->Divide(3,1);
    cDiff1DCircle->cd(1);
    DrawH1(fhDiffXcCircle->ProjectionY());
@@ -705,14 +762,14 @@ void CbmRichGeoTest::DrawHist()
    DrawH1(fhDiffRadius->ProjectionY());
    gPad->SetLogy(true);
 
-   TCanvas *cHits = CreateCanvas("rich_geo_hits", "rich_geo_hits", 600, 300);
+   TCanvas *cHits = CreateCanvas("richgeo_hits", "richgeo_hits", 1200, 600);
    cHits->Divide(2,1);
    cHits->cd(1);
    DrawH1(fhDiffXhit);
    cHits->cd(2);
    DrawH1(fhDiffYhit);
 
-   TCanvas *cFitEff = CreateCanvas("rich_geo_fit_eff", "rich_geo_fit_eff", 900, 300);
+   TCanvas *cFitEff = CreateCanvas("richgeo_fit_eff", "richgeo_fit_eff", 1200, 400);
    cFitEff->Divide(3,1);
    cFitEff->cd(1);
    DrawH1( list_of((TH1D*)fhNofHitsAll->Clone())((TH1D*)fhNofHitsCircleFit->Clone())((TH1D*)fhNofHitsEllipseFit->Clone()),
@@ -728,106 +785,82 @@ void CbmRichGeoTest::DrawHist()
    TLatex* ellipseFitEffTxt = new TLatex(15, 0.5, CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll).c_str());
    ellipseFitEffTxt->Draw();
 
-   TCanvas *cAccEff = CreateCanvas("rich_geo_acc_eff", "rich_geo_acc_eff", 900, 600);
+   TCanvas *cAccEff = CreateCanvas("richgeo_acc_eff", "richgeo_acc_eff", 1200, 800);
    cAccEff->Divide(3,2);
-   TH1D* pxMc = fhMc3D->ProjectionX();
-   pxMc->SetName((string(fhMc3D->GetName())+"_px").c_str());
-   TH1D* pyMc = fhMc3D->ProjectionY();
-   pyMc->SetName((string(fhMc3D->GetName())+"_py").c_str());
-   TH1D* pzMc = fhMc3D->ProjectionZ();
-   pzMc->SetName((string(fhMc3D->GetName())+"_pz").c_str());
-   TH1D* pxAcc = fhAcc3D->ProjectionX();
-   pxAcc->SetName((string(fhAcc3D->GetName())+"_px").c_str());
-   TH1D* pyAcc = fhAcc3D->ProjectionY();
-   pyAcc->SetName((string(fhAcc3D->GetName())+"_py").c_str());
-   TH1D* pzAcc = fhAcc3D->ProjectionZ();
-   pzAcc->SetName((string(fhAcc3D->GetName())+"_pz").c_str());
    cAccEff->cd(1);
-   DrawH1(list_of((TH1D*)pxMc->Clone())((TH1D*)pxAcc->Clone()), list_of("MC")("ACC"), kLinear, kLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of(fh_mc_mom)(fh_acc_mom), list_of("MC")("ACC"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cAccEff->cd(2);
-   DrawH1(list_of((TH1D*)pyMc->Clone())((TH1D*)pyAcc->Clone()), list_of("MC")("ACC"), kLinear, kLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of(fh_mc_pt)(fh_acc_pt), list_of("MC")("ACC"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cAccEff->cd(3);
-   DrawH1(list_of((TH1D*)pzMc->Clone())((TH1D*)pzAcc->Clone()), list_of("MC")("ACC"), kLinear, kLog, true, 0.7, 0.75, 0.99, 0.99);
+   DrawH1(list_of(fh_mc_y)(fh_acc_y), list_of("MC")("ACC"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
-   TH1D* pxEff = DivideH1(pxAcc, pxMc, "pxEff", "", "P [GeV/c]", "Efficiency");
-   TH1D* pyEff = DivideH1(pyAcc, pyMc, "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
-   TH1D* pzEff = DivideH1(pzAcc, pzMc, "pzEff", "", "Rapidity", "Efficiency");
+   TH1D* pxEff = DivideH1((TH1D*)fh_acc_mom->Clone(), (TH1D*)fh_mc_mom->Clone(), "pxEff", "", "P [GeV/c]", "Efficiency");
+   TH1D* pyEff = DivideH1((TH1D*)fh_acc_pt->Clone(), (TH1D*)fh_mc_pt->Clone(), "pyEff", "", "P_{t} [GeV/c]", "Efficiency");
+   TH1D* pzEff = DivideH1((TH1D*)fh_acc_y->Clone(), (TH1D*)fh_mc_y->Clone(), "pzEff", "", "Rapidity", "Efficiency");
    cAccEff->cd(4);
    DrawH1(pxEff);
-   TLatex* pxEffTxt = new TLatex(3, 0.5, CalcEfficiency(pxAcc, pxMc).c_str());
+   TLatex* pxEffTxt = new TLatex(3, 0.5, CalcEfficiency(fh_acc_mom, fh_mc_mom).c_str());
    pxEffTxt->Draw();
    cAccEff->cd(5);
    DrawH1(pyEff);
    cAccEff->cd(6);
    DrawH1(pzEff);
 
-   TCanvas *cNumbersVsXY = CreateCanvas("rich_geo_numbers_vs_xy", "rich_geo_numbers_vs_xy", 900, 600);
+   TCanvas *cAccEffZoom = CreateCanvas("richgeo_acc_eff_zoom", "richgeo_acc_eff_zoom", 1000, 500);
+   cAccEffZoom->Divide(2,1);
+   cAccEffZoom->cd(1);
+   TH1D* fh_mc_mom_clone = (TH1D*)fh_mc_mom->Clone();
+   TH1D* fh_acc_mom_clone = (TH1D*)fh_acc_mom->Clone();
+   fh_mc_mom_clone->GetXaxis()->SetRangeUser(0., 3.);
+   fh_acc_mom_clone->GetXaxis()->SetRangeUser(0., 3.);
+   fh_mc_mom_clone->SetMinimum(0.);
+   DrawH1(list_of(fh_mc_mom_clone)(fh_acc_mom_clone), list_of("MC")("ACC"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   gPad->SetLogy(false);
+   cAccEffZoom->cd(2);
+   TH1D* px_eff_clone = (TH1D*) pxEff->Clone();
+   px_eff_clone->GetXaxis()->SetRangeUser(0., 3.);
+   px_eff_clone->SetMinimum(0.);
+   DrawH1(px_eff_clone);
+
+   TCanvas *cNumbersVsXY = CreateCanvas("richgeo_numbers_vs_xy", "richgeo_numbers_vs_xy", 1200, 800);
    cNumbersVsXY->Divide(3,2);
    cNumbersVsXY->cd(1);
    fhNofHitsXY->Divide(fhCounterXY);
-   fhNofHitsXY->Draw("COLZ");
+   DrawH2(fhNofHitsXY);
    cNumbersVsXY->cd(2);
    fhNofPointsXY->Divide(fhCounterXY);
-   fhNofPointsXY->Draw("COLZ");
+   DrawH2(fhNofPointsXY);
    cNumbersVsXY->cd(3);
    fhBoverAXY->Divide(fhCounterXY);
-   fhBoverAXY->Draw("COLZ");
+   fhBoverAXY->GetZaxis()->SetRangeUser(0.6, 1.0);
+   DrawH2(fhBoverAXY);
    cNumbersVsXY->cd(4);
    fhBaxisXY->Divide(fhCounterXY);
-   fhBaxisXY->Draw("COLZ");
+   fhBaxisXY->GetZaxis()->SetRangeUser(4., 5.2);
+   DrawH2(fhBaxisXY);
    cNumbersVsXY->cd(5);
    fhAaxisXY->Divide(fhCounterXY);
-   fhAaxisXY->Draw("COLZ");
+   fhAaxisXY->GetZaxis()->SetRangeUser(4.2, 5.7);
+   DrawH2(fhAaxisXY);
    cNumbersVsXY->cd(6);
    fhRadiusXY->Divide(fhCounterXY);
-   fhRadiusXY->Draw("COLZ");
+   fhRadiusXY->GetZaxis()->SetRangeUser(4.2, 5.3);
+   DrawH2(fhRadiusXY);
 
-   TCanvas *cAccVsMinNofHits = CreateCanvas("rich_geo_acc_vs_min_nof_hits", "rich_geo_acc_vs_min_nof_hits", 600, 600);
+   TCanvas *cAccVsMinNofHits = CreateCanvas("richgeo_acc_vs_min_nof_hits", "richgeo_acc_vs_min_nof_hits", 600, 600);
    TH1D* h = CreateAccVsMinNofHitsHist();
+   h->GetXaxis()->SetRangeUser(0., 40.0);
    DrawH1(h);
 
-   TCanvas *cRABvsNofHits = CreateCanvas("rich_geo_rab_vs_nof_hits", "rich_geo_rab_vs_nof_hits", 900, 300);
-   cRABvsNofHits->Divide(3, 1);
-   cRABvsNofHits->cd(1);
-   DrawH2(fhRadiusVsNofHits);
-   cRABvsNofHits->cd(2);
-   DrawH2(fhAaxisVsNofHits);
-   cRABvsNofHits->cd(3);
-   DrawH2(fhBaxisVsNofHits);
-
-   stringstream ss;
-   TH1D* prRMean = fhRadiusVsNofHits->ProjectionX("fhRadiusVsNofHits_mean");
-   TH1D* prRRms = fhRadiusVsNofHits->ProjectionX("fhRadiusVsNofHits_rms");
-   TH1D* prAMean = fhAaxisVsNofHits->ProjectionX("fhAaxisVsNofHits_mean");
-   TH1D* prARms = fhAaxisVsNofHits->ProjectionX("fhAaxisVsNofHits_rms");
-   TH1D* prBMean = fhBaxisVsNofHits->ProjectionX("fhBaxisVsNofHits_mean");
-   TH1D* prBRms = fhBaxisVsNofHits->ProjectionX("fhBaxisVsNofHits_rms");
-   for (Int_t i = 1; i <= fhRadiusVsNofHits->GetXaxis()->GetNbins(); i++){
-      ss << "_py" << i;
-      TH1D* pr = fhRadiusVsNofHits->ProjectionY(ss.str().c_str(), i, i);
-      prRMean->SetBinContent(i, pr->GetMean());
-      prRRms->SetBinContent(i, pr->GetRMS());
-      pr = fhAaxisVsNofHits->ProjectionY(ss.str().c_str(), i, i);
-      prAMean->SetBinContent(i, pr->GetMean());
-      prARms->SetBinContent(i, pr->GetRMS());
-      pr = fhBaxisVsNofHits->ProjectionY(ss.str().c_str(), i, i);
-      prBMean->SetBinContent(i, pr->GetMean());
-      prBRms->SetBinContent(i, pr->GetRMS());
-   }
-   TCanvas *cRABMeanRmsvsNofHits = CreateCanvas("rich_geo_rab_mean_rms_vs_nof_hits", "rich_geo_rab_mean_rms_vs_nof_hits", 900, 450);
-   cRABMeanRmsvsNofHits->Divide(2, 1);
-   cRABMeanRmsvsNofHits->cd(1);
-   DrawH1(list_of(prRMean)(prAMean)(prBMean),
-         list_of("R")("A")("B"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
-   cRABMeanRmsvsNofHits->cd(2);
-   DrawH1(list_of(prRRms)(prARms)(prBRms),
-         list_of("R")("A")("B"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawH2MeanRms(fhRadiusVsNofHits, "richgeo_hits_r_vs_nof_hits");
+   DrawH2MeanRms(fhAaxisVsNofHits, "richgeo_hits_a_vs_nof_hits");
+   DrawH2MeanRms(fhBaxisVsNofHits, "richgeo_hits_b_vs_nof_hits");
 }
 
 void CbmRichGeoTest::CreatePTree()
 {
    ptree pt;
-   pt.put("acc_mean", CalcEfficiency(fhAcc3D, fhMc3D));
+   pt.put("acc_mean", CalcEfficiency(fh_acc_mom, fh_mc_mom));
    pt.put("circle_fit_eff_mean", CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll));
    pt.put("ellipse_fit_eff_mean", CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll));
    pt.put("nof_points_in_ring_mean", fhNofHits[1]->GetMean());

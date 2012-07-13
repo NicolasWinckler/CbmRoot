@@ -71,7 +71,7 @@ void CbmRichMatchRings::Exec(
       Option_t* opt)
 {
    // Clear output array
-   fMatches->Clear();
+   if (fMatches != NULL) fMatches->Clear();
    map<Int_t, Int_t>::iterator it ;
 //   fMatchMCMap.clear();
 

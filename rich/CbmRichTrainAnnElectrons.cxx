@@ -116,9 +116,9 @@ CbmRichTrainAnnElectrons::CbmRichTrainAnnElectrons():
       fHists.push_back(fhChi2[i]);
       fhRadPos[i] = new TH1D(string("fhRadPos"+ss).c_str(), "fhRadPos;Radial position [cm];Counter", 150, 0., 150.);
       fHists.push_back(fhRadPos[i]);
-      fhAaxisVsMom[i] = new TH2D(string("fhAaxisVsMom"+ss).c_str(), "fhAaxisVsMom;P [GeV/c];A axis [cm]",30,0,15, 30,3,8);
+      fhAaxisVsMom[i] = new TH2D(string("fhAaxisVsMom"+ss).c_str(), "fhAaxisVsMom;P [GeV/c];A axis [cm]",45, 0, 15, 75, 0, 10);
       fHists.push_back(fhAaxisVsMom[i]);
-      fhBaxisVsMom[i] = new TH2D(string("fhBAxisVsMom"+ss).c_str(), "fhBAxisVsMom;P [GeV/c];B axis [cm]",30,0,15, 30,3,8);
+      fhBaxisVsMom[i] = new TH2D(string("fhBAxisVsMom"+ss).c_str(), "fhBAxisVsMom;P [GeV/c];B axis [cm]",45, 0, 15, 75, 0, 10);
       fHists.push_back(fhBaxisVsMom[i]);
       fhPhiVsRadAng[i] = new TH2D(string("fhPhiVsRadAng"+ss).c_str(), "fhPhiVsRadAng;Phi [rad];Radial angle [rad]", 50, -2. ,2.,50, 0. , 6.3);
       fHists.push_back(fhPhiVsRadAng[i]);
@@ -360,8 +360,9 @@ void CbmRichTrainAnnElectrons::Draw()
       fhCumProb[0]->SetBinContent(i, 1. - (Double_t)cumProbTrue / nofTrue);
    }
 
+   SetDefaultDrawStyle();
    TCanvas* c1 = new TCanvas("ann_electrons_ann_output", "ann_electrons_ann_output", 500, 500);
-   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("El")("Pi"),
+   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("Electrons")("Pions"),
          kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_electrons_cum_prob", "ann_electrons_cum_prob", 500, 500);
@@ -411,6 +412,15 @@ void CbmRichTrainAnnElectrons::Draw()
    DrawH2(fhPhiVsRadAng[0]);
    c4->cd(c++);
    DrawH2(fhPhiVsRadAng[1]);
+
+//   TCanvas* c5 = new TCanvas("ann_electrons_b_vs_mom", "ann_electrons_b_vs_mom", 600, 600);
+//   fhBaxisVsMom[0]->Add(fhBaxisVsMom[1]);
+//   DrawH2(fhBaxisVsMom[0]);
+//
+//   TCanvas* c6 = new TCanvas("ann_electrons_a_vs_mom", "ann_electrons_a_vs_mom", 600, 600);
+//   fhAaxisVsMom[0]->Add(fhAaxisVsMom[1]);
+//   DrawH2(fhAaxisVsMom[0]);
+
 }
 
 void CbmRichTrainAnnElectrons::FinishTask()

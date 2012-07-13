@@ -1,7 +1,7 @@
 /** CbmAnaDielectronTask.h
  * @author Elena Lebedeva <e.lebedeva@gsi.de>
  * @since 2010
- * @version 2.0
+ * @version 3.0
  **/
 
 #ifndef CBM_ANA_DIELECTRON_TASK_H
@@ -9,7 +9,7 @@
 
 #include "FairTask.h"
 #include "FairBaseParSet.h"
-
+#include "CbmAnaLmvmNames.h"
 #include "CbmVertex.h"
 #include "CbmStsKFTrackFitter.h"
 #include "CbmStsTrack.h"
@@ -38,30 +38,30 @@ public:
    TVector3 position, momentum;
    Double_t mass, energy, rapidity;
    Int_t charge;
-   Double_t chiPrimary;
+   Double_t chi2Prim;
    Double_t chi2sts;
-   Int_t MCMotherId;
-   Int_t stsMCTrackId;
-   Int_t richMCTrackId;
-   Int_t trdMCTrackId;
-   Int_t tofMCTrackId;
+   Int_t McMotherId;
+   Int_t stsMcTrackId;
+   Int_t richMcTrackId;
+   Int_t trdMcTrackId;
+   Int_t tofMcTrackId;
    Int_t stsInd;
    Int_t richInd;
    Int_t trdInd;
    Int_t tofInd;
    Bool_t isElectron;
-   Bool_t isMCSignalElectron;
-   Bool_t isMCPi0Electron;
-   Bool_t isMCGammaElectron;
-   Bool_t isMCEtaElectron;
+   Bool_t isMcSignalElectron;
+   Bool_t isMcPi0Electron;
+   Bool_t isMcGammaElectron;
+   Bool_t isMcEtaElectron;
 
    Bool_t isGamma;
    Double_t dSts;
-   Bool_t isTTCutElectron;
-   Bool_t isSTCutElectron;
-   Bool_t isAPMCutElectron;
-   Bool_t isDSTSCutElectron;
-   Bool_t isDSTSCut2Electron;
+   Bool_t isTtCutElectron;
+   Bool_t isStCutElectron;
+   Bool_t isApmCutElectron;
+   Bool_t isMvd1CutElectron;
+   Bool_t isMvd2CutElectron;
    Double_t richAnn;
    Double_t trdAnn;
    Double_t mass2;
@@ -69,38 +69,130 @@ public:
 
 class KinematicParams{
 public:
-   Double_t momentumMag;
-   Double_t pt;
-   Double_t rapidity;
-   Double_t minv;
-   Double_t angle; // opening angle
+   Double_t momentumMag; // Absolute value of momentum
+   Double_t pt; // Transverse momentum
+   Double_t rapidity; // Rapidity
+   Double_t minv; // Invariant mass
+   Double_t angle; // Opening angle
 };
 
 class CbmAnaDielectronTask : public FairTask {
 
 public:
+   /*
+    * \brief Standard constructor.
+    */
     CbmAnaDielectronTask();
 
-    CbmAnaDielectronTask(
-        const char *name,
-        const char *title = "CbmAnaDielectronTask");
-
+    /*
+     * \brief Standard destructor.
+     */
     virtual ~CbmAnaDielectronTask();
 
-
+    /*
+     * \brief Inherited from FairTask.
+     */
     virtual InitStatus Init();
 
+    /*
+     * \brief Inherited from FairTask.
+     */
     virtual void Exec(
           Option_t *option);
     
-    TH1D* CreateMinvHisto(
-          const string& name);
+    /*
+     * \brief Creates 1D histograms for each analysis step.
+     * \param[in,out] hist Vector if the histograms for each analysis step.
+     * \param[in] name Base name of the histograms.
+     * \param[in] axisX X axis title.
+     * \param[in] axisY Y axis title.
+     * \param[in] nBins Number of bins in the histogram.
+     * \param[in] min Minimum value.
+     * \param[in] max Maximum value.
+     */
+    void CreateAnalysisStepsH1(
+          vector<TH1D*>& hist,
+          const string& name,
+          const string& axisX,
+          const string& axisY,
+          double nBins,
+          double min,
+          double max);
 
-    TH1D* CreateSignalMomHisto(
-          const string& name);
 
-    TH2D* CreatePtYHisto(
-          const string& name);
+    /*
+     * \brief Creates 2D histograms for each analysis step.
+     * \param[in,out] hist Vector if the histograms for each analysis step.
+     * \param[in] name Base name of the histograms.
+     * \param[in] axisX X axis title.
+     * \param[in] axisY Y axis title.
+     * \param[in] axisZ Z axis title.
+     * \param[in] nBinsX Number of bins for X axis in the histogram.
+     * \param[in] minX Minimum value for X axis.
+     * \param[in] maxX Maximum value for X axis.
+     * \param[in] nBinsY Number of bins for Y axis in the histogram.
+     * \param[in] minY Minimum value for Y axis.
+     * \param[in] maxY Maximum value for Y axis.
+     */
+    void CreateAnalysisStepsH2(
+          vector<TH2D*>& hist,
+          const string& name,
+          const string& axisX,
+          const string& axisY,
+          const string& axisZ,
+          double nBinsX,
+          double minX,
+          double maxX,
+          double nBinsY,
+          double minY,
+          double maxY);
+
+    /*
+     * \brief Creates 1D histograms for different track source types.
+     * \param[in,out] hist Vector if the histograms for each analysis step.
+     * \param[in] name Base name of the histograms.
+     * \param[in] axisX X axis title.
+     * \param[in] axisY Y axis title.
+     * \param[in] nBins Number of bins in the histogram.
+     * \param[in] min Minimum value.
+     * \param[in] max Maximum value.
+     */
+    void CreateSourceTypesH1(
+          vector<TH1D*>& hist,
+          const string& name,
+          const string& axisX,
+          const string& axisY,
+          double nBins,
+          double min,
+          double max);
+
+
+    /*
+     * \brief Creates 2D histograms for different track source types.
+     * \param[in,out] hist Vector if the histograms for each analysis step.
+     * \param[in] name Base name of the histograms.
+     * \param[in] axisX X axis title.
+     * \param[in] axisY Y axis title.
+     * \param[in] axisZ Z axis title.
+     * \param[in] nBinsX Number of bins for X axis in the histogram.
+     * \param[in] minX Minimum value for X axis.
+     * \param[in] maxX Maximum value for X axis.
+     * \param[in] nBinsY Number of bins for Y axis in the histogram.
+     * \param[in] minY Minimum value for Y axis.
+     * \param[in] maxY Maximum value for Y axis.
+     */
+    void CreateSourceTypesH2(
+          vector<TH2D*>& hist,
+          const string& name,
+          const string& axisX,
+          const string& axisY,
+          const string& axisZ,
+          double nBinsX,
+          double minX,
+          double maxX,
+          double nBinsY,
+          double minY,
+          double maxY);
 
     KinematicParams CalculateKinematicParams(
         CbmMCTrack* mctrackP, 
@@ -116,14 +208,37 @@ public:
         Double_t &alpha, 
         Double_t &ptt);
 
-    void SourcePairs(
+    /*
+     * \brief Fills histograms for pairs.
+     * \param[in] candP Positive candidate.
+     * \param[in] candM Negative candidate.
+     * \param[in] step Enumeration AnalysisSteps, specify analysis step.
+     * \param[in] angle Opening angle of the pair.
+     */
+    void PairSource(
         DielectronCandidate* candP, 
         DielectronCandidate* candM, 
-        TH2D* h_source_pair);
+        AnalysisSteps step,
+        Double_t angle);
+
+    /*
+     * \brief Fills minv, pty, mom histograms for specified analysis step.
+     * \param[in] candP Positive candidate.
+     * \param[in] candM Negative candidate.
+     * \param[in] parMc MC kinematic parameters.
+     * \param[in] parRec Reconstructed kinematic parameters.
+     * \param[in] step Enumeration AnalysisSteps, specify analysis step.
+     */
+    void FillPairHists(
+          DielectronCandidate* candP,
+          DielectronCandidate* candM,
+          KinematicParams* parMc,
+          KinematicParams* parRec,
+          AnalysisSteps step);
 
     void TrackSource(
     		DielectronCandidate* cand,
-    		Double_t binNum,
+    		AnalysisSteps step,
     		Int_t pdg);
 
     void SingleParticleAcceptance();
@@ -146,13 +261,14 @@ public:
 
     void CheckGammaConvAndPi0();
 
+    /*
+     * \brief
+     * \param[in] mvdStationNum MVD station number.
+     * \param[in, out] hist Vector of histograms for different source types.
+     */
     void CheckClosestMvdHit(
     		Int_t mvdStationNum,
-    		TH2D* signal,
-    		TH2D* bg,
-    		TH2D* gamma,
-    		TH2D* pi0,
-    		TH2D* eta);
+    		vector<TH2D*>& hist);
 
     void CheckTrackTopologyCut();
 
@@ -190,6 +306,7 @@ private:
         CbmGlobalTrack* gTrack, 
         Double_t momentum, 
         DielectronCandidate* cand);
+
 
     TClonesArray *fMCTracks;
     TClonesArray *fRichRings;
@@ -229,41 +346,26 @@ private:
     Double_t fRmsB;
     Double_t fRmsCoeff;
     Double_t fDistCut;
-    CbmRichElectronIdAnn * fElIdAnn;
+    CbmRichElectronIdAnn* fElIdAnn;
     Bool_t fUseRichAnn;
     // Analysis cuts
     Double_t fChiPrimCut;
     Double_t fPtCut;
     Double_t fAngleCut;
     Double_t fGammaCut;
-    Double_t fSTCutAngle;
-    Double_t fSTCutPP;
-    Double_t fTTCutAngle;
-    Double_t fTTCutPP;
-    Double_t fDSTSCutP;
-    Double_t fDSTSCutD;
-    Double_t fDSTSCut2P;
-    Double_t fDSTSCut2D;
+    Double_t fStCutAngle;
+    Double_t fStCutPP;
+    Double_t fTtCutAngle;
+    Double_t fTtCutPP;
+    Double_t fMvd1CutP;
+    Double_t fMvd1CutD;
+    Double_t fMvd2CutP;
+    Double_t fMvd2CutD;
 
     vector<TH1*> fHistoList; //list of all histograms
 
     // Number of hits in the MC RICH ring
     std::map<Int_t, Int_t> fNofHitsInRingMap;
-
-   //signal momentum distribution
-   TH1D* fh_mc_signal_mom;
-   TH1D* fh_acc_signal_mom;
-   TH1D* fh_reco_signal_mom;
-   TH1D* fh_el_id_signal_mom;
-   TH1D* fh_chi_prim_signal_mom;
-   TH1D* fh_ptcut_signal_mom;
-   TH1D* fh_anglecut_signal_mom;
-   TH1D* fh_gammacut_signal_mom;
-   TH1D* fh_ttcut_signal_mom;
-   TH1D* fh_stcut_signal_mom;
-   TH1D* fh_apmcut_signal_mom;
-   TH1D* fh_dstscut_signal_mom;
-   TH1D* fh_dsts2cut_signal_mom;
 
    TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
    TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
@@ -272,135 +374,39 @@ private:
    TH2D* fh_mc_vertex_gamma_yz;
    TH2D* fh_mc_vertex_gamma_xy;
 
-   // invariant mass distribution for signal
-   TH1D* fh_mc_signal_minv;
-   TH1D* fh_acc_signal_minv;
-   TH1D* fh_rec_signal_minv; //minv of reconstructed signal (ideal ID)
-   TH1D* fh_el_id_signal_minv;
-   TH1D* fh_chi_prim_signal_minv; //chi primary cut after identification for signal
-   TH1D* fh_ptcut_signal_minv; //pt cut
-   TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal
-   TH1D* fh_gammacut_signal_minv;
-   TH1D* fh_ttcut_signal_minv;
-   TH1D* fh_stcut_signal_minv;
-   TH1D* fh_apmcut_signal_minv;
-   TH1D* fh_dstscut_signal_minv;
-   TH1D* fh_dsts2cut_signal_minv;
+   //Index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
+   // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
+   //Use AnalysisSteps enumeration for access.
+   //MC and ACC histograms are not filled sometimes.
+   vector<TH1D*> fh_signal_minv; // Invariant mass for Signal
+   vector<TH1D*> fh_bg_minv; // Invariant mass for BG
+   vector<TH1D*> fh_pi0_minv; // Invariant mass for Pi0
+   vector<TH1D*> fh_eta_minv; // Invariant mass for Eta
+   vector<TH1D*> fh_signal_mom; // Signal momentum distribution
+   vector<TH2D*> fh_signal_pty; // Pt/y distribution for signal
+   vector<TH2D*> fh_signal_minv_pt; // Invariant mass vs. MC Pt
 
-   TH2D* fh_ttcut_signal_minv_pt;
-   TH2D* fh_ptcut_signal_minv_pt;
+   //Index is the source type: [0]-signal, [1]-bg, [2]-pi0, [3]-gamma
+   //Use SourceTypes enumeration for access.
+	vector<TH1D*> fh_pt; // Transverse momentum of single track distribution
+   vector<TH1D*> fh_mom; //Momentum of the single track
+   vector<TH1D*> fh_chi2sts; // Chi2 of the STS tracks
+   vector<TH1D*> fh_chi2prim; // Chi2 of the primary vertex
+   vector <TH2D*> fh_ttcut; // TT cut
+   vector <TH2D*> fh_stcut; // ST cut
+   vector<TH2D*> fh_apcut; // Armanteros-Podalyanski
+   vector<TH2D*> fh_apmcut; // AP modified
+   vector<TH2D*> fh_mvd1cut; // MVD cut at the first station
+   vector<TH2D*> fh_mvd2cut; // MVD cut at the second station
+   vector<TH1D*> fh_richann; // RICH ANN
+   vector<TH1D*> fh_trdann; // TRD ANN
+   vector<TH2D*> fh_tofm2; // TOF m2
 
-   //BG minv
-   TH1D* fh_rec_bg_minv;
-   TH1D* fh_el_id_bg_minv;
-   TH1D* fh_chi_prim_bg_minv; //chi primary cut
-   TH1D* fh_ptcut_bg_minv; //pt cut
-   TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
-   TH1D* fh_gammacut_bg_minv;
-   TH1D* fh_ttcut_bg_minv;
-   TH1D* fh_stcut_bg_minv;
-   TH1D* fh_apmcut_bg_minv;
-   TH1D* fh_dstscut_bg_minv;
-   TH1D* fh_dsts2cut_bg_minv;
-
-   //pi0 minv
-   TH1D* fh_rec_pi0_minv;
-   TH1D* fh_el_id_pi0_minv;
-   TH1D* fh_chi_prim_pi0_minv; //chi primary cut
-   TH1D* fh_ptcut_pi0_minv; //pt cut
-   TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for pi0
-   TH1D* fh_gammacut_pi0_minv;
-   TH1D* fh_ttcut_pi0_minv;
-   TH1D* fh_stcut_pi0_minv;
-   TH1D* fh_apmcut_pi0_minv;
-   TH1D* fh_dstscut_pi0_minv;
-   TH1D* fh_dsts2cut_pi0_minv;
-
-   //eta minv
-   TH1D* fh_rec_eta_minv;
-	TH1D* fh_el_id_eta_minv;
-	TH1D* fh_chi_prim_eta_minv; //chi primary cut
-	TH1D* fh_ptcut_eta_minv; //pt cut
-	TH1D* fh_anglecut_eta_minv; // openning angle after pt cut for eta
-	TH1D* fh_gammacut_eta_minv;
-	TH1D* fh_ttcut_eta_minv;
-   TH1D* fh_stcut_eta_minv;
-	TH1D* fh_apmcut_eta_minv;
-	TH1D* fh_dstscut_eta_minv;
-	TH1D* fh_dsts2cut_eta_minv;
-
-	// cuts distribution
-   TH1D* fh_pt_signal;
-   TH1D* fh_pt_bg;
-   TH1D* fh_chi2_prim_signal; // Chi2 primary
-   TH1D* fh_chi2_prim_bg;
-   TH1D* fh_mom_signal; // signal e+/e- momentum
-   TH1D* fh_mom_bg; // bg momentum
-   TH1D* fh_angle_signal;
-   TH1D* fh_angle_bg;
-   TH1D* fh_chi2sts_signal;
-   TH1D* fh_chi2sts_bg;
-   TH2D* fh_ttcut_signal;
-   TH2D* fh_stcut_signal;
-   TH2D* fh_ttcut_bg;
-   TH2D* fh_stcut_bg;
-   TH2D* fh_apcut_signal;
-   TH2D* fh_apcut_bg;
-   TH2D* fh_ttcut_pi0;
-   TH2D* fh_stcut_pi0;
-   TH2D* fh_apcut_pi0;
-   TH2D* fh_ttcut_gamma;
-   TH2D* fh_stcut_gamma;
-   TH2D* fh_apcut_gamma;
-   TH2D* fh_apmcut_signal;
-   TH2D* fh_apmcut_bg;
-   TH2D* fh_dsts_signal;
-   TH2D* fh_dsts_bg;
-   TH2D* fh_dsts_gamma;
-   TH2D* fh_dsts_pi0;
-   TH2D* fh_dsts_eta;
-   //dsts cut at he second MVD station
-   TH2D* fh_dsts2_signal;
-   TH2D* fh_dsts2_bg;
-   TH2D* fh_dsts2_gamma;
-   TH2D* fh_dsts2_pi0;
-   TH2D* fh_dsts2_eta;
-
-   //source of BG pairs
-   TH2D*  fh_source_pair_reco;
-   TH2D*  fh_source_pair_el_id;
-   TH2D*  fh_source_pair_chi_prim;
-   TH2D*  fh_source_pair_ptcut;
-   TH2D*  fh_source_pair_anglecut;
-   TH2D*  fh_source_pair_gammacut;
-   TH2D*  fh_source_pair_ttcut;
-   TH2D*  fh_source_pair_stcut;
-   TH2D*  fh_source_pair_apmcut;
-   TH2D*  fh_source_pair_dstscut;
-   TH2D*  fh_source_pair_dsts2cut;
-
-   //pt/y distribution for signal
-   TH2D* fh_mc_signal_pty;
-   TH2D* fh_acc_signal_pty;
-   TH2D* fh_reco_signal_pty;
-   TH2D* fh_el_id_signal_pty;
-   TH2D* fh_chi_prim_signal_pty;
-   TH2D* fh_ptcut_signal_pty;
-   TH2D* fh_anglecut_signal_pty;
-   TH2D* fh_gammacut_signal_pty;
-   TH2D* fh_ttcut_signal_pty;
-   TH2D* fh_stcut_signal_pty;
-   TH2D* fh_apmcut_signal_pty;
-   TH2D* fh_dstscut_signal_pty;
-   TH2D* fh_dsts2cut_signal_pty;
-
-   //ID cuts distributions
-   TH1D* fh_rich_ann_signal;
-   TH1D* fh_rich_ann_bg;
-   TH1D* fh_trd_ann_signal;
-   TH1D* fh_trd_ann_bg;
-   TH2D* fh_tof_m2_signal;
-   TH2D* fh_tof_m2_bg;
+   //source of BG pairs 2D.
+   //second index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
+   // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
+   //Use AnalysisSteps enumeration for access.
+   vector<TH2D*> fh_source_pair;
 
    //store event number
    TH1D* fh_event_number;
@@ -410,18 +416,16 @@ private:
    TH1D* fh_nof_el_tracks;
    TH2D* fh_source_tracks;
 
-   TH1D* fh_gamma_mom;
-   TH1D* fh_pi0_mom;
-   TH1D* fh_pions_mom;
-   TH1D* fh_proton_mom;
-   TH1D* fh_kaons_mom;
-   TH1D* fh_other_mom;
-   TH1D* fh_gamma_id_mom;
-   TH1D* fh_pi0_id_mom;
-   TH1D* fh_pions_id_mom;
-   TH1D* fh_proton_id_mom;
-   TH1D* fh_kaons_id_mom;
-   TH1D* fh_other_id_mom;
+   //First index is the source type: [0]-signal, [1]-bg, [2]-pi0, [3]-gamma
+   //Use SourceTypes enumeration for access.
+   //second index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
+   // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
+   //Use AnalysisSteps enumeration for access.
+
+   //Track momentum distribution for different sources after each cut.
+   vector<vector<TH1D*> > fh_source_mom;
+   //Opening angle distribution for different sources after each cut.
+   vector<vector<TH1D*> > fh_opening_angle;
 
 public:
    void SetUseMvd(Bool_t use){fUseMvd = use;};
@@ -439,8 +443,8 @@ public:
    void SetPtCut(Double_t par){fPtCut = par;}
    void SetAngleCut(Double_t par){fAngleCut = par;}
    void SetGammaCut(Double_t par){fGammaCut = par;}
-   void SetSTCut(Double_t ang, Double_t pp){fSTCutAngle = ang; fSTCutPP = pp;}
-   void SetTTCut(Double_t ang, Double_t pp){fTTCutAngle = ang; fTTCutPP = pp;}
+   void SetStCut(Double_t ang, Double_t pp){fStCutAngle = ang; fStCutPP = pp;}
+   void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
 };
 
 #endif

@@ -7,8 +7,8 @@
 #ifndef CBM_ANA_DIELECTRON_TASK_DRAW_H
 #define CBM_ANA_DIELECTRON_TASK_DRAW_H
 
+#include "CbmAnaLmvmNames.h"
 #include <string>
-#include <map>
 
 #include "TObject.h"
 
@@ -17,6 +17,8 @@ class TH2D;
 class TH1D;
 class TFile;
 class TCanvas;
+class CbmHistManager;
+class CbmAnaPTree;
 
 using namespace std;
 
@@ -29,57 +31,66 @@ public:
     virtual ~CbmAnaDielectronTaskDraw(){;}
 
     /**
-     * Implement functionality of drawing histograms in the macro
+     * \brief Implement functionality of drawing histograms in the macro
      * from the specified file, this function should be called from macro.
-     * \param fileName Name of the file
-     * \param useMvd draw histograms related to the MVD detector?
+     * \param[in] fileName Name of the input file with histograms.
+     * \param[in] outputDir Path to the output directory (if it does not exist, it will be created automatically).
+     * \param[in] useMvd draw histograms related to the MVD detector?
+     * \param[in] drawSig Do you want to draw significance histograms?
      **/
-    void DrawHistosFromFile(
+    void DrawHistFromFile(
           const string& fileName,
+          const string& outputDir = "",
           Bool_t useMvd = true,
-          Bool_t drawSig = true,
-          Bool_t drawCumProb = true);
+          Bool_t drawSig = true);
 
 private:
     Bool_t fUseMvd; // do you want to draw histograms related to the MVD detector?
     Bool_t fDrawSignificance; // do you want to draw significance histograms of 1D cuts?
-    Bool_t fDrawCumProb; // do you want to draw cumulative probability histograms of 1D cuts?
 
-    string fFileName; // path to file with histograms
-    TFile* fFile; // TFile with histograms
-    map<string, TH1*> fHistoMap; // map which connects histogram's name and pointer to the histogram
-
-    /**
-     * \brief Read all histograms from file to map fHistoMap.
-     */
-    void ReadAllHistosToMap(
-          TFile* file);
-
-    /**
-     * \brief Scale all histograms on the value 1./nofEvents.
-     */
-    void ScaleAllHistos(
-          Int_t nofEvents);
+    CbmHistManager* fHM; //histogram manager
+    vector<TCanvas*> fCanvas; // store pointers to all canvas -> save as image
+    string fOutputDir; // output directory for results (figures and json)
+    CbmAnaPTree* fPt; // property tree
 
     /**
      * \brief Rebin minv histograms for better drawing. Should be called after
      * calculation of S/BG ratios.
      */
-    void RebinMinvHistos();
+    void RebinMinvHist();
 
     /**
      * \brief Return TH1D* pointer to the specified histogram.
-     * \param name Histogram name.
+     * \param[in] name Histogram name.
      */
     TH1D* H1(
           const string& name);
 
     /**
      * \brief Return TH2D* pointer to the specified histogram.
-     * \param[in] name Histogram name
+     * \param[in] name Histogram name.
      */
     TH2D* H2(
           const string& name);
+
+    /**
+     * \brief Create Canvas with specified parameters and add pointer to vector fCanvas.
+     * \param[in] name Canvas name.
+     * \param[in] title Canvas title.
+     * \param[in] width Canvas width.
+     * \param[in] height Canvas height.
+     * \param return Created canvas.
+     */
+    TCanvas* CreateCanvas(
+          const string& name,
+          const string& title,
+          int width,
+          int height);
+
+    /**
+     * \brief Save all created canvases to images.
+     */
+    void SaveCanvasToImage();
 
     /**
      * \brief Draw an integrated efficiency on a histogram (100.*h1->GetEntries()/h2->GetEntries()).
@@ -97,11 +108,11 @@ private:
 
     /**
      * Draw text on the histogram. Histogram must be drawn in advance.
-     * \param text Text you want to draw
-     * \param x1
-     * \param y1
-     * \param x2
-     * \param y2
+     * \param[in] text Text you want to draw.
+     * \param[in] x1
+     * \param[in] y1
+     * \param[in] x2
+     * \param[in] y2
      */
     void DrawTextOnHist(
           const string& text,
@@ -112,28 +123,33 @@ private:
 
     /**
      * Divide two 2D histograms and return 2D result histogram.
-     * \param h1 Pointer to the first histogram
-     * \param h2 Pointer to the second histogram
+     * \param[in] h1 Pointer to the first histogram.
+     * \param[in] h2 Pointer to the second histogram.
+     * \param return Created 2D histogram.
      */
-    TH2D* DivideHisto2D(
+    TH2D* DivideH2D(
           TH2D* h1,
           TH2D* h2);
 
     /**
      * Divide two 1D histograms and returns 1D result histogram.
-     * \param h1 Pointer to the first histogram
-     * \param h2 Pointer to the second histogram
+     * \param[in] h1 Pointer to the first histogram.
+     * \param[in] h2 Pointer to the second histogram.
+     * \param[in] return Created 1D histogram.
      */
-    TH1D* DivideHisto1D(
+    TH1D* DivideH1D(
           TH1D* h1,
           TH1D* h2);
 
     /**
      * Produce 1D significance histogram Significance=S/sqrt(S+BG).
-     * \param option Could be "forward" or "back"
+     * \param[in] s Histogram with signal.
+     * \param[in] bg Histogram eith background.
+     * \param[in] name Name of new significance histogram.
+     * \param[in] option Could be "right" or "left".
      */
-    TH1D* CreateSignificanceHisto1D(
-          TH1D* signal,
+    TH1D* CreateSignificanceH1D(
+          TH1D* s,
           TH1D* bg,
           const string& name,
           const string& option);
@@ -141,39 +157,34 @@ private:
     /**
      * Produce 2D significance histogram Significance=S/sqrt(S+BG).
      */
-    TH2D* CreateSignificanceHisto2D(
+    TH2D* CreateSignificanceH2D(
           TH2D* signal,
           TH2D* bg,
           const string& name,
           const string& title);
 
     /**
-     * Fit signal histogram using Fit("gaus").
+     * \brief Fit signal histogram using Fit("gaus").
      * Calculate S/BG ratio in 2 sigma region.
-     * Print summary table of the efficiency, S/BG, sigma etc
-     * for each step in cout.
+     * Print summary table of the efficiency, S/BG, sigma etc for each step in cout.
+     * \param[in] step Analysis step.
      */
-    void CalculateSignalOverBg(
-          TH1D* s,
-          TH1D* bg,
-          TH2D* pty1,
-          TH2D* pty2,
-          const string& stepName);
+    void SOverBg(
+          AnalysisSteps step);
 
     /**
      * Calculates S/BG ratio for each step of the analysis
-     * using CalculateSignalOverBg method.
+     * using SOverBg method.
      */
-    void SignalOverBgAll();
+    void SOverBgAll();
 
     /**
      * Draw Pt vs. Y distribution of signal for one step.
      * Print integrated efficiency using DrawEfficiencyOnHist method.
+     * \param[in] step Analysis step.
      */
     void DrawPtYDistribution(
-          TH2D* h1,
-          TH2D* h2,
-          const string& text);
+          int step);
 
     /**
      * Draw Pt vs. Y distributions of signal for all steps
@@ -181,11 +192,13 @@ private:
      */
     void DrawPtYDistributionAll();
 
-    //pty efficiency of signal for one step
+    /**
+     * \brief Draw efficiency in dependence on Pt and Rapidity.
+     * Efficiency is normalized to the previous step.
+     * \param[in] step Analysis step.
+     */
     void DrawPtYEfficiency(
-          TH2D* h1,
-          TH2D* h2,
-          const string& text);
+          int step);
 
     /**
      * Draw efficiency in dependence on Pt and Rapidity of signal for all steps.
@@ -208,105 +221,54 @@ private:
     void DrawMotherPdg();
 
     // Draw distribution and significance of 1D analysis cut
-    void Draw1DCutsForSandBg(
-          TH1D* s,
-          TH1D* bg);
+    void Draw1DSourceTypes(
+          const string& hName);
 
-    // Draw significance of 1D analysis cut
-     void Draw1DSignificance(
-          TH1D* s,
-          TH1D* bg,
-          const string& sigHistoName,
-          const string& sigHistoOption);
-
-     void DrawCutsAndSignificance(
-           const string& canvasName,
-           const string& sName,
-           const string& bgName,
-           const string& significanceName,
+     void Draw1DCut(
+           const string& hName,
            const string& sigOption);
 
-    //Draw identification cuts distributions
-    void DrawIdCutsAll();
+     void Draw2DCut(
+           const string& hist);
 
-    // Draw distributions and significances of 1D analysis cuts for all cuts
-    void DrawAnalysisCutsAll();
+     void DrawCutDistributions();
 
     void DrawSourcesBgPairs(
-          TH2D* h,
-          const string& text);
+          int step,
+          bool inPercent);
 
     /**
      * Draw sources of BG pairs for all steps.
      */
     void DrawSourcesBgPairsAll();
 
-
-    //Draw AP CUT distribution
-    void DrawAPCut();
-
-    //Draw APM cut distribution
-    void DrawAPMCut();
-
-    //Draw ST cut distribution (segment tracks)
-    void DrawSTCut();
-
-    //Draw TT cut distribution (full reco tracks)
-    void DrawTTCut();
-
     void DrawGammaVertex();
 
-    //Draw Dsts cut distribution for the first and the second MVD stations
-    void DrawDstsCut();
-
-    void Draw1DHistoAfterEachCut(
-          TH1D* mc,
-          TH1D* acc,
-          TH1D* rec,
-          TH1D* chi_prim,
-          TH1D* elid,
-          TH1D* gamma,
-          TH1D* dsts,
-          TH1D* dsts2,
-          TH1D* st,
-          TH1D* tt,
-          TH1D* pt,
-          TH1D* angle,
-          TH1D* apm,
+    void Draw1DHistoForEachAnalysisStep(
+          const string& hist,
           Bool_t logy = false);
 
     //Draw Invariant mass distributions after each cut
-    void DrawInvariantMassAfterEachCut();
+    void DrawMinvForEachAnalysisStep();
 
-    void DrawMinvBothSandBG(
-          TH1* s,
-          TH1* bg,
-          const string& text);
+    void DrawMinvSandBg(
+          int step);
 
     // Invariant mass distribution after each cut for BG and signal
-    void DrawInvariantMassSandBG();
-
-    // Invariant mass distribution after each cut for Pi0 and Etal
-    void DrawInvariantMassPi0andEta();
+    void DrawMinvSandBgAll();
 
     //SOURCE TRACKS
     void DrawBGSourceTracks();
 
-    //MINV vs. PT
-    void DrawMinvVsPt();
+    /**
+     * \brief Set labels of X axis usinf analysis steps names.
+     */
+    void SetAnalysisStepLabels(
+          TH1* h);
+
+    void DrawMinvPtAll();
 
     void DrawBgSourcesVsMomentum();
-
-    TH1D* CreateCumulativeProbabilityHisto(
-          TH1D* histo,
-          TString name,
-          TString title);
-
-    void DrawCumulativeProbabilities(
-          TH1D* s,
-          TH1D* bg);
-
-    void DrawCumulativeProbabilitiesAll();
 
    ClassDef(CbmAnaDielectronTaskDraw, 1);
 };

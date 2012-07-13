@@ -1,14 +1,17 @@
 /** CbmAnaDielectronTaskDrawAll.h
  * @author Elena Lebedeva <e.lebedeva@gsi.de>
  * @since 2011
- * @version 1.0
+ * @version 2.0
  **/
 
-#ifndef CBM_ANA_DIELECTRON_TASK_DRAW_ALL_H
-#define CBM_ANA_DIELECTRON_TASK_DRAW_ALL_H
+#ifndef CBM_ANA_DIELECTRON_TASK_DRAW_ALL
+#define CBM_ANA_DIELECTRON_TASK_DRAW_ALL
 
+#include <vector>
 #include <string>
 #include <map>
+
+#include "CbmAnaLmvmNames.h"
 
 #include "TObject.h"
 
@@ -17,8 +20,16 @@ class TH2D;
 class TH1D;
 class TFile;
 class TCanvas;
+class CbmHistManager;
 
 using namespace std;
+
+enum SignalType {
+   kRho0 = 0,
+   kOmega = 1,
+   kPhi = 2,
+   kOmegaD = 3
+};
 
 class CbmAnaDielectronTaskDrawAll: public TObject {
 
@@ -51,56 +62,52 @@ public:
          Bool_t useMvd = false);
 
 private:
-   static const int fNofCuts = 7;
    static const int fNofSignals = 4;
+
+   vector<TCanvas*> fCanvas; // store all pointers to TCanvas -> save to images
 
    Bool_t fUseMvd; // do you want to draw histograms related to the MVD detector?
 
    //[0]=rho0, [1]=omega, [2]=phi, [3]=omegaDalitz
-   vector<string> fFileNames; // path to files with histograms
-   vector<TFile*> fFile; // TFile with histograms
+   vector<CbmHistManager*> fHM;
+
    vector<string> fNames; // Names of the signals
-   vector<string> fCutNames; // Names of the cuts
 
-   // first index: [0]=rho0, [1]=omega, [2]=phi, [3]=omegaDalitz
-   // second index: [0]=signal, [1]=background, [2]=eta, [3]=pi0
-   // third index: [0]=el_id, [1]=gammacut, [2]=dstscut, [3]=dsts2cut, [4]=stcut, [5]=ttcut, [6]=ptcut
-   vector<vector<vector<TH1D*> > > fh_minv; // minv histograms after each cut (third index)
+   // index: AnalysisSteps
+   vector<TH1D*> fh_mean_bg_minv; //mean histograms from 4 files
+   vector<TH1D*> fh_mean_eta_minv;
+   vector<TH1D*> fh_mean_pi0_minv;
 
-   // first index: [0]=signal(only for convenience), [1]=background, [2]=eta, [3]=pi0
-   // second index: [0]=el_id, [1]=gammacut, [2]=dstscut, [3]=dsts2cut, [4]=stcut, [5]=ttcut, [6]=ptcut
-   vector<vector<TH1D*> > fh_mean_minv;//mean histograms from 4 files
+   // index: AnalysisSteps
+   vector<TH1D*> fh_sum_s_minv; // sum of all signals
 
-   // index: [0]=el_id, [1]=gammacut, [2]=dstscut, [3]=dsts2cut, [4]=stcut, [5]=ttcut, [6]=ptcut
-   vector<TH1D*> fh_sum_signals_minv; // sum of all signals
 
-   // first index: [0]=rho0, [1]=omega, [2]=phi, [3]=omegaDalitz
-   // second index: [0]=el_id, [1]=gammacut, [2]=dstscut, [3]=dsts2cut, [4]=stcut, [5]=ttcut, [6]=ptcut
-   vector<vector<TH1D*> > fh_pty; // pty distribution of signal for efficiency calculation
+   TCanvas* CreateCanvas(
+         const string& name,
+         const string& title,
+         int width,
+         int height);
 
-   // first index: [0]=rho0, [1]=omega, [2]=phi, [3]=omegaDalitz
-   vector<TH1D*> fh_mc_pty; // MC pty distribution of signal for efficiency calculation
+   TH1D* H1(
+         int signalType,
+         const string& name);
+
+   TH2D* H2(
+         int signalType,
+         const string& name);
+
 
    /**
-    * \brief Scale all histograms from the file to one event.
-    * \param[in] file Pointer to TFile.
-    * \param[in] nofEvents Number of events.
+    * \brief Draw invariant mass histograms.
     */
-   void ScaleAllHistogramms(
-         TFile* file,
-         Int_t nofEvents);
+   void DrawMinvAll();
 
    /**
-    * \brief Draw histograms and plots.
-    */
-   void Draw();
-
-   /**
-    * \brief Draw invariant mass spectra for all signals for specified cut.
-    * \param[in] cutType [0]=el_id, [1]=gammacut, [2]=dstscut, [3]=dsts2cut, [4]=stcut, [5]=ttcut, [6]=ptcut
+    * \brief Draw invariant mass spectra for all signal types for specified analysis step.
+    * \param[in] step Analysis step.
     */
    void DrawMinv(
-         int cutType);
+         AnalysisSteps step);
 
    /**
     * \brief It creates a mean histogram from 4 files.
@@ -126,14 +133,14 @@ private:
     * \param[in] min Minimum invariant mass.
     * \param[in] max Maximum invariant mass.
     */
-   TH1D* CreateSBGRegionHist(
+   TH1D* SBgRegion(
          Double_t min,
          Double_t max);
 
    /**
     * \brief Draw S/BG vs plots for different mass regions.
     */
-   void DrawSBGRegion();
+   void SBgRegionAll();
 
    /**
     * \brief Draw S/BG vs plots for different signals.

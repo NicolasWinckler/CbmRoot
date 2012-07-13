@@ -79,7 +79,7 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn()
       fHists.push_back(fhSumEloss[i]);
       fhEloss[i] = new TH1D(("fhEloss"+s).c_str(),"fhEloss;Energy loss [GeV];Counters",100, 0, 30e-6);
       fHists.push_back(fhEloss[i]);
-      fhdEdX[i] = new TH1D(("fhdEdX"+s).c_str(),"fhdEdX;dEdX [GeV];Counters",100, 0, 30e-6);
+      fhdEdX[i] = new  TH1D(("fhdEdX"+s).c_str(),"fhdEdX;dEdX [GeV];Counters",100, 0, 30e-6);
       fHists.push_back(fhdEdX[i]);
       fhTR[i] = new TH1D(("fhTR"+s).c_str(),"fhTR;Transition radiation [GeV];Counters",100, 0, 30e-6);
       fHists.push_back(fhTR[i]);

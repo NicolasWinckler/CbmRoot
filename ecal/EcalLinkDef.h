@@ -21,7 +21,6 @@
 #pragma link C++ class  CbmEcalAnalysisCluster;
 #pragma link C++ class  CbmEcalHitProducer+;
 #pragma link C++ class  CbmEcalHitProducerFastMC+;
-#pragma link C++ class  CbmGeoEcal+;
 #pragma link C++ class  CbmEcalReconstructionFastMC+;
 #pragma link C++ class  CbmEcalDrawer+;
 #pragma link C++ class  CbmEcalPhotonCalibrator+;
@@ -72,5 +71,6 @@
 #pragma link C++ class  CbmEcalRecoCorr;
 #pragma link C++ class  CbmEcalDigi;
 #pragma link C++ class  CbmEcalPrepare;
+#pragma link C++ class  CbmEcalAnalysisCalib;
 
 #endif

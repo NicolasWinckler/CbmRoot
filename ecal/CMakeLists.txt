@@ -33,7 +33,7 @@ set(ECAL_SRCS_RULECHECKER
 CbmEcal.cxx CbmEcalDetailed.cxx 	
 CbmEcalHitProducer.cxx 
 CbmGeoEcalPar.cxx CbmEcalDrawer.cxx 
-CbmEcalContFact.cxx CbmGeoEcal.cxx  
+CbmEcalContFact.cxx
 CbmEcalAnalysisDS.cxx CbmEcalAnalysis.cxx 
 CbmEcalModule.cxx CbmEcalStructure.cxx 
 CbmEcalHitProducerFastMC.cxx  CbmEcalCellMC.cxx
@@ -60,7 +60,7 @@ CbmEcalClusterFinder.cxx CbmEcalReco.cxx CbmEcalShLibNN.cxx
 CbmEcalAnalysisEres.cxx CbmEcalPosLib.cxx CbmEcalReco2.cxx
 CbmEcalShLibCorr.cxx CbmEcalShLibCorrTable.cxx
 CbmEcalShLibCorrRecord.cxx CbmEcalRecoCorr.cxx
-CbmEcalDigi.cxx CbmEcalPrepare.cxx
+CbmEcalDigi.cxx CbmEcalPrepare.cxx CbmEcalAnalysisCalib.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

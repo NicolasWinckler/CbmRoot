@@ -100,7 +100,6 @@
 #include "CbmEcal.h"
 
 #include "CbmEcalPoint.h"
-#include "CbmGeoEcal.h"
 #include "CbmGeoEcalPar.h"
 
 #include "CbmDetectorList.h"

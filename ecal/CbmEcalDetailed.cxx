@@ -8,7 +8,6 @@
 #include "CbmEcalDetailed.h"
 
 #include "CbmEcalPoint.h"
-#include "CbmGeoEcal.h"
 #include "CbmGeoEcalPar.h"
 #include "CbmEcalLightMap.h"
 

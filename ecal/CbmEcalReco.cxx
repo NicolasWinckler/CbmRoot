@@ -3,6 +3,7 @@
 #include "TTree.h"
 #include "TClonesArray.h"
 #include "TFormula.h"
+#include "TVector3.h"
 
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
@@ -297,6 +298,7 @@ void CbmEcalReco::FitCluster(CbmEcalCluster* clstr)
   Double_t pe[6];
   CbmEcalRecParticle* p;
   TString par;
+  TVector3 tv;
 
   if (n>6)
   {
@@ -383,6 +385,11 @@ void CbmEcalReco::FitCluster(CbmEcalCluster* clstr)
     }
     else
       p->fE=fFitter->GetParameter(i*3);
+    tv.SetXYZ(p->fX, p->fY, fInf->GetZPos());
+    tv*=p->fE/tv.Mag();
+    p->fPx=tv.X();
+    p->fPy=tv.Y();
+    p->fPz=tv.Z();
     p->fChi2=chi2;
     TimeReco(p, clstr);
   }

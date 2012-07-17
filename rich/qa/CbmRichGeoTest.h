@@ -197,6 +197,14 @@ private:
 	      TH2D* hist,
 	      const string& canvasName);
 
+	void FitH1OneOverX(
+	      TH1D* hist,
+	      double xMinFit,
+	      double xMaxFit,
+	      double xMin,
+	      double xMax,
+	      const string& canvasName);
+
 	/**
 	 * \brief Create property tree an store different statistics there.
 	 */
@@ -278,11 +286,11 @@ private:
 	vector<TH2D*> fhBaxisVsMom; // minor axis (B) vs. MC momentum
 	vector<TH1D*> fhBoverA; // B/A distribution
 	vector<TH2D*> fhXcYcEllipse; // (Xc, Yc) of ellipse center
-   vector<TH1D*> fhChi2Ellipse; // Chi2
+   vector<TH2D*> fhChi2EllipseVsMom; // Chi2
    // for circle
 	vector<TH2D*> fhXcYcCircle; // (Xc, Yc) of circle center
 	vector<TH2D*> fhRadiusVsMom; // circle radius vs. MC momentum
-   vector<TH1D*> fhChi2Circle; // chi2
+   vector<TH2D*> fhChi2CircleVsMom; // chi2
    vector<TH2D*> fhDRVsMom; // dR
 
    // R, A, B distribution for different number of hits from 0 to 40
@@ -337,6 +345,8 @@ private:
    TH2D* fhAaxisXY; // A axis
    TH2D* fhRadiusXY; // Radius
    TH2D* fhCounterXY; // counter for mean value calculation
+
+   TH2D* fhHitsXY1Gev; // number of hits for tracks with P<1GeV/c
 
 	vector<TH1*> fHists; // store all TH1 pointers of the histogram
 

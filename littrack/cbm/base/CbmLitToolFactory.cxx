@@ -183,7 +183,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		settings.IsProcessSubstationsTogether(true);
 		trdFinderNN->SetSettings(settings);
 		trdFinderNN->SetZPropagationForTrackSeeds(400.);
-		trdFinderNN->SetUseTGeo(true);
+		trdFinderNN->SetUseTGeo(false);
 		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		TrackFinderPtr finder(trdFinderNN);
 		return finder;
@@ -209,7 +209,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		settings.SetChiSqStripHitCut(9.);
 		trdFinderBranch->SetSettings(settings);
 		trdFinderBranch->SetZPropagationForTrackSeeds(400.);
-		trdFinderBranch->SetUseTGeo(true);
+		trdFinderBranch->SetUseTGeo(false);
 		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		TrackFinderPtr finder(trdFinderBranch);
 		return finder;

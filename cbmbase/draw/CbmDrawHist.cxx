@@ -169,6 +169,7 @@ void DrawGraph(
    gPad->SetLeftMargin(0.17);
    gPad->SetBottomMargin(0.15);
    graph->Draw(drawOpt.c_str());
+   gPad->SetGrid(true, true);
 }
 
 

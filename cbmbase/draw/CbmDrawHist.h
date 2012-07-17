@@ -160,7 +160,7 @@ void DrawGraph(
    TGraph* graph,
    HistScale logx = kLinear,
    HistScale logy = kLinear,
-   const string& drawOpt = "",
+   const string& drawOpt = "AC",
    Int_t color = CbmDrawingOptions::Color(0),
    Int_t lineWidth = CbmDrawingOptions::LineWidth(),
    Int_t lineStyle = CbmDrawingOptions::LineStyle(0),

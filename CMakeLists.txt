@@ -166,6 +166,7 @@ add_subdirectory (trdcatrack)
 add_subdirectory (cbmgenerators)
 add_subdirectory (run)
 add_subdirectory (hadron)
+add_subdirectory (analysis)
 
 Option(BUILD_UNITTESTS "Build all unittests and add them as new tests" OFF)
 If(BUILD_UNITTESTS)

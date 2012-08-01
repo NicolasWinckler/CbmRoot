@@ -1,5 +1,5 @@
 /*
- * CbmMuchFindHitsAdvancedGem.h
+ * CbmMuchFindHitsGem.h
  *
  *  Created on: June 17, 2007
  *      Author: M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
@@ -36,18 +36,18 @@ using std::set;
 class CbmMuchPad;
 class CbmMuchCluster;
 
-class CbmMuchFindHitsAdvancedGem: public FairTask {
+class CbmMuchFindHitsGem: public FairTask {
 
   public:
 
     /** Default constructor. */
-    CbmMuchFindHitsAdvancedGem();
+    CbmMuchFindHitsGem();
 
     /**
      * Standard constructor.
      * @param iVerbose   Verbosity level.
      */
-    CbmMuchFindHitsAdvancedGem(Int_t iVerbose);
+    CbmMuchFindHitsGem(Int_t iVerbose);
 
     /**
      * Constructor with task name.
@@ -55,11 +55,11 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
      * @param digiFile  Input digitization scheme file.
      * @param iVerbose  Verbosity level.
      */
-    CbmMuchFindHitsAdvancedGem(const char* name, const char* digiFileName,
+    CbmMuchFindHitsGem(const char* name, const char* digiFileName,
         Int_t iVerbose);
 
     /** Destructor. */
-    virtual ~CbmMuchFindHitsAdvancedGem();
+    virtual ~CbmMuchFindHitsGem();
 
     /** Sets number of stations for the current setup. */
     void SetNStations(Int_t nStations);
@@ -183,10 +183,10 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     Bool_t IsCornerBorder(CbmMuchPad *pad, CbmMuchPad *neighbourPad);
     Bool_t CornersNotFired(CbmMuchPad *pad, CbmMuchPad *neighbourPad, Double_t deltaX, Double_t deltaY);
 
-    CbmMuchFindHitsAdvancedGem(const CbmMuchFindHitsAdvancedGem&);
-    CbmMuchFindHitsAdvancedGem& operator=(const CbmMuchFindHitsAdvancedGem&);
+    CbmMuchFindHitsGem(const CbmMuchFindHitsGem&);
+    CbmMuchFindHitsGem& operator=(const CbmMuchFindHitsGem&);
 
-    ClassDef(CbmMuchFindHitsAdvancedGem,1);
+    ClassDef(CbmMuchFindHitsGem,1);
 };
 
 #endif

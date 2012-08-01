@@ -1,4 +1,4 @@
-/** CbmMuchDigitizeAdvancedGem.h
+/** CbmMuchDigitizeGem.h
  *@author Evgeny Kryshen <e.kryshen@gsi.de>
  *@since 01.05.11
  *@version 2.0
@@ -51,22 +51,22 @@ static double min_logT_p  =  1.0986;
 static double l_e         = 0.47;
 static double l_not_e     = 0.36;
 
-class CbmMuchDigitizeAdvancedGem : public FairTask
+class CbmMuchDigitizeGem : public FairTask
 {
 
   public:
 
     /** Default constructor. */
-    CbmMuchDigitizeAdvancedGem();
+    CbmMuchDigitizeGem();
 
     /** Standard constructor. */
-    CbmMuchDigitizeAdvancedGem(Int_t iVerbose);
+    CbmMuchDigitizeGem(Int_t iVerbose);
 
     /** Constructor with name. */
-    CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose);
+    CbmMuchDigitizeGem(const char* name, const char* digiFileName, Int_t iVerbose);
 
     /** Destructor. */
-    virtual ~CbmMuchDigitizeAdvancedGem();
+    virtual ~CbmMuchDigitizeGem();
 
     /** Execution. */
     virtual void Exec(Option_t* opt);
@@ -199,8 +199,8 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Bool_t AddDigi(CbmMuchPad* pad);
     Bool_t AddDigi(CbmMuchRadialPad* pad);
     inline Int_t GasGain();
-    CbmMuchDigitizeAdvancedGem(const CbmMuchDigitizeAdvancedGem&);
-    CbmMuchDigitizeAdvancedGem& operator=(const CbmMuchDigitizeAdvancedGem&);
+    CbmMuchDigitizeGem(const CbmMuchDigitizeGem&);
+    CbmMuchDigitizeGem& operator=(const CbmMuchDigitizeGem&);
         
     Double_t GetNPrimaryElectronsPerCm(CbmMuchPoint* point);
     Bool_t AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
@@ -209,6 +209,6 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
 
     Double_t fTotalDriftTime;
     
-    ClassDef(CbmMuchDigitizeAdvancedGem,1)
+    ClassDef(CbmMuchDigitizeGem,1)
 };
 #endif

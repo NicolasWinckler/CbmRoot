@@ -1,4 +1,4 @@
-/** CbmMuchDigitizeAdvancedGem.cxx
+/** CbmMuchDigitizeGem.cxx
  *@author Evgeny Kryshen <e.kryshen@gsi.de>
  *@since 01.05.11
  *@version 2.0
@@ -12,7 +12,7 @@
  **/
 
 // Includes from MUCH
-#include "CbmMuchDigitizeAdvancedGem.h"
+#include "CbmMuchDigitizeGem.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchStation.h"
@@ -51,12 +51,12 @@ using std::setprecision;
 using std::map;
 using std::pair;
 
-void CbmMuchDigitizeAdvancedGem::SetParContainers() {}
-void CbmMuchDigitizeAdvancedGem::FinishTask() {}
-InitStatus CbmMuchDigitizeAdvancedGem::ReInit() { return kSUCCESS; }
+void CbmMuchDigitizeGem::SetParContainers() {}
+void CbmMuchDigitizeGem::FinishTask() {}
+InitStatus CbmMuchDigitizeGem::ReInit() { return kSUCCESS; }
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() 
+CbmMuchDigitizeGem::CbmMuchDigitizeGem() 
   : FairTask("MuchDigitize", 1),
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiFile(""),
@@ -98,7 +98,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor    -----------------------------------------
-CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose) 
+CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* name, const char* digiFileName, Int_t iVerbose) 
   : FairTask(name, iVerbose),
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiFile(digiFileName),
@@ -139,7 +139,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
+CbmMuchDigitizeGem::~CbmMuchDigitizeGem() {
   if (fDigis) {
     fDigis->Delete();
     delete fDigis;
@@ -153,7 +153,7 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
 // -------------------------------------------------------------------------
 
 // -----   Private method Reset   ------------------------------------------
-void CbmMuchDigitizeAdvancedGem::Reset() {
+void CbmMuchDigitizeGem::Reset() {
   fNFailed = fNOutside = fNMulti = 0;
   if (fDigis) fDigis->Clear();
   if (fDigiMatches) fDigiMatches->Delete(); // Delete because of memory leaks
@@ -161,7 +161,7 @@ void CbmMuchDigitizeAdvancedGem::Reset() {
 // -------------------------------------------------------------------------
 
 // -----   Private method Init   -------------------------------------------
-InitStatus CbmMuchDigitizeAdvancedGem::Init() {
+InitStatus CbmMuchDigitizeGem::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
   if (!ioman)
     Fatal("Init", "No FairRootManager");
@@ -219,7 +219,7 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
 
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
+void CbmMuchDigitizeGem::Exec(Option_t* opt) {
   // Reset all eventwise counters
   fTimer.Start();
   Reset();
@@ -287,7 +287,7 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
 
 
 // ------- Private method ExecAdvanced -------------------------------------
-Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
+Bool_t CbmMuchDigitizeGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
   TVector3 v1,v2,dv;
   point->PositionIn(v1);
   point->PositionOut(v2);
@@ -385,7 +385,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Int_t CbmMuchDigitizeAdvancedGem::GasGain() {
+Int_t CbmMuchDigitizeGem::GasGain() {
   Double_t gasGain = -fMeanGasGain * TMath::Log(1 - gRandom->Rndm());
   if (gasGain < 0.) gasGain = 1e6;
   return (Int_t) gasGain;
@@ -393,7 +393,7 @@ Int_t CbmMuchDigitizeAdvancedGem::GasGain() {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchDigitizeAdvancedGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
+Double_t CbmMuchDigitizeGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
   Double_t logT;
   TF1 fPol6("fPol6","pol6",-5,10);
   if (mass < 0.1) {
@@ -416,7 +416,7 @@ Double_t CbmMuchDigitizeAdvancedGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchDigitizeAdvancedGem::MPV_n_e(Double_t Tkin, Double_t mass) {
+Double_t CbmMuchDigitizeGem::MPV_n_e(Double_t Tkin, Double_t mass) {
   Double_t logT;
   TF1 fPol6("fPol6","pol6",-5,10);
   if (mass < 0.1) {
@@ -439,7 +439,7 @@ Double_t CbmMuchDigitizeAdvancedGem::MPV_n_e(Double_t Tkin, Double_t mass) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
+Bool_t CbmMuchDigitizeGem::AddDigi(CbmMuchPad* pad) {
   CbmMuchDigiMatch* match = pad->GetMatch();
   CbmMuchDigi* digi = pad->GetDigi();
   
@@ -466,7 +466,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchPad* pad) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchRadialPad* pad) {
+Bool_t CbmMuchDigitizeGem::AddDigi(CbmMuchRadialPad* pad) {
   CbmMuchDigiMatch* match = pad->GetMatch();
   CbmMuchDigi* digi = pad->GetDigi();
   
@@ -493,7 +493,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddDigi(CbmMuchRadialPad* pad) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectronsPerCm(CbmMuchPoint* point){
+Double_t CbmMuchDigitizeGem::GetNPrimaryElectronsPerCm(CbmMuchPoint* point){
   Int_t trackID = point->GetTrackID();
   if (trackID < 0) return -1;
 
@@ -521,15 +521,15 @@ Double_t CbmMuchDigitizeAdvancedGem::GetNPrimaryElectronsPerCm(CbmMuchPoint* poi
   TLorentzVector p;
   p.SetXYZM(point->GetPx(),point->GetPy(),point->GetPz(),m);
   Double_t Tkin = p.E()-m; // kinetic energy of the particle
-  Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
-  Double_t mpv   = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
+  Double_t sigma = CbmMuchDigitizeGem::Sigma_n_e(Tkin,m); // sigma for Landau distribution
+  Double_t mpv   = CbmMuchDigitizeGem::MPV_n_e(Tkin,m);   // most probable value for Landau distr.
   Double_t n = gRandom->Landau(mpv, sigma);
   while (n > 5e4) n = gRandom->Landau(mpv, sigma); // restrict Landau tail to increase performance
   return m<0.1 ? n/l_e : n/l_not_e;
 }
 
 
-Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL){
+Bool_t CbmMuchDigitizeGem::AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL){
   CbmMuchDigi*      digi  = pad->GetDigi();
   CbmMuchDigiMatch* match = pad->GetMatch();
   if (match->GetNPoints()==0) {
@@ -545,7 +545,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialPad* pad, UInt_t charg
   return kFALSE;
 }
 
-Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL, 
+Bool_t CbmMuchDigitizeGem::AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL, 
     Double_t phi1, Double_t phi2){
   
   CbmMuchRadialPad* pad1 = s->GetPadByPhi(phi1);
@@ -560,7 +560,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchRadialSector* s,UInt_t ne, I
   return kFALSE;
 }
 
-Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL){
+Bool_t CbmMuchDigitizeGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL){
   CbmMuchDigi*      digi  = pad->GetDigi();
   CbmMuchDigiMatch* match = pad->GetMatch();
   if (match->GetNPoints()==0) {
@@ -576,4 +576,4 @@ Bool_t CbmMuchDigitizeAdvancedGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int
   return kFALSE;
 }
 
-ClassImp(CbmMuchDigitizeAdvancedGem)
+ClassImp(CbmMuchDigitizeGem)

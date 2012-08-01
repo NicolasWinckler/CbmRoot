@@ -1,5 +1,5 @@
 /*
- * CbmMuchFindHitsAdvancedGem.cxx
+ * CbmMuchFindHitsGem.cxx
  *
  *  Created on: June 17, 2007
  *      Author: M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
@@ -15,7 +15,7 @@
  *
  */
 
-#include "CbmMuchFindHitsAdvancedGem.h"
+#include "CbmMuchFindHitsGem.h"
 #include "CbmMuchPixelHit.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
@@ -48,7 +48,7 @@ using std::right;
 using std::multimap;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() 
+CbmMuchFindHitsGem::CbmMuchFindHitsGem() 
   : FairTask("MuchFindHitsAdvancedGem", 1) ,
     fGeoScheme( CbmMuchGeoScheme::Instance()),
     fDigiFile(""),
@@ -78,7 +78,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) 
+CbmMuchFindHitsGem::CbmMuchFindHitsGem(Int_t iVerbose) 
   : FairTask("MuchFindHitsAdvancedGem", iVerbose),
     fGeoScheme( CbmMuchGeoScheme::Instance()),
     fDigiFile(""),
@@ -108,7 +108,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose)
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name,
+CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* name,
     const char* digiFileName, Int_t iVerbose) 
   : FairTask(name, iVerbose),
     fGeoScheme( CbmMuchGeoScheme::Instance()),
@@ -140,7 +140,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name,
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchFindHitsAdvancedGem::~CbmMuchFindHitsAdvancedGem() {
+CbmMuchFindHitsGem::~CbmMuchFindHitsGem() {
   if (fHits) {
     fHits->Delete();
     delete fHits;
@@ -153,7 +153,7 @@ CbmMuchFindHitsAdvancedGem::~CbmMuchFindHitsAdvancedGem() {
 // -------------------------------------------------------------------------
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
+void CbmMuchFindHitsGem::Exec(Option_t* opt) {
   fTimer.Start();
   fEvent++;
 
@@ -226,7 +226,7 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
         break;
       }
       default: {
-        Fatal("CbmMuchFindHitsAdvancedGem::Exec:",
+        Fatal("CbmMuchFindHitsGem::Exec:",
             "The algorithm index does not exist.");
         break;
       }
@@ -256,7 +256,7 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
 }
 // -------------------------------------------------------------------------
 
-void CbmMuchFindHitsAdvancedGem::FinishTask() {
+void CbmMuchFindHitsGem::FinishTask() {
   printf(
       "----------------------- Some statistics -----------------------------\n");
   // Loop over stations
@@ -277,7 +277,7 @@ void CbmMuchFindHitsAdvancedGem::FinishTask() {
 }
 
 // -------------------------------------------------------------------------
-void CbmMuchFindHitsAdvancedGem::SetNStations(Int_t nStations) {
+void CbmMuchFindHitsGem::SetNStations(Int_t nStations) {
   fNStations = nStations;
   fThresholdRatios.resize(fNStations);
 
@@ -285,10 +285,10 @@ void CbmMuchFindHitsAdvancedGem::SetNStations(Int_t nStations) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchFindHitsAdvancedGem::SetThresholdRatios(Double_t* thresholdRatios) {
+void CbmMuchFindHitsGem::SetThresholdRatios(Double_t* thresholdRatios) {
   for (Int_t iStation = 0; iStation < fNStations; ++iStation) {
     if (iStation >= fNStations) Fatal(
-        "CbmMuchFindHitsAdvancedGem::SetThresholdRatios",
+        "CbmMuchFindHitsGem::SetThresholdRatios",
         "Station index is out of range.");
     fThresholdRatios.at(iStation) = thresholdRatios[iStation];
   }
@@ -297,7 +297,7 @@ void CbmMuchFindHitsAdvancedGem::SetThresholdRatios(Double_t* thresholdRatios) {
 
 
 // -----   Public method StatInfo  -----------------------------------------
-void CbmMuchFindHitsAdvancedGem::StatInfo() {
+void CbmMuchFindHitsGem::StatInfo() {
   for (Int_t iStation = 0; iStation < fGeoScheme->GetNStations(); ++iStation) {
     Int_t nStationPoints = 0; // Number of MC points in a station
     Int_t nStationHits = 0; // Number of hits in the station
@@ -390,7 +390,7 @@ void CbmMuchFindHitsAdvancedGem::StatInfo() {
 // -------------------------------------------------------------------------
 
 // -----   Private method CreateHits  --------------------------------------
-void CbmMuchFindHitsAdvancedGem::CreateHits(vector<CbmMuchCluster*> clusters,
+void CbmMuchFindHitsGem::CreateHits(vector<CbmMuchCluster*> clusters,
     Int_t iCluster) {
   // Produce hits
   for (vector<CbmMuchCluster*>::iterator it = clusters.begin(); it
@@ -404,7 +404,7 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(vector<CbmMuchCluster*> clusters,
 // -------------------------------------------------------------------------
 
 // -----   Private method CreateHits  --------------------------------------
-void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster,
+void CbmMuchFindHitsGem::CreateHits(CbmMuchCluster* cluster,
     Int_t iCluster) {
   // Produce a hit
   Double_t x, y, z;
@@ -502,15 +502,15 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster,
 // -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers   -------------------------------
-void CbmMuchFindHitsAdvancedGem::SetParContainers() {
+void CbmMuchFindHitsGem::SetParContainers() {
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method Init   -------------------------------------------
-InitStatus CbmMuchFindHitsAdvancedGem::Init() {
+InitStatus CbmMuchFindHitsGem::Init() {
   // Get input arrays
   FairRootManager* ioman = FairRootManager::Instance();
-  if (!ioman) Fatal("CbmMuchFindHitsAdvancedGem::Init", "No FairRootManager");
+  if (!ioman) Fatal("CbmMuchFindHitsGem::Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
   
@@ -539,13 +539,13 @@ InitStatus CbmMuchFindHitsAdvancedGem::Init() {
 // -------------------------------------------------------------------------
 
 // -----   Private method ReInit   -----------------------------------------
-InitStatus CbmMuchFindHitsAdvancedGem::ReInit() {
+InitStatus CbmMuchFindHitsGem::ReInit() {
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method FindChannelDigiMap  ------------------------------
-void CbmMuchFindHitsAdvancedGem::FillChannelDigiMap() {
+void CbmMuchFindHitsGem::FillChannelDigiMap() {
   fChannelDigiMap.clear();
   Int_t nDigis = fDigis->GetEntriesFast();
   for (Int_t iDigi = 0; iDigi < nDigis; iDigi++) {
@@ -564,7 +564,7 @@ void CbmMuchFindHitsAdvancedGem::FillChannelDigiMap() {
 // -------------------------------------------------------------------------
 
 // -----   Private method FindClusters  ------------------------------------
-void CbmMuchFindHitsAdvancedGem::FindClusters() {
+void CbmMuchFindHitsGem::FindClusters() {
   Int_t nClusters = 0;
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
 
@@ -633,7 +633,7 @@ void CbmMuchFindHitsAdvancedGem::FindClusters() {
 // -------------------------------------------------------------------------
 
 // -----   Private method CornersNotFired ----------------------------------
-Bool_t CbmMuchFindHitsAdvancedGem::CornersNotFired(CbmMuchPad *pad,
+Bool_t CbmMuchFindHitsGem::CornersNotFired(CbmMuchPad *pad,
     CbmMuchPad *neighbourPad, Double_t deltaX, Double_t deltaY) {
   Int_t nDx = Int_t((TMath::Abs(deltaX) + 1e-5)/deltaX);
   Int_t nDy = Int_t((TMath::Abs(deltaY) + 1e-5)/deltaY);
@@ -679,7 +679,7 @@ Bool_t CbmMuchFindHitsAdvancedGem::CornersNotFired(CbmMuchPad *pad,
 // -------------------------------------------------------------------------
 
 // -----   Private method IsCornerBorder -----------------------------------
-Bool_t CbmMuchFindHitsAdvancedGem::IsCornerBorder(CbmMuchPad *pad,
+Bool_t CbmMuchFindHitsGem::IsCornerBorder(CbmMuchPad *pad,
     CbmMuchPad *neighbourPad) {
   Double_t deltaX = neighbourPad->GetX0() - pad->GetX0();
   Double_t deltaY = neighbourPad->GetY0() - pad->GetY0();
@@ -694,7 +694,7 @@ Bool_t CbmMuchFindHitsAdvancedGem::IsCornerBorder(CbmMuchPad *pad,
 // -------------------------------------------------------------------------
 
 // -----   Private method CreateCluster  -----------------------------------
-void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
+void CbmMuchFindHitsGem::CreateCluster(Int_t iDigi,
     vector<Int_t> &digiIndices, UInt_t &sumCharge, UInt_t &qMax, UInt_t qThreshold) {
   digiIndices.push_back(iDigi);
   fSelectedDigis.insert(iDigi);
@@ -734,7 +734,7 @@ void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
 // -------------------------------------------------------------------------
 
 // -----   Private method GetPadByDigi  ------------------------------------
-CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, UInt_t &charge) {
+CbmMuchPad* CbmMuchFindHitsGem::GetPadByDigi(Int_t digiIndex, UInt_t &charge) {
   CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(digiIndex);
   CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
   if (digi) {
@@ -762,7 +762,7 @@ CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, UInt_t &ch
 // -------------------------------------------------------------------------
 
 // -----   Private method ExecClusteringSimple  ----------------------------
-void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster,
+void CbmMuchFindHitsGem::ExecClusteringSimple(CbmMuchCluster* cluster,
     vector<CbmMuchCluster*> &clusters) {
   fSelectedDigis.clear();
 
@@ -776,7 +776,7 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster,
     break;
   case 2:
     if (iStation >= fNStations) Fatal(
-        "CbmMuchFindHitsAdvancedGem::ExecClusterSimple",
+        "CbmMuchFindHitsGem::ExecClusterSimple",
         "Station index is out of range.");
     thresholdRatio = fThresholdRatios.at(iStation);
     break;
@@ -805,7 +805,7 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster,
 // -------------------------------------------------------------------------
 
 // -----   Private method ExecClusteringPeaks   ----------------------------
-void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
+void CbmMuchFindHitsGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     vector<CbmMuchCluster*> &clusters) {
   fSelectedDigis.clear();
   //  printf("Cluster contents:\n");
@@ -989,4 +989,4 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
 // -------------------------------------------------------------------------
 
 
-ClassImp(CbmMuchFindHitsAdvancedGem)
+ClassImp(CbmMuchFindHitsGem)

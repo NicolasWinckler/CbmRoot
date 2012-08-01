@@ -12,8 +12,10 @@
 
 #include "CbmMuchStation.h"
 #include "CbmMuchModuleGem.h"
+#include "CbmMuchModuleSector.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchPad.h"
+#include "CbmMuchRadialPad.h"
 
 #include "CbmMCTrack.h"
 #include "TParticlePDG.h"
@@ -275,54 +277,74 @@ InitStatus CbmMuchHitFinderQa::Init()
     Double_t rMax = station->GetRmax();
     fhPadsTotalR[i] = new TH1D(Form("hPadsTotal%i",i+1),Form("Number of  pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
     fhPadsFiredR[i] = new TH1D(Form("hPadsFired%i",i+1),Form("Number of fired pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
-    fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i;Radius [cm];Occupancy",i+1),100,0,1.2*rMax);
+    fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i;Radius [cm];Occupancy, %%",i+1),100,0,1.2*rMax);
   }
 
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
   for(vector<CbmMuchModule*>::iterator im = modules.begin(); im!=modules.end(); im++){
     CbmMuchModule* mod = (*im);
-    if(mod->GetDetectorType() != 1) continue;
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
-    vector<CbmMuchPad*> pads = module->GetPads();
-    for (vector<CbmMuchPad*>::iterator ip = pads.begin(); ip != pads.end(); ++ip) {
-      CbmMuchPad* pad = (*ip);
-      Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
-      Double_t x0 = pad->GetX0();
-      Double_t y0 = pad->GetY0();
-      Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
-      fhPadsTotalR[stationId]->Fill(r0);
+    if(mod->GetDetectorType() == 1) {
+      CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+      vector<CbmMuchPad*> pads = module->GetPads();
+      for (vector<CbmMuchPad*>::iterator ip = pads.begin(); ip != pads.end(); ++ip) {
+        CbmMuchPad* pad = (*ip);
+        Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
+        Double_t x0 = pad->GetX0();
+        Double_t y0 = pad->GetY0();
+        Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
+        fhPadsTotalR[stationId]->Fill(r0);
+      }
+    }
+    else if(mod->GetDetectorType() == 3) {
+      CbmMuchModuleSector* module = (CbmMuchModuleSector*) mod;
+      vector<CbmMuchRadialPad*> pads = module->GetPads();
+      for (vector<CbmMuchRadialPad*>::iterator ip = pads.begin(); ip != pads.end(); ++ip) {
+        CbmMuchRadialPad* pad = (*ip);
+        Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
+        Double_t r1 = pad->GetR1();
+        Double_t r2 = pad->GetR2();
+        Double_t r0 = (r2+r1)/2.;
+        fhPadsTotalR[stationId]->Fill(r0);
+      }
     }
   }
-
+  /*
   fPadMinLx = std::numeric_limits<Double_t>::max();
   fPadMinLy = std::numeric_limits<Double_t>::max();
   fPadMaxLx = std::numeric_limits<Double_t>::min();
   fPadMaxLy = std::numeric_limits<Double_t>::min();
-
+  
   Int_t nTotSectors = 0;
   Int_t nTotChannels = 0;
   printf("=========================================================================================\n");
   printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max length\t \n");
   printf("-----------------------------------------------------------------------------------------\n");
+  */
+  Int_t nTotChannels = 0;
   for (Int_t iStation=0;iStation<fNstations;iStation++){
+/*    
     Double_t padMinLx = GetMinPadSize(iStation).X();
     Double_t padMinLy = GetMinPadSize(iStation).Y();
     Double_t padMaxLx = GetMaxPadSize(iStation).X();
     Double_t padMaxLy = GetMaxPadSize(iStation).Y();
+*/
     Int_t nChannels  = GetNChannels(iStation);
+/*
     Int_t nSectors   = GetNSectors(iStation);
     if (fPadMinLx>padMinLx) fPadMinLx = padMinLx;
     if (fPadMinLy>padMinLy) fPadMinLy = padMinLy;
     if (fPadMaxLx<padMaxLx) fPadMaxLx = padMaxLx;
     if (fPadMaxLy<padMaxLy) fPadMaxLy = padMaxLy;
     printf("%i\t\t| %i\t\t| %i\t| %5.4fx%5.4f\t\t| %5.4fx%5.4f\n",iStation+1, nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
-    nTotSectors += nSectors;
+*/
+//    nTotSectors += nSectors;
+    printf("%i\t\t| %i\t\t\n",iStation+1, nChannels);
     nTotChannels += nChannels;
   }
   printf("-----------------------------------------------------------------------------------------\n");
-  printf(" Total:\t\t| %i\t\t| %i\t| %5.4fx%5.4f\t\t| %5.4fx%5.4f\n", nTotSectors, nTotChannels,fPadMinLx,fPadMinLy,fPadMaxLx,fPadMaxLy);
+  printf(" Total:\t\t| %i\t\t\n", nTotChannels);
   printf("=========================================================================================\n");
-
+/*
   fnPadSizesX = TMath::CeilNint(TMath::Log2(fPadMaxLx/fPadMinLx)+1);
   fnPadSizesY = TMath::CeilNint(TMath::Log2(fPadMaxLy/fPadMinLy)+1);
   Info("Init","nPadSizesX=%i",fnPadSizesX);
@@ -351,12 +373,12 @@ InitStatus CbmMuchHitFinderQa::Init()
   for (Int_t i=1;i<fNTimingPulls;i++){
     fhPullT[i] = new TH1D(Form("hPullT%i",i),Form("Pull distribution T. Npads = %i; (t_{RC} - t_{MC}) / dt_{RC}",i),100,-5,5);
   }
+  */
 
   fhPullX = new TH1D("hPullX","Pull distribution X;(x_{RC} - x_{MC}) / dx_{RC}",100,-5,5);
   fhPullY = new TH1D("hPullY","Pull distribution Y;(y_{RC} - y_{MC}) / dy_{RC}",100,-5,5);
 
   fhNpadsVsS = new TH2D("hNpadsVsS","Number of fired pads vs pad area:area:n pads",10,-5,0,10,0.5,10.5);
-
   pointsFile = fopen ("points.txt","w");
   padsFile = fopen ("pads.txt","w");
   return kSUCCESS;
@@ -377,7 +399,7 @@ void CbmMuchHitFinderQa::SetParContainers() {
 
 
 
-// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------x
 void CbmMuchHitFinderQa::Exec(Option_t * option){
   fEvent++;
   fLogger->Info(MESSAGE_ORIGIN,"Event:%i",fEvent);
@@ -390,6 +412,7 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
   if (fStatisticsQaOn) StatisticsQa();
   if (fClusterDeconvQaOn) ClusterDeconvQa();
   
+  return;
   for (int i=0;i<fPoints->GetEntriesFast();i++){
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(i);
     Int_t stId = fGeoScheme->GetStationIndex(point->GetDetectorID());
@@ -423,6 +446,7 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
 
 // -------------------------------------------------------------------------
 void CbmMuchHitFinderQa::FinishTask(){
+  printf("FinishTask\n");
   fclose (pointsFile);
   fclose (padsFile);
 
@@ -437,6 +461,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     fhPadsFiredR[i]->Sumw2();
     fhPadsFiredR[i]->Scale(1./fEvent);
     fhOccupancyR[i]->Divide(fhPadsFiredR[i],fhPadsTotalR[i]);
+    fhOccupancyR[i]->Scale(100);
   }
 
   if (fPullsQaOn && fVerbose>1){
@@ -564,7 +589,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     }
     c2->cd();
 
-    TCanvas* c3 = new TCanvas("c3","Occupancy plots",1200,800);
+    TCanvas* c3 = new TCanvas("c3","Occupancy plots",2400,1600);
     c3->Divide(3,2);
     for (Int_t i=0;i<fNstations;i++) {
       c3->cd(i+1);
@@ -574,6 +599,19 @@ void CbmMuchHitFinderQa::FinishTask(){
       if (fPrintToFileOn) gPad->Print(".eps");
     }
     c3->cd();
+    
+    TCanvas* oc_1 = new TCanvas("oc_1","",1200,1000);
+    fhOccupancyR[0]->GetYaxis()->SetTitleOffset(1.6);
+    fhOccupancyR[0]->Draw();
+    if (fPrintToFileOn) gPad->Print(".gif");
+    TCanvas* oc_2 = new TCanvas("oc_2","",1200,1000);
+    fhOccupancyR[1]->GetYaxis()->SetTitleOffset(1.6);
+    fhOccupancyR[1]->Draw();
+    if (fPrintToFileOn) gPad->Print(".gif");
+    TCanvas* oc_3 = new TCanvas("oc_3","",1200,1000);
+    fhOccupancyR[2]->GetYaxis()->SetTitleOffset(1.6);
+    fhOccupancyR[2]->Draw();
+    if (fPrintToFileOn) gPad->Print(".gif");
   }
 
   if (fDigitizerQaOn && fVerbose>1) {
@@ -583,15 +621,17 @@ void CbmMuchHitFinderQa::FinishTask(){
     TF1* fit_el = new TF1("fit_el",LandauMPV,-0.5,4.5,1);
     fit_el->SetParameter(0,0.511);
     fit_el->SetLineWidth(2);
+    fit_el->SetLineColor(kBlack);
 
     TF1* fit_pi = new TF1("fit_pi",LandauMPV,-0.5,4.5,1);
     fit_pi->SetParameter(0,139.57);
     fit_pi->SetLineWidth(2);
-
+    fit_pi->SetLineColor(kBlack);
+    
     TF1* fit_pr = new TF1("fit_pr",LandauMPV,-0.5,4.5,1);
     fit_pr->SetParameter(0,938.27);
     fit_pr->SetLineWidth(2);
-
+    fit_pr->SetLineColor(kBlack);
 
     TH1D* hLength   = fhChargeTrackLength  ->ProjectionX();
     TH1D* hLengthEl = fhChargeTrackLengthEl->ProjectionX();;
@@ -607,7 +647,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     fChargeHistos->Add(hLengthPi);
     fChargeHistos->Add(hLengthPr);
 
-    TCanvas* c5 = new TCanvas("c5","Charge vs energy and length",1600,1200);
+    TCanvas* c5 = new TCanvas("c5","Charge vs energy and length",2100,1300);
     c5->Divide(4,3);
     for (Int_t i=0;i<8;i++){
       c5->cd(i+1);
@@ -624,7 +664,38 @@ void CbmMuchHitFinderQa::FinishTask(){
       if (fPrintToFileOn) gPad->Print(".gif");
       if (fPrintToFileOn) gPad->Print(".eps");
     }
+    
+    TCanvas* ch_1 = new TCanvas("ch_1","",1200,1000);
+    gPad->SetBottomMargin(0.11);
+    gPad->SetRightMargin(0.14);
+    gPad->SetLeftMargin(0.12);
+    gPad->SetLogz();
+    TH2D* histo1 = (TH2D*) fChargeHistos->At(1);
+    histo1->Draw("colz");
+    fit_el->Draw("same");
+    if (fPrintToFileOn) gPad->Print(".gif");
+    
+    TCanvas* ch_2 = new TCanvas("ch_2","",1200,1000);
+    gPad->SetBottomMargin(0.11);
+    gPad->SetRightMargin(0.14);
+    gPad->SetLeftMargin(0.12);
+    gPad->SetLogz();
+    TH2D* histo2 = (TH2D*) fChargeHistos->At(2);
+    histo2->Draw("colz");
+    fit_pi->Draw("same");
+    if (fPrintToFileOn) gPad->Print(".gif");
 
+    TCanvas* ch_3 = new TCanvas("ch_3","",1200,1000);
+    gPad->SetBottomMargin(0.11);
+    gPad->SetRightMargin(0.14);
+    gPad->SetLeftMargin(0.12);
+    gPad->SetLogz();
+    TH2D* histo3 = (TH2D*) fChargeHistos->At(3);
+    histo3->Draw("colz");
+    fit_pr->Draw("same");
+    if (fPrintToFileOn) gPad->Print(".gif");
+
+    
     for (Int_t i=10;i<14;i++){
       c5->cd(i-1);
       gPad->SetLogy();
@@ -742,25 +813,25 @@ void CbmMuchHitFinderQa::FinishTask(){
     printf("Signal hits: %i\n", fSignalHits);
   }
 
-  TFile* performanceFile = new TFile(fFileName, "recreate");
-
-   for (Int_t i=0;i<fNstations;i++) {
-     fhPadsTotalR[i]->Write();
-     fhPadsFiredR[i]->Write();
-     fhOccupancyR[i]->Write();
-   }
-
-   fhPullX->Write();
-   fhPullY->Write();
-
-   fhPointsInCluster->Write();
-   fhDigisInCluster->Write();
-   fhHitsInCluster->Write();
-
-   for (Int_t i=0;i<10;i++) fChargeHistos->At(i)->Write();
-
-   fhNpadsVsS->Write();
-   performanceFile->Close();
+//  TFile* performanceFile = new TFile(fFileName, "recreate");
+//
+//   for (Int_t i=0;i<fNstations;i++) {
+//     fhPadsTotalR[i]->Write();
+//     fhPadsFiredR[i]->Write();
+//     fhOccupancyR[i]->Write();
+//   }
+//
+//   fhPullX->Write();
+//   fhPullY->Write();
+//
+//   fhPointsInCluster->Write();
+//   fhDigisInCluster->Write();
+//   fhHitsInCluster->Write();
+//
+//   for (Int_t i=0;i<10;i++) fChargeHistos->At(i)->Write();
+//
+//   fhNpadsVsS->Write();
+//   performanceFile->Close();
 
 }
 // -------------------------------------------------------------------------
@@ -850,10 +921,20 @@ void CbmMuchHitFinderQa::DigitizerQa(){
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
     // Get pad area
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
     if(!module) continue;
-    CbmMuchPad* pad = module->GetPad(digi->GetChannelId());//fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
-    Double_t area = pad->GetLx()*pad->GetLy();
+    Double_t area=0;
+    if (module->GetDetectorType()==1) {
+      CbmMuchModuleGem* module1 = (CbmMuchModuleGem*) module;
+      CbmMuchPad* pad = module1->GetPad(digi->GetChannelId());
+      area = pad->GetLx()*pad->GetLy();
+    }
+    if (module->GetDetectorType()==3) {
+      CbmMuchModuleSector* module3 = (CbmMuchModuleSector*) module;
+      CbmMuchRadialPad* pad = module3->GetPad(digi->GetChannelId());
+      if (!pad) continue;
+      area = TMath::Power(pad->GetR2()-pad->GetR1(),2)*(pad->GetPhimax()-pad->GetPhimin())/180.*TMath::Pi();
+    }
     for (Int_t pt=0;pt<match->GetNPoints();pt++){
       Int_t pointId = match->GetRefIndex(pt);
       Int_t charge  = match->GetCharge(pt);
@@ -911,12 +992,23 @@ void CbmMuchHitFinderQa::OccupancyQa(){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
     Int_t detectorId = digi->GetDetectorId();
     Long64_t channelId  = digi->GetChannelId();
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
     if(!module) continue;
-    CbmMuchPad* pad = module->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);
-    Double_t x0 = pad->GetX0();
-    Double_t y0 = pad->GetY0();
-    Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
+    Double_t r0=0;
+    if (module->GetDetectorType()==1) {
+      CbmMuchModuleGem* module1 = (CbmMuchModuleGem*)module;
+      CbmMuchPad* pad = module1->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);
+      Double_t x0 = pad->GetX0();
+      Double_t y0 = pad->GetY0();
+      r0 = TMath::Sqrt(x0*x0+y0*y0);
+    }
+    if (module->GetDetectorType()==3) {
+      CbmMuchModuleSector* module3 = (CbmMuchModuleSector*)module;
+      CbmMuchRadialPad* pad = module3->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);
+      Double_t r1 = pad->GetR1();
+      Double_t r2 = pad->GetR2();
+      r0 = (r1+r2)/2.;
+    }
     fhPadsFiredR[fGeoScheme->GetStationIndex(detectorId)]->Fill(r0);
   }
 }
@@ -1157,7 +1249,7 @@ Int_t CbmMuchHitFinderQa::GetNChannels(Int_t iStation){
   Int_t nChannels = 0;
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
   for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)(*it);
+    CbmMuchModule* module = (CbmMuchModule*)(*it);
     if(!module) continue;
     nChannels += module->GetNPads();
   }

@@ -43,13 +43,12 @@ geo/CbmMuchSegmentManual.cxx
 geo/CbmMuchSegmentSector.cxx
 geo/CbmMuchStation.cxx
 geo/CbmMuchRadialSector.cxx
-geo/CbmMuchRadialPad.cxx
 
-reco/CbmMuchDigitizeAdvancedGem.cxx
-reco/CbmMuchDigitizeSimpleGem.cxx
+reco/CbmMuchDigitizeGem.cxx
+reco/CbmMuchDigitizeGem.cxx
 reco/CbmMuchDigitizeStraws.cxx
-reco/CbmMuchFindHitsAdvancedGem.cxx
-reco/CbmMuchFindHitsSimpleGem.cxx
+reco/CbmMuchFindHitsGem.cxx
+reco/CbmMuchFindHitsGem.cxx
 reco/CbmMuchFindHitsStraws.cxx
 reco/CbmMuchHitFinderQa.cxx
 reco/CbmMuchHitProducerIdeal.cxx

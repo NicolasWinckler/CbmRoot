@@ -9,7 +9,7 @@
  * @param nEvents        Number of events to process
  */
 void much_hits_gem(TString inFile = "",
-      TString digiFile = "data/much_digi.root",
+      TString digiFile = "",
       TString outFile = "",
       Int_t nEvents = 1)
 {
@@ -34,23 +34,8 @@ void much_hits_gem(TString inFile = "",
    // ----  Load libraries   -------------------------------------------------
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();
-   gSystem->Load("libGeoBase");
-   gSystem->Load("libParBase");
-   gSystem->Load("libBase");
-   gSystem->Load("libCbmBase");
-   gSystem->Load("libCbmData");
-   gSystem->Load("libField");
-   gSystem->Load("libGen");
-   gSystem->Load("libPassive");
-   gSystem->Load("libSts");
-   gSystem->Load("libRich");
-   gSystem->Load("libTrd");
-   gSystem->Load("libTof");
-   gSystem->Load("libEcal");
-   gSystem->Load("libGlobal");
-   gSystem->Load("libKF");
-   gSystem->Load("libL1");
-   gSystem->Load("libMuch");
+   gROOT->LoadMacro("$VMCWORKDIR/macro/much/muchlibs.C");
+   muchlibs();
    // ------------------------------------------------------------------------
 
    // -----   Reconstruction run   -------------------------------------------
@@ -70,8 +55,7 @@ void much_hits_gem(TString inFile = "",
    // ------------------------------------------------------------------------
 
    // ---  MuCh digitizer ----------------------------------------------------
-//   CbmMuchDigitizeSimpleGem* digitize = new CbmMuchDigitizeSimpleGem("MuchDigitizeSimpleGem", digiFile, iVerbose);
-   CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem("MuchDigitizeAdvancedGem", digiFile, iVerbose);
+   CbmMuchDigitizeGem* digitize = new CbmMuchDigitizeGem("MuchDigitizeGem", digiFile, iVerbose);
    digitize->SetSpotRadius(0.05);
    digitize->SetQThreshold(3);
    digitize->SetQMaximum(500000);
@@ -81,13 +65,12 @@ void much_hits_gem(TString inFile = "",
    // ------------------------------------------------------------------------
 
    // ---  MuCh hit finder ---------------------------------------------------
-//   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
-   CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
+   CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem("MuchFindHitsGem", digiFile, iVerbose);
    findHits->SetAlgorithm(3);
 
-   findHits->SetNStations(6);
-   Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-   findHits->SetThresholdRatios(thresholds);
+//   findHits->SetNStations(6);
+//   Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+//   findHits->SetThresholdRatios(thresholds);
 
    fRun->AddTask(findHits);
    // ------------------------------------------------------------------------

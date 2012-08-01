@@ -70,8 +70,7 @@ void much_hits_straw(TString inFile = "",
    // ------------------------------------------------------------------------
 
    // ---  MuCh digitizer ----------------------------------------------------
-//   CbmMuchDigitizeSimpleGem* digitize = new CbmMuchDigitizeSimpleGem("MuchDigitizeSimpleGem", digiFile, iVerbose);
-   CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem("MuchDigitizeAdvancedGem", digiFile, iVerbose);
+   CbmMuchDigitizeGem* digitize = new CbmMuchDigitizeGem("MuchDigitizeGem", digiFile, iVerbose);
    fRun->AddTask(digitize);
 
    // ---  MuCh straw digitizer -----------------------------------------------
@@ -81,8 +80,7 @@ void much_hits_straw(TString inFile = "",
    // ------------------------------------------------------------------------
 
    // ---  MuCh hit finder ---------------------------------------------------
-//   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
-   CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
+   CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem("MuchFindHitsGem", digiFile, iVerbose);
    fRun->AddTask(findHits);
 
    // ---  MuCh straw hit finder ----------------------------------------------

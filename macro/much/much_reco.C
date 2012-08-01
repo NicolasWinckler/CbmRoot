@@ -122,12 +122,12 @@ void much_reco(
 
 		if (IsMuch(parFile)) {
 		// ----- MUCH hits----------   --------------------------------------------
-			CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
+			CbmMuchDigitizeGem* muchDigitize = new CbmMuchDigitizeGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
 			run->AddTask(muchDigitize);
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawDigitize);
 
-			CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
+			CbmMuchFindHitsGem* muchFindHits = new CbmMuchFindHitsGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
 			run->AddTask(muchFindHits);
 			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawFindHits);
@@ -267,7 +267,7 @@ void much_reco(
 	cout << endl;
 	// ------------------------------------------------------------------------
 
-        cout << " Test passed" << endl;
-        cout << " All ok " << endl;
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
 
 }

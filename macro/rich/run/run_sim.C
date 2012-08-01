@@ -1,4 +1,4 @@
-void run_sim(Int_t nEvents = 2)
+void run_sim(Int_t nEvents = 1)
 {
    TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
@@ -27,8 +27,8 @@ void run_sim(Int_t nEvents = 2)
 
 	if (script != "yes") {
 		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
-		parFile = "/d/cbm02/slebedev/rich/JUL09/test.params.root";
-		outFile = "/d/cbm02/slebedev/rich/JUL09/test.mc.root";
+		parFile = "/d/cbm06/user/slebedev/test/test2.params.root";
+		outFile = "/d/cbm06/user/slebedev/test/test2.mc.root";
 
 	   caveGeom = "cave.geo";
 	   targetGeom = "target_au_250mu.geo";
@@ -39,8 +39,9 @@ void run_sim(Int_t nEvents = 2)
 	   trdGeom = "trd/trd_v10b.geo";
 	   tofGeom = "tof/tof_v07a.geo";
 	   ecalGeom = "";//"ecal_FastMC.geo";
-	   //fieldMap = "field_v10e";
-	   fieldMap = "FieldShieldBox";
+	   fieldMap = "field_v10e";
+	   //fieldMap = "FieldShieldBox";
+      //fieldMap = "field_v10e_by_0_8_test";
 	   magnetGeom = "passive/magnet_v09e.geo";
 
 		electrons = "yes";
@@ -156,16 +157,16 @@ void run_sim(Int_t nEvents = 2)
 
 	// -----   Create magnetic field   ----------------------------------------
 	CbmFieldMap* magField = NULL;
-	if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e" || fieldMap == "FieldShieldBox" )
+	//if (fieldMap == "new_field" || fieldMap == "field_v10e" || fieldMap == "FieldShieldBox" ){
 	   magField = new CbmFieldMapSym2(fieldMap);
-	else if (fieldMap == "field_muon_standard" )
-		magField = new CbmFieldMapSym2(fieldMap);
-	else if (fieldMap == "FieldMuonMagnet" )
-		magField = new CbmFieldMapSym3(fieldMap);
-	else {
-		cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-		exit;
-	}
+   //}else if (fieldMap == "field_muon_standard" )
+	//	magField = new CbmFieldMapSym2(fieldMap);
+	//else if (fieldMap == "FieldActive" )
+	//	magField = new CbmFieldMapSym3(fieldMap);
+	//else {
+	//	cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+	//	exit;
+	//}
 	magField->SetPosition(0., 0., fieldZ);
 	magField->SetScale(fieldScale);
 	fRun->SetField(magField);
@@ -245,6 +246,5 @@ void run_sim(Int_t nEvents = 2)
 
 	cout << " Test passed" << endl;
 	cout << " All ok " << endl;
-	exit(0);
 }
 

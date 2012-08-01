@@ -4,7 +4,7 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/u/slebedev/JUL09/buildSC
+export MYBUILDDIR=/u/slebedev/JUL09/build64
 
 export TRACKINGTYPE=branch
 
@@ -48,43 +48,57 @@ export LIT_RESULT_DIR=recoqa/
 #number of events for each thread
 export NEVENTS=1000
 
-for Z in 0 1 2 3 4; do
+for Z in 7 8 9 10 11; do
    export DIR=/d/cbm06/user/slebedev/rich
    export XXXX=000$Z
    
    export INFILE=/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
    export MCFILE=$DIR/mc.$XXXX.root
    export PARFILE=$DIR/param.$XXXX.root
-   export RECOFILE=$DIR/reco.$XXXX.root   
-   
-   
-    if [ $Z = "0" ] ; then
-      export LIT_RESULT_DIR=recqa/rich_15/
-      export RICHGEOM=rich/rich_compact_15.geo
+   export RECOFILE=$DIR/reco.$XXXX.root 
+     
+        
+   if [ $Z = "0" ] ; then
+       export LIT_RESULT_DIR=results_50field/
+       export FIELDMAPSCALE=0.5
    fi
-
-   if [ $Z = "1" ] ; then
-      export LIT_RESULT_DIR=recqa/rich_10/
-      export RICHGEOM=rich/rich_compact_10.geo
-   fi  
-
+   
+    if [ $Z = "1" ] ; then
+       export LIT_RESULT_DIR=results_70field/
+       export FIELDMAPSCALE=0.7
+   fi
+   
     if [ $Z = "2" ] ; then
-      export LIT_RESULT_DIR=recqa/rich_5/
-      export RICHGEOM=rich/rich_compact_5.geo
+       export LIT_RESULT_DIR=results_100field/
+       export FIELDMAPSCALE=1.0
+   fi
+      
+    if [ $Z = "3" ] ; then
+       export LIT_RESULT_DIR=results_150field/
+       export FIELDMAPSCALE=1.5
    fi
    
-   if [ $Z = "3" ] ; then
-      export LIT_RESULT_DIR=recqa/rich_minus1/
-      export RICHGEOM=rich/rich_compact_minus1.geo
+       if [ $Z = "4" ] ; then
+       export LIT_RESULT_DIR=results_200field/
+       export FIELDMAPSCALE=2.0
    fi
    
-    if [ $Z = "4" ] ; then
-      export LIT_RESULT_DIR=recqa/rich_v08a/
-      export RICHGEOM=rich/rich_v08a.geo
+      
+      if [ $Z = "5" ] ; then
+       export LIT_RESULT_DIR=results_20field/
+       export FIELDMAPSCALE=0.2
+   fi
+   
+ # field active  
+   
+    if [ $Z = "6" ] ; then
+       export LIT_RESULT_DIR=results_field_active_100/
+       export FIELDMAPSCALE=1.0
+        export FIELDMAP=FieldActive
    fi
 
    
- # . ./sim.sh
+  #. ./sim.sh
    xterm -hold -e ". ./sim.sh"&
    # bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
    

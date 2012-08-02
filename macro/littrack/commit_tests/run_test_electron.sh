@@ -16,7 +16,7 @@ set_simulation_parameters ${pars}
 set_default_electron_geometry
 
 export LIT_STS_HITPRODUCER_TYPE=real
-export LIT_TRD_HITPRODUCER_TYPE=smearing
+export LIT_TRD_HITPRODUCER_TYPE=clustering
 export LIT_MUCH_HITPRODUCER_TYPE=advanced
 export LIT_GLOBAL_TRACKING_TYPE=branch
 

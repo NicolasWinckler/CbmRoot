@@ -42,11 +42,11 @@ void field_qa(Int_t nEvents = 1)
 	CbmLitFieldQa* fieldQa = new CbmLitFieldQa();
 
 	std::vector<Double_t> zPos;
-    zPos.push_back(170.);
-    zPos.push_back(180.);
-    zPos.push_back(190.);
+    zPos.push_back(0.);
+    zPos.push_back(50.);
+    zPos.push_back(100.);
+    zPos.push_back(150.);
     zPos.push_back(200.);
-    zPos.push_back(210.);
     fieldQa->SetSliceZPosition(zPos);
 	fieldQa->SetAcceptanceAngleX(35.);
 	fieldQa->SetAcceptanceAngleY(35.);

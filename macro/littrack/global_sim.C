@@ -58,9 +58,9 @@ void global_sim(Int_t nEvents = 100)
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
-		richGeom   = "";//"rich/rich_v08a.geo";
-		trdGeom    = "";//"trd/trd_v11d.geo";
-		tofGeom    = "";//"tof/tof_v07a.geo";
+		richGeom   = "rich/rich_v08a.geo";
+		trdGeom    = "trd/trd_v11d.geo";
+		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";
 		magnetGeom = "passive/magnet_v09e.geo";
@@ -198,7 +198,7 @@ void global_sim(Int_t nEvents = 100)
 	// ------------------------------------------------------------------------
 
    // -----   Create magnetic field   ----------------------------------------
-   CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+   CbmFieldMap* magField = new CbmFieldMap(fieldMap);//new CbmFieldMapSym2(fieldMap);
    magField->SetPosition(0., 0., fieldZ);
    magField->SetScale(fieldScale);
    fRun->SetField(magField);

@@ -12,10 +12,10 @@ using std::endl;
 void create_field()
 {
 	// Input ASCII file
-	const char* fieldASCII = "NewField";
+	const char* fieldASCII = "AMFz";
 	// Output ROOT file
-	const char* fieldROOT = "/d/cbm02/andrey/field/NewField.root";
-	const char* mapName = "NewMap";
+	const char* fieldROOT = "~/Development/cbm/trunk/cbmroot/input/AMFz.root";
+	const char* mapName = "AMFz";
 
 	TStopwatch timer;
 	timer.Start();
@@ -25,10 +25,12 @@ void create_field()
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	CbmFieldMapSym2* fieldMap = new CbmFieldMapSym2(fieldASCII, "A");
+	//CbmFieldMapSym2* fieldMap = new CbmFieldMapSym2(fieldASCII, "A");
+	CbmFieldMap* fieldMap = new CbmFieldMap(fieldASCII, "A");
 	fieldMap->Init();
 	fieldMap->Print();
 	fieldMap->WriteRootFile(fieldROOT, mapName);
+	fieldMap->Print();
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();

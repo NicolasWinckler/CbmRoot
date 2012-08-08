@@ -1,5 +1,7 @@
 # Create a library called "libLittrack".
 
+
+add_subdirectory(clustering)
 add_subdirectory(parallel)
 #add_subdirectory(std)
 INCLUDE(std/CMakeLists.txt)

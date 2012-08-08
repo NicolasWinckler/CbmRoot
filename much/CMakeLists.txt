@@ -34,27 +34,29 @@ geo/CbmMuchGeoScheme.cxx
 geo/CbmMuchLayer.cxx
 geo/CbmMuchLayerSide.cxx
 geo/CbmMuchModule.cxx
-#geo/CbmMuchModuleGem.cxx
+geo/CbmMuchModuleGem.cxx
+geo/CbmMuchModuleGemRadial.cxx
+geo/CbmMuchModuleGemRectangular.cxx
 geo/CbmMuchModuleStraws.cxx
 geo/CbmMuchPad.cxx
+geo/CbmMuchPadRadial.cxx
+geo/CbmMuchPadRectangular.cxx
 geo/CbmMuchSector.cxx
+geo/CbmMuchSectorRadial.cxx
+geo/CbmMuchSectorRectangular.cxx
 geo/CbmMuchSegmentAuto.cxx
 geo/CbmMuchSegmentManual.cxx
 geo/CbmMuchSegmentSector.cxx
 geo/CbmMuchStation.cxx
-geo/CbmMuchRadialSector.cxx
-
-reco/CbmMuchDigitizeGem.cxx
 reco/CbmMuchDigitizeGem.cxx
 reco/CbmMuchDigitizeStraws.cxx
 reco/CbmMuchFindHitsGem.cxx
-reco/CbmMuchFindHitsGem.cxx
 reco/CbmMuchFindHitsStraws.cxx
-reco/CbmMuchHitFinderQa.cxx
+#reco/CbmMuchHitFinderQa.cxx
 reco/CbmMuchHitProducerIdeal.cxx
 reco/CbmMuchPointInfo.cxx
 reco/CbmMuchStrawHitFinderQa.cxx
-reco/CbmMuchClusterAnalysis.cxx
+#reco/CbmMuchClusterAnalysis.cxx
 
 tracking/CbmMuchFindTracks.cxx
 tracking/CbmMuchMatchTracks.cxx 
@@ -62,8 +64,6 @@ tracking/CbmMuchTrackFinderIdeal.cxx
 )
 set(MUCH_SRCS
     ${MUCHRULECHECKER_SRCS}
-    geo/CbmMuchModuleGem.cxx
-    geo/CbmMuchModuleSector.cxx
    )
 
 if(RULE_CHECKER_FOUND)

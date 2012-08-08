@@ -16,14 +16,6 @@ public:
     CbmMuchModuleStraws();
 
     /** Standard constructor
-     *@param detId     Detector ID
-     *@param position  Location of the module center in global c.s. (all dimensions in [cm])
-     *@param size      Size of the module (all dimensions in [cm])
-     *@param cutRadius Radius of the cut (if any, otherwise = -1.) [cm]
-     **/
-    CbmMuchModuleStraws(Int_t detId, TVector3 position, TVector3 size, Double_t cutRadius);
-
-    /** Standard constructor
      *@param iStation  Station index
      *@param iLayer    Layer index
      *@param iSide     Defines side of the layer (0 - Front, 1 - Back)

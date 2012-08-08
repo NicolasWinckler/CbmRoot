@@ -34,6 +34,7 @@ class CbmMuchStation;
 class CbmMuchLayer;
 class CbmMuchLayerSide;
 class CbmMuchModule;
+class CbmMuchModuleGem;
 class CbmMuchPad;
 
 using std::vector;
@@ -184,6 +185,7 @@ class CbmMuchGeoScheme: public TObject {
     void ClearHitArrays();
     void ClearClusterArrays();
     vector<CbmMuchModule*>    GetModules();
+    vector<CbmMuchModuleGem*>    GetGemModules();
     vector<CbmMuchModule*>    GetModules(Int_t iStation);
     vector<CbmMuchLayerSide*> GetLayerSides(Int_t iStation);
     Int_t GetLayerSideNr(Int_t detId);

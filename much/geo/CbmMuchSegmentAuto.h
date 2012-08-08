@@ -19,7 +19,7 @@ class TClonesArray;
 class CbmGeoMuchPar;
 class CbmMuchLayerSide;
 class CbmMuchModuleGem;
-class CbmMuchSector;
+class CbmMuchSectorRectangular;
 class TH1D;
 
 using std::vector;
@@ -70,10 +70,10 @@ class CbmMuchSegmentAuto : public FairTask{
   /** Initialization **/
   void InitLayerSide(CbmMuchLayerSide* layerSide);
   void SegmentModule(CbmMuchModuleGem* module);
-  void SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector);
-  Bool_t ShouldSegmentByX(CbmMuchSector* sector);
-  Bool_t ShouldSegmentByY(CbmMuchSector* sector);
-  Int_t IntersectsRad(CbmMuchSector* sector, Double_t radius);
+  void SegmentSector(CbmMuchModuleGem* module, CbmMuchSectorRectangular* sector);
+  Bool_t ShouldSegmentByX(CbmMuchSectorRectangular* sector);
+  Bool_t ShouldSegmentByY(CbmMuchSectorRectangular* sector);
+  Int_t IntersectsRad(CbmMuchSectorRectangular* sector, Double_t radius);
   void DrawSegmentation();
   void Print();
 

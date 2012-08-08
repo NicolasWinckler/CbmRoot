@@ -11,8 +11,8 @@
  ** Produces objects of type CbmMuchDigi out of CbmMuchPoint.
  **/
 
-#ifndef CBMMUCHDIGITIZEADVANCEDGEM_H
-#define CBMMUCHDIGITIZEADVANCEDGEM_H 1
+#ifndef CBMMUCHDIGITIZEGEM_H
+#define CBMMUCHDIGITIZEGEM_H 1
 
 #include "FairTask.h"
 
@@ -33,8 +33,7 @@ class CbmMuchSector;
 class CbmMuchPoint;
 class CbmMCEpoch;
 class CbmMuchPad;
-class CbmMuchRadialPad;
-class CbmMuchRadialSector;
+class CbmMuchSectorRadial;
 class TChain;
 
 enum DetectorType {kGEM, kMICROMEGAS};
@@ -140,7 +139,9 @@ class CbmMuchDigitizeGem : public FairTask
     void SetPeakingTime(Double_t peakingTime) {fPeakingTime = peakingTime; }
     void SetRemainderTime(Double_t remainderTime) {fRemainderTime = remainderTime; }
     void SetTimeBinWidth(Double_t timeBinWidth) {fTimeBinWidth = timeBinWidth; }
+    void SetAlgorithm(Int_t algorithm) {fAlgorithm = algorithm; }
   private:
+    Int_t              fAlgorithm;     // Algorithm
     CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
     TString            fDigiFile;      // Digitization file
     TClonesArray*      fPoints;        // Input array of CbmMuchPoint
@@ -187,7 +188,7 @@ class CbmMuchDigitizeGem : public FairTask
     void Reset();
 
     /** Advanced digis production using avalanches. **/
-    Bool_t ExecAdvanced(CbmMuchPoint* point, Int_t iPoint);
+    Bool_t ExecPoint(CbmMuchPoint* point, Int_t iPoint);
 
     /** Builds a TPolyLine from given rectangle parameters (no rotation angle).
      *@param x0     X of the center.
@@ -197,15 +198,13 @@ class CbmMuchDigitizeGem : public FairTask
      **/
 
     Bool_t AddDigi(CbmMuchPad* pad);
-    Bool_t AddDigi(CbmMuchRadialPad* pad);
     inline Int_t GasGain();
     CbmMuchDigitizeGem(const CbmMuchDigitizeGem&);
     CbmMuchDigitizeGem& operator=(const CbmMuchDigitizeGem&);
         
     Double_t GetNPrimaryElectronsPerCm(CbmMuchPoint* point);
-    Bool_t AddCharge(CbmMuchRadialPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
-    Bool_t AddCharge(CbmMuchRadialSector* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t aL,Double_t phi1, Double_t phi2);
-    Bool_t AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t aL);
+    Bool_t AddCharge(CbmMuchSectorRadial* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t driftTime, Double_t phi1, Double_t phi2);
+    void AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t driftTime);
 
     Double_t fTotalDriftTime;
     

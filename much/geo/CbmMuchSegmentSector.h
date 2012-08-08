@@ -27,8 +27,8 @@ using std::string;
 using std::stringstream;
 using std::istream_iterator;
 
-class CbmMuchModuleSector;
-class CbmMuchSector;
+class CbmMuchModuleGemRadial;
+class CbmMuchSectorRadial;
 class CbmMuchLayerSide;
 class CbmGeoMuchPar;
 class TObjArray;
@@ -86,14 +86,14 @@ class CbmMuchSegmentSector : public FairTask {
      * @param module          Module to segment
      * @param useModuleDesign Whether module design is used
      */
-    void SegmentModule(CbmMuchModuleSector* module, Bool_t useModuleDesign);
+    void SegmentModule(CbmMuchModuleGemRadial* module, Bool_t useModuleDesign);
 
     /**
      * Performs segmentation of the given sector in the module.
      * @param module  Module which contains the given sector
      * @param sector  Sector to segment
      */
-    void SegmentSector(CbmMuchModuleSector* module, CbmMuchSector* sector);
+    void SegmentSector(CbmMuchModuleGemRadial* module, CbmMuchSectorRadial* sector);
 
     /** Reads input parameters for the segmentation. */
     void ReadInputFile();

@@ -7,8 +7,9 @@
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGem.h"
+#include "CbmMuchModuleGemRadial.h"
+#include "CbmMuchModuleGemRectangular.h"
 #include "CbmMuchModuleStraws.h"
-#include "CbmMuchModuleSector.h"
 #include "TObjArray.h"
 #include "TFile.h"
 #include "TMath.h"
@@ -16,6 +17,7 @@
 #include <fstream>
 #include <cassert>
 #include <stdexcept>
+#include "TClonesArray.h"
 
 CbmMuchGeoScheme* CbmMuchGeoScheme::fInstance = NULL;
 Bool_t CbmMuchGeoScheme::fInitialized = kFALSE;
@@ -664,7 +666,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
           pos[1] = (ymin+dy)*sin(phi);
           pos[2] = (isBack ? 1 : -1)*moduleZ + layerGlobalZ0;
           CbmMuchLayerSide* side = layer->GetSide(isBack);
-          side->AddModule(new CbmMuchModuleSector(st, l, isBack, side->GetNModules(), pos,size,dx1,dx2,dy,dz,rmin));
+          side->AddModule(new CbmMuchModuleGemRadial(st, l, isBack, side->GetNModules(), pos,dx1,dx2,dy,dz,rmin));
         }
         // Set support shape
         layer->SetSupportDx(sqrt(rmax*rmax+dx2*dx2));
@@ -800,6 +802,24 @@ vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
   return modules;
 }
 // -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+vector<CbmMuchModuleGem*> CbmMuchGeoScheme::GetGemModules(){
+  vector<CbmMuchModuleGem*> modules;
+  for(Int_t iStation =0; iStation < GetNStations(); ++iStation){
+    vector<CbmMuchModule*> stationModules = GetModules(iStation);
+    for(vector<CbmMuchModule*>::iterator it=stationModules.begin(); it!=stationModules.end(); it++){
+      CbmMuchModule* module = (*it);
+      if (module->GetDetectorType()!=1 && module->GetDetectorType()!=3) continue;
+      modules.push_back((CbmMuchModuleGem*)module);
+      assert(GetStationIndex(module->GetDetectorId()) == iStation);
+    }
+  }
+  return modules;
+}
+// -------------------------------------------------------------------------
+
 
 // -------------------------------------------------------------------------
 vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(Int_t iStation){

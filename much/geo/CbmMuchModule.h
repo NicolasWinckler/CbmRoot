@@ -16,24 +16,15 @@
 #include "TObject.h"
 #include "TVector3.h"
 #include "TPave.h"
+#include "map"
 
+using std::multimap;
+using std::pair;
 
-class CbmMuchModule : public TPave
-{
-
+class CbmMuchModule : public TPave{
 public:
-
   /** Default constructor **/
   CbmMuchModule();
-
-  /** Standard constructor
-   *@param detId     Detector ID
-   *@param position  Location of the module center in global c.s. (all dimensions in [cm])
-   *@param size      Size of the module (all dimensions in [cm])
-   *@param cutRadius Radius of the cut (if any, otherwise = -1.) [cm]
-   **/
-  CbmMuchModule(Int_t detId, TVector3 position, TVector3 size, Double_t cutRadius);
-
   /** Standard constructor
    *@param iStation  Station index
    *@param iLayer    Layer index
@@ -44,9 +35,8 @@ public:
    *@param cutRadius Radius of the cut (if any, otherwise = -1.) [cm]
    **/
   CbmMuchModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius);
-
   /** Destructor **/
-  virtual ~CbmMuchModule();
+  virtual ~CbmMuchModule(){}
 
   /** Accessors */
   Int_t    GetDetectorId()    const { return fDetectorId; }
@@ -54,7 +44,6 @@ public:
   TVector3 GetSize()          const { return fSize; }
   TVector3 GetPosition()      const { return fPosition; }
   Int_t    GetDetectorType()  const { return fDetectorType; }
-  Int_t    GetNSectors()      const { return fSectors.GetEntriesFast(); }
   TClonesArray* GetPoints()   const { return fPoints;     }
   TClonesArray* GetHits()     const { return fHits;       }
   TClonesArray* GetClusters() const { return fClusters;   }
@@ -65,6 +54,12 @@ public:
   void SetPoints(TClonesArray* points)     { fPoints   = points;   }
   void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
   void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
+  /** */
+  void AddDigi(Double_t time,Int_t id) { fDigis.insert(pair<Double_t,Int_t>(time,id)); }
+  /** */
+   void ClearDigis() { fDigis.clear(); }
+   /** */
+   multimap<Double_t,Int_t> GetDigis() { return fDigis; } 
 
 protected:
   Int_t                  fDetectorId;            // Unique detector ID
@@ -72,11 +67,11 @@ protected:
   Double_t               fCutRadius;             // Radius of the cut (if any, otherwise = -1.) [cm]
   TVector3               fSize;                  // Size vector of the module (all dimensions in [cm])
   TVector3               fPosition;              // Location vector of the module center in global c.s. (all dimensions in [cm])
-  TObjArray              fSectors;               // Array of sectors within this module
   TClonesArray*          fPoints;                //!
   TClonesArray*          fHits;                  //!
   TClonesArray*          fClusters;              //!
-
+  multimap<Double_t,Int_t> fDigis;               //!
+ 
  private:
   CbmMuchModule(const CbmMuchModule&);
   CbmMuchModule& operator=(const CbmMuchModule&);

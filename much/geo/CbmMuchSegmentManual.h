@@ -27,8 +27,8 @@ using std::string;
 using std::stringstream;
 using std::istream_iterator;
 
-class CbmMuchModuleGem;
-class CbmMuchSector;
+class CbmMuchModuleGemRectangular;
+class CbmMuchSectorRectangular;
 class CbmMuchLayerSide;
 class CbmGeoMuchPar;
 class TObjArray;
@@ -121,7 +121,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return       0 if the module is outside the circle, 1 if it is intersected by
      *               the circle, 2 if it is contained in the circle
      */
-    Int_t IntersectsRad(CbmMuchModuleGem* module, Double_t radius);
+    Int_t IntersectsRad(CbmMuchModuleGemRectangular* module, Double_t radius);
 
     /**
      * Checks whether the given sector is intersected by the circle of the given radius.
@@ -130,7 +130,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return       0 if the sector is outside the circle, 1 if it is intersected by
      *               the circle, 2 if it is contained in the circle
      */
-    Int_t IntersectsRad(CbmMuchSector* sector, Double_t radius);
+    Int_t IntersectsRad(CbmMuchSectorRectangular* sector, Double_t radius);
 
     /**
      * Performs segmentation of the given layer side.
@@ -143,14 +143,14 @@ class CbmMuchSegmentManual : public FairTask {
      * @param module          Module to segment
      * @param useModuleDesign Whether module design is used
      */
-    void SegmentModule(CbmMuchModuleGem* module, Bool_t useModuleDesign);
+    void SegmentModule(CbmMuchModuleGemRectangular* module, Bool_t useModuleDesign);
 
     /**
      * Performs segmentation of the given sector in the module.
      * @param module  Module which contains the given sector
      * @param sector  Sector to segment
      */
-    void SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector);
+    void SegmentSector(CbmMuchModuleGemRectangular* module, CbmMuchSectorRectangular* sector);
 
     /**
      * Gets maximum sector size for the given module.
@@ -160,7 +160,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return        Maximum sector length, if side="Length", maximum
      *                sector width, if side="Width"
      */
-    Double_t GetSectorMaxSize(CbmMuchModuleGem* module, const TString side, Int_t &iRegion);
+    Double_t GetSectorMaxSize(CbmMuchModuleGemRectangular* module, const TString side, Int_t &iRegion);
 
     /**
      * Gets maximum pad size for the given module.
@@ -169,7 +169,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return       maximum pad length, if side="Length", maximum
      *               pad width, if side="Width"
      */
-    Double_t GetPadMaxSize(CbmMuchModuleGem* module, const TString side);
+    Double_t GetPadMaxSize(CbmMuchModuleGemRectangular* module, const TString side);
 
     /**
      * Checks whether the given sector should be segmented in the given direction.
@@ -178,20 +178,20 @@ class CbmMuchSegmentManual : public FairTask {
      * @param iRegion   Region index of the sector
      * @return          true if segmentation is required, false otherwise
      */
-    Bool_t ShouldSegment(CbmMuchSector* sector, const TString direction, Int_t &iRegion);
+    Bool_t ShouldSegment(CbmMuchSectorRectangular* sector, const TString direction, Int_t &iRegion);
 
     /**
      * Gets region index for the given sector.
      * @param sector Sector
      * @return Index of the region for the sector
      */
-    Int_t GetRegionIndex(CbmMuchSector* sector);
+    Int_t GetRegionIndex(CbmMuchSectorRectangular* sector);
 
     /** Determines whether the given sector is incomplete.
      * @param sector Sector to process
      * @return true if the sector is incomplete, false otherwise
      */
-    Bool_t IsIncompleteSector(CbmMuchSector* sector);
+    Bool_t IsIncompleteSector(CbmMuchSectorRectangular* sector);
 
     /** Draws segmented stations. */
     void DrawSegmentation();

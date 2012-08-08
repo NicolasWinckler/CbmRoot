@@ -12,8 +12,8 @@
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
-#include "CbmMuchModuleGem.h"
-#include "CbmMuchSector.h"
+#include "CbmMuchModuleGemRectangular.h"
+#include "CbmMuchSectorRectangular.h"
 
 #include "FairRuntimeDb.h"
 
@@ -257,7 +257,7 @@ void CbmMuchSegmentManual::SegmentLayerSide(CbmMuchLayerSide* layerSide){
   for(Int_t iModule = 0; iModule < nModules; iModule++){
     CbmMuchModule* module = layerSide->GetModule(iModule);
     if(module->GetDetectorType()!=1) continue;
-    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    CbmMuchModuleGemRectangular* mod = (CbmMuchModuleGemRectangular*)module;
     if(nModules > 1) SegmentModule(mod, true); // Module design
     else SegmentModule(mod, false);            // Monolithic design
   }
@@ -265,11 +265,10 @@ void CbmMuchSegmentManual::SegmentLayerSide(CbmMuchLayerSide* layerSide){
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentSector  -----------------------------------
-void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useModuleDesign){
+void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGemRectangular* module, Bool_t useModuleDesign){
   Int_t detectorId = module->GetDetectorId();
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
-  module->SetNSectorChannels(fNChannels[iStation]);
   Int_t iRegion = -1;
   Double_t secMaxLx = GetSectorMaxSize(module, "Width", iRegion);
   Double_t secMaxLy = GetSectorMaxSize(module, "Length", iRegion);
@@ -303,7 +302,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
       iSector = module->GetNSectors();
       secSize.SetXYZ(secMaxLx, secMaxLy, modLz);
       secPosition.SetXYZ(secX, secY, modZ);
-      SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize,
+      SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, secPosition, secSize,
                     fNCols[iStation].at(iRegion), fNRows[iStation].at(iRegion)));
     }
   }
@@ -323,7 +322,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
         iSector = module->GetNSectors();
         secSize.SetXYZ(secMaxLx, ly, modLz);
         secPosition.SetXYZ(secX, secY, modZ);
-        SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize, fNCols[iStation].at(iRegion), nPadRows));
+        SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, secPosition, secSize, fNCols[iStation].at(iRegion), nPadRows));
       }
     }
   }
@@ -340,7 +339,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
         iSector = module->GetNSectors();
         secSize.SetXYZ(lx, secMaxLy, modLz);
         secPosition.SetXYZ(secX, secY, modZ);
-        SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, fNRows[iStation].at(iRegion)));
+        SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, secPosition, secSize, nPadCols, fNRows[iStation].at(iRegion)));
       }
     }
   }
@@ -353,13 +352,13 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
     iSector = module->GetNSectors();
     secSize.SetXYZ(lx, ly, modLz);
     secPosition.SetXYZ(secX, secY, modZ);
-    SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, nPadRows));
+    SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, secPosition, secSize, nPadCols, nPadRows));
   }
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentSector  -----------------------------------
-void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector){
+void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGemRectangular* module, CbmMuchSectorRectangular* sector){
   TVector3 secSize = sector->GetSize();
   TVector3 secPosition = sector->GetPosition();
   Int_t detectorId = module->GetDetectorId();
@@ -368,14 +367,14 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
   Double_t secLx = secSize.X();
   Double_t secLy = secSize.Y();
   Double_t secLz = secSize.Z();
-  Double_t padLx = sector->GetDx();
-  Double_t padLy = sector->GetDy();
+  Double_t padLx = sector->GetPadDx();
+  Double_t padLy = sector->GetPadDy();
   Double_t secX  = secPosition.X();
   Double_t secY  = secPosition.Y();
   Double_t secZ  = secPosition.Z();
   Bool_t isIncomplete = IsIncompleteSector(sector);
-  Int_t nCols = sector->GetNCols();
-  Int_t nRows = sector->GetNRows();
+  Int_t nCols = sector->GetPadNx();
+  Int_t nRows = sector->GetPadNy();
   Int_t nX = secX < 0 ? -1 : 1;
   Int_t nY = secY < 0 ? -1 : 1;
 
@@ -392,7 +391,7 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
        !IntersectsRad(sector, rMax)) return;
     nCols = isIncomplete ? nCols : fNCols[iStation].at(iRegion);
     nRows = isIncomplete ? nRows : fNRows[iStation].at(iRegion);
-    module->AddSector(new CbmMuchSector(detectorId, iSector, secPosition, secSize, nCols, nRows));
+    module->AddSector(new CbmMuchSectorRectangular(detectorId, iSector, secPosition, secSize, nCols, nRows));
     return;
   }
 
@@ -428,13 +427,13 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
     position.SetXYZ(newSecX, newSecY, secZ);
     size.SetXYZ(newSecLx, newSecLy, secLz);
     iSector = module->GetNSectors();
-    SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, nCols, nRows));
+    SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, position, size, nCols, nRows));
   }
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method IntersectsRad  -----------------------------------
-Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchModuleGem* module, Double_t radius){
+Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchModuleGemRectangular* module, Double_t radius){
   if(radius < 0) return 0;
 
   Int_t intersects = 0;
@@ -461,7 +460,7 @@ Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchModuleGem* module, Double_t rad
 // -------------------------------------------------------------------------
 
 // -----   Private method IntersectsRad  -----------------------------------
-Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchSector* sector, Double_t radius){
+Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchSectorRectangular* sector, Double_t radius){
   if(radius < 0) return 0;
 
   Int_t intersects = 0;
@@ -488,7 +487,7 @@ Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchSector* sector, Double_t radius
 // -------------------------------------------------------------------------
 
 // -----   Private method ShouldSegment  -----------------------------------
-Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString direction, Int_t &iRegion){
+Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSectorRectangular* sector, const TString direction, Int_t &iRegion){
   Double_t secLx = sector->GetSize()[0];
   Double_t secLy = sector->GetSize()[1];
   Double_t secArea = secLx*secLy;
@@ -516,7 +515,7 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
 // -------------------------------------------------------------------------
 
 // -----   Private method GetRegionIndex  ----------------------------------
-Int_t CbmMuchSegmentManual::GetRegionIndex(CbmMuchSector* sector){
+Int_t CbmMuchSegmentManual::GetRegionIndex(CbmMuchSectorRectangular* sector){
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
   Double_t secLx = sector->GetSize()[0];
   Double_t secLy = sector->GetSize()[1];
@@ -544,7 +543,7 @@ Int_t CbmMuchSegmentManual::GetRegionIndex(CbmMuchSector* sector){
 // -------------------------------------------------------------------------
 
 // -----   Private method GetSectorMaxSize  --------------------------------
-Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModuleGem* module,
+Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModuleGemRectangular* module,
     const TString side, Int_t &iRegion){
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(module->GetDetectorId());
   Int_t nRegions = fNRegions[iStation];
@@ -559,7 +558,7 @@ Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModuleGem* module,
 // -------------------------------------------------------------------------
 
 // -----   Private method GetPadMaxSize  -----------------------------------
-Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModuleGem* module, const TString side){
+Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModuleGemRectangular* module, const TString side){
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(module->GetDetectorId());
   Int_t iRegion = -1;
   Double_t sectorSize = GetSectorMaxSize(module, side, iRegion);
@@ -569,7 +568,7 @@ Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModuleGem* module, const TSt
 // -------------------------------------------------------------------------
 
 // -----   Private method IsIncompleteSector  ------------------------------
-Bool_t CbmMuchSegmentManual::IsIncompleteSector(CbmMuchSector* sector){
+Bool_t CbmMuchSegmentManual::IsIncompleteSector(CbmMuchSectorRectangular* sector){
   Bool_t result = false;
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
   Double_t secLx = sector->GetSize()[0];
@@ -620,19 +619,19 @@ void CbmMuchSegmentManual::Print(){
           if(!mod) continue;
           switch(mod->GetDetectorType()){
             case 1:{ // GEMs
-              CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
+              CbmMuchModuleGemRectangular* module = (CbmMuchModuleGemRectangular*)mod;
               if(!module) continue;
               nGems++;
               nSectors += module->GetNSectors();
               for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-                CbmMuchSector* sector = module->GetSector(iSector);
+                CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSectorByIndex(iSector);
                 if(!sector) continue;
-                Double_t padLx = sector->GetDx();
-                Double_t padLy = sector->GetDy();
-                if(padLx > padMaxLx) { padMaxLx = padLx; secMaxLx = sector->GetNCols()*padLx; }
-                if(padLx < padMinLx) { padMinLx = padLx; secMinLx = sector->GetNCols()*padLx; }
-                if(padLy > padMaxLy) { padMaxLy = padLy; secMaxLy = sector->GetNRows()*padLy; }
-                if(padLy < padMinLy) { padMinLy = padLy; secMinLy = sector->GetNRows()*padLy; }
+                Double_t padLx = sector->GetPadDx();
+                Double_t padLy = sector->GetPadDy();
+                if(padLx > padMaxLx) { padMaxLx = padLx; secMaxLx = sector->GetPadNx()*padLx; }
+                if(padLx < padMinLx) { padMinLx = padLx; secMinLx = sector->GetPadNx()*padLx; }
+                if(padLy > padMaxLy) { padMaxLy = padLy; secMaxLy = sector->GetPadNy()*padLy; }
+                if(padLy < padMinLy) { padMinLy = padLy; secMinLy = sector->GetPadNy()*padLy; }
                 nChannels += sector->GetNChannels();
               }
               break;
@@ -703,27 +702,28 @@ void CbmMuchSegmentManual::DrawSegmentation(){
         mod->SetFillStyle(0);
         mod->Draw();
         if(mod->GetDetectorType() != 1) continue;
-        CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
+        CbmMuchModuleGemRectangular* module = (CbmMuchModuleGemRectangular*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
-          CbmMuchSector* sector = module->GetSector(iSector);
+          CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSectorByIndex(iSector);
           // Reject incomplete sectors by size
           Double_t secLx = sector->GetSize()[0];
           Double_t secLy = sector->GetSize()[1];
           Bool_t isIncomplete = IsIncompleteSector(sector);
-          if(isIncomplete){
-            iSide ? sector->SetFillColor(TColor::GetColorDark(kGray+1)) : sector->SetFillColor(kGray + 1);
-          }
-          else{
-            Int_t i = Int_t((secLx+1e-5)/fSecLx[iStation].at(0)) - 1;
-            Int_t j = Int_t((secLy+1e-5)/fSecLy[iStation].at(0)) - 1;
-            sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
-          }
-          sector->Draw("f");
+// TODO
+//          if(isIncomplete){
+//            iSide ? sector->SetFillColor(TColor::GetColorDark(kGray+1)) : sector->SetFillColor(kGray + 1);
+//          }
+//          else{
+//            Int_t i = Int_t((secLx+1e-5)/fSecLx[iStation].at(0)) - 1;
+//            Int_t j = Int_t((secLy+1e-5)/fSecLy[iStation].at(0)) - 1;
+//            sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
+//          }
+//          sector->Draw("f");
           sector->Draw();
           const char* side = iSide ? "Back" : "Front";
           fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", secLx, secLy,
               sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);
-          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetDx(), sector->GetDy());
+          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetPadDx(), sector->GetPadDy());
         } // sectors
       } // modules
     } // sides

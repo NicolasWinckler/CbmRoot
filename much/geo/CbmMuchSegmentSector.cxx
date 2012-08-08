@@ -12,8 +12,8 @@
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
-#include "CbmMuchModuleSector.h"
-#include "CbmMuchRadialSector.h"
+#include "CbmMuchModuleGemRadial.h"
+#include "CbmMuchSectorRadial.h"
 
 #include "FairRuntimeDb.h"
 
@@ -147,7 +147,7 @@ void CbmMuchSegmentSector::SegmentLayerSide(CbmMuchLayerSide* layerSide){
   for(Int_t iModule = 0; iModule < nModules; iModule++){
     CbmMuchModule* module = layerSide->GetModule(iModule);
     if(module->GetDetectorType()!=3) continue;
-    CbmMuchModuleSector* mod = (CbmMuchModuleSector*)module;
+    CbmMuchModuleGemRadial* mod = (CbmMuchModuleGemRadial*)module;
     if(nModules > 1) SegmentModule(mod, true); // Module design
     else SegmentModule(mod, false);            // Monolithic design
   }
@@ -155,7 +155,7 @@ void CbmMuchSegmentSector::SegmentLayerSide(CbmMuchLayerSide* layerSide){
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentSector  -----------------------------------
-void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleSector* module, Bool_t useModuleDesign){
+void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleGemRadial* module, Bool_t useModuleDesign){
   Int_t detectorId = module->GetDetectorId();
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
   Int_t iModule  = CbmMuchGeoScheme::GetModuleIndex(detectorId);
@@ -183,13 +183,13 @@ void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleSector* module, Bool_t use
 //  printf("Debug: %i %i %i %i\n",iStation,iLayer,iSide,iModule);
   Int_t iSector=0;
   for (Int_t i=0;i<fNRegions[iStation];i++){
-    Double_t angle = fAngles[iStation][i]/180.*TMath::Pi();
+    Double_t angle = fAngles[iStation][i]*TMath::DegToRad();
     while (r2<fRadii[iStation][i] && r2<rMax){
       r2 = r1+r1*angle;
-      Double_t phiMax = TMath::ASin((-bt+sqrt(a*r2*r2-b2))/a/r2); 
-      Int_t nPads = 2*Int_t(phiMax/angle)+2;
-      if (iStation==0 && iLayer==0 && iSide==0 && iModule==0) printf("Sector: %f-%f %i phiMax=%f\n",r1,r2,nPads,phiMax);
-      module->AddSector(new CbmMuchRadialSector(detectorId,iSector,r1,r2,phi0,angle,nPads));
+      Double_t dphi = TMath::ASin((-bt+sqrt(a*r2*r2-b2))/a/r2); 
+//      Int_t nPads = 2*Int_t(phiMax/angle)+2;
+//      if (iStation==0 && iLayer==0 && iSide==0 && iModule==0) printf("Sector: %f-%f %i phiMax=%f\n",r1,r2,nPads,phiMax);
+      module->AddSector(new CbmMuchSectorRadial(detectorId,iSector,r1,r2,phi0-dphi,phi0+dphi));
       r1 = r2;
       iSector++;
     }
@@ -278,32 +278,31 @@ void CbmMuchSegmentSector::DrawSegmentation(){
                     kPink+2, kAzure+2, kOrange+2, kViolet+2, kSpring+2,
                     kGreen+4, kMagenta+4, kCyan+4, kRed+4, kBlue+4, kYellow+4, kTeal+4,
                     kPink+4, kAzure+4, kOrange+4, kViolet+4, kSpring+4};
-  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
-//  for (Int_t iStation=0;iStation<1;++iStation){
+//  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
+  for (Int_t iStation=0;iStation<1;++iStation){
     fprintf(outfile, "===========================================================================\n");
     fprintf(outfile, "Station %i\n", iStation+1);
     fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");
     fprintf(outfile, "----------------------------------------------------------------------------\n");
     TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),1000,1000);
     c1->SetFillColor(0);
-    c1->Range(-200,-200,200,200);
+//    c1->Range(-200,-200,200,200);
+    c1->Range(-100,-100,100,100);
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
-    for (Int_t iSide=1;iSide>=0;iSide--){
+    for (Int_t iSide=0;iSide>=0;iSide--){
       CbmMuchLayerSide* layerSide = layer->GetSide(iSide);
       for (Int_t iModule=0;iModule<layerSide->GetNModules();++iModule) {
         CbmMuchModule* mod = layerSide->GetModule(iModule);
         mod->SetFillStyle(0);
 //        mod->Draw();
         if(mod->GetDetectorType() != 3) continue;
-        CbmMuchModuleSector* module = (CbmMuchModuleSector*)mod;
+        CbmMuchModuleGemRadial* module = (CbmMuchModuleGemRadial*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
-          CbmMuchRadialSector* sector = module->GetSector(iSector);
+          CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSector(iSector);
           if (iSector==0){
             printf("  Station: %i",iStation);
-            printf("  Phimin: %f",sector->GetPhimin());
-            printf("  Phimax: %f\n",sector->GetPhimax());
-            printf("  Phi0: %f\n",sector->GetPhi0());
+//            printf("  Phi0: %f\n",sector->GetPhi0());
           }
 //          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
 //          sector->Draw("f");

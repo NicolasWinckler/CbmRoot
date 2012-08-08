@@ -15,7 +15,7 @@
 #include "CbmMuchPoint.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchModuleGem.h"
-#include "CbmMuchSector.h"
+#include "CbmMuchSectorRectangular.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchGeoScheme.h"
 
@@ -245,7 +245,6 @@ void CbmMuchSegmentAuto::InitLayerSide(CbmMuchLayerSide* layerSide){
     CbmMuchModule* mod = layerSide->GetModule(iModule);
     if(mod->GetDetectorType()!=1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
-    module->SetNSectorChannels(128);
     SegmentModule(module);
   }
 }
@@ -280,13 +279,14 @@ void CbmMuchSegmentAuto::SegmentModule(CbmMuchModuleGem* module){
 
     TVector3 sectorPosition(secX, secY, modZ);
     TVector3 sectorSize(secLx, secLy, modLz);
-    SegmentSector(module, new CbmMuchSector(detectorId, iSector, sectorPosition, sectorSize, 8, 16));
+    CbmMuchSectorRectangular* sector = new CbmMuchSectorRectangular(detectorId, iSector, sectorPosition, sectorSize, 8, 16);
+    SegmentSector(module,sector);
   }
 }
 // -------------------------------------------------------------------------
 
 // -----  Private method SegmentSector  ------------------------------------
-void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector){
+void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSectorRectangular* sector){
   TVector3 secSize = sector->GetSize();
   TVector3 secPosition = sector->GetPosition();
   Int_t detectorId = module->GetDetectorId();
@@ -340,7 +340,7 @@ void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* 
       newSecY  = res ? secY : secY + (i - 0.5)*newSecLy;
       position.SetXYZ(newSecX, newSecY, secZ);
       size.SetXYZ(newSecLx, newSecLy, secLz);
-      SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, 8, 16));
+      SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, position, size, 8, 16));
     }
   }
   else if(result1 || result2){
@@ -352,14 +352,14 @@ void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* 
       newSecY  = result1 ? secY : secY + (i - 0.5)*newSecLy;
       position.SetXYZ(newSecX, newSecY, secZ);
       size.SetXYZ(newSecLx, newSecLy, secLz);
-      SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, 8, 16));
+      SegmentSector(module, new CbmMuchSectorRectangular(detectorId, iSector, position, size, 8, 16));
     }
   }
 }
 // -------------------------------------------------------------------------
 
 // -----  Private method ShouldSegmentByX  ---------------------------------
-Bool_t CbmMuchSegmentAuto::ShouldSegmentByX(CbmMuchSector* sector){
+Bool_t CbmMuchSegmentAuto::ShouldSegmentByX(CbmMuchSectorRectangular* sector){
   Double_t secLx = sector->GetSize()[0];
   Double_t secLy = sector->GetSize()[1];
   Double_t secX  = sector->GetPosition()[0];
@@ -395,7 +395,7 @@ Bool_t CbmMuchSegmentAuto::ShouldSegmentByX(CbmMuchSector* sector){
 // -------------------------------------------------------------------------
 
 // -----  Private method ShouldSegmentByY  ---------------------------------
-Bool_t CbmMuchSegmentAuto::ShouldSegmentByY(CbmMuchSector* sector){
+Bool_t CbmMuchSegmentAuto::ShouldSegmentByY(CbmMuchSectorRectangular* sector){
   Double_t secLx = sector->GetSize()[0];
   Double_t secLy = sector->GetSize()[1];
   Double_t secX  = sector->GetPosition()[0];
@@ -431,7 +431,7 @@ Bool_t CbmMuchSegmentAuto::ShouldSegmentByY(CbmMuchSector* sector){
 
 
 // -----  Private method IntersectsHole  -----------------------------------
-Int_t CbmMuchSegmentAuto::IntersectsRad(CbmMuchSector* sector, Double_t radius){
+Int_t CbmMuchSegmentAuto::IntersectsRad(CbmMuchSectorRectangular* sector, Double_t radius){
   if(radius < 0) return 0;
 
   Int_t intersects = 0;
@@ -491,10 +491,10 @@ void CbmMuchSegmentAuto::Print(){
               nGems++;
               nSectors += module->GetNSectors();
               for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-                CbmMuchSector* sector = module->GetSector(iSector);
+                CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSector(iSector);
                 if(!sector) continue;
-                Double_t padLx = sector->GetDx();
-                Double_t padLy = sector->GetDy();
+                Double_t padLx = sector->GetPadDx();
+                Double_t padLy = sector->GetPadDy();
                 if(padLx > padMaxLx) padMaxLx = padLx;
                 if(padLx < padMinLx) padMinLx = padLx;
                 if(padLy > padMaxLy) padMaxLy = padLy;
@@ -548,7 +548,7 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
         if(mod->GetDetectorType()!= 1) continue;
         CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
         for(Int_t iSector=0;iSector<module->GetNSectors();++iSector){
-          CbmMuchSector* sector = module->GetSector(iSector);
+          CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSector(iSector);
           if(sector->GetSize()[0] < secMinLx) secMinLx = sector->GetSize()[0];
           if(sector->GetSize()[1] < secMinLy) secMinLy = sector->GetSize()[1];
         }
@@ -575,17 +575,18 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
         if(mod->GetDetectorType() != 1) continue;
         CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
-          CbmMuchSector* sector = module->GetSector(iSector);
+          CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSector(iSector);
 
           Int_t i = Int_t((sector->GetSize()[0]+1e-3)/secMinLx) - 1;
           Int_t j = Int_t((sector->GetSize()[1]+1e-3)/secMinLy) - 1;
-          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
-          sector->Draw("f");
+// TODO
+//          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
+//          sector->Draw("f");
           sector->Draw();
           const char* side = iSide ? "Back" : "Front";
           fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", sector->GetSize()[0], sector->GetSize()[1],
               sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);
-          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetDx(), sector->GetDy());
+//TODO          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetDx(), sector->GetDy());
         } // sectors
       } // modules
     } // sides

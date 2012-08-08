@@ -36,7 +36,7 @@
 #include "CbmMuchModule.h"
 #include "CbmMuchGeoScheme.h"
 #include "TGeoMatrix.h"
-#include "CbmMuchModuleSector.h"
+#include "CbmMuchModuleGemRadial.h"
 
 #include <iostream>
 #include <fstream>
@@ -432,10 +432,10 @@ void CbmMuch::ConstructGeometry() {
           }
 
           if (module->GetDetectorType()==3) {
-            Double_t dx1 = ((CbmMuchModuleSector*)module)->GetDx1(); 
-            Double_t dx2 = ((CbmMuchModuleSector*)module)->GetDx2(); 
-            Double_t dy  = ((CbmMuchModuleSector*)module)->GetDy();
-            Double_t dz  = ((CbmMuchModuleSector*)module)->GetDz();
+            Double_t dx1 = ((CbmMuchModuleGemRadial*)module)->GetDx1(); 
+            Double_t dx2 = ((CbmMuchModuleGemRadial*)module)->GetDx2(); 
+            Double_t dy  = ((CbmMuchModuleGemRadial*)module)->GetDy();
+            Double_t dz  = ((CbmMuchModuleGemRadial*)module)->GetDz();
             TGeoTrap* shape = new TGeoTrap(dz,0,0,dy,dx1,dx2,0,dy,dx1,dx2,0);
             shape->SetName(Form("shStation%02iLayer%i%cModule%03iActiveNoHole", iStation, iLayer, cside, iModule));
 

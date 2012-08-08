@@ -2,6 +2,7 @@
  **/
 
 #include "CbmMuchModuleStraws.h"
+#include "CbmMuchModule.h"
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchModuleStraws::CbmMuchModuleStraws(): CbmMuchModule() {
@@ -9,13 +10,6 @@ CbmMuchModuleStraws::CbmMuchModuleStraws(): CbmMuchModule() {
 }
 // -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-CbmMuchModuleStraws::CbmMuchModuleStraws(Int_t detId, TVector3 position, TVector3 size,
-    Double_t cutRadius)
-: CbmMuchModule(detId, position, size, cutRadius) {
-  fDetectorType = 2;
-}
-// -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchModuleStraws::CbmMuchModuleStraws(Int_t iStation, Int_t iLayer, Bool_t iSide,

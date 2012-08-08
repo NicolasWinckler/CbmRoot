@@ -19,6 +19,15 @@ CbmMuchCluster::CbmMuchCluster()
 }
 // -------------------------------------------------------------------------
 
+
+// ------ Standard constructor  --------------------------------------------
+CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices): TObject(),
+    fDigiIndices(digiIndices.size(),&(digiIndices[0]))
+{
+}
+// -------------------------------------------------------------------------
+
+
 // ------ Standard constructor  --------------------------------------------
 CbmMuchCluster::CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge)
   : TObject(),

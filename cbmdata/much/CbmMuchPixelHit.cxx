@@ -28,11 +28,13 @@ CbmMuchPixelHit::CbmMuchPixelHit(
 		Double_t dz,
 		Double_t dxy,
 		Int_t refId,
-		Int_t planeId)
+		Int_t planeId,
+		Double_t t,
+		Double_t dt)
   : CbmPixelHit(detectorId, x, y, z, dx, dy, dz, dxy, refId),
     fPlaneId(planeId),
-    fTime(-1.),
-    fDTime(-1.)
+    fTime(t),
+    fDTime(dt)
 {
 	SetType(kMUCHPIXELHIT);
 }

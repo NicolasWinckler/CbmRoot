@@ -41,7 +41,9 @@ public:
 			Double_t dz,
 			Double_t dxy,
 			Int_t refId,
-			Int_t planeId);
+			Int_t planeId,
+      Double_t t,
+      Double_t dt);
 
 	/** Standard constructor
 	  *@param detId  Unique detector ID (including module number)

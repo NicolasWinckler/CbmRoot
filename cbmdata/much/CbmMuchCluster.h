@@ -23,6 +23,7 @@ public:
    * Default constructor.
    */
   CbmMuchCluster();
+  CbmMuchCluster(vector<Int_t> digiIndices);
   /**
    * Standard constructor.
    * @param digiIndices Indices of the digis that are contained in the cluster

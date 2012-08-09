@@ -18,7 +18,7 @@
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsGem::CbmMuchFindHitsGem() 
   : FairTask("MuchFindHitsAdvancedGem", 1) ,
-    fAlgorithm(1),
+    fAlgorithm(3),
     fDigiFile(""),
     fClusterSeparationTime(100.),
     fThresholdRatio(0.1),
@@ -42,7 +42,7 @@ CbmMuchFindHitsGem::CbmMuchFindHitsGem()
 CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* name,
     const char* digiFileName, Int_t iVerbose) 
   : FairTask(name, iVerbose),
-    fAlgorithm(1),
+    fAlgorithm(3),
     fDigiFile(digiFileName),
     fClusterSeparationTime(100.),
     fThresholdRatio(0.1),

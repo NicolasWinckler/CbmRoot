@@ -1,7 +1,5 @@
 /**
  * @author E. Kryshen <e.kryshen@gsi.de>
- *
- * Digitization of simulated events in MUCH
  **/
 void much_hits_sector(){
   TString inFile   = "data/mc_sector.root";
@@ -9,7 +7,6 @@ void much_hits_sector(){
   TString outFile  = "data/hits_sector.root";
   TString parFile  = "data/params.root";
   Int_t nEvents    = 1;
-  Int_t iVerbose   = 1;
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -27,17 +24,8 @@ void much_hits_sector(){
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
 
-  CbmMuchDigitizeGem* digitize = new CbmMuchDigitizeGem("MuchDigitizeGem", digiFile, iVerbose);
-  digitize->SetAlgorithm(1);
-  digitize->SetSpotRadius(0.05);
-  digitize->SetQThreshold(3);
-  digitize->SetQMaximum(500000);
-  digitize->SetNADCChannels(256);
-
-  // ---  MuCh hit finder ---------------------------------------------------
-  CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem("MuchFindHitsGem", digiFile, iVerbose);
-  findHits->SetAlgorithm(3);
-
+  CbmMuchDigitizeGem* digitize = new CbmMuchDigitizeGem(digiFile);
+  CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(digiFile);
   fRun->AddTask(digitize);
   fRun->AddTask(findHits);
   fRun->Init();

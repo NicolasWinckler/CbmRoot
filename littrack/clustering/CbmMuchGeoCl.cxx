@@ -19,6 +19,8 @@
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
+#include "CbmMuchSectorRectangular.h"
+#include "CbmMuchPadRectangular.h"
 
 #include "FairRootManager.h"
 
@@ -65,38 +67,32 @@ void CbmMuchGeoCl::SetLayerGeom(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_
 	fSingleLayerGeo = new LayerGeom[fNofPads];
 	Int_t nofSectors = module->GetNSectors();
 	Int_t padIterator = 0;
-	//Цикл фор1 по секторам
 	for(Int_t iSector = 0; iSector < nofSectors; iSector++)
 	{
-	//-получить число пэдов в секторе, высоту, ширину пэда
-		CbmMuchSector* sector = (CbmMuchSector*) module->GetSector(iSector); //???
+		CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSector(iSector); //???
 		Int_t nofPadsInSector = sector->GetNChannels();//(sector->GetNCols())*(sector->GetNRows());
-		Double_t padsDx_2 = (sector->GetDx())/2;
-		Double_t padsDy_2 = (sector->GetDy())/2;
+		Double_t padsDx_2 = (sector->GetPadDx())/2;
+		Double_t padsDy_2 = (sector->GetPadDy())/2;
 		//std::cout<<"DX: "<<padsDx_2<<"\n";
-	//-Цикл фор2 по пэдам в секторе
 		for(Int_t iPad = 0; iPad < nofPadsInSector; iPad++)
-	//--получить номер и координаты пэда
 		{
-			CbmMuchPad* pad = (CbmMuchPad*) sector->GetPad(iPad);
+			CbmMuchPadRectangular* pad = (CbmMuchPadRectangular*) sector->GetPad(0, 0);	//!!!
 			fSingleLayerGeo[padIterator].Ndigi = 0;
 			fSingleLayerGeo[padIterator].charge = 0;
-			fSingleLayerGeo[padIterator].xc = pad->GetX0();
-			fSingleLayerGeo[padIterator].yc = pad->GetY0();
+			fSingleLayerGeo[padIterator].xc = pad->GetX();
+			fSingleLayerGeo[padIterator].yc = pad->GetY();
 			fSingleLayerGeo[padIterator].x1 = fSingleLayerGeo[padIterator].xc - padsDx_2;
 			fSingleLayerGeo[padIterator].x2 = fSingleLayerGeo[padIterator].xc + padsDx_2;
 			fSingleLayerGeo[padIterator].y1 = fSingleLayerGeo[padIterator].yc - padsDy_2;
 			fSingleLayerGeo[padIterator].y2 = fSingleLayerGeo[padIterator].yc + padsDy_2;
 			fSingleLayerGeo[padIterator].channelID = pad->GetChannelId();
+			fPadByChannelId[pad->GetChannelId()] = padIterator;
 			/*std::cout<<"Pad: "<<padIterator<<"; ChannelID: "<<pad->GetChannelId()<<"\n";
 			std::cout<<"Xc = "<<fSingleLayerGeo[padIterator].xc;
 			std::cout<<"Yc = "<<fSingleLayerGeo[padIterator].yc<<"\n";*/
 			padIterator++;
 		}
-	//-Конец фор2
 	}
-	//Конец фор1
-	//Составить список соседей. М.б. можно взять из старой версии.
 	padIterator = 0;
 	for(Int_t iPadMain = 0; iPadMain < fNofPads; iPadMain++)
 	{
@@ -235,6 +231,11 @@ void CbmMuchGeoCl::SetAPadsNom(Int_t nPads)
 	fActivePads = nPads;
 }
 
+void CbmMuchGeoCl::SetAPadsPlusOne()
+{
+	fActivePads++;
+}
+
 template <typename T1>
 T1 CbmMuchGeoCl::GetMin(T1& a, T1& b)
 {
@@ -272,4 +273,9 @@ Bool_t CbmMuchGeoCl::SubEqual(Float_t x1, Float_t x2, Float_t l)
 	{
 		return 0;
 	}
+}
+
+Int_t CbmMuchGeoCl::GetPadByChannelId(Long64_t chId)
+{
+	return fPadByChannelId[chId];
 }

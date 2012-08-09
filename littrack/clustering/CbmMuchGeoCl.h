@@ -40,6 +40,7 @@ public:
    Int_t GetNPads()			const { return fNofPads; }
    Int_t GetAPadsNom()		const { return fActivePads;}
    void SetAPadsNom(Int_t nPads);
+   void SetAPadsPlusOne();
 
    Float_t GetX1(Int_t iPad);
    Float_t GetX2(Int_t iPad);
@@ -58,6 +59,8 @@ public:
 
    UInt_t GetPadCharge(Int_t iPad);
    void SetPadCharge(Int_t iPad, UInt_t iCharge);
+
+   Int_t GetPadByChannelId(Long64_t chId);
 
 
 
@@ -78,6 +81,7 @@ private:
    Int_t fDetId;
    Int_t fActivePads;
 
+   map <Long64_t, Int_t> fPadByChannelId;
    struct LayerGeom{
 	   Float_t x1, x2, y1, y2, xc, yc;
 	   Int_t Ndigi;

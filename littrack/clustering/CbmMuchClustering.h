@@ -13,7 +13,6 @@
 #include "CbmClusteringA1.h"
 #include "CbmClusteringSL.h"
 #include "CbmClusteringWard.h"
-#include "CbmMuchTest.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchModuleGem.h"
 //#include "TClonesArray.h"
@@ -54,40 +53,40 @@ public:
 
    void DeletePadsCharge(CbmMuchGeoCl* moduleGeo);
 
-   void MuchClustering(CbmMuchGeoCl* moduleGeo, Int_t algVersion, CbmMuchGeoScheme* scheme);
+   void MuchClustering(Int_t algVersion, CbmMuchGeoScheme* scheme);
+
+   void CreateModulesGeometryArray();
+
+   void SetDigiCharges();
+
+   void ClusteringMainFunction();
 
 private:
 
    void ReadDataBranches();
 
-   Int_t fNofPads;
-   Int_t fNofPadsInModule;
-   Int_t fNofActivePads;
    Int_t fAlgorithmVersion;
+   Int_t fNofModules;
 
-   Int_t fTotalClusters;
-   //Float_t* fPadsCharges;
-   CbmMuchGeoCl* fModuleGeo;
    CbmClusteringA1* fClustersA1;
    CbmClusteringSL* fClustersSL;
    CbmClusteringWard* fClustersWard;
 
    CbmMuchGeoScheme* fScheme;
 
-   CbmMuchTest* fTestData;
+   CbmMuchGeoCl** fModulesGeometryArray;
+   map <Int_t, Int_t> fModulesByDetId;
 
    TClonesArray* fMuchDigi;
    TClonesArray* fMuchPad;
    TClonesArray* fMuchPoint;
 
-   TClonesArray* fClusters;
-
    TClonesArray* fCluster;
    TClonesArray* fHit;
-   TClonesArray* fStrawHit;
+   //TClonesArray* fStrawHit;
 
-   void ClusteringA1(CbmMuchGeoCl* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &k, Int_t &nHit, Int_t &nCluster, Int_t &nClusters);
-   void ClusteringSL(CbmMuchGeoCl* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &k, Int_t &nHit, Int_t &nCluster, Int_t &nClusters);
+   void ClusteringA1(CbmMuchGeoCl* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &nHit, Int_t &nCluster);
+   void ClusteringSL(CbmMuchGeoCl* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &nHit, Int_t &nCluster);
 
    ClassDef(CbmMuchClustering, 1);
 };

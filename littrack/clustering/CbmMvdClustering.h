@@ -70,9 +70,9 @@ public:
 
    void CalculateAcuracy();
 
-   void FillHistogramsForRadius();
+   //void FillHistogramsForRadius();
 
-   void TestStrangeClusters();
+   //void TestStrangeClusters();
 
    void PrintClusters();
 
@@ -103,6 +103,7 @@ private:
 
    Int_t fNofPointsBySt[2];
    Int_t fNofDigisBySt[2];
+   Int_t fNofClustersBySt[2];
 
    static const Int_t nDigiByCl = 100;
    Int_t fNofClusters;
@@ -120,15 +121,14 @@ private:
 
    map<Int_t, CbmMvdStation*> fStationMap;
 
-   TH1F* fhMvdClusters;
-   TH1F* fhMvdErrors;
-
-   TH1F* fhMvdErrorsByPixels;
-
-   static const Int_t nRadiusSteps = 100;
+   /*static const Int_t nRadiusSteps = 100;
    TH1F* fhErrPoint_Hit;
    TH1F* fhErrPoint_Pixel;
-   TH1F* fhErrHit_Pixel;
+   TH1F* fhErrHit_Pixel;*/
+
+   TH1F* fhErrorsHit_MCPoint;
+   TH1F* fhErrorsHit_Pixel;
+   TH1F* fhErrorsPixel_MCPoint;
 
    Int_t fNofEvents;
    Float_t fEfficiency;
@@ -136,7 +136,9 @@ private:
    Float_t fErrHit_Point;
    Float_t fErrPoint_Pixel;
    Int_t fLooseCl;
+   Int_t fLooseClustersBySt[2];
    Int_t fFakeCl;
+   Int_t fFakeClustersBySt[2];
 
    Int_t GetMvdGeometry();
    void Register();

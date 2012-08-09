@@ -733,7 +733,7 @@ void CbmMuchClusteringQa::FillErrorsByRadiusHistograms()
 				Long64_t chId = digi->GetChannelId();
 				CbmMuchModuleGem* module = static_cast<CbmMuchModuleGem*>(fGeoScheme->GetModuleByDetId(detId));
 				const CbmMuchPad* pad = static_cast<const CbmMuchPad*>(module->GetPad(chId));
-				Float_t padSize = pad->GetLx();
+				Float_t padSize = pad->GetDx();
 				const CbmMuchPixelHit* hit = static_cast<const CbmMuchPixelHit*>(fMuchHit->At(fAccuracyArray[iCl].nHit));
 				Float_t rad = sqrt((hit->GetX() * hit->GetX()) + (hit->GetY() * hit->GetY()));
 				Int_t n = static_cast<Int_t>((rad - rMin) / step);

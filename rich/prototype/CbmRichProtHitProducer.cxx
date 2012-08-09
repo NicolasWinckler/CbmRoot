@@ -58,7 +58,7 @@ CbmRichProtHitProducer::CbmRichProtHitProducer():
 
    fPhotomulRadius(0.0),
    fPhotomulDist(0.),
-   fDetType(4),
+   fDetType(6), //type 6 with measured QE
    fNofNoiseHits(220),
    fCollectionEfficiency(1.),
    fSigmaMirror(0.06),
@@ -176,7 +176,10 @@ InitStatus CbmRichProtHitProducer::Init()
       if (fDetType==3)
          cout << "   detector type: CSI with pad size = " << fPhotomulRadius << " cm, distance between panels = " << fPhotomulDist << " cm" << endl;
       if (fDetType==2 || fDetType == 4)
-         cout << "   detector type: Hamamatsu H8500 with pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
+	cout << "   detector type: Hamamatsu H8500 with pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
+     if (fDetType==6)
+	cout << "   detector type: Hamamatsu H8500 with measured QE and pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
+
       cout << "   number of noise hits (to be reduced by geometrical efficiency) " << fNofNoiseHits << endl;
       cout << "--------------------------------------------------------------------------------" << endl;
    }
@@ -229,10 +232,11 @@ InitStatus CbmRichProtHitProducer::Init()
       fPhotomulRadius = 0.;
       fPhotomulDist = 0.;
    }
-   if (fDetType == 2 || fDetType == 4 || fDetType == 5) {
+   if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) {
       fPhotomulRadius = 0.6125;
       fPhotomulDist = 0.2;
       //fCrossTalkHitProb = 0.02;
+      //fDetType == 6 with measured QE
    }
    if (fDetType == 3) {
       fPhotomulRadius = 0.8;
@@ -297,7 +301,7 @@ void CbmRichProtHitProducer::Exec(
          pmtID = j;
       }
       if (fDetType == 1) FindRichHitPositionSinglePMT(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5) FindRichHitPositionMAPMT(sigma0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
+      if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) FindRichHitPositionMAPMT(sigma0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
       if (fDetType == 3) FindRichHitPositionCsI(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
 
       //Double_t zHit = detPoint.Z();
@@ -315,7 +319,7 @@ void CbmRichProtHitProducer::Exec(
                if (TMath::Sqrt((detPoint.X()-xHit)*(detPoint.X()-xHit)+(detPoint.Y()-yHit)*(detPoint.Y()-yHit)) > (fPhotomulRadius+fPhotomulDist)*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)!" << endl;
          }
-         if (fDetType == 2 || fDetType == 3 || fDetType == 4) {
+         if (fDetType == 2 || fDetType == 3 || fDetType == 4 || fDetType == 6) {
             if (fVerbose)
                if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)! " <<
@@ -391,7 +395,7 @@ void CbmRichProtHitProducer::Exec(
          pmtID = -j;
       }
       if (fDetType == 1) FindRichHitPositionSinglePMT(xRand,yRand,xHit,yHit,pmtID);
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
+      if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
       if (fDetType == 3) FindRichHitPositionCsI(xRand,yRand,xHit,yHit,pmtID);
 
       // add Hit
@@ -655,7 +659,84 @@ void CbmRichProtHitProducer::SetPhotoDetPar(
       fEfficiency[21] = 0.017;
       fEfficiency[22] = 0.007;
       fEfficiency[23] = 0.0033;
+   } else if (det_type == 6){
+
+  /** PMT efficiencies for Hamamatsu H8500-03 
+      with measured QE
+                        (Flat type Multianode Photomultiplier with UV window)
+   corresponding range in lambda: 200nm - 640nm in steps of 20nm */
+
+    fLambdaMin = 180.;
+    fLambdaMax = 800.;
+    fLambdaStep = 10.;
+
+    fEfficiency[0] = 0.06;
+    fEfficiency[1] = 0.08;
+    fEfficiency[2] = 0.0945;
+    fEfficiency[3] = 0.1061;
+    fEfficiency[4] = 0.1265;
+    fEfficiency[5] = 0.1482;
+    fEfficiency[6] = 0.1668;
+    fEfficiency[7] = 0.1887;
+    fEfficiency[8] = 0.2093;
+    fEfficiency[9] = 0.2134;
+    fEfficiency[10] = 0.2303;
+    fEfficiency[11] = 0.2482;
+    fEfficiency[12] = 0.2601;
+    fEfficiency[13] = 0.2659;
+    fEfficiency[14] = 0.2702;
+    fEfficiency[15] = 0.283;
+    fEfficiency[16] = 0.2863;
+    fEfficiency[17] = 0.2863;
+    fEfficiency[18] = 0.2884;
+    fEfficiency[19] = 0.286;
+    fEfficiency[20] = 0.2811;
+    fEfficiency[21] = 0.2802;
+    fEfficiency[22] = 0.272;
+    fEfficiency[23] = 0.2638;
+    fEfficiency[24] = 0.2562;
+    fEfficiency[25] = 0.2472;
+    fEfficiency[26] = 0.2368;
+    fEfficiency[27] = 0.2218;
+    fEfficiency[28] = 0.2032;
+    fEfficiency[29] = 0.186;
+    fEfficiency[30] = 0.1735;
+    fEfficiency[31] = 0.1661;
+    fEfficiency[32] = 0.1483;
+    fEfficiency[33] = 0.121;
+    fEfficiency[34] = 0.0959;
+    fEfficiency[35] = 0.0782;
+    fEfficiency[36] = 0.0647;
+    fEfficiency[37] = 0.0538;
+    fEfficiency[38] = 0.0372;
+    fEfficiency[39] = 0.0296;
+    fEfficiency[40] = 0.0237;
+    fEfficiency[41] = 0.0176;
+    fEfficiency[42] = 0.0123;
+    fEfficiency[43] = 0.0083;
+    fEfficiency[44] = 0.005;
+    fEfficiency[45] = 0.003;
+    fEfficiency[46] = 0.0017;
+    fEfficiency[47] = 0.0008;
+    fEfficiency[48] = 0.0006;
+    fEfficiency[49] = 0.0003;
+    fEfficiency[50] = 0.0003;
+    fEfficiency[51] = 0.0002;
+    fEfficiency[52] = 0.0001;
+    fEfficiency[53] = 0.0001;
+    fEfficiency[54] = 0.0001;
+    fEfficiency[55] = 0.0001;
+    fEfficiency[56] = 0.0001;
+    fEfficiency[57] = 0.0001;
+    fEfficiency[58] = 0.;
+    fEfficiency[59] = 0.0001;
+    fEfficiency[60] = 0.0001;
+    fEfficiency[61] = 0.;
+
+
    } else if (det_type == 0){
+       /** ideal detector */
+
       fLambdaMin = 100.;
       fLambdaMax = 700.;
       fLambdaStep = 600.;

@@ -41,54 +41,9 @@
 #include <vector>
 using std::map;
 
-void CbmMuchDigitizeGem::SetParContainers() {}
-void CbmMuchDigitizeGem::FinishTask() {}
-InitStatus CbmMuchDigitizeGem::ReInit() { return kSUCCESS; }
-
-// -----   Default constructor   ------------------------------------------
-CbmMuchDigitizeGem::CbmMuchDigitizeGem() 
-  : FairTask("MuchDigitize", 1),
-    fAlgorithm(1),
-    fGeoScheme(CbmMuchGeoScheme::Instance()),
-    fDigiFile(""),
-    fPoints(NULL),
-    fMCTracks(NULL),
-    fDigis(NULL),
-    fDigiMatches(NULL),
-    fMcEpoch(NULL),
-    fNFailed(0),
-    fNOutside(0),
-    fNMulti(0),
-    fNADCChannels(256),
-    fQMax(500000),
-    fQThreshold(0),
-    fMeanNoise(0),//(1500),
-    fSpotRadius(0.),
-    fMeanGasGain(1e4),
-    fDTime(3),
-    fEvent(0),
-    fDeadPadsFrac(0),
-    fTimer(),
-    fEpoch(0),
-    fMcChain(NULL),
-    fDeadTime(400),
-    fDriftVelocity(100),
-    fPeakingTime(20),
-    fRemainderTime(40),
-    fTimeBinWidth(1),
-    fChainEventId(0),
-    fTotalDriftTime(0.)
-{
-  SetQThreshold(3);
-  SetSpotRadius();
-  Double_t driftVolumeWidth = 0.4; // cm // TODO
-  fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
-}
 // -------------------------------------------------------------------------
-
-// -----   Standard constructor    -----------------------------------------
-CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* name, const char* digiFileName, Int_t iVerbose) 
-  : FairTask(name, iVerbose),
+CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* digiFileName) 
+  : FairTask("MuchDigitizeGem",1),
     fAlgorithm(1),
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiFile(digiFileName),
@@ -102,9 +57,9 @@ CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* name, const char* digiFileNam
     fNMulti(0),
     fNADCChannels(256),
     fQMax(500000),
-    fQThreshold(0),
+    fQThreshold(3),
     fMeanNoise(0),//(1500),
-    fSpotRadius(0.),
+    fSpotRadius(0.05),
     fMeanGasGain(1e4),
     fDTime(3),
     fEvent(0),
@@ -120,8 +75,6 @@ CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* name, const char* digiFileNam
     fChainEventId(0),
     fTotalDriftTime(0.)
 {
-  SetQThreshold(3);
-  SetSpotRadius();
   Double_t driftVolumeWidth = 0.4; // cm // TODO
   fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
 }

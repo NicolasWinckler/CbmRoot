@@ -15,35 +15,11 @@
 #include "TStopwatch.h"
 #include "TClonesArray.h"
 
-// -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsGem::CbmMuchFindHitsGem() 
+// -------------------------------------------------------------------------
+CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* digiFileName) 
   : FairTask("MuchFindHitsAdvancedGem", 1) ,
     fAlgorithm(3),
     fDigiFile(""),
-    fClusterSeparationTime(100.),
-    fThresholdRatio(0.1),
-    fEvent(0),
-    fDigis(NULL),
-    fClusters(new TClonesArray("CbmMuchCluster", 1000)),
-    fHits(new TClonesArray("CbmMuchPixelHit", 1000)),
-    fGeoScheme(CbmMuchGeoScheme::Instance()),
-    fDigiIndices(),
-    fFiredPads(),
-    fDigiIndexMap(),
-    fClusterMap(),
-    fLocalMax(),
-    fClusterNx(0),
-    fClusterNy(0)
-{
-}
-// -------------------------------------------------------------------------
-
-// -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* name,
-    const char* digiFileName, Int_t iVerbose) 
-  : FairTask(name, iVerbose),
-    fAlgorithm(3),
-    fDigiFile(digiFileName),
     fClusterSeparationTime(100.),
     fThresholdRatio(0.1),
     fEvent(0),
@@ -130,6 +106,8 @@ void CbmMuchFindHitsGem::Exec(Option_t* opt) {
     }
   }
   clusters.clear();
+  fDigiIndices.clear();
+  fFiredPads.clear();
 
   timer.Stop();
   printf("-I- %s:",fName.Data());

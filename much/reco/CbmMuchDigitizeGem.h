@@ -50,19 +50,10 @@ static double min_logT_p  =  1.0986;
 static double l_e         = 0.47;
 static double l_not_e     = 0.36;
 
-class CbmMuchDigitizeGem : public FairTask
-{
-
+class CbmMuchDigitizeGem : public FairTask{
   public:
-
-    /** Default constructor. */
-    CbmMuchDigitizeGem();
-
-    /** Standard constructor. */
-    CbmMuchDigitizeGem(Int_t iVerbose);
-
-    /** Constructor with name. */
-    CbmMuchDigitizeGem(const char* name, const char* digiFileName, Int_t iVerbose);
+    /** Constructor */
+    CbmMuchDigitizeGem(const char* digiFileName);
 
     /** Destructor. */
     virtual ~CbmMuchDigitizeGem();
@@ -171,18 +162,9 @@ class CbmMuchDigitizeGem : public FairTask
     Double_t           fTimeBinWidth;  // Width of the bin for signal shape simulation
     Int_t              fChainEventId;  // Temporary solution for accessing MC chain in epoch approach
 //    static TF1*        fPol6;          // 6-order polynomial for Landau sigma and MPV
-    
-    /** Finish. **/
-    virtual void FinishTask();
-
-    /** Get parameter containers. **/
-    virtual void SetParContainers();
 
     /** Initialization. **/
     virtual InitStatus Init();
-
-    /** Re-initialization. **/
-    virtual InitStatus ReInit();
 
     /** Advanced digis production using avalanches. **/
     Bool_t ExecPoint(CbmMuchPoint* point, Int_t iPoint);

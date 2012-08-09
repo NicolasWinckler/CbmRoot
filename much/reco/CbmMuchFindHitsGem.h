@@ -36,21 +36,14 @@ class CbmMuchGeoScheme;
 
 class CbmMuchFindHitsGem: public FairTask {
   public:
-    CbmMuchFindHitsGem();
-    CbmMuchFindHitsGem(const char* name, const char* digiFileName,Int_t iVerbose);
-    virtual ~CbmMuchFindHitsGem() {
-      fDigiIndices.clear();
-      fFiredPads.clear();
-    }
+    CbmMuchFindHitsGem(const char* digiFileName);
+    virtual ~CbmMuchFindHitsGem() {}
     virtual void Exec(Option_t* opt);
     void SetAlgorithm(Int_t iAlgorithm)             { fAlgorithm = iAlgorithm;}
     void SetThresholdRatio(Double_t thresholdRatio) {fThresholdRatio = thresholdRatio; }
     void SetClusterSeparationTime(Double_t time)    { fClusterSeparationTime = time; }
   private:
     virtual InitStatus Init();
-    virtual InitStatus ReInit(){ return kSUCCESS;}
-    virtual void SetParContainers() {}
-    virtual void FinishTask() {}
     void FindClusters();
     void CreateCluster(CbmMuchPad* pad);
     void ExecClusteringSimple(CbmMuchCluster* cluster, vector<CbmMuchCluster*> &clusters);

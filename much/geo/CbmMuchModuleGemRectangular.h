@@ -11,6 +11,7 @@
 using std::vector;
 
 class CbmMuchSectorRectangular;
+class CbmMuchPadRectangular;
 
 class CbmMuchModuleGemRectangular : public CbmMuchModuleGem{
  public:
@@ -21,6 +22,7 @@ class CbmMuchModuleGemRectangular : public CbmMuchModuleGem{
   virtual Bool_t InitModule();
   CbmMuchSectorRectangular* GetSector(Double_t x, Double_t y);
   CbmMuchSectorRectangular* GetSector(Int_t ix, Int_t iy);
+  CbmMuchPadRectangular* GetPad(Double_t x, Double_t y);
  protected:
   Bool_t fUseModuleDesign;
   Int_t fGridNx;    // Number of grid values in X direction

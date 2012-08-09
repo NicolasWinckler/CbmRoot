@@ -42,7 +42,7 @@ public:
   vector<CbmMuchPad*> GetNeighbours() const { return fNeighbours; }
   void SetNeighbours(vector<CbmMuchPad*> neighbours) { fNeighbours = neighbours; }
   void SetDigiIndex(Int_t iDigi)             { fDigiIndex = iDigi; }
-  virtual void SetFired() {}
+  virtual void SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels=256){}
 protected:
   Int_t               fDetectorId; // Detector ID (including module number)
   Long64_t            fChannelId;  // Channel ID within the module

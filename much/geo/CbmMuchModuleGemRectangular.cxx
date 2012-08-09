@@ -9,7 +9,7 @@
 
 #include "CbmMuchModuleGemRectangular.h"
 #include "CbmMuchSectorRectangular.h"
-#include "CbmMuchPad.h"
+#include "CbmMuchPadRectangular.h"
 #include "CbmMuchGeoScheme.h"
 
 #include <algorithm>
@@ -76,6 +76,16 @@ CbmMuchSectorRectangular* CbmMuchModuleGemRectangular::GetSector(Double_t x, Dou
   return GetSector(ix,iy);
 }
 // -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+CbmMuchPadRectangular* CbmMuchModuleGemRectangular::GetPad(Double_t x, Double_t y){
+  CbmMuchSectorRectangular* sector = GetSector(x,y);
+  if (!sector) return NULL;
+  return sector->GetPad(x,y);
+}
+// -------------------------------------------------------------------------
+
 
 // -----   Public method GetGridCellX  -------------------------------------
 Double_t CbmMuchModuleGemRectangular::GetGridCellX(Int_t ix){

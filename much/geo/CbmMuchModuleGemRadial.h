@@ -13,6 +13,7 @@
 using std::vector;
 
 class CbmMuchSectorRadial;
+class CbmMuchPadRadial;
 
 class CbmMuchModuleGemRadial : public CbmMuchModuleGem{
  public:
@@ -25,6 +26,7 @@ class CbmMuchModuleGemRadial : public CbmMuchModuleGem{
   Double_t GetDy()  const { return fDy;  }
   Double_t GetDz()  const { return fDz;  }
   CbmMuchSectorRadial* GetSectorByRadius(Double_t r);
+  CbmMuchPadRadial* GetPad(Double_t x, Double_t y);
   Bool_t InitModule();
  protected:
   vector<Double_t> fSectorRadii; //! vector of sector radii

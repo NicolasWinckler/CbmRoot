@@ -27,8 +27,8 @@
 
 // Includes from base
 #include "FairRootManager.h"
-#include "CbmMCTrack.h"
 #include "FairMCPoint.h"
+#include "CbmMCTrack.h"
 #include "CbmMCEpoch.h"
 
 // Includes from ROOT
@@ -38,21 +38,8 @@
 #include "TRandom.h"
 #include "TChain.h"
 
-#include <iostream>
-#include <iomanip>
-#include <cassert>
 #include <vector>
-
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::setw;
-using std::fixed;
-using std::left;
-using std::right;
-using std::setprecision;
 using std::map;
-using std::pair;
 
 void CbmMuchDigitizeGem::SetParContainers() {}
 void CbmMuchDigitizeGem::FinishTask() {}
@@ -96,8 +83,6 @@ CbmMuchDigitizeGem::CbmMuchDigitizeGem()
   SetSpotRadius();
   Double_t driftVolumeWidth = 0.4; // cm // TODO
   fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
-
-    Reset();
 }
 // -------------------------------------------------------------------------
 
@@ -139,7 +124,6 @@ CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* name, const char* digiFileNam
   SetSpotRadius();
   Double_t driftVolumeWidth = 0.4; // cm // TODO
   fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
-  Reset();
 }
 // -------------------------------------------------------------------------
 
@@ -153,15 +137,6 @@ CbmMuchDigitizeGem::~CbmMuchDigitizeGem() {
     fDigiMatches->Delete();
     delete fDigiMatches;
   }
-  Reset();
-}
-// -------------------------------------------------------------------------
-
-// -----   Private method Reset   ------------------------------------------
-void CbmMuchDigitizeGem::Reset() {
-  fNFailed = fNOutside = fNMulti = 0;
-  if (fDigis) fDigis->Clear();
-  if (fDigiMatches) fDigiMatches->Delete(); // Delete because of memory leaks
 }
 // -------------------------------------------------------------------------
 
@@ -225,41 +200,20 @@ InitStatus CbmMuchDigitizeGem::Init() {
 
 // -----   Public method Exec   --------------------------------------------
 void CbmMuchDigitizeGem::Exec(Option_t* opt) {
-  // Reset all eventwise counters
   fTimer.Start();
-  Reset();
-  cout << endl;
-  cout << "-I- " << fName << "   :   Event " << ++fEvent << endl;
+  fDigis->Clear();
+  fDigiMatches->Delete();
 
   if (fEpoch) fPoints = fMcEpoch->GetPoints(kMUCH);
-  
-  Int_t notUsable = 0; // DEBUG: counter for not usable points
-
-  // Loop over all MuchPoints
   Int_t nPoints = fPoints->GetEntriesFast();
 
   for (Int_t iPoint = 0; iPoint < nPoints; iPoint++) {
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
-
-    // Take only usable points
-    if (!point || !point->IsUsable()) {
-      notUsable++;
-      continue;
-    }
-
-    // Get the module the point is in
+    if (!point || !point->IsUsable())  continue;
     CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
-    if (!module) {
-      fNFailed++;
-      continue;
-    }
-//TODO    if (!module->GetNSectors()) {
-//      fNOutside++;
-//      continue;
-//    }
-    
+    if (!module) continue;
     ExecPoint(point, iPoint);
-  } // MuchPoint loop
+  }
 
   // Add remaining digis
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
@@ -270,18 +224,8 @@ void CbmMuchDigitizeGem::Exec(Option_t* opt) {
     for (Int_t ip=0;ip<pads.size();ip++) AddDigi(pads[ip]);
   }
 
-  // Screen output
   fTimer.Stop();
-
-  if (!fVerbose)
-    cout << "+ ";
-  else
-    cout << "-I- ";
-  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-  << fixed << right << fTimer.RealTime() << " s, points " << nPoints
-  << ", failed " << fNFailed << ", not usable " << notUsable
-  << ", outside " << fNOutside << ", multihits " << fNMulti
-  << ", digis " << fDigis->GetEntriesFast() << endl;
+  printf("-I- MuchDigitizer: event=%3i, time=%5.2f s, points=%i, digis=%i\n",fEvent++,fTimer.RealTime(),nPoints,fDigis->GetEntriesFast());
 }
 // -------------------------------------------------------------------------
 
@@ -296,16 +240,22 @@ Bool_t CbmMuchDigitizeGem::ExecPoint(CbmMuchPoint* point, Int_t iPoint) {
   Int_t detectorId = point->GetDetectorID();
   CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
   
-  if (fAlgorithm==0){
-    // Simple digitization
-// TODO    
-    CbmMuchPad* pad = 0;//module->GetPad(dv[0],dv[1]);
+  if (fAlgorithm==0){    // Simple digitization
+    TVector3 v = 0.5*(v1+v2);
+    CbmMuchPad* pad = 0;
+    if (module->GetDetectorType()==1){
+      CbmMuchModuleGemRectangular* module1 = (CbmMuchModuleGemRectangular*) module;
+      pad = module1->GetPad(v[0],v[1]);
+    } else if (module->GetDetectorType()==3){
+      CbmMuchModuleGemRadial* module3 = (CbmMuchModuleGemRadial*) module;
+      pad = module3->GetPad(v[0],v[1]);
+    }
     if (!pad) return kFALSE;
-    AddCharge(pad,fQMax,iPoint,point->GetTime(),fTotalDriftTime);
+    AddCharge(pad,fQMax,iPoint,point->GetTime(),0);
     return kTRUE;
   }
-  // Start of advanced digitization
   
+  // Start of advanced digitization
   Int_t nElectrons = Int_t(GetNPrimaryElectronsPerCm(point)*dv.Mag());
   if (nElectrons<0) return kFALSE;
   
@@ -494,13 +444,8 @@ Double_t CbmMuchDigitizeGem::GetNPrimaryElectronsPerCm(CbmMuchPoint* point){
 // -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeGem::AddCharge(CbmMuchSectorRadial* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t driftTime, 
     Double_t phi1, Double_t phi2){
-//  printf ("%i\n",s);
-//  printf("phi1=%f\n",phi1);
-//  printf("phi2=%f\n",phi2);
   CbmMuchPadRadial* pad1 = s->GetPadByPhi(phi1);
   CbmMuchPadRadial* pad2 = s->GetPadByPhi(phi2);
-//  printf("pad1=%i\n",pad1);
-//  printf("pad2=%i\n",pad2);
   if (pad1==pad2) 
     AddCharge(pad1,ne,iPoint,time,driftTime);
   else {

@@ -95,4 +95,20 @@ void CbmMuchModuleGem::DrawModule(Color_t color) {
 }
 // -------------------------------------------------------------------------
 
+
+// -------------------------------------------------------------------------
+void CbmMuchModuleGem::DrawPads() {
+  for (Int_t s=0;s<fSectors.size();s++){
+    CbmMuchSector* sector = (CbmMuchSector*) fSectors[s];
+    sector->DrawPads();
+  }
+}
+// -------------------------------------------------------------------------
+
+
+void CbmMuchModuleGem::SetPadFired(Long64_t channelId,Int_t digiIndex,Int_t adcCharge){
+  CbmMuchSector* sector = GetSector(channelId);
+  CbmMuchPad* pad = sector->GetPad(CbmMuchModuleGem::GetChannelIndex(channelId));
+  pad->SetFired(digiIndex,adcCharge);
+}
 ClassImp(CbmMuchModuleGem)

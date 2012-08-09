@@ -184,9 +184,6 @@ class CbmMuchDigitizeGem : public FairTask
     /** Re-initialization. **/
     virtual InitStatus ReInit();
 
-    /** Reset eventwise counters. **/
-    void Reset();
-
     /** Advanced digis production using avalanches. **/
     Bool_t ExecPoint(CbmMuchPoint* point, Int_t iPoint);
 

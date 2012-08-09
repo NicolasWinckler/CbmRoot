@@ -13,6 +13,7 @@
 #include "TArrayL64.h"
 #include "CbmMuchPad.h"
 #include "CbmMuchPadRadial.h"
+#include "TMath.h"
 using std::vector;
 
 // -------------------------------------------------------------------------
@@ -50,7 +51,16 @@ CbmMuchSectorRadial* CbmMuchModuleGemRadial::GetSectorByRadius(Double_t r){
   i0 = fSectorRadii.begin();
   ie = fSectorRadii.end();
   i = upper_bound(i0,ie,r);
-  return i-i0-1>=0 ? (CbmMuchSectorRadial*) fSectors[i-i0-1] : 0;
+  return i-i0-1>=0 ? (CbmMuchSectorRadial*) fSectors[i-i0-1] : NULL;
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+CbmMuchPadRadial* CbmMuchModuleGemRadial::GetPad(Double_t x, Double_t y){
+  TVector3 v = TVector3(x,y,0);
+  CbmMuchSectorRadial* sector = GetSectorByRadius(v.Mag());
+  return sector->GetPadByPhi(v.Phi());
 }
 // -------------------------------------------------------------------------
 

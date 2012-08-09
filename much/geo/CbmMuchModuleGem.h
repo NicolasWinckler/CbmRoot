@@ -112,6 +112,9 @@ class CbmMuchModuleGem : public CbmMuchModule{
   /** */
   void DrawModule(Color_t color);
   
+  void DrawPads();
+  void SetPadFired(Long64_t channelId,Int_t digiIndex,Int_t adcCharge);
+  
  protected:
   vector<CbmMuchSector*> fSectors; // Array of sectors within this module
 

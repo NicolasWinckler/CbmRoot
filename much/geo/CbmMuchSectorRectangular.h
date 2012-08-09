@@ -17,6 +17,8 @@
 #include "vector"
 using std::vector;
 
+class CbmMuchPadRectangular;
+
 class CbmMuchSectorRectangular : public CbmMuchSector{
 public:
   CbmMuchSectorRectangular();
@@ -24,17 +26,21 @@ public:
   virtual ~CbmMuchSectorRectangular(){};
 //  virtual void GetPadVertices(Int_t iChannel, Double_t* xPad, Double_t* yPad);
   TVector3 GetPosition() const { return fPosition; }
-  TVector3 GetSize()  const { return fSize; }
-  Int_t    GetPadNx() const { return fPadNx; } 
-  Int_t    GetPadNy() const { return fPadNy; }
-  Double_t GetPadDx() const { return fPadDx; }
-  Double_t GetPadDy() const { return fPadDy; }
-  Double_t GetSigmaX() const { return fPadDx/12; }
-  Double_t GetSigmaY() const { return fPadDy/12; }
+  TVector3 GetSize()     const { return fSize; }
+  Int_t    GetPadNx()    const { return fPadNx; } 
+  Int_t    GetPadNy()    const { return fPadNy; }
+  Double_t GetPadDx()    const { return fPadDx; }
+  Double_t GetPadDy()    const { return fPadDy; }
+  Double_t GetSigmaX()   const { return fPadDx/12; }
+  Double_t GetSigmaY()   const { return fPadDy/12; }
+  Double_t GetXmin()     const { return fPosition[0]-fSize[0]/2;}
+  Double_t GetYmin()     const { return fPosition[1]-fSize[1]/2;}
+
 //  TArrayI  GetNeighbours() const { return fNeighbours; }
   void SetNeighbours(TArrayI &array) { fNeighbours = array; }
   Bool_t Inside(Double_t x, Double_t y) const {return 0; } // TODO
   vector<CbmMuchSectorRectangular*> GetNeighbours();
+  CbmMuchPadRectangular* GetPad(Double_t x, Double_t y);
   void AddPads();
   void DrawPads();
   void Draw() { DrawPads(); }

@@ -34,22 +34,28 @@ CbmMuchSectorRectangular::CbmMuchSectorRectangular(Int_t detId, Int_t secId,
 }
 // -------------------------------------------------------------------------
 
+CbmMuchPadRectangular* CbmMuchSectorRectangular::GetPad(Double_t x, Double_t y){
+  Int_t ix = Int_t(GetXmin()/fPadDx);
+  Int_t iy = Int_t(GetYmin()/fPadDy);
+  if (ix<0 || ix >=fPadNx) return NULL;
+  if (iy<0 || iy >=fPadNy) return NULL;
+  Int_t channelIndex = fPadNy*ix+iy;
+  return (CbmMuchPadRectangular*) fPads[channelIndex];
+}
+
 
 // -------------------------------------------------------------------------
 void CbmMuchSectorRectangular::AddPads(){
   for(Int_t ix = 0; ix < fPadNx; ix++){
     for(Int_t iy = 0; iy < fPadNy; iy++){
-      Long64_t channelId = CbmMuchModuleGem::GetChannelId(fSectorId,fPadNy*ix+iy);
-      // TODO
-//      CbmMuchPad* pad = new CbmMuchPadRectangular(fDetectorId,channelId,fX1+ix*fPadDx,fY1+iy*fPadDy,fPadDx,fPadDy);
-//      fPads.push_back(pad);
+      Int_t channelIndex = fPadNy*ix+iy;
+      Long64_t channelId = CbmMuchModuleGem::GetChannelId(fSectorId,channelIndex);
+      Double_t x0 = GetXmin()+(ix+0.5)*fPadDx;
+      Double_t y0 = GetYmin()+(iy+0.5)*fPadDy;
+      CbmMuchPad* pad = new CbmMuchPadRectangular(fDetectorId,channelId,x0,y0,fPadDx,fPadDy);
+      fPads.push_back(pad);
     }
   }
-//  for(Int_t iChannel = 0; iChannel < fNChannels; iChannel++){
-//    Long64_t channelId = CbmMuchModuleGem::GetChannelId(fSectorId,iChannel);
-//    CbmMuchPad* pad = new CbmMuchPadRectangular(fDetectorId,channelId,fX1+iChannel*fPadDx,fY1+iChannel*fPadDy,fPadDx,fPadDy);
-//    fPads.push_back(pad);
-//  }
 }
 // -------------------------------------------------------------------------
 

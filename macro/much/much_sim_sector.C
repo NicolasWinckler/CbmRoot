@@ -11,7 +11,7 @@
 void much_sim_sector(TString inputSignal = "",
               TString inputBgr = "",
               TString outFile = "",
-              Int_t nEvents = 1)
+              Int_t nEvents = 3)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -21,7 +21,7 @@ void much_sim_sector(TString inputSignal = "",
     inputSignal = inputdir + "/macro/much/data/jpsi.root";
   }
   if (inputBgr == "") {
-    inputBgr = inputdir + "/input/urqmd.ftn14";
+    inputBgr = "data/urqmd.ftn14";
   }
   if (outFile == "") {
     outFile = "data/mc_sector.root";

@@ -8,7 +8,7 @@ void much_hits_sector(){
   TString digiFile = "data/much_digi_sector.root";
   TString outFile  = "data/hits_sector.root";
   TString parFile  = "data/params.root";
-  Int_t nEvents    = 500;
+  Int_t nEvents    = 1;
   Int_t iVerbose   = 1;
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -28,13 +28,18 @@ void much_hits_sector(){
   rtdb->saveOutput();
 
   CbmMuchDigitizeGem* digitize = new CbmMuchDigitizeGem("MuchDigitizeGem", digiFile, iVerbose);
+  digitize->SetAlgorithm(1);
   digitize->SetSpotRadius(0.05);
   digitize->SetQThreshold(3);
   digitize->SetQMaximum(500000);
   digitize->SetNADCChannels(256);
 
-  fRun->AddTask(digitize);
+  // ---  MuCh hit finder ---------------------------------------------------
+  CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem("MuchFindHitsGem", digiFile, iVerbose);
+  findHits->SetAlgorithm(3);
 
+  fRun->AddTask(digitize);
+  fRun->AddTask(findHits);
   fRun->Init();
   fRun->Run(0,nEvents);
 }

@@ -1,17 +1,17 @@
 Bool_t IsSelected(Int_t detId, Int_t iStation,Int_t iLayer,Int_t iSide);
 
 void much_draw_digis(
-  TString mcFileName   = "data/mc_sector.root",
-  TString rcFileName   = "data/hits_sector.root",
-  TString digiFileName = "data/much_digi_sector.root",
+  TString mcFileName   = "data/mc.root",
+  TString digiFileName = "data/much_digi.root",
+  TString rcFileName   = "data/hits.root",
   Int_t iEvent = 0,
-  Int_t iStationSelected = 5,
+  Int_t iStationSelected = 0,
   Int_t iLayerSelected = 0,
-  Int_t iSideSelected = 0,
-  Double_t xmin = -60,
-  Double_t xmax =  60,
-  Double_t ymin = -60,
-  Double_t ymax =  60
+  Int_t iSideSelected = 0, // 0 - front, 1 - back, 2 - both
+  Double_t xmin = 0,
+  Double_t xmax = 60,
+  Double_t ymin = 0,
+  Double_t ymax = 60
 ){
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -27,27 +27,17 @@ void much_draw_digis(
   // get TClonesArrays from trees
   TFile* mcFile = new TFile(mcFileName);
   TFile* rcFile = new TFile(rcFileName);
-  TTree* mcTree = (TTree*) mcFile->Get("cbmsim");
-  TTree* rcTree = (TTree*) rcFile->Get("cbmsim");
+  TTree* mcTree = mcFile ? (TTree*) mcFile->Get("cbmsim") : 0;
+  TTree* rcTree = rcFile ? (TTree*) rcFile->Get("cbmsim") : 0;
   TClonesArray* points = new TClonesArray("CbmMuchPoint");
   TClonesArray* digis  = new TClonesArray("CbmMuchDigi");
   TClonesArray* hits   = new TClonesArray("CbmMuchPixelHit");
-  mcTree->SetBranchAddress("MuchPoint",&points);
-  rcTree->SetBranchAddress("MuchDigi",&digis);
-  rcTree->SetBranchAddress("MuchPixelHit",&hits);
-  mcTree->GetEntry(iEvent);
-  rcTree->GetEntry(iEvent);
+  if (mcTree) mcTree->SetBranchAddress("MuchPoint",&points);
+  if (rcTree) rcTree->SetBranchAddress("MuchDigi",&digis);
+  if (rcTree) rcTree->SetBranchAddress("MuchPixelHit",&hits);
+  if (mcTree) mcTree->GetEntry(iEvent);
+  if (rcTree) rcTree->GetEntry(iEvent);
   
-  // Mark fired pads
-  for (Int_t i=0;i<digis->GetEntriesFast();i++){
-    CbmMuchDigi* digi = (CbmMuchDigi*) digis->At(i);
-    // Filter out points
-    Int_t detId = digi->GetDetectorId();
-    if (!IsSelected(detId,iStationSelected,iLayerSelected,iSideSelected)) continue;
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)digiScheme->GetModuleByDetId(detId);
-    if (!module) continue;
-    module->SetPadFired(digi->GetChannelId(),i,digi->GetADCCharge());
-  }
 
   // Draw pads
   TCanvas* c1 = new TCanvas("station","station",1000*(xmax-xmin)/(ymax-ymin),1000);
@@ -60,6 +50,17 @@ void much_draw_digis(
       if (!module) continue;
       module->DrawPads();
     }
+  }
+
+  // Mark fired pads
+  for (Int_t i=0;i<digis->GetEntriesFast();i++){
+    CbmMuchDigi* digi = (CbmMuchDigi*) digis->At(i);
+    // Filter out points
+    Int_t detId = digi->GetDetectorId();
+    if (!IsSelected(detId,iStationSelected,iLayerSelected,iSideSelected)) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)digiScheme->GetModuleByDetId(detId);
+    if (!module) continue;
+    module->SetPadFired(digi->GetChannelId(),i,digi->GetADCCharge());
   }
 
   // Draw points
@@ -78,7 +79,7 @@ void much_draw_digis(
     CbmMuchPixelHit* hit = (CbmMuchPixelHit*) hits->At(i);
     Int_t detId = hit->GetDetectorId();
     if (!IsSelected(detId,iStationSelected,iLayerSelected,iSideSelected)) continue;
-    TEllipse* p = new TEllipse(hit->GetX(),hit->GetY(),0.12);
+    TEllipse* p = new TEllipse(hit->GetX(),hit->GetY(),0.08);
     p->SetFillColor(kRed);
     p->SetLineColor(kRed);
     p->Draw();

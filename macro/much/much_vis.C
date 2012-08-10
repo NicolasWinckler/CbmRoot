@@ -11,28 +11,21 @@ void much_vis(TString mcFile="", TString rcFile="", TString digiFile="")
 {
   TString inputdir = gSystem->Getenv("VMCWORKDIR");
   if (mcFile == "") {
-     mcFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.mc.root";
+     mcFile = inputdir + "/macro/much/data/mc.root";
   }
   if (digiFile == "") {
-     digiFile = inputdir + "/macro/much/data/much_digi.root";//"/parameters/much/much_standard.digi.root";
+     digiFile = inputdir + "/macro/much/data/much_digi.root";
   }
   if (rcFile == "") {
-     rcFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.muchhits.root";
+     rcFile = inputdir + "/macro/much/data/hits_gem.root";
   }
 
   TString outFile  = inputdir + "/macro/much/data/dummy.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libPassive");
-  gSystem->Load("libGen");
-  gSystem->Load("libSts");
-  gSystem->Load("libMuch");
+  gROOT->LoadMacro("$VMCWORKDIR/macro/much/muchlibs.C");
+  muchlibs();
   gSystem->Load("libVis");
 
   FairRunAna *fRun= new FairRunAna();

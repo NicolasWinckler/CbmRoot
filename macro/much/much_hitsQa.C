@@ -3,37 +3,20 @@
 // E.Kryshen 22.11.2007
 // --------------------------------------------------------------------------
 void much_hitsQa(){
-  Int_t nEvents = 5;
+  Int_t nEvents = 1;
   Int_t iVerbose = 1;
 
   TString  dir            = "data/";
-  TString  mcFile         = dir + "Jpsi.auau.25gev.centr.mc.root";
-  TString  parFile        = dir + "Jpsi.auau.25gev.centr.mc.root";
+  TString  mcFile         = dir + "mc.root";
+  TString  parFile        = dir + "params.root";
   TString  digiFile       = dir + "much_digi.root";
-  TString  muchHitsFile   = dir + "Jpsi.auau.25gev.centr.muchhits.root";
-  TString  outFile        = dir + "Jpsi.auau.25gev.centr.muchhits.qa.root";
+  TString  muchHitsFile   = dir + "hits_gem.root";
+  TString  outFile        = dir + "hits_gem.qa.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  //gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMuch");
-
+  gROOT->LoadMacro("$VMCWORKDIR/macro/much/muchlibs.C");
+  muchlibs();
   gROOT->LoadMacro("$VMCWORKDIR/much/much_histo_style.C");
   much_histo_style();
 
@@ -60,11 +43,11 @@ void much_hitsQa(){
   qa->SetGeoFileName(digiFile);
   qa->SetPerformanceFileName(outFile);
   qa->SetPrintToFile(0);
-  qa->SetPullsQa(1);
+  qa->SetPullsQa(0);
   qa->SetOccupancyQa(1);
-  qa->SetDigitizerQa(1);
-  qa->SetStatisticsQa(1);
-  qa->SetClusterDeconvQa(1);
+  qa->SetDigitizerQa(0);
+  qa->SetStatisticsQa(0);
+  qa->SetClusterDeconvQa(0);
 
   fRun->AddTask(qa);
   // ------------------------------------------------------------------------

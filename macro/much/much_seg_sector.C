@@ -15,7 +15,7 @@ void much_seg_sector(const char* mcFile = "",
   //          Adjust this part according to your requirements
 
   if (mcFile == "") {
-    mcFile = "data/mc_sector.root";
+    mcFile = "data/mc.root";
   }
   if (inDigiFile == "") {
     inDigiFile = "data/much_digi_sector.seg";

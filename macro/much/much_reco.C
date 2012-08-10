@@ -122,12 +122,12 @@ void much_reco(
 
 		if (IsMuch(parFile)) {
 		// ----- MUCH hits----------   --------------------------------------------
-			CbmMuchDigitizeGem* muchDigitize = new CbmMuchDigitizeGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
+			CbmMuchDigitizeGem* muchDigitize = new CbmMuchDigitizeGem(muchDigiFile.Data());
 			run->AddTask(muchDigitize);
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawDigitize);
 
-			CbmMuchFindHitsGem* muchFindHits = new CbmMuchFindHitsGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
+			CbmMuchFindHitsGem* muchFindHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
 			run->AddTask(muchFindHits);
 			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawFindHits);

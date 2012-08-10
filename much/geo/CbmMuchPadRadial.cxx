@@ -17,7 +17,6 @@ CbmMuchPadRadial::CbmMuchPadRadial()
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
 CbmMuchPadRadial::CbmMuchPadRadial(Int_t detId, Long64_t chanId, Double_t r1, Double_t r2, Double_t phi1, Double_t phi2)
   : CbmMuchPad(detId,chanId,(r1+r2)/2.*cos((phi1+phi2)/2.),(r1+r2)/2.*sin((phi1+phi2)/2.),r2-r1,r2-r1),
@@ -25,28 +24,12 @@ CbmMuchPadRadial::CbmMuchPadRadial(Int_t detId, Long64_t chanId, Double_t r1, Do
     fPhi1(phi1),
     fPhi2(phi2)
 {
-  SetFillColor(0);
+  SetFillColor(kYellow);
   SetLineWidth(1);
   SetLineColor(34);
-//  Double_t dr = (r2-r1)/12.;
-//  Double_t dp = (phi2-phi1)*r1/12.;
-//  Double_t phi0 = (phi2+phi1)/2.;
-//  Double_t c = cos(phi0);
-//  Double_t s = sin(phi0);
-//  Double_t wx  = dr*dr*c*c+dp*dp*s*s;
-//  Double_t wy  = dr*dr*s*s+dp*dp*c*c;
-//  Double_t wxy = (dr*dr-dp*dp)*c*s;
 }
 // -------------------------------------------------------------------------
 
-//
-//// -------------------------------------------------------------------------
-//void CbmMuchPadRadial::Reset(){
-//  fDigiIndex = -1;
-//  SetFillColor(kYellow);
-//}
-//// -------------------------------------------------------------------------
-//
 // -------------------------------------------------------------------------
 void CbmMuchPadRadial::SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels){
   fDigiIndex = iDigi;
@@ -54,7 +37,7 @@ void CbmMuchPadRadial::SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels
   else SetFillColor(kYellow);
 }
 // -------------------------------------------------------------------------
-//
+
 // -------------------------------------------------------------------------
 void CbmMuchPadRadial::DrawPad(){
   Draw("f");

@@ -161,7 +161,7 @@ class CbmMuchDigitizeGem : public FairTask{
     Double_t           fRemainderTime; // Remainder time = t_r [ns]: remainder is simulated as exp(-t/t_r)
     Double_t           fTimeBinWidth;  // Width of the bin for signal shape simulation
     Int_t              fChainEventId;  // Temporary solution for accessing MC chain in epoch approach
-//    static TF1*        fPol6;          // 6-order polynomial for Landau sigma and MPV
+    Double_t fTotalDriftTime;
 
     /** Initialization. **/
     virtual InitStatus Init();
@@ -185,7 +185,6 @@ class CbmMuchDigitizeGem : public FairTask{
     Bool_t AddCharge(CbmMuchSectorRadial* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t driftTime, Double_t phi1, Double_t phi2);
     void AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t driftTime);
 
-    Double_t fTotalDriftTime;
     
     ClassDef(CbmMuchDigitizeGem,1)
 };

@@ -15,29 +15,28 @@
 #include "TStopwatch.h"
 #include "TClonesArray.h"
 
+#include <algorithm>
+
 // -------------------------------------------------------------------------
 CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* digiFileName) 
   : FairTask("MuchFindHitsGem", 1) ,
-    fAlgorithm(3),
     fDigiFile(""),
+    fAlgorithm(3),
     fClusterSeparationTime(100.),
     fThresholdRatio(0.1),
     fEvent(0),
     fDigis(NULL),
+    fClusterCharges(),
+    fLocalMax(),
+    fClusterPads(),
+    fNeighbours(),
     fClusters(new TClonesArray("CbmMuchCluster", 1000)),
     fHits(new TClonesArray("CbmMuchPixelHit", 1000)),
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiIndices(),
-    fFiredPads(),
-    fDigiIndexMap(),
-    fClusterMap(),
-    fLocalMax(),
-    fClusterNx(0),
-    fClusterNy(0)
+    fFiredPads()
 {
 }
-// -------------------------------------------------------------------------
-
 
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchFindHitsGem::Init() {
@@ -92,11 +91,7 @@ void CbmMuchFindHitsGem::Exec(Option_t* opt) {
       break;
     }
     case 3: {
-      // Peak finder
-//      clusters.clear();
       ExecClusteringPeaks(cluster,iCluster);
-//      CreateHits(clusters, iCluster);
-//      CreateHits(cluster, iCluster);
       break;
     }
     default: {
@@ -288,125 +283,88 @@ void CbmMuchFindHitsGem::CreateHits(CbmMuchCluster* cluster, Int_t iCluster) {
 
 // -------------------------------------------------------------------------
 void CbmMuchFindHitsGem::ExecClusteringPeaks(CbmMuchCluster* cluster,Int_t iCluster) {
-  if (!CreateClusterMap(cluster)) { CreateHits(cluster,iCluster);  return; }
-  if (FindLocalMaxima()<2) { CreateHits(cluster,iCluster); return; }
+  if (FindLocalMaxima(cluster)<2) { CreateHits(cluster,iCluster); return; }
   // Create clusters from single digi corresponding to each local maximum
-  for (Int_t i=0; i<fClusterNx; i++) { 
-    for (Int_t j=0; j<fClusterNy; j++) {
-      if (fLocalMax[i][j]==1) {
-        fDigiIndices.clear();
-        fDigiIndices.push_back(fDigiIndexMap[i][j]);
-        CbmMuchCluster* newcluster = new CbmMuchCluster(fDigiIndices);
-        CreateHits(newcluster,iCluster); 
-      }
-    }
+  for (Int_t i=0; i<fLocalMax.size(); i++) { 
+    if (fLocalMax[i]!=1) continue;
+    fDigiIndices.clear();
+    fDigiIndices.push_back(cluster->GetDigiIndex(i));
+    CbmMuchCluster* newcluster = new CbmMuchCluster(fDigiIndices);
+    CreateHits(newcluster,iCluster); 
   }
 }
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
-Bool_t CbmMuchFindHitsGem::CreateClusterMap(CbmMuchCluster* cluster){
+Int_t CbmMuchFindHitsGem::FindLocalMaxima(CbmMuchCluster* cluster){
   // Skip small clusters
-  if (cluster->GetNDigis()<=2) return kFALSE; 
+  Int_t nDigis = cluster->GetNDigis();
+  if (nDigis<=2) return 1; 
+  fClusterCharges.clear();
+  fClusterPads.clear();
+  fLocalMax.clear();
+  fNeighbours.clear();
   
-  // Determine cluster dimensions
-  Int_t xmin = std::numeric_limits<Int_t>::max();
-  Int_t ymin = std::numeric_limits<Int_t>::max();
-  Int_t xmax = 0;
-  Int_t ymax = std::numeric_limits<Int_t>::min();
-
-  for (Int_t i=0;i<cluster->GetNDigis();i++){
-    Int_t iDigi = cluster->GetDigiIndex(i);
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-    Long64_t channelId = digi->GetChannelId();
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
-    Int_t n = module->GetNSectors();
-    Int_t x = CbmMuchModuleGem::GetSectorIndex(channelId);
-    Int_t y = CbmMuchModuleGem::GetChannelIndex(channelId)-n/2;
-    if (x<xmin) xmin = x;
-    if (y<ymin) ymin = y;
-    if (x>xmax) xmax = x;
-    if (y>ymax) ymax = y;
-  }
-  
-  fClusterNx = xmax-xmin+1;
-  fClusterNy = ymax-ymin+1;
-  // Skip small clusters
-  if (fClusterNx<3 && fClusterNy<3) return kFALSE;
-  
-  // Skip too large clusters
-  if (fClusterNx>MAXCLUSTERSIZE) return kFALSE;
-  if (fClusterNy>MAXCLUSTERSIZE) return kFALSE;
-  
-  // Clear cluster map and local maxima
-  for (Int_t i=0;i<fClusterNx;i++) {
-    for (Int_t j=0;j<fClusterNy;j++) {
-      fDigiIndexMap[i][j]=0;
-      fClusterMap[i][j]=0;
-      fLocalMax[i][j]=0;
-    }
-  }
-
   // Fill cluster map
-  for (Int_t i=0;i<cluster->GetNDigis();i++){
+  for (Int_t i=0;i<nDigis;i++){
     Int_t iDigi = cluster->GetDigiIndex(i);
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-    Long64_t channelId = digi->GetChannelId();
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
-    Int_t n = module->GetNSectors();
-    Int_t x = CbmMuchModuleGem::GetSectorIndex(channelId);
-    Int_t y = CbmMuchModuleGem::GetChannelIndex(channelId)-n/2;
+    Int_t detId = digi->GetDetectorId();
+    Long64_t chanId = digi->GetChannelId();
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detId);
+    CbmMuchPad* pad = module->GetPad(chanId);
     Int_t c = digi->GetADCCharge();
-    fDigiIndexMap[x-xmin][y-ymin]=iDigi;
-    fClusterMap[x-xmin][y-ymin]=c;
+    fClusterPads.push_back(pad);
+    fClusterCharges.push_back(c);
+    fLocalMax.push_back(0);
   }
   
-  return kTRUE;
-}
-// -------------------------------------------------------------------------
-
-
-// -------------------------------------------------------------------------
-Int_t CbmMuchFindHitsGem::FindLocalMaxima(){
-  // Flag local maxima
-  for (Int_t i=0; i<fClusterNx;i++) {
-    for (Int_t j=0; j<fClusterNy;j++) {
-      if (fLocalMax[i][j]!=0) continue;
-      FlagLocalMax(i,j);
+  // Fill neighbours
+  for (Int_t i=0;i<nDigis;i++){
+    CbmMuchPad* pad = fClusterPads[i];
+    vector<CbmMuchPad*> neighbours = pad->GetNeighbours();
+    vector<Int_t> selected_neighbours;
+    for (Int_t ip=0;ip<neighbours.size();ip++){
+      CbmMuchPad* p = neighbours[ip];
+      vector<CbmMuchPad*>:: iterator it = find(fClusterPads.begin(),fClusterPads.end(),p);
+      if (it==fClusterPads.end()) continue;
+      selected_neighbours.push_back(it-fClusterPads.begin());
     }
+    fNeighbours.push_back(selected_neighbours);
   }
+
+  // Flag local maxima
+  for (Int_t i=0; i<nDigis;i++) {
+    if (fLocalMax[i]!=0) continue;
+    FlagLocalMax(i);
+  }
+  
   // Count local maxima
   Int_t nMax = 0;
-  for (Int_t i=0; i<fClusterNx; i++) 
-    for (Int_t j=0; j<fClusterNy; j++) 
-      if (fLocalMax[i][j]==1) nMax++;
+  for (Int_t i=0; i<nDigis; i++)  if (fLocalMax[i]==1) nMax++;
   return nMax;
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchFindHitsGem::FlagLocalMax(Int_t i, Int_t j){
-  Int_t c = fClusterMap[i][j];
-  for (Int_t i1=i-1;i1<=i+1;i1++) {
-    if (i1<0 || i1>=fClusterNx) continue;
-    for (Int_t j1=j-1;j1<=j+1;j1++) {
-      if (j1<0 || j1>=fClusterNy) continue;
-      if (i==i1 && j==j1) continue;
-      Int_t c1 = fClusterMap[i1][j1];
-      if      (c < c1) { fLocalMax[i][j] = -1; return; }
-      else if (c > c1)   fLocalMax[i1][j1] = -1;
-      else { // the same charge
-        fLocalMax[i][j] = 1; 
-        if (fLocalMax[i1][j1] == 0) {
-          FlagLocalMax(i1,j1);
-          if (fLocalMax[i1][j1] < 0) { fLocalMax[i][j] = -1; return; }
-          else fLocalMax[i1][j1] = -1;
-        }
-      } 
+void CbmMuchFindHitsGem::FlagLocalMax(Int_t i){
+  Int_t c = fClusterCharges[i];
+  for (Int_t n=0;n<fNeighbours[i].size();n++) {
+    Int_t in = fNeighbours[i][n];
+    Int_t cn = fClusterCharges[in];
+    if      (c < cn) { fLocalMax[i] = -1; return; }
+    else if (c > cn)   fLocalMax[in] = -1;
+    else { // the same charge
+      fLocalMax[i] = 1; 
+      if (fLocalMax[in] == 0) {
+        FlagLocalMax(in);
+        if (fLocalMax[in] < 0) { fLocalMax[i] = -1; return; }
+        else fLocalMax[in] = -1;
+      }
     }
   }
-  fLocalMax[i][j] = 1;
+  fLocalMax[i] = 1;
 }
 // -------------------------------------------------------------------------
 

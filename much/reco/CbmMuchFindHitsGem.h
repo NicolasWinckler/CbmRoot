@@ -15,12 +15,11 @@
  *  0 - one hit per fired pad
  *  1 - one hit per cluster
  *  2 - simple cluster deconvolution with charge threshold
+ *  3 - local maxima finder
  */
 
 #ifndef CBMMUCHFINDHITSGEM_H
 #define CBMMUCHFINDHITSGEM_H 1
-
-#define MAXCLUSTERSIZE 40
 #include "FairTask.h"
 #include "TString.h"
 #include <map>
@@ -50,27 +49,25 @@ class CbmMuchFindHitsGem: public FairTask {
     void ExecClusteringPeaks(CbmMuchCluster* cluster,Int_t iCluster);
     void CreateHits(vector<CbmMuchCluster*> clusters, Int_t iCluster);
     void CreateHits(CbmMuchCluster* cluster,Int_t iCluster);
-    Int_t FindLocalMaxima();
-    void FlagLocalMax(Int_t i,Int_t j);
-    Bool_t CreateClusterMap(CbmMuchCluster* cluster);
-    TString  fDigiFile;                    // Digitization file
-    Int_t    fAlgorithm;                   // Defines which algorithm to use
-    Double_t fClusterSeparationTime;       // Minimum required time between two clusters
-    Double_t fThresholdRatio;              // Charge threshold ratio relative to max cluster charge
-    Int_t fEvent;                          // Event counter
-    TClonesArray* fDigis;                  // Input array of CbmMuchDigi
-    Int_t fDigiIndexMap[MAXCLUSTERSIZE][MAXCLUSTERSIZE]; //
-    Int_t fClusterMap[MAXCLUSTERSIZE][MAXCLUSTERSIZE];   //
-    Int_t fLocalMax[MAXCLUSTERSIZE][MAXCLUSTERSIZE];     //
-    Int_t fClusterNx;
-    Int_t fClusterNy;
-
-    TClonesArray* fClusters;               // Output array of CbmMuchCluster objects
-    TClonesArray* fHits;                   // Output array of CbmMuchHit
-    CbmMuchGeoScheme* fGeoScheme;          // Geometry scheme
+    Int_t FindLocalMaxima(CbmMuchCluster* cluster);
+    void FlagLocalMax(Int_t i);
+    TString  fDigiFile;                     // Digitization file
+    Int_t    fAlgorithm;                    // Defines which algorithm to use
+    Double_t fClusterSeparationTime;        // Minimum required time between two clusters
+    Double_t fThresholdRatio;               // Charge threshold ratio relative to max cluster charge
+    Int_t fEvent;                           // Event counter
+    TClonesArray* fDigis;                   // Input array of CbmMuchDigi
+    vector<Int_t> fClusterCharges;          //!
+    vector<Int_t> fLocalMax;                //!
+    vector<CbmMuchPad*> fClusterPads;       //!
+    vector<vector<Int_t> >fNeighbours;      //!
+    
+    TClonesArray* fClusters;                // Output array of CbmMuchCluster objects
+    TClonesArray* fHits;                    // Output array of CbmMuchHit
+    CbmMuchGeoScheme* fGeoScheme;           // Geometry scheme
     // auxiliary maps and vectors
-    vector<Int_t> fDigiIndices;            //!
-    vector<CbmMuchPad*> fFiredPads;        //!
+    vector<Int_t> fDigiIndices;             //!
+    vector<CbmMuchPad*> fFiredPads;         //!
     
     ClassDef(CbmMuchFindHitsGem,1);
 };

@@ -697,7 +697,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
             for(Int_t i=0; i<2; ++i){
               TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
               TVector3 pos = TVector3(TMath::Power(-1, i)*moduleX, moduleY, moduleZ + layerGlobalZ0);
-              side->AddModule(new CbmMuchModuleGem(st, l, isBack, side->GetNModules(), pos, size,
+              side->AddModule(new CbmMuchModuleGemRectangular(st, l, isBack, side->GetNModules(), pos, size,
                   rHole));
             }
           } // mY
@@ -711,7 +711,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
     } else {
       TVector3 size = TVector3(2 * rmax, 2 * rmax, fActiveLz);
       TVector3 pos = TVector3(0, 0, layerGlobalZ0 - moduleZ);
-      layer->GetSideF()->AddModule(new CbmMuchModuleGem(st, l, 0, 0, pos, size, rmin));
+      layer->GetSideF()->AddModule(new CbmMuchModuleGemRectangular(st, l, 0, 0, pos, size, rmin));
       layer->SetSupportDx(rmax);
       layer->SetSupportDy(rmax);
       layer->SetSupportDz(fSupportLz[st] / 2.);

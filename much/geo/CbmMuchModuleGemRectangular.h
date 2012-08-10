@@ -23,6 +23,11 @@ class CbmMuchModuleGemRectangular : public CbmMuchModuleGem{
   CbmMuchSectorRectangular* GetSector(Double_t x, Double_t y);
   CbmMuchSectorRectangular* GetSector(Int_t ix, Int_t iy);
   CbmMuchPadRectangular* GetPad(Double_t x, Double_t y);
+  vector<vector<Int_t> > GetGrid() { return fGrid; }
+  Int_t GetGridNx() { return fGridNx; }
+  Int_t GetGridNy() { return fGridNy; }
+  Double_t GetGridDx() { return fGridDx; }
+  Double_t GetGridDy() { return fGridDy; }
  protected:
   Bool_t fUseModuleDesign;
   Int_t fGridNx;    // Number of grid values in X direction
@@ -34,12 +39,9 @@ class CbmMuchModuleGemRectangular : public CbmMuchModuleGem{
   // Grid related private functions
   void InitNeighbourSectors();
   void InitNeighbourPads();
+  Int_t GetGridIndexX(Double_t x);
+  Int_t GetGridIndexY(Double_t y);
   Bool_t InitGrid(Bool_t useModuleDesign);
-  Double_t GetInitX(CbmMuchSectorRectangular* sector);
-  Double_t GetInitY(CbmMuchSectorRectangular* sector);
-  Double_t GetGridCellX(Int_t ix);
-  Double_t GetGridCellY(Int_t iy);
-
 
   ClassDef(CbmMuchModuleGemRectangular,1);
 };

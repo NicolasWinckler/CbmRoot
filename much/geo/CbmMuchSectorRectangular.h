@@ -19,7 +19,7 @@ using std::vector;
 
 class CbmMuchPadRectangular;
 
-class CbmMuchSectorRectangular : public CbmMuchSector{
+class CbmMuchSectorRectangular : public CbmMuchSector, public TPave{
 public:
   CbmMuchSectorRectangular();
   CbmMuchSectorRectangular(Int_t detId, Int_t secId, TVector3 pos, TVector3 size, Int_t padNx, Int_t padNy);
@@ -37,13 +37,14 @@ public:
   Double_t GetYmin()     const { return fPosition[1]-fSize[1]/2;}
 
 //  TArrayI  GetNeighbours() const { return fNeighbours; }
-  void SetNeighbours(TArrayI &array) { fNeighbours = array; }
-  Bool_t Inside(Double_t x, Double_t y) const {return 0; } // TODO
-  vector<CbmMuchSectorRectangular*> GetNeighbours();
+  void SetNeighbours(vector<CbmMuchSectorRectangular*> neighbours) { fNeighbours = neighbours; }
+  Bool_t Inside(Double_t x, Double_t y) {return x>fX1 && x<fX2 && y>fY1 && y<fY2;}
+  Bool_t IsIncomplete() { return kFALSE; }
+  
+  vector<CbmMuchSectorRectangular*> GetNeighbours() { return fNeighbours; }
   CbmMuchPadRectangular* GetPad(Double_t x, Double_t y);
   void AddPads();
   void DrawPads();
-  void Draw() { DrawPads(); }
 
 protected:
   TVector3 fPosition;
@@ -52,7 +53,7 @@ protected:
   Int_t fPadNy;
   Double_t fPadDx;
   Double_t fPadDy;
-  TArrayI fNeighbours;
+  vector<CbmMuchSectorRectangular*> fNeighbours; //!
 
   ClassDef(CbmMuchSectorRectangular,1);
 

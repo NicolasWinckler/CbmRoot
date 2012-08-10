@@ -43,7 +43,7 @@ vector<CbmMuchPad*> CbmMuchModuleGem::GetPads() {
     CbmMuchSector* sector = GetSector(iSector);
     if(!sector) continue;
     for(Int_t iPad=0; iPad<sector->GetNChannels(); ++iPad){
-      CbmMuchPad* pad = sector->GetPad(iPad);
+      CbmMuchPad* pad = sector->GetPadByChannelIndex(iPad);
       if(!pad) continue;
       pads.push_back(pad);
     }
@@ -57,7 +57,7 @@ vector<CbmMuchPad*> CbmMuchModuleGem::GetPads() {
 CbmMuchPad* CbmMuchModuleGem::GetPad(Long64_t channelId) {
   CbmMuchSector* sector = GetSector(channelId);
   Int_t iChannel = GetChannelIndex(channelId);
-  return sector ? sector->GetPad(iChannel) : NULL;
+  return sector ? sector->GetPadByChannelIndex(iChannel) : NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ void CbmMuchModuleGem::DrawPads() {
 
 void CbmMuchModuleGem::SetPadFired(Long64_t channelId,Int_t digiIndex,Int_t adcCharge){
   CbmMuchSector* sector = GetSector(channelId);
-  CbmMuchPad* pad = sector->GetPad(CbmMuchModuleGem::GetChannelIndex(channelId));
+  CbmMuchPad* pad = sector->GetPadByChannelIndex(CbmMuchModuleGem::GetChannelIndex(channelId));
   pad->SetFired(digiIndex,adcCharge);
 }
 ClassImp(CbmMuchModuleGem)

@@ -20,9 +20,9 @@ CbmMuchPadRectangular::CbmMuchPadRectangular()
 CbmMuchPadRectangular::CbmMuchPadRectangular(Int_t detId, Long64_t channelId, 
     Double_t x, Double_t y, Double_t lx, Double_t ly)
   :CbmMuchPad(detId,channelId,x,y,lx,ly),
-   TPave(x-lx/2,y-ly/2,x+lx/2,y+ly/2)
+   TPave(x-lx/2,y-ly/2,x+lx/2,y+ly/2,1)
 {
-  SetFillColor(0);
+  SetFillColor(kYellow);
   SetLineWidth(1);
   SetLineColor(34);
 }
@@ -44,13 +44,13 @@ void CbmMuchPadRectangular::SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCCha
   else SetFillColor(kYellow);
 }
 // -------------------------------------------------------------------------
-//
-//// -------------------------------------------------------------------------
-//void CbmMuchPadRectangular::DrawPad(){
-//  Draw("f");
-//  Draw();
-//}
-//// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+void CbmMuchPadRectangular::DrawPad(){
+  Draw("f");
+  Draw();
+}
+// -------------------------------------------------------------------------
 //
 //
 //// -------------------------------------------------------------------------

@@ -17,7 +17,7 @@
 
 // -------------------------------------------------------------------------
 CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* digiFileName) 
-  : FairTask("MuchFindHitsAdvancedGem", 1) ,
+  : FairTask("MuchFindHitsGem", 1) ,
     fAlgorithm(3),
     fDigiFile(""),
     fClusterSeparationTime(100.),

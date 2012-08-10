@@ -32,7 +32,6 @@ class CbmMuchSectorRadial : public CbmMuchSector{
   Double_t GetR2() const { return fR2; }
   void AddPads();
   void DrawPads();
-  void Draw() { DrawPads(); }
 private:
   Double_t fR1;
   Double_t fR2;

@@ -582,7 +582,7 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
 // TODO
 //          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
 //          sector->Draw("f");
-          sector->Draw();
+//          sector->Draw();
           const char* side = iSide ? "Back" : "Front";
           fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", sector->GetSize()[0], sector->GetSize()[1],
               sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);

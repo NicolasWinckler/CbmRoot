@@ -6,7 +6,7 @@
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchSectorRectangular::CbmMuchSectorRectangular()
-  : CbmMuchSector(),
+  : CbmMuchSector(),TPave(),
     fPosition(),
     fSize(),
     fPadNx(0),
@@ -23,6 +23,7 @@ CbmMuchSectorRectangular::CbmMuchSectorRectangular()
 CbmMuchSectorRectangular::CbmMuchSectorRectangular(Int_t detId, Int_t secId, 
     TVector3 pos, TVector3 size, Int_t padNx, Int_t padNy)
   : CbmMuchSector(detId,secId,padNx*padNy),
+    TPave(pos[0]-size[0]/2,pos[1]-size[1]/2,pos[0]+size[0]/2,pos[1]+size[1]/2,1),
     fPosition(pos),
     fSize(size),
     fPadNx(padNx),
@@ -35,8 +36,8 @@ CbmMuchSectorRectangular::CbmMuchSectorRectangular(Int_t detId, Int_t secId,
 // -------------------------------------------------------------------------
 
 CbmMuchPadRectangular* CbmMuchSectorRectangular::GetPad(Double_t x, Double_t y){
-  Int_t ix = Int_t(GetXmin()/fPadDx);
-  Int_t iy = Int_t(GetYmin()/fPadDy);
+  Int_t ix = Int_t((x-GetXmin())/fPadDx);
+  Int_t iy = Int_t((y-GetYmin())/fPadDy);
   if (ix<0 || ix >=fPadNx) return NULL;
   if (iy<0 || iy >=fPadNy) return NULL;
   Int_t channelIndex = fPadNy*ix+iy;
@@ -52,28 +53,23 @@ void CbmMuchSectorRectangular::AddPads(){
       Long64_t channelId = CbmMuchModuleGem::GetChannelId(fSectorId,channelIndex);
       Double_t x0 = GetXmin()+(ix+0.5)*fPadDx;
       Double_t y0 = GetYmin()+(iy+0.5)*fPadDy;
-      CbmMuchPad* pad = new CbmMuchPadRectangular(fDetectorId,channelId,x0,y0,fPadDx,fPadDy);
+      CbmMuchPadRectangular* pad = new CbmMuchPadRectangular(fDetectorId,channelId,x0,y0,fPadDx,fPadDy);
       fPads.push_back(pad);
     }
   }
 }
 // -------------------------------------------------------------------------
 
-vector<CbmMuchSectorRectangular*> CbmMuchSectorRectangular::GetNeighbours(){
-  vector<CbmMuchSectorRectangular*> neighbours;
-  // TODO
-  return neighbours;
-}
-
 // -------------------------------------------------------------------------
 void CbmMuchSectorRectangular::DrawPads(){
   for(Int_t iChannel = 0; iChannel < fNChannels; iChannel++){
      CbmMuchPadRectangular* pad = (CbmMuchPadRectangular*) fPads[iChannel];
+     if (!pad) return;
      pad->DrawPad();
-//     pad->Draw();
   }
 }
 // -------------------------------------------------------------------------
+
 
 
 ClassImp(CbmMuchSectorRectangular)

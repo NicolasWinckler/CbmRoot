@@ -199,6 +199,7 @@ Bool_t CbmMuchDigitizeGem::ExecPoint(CbmMuchPoint* point, Int_t iPoint) {
     if (module->GetDetectorType()==1){
       CbmMuchModuleGemRectangular* module1 = (CbmMuchModuleGemRectangular*) module;
       pad = module1->GetPad(v[0],v[1]);
+      if (pad) printf("x0=%f,y0=%f\n",pad->GetX(),pad->GetY());
     } else if (module->GetDetectorType()==3){
       CbmMuchModuleGemRadial* module3 = (CbmMuchModuleGemRadial*) module;
       pad = module3->GetPad(v[0],v[1]);
@@ -239,7 +240,7 @@ Bool_t CbmMuchDigitizeGem::ExecPoint(CbmMuchPoint* point, Int_t iPoint) {
         CbmMuchSector* sector  = (*it).first;
         if (!sector) continue;
         for (Int_t iPad=0;iPad<sector->GetNChannels();iPad++){
-          CbmMuchPad* pad = sector->GetPad(iPad);
+          CbmMuchPad* pad = sector->GetPadByChannelIndex(iPad);
           Double_t xp0 = pad->GetX();
           Double_t xpd = pad->GetDx()/2.;
           Double_t xp1 = xp0-xpd;

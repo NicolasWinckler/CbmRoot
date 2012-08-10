@@ -57,7 +57,7 @@ CbmMuchPadRadial* CbmMuchSectorRadial::GetPadByPhi(Double_t phi) {
 //  printf("i=%i\n",i);
   if (i==-1) return NULL;
   
-  return (CbmMuchPadRadial*) GetPad(i);
+  return (CbmMuchPadRadial*) GetPadByChannelIndex(i);
 }
 // -------------------------------------------------------------------------
 

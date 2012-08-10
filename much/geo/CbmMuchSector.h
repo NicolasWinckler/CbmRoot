@@ -25,11 +25,10 @@ public:
   Int_t GetDetectorId() const { return fDetectorId; }
   Int_t GetSectorId()   const { return fSectorId; }
   Int_t GetNChannels()  const { return fNChannels; }
-  CbmMuchPad* GetPad(Int_t iChannel) const { return fPads[iChannel]; }
+  CbmMuchPad* GetPadByChannelIndex(Int_t iChannel) const { return fPads[iChannel]; }
 //  virtual void GetPadVertices(Int_t iChannel, Double_t* xPad, Double_t* yPad) {}
   virtual void AddPads() {}
   virtual void DrawPads() {}
-  virtual void Draw() {}
 protected:
   Int_t      fDetectorId;    //  Detector ID (including module number)
   Int_t      fSectorId;      //  Sector index within the module

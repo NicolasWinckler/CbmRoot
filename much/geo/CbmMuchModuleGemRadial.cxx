@@ -78,10 +78,10 @@ Bool_t CbmMuchModuleGemRadial::InitModule(){
     CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) GetSector(s);
     if (!sector) continue;
     for (Int_t p=0;p<sector->GetNChannels();p++){
-      CbmMuchPadRadial* pad = (CbmMuchPadRadial*) sector->GetPad(p);
+      CbmMuchPadRadial* pad = (CbmMuchPadRadial*) sector->GetPadByChannelIndex(p);
       if (!pad) continue;
-      if (p>0)                        neighbours.push_back(sector->GetPad(p-1));
-      if (p<sector->GetNChannels()-1) neighbours.push_back(sector->GetPad(p+1));
+      if (p>0)                        neighbours.push_back(sector->GetPadByChannelIndex(p-1));
+      if (p<sector->GetNChannels()-1) neighbours.push_back(sector->GetPadByChannelIndex(p+1));
       CbmMuchSectorRadial* sec1 = s>0 ?               (CbmMuchSectorRadial*) GetSector(s-1) : 0;
       CbmMuchSectorRadial* sec2 = s<GetNSectors()-1 ? (CbmMuchSectorRadial*) GetSector(s+1) : 0;
       Double_t phi1 = pad->GetPhi1()-0.001;
@@ -91,14 +91,14 @@ Bool_t CbmMuchModuleGemRadial::InitModule(){
         CbmMuchPad* pad12 = sec1->GetPadByPhi(phi2);
         Int_t iMin = (pad11) ? pad11->GetChannelIndex() : 0;
         Int_t iMax = (pad12) ? pad12->GetChannelIndex() : sec1->GetNChannels()-1;
-        for (Int_t i=iMin;i<=iMax;i++) neighbours.push_back(sec1->GetPad(i));
+        for (Int_t i=iMin;i<=iMax;i++) neighbours.push_back(sec1->GetPadByChannelIndex(i));
       }
       if (sec2) {
         CbmMuchPad* pad21 = sec2->GetPadByPhi(phi1);
         CbmMuchPad* pad22 = sec2->GetPadByPhi(phi2);
         Int_t iMin = (pad21) ? pad21->GetChannelIndex() : 0;
         Int_t iMax = (pad22) ? pad22->GetChannelIndex() : sec2->GetNChannels()-1;
-        for (Int_t i=iMin;i<=iMax;i++) neighbours.push_back(sec2->GetPad(i));
+        for (Int_t i=iMin;i<=iMax;i++) neighbours.push_back(sec2->GetPadByChannelIndex(i));
       }
       pad->SetNeighbours(neighbours);
       neighbours.clear();

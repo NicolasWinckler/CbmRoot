@@ -20,7 +20,7 @@ CbmMuchSector::CbmMuchSector(Int_t detId, Int_t secId, Int_t nChannels)
     fNChannels(nChannels),
     fPads()
 {
-  fPads.resize(nChannels);
+//  fPads.resize(nChannels);
 }
 // -------------------------------------------------------------------------
 

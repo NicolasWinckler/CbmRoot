@@ -24,13 +24,6 @@
 #include "TColor.h"
 #include "TSystem.h"
 
-#include <stdio.h>
-#include <cassert>
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
 // -----   Default constructor   -------------------------------------------
 CbmMuchSegmentManual::CbmMuchSegmentManual()
   : FairTask(),
@@ -272,8 +265,6 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGemRectangular* module, Bo
   Int_t iRegion = -1;
   Double_t secMaxLx = GetSectorMaxSize(module, "Width", iRegion);
   Double_t secMaxLy = GetSectorMaxSize(module, "Length", iRegion);
-  assert(TMath::Abs(secMaxLx - fSecLx[iStation].at(iRegion)) < 1e-5);
-  assert(TMath::Abs(secMaxLy - fSecLy[iStation].at(iRegion)) < 1e-5);
   Double_t padMaxLx = GetPadMaxSize(module, "Width");
   Double_t padMaxLy = GetPadMaxSize(module, "Length");
   TVector3 size = module->GetSize();
@@ -405,10 +396,6 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGemRectangular* module, Cb
   Double_t sLy = nR == 0 ? secLy : nR*GetSectorMaxSize(module, "Length", iReg);
   nCols = Int_t(sLx/pLx);
   nRows = Int_t(sLy/pLy);
-
-  assert(resultX || resultY);
-  assert(!(resultX && resultY));
-  assert(iRegion > -1);
   delete sector;
 
   TVector3 position, size;
@@ -699,10 +686,9 @@ void CbmMuchSegmentManual::DrawSegmentation(){
       CbmMuchLayerSide* layerSide = layer->GetSide(iSide);
       for (Int_t iModule=0;iModule<layerSide->GetNModules();++iModule) {
         CbmMuchModule* mod = layerSide->GetModule(iModule);
-        mod->SetFillStyle(0);
-        mod->Draw();
         if(mod->GetDetectorType() != 1) continue;
         CbmMuchModuleGemRectangular* module = (CbmMuchModuleGemRectangular*)mod;
+        module->InitModule();
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
           CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSectorByIndex(iSector);
           // Reject incomplete sectors by size
@@ -718,8 +704,7 @@ void CbmMuchSegmentManual::DrawSegmentation(){
 //            Int_t j = Int_t((secLy+1e-5)/fSecLy[iStation].at(0)) - 1;
 //            sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
 //          }
-//          sector->Draw("f");
-          sector->Draw();
+          sector->DrawPads();
           const char* side = iSide ? "Back" : "Front";
           fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", secLx, secLy,
               sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);

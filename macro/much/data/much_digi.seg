@@ -6,13 +6,13 @@
 Number of stations          :   6
 
 # Station specification
-Number of channels          : 128     128     128     128     128     128
+Number of channels          :  64      64      64      64      64      64
 Number of regions           :   4       1       1       1       1       1
 
 # Station 1
 Region radii [cm]           :   20     40      60      90
 Pad width [cm]              :  0.2    0.4     0.8     1.6
-Pad length [cm]             :  0.4    1.6     3.2     3.2
+Pad length [cm]             :  0.2    0.4     0.8     1.6
 
 # Station 2
 Region radii [cm]           :  110

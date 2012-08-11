@@ -93,12 +93,12 @@ InitStatus CbmAnaMuchJpsiPolarization::Init()
   fEvent=0;
   
   if (!(fMCTracks&&fStsPoints&&fMuchPoints&&fMuchHits&&fStsTracks&&fMuchTracks&&fMuchTrackMatches&&fStsTrackMatches)){
-    printf(" %i",fStsPoints);
-    printf(" %i",fMuchPoints);
-    printf(" %i",fStsTracks);
-    printf(" %i",fMuchHits);
-    printf(" %i",fMuchTracks);
-    printf(" %i",fMuchTrackMatches);
+    printf(" %p",fStsPoints);
+    printf(" %p",fMuchPoints);
+    printf(" %p",fStsTracks);
+    printf(" %p",fMuchHits);
+    printf(" %p",fMuchTracks);
+    printf(" %p",fMuchTrackMatches);
     printf("\n");
     Fatal("Init","One of TCloneArrays not available");
   }  

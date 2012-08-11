@@ -79,8 +79,8 @@ InitStatus CbmAnaDimuonHisto::Init()
   fEvent=0;
   
   if (!(fMuCandidates && fDimuonCandidates)){
-    printf(" %i",fMuCandidates);
-    printf(" %i",fDimuonCandidates);
+    printf(" %p",fMuCandidates);
+    printf(" %p",fDimuonCandidates);
     printf("\n");
     Fatal("Init","One of TCloneArrays not available");
   }  

@@ -68,7 +68,7 @@ void CbmAnaHypRecEff::Exec(Option_t* option){
   printf("Event:%i\n",fEvent++);
   hEventCounter->Fill(0);
 
-  Int_t fDaPdg=0;
+  fDaPdg=0;
   if (fMoPdg==3312) fDaPdg=-211;
   if (fMoPdg==3334) fDaPdg=-321;
 

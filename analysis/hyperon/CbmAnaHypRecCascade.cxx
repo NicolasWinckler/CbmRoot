@@ -70,7 +70,7 @@ void CbmAnaHypRecCascade::Exec(Option_t* option){
 
   CreateDaVector();
   printf("  nLambda=%2i",fListRCLambda->GetEntriesFast());
-  printf("  nDa=%3i",vDa.size());
+  printf("  nDa=%3lu",vDa.size());
   printf("\n");
 
   for (unsigned j=0;j<vDa.size();j++){

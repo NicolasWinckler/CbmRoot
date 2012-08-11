@@ -103,10 +103,10 @@ InitStatus CbmAnaMuch::Init(){
   fEvent=0;
 //  printf(" %i",fStsPoints);
 //  printf(" %i",fMuchPoints);
-  printf(" %i",fStsTracks);
-  printf(" %i",fMuchHits);
-  printf(" %i",fMuchTracks);
-  printf(" %i",fMuchTrackMatches);
+  printf(" %p",fStsTracks);
+  printf(" %p",fMuchHits);
+  printf(" %p",fMuchTracks);
+  printf(" %p",fMuchTrackMatches);
   printf("\n");
 
   hAllP     = new TH1D("hAllP"    ,"All muons distribution vs P;p [GeV/c]; Entries"    ,PBINNING);

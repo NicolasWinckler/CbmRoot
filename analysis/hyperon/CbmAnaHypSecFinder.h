@@ -156,7 +156,7 @@ class Hit{
   Int_t    tr;
   CbmKFHit* hit;
   CbmKFStsHit sHit;
-  int operator==(const Hit &hit){ return id == hit.id; }
+  int operator==(const Hit &h){ return id == h.id; }
 
   CbmKFHit *GetKFHit(){
     return &sHit;
@@ -176,7 +176,7 @@ class GreaterY{
   Double_t y;
 public:
   GreaterY(Double_t y_min) { y=y_min; }
-  bool operator () (Hit &hit) { return (hit.y > y); }
+  bool operator () (Hit &h) { return (h.y > y); }
 };
 
 #endif

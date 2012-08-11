@@ -24,7 +24,6 @@ void CbmAnaHypTools::Init(){
   fPV            = (CbmVertex*)    ioman->GetObject("PrimaryVertex");
   fTrackMatch    = (TClonesArray*) ioman->GetObject("StsTrackMatch");
 
-  TVector3 pv;
   fPV->Position(pv);
 }
 

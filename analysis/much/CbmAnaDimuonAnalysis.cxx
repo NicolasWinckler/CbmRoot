@@ -107,14 +107,14 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   fEvent=0;
   
   if (!(fMCTracks&&fStsPoints&&fMuchPoints&&fMuchPixelHits&&fStsTracks&&fMuchTracks&&fMuchTrackMatches&&fStsTrackMatches)){
-    printf(" %i",fStsPoints);
-    printf(" %i",fMuchPoints);
-    printf(" %i",fStsTracks);
-    printf(" %i",fMuchPixelHits);
-    printf(" %i",fMuchTracks);
-    printf(" %i",fMuchTrackMatches);
-    printf(" %i",fMuchPixelHits);
-    printf(" %i",fMuchStrawHits);
+    printf(" %p",fStsPoints);
+    printf(" %p",fMuchPoints);
+    printf(" %p",fStsTracks);
+    printf(" %p",fMuchPixelHits);
+    printf(" %p",fMuchTracks);
+    printf(" %p",fMuchTrackMatches);
+    printf(" %p",fMuchPixelHits);
+    printf(" %p",fMuchStrawHits);
     printf("\n");
     Fatal("Init","One of TCloneArrays not available");
   }  

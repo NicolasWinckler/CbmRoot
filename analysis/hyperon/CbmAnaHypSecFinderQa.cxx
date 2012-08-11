@@ -355,7 +355,7 @@ void CbmAnaHypSecFinderQa::Analyse(){
   for (Int_t stl=0;stl<fNstations-3;stl++){
 //  for (Int_t stl=0;stl<1;stl++){
     if (fVerbose) printf("  Station:%i",stl);
-    if (fVerbose) printf("  lhits:%i\n",vHits[stl].size());
+    if (fVerbose) printf("  lhits:%lu\n",vHits[stl].size());
     for (unsigned il=0;il<vHits[stl].size();il++){
       Hit &hl = vHits[stl][il];
       if (hl.used) continue;
@@ -436,10 +436,10 @@ void CbmAnaHypSecFinderQa::Analyse(){
           if (stl==0) fAll++;
           if (sig_triplet && stl==0) fSig++;
 
-        Bool_t sig = (hl.tr==hm.tr && hm.tr==hr.tr && hm.tr!=-1 && fTools->IsL1accepted(hl.tr)>3);
+         sig = (hl.tr==hm.tr && hm.tr==hr.tr && hm.tr!=-1 && fTools->IsL1accepted(hl.tr)>3);
          //if (!sig) continue;
          CbmKFTrack track;
-          C = track.GetCovMatrix();
+         C = track.GetCovMatrix();
          T = track.GetTrack();
 
          for (Int_t i=0;i<5;i++) track.GetTrack()[i]=0;
@@ -759,8 +759,8 @@ void CbmAnaHypSecFinderQa::AnalyseDoubleStrips(){
     Hit &h0 = vHits[0][i];
     if (h0.tr==-1) { continue; }
     if (fTools->IsL1accepted(h0.tr)<4) continue;
-    for (unsigned i=0;i<vHits[1].size();i++){
-      Hit &h1 = vHits[1][i];
+    for (unsigned j=0;j<vHits[1].size();j++){
+      Hit &h1 = vHits[1][j];
       if (h0.tr!=h1.tr) continue;
       hTxS[0]->Fill(TMath::Abs((h0.x-h1.x)/(h0.z-h1.z)));
       hTyS[0]->Fill(TMath::Abs((h0.y-h1.y)/(h0.z-h1.z)));
@@ -778,12 +778,12 @@ void CbmAnaHypSecFinderQa::AnalyseDoubleStrips(){
   Int_t nFake=0;
 
 
-  printf("nHits:%i\n",vHits[0].size());
+  printf("nHits:%lu\n",vHits[0].size());
   for (unsigned i=0;i<vHits[0].size();i++){
     Hit &h0 = vHits[0][i];
 
-    for (unsigned i=0;i<vHits[1].size();i++){
-      Hit &h1 = vHits[1][i];
+    for (unsigned j=0;j<vHits[1].size();j++){
+      Hit &h1 = vHits[1][j];
 
       if (TMath::Abs(h0.x-h1.x) > dx) continue;
       if (TMath::Abs(h0.y-h1.y) > dy) continue;
@@ -868,7 +868,7 @@ void CbmAnaHypSecFinderQa::AddNextStationAna(CbmKFTrackSec &track, Int_t st){
   track.Fit(1);
   Double_t chi2=track.GetRefChi2()/track.GetRefNDF();
   printf("iAll:%i  ",iAll);
-  printf("nHits:%i  ",track.hits.size());
+  printf("nHits:%lu  ",track.hits.size());
   if   (track.Sig()) printf("+Fit!!! chi2=%6.2f\n",chi2);
   else printf(" Fit!!! chi2=%6.2f\n",chi2);
   h.used=true;

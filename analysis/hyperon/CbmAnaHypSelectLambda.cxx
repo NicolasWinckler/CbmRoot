@@ -143,8 +143,8 @@ void CbmAnaHypSelectLambda::Exec(Option_t * option){
     if (fVerbose>1) printf("\n");
   }
 
-  if (fVerbose) printf(" pos.tracks: %2i",vP.size());
-  if (fVerbose) printf(" neg.tracks: %2i",vN.size());
+  if (fVerbose) printf(" pos.tracks: %2lu",vP.size());
+  if (fVerbose) printf(" neg.tracks: %2lu",vN.size());
 
   for (unsigned i=0;i<vP.size();i++){
     CbmAnaHypTrack &tp = vP[i];

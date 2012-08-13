@@ -180,32 +180,16 @@ void global_reco(Int_t nEvents = 5, // number of events
 		// ------------------------------------------------------------------------
 
 		if (IsMuch(parFile)) {
-			// ----- MUCH reconstruction ---------------------------------------
-		   if (muchHitProducerType == "simple") {
-            CbmMuchDigitizeSimpleGem* muchDigitize = 	new CbmMuchDigitizeSimpleGem(
-                  "MuchDigitize", muchDigiFile.Data(), iVerbose);
-            run->AddTask(muchDigitize);
-            CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem(
-                  "MuchFindHits", muchDigiFile.Data(), iVerbose);
-            run->AddTask(muchFindHits);
-		   } else if (muchHitProducerType == "advanced") {
-            CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem(
-                  "MuchDigitizeAdvancedGem", muchDigiFile.Data(), iVerbose);
-            digitize->SetSpotRadius(0.05);
-            digitize->SetQThreshold(3);
-            digitize->SetQMaximum(500000);
-            digitize->SetNADCChannels(256);
-            digitize->SetDeadPadsFrac(0.05);
-            run->AddTask(digitize);
-
-            CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem(
-                  "MuchFindHitsAdvancedGem", muchDigiFile.Data(), iVerbose);
-            findHits->SetAlgorithm(3);
-            findHits->SetNStations(6);
-            Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-            findHits->SetThresholdRatios(thresholds);
-            run->AddTask(findHits);
-		   }
+			// -------- MUCH digitization ------------
+			CbmMuchDigitizeGem* digitize = new CbmMuchDigitizeGem(muchDigiFile.Data());
+			if (muchHitProducerType == "simple") {
+				digitize->SetAlgorithm(0);
+			} else if (muchHitProducerType == "advanced") {
+				digitize->SetAlgorithm(1);
+			}
+			run->AddTask(digitize);
+			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
+			run->AddTask(findHits);
 
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
 			      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
@@ -213,8 +197,6 @@ void global_reco(Int_t nEvents = 5, // number of events
 			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
 					"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
 			strawFindHits->SetMerge(1);
-//			strawFindHits->SetMirror(1);
-//			strawFindHits->SetBinary();
 			run->AddTask(strawFindHits);
 			// -----------------------------------------------------------------
 		}

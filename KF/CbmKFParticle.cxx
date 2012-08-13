@@ -13,7 +13,9 @@
 #include "CbmKFTrack.h"
 #include "CbmStsKFTrackFitter.h"
 #include "TMath.h"
-#include "TDatabasePDG.h"
+//#include "TDatabasePDG.h"
+
+#include "CbmKFParticleDatabase.h"
 
 #include <cmath>
 #include <vector>
@@ -49,7 +51,8 @@ CbmKFParticle::CbmKFParticle( CbmKFTrackInterface* Track, Double_t *z0, Int_t  *
   double Mass = Tr.GetMass();
   if(pdg)
   {
-    Mass=TDatabasePDG::Instance()->GetParticle(*pdg)->Mass();
+    Mass=CbmKFParticleDatabase::Instance()->GetMass(*pdg);
+//    Mass=TDatabasePDG::Instance()->GetParticle(*pdg)->Mass();
   }
 
 

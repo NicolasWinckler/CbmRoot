@@ -17,7 +17,9 @@
 
 #include "CbmKFHit.h"
 #include "CbmStsHit.h"
-#include "TDatabasePDG.h"
+//#include "TDatabasePDG.h"
+
+#include "CbmKFParticleDatabase.h"
 
 //#include "CbmKFField.h"
 
@@ -47,7 +49,19 @@ CbmKFParticle_simd::CbmKFParticle_simd(): fId(-1), fDaughterIds(), NDF(0), Chi2(
 }
 
 
-CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part): fId(part.Id()), fDaughterIds(), NDF(part.GetNDF()), Chi2(part.GetChi2()), Q(part.GetQ()), fPDG(part.GetPDG()), AtProductionVertex(part.GetAtProductionVertex()), fIsVtxGuess(0), fIsVtxErrGuess(0), fField() {
+CbmKFParticle_simd::CbmKFParticle_simd( CbmKFParticle &part):
+ fId(part.Id()),
+ fDaughterIds(),
+ NDF(part.GetNDF()),
+ Chi2(part.GetChi2()),
+ Q(part.GetQ()),
+ fPDG(part.GetPDG()),
+ AtProductionVertex(part.GetAtProductionVertex()),
+ fIsVtxGuess(0),
+ fIsVtxErrGuess(0),
+ fField()
+{
+  SetNDaughters(part.NDaughters());
   for( int i = 0; i < part.NDaughters(); ++i ) {
     fDaughterIds.push_back( part.DaughterIds()[i] );
   }
@@ -119,7 +133,9 @@ CbmKFParticle_simd::CbmKFParticle_simd(CbmKFTrackInterface &Track, Int_t *qHypo,
     m[i] = Tr.GetTrack()[i];
   for(unsigned int i=0; i<15; i++)
     V[i] = Tr.GetCovMatrix()[i];
-  TrMass = pdg ? TDatabasePDG::Instance()->GetParticle(*pdg)->Mass() :Tr.GetMass();
+//  TrMass = pdg ? TDatabasePDG::Instance()->GetParticle(*pdg)->Mass() :Tr.GetMass();
+  TrMass = pdg ? CbmKFParticleDatabase::Instance()->GetMass(*pdg) :Tr.GetMass();
+
   NDF  = Tr.GetRefNDF();
   Chi2 = Tr.GetRefChi2();
 
@@ -201,23 +217,19 @@ void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks, Int_t
   fvec V[15];
   fvec TrMass;
 
-  double *m1[fvecLen];
-  double *V1[fvecLen];
-  CbmKFTrack *Tr[fvecLen];
   fDaughterIds.push_back( fvec(-1) );
   for (int j=0; j<NTracks; j++)
   {
     fDaughterIds.back()[j] =  Track[j]->Id();
 
-    Tr[j] = new CbmKFTrack(*Track[j]);
-    m1[j] = Tr[j]->GetTrack();
-    V1[j] = Tr[j]->GetCovMatrix();
-    TrMass[j] = pdg ? TDatabasePDG::Instance()->GetParticle(*pdg)->Mass() : Tr[j]->GetMass();
-    NDF[j] = Tr[j]->GetRefNDF();
-    Chi2[j] = Tr[j]->GetRefChi2();
+//    TrMass[j] = pdg ? TDatabasePDG::Instance()->GetParticle(*pdg)->Mass() : Track[j]->GetMass();
+    TrMass[j] = pdg ? CbmKFParticleDatabase::Instance()->GetMass(*pdg) : Track[j]->GetMass();
 
-    for(int i = 0; i < 6; i++) m[i][j] = m1[j][i];
-    for(int i = 0; i < 15; i++) V[i][j] = V1[j][i];
+    NDF[j] = Track[j]->GetRefNDF();
+    Chi2[j] = Track[j]->GetRefChi2();
+
+    for(int i = 0; i < 6; i++) m[i][j] = Track[j]->GetTrack()[i];
+    for(int i = 0; i < 15; i++) V[i][j] = Track[j]->GetCovMatrix()[i];
 
   }
 
@@ -289,10 +301,6 @@ void CbmKFParticle_simd::Create(CbmKFTrackInterface* Track[], int NTracks, Int_t
   AtProductionVertex = 1;
   fIsVtxGuess = false;
   fIsVtxErrGuess = false;
-
-  for(int j=0; j<NTracks; j++)
-    if(Tr[j]) delete Tr[j];
-
 }
 
 void CbmKFParticle_simd::SetField(const L1FieldRegion &field, bool isOneEntry, const int iVec)

@@ -31,6 +31,7 @@
 #include "TDatabasePDG.h"
 
 #include "CbmKFVertex.h"
+#include "CbmKFParticleDatabase.h"
 
 using std::vector;
 
@@ -896,10 +897,9 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
   delete[] fB;
 }
 
-void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &chiToVtx, CbmKFVertex &primVtx)
+void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<L1FieldRegion> &field, vector<float> &chiToVtx, CbmKFVertex &primVtx, float chiPrim)
 {
-  vector<L1FieldRegion> B;
-  CalculateFieldRegion(Tracks,B);
+  chiToVtx.reserve(Tracks.size());
 
   int nTracks_SIMD = fvecLen;
   L1TrackPar T; // fitting parametr coresponding to current track
@@ -913,8 +913,20 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &c
   for(int iSta=0; iSta<nStations; iSta++)
     zSta[iSta] = sta[iSta].z;
 
-  unsigned short N_vTracks = Tracks.size();
+  field.reserve(Tracks.size());
 
+  L1FieldRegion fld _fvecalignment;
+  L1FieldValue fB[3], fB_temp _fvecalignment;
+  fvec zField[3];
+
+  FairRootManager *fManger = FairRootManager::Instance();
+  TClonesArray *listStsHits = (TClonesArray *)  fManger->GetObject("StsHit");
+  TClonesArray *listMvdHits=0;
+  if(NMvdStations>0.)
+    listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
+
+  unsigned short N_vTracks = Tracks.size();
+  int ista;
   for(unsigned short itrack = 0; itrack < N_vTracks; itrack+=fvecLen)
   {
     if(N_vTracks - itrack < static_cast<unsigned short>(fvecLen))
@@ -945,11 +957,51 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &c
       T.C42[iVec] = t[iVec]->GetParamFirst()->GetCovariance(4,1);
       T.C43[iVec] = t[iVec]->GetParamFirst()->GetCovariance(4,3);
       T.C44[iVec] = t[iVec]->GetParamFirst()->GetCovariance(4,4);
-      float mass = TDatabasePDG::Instance()->GetParticle(t[iVec]->GetPidHypo())->Mass();
+//      float mass = TDatabasePDG::Instance()->GetParticle(t[iVec]->GetPidHypo())->Mass();
+      const float mass = CbmKFParticleDatabase::Instance()->GetMass(t[iVec]->GetPidHypo());
       mass2[iVec] = mass*mass;
+
+      int nHitsTrackMvd = t[iVec]->GetNMvdHits();
+      for(int iH = 0; iH < 2; iH++ )
+      {
+        float posx = 0.f, posy = 0.f, posz = 0.f;
+
+        if(iH<nHitsTrackMvd)
+        {
+          if(!listMvdHits) continue;
+          int hitIndex = t[iVec]->GetMvdHitIndex(iH);
+          CbmMvdHit *hit = L1_DYNAMIC_CAST<CbmMvdHit*>(listMvdHits->At(hitIndex));
+
+          posx = hit->GetX();
+          posy = hit->GetY();
+          posz = hit->GetZ();
+          ista = posz < 7.f ? 0 : 1;
+        }
+        else
+        {
+          if(!listStsHits) continue;
+          int hitIndex = t[iVec]->GetStsHitIndex(iH - nHitsTrackMvd);
+          CbmStsHit *hit = L1_DYNAMIC_CAST<CbmStsHit*>(listStsHits->At(hitIndex));
+
+          posx = hit->GetX();
+          posy = hit->GetY();
+          posz = hit->GetZ();
+          ista = hit->GetStationNr()-1+NMvdStations;
+        }
+
+        sta[ista].fieldSlice.GetFieldValue( posx, posy, fB_temp );
+        fB[iH+1].x[iVec] = fB_temp.x[iVec];
+        fB[iH+1].y[iVec] = fB_temp.y[iVec];
+        fB[iH+1].z[iVec] = fB_temp.z[iVec];
+        zField[iH+1][iVec] = posz;
+      }
     }
 
-    L1FieldRegion& fld = B[itrack/fvecLen];
+    fB[0] = CbmL1::Instance()->algo->GetvtxFieldValue();
+    zField[0] = 0;
+    fld.Set( fB[2], zField[2], fB[1], zField[1], fB[0], zField[0] );
+    field.push_back(fld);
+
     for(int iSt= nStations-4; iSt>=0; iSt--)
     {
       fvec zero = ZERO;
@@ -978,12 +1030,46 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<float> &c
 
     for(int iVec=0; iVec<nTracks_SIMD; iVec++)
       chiToVtx.push_back(chi[iVec]);
+
+    if(chiPrim>0)
+    {
+      for(int iVec=0; iVec<nTracks_SIMD; iVec++)
+      {
+        if( chi[iVec] < chiPrim )
+        {
+          t[iVec]->GetParamFirst()->SetX(T.x[iVec]);
+          t[iVec]->GetParamFirst()->SetY(T.y[iVec]);
+          t[iVec]->GetParamFirst()->SetTx(T.tx[iVec]);
+          t[iVec]->GetParamFirst()->SetTy(T.ty[iVec]);
+          t[iVec]->GetParamFirst()->SetQp(T.qp[iVec]);
+          t[iVec]->GetParamFirst()->SetZ(T.z[iVec]);
+
+          t[iVec]->GetParamFirst()->SetCovariance(0,0,T.C00[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(1,0,T.C10[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(1,1,T.C11[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(2,0,T.C20[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(2,1,T.C21[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(2,2,T.C22[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(3,0,T.C30[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(3,1,T.C31[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(3,2,T.C32[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(3,3,T.C33[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(4,0,T.C40[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(4,1,T.C41[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(4,2,T.C42[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(4,3,T.C43[iVec]);
+          t[iVec]->GetParamFirst()->SetCovariance(4,4,T.C44[iVec]);
+        }
+      }
+    }
   }
   delete[] zSta;
 }
 
 void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1FieldRegion> &field)
 {
+  field.reserve(Tracks.size());
+
   L1FieldRegion fld _fvecalignment;
 
   FairRootManager *fManger = FairRootManager::Instance();

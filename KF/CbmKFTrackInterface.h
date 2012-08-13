@@ -23,7 +23,7 @@
 class CbmKFHit;
 class CbmKFVertexInterface;
 
-class CbmKFTrackInterface :public TObject{
+class CbmKFTrackInterface {
   
  public:  
 

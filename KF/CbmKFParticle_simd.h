@@ -56,7 +56,10 @@ class CbmKFParticle_simd {
   fvec GetChi2 ()  const { return Chi2; }
   fvec GetNDF  ()  const { return NDF;  }
   fvec *GetParameters()  { return r; }
+  const fvec *GetParameters() const  { return r; }
   fvec *GetCovMatrix()   { return C; }
+  fvec GetParameter ( Int_t i )          const { return r[i]; }
+  fvec GetCovariance( Int_t i )          const { return C[i]; }
   
 //  fvec GetParameter ( Int_t i )          const { return r[i]; }
 //  fvec GetCovariance( Int_t i )          const { return C[i]; }
@@ -115,7 +118,9 @@ class CbmKFParticle_simd {
   const fvec& GetPDG () const { return fPDG; }
 
   void SetId( fvec id ){ fId = id; };
+  void SetNDaughters( int n ) { fDaughterIds.reserve(n); }
   void AddDaughterId( fvec id ){ fDaughterIds.push_back(id); };
+  void CleanDaughtersId() { fDaughterIds.clear(); }
 
   fvec Id() const { return fId; };
   int NDaughters() const { return fDaughterIds.size(); };

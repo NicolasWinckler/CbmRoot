@@ -1421,6 +1421,8 @@ void CbmL1::TrackFitPerformance()
   const int Nh_fit = 12;
   static TH1F *h_fit[Nh_fit], *h_fitL[Nh_fit], *h_fitSV[Nh_fit], *h_fitPV[Nh_fit], *h_fit_chi2;
 
+  static TH2F *PRes2D, *PRes2DPrim, *PRes2DSec;
+
   static bool first_call = 1;
 
   if ( first_call )
@@ -1432,7 +1434,10 @@ void CbmL1::TrackFitPerformance()
     gDirectory->mkdir("Fit");
     gDirectory->cd("Fit");
     {
-      
+      PRes2D = new TH2F("PRes2D", "Resolution P vs P", 100, 0., 20.,100, -15., 15.);
+      PRes2DPrim = new TH2F("PRes2DPrim", "Resolution P vs P", 100, 0., 20.,100, -15., 15.);
+      PRes2DSec  = new TH2F("PRes2DSec",  "Resolution P vs P", 100, 0., 20.,100, -15., 15.);
+
       struct {
         const char *name;
         const char *title;
@@ -1509,6 +1514,15 @@ void CbmL1::TrackFitPerformance()
       h_fit[2]->Fill((mc.px/mc.pz-it->T[2])*1.e3);
       h_fit[3]->Fill((mc.py/mc.pz-it->T[3])*1.e3);
       h_fit[4]->Fill(it->T[4]/mc.q*mc.p-1);
+
+      PRes2D->Fill( mc.p, (1./fabs(it->T[4]) - mc.p)/mc.p*100. );
+
+      CbmL1MCTrack mcTrack = *(it->GetMCTracks()[0]);
+      if(mcTrack.IsPrimary())
+        PRes2DPrim->Fill( mc.p, (1./fabs(it->T[4]) - mc.p)/mc.p*100. );
+      else
+        PRes2DSec->Fill( mc.p, (1./fabs(it->T[4]) - mc.p)/mc.p*100. );
+
       if( finite(it->C[0]) && it->C[0]>0 )h_fit[5]->Fill( (mc.x-it->T[0])/sqrt(it->C[0]));
       if( finite(it->C[2]) && it->C[2]>0 )h_fit[6]->Fill( (mc.y-it->T[1])/sqrt(it->C[2]));
       if( finite(it->C[5]) && it->C[5]>0 )h_fit[7]->Fill( (mc.px/mc.pz-it->T[2])/sqrt(it->C[5]));

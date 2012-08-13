@@ -39,7 +39,8 @@ class CbmKFPartEfficiencies: public TNamed
                                 411,-411, //D+, D-
                                 431,-431, //Ds+, Ds-
                                 4122,-4122, //Lambdac
-                                10421, -10421, 10411, -10411, 20411, -20411
+                                10421, -10421, 10411, -10411, 20411, -20411,
+                                3001 //H->Lambda p pi
                                };
     TString mPartName[nParticles] = {"ks","lambda","lambdab","xi-","xi+","omega-","omega+",
                                      "k*0","k*0b","k*+","k*-",
@@ -56,7 +57,8 @@ class CbmKFPartEfficiencies: public TNamed
                                      "D+","D-",
                                      "Ds+","Ds-",
                                      "lambdac", "lambdacb",
-                                     "D*0", "D*0b", "D*+", "D*-", "D*+_4", "D*-_4"
+                                     "D*0", "D*0b", "D*+", "D*-", "D*+_4", "D*-_4",
+                                     "H0"
                                     };
     TString mPartTitle[nParticles] = {"KShort   ", //0
                                       "Lambda   ", //1
@@ -104,7 +106,8 @@ class CbmKFPartEfficiencies: public TNamed
                                       "D*+      ", //43
                                       "D*-      ", //44
                                       "D*+_4    ", //45
-                                      "D*-_4    " //46
+                                      "D*-_4    ", //46
+                                      "H0       " //47
                                      };
 
     float mPartMHistoMin[nParticles] = {0.3, 1., 1., 1., 1.,1.,1.,
@@ -122,7 +125,8 @@ class CbmKFPartEfficiencies: public TNamed
                                         1.,1.,
                                         1.,1.,
                                         1.8,1.8,
-                                        1.8,1.8,1.8,1.8,1.8,1.8};
+                                        1.8,1.8,1.8,1.8,1.8,1.8,
+                                        1.};
     float mPartMHistoMax[nParticles] = {1.3, 2., 2., 3., 3., 3., 3.,
                                         2.6, 2.6, 2.6, 2.6,
                                         3., 3., 3., 3.,
@@ -138,7 +142,8 @@ class CbmKFPartEfficiencies: public TNamed
                                         3.,3.,
                                         3.,3.,
                                         3.8,3.8,
-                                        3.8,3.8,3.8,3.8,3.8,3.8};
+                                        3.8,3.8,3.8,3.8,3.8,3.8,
+                                        3.};
     //set decay mode
     partDaughterPdg.resize(nParticles);
 
@@ -295,6 +300,10 @@ class CbmKFPartEfficiencies: public TNamed
     partDaughterPdg[46].push_back( -421); //D*- -> D04_bar pi-
     partDaughterPdg[46].push_back( -211);
 
+    partDaughterPdg[47].push_back( 3122); //H0-> Lambda pi- p
+    partDaughterPdg[47].push_back( -211);
+    partDaughterPdg[47].push_back( 2212);
+
     for(int iP=0; iP<nParticles; iP++)
     {
       partPDG[iP] = mPartPDG[iP];
@@ -438,7 +447,7 @@ class CbmKFPartEfficiencies: public TNamed
     file >> *this;
   }
 
-  static const int nParticles = 47;
+  static const int nParticles = 48;
   int partPDG[nParticles];
   TString partName[nParticles];
   TString partTitle[nParticles];

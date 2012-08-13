@@ -40,6 +40,7 @@
 #include "TAxis.h"
 
 #include "CbmL1PFFitter.h"
+#include "L1Field.h"
 
 #include <iostream>
 #include <fstream>
@@ -744,7 +745,7 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
 
     //   cout.precision(3);
   if( fVerbose ){
-    if(fNEvents%500 == 0)
+    if(fNEvents%10 == 0)
     {
       cout << " ---- KF Particle finder --- " << endl;
       // cout << "L1 STAT    : " << fNEvents << " EVENT "               << endl << endl;
@@ -999,10 +1000,11 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
 
     CbmKFVertex kfVertex;
     CbmL1PFFitter fitter;
-    fitter.Fit(vRTracks);
+//    fitter.Fit(vRTracks);
 
     vector<float> ChiToPrimVtx;
-    fitter.GetChiToVertex(vRTracks,ChiToPrimVtx,kfVertex);
+    vector<L1FieldRegion> vField;
+    fitter.GetChiToVertex(vRTracks, vField, ChiToPrimVtx, kfVertex);
 
     for(unsigned int i=0; i<vRTracks.size(); i++)
       hTrackParameters[0]->Fill(ChiToPrimVtx[i]);

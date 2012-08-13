@@ -48,6 +48,7 @@ class CbmL1PFFitter
   //functions for fitting CbmStsTrack
   void Fit(std::vector<CbmStsTrack> &Tracks, int pidHypo = 211);
   void CalculateFieldRegion(std::vector<CbmStsTrack> &Tracks,std::vector<L1FieldRegion> &Field);
-  void GetChiToVertex(std::vector<CbmStsTrack> &Tracks, std::vector<float> &chiToVtx, CbmKFVertex &primVtx);
+  void GetChiToVertex(std::vector<CbmStsTrack> &Tracks, std::vector<L1FieldRegion> &field, std::vector<float> &chiToVtx, CbmKFVertex &primVtx,
+                      float chiPrim = -1);
 };
 #endif

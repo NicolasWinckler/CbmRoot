@@ -18,6 +18,7 @@
 
 #include "CbmKFParticleInterface.h"
 #include "CbmKFVertex.h"
+#include "CbmKFTrack.h"
 #include "CbmStsTrack.h"
 
 #include "TClonesArray.h"
@@ -26,6 +27,9 @@
 
 #include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
+
+#include "CbmL1PFFitter.h"
+
 
 ClassImp(CbmKFParticlesFinder)
 
@@ -88,10 +92,6 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   if(!flistStsTracksMatch) return;
   if(!flistMCTracks) return;
 
-  TStopwatch timerSelect;
-
-  fParticles.clear();
-
   vector<CbmStsTrack> vRTracks;
   int nTracks = flistStsTracks->GetEntries();
   vRTracks.resize(nTracks);
@@ -101,7 +101,7 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   CbmKFVertex kfVertex;
   if(fPrimVtx)
     kfVertex = CbmKFVertex(*fPrimVtx);
-
+  
   vector<int> vTrackPDG(vRTracks.size(), -1);
   if(fUseMCPID)
   {
@@ -119,8 +119,26 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   {
     if(vRTracks[iTr].GetParamFirst()->GetQp()<0) vTrackPDG[iTr] *= -1;
   }*/
+  
+  TStopwatch timerSelect;
 
-  CbmKFParticleInterface::FindParticles(vRTracks, fParticles, kfVertex, vTrackPDG, fCuts);
+  fParticles.clear();
+
+  CbmL1PFFitter fitter;
+
+//  fitter.Fit(vRTracks); //assumed, that the initial fit should be fixed and must return good results!!!
+
+  vector<L1FieldRegion> vField;
+  vector<float> ChiToPrimVtx;
+  fitter.GetChiToVertex(vRTracks, vField, ChiToPrimVtx, kfVertex, 3);
+
+//  fitter.CalculateFieldRegion(vRTracks, vField);
+
+  vector<CbmKFTrack> vKFTrack(nTracks);
+  for(int iTr=0; iTr<nTracks; iTr++)
+    vKFTrack[iTr] = CbmKFTrack(vRTracks[iTr]);
+
+  CbmKFParticleInterface::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
 
   timerSelect.Stop();
 
@@ -132,7 +150,7 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   timeSelectCPU += timerSelect.CpuTime();
   timeSelectReal += timerSelect.RealTime();
 
-  if(NEv%500==0)
+  if(NEv%10==0)
   {
     std::cout.setf(ios::fixed);
     std::cout.setf(ios::showpoint);

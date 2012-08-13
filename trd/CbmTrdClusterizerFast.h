@@ -144,9 +144,9 @@ class CbmTrdClusterizerFast : public FairTask {
   Int_t   fModuleCopy;
   Int_t   fModuleID;//Unique number for detector module
   Int_t   fMCindex;// index to MCPoint
-
-  static const Int_t fPadNrX = 11;//15;//7; // has to be odd
-  static const Int_t fPadNrY = 11;//5;//5; // has to be odd
+  static const Int_t fnPadCluster = 5;//11; // has to be odd
+  //static const Int_t fPadNrX = 3;//11;//15;//7; // has to be odd
+  //static const Int_t fPadNrY = 3;//11;//5;//5; // has to be odd
  
   //static const Int_t fNoSectors = 3;
   static const Int_t endOfMathiesonArray = 35; //+- mm

@@ -38,6 +38,14 @@ ADD_TEST(littrack_muon_auau_25gev_mbias "${CBMROOT_BINARY_DIR}/macro/littrack/ni
 SET_TESTS_PROPERTIES(littrack_muon_auau_25gev_mbias PROPERTIES TIMEOUT "36000")
 SET_TESTS_PROPERTIES(littrack_muon_auau_25gev_mbias PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
+ADD_TEST(littrack_muon_radial_auau_25gev_centr "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_reco.sh" "littrack_global_reco_muon_radial_auau_25gev_centr" "muon_radial" "auau" "25gev" "centr")
+SET_TESTS_PROPERTIES(littrack_muon_radial_auau_25gev_centr PROPERTIES TIMEOUT "36000")
+SET_TESTS_PROPERTIES(littrack_muon_radial_auau_25gev_centr PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+
+ADD_TEST(littrack_muon_radial_auau_25gev_mbias "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_reco.sh" "littrack_global_reco_muon_radial_auau_25gev_mbias" "muon_radial" "auau" "25gev" "mbias")
+SET_TESTS_PROPERTIES(littrack_muon_radial_auau_25gev_mbias PROPERTIES TIMEOUT "36000")
+SET_TESTS_PROPERTIES(littrack_muon_radial_auau_25gev_mbias PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+
 GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh)
 
 ADD_TEST(littrack_mvd_auau_25gev_centr_nodelta "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_mvd.sh" "littrack_mvd_reco_auau_25gev_centr_nodelta" "auau" "25gev" "centr" "nodelta")

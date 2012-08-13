@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 5, // number of events
+void global_reco(Int_t nEvents = 100, // number of events
 		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/commit_tests/events_electron/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/much_v11a/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -36,7 +36,7 @@ void global_reco(Int_t nEvents = 5, // number of events
    TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
 
    // Directory for output results
-   TString resultDir = "./test_v11c/";
+   TString resultDir = "./test/";
 
    // Reconstruction parameters
    TString globalTrackingType = "branch"; // Global tracking type

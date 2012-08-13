@@ -12,7 +12,7 @@ collision_type=$5
 
 create_output_dir events_${test_name}/
 
-nevents=300
+nevents=500
 
 if [ "${detector_setup}" = "electron" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
@@ -22,6 +22,13 @@ elif [ "${detector_setup}" = "muon" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
     pars=(0    0    0   0   0    0    10       0     0  yes   no)
     set_default_muon_geometry
+else
+elif [ "${detector_setup}" = "muon_radial" ] ; then
+    #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
+    pars=(0    0    0   0   0    0    10       0     0  yes   no)
+    set_default_muon_geometry
+    export LIT_MUCH_GEOM=much/much_v12a.geo
+    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v12a.digi.root
 else
     echo "Error! Detector setup unknown! Must be electron or muon!"
     exit 2

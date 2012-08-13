@@ -1820,6 +1820,12 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
     TClonesArray& clref = *fClusterHits;
     Int_t size = clref.GetEntriesFast();
 
+    //eLoss has to be calibrated due to losses corensponding to the limitation to 3 pad cluster
+    eLoss *= 0.5 * (
+		    3.71211 / 3.07664 + // Pion MPV MC / Pion MPV Hit (100 events 25 AGeV)
+		    5.14198 / 4.06185   //Electron MPV MC / Electron MPV Hit (100 events 25 AGeV)
+		    );
+
     new ((*fClusterHits)[size]) CbmTrdHit( detectorId,
 					   pos,
 					   dpos,

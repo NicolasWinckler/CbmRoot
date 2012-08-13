@@ -1,70 +1,68 @@
-/** CbmTrdCluster.h
- *@author Florian Uhlig <f.uhlig@gsi.de>
- **
- ** Data Container for Trd clusters which are collection 
- ** of neighbouring pads above a defined threshold.
- ** TODO: It has to be defined if the threshold is defined here
- **       or in the digi class. It has also to be defined if 
- **       neighbouring also includes pads which are only touched 
- **       at the edges of the pad (diagonal)
+/**
+ * \file CbmTrdCluster.h
+ * \author Florian Uhlig <f.uhlig@gsi.de>
+ * \brief Data Container for TRD clusters.
+ *
+ * TRD clusters are collection of neighbouring pads above a defined threshold.
+ *
+ * TODO: It has to be defined if the threshold is defined here
+ *       or in the digi class. It has also to be defined if
+ *       neighbouring also includes pads which are only touched
+ *       at the edges of the pad (diagonal)
  **/
 
 #ifndef CBMTRDCLUSTER_H
 #define CBMTRDCLUSTER_H 
 
-#include "TObject.h"
-#include "TArrayI.h"
+#include "CbmCluster.h"
 
-class CbmTrdCluster : public TObject{
-
+/**
+ * \class CbmTrdCluster
+ * \author Florian Uhlig <f.uhlig@gsi.de>
+ * \brief Data Container for TRD clusters.
+ */
+class CbmTrdCluster : public CbmCluster
+{
 public:
 
   /**
-   * Default constructor.
+   * \brief Default constructor.
    */
   CbmTrdCluster();
 
   /**
-   * Standard constructor.
-   * @param digiIndices Indices of the digis that are contained in the cluster
-   * @param charge      The whole cluster charge
+   * \brief Destructor.
    */
-  CbmTrdCluster(TArrayI digiIndices, Float_t charge);
+  virtual ~CbmTrdCluster();
 
   /**
-   * Standard constructor.
-   * @param digiIndices Indices of the digis that are contained in the cluster
-   * @param charge      The whole cluster charge
-   * @param qMax        Maximum charge on a pad from the cluster
+   * \brief Set summary charge for cluster.
+   * \param[in] charge Summary charge.
    */
-  CbmTrdCluster(TArrayI digiIndices, Float_t charge, Float_t qMax);
-
-  ~CbmTrdCluster();
-
-  /** Gets TArrayI of digi indices. */
-  TArrayI GetDigiIndices() const {return fDigiIndices;}
-
-  /** Gets number of digis/pads in the cluster. */
-  Int_t GetNDigis() const {return fDigiIndices.GetSize();}
+  void SetCharge(Float_t charge) { fCharge = charge; }
 
   /**
-   * Gets the index of a digi.
-   * @param iDigi Zero based ordinal number of digi in the internal list.
+   * \brief Set maximum charge collected on a single digi.
+   * \param[in] charge Maximum charge.
    */
-  Int_t GetDigiIndex(Int_t iDigi) const {return fDigiIndices.At(iDigi);}
+  void SetMaxCharge(Float_t maxCharge) { fMaxCharge = maxCharge; }
 
-  /** Total charge in the cluster. */
-  Float_t GetCharge() const {return fCharge;}
+  /**
+   * \brief Return total charge in the cluster.
+   * \return Total charge in the cluster.
+   */
+  Float_t GetCharge() const { return fCharge; }
 
-  /** Maximum charge on a single pad. */
-  Float_t GetMaxCharge() const {return fQMax;}
-
+  /**
+   * \brief Return maximum charge collected on a single digi.
+   * \return Maximum charge collected on a single digi.
+   */
+  Float_t GetMaxCharge() const { return fMaxCharge; }
 
 private:
-  TArrayI  fDigiIndices; // Array of digi indices which form the cluster
-  Float_t    fCharge;      // Summary charge of the cluster
-  Float_t    fQMax;        // Maximal charge collected on a single pad
+  Float_t fCharge; // Summary charge of the cluster
+  Float_t fMaxCharge;  // Maximal charge collected on a single pad
 
-ClassDef(CbmTrdCluster,1)
+  ClassDef(CbmTrdCluster, 2)
 };
 #endif

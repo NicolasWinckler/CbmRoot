@@ -26,6 +26,7 @@ CbmStack.cxx
 CbmStripHit.cxx
 CbmTrack.cxx
 CbmTrackMatch.cxx
+CbmCluster.cxx
 
 CbmMCEpoch.cxx
 CbmMCEventHeader.cxx

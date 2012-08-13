@@ -546,12 +546,12 @@ void CbmTrdQa::Exec(Option_t * option)
     for (Int_t iCluster=0; iCluster < nEntries; iCluster++ ) {
       cluster = (CbmTrdCluster*) fClusters->At(iCluster);
       fdEdxCluster->Fill(cluster->GetCharge());
-      fClusterSize->Fill(cluster->GetNDigis());
-      fDigiPerCluster->Fill(cluster->GetNDigis());
-      if (cluster->GetNDigis() >= 3) {
+      fClusterSize->Fill(cluster->GetNofDigis());
+      fDigiPerCluster->Fill(cluster->GetNofDigis());
+      if (cluster->GetNofDigis() >= 3) {
 	Double_t qLeft(0.0), qCenter(.0), qRight(0.0);
-	for (Int_t i = 0; i < cluster->GetNDigis(); i++) {
-	  digi = (CbmTrdDigi*) fDigis->At(cluster->GetDigiIndex(i));
+	for (Int_t i = 0; i < cluster->GetNofDigis(); i++) {
+	  digi = (CbmTrdDigi*) fDigis->At(cluster->GetDigi(i));
 	 
 	}
 	//fPRF_2D->Fill();

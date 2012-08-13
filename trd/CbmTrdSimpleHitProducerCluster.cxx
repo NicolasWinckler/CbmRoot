@@ -154,7 +154,7 @@ void CbmTrdSimpleHitProducerCluster::Exec(Option_t * option)
     
     cluster =  (CbmTrdCluster*) fTrdCluster->At(j);
 
-    Int_t nofDigis=cluster->GetNDigis();
+    Int_t nofDigis=cluster->GetNofDigis();
 
     if(nofDigis != 1 ) {
       cout<<"--E-- CbmTrdSimpleHitProducerCluster can only work with one digi per cluster. For this cluster ther have been "<<nofDigis<<" clusters"<<endl;
@@ -162,7 +162,7 @@ void CbmTrdSimpleHitProducerCluster::Exec(Option_t * option)
     }
 
     for (int k=0; k < nofDigis; k++ ) {
-      Int_t digiIndex=cluster->GetDigiIndex(k);
+      Int_t digiIndex=cluster->GetDigi(k);
       digi =  (CbmTrdDigi*) fTrdDigi->At(digiIndex);
     
       Col = digi->GetCol();

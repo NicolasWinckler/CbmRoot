@@ -35,7 +35,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
    ClusterSum(-1),
-   fMinimumChargeTH(5.0e-07),
+   fMinimumChargeTH(1.0e-08),
    fMultiHit(true),
    fRowClusterMerger(false),
    fNeighbourReadout(true)
@@ -629,7 +629,7 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
       for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
 	{
 	  ClusterSum++;
-	  TArrayI digiIndices( 3/*(*iCluster)->size()*/ );
+	  std::vector<Int_t> digiIndices( 3/*(*iCluster)->size()*/ ); // andrey
 	  Int_t idigi = 0;
 	  Int_t i = 1;
 	  Charge = 0;
@@ -656,22 +656,26 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		    if ((*nextDigi) != (*iDigi))
 		      i++;
 
-		    digiIndices.Reset();
-		    digiIndices.Set(i);
+		    digiIndices.resize(i, 0.); // andrey
+//		    digiIndices.Reset();
+//		    digiIndices.Set(i);
 
 		    i = 0;
 		    if ((*lastDigi) != (*iDigi)){
-		      digiIndices.SetAt((*lastDigi)->digiId,i);
+		      digiIndices[i] = (*lastDigi)->digiId; // andrey
+//		      digiIndices.SetAt((*lastDigi)->digiId,i);
 		      Charge += (*lastDigi)->charge;
 		      i++;
 		    }
 
-		    digiIndices.SetAt((*iDigi)->digiId,i);
+		    digiIndices[i] = (*iDigi)->digiId; // andrey
+//		    digiIndices.SetAt((*iDigi)->digiId,i);
 		    Charge += (*iDigi)->charge;
 		    i++;
  
-		    if ((*nextDigi) != (*iDigi)){
-		      digiIndices.SetAt((*nextDigi)->digiId,i);
+		    if ((*nextDigi) != (*iDigi)) {
+		      digiIndices[i] = (*nextDigi)->digiId; // andrey
+//		      digiIndices.SetAt((*nextDigi)->digiId,i);
 		      Charge += (*nextDigi)->charge;
 		    }
 
@@ -680,8 +684,12 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		    TClonesArray& clref = *fClusters;
 		    Int_t size = clref.GetEntriesFast();
 
-		    new ((*fClusters)[size]) CbmTrdCluster(digiIndices, Charge, qMax);
-		    digiIndices.Reset();
+		    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
+		    cluster->SetDigis(digiIndices);
+		    cluster->SetCharge(Charge);
+		    cluster->SetMaxCharge(qMax);
+		    digiIndices.clear();
+		    //digiIndices.Reset();
 		    //digiIndices.Set(3);
 		    Charge = 0;
 		   
@@ -692,7 +700,8 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		//cout << endl;
 	      }
 	      else {
-		digiIndices.SetAt((*iDigi)->digiId,idigi);
+	    	  digiIndices[idigi] = (*iDigi)->digiId; // andrey
+//		digiIndices.SetAt((*iDigi)->digiId,idigi);
 		Charge += (*iDigi)->charge;
 	
 		if (qMax < (*iDigi)->charge)
@@ -706,7 +715,10 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 	    TClonesArray& clref = *fClusters;
 	    Int_t size = clref.GetEntriesFast();
 
-	    new ((*fClusters)[size]) CbmTrdCluster(digiIndices, Charge, qMax);
+	    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster(); // andrey
+	    cluster->SetDigis(digiIndices); // andrey
+	    cluster->SetCharge(Charge); // andrey
+	    cluster->SetMaxCharge(qMax); // andrey
 	  }	  
 	}       
     } 

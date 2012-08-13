@@ -136,26 +136,19 @@ void CbmTrdClusterFinder::Exec(Option_t * option)
 // --------------------------------------------------------------------
 void CbmTrdClusterFinder::SimpleClustering()
 {
-  //Loop over all digis and create for each digi a cluster
+  // Loop over all digis and create for each digi a cluster
 
-  TArrayI digiIndex(1);
-  CbmTrdDigi *digi=NULL;
-  Int_t nentries = fDigis->GetEntries();
-
-  for (int iDigi=0; iDigi < nentries; iDigi++ ) {
-
-    digi =  (CbmTrdDigi*) fDigis->At(iDigi);
-
-    digiIndex.SetAt(iDigi,0);
-
+  Int_t nofDigis = fDigis->GetEntries();
+  for (Int_t iDigi=0; iDigi < nofDigis; iDigi++ ) {
+    const CbmTrdDigi* digi = static_cast<const CbmTrdDigi*>(fDigis->At(iDigi));
 
     TClonesArray& clref = *fClusters;
     Int_t size = clref.GetEntriesFast();
 
-    
-    new((*fClusters)[size]) CbmTrdCluster(digiIndex,digi->GetCharge(),
-					  digi->GetCharge());
-    
+    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
+    cluster->AddDigi(iDigi);
+    cluster->SetCharge(digi->GetCharge());
+    cluster->SetMaxCharge(digi->GetCharge());
   }
 }
 // --------------------------------------------------------------------

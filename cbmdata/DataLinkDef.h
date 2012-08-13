@@ -13,6 +13,7 @@
 #pragma link C++ class CbmStripHit+;
 #pragma link C++ class CbmTrack+;
 #pragma link C++ class CbmTrackMatch+;
+#pragma link C++ class CbmCluster+;
 
 #pragma link C++ class CbmMCEpoch+;
 #pragma link C++ class CbmMCEventHeader+;

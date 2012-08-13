@@ -324,11 +324,11 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
     fClusterId = iCluster;
     //cout << "NoDigis:" << cluster->GetNDigis() << endl;
-    nDigi = cluster->GetNDigis();
+    nDigi = cluster->GetNofDigis();
     qMax = 0;
     qMaxIndex = -1;
     for (Int_t iDigi = 0; iDigi < nDigi; iDigi++) {
-      DigiIndex = cluster->GetDigiIndex(iDigi);
+      DigiIndex = cluster->GetDigi(iDigi);
       CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(DigiIndex);
       DigiCharge = digi->GetCharge();
       //-----------unrotated--------------------
@@ -1236,7 +1236,7 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
     for (Int_t iCluster = 0; iCluster < nCluster; iCluster++)
       { 
 	CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);
-	Int_t dId = cluster->GetDigiIndex(0);
+	Int_t dId = cluster->GetDigi(0);
 	CbmTrdDigi *d = (CbmTrdDigi*) fDigis->At(dId);
 	moduleId = d->GetDetId();
 	if (clusterId.find(moduleId) == clusterId.end())
@@ -1245,10 +1245,10 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  }
 	clusterId[moduleId] += 1;
 
-	Int_t NDigis = cluster->GetNDigis();
+	Int_t NDigis = cluster->GetNofDigis();
 	for (Int_t iDigi = 0; iDigi < NDigis; iDigi++)
 	  {
-	    Int_t digiId = cluster->GetDigiIndex(iDigi);
+	    Int_t digiId = cluster->GetDigi(iDigi);
 	    CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(digiId);
 	    moduleId = digi->GetDetId();
 

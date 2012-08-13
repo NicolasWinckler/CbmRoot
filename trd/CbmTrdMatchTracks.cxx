@@ -356,8 +356,8 @@ void CbmTrdMatchTracks::ExecCluster(
 			Int_t clusterId = hit->GetRefId();
          CbmTrdCluster* cluster = (CbmTrdCluster*) fClusters->At(clusterId);
 			if (cluster == NULL) continue;
-			for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-             Int_t digiId = cluster->GetDigiIndex(iDigi);
+			for (Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+             Int_t digiId = cluster->GetDigi(iDigi);
 			    CbmTrdDigiMatch* digiMatch = (CbmTrdDigiMatch*) fDigiMatches->At(digiId);
 			    if (digiMatch == NULL) continue;
 			    for (Int_t iPoint = 0; iPoint < digiMatch->GetNofRefs(); iPoint++) {

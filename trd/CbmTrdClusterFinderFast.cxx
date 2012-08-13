@@ -35,7 +35,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
    ClusterSum(-1),
-   fMinimumChargeTH(1.0e-08),
+   fMinimumChargeTH(5.0e-07),
    fMultiHit(true),
    fRowClusterMerger(false),
    fNeighbourReadout(true)

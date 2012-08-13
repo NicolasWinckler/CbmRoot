@@ -58,10 +58,9 @@ class CbmMuchFindHitsGem: public FairTask {
     Int_t fEvent;                           // Event counter
     TClonesArray* fDigis;                   // Input array of CbmMuchDigi
     vector<Int_t> fClusterCharges;          //!
-    vector<Int_t> fLocalMax;                //!
+    vector<Bool_t> fLocalMax;               //!
     vector<CbmMuchPad*> fClusterPads;       //!
     vector<vector<Int_t> >fNeighbours;      //!
-    
     TClonesArray* fClusters;                // Output array of CbmMuchCluster objects
     TClonesArray* fHits;                    // Output array of CbmMuchHit
     CbmMuchGeoScheme* fGeoScheme;           // Geometry scheme

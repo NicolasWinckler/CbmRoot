@@ -286,7 +286,7 @@ void CbmMuchFindHitsGem::ExecClusteringPeaks(CbmMuchCluster* cluster,Int_t iClus
   if (FindLocalMaxima(cluster)<2) { CreateHits(cluster,iCluster); return; }
   // Create clusters from single digi corresponding to each local maximum
   for (Int_t i=0; i<fLocalMax.size(); i++) { 
-    if (fLocalMax[i]!=1) continue;
+    if (!fLocalMax[i]) continue;
     fDigiIndices.clear();
     fDigiIndices.push_back(cluster->GetDigiIndex(i));
     CbmMuchCluster* newcluster = new CbmMuchCluster(fDigiIndices);
@@ -317,7 +317,7 @@ Int_t CbmMuchFindHitsGem::FindLocalMaxima(CbmMuchCluster* cluster){
     Int_t c = digi->GetADCCharge();
     fClusterPads.push_back(pad);
     fClusterCharges.push_back(c);
-    fLocalMax.push_back(0);
+    fLocalMax.push_back(1);
   }
   
   // Fill neighbours
@@ -325,6 +325,7 @@ Int_t CbmMuchFindHitsGem::FindLocalMaxima(CbmMuchCluster* cluster){
     CbmMuchPad* pad = fClusterPads[i];
     vector<CbmMuchPad*> neighbours = pad->GetNeighbours();
     vector<Int_t> selected_neighbours;
+    
     for (Int_t ip=0;ip<neighbours.size();ip++){
       CbmMuchPad* p = neighbours[ip];
       vector<CbmMuchPad*>:: iterator it = find(fClusterPads.begin(),fClusterPads.end(),p);
@@ -332,42 +333,28 @@ Int_t CbmMuchFindHitsGem::FindLocalMaxima(CbmMuchCluster* cluster){
       selected_neighbours.push_back(it-fClusterPads.begin());
     }
     fNeighbours.push_back(selected_neighbours);
+    
+    
   }
 
   // Flag local maxima
   for (Int_t i=0; i<nDigis;i++) {
-    if (fLocalMax[i]!=0) continue;
-    FlagLocalMax(i);
+    if (!fLocalMax[i]) continue;
+    Int_t c = fClusterCharges[i];
+    for (Int_t n=0;n<fNeighbours[i].size();n++) {
+      Int_t in = fNeighbours[i][n];
+      Int_t cn = fClusterCharges[in];
+      if      (c < cn) { fLocalMax[i]  = 0; continue; }
+      else if (c > cn)   fLocalMax[in] = 0;
+    }
   }
   
   // Count local maxima
   Int_t nMax = 0;
-  for (Int_t i=0; i<nDigis; i++)  if (fLocalMax[i]==1) nMax++;
+  for (Int_t i=0; i<nDigis; i++)  if (fLocalMax[i]) nMax++;
   return nMax;
 }
 // -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-void CbmMuchFindHitsGem::FlagLocalMax(Int_t i){
-  Int_t c = fClusterCharges[i];
-  for (Int_t n=0;n<fNeighbours[i].size();n++) {
-    Int_t in = fNeighbours[i][n];
-    Int_t cn = fClusterCharges[in];
-    if      (c < cn) { fLocalMax[i] = -1; return; }
-    else if (c > cn)   fLocalMax[in] = -1;
-    else { // the same charge
-      fLocalMax[i] = 1; 
-      if (fLocalMax[in] == 0) {
-        FlagLocalMax(in);
-        if (fLocalMax[in] < 0) { fLocalMax[i] = -1; return; }
-        else fLocalMax[in] = -1;
-      }
-    }
-  }
-  fLocalMax[i] = 1;
-}
-// -------------------------------------------------------------------------
-
 
 
 ClassImp(CbmMuchFindHitsGem)

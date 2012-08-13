@@ -11,6 +11,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "TMath.h"
+#include "TLegend.h"
 #include "TF1.h"
 #include "TH2.h"
 #include "TH1.h"
@@ -65,8 +66,10 @@ CbmTrdQa::CbmTrdQa()
     fDistanceMcToHitAll(NULL),
     fdEdxPionMc(NULL),
     fdEdxPionHit(NULL),
+    fdEdxPionGhost(NULL),
     fdEdxElectronMc(NULL),
     fdEdxElectronHit(NULL),
+    fdEdxElectronGhost(NULL),
     fdEdxPoint(NULL),
     fdEdxDigi(NULL),
     fdEdxCluster(NULL),
@@ -81,6 +84,12 @@ CbmTrdQa::CbmTrdQa()
     fHitToPointEfficiencyVsAlpha(NULL),
     fPositionResolutionShort(NULL),
     fPositionResolutionLong(NULL),  
+    fClusterSize(NULL),  
+    fPointsPerDigi(NULL),
+    fDigiPerCluster(NULL),
+    fClusterPerHit(NULL),
+    fPRF_1D(NULL),
+    fPRF_2D(NULL),
     fD(true),
     fT(true),
     fP(true),
@@ -123,12 +132,14 @@ CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_
     fDistanceMcToHitAll(NULL),
     fdEdxPionMc(NULL),
     fdEdxPionHit(NULL),
+    fdEdxPionGhost(NULL),
     fdEdxPoint(NULL),
     fdEdxDigi(NULL),
     fdEdxCluster(NULL),
     fdEdxHit(NULL),
     fdEdxElectronMc(NULL),
     fdEdxElectronHit(NULL),
+    fdEdxElectronGhost(NULL),
     fGhostHitVsR(NULL),
     fLostPointVsR(NULL),
     fPositionResolutionShort(NULL),
@@ -139,6 +150,12 @@ CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_
     fMultiHitsVsAlpha(NULL),
     fLostPointVsAlpha(NULL),
     fHitToPointEfficiencyVsAlpha(NULL),
+    fClusterSize(NULL),  
+    fPointsPerDigi(NULL),
+    fDigiPerCluster(NULL),
+    fClusterPerHit(NULL),
+    fPRF_1D(NULL),
+    fPRF_2D(NULL),
     fD(true),
     fT(true),
     fP(true),
@@ -228,8 +245,10 @@ CbmTrdQa::~CbmTrdQa()
   delete fDistanceMcToHitAll;
   delete fdEdxPionMc;
   delete fdEdxPionHit;
+  delete fdEdxPionGhost;
   delete fdEdxElectronMc;
   delete fdEdxElectronHit;
+  delete fdEdxElectronGhost;
   delete fdEdxPoint;
   delete fdEdxDigi;
   delete fdEdxCluster;
@@ -244,6 +263,12 @@ CbmTrdQa::~CbmTrdQa()
   delete fGhostHitVsAlpha;
   delete fLostPointVsAlpha;
   delete fHitToPointEfficiencyVsAlpha;
+  delete fClusterSize;
+  delete fPointsPerDigi;
+  delete fDigiPerCluster;
+  delete fClusterPerHit;
+  delete fPRF_1D;
+  delete fPRF_2D;
   //delete fLayerDummy;
   
 }
@@ -323,36 +348,46 @@ InitStatus CbmTrdQa::Init()
   fDistanceMcToHitAll->SetXTitle("#Delta r (MC-Hit) all [cm]");
   fDistanceMcToHitAll->SetYTitle("#");
   fDistanceMcToHitAll->SetMarkerStyle(24);
-  fdEdxPionMc = new TH1I("dEdxPionMc", "dEdxPionMc", 1.0e3, 0, 30.0e-6);
+  fdEdxPionMc = new TH1F("dEdxPionMc", "dEdxPionMc", 250, 0, 30.0e-6);
   fdEdxPionMc->SetXTitle("dE/dx MC [GeV]");
   fdEdxPionMc->SetYTitle("#");
   fdEdxPionMc->SetLineColor(1);
   fdEdxPionMc->SetLineStyle(1);
-  fdEdxPionHit = new TH1I("dEdxPionHit", "dEdxPionHit", 1.0e3, 0, 30.0e-6);
+  fdEdxPionHit = new TH1F("dEdxPionHit", "dEdxPionHit", 250, 0, 30.0e-6);
   fdEdxPionHit->SetXTitle("dE/dx Hit [GeV]");
   fdEdxPionHit->SetYTitle("#");
   fdEdxPionHit->SetLineColor(1);
   fdEdxPionHit->SetLineStyle(2);
-  fdEdxElectronMc = new TH1I("dEdxElectronMc", "dEdxElectronMc", 1.0e3, 0, 30.0e-6);
+  fdEdxPionGhost = new TH1F("dEdxPionGhost", "dEdxPionGhost", 250, 0, 30.0e-6);
+  fdEdxPionGhost->SetXTitle("dE/dx Ghost [GeV]");
+  fdEdxPionGhost->SetYTitle("#");
+  fdEdxPionGhost->SetLineColor(1);
+  fdEdxPionGhost->SetLineStyle(3);
+  fdEdxElectronMc = new TH1F("dEdxElectronMc", "dEdxElectronMc", 250, 0, 30.0e-6);
   fdEdxElectronMc->SetXTitle("dE/dx MC [GeV]");
   fdEdxElectronMc->SetYTitle("#");
   fdEdxElectronMc->SetLineColor(2);
   fdEdxElectronMc->SetLineStyle(1);
-  fdEdxElectronHit = new TH1I("dEdxElectronHit", "dEdxElectronHit", 1.0e3, 0, 30.0e-6);
+  fdEdxElectronHit = new TH1F("dEdxElectronHit", "dEdxElectronHit", 250, 0, 30.0e-6);
   fdEdxElectronHit->SetXTitle("dE/dx Hit [GeV]");
   fdEdxElectronHit->SetYTitle("#");
   fdEdxElectronHit->SetLineColor(2);
   fdEdxElectronHit->SetLineStyle(2);
-  fdEdxPoint = new TH1I("dEdxPoint", "dEdxPoint", 1.0e3, 0, 30.0e-6);
+  fdEdxElectronGhost = new TH1F("dEdxElectronGhost", "dEdxElectronGhost", 250, 0, 30.0e-6);
+  fdEdxElectronGhost->SetXTitle("dE/dx Ghost [GeV]");
+  fdEdxElectronGhost->SetYTitle("#");
+  fdEdxElectronGhost->SetLineColor(2);
+  fdEdxElectronGhost->SetLineStyle(3);
+  fdEdxPoint = new TH1F("dEdxPoint", "dEdxPoint", 1.0e3, 0, 30.0e-6);
   fdEdxPoint->SetXTitle("dE/dx Hit [GeV]");
   fdEdxPoint->SetYTitle("#");
-  fdEdxDigi = new TH1I("dEdxDigi", "dEdxDigi", 1.0e3, 0, 30.0e-6);
+  fdEdxDigi = new TH1F("dEdxDigi", "dEdxDigi", 1.0e3, 0, 30.0e-6);
   fdEdxDigi->SetXTitle("dE/dx Hit [GeV]");
   fdEdxDigi->SetYTitle("#");
-  fdEdxCluster = new TH1I("dEdxCluster", "dEdxCluster", 1.0e3, 0, 30.0e-6);
+  fdEdxCluster = new TH1F("dEdxCluster", "dEdxCluster", 1.0e3, 0, 30.0e-6);
   fdEdxCluster->SetXTitle("dE/dx Hit [GeV]");
   fdEdxCluster->SetYTitle("#");
-  fdEdxHit = new TH1I("dEdxHit", "dEdxHit", 1.0e3, 0, 30.0e-6);
+  fdEdxHit = new TH1F("dEdxHit", "dEdxHit", 1.0e3, 0, 30.0e-6);
   fdEdxHit->SetXTitle("dE/dx Hit [GeV]");
   fdEdxHit->SetYTitle("#");
   fMultiHitsVsR = new TProfile("MultiHitVsR", "MultiHitVsR", 785, 0, 785);
@@ -409,6 +444,20 @@ InitStatus CbmTrdQa::Init()
   fPositionResolutionLong = new TH1I("fPositionResolutionLong", "fPositionResolutionLong", 20000, -10, 10);
   fPositionResolutionLong->SetXTitle("position deviation along long pad side  [cm]");
   fPositionResolutionLong->SetYTitle("#");
+  fClusterSize = new TH1I("fClusterSize","fClusterSize",21,-0.5,20.5);
+  fClusterSize->SetXTitle("cluster size [pads]");
+  fClusterSize->SetYTitle("#");
+  fPointsPerDigi = new TH1I("fPointsPerDigi","fPointsPerDigi",101,-0.5,100.5);
+  fPointsPerDigi->SetXTitle("point per digi");
+  fPointsPerDigi->SetYTitle("#");
+  fDigiPerCluster = new TH1I("fDigiPerCluster","fDigiPerCluster",101,-0.5,100.5);
+  fDigiPerCluster->SetXTitle("digi per cluster");
+  fDigiPerCluster->SetYTitle("#");
+  fClusterPerHit = new TH1I("fClusterPerHit","fClusterPerHit",101,-0.5,100.5);
+  fClusterPerHit->SetXTitle("cluster per hit");
+  fClusterPerHit->SetYTitle("#");
+  fPRF_1D = new TProfile("fPRF_1D","fPRF_1D",300,-1.5,1.5);
+  fPRF_2D = new TH2I("fPRF_2D","fPRF_2D",300,-1.5,1.5,100,0,1);
 
   return kSUCCESS;
 }
@@ -471,6 +520,7 @@ void CbmTrdQa::Exec(Option_t * option)
     printf("%i Digis \n",nEntries);
     for (Int_t iDigi=0; iDigi < nEntries; iDigi++ ) {
       digi = (CbmTrdDigi*) fDigis->At(iDigi);
+      fPointsPerDigi->Fill((Int_t)digi->GetMCIndex().size());
       fdEdxDigi->Fill(digi->GetCharge());
       moduleId = digi->GetDetId();
       Station  = fGeoHandler->GetStation(moduleId);
@@ -496,6 +546,17 @@ void CbmTrdQa::Exec(Option_t * option)
     for (Int_t iCluster=0; iCluster < nEntries; iCluster++ ) {
       cluster = (CbmTrdCluster*) fClusters->At(iCluster);
       fdEdxCluster->Fill(cluster->GetCharge());
+      fClusterSize->Fill(cluster->GetNDigis());
+      fDigiPerCluster->Fill(cluster->GetNDigis());
+      if (cluster->GetNDigis() >= 3) {
+	Double_t qLeft(0.0), qCenter(.0), qRight(0.0);
+	for (Int_t i = 0; i < cluster->GetNDigis(); i++) {
+	  digi = (CbmTrdDigi*) fDigis->At(cluster->GetDigiIndex(i));
+	 
+	}
+	//fPRF_2D->Fill();
+	//fPRF_1D->Fill();
+      }
       //moduleId = cluster->GetDetId();
       //Station  = fGeoHandler->GetStation(moduleId);
       //Layer    = fGeoHandler->GetLayer(moduleId);
@@ -574,10 +635,12 @@ void CbmTrdQa::Exec(Option_t * option)
 	Int_t xPpad(0), yPpad(0); // correspoondig digi from point point of view
 	Double_t xPPadSize(0), yPPadSize(0); // correspoondig pad sizes from point point of view
 	GetPadInfos( moduleId, p_local[0], p_local[1], xPpad, yPpad, xPPadSize, yPPadSize);
-	if (Pdg_code == 211 || Pdg_code == -211)
-	  fdEdxPionMc->Fill(point->GetEnergyLoss());
-	if (Pdg_code == 11 || Pdg_code == -11 )
-	  fdEdxElectronMc->Fill(point->GetEnergyLoss());
+	if (point->GetEnergyLoss() > 0.0) {
+	  if (Pdg_code == 211 || Pdg_code == -211)
+	    fdEdxPionMc->Fill(point->GetEnergyLoss());
+	  if (Pdg_code == 11 || Pdg_code == -11 )
+	    fdEdxElectronMc->Fill(point->GetEnergyLoss());
+	}
 	Double_t minimumDistance = sqrt(xPPadSize * xPPadSize + yPPadSize * yPPadSize);
 	Double_t xDiviation(0), yDiviation(0);
 	Int_t minDHitId = -1;
@@ -613,7 +676,7 @@ void CbmTrdQa::Exec(Option_t * option)
 	    yDiviation = p_local[1]-h_local[1];
 	    hitELoss = hit->GetELoss();
 	    if (xHpad == xPpad && yHpad == yPpad){
-		multiHitCounter++;
+	      multiHitCounter++;
 	      if (samePadMerge)
 		mergedELoss += hit->GetELoss();
 	    }
@@ -674,24 +737,48 @@ void CbmTrdQa::Exec(Option_t * option)
 }
 void CbmTrdQa::SaveHistos()
 {
+  TCanvas *c = new TCanvas("c","c",800,600);
+  c->cd();
+  TLegend *l = new TLegend(0.65,0.65,0.85,0.85);
+  l->SetTextSize(0.025);
+  l->SetTextColor(1);
+  l->SetFillStyle(0);
+  l->SetLineStyle(0);
+  l->SetLineColor(0);
+  fdEdxPionMc->DrawCopy();
+  l->AddEntry(fdEdxElectronMc,"MC electron","l");
+  fdEdxElectronMc->DrawCopy("same");
+  l->AddEntry(fdEdxElectronHit,"Hit electron","l");
+  fdEdxElectronHit->DrawCopy("same");
+  l->AddEntry(fdEdxPionMc,"MC pion","l");
+  fdEdxPionMc->DrawCopy("same");
+  l->AddEntry(fdEdxPionHit,"Hit pion","l");
+  fdEdxPionHit->DrawCopy("same");
+  l->Draw("same");
+  c->SaveAs("pics/TrdQadEdx.pdf");
   /*
-    Double_t Entries = fdEdxPoint->GetEntries();
-    fdEdxPoint->Scale(1./Entries);
-    Entries = fdEdxDigi->GetEntries();
-    fdEdxDigi->Scale(1./Entries);
-    Entries = fdEdxCluster->GetEntries();
-    fdEdxCluster->Scale(1./Entries);
-    Entries = fdEdxHit->GetEntries();
-    fdEdxHit->Scale(1./Entries);
-    Entries = fdEdxPionMc->GetEntries();
-    fdEdxPionMc->Scale(1./Entries);
-    Entries = fdEdxPionHit->GetEntries();
-    fdEdxPionHit->Scale(1./Entries);
-    Entries = fdEdxElectronMc->GetEntries();
-    fdEdxElectronMc->Scale(1./Entries);
-    Entries = fdEdxElectronHit->GetEntries();
-    fdEdxElectronHit->Scale(1./Entries);
+    delete l;
+    TLegend *l = new TLegend(0.65,0.65,0.85,0.85);
+    l->SetTextSize(0.025);
+    l->SetTextColor(1);
+    l->SetFillStyle(0);
+    l->SetLineStyle(0);
+    l->SetLineColor(0);
   */
+  l->Clear();
+  l->AddEntry(fHitToPointEfficiencyVsR,"Hit to point efficiency","p");
+  fHitToPointEfficiencyVsR->DrawCopy();
+  l->AddEntry(fGhostHitVsR,"Ghost hits","p");
+  fGhostHitVsR->DrawCopy("same");
+  l->AddEntry(fLostPointVsR,"Lost points","p");
+  fLostPointVsR->DrawCopy("same");
+  l->Draw("same");
+  c->SaveAs("pics/TrdQaStatisticVsR.pdf");
+  fHitToPointEfficiencyVsAlpha->DrawCopy();
+  fGhostHitVsAlpha->DrawCopy("same");
+  fLostPointVsAlpha->DrawCopy("same");
+  l->Draw("same");
+  c->SaveAs("pics/TrdQaStatisticVsAlpha.pdf");
   gDirectory->pwd();
   fdEdxPoint->Write("", TObject::kOverwrite);
   fdEdxDigi->Write("", TObject::kOverwrite);
@@ -699,8 +786,10 @@ void CbmTrdQa::SaveHistos()
   fdEdxHit->Write("", TObject::kOverwrite);
   fdEdxPionMc->Write("", TObject::kOverwrite);
   fdEdxPionHit->Write("", TObject::kOverwrite);
+  fdEdxPionGhost->Write("", TObject::kOverwrite);
   fdEdxElectronMc->Write("", TObject::kOverwrite);
   fdEdxElectronHit->Write("", TObject::kOverwrite);
+  fdEdxElectronGhost->Write("", TObject::kOverwrite);
   fDistanceMcToHit->Write("", TObject::kOverwrite);
   fDistanceMcToHitAll->Write("", TObject::kOverwrite);
   fMultiHitsVsR->Write("", TObject::kOverwrite);
@@ -713,7 +802,13 @@ void CbmTrdQa::SaveHistos()
   fHitToPointEfficiencyVsAlpha->Write("", TObject::kOverwrite);
   fPositionResolutionShort->Write("", TObject::kOverwrite);
   fPositionResolutionLong->Write("", TObject::kOverwrite);
-
+  fClusterSize->Write("", TObject::kOverwrite);
+  fPointsPerDigi->Write("", TObject::kOverwrite);
+  fDigiPerCluster->Write("", TObject::kOverwrite);
+  fClusterPerHit->Write("", TObject::kOverwrite);
+  fPRF_1D->Write("", TObject::kOverwrite);
+  fPRF_2D->Write("", TObject::kOverwrite);
+  delete l;
 }
 void CbmTrdQa::FinishEvent()
 { 
@@ -995,7 +1090,7 @@ void CbmTrdQa::NormalizeHistos()
 }
   void CbmTrdQa::FinishTask()
   {
-    //NormalizeHistos();
+    NormalizeHistos();
     SaveHistos();
     CreateLayerView();  
   }

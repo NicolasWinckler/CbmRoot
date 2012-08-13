@@ -91,15 +91,22 @@ class CbmTrdQa : public FairTask {
   TH1I *fPositionResolutionShort;
   TH1I *fPositionResolutionLong;
 
-  TH1I *fdEdxPoint;
-  TH1I *fdEdxDigi;
-  TH1I *fdEdxCluster;
-  TH1I *fdEdxHit;
+  TH1F *fdEdxPoint;
+  TH1F *fdEdxDigi;
+  TH1F *fdEdxCluster;
+  TH1F *fdEdxHit;
 
-  TH1I *fdEdxPionMc;
-  TH1I *fdEdxPionHit;
-  TH1I *fdEdxElectronMc;
-  TH1I *fdEdxElectronHit;
+  TH1F *fdEdxPionMc;
+  TH1F *fdEdxPionHit;
+  TH1F *fdEdxPionGhost;
+  TH1F *fdEdxElectronMc;
+  TH1F *fdEdxElectronHit;
+  TH1F *fdEdxElectronGhost;
+
+  TH1I *fClusterSize;
+  TH1I *fPointsPerDigi;
+  TH1I *fDigiPerCluster;
+  TH1I *fClusterPerHit;
 
   TProfile *fMultiPointssVsR;
   TProfile *fGhostPointsVsR;
@@ -111,6 +118,8 @@ class CbmTrdQa : public FairTask {
   TProfile *fGhostHitVsAlpha;
   TProfile *fLostPointVsAlpha;
   TProfile *fHitToPointEfficiencyVsAlpha;
+  TProfile *fPRF_1D;
+  TH2I *fPRF_2D;
   //LayerView
 
   ClassDef(CbmTrdQa,1);

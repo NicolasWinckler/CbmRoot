@@ -439,11 +439,11 @@ void CbmTrdClusterizerFast::Exec(Option_t * option)
     }
     else
       {
-	const Int_t nPadCluster = 11; // has to be odd
-	Int_t xStart = PadMax[0] - nPadCluster / 2;
-	Int_t xStop  = PadMax[0] + nPadCluster / 2 + 1;
-	Int_t yStart = PadMax[1] - nPadCluster / 2;
-	Int_t yStop  = PadMax[1] + nPadCluster / 2 + 1;
+	//const Int_t fnPadCluster = 11; // has to be odd
+	Int_t xStart = PadMax[0] - fnPadCluster / 2;
+	Int_t xStop  = PadMax[0] + fnPadCluster / 2 + 1;
+	Int_t yStart = PadMax[1] - fnPadCluster / 2;
+	Int_t yStop  = PadMax[1] + fnPadCluster / 2 + 1;
 	if(fDebug/* || fModuleClusterMap[fModuleID]->Layer%2 > 0*/)
 	  printf("L%i M%i\n   ",fModuleClusterMap[fModuleID]->Layer,fModuleID);
 

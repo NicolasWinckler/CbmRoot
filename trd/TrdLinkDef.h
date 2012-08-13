@@ -52,4 +52,5 @@
 //#pragma link C++ class CbmTrdDigiWriteoutBuffer+;
 //#pragma link C++ class CbmTrdDigiRingSorter+;
 //#pragma link C++ class CbmTrdDigiSorterTask+;
+#pragma link C++ class CbmTrdQa+;
 #endif

@@ -77,6 +77,7 @@ CbmTrdGeoHandler.cxx
 #CbmTrdDigiWriteoutBuffer.cxx
 #CbmTrdDigiSorterTask.cxx
 #CbmTrdDigiRingSorter.cxx
+CbmTrdQa.cxx
 )
 
 if(RULE_CHECKER_FOUND)

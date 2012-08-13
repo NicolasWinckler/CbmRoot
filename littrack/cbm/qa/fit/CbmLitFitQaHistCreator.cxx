@@ -90,7 +90,6 @@ void CbmLitFitQaHistCreator::CreateResidualAndPullHistograms(
 		  for (Int_t iPar = 0; iPar < 5; iPar++) {
 			 string histName = "htf_" + detName + "_" + trackParamName + "_" + catNames[iCat] + "_" + parameterNames[iPar];
 			 Int_t histId = iCat * 5 + iPar;
-			 std::cout << ">>> i=" << i << " iCat=" << iCat << " iPar=" << iPar << " histId=" << histId << " histName=" << histName << std::endl;
 			 fHM->Add(histName, new TH1F(histName.c_str(), string(histName + ";" + xTitles[histId] + ";Counter").c_str(),
 				   bins[histId], bounds[histId].first, bounds[histId].second));
 		  }

@@ -480,7 +480,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
 
   sprintf(name,"S%d_L%d",fStation,fLayer);
   sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  printf("\n%s\n",title);
+  printf("%s                        \n",title);
   //sprintf(Canfile1,"pics/Station%dLayer%d.png",fStation,fLayer);
   //sprintf(Canfile2,"pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
   Layer = new TH2F(name,title,int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
@@ -822,14 +822,14 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
   //  TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
 
   // show only current module name
-  //  name.Form("Module %d",GeoPara->moduleId);
-  //  cout << "      " << name << "\r" << flush;
-
+  name.Form("Module %d",GeoPara->moduleId);
+  cout << "      " << name << "\r" << flush;
+  /*
   // show all module names
   //  cout << "Modules" << endl;
   name.Form("%10d",GeoPara->moduleId);
   cout << name << flush;
-
+  */
   //cout << "Histo" << endl;
   //cout << Mpos[2] << endl;
 
@@ -1160,7 +1160,11 @@ void CbmTrdHitRateTest::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Dou
 			Mpos[1]+Msize[1]);
   */
   TBox *M = new TBox(Mpos[0]-Msize[0],Mpos[1]-Msize[1],Mpos[0]+Msize[0],Mpos[1]+Msize[1]);
-  M->SetUniqueID(Mid);
+  TBox *M_inner = new TBox(Mpos[0]-100,Mpos[1]-100,Mpos[0]+100,Mpos[1]+100);
+  M_inner->SetUniqueID(Mid);
+  M_inner->SetFillColor(kWhite);
+  M->SetFillStyle(0);
+  M->SetLineColor(1);
   if(fDraw){
     c1->cd(1);
     /*
@@ -1170,6 +1174,7 @@ void CbmTrdHitRateTest::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Dou
     Md->Draw("same");
     */
     M->Draw("same");
+    M_inner->Draw("same");
     //c1->Update();
     c1->Write("", TObject::kOverwrite);
   }

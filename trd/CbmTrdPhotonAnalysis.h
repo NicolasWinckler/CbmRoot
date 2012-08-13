@@ -115,121 +115,15 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   //Histos
 
+  std::map<TString, TH1*> fHistoMap;
+  std::map<TString, TH1*>::iterator fHistoMapIt;
+  
   // Birth Vertex
   TH3I*  fMotherDaughterZBirth;
   TH3I*  fBirthGamma;
   TH3I*  fBirthPi0;
   TH3I*  fBirthPair;
-  TH2I*  fZBirthAll;
-  TH1I*  fZBirthEPfromGamma;
-  TH1I*  fZBirth[4];
-  TH1I* fPairAllVertex[3];
-  TH1I* fPairGammaVertex[3];
-  TH1I* fPairPi0Vertex[3];
-  TH1I* fEPPairVertexDistance_global;
-  TH1I* fEPPairVertexDistance_inMagnet;
-  TH1I* fEPPairVertexDistance_inTarget;
-  // Death Vertex
-  TH1I* fpi02GammaVertex[3];
-  TH1I* fgamma2PairVertex[3];
-
-  // Mother Daughter
-  TH2I*  fMotherDaughter_global;
-  TH2I*  fMotherDaughter_inMagnet;
-  TH2I*  fMotherDaughter_inTarget;
-  TH2I*  fNoDaughters_global;
-  TH2I*  fNoDaughters_inMagnet;
-  TH2I*  fNoDaughters_inTarget;
-  TH1I*  fePlusMinusMother;
-  TH1I*  fePlusAndMinusMother;
-  TH1I*  fgammaMother;
-  TH1I*  fgammaAndGammaMother;
-  TH1I*  fDalizMother;
-  TH1I*  fgammaDaughter;
-  TH2I*  fmotherGrani_gamma_global;
-  TH2I*  fmotherGrani_posi_global;
-  TH2I*  fmotherGrani_elec_global;
-  TH2I*  fmotherGrani_gamma_inMagnet;
-  TH2I*  fmotherGrani_posi_inMagnet; 
-  TH2I*  fmotherGrani_elec_inMagnet;
-  TH2I*  fmotherGrani_gamma_inTarget;
-  TH2I*  fmotherGrani_posi_inTarget;
-  TH2I*  fmotherGrani_elec_inTarget; 
-
-  TH2I* fInvMPairMother;
-  TH2I* fPtPairMother;
-  TH2I* fPPairMother;
-  TH2I* fOpenAnglePairMother;
-
-  // Global PID
-  TH1I*  fMCPid_global;
-  TH1I*  fMCPid_inMagnet;
-  TH1I*  fMCPid_inTarget;
-  TH1I*  fGTPid;
-  TH2I*  fPt_global;
-  TH2I*  fPt_inMagnet;
-  TH2I*  fPt_inTarget;
-  TH2I*  fP_global;
-  TH2I*  fP_inMagnet;
-  TH2I*  fP_inTarget;
-
-  TH1I*  fPairHistory;
-
-  // Spectra
-  //TH1D* fInvMSpectra[20];
-  //TH1D* fEPPairOpenAngle[20];
-
-  TH1I* fInvMassSpectrumGammaTruePairs;
-  TH1I* fInvMassSpectrumGammaAllPairs;
-  TH1I* fInvMassSpectrumGammaEPPairs; 
-  //TH1I* fInvMassSpectrumGammaEPPairsSameMother;
-  TH1I* fInvMassSpectrumGammaEPPairsInTarget;
-  TH1I* fInvMassSpectrumGammaEPPairsInMagnet;
-  TH1I* fInvMassSpectrumGammaEPPairsOpenAngle;
-  TH1I* fInvMassSpectrumGammaEPPairsGamma;
-  TH1I* fInvMassSpectrumGammaEPPairsPi0;
-  TH1I* fInvMassSpectrumTrueEPPairs;
-  TH1I* fInvMassSpectrumAllEPPairs;
-  TH1I* fInvMassSpectrumEPPairsInTarget;
-  TH1I* fInvMassSpectrumEPPairsInMagnet;
-  TH2I* fInvMassSpectrumGammaEPPairsInTargetPt; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInMagnetPt; // new
-  TH2I* fInvMassSpectrumGammaEPPairsPt; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInTargetP; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInMagnetP; // new
-  TH2I* fInvMassSpectrumGammaEPPairsP; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInTargetOA; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInMagnetOA; // new
-  TH2I* fInvMassSpectrumGammaEPPairsOA; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInTargetVD; // new
-  TH2I* fInvMassSpectrumGammaEPPairsInMagnetVD; // new
-  TH2I* fInvMassSpectrumGammaEPPairsVD; // new
-
-  TH1D* fInvMassSpectrumGammaEPPairsInMagnetBackground;
-
-  // Cuts
-  TH1I* fEPPairOpeningAngle;
-  TH1I* fEPPairOpeningAngleGamma;
-  TH1I* fEPPairOpeningAnglePi0;
-  TH1I* fEPPairOpeningAngleSameMother;
-  TH1I* fEPPairOpeningAngleInTarget;
-  TH1I* fEPPairOpeningAngleInMagnet;
-
-  TH1I* fPairOpeningAngleAll;
-  TH1I* fPairOpeningAngleGamma;
-  TH1I* fPairOpeningAnglePi0;
-  TH1I* fPairOpeningAngleGammaWoPi0;
-  /*
-    std::map<Int_t, MCParticle*> fMCParticleMap;
-    std::map<Int_t, MCParticle*>::iterator it;
-
-    std::vector<Int_t> fElectronIds;
-    std::vector<Int_t> fPositronIds;
-    std::vector<Int_t> fGammaIds;
-    std::vector<Int_t> fPi0Ids;
-
-    std::vector<CbmMCTrack*> fGammaFromPairs;
-  */
+  
   ClassDef(CbmTrdPhotonAnalysis,2)
     };
 

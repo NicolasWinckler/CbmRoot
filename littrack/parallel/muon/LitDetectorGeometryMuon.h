@@ -1,9 +1,10 @@
-/** LitDetectorGeometryMuon.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file LitDetectorGeometryMuon.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Classes for muon geometry description of CBM.
  *
- * Classes for geometry description of the 'muon' setup of CBM.
+ * Classes for muon geometry description of CBM.
  * Detector layout consists of station groups. Each station
  * group consists of stations and absorber. Each station consists
  * of substations. Detector layout also provides access to
@@ -23,57 +24,73 @@
 namespace lit {
 namespace parallel{
 
-/* Class describes substation for muon setup. */
+/**
+ * \class LitSubstationMuon
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Substation in muon detector layout.
+ **/
 template<class T>
 class LitSubstationMuon
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitSubstationMuon():
       fZ(0.),
-      fMaterial()
-   {}
+      fMaterial() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitSubstationMuon() {}
 
-   /* @return Z */
-   const T& GetZ() const {
-      return fZ;
-   }
+   /**
+    * \brief Return Z position of substation.
+    * \return Z position of substation.
+    */
+   const T& GetZ() const { return fZ; }
 
-   /* Sets Z
-    * @param Value */
-   void SetZ(const T& z) {
-      fZ = z;
-   }
+   /**
+    * \brief Set Z pposition of substation.
+    * \param[in] z Z position value.
+    */
+   void SetZ(const T& z) { fZ = z; }
 
-   /* @return Material */
-   const LitMaterialInfo<T>& GetMaterial() const {
-      return fMaterial;
-   }
+   /**
+    * \brief Return material of substation.
+    * \return Material of substation.
+    */
+   const LitMaterialInfo<T>& GetMaterial() const { return fMaterial; }
 
-   /* Sets material
-    * @param Value */
-   void SetMaterial(const LitMaterialInfo<T>& material) {
-      fMaterial = material;
-   }
+   /**
+    * \brief Set material of substation.
+    * \param[in] materiel Material value.
+    */
+   void SetMaterial(const LitMaterialInfo<T>& material) { fMaterial = material; }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Return string representation for the class.
+    * \return String representation of class.
+    */
    std::string ToString() const {
       return "LitSubstationMuon: Z=" + lit::parallel::ToString<T>(GetZ())
             + ", material=" + GetMaterial().ToString();
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return std::ostream for continuous output.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitSubstationMuon& substation ) {
       strm << substation.ToString();
       return strm;
    }
 
 private:
-   T fZ; // Z position of the substation in [cm]
-   LitMaterialInfo<T> fMaterial; // Material information of the substation
+   T fZ; // Z position of substation in [cm]
+   LitMaterialInfo<T> fMaterial; // Material of substation
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -82,48 +99,67 @@ typedef LitSubstationMuon<fscal> LitSubstationMuonScal;
 
 
 
-/* Class describes station for muon setup. */
+/**
+ * \class LitStationMuon
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Station in muon detector layout.
+ **/
 template<class T>
 class LitStationMuon
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitStationMuon():
       fType(kLITPIXELHIT),
       fSubstations() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitStationMuon() {}
 
-   /* Adds substation to the station.
-    * @param substation Reference to substation to be added */
+   /**
+    * \brief Add substation to station.
+    * \param[in] substation Substation to be added.
+    */
    void AddSubstation(const LitSubstationMuon<T>& substation) {
       fSubstations.push_back(substation);
    }
 
-   /* @param index Index of the substation
-    * @return substation */
+   /**
+    * \brief Return substation by index.
+    * \param[in] index Index of substation.
+    * \return Substation by index.
+    */
    const LitSubstationMuon<T>& GetSubstation(unsigned short index) const {
       return fSubstations[index];
    }
 
-   /* @return Number of substaions for this station */
-   unsigned char GetNofSubstations() const {
-      return fSubstations.size();
-   }
+   /**
+    * \brief Return number of substations in station.
+    * \return Number of substaions in station.
+    */
+   unsigned char GetNofSubstations() const { return fSubstations.size(); }
 
-   /* @return Type */
-   LitHitType GetType() const {
-      return fType;
-   }
+   /**
+    * \brief Return type of hits for station.
+    * \return Type of hits for station.
+    */
+   LitHitType GetType() const { return fType; }
 
-   /* Sets type
-    * @param Value */
-   void SetType(LitHitType type) {
-      fType = type;
-   }
+   /**
+    * \brief Set type of hits for station.
+    * \param[in] type Type value.
+    */
+   void SetType(LitHitType type) { fType = type; }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Return std::string representation for the class.
+    * \return std::string representation for the class.
+    */
    std::string ToString() const {
       std::string str = "LitStationMuon: type=" + lit::parallel::ToString<LitHitType>(GetType())
             + ", nofSubstations=" + lit::parallel::ToString<int>((int)GetNofSubstations()) + "\n";
@@ -133,7 +169,10 @@ public:
       return str;
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return std::ostream for continuous output.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitStationMuon& station) {
       strm << station.ToString();
       return strm;
@@ -141,7 +180,7 @@ public:
 
 private:
    LitHitType fType; // Type of hits on the station
-   std::vector<LitSubstationMuon<T> > fSubstations; // Array with substations in the station
+   std::vector<LitSubstationMuon<T> > fSubstations; // Array of substations in the station
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -150,120 +189,104 @@ typedef LitStationMuon<fscal> LitStationMuonScal;
 
 
 
-/* Class describes muon absorber */
+/**
+ * \class LitAbsorber
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Absorber in muon detector layout.
+ **/
 template<class T>
 class LitAbsorber
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitAbsorber():
       fZ(0.),
       fMaterial(),
-//      fFieldSliceFront(),
-//      fFieldSliceMiddle(),
-//      fFieldSliceBack()
       fFieldGridFront(),
-         fFieldGridMiddle(),
-         fFieldGridBack() {}
+      fFieldGridMiddle(),
+      fFieldGridBack() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitAbsorber() {}
 
-   /* @return Z */
-   const T& GetZ() const {
-      return fZ;
-   }
+   /**
+    * \brief Return Z position of absorber.
+    * \return Z position of absorber.
+    */
+   const T& GetZ() const { return fZ; }
 
-   /* Sets Z
-    * @param Value */
-   void SetZ(const T& z) {
-      fZ = z;
-   }
+   /**
+    * \brief Set Z position of absorber.
+    * \param[in] z Z position value.
+    */
+   void SetZ(const T& z) { fZ = z; }
 
-   /* @return Material */
-   const LitMaterialInfo<T>& GetMaterial() const {
-      return fMaterial;
-   }
+   /**
+    * \brief Return absorber material.
+    * \return Absorber material.
+    */
+   const LitMaterialInfo<T>& GetMaterial() const { return fMaterial; }
 
-   /* Sets material
-    * @param Value */
-   void SetMaterial(const LitMaterialInfo<T>& material) {
-      fMaterial = material;
-   }
+   /**
+    * \brief Set absorber material.
+    * \param[in] material Absorber material value.
+    */
+   void SetMaterial(const LitMaterialInfo<T>& material) { fMaterial = material; }
 
-//   /* @return field slice in front of the absorber */
-//   const LitFieldSlice<T>& GetFieldSliceFront() const {
-//      return fFieldSliceFront;
-//   }
-//
-//   /* Sets field slice in front of the absorber
-//    * @param Value */
-//   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSliceFront = fieldSlice;
-//   }
-//
-//   /* @return field slice in middle of the absorber */
-//   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
-//      return fFieldSliceMiddle;
-//   }
-//
-//   /* Sets field slice in the middle of the absorber
-//    * @param Value */
-//   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSliceMiddle = fieldSlice;
-//   }
-//
-//   /* @return field slice in back of the absorber */
-//   const LitFieldSlice<T>& GetFieldSliceBack() const {
-//      return fFieldSliceBack;
-//   }
-//
-//   /* Sets field slice in front of the absorber
-//    * @param Value */
-//   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSliceBack = fieldSlice;
-//   }
+   /**
+    * \brief Return magnetic field grid in front of the absorber.
+    * \return magnetic field grid in front of the absorber.
+    */
+   const LitFieldGrid& GetFieldGridFront() const { return fFieldGridFront; }
 
-   /* @return field grid in front of the absorber */
-   const LitFieldGrid& GetFieldGridFront() const {
-      return fFieldGridFront;
-   }
+   /**
+    * \brief Set magnetic field grid in front of the absorber.
+    * \param[in] fieldGrid Magnetic field value.
+    */
+   void SetFieldGridFront(const LitFieldGrid& fieldGrid) { fFieldGridFront = fieldGrid; }
 
-   /* Sets field grid in front of the absorber
-    * @param Value */
-   void SetFieldGridFront(const LitFieldGrid& fieldGrid) {
-      fFieldGridFront = fieldGrid;
-   }
+   /**
+    * \brief Return magnetic field grid in the middle of the absorber.
+    * \return magnetic field grid in the middle of the absorber.
+    */
+   const LitFieldGrid& GetFieldGridMiddle() const { return fFieldGridMiddle; }
 
-   /* @return field grid in the middle of the absorber */
-   const LitFieldGrid& GetFieldGridMiddle() const {
-      return fFieldGridMiddle;
-   }
+   /**
+    * \brief Set magnetic field grid in the middle of the absorber.
+    * \param[in] fieldGrid Magnetic field value.
+    */
+   void SetFieldGridMiddle(const LitFieldGrid& fieldGrid) { fFieldGridMiddle = fieldGrid; }
 
-   /* Sets field grid in the middle of the absorber
-    * @param Value */
-   void SetFieldGridMiddle(const LitFieldGrid& fieldGrid) {
-      fFieldGridMiddle = fieldGrid;
-   }
+   /**
+    * \brief Return magnetic field grid in the back of the absorber.
+    * \return Magnetic field grid in the back of the absorber.
+    */
+   const LitFieldGrid& GetFieldGridBack() const { return fFieldGridBack; }
 
-   /* @return field grid in the back of the absorber */
-   const LitFieldGrid& GetFieldGridBack() const {
-      return fFieldGridBack;
-   }
+   /**
+    * \brief Set magnetic field grid in the back of the absorber.
+    * \param[in] fieldGrid magnetic field value.
+    */
+   void SetFieldGridBack(const LitFieldGrid& fieldGrid) { fFieldGridBack = fieldGrid; }
 
-   /* Sets field grid in the back of the absorber.
-    * @param Value */
-   void SetFieldGridBack(const LitFieldGrid& fieldGrid) {
-      fFieldGridBack = fieldGrid;
-   }
-
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Return std::string representation of the class.
+    * \return std::string representation of the class.
+    */
    std::string ToString() const {
       return "LitAbsorber: Z=" + lit::parallel::ToString<T>(GetZ())
             + ", material=" + GetMaterial().ToString();
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return std::ostream for continuous output.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitAbsorber& absorber) {
       strm << absorber.ToString();
       return strm;
@@ -275,10 +298,6 @@ private:
    LitFieldGrid fFieldGridFront; // Magnetic field approximation in front of absorber
    LitFieldGrid fFieldGridMiddle; // Magnetic field approximation in the middle of absorber
    LitFieldGrid fFieldGridBack; // Magnetic field approximation in the back of absorber
-
-//   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front of the absorber
-//   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle of the absorber
-//   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back of the absorber
 } _fvecalignment;
 
 /* Some typedefs for convenience */
@@ -287,124 +306,104 @@ typedef LitAbsorber<fscal> LitAbsorberScal;
 
 
 
-/* Class describes station group for muon setup */
+/**
+ * \class LitAbsorber
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Station group in muon detector layout.
+ **/
 template<class T>
 class LitStationGroupMuon
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitStationGroupMuon():
-//      fFieldSliceFront(),
-//      fFieldSliceMiddle(),
-//      fFieldSliceBack(),
 		fFieldGridFront(),
 		fFieldGridMiddle(),
 		fFieldGridBack(),
-      fStations(),
-      fAbsorber() {}
+        fStations(),
+        fAbsorber() {}
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitStationGroupMuon() {}
 
-//   /* @return field slice in front of the absorber */
-//   const LitFieldSlice<T>& GetFieldSliceFront() const {
-//      return fFieldSliceFront;
-//   }
-//
-//   /* Sets field slice in front of the absorber
-//    * @param Value */
-//   void SetFieldSliceFront(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSliceFront = fieldSlice;
-//   }
-//
-//   /* @return field slice in middle of the absorber */
-//   const LitFieldSlice<T>& GetFieldSliceMiddle() const {
-//      return fFieldSliceMiddle;
-//   }
-//
-//   /* Sets field slice in the middle of the absorber
-//    * @param Value */
-//   void SetFieldSliceMiddle(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSliceMiddle = fieldSlice;
-//   }
-//
-//   /* @return field slice in back of the absorber */
-//   const LitFieldSlice<T>& GetFieldSliceBack() const {
-//      return fFieldSliceBack;
-//   }
-//
-//   /* Sets field slice in front of the absorber
-//    * @param Value */
-//   void SetFieldSliceBack(const LitFieldSlice<T>& fieldSlice) {
-//      fFieldSliceBack = fieldSlice;
-//   }
+   /**
+    * \brief Return magnetic field grid in front of the absorber.
+    * \return Magnetic field grid in front of the absorber.
+    */
+   const LitFieldGrid& GetFieldGridFront() const { return fFieldGridFront; }
 
+   /**
+    * \brief Set field grid in front of the absorber.
+    * \param[in] fieldGrid Field grid value.
+    */
+   void SetFieldGridFront(const LitFieldGrid& fieldGrid) { fFieldGridFront = fieldGrid; }
 
-   /* @return field grid in front of the absorber */
-   const LitFieldGrid& GetFieldGridFront() const {
-      return fFieldGridFront;
-   }
+   /**
+    * \brief Return magnetic field grid in the middle of the absorber.
+    * \return Magnetic field grid in the middle of the absorber.
+    */
+   const LitFieldGrid& GetFieldGridMiddle() const { return fFieldGridMiddle; }
 
-   /* Sets field grid in front of the absorber
-    * @param Value */
-   void SetFieldGridFront(const LitFieldGrid& fieldGrid) {
-      fFieldGridFront = fieldGrid;
-   }
+   /**
+    * \brief Set field grid in the middle of the absorber.
+    * \param[in] fieldGrid Field grid value.
+    */
+   void SetFieldGridMiddle(const LitFieldGrid& fieldGrid) { fFieldGridMiddle = fieldGrid; }
 
-   /* @return field grid in the middle of the absorber */
-   const LitFieldGrid& GetFieldGridMiddle() const {
-      return fFieldGridMiddle;
-   }
+   /**
+    * \brief Return magnetic field grid in the back of the absorber.
+    * \return Magnetic field grid in the back of the absorber.
+    */
+   const LitFieldGrid& GetFieldGridBack() const { return fFieldGridBack; }
 
-   /* Sets field grid in the middle of the absorber
-    * @param Value */
-   void SetFieldGridMiddle(const LitFieldGrid& fieldGrid) {
-      fFieldGridMiddle = fieldGrid;
-   }
+   /**
+    * \brief Set magnetic field grid in the back of the absorber.
+    * \param[in] fieldGrid Field grid value.
+    */
+   void SetFieldGridBack(const LitFieldGrid& fieldGrid) { fFieldGridBack = fieldGrid; }
 
-   /* @return field grid in the back of the absorber */
-   const LitFieldGrid& GetFieldGridBack() const {
-      return fFieldGridBack;
-   }
+   /**
+    * \brief Add station to the station group.
+    * \param[in] station Station to be added.
+    */
+   void AddStation(const LitStationMuon<T>& station) { fStations.push_back(station); }
 
-   /* Sets field grid in the back of the absorber.
-    * @param Value */
-   void SetFieldGridBack(const LitFieldGrid& fieldGrid) {
-      fFieldGridBack = fieldGrid;
-   }
+   /**
+    * \brief Return station by index.
+    * \param[in] index Index of the station.
+    * \return Station by index.
+    */
+   const LitStationMuon<T>& GetStation(unsigned short index) const { return fStations[index]; }
 
-   /* Adds station to the station group
-    * @param station Station to be added */
-   void AddStation(const LitStationMuon<T>& station) {
-      fStations.push_back(station);
-   }
+   /**
+    * \brief Return number of stations in this station group.
+    * \return Number of stations in this station group.
+    */
+   unsigned char GetNofStations() const { return fStations.size(); }
 
-   /* @param index Index of the station
-    * @return station */
-   const LitStationMuon<T>& GetStation(unsigned short index) const {
-      return fStations[index];
-   }
+   /**
+    * \brief Return absorber.
+    * \return Absorber.
+    */
+   const LitAbsorber<T>& GetAbsorber() const { return fAbsorber; }
 
-   /* @return Number of stations in this station group */
-   unsigned char GetNofStations() const {
-      return fStations.size();//nofStations;
-   }
+   /**
+    * \brief Set absorber.
+    * \param[in] absorber Absorber value.
+    */
+   void SetAbsorber(const LitAbsorber<T>& absorber) { fAbsorber = absorber; }
 
-   /* @return Absorber */
-   const LitAbsorber<T>& GetAbsorber() const {
-      return fAbsorber;
-   }
-
-   /* Sets Absorber
-    * @param absorber Value */
-   void SetAbsorber(const LitAbsorber<T>& absorber) {
-      fAbsorber = absorber;
-   }
-
-   /* Calculates field region for the group of stations
-    * @param x X position
-    * @param y Y position
-    * @param field OUTPUT field region */
+   /**
+    * \brief Calculate field region for the group of stations.
+    * \param[in] x X position.
+    * \param[in] y Y position.
+    * \param[out] field Output field region.
+    */
    void GetFieldRegion(T x, T y, LitFieldRegion<T>& field) const {
       LitFieldValue<T> v1, v2, v3;
       fFieldGridFront.GetFieldValue(x, y, v1);
@@ -413,7 +412,10 @@ public:
       field.Set(v1, fFieldGridFront.GetZ(), v2, fFieldGridMiddle.GetZ(), v3, fFieldGridBack.GetZ());
    }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Return std::string representation for the class.
+    * \return std::string representation for the class.
+    */
    std::string ToString() const {
       std::string str = "LitStationGroupMuon: nofStations="
             + lit::parallel::ToString<int>((int)GetNofStations()) + "\n";
@@ -424,7 +426,10 @@ public:
       return str;
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return std::ostream for continuous output.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitStationGroupMuon& stationGroup) {
       strm << stationGroup.ToString();
       return strm;
@@ -435,13 +440,9 @@ private:
    // in the group of stations. We need 3 values in order to use
    // parabolic approximation. So the values are in front, middle
    // and back of the gap.
-//   LitFieldSlice<T> fFieldSliceFront; // Magnetic field approximation in front
-//   LitFieldSlice<T> fFieldSliceMiddle; // Magnetic field approximation in the middle
-//   LitFieldSlice<T> fFieldSliceBack; // Magnetic field approximation in the back
-
-      LitFieldGrid fFieldGridFront; // Magnetic field approximation in front
-      LitFieldGrid fFieldGridMiddle; // Magnetic field approximation in the middle
-      LitFieldGrid fFieldGridBack; // Magnetic field approximation in the back
+   LitFieldGrid fFieldGridFront; // Magnetic field approximation in front
+   LitFieldGrid fFieldGridMiddle; // Magnetic field approximation in the middle
+   LitFieldGrid fFieldGridBack; // Magnetic field approximation in the back
 
    std::vector<LitStationMuon<T> > fStations; // Array with stations
    LitAbsorber<T> fAbsorber; // Absorber
@@ -453,63 +454,91 @@ typedef LitStationGroupMuon<fscal> LitStationGroupMuonScal;
 
 
 
-/* Class describes detector layout for muon setup */
+/**
+ * \class LitDetectorLayoutMuon
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Muon detector layout.
+ **/
 template<class T>
 class LitDetectorLayoutMuon
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitDetectorLayoutMuon():fStationGroups() {};
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitDetectorLayoutMuon() {}
 
-   /* Adds station group to the layout
-    * @param stationGroup Station group to be added */
-   void AddStationGroup(const LitStationGroupMuon<T>& stationGroup) {
-      fStationGroups.push_back(stationGroup);
-   }
+   /**
+    * \brief Add station group to the layout.
+    * \param stationGroup Station group to be added.
+    */
+   void AddStationGroup(const LitStationGroupMuon<T>& stationGroup) { fStationGroups.push_back(stationGroup); }
 
-   /* @return Number of station groups */
-   unsigned char GetNofStationGroups() const {
-      return fStationGroups.size();
-   }
+   /**
+    * \brief Return number of station groups.
+    * \return Number of station groups.
+    */
+   unsigned char GetNofStationGroups() const { return fStationGroups.size(); }
 
-   /* @param stationGroup Station group index
-    * @return Number of stations for specified station group */
+   /**
+    * \brief Return number of stations for specified station group.
+    * \param[in] stationGroup Station group index.
+    * \return Number of stations for specified station group.
+    */
    unsigned char GetNofStations(unsigned char stationGroup) const {
-      return fStationGroups[stationGroup].GetNofStations();
+	   return fStationGroups[stationGroup].GetNofStations();
    }
 
-   /* @param stationGroup Station group index
-    * @param station Station index
-    * @return Number of substations for specified station group and station */
+   /**
+    * \brief Return number of substations for specified station group and station.
+    * \param[in] stationGroup Station group index.
+    * \param[in] station Station index.
+    * \return Number of substations for specified station group and station.
+    */
    unsigned char GetNofSubstations(unsigned char stationGroup, unsigned char station) const {
       return fStationGroups[stationGroup].GetStation(station).GetNofSubstations();
    }
 
-   /* @param stationGroup Station group index
-    * @return Station group for specified station group index */
+   /**
+    * \brief Return station group for specified station group index.
+    * \param[in] stationGroup Station group index.
+    * \return Station group for specified station group index.
+    */
    const LitStationGroupMuon<T>& GetStationGroup(unsigned char stationGroup) const {
       return fStationGroups[stationGroup];
    }
 
-   /* @param stationGroup Station group index
-    * @param station Station index
-    * @return Station for specified station group and station indices */
+   /**
+    * \brief Return station for specified station group and station indices.
+    * \param[in] stationGroup Station group index.
+    * \param[in] station Station index.
+    * \return Station for specified station group and station indices.
+    */
    const LitStationMuon<T>& GetStation(unsigned char stationGroup, unsigned char station) const {
       return fStationGroups[stationGroup].GetStation(station);
    }
 
-   /* @param stationGroup Station group index
-    * @param station Station index
-    * @param substation Substation index
-    * @return Substation for specified station group, station and substation indices */
+   /**
+    * \brief Return substation for specified station group, station and substation indices.
+    * \param[in] stationGroup Station group index.
+    * \param[in] station Station index.
+    * \param[in] substation Substation index.
+    * \return[in] Substation for specified station group, station and substation indices.
+    */
    const LitSubstationMuon<T>& GetSubstation(unsigned char stationGroup, unsigned char station, unsigned char substation) const {
       return fStationGroups[stationGroup].GetStation(station).GetSubstation(substation);
    }
 
-   /* Returns std::string representation for the class */
+   /**
+    * \brief Return std::string representation of the class.
+    * \return std::string representation of the class.
+    */
    std::string ToString() const {
       std::string str = "LitDetectorLayoutMuon: nofStationGroups="
             + lit::parallel::ToString<int>((int)GetNofStationGroups()) + "\n";
@@ -519,14 +548,17 @@ public:
       return str;
    }
 
-   /* Operator << for convenient output to std::ostream */
+   /**
+    * \brief Operator << for convenient output to std::ostream.
+    * \return std::ostream for continuous output.
+    */
    friend std::ostream& operator<<(std::ostream& strm, const LitDetectorLayoutMuon& layout) {
       strm << layout.ToString();
       return strm;
    }
 
 private:
-   std::vector<LitStationGroupMuon<T> > fStationGroups; // Array with station groups
+   std::vector<LitStationGroupMuon<T> > fStationGroups; // Array of station groups
 } _fvecalignment;
 
 /* Some typedefs for convenience */

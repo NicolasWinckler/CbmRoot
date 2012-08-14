@@ -22,7 +22,6 @@ elif [ "${detector_setup}" = "muon" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
     pars=(0    0    0   0   0    0    10       0     0  yes   no)
     set_default_muon_geometry
-else
 elif [ "${detector_setup}" = "muon_radial" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
     pars=(0    0    0   0   0    0    10       0     0  yes   no)

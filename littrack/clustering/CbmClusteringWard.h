@@ -9,7 +9,7 @@
 #define CBMCLUSTERINGWARD_H_
 
 #include "FairTask.h"
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 
 //class CbmMuchGeoScheme;
 //class CbmMuchCluster;
@@ -24,24 +24,24 @@ public:
     */
 	CbmClusteringWard();
 
-	CbmClusteringWard(CbmMuchGeoCl* moduleGeo, Int_t blockSize);
+	CbmClusteringWard(CbmClusteringGeometry* moduleGeo, Int_t blockSize);
    /**
     * \brief Destructor.
     */
    virtual ~CbmClusteringWard();
 
    Float_t WardDistance(Int_t iPad1, Int_t iPad2);
-   void WardCreate(CbmMuchGeoCl* moduleGeo);
-   void AddClusterInBlock(CbmMuchGeoCl* moduleGeo, Int_t newCluster, Int_t addedCluster);
-   Bool_t WardBlockCreateStep(CbmMuchGeoCl* moduleGeo, Int_t wardStep, Bool_t wardStepRec, Int_t addedPad);
-   void WardBlockCreate(CbmMuchGeoCl* moduleGeo);
+   void WardCreate(CbmClusteringGeometry* moduleGeo);
+   void AddClusterInBlock(CbmClusteringGeometry* moduleGeo, Int_t newCluster, Int_t addedCluster);
+   Bool_t WardBlockCreateStep(CbmClusteringGeometry* moduleGeo, Int_t wardStep, Bool_t wardStepRec, Int_t addedPad);
+   void WardBlockCreate(CbmClusteringGeometry* moduleGeo);
    void DeleteCluaster(Int_t clusterNumber);
    void WardDistanceRecalculation(Int_t clusterNumber);
    Float_t XCenterRecalculation(Int_t cl1, Int_t cl2);
    Float_t YCenterRecalculation(Int_t cl1, Int_t cl2);
    void WardProcessingData(Float_t maxDistance);
    void GetClustersFromBlock();
-   void WardMainFunction(CbmMuchGeoCl* moduleGeo, Float_t maxDistance);
+   void WardMainFunction(CbmClusteringGeometry* moduleGeo, Float_t maxDistance);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
 
@@ -69,7 +69,7 @@ private:
    Bool_t* fS; //g_MAX_PADS
    Int_t* fNumbersOfPads; //g_MAX_PADS
 
-   CbmMuchGeoCl* fModuleGeo;
+   CbmClusteringGeometry* fModuleGeo;
 
    Int_t fNofClusters;
 

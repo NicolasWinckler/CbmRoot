@@ -5,7 +5,7 @@
  *      Author: kozlov
  */
 
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 #include "CbmStsHit.h"
 #include "CbmStsPoint.h"
 #include "CbmMuchPixelHit.h"
@@ -35,7 +35,7 @@ CbmClusteringSL::CbmClusteringSL()
 	fNofClusters = 0;
 }
 
-CbmClusteringSL::CbmClusteringSL(CbmMuchGeoCl* moduleGeo)
+CbmClusteringSL::CbmClusteringSL(CbmClusteringGeometry* moduleGeo)
 {
 	fNofPads = moduleGeo->GetNPads();
 	fNofActivePads = moduleGeo->GetAPadsNom();
@@ -66,9 +66,9 @@ CbmClusteringSL::~CbmClusteringSL()
 	delete fClusters;
 }
 
-void CbmClusteringSL::SLRec1(CbmMuchGeoCl* moduleGeo, Int_t activePad)
+void CbmClusteringSL::SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad)
 {
-	for(Int_t iPad = 0; iPad < moduleGeo->GetNeighborsNum(activePad); iPad++)
+	/*for(Int_t iPad = 0; iPad < moduleGeo->GetNeighborsNum(activePad); iPad++)
 	{
 		//Vipoln9ets9 tol'ko dl9 aktivnih sosedei
 		if(fS[moduleGeo->GetNeighbor(activePad, iPad)] == 1)
@@ -78,25 +78,26 @@ void CbmClusteringSL::SLRec1(CbmMuchGeoCl* moduleGeo, Int_t activePad)
 			fS[moduleGeo->GetNeighbor(activePad, iPad)] = 0;
 			SLRec1(moduleGeo, moduleGeo->GetNeighbor(activePad, iPad));
         }
-	}
+	}*/
+	std::cout<<"SORRY, NOT WORKING NOW.\n";
 }
 
-void CbmClusteringSL::SLRec2(CbmMuchGeoCl* moduleGeo, Int_t activePad)
+void CbmClusteringSL::SLRec2(CbmClusteringGeometry* moduleGeo, Int_t activePad)
 {
 	for(Int_t iPad = 0; iPad < moduleGeo->GetGoodNeighborsNum(activePad); iPad++)
 	{
 		//Vipoln9ets9 tol'ko dl9 aktivnih sosedei
-		if(fS[moduleGeo->GetGoodNeighbor(activePad, iPad)] == 1)
+		if(fS[moduleGeo->GetNeighbor(activePad, iPad)] == 1)
 		{
-			fNumbersOfPads[moduleGeo->GetGoodNeighbor(activePad, iPad)] = fNumbersOfPads[activePad];
+			fNumbersOfPads[moduleGeo->GetNeighbor(activePad, iPad)] = fNumbersOfPads[activePad];
 			//Sn9tie aktivnosti 94eiki
-			fS[moduleGeo->GetGoodNeighbor(activePad, iPad)] = 0;
-			SLRec1(moduleGeo, moduleGeo->GetGoodNeighbor(activePad, iPad));
+			fS[moduleGeo->GetNeighbor(activePad, iPad)] = 0;
+			SLRec2(moduleGeo, moduleGeo->GetNeighbor(activePad, iPad));
         }
 	}
 }
 
-void CbmClusteringSL::MainClusteringSL(CbmMuchGeoCl* moduleGeo, Int_t algVersion)
+void CbmClusteringSL::MainClusteringSL(CbmClusteringGeometry* moduleGeo, Int_t algVersion)
 {
 	//algVersion == 1 -> all neighbors
 	//algVersion == 2 -> only good neighbors

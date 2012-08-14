@@ -93,11 +93,11 @@ private:
    map<pair<Int_t, Int_t>, Bool_t> fActiveMap;
    map<pair<Int_t, Int_t>, Bool_t>::iterator fActiveMapIt;
 
-   map<pair<Int_t, Int_t>, Int_t> fChargeMap1;
-   map<pair<Int_t, Int_t>, Int_t>::iterator fChargeMap1It;
+   map<pair<Int_t, Int_t>, Bool_t> fChargeMap1;
+   map<pair<Int_t, Int_t>, Bool_t>::iterator fChargeMap1It;
 
-   map<pair<Int_t, Int_t>, Int_t> fChargeMap2;
-   map<pair<Int_t, Int_t>, Int_t>::iterator fChargeMap2It;
+   /*map<pair<Int_t, Int_t>, Int_t> fChargeMap2;
+   map<pair<Int_t, Int_t>, Int_t>::iterator fChargeMap2It;*/
    Int_t fNofDigis;
    Int_t fNofPoints;
 

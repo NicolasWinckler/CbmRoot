@@ -5,7 +5,7 @@
  *      Author: kozlov
  */
 
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 #include "CbmStsHit.h"
 #include "CbmStsPoint.h"
 #include "CbmMuchPixelHit.h"

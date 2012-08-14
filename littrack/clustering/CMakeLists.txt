@@ -5,10 +5,14 @@ ${INCLUDE_DIRECTORIES}
 ${GEANT3_INCLUDE_DIR}
 ${Boost_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/littrack/clustering
+${CBMROOT_SOURCE_DIR}/littrack/clustering/qa/clustering
+${CBMROOT_SOURCE_DIR}/littrack/std/utils
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/cbmbase/report
+${CBMROOT_SOURCE_DIR}/cbmbase/draw
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/much
@@ -29,27 +33,35 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(CLUSTERING_SRCS
-CbmMuchGeoCl.cxx
+CbmClusteringGeometry.cxx
 CbmMuchClustering.cxx
 CbmClusteringA1.cxx
 CbmClusteringSL.cxx
 CbmClusteringWard.cxx
 CbmMuchTest.cxx
-CbmMuchClusteringQa.cxx
 CbmMvdGeoCl.cxx
 CbmMvdClustering.cxx
+CbmMuchClusteringQa0.cxx
+#qa/clustering/CbmMuchClusteringQa.cxx
+#qa/clustering/CbmMuchClusteringQaCalculator.cxx
+#qa/clustering/CbmMuchClusteringQaDraw.cxx
+#qa/clustering/CbmMuchClusteringQaHistCreator.cxx
+#qa/clustering/CbmMuchClusteringQaPTreeCreator.cxx
+#qa/clustering/CbmMuchClusteringQaReport.cxx
+#qa/clustering/CbmMuchClusteringQaStudyReport.cxx
 )
 
 set(CLUSTERING_HEADERS
-CbmMuchGeoCl.h
+CbmClusteringGeometry.h
 CbmMuchClustering.h
 CbmClusteringA1.h
 CbmClusteringSL.h
 CbmClusteringWard.h
 CbmMuchTest.h
-CbmMuchClusteringQa.h
 CbmMvdGeoCl.h
 CbmMvdClustering.h
+CbmMuchClusteringQa0.h
+#qa/clustering/CbmMuchClusteringQa.h
 )
 
 if(RULE_CHECKER_FOUND)

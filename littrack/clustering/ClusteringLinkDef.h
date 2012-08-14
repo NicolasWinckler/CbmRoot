@@ -5,7 +5,11 @@
 #pragma link off all functions;
 
 #pragma link C++ class CbmMuchClustering+;
-#pragma link C++ class CbmMuchClusteringQa+;
+#pragma link C++ class CbmMuchClusteringQa0+;
 #pragma link C++ class CbmMvdClustering+;
+
+#ifdef BOOST_FOUND
+#pragma link C++ class CbmMuchClusteringQa+;
+#endif
 
 #endif

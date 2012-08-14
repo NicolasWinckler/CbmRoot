@@ -9,7 +9,7 @@
 #define CBMCLUSTERINGSL_H_
 
 #include "FairTask.h"
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 
 class CbmClusteringSL//: public FairTask
 {
@@ -19,15 +19,15 @@ public:
     */
 	CbmClusteringSL();
 
-	CbmClusteringSL(CbmMuchGeoCl* moduleGeo);
+	CbmClusteringSL(CbmClusteringGeometry* moduleGeo);
    /**
     * \brief Destructor.
     */
    virtual ~CbmClusteringSL();
 
-   void SLRec1(CbmMuchGeoCl* moduleGeo, Int_t activePad);
-   void SLRec2(CbmMuchGeoCl* moduleGeo, Int_t activePad);
-   void MainClusteringSL(CbmMuchGeoCl* moduleGeo, Int_t algVersion);
+   void SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad);
+   void SLRec2(CbmClusteringGeometry* moduleGeo, Int_t activePad);
+   void MainClusteringSL(CbmClusteringGeometry* moduleGeo, Int_t algVersion);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
    Int_t GetNofPads()		const { return fNofPads;}

@@ -9,7 +9,7 @@
 #define CBMCLUSTERINGA1_H_
 
 #include "FairTask.h"
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 //#include "TClonesArray.h"
 //#include "CbmMuchClFull.h"
 
@@ -26,13 +26,13 @@ public:
     */
 	CbmClusteringA1();
 
-	CbmClusteringA1(CbmMuchGeoCl* moduleGeo);
+	CbmClusteringA1(CbmClusteringGeometry* moduleGeo);
    /**
     * \brief Destructor.
     */
    virtual ~CbmClusteringA1();
 
-   void MainClusteringA1(CbmMuchGeoCl* moduleGeo, Int_t algVersion);
+   void MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t algVersion);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
    Int_t GetNofPads()		const { return fNofPads;}

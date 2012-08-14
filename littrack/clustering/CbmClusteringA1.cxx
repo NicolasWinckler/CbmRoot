@@ -5,7 +5,7 @@
  *      Author: kozlov
  */
 
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 #include "CbmStsHit.h"
 #include "CbmStsPoint.h"
 #include "CbmMuchPixelHit.h"
@@ -35,7 +35,7 @@ CbmClusteringA1::CbmClusteringA1()
 	fNofClusters = 0;
 }
 
-CbmClusteringA1::CbmClusteringA1(CbmMuchGeoCl* moduleGeo)
+CbmClusteringA1::CbmClusteringA1(CbmClusteringGeometry* moduleGeo)
 {
 	fNofPads = moduleGeo->GetNPads();
 	fNofActivePads = moduleGeo->GetAPadsNom();
@@ -73,7 +73,7 @@ CbmClusteringA1::~CbmClusteringA1()
 	  }*/
 }
 
-void CbmClusteringA1::MainClusteringA1(CbmMuchGeoCl* moduleGeo, Int_t algVersion)
+void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t algVersion)
 {
 	//algVersion == 1 -> all neighbors
 	//algVersion == 2 -> only good neighbors
@@ -90,26 +90,23 @@ void CbmClusteringA1::MainClusteringA1(CbmMuchGeoCl* moduleGeo, Int_t algVersion
 			//Opredelenie novogo lokal'nogo maximuma sredi sosedei
 			if(algVersion == 1){
 				//std::cout<<"neighbors: "<<moduleGeo->GetNeighborsNum(iPad)<<"\n";
-				for(Int_t nPad = 0; nPad < moduleGeo->GetNeighborsNum(iPad); nPad++)
+				/*for(Int_t nPad = 0; nPad < moduleGeo->GetNeighborsNum(iPad); nPad++)
 				{
-					/*std::cout<<"WORKED 1\n";
-					std::cout<<"iPad: "<<iPad<<"; nPad: "<<nPad<<"; localMaximum: "<<localMaximum<<"\n";
-					std::cout<<"fA1_1: "<<fA1[moduleGeo->GetNeighbor(iPad, nPad)];
-					std::cout<<"; fA1_2: "<<fA1[localMaximum]<<"\n";*/
 					if(fA1[moduleGeo->GetNeighbor(iPad, nPad)] > fA1[localMaximum])
 					{
 						localMaximum = moduleGeo->GetNeighbor(iPad, nPad);
 						//std::cout<<"Get Neighbour\n";
 						//std::cout<<iPad<<" -> "<<moduleGeo->GetNeighbor(iPad, nPad)<<"\n";
 					}
-				}
+				}*/
+				std::cout<<"SORRY, NOT WORKING NOW.\n";
 			}
 			if(algVersion == 2){
 				for(Int_t nPad = 0; nPad < moduleGeo->GetGoodNeighborsNum(iPad); nPad++)
 				{
-					if(fA1[moduleGeo->GetGoodNeighbor(iPad, nPad)] > fA1[localMaximum])
+					if(fA1[moduleGeo->GetNeighbor(iPad, nPad)] > fA1[localMaximum])
 					{
-						localMaximum = moduleGeo->GetGoodNeighbor(iPad, nPad);
+						localMaximum = moduleGeo->GetNeighbor(iPad, nPad);
 					}
 				}
 			}

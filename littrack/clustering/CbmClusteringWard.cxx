@@ -5,7 +5,7 @@
  *      Author: kozlov
  */
 
-#include "CbmMuchGeoCl.h"
+#include "CbmClusteringGeometry.h"
 #include "CbmStsHit.h"
 #include "CbmStsPoint.h"
 #include "CbmMuchPixelHit.h"
@@ -35,7 +35,7 @@ CbmClusteringWard::CbmClusteringWard()
 	fNofClusters = 0;
 }
 
-CbmClusteringWard::CbmClusteringWard(CbmMuchGeoCl* moduleGeo, Int_t blockSize)
+CbmClusteringWard::CbmClusteringWard(CbmClusteringGeometry* moduleGeo, Int_t blockSize)
 {
 	MAX_NEIGHBORS = 50;
 	BLOCK_SIZE = blockSize;
@@ -125,7 +125,7 @@ Float_t CbmClusteringWard::WardDistance(Int_t iPad1, Int_t iPad2)
 			(fClustersInBlock[iPad1].yc - fClustersInBlock[iPad2].yc))) / (fClustersInBlock[iPad1].clCharge + fClustersInBlock[iPad2].clCharge));
 }
 
-void CbmClusteringWard::WardCreate(CbmMuchGeoCl* moduleGeo)
+void CbmClusteringWard::WardCreate(CbmClusteringGeometry* moduleGeo)
 {
 	Int_t clusterNumber = 0;
 	for(Int_t iPad = 0; iPad < fNofPads; iPad++)	//0 <> 1 -???
@@ -178,7 +178,7 @@ void CbmClusteringWard::WardCreate(CbmMuchGeoCl* moduleGeo)
 }
 
 //функции загрузки в блок недоделаны. есть проблема с nofNeighbors
-void CbmClusteringWard::AddClusterInBlock(CbmMuchGeoCl* moduleGeo, Int_t newCluster, Int_t addedCluster)
+void CbmClusteringWard::AddClusterInBlock(CbmClusteringGeometry* moduleGeo, Int_t newCluster, Int_t addedCluster)
 {
 	fClustersInBlock[newCluster].nofNeighbors = moduleGeo->GetNeighborsNum(addedCluster);
 	fClustersInBlock[newCluster].nofPads = 1;
@@ -197,7 +197,7 @@ void CbmClusteringWard::AddClusterInBlock(CbmMuchGeoCl* moduleGeo, Int_t newClus
 	//std::cout<<"nofNeighbors: "<<fClustersInBlock[newCluster].nofNeighbors<<"\n";
 }
 
-Bool_t CbmClusteringWard::WardBlockCreateStep(CbmMuchGeoCl* moduleGeo, Int_t wardStep, Bool_t wardStepRec, Int_t addedPad)
+Bool_t CbmClusteringWard::WardBlockCreateStep(CbmClusteringGeometry* moduleGeo, Int_t wardStep, Bool_t wardStepRec, Int_t addedPad)
 {
 	//std::cout<<"BlockCreateStep started!\n";
 	Int_t tempPad = addedPad;
@@ -261,7 +261,7 @@ Bool_t CbmClusteringWard::WardBlockCreateStep(CbmMuchGeoCl* moduleGeo, Int_t war
 	return wardStepRec;
 }
 
-void CbmClusteringWard::WardBlockCreate(CbmMuchGeoCl* moduleGeo)
+void CbmClusteringWard::WardBlockCreate(CbmClusteringGeometry* moduleGeo)
 {
 	//Koeffitsient dostato4nosti razmera spiska obrabotki
 	Float_t listLimit = 0.97;
@@ -628,7 +628,7 @@ void CbmClusteringWard::GetClustersFromBlock()
 	//std::cout<<"clustersInMethod: "<<clustersInMethod<<"\n";
 }
 
-void CbmClusteringWard::WardMainFunction(CbmMuchGeoCl* moduleGeo, Float_t maxDistance)
+void CbmClusteringWard::WardMainFunction(CbmClusteringGeometry* moduleGeo, Float_t maxDistance)
 {
 	//WardCreate(moduleGeo);
 	WardBlockCreate(moduleGeo);

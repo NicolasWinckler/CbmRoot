@@ -38,7 +38,8 @@
 using std::cout;
 using std::endl;
 
-CbmMvdGeoCl::CbmMvdGeoCl()
+CbmMvdGeoCl::CbmMvdGeoCl():
+		fMvdGeo()
 {
 	fNofPads = 0;
 	fActivePads = 0;

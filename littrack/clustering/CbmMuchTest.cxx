@@ -30,7 +30,18 @@
 using std::cout;
 using std::endl;
 
-CbmMuchTest::CbmMuchTest()
+CbmMuchTest::CbmMuchTest():
+		fMeanErrorOnXforSubCenters(),
+		fMeanErrorOnYforSubCenters(),
+		fErrorsOnXforSubCenters(),
+		fErrorsOnYforSubCenters(),
+		fEfficiencyForSubCenters(),
+		fEfficiency(),
+		fMeanErrorOnY(),
+		fMeanErrorOnX(),
+		fClusters(),
+		fErrorsOnX(),
+		fErrorsOnY()
 {
 	fNofPoints = 0;
 	//fNofHits = 0;
@@ -40,7 +51,18 @@ CbmMuchTest::CbmMuchTest()
 	fRealPoints = 0;
 }
 
-CbmMuchTest::CbmMuchTest(Int_t nofPoints, Float_t subStep)
+CbmMuchTest::CbmMuchTest(Int_t nofPoints, Float_t subStep):
+		fMeanErrorOnXforSubCenters(),
+		fMeanErrorOnYforSubCenters(),
+		fErrorsOnXforSubCenters(),
+		fErrorsOnYforSubCenters(),
+		fMeanErrorOnY(),
+		fMeanErrorOnX(),
+		fErrorsOnX(),
+		fErrorsOnY(),
+		fEfficiencyForSubCenters(),
+		fEfficiency(),
+		fClusters()
 {
 	fNofPoints = nofPoints;
 	fSubStep = subStep;

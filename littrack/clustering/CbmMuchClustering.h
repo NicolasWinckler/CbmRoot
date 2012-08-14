@@ -49,11 +49,7 @@ public:
 
    void SetAlgorithmVersion(Int_t AlgorithmVersion) { fAlgorithmVersion = AlgorithmVersion;}
 
-   void SetPadsCharge(CbmClusteringGeometry* moduleGeo, CbmMuchGeoScheme* geoScheme);//Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule);
-
    void DeletePadsCharge(CbmClusteringGeometry* moduleGeo);
-
-   void MuchClustering(Int_t algVersion, CbmMuchGeoScheme* scheme);
 
    void CreateModulesGeometryArray();
 

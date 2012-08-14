@@ -42,26 +42,26 @@ CbmMuchTest.cxx
 CbmMvdGeoCl.cxx
 CbmMvdClustering.cxx
 CbmMuchClusteringQa0.cxx
-#qa/clustering/CbmMuchClusteringQa.cxx
-#qa/clustering/CbmMuchClusteringQaCalculator.cxx
-#qa/clustering/CbmMuchClusteringQaDraw.cxx
-#qa/clustering/CbmMuchClusteringQaHistCreator.cxx
-#qa/clustering/CbmMuchClusteringQaPTreeCreator.cxx
-#qa/clustering/CbmMuchClusteringQaReport.cxx
-#qa/clustering/CbmMuchClusteringQaStudyReport.cxx
+qa/clustering/CbmMuchClusteringQa.cxx
+qa/clustering/CbmMuchClusteringQaCalculator.cxx
+qa/clustering/CbmMuchClusteringQaDraw.cxx
+qa/clustering/CbmMuchClusteringQaHistCreator.cxx
+qa/clustering/CbmMuchClusteringQaPTreeCreator.cxx
+qa/clustering/CbmMuchClusteringQaReport.cxx
+qa/clustering/CbmMuchClusteringQaStudyReport.cxx
 )
 
 set(CLUSTERING_HEADERS
-CbmClusteringGeometry.h
+#CbmClusteringGeometry.h
 CbmMuchClustering.h
-CbmClusteringA1.h
-CbmClusteringSL.h
-CbmClusteringWard.h
+#CbmClusteringA1.h
+#CbmClusteringSL.h
+#CbmClusteringWard.h
 CbmMuchTest.h
-CbmMvdGeoCl.h
+#CbmMvdGeoCl.h
 CbmMvdClustering.h
 CbmMuchClusteringQa0.h
-#qa/clustering/CbmMuchClusteringQa.h
+qa/clustering/CbmMuchClusteringQa.h
 )
 
 if(RULE_CHECKER_FOUND)
@@ -82,7 +82,9 @@ ENDIF (SSE_FOUND)
 set(LINKDEF ClusteringLinkDef.h)
 set(DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmClusteringDict.cxx) 
 set(HDRS ${CLUSTERING_HEADERS})
-
+If (Boost_FOUND)
+  set(DEFINITIONS BOOST_FOUND)
+EndIf (Boost_FOUND)
 ROOT_GENERATE_DICTIONARY()
 
 SET(CLUSTERING_SRCS ${CLUSTERING_SRCS} ${DICTIONARY})

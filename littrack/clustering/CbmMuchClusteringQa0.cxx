@@ -57,10 +57,20 @@ CbmMuchClusteringQa0::CbmMuchClusteringQa0():
 		fhMuchQualityDigiToClByRadiusS1L0(NULL),
 		fhMuchQualityDigiToClByRadiusS2L0(NULL),
 		fhMuchQualityDigiToClByRadiusS3L0(NULL),
-		fhMuchQualityDigiToClByRadiusS4L0(NULL)
-  /*:FairTask(name,verbose),
-    fGeoScheme( CbmMuchGeoScheme::Instance()),
-    fGeoFileName("much.digi.root")*/
+		fhMuchQualityDigiToClByRadiusS4L0(NULL),
+		fMuchPoint(),
+		fAccuracyArray(),
+		fNofDigis(),
+		fMuchDigi(),
+		fRealPoints(),
+		fClusters(),
+		fGeoScheme(),
+		fMuchHit(),
+		fNofClusters(),
+		fEfficiency(),
+		fNofPoints(),
+		fMuchCluster(),
+		fMuchDigiMatch()
 {
 }
 // -------------------------------------------------------------------------

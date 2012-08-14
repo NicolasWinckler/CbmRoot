@@ -28,14 +28,28 @@
 using std::cout;
 using std::endl;
 
-CbmClusteringWard::CbmClusteringWard()
+CbmClusteringWard::CbmClusteringWard():
+		clustersInMethod(),
+		padsInClusters(),
+		fS(),
+		fClustersInBlock(),
+		clustersInMethod_2(),
+		wardActivePads(),
+		fClusters(),
+		firstBlockElement(),
+		fModuleGeo(),
+		BLOCK_SIZE(),
+		fNumbersOfPads(),
+		MAX_NEIGHBORS(),
+		listValue()
 {
 	fNofPads = 0;
 	fNofActivePads = 0;
 	fNofClusters = 0;
 }
 
-CbmClusteringWard::CbmClusteringWard(CbmClusteringGeometry* moduleGeo, Int_t blockSize)
+CbmClusteringWard::CbmClusteringWard(CbmClusteringGeometry* moduleGeo, Int_t blockSize):
+		fModuleGeo()
 {
 	MAX_NEIGHBORS = 50;
 	BLOCK_SIZE = blockSize;

@@ -28,14 +28,20 @@
 using std::cout;
 using std::endl;
 
-CbmClusteringA1::CbmClusteringA1()
+CbmClusteringA1::CbmClusteringA1():
+		fA1(),
+		fA2(),
+		fS(),
+		fClusters(),
+		fNumbersOfPads()
 {
 	fNofPads = 0;
 	fNofActivePads = 0;
 	fNofClusters = 0;
 }
 
-CbmClusteringA1::CbmClusteringA1(CbmClusteringGeometry* moduleGeo)
+CbmClusteringA1::CbmClusteringA1(CbmClusteringGeometry* moduleGeo):
+		fClusters()
 {
 	fNofPads = moduleGeo->GetNPads();
 	fNofActivePads = moduleGeo->GetAPadsNom();

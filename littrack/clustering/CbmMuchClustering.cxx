@@ -37,7 +37,18 @@
 using std::cout;
 using std::endl;
 
-CbmMuchClustering::CbmMuchClustering()
+CbmMuchClustering::CbmMuchClustering():
+		FairTask(),
+		fClustersSL(),
+		fClustersA1(),
+		fClustersWard(),
+		fModulesGeometryArray(),
+		fScheme(),
+		fCluster(),
+		fMuchDigi(),
+		fMuchPoint(),
+		fHit(),
+		fMuchPad()
 {
 	fAlgorithmVersion = 2;
 	fNofModules = 0;
@@ -180,9 +191,9 @@ void CbmMuchClustering::ClearDigiCharges()
 	}
 }
 
-void CbmMuchClustering::SetPadsCharge(CbmClusteringGeometry* moduleGeo, CbmMuchGeoScheme* geoScheme)
+/*void CbmMuchClustering::SetPadsCharge(CbmClusteringGeometry* moduleGeo, CbmMuchGeoScheme* geoScheme)
 {
-	/*Int_t nofActivePads = 0;
+	Int_t nofActivePads = 0;
 	for(Int_t iDigi = 0; iDigi < fMuchDigi->GetEntriesFast(); iDigi++)
 	{
 		const CbmMuchDigi* muchDigi = static_cast<const CbmMuchDigi*>(fMuchDigi->At(iDigi));
@@ -211,8 +222,8 @@ void CbmMuchClustering::SetPadsCharge(CbmClusteringGeometry* moduleGeo, CbmMuchG
 			}
 		}
 	}
-	moduleGeo->SetAPadsNom(nofActivePads);*/
-}
+	moduleGeo->SetAPadsNom(nofActivePads);
+}*/
 
 void CbmMuchClustering::DeletePadsCharge(CbmClusteringGeometry* moduleGeo)
 {
@@ -222,7 +233,7 @@ void CbmMuchClustering::DeletePadsCharge(CbmClusteringGeometry* moduleGeo)
 	}
 }
 
-void CbmMuchClustering::MuchClustering(Int_t algVersion, CbmMuchGeoScheme* scheme)
+/*void CbmMuchClustering::MuchClustering(Int_t algVersion, CbmMuchGeoScheme* scheme)
 {
 	Int_t nClusters = 0;
 	Int_t nCluster = 0;
@@ -362,7 +373,7 @@ void CbmMuchClustering::MuchClustering(Int_t algVersion, CbmMuchGeoScheme* schem
 			}
 		}
 	}
-}
+}*/
 
 void CbmMuchClustering::ClusteringMainFunction()
 {

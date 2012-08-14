@@ -67,7 +67,17 @@ CbmMvdClustering::CbmMvdClustering():
 		fhErrHit_Pixel(NULL),*/
 		fhErrorsHit_MCPoint(NULL),
 		fhErrorsHit_Pixel(NULL),
-		fhErrorsPixel_MCPoint(NULL)
+		fhErrorsPixel_MCPoint(NULL),
+		fErrHit_Point(),
+		fErrHit_Pixel(),
+		fErrPoint_Pixel(),
+		fNofClusters(),
+		fClusters(),
+		fNofDigis(),
+		fDigis(),
+		fNofPoints(),
+		fPoints(),
+		fHits()
 {
 	fNofDigisBySt[0] = 0;
 	fNofDigisBySt[1] = 0;
@@ -1055,12 +1065,12 @@ void CbmMvdClustering::PrintClusters()
 	//TString fname = "/u/gkozlov/cbm/events/cc.25gev.centr_draw10.txt";
 	//TString fname = "/u/gkozlov/cbm/events/pc.25gev.centr_draw10.txt";
 	//TString fname = "/u/gkozlov/cbm/events/pAu.25gev.centr_draw10.txt";
-	TString fname = "/u/gkozlov/cbm/events/mvd.clustering.out.txt";
+	/*TString fname = "/u/gkozlov/cbm/events/mvd.clustering.out.txt";
 	FILE* f1 = fopen(fname , "a");
 	fprintf(f1, "\n--->START EVENT<---\n");
 	fprintf(f1, "Points: %d; St1: %d; St2: %d\nDigis: %d; St1: %d; St2: %d\nClusters: %d\n\n",
 			fNofPoints, fNofPointsBySt[0], fNofPointsBySt[1],
-			fNofDigis, fNofDigisBySt[0], fNofDigisBySt[1], fNofClusters);
+			fNofDigis, fNofDigisBySt[0], fNofDigisBySt[1], fNofClusters);*/
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
 		CbmMvdDigi* digi = (CbmMvdDigi*) fDigis->At(fClusters[iCl].nDigiMax);
@@ -1095,12 +1105,12 @@ void CbmMvdClustering::PrintClusters()
 				"\n--errHit_Point: "<<errHit_Point<<
 				"\n--errHit_Pixel: "<<errHit_Pixel<<
 				"\n--errPoint_Pixel: "<<errPoint_Pixel<<"\n";*/
-		fprintf(f1, "Cl: %d; Station: %d\n-Xc: %.7f; Yc: %.7f; Charge: %d; nDigis: %d\n--errHit_Point: %.7f\n--errHit_Pixel: %.7f\n--errPoint_Pixel: %.7f\n\n",
+		/*fprintf(f1, "Cl: %d; Station: %d\n-Xc: %.7f; Yc: %.7f; Charge: %d; nDigis: %d\n--errHit_Point: %.7f\n--errHit_Pixel: %.7f\n--errPoint_Pixel: %.7f\n\n",
 				iCl, digi->GetStationNr(), fClusters[iCl].xc, fClusters[iCl].yc,
 				fClusters[iCl].sumClCharge, fClusters[iCl].nofDidis,
-				errHit_Point, errHit_Pixel, errPoint_Pixel);
+				errHit_Point, errHit_Pixel, errPoint_Pixel);*/
 	}
-	fclose(f1);
+	//fclose(f1);
 	fErrHit_Pixel += eHit_Pixel / (Float_t)fNofClusters;
 	fErrHit_Point += eHit_Point / (Float_t)fNofClusters;
 	/*std::cout<<"--fErrHit_Point: "<<fErrHit_Point<<"; eHit_Point: "<<eHit_Point<<

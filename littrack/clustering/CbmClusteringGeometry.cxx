@@ -32,7 +32,9 @@
 using std::cout;
 using std::endl;
 
-CbmClusteringGeometry::CbmClusteringGeometry()
+CbmClusteringGeometry::CbmClusteringGeometry():
+		fDetId(),
+		fPadList()
 {
 	fNofPads = 0;
 	//fStation = 0;

@@ -1,12 +1,12 @@
 /*
- * CbmMuchClusteringQa.h
+ * CbmMuchClusteringQa0.h
  *
  *  Created on: May 24, 2012
  *      Author: kozlov
  */
 
-#ifndef CBMMUCHCLUSTERINGQA_H_
-#define CBMMUCHCLUSTERINGQA_H_
+#ifndef CBMMUCHCLUSTERINGQA0_H_
+#define CBMMUCHCLUSTERINGQA0_H_
 
 #include "FairTask.h"
 #include "TClonesArray.h"
@@ -20,11 +20,11 @@ class TObjArray;
 
 class TH1F;
 
-class CbmMuchClusteringQa : public FairTask {
+class CbmMuchClusteringQa0 : public FairTask {
 
 public:
-	CbmMuchClusteringQa();
-	virtual ~CbmMuchClusteringQa();
+	CbmMuchClusteringQa0();
+	virtual ~CbmMuchClusteringQa0();
 	virtual InitStatus Init();
 	virtual void Exec(Option_t * option);
 	virtual void FinishTask();
@@ -130,7 +130,7 @@ private:
 
 	static const Int_t nRadiusSteps = 50;
 
-  ClassDef(CbmMuchClusteringQa,1)
+  ClassDef(CbmMuchClusteringQa0,1)
 };
 
-#endif /* CBMMUCHCLUSTERINGQA_H_ */
+#endif /* CBMMUCHCLUSTERINGQA0_H_ */

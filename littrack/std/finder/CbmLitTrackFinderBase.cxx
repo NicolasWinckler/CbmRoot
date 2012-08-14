@@ -26,7 +26,6 @@ CbmLitTrackFinderBase::CbmLitTrackFinderBase():
    fNofIter(0),
    fMaxNofMissingHits(0),
    fPDG(),
-   fEventNo(0),
    fZPropagationForTrackSeeds(-1.),
    fUseTGeo(false)
 {
@@ -47,7 +46,6 @@ void CbmLitTrackFinderBase::ArrangeHits(
       Int_t station = hit->GetStation();
       Int_t substation = hit->GetSubstation();
       Int_t moduleRotation = fLayout.GetSubstation(stationGroup, station, substation).GetModuleRotationId(hit->GetModule());
-//      std::cout << ">>>> sg=" << stationGroup << " st=" << station << " ss=" << substation << " module=" << hit->GetModule() << " moduleRotation=" << moduleRotation << " " << hit->ToString();
       fHitData.AddHit(stationGroup, station, substation, moduleRotation, hit);
    }
 
@@ -56,7 +54,7 @@ void CbmLitTrackFinderBase::ArrangeHits(
 
    for (Int_t i = 0; i < fLayout.GetNofStationGroups(); i++) {
       for (Int_t j = 0; j < fLayout.GetNofStations(i); j++) {
-         CbmLitStation station = fLayout.GetStation(i, j);
+         const CbmLitStation& station = fLayout.GetStation(i, j);
          if (station.GetType() == kLITPIXELHIT) {
             for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
             	for (Int_t l = 0; l < fLayout.GetNofModuleRotations(i, j, k); l++) {

@@ -18,8 +18,7 @@
 
 #include <set>
 
-class CbmLitTrackFinderBase : public CbmLitTrackFinder,
-   public CbmLitGating
+class CbmLitTrackFinderBase : public CbmLitTrackFinder, public CbmLitGating
 {
 public:
    /* Constructor */
@@ -86,7 +85,6 @@ protected:
    Int_t fNofIter; // Number of iterations for tracking.
    Int_t fMaxNofMissingHits; // Maximum number of acceptable missing hits.
    Int_t fPDG; // Particle hypothesis for tracking.
-   Int_t fEventNo; // Event counter.
    Double_t fZPropagationForTrackSeeds; // Z position for propagation of track seeds.
    Bool_t fUseTGeo; // If true than TGeoManager is used for navigation in tracking.
                     // Attention! This method works only in magnetic free regions.

@@ -65,8 +65,8 @@ LitStatus CbmLitTrackFinderNN::DoFind(
       fTracks.clear();
       fHitData.Clear();
    }
-   std::cout << "CbmLitTrackFinderNN::DoFind: " << fEventNo++ << " events processed" << std::endl;
-
+   static Int_t eventNo = 0;
+   std::cout << "CbmLitTrackFinderNN::DoFind: " << eventNo++ << " events processed" << std::endl;
    return kLITSUCCESS;
 }
 
@@ -189,7 +189,7 @@ bool CbmLitTrackFinderNN::AddNearestHit1(
    const std::vector<CbmLitTrackParam>& par,
    Int_t nofSubstations)
 {
-   //fIsProcessSubstationsTogether == true
+   // fIsProcessSubstationsTogether == true
    bool hitAdded = false;
    CbmLitTrackParam uPar, param;
    HitPtrIterator hit(hits[0].second);
@@ -226,7 +226,7 @@ bool CbmLitTrackFinderNN::AddNearestHit2(
    const std::vector<CbmLitTrackParam>& par,
    Int_t nofSubstations)
 {
-   //fIsProcessSubstationsTogether == false
+   // fIsProcessSubstationsTogether == false
    bool hitAdded = false;
    for (Int_t iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
       CbmLitTrackParam uPar, param;

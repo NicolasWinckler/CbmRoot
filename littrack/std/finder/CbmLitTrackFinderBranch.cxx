@@ -25,7 +25,9 @@ CbmLitTrackFinderBranch::CbmLitTrackFinderBranch():
    fMaxNofBranchesStationGroup(27),
    fIsProcessSubstationsTogether(true),
    fMaxNofBranches(2048),
-   fNofBranches()
+   fNofBranchesStationGroup(512),
+   fNofBranches(),
+   fIsAlwaysCreateMissingHit(false)
 {
 }
 
@@ -60,7 +62,8 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
       fHitData.Clear();
       fNofBranches.clear();
    }
-   std::cout << "-I- CbmLitTrackFinderBranch: " << fEventNo++  << " events processed" << std::endl;
+   static Int_t eventNo = 0;
+   std::cout << "-I- CbmLitTrackFinderBranch: " << eventNo++  << " events processed" << std::endl;
    return kLITSUCCESS;
 }
 
@@ -117,15 +120,11 @@ void CbmLitTrackFinderBranch::FollowTracks()
       for_each(fTracks.begin(), fTracks.end(), DeleteObject());
       fTracks.clear();
 
-//      std::cout << "-I- CbmLitTrackFinderBranch:"   << fFoundTracks.size() << " followed in the " << stationGroup << " station group" << std::endl;
-
       fStationGroupSelection->DoSelect(fFoundTracks.begin(), fFoundTracks.end());
-//         std::cout << "-I- CbmLitTrackFinderBranch: track selection in station group finished" << std::endl;
 
       // Copy fFoundTracks to fTracksCopy array to store also short tracks
       CopyToOutputArray();
-//         std::cout << "-I- CbmLitTrackFinderBranch: copy to output array finished" << std::endl;
-   } //loop over station groups
+   } // Loop over station groups
 
    for_each(fTracks.begin(), fTracks.end(), DeleteObject());
    fTracks.clear();
@@ -144,8 +143,8 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
    std::vector<TrackPtrVector> tracks(nofStations);
    fNofBranchesStationGroup = 0;
 
-   if (ProcessStation(track, stationGroup, 0, tracks[0])) { //0
-      for (TrackPtrIterator trk0 = tracks[0].begin(); trk0 != tracks[0].end(); trk0++) { //1
+   if (ProcessStation(track, stationGroup, 0, tracks[0])) { // 0
+      for (TrackPtrIterator trk0 = tracks[0].begin(); trk0 != tracks[0].end(); trk0++) { // 1
          if (!ProcessStation(*trk0, stationGroup, 1, tracks[1])) { continue; }
 
          if (nofStations < 3) {
@@ -153,7 +152,7 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
             continue;
          }
 
-         for (TrackPtrIterator trk1 = tracks[1].begin(); trk1 != tracks[1].end(); trk1++) { //2
+         for (TrackPtrIterator trk1 = tracks[1].begin(); trk1 != tracks[1].end(); trk1++) { // 2
             if (!ProcessStation(*trk1, stationGroup, 2, tracks[2])) { continue; }
 
             if (nofStations < 4) {
@@ -161,13 +160,13 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
                continue;
             }
 
-            for (TrackPtrIterator trk2 = tracks[2].begin(); trk2 != tracks[2].end(); trk2++) { //3
+            for (TrackPtrIterator trk2 = tracks[2].begin(); trk2 != tracks[2].end(); trk2++) { // 3
                if (!ProcessStation(*trk2, stationGroup, 3, tracks[3])) { continue; }
                if (!AddTrackCandidate(tracks[3], stationGroup)) { return; }
-            } //3
-         } //2
-      }//1
-   }//0
+            } // 3
+         } // 2
+      } // 1
+   } // 0
 
    for (Int_t i = 0; i < nofStations; i++) {
       for_each(tracks[i].begin(), tracks[i].end(), DeleteObject());
@@ -187,12 +186,9 @@ bool CbmLitTrackFinderBranch::ProcessStation(
    for_each(tracksOut.begin(), tracksOut.end(), DeleteObject());
    tracksOut.clear();
 
-   bool isBranchCreated;
-   if (fIsProcessSubstationsTogether) {
-      isBranchCreated = ProcessStation1(track, stationGroup, station, tracksOut);
-   } else {
-      isBranchCreated = ProcessStation2(track, stationGroup, station, tracksOut);
-   }
+   bool isBranchCreated = (fIsProcessSubstationsTogether) ?
+      ProcessStation1(track, stationGroup, station, tracksOut) :
+      	  ProcessStation2(track, stationGroup, station, tracksOut);
 
    bool isMissingHitOk = false;
    if (fIsAlwaysCreateMissingHit || !isBranchCreated) {

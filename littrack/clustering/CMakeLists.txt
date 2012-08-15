@@ -42,13 +42,13 @@ CbmMuchTest.cxx
 CbmMvdGeoCl.cxx
 CbmMvdClustering.cxx
 CbmMuchClusteringQa0.cxx
-qa/clustering/CbmMuchClusteringQa.cxx
-qa/clustering/CbmMuchClusteringQaCalculator.cxx
-qa/clustering/CbmMuchClusteringQaDraw.cxx
-qa/clustering/CbmMuchClusteringQaHistCreator.cxx
-qa/clustering/CbmMuchClusteringQaPTreeCreator.cxx
-qa/clustering/CbmMuchClusteringQaReport.cxx
-qa/clustering/CbmMuchClusteringQaStudyReport.cxx
+#qa/clustering/CbmMuchClusteringQa.cxx
+#qa/clustering/CbmMuchClusteringQaCalculator.cxx
+#qa/clustering/CbmMuchClusteringQaDraw.cxx
+#qa/clustering/CbmMuchClusteringQaHistCreator.cxx
+#qa/clustering/CbmMuchClusteringQaPTreeCreator.cxx
+#qa/clustering/CbmMuchClusteringQaReport.cxx
+#qa/clustering/CbmMuchClusteringQaStudyReport.cxx
 )
 
 set(CLUSTERING_HEADERS
@@ -61,7 +61,7 @@ CbmMuchTest.h
 #CbmMvdGeoCl.h
 CbmMvdClustering.h
 CbmMuchClusteringQa0.h
-qa/clustering/CbmMuchClusteringQa.h
+#qa/clustering/CbmMuchClusteringQa.h
 )
 
 if(RULE_CHECKER_FOUND)

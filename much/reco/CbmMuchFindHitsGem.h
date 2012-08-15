@@ -45,9 +45,8 @@ class CbmMuchFindHitsGem: public FairTask {
     virtual InitStatus Init();
     void FindClusters();
     void CreateCluster(CbmMuchPad* pad);
-    void ExecClusteringSimple(CbmMuchCluster* cluster, vector<CbmMuchCluster*> &clusters);
+    void ExecClusteringSimple(CbmMuchCluster* cluster,Int_t iCluster);
     void ExecClusteringPeaks(CbmMuchCluster* cluster,Int_t iCluster);
-    void CreateHits(vector<CbmMuchCluster*> clusters, Int_t iCluster);
     void CreateHits(CbmMuchCluster* cluster,Int_t iCluster);
     TString  fDigiFile;                     // Digitization file
     Int_t    fAlgorithm;                    // Defines which algorithm to use
@@ -55,16 +54,17 @@ class CbmMuchFindHitsGem: public FairTask {
     Double_t fThresholdRatio;               // Charge threshold ratio relative to max cluster charge
     Int_t fEvent;                           // Event counter
     TClonesArray* fDigis;                   // Input array of CbmMuchDigi
+    vector<Int_t> fClusterCharges;          //!
+    vector<Bool_t> fLocalMax;               //!
+    vector<CbmMuchPad*> fClusterPads;       //!
+    vector<vector<Int_t> >fNeighbours;      //!
+    
     TClonesArray* fClusters;                // Output array of CbmMuchCluster objects
     TClonesArray* fHits;                    // Output array of CbmMuchHit
     CbmMuchGeoScheme* fGeoScheme;           // Geometry scheme
     // auxiliary maps and vectors
     vector<Int_t> fDigiIndices;             //!
     vector<CbmMuchPad*> fFiredPads;         //!
-    vector<Int_t> fClusterCharges;          //!
-    vector<Bool_t> fLocalMax;               //!
-    vector<CbmMuchPad*> fClusterPads;       //!
-    vector<vector<Int_t> >fNeighbours;      //!
     
     ClassDef(CbmMuchFindHitsGem,1);
 };

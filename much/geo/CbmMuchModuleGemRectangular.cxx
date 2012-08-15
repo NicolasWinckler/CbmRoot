@@ -210,8 +210,8 @@ void CbmMuchModuleGemRectangular::InitNeighbourPads() {
       Double_t x2 = pad->GetX2();
       Double_t y1 = pad->GetY1();
       Double_t y2 = pad->GetY2();
-      for (Double_t x=x1-mindx;x<x2+mindx+1e-3;x+=mindx){
-        for (Double_t y=y1-mindy;y<y2+mindy+1e-3;y+=mindy){
+      for (Double_t x=x1-mindx/2;x<x2+mindx/2+1e-3;x+=mindx){
+        for (Double_t y=y1-mindy/2;y<y2+mindy/2+1e-3;y+=mindy){
           CbmMuchPad* p = GetPad(x,y);
           if (!p) continue;
           if (p==pad) continue;

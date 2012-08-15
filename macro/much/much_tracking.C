@@ -1,4 +1,4 @@
-void much_tracking(Int_t nEvents=1){
+void much_tracking(Int_t nEvents=1000){
   TString mcFile     = "data/mc.root";
   TString parFile    = "data/params.root";
   TString stsFile    = "data/sts.root";
@@ -23,6 +23,16 @@ void much_tracking(Int_t nEvents=1){
   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
   fRun->AddTask(muchMatchTracks);
 
+  CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+  trackingQa->SetUseConsecutivePointsInSts(true);
+  trackingQa->SetMinNofPointsSts(4);
+  trackingQa->SetMinNofPointsMuch(10);
+  trackingQa->SetQuota(0.7);
+  trackingQa->SetMinNofHitsMuch(10);
+  trackingQa->SetVerbose(0);
+  trackingQa->SetOutputDir("qa/");
+  fRun->AddTask(trackingQa);
+  
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
   parIo1->open(parFile.Data());

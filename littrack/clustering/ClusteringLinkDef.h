@@ -8,8 +8,8 @@
 #pragma link C++ class CbmMuchClusteringQa0+;
 #pragma link C++ class CbmMvdClustering+;
 
-#ifdef BOOST_FOUND
+/*#ifdef BOOST_FOUND
 #pragma link C++ class CbmMuchClusteringQa+;
-#endif
+#endif*/
 
 #endif

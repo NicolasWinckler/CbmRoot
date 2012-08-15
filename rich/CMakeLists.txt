@@ -27,6 +27,7 @@ ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
 ${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
+${CBMROOT_SOURCE_DIR}/L1
 #/u/slebedev/Baykal/tbb21_017oss/include
 #/u/andrey/soft/tbb/tbb22_009oss/include
 )

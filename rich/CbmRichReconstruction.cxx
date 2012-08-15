@@ -18,6 +18,7 @@
 
 #include "CbmRichRingFinderHough.h"
 #include "CbmRichRingFinderIdeal.h"
+#include "CbmL1RichENNRingFinder.h"
 
 #include "CbmRichRingFitterCircle.h"
 #include "CbmRichRingFitterTAU.h"
@@ -157,6 +158,8 @@ void CbmRichReconstruction::InitFinder()
       fRingFinder = new CbmRichRingFinderHough();
    } else if (fFinderName == "ideal"){
       fRingFinder = new CbmRichRingFinderIdeal();
+   } else if (fFinderName == "enn"){
+      fRingFinder = new CbmL1RichENNRingFinder(0);
    } else {
       Fatal("CbmRichReconstruction::InitFinder",
             (fFinderName + string(" is not correct name for ring finder algorithm.")).c_str());

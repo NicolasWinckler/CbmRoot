@@ -104,6 +104,12 @@ private:
    void InitHistograms();
 
    /**
+    * \brief Temporary function for summary plots drawing.
+    */
+   void DrawSummaryPlotsTemp();
+
+
+   /**
     * \brief Fill MC histogram for detector acceptance calculation.
     */
    void FillMcHist();

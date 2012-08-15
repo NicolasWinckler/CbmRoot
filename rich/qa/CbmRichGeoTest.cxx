@@ -361,22 +361,64 @@ void CbmRichGeoTest::InitHistograms()
    fhHitsXY1Gev = new TH2D("fhHitsXY1Gev", "fhHitsXY1Gev;X [cm];Y [cm];Counter", nBinsX, xMin, xMax, nBinsY, yMin, yMax);
    fHists.push_back(fhHitsXY1Gev);
 
-/*
+   DrawSummaryPlotsTemp();
+}
+
+void CbmRichGeoTest::DrawSummaryPlotsTemp()
+{
    TCanvas *c1 = CreateCanvas("chi2_mean_fit_vs_bfield_scale", "chi2_mean_fit_vs_bfield_scale", 600, 600);
-   Double_t x1[5]={50, 70, 100, 150, 200};
-   Double_t y1[5]={0.03, 0.035, 0.047, 0.063, 0.082};
-   TGraph* gr1 = new TGraph(5, x1, y1);
-   gr1->GetXaxis()->SetTitle("Magnetic field scale [%]");
+   Double_t x[5]={0.015*0.2, 0.015*0.5, 0.015*0.7, 0.015*1., 0.015*1.5};
+   Double_t y1[5]={0.02, 0.021, 0.025, 0.029, 0.038};
+   TGraph* gr1 = new TGraph(5, x, y1);
+   gr1->GetXaxis()->SetTitle("Field integral in RICH [Tm]");
    gr1->GetYaxis()->SetTitle("a_{fit}^{#Chi^{2}.mean}");
-   DrawGraph(gr1);
+   TF1 *f1 = new TF1("f1", "[0]*x+[1]", 0., 210.);
+   f1->SetLineColor(kBlack);
+   gr1->GetXaxis()->SetRangeUser(10., 210.);
+   DrawGraph(gr1, kLinear, kLinear, "AP");
+   gr1->SetMarkerColor(4);
+   gr1->SetMarkerSize(2.5);
+   gr1->SetMarkerStyle(21);
+   gr1->Fit(f1, "R");
+   gr1->GetXaxis()->SetRangeUser(10., 210.);
+   f1->SetLineColor(kBlack);
+   double p0 = f1->GetParameter(0);
+   double p1 = f1->GetParameter(1);
+   stringstream ss;
+   ss.precision(3);
+   ss << "y="<<lit::NumberToString(p0, 1)<<"*x+"<<lit::NumberToString(p1, 1);
+   TLegend* leg = new TLegend(0.15, 0.9, 0.85, 0.99);
+   leg->AddEntry(new TH2D(), ss.str().c_str(), "");
+   leg->SetFillColor(kWhite);
+   leg->SetFillStyle(0);
+   leg->SetBorderSize(0);
+   leg->Draw();
+
 
    TCanvas *c2 = CreateCanvas("dr_rms_fit_vs_bfield_scale", "dr_rms_fit_vs_bfield_scale", 600, 600);
-   Double_t x2[5]={50, 70, 100, 150, 200};
-   Double_t y2[5]={0.043, 0.042, 0.073, 0.1, 0.13};
-   TGraph* gr2 = new TGraph(5, x2, y2);
-   gr2->GetXaxis()->SetTitle("Magnetic field scale [%]");
+   Double_t y2[5]={0.025, 0.026, 0.033, 0.045, 0.078};
+   TGraph* gr2 = new TGraph(5, x, y2);
+   gr2->GetXaxis()->SetTitle("Field integral in RICH [Tm]");
    gr2->GetYaxis()->SetTitle("a_{fit}^{dR.RMS}");
-   DrawGraph(gr2);*/
+   TF1 *f2 = new TF1("f2", "[0]*x+[1]", 0., 210.);
+   f2->SetLineColor(kBlack);
+   DrawGraph(gr2, kLinear, kLinear, "AP");
+   gr2->SetMarkerColor(4);
+   gr2->SetMarkerSize(2.5);
+   gr2->SetMarkerStyle(21);
+   gr2->Fit(f2, "R");
+   gr2->GetXaxis()->SetRange(0., 210.);
+   f2->SetLineColor(kBlack);
+   double p10 = f2->GetParameter(0);
+   double p11 = f2->GetParameter(1);
+   stringstream ss2;
+   ss2 << "y="<<lit::NumberToString(p10, 1)<<"*x+"<<lit::NumberToString(p11, 1);
+   TLegend* leg2 = new TLegend(0.15, 0.9, 0.85, 0.99);
+   leg2->AddEntry(new TH2D(), ss2.str().c_str(), "");
+   leg2->SetFillColor(kWhite);
+   leg2->SetFillStyle(0);
+   leg2->SetBorderSize(0);
+   leg2->Draw();
 }
 
 void CbmRichGeoTest::FillMcHist()
@@ -716,18 +758,20 @@ void CbmRichGeoTest::FitH1OneOverX(
       double xMax,
       const string& canvasName)
 {
+   cout << "-I-" << canvasName << endl;
+   cout << "bins = " << hist->GetNbinsX() << endl;
    for (int i = 1; i < hist->GetNbinsX() - 1;i++){
       double c0 = hist->GetBinContent(i);
       double c1 = hist->GetBinContent(i+1);
-      if (c0 > 0 && c0 < c1){
+      cout << i << "  " << c0 << endl;
+      if (c0 > 0 && c0 <= c1){
          xMinFit = hist->GetBinCenter(i+1);
-         cout << "-I- New xMinFit = " << xMinFit << endl << endl;
-      } else {
+         cout <<endl<<endl<<endl<< "-I- New xMinFit = " << xMinFit << endl << endl;
+      }
+      if (c0 > c1) {
          break;
       }
    }
-
-   cout << "-I-" << canvasName << endl;
    TCanvas *cDrRmsFit = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 600);
    TF1 *f1 = new TF1("f1", "[0]/x+[1]", xMinFit, xMaxFit);
    f1->SetLineColor(kBlack);
@@ -795,7 +839,6 @@ void CbmRichGeoTest::DrawHist()
       CreateH2MeanRms(fhChi2CircleVsMom[i], &meanChi2, &rmsChi2);
       FitH1OneOverX(meanChi2, 0.1, 2.9, 0.0, 3.0, ss.str() + "chi2_circle_mean_vs_mom_fit");
    }
-   return;
 
    TCanvas *cDiff2DEllipse = CreateCanvas("richgeo_diff2d_ellipse", "richgeo_diff2d_ellipse", 800, 800);
    cDiff2DEllipse->Divide(2,2);

@@ -78,7 +78,9 @@ CbmMvdClustering::CbmMvdClustering():
 		fDigis(),
 		fNofPoints(),
 		fPoints(),
-		fHits()
+		fHits(),
+		fCluster(),
+		fMatches()
 {
 	fNofDigisBySt[0] = 0;
 	fNofDigisBySt[1] = 0;
@@ -101,6 +103,14 @@ CbmMvdClustering::~CbmMvdClustering()
 	if ( fHits ) {
 	fHits->Delete();
 	delete fHits;
+	}
+	if ( fCluster ) {
+	fCluster->Delete();
+	delete fCluster;
+	}
+	if ( fMatches ) {
+	fMatches->Delete();
+	delete fMatches;
 	}
 }
 
@@ -130,6 +140,12 @@ InitStatus CbmMvdClustering::Init()
 
    fHits = new TClonesArray("CbmMvdHit", 1000);
    ioman->Register("MvdHit", "Hit in MVD", fHits, kTRUE);
+
+   fCluster = new TClonesArray("CbmMvdCluster", 1000);
+   ioman->Register("MvdCluster", "Cluster in MVD", fCluster, kTRUE);
+
+   fMatches = new TClonesArray("CbmMvdHitMatch", 1000);
+   ioman->Register("MvdHitMatch", "HitMatch in MVD", fMatches, kTRUE);
    //Register();
    //ReadDataBranches();
 
@@ -763,9 +779,85 @@ void CbmMvdClustering::FindClusters()
 		CbmMvdDigi* digi = (CbmMvdDigi*) fDigis->At(fClusters[iCl].digisInCluster[0]);
 		Int_t stNr = digi->GetStationNr();
 		CbmMvdStation* station= fStationMap[stNr];
+
+		//---
+		Short_t chargeArray[49], dominatorArray[49];
+		CbmMvdDigi* centralDigi;
+		Float_t xPos[5],yPos[5];
+		Short_t contributors=-2;
+		Bool_t digiFound;
+		Double_t layerRadius = station->GetRmax();
+		for (Int_t k = 0;k < 5;k++)
+		{
+			xPos[k]=0;
+			yPos[k]=0;
+		}
+		//std::cout<<"-Step 1\n";
+		for( Int_t i = 0; i < 7; i++ )
+		{
+			for( Int_t j = 0; j < 7; j++ )
+			{
+				digiFound = kFALSE;
+			    for(Int_t k = 0; k < fClusters[iCl].nofDidis; k++ )
+			    {
+			    	//std::cout<<"--Step 2\n";
+			    	CbmMvdDigi* digi1 = (CbmMvdDigi*) fDigis->At(fClusters[iCl].digisInCluster[k]);
+			    	Float_t pixelSizeX = digi1->GetPixelSizeX();
+			    	Float_t pixelSizeY = digi1->GetPixelSizeY();
+			    	//std::cout<<"--Step 3\n";
+			    	Int_t xSeed = int( (fClusters[iCl].xc + layerRadius) / pixelSizeX );  // find index of seed pixel in the detector frame
+			    	Int_t ySeed = int( (fClusters[iCl].yc + layerRadius) / pixelSizeY );
+			    	//std::cout<<"--Step 4\n";
+			    	if( (digi1->GetPixelX() - xSeed == i-3) && (digi1->GetPixelY() - ySeed == j-3) )
+	    			{
+	    			    chargeArray[7*i+j] = digi1->GetCharge();//???GetAdcCharge(digi->GetCharge())
+		    			Short_t l=-1,trackNr=-1;
+		    			do {
+		    				l=l+1;
+		    				if( xPos[l]==digi1->GetDominatorX() && yPos[l]==digi1->GetDominatorY() )
+		    				{
+		    					trackNr=l;
+		    				};
+	    			    }while ( xPos[l]!=0 && l<4 );  //4 is  the size of xPos[] array -> save up to 4 mc points
+	    			    if (trackNr>=0) { dominatorArray[7*i+j]=trackNr; }
+	    			    else if( trackNr == -1 && l == 4 ) {
+	    				dominatorArray[7*i+j] = l;
+	    				if (l>contributors) {contributors=l;}
+	    			    }
+	    			    else {
+	    				xPos[l] = digi1->GetDominatorX();
+	    				yPos[l]=digi1->GetDominatorY();
+	    				dominatorArray[7*i+j]=l;
+	    				if(l>contributors){contributors=l;}
+	    			    }
+		    			    digiFound = kTRUE;
+			    			} // if
+		    			if( !digiFound ){
+	    			    dominatorArray[7*i+j] = 0;
+			    			}
+		    			//std::cout<<"--Step 5\n";
+			    } // for k
+			} // for j
+		} // for i
+		//std::cout<<"-Step 6\n";
+		Int_t detId = digi->GetDetectorId();
+		Float_t pixelSizeX  = digi->GetPixelSizeX();
+		Float_t pixelSizeY  = digi->GetPixelSizeY();
+		Int_t nClusters = fCluster->GetEntriesFast();
+		//std::cout<<"-Step 7\n";
+		CbmMvdCluster* clusterNew = new ((*fCluster)[nClusters])CbmMvdCluster(detId, pos, dpos, 0,  chargeArray, pixelSizeX, pixelSizeY);
+		clusterNew->SetDebuggingInfo(dominatorArray,xPos,yPos);
+		clusterNew->SetContributors(contributors);
+		//std::cout<<"-Step 8\n";
+		//---
+
 		pos.SetXYZ(fClusters[iCl].xc, fClusters[iCl].yc, station->GetZ());
 		Int_t nHits = fHits->GetEntriesFast();
 		new ((*fHits)[nHits]) CbmMvdHit(stNr, pos, dpos, 0);
+		//std::cout<<"-Step 9\n";
+		centralDigi = (CbmMvdDigi*)fDigis->At(fClusters[iCl].digisInCluster[0]);
+		new ((*fMatches)[nHits]) CbmMvdHitMatch(0, 0, centralDigi->GetTrackID(), centralDigi->GetPointID(), clusterNew->GetContributors());
+		//std::cout<<"-Step 10\n";
 	}
 }
 

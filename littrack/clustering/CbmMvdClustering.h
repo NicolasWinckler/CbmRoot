@@ -84,6 +84,8 @@ private:
    TClonesArray* fDigis;
    TClonesArray* fPoints;
    TClonesArray* fHits;
+   TClonesArray* fCluster;
+   TClonesArray* fMatches;
    map<pair<Int_t, Int_t>, Int_t> fDigiMap;
    map<pair<Int_t, Int_t>, Int_t>::iterator fDigiMapIt;
 

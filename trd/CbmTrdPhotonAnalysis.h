@@ -12,14 +12,24 @@
 #include "TH2I.h"
 #include "TH3I.h"
 #include <vector>
+#include <map>
 #include "CbmMCTrack.h"
-
+#include "CbmGlobalTrack.h"
+#include "CbmVertex.h"
+#include "FairTrackParam.h"
+#include "CbmRichElectronIdAnn.h"
+#include "CbmStsKFTrackFitter.h"
 class TClonesArray;
-
+//class CbmStsKFTrackFitter;
+class CbmRichElectronIdAnn;
+class CbmVertex;
 class CbmTrdDigiPar;
+class CbmTrdTrack;
 class CbmTrdDigi;
 class CbmTrdModule;
+class CbmRichRing;
 class CbmMCTrack;
+class CbmGlobalTrack;
 class TLegend;
 class TProfile;
 class TH1;
@@ -31,6 +41,7 @@ class TH2I;
 //class TH2F;
 //class TH2D;
 //class vector;
+//class map;
 
 typedef struct MCParticle
 {
@@ -44,6 +55,49 @@ typedef struct MCParticle
   Double_t Pz;
 MCParticle() : PID(0), motherId(0), /*motherPid(0),*/ daughterIds(), /*daughterPids(),*/ Px(0), Py(0), Pz(0) {};
 } MCParticle;
+
+class ElectronCandidate{
+public:
+   TVector3 position, momentum;
+   Double_t mass, energy, rapidity;
+   Int_t charge;
+   Double_t chi2Prim;
+   Double_t chi2sts;
+   Int_t McMotherId;
+   Int_t stsMcTrackId;
+   Int_t richMcTrackId;
+   Int_t trdMcTrackId;
+   Int_t tofMcTrackId;
+   Int_t stsInd;
+   Int_t richInd;
+   Int_t trdInd;
+   Int_t tofInd;
+   Bool_t isElectron;
+   Bool_t isMcSignalElectron;
+   Bool_t isMcPi0Electron;
+   Bool_t isMcGammaElectron;
+   Bool_t isMcEtaElectron;
+
+   Bool_t isGamma;
+   Double_t dSts;
+   Bool_t isTtCutElectron;
+   Bool_t isStCutElectron;
+   Bool_t isApmCutElectron;
+   Bool_t isMvd1CutElectron;
+   Bool_t isMvd2CutElectron;
+   Double_t richAnn;
+   Double_t trdAnn;
+   Double_t mass2;
+};
+
+class KinematicParam{
+public:
+   Double_t momentumMag; // Absolute value of momentum
+   Double_t pt; // Transverse momentum
+   Double_t rapidity; // Rapidity
+   Double_t minv; // Invariant mass
+   Double_t angle; // Opening angle
+};
 
 class CbmTrdPhotonAnalysis : public FairTask {
   
@@ -61,6 +115,11 @@ class CbmTrdPhotonAnalysis : public FairTask {
   void SaveHistosToFile();
   void NormalizeHistos(TH1* h);
 
+  Bool_t IsElec(CbmRichRing* ring, Double_t momentum, CbmTrdTrack* trdTrack, CbmGlobalTrack* gTrack, ElectronCandidate* cand);
+  Bool_t IsRichElec(CbmRichRing *ring, Double_t momentum, ElectronCandidate* cand);
+  Bool_t IsTrdElec(CbmTrdTrack* trdTrack, ElectronCandidate* cand);
+  Bool_t IsTofElec(CbmGlobalTrack* gTrack, Double_t momentum, ElectronCandidate* cand);
+
   Bool_t VertexInMagnet(CbmMCTrack* track); 
   Bool_t VertexInTarget(CbmMCTrack* track);
   Bool_t CloseByVertex(CbmMCTrack* trackA, CbmMCTrack* trackB, Double_t minimumDistance /*[cm]*/);
@@ -74,6 +133,11 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Double_t CalcOpeningAngle(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcPt(CbmMCTrack* trackA, CbmMCTrack* trackB);
   Double_t CalcP(CbmMCTrack* trackA, CbmMCTrack* trackB);
+
+  Double_t CalcInvariantMass(ElectronCandidate candA, ElectronCandidate candB);
+  Double_t CalcOpeningAngle(ElectronCandidate candA, ElectronCandidate candB);
+  Double_t CalcPt(ElectronCandidate candA, ElectronCandidate candB);
+  Double_t CalcP(ElectronCandidate candA, ElectronCandidate candB);
 
   void StatisticHistos();
 
@@ -107,11 +171,59 @@ class CbmTrdPhotonAnalysis : public FairTask {
   TClonesArray*     fTrdClusters;    /**  array of CbmTrdCluster **/
   TClonesArray*     fTrdHits;        /**  array of CbmTrdHit     **/
   TClonesArray*     fTrdTracks;      /**  CbmTrdTrack array      **/
+  TClonesArray*     fTrdTrackMatches;
   TClonesArray*     fGlobalTracks;   /**  CbmGlobalTrack array   **/
   TClonesArray*     fPrimaryVertex;  /**  PrimaryVertex  array   **/
+  TClonesArray *fRichRings;
+  TClonesArray *fRichProj;
+  TClonesArray *fRichPoints;
+  TClonesArray *fRichRingMatches;
+  TClonesArray *fRichHits;
+  TClonesArray *fStsTracks;
+  TClonesArray *fStsTrackMatches;
+  TClonesArray *fStsHits;
+  TClonesArray *fMvdHits;   
+  TClonesArray *fTofHits;
+  TClonesArray *fTofPoints;
+  CbmStsKFTrackFitter *fKFFitter;
+  //CbmRichElectronIdAnn* fElIdAnn;
+  CbmVertex *fPrimVertex;
+
+
+  //FairTrackParam* fParamFirst;
+  //FairTrackParam* fParamLast;
 
   CbmTrdDigiPar  *fDigiPar;
   CbmTrdModule   *fModuleInfo;
+
+  std::vector<ElectronCandidate> fCandidates;
+  std::vector<ElectronCandidate> fElectronCandidates;
+  std::vector<ElectronCandidate> fPositronCandidates;
+
+  // ID cuts
+  Double_t fTrdAnnCut;
+  Double_t fRichAnnCut;
+  Double_t fMeanA;
+  Double_t fMeanB;
+  Double_t fRmsA;
+  Double_t fRmsB;
+  Double_t fRmsCoeff;
+  Double_t fDistCut;
+  CbmRichElectronIdAnn* fElIdAnn;
+  Bool_t fUseRichAnn;
+  // Analysis cuts
+  Double_t fChiPrimCut;
+  Double_t fPtCut;
+  Double_t fAngleCut;
+  Double_t fGammaCut;
+  Double_t fStCutAngle;
+  Double_t fStCutPP;
+  Double_t fTtCutAngle;
+  Double_t fTtCutPP;
+  Double_t fMvd1CutP;
+  Double_t fMvd1CutD;
+  Double_t fMvd2CutP;
+  Double_t fMvd2CutD;
 
   //Histos
 

@@ -56,7 +56,7 @@ private:
 	   Float_t yc;
 	   UInt_t sumClCharge;
 	   Int_t nofPads;
-	   Int_t padsInCluster[50];
+	   Int_t padsInCluster[300];
    };
    Cluster* fClusters;
 };

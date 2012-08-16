@@ -111,7 +111,7 @@ private:
 	   Int_t nofCluster;
    	   Float_t xc;
    	   Float_t yc;
-   	   UInt_t sumClCharge;
+   	   Float_t sumClCharge;
    	   Int_t nofDidis;
    	   Int_t digisInCluster[nDigiByCl];
    	   Int_t nDigiMax;

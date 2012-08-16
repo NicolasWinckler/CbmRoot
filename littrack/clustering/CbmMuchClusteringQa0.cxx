@@ -70,7 +70,8 @@ CbmMuchClusteringQa0::CbmMuchClusteringQa0():
 		fEfficiency(),
 		fNofPoints(),
 		fMuchCluster(),
-		fMuchDigiMatch()
+		fMuchDigiMatch(),
+		fNofEvents(0)
 {
 }
 // -------------------------------------------------------------------------
@@ -97,7 +98,7 @@ InitStatus CbmMuchClusteringQa0::Init()
 	fGeoScheme = CbmMuchGeoScheme::Instance();
 	TString muchDigiFile = "/u/gkozlov/cbm/trunk/cbmroot/parameters/much/much_v11a.digi.root";
 	fGeoScheme->Init(muchDigiFile);
-
+	fNofEvents = 0;
 	fhMuchEfficiencyByLayerSide = new TH1F("fhMuchEfficiencyByLayer", "hMuchEfficiencyByLayer;Layer;Efficiency", 19, 0, 0);
 	fhMuchErrorsByLayerSide = new TH1F("fhMuchErrorsByLayer", "hMuchErrorsByLayer;Layer;Errors", 19, 0, 0);
 	fhMuchQualityClToPointByLayer = new TH1F("fhMuchQualityClToPointByLayer", "hMuchQualityClToPoint;Layer;Quality", 19, 0, 0);
@@ -128,9 +129,14 @@ InitStatus CbmMuchClusteringQa0::Init()
 void CbmMuchClusteringQa0::Exec(Option_t * option)
 {
 	std::cout << "CbmMuchClusteringQa::Exec" << std::endl;
+	fNofEvents++;
+	std::cout<<"Step 0\n";
 	fNofClusters = fMuchCluster->GetEntriesFast();
+	std::cout<<"Step 0.1\n";
 	fNofDigis = fMuchDigi->GetEntriesFast();
+	std::cout<<"Step 0.2\n";
 	fNofPoints = fMuchPoint->GetEntriesFast();
+	std::cout<<"Step 1\n";
 	for(Int_t iStation = 0; iStation < fGeoScheme->GetNStations(); iStation++)
 	{
 		const CbmMuchStation* station = static_cast<CbmMuchStation*>(fGeoScheme->GetStation(iStation));
@@ -150,9 +156,14 @@ void CbmMuchClusteringQa0::Exec(Option_t * option)
 			fAccuracyLayerSide[iStation][iLayer][1];
 		}
 	}
+	std::cout<<"Step 2\n";
+	if(fAccuracyArray)delete [] fAccuracyArray;
 	fAccuracyArray = new AccuracyStruct[fNofClusters];
+	std::cout<<"Step 3\n";
 	SetMCPoints();
+	std::cout<<"Step 4\n";
 	LinkingClustersToMCPoints();
+	std::cout<<"Step 5\n";
 	CreationOfRelations();
 	std::cout<<"Clusters: "<<fNofClusters<<"\n";
 	CalculateEfficienciByLayerSide();
@@ -161,8 +172,8 @@ void CbmMuchClusteringQa0::Exec(Option_t * option)
 	FillEfficiencyByLayerSideHistograms();
 	FillErrorsByLayerSideHistograms();
 
-	FillQualityClToPointHistograms();
-	FillQualityDigiToClHistograms();
+	//FillQualityClToPointHistograms();
+	//FillQualityDigiToClHistograms();
 
 	FillErrorsByRadiusHistograms();
 }
@@ -172,12 +183,14 @@ void CbmMuchClusteringQa0::Exec(Option_t * option)
 // -------------------------------------------------------------------------
 void CbmMuchClusteringQa0::FinishTask()
 {
+	fhMuchEfficiencyByLayerSide->Scale(1. / fNofEvents);
 	fhMuchEfficiencyByLayerSide->Write();
 	TCanvas* canvasEffLS = new TCanvas("much_eff_by_ls", "much_eff_by_ls", 700, 700);
 	canvasEffLS->Divide(1, 1);
 	canvasEffLS->cd(1);
 	fhMuchEfficiencyByLayerSide->Draw();
 
+	fhMuchErrorsByLayerSide->Scale(1. / fNofEvents);
 	fhMuchErrorsByLayerSide->Write();
 	TCanvas* canvasErrLS = new TCanvas("much_err_by_ls", "much_err_by_ls", 700, 700);
 	canvasErrLS->Divide(1, 1);
@@ -301,6 +314,7 @@ void CbmMuchClusteringQa0::SetMCPoints()
 
 void CbmMuchClusteringQa0::LinkingClustersToMCPoints()
 {
+	if(fClusters)delete [] fClusters;
 	fClusters = new Cluster [fNofClusters];
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
@@ -560,6 +574,10 @@ void CbmMuchClusteringQa0::FillEfficiencyByLayerSideHistograms()
 	{
 		for(Int_t iLayer = 0; iLayer < 3; iLayer++)
 		{
+			if(fEfficiencyLayerSide[iStation][iLayer][0] > 100)
+			{
+				fEfficiencyLayerSide[iStation][iLayer][0] = 100;
+			}
 			fhMuchEfficiencyByLayerSide->Fill((iStation * 3 + iLayer), fEfficiencyLayerSide[iStation][iLayer][0]);
 		}
 	}
@@ -611,8 +629,8 @@ void CbmMuchClusteringQa0::FillQualityClToPointHistograms()
 			quality2ByRadius[i][j] = 0;
 		}
 	}
-	TString fnameClToPoint = "/home/kozlov/cbm/cbmroot_new/events/03/TestResults/_ClToPoint.txt";
-	FILE* ClToPoint = fopen(fnameClToPoint , "w");
+	//TString fnameClToPoint = "/home/kozlov/cbm/cbmroot_new/events/03/TestResults/_ClToPoint.txt";
+	//FILE* ClToPoint = fopen(fnameClToPoint , "w");
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
 		if(fClusters[iCl].bestPoint != 0)std::cout<<"Cl: "<<iCl<<"; bp: "<<fClusters[iCl].bestPoint<<"\n";
@@ -640,11 +658,11 @@ void CbmMuchClusteringQa0::FillQualityClToPointHistograms()
 				clustersByRadius[n][i]++;
 				/*if(n == 0)std::cout<<"S: "<<i<<"; Q1: "<<qualityByRadius[n][i]<<
 						"; K: "<<clustersByRadius[n][i]<<"\n";*/
-				fprintf(ClToPoint, "Cluster: %d; ClToPoint: %.3f\n", iCl, fClusters[iCl].mClToPoint[fClusters[iCl].bestPoint]);
+				//fprintf(ClToPoint, "Cluster: %d; ClToPoint: %.3f\n", iCl, fClusters[iCl].mClToPoint[fClusters[iCl].bestPoint]);
 			}
 		}}
 	}
-	fclose(ClToPoint);
+	//fclose(ClToPoint);
 	for(Int_t i = 0; i < nRadiusSteps; i++)
 	{
 		for(Int_t j = 0; j < 4; j++)
@@ -747,9 +765,10 @@ void CbmMuchClusteringQa0::FillErrorsByRadiusHistograms()
 				const CbmMuchPixelHit* hit = static_cast<const CbmMuchPixelHit*>(fMuchHit->At(fAccuracyArray[iCl].nHit));
 				Float_t rad = sqrt((hit->GetX() * hit->GetX()) + (hit->GetY() * hit->GetY()));
 				Int_t n = static_cast<Int_t>((rad - rMin) / step);
-				if(n >= nRadiusSteps)std::cout<<"Error! n = "<<n<<"\n";
+				if((n >= nRadiusSteps) || (n < 0)){std::cout<<"Error! n = "<<n<<"\n";}
+				else{
 				errSiL0[n][i] += fAccuracyArray[iCl].errorXY / padSize;
-				nofClSiL0[n][i]++;
+				nofClSiL0[n][i]++;}
 				//errS0L0[n] += fAccuracyArray[iCl].errorXY / padSize;
 				//nofClS0L0[n]++;
 			}

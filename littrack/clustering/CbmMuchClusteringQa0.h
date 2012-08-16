@@ -46,6 +46,7 @@ public:
 
 private:
 	CbmMuchGeoScheme* fGeoScheme;
+	Int_t fNofEvents;
 	//TClonesArray* fClFull;
 	TClonesArray* fMuchDigi;
 	TClonesArray* fMuchDigiMatch;

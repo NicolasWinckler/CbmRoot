@@ -15,6 +15,7 @@
 #include "CbmMvdDigitize.h"
 #include "CbmMvdFindHits.h"
 #include "CbmMvdStation.h"
+#include "draw/CbmDrawHist.h"
 
 // Includes from base
 #include "FairGeoNode.h"
@@ -136,7 +137,7 @@ InitStatus CbmMvdClustering::Init()
    fhErrPoint_Pixel = new TH1F("fhErrPoint_PixelByRadius", "hErrPoint_PixelByRadius;Radius;Error", nRadiusSteps + 2, 0, 0);
    fhErrHit_Pixel = new TH1F("fhErrHit_PixelByRadius", "hErrHit_PixelByRadius;Radius;Error", nRadiusSteps + 2, 0, 0);*/
 
-   fhErrorsHit_MCPoint = new TH1F("fhErrorsHit_MCPoint", "hErrorsHit_MCPoint;Error(cm);nofHits", 500, 0, 0.002);
+   fhErrorsHit_MCPoint = new TH1F("fhErrorsHit_MCPoint", "hErrorsHit_MCPoint;Error(cm);nofHits", 100, 0, 0.002);
    fhErrorsHit_Pixel = new TH1F("fhErrorsHit_Pixel", "hErrorsHit_Pixel;Error(cm);nofHits", 100, 0, 0.002);
    fhErrorsPixel_MCPoint = new TH1F("fhErrorsPixel_MCPoint", "hErrorsPixel_MCPoint;Error(cm);nofHits", 100, 0, 0.002);
 
@@ -177,7 +178,6 @@ void CbmMvdClustering::Exec(Option_t* opt)
 		    cout << "-I- " << GetName() << ": station->GetVolumeId(): " << station->GetVolumeId() << " , layerRadius " << layerRadius << endl;
 	}
 	}
-	if (fHits) fHits->Clear();
 	fDigiMap.clear();
 	fClusterMap.clear();
 	//fChargeMap1.clear();
@@ -252,19 +252,19 @@ void CbmMvdClustering::Finish()
    fErrHit_Point = fErrHit_Point / (Float_t)fNofEvents;
    //std::cout<<"---fErrHit_Point: "<<fErrHit_Point<<"; fNofEvents: "<<fNofEvents<<"\n";
    fErrPoint_Pixel = fErrPoint_Pixel / (Float_t)fNofEvents;
-   std::cout<<"ErrHit_Pixel: "<<fErrHit_Pixel<<"\nErrHit_Point: "<<fErrHit_Point<<
-		   "\nErrPoint_Pixel: "<<fErrPoint_Pixel<<"\n";
+   /*std::cout<<"ErrHit_Pixel: "<<fhErrorsHit_Pixel->GetMean(1)<<"\nErrHit_Point: "<<fhErrorsHit_MCPoint->GetMean(1)<<
+		   "\nErrPoint_Pixel: "<<fhErrorsPixel_MCPoint->GetMean(1)<<"\n";*/
    std::cout<<"Loosing Clusters: "<<fLooseCl<<"; St1: "<<fLooseClustersBySt[0]<<
 		   "; St2: "<<fLooseClustersBySt[1]<<"\nFake Clusters: "<<fFakeCl<<
 		   "; St1: "<<fFakeClustersBySt[0]<<"; St2: "<<fFakeClustersBySt[1]<<"\n";
    //TString fname = "/u/gkozlov/cbm/events/cc.25gev.centr_draw10.txt";
    //TString fname = "/u/gkozlov/cbm/events/pc.25gev.centr_draw10.txt";
    //TString fname = "/u/gkozlov/cbm/events/pAu.25gev.centr_draw10.txt";
-   TString fname = "/u/gkozlov/cbm/events/mvd.clustering.out.txt";
+   /*TString fname = "/u/gkozlov/cbm/events/mvd.clustering.out.txt";
    FILE* f1 = fopen(fname , "a");
    fprintf(f1, "\n\n\nEfficiency: %.3f\nErrHit_Pixel: %.7f\nErrHit_Point: %.7f\nErrPoint_Pixel: %.7f",
 		   fEfficiency, fErrHit_Pixel, fErrHit_Point, fErrPoint_Pixel);
-   fclose(f1);
+   fclose(f1);*/
    /*fhMvdClusters->Write();
    TCanvas* canvasL = new TCanvas("mvd_clusters", "mvd_clusters", 700, 700);
    canvasL->Divide(1, 1);
@@ -301,23 +301,29 @@ void CbmMvdClustering::Finish()
    canvasE3->cd(1);
    fhErrHit_Pixel->Draw();*/
 
+   SetDefaultDrawStyle();
+
+   fhErrorsHit_MCPoint->Scale(1. / fNofEvents);
    fhErrorsHit_MCPoint->Write();
    TCanvas* canvasHMP = new TCanvas("fhErrorsHit_MCPoint", "fhErrorsHit_MCPoint", 1000, 500);
-   canvasHMP->Divide(1, 1);
-   canvasHMP->cd(1);
-   fhErrorsHit_MCPoint->Draw();
+   //canvasHMP->Divide(1, 1);
+   //canvasHMP->cd(1);
+   //fhErrorsHit_MCPoint->Draw();
+   DrawH1(fhErrorsHit_MCPoint);//, kLinear, kLog);
 
+   /*fhErrorsHit_Pixel->Scale(1. / fNofEvents);
    fhErrorsHit_Pixel->Write();
    TCanvas* canvasHP = new TCanvas("fhErrorsHit_Pixel", "fhErrorsHit_Pixel", 1000, 500);
    canvasHP->Divide(1, 1);
    canvasHP->cd(1);
    fhErrorsHit_Pixel->Draw();
 
+   fhErrorsPixel_MCPoint->Scale(1. / fNofEvents);
    fhErrorsPixel_MCPoint->Write();
    TCanvas* canvasPMP = new TCanvas("fhErrorsPixel_MCPoint", "fhErrorsPixel_MCPoint", 1000, 500);
    canvasPMP->Divide(1, 1);
    canvasPMP->cd(1);
-   fhErrorsPixel_MCPoint->Draw();
+   fhErrorsPixel_MCPoint->Draw();*/
 }
 
 Int_t CbmMvdClustering::GetMvdGeometry() {
@@ -686,9 +692,11 @@ void CbmMvdClustering::FindClusters()
 					Double_t Xdigi = (0.5 + (Double_t)chX) * pixelSizeX - layerRadius;
 					Double_t Ydigi = (0.5 + (Double_t)chY) * pixelSizeY - layerRadius;
 					//std::cout<<"Cluster: "<<nomCl<<"; Digi: "<<jDigi<<"; cX: "<<chX<<"; cY: "<<chY<<"; Xd: "<<Xdigi<<"; Yd: "<<Ydigi<<"\n";
-					fClusters[nomCl].xc += Xdigi * digiNeighbor->GetCharge();
-					fClusters[nomCl].yc += Ydigi * digiNeighbor->GetCharge();
-					fClusters[nomCl].sumClCharge += digiNeighbor->GetCharge();
+					//UInt_t digiNeighborCharge = (UInt_t)digiNeighbor->GetCharge();
+					Float_t digiNeighborCharge = digiNeighbor->GetCharge();
+					fClusters[nomCl].xc += Xdigi * digiNeighborCharge;
+					fClusters[nomCl].yc += Ydigi * digiNeighborCharge;
+					fClusters[nomCl].sumClCharge += digiNeighborCharge;
 					fClusters[nomCl].digisInCluster[nofDigisInCluster] = fDigiMap[b];
 					nofDigisInCluster++;
 					fClusters[nomCl].nofDidis = nofDigisInCluster;
@@ -711,7 +719,7 @@ void CbmMvdClustering::FindClusters()
 		fClusters[iCl].yc = fClusters[iCl].yc / fClusters[iCl].sumClCharge;
 	}*/
 
-	std::cout<<"nomCl: "<<nomCl<<"; fNofClusters: "<<fNofClusters<<"\n";
+	/////std::cout<<"nomCl: "<<nomCl<<"; fNofClusters: "<<fNofClusters<<"\n";
 	//if(fNofClusters > nomCl)std::cout<<"---Ch: "<<fClusters[nomCl+1].sumClCharge<<"\n";
 	for(Int_t iCl = 0; iCl < nomCl; iCl++)
 	{
@@ -748,17 +756,17 @@ void CbmMvdClustering::FindClusters()
 	fNofClusters = nomCl;
 
 
-	/*TVector3 pos, dpos;
-	 dpos.SetXYZ(0.0005, 0.0005, 0.);
+	TVector3 pos, dpos;
+	 dpos.SetXYZ(0.0002, 0.0002, 0.);
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
-		CbmMvdDigi* digi = (CbmMvdDigi*) fDigis->At(fClusters[iCl].nDigiMax);
+		CbmMvdDigi* digi = (CbmMvdDigi*) fDigis->At(fClusters[iCl].digisInCluster[0]);
 		Int_t stNr = digi->GetStationNr();
 		CbmMvdStation* station= fStationMap[stNr];
 		pos.SetXYZ(fClusters[iCl].xc, fClusters[iCl].yc, station->GetZ());
 		Int_t nHits = fHits->GetEntriesFast();
 		new ((*fHits)[nHits]) CbmMvdHit(stNr, pos, dpos, 0);
-	}*/
+	}
 }
 
 void CbmMvdClustering::ChangeClusters(pair<Int_t, Int_t> h, Int_t nCl0, Int_t nCl1)
@@ -857,6 +865,18 @@ void CbmMvdClustering::CalculateAcuracy()
 		if(errorXY[iCl] < dMin)dMin = errorXY[iCl];
 		if(errorXY[iCl] > dMax)dMax = errorXY[iCl];
 		fClusters[iCl].nMCPoint = nPoint;
+		/*std::cout<<"Cl: "<<iCl<<"; X: "<<fClusters[iCl].xc<<"; Y: "<<
+				fClusters[iCl].yc<<"; Charge: "<<fClusters[iCl].sumClCharge<<
+				"; nDigi: "<<fClusters[iCl].nofDidis<<"\n";
+		std::cout<<"Point: "<<nPoint<<"; Xp: "<<xx<<"; Yp: "<<yy<<"; Error: "<<
+				distMin<<"\n";
+		for(Int_t i = 0; i < fClusters[iCl].nofDidis; i++)
+		{
+			CbmMvdDigi* xdigi = (CbmMvdDigi*) fDigis->At(fClusters[iCl].digisInCluster[i]);
+			std::cout<<"---Digi: "<<fClusters[iCl].digisInCluster[i]<<
+					"; X: "<<xdigi->GetPixelX()<<"; Y: "<<xdigi->GetPixelY()<<
+					"; Charge: "<<(UInt_t)xdigi->GetCharge()<<"\n";
+		}*/
 	}
 
 	std::cout<<"Clusters: "<<fNofClusters<<"; St1: "<<fNofClustersBySt[0]<<

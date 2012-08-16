@@ -48,7 +48,9 @@ CbmMuchClustering::CbmMuchClustering():
 		fMuchDigi(),
 		fMuchPoint(),
 		fHit(),
-		fMuchPad()
+		//fStrawHit(),
+		fMuchPad(),
+		fNofClusters()
 {
 	fAlgorithmVersion = 2;
 	fNofModules = 0;
@@ -66,6 +68,11 @@ CbmMuchClustering::~CbmMuchClustering()
 		fCluster->Delete();
 		delete fCluster;
 	}
+	/*if (fStrawHit)
+	{
+		fStrawHit->Delete();
+		delete fStrawHit;
+	}*/
 }
 
 InitStatus CbmMuchClustering::Init()
@@ -79,6 +86,7 @@ InitStatus CbmMuchClustering::Init()
    CreateModulesGeometryArray();
    if (fHit) fHit->Clear();
    if (fCluster) fCluster->Clear();
+   //if (fStrawHit) fStrawHit->Clear();
 
    return kSUCCESS;
 }
@@ -86,13 +94,14 @@ InitStatus CbmMuchClustering::Init()
 void CbmMuchClustering::Exec(Option_t* opt)
 {
 	static Int_t eventNo = 0;
-	std::cout << "CbmMuchClustering::Exec: eventNo=" << eventNo++ << std::endl;
+	std::cout << " - CbmMuchClustering::Exec: eventNo=" << eventNo++ << std::endl;
+	fNofClusters = 0;
 	//if (fHit) fHit->Clear();
 	//if (fCluster) fCluster->Clear();
 	SetDigiCharges();
 	ClusteringMainFunction();
 	ClearDigiCharges();
-	//MuchClustering(fAlgorithmVersion, fScheme);
+	std::cout<<" - Much clusters:   "<<fNofClusters<<"\n";
 }
 
 void CbmMuchClustering::Finish()
@@ -110,6 +119,8 @@ void CbmMuchClustering::ReadDataBranches()
 	ioman->Register("MuchCluster", "Cluster in MUCH", fCluster, kTRUE);
 	fHit = new TClonesArray("CbmMuchPixelHit", 1000);
 	ioman->Register("MuchPixelHit", "Hit in MUCH", fHit, kTRUE);
+	/*fStrawHit = new TClonesArray("CbmMuchStrawHit", 1000);
+	ioman->Register("MuchStrawHit", "StrawHit in MUCH", fStrawHit, kTRUE);*/
 
 	/*fStrawHit = new TClonesArray("CbmMuchStrawHit", 1000);
 	ioman->Register("MuchStrawHit", "StrawHit in MUCH", fStrawHit, kTRUE);*/
@@ -233,148 +244,6 @@ void CbmMuchClustering::DeletePadsCharge(CbmClusteringGeometry* moduleGeo)
 	}
 }
 
-/*void CbmMuchClustering::MuchClustering(Int_t algVersion, CbmMuchGeoScheme* scheme)
-{
-	Int_t nClusters = 0;
-	Int_t nCluster = 0;
-	Int_t nHit = 0;
-	std::cout<<"\nCOMMENT\n";
-	Int_t nStations = scheme->GetNStations();
-	std::cout<<"NStations: "<<nStations<<"\n";
-	for(Int_t i = 0; i < nStations; i++)
-	{
-		CbmMuchStation* station = (CbmMuchStation*) scheme->GetStation(i);
-		Int_t nLayers = station->GetNLayers();
-		std::cout<<"\n-Station: "<<i<<"; NLayers: "<<nLayers<<"\n";
-		for(Int_t j = 0; j < nLayers; j++)
-		{
-			CbmMuchLayer* layer = (CbmMuchLayer*) station->GetLayer(j);
-			CbmMuchLayerSide* layerSideF = (CbmMuchLayerSide*) layer->GetSideF();
-			CbmMuchLayerSide* layerSideB = (CbmMuchLayerSide*) layer->GetSideB();
-			Int_t nModulesF = layerSideF->GetNModules();
-			Int_t nModulesB = layerSideB->GetNModules();
-			std::cout<<"--Layer: "<<j<<"; NModules in F: "<<nModulesF<<"\n";
-			//if((i == 0)&&(j == 0))
-			if(true)
-			{
-			for(Int_t k = 0; k < nModulesF; k++)
-			{
-				CbmClusteringGeometry* moduleF = new CbmClusteringGeometry(i, j, 0, k, scheme);
-				SetPadsCharge(moduleF, scheme);
-				CbmMuchModuleGem* module = (CbmMuchModuleGem*)scheme->GetModule(i, j, 0, k);
-				if(moduleF->GetAPadsNom() > 0)
-				{
-				switch(algVersion){
-				case 1:
-				{
-					//A1.v1
-					ClusteringA1(moduleF, module, 1, nHit, nCluster);
-					break;
-				}
-				case 2:
-				{
-					//A1.v2
-					ClusteringA1(moduleF, module, 2, nHit, nCluster);
-					break;
-				}
-				case 3:
-				{
-					//SL.v1
-					ClusteringSL(moduleF, module, 1, nHit, nCluster);
-					break;
-				}
-				case 4:
-				{
-					//SL.v2
-					ClusteringSL(moduleF, module, 2, nHit, nCluster);
-					break;
-				}
-				case 5:
-				{
-					//Ward
-					fClustersWard = new CbmClusteringWard(moduleF, 1000);
-					fClustersWard->WardMainFunction(moduleF, 100);
-					std::cout<<"Module:"<<k<<" - Ward: nofClusters: "<<fClustersWard->GetNofClusters()<<"\n";
-//					for(Int_t iCl = 0; iCl < fClustersWard->GetNofClusters(); iCl++)
-//					{
-//						new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersWard->GetX0(iCl),
-//								fClustersWard->GetY0(iCl), fClustersWard->GetClCharge(iCl),
-//								fClustersWard->GetNofPads(iCl), 0,
-//								layerSideF->GetDetectorId(), moduleF->GetDetId());
-//					}
-					delete fClustersWard;
-					break;
-				}
-				default: std::cout<<"Wrong version of the algorithm.\n"; break;
-				}
-				}
-				DeletePadsCharge(moduleF);
-				delete moduleF;
-			}
-			}
-			std::cout<<"--Layer: "<<j<<"; NModules in B: "<<nModulesF<<"\n";
-			//if((i == 0)&&(j == 0))
-			if(true)
-			{
-			for(Int_t k = 0; k < nModulesB; k++)
-			{
-				CbmClusteringGeometry* moduleB = new CbmClusteringGeometry(i, j, 1, k, scheme);
-				SetPadsCharge(moduleB, scheme);
-				CbmMuchModuleGem* module = (CbmMuchModuleGem*)scheme->GetModule(i, j, 1, k);
-				if(moduleB->GetAPadsNom() > 0)
-				{
-				switch(algVersion){
-				case 1:
-				{
-					//A1.v1
-					ClusteringA1(moduleB, module, 1, nHit, nCluster);
-					break;
-				}
-				case 2:
-				{
-					//A1.v2
-					ClusteringA1(moduleB, module, 2, nHit, nCluster);
-					break;
-				}
-				case 3:
-				{
-					//SL.v1
-					ClusteringSL(moduleB, module, 1, nHit, nCluster);
-					break;
-				}
-				case 4:
-				{
-					//SL.v2
-					ClusteringSL(moduleB, module, 2, nHit, nCluster);
-					break;
-				}
-				case 5:
-				{
-					//Ward
-					fClustersWard = new CbmClusteringWard(moduleB, 1000);
-					fClustersWard->WardMainFunction(moduleB, 100);
-					std::cout<<"Module:"<<k<<" - Ward: nofClusters: "<<fClustersWard->GetNofClusters()<<"\n";
-//					for(Int_t iCl = 0; iCl < fClustersWard->GetNofClusters(); iCl++)
-//					{
-//						new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersWard->GetX0(iCl),
-//								fClustersWard->GetY0(iCl), fClustersWard->GetClCharge(iCl),
-//								fClustersWard->GetNofPads(iCl), 0,
-//								layerSideB->GetDetectorId(), moduleB->GetDetId());
-//					}
-					delete fClustersWard;
-					break;
-				}
-				default: std::cout<<"Wrong version of the algorithm.\n";break;
-				}
-				}
-				DeletePadsCharge(moduleB);
-				delete moduleB;
-			}
-			}
-		}
-	}
-}*/
-
 void CbmMuchClustering::ClusteringMainFunction()
 {
 	Int_t nHit = 0;
@@ -428,7 +297,8 @@ void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem
 {
 	fClustersA1 = new CbmClusteringA1(m1);
 	fClustersA1->MainClusteringA1(m1, Ver);
-	if(fClustersA1->GetNofClusters() != 0)std::cout<<"Module:"<<m2->GetDetectorId()<<" - A1.v"<<Ver<<": nofClusters: "<<fClustersA1->GetNofClusters()<<"\n";
+	//if(fClustersA1->GetNofClusters() != 0)std::cout<<"Module:"<<m2->GetDetectorId()<<" - A1.v"<<Ver<<": nofClusters: "<<fClustersA1->GetNofClusters()<<"\n";
+	fNofClusters += fClustersA1->GetNofClusters();
 	for(Int_t iCl = 0; iCl < fClustersA1->GetNofClusters(); iCl++)
 	{
 		vector<Int_t> digiIndices;
@@ -479,7 +349,8 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 {
 	fClustersSL = new CbmClusteringSL(m1);
 	fClustersSL->MainClusteringSL(m1, Ver);
-	std::cout<<"Module:"<<m2->GetDetectorId()<<" - SL.v2: nofClusters: "<<fClustersSL->GetNofClusters()<<"\n";
+	fNofClusters += fClustersSL->GetNofClusters();
+	//std::cout<<"Module:"<<m2->GetDetectorId()<<" - SL.v2: nofClusters: "<<fClustersSL->GetNofClusters()<<"\n";
 	for(Int_t iCl = 0; iCl < fClustersSL->GetNofClusters(); iCl++)
 	{
 		vector<Int_t> digiIndices;
@@ -500,6 +371,7 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 			digiIndices.push_back(iDigi);
 			//std::cout<<"-"<<a<<"-";
 			Long64_t channelId = muchDigi->GetChannelId();
+			std::cout<<iPad<<"; ChId: "<<channelId<<"; iCl: "<<iCl<<"\n";
 			pad = m2->GetPad(channelId);
 			if (dx > pad->GetDx()) dx = pad->GetDx();
 			if (dy > pad->GetDy()) dy = pad->GetDy();

@@ -64,6 +64,7 @@ private:
 
    Int_t fAlgorithmVersion;
    Int_t fNofModules;
+   Int_t fNofClusters;
 
    CbmClusteringA1* fClustersA1;
    CbmClusteringSL* fClustersSL;

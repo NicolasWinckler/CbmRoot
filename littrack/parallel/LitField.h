@@ -1,11 +1,8 @@
 /**
  * \file LitField.h
- *
  * \brief Classes to work with magnetic field.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- *
  */
 #ifndef LITFIELD_H_
 #define LITFIELD_H_

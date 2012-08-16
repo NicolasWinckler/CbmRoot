@@ -1,7 +1,7 @@
-/** LitTrackFinderNNVecMuon.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
+/**
+ * \file LitTrackFinderNNVecMuon.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
 #include "LitTrackFinderNNVecMuon.h"
 #include "LitDetectorGeometryMuon.h"
@@ -22,10 +22,14 @@
 #include <limits>
 
 lit::parallel::LitTrackFinderNNVecMuon::LitTrackFinderNNVecMuon():
-   fMaxNofMissingHits(3),
-   fSigmaCoef(3.5),
-   fMaxCovSq(20.*20.),
-   fChiSqPixelHitCut(25.)
+	fTracks(),
+	fLayout(),
+	fHitData(),
+	fMaxNofMissingHits(3),
+	fIsProcessSubstationsTogether(true),
+	fSigmaCoef(3.5),
+	fMaxCovSq(20.*20.),
+	fChiSqPixelHitCut(25)
 {
 
 }

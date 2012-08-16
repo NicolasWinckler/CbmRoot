@@ -1,18 +1,12 @@
-/** LitTrackFinderNNVecMuon.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- ** Parallel SIMDized implementation of the MUCH tracking.
- ** Input: array with track seeds and array with hits.
- ** Output: reconstructed tracks.
- ** Algorithm is based on track following and Kalman Filter methods.
- ** The track is propagated from station to station and the track
- ** branch is created for each hit in the validation gate.
+/**
+ * \file LitTrackFinderNNVecMuon.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Parallel implementation of MUCH tracking.
  **/
 
-#ifndef LitTrackFinderNNVecMuon_H_
-#define LitTrackFinderNNVecMuon_H_
+#ifndef LITTRACKFINDERNNVECMUON_H_
+#define LITTRACKFINDERNNVECMUON_H_
 
 #include "LitDetectorGeometryMuon.h"
 #include "LitHitDataMuon.h"
@@ -23,23 +17,46 @@
 namespace lit {
 namespace parallel {
 
+/**
+ * \class LitTrackFinderNNVecMuon.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief Parallel implementation of MUCH tracking.
+ *
+ * Input: array of track seeds and array of hits.
+ * Output: reconstructed tracks.
+ * Algorithm is based on track following and Kalman Filter methods.
+ * The track is propagated from station to station and nearest
+ * hit in the validation gate is attached to track.
+ **/
 class LitTrackFinderNNVecMuon
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    LitTrackFinderNNVecMuon();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~LitTrackFinderNNVecMuon();
 
-   /* Inherited from LitTrackFinder */
+   /**
+    * \brief Main function for tracking.
+    * \param[in] hits Array of hits.
+    * \param[in] trackSeeds Array of track seeds.
+    * \param[out] track Output reconstructed tracks.
+    */
    virtual void DoFind(
       const PixelHitArray& hits,
       const TrackArray& trackSeeds,
       TrackArray& tracks);
 
-   /* Sets detector layout for the tracking
-    * @param layout Detector layout */
+   /**
+    * \brief Sets detector layout for the tracking.
+    * \param[in] layout Detector layout.
+    */
    void SetDetectorLayout(
          const LitDetectorLayoutMuon<fvec>& layout) {
       fLayout = layout;
@@ -124,41 +141,16 @@ private:
           PixelHitConstIterator& last);
 
 private:
-   /* Local copy of tracks */
-   TrackArray fTracks;
-   /* Detector geometry */
-   LitDetectorLayoutMuon<fvec> fLayout;
-   /* Arranged hits */
-   LitHitDataMuon<fvec> fHitData;
-   /* Maximum number of missing hits */
-   unsigned char fMaxNofMissingHits;
-   /* Maximum number of branches created in the station
-      for one input track */
-   unsigned int fMaxNofBranchesStation;
-   /* Maximum number of branches for one input track seed
-      which can be created in a station group */
-   unsigned int fMaxNofBranchesStationGroup;
-   /* Maximum number of branches for one input track seed */
-   unsigned int fMaxNofBranches;
-   /* Counter for number of branches in the station group */
-   unsigned int fNofBranchesStationGroup;
-   /* Map for monitoring of number of branches for each input track seed
-      map<previousTrackId, nofBranches> */
-   std::map<int, int> fNofBranches;
-   /* If true than a separate branch for a missing hit is always created
-      if false than it is created only if there are no hits in the validation gate */
-   bool fIsAlwaysCreateMissingHit;
-   /* If true than hits from all substations are gathered together and
-      hit selection is done over all this hits at a time */
-   bool fIsProcessSubstationsTogether;
-   /* Sigma coefficient for fast hit search */
-   fscal fSigmaCoef;
-   /* Maximum covariance value */
-   fscal fMaxCovSq;
-   /* Chi square cut for pixel hits */
-   fvec fChiSqPixelHitCut;
+   TrackArray fTracks; // Local copy of tracks
+   LitDetectorLayoutMuon<fvec> fLayout; // Detector geometry
+   LitHitDataMuon<fvec> fHitData; // Arranged hits
+   unsigned char fMaxNofMissingHits; // Maximum number of missing hits
+   bool fIsProcessSubstationsTogether; //  If true than hits from all substations are gathered together and hit selection is done over all this hits at a time
+   fscal fSigmaCoef; // Sigma coefficient for fast hit search
+   fscal fMaxCovSq; // Maximum covariance value
+   fvec fChiSqPixelHitCut; // Chi square cut for pixel hits
 };
 
 } // namespace parallel
 } // namespace lit
-#endif /* LitTrackFinderNNVecMuon_H_ */
+#endif /* LITTRACKFINDERNNVECMUON_H_ */

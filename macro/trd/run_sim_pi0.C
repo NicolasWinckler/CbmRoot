@@ -9,7 +9,7 @@
 
 void run_sim_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
 {
-
+  if (nEvents > 500) nEvents = 500;
   // ========================================================================
   // geometry selection for sim + reco  by Cyrano
   // ========================================================================

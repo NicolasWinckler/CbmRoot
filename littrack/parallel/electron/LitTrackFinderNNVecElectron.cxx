@@ -14,7 +14,7 @@
 #include "../LitAddMaterial.h"
 #include "../LitExtrapolation.h"
 #include "../LitFiltration.h"
-#include "../LitField.h"
+#include "../LitFieldGrid.h"
 #include "../LitMath.h"
 #include "../LitVecPack.h"
 #include "../LitTrack.h"

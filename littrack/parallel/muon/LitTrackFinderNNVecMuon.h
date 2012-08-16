@@ -8,7 +8,7 @@
 #ifndef LITTRACKFINDERNNVECMUON_H_
 #define LITTRACKFINDERNNVECMUON_H_
 
-#include "LitDetectorGeometryMuon.h"
+#include "LitDetectorLayoutMuon.h"
 #include "LitHitDataMuon.h"
 
 #include <vector>

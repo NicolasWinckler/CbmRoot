@@ -9,7 +9,7 @@
 #define CBMLITFIELDFITTER_H_
 
 #include <vector>
-#include "../../parallel/LitField.h"
+#include "../../parallel/LitFieldSlice.h"
 class FairField;
 
 /**

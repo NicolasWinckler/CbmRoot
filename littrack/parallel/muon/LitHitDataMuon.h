@@ -8,7 +8,7 @@
 #ifndef LITHITDATAMUON_H_
 #define LITHITDATAMUON_H_
 
-#include "LitDetectorGeometryMuon.h"
+#include "LitDetectorLayoutMuon.h"
 #include "../LitHit.h"
 #include "../LitComparators.h"
 

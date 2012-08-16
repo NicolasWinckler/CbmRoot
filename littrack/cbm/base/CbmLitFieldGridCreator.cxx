@@ -7,7 +7,7 @@
  */
 #include "CbmLitFieldGridCreator.h"
 #include "CbmLitEnvironment.h"
-#include "../../parallel/LitField.h"
+#include "../../parallel/LitFieldGrid.h"
 
 #include "FairField.h"
 

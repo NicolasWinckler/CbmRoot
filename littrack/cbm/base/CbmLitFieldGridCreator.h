@@ -11,7 +11,7 @@
 #define CBMLITFIELDGRIDCREATOR_H_
 
 #include <vector>
-#include "../../parallel/LitField.h"
+#include "../../parallel/LitFieldGrid.h"
 class FairField;
 
 class CbmLitFieldGridCreator

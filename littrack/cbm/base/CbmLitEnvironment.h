@@ -12,7 +12,7 @@
 #define CBMLITENVIRONMENT_H_
 
 #include "base/CbmLitDetectorLayout.h"
-#include "parallel/muon/LitDetectorGeometryMuon.h"
+#include "parallel/muon/LitDetectorLayoutMuon.h"
 #include "parallel/electron/LitDetectorGeometryElectron.h"
 
 #include <vector>
@@ -105,23 +105,8 @@ private:
    /* Constructs TRD layout. */
    void TrdLayout();
 
-   /* Constructs simple TRD layout. */
-   void TrdLayoutSimple();
-
    /* Constructs MVD layout */
    void MvdLayout();
-
-   /* Creates detector layout out of an array stations. */
-   void DetermineLayout(
-      const std::vector<CbmLitStation>& stations,
-      CbmLitDetectorLayout& layout);
-
-   /* */
-   std::vector<CbmLitStation> DivideToSubstations(
-      const std::vector<CbmLitStation>& stations);
-
-   /* Returns true if straw tube detector is simulated. */
-   bool IsStraw() const;
 
    CbmLitDetectorLayout fLayout; // current detector layout
    CbmLitDetectorLayout fMuchTrdLayout; // MUCH+TRD detector layout

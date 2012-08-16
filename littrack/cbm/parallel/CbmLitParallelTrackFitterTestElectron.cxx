@@ -16,7 +16,7 @@
 #include "parallel/LitFiltration.h"
 #include "parallel/LitAddMaterial.h"
 #include "parallel/LitTrackParam.h"
-#include "parallel/LitField.h"
+#include "parallel/LitFieldGrid.h"
 #include "parallel/LitHit.h"
 #include "parallel/LitConverter.h"
 #include "parallel/LitMath.h"

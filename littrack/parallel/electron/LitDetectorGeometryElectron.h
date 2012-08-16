@@ -21,7 +21,7 @@
 
 #include "../LitTypes.h"
 #include "../LitMaterialInfo.h"
-#include "../LitField.h"
+#include "../LitFieldGrid.h"
 #include "../LitUtils.h"
 
 namespace lit {

@@ -19,7 +19,9 @@
 #define LITEXTRAPOLATION_H_
 
 #include "LitTrackParam.h"
-#include "LitField.h"
+#include "LitFieldGrid.h"
+#include "LitFieldRegion.h"
+#include "LitMath.h"
 
 namespace lit {
 namespace parallel {

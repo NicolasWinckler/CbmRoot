@@ -4,14 +4,14 @@
  * \date 2009
  **/
 #include "LitTrackFinderNNVecMuon.h"
-#include "LitDetectorGeometryMuon.h"
+#include "LitDetectorLayoutMuon.h"
 #include "LitHitDataMuon.h"
 #include "../LitTypes.h"
 #include "../LitHit.h"
 #include "../LitAddMaterial.h"
 #include "../LitExtrapolation.h"
 #include "../LitFiltration.h"
-#include "../LitField.h"
+#include "../LitFieldGrid.h"
 #include "../LitMath.h"
 #include "../LitVecPack.h"
 #include "../LitTrackSelection.h"

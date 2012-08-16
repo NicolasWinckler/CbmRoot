@@ -10,7 +10,7 @@
 #include "std/interface/CbmLitTrackFitter.h"
 #include "std/data/CbmLitPixelHit.h"
 #include "parallel/LitHit.h"
-#include "parallel/muon/LitDetectorGeometryMuon.h"
+#include "parallel/muon/LitDetectorLayoutMuon.h"
 
 class CbmLitTrack;
 class CbmLitTrackParam;

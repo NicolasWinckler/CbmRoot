@@ -9,7 +9,7 @@
 
 #include "parallel/LitTypes.h"
 #include "parallel/LitHit.h"
-#include "parallel/muon/LitDetectorGeometryMuon.h"
+#include "parallel/muon/LitDetectorLayoutMuon.h"
 #include "parallel/LitTrack.h"
 #include "parallel/LitConverter.h"
 #include "parallel/muon/LitTrackFinderNNVecMuon.h"

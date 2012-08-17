@@ -16,7 +16,7 @@
 #pragma link C++ class  CbmMuchFindHitsGem+;
 #pragma link C++ class  CbmMuchFindHitsGem+;
 #pragma link C++ class  CbmMuchFindTracks+;
-//#pragma link C++ class  CbmMuchHitFinderQa+;
+#pragma link C++ class  CbmMuchHitFinderQa+;
 #pragma link C++ class  CbmMuchHitProducerIdeal+;
 #pragma link C++ class  CbmMuchLayer+;
 #pragma link C++ class  CbmMuchLayerSide+;

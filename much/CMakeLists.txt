@@ -52,7 +52,7 @@ reco/CbmMuchDigitizeGem.cxx
 reco/CbmMuchDigitizeStraws.cxx
 reco/CbmMuchFindHitsGem.cxx
 reco/CbmMuchFindHitsStraws.cxx
-#reco/CbmMuchHitFinderQa.cxx
+reco/CbmMuchHitFinderQa.cxx
 reco/CbmMuchHitProducerIdeal.cxx
 reco/CbmMuchPointInfo.cxx
 reco/CbmMuchStrawHitFinderQa.cxx

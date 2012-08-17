@@ -25,7 +25,7 @@
 CbmLitParallelTrackFitterTestMuon::CbmLitParallelTrackFitterTestMuon()
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   env->GetMuchLayoutScal(fLayout);
+   //env->GetMuchLayoutScal(fLayout);
    std::cout << fLayout;
 }
 

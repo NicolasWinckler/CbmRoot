@@ -5,7 +5,7 @@
 
 #include "base/CbmLitFieldFitter.h"
 #include "base/CbmLitFieldGridCreator.h"
-#include "base/CbmLitSimpleGeometryConstructor.h"
+#include "base/CbmLitTrackingGeometryConstructor.h"
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitDetectorSetup.h"
 #include "utils/CbmLitMemoryManagment.h"
@@ -159,8 +159,8 @@ void CbmLitEnvironment::TrdLayout()
 {
    static Bool_t layoutCreated = false;
    if (!layoutCreated) {
-	  fTrdLayout = CbmLitSimpleGeometryConstructor::Instance()->GetTrdLayout();
-      fTrdLayout.SetGeo(CbmLitSimpleGeometryConstructor::Instance()->GetTrdTrackingGeo());
+	  fTrdLayout = CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayout();
+      fTrdLayout.SetGeo(CbmLitTrackingGeometryConstructor::Instance()->GetTrdTrackingGeo());
       //cout << fTrdLayout.ToString();
       layoutCreated = true;
    }
@@ -289,110 +289,6 @@ void CbmLitEnvironment::MvdLayout()
    }
 }
 
-void CbmLitEnvironment::GetMuchLayoutVec(
-   lit::parallel::LitDetectorLayoutMuonVec& layout)
-{
-   GetMuchLayout(layout);
-}
-
-void CbmLitEnvironment::GetMuchLayoutScal(
-   lit::parallel::LitDetectorLayoutMuonScal& layout)
-{
-   GetMuchLayout(layout);
-}
-
-template<class T>
-void CbmLitEnvironment::GetMuchLayout(
-   lit::parallel::LitDetectorLayoutMuon<T>& layout)
-{
-   cout << "Getting detector layout for parallel MUCH tracking..." << endl;
-
-   CbmLitFieldGridCreator gridCreator;
-   CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
-   std::vector<CbmLitMaterialInfo> muchMaterial = geoConstructor->GetMyMuchGeoNodes();
-
-   MuchLayout();
-   const CbmLitDetectorLayout& muchLayout = GetMuchLayout();
-   cout << muchLayout.ToString();
-   for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
-      const CbmLitStationGroup& stationGroup = muchLayout.GetStationGroup(isg);
-      lit::parallel::LitStationGroupMuon<T> sg;
-
-      // Add absorber
-      // Approximate the field at Z front, Z middle and Z back of the absorber
-      int absorberMatId = MaterialId(isg, 0, 0, muchLayout) - 1;
-      CbmLitMaterialInfo amat = muchMaterial[absorberMatId];
-      double aZ[3] = { amat.GetZpos() - amat.GetLength(), amat.GetZpos() - 0.5 * amat.GetLength(), amat.GetZpos() };
-      lit::parallel::LitAbsorber<T> absorber;
-      lit::parallel::LitFieldGrid frontGrid, middleGrid, backGrid;
-      gridCreator.CreateGrid(aZ[0], frontGrid);
-      gridCreator.CreateGrid(aZ[1], middleGrid);
-      gridCreator.CreateGrid(aZ[2], backGrid);
-      absorber.SetFieldGridFront(frontGrid);
-      absorber.SetFieldGridMiddle(middleGrid);
-      absorber.SetFieldGridBack(backGrid);
-
-      lit::parallel::LitMaterialInfo<T> mat1;
-      mat1.A = amat.GetA();
-      mat1.Z = amat.GetZ();
-      mat1.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 : 16 * std::pow(amat.GetZ(), 0.9) * 1e-9;
-      mat1.Rho = amat.GetRho();
-      mat1.Thickness = amat.GetLength();
-      mat1.X0 = amat.GetRL();
-      mat1.Zpos = amat.GetZpos();
-      mat1.CalculateValues();
-
-      absorber.SetMaterial(mat1);
-      absorber.SetZ(amat.GetZpos());
-      sg.SetAbsorber(absorber);
-      // End add absorber
-
-      for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-         const CbmLitStation& station = stationGroup.GetStation(ist);
-         lit::parallel::LitStationMuon<T> st;
-         st.SetType(lit::parallel::LitHitType(station.GetType()));
-         for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
-            const CbmLitSubstation& substation = station.GetSubstation(iss);
-            lit::parallel::LitSubstationMuon<T> ss;
-            ss.SetZ(substation.GetZ());
-
-            int matId = MaterialId(isg, ist, iss, muchLayout);
-            CbmLitMaterialInfo mat = muchMaterial[matId];
-            lit::parallel::LitMaterialInfo<T> lmat;
-            lmat.A = mat.GetA();
-            lmat.Z = mat.GetZ();
-            lmat.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
-                            16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
-            lmat.Rho = mat.GetRho();
-            lmat.Thickness = mat.GetLength();
-            lmat.X0 = mat.GetRL();
-            lmat.Zpos = mat.GetZpos();
-            lmat.CalculateValues();
-
-            ss.SetMaterial(lmat);
-            st.AddSubstation(ss);
-         } // loop over substations
-         sg.AddStation(st);
-      } // loop over stations
-
-      // Magnetic field approximation for the station group
-      lit::parallel::LitFieldGrid fGrid, mGrid, bGrid;
-      const CbmLitStation& frontStation = stationGroup.GetStation(0);
-      fscal fZ = frontStation.GetSubstation(0).GetZ();
-      const CbmLitStation& backStation = stationGroup.GetStation(stationGroup.GetNofStations() - 1);
-      fscal bZ = backStation.GetSubstation(backStation.GetNofSubstations() - 1).GetZ();
-      fscal mZ = fZ + 0.5 * (bZ - fZ);
-
-      gridCreator.CreateGrid(fZ, fGrid);
-      gridCreator.CreateGrid(mZ, mGrid);
-      gridCreator.CreateGrid(bZ, bGrid);
-
-      // end Magnetic field approximation for the station group
-
-      layout.AddStationGroup(sg);
-   } // loop over station groups
-}
-
 void CbmLitEnvironment::GetTrdLayoutVec(
    lit::parallel::LitDetectorLayoutElectronVec& layout)
 {
@@ -409,7 +305,7 @@ template<class T>
 void CbmLitEnvironment::GetTrdLayout(
    lit::parallel::LitDetectorLayoutElectron<T>& layout)
 {
-   cout << "Getting TRD layout for parallel version of tracking..." << endl;
+/*   cout << "Getting TRD layout for parallel version of tracking..." << endl;
 
    CbmLitFieldGridCreator gridCreator;
    CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
@@ -495,30 +391,7 @@ void CbmLitEnvironment::GetTrdLayout(
    } // loop over station groups
    cout << layout;
    cout << "Finish getting TRD layout for parallel version of tracking..." << endl;
-}
-
-int CbmLitEnvironment::MaterialId(
-   int stationGroup,
-   int station,
-   int substation,
-   const CbmLitDetectorLayout& layout) const
-{
-   int counter = 0;
-   for(int i = 0; i < stationGroup; i++) {
-      for(int j = 0; j < layout.GetNofStations(i); j++) {
-         counter += layout.GetNofSubstations(i, j);
-      }
-      counter++; // count for absorber
-   }
-   counter++;//again count for absorber
-   for(int j = 0; j < station; j++) {
-      counter += layout.GetNofSubstations(stationGroup, j);
-   }
-   counter += substation;
-
-   cout << "MaterialId: " << stationGroup << " " << station << " " << substation
-             << " " << counter << endl;
-   return counter;
+   */
 }
 
 int CbmLitEnvironment::TrdMaterialId(

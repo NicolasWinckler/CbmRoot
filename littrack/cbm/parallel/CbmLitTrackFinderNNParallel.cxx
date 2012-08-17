@@ -1,6 +1,7 @@
 #include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 
 #include "cbm/base/CbmLitEnvironment.h"
+#include "cbm/base/CbmLitTrackingGeometryConstructor.h"
 #include "std/data/CbmLitHit.h"
 #include "std/data/CbmLitPixelHit.h"
 #include "std/data/CbmLitTrackParam.h"
@@ -27,17 +28,18 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
    fTrackingType(trackingType)
 {
    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+   CbmLitTrackingGeometryConstructor* geo = CbmLitTrackingGeometryConstructor::Instance();
 
    if (fTrackingType == "nn_parallel_muon") {
       lit::parallel::LitDetectorLayoutMuonVec layout;
-      env->GetMuchLayoutVec(layout);
+      geo->GetMuchLayoutVec(layout);
       fTFParallelMuon = new lit::parallel::LitTrackFinderNNVecMuon();
       fTFParallelMuon->SetDetectorLayout(layout);
    } else if (fTrackingType == "nn_parallel_electron") {
       lit::parallel::LitDetectorLayoutElectronVec layout;
       env->GetTrdLayoutVec(layout);
       fTFVecElectron = new lit::parallel::LitTrackFinderNNVecElectron();
-      fTFVecElectron->SetDetectorLayout(layout);
+    //  fTFVecElectron->SetDetectorLayout(layout);
    } else {
       std::cout << "-E- CbmLitTrackFinderNNParallel: TRACKING TYPE NOT FOUND!" << std::endl;
       exit(0);

@@ -1,18 +1,17 @@
 /**
- * \file CbmLitSimpleGeometryConstructor.h
- *
- * \brief Simplified geometry constructor.
- *
+ * \file CbmLitTrackingGeometryConstructor.h
+ * \brief Tracking geometry constructor.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
  **/
 
-#ifndef CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
-#define CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
+#ifndef CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_
+#define CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_
 
 #include "propagation/CbmLitMaterialInfo.h"
 #include "base/CbmLitDetectorSetup.h"
 #include "base/CbmLitDetectorLayout.h"
+#include "parallel/muon/LitDetectorLayoutMuon.h"
 
 #include <string>
 #include <map>
@@ -23,43 +22,34 @@ class TGeoMedium;
 class TGeoVolume;
 class TGeoNode;
 
-class CbmLitSimpleGeometryConstructor
+class CbmLitTrackingGeometryConstructor
 {
 public:
    /**
     * \brief Return pointer to singleton object.
     * \return Pointer to singleton object.
     */
-   static CbmLitSimpleGeometryConstructor* Instance();
-
-   /**
-    * \brief Return array of materials for simplified geometry.
-    * \return Array of materials for simplified geometry.
-    */
-   const std::vector<CbmLitMaterialInfo>& GetMyGeoNodes() const {return fMyGeoNodes;}
-
-   /**
-    * \brief Returs array of materials for MUCH geometry.
-    * \return Array of materials for MUCH geometry.
-    */
-   const std::vector<CbmLitMaterialInfo>& GetMyMuchGeoNodes() const {return fMyMuchGeoNodes;}
-
-   /**
-    * \brief Return array of materials for TRD geometry.
-    * \return Array of materials for TRD geometry.
-    */
-   const std::vector<CbmLitMaterialInfo>& GetMyTrdGeoNodes() const {return fMyTrdGeoNodes;}
-
-   /**
-    * \brief Return array of materials for RICH geometry.
-    * \return Array of materials for RICH geometry.
-    */
-   const std::vector<CbmLitMaterialInfo>& GetMyRichGeoNodes() const {return fMyRichGeoNodes;}
+   static CbmLitTrackingGeometryConstructor* Instance();
 
    /**
     * \brief Draw simplified geometry.
     */
    void Draw();
+
+   /**
+    * \brief Return reference to the MUCH detector layout in SIMD format.
+    */
+   void GetMuchLayoutVec(lit::parallel::LitDetectorLayoutMuonVec& layout);
+
+   /**
+    * \brief Return reference to the MUCH detector layout in scalar format.
+    */
+   void GetMuchLayoutScal(lit::parallel::LitDetectorLayoutMuonScal& layout);
+
+   /**
+    * \brief Template function that returns reference to the MUCH detector layout.
+    */
+   template<class T> void GetMuchLayout(lit::parallel::LitDetectorLayoutMuon<T>& layout);
 
    TGeoManager* GetTrdTrackingGeo() const { return fTrdTrackingGeo; }
    const CbmLitDetectorLayout& GetTrdLayout() const { return fTrdLayout; }
@@ -71,22 +61,22 @@ private:
     * Constructor is protected since singleton pattern is used.
     * Pointer to object is returned by static Instance() method.
     */
-   CbmLitSimpleGeometryConstructor();
+   CbmLitTrackingGeometryConstructor();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitSimpleGeometryConstructor();
+   virtual ~CbmLitTrackingGeometryConstructor();
 
    /**
     * \brief Copy constructor.
     */
-   CbmLitSimpleGeometryConstructor(const CbmLitSimpleGeometryConstructor&);
+   CbmLitTrackingGeometryConstructor(const CbmLitTrackingGeometryConstructor&);
 
    /**
     * \brief Assignment operator.
     */
-   const CbmLitSimpleGeometryConstructor& operator=(const CbmLitSimpleGeometryConstructor&);
+   const CbmLitTrackingGeometryConstructor& operator=(const CbmLitTrackingGeometryConstructor&);
 
    /**
     * \brief Main function for simplified geometry construction.
@@ -142,19 +132,10 @@ private:
          double startZ);
 
    TGeoManager* fGeo; // Pointer to full geometry
-   TGeoManager* fSimpleGeo; // Pointer to simplified geometry
-
    std::map<std::string, TGeoMedium*> fMedium; // Maps name of the medium to TGeoMedium pointer
-
-   std::vector<CbmLitMaterialInfo> fMyGeoNodes; // Vector of materials for the simplified geometry
-   std::vector<CbmLitMaterialInfo> fMyMuchGeoNodes; // Vector of materials for the MUCH simplified geometry
-   std::vector<CbmLitMaterialInfo> fMyTrdGeoNodes; // Vector of materials for the TRD simplified geometry
-   std::vector<CbmLitMaterialInfo> fMyRichGeoNodes; // Vector of materials for the RICH simplified geometry
-
-   CbmLitDetectorSetup fDet;
-
-   TGeoManager* fTrdTrackingGeo;
-   CbmLitDetectorLayout fTrdLayout;
+   CbmLitDetectorSetup fDet; // Used for detector layout determination
+   TGeoManager* fTrdTrackingGeo; // This is needed for TRD geometries with rotated planes.
+   CbmLitDetectorLayout fTrdLayout; // TRD tracking layout
 };
 
-#endif /* CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_ */
+#endif /* CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_ */

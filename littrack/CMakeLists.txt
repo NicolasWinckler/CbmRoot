@@ -84,7 +84,7 @@ cbm/geo/CbmLitDetPoint.cxx
 cbm/propagation/CbmPropagatorGeane.cxx
 cbm/propagation/CbmPropagatorLit.cxx
 
-cbm/qa/geo/CbmLitSimpleGeoQa.cxx 
+cbm/qa/geo/CbmLitTrackingGeoQa.cxx 
 cbm/qa/material/CbmLitCheckMultipleScattering.cxx
 cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
 cbm/qa/material/CbmLitCheckBrem.cxx 
@@ -154,7 +154,7 @@ cbm/propagation/CbmPropagatorGeane.h
 cbm/propagation/CbmPropagatorLit.h
 cbm/finder/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/propagation/CbmLitPropagationQa.h
-cbm/qa/geo/CbmLitSimpleGeoQa.h 
+cbm/qa/geo/CbmLitTrackingGeoQa.h 
 cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/material/CbmLitCheckMultipleScattering.h
 cbm/qa/material/CbmLitCheckBrem.h 
@@ -194,7 +194,7 @@ cbm/base/CbmLitFieldGridCreator.cxx
 cbm/base/CbmLitEnvironment.cxx
 cbm/base/CbmLitFieldFitter.cxx
 cbm/base/CbmLitToolFactory.cxx
-cbm/base/CbmLitSimpleGeometryConstructor.cxx
+cbm/base/CbmLitTrackingGeometryConstructor.cxx
 cbm/finder/CbmLitFindGlobalTracks.cxx 
 cbm/finder/CbmLitFindGlobalTracksIdeal.cxx 
 cbm/qa/propagation/CbmLitPropagationQa.cxx 

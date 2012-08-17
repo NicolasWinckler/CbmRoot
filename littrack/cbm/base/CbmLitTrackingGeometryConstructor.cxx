@@ -1,12 +1,13 @@
 /**
- * \file CbmLitSimpleGeometryConstructor.cxx
+ * \file CbmLitTrackingGeometryConstructor.cxx
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
  **/
 
-#include "base/CbmLitSimpleGeometryConstructor.h"
+#include "base/CbmLitTrackingGeometryConstructor.h"
 
 #include "base/CbmLitEnvironment.h"
+#include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitComparators.h"
 #include "utils/CbmLitUtils.h"
 
@@ -37,30 +38,26 @@
 using std::set;
 using lit::ToString;
 
-CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
+CbmLitTrackingGeometryConstructor::CbmLitTrackingGeometryConstructor():
    fGeo(NULL),
-   fSimpleGeo(NULL),
    fMedium(),
-   fMyGeoNodes(),
-   fMyMuchGeoNodes(),
-   fMyTrdGeoNodes(),
    fDet(),
    fTrdTrackingGeo(NULL)
 {
    ConstructGeometry();
 }
 
-CbmLitSimpleGeometryConstructor::~CbmLitSimpleGeometryConstructor()
+CbmLitTrackingGeometryConstructor::~CbmLitTrackingGeometryConstructor()
 {
 }
 
-CbmLitSimpleGeometryConstructor* CbmLitSimpleGeometryConstructor::Instance()
+CbmLitTrackingGeometryConstructor* CbmLitTrackingGeometryConstructor::Instance()
 {
-   static CbmLitSimpleGeometryConstructor instance;
+   static CbmLitTrackingGeometryConstructor instance;
    return &instance;
 }
 
-void CbmLitSimpleGeometryConstructor::Draw()
+void CbmLitTrackingGeometryConstructor::Draw()
 {
 //   fSimpleGeo->SetVisLevel(0);
 //   TGeoVolume* master = fSimpleGeo->GetMasterVolume();
@@ -71,7 +68,7 @@ void CbmLitSimpleGeometryConstructor::Draw()
    trdGeoMaster->Draw("ogl");
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructGeometry()
+void CbmLitTrackingGeometryConstructor::ConstructGeometry()
 {
    std::cout << "-I- Simple geometry construction started" << std::endl;
 
@@ -101,33 +98,12 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 //   fSimpleGeo->PrintOverlaps();
 //   fSimpleGeo->Write();
 
-//   std::sort(fMyGeoNodes.begin(), fMyGeoNodes.end(), CompareMaterialInfoZLess());
-//   std::sort(fMyMuchGeoNodes.begin(), fMyMuchGeoNodes.end(), CompareMaterialInfoZLess());
-//   std::sort(fMyTrdGeoNodes.begin(), fMyTrdGeoNodes.end(), CompareMaterialInfoZLess());
-//   std::sort(fMyRichGeoNodes.begin(), fMyRichGeoNodes.end(), CompareMaterialInfoZLess());
-
-//   std::cout << "My Simple Geometry:" << std::endl;
-//   for (size_t i = 0; i < fMyGeoNodes.size(); ++i) {
-//      std::cout << i << " " << fMyGeoNodes[i].ToString();
-//   }
-
-// std::cout << "My MUCH Simple Geometry:" << std::endl;
-//    for (size_t i = 0; i < fMyMuchGeoNodes.size(); ++i)
-//       std::cout << i << " " << fMyMuchGeoNodes[i].ToString();
-//
-//   std::cout << "My TRD Simple Geometry:" << std::endl;
-//   for (size_t i = 0; i < fMyTrdGeoNodes.size(); ++i)
-//      std::cout << i << " " << fMyTrdGeoNodes[i].ToString();
-
-//   std::cout << "My RICH Simple Geometry:" << std::endl;
-//   for (size_t i = 0; i < fMyRichGeoNodes.size(); ++i)
-//      std::cout << i << " " << fMyRichGeoNodes[i].ToString();
 
 //   gGeoManager = fGeo;
    std::cout << "-I- Simple geometry construction finished" << std::endl;
 }
 
-void CbmLitSimpleGeometryConstructor::GeoMediumToMaterialInfo(
+void CbmLitTrackingGeometryConstructor::GeoMediumToMaterialInfo(
    const TGeoMedium* med,
    CbmLitMaterialInfo& mat)
 {
@@ -138,7 +114,7 @@ void CbmLitSimpleGeometryConstructor::GeoMediumToMaterialInfo(
    mat.SetA(material->GetA());
 }
 
-void CbmLitSimpleGeometryConstructor::CreateMediumList()
+void CbmLitTrackingGeometryConstructor::CreateMediumList()
 {
 	TList* mediumList = fGeo->GetListOfMedia();
 	Int_t nofMedium = mediumList->GetEntries();
@@ -151,7 +127,7 @@ void CbmLitSimpleGeometryConstructor::CreateMediumList()
 	}
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructSts()
+void CbmLitTrackingGeometryConstructor::ConstructSts()
 {
    std::cout << "-I- Construction of the STS geometry started" << std::endl;
    FairRunAna* run = FairRunAna::Instance();
@@ -165,104 +141,135 @@ void CbmLitSimpleGeometryConstructor::ConstructSts()
    for (int i = 0; i < nofStations; i++ ) {
       CbmStsStation* station = stsDigiScheme.GetStation(i);
       if (station == NULL) { continue; }
-      std::stringstream name;
-      name << "sts" << i;
-
-      TGeoShape* shape = new TGeoCone( station->GetD() / 2.,   station->GetRmin(),
-                                       station->GetRmax(), station->GetRmin(),   station->GetRmax());
-
-      TGeoMedium* medium = fMedium["silicon"];
-
-      TGeoVolume* volume = new TGeoVolume(name.str().c_str(), shape, medium);
-      TGeoMatrix* matrix = new TGeoTranslation(0, 0, station->GetZ());
-      fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
-
-      CbmLitMaterialInfo litMaterial;
-      litMaterial.SetLength(station->GetD());
-      litMaterial.SetZpos(station->GetZ());
-      GeoMediumToMaterialInfo(medium, litMaterial);
-      fMyGeoNodes.push_back(litMaterial);
+//      CbmLitMaterialInfo litMaterial;
+//      litMaterial.SetLength(station->GetD());
+//      litMaterial.SetZpos(station->GetZ());
+//      GeoMediumToMaterialInfo(medium, litMaterial);
    }
    std::cout << "-I- Construction of the STS geometry finished" << std::endl;
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructMuch()
+void CbmLitTrackingGeometryConstructor::GetMuchLayoutVec(
+   lit::parallel::LitDetectorLayoutMuonVec& layout)
 {
-   std::cout << "-I- Construction of the MUCH geometry started" << std::endl;
-   TGeoNode* much = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject("much_0");
+   GetMuchLayout(layout);
+}
+
+void CbmLitTrackingGeometryConstructor::GetMuchLayoutScal(
+   lit::parallel::LitDetectorLayoutMuonScal& layout)
+{
+   GetMuchLayout(layout);
+}
+
+template<class T> void CbmLitTrackingGeometryConstructor::GetMuchLayout(
+   lit::parallel::LitDetectorLayoutMuon<T>& layout)
+{
+   std::cout << "Getting detector layout for parallel MUCH tracking..." << std::endl;
+
+   CbmLitFieldGridCreator gridCreator;
+
+   const TGeoNode* much = static_cast<const TGeoNode*>(fGeo->GetTopNode()->GetNodes()->FindObject("much_0"));
    const double* muchPos  = much->GetMatrix()->GetTranslation();
    TObjArray* muchNodes = much->GetNodes();
-   for (int iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
-      TGeoNode* muchNode = (TGeoNode*) muchNodes->At(iMuchNode);
+   for (Int_t iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
+      const TGeoNode* muchNode = static_cast<const TGeoNode*>(muchNodes->At(iMuchNode));
+
+      // If MUCH node is an absorber
       if (TString(muchNode->GetName()).Contains("absorber")) {
-         TGeoCone* sh = (TGeoCone*) muchNode->GetVolume()->GetShape();
-         TGeoMedium* med = muchNode->GetVolume()->GetMedium();
+         const TGeoCone* absorberShape = static_cast<const TGeoCone*>(muchNode->GetVolume()->GetShape());
+         const TGeoMaterial* absorberMaterial = muchNode->GetVolume()->GetMedium()->GetMaterial();
 
-         TGeoShape* shape = new TGeoCone(sh->GetDz(), sh->GetRmin1(), sh->GetRmax1(),
-                                         sh->GetRmin2(),   sh->GetRmax2());
+         Double_t zPos = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]; // Z center position
+         Double_t thickness = 2. * absorberShape->GetDz();
 
-         TGeoMedium* medium = fMedium[med->GetName()];
+         lit::parallel::LitAbsorber<T> absorber;
+         absorber.SetZ(zPos);
 
-         litfloat Z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2];
+         lit::parallel::LitMaterialInfo<T> material;
+         material.Thickness = thickness;
+         material.A = absorberMaterial->GetA();
+         material.Z = absorberMaterial->GetZ();
+         material.Rho = absorberMaterial->GetDensity();
+         material.X0 = absorberMaterial->GetRadLen();
+         material.I = (absorberMaterial->GetZ() > 16.) ? 10. * absorberMaterial->GetZ() * 1e-9 : 16. * std::pow(absorberMaterial->GetZ(), 0.9) * 1e-9;
+         absorber.SetMaterial(material);
 
-         TGeoVolume* volume = new TGeoVolume(muchNode->GetName(), shape, medium);
-         TGeoMatrix* matrix = new TGeoTranslation(0, 0, Z);
-         fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
-
-         CbmLitMaterialInfo litMaterial;
-         litMaterial.SetLength(2. * sh->GetDz());
-         litMaterial.SetZpos(Z + sh->GetDz());
-         GeoMediumToMaterialInfo(medium, litMaterial);
-         fMyGeoNodes.push_back(litMaterial);
-         fMyMuchGeoNodes.push_back(litMaterial);
+         Double_t gridZ[3] = { zPos - 0.5 * thickness, zPos, zPos + 0.5 * thickness};
+         lit::parallel::LitFieldGrid frontGrid, middleGrid, backGrid;
+         gridCreator.CreateGrid(gridZ[0], frontGrid);
+         gridCreator.CreateGrid(gridZ[1], middleGrid);
+         gridCreator.CreateGrid(gridZ[2], backGrid);
+         absorber.SetFieldGridFront(frontGrid);
+         absorber.SetFieldGridMiddle(middleGrid);
+         absorber.SetFieldGridBack(backGrid);
       }
 
+      // If MUCH node is a station
       if (TString(muchNode->GetName()).Contains("station")) {
+    	 // Create station group
+    	 lit::parallel::LitStationGroupMuon<T> sg;
          TObjArray* layerNodes = muchNode->GetNodes();
-         for (int iLayerNode = 0; iLayerNode < layerNodes->GetEntriesFast(); iLayerNode++) {
-            TGeoNode* sideNode = (TGeoNode*) layerNodes->At(iLayerNode);
-
-            bool bactive = false, factive = false;
-            for (int iSideNode = 0; iSideNode < sideNode->GetNodes()->GetEntriesFast(); iSideNode++) {
-               TGeoNode* active = (TGeoNode*) sideNode->GetNodes()->At(iSideNode);
+         // Calculate minimum and maximum Z of the substation which is needed for field approximation.
+         Double_t minZ = std::numeric_limits<Double_t>::max(), maxZ = std::numeric_limits<Double_t>::min();
+         for (Int_t iLayerNode = 0; iLayerNode < layerNodes->GetEntriesFast(); iLayerNode++) {
+        	// Create station
+        	lit::parallel::LitStationMuon<T> st;
+        	st.SetType(lit::parallel::kLITPIXELHIT);
+            const TGeoNode* sideNode = static_cast<const TGeoNode*>(layerNodes->At(iLayerNode));
+            Bool_t bactive = false, factive = false;
+            TObjArray* sideNodes = sideNode->GetNodes();
+            for (Int_t iSideNode = 0; iSideNode < sideNodes->GetEntriesFast(); iSideNode++) {
+               const TGeoNode* active = static_cast<const TGeoNode*>(sideNode->GetNodes()->At(iSideNode));
                if (TString(active->GetName()).Contains("active")) {
                   if (bactive && TString(active->GetName()).Contains("bactive")) { continue; }
                   if (factive && TString(active->GetName()).Contains("factive")) { continue; }
 
-                  TGeoBBox* sh = (TGeoBBox*) active->GetVolume()->GetShape();
-                  TGeoMedium* med = active->GetVolume()->GetMedium();
+                  const TGeoBBox* activeShape = static_cast<const TGeoBBox*>(active->GetVolume()->GetShape());
+                  const TGeoMaterial* activeMaterial = active->GetVolume()->GetMedium()->GetMaterial();
 
-                  TGeoShape* shape = new TGeoCone(sh->GetDZ(), 0., 300.,   0.,   300.);
+                  Double_t zPos = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
+                          + sideNode->GetMatrix()->GetTranslation()[2] + active->GetMatrix()->GetTranslation()[2] + activeShape->GetDZ();
 
-                  TGeoMedium* medium = fMedium[med->GetName()];
+                  minZ = std::min(minZ, zPos);
+                  maxZ = std::max(maxZ, zPos);
 
-                  TGeoVolume* volume = new TGeoVolume(active->GetName(), shape, medium);
-                  litfloat z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
-                          + sideNode->GetMatrix()->GetTranslation()[2] + active->GetMatrix()->GetTranslation()[2];
-                  std::cout << std::cout.precision(5) << "z station MUCH: " << z << std::endl;
-                  TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
-                  fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
+                  lit::parallel::LitSubstationMuon<T> ss;
+                  ss.SetZ(zPos);
 
-                  CbmLitMaterialInfo litMaterial;
-                  litMaterial.SetLength(2. * sh->GetDZ());
-                  litMaterial.SetZpos(z);
-                  GeoMediumToMaterialInfo(medium, litMaterial);
-                  fMyGeoNodes.push_back(litMaterial);
-                  fMyMuchGeoNodes.push_back(litMaterial);
+                  lit::parallel::LitMaterialInfo<T> material;
+                  material.Thickness = 2. * activeShape->GetDZ();
+                  material.A = activeMaterial->GetA();
+                  material.Z = activeMaterial->GetZ();
+                  material.Rho = activeMaterial->GetDensity();
+                  material.X0 = activeMaterial->GetRadLen();
+                  material.I = (activeMaterial->GetZ() > 16.) ? 10. * activeMaterial->GetZ() * 1e-9 : 16. * std::pow(activeMaterial->GetZ(), 0.9) * 1e-9;
+                  ss.SetMaterial(material);
+
+                  st.AddSubstation(ss);
 
                   bactive = TString(active->GetName()).Contains("bactive");
                   factive = TString(active->GetName()).Contains("factive");
-
                   if (factive && bactive) { break; }
                }
             }
+            sg.AddStation(st);
          }
+         // Magnetic field approximation for the station group
+         lit::parallel::LitFieldGrid frontGrid, middleGrid, backGrid;
+         gridCreator.CreateGrid(minZ, frontGrid);
+         gridCreator.CreateGrid((minZ + 0.5 * (maxZ - minZ)), middleGrid);
+         gridCreator.CreateGrid(maxZ, backGrid);
+         sg.SetFieldGridFront(frontGrid);
+         sg.SetFieldGridMiddle(middleGrid);
+         sg.SetFieldGridBack(backGrid);
+         layout.AddStationGroup(sg);
       }
    }
-   std::cout << "-I- Construction of the MUCH geometry finished" << std::endl;
+
+   std::cout << layout;
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructTrd()
+void CbmLitTrackingGeometryConstructor::ConstructTrd()
 {
 	TObject* trd1 = fGeo->GetTopNode()->GetNodes()->FindObject("trd1_0");
 	TObject* trd2 = fGeo->GetTopNode()->GetNodes()->FindObject("trd2_0");
@@ -273,7 +280,7 @@ void CbmLitSimpleGeometryConstructor::ConstructTrd()
 	}
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructTrdWitDifferentKeepingVolumes()
+void CbmLitTrackingGeometryConstructor::ConstructTrdWitDifferentKeepingVolumes()
 {
 	std::cout << "-I- Construction of the TRD geometry started" << std::endl;
 
@@ -352,7 +359,7 @@ void CbmLitSimpleGeometryConstructor::ConstructTrdWitDifferentKeepingVolumes()
 }
 
 
-void CbmLitSimpleGeometryConstructor::ConstructTrdWithSameKeepingVolume()
+void CbmLitTrackingGeometryConstructor::ConstructTrdWithSameKeepingVolume()
 {
 	std::cout << "-I- Construction of the TRD geometry with same keeping volume started" << std::endl;
 
@@ -427,8 +434,9 @@ void CbmLitSimpleGeometryConstructor::ConstructTrdWithSameKeepingVolume()
     std::cout << "-I- Construction of the TRD geometry with same keeping volume finished" << std::endl;
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructTof()
+void CbmLitTrackingGeometryConstructor::ConstructTof()
 {
+	/*
    std::cout << "-I- Construction of the TOF geometry started" << std::endl;
    TGeoNode* tof = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject("tof1_0");
    const double* tofPos  = tof->GetMatrix()->GetTranslation();
@@ -467,10 +475,12 @@ void CbmLitSimpleGeometryConstructor::ConstructTof()
    }
 
    std::cout << "-I- Construction of the TOF geometry finished" << std::endl;
+   */
 }
 
-void CbmLitSimpleGeometryConstructor::ConstructRich()
+void CbmLitTrackingGeometryConstructor::ConstructRich()
 {
+	/*
    std::cout << "-I- Construction of the RICH geometry started" << std::endl;
 
    TGeoNode* rich = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject("rich1_0");
@@ -537,13 +547,14 @@ void CbmLitSimpleGeometryConstructor::ConstructRich()
    // end exit
 
    std::cout << "-I- Construction of the RICH geometry finished" << std::endl;
+   */
 }
 
-void CbmLitSimpleGeometryConstructor::ReadRichTRAP(
+void CbmLitTrackingGeometryConstructor::ReadRichTRAP(
       TGeoNode* node,
       double startZ)
 {
-   TGeoTrap* shape = (TGeoTrap*) node->GetVolume()->GetShape();
+/*   TGeoTrap* shape = (TGeoTrap*) node->GetVolume()->GetShape();
    TGeoMedium* med = node->GetVolume()->GetMedium();
    double DZ = 2 * shape->GetDz();
    TGeoShape* shape1 = new TGeoCone(DZ, 0., 300.,   0.,   300.);
@@ -559,5 +570,6 @@ void CbmLitSimpleGeometryConstructor::ReadRichTRAP(
    GeoMediumToMaterialInfo(med1, litMaterial);
    fMyGeoNodes.push_back(litMaterial);
    fMyRichGeoNodes.push_back(litMaterial);
+   */
 }
 

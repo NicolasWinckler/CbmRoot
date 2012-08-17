@@ -1,11 +1,8 @@
 /**
- * \file CbmLitSimpleGeoQa.h
- *
- * \brief Task for checking of simplified geometry creator.
- *
+ * \file CbmLitTrackingGeoQa.h
+ * \brief Tracking geometry creator QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- *
  **/
 
 #ifndef CBMLITSIMPLEGEOQA_H_
@@ -13,29 +10,26 @@
 
 #include "FairTask.h"
 
-class CbmLitSimpleGeometryConstructor;
+class CbmLitTrackingGeometryConstructor;
 
 /**
- * \class CbmLitSimpleGeoQa
- *
- * \brief Task for checking of simplified geometry creator.
- *
+ * \class CbmLitTrackingGeoQa
+ * \brief Tracking geometry creator QA.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- *
  **/
-class CbmLitSimpleGeoQa : public FairTask
+class CbmLitTrackingGeoQa : public FairTask
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmLitSimpleGeoQa();
+   CbmLitTrackingGeoQa();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmLitSimpleGeoQa();
+   virtual ~CbmLitTrackingGeoQa();
 
    /**
     * Inherited from FairTask.
@@ -60,9 +54,9 @@ public:
 
 private:
    // Simplified geometry constructor tool
-   CbmLitSimpleGeometryConstructor* fGeoConstructor;
+   CbmLitTrackingGeometryConstructor* fGeoConstructor;
 
-   ClassDef(CbmLitSimpleGeoQa, 1);
+   ClassDef(CbmLitTrackingGeoQa, 1);
 };
 
 #endif /* CBMLITSIMPLEGEOQA_H_ */

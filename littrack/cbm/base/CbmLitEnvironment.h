@@ -40,15 +40,6 @@ public:
    /* Returns reference to the TRD detector layout. */
    const CbmLitDetectorLayout& GetTrdLayout() {return fTrdLayout;}
 
-   /* Returns reference to the MUCH detector layout in SIMD format. */
-   void GetMuchLayoutVec(lit::parallel::LitDetectorLayoutMuonVec& layout);
-
-   /* Returns reference to the MUCH detector layout in scalar format. */
-   void GetMuchLayoutScal(lit::parallel::LitDetectorLayoutMuonScal& layout);
-
-   /* Template function that returns reference to the MUCH detector layout. */
-   template<class T> void GetMuchLayout(lit::parallel::LitDetectorLayoutMuon<T>& layout);
-
    /* Returns reference to the TRD detector layout in SIMD format. */
    void GetTrdLayoutVec(lit::parallel::LitDetectorLayoutElectronVec& layout);
 
@@ -60,14 +51,6 @@ public:
 
    /* Returns reference to the MVD detector layout. */
    const CbmLitDetectorLayout& GetMvdLayout();
-
-   /* Returns index of the material needed for the construction of the
-    * simplified layout for the parallel tracking. */
-   int MaterialId(
-      int stationGroup,
-      int station,
-      int substation,
-      const CbmLitDetectorLayout& layout) const;
 
    /* Returns index of the TRD material needed for the construction of the
     * simplified layout for the parallel tracking. */

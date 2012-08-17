@@ -1370,9 +1370,11 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (mcTrack2 == NULL) continue;
     fHistoMap["RICH_GT_radiusA_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
     fHistoMap["RICH_GT_radiusB_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
+    fHistoMap["RICH_GT_radius_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
     if (IsRichElec(richRing, cand.momentum.Mag(), &cand)) {
       fHistoMap["RICH_GT_radiusA_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
       fHistoMap["RICH_GT_radiusB_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
+      fHistoMap["RICH_GT_radius_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
     }
     // check RICH ring - STS track matches
     //	   if ( cand.stsMCTrackId == cand.richMCTrackId){
@@ -2473,8 +2475,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["TRD_GT_dEdx_KF_P_true"] = new  TH2I("TRD_GT_dEdx_KF_P_true","TRD_GT_dEdx_KF_P_true",100,0,10,500,0,100);
   fHistoMap["RICH_GT_radiusA_KF_P"] = new  TH2I("RICH_GT_radiusA_KF_P","RICH_GT_radiusA_KF_P",100,0,10,100,0,10);
   fHistoMap["RICH_GT_radiusB_KF_P"] = new  TH2I("RICH_GT_radiusB_KF_P","RICH_GT_radiusB_KF_P",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radius_KF_P"] = new  TH2I("RICH_GT_radius_KF_P","RICH_GT_radius_KF_P",100,0,10,100,0,10);
   fHistoMap["RICH_GT_radiusA_KF_P_true"] = new  TH2I("RICH_GT_radiusA_KF_P_true","RICH_GT_radiusA_KF_P_true",100,0,10,100,0,10);
   fHistoMap["RICH_GT_radiusB_KF_P_true"] = new  TH2I("RICH_GT_radiusB_KF_P_true","RICH_GT_radiusB_KF_P_true",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radius_KF_P_true"] = new  TH2I("RICH_GT_radius_KF_P_true","RICH_GT_radius_KF_P_true",100,0,10,100,0,10);
   fHistoMap["TOF_GT_time_KF_P"] = new  TH2I("TOF_GT_time_KF_P","TOF_GT_time_KF_P",100,0,5,100,0.5,1.1);
   fHistoMap["TOF_GT_time_KF_P_true"] = new  TH2I("TOF_GT_time_KF_P_true","TOF_GT_time_KF_P_true",100,0,5,100,0.5,1.1);
 
@@ -2637,11 +2641,13 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
   NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
 
   NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
   NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
 
   NiceHisto1(fHistoMap["EPCandPairOpeningAngle"],1,1,1,"opening angle #theta [#circ]","");
@@ -2951,10 +2957,12 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fHistoMap["TRD_GT_dEdx_KF_P"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_radiusA_KF_P"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_radiusB_KF_P"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radius_KF_P"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_time_KF_P"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_GT_dEdx_KF_P_true"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_radiusA_KF_P_true"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_radiusB_KF_P_true"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radius_KF_P_true"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_time_KF_P_true"]->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
   //==================================================================Cuts
@@ -3076,7 +3084,7 @@ void CbmTrdPhotonAnalysis::FinishTask()
   fHistoMap["GT_MC_PID"]->Draw("PE");
   c->SaveAs("pics/Photon/PhD/GT_MC_PID.pdf");
   c->SaveAs("pics/Photon/PhD/GT_MC_PID.png");
-
+  fHistoMap["gammaAndGammaMother"]->SetMarkerStyle(20);
   fHistoMap["gammaAndGammaMother"]->SetLineColor(2);
   fHistoMap["gammaAndGammaMother"]->SetMarkerColor(2);
   fHistoMap["gammaAndGammaMother"]->Draw("PE");
@@ -3085,6 +3093,7 @@ void CbmTrdPhotonAnalysis::FinishTask()
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_gamma_andOr_gamma.png");
 
   fHistoMap["ePlusMinusMother"]->Draw("PE");
+  fHistoMap["ePlusAndMinusMother"]->SetMarkerStyle(20);
   fHistoMap["ePlusAndMinusMother"]->SetLineColor(2);
   fHistoMap["ePlusAndMinusMother"]->SetMarkerColor(2);
   fHistoMap["ePlusAndMinusMother"]->Draw("PE,same");
@@ -3178,9 +3187,28 @@ void CbmTrdPhotonAnalysis::FinishTask()
   fHistoMap["RICH_GT_radiusB_KF_P"]->Draw("colz");
   c->SaveAs("pics/Photon/PhD/RICH_GT_radiusB_KF_P.pdf");
   c->SaveAs("pics/Photon/PhD/RICH_GT_radiusB_KF_P.png");
+fHistoMap["RICH_GT_radius_KF_P"]->Draw("colz");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radius_KF_P.pdf");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radius_KF_P.png");
   fHistoMap["TOF_GT_time_KF_P"]->Draw("colz");
   c->SaveAs("pics/Photon/PhD/TOF_GT_time_KF_P.pdf");
   c->SaveAs("pics/Photon/PhD/TOF_GT_time_KF_P.png");
+
+  fHistoMap["TRD_GT_dEdx_KF_P_true"]->Draw("colz");
+  c->SaveAs("pics/Photon/PhD/TRD_GT_dEdx_KF_P_true.pdf");
+  c->SaveAs("pics/Photon/PhD/TRD_GT_dEdx_KF_P_true.png");
+  fHistoMap["RICH_GT_radiusA_KF_P_true"]->Draw("colz");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radiusA_KF_P_true.pdf");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radiusA_KF_P_true.png");
+  fHistoMap["RICH_GT_radiusB_KF_P_true"]->Draw("colz");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radiusB_KF_P_true.pdf");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radiusB_KF_P_true.png");
+  fHistoMap["RICH_GT_radius_KF_P_true"]->Draw("colz");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radius_KF_P_true.pdf");
+  c->SaveAs("pics/Photon/PhD/RICH_GT_radius_KF_P_true.png");
+  fHistoMap["TOF_GT_time_KF_P_true"]->Draw("colz");
+  c->SaveAs("pics/Photon/PhD/TOF_GT_time_KF_P_true.pdf");
+  c->SaveAs("pics/Photon/PhD/TOF_GT_time_KF_P_true.png");
 
   fHistoMap["DeltaP"]->Draw("colz");
   c->SaveAs("pics/Photon/PhD/DeltaP.pdf");

@@ -28,7 +28,8 @@ using boost::property_tree::ptree;
 CbmMuchClusteringQa::CbmMuchClusteringQa():
    fHM(NULL),
    fClusteringQa(NULL),
-   fOutputDir("")
+   fOutputDir("/u/gkozlov/cbm/trunk/cbmroot/littrack/clustering/qa/clustering/res/"),
+   fNofEvents()
 {
 
 }
@@ -42,6 +43,7 @@ CbmMuchClusteringQa::~CbmMuchClusteringQa()
 InitStatus CbmMuchClusteringQa::Init()
 {
 	std::cout<<"CbmMuchClusteringQa::Init\n";
+	fNofEvents = 0;
 	CbmMuchGeoScheme* muchGeoScheme = CbmMuchGeoScheme::Instance();
 	TString muchDigiFile = string(gSystem->Getenv("VMCWORKDIR")) + "/parameters/much/much_v11a.digi.root";//"../../../parameters/much/much_v11a.digi.root";
 	muchGeoScheme->Init(muchDigiFile);
@@ -67,9 +69,10 @@ InitStatus CbmMuchClusteringQa::Init()
 void CbmMuchClusteringQa::Exec(
     Option_t* opt)
 {
-	std::cout<<"CbmMuchClusteringQa::Exec\n";
+	std::cout<<"CbmMuchClusteringQa::Exec EventNo = "<<fNofEvents<<"\n";
 	fClusteringQa->Exec();
 	std::cout<<"-Clustering calculator Exec finished\n";
+	fNofEvents++;
 }
 
 void CbmMuchClusteringQa::Finish()
@@ -86,7 +89,7 @@ void CbmMuchClusteringQa::Finish()
    std::cout<<"-CbmMuchClusteringQaDraw initialized\n";
 
    string qaFile = fOutputDir + "/clustering_qa.json";
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + "/littrack/clustering/qa/clustering/clustering_qa_ideal.json";
+   string idealFile = fOutputDir + "/clustering_qa_ideal.json";
    string checkFile = fOutputDir + "/clustering_qa_check.json";
    std::cout<<"-json checked\n";
 

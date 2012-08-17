@@ -66,7 +66,8 @@ CbmMuchClusteringQaCalculator::CbmMuchClusteringQaCalculator(
       fDigisByPoint(),
       fNofDigis(),
       fNofClusters(),
-      fAccuracyArray()
+      fAccuracyArray(),
+      fNofHits()
 {
 
 }
@@ -121,6 +122,28 @@ void CbmMuchClusteringQaCalculator::Exec()
    }
    fDigisByPoint = new Int_t[fNofPoints];*/
 
+   //---------
+   /*for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
+   {
+	   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
+	   std::cout<<"Cl: "<<iCl<<"; Digi: "<<cluster->GetDigiIndex(0)<<"; nofDigis: "<<
+			   fNofDigis<<"\n";
+	   CbmMuchPixelHit* hit = (CbmMuchPixelHit*)fMuchPixelHits->At(iCl);
+	   std::cout<<"hitX: "<<hit->GetX()<<"; hitY: "<<hit->GetY()<<"\n";
+	   if(cluster->GetDigiIndex(0) > fNofDigis)
+	   {
+		   std::cout<<"--------------------------------\n";
+		   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++)
+		   {
+			   std::cout<<"---Digi: "<<cluster->GetDigiIndex(iDigi)<<"\n";
+		   }
+		   CbmMuchPixelHit* hit = (CbmMuchPixelHit*)fMuchPixelHits->At(iCl);
+		   std::cout<<"hitX: "<<hit->GetX()<<"; hitY: "<<hit->GetY()<<"\n";
+		   std::cout<<"--------------------------------\n";
+	   }
+   }*/
+   //---------
+
    CalculateClustersRelations();
    CalculateAccuracy();
 
@@ -141,9 +164,11 @@ void CbmMuchClusteringQaCalculator::Finish()
 	Int_t nofEvents = fHM->H1("hen_EventNo_ClusteringQa")->GetEntries();
 	std::cout<<"--nofEvents loaded\n";
 	//???
-	//fHM->ScaleByPattern("hno_NofObjects_.*_Station", 1. / nofEvents);
-	//fHM->ScaleByPattern("hno_ErrorsByRadius_Much_Station_.*", 1. / nofEvents);
-	std::cout<<"--nofObject histograms normalized\n";
+	fHM->ScaleByPattern("hno_NofObjects_.*_Station", 1. / nofEvents);
+	fHM->ScaleByPattern("hno_ErrorsByRadius_Much_Station_.*", 1. / nofEvents);
+	fHM->ScaleByPattern("hno_QualClToPointByRadius_Much_Station_.*", 1. / nofEvents);
+	fHM->ScaleByPattern("hno_QualDigisToClByRadius_Much_Station_.*", 1. / nofEvents);
+	std::cout<<"--Histograms normalized\n";
 	//fHM->ShrinkEmptyBinsByPattern("hno_NofObjects_.*_Station");
 	std::cout<<"--Calculator Finish finished\n";
 }
@@ -260,6 +285,7 @@ void CbmMuchClusteringQaCalculator::IncreaseCounters()
 
 void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 {
+	//std::cout<<"-----Calculator Step 1\n";
 	fClustersRelations = new ClusterInformation[fNofClusters];
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
@@ -273,11 +299,13 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 		fClustersRelations[iCl].fClusterToPointRelations.clear();
 		fClustersRelations[iCl].fNDigisToClusterRelations.clear();
 	}
+	//std::cout<<"-----Calculator Step 2\n";
 	fDigisByPoint = new Int_t[fNofPoints];
 	for(Int_t iPoint = 0; iPoint < fNofPoints; iPoint++)
 	{
 		fDigisByPoint[iPoint] = 0;
 	}
+	//std::cout<<"-----Calculator Step 3\n";
 	for(Int_t iDigi = 0; iDigi < fNofDigis; iDigi++)
 	{
 		CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(iDigi);
@@ -288,16 +316,31 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 			fDigisByPoint[refIndex]++;
 		}
 	}
+	//std::cout<<"-----Calculator Step 4\n";
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
 		CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
 		Int_t nDigis = cluster->GetNDigis();
+		//std::cout<<"------Calculator Step 4.1\n";
+		//std::cout<<"------NDigiMatces: "<<fMuchDigiMatches->GetEntriesFast()<<"\n";
 		for(Int_t iDigi = 0; iDigi < nDigis; iDigi++)
 		{
 			Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+			/*if(digiIndex >= fMuchDigiMatches->GetEntriesFast())
+			{
+				std::cout<<"Err; DigiMatch = "<<digiIndex<<"\n";
+			}
+			else
+			{*/
 			//std::cout<<"digiIndex: "<<digiIndex<<"\n";
+			//std::cout<<"-------Calculator Step 4.1.1\n";
+			//std::cout<<"--------Digi Index: "<<digiIndex<<"\n";
 			CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
+			//std::cout<<"--------CbmMuchDigiMatch created\n";
+			UInt_t c = digiMatch->GetCharge(0);
+			//std::cout<<"c = "<<c<<"\n";
 			Int_t nPoints = digiMatch->GetNPoints();
+			//std::cout<<"-------Calculator Step 4.1.2\n";
 			for(Int_t iPoint = 0; iPoint < nPoints; iPoint++)
 			{
 				Int_t refIndex = digiMatch->GetRefIndex(iPoint);
@@ -305,16 +348,19 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 				//const CbmMuchPoint* muchPoint = static_cast<const CbmMuchPoint*>(fMuchPoints->At(refIndex));
 				//const CbmMuchPixelHit* hit = static_cast<const CbmMuchPixelHit*>(fMuchHits->At(iCl));
 				//---
+				//std::cout<<"-------Calculator Step 4.1.3\n";
 				if(fClustersRelations[iCl].fNofPoints == 0)
 				{
 					fClustersRelations[iCl].fPointsInCluster.push_back(refIndex);
 					//fClustersRelations[iCl].fPointsInCluster[fClustersRelations[iCl].fNofPoints] = refIndex;
 					fClustersRelations[iCl].fDigisByPoint.push_back(1);
 					fClustersRelations[iCl].fNofPoints++;
+					//std::cout<<"-------Calculator Step 4.1.4a\n";
 				}
 				else
 				{
 					Bool_t ip = 0;
+					//std::cout<<"-------Calculator Step 4.1.4b\n";
 					for(Int_t i = 0; i < fClustersRelations[iCl].fNofPoints; i++)
 					{
 						if(fClustersRelations[iCl].fPointsInCluster[i] == refIndex)
@@ -333,13 +379,24 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 						fClustersRelations[iCl].fNofPoints++;
 						//std::cout<<"Add point to cluster "<<iCl<<"\n";
 					}
+					//std::cout<<"-------Calculator Step 4.1.4bb\n";
 				}
 			}
+			//}
 		}
+		//std::cout<<"------Calculator Step 4.2\n";
 		//---
+		//std::cout<<"nDigis: "<<fMuchDigis->GetEntriesFast()<<"\n";
+		/*if(cluster->GetDigiIndex(0) >= fMuchDigis->GetEntriesFast())
+		{
+			std::cout<<"Err; Digi = "<<cluster->GetDigiIndex(0)<<"\n";
+		}
+		else
+		{*/
 		CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
 		const CbmMuchLayerSide* layerSide = static_cast<CbmMuchLayerSide*>(fMuchGeoScheme->GetLayerSideByDetId(digi->GetDetectorId()));
 		Int_t nStations = fMuchGeoScheme->GetNStations();
+		//std::cout<<"------Calculator Step 4.3\n";
 		for(Int_t iStation = 0; iStation < nStations; iStation++)
 		{
 			//CbmMuchStation* muchStation = (CbmMuchStation)fMuchGeoScheme->GetStation()
@@ -366,7 +423,10 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 				}
 			}
 		}
+		//}
+		//std::cout<<"------Calculator Step 4.4\n";
 	}
+	//std::cout<<"-----Calculator Step 5\n";
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
 		CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
@@ -408,6 +468,7 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 			}
 		}
 	}
+	//std::cout<<"-----Calculator Step 6\n";
 }
 
 void CbmMuchClusteringQaCalculator::CalculateAccuracy()

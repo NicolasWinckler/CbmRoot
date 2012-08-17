@@ -69,6 +69,7 @@ private:
     CbmHistManager* fHM; // Histogram manager
     CbmMuchClusteringQaCalculator* fClusteringQa; // Clustering performance calculator
     string fOutputDir; // Output directory for results
+    Int_t fNofEvents;
 
     ClassDef(CbmMuchClusteringQa, 1);
 };

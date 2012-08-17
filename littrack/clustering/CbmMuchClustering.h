@@ -83,8 +83,8 @@ private:
    TClonesArray* fHit;
    //TClonesArray* fStrawHit;
 
-   void ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &nHit, Int_t &nCluster);
-   void ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &nHit, Int_t &nCluster);
+   void ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
+   void ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
 
    ClassDef(CbmMuchClustering, 1);
 };

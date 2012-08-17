@@ -84,8 +84,7 @@ InitStatus CbmMuchClustering::Init()
 
    ReadDataBranches();
    CreateModulesGeometryArray();
-   if (fHit) fHit->Clear();
-   if (fCluster) fCluster->Clear();
+
    //if (fStrawHit) fStrawHit->Clear();
 
    return kSUCCESS;
@@ -96,6 +95,8 @@ void CbmMuchClustering::Exec(Option_t* opt)
 	static Int_t eventNo = 0;
 	std::cout << " - CbmMuchClustering::Exec: eventNo=" << eventNo++ << std::endl;
 	fNofClusters = 0;
+	fHit->Clear();
+	fCluster->Clear();
 	//if (fHit) fHit->Clear();
 	//if (fCluster) fCluster->Clear();
 	SetDigiCharges();
@@ -255,22 +256,22 @@ void CbmMuchClustering::ClusteringMainFunction()
 		switch(fAlgorithmVersion){
 		case 1:
 		{//A1.v1
-			ClusteringA1(fModulesGeometryArray[iMod], module, 1, nHit, nCluster);
+			ClusteringA1(fModulesGeometryArray[iMod], module, 1/*, nHit, nCluster*/);
 			break;
 		}
 		case 2:
 		{//A1.v2
-			ClusteringA1(fModulesGeometryArray[iMod], module, 2, nHit, nCluster);
+			ClusteringA1(fModulesGeometryArray[iMod], module, 2/*, nHit, nCluster*/);
 			break;
 		}
 		case 3:
 		{//SL.v1
-			ClusteringSL(fModulesGeometryArray[iMod], module, 1, nHit, nCluster);
+			ClusteringSL(fModulesGeometryArray[iMod], module, 1/*, nHit, nCluster*/);
 			break;
 		}
 		case 4:
 		{//SL.v2
-			ClusteringSL(fModulesGeometryArray[iMod], module, 2, nHit, nCluster);
+			ClusteringSL(fModulesGeometryArray[iMod], module, 2/*, nHit, nCluster*/);
 			break;
 		}
 		case 5:
@@ -293,7 +294,7 @@ void CbmMuchClustering::ClusteringMainFunction()
 	}
 }
 
-void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &nHit, Int_t &nCluster)
+void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/)
 {
 	fClustersA1 = new CbmClusteringA1(m1);
 	fClustersA1->MainClusteringA1(m1, Ver);
@@ -324,18 +325,19 @@ void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem
 			if (dy > pad->GetDy()) dy = pad->GetDy();
 		}
 		//std::cout<<"; qMax: "<<qMax<<"; SumCharge; "<<sumCharge<<"; Size: "<<digiIndices.size()<<"\n";
-		new ((*fCluster)[nCluster++]) CbmMuchCluster(digiIndices);
+		Int_t nCluster = fCluster->GetEntriesFast();
+		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
 		//---
 		Double_t sigmaX = dx / TMath::Sqrt(12.);
 		Double_t sigmaY = dy / TMath::Sqrt(12.);
 		Int_t planeId = fScheme->GetLayerSideNr(detId);
+		Int_t nHit = fHit->GetEntriesFast();
 		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, sigmaX, sigmaY, 0, 0, fClustersA1->GetCluster(iCl), planeId, 0, 0);
 		//---
 		/*TVector3 pos, dpos;
 		pos.SetXYZ(x, y, z);
 		dpos.SetXYZ(sigmaX, sigmaY, 0.);
 		new ((*fStrawHit)[nHit]) CbmMuchStrawHit(detId, pos, dpos, 0);*/
-		nHit++;
 		//---
 		/*new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersA1->GetX0(iCl),
 				fClustersA1->GetY0(iCl), fClustersA1->GetClCharge(iCl),
@@ -345,7 +347,7 @@ void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem
 	delete fClustersA1;
 }
 
-void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, Int_t &nHit, Int_t &nCluster)
+void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/)
 {
 	fClustersSL = new CbmClusteringSL(m1);
 	fClustersSL->MainClusteringSL(m1, Ver);
@@ -377,12 +379,14 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 			if (dy > pad->GetDy()) dy = pad->GetDy();
 		}
 		//std::cout<<"; qMax: "<<qMax<<"; SumCharge; "<<sumCharge<<"; Size: "<<digiIndices.size()<<"\n";
-		new ((*fCluster)[nCluster++]) CbmMuchCluster(digiIndices);
+		Int_t nCluster = fCluster->GetEntriesFast();
+		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
 		//---
 		Double_t sigmaX = dx / TMath::Sqrt(12.);
 		Double_t sigmaY = dy / TMath::Sqrt(12.);
 		Int_t planeId = fScheme->GetLayerSideNr(detId);
-		new ((*fHit)[nHit++]) CbmMuchPixelHit(detId, x, y, z, sigmaX, sigmaY, 0, 0, fClustersSL->GetCluster(iCl), planeId, 0, 0);
+		Int_t nHit = fHit->GetEntriesFast();
+		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, sigmaX, sigmaY, 0, 0, fClustersSL->GetCluster(iCl), planeId, 0, 0);
 		//---
 		/*new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersA1->GetX0(iCl),
 				fClustersA1->GetY0(iCl), fClustersA1->GetClCharge(iCl),

@@ -173,6 +173,10 @@ void CbmMvdClustering::Exec(Option_t* opt)
 	std::cout << "\n---<>---\nCbmMvdClustering::Exec: event No=" << eventNo++ << std::endl;
 	fNofEvents++;
 
+	fHits->Clear();
+	fCluster->Clear();
+	fMatches->Clear();
+
 	if( fDigis->GetEntriesFast() == 0 ){
 		cout << "-I- " << GetName() << "::Exec: No digis found, event skipped. " << endl;
 		fNofEvents--;
@@ -417,6 +421,8 @@ void CbmMvdClustering::ReadDataBranches()
 
 void CbmMvdClustering::FindClusters()
 {
+
+	Int_t nHitsT = 0;
 	Int_t x1[2500];
 	Int_t y1[2500];
 	for(Int_t i = 0; i < 1201; i++)
@@ -858,6 +864,7 @@ void CbmMvdClustering::FindClusters()
 		centralDigi = (CbmMvdDigi*)fDigis->At(fClusters[iCl].digisInCluster[0]);
 		new ((*fMatches)[nHits]) CbmMvdHitMatch(0, 0, centralDigi->GetTrackID(), centralDigi->GetPointID(), clusterNew->GetContributors());
 		//std::cout<<"-Step 10\n";
+		nHitsT++;
 	}
 }
 

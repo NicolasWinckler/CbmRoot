@@ -16,6 +16,11 @@ project(CBMROOT)
 # is checked
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
+# Check if the compiler support specific C++11 features
+# Up to now this is only a check since the code does not use
+# any of the features of the new standard
+Set(CheckSrcDir "${CMAKE_SOURCE_DIR}/cmake/checks")
+include(CheckCXX11Features)
 
 # Load some basic macros which are needed later on
 include(FairMacros)
@@ -81,9 +86,12 @@ else(CBMROOT_MINIMAL)
   find_package(GEANT4)
   find_package(GEANT4VMC)
   find_package(CLHEP)
-  find_package(RuleChecker)
   find_package(TBB)
   find_package(SSE)
+# switch of the checking for the RuleChecker, since there is a problem
+# with JAVA on some systems which resulting in endless hanging of CMake 
+#  find_package(RuleChecker)
+
 
   Set(Boost_NO_SYSTEM_PATHS TRUE)
   Set(Boost_NO_BOOST_CMAKE TRUE)

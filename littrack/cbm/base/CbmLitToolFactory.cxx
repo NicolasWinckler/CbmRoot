@@ -7,7 +7,6 @@
 
 #include "base/CbmLitMapField.h"
 #include "base/CbmLitTrackingGeometryConstructor.h"
-#include "base/CbmLitEnvironment.h"
 #include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitTrackFinderSettings.h"
 #include "finder/CbmLitTrackFinderNN.h"
@@ -30,6 +29,8 @@
 #include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
 #include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 
+#include "FairRunAna.h"
+
 CbmLitToolFactory::CbmLitToolFactory()
 {
 }
@@ -51,8 +52,7 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
       TrackExtrapolatorPtr extrapolator(new CbmLitLineTrackExtrapolator());
       return extrapolator;
    } else if (name == "rk4") {
-      CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-      CbmLitField* field = new CbmLitMapField(env->GetField());
+      CbmLitField* field = new CbmLitMapField(FairRunAna::Instance()->GetField());
       TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator(field));
       return extrapolator;
    } else if (name == "lit") {

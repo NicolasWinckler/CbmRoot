@@ -5,7 +5,6 @@
  **/
 #include "CbmLitFieldApproximationQa.h"
 #include "CbmLitFieldApproximationQaReport.h"
-#include "base/CbmLitEnvironment.h"
 #include "base/CbmLitFloat.h"
 #include "base/CbmLitFieldFitter.h"
 #include "base/CbmLitFieldGridCreator.h"
@@ -117,8 +116,7 @@ InitStatus CbmLitFieldApproximationQa::Init()
    // Create grid creator tool
    fGridCreator = new CbmLitFieldGridCreator();
 
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fField = env->GetField();
+   fField = FairRunAna::Instance()->GetField();
 
    return kSUCCESS;
 }

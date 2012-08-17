@@ -6,7 +6,6 @@
 
 #include "base/CbmLitTrackingGeometryConstructor.h"
 
-#include "base/CbmLitEnvironment.h"
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitComparators.h"
 #include "utils/CbmLitUtils.h"

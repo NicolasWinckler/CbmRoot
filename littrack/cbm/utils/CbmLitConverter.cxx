@@ -1,6 +1,5 @@
 #include "utils/CbmLitConverter.h"
 
-#include "base/CbmLitEnvironment.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitPixelHit.h"
 #include "data/CbmLitStripHit.h"

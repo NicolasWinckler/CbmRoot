@@ -6,13 +6,13 @@
  *
  */
 #include "CbmLitFieldGridCreator.h"
-#include "CbmLitEnvironment.h"
 #include "../../parallel/LitFieldGrid.h"
 
 #include "FairField.h"
+#include "FairRunAna.h"
 
 CbmLitFieldGridCreator::CbmLitFieldGridCreator():
-   fField(CbmLitEnvironment::Instance()->GetField()),
+   fField(FairRunAna::Instance()->GetField()),
    fXangle(35.),
    fYangle(35.),
    fCellSizeX(2.),

@@ -5,7 +5,6 @@
  **/
 #include "CbmLitFieldQa.h"
 #include "CbmLitFieldQaReport.h"
-#include "cbm/base/CbmLitEnvironment.h"
 #include "utils/CbmLitUtils.h"
 #include "CbmDrawHist.h"
 
@@ -83,8 +82,7 @@ InitStatus CbmLitFieldQa::Init()
    fAlongZXY.push_back(std::make_pair(100., 0.));
    fAlongZXY.push_back(std::make_pair(0., 100.));
 
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fField = env->GetField();
+   fField = FairRunAna::Instance()->GetField();
 
    return kSUCCESS;
 }

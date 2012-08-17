@@ -1,7 +1,5 @@
 #include "qa/CbmLitCreateStandaloneData.h"
 
-#include "base/CbmLitEnvironment.h"
-
 #include "CbmStsTrack.h"
 #include "CbmMuchPixelHit.h"
 #include "FairTrackParam.h"
@@ -29,7 +27,7 @@ InitStatus CbmLitCreateStandaloneData::Init()
    std::cout << "-I- CbmLitCreateStandaloneData::Init Creating MUCH layout" << std::endl;
 
    // Save MUCH layout to text file
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+//   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 //   lit::parallel::LitDetectorLayoutMuonScal layout;
 //   env->GetMuchLayoutScal(layout);
 

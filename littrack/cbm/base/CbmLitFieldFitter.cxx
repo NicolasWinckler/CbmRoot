@@ -4,10 +4,10 @@
  * \date 2009
  **/
 #include "base/CbmLitFieldFitter.h"
-#include "base/CbmLitEnvironment.h"
 #include "../std/utils/CbmLitUtils.h"
 
 #include "FairField.h"
+#include "FairRunAna.h"
 
 #include "TFitterMinuit.h"
 #include "TMatrixD.h"
@@ -832,8 +832,7 @@ CbmLitFieldFitter::CbmLitFieldFitter(
    fUseEllipseAcc(true),
    fPolynomDegree(polynomDegree)
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fField = env->GetField();
+   fField = FairRunAna::Instance()->GetField();
 
    switch (polynomDegree) {
    case 0:
@@ -1033,7 +1032,7 @@ void CbmLitFieldFitter::FitSliceMy(
          Double_t w = 1./(r*r+1);
          Double_t p[3] = { x, y, Z};
          Double_t B[3] = {0., 0., 0.};
-         CbmLitEnvironment::Instance()->GetField()->GetFieldValue(p, B);
+         FairRunAna::Instance()->GetField()->GetFieldValue(p, B);
          TVectorD m(N);
          m(0)=1;
          for( int i=1; i<=M; i++) {

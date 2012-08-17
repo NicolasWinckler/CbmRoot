@@ -5,8 +5,6 @@
  */
 #include "finder/CbmLitFindGlobalTracksIdeal.h"
 
-#include "base/CbmLitEnvironment.h"
-
 #include "CbmTrackMatch.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"

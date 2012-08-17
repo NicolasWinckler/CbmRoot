@@ -6,7 +6,6 @@
  **/
 #include "cbm/parallel/CbmLitParallelTrackFitterTestMuon.h"
 
-#include "cbm/base/CbmLitEnvironment.h"
 #include "std/data/CbmLitTrack.h"
 #include "std/data/CbmLitFitNode.h"
 #include "std/data/CbmLitHit.h"
@@ -24,7 +23,7 @@
 
 CbmLitParallelTrackFitterTestMuon::CbmLitParallelTrackFitterTestMuon()
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+  // CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    //env->GetMuchLayoutScal(fLayout);
    std::cout << fLayout;
 }

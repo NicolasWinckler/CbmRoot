@@ -5,7 +5,6 @@
  **/
 #include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
 
-#include "base/CbmLitEnvironment.h"
 #include "base/CbmLitToolFactory.h"
 #include "data/CbmLitTrack.h"
 #include "data/CbmLitFitNode.h"

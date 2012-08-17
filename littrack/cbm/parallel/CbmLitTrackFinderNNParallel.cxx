@@ -1,6 +1,5 @@
 #include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 
-#include "cbm/base/CbmLitEnvironment.h"
 #include "cbm/base/CbmLitTrackingGeometryConstructor.h"
 #include "std/data/CbmLitHit.h"
 #include "std/data/CbmLitPixelHit.h"
@@ -27,7 +26,6 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
    fEventNo(1),
    fTrackingType(trackingType)
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
    CbmLitTrackingGeometryConstructor* geo = CbmLitTrackingGeometryConstructor::Instance();
 
    if (fTrackingType == "nn_parallel_muon") {
@@ -37,7 +35,7 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
       fTFParallelMuon->SetDetectorLayout(layout);
    } else if (fTrackingType == "nn_parallel_electron") {
       lit::parallel::LitDetectorLayoutElectronVec layout;
-      env->GetTrdLayoutVec(layout);
+      geo->GetTrdLayoutVec(layout);
       fTFVecElectron = new lit::parallel::LitTrackFinderNNVecElectron();
     //  fTFVecElectron->SetDetectorLayout(layout);
    } else {

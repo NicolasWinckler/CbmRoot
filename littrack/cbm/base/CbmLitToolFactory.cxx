@@ -6,6 +6,7 @@
 #include "base/CbmLitToolFactory.h"
 
 #include "base/CbmLitMapField.h"
+#include "base/CbmLitTrackingGeometryConstructor.h"
 #include "base/CbmLitEnvironment.h"
 #include "base/CbmLitPtrTypes.h"
 #include "base/CbmLitTrackFinderSettings.h"
@@ -184,7 +185,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->SetSettings(settings);
 		trdFinderNN->SetZPropagationForTrackSeeds(400.);
 		trdFinderNN->SetUseTGeo(false);
-		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+		trdFinderNN->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
 		TrackFinderPtr finder(trdFinderNN);
 		return finder;
 	} else if(name == "e_branch") {
@@ -210,7 +211,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderBranch->SetSettings(settings);
 		trdFinderBranch->SetZPropagationForTrackSeeds(400.);
 		trdFinderBranch->SetUseTGeo(false);
-		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+		trdFinderBranch->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
 		TrackFinderPtr finder(trdFinderBranch);
 		return finder;
    } else if(name == "mu_nn") {
@@ -231,7 +232,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       muchFinderNN->SetSettings(settings);
       muchFinderNN->SetZPropagationForTrackSeeds(-1.);
 	  muchFinderNN->SetUseTGeo(false);
-      muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+      muchFinderNN->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
       TrackFinderPtr finder(muchFinderNN);
       return finder;
    } else if(name == "e_nn_parallel") {
@@ -260,7 +261,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.SetChiSqPixelHitCut(15.);//13.86);
       settings.SetChiSqStripHitCut(11.);
       muchFinderBranch->SetSettings(settings);
-      muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+      muchFinderBranch->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
       TrackFinderPtr finder(muchFinderBranch);
       return finder;
    } else if(name == "mvd_nn") {
@@ -279,7 +280,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       settings.SetPDG(211);
       settings.IsProcessSubstationsTogether(true);
       mvdFinderNN->SetSettings(settings);
-      mvdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMvdLayout());
+      mvdFinderNN->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetMvdLayout());
       TrackFinderPtr finder(mvdFinderNN);
       return finder;
    }
@@ -298,7 +299,7 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
       nhMerger->SetSigmaCoef(5.);
       nhMerger->SetChiSqPixelHitCut(50.);//13.86);
       nhMerger->SetChiSqStripHitCut(9.);
-      nhMerger->SetStation(CbmLitEnvironment::Instance()->GetTofStation());
+      nhMerger->SetStation(CbmLitTrackingGeometryConstructor::Instance()->GetTofStation());
       HitToTrackMergerPtr merger(nhMerger);
       return merger;
    }

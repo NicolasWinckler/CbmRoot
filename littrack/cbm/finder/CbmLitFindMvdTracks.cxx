@@ -5,7 +5,7 @@
  * \date 2011
  */
 #include "finder/CbmLitFindMvdTracks.h"
-#include "base/CbmLitEnvironment.h"
+#include "base/CbmLitTrackingGeometryConstructor.h"
 #include "base/CbmLitToolFactory.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitPixelHit.h"
@@ -107,8 +107,8 @@ void CbmLitFindMvdTracks::ConvertInputData()
 
    CbmLitConverter::MvdHitArrayToHitVector(fMvdHits, fLitMvdHits);
    // Make reverse order of the hits
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   Int_t nofStations = env->GetMvdLayout().GetStationGroup(0).GetNofStations();
+   CbmLitTrackingGeometryConstructor* geo = CbmLitTrackingGeometryConstructor::Instance();
+   Int_t nofStations = geo->GetMvdLayout().GetStationGroup(0).GetNofStations();
    for(Int_t iHit = 0; iHit < fLitMvdHits.size(); iHit++) {
       CbmLitHit* hit = fLitMvdHits[iHit];
       hit->SetDetectorId(kLITMVD, hit->GetStationGroup(), nofStations - hit->GetStation() - 1, hit->GetSubstation(), hit->GetModule());

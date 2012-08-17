@@ -12,6 +12,7 @@
 #include "base/CbmLitDetectorSetup.h"
 #include "base/CbmLitDetectorLayout.h"
 #include "parallel/muon/LitDetectorLayoutMuon.h"
+#include "parallel/electron/LitDetectorGeometryElectron.h"
 
 #include <string>
 #include <map>
@@ -37,27 +38,86 @@ public:
    void Draw();
 
    /**
-    * \brief Return reference to the MUCH detector layout in SIMD format.
+    * \brief Return MUCH detector layout for parallel MUCH tracking in SIMD format.
+    * \param[out] layout MUCH detector layout.
     */
    void GetMuchLayoutVec(lit::parallel::LitDetectorLayoutMuonVec& layout);
 
    /**
-    * \brief Return reference to the MUCH detector layout in scalar format.
+    * \brief Return MUCH detector layout for parallel MUCH tracking in scalar format.
+    * \param[out] layout MUCH detector layout.
     */
    void GetMuchLayoutScal(lit::parallel::LitDetectorLayoutMuonScal& layout);
 
    /**
-    * \brief Template function that returns reference to the MUCH detector layout.
+    * \brief Return MUCH detector layout for parallel MUCH tracking.
+    * \param[out] layout MUCH detector layout.
     */
    template<class T> void GetMuchLayout(lit::parallel::LitDetectorLayoutMuon<T>& layout);
 
+   /**
+    * \brief Return TRD detector layout for TRD parallel tracking in SIMD format.
+    * \param[out] layout TRD detector layout.
+    */
+   void GetTrdLayoutVec(lit::parallel::LitDetectorLayoutElectronVec& layout);
+
+   /**
+    * \brief Return TRD detector layout for TRD parallel tracking in scalar format.
+    * \param[out] layout TRD detector layout.
+    */
+   void GetTrdLayoutScal(lit::parallel::LitDetectorLayoutElectronScal& layout);
+
+   /**
+    * \brief Return TRD detector layout for TRD parallel tracking.
+    * \param[out] layout TRD detector layout.
+    */
+   template<class T> void GetTrdLayout(lit::parallel::LitDetectorLayoutElectron<T>& layout);
+
+   /**
+    * \brief Return MVD detector layout.
+    * \return MVD detector layout.
+    */
+   const CbmLitDetectorLayout& GetMvdLayout();
+
+   /**
+    * \brief Return detector layout. Automatically determines TRD or MUCH.
+    * \return Detector layout.
+    */
+   const CbmLitDetectorLayout& GetLayout();
+
+   /**
+    * \brief Return MUCH detector layout.
+    * \return MUCH detector layout.
+    */
+   const CbmLitDetectorLayout& GetMuchLayout();
+
+   /**
+    * \brief Return TRD tracking geometry in TGeo. GetTrdLayout has to be called in advance.
+    * \return TRD tracking geometry in TGeo.
+    */
    TGeoManager* GetTrdTrackingGeo() const { return fTrdTrackingGeo; }
-   const CbmLitDetectorLayout& GetTrdLayout() const { return fTrdLayout; }
+
+   /**
+    * \brief Return TRD detector layout.
+    * \return TRD detector layout.
+    */
+   const CbmLitDetectorLayout& GetTrdLayout();
+
+   /**
+    * \brief Return TOF detector layout.
+    * \return TOF detector layout.
+    */
+   const CbmLitDetectorLayout& GetTofLayout();
+
+   /**
+    * \brief Return TOF detector as station.
+    * \return TOF detector station.
+    */
+   const CbmLitStation& GetTofStation();
 
 private:
    /**
     * \brief Constructor.
-    *
     * Constructor is protected since singleton pattern is used.
     * Pointer to object is returned by static Instance() method.
     */
@@ -78,22 +138,13 @@ private:
     */
    const CbmLitTrackingGeometryConstructor& operator=(const CbmLitTrackingGeometryConstructor&);
 
-   /**
-    * \brief Main function for simplified geometry construction.
-    */
-   void ConstructGeometry();
-
    /* */
    void CreateMediumList();
 
    /**
-    * \brief Convert TGeoMedium to CbmLitMaterialInfo.
-    * \param[in] med Pointer to TGeoMedium.
-    * \param[out] mat Output CbmLitMaterialInfo.
+    * \brief Constructs MVD tracking geometry.
     */
-   void GeoMediumToMaterialInfo(
-      const TGeoMedium* med,
-      CbmLitMaterialInfo& mat);
+   void ConstructMvd();
 
    /**
     * \brief Construct simplified STS geometry.
@@ -106,11 +157,6 @@ private:
    void ConstructMuch();
 
    /**
-    * \brief Construct simplified TOF geometry.
-    */
-   void ConstructTof();
-
-   /**
     * \brief Construct simplified TRD geometry.
     */
    void ConstructTrd();
@@ -118,6 +164,16 @@ private:
    void ConstructTrdWitDifferentKeepingVolumes();
 
    void ConstructTrdWithSameKeepingVolume();
+
+   /**
+    * \brief Construct tracking TOF geometry.
+    */
+   void ConstructTof();
+
+   /**
+    * \brief Construct TOF tracking station.
+    */
+   void ConstructTofStation();
 
    /**
     * \brief Construct simplified RICH geometry.
@@ -134,6 +190,11 @@ private:
    TGeoManager* fGeo; // Pointer to full geometry
    std::map<std::string, TGeoMedium*> fMedium; // Maps name of the medium to TGeoMedium pointer
    CbmLitDetectorSetup fDet; // Used for detector layout determination
+   CbmLitDetectorLayout fLayout; // Detector layout
+   CbmLitDetectorLayout fMvdLayout; // MVD detector layout
+   CbmLitDetectorLayout fMuchLayout; // MUCH detector layout
+   CbmLitDetectorLayout fTofLayout; // TOf detector layout
+   CbmLitStation fTofStation; // TOF station
    TGeoManager* fTrdTrackingGeo; // This is needed for TRD geometries with rotated planes.
    CbmLitDetectorLayout fTrdLayout; // TRD tracking layout
 };

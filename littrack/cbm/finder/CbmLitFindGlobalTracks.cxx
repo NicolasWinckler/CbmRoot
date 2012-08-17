@@ -7,7 +7,7 @@
 #include "finder/CbmLitFindGlobalTracks.h"
 
 #include "base/CbmLitToolFactory.h"
-#include "base/CbmLitEnvironment.h"
+#include "base/CbmLitTrackingGeometryConstructor.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitPixelHit.h"
 #include "data/CbmLitStripHit.h"
@@ -244,7 +244,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
       CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitHits);
       //If MUCH-TRD setup, than shift plane id for the TRD hits
       if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
-         Int_t nofPlanes = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
+         Int_t nofPlanes = CbmLitTrackingGeometryConstructor::Instance()->GetMuchLayout().GetNofPlanes();
          for (Int_t i = 0; i < fLitHits.size(); i++) {
             CbmLitHit* hit = fLitHits[i];
 //            if (hit->GetDetectorId() == kLITTRD) { hit->SetPlaneId(hit->GetPlaneId() + nofPlanes); } TODO No planeIDs now
@@ -439,7 +439,7 @@ void CbmLitFindGlobalTracks::SelectTracksForTofMerging()
    // Only those tracks will be propagated further and merged
    // with TOF hits.
 
-   const CbmLitDetectorLayout& layout = CbmLitEnvironment::Instance()->GetLayout();
+   const CbmLitDetectorLayout& layout = CbmLitTrackingGeometryConstructor::Instance()->GetLayout();
    Int_t stationGroupCut = layout.GetNofStationGroups() - 1;
 
    for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++) {

@@ -12,6 +12,7 @@
 #include "data/CbmLitHit.h"
 #include "data/CbmLitPixelHit.h"
 #include "data/CbmLitTrackParam.h"
+#include "base/CbmLitTrackingGeometryConstructor.h"
 #include "parallel/LitExtrapolation.h"
 #include "parallel/LitFiltration.h"
 #include "parallel/LitAddMaterial.h"
@@ -22,20 +23,21 @@
 #include "parallel/LitMath.h"
 
 #include "FairField.h"
+#include "FairRunAna.h"
 #include "../std/interface/CbmLitField.h"
 #include "../base/CbmLitMapField.h"
 
 CbmLitParallelTrackFitterTestElectron::CbmLitParallelTrackFitterTestElectron()
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   env->GetTrdLayoutScal(fLayout);
+   CbmLitTrackingGeometryConstructor* geo = CbmLitTrackingGeometryConstructor::Instance();
+   geo->GetTrdLayoutScal(fLayout);
    std::cout << fLayout;
 
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fExtrapolator = factory->CreateTrackExtrapolator("rk4");
    fPropagator = factory->CreateTrackPropagator("lit");
 
-   fField = new CbmLitMapField(env->GetField());
+ //  fField = FairRunAna::Instance()->GetField();
 }
 
 CbmLitParallelTrackFitterTestElectron::~CbmLitParallelTrackFitterTestElectron()

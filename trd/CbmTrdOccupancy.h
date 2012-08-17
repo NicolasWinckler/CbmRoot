@@ -9,14 +9,17 @@
 //#include <vector>
 #include "CbmTrdDigi.h"
 
+#include "TH1.h"
+#include "TH2.h"
+
 class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdGeoHandler;
 
 class TClonesArray;
 class TH1F;
-class TH1I;
-class TH2I;
+//class TH1I;
+//class TH2I;
 class TH2F;
 class TProfile;
 class TProfile2D;

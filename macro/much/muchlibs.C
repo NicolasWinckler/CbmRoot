@@ -1,4 +1,6 @@
 void muchlibs(){
+  gSystem->Load("libboost_regex");
+
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
@@ -27,5 +29,5 @@ void muchlibs(){
   gSystem->Load("libGlobal");
 
   gSystem->Load("libMinuit2");
-//gSystem->Load("libAnalysis");
+  gSystem->Load("libAnalysis");
 }

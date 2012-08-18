@@ -9,8 +9,8 @@ directory=geometry
 
 for file in $directory/*.geo; do
  echo "Creating trd parameters for $file"
- root -l create_geometry_file.C\(\"$file\"\)
- root -l create_digipar.C\(\"$file\"\)
+ root -l -b -q create_geometry_file.C\(\"$file\"\)
+ root -l -b -q create_digipar.C\(\"$file\"\)
 #[ -x digipar_cut_lf ] echo digipar_cut_lf digipar_cut_lf.cut
 # # fileName=$(basename $file)
 # # fileNameNoExt=${fileName%.*}

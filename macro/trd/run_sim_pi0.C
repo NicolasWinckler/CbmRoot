@@ -34,7 +34,8 @@ void run_sim_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   TString outFile;
   outFile.Form("%s/test.mc.%04i.root",outDir.Data(),urqmd);
   TString parFile = outDir + "/params.root";
-  
+  TString parFile;// = "data/params.root";
+  parFile.Form("%s/params.%04i.root",outDir.Data(),urqmd);
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
@@ -75,7 +76,7 @@ void run_sim_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
- gSystem->Load("libGeoBase");
+  gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
@@ -93,22 +94,22 @@ void run_sim_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
   /*
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
+    gSystem->Load("libGeoBase");
+    gSystem->Load("libParBase");
+    gSystem->Load("libBase");
+    gSystem->Load("libCbmBase");
+    gSystem->Load("libCbmData");
+    gSystem->Load("libField");
+    gSystem->Load("libGen");
+    gSystem->Load("libPassive");
+    gSystem->Load("libEcal");
+    gSystem->Load("libKF");
+    gSystem->Load("libMvd");
+    gSystem->Load("libSts");
+    gSystem->Load("libLittrack");
+    gSystem->Load("libRich");
+    gSystem->Load("libTrd");
+    gSystem->Load("libTof");
   */
   // -----------------------------------------------------------------------
 

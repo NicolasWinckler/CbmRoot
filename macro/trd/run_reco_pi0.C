@@ -49,8 +49,8 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   TString inFile;// = "data/test.mc.root";
   inFile.Form("data/test.mc.%04i.root",urqmd);
   // Parameter file
-  TString parFile = "data/params.root";
-
+  TString parFile;// = "data/params.root";
+  parFile.Form("data/params.%04i.root",urqmd);
   //  Digitisation files
   TList *parFileList = new TList();
 
@@ -428,9 +428,9 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   //   //fitQa->SetOutputDir(std::string(resultDir));
   //   run->AddTask(fitQa);
   /*
-  CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-  clusteringQa->SetOutputDir("recqa/");
-  run->AddTask(clusteringQa);
+    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+    clusteringQa->SetOutputDir("recqa/");
+    run->AddTask(clusteringQa);
   */
 
   /*
@@ -632,10 +632,10 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
 
   // -----  Parameter database   --------------------------------------------
   /*
-  TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-  stsDigi += "/parameters/sts/";
-  stsDigi += (TString)stsDigiFile;
-*/
+    TString stsDigi = gSystem->Getenv("VMCWORKDIR");
+    stsDigi += "/parameters/sts/";
+    stsDigi += (TString)stsDigiFile;
+  */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();

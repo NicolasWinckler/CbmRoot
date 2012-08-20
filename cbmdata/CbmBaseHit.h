@@ -25,9 +25,9 @@ enum HitType {
 	kECALHIT
 };
 
-#include "TObject.h"
+#include "FairMultiLinkedData.h"
 
-class CbmBaseHit : public TObject
+class CbmBaseHit : public FairMultiLinkedData
 {
 public:
 	/** Default constructor */
@@ -61,7 +61,7 @@ public:
 	/** Returns Z position of the hit */
 	Double_t GetZ() const {return fZ;}
 
-	/** Returns Zposition error of the hit */
+	/** Returns Z position error of the hit */
 	Double_t GetDz() const {return fDz;}
 
 	/** Returns reference ID*/

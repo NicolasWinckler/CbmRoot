@@ -6,6 +6,7 @@
 #include "CbmBaseHit.h"
 
 CbmBaseHit::CbmBaseHit():
+    FairMultiLinkedData(),
 	fType(kHIT),
 	fDetectorId(-1),
 	fZ(0.),

@@ -12,7 +12,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrack::CbmTrack()
-  : TObject(),	
+  : FairMultiLinkedData(),
     fHitIndex(),
     fHitType(),
     fPidHypo(0),

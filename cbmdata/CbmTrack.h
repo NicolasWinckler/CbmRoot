@@ -19,11 +19,11 @@
 #include "FairTrackParam.h"
 #include "CbmBaseHit.h"
 
-#include "TObject.h"
+#include "FairMultiLinkedData.h"
 
 #include <vector>
 
-class CbmTrack : public TObject
+class CbmTrack : public FairMultiLinkedData
 {
 public:
 	/** Default constructor **/

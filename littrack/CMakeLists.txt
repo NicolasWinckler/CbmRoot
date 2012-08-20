@@ -137,6 +137,12 @@ If(Boost_FOUND)
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
+    #  cbm/qa/sts/CbmStsSimulationQaHistCreator.cxx
+    #  cbm/qa/sts/CbmStsSimulationQaCalculator.cxx
+    #  cbm/qa/sts/CbmStsSimulationQaDraw.cxx
+    #  cbm/qa/sts/CbmStsSimulationQaPTreeCreator.cxx
+    #  cbm/qa/sts/CbmStsSimulationQaReport.cxx
+    #  cbm/qa/sts/CbmStsSimulationQaStudyReport.cxx
   )  
 EndIf(Boost_FOUND)
 
@@ -183,7 +189,8 @@ If(Boost_FOUND)
       ${LITTRACK_HEADERS}
       cbm/qa/tracking/CbmLitTrackingQa.h
       cbm/qa/clustering/CbmLitClusteringQa.h
-      cbm/qa/fit/CbmLitFitQa.h      
+      cbm/qa/fit/CbmLitFitQa.h   
+ #     cbm/qa/sts/CbmStsSimulationQa.h   
      )
 EndIf(Boost_FOUND)
 
@@ -206,6 +213,7 @@ If(Boost_FOUND)
       cbm/qa/tracking/CbmLitTrackingQa.cxx
       cbm/qa/clustering/CbmLitClusteringQa.cxx
       cbm/qa/fit/CbmLitFitQa.cxx
+    #  cbm/qa/sts/CbmStsSimulationQa.cxx
      )
 EndIf(Boost_FOUND)
 

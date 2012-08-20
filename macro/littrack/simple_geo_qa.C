@@ -29,7 +29,7 @@ void simple_geo_qa(Int_t nEvents = 1)
 	run->SetOutputFile(outFile);
 
 	// -------------------------------------------------------------------------
-	CbmLitSimpleGeoQa* geo = new CbmLitSimpleGeoQa();
+	CbmLitTrackingGeoQa* geo = new CbmLitTrackingGeoQa();
 	run->AddTask(geo);
 	// -------------------------------------------------------------------------
 

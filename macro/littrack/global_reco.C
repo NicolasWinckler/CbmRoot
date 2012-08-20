@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 void global_reco(Int_t nEvents = 100, // number of events
-		TString opt = "all")
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/d/events/much_v11a/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/much_v11a_signal/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -39,7 +39,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "branch"; // Global tracking type
+   TString globalTrackingType = "nn_parallel"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
@@ -354,6 +354,10 @@ void global_reco(Int_t nEvents = 100, // number of events
 		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
 		clusteringQa->SetOutputDir(std::string(resultDir));
 		run->AddTask(clusteringQa);
+
+	/*	CbmStsSimulationQa* stsSimulationQa = new CbmStsSimulationQa();
+		stsSimulationQa->SetOutputDir(std::string(resultDir));
+		run->AddTask(stsSimulationQa);*/
 	}
 
 	// -----  Parameter database   --------------------------------------------

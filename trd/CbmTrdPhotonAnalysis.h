@@ -161,6 +161,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
   void NiceProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle);
   void NiceLegend(TLegend *l);
   void Statusbar(Int_t i, Int_t n);
+  void CalcDeltaInvMassSpectrum(TString name);
  private:
   CbmTrdPhotonAnalysis(const CbmTrdPhotonAnalysis&);
   CbmTrdPhotonAnalysis& operator=(const CbmTrdPhotonAnalysis&);
@@ -195,7 +196,7 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   CbmTrdDigiPar  *fDigiPar;
   CbmTrdModule   *fModuleInfo;
-
+  std::vector<ElectronCandidate> fGTCandidates;
   std::vector<ElectronCandidate> fCandidates;
   std::vector<ElectronCandidate> fElectronCandidates;
   std::vector<ElectronCandidate> fPositronCandidates;

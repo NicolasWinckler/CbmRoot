@@ -1446,6 +1446,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["TOF_GT_time_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     }
     fHistoMap["GT_MC_PID"]->Fill(PdgToGeant(Pdg1));
+    fGTCandidates.push_back(cand);
     if (IsElec(richRing, cand.momentum.Mag(), trdTrack, gtrack, &cand)) {
       fHistoMap["KF_PID_MC_PID"]->Fill(PdgToGeant(Pdg1), PdgToGeant(-11 * cand.charge));
       fCandidates.push_back(cand);
@@ -1510,6 +1511,40 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Fill(5);
   }
  
+  std::vector<CbmMCTrack *> gammaFromGTCandPairs;
+  Int_t nGTCand = (Int_t)fGTCandidates.size();
+  for (Int_t iGTCand = 0; iGTCand < nGTCand-1; iGTCand++) {
+    for (Int_t jGTCand = iGTCand+1; jGTCand < nGTCand; jGTCand++) {
+      invMass = CalcInvariantMass(fGTCandidates[iGTCand],fGTCandidates[jGTCand]);
+      openingAngle = CalcOpeningAngle(fGTCandidates[iGTCand],fGTCandidates[jGTCand]);
+      pT = CalcPt(fGTCandidates[iGTCand],fGTCandidates[jGTCand]);
+      p = CalcP(fGTCandidates[iGTCand],fGTCandidates[jGTCand]);
+      CbmMCTrack *gamma = new CbmMCTrack(22, -1, 
+					 fGTCandidates[iGTCand].momentum[0] + fGTCandidates[jGTCand].momentum[0],
+					 fGTCandidates[iGTCand].momentum[1] + fGTCandidates[jGTCand].momentum[1],
+					 fGTCandidates[iGTCand].momentum[2] + fGTCandidates[jGTCand].momentum[2],
+					 0,
+					 0,
+					 0,
+					 0,//invariantMass,
+					 0);
+      gammaFromGTCandPairs.push_back(gamma);
+      //fHistoMap["CandPairOpeningAngle"]->Fill(openingAngle);
+      //fHistoMap["InvMassSpectrumGTCandPairs"]->Fill(invMass);
+    }
+  }
+  nGamma = (Int_t)gammaFromGTCandPairs.size();
+  for (Int_t iGamma = 0; iGamma < nGamma-1; iGamma++) {
+    gtrack1 = gammaFromGTCandPairs[iGamma];
+    for (Int_t jGamma = iGamma+1; jGamma < nGamma; jGamma++) {
+      gtrack2 = gammaFromGTCandPairs[jGamma];
+      invMass = CalcInvariantMass(gtrack1, gtrack2);
+      pT = CalcPt(gtrack1, gtrack2);
+      p = CalcP(gtrack1, gtrack2);
+      fHistoMap["InvMassSpectrumGammaGTCandPairs"]->Fill(invMass);
+    }
+  }
+
   std::vector<CbmMCTrack *> gammaFromCandPairs;
   Int_t nCand = (Int_t)fCandidates.size();
   for (Int_t iCand = 0; iCand < nCand-1; iCand++) {
@@ -1752,6 +1787,11 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       delete gammaFromCandPairs[i];
   gammaFromCandPairs.clear();
 
+  for (Int_t i = 0; i < gammaFromGTCandPairs.size(); i++)
+    if (NULL != gammaFromGTCandPairs[i])
+      delete gammaFromGTCandPairs[i];
+  gammaFromGTCandPairs.clear();
+
   for (Int_t i = 0; i < gammaFromEPCandPairs.size(); i++)
     if (NULL != gammaFromEPCandPairs[i])
       delete gammaFromEPCandPairs[i];
@@ -1771,6 +1811,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     notDalitzEPMapIt->second.clear();
   notDalitzEPMap.clear();
 
+  fGTCandidates.clear();
   fCandidates.clear();
   fElectronCandidates.clear();
   fPositronCandidates.clear();
@@ -2487,6 +2528,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["CandPairOpeningAngle"] = new TH1I("CandPairOpeningAngle","opening angle #theta of e^{+}e^{-} cand. pairs",1800,0,180);
   fHistoMap["InvMassSpectrumEPCandPairs"] = new TH1I("InvMassSpectrumEPCandPairs","Invariant mass spectrum from e^{+}e^{-} cand. pairs",2000,0,2);
   fHistoMap["InvMassSpectrumCandPairs"] = new TH1I("InvMassSpectrumCandPairs","Invariant mass spectrum from e^{+}e^{-} cand. pairs",2000,0,2);
+  fHistoMap["InvMassSpectrumGammaGTCandPairs"] = new TH1I("InvMassSpectrumGTCandPairs","Invariant mass spectrum from e^{+}e^{-} global track cand. pairs without PID",2000,0,2);
   fHistoMap["InvMassSpectrumGammaEPCandPairs"] = new TH1I("InvMassSpectrumGammaEPCandPairs","Invariant mass spectrum from #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
   fHistoMap["InvMassSpectrumGammaCandPairs"] = new TH1I("InvMassSpectrumGammaCandPairs","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
   fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"] = new TH1I("InvMassSpectrumGammaCandPairsOpenAngle","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
@@ -2656,6 +2698,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fHistoMap["InvMassSpectrumCandPairs"],2,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairs"],3,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fHistoMap["InvMassSpectrumGammaCandPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
+  NiceHisto1(fHistoMap["InvMassSpectrumGammaGTCandPairs"],6,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"],4,1,1,"Invariant mass [GeV/c^{2}]","");
 }
     void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)
@@ -2946,6 +2989,7 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     gDirectory->mkdir("FromEPPairs");
   gDirectory->Cd("FromEPPairs");
   gDirectory->pwd(); 
+ fHistoMap["InvMassSpectrumGammaGTCandPairs"]->Write("", TObject::kOverwrite);
   fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Write("", TObject::kOverwrite);
   fHistoMap["InvMassSpectrumGammaCandPairs"]->Write("", TObject::kOverwrite);
   fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"]->Write("", TObject::kOverwrite);
@@ -3006,6 +3050,8 @@ void CbmTrdPhotonAnalysis::FinishTask()
   TCanvas *c = new TCanvas("c","c",800,600);
   c->Divide(1,1);
   c->cd(1);
+  TLegend *leg = new TLegend(0.6,0.7,0.85,0.85);
+  NiceLegend(leg);
   Bool_t debug = false;
 
   for (fHistoMapIt = fHistoMap.begin(); fHistoMapIt != fHistoMap.end(); fHistoMapIt++){
@@ -3046,21 +3092,52 @@ void CbmTrdPhotonAnalysis::FinishTask()
   name = fBirthPair->GetName();
   c->SaveAs(TString("pics/Photon/PhD/" + name + ".pdf"));
   c->SaveAs(TString("pics/Photon/PhD/" + name + ".png"));
-
+  leg->SetHeader("MC-#gamma pairs from MC-e^{+}e^{-} pairs");
+  leg->AddEntry(fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"],"with vertex in magnet volume","L");
+  leg->AddEntry(fHistoMap["InvMassSpectrumGammaEPPairsInTarget"],"with vertex in target volume","L");
+  leg->AddEntry(fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"],"with vertex in target volume #Theta < 1.0","L");
   fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"]->Draw();
   fHistoMap["InvMassSpectrumGammaEPPairsInTarget"]->Draw("same");
   fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"]->Draw("same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/MC_InvM_fromGamma_fromEPPair.pdf");
   c->SaveAs("pics/Photon/PhD/MC_InvM_fromGamma_fromEPPair.png");
+  leg->Clear();
   fHistoMap["InvMassSpectrumGammaAllPairs"]->Draw();
   c->SaveAs("pics/Photon/PhD/MC_InvM_fromGamma.pdf");
   c->SaveAs("pics/Photon/PhD/MC_InvM_fromGamma.png");
 
+  //fHistoMap["InvMassSpectrumGammaGTCandPairs"]->Draw();
+  //fHistoMap["InvMassSpectrumGammaCandPairs"]->Draw("same");
+  leg->SetHeader("GT-#gamma pairs from GT-e^{+}e^{-} pairs");
+  leg->AddEntry(fHistoMap["InvMassSpectrumGammaCandPairs"],"without charge info.","L");
+  leg->AddEntry(fHistoMap["InvMassSpectrumGammaEPCandPairs"],"with charge info.","L");
+  leg->AddEntry(fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"],"with charge info. #Theta < 1.0","L");
   fHistoMap["InvMassSpectrumGammaCandPairs"]->Draw();
   fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Draw("same"); 
   fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"]->Draw("same"); 
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/KF_InvM_fromGamma_fromEPPair.pdf");
   c->SaveAs("pics/Photon/PhD/KF_InvM_fromGamma_fromEPPair.png");
+  leg->Clear();
+
+  CalcDeltaInvMassSpectrum("InvMassSpectrumGammaGTCandPairs");
+  CalcDeltaInvMassSpectrum("InvMassSpectrumGammaCandPairs");
+  CalcDeltaInvMassSpectrum("InvMassSpectrumGammaEPCandPairs");
+  CalcDeltaInvMassSpectrum("InvMassSpectrumGammaEPCandPairsOpenAngle");
+  leg->SetHeader("GT-#gamma pairs from GT-e^{+}e^{-} pairs");
+  leg->AddEntry(fHistoMap["DeltaInvMassSpectrumGammaGTCandPairs"],"all GT","L");
+  leg->AddEntry(fHistoMap["DeltaInvMassSpectrumGammaCandPairs"],"without charge info.","L");
+  leg->AddEntry(fHistoMap["DeltaInvMassSpectrumGammaEPCandPairs"],"with charge info.","L");
+  leg->AddEntry(fHistoMap["DeltaInvMassSpectrumGammaEPCandPairsOpenAngle"],"with charge info. #Theta < 1.0","L");
+  fHistoMap["DeltaInvMassSpectrumGammaGTCandPairs"]->Draw();
+  fHistoMap["DeltaInvMassSpectrumGammaCandPairs"]->Draw("same");
+  fHistoMap["DeltaInvMassSpectrumGammaEPCandPairs"]->Draw("same"); 
+  fHistoMap["DeltaInvMassSpectrumGammaEPCandPairsOpenAngle"]->Draw("same");
+  leg->Draw("same");
+  c->SaveAs("pics/Photon/PhD/KF_DeltaInvM_fromGamma_fromEPPair.pdf");
+  c->SaveAs("pics/Photon/PhD/KF_DeltaInvM_fromGamma_fromEPPair.png");
+  leg->Clear();
 
   fHistoMap["gammaAndGammaMother"]->Draw();
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_gamma_and_gamma.pdf");
@@ -3076,29 +3153,42 @@ void CbmTrdPhotonAnalysis::FinishTask()
   c->cd(1)->SetLogx(0);
   c->cd(1)->SetLogy(1);
   c->cd(1)->SetLogz(0);
+  leg->AddEntry(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],"all reco. global tracks","LEP");
+  leg->AddEntry(fHistoMap["EPPairFromPi0DetectionEfficiency"],"reco. global tracks after PID cut","LEP");
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Draw("PE");
   fHistoMap["EPPairFromPi0DetectionEfficiency"]->Draw("PE,same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/EPPairFromPi0DetectionEfficiency.pdf");
   c->SaveAs("pics/Photon/PhD/EPPairFromPi0DetectionEfficiency.png");
-
+  leg->Clear();
   fHistoMap["GT_MC_PID"]->Draw("PE");
   c->SaveAs("pics/Photon/PhD/GT_MC_PID.pdf");
   c->SaveAs("pics/Photon/PhD/GT_MC_PID.png");
   fHistoMap["gammaAndGammaMother"]->SetMarkerStyle(20);
   fHistoMap["gammaAndGammaMother"]->SetLineColor(2);
   fHistoMap["gammaAndGammaMother"]->SetMarkerColor(2);
+  leg->SetHeader("");
+  leg->AddEntry(fHistoMap["gammaAndGammaMother"],"#gamma pairs","LEP");
+  leg->AddEntry(fHistoMap["gammaMother"],"single #gamma","LEP");
   fHistoMap["gammaAndGammaMother"]->Draw("PE");
   fHistoMap["gammaMother"]->Draw("PE,same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_gamma_andOr_gamma.pdf");
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_gamma_andOr_gamma.png");
+  leg->Clear();
 
   fHistoMap["ePlusMinusMother"]->Draw("PE");
   fHistoMap["ePlusAndMinusMother"]->SetMarkerStyle(20);
   fHistoMap["ePlusAndMinusMother"]->SetLineColor(2);
   fHistoMap["ePlusAndMinusMother"]->SetMarkerColor(2);
+  leg->SetHeader();
+  leg->AddEntry(fHistoMap["ePlusMinusMother"],"single e^{+} or e^{-}","LEP");
+  leg->AddEntry(fHistoMap["ePlusAndMinusMother"],"e^{+}e^{-} pairs","LEP");
   fHistoMap["ePlusAndMinusMother"]->Draw("PE,same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_elec_andOr_posi.pdf");
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_elec_andOr_posi.png");
+  leg->Clear();
 
   fHistoMap["ePlusMinusMother"]->Draw();
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_elec_or_posi.pdf");
@@ -3107,21 +3197,37 @@ void CbmTrdPhotonAnalysis::FinishTask()
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_elec_and_posi.pdf");
   c->SaveAs("pics/Photon/PhD/MC_MotherPID_elec_and_posi.png");
 
+  leg->AddEntry(fHistoMap["MCPid_global"],"global","LEP");
+  leg->AddEntry(fHistoMap["MCPid_inMagnet"],"vertex within magnet volume","LEP");
+  leg->AddEntry(fHistoMap["MCPid_inTarget"],"vertex within target volume","LEP");
   fHistoMap["MCPid_global"]->Draw("PE");
   fHistoMap["MCPid_inMagnet"]->Draw("PE,same");
   fHistoMap["MCPid_inTarget"]->Draw("PE,same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/MC_PID.pdf");
   c->SaveAs("pics/Photon/PhD/MC_PID.png");
+  leg->Clear();
 
+  leg->SetHeader("vertex of e^{+}e^{-} from");
+  leg->AddEntry(fHistoMap["PairGammaVertex_z"],"#gamma","LEP");
+  leg->AddEntry(fHistoMap["PairPi0Vertex_z"],"#pi^{0}","LEP");
   fHistoMap["PairGammaVertex_z"]->Draw();
   fHistoMap["PairPi0Vertex_z"]->Draw("same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/MC_zBirth_ep_from_gamma_pi0.pdf");
   c->SaveAs("pics/Photon/PhD/MC_zBirth_ep_from_gamma_pi0.png");
+  leg->Clear();
+
+  leg->AddEntry(fHistoMap["EPPairOpeningAngle"],"mixed MC-e^{+}e^{-} pairs","L");
+  leg->AddEntry(fHistoMap["EPPairOpeningAnglePi0"],"MC-e^{+}e^{-} pairs from #pi^{0}","L");
+  leg->AddEntry(fHistoMap["EPPairOpeningAngleGamma"],"MC-e^{+}e^{-} pairs from #gamma","L");
   fHistoMap["EPPairOpeningAngle"]->Draw();
   fHistoMap["EPPairOpeningAnglePi0"]->Draw("same");
   fHistoMap["EPPairOpeningAngleGamma"]->Draw("same");
+  leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/MC_openingAngle_sameMother_Gamma_Pi0.pdf");
   c->SaveAs("pics/Photon/PhD/MC_openingAngle_sameMother_Gamma_Pi0.png");
+  leg->Clear();
 
   c->cd(1)->SetLogx(1);
   c->cd(1)->SetLogy(1);
@@ -3187,7 +3293,7 @@ void CbmTrdPhotonAnalysis::FinishTask()
   fHistoMap["RICH_GT_radiusB_KF_P"]->Draw("colz");
   c->SaveAs("pics/Photon/PhD/RICH_GT_radiusB_KF_P.pdf");
   c->SaveAs("pics/Photon/PhD/RICH_GT_radiusB_KF_P.png");
-fHistoMap["RICH_GT_radius_KF_P"]->Draw("colz");
+  fHistoMap["RICH_GT_radius_KF_P"]->Draw("colz");
   c->SaveAs("pics/Photon/PhD/RICH_GT_radius_KF_P.pdf");
   c->SaveAs("pics/Photon/PhD/RICH_GT_radius_KF_P.png");
   fHistoMap["TOF_GT_time_KF_P"]->Draw("colz");
@@ -3327,3 +3433,17 @@ fHistoMap["RICH_GT_radius_KF_P"]->Draw("colz");
 	  cout << "]" <<endl;
       }
     }
+void CbmTrdPhotonAnalysis::CalcDeltaInvMassSpectrum(TString name) {
+  fHistoMap[TString("Delta"+name)] = (TH1F*)fHistoMap[name]->Clone(TString("Delta"+name));
+//fHistoMap[TString("Delta"+name)]->Reset();
+ Int_t nbin = fHistoMap[TString("Delta"+name)]->GetNbinsX();
+ Int_t lastBin(0), nextBin(0);
+ Float_t deltaReal(0.), deltaTheo(0.);
+ for (Int_t ibin = 2; ibin < nbin-1; ibin++) {
+   lastBin = ibin-1;
+   nextBin = ibin+1;
+   deltaTheo = 0.5 * (fHistoMap[name]->GetBinContent(nextBin) - fHistoMap[name]->GetBinContent(lastBin));
+   deltaReal = fHistoMap[name]->GetBinContent(ibin);
+   fHistoMap[TString("Delta"+name)]->SetBinContent(ibin, deltaReal - deltaTheo);
+ }
+}

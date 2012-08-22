@@ -2310,7 +2310,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["gammaMother"] = new TH1I("gammaMother","Mother ID for #gamma",49,0.5,49.5);
   fHistoMap["gammaAndGammaMother"] = new TH1I("gammaAndGammaMother","Mother ID for #gamma & #gamma",49,0.5,49.5);
   fHistoMap["gammaDaughter"] = new TH1I("gammaDaughter","Daughter ID for #gamma",49,0.5,49.5);
-  fHistoMap["ZBirthAll"] = new TH2I("ZBirth_All","z birth",10000,0,1000,49,0.5,49.5);
+  fHistoMap["ZBirthAll"] = new TH2I("ZBirthAll","z birth",10000,0,1000,49,0.5,49.5);
   fHistoMap["ZBirthEPfromGamma"] = new TH1I("ZBirthEPfromGamma","z birth from e^{+} & e^{-} pairs with mother #gamma",10000,0,1000);
   fHistoMap["NoDaughters_global"] = new TH2I("NoDaughters_global","Number of daughters global",49,0.5,49.5,101,-0.5,100.5);
   fHistoMap["NoDaughters_inMagnet"] = new TH2I("NoDaughters_inMagnet","Number of daughters in magnet",49,0.5,49.5,101,-0.5,100.5);
@@ -2459,7 +2459,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["InvMassSpectrumGammaEPPairsInMagnetBackground"] = new TH1D("InvMassSpectrumAllEPPairsInMagnetBackground","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet background",2000,0,2);
 
   fHistoMap["EPPairOpeningAngle"] = new TH1I("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
-  fHistoMap["EPPairOpeningAngleGamma"] = new TH1I("EPPairOpeningAngleGamma ","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
+  fHistoMap["EPPairOpeningAngleGamma"] = new TH1I("EPPairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
   fHistoMap["EPPairOpeningAnglePi0"] = new TH1I("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
   fHistoMap["EPPairOpeningAngleSameMother"] = new TH1I("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
   fHistoMap["EPPairOpeningAngleInTarget"] = new TH1I("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
@@ -2531,7 +2531,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["InvMassSpectrumGammaGTCandPairs"] = new TH1I("InvMassSpectrumGTCandPairs","Invariant mass spectrum from e^{+}e^{-} global track cand. pairs without PID",2000,0,2);
   fHistoMap["InvMassSpectrumGammaEPCandPairs"] = new TH1I("InvMassSpectrumGammaEPCandPairs","Invariant mass spectrum from #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
   fHistoMap["InvMassSpectrumGammaCandPairs"] = new TH1I("InvMassSpectrumGammaCandPairs","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
-  fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"] = new TH1I("InvMassSpectrumGammaCandPairsOpenAngle","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
+  fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"] = new TH1I("InvMassSpectrumGammaEPCandPairsOpenAngle","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
 
   fHistoMap["EPPairFromPi0DetectionEfficiency"] = new TH1I("EPPairFromPi0DetectionEfficiency","e^{+}e^{-} cand. pair from same #pi^{0} detection efficiency",8,0.5,8.5);
   fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetXaxis()->SetBinLabel(1,"#pi^{0}_{MC}#rightarrow #gamma#gamma#rightarrow 2e^{+}2e^{-}");     

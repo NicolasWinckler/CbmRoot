@@ -102,18 +102,20 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const cha
 // ---- Destructor ----------------------------------------------------
 CbmTrdHitProducerSmearing::~CbmTrdHitProducerSmearing()
 {
-    FairRootManager *ioman =FairRootManager::Instance();
-    ioman->Write();
-    fHitCollection->Clear("C");
-    delete fHitCollection;
+  FairRootManager *ioman =FairRootManager::Instance();
+  ioman->Write();
+  fHitCollection->Clear("C");
+  delete fHitCollection;
 
-    if(fRadiator) delete fRadiator;
+  if(fRadiator) delete fRadiator;
 
-    for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
-      for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
-	delete (*fModuleHitBufferMapIt).second[i];
-    }
+  for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
+    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
+      delete (*fModuleHitBufferMapIt).second[i];
+    
     (*fModuleHitBufferMapIt).second.clear();
+  }
+  fModuleHitBufferMap.clear();
 }
 // --------------------------------------------------------------------
 
@@ -324,13 +326,16 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	// um -> cm
 	errX/=10000.0;
     
-	xHit = xHit + errX;
+	xHit = pos.X() + errX;
     
 	xHitErr = fDx/10000.0; //error in cm, fDx is in um
 	zHitErr = 0.0;
-
-      } while (xHit > moduleXmax || xHit < moduleXmin);
-
+	//printf("DEBUG:: %i times out of chamber\n",randomCounter);
+      } while ((xHit > moduleXmax || xHit < moduleXmin) && randomCounter < 10);
+      if (xHit > moduleXmax || xHit < moduleXmin) {
+	xHitErr = 0.0;
+	xHit = pos.X();
+      }
       do {   
 	randomCounter++;
 	Float_t errY = gRandom->Gaus(0,fDy);
@@ -342,11 +347,16 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	// um -> cm
 	errY/=10000.0;
     
-	yHit = yHit + errY;
+	yHit =  pos.Y() + errY;
     
 	yHitErr = fDy/10000.0; //error in cm, fDy is in um
 	zHitErr = 0.0;
-      } while (yHit > moduleYmax || yHit < moduleYmin); // avoid to shift the hit position out of the module in x and y
+	//printf("DEBUG:: %i times out of chamber\n",randomCounter);
+      } while ((yHit > moduleYmax || yHit < moduleYmin) && randomCounter < 10); // avoid to shift the hit position out of the module in x and y
+      if (yHit > moduleYmax || yHit < moduleYmin){
+	yHitErr = 0.0;
+	yHit =  pos.Y();
+      }
       if (debug) if (randomCounter > 1) printf("DEBUG:: %i times out of chamber\n",randomCounter);
 
       TVector3 posHit(xHit, yHit, zHit);
@@ -416,87 +426,89 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
   printf("\n   %7i (%5.1f%%) input points\n   %7i (%5.1f%%) lost points\n   %7i (%5.1f%%) ghost hits\n   %7i (%5.1f%%) output hits\n",nentries,nentries*100./nentries,lostCoungter,lostCoungter*100./nentries,ghostCounter,ghostCounter*100./nentries,outputCounter,outputCounter*100./nentries);
   for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
     for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
-      (*fModuleHitBufferMapIt).second.clear();
+      delete (*fModuleHitBufferMapIt).second[i];
+    (*fModuleHitBufferMapIt).second.clear();
   }
+  fModuleHitBufferMap.clear();
 }
 
 
-  // --------------------------------------------------------------------
+	       // --------------------------------------------------------------------
 
-  // ---- Add Hit to HitCollection --------------------------------------
-  void CbmTrdHitProducerSmearing::AddHit(Int_t trdId, TVector3 &posHit, 
-					 TVector3 &posHitErr,
-					 Int_t ref, Int_t Plane, 
-					 Double_t ELoss, Double_t ELossTR,
-					 Double_t ELossdEdX) 
-  {
-    new((*fHitCollection)[fNHits]) CbmTrdHit(trdId, posHit, posHitErr, 0., 
-					     ref, Plane, ELossTR, ELossdEdX, 
-					     ELoss);
-    fNHits++;
-  }
+	       // ---- Add Hit to HitCollection --------------------------------------
+	       void CbmTrdHitProducerSmearing::AddHit(Int_t trdId, TVector3 &posHit, 
+						      TVector3 &posHitErr,
+						      Int_t ref, Int_t Plane, 
+						      Double_t ELoss, Double_t ELossTR,
+						      Double_t ELossdEdX) 
+	       {
+		 new((*fHitCollection)[fNHits]) CbmTrdHit(trdId, posHit, posHitErr, 0., 
+							  ref, Plane, ELossTR, ELossdEdX, 
+							  ELoss);
+		 fNHits++;
+	       }
 
-  // --------------------------------------------------------------------
+	       // --------------------------------------------------------------------
 
-  // ---- Finish --------------------------------------------------------
-  void CbmTrdHitProducerSmearing::Finish()
-  {
-    /*
-    for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
-      for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
-	delete (*fModuleHitBufferMapIt).second[i];
-    }
-    (*fModuleHitBufferMapIt).second.clear();
-    */
-  }
-  // --------------------------------------------------------------------
+	       // ---- Finish --------------------------------------------------------
+	       void CbmTrdHitProducerSmearing::Finish()
+	{
+	  /*
+	    for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
+	    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
+	    delete (*fModuleHitBufferMapIt).second[i];
+	    }
+	    (*fModuleHitBufferMapIt).second.clear();
+	  */
+	}
+	       // --------------------------------------------------------------------
 
-  // ---- Register ------------------------------------------------------
-  void CbmTrdHitProducerSmearing::Register(){
+	       // ---- Register ------------------------------------------------------
+	       void CbmTrdHitProducerSmearing::Register(){
 
-    FairRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
+		 FairRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
 
-  }
-  // --------------------------------------------------------------------
+	       }
+	       // --------------------------------------------------------------------
 
-  // ---- SetSigmaX -----------------------------------------------------
-  void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])
-  {
-    for(Int_t i = 0; i < 3; i++)    fSigmaX[i] = sigma[i];
-  }
-  // --------------------------------------------------------------------
+	       // ---- SetSigmaX -----------------------------------------------------
+	       void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])
+	{
+	  for(Int_t i = 0; i < 3; i++)    fSigmaX[i] = sigma[i];
+	}
+	       // --------------------------------------------------------------------
 
-  // ---- SetSigmaY -----------------------------------------------------
-  void CbmTrdHitProducerSmearing::SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[])
-  {
-    for(Int_t i = 0; i < 7; i++)   fSigmaY[0][i] = s1[i];
-    for(Int_t j = 0; j < 7; j++)  fSigmaY[1][j] = s2[j];
-    for(Int_t k = 0; k < 7; k++ ) fSigmaY[2][k] = s3[k];
-  }
-  // --------------------------------------------------------------------
+	       // ---- SetSigmaY -----------------------------------------------------
+	       void CbmTrdHitProducerSmearing::SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[])
+	{
+	  for(Int_t i = 0; i < 7; i++)   fSigmaY[0][i] = s1[i];
+	  for(Int_t j = 0; j < 7; j++)  fSigmaY[1][j] = s2[j];
+	  for(Int_t k = 0; k < 7; k++ ) fSigmaY[2][k] = s3[k];
+	}
+	       // --------------------------------------------------------------------
 
-  // ---- GetSigmaX -----------------------------------------------------
-  Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack) const
-  {
-    if  (stack == 1)    	return fSigmaX[0];
-    else if (stack == 2)    return fSigmaX[1];
-    else if (stack == 3)     return fSigmaX[2];
-    else return 0;
-  }
-  // --------------------------------------------------------------------
+	       // ---- GetSigmaX -----------------------------------------------------
+	       Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack) const
+	{
+	  if  (stack == 1)    	return fSigmaX[0];
+	  else if (stack == 2)    return fSigmaX[1];
+	  else if (stack == 3)     return fSigmaX[2];
+	  else return 0;
+	}
+	       // --------------------------------------------------------------------
 
-  // ---- GetSigmaY -----------------------------------------------------
-  Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack ) const
-  {
-    if (teta <= 50)	                 return fSigmaY[stack - 1][0];
-    else if(teta > 50 && teta <= 100)    return fSigmaY[stack - 1][1];
-    else if(teta > 100 && teta <= 200)   return fSigmaY[stack - 1][2];
-    else if(teta > 200 && teta <= 300)   return fSigmaY[stack - 1][3];
-    else if(teta > 300 && teta <= 400)   return fSigmaY[stack - 1][4];
-    else if(teta > 400 && teta <= 500)   return fSigmaY[stack - 1][5];
-    else if(teta > 500)		         return fSigmaY[stack - 1][6];
-    else return 0;
-  }
-  // --------------------------------------------------------------------
+	       // ---- GetSigmaY -----------------------------------------------------
+	       Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack ) const
+	{
+	  if (teta <= 50)	                 return fSigmaY[stack - 1][0];
+	  else if(teta > 50 && teta <= 100)    return fSigmaY[stack - 1][1];
+	  else if(teta > 100 && teta <= 200)   return fSigmaY[stack - 1][2];
+	  else if(teta > 200 && teta <= 300)   return fSigmaY[stack - 1][3];
+	  else if(teta > 300 && teta <= 400)   return fSigmaY[stack - 1][4];
+	  else if(teta > 400 && teta <= 500)   return fSigmaY[stack - 1][5];
+	  else if(teta > 500)		         return fSigmaY[stack - 1][6];
+	  else return 0;
+	}
+	       // --------------------------------------------------------------------
 
-  ClassImp(CbmTrdHitProducerSmearing)
+	       ClassImp(CbmTrdHitProducerSmearing)

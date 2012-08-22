@@ -2700,6 +2700,12 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fHistoMap["InvMassSpectrumGammaCandPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fHistoMap["InvMassSpectrumGammaGTCandPairs"],6,1,1,"Invariant mass [GeV/c^{2}]","");
   NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"],4,1,1,"Invariant mass [GeV/c^{2}]","");
+
+  NiceHisto1(fHistoMap["ePlusMinusMother"],1,20,1,"Mother","");
+  NiceHisto1(fHistoMap["ePlusAndMinusMother"],2,20,1,"Mother","");
+  NiceHisto1(fHistoMap["gammaMother"],1,20,1,"Mother","");
+  NiceHisto1(fHistoMap["gammaAndGammaMother"],2,20,1,"Mother","");
+
 }
     void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)
     {
@@ -2989,10 +2995,14 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
     gDirectory->mkdir("FromEPPairs");
   gDirectory->Cd("FromEPPairs");
   gDirectory->pwd(); 
- fHistoMap["InvMassSpectrumGammaGTCandPairs"]->Write("", TObject::kOverwrite);
+  fHistoMap["InvMassSpectrumGammaGTCandPairs"]->Write("", TObject::kOverwrite);
   fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Write("", TObject::kOverwrite);
   fHistoMap["InvMassSpectrumGammaCandPairs"]->Write("", TObject::kOverwrite);
   fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"]->Write("", TObject::kOverwrite);
+  //fHistoMap["DeltaInvMassSpectrumGammaGTCandPairs"]->Write("", TObject::kOverwrite);
+  //fHistoMap["DeltaInvMassSpectrumGammaEPCandPairs"]->Write("", TObject::kOverwrite);
+  //fHistoMap["DeltaInvMassSpectrumGammaCandPairs"]->Write("", TObject::kOverwrite);
+  //fHistoMap["DeltaInvMassSpectrumGammaEPCandPairsOpenAngle"]->Write("", TObject::kOverwrite);
   //==================================================================Cuts
   if (!gDirectory->Cd("Cuts")) 
     gDirectory->mkdir("Cuts");
@@ -3155,8 +3165,8 @@ void CbmTrdPhotonAnalysis::FinishTask()
   c->cd(1)->SetLogz(0);
   leg->AddEntry(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],"all reco. global tracks","LEP");
   leg->AddEntry(fHistoMap["EPPairFromPi0DetectionEfficiency"],"reco. global tracks after PID cut","LEP");
-  fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Draw("PE");
-  fHistoMap["EPPairFromPi0DetectionEfficiency"]->Draw("PE,same");
+  fHistoMap["EPPairFromPi0DetectionEfficiency"]->Draw("PE");
+  fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Draw("PE,same");
   leg->Draw("same");
   c->SaveAs("pics/Photon/PhD/EPPairFromPi0DetectionEfficiency.pdf");
   c->SaveAs("pics/Photon/PhD/EPPairFromPi0DetectionEfficiency.png");
@@ -3434,16 +3444,17 @@ void CbmTrdPhotonAnalysis::FinishTask()
       }
     }
 void CbmTrdPhotonAnalysis::CalcDeltaInvMassSpectrum(TString name) {
-  fHistoMap[TString("Delta"+name)] = (TH1F*)fHistoMap[name]->Clone(TString("Delta"+name));
-//fHistoMap[TString("Delta"+name)]->Reset();
- Int_t nbin = fHistoMap[TString("Delta"+name)]->GetNbinsX();
- Int_t lastBin(0), nextBin(0);
- Float_t deltaReal(0.), deltaTheo(0.);
- for (Int_t ibin = 2; ibin < nbin-1; ibin++) {
-   lastBin = ibin-1;
-   nextBin = ibin+1;
-   deltaTheo = 0.5 * (fHistoMap[name]->GetBinContent(nextBin) - fHistoMap[name]->GetBinContent(lastBin));
-   deltaReal = fHistoMap[name]->GetBinContent(ibin);
-   fHistoMap[TString("Delta"+name)]->SetBinContent(ibin, deltaReal - deltaTheo);
- }
+  TString newname ="Delta"+name;
+  fHistoMap[newname] = (TH1F*)fHistoMap[name]->Clone(newname);
+  fHistoMap[newname]->Reset();
+  Int_t nbin = fHistoMap[newname]->GetNbinsX();
+  Int_t lastBin(0), nextBin(0);
+  Float_t deltaReal(0.), deltaTheo(0.);
+  for (Int_t ibin = 2; ibin < nbin-1; ibin++) {
+    lastBin = ibin-1;
+    nextBin = ibin+1;
+    deltaTheo = 0.5 * (fHistoMap[name]->GetBinContent(nextBin) - fHistoMap[name]->GetBinContent(lastBin));
+    deltaReal = fHistoMap[name]->GetBinContent(ibin);
+    fHistoMap[newname]->SetBinContent(ibin, deltaReal - deltaTheo);
+  }
 }

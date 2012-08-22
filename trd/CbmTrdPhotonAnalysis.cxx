@@ -207,6 +207,8 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fElIdAnn->Init();
   }
   fKFFitter = new CbmStsKFTrackFitter();
+    for (fHistoMapIt = fHistoMap.begin(); fHistoMapIt != fHistoMap.end(); fHistoMapIt++)
+      delete fHistoMapIt->second;
   fHistoMap.clear();
   fCandidates.clear();
   fElectronCandidates.clear();
@@ -343,9 +345,12 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
  
     for (fHistoMapIt = fHistoMap.begin(); fHistoMapIt != fHistoMap.end(); fHistoMapIt++)
       delete fHistoMapIt->second;
+    fHistoMap.clear();
 
     delete fDigiPar;
     delete fModuleInfo;
+
+    delete fPrimVertex;
 
   fCandidates.clear();
   fElectronCandidates.clear();
@@ -360,7 +365,7 @@ CbmTrdPhotonAnalysis::CbmTrdPhotonAnalysis(const char *name, const char *title, 
     fDigiPar = (CbmTrdDigiPar*)
       (rtdb->getContainer("CbmTrdDigiPar"));
 
-    InitHistos();
+    //InitHistos();
 
     return kSUCCESS;
   }
@@ -542,6 +547,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   cout << endl << "================CbmTrdPhotonAnalysis=====================" << endl;
   //InitHistos();
   fHistoMap["MC_EventCounter"]->Fill(0);
+  const Double_t minDistance = 1e-4;
   CbmMCTrack* mctrack = NULL;
   CbmMCTrack* grandmother = NULL;
   CbmMCTrack* mother = NULL;
@@ -550,12 +556,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   CbmMCTrack* ptrack = NULL;
   CbmMCTrack* gtrack1 = NULL;
   CbmMCTrack* gtrack2 = NULL;
-
-  const Double_t minDistance = 1e-4;
-
   CbmTrdTrack* track = NULL;
   CbmGlobalTrack* gtrack = NULL;
-
   CbmTrdHit* trdHit = NULL;
   /*
     CbmTrdPoint *mcpt = NULL;
@@ -1291,6 +1293,14 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::map<Int_t, std::vector<Int_t> >::iterator notDalitzEPMapAllIt;
   std::map<Int_t, std::vector<Int_t> > dalitzEPMapAll; //< pi0Id, e+e-IDs[]>
   std::map<Int_t, std::vector<Int_t> >::iterator dalitzEPMapAllIt;
+   std::map<Int_t, std::vector<Int_t> > notDalitzEPMap;//< pi0Id, e+e-IDs[]>
+  std::map<Int_t, std::vector<Int_t> >::iterator notDalitzEPMapIt;
+  std::map<Int_t, std::vector<Int_t> > dalitzEPMap; //< pi0Id, e+e-IDs[]>
+  std::map<Int_t, std::vector<Int_t> >::iterator dalitzEPMapIt;
+  std::vector<CbmMCTrack *> gammaFromEPCandPairs;
+  std::vector<CbmMCTrack *> gammaFromEPCandPairsOpeningAngle;
+  std::vector<CbmMCTrack *> gammaFromCandPairs;
+
   CbmMCTrack* mctMother = NULL; 
   CbmMCTrack* mctGrani = NULL; 
   for (Int_t iGlobalTrack = 0; iGlobalTrack < nGlobalTracks; iGlobalTrack++) {
@@ -1395,6 +1405,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       if(mct1 != NULL && motherPdg == 221 && pdg == 11){
 	cand.isMcEtaElectron = true;
       }
+      //if (NULL != mct1)
+      //delete mct1;
     }
     //	    }
     //        IsRichElectron(richRing, cand.momentum.Mag(), &cand);
@@ -1489,6 +1501,32 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	}
       }
     }
+    /*
+      if (NULL != tofHit)
+      delete tofHit;
+      //if (NULL != mcTrack4)
+      //delete mcTrack4;
+      if (NULL != tofPoint)
+      delete tofPoint;
+      //if (NULL != mcTrack3)
+      //delete mcTrack3;
+      if (NULL != trdMatch)
+      delete trdMatch;
+      if (NULL != trdTrack)
+      delete trdTrack;
+      //if (NULL != mcTrack2)
+      // delete mcTrack2;
+      if (NULL != richMatch)
+      delete richMatch;
+      if (NULL != richRing)
+      delete richRing;
+      //if (NULL != mcTrack1)
+      //delete mcTrack1;
+      if (NULL != stsMatch)
+      delete stsMatch;
+      if (NULL != stsTrack)
+      delete stsTrack;
+    */
   }
 
 
@@ -1510,7 +1548,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (notDalitzDaughterSize == 4)
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Fill(5);
   }
- 
+
   std::vector<CbmMCTrack *> gammaFromGTCandPairs;
   Int_t nGTCand = (Int_t)fGTCandidates.size();
   for (Int_t iGTCand = 0; iGTCand < nGTCand-1; iGTCand++) {
@@ -1545,7 +1583,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     }
   }
 
-  std::vector<CbmMCTrack *> gammaFromCandPairs;
+
   Int_t nCand = (Int_t)fCandidates.size();
   for (Int_t iCand = 0; iCand < nCand-1; iCand++) {
     for (Int_t jCand = iCand+1; jCand < nCand; jCand++) {
@@ -1582,13 +1620,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t nECand = (Int_t)fElectronCandidates.size();
   Int_t nPCand = (Int_t)fPositronCandidates.size();
 
-  std::map<Int_t, std::vector<Int_t> > notDalitzEPMap;//< pi0Id, e+e-IDs[]>
-  std::map<Int_t, std::vector<Int_t> >::iterator notDalitzEPMapIt;
-  std::map<Int_t, std::vector<Int_t> > dalitzEPMap; //< pi0Id, e+e-IDs[]>
-  std::map<Int_t, std::vector<Int_t> >::iterator dalitzEPMapIt;
+
 
   CbmMCTrack* mctMotherE = NULL; 
   CbmMCTrack* mctGraniE = NULL;  
+  CbmMCTrack* mctMotherP = NULL;
+  CbmMCTrack* mctGraniP = NULL;
+
   for (Int_t iECand = 0; iECand < nECand; iECand++) {
     //printf("%i (MID:%i ",iECand,fElectronCandidates[iECand].McMotherId);
     if (fElectronCandidates[iECand].McMotherId > -1) {
@@ -1609,8 +1647,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       }
     }
   }
-  CbmMCTrack* mctMotherP = NULL;
-  CbmMCTrack* mctGraniP = NULL;
+
   for (Int_t iPCand = 0; iPCand < nPCand; iPCand++) {
     if (fPositronCandidates[iPCand].McMotherId > -1){
       mctMotherP = (CbmMCTrack*) fMCTracks->At(fPositronCandidates[iPCand].McMotherId);
@@ -1646,7 +1683,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["EPPairFromPi0DetectionEfficiency"]->Fill(5);
   }
 
-  std::vector<CbmMCTrack *> gammaFromEPCandPairs;
+
   for (Int_t iECand = 0; iECand < nECand; iECand++) {
     for (Int_t iPCand = 0; iPCand < nPCand; iPCand++) {
  
@@ -1686,7 +1723,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Fill(invMass);
     }
   }
-  std::vector<CbmMCTrack *> gammaFromEPCandPairsOpeningAngle;
+
   for (Int_t iECand = 0; iECand < nECand; iECand++) {
     for (Int_t iPCand = 0; iPCand < nPCand; iPCand++) {
       invMass = CalcInvariantMass(fElectronCandidates[iECand],fPositronCandidates[iPCand]);
@@ -1728,42 +1765,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   printf("\n\n******************** Reading Test  **********************\n");
   printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
   printf("*********************************************************\n\n");
-  /*
-    if(gtrack1 != NULL)
-    delete gtrack1;
-    if(gtrack2 != NULL)
-    delete gtrack2;
-    if(etrack != NULL)
-    delete etrack;
-    if(ptrack != NULL)
-    delete ptrack;
-    if(mctrack != NULL)
-    delete mctrack;
-    if(track != NULL)
-    delete track;
-    if(mother != NULL)
-    delete mother;
-    if(grandmother != NULL)
-    delete grandmother;
-    if(daughter != NULL)
-    delete daughter;
-    if(mcpt != NULL)
-    delete mcpt;
-    if(digi != NULL)
-    delete digi;
-    if(cluster != NULL)
-    delete cluster;
-    if(hit != NULL)
-    delete hit;
-    if(track != NULL)
-    delete track;
-    if(gtrack != NULL)
-    delete gtrack;
-    if(pvertex != NULL)
-    delete pvertex;
-  */
+
   // DO:: clear all global data container
+
  
+ 
+  electronPositronPairs.clear();
+  gammaGammaPairs.clear(); 
 
   for (Int_t i = 0; i < fGammaFromPairs.size(); i++)
     delete fGammaFromPairs[i];
@@ -1811,10 +1819,19 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     notDalitzEPMapIt->second.clear();
   notDalitzEPMap.clear();
 
+  for (dalitzEPMapAllIt = dalitzEPMapAll.begin(); dalitzEPMapAllIt != dalitzEPMapAll.end(); dalitzEPMapAllIt++) 
+    dalitzEPMapAllIt->second.clear();
+  dalitzEPMapAll.clear();
+
+  for (notDalitzEPMapAllIt = notDalitzEPMapAll.begin(); notDalitzEPMapAllIt != notDalitzEPMapAll.end(); notDalitzEPMapAllIt++) 
+    notDalitzEPMapAllIt->second.clear();
+  notDalitzEPMapAll.clear();
+
   fGTCandidates.clear();
   fCandidates.clear();
   fElectronCandidates.clear();
   fPositronCandidates.clear();
+
   /*
     for (Int_t i = 0; i < gammaFromEPPairsInMagnetBackground.size(); i++)
     if (NULL != gammaFromEPPairsInMagnetBackground[i])
@@ -1831,15 +1848,72 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     delete gammaFromTrueEPPairs[i];
   */
 
-
-  //delete track;
-  //delete gtrack;
-  //delete etrack;
-  //delete ptrack;
-  //delete gtrack1;
-  //delete gtrack2;
-  //delete mctrack;
-  //delete mother;
+  /*
+    if(gtrack1 != NULL)
+    delete gtrack1;
+    if(gtrack2 != NULL)
+    delete gtrack2;
+    if(etrack != NULL)
+    delete etrack;
+    if(ptrack != NULL)
+    delete ptrack;
+    if(mctrack != NULL)
+    delete mctrack;
+    if(track != NULL)
+    delete track;
+    if(mother != NULL)
+    delete mother;
+    if(grandmother != NULL)
+    delete grandmother;
+    if(daughter != NULL)
+    delete daughter;
+    if(mcpt != NULL)
+    delete mcpt;
+    if(digi != NULL)
+    delete digi;
+    if(cluster != NULL)
+    delete cluster;
+    if(hit != NULL)
+    delete hit;
+    if(track != NULL)
+    delete track;
+    if(gtrack != NULL)
+    delete gtrack;
+    if(pvertex != NULL)
+    delete pvertex;
+  */
+  /*
+    if (mctrack)
+    delete mctrack;
+    if (grandmother)
+    delete grandmother;
+    if (mother)
+    delete mother;
+    if (daughter)
+    delete daughter;
+    if (etrack)
+    delete etrack;
+    if (ptrack)
+    delete ptrack;
+    if (gtrack1)
+    delete gtrack1;
+    if (gtrack2)
+    delete gtrack2;  
+    if (track)
+    delete track;
+    if (gtrack)
+    delete gtrack;
+    if (trdHit)
+    delete trdHit;
+    if (mctMotherE)
+    delete mctMotherE; 
+    if (mctGraniE)
+    delete mctGraniE;  
+    if (mctMotherP)
+    delete mctMotherP;
+    if (mctGraniP)
+    delete mctGraniP;
+  */
 }
 
     Bool_t CbmTrdPhotonAnalysis::IsElec( CbmRichRing * ring, Double_t momentum, CbmTrdTrack* trdTrack, CbmGlobalTrack * gTrack, ElectronCandidate* cand)
@@ -2235,6 +2309,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 
 void CbmTrdPhotonAnalysis::InitHistos()
 {
+  cout << endl << endl << endl << endl << "CbmTrdPhotonAnalysis::InitHistos" << endl << endl << endl << endl;
   fHistoMap["MC_EventCounter"] = new TH1I("MC_EventCounter","MC_EventCounter",1,-0.5,0.5);
   NiceHisto1(fHistoMap["MC_EventCounter"],1,0,0,"","number of events");
   TString particleID[49] = {
@@ -3339,8 +3414,7 @@ void CbmTrdPhotonAnalysis::FinishTask()
   c->SaveAs("pics/Photon/PhD/KF_PID_MC_PID.pdf");
   c->SaveAs("pics/Photon/PhD/KF_PID_MC_PID.png");
 
-
-
+  delete leg;
   c->Close();
 }
 

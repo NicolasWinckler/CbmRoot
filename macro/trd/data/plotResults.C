@@ -2,6 +2,7 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TTree.h"
 #include "TKey.h"
 #include "Riostream.h"
@@ -9,7 +10,10 @@
 #include "TDirectory.h"
 #include "TCanvas.h"
 #include "TLegend.h"
-
+#include "Riostream.h"
+#include "TRint.h"
+#include "TROOT.h"
+#include "TStyle.h"
 #include <map>
 
 TFile *Target;
@@ -20,6 +24,13 @@ std::map<TString, TH1*>::iterator fHistoMapIt;
 void FindHistos(TDirectory *target);
 
 void plotResults(){
+  gROOT->Reset(); 
+  gStyle->SetPalette(1,0);
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadTickX(1);                        
+  gStyle->SetPadTickY(1);  
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetOptTitle(kFALSE);
   Target = TFile::Open("result.root", "READ");
   FindHistos(Target);
   TCanvas *c = new TCanvas("c","c",800,600);
@@ -302,6 +313,9 @@ void FindHistos(TDirectory *target) {
     TObject *obj = key->ReadObj();
     if ( obj->IsA()->InheritsFrom( TH1::Class() ) ) {
       fHistoMap[TString(obj->GetName())] = (TH1*)obj;
+      if ( obj->IsA()->InheritsFrom( TH2::Class() ) ) {
+	fHistoMap[TString(obj->GetName())]->SetContour(99);
+      }
     } else if ( obj->IsA()->InheritsFrom( TDirectory::Class() ) ) {
       cout << "Found subdirectory " << obj->GetName() << endl;
       target->cd(obj->GetName());

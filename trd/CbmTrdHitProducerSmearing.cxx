@@ -332,10 +332,11 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	zHitErr = 0.0;
 	//printf("DEBUG:: %i times out of chamber\n",randomCounter);
       } while ((xHit > moduleXmax || xHit < moduleXmin) && randomCounter < 10);
-      if (xHit > moduleXmax || xHit < moduleXmin) {
+      if (xHit > moduleXmax || xHit < moduleXmin) { // if the smeared position is not within chamber volume after 10 tries, use original MC-position
 	xHitErr = 0.0;
 	xHit = pos.X();
       }
+      randomCounter = 0;
       do {   
 	randomCounter++;
 	Float_t errY = gRandom->Gaus(0,fDy);
@@ -353,7 +354,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	zHitErr = 0.0;
 	//printf("DEBUG:: %i times out of chamber\n",randomCounter);
       } while ((yHit > moduleYmax || yHit < moduleYmin) && randomCounter < 10); // avoid to shift the hit position out of the module in x and y
-      if (yHit > moduleYmax || yHit < moduleYmin){
+      if (yHit > moduleYmax || yHit < moduleYmin){ // if the smeared position is not within chamber volume after 10 tries, use original MC-position
 	yHitErr = 0.0;
 	yHit =  pos.Y();
       }

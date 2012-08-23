@@ -191,14 +191,17 @@ CbmTrdQa::~CbmTrdQa()
        fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
     delete fLayerMapIt->second;
   } 
+  fLayerMap.clear();
   for (fLayerPointMapIt = fLayerPointMap.begin();
        fLayerPointMapIt != fLayerPointMap.end(); ++fLayerPointMapIt) {
     delete fLayerPointMapIt->second;
   } 
+  fLayerPointMap.clear();
   for (fLayerHitMapIt = fLayerHitMap.begin();
        fLayerHitMapIt != fLayerHitMap.end(); ++fLayerHitMapIt) {
     delete fLayerHitMapIt->second;
   } 
+  fLayerHitMap.clear();
   for (fModulePointMapIt = fModulePointMap.begin();
        fModulePointMapIt != fModulePointMap.end(); ++fModulePointMapIt) {
     fModulePointMapIt->second.clear();
@@ -438,7 +441,7 @@ InitStatus CbmTrdQa::Init()
   fHitToPointEfficiencyVsAlpha->SetMarkerStyle(24);
   fHitToPointEfficiencyVsAlpha->SetMarkerColor(1);
   fHitToPointEfficiencyVsAlpha->SetLineColor(1);
-  fPositionResolutionShort = new TH1I("fPositionResolutionShort", "fPositionResolutionShort", 2000, -1, 1);
+  fPositionResolutionShort = new TH1I("fPositionResolutionShort", "fPositionResolutionShort", 20000, -10, 10);
   fPositionResolutionShort->SetXTitle("position deviation along short pad side [cm]");
   fPositionResolutionShort->SetYTitle("#");
   fPositionResolutionLong = new TH1I("fPositionResolutionLong", "fPositionResolutionLong", 20000, -10, 10);
@@ -737,6 +740,10 @@ void CbmTrdQa::Exec(Option_t * option)
 }
 void CbmTrdQa::SaveHistos()
 {
+  gDirectory->pwd();
+  if (!gDirectory->Cd("TrdQa")) 
+    gDirectory->mkdir("TrdQa");
+  gDirectory->Cd("TrdQa");
   TCanvas *c = new TCanvas("c","c",800,600);
   c->cd();
   TLegend *l = new TLegend(0.65,0.65,0.85,0.85);
@@ -809,6 +816,7 @@ void CbmTrdQa::SaveHistos()
   fPRF_1D->Write("", TObject::kOverwrite);
   fPRF_2D->Write("", TObject::kOverwrite);
   delete l;
+gDirectory->Cd("..");
 }
 void CbmTrdQa::FinishEvent()
 { 
@@ -897,6 +905,11 @@ void CbmTrdQa::CreateLayerView()
     fLayerHitMapIt->second;
     } 
   */
+  gDirectory->pwd();
+  if (!gDirectory->Cd("TrdQa")) 
+    gDirectory->mkdir("TrdQa");
+  gDirectory->Cd("TrdQa");
+
   TString title;
   printf("fModuleGhostMap: %i\n",(Int_t)fModuleGhostMap.size());
   for (fModuleGhostMapIt = fModuleGhostMap.begin();
@@ -1066,7 +1079,7 @@ void CbmTrdQa::CreateLayerView()
     fModuleEfficiencyMapIt->second->Write("", TObject::kOverwrite);
   }
   gDirectory->Cd("..");
-
+  gDirectory->Cd("..");
 
 }
 void CbmTrdQa::NormalizeHistos()

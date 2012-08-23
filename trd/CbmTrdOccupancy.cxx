@@ -43,6 +43,23 @@ CbmTrdOccupancy::CbmTrdOccupancy()
     fNeigbourReadout(true),
     fGeo()
 {
+ fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
+  fLayerDummy->SetXTitle("x-coordinate [cm]");
+  fLayerDummy->SetYTitle("y-coordinate [cm]");
+  fLayerDummy->GetXaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetYaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetZaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleOffset(1.5);
+  fLayerDummy->GetYaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetYaxis()->SetTitleOffset(2);
+  fLayerDummy->GetZaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
+  for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
+       fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
+    //delete fModuleOccupancyMapIt->second;
+  } 
 }
 /*
 CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char *geo)
@@ -81,6 +98,23 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char
     fNeigbourReadout(true),
     fGeo(geo)
 {
+ fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
+  fLayerDummy->SetXTitle("x-coordinate [cm]");
+  fLayerDummy->SetYTitle("y-coordinate [cm]");
+  fLayerDummy->GetXaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetYaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetZaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleOffset(1.5);
+  fLayerDummy->GetYaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetYaxis()->SetTitleOffset(2);
+  fLayerDummy->GetZaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
+  for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
+       fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
+    //delete fModuleOccupancyMapIt->second;
+  } 
 }
 
 CbmTrdOccupancy::~CbmTrdOccupancy()
@@ -100,18 +134,22 @@ CbmTrdOccupancy::~CbmTrdOccupancy()
        fModuleMapIt != fModuleMap.end(); ++fModuleMapIt) {
     delete fModuleMapIt->second;
   } 
+  fModuleMap.clear();
   for (fLayerOccupancyMapIt = fLayerOccupancyMap.begin();
        fLayerOccupancyMapIt != fLayerOccupancyMap.end(); ++fLayerOccupancyMapIt) {
     delete fLayerOccupancyMapIt->second;
   }
+  fLayerOccupancyMap.clear();
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     delete fModuleOccupancyMapIt->second;
   } 
+  fModuleOccupancyMap.clear();
   for (fModuleOccupancyMemoryMapIt = fModuleOccupancyMemoryMap.begin();
        fModuleOccupancyMemoryMapIt != fModuleOccupancyMemoryMap.end(); ++fModuleOccupancyMemoryMapIt) {
     delete fModuleOccupancyMemoryMapIt->second;
   }
+  fModuleOccupancyMemoryMap.clear();
   delete fDigiChargeSpectrum;
   delete fLayerDummy;
 }
@@ -131,14 +169,7 @@ InitStatus CbmTrdOccupancy::ReInit()
   FairRunAna* ana = FairRunAna::Instance();
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();  
   fDigiPar = (CbmTrdDigiPar*)(rtdb->getContainer("CbmTrdDigiPar")); 
-  fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
-  fLayerDummy->SetXTitle("x-coordinate [cm]");
-  fLayerDummy->SetYTitle("y-coordinate [cm]");
-  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
-  for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
-       fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
-    //delete fModuleOccupancyMapIt->second;
-  } 
+ 
   return kSUCCESS;
 }
 // --------------------------------------------------------------------
@@ -155,24 +186,6 @@ InitStatus CbmTrdOccupancy::Init()
     return kERROR;
   }
   fGeoHandler->Init();
-  fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
-  fLayerDummy->SetXTitle("x-coordinate [cm]");
-  fLayerDummy->SetYTitle("y-coordinate [cm]");
-  fLayerDummy->GetXaxis()->SetLabelSize(0.02);
-  fLayerDummy->GetYaxis()->SetLabelSize(0.02);
-  fLayerDummy->GetZaxis()->SetLabelSize(0.02);
-  fLayerDummy->GetXaxis()->SetTitleSize(0.02);
-  fLayerDummy->GetXaxis()->SetTitleOffset(1.5);
-  fLayerDummy->GetYaxis()->SetTitleSize(0.02);
-  fLayerDummy->GetYaxis()->SetTitleOffset(2);
-  fLayerDummy->GetZaxis()->SetTitleSize(0.02);
-  fLayerDummy->GetZaxis()->SetTitleOffset(-2);
-
-  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
-  for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
-       fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
-    //delete fModuleOccupancyMapIt->second;
-  } 
   return kSUCCESS;
 
 }
@@ -285,7 +298,8 @@ void CbmTrdOccupancy::Exec(Option_t * option)
 	  // ---- FinishTask-----------------------------------------------------
 void CbmTrdOccupancy::FinishEvent()
 {
-  fDigis->Delete();
+  if (fDigis)
+    fDigis->Delete();
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     fModuleOccupancyMapIt->second->Reset();
@@ -441,6 +455,9 @@ void CbmTrdOccupancy::SaveHistos2File()
     outFile->cd();
   */
   gDirectory->pwd();
+  if (!gDirectory->Cd("TrdOccupancy")) 
+    gDirectory->mkdir("TrdOccupancy");
+  gDirectory->Cd("TrdOccupancy");
   
   fDigiChargeSpectrum->Write("", TObject::kOverwrite);
   /*
@@ -468,6 +485,7 @@ void CbmTrdOccupancy::SaveHistos2File()
        fModuleOccupancyMemoryMapIt != fModuleOccupancyMemoryMap.end(); ++fModuleOccupancyMemoryMapIt) {
     fModuleOccupancyMemoryMapIt->second->Write("", TObject::kOverwrite);
   }
+  gDirectory->Cd("..");
   gDirectory->Cd("..");
   //outFile->Close();
 }

@@ -219,6 +219,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
   Int_t ghostCounter = 0;
   Int_t lostCoungter = 0;
   Int_t outputCounter = 0;
+  Int_t notMovedCounter = 0;
   
   printf("   Ghost rate per hit:                     %.3f\n",fGhostRate);
   printf("   min. distance between hits:             %.3f cm\n",fMinDist);
@@ -359,6 +360,8 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	yHit =  pos.Y();
       }
       if (debug) if (randomCounter > 1) printf("DEBUG:: %i times out of chamber\n",randomCounter);
+      if (xHit ==  pos.X() || yHit == pos.Y())
+	notMovedCounter++;
 
       TVector3 posHit(xHit, yHit, zHit);
       TVector3 posHitErr(xHitErr,yHitErr, zHitErr);
@@ -424,7 +427,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
     
     }
   }
-  printf("\n   %7i (%5.1f%%) input points\n   %7i (%5.1f%%) lost points\n   %7i (%5.1f%%) ghost hits\n   %7i (%5.1f%%) output hits\n",nentries,nentries*100./nentries,lostCoungter,lostCoungter*100./nentries,ghostCounter,ghostCounter*100./nentries,outputCounter,outputCounter*100./nentries);
+  printf("\n   %7i (%5.1f%%) input points\n   %7i (%5.1f%%) lost points\n   %7i (%5.1f%%) ghost hits\n   %7i (%5.1f%%) output hits\n   %7i (%5.1f%%) not moved hits\n",nentries,nentries*100./nentries,lostCoungter,lostCoungter*100./nentries,ghostCounter,ghostCounter*100./nentries,outputCounter,outputCounter*100./nentries,notMovedCounter,notMovedCounter*100./nentries);
   for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
     for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
       delete (*fModuleHitBufferMapIt).second[i];

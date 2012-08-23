@@ -21,6 +21,7 @@
 void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
 {
   if (nEvents > 500) nEvents = 500;
+  Bool_t trdSmearing(1), trdClustering(0), qa(0);
   // ========================================================================
   // geometry selection for sim + reco  by Cyrano                            
   // ========================================================================
@@ -41,7 +42,13 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   gStyle->SetPadTickY(1);  
   gStyle->SetOptStat(kFALSE);
   gStyle->SetOptTitle(kFALSE);
-
+  TString trdOption;
+  if (trdSmearing) 
+    trdOption = "smearing";
+  else if (trdClustering) 
+    trdOption = "cluster";
+  else
+    trdOption = "no_trd";
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
 
@@ -72,7 +79,7 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   TString statistic;
   statistic.Form(".%03ievents",nEvents);
   TString outFile;// = "data/test.pa." + digipar + statistic + ".root";
-  outFile.Form("data/test.pa.%s.%04i.%03ievents.root",digipar.Data(),urqmd,nEvents);
+  outFile.Form("data/test.pa.%s.%s.%04i.%03ievents.root",digipar.Data(),trdOption.Data(),urqmd,nEvents);
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -275,42 +282,37 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
 
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
 						trdDFoils, trdDGap);
+  if (trdSmearing) {
+    // -----   TRD hit producer   ----------------------------------------------
+    Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+    // Resolutions in y - station and angle dependent [mum]
+    Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+    Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+    Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
   
-  // -----   TRD hit producer   ----------------------------------------------
-  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-  // Resolutions in y - station and angle dependent [mum]
-  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+    CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 
-  CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+    trdHitProd->SetSigmaX(trdSigmaX);
+    trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
 
-  trdHitProd->SetSigmaX(trdSigmaX);
-  trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-
-  run->AddTask(trdHitProd);
-    
+    run->AddTask(trdHitProd);
+  } else if (trdClustering) {
+    // -----   TRD clusterizer     ----------------------------------------------
+  
+    CbmTrdClusterizerFast* trdCluster = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator,false,true);
+    run->AddTask(trdCluster);
+    printf("Init ClusterfinderFast\n");
+      
+    //printf("HIER KOMMT DER CLUSTERFINDERFAST\n");
+    CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast(true, true, false, 5.0e-7);
+    run->AddTask(trdClusterfindingfast);
+    printf("Finished ClusterfinderFast\n");
+  
+    CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
+    run->AddTask(trdClusterHitProducer);
+    printf("Finished Hit Producer\n");
+  }
   /*
-  // -----   TRD clusterizer     ----------------------------------------------
-  
-  CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
-  run->AddTask(trdClustering);
-  printf("Init ClusterfinderFast\n");
-    
-  CbmTrdClusterFinder* trdClusterfinding = new CbmTrdClusterFinder();
-  run->AddTask(trdClusterfinding);
-  printf("Finished Clusterfinder\n");
-    
-  
-  //printf("HIER KOMMT DER CLUSTERFINDERFAST\n");
-  CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
-  run->AddTask(trdClusterfindingfast);
-  printf("Finished ClusterfinderFast\n");
-  
-  CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
-  run->AddTask(trdClusterHitProducer);
-  printf("Finished Hit Producer\n");
-  
   // -------------------------------------------------------------------------
   */
   /*
@@ -627,8 +629,15 @@ void run_reco_pi0(Int_t nEvents = 1, Int_t urqmd = 0)
   */
 
   //
+  if (qa) {
+    CbmTrdOccupancy* trdOccupancy = new CbmTrdOccupancy("TRD Occupancy", "TRD task", digipar, 5.0e-7);
+    run->AddTask(trdOccupancy);
+    CbmTrdQa* trdQa = new CbmTrdQa("TRD QA", "TRD task", digipar, 5.0e-7);
+    run->AddTask(trdQa);
+  }
   CbmTrdPhotonAnalysis *trdphot = new CbmTrdPhotonAnalysis("PhotonAnalysis","PhotonAnalysis",iVerbose);
   run->AddTask(trdphot);
+
 
   // -----  Parameter database   --------------------------------------------
   /*

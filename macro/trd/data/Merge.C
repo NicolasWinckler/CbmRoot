@@ -46,7 +46,7 @@ void Merge() {
   TString filename;
   FileList = new TList();
   for (Int_t iurqmd = 0; iurqmd < 200; iurqmd++){
-    filename.Form("test.pa.trd_v12f.%04i.001events.root",iurqmd);
+    filename.Form("test.pa.trd_v12f.smearing.%04i.001events.root",iurqmd);
     TFile test = TFile(filename,"READ");
     if (test.IsOpen())
       FileList->Add( TFile::Open(filename) );

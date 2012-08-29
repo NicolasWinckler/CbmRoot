@@ -66,6 +66,11 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 // 			SetLinks(FairMultiLinkedData(kStsPoint, index));
 // 		}
 
+
+  /**   Maximal number of ADC bits   **/
+  static Int_t GetNofAdcBits() { return fgkCharBits; }
+
+
   /**   Station number   **/
   Int_t GetStationNr() const { return StationNr(GetDetectorId()); }
 
@@ -83,6 +88,10 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 
   /**   Charge   **/
   Int_t GetAdc() const { return ( (fData >> fgkCharShift) & fgkCharMask ); }
+
+
+  /**   Maximum ADC   **/
+  static Int_t GetMaxAdc() { return ( (1 << fgkCharBits) - 1 ); }
 
 
   /**   Time   **/
@@ -116,6 +125,7 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
   static const Long64_t fgkAddrMask;
   static const Long64_t fgkCharMask;
   static const Long64_t fgkTimeMask;
+
 
 
 

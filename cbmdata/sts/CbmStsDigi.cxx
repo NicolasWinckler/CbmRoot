@@ -7,6 +7,8 @@
 
 #include "CbmStsDigi.h"
 
+#include "FairLogger.h"
+
 
 // -----   Bit fields for charge and time stamp   --------------------------
 const Int_t CbmStsDigi::fgkCharBits = 12;   // in data0
@@ -32,6 +34,8 @@ const Long64_t CbmStsDigi::fgkAddrMask = (1 << CbmStsDigi::fgkAddrBits) - 1;
 const Long64_t CbmStsDigi::fgkCharMask = (1 << CbmStsDigi::fgkCharBits) - 1;
 const Long64_t CbmStsDigi::fgkTimeMask = (1 << CbmStsDigi::fgkTimeBits) - 1;
 // -------------------------------------------------------------------------
+
+
 
 
 
@@ -68,6 +72,14 @@ CbmStsDigi::CbmStsDigi(Int_t station, Int_t sector, Int_t side,
     fData(0) 
 {
 //   AddIndex(index,adc);
+
+  // Check for ADC range
+  if ( adc > GetMaxAdc() ) {
+    FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
+        "ADC %i exceeds ADC range %i", adc, GetMaxAdc());
+    return;
+  }
+
   fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )
     | ( (adc  & fgkCharMask) << fgkCharShift )
     | ( (time & fgkTimeMask) << fgkTimeShift ) ; 
@@ -99,6 +111,13 @@ void CbmStsDigi::SetAdc(Int_t adc) {
 
   // First set old charge to zero
   fData = fData & ~(fgkCharMask << fgkCharShift);
+
+  // Check for ADC range
+  if ( adc > GetMaxAdc() ) {
+    FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
+        "ADC %i exceeds ADC range %i", adc, GetMaxAdc());
+    return;
+  }
 
   // Now set new charge
   fData = fData | ( (adc & fgkCharMask) << fgkCharShift );

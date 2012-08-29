@@ -68,20 +68,19 @@ CbmStsDigitize::CbmStsDigitize()
   fNMulti(0),
   fNEvents(0),
   fNPoints(0),
-  fNOutside(0),
   fNDigisFront(0),
   fNDigisBack(0),
   fStep(0.001),
   fEnergyLossToSignal(0.),
-  fFThreshold(8.0),
-  fBThreshold(8.0),
+  fFThreshold(4.0),
+  fBThreshold(4.0),
   fFNoiseWidth(0.1),
   fBNoiseWidth(0.1),
   fStripDeadTime(10),
-  fFNofBits(20),
-  fBNofBits(20),
-  fFMinStep(0.01),
-  fBMinStep(0.01),
+  fFNofBits(12),
+  fBNofBits(12),
+  fFNofElPerAdc(10.),
+  fBNofElPerAdc(10.),
   fFNofSteps(0),
   fBNofSteps(0),
   fStripSignalF(NULL),
@@ -111,20 +110,19 @@ CbmStsDigitize::CbmStsDigitize(Int_t iVerbose)
   fNMulti(0),
   fNEvents(0),
   fNPoints(0),
-  fNOutside(0),
   fNDigisFront(0),
   fNDigisBack(0),
   fStep(0.001),
   fEnergyLossToSignal(0.),
-  fFThreshold(8.0),
-  fBThreshold(8.0),
+  fFThreshold(4.0),
+  fBThreshold(4.0),
   fFNoiseWidth(0.1),
   fBNoiseWidth(0.1),
   fStripDeadTime(10),
-  fFNofBits(20),
-  fBNofBits(20),
-  fFMinStep(0.01),
-  fBMinStep(0.01),
+  fFNofBits(12),
+  fBNofBits(12),
+  fFNofElPerAdc(10.),
+  fBNofElPerAdc(10.),
   fFNofSteps(0),
   fBNofSteps(0),
   fStripSignalF(NULL),
@@ -154,20 +152,19 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
   fNMulti(0),
   fNEvents(0),
   fNPoints(0),
-  fNOutside(0),
   fNDigisFront(0),
   fNDigisBack(0),
   fStep(0.001),
   fEnergyLossToSignal(0.),
-  fFThreshold(8.0),
-  fBThreshold(8.0),
+  fFThreshold(4.0),
+  fBThreshold(4.0),
   fFNoiseWidth(0.1),
   fBNoiseWidth(0.1),
   fStripDeadTime(10),
-  fFNofBits(20),
-  fBNofBits(20),
-  fFMinStep(0.01),
-  fBMinStep(0.01),
+  fFNofBits(12),
+  fBNofBits(12),
+  fFNofElPerAdc(10.),
+  fBNofElPerAdc(10.),
   fFNofSteps(0),
   fBNofSteps(0),
   fStripSignalF(NULL),
@@ -189,15 +186,15 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
 
   fStep = 0.001;
 
-  fFThreshold  = 8.0;
-  fBThreshold  = 8.0;
+  fFThreshold  = 4.0;
+  fBThreshold  = 4.0;
   fFNoiseWidth = 0.1;
   fBNoiseWidth = 0.1;
 
-  fFNofBits    = 20;
-  fBNofBits    = 20;
-  fFMinStep    = 0.01;
-  fBMinStep    = 0.01;
+  fFNofBits    = 12;
+  fBNofBits    = 12;
+  fFNofElPerAdc    = 10.;
+  fBNofElPerAdc    = 10.;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }
@@ -223,23 +220,18 @@ CbmStsDigitize::~CbmStsDigitize() {
 // -----   Public method Exec   --------------------------------------------
 void CbmStsDigitize::Exec(Option_t* opt) {
 
-//   cout << "threshold = " << fFThreshold << endl;
-
   // Reset all eventwise counters
   fTimer.Start();
   Reset();
-   TF1* digiGausDist = new TF1("digiGausDist","gaus",-5.,5.);
-
   // Verbose screen output
   if ( fVerbose > 2 ) {
     cout << endl << "-I- " << fName << ": executing event" << endl; 
     cout << "----------------------------------------------" << endl;
   }
 
-  Double_t nPoints  = 0.;
-  Double_t nOutside = 0.;
-  Double_t nDigisF  = 0.;
-  Double_t nDigisB  = 0.;
+  Int_t nPoints  = 0;
+  Int_t nDigisF  = 0;
+  Int_t nDigisB  = 0;
 
   // Loop over all StsPoints
   if ( ! fPoints ) {
@@ -248,7 +240,24 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     cout << "- " << fName << endl;
     return;
   }
-
+  if (fFNofBits>CbmStsDigi::GetNofAdcBits()||fBNofBits>CbmStsDigi::GetNofAdcBits()) {
+    cerr << "-W- " << fName << "::Exec: Number of AdcBits("<<fFNofBits<<") during digitization exceeds ADC range("<<CbmStsDigi::GetNofAdcBits()<<") defined in data class "
+	 << endl;
+    cout << "- " << fName << endl;
+    return;
+  }
+  if (fFNofBits<=CbmStsDigi::GetNofAdcBits()&& fFNofElPerAdc!=10*TMath::Power(2,(12-fFNofBits))) {
+    cerr << "-W- " << fName << "::Exec: Number of electrons per AdcChannel does not match Adc range "
+	 << endl;
+    cout << "- " << fName << endl;
+    return;
+  }
+  if (fBNofBits<=CbmStsDigi::GetNofAdcBits()&& fBNofElPerAdc!=10*TMath::Power(2,(12-fFNofBits))) {
+    cerr << "-W- " << fName << "::Exec: Number of electrons per AdcChannel does not match Adc range "
+	 << endl;
+    cout << "- " << fName << endl;
+    return;
+  }
   map<CbmStsSensor*, set<Int_t> >::iterator mapIt;
   for (mapIt=fPointMap.begin(); mapIt!=fPointMap.end(); mapIt++)
     ((*mapIt).second).clear();
@@ -269,7 +278,8 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	   << " not found in digi scheme!" << endl;
       continue;
     }
-    fPointMap[sensor].insert(iPoint);     
+    fPointMap[sensor].insert(iPoint); 
+    nPoints++;
   }
   
   for (Int_t iStation=fDigiScheme->GetNStations(); iStation > 0 ; ) {
@@ -288,6 +298,8 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       // should be more sophisticated...
       // the question is: sectorwise or sensorwise???
       Int_t nChannels = sector->GetNChannelsFront();
+      
+      //-----aplying noise on every channel-----
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
 // 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
 // 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
@@ -308,32 +320,24 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       Int_t sectorDetId = sector->GetDetectorId();
       
       for ( Int_t ifstr = 0 ; ifstr < nChannels ; ifstr++ ) {
-	if ( fStripSignalF[ifstr] < fFThreshold ) continue;
+	if ( fStripSignalF[ifstr] < (fFThreshold*1000.) ) continue;//threshold cut
         
+        //-----random strip inefficiency-----
 	Double_t generator;
-	generator = gRandom->Rndm()*100.;	
-// 	cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
-// 	     << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;        
-// 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ifstr/125])
-// 	{
-// 	cout << "OCCUPANCYF [" << iStation+1 << "][" << iSector+1 << "][" << ifstr/125 << "] "<< fStripDeadTime*occupancy [iStation][iSector][ifstr/125] << "%" << " generator = "<<generator<< endl;
-// 	}
-// 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ifstr/125]) ifstr = ifstr+2;
+	generator = gRandom->Rndm()*100.;
 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ifstr/125]) continue;
+	//-----------------------------------
 	
-	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr]-fFThreshold)/fFMinStep);
+	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr])/fFNofElPerAdc);
 	if ( digiFSignal >= fFNofSteps ) digiFSignal = fFNofSteps-1;
 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
 						  0, ifstr, 
 						  digiFSignal, 0);
-	//						  fStripSignalF[ifstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fFChannelPointsMap[ifstr];
 	Int_t pnt;
 	CbmStsDigiMatch* match;
 	if ( chPnt.size() == 0 ) {
-// 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
-// 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
 	  new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(-666);
 	}
 	else {
@@ -348,33 +352,28 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	  }
 	}
 	fNDigis++;
+	nDigisF++;
       }
       
       for ( Int_t ibstr = 0 ; ibstr < nChannels ; ibstr++ ) {
-	if ( fStripSignalB[ibstr] < fBThreshold ) continue;
-
+	if ( fStripSignalB[ibstr] < (fBThreshold*1000.) ) continue; //threshold cut
+	
+	//-----random strip inefficiency-----
 	Double_t generator;
 	generator = gRandom->Rndm()*100.;
-// 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ibstr/125])
-// 	{
-// 	cout << "OCCUPANCYB [" << iStation+1 << "][" << iSector+1 << "][" << ibstr/125 << "] "<< fStripDeadTime*occupancy [iStation][iSector][ibstr/125] << "%  generator = "<<generator<< endl;
-// 	}
-// 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ibstr/125]) ibstr = ibstr+2;
 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ibstr/125]) continue;
-
-	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr]-fBThreshold)/fBMinStep);
+	//-----------------------------------
+	
+	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr])/fBNofElPerAdc);
 	if ( digiBSignal >= fBNofSteps ) digiBSignal = fBNofSteps-1;
 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
 						  1, ibstr, 
 						  digiBSignal, 0);
-	//						  fStripSignalB[ibstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fBChannelPointsMap[ibstr];
 	Int_t pnt;
 	CbmStsDigiMatch* match;
 	if ( chPnt.size() == 0 ) {
-// 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
-// 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
 	  new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(-666);
 	}
 	else {
@@ -389,6 +388,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	  }
 	}
 	fNDigis++;
+	nDigisB++;
       }
     }
   }
@@ -401,7 +401,6 @@ void CbmStsDigitize::Exec(Option_t* opt) {
   
   fNEvents     += 1.;
   fNPoints     += Double_t(nPoints);
-  fNOutside    += Double_t(nOutside);
   fNDigisFront += Double_t(nDigisF);
   fNDigisBack  += Double_t(nDigisB);
   fTime        += fTimer.RealTime();
@@ -445,17 +444,14 @@ void CbmStsDigitize::ProduceHitResponse(CbmStsSensor* sensor) {
     zvec = zvec/((Double_t)nofSteps);  
 
     for ( Int_t istep = 0 ; istep <= nofSteps ; istep++ ) {
-      //      Float_t iFChan = sensor->GetChannelPlus(xin, yin, 0);
+
       Int_t   iIChan = sensor->GetFrontChannel(xin,yin,zin);
-	//(Int_t)iFChan;
       
       if ( iIChan != -1 ) {
 	fStripSignalF[iIChan] += stepEL;
 	fFChannelPointsMap[iIChan].insert(iPoint);
       }
 
-      //      iFChan = sensor->GetChannelPlus(xin, yin, 1);
-      //      iIChan = (Int_t)iFChan;
       iIChan = sensor->GetBackChannel (xin,yin,zin);
       
       if ( iIChan != -1 ) {
@@ -467,65 +463,9 @@ void CbmStsDigitize::ProduceHitResponse(CbmStsSensor* sensor) {
       yin+=yvec;
       zin+=zvec;
     }
-    
   }
 
 }
-// -------------------------------------------------------------------------
-
-// -----   Private method FindFiredStrips   --------------------------------
-void CbmStsDigitize::FindFiredStrips(CbmStsPoint* pnt,Int_t& nofStr,Int_t*& strips,Double_t*& signals, Int_t side) {
-
-  nofStr = 0;
-
-  Double_t xin = pnt->GetXIn();
-  Double_t yin = pnt->GetYIn();
-  Double_t zin = pnt->GetZIn();
-
-  gGeoManager->FindNode(xin,yin,zin);
-  TGeoNode* curNode = gGeoManager->GetCurrentNode();
-  
-  CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
-
-  Double_t xvec = pnt->GetXOut()-xin;
-  Double_t yvec = pnt->GetYOut()-yin;
-  Double_t zvec = pnt->GetZOut()-zin;
-
-  Int_t nofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
-
-  Double_t stepEL = fEnergyLossToSignal*pnt->GetEnergyLoss()/(nofSteps+1);
-
-  xvec = xvec/((Double_t)nofSteps);  
-  yvec = yvec/((Double_t)nofSteps);  
-  zvec = zvec/((Double_t)nofSteps);  
-
-  for ( Int_t istep = 0 ; istep <= nofSteps ; istep++ ) {
-    Float_t iFChan = sensor->GetChannelPlus(xin, yin, side);
-    Int_t   iIChan = (Int_t)iFChan;
-
-    xin+=xvec;
-    yin+=yvec;
-    zin+=zvec;
-
-    if ( iIChan == -1 ) continue;
-
-    for ( Int_t ifstr = 0 ; ifstr < nofStr ; ifstr++ ) {
-      if ( strips[ifstr] == iIChan ) {
-	signals[ifstr] += stepEL;
-	iIChan = -1;
-	break;
-      }
-    }
-    if ( iIChan == -1 ) continue;
-
-    strips [nofStr] = iIChan;
-    signals[nofStr] = stepEL;
-
-    nofStr++;
-
-  }
-}
-// -------------------------------------------------------------------------
  
 // -----   Private method SetParContainers   -------------------------------
 void CbmStsDigitize::SetParContainers() {
@@ -572,7 +512,7 @@ InitStatus CbmStsDigitize::Init() {
   fStripSignalF = new Double_t[2000];
   fStripSignalB = new Double_t[2000];
 
-  fEnergyLossToSignal    = 280000.;
+  fEnergyLossToSignal    = 280000000.;
 
   fFNofSteps = (Int_t)TMath::Power(2,(Double_t)fFNofBits);
   fBNofSteps = (Int_t)TMath::Power(2,(Double_t)fBNofBits);
@@ -617,11 +557,13 @@ InitStatus CbmStsDigitize::ReInit() {
 
 
 // -----   Private method MakeSets   ---------------------------------------
-void CbmStsDigitize::MakeSets1() {
+void CbmStsDigitize::MakeSets() {
 
   fPointMap.clear();
   Int_t nStations = fDigiScheme->GetNStations();
+  
   Double_t fSectorWidth = 0.;
+  
   for (Int_t iStation=0; iStation<nStations; iStation++) {
     CbmStsStation* station = fDigiScheme->GetStation(iStation);
     Int_t nSectors = station->GetNSectors();
@@ -663,7 +605,7 @@ void CbmStsDigitize::MakeSets1() {
   }
 }
 // -------------------------------------------------------------------------
-void CbmStsDigitize::MakeSets() {
+void CbmStsDigitize::MakeSets1() { //with occupancy file - default not used
 
 
   fPointMap.clear();
@@ -675,11 +617,7 @@ void CbmStsDigitize::MakeSets() {
   qaFileName = "occup.sts.reco.root";
   cout << "Occupancy read from file: \"" << qaFileName.Data() << "\"" << endl;
   TFile* occuF = TFile::Open(qaFileName.Data());  
-  if ( !occuF ) {
-    cout << "sorry, no file" << endl; 
-    MakeSets1();
-    return; 
-  }
+
   TString directoryName = "STSFindHitsQA";
   
   Double_t fSectorWidth = 0.;
@@ -741,7 +679,7 @@ void CbmStsDigitize::MakeSets() {
 
 // -----   Private method Reset   ------------------------------------------
 void CbmStsDigitize::Reset() {
-  //  fNPoints = fNOutside = fNDigisFront = fNDigisBack = fTime = 0.;
+  //  fNPoints = fNDigisFront = fNDigisBack = fTime = 0.;
   fNDigis = fNMulti = 0;
   fFChannelPointsMap.clear();
   fBChannelPointsMap.clear();
@@ -768,17 +706,15 @@ void CbmStsDigitize::Finish() {
   cout << "===== StsPoints per event       : " 
        << setw(8) << setprecision(2) 
        << fNPoints / fNEvents << endl;
-  cout << "===== Outside hits per event    : " 
+  cout << "===== StsDigis per event        : " 
        << setw(8) << setprecision(2) 
-       << fNOutside / fNEvents << " = " 
-       << setw(6) << setprecision(2) 
-       << fNOutside / fNPoints * 100. << " %" << endl;
+       << (fNDigisFront+fNDigisBack) / fNEvents << endl;
   cout << "===== Front digis per point     : " 
        << setw(8) << setprecision(2) 
-       << fNDigisFront / (fNPoints-fNOutside) << endl;
+       << fNDigisFront / (fNPoints) << endl;
   cout << "===== Back digis per point      : " 
        << setw(8) << setprecision(2) 
-       << fNDigisBack / (fNPoints-fNOutside) << endl;
+       << fNDigisBack / (fNPoints) << endl;
   cout << "============================================================"
        << endl;
 	

@@ -118,8 +118,8 @@ void run_reco(Int_t nEvents = 2) {
   // -----   STS digitizer   -------------------------------------------------
   Double_t threshold  =  4;
   Double_t noiseWidth =  0.01;
-  Int_t    nofBits    = 20;
-  Double_t minStep    =  0.01,;
+  Int_t    nofBits    = 12;
+  Double_t electronsPerAdc    =  10;
   Double_t StripDeadTime = 0.1;
   CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
   stsDigitize->SetRealisticResponse();
@@ -129,8 +129,8 @@ void run_reco(Int_t nEvents = 2) {
   stsDigitize->SetBackNoiseWidth (noiseWidth);
   stsDigitize->SetFrontNofBits   (nofBits);
   stsDigitize->SetBackNofBits    (nofBits);
-  stsDigitize->SetFrontMinStep   (minStep);
-  stsDigitize->SetBackMinStep    (minStep);
+  stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
+  stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
   stsDigitize->SetStripDeadTime  (StripDeadTime);
   run->AddTask(stsDigitize);
   // -------------------------------------------------------------------------

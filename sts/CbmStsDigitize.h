@@ -76,8 +76,8 @@ class CbmStsDigitize : public FairTask
   
   void SetFrontNofBits   (Int_t     frontNB=0 ) {fFNofBits    =  frontNB;}
   void SetBackNofBits    (Int_t      backNB=0 ) {fBNofBits    =   backNB;}
-  void SetFrontMinStep   (Double_t  frontMS=0.) {fFMinStep    =  frontMS;}
-  void SetBackMinStep    (Double_t   backMS=0.) {fBMinStep    =   backMS;}
+  void SetFrontNofElPerAdc   (Double_t  frontMS=0.) {fFNofElPerAdc    =  frontMS;}
+  void SetBackNofElPerAdc    (Double_t   backMS=0.) {fBNofElPerAdc    =   backMS;}
   
   void SetStripDeadTime  (Double_t  StripDeadTime=0.) {fStripDeadTime =  StripDeadTime;}
 
@@ -97,7 +97,6 @@ class CbmStsDigitize : public FairTask
 
   Double_t          fNEvents;
   Double_t          fNPoints;     
-  Double_t          fNOutside;
   Double_t          fNDigisFront;
   Double_t          fNDigisBack;
   Double_t          fTime;
@@ -119,8 +118,8 @@ class CbmStsDigitize : public FairTask
   
   Int_t     fFNofBits;
   Int_t     fBNofBits;
-  Double_t  fFMinStep;
-  Double_t  fBMinStep;
+  Double_t  fFNofElPerAdc;
+  Double_t  fBNofElPerAdc;
   Int_t     fFNofSteps;
   Int_t     fBNofSteps;
 

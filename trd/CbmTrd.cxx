@@ -115,28 +115,29 @@ void CbmTrd::SetSpecialPhysicsCuts(){
       // Get the material properties for material with id+1
       // (of-by-one problem) from the Virtual Monte Carlo
       Int_t matIdVMC = mat+1;
-      char name[20];
-      Double_t a[1]={0.};
-      Double_t z[1]={0.};
-      Double_t dens[1]={0.};
-      Double_t radl[1]={0.};
-      Double_t absl[1]={0.};
-      Double_t *ubuf;
-      Int_t nbuf[1]={0};
-      gMC->Gfmate(matIdVMC,name, *a, *z, *dens, *radl, *absl, ubuf, *nbuf);
+
+      TString name;
+      Double_t a;
+      Double_t z;
+      Double_t dens;
+      Double_t radl;
+      Double_t inter;
+      TArrayD par;
+
+      gMC->GetMaterial(matIdVMC, name, a, z, dens, radl, inter, par);
 
       // Check if the material properties are the same for TGeoManager
       // and TVirtualMC. If not stop the execution of the simulation.
       // This is done to stop the program whenever the
       // of-by-one problem is fixed in the Virtual Monte Carlo
-      if ( ( TMath::Abs(mass - a[0]) > 0.0001 ) ||  
-	   ( TMath::Abs(charge - z[0]) ) > 0.0001 ) {
+      if ( ( TMath::Abs(mass - a) > 0.0001 ) ||  
+	   ( TMath::Abs(charge - z) ) > 0.0001 ) {
 	cout<<"**********************************"<<endl;
-        cout<<TMath::Abs(mass - a[0])<<" , "<<TMath::Abs(charge - z[0])<<endl;
+        cout<<TMath::Abs(mass - a)<<" , "<<TMath::Abs(charge - z)<<endl;
 	cout <<"Parameters from Geomanager:"<<endl;
 	trdgas->Print();
 	cout <<"Parameters from Virtual Montecarlo:"<<endl;
-	cout <<"Name "<<name<<" Aeff="<<a[0]<<" Zeff="<<z[0]<<endl;
+	cout <<"Name "<<name<<" Aeff="<<a<<" Zeff="<<z<<endl;
 	Fatal("SetSpecialPhysicsCuts","Material parameters different between TVirtualMC and TGeomanager");
       }
 

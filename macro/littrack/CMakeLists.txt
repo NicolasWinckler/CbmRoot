@@ -74,4 +74,4 @@ ADD_TEST(littrack_fieldapr "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/r
 SET_TESTS_PROPERTIES(littrack_fieldapr PROPERTIES TIMEOUT "3600")
 SET_TESTS_PROPERTIES(littrack_fieldapr PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
-EndIf($ENV{ctest_model} MATCHES Experimental)
+EndIf($ENV{ctest_model} MATCHES Experimental AND BUILD_LITTRACK_EXPERIMENTAL)

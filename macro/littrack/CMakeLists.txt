@@ -19,7 +19,7 @@ SET_TESTS_PROPERTIES(littrack_mvd_nodelta PROPERTIES TIMEOUT "1800")
 SET_TESTS_PROPERTIES(littrack_mvd_nodelta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
 # Additional nightly tests
-If($ENV{ctest_model} MATCHES Experimental)
+If($ENV{ctest_model} MATCHES Experimental AND BUILD_LITTRACK_EXPERIMENTAL)
 GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_reco.sh)
 
 ADD_TEST(littrack_electron_auau_25gev_centr "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_reco.sh" "littrack_global_reco_electron_auau_25gev_centr" "electron" "auau" "25gev" "centr")

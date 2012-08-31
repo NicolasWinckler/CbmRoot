@@ -116,12 +116,12 @@ void CbmTrd::SetSpecialPhysicsCuts(){
       // (of-by-one problem) from the Virtual Monte Carlo
       Int_t matIdVMC = mat+1;
 
-      TString name;
-      Double_t a;
-      Double_t z;
-      Double_t dens;
-      Double_t radl;
-      Double_t inter;
+      TString name="";
+      Double_t a=0.;
+      Double_t z=0.;
+      Double_t dens=0.;
+      Double_t radl=0.;
+      Double_t inter=0.;
       TArrayD par;
 
       gMC->GetMaterial(matIdVMC, name, a, z, dens, radl, inter, par);

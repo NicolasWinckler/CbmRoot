@@ -1293,7 +1293,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::map<Int_t, std::vector<Int_t> >::iterator notDalitzEPMapAllIt;
   std::map<Int_t, std::vector<Int_t> > dalitzEPMapAll; //< pi0Id, e+e-IDs[]>
   std::map<Int_t, std::vector<Int_t> >::iterator dalitzEPMapAllIt;
-   std::map<Int_t, std::vector<Int_t> > notDalitzEPMap;//< pi0Id, e+e-IDs[]>
+  std::map<Int_t, std::vector<Int_t> > notDalitzEPMap;//< pi0Id, e+e-IDs[]>
   std::map<Int_t, std::vector<Int_t> >::iterator notDalitzEPMapIt;
   std::map<Int_t, std::vector<Int_t> > dalitzEPMap; //< pi0Id, e+e-IDs[]>
   std::map<Int_t, std::vector<Int_t> >::iterator dalitzEPMapIt;
@@ -1362,7 +1362,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) / (cand.energy - cand.momentum.Z()));
 
     Double_t MCmoment = mcTrack1->GetP();
-    Int_t Pdg = TMath::Abs(mcTrack1->GetPdgCode());
+    Int_t pdg = TMath::Abs(mcTrack1->GetPdgCode());
     Int_t Pdg1 = mcTrack1->GetPdgCode();
     Int_t MotherId = mcTrack1->GetMotherId();
     Int_t motherPdg = 0;
@@ -1386,9 +1386,33 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["RICH_GT_radiusB_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
       fHistoMap["RICH_GT_radius_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
     }
+
+
+    if (fabs(pdg) == 11){
+    fHistoMap["RICH_GT_radiusA_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
+    fHistoMap["RICH_GT_radiusB_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
+    fHistoMap["RICH_GT_radius_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
+    }
+    if (fabs(pdg) == 13){
+    fHistoMap["RICH_GT_radiusA_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
+    fHistoMap["RICH_GT_radiusB_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
+    fHistoMap["RICH_GT_radius_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
+    }
+
+    if (fabs(pdg) == 211){
+    fHistoMap["RICH_GT_radiusA_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
+    fHistoMap["RICH_GT_radiusB_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
+    fHistoMap["RICH_GT_radius_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
+    }
+
+    if (fabs(pdg) == 2212){
+    fHistoMap["RICH_GT_radiusA_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
+    fHistoMap["RICH_GT_radiusB_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
+    fHistoMap["RICH_GT_radius_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),sqrt(richRing->GetAaxis() * richRing->GetAaxis() + richRing->GetBaxis() * richRing->GetBaxis()));
+    }
     // check RICH ring - STS track matches
     //	   if ( cand.stsMCTrackId == cand.richMCTrackId){
-    Int_t pdg = TMath::Abs( mcTrack1->GetPdgCode() );
+    //Int_t pdg = TMath::Abs( mcTrack1->GetPdgCode() );
     motherId = mcTrack1->GetMotherId();
     cand.McMotherId = motherId;
     if (pdg == 11 && motherId == -1) cand.isMcSignalElectron = true;
@@ -1454,6 +1478,14 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
     if (mcTrack4 == NULL) continue;
     fHistoMap["TOF_GT_time_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
+    if (fabs(pdg) == 11)//electron
+      fHistoMap["TOF_GT_time_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
+    if (fabs(pdg) == 211)//pion
+      fHistoMap["TOF_GT_time_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
+    if (fabs(pdg) == 13)//myon
+      fHistoMap["TOF_GT_time_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
+    if (fabs(pdg) == 2212)//proton
+      fHistoMap["TOF_GT_time_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     if (IsTofElec( gtrack, cand.momentum.Mag(), &cand)) {
       fHistoMap["TOF_GT_time_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     }
@@ -2172,9 +2204,9 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       Int_t gammaWoPi0 = 0;
       for (Int_t bin = 1; bin < fHistoMap["EPPairOpeningAngleInTarget"]->GetNbinsX(); bin++) {
 	//for (Int_t bin = 1; bin < maxbin; bin++) {
-	allPairs += fHistoMap["EPPairOpeningAngleInTarget"]->GetBinContent(bin);
-	gammaPairs += fHistoMap["EPPairOpeningAngleGamma"]->GetBinContent(bin);
-	pi0Pairs += fHistoMap["EPPairOpeningAnglePi0"]->GetBinContent(bin);
+	allPairs += (Int_t)fHistoMap["EPPairOpeningAngleInTarget"]->GetBinContent(bin);
+	gammaPairs += (Int_t)fHistoMap["EPPairOpeningAngleGamma"]->GetBinContent(bin);
+	pi0Pairs += (Int_t)fHistoMap["EPPairOpeningAnglePi0"]->GetBinContent(bin);
 	gammaWoPi0 = gammaPairs - pi0Pairs;
 	fHistoMap["PairOpeningAngleAll"]->SetBinContent(bin,allPairs / (Float_t)fHistoMap["EPPairOpeningAngleInTarget"]->GetEntries());
 	fHistoMap["PairOpeningAngleGamma"]->SetBinContent(bin,gammaPairs / (Float_t)fHistoMap["EPPairOpeningAngleInTarget"]/*fEPPairOpeningAngleGamma*/->GetEntries());
@@ -2497,8 +2529,8 @@ void CbmTrdPhotonAnalysis::InitHistos()
     fHistoMap["ePlusMinusMother"] = new TH1I("fHistoMap["ePlusMinusMother","Mother ID for e^{+}/e^{-}",4501,-1000.5,3500.5);
   */
   fHistoMap["EPPairVertexDistance_global"] = new TH1I("EPPairVertexDistance_global","Vertex distance for e^{+}e^{-} pairs global",2500000,0,2500);
-  fHistoMap["EPPairVertexDistance_inMagnet"] = new TH1I("EPPairVertexDistance_inMagnet","Vertex distance for e^{+}e^{-} pairs in Magnet",1e7,0,1);
-  fHistoMap["EPPairVertexDistance_inTarget"] = new TH1I("EPPairVertexDistance_inTarget","Vertex distance for e^{+}e^{-} pairs in Target",1e7,0,1);
+  fHistoMap["EPPairVertexDistance_inMagnet"] = new TH1I("EPPairVertexDistance_inMagnet","Vertex distance for e^{+}e^{-} pairs in Magnet",1.0e7,0.,1.);
+  fHistoMap["EPPairVertexDistance_inTarget"] = new TH1I("EPPairVertexDistance_inTarget","Vertex distance for e^{+}e^{-} pairs in Target",1.0e7,0.,1.);
   fHistoMap["ZBirth[0]"] = new TH1I("ZBirth_gamma","z birth #gamma",10000,0,1000);
   fHistoMap["ZBirth[1]"] = new TH1I("ZBirth_positron","z birth e^{+}",10000,0,1000);
   fHistoMap["ZBirth[2]"] = new TH1I("ZBirth_electron","z birth e^{-}",10000,0,1000);
@@ -2597,6 +2629,27 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["RICH_GT_radius_KF_P_true"] = new  TH2I("RICH_GT_radius_KF_P_true","RICH_GT_radius_KF_P_true",100,0,10,100,0,10);
   fHistoMap["TOF_GT_time_KF_P"] = new  TH2I("TOF_GT_time_KF_P","TOF_GT_time_KF_P",100,0,5,100,0.5,1.1);
   fHistoMap["TOF_GT_time_KF_P_true"] = new  TH2I("TOF_GT_time_KF_P_true","TOF_GT_time_KF_P_true",100,0,5,100,0.5,1.1);
+
+  //myon
+  fHistoMap["RICH_GT_radiusA_KF_P_myon"] = new  TH2I("RICH_GT_radiusA_KF_P_myon","RICH_GT_radiusA_KF_P_myon",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radiusB_KF_P_myon"] = new  TH2I("RICH_GT_radiusB_KF_P_myon","RICH_GT_radiusB_KF_P_myon",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radius_KF_P_myon"] = new  TH2I("RICH_GT_radius_KF_P_myon","RICH_GT_radius_KF_P_myon",100,0,10,100,0,10);
+  fHistoMap["TOF_GT_time_KF_P_myon"] = new  TH2I("TOF_GT_time_KF_P_myon","TOF_GT_time_KF_P_myon",100,0,5,100,0.5,1.1);
+  //pion
+  fHistoMap["RICH_GT_radiusA_KF_P_pion"] = new  TH2I("RICH_GT_radiusA_KF_P_pion","RICH_GT_radiusA_KF_P_pion",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radiusB_KF_P_pion"] = new  TH2I("RICH_GT_radiusB_KF_P_pion","RICH_GT_radiusB_KF_P_pion",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radius_KF_P_pion"] = new  TH2I("RICH_GT_radius_KF_P_pion","RICH_GT_radius_KF_P_pion",100,0,10,100,0,10);
+  fHistoMap["TOF_GT_time_KF_P_pion"] = new  TH2I("TOF_GT_time_KF_P_pion","TOF_GT_time_KF_P_pion",100,0,5,100,0.5,1.1);
+  //electron
+  fHistoMap["RICH_GT_radiusA_KF_P_electron"] = new  TH2I("RICH_GT_radiusA_KF_P_electron","RICH_GT_radiusA_KF_P_electron",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radiusB_KF_P_electron"] = new  TH2I("RICH_GT_radiusB_KF_P_electron","RICH_GT_radiusB_KF_P_electron",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radius_KF_P_electron"] = new  TH2I("RICH_GT_radius_KF_P_electron","RICH_GT_radius_KF_P_electron",100,0,10,100,0,10);
+  fHistoMap["TOF_GT_time_KF_P_electron"] = new  TH2I("TOF_GT_time_KF_P_electron","TOF_GT_time_KF_P_electron",100,0,5,100,0.5,1.1);
+  //proton
+  fHistoMap["RICH_GT_radiusA_KF_P_proton"] = new  TH2I("RICH_GT_radiusA_KF_P_proton","RICH_GT_radiusA_KF_P_proton",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radiusB_KF_P_proton"] = new  TH2I("RICH_GT_radiusB_KF_P_proton","RICH_GT_radiusB_KF_P_proton",100,0,10,100,0,10);
+  fHistoMap["RICH_GT_radius_KF_P_proton"] = new  TH2I("RICH_GT_radius_KF_P_proton","RICH_GT_radius_KF_P_proton",100,0,10,100,0,10);
+  fHistoMap["TOF_GT_time_KF_P_proton"] = new  TH2I("TOF_GT_time_KF_P_proton","TOF_GT_time_KF_P_proton",100,0,5,100,0.5,1.1);
 
 
   fHistoMap["EPCandPairOpeningAngle"] = new TH1I("EPCandPairOpeningAngle","opening angle #theta of e^{+}e^{-} cand. pairs",1800,0,180);
@@ -2761,6 +2814,27 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
   NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
 
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_myon"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_myon"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_myon"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_myon"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_pion"],2,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_pion"] ,2,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_pion"],2,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_pion"] ,2,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_electron"],3,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_electron"] ,3,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_electron"],3,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_electron"] ,3,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_proton"],4,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_proton"] ,4,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_proton"],4,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
+  NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_proton"] ,4,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+
+
   NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
@@ -2784,7 +2858,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
 }
     void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)
     {
-      Int_t nEntries = h->GetEntries();
+      Int_t nEntries = (Int_t)h->GetEntries();
       h->Scale(1./ Float_t(nEntries));
     }
 
@@ -3093,6 +3167,23 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fHistoMap["RICH_GT_radiusB_KF_P_true"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_radius_KF_P_true"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_time_KF_P_true"]->Write("", TObject::kOverwrite);
+
+  fHistoMap["RICH_GT_radiusA_KF_P_myon"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusB_KF_P_myon"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radius_KF_P_myon"]->Write("", TObject::kOverwrite);
+  fHistoMap["TOF_GT_time_KF_P_myon"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusA_KF_P_pion"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusB_KF_P_pion"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radius_KF_P_pion"]->Write("", TObject::kOverwrite);
+  fHistoMap["TOF_GT_time_KF_P_pion"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusA_KF_P_electron"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusB_KF_P_electron"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radius_KF_P_electron"]->Write("", TObject::kOverwrite);
+  fHistoMap["TOF_GT_time_KF_P_electron"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusA_KF_P_proton"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radiusB_KF_P_proton"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_radius_KF_P_proton"]->Write("", TObject::kOverwrite);
+  fHistoMap["TOF_GT_time_KF_P_proton"]->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
   //==================================================================Cuts
   gDirectory->Cd("..");

@@ -18,6 +18,7 @@
 #include "CbmGlobalTrack.h"
 #include "CbmRichElectronIdAnn.h"
 
+
 #include <map>
 #include <fstream>
 #include <vector>
@@ -30,6 +31,7 @@ class TClonesArray;
 class TH2D;
 class TH1D;
 class TH2F;
+class TRandom3;
 
 class FairRootManager;
 
@@ -282,6 +284,9 @@ public:
 
     virtual void Finish();
 
+
+
+
     ClassDef(CbmAnaDielectronTask,1);
 
 private:
@@ -336,6 +341,9 @@ private:
     vector<DielectronCandidate> fSegmentCandidates;
 
     Double_t fWeight; //Multiplicity*BR
+
+    Double_t fPionMisidLevel; // For the ideal particle identification cases, set to -1 for real PID
+    TRandom3* fRandom3;
 
     // ID cuts
     Double_t fTrdAnnCut;
@@ -445,6 +453,8 @@ public:
    void SetGammaCut(Double_t par){fGammaCut = par;}
    void SetStCut(Double_t ang, Double_t pp){fStCutAngle = ang; fStCutPP = pp;}
    void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
+
+   void SetPionMisidLevel(Double_t level) {fPionMisidLevel = level;}
 };
 
 #endif

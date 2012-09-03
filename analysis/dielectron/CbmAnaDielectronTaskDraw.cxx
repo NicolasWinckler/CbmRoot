@@ -78,7 +78,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawBgSourcesVsMomentum();
    SaveCanvasToImage();
 
-   string qaFile = fOutputDir + "lmvm_results.json";
+   string qaFile = fOutputDir + "/lmvm_results.json";
    fPt->Write(qaFile);
 }
 
@@ -454,7 +454,6 @@ void CbmAnaDielectronTaskDraw::DrawCutDistributions()
    }
 }
 
-
 void CbmAnaDielectronTaskDraw::DrawSourcesBgPairs(
       int step,
       bool inPercent)
@@ -733,6 +732,9 @@ void CbmAnaDielectronTaskDraw::DrawMinvPtAll()
 
 void CbmAnaDielectronTaskDraw::DrawBgSourcesVsMomentum()
 {
+   TCanvas *c1mc = CreateCanvas("lmvm_fh_source_mom_mc_signal","lmvm_fh_source_mom_mc_signal", 600, 600);
+   DrawH1( H1("fh_source_mom_mc_signal") );
+
    int hi = 1;
    TCanvas *c1 = CreateCanvas("lmvm_fh_source_mom","lmvm_fh_source_mom", 900, 900);
    c1->Divide(3,3);

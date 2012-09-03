@@ -21,3 +21,5 @@ const vector<string> CbmAnaLmvmNames::fAnaStepsLatex =
       list_of("MC")("ACC")("REC")("#chi^{2}_{prim}")("ID")("m_{#gamma}")("mvd1")("mvd2")("ST")("TT")("P_{t}");
 const vector<int> CbmAnaLmvmNames::fAnaStepsColor =
       list_of(kGreen+3)(kOrange+3)(kBlack)(kOrange+7)(kRed)(kPink-6)(kGreen)(kOrange-3)(kViolet+10)(kMagenta)(kYellow+1);
+const vector<string> CbmAnaLmvmNames::fSignalNames =
+      list_of("rho0")("omega")("phi")("omega_dalitz");

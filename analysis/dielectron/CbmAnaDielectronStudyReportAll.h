@@ -1,11 +1,11 @@
 /**
- * \file CbmAnaDielectronStudyReport.h
+ * \file CbmAnaDielectronStudyReportAll.h
  * \brief Creates study report for LMVM analysis.
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2012
  */
-#ifndef CBM_ANA_DIELECTRON_STUDY_REPORT
-#define CBM_ANA_DIELECTRON_STUDY_REPORT
+#ifndef CBM_ANA_DIELECTRON_STUDY_REPORT_ALL
+#define CBM_ANA_DIELECTRON_STUDY_REPORT_ALL
 
 #include "CbmStudyReport.h"
 #include <string>
@@ -13,25 +13,25 @@
 using std::string;
 
 /**
- * \class CbmAnaDielectronStudyReport
+ * \class CbmAnaDielectronStudyReportAll
  * \brief Creates study report for LMVM analysis.
  *
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2012
  *
  */
-class CbmAnaDielectronStudyReport : public CbmStudyReport
+class CbmAnaDielectronStudyReportAll : public CbmStudyReport
 {
 public:
    /**
     * \brief Constructor.
     */
-   CbmAnaDielectronStudyReport();
+   CbmAnaDielectronStudyReportAll();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmAnaDielectronStudyReport();
+   virtual ~CbmAnaDielectronStudyReportAll();
 
 protected:
     /**
@@ -44,21 +44,21 @@ protected:
      * \brief Inherited from CbmLitSimulationReport.
      */
     virtual string GetQaFileName() const {
-       return "lmvm_results.json";
+       return "lmvm_results_all.json";
     }
 
     /**
      * \brief Inherited from CbmLitSimulationReport.
      */
     virtual string GetIdealFileName() const {
-       return "lmvm_results.json";
+       return "lmvm_results_all.json";
     }
 
     /**
      * \brief Inherited from CbmLitSimulationReport.
      */
     virtual string GetCheckFileName() const {
-       return "lmvm_results.json";
+       return "lmvm_results_all.json";
     }
 
    /**

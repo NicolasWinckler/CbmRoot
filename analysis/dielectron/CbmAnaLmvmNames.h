@@ -33,6 +33,16 @@ enum AnalysisSteps {
   kPtCut = 10
 };
 
+/*
+ * \brief Enumeration for signal names.
+ */
+/*enum SignalNames {
+  kRho0 = 0,
+  kOmega = 1,
+  kPhi = 2,
+  kOmegaDalitz = 3
+};*/
+
 class CbmAnaLmvmNames
 {
 public:
@@ -45,6 +55,8 @@ public:
    const static vector<string> fAnaSteps;
    const static vector<string> fAnaStepsLatex;
    const static vector<int> fAnaStepsColor;
+
+   const static vector<string> fSignalNames;
 };
 
 #endif

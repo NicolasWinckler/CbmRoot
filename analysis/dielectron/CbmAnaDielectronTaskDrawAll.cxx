@@ -29,6 +29,7 @@
 #include "TEllipse.h"
 #include "TStyle.h"
 
+#include "CbmAnaPTree.h"
 
 using namespace std;
 using namespace lit;
@@ -41,8 +42,12 @@ void CbmAnaDielectronTaskDrawAll::DrawHistosFromFile(
       const string& fileNameOmega,
       const string& fileNamePhi,
       const string& fileNameOmegaDalitz,
+      const string& outputDir,
       Bool_t useMvd)
 {
+   fOutputDir = outputDir;
+   fPt = new CbmAnaPTree();
+
    SetDefaultDrawStyle();
    vector<string> fileNames;
    fileNames.push_back(fileNameRho0);
@@ -59,11 +64,6 @@ void CbmAnaDielectronTaskDrawAll::DrawHistosFromFile(
       fHM[i]->ScaleByPattern(".*", 1./fNofEvents);
    }
 
-   fNames.push_back("rho0");
-   fNames.push_back("omega");
-   fNames.push_back("phi");
-   fNames.push_back("omegaD");
-
    // index: AnalysisSteps
    fh_mean_bg_minv.resize(CbmAnaLmvmNames::fNofAnaSteps);
    fh_mean_eta_minv.resize(CbmAnaLmvmNames::fNofAnaSteps);
@@ -78,6 +78,10 @@ void CbmAnaDielectronTaskDrawAll::DrawHistosFromFile(
    SBgRegionAll();
    DrawSBGSignals();
    DrawMinvAll();
+   SaveCanvasToImage();
+
+   string qaFile = fOutputDir + "/lmvm_results_all.json";
+   fPt->Write(qaFile);
 }
 
 TCanvas* CbmAnaDielectronTaskDrawAll::CreateCanvas(
@@ -107,7 +111,7 @@ TH2D* CbmAnaDielectronTaskDrawAll::H2(
 
 void CbmAnaDielectronTaskDrawAll::DrawMinvAll()
 {
-   TCanvas *c = CreateCanvas("minv_all", "minv_all", 800, 800);
+   TCanvas *c = CreateCanvas("minv_all_ptcut", "minv_all_ptcut", 800, 800);
    DrawMinv(kPtCut);
 }
 
@@ -162,15 +166,56 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sOmega->Rebin(10);
    sRho->Rebin(10);
    sPhi->Rebin(10);
+   DrawH1(list_of(sbg)(bg)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
+         list_of("")("")("")("")("")("")("")(""), kLinear, kLog, false, 0.8, 0.8, 0.99, 0.99);
+//   sbg->Draw();
+//   bg->Draw("same");
+//   sPi0->Draw("same");
+//   sEta->Draw("same");
+//   sOmegaDalitz->Draw("same");
+//   sOmega->Draw("same");
+//   sRho->Draw("same");
+//   sPhi->Draw("same");
+   sRho->SetFillColor(kMagenta-3);
+   sRho->SetLineColor(kBlack);
+   sRho->SetLineStyle(0);
+   sRho->SetLineWidth(1);
 
-   sbg->Draw();
-   bg->Draw("same");
-   sPi0->Draw("same");
-   sEta->Draw("same");
-   sOmegaDalitz->Draw("same");
-   sOmega->Draw("same");
-   sRho->Draw("same");
-   sPhi->Draw("same");
+   sOmega->SetFillColor(kOrange+7);
+   sOmega->SetLineColor(kBlack);
+   sOmega->SetLineStyle(0);
+   sOmega->SetLineWidth(1);
+
+   sPhi->SetFillColor(kRed+1);
+   sPhi->SetLineColor(kBlack);
+   sPhi->SetLineStyle(0);
+   sPhi->SetLineWidth(1);
+
+   bg->SetFillColor(kYellow-10);
+   bg->SetLineColor(kBlack);
+   bg->SetLineStyle(0);
+   bg->SetLineWidth(1);
+
+   sEta->SetFillColor(kAzure+2);
+   sEta->SetLineColor(kBlack);
+   sEta->SetLineStyle(0);
+   sEta->SetLineWidth(1);
+
+   sPi0->SetFillColor(kGreen-3);
+   sPi0->SetLineColor(kBlack);
+   sPi0->SetLineStyle(0);
+   sPi0->SetLineWidth(1);
+
+   sOmegaDalitz->SetFillColor(kCyan+2);
+   sOmegaDalitz->SetLineColor(kBlack);
+   sOmegaDalitz->SetLineStyle(0);
+   sOmegaDalitz->SetLineWidth(1);
+
+   sbg->SetFillColor(kBlack);
+   sbg->SetLineColor(kBlack);
+   sbg->SetLineStyle(0);
+   sbg->SetLineWidth(1);
+
    gPad->SetLogy(true);
 }
 
@@ -192,6 +237,10 @@ void CbmAnaDielectronTaskDrawAll::FillMeanHist()
       fh_mean_eta_minv[step]->Scale(1./(double) fNofSignals);
       fh_mean_pi0_minv[step]->Scale(1./(double) fNofSignals);
    }
+   //TFile* f = TFile::Open( "mean_hist.root", "RECREATE" );
+   //fh_mean_bg_minv[CbmAnaLmvmNames::fNofAnaSteps - 1]->Write();
+   //f->Close();
+
 }
 
 void CbmAnaDielectronTaskDrawAll::FillSumSignalsHist()
@@ -285,9 +334,10 @@ void CbmAnaDielectronTaskDrawAll::DrawSBGSignals()
    Double_t y[CbmAnaLmvmNames::fNofAnaSteps];
    TCanvas* cFit = CreateCanvas("lmvm_signal_fit", "lmvm_signal_fit", 600, 600);
    for (int iF = 0; iF < fNofSignals; iF++){
-      cout << "Signal: " << fNames[iF] << endl;
+      string signalName = CbmAnaLmvmNames::fSignalNames[iF];
+      cout << "Signal: " << signalName << endl;
       stringstream ss;
-      ss << "lmvm_s_bg_cuts_" << fNames[iF];
+      ss << "lmvm_s_bg_cuts_" << signalName;
 
       TH1D* h_s_bg = new TH1D(ss.str().c_str(), string(ss.str()+";Analysis steps;S/BG").c_str(), CbmAnaLmvmNames::fNofAnaSteps, 0, CbmAnaLmvmNames::fNofAnaSteps);
       h_s_bg->GetXaxis()->SetLabelSize(0.06);
@@ -312,16 +362,24 @@ void CbmAnaDielectronTaskDrawAll::DrawSBGSignals()
          Double_t sbg = sumSignal/sumBg;
          double eff = 100. * H1(iF, "fh_signal_pty_" + CbmAnaLmvmNames::fAnaSteps[step])->GetEntries() /
                              H1(iF, "fh_signal_pty_" + CbmAnaLmvmNames::fAnaSteps[kMc])->GetEntries();
-         cout.precision(3);
-         cout << left << setw(10) << CbmAnaLmvmNames::fAnaSteps[step]
-              << left << setw(10) << sbg
-              << left << setw(10) << eff << endl;
+
+         fPt->Put(signalName + "_sbg_"+CbmAnaLmvmNames::fAnaSteps[step], sumSignal/sumBg);
+         fPt->Put(signalName + "_eff_"+CbmAnaLmvmNames::fAnaSteps[step], eff);
+         fPt->Put(signalName + "_signal_minv_mean_"+CbmAnaLmvmNames::fAnaSteps[step], 1000.*mean);
+         fPt->Put(signalName + "_signal_minv_rms_"+CbmAnaLmvmNames::fAnaSteps[step], 1000.*sigma);
 
          h_s_bg->GetXaxis()->SetBinLabel(step + 1, CbmAnaLmvmNames::fAnaStepsLatex[step].c_str());
-         h_s_bg->SetBinContent(step+1, sbg);
+         if (sbg < 1000.) h_s_bg->SetBinContent(step+1, sbg);
       }
       TCanvas* c = CreateCanvas(ss.str().c_str(), ss.str().c_str(), 800, 800);
       DrawH1(h_s_bg);
+   }
+}
+
+void CbmAnaDielectronTaskDrawAll::SaveCanvasToImage()
+{
+   for (int i = 0; i < fCanvas.size(); i++){
+      lit::SaveCanvasAsImage(fCanvas[i], fOutputDir);
    }
 }
 

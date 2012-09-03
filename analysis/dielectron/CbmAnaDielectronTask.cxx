@@ -41,6 +41,7 @@
 #include "TMath.h"
 #include "TLorentzVector.h"
 #include "TProfile.h"
+#include "TRandom3.h"
 #include "TObject.h"
 
 #include "FairRunAna.h"
@@ -166,6 +167,9 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
    fUseTrd = true;
    fUseTof = true;
 
+   fPionMisidLevel = -1.;
+   fRandom3 = new TRandom3(0);
+
    fHistoList.clear();
 
    // Mother PDG
@@ -252,7 +256,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
 
          hname = "fh_source_mom_" + CbmAnaLmvmNames::fAnaSteps[step] + "_" + CbmAnaLmvmNames::fSourceTypes[i];
          htitle = hname + ";P [GeV/c];Yield";
-         fh_source_mom[i][step] = new TH1D(hname.c_str(), htitle.c_str(),100, 0., 10);
+         fh_source_mom[i][step] = new TH1D(hname.c_str(), htitle.c_str(), 150, 0., 15.);
          fHistoList.push_back(fh_source_mom[i][step]);
       }
    }
@@ -425,11 +429,15 @@ void CbmAnaDielectronTask::MCPairs()
         CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(i);
         Int_t motherId = mctrack->GetMotherId();
         Int_t pdg = mctrack->GetPdgCode();
+        Double_t mom = mctrack->GetP();
 
         // mother pdg of e-/e+
         Int_t mcMotherPdg = 0;
         if (pdg == -11 || pdg == 11) {
-            if (motherId != -1){
+           // momentum distribution for electrons from signal
+           if (motherId == -1) fh_source_mom[kSignal][kMc]->Fill(mom);
+
+           if (motherId != -1){
                 CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(motherId);
                 if (mother) mcMotherPdg = mother->GetPdgCode();
                 // vertex of gamma
@@ -480,6 +488,7 @@ void CbmAnaDielectronTask::SingleParticleAcceptance()
         Int_t nMvdPoints = mctrack->GetNPoints(kMVD);
         Int_t nStsPoints = mctrack->GetNPoints(kSTS);
         Int_t nRichPoints = fNofHitsInRingMap[i];
+
 
         Bool_t isAcc = ( nMvdPoints+nStsPoints >= 4 && nRichPoints >= 7);
 
@@ -1055,41 +1064,33 @@ void CbmAnaDielectronTask::IsElectron(
       CbmGlobalTrack * gTrack,
       DielectronCandidate* cand)
 {
-	Bool_t richEl = IsRichElectron(ring, momentum, cand);
-	Bool_t trdEl = IsTrdElectron(trdTrack, cand);
-	Double_t annRich = cand->richAnn;
-	Double_t annTrd = cand->trdAnn;
-	Bool_t tofEl = IsTofElectron(gTrack, momentum, cand);
+   if (fPionMisidLevel < 0.){
+      Bool_t richEl = IsRichElectron(ring, momentum, cand);
+      Bool_t trdEl = IsTrdElectron(trdTrack, cand);
+      Double_t annRich = cand->richAnn;
+      Double_t annTrd = cand->trdAnn;
+      Bool_t tofEl = IsTofElectron(gTrack, momentum, cand);
 
-	if (richEl && trdEl && tofEl) {
-			cand->isElectron = true;
-	} else {
-		cand->isElectron = false;
-	}
-
-/*
-	if (annRich > 0.85){
-		cand->isElectron = true;
-		return;
-	} else if (annTrd > 1.95) {
-		cand->isElectron = true;
-		return;
-	} else 	if (annRich > 0.4 && annTrd > 0.92) {
-		cand->isElectron = true;
-		return;
-	} else if (momentum < 0.7 && tofEl && annRich > 0.5) {
-		cand->isElectron = true;
-		return;
-	} else if (momentum < 0.7 && tofEl && annTrd > 0.92){
-		cand->isElectron = true;
-		return;
-	} else if (richEl && trdEl && tofEl) {
-		cand->isElectron = true;
-		return;
-	} else {
-		cand->isElectron = false;
-		return;
-	}*/
+      if (richEl && trdEl && tofEl) {
+         cand->isElectron = true;
+      } else {
+         cand->isElectron = false;
+      }
+   } else {
+      // PID using MC information, a certain pi supression level can be set
+      CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(cand->stsMcTrackId);
+      Int_t pdg = mcTrack->GetPdgCode();
+      if (pdg == 11 || pdg == -11){
+         cand->isElectron = true;
+      } else {
+         Double_t r = fRandom3->Rndm();
+         if (r < fPionMisidLevel){
+            cand->isElectron = true;
+         } else {
+            cand->isElectron = false;
+         }
+      }
+   }
 }
 
 Bool_t CbmAnaDielectronTask::IsRichElectron(

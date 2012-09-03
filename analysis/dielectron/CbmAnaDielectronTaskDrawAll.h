@@ -21,6 +21,7 @@ class TH1D;
 class TFile;
 class TCanvas;
 class CbmHistManager;
+class CbmAnaPTree;
 
 using namespace std;
 
@@ -52,6 +53,7 @@ public:
    * \param[in] fileNameOmega Name of the file with omega histograms.
    * \param[in] fileNamePhi Name of the file with phi histograms.
    * \param[in] fileNameOmegaDalitz Name of the file with omegaDalitz histograms.
+   * \param[in] outputDir Output directory for figures and .json file.
    * \param useMvd draw histograms related to the MVD detector?
    **/
    void DrawHistosFromFile(
@@ -59,6 +61,7 @@ public:
          const string& fileNameOmega,
          const string& fileNamePhi,
          const string& fileNameOmegaDalitz,
+         const string& outputDir = "",
          Bool_t useMvd = false);
 
 private:
@@ -71,8 +74,6 @@ private:
    //[0]=rho0, [1]=omega, [2]=phi, [3]=omegaDalitz
    vector<CbmHistManager*> fHM;
 
-   vector<string> fNames; // Names of the signals
-
    // index: AnalysisSteps
    vector<TH1D*> fh_mean_bg_minv; //mean histograms from 4 files
    vector<TH1D*> fh_mean_eta_minv;
@@ -81,6 +82,8 @@ private:
    // index: AnalysisSteps
    vector<TH1D*> fh_sum_s_minv; // sum of all signals
 
+   string fOutputDir; // output directory for figures and .json file
+   CbmAnaPTree* fPt;
 
    TCanvas* CreateCanvas(
          const string& name,
@@ -146,6 +149,11 @@ private:
     * \brief Draw S/BG vs plots for different signals.
     */
    void DrawSBGSignals();
+
+   /**
+    * \brief Save all created canvases to images.
+    */
+   void SaveCanvasToImage();
 
    ClassDef(CbmAnaDielectronTaskDrawAll, 1);
 };

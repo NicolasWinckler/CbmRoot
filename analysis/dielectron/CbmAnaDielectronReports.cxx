@@ -4,7 +4,7 @@
  * \date 2012
  */
 #include "CbmAnaDielectronReports.h"
-#include "CbmAnaDielectronStudyReport.h"
+#include "CbmAnaDielectronStudyReportAll.h"
 #include "CbmReport.h"
 #include "CbmStudyReport.h"
 
@@ -30,7 +30,7 @@ void CbmAnaDielectronReports::CreateStudyReport(
 {
    if (outputDir != "") gSystem->mkdir(outputDir.c_str(), true);
 
-   CbmStudyReport* report = new CbmAnaDielectronStudyReport();
+   CbmStudyReport* report = new CbmAnaDielectronStudyReportAll();
    report->SetTitle(title);
    cout << "Report can be found here: " << outputDir << endl;
    ofstream foutHtml(string(outputDir + "lmvm_study.html").c_str());

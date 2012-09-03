@@ -13,6 +13,7 @@ void run_analysis(Int_t nEvents = 10)
     TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
     //gRandom->SetSeed(10);
+    Double_t pionMisidLevel = -1;
 
     TString inFile1 = "", inFile2 = "", parFile = "", outFile ="";
 
@@ -31,6 +32,7 @@ void run_analysis(Int_t nEvents = 10)
         inFile2 = TString(gSystem->Getenv("RECOFILE"));
         parFile = TString(gSystem->Getenv("PARFILE"));
         outFile = TString(gSystem->Getenv("DILEPANALYSISFILE"));
+        pionMisidLevel = TString(gSystem->Getenv("PIONMISIDENTIFICATIONLEVEL")).Atof();
     }
 
     TString stsDigiFile = "sts_v11a.digi.par";
@@ -62,7 +64,7 @@ void run_analysis(Int_t nEvents = 10)
      // create and add task
   //   CbmDielectronTask *task = new CbmDielectronTask("name", "title");
 
-   CbmAnaDielectronTask *task = new CbmAnaDielectronTask("CbmAnaDielectronTask", "CbmAnaDielectronTask");
+   CbmAnaDielectronTask *task = new CbmAnaDielectronTask();
     // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
 
 // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy
@@ -94,6 +96,7 @@ void run_analysis(Int_t nEvents = 10)
      task->SetUseRich(true);
      task->SetUseTrd(true);
      task->SetUseTof(true);
+     task->SetPionMisidLevel(pionMisidLevel);
 
      fRun->AddTask(task);
 

@@ -25,7 +25,12 @@ void run_reco(Int_t nEvents = 1000)
 		deltaFile = TString(gSystem->Getenv("DELTAFILE"));
 	}
 
-	TString stsDigiFile = "sts_v11a.digi.par";
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TList *parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+   parFileList->Add(&stsDigiFile);
+   parFileList->Add(&trdDigiFile);
    gDebug = 0;
 
    TStopwatch timer;
@@ -223,6 +228,7 @@ void run_reco(Int_t nEvents = 1000)
       run->AddTask(richHitProd);
 
       CbmRichReconstruction* richReco = new CbmRichReconstruction();
+      //richReco->SetFinderName("ideal");
       run->AddTask(richReco);
 
       // ------------------- RICH Ring matching  ---------------------------------
@@ -269,18 +275,15 @@ void run_reco(Int_t nEvents = 1000)
 //  run->AddTask(ecalHitProd);
 
     // -----  Parameter database   --------------------------------------------
-    TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-    stsDigi += "/parameters/sts/";
-    stsDigi += stsDigiFile;
-    FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    FairParRootFileIo* parIo1 = new FairParRootFileIo();
-    FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-    parIo1->open(parFile.Data());
-    parIo2->open(stsDigi.Data(),"in");
-    rtdb->setFirstInput(parIo1);
-    rtdb->setSecondInput(parIo2);
-    rtdb->setOutput(parIo1);
-    rtdb->saveOutput();
+   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+   FairParRootFileIo* parIo1 = new FairParRootFileIo();
+   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+   parIo1->open(parFile.Data());
+   parIo2->open(parFileList, "in");
+   rtdb->setFirstInput(parIo1);
+   rtdb->setSecondInput(parIo2);
+   rtdb->setOutput(parIo1);
+   rtdb->saveOutput();
 
     run->Init();
     cout << "Starting run" << endl;

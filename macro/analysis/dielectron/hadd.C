@@ -57,15 +57,15 @@ void hadd() {
          particle = "rho0";
       }
 
-      string dir = "/lustre/cbm/user/ebelolap/aug11/mar12/25gev/100field/mvd/"+particle+"/";
+      string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/70field/nomvd/"+particle+"/";
       cout << "-I- " << dir << endl;
 
-      Target = TFile::Open( string(dir+"reco.all.root").c_str(), "RECREATE" );
+      Target = TFile::Open( string(dir+"analysis.all.root").c_str(), "RECREATE" );
 
       FileList = new TList();
-      for (int i = 0; i < 200; i++){
+      for (int i = 1; i < 200; i++){
          stringstream ss;
-         ss << dir << "reco." ;
+         ss << dir << "analysis." ;
          ss.fill('0');
          ss.width(4);
          ss  << i << ".root";

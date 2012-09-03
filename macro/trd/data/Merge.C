@@ -42,14 +42,66 @@ void Merge() {
   // Target and FileList, then
   // root > .L hadd.C
   // root > hadd()
-  Target = TFile::Open("result.root", "RECREATE");
+  //Target = TFile::Open("result_0000Pi0.root", "RECREATE");
+  //Target = TFile::Open("result_1000Pi0.root", "RECREATE");
+  Target = TFile::Open("result_0100Pi0.root", "RECREATE");
+  //Target = TFile::Open("result_0010Pi0.root", "RECREATE");
   TString filename;
   FileList = new TList();
-  for (Int_t iurqmd = 0; iurqmd < 200; iurqmd++){
-    filename.Form("test.pa.trd_v12f.smearing.%04i.001events.root",iurqmd);
-    TFile test = TFile(filename,"READ");
-    if (test.IsOpen())
-      FileList->Add( TFile::Open(filename) );
+  for (Int_t iurqmd = 0; iurqmd < 200; iurqmd++){ 
+    //if (iurqmd < 100) { //with 0100 pi0
+      //if (iurqmd >= 100) { //with 0000 pi0
+      /* 
+	 if (
+	 iurqmd != 31 &&
+	 iurqmd != 34 &&
+	 iurqmd != 35 &&
+	 iurqmd != 39 &&
+	 iurqmd != 43 &&
+	 iurqmd != 50 &&
+	 iurqmd != 61 &&
+	 iurqmd != 78 &&
+	 iurqmd != 83 &&
+	 iurqmd != 86 &&
+	 iurqmd != 93 &&
+	 iurqmd != 169 &&
+	 iurqmd != 173 &&
+	 iurqmd != 179 &&
+	 iurqmd != 185 &&
+	 iurqmd != 186 &&
+	 iurqmd != 189 &&
+	 iurqmd != 191 &&
+	 iurqmd != 192 &&
+	 iurqmd != 193 &&
+	 iurqmd != 195
+	 ){ //with 1000 pi0
+      */
+      /*if (
+	iurqmd == 31 ||
+	iurqmd == 34 ||
+	iurqmd == 39 ||
+	iurqmd == 43 ||
+	iurqmd == 50 ||
+	iurqmd == 61 ||
+	iurqmd == 78 ||
+	iurqmd == 83 ||
+	iurqmd == 86 ||
+	iurqmd == 93 ||
+	iurqmd == 185 ||
+	iurqmd == 186 ||
+	iurqmd == 191 ||
+	iurqmd == 192 ||
+	iurqmd == 193
+	){ //without pi0
+      */
+      if (iurqmd == 00) {
+      filename.Form("test.pa.trd_v12f.smearing.%04i.100events.root",iurqmd);
+      cout << filename << endl;
+      TFile test = TFile(filename,"READ");
+      if (test.IsOpen()){
+	FileList->Add( TFile::Open(filename) );
+      }
+    }
   }
 
   MergeHistos( Target, FileList );
@@ -57,7 +109,7 @@ void Merge() {
 void MergeHistos(TDirectory *target, TList *sourcelist) {
   
 
-   cout << "Target path: " << target->GetPath() << endl;
+  cout << "Target path: " << target->GetPath() << endl;
   TString path( (char*)strstr( target->GetPath(), ":" ) );
   path.Remove( 0, 2 );
   TFile *first_source = (TFile*)sourcelist->First();
@@ -73,6 +125,7 @@ void MergeHistos(TDirectory *target, TList *sourcelist) {
   TChain *globChain = 0;
   TIter nextkey( current_sourcedir->GetListOfKeys() );
   TKey *key, *oldkey=0;
+  cout << "Merging histograms ..." << endl;
   while ( (key = (TKey*)nextkey())) {
 
     //keep only the highest cycle number for each key
@@ -85,14 +138,14 @@ void MergeHistos(TDirectory *target, TList *sourcelist) {
     if ( obj->IsA()->InheritsFrom( TH1::Class() ) ) {
       // descendant of TH1 -> merge it
 
-      //      cout << "Merging histogram " << obj->GetName() << endl;
+      cout << "               ..." << obj->GetName() << endl;
       TH1 *h1 = (TH1*)obj;
 
       // loop over all source files and add the content of the
       // correspondant histogram to the one pointed to by "h1"
       TFile *nextsource = (TFile*)sourcelist->After( first_source );
       while ( nextsource ) {
-
+	//cout << "     File: " << nextsource->GetName() << endl;
 	// make sure we are at the correct directory level by cd'ing to path
 	nextsource->cd( path );
 	TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(h1->GetName());
@@ -100,6 +153,9 @@ void MergeHistos(TDirectory *target, TList *sourcelist) {
 	  TH1 *h2 = (TH1*)key2->ReadObj();
 	  h1->Add( h2 );
 	  delete h2;
+	}
+	else {
+	  // damaged file
 	}
 
 	nextsource = (TFile*)sourcelist->After( nextsource );

@@ -1526,7 +1526,10 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["KF_PID_TOF_MC_PID"]->Fill(PdgToGeant(mcTrack4->GetPdgCode()), PdgToGeant(-11 * cand.charge));
       fHistoMap["TOF_GT_time_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     }
-    fHistoMap["GT_MC_PID"]->Fill(PdgToGeant(Pdg1));
+    fHistoMap["GT_MC_PID_STS"]->Fill(PdgToGeant(mcTrack1->GetPdgCode()));
+    fHistoMap["GT_MC_PID_RICH"]->Fill(PdgToGeant(mcTrack2->GetPdgCode()));
+    fHistoMap["GT_MC_PID_TRD"]->Fill(PdgToGeant(mcTrack3->GetPdgCode()));
+    fHistoMap["GT_MC_PID_TOF"]->Fill(PdgToGeant(mcTrack4->GetPdgCode()));
     fGTCandidates.push_back(cand);
     if (IsElec(richRing, cand.momentum.Mag(), trdTrack, gtrack, &cand)) {
       fHistoMap["KF_PID_MC_PID"]->Fill(PdgToGeant(Pdg1), PdgToGeant(-11 * cand.charge));
@@ -2441,7 +2444,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
     "#gamma_{RICH}",
     "Primary"
   };
-  fHistoMap["GT_MC_PID"] = new TH1I("GT_MC_PID","MC PID of associated STS tracks for global tracks",49,0.5,49.5);
+  fHistoMap["GT_MC_PID_STS"] = new TH1I("GT_MC_PID_STS","MC PID of associated STS tracks for global tracks",49,0.5,49.5);
+  fHistoMap["GT_MC_PID_RICH"] = new TH1I("GT_MC_PID_RICH","MC PID of associated RICH tracks for global tracks",49,0.5,49.5);
+  fHistoMap["GT_MC_PID_TRD"] = new TH1I("GT_MC_PID_TRD","MC PID of associated TRD tracks for global tracks",49,0.5,49.5);
+  fHistoMap["GT_MC_PID_TOF"] = new TH1I("GT_MC_PID_TOF","MC PID of associated TOF tracks for global tracks",49,0.5,49.5);
   fHistoMap["MCPid_global"] = new TH1I("MCPid_global","MC Pid global",49,0.5,49.5);
   fHistoMap["MCPid_inMagnet"] = new TH1I("MCPid_inMagnet","MC Pid in magnet",49,0.5,49.5);
   fHistoMap["MCPid_inTarget"] = new TH1I("MCPid_inTarget","MC Pid in target",49,0.5,49.5);
@@ -2493,7 +2499,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
 
 
   for (Int_t bin = 0; bin < 49; bin++) {
-    fHistoMap["GT_MC_PID"]->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fHistoMap["GT_MC_PID_STS"]->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fHistoMap["GT_MC_PID_RICH"]->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fHistoMap["GT_MC_PID_TRD"]->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
+    fHistoMap["GT_MC_PID_TOF"]->GetXaxis()->SetBinLabel(bin+1,particleID[bin]);
     fHistoMap["InvMPairMother"]->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fHistoMap["PtPairMother"]->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
     fHistoMap["PPairMother"]->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
@@ -2743,7 +2752,10 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],1,24,1,"","");
 
   NiceHisto1(fHistoMap["MCPid_global"],1,20,1,"","");
-  NiceHisto1(fHistoMap["GT_MC_PID"],1,20,1,"STS track MC PID for global tracks","");
+  NiceHisto1(fHistoMap["GT_MC_PID_STS"],1,20,1,"MC PID for global tracks","");
+  NiceHisto1(fHistoMap["GT_MC_PID_RICH"],2,20,1,"MC PID for global tracks","");
+  NiceHisto1(fHistoMap["GT_MC_PID_TRD"],3,20,1,"MC PID for global tracks","");
+  NiceHisto1(fHistoMap["GT_MC_PID_TOF"],4,20,1,"MC PID for global tracks","");
   NiceHisto1(fHistoMap["MCPid_inMagnet"],2,20,1,"","");
   NiceHisto1(fHistoMap["MCPid_inTarget"],3,20,1,"","");
   NiceHisto1(fHistoMap["GTPid"],1,20,1,"","");
@@ -3146,7 +3158,10 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   gDirectory->Cd("Statistic");
   gDirectory->pwd();
   fHistoMap["GTPid"]->Write("", TObject::kOverwrite);
-  fHistoMap["GT_MC_PID"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_MC_PID_STS"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_MC_PID_RICH"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_MC_PID_TRD"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_MC_PID_TOF"]->Write("", TObject::kOverwrite);
   fHistoMap["EPPairFromPi0DetectionEfficiency"]->Write("", TObject::kOverwrite);
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Write("", TObject::kOverwrite);
   fHistoMap["PidWkn"]->Write("", TObject::kOverwrite);
@@ -3405,9 +3420,9 @@ void CbmTrdPhotonAnalysis::FinishTask()
     c->SaveAs("pics/Photon/PhD/EPPairFromPi0DetectionEfficiency.pdf");
     c->SaveAs("pics/Photon/PhD/EPPairFromPi0DetectionEfficiency.png");
     leg->Clear();
-    fHistoMap["GT_MC_PID"]->Draw("PE");
-    c->SaveAs("pics/Photon/PhD/GT_MC_PID.pdf");
-    c->SaveAs("pics/Photon/PhD/GT_MC_PID.png");
+    fHistoMap["GT_MC_PID_STS"]->Draw("PE");
+    c->SaveAs("pics/Photon/PhD/GT_MC_PID_STS.pdf");
+    c->SaveAs("pics/Photon/PhD/GT_MC_PID_STS.png");
     fHistoMap["gammaAndGammaMother"]->SetMarkerStyle(20);
     fHistoMap["gammaAndGammaMother"]->SetLineColor(2);
     fHistoMap["gammaAndGammaMother"]->SetMarkerColor(2);

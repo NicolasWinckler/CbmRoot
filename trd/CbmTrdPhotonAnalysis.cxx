@@ -2513,14 +2513,14 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	"#gamma_{RICH}",
 	"Primary"
       };
-      fHistoMap["GT_MC_PID_STS"] = new TH1I("GT_MC_PID_STS","MC PID of associated STS tracks for global tracks",49,0.5,49.5);
-      fHistoMap["GT_MC_PID_RICH"] = new TH1I("GT_MC_PID_RICH","MC PID of associated RICH tracks for global tracks",49,0.5,49.5);
-      fHistoMap["GT_MC_PID_TRD"] = new TH1I("GT_MC_PID_TRD","MC PID of associated TRD tracks for global tracks",49,0.5,49.5);
-      fHistoMap["GT_MC_PID_TOF"] = new TH1I("GT_MC_PID_TOF","MC PID of associated TOF tracks for global tracks",49,0.5,49.5);
-      fHistoMap["MCPid_global"] = new TH1I("MCPid_global","MC Pid global",49,0.5,49.5);
-      fHistoMap["MCPid_inMagnet"] = new TH1I("MCPid_inMagnet","MC Pid in magnet",49,0.5,49.5);
-      fHistoMap["MCPid_inTarget"] = new TH1I("MCPid_inTarget","MC Pid in target",49,0.5,49.5);
-      fHistoMap["GTPid"] = new TH1I("GTPid","GT Pid",49,0.5,49.5);
+      fHistoMap["GT_MC_PID_STS"] = new TH1F("GT_MC_PID_STS","MC PID of associated STS tracks for global tracks",49,0.5,49.5);
+      fHistoMap["GT_MC_PID_RICH"] = new TH1F("GT_MC_PID_RICH","MC PID of associated RICH tracks for global tracks",49,0.5,49.5);
+      fHistoMap["GT_MC_PID_TRD"] = new TH1F("GT_MC_PID_TRD","MC PID of associated TRD tracks for global tracks",49,0.5,49.5);
+      fHistoMap["GT_MC_PID_TOF"] = new TH1F("GT_MC_PID_TOF","MC PID of associated TOF tracks for global tracks",49,0.5,49.5);
+      fHistoMap["MCPid_global"] = new TH1F("MCPid_global","MC Pid global",49,0.5,49.5);
+      fHistoMap["MCPid_inMagnet"] = new TH1F("MCPid_inMagnet","MC Pid in magnet",49,0.5,49.5);
+      fHistoMap["MCPid_inTarget"] = new TH1F("MCPid_inTarget","MC Pid in target",49,0.5,49.5);
+      fHistoMap["GTPid"] = new TH1F("GTPid","GT Pid",49,0.5,49.5);
       fHistoMap["Pt_global"] = new TH2I("Pt_global","p_{T} vs PID global",200,0,2,49,0.5,49.5);
       fHistoMap["Pt_inMagnet"] = new TH2I("Pt_inMagnet","p_{T} vs PID in magnet",200,0,2,49,0.5,49.5);
       fHistoMap["Pt_inTarget"] = new TH2I("Pt_inTarget","p_{T} vs PID in target",200,0,2,49,0.5,49.5);
@@ -2532,14 +2532,14 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["Pt_OpenAngle_inTarget"] = new TH2I("Pt_OpenAngle_inTarget","p_{T} vs OpenAngle in target",200,0,2,180,0,180);
       fHistoMap["Pt_OpenAngle_inTarget_EPPairsPi0"] = new TH2I("Pt_OpenAngle_inTarget_EPPairsPi0","p_{T} vs OpenAngle in target e^{+}e^{-} from #gamma",200,0,2,45,0,4.5);
       fHistoMap["Pt_OpenAngle_inTarget_EPPairsGamma"] = new TH2I("Pt_OpenAngle_inTarget_EPPairsGamma","p_{T} vs OpenAngle in target e^{+}e^{-} from #pi^{0}",200,0,2,45,0,4.5);
-      fHistoMap["DalizMother"] = new TH1I("DalizMother","Mother ID for e^{+} & e^{-} & #gamma",49,0.5,49.5);
-      fHistoMap["ePlusMinusMother"] = new TH1I("ePlusMinusMother","Mother ID for e^{+}/e^{-}",49,0.5,49.5);
-      fHistoMap["ePlusAndMinusMother"] = new TH1I("ePlusAndMinusMother","Mother ID for e^{+} & e^{-}",49,0.5,49.5);
-      fHistoMap["gammaMother"] = new TH1I("gammaMother","Mother ID for #gamma",49,0.5,49.5);
-      fHistoMap["gammaAndGammaMother"] = new TH1I("gammaAndGammaMother","Mother ID for #gamma & #gamma",49,0.5,49.5);
-      fHistoMap["gammaDaughter"] = new TH1I("gammaDaughter","Daughter ID for #gamma",49,0.5,49.5);
+      fHistoMap["DalizMother"] = new TH1F("DalizMother","Mother ID for e^{+} & e^{-} & #gamma",49,0.5,49.5);
+      fHistoMap["ePlusMinusMother"] = new TH1F("ePlusMinusMother","Mother ID for e^{+}/e^{-}",49,0.5,49.5);
+      fHistoMap["ePlusAndMinusMother"] = new TH1F("ePlusAndMinusMother","Mother ID for e^{+} & e^{-}",49,0.5,49.5);
+      fHistoMap["gammaMother"] = new TH1F("gammaMother","Mother ID for #gamma",49,0.5,49.5);
+      fHistoMap["gammaAndGammaMother"] = new TH1F("gammaAndGammaMother","Mother ID for #gamma & #gamma",49,0.5,49.5);
+      fHistoMap["gammaDaughter"] = new TH1F("gammaDaughter","Daughter ID for #gamma",49,0.5,49.5);
       fHistoMap["ZBirthAll"] = new TH2I("ZBirthAll","z birth",10000,0,1000,49,0.5,49.5);
-      fHistoMap["ZBirthEPfromGamma"] = new TH1I("ZBirthEPfromGamma","z birth from e^{+} & e^{-} pairs with mother #gamma",10000,0,1000);
+      fHistoMap["ZBirthEPfromGamma"] = new TH1F("ZBirthEPfromGamma","z birth from e^{+} & e^{-} pairs with mother #gamma",10000,0,1000);
       fHistoMap["NoDaughters_global"] = new TH2I("NoDaughters_global","Number of daughters global",49,0.5,49.5,101,-0.5,100.5);
       fHistoMap["NoDaughters_inMagnet"] = new TH2I("NoDaughters_inMagnet","Number of daughters in magnet",49,0.5,49.5,101,-0.5,100.5);
       fHistoMap["NoDaughters_inTarget"] = new TH2I("NoDaughters_inTarget","Number of daughters in target",49,0.5,49.5,101,-0.5,100.5);
@@ -2633,36 +2633,36 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       Int_t low[3] = {-50,-50,0};
       Int_t high[3] = {50,50,100};
       for (Int_t i = 0; i < 3; i++) {
-	fHistoMap["PairAllVertex_" + coo[i]] = new TH1I("PairAllVertex_" + coo[i], "all e^{+} e^{-} pair vertex " + coo[i], 1000, low[i], high[i]);
-	fHistoMap["PairGammaVertex_" + coo[i]] = new TH1I("PairGammaVertex_" + coo[i], "e^{+} e^{-} pair from #gamma vertex " + coo[i], 1000, low[i], high[i]);
-	fHistoMap["PairPi0Vertex_" + coo[i]] = new TH1I("PairPi0Vertex_" + coo[i], "e^{+} e^{-} pair from #pi^{0} vertex " + coo[i], 1000, low[i], high[i]);
+	fHistoMap["PairAllVertex_" + coo[i]] = new TH1F("PairAllVertex_" + coo[i], "all e^{+} e^{-} pair vertex " + coo[i], 1000, low[i], high[i]);
+	fHistoMap["PairGammaVertex_" + coo[i]] = new TH1F("PairGammaVertex_" + coo[i], "e^{+} e^{-} pair from #gamma vertex " + coo[i], 1000, low[i], high[i]);
+	fHistoMap["PairPi0Vertex_" + coo[i]] = new TH1F("PairPi0Vertex_" + coo[i], "e^{+} e^{-} pair from #pi^{0} vertex " + coo[i], 1000, low[i], high[i]);
 
-	fHistoMap["pi02GammaVertex_" + coo[i]] = new TH1I("pi02GammaVertex_" + coo[i], "decay vertex of #pi^{0} to 2#gamma or e^{+}e^{-}#gamma" + coo[i], 1000, low[i], high[i]);
-	fHistoMap["gamma2PairVertex_" + coo[i]] = new TH1I("gamma2PairVertex_" + coo[i], "decay vertex of #gamma to e^{+} e^{-} pair " + coo[i], 1000, low[i], high[i]);
+	fHistoMap["pi02GammaVertex_" + coo[i]] = new TH1F("pi02GammaVertex_" + coo[i], "decay vertex of #pi^{0} to 2#gamma or e^{+}e^{-}#gamma" + coo[i], 1000, low[i], high[i]);
+	fHistoMap["gamma2PairVertex_" + coo[i]] = new TH1F("gamma2PairVertex_" + coo[i], "decay vertex of #gamma to e^{+} e^{-} pair " + coo[i], 1000, low[i], high[i]);
 
-	NiceHisto1(fHistoMap["PairAllVertex_" + coo[i]],1,0,0,TString(coo[i]+"-position [cm]"),"");
-	NiceHisto1(fHistoMap["PairGammaVertex_" + coo[i]],2,0,0,TString(coo[i]+"-position [cm]"),"");
-	NiceHisto1(fHistoMap["PairPi0Vertex_" + coo[i]],3,0,0,TString(coo[i]+"-position [cm]"),"");
+	NiceHisto1(fHistoMap["PairAllVertex_" + coo[i]],1,0,0,TString(coo[i]+"-position [cm]"),"counts");
+	NiceHisto1(fHistoMap["PairGammaVertex_" + coo[i]],2,0,0,TString(coo[i]+"-position [cm]"),"counts");
+	NiceHisto1(fHistoMap["PairPi0Vertex_" + coo[i]],3,0,0,TString(coo[i]+"-position [cm]"),"counts");
 
-	NiceHisto1(fHistoMap["pi02GammaVertex_" + coo[i]],1,0,0,TString(coo[i]+"-position [cm]"),"");
-	NiceHisto1(fHistoMap["gamma2PairVertex_" + coo[i]],2,0,0,TString(coo[i]+"-position [cm]"),"");
+	NiceHisto1(fHistoMap["pi02GammaVertex_" + coo[i]],1,0,0,TString(coo[i]+"-position [cm]"),"counts");
+	NiceHisto1(fHistoMap["gamma2PairVertex_" + coo[i]],2,0,0,TString(coo[i]+"-position [cm]"),"counts");
       }
       /*
-	fHistoMap["MCPid"] = new TH1I("MCPid","MC Pid",4501,-1000.5,3500.5);
-	fHistoMap["GTPid"] = new TH1I("GTPid","GT Pid",4501,-1000.5,3500.5);
-	fHistoMap["ePlusMinusMother"] = new TH1I("fHistoMap["ePlusMinusMother","Mother ID for e^{+}/e^{-}",4501,-1000.5,3500.5);
+	fHistoMap["MCPid"] = new TH1F("MCPid","MC Pid",4501,-1000.5,3500.5);
+	fHistoMap["GTPid"] = new TH1F("GTPid","GT Pid",4501,-1000.5,3500.5);
+	fHistoMap["ePlusMinusMother"] = new TH1F("fHistoMap["ePlusMinusMother","Mother ID for e^{+}/e^{-}",4501,-1000.5,3500.5);
       */
-      fHistoMap["EPPairVertexDistance_global"] = new TH1I("EPPairVertexDistance_global","Vertex distance for e^{+}e^{-} pairs global",2500000,0,2500);
-      fHistoMap["EPPairVertexDistance_inMagnet"] = new TH1I("EPPairVertexDistance_inMagnet","Vertex distance for e^{+}e^{-} pairs in Magnet",1.0e7,0.,1.);
-      fHistoMap["EPPairVertexDistance_inTarget"] = new TH1I("EPPairVertexDistance_inTarget","Vertex distance for e^{+}e^{-} pairs in Target",1.0e7,0.,1.);
-      fHistoMap["ZBirth[0]"] = new TH1I("ZBirth_gamma","z birth #gamma",10000,0,1000);
-      fHistoMap["ZBirth[1]"] = new TH1I("ZBirth_positron","z birth e^{+}",10000,0,1000);
-      fHistoMap["ZBirth[2]"] = new TH1I("ZBirth_electron","z birth e^{-}",10000,0,1000);
-      fHistoMap["ZBirth[3]"] = new TH1I("ZBirth_pi0","z birth #pi^{0}",10000,0,1000);
+      fHistoMap["EPPairVertexDistance_global"] = new TH1F("EPPairVertexDistance_global","Vertex distance for e^{+}e^{-} pairs global",2500000,0,2500);
+      fHistoMap["EPPairVertexDistance_inMagnet"] = new TH1F("EPPairVertexDistance_inMagnet","Vertex distance for e^{+}e^{-} pairs in Magnet",1.0e7,0.,1.);
+      fHistoMap["EPPairVertexDistance_inTarget"] = new TH1F("EPPairVertexDistance_inTarget","Vertex distance for e^{+}e^{-} pairs in Target",1.0e7,0.,1.);
+      fHistoMap["ZBirth[0]"] = new TH1F("ZBirth_gamma","z birth #gamma",10000,0,1000);
+      fHistoMap["ZBirth[1]"] = new TH1F("ZBirth_positron","z birth e^{+}",10000,0,1000);
+      fHistoMap["ZBirth[2]"] = new TH1F("ZBirth_electron","z birth e^{-}",10000,0,1000);
+      fHistoMap["ZBirth[3]"] = new TH1F("ZBirth_pi0","z birth #pi^{0}",10000,0,1000);
       fBirthPi0 = new TH3I("BirthPi0","#pi^{0} vertex"           ,100,-500,500,100,-500,500,100,0,1000);
       fBirthPair = new TH3I("BirthPair","e^{-}e^{+} pairs vertex",100,-500,500,100,-500,500,100,0,1000);
       fBirthGamma = new TH3I("BirthGamma","#gamma vertex"        ,100,-500,500,100,-500,500,100,0,1000);
-      fHistoMap["PairHistory"] = new TH1I("PairHistory","history for #gamma",10,-0.5,9.5);
+      fHistoMap["PairHistory"] = new TH1F("PairHistory","history for #gamma",10,-0.5,9.5);
       fHistoMap["PairHistory"]->GetXaxis()->SetBinLabel( 1,"all e^{-} e^{+} pairs");
       fHistoMap["PairHistory"]->GetXaxis()->SetBinLabel( 2,"pairs from #gamma");
       fHistoMap["PairHistory"]->GetXaxis()->SetBinLabel( 3,"pairs from #pi^{0}#rightarrow e^{+}+e^{-}+#gamma");
@@ -2674,32 +2674,32 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["PairHistory"]->GetXaxis()->SetBinLabel( 9,"pairs from #pi^{0} within target");
       fHistoMap["PairHistory"]->GetXaxis()->SetBinLabel(10,"");
 
-      fHistoMap["InvMassSpectrumGammaTruePairs"] = new TH1I("InvMassSpectrumGammaTruePairs","Invariant mass spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaAllPairs"] = new TH1I("InvMassSpectrumGammaAllPairs","Invariant mass spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPPairs"] = new TH1I("InvMassSpectrumGammaEPPairs","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+/-}e^{-/+} pairs outside magnet",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPPairsInTarget"] = new TH1I("InvMassSpectrumGammaEPPairsInTarget","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"] = new TH1I("InvMassSpectrumGammaEPPairsInMagnet","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"] = new TH1I("InvMassSpectrumGammaEPPairsOpenAngle","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs oping angle cut",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPPairsGamma"] = new TH1I("InvMassSpectrumGammaEPPairsGamma","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#gamma",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPPairsPi0"] = new TH1I("InvMassSpectrumGammaEPPairsPi0","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#pi^{0}",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaTruePairs"] = new TH1F("InvMassSpectrumGammaTruePairs","Invariant mass spectrum from true MC-#gamma-#gamma pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaAllPairs"] = new TH1F("InvMassSpectrumGammaAllPairs","Invariant mass spectrum from all MC-#gamma-#gamma pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPPairs"] = new TH1F("InvMassSpectrumGammaEPPairs","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+/-}e^{-/+} pairs outside magnet",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPPairsInTarget"] = new TH1F("InvMassSpectrumGammaEPPairsInTarget","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in target",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"] = new TH1F("InvMassSpectrumGammaEPPairsInMagnet","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"] = new TH1F("InvMassSpectrumGammaEPPairsOpenAngle","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs oping angle cut",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPPairsGamma"] = new TH1F("InvMassSpectrumGammaEPPairsGamma","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#gamma",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPPairsPi0"] = new TH1F("InvMassSpectrumGammaEPPairsPi0","Invariant mass spectrum from all MC-#gamma pairs from MC-e^{+}e^{-} pairs mother=#pi^{0}",2000,0,2);
 
-      fHistoMap["InvMassSpectrumTrueEPPairs"] = new TH1I("InvMassSpectrumTrueEPPairs","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumAllEPPairs"] = new TH1I("InvMassSpectrumAllEPPairs","Invariant mass spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumEPPairsInTarget"] = new TH1I("InvMassSpectrumAllEPPairsInTarget","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in target",2000,0,2);
-      fHistoMap["InvMassSpectrumEPPairsInMagnet"] = new TH1I("InvMassSpectrumAllEPPairsInMagnet","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet",2000,0,2);
+      fHistoMap["InvMassSpectrumTrueEPPairs"] = new TH1F("InvMassSpectrumTrueEPPairs","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumAllEPPairs"] = new TH1F("InvMassSpectrumAllEPPairs","Invariant mass spectrum from all MC-e^{+}e^{-} pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumEPPairsInTarget"] = new TH1F("InvMassSpectrumAllEPPairsInTarget","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in target",2000,0,2);
+      fHistoMap["InvMassSpectrumEPPairsInMagnet"] = new TH1F("InvMassSpectrumAllEPPairsInMagnet","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet",2000,0,2);
       fHistoMap["InvMassSpectrumGammaEPPairsInMagnetBackground"] = new TH1D("InvMassSpectrumAllEPPairsInMagnetBackground","Invariant mass spectrum from all MC-e^{+}e^{-} pairs in magnet background",2000,0,2);
 
-      fHistoMap["EPPairOpeningAngle"] = new TH1I("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
-      fHistoMap["EPPairOpeningAngleGamma"] = new TH1I("EPPairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
-      fHistoMap["EPPairOpeningAnglePi0"] = new TH1I("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
-      fHistoMap["EPPairOpeningAngleSameMother"] = new TH1I("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
-      fHistoMap["EPPairOpeningAngleInTarget"] = new TH1I("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
-      fHistoMap["EPPairOpeningAngleInMagnet"] = new TH1I("EPPairOpeningAngleInMagnet","opening angle #theta of MC-e^{+}e^{-} pairs in magnet",1800,0,180);
+      fHistoMap["EPPairOpeningAngle"] = new TH1F("EPPairOpeningAngle","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
+      fHistoMap["EPPairOpeningAngleGamma"] = new TH1F("EPPairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs mother #gamma",1800,0,180);
+      fHistoMap["EPPairOpeningAnglePi0"] = new TH1F("EPPairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs mother #pi^{0}",1800,0,180);
+      fHistoMap["EPPairOpeningAngleSameMother"] = new TH1F("EPPairOpeningAngleSameMother","opening angle #theta of MC-e^{+}e^{-} pairs same mother",1800,0,180);
+      fHistoMap["EPPairOpeningAngleInTarget"] = new TH1F("EPPairOpeningAngleInTarget","opening angle #theta of MC-e^{+}e^{-} pairs in target",1800,0,180);
+      fHistoMap["EPPairOpeningAngleInMagnet"] = new TH1F("EPPairOpeningAngleInMagnet","opening angle #theta of MC-e^{+}e^{-} pairs in magnet",1800,0,180);
 
-      fHistoMap["PairOpeningAngleAll"] = new TH1I("PairOpeningAngleAll","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
-      fHistoMap["PairOpeningAngleGamma"] = new TH1I("PairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma",1800,0,180);
-      fHistoMap["PairOpeningAnglePi0"] = new TH1I("PairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs from #pi^{0}",1800,0,180);
-      fHistoMap["PairOpeningAngleGammaWoPi0"] = new TH1I("PairOpeningAngleGammaWoPi0","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma - pairs from #pi^{0}",1800,0,180);
+      fHistoMap["PairOpeningAngleAll"] = new TH1F("PairOpeningAngleAll","opening angle #theta of MC-e^{+}e^{-} pairs",1800,0,180);
+      fHistoMap["PairOpeningAngleGamma"] = new TH1F("PairOpeningAngleGamma","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma",1800,0,180);
+      fHistoMap["PairOpeningAnglePi0"] = new TH1F("PairOpeningAnglePi0","opening angle #theta of MC-e^{+}e^{-} pairs from #pi^{0}",1800,0,180);
+      fHistoMap["PairOpeningAngleGammaWoPi0"] = new TH1F("PairOpeningAngleGammaWoPi0","opening angle #theta of MC-e^{+}e^{-} pairs from #gamma - pairs from #pi^{0}",1800,0,180);
 
       fHistoMap["InvMassSpectrumGammaEPPairsInTargetPt"] = new TH2I("InvMassSpectrumGammaEPPairsInTargetPt","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",200,0,2,250,0,5); // new
       fHistoMap["InvMassSpectrumGammaEPPairsInMagnetPt"] = new TH2I("InvMassSpectrumGammaEPPairsInMagnetPt","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",200,0,2,250,0,5); // new
@@ -2713,33 +2713,33 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["InvMassSpectrumGammaEPPairsInTargetVD"] = new TH2I("InvMassSpectrumGammaEPPairsInTargetVD","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",200,0,2,1000,0,1e-10); // new
       fHistoMap["InvMassSpectrumGammaEPPairsInMagnetVD"] = new TH2I("InvMassSpectrumGammaEPPairsInMagnetVD","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",200,0,2,1000,0,1e-10); // new
       fHistoMap["InvMassSpectrumGammaEPPairsVD"] = new TH2I("InvMassSpectrumGammaEPPairsVD","Invariant mass spectrum from true MC-e^{+}e^{-} pairs",2000,0,2,1000,0,1e-7);
-      fHistoMap["PidWkn"] = new TH1I("PidWkn","PidWkn",400,-2.1,2.1);
-      fHistoMap["PidANN"] = new TH1I("PidANN","PidANN",400,-2.1,2.1);
-      fHistoMap["PidLikeEL"] = new TH1I("PidLikeEL","PidLikeEL",400,-2.1,2.1);
-      fHistoMap["PidLikePI"] = new TH1I("PidLikePI","PidLikePI",400,-2.1,2.1);
-      fHistoMap["PidLikeKA"] = new TH1I("PidLikeKA","PidLikeKA",400,-2.1,2.1);
-      fHistoMap["PidLikePR"] = new TH1I("PidLikePR","PidLikePR",400,-2.1,2.1);
-      fHistoMap["PidLikeMU"] = new TH1I("PidLikeMU","PidLikeMU",400,-2.1,2.1);
-      fHistoMap["GT_Qp_first"] = new TH1I("GT_Qp_first","GT_Qp_first",200,-20,20);
-      fHistoMap["GT_Qp_last"] = new TH1I("GT_Qp_last","GT_Qp_last",200,-20,20);
-      fHistoMap["GT_Vertex_x_first"] = new TH1I("GT_Vertex_x_first","GT_Vertex_x_first",1000,-50,50);
-      fHistoMap["GT_Vertex_y_first"] = new TH1I("GT_Vertex_y_first","GT_Vertex_y_first",1000,-50,50);
-      fHistoMap["GT_Vertex_z_first"] = new TH1I("GT_Vertex_z_first","GT_Vertex_z_first",10000,0,1000);
-      fHistoMap["GT_Vertex_x_last"] = new TH1I("GT_Vertex_x_last","GT_Vertex_x_last",1000,-50,50);
-      fHistoMap["GT_Vertex_y_last"] = new TH1I("GT_Vertex_y_last","GT_Vertex_y_last",1000,-50,50);
-      fHistoMap["GT_Vertex_z_last"] = new TH1I("GT_Vertex_z_last","GT_Vertex_z_last",10000,0,1000);
+      fHistoMap["PidWkn"] = new TH1F("PidWkn","PidWkn",400,-2.1,2.1);
+      fHistoMap["PidANN"] = new TH1F("PidANN","PidANN",400,-2.1,2.1);
+      fHistoMap["PidLikeEL"] = new TH1F("PidLikeEL","PidLikeEL",400,-2.1,2.1);
+      fHistoMap["PidLikePI"] = new TH1F("PidLikePI","PidLikePI",400,-2.1,2.1);
+      fHistoMap["PidLikeKA"] = new TH1F("PidLikeKA","PidLikeKA",400,-2.1,2.1);
+      fHistoMap["PidLikePR"] = new TH1F("PidLikePR","PidLikePR",400,-2.1,2.1);
+      fHistoMap["PidLikeMU"] = new TH1F("PidLikeMU","PidLikeMU",400,-2.1,2.1);
+      fHistoMap["GT_Qp_first"] = new TH1F("GT_Qp_first","GT_Qp_first",200,-20,20);
+      fHistoMap["GT_Qp_last"] = new TH1F("GT_Qp_last","GT_Qp_last",200,-20,20);
+      fHistoMap["GT_Vertex_x_first"] = new TH1F("GT_Vertex_x_first","GT_Vertex_x_first",1000,-50,50);
+      fHistoMap["GT_Vertex_y_first"] = new TH1F("GT_Vertex_y_first","GT_Vertex_y_first",1000,-50,50);
+      fHistoMap["GT_Vertex_z_first"] = new TH1F("GT_Vertex_z_first","GT_Vertex_z_first",10000,0,1000);
+      fHistoMap["GT_Vertex_x_last"] = new TH1F("GT_Vertex_x_last","GT_Vertex_x_last",1000,-50,50);
+      fHistoMap["GT_Vertex_y_last"] = new TH1F("GT_Vertex_y_last","GT_Vertex_y_last",1000,-50,50);
+      fHistoMap["GT_Vertex_z_last"] = new TH1F("GT_Vertex_z_last","GT_Vertex_z_last",10000,0,1000);
 
-      fHistoMap["KF_PrimVertex_x"] = new TH1I("KF_PrimVertex_x","KF_PrimVertex_x",1000,-50,50);
-      fHistoMap["KF_PrimVertex_y"] = new TH1I("KF_PrimVertex_y","KF_PrimVertex_y",1000,-50,50);
-      fHistoMap["KF_PrimVertex_z"] = new TH1I("KF_PrimVertex_z","KF_PrimVertex_z",10000,-0.5,1000);
-      fHistoMap["KF_P"] = new TH1I("KF_P","KF_P",1000,0,10);
-      fHistoMap["KF_Pt"] = new TH1I("KF_Pt","KF_Pt",200,0,2);
-      fHistoMap["KF_E"] = new TH1I("KF_E","KF_E",2000,0,20);
+      fHistoMap["KF_PrimVertex_x"] = new TH1F("KF_PrimVertex_x","KF_PrimVertex_x",1000,-50,50);
+      fHistoMap["KF_PrimVertex_y"] = new TH1F("KF_PrimVertex_y","KF_PrimVertex_y",1000,-50,50);
+      fHistoMap["KF_PrimVertex_z"] = new TH1F("KF_PrimVertex_z","KF_PrimVertex_z",10000,-0.5,1000);
+      fHistoMap["KF_P"] = new TH1F("KF_P","KF_P",1000,0,10);
+      fHistoMap["KF_Pt"] = new TH1F("KF_Pt","KF_Pt",200,0,2);
+      fHistoMap["KF_E"] = new TH1F("KF_E","KF_E",2000,0,20);
       fHistoMap["KF_PID_MC_PID"] = new  TH2I("KF_PID_MC_PID","KF_PID_MC_PID",49,0.5,49.5,49,0.5,49.5);
       fHistoMap["KF_PID_RICH_MC_PID"] = new  TH2I("KF_PID_RICH_MC_PID","KF_PID_RICH_MC_PID",49,0.5,49.5,49,0.5,49.5);
       fHistoMap["KF_PID_TRD_MC_PID"] = new  TH2I("KF_PID_TRD_MC_PID","KF_PID_TRD_MC_PID",49,0.5,49.5,49,0.5,49.5);
       fHistoMap["KF_PID_TOF_MC_PID"] = new  TH2I("KF_PID_TOF_MC_PID","KF_PID_TOF_MC_PID",49,0.5,49.5,49,0.5,49.5);
-      fHistoMap["GT_MC_Tracks"] = new  TH1I("GT_MC_Tracks","GT_MC_Tracks",4,0.5,4.5);
+      fHistoMap["GT_MC_Tracks"] = new  TH1F("GT_MC_Tracks","GT_MC_Tracks",4,0.5,4.5);
 
       for (Int_t bin = 0; bin < 49; bin++) {
 	fHistoMap["KF_PID_MC_PID"]->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
@@ -2765,21 +2765,21 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["TOF_GT_time_KF_P"] = new  TH2I("TOF_GT_time_KF_P","TOF_GT_time_KF_P",100,0,5,100,0.5,1.1);
       fHistoMap["TOF_GT_time_KF_P_true"] = new  TH2I("TOF_GT_time_KF_P_true","TOF_GT_time_KF_P_true",100,0,5,100,0.5,1.1);
       fHistoMap["TOF_GT_mass2_KF_P"] = new  TH2I("TOF_GT_mass2_KF_P","TOF_GT_mass2_KF_P",100,0,5,100,-0.5,1.5);
-      fHistoMap["TRD_GT_electron_all"] = new TH1I("TRD_GT_electron_all","TRD_GT_electron_all",100,0,5); 
-      fHistoMap["TRD_GT_electron_found"] = new TH1I("TRD_GT_electron_found","TRD_GT_electron_found",100,0,5);
-      fHistoMap["TRD_GT_electron_wrong"] = new TH1F("TRD_GT_electron_wrong","TRD_GT_electron_wrong",100,0,5);
-      fHistoMap["RICH_GT_electron_all"] = new TH1F("RICH_GT_electron_all","RICH_GT_electron_all",100,0,5); 
-      fHistoMap["RICH_GT_electron_found"] = new TH1F("RICH_GT_electron_found","RICH_GT_electron_found",100,0,5);
-      fHistoMap["RICH_GT_electron_wrong"] = new TH1F("RICH_GT_electron_wrong","RICH_GT_electron_wrong",100,0,5);
-      fHistoMap["TOF_GT_electron_all"] = new TH1F("TOF_GT_electron_all","TOF_GT_electron_all",100,0,5); 
-      fHistoMap["TOF_GT_electron_found"] = new TH1F("TOF_GT_electron_found","TOF_GT_electron_found",100,0,5);
-      fHistoMap["TOF_GT_electron_wrong"] = new TH1F("TOF_GT_electron_wrong","TOF_GT_electron_wrong",100,0,5);
-      fHistoMap["TRD_RICH_GT_electron_all"] = new TH1F("TRD_RICH_GT_electron_all","TRD_RICH_GT_electron_all",100,0,5); 
-      fHistoMap["TRD_RICH_GT_electron_found"] = new TH1F("TRD_RICH_GT_electron_found","TRD_RICH_GT_electron_found",100,0,5);
-      fHistoMap["TRD_RICH_GT_electron_wrong"] = new TH1F("TRD_RICH_GT_electron_wrong","TRD_RICH_GT_electron_wrong",100,0,5);
-      fHistoMap["TRD_RICH_TOF_GT_electron_all"] = new TH1F("TRD_RICH_TOF_GT_electron_all","TRD_RICH_TOF_GT_electron_all",100,0,5); 
-      fHistoMap["TRD_RICH_TOF_GT_electron_found"] = new TH1F("TRD_RICH_TOF_GT_electron_found","TRD_RICH_TOF_GT_electron_found",100,0,5);
-      fHistoMap["TRD_RICH_TOF_GT_electron_wrong"] = new TH1F("TRD_RICH_TOF_GT_electron_wrong","TRD_RICH_TOF_GT_electron_wrong",100,0,5);
+      fHistoMap["TRD_GT_electron_all"] = new TH1F("TRD_GT_electron_all","TRD_GT_electron_all",30,0,10); 
+      fHistoMap["TRD_GT_electron_found"] = new TH1F("TRD_GT_electron_found","TRD_GT_electron_found",30,0,10);
+      fHistoMap["TRD_GT_electron_wrong"] = new TH1F("TRD_GT_electron_wrong","TRD_GT_electron_wrong",30,0,10);
+      fHistoMap["RICH_GT_electron_all"] = new TH1F("RICH_GT_electron_all","RICH_GT_electron_all",30,0,10); 
+      fHistoMap["RICH_GT_electron_found"] = new TH1F("RICH_GT_electron_found","RICH_GT_electron_found",30,0,10);
+      fHistoMap["RICH_GT_electron_wrong"] = new TH1F("RICH_GT_electron_wrong","RICH_GT_electron_wrong",30,0,10);
+      fHistoMap["TOF_GT_electron_all"] = new TH1F("TOF_GT_electron_all","TOF_GT_electron_all",30,0,10); 
+      fHistoMap["TOF_GT_electron_found"] = new TH1F("TOF_GT_electron_found","TOF_GT_electron_found",30,0,10);
+      fHistoMap["TOF_GT_electron_wrong"] = new TH1F("TOF_GT_electron_wrong","TOF_GT_electron_wrong",30,0,10);
+      fHistoMap["TRD_RICH_GT_electron_all"] = new TH1F("TRD_RICH_GT_electron_all","TRD_RICH_GT_electron_all",30,0,10); 
+      fHistoMap["TRD_RICH_GT_electron_found"] = new TH1F("TRD_RICH_GT_electron_found","TRD_RICH_GT_electron_found",30,0,10);
+      fHistoMap["TRD_RICH_GT_electron_wrong"] = new TH1F("TRD_RICH_GT_electron_wrong","TRD_RICH_GT_electron_wrong",30,0,10);
+      fHistoMap["TRD_RICH_TOF_GT_electron_all"] = new TH1F("TRD_RICH_TOF_GT_electron_all","TRD_RICH_TOF_GT_electron_all",30,0,10); 
+      fHistoMap["TRD_RICH_TOF_GT_electron_found"] = new TH1F("TRD_RICH_TOF_GT_electron_found","TRD_RICH_TOF_GT_electron_found",30,0,10);
+      fHistoMap["TRD_RICH_TOF_GT_electron_wrong"] = new TH1F("TRD_RICH_TOF_GT_electron_wrong","TRD_RICH_TOF_GT_electron_wrong",30,0,10);
       //myon
       fHistoMap["RICH_GT_radiusA_KF_P_myon"] = new  TH2I("RICH_GT_radiusA_KF_P_myon","RICH_GT_radiusA_KF_P_myon",100,0,10,100,0,10);
       fHistoMap["RICH_GT_radiusB_KF_P_myon"] = new  TH2I("RICH_GT_radiusB_KF_P_myon","RICH_GT_radiusB_KF_P_myon",100,0,10,100,0,10);
@@ -2802,16 +2802,16 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["TOF_GT_time_KF_P_proton"] = new  TH2I("TOF_GT_time_KF_P_proton","TOF_GT_time_KF_P_proton",100,0,5,100,0.5,1.1);
 
 
-      fHistoMap["EPCandPairOpeningAngle"] = new TH1I("EPCandPairOpeningAngle","opening angle #theta of e^{+}e^{-} cand. pairs",1800,0,180);
-      fHistoMap["CandPairOpeningAngle"] = new TH1I("CandPairOpeningAngle","opening angle #theta of e^{+}e^{-} cand. pairs",1800,0,180);
-      fHistoMap["InvMassSpectrumEPCandPairs"] = new TH1I("InvMassSpectrumEPCandPairs","Invariant mass spectrum from e^{+}e^{-} cand. pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumCandPairs"] = new TH1I("InvMassSpectrumCandPairs","Invariant mass spectrum from e^{+}e^{-} cand. pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaGTCandPairs"] = new TH1I("InvMassSpectrumGTCandPairs","Invariant mass spectrum from e^{+}e^{-} global track cand. pairs without PID",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPCandPairs"] = new TH1I("InvMassSpectrumGammaEPCandPairs","Invariant mass spectrum from #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaCandPairs"] = new TH1I("InvMassSpectrumGammaCandPairs","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
-      fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"] = new TH1I("InvMassSpectrumGammaEPCandPairsOpenAngle","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
+      fHistoMap["EPCandPairOpeningAngle"] = new TH1F("EPCandPairOpeningAngle","opening angle #theta of e^{+}e^{-} cand. pairs",1800,0,180);
+      fHistoMap["CandPairOpeningAngle"] = new TH1F("CandPairOpeningAngle","opening angle #theta of e^{+}e^{-} cand. pairs",1800,0,180);
+      fHistoMap["InvMassSpectrumEPCandPairs"] = new TH1F("InvMassSpectrumEPCandPairs","Invariant mass spectrum from e^{+}e^{-} cand. pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumCandPairs"] = new TH1F("InvMassSpectrumCandPairs","Invariant mass spectrum from e^{+}e^{-} cand. pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaGTCandPairs"] = new TH1F("InvMassSpectrumGTCandPairs","Invariant mass spectrum from e^{+}e^{-} global track cand. pairs without PID",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPCandPairs"] = new TH1F("InvMassSpectrumGammaEPCandPairs","Invariant mass spectrum from #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaCandPairs"] = new TH1F("InvMassSpectrumGammaCandPairs","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
+      fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"] = new TH1F("InvMassSpectrumGammaEPCandPairsOpenAngle","Invariant mass spectrum from all #gamma pairs from e^{+/-}e^{-/+} cand. pairs",2000,0,2);
 
-      fHistoMap["EPPairFromPi0DetectionEfficiency"] = new TH1I("EPPairFromPi0DetectionEfficiency","e^{+}e^{-} cand. pair from same #pi^{0} detection efficiency",8,0.5,8.5);
+      fHistoMap["EPPairFromPi0DetectionEfficiency"] = new TH1F("EPPairFromPi0DetectionEfficiency","e^{+}e^{-} cand. pair from same #pi^{0} detection efficiency",8,0.5,8.5);
       fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetXaxis()->SetBinLabel(1,"#pi^{0}_{MC}#rightarrow #gamma#gamma#rightarrow 2e^{+}2e^{-}");     
       fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetXaxis()->SetBinLabel(2,"1 e^{+}#vee e^{-}");   
       fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetXaxis()->SetBinLabel(3,"2 e^{+}#vee e^{-}");    
@@ -2821,9 +2821,9 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetXaxis()->SetBinLabel(7,"1 e^{+}#vee e^{-}");
       fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetXaxis()->SetBinLabel(8,"2 e^{+}#vee e^{-}");
 
-      NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiency"],2,20,1,"","");
+      NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiency"],2,20,1,"","counts");
 
-      fHistoMap["EPPairFromPi0DetectionEfficiencyAll"] = new TH1I("EPPairFromPi0DetectionEfficiencyAll","e^{+}e^{-} pair from same #pi^{0} detection efficiency",8,0.5,8.5);
+      fHistoMap["EPPairFromPi0DetectionEfficiencyAll"] = new TH1F("EPPairFromPi0DetectionEfficiencyAll","e^{+}e^{-} pair from same #pi^{0} detection efficiency",8,0.5,8.5);
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(1,"#pi^{0}_{MC}#rightarrow #gamma#gamma#rightarrow 2e^{+}2e^{-}");     
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(2,"1 e^{+}#vee e^{-}");   
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(3,"2 e^{+}#vee e^{-}");    
@@ -2833,204 +2833,204 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(7,"1 e^{+}#vee e^{-}");
       fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(8,"2 e^{+}#vee e^{-}");
 
-      NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],1,24,1,"","");
+      NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],1,24,1,"","counts");
 
-      NiceHisto1(fHistoMap["MCPid_global"],1,20,1,"","");
-      NiceHisto1(fHistoMap["GT_MC_PID_STS"],1,20,1,"MC PID for global tracks","");
-      NiceHisto1(fHistoMap["GT_MC_PID_RICH"],2,20,1,"MC PID for global tracks","");
-      NiceHisto1(fHistoMap["GT_MC_PID_TRD"],3,20,1,"MC PID for global tracks","");
-      NiceHisto1(fHistoMap["GT_MC_PID_TOF"],4,20,1,"MC PID for global tracks","");
-      NiceHisto1(fHistoMap["MCPid_inMagnet"],2,20,1,"","");
-      NiceHisto1(fHistoMap["MCPid_inTarget"],3,20,1,"","");
-      NiceHisto1(fHistoMap["GTPid"],1,20,1,"","");
-      NiceHisto2((TH2*)fHistoMap["Pt_global"],1,1,1,"p_{T} [Gev/c]","","");
-      NiceHisto2((TH2*)fHistoMap["P_global"],1,1,1,"p [Gev/c]","","");
-      NiceHisto2((TH2*)fHistoMap["Pt_inMagnet"],1,1,1,"p_{T} [Gev/c]","","");
-      NiceHisto2((TH2*)fHistoMap["P_inMagnet"],1,1,1,"p [Gev/c]","","");
-      NiceHisto2((TH2*)fHistoMap["Pt_inTarget"],1,1,1,"p_{T} [Gev/c]","","");
-      NiceHisto2((TH2*)fHistoMap["P_inTarget"],1,1,1,"p [Gev/c]","","");
-      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_global"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","");
-      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inMagnet"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","");
-      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inTarget"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","");
-      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inTarget_EPPairsPi0"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","");
-      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inTarget_EPPairsGamma"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["ePlusMinusMother"],1,20,1,"","");
-      NiceHisto1(fHistoMap["gammaMother"],1,20,1,"","");
-      NiceHisto1(fHistoMap["gammaDaughter"],1,20,1,"","");
-      NiceHisto1(fHistoMap["ZBirth[0]"],1,20,1,"z-position [cm]","");
-      NiceHisto1(fHistoMap["ZBirth[1]"],2,20,1,"z-position [cm]","");
-      NiceHisto1(fHistoMap["ZBirth[2]"],3,20,1,"z-position [cm]","");
-      NiceHisto1(fHistoMap["ZBirth[3]"],4,20,1,"z-position [cm]","");
-      NiceHisto1(fHistoMap["PairHistory"],1,20,1,"","");
-      NiceHisto1(fHistoMap["GT_MC_Tracks"],1,20,1,"Number of assigned MC-tracks per GT","");
-      NiceHisto2((TH2*)fHistoMap["NoDaughters_global"],1,1,1,"","Number of daughters","");
-      NiceHisto2((TH2*)fHistoMap["NoDaughters_inMagnet"],1,1,1,"","Number of daughters","");
-      NiceHisto2((TH2*)fHistoMap["NoDaughters_inTarget"],1,1,1,"","Number of daughters","");
-      NiceHisto2((TH2*)fHistoMap["ZBirthAll"],1,1,1,"z-position [cm]","","#");
-      NiceHisto2((TH2*)fHistoMap["MotherDaughter_global"],1,1,1,"Mother","Daughter","#");
-      NiceHisto2((TH2*)fHistoMap["MotherDaughter_inMagnet"],1,1,1,"Mother","Daughter","#");
-      NiceHisto2((TH2*)fHistoMap["MotherDaughter_inTarget"],1,1,1,"Mother","Daughter","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_gamma_global"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_posi_global"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_elec_global"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_gamma_inMagnet"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_posi_inMagnet"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_elec_inMagnet"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_gamma_inTarget"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_posi_inTarget"],1,1,1,"Mother","Grandmother","#");
-      NiceHisto2((TH2*)fHistoMap["motherGrani_elec_inTarget"],1,1,1,"Mother","Grandmother","#");
+      NiceHisto1(fHistoMap["MCPid_global"],1,20,1,"","counts");
+      NiceHisto1(fHistoMap["GT_MC_PID_STS"],1,20,1,"MC PID for global tracks","counts");
+      NiceHisto1(fHistoMap["GT_MC_PID_RICH"],2,20,1,"MC PID for global tracks","counts");
+      NiceHisto1(fHistoMap["GT_MC_PID_TRD"],3,20,1,"MC PID for global tracks","counts");
+      NiceHisto1(fHistoMap["GT_MC_PID_TOF"],4,20,1,"MC PID for global tracks","counts");
+      NiceHisto1(fHistoMap["MCPid_inMagnet"],2,20,1,"","counts");
+      NiceHisto1(fHistoMap["MCPid_inTarget"],3,20,1,"","counts");
+      NiceHisto1(fHistoMap["GTPid"],1,20,1,"","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_global"],1,1,1,"p_{T} [Gev/c]","","counts");
+      NiceHisto2((TH2*)fHistoMap["P_global"],1,1,1,"p [Gev/c]","","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_inMagnet"],1,1,1,"p_{T} [Gev/c]","","counts");
+      NiceHisto2((TH2*)fHistoMap["P_inMagnet"],1,1,1,"p [Gev/c]","","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_inTarget"],1,1,1,"p_{T} [Gev/c]","","counts");
+      NiceHisto2((TH2*)fHistoMap["P_inTarget"],1,1,1,"p [Gev/c]","","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_global"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inMagnet"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inTarget"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inTarget_EPPairsPi0"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","counts");
+      NiceHisto2((TH2*)fHistoMap["Pt_OpenAngle_inTarget_EPPairsGamma"],1,1,1,"p_{T} [Gev/c]","Opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["ePlusMinusMother"],1,20,1,"","counts");
+      NiceHisto1(fHistoMap["gammaMother"],1,20,1,"","counts");
+      NiceHisto1(fHistoMap["gammaDaughter"],1,20,1,"","counts");
+      NiceHisto1(fHistoMap["ZBirth[0]"],1,20,1,"z-position [cm]","counts");
+      NiceHisto1(fHistoMap["ZBirth[1]"],2,20,1,"z-position [cm]","counts");
+      NiceHisto1(fHistoMap["ZBirth[2]"],3,20,1,"z-position [cm]","counts");
+      NiceHisto1(fHistoMap["ZBirth[3]"],4,20,1,"z-position [cm]","counts");
+      NiceHisto1(fHistoMap["PairHistory"],1,20,1,"","counts");
+      NiceHisto1(fHistoMap["GT_MC_Tracks"],1,20,1,"Number of assigned MC-tracks per GT","counts");
+      NiceHisto2((TH2*)fHistoMap["NoDaughters_global"],1,1,1,"","Number of daughters","counts");
+      NiceHisto2((TH2*)fHistoMap["NoDaughters_inMagnet"],1,1,1,"","Number of daughters","counts");
+      NiceHisto2((TH2*)fHistoMap["NoDaughters_inTarget"],1,1,1,"","Number of daughters","counts");
+      NiceHisto2((TH2*)fHistoMap["ZBirthAll"],1,1,1,"z-position [cm]","","counts");
+      NiceHisto2((TH2*)fHistoMap["MotherDaughter_global"],1,1,1,"Mother","Daughter","counts");
+      NiceHisto2((TH2*)fHistoMap["MotherDaughter_inMagnet"],1,1,1,"Mother","Daughter","counts");
+      NiceHisto2((TH2*)fHistoMap["MotherDaughter_inTarget"],1,1,1,"Mother","Daughter","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_gamma_global"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_posi_global"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_elec_global"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_gamma_inMagnet"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_posi_inMagnet"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_elec_inMagnet"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_gamma_inTarget"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_posi_inTarget"],1,1,1,"Mother","Grandmother","counts");
+      NiceHisto2((TH2*)fHistoMap["motherGrani_elec_inTarget"],1,1,1,"Mother","Grandmother","counts");
       NiceHisto3((TH3*)fBirthPi0,1,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
       NiceHisto3((TH3*)fBirthGamma,2,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
       NiceHisto3((TH3*)fBirthPair,3,7,1,"x-position [cm]","y-position [cm]","z-position [cm]");
-      //NiceHisto3((TH3*)fHistoMap["MotherDaughterZBirth"],1,1,1,"z-position [cm]","","");
+      //NiceHisto3((TH3*)fHistoMap["MotherDaughterZBirth"],1,1,1,"z-position [cm]","","counts");
 
-      NiceHisto1(fHistoMap["EPPairVertexDistance_global"],1,1,1,"vertex distance [cm]","");
-      NiceHisto1(fHistoMap["EPPairVertexDistance_inMagnet"],2,1,1,"vertex distance [cm]","");
-      NiceHisto1(fHistoMap["EPPairVertexDistance_inTarget"],3,1,1,"vertex distance [cm]","");
+      NiceHisto1(fHistoMap["EPPairVertexDistance_global"],1,1,1,"vertex distance [cm]","counts");
+      NiceHisto1(fHistoMap["EPPairVertexDistance_inMagnet"],2,1,1,"vertex distance [cm]","counts");
+      NiceHisto1(fHistoMap["EPPairVertexDistance_inTarget"],3,1,1,"vertex distance [cm]","counts");
 
-      NiceHisto2((TH2*)fHistoMap["InvMPairMother"],1,1,1,"Invariant mass [GeV/c^{2}]","Mother","");
-      NiceHisto2((TH2*)fHistoMap["PtPairMother"],1,1,1,"p_{T} [Gev/c]","Mother","");
-      NiceHisto2((TH2*)fHistoMap["PPairMother"],1,1,1,"p [Gev/c]","Mother","");
-      NiceHisto2((TH2*)fHistoMap["OpenAnglePairMother"],1,1,1,"opening angle #theta [#circ]","Mother","");
+      NiceHisto2((TH2*)fHistoMap["InvMPairMother"],1,1,1,"Invariant mass [GeV/c^{2}]","Mother","counts");
+      NiceHisto2((TH2*)fHistoMap["PtPairMother"],1,1,1,"p_{T} [Gev/c]","Mother","counts");
+      NiceHisto2((TH2*)fHistoMap["PPairMother"],1,1,1,"p [Gev/c]","Mother","counts");
+      NiceHisto2((TH2*)fHistoMap["OpenAnglePairMother"],1,1,1,"opening angle #theta [#circ]","Mother","counts");
 
 
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetPt"],1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetPt"],1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsPt"],1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetP"],1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetP"],1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsP"],1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetOA"],1,1,1,"Invariant mass [GeV/c^{2}]","pair opening angle #theta [#circ]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetOA"],1,1,1,"Invariant mass [GeV/c^{2}]","pair opening angle #theta [#circ]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsOA"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair opening angle #theta [#circ]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetVD"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetVD"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]",""); // new
-      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsVD"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]","");
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetPt"],1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetPt"],1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsPt"],1,1,1,"Invariant mass [GeV/c^{2}]","p_{T} [Gev/c]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetP"],1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetP"],1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsP"],1,1,1,"Invariant mass [GeV/c^{2}]","p [Gev/c]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetOA"],1,1,1,"Invariant mass [GeV/c^{2}]","pair opening angle #theta [#circ]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetOA"],1,1,1,"Invariant mass [GeV/c^{2}]","pair opening angle #theta [#circ]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsOA"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair opening angle #theta [#circ]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInTargetVD"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsInMagnetVD"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]","counts"); // new
+      NiceHisto2((TH2*)fHistoMap["InvMassSpectrumGammaEPPairsVD"],1,1,1,"Invariant mass [GeV/c^{2}]","#gamma pair vertex distance [cm]","counts");
 
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaAllPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaTruePairs"],2,1,1,"Invariant mass [GeV/c^{2}]","");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaAllPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaTruePairs"],2,1,1,"Invariant mass [GeV/c^{2}]","counts");
 
-      NiceHisto1(fHistoMap["InvMassSpectrumAllEPPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumEPPairsInMagnet"],2,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsInMagnetBackground"],800,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumEPPairsInTarget"],3,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumTrueEPPairs"],4,1,1,"Invariant mass [GeV/c^{2}]","");
+      NiceHisto1(fHistoMap["InvMassSpectrumAllEPPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumEPPairsInMagnet"],2,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsInMagnetBackground"],800,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumEPPairsInTarget"],3,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumTrueEPPairs"],4,1,1,"Invariant mass [GeV/c^{2}]","counts");
 
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"],2,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsInTarget"],3,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"],4,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsGamma"],6,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsPi0"],7,1,1,"Invariant mass [GeV/c^{2}]","");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"],2,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsInTarget"],3,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"],4,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsGamma"],6,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPPairsPi0"],7,1,1,"Invariant mass [GeV/c^{2}]","counts");
 
-      NiceHisto1(fHistoMap["EPPairOpeningAngle"],1,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["EPPairOpeningAngleInMagnet"],2,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["EPPairOpeningAngleInTarget"],3,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["EPPairOpeningAngleSameMother"],4,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["EPPairOpeningAngleGamma"],6,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["EPPairOpeningAnglePi0"],7,1,1,"opening angle #theta [#circ]","");
+      NiceHisto1(fHistoMap["EPPairOpeningAngle"],1,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["EPPairOpeningAngleInMagnet"],2,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["EPPairOpeningAngleInTarget"],3,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["EPPairOpeningAngleSameMother"],4,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["EPPairOpeningAngleGamma"],6,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["EPPairOpeningAnglePi0"],7,1,1,"opening angle #theta [#circ]","counts");
 
       NiceHisto1(fHistoMap["PairOpeningAngleAll"],1,1,1,"opening angle #theta cut [#circ]","pair fraction");
       NiceHisto1(fHistoMap["PairOpeningAngleGamma"],2,1,1,"opening angle #theta cut [#circ]","pair fraction");
       NiceHisto1(fHistoMap["PairOpeningAnglePi0"],3,1,1,"opening angle #theta cut [#circ]","pair fraction");
       NiceHisto1(fHistoMap["PairOpeningAngleGammaWoPi0"],4,1,1,"opening angle #theta cut [#circ]","pair fraction");
-      NiceHisto1(fHistoMap["PidWkn"],1,1,1,"PID Wkn","");
-      NiceHisto1(fHistoMap["PidANN"],1,1,1,"Pid ANN","");
-      NiceHisto1(fHistoMap["PidLikeEL"],1,1,1,"Likelihood EL","");
-      NiceHisto1(fHistoMap["PidLikePI"],1,1,1,"Likelihood Pi","");
-      NiceHisto1(fHistoMap["PidLikeKA"],1,1,1,"Likelihood Ka","");
-      NiceHisto1(fHistoMap["PidLikePR"],1,1,1,"Likelihood Pr","");
-      NiceHisto1(fHistoMap["PidLikeMU"],1,1,1,"Likelihood Mu","");
-      NiceHisto1(fHistoMap["GT_Qp_first"],1,1,1,"Q/p [1/GeV/c]","");
-      NiceHisto1(fHistoMap["GT_Qp_last"],1,1,1,"Q/p [1/GeV/c]","");
-      NiceHisto1(fHistoMap["GT_Vertex_x_first"],1,1,1,"x-position [cm]","");
-      NiceHisto1(fHistoMap["GT_Vertex_y_first"],1,1,1,"y-position [cm]","");
-      NiceHisto1(fHistoMap["GT_Vertex_z_first"],1,1,1,"z-position [cm]","");
-      NiceHisto1(fHistoMap["GT_Vertex_x_last"],1,1,1,"x-position [cm]","");
-      NiceHisto1(fHistoMap["GT_Vertex_y_last"],1,1,1,"y-position [cm]","");
-      NiceHisto1(fHistoMap["GT_Vertex_z_last"],1,1,1,"z-position [cm]","");
+      NiceHisto1(fHistoMap["PidWkn"],1,1,1,"PID Wkn","counts");
+      NiceHisto1(fHistoMap["PidANN"],1,1,1,"Pid ANN","counts");
+      NiceHisto1(fHistoMap["PidLikeEL"],1,1,1,"Likelihood EL","counts");
+      NiceHisto1(fHistoMap["PidLikePI"],1,1,1,"Likelihood Pi","counts");
+      NiceHisto1(fHistoMap["PidLikeKA"],1,1,1,"Likelihood Ka","counts");
+      NiceHisto1(fHistoMap["PidLikePR"],1,1,1,"Likelihood Pr","counts");
+      NiceHisto1(fHistoMap["PidLikeMU"],1,1,1,"Likelihood Mu","counts");
+      NiceHisto1(fHistoMap["GT_Qp_first"],1,1,1,"Q/p [1/GeV/c]","counts");
+      NiceHisto1(fHistoMap["GT_Qp_last"],1,1,1,"Q/p [1/GeV/c]","counts");
+      NiceHisto1(fHistoMap["GT_Vertex_x_first"],1,1,1,"x-position [cm]","counts");
+      NiceHisto1(fHistoMap["GT_Vertex_y_first"],1,1,1,"y-position [cm]","counts");
+      NiceHisto1(fHistoMap["GT_Vertex_z_first"],1,1,1,"z-position [cm]","counts");
+      NiceHisto1(fHistoMap["GT_Vertex_x_last"],1,1,1,"x-position [cm]","counts");
+      NiceHisto1(fHistoMap["GT_Vertex_y_last"],1,1,1,"y-position [cm]","counts");
+      NiceHisto1(fHistoMap["GT_Vertex_z_last"],1,1,1,"z-position [cm]","counts");
 
-      NiceHisto1(fHistoMap["KF_PrimVertex_x"],1,1,1,"x-position [cm]","");
-      NiceHisto1(fHistoMap["KF_PrimVertex_y"],1,1,1,"y-position [cm]","");
-      NiceHisto1(fHistoMap["KF_PrimVertex_z"],1,1,1,"z-position [cm]","");
-      NiceHisto1(fHistoMap["KF_P"],1,1,1,"p [1/GeV/c]","");
-      NiceHisto1(fHistoMap["KF_Pt"],1,1,1,"p_{T} [1/GeV/c]","");
-      NiceHisto1(fHistoMap["KF_E"],1,1,1,"E [GeV]","");
-      NiceHisto2((TH2*)fHistoMap["KF_PID_MC_PID"],1,1,1,"MC","KF ANN","");
-      NiceHisto2((TH2*)fHistoMap["KF_PID_RICH_MC_PID"],1,1,1,"MC","KF ANN RICH","");
-      NiceHisto2((TH2*)fHistoMap["KF_PID_TRD_MC_PID"],1,1,1,"MC","KF ANN TRD","");
-      NiceHisto2((TH2*)fHistoMap["KF_PID_TOF_MC_PID"],1,1,1,"MC","KF ANN TOF","");
+      NiceHisto1(fHistoMap["KF_PrimVertex_x"],1,1,1,"x-position [cm]","counts");
+      NiceHisto1(fHistoMap["KF_PrimVertex_y"],1,1,1,"y-position [cm]","counts");
+      NiceHisto1(fHistoMap["KF_PrimVertex_z"],1,1,1,"z-position [cm]","counts");
+      NiceHisto1(fHistoMap["KF_P"],1,1,1,"p [1/GeV/c]","counts");
+      NiceHisto1(fHistoMap["KF_Pt"],1,1,1,"p_{T} [1/GeV/c]","counts");
+      NiceHisto1(fHistoMap["KF_E"],1,1,1,"E [GeV]","counts");
+      NiceHisto2((TH2*)fHistoMap["KF_PID_MC_PID"],1,1,1,"MC","KF ANN","counts");
+      NiceHisto2((TH2*)fHistoMap["KF_PID_RICH_MC_PID"],1,1,1,"MC","KF ANN RICH","counts");
+      NiceHisto2((TH2*)fHistoMap["KF_PID_TRD_MC_PID"],1,1,1,"MC","KF ANN TRD","counts");
+      NiceHisto2((TH2*)fHistoMap["KF_PID_TOF_MC_PID"],1,1,1,"MC","KF ANN TOF","counts");
 
-      NiceHisto2((TH2*)fHistoMap["DeltaP"],1,1,1,"p_{MC} [GeV/c]","#Delta p/p_{MC} [%]","");
-      NiceHisto2((TH2*)fHistoMap["DeltaPt"],1,1,1,"p_{T,MC} [GeV/c]","#Delta p_{T}/p_{T,MC} [%]","");
-      NiceHisto2((TH2*)fHistoMap["DeltaPGT_PKF"],1,1,1,"p_{MC} [GeV/c]","#Delta p_{GT} - p_{KF} [GeV/c]","");
+      NiceHisto2((TH2*)fHistoMap["DeltaP"],1,1,1,"p_{MC} [GeV/c]","#Delta p/p_{MC} [%]","counts");
+      NiceHisto2((TH2*)fHistoMap["DeltaPt"],1,1,1,"p_{T,MC} [GeV/c]","#Delta p_{T}/p_{T,MC} [%]","counts");
+      NiceHisto2((TH2*)fHistoMap["DeltaPGT_PKF"],1,1,1,"p_{MC} [GeV/c]","#Delta p_{GT} - p_{KF} [GeV/c]","counts");
 
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_mass2_KF_P"],1,1,1,"p_{MC} [GeV/c]","m^{2} []","");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_mass2_KF_P"],1,1,1,"p_{MC} [GeV/c]","m^{2} []","counts");
 
-      NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+      NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P"] ,1,1,1,"p_{MC} [GeV/c]","#beta","counts");//"time of flight [ns]"
 
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_myon"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_myon"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_myon"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_myon"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_myon"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_myon"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_myon"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_myon"] ,1,1,1,"p_{MC} [GeV/c]","#beta","counts");//"time of flight [ns]"
 
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_pion"],2,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_pion"] ,2,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_pion"],2,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_pion"] ,2,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_pion"],2,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_pion"] ,2,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_pion"],2,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_pion"] ,2,1,1,"p_{MC} [GeV/c]","#beta","counts");//"time of flight [ns]"
 
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_electron"],3,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_electron"] ,3,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_electron"],3,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_electron"] ,3,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_electron"],3,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_electron"] ,3,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_electron"],3,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_electron"] ,3,1,1,"p_{MC} [GeV/c]","#beta","counts");//"time of flight [ns]"
 
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_proton"],4,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_proton"] ,4,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_proton"],4,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_proton"] ,4,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
-
-
-      NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","");
-      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","#beta","");//"time of flight [ns]"
-
-      NiceHisto1(fHistoMap["TRD_GT_electron_all"],1,20,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_GT_electron_found"],1,20,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_GT_electron_wrong"],1,20,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["RICH_GT_electron_all"],2,21,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["RICH_GT_electron_found"],2,21,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["RICH_GT_electron_wrong"],2,21,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TOF_GT_electron_all"],3,22,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TOF_GT_electron_found"],3,22,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TOF_GT_electron_wrong"],3,22,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_RICH_GT_electron_all"] ,4,24,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_RICH_GT_electron_found"],4,24,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_RICH_GT_electron_wrong"],4,24,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_all"],800,25,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_found"],800,25,1,"p_{MC} [GeV/c]","");
-      NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_wrong"],800,25,1,"p_{MC} [GeV/c]","");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_proton"],4,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_proton"] ,4,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_proton"],4,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_proton"] ,4,1,1,"p_{MC} [GeV/c]","#beta","counts");//"time of flight [ns]"
 
 
+      NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P_true"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusB_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["RICH_GT_radius_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");
+      NiceHisto2((TH2*)fHistoMap["TOF_GT_time_KF_P_true"] ,1,1,1,"p_{MC} [GeV/c]","#beta","counts");//"time of flight [ns]"
 
-      NiceHisto1(fHistoMap["EPCandPairOpeningAngle"],1,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["CandPairOpeningAngle"],2,1,1,"opening angle #theta [#circ]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumEPCandPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumCandPairs"],2,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairs"],3,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaCandPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaGTCandPairs"],6,1,1,"Invariant mass [GeV/c^{2}]","");
-      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"],4,1,1,"Invariant mass [GeV/c^{2}]","");
+      NiceHisto1(fHistoMap["TRD_GT_electron_all"],1,20,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_GT_electron_found"],1,20,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_GT_electron_wrong"],1,20,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["RICH_GT_electron_all"],2,21,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["RICH_GT_electron_found"],2,21,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["RICH_GT_electron_wrong"],2,21,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TOF_GT_electron_all"],3,22,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TOF_GT_electron_found"],3,22,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TOF_GT_electron_wrong"],3,22,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_RICH_GT_electron_all"] ,4,24,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_RICH_GT_electron_found"],4,24,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_RICH_GT_electron_wrong"],4,24,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_all"],800,25,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_found"],800,25,1,"p_{MC} [GeV/c]","counts");
+      NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_wrong"],800,25,1,"p_{MC} [GeV/c]","counts");
 
-      NiceHisto1(fHistoMap["ePlusMinusMother"],1,20,1,"Mother","");
-      NiceHisto1(fHistoMap["ePlusAndMinusMother"],2,20,1,"Mother","");
-      NiceHisto1(fHistoMap["gammaMother"],1,20,1,"Mother","");
-      NiceHisto1(fHistoMap["gammaAndGammaMother"],2,20,1,"Mother","");
+
+
+      NiceHisto1(fHistoMap["EPCandPairOpeningAngle"],1,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["CandPairOpeningAngle"],2,1,1,"opening angle #theta [#circ]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumEPCandPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumCandPairs"],2,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairs"],3,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaCandPairs"],1,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaGTCandPairs"],6,1,1,"Invariant mass [GeV/c^{2}]","counts");
+      NiceHisto1(fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"],4,1,1,"Invariant mass [GeV/c^{2}]","counts");
+
+      NiceHisto1(fHistoMap["ePlusMinusMother"],1,20,1,"Mother","counts");
+      NiceHisto1(fHistoMap["ePlusAndMinusMother"],2,20,1,"Mother","counts");
+      NiceHisto1(fHistoMap["gammaMother"],1,20,1,"Mother","counts");
+      NiceHisto1(fHistoMap["gammaAndGammaMother"],2,20,1,"Mother","counts");
 
     }
     void  CbmTrdPhotonAnalysis::NormalizeHistos(TH1* h)

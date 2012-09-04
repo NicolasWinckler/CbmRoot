@@ -23,7 +23,7 @@ std::map<TString, TH1*>::iterator fHistoMapIt;
 
 void FindHistos(TDirectory *target);
 
-void plotResults(){
+void plotResults(TString filename = "result_0100Pi0.root"){
   gROOT->Reset(); 
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");
@@ -31,10 +31,9 @@ void plotResults(){
   gStyle->SetPadTickY(1);  
   gStyle->SetOptStat(kFALSE);
   gStyle->SetOptTitle(kFALSE);
-  //Target = TFile::Open("result_0000Pi0.root", "READ");
-  //Target = TFile::Open("result_1000Pi0.root", "READ");
-  Target = TFile::Open("result_0100Pi0.root", "READ");
-  //Target = TFile::Open("result_0010Pi0.root", "READ");
+  TH1::SetDefaultSumw2();
+  Float_t max(0), min(1), nEntries(0);
+  Target = TFile::Open(filename, "READ");
   FindHistos(Target);
   TCanvas *c = new TCanvas("c","c",800,600);
   c->Divide(1,1);
@@ -79,58 +78,79 @@ void plotResults(){
     c->SaveAs(TString("pics/" + name + ".pdf"));
     c->SaveAs(TString("pics/" + name + ".png"));
   */
+
   fHistoMap["TRD_GT_electronEff"] = (TH1F*)fHistoMap["TRD_GT_electron_found"]->Clone("TRD_GT_electronEff");
   fHistoMap["TRD_GT_electronEff"]->SetYTitle("Electron efficiency");
-  fHistoMap["TRD_GT_electronEff"]->Divide(fHistoMap["TRD_GT_electron_all"]);
+  fHistoMap["TRD_GT_electronEff"]->Divide((TH1F*)fHistoMap["TRD_GT_electron_all"]);
   fHistoMap["TRD_GT_contaminationEff"] = (TH1F*)fHistoMap["TRD_GT_electron_wrong"]->Clone("TRD_GT_contaminationEff");
   fHistoMap["TRD_GT_contaminationEff"]->SetYTitle("Contamination efficiency");
-  fHistoMap["TRD_GT_contaminationEff"]->Divide(fHistoMap["TRD_GT_electron_found"]);
+  fHistoMap["TRD_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_GT_electron_found"]);
   fHistoMap["RICH_GT_electronEff"] = (TH1F*)fHistoMap["RICH_GT_electron_found"]->Clone("RICH_GT_electronEff");
-  fHistoMap["RICH_GT_electronEff"]->Divide(fHistoMap["RICH_GT_electron_all"]);
+  fHistoMap["RICH_GT_electronEff"]->Divide((TH1F*)fHistoMap["RICH_GT_electron_all"]);
   fHistoMap["RICH_GT_contaminationEff"] = (TH1F*)fHistoMap["RICH_GT_electron_wrong"]->Clone("RICH_GT_contaminationEff");
-  fHistoMap["RICH_GT_contaminationEff"]->Divide(fHistoMap["RICH_GT_electron_found"]);
+  fHistoMap["RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["RICH_GT_electron_found"]);
   fHistoMap["TOF_GT_electronEff"] = (TH1F*)fHistoMap["TOF_GT_electron_found"]->Clone("TOF_GT_electronEff");
-  fHistoMap["TOF_GT_electronEff"]->Divide(fHistoMap["TOF_GT_electron_all"]);
+  fHistoMap["TOF_GT_electronEff"]->Divide((TH1F*)fHistoMap["TOF_GT_electron_all"]);
   fHistoMap["TOF_GT_contaminationEff"] = (TH1F*)fHistoMap["TOF_GT_electron_wrong"]->Clone("TOF_GT_contaminationEff");
-  fHistoMap["TOF_GT_contaminationEff"]->Divide(fHistoMap["TOF_GT_electron_found"]);
+  fHistoMap["TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TOF_GT_electron_found"]);
   fHistoMap["TRD_RICH_GT_electronEff"] = (TH1F*)fHistoMap["TRD_RICH_GT_electron_found"]->Clone("TRD_RICH_GT_electronEff");
-  fHistoMap["TRD_RICH_GT_electronEff"]->Divide(fHistoMap["TRD_RICH_GT_electron_all"]);
+  fHistoMap["TRD_RICH_GT_electronEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_GT_electron_all"]);
   fHistoMap["TRD_RICH_GT_contaminationEff"] = (TH1F*)fHistoMap["TRD_RICH_GT_electron_wrong"]->Clone("TRD_RICH_GT_contaminationEff");
-  fHistoMap["TRD_RICH_GT_contaminationEff"]->Divide(fHistoMap["TRD_RICH_GT_electron_found"]);
+  fHistoMap["TRD_RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_GT_electron_found"]);
   fHistoMap["TRD_RICH_TOF_GT_electronEff"] = (TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Clone("TRD_RICH_TOF_GT_electronEff");
-  fHistoMap["TRD_RICH_TOF_GT_electronEff"]->Divide(fHistoMap["TRD_RICH_TOF_GT_electron_all"]);
+  fHistoMap["TRD_RICH_TOF_GT_electronEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_all"]);
   fHistoMap["TRD_RICH_TOF_GT_contaminationEff"] = (TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->Clone("TRD_RICH_TOF_GT_contaminationEff");
-  fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Divide(fHistoMap["TRD_RICH_TOF_GT_electron_found"]);
+  fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_found"]);
   legLR->AddEntry(fHistoMap["TRD_GT_electron_found"],"TRD","LEP");
   legLR->AddEntry(fHistoMap["RICH_GT_electron_found"],"RICH","LEP");
   legLR->AddEntry(fHistoMap["TOF_GT_electron_found"],"TOF","LEP");
   legLR->AddEntry(fHistoMap["TRD_RICH_GT_electron_found"],"RICH & TRD","LEP");
   legLR->AddEntry(fHistoMap["TRD_RICH_TOF_GT_electron_found"],"RICH & TRD & TOF","LEP");
-  fHistoMap["TRD_GT_electronEff"]->Draw("PE");
-  fHistoMap["RICH_GT_electronEff"]->Draw("PE,same");
-  fHistoMap["TOF_GT_electronEff"]->Draw("PE,same");
-  fHistoMap["TRD_RICH_GT_electronEff"]->Draw("PE,same");
-  fHistoMap["TRD_RICH_TOF_GT_electronEff"]->Draw("PE,same");
+  fHistoMap["TRD_GT_electronEff"]->GetYaxis()->SetRangeUser(0,1);
+  fHistoMap["TRD_GT_electronEff"]->Draw("P");
+  fHistoMap["RICH_GT_electronEff"]->Draw("P,same");
+  fHistoMap["TOF_GT_electronEff"]->Draw("P,same");
+  fHistoMap["TRD_RICH_GT_electronEff"]->Draw("P,same");
+  fHistoMap["TRD_RICH_TOF_GT_electronEff"]->Draw("P,same");
   legLR->Draw("same");
   c->SaveAs("pics/ElectronEfficiency.pdf");
   c->SaveAs("pics/ElectronEfficiency.png");
   legLR->Clear();
 
-
+  c->cd(1)->SetLogy(1);
   legLR->AddEntry(fHistoMap["TRD_GT_electron_wrong"],"TRD","LEP");
+  Float_t mintemp = 1;
+  if (fHistoMap["TRD_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_GT_contaminationEff"]->GetMinimumBin()) < mintemp && 
+      fHistoMap["TRD_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_GT_contaminationEff"]->GetMinimumBin()) > 0)
+    mintemp = fHistoMap["TRD_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_GT_contaminationEff"]->GetMinimumBin());
   legLR->AddEntry(fHistoMap["RICH_GT_electron_wrong"],"RICH","LEP");
+  if (fHistoMap["RICH_GT_contaminationEff"]->GetBinContent(fHistoMap["RICH_GT_contaminationEff"]->GetMinimumBin()) < mintemp && 
+      fHistoMap["RICH_GT_contaminationEff"]->GetBinContent(fHistoMap["RICH_GT_contaminationEff"]->GetMinimumBin()) > 0)
+    mintemp = fHistoMap["RICH_GT_contaminationEff"]->GetBinContent(fHistoMap["RICH_GT_contaminationEff"]->GetMinimumBin());
   legLR->AddEntry(fHistoMap["TOF_GT_electron_wrong"],"TOF","LEP");
+  if (fHistoMap["TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TOF_GT_contaminationEff"]->GetMinimumBin()) < mintemp && 
+      fHistoMap["TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TOF_GT_contaminationEff"]->GetMinimumBin()) > 0)
+    mintemp = fHistoMap["TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TOF_GT_contaminationEff"]->GetMinimumBin());
   legLR->AddEntry(fHistoMap["TRD_RICH_GT_electron_wrong"],"RICH & TRD","LEP");
+  if (fHistoMap["TRD_RICH_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_GT_contaminationEff"]->GetMinimumBin()) < mintemp && 
+      fHistoMap["TRD_RICH_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_GT_contaminationEff"]->GetMinimumBin()) > 0)
+    mintemp = fHistoMap["TRD_RICH_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_GT_contaminationEff"]->GetMinimumBin());
   legLR->AddEntry(fHistoMap["TRD_RICH_TOF_GT_electron_wrong"],"RICH & TRD & TOF","LEP");
-  fHistoMap["TRD_GT_contaminationEff"]->Draw("PE");
-  fHistoMap["RICH_GT_contaminationEff"]->Draw("PE,same");
-  fHistoMap["TOF_GT_contaminationEff"]->Draw("PE,same");
-  fHistoMap["TRD_RICH_GT_contaminationEff"]->Draw("PE,same");
-  fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Draw("PE,same");
+  if (fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetMinimumBin()) < mintemp && 
+      fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetMinimumBin()) > 0)
+    mintemp = fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetMinimumBin());
+  fHistoMap["TRD_GT_contaminationEff"]->GetYaxis()->SetRangeUser(1e-6,1.);
+  fHistoMap["TRD_GT_contaminationEff"]->Draw("P");
+  fHistoMap["RICH_GT_contaminationEff"]->Draw("P,same");
+  fHistoMap["TOF_GT_contaminationEff"]->Draw("P,same");
+  fHistoMap["TRD_RICH_GT_contaminationEff"]->Draw("P,same");
+  fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Draw("P,same");
   legLR->Draw("same");
   c->SaveAs("pics/ContaminationEfficiency.pdf");
   c->SaveAs("pics/ContaminationEfficiency.png");
   legLR->Clear();
+  c->cd(1)->SetLogy(0);
+
 
   legUR->AddEntry(fHistoMap["RICH_GT_radiusA_KF_P_pion"],"pion","LEP");
   legUR->AddEntry(fHistoMap["RICH_GT_radiusA_KF_P_electron"],"electron","LEP");
@@ -170,7 +190,9 @@ void plotResults(){
   c->SaveAs("pics/TOF_GT_time_KF_P_PID.png");
   legUR->Clear();
   legLR->Clear();
-  fHistoMap["GT_MC_Tracks"]->Draw("PE");
+  nEntries = Float_t(fHistoMap["GT_MC_Tracks"]->GetEntries());
+  fHistoMap["GT_MC_Tracks"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_Tracks"]->Draw("PE1X0");
   c->SaveAs("pics/GT_MC_Tracks.pdf");
   c->SaveAs("pics/GT_MC_Tracks.png");
 
@@ -241,7 +263,7 @@ void plotResults(){
   Float_t min1 = fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetBinContent(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetMinimumBin());
   Float_t max2 = fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetBinContent(fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetMaximumBin());
   Float_t min2 = fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetBinContent(fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetMinimumBin());
-  Float_t max(0), min(0);
+
   if (max2 >= max1)
     max = 5.0*max2;
   else 
@@ -251,8 +273,8 @@ void plotResults(){
   else if (min1 > 0)
     min = 0.1*min1;
   fHistoMap["EPPairFromPi0DetectionEfficiency"]->GetYaxis()->SetRangeUser(min,max);
-  fHistoMap["EPPairFromPi0DetectionEfficiency"]->Draw("PE");
-  fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Draw("PE,same");
+  fHistoMap["EPPairFromPi0DetectionEfficiency"]->Draw("PE1");
+  fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->Draw("PE1,same");
   legLL->Draw("same");
   c->SaveAs("pics/EPPairFromPi0DetectionEfficiency.pdf");
   c->SaveAs("pics/EPPairFromPi0DetectionEfficiency.png");
@@ -261,10 +283,24 @@ void plotResults(){
   legUR->AddEntry(fHistoMap["GT_MC_PID_RICH"],"RICH track","LEP");
   legUR->AddEntry(fHistoMap["GT_MC_PID_TRD"],"TRD track","LEP");
   legUR->AddEntry(fHistoMap["GT_MC_PID_TOF"],"TOF track","LEP");
-  fHistoMap["GT_MC_PID_STS"]->Draw("PE");
-  fHistoMap["GT_MC_PID_RICH"]->Draw("PE,same");
-  fHistoMap["GT_MC_PID_TRD"]->Draw("PE,same");
-  fHistoMap["GT_MC_PID_TOF"]->Draw("PE,same");
+  fHistoMap["GT_MC_PID_RICH"]->SetYTitle("Normalized counts");
+  nEntries = fHistoMap["GT_MC_PID_RICH"]->GetEntries();
+  fHistoMap["GT_MC_PID_RICH"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_PID_RICH"]->GetYaxis()->SetRangeUser(0.1/nEntries,1.);
+  fHistoMap["GT_MC_PID_RICH"]->DrawCopy("PE11");
+
+  nEntries = fHistoMap["GT_MC_PID_STS"]->GetEntries();
+  fHistoMap["GT_MC_PID_STS"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_PID_STS"]->DrawCopy("PE11,same");
+
+  nEntries = fHistoMap["GT_MC_PID_TRD"]->GetEntries();
+  fHistoMap["GT_MC_PID_TRD"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_PID_TRD"]->DrawCopy("PE11,same");
+
+  nEntries = fHistoMap["GT_MC_PID_TOF"]->GetEntries();
+  fHistoMap["GT_MC_PID_TOF"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_PID_TOF"]->DrawCopy("PE11,same");
+
   legUR->Draw("same");
   c->SaveAs("pics/GT_MC_PID.pdf");
   c->SaveAs("pics/GT_MC_PID.png");
@@ -275,21 +311,21 @@ void plotResults(){
   legUR->SetHeader("");
   legUR->AddEntry(fHistoMap["gammaAndGammaMother"],"#gamma pairs","LEP");
   legUR->AddEntry(fHistoMap["gammaMother"],"single #gamma","LEP");
-  fHistoMap["gammaAndGammaMother"]->Draw("PE");
-  fHistoMap["gammaMother"]->Draw("PE,same");
+  fHistoMap["gammaAndGammaMother"]->Draw("PE1");
+  fHistoMap["gammaMother"]->Draw("PE1,same");
   legUR->Draw("same");
   c->SaveAs("pics/MC_MotherPID_gamma_andOr_gamma.pdf");
   c->SaveAs("pics/MC_MotherPID_gamma_andOr_gamma.png");
   legUR->Clear();
 
-  fHistoMap["ePlusMinusMother"]->Draw("PE");
+  fHistoMap["ePlusMinusMother"]->Draw("PE1");
   fHistoMap["ePlusAndMinusMother"]->SetMarkerStyle(20);
   fHistoMap["ePlusAndMinusMother"]->SetLineColor(2);
   fHistoMap["ePlusAndMinusMother"]->SetMarkerColor(2);
   legUR->SetHeader();
   legUR->AddEntry(fHistoMap["ePlusMinusMother"],"single e^{+} or e^{-}","LEP");
   legUR->AddEntry(fHistoMap["ePlusAndMinusMother"],"e^{+}e^{-} pairs","LEP");
-  fHistoMap["ePlusAndMinusMother"]->Draw("PE,same");
+  fHistoMap["ePlusAndMinusMother"]->Draw("PE1,same");
   legUR->Draw("same");
   c->SaveAs("pics/MC_MotherPID_elec_andOr_posi.pdf");
   c->SaveAs("pics/MC_MotherPID_elec_andOr_posi.png");
@@ -305,9 +341,9 @@ void plotResults(){
   legUR->AddEntry(fHistoMap["MCPid_global"],"global","LEP");
   legUR->AddEntry(fHistoMap["MCPid_inMagnet"],"vertex within magnet volume","LEP");
   legUR->AddEntry(fHistoMap["MCPid_inTarget"],"vertex within target volume","LEP");
-  fHistoMap["MCPid_global"]->Draw("PE");
-  fHistoMap["MCPid_inMagnet"]->Draw("PE,same");
-  fHistoMap["MCPid_inTarget"]->Draw("PE,same");
+  fHistoMap["MCPid_global"]->Draw("PE1");
+  fHistoMap["MCPid_inMagnet"]->Draw("PE1,same");
+  fHistoMap["MCPid_inTarget"]->Draw("PE1,same");
   legUR->Draw("same");
   c->SaveAs("pics/MC_PID.pdf");
   c->SaveAs("pics/MC_PID.png");
@@ -457,7 +493,7 @@ void plotResults(){
     TDirectory *current_sourcedir = gDirectory;
     Bool_t status = TH1::AddDirectoryStatus();
     TH1::AddDirectory(kFALSE);
-    TChain *globChain = 0;
+    //TChain *globChain = 0;
     TIter nextkey( current_sourcedir->GetListOfKeys() );
     TKey *key, *oldkey=0;
     while ( (key = (TKey*)nextkey())) {

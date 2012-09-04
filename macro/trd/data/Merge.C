@@ -37,15 +37,12 @@ TFile *Target;
 
 void MergeHistos(TDirectory *target, TList *sourcelist);
 
-void Merge() {
+void Merge(TString outfilename = "result_0100Pi0.root") {
   // in an interactive ROOT session, edit the file names
   // Target and FileList, then
   // root > .L hadd.C
   // root > hadd()
-  //Target = TFile::Open("result_0000Pi0.root", "RECREATE");
-  //Target = TFile::Open("result_1000Pi0.root", "RECREATE");
-  Target = TFile::Open("result_0100Pi0.root", "RECREATE");
-  //Target = TFile::Open("result_0010Pi0.root", "RECREATE");
+  Target = TFile::Open(outfilename, "RECREATE");
   TString filename;
   FileList = new TList();
   for (Int_t iurqmd = 0; iurqmd < 200; iurqmd++){ 

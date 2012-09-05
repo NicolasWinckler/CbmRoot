@@ -33,6 +33,7 @@ public:
    virtual ~CbmClusteringA1();
 
    void MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t algVersion);
+   void ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
    Int_t GetNofPads()		const { return fNofPads;}
@@ -45,7 +46,7 @@ public:
    Int_t GetNofPads(Int_t iCluster);
    Int_t GetPadInCluster(Int_t iCluster, Int_t iPad);
    //UInt_t GetPadCharge(Int_t iCluster, Int_t iPad);
-   Int_t* GetPads(Int_t iCluster);
+   vector<Int_t> GetPads(Int_t iCluster);
 
 private:
 
@@ -64,12 +65,13 @@ private:
 
    Int_t fNofClusters;
    struct Cluster{
-	   Int_t nofCluster;
-	   Float_t xc;
-	   Float_t yc;
-	   UInt_t sumClCharge;
-	   Int_t nofPads;
-	   Int_t padsInCluster[30];
+	   Int_t fNCluster;
+	   Float_t fX;
+	   Float_t fY;
+	   UInt_t fCharge;
+	   Int_t fNofPads;
+	   //Int_t padsInCluster[30];
+	   vector<Int_t> fPadsInCluster;
    };
    Cluster* fClusters;
    //TClonesArray* fClFull;

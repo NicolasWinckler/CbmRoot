@@ -28,7 +28,7 @@ using boost::property_tree::ptree;
 CbmMuchClusteringQa::CbmMuchClusteringQa():
    fHM(NULL),
    fClusteringQa(NULL),
-   fOutputDir("/u/gkozlov/cbm/trunk/cbmroot/littrack/clustering/qa/clustering/res/"),
+   fOutputDir("/home/kozlov/cbm/cbmroot_new/cbmroot/littrack/clustering/qa/clustering/res/"),
    fNofEvents()
 {
 
@@ -60,6 +60,7 @@ InitStatus CbmMuchClusteringQa::Init()
    std::cout<<"-Creating clustering calculator\n";
    fClusteringQa = new CbmMuchClusteringQaCalculator(fHM);
    std::cout<<"-Clustering calculator created\n";
+   fClusteringQa->AddMuchGeoScheme(muchGeoScheme);
    fClusteringQa->Init();
    std::cout<<"-Clustering calculator initialized\n";
 
@@ -88,9 +89,9 @@ void CbmMuchClusteringQa::Finish()
    drawQa.Draw(fHM, fOutputDir);
    std::cout<<"-CbmMuchClusteringQaDraw initialized\n";
 
-   string qaFile = fOutputDir + "/clustering_qa.json";
-   string idealFile = fOutputDir + "/clustering_qa_ideal.json";
-   string checkFile = fOutputDir + "/clustering_qa_check.json";
+   string qaFile = fOutputDir + "clustering_qa.json";
+   string idealFile = fOutputDir + "clustering_qa_ideal.json";
+   string checkFile = fOutputDir + "clustering_qa_check.json";
    std::cout<<"-json checked\n";
 
    CbmMuchClusteringQaPTreeCreator ptCreator;

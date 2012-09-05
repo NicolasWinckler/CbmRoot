@@ -67,6 +67,7 @@ void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, 
 	fNofPads = module->GetNPads();
 	fDetId = module->GetDetectorId();
 	fPadList = new PadInformation[fNofPads];
+	fNofActivePads = 0;
 	Int_t nofSectors = module->GetNSectors();
 	Int_t padIterator = 0;
 	for(Int_t iSector = 0; iSector < nofSectors; iSector++)
@@ -120,6 +121,8 @@ void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, 
 		Float_t yUp_1 = fPadList[iPadMain].fY + (fPadList[iPadMain].fDy / 2);
 		for(Int_t iPadNeighbor = 0; iPadNeighbor < fNofPads; iPadNeighbor++)
 		{
+			if((fabs(fPadList[iPadMain].fX - fPadList[iPadNeighbor].fX) < (fPadList[iPadMain].fDx * 3)) &&
+				(fabs(fPadList[iPadMain].fY - fPadList[iPadNeighbor].fY) < (fPadList[iPadNeighbor].fDy * 3))){
 			Float_t xLeft_2 = fPadList[iPadNeighbor].fX - (fPadList[iPadNeighbor].fDx / 2);
 			Float_t xRight_2 = fPadList[iPadNeighbor].fX + (fPadList[iPadNeighbor].fDx / 2);
 			Float_t yDown_2 = fPadList[iPadNeighbor].fY - (fPadList[iPadNeighbor].fDy / 2);
@@ -164,7 +167,7 @@ void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, 
 				fPadList[iPadMain].fNofGoodNeighbors++;
 				//padIterator2++;
 			}
-		}
+		}}
 	}
 	//fStation = nStation;
 	//fLayer = nLayer;

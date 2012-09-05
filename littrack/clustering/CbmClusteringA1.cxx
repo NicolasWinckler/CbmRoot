@@ -68,11 +68,11 @@ CbmClusteringA1::CbmClusteringA1(CbmClusteringGeometry* moduleGeo):
 
 CbmClusteringA1::~CbmClusteringA1()
 {
-	delete fA1;
-	delete fA2;
-	delete fS;
-	delete fNumbersOfPads;
-	delete fClusters;
+	delete [] fA1;
+	delete [] fA2;
+	delete [] fS;
+	delete [] fNumbersOfPads;
+	delete [] fClusters;
 	/*if (fClFull) {
 		fClFull->Delete();
 	    delete fClFull;
@@ -135,14 +135,15 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 				fA2[iPad] = 0;
 				fNofActivePads--;
 				//Ob'edinenie klasterov
-				temp = fNumbersOfPads[iPad];
+				/*temp = fNumbersOfPads[iPad];
 				for(Int_t nPad = 0; nPad < fNofPads; nPad++)
 				{
 					if(fNumbersOfPads[nPad] == temp)
 					{
 						fNumbersOfPads[nPad] = fNumbersOfPads[localMaximum];
 					}
-				}
+				}*/
+				ChangeClusters(moduleGeo, iPad, fNumbersOfPads[iPad], fNumbersOfPads[localMaximum]);
 			}
 		}
 		/* Perestroika matritsi amplitud vo vrem9 raboti algoritma
@@ -168,14 +169,16 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 	}*/
 	//std::cout<<"fNofActivePads before: "<<fNofActivePads<<"\n";
 
+	//delete [] fClusters;
 	fClusters = new Cluster[fNofActivePads];
 	for(Int_t iPad = 0; iPad < fNofActivePads; iPad++)
 	{
-		fClusters[iPad].nofCluster = 0;
-		fClusters[iPad].nofPads = 0;
-		fClusters[iPad].sumClCharge = 0;
-		fClusters[iPad].xc = 0;
-		fClusters[iPad].yc = 0;
+		fClusters[iPad].fNCluster = 0;
+		fClusters[iPad].fNofPads = 0;
+		fClusters[iPad].fCharge = 0;
+		fClusters[iPad].fX = 0;
+		fClusters[iPad].fY = 0;
+		fClusters[iPad].fPadsInCluster.clear();
 	}
 
 	Int_t nomCl = 0;
@@ -197,19 +200,20 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 					//Renumerovka klastera i ego 94eek
 					fNumbersOfPads[nPad] = nomCl;
 					fS[nPad] = 0;
-					fClusters[nomCl - 1].nofCluster = nomCl;
+					fClusters[nomCl - 1].fNCluster = nomCl;
 					//std::cout<<"X0: "<<moduleGeo->GetX0(nPad)<<"\n";
 					//Float_t x = moduleGeo->GetX0(nPad);
 					//fClusters[nomCl].xc += x;
 					//std::cout<<"\nXC1 = "<<fClusters[nomCl - 1].xc<<"\n";
 					//std::cout<<" += "<<moduleGeo->GetX0(nPad)<<"\n";
-					fClusters[nomCl - 1].xc += (moduleGeo->GetX0(nPad) * moduleGeo->GetPadCharge(nPad));
+					fClusters[nomCl - 1].fX += (moduleGeo->GetX0(nPad) * moduleGeo->GetPadCharge(nPad));
 					//std::cout<<"XC2 = "<<fClusters[nomCl - 1].xc<<"\n";
-					fClusters[nomCl - 1].yc += (moduleGeo->GetY0(nPad) * moduleGeo->GetPadCharge(nPad));
-					fClusters[nomCl - 1].sumClCharge += moduleGeo->GetPadCharge(nPad);
-					fClusters[nomCl - 1].padsInCluster[padInCluster] = moduleGeo->GetDigiNum(nPad);
+					fClusters[nomCl - 1].fY += (moduleGeo->GetY0(nPad) * moduleGeo->GetPadCharge(nPad));
+					fClusters[nomCl - 1].fCharge += moduleGeo->GetPadCharge(nPad);
+					//fClusters[nomCl - 1].padsInCluster[padInCluster] = moduleGeo->GetDigiNum(nPad);
+					fClusters[nomCl - 1].fPadsInCluster.push_back(moduleGeo->GetDigiNum(nPad));
 					padInCluster++;
-					fClusters[nomCl - 1].nofPads = padInCluster;
+					fClusters[nomCl - 1].fNofPads = padInCluster;
 					//std::cout<<"nPad: "<<nPad<<"; A: "<<fA2[nPad]<<"\n";
 				}
 			}
@@ -222,13 +226,13 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 	for(Int_t iCl = 0; iCl < nomCl; iCl++)
 	{
 		//-!!!DELENIE!!!-
-		if(fClusters[iCl].sumClCharge == 0)
+		if(fClusters[iCl].fCharge == 0)
 		{
 			cout<<"DIVISION ON NULL";
 			break;
 		}
-		fClusters[iCl].xc = fClusters[iCl].xc / fClusters[iCl].sumClCharge;
-		fClusters[iCl].yc = fClusters[iCl].yc / fClusters[iCl].sumClCharge;
+		fClusters[iCl].fX = fClusters[iCl].fX / fClusters[iCl].fCharge;
+		fClusters[iCl].fY = fClusters[iCl].fY / fClusters[iCl].fCharge;
 	}
 	fNofClusters = nomCl;
 	/*std::cout<<"Found clusters: "<<fNofClusters<<"\n";
@@ -240,32 +244,45 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 	}*/
 }
 
+void CbmClusteringA1::ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1)
+{
+	fNumbersOfPads[nPad] = Cl1;
+	for(Int_t iPad = 0; iPad < moduleGeo->GetGoodNeighborsNum(nPad); iPad++)
+	{
+		if(fNumbersOfPads[moduleGeo->GetNeighbor(nPad, iPad)] == Cl0)
+		{
+			//fNumbersOfPads[nPad] = Cl1;
+			ChangeClusters(moduleGeo, moduleGeo->GetNeighbor(nPad, iPad), Cl0, Cl1);
+		}
+	}
+}
+
 Int_t CbmClusteringA1::GetCluster(Int_t iCluster)
 {
-	return fClusters[iCluster].nofCluster;
+	return fClusters[iCluster].fNCluster;
 }
 Float_t CbmClusteringA1::GetX0(Int_t iCluster)
 {
-	return fClusters[iCluster].xc;
+	return fClusters[iCluster].fX;
 }
 Float_t CbmClusteringA1::GetY0(Int_t iCluster)
 {
-	return fClusters[iCluster].yc;
+	return fClusters[iCluster].fY;
 }
 UInt_t CbmClusteringA1::GetClCharge(Int_t iCluster)
 {
-	return fClusters[iCluster].sumClCharge;
+	return fClusters[iCluster].fCharge;
 }
 Int_t CbmClusteringA1::GetNofPads(Int_t iCluster)
 {
-	return fClusters[iCluster].nofPads;
+	return fClusters[iCluster].fNofPads;
 }
 Int_t CbmClusteringA1::GetPadInCluster(Int_t iCluster, Int_t iPad)
 {
-	return fClusters[iCluster].padsInCluster[iPad];
+	return fClusters[iCluster].fPadsInCluster[iPad];
 }
 
-Int_t* CbmClusteringA1::GetPads(Int_t iCluster)
+vector<Int_t> CbmClusteringA1::GetPads(Int_t iCluster)
 {
-	return fClusters[iCluster].padsInCluster;
+	return fClusters[iCluster].fPadsInCluster;
 }

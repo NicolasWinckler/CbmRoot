@@ -10,6 +10,7 @@
 
 #include "FairTask.h"
 #include "TClonesArray.h"
+#include "CbmMuchGeoScheme.h"
 
 #include <vector>
 #include <list>
@@ -54,6 +55,8 @@ public:
     * \brief Finish. Has to be called in FairTask::Finish.
     */
    void Finish();
+
+   void AddMuchGeoScheme(CbmMuchGeoScheme* geoScheme);
 
 private:
 

@@ -33,7 +33,7 @@ public:
    Int_t GetNofPads()		const { return fNofPads;}
    Int_t GetNofActivePads()	const { return fNofActivePads;}
 
-   Int_t GetCluster(Int_t iCluster);
+   //Int_t GetCluster(Int_t iCluster);
    Float_t GetX0(Int_t iCluster);
    Float_t GetY0(Int_t iCluster);
    UInt_t GetClCharge(Int_t iCluster);
@@ -51,12 +51,12 @@ private:
 
    Int_t fNofClusters;
    struct Cluster{
-	   Int_t nofCluster;
-	   Float_t xc;
-	   Float_t yc;
-	   UInt_t sumClCharge;
-	   Int_t nofPads;
-	   Int_t padsInCluster[300];
+	   //Int_t fNofCluster;
+	   Float_t fX;
+	   Float_t fY;
+	   UInt_t fCharge;
+	   Int_t fNofPads;
+	   vector<Int_t> fPadsInCluster;
    };
    Cluster* fClusters;
 };

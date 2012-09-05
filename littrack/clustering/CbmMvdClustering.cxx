@@ -160,10 +160,10 @@ InitStatus CbmMvdClustering::Init()
    //TString fname = "/u/gkozlov/cbm/events/cc.25gev.centr_draw10.txt";
    //TString fname = "/u/gkozlov/cbm/events/pc.25gev.centr_draw10.txt";
    //TString fname = "/u/gkozlov/cbm/events/pAu.25gev.centr_draw10.txt";
-   TString fname = "/u/gkozlov/cbm/events/mvd.clustering.out.txt";
+   /*TString fname = "/u/gkozlov/cbm/events/mvd.clustering.out.txt";
    FILE* f1 = fopen(fname , "w");
    fprintf(f1, "Output file:\n\n");
-   fclose(f1);
+   fclose(f1);*/
    return kSUCCESS;
 }
 

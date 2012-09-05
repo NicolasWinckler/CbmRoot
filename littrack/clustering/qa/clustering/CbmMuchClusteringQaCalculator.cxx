@@ -79,9 +79,9 @@ CbmMuchClusteringQaCalculator::~CbmMuchClusteringQaCalculator()
 
 void CbmMuchClusteringQaCalculator::Init()
 {
-	fMuchGeoScheme = CbmMuchGeoScheme::Instance();
+	/*fMuchGeoScheme = CbmMuchGeoScheme::Instance();
 	TString muchDigiFile = "/u/gkozlov/cbm/trunk/cbmroot/parameters/much/much_v11a.digi.root";
-	fMuchGeoScheme->Init(muchDigiFile);
+	fMuchGeoScheme->Init(muchDigiFile);*/
 	/*fGeoScheme = CbmMuchGeoScheme::Instance();
 	TString muchDigiFile = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters/much/much_v11a.digi.root");
 	fGeoScheme->Init(muchDigiFile);*/
@@ -171,6 +171,11 @@ void CbmMuchClusteringQaCalculator::Finish()
 	std::cout<<"--Histograms normalized\n";
 	//fHM->ShrinkEmptyBinsByPattern("hno_NofObjects_.*_Station");
 	std::cout<<"--Calculator Finish finished\n";
+}
+
+void CbmMuchClusteringQaCalculator::AddMuchGeoScheme(CbmMuchGeoScheme* geoScheme)
+{
+	fMuchGeoScheme = geoScheme;
 }
 
 void CbmMuchClusteringQaCalculator::ReadDataBranches()
@@ -448,6 +453,7 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 			fClustersRelations[iCl].fBestPoint = 0;
 			fClustersRelations[iCl].fNDigisToClusterRelations.push_back(100.0 * (Float_t)(fClustersRelations[iCl].fDigisByPoint[0]) /
 					(Float_t)(cluster->GetNDigis()));
+			if(fClustersRelations[iCl].fNDigisToClusterRelations[0] > 100) fClustersRelations[iCl].fNDigisToClusterRelations[0] = 100;
 		}
 		else
 		{
@@ -460,6 +466,7 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 				if(fClustersRelations[iCl].fClusterToPointRelations[iPoint] > 100) fClustersRelations[iCl].fClusterToPointRelations[iPoint] = 100;
 				fClustersRelations[iCl].fNDigisToClusterRelations.push_back(100.0 * (Float_t)(fClustersRelations[iCl].fDigisByPoint[iPoint]) /
 						(Float_t)(cluster->GetNDigis()));
+				if(fClustersRelations[iCl].fNDigisToClusterRelations[iPoint] > 100) fClustersRelations[iCl].fNDigisToClusterRelations[iPoint] = 100;
 				if(fClustersRelations[iCl].fDigisByPoint[iPoint] > bp)
 				{
 					bp = fClustersRelations[iCl].fDigisByPoint[iPoint];
@@ -473,11 +480,11 @@ void CbmMuchClusteringQaCalculator::CalculateClustersRelations()
 
 void CbmMuchClusteringQaCalculator::CalculateAccuracy()
 {
-	fAccuracyArray = new AccuracyStruct[fNofClusters];
-	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
+	fAccuracyArray = new AccuracyStruct[fNofHits];
+	for(Int_t iCl = 0; iCl < fNofHits; iCl++)
 	{
 		const CbmMuchPixelHit* cluster = static_cast<const CbmMuchPixelHit*>(fMuchPixelHits->At(iCl));
-		const CbmMuchPoint* muchPoint = static_cast<const CbmMuchPoint*>(fMuchPoints->At(fClustersRelations[iCl].fPointsInCluster[fClustersRelations[iCl].fBestPoint]));
+		const CbmMuchPoint* muchPoint = static_cast<const CbmMuchPoint*>(fMuchPoints->At(fClustersRelations[cluster->GetRefId()/*iCl*/].fPointsInCluster[fClustersRelations[cluster->GetRefId()/*iCl*/].fBestPoint]));
 		Float_t xPoint = (muchPoint->GetXIn() + muchPoint->GetXOut()) / 2;
 		Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
 		Float_t dist = sqrt((xPoint - cluster->GetX()) *
@@ -490,7 +497,7 @@ void CbmMuchClusteringQaCalculator::CalculateAccuracy()
 		fAccuracyArray[iCl].fErrorX = distX;
 		fAccuracyArray[iCl].fErrorY = distY;
 		fAccuracyArray[iCl].fHit = iCl;
-		fAccuracyArray[iCl].fPoint = fClustersRelations[iCl].fPointsInCluster[fClustersRelations[iCl].fBestPoint];
+		fAccuracyArray[iCl].fPoint = fClustersRelations[cluster->GetRefId()/*iCl*/].fPointsInCluster[fClustersRelations[cluster->GetRefId()/*iCl*/].fBestPoint];
 		//std::cout<<"_Cl: "<<iCl<<"; dXY: "<<fAccuracyArray[iCl].errorXY<<"\n";
 		//std::cout<<"xCl: "<<cluster->GetX()<<"; xP: "<<fRealPoints[fClusters[iCl].mPointsInCluster[fClusters[iCl].bestPoint]].xc<<"\n";
 	}
@@ -507,6 +514,7 @@ void CbmMuchClusteringQaCalculator::FillErrorsAndQualityByRadiusHistograms()
 		for(Int_t iLayer = 0; iLayer < nLayers; iLayer++)
 		{
 			Float_t errorsByRadius[nR];
+			Float_t hitsByRadius[nR];
 			Float_t clustersByRadius[nR];
 			Float_t qualityCPByRadius[nR];
 			Float_t qualityDCByRadius[nR];
@@ -515,28 +523,30 @@ void CbmMuchClusteringQaCalculator::FillErrorsAndQualityByRadiusHistograms()
 				errorsByRadius[i] = 0;
 				qualityCPByRadius[i] = 0;
 				qualityDCByRadius[i] = 0;
+				hitsByRadius[i] = 0;
 				clustersByRadius[i] = 0;
 			}
-			for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
+			Float_t rMin = muchStation->GetRmin();
+			Float_t rMax = muchStation->GetRmax();
+			Float_t step = (rMax - rMin) / nR;
+			for(Int_t iCl = 0; iCl < fNofHits; iCl++)
 			{
-			if((fClustersRelations[iCl].fStation == iStation) && (fClustersRelations[iCl].fLeyer == iLayer))
+				const CbmMuchPixelHit* h1 = static_cast<const CbmMuchPixelHit*>(fMuchPixelHits->At(iCl));
+			if((fClustersRelations[h1->GetRefId()/*iCl*/].fStation == iStation) && (fClustersRelations[h1->GetRefId()/*iCl*/].fLeyer == iLayer))
 			{
-				Float_t rMin = muchStation->GetRmin();
-				Float_t rMax = muchStation->GetRmax();
-				Float_t step = (rMax - rMin) / nR;
-				const CbmMuchCluster* cluster = static_cast<const CbmMuchCluster*>(fMuchClusters->At(fAccuracyArray[iCl].fHit));
+				const CbmMuchCluster* cluster = static_cast<const CbmMuchCluster*>(fMuchClusters->At(h1->GetRefId()/*fAccuracyArray[iCl].fHit*/));
 				const CbmMuchDigi* digi = static_cast<const CbmMuchDigi*>(fMuchDigis->At(cluster->GetDigiIndex(0)));
 				Int_t detId = digi->GetDetectorId();
 				Long64_t chId = digi->GetChannelId();
 				CbmMuchModuleGem* module = static_cast<CbmMuchModuleGem*>(fMuchGeoScheme->GetModuleByDetId(detId));
 				const CbmMuchPad* pad = static_cast<const CbmMuchPad*>(module->GetPad(chId));
 				Float_t padSize = pad->GetDx();
-				const CbmMuchPixelHit* hit = static_cast<const CbmMuchPixelHit*>(fMuchPixelHits->At(fAccuracyArray[iCl].fHit));
-				Float_t rad = sqrt((hit->GetX() * hit->GetX()) + (hit->GetY() * hit->GetY()));
+				//const CbmMuchPixelHit* hit = static_cast<const CbmMuchPixelHit*>(fMuchPixelHits->At(fAccuracyArray[iCl].fHit));
+				Float_t rad = sqrt((h1->GetX() * h1->GetX()) + (h1->GetY() * h1->GetY()));
 				Int_t n = static_cast<Int_t>((rad - rMin) / step);
 				if((n >= nR) || (n < 0))
 				{
-					std::cout<<"Error! n = "/*<<n<<"; rad = "<<rad<<"; rMin = "<<rMin<<"; step = "<<step*/<<"\n";
+					std::cout<<"Error! n = "<<n<<"; rad = "<<rad<<"; rMin = "<<rMin<<"; step = "<<step<<"\n";
 					//std::cout<<"hX: "<<hit->GetX()<<"; hY: "<<hit->GetY()<<"\n";
 				}
 				else{
@@ -545,15 +555,32 @@ void CbmMuchClusteringQaCalculator::FillErrorsAndQualityByRadiusHistograms()
 				std::cout<<"; err: "<<errorsByRadius[n]<<"; AA: "<<fAccuracyArray[iCl].fErrorXY;
 						std::cout<<"; size: "<<padSize<<"\n";*/
 				errorsByRadius[n] += fAccuracyArray[iCl].fErrorXY / padSize;
-				qualityCPByRadius[n] += fClustersRelations[iCl].fClusterToPointRelations[fClustersRelations[iCl].fBestPoint];
-				qualityDCByRadius[n] += fClustersRelations[iCl].fNDigisToClusterRelations[fClustersRelations[iCl].fBestPoint];
-				clustersByRadius[n]++;}
+				///!\\\qualityCPByRadius[n] += fClustersRelations[iCl].fClusterToPointRelations[fClustersRelations[iCl].fBestPoint];
+				///!\\\qualityDCByRadius[n] += fClustersRelations[iCl].fNDigisToClusterRelations[fClustersRelations[iCl].fBestPoint];
+				hitsByRadius[n]++;}
 			}
+			}
+			for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
+			{
+				CbmMuchPoint* p1 = (CbmMuchPoint*)(fMuchPoints->At(fClustersRelations[iCl].fBestPoint));
+				Double_t rad = sqrt((((p1->GetXIn() + p1->GetXOut()) / 2) * ((p1->GetXIn() + p1->GetXOut()) / 2))
+						+ (((p1->GetYIn() + p1->GetYOut()) / 2) * ((p1->GetYIn() + p1->GetYOut()) / 2)));
+				Int_t n = static_cast<Int_t>((rad - rMin) / step);
+				if((n >= nR) || (n < 0))
+				{
+					std::cout<<"Error! n = "<<n<<"; rad = "<<rad<<"; rMin = "<<rMin<<"; step = "<<step<<"\n";
+				}
+				else
+				{
+					qualityCPByRadius[n] += fClustersRelations[iCl].fClusterToPointRelations[fClustersRelations[iCl].fBestPoint];
+					qualityDCByRadius[n] += fClustersRelations[iCl].fNDigisToClusterRelations[fClustersRelations[iCl].fBestPoint];
+					clustersByRadius[n]++;
+				}
 			}
 			for(Int_t i = 0; i < nR; i++)
 			{
-				if(clustersByRadius[i] == 0)clustersByRadius[i] = 1;
-				errorsByRadius[i] = errorsByRadius[i] / clustersByRadius[i];
+				if(hitsByRadius[i] == 0)hitsByRadius[i] = 1;
+				errorsByRadius[i] = errorsByRadius[i] / hitsByRadius[i];
 				char iSt[8]={0};
 				char iL[8]={0};
 				sprintf(iSt, "%d", iStation);

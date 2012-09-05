@@ -79,7 +79,8 @@ InitStatus CbmMuchClustering::Init()
 {
    std::cout << "CbmMuchClustering::Init" << std::endl;
    fScheme = CbmMuchGeoScheme::Instance();
-   TString muchDigiFile = "/u/gkozlov/cbm/trunk/cbmroot/parameters/much/much_v11a.digi.root";
+   //TString muchDigiFile = "/u/gkozlov/cbm/trunk/cbmroot/parameters/much/much_v11a.digi.root";
+   TString muchDigiFile = "/home/kozlov/cbm/cbmroot_new/cbmroot/parameters/much/much_v11a.digi.root";
    fScheme->Init(muchDigiFile);
 
    ReadDataBranches();
@@ -96,7 +97,7 @@ void CbmMuchClustering::Exec(Option_t* opt)
 	std::cout << " - CbmMuchClustering::Exec: eventNo=" << eventNo++ << std::endl;
 	fNofClusters = 0;
 	fHit->Clear();
-	fCluster->Clear();
+	fCluster->Delete();
 	//if (fHit) fHit->Clear();
 	//if (fCluster) fCluster->Clear();
 	SetDigiCharges();
@@ -305,12 +306,13 @@ void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem
 		vector<Int_t> digiIndices;
 		//---
 		Int_t detId = m2->GetDetectorId();
-		Double_t x, y, z;
+		Double_t sumq=0, sumx=0, sumy=0, sumt=0, sumdx2=0, sumdy2=0, sumdxy2=0, sumdt2=0;
+		Double_t q=0,x=0,y=0,t=0,z=0,dx=0,dy=0,dxy=0,dt=0;
 		x = fClustersA1->GetX0(iCl);
 		y = fClustersA1->GetY0(iCl);
 		z = m2->GetPosition()[2];
-		Double_t dx = std::numeric_limits<Double_t>::max();
-		Double_t dy = std::numeric_limits<Double_t>::max();
+		//Double_t dx = std::numeric_limits<Double_t>::max();
+		//Double_t dy = std::numeric_limits<Double_t>::max();
 		CbmMuchPad* pad = NULL;
 		//std::cout<<"->iCl: "<<iCl<<"; Npads: "<<fClustersA1->GetNofPads(iCl);
 		for(Int_t iPad = 0; iPad < fClustersA1->GetNofPads(iCl); iPad++)
@@ -321,18 +323,44 @@ void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem
 			//std::cout<<"-"<<a<<"-";
 			Long64_t channelId = muchDigi->GetChannelId();
 			pad = m2->GetPad(channelId);
-			if (dx > pad->GetDx()) dx = pad->GetDx();
-			if (dy > pad->GetDy()) dy = pad->GetDy();
+			//if (dx > pad->GetDx()) dx = pad->GetDx();
+			//if (dy > pad->GetDy()) dy = pad->GetDy();
+			//x   = pad->GetX();
+			//y   = pad->GetY();
+			t   = muchDigi->GetTime();
+			q   = muchDigi->GetADCCharge();
+			dx  = pad->GetDx();
+			dy  = pad->GetDy();
+			dxy = pad->GetDxy();
+			dt = muchDigi->GetDTime();
+			sumq    += q;
+			//sumx    += q*x;
+			//sumy    += q*y;
+			sumt    += q*t;
+			sumdx2  += q*q*dx*dx;
+			sumdy2  += q*q*dy*dy;
+			sumdxy2 += q*q*dxy*dxy;
+			sumdt2  += q*q*dt*dt;
 		}
+		t   = sumt/sumq;
+		dx  = sqrt(sumdx2/12)/sumq;
+		dy  = sqrt(sumdy2/12)/sumq;
+		dxy = sqrt(sumdxy2/12)/sumq;
+		dt = sqrt(sumdt2)/sumq;
 		//std::cout<<"; qMax: "<<qMax<<"; SumCharge; "<<sumCharge<<"; Size: "<<digiIndices.size()<<"\n";
 		Int_t nCluster = fCluster->GetEntriesFast();
 		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
 		//---
-		Double_t sigmaX = dx / TMath::Sqrt(12.);
-		Double_t sigmaY = dy / TMath::Sqrt(12.);
+		//Double_t sigmaX = dx / TMath::Sqrt(12.);
+		//Double_t sigmaY = dy / TMath::Sqrt(12.);
 		Int_t planeId = fScheme->GetLayerSideNr(detId);
 		Int_t nHit = fHit->GetEntriesFast();
-		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, sigmaX, sigmaY, 0, 0, fClustersA1->GetCluster(iCl), planeId, 0, 0);
+		/*std::cout<<"\nCluster: "<<nHit<<"; detId: "<<detId<<"\n";
+		std::cout<<"x: "<<x<<"; y: "<<y<<"; z: "<<z<<"\n";
+		std::cout<<"dx: "<<dx<<"; dy: "<<dy<<"; dxy: "<<dxy<<"\n";
+		std::cout<<"planeId: "<<planeId<<"; t: "<<t<<"; dt: "<<dt<<"\n";
+		std::cout<<"-------\n";*/
+		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, dx, dy, 0, dxy, nCluster/*fClustersA1->GetCluster(iCl)*/, planeId, t, dt);
 		//---
 		/*TVector3 pos, dpos;
 		pos.SetXYZ(x, y, z);
@@ -353,7 +381,7 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 	fClustersSL->MainClusteringSL(m1, Ver);
 	fNofClusters += fClustersSL->GetNofClusters();
 	//std::cout<<"Module:"<<m2->GetDetectorId()<<" - SL.v2: nofClusters: "<<fClustersSL->GetNofClusters()<<"\n";
-	for(Int_t iCl = 0; iCl < fClustersSL->GetNofClusters(); iCl++)
+	/*for(Int_t iCl = 0; iCl < fClustersSL->GetNofClusters(); iCl++)
 	{
 		vector<Int_t> digiIndices;
 		//---
@@ -388,11 +416,63 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 		Int_t nHit = fHit->GetEntriesFast();
 		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, sigmaX, sigmaY, 0, 0, fClustersSL->GetCluster(iCl), planeId, 0, 0);
 		//---
-		/*new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersA1->GetX0(iCl),
-				fClustersA1->GetY0(iCl), fClustersA1->GetClCharge(iCl),
-				fClustersA1->GetNofPads(iCl), fClustersA1->GetPads(iCl),
-				layerSideF->GetDetectorId(), m1->GetDetId());*/
+	}*/
+	for(Int_t iCl = 0; iCl < fClustersSL->GetNofClusters(); iCl++)
+	{
+		vector<Int_t> digiIndices;
+		//---
+		Int_t detId = m2->GetDetectorId();
+		Double_t sumq=0, sumx=0, sumy=0, sumt=0, sumdx2=0, sumdy2=0, sumdxy2=0, sumdt2=0;
+		Double_t q=0,x=0,y=0,t=0,z=0,dx=0,dy=0,dxy=0,dt=0;
+		x = fClustersSL->GetX0(iCl);
+		y = fClustersSL->GetY0(iCl);
+		z = m2->GetPosition()[2];
+		//Double_t dx = std::numeric_limits<Double_t>::max();
+		//Double_t dy = std::numeric_limits<Double_t>::max();
+		CbmMuchPad* pad = NULL;
+		//std::cout<<"->iCl: "<<iCl<<"; Npads: "<<fClustersA1->GetNofPads(iCl);
+		for(Int_t iPad = 0; iPad < fClustersSL->GetNofPads(iCl); iPad++)
+		{
+			Int_t iDigi = fClustersSL->GetPadInCluster(iCl, iPad);
+			const CbmMuchDigi* muchDigi = static_cast<const CbmMuchDigi*>(fMuchDigi->At(iDigi));
+			digiIndices.push_back(iDigi);
+			//std::cout<<"-"<<a<<"-";
+			Long64_t channelId = muchDigi->GetChannelId();
+			pad = m2->GetPad(channelId);
+			//if (dx > pad->GetDx()) dx = pad->GetDx();
+			//if (dy > pad->GetDy()) dy = pad->GetDy();
+			//x   = pad->GetX();
+			//y   = pad->GetY();
+			t   = muchDigi->GetTime();
+			q   = muchDigi->GetADCCharge();
+			dx  = pad->GetDx();
+			dy  = pad->GetDy();
+			dxy = pad->GetDxy();
+			dt = muchDigi->GetDTime();
+			sumq    += q;
+			//sumx    += q*x;
+			//sumy    += q*y;
+			sumt    += q*t;
+			sumdx2  += q*q*dx*dx;
+			sumdy2  += q*q*dy*dy;
+			sumdxy2 += q*q*dxy*dxy;
+			sumdt2  += q*q*dt*dt;
+		}
+		t   = sumt/sumq;
+		dx  = sqrt(sumdx2/12)/sumq;
+		dy  = sqrt(sumdy2/12)/sumq;
+		dxy = sqrt(sumdxy2/12)/sumq;
+		dt = sqrt(sumdt2)/sumq;
+		//std::cout<<"; qMax: "<<qMax<<"; SumCharge; "<<sumCharge<<"; Size: "<<digiIndices.size()<<"\n";
+		Int_t nCluster = fCluster->GetEntriesFast();
+		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
+		//---
+		//Double_t sigmaX = dx / TMath::Sqrt(12.);
+		//Double_t sigmaY = dy / TMath::Sqrt(12.);
+		Int_t planeId = fScheme->GetLayerSideNr(detId);
+		Int_t nHit = fHit->GetEntriesFast();
+		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, dx, dy, 0, dxy, nCluster/*fClustersSL->GetCluster(iCl)*/, planeId, t, dt);
 	}
-	delete fClustersA1;
+	delete fClustersSL;
 }
 ClassImp(CbmMuchClustering);

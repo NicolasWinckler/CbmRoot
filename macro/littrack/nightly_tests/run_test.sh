@@ -50,6 +50,11 @@ if [ "$1" = "build" ] ; then
     copy_results_to_web "${test_dir}/cbmroot/macro/littrack/nightly_tests/littrack*"
 elif [ "$1" = "cdash" ] ; then 
     checkout_cbmroot ${test_dir}
+    
+    # Patch CbmRoot_test.cmake
+    rm ${test_dir}/cbmroot/CbmRoot_test.cmake
+    cp /data.local1/andrey/tests/patch/CbmRoot_test.cmake
+    
     # Run tests with CDash
     . ${test_dir}/cbmroot/Dart.sh Experimental ${test_dir}/cbmroot/Dart.cfg
     

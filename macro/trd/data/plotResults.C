@@ -15,6 +15,7 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include <map>
+#include "TBox.h"
 
 TFile *Target;
 
@@ -33,8 +34,14 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   gStyle->SetOptTitle(kFALSE);
   TH1::SetDefaultSumw2();
   Float_t max(0), min(1), nEntries(0);
+  Bool_t foundAll = true;
+ 
   Target = TFile::Open(filename, "READ");
   FindHistos(Target);
+
+  TBox *pi0 = new TBox(0.125,0,0.145,0.002);
+  pi0->SetLineColor(2);
+  pi0->SetFillStyle(0);
   TCanvas *c = new TCanvas("c","c",800,600);
   c->Divide(1,1);
   c->cd(1);
@@ -78,35 +85,74 @@ void plotResults(TString filename = "result_0100Pi0.root"){
     c->SaveAs(TString("pics/" + name + ".pdf"));
     c->SaveAs(TString("pics/" + name + ".png"));
   */
+  c->cd(1)->SetLogy(1);
+  nEntries = fHistoMap["GT_Detector_Eff"]->GetBinContent(fHistoMap["GT_Detector_Eff"]->GetMaximumBin());//->GetEntries();
+  fHistoMap["GT_Detector_Eff"]->SetYTitle("normalized counts");
+  fHistoMap["GT_Detector_Eff"]->Scale(1./nEntries);
+  fHistoMap["GT_Detector_Eff"]->GetYaxis()->SetRangeUser(0.01,1.9);
+  fHistoMap["GT_Detector_Eff"]->Draw("PX0");
+  c->SaveAs("pics/DetectorEfficiency.pdf");
+  c->SaveAs("pics/DetectorEfficiency.png");
+  c->cd(1)->SetLogy(0);
 
   fHistoMap["TRD_GT_electronEff"] = (TH1F*)fHistoMap["TRD_GT_electron_found"]->Clone("TRD_GT_electronEff");
   fHistoMap["TRD_GT_electronEff"]->SetYTitle("Electron efficiency");
   fHistoMap["TRD_GT_electronEff"]->Divide((TH1F*)fHistoMap["TRD_GT_electron_all"]);
   fHistoMap["TRD_GT_contaminationEff"] = (TH1F*)fHistoMap["TRD_GT_electron_wrong"]->Clone("TRD_GT_contaminationEff");
   fHistoMap["TRD_GT_contaminationEff"]->SetYTitle("Contamination efficiency");
-  fHistoMap["TRD_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_GT_electron_found"]);
+  fHistoMap["TRD_GT_all_found"] = (TH1F*)fHistoMap["TRD_GT_electron_found"]->Clone("TRD_GT_all_found");
+  fHistoMap["TRD_GT_all_found"]->Add((TH1F*)fHistoMap["TRD_GT_electron_wrong"],1.0);
+  if (foundAll)
+    fHistoMap["TRD_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_GT_all_found"]);
+  else
+    fHistoMap["TRD_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_GT_electron_found"]);
+
   fHistoMap["RICH_GT_electronEff"] = (TH1F*)fHistoMap["RICH_GT_electron_found"]->Clone("RICH_GT_electronEff");
   fHistoMap["RICH_GT_electronEff"]->Divide((TH1F*)fHistoMap["RICH_GT_electron_all"]);
   fHistoMap["RICH_GT_contaminationEff"] = (TH1F*)fHistoMap["RICH_GT_electron_wrong"]->Clone("RICH_GT_contaminationEff");
-  fHistoMap["RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["RICH_GT_electron_found"]);
+  fHistoMap["RICH_GT_all_found"] = (TH1F*)fHistoMap["RICH_GT_electron_found"]->Clone("RICH_GT_all_found");
+  fHistoMap["RICH_GT_all_found"]->Add((TH1F*)fHistoMap["RICH_GT_electron_wrong"],1.0);
+  if (foundAll)
+    fHistoMap["RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["RICH_GT_all_found"]);
+  else
+    fHistoMap["RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["RICH_GT_electron_found"]);
+
   fHistoMap["TOF_GT_electronEff"] = (TH1F*)fHistoMap["TOF_GT_electron_found"]->Clone("TOF_GT_electronEff");
   fHistoMap["TOF_GT_electronEff"]->Divide((TH1F*)fHistoMap["TOF_GT_electron_all"]);
   fHistoMap["TOF_GT_contaminationEff"] = (TH1F*)fHistoMap["TOF_GT_electron_wrong"]->Clone("TOF_GT_contaminationEff");
-  fHistoMap["TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TOF_GT_electron_found"]);
+  fHistoMap["TOF_GT_all_found"] = (TH1F*)fHistoMap["TOF_GT_electron_found"]->Clone("TOF_GT_all_found");
+  fHistoMap["TOF_GT_all_found"]->Add((TH1F*)fHistoMap["TOF_GT_electron_wrong"],1.0);
+  if (foundAll)
+    fHistoMap["TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TOF_GT_all_found"]);
+  else
+    fHistoMap["TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TOF_GT_electron_found"]);
+
   fHistoMap["TRD_RICH_GT_electronEff"] = (TH1F*)fHistoMap["TRD_RICH_GT_electron_found"]->Clone("TRD_RICH_GT_electronEff");
   fHistoMap["TRD_RICH_GT_electronEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_GT_electron_all"]);
   fHistoMap["TRD_RICH_GT_contaminationEff"] = (TH1F*)fHistoMap["TRD_RICH_GT_electron_wrong"]->Clone("TRD_RICH_GT_contaminationEff");
-  fHistoMap["TRD_RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_GT_electron_found"]);
+  fHistoMap["TRD_RICH_GT_all_found"] = (TH1F*)fHistoMap["TRD_RICH_GT_electron_found"]->Clone("TRD_RICH_GT_all_found");
+  fHistoMap["TRD_RICH_GT_all_found"]->Add((TH1F*)fHistoMap["TRD_RICH_GT_electron_wrong"],1.0);
+  if (foundAll)
+    fHistoMap["TRD_RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_GT_all_found"]);
+  else
+    fHistoMap["TRD_RICH_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_GT_electron_found"]);
+
   fHistoMap["TRD_RICH_TOF_GT_electronEff"] = (TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Clone("TRD_RICH_TOF_GT_electronEff");
   fHistoMap["TRD_RICH_TOF_GT_electronEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_all"]);
   fHistoMap["TRD_RICH_TOF_GT_contaminationEff"] = (TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->Clone("TRD_RICH_TOF_GT_contaminationEff");
-  fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_found"]);
+  fHistoMap["TRD_RICH_TOF_GT_all_found"] = (TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Clone("TRD_RICH_TOF_GT_all_found");
+  fHistoMap["TRD_RICH_TOF_GT_all_found"]->Add((TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_wrong"],1.0);
+  if (foundAll)
+    fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_TOF_GT_all_found"]);
+  else
+    fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->Divide((TH1F*)fHistoMap["TRD_RICH_TOF_GT_electron_found"]);
+
   legLR->AddEntry(fHistoMap["TRD_GT_electron_found"],"TRD","LEP");
   legLR->AddEntry(fHistoMap["RICH_GT_electron_found"],"RICH","LEP");
   legLR->AddEntry(fHistoMap["TOF_GT_electron_found"],"TOF","LEP");
   legLR->AddEntry(fHistoMap["TRD_RICH_GT_electron_found"],"RICH & TRD","LEP");
   legLR->AddEntry(fHistoMap["TRD_RICH_TOF_GT_electron_found"],"RICH & TRD & TOF","LEP");
-  fHistoMap["TRD_GT_electronEff"]->GetYaxis()->SetRangeUser(0,1);
+  fHistoMap["TRD_GT_electronEff"]->GetYaxis()->SetRangeUser(0,1.05);
   fHistoMap["TRD_GT_electronEff"]->Draw("P");
   fHistoMap["RICH_GT_electronEff"]->Draw("P,same");
   fHistoMap["TOF_GT_electronEff"]->Draw("P,same");
@@ -139,7 +185,10 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   if (fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetMinimumBin()) < mintemp && 
       fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetMinimumBin()) > 0)
     mintemp = fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetBinContent(fHistoMap["TRD_RICH_TOF_GT_contaminationEff"]->GetMinimumBin());
-  fHistoMap["TRD_GT_contaminationEff"]->GetYaxis()->SetRangeUser(1e-6,1.);
+  if (foundAll)
+    fHistoMap["TRD_GT_contaminationEff"]->GetYaxis()->SetRangeUser(1e-6,1.1);
+  else
+    fHistoMap["TRD_GT_contaminationEff"]->GetYaxis()->SetRangeUser(1e-6,1.e2);
   fHistoMap["TRD_GT_contaminationEff"]->Draw("P");
   fHistoMap["RICH_GT_contaminationEff"]->Draw("P,same");
   fHistoMap["TOF_GT_contaminationEff"]->Draw("P,same");
@@ -192,6 +241,8 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   legLR->Clear();
   nEntries = Float_t(fHistoMap["GT_MC_Tracks"]->GetEntries());
   fHistoMap["GT_MC_Tracks"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_Tracks"]->SetYTitle("normalized counts");
+  fHistoMap["GT_MC_Tracks"]->GetYaxis()->SetRangeUser(0,1);
   fHistoMap["GT_MC_Tracks"]->Draw("PE1X0");
   c->SaveAs("pics/GT_MC_Tracks.pdf");
   c->SaveAs("pics/GT_MC_Tracks.png");
@@ -200,13 +251,23 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   legUR->AddEntry(fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"],"with vertex in magnet volume","L");
   legUR->AddEntry(fHistoMap["InvMassSpectrumGammaEPPairsInTarget"],"with vertex in target volume","L");
   legUR->AddEntry(fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"],"with vertex in target volume #Theta < 1.0","L");
-  fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"]->Draw();
+  nEntries = fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"]->Scale(1./nEntries);
+  fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"]->Draw();
+  nEntries = fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"]->Scale(1./nEntries);
+  fHistoMap["InvMassSpectrumGammaEPPairsInMagnet"]->Draw("same");
+  nEntries = fHistoMap["InvMassSpectrumGammaEPPairsInTarget"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaEPPairsInTarget"]->Scale(1./nEntries);
   fHistoMap["InvMassSpectrumGammaEPPairsInTarget"]->Draw("same");
-  fHistoMap["InvMassSpectrumGammaEPPairsOpenAngle"]->Draw("same");
+
   legUR->Draw("same");
+  //pi0->Draw("same");
   c->SaveAs("pics/MC_InvM_fromGamma_fromEPPair.pdf");
   c->SaveAs("pics/MC_InvM_fromGamma_fromEPPair.png");
   legUR->Clear();
+  nEntries = fHistoMap["InvMassSpectrumGammaAllPairs"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaAllPairs"]->Scale(1./nEntries);
   fHistoMap["InvMassSpectrumGammaAllPairs"]->Draw();
   c->SaveAs("pics/MC_InvM_fromGamma.pdf");
   c->SaveAs("pics/MC_InvM_fromGamma.png");
@@ -217,9 +278,20 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   legUR->AddEntry(fHistoMap["InvMassSpectrumGammaCandPairs"],"without charge info.","L");
   legUR->AddEntry(fHistoMap["InvMassSpectrumGammaEPCandPairs"],"with charge info.","L");
   legUR->AddEntry(fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"],"with charge info. #Theta < 1.0","L");
-  fHistoMap["InvMassSpectrumGammaCandPairs"]->Draw();
-  fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Draw("same"); 
+  legUR->AddEntry(fHistoMap["InvMassSpectrumGammaGTCandPairsMC"],"with MC info.","L");
+  nEntries = fHistoMap["InvMassSpectrumGammaGTCandPairsMC"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaGTCandPairsMC"]->Scale(1./nEntries);
+  fHistoMap["InvMassSpectrumGammaGTCandPairsMC"]->Draw(); 
+  nEntries = fHistoMap["InvMassSpectrumGammaCandPairs"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaCandPairs"]->Scale(1./nEntries);
+  fHistoMap["InvMassSpectrumGammaCandPairs"]->Draw("same");
+  nEntries = fHistoMap["InvMassSpectrumGammaEPCandPairs"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Scale(1./nEntries);
+  fHistoMap["InvMassSpectrumGammaEPCandPairs"]->Draw("same");
+  nEntries = fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"]->GetEntries();
+  fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"]->Scale(1./nEntries);
   fHistoMap["InvMassSpectrumGammaEPCandPairsOpenAngle"]->Draw("same"); 
+  //pi0->Draw("same");
   legUR->Draw("same");
   c->SaveAs("pics/KF_InvM_fromGamma_fromEPPair.pdf");
   c->SaveAs("pics/KF_InvM_fromGamma_fromEPPair.png");
@@ -257,6 +329,46 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   c->cd(1)->SetLogx(0);
   c->cd(1)->SetLogy(1);
   c->cd(1)->SetLogz(0);
+
+  legUL->AddEntry(fHistoMap["PidWknEL"],"electron","L");
+  legUL->AddEntry(fHistoMap["PidWknPI"],"pion","L");
+  legUL->AddEntry(fHistoMap["PidWknelse"],"else","L");
+  fHistoMap["PidWknEL"]->Draw();
+  fHistoMap["PidWknPI"]->Draw("same");
+  fHistoMap["PidWknelse"]->Draw("same");
+  legUL->Draw("same");
+  c->SaveAs("pics/WKNLikelihood.pdf");
+  c->SaveAs("pics/WKNLikelihood.png");
+  legUL->Clear();
+
+  legUL->AddEntry(fHistoMap["PidLikeEL"],"electron","L");
+  legUL->AddEntry(fHistoMap["PidLikePI"],"pion","L");
+  legUL->AddEntry(fHistoMap["PidLikeKA"],"kaon","L");
+  legUL->AddEntry(fHistoMap["PidLikePR"],"proton","L");
+  legUL->AddEntry(fHistoMap["PidLikeMU"],"myon","L");
+  fHistoMap["PidLikeEL"]->Draw();
+  fHistoMap["PidLikePI"]->Draw("same");
+  fHistoMap["PidLikeKA"]->Draw("same");
+  fHistoMap["PidLikePR"]->Draw("same");
+  fHistoMap["PidLikeMU"]->Draw("same");
+  legUL->Draw("same");
+  c->SaveAs("pics/Likelihood.pdf");
+  c->SaveAs("pics/Likelihood.png");
+  legUL->Clear();
+
+  legUL->AddEntry(fHistoMap["PidANNelectron"],"electron","L");
+  legUL->AddEntry(fHistoMap["PidANNpion"],"pion","L");
+  legUL->AddEntry(fHistoMap["PidANNelse"],"else","L");
+  fHistoMap["PidANNelectron"]->Draw();
+  fHistoMap["PidANNpion"]->Draw("same");
+  fHistoMap["PidANNelse"]->Draw("same");
+  fHistoMap["PidANNelectron"]->Draw("same");
+  legUL->Draw("same");
+  c->SaveAs("pics/ANNLikelihood.pdf");
+  c->SaveAs("pics/ANNLikelihood.png");
+  legUL->Clear();
+
+
   legLL->AddEntry(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],"all global tracks","LEP");
   legLL->AddEntry(fHistoMap["EPPairFromPi0DetectionEfficiency"],"global tracks after PID cut","LEP");
   Float_t max1 = fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetBinContent(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetMaximumBin());
@@ -279,6 +391,7 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   c->SaveAs("pics/EPPairFromPi0DetectionEfficiency.pdf");
   c->SaveAs("pics/EPPairFromPi0DetectionEfficiency.png");
   legLL->Clear();
+  legUR->AddEntry(fHistoMap["GT_MC_PID"],"pure track","LEP");
   legUR->AddEntry(fHistoMap["GT_MC_PID_STS"],"STS track","LEP");
   legUR->AddEntry(fHistoMap["GT_MC_PID_RICH"],"RICH track","LEP");
   legUR->AddEntry(fHistoMap["GT_MC_PID_TRD"],"TRD track","LEP");
@@ -288,6 +401,10 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   fHistoMap["GT_MC_PID_RICH"]->Scale(1./nEntries);
   fHistoMap["GT_MC_PID_RICH"]->GetYaxis()->SetRangeUser(0.1/nEntries,1.);
   fHistoMap["GT_MC_PID_RICH"]->DrawCopy("PE11");
+
+  nEntries = fHistoMap["GT_MC_PID"]->GetEntries();
+  fHistoMap["GT_MC_PID"]->Scale(1./nEntries);
+  fHistoMap["GT_MC_PID"]->DrawCopy("PE11,same");
 
   nEntries = fHistoMap["GT_MC_PID_STS"]->GetEntries();
   fHistoMap["GT_MC_PID_STS"]->Scale(1./nEntries);
@@ -300,7 +417,10 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   nEntries = fHistoMap["GT_MC_PID_TOF"]->GetEntries();
   fHistoMap["GT_MC_PID_TOF"]->Scale(1./nEntries);
   fHistoMap["GT_MC_PID_TOF"]->DrawCopy("PE11,same");
-
+  fHistoMap["GT_MC_PID_TRD"]->DrawCopy("PE11,same");
+  fHistoMap["GT_MC_PID_STS"]->DrawCopy("PE11,same");
+  fHistoMap["GT_MC_PID_RICH"]->DrawCopy("PE11,same");
+  fHistoMap["GT_MC_PID"]->DrawCopy("PE11,same");
   legUR->Draw("same");
   c->SaveAs("pics/GT_MC_PID.pdf");
   c->SaveAs("pics/GT_MC_PID.png");
@@ -380,6 +500,31 @@ void plotResults(TString filename = "result_0100Pi0.root"){
   c->cd(1)->SetLogx(0);
   c->cd(1)->SetLogy(0);
   c->cd(1)->SetLogz(1);
+
+  fHistoMap["RICH_PidANN_MC"]->Draw("colz");
+  c->SaveAs("pics/RICH_PidANN_MC.pdf");
+  c->SaveAs("pics/RICH_PidANN_MC.png");
+  fHistoMap["PidANN_MC"]->Draw("colz");
+  c->SaveAs("pics/PidANN_MC.pdf");
+  c->SaveAs("pics/PidANN_MC.png");
+  fHistoMap["PidWkn_MC"]->Draw("colz");
+  c->SaveAs("pics/PidWkn_MC.pdf");
+  c->SaveAs("pics/PidWkn_MC.png");
+  fHistoMap["PidLikeEl_MC"]->Draw("colz");
+  c->SaveAs("pics/PidLikeEl_MC.pdf");
+  c->SaveAs("pics/PidLikeEl_MC.png");
+  fHistoMap["PidLikePI_MC"]->Draw("colz");
+  c->SaveAs("pics/PidLikePI_MC.pdf");
+  c->SaveAs("pics/PidLikePI_MC.png");
+  fHistoMap["PidLikePR_MC"]->Draw("colz");
+  c->SaveAs("pics/PidLikePR_MC.pdf");
+  c->SaveAs("pics/PidLikePR_MC.png");
+  fHistoMap["PidLikeKA_MC"]->Draw("colz");
+  c->SaveAs("pics/PidLikeKA_MC.pdf");
+  c->SaveAs("pics/PidLikeKA_MC.png");
+  fHistoMap["PidLikeMU_MC"]->Draw("colz");
+  c->SaveAs("pics/PidLikeMU_MC.pdf");
+  c->SaveAs("pics/PidLikeMU_MC.png");
 
   fHistoMap["Pt_global"]->Draw("colz");
   c->SaveAs("pics/MC_PT_PID_global.pdf");

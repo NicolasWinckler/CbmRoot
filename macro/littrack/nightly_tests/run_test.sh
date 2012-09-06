@@ -53,7 +53,7 @@ elif [ "$1" = "cdash" ] ; then
     
     # Patch CbmRoot_test.cmake
     rm ${test_dir}/cbmroot/CbmRoot_test.cmake
-    cp /data.local1/andrey/tests/patch/CbmRoot_test.cmake
+    cp /data.local1/andrey/tests/patch/CbmRoot_test.cmake ${test_dir}/cbmroot/CbmRoot_test.cmake
     
     # Run tests with CDash
     . ${test_dir}/cbmroot/Dart.sh Experimental ${test_dir}/cbmroot/Dart.cfg

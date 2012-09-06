@@ -196,6 +196,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   CbmTrdDigiPar  *fDigiPar;
   CbmTrdModule   *fModuleInfo;
+  std::vector<ElectronCandidate> fGTElectronCandidates;
+  std::vector<ElectronCandidate> fGTPositronCandidates;
   std::vector<ElectronCandidate> fGTCandidates;
   std::vector<ElectronCandidate> fCandidates;
   std::vector<ElectronCandidate> fElectronCandidates;
@@ -203,6 +205,8 @@ class CbmTrdPhotonAnalysis : public FairTask {
 
   // ID cuts
   Double_t fTrdAnnCut;
+  Double_t fTrdLikeCut;
+  Double_t fTrdWknCut;
   Double_t fRichAnnCut;
   Double_t fMeanA;
   Double_t fMeanB;

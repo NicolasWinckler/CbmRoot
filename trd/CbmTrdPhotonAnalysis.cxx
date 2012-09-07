@@ -1649,13 +1649,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     }
     
     fHistoMap["TOF_GT_time_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
-    if (fabs(pdg) == 11)//electron
+    if (fabs(mcTOFtrack->GetPdgCode()) == 11)//electron
       fHistoMap["TOF_GT_time_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
-    if (fabs(pdg) == 211)//pion
+    if (fabs(mcTOFtrack->GetPdgCode()) == 211)//pion
       fHistoMap["TOF_GT_time_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
-    if (fabs(pdg) == 13)//myon
+    if (fabs(mcTOFtrack->GetPdgCode()) == 13)//myon
       fHistoMap["TOF_GT_time_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
-    if (fabs(pdg) == 2212)//proton
+    if (fabs(mcTOFtrack->GetPdgCode()) == 2212)//proton
       fHistoMap["TOF_GT_time_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     if (IsTofElec( gtrack, cand.momentum.Mag(), &cand)) {
       fHistoMap["KF_PID_TOF_MC_PID"]->Fill(PdgToGeant(mcTOFtrack->GetPdgCode()), PdgToGeant(-11 * cand.charge));
@@ -1698,7 +1698,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     
     if (useRICH){
       if (IsTrdElec(trdTrack, &cand) && IsRichElec(richRing, cand.momentum.Mag(), &cand) && IsTofElec( gtrack, cand.momentum.Mag(), &cand)/*IsElec(richRing, cand.momentum.Mag(), trdTrack, gtrack, &cand)*/) {
-	fHistoMap["KF_PID_MC_PID"]->Fill(PdgToGeant(Pdg1), PdgToGeant(-11 * cand.charge));
+	fHistoMap["KF_PID_MC_PID"]->Fill(PdgToGeant(mcSTStrack->GetPdgCode()), PdgToGeant(-11 * cand.charge));
 	fCandidates.push_back(cand);
 	if (cand.charge < 0)
 	  fElectronCandidates.push_back(cand);
@@ -1708,7 +1708,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     }
     else {
       if (IsTrdElec(trdTrack, &cand) && IsTofElec( gtrack, cand.momentum.Mag(), &cand)/*IsElec(richRing, cand.momentum.Mag(), trdTrack, gtrack, &cand)*/) {
-	fHistoMap["KF_PID_MC_PID"]->Fill(PdgToGeant(Pdg1), PdgToGeant(-11 * cand.charge));
+	fHistoMap["KF_PID_MC_PID"]->Fill(PdgToGeant(mcSTStrack->GetPdgCode()), PdgToGeant(-11 * cand.charge));
 	fCandidates.push_back(cand);
 	if (cand.charge < 0)
 	  fElectronCandidates.push_back(cand);
@@ -1793,7 +1793,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 ---      %7i pure GT\n\
 ---      %7i MC electron GT\n\
 ---      %7i found electron GT\n\
----      %7i wrong electron GT\n\n", 
+---      %7i wrong electron GT\n", 
 	  nGlobalTracks,   noSTStrack, noSTStrackMatch, noRICHRing, noRICHringMatch, noTRDtrack, noTRDtrackMatch, noTOFhit, foundGT,
 	  nGlobalTracks-noSTStrack-noSTStrackMatch-/*noRICHRing-noRICHringMatch-*/noTRDtrack-noTRDtrackMatch-noTOFhit-foundGT, 
 	  mixedGT, pureGT, electronGT_true, electronGT_found, electronGT_wrong
@@ -1821,7 +1821,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t nGTPCand = (Int_t)fGTPositronCandidates.size();
   printf ("\n--- Found\n\
 ---      %7i found GT electron cand.\n\
----      %7i found GT positron cand\n\n", 
+---      %7i found GT positron cand\n", 
 	  nGTECand,nGTPCand
 	  );
   //cout << nGTECand << " " << nGTPCand << endl;
@@ -1867,7 +1867,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   std::vector<CbmMCTrack *> gammaFromGTCandPairs;
   Int_t nGTCand = (Int_t)fGTCandidates.size();
   printf ("\n--- Found\n\
----      %7i found GT cand.\n\n", 
+---      %7i found GT cand.\n", 
 	  nGTCand
 	  );
   //cout << nGTCand << endl;
@@ -1911,7 +1911,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 
   Int_t nCand = (Int_t)fCandidates.size();
   printf ("\n--- Found\n\
----      %7i found GT cand.\n\n", 
+---      %7i found GT electron and positron cand.\n", 
 	  nCand
 	  );
   for (Int_t iCand = 0; iCand < nCand-1; iCand++) {
@@ -1950,7 +1950,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t nPCand = (Int_t)fPositronCandidates.size();
   printf ("\n--- Found\n\
 ---      %7i found electron cand.\n\
----      %7i found positron cand\n\n", 
+---      %7i found positron cand\n", 
 	  nECand,nPCand
 	  );
 

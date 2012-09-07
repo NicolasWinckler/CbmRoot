@@ -3017,7 +3017,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["RICH_GT_radius_KF_P_true"] = new  TH2I("RICH_GT_radius_KF_P_true","RICH_GT_radius_KF_P_true",100,0,10,100,0,10);
   fHistoMap["TOF_GT_time_KF_P"] = new  TH2I("TOF_GT_time_KF_P","TOF_GT_time_KF_P",100,0,5,100,0.5,1.1);
   fHistoMap["TOF_GT_time_KF_P_true"] = new  TH2I("TOF_GT_time_KF_P_true","TOF_GT_time_KF_P_true",100,0,5,100,0.5,1.1);
-  fHistoMap["TOF_GT_mass2_KF_P"] = new  TH2I("TOF_GT_mass2_KF_P","TOF_GT_mass2_KF_P",100,0,5,100,-0.5,1.5);
+  fHistoMap["TOF_GT_mass2_KF_P"] = new  TH2I("TOF_GT_mass2_KF_P","TOF_GT_mass2_KF_P",100,0,5,300,-1.5,1.5);
   fHistoMap["TRD_GT_electron_all"] = new TH1F("TRD_GT_electron_all","TRD_GT_electron_all",30,0,10); 
   fHistoMap["TRD_GT_electron_found"] = new TH1F("TRD_GT_electron_found","TRD_GT_electron_found",30,0,10);
   fHistoMap["TRD_GT_electron_wrong"] = new TH1F("TRD_GT_electron_wrong","TRD_GT_electron_wrong",30,0,10);

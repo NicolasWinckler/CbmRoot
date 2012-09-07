@@ -908,7 +908,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t nElectrons = fElectronIds.size();
   Int_t nPositrons = fPositronIds.size();
   for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
-    Statusbar(iElectron,nElectrons);
+    if (nElectrons > 100)
+      Statusbar(iElectron,nElectrons);
     for (Int_t iPositron = 0; iPositron < nPositrons; iPositron++) {
       etrack = (CbmMCTrack*)fMCTracks->At(fElectronIds[iElectron]);
       ptrack = (CbmMCTrack*)fMCTracks->At(fPositronIds[iPositron]);
@@ -1079,7 +1080,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t nGamma = gammaFromEPPairsOpeningAngle.size();
   Double_t invMass(0.0), openingAngle(-1.0), pT(0.0), p(0.0), vertexDistance(0.0);
   for (Int_t iGamma = 0; iGamma < nGamma-1; iGamma++) {
-    //Statusbar(iGamma,nGamma);
+    if(nGamma > 100)
+      Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       if (CloseByVertex(gammaFromEPPairsOpeningAngle[iGamma], gammaFromEPPairsOpeningAngle[jGamma], minDistance /*cm*/)) // up to now now vertex calculated
@@ -1102,7 +1104,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   printf("fInvMassSpectrumGammaEPPairsInTarget\n");
   nGamma = gammaFromEPPairsInTarget.size();
   for (Int_t iGamma = 0; iGamma < nGamma-1; iGamma++) {
-    //Statusbar(iGamma,nGamma);
+    if(nGamma > 100)
+      Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       if (CloseByVertex(gammaFromEPPairsInTarget[iGamma], gammaFromEPPairsInTarget[jGamma], minDistance /*cm*/)){ // up to now now vertex calculated
@@ -1122,7 +1125,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   printf("fInvMassSpectrumGammaEPPairsInMagnet\n");
   nGamma = gammaFromEPPairsInMagnet.size();
   for (Int_t iGamma = 0; iGamma < nGamma-1; iGamma++) {
-    //Statusbar(iGamma,nGamma);
+    if(nGamma > 100)
+      Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       if (CloseByVertex(gammaFromEPPairsInMagnet[iGamma], gammaFromEPPairsInMagnet[jGamma], minDistance /*cm*/)){ // up to now now vertex calculated
@@ -1148,7 +1152,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   printf("fInvMassSpectrumGammaEPPairs\n");
   nGamma = gammaFromEPPairs.size();
   for (Int_t iGamma = 0; iGamma < nGamma-1; iGamma++) {
-    //Statusbar(iGamma,nGamma);
+    if(nGamma > 100)
+      Statusbar(iGamma,nGamma);
     for (Int_t jGamma = iGamma + 1; jGamma < nGamma; jGamma++) {
       //cout << iGamma << " " << jGamma << endl;
       if (CloseByVertex(gammaFromEPPairs[iGamma], gammaFromEPPairs[jGamma], minDistance /*cm*/)){ // up to now now vertex calculated
@@ -1172,7 +1177,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   // Find Gamma Gamma Pairs
   nGamma = fGammaIds.size();
   for (Int_t iGamma = 0; iGamma < nGamma-1; iGamma++) {
-    //Statusbar(iGamma,nGamma);
+    if(nGamma > 100)
+      Statusbar(iGamma,nGamma);
     gtrack1 = (CbmMCTrack*)fMCTracks->At(fGammaIds[iGamma]);
     for (Int_t jGamma = iGamma+1; jGamma < nGamma; jGamma++) {      
       gtrack2 = (CbmMCTrack*)fMCTracks->At(fGammaIds[jGamma]); 
@@ -1219,7 +1225,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   // Vertizes of real electron positron pairs
   printf("Vertizes of real electron positron pairs\n");
   for (Int_t iPair = 0; iPair < nPairs; iPair++ ) {
-    //Statusbar(iPair,nPairs);
+    if(nPairs > 100)
+      Statusbar(iPair,nPairs);
     etrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].first);
     ptrack = (CbmMCTrack*)fMCTracks->At(electronPositronPairs[iPair].second);
 
@@ -1300,15 +1307,15 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   CbmMCTrack* mctMother = NULL; 
   CbmMCTrack* mctGrani = NULL; 
   CbmTofHit* tofHit = NULL;
-  CbmMCTrack* mcTrack4 = NULL;
+  CbmMCTrack* mcTOFtrack = NULL;
   FairMCPoint* tofPoint = NULL;
-  CbmMCTrack* mcTrack3 = NULL;
+  CbmMCTrack* mcTRDtrack = NULL;
   CbmTrackMatch* trdMatch = NULL;
   CbmTrdTrack* trdTrack = NULL;
-  CbmMCTrack* mcTrack2 = NULL;
+  CbmMCTrack* mcRICHtrack = NULL;
   CbmTrackMatch* richMatch = NULL;
   CbmRichRing* richRing = NULL;
-  CbmMCTrack* mcTrack1 = NULL;
+  CbmMCTrack* mcSTStrack = NULL;
   CbmTrackMatch* stsMatch = NULL;
   CbmStsTrack* stsTrack = NULL;
   std::map<Int_t,Int_t> AssignedMcTrackMap;
@@ -1320,9 +1327,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     Statusbar(iGlobalTrack,nGlobalTracks);
     ElectronCandidate cand;
     cand.stsInd = -1;
+    cand.stsMcTrackId = -1;
     cand.richInd = -1;
+    cand.richMcTrackId = -1;
     cand.trdInd = -1;
+    cand.trdMcTrackId  = -1;
     cand.tofInd = -1;
+    cand.tofMcTrackId = -1;
     cand.isMcSignalElectron = false;
     cand.isMcPi0Electron = false;
     cand.isMcGammaElectron = false;
@@ -1349,8 +1360,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (stsMatch == NULL) {noSTStrackMatch++; continue;}
     cand.stsMcTrackId = stsMatch->GetMCTrackId();
     if (cand.stsMcTrackId < 0) {continue;}
-    mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
-    if (mcTrack1 == NULL) {continue;}
+    mcSTStrack = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
+    if (mcSTStrack == NULL) {continue;}
     fHistoMap["GT_Detector_Eff"]->Fill(2);
     //cout << "RICH" << endl;
     cand.richInd = gtrack->GetRichRingIndex();
@@ -1361,8 +1372,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       if (richMatch == NULL) {noRICHringMatch++; continue;}
       cand.richMcTrackId = richMatch->GetMCTrackId();    
       if (cand.richMcTrackId < 0) {continue;}
-      mcTrack2 = (CbmMCTrack*) fMCTracks->At(cand.richMcTrackId);
-      if (mcTrack2 == NULL) {continue;}
+      mcRICHtrack = (CbmMCTrack*) fMCTracks->At(cand.richMcTrackId);
+      if (mcRICHtrack == NULL) {continue;}
       fHistoMap["GT_Detector_Eff"]->Fill(3);
     }
     //cout << "TRD" << endl;
@@ -1374,8 +1385,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (trdMatch == NULL) {noTRDtrackMatch; continue;}
     cand.trdMcTrackId = trdMatch->GetMCTrackId();
     if (cand.trdMcTrackId < 0) {continue;}
-    mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
-    if (mcTrack3 == NULL) {continue;}
+    mcTRDtrack = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
+    if (mcTRDtrack == NULL) {continue;}
     fHistoMap["GT_Detector_Eff"]->Fill(4);
     //cout << "TOF" << endl;
     cand.tofInd = gtrack->GetTofHitIndex();
@@ -1388,22 +1399,24 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (tofPoint == NULL) {continue;}
     cand.tofMcTrackId = tofPoint->GetTrackID();
     if (cand.tofMcTrackId < 0) {continue;}
-    mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
-    if (mcTrack4 == NULL) {continue;}
+    mcTOFtrack = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
+    if (mcTOFtrack == NULL) {continue;}
     fHistoMap["GT_Detector_Eff"]->Fill(5);
     foundGT++;
- 
+    // All global tracks without full mc and reco info are skipped exept rich info
     //cout << "1" << endl;
   
     if (useRICH){
       Int_t MCids[4] = {cand.stsMcTrackId, cand.richMcTrackId, cand.trdMcTrackId, cand.tofMcTrackId};
       for (Int_t i = 0; i < 4; i++){ 
-	AssignedMcTrackMap[MCids[i]] = 1;
+	if (MCids[i] >= 0)
+	  AssignedMcTrackMap[MCids[i]] = 1;
       }
     } else {
       Int_t MCids[3] = {cand.stsMcTrackId, cand.trdMcTrackId, cand.tofMcTrackId};
       for (Int_t i = 0; i < 3; i++){ 
-	AssignedMcTrackMap[MCids[i]] = 1;
+	if (MCids[i] >= 0)
+	  AssignedMcTrackMap[MCids[i]] = 1;
       }
     }
     Int_t nAssignedMcTracks = (Int_t)AssignedMcTrackMap.size();
@@ -1445,17 +1458,17 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     cand.energy = sqrt(cand.momentum.Mag2() + cand.mass * cand.mass);
     cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) / (cand.energy - cand.momentum.Z()));
 
-    Double_t MCmoment = mcTrack1->GetP();
-    Int_t pdg = TMath::Abs(mcTrack1->GetPdgCode());
-    Int_t Pdg1 = mcTrack1->GetPdgCode();
-    Int_t MotherId = mcTrack1->GetMotherId();
+    Double_t MCmoment = mcSTStrack->GetP();
+    Int_t pdg = TMath::Abs(mcSTStrack->GetPdgCode());
+    Int_t Pdg1 = mcSTStrack->GetPdgCode();
+    Int_t MotherId = mcSTStrack->GetMotherId();
     Int_t motherPdg = 0;
     cand.McMotherId = MotherId;
     // RICH
     //cout << "RICH" << endl;
     if (useRICH) {
-      fHistoMap["RICH_PidANN_MC"]->Fill(fElIdAnn->DoSelect(richRing, cand.momentum.Mag()),PdgToGeant(mcTrack2->GetPdgCode()));
-      if (fabs(mcTrack2->GetPdgCode()) == 11) {
+      fHistoMap["RICH_PidANN_MC"]->Fill(fElIdAnn->DoSelect(richRing, cand.momentum.Mag()),PdgToGeant(mcRICHtrack->GetPdgCode()));
+      if (fabs(mcRICHtrack->GetPdgCode()) == 11) {
 	fHistoMap["RICH_GT_electron_all"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
 	if (IsRichElec(richRing, cand.momentum.Mag(), &cand)) {
 	  fHistoMap["RICH_GT_electron_found"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
@@ -1471,40 +1484,40 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["RICH_GT_radiusB_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
       fHistoMap["RICH_GT_radius_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetRadius());
       if (IsRichElec(richRing, cand.momentum.Mag(), &cand)) {
-	fHistoMap["KF_PID_RICH_MC_PID"]->Fill(PdgToGeant(mcTrack2->GetPdgCode()), PdgToGeant(-11 * cand.charge));
+	fHistoMap["KF_PID_RICH_MC_PID"]->Fill(PdgToGeant(mcRICHtrack->GetPdgCode()), PdgToGeant(-11 * cand.charge));
 	fHistoMap["RICH_GT_radiusA_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
 	fHistoMap["RICH_GT_radiusB_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
 	fHistoMap["RICH_GT_radius_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetRadius());
       }
 
 
-      if (fabs(pdg) == 11){
+      if (fabs(mcRICHtrack->GetPdgCode()) == 11){
 	fHistoMap["RICH_GT_radiusA_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
 	fHistoMap["RICH_GT_radiusB_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
 	fHistoMap["RICH_GT_radius_KF_P_electron"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetRadius());
       }
-      if (fabs(pdg) == 13){
+      if (fabs(mcRICHtrack->GetPdgCode()) == 13){
 	fHistoMap["RICH_GT_radiusA_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
 	fHistoMap["RICH_GT_radiusB_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
 	fHistoMap["RICH_GT_radius_KF_P_myon"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetRadius());
       }
 
-      if (fabs(pdg) == 211){
+      if (fabs(mcRICHtrack->GetPdgCode()) == 211){
 	fHistoMap["RICH_GT_radiusA_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
 	fHistoMap["RICH_GT_radiusB_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
 	fHistoMap["RICH_GT_radius_KF_P_pion"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetRadius());
       }
 
-      if (fabs(pdg) == 2212){
+      if (fabs(mcRICHtrack->GetPdgCode()) == 2212){
 	fHistoMap["RICH_GT_radiusA_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetAaxis());
 	fHistoMap["RICH_GT_radiusB_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetBaxis());
 	fHistoMap["RICH_GT_radius_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),richRing->GetRadius());
       }
       // check RICH ring - STS track matches
       //	   if ( cand.stsMCTrackId == cand.richMCTrackId){
-      //Int_t pdg = TMath::Abs( mcTrack1->GetPdgCode() );
+      //Int_t pdg = TMath::Abs( mcSTStrack->GetPdgCode() );
     }
-    motherId = mcTrack1->GetMotherId();
+    motherId = mcSTStrack->GetMotherId();
     cand.McMotherId = motherId;
     if (pdg == 11 && motherId == -1) cand.isMcSignalElectron = true;
 
@@ -1529,13 +1542,13 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     
     // TRD
     //cout << "TRD" << endl;
-    fHistoMap["PidWkn_MC"]->Fill(trdTrack->GetPidWkn(),PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["PidANN_MC"]->Fill(trdTrack->GetPidANN(),PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["PidLikeEL_MC"]->Fill(trdTrack->GetPidLikeEL(),PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["PidLikePI_MC"]->Fill(trdTrack->GetPidLikePI(),PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["PidLikePR_MC"]->Fill(trdTrack->GetPidLikePR(),PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["PidLikeKA_MC"]->Fill(trdTrack->GetPidLikeKA(),PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["PidLikeMU_MC"]->Fill(trdTrack->GetPidLikeMU(),PdgToGeant(mcTrack3->GetPdgCode()));
+    fHistoMap["PidWkn_MC"]->Fill(trdTrack->GetPidWkn(),PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["PidANN_MC"]->Fill(trdTrack->GetPidANN(),PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["PidLikeEL_MC"]->Fill(trdTrack->GetPidLikeEL(),PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["PidLikePI_MC"]->Fill(trdTrack->GetPidLikePI(),PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["PidLikePR_MC"]->Fill(trdTrack->GetPidLikePR(),PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["PidLikeKA_MC"]->Fill(trdTrack->GetPidLikeKA(),PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["PidLikeMU_MC"]->Fill(trdTrack->GetPidLikeMU(),PdgToGeant(mcTRDtrack->GetPdgCode()));
     fHistoMap["PidANN_LikeEl"]->Fill(trdTrack->GetPidANN(), trdTrack->GetPidLikeEL()); 
     //fHistoMap["PidANN_LikeEl"]->Fill(trdTrack->GetPidANN(), -1.*trdTrack->GetPidLikePI()); 
     fHistoMap["PidWkn"]->Fill(trdTrack->GetPidWkn());
@@ -1545,20 +1558,20 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fHistoMap["PidLikeKA"]->Fill(trdTrack->GetPidLikeKA());
     fHistoMap["PidLikePR"]->Fill(trdTrack->GetPidLikePR());
     fHistoMap["PidLikeMU"]->Fill(trdTrack->GetPidLikeMU());
-    if (fabs(mcTrack3->GetPdgCode()) != 11)
+    if (fabs(mcTRDtrack->GetPdgCode()) != 11)
       fHistoMap["PidLikeELfalse"]->Fill(trdTrack->GetPidLikeEL());
-    if (fabs(mcTrack3->GetPdgCode()) != 211)
+    if (fabs(mcTRDtrack->GetPdgCode()) != 211)
       fHistoMap["PidLikePIfalse"]->Fill(trdTrack->GetPidLikePI());
-    if (fabs(mcTrack3->GetPdgCode()) != 321)
+    if (fabs(mcTRDtrack->GetPdgCode()) != 321)
       fHistoMap["PidLikeKAfalse"]->Fill(trdTrack->GetPidLikeKA());
-    if (fabs(mcTrack3->GetPdgCode()) != 2212)
+    if (fabs(mcTRDtrack->GetPdgCode()) != 2212)
       fHistoMap["PidLikePRfalse"]->Fill(trdTrack->GetPidLikePR());
-    if (fabs(mcTrack3->GetPdgCode()) != 13)
+    if (fabs(mcTRDtrack->GetPdgCode()) != 13)
       fHistoMap["PidLikeMUfalse"]->Fill(trdTrack->GetPidLikeMU());
 
 
     //fHistoMap["TRD_GT_dEdx_KF_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)),trdTrack->GetELoss()); //trdTrack->GetELoss() always == 0
-    if (fabs(mcTrack3->GetPdgCode()) == 11) {
+    if (fabs(mcTRDtrack->GetPdgCode()) == 11) {
       fHistoMap["PidANNelectron"]->Fill(trdTrack->GetPidANN());
       fHistoMap["PidLikeELtrue"]->Fill(trdTrack->GetPidLikeEL());
       fHistoMap["PidWknEL"]->Fill(trdTrack->GetPidWkn());
@@ -1568,7 +1581,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       }
     }
     else {     
-      if (fabs(mcTrack3->GetPdgCode()) == 211){
+      if (fabs(mcTRDtrack->GetPdgCode()) == 211){
 	fHistoMap["PidANNpion"]->Fill(trdTrack->GetPidANN());
 	fHistoMap["PidLikePItrue"]->Fill(trdTrack->GetPidLikePI());
 	fHistoMap["PidWknPI"]->Fill(trdTrack->GetPidWkn());
@@ -1576,11 +1589,11 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       else{
 	fHistoMap["PidANNelse"]->Fill(trdTrack->GetPidANN());
 	fHistoMap["PidWknelse"]->Fill(trdTrack->GetPidWkn());
-	if (fabs(mcTrack3->GetPdgCode()) == 321)
+	if (fabs(mcTRDtrack->GetPdgCode()) == 321)
 	  fHistoMap["PidLikeKAtrue"]->Fill(trdTrack->GetPidLikeKA());
-	if (fabs(mcTrack3->GetPdgCode()) == 2212)
+	if (fabs(mcTRDtrack->GetPdgCode()) == 2212)
 	  fHistoMap["PidLikePRtrue"]->Fill(trdTrack->GetPidLikePR());
-	if (fabs(mcTrack3->GetPdgCode()) == 13)
+	if (fabs(mcTRDtrack->GetPdgCode()) == 13)
 	  fHistoMap["PidLikeMUtrue"]->Fill(trdTrack->GetPidLikeMU());
       }
       if (IsTrdElec(trdTrack, &cand)) {
@@ -1588,7 +1601,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       }
     }
     if (IsTrdElec(trdTrack, &cand)) {
-      fHistoMap["KF_PID_TRD_MC_PID"]->Fill(PdgToGeant(mcTrack3->GetPdgCode()), PdgToGeant(-11 * cand.charge));
+      fHistoMap["KF_PID_TRD_MC_PID"]->Fill(PdgToGeant(mcTRDtrack->GetPdgCode()), PdgToGeant(-11 * cand.charge));
     }
     Int_t nTrdTrackHits = trdTrack->GetNofHits();
     for (Int_t iTrdTrackHit = 0; iTrdTrackHit < nTrdTrackHits; iTrdTrackHit++) {
@@ -1601,8 +1614,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	//printf("%f\n",trdHit->GetELoss()*1e6);
       }
     }
-    if ( cand.richMcTrackId == cand.trdMcTrackId) {
-      if (fabs(mcTrack3->GetPdgCode()) == 11 && fabs(mcTrack2->GetPdgCode()) == 11) {
+    if ( cand.richMcTrackId == cand.trdMcTrackId && cand.richMcTrackId >= 0) {
+      if (fabs(mcTRDtrack->GetPdgCode()) == 11 && fabs(mcRICHtrack->GetPdgCode()) == 11) {
 	fHistoMap["TRD_RICH_GT_electron_all"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
 	if (IsTrdElec(trdTrack, &cand) && IsRichElec(richRing, cand.momentum.Mag(), &cand)) {
 	  fHistoMap["TRD_RICH_GT_electron_found"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
@@ -1623,7 +1636,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
    
     // ToF
     //cout << "TOF" << endl;
-    if (fabs(mcTrack4->GetPdgCode()) == 11) {
+    if (fabs(mcTOFtrack->GetPdgCode()) == 11) {
       fHistoMap["TOF_GT_electron_all"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
       if (IsTofElec( gtrack, cand.momentum.Mag(), &cand)) {
 	fHistoMap["TOF_GT_electron_found"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
@@ -1645,12 +1658,12 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (fabs(pdg) == 2212)//proton
       fHistoMap["TOF_GT_time_KF_P_proton"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     if (IsTofElec( gtrack, cand.momentum.Mag(), &cand)) {
-      fHistoMap["KF_PID_TOF_MC_PID"]->Fill(PdgToGeant(mcTrack4->GetPdgCode()), PdgToGeant(-11 * cand.charge));
+      fHistoMap["KF_PID_TOF_MC_PID"]->Fill(PdgToGeant(mcTOFtrack->GetPdgCode()), PdgToGeant(-11 * cand.charge));
       fHistoMap["TOF_GT_time_KF_P_true"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)), ((gtrack->GetLength()/100.) / (tofHit->GetTime()*1e-9) / TMath::C())); //cm -> m; ns -> s
     }
 
     if ( cand.richMcTrackId == cand.trdMcTrackId && cand.richMcTrackId == cand.tofMcTrackId) {
-      if (fabs(mcTrack3->GetPdgCode()) == 11 && fabs(mcTrack2->GetPdgCode()) == 11 && fabs(mcTrack4->GetPdgCode()) == 11) {
+      if (fabs(mcTRDtrack->GetPdgCode()) == 11 && fabs(mcRICHtrack->GetPdgCode()) == 11 && fabs(mcTOFtrack->GetPdgCode()) == 11) {
 	electronGT_true++;
 	fHistoMap["TRD_RICH_TOF_GT_electron_all"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
 	if (IsTrdElec(trdTrack, &cand) && IsRichElec(richRing, cand.momentum.Mag(), &cand) && IsTofElec( gtrack, cand.momentum.Mag(), &cand)) {
@@ -1669,18 +1682,18 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       // global track from mixed mc tracks !!!
     }
     //cout << "PID" << endl;
-    fHistoMap["GT_MC_PID_STS"]->Fill(PdgToGeant(mcTrack1->GetPdgCode()));
+    fHistoMap["GT_MC_PID_STS"]->Fill(PdgToGeant(mcSTStrack->GetPdgCode()));
     if (useRICH)
-      fHistoMap["GT_MC_PID_RICH"]->Fill(PdgToGeant(mcTrack2->GetPdgCode()));
-    fHistoMap["GT_MC_PID_TRD"]->Fill(PdgToGeant(mcTrack3->GetPdgCode()));
-    fHistoMap["GT_MC_PID_TOF"]->Fill(PdgToGeant(mcTrack4->GetPdgCode()));
+      fHistoMap["GT_MC_PID_RICH"]->Fill(PdgToGeant(mcRICHtrack->GetPdgCode()));
+    fHistoMap["GT_MC_PID_TRD"]->Fill(PdgToGeant(mcTRDtrack->GetPdgCode()));
+    fHistoMap["GT_MC_PID_TOF"]->Fill(PdgToGeant(mcTOFtrack->GetPdgCode()));
     if (nAssignedMcTracks == 1){ // GT is assigned to only one mc-track -> defined pid no fake track
       //fGTCandidates.push_back(cand);
-      fHistoMap["GT_MC_PID"]->Fill(PdgToGeant(mcTrack1->GetPdgCode()));
+      fHistoMap["GT_MC_PID"]->Fill(PdgToGeant(mcSTStrack->GetPdgCode()));
     }      
-    if (mcTrack1->GetPdgCode() == 11) // sts mc track pid
+    if (mcSTStrack->GetPdgCode() == 11) // sts mc track pid
       fGTElectronCandidates.push_back(cand);
-    if (mcTrack1->GetPdgCode() == -11)
+    if (mcSTStrack->GetPdgCode() == -11)
       fGTPositronCandidates.push_back(cand);     
     
     if (useRICH){
@@ -1716,7 +1729,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 
 
     fHistoMap["DeltaP"]->Fill(MCmoment,(MCmoment-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)))/MCmoment);
-    fHistoMap["DeltaPt"]->Fill(mcTrack1->GetPt(),(mcTrack1->GetPt()-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)))/mcTrack1->GetPt());
+    fHistoMap["DeltaPt"]->Fill(mcSTStrack->GetPt(),(mcSTStrack->GetPt()-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)))/mcSTStrack->GetPt());
     fHistoMap["DeltaPGT_PKF"]->Fill(MCmoment, fabs(fParamLast.GetQp()) - sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
     fHistoMap["DeltaPKF"]->Fill(MCmoment,(MCmoment-fabs(fParamLast.GetQp()))/MCmoment);
 
@@ -1741,24 +1754,24 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     /*
       if (NULL != tofHit)
       delete tofHit;
-      //if (NULL != mcTrack4)
-      //delete mcTrack4;
+      //if (NULL != mcTOFtrack)
+      //delete mcTOFtrack;
       if (NULL != tofPoint)
       delete tofPoint;
-      //if (NULL != mcTrack3)
-      //delete mcTrack3;
+      //if (NULL != mcTRDtrack)
+      //delete mcTRDtrack;
       if (NULL != trdMatch)
       delete trdMatch;
       if (NULL != trdTrack)
       delete trdTrack;
-      //if (NULL != mcTrack2)
-      // delete mcTrack2;
+      //if (NULL != mcRICHtrack)
+      // delete mcRICHtrack;
       if (NULL != richMatch)
       delete richMatch;
       if (NULL != richRing)
       delete richRing;
-      //if (NULL != mcTrack1)
-      //delete mcTrack1;
+      //if (NULL != mcSTStrack)
+      //delete mcSTStrack;
       if (NULL != stsMatch)
       delete stsMatch;
       if (NULL != stsTrack)
@@ -1814,7 +1827,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   //cout << nGTECand << " " << nGTPCand << endl;
   std::vector<CbmMCTrack *> gammaFromGTCandMCPairs;
   for (Int_t iGTECand = 0; iGTECand < nGTECand; iGTECand++) {
-    Statusbar(iGTECand,nGTECand);
+    if(nGTECand > 100)
+      Statusbar(iGTECand,nGTECand);
     for (Int_t jGTPCand = 0; jGTPCand < nGTPCand; jGTPCand++) {
       //if (fGTElectronCandidates[iGTECand].charge != fGTPositronCandidates[jGTPCand].charge) {
       invMass = CalcInvariantMass(fGTElectronCandidates[iGTECand],fGTPositronCandidates[jGTPCand]);
@@ -1858,7 +1872,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	  );
   //cout << nGTCand << endl;
   for (Int_t iGTCand = 0; iGTCand < nGTCand-1; iGTCand++) {
-    Statusbar(iGTCand,nGTCand);
+    if (nGTCand > 100)
+      Statusbar(iGTCand,nGTCand);
     for (Int_t jGTCand = iGTCand+1; jGTCand < nGTCand; jGTCand++) {
       if (fGTCandidates[iGTCand].charge != fGTCandidates[jGTCand].charge) {
 	invMass = CalcInvariantMass(fGTCandidates[iGTCand],fGTCandidates[jGTCand]);
@@ -3231,7 +3246,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto2((TH2*)fHistoMap["DeltaPt"],1,1,1,"p_{T,MC} [GeV/c]","#Delta p_{T}/p_{T,MC} [%]","counts");
   NiceHisto2((TH2*)fHistoMap["DeltaPGT_PKF"],1,1,1,"p_{MC} [GeV/c]","#Delta p_{GT} - p_{KF} [GeV/c]","counts");
 
-  NiceHisto2((TH2*)fHistoMap["TOF_GT_mass2_KF_P"],1,1,1,"p_{MC} [GeV/c]","m^{2} []","counts");
+  NiceHisto2((TH2*)fHistoMap["TOF_GT_mass2_KF_P"],1,1,1,"p_{MC} [GeV/c]","m^{2} [GeV/c^{2}]","counts");
 
   NiceHisto2((TH2*)fHistoMap["TRD_GT_dEdx_KF_P"],1,1,1,"p_{MC} [GeV/c]","dE/dx + TR [keV]","counts");
   NiceHisto2((TH2*)fHistoMap["RICH_GT_radiusA_KF_P"],1,1,1,"p_{MC} [GeV/c]","radius r [cm]","counts");

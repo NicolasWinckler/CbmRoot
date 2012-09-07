@@ -1319,6 +1319,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   CbmTrackMatch* stsMatch = NULL;
   CbmStsTrack* stsTrack = NULL;
   std::map<Int_t,Int_t> AssignedMcTrackMap;
+  Int_t AssignedMcTracks[5] = {0};
   Int_t foundGT(0), mixedGT(0), pureGT(0), electronGT_true(0), electronGT_found(0), electronGT_wrong(0),
     noSTStrack(0), noSTStrackMatch(0), noRICHRing(0), noRICHringMatch(0), noTRDtrack(0), noTRDtrackMatch(0), noTOFhit(0);
   Bool_t useRICH = true;
@@ -1348,10 +1349,10 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     cand.isMvd2CutElectron = true;
     gtrack = (CbmGlobalTrack*) fGlobalTracks->At(iGlobalTrack);
     fHistoMap["GTPid"]->Fill(gtrack->GetPidHypo());
-    fHistoMap["GT_Detector_Eff"]->Fill(0);
+    //fHistoMap["GT_Detector_Eff"]->Fill(0);
     //cout << "STS" << endl;
     //if (gtrack->GetMvdTrackIndex() > 0)
-    fHistoMap["GT_Detector_Eff"]->Fill(1);
+    //fHistoMap["GT_Detector_Eff"]->Fill(1);
     cand.stsInd = gtrack->GetStsTrackIndex();
     if (cand.stsInd < 0) {noSTStrack++; continue;}
     stsTrack = (CbmStsTrack*) fStsTracks->At(cand.stsInd);
@@ -1362,7 +1363,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (cand.stsMcTrackId < 0) {continue;}
     mcSTStrack = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
     if (mcSTStrack == NULL) {continue;}
-    fHistoMap["GT_Detector_Eff"]->Fill(2);
+    fHistoMap["GT_STS_P"]->Fill(mcSTStrack->GetP());
+    //fHistoMap["GT_Detector_Eff"]->Fill(2);
     //cout << "RICH" << endl;
     cand.richInd = gtrack->GetRichRingIndex();
     if (cand.richInd < 0) {noRICHRing++; useRICH = false; /*continue;*/}
@@ -1374,7 +1376,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       if (cand.richMcTrackId < 0) {continue;}
       mcRICHtrack = (CbmMCTrack*) fMCTracks->At(cand.richMcTrackId);
       if (mcRICHtrack == NULL) {continue;}
-      fHistoMap["GT_Detector_Eff"]->Fill(3);
+      fHistoMap["GT_RICH_P"]->Fill(mcRICHtrack->GetP());
+      //fHistoMap["GT_Detector_Eff"]->Fill(3);
     }
     //cout << "TRD" << endl;
     cand.trdInd = gtrack->GetTrdTrackIndex();
@@ -1387,7 +1390,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (cand.trdMcTrackId < 0) {continue;}
     mcTRDtrack = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
     if (mcTRDtrack == NULL) {continue;}
-    fHistoMap["GT_Detector_Eff"]->Fill(4);
+    fHistoMap["GT_TRD_P"]->Fill(mcTRDtrack->GetP());
+    //fHistoMap["GT_Detector_Eff"]->Fill(4);
     //cout << "TOF" << endl;
     cand.tofInd = gtrack->GetTofHitIndex();
     if (cand.tofInd < 0) {noTOFhit++; continue;}
@@ -1401,7 +1405,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     if (cand.tofMcTrackId < 0) {continue;}
     mcTOFtrack = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
     if (mcTOFtrack == NULL) {continue;}
-    fHistoMap["GT_Detector_Eff"]->Fill(5);
+    fHistoMap["GT_TOF_P"]->Fill(mcTOFtrack->GetP());
+    //fHistoMap["GT_Detector_Eff"]->Fill(5);
     foundGT++;
     // All global tracks without full mc and reco info are skipped exept rich info
     //cout << "1" << endl;
@@ -1420,9 +1425,10 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       }
     }
     Int_t nAssignedMcTracks = (Int_t)AssignedMcTrackMap.size();
+    AssignedMcTracks[nAssignedMcTracks] += 1;
     AssignedMcTrackMap.clear();
     //printf("%i %i %i %i : %i\n",cand.stsMcTrackId, cand.richMcTrackId, cand.trdMcTrackId, cand.tofMcTrackId, nAssignedMcTracks);
-    fHistoMap["GT_MC_Tracks"]->Fill(nAssignedMcTracks);
+    //fHistoMap["GT_MC_Tracks"]->Fill(nAssignedMcTracks);
     if (nAssignedMcTracks == 1)
       pureGT++;
     else
@@ -1726,12 +1732,12 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fHistoMap["KF_Pt"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)));
     fHistoMap["KF_E"]->Fill(cand.energy);
 
-
-
-    fHistoMap["DeltaP"]->Fill(MCmoment,(MCmoment-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)))/MCmoment);
-    fHistoMap["DeltaPt"]->Fill(mcSTStrack->GetPt(),(mcSTStrack->GetPt()-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)))/mcSTStrack->GetPt());
+    fHistoMap["GT_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
+    fHistoMap["GT_STS_DeltaP"]->Fill(MCmoment,fabs((MCmoment-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)))/MCmoment)*100);
+    fHistoMap["DeltaP"]->Fill(MCmoment,(MCmoment-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)))/MCmoment*100);
+    fHistoMap["DeltaPt"]->Fill(mcSTStrack->GetPt(),(mcSTStrack->GetPt()-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)))/mcSTStrack->GetPt()*100);
     fHistoMap["DeltaPGT_PKF"]->Fill(MCmoment, fabs(fParamLast.GetQp()) - sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
-    fHistoMap["DeltaPKF"]->Fill(MCmoment,(MCmoment-fabs(fParamLast.GetQp()))/MCmoment);
+    fHistoMap["DeltaPKF"]->Fill(MCmoment,(MCmoment-fabs(fParamLast.GetQp()))/MCmoment*100);
 
     //printf("PidHypo:%.2i\n",gtrack->GetPidHypo());
     if (cand.McMotherId > -1) {
@@ -1798,7 +1804,54 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	  nGlobalTracks-noSTStrack-noSTStrackMatch-/*noRICHRing-noRICHringMatch-*/noTRDtrack-noTRDtrackMatch-noTOFhit-foundGT, 
 	  mixedGT, pureGT, electronGT_true, electronGT_found, electronGT_wrong
 	  );
- 
+  // Including mixed MC-tracklets
+  for (Int_t ibin = 1; ibin <= fHistoMap["GT_P"]->GetNbinsX(); ibin++){
+    Float_t momentum = fHistoMap["GT_P"]->GetBinCenter(ibin);
+    Float_t allGT = (Float_t)fHistoMap["GT_P"]->GetBinContent(ibin);
+    //cout << momentum << endl;
+    if (allGT > 0){
+      fHistoMap["GT_STS_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_STS_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
+      fHistoMap["GT_RICH_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_RICH_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
+      fHistoMap["GT_TRD_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_TRD_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
+      fHistoMap["GT_TOF_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_TOF_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
+    }
+    
+    if (fHistoMap["TRD_GT_electron_all"]->GetBinContent(ibin) > 0)
+      fHistoMap["TRD_GT_electron_Eff"]->Fill(momentum,fHistoMap["TRD_GT_electron_found"]->GetBinContent(ibin)/fHistoMap["TRD_GT_electron_all"]->GetBinContent(ibin));
+    if (fHistoMap["RICH_GT_electron_all"]->GetBinContent(ibin) > 0)
+      fHistoMap["RICH_GT_electron_Eff"]->Fill(momentum,fHistoMap["RICH_GT_electron_found"]->GetBinContent(ibin)/fHistoMap["RICH_GT_electron_all"]->GetBinContent(ibin));
+    if (fHistoMap["TOF_GT_electron_all"]->GetBinContent(ibin) > 0)
+      fHistoMap["TOF_GT_electron_Eff"]->Fill(momentum,fHistoMap["TOF_GT_electron_found"]->GetBinContent(ibin)/fHistoMap["TOF_GT_electron_all"]->GetBinContent(ibin));
+    if (fHistoMap["TRD_RICH_GT_electron_all"]->GetBinContent(ibin) > 0)
+      fHistoMap["TRD_RICH_GT_electron_Eff"]->Fill(momentum,fHistoMap["TRD_RICH_GT_electron_found"]->GetBinContent(ibin)/fHistoMap["TRD_RICH_GT_electron_all"]->GetBinContent(ibin));
+    if (fHistoMap["TRD_RICH_TOF_GT_electron_all"]->GetBinContent(ibin) > 0)
+      fHistoMap["TRD_RICH_TOF_GT_electron_Eff"]->Fill(momentum,fHistoMap["TRD_RICH_TOF_GT_electron_found"]->GetBinContent(ibin)/fHistoMap["TRD_RICH_TOF_GT_electron_all"]->GetBinContent(ibin));
+
+    if (fHistoMap["TRD_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_GT_electron_wrong"]->GetBinContent(ibin) > 0)
+      fHistoMap["TRD_GT_contamination_Eff"]->Fill(momentum,fHistoMap["TRD_GT_electron_wrong"]->GetBinContent(ibin)/
+						  (fHistoMap["TRD_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_GT_electron_wrong"]->GetBinContent(ibin)));
+    if (fHistoMap["RICH_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["RICH_GT_electron_wrong"]->GetBinContent(ibin) > 0)
+      fHistoMap["RICH_GT_contamination_Eff"]->Fill(momentum,fHistoMap["RICH_GT_electron_wrong"]->GetBinContent(ibin)/
+						   (fHistoMap["RICH_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["RICH_GT_electron_wrong"]->GetBinContent(ibin)));
+    if (fHistoMap["TOF_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TOF_GT_electron_wrong"]->GetBinContent(ibin) > 0)
+      fHistoMap["TOF_GT_contamination_Eff"]->Fill(momentum,fHistoMap["TOF_GT_electron_wrong"]->GetBinContent(ibin)/
+						  (fHistoMap["TOF_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TOF_GT_electron_wrong"]->GetBinContent(ibin)));
+    if (fHistoMap["TRD_RICH_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_RICH_GT_electron_wrong"]->GetBinContent(ibin)> 0)
+      fHistoMap["TRD_RICH_GT_contamination_Eff"]->Fill(momentum,fHistoMap["TRD_RICH_GT_electron_wrong"]->GetBinContent(ibin)/
+						       (fHistoMap["TRD_RICH_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_RICH_GT_electron_wrong"]->GetBinContent(ibin)));
+    if (fHistoMap["TRD_RICH_TOF_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->GetBinContent(ibin) > 0)
+      fHistoMap["TRD_RICH_TOF_GT_contamination_Eff"]->Fill(momentum,fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->GetBinContent(ibin)/
+							   (fHistoMap["TRD_RICH_TOF_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->GetBinContent(ibin)));
+  }
+  for (Int_t i = 1; i < 5; i++){
+    fHistoMap["GT_MC_Tracks"]->Fill(i,(Float_t)AssignedMcTracks[i]/(Float_t)nGlobalTracks);
+  }
+  fHistoMap["GT_Detector_Eff"]->Fill(0.,(Float_t)nGlobalTracks/(Float_t)nGlobalTracks);
+  fHistoMap["GT_Detector_Eff"]->Fill(1.,(Float_t)nGlobalTracks/(Float_t)nGlobalTracks);
+  fHistoMap["GT_Detector_Eff"]->Fill(2.,(Float_t)(nGlobalTracks-noSTStrack)/(Float_t)nGlobalTracks);
+  fHistoMap["GT_Detector_Eff"]->Fill(3.,(Float_t)(nGlobalTracks-noRICHRing)/(Float_t)nGlobalTracks);
+  fHistoMap["GT_Detector_Eff"]->Fill(4.,(Float_t)(nGlobalTracks-noTRDtrack)/(Float_t)nGlobalTracks);
+  fHistoMap["GT_Detector_Eff"]->Fill(5.,(Float_t)(nGlobalTracks-noTOFhit)/(Float_t)nGlobalTracks);
   for (dalitzEPMapAllIt = dalitzEPMapAll.begin(); dalitzEPMapAllIt != dalitzEPMapAll.end(); dalitzEPMapAllIt++) {
     Int_t dalitzDaughterSize = (Int_t)(*dalitzEPMapAllIt).second.size();
     if (dalitzDaughterSize == 1)
@@ -1820,8 +1873,8 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
   Int_t nGTECand = (Int_t)fGTElectronCandidates.size();
   Int_t nGTPCand = (Int_t)fGTPositronCandidates.size();
   printf ("\n--- Found\n\
----      %7i found GT electron cand.\n\
----      %7i found GT positron cand\n", 
+---      %7i found GT MC electron cand.\n\
+---      %7i found GT MC positron cand\n", 
 	  nGTECand,nGTPCand
 	  );
   //cout << nGTECand << " " << nGTPCand << endl;
@@ -2724,7 +2777,17 @@ void CbmTrdPhotonAnalysis::InitHistos()
     "#gamma_{RICH}",
     "Primary"
   };
-  fHistoMap["GT_Detector_Eff"] = new TH1F("GT_Detector_Eff","GT_Detector_Eff",6,-0.5,5.5);
+  fHistoMap["GT_P"] = new TH1F("GT_P","GT_P",30,0,10);
+  fHistoMap["GT_STS_P"] = new TH1F("GT_STS_P","GT_STS_P",30,0,10);
+  fHistoMap["GT_RICH_P"] = new TH1F("GT_RICH_P","GT_RICH_P",30,0,10);
+  fHistoMap["GT_TRD_P"] = new TH1F("GT_TRD_P","GT_TRD_P",30,0,10);
+  fHistoMap["GT_TOF_P"] = new TH1F("GT_TOF_P","GT_TOF_P",30,0,10);
+  fHistoMap["GT_STS_Eff"] = new TProfile("GT_STS_Eff","GT_STS_Eff",30,0,10);
+  fHistoMap["GT_STS_DeltaP"] = new TProfile("GT_STS_DeltaP","GT_STS_DeltaP",30,0,10);
+  fHistoMap["GT_RICH_Eff"] = new TProfile("GT_RICH_Eff","GT_RICH_Eff",30,0,10);
+  fHistoMap["GT_TRD_Eff"] = new TProfile("GT_TRD_Eff","GT_TRD_Eff",30,0,10);
+  fHistoMap["GT_TOF_Eff"] = new TProfile("GT_TOF_Eff","GT_TOF_Eff",30,0,10);
+  fHistoMap["GT_Detector_Eff"] = new TProfile("GT_Detector_Eff","GT_Detector_Eff",6,-0.5,5.5);
   fHistoMap["GT_Detector_Eff"]->GetXaxis()->SetBinLabel(1,"all");
   fHistoMap["GT_Detector_Eff"]->GetXaxis()->SetBinLabel(2,"MVD");
   fHistoMap["GT_Detector_Eff"]->GetXaxis()->SetBinLabel(3,"STS");
@@ -2991,7 +3054,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["KF_PID_RICH_MC_PID"] = new  TH2I("KF_PID_RICH_MC_PID","KF_PID_RICH_MC_PID",49,0.5,49.5,49,0.5,49.5);
   fHistoMap["KF_PID_TRD_MC_PID"] = new  TH2I("KF_PID_TRD_MC_PID","KF_PID_TRD_MC_PID",49,0.5,49.5,49,0.5,49.5);
   fHistoMap["KF_PID_TOF_MC_PID"] = new  TH2I("KF_PID_TOF_MC_PID","KF_PID_TOF_MC_PID",49,0.5,49.5,49,0.5,49.5);
-  fHistoMap["GT_MC_Tracks"] = new  TH1F("GT_MC_Tracks","GT_MC_Tracks",4,0.5,4.5);
+  fHistoMap["GT_MC_Tracks"] = new TProfile("GT_MC_Tracks","GT_MC_Tracks",4,0.5,4.5);
 
   for (Int_t bin = 0; bin < 49; bin++) {
     fHistoMap["KF_PID_MC_PID"]->GetYaxis()->SetBinLabel(bin+1,particleID[bin]);
@@ -3021,18 +3084,28 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["TRD_GT_electron_all"] = new TH1F("TRD_GT_electron_all","TRD_GT_electron_all",30,0,10); 
   fHistoMap["TRD_GT_electron_found"] = new TH1F("TRD_GT_electron_found","TRD_GT_electron_found",30,0,10);
   fHistoMap["TRD_GT_electron_wrong"] = new TH1F("TRD_GT_electron_wrong","TRD_GT_electron_wrong",30,0,10);
+  fHistoMap["TRD_GT_electron_Eff"] = new TProfile("TRD_GT_electron_Eff","TRD_GT_electron_Eff",30,0,10);
+  fHistoMap["TRD_GT_contamination_Eff"] = new TProfile("TRD_GT_contamination_Eff","TRD_GT_contamination_Eff",30,0,10);
   fHistoMap["RICH_GT_electron_all"] = new TH1F("RICH_GT_electron_all","RICH_GT_electron_all",30,0,10); 
   fHistoMap["RICH_GT_electron_found"] = new TH1F("RICH_GT_electron_found","RICH_GT_electron_found",30,0,10);
   fHistoMap["RICH_GT_electron_wrong"] = new TH1F("RICH_GT_electron_wrong","RICH_GT_electron_wrong",30,0,10);
+  fHistoMap["RICH_GT_electron_Eff"] = new TProfile("RICH_GT_electron_Eff","RICH_GT_electron_Eff",30,0,10);
+  fHistoMap["RICH_GT_contamination_Eff"] = new TProfile("RICH_GT_contamination_Eff","RICH_GT_contamination_Eff",30,0,10);
   fHistoMap["TOF_GT_electron_all"] = new TH1F("TOF_GT_electron_all","TOF_GT_electron_all",30,0,10); 
   fHistoMap["TOF_GT_electron_found"] = new TH1F("TOF_GT_electron_found","TOF_GT_electron_found",30,0,10);
   fHistoMap["TOF_GT_electron_wrong"] = new TH1F("TOF_GT_electron_wrong","TOF_GT_electron_wrong",30,0,10);
+  fHistoMap["TOF_GT_electron_Eff"] = new TProfile("TOF_GT_electron_Eff","TRD_GT_electron_Eff",30,0,10);
+  fHistoMap["TOF_GT_contamination_Eff"] = new TProfile("TOF_GT_contamination_Eff","TRD_GT_contamination_Eff",30,0,10);
   fHistoMap["TRD_RICH_GT_electron_all"] = new TH1F("TRD_RICH_GT_electron_all","TRD_RICH_GT_electron_all",30,0,10); 
   fHistoMap["TRD_RICH_GT_electron_found"] = new TH1F("TRD_RICH_GT_electron_found","TRD_RICH_GT_electron_found",30,0,10);
   fHistoMap["TRD_RICH_GT_electron_wrong"] = new TH1F("TRD_RICH_GT_electron_wrong","TRD_RICH_GT_electron_wrong",30,0,10);
+  fHistoMap["TRD_RICH_GT_electron_Eff"] = new TProfile("TRD_RICH_GT_electron_Eff","TRD_GT_electron_Eff",30,0,10);
+  fHistoMap["TRD_RICH_GT_contamination_Eff"] = new TProfile("TRD_RICH_GT_contamination_Eff","TRD_GT_contamination_Eff",30,0,10);
   fHistoMap["TRD_RICH_TOF_GT_electron_all"] = new TH1F("TRD_RICH_TOF_GT_electron_all","TRD_RICH_TOF_GT_electron_all",30,0,10); 
   fHistoMap["TRD_RICH_TOF_GT_electron_found"] = new TH1F("TRD_RICH_TOF_GT_electron_found","TRD_RICH_TOF_GT_electron_found",30,0,10);
   fHistoMap["TRD_RICH_TOF_GT_electron_wrong"] = new TH1F("TRD_RICH_TOF_GT_electron_wrong","TRD_RICH_TOF_GT_electron_wrong",30,0,10);
+  fHistoMap["TRD_RICH_TOF_GT_electron_Eff"] = new TProfile("TRD_RICH_TOF_GT_electron_Eff","TRD_GT_electron_Eff",30,0,10);
+  fHistoMap["TRD_RICH_TOF_GT_contamination_Eff"] = new TProfile("TRD_RICH_TOF_GT_contamination_Eff","TRD_GT_contamination_Eff",30,0,10);
   //myon
   fHistoMap["RICH_GT_radiusA_KF_P_myon"] = new  TH2I("RICH_GT_radiusA_KF_P_myon","RICH_GT_radiusA_KF_P_myon",100,0,10,100,0,10);
   fHistoMap["RICH_GT_radiusB_KF_P_myon"] = new  TH2I("RICH_GT_radiusB_KF_P_myon","RICH_GT_radiusB_KF_P_myon",100,0,10,100,0,10);
@@ -3086,9 +3159,18 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(6,"#pi^{0}_{MC}#rightarrow e^{+}e^{-}#gamma");
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(7,"1 e^{+}#vee e^{-}");
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(8,"2 e^{+}#vee e^{-}");
-
+  NiceHisto1(fHistoMap["GT_P"],1,20,1,"p [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_STS_P"],1,20,1,"p [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_RICH_P"],1,20,1,"p [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_TRD_P"],1,20,1,"p [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_TOF_P"],1,20,1,"p [Gev/c]","counts");
+  NiceProfile((TProfile*)fHistoMap["GT_STS_Eff"],1,20,1,"p [Gev/c]","efficiency");
+  NiceProfile((TProfile*)fHistoMap["GT_STS_DeltaP"],1,20,1,"p_{MC} [Gev/c]","#Delta p/p_{MC} [%]");
+  NiceProfile((TProfile*)fHistoMap["GT_RICH_Eff"],2,20,1,"p [Gev/c]","efficiency");
+  NiceProfile((TProfile*)fHistoMap["GT_TRD_Eff"],3,20,1,"p [Gev/c]","efficiency");
+  NiceProfile((TProfile*)fHistoMap["GT_TOF_Eff"],4,20,1,"p [Gev/c]","efficiency");
   NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],1,24,1,"","counts");
-  NiceHisto1(fHistoMap["GT_Detector_Eff"],1,20,1,"Global tracks","counts");
+  NiceProfile((TProfile*)fHistoMap["GT_Detector_Eff"],1,20,1,"Global tracks","counts");
   NiceHisto1(fHistoMap["MCPid_global"],1,20,1,"","counts");
   NiceHisto1(fHistoMap["GT_MC_PID"],1,20,1,"MC PID for global tracks","counts");
   NiceHisto1(fHistoMap["GT_MC_PID_STS"],2,20,1,"MC PID for global tracks","counts");
@@ -3117,7 +3199,7 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fHistoMap["ZBirth[2]"],3,20,1,"z-position [cm]","counts");
   NiceHisto1(fHistoMap["ZBirth[3]"],4,20,1,"z-position [cm]","counts");
   NiceHisto1(fHistoMap["PairHistory"],1,20,1,"","counts");
-  NiceHisto1(fHistoMap["GT_MC_Tracks"],1,20,1,"Number of assigned MC-tracks per GT","counts");
+  NiceProfile((TProfile*)fHistoMap["GT_MC_Tracks"],1,20,1,"Number of assigned MC-tracks per GT","counts");
   NiceHisto2((TH2*)fHistoMap["NoDaughters_global"],1,1,1,"","Number of daughters","counts");
   NiceHisto2((TH2*)fHistoMap["NoDaughters_inMagnet"],1,1,1,"","Number of daughters","counts");
   NiceHisto2((TH2*)fHistoMap["NoDaughters_inTarget"],1,1,1,"","Number of daughters","counts");
@@ -3284,20 +3366,28 @@ void CbmTrdPhotonAnalysis::InitHistos()
   NiceHisto1(fHistoMap["TRD_GT_electron_all"],1,20,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TRD_GT_electron_found"],1,20,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TRD_GT_electron_wrong"],1,20,1,"p_{MC} [GeV/c]","counts");
+  NiceProfile((TProfile*)fHistoMap["TRD_GT_electron_Eff"],1,20,1,"p_{MC} [GeV/c]","electron efficiency");
+  NiceProfile((TProfile*)fHistoMap["TRD_GT_contamination_Eff"],1,20,1,"p_{MC} [GeV/c]","contamination efficiency");
   NiceHisto1(fHistoMap["RICH_GT_electron_all"],2,21,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["RICH_GT_electron_found"],2,21,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["RICH_GT_electron_wrong"],2,21,1,"p_{MC} [GeV/c]","counts");
+  NiceProfile((TProfile*)fHistoMap["RICH_GT_electron_Eff"],2,21,1,"p_{MC} [GeV/c]","electron efficiency");
+  NiceProfile((TProfile*)fHistoMap["RICH_GT_contamination_Eff"],2,21,1,"p_{MC} [GeV/c]","contamination efficiency");
   NiceHisto1(fHistoMap["TOF_GT_electron_all"],3,22,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TOF_GT_electron_found"],3,22,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TOF_GT_electron_wrong"],3,22,1,"p_{MC} [GeV/c]","counts");
+  NiceProfile((TProfile*)fHistoMap["TOF_GT_electron_Eff"],3,22,1,"p_{MC} [GeV/c]","electron efficiency");
+  NiceProfile((TProfile*)fHistoMap["TOF_GT_contamination_Eff"],3,22,1,"p_{MC} [GeV/c]","contamination efficiency");
   NiceHisto1(fHistoMap["TRD_RICH_GT_electron_all"] ,4,24,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TRD_RICH_GT_electron_found"],4,24,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TRD_RICH_GT_electron_wrong"],4,24,1,"p_{MC} [GeV/c]","counts");
+  NiceProfile((TProfile*)fHistoMap["TRD_RICH_GT_electron_Eff"],4,24,1,"p_{MC} [GeV/c]","electron efficiency");
+  NiceProfile((TProfile*)fHistoMap["TRD_RICH_GT_contamination_Eff"],4,24,1,"p_{MC} [GeV/c]","contamination efficiency");
   NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_all"],800,25,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_found"],800,25,1,"p_{MC} [GeV/c]","counts");
   NiceHisto1(fHistoMap["TRD_RICH_TOF_GT_electron_wrong"],800,25,1,"p_{MC} [GeV/c]","counts");
-
-
+  NiceProfile((TProfile*)fHistoMap["TRD_RICH_TOF_GT_electron_Eff"],800,25,1,"p_{MC} [GeV/c]","electron efficiency");
+  NiceProfile((TProfile*)fHistoMap["TRD_RICH_TOF_GT_contamination_Eff"],800,25,1,"p_{MC} [GeV/c]","contamination efficiency");
 
   NiceHisto1(fHistoMap["EPCandPairOpeningAngle"],1,1,1,"opening angle #theta [#circ]","counts");
   NiceHisto1(fHistoMap["CandPairOpeningAngle"],2,1,1,"opening angle #theta [#circ]","counts");
@@ -3556,12 +3646,23 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fHistoMap["DeltaPKF"]->Write("", TObject::kOverwrite);
   fHistoMap["DeltaPt"]->Write("", TObject::kOverwrite);
   fHistoMap["DeltaPGT_PKF"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_MC_Tracks"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_STS_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_STS_DeltaP"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_RICH_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_TRD_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_TOF_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_P"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_STS_P"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_RICH_P"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_TRD_P"]->Write("", TObject::kOverwrite);
+  fHistoMap["GT_TOF_P"]->Write("", TObject::kOverwrite);
   //==================================================================Relationships
   if (!gDirectory->Cd("Relationships")) 
     gDirectory->mkdir("Relationships");
   gDirectory->Cd("Relationships");
   gDirectory->pwd(); 
-  fHistoMap["GT_MC_Tracks"]->Write("", TObject::kOverwrite);
+  
   fHistoMap["KF_PID_MC_PID"]->Write("", TObject::kOverwrite);
   fHistoMap["KF_PID_RICH_MC_PID"]->Write("", TObject::kOverwrite);
   fHistoMap["KF_PID_TRD_MC_PID"]->Write("", TObject::kOverwrite);
@@ -3684,18 +3785,28 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fHistoMap["TRD_GT_electron_all"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_GT_electron_found"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  fHistoMap["TRD_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["TRD_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_electron_all"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_electron_found"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["RICH_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_electron_all"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_electron_found"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  fHistoMap["TOF_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["TOF_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_GT_electron_all"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_GT_electron_found"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  fHistoMap["TRD_RICH_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["TRD_RICH_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_TOF_GT_electron_all"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  fHistoMap["TRD_RICH_TOF_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  fHistoMap["TRD_RICH_TOF_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
   //==================================================================Cuts
   gDirectory->Cd("..");

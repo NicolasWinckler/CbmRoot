@@ -37,13 +37,14 @@
 using std::cout;
 using std::endl;
 
-CbmMuchClustering::CbmMuchClustering():
+CbmMuchClustering::CbmMuchClustering(const char* digiFileName):
 		FairTask(),
 		fClustersSL(),
 		fClustersA1(),
 		fClustersWard(),
 		fModulesGeometryArray(),
-		fScheme(),
+		fDigiFile(digiFileName),
+		fScheme(CbmMuchGeoScheme::Instance()),
 		fCluster(),
 		fMuchDigi(),
 		fMuchPoint(),
@@ -78,10 +79,17 @@ CbmMuchClustering::~CbmMuchClustering()
 InitStatus CbmMuchClustering::Init()
 {
    std::cout << "CbmMuchClustering::Init" << std::endl;
-   fScheme = CbmMuchGeoScheme::Instance();
+   /*fScheme = CbmMuchGeoScheme::Instance();
    //TString muchDigiFile = "/u/gkozlov/cbm/trunk/cbmroot/parameters/much/much_v11a.digi.root";
    TString muchDigiFile = "/home/kozlov/cbm/cbmroot_new/cbmroot/parameters/much/much_v11a.digi.root";
-   fScheme->Init(muchDigiFile);
+   fScheme->Init(muchDigiFile);*/
+   TFile* oldfile=gFile;
+   TFile* file=new TFile(fDigiFile);
+   TObjArray* stations = (TObjArray*) file->Get("stations");
+   file->Close();
+   file->Delete();
+   gFile=oldfile;
+   fScheme->Init(stations);
 
    ReadDataBranches();
    CreateModulesGeometryArray();

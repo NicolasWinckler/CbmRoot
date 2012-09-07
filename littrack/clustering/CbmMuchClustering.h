@@ -25,7 +25,7 @@ public:
    /**
     * \brief Constructor.
     */
-	CbmMuchClustering();
+	CbmMuchClustering(const char* digiFileName);
 
    /**
     * \brief Destructor.
@@ -71,6 +71,7 @@ private:
    CbmClusteringWard* fClustersWard;
 
    CbmMuchGeoScheme* fScheme;
+   TString            fDigiFile;
 
    CbmClusteringGeometry** fModulesGeometryArray;
    map <Int_t, Int_t> fModulesByDetId;

@@ -1348,6 +1348,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     cand.isMvd1CutElectron = true;
     cand.isMvd2CutElectron = true;
     gtrack = (CbmGlobalTrack*) fGlobalTracks->At(iGlobalTrack);
+    //fHistoMap["GT_P"]->Fill();
     fHistoMap["GTPid"]->Fill(gtrack->GetPidHypo());
     //fHistoMap["GT_Detector_Eff"]->Fill(0);
     //cout << "STS" << endl;
@@ -1364,6 +1365,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     mcSTStrack = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
     if (mcSTStrack == NULL) {continue;}
     fHistoMap["GT_STS_P"]->Fill(mcSTStrack->GetP());
+    fHistoMap["GT_P"]->Fill(/*sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2))*/mcSTStrack->GetP());
     //fHistoMap["GT_Detector_Eff"]->Fill(2);
     //cout << "RICH" << endl;
     cand.richInd = gtrack->GetRichRingIndex();
@@ -1732,7 +1734,7 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
     fHistoMap["KF_Pt"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)));
     fHistoMap["KF_E"]->Fill(cand.energy);
 
-    fHistoMap["GT_P"]->Fill(sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)));
+  
     fHistoMap["GT_STS_DeltaP"]->Fill(MCmoment,fabs((MCmoment-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)))/MCmoment)*100);
     fHistoMap["DeltaP"]->Fill(MCmoment,(MCmoment-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2) + pow(cand.momentum[2],2)))/MCmoment*100);
     fHistoMap["DeltaPt"]->Fill(mcSTStrack->GetPt(),(mcSTStrack->GetPt()-sqrt(pow(cand.momentum[0],2) + pow(cand.momentum[1],2)))/mcSTStrack->GetPt()*100);
@@ -1805,17 +1807,19 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
 	  mixedGT, pureGT, electronGT_true, electronGT_found, electronGT_wrong
 	  );
   // Including mixed MC-tracklets
+  Float_t sts2gtEff = Float_t(nGlobalTracks - noSTStrack)/Float_t(nGlobalTracks);
   for (Int_t ibin = 1; ibin <= fHistoMap["GT_P"]->GetNbinsX(); ibin++){
     Float_t momentum = fHistoMap["GT_P"]->GetBinCenter(ibin);
     Float_t allGT = (Float_t)fHistoMap["GT_P"]->GetBinContent(ibin);
     //cout << momentum << endl;
     if (allGT > 0){
-      fHistoMap["GT_STS_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_STS_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
-      fHistoMap["GT_RICH_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_RICH_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
-      fHistoMap["GT_TRD_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_TRD_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
-      fHistoMap["GT_TOF_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_TOF_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin));
+      fHistoMap["GT_STS_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_STS_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin) * sts2gtEff);
+      fHistoMap["GT_RICH_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_RICH_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin) * sts2gtEff);
+      fHistoMap["GT_TRD_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_TRD_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin) * sts2gtEff);
+      fHistoMap["GT_TOF_Eff"]->Fill(momentum,(Float_t)fHistoMap["GT_TOF_P"]->GetBinContent(ibin)/(Float_t)fHistoMap["GT_P"]->GetBinContent(ibin) * sts2gtEff);
     }
-    
+
+
     if (fHistoMap["TRD_GT_electron_all"]->GetBinContent(ibin) > 0)
       fHistoMap["TRD_GT_electron_Eff"]->Fill(momentum,fHistoMap["TRD_GT_electron_found"]->GetBinContent(ibin)/fHistoMap["TRD_GT_electron_all"]->GetBinContent(ibin));
     if (fHistoMap["RICH_GT_electron_all"]->GetBinContent(ibin) > 0)
@@ -1843,8 +1847,38 @@ void CbmTrdPhotonAnalysis::Exec(Option_t * option)
       fHistoMap["TRD_RICH_TOF_GT_contamination_Eff"]->Fill(momentum,fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->GetBinContent(ibin)/
 							   (fHistoMap["TRD_RICH_TOF_GT_electron_found"]->GetBinContent(ibin) + fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->GetBinContent(ibin)));
   }
+  fHistoMap["GT_P"]->Reset();
+  fHistoMap["GT_STS_P"]->Reset();
+  fHistoMap["GT_RICH_P"]->Reset();
+  fHistoMap["GT_TRD_P"]->Reset();
+  fHistoMap["GT_TOF_P"]->Reset();
+
+  fHistoMap["TRD_GT_electron_all"]->Reset();
+  fHistoMap["TRD_GT_electron_found"]->Reset();
+  fHistoMap["TRD_GT_electron_wrong"]->Reset();
+
+  fHistoMap["RICH_GT_electron_all"]->Reset();
+  fHistoMap["RICH_GT_electron_found"]->Reset();
+  fHistoMap["RICH_GT_electron_wrong"]->Reset();
+
+  fHistoMap["TOF_GT_electron_all"]->Reset();
+  fHistoMap["TOF_GT_electron_found"]->Reset();
+  fHistoMap["TOF_GT_electron_wrong"]->Reset();
+
+  fHistoMap["TRD_RICH_GT_electron_all"]->Reset();
+  fHistoMap["TRD_RICH_GT_electron_found"]->Reset();
+  fHistoMap["TRD_RICH_GT_electron_wrong"]->Reset();
+
+  fHistoMap["TRD_RICH_TOF_GT_electron_all"]->Reset();
+  fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Reset();
+  fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->Reset();
+
+
+  Int_t allGoodTrack(0);
+  for (Int_t i = 1; i < 5; i++)
+    allGoodTrack += AssignedMcTracks[i];
   for (Int_t i = 1; i < 5; i++){
-    fHistoMap["GT_MC_Tracks"]->Fill(i,(Float_t)AssignedMcTracks[i]/(Float_t)nGlobalTracks);
+    fHistoMap["GT_MC_Tracks"]->Fill(i,(Float_t)AssignedMcTracks[i]/(Float_t)/*nGlobalTracks*/allGoodTrack);
   }
   fHistoMap["GT_Detector_Eff"]->Fill(0.,(Float_t)nGlobalTracks/(Float_t)nGlobalTracks);
   fHistoMap["GT_Detector_Eff"]->Fill(1.,(Float_t)nGlobalTracks/(Float_t)nGlobalTracks);
@@ -3159,16 +3193,16 @@ void CbmTrdPhotonAnalysis::InitHistos()
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(6,"#pi^{0}_{MC}#rightarrow e^{+}e^{-}#gamma");
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(7,"1 e^{+}#vee e^{-}");
   fHistoMap["EPPairFromPi0DetectionEfficiencyAll"]->GetXaxis()->SetBinLabel(8,"2 e^{+}#vee e^{-}");
-  NiceHisto1(fHistoMap["GT_P"],1,20,1,"p [Gev/c]","counts");
-  NiceHisto1(fHistoMap["GT_STS_P"],1,20,1,"p [Gev/c]","counts");
-  NiceHisto1(fHistoMap["GT_RICH_P"],1,20,1,"p [Gev/c]","counts");
-  NiceHisto1(fHistoMap["GT_TRD_P"],1,20,1,"p [Gev/c]","counts");
-  NiceHisto1(fHistoMap["GT_TOF_P"],1,20,1,"p [Gev/c]","counts");
-  NiceProfile((TProfile*)fHistoMap["GT_STS_Eff"],1,20,1,"p [Gev/c]","efficiency");
+  NiceHisto1(fHistoMap["GT_P"],1,20,1,"p_{MC} [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_STS_P"],1,20,1,"p_{MC} [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_RICH_P"],1,20,1,"p_{MC} [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_TRD_P"],1,20,1,"p_{MC} [Gev/c]","counts");
+  NiceHisto1(fHistoMap["GT_TOF_P"],1,20,1,"p_{MC} [Gev/c]","counts");
+  NiceProfile((TProfile*)fHistoMap["GT_STS_Eff"],1,20,1,"p_{MC} [Gev/c]","efficiency");
   NiceProfile((TProfile*)fHistoMap["GT_STS_DeltaP"],1,20,1,"p_{MC} [Gev/c]","#Delta p/p_{MC} [%]");
-  NiceProfile((TProfile*)fHistoMap["GT_RICH_Eff"],2,20,1,"p [Gev/c]","efficiency");
-  NiceProfile((TProfile*)fHistoMap["GT_TRD_Eff"],3,20,1,"p [Gev/c]","efficiency");
-  NiceProfile((TProfile*)fHistoMap["GT_TOF_Eff"],4,20,1,"p [Gev/c]","efficiency");
+  NiceProfile((TProfile*)fHistoMap["GT_RICH_Eff"],2,20,1,"p_{MC} [Gev/c]","efficiency");
+  NiceProfile((TProfile*)fHistoMap["GT_TRD_Eff"],3,20,1,"p_{MC} [Gev/c]","efficiency");
+  NiceProfile((TProfile*)fHistoMap["GT_TOF_Eff"],4,20,1,"p_{MC} [Gev/c]","efficiency");
   NiceHisto1(fHistoMap["EPPairFromPi0DetectionEfficiencyAll"],1,24,1,"","counts");
   NiceProfile((TProfile*)fHistoMap["GT_Detector_Eff"],1,20,1,"Global tracks","counts");
   NiceHisto1(fHistoMap["MCPid_global"],1,20,1,"","counts");
@@ -3652,11 +3686,12 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fHistoMap["GT_RICH_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["GT_TRD_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["GT_TOF_Eff"]->Write("", TObject::kOverwrite);
-  fHistoMap["GT_P"]->Write("", TObject::kOverwrite);
-  fHistoMap["GT_STS_P"]->Write("", TObject::kOverwrite);
-  fHistoMap["GT_RICH_P"]->Write("", TObject::kOverwrite);
-  fHistoMap["GT_TRD_P"]->Write("", TObject::kOverwrite);
-  fHistoMap["GT_TOF_P"]->Write("", TObject::kOverwrite);
+  /*fHistoMap["GT_P"]->Write("", TObject::kOverwrite);
+    fHistoMap["GT_STS_P"]->Write("", TObject::kOverwrite);
+    fHistoMap["GT_RICH_P"]->Write("", TObject::kOverwrite);
+    fHistoMap["GT_TRD_P"]->Write("", TObject::kOverwrite);
+    fHistoMap["GT_TOF_P"]->Write("", TObject::kOverwrite);
+  */
   //==================================================================Relationships
   if (!gDirectory->Cd("Relationships")) 
     gDirectory->mkdir("Relationships");
@@ -3781,31 +3816,31 @@ void CbmTrdPhotonAnalysis::SaveHistosToFile()
   fHistoMap["RICH_GT_radiusB_KF_P_proton"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_radius_KF_P_proton"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_time_KF_P_proton"]->Write("", TObject::kOverwrite);
-
-  fHistoMap["TRD_GT_electron_all"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_GT_electron_found"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_GT_electron_wrong"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  /*
+    fHistoMap["TRD_GT_electron_all"]->Write("", TObject::kOverwrite);
+    fHistoMap["TRD_GT_electron_found"]->Write("", TObject::kOverwrite);
+    fHistoMap["TRD_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  */fHistoMap["TRD_GT_electron_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
-  fHistoMap["RICH_GT_electron_all"]->Write("", TObject::kOverwrite);
-  fHistoMap["RICH_GT_electron_found"]->Write("", TObject::kOverwrite);
-  fHistoMap["RICH_GT_electron_wrong"]->Write("", TObject::kOverwrite);
-  fHistoMap["RICH_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  /*fHistoMap["RICH_GT_electron_all"]->Write("", TObject::kOverwrite);
+    fHistoMap["RICH_GT_electron_found"]->Write("", TObject::kOverwrite);
+    fHistoMap["RICH_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  */fHistoMap["RICH_GT_electron_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["RICH_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
-  fHistoMap["TOF_GT_electron_all"]->Write("", TObject::kOverwrite);
-  fHistoMap["TOF_GT_electron_found"]->Write("", TObject::kOverwrite);
-  fHistoMap["TOF_GT_electron_wrong"]->Write("", TObject::kOverwrite);
-  fHistoMap["TOF_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  /*fHistoMap["TOF_GT_electron_all"]->Write("", TObject::kOverwrite);
+    fHistoMap["TOF_GT_electron_found"]->Write("", TObject::kOverwrite);
+    fHistoMap["TOF_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  */fHistoMap["TOF_GT_electron_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TOF_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_GT_electron_all"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_GT_electron_found"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_GT_electron_wrong"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  /*fHistoMap["TRD_RICH_GT_electron_all"]->Write("", TObject::kOverwrite);
+    fHistoMap["TRD_RICH_GT_electron_found"]->Write("", TObject::kOverwrite);
+    fHistoMap["TRD_RICH_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  */fHistoMap["TRD_RICH_GT_electron_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_TOF_GT_electron_all"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->Write("", TObject::kOverwrite);
-  fHistoMap["TRD_RICH_TOF_GT_electron_Eff"]->Write("", TObject::kOverwrite);
+  /*fHistoMap["TRD_RICH_TOF_GT_electron_all"]->Write("", TObject::kOverwrite);
+    fHistoMap["TRD_RICH_TOF_GT_electron_found"]->Write("", TObject::kOverwrite);
+    fHistoMap["TRD_RICH_TOF_GT_electron_wrong"]->Write("", TObject::kOverwrite);
+  */fHistoMap["TRD_RICH_TOF_GT_electron_Eff"]->Write("", TObject::kOverwrite);
   fHistoMap["TRD_RICH_TOF_GT_contamination_Eff"]->Write("", TObject::kOverwrite);
   gDirectory->Cd("..");
   //==================================================================Cuts

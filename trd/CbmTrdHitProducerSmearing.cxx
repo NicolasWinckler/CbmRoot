@@ -1,3 +1,9 @@
+/**
+ * \file CbmTrdHitProducerSmearing.cxx
+ * \author M.Kalisky <m.kalisky@gsi.de>
+ * \date 2005
+ */
+
 #include "CbmTrdHitProducerSmearing.h"
 
 #include "CbmTrdRadiator.h"
@@ -17,502 +23,283 @@
 #include "TRandom.h"
 #include "TVector3.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 #include <vector>
+#include <cassert>
 
 using std::cout;
 using std::endl;
 using std::vector;
+using std::map;
+using boost::assign::list_of;
 
-// ---- Default constructor -------------------------------------------
-CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
-  :FairTask("TrdHitProducer"),
-   fTrdPoints(NULL),
-   fHitCollection(new TClonesArray("CbmTrdHit")),
-   fListStack(NULL),
-   fDx(0.0),
-   fDy(0.0),
-   fNHits(0),
-   fEfficency(1.0),
-   fGhostRate(0.0),
-   fGhostDistance(0.0),
-   fMinDist(0.0),
-   fRadiator(new CbmTrdRadiator()),
-   fGeoHandler(new CbmTrdGeoHandler())
+CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(
+      CbmTrdRadiator* radiator) :
+      FairTask("CbmTrdHitProducerSmearing"),
+      fTrdPoints(NULL),
+      fTrdHits(NULL),
+      fMCTracks(NULL),
+      fDigiPar(NULL),
+      fModuleInfo(NULL),
+      fGeoHandler(new CbmTrdGeoHandler()),
+      fRadiator(radiator),
+      fEfficency(1.),
+      fGhostRate(0.),
+      fGhostDistance(0.),
+      fHitMergingDistance(0.),
+      fUseDigiPar(true)
 {
-  for (Int_t i=0; i<3; i++) {
-    fSigmaX[i]=0.0;
-    for (Int_t j=0; j<7; j++) {
-      fSigmaY[i][j]=0.0;
-    }
-  }
+   // Default resolution
+   fSigmaX = list_of(0.03)(0.04)(0.05); // Resolution in x [cm]
+   // Resolutions in y - station and angle dependent [cm]
+   fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3));
+   fSigmaY.push_back(list_of(0.63)(0.83)(3.3)(3.3)(3.3)(3.3)(3.3));
+   fSigmaY.push_back(list_of(1.03)(1.5)(3.3)(3.3)(3.3)(3.3)(3.3));
 }
-// --------------------------------------------------------------------
 
-// ---- Constructor -------------------------------------------
-CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name)
-  :FairTask(name),
-   fTrdPoints(NULL),
-   fHitCollection(new TClonesArray("CbmTrdHit")),
-   fListStack(NULL),
-   fDx(0.0),
-   fDy(0.0),
-   fNHits(0),
-   fEfficency(1.0),
-   fGhostRate(0.0),
-   fGhostDistance(0.0),
-   fMinDist(0.0),
-   fRadiator(new CbmTrdRadiator()),
-   fGeoHandler(new CbmTrdGeoHandler())
-{
-  for (Int_t i=0; i<3; i++) {
-    fSigmaX[i]=0.0;
-    for (Int_t j=0; j<7; j++) {
-      fSigmaY[i][j]=0.0;
-    }
-  }
-}
-// --------------------------------------------------------------------
-
-// ---- Constructor ----------------------------------------------------
-CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const char *title, CbmTrdRadiator *radiator)
-  :FairTask(name),
-   fTrdPoints(NULL),
-   fHitCollection(new TClonesArray("CbmTrdHit")),
-   fListStack(NULL),
-   fDx(0.0),
-   fDy(0.0),
-   fNHits(0),
-   fEfficency(1.0),
-   fGhostRate(0.0),
-   fGhostDistance(0.0),
-   fMinDist(0.0),
-   fRadiator(radiator),
-   fGeoHandler(new CbmTrdGeoHandler())
-{
-  for (Int_t i=0; i<3; i++) {
-    fSigmaX[i]=0.0;
-    for (Int_t j=0; j<7; j++) {
-      fSigmaY[i][j]=0.0;
-    }
-  }
-}
-// --------------------------------------------------------------------
-
-// ---- Destructor ----------------------------------------------------
 CbmTrdHitProducerSmearing::~CbmTrdHitProducerSmearing()
 {
-  FairRootManager *ioman =FairRootManager::Instance();
-  ioman->Write();
-  fHitCollection->Clear("C");
-  delete fHitCollection;
-
-  if(fRadiator) delete fRadiator;
-
-  for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
-    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
-      delete (*fModuleHitBufferMapIt).second[i];
-    
-    (*fModuleHitBufferMapIt).second.clear();
-  }
-  fModuleHitBufferMap.clear();
+   fTrdHits->Clear("C");
+   delete fTrdHits;
+   if (fRadiator) delete fRadiator;
 }
-// --------------------------------------------------------------------
 
-// ----  Initialisation  ----------------------------------------------
 void CbmTrdHitProducerSmearing::SetParContainers()
 {
-    cout<<" * HitProducer * :: SetParContainers() "<<endl;
-    FairRunAna* ana = FairRunAna::Instance();
-    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-    fDigiPar = (CbmTrdDigiPar*)
-               (rtdb->getContainer("CbmTrdDigiPar"));
+   FairRuntimeDb* rtdb = FairRunAna::Instance()->GetRuntimeDb();
+   fDigiPar = (CbmTrdDigiPar*) rtdb->getContainer("CbmTrdDigiPar");
 }
-// --------------------------------------------------------------------
 
-// ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdHitProducerSmearing::ReInit(){
-
-    cout<<" * HitProducer * :: ReInit() "<<endl;
-
-    return kSUCCESS;
-}
-// --------------------------------------------------------------------
-
-// ---- Init ----------------------------------------------------------
 InitStatus CbmTrdHitProducerSmearing::Init()
 {
+   FairRootManager* ioman = FairRootManager::Instance();
 
-  cout<<"********** Initilization of TRD Hitproducer ********"<<endl;
+   fTrdPoints = (TClonesArray *) ioman->GetObject("TrdPoint");
+   if (NULL == fTrdPoints) Fatal("CbmTrdHitProducerSmearing", "No TrdPoint array!");
 
-  FairRootManager *ioman = FairRootManager::Instance();
-  
-  fTrdPoints=(TClonesArray *)  ioman->GetObject("TrdPoint");
-  if ( ! fTrdPoints ) {
-    cout << "-W CbmTrdHitProducerSmearing::Init: No TrdPoints array!" << endl;
-    cout << "                            Task will be inactive" << endl;
-    return kERROR;
-  }
-  
-  fListStack = (TClonesArray*)ioman->GetObject("MCTrack");
-  
-  fHitCollection = new TClonesArray("CbmTrdHit", 100);
-  ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
-  
-  // Extract information about the number of TRD stations and
-  // the number of layers per TRD station from the geomanager.
-  // Store the information about the number of layers at the entrance
-  // of subsequent stations in a vector. 
-  // This allows to calculate the layer number starting with 1 for the
-  // first layer of the first station at a later stage by only adding 
-  // the layer number in the station to the number of layers in 
-  // previous stations 
-  
-  fGeoHandler->Init();  
+   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+   if (NULL == fMCTracks) Fatal("CbmTrdHitProducerSmearing", "No MCTrack array!");
 
-  fRadiator->Init();
-  
-  cout<<"********** End of TRD Hitproducer init ********"<<endl;
+   fTrdHits = new TClonesArray("CbmTrdHit", 100);
+   ioman->Register("TrdHit", "TRD", fTrdHits, kTRUE);
 
-  return kSUCCESS;
-  
+   // Extract information about the number of TRD stations and
+   // the number of layers per TRD station from the geomanager.
+   // Store the information about the number of layers at the entrance
+   // of subsequent stations in a vector.
+   // This allows to calculate the layer number starting with 1 for the
+   // first layer of the first station at a later stage by only adding
+   // the layer number in the station to the number of layers in
+   // previous stations
+
+   fGeoHandler->Init();
+
+   fRadiator->Init();
+
+   return kSUCCESS;
 }
-// --------------------------------------------------------------------
 
-
-// ---- Exec ----------------------------------------------------------
 void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 {
-  Bool_t debug = false;
+   fTrdHits->Clear();
 
-  fNHits = 0;
-  
-  fHitCollection->Clear();
-  
-  CbmTrdPoint *pt=NULL;
-  
-  
-  Int_t nentries = fTrdPoints->GetEntries();
-  cout<<" ** "<<nentries<<" Trd hits to be created in this event** "<<endl;
-  
-  Double_t xHit, yHit, zHit;
-  Double_t xHitErr, yHitErr, zHitErr;
-  TVector3 pos, mom;
-  Double_t teta;
-  Double_t phi;
-  Double_t X, Y, Z;
-  Double_t ELoss;       // total energy loss
-  Double_t ELossTR;     // TR energy loss for e- & e+
-  Double_t ELossdEdX;   // ionization energy loss
-  
-  Int_t trdId;          // unique trd identifier
-  Int_t station;        // trd station
-  Int_t layer;          // trd layer in given trd station
-  Int_t plane;          // unique numberof the TRD plane in the whole setup
-  
-  Double_t a; // used in the smearing part
-  Double_t b; // used in the smearing part
-  Int_t rot;  // used in the smearing part - rotation of the TRD planes
-  
-  Int_t nGhosts = 0;
-  Int_t ghostCounter = 0;
-  Int_t lostCoungter = 0;
-  Int_t outputCounter = 0;
-  Int_t notMovedCounter = 0;
-  
-  printf("   Ghost rate per hit:                     %.3f\n",fGhostRate);
-  printf("   min. distance between hits:             %.3f cm\n",fMinDist);
-  printf("   average distance between hit and ghost: %.3f cm\n",fGhostDistance/10000.);//µm -> cm
-  for (int j=0; j < nentries; j++ ) {
-    
-    // if random value above fEfficency reject point
-    if (gRandom->Rndm() > fEfficency ) continue;
-   
-    if (fGhostRate > 0.0) nGhosts = gRandom->Poisson(fGhostRate);
+   vector<CbmTrdHit*> hits; // Temporary storage for CbmTrdHits. Used for merging procedure.
+   Int_t nofTrdPoints = fTrdPoints->GetEntries();
+   for (Int_t iPoint = 0; iPoint < nofTrdPoints; iPoint++) {
+      // If random value above fEfficency reject point
+      if (gRandom->Rndm() > fEfficency) continue;
 
-    
-    pt = (CbmTrdPoint*) fTrdPoints->At(j);
-    if(NULL == pt) continue;
-    
-    Int_t trackID = pt->GetTrackID();
-    CbmMCTrack *p= (CbmMCTrack*) fListStack->At(trackID);
-    
-    if(NULL == p) continue;
-    Int_t pdgCode = p->GetPdgCode();
-    
-    trdId = pt->GetDetectorID();
-    station = fGeoHandler->GetStation(trdId);
-    layer = fGeoHandler->GetLayer(trdId);
-    plane = fGeoHandler->GetPlane(trdId);
+      CbmTrdHit* hit = CreateHit(iPoint);
+      hits.push_back(hit);
 
-    
-    fModuleInfo = fDigiPar->GetModule(trdId);
-    Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizex();
-    Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizex();
-    Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizey();
-    Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizey();
+      Int_t nofGhosts = (fGhostRate > 0.0) ? gRandom->Poisson(fGhostRate) : 0;
+      for (Int_t iGhost = 0; iGhost < nofGhosts; iGhost++) {
+         hits.push_back(CreateGhostHit(hit));
+      }
+   }
 
-    ELossTR = 0.0;
-    ELossdEdX = pt->GetEnergyLoss();
-    ELoss = ELossdEdX;
-    
-    // Get the momentum and the position to calculate the TR 
-    // production, the hit position and the hit error.	
-    // The corresponding hit should be stored at the position of
-    // the padplane which is the roughly the the exit of the gas
-    // volume. So take the position from the exit point. The 
-    // momentum to calculate the TR production should be taken from 
-    // the entrance point.
-    // FU, 21.06.10
-    pt->PositionOut(pos); 
-    pt->Momentum(mom);
-    
-    // TR
-    // Sorry, Electrons & Positrons only
-    if(TMath::Abs(pdgCode) == 11){
-      
-      ELossTR = fRadiator->GetTR(mom);
-      
+   if (fHitMergingDistance > 0) MergeHits(hits);
+
+   // Copy hits to TClonesArray and clean the memory
+   for (Int_t iHit = 0; iHit < hits.size(); iHit++) {
+      new ((*fTrdHits)[iHit]) CbmTrdHit(*hits[iHit]);
+      delete hits[iHit];
+   }
+   hits.clear();
+}
+
+void CbmTrdHitProducerSmearing::Finish()
+{
+
+}
+
+CbmTrdHit* CbmTrdHitProducerSmearing::CreateHit(Int_t pointId)
+{
+   CbmTrdPoint* trdPoint = static_cast<CbmTrdPoint*>(fTrdPoints->At(pointId));
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(trdPoint->GetTrackID()));
+
+   Int_t detectorId = trdPoint->GetDetectorID();
+   Int_t station = fGeoHandler->GetStation(detectorId);
+   Int_t layer = fGeoHandler->GetLayer(detectorId);
+   Int_t plane = fGeoHandler->GetPlane(detectorId);
+
+   Double_t ELossTR = 0.0; // TR energy loss for e- and e+
+   Double_t ELossdEdX = trdPoint->GetEnergyLoss(); // Ionization energy loss
+   Double_t ELoss = ELossdEdX; // Total energy loss
+
+   TVector3 mcPos, mcMom;
+   trdPoint->PositionOut(mcPos);
+   trdPoint->Momentum(mcMom);
+
+   // TR: Sorry, electrons and positrons only
+   if (TMath::Abs(mcTrack->GetPdgCode()) == 11) {
+      ELossTR = fRadiator->GetTR(mcMom);
       ELoss += ELossTR;
-      
-    }
-    
-    X = pos(0);
-    Y = pos(1);
-    Z = pos(2);
-    
-    // rotation of the trd planes
-    rot = layer%2; // event layers are rotated
-    
-    // New smearing
-    teta = 0.;
-    phi = 0.;
-    teta = TMath::ATan(TMath::Abs(X / Z)) * 1000;    // mrad
-    phi = TMath::ATan(TMath::Abs(Y / Z))  * 1000;     // mrad
+   }
 
-    a = 0.;
-    b = 0.;
+   Int_t rotation = layer % 2; // Rotation of the TRD planes. Even layers are rotated.
 
-    for (Int_t iGhost = 0; iGhost <= nGhosts; iGhost++) { //iGhost == 0 for real particle 
-      if (iGhost > 0)
-	ghostCounter++;
-      if (rot == 1){   // ROTATED Trd x->Y  y->X
-	a = GetSigmaX(station);
-	SmearingY(a);
-	b = GetSigmaY(teta, station);
-	SmearingX(b);
-      }
-      else if(rot == 0) {    // NOT ROTATED Trd x->X  y->Y
-	a = GetSigmaX(station);
-	SmearingX(a);
-	b = GetSigmaY(phi, station);
-	SmearingY(b);
-      }
-      else cout<<" - Err - CBmTrdHitProducer :: Exec : wrong rotation of the trd layers "<<endl;
-    
-    
-      xHit = pos.X();
-      yHit = pos.Y();
-      zHit = pos.Z();
-      Int_t randomCounter = 0;
+   Double_t sigmaX = 0.;
+   Double_t sigmaY = 0.;
+   if (rotation == 1) { // rotated x->Y  y->X
+      Double_t teta = TMath::ATan(TMath::Abs(mcPos.X() / mcPos.Z())) * 1000; // mrad
+      sigmaY = GetSigmaX(station);
+      sigmaX = GetSigmaY(teta, station);
+   } else if (rotation == 0) { // not rotated x->X  y->Y
+      Double_t phi = TMath::ATan(TMath::Abs(mcPos.Y() / mcPos.Z())) * 1000; // mrad
+      sigmaX = GetSigmaX(station);
+      sigmaY = GetSigmaY(phi, station);
+   }
+
+   TVector3 hitPos;
+   if (!fUseDigiPar) {
+      Double_t errX = GetHitErr(sigmaX);
+      Double_t errY = GetHitErr(sigmaY);
+      hitPos.SetX(mcPos.X() + errX);
+      hitPos.SetY(mcPos.Y() + errY);
+      hitPos.SetZ(mcPos.Z());
+   } else {
+      Bool_t isOutside = true;
+      Bool_t hitPosSet = false;
+      Int_t counter = 0;
       do {
-	randomCounter++;
-	Float_t errX = gRandom->Gaus(0,fDx);
-	if (iGhost > 0) { // keep real hit at its position
-	  errX += gRandom->Gaus(0,fGhostDistance);
-	}
-	if (TMath::Abs(errX) > 3*fDx) errX = 3* fDx * errX/TMath::Abs(errX);
-    
-	// um -> cm
-	errX/=10000.0;
-    
-	xHit = pos.X() + errX;
-    
-	xHitErr = fDx/10000.0; //error in cm, fDx is in um
-	zHitErr = 0.0;
-	//printf("DEBUG:: %i times out of chamber\n",randomCounter);
-      } while ((xHit > moduleXmax || xHit < moduleXmin) && randomCounter < 10);
-      if (xHit > moduleXmax || xHit < moduleXmin) { // if the smeared position is not within chamber volume after 10 tries, use original MC-position
-	xHitErr = 0.0;
-	xHit = pos.X();
-      }
-      randomCounter = 0;
-      do {   
-	randomCounter++;
-	Float_t errY = gRandom->Gaus(0,fDy);
-	if (iGhost > 0) { // keep real hit at its position
-	  errY += gRandom->Gaus(0,fGhostDistance);
-	}
-	if (TMath::Abs(errY) > 3*fDy) errY = 3* fDy * errY/TMath::Abs(errY);
-    
-	// um -> cm
-	errY/=10000.0;
-    
-	yHit =  pos.Y() + errY;
-    
-	yHitErr = fDy/10000.0; //error in cm, fDy is in um
-	zHitErr = 0.0;
-	//printf("DEBUG:: %i times out of chamber\n",randomCounter);
-      } while ((yHit > moduleYmax || yHit < moduleYmin) && randomCounter < 10); // avoid to shift the hit position out of the module in x and y
-      if (yHit > moduleYmax || yHit < moduleYmin){ // if the smeared position is not within chamber volume after 10 tries, use original MC-position
-	yHitErr = 0.0;
-	yHit =  pos.Y();
-      }
-      if (debug) if (randomCounter > 1) printf("DEBUG:: %i times out of chamber\n",randomCounter);
-      if (xHit ==  pos.X() || yHit == pos.Y())
-	notMovedCounter++;
+         Double_t errX = GetHitErr(sigmaX);
+         Double_t errY = GetHitErr(sigmaY);
+         Double_t hitPosX = mcPos.X() + errX;
+         Double_t hitPosY = mcPos.Y() + errY;
+         Double_t hitPosZ = mcPos.Z();
 
-      TVector3 posHit(xHit, yHit, zHit);
-      TVector3 posHitErr(xHitErr,yHitErr, zHitErr);
-
-      CbmTrdHit* hit = new CbmTrdHit(trdId, posHit, posHitErr, 0., 
-				     j, plane, ELossTR, ELossdEdX, 
-				     ELoss);
-      //trdId, posHit, posHitErr, j, plane , ELoss, ELossTR, ELossdEdX);
-      fModuleHitBufferMap[trdId].push_back(hit); 
-
-      /*
-	std::map<Int_t, std::vector<CbmTrdHit*> >::iterator it;
-	it = fModuleHitBufferMap.find(trdId);
-	if (it == fModuleHitBufferMap.end()) {
-	//cout << "------new ModuleID: " << VolumeID << endl;
-	CbmTrdHit* hit = new CbmTrdHit(trdId, posHit, posHitErr, 0., 
-	j, plane, ELossTR, ELossdEdX, 
-	ELoss);
-	//trdId, posHit, posHitErr, j, plane , ELoss, ELossTR, ELossdEdX);
-	fModuleHitBufferMap[trdId].push_back(hit); 
-	//AddHit(trdId, posHit, posHitErr, j, plane , ELoss, ELossTR, ELossdEdX);
-	}
-      */
-    }
-  }
-  
-  printf("\n---Merger---\n");
-  for ( fModuleHitBufferMapIt = fModuleHitBufferMap.begin();
-	fModuleHitBufferMapIt != fModuleHitBufferMap.end(); ++fModuleHitBufferMapIt) {
-    Double_t deltar(0.0);
-    //printf("%7i hits per module befor merging\n",(*fModuleHitBufferMapIt).second.size());
-    if (fMinDist > 0.0) {
-      for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size()-1; i++) {
-	for (Int_t j = i+1; j < (*fModuleHitBufferMapIt).second.size(); j++) {
-	  deltar =  sqrt(
-			 pow((*fModuleHitBufferMapIt).second[i]->GetX() - (*fModuleHitBufferMapIt).second[j]->GetX(),2) +
-			 pow((*fModuleHitBufferMapIt).second[i]->GetY() - (*fModuleHitBufferMapIt).second[j]->GetY(),2) 
-			 );
-	  if (deltar < fMinDist) {
-	    lostCoungter++;
-	    // move merged new hit to center between mother hits
-	    (*fModuleHitBufferMapIt).second[i]->SetX((*fModuleHitBufferMapIt).second[i]->GetX() + 
-						     0.5 * ((*fModuleHitBufferMapIt).second[j]->GetX() - (*fModuleHitBufferMapIt).second[i]->GetX()));
-	    (*fModuleHitBufferMapIt).second[i]->SetY((*fModuleHitBufferMapIt).second[i]->GetY() + 
-						     0.5 * ((*fModuleHitBufferMapIt).second[j]->GetY() - (*fModuleHitBufferMapIt).second[i]->GetY()));
-	    (*fModuleHitBufferMapIt).second[i]->SetZ((*fModuleHitBufferMapIt).second[i]->GetZ() + 
-						     0.5 * ((*fModuleHitBufferMapIt).second[j]->GetZ() - (*fModuleHitBufferMapIt).second[i]->GetZ()));
-	    //Sum ELoss ELossTR ELossdEdX
-	    (*fModuleHitBufferMapIt).second[i]->SetELossdEdx((*fModuleHitBufferMapIt).second[i]->GetELossdEdX() + (*fModuleHitBufferMapIt).second[j]->GetELossdEdX());
-	    (*fModuleHitBufferMapIt).second[i]->SetELoss((*fModuleHitBufferMapIt).second[i]->GetELoss() + (*fModuleHitBufferMapIt).second[j]->GetELoss());
-	    (*fModuleHitBufferMapIt).second[i]->SetELossTR((*fModuleHitBufferMapIt).second[i]->GetELossTR() + (*fModuleHitBufferMapIt).second[j]->GetELossTR());
-	    (*fModuleHitBufferMapIt).second.erase((*fModuleHitBufferMapIt).second.begin()+j);
-	  }
-	}
+         // If digitization scheme is provided than check if hit position is inside the detector
+         assert(fDigiPar != NULL);
+         fModuleInfo = fDigiPar->GetModule(detectorId);
+         Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizex();
+         Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizex();
+         Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizey();
+         Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizey();
+         isOutside = (hitPosX > moduleXmax || hitPosX < moduleXmin)
+                            || (hitPosX > moduleXmax || hitPosX < moduleXmin);
+         counter++;
+         if (!isOutside) { // If hit position is inside active volume
+            hitPos.SetX(hitPosX);
+            hitPos.SetY(hitPosY);
+            hitPos.SetZ(hitPosZ);
+            hitPosSet = true;
+            break;
+         }
+      } while (isOutside && counter < 10);
+      if (!hitPosSet) { // If hit position was not set than use Mc position
+         hitPos.SetX(mcPos.X());
+         hitPos.SetY(mcPos.Y());
+         hitPos.SetZ(mcPos.Z());
       }
-    }
-    //printf("%7i hits per module after merging\n",(*fModuleHitBufferMapIt).second.size());
-    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++) {
-      TVector3 posHit((*fModuleHitBufferMapIt).second[i]->GetX(), (*fModuleHitBufferMapIt).second[i]->GetY(), (*fModuleHitBufferMapIt).second[i]->GetZ());
-      TVector3 posHitErr((*fModuleHitBufferMapIt).second[i]->GetDx(), (*fModuleHitBufferMapIt).second[i]->GetDy(), (*fModuleHitBufferMapIt).second[i]->GetDz());
-      AddHit((*fModuleHitBufferMapIt).first, posHit, posHitErr, (*fModuleHitBufferMapIt).second[i]->GetRefId(), (*fModuleHitBufferMapIt).second[i]->GetPlaneId(), (*fModuleHitBufferMapIt).second[i]->GetELoss(), (*fModuleHitBufferMapIt).second[i]->GetELossTR(), (*fModuleHitBufferMapIt).second[i]->GetELossdEdX());
-      outputCounter++;
-    
-    }
-  }
-  printf("\n   %7i (%5.1f%%) input points\n   %7i (%5.1f%%) lost points\n   %7i (%5.1f%%) ghost hits\n   %7i (%5.1f%%) output hits\n   %7i (%5.1f%%) not moved hits\n",nentries,nentries*100./nentries,lostCoungter,lostCoungter*100./nentries,ghostCounter,ghostCounter*100./nentries,outputCounter,outputCounter*100./nentries,notMovedCounter,notMovedCounter*100./nentries);
-  for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
-    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
-      delete (*fModuleHitBufferMapIt).second[i];
-    (*fModuleHitBufferMapIt).second.clear();
-  }
-  fModuleHitBufferMap.clear();
+   }
+
+   TVector3 hitErr(sigmaX, sigmaY, 0.);
+
+   return new CbmTrdHit(detectorId, hitPos, hitErr, 0., pointId, plane, ELossTR, ELossdEdX, ELoss);
 }
 
 
-	       // --------------------------------------------------------------------
+CbmTrdHit* CbmTrdHitProducerSmearing::CreateGhostHit(
+      const CbmTrdHit* hit)
+{
+   CbmTrdHit* ghostHit = new CbmTrdHit(*hit);
+   // Additional errors for the ghost hit
+   Double_t x = ghostHit->GetX() + gRandom->Gaus(0, fGhostDistance);
+   Double_t y = ghostHit->GetY() + gRandom->Gaus(0, fGhostDistance);
+   ghostHit->SetX(x);
+   ghostHit->SetY(y);
+   return ghostHit;
+}
 
-	       // ---- Add Hit to HitCollection --------------------------------------
-	       void CbmTrdHitProducerSmearing::AddHit(Int_t trdId, TVector3 &posHit, 
-						      TVector3 &posHitErr,
-						      Int_t ref, Int_t Plane, 
-						      Double_t ELoss, Double_t ELossTR,
-						      Double_t ELossdEdX) 
-	       {
-		 new((*fHitCollection)[fNHits]) CbmTrdHit(trdId, posHit, posHitErr, 0., 
-							  ref, Plane, ELossTR, ELossdEdX, 
-							  ELoss);
-		 fNHits++;
-	       }
+void CbmTrdHitProducerSmearing::MergeHits(
+      vector<CbmTrdHit*>& hits)
+{
+   for (Int_t i = 0; i < hits.size() - 1; i++) {
+      for (Int_t j = i + 1; j < hits.size(); j++) {
+         CbmTrdHit* hit1 = hits[i];
+         CbmTrdHit* hit2 = hits[j];
+         Double_t dx = hit1->GetX() - hit2->GetX();
+         Double_t dy = hit1->GetY() - hit2->GetY();
+         Double_t dr = sqrt(dx * dx + dy * dy);
+         if (dr < fHitMergingDistance) {
+            // Move merged new hit to center between mother hits
+            hit1->SetX(hit1->GetX() + 0.5 * (hit2->GetX() - hit1->GetX()));
+            hit1->SetY(hit1->GetY() + 0.5 * (hit2->GetY() - hit1->GetY()));
+            hit1->SetZ(hit1->GetZ() + 0.5 * (hit2->GetZ() - hit1->GetZ()));
+            // Sum ELoss ELossTR ELossdEdX
+            hit1->SetELossdEdx(hit1->GetELossdEdX() + hit2->GetELossdEdX());
+            hit1->SetELoss(hit1->GetELoss() + hit2->GetELoss());
+            hit1->SetELossTR(hit1->GetELossTR() + hit2->GetELossTR());
+            delete hit2;
+            hits.erase(hits.begin() + j);
+         }
+      }
+   }
+}
 
-	       // --------------------------------------------------------------------
+Double_t CbmTrdHitProducerSmearing::GetHitErr(
+      Double_t sigma)
+{
+   Double_t err = gRandom->Gaus(0, sigma);
+   return (TMath::Abs(err) > 3 * sigma) ? 3 * sigma * err / TMath::Abs(err) : err;
+}
 
-	       // ---- Finish --------------------------------------------------------
-	       void CbmTrdHitProducerSmearing::Finish()
-	{
-	  /*
-	    for (fModuleHitBufferMapIt = fModuleHitBufferMap.begin(); fModuleHitBufferMapIt != fModuleHitBufferMap.end(); fModuleHitBufferMapIt++){
-	    for (Int_t i = 0; i < (*fModuleHitBufferMapIt).second.size(); i++)
-	    delete (*fModuleHitBufferMapIt).second[i];
-	    }
-	    (*fModuleHitBufferMapIt).second.clear();
-	  */
-	}
-	       // --------------------------------------------------------------------
+void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])
+{
+   for (Int_t i = 0; i < 3; i++) fSigmaX[i] = sigma[i];
+}
 
-	       // ---- Register ------------------------------------------------------
-	       void CbmTrdHitProducerSmearing::Register(){
+void CbmTrdHitProducerSmearing::SetSigmaY(
+      Double_t s1[],
+      Double_t s2[],
+      Double_t s3[])
+{
+   for (Int_t i = 0; i < 7; i++) {
+      fSigmaY[0][i] = s1[i];
+      fSigmaY[1][i] = s2[i];
+      fSigmaY[2][i] = s3[i];
+   }
+}
 
-		 FairRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
+Double_t CbmTrdHitProducerSmearing::GetSigmaX(Int_t stack) const
+{
+   return fSigmaX[stack - 1];
+}
 
-	       }
-	       // --------------------------------------------------------------------
+Double_t CbmTrdHitProducerSmearing::GetSigmaY(Double_t teta,
+      Int_t stack) const
+{
+   if (teta <= 50) return fSigmaY[stack - 1][0];
+   else if (teta > 50 && teta <= 100) return fSigmaY[stack - 1][1];
+   else if (teta > 100 && teta <= 200) return fSigmaY[stack - 1][2];
+   else if (teta > 200 && teta <= 300) return fSigmaY[stack - 1][3];
+   else if (teta > 300 && teta <= 400) return fSigmaY[stack - 1][4];
+   else if (teta > 400 && teta <= 500) return fSigmaY[stack - 1][5];
+   else if (teta > 500) return fSigmaY[stack - 1][6];
+   else return 0;
+}
 
-	       // ---- SetSigmaX -----------------------------------------------------
-	       void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])
-	{
-	  for(Int_t i = 0; i < 3; i++)    fSigmaX[i] = sigma[i];
-	}
-	       // --------------------------------------------------------------------
-
-	       // ---- SetSigmaY -----------------------------------------------------
-	       void CbmTrdHitProducerSmearing::SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[])
-	{
-	  for(Int_t i = 0; i < 7; i++)   fSigmaY[0][i] = s1[i];
-	  for(Int_t j = 0; j < 7; j++)  fSigmaY[1][j] = s2[j];
-	  for(Int_t k = 0; k < 7; k++ ) fSigmaY[2][k] = s3[k];
-	}
-	       // --------------------------------------------------------------------
-
-	       // ---- GetSigmaX -----------------------------------------------------
-	       Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack) const
-	{
-	  if  (stack == 1)    	return fSigmaX[0];
-	  else if (stack == 2)    return fSigmaX[1];
-	  else if (stack == 3)     return fSigmaX[2];
-	  else return 0;
-	}
-	       // --------------------------------------------------------------------
-
-	       // ---- GetSigmaY -----------------------------------------------------
-	       Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack ) const
-	{
-	  if (teta <= 50)	                 return fSigmaY[stack - 1][0];
-	  else if(teta > 50 && teta <= 100)    return fSigmaY[stack - 1][1];
-	  else if(teta > 100 && teta <= 200)   return fSigmaY[stack - 1][2];
-	  else if(teta > 200 && teta <= 300)   return fSigmaY[stack - 1][3];
-	  else if(teta > 300 && teta <= 400)   return fSigmaY[stack - 1][4];
-	  else if(teta > 400 && teta <= 500)   return fSigmaY[stack - 1][5];
-	  else if(teta > 500)		         return fSigmaY[stack - 1][6];
-	  else return 0;
-	}
-	       // --------------------------------------------------------------------
-
-	       ClassImp(CbmTrdHitProducerSmearing)
+ClassImp(CbmTrdHitProducerSmearing)

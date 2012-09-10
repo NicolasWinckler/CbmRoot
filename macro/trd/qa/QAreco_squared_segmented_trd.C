@@ -107,23 +107,8 @@ void QAreco_squared_segmented_trd(Int_t nEvents = 2)
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
                                        trdDFoils, trdDGap);
 
-  // -----   TRD hit producer   ----------------------------------------------
-  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-  // Resolutions in y - station and angle dependent [mum]
-  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
-
-  CbmTrdHitProducerSmearing* trdHitProd = new
-        CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-
-  trdHitProd->SetSigmaX(trdSigmaX);
-  trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-
+  CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
   run->AddTask(trdHitProd);
-
-
-
 
   /*
   CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",

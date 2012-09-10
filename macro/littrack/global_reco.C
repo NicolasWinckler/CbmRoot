@@ -12,8 +12,8 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 100, // number of events
-		TString opt = "tracking")
+void global_reco(Int_t nEvents = 10, // number of events
+		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/d/events/much_v11a_signal/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/trd_v12ala/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -32,14 +32,14 @@ void global_reco(Int_t nEvents = 100, // number of events
    // Digi files
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v11c.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
 
    // Directory for output results
    TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "nn_parallel"; // Global tracking type
+   TString globalTrackingType = "branch"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
@@ -192,7 +192,10 @@ void global_reco(Int_t nEvents = 100, // number of events
 				digitize->SetAlgorithm(1);
 			}
 			run->AddTask(digitize);
-			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
+//			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
+//			run->AddTask(findHits);
+			CbmMuchClustering* findHits = new CbmMuchClustering();
+			findHits->SetAlgorithmVersion(2);
 			run->AddTask(findHits);
 
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
@@ -216,18 +219,10 @@ void global_reco(Int_t nEvents = 100, // number of events
 			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
 			if (trdHitProducerType == "smearing") {
-//				// ----- TRD hit smearing -----
-				Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
-				// Resolutions in y - station and angle dependent [mum]
-				Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
-				Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
-				Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
-
-				CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-				trdHitProd->SetSigmaX(trdSigmaX);
-				trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+   			// ----- TRD hit smearing -----
+				CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
 				run->AddTask(trdHitProd);
-//				// ----- End TRD hit smearing -----
+				// ----- End TRD hit smearing -----
 			} else if (trdHitProducerType == "digi") {
 				// ----- TRD Digitizer -----
 				CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer", "TRD task", radiator);

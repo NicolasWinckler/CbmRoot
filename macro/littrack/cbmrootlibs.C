@@ -42,4 +42,6 @@ void cbmrootlibs()
 
    gSystem->Load("libLittrackparallel");
    gSystem->Load("libMinuit2"); // Needed for field fitter
+
+   gSystem->Load("libClustering");
 }

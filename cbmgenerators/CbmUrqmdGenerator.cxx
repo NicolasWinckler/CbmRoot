@@ -318,6 +318,9 @@ void CbmUrqmdGenerator::ReadConversionTable() {
       fParticleTable[index] = pdgId;
   }
     
+  pdgconv->close();
+  delete pdgconv; 
+
   cout << "-I CbmUrqmdGenerator: Particle table for conversion from "
        << "UrQMD loaded" <<  endl;
 

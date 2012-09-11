@@ -23,6 +23,9 @@ Set(CTEST_CUSTOM_ERROR_EXCEPTION
     ${CTEST_CUSTOM_ERROR_EXCEPTION}
     "/include/boost"
     "/boost/include"
+    "/include/root"
+    "/root/include"
+    "boost::"
 )
 
 set(CTEST_CUSTOM_WARNING_EXCEPTION

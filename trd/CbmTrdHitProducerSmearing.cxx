@@ -29,8 +29,6 @@
 #include <vector>
 #include <cassert>
 
-using std::cout;
-using std::endl;
 using std::vector;
 using std::map;
 using boost::assign::list_of;
@@ -264,7 +262,7 @@ Double_t CbmTrdHitProducerSmearing::GetHitErr(
       Double_t sigma)
 {
    Double_t err = gRandom->Gaus(0, sigma);
-   return (TMath::Abs(err) > 3 * sigma) ? 3 * sigma * err / TMath::Abs(err) : err;
+   return (TMath::Abs(err) < 3 * sigma) ? err : (err > 0) ? 3 * sigma : -3 * sigma;
 }
 
 void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])

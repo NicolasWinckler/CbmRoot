@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 void global_reco(Int_t nEvents = 10, // number of events
-		TString opt = "all")
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -192,11 +192,11 @@ void global_reco(Int_t nEvents = 10, // number of events
 				digitize->SetAlgorithm(1);
 			}
 			run->AddTask(digitize);
-//			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
-//			run->AddTask(findHits);
-			CbmMuchClustering* findHits = new CbmMuchClustering();
-			findHits->SetAlgorithmVersion(2);
+			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
 			run->AddTask(findHits);
+//			CbmMuchClustering* findHits = new CbmMuchClustering();
+//			findHits->SetAlgorithmVersion(2);
+//			run->AddTask(findHits);
 
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
 			      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
@@ -221,6 +221,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 			if (trdHitProducerType == "smearing") {
    			// ----- TRD hit smearing -----
 				CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
+				trdHitProd->SetUseDigiPar(false);
 				run->AddTask(trdHitProd);
 				// ----- End TRD hit smearing -----
 			} else if (trdHitProducerType == "digi") {

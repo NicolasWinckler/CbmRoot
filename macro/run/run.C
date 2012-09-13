@@ -1,5 +1,6 @@
 // Macro for running Cbm  with Geant3  or Geant4 (M. Al-Turany , D. Bertini)
 // Modified 22/06/2005 D.Bertini
+void run()
 {
   TStopwatch timer;
   timer.Start();

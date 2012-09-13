@@ -50,6 +50,9 @@ void global_sim_new(Int_t nEvents = 5, TString setup = "electron",
   TString mcFile; 
   TString parFile;
   TString resultDir;
+  TString globalRecoFile;
+  TString globalHitsFile;
+  TString globalTracksFile;
 
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/SetDefaults.C");
   defaultGeometrie(setup, caveGeom, targetGeom, pipeGeom, shieldGeom, mvdGeom, 
@@ -60,7 +63,8 @@ void global_sim_new(Int_t nEvents = 5, TString setup = "electron",
 		   nofMuonsMinus, nofElectrons, nofPositrons, nofPionsPlus, 
 		   nofPionsMinus, nofJPsiToMuons, nofJPsiToElectrons, nofAuIons);
 
-  defaultOutput(setup, mcDir, mcFile, parFile, fileNr);
+  defaultOutput(setup, fileNr, mcDir, resultDir, mcFile, parFile, 
+		    globalRecoFile, globalHitsFile, globalTracksFile);
 
   if (definitionFile != "" ) {
     definitionFile = definitionDir + definitionFile;

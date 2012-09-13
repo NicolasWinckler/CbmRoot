@@ -80,7 +80,7 @@ void defaultGenerator(TString setup, TString& inputDir, TString& urqmdFile,
 void defaultOutput(TString setup, TString fileNr, TString& mcDir, 
 		   TString& resultDir, TString& mcFile, TString& parFile,
 		   TString& globalRecoFile, TString& globalHitsFile, 
-		   TString& globalTracksFile);
+		   TString& globalTracksFile)
 {
   cout << "Setup the normal output directories and filnames." << endl;
   
@@ -138,10 +138,10 @@ void defaultDigiParameter(TString& parDir, TString& muchDigiFile,
 {
   parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
   muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
-
-  TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
-  TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
-  parFileList->Add(&stsDigiFile);
-  parFileList->Add(&trdDigiFile);
+ 
+  TString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
+  TString trdDigiFile = parDir + "/trd/trd_v12a.digi.par"; // TRD digi file
+  parFileList->Add(new TObjString(stsDigiFile));
+  parFileList->Add(new TObjString(trdDigiFile));
 }
   

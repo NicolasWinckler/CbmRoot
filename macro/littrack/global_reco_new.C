@@ -21,6 +21,7 @@ void global_reco_new(Int_t nEvents = 10,
 // if opt == "tracking" global tracking is executed
 {
   
+
   // Data files
   TString mcFile;
   TString parFile;
@@ -50,13 +51,13 @@ void global_reco_new(Int_t nEvents = 10,
 
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/SetDefaults.C");
 
-  defaultOutput(mcDir, fileNr, resultDir, mcFile, parFile, 
+  defaultOutput(setup, fileNr, mcDir, resultDir, mcFile, parFile, 
 		    globalRecoFile, globalHitsFile, globalTracksFile);
   defaultRecoSettings(globalTrackingType, stsHitProducerType, 
 		      trdHitProducerType, muchHitProducerType);
   defaultNormalization(normStsPoints, normTrdPoints, normMuchPoints,
 		       normTofPoints, normTrdHits, normMuchHits, normTofHits);
-  defaultDigiParameter(parDir; muchDigiFile, parFileList);  
+  defaultDigiParameter(parDir, muchDigiFile, parFileList);  
 
    
   Int_t iVerbose = 1;

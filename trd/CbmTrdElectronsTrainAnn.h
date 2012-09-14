@@ -25,22 +25,37 @@ class TGraph;
 class TRandom;
 //class TMultiLayerPerceptron;
 
-enum IdMethod {kANN = 0, kBDT = 1, kMEDIANA = 2, kLIKELIHOOD = 3};
+enum IdMethod {kANN = 0, kBDT = 1, kMEDIAN = 2, kLIKELIHOOD = 3, kMeanCut = 4};
 
 /**
- * \class ElossInfo
+ * \class TrdEloss
  *
  * \brief Represents information about energy losses in one layer.
  *
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  **/
-class ElossInfo
+class TrdEloss
 {
 public:
-   double fEloss;
-   double fdEdX;
-   double fTR;
+	TrdEloss(){
+		fEloss = 0.;
+		fdEdX = 0.;
+		fTR = 0.;
+	}
+
+	TrdEloss(
+			double eloss,
+			double dedx = 0.,
+			double tr = 0.) {
+		fEloss = eloss;
+		fdEdX = dedx;
+		fTR = tr;
+	}
+
+	double fEloss;
+	double fdEdX;
+	double fTR;
 };
 
 
@@ -51,7 +66,7 @@ public:
    /**
     * \brief Default constructor
     */
-   CbmTrdElectronsTrainAnn();
+   CbmTrdElectronsTrainAnn(int nofTrdLayers);
 
    /**
     * \brief Destructor
@@ -74,70 +89,93 @@ public:
     */
    virtual void Finish();
 
+   /**
+    * \brief Draw results.
+    */
+	void Draw();
+
 private:
 
    /**
-    * \brief Fill vector with energy loss information.
+    * \brief Fill vector with energy loss information for simulated data.
     */
-   void FillElossVector();
+   void FillElossVectorSim();
+
+   /**
+    * \brief Fill vector with energy loss information simulated from real data spectra.
+    */
+   void FillElossVectorReal();
 
    /**
     * \brief Fill histograms with energy loss information.
     */
-   void FillElossAnaHist();
+   void FillElossHist();
 
    /**
     * \brief Sort energy losses and fill histograms.
     */
    void SortElossAndFillHist();
 
-   /**
-    * \brief Fill cumulative probability histograms.
-    */
-   void FillCumProbHist();
-
-   /**
-    * \brief Draw results.
-    */
-	void Draw();
-
 	void Run();
 
 	void DoTrain();
+
 	void DoTest();
+
 	void DoPreTest();
 
 	TTree* CreateTree();
+
 	string CreateAnnString();
+
 	TMVA::Factory* CreateFactory(TTree* simu);
+
 	TMVA::Reader* CreateTmvaReader();
 
 	void Transform();
+
 	void Transform1();
+
 	void Transform2();
 
 	Double_t FindOptimalCut();
-	void CreateCumProbHistos();
-	void CreateROCDiagramm();
+
+	void CreateCumProbOutputHist();
+
+	TGraph* CreateRocDiagramm();
+
 	Double_t Likelihood();
+
+	Double_t Median();
+
+	Double_t MeanCut();
+
 	Double_t Eval(Bool_t isEl);
 
-	void SetAnnCut(Double_t annCut){fAnnCut = annCut;}
+public:
+
+
 	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
+
 	void SetTransformType(Int_t type){fTransformType = type;}
+
 	void SetIdMethod(IdMethod idMethod){fIdMethod = idMethod;}
-	void SetWeightFileDir(const string& weightFileDir){fWeightFileDir = weightFileDir;}
-	void SetNofHiddenNeurons(Int_t nofHiddenNeurons){fNofHiddenNeurons = nofHiddenNeurons;}
+
+	void SetOutputDir(const string& outputDir){fOutputDir = outputDir;}
+
 	void SetNofAnnEpochs(Int_t nofAnnEpochs){fNofAnnEpochs = nofAnnEpochs;}
-	void SetMaxNofTrainSamples(Int_t nofTr){fMaxNofTrainSamples = nofTr;}
+
+	void SetNofTrainSamples(Int_t nofTr){fNofTrainSamples = nofTr;}
+
 	void SetSigmaError(Double_t sigma){fSigmaError = sigma;}
 
+	void RunReal();
+
+private:
 	void FillAnnInputHist(
 	      Bool_t isEl);
 
-	Bool_t FileExists(const string& fileName);
-
-
+	// Input arrays of simulated events
    TClonesArray* fMCTracks;
    TClonesArray* fTrdPoints;
    TClonesArray* fTrdTracks;
@@ -148,12 +186,12 @@ private:
    // 1st index -> [0] = electrons, [1] = pions
    // 2nd index -> track index
    // 3rd index -> hit index in track
-   vector< vector< vector<ElossInfo> > > fEloss;
+   vector< vector< vector<TrdEloss> > > fEloss;
 
    vector<TH1*> fHists; //store all pointers to histograms
 
    // [0] = electrons, [1] = pions
-   vector<TH1D*> fhSumEloss; // sum of energy losses in all layers
+   vector<TH1D*> fhMeanEloss; // sum of energy losses in all layers devided by number of layers
    vector<TH1D*> fhEloss; // energy losses in one layer
    vector<TH1D*> fhdEdX; // dEdX in one layer
    vector<TH1D*> fhTR; // TR in one layer
@@ -164,45 +202,33 @@ private:
    // 1st index -> [0] = electrons, [1] = pions
    // 2nd index -> layer number
    vector<vector<TH1D*> > fhElossSort;
-   vector<vector<TH1D*> > fhCumProbSort;
-	vector<vector<TH1D*> > fhElossPdfSort;
 
    Int_t fEventNum; // event number
-
-	string fWeightFileDir;
-	Double_t fSigmaError;
-
-	Bool_t fIsDoTrain;
-	Int_t fTransformType;
+	string fOutputDir; // output directory
+	Double_t fSigmaError; // additional sigma error for energy loss measurements
+	Bool_t fIsDoTrain; // do you want to run training procedure?
+	Int_t fTransformType; // Energy loss transformation type
 
 	vector<Float_t> fAnnInput; // input vector for ANN
 	Float_t fXOut; // output value from ANN
 
-	Double_t fAnnCut;
-	Int_t fNofInputNeurons;
-	Int_t fNofHiddenNeurons;
-	Int_t fNofTrdLayers;
+	Int_t fNofTrdLayers; // number of TRD layers
 
 	Double_t fMaxEval;
 	Double_t fMinEval;
 
-	string fAnnWeightsFile;
 	TMultiLayerPerceptron* fNN;
 	TMVA::Reader* fReader;
 	IdMethod fIdMethod;
 	Int_t fNofAnnEpochs;
-
-	Int_t fMaxNofTrainSamples;
-
+	Int_t fNofTrainSamples;
 	TRandom* fRandom;
 
    // Histograms for testing
 	// [0] = electron, [1] = pion
-	vector<TH1D*> fhAnnOutput; // ANN output
-	vector<TH1D*> fhCumProbAnnOutput; // Cumulative probabilities for ANN output
-   vector< vector<TH1D*> > fhAnnInput; // Input data for ANN for each input
-
-   TGraph* fROCGraph;
+	vector<TH1D*> fhOutput; // algorithm output
+	vector<TH1D*> fhCumProbOutput; // Cumulative probabilities for algorithm's output
+   vector< vector<TH1D*> > fhInput; // Input data for algorithm for each input
 
     CbmTrdElectronsTrainAnn(const CbmTrdElectronsTrainAnn&);
     CbmTrdElectronsTrainAnn& operator=(const CbmTrdElectronsTrainAnn&);

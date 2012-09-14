@@ -5,96 +5,30 @@
  E-mail : S.Lebedev@gsi.de
  */
 #include <vector>
-//#include "../../trd/CbmTrdElectronsTrainAnn.h"
 
-void coeffCalc(double mom, double* coeff1, double* coeff2) {
-	double momAr[] = { 1., 1.5, 2., 3., 4., 5., 7., 9., 11., 13. };
-	double coeffAr1[] = { 1.04, 1.105, 1.154, 1.277, 1.333, 1.394, 1.47, 1.50,
-			1.54, 1.58 };
-	double coeffAr2[] = { 0.548, 0.567, 0.585, 0.63, 0.645, 0.664, 0.69, 0.705,
-			0.716, 0.723 };
-	for (int i = 0; i <10; i++) {
-		if (mom < momAr[i] + 0.01 && mom > momAr[0] - 0.01) {
-			*coeff1 = coeffAr1[i];
-			*coeff2 = coeffAr2[i];
-			break;
-		}
-	}
-}
-
-void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0, Double_t sigmaError)
+void trd_elid_trainANN_txt()
 {
-	///load libraries for neural net
-	if (!gROOT->GetClass("TMultiLayerPerceptron"))
-		gSystem->Load("libMLP");
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gSystem->Load("libGeoBase");
-	gSystem->Load("libParBase");
-	gSystem->Load("libBase");
-	gSystem->Load("libCbmBase");
-	gSystem->Load("libCbmData");
-	gSystem->Load("libField");
-	gSystem->Load("libGen");
-	gSystem->Load("libPassive");
-	gSystem->Load("libTMVA");
-	gSystem->Load("libTrd");
 
+   // ----  Load libraries   -------------------------------------------------
+   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+   basiclibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+   cbmlibs();
+   gSystem->Load("libTMVA");
 
-	paramNum = 3;
-	fileNum = 1;
-	Double_t sigmaError = 0.0;
-	Int_t maxNofTrain = 200500;
-	Int_t transType = 3;
+   int nofTrdLayers = 12;
 
+  // nofTrdLayers = TString(gSystem->Getenv("NOF_TRD_LAYERS")).Atoi();
 
-	TString fileNumSt;
-	if (fileNum == 0)fileNumSt = "0000";
-	if (fileNum == 1)fileNumSt = "0001";
-	if (fileNum == 2)fileNumSt = "0002";
-	if (fileNum == 3)fileNumSt = "0003";
-	if (fileNum == 4)fileNumSt = "0004";
-	if (fileNum == 5)fileNumSt = "0005";
-	if (fileNum == 6)fileNumSt = "0006";
-	if (fileNum == 7)fileNumSt = "0007";
-	if (fileNum == 8)fileNumSt = "0008";
-	if (fileNum == 9)fileNumSt = "0009";
-
-	TString paramSt;
-	if (paramNum == 1)paramSt = "param1";
-	if (paramNum == 2)paramSt = "param2";
-	if (paramNum == 3)paramSt = "param3";
-
-	cout << "-I- Current file number is " << fileNumSt << endl;
-	TString geoType = "st";
-	TString inputDir = "/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/st/";
-	fileNameEl = inputDir + geoType + "_" + "electrons_mom_" + fileNumSt	+ ".txt";
-	fileNamePi = inputDir + geoType + "_" + "pions_mom_" + fileNumSt + ".txt";
-	fileNameTestEl = inputDir + geoType + "_" + "electrons_mom_" + fileNumSt	+ ".txt";
-	fileNameTestPi = inputDir + geoType + "_" + "pions_mom_" + fileNumSt	+ ".txt";
-	fileNameCumHistos ="/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/st/piel."+fileNumSt+".reco.root";
-	weightFileDir="weights/"+paramSt+"_"+fileNumSt;
-
-	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
-	trainer->SetFileNameEl(fileNameEl);
-	trainer->SetFileNamePi(fileNamePi);
-	trainer->SetFileNameTestEl(fileNameTestEl);
-	trainer->SetFileNameTestPi(fileNameTestPi);
-	trainer->SetFileNameCumHistos(fileNameCumHistos);
-	trainer->SetWeightFileDir(weightFileDir);
-	trainer->SetNofHiddenNeurons(12);
-	trainer->SetNofAnnEpochs(500);
-	trainer->SetMaxNofTrainPi(maxNofTrain);
-	trainer->SetMaxNofTrainEl(maxNofTrain);
-	trainer->SetFileNum(fileNum);
-	trainer->SetSigmaError(sigmaError);
-
-	//Cut will be calculated automatically, taken into account 90% of electron efficiency
-	trainer->SetIsDoTrain(false);
-	trainer->SetTransformType(transType);
-	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3, kLIKELIHOOD = 4
-	trainer->SetIdMethod(1);
-	trainer->Run();
-	trainer->DrawHistos();
-
+   std::stringstream ss;
+   ss << "results/" <<nofTrdLayers<<"/";
+	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn(nofTrdLayers);
+	trainer->SetOutputDir(ss.str());
+   //kANN = 0, kBDT = 1, kMEDIANA = 2, kLIKELIHOOD = 3, kMeanCut = 4
+   trainer->SetIdMethod(4);
+   trainer->SetTransformType(2);
+   trainer->SetIsDoTrain(true);
+   trainer->SetNofTrainSamples(2500);
+   trainer->SetSigmaError(0.0);
+	trainer->RunReal();
 }

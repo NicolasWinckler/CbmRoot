@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export DIR=/lustre/cbm/user/ebelolap/aug11/sep12/25gev/70field/nomvd
+export DIR=/lustre/cbm/user/ebelolap/aug11/sep12/10gev/70field/nomvd
 
 function create_dir() {
     mkdir -p ${DIR}/${1}/log

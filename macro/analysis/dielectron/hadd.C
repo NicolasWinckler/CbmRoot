@@ -45,6 +45,8 @@ void hadd() {
    // root > hadd()
 
    string particle = "";
+
+
    for (int iF = 0; iF < 4; iF++){
 
       if (iF == 0) {
@@ -57,15 +59,15 @@ void hadd() {
          particle = "rho0";
       }
 
-      string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/70field/nomvd/"+particle+"/";
+      string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/10gev/100field/nomvd/"+particle+"/";
       cout << "-I- " << dir << endl;
 
-      Target = TFile::Open( string(dir+"analysis.all.root").c_str(), "RECREATE" );
+      Target = TFile::Open( string(dir+"analysis.pi_misid_0.0.all.root").c_str(), "RECREATE" );
 
       FileList = new TList();
-      for (int i = 1; i < 200; i++){
+      for (int i = 1; i < 100; i++){
          stringstream ss;
-         ss << dir << "analysis." ;
+         ss << dir << "analysis.pi_misid_0.0." ;
          ss.fill('0');
          ss.width(4);
          ss  << i << ".root";

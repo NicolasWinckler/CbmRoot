@@ -16,13 +16,14 @@ void draw_analysis_all(){
 
     Bool_t useMvd = false;
 
-    std::string setup ="70field/nomvd";
-    std::string fnRho0 = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/rho0/analysis.all.root";
-    std::string fnOmega = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/omega/analysis.all.root";
-    std::string fnPhi = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/phi/analysis.all.root";
-    std::string fnOmegaD = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/omegadalitz/analysis.all.root";
+    std::string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/10gev/";
+    std::string setup ="100field/nomvd";
+    std::string fnRho0 = dir + setup + "/rho0/analysis.pi_misid_0.0.all.root";
+    std::string fnOmega = dir + setup + "/omega/analysis.pi_misid_0.0.all.root";
+    std::string fnPhi = dir + setup + "/phi/analysis.pi_misid_0.0.all.root";
+    std::string fnOmegaD = dir + setup + "/omegadalitz/analysis.pi_misid_0.0.all.root";
 
-    std::string outputDir = "results/all/" + setup + "/";
+    std::string outputDir = "results/10gev/all/" + setup + "/ideal_pid/";
 
     CbmAnaDielectronTaskDrawAll *draw = new CbmAnaDielectronTaskDrawAll();
     draw->DrawHistosFromFile(fnRho0, fnOmega, fnPhi, fnOmegaD, outputDir, useMvd);

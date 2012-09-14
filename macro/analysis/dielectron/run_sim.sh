@@ -46,19 +46,19 @@ export ENERGY=25gev
 	export FIELDMAPSCALE=1.0
 
 export FIELDDIR=100field
-export MVDDIR=mvd
-export MAINDIR=/lustre/cbm/user/ebelolap/aug11/sep12/25gev/${FIELDDIR}/${MVDDIR}
+export MVDDIR=nomvd
+export MAINDIR=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/${MVDDIR}
 	
 #If "yes" DELTA electrons will be embedded
 export DELTA=no
-export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/mar12/25gev/${FIELDDIR}/deltasource/mc.delta.root
+export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/deltasource/mc.delta.root
 
 #number of events for each thread
 export NEVENTS=1000
 
 export PIONMISIDENTIFICATIONLEVEL=-1.0
 
-for Z in 1 2 3 4; do
+for Z in 1 ; do
     if [ $Z = "0" ] ; then
         export PLUTOPARTICLE=
         export DIR=
@@ -93,35 +93,35 @@ for Z in 1 2 3 4; do
 	for Y in 0 1 2 3 4 5 6 7 8 9; do
     for X in 0 1 2 3 4 5 6 7 8 9 ; do
 
-	  export XXXX=0$K$Y$X
-	  #echo batch $XXXX submitted
-	  export INFILE=/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
-	  export MCFILE=$DIR/mc.$XXXX.root
-	  export PARFILE=$DIR/param.$XXXX.root
-      export RECOFILE=$DIR/reco.$XXXX.root
-      export RECOQAFILE=$DIR/reco.litqa.$XXXX.root
-	 # export DILEPANALYSISFILE=$DIR/analysis.pi_misid_${PIONMISIDENTIFICATIONLEVEL}.${XXXX}.root
-     export DILEPANALYSISFILE=$DIR/analysis.${XXXX}.root
+	  export XXXX=0${K}${Y}${X}
+	  #echo batch ${XXXX} submitted
+	  export INFILE=/d/cbm03/urqmd/auau/${ENERGY}/centr/urqmd.AuAu.${ENERGY}.centr.${XXXX}.ftn14
+	  export MCFILE=${DIR}/mc.${XXXX}.root
+	  export PARFILE=${DIR}/param.${XXXX}.root
+      export RECOFILE=${DIR}/reco.${XXXX}.root
+      export RECOQAFILE=${DIR}/reco.litqa.${XXXX}.root
+    #export DILEPANALYSISFILE=${DIR}/analysis.pi_misid_${PIONMISIDENTIFICATIONLEVEL}.${XXXX}.root
+      export DILEPANALYSISFILE=${DIR}/analysis.${XXXX}.root
  
  
 	  if [ $Z = "1" ] ; then 
-		export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/rho0/epem/pluto.auau.25gev.rho0.epem.$XXXX.root
+		export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
 	  fi	
 	  if [ $Z = "2" ] ; then 
-	  	export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/omega/epem/pluto.auau.25gev.omega.epem.$XXXX.root
+	  	export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
 	  fi	
 	  if [ $Z = "3" ] ; then 
-  		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/omega/pi0epem/pluto.auau.25gev.omega.pi0epem.$XXXX.root
+  		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
   	  fi	
 	  if [ $Z = "4" ] ; then 
-		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/phi/epem/pluto.auau.25gev.phi.epem.$XXXX.root
+		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
 	  fi	  
  	  if [ $Z = "5" ] ; then 
-		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/25gev/pi0/gammaepem/pluto.auau.25gev.pi0.gammaepem.10k.$XXXX.root
+		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/${ENERGY}/pi0/gammaepem/pluto.auau.${ENERGY}.pi0.gammaepem.10k.${XXXX}.root
 	  fi	  
       #	. ./sim.sh
 	 	# xterm -hold -e ". ./sim.sh $number"&
-     	 bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
+     	 bsub -q batch -J mc.${Z}.${XXXX}.run -o ${DIR}/log/${XXXX}.log -N sh ./sim.sh
      	
 	  done
 	 done

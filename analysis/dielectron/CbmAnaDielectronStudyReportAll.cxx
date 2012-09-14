@@ -28,11 +28,11 @@ void CbmAnaDielectronStudyReportAll::Create(
    out << fR->DocumentBegin();
    out << fR->Title(0, fTitle);
 
-   for (int iF = 0; iF < 4; iF++){
-      string signalName = CbmAnaLmvmNames::fSignalNames[iF];
-      out << fR->TableBegin("LMVM Results " + CbmAnaLmvmNames::fSignalNames[iF], list_of(string("")).range(fStudyNames));
-      for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
-         out << fR->TableEmptyRow(fStudyNames.size() + 1, CbmAnaLmvmNames::fAnaSteps[step]);
+   for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
+      out << fR->TableBegin("LMVM Results " + CbmAnaLmvmNames::fAnaSteps[step], list_of(string("")).range(fStudyNames));
+      for (int iF = 0; iF < 3; iF++){
+         string signalName = CbmAnaLmvmNames::fSignalNames[iF];
+         out << fR->TableEmptyRow(fStudyNames.size() + 1, signalName);
          out << PrintRow(signalName + "_sbg_" + CbmAnaLmvmNames::fAnaSteps[step], "S/BG");
          out << PrintRow(signalName + "_eff_" + CbmAnaLmvmNames::fAnaSteps[step], "Efficiency [%]");
          out << PrintRow(signalName + "_signal_minv_mean_" + CbmAnaLmvmNames::fAnaSteps[step], "Mean [MeV/c2]");

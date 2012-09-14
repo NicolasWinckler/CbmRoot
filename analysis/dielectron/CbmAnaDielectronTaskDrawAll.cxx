@@ -28,6 +28,7 @@
 #include "TF1.h"
 #include "TEllipse.h"
 #include "TStyle.h"
+#include "TSystem.h"
 
 #include "CbmAnaPTree.h"
 
@@ -237,9 +238,13 @@ void CbmAnaDielectronTaskDrawAll::FillMeanHist()
       fh_mean_eta_minv[step]->Scale(1./(double) fNofSignals);
       fh_mean_pi0_minv[step]->Scale(1./(double) fNofSignals);
    }
-   //TFile* f = TFile::Open( "mean_hist.root", "RECREATE" );
-   //fh_mean_bg_minv[CbmAnaLmvmNames::fNofAnaSteps - 1]->Write();
-   //f->Close();
+
+   if (fOutputDir != ""){
+      gSystem->mkdir(fOutputDir.c_str(), true);
+      TFile* f = TFile::Open( string(fOutputDir + "/mean_hist.root").c_str(), "RECREATE" );
+      fh_mean_bg_minv[CbmAnaLmvmNames::fNofAnaSteps - 1]->Write();
+      f->Close();
+   }
 
 }
 

@@ -61,6 +61,7 @@
 #include "TSystem.h"
 #include "TStopwatch.h"
 
+#include <sstream>
 
 #define M2E 2.6112004954086e-7
 
@@ -190,7 +191,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
    fHistoList.push_back(fh_nof_bg_tracks);
    fh_nof_el_tracks = new TH1D("fh_nof_el_tracks","fh_nof_el_tracks;analysis steps;tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
    fHistoList.push_back(fh_nof_el_tracks);
-   fh_source_tracks = new  TH2D("fh_source_tracks","fh_source_tracks;analysis steps;particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 6, 0., 6.);
+   fh_source_tracks = new  TH2D("fh_source_tracks","fh_source_tracks;analysis steps;particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 7, 0., 7.);
    fHistoList.push_back(fh_source_tracks);
 
    // Event number counter
@@ -230,6 +231,13 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
    CreateAnalysisStepsH1(fh_bg_minv, "fh_bg_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
    CreateAnalysisStepsH1(fh_pi0_minv, "fh_pi0_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
    CreateAnalysisStepsH1(fh_eta_minv, "fh_eta_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
+   // Minv for different sources
+   fh_source_minv.resize(9);
+   for (int i = 0; i < 9; i++){
+      stringstream ss;
+      ss << "fh_source_minv_" << i;
+      CreateAnalysisStepsH1(fh_source_minv[i], ss.str(), "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
+   }
    // Momentum distribution of the signal
    CreateAnalysisStepsH1(fh_signal_mom, "fh_signal_mom", "P [GeV/c]", "Yield", 100, 0., 15.);
    //Pt/y distibution of the signal
@@ -387,6 +395,8 @@ void CbmAnaDielectronTask::Exec(
     		"fTtCut (ang,pp) = (" << fTtCutAngle << "," << fTtCutPP << ")" << endl <<
     		"fMvd1Cut (p,d) = (" << fMvd1CutP << "," << fMvd1CutD << ")" << endl <<
          "fMvd2Cut (p,d) = (" << fMvd2CutP << "," << fMvd2CutD << ")" << endl;
+
+    cout << "fWeight = " << fWeight << endl;
 
     FillRichRingNofHits();
     MCPairs();   
@@ -729,22 +739,43 @@ void CbmAnaDielectronTask::PairSource(
       DielectronCandidate* candP,
       DielectronCandidate* candM,
       AnalysisSteps step,
-      Double_t angle)
+      KinematicParams* parRec)
 {
    // Fill BG source pair histograms
-   TH2D* h_source_pair = fh_source_pair[step];
-    if (candM->isMcGammaElectron) {
-        if (candP->isMcGammaElectron && candP->McMotherId != candM->McMotherId) h_source_pair->Fill(0.5, 0.5);
-        if (candP->isMcPi0Electron) h_source_pair->Fill(1.5, 0.5);
-        if (!candP->isMcGammaElectron && !candP->isMcPi0Electron) h_source_pair->Fill(2.5, 0.5);
-    } else if (candM->isMcPi0Electron) {
-        if (candP->isMcGammaElectron) h_source_pair->Fill(0.5, 1.5);
-        if (candP->isMcPi0Electron && candP->McMotherId != candM->McMotherId) h_source_pair->Fill(1.5, 1.5);
-        if (!candP->isMcGammaElectron && !candP->isMcPi0Electron) h_source_pair->Fill(2.5, 1.5);
-    } else if (!candM->isMcGammaElectron && !candM->isMcPi0Electron) {
-        if (candP->isMcGammaElectron) h_source_pair->Fill(0.5, 2.5);
-        if (candP->isMcPi0Electron) h_source_pair->Fill(1.5, 2.5);
-        else h_source_pair->Fill(2.5, 2.5);
+   TH2D* hsp = fh_source_pair[step];
+   if (candM->isMcGammaElectron) {
+      if (candP->isMcGammaElectron && candP->McMotherId != candM->McMotherId){
+         hsp->Fill(0.5, 0.5);
+         fh_source_minv[0][step]->Fill(parRec->minv);
+      }else if (candP->isMcPi0Electron){
+         hsp->Fill(1.5, 0.5);
+         fh_source_minv[1][step]->Fill(parRec->minv);
+      }else{
+         hsp->Fill(2.5, 0.5);
+         fh_source_minv[2][step]->Fill(parRec->minv);
+      }
+   }else if (candM->isMcPi0Electron) {
+     if (candP->isMcGammaElectron){
+        hsp->Fill(0.5, 1.5);
+        fh_source_minv[3][step]->Fill(parRec->minv);
+     } else if (candP->isMcPi0Electron && candP->McMotherId != candM->McMotherId){
+        hsp->Fill(1.5, 1.5);
+        fh_source_minv[4][step]->Fill(parRec->minv);
+     } else {
+        hsp->Fill(2.5, 1.5);
+        fh_source_minv[5][step]->Fill(parRec->minv);
+     }
+   }else {
+      if (candP->isMcGammaElectron){
+         hsp->Fill(0.5, 2.5);
+         fh_source_minv[6][step]->Fill(parRec->minv);
+      }else if (candP->isMcPi0Electron){
+         hsp->Fill(1.5, 2.5);
+         fh_source_minv[7][step]->Fill(parRec->minv);
+      }else {
+         hsp->Fill(2.5, 2.5);
+         fh_source_minv[8][step]->Fill(parRec->minv);
+      }
     }
 
     // Fill opening angle histograms
@@ -752,10 +783,10 @@ void CbmAnaDielectronTask::PairSource(
     Bool_t isBg = !(candP->isMcSignalElectron || candM->isMcSignalElectron);
     Bool_t isPi0 = (candP->isMcPi0Electron && candM->isMcPi0Electron && candP->McMotherId == candM->McMotherId);
     Bool_t isGamma = (candP->isMcGammaElectron && candM->isMcGammaElectron && candP->McMotherId == candM->McMotherId);
-    if (isSignal) fh_opening_angle[kSignal][step]->Fill(angle, fWeight);
-    if (isBg) fh_opening_angle[kBg][step]->Fill(angle);
-    if (isPi0) fh_opening_angle[kPi0][step]->Fill(angle);
-    if (isGamma)fh_opening_angle[kGamma][step]->Fill(angle);
+    if (isSignal) fh_opening_angle[kSignal][step]->Fill(parRec->angle, fWeight);
+    if (isBg) fh_opening_angle[kBg][step]->Fill(parRec->angle);
+    if (isPi0) fh_opening_angle[kPi0][step]->Fill(parRec->angle);
+    if (isGamma)fh_opening_angle[kGamma][step]->Fill(parRec->angle);
 }
 
 void CbmAnaDielectronTask::TrackSource(
@@ -771,12 +802,24 @@ void CbmAnaDielectronTask::TrackSource(
 	} else {
 		fh_nof_bg_tracks->Fill(binNum);
 		fh_source_mom[kBg][step]->Fill(mom);
-		if (cand->isMcGammaElectron) {fh_source_tracks->Fill(binNum, 0.5); fh_source_mom[kGamma][step]->Fill(mom);}
-		else if (cand->isMcPi0Electron) {fh_source_tracks->Fill(binNum, 1.5); fh_source_mom[kPi0][step]->Fill(mom);}
-		else if (pdg == 211 || pdg ==-211) {fh_source_tracks->Fill(binNum, 2.5);}
-		else if (pdg == 2212) {fh_source_tracks->Fill(binNum, 3.5);}
-		else if (pdg == 321 || pdg == -321) {fh_source_tracks->Fill(binNum, 4.5);}
-		else {fh_source_tracks->Fill(binNum, 5.5);}
+		if (cand->isMcGammaElectron) {
+		   fh_source_tracks->Fill(binNum, 0.5);
+		   fh_source_mom[kGamma][step]->Fill(mom);
+		}else if (cand->isMcPi0Electron) {
+		   fh_source_tracks->Fill(binNum, 1.5);
+		   fh_source_mom[kPi0][step]->Fill(mom);
+		}else if (pdg == 211 || pdg ==-211) {
+		   fh_source_tracks->Fill(binNum, 2.5);
+		}else if (pdg == 2212) {
+		   fh_source_tracks->Fill(binNum, 3.5);
+		}else if (pdg == 321 || pdg == -321) {
+		   fh_source_tracks->Fill(binNum, 4.5);
+		}else if ( (pdg == 11 || pdg == -11) && !cand->isMcGammaElectron
+		      && !cand->isMcPi0Electron && !cand->isMcSignalElectron){
+		   fh_source_tracks->Fill(binNum, 5.5);
+		}else{
+		   fh_source_tracks->Fill(binNum, 6.5);
+		}
 	}
 }
 
@@ -797,7 +840,7 @@ void CbmAnaDielectronTask::FillPairHists(
    if (isSignal) fh_signal_minv[step]->Fill(parRec->minv, fWeight);
    if (isSignal) fh_signal_minv_pt[step]->Fill(parRec->minv, parMc->pt, fWeight);
    if (isBG) fh_bg_minv[step]->Fill(parRec->minv);
-   PairSource(candP, candM, step, parRec->angle);
+   if (isBG) PairSource(candP, candM, step, parRec);
    if (isPi0) fh_pi0_minv[step]->Fill(parRec->minv);
    if (isEta) fh_eta_minv[step]->Fill(parRec->minv);
 }

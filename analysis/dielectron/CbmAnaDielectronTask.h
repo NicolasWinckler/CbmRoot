@@ -215,13 +215,13 @@ public:
      * \param[in] candP Positive candidate.
      * \param[in] candM Negative candidate.
      * \param[in] step Enumeration AnalysisSteps, specify analysis step.
-     * \param[in] angle Opening angle of the pair.
+     * \param[in] parRec Kinematic parameters for reconstructed pair.
      */
     void PairSource(
         DielectronCandidate* candP, 
         DielectronCandidate* candM, 
         AnalysisSteps step,
-        Double_t angle);
+        KinematicParams* parRec);
 
     /*
      * \brief Fills minv, pty, mom histograms for specified analysis step.
@@ -393,6 +393,11 @@ private:
    vector<TH1D*> fh_signal_mom; // Signal momentum distribution
    vector<TH2D*> fh_signal_pty; // Pt/y distribution for signal
    vector<TH2D*> fh_signal_minv_pt; // Invariant mass vs. MC Pt
+
+   //G-Gamma, P-Pi0, O-other
+   //[0]=G-G, [1]=G-P, [2]=G-O, [3]=P-G, [4]=P-P, [5]=P-O, [6]=O-G, [7]=O-P, [8]=O-O
+   vector<vector<TH1D*> > fh_source_minv; // Invariant mass for diferent source
+
 
    //Index is the source type: [0]-signal, [1]-bg, [2]-pi0, [3]-gamma
    //Use SourceTypes enumeration for access.

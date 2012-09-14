@@ -14,6 +14,7 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #include <boost/assign/list_of.hpp>
 #include "CbmAnaPTree.h"
@@ -73,6 +74,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawCutDistributions();
    DrawMinvForEachAnalysisStep();
    DrawMinvSandBgAll();
+   DrawMinvSourceAll();
    DrawBGSourceTracks();
    DrawMinvPtAll();
    DrawBgSourcesVsMomentum();
@@ -90,7 +92,14 @@ void CbmAnaDielectronTaskDraw::RebinMinvHist()
       fHM->Rebin("fh_bg_minv_" + CbmAnaLmvmNames::fAnaSteps[i], nRebin);
       fHM->Rebin("fh_pi0_minv_" + CbmAnaLmvmNames::fAnaSteps[i], nRebin);
       fHM->Rebin("fh_eta_minv_" + CbmAnaLmvmNames::fAnaSteps[i], nRebin);
+
+      for (int iP = 0; iP < 9; iP++){
+         stringstream ss;
+         ss << "fh_source_minv_" << iP << "_" << CbmAnaLmvmNames::fAnaSteps[i];
+         fHM->Rebin(ss.str(), nRebin);
+      }
    }
+
 }
 
 TH1D* CbmAnaDielectronTaskDraw::H1(
@@ -648,6 +657,47 @@ void CbmAnaDielectronTaskDraw::DrawMinvSandBgAll()
    }
 }
 
+void CbmAnaDielectronTaskDraw::DrawMinvSource(
+      int step)
+{
+   vector<TH1*> hists;
+   for (int i = 0; i < 9; i++){
+      stringstream ss;
+      ss << "fh_source_minv_" <<i << "_" << CbmAnaLmvmNames::fAnaSteps[step];
+      TH1D* h = H1(ss.str());
+      TH1D* hs = NULL;
+      if (i > 0){
+         hs = (TH1D*)hists[i-1]->Clone();
+         hs->Add(h);
+      } else {
+         hs = h;
+      }
+      hists.push_back(hs);
+   }
+   DrawH1(hists, list_of("G-G")("G-P")("G-O")("P-G")("P-P")("P-O")("O-G")("O-P")("O-O"),
+         kLinear, kLog, false, 0,0,0,0);
+
+   for (int i = 0; i < 9; i++){
+      hists[i]->SetMinimum(1e-8);
+      hists[i]->SetFillColor(i);
+      hists[i]->SetLineWidth(1);
+      hists[i]->SetLineStyle(CbmDrawingOptions::MarkerStyle(1));
+   }
+   DrawTextOnHist(CbmAnaLmvmNames::fAnaStepsLatex[step], 0.65, 0.78, 0.85, 0.9);
+}
+
+void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
+{
+   Int_t hi = 1;
+   TCanvas *c = CreateCanvas("lmvm_minv_source", "lmvm_minv_source", 900, 900);
+   c->Divide(3,3);
+   for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
+      if ( !fUseMvd && (step == kMvd1Cut || step == kMvd2Cut)) continue;
+      c->cd(hi++);
+      DrawMinvSource(step);
+   }
+}
+
 void CbmAnaDielectronTaskDraw::DrawBGSourceTracks()
 {
    gStyle->SetPaintTextFormat("4.1f");
@@ -693,8 +743,8 @@ void CbmAnaDielectronTaskDraw::DrawBGSourceTracks()
    source_tracks_perc->GetXaxis()->SetRange(kReco, CbmAnaLmvmNames::fNofAnaSteps);
    DrawH2(source_tracks_perc, kLinear, kLinear, kLinear, "text COLZ");
 
-   Int_t ny = 6;
-   string yLabels[6] = {"#gamma", "#pi^{0}", "#pi^{#pm}", "p", "K", "oth"};
+   Int_t ny = 7;
+   string yLabels[7] = {"#gamma", "#pi^{0}", "#pi^{#pm}", "p", "K", "e^{#pm}", "oth"};
    for (Int_t y = 1; y <= ny; y++){
       source_tracks_perc->GetYaxis()->SetBinLabel(y, yLabels[y-1].c_str());
       source_tracks_abs->GetYaxis()->SetBinLabel(y, yLabels[y-1].c_str());

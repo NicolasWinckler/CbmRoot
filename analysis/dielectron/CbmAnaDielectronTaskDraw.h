@@ -254,8 +254,15 @@ private:
     void DrawMinvSandBg(
           int step);
 
-    // Invariant mass distribution after each cut for BG and signal
+    // Invariant mass distribution after each cut for source of BG
     void DrawMinvSandBgAll();
+
+
+    void DrawMinvSource(
+          int step);
+
+    // Invariant mass distribution after each cut for source of BG
+    void DrawMinvSourceAll();
 
     //SOURCE TRACKS
     void DrawBGSourceTracks();

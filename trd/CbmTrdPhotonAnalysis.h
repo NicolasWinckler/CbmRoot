@@ -208,6 +208,10 @@ class CbmTrdPhotonAnalysis : public FairTask {
   Double_t fTrdLikeCut;
   Double_t fTrdWknCut;
   Double_t fRichAnnCut;
+  Int_t fRichHitsMinCut;
+  Int_t fRichHitsMaxCut;
+  Double_t fRichMinRadiusCut;
+  Double_t fRichMaxRadiusCut;
   Double_t fMeanA;
   Double_t fMeanB;
   Double_t fRmsA;

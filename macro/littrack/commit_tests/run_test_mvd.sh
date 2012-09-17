@@ -7,9 +7,6 @@ export LIT_SCRIPT=yes
 setup=$1
 opt=$2
 
-create_output_dir events_mvd_${setup}/
-create_result_dir results_mvd_${setup}/
-
 if [ "${opt}" = "all" ] ; then
    create_output_dir events_mvd_${setup}/
    create_result_dir results_mvd_${setup}/

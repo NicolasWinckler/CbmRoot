@@ -1,14 +1,11 @@
-File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_electron)
-File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_electron)
-File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_muon)
-File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_muon)
-
 GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test.sh)
 
 # Define the different setups to be tested
 List(APPEND  setup  electron  muon)
 
 ForEach(__setup IN  LISTS  setup)
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_${__setup})
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_${__setup})
 
   Set(testname global_sim_${__setup})
 
@@ -26,18 +23,31 @@ ForEach(__setup IN  LISTS  setup)
  
 EndForEach(__setup IN LISTS setup)
 
+GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test_mvd.sh)
 
+# Define the different setups to be tested
+List(APPEND  setup_mvd  delta  no_delta)
 
-#GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test_mvd.sh)
-#
-#Add_Test(littrack_mvd_delta "${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_mvd.sh" "delta")
-#Set_Tests_Properties(littrack_mvd_delta PROPERTIES TIMEOUT "1800")
-#Set_Tests_Properties(littrack_mvd_delta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
-#
-#Add_Test(littrack_mvd_nodelta "${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_mvd.sh" "nodelta")
-#Set_Tests_Properties(littrack_mvd_nodelta PROPERTIES TIMEOUT "1800")
-#Set_Tests_Properties(littrack_mvd_nodelta PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
-#
+ForEach(__setup IN  LISTS  setup_mvd)
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_mvd_${__setup})
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_mvd_${__setup})
+
+  Set(testname mvd_sim_${__setup})
+
+  Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_mvd.sh ${__setup} sim)
+  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+  
+  Set(_dep ${testname})
+  Set(testname mvd_reco_${__setup})
+  
+  Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_mvd.sh ${__setup} reco)
+  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+  Set_Tests_Properties(${testname} PROPERTIES DEPENDS ${_dep})
+ 
+EndForEach(__setup IN LISTS setup_mvd)
+
 
 # Additional nightly tests
 If(BUILD_LITTRACK_EXPERIMENTAL)

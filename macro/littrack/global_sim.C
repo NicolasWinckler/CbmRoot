@@ -23,9 +23,9 @@ void global_sim(Int_t nEvents = 10)
 	Int_t nofElectrons = 0; // number of embedded electrons from FairBoxGenerator
 	Int_t nofPositrons = 0; // number of embedded positrons from FairBoxGenerator
 	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
-	Int_t nofPionsMinus = 10; // number of embedded pions from FairBoxGenerator
+	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
-	Int_t nofJPsiToElectrons = 0; // number of embedded J/Psi particles decaying to e+ and e-
+	Int_t nofJPsiToElectrons = 10; // number of embedded J/Psi particles decaying to e+ and e-
 	Int_t nofAuIons = 0; // number of generated Au ions
 	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
     TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
@@ -343,6 +343,8 @@ void global_sim(Int_t nEvents = 10)
 	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
 	cout << "Macro finished successfully." << endl;
+	cout << "Test passed"<< endl;
+   cout << " All ok " << endl;
 	cout << "Output file is " << mcFile << endl;
 	cout << "Real time used: " << rtime << "s " << endl;
 	cout << "CPU time used : " << ctime << "s " << endl << endl << endl;

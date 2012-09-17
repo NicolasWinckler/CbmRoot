@@ -22,15 +22,15 @@ nevents=5
 
 set_default_mvd_geometry
 
-export LIT_NOF_MVD_DELTA_EVENTS=0
-
 export LIT_STS_HITPRODUCER_TYPE=real
-
+   
+export LIT_NOF_MVD_DELTA_EVENTS=0
+   
 set_default_file_names ${LIT_DIR} 0000
 
 export LIT_URQMD_FILE=${VMCWORKDIR}/input/urqmd.auau.25gev.centr.root
 
-function run_delta() {
+function run_sim() {
    # Generate file for delta electrons
    if [ "${setup}" = "delta" ] ; then
        #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
@@ -40,27 +40,21 @@ function run_delta() {
        export LIT_PAR_FILE=${LIT_DIR}/param.delta.0000.root
        ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(20)"
        export LIT_NOF_MVD_DELTA_EVENTS=10
-       export LIT_MC_FILE=${LIT_DIR}/mc.0000.root
-       export LIT_PAR_FILE=${LIT_DIR}/param.0000.root
    fi
-}
-
-function run_sim() {
+  
    #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
    pars=(0    0    0   0   0    0    0       10      0  yes   yes)
    set_simulation_parameters ${pars}   
-   
+
    export LIT_MC_FILE=${LIT_DIR}/mc.0000.root
    export LIT_PAR_FILE=${LIT_DIR}/param.0000.root
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
 }
 
 if [ "${opt}" = "all" ] ; then
-   run_delta
    run_sim
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/mvd_reco.C(${nevents})"
 elif [ "${opt}" = "sim" ] ; then
-   run_delta
    run_sim
 elif [ "${opt}" = "reco" ] ; then
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/mvd_reco.C(${nevents})"

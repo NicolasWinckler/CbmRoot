@@ -3,6 +3,8 @@ File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_electron)
 File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_muon)
 File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_muon)
 
+GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test.sh)
+
 # Define the different setups to be tested
 List(APPEND  setup  electron  muon)
 

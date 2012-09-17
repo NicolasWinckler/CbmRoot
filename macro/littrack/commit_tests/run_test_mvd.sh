@@ -45,20 +45,23 @@ function run_delta() {
    fi
 }
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
-pars=(0    0    0   0   0    0    0       10      0  yes   yes)
-set_simulation_parameters ${pars}   
-
-export LIT_MC_FILE=${LIT_DIR}/mc.0000.root
-export LIT_PAR_FILE=${LIT_DIR}/param.0000.root
+function run_sim() {
+   #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
+   pars=(0    0    0   0   0    0    0       10      0  yes   yes)
+   set_simulation_parameters ${pars}   
+   
+   export LIT_MC_FILE=${LIT_DIR}/mc.0000.root
+   export LIT_PAR_FILE=${LIT_DIR}/param.0000.root
+   ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
+}
 
 if [ "${opt}" = "all" ] ; then
    run_delta
-   ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
+   run_sim
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/mvd_reco.C(${nevents})"
 elif [ "${opt}" = "sim" ] ; then
    run_delta
-   ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
+   run_sim
 elif [ "${opt}" = "reco" ] ; then
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/mvd_reco.C(${nevents})"
 fi

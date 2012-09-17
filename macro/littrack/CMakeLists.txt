@@ -3,38 +3,28 @@ File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_electron)
 File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_muon)
 File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_muon)
 
-GENERATE_ROOT_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/global_sim_new.C)
-GENERATE_ROOT_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/global_reco_new.C)
-
 # Define the different setups to be tested
-List(APPEND  setup  electron  muon)  
-# Define the different program options in the reconstruction stage
-List(APPEND prog_opt all hits tracking)
+List(APPEND  setup  electron  muon)
 
 ForEach(__setup IN  LISTS  setup)
 
   Set(testname global_sim_${__setup})
-  # parameter has to be in quotes since it is a string. Otherwise it is not
-  # passed correctly to root
-  Set(_param \"${__setup}\")
 
-  Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/global_sim_new.sh 1 ${_param})
+  Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test.sh ${__setup} sim)
   Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
   Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
-
-  ForEach(__opt IN  LISTS  prog_opt)
-    Set(_dep ${testname})
-    Set(testname global_reco_${__setup}_${__opt})
-    Set(_opt \"${__opt}\")
-
-    Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/global_reco_new.sh 1 ${_opt} ${_param})
-    Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
-    Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
-    Set_Tests_Properties(${testname} PROPERTIES DEPENDS ${_dep})
-
-  EndForEach(__opt IN  LISTS  prog_opt)
+  
+  Set(_dep ${testname})
+  Set(testname global_reco_${__setup})
+  
+  Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test.sh ${__setup} reco)
+  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+  Set_Tests_Properties(${testname} PROPERTIES DEPENDS ${_dep})
  
 EndForEach(__setup IN LISTS setup)
+
+
 
 #GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test_mvd.sh)
 #

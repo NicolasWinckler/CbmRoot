@@ -143,7 +143,8 @@ const Float_t frame_position         =  - LayerThickness /2. + frame_thickness/2
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
 const TString KeepingVolumeMedium = "air";
-const TString RadiatorVolumeMedium = "polypropylene";
+const TString RadiatorVolumeMedium = "pefoam20";
+//const TString RadiatorVolumeMedium = "polypropylene";
 const TString GasVolumeMedium = "TRDgas";
 const TString PadVolumeMedium = "goldcoatedcopper";
 const TString MylarVolumeMedium = "mylar";
@@ -222,7 +223,8 @@ void create_materials_from_media_file()
   FairGeoBuilder* geoBuild = geoLoad->getGeoBuilder();
 
   FairGeoMedium* air = geoMedia->getMedium("air");
-  FairGeoMedium* polypropylene  = geoMedia->getMedium("polypropylene");
+  FairGeoMedium* pefoam20  = geoMedia->getMedium("pefoam20");
+//  FairGeoMedium* polypropylene  = geoMedia->getMedium("polypropylene");
   FairGeoMedium* trdGas = geoMedia->getMedium("TRDgas");
   FairGeoMedium* goldCoatedCopper = geoMedia->getMedium("goldcoatedcopper");
   FairGeoMedium* mylar = geoMedia->getMedium("mylar");
@@ -230,7 +232,8 @@ void create_materials_from_media_file()
   FairGeoMedium* PeFoam20  = geoMedia->getMedium("pefoam20");
 
   geoBuild->createMedium(air);
-  geoBuild->createMedium(polypropylene);
+  geoBuild->createMedium(pefoam20);
+//  geoBuild->createMedium(polypropylene);
   geoBuild->createMedium(trdGas);
   geoBuild->createMedium(goldCoatedCopper);
   geoBuild->createMedium(mylar);

@@ -50,8 +50,9 @@ void Create_TRD_Geometry_v12b() {
   FairGeoBuilder* geoBuild = geoLoad->getGeoBuilder();
 
   FairGeoMedium* FairMediumAir      = geoMedia->getMedium("air");
-  FairGeoMedium* FairMediumPolyPropylene   = 
-    geoMedia->getMedium("polypropylene");
+  FairGeoMedium* FairMediumPeFoam20 = geoMedia->getMedium("pefoam20");
+//  FairGeoMedium* FairMediumPolyPropylene   = 
+//    geoMedia->getMedium("polypropylene");
   FairGeoMedium* FairMediumTrdGas = geoMedia->getMedium("TRDgas");
   FairGeoMedium* FairMediumGoldCoatedCopper  = 
     geoMedia->getMedium("goldcoatedcopper");
@@ -59,7 +60,8 @@ void Create_TRD_Geometry_v12b() {
   FairGeoMedium* FairMediumG10   = geoMedia->getMedium("G10");
 
   geoBuild->createMedium(FairMediumAir);
-  geoBuild->createMedium(FairMediumPolyPropylene);
+  geoBuild->createMedium(FairMediumPeFoam20);
+//  geoBuild->createMedium(FairMediumPolyPropylene);
   geoBuild->createMedium(FairMediumTrdGas);
   geoBuild->createMedium(FairMediumGoldCoatedCopper);
   geoBuild->createMedium(FairMediumMylar);
@@ -321,7 +323,8 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
    // Radiator
    TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, Active_area_y/2, radiator_thickness);
-   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("polypropylene"));
+   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("pefoam20"));
+//   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("polypropylene"));
    trdmod1_radvol->SetLineColor(kBlue);
    TGeoTranslation *trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    man->GetVolume(name)->AddNode(trdmod1_radvol, 0, trd_radiator_trans);

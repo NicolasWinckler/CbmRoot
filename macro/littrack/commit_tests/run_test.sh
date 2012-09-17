@@ -11,6 +11,9 @@ opt=$2
 if [ "${opt}" = "all" ] ; then
    create_output_dir events_${setup}/
    create_result_dir results_${setup}/
+else
+   export LIT_DIR=events_${setup}/
+   export LIT_RESULT_DIR=results_${setup}/
 fi
 
 nevents=5

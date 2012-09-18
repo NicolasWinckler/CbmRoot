@@ -4,8 +4,8 @@ GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test.
 List(APPEND  setup  electron  muon)
 
 ForEach(__setup IN  LISTS  setup)
-  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_${__setup})
-  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_${__setup})
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/commit_tests/events_${__setup})
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/commit_tests/results_${__setup})
 
   Set(testname global_sim_${__setup})
 
@@ -28,8 +28,8 @@ GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/commit_tests/run_test_
 List(APPEND  setup_mvd  delta  no_delta)
 
 ForEach(__setup_mvd IN  LISTS  setup_mvd)
-  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/events_mvd_${__setup_mvd})
-  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results_mvd_${__setup_mvd})
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/commit_tests/events_mvd_${__setup_mvd})
+  File(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/commit_tests/results_mvd_${__setup_mvd})
 
   Set(testname_mvd mvd_sim_${__setup_mvd})
 

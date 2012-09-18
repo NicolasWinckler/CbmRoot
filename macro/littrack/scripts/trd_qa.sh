@@ -39,7 +39,7 @@ function run_reco() {
 
 run_reco smearing nn
 run_reco smearing branch
-run_reco clustering nn
-run_reco clustering branch
+#run_reco clustering nn
+#run_reco clustering branch
 
 export LIT_SCRIPT=no

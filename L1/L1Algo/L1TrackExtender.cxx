@@ -216,8 +216,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       // find first hit
     int start = StsHitsUnusedStartIndex[ista];
     {
-      int end = StsHitsUnusedStopIndex[ista];
-      for( THitI ih = start; end - start >= 3; ih++ ){ // optimize
+      for(int end = StsHitsUnusedStopIndex[ista]; end - start >= 3;  ){
         int middle = (start + end)/2;
         L1StsHit &hit = (*vStsHitsUnused)[middle];
 
@@ -233,7 +232,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
         else end = middle;
       }
     }
-    for( THitI ih = start; ih < StsHitsUnusedStopIndex[ista]; ih++ ){ // optimize
+    for( THitI ih = start; ih < StsHitsUnusedStopIndex[ista]; ih++ ){
       L1StsHit &hit = (*vStsHitsUnused)[ih];
 
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used

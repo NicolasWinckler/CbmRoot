@@ -506,13 +506,39 @@ inline void L1Algo::f30(  // input
 
       //     THitI nm = vStsHits_m[hitsm_2[i2]].n;
     L1TrackPar &T2 = T_2[i2_V];
-
+    if ( isec == kAllPrimIter || isec == kAllPrimJumpIter ||
+         isec == kAllSecIter  || isec == kAllSecJumpIter )
+      if ( T2.chi2[i2_4] > TRIPLET_CHI2_CUT ) continue; // TODO understand NDF
+    
     T_3.push_back(L1TrackPar_0);
     u_front_3.push_back(fvec_0);
     u_back_3.push_back(fvec_0);
-    for (unsigned int irh_index = duplet_b; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
+    
+      // find first possible hit
+    int start = duplet_b;
+    if ( // isec == kAllPrimIter || isec == kAllPrimJumpIter ||
+         isec == kAllSecIter  || isec == kAllSecJumpIter ) { // for secondary there are a lot of doubletAB-doubletBC combinations
+      
+        // find the biggest possible track error
+      L1TrackPar T2_new = T2;
+      L1ExtrapolateLine( T2_new, T2.z + 0.4*fabs(T2.ty) );
+      fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11)) - 0.4*fabs(T2.ty[i2_4]);
+      fvec y_minus_new = T2.y - dym_est;
+      for( int end = duplet_e; end - start > 2; ){
+        int middle = (start + end)/2;
+        int irh = mrDuplets_hits[middle];
 
-        //       if( n3 >= MaxPortionTriplets ) break;
+        L1HitPoint &hitr = vStsHits_r[irh];
+
+          // check the position
+        if (hitr.y < y_minus_new[i2_4]) start = middle;
+        else end = middle;
+      }
+    }
+    
+    
+    for (unsigned int irh_index = start; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
+
       int irh = mrDuplets_hits[irh_index];
 
       L1HitPoint &hitr = vStsHits_r[irh];
@@ -1382,9 +1408,12 @@ void L1Algo::CATrackFinder()
   
   L1CATFTimerInfo ti;
   ti.SetNIter( fNFindIterations ); // for iterations
-  ti.Add("snglts");
-  ti.Add("dbltes");
-  ti.Add("tripls");
+  ti.Add("init  ");
+  ti.Add("dblte1");
+  ti.Add("dblte2");
+  ti.Add("tripl1");
+  ti.Add("tripl2");
+  ti.Add("tripl3");
   ti.Add("cpTrls"); 
   ti.Add("nghbrs"); 
   ti.Add("tracks"); 
@@ -1649,11 +1678,11 @@ void L1Algo::CATrackFinder()
 // #endif
 
 
-#ifdef XXX
-    c_timer.Stop();
-    ti[isec]["snglts"] = c_timer;
-    c_timer.Start(1);
-#endif
+// #ifdef XXX
+//     c_timer.Stop();
+//     ti[isec]["init  "] = c_timer;
+//     c_timer.Start(1);
+// #endif
 
 #ifdef TBB
     {
@@ -1684,6 +1713,12 @@ void L1Algo::CATrackFinder()
                                         ), af,ap);
     }
 #else // TBB
+
+#ifdef XXX
+    c_timer.Stop();
+    ti[isec]["init  "] = c_timer;
+    c_timer.Start(1);
+#endif
     
     T_g1.resize(nPortions);
     fld_g1.resize(nPortions);
@@ -1709,7 +1744,11 @@ void L1Algo::CATrackFinder()
                       hitsm_g2
                       );
     }// lstations
-
+#ifdef XXX
+    c_timer.Stop();
+    ti[isec]["dblte1"] = c_timer;
+    c_timer.Start(1);
+#endif
     if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter) ) {
       TG_g1.resize(nPortions);
       fldG_g1.resize(nPortions);
@@ -1735,12 +1774,17 @@ void L1Algo::CATrackFinder()
                       );
       }// lstations
     }
-#endif // TBB
 
 #ifdef XXX
-        c_timer.Stop();
-        ti[isec]["dbltes"] = c_timer;
+    c_timer.Stop();
+    ti[isec]["dblte2"] = c_timer;
 #endif
+#endif // TBB
+
+// #ifdef XXX
+//         c_timer.Stop();
+//         ti[isec]["dbltes"] = c_timer;
+// #endif
 
 #ifdef XXX
     int istat_n_triplet_c=0;
@@ -1774,9 +1818,9 @@ void L1Algo::CATrackFinder()
 
 
 
-#ifdef XXX
-    c_timer.Start(1);
-#endif
+// #ifdef XXX
+//     c_timer.Start(1);
+// #endif
 
 #ifdef TBB
     {
@@ -1803,6 +1847,10 @@ void L1Algo::CATrackFinder()
                                         ), af,ap);
     }
 #else // TBB
+
+#ifdef XXX
+    c_timer.Start(1);
+#endif
     for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
       TripletsStaPort(  // input
         istal, istal + 1,  istal + 2,
@@ -1823,6 +1871,12 @@ void L1Algo::CATrackFinder()
         TripStartIndexH, TripStopIndexH
         );
     }// l-stations
+
+#ifdef XXX
+    c_timer.Stop();
+    ti[isec]["tripl1"] = c_timer;
+    c_timer.Start(1);
+#endif
     if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter) ) {
       for (int istal = NStations-3; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
         TripletsStaPort(  // input
@@ -1844,6 +1898,12 @@ void L1Algo::CATrackFinder()
           TripStartIndexHG124, TripStopIndexHG124
           );
       }// l-stations
+
+#ifdef XXX
+      c_timer.Stop();
+      ti[isec]["tripl2"] = c_timer;
+    c_timer.Start(1);
+#endif
       for (int istal = NStations-3; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
         TripletsStaPort(  // input
           istal, istal + 2,  istal + 3,
@@ -1865,11 +1925,15 @@ void L1Algo::CATrackFinder()
           );
       }// l-stations
     }
-#endif // TBB
 #ifdef XXX
-        c_timer.Stop();
-        ti[isec]["tripls"] = c_timer;
+    c_timer.Stop();
+    ti[isec]["tripl3"] = c_timer;
 #endif
+#endif // TBB
+// #ifdef XXX
+//         c_timer.Stop();
+//         ti[isec]["tripls"] = c_timer;
+// #endif
 
 // #ifdef XXX
 //     cout<<"isec: " << isec <<  "  n hits, dup, tr_c, trip: "

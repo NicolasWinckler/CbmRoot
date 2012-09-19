@@ -153,26 +153,27 @@ inline void L1Algo::f11(  // input
 #endif // USE_3HITS
     fld_1.push_back(fld1);
 
-// #define BEGIN_FROM_TARGET
-#ifndef BEGIN_FROM_TARGET // the best now
-
     T.chi2 = 0.;
     T.NDF = 2.;
     if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) T.NDF = 0;
-    T.x  = xl;
-    T.y  = yl;
     T.tx = tx;
     T.ty = ty;
     T.qp = 0.;
+    T.C20 = T.C21 = 0;
+    T.C30 = T.C31 = T.C32 = 0;
+    T.C40 = T.C41 = T.C42 = T.C43 = 0;
+    T.C22 = T.C33 = MaxSlope*MaxSlope/9.; T.C44 = MaxInvMom/3.*MaxInvMom/3.;
+    
+// #define BEGIN_FROM_TARGET
+#ifndef BEGIN_FROM_TARGET // the best now
+
+    T.x  = xl;
+    T.y  = yl;
     T.z  = zl;
     T.C00 = stal.XYInfo.C00;
     T.C10 = stal.XYInfo.C10;
     T.C11 = stal.XYInfo.C11;
-    T.C20 = T.C21 = 0;
-    T.C30 = T.C31 = T.C32 = 0;
-    T.C40 = T.C41 = T.C42 = T.C43 = 0;
-    T.C22 = T.C33 = MaxSlope*MaxSlope/9.; T.C44 = MaxInvMom*MaxInvMom/9.; // max = 3*sigma
-
+    
     //add the target
     {
       fvec eX, eY, J04, J14;
@@ -186,22 +187,14 @@ inline void L1Algo::f11(  // input
     }
 #else  // TODO: doesn't work. Why?
 
-    T.chi2 = 0.;
-    T.NDF = 2.;
-    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) T.NDF = 0;
     T.x  = targX;
     T.y  = targY;
-    T.tx = tx;
-    T.ty = ty;
-    T.qp = 0.;
+
     T.z  = targZ;
     T.C00 = TargetXYInfo.C00;
     T.C10 = TargetXYInfo.C10;
     T.C11 = TargetXYInfo.C11;
-    T.C20 = T.C21 = 0;
-    T.C30 = T.C31 = T.C32 = 0;
-    T.C40 = T.C41 = T.C42 = T.C43 = 0;
-    T.C22 = T.C33 = MaxSlope*MaxSlope/9.; T.C44 = MaxInvMom/3.*MaxInvMom/3.;
+
     
       // extrapolate to left hit
     L1Extrapolate0( T, zl, fld0 );
@@ -217,7 +210,7 @@ inline void L1Algo::f11(  // input
     L1AddMaterial( T, stal.materialInfo, MaxInvMom );
     if ( (istam >= NMvdStations) && (istal <= NMvdStations - 1) )  L1AddPipeMaterial( T, MaxInvMom );
 
-     L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
+    L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
 //     L1Extrapolate( T, zstam, T.qp, fld1 );
 
     T_1.push_back(T);
@@ -239,7 +232,7 @@ inline void L1Algo::f20(  // input
                 vector<THitI> &hitsl_2,
 #endif // DOUB_PERFORMANCE
                 vector<THitI> &hitsm_2,
-                map<unsigned /*short*/ int, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
+                vector<unsigned int> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
                 )
 {
   n2 = 0; // number of doublet
@@ -249,6 +242,7 @@ inline void L1Algo::f20(  // input
     const int i1_4 = i1%fvecLen;
     const L1TrackPar& T1 = T_1[i1_V];
 
+    L1_ASSERT( hitsl_1[i1] < lmDuplets_start.size(), hitsl_1[i1] << " < " << lmDuplets_start.size() );
     lmDuplets_start[hitsl_1[i1]] = nDuplets_lm; // mark begin
 
     const THitI nl = vStsHits_l[hitsl_1[i1]].n;
@@ -317,44 +311,12 @@ inline void L1Algo::f20(  // input
 
       n2++;
     }
-
+    
+    L1_ASSERT( hitsl_1[i1]+1 < lmDuplets_start.size(), hitsl_1[i1]+1 << " < " << lmDuplets_start.size() );
     lmDuplets_start[hitsl_1[i1]+1] = nDuplets_lm; // mark the end
   }  // for i1
 }
 
-
-          /// Add the middle hits to parameters estimation. Propagate to right station.
-/*void inline f21(  // input
-                int n2_V,
-                L1Station &stam, L1Station &star,
-                fvec *u_front, fvec *u_back,
-                L1FieldRegion *fld_2,
-                double Pick_r,
-                  // output
-                L1TrackPar *T_2,
-                fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
-               )
-{
-  for( int i2_V=0; i2_V<n2_V; i2_V++){
-
-    L1TrackPar &T2 = T_2[i2_V];
-    L1FieldRegion &f2 = fld_2[i2_V];
-    L1Filter( T2, stam.frontInfo, u_front[i2_V] );
-    L1Filter( T2, stam.backInfo,  u_back[i2_V] );
-
-    L1AddMaterial( T2, stam.materialInfo, T2.qp );
-
-    L1Extrapolate( T2, star.z, T2.qp, f2 );
-    fvec dxm_est = Pick_r*sqrt(fabs(T2.C00+star.XYInfo.C00));
-    fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));
-    x_minusV[i2_V] = T2.x - dxm_est;
-    x_plusV [i2_V] = T2.x + dxm_est;
-    y_minusV[i2_V] = T2.y - dym_est;
-    y_plusV [i2_V] = T2.y + dym_est;
-
-  }
-}
-*/
 
           /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets(right hit). Reformat data in the portion of triplets.
@@ -370,7 +332,7 @@ inline void L1Algo::f30(  // input
                 vector<THitI> &hitsm_2,
                 vector<THitI> &i1_2,
 
-                map<unsigned /*short*/ int, THitI> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
+                vector<unsigned int> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
 //                 int MaxPortionTriplets,
                   // output
                 int &n3,
@@ -569,6 +531,7 @@ inline void L1Algo::f31(  // input
     L1Filter( T_3[i3_V], star.frontInfo, u_front[i3_V] );    // 2.1/100 sec
     L1Filter( T_3[i3_V], star.backInfo,  u_back [i3_V] );   // 2.0/100 sec
   };
+  
 }
 
 
@@ -905,7 +868,7 @@ inline void L1Algo::f5(  // input
             if (level == nLevel + 1) trip->neighbours.push_back(neighCands[in] - offset_m);
           }
 
-        }; // if exist at least one trip
+        }; // if at least one triplet exists 
 
           // save information
         trip->Set( ihitl, ihitm, ihitr,
@@ -930,7 +893,7 @@ inline void L1Algo::DupletsStaPort(  // input
                       L1Portion<THitI> &hitsl_g1,
 
                         // output
-                      map<THitI,THitI> *Duplets_start, vector<THitI> *Duplets_hits,
+                      vector<unsigned int> *Duplets_start, vector<THitI> *Duplets_hits,
 
                       vector<int> &n_g2,
                       L1Portion<THitI> &i1_g2,
@@ -941,7 +904,7 @@ inline void L1Algo::DupletsStaPort(  // input
       L1Station &stam = vStations[istam];
 
             // prepare data
-      map<THitI, THitI> &lmDuplets_start = Duplets_start[istal];// lmDuplets_start -
+      vector<unsigned int> &lmDuplets_start = Duplets_start[istal];// lmDuplets_start -
       vector<THitI>
 //       &mrDuplets_hits = Duplets_hits[istam], // mrDuplets_hits - right hits of middle-right doublets
       &lmDuplets_hits = Duplets_hits[istal]; // lmDuplets_hits - same for left-middle doublets
@@ -985,13 +948,6 @@ inline void L1Algo::DupletsStaPort(  // input
         nsL1::vector<L1TrackPar>::TSimd &T_1 = T_g1[ip];
         nsL1::vector<L1FieldRegion>::TSimd &fld_1 = fld_g1[ip];
 
-        fvec x_minusV_1[Portion/fvecLen];    // region on next station to add hit
-        fvec x_plusV_1 [Portion/fvecLen];
-        fvec y_minusV_1[Portion/fvecLen];
-        fvec y_plusV_1 [Portion/fvecLen];
-
-//         cout << "Run f11" << endl;
-
         f11(istal, istam,
             n1_V,
 
@@ -1002,15 +958,6 @@ inline void L1Algo::DupletsStaPort(  // input
 
           /// Find the doublets. Reformat data in the portion of doublets.
 
-        fscal *x_minus;
-        fscal *x_plus;
-        fscal *y_minus;
-        fscal *y_plus;
-        x_minus  = reinterpret_cast<fscal*>(&(x_minusV_1[0]));
-        x_plus   = reinterpret_cast<fscal*>(&(x_plusV_1 [0]));
-        y_minus  = reinterpret_cast<fscal*>(&(y_minusV_1[0]));
-        y_plus   = reinterpret_cast<fscal*>(&(y_plusV_1 [0]));
-
         vector<THitI> &hitsm_2 = hitsm_g2[ip];
 #ifdef DOUB_PERFORMANCE
         vector<THitI> hitsl_2;
@@ -1018,7 +965,7 @@ inline void L1Algo::DupletsStaPort(  // input
 
         vector<THitI> &i1_2 = i1_g2[ip];
 
-         int n2;
+        int n2;
 
 
         f20(  // input
@@ -1054,31 +1001,6 @@ inline void L1Algo::DupletsStaPort(  // input
         }
 #endif // DOUB_PERFORMANCE
 
-          // Add the middle hits to parameters estimation. Propagate to right station.
-
-//          int n2_V = (n2+fvecLen-1)/fvecLen;
-
-//         fvec *x_minusV_2;
-//         fvec *x_plusV_2;
-//         fvec *y_minusV_2;
-//         fvec *y_plusV_2;
-//         x_minusV_2 = (&(x_minusV_g2[ip*MaxPortionDoublets/fvecLen+0]));
-//         x_plusV_2  = (&(x_plusV_g2 [ip*MaxPortionDoublets/fvecLen+0]));
-//         y_minusV_2 = (&(y_minusV_g2[ip*MaxPortionDoublets/fvecLen+0]));
-//         y_plusV_2  = (&(y_plusV_g2 [ip*MaxPortionDoublets/fvecLen+0]));
-
-//         f21(  // input
-//             n2_V,
-//             stam, star,
-//             u_front, u_back,
-//             fld_2,
-//             Pick_r,
-//               // output
-//             T_2,
-//             x_minusV_2, x_plusV_2, y_minusV_2, y_plusV_2
-//            );
-
-
 //         if (n2 >= MaxPortionDoublets) cout << "isec: " << isec << " stantion: " << istal << " portion number: " << ip << " CATrackFinder: Warning: Too many doublets created in portion" << endl;
 
         n_g2[ip] = n2;
@@ -1103,7 +1025,7 @@ inline void L1Algo::TripletsStaPort(  // input
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
                             
-                            map<unsigned /*short*/ int,THitI> *Duplets2_start, vector<THitI>  *Duplets2_hits,
+                            vector<unsigned int> *Duplets2_start, vector<THitI>  *Duplets2_hits,
                             
                               // output
                             std::vector<L1Triplet> *vTriplets_part,
@@ -1112,8 +1034,7 @@ inline void L1Algo::TripletsStaPort(  // input
 {
 
         // prepare data
-      map<unsigned /*short*/ int, THitI>
-        &mrDuplets_start = Duplets2_start[istam];// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
+      vector<unsigned int>  &mrDuplets_start = Duplets2_start[istam];// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
       vector<THitI>
         &mrDuplets_hits = Duplets2_hits[istam]; // mrDuplets_hits - right hits of middle-right doublets
       
@@ -1307,9 +1228,12 @@ void L1Algo::CATrackFinder()
 
   TStopwatch c_time;   // for performance time
 
-#ifdef XXX
+#if defined(XXX) || defined(COUNTERS)
   static unsigned int stat_N = 0; // number of events
-
+  stat_N++;
+#endif
+  
+#ifdef XXX
   TStopwatch c_timerG; // global
   TStopwatch c_timerI; // for iterations
   
@@ -1337,6 +1261,13 @@ void L1Algo::CATrackFinder()
 
 #endif
 
+#ifdef COUNTERS
+  static unsigned int stat_nHits[fNFindIterations] = {0};
+  static unsigned int stat_nSinglets[fNFindIterations] = {0};
+  static unsigned int stat_nDoublets[fNFindIterations] = {0};
+  static unsigned int stat_nTriplets[fNFindIterations] = {0};
+#endif
+  
 
   c_time.Start();
 
@@ -1356,9 +1287,9 @@ void L1Algo::CATrackFinder()
 
 #ifdef XXX
   unsigned int
-    stat_max_n_trip = 0,
+    // stat_max_n_trip = 0,
     stat_max_trip_size = 0,
-    stat_max_n_dup = 0,
+    // stat_max_n_dup = 0,
     stat_max_BranchSize = 0,
     stat_max_n_branches = 0;
 #endif
@@ -1419,7 +1350,8 @@ void L1Algo::CATrackFinder()
 #endif
 
 #ifdef COUNTERS
-    cout << " NHits = " << vStsHitsUnused->size() << endl;
+  cout << " Begin " << endl;
+  cout << " NHits = " << vStsHitsUnused->size() << endl;
 #endif // COUNTERS
     // iterations of finding:
     // kFastPrimIter = 0, // primary fast track
@@ -1432,6 +1364,11 @@ void L1Algo::CATrackFinder()
     L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex, NStations );
     sh.Sort();
     
+#ifdef COUNTERS
+  unsigned int nSinglets = 0;
+  unsigned int nDoublets = 0;
+  // unsigned int nTriplets = 0;
+#endif
     
 #ifdef XXX
 //     cout << " Begin of iteration " << isec << endl;
@@ -1501,15 +1438,19 @@ void L1Algo::CATrackFinder()
     if (NStations > MaxNStations) cout << " CATrackFinder: Error: Too many Stantions" << endl;
 
     vector<THitI> Duplets_hits[MaxNStations];       // right hits of doublets(left-right)
-    map<THitI, THitI> Duplets_start[MaxNStations];  // index of first right hits of doublets in Duplets_hits array   indexed by left hit
+    vector<unsigned int> Duplets_start[MaxNStations];  // index of first right hits of doublets in Duplets_hits array   indexed by left hit
     vector<THitI> DupletsG_hits[MaxNStations];      // gaped duplets. istam = istal + 2;
-    map<THitI, THitI> DupletsG_start[MaxNStations];
+    vector<unsigned int> DupletsG_start[MaxNStations];
     
       // set 0 for all doublets begin from last station - they don't exist.
-    for (int i = 0; i < MaxNStations; i++){
+    for (int i = 0; i < NStations; i++){
       Duplets_hits[i].reserve(MaxArrSize);
-//       Duplets_start[i].reserve(MaxArrSize);
+ 
       DupletsG_hits[i].reserve(MaxArrSize);
+
+      int NHitsSta = StsHitsStopIndex[i] - StsHitsStartIndex[i]; // TODO
+      Duplets_start[i].resize(NHitsSta + 1);
+      DupletsG_start[i].resize(NHitsSta + 1);
     }
 
       // global arrays for keep data of doublets on all stations
@@ -1602,17 +1543,27 @@ void L1Algo::CATrackFinder()
         for( int ipp = 0; ipp < NHits_l_P; ipp++ ){
 //           n_g1[ip++] = Portion;
           n_g1.push_back(Portion);
+#ifdef COUNTERS
+          nSinglets += Portion;
+#endif
           ip++;
         } // start_lh - portion of left hits
 
 //         n_g1[ip++] = NHits_l - NHits_l_P*Portion;
         n_g1.push_back(NHits_l - NHits_l_P*Portion);
+#ifdef COUNTERS
+        nSinglets += n_g1.back();
+#endif
         ip++;
         portionStopIndex[istal] = ip;
       }// lstations
       nPortions = ip;
     }
-
+    
+#ifdef COUNTERS
+  stat_nSinglets[isec] += nSinglets;
+#endif
+  
       ///   CREATE doublets
 
 // #ifdef XXX
@@ -1728,12 +1679,12 @@ void L1Algo::CATrackFinder()
 //         ti[isec]["dbltes"] = c_timer;
 // #endif
 
-#ifdef XXX
-    int istat_n_triplet_c=0;
+#ifdef COUNTERS
     for(unsigned int ip = 0; ip < portionStopIndex[FIRSTCASTATION]; ip++)
-      istat_n_triplet_c += n_g2[ip];
+      nDoublets += n_g2[ip];
+    stat_nDoublets[isec] += nDoublets;
 #endif
-
+    
 // #ifdef DRAW
 //     draw.ClearVeiw();
 // //     draw.DrawInputHits();
@@ -1909,6 +1860,10 @@ void L1Algo::CATrackFinder()
       TripStopIndex[istal] = vTriplets.size();
     }
 
+#ifdef COUNTERS
+    stat_nTriplets[isec] += vTriplets.size();
+#endif
+    
 // #ifdef DRAW
 //     {
 //       draw.ClearVeiw();
@@ -2253,7 +2208,13 @@ void L1Algo::CATrackFinder()
 //       fL1Pulls->Build(1);
 // #endif
 #ifdef COUNTERS
-    cout << " NHits = " << vStsHitsUnused->size() << endl;
+    stat_nHits[isec] += vStsHitsUnused->size();
+    
+    cout << "iter = " << isec << endl;
+    cout << " NHits = " << stat_nHits[isec]/stat_N << endl;
+    cout << " NSinglets = " << stat_nSinglets[isec]/stat_N << " 1/ev" << endl;
+    cout << " NDoublets = " << stat_nDoublets[isec]/stat_N << " 1/ev" << endl;
+    cout << " NTriplets = " << stat_nTriplets[isec]/stat_N << " 1/ev" << endl;
 #endif // COUNTERS
     
   } // for (int isec
@@ -2282,7 +2243,7 @@ void L1Algo::CATrackFinder()
   CATime = (double(c_time.RealTime()));
 
 #ifdef XXX
-  stat_N++;
+  
 
   cout << endl << " --- Timers, ms --- " << endl;
   ti.Calc();

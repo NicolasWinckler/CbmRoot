@@ -235,7 +235,7 @@ class L1Algo{
                 vector<THitI> &hitsl_2,
 #endif // DOUB_PERFORMANCE
                 vector<THitI> &hitsm_2,
-                map<THitI, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
+                vector<unsigned int> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
                 );
            /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets (right hit). Reformat data in the portion of triplets.
@@ -250,8 +250,8 @@ class L1Algo{
                 int n2,
                 vector<THitI> &hitsm_2,
                 vector<THitI> &i1_2,
-                                
-                map<THitI, THitI> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
+                
+                vector<unsigned int> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
                   // output
                 int &n3,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
@@ -308,7 +308,7 @@ class L1Algo{
                       L1Portion<L1FieldRegion> &fld_g1,
                       L1Portion<THitI> &hitsl_g1,
                       
-                      map<THitI,THitI> *Duplets_start, vector<THitI> *Duplets_hits,
+                      vector<unsigned int> *Duplets_start, vector<THitI> *Duplets_hits,
                       
                       vector<int> &n_g2,
                       L1Portion<THitI> &i1_g2,
@@ -327,7 +327,7 @@ class L1Algo{
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
                               
-                            map<unsigned /*short*/ int,THitI> *Duplets2_start, vector<THitI>  *Duplets2_hits,
+                            vector<unsigned int> *Duplets2_start, vector<THitI>  *Duplets2_hits,
                             
                               // output
                             vector<L1Triplet> *vTriplets_part,

@@ -246,6 +246,8 @@ inline void L1Algo::f20(  // input
     lmDuplets_start[hitsl_1[i1]] = nDuplets_lm; // mark begin
 
     const THitI nl = vStsHits_l[hitsl_1[i1]].n;
+    fvec Pick_m22 = (TRIPLET_CHI2_CUT*(T1.NDF-1) - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
+    Pick_m22 = ( (Pick_m2-Pick_m22)[i1_4] > 0 ) ? Pick_m22 : Pick_m2;
       // -- find first possible hit for next singlet --
     for (; start_mhit < NHits_m; start_mhit++){      // binary finding has no sense
       const L1HitPoint &hitm = vStsHits_m[start_mhit];
@@ -254,15 +256,18 @@ inline void L1Algo::f20(  // input
       const fscal &zm = hitm.z;
       fvec y, C11;
       L1ExtrapolateYC11Line( T1, zm, y, C11 );
-      const fvec dym_est = Pick_m * sqrt(fabs(C11 + stam.XYInfo.C11));
-      fvec y_minus_new_break = y - dym_est;
-      y_minus_new_break -= 2*MaxDZ*fabs(T1.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
-      if ( hitm.y >= y_minus_new_break[i1_4] ) break;
+      // const fvec dym_est = Pick_m * sqrt(fabs(C11 + stam.XYInfo.C11)); // sqrt is not a problem CHECKME: C11 is different for diff tracks. should we break?
+      // fvec y_minus_new_break = y - dym_est;
+      // y_minus_new_break -= 2*MaxDZ*fabs(T1.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
+      // if ( hitm.y >= y_minus_new_break[i1_4] ) break;
+
+      const fvec dym_est2 = Pick_m22 * fabs(C11 + stam.XYInfo.C11);
+      const fvec d = y - hitm.y - 2*MaxDZ*fabs(T1.ty);
+      if ( (dym_est2 - d*d)[0] >= 0 || d[0] < 0 ) break;
     }
     
       // -- collect possible doublets --
-    fvec Pick_m22 = (TRIPLET_CHI2_CUT*(T1.NDF-1) - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
-    Pick_m22 = ( (Pick_m2-Pick_m22)[i1_4] > 0 ) ? Pick_m22 : Pick_m2;
+
     for (int imh = start_mhit; imh < NHits_m; imh++){   // 6.3/100 sec
       const L1HitPoint &hitm = vStsHits_m[imh];
         // check y-boundaries
@@ -280,10 +285,10 @@ inline void L1Algo::f20(  // input
       if ( dy2 > dy_est2 && dy < 0 ) continue;
 
         // check upper boundary
-      const fscal dy_break = dy - (MaxDZ*fabs(T1.ty))[i1_4]; // take into account overlapping on middle station.
+      const fscal dy_break = dy;// - (MaxDZ*fabs(T1.ty))[i1_4]; // take into account overlapping on middle station.
       if ( dy_break*dy_break > dy_est2 && dy_break > 0 ) break;
       const unsigned short int nm = hitm.n;
-      if ( ( dy2 > dy_est2 ) || ( nl != nm ) ) continue;
+      if ( ( nl != nm ) ) continue;
 
         // check x-boundaries
       fvec x, C00;
@@ -297,8 +302,9 @@ inline void L1Algo::f20(  // input
       L1ExtrapolateC10Line( T1, zm, C10 );
       fvec chi2 = T1.chi2;
       L1FilterChi2XYC00C10C11( stam.frontInfo, x, y, C00, C10, C11, chi2, hitm.u );
-      L1FilterChi2           ( stam.backInfo,  x, y, C00, C10, C11, chi2, hitm.v );
       if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) || C00[i1_4] < 0 || C11[i1_4] < 0 ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
+      L1FilterChi2           ( stam.backInfo,  x, y, C00, C10, C11, chi2, hitm.v );
+      if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
 
       lmDuplets_hits.push_back(imh);
       nDuplets_lm++;
@@ -1354,6 +1360,10 @@ void L1Algo::CATrackFinder()
   c_timerG.Start(1);
 #endif
 
+    // sort hits by y/z
+  L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex, NStations );
+  sh.Sort();
+  
 #ifdef COUNTERS
   cout << " Begin " << endl;
   cout << " NHits = " << vStsHitsUnused->size() << endl;
@@ -1363,11 +1373,9 @@ void L1Algo::CATrackFinder()
     // kFastPrimJumpIter, // primary fast tracks with gaps. can be dissabled by macro
     // kAllPrimIter,      // primary all track
     // kAllPrimJumpIter,  // primary tracks with gaps. can be dissabled by macro
-    // kAllSecIter        // secondary all track 
+    // kAllSecIter        // secondary all track
   for (isec = 0; isec < fNFindIterations; isec++){ // all finder
-      // sort hits by y/z
-    L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex, NStations );
-    sh.Sort();
+
     
 #ifdef COUNTERS
   unsigned int nSinglets = 0;

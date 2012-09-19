@@ -5,11 +5,12 @@
 #include "L1MaterialInfo.h"
 #include "L1TrackPar.h"
 
-#define cnst static const fvec 
+//#define cnst static const fvec
+#define cnst const fvec
 
 inline void L1AddMaterial( L1TrackPar &T, L1MaterialInfo &info, fvec qp0 )
 {
-  cnst ZERO = 0.0f, ONE = 1.;
+  cnst ZERO = 0.0f, ONE = 1.f;
   cnst mass2 = 0.1395679f*0.1395679f;
 
   fvec tx = T.tx;
@@ -62,8 +63,10 @@ inline void L1AddPipeMaterial( L1TrackPar &T, fvec qp0 )
   cnst ZERO = 0.0f, ONE = 1.f;
   cnst mass2 = 0.1395679f*0.1395679f;
 
-  static const fscal RadThick=0.0009f;//0.5/18.76;
-  static const fscal logRadThick=log(RadThick);
+//  static const fscal RadThick=0.0009f;//0.5/18.76;
+//  static const fscal logRadThick=log(RadThick);
+  const fscal RadThick=0.0009f;//0.5/18.76;
+  const fscal logRadThick=log(RadThick);
   fvec tx = T.tx;
   fvec ty = T.ty;
   fvec txtx = tx*tx;
@@ -81,9 +84,6 @@ inline void L1AddPipeMaterial( L1TrackPar &T, fvec qp0 )
   T.C32 += tx*ty*a; T.C33 += (ONE+tyty)*a;
 
 }
-
-
-
 
 #undef cnst
 

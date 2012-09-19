@@ -62,6 +62,9 @@ class L1Algo{
     vRecoHits(), // packed hits of reconstructed tracks
     CATime(0), // time of trackfinding
 
+    TRACK_CHI2_CUT(10.),
+    TRIPLET_CHI2_CUT(5.),
+
     Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r(0), // same for right hits
     Pick_gather(0),
@@ -77,8 +80,18 @@ class L1Algo{
     fMomentumCutOff(0)// really doesn't used
   {}
        
-   void Init( fscal geo[] );
-   
+  void Init( const fscal geo[] );
+#ifdef TBB2
+  void SetData( const vector< L1StsHit >      & StsHits_,
+                const vector< L1Strip >       & StsStrips_,
+                const vector< L1Strip >       & StsStripsB_,
+                const vector< fscal >         & StsZPos_,
+                const vector< unsigned char > & SFlag_,
+                const vector< unsigned char > & SFlagB_,
+                const THitI* StsHitsStartIndex_,
+                const THitI* StsHitsStopIndex_ );
+  void PrintHits();
+#endif
     /// The main procedure - find tracks.
   void CATrackFinder();
 
@@ -338,7 +351,12 @@ class L1Algo{
   friend class ParalleledDup;
   friend class ParalleledTrip;
 #endif // TBB
-
+#ifdef TBB2
+  public:
+  int thrId;
+#endif // TBB2
+  private:
+  
         /// =================================  DATA PART  =================================
   
     /// ----- Different parameters of CATrackFinder -----
@@ -370,8 +388,8 @@ class L1Algo{
   };
 #endif // FIND_GAPED_TRACKS
   
-  static const float TRACK_CHI2_CUT = 10.0;  // cut for tracks candidates.
-  static const float TRIPLET_CHI2_CUT = 5.0; // cut for selecting triplets before collecting tracks.
+  const float TRACK_CHI2_CUT;// = 10.0;  // cut for tracks candidates.
+  const float TRIPLET_CHI2_CUT;// = 5.0; // cut for selecting triplets before collecting tracks.
 
   fvec MaxDZ; // correction in order to take into account overlaping and iff z. if sort by y then it is max diff between same station's modules (~0.4cm)
   
@@ -430,12 +448,5 @@ private:
   L1Algo(const L1Algo&);
   void operator=(const L1Algo&);
 } _fvecalignment;
-
-
-
-
-// #include "L1Algo.cxx"  // uncomment if don't use make
-// #include "L1CATrackFinder.cxx"  // uncomment if don't use make
-
 
 #endif

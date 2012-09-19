@@ -5,7 +5,8 @@
 #include "L1Field.h"
 #include "L1TrackPar.h"
 
-#define cnst static const fvec 
+//#define cnst static const fvec
+#define cnst const fvec  
 
 inline void L1Extrapolate
 ( 
@@ -259,7 +260,7 @@ inline void L1Extrapolate
   const fvec c42 = T.C42, c43 = T.C43;
 
   const fvec cj00 = T.C00 + T.C20*j02 + T.C30*j03 + T.C40*j04;
-  const fvec cj10 = T.C10 + T.C21*j02 + T.C31*j03 + T.C41*j04;
+//  const fvec cj10 = T.C10 + T.C21*j02 + T.C31*j03 + T.C41*j04;
   const fvec cj20 = T.C20 + T.C22*j02 + T.C32*j03 + c42*j04;
   const fvec cj30 = T.C30 + T.C32*j02 + T.C33*j03 + c43*j04;
  
@@ -268,13 +269,13 @@ inline void L1Extrapolate
   const fvec cj21 = T.C21 + T.C22*j12 + T.C32*j13 + c42*j14;
   const fvec cj31 = T.C31 + T.C32*j12 + T.C33*j13 + c43*j14;
 
-  const fvec cj02 = T.C20*j22 + T.C30*j23 + T.C40*j24;
-  const fvec cj12 = T.C21*j22 + T.C31*j23 + T.C41*j24;
+//  const fvec cj02 = T.C20*j22 + T.C30*j23 + T.C40*j24;
+//  const fvec cj12 = T.C21*j22 + T.C31*j23 + T.C41*j24;
   const fvec cj22 = T.C22*j22 + T.C32*j23 + c42*j24;
   const fvec cj32 = T.C32*j22 + T.C33*j23 + c43*j24;
 
-  const fvec cj03 = T.C20*j32 + T.C30*j33 + T.C40*j34;
-  const fvec cj13 = T.C21*j32 + T.C31*j33 + T.C41*j34;
+//  const fvec cj03 = T.C20*j32 + T.C30*j33 + T.C40*j34;
+//  const fvec cj13 = T.C21*j32 + T.C31*j33 + T.C41*j34;
   const fvec cj23 = T.C22*j32 + T.C32*j33 + c42*j34;
   const fvec cj33 = T.C32*j32 + T.C33*j33 + c43*j34;
 
@@ -362,7 +363,7 @@ inline void L1Extrapolate0
   //          covariance matrix transport 
 
   const fvec cj00 = T.C00 + T.C20*dz + T.C40*j04;
-  const fvec cj10 = T.C10 + T.C21*dz + T.C41*j04;
+//  const fvec cj10 = T.C10 + T.C21*dz + T.C41*j04;
   const fvec cj20 = T.C20 + T.C22*dz + T.C42*j04;
   const fvec cj30 = T.C30 + T.C32*dz + T.C43*j04;
  
@@ -371,14 +372,14 @@ inline void L1Extrapolate0
   const fvec cj21 = T.C21 + T.C32*dz + T.C42*j14;
   const fvec cj31 = T.C31 + T.C33*dz + T.C43*j14;
  
-  const fvec cj02 = T.C20 +  T.C40*j24;
-  const fvec cj12 = T.C21 +  T.C41*j24;
+//  const fvec cj02 = T.C20 +  T.C40*j24;
+//  const fvec cj12 = T.C21 +  T.C41*j24;
   const fvec cj22 = T.C22 +  T.C42*j24;
   const fvec cj32 = T.C32 +  T.C43*j24;
  
-  const fvec cj03 = T.C30 + T.C40*j34;
-  const fvec cj13 = T.C31 + T.C41*j34;
-  const fvec cj23 = T.C32 + T.C42*j34;
+//  const fvec cj03 = T.C30 + T.C40*j34;
+//  const fvec cj13 = T.C31 + T.C41*j34;
+//  const fvec cj23 = T.C32 + T.C42*j34;
   const fvec cj33 = T.C33 + T.C43*j34;
 
   T.C40+= T.C42*dz + T.C44*j04; // cj40

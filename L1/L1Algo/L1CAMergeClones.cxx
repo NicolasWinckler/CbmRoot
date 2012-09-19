@@ -30,12 +30,12 @@ void L1Algo::InvertCholetsky(fvec a[15])
   {
     d[i]=0.f;
     for(int j=0; j<5; j++) 
-      u[i][j]=0.;
+      u[i][j]=0.f;
   }
 
   for(int i=0; i<5; i++)
   {
-    uud=0.;
+    uud=0.f;
     for(int j=0; j<i; j++) 
       uud += u[j][i]*u[j][i]*d[j];
     uud = a[i*(i+3)/2] - uud;
@@ -49,7 +49,7 @@ void L1Algo::InvertCholetsky(fvec a[15])
 
     for(int j=i+1; j<5; j++) 
     {
-      uud = 0.;
+      uud = 0.f;
       for(int k=0; k<i; k++)
         uud += u[k][i]*u[k][j]*d[k];
       uud = a[j*(j+1)/2+i]/*a[i][j]*/ - uud;
@@ -248,6 +248,12 @@ void L1Algo::CAMergeClones()
 
   L1KFTrackFitter();
   //KFTrackFitter_simple();
+
+  L1TrackPar Tb;
+  L1TrackPar Tf;
+  L1FieldValue fBm, fBb, fBf _fvecalignment;
+  L1FieldRegion fld _fvecalignment;
+
   for(int iTr = 0; iTr < static_cast<unsigned short>(vTracks.size()); iTr++)
   {
     if(static_cast<int>(vTracks[iTr].NHits) > 6) continue;
@@ -257,8 +263,6 @@ void L1Algo::CAMergeClones()
       if(static_cast<int>(vTracks[iTr].NHits) > 6) continue;
 
       unsigned short dist = 0;
-      L1TrackPar Tb;
-      L1TrackPar Tf;
       unsigned short stab=0, staf=0;
       bool IsNextTemp=0;
 //if((vTracks[iTr].TFirst[4] - vTracks[jTr].TFirst[4])*(vTracks[iTr].TFirst[4] - vTracks[jTr].TFirst[4]) 
@@ -371,8 +375,6 @@ void L1Algo::CAMergeClones()
       if(dist == 0) continue;
       //if(((Tf.qp - Tb.qp)*(Tf.qp - Tb.qp)/(Tb.C44+Tf.C44))[0] > 25*10*7) continue;
 
-      L1FieldValue fBm, fBb, fBf _fvecalignment;
-      L1FieldRegion fld _fvecalignment;
       unsigned short stam;
 
       vStations[staf].fieldSlice.GetFieldValue( Tf.x, Tf.y, fBf );

@@ -6,13 +6,11 @@
 #include "L1XYMeasurementInfo.h"
 #include "L1TrackPar.h"
 
-#define cnst static const fvec
+//#define cnst static const fvec
+#define cnst const fvec
 
 inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u )
 {
-
-  cnst ZERO = 0.0, ONE = 1.;
-
   register fvec wi, zeta, zetawi, HCH;
   register fvec F0, F1, F2, F3, F4;
   register fvec K1, K2, K3, K4;
@@ -32,7 +30,7 @@ inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u )
   wi = 1./(info.sigma2 +HCH);
   zetawi = zeta *wi;
   T.chi2 +=  zeta * zetawi ;
-  T.NDF  += ONE;
+  T.NDF += 1;
 
   K1 = F1*wi;
   K2 = F2*wi;

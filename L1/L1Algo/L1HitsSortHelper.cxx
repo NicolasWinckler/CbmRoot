@@ -9,7 +9,7 @@
 
 using std::vector;
 
-L1HitsSortHelper::L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &points, vector<THitI> &indices, THitI* iStart, THitI* iStop ): fHits(hits), fPoints(points), fIndices(indices), fStsHitsUnusedStartIndex( iStart ), fStsHitsUnusedStopIndex( iStop ) {
+L1HitsSortHelper::L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &points, vector<THitI> &indices, THitI* iStart, THitI* iStop, int nStations ): fHits(hits), fPoints(points), fIndices(indices), fStsHitsUnusedStartIndex( iStart ), fStsHitsUnusedStopIndex( iStop ), fNStations(nStations) {
   L1_ASSERT( hits.size() ==  points.size(), hits.size() << " " << points.size() );
   const int NHits = hits.size();
   fD.resize( NHits );
@@ -21,10 +21,9 @@ L1HitsSortHelper::L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &
 }
 
 void L1HitsSortHelper::Sort(){
-  for ( int iS = 0; iS < L1Algo::MaxNStations; ++iS ) { // TODO
+  for ( int iS = 0; iS < fNStations; ++iS ) { // TODO
     std::sort(fD.begin()+fStsHitsUnusedStartIndex[iS], fD.begin()+fStsHitsUnusedStopIndex[iS], L1HitsSortHelperData::compare);
   }
-    
     
   vector<L1StsHit> hits = fHits;
   vector<L1HitPoint> points = fPoints;

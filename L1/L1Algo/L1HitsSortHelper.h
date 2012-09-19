@@ -21,7 +21,7 @@ struct L1HitsSortHelperData{
 
 class L1HitsSortHelper{
  public:
-  L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &points, vector<THitI> &indices, THitI* iStart, THitI* iStop );
+  L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &points, vector<THitI> &indices, THitI* iStart, THitI* iStop, int nStations );
 
   void Sort();
   
@@ -31,6 +31,7 @@ class L1HitsSortHelper{
   vector<L1HitPoint> &fPoints;
   vector<THitI> &fIndices;
   THitI *fStsHitsUnusedStartIndex, *fStsHitsUnusedStopIndex;
+  int fNStations;
 };
     
 #endif

@@ -118,8 +118,10 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         T.C22 = T.C33 = vINF;
         T.C44 = 1.;
 
-        static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-        static L1FieldRegion fld _fvecalignment;
+//        static L1FieldValue fB0, fB1, fB2 _fvecalignment;
+//        static L1FieldRegion fld _fvecalignment;
+        L1FieldValue fB0, fB1, fB2 _fvecalignment;
+        L1FieldRegion fld _fvecalignment;
         fvec fz0 = sta1.z; // suppose field is smoth
         fvec fz1 = sta2.z;
         fvec fz2 = sta0.z;
@@ -248,8 +250,10 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         T.C22 = T.C33 = vINF;
         T.C44 = 1.;
 
-        static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-        static L1FieldRegion fld _fvecalignment;
+//        static L1FieldValue fB0, fB1, fB2 _fvecalignment;
+//        static L1FieldRegion fld _fvecalignment;
+        L1FieldValue fB0, fB1, fB2 _fvecalignment;
+        L1FieldRegion fld _fvecalignment;
         fvec fz0 = sta1.z;
         fvec fz1 = sta2.z;
         fvec fz2 = sta0.z;
@@ -548,10 +552,13 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
 //  cout << " Start L1 Track Fitter " << endl;
   int start_hit = 0; // for interation in vRecoHits[]
 
-  static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-  static L1FieldRegion fld _fvecalignment;
+//  static L1FieldValue fB0, fB1, fB2 _fvecalignment;
+//  static L1FieldRegion fld _fvecalignment;
+  L1FieldValue fB0, fB1, fB2 _fvecalignment;
+  L1FieldRegion fld _fvecalignment;
 
-  static int nHits = NStations;
+//  static int nHits = NStations;
+  const int nHits = NStations;
   int iVec=0, i=0;
   int nTracks_SIMD = fvecLen;
   L1TrackPar T; // fitting parametr coresponding to current track

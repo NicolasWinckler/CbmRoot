@@ -1,6 +1,6 @@
 #include "L1Algo.h"
 
-void L1Algo::Init( fscal geo[] )
+void L1Algo::Init( const fscal geo[] )
 {
   int ind=0;
   {
@@ -8,15 +8,19 @@ void L1Algo::Init( fscal geo[] )
     fvec z[3];
     for( int i=0; i<3; i++){
       z[i] = geo[ind++]; B[i].x = geo[ind++];   B[i].y = geo[ind++];  B[i].z = geo[ind++];
-//      std::cout<<"L1Algo Input Magnetic field:"<<z[i][0]<<" "<<B[i].x[0]<<" "<<B[i].y[0]<<" "<<B[i].z[0]<<std::endl;
+#ifndef TBB2
+      std::cout<<"L1Algo Input Magnetic field:"<<z[i][0]<<" "<<B[i].x[0]<<" "<<B[i].y[0]<<" "<<B[i].z[0]<<std::endl;
+#endif // TBB2
     }
     vtxFieldRegion.Set(B[0], z[0], B[1], z[1], B[2], z[2] );
     vtxFieldValue = B[0];
   }
   //vStations.clear();
-  NStations = static_cast<int>( geo[ind++] );
-  NMvdStations = static_cast<int>( geo[ind++] );
-//  std::cout<<"L1Algo Input "<<NStations<<" Stations:"<<std::endl;
+  NStations = static_cast<int>(geo[ind++]);
+  NMvdStations = static_cast<int>(geo[ind++]);
+#ifndef TBB2
+  std::cout<<"L1Algo Input "<<NStations<<" Stations:"<<std::endl;
+#endif // TBB2
   for( int i=0; i<NStations; i++ ){
     L1Station &st = vStations[i];
     st.z = geo[ind++];
@@ -85,9 +89,11 @@ void L1Algo::Init( fscal geo[] )
     for( int iC=0; iC<N; iC++ ) st.fieldSlice.cx[iC] = geo[ind++];
     for( int iC=0; iC<N; iC++ ) st.fieldSlice.cy[iC] = geo[ind++];
     for( int iC=0; iC<N; iC++ ) st.fieldSlice.cz[iC] = geo[ind++];
-//    std::cout<<"    "<<st.z[0] <<" "<<st.materialInfo.thick[0]<<" "<<st.materialInfo.RL[0]<<", "
-//        <<N<<" field coeff."<<std::endl;
-//    std::cout<<"       "<<f_phi<<" "<<f_sigma <<" "<<b_phi<<" "<<b_sigma <<std::endl;
+#ifndef TBB2
+    std::cout<<"    "<<st.z[0] <<" "<<st.materialInfo.thick[0]<<" "<<st.materialInfo.RL[0]<<", "
+        <<N<<" field coeff."<<std::endl;
+    std::cout<<"       "<<f_phi<<" "<<f_sigma <<" "<<b_phi<<" "<<b_sigma <<std::endl;
+#endif // TBB2
   }
 
   fTrackingLevel = static_cast<int>( geo[ind++] );
@@ -108,8 +114,39 @@ void L1Algo::Init( fscal geo[] )
       z0 = st.z;
     }
   }
+#ifndef TBB2
   std::cout<<"L1Algo initialized"<<std::endl;
+#endif // TBB2
 }
+
+#ifdef TBB2
+void L1Algo::SetData( const vector< L1StsHit >      & StsHits_,
+                      const vector< L1Strip >       & StsStrips_,
+                      const vector< L1Strip >       & StsStripsB_,
+                      const vector< fscal >         & StsZPos_,
+                      const vector< unsigned char > & SFlag_,
+                      const vector< unsigned char > & SFlagB_,
+                      const THitI* StsHitsStartIndex_,
+                      const THitI* StsHitsStopIndex_ )
+{
+  vStsHits.resize(StsHits_.size());
+  vStsStrips.resize(StsStrips_.size());
+  vStsStripsB.resize(StsStripsB_.size());
+  vStsZPos.resize(StsZPos_.size());
+  vSFlag.resize(SFlag_.size());
+  vSFlagB.resize(SFlagB_.size());
+  
+  for(int i=0; i<StsHits_.size(); ++i ) vStsHits[i] = StsHits_[i];
+  for(int i=0; i<StsStrips_.size(); ++i ) vStsStrips[i] = StsStrips_[i];
+  for(int i=0; i<StsStripsB_.size(); ++i ) vStsStripsB[i] = StsStripsB_[i];
+  for(int i=0; i<StsZPos_.size(); ++i ) vStsZPos[i] = StsZPos_[i];
+  for(int i=0; i<SFlag_.size(); ++i ) vSFlag[i] = SFlag_[i];
+  for(int i=0; i<SFlagB_.size(); ++i ) vSFlagB[i] = SFlagB_[i];
+
+  for(int i=0; i<MaxNStations+1; ++i) StsHitsStartIndex[i] = StsHitsStartIndex_[i];
+  for(int i=0; i<MaxNStations+1; ++i) StsHitsStopIndex[i]  = StsHitsStopIndex_[i];
+}
+#endif
 
 void L1Algo::GetHitCoor(const L1StsHit& _h, fscal &_x, fscal &_y, fscal &_z, const L1Station &sta)
 {
@@ -120,7 +157,7 @@ void L1Algo::GetHitCoor(const L1StsHit& _h, fscal &_x, fscal &_y, fscal &_z, con
   _x = x;
   _y = y;
   _z = vStsZPos[_h.iz];
-};
+}
 
   /// convert strip positions to coordinates
 void L1Algo::StripsToCoor(const fscal &u, const fscal &v, fscal &_x, fscal &_y, const L1Station &sta) // TODO: Actually sta.yInfo.sin_phi is same for all stations, so ...
@@ -129,7 +166,7 @@ void L1Algo::StripsToCoor(const fscal &u, const fscal &v, fscal &_x, fscal &_y, 
   StripsToCoor(u,v,x,y,sta);
   _x = x[0];
   _y = y[0];
-};
+}
 
 void L1Algo::StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const L1Station &sta) // TODO: Actually sta.yInfo.sin_phi is same for all stations, so ...
 {
@@ -138,7 +175,7 @@ void L1Algo::StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const 
 //   y = (sta.yInfo.cos_phi*u + sta.yInfo.sin_phi*v);
   x = sta.xInfo.sin_phi*u + sta.xInfo.cos_phi*v;
   y = sta.yInfo.cos_phi*u + sta.yInfo.sin_phi*v;
-};
+}
 
   /// full the hit point by hit information.
 L1HitPoint L1Algo::CreateHitPoint(const L1StsHit &hit, char ista)
@@ -151,4 +188,5 @@ L1HitPoint L1Algo::CreateHitPoint(const L1StsHit &hit, char ista)
   fscal z = vStsZPos[hit.iz];
 
   return  L1HitPoint(x,y,z,v,u,hit.n);
-};
+}
+

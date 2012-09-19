@@ -94,7 +94,7 @@ inline void L1TrackPar::Print(int i)
     std::cout << C33[i]  << " ";
     std::cout << C44[i]  << std::endl;
   }
-};
+}
 
 inline void L1TrackPar::SetOneEntry( const int i0, const L1TrackPar &T1, const int i1 )
 {

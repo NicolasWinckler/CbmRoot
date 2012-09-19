@@ -62,6 +62,50 @@ inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u )
   T.C44-= K4*F4;
 }
 
+inline void L1FilterChi2( const L1UMeasurementInfo &info, const fvec& x, const fvec& y, const fvec& C00, const fvec& C10, const fvec& C11, fvec& chi2, const fvec& u )
+{
+  register fvec zeta, HCH;
+  register fvec F0, F1;
+
+  zeta = info.cos_phi*x + info.sin_phi*y - u;
+
+  // F = CH'
+  F0 = info.cos_phi*C00 + info.sin_phi*C10;
+  F1 = info.cos_phi*C10 + info.sin_phi*C11;
+
+  HCH = ( F0*info.cos_phi + F1*info.sin_phi );
+
+  chi2 +=  zeta * zeta / (info.sigma2 + HCH) ;
+}
+
+inline void L1FilterChi2XYC00C10C11( const L1UMeasurementInfo &info, fvec& x, fvec& y, fvec& C00, fvec& C10, fvec& C11, fvec& chi2, const fvec& u )
+{
+  register fvec wi, zeta, zetawi, HCH;
+  register fvec F0, F1;
+  register fvec K1;
+
+  zeta = info.cos_phi*x + info.sin_phi*y - u;
+
+  // F = CH'
+  F0 = info.cos_phi*C00 + info.sin_phi*C10;
+  F1 = info.cos_phi*C10 + info.sin_phi*C11;
+
+  HCH = ( F0*info.cos_phi + F1*info.sin_phi );
+
+  wi = 1./(info.sigma2 + HCH);
+  zetawi = zeta *wi;
+  chi2 +=  zeta * zetawi ;
+
+  K1 = F1*wi;
+
+  x  -= F0*zetawi;
+  y  -= F1*zetawi;
+
+  C00-= F0*F0*wi;
+  C10-= K1*F0;
+  C11-= K1*F1;
+}
+
 inline void L1FilterVtx( L1TrackPar &T, fvec x, fvec y, L1XYMeasurementInfo &info, 
 			 fvec extrDx, fvec extrDy, fvec J[] )
 {

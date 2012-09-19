@@ -88,8 +88,8 @@ void L1Algo::BranchFitterFast(const L1Branch &t, L1TrackPar& T, const bool dir, 
   T.C22 = T.C33 = vINF;
   T.C44 = 1.;
 
-  static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-  static L1FieldRegion fld _fvecalignment;
+  L1FieldValue fB0, fB1, fB2 _fvecalignment;
+  L1FieldRegion fld _fvecalignment;
   fvec fz0 = sta1.z; // suppose field is smoth
   fvec fz1 = sta2.z;
   fvec fz2 = sta0.z;
@@ -192,8 +192,8 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
   fvec dzi = 1./(z1-z0);
 
-  static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-  static L1FieldRegion fld _fvecalignment;
+  L1FieldValue fB0, fB1, fB2 _fvecalignment;
+  L1FieldRegion fld _fvecalignment;
   fvec fz0 = sta1.z;
   fvec fz1 = sta2.z;
   fvec fz2 = sta0.z;

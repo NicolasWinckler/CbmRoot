@@ -42,6 +42,8 @@ class CbmTrdRadiator
   /** Init function **/
    void Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapTick, TString material);
   /** Init function **/
+  void  Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick);
+  /** Init function **/
    void Init(Bool_t SimpleTR, TString prototype);
   /** Init function **/
    void Init();

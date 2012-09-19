@@ -9,6 +9,7 @@
 // #define DOUB_PERFORMANCE // doublets efficiencies
 // #define DRAW             // event display
 // #define XXX              // time debug
+// #define COUNTERS          // diff counters (hits, doublets, ... )
 
 #define FIND_GAPED_TRACKS // use triplets with gaps
 
@@ -240,14 +241,14 @@ class L1Algo{
                 int &n3,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
-                nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3
+                nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3, nsL1::vector<fvec>::TSimd &z_Pos_3
                 );
           
           /// Add the right hits to parameters estimation.
   void f31(  // input
                 int n3_V,  
                 L1Station &star, 
-                nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3,
+                nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3, nsL1::vector<fvec>::TSimd &z_Pos_3,
                   // output
                 nsL1::vector<L1TrackPar>::TSimd &T_3
                );
@@ -389,7 +390,7 @@ class L1Algo{
   enum { 
     multiCoeff = 1, // central - 1, mbias -
 
-    coeff = 64,
+    coeff = 64/4,
 
     Portion = 1024/coeff, // portion of left hits
 

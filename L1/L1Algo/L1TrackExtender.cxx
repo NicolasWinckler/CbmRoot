@@ -138,7 +138,7 @@ void L1Algo::BranchFitterFast(const L1Branch &t, L1TrackPar& T, const bool dir, 
 void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0, const bool initParams)
 {
   BranchFitterFast (t, T, dir, qp0, initParams);
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 1; i++) {
     BranchFitterFast (t, T, !dir, T.qp, false);
     BranchFitterFast (t, T, dir, T.qp, false);  
   }
@@ -212,7 +212,28 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
     fscal r2_best = 1e8; // best distance to hit
     int iHit_best = -1;  // index of the best hit
-    for( THitI ih = StsHitsUnusedStartIndex[ista]; ih < StsHitsUnusedStopIndex[ista]; ih++ ){ // optimize
+    
+      // find first hit
+    int start = StsHitsUnusedStartIndex[ista];
+    {
+      int end = StsHitsUnusedStopIndex[ista];
+      for( THitI ih = start; end - start >= 3; ih++ ){ // optimize
+        int middle = (start + end)/2;
+        L1StsHit &hit = (*vStsHitsUnused)[middle];
+
+        fscal x, y, z;
+        GetHitCoor(hit, x, y, z, sta);
+      
+        L1TrackPar T_new = T;
+        L1ExtrapolateShort( T_new, z, qp0, fld);
+
+        fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
+        fscal y_minus_new = T_new.y[0] - dym_est;
+        if (y < y_minus_new) start = middle;
+        else end = middle;
+      }
+    }
+    for( THitI ih = start; ih < StsHitsUnusedStopIndex[ista]; ih++ ){ // optimize
       L1StsHit &hit = (*vStsHitsUnused)[ih];
 
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
@@ -225,7 +246,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
       fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
       fscal y_minus_new = T_new.y[0] - dym_est;
-      if (y < y_minus_new) continue;
+      if (y < y_minus_new) continue;  // CHECKME tack into account overlaping?
       fscal y_plus_new = T_new.y[0] + dym_est;
       if (y > y_plus_new ) break;
       
@@ -292,32 +313,23 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
   /// Try to extrapolate and find additional hits on other stations
 fscal L1Algo::BranchExtender(L1Branch &t) // TODO Simdize
 {
-#define PRECISE_HIT_FINDING
   //  const unsigned int minNHits = 3;
   
   L1TrackPar T;
 
     // forward
   bool dir = 0;
-#ifdef PRECISE_HIT_FINDING
+
   BranchFitter (t, T, dir);
-#else
-  BranchFitterFast (t, T, dir);
-#endif
+  // BranchFitterFast (t, T, dir, 0, true);
   
 //  if (t.StsHits.size() < minNHits) return T.chi2[0];
   FindMoreHits(t, T, dir, T.qp);
 
     // backward
   dir = 1;
-  //  BranchFitter (t, T, dir); // 577  // TODO investigate fitter
-  //  BranchFitter (t, T, dir, T.qp); // 574
-  //  BranchFitter (t, T, dir, T.qp, false); // 571
-#ifdef PRECISE_HIT_FINDING
-  BranchFitter (t, T, dir, 0, false);
-#else
-  BranchFitterFast (t, T, dir, 0, false); // 577
-#endif
+  BranchFitterFast (t, T, dir, T.qp, false); // 577
+
 
   FindMoreHits(t, T, dir, T.qp);
 

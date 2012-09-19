@@ -74,6 +74,7 @@ L1Algo/L1CATrackFinder.cxx
 L1Algo/L1TrackExtender.cxx
 L1Algo/L1TrackFitter.cxx
 L1Algo/L1CAMergeClones.cxx
+L1Algo/L1HitsSortHelper.cxx
 CbmL1Performance.cxx 
 CbmL1ReadEvent.cxx
 

@@ -261,7 +261,7 @@ inline void L1Algo::f20(  // input
     }
     
       // -- collect possible doublets --
-    fvec Pick_m22 = TRIPLET_CHI2_CUT*(T1.NDF-1) - T1.chi2;
+    fvec Pick_m22 = (TRIPLET_CHI2_CUT*(T1.NDF-1) - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
     Pick_m22 = ( (Pick_m2-Pick_m22)[i1_4] > 0 ) ? Pick_m22 : Pick_m2;
     for (int imh = start_mhit; imh < NHits_m; imh++){   // 6.3/100 sec
       const L1HitPoint &hitm = vStsHits_m[imh];
@@ -280,7 +280,7 @@ inline void L1Algo::f20(  // input
       if ( dy2 > dy_est2 && dy < 0 ) continue;
 
         // check upper boundary
-      const fscal dy_break = dy - (MaxDZ*fabs(T1.ty))[i1_4]; // take into account overlapping on middle station. dz_max ~ 0.4 cm. dy/dz ~ 1. CHECKME why do we need this for secondary?
+      const fscal dy_break = dy - (MaxDZ*fabs(T1.ty))[i1_4]; // take into account overlapping on middle station.
       if ( dy_break*dy_break > dy_est2 && dy_break > 0 ) break;
       const unsigned short int nm = hitm.n;
       if ( ( dy2 > dy_est2 ) || ( nl != nm ) ) continue;
@@ -343,6 +343,7 @@ inline void L1Algo::f30(  // input
 {
   const fvec Pick_r2 = Pick_r*Pick_r;
   THitI hitsl_2[fvecLen];
+  THitI hitsm_2_tmp[fvecLen];
   fvec fvec_0;
   L1TrackPar L1TrackPar_0;
 
@@ -354,11 +355,9 @@ inline void L1Algo::f30(  // input
   z_Pos_3.push_back(fvec_0);
   
     // ---- Add the middle hits to parameters estimation. Propagate to right station. ----
-  const int n2_V = (n2+fvecLen-1)/fvecLen;
   if (istar < NStations){
 
-    for (int i2_V = 0; i2_V < n2_V; i2_V++){
-      const int max_i2_4 = ( (n2-i2_V*fvecLen) >= fvecLen ) ? fvecLen : (n2-i2_V*fvecLen);
+    for (int i2 = 0; i2 < n2;) {
 
       L1TrackPar T2;
       L1FieldRegion f2;
@@ -366,31 +365,39 @@ inline void L1Algo::f30(  // input
       fvec u_front_2;
       fvec u_back_2;
       fvec zPos_2;
-      for (int i2_4 = 0; i2_4 < max_i2_4; i2_4++){
-        const int i2 = i2_V*fvecLen+i2_4;
+      int n2_4 = 0;
+      for (; n2_4 < fvecLen && i2 < n2; n2_4++, i2++){
+
+        const THitI duplet_b = mrDuplets_start[hitsm_2[i2]];  
+        const THitI duplet_e = mrDuplets_start[hitsm_2[i2]+1];
+        if (duplet_b >= duplet_e) {
+          n2_4--;
+          continue;
+        }
+
         const int i1 = i1_2[i2];
         const int i1_V = i1/fvecLen;
         const int i1_4 = i1%fvecLen;
 
         const L1TrackPar &T1 = T_1[i1_V];
         const L1FieldRegion &f1 = fld_1[i1_V];
-        T2.SetOneEntry(i2_4, T1, i1_4);
-        f2.SetOneEntry(i2_4, f1, i1_4);
+        T2.SetOneEntry(n2_4, T1, i1_4);
+        f2.SetOneEntry(n2_4, f1, i1_4);
          
         const int imh = hitsm_2[i2];
         const L1HitPoint &hitm = vStsHits_m[imh];
-        u_front_2[i2_4] = hitm.u;
-        u_back_2 [i2_4] = hitm.v;
-        zPos_2   [i2_4] = hitm.z;
+        u_front_2[n2_4] = hitm.u;
+        u_back_2 [n2_4] = hitm.v;
+        zPos_2   [n2_4] = hitm.z;
 
-        hitsl_2[i2_4] = hitsl_1[i1];
-      }  // i2_4
+        hitsl_2[n2_4] = hitsl_1[i1];
+        hitsm_2_tmp[n2_4] = hitsm_2[i2];
+      }  // n2_4
 
         // add middle hit
       L1ExtrapolateLine( T2, zPos_2 );
       L1Filter( T2, stam.frontInfo, u_front_2 );
       L1Filter( T2, stam.backInfo,  u_back_2 );
-
        
       L1AddMaterial( T2, stam.materialInfo, T2.qp );
       if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp );
@@ -416,12 +423,10 @@ inline void L1Algo::f30(  // input
 
         // ---- Find the triplets(right hit). Reformat data in the portion of triplets. ----
 
-      for (int i2_4 = 0; i2_4 < max_i2_4; i2_4++){
-        const int i2 = i2_V*fvecLen + i2_4;
-
-        const THitI duplet_b = mrDuplets_start[hitsm_2[i2]];  
-        const THitI duplet_e = mrDuplets_start[hitsm_2[i2]+1];
-
+      for (int i2_4 = 0; i2_4 < n2_4; i2_4++){
+        const THitI duplet_b = mrDuplets_start[hitsm_2_tmp[i2_4]];  
+        const THitI duplet_e = mrDuplets_start[hitsm_2_tmp[i2_4]+1];
+        
           //     THitI nm = vStsHits_m[hitsm_2[i2]].n;
           // if ( T2.chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT. // don't need it since Have cut during doublets finding.
         if ( T2.C00[i2_4] < 0 ||  T2.C11[i2_4] < 0 ||  T2.C22[i2_4] < 0 ||  T2.C33[i2_4] < 0 ||  T2.C44[i2_4] < 0 ) continue;
@@ -448,7 +453,7 @@ inline void L1Algo::f30(  // input
           }
         }
 
-        fvec Pick_r22 = TRIPLET_CHI2_CUT*(T2.NDF-3) - T2.chi2;
+        fvec Pick_r22 = (TRIPLET_CHI2_CUT*(T2.NDF-3) - T2.chi2);// if make it bigger the found hits will be rejected later because of the chi2 cut.
         Pick_r22 = ( (Pick_r2-Pick_r22)[i2_4] > 0 ) ? Pick_r22 : Pick_r2;
         for (unsigned int irh_index = start; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
           const int irh = mrDuplets_hits[irh_index];
@@ -491,7 +496,7 @@ inline void L1Algo::f30(  // input
           L1TrackPar &T3 = T_3[n3_V];
 
           hitsl_3.push_back(hitsl_2[i2_4]);
-          hitsm_3.push_back(hitsm_2[i2]);
+          hitsm_3.push_back(hitsm_2_tmp[i2_4]);
           hitsr_3.push_back(irh);        
 
           T3.SetOneEntry(n3_4, T2, i2_4);
@@ -2212,9 +2217,9 @@ void L1Algo::CATrackFinder()
     
     cout << "iter = " << isec << endl;
     cout << " NHits = " << stat_nHits[isec]/stat_N << endl;
-    cout << " NSinglets = " << stat_nSinglets[isec]/stat_N << " 1/ev" << endl;
-    cout << " NDoublets = " << stat_nDoublets[isec]/stat_N << " 1/ev" << endl;
-    cout << " NTriplets = " << stat_nTriplets[isec]/stat_N << " 1/ev" << endl;
+    cout << " NSinglets = " << stat_nSinglets[isec]/stat_N << endl;
+    cout << " NDoublets = " << stat_nDoublets[isec]/stat_N << endl;
+    cout << " NTriplets = " << stat_nTriplets[isec]/stat_N << endl;
 #endif // COUNTERS
     
   } // for (int isec

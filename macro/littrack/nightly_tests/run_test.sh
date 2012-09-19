@@ -56,7 +56,7 @@ elif [ "$1" = "cdash" ] ; then
     cp /data.local1/andrey/tests/patch/CbmRoot_test.cmake ${test_dir}/cbmroot/CbmRoot_test.cmake
     
     # Run tests with CDash
-    . ${test_dir}/cbmroot/Dart.sh Experimental ${test_dir}/cbmroot/Dart.cfg
+    ${test_dir}/cbmroot/Dart.sh Experimental ${test_dir}/cbmroot/Dart.cfg
     
     copy_results_to_web "${build_dir}/macro/littrack/nightly_tests/littrack*"
 elif [ "$1" = "local" ] ; then

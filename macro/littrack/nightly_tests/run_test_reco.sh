@@ -6,28 +6,31 @@ export LIT_SCRIPT=yes
 
 test_name=$1
 detector_setup=$2
-system=$3
-energy=$4
-collision_type=$5
+main_detector_geometry=$3
+collision=$4
+
+# Parse collision
+collision_arr=(${collision//_/ })
+system=${collision_arr[0]}
+energy=${collision_arr[1]}
+collision_type=${collision_arr[2]}
 
 create_output_dir events_${test_name}/
 
-nevents=500
+nevents=5
 
 if [ "${detector_setup}" = "electron" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
     pars=(0    0    0   0   0    0    0       10     0  yes   no)
     set_default_electron_geometry
+    export LIT_MUCH_GEOM=trd/trd_${main_detector_geometry}.geo
+    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/trd/trd_${main_detector_geometry}.digi.root
 elif [ "${detector_setup}" = "muon" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
     pars=(0    0    0   0   0    0    10       0     0  yes   no)
     set_default_muon_geometry
-elif [ "${detector_setup}" = "muon_radial" ] ; then
-    #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
-    pars=(0    0    0   0   0    0    10       0     0  yes   no)
-    set_default_muon_geometry
-    export LIT_MUCH_GEOM=much/much_v12a.geo
-    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v12a.digi.root
+    export LIT_MUCH_GEOM=much/much_${main_detector_geometry}.geo
+    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_${main_detector_geometry}.digi.root
 else
     echo "Error! Detector setup unknown! Must be electron or muon!"
     exit 2

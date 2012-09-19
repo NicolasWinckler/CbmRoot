@@ -29,6 +29,10 @@ class CbmTrdRadiator
   CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, 
                  Float_t GapThick);
 
+ /** Constructor **/
+  CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, 
+                 Float_t GapThick, TString material, TString prototype);
+
   /** Destructor **/
    virtual ~CbmTrdRadiator();
   
@@ -36,7 +40,9 @@ class CbmTrdRadiator
    void CreateHistograms();
 
   /** Init function **/
-   void Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapTick);
+   void Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapTick, TString material);
+  /** Init function **/
+   void Init(Bool_t SimpleTR, TString prototype);
   /** Init function **/
    void Init();
 
@@ -118,6 +124,7 @@ private:
   Float_t   fGapDens;     // Dens. of gas in the radiator gaps (g/cm^3)
   Float_t   fFoilOmega;   // Plasma frequency of the radiator foils
   Float_t   fGapOmega;    // Plasma freq. of gas
+  Float_t fnPhotonCorr;   // Correction of number of photon production efficiency
 
   /* Parameters after correction of the angle of the particle */
 

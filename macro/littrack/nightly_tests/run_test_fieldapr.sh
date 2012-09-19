@@ -15,11 +15,6 @@ set_simulation_parameters ${pars}
 
 set_default_electron_geometry
 
-export LIT_STS_HITPRODUCER_TYPE=real
-export LIT_TRD_HITPRODUCER_TYPE=smearing
-export LIT_MUCH_HITPRODUCER_TYPE=advanced
-export LIT_GLOBAL_TRACKING_TYPE=branch
-
 set_default_file_names ${LIT_DIR} 0000
 
 export LIT_URQMD_FILE=${VMCWORKDIR}/input/urqmd.auau.25gev.centr.root

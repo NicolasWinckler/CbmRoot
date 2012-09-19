@@ -7,7 +7,7 @@ export LIT_SCRIPT=yes
 create_output_dir events_field/
 create_result_dir littrack_field/
 
-nevents=100
+nevents=1
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       5      0  no    no)
@@ -17,11 +17,6 @@ set_default_electron_geometry
 
 export LIT_FIELD_MAP=field_v10e
 export LIT_MAGNET_GEOM=passive/magnet_v09e.geo
-
-export LIT_STS_HITPRODUCER_TYPE=real
-export LIT_TRD_HITPRODUCER_TYPE=smearing
-export LIT_MUCH_HITPRODUCER_TYPE=advanced
-export LIT_GLOBAL_TRACKING_TYPE=branch
 
 set_default_file_names ${LIT_DIR} 0000
 

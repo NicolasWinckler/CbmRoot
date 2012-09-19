@@ -10,14 +10,14 @@ ForEach(__setup IN  LISTS  setup)
   Set(testname global_sim_${__setup})
 
   Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test.sh ${__setup} sim)
-  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "420")
   Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
   
   Set(_dep ${testname})
   Set(testname global_reco_${__setup})
   
   Add_Test(${testname} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test.sh ${__setup} reco)
-  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname} PROPERTIES TIMEOUT "420")
   Set_Tests_Properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
   Set_Tests_Properties(${testname} PROPERTIES DEPENDS ${_dep})
  
@@ -34,14 +34,14 @@ ForEach(__setup_mvd IN  LISTS  setup_mvd)
   Set(testname_mvd mvd_sim_${__setup_mvd})
 
   Add_Test(${testname_mvd} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_mvd.sh ${__setup_mvd} sim)
-  Set_Tests_Properties(${testname_mvd} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname_mvd} PROPERTIES TIMEOUT "420")
   Set_Tests_Properties(${testname_mvd} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
   
   Set(_dep ${testname_mvd})
   Set(testname_mvd mvd_reco_${__setup_mvd})
   
   Add_Test(${testname_mvd} ${CBMROOT_BINARY_DIR}/macro/littrack/commit_tests/run_test_mvd.sh ${__setup_mvd} reco)
-  Set_Tests_Properties(${testname_mvd} PROPERTIES TIMEOUT "300")
+  Set_Tests_Properties(${testname_mvd} PROPERTIES TIMEOUT "420")
   Set_Tests_Properties(${testname_mvd} PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
   Set_Tests_Properties(${testname_mvd} PROPERTIES DEPENDS ${_dep})
  

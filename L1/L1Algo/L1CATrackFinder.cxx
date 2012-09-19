@@ -1,4 +1,5 @@
-/*
+
+  /*
  *=====================================================
  *
  *  CBM Level 1 Reconstruction
@@ -25,6 +26,8 @@
 #include "L1HitPoint.h"
 
 #include "L1Portion.h"
+
+#include "L1Timer.h"
 
 #ifdef DRAW
 #include "utils/L1AlgoDraw.h"
@@ -1363,66 +1366,41 @@ void L1Algo::CATrackFinder()
 #endif
 
   cout.precision(6);
-        
+
+  TStopwatch c_time;   // for performance time
+
 #ifdef XXX
   static unsigned int stat_N = 0; // number of events
 
-  const int Nisec = fNFindIterations; //number of main loops
-
-    // timers for different part of CATrackFinder
-  const int ntimers = 6; //number of timers + 1
-
-  static double
-    stat_time = 0.0, stat_time_real = 0.0, stat_time_trip[Nisec], stat_time_fit[Nisec],  stat_time_fit_bra[Nisec], stat_time_fit_fin[Nisec];
-
-  if (stat_N == 0)
-    for(int i1 = 0; i1 < Nisec; i1++){
-      stat_time_trip[i1] = .0;
-      stat_time_fit[i1] = .0;
-      stat_time_fit_bra[i1] = .0;
-      stat_time_fit_fin[i1] = .0;
-    }
-
-  double
-  time_trip[Nisec], time_fit[Nisec], time_fit_bra[Nisec], time_fit_fin[Nisec];
-
-  for(int i1 = 0; i1 < Nisec; i1++){
-    time_trip[i1] = .0;
-    time_fit[i1] = .0;
-    time_fit_bra[i1] = .0;
-    time_fit_fin[i1] = .0;
-  }
-
-  static double stat_time_find[ntimers][2][Nisec];
-  if (stat_N == 0)
-    for(int i1 = 0; i1 < Nisec; i1++)
-      for(int i2 = 0; i2 < ntimers; i2++)
-        for(int i3 = 0; i3 < 2; i3++)
-          stat_time_find[i2][i3][i1] = 0.;
-
-  double stat_time_find_all[ntimers][2];
-  for(int i2 = 0; i2 < ntimers; i2++)
-    for(int i3 = 0; i3 < 2; i3++)
-      stat_time_find_all[i2][i3] = 0.;
-
-
-  double time_find[ntimers][2][Nisec];
-  for(int i1 = 0; i1 < Nisec; i1++)
-    for(int i2 = 0; i2 < ntimers; i2++)
-      for(int i3 = 0; i3 < 2; i3++)
-        time_find[i2][i3][i1] = 0.;
-
-  TStopwatch c_time_find[ntimers][2];
-
+  TStopwatch c_timerG; // global
+  TStopwatch c_timerI; // for iterations
+  
+  L1CATFIterTimerInfo gti; // global
+  gti.Add("init  ");
+  gti.Add("iterts");
+  gti.Add("merge ");
+  
+  L1CATFTimerInfo ti;
+  ti.SetNIter( fNFindIterations ); // for iterations
+  ti.Add("snglts");
+  ti.Add("dbltes");
+  ti.Add("tripls");
+  ti.Add("cpTrls"); 
+  ti.Add("nghbrs"); 
+  ti.Add("tracks"); 
+  ti.Add("finish");
+  
+  static L1CATFIterTimerInfo stat_gti = gti;
+  static L1CATFTimerInfo stat_ti = ti;
+  
 
 #endif
 
 
-  TStopwatch c_time;  // all CATrackFinder work time
   c_time.Start();
 
 #ifdef XXX
-    c_time_find[0][0].Start();
+    c_timerG.Start();
 #endif
 
   vTracks.clear();
@@ -1494,9 +1472,9 @@ void L1Algo::CATrackFinder()
 
   
 #ifdef XXX
-  c_time_find[0][0].Stop();
-  time_find[0][0][0] += double(c_time_find[0][0].CpuTime()); //ms
-  time_find[0][1][0] += double(c_time_find[0][0].RealTime()); //ms
+  c_timerG.Stop();
+  gti["init  "] = c_timerG;
+  c_timerG.Start(1);
 #endif
 
   
@@ -1509,15 +1487,16 @@ void L1Algo::CATrackFinder()
   for (isec = 0; isec < fNFindIterations; isec++){ // all finder
 #ifdef XXX
 //     cout << " Begin of iteration " << isec << endl;
-    TStopwatch c_time_trip;  // time for find all triplets
+     TStopwatch c_timer;
 #endif
     
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
-    Pick_gather = 3.0; // coefficient for size of region for attach new hits to the created track
     if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ){ // it's hard to estimate errors correctly for slow tracks & w\o target!
       Pick_m =  3.0;
     }
+
+    Pick_gather = 3.0; // coefficient for size of region for attach new hits to the created track
     if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
       Pick_gather = 4.0;
 
@@ -1665,13 +1644,15 @@ void L1Algo::CATrackFinder()
 
       ///   CREATE doublets
 
-#ifdef XXX
-    cout << "CREATE doublets" << endl;
-#endif
+// #ifdef XXX
+//     cout << "CREATE doublets" << endl;
+// #endif
 
 
 #ifdef XXX
-    c_time_find[1][0].Start();
+    c_timer.Stop();
+    ti[isec]["snglts"] = c_timer;
+    c_timer.Start(1);
 #endif
 
 #ifdef TBB
@@ -1757,9 +1738,8 @@ void L1Algo::CATrackFinder()
 #endif // TBB
 
 #ifdef XXX
-        c_time_find[1][0].Stop();
-        time_find[1][0][isec] += double(c_time_find[1][0].CpuTime()); //ms
-        time_find[1][1][isec] += double(c_time_find[1][0].RealTime()); //ms
+        c_timer.Stop();
+        ti[isec]["dbltes"] = c_timer;
 #endif
 
 #ifdef XXX
@@ -1788,14 +1768,14 @@ void L1Algo::CATrackFinder()
 
       ///   CREATE triplets
 
-#ifdef XXX
-    cout << " CREATE TRIPLETS " << endl;
-#endif
+// #ifdef XXX
+//     cout << " CREATE TRIPLETS " << endl;
+// #endif
 
 
 
 #ifdef XXX
-    c_time_find[1][0].Start();
+    c_timer.Start(1);
 #endif
 
 #ifdef TBB
@@ -1887,9 +1867,8 @@ void L1Algo::CATrackFinder()
     }
 #endif // TBB
 #ifdef XXX
-        c_time_find[1][0].Stop();
-        time_find[2][0][isec] += double(c_time_find[1][0].CpuTime()); //ms
-        time_find[2][1][isec] += double(c_time_find[1][0].RealTime()); //ms
+        c_timer.Stop();
+        ti[isec]["tripls"] = c_timer;
 #endif
 
 // #ifdef XXX
@@ -1898,11 +1877,11 @@ void L1Algo::CATrackFinder()
 // #endif
 
           /// save triplets in vTriplets
+// #ifdef XXX
+//     cout << " copy triplets in vTriplets " << endl;
+// #endif
 #ifdef XXX
-    cout << " copy triplets in vTriplets " << endl;
-#endif
-#ifdef XXX
-    c_time_find[2][0].Start();
+    c_timer.Start(1);
 #endif
 
     vTriplets.clear();
@@ -1944,56 +1923,55 @@ void L1Algo::CATrackFinder()
 //     }
 // #endif
 
+// #ifdef XXX
+//     { // calculate occupied memory size // TODO
+
+// //       int sizeD, sizeN, sizeT, sizeF, sizeH, sizeTrip;
+// //       sizeD = sizeof(THitI)*MaxArrSize*MaxNStations*2; // Duplets_*,
+// //       sizeN = sizeof(int)*MaxNPortion*2; // n_g*
+// //       sizeT = sizeof(L1TrackPar)*MaxNPortion*Portion/fvecLen; // T_g1
+// //       sizeF = sizeof(L1FieldRegion)*MaxNPortion*Portion/fvecLen; // fld_g1
+// //       sizeH = sizeof(THitI)*MaxNPortion*(Portion + MaxPortionDoublets*2); // hitsl_g1, hitsm_g2,i1_g2
+// //       sizeTrip = sizeof(L1Triplet)*vTriplets.size();
+
+//       int sizeD2 = 0, sizeN2, sizeT2, sizeF2, sizeH2, sizeTrip2;
+//       int ndoublets = 0;
+//       for(int i = 0; i < NStations; i++){
+//         sizeD2 += Duplets_hits[i].size();
+//         sizeD2 += Duplets_start[i].size();
+//         ndoublets += Duplets_hits[i].size();
+//         sizeD2*=sizeof(THitI);
+//       }
+
+//       cout << "number of doublets: " << ndoublets << endl;
+//       cout << "number of triplets: " << vTriplets.size() << endl;
+// /*
+//       sizeN2 = ( n_g1.size() + n_g2.size() )*sizeof(int);
+//       sizeT2 = T_g1.CalcSize();
+//       sizeF2 = fld_g1.CalcSize();
+//       sizeH2 = ( hitsl_g1.CalcSize() + hitsm_g2.CalcSize() + i1_g2.CalcSize());
+
+//       cout << sizeD/1000 << " D " << sizeD2/1000 << " [1000elem]" << endl;
+//       cout << sizeN/1000 << " N " << sizeN2/1000 << " [1000elem]" << endl;
+//       cout << sizeT/1000 << " T " << sizeT2/1000 << " [1000elem]" << endl;
+//       cout << sizeF/1000 << " F " << sizeF2/1000 << " [1000elem]" << endl;
+//       cout << sizeH/1000 << " H " << sizeH2/1000 << " [1000elem]" << endl;
+
+//       long int size = sizeD2 + sizeN2 + sizeT2+ sizeF2 + sizeH2 + sizeTrip;
+//       cout << "Size: " << size/1000 << " KB" << endl;*/
+//     }
+// #endif
 #ifdef XXX
-    { // calculate occupied memory size
-
-//       int sizeD, sizeN, sizeT, sizeF, sizeH, sizeTrip;
-//       sizeD = sizeof(THitI)*MaxArrSize*MaxNStations*2; // Duplets_*,
-//       sizeN = sizeof(int)*MaxNPortion*2; // n_g*
-//       sizeT = sizeof(L1TrackPar)*MaxNPortion*Portion/fvecLen; // T_g1
-//       sizeF = sizeof(L1FieldRegion)*MaxNPortion*Portion/fvecLen; // fld_g1
-//       sizeH = sizeof(THitI)*MaxNPortion*(Portion + MaxPortionDoublets*2); // hitsl_g1, hitsm_g2,i1_g2
-//       sizeTrip = sizeof(L1Triplet)*vTriplets.size();
-
-      int sizeD2 = 0, sizeN2, sizeT2, sizeF2, sizeH2, sizeTrip2;
-      int ndoublets = 0;
-      for(int i = 0; i < NStations; i++){
-        sizeD2 += Duplets_hits[i].size();
-        sizeD2 += Duplets_start[i].size();
-        ndoublets += Duplets_hits[i].size();
-        sizeD2*=sizeof(THitI);
-      }
-
-      cout << "number of doublets: " << ndoublets << endl;
-      cout << "number of triplets: " << vTriplets.size() << endl;
-/*
-      sizeN2 = ( n_g1.size() + n_g2.size() )*sizeof(int);
-      sizeT2 = T_g1.CalcSize();
-      sizeF2 = fld_g1.CalcSize();
-      sizeH2 = ( hitsl_g1.CalcSize() + hitsm_g2.CalcSize() + i1_g2.CalcSize());
-
-      cout << sizeD/1000 << " D " << sizeD2/1000 << " [1000elem]" << endl;
-      cout << sizeN/1000 << " N " << sizeN2/1000 << " [1000elem]" << endl;
-      cout << sizeT/1000 << " T " << sizeT2/1000 << " [1000elem]" << endl;
-      cout << sizeF/1000 << " F " << sizeF2/1000 << " [1000elem]" << endl;
-      cout << sizeH/1000 << " H " << sizeH2/1000 << " [1000elem]" << endl;
-
-      long int size = sizeD2 + sizeN2 + sizeT2+ sizeF2 + sizeH2 + sizeTrip;
-      cout << "Size: " << size/1000 << " KB" << endl;*/
-    }
-#endif
-
-#ifdef XXX
-    c_time_find[2][0].Stop();
-    time_find[2][0][isec] += double(c_time_find[2][0].CpuTime()); //ms
+    c_timer.Stop();
+    ti[isec]["cpTrls"] = c_timer;
 #endif
 
           /// Find neighbours of triplets.
+// #ifdef XXX
+//     cout << " Find neighbours of triplets. " << endl;
+// #endif
 #ifdef XXX
-    cout << " Find neighbours of triplets. " << endl;
-#endif
-#ifdef XXX
-    c_time_find[4][0].Start();
+    c_timer.Start(1);
 #endif
 
     int nlevels[NStations];  // number of triplets with some number of neighbours.
@@ -2004,16 +1982,11 @@ void L1Algo::CATrackFinder()
         TripStartIndexH, TripStopIndexH,
         nlevels
       );
-
 #ifdef XXX
-    c_time_find[4][0].Stop();
-    time_find[4][0][isec] += double(c_time_find[4][0].CpuTime()); //ms
+    c_timer.Stop();
+    ti[isec]["nghbrs"] = c_timer;
 #endif
 
-#ifdef XXX
-    c_time_trip.Stop();
-    time_trip[isec] += double(c_time_trip.CpuTime()); //ms
-#endif
 
     ///====================================================================
     ///=                                                                  =
@@ -2021,11 +1994,11 @@ void L1Algo::CATrackFinder()
     ///=                                                                  =
     ///====================================================================
 
+// #ifdef XXX
+//     cout<<"---- Collect track candidates. ----"<<endl;
+// #endif
 #ifdef XXX
-    cout<<"---- Collect track candidates. ----"<<endl;
-#endif
-#ifdef XXX
-    TStopwatch c_time_fit;
+    c_timer.Start(1);
 #endif
     int min_level = 0; // min level for start triplet. So min track length = min_level+3.
 //    if (isec == kFastPrimJumpIter) min_level = 1;
@@ -2034,9 +2007,6 @@ void L1Algo::CATrackFinder()
 
       // collect consequtive: the longest tracks, shorter, more shorter and so on
     for (int ilev = NStations-3; ilev >= min_level; ilev--){ // choose length
-#ifdef XXX
-      TStopwatch c_time_fit_bra;
-#endif
       vector<L1Branch> vtrackcandidate; vtrackcandidate.clear();
 
         //  how many levels to check
@@ -2123,14 +2093,7 @@ void L1Algo::CATrackFinder()
       // cout << " total number of track candidates " << vtrackcandidate.size() <<endl;
 
       if (--nlevel == 0) break;
-#ifdef XXX
-      c_time_fit_bra.Stop();
-      time_fit_bra[isec] += double(c_time_fit_bra.CpuTime());
-#endif
         // -- make competition between tracks of the same length --
-#ifdef XXX
-      TStopwatch c_time_fit_fin;
-#endif
         // sort track candidates
       vector<L1Branch*> vptrackcandidate;  // vptrackcandidate - array of pointers to vtrackcandidate
       vptrackcandidate.clear();
@@ -2200,9 +2163,6 @@ void L1Algo::CATrackFinder()
 
 //       for (int iu = 0; iu < 10; iu++) cout << iu+1 << " " << nUsed[iu] << endl;
 #ifdef XXX
-      c_time_fit_fin.Stop();
-      time_fit_fin[isec] += double(c_time_fit_fin.CpuTime());
-
       unsigned int Bsize=0, nb=0;
       for (vector<L1Branch*>::iterator   trIt = vptrackcandidate.begin();
                                          trIt != vptrackcandidate.end(); ++trIt){
@@ -2217,11 +2177,16 @@ void L1Algo::CATrackFinder()
 
       //cout<< " track candidates stored: "<< ntracks <<endl;
     } //ilev
-
-      // renew hits array
+      
 #ifdef XXX
-    cout << " renew hits arrays " << endl;
+    c_timer.Stop();
+    ti[isec]["tracks"] = c_timer;
+    c_timer.Start(1);
 #endif
+      // renew hits array
+// #ifdef XXX
+//     cout << " renew hits arrays " << endl;
+// #endif
 
     int StsHitsUnusedStartIndex_temp;
     int ista = 0;
@@ -2258,8 +2223,8 @@ void L1Algo::CATrackFinder()
 
 //     cout<<"End of collecting track candidates "<<endl;
 #ifdef XXX
-    c_time_fit.Stop();
-    time_fit[isec] += double(c_time_fit.CpuTime());
+    c_timer.Stop();
+    ti[isec]["finish"] = c_timer;
 #endif
 #ifdef XXX
 //     if( stat_max_n_trip<stat_n_trip ) stat_max_n_trip = vTriplets.size();
@@ -2281,8 +2246,18 @@ void L1Algo::CATrackFinder()
     
   } // for (int isec
 
+#ifdef XXX
+  c_timerG.Stop();
+  gti["iterts"] = c_timerG;
+  c_timerG.Start(1);
+#endif
+    
   CAMergeClones();
-
+  
+#ifdef XXX
+  c_timerG.Stop();
+  gti["merge "] = c_timerG;
+#endif
 
   //cout<< "Total number of tracks found " << vTracks.size() <<endl;
 
@@ -2291,83 +2266,23 @@ void L1Algo::CATrackFinder()
   c_time.Stop();
 
 //   cout << "End TrackFinder" << endl;
-  CATime = (double(c_time.CpuTime()));
-
+//  CATime = (double(c_time.CpuTime()));
+  CATime = (double(c_time.RealTime()));
 
 #ifdef XXX
-  double CATimeReal = (double(c_time.RealTime()));
-  /*
-  cout<<"CA Track Finder: " << (double(c_time.CpuTime()))
-      <<" (" << time_trip <<" ["
-      << time_find[1][0] << "/"<< time_find[1][1]<< "+"
-      << time_find[1][0] << "/"<< time_find[1][1]<< "+"
-      << time_find[2][0] << "/"<< time_find[2][1]<< "+"
-      << time_find[4][0] << "+"
-      << time_find[4][0] << "+"
-      << "]"
-      << " + " << time_fit <<" [" << time_fit_bra << "/" << time_fit_fin << "]"
-      << " ) s/ev"<<endl;
-  */
   stat_N++;
-  stat_time     += CATime;
-  stat_time_real += CATimeReal;
 
+  cout << endl << " --- Timers, ms --- " << endl;
+  ti.Calc();
+  stat_ti += ti;
+  L1CATFTimerInfo tmp_ti = stat_ti/0.001/stat_N; // ms
+  
+  tmp_ti.PrintReal();
+  stat_gti += gti;
+  L1CATFIterTimerInfo tmp_gti = stat_gti/0.001/stat_N; // ms
+  tmp_gti.PrintReal( 1 );
 
-  cout.precision(3);
-  cout<<"CA stat time: " << (stat_time/stat_N) << "/" << stat_time_real/stat_N << "(k=" << stat_time/stat_time_real <<") s/ev"<<endl;
-
-  for (int isec2 = 0; isec2 < Nisec; isec2++){
-    stat_time_trip[isec2] += time_trip[isec2];
-
-    for (int i1 = 0; i1 < ntimers; i1++)
-      for (int i2 = 0; i2 < 2; i2++)
-        stat_time_find[i1][i2][isec] += time_find[i1][i2][isec];
-
-    stat_time_fit[isec] += time_fit[isec];
-    stat_time_fit_bra[isec] += time_fit_bra[isec];
-    stat_time_fit_fin[isec] += time_fit_fin[isec];
-
-
-
-  cout  << isec << " isec :   "
-        <<" (" << stat_time_trip[isec]/stat_N <<" ["
-          << stat_time_find[1][0][isec]/stat_N  <<"/" << stat_time_find[1][1][isec]/stat_N
-          <<  "(k=" << stat_time_find[1][0][isec]/stat_time_find[1][1][isec] <<")+"
-          << stat_time_find[2][0][isec]/stat_N  <<"/" << stat_time_find[2][1][isec]/stat_N
-          <<  "(k=" << stat_time_find[1][0][isec]/stat_time_find[1][1][isec] <<")+"
-          << stat_time_find[2][0][isec]/stat_N  <<"/" << stat_time_find[2][1][isec]/stat_N <<" + "
-          << stat_time_find[3][0][isec]/stat_N <<" + "
-          << stat_time_find[4][0][isec]/stat_N
-          << "]"
-        << " + " << stat_time_fit[isec]/stat_N
-          <<" [" << stat_time_fit_bra[isec]/stat_N << "\\" << stat_time_fit_fin[isec]/stat_N << "]"
-        << ") s/ev"<<endl;
-
-  stat_time_find_all[1][0] += stat_time_find[1][0][isec];
-  stat_time_find_all[1][1] += stat_time_find[1][1][isec];
-  stat_time_find_all[2][0] += stat_time_find[2][0][isec];
-  stat_time_find_all[2][1] += stat_time_find[2][1][isec];
-  stat_time_find_all[3][0] += stat_time_find[3][0][isec];
-  stat_time_find_all[3][1] += stat_time_find[4][0][isec];
-  stat_time_find_all[4][0] += stat_time_fit[isec];
-  } // isec
-
-  for(int i2 = 0; i2 < ntimers; i2++)
-    for(int i3 = 0; i3 < 2; i3++)
-      stat_time_find_all[i2][i3] /= stat_N;
-
-  cout  << "all :   "
-        << stat_time_find[0][0] << "+"
-        <<" (" << "  ["
-          << stat_time_find_all[1][0]  <<"/" <<   stat_time_find_all[1][1] << "(k=" << stat_time_find_all[1][0]/stat_time_find_all[1][1] <<")+"
-          << stat_time_find_all[2][0]  <<"/" <<   stat_time_find_all[2][1] << "(k=" << stat_time_find_all[2][0]/stat_time_find_all[2][1] <<")+"
-          << stat_time_find_all[3][0]  <<"+"
-          << stat_time_find_all[3][1]
-          << "]"
-        << " + " << stat_time_find_all[4][0]
-        << ") s/ev"<<endl;
-
-
+#if 0
   static long int NTimes =0, NHits=0, HitSize =0, NStrips=0, StripSize =0, NStripsB=0, StripSizeB =0,
     NDup=0, DupSize=0, NTrip=0, TripSize=0, NBranches=0, BranchSize=0, NTracks=0, TrackSize=0 ;
 
@@ -2400,7 +2315,7 @@ void L1Algo::CATrackFinder()
   cout<<" L1 total event size = "
       <<( HitSize + StripSize +  StripSizeB + DupSize + TripSize + BranchSize + TrackSize )/k
       <<" Kb"<<endl;
-
+#endif // 0
   //cout << "===> ... CA Track Finder    " << endl << endl;
 #endif
 

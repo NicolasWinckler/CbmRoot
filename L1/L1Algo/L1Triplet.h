@@ -26,7 +26,6 @@ class L1Triplet
   
   void Set( unsigned int iHitL, unsigned int iHitM, unsigned int iHitR,
             unsigned int iStaL, unsigned int iStaM, unsigned int iStaR,
-	    unsigned int iFirstNeighbour, unsigned int NNeighbours, // TODO rid of it
 	    unsigned char Level, unsigned char  Qp, 
 	    float Chi2  
 	    ){ 

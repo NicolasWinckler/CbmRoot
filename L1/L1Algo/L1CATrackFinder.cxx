@@ -91,8 +91,7 @@ inline void L1Algo::f11(  // input
                   // output
 //                 L1TrackPar *T_1,
                 nsL1::vector<L1TrackPar>::TSimd &T_1,
-                nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
+                nsL1::vector<L1FieldRegion>::TSimd &fld_1
                )
 {
   L1Station &stal = vStations[istal];
@@ -221,15 +220,6 @@ inline void L1Algo::f11(  // input
      L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
 //     L1Extrapolate( T, zstam, T.qp, fld1 );
 
-      // find region on next station to find middle hit
-//     fvec dxm_est = Pick_m*sqrt(fabs(T.C00+stam.XYInfo.C00));
-//     fvec dym_est = Pick_m*sqrt(fabs(T.C11+stam.XYInfo.C11));
-// 
-//     x_minusV[i1_V] = T.x - dxm_est;
-//     x_plusV [i1_V] = T.x + dxm_est;
-//     y_minusV[i1_V] = T.y - dym_est;
-//     y_plusV [i1_V] = T.y + dym_est;
-
     T_1.push_back(T);
   }// i1_V
 }
@@ -237,12 +227,10 @@ inline void L1Algo::f11(  // input
 
           /// Find the doublets. Reformat data in the portion of doublets.
 inline void L1Algo::f20(  // input
-                int n1, L1Station &stal, L1Station &stam,
+                int n1, L1Station &stam,
                 L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,
-                fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,
-                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                nsL1::vector<L1TrackPar>::TSimd &T_1, 
                 vector<THitI> &hitsl_1,
-                map<unsigned /*short*/ int, THitI> &mrDuplets_start,
                   // output
                 int &n2,
                 vector<THitI> &i1_2,
@@ -371,13 +359,12 @@ inline void L1Algo::f20(  // input
           /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets(right hit). Reformat data in the portion of triplets.
 inline void L1Algo::f30(  // input
-                L1HitPoint *vStsHits_r, int NHits_r, L1Station &stam, L1Station &star,
+                L1HitPoint *vStsHits_r, L1Station &stam, L1Station &star,
 
-                int istam, int istar, int n1,
+                int istam, int istar,
                 L1HitPoint *vStsHits_m,
                 nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,
-                map<unsigned /*short*/ int, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits,
 
                 int n2,
                 vector<THitI> &hitsm_2,
@@ -803,7 +790,6 @@ inline void L1Algo::f4(  // input
     L1Triplet trip;
     trip.Set( ihitl, ihitm, ihitr,
               istal, istam, istar,
-              0, 0,
               0, static_cast<unsigned char>( qp ), chi2);   // 1.2/1000 sec
     
     trip.Cqp   = static_cast<unsigned char>( Cqp );
@@ -868,9 +854,6 @@ inline void L1Algo::f5(  // input
         L1_ASSERT( ihitm < StsHitsUnusedStopIndex[istam], ihitm << " < " << StsHitsUnusedStopIndex[istam] );
         L1_ASSERT( ihitr < StsHitsUnusedStopIndex[istar], ihitr << " < " << StsHitsUnusedStopIndex[istar] );
 
-        THitI first_neighbour = 0;
-        THitI end_neighbour   = 0;
-
           // neighbours should have 2 common hits
         unsigned int first_triplet;
         unsigned int last_triplet;
@@ -927,7 +910,6 @@ inline void L1Algo::f5(  // input
           // save information
         trip->Set( ihitl, ihitm, ihitr,
         istal, istam, istar,
-        first_neighbour, end_neighbour - first_neighbour,
         level, qp, chi2 );
 
         nlevel[level]++;
@@ -956,13 +938,10 @@ inline void L1Algo::DupletsStaPort(  // input
 
                       )
 {
-      L1Station &stal = vStations[istal];
       L1Station &stam = vStations[istam];
 
             // prepare data
-      map<THitI, THitI>
-      &mrDuplets_start = Duplets_start[istam],// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
-      &lmDuplets_start = Duplets_start[istal];// lmDuplets_start -
+      map<THitI, THitI> &lmDuplets_start = Duplets_start[istal];// lmDuplets_start -
       vector<THitI>
 //       &mrDuplets_hits = Duplets_hits[istam], // mrDuplets_hits - right hits of middle-right doublets
       &lmDuplets_hits = Duplets_hits[istal]; // lmDuplets_hits - same for left-middle doublets
@@ -1018,8 +997,7 @@ inline void L1Algo::DupletsStaPort(  // input
 
             u_front, u_back, zPos,
               // output
-            T_1, fld_1,
-            x_minusV_1, x_plusV_1, y_minusV_1, y_plusV_1
+            T_1, fld_1
           );
 
           /// Find the doublets. Reformat data in the portion of doublets.
@@ -1044,12 +1022,10 @@ inline void L1Algo::DupletsStaPort(  // input
 
 
         f20(  // input
-            n1, stal, stam,
+            n1, stam,
             vStsHits_l, vStsHits_m, NHits_m,
-            y_minus, x_minus, y_plus, x_plus,
-            T_1, fld_1,
+            T_1, 
             hitsl_1,
-            mrDuplets_start,
               // output
             n2,
             i1_2,
@@ -1119,7 +1095,6 @@ inline void L1Algo::DupletsStaPort(  // input
 inline void L1Algo::TripletsStaPort(  // input
                             int istal, int istam, int istar,
 
-                            vector<int> &n_g1,
                             L1Portion<L1TrackPar> &T_g1,
                             L1Portion<L1FieldRegion> &fld_g1,
                             L1Portion<THitI> &hitsl_g1,
@@ -1128,7 +1103,6 @@ inline void L1Algo::TripletsStaPort(  // input
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
                             
-                            map<unsigned /*short*/ int,THitI> *Duplets1_start, vector<THitI>  *Duplets1_hits,
                             map<unsigned /*short*/ int,THitI> *Duplets2_start, vector<THitI>  *Duplets2_hits,
                             
                               // output
@@ -1139,11 +1113,9 @@ inline void L1Algo::TripletsStaPort(  // input
 
         // prepare data
       map<unsigned /*short*/ int, THitI>
-      &mrDuplets_start = Duplets2_start[istam],// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
-      &lmDuplets_start = Duplets1_start[istal];// lmDuplets_start -
+        &mrDuplets_start = Duplets2_start[istam];// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
       vector<THitI>
-      &mrDuplets_hits = Duplets2_hits[istam], // mrDuplets_hits - right hits of middle-right doublets
-      &lmDuplets_hits = Duplets1_hits[istal]; // lmDuplets_hits - same for left-middle doublets
+        &mrDuplets_hits = Duplets2_hits[istam]; // mrDuplets_hits - right hits of middle-right doublets
       
       L1Station &stam = vStations[istam];
       L1Station &star = vStations[istar];
@@ -1167,8 +1139,6 @@ inline void L1Algo::TripletsStaPort(  // input
         nsL1::vector<L1TrackPar>::TSimd &T_1 = T_g1[ip];
         nsL1::vector<L1FieldRegion>::TSimd &fld_1 = fld_g1[ip];
         vector<THitI> &hitsl_1 = hitsl_g1[ip];
-
-        int n1 = n_g1[ip];
 
         vector<THitI> &hitsm_2 = hitsm_g2[ip];
 
@@ -1196,13 +1166,12 @@ inline void L1Algo::TripletsStaPort(  // input
           /// Find the triplets(right hit). Reformat data in the portion of triplets.
 
         f30(  // input
-            vStsHits_r, NHits_r, stam, star,
+            vStsHits_r, stam, star,
 
-            istam, istar, n1,
+            istam, istar,
             vStsHits_m,
             T_1, fld_1,
             hitsl_1,
-            lmDuplets_start, lmDuplets_hits,
 
             n2,
             hitsm_2,
@@ -1828,7 +1797,6 @@ void L1Algo::CATrackFinder()
       TripletsStaPort(  // input
         istal, istal + 1,  istal + 2,
 
-        n_g1,
         T_g1,
         fld_g1,
         hitsl_g1,
@@ -1837,7 +1805,6 @@ void L1Algo::CATrackFinder()
         i1_g2,
         hitsm_g2,
 
-        Duplets_start, Duplets_hits,
         Duplets_start, Duplets_hits,
           // output
         vTriplets_part,
@@ -1855,7 +1822,6 @@ void L1Algo::CATrackFinder()
         TripletsStaPort(  // input
           istal, istal + 1,  istal + 3,
 
-          n_g1,
           T_g1,
           fld_g1,
           hitsl_g1,
@@ -1864,7 +1830,6 @@ void L1Algo::CATrackFinder()
           i1_g2,
           hitsm_g2,
 
-          Duplets_start, Duplets_hits,
           DupletsG_start, DupletsG_hits,
             // output
           vTripletsG124_part,
@@ -1881,7 +1846,6 @@ void L1Algo::CATrackFinder()
         TripletsStaPort(  // input
           istal, istal + 2,  istal + 3,
 
-          n_g1,
           TG_g1,
           fldG_g1,
           hitslG_g1,
@@ -1890,7 +1854,6 @@ void L1Algo::CATrackFinder()
           i1G_g2,
           hitsmG_g2,
 
-          DupletsG_start, DupletsG_hits,
           Duplets_start, Duplets_hits,
             // output
           vTripletsG134_part,
@@ -2011,7 +1974,7 @@ void L1Algo::CATrackFinder()
     c_timer.Start(1);
 #endif
 
-    int nlevels[NStations];  // number of triplets with some number of neighbours.
+    int nlevels[MaxNStations];  // number of triplets with some number of neighbours.
     for (int il = 0; il < NStations; ++il) nlevels[il] = 0;
 
      f5(   // input

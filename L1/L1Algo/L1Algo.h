@@ -211,18 +211,15 @@ class L1Algo{
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
                   // output
-                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
+                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1
                );
   
           /// Find the doublets. Reformat data in the portion of doublets.
   void f20(  // input
-                int n1, L1Station &stal, L1Station &stam,
-                L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,
-                fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,                
-                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                int n1, L1Station &stam,
+                L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,          
+                nsL1::vector<L1TrackPar>::TSimd &T_1,
                 vector<THitI> &hitsl_1,
-                map<THitI, THitI> &mrDuplets_start,
                   // output
                 int &n2,
                 vector<THitI> &i1_2,
@@ -237,14 +234,13 @@ class L1Algo{
           /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets (right hit). Reformat data in the portion of triplets.
   void f30(  // input
-                L1HitPoint *vStsHits_r, int NHits_r, L1Station &stam, L1Station &star,
+                L1HitPoint *vStsHits_r, L1Station &stam, L1Station &star,
                 
-                int istam, int istar, int n1,
+                int istam, int istar,
                 L1HitPoint *vStsHits_m,
                 nsL1::vector<L1TrackPar>::TSimd &T_1,nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,
-                map<THitI, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits,
-
+ 
                 int n2,
                 vector<THitI> &hitsm_2,
                 vector<THitI> &i1_2,
@@ -317,7 +313,6 @@ class L1Algo{
   void TripletsStaPort(  // input
                             int istal, int istam, int istar,
 
-                            vector<int> &n_g1,
                             L1Portion<L1TrackPar> &T_g1,
                             L1Portion<L1FieldRegion> &fld_g1,
                             L1Portion<THitI> &hitsl_g1,
@@ -326,7 +321,6 @@ class L1Algo{
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
                               
-                            map<unsigned /*short*/ int,THitI> *Duplets1_start, vector<THitI>  *Duplets1_hits,
                             map<unsigned /*short*/ int,THitI> *Duplets2_start, vector<THitI>  *Duplets2_hits,
                             
                               // output

@@ -136,15 +136,15 @@ void L1Algo::SetData( const vector< L1StsHit >      & StsHits_,
   vSFlag.resize(SFlag_.size());
   vSFlagB.resize(SFlagB_.size());
   
-  for(int i=0; i<StsHits_.size(); ++i ) vStsHits[i] = StsHits_[i];
-  for(int i=0; i<StsStrips_.size(); ++i ) vStsStrips[i] = StsStrips_[i];
-  for(int i=0; i<StsStripsB_.size(); ++i ) vStsStripsB[i] = StsStripsB_[i];
-  for(int i=0; i<StsZPos_.size(); ++i ) vStsZPos[i] = StsZPos_[i];
-  for(int i=0; i<SFlag_.size(); ++i ) vSFlag[i] = SFlag_[i];
-  for(int i=0; i<SFlagB_.size(); ++i ) vSFlagB[i] = SFlagB_[i];
+  for(unsigned int i=0; i<StsHits_.size(); ++i ) vStsHits[i] = StsHits_[i];
+  for(unsigned int i=0; i<StsStrips_.size(); ++i ) vStsStrips[i] = StsStrips_[i];
+  for(unsigned int i=0; i<StsStripsB_.size(); ++i ) vStsStripsB[i] = StsStripsB_[i];
+  for(unsigned int i=0; i<StsZPos_.size(); ++i ) vStsZPos[i] = StsZPos_[i];
+  for(unsigned int i=0; i<SFlag_.size(); ++i ) vSFlag[i] = SFlag_[i];
+  for(unsigned int i=0; i<SFlagB_.size(); ++i ) vSFlagB[i] = SFlagB_[i];
 
-  for(int i=0; i<MaxNStations+1; ++i) StsHitsStartIndex[i] = StsHitsStartIndex_[i];
-  for(int i=0; i<MaxNStations+1; ++i) StsHitsStopIndex[i]  = StsHitsStopIndex_[i];
+  for(unsigned int i=0; i<MaxNStations+1; ++i) StsHitsStartIndex[i] = StsHitsStartIndex_[i];
+  for(unsigned int i=0; i<MaxNStations+1; ++i) StsHitsStopIndex[i]  = StsHitsStopIndex_[i];
 }
 #endif
 

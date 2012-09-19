@@ -314,7 +314,7 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         t.CLast[12] = T.C42[0];
         t.CLast[13] = T.C43[0];
         t.CLast[14] = T.C44[0];
-
+ 
         t.chi2 += T.chi2[0];
         t.NDF += static_cast<int>( T.NDF[0] );
       }
@@ -557,8 +557,7 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
   L1FieldValue fB0, fB1, fB2 _fvecalignment;
   L1FieldRegion fld _fvecalignment;
 
-//  static int nHits = NStations;
-  const int nHits = NStations;
+  const int nHits = MaxNStations;
   int iVec=0, i=0;
   int nTracks_SIMD = fvecLen;
   L1TrackPar T; // fitting parametr coresponding to current track
@@ -860,9 +859,9 @@ void L1Algo::FilterLast( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station 
 
 void L1Algo::Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec &u , fvec &w)
 {
-  register fvec wi, zeta, zetawi, HCH;
-  register fvec F0, F1, F2, F3, F4;
-  register fvec K1, K2, K3, K4;
+  fvec wi, zeta, zetawi, HCH;
+  fvec F0, F1, F2, F3, F4;
+  fvec K1, K2, K3, K4;
 
   zeta = info.cos_phi*T.x + info.sin_phi*T.y - u;
 

@@ -27,6 +27,8 @@
 
 #include "L1Portion.h"
 
+#include "L1HitsSortHelper.h"
+
 #include "L1Timer.h"
 
 #ifdef DRAW
@@ -262,7 +264,7 @@ inline void L1Algo::f20(  // input
 
     THitI nl = vStsHits_l[hitsl_1[i1]].n;
       // -- find first possible hit for next singlet --
-    for (; start_mhit < NHits_m; start_mhit++){      // 1.0/1000 sec
+    for (; start_mhit < NHits_m; start_mhit++){      // binar finding has no sense
       L1HitPoint &hitm = vStsHits_m[start_mhit];
 
         // find track position in the hit plane
@@ -271,8 +273,8 @@ inline void L1Algo::f20(  // input
       L1ExtrapolateLine( T1_tmp, zm);
       fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
       fvec y_minus_new_break = T1_tmp.y - dym_est;
-      y_minus_new_break -= 2*0.4*fabs(T1_tmp.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
-
+      y_minus_new_break -= 2*MaxDZ*fabs(T1_tmp.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
+        
         // check position
       fscal ym = hitm.y;
       if ( ym >= y_minus_new_break[i1_4]) break;
@@ -290,13 +292,14 @@ inline void L1Algo::f20(  // input
       fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
       fvec y_minus_new = T1_tmp.y - dym_est;
       fvec y_plus_new = T1_tmp.y + dym_est;
-      fvec y_plus_new_break = y_plus_new + 0.4*fabs(T1_tmp.ty); // take into account overlapping on middle station. dz_max ~ 0.4 cm. dy/dz ~ 1
+      fvec y_plus_new_break = y_plus_new;
+      y_plus_new_break += MaxDZ*fabs(T1_tmp.ty); // take into account overlapping on middle station. dz_max ~ 0.4 cm. dy/dz ~ 1
       
         // check position
       unsigned short int nm = hitm.n;
       fscal ym = hitm.y;
       if ( ym > y_plus_new_break[i1_4] ) break;
-      if ( ( ym < y_minus_new[i1_4]) || ( ym > y_plus_new[i1_4] ) || ( nl != nm)) continue;
+      if ( ( ym < y_minus_new[i1_4]) || ( ym > y_plus_new[i1_4] ) || ( nl != nm) ) continue;
       
       fvec dxm_est = Pick_m * sqrt(fabs(T1_tmp.C00 + stam.XYInfo.C00));
       fvec x_minus_new = T1_tmp.x - dxm_est;
@@ -521,8 +524,8 @@ inline void L1Algo::f30(  // input
       
         // find the biggest possible track error
       L1TrackPar T2_new = T2;
-      L1ExtrapolateLine( T2_new, T2.z + 0.4*fabs(T2.ty) );
-      fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11)) - 0.4*fabs(T2.ty[i2_4]);
+      L1ExtrapolateLine( T2_new, T2.z + MaxDZ*fabs(T2.ty) );
+      fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11)) - MaxDZ*fabs(T2.ty[i2_4]);
       fvec y_minus_new = T2.y - dym_est;
       for( int end = duplet_e; end - start > 2; ){
         int middle = (start + end)/2;
@@ -559,7 +562,7 @@ inline void L1Algo::f30(  // input
       if (yr < y_minus_new[i2_4]) continue;
 
       fvec y_plus_new  = T2_new.y + dym_est;
-      fvec y_plus_new_break = y_plus_new + 0.4*fabs(T2_new.ty); // take into account overlapping on right station. dz_max ~ 0.4 cm. dy/dz ~ 1 TODO read parameter
+      fvec y_plus_new_break = y_plus_new + MaxDZ*fabs(T2_new.ty); // take into account overlapping on right station. dz_max ~ 0.4 cm. dy/dz ~ 1 TODO read parameter
 
       if (yr > y_plus_new_break [i2_4] ) break;
       if (yr > y_plus_new [i2_4] ) continue;
@@ -1475,7 +1478,7 @@ void L1Algo::CATrackFinder()
   vStsHitsUnused_buf->clear();
   vStsHitPointsUnused_buf->clear();
   vector<THitI> RealIHit_v; // index of hit in vStsHits indexed by index of hit in vStsHitsUnused;
-  RealIHit_v.reserve(vStsHits.size());
+  RealIHit_v.resize(vStsHits.size());
   RealIHit = &(RealIHit_v[0]);
 
 
@@ -1514,11 +1517,18 @@ void L1Algo::CATrackFinder()
     // kAllPrimJumpIter,  // primary tracks with gaps. can be dissabled by macro
     // kAllSecIter        // secondary all track 
   for (isec = 0; isec < fNFindIterations; isec++){ // all finder
+      // sort hits by y/z
+    L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex );
+    sh.Sort();
+    
+    
 #ifdef XXX
 //     cout << " Begin of iteration " << isec << endl;
      TStopwatch c_timer;
 #endif
-    
+
+     // --- SET PARAMETERS FOR THE ITERATION ---
+     
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
     if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ){ // it's hard to estimate errors correctly for slow tracks & w\o target!
@@ -1537,9 +1547,10 @@ void L1Algo::CATrackFinder()
     targX = 0; targY = 0; targZ = 0;      //  suppose, what target will be at (0,0,0)
     
     float SigmaTargetX = 0, SigmaTargetY = 0; // target constraint [cm]
-    if ( (isec == kFastPrimIter) || (isec == kFastPrimJumpIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ){ // target
+    if ( (isec == kFastPrimIter) || (isec == kFastPrimIter2) || (isec == kFastPrimJumpIter) ||
+         (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ){ // target
       targB = vtxFieldValue;
-      if (isec ==-1)
+      if ( (isec == kFastPrimIter) || (isec == kAllPrimIter) )
         SigmaTargetX = SigmaTargetY = 0.01; // target
       else
         SigmaTargetX = SigmaTargetY = 0.1;
@@ -1555,7 +1566,15 @@ void L1Algo::CATrackFinder()
     TargetXYInfo.C10 = 0;
     TargetXYInfo.C11 = SigmaTargetY * SigmaTargetY;
 
+      // Set correction in order to take into account overlaping and iff z.
+      // The reason is that low momentum tracks are too curved and goes not from target direction. That's why sort by hit_y/hit_z is not work idealy
+      // If sort by y then it is max diff between same station's modules (~0.4cm)
+    MaxDZ = 0;
+    if (  (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ) MaxDZ = 0.1;
+    if (  (isec == kAllSecIter ) || (isec == kAllSecJumpIter ) ) MaxDZ = 0.1;
 
+
+    
     if (NStations > MaxNStations) cout << " CATrackFinder: Error: Too many Stantions" << endl;
 
     vector<THitI> Duplets_hits[MaxNStations];       // right hits of doublets(left-right)
@@ -2090,7 +2109,7 @@ void L1Algo::CATrackFinder()
 #ifndef FIND_GAPED_TRACKS
           if( /*(isec == kFastPrimIter) ||*/ (isec == kAllPrimIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #else
-          if( (isec == kFastPrimIter) || (isec == kFastPrimJumpIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
+          if( (isec == kFastPrimIter) || (isec == kFastPrimIter2) || (isec == kFastPrimJumpIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #endif
             if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
             if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either

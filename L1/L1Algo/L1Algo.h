@@ -347,12 +347,15 @@ class L1Algo{
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
 #ifdef FIND_GAPED_TRACKS
-  enum { fNFindIterations = 5 }; // TODO investigate kAllPrimJumpIter & kAllSecJumpIter
-  enum { kFastPrimIter = 0, // primary fast tracks
-         kFastPrimJumpIter, // primary fast tracks with jumped triplets
+  enum { fNFindIterations = 4 }; // TODO investigate kAllPrimJumpIter & kAllSecJumpIter
+  enum { kFastPrimIter, // primary fast tracks
          kAllPrimIter,      // primary all tracks
          kAllPrimJumpIter,  // primary tracks with jumped triplets
          kAllSecIter,       // secondary all tracks
+
+         
+         kFastPrimJumpIter, // primary fast tracks with jumped triplets
+         kFastPrimIter2,
          kAllSecJumpIter    // secondary tracks with jumped triplets
   };
 #else
@@ -369,8 +372,10 @@ class L1Algo{
   static const float TRACK_CHI2_CUT = 10.0;  // cut for tracks candidates.
   static const float TRIPLET_CHI2_CUT = 5.0; // cut for selecting triplets before collecting tracks.
 
+  fvec MaxDZ; // correction in order to take into account overlaping and iff z. if sort by y then it is max diff between same station's modules (~0.4cm)
+  
     /// parameters which are different for different iterations. Set in the begin of CAL1TrackFinder
-  float Pick_m, // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
+  fvec Pick_m, // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r, // same for right hits
     Pick_gather; // same for attaching additional hits to track
   float PickNeighbour; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours

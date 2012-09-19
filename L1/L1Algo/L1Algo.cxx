@@ -18,6 +18,8 @@ void L1Algo::Init( const fscal geo[] )
   //vStations.clear();
   NStations = static_cast<int>(geo[ind++]);
   NMvdStations = static_cast<int>(geo[ind++]);
+
+  // cout << "N MVD & STS stations: " << NMvdStations << " " << NStations-NMvdStations << endl;
 #ifndef TBB2
   std::cout<<"L1Algo Input "<<NStations<<" Stations:"<<std::endl;
 #endif // TBB2
@@ -160,7 +162,7 @@ void L1Algo::GetHitCoor(const L1StsHit& _h, fscal &_x, fscal &_y, fscal &_z, con
 }
 
   /// convert strip positions to coordinates
-void L1Algo::StripsToCoor(const fscal &u, const fscal &v, fscal &_x, fscal &_y, const L1Station &sta) // TODO: Actually sta.yInfo.sin_phi is same for all stations, so ...
+void L1Algo::StripsToCoor(const fscal &u, const fscal &v, fscal &_x, fscal &_y, const L1Station &sta) const// TODO: Actually sta.yInfo.sin_phi is same for all stations, so ...
 {
   fvec x,y;
   StripsToCoor(u,v,x,y,sta);
@@ -168,7 +170,7 @@ void L1Algo::StripsToCoor(const fscal &u, const fscal &v, fscal &_x, fscal &_y, 
   _y = y[0];
 }
 
-void L1Algo::StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const L1Station &sta) // TODO: Actually sta.yInfo.sin_phi is same for all stations, so ...
+void L1Algo::StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const L1Station &sta) const// TODO: Actually sta.yInfo.sin_phi is same for all stations, so ...
 {
   // only for same-z
 //   x = u;

@@ -64,7 +64,7 @@ class L1Algo{
 
     TRACK_CHI2_CUT(10.),
     TRIPLET_CHI2_CUT(5.),
-
+    
     Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r(0), // same for right hits
     Pick_gather(0),
@@ -137,24 +137,31 @@ class L1Algo{
  private:
 
         /// =================================  FUNCTIONAL PART  =================================
-    
+
+  const L1FieldValue&  GetVtxFieldValue() const {return vtxFieldValue;}
+  const L1FieldRegion& GetVtxFieldRegion() const {return vtxFieldRegion;}
     /// ----- Hit-point-strips conversion routines ------
 
   void GetHitCoor(const L1StsHit& _h, fscal &_x, fscal &_y, fscal &_z, const L1Station &sta);
-  void StripsToCoor(const fscal &u, const fscal &v, fscal &x, fscal &y, const L1Station &sta); // convert strip positions to coordinates
-  void StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const L1Station &sta);
+  void StripsToCoor(const fscal &u, const fscal &v, fscal &x, fscal &y, const L1Station &sta) const; // convert strip positions to coordinates
+  void StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const L1Station &sta) const;
   L1HitPoint CreateHitPoint(const L1StsHit &hit, char ista); // full the hit point by hit information.
 
   
     /// ----- Subroutines used by L1Algo::CATrackFinder() ------
-  
+    
   void CAFindTrack(int ista,
                    L1Branch& best_tr, unsigned char &best_L, fscal &best_chi2,
                    const L1Triplet* curr_trip,
                    L1Branch &curr_tr, unsigned char &curr_L, fscal &curr_chi2,
                    int &NCalls );
 
-
+  void CleanTriplets(bool isClean = 0
+#ifdef COUNTERS
+                     ,unsigned int* nlevels = 0
+#endif
+    ); // isClean = true - find neighbours only 
+  
     /// Fit track
     /// t - track with hits
     /// T - track params
@@ -230,8 +237,7 @@ class L1Algo{
                 vector<THitI> &hitsm_2,
                 map<THitI, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
                 );
-          
-          /// Add the middle hits to parameters estimation. Propagate to right station.
+           /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets (right hit). Reformat data in the portion of triplets.
   void f30(  // input
                 L1HitPoint *vStsHits_r, L1Station &stam, L1Station &star,
@@ -327,14 +333,11 @@ class L1Algo{
                             vector<L1Triplet> *vTriplets_part,
                             unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
                             );
-
   
     ///  ------ Subroutines used by L1Algo::KFTrackFitter()  ------
   
-  void GuessVec( L1TrackPar &t, fvec *xV, fvec *yV, fvec *zV, fvec *wV, int NHits, fvec *zCur = 0 );
-  void FilterFirst( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
-  void FilterLast( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
-  void Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec &u , fvec &w);
+  void GuessVec( L1TrackPar &t, fvec *xV, fvec *yV, fvec *zV, fvec *Sy, fvec *wV, int NHits, fvec *zCur = 0 );
+  void FilterFirst( L1TrackPar &track,fvec &x, fvec &y, L1Station &st );
   
 #ifdef TBB
   enum { 
@@ -382,9 +385,9 @@ class L1Algo{
   };
 #endif // FIND_GAPED_TRACKS
   
-  const float TRACK_CHI2_CUT;// = 10.0;  // cut for tracks candidates.
-  const float TRIPLET_CHI2_CUT;// = 5.0; // cut for selecting triplets before collecting tracks.
-
+  const float TRACK_CHI2_CUT; // = 10.0;  // cut for tracks candidates. per one DoF
+  const float TRIPLET_CHI2_CUT; // = 5.0; // cut for selecting triplets before collecting tracks.per one DoF
+  
   fvec MaxDZ; // correction in order to take into account overlaping and iff z. if sort by y then it is max diff between same station's modules (~0.4cm)
   
     /// parameters which are different for different iterations. Set in the begin of CAL1TrackFinder
@@ -418,7 +421,7 @@ class L1Algo{
   L1FieldValue  vtxFieldValue _fvecalignment; // field at teh vertex position.
 
   vector <L1Triplet> vTriplets; // container for triplets got in finding
-  int TripStartIndex[MaxNStations+1], TripStopIndex[MaxNStations+1]; // containers for stations bounders in vTriplets
+  int TripStartIndex[MaxNStations-2], TripStopIndex[MaxNStations-2]; // containers for stations bounders in vTriplets. indices are from start to stop-1
 
   int fTrackingLevel, fGhostSuppression; // really doesn't used
   float fMomentumCutOff;// really doesn't used

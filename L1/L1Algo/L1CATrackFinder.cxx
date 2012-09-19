@@ -171,7 +171,7 @@ inline void L1Algo::f11(  // input
     T.C20 = T.C21 = 0;
     T.C30 = T.C31 = T.C32 = 0;
     T.C40 = T.C41 = T.C42 = T.C43 = 0;
-    T.C22 = T.C33 = 10.; T.C44 = MaxInvMom/3.*MaxInvMom/3.;
+    T.C22 = T.C33 = MaxSlope*MaxSlope/9.; T.C44 = MaxInvMom*MaxInvMom/9.; // max = 3*sigma
 
     //add the target
     {
@@ -202,7 +202,7 @@ inline void L1Algo::f11(  // input
     T.C20 = T.C21 = 0;
     T.C30 = T.C31 = T.C32 = 0;
     T.C40 = T.C41 = T.C42 = T.C43 = 0;
-    T.C22 = T.C33 = 10.; T.C44 = MaxInvMom/3.*MaxInvMom/3.;
+    T.C22 = T.C33 = MaxSlope*MaxSlope/9.; T.C44 = MaxInvMom/3.*MaxInvMom/3.;
     
       // extrapolate to left hit
     L1Extrapolate0( T, zl, fld0 );
@@ -256,56 +256,53 @@ inline void L1Algo::f20(  // input
 {
   n2 = 0; // number of doublet
   for (int i1 = 0; i1 < n1; i1++){ // for each singlet
-    int i1_V = i1/fvecLen;
-    int i1_4 = i1%fvecLen;
-    L1TrackPar& T1 = T_1[i1_V];
+    const int i1_V = i1/fvecLen;
+    const int i1_4 = i1%fvecLen;
+    const L1TrackPar& T1 = T_1[i1_V];
 
     lmDuplets_start[hitsl_1[i1]] = nDuplets_lm; // mark begin
 
-    THitI nl = vStsHits_l[hitsl_1[i1]].n;
+    const THitI nl = vStsHits_l[hitsl_1[i1]].n;
       // -- find first possible hit for next singlet --
-    for (; start_mhit < NHits_m; start_mhit++){      // binar finding has no sense
-      L1HitPoint &hitm = vStsHits_m[start_mhit];
+    for (; start_mhit < NHits_m; start_mhit++){      // binary finding has no sense
+      const L1HitPoint &hitm = vStsHits_m[start_mhit];
 
         // find track position in the hit plane
-      fscal &zm = hitm.z;
+      const fscal &zm = hitm.z;
       L1TrackPar T1_tmp = T1;
-      L1ExtrapolateLine( T1_tmp, zm);
-      fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
+      L1ExtrapolateYC11Line( T1_tmp, zm );
+      const fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
       fvec y_minus_new_break = T1_tmp.y - dym_est;
       y_minus_new_break -= 2*MaxDZ*fabs(T1_tmp.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
-        
-        // check position
-      fscal ym = hitm.y;
-      if ( ym >= y_minus_new_break[i1_4]) break;
+      if ( hitm.y >= y_minus_new_break[i1_4]) break;
     }
     
       // -- collect possible doublets --
     for (int imh = start_mhit; imh < NHits_m; imh++){   // 6.3/100 sec
-//       if( n2 >= MaxPortionDoublets ) break;
-      L1HitPoint &hitm = vStsHits_m[imh];
+      const L1HitPoint &hitm = vStsHits_m[imh];
 
          // find track position in the hit plane
-      fscal &zm = hitm.z;
+      const fscal &zm = hitm.z;
       L1TrackPar T1_tmp = T1;
-      L1ExtrapolateLine( T1_tmp, zm );
-      fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
-      fvec y_minus_new = T1_tmp.y - dym_est;
-      fvec y_plus_new = T1_tmp.y + dym_est;
+      L1ExtrapolateYC11Line( T1_tmp, zm );
+      const fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
+      const fvec y_plus_new = T1_tmp.y + dym_est;
       fvec y_plus_new_break = y_plus_new;
-      y_plus_new_break += MaxDZ*fabs(T1_tmp.ty); // take into account overlapping on middle station. dz_max ~ 0.4 cm. dy/dz ~ 1
+      y_plus_new_break += MaxDZ*fabs(T1_tmp.ty); // take into account overlapping on middle station. dz_max ~ 0.4 cm. dy/dz ~ 1. CHECKME why do we need this for secondary?
       
         // check position
-      unsigned short int nm = hitm.n;
-      fscal ym = hitm.y;
+      const fscal ym = hitm.y;
       if ( ym > y_plus_new_break[i1_4] ) break;
+      const unsigned short int nm = hitm.n;
+      const fvec y_minus_new = T1_tmp.y - dym_est;
       if ( ( ym < y_minus_new[i1_4]) || ( ym > y_plus_new[i1_4] ) || ( nl != nm) ) continue;
-      
-      fvec dxm_est = Pick_m * sqrt(fabs(T1_tmp.C00 + stam.XYInfo.C00));
-      fvec x_minus_new = T1_tmp.x - dxm_est;
-      fvec x_plus_new = T1_tmp.x + dxm_est;
 
-      fscal xm = hitm.x;
+      L1ExtrapolateXC00Line( T1_tmp, zm );
+      const fvec dxm_est = Pick_m * sqrt(fabs(T1_tmp.C00 + stam.XYInfo.C00));
+      const fvec x_minus_new = T1_tmp.x - dxm_est;
+      const fvec x_plus_new = T1_tmp.x + dxm_est;
+
+      const fscal xm = hitm.x;
       if ( (xm < x_minus_new[i1_4] ) || (xm > x_plus_new[i1_4]) ) continue;
 
 //       lmDuplets_hits[nDuplets_lm++]=imh;
@@ -412,7 +409,7 @@ inline void L1Algo::f30(  // input
 
 
     // ---- Add the middle hits to parameters estimation. Propagate to right station. ----
-  int n2_V = (n2+fvecLen-1)/fvecLen;
+  const int n2_V = (n2+fvecLen-1)/fvecLen;
   if (istar < NStations){
     for (int i2_V = 0; i2_V < n2_V; i2_V++){
       const int max_i2_4 = ( (n2-i2_V*fvecLen) >= fvecLen ) ? fvecLen : (n2-i2_V*fvecLen);
@@ -426,24 +423,21 @@ inline void L1Algo::f30(  // input
       u_back_2.push_back(fvec_0);
       zPos_2.push_back(fvec_0);
       for (int i2_4 = 0; i2_4 < max_i2_4; i2_4++){
-        int i2 = i2_V*fvecLen+i2_4;
-        int i1 = i1_2[i2];
-        int i1_V = i1/fvecLen;
-        int i1_4 = i1%fvecLen;
+        const int i2 = i2_V*fvecLen+i2_4;
+        const int i1 = i1_2[i2];
+        const int i1_V = i1/fvecLen;
+        const int i1_4 = i1%fvecLen;
 
-        L1TrackPar &T1 = T_1[i1_V];
-        L1FieldRegion &f1 = fld_1[i1_V];
+        const L1TrackPar &T1 = T_1[i1_V];
+        const L1FieldRegion &f1 = fld_1[i1_V];
         T2.SetOneEntry(i2_4, T1, i1_4);
         f2.SetOneEntry(i2_4, f1, i1_4);
         
-        int imh = hitsm_2[i2];
-        L1HitPoint &hitm = vStsHits_m[imh];
-        fscal &um = hitm.u;
-        fscal &vm = hitm.v;
-        fscal &zm = hitm.z;
-        u_front_2[i2_V][i2_4] = um;
-        u_back_2 [i2_V][i2_4] = vm;
-        zPos_2   [i2_V][i2_4] = zm;
+        const int imh = hitsm_2[i2];
+        const L1HitPoint &hitm = vStsHits_m[imh];
+        u_front_2[i2_V][i2_4] = hitm.u;
+        u_back_2 [i2_V][i2_4] = hitm.v;
+        zPos_2   [i2_V][i2_4] = hitm.z;
 
 //         hitsl_2[i2] = hitsl_1[i1];
         hitsl_2.push_back(hitsl_1[i1]);
@@ -501,14 +495,14 @@ inline void L1Algo::f30(  // input
   int n3_V = 0, n3_4 = 0;
   
   for( int i2 = 0; i2 < n2; i2++){
-    int i2_V = i2/fvecLen;
-    int i2_4 = i2%fvecLen;
+    const int i2_V = i2/fvecLen;
+    const int i2_4 = i2%fvecLen;
 
-    THitI duplet_b = mrDuplets_start[hitsm_2[i2]];      // < 0.001/100000 sec (cash!)
-    THitI duplet_e = mrDuplets_start[hitsm_2[i2]+1];
+    const THitI duplet_b = mrDuplets_start[hitsm_2[i2]];      // < 0.001/100000 sec (cash!)
+    const THitI duplet_e = mrDuplets_start[hitsm_2[i2]+1];
 
       //     THitI nm = vStsHits_m[hitsm_2[i2]].n;
-    L1TrackPar &T2 = T_2[i2_V];
+    const L1TrackPar &T2 = T_2[i2_V];
     if ( isec == kAllPrimIter || isec == kAllPrimJumpIter ||
          isec == kAllSecIter  || isec == kAllSecJumpIter )
       if ( T2.chi2[i2_4] > TRIPLET_CHI2_CUT ) continue; // TODO understand NDF
@@ -519,19 +513,19 @@ inline void L1Algo::f30(  // input
     
       // find first possible hit
     int start = duplet_b;
-    if ( // isec == kAllPrimIter || isec == kAllPrimJumpIter ||
+    if ( // isec == kAllPrimIter || isec == kAllPrimJumpIter || 
          isec == kAllSecIter  || isec == kAllSecJumpIter ) { // for secondary there are a lot of doubletAB-doubletBC combinations
-      
+
         // find the biggest possible track error
       L1TrackPar T2_new = T2;
-      L1ExtrapolateLine( T2_new, T2.z + MaxDZ*fabs(T2.ty) );
-      fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11)) - MaxDZ*fabs(T2.ty[i2_4]);
-      fvec y_minus_new = T2.y - dym_est;
+      L1ExtrapolateYC11Line( T2_new, T2.z + MaxDZ*fabs(T2.ty) );
+      const fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11)) - MaxDZ*fabs(T2.ty[i2_4]);
+      const fvec y_minus_new = T2.y - dym_est;
       for( int end = duplet_e; end - start > 2; ){
-        int middle = (start + end)/2;
-        int irh = mrDuplets_hits[middle];
+        const int middle = (start + end)/2;
+        const int irh = mrDuplets_hits[middle];
 
-        L1HitPoint &hitr = vStsHits_r[irh];
+        const L1HitPoint &hitr = vStsHits_r[irh];
 
           // check the position
         if (hitr.y < y_minus_new[i2_4]) start = middle;
@@ -542,36 +536,35 @@ inline void L1Algo::f30(  // input
     
     for (unsigned int irh_index = start; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
 
-      int irh = mrDuplets_hits[irh_index];
+      const int irh = mrDuplets_hits[irh_index];
 
-      L1HitPoint &hitr = vStsHits_r[irh];
+      const L1HitPoint &hitr = vStsHits_r[irh];
 
-      fscal ur = hitr.u;
-      fscal vr = hitr.v;
-      fscal zr = hitr.z;
+      const fscal zr = hitr.z;
 
         // find track position in the hit plane
       L1TrackPar T2_new = T2;
-      L1ExtrapolateLine( T2_new, zr );
-      fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11));
-      fvec y_minus_new = T2_new.y - dym_est;
+      L1ExtrapolateYC11Line( T2_new, zr );
+      const fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11));
+      const fvec y_minus_new = T2_new.y - dym_est;
 
-      fscal yr = hitr.y;
+      const fscal yr = hitr.y;
 
         // check the position
       if (yr < y_minus_new[i2_4]) continue;
 
-      fvec y_plus_new  = T2_new.y + dym_est;
-      fvec y_plus_new_break = y_plus_new + MaxDZ*fabs(T2_new.ty); // take into account overlapping on right station. dz_max ~ 0.4 cm. dy/dz ~ 1 TODO read parameter
+      const fvec y_plus_new  = T2_new.y + dym_est;
+      const fvec y_plus_new_break = y_plus_new + MaxDZ*fabs(T2_new.ty); // take into account overlapping on right station. dz_max ~ 0.4 cm.
 
       if (yr > y_plus_new_break [i2_4] ) break;
       if (yr > y_plus_new [i2_4] ) continue;
 
-      fvec dxm_est = Pick_r*sqrt(fabs(T2_new.C00 + star.XYInfo.C00));
-      fvec x_minus_new = T2_new.x - dxm_est;
-      fvec x_plus_new  = T2_new.x + dxm_est;
+      L1ExtrapolateXC00Line( T2_new, zr );
+      const fvec dxm_est = Pick_r*sqrt(fabs(T2_new.C00 + star.XYInfo.C00));
+      const fvec x_minus_new = T2_new.x - dxm_est;
+      const fvec x_plus_new  = T2_new.x + dxm_est;
 
-      fscal xr = hitr.x;
+      const fscal xr = hitr.x;
       
       if ((xr < x_minus_new[i2_4]) || (xr > x_plus_new[i2_4]) ) continue;
 
@@ -585,9 +578,11 @@ inline void L1Algo::f30(  // input
       hitsm_3.push_back(hitsm_2[i2]);   // 1/3  2.3/1000 sec
       hitsr_3.push_back(irh);           // 1/3  2.3/1000 sec
 
-      T3.SetOneEntry(n3_4, T2_new, i2_4);
-      u_front_3[n3_V][n3_4] = ur;
-      u_back_3 [n3_V][n3_4] = vr;
+      L1TrackPar T2_new2 = T2;
+      L1ExtrapolateLine( T2_new2, zr );
+      T3.SetOneEntry(n3_4, T2_new2, i2_4);
+      u_front_3[n3_V][n3_4] = hitr.u;
+      u_back_3 [n3_V][n3_4] = hitr.v;
 
 
       n3++;                    // < 0.001/1000000
@@ -808,12 +803,13 @@ inline void L1Algo::f4(  // input
     if ( !finite(chi2) || chi2 < 0 || chi2 > TRIPLET_CHI2_CUT * (T3.NDF[i3_4] - 5) )  continue; 
 
       // prepare data
-    fscal qp = MaxInvMom + T3.qp[i3_4];
+    fscal MaxInvMomS = MaxInvMom[0];
+    fscal qp = MaxInvMomS + T3.qp[i3_4];
     if( qp < 0 )            qp = 0;          
-    if( qp > MaxInvMom*2 )  qp = MaxInvMom*2;
+    if( qp > MaxInvMomS*2 )  qp = MaxInvMomS*2;
     fscal Cqp = 5.*sqrt(fabs(T3.C44[i3_4]));  
 
-    fscal scale = 255/(MaxInvMom*2);
+    fscal scale = 255/(MaxInvMom[0]*2);
 
     qp  = (static_cast<unsigned int>(qp*scale) )%256;
     Cqp = (static_cast<unsigned int>(Cqp*scale))%256;
@@ -863,7 +859,7 @@ inline void L1Algo::f5(  // input
 {
 //     cout << "Start  Finding levels of triplets "  << endl;
 
-  for  (int istal = NStations - 4; istal >= 0; istal--){
+  for  (int istal = NStations - 4; istal >= FIRSTCASTATION; istal--){
     for (int tripType = 0; tripType < 3; tripType++) { // tT = 0 - 123triplet, tT = 1 - 124triplet, tT = 2 - 134triplet
       if ( ( ((isec != kFastPrimJumpIter) && (isec != kAllPrimJumpIter) && (isec != kAllSecJumpIter)) && (tripType != 0)          ) ||
            ( ((isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter)) && (tripType != 0) && (istal == NStations - 4) )
@@ -1528,6 +1524,11 @@ void L1Algo::CATrackFinder()
 #endif
 
      // --- SET PARAMETERS FOR THE ITERATION ---
+
+       // first station used in the triplets finding
+     FIRSTCASTATION = 0;
+     // if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+     //   FIRSTCASTATION = 2;
      
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
@@ -1543,6 +1544,11 @@ void L1Algo::CATrackFinder()
 
     MaxInvMom = 1.0/0.5;                     // max considered q/p
     if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) MaxInvMom =  1.0/0.1;
+
+    MaxSlope = 1.1;
+    if ( // (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
+         (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) MaxSlope =  1.5;
+    
       // define the target
     targX = 0; targY = 0; targZ = 0;      //  suppose, what target will be at (0,0,0)
     
@@ -1570,8 +1576,8 @@ void L1Algo::CATrackFinder()
       // The reason is that low momentum tracks are too curved and goes not from target direction. That's why sort by hit_y/hit_z is not work idealy
       // If sort by y then it is max diff between same station's modules (~0.4cm)
     MaxDZ = 0;
-    if (  (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ) MaxDZ = 0.1;
-    if (  (isec == kAllSecIter ) || (isec == kAllSecJumpIter ) ) MaxDZ = 0.1;
+    if (  (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
+          (isec == kAllSecIter ) || (isec == kAllSecJumpIter ) ) MaxDZ = 0.1;
 
 
     
@@ -2096,7 +2102,7 @@ void L1Algo::CATrackFinder()
       int nlevel = (NStations-2)-ilev+1;
       int ntracks = 0;
 
-      for( int istaF = 0; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
+      for( int istaF = FIRSTCASTATION; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
 
         // if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
         //     ( istaF >= NStations-6) ) break; // ghost supression !!!  too strong for Lambda. According to I.Vassiliev NStations-4 is good
@@ -2164,7 +2170,7 @@ void L1Algo::CATrackFinder()
           // best_L = best_tr.StsHits.size();
           
              // store candidate
-          best_tr.Set( istaF, best_L, best_chi2, first_trip->GetQpOrig(MaxInvMom));
+          best_tr.Set( istaF, best_L, best_chi2, first_trip->GetQpOrig(MaxInvMom[0]));
           vtrackcandidate.push_back(best_tr);
           
           ntracks++;

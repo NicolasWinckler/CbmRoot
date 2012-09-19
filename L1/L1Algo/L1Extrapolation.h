@@ -429,6 +429,20 @@ inline void L1ExtrapolateLine( L1TrackPar &T, fvec z_out)
 
 }
 
+inline void L1ExtrapolateYC11Line( L1TrackPar &T, fvec z_out )
+{
+  const fvec dz = (z_out - T.z);
+  T.y += T.ty*dz;
+  T.C11 += dz * ( 2*T.C31 + dz * T.C33 );
+}
+
+inline void L1ExtrapolateXC00Line( L1TrackPar &T, fvec z_out )
+{
+  const fvec dz = (z_out - T.z);
+  T.x += T.tx*dz;
+  T.C00 += dz * ( 2*T.C20 + dz * T.C22 );
+}
+
 inline void L1ExtrapolateJXY
 ( 
  fvec &tx, fvec &ty, fvec &qp, // input track parameters

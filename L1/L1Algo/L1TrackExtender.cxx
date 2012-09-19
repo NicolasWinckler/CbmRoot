@@ -203,8 +203,12 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
   sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
 
   fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
-  
-  for( int ista = ista2 + 2*step; (ista < NStations) && (ista >= 0); ista += step ){ // CHECKME why ista2?
+
+  int ista = ista2 + 2*step; // skip one station. if there would be hit it has to be found on previous stap
+  if (ista2 == FIRSTCASTATION) 
+    ista = ista2 + step;
+
+  for( ; (ista < NStations) && (ista >= 0); ista += step ){ // CHECKME why ista2?
 
     L1Station &sta = vStations[ista];
           

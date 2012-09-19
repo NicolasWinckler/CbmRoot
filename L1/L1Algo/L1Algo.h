@@ -342,7 +342,7 @@ class L1Algo{
   
     /// ----- Different parameters of CATrackFinder -----
 
-  enum { FIRSTCASTATION = 0 };  //first station used in CA
+  int FIRSTCASTATION;  //first station used in CA
 
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
@@ -379,7 +379,8 @@ class L1Algo{
     Pick_r, // same for right hits
     Pick_gather; // same for attaching additional hits to track
   float PickNeighbour; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
-  fscal MaxInvMom;     // max considered q/p for tracks
+  fvec MaxInvMom;     // max considered q/p for tracks
+  fvec MaxSlope;      // max slope (tx\ty) in prim vertex
   fvec targX, targY, targZ;                        // target coor
   L1FieldValue targB _fvecalignment;               // field in the target point
   L1XYMeasurementInfo TargetXYInfo _fvecalignment; // target constraint  [cm]

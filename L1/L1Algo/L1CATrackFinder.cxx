@@ -265,7 +265,7 @@ inline void L1Algo::f20(  // input
         // find track position in the hit plane
       fscal &zm = hitm.z;
       L1TrackPar T1_tmp = T1;
-      L1ExtrapolateShort( T1_tmp, zm, T1.qp, fld_1[i1_V]);
+      L1ExtrapolateLine( T1_tmp, zm);
       fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
       fvec y_minus_new_break = T1_tmp.y - dym_est;
       y_minus_new_break -= 2*0.4*fabs(T1_tmp.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
@@ -283,7 +283,7 @@ inline void L1Algo::f20(  // input
          // find track position in the hit plane
       fscal &zm = hitm.z;
       L1TrackPar T1_tmp = T1;
-      L1ExtrapolateShort( T1_tmp, zm, T1.qp, fld_1[i1_V]);
+      L1ExtrapolateLine( T1_tmp, zm );
       fvec dym_est = Pick_m * sqrt(fabs(T1_tmp.C11 + stam.XYInfo.C11));
       fvec y_minus_new = T1_tmp.y - dym_est;
       fvec y_plus_new = T1_tmp.y + dym_est;
@@ -444,7 +444,7 @@ inline void L1Algo::f30(  // input
       }  // i2_4
 
         // add middle hit
-      L1ExtrapolateShort( T2, zPos_2[i2_V], T2.qp, f2);
+      L1ExtrapolateLine( T2, zPos_2[i2_V] );
       L1Filter( T2, stam.frontInfo, u_front_2[i2_V] );
       L1Filter( T2, stam.backInfo,  u_back_2[i2_V] );
 
@@ -520,8 +520,7 @@ inline void L1Algo::f30(  // input
 
         // find track position in the hit plane
       L1TrackPar T2_new = T2;
-      L1ExtrapolateShort( T2_new, zr, T2.qp, fld_2[i2_V]);
-        //       L1Extrapolate( T2_new, zr, T2.qp, fld_2[i2_V] );
+      L1ExtrapolateLine( T2_new, zr );
       fvec dym_est = Pick_r*sqrt(fabs(T2_new.C11 + star.XYInfo.C11));
       fvec y_minus_new = T2_new.y - dym_est;
 

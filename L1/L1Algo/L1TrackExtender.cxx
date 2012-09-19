@@ -225,7 +225,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
         GetHitCoor(hit, x, y, z, sta);
       
         L1TrackPar T_new = T;
-        L1ExtrapolateShort( T_new, z, qp0, fld);
+        L1ExtrapolateLine( T_new, z);
 
         fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
         fscal y_minus_new = T_new.y[0] - dym_est;
@@ -242,7 +242,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       GetHitCoor(hit, x, y, z, sta);
       
       L1TrackPar T_new = T;
-      L1ExtrapolateShort( T_new, z, qp0, fld);
+      L1ExtrapolateLine( T_new, z);
 
       fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
       fscal y_minus_new = T_new.y[0] - dym_est;
@@ -272,7 +272,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
     StripsToCoor(u, v, x, y, sta);
     z = vStsZPos[hit.iz];
       
-    L1ExtrapolateShort( T, z, qp0, fld);
+    L1ExtrapolateLine( T, z );
     L1AddMaterial( T, sta.materialInfo, qp0 );
     L1Filter( T, sta.frontInfo, u );
     L1Filter( T, sta.backInfo,  v );

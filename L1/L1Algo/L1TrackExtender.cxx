@@ -49,7 +49,7 @@ void L1Algo::BranchFitterFast(const L1Branch &t, L1TrackPar& T, const bool dir, 
   fvec u0  = static_cast<fscal>( vStsStrips[hit0.f] );
   fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
   fvec x0,y0;
-  StripsToCoor(u0, v0, x0, y0, sta1);
+  StripsToCoor(u0, v0, x0, y0, sta0);
   fvec z0 = vStsZPos[hit0.iz];
 
   fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
@@ -175,7 +175,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
   fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
   fvec x0,y0;
 
-  StripsToCoor(u0, v0, x0, y0, sta1);
+  StripsToCoor(u0, v0, x0, y0, sta0);
   fvec z0 = vStsZPos[hit0.iz];
 
   fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
@@ -224,15 +224,15 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
         int middle = (start + end)/2;
         L1StsHit &hit = (*vStsHitsUnused)[middle];
 
-        fscal x, y, z;
-        GetHitCoor(hit, x, y, z, sta);
-      
-        L1TrackPar T_new = T;
-        L1ExtrapolateLine( T_new, z);
+        fscal xh, yh, zh;
+        GetHitCoor(hit, xh, yh, zh, sta);
 
-        fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
-        fscal y_minus_new = T_new.y[0] - dym_est;
-        if (y < y_minus_new) start = middle;
+        fvec y, C11;
+        L1ExtrapolateYC11Line( T, zh, y, C11 );
+      
+        fscal dym_est = ( Pick_gather*sqrt(fabs(C11+sta.XYInfo.C11)) )[0];
+        fscal y_minus_new = y[0] - dym_est;
+        if (yh < y_minus_new) start = middle;
         else end = middle;
       }
     }
@@ -241,26 +241,29 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
 
-      fscal x, y, z;
-      GetHitCoor(hit, x, y, z, sta);
+      fscal xh, yh, zh;
+      GetHitCoor(hit, xh, yh, zh, sta);
       
-      L1TrackPar T_new = T;
-      L1ExtrapolateLine( T_new, z);
+      fvec y, C11;
+      L1ExtrapolateYC11Line( T, zh, y, C11 );
+        
+      fscal dym_est = ( Pick_gather*sqrt(fabs(C11+sta.XYInfo.C11)) )[0];
+      fscal y_minus_new = y[0] - dym_est;
+      if (yh < y_minus_new) continue;  // CHECKME take into account overlaping?
+      fscal y_plus_new = y[0] + dym_est;
+      if (yh > y_plus_new ) break;
 
-      fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
-      fscal y_minus_new = T_new.y[0] - dym_est;
-      if (y < y_minus_new) continue;  // CHECKME tack into account overlaping?
-      fscal y_plus_new = T_new.y[0] + dym_est;
-      if (y > y_plus_new ) break;
+      fvec x, C00;
+      L1ExtrapolateXC00Line( T, zh, x, C00 );
       
-      fscal dxm_est = ( Pick_gather*sqrt(fabs(T_new.C00+sta.XYInfo.C00)) )[0];
-      fscal x_minus_new = T_new.x[0] - dxm_est;
-      fscal x_plus_new  = T_new.x[0] + dxm_est;
-      if ((x < x_minus_new) || (x > x_plus_new)) continue;
-      fscal dx = x - T_new.x[0];
-      fscal dy = y - T_new.y[0];
+      fscal dx = xh - x[0];
+      fscal dy = yh - y[0];
       fscal d2 = dx*dx + dy*dy;
       if( d2 > r2_best ) continue;
+      
+      fscal dxm_est2 = ( Pick_gather*Pick_gather*(fabs(C00+sta.XYInfo.C00)) )[0];
+      if (dx*dx > dxm_est2) continue;
+      
       r2_best = d2;
       iHit_best = ih;
     }
@@ -292,17 +295,20 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
     // save hits
   if (dir) { // backward
     std::vector<THitI> oldHits;
-    oldHits.clear();
-    oldHits.resize(t.StsHits.size());
+    // oldHits.clear();
+    const int NOldHits = t.StsHits.size();
+    oldHits.resize(NOldHits);
     for (unsigned int i = 0; i < t.StsHits.size(); i++) { 
       oldHits[i] = t.StsHits[i];
     }
-    t.StsHits.clear();
+    // t.StsHits.clear();
+    t.StsHits.resize(newHits.size() + NOldHits);
+    int ii = 0;
     for (int i = newHits.size()-1; i >= 0 ; i--) { 
-      t.StsHits.push_back(newHits[i]);
+      t.StsHits[ii++] = newHits[i];
     }
     for (unsigned int i = 0; i < oldHits.size(); i++) { 
-      t.StsHits.push_back(oldHits[i]);
+      t.StsHits[ii++] = oldHits[i];
     }
   }
   else { // forward

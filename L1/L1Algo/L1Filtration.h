@@ -9,11 +9,11 @@
 //#define cnst static const fvec
 #define cnst const fvec
 
-inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u )
+inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u, fvec w = 1.)
 {
-  register fvec wi, zeta, zetawi, HCH;
-  register fvec F0, F1, F2, F3, F4;
-  register fvec K1, K2, K3, K4;
+  fvec wi, zeta, zetawi, HCH;
+  fvec F0, F1, F2, F3, F4;
+  fvec K1, K2, K3, K4;
 
   zeta = info.cos_phi*T.x + info.sin_phi*T.y - u;
 
@@ -27,10 +27,17 @@ inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u )
   F3 = info.cos_phi*T.C30 + info.sin_phi*T.C31;
   F4 = info.cos_phi*T.C40 + info.sin_phi*T.C41;
 
-  wi = 1./(info.sigma2 +HCH);
+#if 0 // use mask
+  const fvec mask = (HCH < info.sigma2 * 16.);
+  wi = w/( (mask & info.sigma2) +HCH );
   zetawi = zeta *wi;
-  T.chi2 +=  zeta * zetawi ;
-  T.NDF += 1;
+  T.chi2 +=  mask & (zeta * zetawi);
+#else
+  wi = w/( info.sigma2 + HCH );
+  zetawi = zeta *wi;
+  T.chi2 +=  zeta * zetawi;
+#endif // 0
+  T.NDF += w;
 
   K1 = F1*wi;
   K2 = F2*wi;
@@ -62,8 +69,8 @@ inline void L1Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec u )
 
 inline void L1FilterChi2( const L1UMeasurementInfo &info, const fvec& x, const fvec& y, const fvec& C00, const fvec& C10, const fvec& C11, fvec& chi2, const fvec& u )
 {
-  register fvec zeta, HCH;
-  register fvec F0, F1;
+  fvec zeta, HCH;
+  fvec F0, F1;
 
   zeta = info.cos_phi*x + info.sin_phi*y - u;
 
@@ -78,9 +85,9 @@ inline void L1FilterChi2( const L1UMeasurementInfo &info, const fvec& x, const f
 
 inline void L1FilterChi2XYC00C10C11( const L1UMeasurementInfo &info, fvec& x, fvec& y, fvec& C00, fvec& C10, fvec& C11, fvec& chi2, const fvec& u )
 {
-  register fvec wi, zeta, zetawi, HCH;
-  register fvec F0, F1;
-  register fvec K1;
+  fvec wi, zeta, zetawi, HCH;
+  fvec F0, F1;
+  fvec K1;
 
   zeta = info.cos_phi*x + info.sin_phi*y - u;
 
@@ -109,9 +116,9 @@ inline void L1FilterVtx( L1TrackPar &T, fvec x, fvec y, L1XYMeasurementInfo &inf
 {
   cnst TWO = 2.;
 
-  register fvec zeta0, zeta1, S00, S10, S11, si;
-  register fvec F00, F10, F20, F30, F40,  F01, F11, F21, F31, F41 ;
-  register fvec K00, K10, K20, K30, K40, K01, K11, K21, K31, K41;
+  fvec zeta0, zeta1, S00, S10, S11, si;
+  fvec F00, F10, F20, F30, F40,  F01, F11, F21, F31, F41 ;
+  fvec K00, K10, K20, K30, K40, K01, K11, K21, K31, K41;
 
   //zeta0 = T.x + J[0]*T.tx + J[1]*T.ty + J[2]*T.qp - x;
   //zeta1 = T.y + J[3]*T.tx + J[4]*T.ty + J[5]*T.qp - y;
@@ -119,6 +126,9 @@ inline void L1FilterVtx( L1TrackPar &T, fvec x, fvec y, L1XYMeasurementInfo &inf
   zeta0 = T.x + extrDx - x;
   zeta1 = T.y + extrDy - y;
 
+    // H = 1 0 J[0] J[1] J[2]
+    //     0 1 J[3] J[4] J[5]
+  
   // F = CH'
   F00 = T.C00;       F01 = T.C10;    
   F10 = T.C10;       F11 = T.C11;
@@ -174,9 +184,9 @@ inline void L1FilterXY( L1TrackPar &T, fvec x, fvec y, L1XYMeasurementInfo &info
 {
   cnst TWO = 2.;
 
-  register fvec zeta0, zeta1, S00, S10, S11, si;
-  register fvec F00, F10, F20, F30, F40,  F01, F11, F21, F31, F41 ;
-  register fvec K00, K10, K20, K30, K40, K01, K11, K21, K31, K41;
+  fvec zeta0, zeta1, S00, S10, S11, si;
+  fvec F00, F10, F20, F30, F40,  F01, F11, F21, F31, F41 ;
+  fvec K00, K10, K20, K30, K40, K01, K11, K21, K31, K41;
 
   zeta0 = T.x - x;
   zeta1 = T.y - y;
@@ -243,9 +253,9 @@ inline void L1Filter1D( L1TrackPar &T, fvec &u, fvec &sigma2, fvec H[] )
 
   cnst ZERO = 0.0, ONE = 1.;
 
-  register fvec wi, zeta, zetawi, HCH;
-  register fvec F0, F1, F2, F3, F4;
-  register fvec K1, K2, K3, K4;
+  fvec wi, zeta, zetawi, HCH;
+  fvec F0, F1, F2, F3, F4;
+  fvec K1, K2, K3, K4;
 
   zeta = H[0]*T.x +H[1]*T.y +H[2]*T.tx +H[3]*T.ty +H[4]*T.qp - u;
 
@@ -296,9 +306,9 @@ inline void L1Filter2D( L1TrackPar &T, fvec &x, fvec &y, L1XYMeasurementInfo &in
 {
   cnst TWO = 2.;
 
-  register fvec zeta0, zeta1, S00, S10, S11, si;
-  register fvec F00, F10, F20, F30, F40,  F01, F11, F21, F31, F41 ;
-  register fvec K00, K10, K20, K30, K40, K01, K11, K21, K31, K41;
+  fvec zeta0, zeta1, S00, S10, S11, si;
+  fvec F00, F10, F20, F30, F40,  F01, F11, F21, F31, F41 ;
+  fvec K00, K10, K20, K30, K40, K01, K11, K21, K31, K41;
 
   zeta0 = H[0]*T.x +H[1]*T.y +H[2]*T.tx +H[3]*T.ty +H[4]*T.qp - x;
   zeta1 = H[5]*T.x +H[6]*T.y +H[7]*T.tx +H[8]*T.ty +H[9]*T.qp - y;

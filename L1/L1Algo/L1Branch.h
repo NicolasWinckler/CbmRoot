@@ -25,8 +25,10 @@ class L1Triplet;
 
 struct L1Branch
 {
-  L1Branch():Quality(0),Momentum(0),chi2(0),StsHits(){}
-  
+  L1Branch():Quality(0),Momentum(0),chi2(0),StsHits(){
+    StsHits.reserve(10);
+  }
+    
   unsigned short int Quality;
   float Momentum, chi2;
   std::vector<THitI> StsHits;

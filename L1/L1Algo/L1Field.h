@@ -26,7 +26,6 @@ class L1FieldValue{
     friend ostream& operator<<(ostream& out, L1FieldValue &B){
       return out << B.x[0] << " | " << B.y[0] << " | " << B.z[0];
     };
-  
 } _fvecalignment;
 
 
@@ -53,10 +52,6 @@ class L1FieldSlice{
       fvec xy2 = x*y2;
       fvec x2y = x2*y;
 
-      B.x = cx[0] +cx[1]*x +cx[2]*y +cx[3]*x2 +cx[4]*xy +cx[5]*y2 +cx[6]*x3 +cx[7]*x2y +cx[8]*xy2 +cx[9]*y3;
-      B.y = cy[0] +cy[1]*x +cy[2]*y +cy[3]*x2 +cy[4]*xy +cy[5]*y2 +cy[6]*x3 +cy[7]*x2y +cy[8]*xy2 +cy[9]*y3;
-      B.z = cz[0] +cz[1]*x +cz[2]*y +cz[3]*x2 +cz[4]*xy +cz[5]*y2 +cz[6]*x3 +cz[7]*x2y +cz[8]*xy2 +cz[9]*y3;
-
       fvec x4 = x3*x;
       fvec y4 = y3*y;
       fvec xy3 = x*y3;
@@ -69,26 +64,18 @@ class L1FieldSlice{
       fvec x2y3 = x2*y3;
       fvec x3y2 = x3*y2;
       fvec x4y = x4*y;
-
-      B.x += cx[10]*x4 +cx[11]*x3y +cx[12]*x2y2 +cx[13]*xy3 +cx[14]*y4
+      
+      B.x = cx[0] +cx[1]*x +cx[2]*y +cx[3]*x2 +cx[4]*xy +cx[5]*y2 +cx[6]*x3 +cx[7]*x2y +cx[8]*xy2 +cx[9]*y3
+          +cx[10]*x4 +cx[11]*x3y +cx[12]*x2y2 +cx[13]*xy3 +cx[14]*y4
           +cx[15]*x5 +cx[16]*x4y +cx[17]*x3y2 +cx[18]*x2y3 +cx[19]*xy4 +cx[20]*y5;
 
-      B.y += cy[10]*x4 +cy[11]*x3y +cy[12]*x2y2 +cy[13]*xy3 +cy[14]*y4
+      B.y = cy[0] +cy[1]*x +cy[2]*y +cy[3]*x2 +cy[4]*xy +cy[5]*y2 +cy[6]*x3 +cy[7]*x2y +cy[8]*xy2 +cy[9]*y3
+          +cy[10]*x4 +cy[11]*x3y +cy[12]*x2y2 +cy[13]*xy3 +cy[14]*y4
           +cy[15]*x5 +cy[16]*x4y +cy[17]*x3y2 +cy[18]*x2y3 +cy[19]*xy4 +cy[20]*y5;
 
-      B.z += cz[10]*x4 +cz[11]*x3y +cz[12]*x2y2 +cz[13]*xy3 +cz[14]*y4
+      B.z = cz[0] +cz[1]*x +cz[2]*y +cz[3]*x2 +cz[4]*xy +cz[5]*y2 +cz[6]*x3 +cz[7]*x2y +cz[8]*xy2 +cz[9]*y3
+          +cz[10]*x4 +cz[11]*x3y +cz[12]*x2y2 +cz[13]*xy3 +cz[14]*y4
           +cz[15]*x5 +cz[16]*x4y +cz[17]*x3y2 +cz[18]*x2y3 +cz[19]*xy4 +cz[20]*y5;
-//       B.x = cx[0] +cx[1]*x +cx[2]*y +cx[3]*x2 +cx[4]*xy +cx[5]*y2 +cx[6]*x3 +cx[7]*x2y +cx[8]*xy2 +cx[9]*y3
-//           +cx[10]*x4 +cx[11]*x3y +cx[12]*x2y2 +cx[13]*xy3 +cx[14]*y4
-//           +cx[15]*x5 +cx[16]*x4y +cx[17]*x3y2 +cx[18]*x2y3 +cx[19]*xy4 +cx[20]*y5;
-// 
-//       B.y = cy[0] +cy[1]*x +cy[2]*y +cy[3]*x2 +cy[4]*xy +cy[5]*y2 +cy[6]*x3 +cy[7]*x2y +cy[8]*xy2 +cy[9]*y3
-//           +cy[10]*x4 +cy[11]*x3y +cy[12]*x2y2 +cy[13]*xy3 +cy[14]*y4
-//           +cy[15]*x5 +cy[16]*x4y +cy[17]*x3y2 +cy[18]*x2y3 +cy[19]*xy4 +cy[20]*y5;
-// 
-//       B.z = cz[0] +cz[1]*x +cz[2]*y +cz[3]*x2 +cz[4]*xy +cz[5]*y2 +cz[6]*x3 +cz[7]*x2y +cz[8]*xy2 +cz[9]*y3
-//           +cz[10]*x4 +cz[11]*x3y +cz[12]*x2y2 +cz[13]*xy3 +cz[14]*y4
-//           +cz[15]*x5 +cz[16]*x4y +cz[17]*x3y2 +cz[18]*x2y3 +cz[19]*xy4 +cz[20]*y5;
     }
 } _fvecalignment;
 

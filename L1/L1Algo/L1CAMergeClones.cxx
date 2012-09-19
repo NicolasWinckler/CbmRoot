@@ -165,20 +165,21 @@ void L1Algo::FilterTracks(fvec const r[5], fvec const C[15], fvec const m[5], fv
     if(W)  W[i] = C[i];
     S[i] = C[i] + V[i];
   }
-  if(R)
-  {
-    for(int i=0; i<5; i++)
-      R[i] = r[i];
-  }
-  InvertCholetsky(S);
 
-  fvec K[5][5];
+  InvertCholetsky(S);
+ 
   fvec dzeta[5];
-  MultiplySS(C,S,K);
+
   for(int i=0; i<5; i++) dzeta[i] = m[i] - r[i];
 
   if(W && R)
   {
+    for(int i=0; i<5; i++)
+      R[i] = r[i];
+      
+    fvec K[5][5];
+    MultiplySS(C,S,K);
+      
     fvec KC[15];
     MultiplyMS(K,C,KC);
     for(int i=0; i< 15; i++)
@@ -393,11 +394,7 @@ void L1Algo::CAMergeClones()
       L1Extrapolate( Tb, zMiddle, Tb.qp, fld );
 
       fvec Chi2Tracks = 0.f;
-      fvec rf[5] = {Tf.x,Tf.y,Tf.tx,Tf.ty,Tf.qp};
-      fvec rb[5] = {Tb.x,Tb.y,Tb.tx,Tb.ty,Tb.qp};
-      fvec Cf[15] = {Tf.C00,Tf.C10,Tf.C11,Tf.C20,Tf.C21,Tf.C22,Tf.C30,Tf.C31,Tf.C32,Tf.C33,Tf.C40,Tf.C41,Tf.C42,Tf.C43,Tf.C44};
-      fvec Cb[15] = {Tb.C00,Tb.C10,Tb.C11,Tb.C20,Tb.C21,Tb.C22,Tb.C30,Tb.C31,Tb.C32,Tb.C33,Tb.C40,Tb.C41,Tb.C42,Tb.C43,Tb.C44};
-      FilterTracks(rf,Cf,rb,Cb,0,0,&Chi2Tracks);
+      FilterTracks(&(Tf.x),&(Tf.C00),&(Tb.x),&(Tb.C00),0,0,&Chi2Tracks);
       if(Chi2Tracks[0] > 50 ) continue;
       if(Chi2Tracks[0] < TrackChi2[iTr] || Chi2Tracks[0] < TrackChi2[jTr])
       {

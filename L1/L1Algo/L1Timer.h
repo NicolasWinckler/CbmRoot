@@ -33,7 +33,7 @@ class TimerInfo {
   TimerInfo operator/( const float f ) const { TimerInfo r; r.fName = fName; r.fReal = fReal/f; r.fCpu = fCpu/f; return r; }
   
   // void Print(){ cout << fReal << "/" << fCpu; };
-  void PrintReal(){ cout << setw(6) << fReal ; };
+  void PrintReal(){ cout << fReal ; };
   float Real(){ return fReal; };
   string& Name(){ return fName; };
  private:
@@ -59,7 +59,7 @@ class L1CATFIterTimerInfo {
   
   void PrintReal( int f = 0 ){
     if (f) { PrintNames(); cout << endl; }
-    fTIs[0].PrintReal(); for( unsigned int i = 1; i < fTIs.size(); ++i ) { cout << " | "; fTIs[i].PrintReal(); }
+    fTIs[0].PrintReal(); for( unsigned int i = 1; i < fTIs.size(); ++i ) { cout << " | " << setw(fTIs[i].Name().size()); fTIs[i].PrintReal(); }
     if (f) cout << endl;
   };
   void PrintNames(){ cout << fTIs[0].Name(); for( unsigned int i = 1; i < fTIs.size(); ++i ) { cout << " | " << fTIs[i].Name(); } };
@@ -99,7 +99,7 @@ class L1CATFTimerInfo {
   
   L1CATFIterTimerInfo& GetAllInfo() { return fTIAll; };
   void PrintReal() {
-    cout.precision(0);
+    cout.precision(1);
     cout.setf(ios::fixed);
     cout << " stage "<< " : "; fTIAll.PrintNames(); cout << endl;
     for( unsigned int i = 0; i < fTIIs.size(); ++i ) {

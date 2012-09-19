@@ -11,7 +11,7 @@ using std::vector;
 struct L1HitsSortHelperData{
   L1StsHit* h;
   L1HitPoint* p;
-  THitI *i;
+  THitI i;
 
   static bool compare(const L1HitsSortHelperData &a, const L1HitsSortHelperData &b){
     return ( a.p->y/a.p->z < b.p->y/b.p->z );

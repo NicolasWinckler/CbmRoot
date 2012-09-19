@@ -16,7 +16,7 @@ L1HitsSortHelper::L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &
   for ( int i = 0; i < NHits; i++ ) {
     fD[i].h = &(hits[i]);
     fD[i].p = &(points[i]);
-    fD[i].i = &(indices[i]);
+    fD[i].i = indices[i];
   }
 }
 
@@ -27,15 +27,13 @@ void L1HitsSortHelper::Sort(){
     
   vector<L1StsHit> hits = fHits;
   vector<L1HitPoint> points = fPoints;
-  vector<THitI> indices = fIndices;
   const int NHits = fD.size();
   for ( int i = 0; i < NHits; i++ ) {
     hits[i] = *fD[i].h;
     points[i] = *fD[i].p;
-    indices[i] = *fD[i].i;
+    fIndices[i] = fD[i].i;
   }
   fHits = hits;
   fPoints = points;
-  fIndices = indices;
 }
 

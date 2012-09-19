@@ -9,6 +9,7 @@ struct L1HitPoint{
         
   unsigned short int n; // number of event
   
+  L1HitPoint(){};
   L1HitPoint(fscal x_, fscal y_, fscal z_, fscal v_, fscal u_, unsigned short int n_ = 0): x(x_), y(y_), z(z_), u(u_), v(v_), n(n_){};
 };
 

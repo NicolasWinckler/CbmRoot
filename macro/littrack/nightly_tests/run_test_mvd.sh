@@ -5,10 +5,15 @@
 export LIT_SCRIPT=yes
 
 test_name=$1
-system=$2
-energy=$3
-collision_type=$4
-mvd_delta=$5
+collision=$2
+mvd_delta=$3
+
+# Parse collision
+collision_arr=(${collision//_/ })
+system=${collision_arr[0]}
+energy=${collision_arr[1]}
+collision_type=${collision_arr[2]}
+
 nevents=500
 
 create_output_dir events_${test_name}/

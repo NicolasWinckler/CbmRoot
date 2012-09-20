@@ -652,6 +652,7 @@ void CbmL1::PartHistoPerformance()
     first_call = 0;
 
     TDirectory *currentDir = gDirectory;
+    gDirectory = histodir;
     gDirectory->cd("L1");    
     gDirectory->mkdir("Particles");
     gDirectory->cd("Particles");
@@ -1025,8 +1026,8 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   {
     first_call = 0;
 
-
     TDirectory *curdir = gDirectory;
+    gDirectory = histodir;
     gDirectory->cd("L1");
 
     p_eff_all_vs_mom = new TProfile("p_eff_all_vs_mom", "AllSet Efficiency vs Momentum",
@@ -1430,6 +1431,7 @@ void CbmL1::TrackFitPerformance()
     first_call = 0;
 
     TDirectory *currentDir = gDirectory;
+    gDirectory = histodir;
     gDirectory->cd("L1");
     gDirectory->mkdir("Fit");
     gDirectory->cd("Fit");
@@ -1921,9 +1923,8 @@ void CbmL1::InputPerformance()
     first_call = 0;
     
     TDirectory *currentDir = gDirectory;
-    gDirectory->mkdir("L1");
+    gDirectory = histodir;
     gDirectory->cd("L1");
-    histodir = gDirectory;
     gDirectory->mkdir("Input");
     gDirectory->cd("Input");
     
@@ -1956,8 +1957,9 @@ void CbmL1::InputPerformance()
   }
   if( listStsHits ){
     for (unsigned int iH=0; iH < vStsHits.size(); iH++ ){
-    
       const CbmL1StsHit &h = vStsHits[iH];
+
+      if (h.extIndex < 0) continue; // mvd hit
       const CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(h.extIndex) );
               // strip - MC correspondence
       int iStripF = sh->GetDigi(0);

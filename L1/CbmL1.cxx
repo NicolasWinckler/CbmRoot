@@ -501,7 +501,7 @@ void CbmL1::Reconstruct()
   
       // input performance
   if (fPerformance){
-    //InputPerformance();
+    InputPerformance();
   }
 //  FieldApproxCheck();
 //  FieldIntegralCheck();

@@ -510,8 +510,8 @@ void CbmL1::Reconstruct()
   algo->CATrackFinder();
 //  IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-//  algo->L1KFTrackFitter();
-  algo->KFTrackFitter_simple();
+  algo->L1KFTrackFitter();
+//  algo->KFTrackFitter_simple();
   if( fVerbose>1 ) cout<<"L1 Track fitter  ok"<<endl;
   
     // save recontstructed tracks

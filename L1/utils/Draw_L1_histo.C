@@ -1,7 +1,6 @@
 #include <unistd.h> // for dir navigation
 
 const int textFont = 22; // TNewRoman
-const bool divide = 0; // = 0 - each histo in separate file\screen. = 1 - all in one file\screen
 
 void makeUpHisto(TH1* hist, TString title, float* sigma = 0)
 {
@@ -91,7 +90,8 @@ void Draw_L1_histo() {
   histoStyle->SetStatFontSize(0.05);
 
   histoStyle->SetStatFont(textFont);
-
+  histoStyle->SetPadBorderMode(0);
+  histoStyle->SetFrameBorderMode(0);
 
   
   TStyle *profStyle = new TStyle("profStyle","Plain Style(no colors/fill areas)");
@@ -108,6 +108,8 @@ void Draw_L1_histo() {
   profStyle->SetOptFit(0);
   profStyle->SetGridStyle(2);
 
+  profStyle->SetPadBorderMode(0);
+  profStyle->SetFrameBorderMode(0);
     // ============================ Open file ============================
 
   const TString fileName = "L1_histo.root";
@@ -137,16 +139,17 @@ void Draw_L1_histo() {
   };
   const THistoData histoData[nHisto] =
   {
-    {"fst_pQP",  "Pull q/p"   }
-    {"fst_ptx",  "Pull t_{x}" }
-    {"fst_pty",  "Pull t_{y}" }
-    {"fst_px",  "Pull x"   }
-    {"fst_py",  "Pull y" }
-    {"fst_P",  "Resolution (p^{reco}-p^{mc})/p^{mc}"   }
-    {"fst_tx",  "Residual (t_{x}^{reco}-t_{x}^{mc}) [mrad]" }
-    {"fst_ty",  "Residual (t_{y}^{reco}-t_{y}^{mc}) [mrad]" }
     {"fst_x",  "Residual (x^{reco}-x^{mc}) [#mum]" }
     {"fst_y",  "Residual (y^{reco}-y^{mc}) [#mum]" }
+    {"fst_tx",  "Residual (t_{x}^{reco}-t_{x}^{mc}) [10^{-3}]" }
+    {"fst_ty",  "Residual (t_{y}^{reco}-t_{y}^{mc}) [10^{-3}]" }
+    {"fst_P",  "Resolution (p^{reco}-p^{mc})/p^{mc}"   }
+    {"fst_px",  "Pull x"   }
+    {"fst_py",  "Pull y" }
+    {"fst_ptx",  "Pull t_{x}" }
+    {"fst_pty",  "Pull t_{y}" }
+    {"fst_pQP",  "Pull q/p"   }
+
     {"svrt_pQP",  "Pull q/p"   }
     {"svrt_ptx",  "Pull t_{x}" }
     {"svrt_pty",  "Pull t_{y}" }
@@ -247,40 +250,44 @@ void Draw_L1_histo() {
 
   system("mkdir L1_histo -p");
   chdir( "L1_histo" );
-  const int nParts = 2;
-  int iPart = 1;
+  
+  TCanvas *c2,*c3;
+  c2 = new TCanvas("c2","c2",0,0,900,600);
+  c3 = new TCanvas("c3","c3",0,0,900,600);
+  c3->Divide(5, 2);
+
   histoStyle->cd();
-  TCanvas *c2;
-  if (!divide) c2 = new TCanvas("c2","c2",0,0,900,600);
-          else c2 = new TCanvas("c2","c2",0,0,900*nParts,600*nParts);
-  if (divide) c2->Divide(nParts, nParts);
+  int iPart = 1;
+  for (int i = 0; i < 10; i++){
+    c3->cd(iPart++);
+    histo[i]->Draw();
+  }
+  c3->SaveAs("fst.pdf");
   
   histoStyle->cd();
   c2->cd();
   for (int i = 0; i < nHisto; i++){
-    if (divide) c2->cd(iPart++);
     histo[i]->Draw();
     TString name = TString(histoData[i].name)+".pdf";
-    if (!divide) c2->SaveAs(name);
+    c2->SaveAs(name);
   }
 
   for (int i = 0; i < nHistoInput; i++){
-    if (divide) c2->cd(iPart++);
     histoInput[i]->Draw();
     TString name = TString(histoDataInput[i].name)+".pdf";
-    if (!divide) c2->SaveAs(name);
+    c2->SaveAs(name);
   }
   
   profStyle->cd();
+  c2->cd();
   for (int i = 0; i < nProf; i++){
-    if (divide) c2->cd(iPart++);
     c2->SetGridx();
     c2->SetGridy();
     profile[i]->Draw();
     TString name = TString(profData[i].name)+".pdf";
-    if (!divide) c2->SaveAs(name);
+    c2->SaveAs(name);
   }
 
-  if (divide) c2->SaveAs("L1_histo.pdf");
+
   chdir( ".." );
 }

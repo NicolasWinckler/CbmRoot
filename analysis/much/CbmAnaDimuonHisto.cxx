@@ -79,6 +79,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     fDimuonMmc->Fill(dimuon->GetMomentumMC().M());
     if (!dimuon->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     fDimuonMrc->Fill(dimuon->GetMomentumRC().M());
+    printf("  m = %f\n",dimuon->GetMomentumRC().M());
   }//dimuon
 
   for (Int_t iMuP=0;iMuP<nMuons;iMuP++){
@@ -98,6 +99,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     } // events
     fTree->GetEntry(fEvent);
   } // positive muons
+
   fEvent++;
 }
 // -------------------------------------------------------------------------

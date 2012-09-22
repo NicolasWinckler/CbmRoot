@@ -26,28 +26,11 @@ using std::map;
 
 class CbmAnaDimuonAnalysis : public FairTask{
 public:
-  /** Default constructor **/
-  CbmAnaDimuonAnalysis();
-
-  /** Standard constructor
-  *@param name   Name of class
-  *@param title  Task title
-  **/
-  CbmAnaDimuonAnalysis(const char* name, TString digiFileName, Int_t nSignalPairs);
-
-  /** Destructor **/
-  virtual ~CbmAnaDimuonAnalysis();
-
-  /** Initialisation **/
+  CbmAnaDimuonAnalysis(TString digiFileName, Int_t nSignalPairs);
+  virtual ~CbmAnaDimuonAnalysis(){}
   virtual InitStatus Init();
-
-  /** Task execution **/
   virtual void Exec(Option_t* opt);
-
-  /** Finish at the end **/
   virtual void Finish();
-
-  /** SetParContainers **/
   virtual void SetParContainers();
 
   // Set STS acceptance criteria as a number of STS points
@@ -55,7 +38,7 @@ public:
   void SetMuchPointsAccQuota(Int_t nPoints) { fMuchPointsAccQuota = nPoints; }
   void SetStsTrueHitQuota(Double_t quota)   { fStsTrueHitQuota = quota; }
   void SetMuchTrueHitQuota(Double_t quota)  { fMuchTrueHitQuota = quota; }
-
+  void IsTriggerEnabled(Bool_t isTriggerEnabled) {fIsTriggerEnabled = isTriggerEnabled; }
   Int_t GetMCTrackId(Int_t iMuchTrack);
   
 private:
@@ -102,7 +85,7 @@ private:
 
   CbmMuchGeoScheme* fGeoScheme;     //!
   Int_t fSignalPairs;               //!
-  
+  Bool_t fIsTriggerEnabled; 
   
   ClassDef(CbmAnaDimuonAnalysis,2);
 };

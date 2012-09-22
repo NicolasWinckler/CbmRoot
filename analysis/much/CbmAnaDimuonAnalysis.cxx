@@ -35,38 +35,19 @@
 #include "TLorentzVector.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(){
-  fEvent=0;
-  fStsPointsAccQuota=4;
-  fStsTrueHitQuota=0.7;
-  fMuchPointsAccQuota=10;
-  fMuchTrueHitQuota=0.7;
-  fHistoFileName="histo.root";
-  fMuCandidates  = new TClonesArray("CbmAnaMuonCandidate",1);
-}
-// -------------------------------------------------------------------------
-
-
-// -----   Standard constructor   ------------------------------------------
-CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(const char* name,
-    TString digiFileName,Int_t nSignalPairs)
-:FairTask(name){
-  fEvent=0;
-  fStsPointsAccQuota=4;
-  fStsTrueHitQuota=0.7;
-  fMuchPointsAccQuota=10;
-  fMuchTrueHitQuota=0.7;
-  fMuCandidates  = new TClonesArray("CbmAnaMuonCandidate",1);
-  fDimuonCandidates  = new TClonesArray("CbmAnaDimuonCandidate",nSignalPairs);
-  fSignalPairs  = nSignalPairs;
-  fDigiFileName = digiFileName;
-}
-
-// -------------------------------------------------------------------------
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmAnaDimuonAnalysis::~CbmAnaDimuonAnalysis(){
+CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(TString digiFileName, Int_t nSignalPairs):
+  FairTask("AnaDimuonAnalysis"),
+  fEvent(0),
+  fStsPointsAccQuota(4),
+  fStsTrueHitQuota(0.7),
+  fMuchPointsAccQuota(10),
+  fMuchTrueHitQuota(0.7),
+  fIsTriggerEnabled(0),
+  fHistoFileName("histo.root"),
+  fDigiFileName(digiFileName),
+  fSignalPairs(nSignalPairs),
+  fMuCandidates(new TClonesArray("CbmAnaMuonCandidate",1))
+{
 }
 // -------------------------------------------------------------------------
 
@@ -228,7 +209,7 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     }
 
     // Take only tracks with at least 3 trigger hits
-    if (nTriggerHits<3) continue;
+    if (fIsTriggerEnabled) if (nTriggerHits<3) continue;
     
     CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchTrackMatches->At(iMuchTrack);
 //    Int_t mcMuchTrackId = CbmAnaMuch::GetTrackId(muchTrackMatch,fMuchTrueHitQuota);

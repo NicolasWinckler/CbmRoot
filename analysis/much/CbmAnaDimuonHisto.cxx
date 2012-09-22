@@ -86,8 +86,8 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     if (muP->GetSign()<0) continue;
     if (!muP->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     TLorentzVector pP = TLorentzVector(*(muP->GetMomentumRC()));
-    for (Int_t ev=0;ev<fNoMixedEv;ev++){
-      fTree->GetEntry(fEvent+1);
+    for (Int_t ev=fEvent+1;ev<fEvent+1+fNoMixedEv;ev++){
+      fTree->GetEntry(ev < fNEvents ? ev : ev-fNEvents);
       for (Int_t iMuN=0;iMuN<fMuCandidates->GetEntriesFast();iMuN++){
         CbmAnaMuonCandidate* muN = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuN);
         if (muN->GetSign()>0) continue;

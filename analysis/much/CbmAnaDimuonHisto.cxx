@@ -20,53 +20,23 @@
 #include "FairRuntimeDb.h"
 #include "FairRunAna.h"
 
-// -----   Default constructor   -------------------------------------------
-CbmAnaDimuonHisto::CbmAnaDimuonHisto(){
-  
+CbmAnaDimuonHisto::CbmAnaDimuonHisto():
+  FairTask("AnaDimuonHisto"),
+  fMmin(0.7),
+  fMmax(0.9),
+  fMbins(100),
+  fMminCut(0.78259-2*0.0083),
+  fMmaxCut(0.78259+2*0.0083),
+  fMuchHitsCut(1),
+  fStsHitsCut(1),
+  fChiToVertexCut(101.),
+  fMultiplicity(38),
+  fBranching(9.e-5),
+  fSignalPairs(1),
+  fNoMixedEv(1),
+  fNEvents(0)
+{
 }
-// -------------------------------------------------------------------------
-
-
-// -----   Standard constructor   ------------------------------------------
-CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName, Int_t nMixedEvents)
-:FairTask(name){
-  fMmin = 0.7;
-  fMmax = 0.9;
-  fMbins = 100;
-  fMminCut = 0.78259-2*0.0083;
-  fMmaxCut = 0.78259+2*0.0083;
-  fHistoFileName=histoFileName;
-  fMuchHitsCut=1;
-  fStsHitsCut=1;
-  fChiToVertexCut=101.;
-  fMultiplicity=38;
-  fBranching=9.e-5;
-  fSignalPairs=10;
-  fNoMixedEv=nMixedEvents;
-}
-
-// -------------------------------------------------------------------------
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmAnaDimuonHisto::~CbmAnaDimuonHisto(){
-}
-// -------------------------------------------------------------------------
-
-
-// -----  SetParContainers -------------------------------------------------
-void CbmAnaDimuonHisto::SetParContainers(){
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-
-  rtdb->getContainer("FairBaseParSet");
-  rtdb->getContainer("CbmGeoPassivePar");
-  rtdb->getContainer("CbmGeoStsPar");
-  rtdb->getContainer("CbmGeoMuchPar");
-  rtdb->getContainer("CbmFieldPar");
-}
-// -------------------------------------------------------------------------
-
 
 // -----   Public method Init (abstract in base class)  --------------------
 InitStatus CbmAnaDimuonHisto::Init()
@@ -76,6 +46,7 @@ InitStatus CbmAnaDimuonHisto::Init()
   fMuCandidates     = (TClonesArray*) fManager->GetObject("MuCandidates");
   fDimuonCandidates = (TClonesArray*) fManager->GetObject("DimuonCandidates");
   fTree=fManager->GetInTree();
+  fNEvents = fTree->GetEntries();
   fEvent=0;
   
   if (!(fMuCandidates && fDimuonCandidates)){
@@ -102,7 +73,6 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
   if (fVerbose>0) printf(" Dimuons: %2i",nDimuons);
   if (fVerbose>0) printf(" Muons: %2i",nMuons);
   if (fVerbose>-1) printf("\n");
-
  
   for (Int_t iDimuon=0;iDimuon<nDimuons;iDimuon++){
     CbmAnaDimuonCandidate* dimuon = (CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon);
@@ -114,26 +84,20 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
   for (Int_t iMuP=0;iMuP<nMuons;iMuP++){
     CbmAnaMuonCandidate* muP = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuP);
     if (muP->GetSign()<0) continue;
-//    printf("%i %i %f\n",muP->GetNMuchHits(),muP->GetNStsHits(),muP->GetChiToVertex());
     if (!muP->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     TLorentzVector pP = TLorentzVector(*(muP->GetMomentumRC()));
-//    printf("%f\n",pP.P());
-    for (Int_t ev=fEvent+1; ev<fEvent+1+fNoMixedEv;ev++){
-      if (ev<fNoMixedEv) fTree->GetEntry(ev);
-      else               fTree->GetEntry(ev-fNoMixedEv);
-//      printf("%f\n",pP.P());
+    for (Int_t ev=0;ev<fNoMixedEv;ev++){
+      fTree->GetEntry(fEvent+1);
       for (Int_t iMuN=0;iMuN<fMuCandidates->GetEntriesFast();iMuN++){
         CbmAnaMuonCandidate* muN = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuN);
         if (muN->GetSign()>0) continue;
         if (!muN->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
         TLorentzVector &pN = *muN->GetMomentumRC();
-//        printf("%f\n",pN.P());
         fBgdM->Fill((pN+pP).M());
       } // negative muons
     } // events
     fTree->GetEntry(fEvent);
   } // positive muons
-//  fTree->GetEntry(fEvent);
   fEvent++;
 }
 // -------------------------------------------------------------------------
@@ -141,7 +105,6 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
 
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaDimuonHisto::Finish(){
-  TFile* f = new TFile(fHistoFileName,"recreate");
   fDimuonMmc->Sumw2();
   fDimuonMrc->Sumw2();
   fBgdM->Sumw2();
@@ -149,11 +112,6 @@ void CbmAnaDimuonHisto::Finish(){
   fDimuonMmc->Scale(1./fSignalPairs*fMultiplicity*fBranching/fEvent);
   fDimuonMrc->Scale(1./fSignalPairs*fMultiplicity*fBranching/fEvent);
   fBgdM->Scale(1./fNoMixedEv/fEvent);
-
-  fDimuonMmc->Write();
-  fDimuonMrc->Write();
-  fBgdM->Write();
-  f->Close();
 
   Int_t mMinCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMminCut);
   Int_t mMaxCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
@@ -178,6 +136,10 @@ void CbmAnaDimuonHisto::Finish(){
   printf(" Ef=%6.4f",S/Stotal);
   printf(" S/B=%6.4f",S/B);
   printf("\n");
+
+  fDimuonMmc->Write();
+  fDimuonMrc->Write();
+  fBgdM->Write();
 }
 // -------------------------------------------------------------------------
 

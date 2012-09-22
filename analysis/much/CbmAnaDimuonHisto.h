@@ -21,29 +21,11 @@ class TTree;
 
 class CbmAnaDimuonHisto : public FairTask{
 public:
-  /** Default constructor **/
   CbmAnaDimuonHisto();
-
-  /** Standard constructor
-  *@param name   Name of class
-  *@param title  Task title
-  **/
-  CbmAnaDimuonHisto(const char* name, TString histoFileName, Int_t nMixedEvents);
-
-  /** Destructor **/
-  virtual ~CbmAnaDimuonHisto();
-
-  /** Initialisation **/
+  virtual ~CbmAnaDimuonHisto(){}
   virtual InitStatus Init();
-
-  /** Task execution **/
   virtual void Exec(Option_t* opt);
-
-  /** Finish at the end **/
   virtual void Finish();
-
-  /** SetParContainers **/
-  virtual void SetParContainers();
 
   inline void SetMbinning(Double_t min, Double_t max, Int_t nBins) {
     fMmin=min;
@@ -69,7 +51,6 @@ private:
   TClonesArray* fMuCandidates;      //!
   TClonesArray* fDimuonCandidates;  //!
   TTree* fTree;                     //!
-  TString  fHistoFileName;
 
   TH1D* fDimuonMmc;
   TH1D* fDimuonMrc;
@@ -88,6 +69,7 @@ private:
   Double_t fBranching;
   Int_t fSignalPairs;
   Int_t fNoMixedEv;
+  Int_t fNEvents;
 
   ClassDef(CbmAnaDimuonHisto,1);
 };

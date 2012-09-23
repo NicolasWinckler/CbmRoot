@@ -17,7 +17,7 @@ class TH1D;
 class TH2D;
 class TH3D;
 class TLorentzVector;
-class TTree;
+class TChain;
 
 class CbmAnaDimuonHisto : public FairTask{
 public:
@@ -50,7 +50,7 @@ private:
   Int_t         fEvent;             //!
   TClonesArray* fMuCandidates;      //!
   TClonesArray* fDimuonCandidates;  //!
-  TTree* fTree;                     //!
+  TChain* fChain;                   //!
 
   TH1D* fDimuonMmc;
   TH1D* fDimuonMrc;

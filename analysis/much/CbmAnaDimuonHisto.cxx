@@ -14,7 +14,7 @@
 #include "TCanvas.h"
 #include "TFile.h"
 #include "TLorentzVector.h"
-#include "TTree.h"
+#include "TChain.h"
 
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
@@ -34,7 +34,8 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto():
   fBranching(9.e-5),
   fSignalPairs(1),
   fNoMixedEv(1),
-  fNEvents(0)
+  fNEvents(0),
+  fChain(NULL)
 {
 }
 
@@ -45,10 +46,10 @@ InitStatus CbmAnaDimuonHisto::Init()
   FairRootManager* fManager = FairRootManager::Instance();
   fMuCandidates     = (TClonesArray*) fManager->GetObject("MuCandidates");
   fDimuonCandidates = (TClonesArray*) fManager->GetObject("DimuonCandidates");
-  fTree=fManager->GetInTree();
-  fNEvents = fTree->GetEntries();
+  fChain=fManager->GetInChain();
+  fNEvents = fChain->GetEntries();
   fEvent=0;
-  
+  printf("fNEvents=%i\n",fNEvents);
   if (!(fMuCandidates && fDimuonCandidates)){
     printf(" %p",fMuCandidates);
     printf(" %p",fDimuonCandidates);
@@ -88,7 +89,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     if (!muP->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     TLorentzVector pP = TLorentzVector(*(muP->GetMomentumRC()));
     for (Int_t ev=fEvent+1;ev<fEvent+1+fNoMixedEv;ev++){
-      fTree->GetEntry(ev < fNEvents ? ev : ev-fNEvents);
+      fChain->GetEntry(ev < fNEvents ? ev : ev-fNEvents);
       for (Int_t iMuN=0;iMuN<fMuCandidates->GetEntriesFast();iMuN++){
         CbmAnaMuonCandidate* muN = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuN);
         if (muN->GetSign()>0) continue;
@@ -97,7 +98,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
         fBgdM->Fill((pN+pP).M());
       } // negative muons
     } // events
-    fTree->GetEntry(fEvent);
+    fChain->GetEntry(fEvent);
   } // positive muons
 
   fEvent++;

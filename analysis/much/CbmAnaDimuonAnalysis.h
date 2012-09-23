@@ -22,6 +22,7 @@ class TLorentzVector;
 class CbmMuchTrack;
 class CbmMuchGeoScheme;
 class CbmStsKFTrackFitter;
+class CbmVertex;
 using std::map;
 
 class CbmAnaDimuonAnalysis : public FairTask{
@@ -63,6 +64,8 @@ private:
   TClonesArray* fStrawDigiMatches;
   TClonesArray* fClusters;
   CbmStsKFTrackFitter* fFitter;
+  CbmVertex* fVertex;
+
   
   Int_t    fStsPointsAccQuota;
   Double_t fStsTrueHitQuota;

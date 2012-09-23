@@ -25,7 +25,7 @@
 #include "FairRuntimeDb.h"
 #include "CbmMuchCluster.h"
 #include "CbmMuchDigiMatch.h"
-
+#include "CbmVertex.h"
 #include "TClonesArray.h"
 #include "TMath.h"
 #include "TH1D.h"
@@ -46,7 +46,8 @@ CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(TString digiFileName, Int_t nSignalPa
   fHistoFileName("histo.root"),
   fDigiFileName(digiFileName),
   fSignalPairs(nSignalPairs),
-  fMuCandidates(new TClonesArray("CbmAnaMuonCandidate",1))
+  fMuCandidates(new TClonesArray("CbmAnaMuonCandidate",1)),
+  fVertex(NULL)
 {
 }
 // -------------------------------------------------------------------------
@@ -84,9 +85,8 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   fPixelDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fStrawDigiMatches = (TClonesArray*) fManager->GetObject("MuchStrawDigiMatch");
   fClusters         = (TClonesArray*) fManager->GetObject("MuchCluster");
-
+  fVertex           = (CbmVertex*)    fManager->GetObject("PrimaryVertex");
   fEvent=0;
-  
   if (!(fMCTracks&&fStsPoints&&fMuchPoints&&fMuchPixelHits&&fStsTracks&&fMuchTracks&&fMuchTrackMatches&&fStsTrackMatches)){
     printf(" %p",fStsPoints);
     printf(" %p",fMuchPoints);
@@ -143,7 +143,6 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
   fMuCandidates->Clear();
   fDimuonCandidates->Clear();
   Int_t iMuCandidates = 0;
-  
   
   // Create array of signal dimuons
   for (Int_t iDimuon=0;iDimuon<fSignalPairs;iDimuon++){
@@ -236,14 +235,14 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     mu->SetNStsHits(nStsHits);
     Double_t chi = fFitter->GetChiToVertex(stsTrack);
     mu->SetChiToVertex(chi);
-//    printf("n=%i chi=%f\n",nStsHits,chi);
-    CbmKFTrack kfTrack = CbmKFTrack(*stsTrack);
-    
-    kfTrack.Extrapolate(0); // TODO change to primary vertex z
-    Double_t* T=kfTrack.GetTrack();
-    mu->SetMomentumRC(T);
-    mu->SetReconstructed(kTRUE);
-    mu->SetSign(T[4]>0 ? 1. : -1.);
+    FairTrackParam par;
+    fFitter->Extrapolate(stsTrack,fVertex->GetZ(),&par);
+    TLorentzVector mom;
+    TVector3 p;
+    par.Momentum(p);
+    mom.SetVectM(p,0.105658);
+    mu->SetMomentumRC(mom);
+    mu->SetSign(par.GetQp()>0 ? 1 : -1);
   }
 
 }

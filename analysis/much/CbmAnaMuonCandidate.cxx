@@ -46,8 +46,7 @@ void CbmAnaMuonCandidate::SetMomentumRC(Double_t* T){
   Double_t pz = TMath::Sqrt( p*p / ( tx*tx + ty*ty + 1 ) );
   Double_t px = tx * pz;
   Double_t py = ty * pz;
-  fpRC.SetXYZM(px, py,pz,0.105658);
-
+  fpRC.SetXYZM(px,py,pz,0.105658);
 }
 
 Bool_t CbmAnaMuonCandidate::IsReconstructed(Int_t nMuchHitsCut, Int_t nStsHitsCut, Double_t chiToVertexCut){

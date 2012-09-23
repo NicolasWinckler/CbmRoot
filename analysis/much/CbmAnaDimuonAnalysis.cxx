@@ -47,6 +47,7 @@ CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(TString digiFileName, Int_t nSignalPa
   fDigiFileName(digiFileName),
   fSignalPairs(nSignalPairs),
   fMuCandidates(new TClonesArray("CbmAnaMuonCandidate",1)),
+  fDimuonCandidates(new TClonesArray("CbmAnaDimuonCandidate",1)),
   fVertex(NULL)
 {
 }

@@ -73,7 +73,7 @@ private:
   Double_t fMuchTrueHitQuota;
   TString  fHistoFileName;
   TString  fDigiFileName;
-  Int_t fLastStationIndex;
+  Int_t fTriggerStationIndex;
   Int_t fNLayers;
   
   map<Int_t,Int_t> mapRecSts;       //!

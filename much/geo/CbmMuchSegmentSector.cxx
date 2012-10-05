@@ -279,7 +279,7 @@ void CbmMuchSegmentSector::DrawSegmentation(){
                     kGreen+4, kMagenta+4, kCyan+4, kRed+4, kBlue+4, kYellow+4, kTeal+4,
                     kPink+4, kAzure+4, kOrange+4, kViolet+4, kSpring+4};
 //  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
-  for (Int_t iStation=0;iStation<1;++iStation){
+  for (Int_t iStation=0;iStation<6;++iStation){
     fprintf(outfile, "===========================================================================\n");
     fprintf(outfile, "Station %i\n", iStation+1);
     fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");
@@ -287,10 +287,10 @@ void CbmMuchSegmentSector::DrawSegmentation(){
     TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),1000,1000);
     c1->SetFillColor(0);
 //    c1->Range(-200,-200,200,200);
-    c1->Range(-100,-100,100,100);
+    c1->Range(-270,-270,270,270);
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
-    for (Int_t iSide=0;iSide>=0;iSide--){
+    for (Int_t iSide=1;iSide>=0;iSide--){
       CbmMuchLayerSide* layerSide = layer->GetSide(iSide);
       for (Int_t iModule=0;iModule<layerSide->GetNModules();++iModule) {
         CbmMuchModule* mod = layerSide->GetModule(iModule);
@@ -300,13 +300,6 @@ void CbmMuchSegmentSector::DrawSegmentation(){
         CbmMuchModuleGemRadial* module = (CbmMuchModuleGemRadial*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
           CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSector(iSector);
-          if (iSector==0){
-            printf("  Station: %i",iStation);
-//            printf("  Phi0: %f\n",sector->GetPhi0());
-          }
-//          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
-//          sector->Draw("f");
-//          sector->Draw();
           sector->AddPads();
           sector->DrawPads();
         } // sectors

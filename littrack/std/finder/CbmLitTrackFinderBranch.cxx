@@ -144,28 +144,32 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
    fNofBranchesStationGroup = 0;
 
    if (ProcessStation(track, stationGroup, 0, tracks[0])) { // 0
-      for (TrackPtrIterator trk0 = tracks[0].begin(); trk0 != tracks[0].end(); trk0++) { // 1
-         if (!ProcessStation(*trk0, stationGroup, 1, tracks[1])) { continue; }
+      if (nofStations < 2) {
+         if (!AddTrackCandidate(tracks[0], stationGroup)) { return; }
+      } else { // else
+         for (TrackPtrIterator trk0 = tracks[0].begin(); trk0 != tracks[0].end(); trk0++) { // 1
+            if (!ProcessStation(*trk0, stationGroup, 1, tracks[1])) { continue; }
 
-         if (nofStations < 3) {
-            if (!AddTrackCandidate(tracks[1], stationGroup)) { return; }
-            continue;
-         }
-
-         for (TrackPtrIterator trk1 = tracks[1].begin(); trk1 != tracks[1].end(); trk1++) { // 2
-            if (!ProcessStation(*trk1, stationGroup, 2, tracks[2])) { continue; }
-
-            if (nofStations < 4) {
-               if (!AddTrackCandidate(tracks[2], stationGroup)) { return; }
+            if (nofStations < 3) {
+               if (!AddTrackCandidate(tracks[1], stationGroup)) { return; }
                continue;
             }
 
-            for (TrackPtrIterator trk2 = tracks[2].begin(); trk2 != tracks[2].end(); trk2++) { // 3
-               if (!ProcessStation(*trk2, stationGroup, 3, tracks[3])) { continue; }
-               if (!AddTrackCandidate(tracks[3], stationGroup)) { return; }
-            } // 3
-         } // 2
-      } // 1
+            for (TrackPtrIterator trk1 = tracks[1].begin(); trk1 != tracks[1].end(); trk1++) { // 2
+               if (!ProcessStation(*trk1, stationGroup, 2, tracks[2])) { continue; }
+
+               if (nofStations < 4) {
+                  if (!AddTrackCandidate(tracks[2], stationGroup)) { return; }
+                  continue;
+               }
+
+               for (TrackPtrIterator trk2 = tracks[2].begin(); trk2 != tracks[2].end(); trk2++) { // 3
+                  if (!ProcessStation(*trk2, stationGroup, 3, tracks[3])) { continue; }
+                  if (!AddTrackCandidate(tracks[3], stationGroup)) { return; }
+               } // 3
+            } // 2
+         } // 1
+      } // else
    } // 0
 
    for (Int_t i = 0; i < nofStations; i++) {

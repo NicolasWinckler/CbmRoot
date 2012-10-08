@@ -129,7 +129,7 @@ void DrawH1(
       TH1* hist = histos[iHist];
       string opt = (iHist == 0) ? drawOpt : (iHist == nofHistos - 1) ? "SAME" + drawOpt : "SAME" + drawOpt;
       DrawH1(hist, logx, logy, opt, CbmDrawingOptions::Color(iHist), CbmDrawingOptions::LineWidth(),
-            CbmDrawingOptions::LineStyle(iHist), CbmDrawingOptions::MarkerSize(), CbmDrawingOptions::MarkerStyle(iHist));
+            CbmDrawingOptions::LineStyle(0), CbmDrawingOptions::MarkerSize(), CbmDrawingOptions::MarkerStyle(iHist));
       max = std::max(max, hist->GetMaximum());
       legend->AddEntry(hist, histLabels[iHist].c_str(), "lp");
    }

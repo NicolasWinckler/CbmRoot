@@ -77,7 +77,7 @@ STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 # mandatory
 if(CBMROOT_MINIMAL)
   MESSAGE("******* Install minimal CbmRoot Version ********")
-  find_package(ROOT REQUIRED)
+  find_package(ROOT 5.32.00 REQUIRED)
 else(CBMROOT_MINIMAL)
   find_package(ROOT REQUIRED)
   find_package(PLUTO REQUIRED)

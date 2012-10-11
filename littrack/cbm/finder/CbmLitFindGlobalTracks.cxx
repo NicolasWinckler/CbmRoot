@@ -102,7 +102,7 @@ void CbmLitFindGlobalTracks::Exec(
 
    ClearArrays();
 
-   std::cout << "Event: " << fEventNo++ << std::endl;
+   std::cout << "CbmLitFindGlobalTracks::Exec event: " << fEventNo++ << std::endl;
 }
 
 void CbmLitFindGlobalTracks::SetParContainers()
@@ -418,7 +418,13 @@ void CbmLitFindGlobalTracks::RunTrackReconstruction()
       }
 
       // Selection of tracks to be merged with TOF
-      if (fDet.GetDet(kMUCH) || fDet.GetDet(kTRD)) { SelectTracksForTofMerging(); }
+      if (fDet.GetDet(kMUCH) || fDet.GetDet(kTRD)) {
+         SelectTracksForTofMerging();
+      } else {
+         for (TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++) {
+            (*it)->SetQuality(kLITGOODMERGE);
+         }
+      }
 
       fMergerWatch.Start(kFALSE);
       fMerger->DoMerge(fLitTofHits, fLitOutputTracks);

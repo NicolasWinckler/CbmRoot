@@ -58,12 +58,12 @@ void CbmLitTrackFinderBase::ArrangeHits(
          if (station.GetType() == kLITPIXELHIT) {
             for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
             	for (Int_t l = 0; l < fLayout.GetNofModuleRotations(i, j, k); l++) {
-				   HitPtrIteratorPair hits = fHitData.GetHits(i, j, k, l);
-				   std::sort(hits.first, hits.second, CompareHitPtrXULess());
+            	   HitPtrIteratorPair hits = fHitData.GetHits(i, j, k, l);
+            	   std::sort(hits.first, hits.second, CompareHitPtrXULess());
 //	               std::cout << "station group " << i << " station " << j << " substation " << k << " moduleRotation " << l << std::endl;
 //	               for(HitPtrIterator it = hits.first; it != hits.second; it++)
 //	                   std::cout << (*it)->ToString();
-				}
+				   }
             }
          } else {
             for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++) {

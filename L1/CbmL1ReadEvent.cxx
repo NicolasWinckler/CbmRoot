@@ -602,6 +602,8 @@ void CbmL1::ReadEvent()
 
 bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
 {
+  cout << "Reading Monte Carlo Information in L1 track finder." << endl;
+
   TVector3 xyzI,PI, xyzO,PO;
   Int_t mcID=-1;
   if( MVD && listMvdPts ){

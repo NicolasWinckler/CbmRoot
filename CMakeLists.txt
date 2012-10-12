@@ -70,6 +70,9 @@ endif(NOT CBMROOT_MINIMAL)
 
 STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
+# Check if the external packages are installed into a separate install
+# directory
+CHECK_EXTERNAL_PACKAGE_INSTALL_DIR()
 
 # searches for needed packages
 # REQUIRED means that cmake will stop if this packages are not found

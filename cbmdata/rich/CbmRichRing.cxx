@@ -58,8 +58,8 @@ CbmRichRing::CbmRichRing()
     fDPar(0.),
     fEPar(0.),
     fFPar(0.),
-    fCenterX(), 
-    fCenterY(), 
+    fCenterX(0.), 
+    fCenterY(0.), 
     fRadius(0.),
     fAaxis(0.),
     fBaxis(0.),
@@ -74,7 +74,6 @@ CbmRichRing::CbmRichRing()
     fSelectionNN(-1.),
     fRecFlag(0)
 {
-  //    fSelectionNN  = -1.;
     fHitCollection.reserve(40);
 }
 // -------------------------------------------------------------------------
@@ -108,7 +107,6 @@ CbmRichRing::CbmRichRing ( Float_t x,
     fSelectionNN(-1.),
     fRecFlag(0)
 {
-  //    fSelectionNN  = -1.;
     fHitCollection.reserve(40);
 }
 // -------------------------------------------------------------------------

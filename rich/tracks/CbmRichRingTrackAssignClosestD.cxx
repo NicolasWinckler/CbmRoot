@@ -48,7 +48,7 @@ void CbmRichRingTrackAssignClosestD::Init()
 	if (NULL == fGlobalTracks) {Fatal("CbmRichRingTrackAssignClosestD::Init", "No GlobalTrack array!");}
 
 	fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
-	if (NULL == fTrdTracks) {Fatal("CbmRichRingTrackAssignClosestD::Init", "No TrdTrack array!");}
+	//if (NULL == fTrdTracks) {Fatal("CbmRichRingTrackAssignClosestD::Init", "No TrdTrack array!");}
 }
 
 void CbmRichRingTrackAssignClosestD::DoAssign(
@@ -90,7 +90,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(
 				// no projection onto the photodetector plane
 				if (xTrack == 0 && yTrack == 0) continue;
 
-				if (fUseTrd && !IsTrdElectron(iTrack)) continue;
+				if (fUseTrd && fTrdTracks != NULL && !IsTrdElectron(iTrack)) continue;
 
 				Double_t dist = TMath::Sqrt( (xRing-xTrack)*(xRing-xTrack) +
 						(yRing-yTrack)*(yRing-yTrack) );

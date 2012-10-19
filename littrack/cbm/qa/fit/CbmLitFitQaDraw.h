@@ -48,6 +48,8 @@ private:
 	   Double_t sigma,
 	   Double_t rms);
 
+	void DrawTrackParamsAtVertex();
+
 	CbmHistManager* fHM; // Pointer to histogram manager
 	string fOutputDir; // Output directory for images
 };

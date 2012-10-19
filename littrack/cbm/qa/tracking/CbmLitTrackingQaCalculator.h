@@ -9,7 +9,6 @@
 #define CBMLITTRACKINGQACALCULATOR_H_
 
 #include "CbmDetectorList.h"
-#include "CbmStsKFTrackFitter.h"
 #include "cbm/base/CbmLitDetectorSetup.h"
 
 #include <map>
@@ -20,7 +19,6 @@
 #include <boost/property_tree/ptree.hpp>
 
 class CbmTrackMatch;
-class CbmVertex;
 class CbmStsKFTrackFitter;
 class CbmMCTrack;
 class TClonesArray;
@@ -306,9 +304,6 @@ private:
    TClonesArray* fTrdMatches; // CbmTrackMatch array
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
-
-//   CbmVertex *fPrimVertex; // Pointer to the primary vertex
-//   CbmStsKFTrackFitter* fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
 //   CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 //   CbmRichRingFitterEllipseTau* fRichEllipseFitter; // ellipse fitter

@@ -10,6 +10,7 @@
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmTrack.h"
+#include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmMvdHit.h"
 #include "CbmStsHit.h"
@@ -33,11 +34,14 @@ CbmLitFitQaCalculator::CbmLitFitQaCalculator(
 		fMuchTrackMatches(NULL),
 		fMuchPixelHits(NULL),
 		fMuchStripHits(NULL),
+		fMCTracks(NULL),
 		fMvdMinNofHits(0),
 		fStsMinNofHits(0),
 		fTrdMinNofHits(0),
 		fMuchMinNofHits(0),
 		fQuota(0.7),
+		fPrimVertex(NULL),
+		fKFFitter(),
 		fHM(histManager),
 		fMCTrackCreator(NULL)
 {
@@ -53,6 +57,8 @@ void CbmLitFitQaCalculator::Init()
 {
 	ReadDataBranches();
 	fMCTrackCreator = CbmLitMCTrackCreator::Instance();
+
+	fKFFitter.Init();
 }
 
 void CbmLitFitQaCalculator::Exec()
@@ -61,6 +67,7 @@ void CbmLitFitQaCalculator::Exec()
 	std::cout << "CbmLitFitQaCalculator::Exec: event=" << nofEvents++ << std::endl;
 	fMCTrackCreator->Create();
 	ProcessGlobalTracks();
+	ProcessTrackParamsAtVertex();
 }
 
 void CbmLitFitQaCalculator::Finish()
@@ -85,6 +92,8 @@ void CbmLitFitQaCalculator::ReadDataBranches()
    fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
    fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
    fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
+   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+   fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
 }
 
 void CbmLitFitQaCalculator::ProcessGlobalTracks()
@@ -292,4 +301,37 @@ void CbmLitFitQaCalculator::FillResidualsAndPulls(
    if (sigmaTx < 0) fHM->H1(histName + "WrongCov_Tx")->Fill(wrongPar); else fHM->H1(histName + "Pull_Tx")->Fill(resTx / sigmaTx);
    if (sigmaTy < 0) fHM->H1(histName + "WrongCov_Ty")->Fill(wrongPar); else fHM->H1(histName + "Pull_Ty")->Fill(resTy / sigmaTy);
    if (sigmaQp < 0) fHM->H1(histName + "WrongCov_Qp")->Fill(wrongPar); else fHM->H1(histName + "Pull_Qp")->Fill(resQp / sigmaQp);
+}
+
+void CbmLitFitQaCalculator::ProcessTrackParamsAtVertex()
+{
+   Int_t nofTracks = fStsTracks->GetEntriesFast();
+   for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+      CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(iTrack));
+      const CbmTrackMatch* match = static_cast<const CbmTrackMatch*>(fStsTrackMatches->At(iTrack));
+      Int_t mcId = match->GetMCTrackId();
+
+      if (mcId < 0) continue; // ghost or fake track
+      const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcId));
+      if (mcTrack->GetMotherId() != -1) continue; // only for primaries
+      //if (mcTrack->GetP() < 1.) continue; // only for momentum large 1 GeV/c
+
+      // Check correctness of reconstructed track
+      Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
+      if ((match->GetNofTrueHits() / allHits) < fQuota) continue;
+
+      fKFFitter.DoFit(track, 211);
+      Double_t chiPrimary = fKFFitter.GetChiToVertex(track, fPrimVertex);
+      fHM->H1("htf_ChiPrimary")->Fill(chiPrimary);
+
+      FairTrackParam vtxTrack;
+      fKFFitter.FitToVertex(track, fPrimVertex, &vtxTrack);
+
+      TVector3 momMC, momRec;
+      mcTrack->GetMomentum(momMC);
+      vtxTrack.Momentum(momRec);
+
+      Double_t dpp = 100. * (momMC.Mag() - momRec.Mag()) / momMC.Mag();
+      fHM->H1("htf_MomRes_Mom")->Fill(momMC.Mag(), dpp);
+   }
 }

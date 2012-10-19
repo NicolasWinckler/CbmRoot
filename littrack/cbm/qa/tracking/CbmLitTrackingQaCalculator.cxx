@@ -85,9 +85,6 @@ CbmLitTrackingQaCalculator::CbmLitTrackingQaCalculator(
    fTofPoints(NULL),
    fTofHits(NULL),
 
-//   fPrimVertex(NULL),
-//   fKFFitter(NULL),
-
 //   fElectronId(NULL),
 
    fHM(histManager)
@@ -662,33 +659,6 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
 
 //void CbmLitTrackingQaCalculator::StsTracksQa()
 //{
-//   Int_t nSts = fStsTracks->GetEntriesFast();
-//   for (Int_t i = 0; i < nSts; i++) {
-//      CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(i);
-//      if (stsTrack == NULL) continue;
-//      const CbmTrackMatch* stsTrackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(i));
-//      if (stsTrackMatch == NULL) continue;
-//      Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
-//      if (mcIdSts < 0) continue;
-//      const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcIdSts));
-//      if (mcTrack == NULL) continue;
-//      Int_t motherId = mcTrack->GetMotherId();
-//      if (motherId != -1) continue;
-//
-//      TVector3 momMC;
-//      mcTrack->GetMomentum(momMC);
-//      //fKFFitter.DoFit(stsTrack,11);
-//      Double_t chiPrimary = fKFFitter->GetChiToVertex(stsTrack, fPrimVertex);
-//      fHM->H1("hStsChiprim")->Fill(chiPrimary);
-//
-//      FairTrackParam vtxTrack;
-//      fKFFitter->FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
-//      TVector3 momRec;
-//      vtxTrack.Momentum(momRec);
-//
-//      Double_t dpp = 100. * (momMC.Mag() - momRec.Mag()) / momMC.Mag();
-//      fHM->H2F("hStsMomresVsMom")->Fill(momMC.Mag(), dpp);
-//   }
 //
 //   // TODO: refactor track length to a seperate method!
 //   //Track length in TOF detector

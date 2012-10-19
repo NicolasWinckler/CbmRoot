@@ -11,12 +11,14 @@
 #include "CbmDetectorList.h"
 #include <string>
 #include "TObject.h"
+#include "CbmStsKFTrackFitter.h"
 using std::string;
 class CbmHistManager;
 class TClonesArray;
 class FairTrackParam;
 class CbmLitMCPoint;
 class CbmLitMCTrackCreator;
+class CbmVertex;
 
 class CbmLitFitQaCalculator
 {
@@ -77,6 +79,8 @@ private:
 		Float_t wrongPar,
 		DetectorId detId);
 
+	void ProcessTrackParamsAtVertex();
+
 	// Data branches
 	TClonesArray* fGlobalTracks; // CbmGlobalTrack array
 	TClonesArray* fStsTracks; // CbmStsTrack array
@@ -90,6 +94,7 @@ private:
 	TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
 	TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
 	TClonesArray* fMuchStripHits; // CbmMuchStripHit array
+	TClonesArray* fMCTracks; // CbmMCTrack array
 
 	Int_t fMvdMinNofHits; // Cut on minimum number of hits in track in MVD
 	Int_t fStsMinNofHits; // Cut on minimum number of hits in track in STS
@@ -97,6 +102,9 @@ private:
 	Int_t fMuchMinNofHits; // Cut on minimum number of hits in track in MUCH
 
 	Double_t fQuota; // percent of correctly attached hits
+
+	CbmVertex* fPrimVertex; // Pointer to the primary vertex
+	CbmStsKFTrackFitter fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
 
 	CbmHistManager* fHM; // Histogram manager
 	CbmLitMCTrackCreator* fMCTrackCreator; // MC track creator tool

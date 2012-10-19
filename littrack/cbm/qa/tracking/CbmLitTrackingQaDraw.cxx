@@ -244,53 +244,6 @@ void CbmLitTrackingQaDraw::DrawHitsHistos(
 
 //void CbmLitTrackingQaDraw::DrawStsTracksQaHistos()
 //{
-//   TCanvas* canvas1 = new TCanvas("tracking_qa_sts_tracks_qa", "tracking_qa_sts_tracks_qa", 900, 900);
-//   canvas1->Divide(2,2);
-//   canvas1->cd(1);
-//   TH1* hChiprim = fHM->H1("hStsChiprim");
-//   hChiprim->Scale(1. / hChiprim->Integral());
-//   DrawH1(hChiprim, kLitLinear, kLitLog);
-//   gPad->SetGridx(true);
-//   gPad->SetGridy(true);
-//
-//   canvas1->cd(2);
-//   TH1* projY = (TH1*)fHM->H2F("hStsMomresVsMom")->ProjectionY();
-//   projY->Scale(1./projY->Integral());
-//   DrawH1(projY, kLitLinear, kLitLog);
-//   gPad->SetGridx(true);
-//   gPad->SetGridy(true);
-//
-////   canvas1->cd(3);
-////   DrawHist2D(fhStsMomresVsMom, "P [GeV/c]", "dP [%]", "Counter",
-////         kLitLinearScale, kLitLinearScale, kLitLinearScale, "COLZ");
-////   gPad->SetGridx(true);
-////   gPad->SetGridy(true);
-//
-//   canvas1->cd(3);
-//   fHM->H2F("hStsMomresVsMom")->FitSlicesY();
-//   TH1* momslice = (TH1*) gDirectory->Get("hStsMomresVsMom_2");
-//   momslice->GetXaxis()->SetTitle("P [GeV/c]");
-//   momslice->GetYaxis()->SetTitle("dP/P, #sigma [%]");
-//   DrawH1(momslice, kLitLinear, kLitLinear);
-//   gPad->SetGridx(true);
-//   gPad->SetGridy(true);
-//   if (fOutputDir != "") lit::SaveCanvasAsImage(canvas1, fOutputDir);
-//
-//   canvas1->cd(4);
-//   TH2F* hMomres = fHM->H2F("hStsMomresVsMom");
-//   Int_t nBins = hMomres->GetNbinsX();
-//   TH1D* momResRms = (TH1D*)hMomres->ProjectionX();
-//   for (Int_t i = 1; i < nBins; i++){
-//      TH1* projY = (TH1*)hMomres->ProjectionY("_py", i, i);
-//      Double_t rms = projY->GetRMS();
-//      momResRms->SetBinContent(i, rms);
-//      momResRms->SetBinError(i, momslice->GetBinError(i));
-//   }
-//   momResRms->GetXaxis()->SetTitle("P [GeV/c]");
-//   momResRms->GetYaxis()->SetTitle("dP/P, RMS [%]");
-//   DrawH1(momResRms, kLitLinear, kLitLinear, "P");
-//   gPad->SetGridx(true);
-//   gPad->SetGridy(true);
 //
 //   TCanvas* canvas2 = new TCanvas("tracking_qa_track_length", "tracking_qa_track_length", 500, 500);
 //   TH1* hLength = fHM->H1("hTrackLength");

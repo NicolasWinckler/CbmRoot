@@ -29,25 +29,37 @@
 #xterm -hold -e ". ./trd_qa.sh trd_v12alv trd/trd_v12alv.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
 
 # pefoam20 radiator 4x4x2
-xterm -hold -e ". ./trd_qa.sh trd_v12alaf trd/trd_v12alaf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12albf trd/trd_v12albf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alcf trd/trd_v12alcf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12aldf trd/trd_v12aldf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alaf trd/trd_v12alaf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12albf trd/trd_v12albf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alcf trd/trd_v12alcf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12aldf trd/trd_v12aldf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
 
 # pefoam20 radiator 3x3x2
-xterm -hold -e ". ./trd_qa.sh trd_v12alef trd/trd_v12alef.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alff trd/trd_v12alff.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12algf trd/trd_v12algf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alhf trd/trd_v12alhf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alef trd/trd_v12alef.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alff trd/trd_v12alff.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12algf trd/trd_v12algf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alhf trd/trd_v12alhf.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
 
 # pefoam20 radiator 4x4x2 frame thickness
-xterm -hold -e ". ./trd_qa.sh trd_v12alas trd/trd_v12alas.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12albs trd/trd_v12albs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alcs trd/trd_v12alcs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alds trd/trd_v12alds.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12ales trd/trd_v12ales.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alfs trd/trd_v12alfs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12algs trd/trd_v12algs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alhs trd/trd_v12alhs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12alis trd/trd_v12alis.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
-xterm -hold -e ". ./trd_qa.sh trd_v12aljs trd/trd_v12aljs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alas trd/trd_v12alas.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12albs trd/trd_v12albs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alcs trd/trd_v12alcs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alds trd/trd_v12alds.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12ales trd/trd_v12ales.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alfs trd/trd_v12alfs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12algs trd/trd_v12algs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alhs trd/trd_v12alhs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12alis trd/trd_v12alis.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+#xterm -hold -e ". ./trd_qa.sh trd_v12aljs trd/trd_v12aljs.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+
+# geometry with febs and 5cm frame thickness
+#xterm -hold -e ". ./trd_qa.sh trd_v12alfeb trd/trd_v12alfeb.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+
+
+
+xterm -hold -e ". ./trd_qa.sh trd_v12altof 2 trd/trd_v12altof.root $VMCWORKDIR/parameters/trd/trd_v12a.digi.par"&
+xterm -hold -e ". ./trd_qa.sh trd_v12alnotrd 0 "&
+
+
+
+

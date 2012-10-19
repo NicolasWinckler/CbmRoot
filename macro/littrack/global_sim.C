@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 10)
+void global_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
@@ -32,7 +32,7 @@ void global_sim(Int_t nEvents = 10)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/Users/andrey/Development/cbm/d/events/trd_v12ala/"; // Directory for output simulation files
+	TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -47,7 +47,7 @@ void global_sim(Int_t nEvents = 10)
 		shieldGeom = "shield_standard.geo";
 		mvdGeom    = "mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
-		muchGeom   = "much/much_v11a.geo";
+		muchGeom   = "much/much_v12b_Anna.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
 		tofGeom    = "tof/tof_v07a.geo";
 		fieldMap   = "field_v10e";
@@ -56,10 +56,10 @@ void global_sim(Int_t nEvents = 10)
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
-		mvdGeom    = "mvd/mvd_v07a.geo";
+		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v11a.geo";
-		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v12ala.root";
+		richGeom   = "";//"rich/rich_v08a.geo";
+		trdGeom    = "";//"trd/trd_v12ala.root";
 		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v10e";

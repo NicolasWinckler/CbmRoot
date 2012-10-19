@@ -29,21 +29,27 @@ void qa_study()
       }
       outputDir = std::string(gSystem->Getenv("LIT_STUDY_OUTPUT_DIR"));
    } else {
-      //results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v10b_smearing_nn/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v11c_clustering_branch/");
-     // results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v11d_smearing_nn/");
-     // results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12a_smearing_nn/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12b_clustering_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12c_clustering_branch/");
-      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12d_clustering_branch/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alds_smearing_branch/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12altof_smearing_branch/");
+      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alnotrd_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alds_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12ales_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alfs_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12algs_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alhs_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alis_smearing_branch/");
+//      results.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12aljs_smearing_branch/");
 
-     // names.push_back("v10b");
-      names.push_back("v11c");
-    //  names.push_back("v11d");
-    //  names.push_back("v12a");
-      names.push_back("v12b");
-      names.push_back("v12c");
-      names.push_back("v12d");
+      names.push_back("v12alds");
+      names.push_back("v12altof");
+      names.push_back("v12alnotrd");
+//      names.push_back("v12alds");
+//      names.push_back("v12ales");
+//      names.push_back("v12alfs");
+//      names.push_back("v12algs");
+//      names.push_back("v12alhs");
+//      names.push_back("v12alis");
+//      names.push_back("v12aljs");
 
       outputDir = "./test/";
    }

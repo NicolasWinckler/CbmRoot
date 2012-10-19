@@ -9,14 +9,14 @@
 using std::cout;
 using std::endl;
 
-void global_reco_qa(Int_t nEvents = 2)
+void global_reco_qa(Int_t nEvents = 500)
 {
-	TString dir = "/Users/andrey/Development/cbm/d/events/std_electrons/"; // Output directory
+	TString dir = "/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/events_trd_v12alnotrd/"; // Output directory
 	TString resultDir = "./test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
-    TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed event
-    TString globalTracksFile = dir + "global.tracks.0000.root"; // File with global tracks
+ //   TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed event
+    TString globalTracksFile = dir + "global.reco.smearing.branch.0000.root"; // File with global tracks
 	TString recoQaFile = dir + "reco.qa.0000.root"; // Output file with histograms
 
 	TStopwatch timer;
@@ -30,7 +30,7 @@ void global_reco_qa(Int_t nEvents = 2)
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run = new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->AddFriend(globalHitsFile);
+	//run->AddFriend(globalHitsFile);
 	run->AddFriend(globalTracksFile);
 	run->SetOutputFile(recoQaFile);
 	// ------------------------------------------------------------------------
@@ -44,12 +44,12 @@ void global_reco_qa(Int_t nEvents = 2)
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
    trackingQa->SetUseConsecutivePointsInSts(true);
    trackingQa->SetMinNofPointsSts(4);
-   trackingQa->SetMinNofPointsTrd(8);
-   trackingQa->SetMinNofPointsMuch(10);
+   trackingQa->SetMinNofPointsTrd(2);
+   trackingQa->SetMinNofPointsMuch(0);
    trackingQa->SetMinNofPointsTof(1);
    trackingQa->SetQuota(0.7);
-   trackingQa->SetMinNofHitsTrd(8);
-   trackingQa->SetMinNofHitsMuch(10);
+   trackingQa->SetMinNofHitsTrd(2);
+   trackingQa->SetMinNofHitsMuch(0);
    trackingQa->SetVerbose(0);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
@@ -60,8 +60,8 @@ void global_reco_qa(Int_t nEvents = 2)
    CbmLitFitQa* fitQa = new CbmLitFitQa();
    fitQa->SetMvdMinNofHits(0);
    fitQa->SetStsMinNofHits(4);
-   fitQa->SetTrdMinNofHits(8);
-   fitQa->SetMuchMinNofHits(4);
+   fitQa->SetTrdMinNofHits(2);
+   fitQa->SetMuchMinNofHits(0);
    fitQa->SetOutputDir(std::string(resultDir));
    //run->AddTask(fitQa);
 

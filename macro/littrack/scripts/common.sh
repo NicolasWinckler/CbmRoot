@@ -59,8 +59,8 @@ function set_default_muon_geometry() {
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v11a.geo
     export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v11a.digi.par
-    export LIT_MUCH_GEOM=much/much_v11a.geo
-    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v11a.digi.root
+    export LIT_MUCH_GEOM=much/much_v12a.geo
+    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v12a.digi.root
     export LIT_RICH_GEOM=
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
@@ -138,7 +138,33 @@ function set_default_mvd_geometry() {
     export LIT_NORM_TOF_HITS=0
 }
 
-
+# Function set default sts geometry
+function set_default_sts_geometry() {
+    export LIT_CAVE_GEOM=cave.geo
+    export LIT_TARGET_GEOM=target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe_much.geo
+    export LIT_SHIELD_GEOM=shield_standard.geo
+    export LIT_MVD_GEOM=
+    export LIT_STS_GEOM=sts/sts_v11a.geo
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v11a.digi.par
+    export LIT_MUCH_GEOM=
+    export LIT_MUCH_DIGI=
+    export LIT_RICH_GEOM=
+    export LIT_TRD_GEOM=
+    export LIT_TRD_DIGI=
+    export LIT_TOF_GEOM=
+    export LIT_ECAL_GEOM=
+    export LIT_FIELD_MAP=field_v10e
+    export LIT_MAGNET_GEOM=passive/magnet_v09m.geo
+    
+    export LIT_NORM_STS_POINTS=4
+    export LIT_NORM_TRD_POINTS=0
+    export LIT_NORM_MUCH_POINTS=0
+    export LIT_NORM_TOF_POINTS=0
+    export LIT_NORM_TRD_HITS=0
+    export LIT_NORM_MUCH_HITS=0
+    export LIT_NORM_TOF_HITS=0
+}
 
 # Function exports and creates output directories for LIT_DIR
 function create_output_dir()

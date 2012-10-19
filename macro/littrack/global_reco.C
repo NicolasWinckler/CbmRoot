@@ -12,8 +12,8 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 10, // number of events
-		TString opt = "tracking")
+void global_reco(Int_t nEvents = 100, // number of events
+		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/d/events/trd_v12ala/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -33,7 +33,7 @@ void global_reco(Int_t nEvents = 10, // number of events
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
+   TString muchDigiFile = parDir + "/much/much_v12a.digi.root"; // MUCH digi file
 
    // Directory for output results
    TString resultDir = "./test/";

@@ -27,8 +27,8 @@ using std::stringstream;
 /* Set default styles for histograms. */
 void SetDefaultDrawStyle()
 {
-   gStyle->SetOptStat("");
-   gStyle->SetOptFit(0);
+   gStyle->SetOptStat("rm");
+   gStyle->SetOptFit(1);
    gStyle->SetOptTitle(0);
 
    gStyle->SetCanvasColor(kWhite);
@@ -73,6 +73,7 @@ void DrawH1(
    gPad->SetTicks(1, 1);
    hist->Draw(drawOpt.c_str());
    gPad->SetGrid(true, true);
+   hist->SetStats(false);
 }
 
 /* Draw TH2 histogram.*/
@@ -105,6 +106,7 @@ void DrawH2(
    gPad->SetTicks(1, 1);
    hist->Draw(drawOpt.c_str());
    gPad->SetGrid(true, true);
+   hist->SetStats(false);
 }
 
 /* Draw several TH1 histograms. */

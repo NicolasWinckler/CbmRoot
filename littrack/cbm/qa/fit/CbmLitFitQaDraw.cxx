@@ -13,6 +13,7 @@
 #include "TH1.h"
 #include "TF1.h"
 #include "TDirectory.h"
+#include "TStyle.h"
 #include <cassert>
 
 CbmLitFitQaDraw::CbmLitFitQaDraw():
@@ -104,8 +105,10 @@ void CbmLitFitQaDraw::DrawTrackParamsAtVertex()
 
    canvas1->cd(2);
    TH1* projY = ((TH2*)(fHM->H1("htf_MomRes_Mom")))->ProjectionY("htf_MomRes_Mom_ProjectionY");
-   //projY->Scale(1./projY->Integral());
-   DrawH1(projY, kLinear, kLog);
+   DrawH1(projY, kLinear, kLinear);
+   projY->SetStats(true);
+   projY->Fit("gaus");
+   projY->SetMaximum(projY->GetMaximum() * 1.25);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 

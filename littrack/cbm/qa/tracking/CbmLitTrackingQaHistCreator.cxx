@@ -413,7 +413,6 @@ void CbmLitTrackingQaHistCreator::Create(
  //  CreateEffHist3D("hSts3D", "track");
    CreateH1Efficiency("hte_Sts_Sts", "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
    CreateH1Efficiency("hte_Sts_Sts", "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
-   CreateH2Efficiency("hte_Sts_Sts", "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    // MUCH
    if (fDet.GetDet(kMUCH)) {
 	   string norm = LocalEfficiencyNormalization("Much");
@@ -455,7 +454,7 @@ void CbmLitTrackingQaHistCreator::Create(
 	   CreateH1Efficiency("hte_Rich_Rich", "Nh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
 	   CreateH1Efficiency("hte_Rich_Rich", "BoA", "B/A", 50, 0.0, 1.0, "ring");
 	   CreateH1Efficiency("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
-      CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
+      CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "ring");
    }
 
    // Global efficiency histograms
@@ -466,7 +465,7 @@ void CbmLitTrackingQaHistCreator::Create(
 	   CreateH1Efficiency(name, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, opt);
 	   CreateH1Efficiency(name, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, opt);
 	   CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, opt);
-      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
+      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, opt);
    }
 
 //   // Electron identification efficiency histograms

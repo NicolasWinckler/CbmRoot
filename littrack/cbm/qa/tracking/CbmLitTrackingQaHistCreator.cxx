@@ -197,7 +197,7 @@ map<string, LitRingAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultRi
 	return cat;
 }
 
-void CbmLitTrackingQaHistCreator::CreateEfficiencyHistogram(
+void CbmLitTrackingQaHistCreator::CreateH1Efficiency(
       const string& name,
       const string& parameter,
       const string& xTitle,
@@ -212,7 +212,7 @@ void CbmLitTrackingQaHistCreator::CreateEfficiencyHistogram(
 
    for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
       for (Int_t iType = 0; iType < 3; iType++) {
-    	 string yTitle = (types[iType] == "Eff") ? "Efficiency [%]" : "Yield";
+    	   string yTitle = (types[iType] == "Eff") ? "Efficiency [%]" : "Counter";
          string histName = name + "_" + cat[iCat] + "_" + types[iType] + "_" + parameter;
          string histTitle = histName + ";" + xTitle + ";" + yTitle;
          fHM->Add(histName, new TH1F(histName.c_str(), histTitle.c_str(), nofBins, minBin, maxBin));
@@ -220,7 +220,34 @@ void CbmLitTrackingQaHistCreator::CreateEfficiencyHistogram(
    }
 }
 
-void CbmLitTrackingQaHistCreator::Create1DHist(
+void CbmLitTrackingQaHistCreator::CreateH2Efficiency(
+      const string& name,
+      const string& parameter,
+      const string& xTitle,
+      const string& yTitle,
+      Int_t nofBinsX,
+      Double_t minBinX,
+      Double_t maxBinX,
+      Int_t nofBinsY,
+      Double_t minBinY,
+      Double_t maxBinY,
+      const string& opt)
+{
+   assert(opt == "track" || opt == "ring");
+   string types[] = { "Acc", "Rec", "Eff" };
+   vector<string> cat = (opt == "track") ? GetTrackCategories() : GetRingCategories();
+
+   for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
+      for (Int_t iType = 0; iType < 3; iType++) {
+         string zTitle = (types[iType] == "Eff") ? "Efficiency [%]" : "Counter";
+         string histName = name + "_" + cat[iCat] + "_" + types[iType] + "_" + parameter;
+         string histTitle = histName + ";" + xTitle + ";" + yTitle + ";" + zTitle;
+         fHM->Add(histName, new TH2F(histName.c_str(), histTitle.c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY));
+      }
+   }
+}
+
+void CbmLitTrackingQaHistCreator::CreateH1(
       const string& name,
       const string& xTitle,
       const string& yTitle,
@@ -232,7 +259,7 @@ void CbmLitTrackingQaHistCreator::Create1DHist(
    fHM->Add(name, h);
 }
 
-void CbmLitTrackingQaHistCreator::Create2DHist(
+void CbmLitTrackingQaHistCreator::CreateH2(
       const string& name,
       const string& xTitle,
       const string& yTitle,
@@ -258,7 +285,7 @@ void CbmLitTrackingQaHistCreator::CreateTrackHitsHistogram(
 	for(Int_t i = 0; i < 5; i++) {
 	   string xTitle = (i == 3 || i == 4) ? "Ratio" : "Number of hits";
 	   string histName = "hth_" + detName + "_TrackHits_" + type[i];
-	   Create1DHist(histName.c_str(), xTitle, "Yeild", bins[i], min[i], max[i]);
+	   CreateH1(histName.c_str(), xTitle, "Yeild", bins[i], min[i], max[i]);
 	}
 }
 
@@ -375,12 +402,6 @@ void CbmLitTrackingQaHistCreator::Create(
 
    fDet.DetermineSetup();
 
-//   cout << "CbmLitTrackingQaHistCreator::Create: track variants:\n";
-//   vector<string> trackVariants = GlobalTrackVariants();
-//   for (Int_t i = 0; i < trackVariants.size(); i++) {
-//	   std::cout << " > " << i << " " << trackVariants[i] << std::endl;
-//   }
-
    // Number of points distributions
    Double_t minNofPoints =  0.;
    Double_t maxNofPoints = 100.;
@@ -390,46 +411,51 @@ void CbmLitTrackingQaHistCreator::Create(
    // Local efficiency histograms
    // STS
  //  CreateEffHist3D("hSts3D", "track");
-   CreateEfficiencyHistogram("hte_Sts_Sts", "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-   CreateEfficiencyHistogram("hte_Sts_Sts", "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+   CreateH1Efficiency("hte_Sts_Sts", "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+   CreateH1Efficiency("hte_Sts_Sts", "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+   CreateH2Efficiency("hte_Sts_Sts", "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    // MUCH
    if (fDet.GetDet(kMUCH)) {
 	   string norm = LocalEfficiencyNormalization("Much");
 	   string histName = "hte_Much_" + norm;
-	   CreateEfficiencyHistogram(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
-	   CreateEfficiencyHistogram(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
-	   CreateEfficiencyHistogram(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
-	   CreateEfficiencyHistogram(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-	   CreateEfficiencyHistogram(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
+	   CreateH1Efficiency(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
+	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+	   CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+	   CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    }
    // TRD
    if (fDet.GetDet(kTRD)) {
 	   string norm = LocalEfficiencyNormalization("Trd");
 	   string histName = "hte_Trd_" + norm;
-	   CreateEfficiencyHistogram(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
-	   CreateEfficiencyHistogram(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
-	   CreateEfficiencyHistogram(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
-	   CreateEfficiencyHistogram(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-	   CreateEfficiencyHistogram(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
+	   CreateH1Efficiency(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
+	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+	   CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    }
    // TOF
    if (fDet.GetDet(kTOF)) {
 	   string norm = LocalEfficiencyNormalization("Tof");
 	   string histName = "hte_Tof_" + norm;
-	   CreateEfficiencyHistogram(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
-	   CreateEfficiencyHistogram(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
-	   CreateEfficiencyHistogram(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
+	   CreateH1Efficiency(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
+	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
 //	   CreateEfficiencyHistogram(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-	   CreateEfficiencyHistogram(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+	   CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    }
    // RICH
    if (fDet.GetDet(kRICH)) {
-	   CreateEfficiencyHistogram("hte_Rich_Rich", "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "ring");
-	   CreateEfficiencyHistogram("hte_Rich_Rich", "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "ring");
-	   CreateEfficiencyHistogram("hte_Rich_Rich", "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "ring");
-	   CreateEfficiencyHistogram("hte_Rich_Rich", "Nh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
-	   CreateEfficiencyHistogram("hte_Rich_Rich", "BoA", "B/A", 50, 0.0, 1.0, "ring");
-	   CreateEfficiencyHistogram("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "Nh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "BoA", "B/A", 50, 0.0, 1.0, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
+      CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    }
 
    // Global efficiency histograms
@@ -437,9 +463,10 @@ void CbmLitTrackingQaHistCreator::Create(
    for (Int_t iHist = 0; iHist < histoNames.size(); iHist++) {
 	   string name = histoNames[iHist];
 	   string opt = (name.find("Rich") == string::npos) ? "track" : "ring";
-	   CreateEfficiencyHistogram(name, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, opt);
-	   CreateEfficiencyHistogram(name, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, opt);
-	   CreateEfficiencyHistogram(name, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, opt);
+	   CreateH1Efficiency(name, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, opt);
+	   CreateH1Efficiency(name, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, opt);
+	   CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, opt);
+      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
    }
 
 //   // Electron identification efficiency histograms
@@ -463,14 +490,14 @@ void CbmLitTrackingQaHistCreator::Create(
 //   CreateEfficiencyHistogramPYPt("hStsTrdTofDetAcc3D", kDetAcc);
 
    // Create histograms for ghost tracks
-   if (fDet.GetDet(kSTS)) Create1DHist("hng_NofGhosts_Sts_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
-   if (fDet.GetDet(kTRD)) Create1DHist("hng_NofGhosts_Trd_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
-   if (fDet.GetDet(kMUCH)) Create1DHist("hng_NofGhosts_Much_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   if (fDet.GetDet(kSTS)) CreateH1("hng_NofGhosts_Sts_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   if (fDet.GetDet(kTRD)) CreateH1("hng_NofGhosts_Trd_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   if (fDet.GetDet(kMUCH)) CreateH1("hng_NofGhosts_Much_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
    if (fDet.GetDet(kRICH)) {
-	   Create1DHist("hng_NofGhosts_Rich_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
-	   Create1DHist("hng_NofGhosts_RichStsMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
-	   Create1DHist("hng_NofGhosts_RichElId_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
-	   Create1DHist("hng_NofGhosts_StsRichMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+	   CreateH1("hng_NofGhosts_Rich_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+	   CreateH1("hng_NofGhosts_RichStsMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+	   CreateH1("hng_NofGhosts_RichElId_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+	   CreateH1("hng_NofGhosts_StsRichMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
    }
 
    // Create track hits histograms
@@ -484,18 +511,14 @@ void CbmLitTrackingQaHistCreator::Create(
    // Create number of object histograms
    Int_t nofBinsC = 100000;
    Double_t maxXC = 100000.;
-   Create1DHist("hno_NofObjects_GlobalTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
-   if (fDet.GetDet(kSTS)) Create1DHist("hno_NofObjects_StsTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
-   if (fDet.GetDet(kTRD)) Create1DHist("hno_NofObjects_TrdTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
-   if (fDet.GetDet(kMUCH)) Create1DHist("hno_NofObjects_MuchTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   CreateH1("hno_NofObjects_GlobalTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kSTS)) CreateH1("hno_NofObjects_StsTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kTRD)) CreateH1("hno_NofObjects_TrdTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kMUCH)) CreateH1("hno_NofObjects_MuchTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
    if (fDet.GetDet(kRICH)) {
-	   Create1DHist("hno_NofObjects_RichRings", "Rings per event", "Yield", nofBinsC, 1., maxXC);
-	   Create1DHist("hno_NofObjects_RichProjections", "Projections per event", "Yield", nofBinsC, 1., maxXC);
+	   CreateH1("hno_NofObjects_RichRings", "Rings per event", "Yield", nofBinsC, 1., maxXC);
+	   CreateH1("hno_NofObjects_RichProjections", "Projections per event", "Yield", nofBinsC, 1., maxXC);
    }
-
-//   Create1DHist("hStsChiprim", "#chi^{2}_{vertex}", "Yield", 150, 0., 15.);
-//   Create2DHist("hStsMomresVsMom", "P [GeV/c]", "dP/P", "Counter", 120, 0., 12., 100, -15., 15.);
-//   Create1DHist("hTrackLength", "dL/L [%]", "Yield", 40, -2., 2.);
 
 //   // MC momentum vs. polar angle histograms
 //   string cat[6];
@@ -508,7 +531,7 @@ void CbmLitTrackingQaHistCreator::Create(
 //   }
 
    // Histogram stores number of events
-   Create1DHist("hen_EventNo_TrackingQa", "", "", 1, 0, 1.);
+   CreateH1("hen_EventNo_TrackingQa", "", "", 1, 0, 1.);
 
 //   cout << fHM->ToString();
 

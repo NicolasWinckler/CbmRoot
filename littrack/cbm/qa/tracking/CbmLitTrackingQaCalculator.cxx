@@ -34,6 +34,8 @@
 
 #include "TClonesArray.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -42,6 +44,7 @@ using std::cout;
 using std::endl;
 using lit::FindAndReplace;
 using lit::Split;
+using boost::assign::list_of;
 
 CbmLitTrackingQaCalculator::CbmLitTrackingQaCalculator(
       CbmHistManager* histManager):
@@ -116,11 +119,6 @@ void CbmLitTrackingQaCalculator::Init()
    	for (Int_t i = 0; i < trackVariants.size(); i++) {
    		fMcToRecoMap.insert(make_pair(trackVariants[i], multimap<Int_t, Int_t>()));
    	}
-//   	cout << "fMcToRecoMap:" << endl;
-//   	map<string, multimap<Int_t, Int_t> >::const_iterator it;
-//   	for (it = fMcToRecoMap.begin(); it != fMcToRecoMap.end(); it++) {
-//		cout << " > " << (*it).first << endl;
-//	}
 }
 
 void CbmLitTrackingQaCalculator::Exec()
@@ -456,57 +454,58 @@ void CbmLitTrackingQaCalculator::ProcessMcTracks()
       Double_t mcPt = mcTrack->GetPt();
 
       // Fill parameter name to value map
-      map<string, Double_t> parMap;
-      parMap["p"] = mcP;
-      parMap["y"] = mcY;
-      parMap["pt"] = mcPt;
-      parMap["Angle"] = angle;
-      parMap["Np"] = 0; // FIXME : correct to number of points in concrete detector!
+      map<string, vector<Double_t> > parMap;
+      parMap["p"] = list_of(mcP);
+      parMap["y"] = list_of(mcY);
+      parMap["pt"] = list_of(mcPt);
+      parMap["Angle"] = list_of(angle);
+      parMap["Np"] = list_of(0); // FIXME : correct to number of points in concrete detector!
                         // Currently as a  temporary solution it is reassigned later
-      parMap["BoA"] = 1;
-      parMap["Nh"] = 1;
-      parMap["RadPos"] = 1;
+      parMap["BoA"] = list_of(1);
+      parMap["Nh"] = list_of(1);
+      parMap["RadPos"] = list_of(1);
+      parMap["YPt"] = list_of(mcY)(mcPt);
 
       for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
-  		TH1* hist = effHistos[iHist];
-  		string histName = hist->GetName();
-  		vector<string> split = Split(histName, '_');
-  		string effName = split[1];
-  		string normName = split[2];
-  		string accName = split[3];
-  		string parName = split[5];
-  		assert(parMap.count(parName) != 0);
+         TH1* hist = effHistos[iHist];
+         string histName = hist->GetName();
+         vector<string> split = Split(histName, '_');
+         string effName = split[1];
+         string normName = split[2];
+         string accName = split[3];
+         string parName = split[5];
+         assert(parMap.count(parName) != 0);
 
-  		Double_t par = 0;
-  		if (parName == "Np") {
-  			par = (effName == "Sts") ? nofPointsSts : (effName == "Trd") ? nofPointsTrd : (effName == "Much") ? nofPointsMuch : (effName == "Tof") ? nofPointsTof : 0;
-  		} else {
-  			par = parMap[parName];
-  		}
+         vector<Double_t> par = list_of(0);
+         if (parName == "Np") {
+            par = list_of((effName == "Sts") ? nofPointsSts : (effName == "Trd") ? nofPointsTrd : (effName == "Much") ? nofPointsMuch : (effName == "Tof") ? nofPointsTof : 0);
+         } else {
+            par = parMap[parName];
+         }
 
-		Bool_t sts = (normName.find("Sts") != string::npos) ? isStsOk : true;
-		Bool_t trd = (normName.find("Trd") != string::npos) ? isTrdOk : true;
-		Bool_t much = (normName.find("Much") != string::npos) ? isMuchOk : true;
-		Bool_t tof = (normName.find("Tof") != string::npos) ? isTofOk : true;
-		Bool_t rich = (normName.find("Rich") != string::npos) ? isRichOk : true;
+         Bool_t sts = (normName.find("Sts") != string::npos) ? isStsOk : true;
+         Bool_t trd = (normName.find("Trd") != string::npos) ? isTrdOk : true;
+         Bool_t much = (normName.find("Much") != string::npos) ? isMuchOk : true;
+         Bool_t tof = (normName.find("Tof") != string::npos) ? isTofOk : true;
+         Bool_t rich = (normName.find("Rich") != string::npos) ? isRichOk : true;
 
-		if (effName == "Trd" || effName == "Much" || effName == "Tof") {
-			string prevRecName = FindAndReplace(normName, effName, "");
-			Bool_t isPrevRec = fMcToRecoMap[prevRecName].find(iMCTrack) != fMcToRecoMap[prevRecName].end();
-			Bool_t accOk = isPrevRec && sts && trd && much && tof && rich;
-			if (accOk) {
-				FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[normName], histName, accName, par);
-			}
-		} else {
-			Bool_t accOk = sts && trd && much && tof && rich;
-			if (accOk) {
-			  if (histName.find("Rich") == string::npos) {
-				FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[effName], histName, accName, par);
-			  } else {
-				  FillGlobalReconstructionHistosRich(iMCTrack, fMcToRecoMap[effName], histName, accName, par);
-			  }
-			}
-		}
+         if (effName == "Trd" || effName == "Much" || effName == "Tof") {
+            string prevRecName = FindAndReplace(normName, effName, "");
+            Bool_t isPrevRec = fMcToRecoMap[prevRecName].find(iMCTrack) != fMcToRecoMap[prevRecName].end();
+            Bool_t accOk = isPrevRec && sts && trd && much && tof && rich;
+            if (accOk) {
+               FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[normName], histName, accName, par);
+            }
+         } else {
+            Bool_t accOk = sts && trd && much && tof && rich;
+            if (accOk) {
+              if (histName.find("Rich") == string::npos) {
+               FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[effName], histName, accName, par);
+              } else {
+                 FillGlobalReconstructionHistosRich(iMCTrack, fMcToRecoMap[effName], histName, accName, par);
+              }
+            }
+         }
       } // Loop over efficiency histograms
    } // Loop over MCTracks
 }
@@ -516,14 +515,21 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistos(
    const multimap<Int_t, Int_t>& mcMap,
    const string& histName,
    const string& accName,
-   Double_t par)
+   const vector<Double_t>& par)
 {
 	string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
 	string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
 	LitTrackAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::Instance()->GetTrackAcceptanceFunctions().find(accName)).second;
 	Bool_t accOk = function(fMCTracks, mcId);
-	if (accOk) { fHM->H1(accHistName)->Fill(par); }
-	if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par); }
+   Int_t nofParams = par.size();
+   assert(nofParams < 3 && nofParams > 0);
+   if (nofParams == 1) {
+      if (accOk) { fHM->H1(accHistName)->Fill(par[0]); }
+      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0]); }
+   } else if (nofParams == 2) {
+      if (accOk) { fHM->H1(accHistName)->Fill(par[0], par[1]); }
+      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
+   }
 }
 
 void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
@@ -531,15 +537,22 @@ void CbmLitTrackingQaCalculator::FillGlobalReconstructionHistosRich(
    const multimap<Int_t, Int_t>& mcMap,
    const string& histName,
    const string& accName,
-   Double_t par)
+   const vector<Double_t>& par)
 {
-    Int_t nofHitsInRing = fMCTrackCreator->GetTrack(mcId).GetNofRichHits();
+   Int_t nofHitsInRing = fMCTrackCreator->GetTrack(mcId).GetNofRichHits();
 	string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
 	string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
 	LitRingAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::Instance()->GetRingAcceptanceFunctions().find(accName)).second;
 	Bool_t accOk = function(fMCTracks, mcId, nofHitsInRing);
-	if (accOk) { fHM->H1(accHistName)->Fill(par); }
-	if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par); }
+	Int_t nofParams = par.size();
+	assert(nofParams < 3 && nofParams > 0);
+	if (nofParams == 1) {
+      if (accOk) { fHM->H1(accHistName)->Fill(par[0]); }
+      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0]); }
+	} else if (nofParams == 2) {
+	   if (accOk) { fHM->H1(accHistName)->Fill(par[0], par[1]); }
+	   if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
+	}
 }
 
 //void CbmLitTrackingQaCalculator::FillGlobalElIdHistos3D(

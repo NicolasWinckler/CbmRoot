@@ -48,6 +48,7 @@ void CbmLitTrackingQaDraw::Draw(
 
    SetDefaultDrawStyle();
    DrawEfficiencyHistos();
+   DrawYPtHistos();
    DrawHitsHistos();
 //   DrawStsTracksQaHistos();
 //   DrawMcEfficiencyGraph();
@@ -109,6 +110,45 @@ void CbmLitTrackingQaDraw::DrawEfficiency(
 	DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
 	DrawMeanEfficiencyLines(histos, efficiencies);
 	lit::SaveCanvasAsImage(canvas, fOutputDir);
+}
+
+void CbmLitTrackingQaDraw::DrawYPtHistos()
+{
+   // Draw global tracking efficiency
+   vector<string> globalTrackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
+   for (UInt_t i = 0; i < globalTrackVariants.size(); i++) {
+      string variant = globalTrackVariants[i];
+      DrawYPt("tracking_qa_" + variant + "_ypt", "hte_" + variant + "_" + variant + "_All_Eff_YPt");
+   }
+}
+
+void CbmLitTrackingQaDraw::DrawYPt(
+      const string& canvasName,
+      const string& effHistName)
+{
+   string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
+   string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
+
+   if (!(fHM->Exists(effHistName) && fHM->Exists(accHistName) && fHM->Exists(recHistName))) return;
+
+   TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1800, 600);
+   canvas->Divide(3, 1);
+   canvas->SetGrid();
+
+   TH2* accHist = (TH2*)fHM->H1(accHistName);
+   TH2* recHist = (TH2*)fHM->H1(recHistName);
+   TH2* effHist = (TH2*)fHM->H1(effHistName);
+
+   canvas->cd(1);
+   DrawH2(accHist);
+
+   canvas->cd(2);
+   DrawH2(recHist);
+
+   canvas->cd(3);
+   DrawH2(effHist);
+
+   lit::SaveCanvasAsImage(canvas, fOutputDir);
 }
 
 Double_t CbmLitTrackingQaDraw::CalcEfficiency(

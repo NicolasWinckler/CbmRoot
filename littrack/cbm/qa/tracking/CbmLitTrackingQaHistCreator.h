@@ -122,7 +122,7 @@ private:
     */
    virtual ~CbmLitTrackingQaHistCreator();
 
-   void CreateEfficiencyHistogram(
+   void CreateH1Efficiency(
          const string& name,
          const string& parameter,
          const string& xTitle,
@@ -131,7 +131,20 @@ private:
          Double_t maxBin,
          const string& opt);
 
-   void Create1DHist(
+   void CreateH2Efficiency(
+         const string& name,
+         const string& parameter,
+         const string& xTitle,
+         const string& yTitle,
+         Int_t nofBinsX,
+         Double_t minBinX,
+         Double_t maxBinX,
+         Int_t nofBinsY,
+         Double_t minBinY,
+         Double_t maxBinY,
+         const string& opt);
+
+   void CreateH1(
          const string& name,
          const string& xTitle,
          const string& yTitle,
@@ -139,7 +152,7 @@ private:
          Double_t minBin,
          Double_t maxBin);
 
-   void Create2DHist(
+   void CreateH2(
          const string& name,
          const string& xTitle,
          const string& yTitle,

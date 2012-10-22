@@ -32,6 +32,7 @@ class TFile;
 using std::multimap;
 using std::string;
 using std::map;
+using std::vector;
 
 /**
  * \class CbmLitTrackingQaCalculator
@@ -192,7 +193,7 @@ private:
       const multimap<Int_t, Int_t>& mcMap,
       const string& histName,
       const string& accName,
-      Double_t par);
+      const vector<Double_t>& par);
 
    /**
     * \brief ADD COMMENTS.
@@ -217,7 +218,7 @@ private:
       const multimap<Int_t, Int_t>& mcMap,
       const string& histName,
       const string& accName,
-      Double_t par);
+      const vector<Double_t>& par);
 
 //   /**
 //    * \brief Fill pion suppression histogramms.

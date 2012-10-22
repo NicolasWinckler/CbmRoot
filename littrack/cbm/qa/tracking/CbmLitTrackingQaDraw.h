@@ -92,6 +92,12 @@ private:
          const string& canvasName,
          const string& histNamePattern);
 
+   void DrawYPtHistos();
+
+   void DrawYPt(
+         const string& canvasName,
+         const string& effHistName);
+
    /**
     * \brief Draw histograms for hits. This function automatically
     * check the existence of histograms.

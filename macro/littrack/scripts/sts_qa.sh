@@ -11,7 +11,7 @@ sts_digi=$3
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/
 
-nevents=100
+nevents=5
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       10     0  yes   no)

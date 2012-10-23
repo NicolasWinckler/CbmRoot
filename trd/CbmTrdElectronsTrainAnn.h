@@ -38,24 +38,15 @@ enum IdMethod {kANN = 0, kBDT = 1, kMEDIAN = 2, kLIKELIHOOD = 3, kMeanCut = 4};
 class TrdEloss
 {
 public:
-	TrdEloss(){
-		fEloss = 0.;
-		fdEdX = 0.;
-		fTR = 0.;
-	}
-
-	TrdEloss(
-			double eloss,
-			double dedx = 0.,
-			double tr = 0.) {
-		fEloss = eloss;
-		fdEdX = dedx;
-		fTR = tr;
-	}
-
-	double fEloss;
-	double fdEdX;
-	double fTR;
+ TrdEloss() 
+   : fEloss(0.), fdEdX(0.), fTR(0.) {}
+  
+ TrdEloss(double eloss, double dedx = 0., double tr = 0.) 
+   : fEloss(eloss), fdEdX(dedx), fTR(tr) {}
+  
+  double fEloss;
+  double fdEdX;
+  double fTR;
 };
 
 

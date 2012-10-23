@@ -110,9 +110,6 @@
 #include "TGeoMatrix.h"
 #include "TGeoBBox.h"
 #include "TPRegexp.h"
-#if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
-#include "CbmTrdStringToken.h"
-#endif
 
 #include <vector>
 #include <utility>

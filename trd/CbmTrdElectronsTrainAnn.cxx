@@ -34,23 +34,41 @@ using boost::assign::list_of;
 
 CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
       Int_t nofTrdLayers)
-  : fOutputDir("results/"),
+  : FairTask(),
+    fMCTracks(NULL),	 
+    fTrdPoints(NULL),
+    fTrdTracks(NULL),
+    fTrdTrackMatches(NULL),
+    fTrdHits(NULL),
+    fEloss(),
+    fHists(),
+    fhMeanEloss(),
+    fhEloss(),
+    fhdEdX(),
+    fhTR(),
+    fhNofTRLayers(),
+    fhNofHits(),
+    fhElossSort(),
+    fEventNum(0),
+    fOutputDir("results/"),
     fSigmaError(0.0),
     fIsDoTrain(true),
     fTransformType(0),
-    fIdMethod(kANN),
-    fNofTrdLayers(nofTrdLayers),
-    fNofTrainSamples(2000),
+    fAnnInput(),
     fXOut(-1.),
+    fNofTrdLayers(nofTrdLayers),
     fMaxEval(1.3),
     fMinEval(-1.3),
     fNN(NULL),
     fReader(NULL),
+    fIdMethod(kANN),
     fNofAnnEpochs(250),
-    fRandom(0)
+    fNofTrainSamples(2000),
+    fRandom(new TRandom(0)),
+    fhOutput(),
+    fhCumProbOutput(),
+    fhInput()
 {
-   fEventNum = 0;
-
    fEloss.resize(2);
    fhMeanEloss.resize(2);
    fhEloss.resize(2);
@@ -108,8 +126,6 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
          fhInput[i][j] = new TH1D(("fhInput"+ss.str()).c_str(), "fhInput", 100, -1.1, 1.1);
       }
    }
-
-   fRandom = new TRandom(0);
 }
 
 CbmTrdElectronsTrainAnn::~CbmTrdElectronsTrainAnn()

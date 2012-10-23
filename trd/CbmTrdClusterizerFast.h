@@ -56,10 +56,11 @@ typedef struct ClusterModule
   Float_t ModulePositionY;
   Float_t ModulePositionZ;
 
-  ClusterModule () : Station(-1), Layer(-1), moduleId(-1), h(0), PadPlane(),
-    nxPad(0), nyPad(0), NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 
+  ClusterModule () : Station(-1), Layer(-1), moduleId(-1), h(0.),
+    AnodeWireOffset(0.), AnodeWireSpacing(0.), nxPad(0), nyPad(0), NoSectors(0), 
+    PadPlane(), SectorSizeX(), SectorSizeY(), PadSizeX(), 
     PadSizeY(), SecxPad(), SecyPad(), ModuleSizeX(0.), ModuleSizeY(0.), 
-    ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
+    ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ(0.) {}
 } ClusterModule;
 
 class CbmTrdClusterizerFast : public FairTask {

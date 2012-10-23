@@ -32,18 +32,23 @@ CbmTrdOccupancy::CbmTrdOccupancy()
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
+    fDigiChargeSpectrum(new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3)),
+    fLayerDummy(new TH2I("LayerDummy","",1200,-600,600,1000,-500,500)),
     fModuleMap(),
     fModuleMapIt(),
-    fModuleOccupancyMemoryMap(),
-    fModuleOccupancyMemoryMapIt(),
     fModuleOccupancyMap(),
     fModuleOccupancyMapIt(),
-    fDigiChargeSpectrum(NULL),
+    fModuleOccupancyMemoryMap(),
+    fModuleOccupancyMemoryMapIt(),
+    fLayerOccupancyMap(),
+    fLayerOccupancyMapIt(),
+    fLayerAverageOccupancyMap(),
+    fLayerAverageOccupancyMapIt(),
     fTriggerThreshold(1e-6),
     fNeigbourReadout(true),
-    fGeo()
+    fGeo("")
 {
- fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
+// fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
   fLayerDummy->GetXaxis()->SetLabelSize(0.02);
@@ -55,7 +60,7 @@ CbmTrdOccupancy::CbmTrdOccupancy()
   fLayerDummy->GetYaxis()->SetTitleOffset(2);
   fLayerDummy->GetZaxis()->SetTitleSize(0.02);
   fLayerDummy->GetZaxis()->SetTitleOffset(-2);
-  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
+//  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     //delete fModuleOccupancyMapIt->second;
@@ -87,18 +92,23 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
+    fDigiChargeSpectrum(new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3)),
+    fLayerDummy(new TH2I("LayerDummy","",1200,-600,600,1000,-500,500)),
     fModuleMap(),
     fModuleMapIt(),
-    fModuleOccupancyMemoryMap(),
-    fModuleOccupancyMemoryMapIt(),
     fModuleOccupancyMap(),
     fModuleOccupancyMapIt(),
-    fDigiChargeSpectrum(NULL),
+    fModuleOccupancyMemoryMap(),
+    fModuleOccupancyMemoryMapIt(),
+    fLayerOccupancyMap(),
+    fLayerOccupancyMapIt(),
+    fLayerAverageOccupancyMap(),
+    fLayerAverageOccupancyMapIt(),
     fTriggerThreshold(triggerThreshold),
     fNeigbourReadout(true),
     fGeo(geo)
 {
- fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
+// fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
   fLayerDummy->GetXaxis()->SetLabelSize(0.02);
@@ -110,7 +120,7 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char
   fLayerDummy->GetYaxis()->SetTitleOffset(2);
   fLayerDummy->GetZaxis()->SetTitleSize(0.02);
   fLayerDummy->GetZaxis()->SetTitleOffset(-2);
-  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
+//  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
     //delete fModuleOccupancyMapIt->second;

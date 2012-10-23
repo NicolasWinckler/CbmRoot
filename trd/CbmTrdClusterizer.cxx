@@ -28,9 +28,6 @@
 #include "TStopwatch.h"
 
 #include "TPRegexp.h"
-#if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
-#include "CbmTrdStringToken.h"
-#endif
 
 //#include "sqlite/sqlite3.h" // used for the lookup table option
 
@@ -597,11 +594,7 @@ void CbmTrdClusterizer::GetModuleInformation()
 
   TString path = gGeoManager->GetPath();
   cout<<"Path: "<<path<<endl;
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,20,0)
   TStringToken* bla = new TStringToken(path,"/");
-#else
-  CbmTrdStringToken* bla = new CbmTrdStringToken(path,"/");
-#endif
 
   while (bla->NextToken()) {
     if (bla->Contains("layer")) {

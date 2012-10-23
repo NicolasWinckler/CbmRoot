@@ -43,6 +43,8 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(
       fModuleInfo(NULL),
       fGeoHandler(new CbmTrdGeoHandler()),
       fRadiator(radiator),
+      fSigmaX(),
+      fSigmaY(),
       fEfficency(1.),
       fGhostRate(0.),
       fGhostDistance(0.),

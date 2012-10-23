@@ -110,6 +110,9 @@ class CbmTrdGeoHandler : public TObject {
   Double_t fGlobal[3];        //! Global centre of volume
   TGeoHMatrix* fGlobalMatrix; //!
 
+ CbmTrdGeoHandler(const CbmTrdGeoHandler&);
+ CbmTrdGeoHandler operator=(const CbmTrdGeoHandler&);
+
  ClassDef(CbmTrdGeoHandler,3) 
 
 };

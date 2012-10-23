@@ -22,6 +22,12 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
    fModuleType(-1),
    fModuleCopy(-1),
    fSector(-1),
+   fSizex(-1.),
+   fSizey(-1.),
+   fSizez(-1.),
+   fX(-1.),
+   fY(-1.),   
+   fZ(-1.),
    fpadsizex(0), 
    fpadsizey(0), 
    fsizex(-1.),    
@@ -37,7 +43,10 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
    fModuleMap(), 
    fModuleMapIt(),
    fDigiPar(NULL),
-   fGeoHandler(new CbmTrdGeoHandler())
+   fGeoHandler(new CbmTrdGeoHandler()),
+   fModInfoMap(),
+   fModTypeMap(),
+   fModuleTypeVector()
 {
   // Get the maximum number of sectors. All arrays will have
   // this number of entries.  
@@ -59,6 +68,12 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
    fModuleType(-1),
    fModuleCopy(-1),
    fSector(-1),
+   fSizex(-1.),
+   fSizey(-1.),
+   fSizez(-1.),
+   fX(-1.),
+   fY(-1.),   
+   fZ(-1.),
    fpadsizex(0), 
    fpadsizey(0), 
    fsizex(-1.),    
@@ -74,7 +89,10 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
    fModuleMap(), 
    fModuleMapIt(),
    fDigiPar(NULL),
-   fGeoHandler(new CbmTrdGeoHandler())
+   fGeoHandler(new CbmTrdGeoHandler()),
+   fModInfoMap(),
+   fModTypeMap(),
+   fModuleTypeVector()
 {
   // Get the maximum number of sectors. All arrays will have
   // this number of entries.  

@@ -62,7 +62,7 @@ CbmTrdTracksPidQa.cxx
 CbmTrdGas.cxx
 CbmTrdDigitizer.cxx
 CbmTrdDigiPar.cxx
-CbmTrdStringToken.cxx
+#CbmTrdStringToken.cxx
 CbmTrdModule.cxx
 CbmTrdCreateDigiPar.cxx
 CbmTrdHitProducerDigi.cxx

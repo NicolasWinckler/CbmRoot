@@ -35,7 +35,11 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fIsSimulation(kFALSE),
     fLastUsedDetectorID(0),
     fDetectorInfoArray(),
-    fGeoPathHash(0)
+    fGeoPathHash(0),
+    fCurrentVolume(NULL),
+    fVolumeShape(NULL),    
+    fGlobal(),    
+    fGlobalMatrix(NULL)
 {
 }
 

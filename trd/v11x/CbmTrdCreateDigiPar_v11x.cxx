@@ -18,9 +18,6 @@
 #include "TGeoBBox.h"
 #include "TMath.h"
 #include "TPRegexp.h"
-#if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
-#include "CbmTrdStringToken.h"
-#endif
 
 #include <iostream>
 using std::cout;
@@ -174,11 +171,7 @@ void CbmTrdCreateDigiPar::GetModuleInformation(){
   // class TStringTocken is not implemented
 
   TString path = gGeoManager->GetPath();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,20,0)
   TStringToken* bla = new TStringToken(path,"/");
-#else
-  CbmTrdStringToken* bla = new CbmTrdStringToken(path,"/");
-#endif
   
   //put here as an example the full path string and the substrings
 

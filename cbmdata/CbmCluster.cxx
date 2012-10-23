@@ -7,6 +7,8 @@
 #include "CbmCluster.h"
 
 CbmCluster::CbmCluster()
+ : FairMultiLinkedData(),
+   fDigis()
 {
 
 }

@@ -90,6 +90,9 @@ private:
   Int_t fSignalPairs;               //!
   Bool_t fIsTriggerEnabled; 
   
+  CbmAnaDimuonAnalysis(const CbmAnaDimuonAnalysis&);
+  CbmAnaDimuonAnalysis operator=(const CbmAnaDimuonAnalysis&);
+
   ClassDef(CbmAnaDimuonAnalysis,2);
 };
 

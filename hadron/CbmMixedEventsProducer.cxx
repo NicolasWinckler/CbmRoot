@@ -34,16 +34,24 @@ using namespace std;
 
 // ------------------------------------------------------------------
 CbmMixedEventsProducer::CbmMixedEventsProducer()
+  : FairTask("MixedEventProducer"),
+    fLevel(1),
+    fSeed(0),
+    fRnd(NULL),
+    fTrackPool(new TObjArray()),
+    fTofPointPool(new TObjArray()),
+    fHadronPool(new TObjArray()),
+    fInputArrayMCTrack(NULL),
+    fInputArrayTofPoint(NULL),
+    fInputArrayHadron(NULL),
+    fOutputArrayMCTrack(new TClonesArray("CbmMCTrack")),
+    fOutputArrayTofPoint(new TClonesArray("CbmTofPoint")),
+    fOutputArrayHadron(new TClonesArray("CbmHadron")),
+    fMapTracks(),
+    fMapTofPoint(),
+    fMapHadrons(),
+    fEvents(0)
 {
-    // Default constructor
-    fLevel = 1;
-    fEvents = fSeed = 0;
-    fOutputArrayMCTrack = new TClonesArray("CbmMCTrack");
-    fOutputArrayTofPoint = new TClonesArray("CbmTofPoint");
-    fOutputArrayHadron = new TClonesArray("CbmHadron");
-    fTrackPool = new TObjArray();
-    fTofPointPool = new TObjArray();
-    fHadronPool = new TObjArray();
 }
 // ------------------------------------------------------------------
 
@@ -51,17 +59,24 @@ CbmMixedEventsProducer::CbmMixedEventsProducer()
 // ------------------------------------------------------------------
 CbmMixedEventsProducer::CbmMixedEventsProducer(const char *name,
 					       Int_t verbose)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fLevel(1),
+    fSeed(0),
+    fRnd(NULL),
+    fTrackPool(new TObjArray()),
+    fTofPointPool(new TObjArray()),
+    fHadronPool(new TObjArray()),
+    fInputArrayMCTrack(NULL),
+    fInputArrayTofPoint(NULL),
+    fInputArrayHadron(NULL),
+    fOutputArrayMCTrack(new TClonesArray("CbmMCTrack")),
+    fOutputArrayTofPoint(new TClonesArray("CbmTofPoint")),
+    fOutputArrayHadron(new TClonesArray("CbmHadron")),
+    fMapTracks(),
+    fMapTofPoint(),
+    fMapHadrons(),
+    fEvents(0)
 {
-    // Standard constructor
-    fLevel = 1;
-    fEvents = fSeed = 0;
-    fOutputArrayMCTrack = new TClonesArray("CbmMCTrack");
-    fOutputArrayTofPoint = new TClonesArray("CbmTofPoint");
-    fOutputArrayHadron = new TClonesArray("CbmHadron");
-    fTrackPool = new TObjArray();
-    fTofPointPool = new TObjArray();
-    fHadronPool = new TObjArray();
 }
 // ------------------------------------------------------------------
 

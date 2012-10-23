@@ -22,7 +22,7 @@ class CbmAnaHypMix : public CbmAnaHypRecCascade{
 public:
 
   /** Default constructor */
-  CbmAnaHypMix(){};
+ CbmAnaHypMix() : CbmAnaHypRecCascade(), fNoMixedEv(0) {};
 
   /** Standard constructor */
   CbmAnaHypMix(Int_t nMixedEvents, Int_t iVerbose);

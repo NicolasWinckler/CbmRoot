@@ -71,6 +71,9 @@ private:
   Int_t fNoMixedEv;
   Int_t fNEvents;
 
+  CbmAnaDimuonHisto(const CbmAnaDimuonHisto&);
+  CbmAnaDimuonHisto operator=(const CbmAnaDimuonHisto&);
+
   ClassDef(CbmAnaDimuonHisto,1);
 };
 

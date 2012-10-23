@@ -109,6 +109,11 @@ protected:
    bool fIsUseChecking;
 
    CbmReportElement* fR; // Report element tool
+
+private:
+
+//   CbmReport(const CbmReport&);
+//   CbmReport operator=(const CbmReport&);
 };
 
 #endif /* CBMREPORT_H_ */

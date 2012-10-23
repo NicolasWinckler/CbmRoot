@@ -54,5 +54,9 @@ protected:
   CbmMuchDigi*        fDigi;       //! pointer to current digi
   CbmMuchDigiMatch*   fMatch;      //! pointer to current digi match
   vector<CbmMuchPad*> fNeighbours; //! Array of channel IDs of neighbour pads
+
+ private:
+  CbmMuchPad(const CbmMuchPad&);
+  CbmMuchPad operator=(const CbmMuchPad&);
 };
 #endif

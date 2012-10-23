@@ -115,6 +115,9 @@ private:
     void CreateHistogramms();
     InitStatus ReadPdfFile();
 
+    CbmHadronSpectra(const CbmHadronSpectra&);
+    CbmHadronSpectra operator=(const CbmHadronSpectra&);
+
 public:
     CbmHadronSpectra();
     CbmHadronSpectra(const char* name, Int_t verbose = 1);

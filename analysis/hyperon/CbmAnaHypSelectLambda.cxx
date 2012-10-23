@@ -28,20 +28,38 @@
 #include "CbmAnaHypLambdaCandidate.h"
 
 // -----   Standard constructor   ------------------------------------------
-CbmAnaHypSelectLambda::CbmAnaHypSelectLambda(const char* name, Int_t iVerbose)
-                 :CbmAnaHypRecLambda(name,iVerbose){
-
-  fListRCLambda = new TClonesArray("CbmAnaHypLambdaCandidate",1);
+CbmAnaHypSelectLambda::CbmAnaHypSelectLambda()
+  : CbmAnaHypRecLambda("AnaHypSelectLambda", 0),
+    fCutB1(0.14),
+    fCutB2(0.65),
+    fCutChi(4.6),
+    fCutDca(0.13),
+    fCutPca(3.0),
+    fCutPcaMax(50.),
+    fCutMmin(1.1157-2*0.0013),
+    fCutMmax(1.1157+2*0.0013),
+    fListRCLambda(new TClonesArray("CbmAnaHypLambdaCandidate",1))
+{
   fCutChi1 = 4.8;
   fCutChi2 = 4.0;
-  fCutB1   = 0.14;
-  fCutB2   = 0.65;
-  fCutDca  = 0.13;
-  fCutChi  = 4.6;
-  fCutPca  = 3.0;
-  fCutPcaMax = 50.;
-  fCutMmin = 1.1157-2*0.0013;
-  fCutMmax = 1.1157+2*0.0013;
+  fPid = 0;
+}
+// -------------------------------------------------------------------------
+
+CbmAnaHypSelectLambda::CbmAnaHypSelectLambda(const char* name, Int_t iVerbose)
+  : CbmAnaHypRecLambda(name,iVerbose),
+    fCutB1(0.14),
+    fCutB2(0.65),
+    fCutChi(4.6),
+    fCutDca(0.13),
+    fCutPca(3.0),
+    fCutPcaMax(50.),
+    fCutMmin(1.1157-2*0.0013),
+    fCutMmax(1.1157+2*0.0013),
+    fListRCLambda(new TClonesArray("CbmAnaHypLambdaCandidate",1))
+{
+  fCutChi1 = 4.8;
+  fCutChi2 = 4.0;
   fPid = 0;
 }
 // -------------------------------------------------------------------------

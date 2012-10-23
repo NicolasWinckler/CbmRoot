@@ -52,6 +52,9 @@ private:
   TH1D* fTanMin;
   TH1D* fTanMax;
   
+  CbmAnaAngularAcceptance(const CbmAnaAngularAcceptance&);
+  CbmAnaAngularAcceptance operator=(const CbmAnaAngularAcceptance&);
+
   ClassDef(CbmAnaAngularAcceptance,1);
 };
 

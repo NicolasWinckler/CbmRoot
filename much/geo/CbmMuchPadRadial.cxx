@@ -12,7 +12,10 @@
 
 // -----  Default constructor  ----------------------------------------------
 CbmMuchPadRadial::CbmMuchPadRadial()
-  : CbmMuchPad(),TCrown()
+  : CbmMuchPad(),
+    TCrown(),
+    fPhi1(0.),
+    fPhi2(0.)
 {
 }
 // -------------------------------------------------------------------------

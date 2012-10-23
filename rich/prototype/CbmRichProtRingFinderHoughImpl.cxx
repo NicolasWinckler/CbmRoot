@@ -33,6 +33,45 @@ using std::vector;
 
 // -----   Standard constructor   ------------------------------------------
 CbmRichProtRingFinderHoughImpl::CbmRichProtRingFinderHoughImpl  (TString geometry)
+  : kMAX_NOF_HITS(0),
+    fNofParts(0),
+    fMaxDistance(0.),
+    fMinDistance(0.),
+    fMinDistanceSq(0.),
+    fMaxDistanceSq(0.),
+    fMinRadius(0.),
+    fMaxRadius(0.),
+    fDx(0.),
+    fDy(0.),
+    fDr(0.),
+    fNofBinsX(0),
+    fNofBinsY(0),
+    fNofBinsXY(0),
+    fHTCut(0),
+    fHitCut(0),
+    fNofBinsR(0),
+    fHTCutR(0),
+    fHitCutR(0),
+    fMinNofHitsInArea(0),
+    fRmsCoeffEl(0.),
+    fMaxCutEl(0.),
+    fRmsCoeffCOP(0.),
+    fMaxCutCOP(0.),
+    fAnnCut(0.),
+    fUsedHitsCut(0.),
+    fUsedHitsAllCut(0.),
+    fCurMinX(0.),
+    fCurMinY(0.),
+    fData(), 
+    fDataPart1(),
+    fDataPart2(),
+    fHist(),
+    fHistR(),
+    fHitInd(),
+    fFoundRings(),
+    fFitCOP(NULL),
+    fANNSelect(NULL),
+    fGeometryType(geometry)
 {
     cout << "-I- CbmRichProtRingFinderHoughImpl constructor for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
@@ -40,12 +79,49 @@ CbmRichProtRingFinderHoughImpl::CbmRichProtRingFinderHoughImpl  (TString geometr
         cout << "-E- CbmRichProtRingFinderHoughImpl::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
-    fGeometryType = geometry;
 }
 
 CbmRichProtRingFinderHoughImpl::CbmRichProtRingFinderHoughImpl()
+  : kMAX_NOF_HITS(0),
+    fNofParts(0),
+    fMaxDistance(0.),
+    fMinDistance(0.),
+    fMinDistanceSq(0.),
+    fMaxDistanceSq(0.),
+    fMinRadius(0.),
+    fMaxRadius(0.),
+    fDx(0.),
+    fDy(0.),
+    fDr(0.),
+    fNofBinsX(0),
+    fNofBinsY(0),
+    fNofBinsXY(0),
+    fHTCut(0),
+    fHitCut(0),
+    fNofBinsR(0),
+    fHTCutR(0),
+    fHitCutR(0),
+    fMinNofHitsInArea(0),
+    fRmsCoeffEl(0.),
+    fMaxCutEl(0.),
+    fRmsCoeffCOP(0.),
+    fMaxCutCOP(0.),
+    fAnnCut(0.),
+    fUsedHitsCut(0.),
+    fUsedHitsAllCut(0.),
+    fCurMinX(0.),
+    fCurMinY(0.),
+    fData(), 
+    fDataPart1(),
+    fDataPart2(),
+    fHist(),
+    fHistR(),
+    fHitInd(),
+    fFoundRings(),
+    fFitCOP(NULL),
+    fANNSelect(NULL),
+    fGeometryType("")
 {
-
 
 }
 

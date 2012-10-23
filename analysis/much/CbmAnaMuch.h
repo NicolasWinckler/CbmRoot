@@ -89,6 +89,10 @@ private:
   Int_t    fMuchPointsAccQuota;
   Double_t fMuchTrueHitQuota;
   TString fHistoFileName;
+
+  CbmAnaMuch(const CbmAnaMuch&);
+  CbmAnaMuch operator=(const CbmAnaMuch&);
+
   ClassDef(CbmAnaMuch,1);
 };
 

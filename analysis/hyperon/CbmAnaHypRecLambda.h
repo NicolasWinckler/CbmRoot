@@ -41,7 +41,7 @@ class CbmAnaHypRecLambda : public FairTask
 public:
 
   /** Default constructor */
-  CbmAnaHypRecLambda(){};
+  CbmAnaHypRecLambda();
 
   /** Standard constructor */
   CbmAnaHypRecLambda(const char *name, Int_t iVerbose);
@@ -69,7 +69,6 @@ public:
   void GetAP(TVector3 p1, TVector3 p2, Double_t &alpha, Double_t &ptt);
   Int_t GetPid(CbmAnaHypTrack tr);
 
-ClassDef(CbmAnaHypRecLambda,1);
 
 protected:
   Int_t fPid;
@@ -91,6 +90,13 @@ protected:
   CbmAnaHypTools* fTools;  ///< Pointer to some useful tools, like SetFlags
   CbmKFSecondaryVertexFinder* fSVF;
   CbmStsKFTrackFitter* fFitter;
+
+ private:
+
+  CbmAnaHypRecLambda(const CbmAnaHypRecLambda&);
+  CbmAnaHypRecLambda operator=(const CbmAnaHypRecLambda&);
+
+  ClassDef(CbmAnaHypRecLambda,1);
 
 };
 

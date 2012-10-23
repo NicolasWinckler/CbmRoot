@@ -78,7 +78,7 @@ CbmRichGeoTest::CbmRichGeoTest():
 
    fCopFit(NULL),
    fTauFit(NULL),
-
+   fCanvas(),
    fEventNum(0),
    fMinNofHits(0),
 

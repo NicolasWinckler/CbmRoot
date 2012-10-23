@@ -19,14 +19,94 @@
 ClassImp(CbmAnaHypSecFinderQa)
 
 // -------------------------------------------------------------------------
-CbmAnaHypSecFinderQa::CbmAnaHypSecFinderQa():CbmAnaHypSecFinder(){}
+CbmAnaHypSecFinderQa::CbmAnaHypSecFinderQa()
+: CbmAnaHypSecFinder(),
+  fTools(NULL),
+  fTrackMatch(NULL),
+  hTxB(),
+  hTyB(),
+  hTxS(),
+  hTyS(),
+  hDtxB(),
+  hDtyB(),
+  hDtxS(),
+  hDtyS(),
+  hChi2S(NULL),
+  hChi2B(NULL),
+  hPS(NULL),
+  hPB(NULL),
+  hDx(),
+  hDy(),
+  hDxPull(),
+  hDyPull(),
+  hPullX(NULL),
+  hPullY(NULL),
+  hPullQp(NULL),
+  hQpDtx(NULL),
+  fEvent(0),
+  fFinder(0),
+  fFound(0),
+  fAll(0),
+  fSig(0),
+  fSigD(0),
+  fFakeD(0),
+  fL1AC(0.),
+  fRC(0),
+  fRC_good(0),
+  fRC_fake(0),
+  fSR(0),
+  fSR_good(0),
+  fSR_fake(0),
+  fAR(0),
+  fAR_good(0),
+  fAR_fake(0)
+{
+}
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmAnaHypSecFinderQa::CbmAnaHypSecFinderQa(char* name, Int_t iVerbose):
-  CbmAnaHypSecFinder(name,iVerbose){
-
-
+CbmAnaHypSecFinderQa::CbmAnaHypSecFinderQa(char* name, Int_t iVerbose)
+  : CbmAnaHypSecFinder(name,iVerbose),
+    fTools(NULL),
+    fTrackMatch(NULL),
+    hTxB(),
+    hTyB(),
+    hTxS(),
+    hTyS(),
+    hDtxB(),
+    hDtyB(),
+    hDtxS(),
+    hDtyS(),
+    hChi2S(NULL),
+    hChi2B(NULL),
+    hPS(NULL),
+    hPB(NULL),
+    hDx(),
+    hDy(),
+    hDxPull(),
+    hDyPull(),
+    hPullX(NULL),
+    hPullY(NULL),
+    hPullQp(NULL),
+    hQpDtx(NULL),
+    fEvent(0),
+    fFinder(0),
+    fFound(0),
+    fAll(0),
+    fSig(0),
+    fSigD(0),
+    fFakeD(0),
+    fL1AC(0.),
+    fRC(0),
+    fRC_good(0),
+    fRC_fake(0),
+    fSR(0),
+    fSR_good(0),
+    fSR_fake(0),
+    fAR(0),
+    fAR_good(0),
+    fAR_fake(0)
+{
 }
 // -------------------------------------------------------------------------
 

@@ -82,6 +82,11 @@ public:
 
 	void SetFitter(CbmRichRingFitter *fitter) { fFitter = fitter; }
 
+private:
+      CbmRichProtRingFinderHough(const CbmRichProtRingFinderHough&);
+      CbmRichProtRingFinderHough operator=(const CbmRichProtRingFinderHough&);
+      
+      
 	ClassDef(CbmRichProtRingFinderHough,1)
 
 };

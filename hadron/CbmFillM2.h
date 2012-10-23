@@ -38,12 +38,14 @@ private:
     Double_t      fMaxM2;            // Max m2
     Double_t      fBinSizeM2;        // Binsize in m2
     Int_t         fNbinsMom;         // Number of bins in momentum
-    Int_t         fNbinsMomCharge;   // Number of bins in mom*charge
     Double_t      fMinMom;           // Min momentum
     Double_t      fMaxMom;           // Max momentum
+    Int_t         fNbinsMomCharge;   // Number of bins in mom*charge
     Double_t      fBinSizeMom;       // Binsize in momentum
 
     void CreateHistogramms();
+    CbmFillM2(const CbmFillM2&);
+    CbmFillM2 operator=(const CbmFillM2&);
 
 public:
     CbmFillM2();

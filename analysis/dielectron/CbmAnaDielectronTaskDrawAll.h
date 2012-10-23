@@ -39,7 +39,18 @@ public:
    /**
    * \brief Default constructor.
    */
-   CbmAnaDielectronTaskDrawAll(){;}
+ CbmAnaDielectronTaskDrawAll() 
+   : TObject(),
+    fCanvas(),
+    fUseMvd(false),
+    fHM(),
+    fh_mean_bg_minv(),
+    fh_mean_eta_minv(),
+    fh_mean_pi0_minv(),
+    fh_sum_s_minv(),
+    fOutputDir(""),
+    fPt(NULL)
+      {;}
 
    /**
     * \brief Destructor.
@@ -154,6 +165,10 @@ private:
     * \brief Save all created canvases to images.
     */
    void SaveCanvasToImage();
+
+
+   CbmAnaDielectronTaskDrawAll(const CbmAnaDielectronTaskDrawAll&);
+   CbmAnaDielectronTaskDrawAll operator=(const CbmAnaDielectronTaskDrawAll&);
 
    ClassDef(CbmAnaDielectronTaskDrawAll, 1);
 };

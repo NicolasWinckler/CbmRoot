@@ -22,20 +22,37 @@
 #include "TLorentzVector.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmAnaAngularAcceptance::CbmAnaAngularAcceptance(){
-  fEvent=0;
-  fSignalPairs=15;
-  fDimuonCandidates=new TClonesArray("CbmAnaDimuonCandidate");
+CbmAnaAngularAcceptance::CbmAnaAngularAcceptance()
+  : FairTask("AnaAngularAcceptance"),
+    fEvent(0),
+    fMCTracks(NULL),
+    fStsTracks(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    fStsTrackMatches(NULL),
+    fSignalPairs(15),
+    fDimuonCandidates(new TClonesArray("CbmAnaDimuonCandidate")),
+    fTanMin(NULL),
+    fTanMax(NULL)
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmAnaAngularAcceptance::CbmAnaAngularAcceptance(const char* name)
-:FairTask(name){
-  fEvent=0;
-  fSignalPairs=15;
-  fDimuonCandidates=new TClonesArray("CbmAnaDimuonCandidate");
+  : FairTask(name),
+    fEvent(0),
+    fMCTracks(NULL),
+    fStsTracks(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    fStsTrackMatches(NULL),
+    fSignalPairs(15),
+    fDimuonCandidates(new TClonesArray("CbmAnaDimuonCandidate")),
+    fTanMin(NULL),
+    fTanMax(NULL)
+{
 }
 
 // -------------------------------------------------------------------------

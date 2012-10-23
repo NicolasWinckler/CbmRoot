@@ -3,37 +3,58 @@
 #include "CbmKFTrack.h"
 #include "TLorentzVector.h"
 
-CbmAnaMuonCandidate::CbmAnaMuonCandidate(){
-  fIsReconstructed = kFALSE;
-  fNStsHits = 0;
-  fNMuchHits = 0;
-  fChiToVertex = 100.;
-  fNTriggerHits = 0;
-  fSign = 0;
-  fMCTrackId = -1;
-  
+CbmAnaMuonCandidate::CbmAnaMuonCandidate()
+  : TObject(),
+    track(),
+    fMCTrackId(-1),
+    fpMC(),
+    fpRC(),
+    muchPoints(),
+    muchHits(),
+    stsPoints(),
+    stsHits(),
+    fIsReconstructed(kFALSE),
+    fNStsHits(0),
+    fNMuchHits(0),
+    fChiToVertex(100.),
+    fNTriggerHits(0),
+    fSign(0.),
+    fNMuchPoints(0),
+    fNStsPoints(0)
+{
   for (Int_t i=0;i<NPLANES;i++){
     muchPoints[i]=-1;
     muchHits[i]=-1;
-  }
-  
+    stsPoints[i]=-1;
+    stsHits[i]=-1;
+  }  
 }
 
 
-CbmAnaMuonCandidate::CbmAnaMuonCandidate(Int_t iTrack, TLorentzVector pMC){
-  fIsReconstructed = kFALSE;
-  fNStsHits = 0;
-  fNMuchHits = 0;
-  fChiToVertex = 100.;
-  fNTriggerHits = 0;
-  fSign = 0;
-  
-  fMCTrackId = iTrack;
-  fpMC = pMC;
-  
+CbmAnaMuonCandidate::CbmAnaMuonCandidate(Int_t iTrack, TLorentzVector pMC)
+  : TObject(),
+    track(),
+    fMCTrackId(iTrack),
+    fpMC(pMC),
+    fpRC(),
+    muchPoints(),
+    muchHits(),
+    stsPoints(),
+    stsHits(),
+    fIsReconstructed(kFALSE),
+    fNStsHits(0),
+    fNMuchHits(0),
+    fChiToVertex(100.),
+    fNTriggerHits(0),
+    fSign(0.),
+    fNMuchPoints(0),
+    fNStsPoints(0)
+{
   for (Int_t i=0;i<NPLANES;i++){
     muchPoints[i]=-1;
     muchHits[i]=-1;
+    stsPoints[i]=-1;
+    stsHits[i]=-1;
   }
   
 }

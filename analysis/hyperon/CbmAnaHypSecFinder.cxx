@@ -16,19 +16,80 @@
 ClassImp(CbmAnaHypSecFinder)
 
 // -------------------------------------------------------------------------
-CbmAnaHypSecFinder::CbmAnaHypSecFinder(){}
+CbmAnaHypSecFinder::CbmAnaHypSecFinder()
+  : FairTask("AnaHypSecFinder"),
+    fRCTracks(0),
+    fStandAlone(kFALSE),
+    fTxMax(NULL),
+    fTyMax(NULL),
+    fdTxMax(NULL),
+    fdTyMax(NULL),
+    fChi2Max(3.),
+    fQpMax(0.2),
+    fNsigma(3.),    
+    mcTrackArray(NULL),
+    rcTrackArray(NULL),
+    mcPointArray(NULL),
+    mHitArray(NULL),
+    hHitArray(NULL),
+    sHitArray(NULL),
+    newTrackArray(NULL),
+    vHits(),
+    fSt_z(),
+    fSt_dz(),
+    fStR1_z(),
+    fStR2_z(),
+    fDx1(),
+    fDy1(),
+    fDx2(),
+    fDy2(),
+    fStL(0),
+    fStF(0),
+    fNstations(0),
+    fFitter(new CbmStsKFTrackFitter()),
+    h_used(),
+    s_used(),
+    vTrackHits()
+{
+}
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 CbmAnaHypSecFinder::CbmAnaHypSecFinder(char* name, Int_t iVerbose)
-  :FairTask(name,iVerbose){
-
-  fChi2Max=3;
-  fTxMax=fTyMax=fdTxMax=fdTyMax=0;
-  fNsigma=3;
-  fQpMax=0.2;
-  fFitter = new CbmStsKFTrackFitter();
-  fStandAlone=0;
+  : FairTask(name,iVerbose),
+    fRCTracks(0),
+    fStandAlone(kFALSE),
+    fTxMax(NULL),
+    fTyMax(NULL),
+    fdTxMax(NULL),
+    fdTyMax(NULL),
+    fChi2Max(3.),
+    fQpMax(0.2),
+    fNsigma(3.),    
+    mcTrackArray(NULL),
+    rcTrackArray(NULL),
+    mcPointArray(NULL),
+    mHitArray(NULL),
+    hHitArray(NULL),
+    sHitArray(NULL),
+    newTrackArray(NULL),
+    vHits(),
+    fSt_z(),
+    fSt_dz(),
+    fStR1_z(),
+    fStR2_z(),
+    fDx1(),
+    fDy1(),
+    fDx2(),
+    fDy2(),
+    fStL(0),
+    fStF(0),
+    fNstations(0),
+    fFitter(new CbmStsKFTrackFitter()),
+    h_used(),
+    s_used(),
+    vTrackHits()
+{
 }
 // -------------------------------------------------------------------------
 

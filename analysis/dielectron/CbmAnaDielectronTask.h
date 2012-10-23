@@ -67,15 +67,60 @@ public:
    Double_t richAnn;
    Double_t trdAnn;
    Double_t mass2;
+
+   DielectronCandidate()
+     : position(), 
+     momentum(),
+     mass(0.), 
+     energy(0.), 
+     rapidity(0.),
+     charge(0.),
+     chi2Prim(0.),
+     chi2sts(0.),
+     McMotherId(0),
+     stsMcTrackId(0),
+     richMcTrackId(0),
+     trdMcTrackId(0),
+     tofMcTrackId(0),
+     stsInd(0),
+     richInd(0),
+     trdInd(0),
+     tofInd(0),
+     isElectron(false),
+     isMcSignalElectron(false),
+     isMcPi0Electron(false),
+     isMcGammaElectron(false),
+     isMcEtaElectron(false),
+     isGamma(false),
+     dSts(0.),
+     isTtCutElectron(false),
+     isStCutElectron(false),
+     isApmCutElectron(false),
+     isMvd1CutElectron(false),
+     isMvd2CutElectron(false),
+     richAnn(0.),
+     trdAnn(0.),
+     mass2(0.)
+     {
+     }
 };
 
 class KinematicParams{
-public:
-   Double_t momentumMag; // Absolute value of momentum
-   Double_t pt; // Transverse momentum
-   Double_t rapidity; // Rapidity
-   Double_t minv; // Invariant mass
-   Double_t angle; // Opening angle
+ public:
+  Double_t momentumMag; // Absolute value of momentum
+  Double_t pt; // Transverse momentum
+  Double_t rapidity; // Rapidity
+  Double_t minv; // Invariant mass
+  Double_t angle; // Opening angle
+  
+ KinematicParams()
+   :  momentumMag(0.),
+    pt(0.),
+    rapidity(0.),
+    minv(0.),
+    angle(0)
+      {
+      }
 };
 
 class CbmAnaDielectronTask : public FairTask {
@@ -284,11 +329,6 @@ public:
 
     virtual void Finish();
 
-
-
-
-    ClassDef(CbmAnaDielectronTask,1);
-
 private:
 
     void IsElectron(
@@ -460,6 +500,12 @@ public:
    void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
 
    void SetPionMisidLevel(Double_t level) {fPionMisidLevel = level;}
+
+   CbmAnaDielectronTask(const CbmAnaDielectronTask&);
+   CbmAnaDielectronTask operator=(const CbmAnaDielectronTask&);
+
+   ClassDef(CbmAnaDielectronTask,1);
+    
 };
 
 #endif

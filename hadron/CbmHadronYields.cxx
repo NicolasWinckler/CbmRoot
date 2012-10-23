@@ -27,19 +27,48 @@ using namespace std;
 
 // ------------------------------------------------------------------
 CbmHadronYields::CbmHadronYields()
+  : FairTask("HadronYields"),
+    fEvents(0),
+    fArrayMCTrack(NULL),
+    fArrayStsTrack(NULL),
+    fArrayStsTrackM(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTrdTrackM(NULL),
+    fArrayTofHit(NULL),
+    fArrayTofPoint(NULL),
+    fArrayGlbTrack(NULL),
+    fmap_all(),
+    fmap_sts_acc(),
+    fmap_trd_acc(),
+    fmap_glb_acc(),
+    fmap_sts_rec(),
+    fmap_trd_rec(),
+    fmap_glb_rec()
 {
-    // Default constructor
-    fEvents = 0;
 }
 // ------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------
 CbmHadronYields::CbmHadronYields(const char* name, Int_t verbose)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fEvents(0),
+    fArrayMCTrack(NULL),
+    fArrayStsTrack(NULL),
+    fArrayStsTrackM(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTrdTrackM(NULL),
+    fArrayTofHit(NULL),
+    fArrayTofPoint(NULL),
+    fArrayGlbTrack(NULL),
+    fmap_all(),
+    fmap_sts_acc(),
+    fmap_trd_acc(),
+    fmap_glb_acc(),
+    fmap_sts_rec(),
+    fmap_trd_rec(),
+    fmap_glb_rec()
 {
-    // Standard constructor
-    fEvents = 0;
 }
 // ------------------------------------------------------------------
 

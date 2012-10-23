@@ -40,6 +40,17 @@ using namespace std;
 using namespace lit;
 using boost::assign::list_of;
 
+CbmAnaDielectronTaskDraw::CbmAnaDielectronTaskDraw()
+  :TObject(),
+   fUseMvd(kFALSE),
+   fDrawSignificance(kFALSE),
+   fHM(NULL),
+   fCanvas(),
+   fOutputDir(""),
+   fPt(NULL)
+{
+}
+
 void CbmAnaDielectronTaskDraw::DrawHistFromFile(
       const string& fileName,
       const string& outputDir,

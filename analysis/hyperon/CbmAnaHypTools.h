@@ -21,7 +21,18 @@ using std::map;
 class CbmAnaHypTools
 {
 public:
-  CbmAnaHypTools(){};
+  CbmAnaHypTools()
+    : fListMCTracks(NULL),
+    fStsPointArray(NULL),
+    fListRCTracks(NULL),
+    fmArray(NULL),
+    fsArray(NULL),
+    fTrackMatch(NULL),
+    fPV(NULL),
+    pv(),
+    fTree(NULL)
+      {};
+
   ~CbmAnaHypTools(){};
   void Init();
   Int_t GetTrackId(CbmTrackMatch* match);
@@ -49,11 +60,15 @@ private:
   TVector3 pv;
   TTree* fTree;
 
+  CbmAnaHypTools(const CbmAnaHypTools&);
+  CbmAnaHypTools operator=(const CbmAnaHypTools&);
+
 };
 
-class Lambda{
+class Lambda
+{
  public:
-  Lambda():laMC(0),piMC(0),prMC(0),piRC(0),prRC(0),piKF(0),prKF(0){}
+  Lambda():laMC(NULL),piMC(NULL),prMC(NULL),piRC(NULL),prRC(NULL),piKF(NULL),prKF(NULL){}
   ~Lambda(){}
   CbmMCTrack* laMC;
   CbmMCTrack* piMC;
@@ -62,22 +77,26 @@ class Lambda{
   CbmStsTrack* prRC;
   CbmKFTrack* piKF;
   CbmKFTrack* prKF;
+ private:
+  Lambda(const Lambda&);
+  Lambda operator=(const Lambda&);
 };
 
 struct HitVector{
-    vector<int> vMvd;
-    vector<int> vSts;
-    vector<int> vStationID;
+  vector<int> vMvd;
+  vector<int> vSts;
+  vector<int> vStationID;
+  
+HitVector() : vMvd(), vSts(), vStationID() {}
 };
 
 class Da{
  public:
-  Da():pdg(0),idMC(-1),idRC(-1),mc(0),rc(0),moId(-1),nPts(0),nHits(0),isL1AC(0){}
-  Da(Int_t IDMC, CbmMCTrack* MC):idMC(IDMC),idRC(0),mc(MC),rc(0),nHits(0),isL1AC(0){
-    moId=MC->GetMotherId();
-    pdg=MC->GetPdgCode();
-    nPts=MC->GetNPoints(kMUCH);
-  }
+  Da() : pdg(0), idMC(-1), idRC(-1), mc(NULL), rc(NULL), moId(-1), nPts(0),
+    nHits(0), hits(), isL1AC(0) {}
+ Da(Int_t IDMC, CbmMCTrack* MC) : pdg(MC->GetPdgCode()), idMC(IDMC), idRC(0), 
+    mc(MC), rc(NULL), moId(MC->GetMotherId()), nPts(MC->GetNPoints(kMUCH)),
+    nHits(0), hits(), isL1AC(0) {}
   ~Da(){}
   Int_t pdg;
   Int_t idMC;
@@ -89,6 +108,10 @@ class Da{
   Int_t nHits;
   HitVector hits;
   Bool_t isL1AC;
+
+ private:
+  Da(const Da&);
+  Da operator=(const Da&);
 };
 
 

@@ -71,6 +71,12 @@ class CbmAnaHypSecFinderQa : public CbmAnaHypSecFinder
   Int_t fRC,fRC_good,fRC_fake;
   Int_t fSR,fSR_good,fSR_fake;
   Int_t fAR,fAR_good,fAR_fake;
+
+ private:
+
+  CbmAnaHypSecFinderQa(const CbmAnaHypSecFinderQa&);
+  CbmAnaHypSecFinderQa operator=(const CbmAnaHypSecFinderQa&);
+
   ClassDef(CbmAnaHypSecFinderQa,1);
 };
 

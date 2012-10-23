@@ -160,42 +160,102 @@ void CbmAnaDielectronTask::CreateSourceTypesH2(
 }
 
 CbmAnaDielectronTask::CbmAnaDielectronTask()
-: FairTask("CbmAnaDielectronTask")
+  : FairTask("CbmAnaDielectronTask"),
+    fMCTracks(NULL),
+    fRichRings(NULL),
+    fRichProj(NULL),
+    fRichPoints(NULL),
+    fRichRingMatches(NULL),
+    fRichHits(NULL),
+    fGlobalTracks(NULL),
+    fStsTracks(NULL),
+    fStsTrackMatches(NULL),
+    fStsHits(NULL),
+    fMvdHits(NULL),
+    fTrdTracks(NULL),
+    fTrdHits(NULL),
+    fTrdTrackMatches(NULL),
+    fTofHits(NULL),
+    fTofPoints(NULL),
+    fPrimVertex(NULL),
+    fKFFitter(),
+    fUseMvd(false),
+    fUseRich(true),
+    fUseTrd(true),
+    fUseTof(true),
+    fCandidates(),
+    fSegmentCandidates(),
+    fWeight(0.),
+    fPionMisidLevel(-1.),
+    fRandom3(new TRandom3(0)),
+    fTrdAnnCut(0.85),
+    fRichAnnCut(0.0),
+    fMeanA(-1.),
+    fMeanB(-1.),
+    fRmsA(-1.),
+    fRmsB(-1.),
+    fRmsCoeff(-1.),
+    fDistCut(-1.),
+    fElIdAnn(NULL), 
+    fUseRichAnn(true),
+    fChiPrimCut(3.),
+    fPtCut(0.2),
+    fAngleCut(1.),
+    fGammaCut(0.025),
+    fStCutAngle(1.5),
+    fStCutPP(1.5),
+    fTtCutAngle(0.75),
+    fTtCutPP(4.0),
+    fMvd1CutP(1.),
+    fMvd1CutD(0.4),
+    fMvd2CutP(1.5),
+    fMvd2CutD(0.5),
+    fHistoList(),
+    fNofHitsInRingMap(),
+    fh_mc_mother_pdg(new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.)),
+    fh_acc_mother_pdg(new TH1D("fh_acc_mother_pdg","fh_acc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.)),
+    fh_mc_vertex_gamma_xz(new TH2D("fh_mc_vertex_gamma_xz","fh_mc_vertex_gamma_xz;Z [cm];X [cm]",200, -10., 110., 200, -100.,100.)),
+    fh_mc_vertex_gamma_yz(new TH2D("fh_mc_vertex_gamma_yz", "fh_mc_vertex_gamma_yz;Z [cm];Y [cm]", 200, -10., 110., 200, -100., 100.)),
+    fh_mc_vertex_gamma_xy(new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.)),
+    fh_signal_minv(),
+    fh_bg_minv(),
+    fh_pi0_minv(),
+    fh_eta_minv(),
+    fh_signal_mom(),
+    fh_signal_pty(),
+    fh_signal_minv_pt(),
+    fh_source_minv(),
+    fh_pt(),
+    fh_mom(),
+    fh_chi2sts(),
+    fh_chi2prim(),
+    fh_ttcut(),
+    fh_stcut(),
+    fh_apcut(),
+    fh_apmcut(),
+    fh_mvd1cut(),
+    fh_mvd2cut(),
+    fh_richann(),
+  fh_trdann(),
+    fh_tofm2(),
+    fh_source_pair(),
+    fh_event_number(new TH1D("fh_event_number","fh_event_number", 1, 0, 1.)),
+    fh_nof_bg_tracks(new TH1D("fh_nof_bg_tracks","fh_nof_bg_tracks;analysis steps;tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps)),
+    fh_nof_el_tracks(new TH1D("fh_nof_el_tracks","fh_nof_el_tracks;analysis steps;tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps)),
+    fh_source_tracks(new  TH2D("fh_source_tracks","fh_source_tracks;analysis steps;particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 7, 0., 7.)),
+    fh_source_mom(),
+    fh_opening_angle()
 {
-   // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
-   fWeight = 0.0;
-   fUseRich = true;
-   fUseTrd = true;
-   fUseTof = true;
-
-   fPionMisidLevel = -1.;
-   fRandom3 = new TRandom3(0);
-
-   fHistoList.clear();
 
    // Mother PDG
-   fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
    fHistoList.push_back(fh_mc_mother_pdg);
-   fh_acc_mother_pdg = new TH1D("fh_acc_mother_pdg","fh_acc_mother_pdg; Pdg code; Particles per event", 7000, -3500., 3500.);
    fHistoList.push_back(fh_acc_mother_pdg);
-
-   fh_mc_vertex_gamma_xz = new TH2D("fh_mc_vertex_gamma_xz","fh_mc_vertex_gamma_xz;Z [cm];X [cm]",200, -10., 110., 200, -100.,100.);
    fHistoList.push_back(fh_mc_vertex_gamma_xz);
-   fh_mc_vertex_gamma_yz = new TH2D("fh_mc_vertex_gamma_yz", "fh_mc_vertex_gamma_yz;Z [cm];Y [cm]", 200, -10., 110., 200, -100., 100.);
    fHistoList.push_back(fh_mc_vertex_gamma_yz);
-   fh_mc_vertex_gamma_xy = new TH2D("fh_mc_vertex_gamma_xy","fh_mc_vertex_gamma_xy;X [cm];Y [cm]", 200, -100.,100., 200, -100., 100.);
    fHistoList.push_back(fh_mc_vertex_gamma_xy);
-
-   // Number of BG and signal tracks after each cut
-   fh_nof_bg_tracks = new TH1D("fh_nof_bg_tracks","fh_nof_bg_tracks;analysis steps;tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
    fHistoList.push_back(fh_nof_bg_tracks);
-   fh_nof_el_tracks = new TH1D("fh_nof_el_tracks","fh_nof_el_tracks;analysis steps;tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
    fHistoList.push_back(fh_nof_el_tracks);
-   fh_source_tracks = new  TH2D("fh_source_tracks","fh_source_tracks;analysis steps;particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 7, 0., 7.);
    fHistoList.push_back(fh_source_tracks);
-
-   // Event number counter
-   fh_event_number = new TH1D("fh_event_number","fh_event_number", 1, 0, 1.);
    fHistoList.push_back(fh_event_number);
 
    CreateSourceTypesH1(fh_richann, "fh_richann", "ANN output", "Yield", 100, -1.1, 1.1);

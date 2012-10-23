@@ -35,6 +35,9 @@ private:
     std::map<Int_t, Int_t> fmap_trd_rec;
     std::map<Int_t, Int_t> fmap_glb_rec;
 
+    CbmHadronYields(const CbmHadronYields&);
+    CbmHadronYields operator=(const CbmHadronYields&);
+
 public:
     CbmHadronYields();
     CbmHadronYields(const char* name, Int_t verbose = 1);

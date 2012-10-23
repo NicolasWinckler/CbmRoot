@@ -35,6 +35,11 @@ public:
 
     inline void SetReso(Float_t pos, Float_t theta) { fPosReso = pos; fThetaReso = theta; }
 
+private:
+
+    CbmRichProtPrepareExtrapolation(const CbmRichProtPrepareExtrapolation&);
+    CbmRichProtPrepareExtrapolation operator=(const CbmRichProtPrepareExtrapolation&);
+
     ClassDef(CbmRichProtPrepareExtrapolation, 1)
 };
 

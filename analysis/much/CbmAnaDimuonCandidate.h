@@ -6,7 +6,7 @@ class TLorentzVector;
 
 class CbmAnaDimuonCandidate : public TObject{
   public:
-    CbmAnaDimuonCandidate() {};
+    CbmAnaDimuonCandidate();
     CbmAnaDimuonCandidate(CbmAnaMuonCandidate muPlus, CbmAnaMuonCandidate muMinus);
     CbmAnaMuonCandidate* GetMuPlus()  { return &fMuPlus;  }
     CbmAnaMuonCandidate* GetMuMinus() { return &fMuMinus; }

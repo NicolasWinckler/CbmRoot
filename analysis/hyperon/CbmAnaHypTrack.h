@@ -5,7 +5,7 @@
 
 class CbmAnaHypTrack : public CbmKFTrack{
   public:
-    CbmAnaHypTrack(){};
+    CbmAnaHypTrack();
     CbmAnaHypTrack(CbmStsTrack track, Int_t rcId, Int_t mcId,
         Int_t moId, Int_t mcPdg, Int_t moPdg,
         Double_t chi, Double_t b);

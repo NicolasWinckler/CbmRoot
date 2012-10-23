@@ -111,17 +111,20 @@ private:
     TH2F         *fh_pdf_kap;         // PDF for K+
     TH2F         *fh_pdf_prot;        // PDF for p
     Int_t         fPdfNbinsM2;        // Number of bins in m2
-    Double_t      fPdfBinSizeM2;      // Binsize in m2
     Double_t      fPdfMinM2;          // Min m2
     Double_t      fPdfMaxM2;          // Max m2
+    Double_t      fPdfBinSizeM2;      // Binsize in m2
     Int_t         fPdfNbinsMom;       // Number of bins in momentum
-    Double_t      fPdfBinSizeMom;     // Binsize in momentum
     Double_t      fPdfMinMom;         // Min momentum
     Double_t      fPdfMaxMom;         // Max momentum
+    Double_t      fPdfBinSizeMom;     // Binsize in momentum
     Int_t         fPdfNbinsMomCharge; // Number of bins in mom*charge
 
     void OpenPdfFile();
     void CreateHistogramms();
+
+    CbmEbefluctPYR(const CbmEbefluctPYR&);
+    CbmEbefluctPYR operator=(const CbmEbefluctPYR&);
 
 public:
     CbmEbefluctPYR();

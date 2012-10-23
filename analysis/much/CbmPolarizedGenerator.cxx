@@ -13,32 +13,53 @@
 #include "TLorentzVector.h"
 
 // ------------------------------------------------------------------------
-CbmPolarizedGenerator::CbmPolarizedGenerator():FairGenerator(){
-  // Default constructor
-  fPDGType =  -1;
-  fMult    =   0;
-  fAlpha   =   0;
-  fBeamMomentum = 25.;
-  fFrame = kHelicity;
-  fDecayMode = kDiMuon;
-  fPol = NULL;
-  fBox = 0;
+CbmPolarizedGenerator::CbmPolarizedGenerator()
+  : FairGenerator(),
+    fPDGType(-1),
+    fMult(0),
+    fT(0.),
+    fPtDistMass(0.),
+    fY0(0.),
+    fSigma(0.),
+    fPtMin(0.),
+    fPtMax(0.),
+    fYMin(0.),
+    fYMax(0.),
+    fPDGMass(0.),
+    fDistPt(NULL),
+    fAlpha(0.),
+    fFrame(kHelicity),
+    fDecayMode(kDiMuon),
+    fBeamMomentum(25.),
+    fPol(NULL),
+    fBox(kFALSE)
+{
 }
 // ------------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------------
 CbmPolarizedGenerator::CbmPolarizedGenerator(Int_t pdgid, Int_t mult)
-  :FairGenerator(){
-  // Constructor. Set default distributions
-  fPDGType = pdgid;
-  fMult    = mult;
-  fAlpha   = 0;
-  fBeamMomentum = 25.;
-  fFrame = kHelicity;
-  fDecayMode = kDiMuon;
-  fPol = NULL;
-  fBox = 0;
+  : FairGenerator(),
+    fPDGType(pdgid),
+    fMult(mult),
+    fT(0.),
+    fPtDistMass(0.),
+    fY0(0.),
+    fSigma(0.),
+    fPtMin(0.),
+    fPtMax(0.),
+    fYMin(0.),
+    fYMax(0.),
+    fPDGMass(0.),
+    fDistPt(NULL),
+    fAlpha(0.),
+    fFrame(kHelicity),
+    fDecayMode(kDiMuon),
+    fBeamMomentum(25.),
+    fPol(NULL),
+    fBox(kFALSE)
+{
   SetDistributionPt();
   SetDistributionY();
   SetRangePt();

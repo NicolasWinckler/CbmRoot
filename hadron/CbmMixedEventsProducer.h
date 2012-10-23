@@ -38,6 +38,9 @@ private:
     map<Int_t, Int_t> fMapHadrons;
     Int_t             fEvents;               // Number of events processed
 
+    CbmMixedEventsProducer(const CbmMixedEventsProducer&);
+    CbmMixedEventsProducer operator=(const CbmMixedEventsProducer&);
+
 public:
     CbmMixedEventsProducer();
     CbmMixedEventsProducer(const char *name, Int_t verbose = 1);

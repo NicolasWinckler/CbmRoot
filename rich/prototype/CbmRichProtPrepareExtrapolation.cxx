@@ -23,10 +23,13 @@ using namespace std;
 
 // ----------------------------------------------------------------------------
 CbmRichProtPrepareExtrapolation::CbmRichProtPrepareExtrapolation()
-    : FairTask("CbmRichProtPrepareExtrapolation")
+    : FairTask("CbmRichProtPrepareExtrapolation"),
+      fPosReso(0.),
+      fThetaReso(0.),
+      fArrayMCTracks(NULL),
+      fArrayStsTracks(NULL),
+      fArrayGlobalTracks(NULL)
 {
-    fPosReso = 0.;
-    fThetaReso = 0.;
 }
 // ----------------------------------------------------------------------------
 
@@ -34,10 +37,14 @@ CbmRichProtPrepareExtrapolation::CbmRichProtPrepareExtrapolation()
 
 // ----------------------------------------------------------------------------
 CbmRichProtPrepareExtrapolation::CbmRichProtPrepareExtrapolation(Int_t verbose)
+    : FairTask("CbmRichProtPrepareExtrapolation"),
+      fPosReso(0.),
+      fThetaReso(0.),
+      fArrayMCTracks(NULL),
+      fArrayStsTracks(NULL),
+      fArrayGlobalTracks(NULL)
 {
     fVerbose = verbose;
-    fPosReso = 0.;
-    fThetaReso = 0.;
 }
 // ----------------------------------------------------------------------------
 

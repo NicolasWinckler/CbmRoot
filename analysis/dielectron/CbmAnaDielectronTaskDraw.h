@@ -26,7 +26,7 @@ class CbmAnaDielectronTaskDraw: public TObject {
 
 public:
 
-    CbmAnaDielectronTaskDraw(){;}
+  CbmAnaDielectronTaskDraw();
     
     virtual ~CbmAnaDielectronTaskDraw(){;}
 
@@ -276,6 +276,9 @@ private:
     void DrawMinvPtAll();
 
     void DrawBgSourcesVsMomentum();
+
+    CbmAnaDielectronTaskDraw(const CbmAnaDielectronTaskDraw&);
+    CbmAnaDielectronTaskDraw operator=(const CbmAnaDielectronTaskDraw&);
 
    ClassDef(CbmAnaDielectronTaskDraw, 1);
 };

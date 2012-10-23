@@ -84,26 +84,30 @@ class CbmAnaHypSecFinder : public FairTask
   Bool_t s_used[100000];
   vector<Hit*> vTrackHits;
 
+ private:
+  CbmAnaHypSecFinder(const CbmAnaHypSecFinder&);
+  CbmAnaHypSecFinder operator=(const CbmAnaHypSecFinder&);
+
   ClassDef(CbmAnaHypSecFinder,1);
 };
 
 class CbmKFTrackSec : public CbmKFTrack {
-public:
-  CbmKFTrackSec(){
-    CbmKFTrack();
-    for (Int_t i=0;i<6;i++) GetTrack()[i]=0;
-    Double_t* C = GetCovMatrix();
-    Double_t INF = 100000000;
-    C[ 0] = INF;
-    C[ 1] = 0.; C[ 2] = INF;
-    C[ 3] = 0.; C[ 4] = 0.; C[ 5] = INF;
-    C[ 6] = 0.; C[ 7] = 0.; C[ 8] = 0.; C[ 9] = INF;
-    C[10] = 0.; C[11] = 0.; C[12] = 0.; C[13] =  0.; C[14] = INF;
-    GetRefNDF() = -5;
-    GetRefChi2() = 0;
-    hits.clear();
-    qp0=0;
-  }
+ public:
+ CbmKFTrackSec() : CbmKFTrack(), hits(), sig(0), qp0(0.)
+    {
+      CbmKFTrack();
+      for (Int_t i=0;i<6;i++) GetTrack()[i]=0;
+      Double_t* C = GetCovMatrix();
+      Double_t INF = 100000000;
+      C[ 0] = INF;
+      C[ 1] = 0.; C[ 2] = INF;
+      C[ 3] = 0.; C[ 4] = 0.; C[ 5] = INF;
+      C[ 6] = 0.; C[ 7] = 0.; C[ 8] = 0.; C[ 9] = INF;
+      C[10] = 0.; C[11] = 0.; C[12] = 0.; C[13] =  0.; C[14] = INF;
+      GetRefNDF() = -5;
+      GetRefChi2() = 0;
+      hits.clear();
+    }
   ~CbmKFTrackSec(){ hits.clear();};
 
   Bool_t Sig();
@@ -128,20 +132,16 @@ public:
 
 class Hit{
  public:
-  Hit():pt(0),id(0),type(0),x(0),y(0),z(0),st(0),used(0),tr(-1),hit(0){};
-  Hit(Int_t i, CbmHit* hitPt, Int_t trackId, Int_t t=1){
-    pt=hitPt;
-    id=i;
-    type=t;
-    x=pt->GetX();
-    y=pt->GetY();
-    z=pt->GetZ();
-    st=CbmKF::Instance()->StsStationIDMap[pt->GetDetectorID()];
-    used=false;
-    tr=trackId;
-    sHit.Create( (CbmStsHit*) hitPt );
-    hit=&this->sHit;
-  }
+  Hit() : pt(NULL), id(0), type(0), x(0.), y(0.), z(0.), st(0), used(kFALSE),
+    tr(-1), hit(NULL), sHit() {};
+  Hit(Int_t i, CbmHit* hitPt, Int_t trackId, Int_t t=1)
+    : pt(hitPt), id(i), type(t), x(pt->GetX()), y(pt->GetY()), 
+    z(pt->GetZ()), st(CbmKF::Instance()->StsStationIDMap[pt->GetDetectorID()]), 
+    used(kFALSE), tr(trackId), hit(NULL), sHit()
+    {
+      sHit.Create( (CbmStsHit*) hitPt );
+      hit=&this->sHit;
+    }
 
   ~Hit(){};
 
@@ -166,6 +166,11 @@ class Hit{
     GetKFHit()->Filter(track,downstream,track.qp0);
   }
 
+ private:
+ 
+  //  Hit(const Hit&);
+  //  Hit operator=(const Hit&);
+
 };
 
 
@@ -174,8 +179,8 @@ static bool CompareY(const Hit h1, const Hit h2) {return h1.y<h2.y;}
 
 class GreaterY{
   Double_t y;
-public:
-  GreaterY(Double_t y_min) { y=y_min; }
+ public:
+ GreaterY(Double_t y_min) : y(y_min) { }
   bool operator () (Hit &h) { return (h.y > y); }
 };
 

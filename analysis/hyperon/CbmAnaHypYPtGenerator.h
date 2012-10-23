@@ -65,7 +65,10 @@ private:
   Double_t fPDGMass;             ///< Particle mass [GeV]
   TF1*     fDistPt;              //! Pointer to the Pt function
 
-ClassDef(CbmAnaHypYPtGenerator,1);
+  CbmAnaHypYPtGenerator(const CbmAnaHypYPtGenerator&);
+  CbmAnaHypYPtGenerator operator=(const CbmAnaHypYPtGenerator&);
+
+  ClassDef(CbmAnaHypYPtGenerator,1);
 };
 
 #endif

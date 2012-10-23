@@ -26,30 +26,44 @@ using namespace std;
 
 // ------------------------------------------------------------------
 CbmProduceDst::CbmProduceDst()
-    : FairTask("CbmProduceDst")
+  : FairTask("CbmProduceDst"),
+    fEvents(0),
+    fHadrons(0),
+    fArrayMCTrack(NULL),
+    fArrayTofPoint(NULL),
+    fArrayStsTrack(NULL),
+    fArrayStsTrackM(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTrdTrackM(NULL),
+      fArrayTofHit(NULL),
+    fArrayGlobalTrack(NULL),
+    fPrimVertex(NULL),
+    fTrackFitter(new CbmStsKFTrackFitter()),
+    fArrayHadron(new TClonesArray("CbmHadron")),
+    fh_pdl(NULL)
 {
-    fEvents = 0;
-    fHadrons = 0;
-    fArrayMCTrack = fArrayTofPoint = fArrayStsTrack = fArrayStsTrackM =
-	fArrayTrdTrack = fArrayTrdTrackM = fArrayTofHit = fArrayGlobalTrack = NULL;
-    fPrimVertex = NULL;
-    fTrackFitter = new CbmStsKFTrackFitter();
-    fArrayHadron = new TClonesArray("CbmHadron");
 }
 // ------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------
 CbmProduceDst::CbmProduceDst(Int_t iVerbose)
-    : FairTask("CbmProduceDst", iVerbose)
+  : FairTask("CbmProduceDst", iVerbose),
+    fEvents(0),
+    fHadrons(0),
+    fArrayMCTrack(NULL),
+    fArrayTofPoint(NULL),
+    fArrayStsTrack(NULL),
+    fArrayStsTrackM(NULL),
+    fArrayTrdTrack(NULL),
+    fArrayTrdTrackM(NULL),
+      fArrayTofHit(NULL),
+    fArrayGlobalTrack(NULL),
+    fPrimVertex(NULL),
+    fTrackFitter(new CbmStsKFTrackFitter()),
+    fArrayHadron(new TClonesArray("CbmHadron")),
+    fh_pdl(NULL)
 {
-    fEvents = 0;
-    fHadrons = 0;
-    fArrayMCTrack = fArrayTofPoint = fArrayStsTrack = fArrayStsTrackM =
-	fArrayTrdTrack = fArrayTrdTrackM = fArrayTofHit = fArrayGlobalTrack = NULL;
-    fPrimVertex = NULL;
-    fTrackFitter = new CbmStsKFTrackFitter();
-    fArrayHadron = new TClonesArray("CbmHadron");
 }
 // ------------------------------------------------------------------
 

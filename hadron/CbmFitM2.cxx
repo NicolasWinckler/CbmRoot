@@ -35,19 +35,40 @@ Double_t fun_m2_all(Double_t *x, Double_t *par);
 
 // ------------------------------------------------------------------
 CbmFitM2::CbmFitM2()
+  : FairTask("FitM2"),
+    fh_m2mom(NULL),
+    fh_sm2(NULL),
+    fh_pdf_pi(NULL),
+    fh_pdf_ka(NULL),
+    fh_pdf_protaprot(NULL),
+    fh_pdf_pip(NULL),
+    fh_pdf_kap(NULL),
+    fh_pdf_prot(NULL),
+    fh_pdf_pim(NULL),
+    fh_pdf_kam(NULL),
+    fh_pdf_aprot(NULL),
+    fh_eff_ka(NULL),
+    fh_m2min_pi(NULL),
+    fh_m2max_pi(NULL),
+    fh_m2min_ka(NULL),
+    fh_m2max_ka(NULL),
+    fh_m2min_prot(NULL),
+    fh_m2max_prot(NULL),
+    fh_pur_pi(NULL),
+    fh_pur_ka(NULL),
+    fh_pur_prot(NULL),
+    fPurity(0.99),
+    fLevel(1),
+    fNbinsM2(900),
+    fMinM2(-1.5),
+    fMaxM2(3.0),
+    fBinSizeM2( (fMaxM2 - fMinM2) / (Double_t)fNbinsM2 ),
+    fNbinsMom(100),
+    fMinMom(0.),
+    fMaxMom(10.),
+    fNbinsMomCharge( TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom)) ),
+    fBinSizeMom((fMaxMom - fMinMom) / (Double_t)fNbinsMom )
 {
-    // Default constructor
-    fPurity         = 0.99;
-    fLevel          = 1;
-    fNbinsM2        = 900;
-    fMinM2          = -1.5;
-    fMaxM2          = 3.0;
-    fBinSizeM2      = (fMaxM2 - fMinM2) / (Double_t)fNbinsM2;
-    fNbinsMom       = 100;
-    fMinMom         = 0.;
-    fMaxMom         = 10.;
-    fBinSizeMom     = (fMaxMom - fMinMom) / (Double_t)fNbinsMom;
-    fNbinsMomCharge = TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom) );
     CreateHistogramms();
     cout << "Nbins momentum*charge  :  " << fNbinsMomCharge << endl;
 }
@@ -56,20 +77,40 @@ CbmFitM2::CbmFitM2()
 
 // ------------------------------------------------------------------
 CbmFitM2::CbmFitM2(const char *name, Int_t verbose)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fh_m2mom(NULL),
+    fh_sm2(NULL),
+    fh_pdf_pi(NULL),
+    fh_pdf_ka(NULL),
+    fh_pdf_protaprot(NULL),
+    fh_pdf_pip(NULL),
+    fh_pdf_kap(NULL),
+    fh_pdf_prot(NULL),
+    fh_pdf_pim(NULL),
+    fh_pdf_kam(NULL),
+    fh_pdf_aprot(NULL),
+    fh_eff_ka(NULL),
+    fh_m2min_pi(NULL),
+    fh_m2max_pi(NULL),
+    fh_m2min_ka(NULL),
+    fh_m2max_ka(NULL),
+    fh_m2min_prot(NULL),
+    fh_m2max_prot(NULL),
+    fh_pur_pi(NULL),
+    fh_pur_ka(NULL),
+    fh_pur_prot(NULL),
+    fPurity(0.99),
+    fLevel(1),
+    fNbinsM2(900),
+    fMinM2(-1.5),
+    fMaxM2(3.0),
+    fBinSizeM2( (fMaxM2 - fMinM2) / (Double_t)fNbinsM2 ),
+    fNbinsMom(100),
+    fMinMom(0.),
+    fMaxMom(10.),
+    fNbinsMomCharge( TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom)) ),
+    fBinSizeMom((fMaxMom - fMinMom) / (Double_t)fNbinsMom )
 {
-    // Standard constructor
-    fPurity         = 0.99;
-    fLevel          = 1;
-    fNbinsM2        = 900;
-    fMinM2          = -1.5;
-    fMaxM2          = 3.0;
-    fBinSizeM2      = (fMaxM2 - fMinM2) / (Double_t)fNbinsM2;
-    fNbinsMom       = 100;
-    fMinMom         = 0.;
-    fMaxMom         = 10.;
-    fBinSizeMom     = (fMaxMom - fMinMom) / (Double_t)fNbinsMom;
-    fNbinsMomCharge = TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom) );
     CreateHistogramms();
     cout << "Nbins momentum*charge  :  " << fNbinsMomCharge << endl;
 }

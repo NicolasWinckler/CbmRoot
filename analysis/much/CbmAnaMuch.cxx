@@ -33,29 +33,75 @@
 #include <vector>
 
 // -----   Default constructor   -------------------------------------------
-CbmAnaMuch::CbmAnaMuch(){
-  fEvent=0;
-  fStsPointsAccQuota=4;
-  fStsTrueHitQuota=0.7;
-  fMuchPointsAccQuota=13;
-  fMuchTrueHitQuota=0.7;
-  fHistoFileName="histo.root";
-  fGeoScheme=CbmMuchGeoScheme::Instance();
+CbmAnaMuch::CbmAnaMuch()
+  : FairTask("AnaMuch"),
+    fDigiFileName(""),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fEvent(0),
+    fMCTracks(NULL),
+    fStsTracks(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    fMuchHits(NULL),
+    fMuchTracks(NULL),
+    fMuchTrackMatches(NULL),
+    fStsTrackMatches(NULL),
+    mapAccSts(),
+    mapAccMuch(),
+    mapRecSts(),
+    mapRecMuch(),
+    hAllP(NULL),
+    hAccStsP(NULL),
+    hAccMuchP(NULL),
+    hRecStsP(NULL),
+    hRecMuchP(NULL),
+    hMuPlusYPt(NULL),
+    hMuMinusYPt(NULL),
+    hJpsiM(NULL),
+    hJpsiYPt(NULL),
+    fStsPointsAccQuota(4),
+    fStsTrueHitQuota(0.7),
+    fMuchPointsAccQuota(13),
+    fMuchTrueHitQuota(0.7),
+    fHistoFileName("histo.root")   
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmAnaMuch::CbmAnaMuch(const char* name, TString digiFileName, TString histoFileName)
-:FairTask(name){
-  fEvent=0;
-  fStsPointsAccQuota=4;
-  fStsTrueHitQuota=0.7;
-  fMuchPointsAccQuota=13;
-  fMuchTrueHitQuota=0.7;
-  fHistoFileName=histoFileName;
-  fDigiFileName=digiFileName;
-  fGeoScheme=CbmMuchGeoScheme::Instance();
+  : FairTask(name),
+    fDigiFileName(""),
+    fGeoScheme(CbmMuchGeoScheme::Instance()),
+    fEvent(0),
+    fMCTracks(NULL),
+    fStsTracks(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    fMuchHits(NULL),
+    fMuchTracks(NULL),
+    fMuchTrackMatches(NULL),
+    fStsTrackMatches(NULL),
+    mapAccSts(),
+    mapAccMuch(),
+    mapRecSts(),
+    mapRecMuch(),
+    hAllP(NULL),
+    hAccStsP(NULL),
+    hAccMuchP(NULL),
+    hRecStsP(NULL),
+    hRecMuchP(NULL),
+    hMuPlusYPt(NULL),
+    hMuMinusYPt(NULL),
+    hJpsiM(NULL),
+    hJpsiYPt(NULL),
+    fStsPointsAccQuota(4),
+    fStsTrueHitQuota(0.7),
+    fMuchPointsAccQuota(13),
+    fMuchTrueHitQuota(0.7),
+    fHistoFileName("histo.root")   
+{
 }
 
 // -------------------------------------------------------------------------

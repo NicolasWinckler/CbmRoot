@@ -16,6 +16,11 @@ using std::cout;
 using std::stringstream;
 
 CbmStudyReport::CbmStudyReport()
+ : fQa(),
+   fIdeal(),
+   fCheck(),
+   fResultDirectories(),
+   fStudyNames()
 {
 
 }

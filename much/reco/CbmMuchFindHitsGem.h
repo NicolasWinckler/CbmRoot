@@ -66,6 +66,9 @@ class CbmMuchFindHitsGem: public FairTask {
     vector<Int_t> fDigiIndices;             //!
     vector<CbmMuchPad*> fFiredPads;         //!
     
+    CbmMuchFindHitsGem(const CbmMuchFindHitsGem&);
+    CbmMuchFindHitsGem operator=(const CbmMuchFindHitsGem&);
+
     ClassDef(CbmMuchFindHitsGem,1);
 };
 

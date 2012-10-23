@@ -31,7 +31,7 @@ class CbmAnaHypRecCascade : public CbmAnaHypRecLambda
 public:
 
   /** Default constructor */
-  CbmAnaHypRecCascade(){};
+  CbmAnaHypRecCascade();
 
   /** Standard constructor */
   CbmAnaHypRecCascade(const char *name, Int_t iVerbose);
@@ -53,8 +53,6 @@ public:
   void SetCutBla     (Double_t cut)   { fCutBla    = cut;    }
   void SetCheckB     (Int_t checkB)   { fCheckB    = checkB; }
 
-ClassDef(CbmAnaHypRecCascade,1);
-
 protected:
   void CreateDaVector();
   void CreatePair(CbmAnaHypTrack da, CbmAnaHypLambdaCandidate v0, Int_t iLa=-1);
@@ -74,6 +72,13 @@ protected:
 
   CbmKFVertex kfPV;
   TVector3 pv;
+
+ private:
+
+  CbmAnaHypRecCascade(const CbmAnaHypRecCascade&);
+  CbmAnaHypRecCascade operator=(const CbmAnaHypRecCascade&);
+
+  ClassDef(CbmAnaHypRecCascade,1);
 };
 
 #endif

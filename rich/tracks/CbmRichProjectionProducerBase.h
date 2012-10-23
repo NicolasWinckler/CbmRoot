@@ -26,7 +26,7 @@ public:
    /**
     * brief Standard constructor.
     */
-   CbmRichProjectionProducerBase(int flag) { fZflag = flag; }
+   CbmRichProjectionProducerBase(int flag) : fZflag(flag) { }
 
    /**
     * \brief Destructor.

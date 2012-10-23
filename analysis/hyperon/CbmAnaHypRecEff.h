@@ -36,13 +36,17 @@ class CbmAnaHypRecEff : public FairTask
   TH1D* hACpi;
   TH1D* hRCpi;
 
+  CbmAnaHypRecEff(const CbmAnaHypRecEff&);
+  CbmAnaHypRecEff operator=(const CbmAnaHypRecEff&);
 
   ClassDef(CbmAnaHypRecEff,1);
 };
 
 class Hyperon {
  public:
-    Hyperon(){daAC=0;piAC=0;prAC=0;daRC=0;piRC=0;prRC=0;y=0;pt=0;}
+    Hyperon()
+      : daAC(0), piAC(0), prAC(0), daRC(0), piRC(0),
+    prRC(0), y(0), pt(0) {}
     ~Hyperon(){};
     Int_t daAC;
     Int_t piAC;

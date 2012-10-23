@@ -12,17 +12,33 @@
 #include "TMath.h"
 
 // ------------------------------------------------------------------------
-CbmAnaHypYPtGenerator::CbmAnaHypYPtGenerator():FairGenerator(){
-  // Default constructor
-  fPDGType =  -1;
-  fMult    =   0;
+CbmAnaHypYPtGenerator::CbmAnaHypYPtGenerator()
+  : FairGenerator(),
+    fPDGType(-1),
+    fMult(0),
+    fT(0.),
+    fY0(0.),
+    fSigma(0.),
+    fPtMin(0.),
+    fPtMax(0.),
+    fPDGMass(0.),
+    fDistPt(NULL)
+{
 }
 
 // ------------------------------------------------------------------------
-CbmAnaHypYPtGenerator::CbmAnaHypYPtGenerator(Int_t pdgid, Int_t mult):FairGenerator(){
-  // Constructor. Set default distributions
-  fPDGType = pdgid;
-  fMult    = mult;
+CbmAnaHypYPtGenerator::CbmAnaHypYPtGenerator(Int_t pdgid, Int_t mult)
+  : FairGenerator(),
+    fPDGType(pdgid),
+    fMult(mult),
+    fT(0.),
+    fY0(0.),
+    fSigma(0.),
+    fPtMin(0.),
+    fPtMax(0.),
+    fPDGMass(0.),
+    fDistPt(NULL)
+{
   SetDistributionPt();
   SetDistributionY();
   SetRangePt();

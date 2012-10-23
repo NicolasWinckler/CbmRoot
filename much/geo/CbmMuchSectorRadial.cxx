@@ -18,7 +18,12 @@
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchSectorRadial::CbmMuchSectorRadial() 
-  : CbmMuchSector()
+  : CbmMuchSector(),
+    fR1(0.),
+    fR2(0.),
+    fPhi1(0.),
+    fPhi2(0.),
+    fPadDphi(0.)
 {
 }
 // -------------------------------------------------------------------------
@@ -30,8 +35,8 @@ CbmMuchSectorRadial::CbmMuchSectorRadial(Int_t detId, Int_t secId,
   : CbmMuchSector(detId,secId,0),
     fR1(r1),
     fR2(r2),
-    fPhi1(0),
-    fPhi2(0),
+    fPhi1(0.),
+    fPhi2(0.),
     fPadDphi((r2-r1)/r1)
 {
   if (phi2<phi1) printf("Panic!\n");

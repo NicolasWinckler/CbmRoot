@@ -15,9 +15,9 @@ class CbmEcalAnalysisCalib : public FairTask
 {
 public:
   CbmEcalAnalysisCalib(const char* name, const Int_t iVerbose);
-public:
+
   /** Default constructor **/
-  CbmEcalAnalysisCalib() {};
+  CbmEcalAnalysisCalib();
 
   /** Initing routine **/
   virtual InitStatus Init();
@@ -49,6 +49,9 @@ private:
   void InitTree();
   CbmEcalStructure* fStr;
   TClonesArray* fTracks;
+
+  CbmEcalAnalysisCalib(const CbmEcalAnalysisCalib&);
+  CbmEcalAnalysisCalib operator=(const CbmEcalAnalysisCalib&);
 
   ClassDef(CbmEcalAnalysisCalib,1)
 };

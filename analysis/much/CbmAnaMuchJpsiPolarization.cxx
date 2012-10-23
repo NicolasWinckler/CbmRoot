@@ -32,26 +32,67 @@
 #include "TF1.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmAnaMuchJpsiPolarization::CbmAnaMuchJpsiPolarization(){
-  fEvent=0;
-  fStsPointsAccQuota=4;
-  fStsTrueHitQuota=0.7;
-  fMuchPointsAccQuota=13;
-  fMuchTrueHitQuota=0.7;
-  fHistoFileName="histo.root";
+CbmAnaMuchJpsiPolarization::CbmAnaMuchJpsiPolarization()
+  : FairTask("AnaMuchJpsiPolarization"),
+    fEvent(0),
+    fMCTracks(NULL),
+    fStsTracks(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    fMuchHits(NULL),
+    fMuchTracks(NULL),
+    fMuchTrackMatches(NULL),
+    fStsTrackMatches(NULL),
+    fStsPointsAccQuota(4),
+    fStsTrueHitQuota(0.7),
+    fMuchPointsAccQuota(13),
+    fMuchTrueHitQuota(0.7),
+    fHistoFileName("histo.root"),
+    fhJpsiAllYPtCost(NULL),
+    fhJpsiAccYPtCost(NULL),
+    fhJpsiRecYPtCost(NULL),
+    mapRecSts(),
+    mapRecMuch(),
+    mapAllMuPlus(),
+    mapAccMuPlus(),
+    mapRecMuPlus(),
+    mapAllMuMinus(),
+    mapAccMuMinus(),
+    mapRecMuMinus()
+{
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmAnaMuchJpsiPolarization::CbmAnaMuchJpsiPolarization(const char* name,TString histoFileName)
-:FairTask(name){
-  fEvent=0;
-  fStsPointsAccQuota=4;
-  fStsTrueHitQuota=0.7;
-  fMuchPointsAccQuota=10;
-  fMuchTrueHitQuota=0.7;
-  fHistoFileName=histoFileName;
+  : FairTask(name),
+    fEvent(0),
+    fMCTracks(NULL),
+    fStsTracks(NULL),
+    fStsPoints(NULL),
+    fMuchPoints(NULL),
+    fMuchHits(NULL),
+    fMuchTracks(NULL),
+    fMuchTrackMatches(NULL),
+    fStsTrackMatches(NULL),
+    fStsPointsAccQuota(4),
+    fStsTrueHitQuota(0.7),
+    fMuchPointsAccQuota(10),
+    fMuchTrueHitQuota(0.7),
+    fHistoFileName(histoFileName),
+    fhJpsiAllYPtCost(NULL),
+    fhJpsiAccYPtCost(NULL),
+    fhJpsiRecYPtCost(NULL),
+    mapRecSts(),
+    mapRecMuch(),
+    mapAllMuPlus(),
+    mapAccMuPlus(),
+    mapRecMuPlus(),
+    mapAllMuMinus(),
+    mapAccMuMinus(),
+    mapRecMuMinus()
+{
 }
 
 // -------------------------------------------------------------------------

@@ -23,15 +23,40 @@
 #include "CbmKFMath.h"
 
 // -------------------------------------------------------------------------
-CbmAnaHypRecCascade::CbmAnaHypRecCascade(const char * name, Int_t iVerbose):
- CbmAnaHypRecLambda(name,iVerbose){
-  fMotherPdg=3334;
-  fSisterPdg=-321;
-  fCutChiDa=4.4;
-  fCutBla=0.1;
-  fCheckB=1;
-  fPid = 0;
-  fListCascades = new TClonesArray("CbmAnaHypPair");
+CbmAnaHypRecCascade::CbmAnaHypRecCascade()
+  : CbmAnaHypRecLambda("AnaHypRecCascade", 0),
+    fTree(NULL),
+    fListRCLambda(NULL),
+    fListCascades(new TClonesArray("CbmAnaHypPair")),
+    fCascades(0),
+    fMotherPdg(3334),
+    fSisterPdg(-321),
+    fCutChiDa(4.4),
+    fCutBla(0.1),
+    fPid(0),
+    fCheckB(1),
+    vDa(),
+    kfPV(),
+    pv()
+{
+}
+// -------------------------------------------------------------------------
+CbmAnaHypRecCascade::CbmAnaHypRecCascade(const char * name, Int_t iVerbose)
+  : CbmAnaHypRecLambda(name,iVerbose),
+    fTree(NULL),
+    fListRCLambda(NULL),
+    fListCascades(new TClonesArray("CbmAnaHypPair")),
+    fCascades(0),
+    fMotherPdg(3334),
+    fSisterPdg(-321),
+    fCutChiDa(4.4),
+    fCutBla(0.1),
+    fPid(0),
+    fCheckB(1),
+    vDa(),
+    kfPV(),
+    pv()
+{
 }
 // -------------------------------------------------------------------------
 

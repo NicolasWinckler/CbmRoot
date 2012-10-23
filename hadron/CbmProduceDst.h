@@ -40,6 +40,8 @@ private:
 
     TH2F *fh_pdl;
 
+    CbmProduceDst(const CbmProduceDst&);
+    CbmProduceDst operator=(const CbmProduceDst&);
 
 public:
     virtual InitStatus Init();

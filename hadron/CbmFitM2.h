@@ -53,6 +53,9 @@ private:
 
     void CreateHistogramms();
 
+    CbmFitM2(const CbmFitM2&);
+    CbmFitM2 operator=(const CbmFitM2&);
+
 public:
     CbmFitM2();
     CbmFitM2(const char *name, Int_t verbose=1);

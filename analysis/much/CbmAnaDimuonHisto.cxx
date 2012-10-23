@@ -20,22 +20,28 @@
 #include "FairRuntimeDb.h"
 #include "FairRunAna.h"
 
-CbmAnaDimuonHisto::CbmAnaDimuonHisto():
-  FairTask("AnaDimuonHisto"),
-  fMmin(0.7),
-  fMmax(0.9),
-  fMbins(100),
-  fMminCut(0.78259-2*0.0083),
-  fMmaxCut(0.78259+2*0.0083),
-  fMuchHitsCut(1),
-  fStsHitsCut(1),
-  fChiToVertexCut(101.),
-  fMultiplicity(38),
-  fBranching(9.e-5),
-  fSignalPairs(1),
-  fNoMixedEv(1),
-  fNEvents(0),
-  fChain(NULL)
+CbmAnaDimuonHisto::CbmAnaDimuonHisto()
+  : FairTask("AnaDimuonHisto"),
+    fEvent(0),
+    fMuCandidates(NULL),
+    fDimuonCandidates(NULL),
+    fChain(NULL),
+    fDimuonMmc(NULL),
+    fDimuonMrc(NULL),
+    fBgdM(NULL),
+    fMmin(0.7),
+    fMmax(0.9),
+    fMbins(100),
+    fMminCut(0.78259-2*0.0083),
+    fMmaxCut(0.78259+2*0.0083),
+    fMuchHitsCut(1),
+    fStsHitsCut(1),
+    fChiToVertexCut(101.),
+    fMultiplicity(38),
+    fBranching(9.e-5),
+    fSignalPairs(1),
+    fNoMixedEv(1),
+    fNEvents(0)
 {
 }
 

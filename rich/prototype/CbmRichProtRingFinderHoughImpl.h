@@ -23,8 +23,11 @@ class CbmRichProtHoughHit {
 public:
 	CbmRichHitLight fHit;
 	Float_t fX2plusY2;
-    UShort_t fId;
+        UShort_t fId;
 	Bool_t fIsUsed;
+   
+ CbmRichProtHoughHit() : fHit(), fX2plusY2(0.), fId(0), fIsUsed(false) {}
+      
 };
 
 class CbmRichProtHoughHitCmpUp:
@@ -170,5 +173,10 @@ public:
 	std::vector<CbmRichRingLight*>& GetFoundRings(){
 		return fFoundRings;
 	}
+
+private:
+   CbmRichProtRingFinderHoughImpl(const CbmRichProtRingFinderHoughImpl&);
+   CbmRichProtRingFinderHoughImpl operator=(const CbmRichProtRingFinderHoughImpl&);
+
 };
 #endif // CBM_RICH_RING_FINDER_HOUGH_IMPL_H

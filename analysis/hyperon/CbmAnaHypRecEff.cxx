@@ -21,13 +21,45 @@ using std::pair;
 ClassImp(CbmAnaHypRecEff)
 
 // -------------------------------------------------------------------------
-CbmAnaHypRecEff::CbmAnaHypRecEff(){}
+CbmAnaHypRecEff::CbmAnaHypRecEff()
+: FairTask("AnaHypRecEff"),
+  fMCTracks(NULL),
+  fRCTracks(NULL),
+  fRCMatch(NULL),
+  fMoPdg(0),
+  fDaPdg(0),
+  fEvent(0),
+  hEventCounter(NULL),
+  hMC(NULL),
+  hAC(NULL),
+  hRC(NULL),
+  hACpr(NULL),
+  hRCpr(NULL),
+  hACpi(NULL),
+  hRCpi(NULL)
+{
+}
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
-CbmAnaHypRecEff::CbmAnaHypRecEff(Int_t pdgCode, Int_t iVerbose):FairTask("Task",iVerbose){
-  fMoPdg = pdgCode;
+CbmAnaHypRecEff::CbmAnaHypRecEff(Int_t pdgCode, Int_t iVerbose)
+  : FairTask("Task",iVerbose),
+    fMCTracks(NULL),
+    fRCTracks(NULL),
+    fRCMatch(NULL),
+    fMoPdg(pdgCode),
+    fDaPdg(0),
+    fEvent(0),
+    hEventCounter(NULL),
+    hMC(NULL),
+    hAC(NULL),
+    hRC(NULL),
+    hACpr(NULL),
+    hRCpr(NULL),
+    hACpi(NULL),
+    hRCpi(NULL)
+{
 }
 // -------------------------------------------------------------------------
 

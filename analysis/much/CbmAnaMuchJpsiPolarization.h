@@ -88,7 +88,9 @@ private:
   map<Int_t,Int_t> mapAccMuMinus;   //!
   map<Int_t,Int_t> mapRecMuMinus;   //!
 
-  
+  CbmAnaMuchJpsiPolarization(const CbmAnaMuchJpsiPolarization&);
+  CbmAnaMuchJpsiPolarization operator=(const CbmAnaMuchJpsiPolarization&);
+
   ClassDef(CbmAnaMuchJpsiPolarization,1);
 };
 

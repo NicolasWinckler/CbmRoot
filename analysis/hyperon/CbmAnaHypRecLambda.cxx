@@ -25,13 +25,41 @@
 #include "CbmKFFieldMath.h"
 
 // -------------------------------------------------------------------------
-CbmAnaHypRecLambda::CbmAnaHypRecLambda(const char * name, Int_t iVerbose):
- FairTask(name,iVerbose){
-  fCutChi1=4.4;
-  fCutChi2=3.6;
-  fCheckChi=1;
-  fPid=0;
-  fListV0Candidates = new TClonesArray("CbmAnaHypPair",10);
+CbmAnaHypRecLambda::CbmAnaHypRecLambda()
+  : FairTask("AnaHypRecLambda"),
+    fPid(0),
+    fCheckChi(1),
+    fEvent(0),
+    fMCTracks(NULL),
+    fRCTracks(NULL),
+    fRCMatch(NULL),
+    fPV(NULL),
+    fListV0Candidates(new TClonesArray("CbmAnaHypPair",10)),
+    fCutChi1(4.4),
+    fCutChi2(3.6),
+    fKF(NULL),
+    fTools(NULL),
+    fSVF(NULL),
+    fFitter(NULL)
+{
+}
+CbmAnaHypRecLambda::CbmAnaHypRecLambda(const char * name, Int_t iVerbose)
+  : FairTask(name,iVerbose),
+    fPid(0),
+    fCheckChi(1),
+    fEvent(0),
+    fMCTracks(NULL),
+    fRCTracks(NULL),
+    fRCMatch(NULL),
+    fPV(NULL),
+    fListV0Candidates(new TClonesArray("CbmAnaHypPair",10)),
+    fCutChi1(4.4),
+    fCutChi2(3.6),
+    fKF(NULL),
+    fTools(NULL),
+    fSVF(NULL),
+    fFitter(NULL)
+{
 }
 // -------------------------------------------------------------------------
 

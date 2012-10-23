@@ -3,7 +3,7 @@
 
 class NNfunction { 
 public:
-   NNfunction() {}
+   NNfunction() : input0(0.), input1(0.), input2(0.), input3(0.), input4(0.), input5(0.) {}
    ~NNfunction() {}
    double Value(int index,double in0,double in1,double in2,double in3,double in4,double in5);
    double Value(int index, double* input);

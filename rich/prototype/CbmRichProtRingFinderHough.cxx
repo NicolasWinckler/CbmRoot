@@ -31,6 +31,16 @@ using std::vector;
 
 // -----   Standard constructor   ------------------------------------------
 CbmRichProtRingFinderHough::CbmRichProtRingFinderHough  ( Int_t verbose, TString geometry )
+  : CbmRichRingFinder(),
+    fNEvent(0),
+    fIsFindOptPar(false),
+    fVerbose(verbose),
+    fGeometryType(geometry),
+    fRingCount(0),
+    fHTImpl(NULL),
+    fExecTime(0.),
+    fFitter(NULL),
+    rNewArray(new TClonesArray("CbmRichRing"))
 {
     cout << "-I- CbmRichProtRingFinderHough constructor for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
@@ -38,11 +48,6 @@ CbmRichProtRingFinderHough::CbmRichProtRingFinderHough  ( Int_t verbose, TString
         cout << "-E- CbmRichProtRingFinderHough::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
-
-    fGeometryType = geometry;
-    fIsFindOptPar = false;
-    fRingCount = 0;
-    fNEvent = 0;
 
 #ifdef HOUGH_SERIAL
 	fHTImpl = new CbmRichProtRingFinderHoughImpl(fGeometryType);;
@@ -52,8 +57,6 @@ CbmRichProtRingFinderHough::CbmRichProtRingFinderHough  ( Int_t verbose, TString
 	fHTImpl  = new CbmRichProtRingFinderHoughSimd(fGeometryType);;
 #endif
 
-    rNewArray = new TClonesArray("CbmRichRing");
-
 }
 
 void CbmRichProtRingFinderHough::Init()
@@ -62,9 +65,17 @@ void CbmRichProtRingFinderHough::Init()
 }
 
 CbmRichProtRingFinderHough::CbmRichProtRingFinderHough()
+  : CbmRichRingFinder(),
+    fNEvent(0),
+    fIsFindOptPar(false),
+    fVerbose(0),
+    fGeometryType(""),
+    fRingCount(0),
+    fHTImpl(NULL),
+    fExecTime(0.),
+    fFitter(NULL),
+    rNewArray(new TClonesArray("CbmRichRing"))
 {
-    fExecTime = 0;
-    rNewArray = new TClonesArray("CbmRichRing");
 }
 
 // -----   Destructor   ----------------------------------------------------

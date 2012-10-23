@@ -93,10 +93,45 @@ void CbmEcalAnalysisCalib::InitTree()
 }
 
 CbmEcalAnalysisCalib::CbmEcalAnalysisCalib(const char* name, const Int_t iVerbose)
-  : FairTask(name, iVerbose)
+  : FairTask(name, iVerbose),
+    fTree(NULL),
+    fX(0.),
+    fY(0.),
+    fCX(0.),
+    fCY(0.),
+    fP(0.),
+    fCE(0.),
+    fOE(0.),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fEv(0),
+    fCellNum(0),
+    fADC(0),
+    fStr(NULL),
+    fTracks(NULL)
 {
-  fTree=NULL;
-  fEv=0;
+}
+
+CbmEcalAnalysisCalib::CbmEcalAnalysisCalib()
+  : FairTask(),
+    fTree(NULL),
+    fX(0.),
+    fY(0.),
+    fCX(0.),
+    fCY(0.),
+    fP(0.),
+    fCE(0.),
+    fOE(0.),
+    fPX(0.),
+    fPY(0.),
+    fPZ(0.),
+    fEv(0),
+    fCellNum(0),
+    fADC(0),
+    fStr(NULL),
+    fTracks(NULL)
+{
 }
 
 /** Initing routine **/

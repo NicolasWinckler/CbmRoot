@@ -31,7 +31,7 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-   CbmAnaPTree(){ }
+ CbmAnaPTree() : fPt() { }
 
 	/**
 	 * \brief Destructor.

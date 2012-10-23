@@ -10,9 +10,10 @@
 #include "CbmAnaHypLambdaCandidate.h"
 
 // -------------------------------------------------------------------------
-CbmAnaHypMix::CbmAnaHypMix(Int_t nMixedEvents, Int_t iVerbose):
-  CbmAnaHypRecCascade("MixTask",iVerbose){
-  fNoMixedEv=nMixedEvents;
+CbmAnaHypMix::CbmAnaHypMix(Int_t nMixedEvents, Int_t iVerbose)
+  : CbmAnaHypRecCascade("MixTask",iVerbose),
+    fNoMixedEv(nMixedEvents)
+{
 }
 // -------------------------------------------------------------------------
 

@@ -4,12 +4,20 @@
 #include "CbmKFTrack.h"
 #include "TLorentzVector.h"
 
+CbmAnaDimuonCandidate::CbmAnaDimuonCandidate()
+  : TObject(),
+    fMuPlus(),
+    fMuMinus()
+{  
+}
+
 CbmAnaDimuonCandidate::CbmAnaDimuonCandidate(
     CbmAnaMuonCandidate muPlus, 
-    CbmAnaMuonCandidate muMinus){
-  
-  fMuPlus  = CbmAnaMuonCandidate(muPlus);
-  fMuMinus = CbmAnaMuonCandidate(muMinus);
+    CbmAnaMuonCandidate muMinus)
+  : TObject(),
+    fMuPlus(CbmAnaMuonCandidate(muPlus)),
+    fMuMinus(CbmAnaMuonCandidate(muMinus))
+{  
 }
 
 TLorentzVector CbmAnaDimuonCandidate::GetMomentumMC(){

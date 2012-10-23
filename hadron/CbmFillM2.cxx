@@ -34,22 +34,31 @@ using namespace std;
 
 // ------------------------------------------------------------------
 CbmFillM2::CbmFillM2()
+  : FairTask("FillM2"),
+    fRnd(new TRandom(1)),
+    fEvents(0),
+    fCoutBunch(1),
+    fTimeResolution(0.08),
+    fLevel(1),
+    fNoTrdStations(0),
+    fNoTrdPerStation(0),
+    fArrayMCTrack(NULL),
+    fArrayTofPoint(NULL),
+    fArrayHadron(NULL),
+    fh_m2mom_hadron_all(NULL),
+    fh_m2mom_hadron(NULL),
+    fh_m2mom_hadron_true(NULL),
+    fh_m2mom_hadron_10m(NULL), 
+    fNbinsM2(90),
+    fMinM2(-1.5),
+    fMaxM2(3.0),
+    fBinSizeM2((fMaxM2 - fMinM2) / (Double_t)fNbinsM2),
+    fNbinsMom(9),
+    fMinMom(1.),
+    fMaxMom(10.),
+    fNbinsMomCharge(TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom) )),
+    fBinSizeMom((fMaxMom - fMinMom) / (Double_t)fNbinsMom)
 {
-    // Default constructor
-    fEvents         = 0;
-    fCoutBunch      = 1;
-    fTimeResolution = 0.08;
-    fLevel          = 1;
-    fNbinsM2        = 90;
-    fMinM2          = -1.5;
-    fMaxM2          = 3.0;
-    fBinSizeM2      = (fMaxM2 - fMinM2) / (Double_t)fNbinsM2;
-    fNbinsMom       = 9;
-    fMinMom         = 1.;
-    fMaxMom         = 10.;
-    fBinSizeMom     = (fMaxMom - fMinMom) / (Double_t)fNbinsMom;
-    fNbinsMomCharge = TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom) );
-    fRnd            = new TRandom(1);
     CreateHistogramms();
     cout << "Nbins momentum*charge  :  " << fNbinsMomCharge << endl;
 }
@@ -62,23 +71,32 @@ CbmFillM2::CbmFillM2(const char *name, Int_t verbose,
 		     Double_t minM2, Double_t maxM2,
 		     Int_t nbinsMom,
 		     Double_t minMom, Double_t maxMom)
-: FairTask(name, verbose)
+  : FairTask(name, verbose),
+    fRnd(new TRandom(1)),
+    fEvents(0),
+    fCoutBunch(10),
+    fTimeResolution(0.08),
+    fLevel(1),
+    fNoTrdStations(0),
+    fNoTrdPerStation(0),
+    fArrayMCTrack(NULL),
+    fArrayTofPoint(NULL),
+    fArrayHadron(NULL),
+    fh_m2mom_hadron_all(NULL),
+    fh_m2mom_hadron(NULL),
+    fh_m2mom_hadron_true(NULL),
+    fh_m2mom_hadron_10m(NULL), 
+    fNbinsM2(nbinsM2),
+    fMinM2(minM2),
+    fMaxM2(maxM2),
+    fBinSizeM2((fMaxM2 - fMinM2) / (Double_t)fNbinsM2),
+    fNbinsMom(nbinsMom),
+    fMinMom(minMom),
+    fMaxMom(maxMom),
+    fNbinsMomCharge(TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom) )),
+    fBinSizeMom((fMaxMom - fMinMom) / (Double_t)fNbinsMom)
+
 {
-    // Standard constructor
-    fEvents         = 0;
-    fCoutBunch      = 10;
-    fTimeResolution = 0.08;
-    fLevel          = 1;
-    fNbinsM2        = nbinsM2;
-    fMinM2          = minM2;
-    fMaxM2          = maxM2;
-    fBinSizeM2      = (fMaxM2 - fMinM2) / (Double_t)fNbinsM2;
-    fNbinsMom       = nbinsMom;
-    fMinMom         = minMom;
-    fMaxMom         = maxMom;
-    fBinSizeMom     = (fMaxMom - fMinMom) / (Double_t)fNbinsMom;
-    fNbinsMomCharge = TMath::Nint( 2*(fNbinsMom+fMinMom/fBinSizeMom) );
-    fRnd            = new TRandom(1);
     CreateHistogramms();
     cout << "Nbins momentum*charge  :  " << fNbinsMomCharge << endl;
 }

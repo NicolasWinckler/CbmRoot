@@ -22,7 +22,7 @@ class TClonesArray;
 class CbmAnaHypSelectLambda : public CbmAnaHypRecLambda
 {
 public:
-  CbmAnaHypSelectLambda(){};
+  CbmAnaHypSelectLambda();
   CbmAnaHypSelectLambda(const char *name, Int_t iVerbose);
   virtual ~CbmAnaHypSelectLambda(){};
   InitStatus Init();
@@ -48,7 +48,12 @@ protected:
   Double_t fCutMmax;
   TClonesArray* fListRCLambda;
 
-ClassDef(CbmAnaHypSelectLambda,1);
+ private:
+
+  CbmAnaHypSelectLambda(const CbmAnaHypSelectLambda&);
+  CbmAnaHypSelectLambda operator=(const CbmAnaHypSelectLambda&);
+
+  ClassDef(CbmAnaHypSelectLambda,1);
 };
 
 #endif

@@ -125,14 +125,14 @@ Bool_t PionReferenceRingAcceptanceFunction(
 
 CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
    fMinMom(0.),
-   fMaxMom(12.),
-   fNofBinsMom(24),
+   fMaxMom(10.),
+   fNofBinsMom(40),
    fMinPt(0.),
    fMaxPt(3.),
-   fNofBinsPt(6),
+   fNofBinsPt(12),
    fMinY(0.),
    fMaxY(4.),
-   fNofBinsY(8),
+   fNofBinsY(16),
    fMinAngle(0.),
    fMaxAngle(25.),
    fNofBinsAngle(5),

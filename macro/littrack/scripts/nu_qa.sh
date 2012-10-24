@@ -4,10 +4,13 @@
 
 export LIT_SCRIPT=yes
 
-XXXX=$1
-
 #main_dir=/lustre/cbm/user/andrey/events/nu/25gev/
-nevents=10
+build_dir=/u/andrey/cbm/trunk_nu/build_lxlenny64/
+nevents=1000
+
+cd ${build_dir}
+. ./config.sh
+cd -
 
 #create_output_dir events_${test_name}/
 create_result_dir ${MAIN_DIR}/results/${XXXX}/

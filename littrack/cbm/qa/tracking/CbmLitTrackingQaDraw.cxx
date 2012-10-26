@@ -118,7 +118,11 @@ void CbmLitTrackingQaDraw::DrawYPtHistos()
    vector<string> globalTrackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
    for (UInt_t i = 0; i < globalTrackVariants.size(); i++) {
       string variant = globalTrackVariants[i];
-      DrawYPt("tracking_qa_" + variant + "_ypt", "hte_" + variant + "_" + variant + "_All_Eff_YPt");
+      string effHistName = "hte_" + variant + "_" + variant;
+      DrawYPt("tracking_qa_" + variant + "_all_ypt", effHistName + "_All_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_proton_ypt", effHistName + "_Proton_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_pion_ypt", effHistName + "_Pion_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_kaon_ypt", effHistName + "_Kaon_Eff_YPt");
    }
 }
 

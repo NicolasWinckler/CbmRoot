@@ -11,8 +11,8 @@
  * material of the detector and approximated magnetic field.
  **/
 
-#ifndef LITDETECTORGEOMETRYMUON_H_
-#define LITDETECTORGEOMETRYMUON_H_
+#ifndef LITDETECTORLAYOUTMUON_H_
+#define LITDETECTORLAYOUTMUON_H_
 
 #include "LitStationGroupMuon.h"
 
@@ -134,4 +134,4 @@ typedef LitDetectorLayoutMuon<fscal> LitDetectorLayoutMuonScal;
 
 } // namespace parallel
 } // namespace lit
-#endif /*LITDETECTORGEOMETRYMUON_H_*/
+#endif /*LITDETECTORLAYOUTMUON_H_*/

@@ -70,6 +70,30 @@ Bool_t PrimaryMuonTrackAcceptanceFunction(
 	return (std::abs(mcTrack->GetPdgCode()) == 13) && (mcTrack->GetMotherId() == -1);
 }
 
+Bool_t ProtonTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 2212);
+}
+
+Bool_t PionTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 211);
+}
+
+Bool_t KaonTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 321);
+}
+
 Bool_t AllRingAcceptanceFunction(
 		const TClonesArray* mcTracks,
 		Int_t index,
@@ -163,7 +187,7 @@ vector<string> CbmLitTrackingQaHistCreator::GetDefaultTrackCategories()
 {
 	CbmLitDetectorSetup det;
 	det.DetermineSetup();
-	return list_of("All")("Primary")("Secondary")("Reference")(det.GetElectronSetup() ? "Electron" : "Muon");
+	return list_of("All")("Primary")("Secondary")("Reference")(det.GetElectronSetup() ? "Electron" : "Muon")("Proton")("Pion")("Kaon");
 }
 
 map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultTrackAcceptanceFunctions()
@@ -177,6 +201,9 @@ map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultT
 	det.DetermineSetup();
 	if (det.GetElectronSetup()) cat["Electron"] = PrimaryElectronTrackAcceptanceFunction;
 	else cat["Muon"] = PrimaryMuonTrackAcceptanceFunction;
+	cat["Proton"] = ProtonTrackAcceptanceFunction;
+	cat["Pion"] = PionTrackAcceptanceFunction;
+	cat["Kaon"] = KaonTrackAcceptanceFunction;
 	return cat;
 }
 

@@ -94,16 +94,15 @@ void CbmLitFitQaDraw::DrawResidualAndPullHistograms(
 
 void CbmLitFitQaDraw::DrawTrackParamsAtVertex()
 {
-   TCanvas* canvas1 = new TCanvas("fit_qa_momentum", "fit_qa_momentum", 1200, 1200);
-   canvas1->Divide(2,2);
-   canvas1->cd(1);
-
+   TCanvas* canvas1 = new TCanvas("fit_qa_momentum_momres_mom_2D", "fit_qa_momentum_momres_mom_2D", 600, 600);
    canvas1->cd(1);
    DrawH2((TH2*)fHM->H1("htf_MomRes_Mom"));
    gPad->SetGridx(true);
    gPad->SetGridy(true);
+   lit::SaveCanvasAsImage(canvas1, fOutputDir);
 
-   canvas1->cd(2);
+   TCanvas* canvas2 = new TCanvas("fit_qa_momentum_projection", "fit_qa_momentum_projection", 600, 600);
+   canvas2->cd(1);
    TH1* projY = ((TH2*)(fHM->H1("htf_MomRes_Mom")))->ProjectionY("htf_MomRes_Mom_ProjectionY");
    DrawH1(projY, kLinear, kLinear);
    projY->SetStats(true);
@@ -111,8 +110,10 @@ void CbmLitFitQaDraw::DrawTrackParamsAtVertex()
    projY->SetMaximum(projY->GetMaximum() * 1.25);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
+   lit::SaveCanvasAsImage(canvas2, fOutputDir);
 
-   canvas1->cd(3);
+   TCanvas* canvas3 = new TCanvas("fit_qa_momentum_momres_mom_sigma", "fit_qa_momentum_momres_mom_sigma", 600, 600);
+   canvas3->cd(1);
    ((TH2*)(fHM->H1("htf_MomRes_Mom")))->FitSlicesY();
    TH1* momslice = (TH1*) gDirectory->Get("htf_MomRes_Mom_2");
    momslice->GetXaxis()->SetTitle("P [GeV/c]");
@@ -122,8 +123,10 @@ void CbmLitFitQaDraw::DrawTrackParamsAtVertex()
    DrawH1(momslice, kLinear, kLinear);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
+   lit::SaveCanvasAsImage(canvas3, fOutputDir);
 
-   canvas1->cd(4);
+   TCanvas* canvas4 = new TCanvas("fit_qa_momentum_momres_mom_rms", "fit_qa_momentum_momres_mom_rms", 600, 600);
+   canvas4->cd(1);
    TH2* hMomres = (TH2*) fHM->H1("htf_MomRes_Mom");
    Int_t nBins = hMomres->GetNbinsX();
    TH1* momResRms = hMomres->ProjectionX();
@@ -140,16 +143,14 @@ void CbmLitFitQaDraw::DrawTrackParamsAtVertex()
    DrawH1(momResRms, kLinear, kLinear, "P");
    gPad->SetGridx(true);
    gPad->SetGridy(true);
+   lit::SaveCanvasAsImage(canvas4, fOutputDir);
 
-   lit::SaveCanvasAsImage(canvas1, fOutputDir);
-
-   TCanvas* canvas2 = new TCanvas("fit_qa_chi_primary", "fit_qa_chi_primary", 600, 600);
-   canvas2->cd(1);
+   TCanvas* canvas5 = new TCanvas("fit_qa_chi_primary", "fit_qa_chi_primary", 600, 600);
+   canvas5->cd(1);
    TH1* hChiprim = fHM->H1("htf_ChiPrimary");
    hChiprim->Scale(1. / hChiprim->Integral());
    DrawH1(hChiprim, kLinear, kLog);
    gPad->SetGridx(true);
    gPad->SetGridy(true);
-
-   lit::SaveCanvasAsImage(canvas2, fOutputDir);
+   lit::SaveCanvasAsImage(canvas5, fOutputDir);
 }

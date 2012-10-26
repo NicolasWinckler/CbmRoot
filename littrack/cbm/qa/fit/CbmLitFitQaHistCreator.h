@@ -30,6 +30,13 @@ public:
 	void Create(
 		 CbmHistManager* histManager);
 
+	/** Setters **/
+	void SetPRange(Int_t bins, Int_t min, Int_t max) {
+	   fPRangeBins = bins;
+	   fPRangeMin = min;
+	   fPRangeMax = max;
+	}
+
 private:
 
 	void CreateResidualAndPullHistograms(
@@ -39,6 +46,10 @@ private:
 	Bool_t fIsFixedBounds; // if true than fixed bounds are used for histograms
 	CbmHistManager* fHM; // Histogram manager for created histograms
 	CbmLitDetectorSetup fDet; // For detector setup determination
+
+	Double_t fPRangeMin; // Min momentum
+	Double_t fPRangeMax; // Max momentum
+	Int_t fPRangeBins; // Number of bins
 };
 
 #endif /* CBMLITFITQAHISTCREATOR_H_ */

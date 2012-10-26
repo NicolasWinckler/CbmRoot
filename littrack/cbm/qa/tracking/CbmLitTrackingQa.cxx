@@ -40,7 +40,16 @@ CbmLitTrackingQa::CbmLitTrackingQa():
    fQuotaRich(0.6),
    fMinNofHitsTrd(8),
    fMinNofHitsMuch(10),
-   fUseConsecutivePointsInSts(true)
+   fUseConsecutivePointsInSts(true),
+   fPRangeMin(0.),
+   fPRangeMax(10.),
+   fPRangeBins(20.),
+   fYRangeMin(0.),
+   fYRangeMax(4.),
+   fYRangeBins(16),
+   fPtRangeMin(0.),
+   fPtRangeMax(3.),
+   fPtRangeBins(12.)
 {
 }
 
@@ -58,7 +67,11 @@ InitStatus CbmLitTrackingQa::Init()
    fDet.DetermineSetup();
 
    // Create histograms
-   CbmLitTrackingQaHistCreator::Instance()->Create(fHM);
+   CbmLitTrackingQaHistCreator* hc = CbmLitTrackingQaHistCreator::Instance();
+   hc->Create(fHM);
+   hc->SetPRange(fPRangeBins, fPRangeMin, fPRangeMax);
+   hc->SetPtRange(fPtRangeBins, fPtRangeMin, fPtRangeMax);
+   hc->SetYRange(fYRangeBins, fYRangeMin, fYRangeMax);
 
    fTrackingQa = new CbmLitTrackingQaCalculator(fHM);
    fTrackingQa->Init();

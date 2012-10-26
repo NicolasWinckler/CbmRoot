@@ -63,6 +63,12 @@ public:
    void SetMuchMinNofHits(Int_t minNofHits) { fMuchMinNofHits = minNofHits; }
    void SetOutputDir(const string& dir) { fOutputDir = dir; }
 
+   void SetPRange(Int_t bins, Int_t min, Int_t max) {
+      fPRangeBins = bins;
+      fPRangeMin = min;
+      fPRangeMax = max;
+   }
+
 private:
 
    void CreateSimulationReport(
@@ -77,6 +83,10 @@ private:
    Int_t fMuchMinNofHits; // Cut on minimum number of hits in track in MUCH
 
    string fOutputDir; // Output directory for images
+
+   Double_t fPRangeMin; // Min momentum
+   Double_t fPRangeMax; // Max momentum
+   Int_t fPRangeBins; // Number of bins
 
    CbmHistManager* fHM; // Histogram manager
    CbmLitFitQaCalculator* fFitQa; // Implementation of track fit QA

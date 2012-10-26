@@ -25,7 +25,10 @@ CbmLitFitQa::CbmLitFitQa():
    fMuchMinNofHits(0),
    fOutputDir("./test/"),
    fHM(NULL),
-   fFitQa(NULL)
+   fFitQa(NULL),
+   fPRangeMin(0.),
+   fPRangeMax(10.),
+   fPRangeBins(20)
 {
 
 }
@@ -42,6 +45,7 @@ InitStatus CbmLitFitQa::Init()
 
    // Create histograms
    CbmLitFitQaHistCreator histCreator;
+   histCreator.SetPRange(fPRangeBins, fPRangeMin, fPRangeMax);
    histCreator.Create(fHM);
 
    fFitQa = new CbmLitFitQaCalculator(fHM);

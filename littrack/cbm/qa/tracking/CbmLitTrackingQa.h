@@ -65,6 +65,21 @@ public:
    void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch; }
    void SetUseConsecutivePointsInSts(Bool_t useConsecutivePointsInSts) { fUseConsecutivePointsInSts = useConsecutivePointsInSts; }
    void SetOutputDir(const std::string& dir) { fOutputDir = dir; }
+   void SetPRange(Int_t bins, Int_t min, Int_t max) {
+      fPRangeBins = bins;
+      fPRangeMin = min;
+      fPRangeMax = max;
+   }
+   void SetYRange(Int_t bins, Int_t min, Int_t max) {
+      fYRangeBins = bins;
+      fYRangeMin = min;
+      fYRangeMax = max;
+   }
+   void SetPtRange(Int_t bins, Int_t min, Int_t max) {
+      fPtRangeBins = bins;
+      fPtRangeMin = min;
+      fPtRangeMax = max;
+   }
 
    /**
     * \brief Generate summary report out of several different simulation results.
@@ -111,6 +126,16 @@ private:
    Int_t fMinNofHitsTrd;
    Int_t fMinNofHitsMuch;
    Bool_t fUseConsecutivePointsInSts;
+
+   Double_t fPRangeMin; // Min momentum
+   Double_t fPRangeMax; // Max momentum
+   Int_t fPRangeBins; // Number of bins
+   Double_t fYRangeMin; // Min rapidity
+   Double_t fYRangeMax; // Max rapidity
+   Int_t fYRangeBins; // Number of bins
+   Double_t fPtRangeMin; // Min rapidity
+   Double_t fPtRangeMax; // Max rapidity
+   Int_t fPtRangeBins; // Number of bins
 
    ClassDef(CbmLitTrackingQa, 1);
 };

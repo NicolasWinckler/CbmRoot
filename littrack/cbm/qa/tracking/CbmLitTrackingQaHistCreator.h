@@ -44,17 +44,17 @@ public:
 
    /**
     * \brief Set properties of momentum axis in histograms.
+    * \param[in] bins Number of bins.
     * \param[in] min Minimum momentum.
     * \param[in] max Maximum momentum.
-    * \param[in] nofBins Number of bins.
     */
-   void SetMomAxis(
+   void SetPRange(
+         Int_t bins,
          Double_t min,
-         Double_t max,
-         Int_t nofBins) {
-      fMinMom = min;
-      fMaxMom = max;
-      fNofBinsMom = nofBins;
+         Double_t max) {
+      fPRangeBins = bins;
+      fPRangeMin = min;
+      fPRangeMax = max;
    }
 
    /**
@@ -63,13 +63,13 @@ public:
     * \param[in] max Maximum Pt.
     * \param[in] nofBins Number of bins.
     */
-   void SetPtAxis(
+   void SetPtRange(
+         Int_t bins,
          Double_t min,
-         Double_t max,
-         Int_t nofBins) {
-      fMinPt = min;
-      fMaxPt = max;
-      fNofBinsPt = nofBins;
+         Double_t max) {
+      fPtRangeBins = bins;
+      fPtRangeMin = min;
+      fPtRangeMax = max;
    }
 
    /**
@@ -78,13 +78,13 @@ public:
     * \param[in] max Maximum rapidity.
     * \param[in] nofBins Number of bins.
     */
-   void SetRapidityAxis(
+   void SetYRange(
+         Int_t bins,
          Double_t min,
-         Double_t max,
-         Int_t nofBins) {
-      fMinY = min;
-      fMaxY = max;
-      fNofBinsY = nofBins;
+         Double_t max) {
+      fYRangeBins = bins;
+      fYRangeMin = min;
+      fYRangeMax = max;
    }
 
    /**
@@ -182,15 +182,15 @@ private:
 
 private:
 
-   Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation [GeV/c]
-   Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation [GeV/c]
-   Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
-   Double_t fMinPt; // Minimum Pt for tracks for efficiency calculation [GeV/c]
-   Double_t fMaxPt; // Maximum Pt for tracks for efficiency calculation [GeV/c]
-   Int_t fNofBinsPt; // Number of bins for efficiency vs. Pt histogram
-   Double_t fMinY; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
-   Double_t fMaxY; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
-   Int_t fNofBinsY; // Number of bins for efficiency vs. rapidity histogram
+   Double_t fPRangeMin; // Minimum momentum for tracks for efficiency calculation [GeV/c]
+   Double_t fPRangeMax; // Maximum momentum for tracks for efficiency calculation [GeV/c]
+   Int_t fPRangeBins; // Number of bins for efficiency vs. momentum histogram
+   Double_t fPtRangeMin; // Minimum Pt for tracks for efficiency calculation [GeV/c]
+   Double_t fPtRangeMax; // Maximum Pt for tracks for efficiency calculation [GeV/c]
+   Int_t fPtRangeBins; // Number of bins for efficiency vs. Pt histogram
+   Double_t fYRangeMin; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
+   Double_t fYRangeMax; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
+   Int_t fYRangeBins; // Number of bins for efficiency vs. rapidity histogram
    Double_t fMinAngle; // Minimum polar angle [grad]
    Double_t fMaxAngle; // Maximum polar angle [grad]
    Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram

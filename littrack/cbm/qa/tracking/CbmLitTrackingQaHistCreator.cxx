@@ -148,15 +148,15 @@ Bool_t PionReferenceRingAcceptanceFunction(
 }
 
 CbmLitTrackingQaHistCreator::CbmLitTrackingQaHistCreator():
-   fMinMom(0.),
-   fMaxMom(10.),
-   fNofBinsMom(40),
-   fMinPt(0.),
-   fMaxPt(3.),
-   fNofBinsPt(12),
-   fMinY(0.),
-   fMaxY(4.),
-   fNofBinsY(16),
+   fPRangeMin(0.),
+   fPRangeMax(10.),
+   fPRangeBins(20.),
+   fYRangeMin(0.),
+   fYRangeMax(4.),
+   fYRangeBins(16),
+   fPtRangeMin(0.),
+   fPtRangeMax(3.),
+   fPtRangeBins(12.),
    fMinAngle(0.),
    fMaxAngle(25.),
    fNofBinsAngle(5),
@@ -306,8 +306,8 @@ void CbmLitTrackingQaHistCreator::CreateTrackHitsHistogram(
 		const string& detName)
 {
 	string type[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
-	Double_t min[] = { 0, 0, 0, -0.1, -0.1 };
-	Double_t max[] = { 100, 100, 100, 1.1, 1.1 };
+	Double_t min[] = { -0.5, -0.5, -0.5, -0.1, -0.1 };
+	Double_t max[] = { 99.5, 99.5, 99.5, 1.1, 1.1 };
 	Int_t bins[] = { 100, 100, 100, 12, 12 };
 	for(Int_t i = 0; i < 5; i++) {
 	   string xTitle = (i == 3 || i == 4) ? "Ratio" : "Number of hits";
@@ -444,44 +444,44 @@ void CbmLitTrackingQaHistCreator::Create(
    if (fDet.GetDet(kMUCH)) {
 	   string norm = LocalEfficiencyNormalization("Much");
 	   string histName = "hte_Much_" + norm;
-	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
-	   CreateH1Efficiency(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
-	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "track");
+	   CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
+	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
 	   CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
 	   CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
-	   CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
    }
    // TRD
    if (fDet.GetDet(kTRD)) {
 	   string norm = LocalEfficiencyNormalization("Trd");
 	   string histName = "hte_Trd_" + norm;
-	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
-	   CreateH1Efficiency(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
-	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "track");
+	   CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
+	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
 	   CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
 	   CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
-      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
    }
    // TOF
    if (fDet.GetDet(kTOF)) {
 	   string norm = LocalEfficiencyNormalization("Tof");
 	   string histName = "hte_Tof_" + norm;
-	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "track");
-	   CreateH1Efficiency(histName, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "track");
-	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "track");
+	   CreateH1Efficiency(histName, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "track");
+	   CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
+	   CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
 //	   CreateEfficiencyHistogram(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
 	   CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fNofBinsAngle, fMinAngle, fMaxAngle, "track");
-      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
    }
    // RICH
    if (fDet.GetDet(kRICH)) {
-	   CreateH1Efficiency("hte_Rich_Rich", "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, "ring");
-	   CreateH1Efficiency("hte_Rich_Rich", "y", "Rapidity", fNofBinsY, fMinY, fMaxY, "ring");
-	   CreateH1Efficiency("hte_Rich_Rich", "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "ring");
+	   CreateH1Efficiency("hte_Rich_Rich", "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "ring");
 	   CreateH1Efficiency("hte_Rich_Rich", "Nh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
 	   CreateH1Efficiency("hte_Rich_Rich", "BoA", "B/A", 50, 0.0, 1.0, "ring");
 	   CreateH1Efficiency("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
-      CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, "ring");
+      CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "ring");
    }
 
    // Global efficiency histograms
@@ -489,10 +489,10 @@ void CbmLitTrackingQaHistCreator::Create(
    for (Int_t iHist = 0; iHist < histoNames.size(); iHist++) {
 	   string name = histoNames[iHist];
 	   string opt = (name.find("Rich") == string::npos) ? "track" : "ring";
-	   CreateH1Efficiency(name, "p", "P [GeV/c]", fNofBinsMom, fMinMom, fMaxMom, opt);
-	   CreateH1Efficiency(name, "y", "Rapidity", fNofBinsY, fMinY, fMaxY, opt);
-	   CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fNofBinsPt, fMinPt, fMaxPt, opt);
-      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fNofBinsY, fMinY, fMaxY, fNofBinsPt, fMinPt, fMaxPt, opt);
+	   CreateH1Efficiency(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, opt);
+	   CreateH1Efficiency(name, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, opt);
+	   CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
+      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
    }
 
 //   // Electron identification efficiency histograms
@@ -553,7 +553,7 @@ void CbmLitTrackingQaHistCreator::Create(
 //   for (Int_t i = 0; i < 6; i++) {
 //      string histName = "hMCMomVsAngle_" + cat[i];
 //      Create2DHist(histName.c_str(), "P [GeV/c]", "Polar angle [grad]", "Counter",
-//            fNofBinsMom, fMinMom, fMaxMom, 10, 0., 35.);
+//            fPRangeBins, fPRangeMin, fPRangeMax, 10, 0., 35.);
 //   }
 
    // Histogram stores number of events

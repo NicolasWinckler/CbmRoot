@@ -18,7 +18,10 @@ using std::vector;
 CbmLitFitQaHistCreator::CbmLitFitQaHistCreator():
     fIsFixedBounds(true),
 	fHM(NULL),
-	fDet()
+	fDet(),
+	fPRangeMin(0.),
+	fPRangeMax(10.),
+	fPRangeBins(20)
 {
 
 }
@@ -41,7 +44,7 @@ void CbmLitFitQaHistCreator::Create(
    CreateResidualAndPullHistograms(kMUCH, "Much");
 
    // Momentum resolution vs momwntum
-   fHM->Add("htf_MomRes_Mom", new TH2F("htf_MomRes_Mom", "htf_MomRes_Mom;P [GeV/c];dP/P [%]", 20, 0, 10, 100, -3., 3.));
+   fHM->Add("htf_MomRes_Mom", new TH2F("htf_MomRes_Mom", "htf_MomRes_Mom;P [GeV/c];dP/P [%]", fPRangeBins, fPRangeMin, fPRangeMax, 100, -3., 3.));
    fHM->Add("htf_ChiPrimary", new TH1F("htf_ChiPrimary", "htf_ChiPrimary;#chi_{primary}", 100, 0, 10));
 }
 

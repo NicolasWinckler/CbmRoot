@@ -26,7 +26,7 @@ class CbmAnaDielectronTaskDraw: public TObject {
 
 public:
 
-  CbmAnaDielectronTaskDraw();
+    CbmAnaDielectronTaskDraw();
     
     virtual ~CbmAnaDielectronTaskDraw(){;}
 
@@ -47,6 +47,22 @@ public:
 private:
     Bool_t fUseMvd; // do you want to draw histograms related to the MVD detector?
     Bool_t fDrawSignificance; // do you want to draw significance histograms of 1D cuts?
+
+    // analysis cut values for drawing in the histograms
+    double fTrdAnnCut;
+    double fRichAnnCut;
+    double fPtCut;
+    double fAngleCut;
+    double fChiPrimCut;
+    double fGammaCut;
+    double fStCutAngle;
+    double fStCutPP;
+    double fTtCutAngle;
+    double fTtCutPP;
+    double fMvd1CutP;
+    double fMvd1CutD;
+    double fMvd2CutP;
+    double fMvd2CutD;
 
     CbmHistManager* fHM; //histogram manager
     vector<TCanvas*> fCanvas; // store pointers to all canvas -> save as image
@@ -184,7 +200,8 @@ private:
      * \param[in] step Analysis step.
      */
     void DrawPtYDistribution(
-          int step);
+          int step,
+          bool drawAnaStep = true);
 
     /**
      * Draw Pt vs. Y distributions of signal for all steps
@@ -222,20 +239,29 @@ private:
 
     // Draw distribution and significance of 1D analysis cut
     void Draw1DSourceTypes(
-          const string& hName);
+          const string& hName,
+          bool doScale = true);
 
      void Draw1DCut(
            const string& hName,
-           const string& sigOption);
+           const string& sigOption,
+           double cutValue = -999999.);
+
+     void Draw2DCutTriangle(
+           double xCross,
+           double yCross);
 
      void Draw2DCut(
-           const string& hist);
+           const string& hist,
+           double cutCrossX = -999999.,
+           double cutCrossY = -999999.);
 
      void DrawCutDistributions();
 
-    void DrawSourcesBgPairs(
+    void DrawSourcesBgPairsEpEm(
           int step,
-          bool inPercent);
+          bool inPercent,
+          bool drawAnaStep = true);
 
     /**
      * Draw sources of BG pairs for all steps.
@@ -259,13 +285,28 @@ private:
 
 
     void DrawMinvSource(
-          int step);
+          int step,
+          bool drawAnaStep = true);
 
     // Invariant mass distribution after each cut for source of BG
     void DrawMinvSourceAll();
 
+    /*
+     * \brief Remove MVD bins from histograms if MVD detector was not used.
+     */
+    void RemoveMvdCutBins();
+
+
+    void DrawBgSource2D(
+          const string& canvasName,
+          const string& histName,
+          const vector<string>& yLabels,
+          double scale,
+          const string& zTitle);
+
+
     //SOURCE TRACKS
-    void DrawBGSourceTracks();
+    void DrawBgSourceTracks();
 
     /**
      * \brief Set labels of X axis usinf analysis steps names.
@@ -277,8 +318,7 @@ private:
 
     void DrawBgSourcesVsMomentum();
 
-    CbmAnaDielectronTaskDraw(const CbmAnaDielectronTaskDraw&);
-    CbmAnaDielectronTaskDraw operator=(const CbmAnaDielectronTaskDraw&);
+    void DrawMvdCutQa();
 
    ClassDef(CbmAnaDielectronTaskDraw, 1);
 };

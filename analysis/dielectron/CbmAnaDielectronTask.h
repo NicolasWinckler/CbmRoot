@@ -67,60 +67,15 @@ public:
    Double_t richAnn;
    Double_t trdAnn;
    Double_t mass2;
-
-   DielectronCandidate()
-     : position(), 
-     momentum(),
-     mass(0.), 
-     energy(0.), 
-     rapidity(0.),
-     charge(0.),
-     chi2Prim(0.),
-     chi2sts(0.),
-     McMotherId(0),
-     stsMcTrackId(0),
-     richMcTrackId(0),
-     trdMcTrackId(0),
-     tofMcTrackId(0),
-     stsInd(0),
-     richInd(0),
-     trdInd(0),
-     tofInd(0),
-     isElectron(false),
-     isMcSignalElectron(false),
-     isMcPi0Electron(false),
-     isMcGammaElectron(false),
-     isMcEtaElectron(false),
-     isGamma(false),
-     dSts(0.),
-     isTtCutElectron(false),
-     isStCutElectron(false),
-     isApmCutElectron(false),
-     isMvd1CutElectron(false),
-     isMvd2CutElectron(false),
-     richAnn(0.),
-     trdAnn(0.),
-     mass2(0.)
-     {
-     }
 };
 
 class KinematicParams{
- public:
-  Double_t momentumMag; // Absolute value of momentum
-  Double_t pt; // Transverse momentum
-  Double_t rapidity; // Rapidity
-  Double_t minv; // Invariant mass
-  Double_t angle; // Opening angle
-  
- KinematicParams()
-   :  momentumMag(0.),
-    pt(0.),
-    rapidity(0.),
-    minv(0.),
-    angle(0)
-      {
-      }
+public:
+   Double_t momentumMag; // Absolute value of momentum
+   Double_t pt; // Transverse momentum
+   Double_t rapidity; // Rapidity
+   Double_t minv; // Invariant mass
+   Double_t angle; // Opening angle
 };
 
 class CbmAnaDielectronTask : public FairTask {
@@ -304,6 +259,11 @@ public:
 
     void SetDefaultIdParameters();
 
+    /*
+     * \brief Initialize all histograms.
+     */
+    void InitHists();
+
     void SignalAndBgReco();
 
     void CheckGammaConvAndPi0();
@@ -315,7 +275,13 @@ public:
      */
     void CheckClosestMvdHit(
     		Int_t mvdStationNum,
-    		vector<TH2D*>& hist);
+    		vector<TH2D*>& hist,
+         vector<TH1D*>& histQa);
+
+    bool MvdPlaneCut(
+          double x,
+          double y,
+          int stationNum);
 
     void CheckTrackTopologyCut();
 
@@ -328,6 +294,11 @@ public:
     void CheckArmPodModified();
 
     virtual void Finish();
+
+
+
+
+    ClassDef(CbmAnaDielectronTask,1);
 
 private:
 
@@ -364,6 +335,8 @@ private:
     TClonesArray *fStsTrackMatches;
     TClonesArray *fStsHits;
     TClonesArray *fMvdHits;
+    TClonesArray *fMvdPoints;
+    TClonesArray *fMvdHitMatches;
     TClonesArray *fTrdTracks;
     TClonesArray *fTrdHits;
     TClonesArray *fTrdTrackMatches;
@@ -384,6 +357,8 @@ private:
 
     Double_t fPionMisidLevel; // For the ideal particle identification cases, set to -1 for real PID
     TRandom3* fRandom3;
+
+    Bool_t fUseMcMomentum;
 
     // ID cuts
     Double_t fTrdAnnCut;
@@ -418,9 +393,13 @@ private:
    TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
    TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
 
-   TH2D* fh_mc_vertex_gamma_xz;
-   TH2D* fh_mc_vertex_gamma_yz;
-   TH2D* fh_mc_vertex_gamma_xy;
+   // Vertex of secondary electron from gamma conversion for different analysis step
+   //Index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
+   // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
+   vector<TH2D*> fh_vertex_el_gamma_xz;
+   vector<TH2D*> fh_vertex_el_gamma_yz;
+   vector<TH2D*> fh_vertex_el_gamma_xy;
+   vector<TH2D*> fh_vertex_el_gamma_rz;//r=sqrt(x^2+y^2)
 
    //Index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
    // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
@@ -435,8 +414,9 @@ private:
    vector<TH2D*> fh_signal_minv_pt; // Invariant mass vs. MC Pt
 
    //G-Gamma, P-Pi0, O-other
-   //[0]=G-G, [1]=G-P, [2]=G-O, [3]=P-G, [4]=P-P, [5]=P-O, [6]=O-G, [7]=O-P, [8]=O-O
-   vector<vector<TH1D*> > fh_source_minv; // Invariant mass for diferent source
+   //e-e+
+   //[0]=G-G, [1]=P-P, [2]=O-O, [3]=G-P, [4]=G-O, [5]=P-O
+   vector<vector<TH1D*> > fh_source_bg_minv; // Invariant mass for different source
 
 
    //Index is the source type: [0]-signal, [1]-bg, [2]-pi0, [3]-gamma
@@ -455,11 +435,18 @@ private:
    vector<TH1D*> fh_trdann; // TRD ANN
    vector<TH2D*> fh_tofm2; // TOF m2
 
+   vector<TH1D*> fh_mvd1cut_qa; // MVD 1 cut quality
+   vector<TH1D*> fh_mvd2cut_qa; // MVD 2 cut quality
+
    //source of BG pairs 2D.
    //second index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
    // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
    //Use AnalysisSteps enumeration for access.
-   vector<TH2D*> fh_source_pair;
+   vector<TH2D*> fh_source_pairs_epem;
+
+   //X axis: analysis step
+   //Y axis: [0]=G-G, [1]=P-P, [2]=O-O, [3]=G-P, [4]=G-O, [5]=P-O
+   TH2D* fh_source_pairs;
 
    //store event number
    TH1D* fh_event_number;
@@ -474,9 +461,10 @@ private:
    //second index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
    // [5]-gamma cut, [6]-mvd1cut, [7]-mvd2cut, [8]-stcut, [9]-ttcut, [10]-ptcut.
    //Use AnalysisSteps enumeration for access.
-
    //Track momentum distribution for different sources after each cut.
    vector<vector<TH1D*> > fh_source_mom;
+   //Pt distribution for different sources after each cut.
+   vector<vector<TH1D*> > fh_source_pt;
    //Opening angle distribution for different sources after each cut.
    vector<vector<TH1D*> > fh_opening_angle;
 
@@ -500,12 +488,7 @@ public:
    void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
 
    void SetPionMisidLevel(Double_t level) {fPionMisidLevel = level;}
-
-   CbmAnaDielectronTask(const CbmAnaDielectronTask&);
-   CbmAnaDielectronTask operator=(const CbmAnaDielectronTask&);
-
-   ClassDef(CbmAnaDielectronTask,1);
-    
+   void SetUseMcMomentum(Bool_t use = false) {fUseMcMomentum = use;}
 };
 
 #endif

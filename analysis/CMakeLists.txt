@@ -75,6 +75,7 @@ much/CbmAnaAngularAcceptance.cxx
 dielectron/CbmAnaDielectronTask.cxx
 dielectron/CbmAnaDielectronTaskDraw.cxx
 dielectron/CbmAnaDielectronTaskDrawAll.cxx
+dielectron/CbmAnaLmvmDrawStudy.cxx
 dielectron/CbmAnaLmvmNames.cxx
 dielectron/CbmAnaDielectronStudyReportAll.cxx
 dielectron/CbmAnaDielectronReports.cxx
@@ -123,6 +124,7 @@ much/CbmAnaAngularAcceptance.h
 dielectron/CbmAnaDielectronTask.h
 dielectron/CbmAnaDielectronTaskDraw.h
 dielectron/CbmAnaDielectronTaskDrawAll.h
+dielectron/CbmAnaLmvmDrawStudy.h
 dielectron/CbmAnaDielectronReports.h
 )
 

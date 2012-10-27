@@ -28,7 +28,10 @@ void CbmAnaDielectronStudyReportAll::Create(
    out << fR->DocumentBegin();
    out << fR->Title(0, fTitle);
 
-   for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
+   Bool_t fUseMvd = false;
+   for (int step = kElId; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
+      if ( !fUseMvd && (step == kMvd1Cut || step == kMvd2Cut)) continue;
+
       out << fR->TableBegin("LMVM Results " + CbmAnaLmvmNames::fAnaSteps[step], list_of(string("")).range(fStudyNames));
       for (int iF = 0; iF < 3; iF++){
          string signalName = CbmAnaLmvmNames::fSignalNames[iF];
@@ -38,9 +41,12 @@ void CbmAnaDielectronStudyReportAll::Create(
          out << PrintRow(signalName + "_signal_minv_mean_" + CbmAnaLmvmNames::fAnaSteps[step], "Mean [MeV/c2]");
          out << PrintRow(signalName + "_signal_minv_rms_" + CbmAnaLmvmNames::fAnaSteps[step], "Sigma [MeV/c2]");
       }
+      out << fR->TableEmptyRow(fStudyNames.size() + 1, "S/BG ranges");
+      out << PrintRow("lmvm_s_bg_region_0_0_2_" + CbmAnaLmvmNames::fAnaSteps[step], "Mee: 0.0-0.2 GeV/c2");
+      out << PrintRow("lmvm_s_bg_region_0_2_0_6_" + CbmAnaLmvmNames::fAnaSteps[step], "Mee: 0.2-0.6 GeV/c2");
+      out << PrintRow("lmvm_s_bg_region_0_6_1_2_" + CbmAnaLmvmNames::fAnaSteps[step], "Mee: 0.6-1.2 GeV/c2");
       out << fR->TableEnd() << endl;
    }
-
    out <<  fR->DocumentEnd();
 }
 

@@ -34,6 +34,18 @@ enum AnalysisSteps {
 };
 
 /*
+ * \brief Enumeration for different sources of BG pairs
+ */
+enum BgPairSource {
+  kGG = 0,
+  kPP = 1,
+  kOO = 2,
+  kGP = 3,
+  kGO = 4,
+  kPO = 5
+};
+
+/*
  * \brief Enumeration for signal names.
  */
 /*enum SignalNames {
@@ -57,6 +69,9 @@ public:
    const static vector<int> fAnaStepsColor;
 
    const static vector<string> fSignalNames;
+
+   const static int fNofBgPairSources = 6;
+   const static vector<string> fBgPairSourceLatex;
 };
 
 #endif

@@ -138,28 +138,28 @@ private:
     * \param[in] min Minimum invariant mass.
     * \param[in] max Maximum invariant mass.
     */
-   void CalcCutEff(
-         Double_t min,
-         Double_t max);
+   void CalcCutEffRange(
+         Double_t minMinv,
+         Double_t maxMinv);
 
    /**
-    * \brief Create S/BG vs cuts for specified invariant mass region.
+    * \brief Create S/BG vs cuts for specified invariant mass range.
     * \param[in] min Minimum invariant mass.
     * \param[in] max Maximum invariant mass.
     */
-   TH1D* SBgRegion(
-         Double_t min,
-         Double_t max);
+   TH1D* SBgRange(
+         Double_t minMinv,
+         Double_t maxMinv);
 
    /**
-    * \brief Draw S/BG vs plots for different mass regions.
+    * \brief Draw S/BG vs plots for different mass ranges.
     */
-   void SBgRegionAll();
+   void SBgRangeAll();
 
    /**
     * \brief Draw S/BG vs plots for different signals.
     */
-   void DrawSBGSignals();
+   void DrawSBgSignals();
 
    /**
     * \brief Save all created canvases to images.

@@ -94,18 +94,23 @@ void run_reco(Int_t nEvents = 1000)
     Double_t minStep    =  0.01;
     Double_t StripDeadTime = 10.;
 
-    CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
-    stsDigitize->SetRealisticResponse();
-    stsDigitize->SetFrontThreshold (threshold);
-    stsDigitize->SetBackThreshold  (threshold);
-    stsDigitize->SetFrontNoiseWidth(noiseWidth);
-    stsDigitize->SetBackNoiseWidth (noiseWidth);
-    stsDigitize->SetFrontNofBits   (nofBits);
-    stsDigitize->SetBackNofBits    (nofBits);
-    stsDigitize->SetFrontMinStep   (minStep);
-    stsDigitize->SetBackMinStep    (minStep);
-    stsDigitize->SetStripDeadTime  (StripDeadTime);
-    run->AddTask(stsDigitize);
+    Double_t threshold  =  4;
+   Double_t noiseWidth =  0.01;
+   Int_t    nofBits    = 12;
+   Double_t electronsPerAdc    =  10;
+   Double_t StripDeadTime = 0.1;
+   CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+   stsDigitize->SetRealisticResponse();
+   stsDigitize->SetFrontThreshold (threshold);
+   stsDigitize->SetBackThreshold  (threshold);
+   stsDigitize->SetFrontNoiseWidth(noiseWidth);
+   stsDigitize->SetBackNoiseWidth (noiseWidth);
+   stsDigitize->SetFrontNofBits   (nofBits);
+   stsDigitize->SetBackNofBits    (nofBits);
+   stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
+   stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
+   stsDigitize->SetStripDeadTime  (StripDeadTime);
+   run->AddTask(stsDigitize);
 
     FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
     run->AddTask(stsClusterFinder);
@@ -115,6 +120,7 @@ void run_reco(Int_t nEvents = 1000)
 
     CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
     run->AddTask(stsMatchHits);
+
     } else { // STS IDEAL RESPONSE
       FairTask* stsDigitize = new CbmStsIdealDigitize("CbmStsIdealDigitize", iVerbose);
       run->AddTask(stsDigitize);

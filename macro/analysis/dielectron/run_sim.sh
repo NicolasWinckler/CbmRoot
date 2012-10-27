@@ -46,7 +46,7 @@ export ENERGY=25gev
 	export FIELDMAPSCALE=1.0
 
 export FIELDDIR=100field
-export MVDDIR=nomvd
+export MVDDIR=mvd
 export MAINDIR=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/${MVDDIR}
 	
 #If "yes" DELTA electrons will be embedded
@@ -57,8 +57,9 @@ export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/del
 export NEVENTS=1000
 
 export PIONMISIDENTIFICATIONLEVEL=-1.0
+export USEMCMOMENTUM=yes
 
-for Z in 1 ; do
+for Z in 1 2 3 4; do
     if [ $Z = "0" ] ; then
         export PLUTOPARTICLE=
         export DIR=
@@ -85,9 +86,9 @@ for Z in 1 ; do
 		export DIR=
 	fi	
 
-   #for K in 0; do
-   #for Y in 0 ; do
-   # for X in 1 ; do
+ #for K in 0; do
+ # for Y in 0 ; do
+  # for X in 1 ; do
 
  for K in 0 1; do
 	for Y in 0 1 2 3 4 5 6 7 8 9; do
@@ -95,13 +96,14 @@ for Z in 1 ; do
 
 	  export XXXX=0${K}${Y}${X}
 	  #echo batch ${XXXX} submitted
-	  export INFILE=/d/cbm03/urqmd/auau/${ENERGY}/centr/urqmd.AuAu.${ENERGY}.centr.${XXXX}.ftn14
+	  export INFILE=/d/cbm03/urqmd/auau/${ENERGY}/centr/urqmd.auau.${ENERGY}.centr.${XXXX}.ftn14
 	  export MCFILE=${DIR}/mc.${XXXX}.root
 	  export PARFILE=${DIR}/param.${XXXX}.root
       export RECOFILE=${DIR}/reco.${XXXX}.root
       export RECOQAFILE=${DIR}/reco.litqa.${XXXX}.root
     #export DILEPANALYSISFILE=${DIR}/analysis.pi_misid_${PIONMISIDENTIFICATIONLEVEL}.${XXXX}.root
-      export DILEPANALYSISFILE=${DIR}/analysis.${XXXX}.root
+      export DILEPANALYSISFILE=${DIR}/analysis.mc_momentum.${XXXX}.root 
+    # export DILEPANALYSISFILE=${DIR}/analysis.${XXXX}.root
  
  
 	  if [ $Z = "1" ] ; then 
@@ -121,7 +123,7 @@ for Z in 1 ; do
 	  fi	  
       #	. ./sim.sh
 	 	# xterm -hold -e ". ./sim.sh $number"&
-     	 bsub -q batch -J mc.${Z}.${XXXX}.run -o ${DIR}/log/${XXXX}.log -N sh ./sim.sh
+       bsub -q batch -J mc.${Z}.${XXXX}.run -o ${DIR}/log/${XXXX}.log -N sh ./sim.sh
      	
 	  done
 	 done

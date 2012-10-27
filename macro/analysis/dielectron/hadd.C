@@ -59,20 +59,28 @@ void hadd() {
          particle = "rho0";
       }
 
-      string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/10gev/100field/nomvd/"+particle+"/";
+      string fileName = "analysis.pi_misid_0.0001.";
+     // string fileName = "analysis.";
+      string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/100field/nomvd/"+particle+"/";
       cout << "-I- " << dir << endl;
 
-      Target = TFile::Open( string(dir+"analysis.pi_misid_0.0.all.root").c_str(), "RECREATE" );
+      Target = TFile::Open( string(dir+fileName+"all.root").c_str(), "RECREATE" );
 
+      int count = 0;
       FileList = new TList();
-      for (int i = 1; i < 100; i++){
+      for (int i = 0; i < 200; i++){
          stringstream ss;
-         ss << dir << "analysis.pi_misid_0.0." ;
+         ss << dir << fileName ;
          ss.fill('0');
          ss.width(4);
          ss  << i << ".root";
-         FileList->Add( TFile::Open(ss.str().c_str()) );
+         TFile* file = TFile::Open(ss.str().c_str());
+         if ( file != NULL && file->GetEND() > 2000){
+            FileList->Add( file );
+            count++;
+         }
       }
+      cout << endl<< "-I- number of files to merge = " << count << endl << endl;
 
       MergeRootfile( Target, FileList );
    }

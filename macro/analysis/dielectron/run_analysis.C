@@ -17,6 +17,7 @@ void run_analysis(Int_t nEvents = 10)
 
    TString inFile1 = "", inFile2 = "", parFile = "", outFile ="", energy = "";
    TString plutoParticle = "";
+   TString useMcMomentum = "no";
 
    if (script != "yes") {
       TString DIR="/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/";
@@ -38,6 +39,7 @@ void run_analysis(Int_t nEvents = 10)
       pionMisidLevel = TString(gSystem->Getenv("PIONMISIDENTIFICATIONLEVEL")).Atof();
       energy = TString(gSystem->Getenv("ENERGY"));
       plutoParticle = TString(gSystem->Getenv("PLUTOPARTICLE"));
+      useMcMomentum = TString(gSystem->Getenv("USEMCMOMENTUM"));
    }
 
    TString stsDigiFile = "sts_v11a.digi.par";
@@ -92,6 +94,8 @@ void run_analysis(Int_t nEvents = 10)
    task->SetUseTrd(true);
    task->SetUseTof(true);
    task->SetPionMisidLevel(pionMisidLevel);
+   task->SetUseMcMomentum(false);
+   if (useMcMomentum == "yes") task->SetUseMcMomentum(true);
 
    fRun->AddTask(task);
 

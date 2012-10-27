@@ -14,12 +14,18 @@ void draw_analysis(){
 
     gSystem->Load("libAnalysis");
 
-    std::string setup = "100field/nomvd";
     Bool_t useMvd = true;
+    std::string setup = "100field/mvd";
+   // std::string fileName = "analysis.pi_misid_0.0001.all.root";
+    std::string fileName = "analysis.all.root";
+
     Bool_t drawSignificance = true;
-    std::string fileName = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/rho0/analysis.all.root";
-    std::string outputDir = "results/25gev/rho0/" + setup + "/real_pid/";
+    std::string fileName2 = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/rho0/" + fileName;
+
+    std::string outputDir = "results/25gev/" + setup + "/rho0/real_pid/";
+    //std::string outputDir = "results/25gev/" + setup + "/rho0/pi_misid_0_0001/";
+
 
     CbmAnaDielectronTaskDraw *draw = new CbmAnaDielectronTaskDraw();
-    draw->DrawHistFromFile(fileName, outputDir, useMvd);//, drawSignificance);
+    draw->DrawHistFromFile(fileName2, outputDir, useMvd);//, drawSignificance);
 }

@@ -68,10 +68,10 @@ InitStatus CbmLitTrackingQa::Init()
 
    // Create histograms
    CbmLitTrackingQaHistCreator* hc = CbmLitTrackingQaHistCreator::Instance();
-   hc->Create(fHM);
    hc->SetPRange(fPRangeBins, fPRangeMin, fPRangeMax);
    hc->SetPtRange(fPtRangeBins, fPtRangeMin, fPtRangeMax);
    hc->SetYRange(fYRangeBins, fYRangeMin, fYRangeMax);
+   hc->Create(fHM);
 
    fTrackingQa = new CbmLitTrackingQaCalculator(fHM);
    fTrackingQa->Init();

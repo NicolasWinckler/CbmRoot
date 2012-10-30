@@ -983,7 +983,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
   //CbmKF &KF = *CbmKF::Instance();
 
-  static TProfile *p_eff_all_vs_mom, *p_eff_prim_vs_mom, *p_eff_sec_vs_mom, *p_eff_d0_vs_mom;
+  static TProfile *p_eff_all_vs_mom, *p_eff_prim_vs_mom, *p_eff_sec_vs_mom, *p_eff_d0_vs_mom, *p_eff_prim_vs_theta, *p_eff_all_vs_pt, *p_eff_prim_vs_pt;
   
   static TH1F *h_reg_mom_prim, *h_reg_mom_sec, *h_reg_nhits_prim, *h_reg_nhits_sec;
   static TH1F *h_acc_mom_prim, *h_acc_mom_sec, *h_acc_nhits_prim, *h_acc_nhits_sec;
@@ -1032,13 +1032,19 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
     p_eff_all_vs_mom = new TProfile("p_eff_all_vs_mom", "AllSet Efficiency vs Momentum",
                                     100, 0.0, 5.0, 0.0, 100.0);
-    p_eff_prim_vs_mom = new TProfile("p_eff_prim_vs_mom", "All Primary Set Efficiency vs Momentum",
+    p_eff_prim_vs_mom = new TProfile("p_eff_prim_vs_mom", "Primary Set Efficiency vs Momentum",
                                      100, 0.0, 5.0, 0.0, 100.0);
-    p_eff_sec_vs_mom = new TProfile("p_eff_sec_vs_mom", "All Secondary Set Efficiency vs Momentum",
+    p_eff_sec_vs_mom = new TProfile("p_eff_sec_vs_mom", "Secondary Set Efficiency vs Momentum",
                                     100, 0.0, 5.0, 0.0, 100.0);
     p_eff_d0_vs_mom = new TProfile("p_eff_d0_vs_mom", "D0 Secondary Tracks Efficiency vs Momentum",
                                    150, 0.0, 15.0, 0.0, 100.0);
-
+    p_eff_prim_vs_theta = new TProfile("p_eff_prim_vs_theta", "All Primary Set Efficiency vs Theta",
+                                    100, 0.0, 30.0, 0.0, 100.0);
+    p_eff_all_vs_pt = new TProfile("p_eff_all_vs_pt", "AllSet Efficiency vs Pt",
+                                    100, 0.0, 5.0, 0.0, 100.0);
+    p_eff_prim_vs_pt = new TProfile("p_eff_prim_vs_pt", "Primary Set Efficiency vs Pt",
+        100, 0.0, 5.0, 0.0, 100.0);
+  
     h_reg_mom_prim   = new TH1F("h_reg_mom_prim", "Momentum of registered primary tracks", 500, 0.0, 5.0);
     h_reg_mom_sec   = new TH1F("h_reg_mom_sec", "Momentum of registered secondary tracks", 500, 0.0, 5.0);
     h_acc_mom_prim   = new TH1F("h_acc_mom_prim", "Momentum of accepted primary tracks", 500, 0.0, 5.0);
@@ -1240,7 +1246,9 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     if (nmchits == 0) continue;
 
     double momentum = mtra.p;
-
+    double pt = sqrt(mtra.px*mtra.px+mtra.py*mtra.py);
+    double theta = acos(mtra.pz/mtra.p)*180/3.1415;
+      
     h_mcp->Fill(momentum);
     h_nmchits->Fill(nmchits);
 
@@ -1315,8 +1323,11 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
     if (reco){
       p_eff_all_vs_mom->Fill(momentum, 100.0);
+      p_eff_all_vs_pt->Fill(pt, 100.0);
       if (mtra.mother_ID < 0){ // primary
         p_eff_prim_vs_mom->Fill(momentum, 100.0);
+        p_eff_prim_vs_pt->Fill(pt, 100.0);
+        p_eff_prim_vs_theta->Fill(theta, 100.0);
       }else{
         p_eff_sec_vs_mom->Fill(momentum, 100.0);
       }
@@ -1340,8 +1351,11 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     }else{
       h_notfound_mom->Fill(momentum);
       p_eff_all_vs_mom->Fill(momentum, 0.0);
+      p_eff_all_vs_pt->Fill(pt, 0.0);
       if (mtra.mother_ID < 0){ // primary
         p_eff_prim_vs_mom->Fill(momentum, 0.0);
+        p_eff_prim_vs_pt->Fill(pt, 0.0);
+        p_eff_prim_vs_theta->Fill(theta, 0.0);
       }else{
         p_eff_sec_vs_mom->Fill(momentum, 0.0);
       }

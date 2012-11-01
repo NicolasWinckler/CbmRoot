@@ -1198,7 +1198,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       h_reco_station->Fill(mh.iStation);
       if (prtra->NDF > 0){
         h_reco_chi2->Fill(prtra->chi2/prtra->NDF);
-        h_reco_prob->Fill(TMath::Erf(sqrt(fabs(prtra->chi2/prtra->NDF))));
+        h_reco_prob->Fill(TMath::Prob(prtra->chi2,prtra->NDF));
       }
     }
 
@@ -1214,7 +1214,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       h_ghost_fstation->Fill(h1.iStation);
       if (prtra->NDF > 0){
         h_ghost_chi2->Fill(prtra->chi2/prtra->NDF);
-        h_ghost_prob->Fill(TMath::Erf(sqrt(fabs(prtra->chi2/prtra->NDF))));
+        h_ghost_prob->Fill(TMath::Prob(prtra->chi2,prtra->NDF));
       }
       h_ghost_r->Fill(sqrt(fabs(h1.x*h1.x+h1.y*h1.y)));
       double z1 = algo->vStations[h1.iStation].z[0];

@@ -271,7 +271,12 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     gGeoManager->FindNode(xin,yin,zin);
     TGeoNode* curNode = gGeoManager->GetCurrentNode();
     
-    CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
+    CbmStsSensor* sensor = NULL;
+    if ( fDigiScheme->IsNewGeometry() ) {
+      TString curPath = fDigiScheme->GetCurrentPath();
+      sensor = fDigiScheme->GetSensorByName(curPath);
+    }
+    else sensor = fDigiScheme->GetSensorByName(curNode->GetName());
 
     if ( fPointMap.find(sensor) == fPointMap.end() ) {
       cerr << "-E- " << fName << "::Exec:: sensor " << curNode->GetName()
@@ -303,10 +308,10 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
 // 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
 // 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
- 	fStripSignalF[--iChannel] = 0.;
- 	fStripSignalB[  iChannel] = 0.;
-// 	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
-// 	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
+// 	fStripSignalF[--iChannel] = 0.;
+// 	fStripSignalB[  iChannel] = 0.;
+ 	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
+ 	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
       }
       
       for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {
@@ -525,6 +530,7 @@ InitStatus CbmStsDigitize::Init() {
     else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
     cout << "-I- " << fName << "::Init: "
 	 << "STS digitisation scheme succesfully initialised" << endl;
+    if ( fDigiScheme->IsNewGeometry() ) cout << "-I- Using new geometry" << endl;
     cout << "    Stations: " << fDigiScheme->GetNStations() 
 	 << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
 	 << fDigiScheme->GetNChannels() << endl;

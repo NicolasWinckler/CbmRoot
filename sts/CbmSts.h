@@ -14,6 +14,7 @@
 #ifndef CBMSTS_H
 #define CBMSTS_H
 
+#include <map>
 #include "FairDetector.h"
 
 #include "TLorentzVector.h"
@@ -21,6 +22,8 @@
 class TClonesArray;
 class CbmStsPoint;
 class FairVolume;
+
+using namespace std;
 
 
 
@@ -108,11 +111,29 @@ class CbmSts : public FairDetector
 			  Int_t offset);
 
 
-  /** Virtaul method Construct geometry
-   **
-   ** Constructs the STS geometry
+  /** Construct the STS geometry.
+   ** Depending on the geometry file extension, the base class method
+   ** ConstructRootGeometry is called (.root), or the ASCII geometry
+   ** file is read by the FairGeoLoader (.geo).
+   ** @since 11.06.2012
    **/
   virtual void ConstructGeometry();
+   
+
+
+  /** Construct the geometry from an ASCII geometry file.
+   **/
+  virtual void ConstructAsciiGeometry();
+
+
+  /** Check whether a volume is sensitive.
+   ** The decision is based on the volume name. Only used in case
+   ** of ROOT geometry.
+   ** @since 11.06.2012
+   ** @param(name)  Volume name
+   ** @value        kTRUE if volume is sensitive, else kFALSE
+   **/
+  virtual Bool_t CheckIfSensitive(std::string name);
 
 
 //  void SaveGeoParams();
@@ -124,6 +145,7 @@ class CbmSts : public FairDetector
 	active volume. **/
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
+    Int_t          fDetectorId;        // ! Unique detector ID
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -134,6 +156,8 @@ class CbmSts : public FairDetector
     TClonesArray*  fStsCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
+    map<Int_t, Int_t> fVolumeMap;       //! Map from MC volume ID to unique detector ID
+    map<Int_t, Int_t>::iterator fVolumeMapIter;  //! Map iterator
 
     /** Private method AddHit
      **
@@ -143,6 +167,8 @@ class CbmSts : public FairDetector
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
+
+    //Int_t GetCurrentDetectorId();
 
 
     /** Private method ResetParameters

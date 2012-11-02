@@ -22,8 +22,7 @@ using std::vector;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsSensor::CbmStsSensor() 
-  :
-  fName(""),
+  : 
   fDetectorId(0),
   fType(0),
   fX0(0.), 
@@ -63,7 +62,7 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
 			   Double_t rotation, Double_t lx, Double_t ly, 
 			   Double_t d, Double_t dx, Double_t dy, Double_t stereoF, Double_t stereoB)
   :
-  fName(tempName.Data()),
+  TNamed(tempName.Data(), ""),
   fDetectorId(0),
   fType(0),
   fX0(0.), 
@@ -224,7 +223,6 @@ CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0,
 			   Double_t ly, Double_t dx, Double_t dy, 
 			   Double_t stereoF, Double_t stereoB) 
   :
-  fName(""),
   fDetectorId(0),
   fType(0),
   fX0(0.), 
@@ -617,7 +615,7 @@ Int_t CbmStsSensor::GetFrontChannel(Double_t x, Double_t y, Double_t z) {
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
   
   Double_t xf = xint + fFrontStripShift + yint * TMath::Tan(fStereoF);
- xf = xf - TMath::Floor(xf/fLx) * fLx;
+  xf = xf - TMath::Floor(xf/fLx) * fLx;
   
   iChan = (Int_t)(xf/fDx);
  
@@ -648,12 +646,12 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
   if (fStereoB*180/TMath::Pi()>80) {
     Double_t xp = yint;
-   xp = xp - TMath::Floor(xp/fLy) * fLy;
+    xp = xp - TMath::Floor(xp/fLy) * fLy;
     iChan = (Int_t)(xp/fDy);
   }
   else {
     Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
-   xp = xp - TMath::Floor(xp/fLx) * fLx;
+    xp = xp - TMath::Floor(xp/fLx) * fLx;
     iChan = (Int_t)(xp/fDx);
   }
   

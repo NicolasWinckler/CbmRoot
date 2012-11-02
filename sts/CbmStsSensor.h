@@ -174,7 +174,7 @@ class CbmStsSensor : public TNamed
 
   /** -------------   Data members   --------------------------**/
 
-  TString    fName;             // Station name
+  //TString    fName;             // Station name
   Int_t    fDetectorId;   // Unique detector ID
   Int_t    fType;         // Sensor type 
   Double_t fX0, fY0, fZ0; // Coordinates of the sensor centre [cm]

@@ -9,6 +9,7 @@
 #include "CbmGeoStsPar.h"
 
 #include "CbmDetectorList.h"
+#include "CbmStsDetectorId.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
@@ -118,6 +119,8 @@ Bool_t CbmSts::ProcessHits(FairVolume* vol) {
   //      cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
   //  }
 
+
+ 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -134,7 +137,7 @@ Bool_t CbmSts::ProcessHits(FairVolume* vol) {
        gMC->IsTrackStop()       ||
        gMC->IsTrackDisappeared()   ) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-    fVolumeID = vol->getMCid();
+    fDetectorId = vol->getMCid();
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
@@ -179,7 +182,7 @@ Bool_t CbmSts::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID,
+    AddHit(fTrackID, fDetectorId,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -192,6 +195,7 @@ Bool_t CbmSts::ProcessHits(FairVolume* vol) {
     
     ResetParameters();
   }
+
 
   return kTRUE;
 }
@@ -231,6 +235,9 @@ void CbmSts::EndOfEvent() {
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
+
+
+
 
 
 
@@ -291,8 +298,37 @@ void CbmSts::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 
 
 
-// -----   Public method ConstructGeometry   ----------------------------------
-void CbmSts::ConstructGeometry() {
+// -----  ConstructGeometry  --------------------------------------------------
+void CbmSts::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if ( fileName.EndsWith(".root") ) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing STS geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  }
+  else if ( fileName.EndsWith(".geo") ) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing STS geometry from ASCII file %s", 
+		  fileName.Data());
+    ConstructAsciiGeometry();
+  }
+  else
+    fLogger->Fatal(MESSAGE_ORIGIN,
+		   "Geometry format of STS file %S not supported.", 
+		   fileName.Data());
+}
+// ----------------------------------------------------------------------------
+
+  
+  
+
+
+
+
+// -----   ConstructAsciiGeometry   -------------------------------------------
+void CbmSts::ConstructAsciiGeometry() {
   
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -328,6 +364,20 @@ void CbmSts::ConstructGeometry() {
 
 }
 // ----------------------------------------------------------------------------
+
+
+
+
+// -----   CheckIfSensitive   -------------------------------------------------
+Bool_t CbmSts::CheckIfSensitive(std::string name) {
+
+  TString volName = name;
+  if ( volName.Contains("Sensor") ) return kTRUE;
+  return kFALSE;
+}
+// ----------------------------------------------------------------------------
+
+
 
 
 

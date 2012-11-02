@@ -91,7 +91,8 @@ CbmStsStation::~CbmStsStation() {
 Int_t CbmStsStation::GetNChannels() {
   Int_t nChan = 0;
   for (Int_t iSect=0; iSect<GetNSectors(); iSect++) 
-    nChan += GetSector(iSect)->GetNChannels();
+    if ( GetSector(iSect)->GetNChannels() > 0 )
+      nChan += GetSector(iSect)->GetNChannels();
   return nChan;
 }
 // -------------------------------------------------------------------------

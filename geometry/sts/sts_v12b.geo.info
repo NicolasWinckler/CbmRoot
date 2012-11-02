@@ -7,7 +7,7 @@ Vertical overlap of sensors = 0.3 cm
 Gap in z between neighbour sensors = 0.02 cm
 Horizontal overlap of sensors = 0.3 cm
 Gap in z between neighbour ladders = 0 cm
-No cables
+Cable thickness = 0.01 cm
 
 Beam pipe: R1 = 1.05 cm at z = 27 cm
 Beam pipe: R2 = 3.25 cm at z = 160 cm

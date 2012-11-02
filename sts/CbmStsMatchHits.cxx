@@ -407,8 +407,11 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
 
   Int_t nofStsHits = fHits->GetEntriesFast();
   Int_t nofStsPoints = fPoints->GetEntriesFast();
-  cout << "there are " << nofStsPoints << " points and " << nofStsHits << " hits." << endl;
+  //cout << "there are " << nofStsPoints << " points and " << nofStsHits << " hits." << endl;
   Int_t   hitStationLimits[2][100];
+
+  // Workaround. TODO.
+  fNStations = 8;
 
   for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
     hitStationLimits[0][ist] = -1;
@@ -426,14 +429,21 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
       hitStationLimits[1][stsHitBack->GetStationNr()-1] = nofStsHits-ihit;
     }
   }
-//   for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) 
-//     cout << "station " << istat << " hits from " << hitStationLimits[0][istat] << " to " << hitStationLimits[1][istat] << endl;
+  //for ( Int_t istat = 0 ; istat < fNStations ; istat++ )
+  //   cout << "station " << istat << " hits from " << hitStationLimits[0][istat] << " to " << hitStationLimits[1][istat] << endl;
 
   for ( Int_t ipnt = 0 ; ipnt < nofStsPoints ; ipnt++ ) {
     CbmStsPoint *stsPoint = (CbmStsPoint*)fPoints->At(ipnt);
 
-    Int_t startHit = hitStationLimits[0][fStationNrFromMcId[stsPoint->GetDetectorID()]];
-    Int_t finalHit = hitStationLimits[1][fStationNrFromMcId[stsPoint->GetDetectorID()]];
+    // This is a workaround. Has to be worked out when new digi scheme is implemented. TODO.
+    Double_t zPoint = stsPoint->GetZIn();
+    Int_t stationNr = TMath::Nint((zPoint-30.)/10.);
+
+    // This does not work with new geometries since the StsGeoPar are not filled.
+    // Int_t stationNr = fStationNrFromMcId[stsPoint->GetDetectorID()]];
+
+    Int_t startHit = hitStationLimits[0][stationNr];
+    Int_t finalHit = hitStationLimits[1][stationNr];
     
     if ( startHit == -1 && finalHit == -1 ) continue;
 
@@ -449,12 +459,12 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
       Double_t yP = stsPoint->GetY(stsHit->GetZ());
       if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .01 ) &&
  	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
-// 	cout << "matching " 
-// 	     << "X: " << stsHit->GetX() << " - " << stsPoint->GetX(stsHit->GetZ())
-// 	     << "Y: " << stsHit->GetY() << " - " << stsPoint->GetY(stsHit->GetZ()) << endl;
-	//	cout << "candidate dist = " << dist << endl;
         Double_t dist = TMath::Sqrt( (xP-xH)*(xP-xH) + (yP-yH)*(yP-yH) );
-	
+ //	cout << "matching "
+ //	     << "X: " << stsHit->GetX() << " - " << stsPoint->GetX(stsHit->GetZ())
+ //	     << "Y: " << stsHit->GetY() << " - " << stsPoint->GetY(stsHit->GetZ()) << endl;
+//		cout << "candidate dist = " << dist << endl;
+
 	//	cout << "setting ref index = " << stsHit->GetRefIndex() << " (max sts pnt = " << nofStsPoints << ")" << endl;
 	nMatched++;
         NofMatched++;
@@ -650,6 +660,7 @@ cout << "-W- " << endl;
     return kERROR;
   }
   Int_t tempNofStations = stsNodes->GetEntries();
+  cout << "Nodes in STS: " << tempNofStations << endl;
 
   cout << "There are " << tempNofStations << " nodes" << (tempNofStations > 10 ? "!!!" : "" ) << endl;
 

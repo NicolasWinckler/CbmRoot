@@ -71,6 +71,12 @@ class CbmStsDigiScheme : public TObject
   Int_t GetDetectorIdByName(TString sensorName);
   CbmStsSensor* GetSensorByName    (TString sensorName);
 
+  /** Check for new geometry **/
+  Bool_t IsNewGeometry() const { return fIsNewGeometry; }
+
+  /** Construct full path to a node **/
+  TString GetCurrentPath();
+
   /** Screen output  **/
   void Print(Bool_t kLong = kFALSE);
 
@@ -80,6 +86,7 @@ class CbmStsDigiScheme : public TObject
   Int_t fNSectors;            /** Total number of sectors **/
   Int_t fNSensors;            /** Total number of sensors **/
   Int_t fNChannels;           /** Total number of channels **/
+  Bool_t fIsNewGeometry;      /** New geometry ( v12 or later ) **/
 
   std::map<Int_t,  CbmStsStation*> fStationMap; //! Map from number to station
   std::map<TString, Int_t>          fDetIdByName;
@@ -87,6 +94,14 @@ class CbmStsDigiScheme : public TObject
 
   CbmStsDigiScheme(const CbmStsDigiScheme&);
   CbmStsDigiScheme operator=(const CbmStsDigiScheme&);
+
+
+  /** Old init method (up to v11b) **/
+  Bool_t InitOld(CbmGeoStsPar* geoPar, CbmStsDigiPar* digiPar);
+
+
+  /** New init method (from V12a on) **/
+  Bool_t InitNew(CbmGeoStsPar* geoPar, CbmStsDigiPar* digiPar);
 
   ClassDef(CbmStsDigiScheme,1);
 };

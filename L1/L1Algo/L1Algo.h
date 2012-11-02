@@ -10,9 +10,12 @@
 // #define DRAW             // event display
 // #define XXX              // time debug
 // #define COUNTERS          // diff counters (hits, doublets, ... )
+
 // #define TRACKS_FROM_TRIPLETS // secondary only
 // #define DO_NOT_SELECT_TRIPLETS // secondary only
-//#define TRACKS_FROM_TRIPLETS_ITERATION kAllSecIter
+// #define TRACKS_FROM_TRIPLETS_ITERATION kFastPrimIter
+
+
 #define FIND_GAPED_TRACKS // use triplets with gaps
 
 #include "L1Field.h"
@@ -365,7 +368,6 @@ class L1Algo{
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
 #ifdef FIND_GAPED_TRACKS
-  enum { fNFindIterations = 4 }; // TODO investigate kAllPrimJumpIter & kAllSecJumpIter
   enum { kFastPrimIter, // primary fast tracks
          kAllPrimIter,      // primary all tracks
          kAllPrimJumpIter,  // primary tracks with jumped triplets
@@ -376,6 +378,11 @@ class L1Algo{
          kFastPrimIter2,
          kAllSecJumpIter    // secondary tracks with jumped triplets
   };
+#ifdef TRACKS_FROM_TRIPLETS
+  enum { fNFindIterations = TRACKS_FROM_TRIPLETS_ITERATION+1 }; // TODO investigate kAllPrimJumpIter & kAllSecJumpIter
+#else
+  enum { fNFindIterations = 4 }; // TODO investigate kAllPrimJumpIter & kAllSecJumpIter
+#endif
 #else
   enum { fNFindIterations = 3 };
   enum { kFastPrimIter = 0, // primary fast tracks
@@ -389,6 +396,7 @@ class L1Algo{
   
   const float TRACK_CHI2_CUT; // = 10.0;  // cut for tracks candidates. per one DoF
   const float TRIPLET_CHI2_CUT; // = 5.0; // cut for selecting triplets before collecting tracks.per one DoF
+
   
   fvec MaxDZ; // correction in order to take into account overlaping and iff z. if sort by y then it is max diff between same station's modules (~0.4cm)
   

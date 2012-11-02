@@ -53,6 +53,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         # should be switched on, but there are so many
         "/htrack/"
 
+
         # -- warnings from ubuntu systems which are a little to much
         # -- probably defined warn-unused-result. ignoring the result
         # -- of fgets is common practice. A work around would be to
@@ -120,6 +121,10 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         # -- FairTSBufferFunctional.h has to be fixed by Tobias
 	"MbsAPI"
 	"FairTSBufferFunctional.h"
+        "FairRegistry.h"
+        "FairDbTableRow.h"
+        "FairDbResult.h"
+        "FairDbValidityRec.h"
   )
 
 # -----------------------------------------------------------

@@ -112,8 +112,8 @@ protected:
 
 private:
 
-//   CbmReport(const CbmReport&);
-//   CbmReport operator=(const CbmReport&);
+   CbmReport(const CbmReport&);
+   CbmReport& operator=(const CbmReport&);
 };
 
 #endif /* CBMREPORT_H_ */

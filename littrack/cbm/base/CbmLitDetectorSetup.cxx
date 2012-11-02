@@ -63,7 +63,7 @@ void CbmLitDetectorSetup::DetermineSetup()
    fIsElectronSetup = !CheckDetectorPresence("much");
    fIsMuonSetup = CheckDetectorPresence("much");
    fDet[kMVD] = CheckDetectorPresence("mvd");
-   fDet[kSTS] = CheckDetectorPresence("sts");
+   fDet[kSTS] = CheckDetectorPresence("sts") || CheckDetectorPresence("STS");
    fDet[kRICH] = CheckDetectorPresence("rich");
    fDet[kTRD] = CheckDetectorPresence("trd");
    fDet[kMUCH] = CheckDetectorPresence("much");

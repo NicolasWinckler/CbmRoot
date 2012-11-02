@@ -114,9 +114,9 @@ void Create_TRD_Geometry_v12sp() {
                                // x-direction
   Float_t Detector_size_y[3];  // length in mm of a detector module in 
                                // y-direction
-  Float_t Frame_width;         // Width of detector frames in mm
-  Float_t Inner_radius[3];     // Inner acceptance in mm
-  Float_t Outer_radius[3];     // Outer acceptance in mm
+  Float_t Frame_width;         // Width of detector frames in cm   // root geometry uses cm as unit (was mm)
+  Float_t Inner_radius[3];     // Inner acceptance in cm   // root geometry uses cm as unit (was mm)
+  Float_t Outer_radius[3];     // Outer acceptance in cm   // root geometry uses cm as unit (was mm)
 
   //--------- Initialization of parameters -------------------------------------
 
@@ -363,7 +363,7 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
 
    // frame1
-   TGeoBBox *trd_frame1 = new TGeoBBox("Fr1", Detector_size_x/2, Frame_width/2, frame_thickness);
+   TGeoBBox *trd_frame1 = new TGeoBBox("", Detector_size_x/2, Frame_width/2, frame_thickness);
    TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("trd%dmod%dframe1", station, module_number), trd_frame1, man->GetMedium("G10"));
    trdmod1_frame1vol->SetLineColor(kRed);
 
@@ -375,7 +375,7 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
 
    // frame2
-   TGeoBBox *trd_frame2 = new TGeoBBox("Fr2", Frame_width/2, Active_area_y/2, frame_thickness);
+   TGeoBBox *trd_frame2 = new TGeoBBox("", Frame_width/2, Active_area_y/2, frame_thickness);
    TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd%dmod%dframe2", station, module_number), trd_frame2, man->GetMedium("G10"));
    trdmod1_frame2vol->SetLineColor(kRed);
 
@@ -385,45 +385,62 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    trd_frame2_trans = new TGeoTranslation("", -(Active_area_x/2+Frame_width/2), 0., frame_position);
    man->GetVolume(name)->AddNode(trdmod1_frame2vol, 2, trd_frame2_trans);
 
-// DEDE
-   TGeoTranslation *t10 = new TGeoTranslation("t10", 0.,  1.00*(Active_area_y/2+Frame_width/2), 0);   // frame_position-frame_thickness);
+
+// DEDE -----------------------------------------
+
+   Float_t Sprosse_o_width   = 2.0; // 0.2;   // Width of outer lattice frame in cm
+   Float_t Sprosse_i_width   = 0.4; // 5.0;   // Width of inner lattice frame in cm
+   Float_t Sprosse_thickness = 1.0;           // Thickness of lattice frames in cm
+
+
+   // drift window - lattice grid - sprossenfenster
+   TGeoBBox *trd_lattice_ho = new TGeoBBox("Sho", Detector_size_x/2, Sprosse_o_width/2, Sprosse_thickness/2);  // horizontal
+   TGeoBBox *trd_lattice_hi = new TGeoBBox("Shi", Detector_size_x/2, Sprosse_i_width/2, Sprosse_thickness/2);  // horizontal
+
+   TGeoBBox *trd_lattice_vo = new TGeoBBox("Svo", Sprosse_o_width/2, Detector_size_x/2, Sprosse_thickness/2);  // vertical
+   TGeoBBox *trd_lattice_vi = new TGeoBBox("Svi", Sprosse_i_width/2, Detector_size_x/2, Sprosse_thickness/2);  // vertical
+
+   //   TGeoBBox *trd_lattice2 = new TGeoBBox("Fr2", Frame_width/2, Active_area_y/2, frame_thickness);
+
+   TGeoTranslation *t10 = new TGeoTranslation("t10", 0.,  (1.00*Active_area_y/2+Sprosse_o_width/2), 0);
    t10->RegisterYourself();
-   TGeoTranslation *t11 = new TGeoTranslation("t11", 0.,  0.60*(Active_area_y/2+Frame_width/2), 0);   // frame_position-frame_thickness);
+   TGeoTranslation *t11 = new TGeoTranslation("t11", 0.,  (0.60*Active_area_y/2)                  , 0);
    t11->RegisterYourself();
-   TGeoTranslation *t12 = new TGeoTranslation("t12", 0.,  0.20*(Active_area_y/2+Frame_width/2), 0);   // frame_position-frame_thickness);
+   TGeoTranslation *t12 = new TGeoTranslation("t12", 0.,  (0.20*Active_area_y/2)                  , 0);
    t12->RegisterYourself();
-   TGeoTranslation *t13 = new TGeoTranslation("t13", 0., -0.20*(Active_area_y/2+Frame_width/2), 0);   // frame_position-frame_thickness);
+   TGeoTranslation *t13 = new TGeoTranslation("t13", 0., -(0.20*Active_area_y/2)                  , 0);
    t13->RegisterYourself();
-   TGeoTranslation *t14 = new TGeoTranslation("t14", 0., -0.60*(Active_area_y/2+Frame_width/2), 0);   // frame_position-frame_thickness);
+   TGeoTranslation *t14 = new TGeoTranslation("t14", 0., -(0.60*Active_area_y/2)                  , 0);
    t14->RegisterYourself();
-   TGeoTranslation *t15 = new TGeoTranslation("t15", 0., -1.00*(Active_area_y/2+Frame_width/2), 0);   // frame_position-frame_thickness);
+   TGeoTranslation *t15 = new TGeoTranslation("t15", 0., -(1.00*Active_area_y/2+Sprosse_o_width/2), 0);
    t15->RegisterYourself();
 
-   TGeoTranslation *t20 = new TGeoTranslation("t20",  1.00*(Active_area_x/2+Frame_width/2), 0., 0);   // frame_position-frame_thickness);
-   t20->RegisterYourself();			          
-   TGeoTranslation *t21 = new TGeoTranslation("t21",  0.60*(Active_area_x/2+Frame_width/2), 0., 0);   // frame_position-frame_thickness);
-   t21->RegisterYourself();			          
-   TGeoTranslation *t22 = new TGeoTranslation("t22",  0.20*(Active_area_x/2+Frame_width/2), 0., 0);   // frame_position-frame_thickness);
-   t22->RegisterYourself();			          
-   TGeoTranslation *t23 = new TGeoTranslation("t23", -0.20*(Active_area_x/2+Frame_width/2), 0., 0);   // frame_position-frame_thickness);
-   t23->RegisterYourself();			          
-   TGeoTranslation *t24 = new TGeoTranslation("t24", -0.60*(Active_area_x/2+Frame_width/2), 0., 0);   // frame_position-frame_thickness);
-   t24->RegisterYourself();			          
-   TGeoTranslation *t25 = new TGeoTranslation("t25", -1.00*(Active_area_x/2+Frame_width/2), 0., 0);   // frame_position-frame_thickness);
+   TGeoTranslation *t20 = new TGeoTranslation("t20",  (1.00*Active_area_x/2+Sprosse_o_width/2), 0., 0);
+   t20->RegisterYourself();
+   TGeoTranslation *t21 = new TGeoTranslation("t21",  (0.60*Active_area_x/2)                  , 0., 0);
+   t21->RegisterYourself();
+   TGeoTranslation *t22 = new TGeoTranslation("t22",  (0.20*Active_area_x/2)                  , 0., 0);
+   t22->RegisterYourself();
+   TGeoTranslation *t23 = new TGeoTranslation("t23", -(0.20*Active_area_x/2)                  , 0., 0);
+   t23->RegisterYourself();
+   TGeoTranslation *t24 = new TGeoTranslation("t24", -(0.60*Active_area_x/2)                  , 0., 0);
+   t24->RegisterYourself();
+   TGeoTranslation *t25 = new TGeoTranslation("t25", -(1.00*Active_area_x/2+Sprosse_o_width/2), 0., 0);
    t25->RegisterYourself();
 
-   // drift window - sprossenfenster
+//   // with additional cross in the center - a la Roland
+//   Float_t Sprosse_1_width   = 0.1; // Width of inner lattice frame in cm
+//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", Active_area_x/5/2, Sprosse_1_width/2, Sprosse_thickness/2);  // horizontal
+//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Sprosse_1_width/2, Active_area_x/5/2, Sprosse_thickness/2);  // vertical
+//   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
+//   "(Sho:t10 + Shi:t11 + Shi:t12 + Shi:t13 + Shi:t14 + Sho:t15 + Svo:t20 + Svi:t21 + Svi:t22 + Svi:t23 + Svi:t24 + Svo:t25 + Sh1 + Sv1)");
+
    TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
-   //                                                   "(Fr1 + Fr2)");
-   //						   "(Fr1:t10 + Fr1)");
-   //                                                   "(Fr1:t10 + Fr1:t11 + Fr2:t20 + Fr2:t21)");
-   "(Fr1:t10 + Fr1:t11 + Fr1:t12 + Fr1:t13 + Fr1:t14 + Fr1:t15 + Fr2:t20 + Fr2:t21 + Fr2:t22 + Fr2:t23 + Fr2:t24 + Fr2:t25)");
-   //   TGeoVolume *comp = new TGeoVolume("COMP",cs);
-   TGeoVolume *comp = new TGeoVolume(Form("trd%dmod%dsprosse1", station, module_number), cs, man->GetMedium("G10"));
+   "(Sho:t10 + Shi:t11 + Shi:t12 + Shi:t13 + Shi:t14 + Sho:t15 + Svo:t20 + Svi:t21 + Svi:t22 + Svi:t23 + Svi:t24 + Svo:t25)");
+   TGeoVolume *comp = new TGeoVolume(Form("trd%dmod%dgrid1", station, module_number), cs, man->GetMedium("G10"));
    comp->SetLineColor(kYellow);
    man->GetVolume(name)->AddNode(comp, 1);
-   //   cout << "dede";
-// DEDE
+// DEDE -----------------------------------------
 
    for (Int_t i=0; i<8; i++)
    {

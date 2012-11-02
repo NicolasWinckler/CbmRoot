@@ -435,11 +435,14 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
 //   "(Sho:t10 + Shi:t11 + Shi:t12 + Shi:t13 + Shi:t14 + Sho:t15 + Svo:t20 + Svi:t21 + Svi:t22 + Svi:t23 + Svi:t24 + Svo:t25 + Sh1 + Sv1)");
 
-   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
+   TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
    "(Sho:t10 + Shi:t11 + Shi:t12 + Shi:t13 + Shi:t14 + Sho:t15 + Svo:t20 + Svi:t21 + Svi:t22 + Svi:t23 + Svi:t24 + Svo:t25)");
-   TGeoVolume *comp = new TGeoVolume(Form("trd%dmod%dgrid1", station, module_number), cs, man->GetMedium("G10"));
-   comp->SetLineColor(kYellow);
-   man->GetVolume(name)->AddNode(comp, 1);
+   TGeoVolume *lattice = new TGeoVolume(Form("trd%dmod%dgrid1", station, module_number), lattice_grid, man->GetMedium("G10"));
+   lattice->SetLineColor(kYellow);
+
+   TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., -Layer_thickness /2.-Sprosse_thickness/2);
+   man->GetVolume(name)->AddNode(lattice, 1, trd_lattice_trans);
+
 // DEDE -----------------------------------------
 
    for (Int_t i=0; i<8; i++)

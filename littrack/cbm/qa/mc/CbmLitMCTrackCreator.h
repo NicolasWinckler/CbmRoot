@@ -18,6 +18,9 @@ class CbmMvdPoint;
 class CbmStsPoint;
 class CbmTrdPoint;
 class CbmMuchPoint;
+class CbmGeoStsPar;
+class CbmStsDigiPar;
+class CbmStsDigiScheme;
 
 /**
  * \class CbmLitMCTrackCreator
@@ -156,6 +159,10 @@ private:
    std::map<int, int>fStsStationsMap; // for STS
    std::map<int, int>fTrdStationsMap; // for TRD
    std::map<int, int>fMuchStationsMap; // for MUCH
+
+   CbmGeoStsPar* fStsGeoPar; // Geometry parameter container
+   CbmStsDigiPar* fStsDigiPar; // Digitisation parameter container
+   CbmStsDigiScheme* fStsDigiScheme;   // Digitisation scheme
 };
 
 #endif /* CBMLITMCTRACKCREATOR_H_ */

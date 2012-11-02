@@ -12,6 +12,10 @@
 #include "CbmMvdPoint.h"
 #include "CbmGeoStsPar.h"
 #include "CbmStsDetectorId.h"
+#include "CbmStsSensor.h"
+#include "CbmStsDigiScheme.h"
+#include "CbmGeoStsPar.h"
+#include "CbmStsDigiPar.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmTrdDetectorId.h"
 #include "CbmMCTrack.h"
@@ -22,6 +26,7 @@
 #include "CbmBaseHit.h"
 
 #include "TDatabasePDG.h"
+#include "TGeoManager.h"
 
 CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fMCTracks(NULL),
@@ -35,6 +40,12 @@ CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fLitMCTracks()
 {
    ReadDataBranches();
+
+   FairRuntimeDb* db = FairRunAna::Instance()->GetRuntimeDb();
+   fStsGeoPar = (CbmGeoStsPar*) db->getContainer("CbmGeoStsPar");
+   fStsDigiPar = (CbmStsDigiPar*) db->getContainer("CbmStsDigiPar");
+   fStsDigiScheme  = new CbmStsDigiScheme();
+   fStsDigiScheme->Init(fStsGeoPar, fStsDigiPar);
 }
 
 CbmLitMCTrackCreator::~CbmLitMCTrackCreator()
@@ -273,27 +284,44 @@ void CbmLitMCTrackCreator::FillStationMaps()
 
    // STS
    if (NULL != fStsPoints) {
-      FairRunAna* run = FairRunAna::Instance();
-      FairRuntimeDb* runDb = run->GetRuntimeDb();
-      CbmGeoStsPar* stsGeoPar = (CbmGeoStsPar*) runDb->getContainer("CbmGeoStsPar");
-      TObjArray* stsNodes = stsGeoPar->GetGeoSensitiveNodes();
-      Int_t nofStsStations = stsNodes->GetEntries();
-      std::map<Int_t, Int_t> stsStationNrFromMcId;
-      for (Int_t ist = 0; ist < nofStsStations; ist++) {
-        FairGeoNode* stsNode = (FairGeoNode*) stsNodes->At(ist);
-        std::string stsNodeName(stsNode->GetName());
-        std::string stsStationNr = stsNodeName.substr(10, 2);
-        Int_t stationNr = atoi(stsStationNr.c_str());
-        stsStationNrFromMcId[stsNode->getMCid()] = stationNr - 1;
-      }
+//      FairRunAna* run = FairRunAna::Instance();
+//      FairRuntimeDb* runDb = run->GetRuntimeDb();
+//      CbmGeoStsPar* stsGeoPar = (CbmGeoStsPar*) runDb->getContainer("CbmGeoStsPar");
+//      TObjArray* stsNodes = stsGeoPar->GetGeoSensitiveNodes();
+//      Int_t nofStsStations = stsNodes->GetEntries();
+//      std::map<Int_t, Int_t> stsStationNrFromMcId;
+//      std::cout << "nofStations=" << nofStsStations << std::endl;
+//      for (Int_t ist = 0; ist < nofStsStations; ist++) {
+//        FairGeoNode* stsNode = (FairGeoNode*) stsNodes->At(ist);
+//        std::string stsNodeName(stsNode->GetName());
+//        std::cout << "stsNode:" <<  stsNode->GetName() << std::endl;
+//        std::string stsStationNr = stsNodeName.substr(10, 2);
+//        Int_t stationNr = atoi(stsStationNr.c_str());
+//        stsStationNrFromMcId[stsNode->getMCid()] = stationNr - 1;
+//      }
+//
+//      CbmStsDetectorId stsDetectorId;
+//      Int_t nofStsPoints = fStsPoints->GetEntriesFast();
+//      for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
+//         const FairMCPoint* point = static_cast<const FairMCPoint*>(fStsPoints->At(iPoint));
+//         Int_t stationId = stsStationNrFromMcId[point->GetDetectorID()];
+//         fStsStationsMap[iPoint] = stationId;
+//      }
 
-      CbmStsDetectorId stsDetectorId;
-      Int_t nofStsPoints = fStsPoints->GetEntriesFast();
-      for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
-         const FairMCPoint* point = static_cast<const FairMCPoint*>(fStsPoints->At(iPoint));
-         Int_t stationId = stsStationNrFromMcId[point->GetDetectorID()];
-         fStsStationsMap[iPoint] = stationId;
-      }
+	   Int_t nofStsPoints = fStsPoints->GetEntriesFast();
+	   for (Int_t iPoint = 0; iPoint < nofStsPoints; iPoint++) {
+		   const CbmStsPoint* point = static_cast<const CbmStsPoint*>(fStsPoints->At(iPoint));
+		   Double_t xin = point->GetXIn();
+		   Double_t yin = point->GetYIn();
+		   Double_t zin = point->GetZIn();
+		   gGeoManager->FindNode(xin, yin, zin);
+		   TGeoNode* curNode = gGeoManager->GetCurrentNode();  // only needed for old geometries
+		   CbmStsSensor* sensor = (fStsDigiScheme->IsNewGeometry()) ?
+				   fStsDigiScheme->GetSensorByName(fStsDigiScheme->GetCurrentPath()) :
+                       fStsDigiScheme->GetSensorByName(curNode->GetName());
+		   Int_t stationId = sensor->GetStationNr() - 1;
+		   fStsStationsMap[iPoint] = stationId;
+	   }
    }
    // end STS
 

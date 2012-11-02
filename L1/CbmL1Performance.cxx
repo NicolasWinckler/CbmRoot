@@ -1067,7 +1067,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     h_ghost_nhits = new TH1F("h_ghost_nhits", "Number of hits in ghost track", 51, -0.1, 10.1);
     h_ghost_fstation = new TH1F("h_ghost_fstation", "First station of ghost track", 50, -0.5, 10.0);
     h_ghost_chi2 = new TH1F("h_ghost_chi2", "Chi2/NDF of ghost track", 50, -0.5, 10.0);
-    h_ghost_prob = new TH1F("h_ghost_prob", "Prob of ghost track", 50, 0., 1.01);
+    h_ghost_prob = new TH1F("h_ghost_prob", "Prob of ghost track", 505, 0., 1.01);
     h_ghost_r = new TH1F("h_ghost_r", "R of ghost track at the first hit", 50, 0.0, 15.0);
     h_ghost_tx = new TH1F("h_ghost_tx", "tx of ghost track at the first hit", 50, -5.0, 5.0);
     h_ghost_ty = new TH1F("h_ghost_ty", "ty of ghost track at the first hit", 50, -1.0, 1.0);
@@ -1076,7 +1076,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     h_reco_nhits = new TH1F("h_reco_nhits", "Number of hits in reco track", 50, 0.0, 10.0);
     h_reco_station = new TH1F("h_reco_station", "First station of reco track", 50, -0.5, 10.0);
     h_reco_chi2 = new TH1F("h_reco_chi2", "Chi2/NDF of reco track", 50, -0.5, 10.0);
-    h_reco_prob = new TH1F("h_reco_prob", "Prob of reco track", 50, 0., 1.01);
+    h_reco_prob = new TH1F("h_reco_prob", "Prob of reco track", 505, 0., 1.01);
     h_reco_clean = new TH1F("h_reco_clean", "Percentage of correct hits", 100, -0.5, 100.5);
     h_reco_time = new TH1F("h_reco_time", "CA Track Finder Time (s/ev)", 20, 0.0, 20.0);
     h_reco_timeNtr = new TProfile("h_reco_timeNtr",
@@ -1196,10 +1196,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       h_reco_nhits->Fill((prtra->StsHits).size());
       CbmL1HitStore &mh = vHitStore[prtra->StsHits[0]];
       h_reco_station->Fill(mh.iStation);
-      if (prtra->NDF > 0){
-        h_reco_chi2->Fill(prtra->chi2/prtra->NDF);
-        h_reco_prob->Fill(TMath::Prob(prtra->chi2,prtra->NDF));
-      }
+
     }
 
     h_reco_clean->Fill( prtra->GetMaxPurity() );
@@ -1233,6 +1230,11 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       if (hl.iStation >= hf.iStation)
         h2_ghost_lstation_vs_fstation->Fill(hf.iStation+1, hl.iStation+1);
     }
+    else
+      if (prtra->NDF > 0){
+        h_reco_chi2->Fill(prtra->chi2/prtra->NDF);
+        h_reco_prob->Fill(TMath::Prob(prtra->chi2,prtra->NDF));
+      }
 
   } // for reco tracks
 

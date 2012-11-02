@@ -302,8 +302,14 @@ inline void L1Algo::f20(  // input
       L1ExtrapolateC10Line( T1, zm, C10 );
       fvec chi2 = T1.chi2;
       L1FilterChi2XYC00C10C11( stam.frontInfo, x, y, C00, C10, C11, chi2, hitm.u );
+#ifdef DO_NOT_SELECT_TRIPLETS
+      if (isec!=kAllSecIter)
+#endif
       if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) || C00[i1_4] < 0 || C11[i1_4] < 0 ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
       L1FilterChi2           ( stam.backInfo,  x, y, C00, C10, C11, chi2, hitm.v );
+#ifdef DO_NOT_SELECT_TRIPLETS
+      if (isec!=kAllSecIter)
+#endif
       if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
 
       lmDuplets_hits.push_back(imh);
@@ -460,6 +466,10 @@ inline void L1Algo::f30(  // input
         }
 
         fvec Pick_r22 = (TRIPLET_CHI2_CUT*(T2.NDF-3) - T2.chi2);// if make it bigger the found hits will be rejected later because of the chi2 cut.
+#ifdef DO_NOT_SELECT_TRIPLETS
+        if ( isec == kAllSecIter )
+          Pick_r22 = Pick_r2+1;
+#endif
         Pick_r22 = ( (Pick_r2-Pick_r22)[i2_4] > 0 ) ? Pick_r22 : Pick_r2;
         for (unsigned int irh_index = start; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
           const int irh = mrDuplets_hits[irh_index];
@@ -496,8 +506,11 @@ inline void L1Algo::f30(  // input
           fvec chi2 = T2.chi2;
           L1FilterChi2XYC00C10C11( star.frontInfo, x, y, C00, C10, C11, chi2, hitr.u );
           L1FilterChi2           ( star.backInfo,  x, y, C00, C10, C11, chi2, hitr.v );
-          if ( chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
-        
+#ifdef DO_NOT_SELECT_TRIPLETS
+          if (isec!=kAllSecIter)
+#endif
+            if ( chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
+
             // pack triplet
           L1TrackPar &T3 = T_3[n3_V];
 
@@ -812,6 +825,9 @@ inline void L1Algo::f5(  // input
 
       unsigned int offset_m = TripStartIndex[istam];
 
+#ifdef TRACKS_FROM_TRIPLETS
+      if( isec != kAllSecIter )
+#endif
       for (int it = TripStartIndex[istal]; it < TripStopIndex[istal]; it++){
         L1Triplet *trip = &(vTriplets[it]);
         if ( istam != trip->GetMSta() ) continue;
@@ -1970,8 +1986,14 @@ void L1Algo::CATrackFinder()
 #endif
     int min_level = 0; // min level for start triplet. So min track length = min_level+3.
 //    if (isec == kFastPrimJumpIter) min_level = 1;
-    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) min_level = 2; // only the long low momentum tracks
-//    if (isec == -1) min_level = NStations-3 - 3; //only the longest tracks
+    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+      min_level = 2; // only the long low momentum tracks
+#ifdef TRACKS_FROM_TRIPLETS
+    if (isec == kAllSecIter)
+      min_level = 0;
+#endif
+      //    if (isec == -1) min_level = NStations-3 - 3; //only the longest tracks
+
 
       // collect consequtive: the longest tracks, shorter, more shorter and so on
     for (int ilev = NStations-3; ilev >= min_level; ilev--){ // choose length
@@ -1999,10 +2021,13 @@ void L1Algo::CATrackFinder()
               (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
               (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #endif
+
+#ifndef TRACKS_FROM_TRIPLETS
             if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
-            if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either
             if ( (ilev == 0) &&
                  (GetFStation(vSFlag[(*vStsHitsUnused)[first_trip->GetLHit()].f]) != 0) ) continue;  // ghost supression // collect only MAPS tracks-triplets
+#endif
+            if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either
           }
           
           if( GetFUsed( vSFlag[(*vStsHitsUnused)[first_trip->GetLHit()].f] | vSFlagB[(*vStsHitsUnused)[first_trip->GetLHit()].b] ) ) continue;
@@ -2044,6 +2069,7 @@ void L1Algo::CATrackFinder()
           // best_L = best_tr.StsHits.size();
 
 //          if( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+#ifndef TRACKS_FROM_TRIPLETS
             if( fGhostSuppression ){
               if( best_L == 3 ){
                   // if( isec == kAllSecIter ) continue; // too /*short*/ secondary track
@@ -2051,7 +2077,7 @@ void L1Algo::CATrackFinder()
                 if( (isec != kAllSecIter) && (isec != kAllSecJumpIter) && (best_chi2 > 5.0) ) continue;
               }
             }
-
+#endif
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();
           
@@ -2100,7 +2126,11 @@ void L1Algo::CATrackFinder()
           L1StsHit &h = vStsHits[*phIt];
           if ( GetFUsed( vSFlag[h.f] | vSFlagB[h.b] ) ) nused++;
         }
+#ifdef TRACKS_FROM_TRIPLETS
+        if ( isec != kAllSecIter )
+#endif
         if (nused > 0) continue; // don't allow tracks have shared hits. Track will be shorter, leave it for the next iteration
+
         // if ( (isec == kFastPrimIter || isec == kAllPrimIter) && (nused > 2) ||
         //      (isec != kFastPrimIter) && (isec != kAllPrimIter) && (nused > 0) ){/*nUsed[nused+1]++;*/ continue;}
 
@@ -2121,8 +2151,16 @@ void L1Algo::CATrackFinder()
         for (vector<THitI>::iterator phitIt = tr->StsHits.begin();
                                                   phitIt != tr->StsHits.end(); ++phitIt){
           L1StsHit &h = vStsHits[*phitIt];
-          SetFUsed( vSFlag[h.f] );
-          SetFUsed( vSFlagB[h.b] );
+#ifdef TRACKS_FROM_TRIPLETS
+          if ( isec != kAllSecIter )
+#endif
+          {
+            SetFUsed( vSFlag[h.f] );
+            SetFUsed( vSFlagB[h.b] );
+          }
+#ifdef TRACKS_FROM_TRIPLETS
+          if ( isec == kAllSecIter )
+#endif
           vRecoHits.push_back(*phitIt);
         }
 
@@ -2133,6 +2171,9 @@ void L1Algo::CATrackFinder()
         for( int i=0; i<15; i++ ) t.CFirst[i] = t.CLast[i] = 10;
         t.chi2 = 100;
 
+#ifdef TRACKS_FROM_TRIPLETS
+        if ( isec == kAllSecIter )
+#endif
         vTracks.push_back(t);
         ntracks++;
 

@@ -300,22 +300,92 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
  
   // 12 mm gas (Jun10) - intelligent
 
-  Float_t radiator_thickness    =  2.9000 /2.;
+  Float_t radiator_thickness    =  25.000 /2.;  // 250 mm
   Float_t radiator_position     =  - Layer_thickness /2. + radiator_thickness;
-  Float_t gas_thickness         =  1.2000 /2.;
-  Float_t gas_position          =  radiator_position + radiator_thickness + gas_thickness;
-  Float_t padplane_thickness    =   0.0030 /2.;
+
+  Float_t lattice_thickness     =   1.0000;  // 10 mm
+  Float_t lattice_position      =  radiator_position + radiator_thickness + lattice_thickness/2.;
+
+  Float_t gas_thickness         =   1.2000 /2.;  // 12 mm
+  Float_t gas_position          =  lattice_position + lattice_thickness/2. + gas_thickness;
+  Float_t padplane_thickness    =   0.0030 /2.;  // 30 my - in real life 0.036 cm (Optiprint) + 0.0025 copper
   Float_t padplane_position     =  gas_position + gas_thickness + padplane_thickness;
-  Float_t mylar_thickness       =   0.1500 /2.;
+  Float_t mylar_thickness       =   0.1500 /2.;  // Muenster - Bucharest padplane??
   Float_t mylar_position        =  padplane_position + padplane_thickness + mylar_thickness;
   Float_t electronics_thickness =   0.0070 /2.;
   Float_t electronics_position  =  mylar_position + mylar_thickness + electronics_thickness;
-  Float_t frame_thickness       =  radiator_thickness + gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
-  Float_t frame_position        =  frame_thickness - Layer_thickness /2.;
- 
+
+  Float_t frame_thickness       =  gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;
+  Float_t frame_position        =  - Layer_thickness /2. + radiator_thickness*2 + lattice_thickness + frame_thickness;
+
+  // new order of material in v12g (Nov 2012)
+  // 1. pefoam radiator               // known material: 25.0    cm - pefoam20
+  // 2. lattice grid                  // known material:  1.0    cm - G10
+  // 3. kapton foil                   // known material:  0.0025 cm - kapton
+  // 4. gas volume                    // known material:  1.2    cm - TRDgas
+  // 5. copper pads                   // known material:  0.0025 cm - copper
+  // 6. pad plane                     // check material:  0.0360 cm - FR4 = G10 ??
+  // 2.-6. surrounded by frame        // known material:  2.241  cm - G10
+  // 6. backpanel                     // check alice   :  2.316  cm -  composite structure
+  // 6.1 glue layer                   // alice         : 
+  // 6.2 carbon layers	              // alice         : 
+  // 6.3 honeycomb support structure  // alice         : 
+  // 7. front-end electronics     // check alice   :  0.0486 cm  
+
+
+  // from AliTRDgeometry.cxx -- start
+  // material is defined in AliTRD.cxx
+
+  //   // Polypropylene (C3H6) for radiator fibers
+  //   Float_t app[2]    = { 12.011 ,  1.0079 };
+  //   Float_t zpp[2]    = {  6.0   ,  1.0    };
+  //   Float_t wpp[2]    = {  3.0   ,  6.0    };
+  //   Float_t dpp       = 0.068;
+  //   AliMixture(60,"Polypropylene",app,   zpp,   dpp,   -2,wpp   );
+
+  // from media.geo
+  // polypropylene      -2   12.01 1.008 6. 1. 0.074 3  6
+  //                    0  0  20.  .001
+  //                    0
+
+  //   // Araldite, low density epoxy (C18H19O3)
+  //   Float_t aAral[3]  = { 15.9994,  1.0079, 12.011  }; 
+  //   Float_t zAral[3]  = {  8.0   ,  1.0   ,  6.0    }; 
+  //   Float_t wAral[3]  = {  3.0   , 19.0   , 18.0    }; 
+  //   Float_t dAral     = 1.12; // Hardener: 1.15, epoxy: 1.1, mixture: 1/2
+  //   AliMixture(58,"Araldite",     aAral, zAral, dAral, -3,wAral );
+
+  // new to put into media.geo
+  // araldite           -3   15.9994 1.0079 12.011 8.0 1.0 6.0 1.12 3.0 19.0 18.0 
+  //                    0  0  20.  .001
+  //                    0
+
+  //   Material layers inside sensitive area:
+  //     Name    Description                     Mat.      Thick.   Dens.    Radl.    X/X_0
+  //                                                        
+  //     URMYxx  Mylar layers (x2)               Mylar     0.0015   1.39     28.5464  0.005%
+  //     URCBxx  Carbon layer (x2)               Carbon    0.0055   1.75     24.2824  0.023%
+  //     URGLxx  Glue on the carbon layers (x2)  Araldite  0.0065   1.12     37.0664  0.018%
+  //     URRHxx  Rohacell layer (x2)             Rohacell  0.8      0.075    536.005  0.149%
+  //     URFBxx  Fiber mat layer                 PP        3.186    0.068    649.727  0.490%
+  //     
+  //     UJxx    Drift region                    Xe/CO2    3.0      0.00495  1792.37  0.167%
+  //     UKxx    Amplification region            Xe/CO2    0.7      0.00495  1792.37  0.039%
+  //     UWxx    Wire planes (x2)                Copper    0.00011  8.96     1.43503  0.008%
+  //
+  //     UPPDxx  Copper of pad plane             Copper    0.0025   8.96     1.43503  0.174%
+  //     UPPPxx  PCB of pad plane                G10       0.0356   2.0      14.9013  0.239%
+  //     UPGLxx  Glue on pad planes              Araldite  0.0923   1.12     37.0664  0.249%
+  //             + add. glue (ca. 600g)          Araldite  0.0505   1.12     37.0663  0.107%
+  //     UPCBxx  Carbon fiber mats (x2)          Carbon    0.019    1.75     24.2824  0.078%
+  //     UPHCxx  Honeycomb structure             Aramide   2.0299   0.032    1198.84  0.169%
+  //     UPPCxx  PCB of readout board            G10       0.0486   2.0      14.9013  0.326%
+  //     UPRDxx  Copper of readout board         Copper    0.0057   8.96     1.43503  0.404%
+  //     UPELxx  Electronics + cables            Copper    0.0029   8.96     1.43503  0.202%
+  // from AliTRDgeometry.cxx -- end
+
+
   Int_t module_number = (Int_t)Position_Station[0][2];
-
-
   
    TGeoBBox *trd_box = new TGeoBBox("", Detector_size_x/2, Detector_size_y/2, Layer_thickness/2);
    TGeoShape *trd_shape = trd_box;
@@ -325,7 +395,8 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    TGeoVolume* trdmod1_box = new TGeoVolume(name, trd_shape, man->GetMedium("air"));
 
    // Radiator
-   TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, Active_area_y/2, radiator_thickness);
+   //   TGeoBBox *trd_radiator = new TGeoBBox("", Active_area_x/2, Active_area_y/2, radiator_thickness);
+   TGeoBBox *trd_radiator = new TGeoBBox("", Detector_size_x/2, Detector_size_y/2, radiator_thickness);
    TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("pefoam20"));
 //   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("polypropylene"));
    trdmod1_radvol->SetLineColor(kBlue);
@@ -337,6 +408,7 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    TGeoBBox *trd_gas = new TGeoBBox("", Active_area_x/2, Active_area_y/2, gas_thickness);
    TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd%dmod%dgas", station, module_number), trd_gas, man->GetMedium("TRDgas"));
    TGeoTranslation *trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
+   trdmod1_gasvol->SetLineColor(kOrange);
    man->GetVolume(name)->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
 
 
@@ -357,7 +429,8 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    // electronics
    TGeoBBox *trd_el = new TGeoBBox("", Active_area_x/2, Active_area_y/2, electronics_thickness);
    TGeoVolume* trdmod1_elvol = new TGeoVolume(Form("trd%dmod%delectronics", station, module_number), trd_el, man->GetMedium("goldcoatedcopper"));
-   trdmod1_elvol->SetLineColor(kGreen);
+   //   trdmod1_elvol->SetLineColor(kGreen);
+   trdmod1_elvol->SetLineColor(kGray);
    TGeoTranslation *trd_el_trans = new TGeoTranslation("", 0., 0., electronics_position);
    man->GetVolume(name)->AddNode(trdmod1_elvol, 0, trd_el_trans);
 
@@ -390,15 +463,16 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
    Float_t Sprosse_o_width   = 2.0; // 0.2;   // Width of outer lattice frame in cm
    Float_t Sprosse_i_width   = 0.4; // 5.0;   // Width of inner lattice frame in cm
-   Float_t Sprosse_thickness = 1.0;           // Thickness of lattice frames in cm
+   //   Float_t lattice_thickness = 1.0;           // Thickness of lattice frames in cm
+   lattice_thickness = 1.0;           // Thickness of lattice frames in cm
 
 
    // drift window - lattice grid - sprossenfenster
-   TGeoBBox *trd_lattice_ho = new TGeoBBox("Sho", Detector_size_x/2, Sprosse_o_width/2, Sprosse_thickness/2);  // horizontal
-   TGeoBBox *trd_lattice_hi = new TGeoBBox("Shi", Detector_size_x/2, Sprosse_i_width/2, Sprosse_thickness/2);  // horizontal
+   TGeoBBox *trd_lattice_ho = new TGeoBBox("Sho", Detector_size_x/2, Sprosse_o_width/2, lattice_thickness/2);  // horizontal
+   TGeoBBox *trd_lattice_hi = new TGeoBBox("Shi", Detector_size_x/2, Sprosse_i_width/2, lattice_thickness/2);  // horizontal
 
-   TGeoBBox *trd_lattice_vo = new TGeoBBox("Svo", Sprosse_o_width/2, Detector_size_x/2, Sprosse_thickness/2);  // vertical
-   TGeoBBox *trd_lattice_vi = new TGeoBBox("Svi", Sprosse_i_width/2, Detector_size_x/2, Sprosse_thickness/2);  // vertical
+   TGeoBBox *trd_lattice_vo = new TGeoBBox("Svo", Sprosse_o_width/2, Detector_size_x/2, lattice_thickness/2);  // vertical
+   TGeoBBox *trd_lattice_vi = new TGeoBBox("Svi", Sprosse_i_width/2, Detector_size_x/2, lattice_thickness/2);  // vertical
 
    //   TGeoBBox *trd_lattice2 = new TGeoBBox("Fr2", Frame_width/2, Active_area_y/2, frame_thickness);
 
@@ -430,8 +504,8 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
 //   // with additional cross in the center - a la Roland
 //   Float_t Sprosse_1_width   = 0.1; // Width of inner lattice frame in cm
-//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", Active_area_x/5/2, Sprosse_1_width/2, Sprosse_thickness/2);  // horizontal
-//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Sprosse_1_width/2, Active_area_x/5/2, Sprosse_thickness/2);  // vertical
+//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", Active_area_x/5/2, Sprosse_1_width/2, lattice_thickness/2);  // horizontal
+//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Sprosse_1_width/2, Active_area_x/5/2, lattice_thickness/2);  // vertical
 //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
 //   "(Sho:t10 + Shi:t11 + Shi:t12 + Shi:t13 + Shi:t14 + Sho:t15 + Svo:t20 + Svi:t21 + Svi:t22 + Svi:t23 + Svi:t24 + Svo:t25 + Sh1 + Sv1)");
 
@@ -440,7 +514,8 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    TGeoVolume *lattice = new TGeoVolume(Form("trd%dmod%dgrid1", station, module_number), lattice_grid, man->GetMedium("G10"));
    lattice->SetLineColor(kYellow);
 
-   TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., -Layer_thickness /2.-Sprosse_thickness/2);
+   //   TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., -Layer_thickness /2.-lattice_thickness/2);
+   TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
    man->GetVolume(name)->AddNode(lattice, 1, trd_lattice_trans);
 
 // DEDE -----------------------------------------

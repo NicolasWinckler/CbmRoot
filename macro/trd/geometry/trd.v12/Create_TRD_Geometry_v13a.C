@@ -144,9 +144,11 @@ const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
 const  Float_t febbox_position       =  electronics_position + electronics_thickness/2. + febbox_thickness/2.;
 const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEBs
 
-const Float_t frame_thickness        =  radiator_thickness + gas_thickness + padplane_thickness 
-                                        + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
-const Float_t frame_position         =  - LayerThickness /2. + frame_thickness/2.;
+//const Float_t frame_thickness      =  radiator_thickness + gas_thickness + padplane_thickness 
+//                                        + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
+
+const Float_t frame_thickness        =  gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;   // frames cover gas volume and the backpanel
+const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + frame_thickness/2.;
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
@@ -157,7 +159,7 @@ const TString GasVolumeMedium         = "TRDgas";
 const TString PadVolumeMedium         = "goldcoatedcopper";
 const TString MylarVolumeMedium       = "mylar";
 const TString ElectronicsVolumeMedium = "goldcoatedcopper";
-const TString febVolumeMedium         = "pefoam20";  // todo - put correct FEB material here
+const TString febVolumeMedium         = "G10"; // "pefoam20";  // todo - put correct FEB material here
 const TString FrameVolumeMedium       = "G10";
 
 
@@ -273,9 +275,11 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   TGeoVolume* module = new TGeoVolumeAssembly(name);
 
    // Radiator
-   TGeoBBox* trd_radiator = new TGeoBBox("", activeAreaX /2., activeAreaY /2., radiator_thickness /2.);
+   //   TGeoBBox* trd_radiator = new TGeoBBox("", activeAreaX /2., activeAreaY /2., radiator_thickness /2.);
+   TGeoBBox* trd_radiator = new TGeoBBox("", sizeX /2., sizeY /2., radiator_thickness /2.);
    TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd1mod%dradiator", moduleType), trd_radiator, radVolMed);
    trdmod1_radvol->SetLineColor(kBlue);
+   trdmod1_radvol->SetTransparency(60);  // (70);  // set transparency for the TRD
    TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 

@@ -57,23 +57,23 @@ const Int_t layer1o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
 // ### Layer Type 2
 
 // v12x - module types in the inner sector of layer2 - looking upstream
-Int_t layer2i[5][5] = { { 4,  3,  3,  3,  4 },     
-                        { 3,  2,  1,  2,  3 },
-                        { 3,  1,  0,  1,  3 },
-                        { 3,  2,  1,  2,  3 },
-                        { 4,  3,  3,  3,  4 } };
+const Int_t layer2i[5][5] = { { 4,  3,  3,  3,  4 },     
+                              { 3,  2,  1,  2,  3 },
+                              { 3,  1,  0,  1,  3 },
+                              { 3,  2,  1,  2,  3 },
+                              { 4,  3,  3,  3,  4 } };
 // number of modules 1x0, 4x1, 4x2, 12x3, 4x4
 
 // v12x - module types in the outer sector of layer2 - looking upstream
-Int_t layer2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                        { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
-                        { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
-                        { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
-                        { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
-                        { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
-                        { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
-                        { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
-                        { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
+const Int_t layer2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+                              { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
+                              { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
+                              { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                              { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                              { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                              { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
+                              { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
+                              { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
 // number of modules 45x0, 0x5, 12x6, 0x7, 42x8
 // Layer2 =  78;   // v12x
 
@@ -83,25 +83,25 @@ Int_t layer2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
 // ### Layer Type 3
 
 // v12x - module types in the inner sector of layer2 - looking upstream
-Int_t layer3i[5][5] = { { 0,  0,  0,  0,  0 },     
-                        { 0,  0,  0,  0,  0 },
-                        { 0,  0,  0,  0,  0 },
-                        { 0,  0,  0,  0,  0 },
-                        { 0,  0,  0,  0,  0 } };
+const Int_t layer3i[5][5] = { { 0,  0,  0,  0,  0 },     
+                              { 0,  0,  0,  0,  0 },
+                              { 0,  0,  0,  0,  0 },
+                              { 0,  0,  0,  0,  0 },
+                              { 0,  0,  0,  0,  0 } };
 // number of modules 25x0 
 // Only for convinience in the function needed
 
 
 // v12x - module types in the outer sector of layer3 - looking upstream
-Int_t layer3o[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
-                         { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
-                         { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
-                         { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
-                         { 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
-                         { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
-                         { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
-                         { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
-                         { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
+const Int_t layer3o[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
+                               { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+                               { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+                               { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+                               { 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
+                               { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+                               { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+                               { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+                               { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
 // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
 // Layer3 = 98;   // v12x
 
@@ -194,7 +194,8 @@ void Create_TRD_Geometry_v12xxx() {
   }
 
   for (Int_t iLayer = 0; iLayer < NofLayers; iLayer++) {
-    //    if (iLayer > 0) continue;  // hide last layer - remove later on
+    //    if ((iLayer != 0) && (iLayer != 3))  continue;  // first layer only - comment later on
+    //    if (iLayer != 0) continue;  // first layer only - comment later on
     create_detector_layers(iLayer);
   }
   
@@ -388,7 +389,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
         trd_feball_box->AddNode(trd_feb_box, iFeb+1, trd_feb_y_position);  // position FEB in y
 
       }
-      TGeoMatrix* trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);
+      TGeoTranslation* trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);
       gGeoMan->GetVolume(name)->AddNode(trd_feball_box, 1, trd_febbox_trans);
    }
 
@@ -405,17 +406,17 @@ void create_detector_layers(Int_t layerId)
   Int_t layerNrInStation = LayerNrInStation[layerId];
   Int_t layerType = LayerType[layerId] / 10; // this is also a station number
   Int_t isRotated = LayerType[layerId] % 10;
-  TGeoRotation* module_rotation;
+  TGeoRotation* module_rotation = new TGeoRotation();
 
   Int_t stationNr = layerType;
 
-  if ( 1 == isRotated) {
-    module_rotation = new TGeoRotation();
-    module_rotation->RotateZ(90.);
-  } else {
-    module_rotation = new TGeoRotation();
-    module_rotation->RotateZ( 0.);
-  }
+//  if ( isRotated == 1 ) {
+//    module_rotation = new TGeoRotation();
+//    module_rotation->RotateZ(90.);
+//  } else {
+//    module_rotation = new TGeoRotation();
+//    module_rotation->RotateZ( 0.);
+//  }
   
   Int_t innerarray_size1 = LayerArraySize[layerType - 1][0];
   Int_t innerarray_size2 = LayerArraySize[layerType - 1][1];
@@ -450,8 +451,36 @@ void create_detector_layers(Int_t layerId)
            Int_t yPos = DetectorSizeY[0] * y;
            copyNrIn[type - 1]++;
            Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);
+
+           // take care of FEB orientation away from beam
+           module_rotation = new TGeoRotation();
+           if ( isRotated == 0 ) 
+             if ( y <= 0 )             
+             {
+               module_rotation->RotateZ(  0.);
+//             printf("rotation 0 x%2d y%2d\n",x,y);
+             }
+             else
+             {
+               module_rotation->RotateZ(180.);
+//             printf("rotation 2 x%2d y%2d\n",x,y);
+             }
+           else
+             if ( x >= 0 )             
+             {
+               module_rotation->RotateZ( 90.);
+//             printf("rotation 1 x%2d y%2d\n",x,y);
+             }
+             else
+             {
+               module_rotation->RotateZ(270.);
+//             printf("rotation 3 x%2d y%2d\n",x,y);
+             }
+
            TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId], module_rotation);
            gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
+
+           delete module_rotation;
          }
       }
     }
@@ -468,6 +497,32 @@ void create_detector_layers(Int_t layerId)
         Int_t yPos = DetectorSizeY[1] * y;
         copyNrOut[type - 5]++;
         Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);
+
+	// take care of FEB orientation away from beam
+        module_rotation = new TGeoRotation();
+        if ( isRotated == 0 ) 
+          if ( y <= 0 )             
+	  {
+            module_rotation->RotateZ(  0.);
+	    //          printf("rotation 0 x%2d y%2d\n",x,y);
+          }
+          else
+	  {
+            module_rotation->RotateZ(180.);
+	    //          printf("rotation 2 x%2d y%2d\n",x,y);
+          }
+        else
+          if ( x >= 0 )             
+	  {
+            module_rotation->RotateZ( 90.);
+	    //          printf("rotation 1 x%2d y%2d\n",x,y);
+	  }
+          else
+	  {
+            module_rotation->RotateZ(270.);
+	    //          printf("rotation 3 x%2d y%2d\n",x,y);
+	  }
+
         TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId], module_rotation);
         gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
       }

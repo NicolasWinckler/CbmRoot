@@ -400,6 +400,7 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("pefoam20"));
 //   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd%dmod%dradiator", station, module_number), trd_radiator, man->GetMedium("polypropylene"));
    trdmod1_radvol->SetLineColor(kBlue);
+   trdmod1_radvol->SetTransparency(70);
    TGeoTranslation *trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    man->GetVolume(name)->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 

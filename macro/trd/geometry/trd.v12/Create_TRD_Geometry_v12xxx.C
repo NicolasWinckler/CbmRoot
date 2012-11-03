@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+// in root all sizes are diven in cm
+
 // Name of output file with geometry
 const TString FileName = "trd_v12ala.root";
 
@@ -21,30 +23,31 @@ const Int_t LayerType[NofLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };
 const Float_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };
 const Float_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 const Float_t LayerThickness = 49.5; // Thickness of one TRD layer
-const Bool_t IncludeFebs = false; // true if FEBs are included in geometry
+const Bool_t IncludeFebs = true; // true if FEBs are included in geometry
+//const Bool_t IncludeFebs = false; // true if FEBs are included in geometry
 
 const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },
-                                { 5, 5, 9, 11 },
-                                { 5, 5, 9, 11 } };
+                                      { 5, 5, 9, 11 },
+                                      { 5, 5, 9, 11 } };
 // ### Layer Type 1
 // v12x - module types in the inner sector of layer1 - looking upstream
 const Int_t layer1i[5][5] = { { 4,  3,  2,  3,  4 },
-                       { 3,  1,  1,  1,  3 },
-                       { 2,  1,  0,  1,  2 },
-                       { 3,  1,  1,  1,  3 },
-                       { 4,  3,  2,  3,  4 } };
+                              { 3,  1,  1,  1,  3 },
+                              { 2,  1,  0,  1,  2 },
+                              { 3,  1,  1,  1,  3 },
+                              { 4,  3,  2,  3,  4 } };
 // number of modules 1x0, 8x1, 4x2, 8x3, 4x4
 
 // v12x - module types in the outer sector of layer1 - looking upstream
 const Int_t layer1o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                       { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                       { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
-                       { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
-                       { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
-                       { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
-                       { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
-                       { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                       { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
+                              { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+                              { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
+                              { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
+                              { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
+                              { 0,  0,  8,  7,  0,  0,  0,  7,  8,  0,  0 },
+                              { 0,  0,  8,  8,  7,  7,  7,  8,  8,  0,  0 },
+                              { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+                              { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
 // number of modules 73x0, 0x5, 0x6, 12x7, 14x8
 // Layer1 =  24 + 26;   // v12x
 
@@ -55,22 +58,22 @@ const Int_t layer1o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
 
 // v12x - module types in the inner sector of layer2 - looking upstream
 Int_t layer2i[5][5] = { { 4,  3,  3,  3,  4 },     
-                  { 3,  2,  1,  2,  3 },
-                  { 3,  1,  0,  1,  3 },
-                  { 3,  2,  1,  2,  3 },
-                  { 4,  3,  3,  3,  4 } };
+                        { 3,  2,  1,  2,  3 },
+                        { 3,  1,  0,  1,  3 },
+                        { 3,  2,  1,  2,  3 },
+                        { 4,  3,  3,  3,  4 } };
 // number of modules 1x0, 4x1, 4x2, 12x3, 4x4
 
 // v12x - module types in the outer sector of layer2 - looking upstream
 Int_t layer2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-                  { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
-                  { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
-                  { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
-                  { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
-                  { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
-                  { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
-                  { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
-                  { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
+                        { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
+                        { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
+                        { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                        { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                        { 0,  8,  8,  6,  0,  0,  0,  6,  8,  8,  0 },
+                        { 0,  8,  8,  8,  6,  6,  6,  8,  8,  8,  0 },
+                        { 0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  0 },
+                        { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 } };
 // number of modules 45x0, 0x5, 12x6, 0x7, 42x8
 // Layer2 =  78;   // v12x
 
@@ -80,25 +83,25 @@ Int_t layer2o[9][11]= { { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
 // ### Layer Type 3
 
 // v12x - module types in the inner sector of layer2 - looking upstream
-Int_t layer3i[5][5] = { { 0,  0,  0,  0, 0 },     
-                  { 0,  0,  0,  0, 0 },
-                  { 0,  0,  0,  0, 0 },
-                  { 0,  0,  0,  0, 0 },
-                  { 0,  0,  0,  0, 0 } };
+Int_t layer3i[5][5] = { { 0,  0,  0,  0,  0 },     
+                        { 0,  0,  0,  0,  0 },
+                        { 0,  0,  0,  0,  0 },
+                        { 0,  0,  0,  0,  0 },
+                        { 0,  0,  0,  0,  0 } };
 // number of modules 25x0 
 // Only for convinience in the function needed
 
 
 // v12x - module types in the outer sector of layer3 - looking upstream
 Int_t layer3o[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
-                   { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
-                   { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
-                   { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
-                   { 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
-                   { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
-                   { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
-                   { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
-                   { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
+                         { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+                         { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+                         { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+                         { 8,  8,  7,  6,  5,  0,  5,  6,  7,  8,  8 },
+                         { 8,  8,  7,  6,  5,  5,  5,  6,  7,  8,  8 },
+                         { 8,  8,  7,  7,  6,  6,  6,  7,  7,  8,  8 },
+                         { 8,  8,  8,  7,  7,  7,  7,  7,  8,  8,  8 },
+                         { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 } };
 // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
 // Layer3 = 98;   // v12x
 
@@ -107,10 +110,10 @@ Int_t layer3o[9][11] = { { 8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 },
 
 // Parameters defining the layout of the different detector modules
 const Int_t NofModuleTypes = 8;
-const Int_t ModuleType[NofModuleTypes] = { 0, 0, 0, 0, 1, 1, 1, 1 };
+const Int_t ModuleType[NofModuleTypes]    = { 0, 0, 0, 0, 1, 1, 1, 1 };
 const Int_t FebsPerModule[NofModuleTypes] = { 19, 10, 5, 5, 12, 6, 4, 3 }; // mod4 = mod3
 
-const Float_t FrameWidth[2]={ 1.5, 2. };         // Width of detector frames in cm
+const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
 const Float_t DetectorSizeX[2] = { 60., 100.};
 const Float_t DetectorSizeY[2] = { 60., 100.};
 
@@ -128,13 +131,13 @@ const Float_t padplane_position      =  gas_position + gas_thickness/2. + padpla
 const Float_t mylar_thickness        =   0.1500; //  1.5 mm thickness of mylar
 const Float_t mylar_position         =  padplane_position + padplane_thickness/2. + mylar_thickness/2.;
 
-// todo - skip, we have FEBs now
+// todo - skip electronics plane, we have FEBs now
 const Float_t electronics_thickness  =   0.0070; //  70 micron thickness of padplane
 const Float_t electronics_position   =  mylar_position + mylar_thickness/2. + electronics_thickness/2.;
 
 const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
 const  Float_t febbox_position       =  electronics_position + electronics_thickness/2. + febbox_thickness/2.;
-const  Float_t feb_thickness         =   0.5;    //  5 mm thickness of FEBs
+const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEBs
 
 const Float_t frame_thickness        =  radiator_thickness + gas_thickness + padplane_thickness 
                                         + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
@@ -142,15 +145,15 @@ const Float_t frame_position         =  - LayerThickness /2. + frame_thickness/2
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
-const TString KeepingVolumeMedium = "air";
-const TString RadiatorVolumeMedium = "pefoam20";
+const TString KeepingVolumeMedium     = "air";
+const TString RadiatorVolumeMedium    = "pefoam20";
 //const TString RadiatorVolumeMedium = "polypropylene";
-const TString GasVolumeMedium = "TRDgas";
-const TString PadVolumeMedium = "goldcoatedcopper";
-const TString MylarVolumeMedium = "mylar";
+const TString GasVolumeMedium         = "TRDgas";
+const TString PadVolumeMedium         = "goldcoatedcopper";
+const TString MylarVolumeMedium       = "mylar";
 const TString ElectronicsVolumeMedium = "goldcoatedcopper";
-const TString febVolumeMedium = "pefoam20";  // todo - put correct FEB material here
-const TString FrameVolumeMedium = "G10";
+const TString febVolumeMedium         = "pefoam20";  // todo - put correct FEB material here
+const TString FrameVolumeMedium       = "G10";
 
 
 // some global variables
@@ -191,6 +194,7 @@ void Create_TRD_Geometry_v12xxx() {
   }
 
   for (Int_t iLayer = 0; iLayer < NofLayers; iLayer++) {
+    //    if (iLayer > 0) continue;  // hide last layer - remove later on
     create_detector_layers(iLayer);
   }
   
@@ -222,14 +226,14 @@ void create_materials_from_media_file()
   FairGeoMedia* geoMedia = geoFace->getMedia();
   FairGeoBuilder* geoBuild = geoLoad->getGeoBuilder();
 
-  FairGeoMedium* air = geoMedia->getMedium("air");
-  FairGeoMedium* pefoam20  = geoMedia->getMedium("pefoam20");
+  FairGeoMedium* air              = geoMedia->getMedium("air");
+  FairGeoMedium* pefoam20         = geoMedia->getMedium("pefoam20");
 //  FairGeoMedium* polypropylene  = geoMedia->getMedium("polypropylene");
-  FairGeoMedium* trdGas = geoMedia->getMedium("TRDgas");
+  FairGeoMedium* trdGas           = geoMedia->getMedium("TRDgas");
   FairGeoMedium* goldCoatedCopper = geoMedia->getMedium("goldcoatedcopper");
-  FairGeoMedium* mylar = geoMedia->getMedium("mylar");
-  FairGeoMedium* G10  = geoMedia->getMedium("G10");
-  FairGeoMedium* PeFoam20  = geoMedia->getMedium("pefoam20");
+  FairGeoMedium* mylar            = geoMedia->getMedium("mylar");
+  FairGeoMedium* G10              = geoMedia->getMedium("G10");
+  FairGeoMedium* PeFoam20         = geoMedia->getMedium("pefoam20");
 
   geoBuild->createMedium(air);
   geoBuild->createMedium(pefoam20);
@@ -250,14 +254,14 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   Float_t activeAreaX = sizeX - 2 * frameWidth;
   Float_t activeAreaY = sizeY - 2 * frameWidth;
 
-  TGeoMedium* keepVolMed = gGeoMan->GetMedium(KeepingVolumeMedium);
-  TGeoMedium* radVolMed = gGeoMan->GetMedium(RadiatorVolumeMedium);
-  TGeoMedium* gasVolMed = gGeoMan->GetMedium(GasVolumeMedium);
-  TGeoMedium* padVolMed = gGeoMan->GetMedium(PadVolumeMedium);
-  TGeoMedium* mylarVolMed = gGeoMan->GetMedium(MylarVolumeMedium);
+  TGeoMedium* keepVolMed        = gGeoMan->GetMedium(KeepingVolumeMedium);
+  TGeoMedium* radVolMed         = gGeoMan->GetMedium(RadiatorVolumeMedium);
+  TGeoMedium* gasVolMed         = gGeoMan->GetMedium(GasVolumeMedium);
+  TGeoMedium* padVolMed         = gGeoMan->GetMedium(PadVolumeMedium);
+  TGeoMedium* mylarVolMed       = gGeoMan->GetMedium(MylarVolumeMedium);
   TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(ElectronicsVolumeMedium);
-  TGeoMedium* frameVolMed = gGeoMan->GetMedium(FrameVolumeMedium);
-  TGeoMedium* febVolMed = gGeoMan->GetMedium(febVolumeMedium);
+  TGeoMedium* frameVolMed       = gGeoMan->GetMedium(FrameVolumeMedium);
+  TGeoMedium* febVolMed         = gGeoMan->GetMedium(febVolumeMedium);
 
   TString name = Form("trd1mod%d", moduleType);
   TGeoVolume* module = new TGeoVolumeAssembly(name);
@@ -323,41 +327,69 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    trd_frame2_trans = new TGeoTranslation("", -(activeAreaX / 2 + frameWidth / 2), 0., frame_position);
    module->AddNode(trdmod1_frame2vol, 2, trd_frame2_trans);
 
+
+//dede
    if (IncludeFebs) {
       // Create all FEBs and place them in an assembly which will added to the TRD module
-      TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));
-      TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX / 2, feb_thickness/2, febbox_thickness/2);
-      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);
+      TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX / 2, feb_thickness/2, febbox_thickness/2);       // the FEB itself - as a cuboid
+      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);   // the FEB made of a certain medium
+      trdmod1_feb->SetLineColor(kBlue);    // set blue color
+      TGeoVolumeAssembly* trd_feb_box    = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));
+      TGeoVolumeAssembly* trd_feball_box = new TGeoVolumeAssembly(Form("trd1mod%dfeballbox", moduleType));
+
 
       // translations
-      TGeoTranslation *trd_feb_trans;
-      TGeoRotation    *trd_feb_rotation;
-      TGeoCombiTrans  *trd_feb_placement;
+      TGeoTranslation *trd_feb_null;       // no displacement
+      TGeoTranslation *trd_feb_trans1;     // center to corner
+      TGeoRotation    *trd_feb_rotation;   // rotation around x axis
+      TGeoTranslation *trd_feb_trans2;     // back to center
+      TGeoTranslation *trd_feb_y_position; // shift to y position on TRD
+
       Float_t feb_pos;
       Float_t feb_pos_y;
 
-      Float_t feb_rotation_angle = 70.;   // 0.;   // 60.;
-      Float_t yback, zback;
+      Float_t feb_rotation_angle = 65.; // 45.; // 0.; // 70.;   // 0.;   // 60.;  // around x-axis, should be < 90 degrees  
 
-      trd_feb_rotation = new TGeoRotation();
+      //      Float_t yback, zback;
+      //      TGeoCombiTrans  *trd_feb_placement;
+//      // fix Z back offset 0.3 at some point
+//      yback = -    sin(feb_rotation_angle/180*3.141)  * febbox_thickness / 2.;
+//      zback = - (1-cos(feb_rotation_angle/180*3.141)) * febbox_thickness / 2. + 0.3;
+//        trd_feb_placement = new TGeoCombiTrans(0, feb_pos_y + yback, zback, trd_feb_rotation);
+//        trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_placement);
+
+      trd_feb_null       = new TGeoTranslation("", 0., 0., 0.);  // empty operation
+      trd_feb_trans1     = new TGeoTranslation("", 0.,-feb_thickness/2,-febbox_thickness/2);  // move bottom right corner to center
+      trd_feb_trans2     = new TGeoTranslation("", 0., feb_thickness/2, febbox_thickness/2);  // move bottom right corner back
+      trd_feb_rotation   = new TGeoRotation();
       trd_feb_rotation->RotateX(feb_rotation_angle);
 
-      // fix Z back offset 0.3 at some point
-      yback = -    sin(feb_rotation_angle/180*3.141)  * febbox_thickness / 2.;
-      zback = - (1-cos(feb_rotation_angle/180*3.141)) * febbox_thickness / 2. + 0.3;
+      TGeoHMatrix *trd_feb_pos = new TGeoHMatrix("");
+
+//        (*trd_feb_pos) = (*trd_feb_null);  // OK
+//        (*trd_feb_pos) = (*trd_feb_y_position);  // OK
+//        (*trd_feb_pos) = (*trd_feb_trans1);  // OK
+//        (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_y_position);  // OK
+//        (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_trans2);  // OK
+//        (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_rotation);  // OK
+      (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2);  // OK
+//        (*trd_feb_pos) =  (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2) * (*trd_feb_y_position);  // not OK
+ 
+      trd_feb_box->AddNode(trdmod1_feb, 1, trd_feb_pos);
 
       Int_t nofFebs = FebsPerModule[ moduleType - 1 ];
       for (Int_t iFeb = 0; iFeb < nofFebs; iFeb++) {
         feb_pos   = (2. * iFeb + 1) / (2 * nofFebs) - 0.5;
         feb_pos_y = feb_pos * activeAreaY;
 
-        trdmod1_feb->SetLineColor(kBlue);    // set blue
+        // define y-positioning matrix
+        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0);    // touching the backpanel with the corner
+//        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.1);  // with additional 1 m offset in z direction
+        trd_feball_box->AddNode(trd_feb_box, iFeb+1, trd_feb_y_position);  // position FEB in y
 
-        trd_feb_placement = new TGeoCombiTrans(0, feb_pos_y + yback, zback, trd_feb_rotation);
-        trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_placement);
       }
       TGeoMatrix* trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);
-      gGeoMan->GetVolume(name)->AddNode(trd_feb_box, 1, trd_febbox_trans);
+      gGeoMan->GetVolume(name)->AddNode(trd_feball_box, 1, trd_febbox_trans);
    }
 
    return module;

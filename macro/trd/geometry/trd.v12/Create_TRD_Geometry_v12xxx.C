@@ -480,7 +480,6 @@ void create_detector_layers(Int_t layerId)
            TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId], module_rotation);
            gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
 
-           delete module_rotation;
          }
       }
     }

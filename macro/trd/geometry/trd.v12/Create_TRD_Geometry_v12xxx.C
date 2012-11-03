@@ -12,9 +12,10 @@
 #include <iostream>
 
 // in root all sizes are diven in cm
+// febs are made of pefoam20 - which is not their final density (!!)
 
 // Name of output file with geometry
-const TString FileName = "trd_v12ala.root";
+const TString FileName = "trd_v12x.root";
 
 // Parameters defining the layout of the complete detector build out of different
 // detector layers.
@@ -329,68 +330,71 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    module->AddNode(trdmod1_frame2vol, 2, trd_frame2_trans);
 
 
-//dede
+   // FEBs
    if (IncludeFebs) {
-      // Create all FEBs and place them in an assembly which will added to the TRD module
+      // Create all FEBs and place them in an assembly which will be added to the TRD module
       TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX / 2, feb_thickness/2, febbox_thickness/2);       // the FEB itself - as a cuboid
       TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);   // the FEB made of a certain medium
       trdmod1_feb->SetLineColor(kBlue);    // set blue color
-      TGeoVolumeAssembly* trd_feb_box    = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));
-      TGeoVolumeAssembly* trd_feball_box = new TGeoVolumeAssembly(Form("trd1mod%dfeballbox", moduleType));
+      TGeoVolumeAssembly* trd_feb_inclined = new TGeoVolumeAssembly(Form("trd1mod%dfebincl", moduleType)); // volume for inclined FEBs, then shifted along y
+      TGeoVolumeAssembly* trd_feb_box      = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));  // the mother volume of all FEBs
 
+      Float_t feb_rotation_angle = 45.; // 65.; // 45.; // 0.; // 70.;   // rotation around x-axis, should be < 90 degrees  
 
-      // translations
-      TGeoTranslation *trd_feb_null;       // no displacement
+      // translations / rotations
+//      TGeoTranslation *trd_feb_null;       // no displacement
       TGeoTranslation *trd_feb_trans1;     // center to corner
       TGeoRotation    *trd_feb_rotation;   // rotation around x axis
-      TGeoTranslation *trd_feb_trans2;     // back to center
+      TGeoTranslation *trd_feb_trans2;     // corner back
       TGeoTranslation *trd_feb_y_position; // shift to y position on TRD
 
       Float_t feb_pos;
       Float_t feb_pos_y;
 
-      Float_t feb_rotation_angle = 65.; // 45.; // 0.; // 70.;   // 0.;   // 60.;  // around x-axis, should be < 90 degrees  
+// replaced by matrix operation (see below)
+//  //      Float_t yback, zback;
+//  //      TGeoCombiTrans  *trd_feb_placement;
+//  //      // fix Z back offset 0.3 at some point
+//  //      yback = -    sin(feb_rotation_angle/180*3.141)  * febbox_thickness / 2.;
+//  //      zback = - (1-cos(feb_rotation_angle/180*3.141)) * febbox_thickness / 2. + 0.3;
+//  //      trd_feb_placement = new TGeoCombiTrans(0, feb_pos_y + yback, zback, trd_feb_rotation);
+//  //      trd_feb_inclined->AddNode(trdmod1_feb, iFeb+1, trd_feb_placement);
 
-      //      Float_t yback, zback;
-      //      TGeoCombiTrans  *trd_feb_placement;
-//      // fix Z back offset 0.3 at some point
-//      yback = -    sin(feb_rotation_angle/180*3.141)  * febbox_thickness / 2.;
-//      zback = - (1-cos(feb_rotation_angle/180*3.141)) * febbox_thickness / 2. + 0.3;
-//        trd_feb_placement = new TGeoCombiTrans(0, feb_pos_y + yback, zback, trd_feb_rotation);
-//        trd_feb_box->AddNode(trdmod1_feb, iFeb+1, trd_feb_placement);
-
-      trd_feb_null       = new TGeoTranslation("", 0., 0., 0.);  // empty operation
+//      trd_feb_null       = new TGeoTranslation("", 0., 0., 0.);  // empty operation
       trd_feb_trans1     = new TGeoTranslation("", 0.,-feb_thickness/2,-febbox_thickness/2);  // move bottom right corner to center
       trd_feb_trans2     = new TGeoTranslation("", 0., feb_thickness/2, febbox_thickness/2);  // move bottom right corner back
       trd_feb_rotation   = new TGeoRotation();
       trd_feb_rotation->RotateX(feb_rotation_angle);
 
-      TGeoHMatrix *trd_feb_pos = new TGeoHMatrix("");
+      TGeoHMatrix *trd_feb_incline = new TGeoHMatrix("");
 
-//        (*trd_feb_pos) = (*trd_feb_null);  // OK
-//        (*trd_feb_pos) = (*trd_feb_y_position);  // OK
-//        (*trd_feb_pos) = (*trd_feb_trans1);  // OK
-//        (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_y_position);  // OK
-//        (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_trans2);  // OK
-//        (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_rotation);  // OK
-      (*trd_feb_pos) = (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2);  // OK
-//        (*trd_feb_pos) =  (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2) * (*trd_feb_y_position);  // not OK
- 
-      trd_feb_box->AddNode(trdmod1_feb, 1, trd_feb_pos);
+//        (*trd_feb_incline) = (*trd_feb_null);        // OK
+//        (*trd_feb_incline) = (*trd_feb_y_position);  // OK
+//        (*trd_feb_incline) = (*trd_feb_trans1);      // OK
+//        (*trd_feb_incline) = (*trd_feb_trans1) * (*trd_feb_y_position);  // OK
+//        (*trd_feb_incline) = (*trd_feb_trans1) * (*trd_feb_trans2);      // OK
+//        (*trd_feb_incline) = (*trd_feb_trans1) * (*trd_feb_rotation);    // OK
+//        (*trd_feb_incline) =  (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2) * (*trd_feb_y_position);  // not OK 
+          // trd_feb_y_position is displaced in rotated coordinate system
+
+      // matrix operation to rotate FEB PCB around its corner on the backanel 
+      (*trd_feb_incline) = (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2);  // OK
+      trd_feb_inclined->AddNode(trdmod1_feb, 1, trd_feb_incline);
 
       Int_t nofFebs = FebsPerModule[ moduleType - 1 ];
       for (Int_t iFeb = 0; iFeb < nofFebs; iFeb++) {
-        feb_pos   = (2. * iFeb + 1) / (2 * nofFebs) - 0.5;
+	//        feb_pos   = (2. * iFeb + 1) / (2 * nofFebs) - 0.5;   // equal spacing o f FEBs on the backpanel
+        feb_pos   = (iFeb + 0.5) / nofFebs - 0.5;   // equal spacing o f FEBs on the backpanel
         feb_pos_y = feb_pos * activeAreaY;
 
-        // define y-positioning matrix
-        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0);    // touching the backpanel with the corner
-//        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.1);  // with additional 1 m offset in z direction
-        trd_feball_box->AddNode(trd_feb_box, iFeb+1, trd_feb_y_position);  // position FEB in y
+        // shift inclined FEB in y to its final position
+//      trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.1);  // with additional 1 mm offset in z direction
+        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.0);  // touching the backpanel with the corner
+        trd_feb_box->AddNode(trd_feb_inclined, iFeb+1, trd_feb_y_position);  // position FEB in y
 
       }
       TGeoTranslation* trd_febbox_trans = new TGeoTranslation("", 0., 0., febbox_position);
-      gGeoMan->GetVolume(name)->AddNode(trd_feball_box, 1, trd_febbox_trans);
+      gGeoMan->GetVolume(name)->AddNode(trd_feb_box, 1, trd_febbox_trans);  // put febbox at correct z position wrt to the module
    }
 
    return module;
@@ -405,12 +409,13 @@ void create_detector_layers(Int_t layerId)
 {
   Int_t module_id = 0;
   Int_t layerNrInStation = LayerNrInStation[layerId];
-  Int_t layerType = LayerType[layerId] / 10; // this is also a station number
-  Int_t isRotated = LayerType[layerId] % 10;
+  Int_t layerType = LayerType[layerId] / 10;  // this is also a station number
+  Int_t isRotated = LayerType[layerId] % 10;  // is 1 for layers 2,4, ...
   TGeoRotation* module_rotation = new TGeoRotation();
 
   Int_t stationNr = layerType;
 
+// rotation is now done in the for loop for each module individually
 //  if ( isRotated == 1 ) {
 //    module_rotation = new TGeoRotation();
 //    module_rotation->RotateZ(90.);
@@ -455,7 +460,7 @@ void create_detector_layers(Int_t layerId)
           Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);
 
           // take care of FEB orientation away from beam
-          module_rotation = new TGeoRotation();
+          module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
    	     module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
           else  // layer 2,4 ...
@@ -481,8 +486,8 @@ void create_detector_layers(Int_t layerId)
           copyNrOut[type - 5]++;
           Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);
   
-          // take care of FEB orientation away from beam
-          module_rotation = new TGeoRotation();
+          // take care of FEB orientation - away from beam
+          module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
           module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
           else  // layer 2,4 ...

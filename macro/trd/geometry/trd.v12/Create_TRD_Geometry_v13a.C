@@ -293,55 +293,122 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 
-   if (type==0)
+   // Lattice grd
+   if (type==0)  // inner modules
    {
-   printf("lattice type %d\n", type);
-   // drift window - lattice grid - sprossenfenster
-   TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
-   TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+     printf("lattice type %d\n", type);
+     // drift window - lattice grid - sprossenfenster
+     TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
+     TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+  
+     TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+     TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+  
+     TGeoTranslation *t010 = new TGeoTranslation("t010", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
+     t010->RegisterYourself();
+     TGeoTranslation *t011 = new TGeoTranslation("t011", 0.,  (0.60*activeAreaY/2.)                         , 0);
+     t011->RegisterYourself();
+     TGeoTranslation *t012 = new TGeoTranslation("t012", 0.,  (0.20*activeAreaY/2.)                         , 0);
+     t012->RegisterYourself();
+     TGeoTranslation *t013 = new TGeoTranslation("t013", 0., -(0.20*activeAreaY/2.)                         , 0);
+     t013->RegisterYourself();
+     TGeoTranslation *t014 = new TGeoTranslation("t014", 0., -(0.60*activeAreaY/2.)                         , 0);
+     t014->RegisterYourself();
+     TGeoTranslation *t015 = new TGeoTranslation("t015", 0., -(1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
+     t015->RegisterYourself();
+  
+     TGeoTranslation *t020 = new TGeoTranslation("t020",  (1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
+     t020->RegisterYourself();
+     TGeoTranslation *t021 = new TGeoTranslation("t021",  (0.60*activeAreaX/2.)                         , 0., 0);
+     t021->RegisterYourself();
+     TGeoTranslation *t022 = new TGeoTranslation("t022",  (0.20*activeAreaX/2.)                         , 0., 0);
+     t022->RegisterYourself();
+     TGeoTranslation *t023 = new TGeoTranslation("t023", -(0.20*activeAreaX/2.)                         , 0., 0);
+     t023->RegisterYourself();
+     TGeoTranslation *t024 = new TGeoTranslation("t024", -(0.60*activeAreaX/2.)                         , 0., 0);
+     t024->RegisterYourself();
+     TGeoTranslation *t025 = new TGeoTranslation("t025", -(1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
+     t025->RegisterYourself();
+  
+  //   // with additional cross in the center - a la Roland
+  //   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
+  //   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", activeAreaX/5/2., Lattice_1_width/2., lattice_thickness/2.);  // horizontal
+  //   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
+  //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
+  //   "(Sho:t010 + Shi:t011 + Shi:t012 + Shi:t013 + Shi:t014 + Sho:t015 + Svo:t020 + Svi:t021 + Svi:t022 + Svi:t023 + Svi:t024 + Svo:t025 + Sh1 + Sv1)");
+  
+     TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
+     "(S0ho:t010 + S0hi:t011 + S0hi:t012 + S0hi:t013 + S0hi:t014 + S0ho:t015 + \
+       S0vo:t020 + S0vi:t021 + S0vi:t022 + S0vi:t023 + S0vi:t024 + S0vo:t025)");
+     TGeoVolume *trdmod0_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
+     trdmod0_lattice->SetLineColor(kYellow);
+     TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
+     module->AddNode(trdmod0_lattice, 0, trd_lattice_trans);
+   }
 
-   TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
-   TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+   else if (type==1)  // outer modules
 
-   TGeoTranslation *t010 = new TGeoTranslation("t010", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
-   t010->RegisterYourself();
-   TGeoTranslation *t011 = new TGeoTranslation("t011", 0.,  (0.60*activeAreaY/2.)                        , 0);
-   t011->RegisterYourself();
-   TGeoTranslation *t012 = new TGeoTranslation("t012", 0.,  (0.20*activeAreaY/2.)                        , 0);
-   t012->RegisterYourself();
-   TGeoTranslation *t013 = new TGeoTranslation("t013", 0., -(0.20*activeAreaY/2.)                        , 0);
-   t013->RegisterYourself();
-   TGeoTranslation *t014 = new TGeoTranslation("t014", 0., -(0.60*activeAreaY/2.)                        , 0);
-   t014->RegisterYourself();
-   TGeoTranslation *t015 = new TGeoTranslation("t015", 0., -(1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
-   t015->RegisterYourself();
-
-   TGeoTranslation *t020 = new TGeoTranslation("t020",  (1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
-   t020->RegisterYourself();
-   TGeoTranslation *t021 = new TGeoTranslation("t021",  (0.60*activeAreaX/2.)                        , 0., 0);
-   t021->RegisterYourself();
-   TGeoTranslation *t022 = new TGeoTranslation("t022",  (0.20*activeAreaX/2.)                        , 0., 0);
-   t022->RegisterYourself();
-   TGeoTranslation *t023 = new TGeoTranslation("t023", -(0.20*activeAreaX/2.)                        , 0., 0);
-   t023->RegisterYourself();
-   TGeoTranslation *t024 = new TGeoTranslation("t024", -(0.60*activeAreaX/2.)                        , 0., 0);
-   t024->RegisterYourself();
-   TGeoTranslation *t025 = new TGeoTranslation("t025", -(1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
-   t025->RegisterYourself();
-
-//   // with additional cross in the center - a la Roland
-//   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
-//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", activeAreaX/5/2., Lattice_1_width/2., lattice_thickness/2.);  // horizontal
-//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
-//   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
-//   "(Sho:t010 + Shi:t011 + Shi:t012 + Shi:t013 + Shi:t014 + Sho:t015 + Svo:t020 + Svi:t021 + Svi:t022 + Svi:t023 + Svi:t024 + Svo:t025 + Sh1 + Sv1)");
-
-   TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
-   "(S0ho:t010 + S0hi:t011 + S0hi:t012 + S0hi:t013 + S0hi:t014 + S0ho:t015 + S0vo:t020 + S0vi:t021 + S0vi:t022 + S0vi:t023 + S0vi:t024 + S0vo:t025)");
-   TGeoVolume *trdmod0_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
-   trdmod0_lattice->SetLineColor(kYellow);
-   TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
-   module->AddNode(trdmod0_lattice, 0, trd_lattice_trans);
+   {
+     printf("lattice type %d\n", type);
+     // drift window - lattice grid - sprossenfenster
+     TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("S1ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
+     TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+  
+     TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("S1vo", lattice_o_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+     TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("S1vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+  
+     TGeoTranslation *t110 = new TGeoTranslation("t110", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
+     t110->RegisterYourself();
+     TGeoTranslation *t111 = new TGeoTranslation("t111", 0.,  (0.75*activeAreaY/2.)                         , 0);
+     t111->RegisterYourself();
+     TGeoTranslation *t112 = new TGeoTranslation("t112", 0.,  (0.50*activeAreaY/2.)                         , 0);
+     t112->RegisterYourself();
+     TGeoTranslation *t113 = new TGeoTranslation("t113", 0.,  (0.25*activeAreaY/2.)                         , 0);
+     t113->RegisterYourself();
+     TGeoTranslation *t114 = new TGeoTranslation("t114", 0.,  (0.00*activeAreaY/2.)                         , 0);
+     t114->RegisterYourself();
+     TGeoTranslation *t115 = new TGeoTranslation("t115", 0., -(0.25*activeAreaY/2.)                         , 0);
+     t115->RegisterYourself();
+     TGeoTranslation *t116 = new TGeoTranslation("t116", 0., -(0.50*activeAreaY/2.)                         , 0);
+     t116->RegisterYourself();
+     TGeoTranslation *t117 = new TGeoTranslation("t117", 0., -(0.75*activeAreaY/2.)                         , 0);
+     t117->RegisterYourself();
+     TGeoTranslation *t118 = new TGeoTranslation("t118", 0., -(1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
+     t118->RegisterYourself();
+  
+     TGeoTranslation *t120 = new TGeoTranslation("t120",  (1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
+     t120->RegisterYourself();
+     TGeoTranslation *t121 = new TGeoTranslation("t121",  (0.75*activeAreaX/2.)                         , 0., 0);
+     t121->RegisterYourself();
+     TGeoTranslation *t122 = new TGeoTranslation("t122",  (0.50*activeAreaX/2.)                         , 0., 0);
+     t122->RegisterYourself();
+     TGeoTranslation *t123 = new TGeoTranslation("t123",  (0.25*activeAreaX/2.)                         , 0., 0);
+     t123->RegisterYourself();
+     TGeoTranslation *t124 = new TGeoTranslation("t124",  (0.00*activeAreaX/2.)                         , 0., 0);
+     t124->RegisterYourself();
+     TGeoTranslation *t125 = new TGeoTranslation("t125", -(0.25*activeAreaX/2.)                         , 0., 0);
+     t125->RegisterYourself();
+     TGeoTranslation *t126 = new TGeoTranslation("t126", -(0.50*activeAreaX/2.)                         , 0., 0);
+     t126->RegisterYourself();
+     TGeoTranslation *t127 = new TGeoTranslation("t127", -(0.75*activeAreaX/2.)                         , 0., 0);
+     t127->RegisterYourself();
+     TGeoTranslation *t128 = new TGeoTranslation("t128", -(1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
+     t128->RegisterYourself();
+  
+  //   // with additional cross in the center - a la Roland
+  //   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
+  //   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", activeAreaX/5/2., Lattice_1_width/2., lattice_thickness/2.);  // horizontal
+  //   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
+  //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
+  //   "(Sho:t110 + Shi:t111 + Shi:t112 + Shi:t113 + Shi:t114 + Sho:t115 + Svo:t120 + Svi:t121 + Svi:t122 + Svi:t123 + Svi:t124 + Svo:t125 + Sh1 + Sv1)");
+  
+     TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid",
+     "(S1ho:t110 + S1hi:t111 + S1hi:t112 + S1hi:t113 + S1hi:t114 + S1hi:t115 + S1hi:t116 + S1hi:t117 + S1ho:t118 + \
+       S1vo:t120 + S1vi:t121 + S1vi:t122 + S1vi:t123 + S1vi:t124 + S1vi:t125 + S1vi:t126 + S1vi:t127 + S1vo:t128)");
+     TGeoVolume *trdmod1_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
+     trdmod1_lattice->SetLineColor(kYellow);
+     TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
+     module->AddNode(trdmod1_lattice, 0, trd_lattice_trans);
    }
 
    // Gas

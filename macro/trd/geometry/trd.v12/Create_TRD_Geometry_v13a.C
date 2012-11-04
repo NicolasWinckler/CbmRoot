@@ -121,12 +121,20 @@ const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in 
 const Float_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
 const Float_t DetectorSizeY[2] = { 60., 100.};
 
+// Lattice
+const Float_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice frame in cm
+const Float_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice frame in cm
+// Thickness (in z) of lattice frames in cm - see below
+
 // z - geometry of TRD modules
 const Float_t radiator_thickness     =  36.0;    //  36 cm thickness of radiator
 const Float_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
+const Float_t lattice_thickness      =   1.0;    // 10 mm
+const Float_t lattice_position       =  radiator_position + radiator_thickness/2. + lattice_thickness/2.;
+
 const Float_t gas_thickness          =   1.2;    //  12 mm thickness of gas
-const Float_t gas_position           =  radiator_position + radiator_thickness/2. + gas_thickness/2.;
+const Float_t gas_position           =  lattice_position + lattice_thickness/2. + gas_thickness/2.;
 
 // todo - put realistic thickness of padplane
 const Float_t padplane_thickness     =   0.0030; //  30 micron thickness of padplane
@@ -148,13 +156,14 @@ const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEB
 //                                        + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
 
 const Float_t frame_thickness        =  gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;   // frames cover gas volume and the backpanel
-const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + frame_thickness/2.;
+const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + frame_thickness/2.;
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
 const TString KeepingVolumeMedium     = "air";
 const TString RadiatorVolumeMedium    = "pefoam20";
 //const TString RadiatorVolumeMedium = "polypropylene";
+const TString LatticeVolumeMedium     = "G10";
 const TString GasVolumeMedium         = "TRDgas";
 const TString PadVolumeMedium         = "goldcoatedcopper";
 const TString MylarVolumeMedium       = "mylar";
@@ -264,6 +273,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
   TGeoMedium* keepVolMed        = gGeoMan->GetMedium(KeepingVolumeMedium);
   TGeoMedium* radVolMed         = gGeoMan->GetMedium(RadiatorVolumeMedium);
+  TGeoMedium* latticeVolMed     = gGeoMan->GetMedium(LatticeVolumeMedium);
   TGeoMedium* gasVolMed         = gGeoMan->GetMedium(GasVolumeMedium);
   TGeoMedium* padVolMed         = gGeoMan->GetMedium(PadVolumeMedium);
   TGeoMedium* mylarVolMed       = gGeoMan->GetMedium(MylarVolumeMedium);
@@ -283,11 +293,62 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 
+   if (type==0)
+   {
+   printf("lattice type %d\n", type);
+   // drift window - lattice grid - sprossenfenster
+   TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
+   TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+
+   TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+   TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+
+   TGeoTranslation *t010 = new TGeoTranslation("t010", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
+   t010->RegisterYourself();
+   TGeoTranslation *t011 = new TGeoTranslation("t011", 0.,  (0.60*activeAreaY/2.)                        , 0);
+   t011->RegisterYourself();
+   TGeoTranslation *t012 = new TGeoTranslation("t012", 0.,  (0.20*activeAreaY/2.)                        , 0);
+   t012->RegisterYourself();
+   TGeoTranslation *t013 = new TGeoTranslation("t013", 0., -(0.20*activeAreaY/2.)                        , 0);
+   t013->RegisterYourself();
+   TGeoTranslation *t014 = new TGeoTranslation("t014", 0., -(0.60*activeAreaY/2.)                        , 0);
+   t014->RegisterYourself();
+   TGeoTranslation *t015 = new TGeoTranslation("t015", 0., -(1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
+   t015->RegisterYourself();
+
+   TGeoTranslation *t020 = new TGeoTranslation("t020",  (1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
+   t020->RegisterYourself();
+   TGeoTranslation *t021 = new TGeoTranslation("t021",  (0.60*activeAreaX/2.)                        , 0., 0);
+   t021->RegisterYourself();
+   TGeoTranslation *t022 = new TGeoTranslation("t022",  (0.20*activeAreaX/2.)                        , 0., 0);
+   t022->RegisterYourself();
+   TGeoTranslation *t023 = new TGeoTranslation("t023", -(0.20*activeAreaX/2.)                        , 0., 0);
+   t023->RegisterYourself();
+   TGeoTranslation *t024 = new TGeoTranslation("t024", -(0.60*activeAreaX/2.)                        , 0., 0);
+   t024->RegisterYourself();
+   TGeoTranslation *t025 = new TGeoTranslation("t025", -(1.00*activeAreaX/2.+lattice_o_width[type]/2.), 0., 0);
+   t025->RegisterYourself();
+
+//   // with additional cross in the center - a la Roland
+//   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
+//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", activeAreaX/5/2., Lattice_1_width/2., lattice_thickness/2.);  // horizontal
+//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
+//   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
+//   "(Sho:t010 + Shi:t011 + Shi:t012 + Shi:t013 + Shi:t014 + Sho:t015 + Svo:t020 + Svi:t021 + Svi:t022 + Svi:t023 + Svi:t024 + Svo:t025 + Sh1 + Sv1)");
+
+   TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
+   "(S0ho:t010 + S0hi:t011 + S0hi:t012 + S0hi:t013 + S0hi:t014 + S0ho:t015 + S0vo:t020 + S0vi:t021 + S0vi:t022 + S0vi:t023 + S0vi:t024 + S0vo:t025)");
+   TGeoVolume *trdmod0_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
+   trdmod0_lattice->SetLineColor(kYellow);
+   TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
+   module->AddNode(trdmod0_lattice, 0, trd_lattice_trans);
+   }
 
    // Gas
    TGeoBBox* trd_gas = new TGeoBBox("", activeAreaX /2., activeAreaY /2., gas_thickness /2.);
    TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd1mod%dgas", moduleType), trd_gas, gasVolMed);
-   trdmod1_gasvol->SetLineColor(kYellow);
+   trdmod1_gasvol->SetLineColor(kOrange);
+   //   trdmod1_gasvol->SetLineColor(kYellow);
    TGeoTranslation* trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    module->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
 

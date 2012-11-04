@@ -462,22 +462,22 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
 
 // DEDE -----------------------------------------
 
-   Float_t Sprosse_o_width   = 2.0; // 0.2;   // Width of outer lattice frame in cm
-   Float_t Sprosse_i_width   = 0.4; // 5.0;   // Width of inner lattice frame in cm
+   Float_t Lattice_o_width   = 2.0; // 0.2;   // Width of outer lattice frame in cm
+   Float_t Lattice_i_width   = 0.4; // 5.0;   // Width of inner lattice frame in cm
    //   Float_t lattice_thickness = 1.0;           // Thickness of lattice frames in cm
-   lattice_thickness = 1.0;           // Thickness of lattice frames in cm
+   //   lattice_thickness = 1.0;           // Thickness of lattice frames in cm
 
 
    // drift window - lattice grid - sprossenfenster
-   TGeoBBox *trd_lattice_ho = new TGeoBBox("Sho", Detector_size_x/2, Sprosse_o_width/2, lattice_thickness/2);  // horizontal
-   TGeoBBox *trd_lattice_hi = new TGeoBBox("Shi", Detector_size_x/2, Sprosse_i_width/2, lattice_thickness/2);  // horizontal
+   TGeoBBox *trd_lattice_ho = new TGeoBBox("Sho", Detector_size_x/2, Lattice_o_width/2, lattice_thickness/2);  // horizontal
+   TGeoBBox *trd_lattice_hi = new TGeoBBox("Shi", Detector_size_x/2, Lattice_i_width/2, lattice_thickness/2);  // horizontal
 
-   TGeoBBox *trd_lattice_vo = new TGeoBBox("Svo", Sprosse_o_width/2, Detector_size_x/2, lattice_thickness/2);  // vertical
-   TGeoBBox *trd_lattice_vi = new TGeoBBox("Svi", Sprosse_i_width/2, Detector_size_x/2, lattice_thickness/2);  // vertical
+   TGeoBBox *trd_lattice_vo = new TGeoBBox("Svo", Lattice_o_width/2, Detector_size_x/2, lattice_thickness/2);  // vertical
+   TGeoBBox *trd_lattice_vi = new TGeoBBox("Svi", Lattice_i_width/2, Detector_size_x/2, lattice_thickness/2);  // vertical
 
    //   TGeoBBox *trd_lattice2 = new TGeoBBox("Fr2", Frame_width/2, Active_area_y/2, frame_thickness);
 
-   TGeoTranslation *t10 = new TGeoTranslation("t10", 0.,  (1.00*Active_area_y/2+Sprosse_o_width/2), 0);
+   TGeoTranslation *t10 = new TGeoTranslation("t10", 0.,  (1.00*Active_area_y/2+Lattice_o_width/2), 0);
    t10->RegisterYourself();
    TGeoTranslation *t11 = new TGeoTranslation("t11", 0.,  (0.60*Active_area_y/2)                  , 0);
    t11->RegisterYourself();
@@ -487,10 +487,10 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    t13->RegisterYourself();
    TGeoTranslation *t14 = new TGeoTranslation("t14", 0., -(0.60*Active_area_y/2)                  , 0);
    t14->RegisterYourself();
-   TGeoTranslation *t15 = new TGeoTranslation("t15", 0., -(1.00*Active_area_y/2+Sprosse_o_width/2), 0);
+   TGeoTranslation *t15 = new TGeoTranslation("t15", 0., -(1.00*Active_area_y/2+Lattice_o_width/2), 0);
    t15->RegisterYourself();
 
-   TGeoTranslation *t20 = new TGeoTranslation("t20",  (1.00*Active_area_x/2+Sprosse_o_width/2), 0., 0);
+   TGeoTranslation *t20 = new TGeoTranslation("t20",  (1.00*Active_area_x/2+Lattice_o_width/2), 0., 0);
    t20->RegisterYourself();
    TGeoTranslation *t21 = new TGeoTranslation("t21",  (0.60*Active_area_x/2)                  , 0., 0);
    t21->RegisterYourself();
@@ -500,13 +500,13 @@ void create_trd_body(Int_t station, Int_t layer, Float_t Frame_width,
    t23->RegisterYourself();
    TGeoTranslation *t24 = new TGeoTranslation("t24", -(0.60*Active_area_x/2)                  , 0., 0);
    t24->RegisterYourself();
-   TGeoTranslation *t25 = new TGeoTranslation("t25", -(1.00*Active_area_x/2+Sprosse_o_width/2), 0., 0);
+   TGeoTranslation *t25 = new TGeoTranslation("t25", -(1.00*Active_area_x/2+Lattice_o_width/2), 0., 0);
    t25->RegisterYourself();
 
 //   // with additional cross in the center - a la Roland
-//   Float_t Sprosse_1_width   = 0.1; // Width of inner lattice frame in cm
-//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", Active_area_x/5/2, Sprosse_1_width/2, lattice_thickness/2);  // horizontal
-//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Sprosse_1_width/2, Active_area_x/5/2, lattice_thickness/2);  // vertical
+//   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
+//   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", Active_area_x/5/2, Lattice_1_width/2, lattice_thickness/2);  // horizontal
+//   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2, Active_area_x/5/2, lattice_thickness/2);  // vertical
 //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
 //   "(Sho:t10 + Shi:t11 + Shi:t12 + Shi:t13 + Shi:t14 + Sho:t15 + Svo:t20 + Svi:t21 + Svi:t22 + Svi:t23 + Svi:t24 + Svo:t25 + Sh1 + Sv1)");
 

@@ -1,4 +1,7 @@
+// 2012-11-04 - DE - add kapton foil, add FR4 padplane
 // 2012-11-03 - DE - add lattice grid on entrance window as CompositeShape
+
+// todo - use realistic padplane material (FR4)
 
 // in root all sizes are diven in cm
 // febs are made of pefoam20 - which is not their final density (!!)
@@ -20,17 +23,16 @@
 // Name of output file with geometry
 const TString FileName = "trd_v13a.root";
 
-// Parameters defining the layout of the complete detector build out of different
-// detector layers.
-const Int_t NofLayers = 10;
-const Int_t LayerType[NofLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };
-const Float_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };
+// Parameters defining the layout of the complete detector build out of different detector layers.
+const Int_t   NofLayers = 10;
+const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads  
+const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 const Float_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
-const Float_t LayerThickness = 49.5; // Thickness of one TRD layer
-const Bool_t IncludeFebs = true; // true if FEBs are included in geometry
-//const Bool_t IncludeFebs = false; // true if FEBs are included in geometry
+const Float_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
+const Bool_t  IncludeLattice = true; // false;  // true if lattice grid is included in geometry
+const Bool_t  IncludeFebs    = true; // false;  // true if FEBs are included in geometry
 
-const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },
+const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },    // for layer[1-3][i,o] below
                                       { 5, 5, 9, 11 },
                                       { 5, 5, 9, 11 } };
 // ### Layer Type 1
@@ -58,8 +60,8 @@ const Int_t layer1o[9][11]= { {  0,    0,    0,    0,    0,    0,    0,    0,   
 // ### Layer Type 11 is Layer Type 1 with detector modules rotated by 90°
 // In the subroutine creating the layers this is recognized automatically 
 
-// ### Layer Type 2
 
+// ### Layer Type 2
 // v12x - module types in the inner sector of layer2 - looking upstream
 const Int_t layer2i[5][5] = { { 423,  323,  321,  321,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
                               { 323,  223,  121,  221,  321 },
@@ -84,8 +86,8 @@ const Int_t layer2o[9][11]= { {   0,    0,    0,    0,    0,    0,    0,    0,  
 // ### Layer Type 21 is Layer Type 2 with detector modules rotated by 90°
 // In the subroutine creating the layers this is recognized automatically 
 
-// ### Layer Type 3
 
+// ### Layer Type 3
 // v12x - module types in the inner sector of layer2 - looking upstream
 const Int_t layer3i[5][5] = { {  0,  0,  0,  0,  0 },     // abc: a module type - b orientation (x90 deg) in odd - c even layers
                               {  0,  0,  0,  0,  0 },
@@ -112,33 +114,41 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 // ### Layer Type 31 is Layer Type 3 with detector modules rotated by 90
 // In the subroutine creating the layers this is recognized automatically 
 
+
 // Parameters defining the layout of the different detector modules
 const Int_t NofModuleTypes = 8;
-const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 };
-const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // mod4 = mod3, therefore same number of febs
+const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
+const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
 
 const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
 const Float_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
-const Float_t DetectorSizeY[2] = { 60., 100.};
+const Float_t DetectorSizeY[2] = { 60., 100.};   // quadratic modules
 
-// Lattice
+// Parameters tor the lattice grid reinforcing the entrance window
 const Float_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice frame in cm
 const Float_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice frame in cm
 // Thickness (in z) of lattice frames in cm - see below
 
 // z - geometry of TRD modules
-const Float_t radiator_thickness     =  36.0;    //  36 cm thickness of radiator
+const Float_t radiator_thickness     =  36.0;    // 25 cm, 36 cm thickness of radiator
 const Float_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
-const Float_t lattice_thickness      =   1.0;    // 10 mm
+const Float_t lattice_thickness      =   1.0;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
 const Float_t lattice_position       =  radiator_position + radiator_thickness/2. + lattice_thickness/2.;
 
-const Float_t gas_thickness          =   1.2;    //  12 mm thickness of gas
-const Float_t gas_position           =  lattice_position + lattice_thickness/2. + gas_thickness/2.;
+const Float_t kapton_thickness       =   0.0025; //  25 micron thickness of kapton
+const Float_t kapton_position        =  lattice_position + lattice_thickness/2. + kapton_thickness/2.;
 
-// todo - put realistic thickness of padplane
-const Float_t padplane_thickness     =   0.0030; //  30 micron thickness of padplane
-const Float_t padplane_position      =  gas_position + gas_thickness/2. + padplane_thickness/2.;
+const Float_t gas_thickness          =   1.2;    //  12 mm thickness of gas
+const Float_t gas_position           =  kapton_position + kapton_thickness/2. + gas_thickness/2.;
+
+const Float_t padcopper_thickness    =   0.0025; //  25 micron thickness of copper pads
+const Float_t padcopper_position     =  gas_position + gas_thickness/2. + padcopper_thickness/2.;
+
+const Float_t padplane_thickness     =   0.0360; // 360 micron thickness of padplane
+const Float_t padplane_position      =  padcopper_position + padcopper_thickness/2. + padplane_thickness/2.;
+
+// z-sizes checked upto to here
 
 // todo - replace by backpanel
 const Float_t mylar_thickness        =   0.1500; //  1.5 mm thickness of mylar
@@ -148,6 +158,7 @@ const Float_t mylar_position         =  padplane_position + padplane_thickness/2
 const Float_t electronics_thickness  =   0.0070; //  70 micron thickness of padplane
 const Float_t electronics_position   =  mylar_position + mylar_thickness/2. + electronics_thickness/2.;
 
+// todo - add 1 mm shift of FEBs in z
 const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
 const  Float_t febbox_position       =  electronics_position + electronics_thickness/2. + febbox_thickness/2.;
 const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEBs
@@ -155,17 +166,20 @@ const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEB
 //const Float_t frame_thickness      =  radiator_thickness + gas_thickness + padplane_thickness 
 //                                        + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
 
-const Float_t frame_thickness        =  gas_thickness + padplane_thickness + mylar_thickness + electronics_thickness;   // frames cover gas volume and the backpanel
-const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + frame_thickness/2.;
+const Float_t frame_thickness        =  gas_thickness + padcopper_thickness + padplane_thickness + mylar_thickness + electronics_thickness;   // frames cover gas volume and the backpanel
+const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
 const TString KeepingVolumeMedium     = "air";
 const TString RadiatorVolumeMedium    = "pefoam20";
-//const TString RadiatorVolumeMedium = "polypropylene";
+//const TString RadiatorVolumeMedium  = "polypropylene";
 const TString LatticeVolumeMedium     = "G10";
+const TString KaptonVolumeMedium      = "kapton";
 const TString GasVolumeMedium         = "TRDgas";
-const TString PadVolumeMedium         = "goldcoatedcopper";
+const TString PadCopperVolumeMedium   = "copper";
+// todo - use realistic padplane material (FR4)
+const TString PadPcbVolumeMedium      = "G10";  // "goldcoatedcopper";
 const TString MylarVolumeMedium       = "mylar";
 const TString ElectronicsVolumeMedium = "goldcoatedcopper";
 const TString febVolumeMedium         = "G10"; // "pefoam20";  // todo - put correct FEB material here
@@ -274,8 +288,10 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   TGeoMedium* keepVolMed        = gGeoMan->GetMedium(KeepingVolumeMedium);
   TGeoMedium* radVolMed         = gGeoMan->GetMedium(RadiatorVolumeMedium);
   TGeoMedium* latticeVolMed     = gGeoMan->GetMedium(LatticeVolumeMedium);
+  TGeoMedium* kaptonVolMed      = gGeoMan->GetMedium(KaptonVolumeMedium);
   TGeoMedium* gasVolMed         = gGeoMan->GetMedium(GasVolumeMedium);
-  TGeoMedium* padVolMed         = gGeoMan->GetMedium(PadVolumeMedium);
+  TGeoMedium* padcopperVolMed   = gGeoMan->GetMedium(PadCopperVolumeMedium);
+  TGeoMedium* padpcbVolMed      = gGeoMan->GetMedium(PadPcbVolumeMedium);
   TGeoMedium* mylarVolMed       = gGeoMan->GetMedium(MylarVolumeMedium);
   TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(ElectronicsVolumeMedium);
   TGeoMedium* frameVolMed       = gGeoMan->GetMedium(FrameVolumeMedium);
@@ -289,14 +305,14 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    TGeoBBox* trd_radiator = new TGeoBBox("", sizeX /2., sizeY /2., radiator_thickness /2.);
    TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd1mod%dradiator", moduleType), trd_radiator, radVolMed);
    trdmod1_radvol->SetLineColor(kBlue);
-   trdmod1_radvol->SetTransparency(60);  // (70);  // set transparency for the TRD
+   trdmod1_radvol->SetTransparency(70);  // (60);  // (70);  // set transparency for the TRD
    TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
    module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 
-   // Lattice grd
+   // Lattice grid
    if (type==0)  // inner modules
    {
-     printf("lattice type %d\n", type);
+     //     printf("lattice type %d\n", type);
      // drift window - lattice grid - sprossenfenster
      TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
      TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
@@ -349,7 +365,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    else if (type==1)  // outer modules
 
    {
-     printf("lattice type %d\n", type);
+     //     printf("lattice type %d\n", type);
      // drift window - lattice grid - sprossenfenster
      TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("S1ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
      TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
@@ -411,25 +427,42 @@ TGeoVolume* create_trd_module(Int_t moduleType)
      module->AddNode(trdmod1_lattice, 0, trd_lattice_trans);
    }
 
+   // Kapton Foil
+   TGeoBBox* trd_kapton = new TGeoBBox("", sizeX /2., sizeY /2., kapton_thickness /2.);
+   TGeoVolume* trdmod1_kaptonvol = new TGeoVolume(Form("trd1mod%dkapton", moduleType), trd_kapton, kaptonVolMed);
+   trdmod1_kaptonvol->SetLineColor(kGreen);
+   TGeoTranslation* trd_kapton_trans = new TGeoTranslation("", 0., 0., kapton_position);
+   module->AddNode(trdmod1_kaptonvol, 0, trd_kapton_trans);
+
+   // start of Frame in z
    // Gas
    TGeoBBox* trd_gas = new TGeoBBox("", activeAreaX /2., activeAreaY /2., gas_thickness /2.);
    TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd1mod%dgas", moduleType), trd_gas, gasVolMed);
-   trdmod1_gasvol->SetLineColor(kOrange);
-   //   trdmod1_gasvol->SetLineColor(kYellow);
+   trdmod1_gasvol->SetLineColor(kBlue);
    TGeoTranslation* trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    module->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
 
 
+   // Pad Copper
+   TGeoBBox *trd_padcopper = new TGeoBBox("", activeAreaX /2., activeAreaY /2., padcopper_thickness /2.);
+   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume(Form("trd1mod%dpadcopper", moduleType), trd_padcopper, padcopperVolMed);
+   trdmod1_padcoppervol->SetLineColor(kOrange);
+   TGeoTranslation *trd_padcopper_trans = new TGeoTranslation("", 0., 0., padcopper_position);
+   module->AddNode(trdmod1_padcoppervol, 0, trd_padcopper_trans);
+
+
    // Pad Plane
-   TGeoBBox *trd_pad = new TGeoBBox("", activeAreaX /2., activeAreaY /2., padplane_thickness /2.);
-   TGeoVolume* trdmod1_padvol = new TGeoVolume(Form("trd1mod%dpadplane", moduleType), trd_pad, padVolMed);
-   TGeoTranslation *trd_pad_trans = new TGeoTranslation("", 0., 0., padplane_position);
-   module->AddNode(trdmod1_padvol, 0, trd_pad_trans);
+   TGeoBBox *trd_padpcb = new TGeoBBox("", activeAreaX /2., activeAreaY /2., padplane_thickness /2.);
+   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume(Form("trd1mod%dpadplane", moduleType), trd_padpcb, padpcbVolMed);
+   trdmod1_padpcbvol->SetLineColor(kGreen);
+   TGeoTranslation *trd_padpcb_trans = new TGeoTranslation("", 0., 0., padplane_position);
+   module->AddNode(trdmod1_padpcbvol, 0, trd_padpcb_trans);
 
 
    // mylar
    TGeoBBox* trd_mylar = new TGeoBBox("", activeAreaX /2., activeAreaY /2., mylar_thickness /2.);
    TGeoVolume* trdmod1_mylarvol = new TGeoVolume(Form("trd1mod%dmylar", moduleType), trd_mylar, mylarVolMed);
+   trdmod1_mylarvol->SetLineColor(kWhite);
    TGeoTranslation* trd_mylar_trans = new TGeoTranslation("", 0., 0., mylar_position);
    module->AddNode(trdmod1_mylarvol, 0, trd_mylar_trans);
 
@@ -440,7 +473,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    trdmod1_elvol->SetLineColor(kGreen);
    TGeoTranslation* trd_el_trans = new TGeoTranslation("", 0., 0., electronics_position);
    module->AddNode(trdmod1_elvol, 0, trd_el_trans);
-
+   // end of Frame in z
 
    // frame1
    TGeoBBox* trd_frame1 = new TGeoBBox("", sizeX /2., frameWidth /2., frame_thickness/2.);
@@ -471,7 +504,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
       // Create all FEBs and place them in an assembly which will be added to the TRD module
       TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX /2., feb_thickness/2., febbox_thickness/2.);       // the FEB itself - as a cuboid
       TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);   // the FEB made of a certain medium
-      trdmod1_feb->SetLineColor(kBlue);    // set blue color
+      //      trdmod1_feb->SetLineColor(kBlue);    // set blue color
+      trdmod1_feb->SetLineColor(kYellow);    // set blue color
       TGeoVolumeAssembly* trd_feb_inclined = new TGeoVolumeAssembly(Form("trd1mod%dfebincl", moduleType)); // volume for inclined FEBs, then shifted along y
       TGeoVolumeAssembly* trd_feb_box      = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));  // the mother volume of all FEBs
 

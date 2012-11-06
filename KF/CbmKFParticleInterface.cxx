@@ -1321,8 +1321,8 @@ void CbmKFParticleInterface::FindParticles(vector<CbmKFTrack> &vRTracks, vector<
                      idNegSec[5], idPosSec[7], PrimVtx, cuts[1], 0,&vLambdaTopoChi2Ndf,
                      SecCuts, massLambdaPDG, 0.0012, &vLambdaPrim, &vLambdaSec);
   //Lambda_bar -> pi+ p-
-  Find2DaughterDecay(vRTracks, vField, Particles, pdgPos[5], pdgNeg[7], -3122,
-                     idPosSec[5], idNegSec[7], PrimVtx, cuts[1], 0, &vLambdaBarTopoChi2Ndf,
+  Find2DaughterDecay(vRTracks, vField, Particles, pdgPos[5], pdgNeg[4], -3122,
+                     idPosSec[5], idNegSec[4], PrimVtx, cuts[1], 0, &vLambdaBarTopoChi2Ndf,
                      SecCuts, massLambdaPDG, 0.0012, &vLambdaBarPrim, &vLambdaBarSec);
   //K*0 -> K+ pi-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgPos[3], pdgNeg[2], 313,
@@ -1373,10 +1373,18 @@ void CbmKFParticleInterface::FindParticles(vector<CbmKFTrack> &vRTracks, vector<
   // Find Xi-
   float cutXi[3] = {3.,5.,6.};
   FindTrackV0Decay(3312, Particles, vLambdaSec, vRTracks, vField, pdgNeg[5], idNegSec[5],
-                   PrimVtx, cutXi, 0, 0, &vXiPrim, massKsiPDG, 0.002, &vXiSec);
+                   PrimVtx, cutXi, 0, 0, &vXiPrim, massKsiPDG, 0.002 );
+
+
+  float cutLL[3] = {6.,10000000.,3.};
+  float cutLL2[3] = {6.,3.,3.};
+  vector<CbmKFParticle> vLL;
+  FindTrackV0Decay(3002, vLL, vLambdaSec, vRTracks, vField, pdgNeg[5], idNegSec[5],
+                   PrimVtx, cutLL, 0, &ChiToPrimVtx);
   // Find H0->Lambda p pi-
-  FindTrackV0Decay(3001, Particles, vXiSec, vRTracks, vField, pdgPos[4], idPosSec[4],
-                   PrimVtx, cutXi, 0, 0);
+  //Find Omega*-
+  FindTrackV0Decay(3001, Particles, vLL, vRTracks, vField, pdgPos[4], idPosSec[4],
+                   PrimVtx, cutLL2, 0, &ChiToPrimVtx);
   // Find Xi+
   float cutXiPlus[3] = {3.,5.,6.};
   FindTrackV0Decay(-3312, Particles, vLambdaBarSec, vRTracks, vField, pdgPos[5], idPosSec[5],
@@ -1799,7 +1807,7 @@ void CbmKFParticleInterface::FindTrackV0Decay(const int MotherPDG,
     {
       bool ok = 1;
       if(ChiToPrimVtx)
-        if( (ChiToPrimVtx->at(idTrack[iTr]) < 7) ) ok=0;
+        if( (ChiToPrimVtx->at(idTrack[iTr]) < 7) ) ok=0; //TODO 7 for Omega
 
       if(ok)
       {

@@ -9,7 +9,7 @@
  *
  *=====================================================
  *
- *  Finds Particles: Lambdas, K0
+ *  Finds Particles: Lambdas, K0...
  *
  */
 
@@ -28,15 +28,19 @@
 #include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
 
+#include "CbmTofHit.h"
+
+#include "CbmGlobalTrack.h"
+
 #include "CbmL1PFFitter.h"
 
 
 ClassImp(CbmKFParticlesFinder)
 
-CbmKFParticlesFinder::CbmKFParticlesFinder(float cuts[2][3], Bool_t useMCPID, const char *name, const char *title, Int_t iVerbose):
+CbmKFParticlesFinder::CbmKFParticlesFinder(float cuts[2][3], Int_t usePID, const char *name, const char *title, Int_t iVerbose):
   FairTask(name,iVerbose),
   fCuts(),
-  fUseMCPID(useMCPID),
+  fusePID(usePID),
   flistStsTracks(0),
   fPrimVtx(0),
   fParticles()
@@ -75,7 +79,8 @@ InitStatus CbmKFParticlesFinder::ReInit()
   //for the particle id
   flistStsTracksMatch = dynamic_cast<TClonesArray*>(  fManger->GetObject("StsTrackMatch") );
   flistMCTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("MCTrack") );
-
+  flsitGlobalTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("GlobalTrack") );
+  flistTofHits = dynamic_cast<TClonesArray*>( fManger->GetObject("TofHit") );
   return kSUCCESS;
 }
 
@@ -103,7 +108,7 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
     kfVertex = CbmKFVertex(*fPrimVtx);
   
   vector<int> vTrackPDG(vRTracks.size(), -1);
-  if(fUseMCPID)
+  if(fusePID == 1)
   {
     for(int iTr=0; iTr<nTracks; iTr++)
     {
@@ -114,6 +119,103 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
       vTrackPDG[iTr] = mcTrack->GetPdgCode();
     }
   }
+
+  if(fusePID == 2)
+  {
+    if (NULL == flsitGlobalTracks) { Fatal("KF Particle Finder", "No GlobalTrack array!"); }
+    if (NULL == flistTofHits) { Fatal("KF Particle Finder", "No TOF hits array!"); }
+
+    const Double_t m2P  = 0.867681;
+    const Double_t m2K  = 0.243707;
+    const Double_t m2Pi = 0.019479835;
+
+    Double_t sP[3][5] = { {0.0243467, -0.00937908, 0.00970666, -0.00063638, 2.42128e-05},
+                          {0.00691158, -0.000777367, 0.00671164, -0.000123594, -2.17075e-05},
+                          {0.0055599, -0.00327273, 0.00981961, -0.00108836, 7.90106e-05} };
+
+//     sP[0][0] =  0.0618927;
+//     sP[0][1] = -0.0719277;
+//     sP[0][2] =  0.0396255;
+//     sP[0][3] = -0.00583356;
+//     sP[0][4] =  0.000317072;
+// 
+//     sP[1][0] =  0.0291881;
+//     sP[1][1] = -0.0904978;
+//     sP[1][2] =  0.086161;
+//     sP[1][3] = -0.0229688;
+//     sP[1][4] =  0.00199382;
+// 
+//     sP[2][0] =  0.162171;
+//     sP[2][1] = -0.194007;
+//     sP[2][2] =  0.0893264;
+//     sP[2][3] = -0.014626;
+//     sP[2][4] =  0.00088203;
+
+    const Int_t PdgHypo[3] = {2212, 321, 211};
+
+    for (Int_t igt = 0; igt < flsitGlobalTracks->GetEntriesFast(); igt++) {
+      const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(flsitGlobalTracks->At(igt));
+
+      Int_t stsTrackIndex = globalTrack->GetStsTrackIndex();
+      if( stsTrackIndex<0 ) continue;
+
+      Double_t l = globalTrack->GetLength();
+      if( !((l>1000.) && (l<1400.)) ) continue;
+
+      Double_t time;
+      Int_t tofHitIndex = globalTrack->GetTofHitIndex();
+      if (tofHitIndex >= 0) {
+         const CbmTofHit* tofHit = static_cast<const CbmTofHit*>(flistTofHits->At(tofHitIndex));
+         if(!tofHit) continue;
+         time = tofHit->GetTime();
+      }
+      else continue;
+
+      if( !((time>29.) && (time<50.)) ) continue;
+
+      FairTrackParam *stsPar = vRTracks[stsTrackIndex].GetParamFirst();
+      TVector3 mom;
+      stsPar->Momentum(mom);
+
+      Double_t p = mom.Mag();
+      Int_t q = stsPar->GetQp() > 0 ? 1 : -1;
+      if(p>12.) continue;
+
+      Double_t m2 = p*p*(1./((l/time/29.9792458)*(l/time/29.9792458))-1.);
+
+      Double_t sigma[3];
+      sigma[0] = sP[0][0] + sP[0][1]*p + sP[0][2]*p*p + sP[0][3]*p*p*p + sP[0][4]*p*p*p*p;
+      sigma[1] = sP[1][0] + sP[1][1]*p + sP[1][2]*p*p + sP[1][3]*p*p*p + sP[1][4]*p*p*p*p;
+      sigma[2] = sP[2][0] + sP[2][1]*p + sP[2][2]*p*p + sP[2][3]*p*p*p + sP[2][4]*p*p*p*p;
+
+      Double_t dm2[3];
+      dm2[0] = fabs(m2 - m2P)/sigma[0];
+      dm2[1] = fabs(m2 - m2K)/sigma[1];
+      dm2[2] = fabs(m2 - m2Pi)/sigma[2];
+
+      int iPdg=2;
+      Double_t dm2min = dm2[2];
+
+      if(q>0)
+      {
+        if(dm2[1] < dm2min) { iPdg = 1; dm2min = dm2[1]; }
+        if(dm2[0] < dm2min) { iPdg = 0; dm2min = dm2[0]; }
+
+        if(dm2min > 2) iPdg=-1;
+      }
+      else
+      {
+        if(dm2[1] < dm2min) { iPdg = 1; dm2min = dm2[1]; }
+        if((dm2min>3) && (dm2[0] < dm2min)) { iPdg = 0; dm2min = dm2[0]; }
+
+        if(dm2min > 2) iPdg=-1;
+      }
+
+      if(iPdg > -1)
+        vTrackPDG[stsTrackIndex] = q*PdgHypo[iPdg];
+    }
+  }
+
 /*
   for(int iTr=0; iTr<nTracks; iTr++)
   {

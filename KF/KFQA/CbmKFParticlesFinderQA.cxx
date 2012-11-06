@@ -418,17 +418,25 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
 
 void CbmKFParticlesFinderQA::Finish()
 {
-  TDirectory *curr = gDirectory;
-  TFile *currentFile = gFile;
-  // Open output file and write histograms
-  TFile* outfile = new TFile(outfileName.Data(),"RECREATE");
-  outfile->cd();
-  WriteHistos(histodir);
-  outfile->Close();
-  outfile->Delete();
-  gFile = currentFile;
-  gDirectory = curr;
+  if(!(outfileName == ""))
+  {
+    TDirectory *curr = gDirectory;
+    TFile *currentFile = gFile;
+    // Open output file and write histograms
+    TFile* outfile;
 
+    outfile = new TFile(outfileName.Data(),"RECREATE");
+    outfile->cd();
+    WriteHistos(histodir);
+    outfile->Close();
+    outfile->Delete();
+    gFile = currentFile;
+    gDirectory = curr;
+  }
+  else
+  {
+    WriteHistos(histodir);
+  }
   std::fstream eff("Efficiency.txt",fstream::out);
   eff << fParteff;
   eff.close();

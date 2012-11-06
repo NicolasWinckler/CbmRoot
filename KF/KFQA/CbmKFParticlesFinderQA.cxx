@@ -463,7 +463,7 @@ void CbmKFParticlesFinderQA::WriteHistosCurFile( TObject *obj ){
     sub->cd();
     TList *listSub = (static_cast<TDirectory*>(obj))->GetList();
     TIter it(listSub);
-    while( TObject *obj1=it() ) WriteHistos(obj1);
+    while( TObject *obj1=it() ) WriteHistosCurFile(obj1);
     cur->cd();
   }
 }

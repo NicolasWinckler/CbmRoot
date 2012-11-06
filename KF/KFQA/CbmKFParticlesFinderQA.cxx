@@ -435,39 +435,7 @@ void CbmKFParticlesFinderQA::Finish()
   }
   else
   {
-    for(int iH1=0; iH1<CbmKFPartEfficiencies::nParticles; iH1++)
-    {
-      for(int iH2=0; iH2<nFitQA; iH2++)
-      {
-        hFitDaughtersQA[iH1][iH2]->Write();
-        hFitQA[iH1][iH2]->Write();
-      }
-      for(int iH2=0; iH2<nHistoPartParam; iH2++)
-      {
-        hPartParam[iH1][iH2]->Write();
-        hPartParamBG[iH1][iH2]->Write();
-        hPartParamGhost[iH1][iH2]->Write();
-        hPartParamSignal[iH1][iH2]->Write();
-      }
-      for(int iH2=0; iH2<nHistoPartParamQA; iH2++)
-      {
-        hPartParamQA[iH1][iH2]->Write();
-      }
-      for(int iH2=0; iH2<nHistoPartParam2D; iH2++)
-      {
-        hPartParam2D[iH1][iH2]->Write();
-        hPartParam2DBG[iH1][iH2]->Write();
-        hPartParam2DGhost[iH1][iH2]->Write();
-        hPartParam2DSignal[iH1][iH2]->Write();
-      }
-    }
-
-    for(int iH1=0; iH1<nHistosPV; iH1++)
-      hPVFitQa[iH1]->Write();
-    for(int iH1=0; iH1<nHistoMotherPdg; iH1++)
-      hMotherPdg[iH1]->Write();
-    for(int iH1=0; iH1<nHistosTP; iH1++)
-      hTrackParameters[iH1]->Write();
+    WriteHistosCurFile(histodir);
   }
   std::fstream eff("Efficiency.txt",fstream::out);
   eff << fParteff;
@@ -479,6 +447,19 @@ void CbmKFParticlesFinderQA::WriteHistos( TObject *obj ){
   else{
     TDirectory *cur = gDirectory;
     TDirectory *sub = cur->mkdir(obj->GetName());
+    sub->cd();
+    TList *listSub = (static_cast<TDirectory*>(obj))->GetList();
+    TIter it(listSub);
+    while( TObject *obj1=it() ) WriteHistos(obj1);
+    cur->cd();
+  }
+}
+
+void CbmKFParticlesFinderQA::WriteHistosCurFile( TObject *obj ){
+  if( !obj->IsFolder() ) obj->Write();
+  else{
+    TDirectory *cur = gDirectory;
+    TDirectory *sub = cur->GetDirectory(obj->GetName());
     sub->cd();
     TList *listSub = (static_cast<TDirectory*>(obj))->GetList();
     TIter it(listSub);

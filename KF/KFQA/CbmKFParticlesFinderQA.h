@@ -52,6 +52,7 @@ class CbmKFParticlesFinderQA :public FairTask
  
   void StsHitMatch();
   void WriteHistos( TObject *obj );
+  void WriteHistosCurFile( TObject *obj );
   void GetMCParticles();
   void FindReconstructableMCParticles();
   void CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part);

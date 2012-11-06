@@ -40,7 +40,8 @@ struct L1Branch
     unsigned short int chi_2 = 255 - static_cast<unsigned char>( tmp );
     Quality = (Length<<12) + (ista<<8) + chi_2;
     Momentum = 1.0/fabs(Qp);
-    chi2 = chi_2;
+//    chi2 = chi_2;
+    chi2 = Chi2;
   }
 
   void SetLength( unsigned char Length ){

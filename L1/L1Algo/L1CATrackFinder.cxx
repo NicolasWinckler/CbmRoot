@@ -510,7 +510,7 @@ inline void L1Algo::f30(  // input
           if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
             if ( chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
-
+          
             // pack triplet
           L1TrackPar &T3 = T_3[n3_V];
 
@@ -2068,6 +2068,7 @@ void L1Algo::CATrackFinder()
 
           int ndf = best_L*2-5;
           best_chi2 = best_chi2/ndf; //normalize
+
           // if (best_chi2 > TRACK_CHI2_CUT) { // never works because of way neibour triplets and chi2 defined !
           //   cout << " A " << endl;
           //   continue;
@@ -2177,9 +2178,11 @@ void L1Algo::CATrackFinder()
         t.Momentum = tr->Momentum;
         for( int i=0; i<6; i++) t.TFirst[i] = t.TLast[i]=0; // CHECKME don't need this
         for( int i=0; i<15; i++ ) t.CFirst[i] = t.CLast[i] = 10;
-        t.chi2 = 100;
+        t.chi2 = tr->chi2;
+        t.NDF = t.NHits*2-5;
 
 #ifdef TRACKS_FROM_TRIPLETS
+        t.NDF = 3; // 3 hits + target
         if ( isec == TRACKS_FROM_TRIPLETS_ITERATION )
 #endif
         vTracks.push_back(t);

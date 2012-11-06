@@ -9,10 +9,10 @@
 // #define DOUB_PERFORMANCE // doublets efficiencies
 // #define DRAW             // event display
 // #define XXX              // time debug
-// #define COUNTERS          // diff counters (hits, doublets, ... )
+// #define COUNTERS          diff counters (hits, doublets, ... )
 
-// #define TRACKS_FROM_TRIPLETS // secondary only
-// #define DO_NOT_SELECT_TRIPLETS // secondary only
+// #define TRACKS_FROM_TRIPLETS //secondary only
+// #define DO_NOT_SELECT_TRIPLETS //secondary only
 // #define TRACKS_FROM_TRIPLETS_ITERATION kFastPrimIter
 
 

@@ -13,7 +13,8 @@ class L1Triplet
   unsigned char      bl; // level
   unsigned char      b1; // qp (8b)
   unsigned char      st; // staL (4b), staM-1-staL (2b), staR-2-staL (2b)
-
+  float chi2;
+  
  public:
 
   unsigned char Cqp;
@@ -29,6 +30,8 @@ class L1Triplet
 	    unsigned char Level, unsigned char  Qp, 
 	    float Chi2  
 	    ){ 
+    chi2 = Chi2;
+    
     w0 = iHitL;
     w1 = iHitM;
     w2 = iHitR;
@@ -69,8 +72,9 @@ class L1Triplet
   }
 
   float GetChi2() const {
-    float x = (b0>>3)*3.5/31.;
-    return x*x;
+    // float x = (b0>>3)*3.5/31.;
+    // return x*x;
+    return chi2;
   }
 
   float GetQpOrig( float MaxInvMom ){

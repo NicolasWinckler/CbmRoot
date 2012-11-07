@@ -37,6 +37,7 @@
 #include "TVectorD.h"
 #include "TMatrixD.h"
 #include "TROOT.h"
+#include "TRandom3.h"
 
 #include <fstream>
 #include <iomanip>
@@ -498,6 +499,50 @@ void CbmL1::Reconstruct()
       ReadSTAPPerfData();
     };
   }
+
+  if(0){  // correct hits on MC // dbg 
+    TRandom3 random; 
+    vector< int > sF, sB, zP; 
+    sF.clear(); 
+    sB.clear(); 
+    zP.clear(); 
+    for( unsigned int iH = 0; iH < algo->vStsHits.size(); ++iH ) { 
+        // for( unsigned int iH = algo->vStsHits.size() - 1; iH >= 0; --iH ) {  
+      if (vStsHits[iH].mcPointIds.size() == 0) continue; 
+      L1StsHit &h = algo->vStsHits[iH]; 
+      const CbmL1MCPoint &mcp = vMCPoints[vStsHits[iH].mcPointIds[0]]; 
+      const int ista = algo->vSFlag[h.f]/4; 
+      const L1Station &sta = algo->vStations[ista]; 
+      if ( std::find( sF.begin(), sF.end(), h.f ) != sF.end() ) { // separate strips 
+        algo->vSFlag.push_back(algo->vSFlag[h.f]); 
+        h.f = algo->vStsStrips.size(); 
+        algo->vStsStrips.push_back(L1Strip()); 
+      } 
+      sF.push_back(h.f); 
+      if ( std::find( sB.begin(), sB.end(), h.b ) != sB.end() ) { 
+        algo->vSFlagB.push_back(algo->vSFlagB[h.b]); 
+        h.b = algo->vStsStripsB.size(); 
+        algo->vStsStripsB.push_back(L1Strip()); 
+      } 
+      sB.push_back(h.b); 
+      if ( std::find( zP.begin(), zP.end(), h.iz ) != zP.end() ) { // TODO why do we need it??gives prob=0 
+        h.iz = algo->vStsZPos.size(); 
+        algo->vStsZPos.push_back(0); 
+      } 
+      zP.push_back(h.iz); 
+ 	       
+      const fscal idet = 1/(sta.xInfo.sin_phi*sta.yInfo.sin_phi - sta.xInfo.cos_phi*sta.yInfo.cos_phi)[0]; 
+#if 1 // GAUSS 
+      algo->vStsStrips[h.f]  = idet * ( + sta.yInfo.sin_phi[0]*mcp.x - sta.xInfo.cos_phi[0]*mcp.y ) + random.Gaus(0,sqrt(sta.frontInfo.sigma2)[0]); 
+      algo->vStsStripsB[h.b] = idet * ( - sta.yInfo.cos_phi[0]*mcp.x + sta.xInfo.sin_phi[0]*mcp.y ) + random.Gaus(0,sqrt(sta.backInfo.sigma2)[0]); 
+#else // UNIFORM 
+      algo->vStsStrips[h.f]  = idet * ( + sta.yInfo.sin_phi[0]*mcp.x - sta.xInfo.cos_phi[0]*mcp.y ) + random.Uniform(-sqrt(sta.frontInfo.sigma2)[0]*3.5, sqrt(sta.frontInfo.sigma2)[0]*3.5); 
+      algo->vStsStripsB[h.b] = idet * ( - sta.yInfo.cos_phi[0]*mcp.x + sta.xInfo.sin_phi[0]*mcp.y ) + random.Uniform(-sqrt(sta.backInfo.sigma2)[0]*3.5, sqrt(sta.backInfo.sigma2)[0]*3.5); 
+#endif   
+      algo->vStsZPos[h.iz] = mcp.z; 
+    } 
+  } 
+
   
       // input performance
   if (fPerformance){

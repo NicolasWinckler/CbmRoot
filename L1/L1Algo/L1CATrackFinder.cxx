@@ -14,6 +14,7 @@
  *
  */
 
+#include "TMath.h"
 #include "TStopwatch.h"
 
 #include "L1Algo.h"
@@ -310,6 +311,7 @@ inline void L1Algo::f20(  // input
 #ifdef DO_NOT_SELECT_TRIPLETS
       if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
+
       if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
 
       lmDuplets_hits.push_back(imh);
@@ -509,7 +511,7 @@ inline void L1Algo::f30(  // input
 #ifdef DO_NOT_SELECT_TRIPLETS
           if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
-            if ( chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
+          if ( chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
           
             // pack triplet
           L1TrackPar &T3 = T_3[n3_V];
@@ -1411,8 +1413,24 @@ void L1Algo::CATrackFinder()
 
        // first station used in the triplets finding
      FIRSTCASTATION = 0;
-     // if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
-     //   FIRSTCASTATION = 2;
+       // if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+       //   FIRSTCASTATION = 2;
+
+     TRIPLET_CHI2_CUT = 5;
+     // switch ( isec ) {
+     //   case kFastPrimIter:
+     //     TRIPLET_CHI2_CUT = 7.815/3;
+     //     break;
+     //   case kAllPrimIter:
+     //     TRIPLET_CHI2_CUT = 7.815/3;
+     //     break;
+     //   case kAllPrimJumpIter:
+     //     TRIPLET_CHI2_CUT = 6.252/3;
+     //     break;
+     //   case kAllSecIter:
+     //     TRIPLET_CHI2_CUT = 2.706;
+     //     break;
+     // }
      
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
@@ -2186,6 +2204,8 @@ void L1Algo::CATrackFinder()
 
 #ifdef TRACKS_FROM_TRIPLETS
         t.NDF = 3; // 3 hits + target
+        if ( isec == kAllSecIter )
+          t.NDF = 1; // 3 hits
         if ( isec == TRACKS_FROM_TRIPLETS_ITERATION )
 #endif
         vTracks.push_back(t);

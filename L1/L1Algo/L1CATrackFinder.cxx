@@ -746,6 +746,9 @@ inline void L1Algo::f4(  // input
     
       // select
     fscal chi2 = T3.chi2[i3_4];
+#ifdef DO_NOT_SELECT_TRIPLETS
+    if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
+#endif
     if ( !finite(chi2) || chi2 < 0 || chi2 > TRIPLET_CHI2_CUT * (T3.NDF[i3_4] - 5) )  continue; 
     // if ( isec == kAllSecIter && T3.qp[i3_4] +sqrt( T3.C44[i3_4] ) < 1./10. ) continue; // why does it cut so much of ExtraSec ?
     

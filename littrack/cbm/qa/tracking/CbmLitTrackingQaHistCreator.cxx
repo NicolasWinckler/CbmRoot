@@ -78,20 +78,36 @@ Bool_t ProtonTrackAcceptanceFunction(
    return (std::abs(mcTrack->GetPdgCode()) == 2212);
 }
 
-Bool_t PionTrackAcceptanceFunction(
+Bool_t PionPlusTrackAcceptanceFunction(
       const TClonesArray* mcTracks,
       Int_t index)
 {
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 211);
+   return (mcTrack->GetPdgCode() == 211);
 }
 
-Bool_t KaonTrackAcceptanceFunction(
+Bool_t PionMinusTrackAcceptanceFunction(
       const TClonesArray* mcTracks,
       Int_t index)
 {
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 321);
+   return (mcTrack->GetPdgCode() == -211);
+}
+
+Bool_t KaonPlusTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetPdgCode()) == 321;
+}
+
+Bool_t KaonMinusTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetPdgCode()) == -321;
 }
 
 Bool_t AllRingAcceptanceFunction(
@@ -187,7 +203,7 @@ vector<string> CbmLitTrackingQaHistCreator::GetDefaultTrackCategories()
 {
 	CbmLitDetectorSetup det;
 	det.DetermineSetup();
-	return list_of("All")("Primary")("Secondary")("Reference")(det.GetElectronSetup() ? "Electron" : "Muon")("Proton")("Pion")("Kaon");
+	return list_of("All")("Primary")("Secondary")("Reference")(det.GetElectronSetup() ? "Electron" : "Muon")("Proton")("PionPlus")("PionMinus")("KaonPlus")("KaonMinus");
 }
 
 map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultTrackAcceptanceFunctions()
@@ -202,8 +218,10 @@ map<string, LitTrackAcceptanceFunction> CbmLitTrackingQaHistCreator::GetDefaultT
 	if (det.GetElectronSetup()) cat["Electron"] = PrimaryElectronTrackAcceptanceFunction;
 	else cat["Muon"] = PrimaryMuonTrackAcceptanceFunction;
 	cat["Proton"] = ProtonTrackAcceptanceFunction;
-	cat["Pion"] = PionTrackAcceptanceFunction;
-	cat["Kaon"] = KaonTrackAcceptanceFunction;
+	cat["PionPlus"] = PionPlusTrackAcceptanceFunction;
+   cat["PionMinus"] = PionMinusTrackAcceptanceFunction;
+	cat["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
+   cat["KaonMinus"] = KaonPlusTrackAcceptanceFunction;
 	return cat;
 }
 

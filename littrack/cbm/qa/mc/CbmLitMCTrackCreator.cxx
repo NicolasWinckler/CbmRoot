@@ -319,8 +319,10 @@ void CbmLitMCTrackCreator::FillStationMaps()
 		   CbmStsSensor* sensor = (fStsDigiScheme->IsNewGeometry()) ?
 				   fStsDigiScheme->GetSensorByName(fStsDigiScheme->GetCurrentPath()) :
                        fStsDigiScheme->GetSensorByName(curNode->GetName());
-		   Int_t stationId = sensor->GetStationNr() - 1;
-		   fStsStationsMap[iPoint] = stationId;
+		   if (sensor != NULL) {
+		      Int_t stationId = sensor->GetStationNr() - 1;
+		      fStsStationsMap[iPoint] = stationId;
+		   }
 	   }
    }
    // end STS

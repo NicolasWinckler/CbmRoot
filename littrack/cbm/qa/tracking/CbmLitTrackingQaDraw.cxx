@@ -121,8 +121,10 @@ void CbmLitTrackingQaDraw::DrawYPtHistos()
       string effHistName = "hte_" + variant + "_" + variant;
       DrawYPt("tracking_qa_" + variant + "_all_ypt", effHistName + "_All_Eff_YPt");
       DrawYPt("tracking_qa_" + variant + "_proton_ypt", effHistName + "_Proton_Eff_YPt");
-      DrawYPt("tracking_qa_" + variant + "_pion_ypt", effHistName + "_Pion_Eff_YPt");
-      DrawYPt("tracking_qa_" + variant + "_kaon_ypt", effHistName + "_Kaon_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_pion_plus_ypt", effHistName + "_PionPlus_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_pion_minus_ypt", effHistName + "_PionMinus_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_kaon_plus_ypt", effHistName + "_KaonPlus_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_kaon_minus_ypt", effHistName + "_KaonMinus_Eff_YPt");
    }
 }
 

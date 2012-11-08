@@ -236,7 +236,6 @@ inline void L1Algo::f20(  // input
                 )
 {
   n2 = 0; // number of doublet
-  const fvec Pick_m2 = Pick_m * Pick_m;
   for (int i1 = 0; i1 < n1; i1++){ // for each singlet
     const int i1_V = i1/fvecLen;
     const int i1_4 = i1%fvecLen;
@@ -248,7 +247,6 @@ inline void L1Algo::f20(  // input
     const THitI nl = vStsHits_l[hitsl_1[i1]].n;
     fvec Pick_m22 = (DOUBLET_CHI2_CUT - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
 
-    Pick_m22 = ( (Pick_m2-Pick_m22)[i1_4] > 0 ) ? Pick_m22 : Pick_m2;
       // -- find first possible hit for next singlet --
     for (; start_mhit < NHits_m; start_mhit++){      // binary finding has no sense
       const L1HitPoint &hitm = vStsHits_m[start_mhit];
@@ -355,7 +353,6 @@ inline void L1Algo::f30(  // input
                 nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3, nsL1::vector<fvec>::TSimd &z_Pos_3
                 )
 {
-  const fvec Pick_r2 = Pick_r*Pick_r;
   THitI hitsl_2[fvecLen];
   THitI hitsm_2_tmp[fvecLen];
   fvec fvec_0;
@@ -442,9 +439,9 @@ inline void L1Algo::f30(  // input
         const THitI duplet_e = mrDuplets_start[hitsm_2_tmp[i2_4]+1];
         
           //     THitI nm = vStsHits_m[hitsm_2[i2]].n;
-          // if ( T2.chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT. // don't need it since Have cut during doublets finding.
         if ( T2.C00[i2_4] < 0 ||  T2.C11[i2_4] < 0 ||  T2.C22[i2_4] < 0 ||  T2.C33[i2_4] < 0 ||  T2.C44[i2_4] < 0 ) continue;
 
+        fvec Pick_r22 = (TRIPLET_CHI2_CUT - T2.chi2);// if make it bigger the found hits will be rejected later because of the chi2 cut.
           // find first possible hit
         int start = duplet_b;
         if ( // isec == kAllPrimIter || isec == kAllPrimJumpIter ||
@@ -453,7 +450,7 @@ inline void L1Algo::f30(  // input
             // find the biggest possible track error
           fvec y, C11;
           L1ExtrapolateYC11Line( T2, T2.z + MaxDZ*fabs(T2.ty), y, C11 );
-          const fvec dym_est = sqrt(Pick_r2*fabs(C11 + star.XYInfo.C11));
+          const fvec dym_est = sqrt(Pick_r22*fabs(C11 + star.XYInfo.C11));
           const fvec y_minus_new = T2.y - dym_est - MaxDZ*fabs(T2.ty[i2_4]);
           for( int end = duplet_e; end - start > 2; ){
             const int middle = (start + end)/2;
@@ -467,12 +464,11 @@ inline void L1Algo::f30(  // input
           }
         }
 
-        fvec Pick_r22 = (TRIPLET_CHI2_CUT*(T2.NDF-3) - T2.chi2);// if make it bigger the found hits will be rejected later because of the chi2 cut.
+        
 #ifdef DO_NOT_SELECT_TRIPLETS
         if ( isec == TRACKS_FROM_TRIPLETS_ITERATION )
           Pick_r22 = Pick_r2+1;
 #endif
-        Pick_r22 = ( (Pick_r2-Pick_r22)[i2_4] > 0 ) ? Pick_r22 : Pick_r2;
         for (unsigned int irh_index = start; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
           const int irh = mrDuplets_hits[irh_index];
                 
@@ -511,7 +507,7 @@ inline void L1Algo::f30(  // input
 #ifdef DO_NOT_SELECT_TRIPLETS
           if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
-          if ( chi2[i2_4] > TRIPLET_CHI2_CUT*(T2.NDF[i2_4]-3) || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
+          if ( chi2[i2_4] > TRIPLET_CHI2_CUT || C00[i2_4] < 0 || C11[i2_4] < 0 ) continue; // chi2_triplet < CHI2_CUT
           
             // pack triplet
           L1TrackPar &T3 = T_3[n3_V];
@@ -751,7 +747,7 @@ inline void L1Algo::f4(  // input
 #ifdef DO_NOT_SELECT_TRIPLETS
     if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
-    if ( !finite(chi2) || chi2 < 0 || chi2 > TRIPLET_CHI2_CUT * (T3.NDF[i3_4] - 5) )  continue; 
+    if ( !finite(chi2) || chi2 < 0 || chi2 > TRIPLET_CHI2_CUT )  continue; 
     // if ( isec == kAllSecIter && T3.qp[i3_4] +sqrt( T3.C44[i3_4] ) < 1./10. ) continue; // why does it cut so much of ExtraSec ?
     
       // prepare data
@@ -1183,7 +1179,7 @@ inline void L1Algo::TripletsStaPort(  // input
 #else
           fL1Eff_triplets->AddOne(iHits);
 #endif
-          if (T_3[i_V].chi2[i_4] < TRIPLET_CHI2_CUT*T_3[i_V].NDF[i_4])
+          if (T_3[i_V].chi2[i_4] < TRIPLET_CHI2_CUT)
             fL1Eff_triplets2->AddOne(iHits);
         }
 #endif // TRIP_PERFORMANCE
@@ -1420,25 +1416,19 @@ void L1Algo::CATrackFinder()
      TRIPLET_CHI2_CUT = 5;
      switch ( isec ) {
        case kFastPrimIter:
-         TRIPLET_CHI2_CUT = 7.815/3; // prob = 0.05
+         TRIPLET_CHI2_CUT = 7.815;// prob = 0.05
          break;
        case kAllPrimIter:
-         TRIPLET_CHI2_CUT = 7.815/3; // prob = 0.05
+         TRIPLET_CHI2_CUT = 7.815; // prob = 0.05
          break;
        case kAllPrimJumpIter:
-         TRIPLET_CHI2_CUT = 6.252/3; // prob = 0.1
+         TRIPLET_CHI2_CUT = 6.252; // prob = 0.1
          break;
        case kAllSecIter:
          TRIPLET_CHI2_CUT = 2.706; // prob = 0.1
          break;
      }
      
-    Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
-    Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
-    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ){ // it's hard to estimate errors correctly for slow tracks & w\o target!
-      Pick_m =  3.0;
-    }
-
     Pick_gather = 3.0; // coefficient for size of region for attach new hits to the created track
     if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
       Pick_gather = 4.0;
@@ -1636,8 +1626,7 @@ void L1Algo::CATrackFinder()
                       vStations, NStations,
                       StsHitsUnusedStartIndex, StsHitsUnusedStopIndex,
                       vSFlag, vSFlagB,
-                      Pick_r,
-                      Pick_m, MaxInvMom,
+                      MaxInvMom,
                       targX, targY, targZ, targB, TargetXYInfo,
 
                       n_g1, portionStopIndex,

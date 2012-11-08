@@ -71,8 +71,6 @@ class L1Algo{
     TRIPLET_CHI2_CUT(5.),
     DOUBLET_CHI2_CUT(5.),
     
-    Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
-    Pick_r(0), // same for right hits
     Pick_gather(0),
     PickNeighbour(0), // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
     MaxInvMom(0),     // max considered q/p for tracks
@@ -403,9 +401,7 @@ class L1Algo{
   fvec MaxDZ; // correction in order to take into account overlaping and iff z. if sort by y then it is max diff between same station's modules (~0.4cm)
   
     /// parameters which are different for different iterations. Set in the begin of CAL1TrackFinder
-  fvec Pick_m, // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
-    Pick_r, // same for right hits
-    Pick_gather; // same for attaching additional hits to track
+  fvec Pick_gather; // coefficient for size of region  for attaching additional hits to track
   float PickNeighbour; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
   fvec MaxInvMom;     // max considered q/p for tracks
   fvec MaxSlope;      // max slope (tx\ty) in prim vertex

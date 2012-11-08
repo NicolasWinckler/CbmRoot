@@ -7,6 +7,9 @@
 
 #include "CbmHistManager.h"
 #include "TH1.h"
+#include "TNamed.h"
+#include "TGraph.h"
+#include "TGraph2D.h"
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TKey.h"
@@ -26,20 +29,20 @@ using std::vector;
 using std::exception;
 using std::sort;
 
-class CompareH1NameMore:
+class CompareTNamedMore:
    public std::binary_function<
-   const TH1*,
-   const TH1*,
+   const TNamed*,
+   const TNamed*,
    Bool_t>
 {
 public:
-   Bool_t operator()(const TH1* hist1, const TH1* hist2) const {
-      return string(hist1->GetName()) > string(hist2->GetName());
+   Bool_t operator()(const TNamed* object1, const TNamed* object2) const {
+      return string(object1->GetName()) > string(object2->GetName());
    }
 };
 
 CbmHistManager::CbmHistManager():
-      fHistMap()
+      fMap()
 {
 
 }
@@ -49,29 +52,47 @@ CbmHistManager::~CbmHistManager()
 
 }
 
+template<class T> vector<T> CbmHistManager::ObjectVector(
+         const string& pattern) const
+{
+  vector<T> objects;
+
+  try {
+	const boost::regex e(pattern);
+	map<string, TNamed*>::const_iterator it;
+	for (it = fMap.begin(); it != fMap.end(); it++) {
+		if (boost::regex_match(it->first, e)) objects.push_back((T)it->second);
+	}
+  } catch (exception& ex) {
+    cout << "Exception in CbmHistManager::ObjectVector: " << ex.what() << endl;
+  }
+
+  sort(objects.begin(), objects.end(), CompareTNamedMore());
+  return objects;
+}
+
 vector<TH1*> CbmHistManager::H1Vector(
       const string& pattern) const
 {
-   vector<TH1*> histos;
-   map<string, TH1*>::const_iterator it;
+	return ObjectVector<TH1*>(pattern);
+}
 
-   try {
-		const boost::regex e(pattern);
-		for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
-			if (boost::regex_match(it->first, e)) histos.push_back(it->second);
-		}
-   } catch (exception& ex) {
-	   cout << "Exception in CbmHistManager::H1Vector: " << ex.what() << endl;
-   }
+vector<TGraph*> CbmHistManager::G1Vector(
+      const string& pattern) const
+{
+	return ObjectVector<TGraph*>(pattern);
+}
 
-   sort(histos.begin(), histos.end(), CompareH1NameMore());
-   return histos;
+vector<TGraph2D*> CbmHistManager::G2Vector(
+      const string& pattern) const
+{
+	return ObjectVector<TGraph2D*>(pattern);
 }
 
 void CbmHistManager::WriteToFile()
 {
-   map<string, TH1*>::iterator it;
-   for (it = fHistMap.begin(); it != fHistMap.end(); it++){
+   map<string, TNamed*>::iterator it;
+   for (it = fMap.begin(); it != fMap.end(); it++){
       it->second->Write();
    }
 }
@@ -87,9 +108,9 @@ void CbmHistManager::ReadFromFile(
    Int_t c = 0;
    while (key = (TKey*) nextkey()) {
       TObject* obj = key->ReadObj();
-      if (obj->IsA()->InheritsFrom (TH1::Class())) {
-         TH1* h = (TH1*) obj;
-         TH1* h1 = (TH1*)file->Get(h->GetName());
+      if (obj->IsA()->InheritsFrom (TH1::Class()) || obj->IsA()->InheritsFrom (TGraph::Class()) || obj->IsA()->InheritsFrom (TGraph2D::Class())) {
+         TNamed* h = (TNamed*) obj;
+         TNamed* h1 = (TNamed*)file->Get(h->GetName());
          Add(string(h->GetName()), h1);
          cout << c++ << " " << h->GetName()<< endl;
       }
@@ -98,11 +119,11 @@ void CbmHistManager::ReadFromFile(
 
 void CbmHistManager::Clear()
 {
-   map<string, TH1*>::iterator it;
-   for (it = fHistMap.begin(); it != fHistMap.end(); it++) {
+   map<string, TNamed*>::iterator it;
+   for (it = fMap.begin(); it != fMap.end(); it++) {
       delete (*it).second;
    }
-   fHistMap.clear();
+   fMap.clear();
 }
 
 void CbmHistManager::ShrinkEmptyBins(
@@ -174,8 +195,8 @@ void CbmHistManager::RebinByPattern(
 string CbmHistManager::ToString() const
 {
 	string str = "CbmHistManager list of histograms:\n";
-	map<string, TH1*>::const_iterator it;
-	for (it = fHistMap.begin(); it != fHistMap.end(); it++){
+	map<string, TNamed*>::const_iterator it;
+	for (it = fMap.begin(); it != fMap.end(); it++){
 		str += it->first + "\n";
 	}
 	return str;

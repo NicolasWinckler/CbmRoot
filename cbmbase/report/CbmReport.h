@@ -8,11 +8,10 @@
 #ifndef CBMREPORT_H_
 #define CBMREPORT_H_
 
-#include "CbmDetectorList.h"
+#include "TObject.h"
 #include <string>
 class CbmReportElement;
 using std::string;
-using std::vector;
 
 /**
  * \enumeration ReportType
@@ -40,21 +39,22 @@ public:
     */
    virtual ~CbmReport();
 
-   /**
-    * \brief Check if the property with name name exists in the QA property tree.
-    * \param[in] name Name of property.
-    * \return True if property exists, otherwise return false.
-    */
-   virtual bool PropertyExists(
-         const std::string& name) const = 0;
+//   /**
+//    * \brief Check if the property with name name exists in the QA property tree.
+//    * \param[in] name Name of property.
+//    * \return True if property exists, otherwise return false.
+//    */
+//   virtual bool PropertyExists(
+//         const std::string& name) const = 0;
 
    /* Setters */
+   void SetName(const string& name) { fName = name; }
    void SetTitle(const string& title) { fTitle = title; }
-   void SetAuthor(const string& author) { fAuthor = author; }
-   void SetErrorColor(const string& color) { fErrorColor = color; }
-   void SetWarningColor(const string& color){ fWarningColor = color; }
-   void SetNormalColor(const string& color){ fNormalColor = color; }
-   void SetIsUseChecking(bool isCheck){ fIsUseChecking = isCheck; }
+//   void SetAuthor(const string& author) { fAuthor = author; }
+//   void SetErrorColor(const string& color) { fErrorColor = color; }
+//   void SetWarningColor(const string& color){ fWarningColor = color; }
+//   void SetNormalColor(const string& color){ fNormalColor = color; }
+//   void SetIsUseChecking(bool isCheck){ fIsUseChecking = isCheck; }
 
 protected:
    /**
@@ -69,48 +69,49 @@ protected:
     */
    void DeleteReportElement();
 
-   /**
-    * \brief Pure virtual function has to return JSON file name with QA results.
-    * \return JSON file name.
-    */
-   virtual string GetQaFileName() const = 0;
+//   /**
+//    * \brief Pure virtual function has to return JSON file name with QA results.
+//    * \return JSON file name.
+//    */
+//   virtual string GetQaFileName() const = 0;
+//
+//   /**
+//    * \brief Pure virtual function has to return JSON file name with ideal results.
+//    * \return JSON file name.
+//    */
+//   virtual string GetIdealFileName() const = 0;
+//
+//   /**
+//    * \brief Pure virtual function has to return JSON file name with checked results.
+//    * \return JSON file name.
+//    */
+//   virtual string GetCheckFileName() const = 0;
+//
+//   /**
+//    * \brief Returns list of image names without extension and without path in specified directory.
+//    * \param[in] dir Directory name.
+//    * \param[in] pattern File name pattern.
+//    */
+//   vector<string> GetImages(
+//		   const string& dir,
+//		   const string& pattern) const;
 
-   /**
-    * \brief Pure virtual function has to return JSON file name with ideal results.
-    * \return JSON file name.
-    */
-   virtual string GetIdealFileName() const = 0;
-
-   /**
-    * \brief Pure virtual function has to return JSON file name with checked results.
-    * \return JSON file name.
-    */
-   virtual string GetCheckFileName() const = 0;
-
-   /**
-    * \brief Returns list of image names without extension and without path in specified directory.
-    * \param[in] dir Directory name.
-    * \param[in] pattern File name pattern.
-    */
-   vector<string> GetImages(
-		   const string& dir,
-		   const string& pattern) const;
-
+   string fName; // Name of report
    string fTitle; // Title of report
-   string fAuthor; // Author of report
+//   string fAuthor; // Author of report
 //   string fDate; // Date when report was generated
 
    // Background colors for error highlighting
-   string fErrorColor; // error
-   string fWarningColor; // warning
-   string fNormalColor; // normal
+//   string fErrorColor; // error
+//   string fWarningColor; // warning
+//   string fNormalColor; // normal
 
    // If TRUE than results are highlighted depending on the results of checking procedure
-   bool fIsUseChecking;
+//   bool fIsUseChecking;
 
    CbmReportElement* fR; // Report element tool
 
-private:
+//private:
 
    CbmReport(const CbmReport&);
    CbmReport& operator=(const CbmReport&);

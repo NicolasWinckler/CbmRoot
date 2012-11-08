@@ -8,12 +8,12 @@
 #define CBMSIMULATIONREPORT_H_
 
 #include "CbmReport.h"
-#include <boost/property_tree/ptree.hpp>
 #include <string>
 
 using std::ostream;
 using std::string;
-using boost::property_tree::ptree;
+
+class CbmHistManager;
 
 /**
  * \class CbmSimulationReport
@@ -47,16 +47,23 @@ public:
     * \param[out] out Output stream for report file.
     * \param[in] resultDirectory Path to directory with results.
     */
+//   void Create(
+//         ReportType reportType,
+//         ostream& out,
+//         const string& resultDirectory);
    void Create(
-         ReportType reportType,
-         ostream& out,
-         const string& resultDirectory);
+		   CbmHistManager* histManager,
+		   const string& resultDir);
 
-   /**
-    * \brief Inherited from CbmLitReport.
-    */
-   bool PropertyExists(
-         const string& name) const;
+   void Create(
+		   const string& fileName,
+		   const string& resultDir);
+
+//   /**
+//    * \brief Inherited from CbmLitReport.
+//    */
+//   bool PropertyExists(
+//         const string& name) const;
 
 protected:
 
@@ -75,9 +82,10 @@ protected:
    string PrintImages(
    		const string& pattern) const;
 
-   ptree fQa; // Property tree of Qa results for each study
-   ptree fIdeal; // Property with ideal values
-   ptree fCheck; // Property tree with checked results for each study
+//   ptree fQa; // Property tree of Qa results for each study
+//   ptree fIdeal; // Property with ideal values
+//   ptree fCheck; // Property tree with checked results for each study
+   CbmHistManager* fHM; // Histogram manager
    string fResultDirectory; // Directory with simulation results
 };
 

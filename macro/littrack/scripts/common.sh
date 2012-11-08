@@ -46,6 +46,7 @@ function set_default_file_names() {
     export LIT_ELID_FILE=${dir}/elid.qa.${XXXX}.root
     export LIT_FIELD_QA_FILE=${dir}/field.qa.${XXXX}.root
     export LIT_FIELDAPR_QA_FILE=${dir}/fieldapr.qa.${XXXX}.root
+    export LIT_ANALYSIS_FILE=${dir}/analysis.${XXXX}.root
 }
 
 

@@ -280,14 +280,15 @@ void CbmMuch::ConstructGeometry() {
 
   // Create media
   TGeoMedium* mat = NULL;
-  TGeoMedium* air        = CreateMedium("air");
-  TGeoMedium* carbon     = CreateMedium("MUCHcarbon");
-  TGeoMedium* iron       = CreateMedium("MUCHiron");
-  TGeoMedium* wolfram    = CreateMedium("MUCHwolfram");
-  TGeoMedium* lead       = CreateMedium("MUCHlead");
-  TGeoMedium* argon      = CreateMedium("MUCHargon");
-  TGeoMedium* supportMat = CreateMedium("MUCHsupport");
-  TGeoMedium* noryl      = CreateMedium("MUCHnoryl");
+  TGeoMedium* air          = CreateMedium("air");
+  TGeoMedium* carbon       = CreateMedium("MUCHcarbon");
+  TGeoMedium* iron         = CreateMedium("MUCHiron");
+  TGeoMedium* wolfram      = CreateMedium("MUCHwolfram");
+  TGeoMedium* lead         = CreateMedium("MUCHlead");
+  TGeoMedium* argon        = CreateMedium("MUCHargon");
+  TGeoMedium* supportMat   = CreateMedium("MUCHsupport");
+  TGeoMedium* noryl        = CreateMedium("MUCHnoryl");
+  TGeoMedium* polyethylene = CreateMedium("MUCHpolyethylene");
 
   Double_t* buf;
 
@@ -308,10 +309,11 @@ void CbmMuch::ConstructGeometry() {
   TObjArray* absorbers = fGeoScheme->GetAbsorbers();
   for (Int_t iAbsorber=0;iAbsorber<absorbers->GetEntriesFast();iAbsorber++){
     switch (fGeoScheme->GetAbsorberMat(iAbsorber)) {
-      case 'C': mat = carbon;  break;
-      case 'I': mat = iron;    break;
-      case 'L': mat = lead;    break;
-      case 'W': mat = wolfram; break;
+      case 'C': mat = carbon;       break;
+      case 'I': mat = iron;         break;
+      case 'L': mat = lead;         break;
+      case 'W': mat = wolfram;      break;
+      case 'P': mat = polyethylene; break;
       default :
         mat = iron;
         Warning("CreateGeometry","Absorber material not defined");
@@ -358,7 +360,7 @@ void CbmMuch::ConstructGeometry() {
     Double_t stRmin = station->GetTubeRmin();
     Double_t stRmax = station->GetTubeRmax();
     Double_t stDz   = station->GetTubeDz();
-    TGeoTube* shStation = new TGeoTube(stRmin,stRmax,stDz);
+    TGeoTube* shStation = new TGeoTube(stRmin,shMuch->GetRmax2()-0.001,stDz);
     TString stationName = Form("muchstation%02i",iStation+1);
     TGeoVolume* voSt = new TGeoVolume(stationName,shStation,air);
     gGeoManager->Node(stationName,0,"much",0.,0.,station->GetZ()-muchZ0,0,kTRUE,buf,0);
@@ -384,7 +386,7 @@ void CbmMuch::ConstructGeometry() {
       CbmMuchLayer* layer = station->GetLayer(iLayer);
       Double_t layerZ  = layer->GetZtoStationCenter();
       Double_t layerDz = layer->GetDz();
-      TGeoTube*   shLayer = new TGeoTube(stRmin,stRmax,layerDz);
+      TGeoTube*   shLayer = new TGeoTube(stRmin,stRmax+50,layerDz);
       TString layerName   = Form("muchstation%02ilayer%i",iStation+1,iLayer+1);
       TGeoVolume* voLayer = new TGeoVolume(layerName,shLayer,air);
       gGeoManager->Node(layerName,0,stationName,0.,0.,layerZ,0,kTRUE,buf,0);

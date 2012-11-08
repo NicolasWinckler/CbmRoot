@@ -581,9 +581,9 @@ void CbmMuchGeoScheme::CreateAbsorbers() {
     Double_t globalZ1 = fAbsorberZ1[i] + fMuchZ1;
     Double_t globalZ2 = fAbsorberZ1[i] + 2 * dz + fMuchZ1;
     Double_t rmin1 = globalZ1 * fAcceptanceTanMin;
-    Double_t rmax1 = globalZ1 * fAcceptanceTanMax + 20;
+    Double_t rmax1 = globalZ1 * fAcceptanceTanMax + 30;
     Double_t rmin2 = globalZ2 * fAcceptanceTanMin;
-    Double_t rmax2 = globalZ2 * fAcceptanceTanMax + 20;
+    Double_t rmax2 = globalZ2 * fAcceptanceTanMax + 30;
     fAbsorbers->Add(new TGeoCone(dz, rmin1, rmax1, rmin2, rmax2));
   }
 }
@@ -625,8 +625,7 @@ void CbmMuchGeoScheme::CreateStations() {
 CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   
   Double_t stGlobalZ0 = fStationZ0[st] + fMuchZ1;
-  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st] + 2
-      * fActiveLz) / 2.;
+  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st]+2*fActiveLzSector)/2.;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
   Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
@@ -640,7 +639,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   for (Int_t l = 0; l < fNlayers[st]; l++) {
     Double_t layerZ0 = (l - (fNlayers[st] - 1) / 2.) * fLayersDz[st];
     Double_t layerGlobalZ0 = layerZ0 + stGlobalZ0;
-    Double_t sideDz = fSupportLz[st] / 2. + fActiveLz / 2. + 0.001; // distance between side's and layer's centers
+    Double_t sideDz = fSupportLz[st]/2. + fActiveLzSector/2.; // distance between side's and layer's centers
     CbmMuchLayer* layer = new CbmMuchLayer(st, l, layerGlobalZ0, layerZ0);
     layer->GetSideB()->SetZ(layerGlobalZ0 + sideDz);
     layer->GetSideF()->SetZ(layerGlobalZ0 - sideDz);
@@ -650,7 +649,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
       // Create modules
       if (fDetType[st]==3){ // start sector modules
         Double_t phi0 = TMath::Pi()/fNSectorsPerLayer[st];
-        Double_t ymin = 0;
+        Double_t ymin = rmin+fSpacerR;
         Double_t ymax = rmax;
         Double_t dy  = (ymax-ymin)/2.;
         Double_t dx1 = ymin*TMath::Tan(phi0)+fOverlapR/TMath::Cos(phi0); 

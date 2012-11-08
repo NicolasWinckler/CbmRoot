@@ -33,7 +33,7 @@ CbmMuchModuleGemRadial::CbmMuchModuleGemRadial():
 // -------------------------------------------------------------------------
 CbmMuchModuleGemRadial::CbmMuchModuleGemRadial(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule, 
   TVector3 pos, Double_t dx1, Double_t dx2, Double_t dy, Double_t dz, Double_t cutRadius):  
-    CbmMuchModuleGem(iStation, iLayer, iSide, iModule, pos, TVector3((dx1+dx2)/2.,dy,dz), cutRadius),
+    CbmMuchModuleGem(iStation, iLayer, iSide, iModule, pos, TVector3(dx1+dx2,2*dy,2*dz), cutRadius),
     fSectorRadii(),
     fDx1(dx1),
     fDx2(dx2),

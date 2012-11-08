@@ -799,6 +799,11 @@ MUCHcarbon         1  12.011  6.0  2.265
                    0  1  20.  .001
                    0
 
+// 30% Borated polyethylene (CH2)n B
+MUCHpolyethylene   3 12.01 1.01 10.81 6. 1. 5. 1.12 0.6 0.1 0.3
+                   0  1  20.  .001
+                   0
+
 MUCHargon          1 39.95 18. 0.00178
                    1  0  20.  .001
                    0

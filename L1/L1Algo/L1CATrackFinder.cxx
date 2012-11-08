@@ -60,7 +60,6 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-
           /// Prepare the portion of left hits data
 inline void L1Algo::f10(  // input
                 int start_lh, int n1,  L1HitPoint *vStsHits_l,
@@ -247,7 +246,8 @@ inline void L1Algo::f20(  // input
     lmDuplets_start[hitsl_1[i1]] = nDuplets_lm; // mark begin
 
     const THitI nl = vStsHits_l[hitsl_1[i1]].n;
-    fvec Pick_m22 = (TRIPLET_CHI2_CUT*(T1.NDF-1) - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
+    fvec Pick_m22 = (DOUBLET_CHI2_CUT - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
+
     Pick_m22 = ( (Pick_m2-Pick_m22)[i1_4] > 0 ) ? Pick_m22 : Pick_m2;
       // -- find first possible hit for next singlet --
     for (; start_mhit < NHits_m; start_mhit++){      // binary finding has no sense
@@ -306,13 +306,13 @@ inline void L1Algo::f20(  // input
 #ifdef DO_NOT_SELECT_TRIPLETS
       if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
-      if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) || C00[i1_4] < 0 || C11[i1_4] < 0 ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
+      if ( chi2[i1_4] > DOUBLET_CHI2_CUT ) continue;
       L1FilterChi2           ( stam.backInfo,  x, y, C00, C10, C11, chi2, hitm.v );
 #ifdef DO_NOT_SELECT_TRIPLETS
       if (isec!=TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
+      if ( chi2[i1_4] > DOUBLET_CHI2_CUT ) continue;
 
-      if ( chi2[i1_4] > TRIPLET_CHI2_CUT*(T1.NDF[i1_4]-1) ) continue; // chi2_doublet < chi2_triplet < CHI2_CUT
 
       lmDuplets_hits.push_back(imh);
       nDuplets_lm++;
@@ -1416,21 +1416,22 @@ void L1Algo::CATrackFinder()
        // if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
        //   FIRSTCASTATION = 2;
 
+     DOUBLET_CHI2_CUT = 2.706; // prob = 0.1
      TRIPLET_CHI2_CUT = 5;
-     // switch ( isec ) {
-     //   case kFastPrimIter:
-     //     TRIPLET_CHI2_CUT = 7.815/3;
-     //     break;
-     //   case kAllPrimIter:
-     //     TRIPLET_CHI2_CUT = 7.815/3;
-     //     break;
-     //   case kAllPrimJumpIter:
-     //     TRIPLET_CHI2_CUT = 6.252/3;
-     //     break;
-     //   case kAllSecIter:
-     //     TRIPLET_CHI2_CUT = 2.706;
-     //     break;
-     // }
+     switch ( isec ) {
+       case kFastPrimIter:
+         TRIPLET_CHI2_CUT = 7.815/3; // prob = 0.05
+         break;
+       case kAllPrimIter:
+         TRIPLET_CHI2_CUT = 7.815/3; // prob = 0.05
+         break;
+       case kAllPrimJumpIter:
+         TRIPLET_CHI2_CUT = 6.252/3; // prob = 0.1
+         break;
+       case kAllSecIter:
+         TRIPLET_CHI2_CUT = 2.706; // prob = 0.1
+         break;
+     }
      
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets

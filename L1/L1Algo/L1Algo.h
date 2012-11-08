@@ -15,7 +15,7 @@
 // #define DO_NOT_SELECT_TRIPLETS
 // #define TRACKS_FROM_TRIPLETS_ITERATION kAllSecIter
 
-#define LAST_ITERATION  kAllSecIter //kFastPrimIter
+#define LAST_ITERATION kAllSecIter
 #define FIND_GAPED_TRACKS // use triplets with gaps
 
 #include "L1Field.h"
@@ -69,6 +69,7 @@ class L1Algo{
 
     TRACK_CHI2_CUT(10.),
     TRIPLET_CHI2_CUT(5.),
+    DOUBLET_CHI2_CUT(5.),
     
     Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r(0), // same for right hits
@@ -396,6 +397,7 @@ class L1Algo{
   
   const float TRACK_CHI2_CUT; // = 10.0;  // cut for tracks candidates. per one DoF
   float TRIPLET_CHI2_CUT; // = 5.0; // cut for selecting triplets before collecting tracks.per one DoF
+  float DOUBLET_CHI2_CUT;
 
   
   fvec MaxDZ; // correction in order to take into account overlaping and iff z. if sort by y then it is max diff between same station's modules (~0.4cm)

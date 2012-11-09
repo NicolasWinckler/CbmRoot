@@ -51,7 +51,7 @@ CbmL1PFFitter::~CbmL1PFFitter()
 {
 }
 
-inline void CbmL1PFFitter::AddMaterial( L1TrackPar &T, L1MaterialInfo &info, fvec qp0, fvec &mass2, fvec &w)
+inline void CbmL1PFFitter::AddMaterial( L1TrackPar &T, fvec radThick, fvec qp0, fvec &mass2, fvec &w)
 {
   static const fvec ZERO = 0.0f, ONE = 1.;
 
@@ -67,8 +67,8 @@ inline void CbmL1PFFitter::AddMaterial( L1TrackPar &T, L1MaterialInfo &info, fve
   
   static const fvec c1=0.0136f, c2=c1*0.038f, c3=c2*0.5f, c4=-c3/2.0f, c5=c3/3.0f, c6=-c3/4.0f;
     
-  fvec s0 = (c1+c2*info.logRadThick + c3*h + h2*(c4 + c5*h +c6*h2) )*qp0t;    
-  fvec a = ( (ONE+mass2*qp0*qp0t)*info.RadThick*s0*s0 );
+  fvec s0 = (c1+c2*log(radThick) + c3*h + h2*(c4 + c5*h +c6*h2) )*qp0t;    
+  fvec a = ( (ONE+mass2*qp0*qp0t)*radThick*s0*s0 );
 // std::cout <<" a " << a << std::endl;
 //  a=0.000005;
   fvec zero = ZERO;
@@ -320,7 +320,7 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
     i= nHits-1;
 
     FilterFirst( T, x[i],y[i],w[i], sta[i] );
-    AddMaterial( T, sta[i].materialInfo, qp0 , mass2, w[i]);
+    AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0 , mass2, w[i]);
 
     fz1 = z[i];
     sta[i].fieldSlice.GetFieldValue( T.x, T.y, fB1 );
@@ -346,7 +346,7 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
 
       L1Extrapolate( T, z[i], qp0, fld, &w1 );
       if(i == NMvdStations - 1) AddPipeMaterial( T, qp0, mass2, w1);
-      AddMaterial( T, sta[i].materialInfo, qp0, mass2, w1 );
+      AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0, mass2, w1 );
       Filter( T, sta[i].frontInfo, u[i], w[i] );
       Filter( T, sta[i].backInfo,  v[i], w[i] );
       fB2 = fB1; 
@@ -390,7 +390,7 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
     i= 0;
     FilterLast( T, x[i],y[i],w[i], sta[i] );
     qp0 = T.qp;
-    AddMaterial( T, sta[i].materialInfo, qp0, mass2, w[i] );
+    AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0, mass2, w[i] );
 
     fz1 = z[i];
     sta[i].fieldSlice.GetFieldValue( T.x, T.y, fB1 );
@@ -417,7 +417,7 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
 
       L1Extrapolate( T, z[i], qp0, fld,&w1 );
       if(i == NMvdStations ) AddPipeMaterial( T, qp0, mass2, w1 );
-      AddMaterial( T, sta[i].materialInfo, qp0, mass2, w1 );
+      AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0, mass2, w1 );
       Filter( T, sta[i].frontInfo, u[i], w[i] );
       Filter( T, sta[i].backInfo,  v[i], w[i] );
 
@@ -529,7 +529,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmL1Track> &Tracks, vector<float> &ch
 
       L1Extrapolate( T, zSta[iSt], T.qp, fld, &w );
       if(iSt == NMvdStations - 1) AddPipeMaterial( T, T.qp, mass2, w);
-      AddMaterial( T, sta[iSt].materialInfo, T.qp, mass2, w);
+      AddMaterial( T, CbmL1::Instance()->algo->fRadThick[iSt].GetRadThick(T.x, T.y), T.qp, mass2, w);
     }
     fvec ONE=1;
     if( NMvdStations <= 0 ) AddPipeMaterial( T, T.qp, mass2, ONE);
@@ -753,7 +753,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
     i= nHits-1;
 
     FilterFirst( T, x[i],y[i],w[i], sta[i] );
-    AddMaterial( T, sta[i].materialInfo, qp0 , mass2, w[i]);
+    AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0 , mass2, w[i]);
 
     fz1 = z[i];
     sta[i].fieldSlice.GetFieldValue( T.x, T.y, fB1 );
@@ -779,7 +779,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
       L1Extrapolate( T, z[i], qp0, fld, &w1 );
       if(i == NMvdStations - 1) AddPipeMaterial( T, qp0, mass2, w1);
-      AddMaterial( T, sta[i].materialInfo, qp0, mass2, w1 );
+      AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0, mass2, w1 );
       Filter( T, sta[i].frontInfo, u[i], w[i] );
       Filter( T, sta[i].backInfo,  v[i], w[i] );
       fB2 = fB1; 
@@ -823,7 +823,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
     i= 0;
     FilterLast( T, x[i],y[i],w[i], sta[i] );
     qp0 = T.qp;
-    AddMaterial( T, sta[i].materialInfo, qp0, mass2, w[i] );
+    AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0, mass2, w[i] );
 
     fz1 = z[i];
     sta[i].fieldSlice.GetFieldValue( T.x, T.y, fB1 );
@@ -850,7 +850,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
       L1Extrapolate( T, z[i], qp0, fld,&w1 );
       if(i == NMvdStations ) AddPipeMaterial( T, qp0, mass2, w1 );
-      AddMaterial( T, sta[i].materialInfo, qp0, mass2, w1 );
+      AddMaterial( T, CbmL1::Instance()->algo->fRadThick[i].GetRadThick(T.x, T.y), qp0, mass2, w1 );
       Filter( T, sta[i].frontInfo, u[i], w[i] );
       Filter( T, sta[i].backInfo,  v[i], w[i] );
 
@@ -1011,7 +1011,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<L1FieldRe
 
       L1Extrapolate( T, zSta[iSt], T.qp, fld, &w );
       if(iSt == NMvdStations - 1) AddPipeMaterial( T, T.qp, mass2, w);
-      AddMaterial( T, sta[iSt].materialInfo, T.qp, mass2, w);
+      AddMaterial( T, CbmL1::Instance()->algo->fRadThick[iSt].GetRadThick(T.x, T.y), T.qp, mass2, w);
     }
     fvec ONE=1;
     if( NMvdStations <= 0 ) AddPipeMaterial( T, T.qp, mass2, ONE);

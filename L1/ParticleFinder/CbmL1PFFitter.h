@@ -34,7 +34,7 @@ class CbmL1PFFitter
   CbmL1PFFitter();
   ~CbmL1PFFitter();
 
-  void AddMaterial( L1TrackPar &T, L1MaterialInfo &info, fvec qp0, fvec &mass2, fvec &w );
+  void AddMaterial( L1TrackPar &T, fvec radThick, fvec qp0, fvec &mass2, fvec &w );
   void AddPipeMaterial( L1TrackPar &T, fvec qp0, fvec &mass2, fvec &w );
   void FilterFirst( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
   void FilterLast ( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );

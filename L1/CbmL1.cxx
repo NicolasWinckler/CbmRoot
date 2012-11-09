@@ -92,7 +92,8 @@ vMCParticles(),
 MCtoRParticleId(),
 RtoMCParticleId(),
 histodir(0),
-    fFindParticlesMode()
+    fFindParticlesMode(),
+  fMatBudgetFileName("")
 {
   if( !fInstance ) fInstance = this;
   PF = new CbmL1ParticlesFinder();
@@ -135,7 +136,8 @@ vMCParticles(),
 MCtoRParticleId(),
 RtoMCParticleId(),
 histodir(0),
-    fFindParticlesMode(findParticleMode_)
+    fFindParticlesMode(findParticleMode_),
+  fMatBudgetFileName("")
 {
   if( !fInstance ) fInstance = this;
   PF = new CbmL1ParticlesFinder();

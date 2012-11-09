@@ -199,7 +199,11 @@ inline void L1Algo::f11(  // input
       // extrapolate to left hit
     L1Extrapolate0( T, zl, fld0 );
     for (int ista = 0; ista <= istal-1; ista++){
-      L1AddMaterial( T, vStations[ista].materialInfo, MaxInvMom );
+#ifdef USE_RL_TABLE
+     L1AddMaterial( T, fRadThick[ista].GetRadThick(T.x, T.y), MaxInvMom );
+#else
+     L1AddMaterial( T, vStations[ista].materialInfo, MaxInvMom );
+#endif
       if (ista == NMvdStations - 1) L1AddPipeMaterial( T, MaxInvMom );
     }
       // add left hit
@@ -207,7 +211,11 @@ inline void L1Algo::f11(  // input
     L1Filter( T, stal.backInfo,  v );
 #endif
 
+#ifdef USE_RL_TABLE
+    L1AddMaterial( T, fRadThick[istal].GetRadThick(T.x, T.y), MaxInvMom );
+#else
     L1AddMaterial( T, stal.materialInfo, MaxInvMom );
+#endif
     if ( (istam >= NMvdStations) && (istal <= NMvdStations - 1) )  L1AddPipeMaterial( T, MaxInvMom );
 
     L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
@@ -409,8 +417,12 @@ inline void L1Algo::f30(  // input
       L1ExtrapolateLine( T2, zPos_2 );
       L1Filter( T2, stam.frontInfo, u_front_2 );
       L1Filter( T2, stam.backInfo,  u_back_2 );
-       
+
+#ifdef USE_RL_TABLE
+      L1AddMaterial( T2, fRadThick[istam].GetRadThick(T2.x, T2.y), T2.qp );
+#else
       L1AddMaterial( T2, stam.materialInfo, T2.qp );
+#endif
       if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp );
 
         //         // update field     // don't help
@@ -650,7 +662,12 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
       // fit
     for( int ih = 1; ih < NHits; ih++){
       L1Extrapolate( T, z[ih], T.qp, fld );
+#ifdef USE_RL_TABLE
+      L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
+#else
       L1AddMaterial( T, sta[ih].materialInfo, T.qp );
+#endif
+      
       if (ista[ih] == NMvdStations - 1) L1AddPipeMaterial( T, T.qp );
       
       L1Filter( T, sta[ih].frontInfo, u[ih] );
@@ -681,7 +698,11 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
 //       L1Filter( T, sta[ih].backInfo,  v[ih] );
       for( ih = NHits-2; ih >= 0; ih--){
         L1Extrapolate( T, z[ih], T.qp, fld );
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
+#else
         L1AddMaterial( T, sta[ih].materialInfo, T.qp );
+#endif
         if (ista[ih] == NMvdStations) L1AddPipeMaterial( T, T.qp );
         
         L1Filter( T, sta[ih].frontInfo, u[ih] );
@@ -708,7 +729,11 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
 //       L1Filter( T, sta[ih].backInfo,  v[ih] );
       for( ih = 1; ih < NHits; ih++){
         L1Extrapolate( T, z[ih], T.qp, fld );
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
+#else
         L1AddMaterial( T, sta[ih].materialInfo, T.qp );
+#endif
         if (ista[ih] == NMvdStations + 1) L1AddPipeMaterial( T, T.qp );
         
         L1Filter( T, sta[ih].frontInfo, u[ih] );

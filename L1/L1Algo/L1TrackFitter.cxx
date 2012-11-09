@@ -464,7 +464,11 @@ void L1Algo::L1KFTrackFitter()
             
         L1Extrapolate( T, z[i], qp0, fld, &w1 );
         if(i == NMvdStations - 1) L1AddPipeMaterial( T, qp0, wIn );
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T, fRadThick[i].GetRadThick(T.x, T.y), qp0, wIn );
+#else
         L1AddMaterial( T, sta[i].materialInfo, qp0, wIn );
+#endif
         L1Filter( T, sta[i].frontInfo, u[i], w1 );
         L1Filter( T, sta[i].backInfo,  v[i], w1 );
         fB2 = fB1; 
@@ -536,7 +540,11 @@ void L1Algo::L1KFTrackFitter()
             
         L1Extrapolate( T, z[i], qp0, fld,&w1 );
         if(i == NMvdStations) L1AddPipeMaterial( T, qp0, wIn );
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T, fRadThick[i].GetRadThick(T.x, T.y), qp0, wIn );
+#else
         L1AddMaterial( T, sta[i].materialInfo, qp0, wIn );
+#endif
         L1Filter( T, sta[i].frontInfo, u[i], w1 );
         L1Filter( T, sta[i].backInfo,  v[i], w1 );
 

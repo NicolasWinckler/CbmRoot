@@ -112,6 +112,8 @@ class CbmL1 : public FairTask
   CbmL1(const char *name, Int_t iVerbose = 1, Int_t _fPerformance = 0, int fSTAPDataMode_ = 0, TString fSTAPDataDir_ = "./", int findParticleMode_ = 0);
 
   ~CbmL1( /*if (targetFieldSlice) delete;*/ );
+
+  void SetMaterialBudgetFileName( TString s ){ fMatBudgetFileName = s; }
   
   void Finish();
 
@@ -211,6 +213,8 @@ class CbmL1 : public FairTask
   void CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part); // recursive func, used in FindReconstructableMCParticles
 
   int fFindParticlesMode;
+
+  TString fMatBudgetFileName;
   
    ClassDef(CbmL1,1);
 };

@@ -1,3 +1,4 @@
+
 #ifndef L1Algo_h
 #define L1Algo_h 1
 
@@ -17,7 +18,8 @@
 
 #define LAST_ITERATION kAllSecIter
 #define FIND_GAPED_TRACKS // use triplets with gaps
-
+#define USE_RL_TABLE
+        
 #include "L1Field.h"
 #include "L1Station.h"
 #include "L1StsHit.h"
@@ -110,6 +112,8 @@ class L1Algo{
   int NStations,    // number of all detector stations
       NMvdStations; // number of mvd stations
   L1Station vStations[MaxNStations] _fvecalignment; // station info
+
+  vector<L1Material> fRadThick; // material for each station
   
   vector< L1Strip > vStsStrips,  // strips positions created from hits. Front strips
                     vStsStripsB; // back strips

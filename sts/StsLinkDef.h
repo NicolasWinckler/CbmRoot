@@ -24,6 +24,7 @@
 #pragma link C++ class CbmStsMatchTracks+;
 #pragma link C++ class CbmStsParAsciiFileIo;
 #pragma link C++ class CbmStsParRootFileIo;
+#pragma link C++ class CbmStsRadTool;
 #pragma link C++ class CbmStsSensor+;
 #pragma link C++ class CbmStsSensorDigiPar+;
 #pragma link C++ class CbmStsSector+;

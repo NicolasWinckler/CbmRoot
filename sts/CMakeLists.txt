@@ -44,6 +44,7 @@ CbmStsMatchHits.cxx
 CbmStsMatchTracks.cxx 
 CbmStsParAsciiFileIo.cxx 
 CbmStsParRootFileIo.cxx 
+CbmStsRadTool.cxx
 CbmStsSensor.cxx 
 CbmStsSensorDigiPar.cxx 
 CbmStsSector.cxx 

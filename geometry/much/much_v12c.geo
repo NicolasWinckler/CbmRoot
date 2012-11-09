@@ -53,6 +53,6 @@ Straw thickness [cm]        :     0.4
 # Sector-type GEM module specification (type 3)
 Number of sectors/layer     :      14      18      22      26      32      42
 Active volume lz [cm]       :     0.4
-Spacer in r [cm]            :       2
+Spacer in r [cm]            :       1
 Spacer in phi [cm]          :       2
 Overlap in r [cm]           :     1.5

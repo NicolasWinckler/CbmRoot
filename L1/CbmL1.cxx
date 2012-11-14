@@ -489,6 +489,7 @@ InitStatus CbmL1::Init()
 
     // Read STS Radiation Thickness table
   if (fMatBudgetFileName != "") {
+    TFile* oldfile = gFile;
     TFile *rlFile = new TFile(fMatBudgetFileName);
 
     cout << "STS Material budget file is " << fMatBudgetFileName << "." << endl;
@@ -517,6 +518,9 @@ InitStatus CbmL1::Init()
         }
       }
     }
+    rlFile->Close();
+    rlFile->Delete();
+    gFile = oldfile;
   }
   else{
     cout << "No material budget file is found. Homogenious budget will be used" << endl;

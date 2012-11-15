@@ -25,6 +25,8 @@
 #include "L1Filtration.h"
 #include "L1AddMaterial.h"
 #include "L1HitPoint.h"
+#include "L1Grid.h"
+#include "L1HitArea.h"
 
 #include "L1Portion.h"
 
@@ -255,27 +257,12 @@ inline void L1Algo::f20(  // input
     const THitI nl = vStsHits_l[hitsl_1[i1]].n;
     fvec Pick_m22 = (DOUBLET_CHI2_CUT - T1.chi2); // if make it bigger the found hits will be rejected later because of the chi2 cut.
 
-      // -- find first possible hit for next singlet --
-    for (; start_mhit < NHits_m; start_mhit++){      // binary finding has no sense
-      const L1HitPoint &hitm = vStsHits_m[start_mhit];
-
-        // find track position in the hit plane
-      const fscal &zm = hitm.z;
-      fvec y, C11;
-      L1ExtrapolateYC11Line( T1, zm, y, C11 );
-      // const fvec dym_est = Pick_m * sqrt(fabs(C11 + stam.XYInfo.C11)); // sqrt is not a problem CHECKME: C11 is different for diff tracks. should we break?
-      // fvec y_minus_new_break = y - dym_est;
-      // y_minus_new_break -= 2*MaxDZ*fabs(T1.ty); // take into account overlapping on left&middle station. dz ~ 0.4 cm.
-      // if ( hitm.y >= y_minus_new_break[i1_4] ) break;
-
-      const fvec dym_est2 = Pick_m22 * fabs(C11 + stam.XYInfo.C11);
-      const fvec d = y - hitm.y - 2*MaxDZ*fabs(T1.ty);
-      if ( (dym_est2 - d*d)[0] >= 0 || d[0] < 0 ) break;
-    }
-    
       // -- collect possible doublets --
 
-    for (int imh = start_mhit; imh < NHits_m; imh++){   // 6.3/100 sec
+    const fscal iz = 1/T1.z[i1_4];
+    L1HitArea area( vGrid[ &stam - vStations ], T1.x[i1_4]*iz, T1.y[i1_4]*iz, (sqrt(Pick_m22*(T1.C00 + stam.XYInfo.C00))+MaxDZ*fabs(T1.tx))[i1_4]*iz, (sqrt(Pick_m22*(T1.C11 + stam.XYInfo.C11))+MaxDZ*fabs(T1.ty))[i1_4]*iz );
+    THitI imh = 0;
+    while( area.GetNext( imh ) ) {
       const L1HitPoint &hitm = vStsHits_m[imh];
         // check y-boundaries
 
@@ -292,8 +279,6 @@ inline void L1Algo::f20(  // input
       if ( dy2 > dy_est2 && dy < 0 ) continue;
 
         // check upper boundary
-      const fscal dy_break = dy;// - (MaxDZ*fabs(T1.ty))[i1_4]; // take into account overlapping on middle station.
-      if ( dy_break*dy_break > dy_est2 && dy_break > 0 ) break;
       const unsigned short int nm = hitm.n;
       if ( ( nl != nm ) ) continue;
 
@@ -425,64 +410,28 @@ inline void L1Algo::f30(  // input
 #endif
       if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp );
 
-        //         // update field     // don't help
-        //       L1TrackPar T2_tmp = T2;
-        //       L1Extrapolate( T2_tmp, star.z, T2.qp, f2 );
-        //       fvec lz = vStations[istar-2].z;
-        //       L1FieldValue l_B,m_B,r_B _fvecalignment;
-        //       l_B = f2.Get(lz);
-        //       m_B = f2.Get(stam.z);
-        //       star.fieldSlice.GetFieldValue( T2_tmp.x + T2_tmp.tx*(star.z - T2_tmp.z), T2_tmp.y + T2_tmp.ty*(star.z - T2_tmp.z), r_B );
-        //       f2.Set     ( l_B, lz, m_B, stam.z, r_B, star.z );
-
-        //       L1FieldValue r_B1, r_B2 _fvecalignment; // Debug
-        //       star.fieldSlice.GetFieldValue( T2.x + T2.tx*(star.z - T2.z), T2.y + T2.ty*(star.z - T2.z), r_B1 );
-        //       r_B2 = f2.Get(T2.z);
-        //       if ( fabs(((r_B2.x-r_B1.x)+(r_B2.y-r_B1.y)+(r_B2.z-r_B1.z))[0]) > 10. )
-        //         cout << T2_tmp.x[0] << " " << T2_tmp.y[0] << " " << T2_tmp.z[0] << endl << r_B2 << endl << r_B1 << endl;
-
         // extrapolate to the right hit station
       L1Extrapolate( T2, star.z, T2.qp, f2 );
 
         // ---- Find the triplets(right hit). Reformat data in the portion of triplets. ----
 
       for (int i2_4 = 0; i2_4 < n2_4; i2_4++){
-        const THitI duplet_b = mrDuplets_start[hitsm_2_tmp[i2_4]];  
-        const THitI duplet_e = mrDuplets_start[hitsm_2_tmp[i2_4]+1];
-        
+
           //     THitI nm = vStsHits_m[hitsm_2[i2]].n;
         if ( T2.C00[i2_4] < 0 ||  T2.C11[i2_4] < 0 ||  T2.C22[i2_4] < 0 ||  T2.C33[i2_4] < 0 ||  T2.C44[i2_4] < 0 ) continue;
 
         fvec Pick_r22 = (TRIPLET_CHI2_CUT - T2.chi2);// if make it bigger the found hits will be rejected later because of the chi2 cut.
           // find first possible hit
-        int start = duplet_b;
-        if ( // isec == kAllPrimIter || isec == kAllPrimJumpIter ||
-          isec == kAllSecIter  || isec == kAllSecJumpIter ) { // for secondary there are a lot of doubletAB-doubletBC combinations
-
-            // find the biggest possible track error
-          fvec y, C11;
-          L1ExtrapolateYC11Line( T2, T2.z + MaxDZ*fabs(T2.ty), y, C11 );
-          const fvec dym_est = sqrt(Pick_r22*fabs(C11 + star.XYInfo.C11));
-          const fvec y_minus_new = T2.y - dym_est - MaxDZ*fabs(T2.ty[i2_4]);
-          for( int end = duplet_e; end - start > 2; ){
-            const int middle = (start + end)/2;
-            const int irh = mrDuplets_hits[middle];
-          
-            const L1HitPoint &hitr = vStsHits_r[irh];
-
-              // check the position
-            if (hitr.y < y_minus_new[i2_4]) start = middle + 1;
-            else end = middle;
-          }
-        }
-
         
 #ifdef DO_NOT_SELECT_TRIPLETS
         if ( isec == TRACKS_FROM_TRIPLETS_ITERATION )
           Pick_r22 = Pick_r2+1;
 #endif
-        for (unsigned int irh_index = start; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
-          const int irh = mrDuplets_hits[irh_index];
+
+        const fscal iz = 1/T2.z[i2_4];
+        L1HitArea area( vGrid[ &star - vStations ], T2.x[i2_4]*iz, T2.y[i2_4]*iz, (sqrt(Pick_r22*(T2.C00 + stam.XYInfo.C00))+MaxDZ*fabs(T2.tx))[i2_4]*iz, (sqrt(Pick_r22*(T2.C11 + stam.XYInfo.C11))+MaxDZ*fabs(T2.ty))[i2_4]*iz );
+        THitI irh = 0;
+         while( area.GetNext( irh ) ) {
                 
           const L1HitPoint &hitr = vStsHits_r[irh];
 
@@ -499,8 +448,6 @@ inline void L1Algo::f30(  // input
           if ( dy2 > dy_est2 && dy < 0 ) continue; // if (yr < y_minus_new[i2_4]) continue;
         
             // check upper boundary
-          const fscal dy_break = dy - (MaxDZ*fabs(T2.ty))[i2_4];
-          if ( dy_break*dy_break > dy_est2 && dy_break > 0 ) break; // if (yr > y_plus_new_break [i2_4] ) break;
           if ( dy2 > dy_est2 ) continue; // if (yr > y_plus_new [i2_4] ) continue;
         
             // check x-boundaries
@@ -1038,7 +985,7 @@ inline void L1Algo::DupletsStaPort(  // input
            );
 
         for (unsigned int i = 0; i < hitsm_2.size(); i++)
-          L1_assert(hitsm_2[i] < StsHitsUnusedStopIndex[istam] - StsHitsUnusedStartIndex[istam]);
+          L1_ASSERT(hitsm_2[i] < StsHitsUnusedStopIndex[istam] - StsHitsUnusedStartIndex[istam], hitsm_2[i] << " " << StsHitsUnusedStopIndex[istam] - StsHitsUnusedStartIndex[istam]);
 
 #ifdef DOUB_PERFORMANCE
         THitI* RealIHitL = &(RealIHit[StsHitsUnusedStartIndex[istal]]);
@@ -1395,6 +1342,14 @@ void L1Algo::CATrackFinder()
     }
 #endif // L1_NO_ASSERT
 
+    for( int iS = 0; iS < NStations; iS++ ) {
+      L1Grid &grid = vGrid[iS];
+      grid.Create(-1,1,-0.6,0.6,0.02,0.001);
+    }
+
+      // sort hits by y/z
+    L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, vGrid, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex, NStations );
+    sh.Sort();
   
 #ifdef XXX
   c_timerG.Stop();
@@ -1402,10 +1357,6 @@ void L1Algo::CATrackFinder()
   c_timerG.Start(1);
 #endif
 
-    // sort hits by y/z
-  L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex, NStations );
-  sh.Sort();
-  
 #ifdef COUNTERS
   cout << " Begin " << endl;
   cout << " NHits = " << vStsHitsUnused->size() << endl;
@@ -1417,7 +1368,6 @@ void L1Algo::CATrackFinder()
     // kAllPrimJumpIter,  // primary tracks with gaps. can be dissabled by macro
     // kAllSecIter        // secondary all track
   for (isec = 0; isec < fNFindIterations; isec++){ // all finder
-
     
 #ifdef COUNTERS
   unsigned int nSinglets = 0;
@@ -1429,6 +1379,13 @@ void L1Algo::CATrackFinder()
 //     cout << " Begin of iteration " << isec << endl;
      TStopwatch c_timer;
 #endif
+
+
+    for( int iS = 0; iS < NStations; iS++ ) {
+      L1Grid &grid = vGrid[iS];
+      grid.Fill(&((*vStsHitPointsUnused)[StsHitsUnusedStartIndex[iS]]),StsHitsUnusedStopIndex[iS]-StsHitsUnusedStartIndex[iS]);
+    }
+
 
      // --- SET PARAMETERS FOR THE ITERATION ---
 
@@ -2314,10 +2271,10 @@ void L1Algo::CATrackFinder()
     stat_nHits[isec] += vStsHitsUnused->size();
     
     cout << "iter = " << isec << endl;
-    cout << " NHits = " << stat_nHits[isec]/stat_N << endl;
     cout << " NSinglets = " << stat_nSinglets[isec]/stat_N << endl;
     cout << " NDoublets = " << stat_nDoublets[isec]/stat_N << endl;
     cout << " NTriplets = " << stat_nTriplets[isec]/stat_N << endl;
+    cout << " NHitsUnused = " << stat_nHits[isec]/stat_N << endl;
 #endif // COUNTERS
     
   } // for (int isec

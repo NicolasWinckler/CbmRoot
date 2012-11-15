@@ -6,6 +6,7 @@
 #include "L1Filtration.h"
 #include "L1AddMaterial.h"
 #include "L1HitPoint.h"
+#include "L1HitArea.h"
 
 #include <iostream>
 
@@ -216,27 +217,12 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
     fscal r2_best = 1e8; // best distance to hit
     int iHit_best = -1;  // index of the best hit
-    
-      // find first hit
-    int start = StsHitsUnusedStartIndex[ista];
-    {
-      for(int end = StsHitsUnusedStopIndex[ista]; end - start >= 3;  ){
-        int middle = (start + end)/2;
-        L1StsHit &hit = (*vStsHitsUnused)[middle];
 
-        fscal xh, yh, zh;
-        GetHitCoor(hit, xh, yh, zh, sta);
-
-        fvec y, C11;
-        L1ExtrapolateYC11Line( T, zh, y, C11 );
-      
-        fscal dym_est = ( Pick_gather*sqrt(fabs(C11+sta.XYInfo.C11)) )[0];
-        fscal y_minus_new = y[0] - dym_est;
-        if (yh < y_minus_new) start = middle;
-        else end = middle;
-      }
-    }
-    for( THitI ih = start; ih < StsHitsUnusedStopIndex[ista]; ih++ ){
+    const fscal iz = 1/T.z[0];
+    L1HitArea area( vGrid[ ista ], T.x[0]*iz, T.y[0]*iz, (sqrt(Pick_gather*(T.C00 + sta.XYInfo.C00))+MaxDZ*fabs(T.tx))[0]*iz, (sqrt(Pick_gather*(T.C11 + sta.XYInfo.C11))+MaxDZ*fabs(T.ty))[0]*iz );
+    THitI ih = 0;
+    while( area.GetNext( ih ) ) {
+      ih += StsHitsUnusedStartIndex[ista];
       L1StsHit &hit = (*vStsHitsUnused)[ih];
 
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
@@ -250,8 +236,6 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       fscal dym_est = ( Pick_gather*sqrt(fabs(C11+sta.XYInfo.C11)) )[0];
       fscal y_minus_new = y[0] - dym_est;
       if (yh < y_minus_new) continue;  // CHECKME take into account overlaping?
-      fscal y_plus_new = y[0] + dym_est;
-      if (yh > y_plus_new ) break;
 
       fvec x, C00;
       L1ExtrapolateXC00Line( T, zh, x, C00 );

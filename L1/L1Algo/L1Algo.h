@@ -31,6 +31,7 @@
 #include "L1Portion.h"
 #include "L1HitPoint.h"
 #include "L1Strip.h"
+#include "L1Grid.h"
 
 #include <iostream>
 #include <vector>
@@ -119,6 +120,7 @@ class L1Algo{
                     vStsStripsB; // back strips
   vector< fscal >   vStsZPos;    // all possible z-positions of hits
   vector< L1StsHit > vStsHits;     // hits as a combination of front-, backstrips and z-position
+  L1Grid vGrid[MaxNStations];     // hits as a combination of front-, backstrips and z-position
   vector< unsigned char > vSFlag,  // information of hits station & using hits in tracks;
                           vSFlagB;
   THitI StsHitsStartIndex[MaxNStations+1], StsHitsStopIndex[MaxNStations+1]; // station-bounders in vStsHits array

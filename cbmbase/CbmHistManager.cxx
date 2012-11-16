@@ -7,6 +7,7 @@
 
 #include "CbmHistManager.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TNamed.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
@@ -75,6 +76,12 @@ vector<TH1*> CbmHistManager::H1Vector(
       const string& pattern) const
 {
 	return ObjectVector<TH1*>(pattern);
+}
+
+vector<TH2*> CbmHistManager::H2Vector(
+      const string& pattern) const
+{
+	return ObjectVector<TH2*>(pattern);
 }
 
 vector<TGraph*> CbmHistManager::G1Vector(

@@ -18,6 +18,7 @@
 class TFile;
 class TNamed;
 class TH1;
+class TH2;
 class TGraph;
 class TGraph2D;
 
@@ -77,6 +78,28 @@ public:
     * \return Vector of pointers to TH1 histogram.
     */
    vector<TH1*> H1Vector(
+         const string& pattern) const;
+
+   /**
+    * \brief Return pointer to TH2 histogram.
+    * \param[in] name Name of histogram.
+    * \return pointer to TH1 histogram.
+    */
+   TH2* H2(
+         const string& name) const {
+      if (fMap.count(name) == 0) { // Temporarily used for debugging
+    	  std::cout << "Error: CbmHistManager::H2(name): name=" << name << std::endl;
+      }
+      assert(fMap.count(name) != 0);
+      return (TH2*) fMap.find(name)->second;
+   }
+
+   /**
+    * \brief Return vector of pointers to TH2 histogram.
+    * \param[in] pattern Regex for histogram name.
+    * \return Vector of pointers to TH2 histogram.
+    */
+   vector<TH2*> H2Vector(
          const string& pattern) const;
 
    /**

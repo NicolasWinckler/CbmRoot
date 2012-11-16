@@ -28,9 +28,6 @@ const TString ActivGasMedium          = "RPCgas";
 const TString GlasMedium              = "RPCglass";
 const TString ElectronicsMedium           = "carbon";
 
-const Int_t NofModuleTypes = 2;
-
-
 // All neded distances and sizes are defined here
 Float_t B_factor=1.; // Relation between x and y
 Float_t Xlim=25.; // Begining of X segmentation [cm]
@@ -42,8 +39,42 @@ Float_t box_ydim = 1100.;  //y extension of wall [cm]
 Float_t box_zdim = 200.;  //z extension of wall [cm]
 Float_t width_box =  0.4;   // Width of the gas box [cm]
 
-//Int_t Nchannel = 0; // don't know if this is needed
-Int_t ngaps=8; // Number of gaps
+const Int_t NumberOfDifferentCounterTypes = 2;
+//
+const Float_t Glass_X[NumberOfDifferentCounterTypes] = {32., 32.};
+const Float_t Glass_Y[NumberOfDifferentCounterTypes] = {26.9, 27.};
+const Float_t Glass_Z[NumberOfDifferentCounterTypes] = {0.1, 0.1};
+
+const Float_t GasGap_X[NumberOfDifferentCounterTypes] = {32., 32.};
+const Float_t GasGap_Y[NumberOfDifferentCounterTypes] = {26.9, 27.};
+const Float_t GasGap_Z[NumberOfDifferentCounterTypes] = {0.025, 0.025};
+
+const Int_t NumberOfGaps[NumberOfDifferentCounterTypes] = {8, 8};
+const Int_t NumberOfReadoutStrips[NumberOfDifferentCounterTypes] = {32, 32};
+
+const Float_t SingleStackStartPosition_Z[NumberOfDifferentCounterTypes] = {-0.6, -0.6};
+
+const Float_t Electronics_X[NumberOfDifferentCounterTypes] = {34.0, 34.0};
+const Float_t Electronics_Y[NumberOfDifferentCounterTypes] = {5.0, 5.0};
+const Float_t Electronics_Z[NumberOfDifferentCounterTypes] = {0.3, 0.3};
+
+
+const Int_t NofModuleTypes = 2;
+
+//Aluminum box 
+const Float_t AluBox_X = 180.;
+const Float_t AluBox_Y = 50.;
+const Float_t AluBox_Z = 20.;
+const Float_t AluBox_Thick_X_left = 5.;
+const Float_t AluBox_Thick_X_right = 1.;
+const Float_t AluBox_Thick_Y = 1.;
+const Float_t AluBox_Thick_Z = 0.1;
+
+const Float_t CounterXStartPosition[NofModuleTypes] = {-60.0, -66.0};
+const Float_t CounterXDistance[NofModuleTypes] = {30.0, 28.0};
+const Float_t CounterZDistance[NofModuleTypes] = {5.0, 8.0};
+const Float_t CounterRotationAngle[NofModuleTypes] = {0., 20.};
+
 
 // some global variables
 TGeoManager* gGeoMan = NULL;  // Pointer to TGeoManager instance
@@ -52,9 +83,9 @@ TGeoVolume* gCounter;
 
 // Forward declarations
 void create_materials_from_media_file();
-TGeoVolume* create_small_tof_module();
+TGeoVolume* create_tof_module(Int_t);
 //TGeoVolume* create_large_tof_module();
-TGeoVolume* create_glass_stack();
+TGeoVolume* create_glass_stack(Int_t);
 
 
 
@@ -81,7 +112,7 @@ void Create_TOF_Geometry_v12a() {
   TGeoVolume* tof = new TGeoVolumeAssembly("tof");
   top->AddNode(tof, 1);
 
-  gCounter = create_glass_stack();
+  gCounter = create_glass_stack(0);
 
   /*
   TGeoTranslation* counter_trans 
@@ -89,13 +120,16 @@ void Create_TOF_Geometry_v12a() {
   gGeoMan->GetVolume("tof")->AddNode(gCounter, 0, counter_trans);
   */
 
-  gModules[0] = create_small_tof_module();
-  //  gModules[1] = create_large_tof_module();
+  gModules[0] = create_tof_module(0);
+  gModules[1] = create_tof_module(1);
 
   
   TGeoTranslation* module_trans 
     = new TGeoTranslation("", 0., 0., 0.);
   gGeoMan->GetVolume("tof")->AddNode(gModules[0], 0, module_trans);
+  module_trans 
+    = new TGeoTranslation("", 0., 0., 100.);
+  gGeoMan->GetVolume("tof")->AddNode(gModules[1], 0, module_trans);
     
 
 
@@ -142,23 +176,35 @@ void create_materials_from_media_file()
   geoBuild->createMedium(carbon);
 }
 
-TGeoVolume* create_glass_stack()
+TGeoVolume* create_glass_stack(Int_t modType)
 {
 
-  Int_t   nstrips=32;
+  //glass
+  Float_t gdx=Glass_X[modType]; 
+  Float_t gdy=Glass_Y[modType];
+  Float_t gdz=Glass_Z[modType];
 
-  Float_t gdx=32.; //glass
-  Float_t gdy=26.9;
-  Float_t gdz=.1;
-  Float_t ggdx=gdx;  //gas gap
-  Float_t ggdy=gdy;
-  Float_t ggdz=0.025;
+  //gas gap
+  Int_t  nstrips=NumberOfReadoutStrips[modType];
+  Int_t  ngaps=NumberOfGaps[modType];
+
+
+  Float_t ggdx=GasGap_X[modType];  
+  Float_t ggdy=GasGap_Y[modType];
+  Float_t ggdz=GasGap_Z[modType];
   Float_t gsdx=ggdx/float(nstrips);
 
+  //single stack
   Float_t dzpos=gdz+ggdz;
-  Float_t startzpos=-.6;
-  Float_t startzposg=-.6+gdz/2.;
+  Float_t startzpos=SingleStackStartPosition_Z[modType];
 
+  // electronics
+  //pcb dimensions 
+  Float_t dxe=Electronics_X[modType]; 
+  Float_t dye=Electronics_Y[modType];
+  Float_t dze=Electronics_Z[modType];
+  Float_t yele=(gdy+0.1)/2.+dye/2.;
+ 
   // needed materials
   TGeoMedium* glassPlateVolMed   = gGeoMan->GetMedium(GlasMedium);
   TGeoMedium* noActiveGasVolMed  = gGeoMan->GetMedium(NoActivGasMedium);
@@ -208,16 +254,9 @@ TGeoVolume* create_glass_stack()
     multi_stack->AddNode(single_stack, l, single_stack_trans);
   }
   TGeoTranslation* single_glass_back_trans 
-    = new TGeoTranslation("", 0., 0., startzpos + 8*dzpos);
+    = new TGeoTranslation("", 0., 0., startzpos + ngaps*dzpos);
   multi_stack->AddNode(glass_plate_vol, l, single_glass_back_trans);
   
-
-// electronics
-  float dxe=34.0; //pcb dimensions 
-  float dye=5.0;
-  float dze=0.3;
-  float yele=(gdy+0.1)/2.+dye/2.;
-
   // Add electronics above and below the glass stack to build a complete counter
   TGeoVolume* counter = new TGeoVolumeAssembly("counter");
   TGeoTranslation* multi_stack_trans 
@@ -240,27 +279,28 @@ TGeoVolume* create_glass_stack()
 
 }
 
-TGeoVolume* create_small_tof_module()
+TGeoVolume* create_tof_module(Int_t modType)
 {
-  //Aluminum box 
-  //dy  = Thickness in Y
-  //dx  = Thickness in X 
-  //dz  = Thickness in Z
-  //width_alu = Aluminum thickness
-  //All dimensions are in cm
+  Float_t dx=AluBox_X;
+  Float_t dy=AluBox_Y;
+  Float_t dz=AluBox_Z;
+  Float_t width_aluxl=AluBox_Thick_X_left;
+  Float_t width_aluxr=AluBox_Thick_X_right;
+  Float_t width_aluy=AluBox_Thick_Y;
+  Float_t width_aluz=AluBox_Thick_Z;
 
-  Float_t dx=180.;
-  Float_t dy=50.;
-  Float_t dz=20.;
-  Float_t width_aluxl=5.;
-  Float_t width_aluxr=1.;
-  Float_t width_aluy=1.;
-  Float_t width_aluz=.1;
+  Float_t shift_gas_box = (AluBox_Thick_X_right - AluBox_Thick_X_left)/2;
+
+  Float_t dxpos=CounterXDistance[modType];
+  Float_t startxpos=CounterXStartPosition[modType];
+  Float_t dzoff=CounterZDistance[modType];
+  Float_t rotangle=CounterRotationAngle[modType];
 
   TGeoMedium* boxVolMed          = gGeoMan->GetMedium(BoxVolumeMedium);
   TGeoMedium* noActiveGasVolMed  = gGeoMan->GetMedium(NoActivGasMedium);
 
-  TGeoVolume* module = new TGeoVolumeAssembly("module");
+  TString moduleName = Form("module_%d", modType);
+  TGeoVolume* module = new TGeoVolumeAssembly(moduleName);
 
   TGeoBBox* alu_box = new TGeoBBox("", dx/2., dy/2., dz/2.);
   TGeoVolume* alu_box_vol = 
@@ -277,19 +317,23 @@ TGeoVolume* create_small_tof_module()
   alu_box_vol->SetLineColor(kYellow); // set line color for the alu box
   alu_box_vol->SetTransparency(70); // set transparency for the TOF
   TGeoTranslation* gas_box_trans 
-    = new TGeoTranslation("", -2., 0., 0.);
+    = new TGeoTranslation("", shift_gas_box, 0., 0.);
   alu_box_vol->AddNode(gas_box_vol, 0, gas_box_trans);
-
-  Float_t dxpos=30.0;
-  Float_t startxpos=-60.0;
-  Float_t zoff=1.;
-  Float_t dzoff=5.0;
   
   for (Int_t j=0; j<5; j++){ //loop over counters (modules)
-    zoff=-zoff;
+    Float_t zpos;
+    if (0 == modType) {
+      zpos = dzoff *=-1;
+    } else {
+      zpos = 0.;
+    }
     TGeoTranslation* counter_trans 
-      = new TGeoTranslation("", startxpos+ j*dxpos , 0.0 , zoff*dzoff);
-    gas_box_vol->AddNode(gCounter, j, counter_trans);
+      = new TGeoTranslation("", startxpos+ j*dxpos , 0.0 , zpos);
+
+    TGeoRotation* counter_rot = new TGeoRotation();
+    counter_rot->RotateY(rotangle);
+    TGeoCombiTrans* counter_combi_trans = new TGeoCombiTrans(*counter_trans, *counter_rot);
+    gas_box_vol->AddNode(gCounter, j, counter_combi_trans);
   }
 
   return module;

@@ -14,6 +14,7 @@
 #pragma link C++ class CbmGeoRichPar;
 #pragma link C++ class CbmRichTrainAnnSelect;
 #pragma link C++ class CbmRichTrainAnnElectrons;
+#pragma link C++ class CbmRichEventDisplay+;
 
 //reconstruction
 #pragma link C++ class CbmRichReconstruction+;

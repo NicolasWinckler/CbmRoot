@@ -58,6 +58,7 @@ set(RICH_SRCS
 CbmGeoRich.cxx 
 CbmRich.cxx 
 CbmRichHitProducer.cxx   
+CbmRichEventDisplay.cxx   
 CbmGeoRichPar.cxx 
 CbmRichContFact.cxx
 CbmRichMatchRings.cxx
@@ -110,6 +111,7 @@ set(RICH_HEADERS
 CbmGeoRich.h
 CbmRich.h
 CbmRichHitProducer.h  
+CbmRichEventDisplay.h  
 CbmGeoRichPar.h
 CbmRichContFact.h
 CbmRichMatchRings.h

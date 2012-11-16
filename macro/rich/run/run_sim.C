@@ -1,4 +1,4 @@
-void run_sim(Int_t nEvents = 1)
+void run_sim(Int_t nEvents = 10)
 {
    TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
@@ -26,23 +26,21 @@ void run_sim(Int_t nEvents = 1)
 	Double_t fieldScale =  1.0; // field scaling factor
 
 	if (script != "yes") {
-		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
-		parFile = "/d/cbm06/user/slebedev/test/test2.params.root";
-		outFile = "/d/cbm06/user/slebedev/test/test2.mc.root";
+		inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		parFile = "/Users/slebedev/Development/cbm/data/simulations/test.params.root";
+		outFile = "/Users/slebedev/Development/cbm/data/simulations/test.mc.root";
 
 	   caveGeom = "cave.geo";
 	   targetGeom = "target_au_250mu.geo";
 	   pipeGeom = "pipe_standard.geo";
 	   mvdGeom = "";//"mvd_v08a.geo";
-	   stsGeom = "sts/sts_v11a.geo";
+	   stsGeom = "sts/sts_v12b.geo.root";
 	   richGeom = "rich/rich_v08a.geo";
 	   trdGeom = "trd/trd_v10b.geo";
 	   tofGeom = "tof/tof_v07a.geo";
 	   ecalGeom = "";//"ecal_FastMC.geo";
-	   fieldMap = "field_v10e";
-	   //fieldMap = "FieldShieldBox";
-      //fieldMap = "field_v10e_by_0_8_test";
-	   magnetGeom = "passive/magnet_v09e.geo";
+	   fieldMap = "field_v12a";
+	   magnetGeom = "passive/magnet_v12a.geo";
 
 		electrons = "yes";
 		NELECTRONS = 5;
@@ -58,10 +56,8 @@ void run_sim(Int_t nEvents = 1)
 		caveGeom = TString(gSystem->Getenv("CAVEGEOM"));
 		targetGeom = TString(gSystem->Getenv("TARGETGEOM"));
 		pipeGeom = TString(gSystem->Getenv("PIPEGEOM"));
-		//shieldGeom = TString(gSystem->Getenv("SHIELDGEOM"));
 		mvdGeom = TString(gSystem->Getenv("MVDGEOM"));
 		stsGeom = TString(gSystem->Getenv("STSGEOM"));
-		muchGeom = TString(gSystem->Getenv("MUCHGEOM"));
 		richGeom = TString(gSystem->Getenv("RICHGEOM"));
 		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
 		tofGeom = TString(gSystem->Getenv("TOFGEOM"));

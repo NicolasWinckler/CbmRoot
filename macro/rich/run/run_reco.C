@@ -1,7 +1,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 2)
+void run_reco(Int_t nEvents = 10)
 {
    TTree::SetMaxTreeSize(90000000000);
 
@@ -15,9 +15,9 @@ void run_reco(Int_t nEvents = 2)
 	TString inFile = "", parFile = "", outFile ="";
 	std::string resultDir = "recqa/";
 	if (script != "yes") {
-		inFile = "/d/cbm02/slebedev/rich/JUL09/test.mc.root";
-		parFile = "/d/cbm02/slebedev/rich/JUL09/test.params.root";
-		outFile = "/d/cbm02/slebedev/rich/JUL09/test.reco.root";
+		inFile = "/Users/slebedev/Development/cbm/data/simulations/test.mc.root";
+		parFile = "/Users/slebedev/Development/cbm/data/simulations/test.params.root";
+		outFile = "/Users/slebedev/Development/cbm/data/simulations/test.reco.root";
 	} else {
 		inFile = TString(gSystem->Getenv("MCFILE"));
 		outFile = TString(gSystem->Getenv("RECOFILE"));
@@ -27,13 +27,11 @@ void run_reco(Int_t nEvents = 2)
 
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
+   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
    gDebug = 0;
-
-
 
     TStopwatch timer;
     timer.Start();
@@ -71,26 +69,25 @@ void run_reco(Int_t nEvents = 2)
 	// =========================================================================
 
     { // STS REAL
-    Double_t threshold  =  4;
-    Double_t noiseWidth =  0.1;
-    Int_t    nofBits    = 20;
-    Double_t minStep    =  0.01;
-    Double_t StripDeadTime = 10.;
+      Double_t threshold  =  4;
+      Double_t noiseWidth =  0.01;
+      Int_t    nofBits    = 12;
+      Double_t electronsPerAdc    =  10;
+      Double_t StripDeadTime = 0.1;
+      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+      stsDigitize->SetRealisticResponse();
+      stsDigitize->SetFrontThreshold (threshold);
+      stsDigitize->SetBackThreshold  (threshold);
+      stsDigitize->SetFrontNoiseWidth(noiseWidth);
+      stsDigitize->SetBackNoiseWidth (noiseWidth);
+      stsDigitize->SetFrontNofBits   (nofBits);
+      stsDigitize->SetBackNofBits    (nofBits);
+      stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
+      stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
+      stsDigitize->SetStripDeadTime  (StripDeadTime);
+      run->AddTask(stsDigitize);
 
-    CbmStsDigitize* stsDigitize = new CbmStsDigitize("CbmStsDigitize", iVerbose);
-    stsDigitize->SetRealisticResponse();
-    stsDigitize->SetFrontThreshold (threshold);
-    stsDigitize->SetBackThreshold  (threshold);
-    stsDigitize->SetFrontNoiseWidth(noiseWidth);
-    stsDigitize->SetBackNoiseWidth (noiseWidth);
-    stsDigitize->SetFrontNofBits   (nofBits);
-    stsDigitize->SetBackNofBits    (nofBits);
-    stsDigitize->SetFrontMinStep   (minStep);
-    stsDigitize->SetBackMinStep    (minStep);
-    stsDigitize->SetStripDeadTime  (StripDeadTime);
-    run->AddTask(stsDigitize);
-
-    FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
     run->AddTask(stsClusterFinder);
 
     FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
@@ -223,6 +220,7 @@ void run_reco(Int_t nEvents = 2)
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir(resultDir);
+   trackingQa->SetPRange(30, 0., 3.);
    run->AddTask(trackingQa);
 
 //   CbmLitFitQa* fitQa = new CbmLitFitQa();

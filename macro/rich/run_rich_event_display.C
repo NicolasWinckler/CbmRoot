@@ -12,10 +12,10 @@ void run_rich_event_display()
    gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
    cbmlibs();
 
-   TString mcFile = "/d/cbm06/user/slebedev/test/test.mc.root";
-   TString recoFile = "/d/cbm06/user/slebedev/test/test.reco.root";
-   TString paramFile = "/d/cbm06/user/slebedev/test/test.params.root";
-   TString outFile = "/d/cbm06/user/slebedev/test/test.ed.root";
+   TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/test.mc.root";
+   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/test.reco.root";
+   TString paramFile = "/Users/slebedev/Development/cbm/data/simulations/test.params.root";
+   TString outFile = "/Users/slebedev/Development/cbm/data/simulations/test.ed.root";
 
    FairRunAna *run= new FairRunAna();
    run->SetInputFile(mcFile);

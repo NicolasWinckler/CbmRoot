@@ -18,10 +18,13 @@
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
 
+#include "CbmDrawHist.h"
+
 #include "TClonesArray.h"
 #include "TEllipse.h"
 #include "TCanvas.h"
 #include "TH2D.h"
+#include "TMarker.h"
 
 #include <iostream>
 #include <map>
@@ -36,6 +39,7 @@ CbmRichEventDisplay::CbmRichEventDisplay():
    fRichPoints(NULL),
    fRichMatches(NULL),
    fMcTracks(NULL),
+   fRichProjections(NULL),
    fEventNum(0),
    fDrawRings(true),
    fDrawHits(true),
@@ -80,6 +84,7 @@ void CbmRichEventDisplay::Exec(
       Option_t* opt)
 {
    fEventNum++;
+   SetDefaultDrawStyle();
    DrawOneEvent();
 }
 
@@ -87,35 +92,40 @@ void CbmRichEventDisplay::DrawOneEvent()
 {
    stringstream ss;
    ss << "rich_event_display_event_"<< fEventNum;
-   TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 900, 800);
+   TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 800, 800);
    c->Divide(1, 2);
-   c->SetGrid(true, true);
    c->cd(1);
    TH2D* padU = new TH2D("padU", ";X [cm];Y [cm]", 1, -110., 110., 1, 90., 180);
-   //padU->SetStats(false);
-   padU->Draw();
+   DrawH2(padU);
+   padU->GetYaxis()->SetTitleOffset(0.75);
+   gPad->SetLeftMargin(0.1);
+   gPad->SetRightMargin(0.05);
    DrawOnePmtPlane("up");
 
    c->cd(2);
    TH2D* padD = new TH2D("padD", ";X [cm];Y [cm]", 1, -110., 110., 1, -180., -90.);
-  // padD->SetStats(false);
-   padD->Draw();
+   DrawH2(padD);
+   padD->GetYaxis()->SetTitleOffset(0.75);
+   gPad->SetLeftMargin(0.1);
+   gPad->SetRightMargin(0.05);
    DrawOnePmtPlane("down");
-
 }
 
 void CbmRichEventDisplay::DrawOnePmtPlane(
       const string& plane)
 {
-   // Draw rings
-   if (fDrawRings){
-      int nofRings = fRichRings->GetEntriesFast();
-      for (int iR = 0; iR < nofRings; iR++){
-         CbmRichRing* ring = (CbmRichRing*) fRichRings->At(iR);
-         if (NULL == ring) continue;
-         if ( (plane == "up" && ring->GetCenterY() >= 0.) ||
-              (plane == "down" && ring->GetCenterY() < 0.) ){
-            DrawCircle(ring);
+   //Draw Track projections
+   if (fDrawProjections) {
+      int nofProjections = fRichProjections->GetEntriesFast();
+      for (int iP = 0; iP < nofProjections; iP++){
+         FairTrackParam* pr = (FairTrackParam*) fRichProjections->At(iP);
+         if (NULL == pr) continue;
+         if ( (plane == "up" && pr->GetY() >= 0.) ||
+              (plane == "down" && pr->GetY() < 0.) ){
+            TMarker* m = new TMarker(pr->GetX(), pr->GetY(), 3.);
+            m->SetMarkerSize(0.7);
+            m->SetMarkerColor(kGreen+3);
+            m->Draw();
          }
       }
    }
@@ -129,10 +139,23 @@ void CbmRichEventDisplay::DrawOnePmtPlane(
          if ( (plane == "up" && hit->GetY() >= 0.) ||
               (plane == "down" && hit->GetY() < 0.) ){
 
-            TEllipse* hitDr = new TEllipse(hit->GetX(), hit->GetY(), 0.75);
+            TEllipse* hitDr = new TEllipse(hit->GetX(), hit->GetY(), 0.6);
             hitDr->SetFillColor(kRed);
             hitDr->SetLineColor(kRed);
             hitDr->Draw();
+         }
+      }
+   }
+
+   // Draw rings
+   if (fDrawRings){
+      int nofRings = fRichRings->GetEntriesFast();
+      for (int iR = 0; iR < nofRings; iR++){
+         CbmRichRing* ring = (CbmRichRing*) fRichRings->At(iR);
+         if (NULL == ring) continue;
+         if ( (plane == "up" && ring->GetCenterY() >= 0.) ||
+              (plane == "down" && ring->GetCenterY() < 0.) ){
+            DrawCircle(ring);
          }
       }
    }
@@ -146,29 +169,12 @@ void CbmRichEventDisplay::DrawOnePmtPlane(
          if ( (plane == "up" && point->GetY() >= 0.) ||
               (plane == "down" && point->GetY() < 0.) ){
             TEllipse* pointDr = new TEllipse(point->GetX(), point->GetY(), 0.4);
-            //pointDr->SetFillColor(kBlue);
-            //pointDr->SetLineColor(kBlue);
             pointDr->Draw();
          }
       }
    }
 
-   //Draw Track projections
-   if (fDrawProjections) {
-      int nofProjections = fRichProjections->GetEntriesFast();
-      for (int iP = 0; iP < nofProjections; iP++){
-         FairTrackParam* pr = (FairTrackParam*) fRichProjections->GetEntriesFast();
-         if (NULL == pr) continue;
-         if ( (plane == "up" && pr->GetY() >= 0.) ||
-              (plane == "down" && pr->GetY() < 0.) ){
 
-            TEllipse* prDr = new TEllipse(pr->GetX(), pr->GetY(), 1.);
-            prDr->SetFillColor(kGreen);
-            prDr->SetLineColor(kGreen);
-            prDr->Draw();
-         }
-      }
-   }
 }
 
 void CbmRichEventDisplay::DrawCircle(
@@ -176,12 +182,12 @@ void CbmRichEventDisplay::DrawCircle(
 {
    TEllipse* circle = new TEllipse(ring->GetCenterX(), ring->GetCenterY(), ring->GetRadius());
    circle->SetFillStyle(0);
-   circle->SetLineWidth(3);
+   circle->SetLineWidth(2);
    circle->SetLineColor(kBlue);
    circle->Draw();
-   TEllipse* center = new TEllipse(ring->GetCenterX(), ring->GetCenterY(), 0.5);
-   center->SetFillColor(kBlue);
-   center->SetLineColor(kBlue);
+   TMarker* center = new TMarker(ring->GetCenterX(), ring->GetCenterY(), 2);
+   center->SetMarkerColor(kBlue);
+   center->SetMarkerSize(0.4);
    center->Draw();
 }
 

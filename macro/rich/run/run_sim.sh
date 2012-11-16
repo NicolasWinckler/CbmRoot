@@ -33,7 +33,7 @@ export LIT_RESULT_DIR=recqa/
 	export TARGETGEOM=target_au_250mu.geo
 	export PIPEGEOM=pipe_standard.geo
 	export MVDGEOM=
-	#mvd/mvd_v08a.geo
+	#mvd/mvd_Nov_2012.geo
 	export STSGEOM=sts/sts_v12b.geo.root
 	export RICHGEOM=rich/rich_v08a.geo
 	export TRDGEOM=trd/trd_v10b.geo

@@ -8,11 +8,15 @@
 #ifndef CBMREPORT_H_
 #define CBMREPORT_H_
 
-#include "CbmDetectorList.h"
+#include "TObject.h"
+#include <iostream>
 #include <string>
+#include <vector>
 class CbmReportElement;
+class TCanvas;
 using std::string;
 using std::vector;
+using std::ostream;
 
 /**
  * \enumeration ReportType
@@ -20,7 +24,7 @@ using std::vector;
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-enum ReportType {kHtmlReport, kLatexReport, kTextReport};
+enum ReportType {kCoutReport, kHtmlReport, kLatexReport, kTextReport};
 
 /**
  * \class CbmReport
@@ -41,22 +45,68 @@ public:
    virtual ~CbmReport();
 
    /**
-    * \brief Check if the property with name name exists in the QA property tree.
-    * \param[in] name Name of property.
-    * \return True if property exists, otherwise return false.
+    * \brief Accessor to CbmReportElement object.
+    * User has to write the report using available tags from CbmReportElement class.
     */
-   virtual bool PropertyExists(
-         const std::string& name) const = 0;
+   const CbmReportElement* R() const { return fR; }
+
+   /**
+    * \brief All text output goes to this stream.
+    */
+   ostream& Out() const { return *fOut; }
 
    /* Setters */
+   void SetName(const string& name) { fName = name; }
    void SetTitle(const string& title) { fTitle = title; }
-   void SetAuthor(const string& author) { fAuthor = author; }
-   void SetErrorColor(const string& color) { fErrorColor = color; }
-   void SetWarningColor(const string& color){ fWarningColor = color; }
-   void SetNormalColor(const string& color){ fNormalColor = color; }
-   void SetIsUseChecking(bool isCheck){ fIsUseChecking = isCheck; }
+   void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
+
+   /* Accessors */
+   const string& GetName() const { return fName; }
+   const string& GetTitle() const { return fTitle; }
+   const string& GetOutputDir() const { return fOutputDir; }
 
 protected:
+   /**
+    * \brief Pure abstract function which is called from public Create() function.
+    * This function has to write report using Out() for output stream and
+    * R() for report elements. This function is called for each report type.
+    */
+   virtual void Create() = 0;
+
+   /**
+    * \brief Pure abstract function which is called from public Create() function.
+    * This function has to draw all necessary histograms and graphs.
+    * It is called only once before report creation.
+    */
+   virtual void Draw() = 0;
+
+   /**
+    * \brief Create all available report types.
+    */
+   void CreateReports();
+
+   /**
+    * \brief Create canvas and put it to vector of TCanvases.
+    * Canvases created with this function will be automatically saved to image and
+    * printed in the report.
+    */
+   TCanvas* CreateCanvas(
+		   const char* name,
+		   const char* title,
+		   Int_t ww,
+		   Int_t wh);
+
+   /**
+    * \brief Save all canvases to images.
+    */
+   void SaveCanvasesAsImages() const;
+
+   /**
+    * \brief Print images created from canvases in the report.
+    */
+   void PrintCanvases() const;
+
+private:
    /**
     * \brief Create concrete CbmReportElement instance based on report type.
     * \param[in] reportType Type of the report to be produced.
@@ -69,48 +119,19 @@ protected:
     */
    void DeleteReportElement();
 
-   /**
-    * \brief Pure virtual function has to return JSON file name with QA results.
-    * \return JSON file name.
-    */
-   virtual string GetQaFileName() const = 0;
-
-   /**
-    * \brief Pure virtual function has to return JSON file name with ideal results.
-    * \return JSON file name.
-    */
-   virtual string GetIdealFileName() const = 0;
-
-   /**
-    * \brief Pure virtual function has to return JSON file name with checked results.
-    * \return JSON file name.
-    */
-   virtual string GetCheckFileName() const = 0;
-
-   /**
-    * \brief Returns list of image names without extension and without path in specified directory.
-    * \param[in] dir Directory name.
-    * \param[in] pattern File name pattern.
-    */
-   vector<string> GetImages(
-		   const string& dir,
-		   const string& pattern) const;
-
+   string fName; // Name of report
    string fTitle; // Title of report
-   string fAuthor; // Author of report
-//   string fDate; // Date when report was generated
-
-   // Background colors for error highlighting
-   string fErrorColor; // error
-   string fWarningColor; // warning
-   string fNormalColor; // normal
-
-   // If TRUE than results are highlighted depending on the results of checking procedure
-   bool fIsUseChecking;
-
+   string fOutputDir; // Output directory for the report files
+   ReportType fReportType; // Current report type
    CbmReportElement* fR; // Report element tool
+   mutable ostream* fOut; // Output stream
 
-private:
+   // Storage for TCanvas. All Canvases in this vector will be automatically saved
+   // to image and printed in the report.
+   // User can use CreateCanvas function which automatically push created canvas in this vector.
+   vector<TCanvas*> fCanvases;
+
+//private:
 
    CbmReport(const CbmReport&);
    CbmReport& operator=(const CbmReport&);

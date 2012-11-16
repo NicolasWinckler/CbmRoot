@@ -6,6 +6,9 @@
 #include "CbmLitPropagationQaReport.h"
 #include "CbmLitPropagationQaHistCreator.h"
 #include "CbmReportElement.h"
+#include "CbmHistManager.h"
+#include "TH1.h"
+#include "TF1.h"
 #include "std/utils/CbmLitUtils.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
@@ -24,26 +27,25 @@ CbmLitPropagationQaReport::~CbmLitPropagationQaReport()
 {
 }
 
-void CbmLitPropagationQaReport::Create(
-   ostream& out)
+void CbmLitPropagationQaReport::Create()
 {
-   out.precision(3);
-   out << fR->DocumentBegin();
-   out << fR->Title(0, fTitle);
+   Out().precision(3);
+   Out() << R()->DocumentBegin();
+   Out() << R()->Title(0, GetTitle());
 
-   out << PrintTable("Propagator: residuals and pulls (sigma)", 0, "sigma");
-   out << PrintTable("Propagator: residuals and pulls (RMS)", 0, "rms");
-   out << PrintTable("Propagator: residuals and pulls (mean)", 0, "mean");
-   out << PrintTable("Fitter: residuals and pulls (sigma)", 1, "sigma");
-   out << PrintTable("Fitter: residuals and pulls (RMS)", 1, "rms");
-   out << PrintTable("Fitter: residuals and pulls (mean)", 1, "mean");
-   out << PrintTable("Smoother: residuals and pulls (sigma)", 2, "sigma");
-   out << PrintTable("Smoother: residuals and pulls (RMS)", 2, "rms");
-   out << PrintTable("Smoother: residuals and pulls (mean)", 2, "mean");
+   Out() << PrintTable("Propagator: residuals and pulls (sigma)", 0, "sigma");
+   Out() << PrintTable("Propagator: residuals and pulls (RMS)", 0, "rms");
+   Out() << PrintTable("Propagator: residuals and pulls (mean)", 0, "mean");
+   Out() << PrintTable("Fitter: residuals and pulls (sigma)", 1, "sigma");
+   Out() << PrintTable("Fitter: residuals and pulls (RMS)", 1, "rms");
+   Out() << PrintTable("Fitter: residuals and pulls (mean)", 1, "mean");
+   Out() << PrintTable("Smoother: residuals and pulls (sigma)", 2, "sigma");
+   Out() << PrintTable("Smoother: residuals and pulls (RMS)", 2, "rms");
+   Out() << PrintTable("Smoother: residuals and pulls (mean)", 2, "mean");
 
-   out << PrintImages(".*propagation_qa_.*png");
+//   Out() << PrintImages(".*propagation_qa_.*png");
 
-   out <<  fR->DocumentEnd();
+   Out() <<  R()->DocumentEnd();
 }
 
 string CbmLitPropagationQaReport::PrintTable(
@@ -52,12 +54,12 @@ string CbmLitPropagationQaReport::PrintTable(
       const string& propertyName)
 {
    stringstream ss;
-   ss << fR->TableBegin(title,
+   ss << R()->TableBegin(title,
          list_of("Plane")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
    for (UInt_t iPlane = 0; iPlane < fNofPlanes; iPlane++) {
       ss << PrintResAndPullRow(ToString<Int_t>(iPlane), algorithmIndex, iPlane, propertyName);
    }
-   ss << fR->TableEnd();
+   ss << R()->TableEnd();
    return ss.str();
 }
 
@@ -67,13 +69,27 @@ string CbmLitPropagationQaReport::PrintResAndPullRow(
         Int_t planeIndex,
         const string& propertyName)
 {
-   string parNames[] = { "hResX", "hResY", "hResTx", "hResTy", "hResQp",
-         "hPullX", "hPullY", "hPullTx", "hPullTy", "hPullQp" };
+   string parNames[] = { "htp_Res_X", "htp_Res_Y", "htp_Res_Tx", "htp_Res_Ty", "htp_Res_Qp",
+	         "htp_Pull_X", "htp_Pull_Y", "htp_Pull_Tx", "htp_Pull_Ty", "htp_Pull_Qp" };
    string algoNames[] = { "Propagator", "Fitter", "Smoother" };
    vector<string> parameters(CbmLitPropagationQaHistCreator::NofQaParameters);
    for (UInt_t iParam = 0; iParam < CbmLitPropagationQaHistCreator::NofQaParameters; iParam++) {
       string name = parNames[iParam] + algoNames[algorithmIndex] + ToString<Int_t>(planeIndex) + "." + propertyName;
-      parameters[iParam] = NumberToString<float>(fQa.get(name, -1.), 2);
+      if (propertyName == "mean") {
+    	  parameters[iParam] = NumberToString<Float_t>(HM()->H1(name)->GetMean(), 2);
+      } else if (propertyName == "rms") {
+    	  parameters[iParam] = NumberToString<Float_t>(HM()->H1(name)->GetRMS(), 2);
+      } else if (propertyName == "sigma") {
+    	  TH1* hist = HM()->H1(name);
+    	  hist->Fit("gaus");
+    	  TF1* fit = hist->GetFunction("gaus");
+    	  parameters[iParam] = (NULL != fit) ? fit->GetParameter(2) : 0.;
+      }
    }
-   return fR->TableRow(list_of(rowName).range(parameters));
+   return R()->TableRow(list_of(rowName).range(parameters));
+}
+
+void CbmLitPropagationQaReport::Draw()
+{
+
 }

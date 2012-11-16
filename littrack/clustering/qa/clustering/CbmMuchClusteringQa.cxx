@@ -113,31 +113,17 @@ void CbmMuchClusteringQa::CreateSimulationReport(
       const string& resultDirectory)
 {
    CbmSimulationReport* report = new CbmMuchClusteringQaReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/clustering_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/clustering_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/clustering_qa.txt").c_str());
-   report->Create(kTextReport, cout, fOutputDir);
-   report->Create(kHtmlReport, foutHtml, fOutputDir);
-   report->Create(kLatexReport, foutLatex, fOutputDir);
-   report->Create(kTextReport, foutText, fOutputDir);
+   report->Create(fHM, resultDirectory);
    delete report;
 }
 
 void CbmMuchClusteringQa::CreateStudyReport(
       const string& title,
-      const vector<string>& resultDirectories,
+      const vector<string>& fileNames,
       const vector<string>& studyNames)
 {
    CbmStudyReport* report = new CbmMuchClusteringQaStudyReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/clustering_qa_study.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/clustering_qa_study.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/clustering_qa_study.txt").c_str());
-//   report->Create(kLitText, cout, resultDirectories, studyNames);
-   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
-   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
-   report->Create(kTextReport, foutText, resultDirectories, studyNames);
+   report->Create(fileNames, studyNames, fOutputDir);
    delete report;
 }
 ClassImp(CbmMuchClusteringQa);

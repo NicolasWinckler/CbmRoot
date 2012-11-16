@@ -24,21 +24,14 @@ CbmAnaDielectronReports::~CbmAnaDielectronReports()
 
 void CbmAnaDielectronReports::CreateStudyReport(
       const string& title,
-      const vector<string>& resultDirectories,
+      const vector<string>& fileNames,
       const vector<string>& studyNames,
       const string& outputDir)
 {
    if (outputDir != "") gSystem->mkdir(outputDir.c_str(), true);
 
    CbmStudyReport* report = new CbmAnaDielectronStudyReportAll();
-   report->SetTitle(title);
-   cout << "Report can be found here: " << outputDir << endl;
-   ofstream foutHtml(string(outputDir + "lmvm_study.html").c_str());
-   ofstream foutLatex(string(outputDir + "lmvm_study.tex").c_str());
-   ofstream foutText(string(outputDir + "lmvm_study.txt").c_str());
-   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
-   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
-   report->Create(kTextReport, foutText, resultDirectories, studyNames);
+   report->Create(fileNames, studyNames, outputDir);
    delete report;
 }
 

@@ -8,28 +8,20 @@
 #include "CbmLatexReportElement.h"
 #include "CbmHtmlReportElement.h"
 #include "CbmTextReportElement.h"
+#include "TCanvas.h"
 
-#include "TSystem.h"
 #include <fstream>
-#include <sstream>
-using std::ifstream;
-using std::stringstream;
-
-//#include <boost/filesystem.hpp>
-//#include <boost/regex.hpp>
-//using boost::filesystem::exists;
-//using boost::filesystem::path;
-//using boost::filesystem::filesystem_error;
-//using boost::filesystem::directory_iterator;
+#include <string>
+using std::ofstream;
+using std::string;
 
 CbmReport::CbmReport():
-   fTitle(""),
-   fAuthor(""),
-   fErrorColor(""),
-   fWarningColor(""),
-   fNormalColor(""),
-   fIsUseChecking(true),
-   fR(NULL)
+   fName("qa_report"),
+   fTitle("QA report"),
+   fOutputDir("./"),
+   fR(NULL),
+   fOut(NULL),
+   fReportType(kCoutReport)
 {
 }
 
@@ -40,75 +32,80 @@ CbmReport::~CbmReport()
 void CbmReport::CreateReportElement(
       ReportType reportType)
 {
-   if (reportType == kLatexReport) fR = new CbmLatexReportElement();
-   else if (reportType == kHtmlReport) fR = new CbmHtmlReportElement();
-   else if (reportType == kTextReport) fR = new CbmTextReportElement();
+   fReportType = reportType;
+   if (NULL != fR) delete fR;
+   if (NULL != fOut && fReportType != kCoutReport) delete fOut;
+   if (reportType == kLatexReport) {
+	   fR = new CbmLatexReportElement();
+	   fOut = new ofstream(string(fOutputDir + "/" + fName + ".tex").c_str());
+   } else if (reportType == kHtmlReport) {
+	   fR = new CbmHtmlReportElement();
+	   fOut = new ofstream(string(fOutputDir + "/" + fName + ".html").c_str());
+   } else if (reportType == kTextReport) {
+	   fR = new CbmTextReportElement();
+	   fOut = new ofstream(string(fOutputDir + "/" + fName + ".txt").c_str());
+   } else if (reportType == kCoutReport) {
+	   fR = new CbmTextReportElement();
+	   fOut = &std::cout;
+   }
 }
 
 void CbmReport::DeleteReportElement()
 {
-   if (NULL != fR) delete fR;
+ //  if (NULL != fR) delete fR;
+ //  if (NULL != fOut && fReportType != kCoutReport) delete fOut;
 }
 
-vector<string> CbmReport::GetImages(
-		   const string& dir,
-		   const string& pattern) const
+void CbmReport::CreateReports()
 {
-	//TODO: When boost::filesystem and boost::system libraries will be available in FAIR externals this can be switched on!
-//	const boost::regex e(pattern);
-//    path p(dir);
-//	try {
-//		if (exists(p)) {
-//			if (is_regular_file(p)) {
-//				cout << "CbmReport::GetImageList: " << p << " is a regular file not a directory!" << '\n';
-//			} else if (is_directory(p)) {
-//				vector<path> v;
-//		        copy(directory_iterator(p), directory_iterator(), back_inserter(v));
-//
-//				vector<string> images;
-//				vector<path>::const_iterator it;
-//				for (it = v.begin(); it != v.end(); it++) {
-//					if (boost::regex_match(it->native(), e)) images.push_back(it->native());
-//				}
-//				return images;
-//			} else {
-//				cout << "CbmReport::GetImageList: " << p << " exists, but is neither a regular file nor a directory!\n";
-//			}
-//		} else {
-//			cout << "CbmReport::GetImageList: " << p << " does not exist\n";
-//		}
-//	} catch (const filesystem_error& ex) {
-//		cout << "CbmReport::GetImageList: " << ex.what() << '\n';
-//	} catch (const exception& ex) {
-//		cout << "CbmReport::GetImageList: " << ex.what() << '\n';
-//	}
-//	return vector<string>();
+   Draw(); // User has to implement this function!
+   SaveCanvasesAsImages();
 
-	// Implementation base on C++ system call.
-   stringstream tmpFileName;
-   tmpFileName << "qa_tmp_file_" << gSystem->GetPid() << ".tmp";
-	string findCommand("find " + dir + " -type f -regex \"" + pattern + "\" -print  | awk -F/ '{print $NF}' > " + tmpFileName.str());
-	system(findCommand.c_str());
-	ifstream tmpFile(tmpFileName.str().c_str(), ifstream::in);
-	vector<string> images;
-	string image;
-	while (tmpFile.good())  {
-	    char c = tmpFile.get();
-	    if (tmpFile.good()) {
-	    	if (c != '\n') { image += c; }
-	    	else {
-	    	    images.push_back(image);
-	    		image = "";
-	    	}
-	    }
-	 }
-	tmpFile.close();
-	system(string("rm -rf " + tmpFileName.str()).c_str());
+   CreateReportElement(kHtmlReport);
+   Create(); // User has to implement this function!
+   DeleteReportElement();
 
-	for (Int_t i = 0; i < images.size(); i++) {
-		images[i].erase(images[i].size() - 4, 4);
+   CreateReportElement(kLatexReport);
+   Create(); // User has to implement this function!
+   DeleteReportElement();
+
+   CreateReportElement(kTextReport);
+   Create(); // User has to implement this function!
+   DeleteReportElement();
+
+   CreateReportElement(kCoutReport);
+   Create(); // User has to implement this function!
+   DeleteReportElement();
+}
+
+TCanvas* CbmReport::CreateCanvas(
+		const char* name,
+		const char* title,
+		Int_t ww,
+		Int_t wh)
+{
+	TCanvas* canvas = new TCanvas(name, title, ww, wh);
+	fCanvases.push_back(canvas);
+	return canvas;
+}
+
+void CbmReport::SaveCanvasesAsImages() const
+{
+	if (GetOutputDir() == "") return;
+	Int_t nofCanvases = fCanvases.size();
+	for (Int_t i = 0; i < nofCanvases; i++) {
+		TCanvas* canvas = fCanvases[i];
+		canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".eps").c_str());
+		canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".png").c_str());
+		canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".gif").c_str());
 	}
+}
 
-	return images;
-	// END Implementation base on C++ system call.
+void CbmReport::PrintCanvases() const
+{
+	Int_t nofCanvases = fCanvases.size();
+	for (Int_t i = 0; i < nofCanvases; i++) {
+		TCanvas* canvas = fCanvases[i];
+		Out() << R()->Image(canvas->GetName(), canvas->GetName());
+	}
 }

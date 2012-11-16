@@ -31,37 +31,34 @@ public:
 
 protected:
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Create(
-      ostream& out);
+   virtual void Create();
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual string GetQaFileName() const {
-      return "fit_qa.json";
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/fit/fit_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "fit_qa_check.json";
-   }
+   virtual void Draw();
 
    string PrintResAndPullRow(
            const string& rowName,
            const string& histName,
            const string& propertyName);
 
+	void DrawResidualAndPullHistograms(
+	      const string& detName);
+
+	/**
+	 * \fn DrawHistSigmaRMS
+	 * \brief Draw sigma and RMS on histogram.
+	 * \param[in] sigma Sigma value.
+	 * \param[in] rms RMS value.
+	 */
+	void DrawHistSigmaRMS(
+	   Double_t sigma,
+	   Double_t rms);
+
+	void DrawTrackParamsAtVertex();
 };
 
 #endif /* CBMLITFITQAREPORT_H_ */

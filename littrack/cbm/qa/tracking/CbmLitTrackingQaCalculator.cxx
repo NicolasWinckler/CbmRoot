@@ -28,11 +28,11 @@
 #include "CbmStsDetectorId.h"
 #include "CbmTrdDetectorId.h"
 #include "CbmMuchGeoScheme.h"
-#include "CbmGeoStsPar.h"
 
 #include "fitter/CbmRichRingFitterEllipseTau.h"
 
 #include "TClonesArray.h"
+#include "TH1.h"
 
 #include <boost/assign/list_of.hpp>
 

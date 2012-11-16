@@ -5,20 +5,22 @@
  * \date 2011
  */
 #include "CbmMuchClusteringQaReport.h"
-#include "../../../cbm/qa/base/CbmLitPropertyTree.h"
 #include "CbmReportElement.h"
+#include "CbmHistManager.h"
 #include "../../../std/utils/CbmLitUtils.h"
-#include <boost/property_tree/ptree.hpp>
+#include "TH1.h"
 #include <boost/assign/list_of.hpp>
+#include <vector>
+using std::vector;
 using std::endl;
 using boost::assign::list_of;
 using lit::NumberToString;
 using lit::Split;
 
 CbmMuchClusteringQaReport::CbmMuchClusteringQaReport():
-		fPT()
+		CbmSimulationReport()
 {
-
+	SetName("clustering_qa");
 }
 
 CbmMuchClusteringQaReport::~CbmMuchClusteringQaReport()
@@ -26,33 +28,29 @@ CbmMuchClusteringQaReport::~CbmMuchClusteringQaReport()
 
 }
 
-void CbmMuchClusteringQaReport::Create(
-   ostream& out)
+void CbmMuchClusteringQaReport::Create()
 {
-   fPT = new CbmLitPropertyTree(fQa);
+   Out().precision(3);
+   Out() << R()->DocumentBegin();
+   Out() << R()->Title(0, GetTitle());
 
-   out.precision(3);
-   out << fR->DocumentBegin();
-   out << fR->Title(0, fTitle);
+   Out() << "Number of events: " << HM()->H1("hen_EventNo_TrackingQa")->GetEntries() << endl;
 
-   out << "Number of events: " << PrintValue("hen_EventNo_ClusteringQa.entries") << endl;
-
-   out << PrintNofObjects();
-   out << PrintImages(".*clustering_qa_.*png");
-   out <<  fR->DocumentEnd();
-
-   delete fPT;
+   Out() << PrintNofObjects();
+  // Out() << PrintImages(".*clustering_qa_.*png");
+   Out() <<  R()->DocumentEnd();
 }
 
 string CbmMuchClusteringQaReport::PrintNofObjects() const
 {
-   	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hno_NofObjects_.+mean");
-   	map<string, Double_t>::const_iterator it;
-   	string str = fR->TableBegin("Number of objects per event", list_of("Name")("Value"));
-   	for (it = properties.begin(); it != properties.end(); it++) {
-   		string cellName = Split(it->first, '_')[2];
-   		str += fR->TableRow(list_of(cellName)(NumberToString<Int_t>(it->second)));
-   	}
-   	str += fR->TableEnd();
+	vector<TH1*> histos = HM()->H1Vector("hno_NofObjects_.+");
+	Int_t nofHistos = histos.size();
+   	string str = R()->TableBegin("Number of objects per event", list_of("Name")("Value"));
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		string cellName = Split(histos[iHist]->GetName(), '_')[2];
+		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetMean())));
+	}
+   	str += R()->TableEnd();
    	return str;
 }
+

@@ -8,17 +8,16 @@
 #define CBMLITTRACKINGQAREPORT_H_
 
 #include "CbmSimulationReport.h"
-#include "TSystem.h"
 #include <string>
-#include <sstream>
+#include <vector>
 using std::string;
-using std::stringstream;
-class CbmLitPropertyTree;
+using std::vector;
+class TH1;
 
 /**
  * \class CbmLitTrackingQaReport
- * \brief Creates report for reconstruction performance.
- * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \brief Create report for tracking QA.
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
 class CbmLitTrackingQaReport : public CbmSimulationReport
@@ -36,43 +35,14 @@ public:
 
 protected:
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Create(
-      ostream& out);
+   virtual void Create();
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual string GetQaFileName() const {
-      return "tracking_qa.json";
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "tracking_qa_check.json";
-   }
-
-   /**
-    * \brief Print specified value.
-    * \param[in] hist full name of the property in property tree.
-    * \return string with table row in specific format.
-    */
-   string PrintValue(
-         const string& hist) const {
-      stringstream ss;
-      ss << fQa.get(hist, -1.);
-      return ss.str();
-   }
+   virtual void Draw();
 
    /**
     * \brief Return string with number of objects statistics.
@@ -87,6 +57,12 @@ protected:
    string PrintTrackHits() const;
 
    /**
+    * \brief Return string with number of ghosts statistics.
+    * \return String with number of ghosts statistics.
+    */
+   string PrintNofGhosts() const;
+
+   /**
     * \brief Return string with tracking efficiency.
     * \param[in] includeRich True if RICH detector is included in the tracking efficiency table.
     * \return String with tracking efficiency.
@@ -95,12 +71,76 @@ protected:
 		   Bool_t includeRich) const;
 
    /**
-    * \brief Return string with number of ghosts statistics.
-    * \return String with number of ghosts statistics.
+    * \brief Main function for drawing efficiency histograms.
     */
-   string PrintNofGhosts() const;
+   void DrawEfficiencyHistos();
 
-   CbmLitPropertyTree* fPT;
+   /**
+    * \brief Draw efficiency histogram.
+    * \param[in] canvasName Name of canvas.
+    * \param[in] histNamePattern Histogram name pattern.
+    */
+   void DrawEfficiency(
+	  const string& canvasName,
+	  const string& histNamePattern);
+
+   /**
+    * \brief Draw mean efficiency lines on histogram.
+    * \param[in] histos Vector of histograms.
+    * \param[in] efficiencies Vector of efficiency numbers.
+    */
+   void DrawMeanEfficiencyLines(
+      const vector<TH1*>& histos,
+      const vector<Double_t>& efficiencies);
+
+   /**
+    * \brief Draw accepted and reconstructed tracks histograms.
+    * \param[in] canvasName Name of canvas.
+    * \param[in] histNamePattern Histogram name pattern.
+    */
+   void DrawAccAndRec(
+         const string& canvasName,
+         const string& histNamePattern);
+
+   /**
+    * \brief Draw histograms for hits.
+    */
+   void DrawHitsHistos();
+
+   /**
+    * \brief Draw histograms for hits. This function automatically
+    * check the existence of histograms.
+    * \param[in] canvasName Name of canvas.
+    * \param[in] hist main name of hits histograms.
+    */
+   void DrawHitsHistos(
+      const string& canvasName,
+      const string& hist);
+
+   /**
+    * \brief Main function for drawing Rapidity-Pt histograms.
+    */
+   void DrawYPtHistos();
+
+   /**
+    * \brief Draw Rapidity-Pt histograms.
+    * \param[in] canvasName Name of canvas.
+    * \param[in] effHistName Name of the efficiency histogram.
+    */
+   void DrawYPt(
+         const string& canvasName,
+         const string& effHistName);
+
+   /**
+    * \brief Calculate efficiency for two histograms.
+    * \param[in] histReco Reconstruction histogram.
+    * \param[in] histAcc Acceptance histogram.
+    * \param[in] scale Scaling factor for efficiency.
+    */
+   Double_t CalcEfficiency(
+      const TH1* histRec,
+      const TH1* histAcc,
+      Double_t scale = 1.) const;
 };
 
 #endif /* CBMLITTRACKINGQAREPORT_H_ */

@@ -8,10 +8,8 @@
 #include "CbmLitClusteringQa.h"
 #include "CbmLitClusteringQaCalculator.h"
 #include "CbmLitClusteringQaHistCreator.h"
-#include "CbmLitClusteringQaPTreeCreator.h"
 #include "CbmLitClusteringQaReport.h"
 #include "CbmLitClusteringQaStudyReport.h"
-#include "CbmLitClusteringQaDraw.h"
 #include "CbmHistManager.h"
 #include "../base/CbmLitResultChecker.h"
 
@@ -61,21 +59,6 @@ void CbmLitClusteringQa::Finish()
 {
    fClusteringQa->Finish();
    fHM->WriteToFile();
-
-   CbmLitClusteringQaDraw drawQa;
-   drawQa.Draw(fHM, fOutputDir);
-
-   string qaFile = fOutputDir + "/clustering_qa.json";
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + "/littrack/cbm/qa/clustering/clustering_qa_ideal.json";
-   string checkFile = fOutputDir + "/clustering_qa_check.json";
-
-   CbmLitClusteringQaPTreeCreator ptCreator;
-   ptree qa = ptCreator.Create(fHM);
-   if (fOutputDir != "") { write_json(qaFile.c_str(), qa); }
-
-   CbmLitResultChecker qaChecker;
-   qaChecker.DoCheck(qaFile, idealFile, checkFile);
-
    CreateSimulationReport("Clustering QA", fOutputDir);
 }
 
@@ -84,31 +67,18 @@ void CbmLitClusteringQa::CreateSimulationReport(
       const string& resultDirectory)
 {
    CbmSimulationReport* report = new CbmLitClusteringQaReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/clustering_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/clustering_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/clustering_qa.txt").c_str());
-   report->Create(kTextReport, cout, fOutputDir);
-   report->Create(kHtmlReport, foutHtml, fOutputDir);
-   report->Create(kLatexReport, foutLatex, fOutputDir);
-   report->Create(kTextReport, foutText, fOutputDir);
+   report->Create(fHM, resultDirectory);
    delete report;
 }
 
 void CbmLitClusteringQa::CreateStudyReport(
       const string& title,
-      const vector<string>& resultDirectories,
+      const vector<string>& fileNames,
       const vector<string>& studyNames)
 {
    CbmStudyReport* report = new CbmLitClusteringQaStudyReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/clustering_qa_study.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/clustering_qa_study.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/clustering_qa_study.txt").c_str());
-//   report->Create(kLitText, cout, resultDirectories, studyNames);
-   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
-   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
-   report->Create(kTextReport, foutText, resultDirectories, studyNames);
+   report->Create(fileNames, studyNames, fOutputDir);
    delete report;
 }
+
 ClassImp(CbmLitClusteringQa);

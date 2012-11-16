@@ -17,6 +17,7 @@ class FairField;
 class TGraph;
 class TGraph2D;
 class TList;
+class CbmHistManager;
 
 using std::vector;
 using std::string;
@@ -79,9 +80,9 @@ private:
    void FillBHistos();
 
    /**
-    * \brief Create property tree and serialize it to JSON.
+    * \brief Create simulation report.
     */
-   void CreatePropertyTree();
+   void CreateSimulationReport();
 
    /**
     * \brief Draw field map components for each slice.
@@ -95,8 +96,6 @@ private:
 
    // Pointer to the magnetic field map
    FairField* fField;
-   // List of histograms and graphs
-   TList* fHistoList;
 
    // Slice is defined as rectangle at a certain Z position
    // with upper left corner coordinate equals to [-X, -Y]
@@ -128,30 +127,10 @@ private:
    Double_t fZMax; // Maximum Z position [cm]
    Double_t fZStep; // Step size [cm]
 
-   // Field map graph for each component and each slice
-   // [BX, BY, BZ, MOD][slice number]
-   vector<vector<TGraph2D*> > fgB;
-
-   // Field map values histograms along Z
-   // [BX, BY, BZ][polar angle]
-   vector<vector<TGraph*> > fgBAlongZAngle;
-
-   // Field map values histograms along Z
-   // [BX, BY, BZ][xy position]
-   vector<vector<TGraph*> > fgBAlongZXY;
-
-   // Field integral along Z for specified X and Y
-   // [BX, BY, BZ][xy position]
-   vector<vector<TGraph*> > fgBAlongZXYIntegral;
+   CbmHistManager* fHM; // Histogram manager
 
    // Output directory for images
    string fOutputDir;
-
-   // Indexes of the magnetic field components for convenience
-   static const Int_t BX = 0; // Bx
-   static const Int_t BY = 1; // By
-   static const Int_t BZ = 2; // Bz
-   static const Int_t MOD = 3; // Mod = sqrt(Bx*Bx + By*By + Bz*Bz)
 
    ClassDef(CbmLitFieldQa, 1);
 };

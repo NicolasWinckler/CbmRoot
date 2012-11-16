@@ -20,7 +20,7 @@ class TGraph2D;
 class TList;
 class CbmLitFieldFitter;
 class CbmLitFieldGridCreator;
-class CBmLitPolynom;
+class CbmHistManager;
 
 using std::vector;
 using std::string;
@@ -132,9 +132,9 @@ private:
    void FillGridCreatorHistos();
 
    /**
-    * \brief Create property tree and serialize it to JSON.
+    * \brief Create simulation QA report.
     */
-   void CreatePropertyTree();
+   void CreateSimulationReport();
 
    /**
     * \brief Draw canvas with histograms for each approximated slice.
@@ -153,8 +153,8 @@ private:
 
    // Pointer to the magnetic field map
    FairField* fField;
-   // List of histograms and graphs
-   TList* fHistoList;
+//   // List of histograms and graphs
+//   TList* fHistoList;
 
    // Number of slices along Z for field approximation
    Int_t fNofSlices;
@@ -198,40 +198,42 @@ private:
    // Field grid creator tool
    CbmLitFieldGridCreator* fGridCreator;
 
-   //
-   // Histograms and graphs
-   //
-   // Field map graph for each component and each slice
-   // [BX, BY, BZ, MOD][slice number]
-   vector<vector<TGraph2D*> > fhBGraph;
-   // Approximated field graph for each component, each slice and each polynom order
-   // [BX, BY, BZ, MOD][slice number][polynom order]
-   vector<vector<vector<TGraph2D*> > > fhBAprGraph;
-   // Grid field graph for each component and each slice
-   // [BX, BY, BZ][slice number]
-   vector<vector<TGraph2D*> > fhBGridGraph;
+   CbmHistManager* fHM; // Histogram manager
 
-   // Error histograms for polynomial approximation
-   // [BX, BY, BZ, MOD][slice number][polynom number]
-   vector<vector<vector<TH2*> > > fhBPolynomialErrH2; // 2D absolute error error distribution in (X, Y)
-   vector<vector<vector<TH1*> > > fhBPolynomialErrH1; // Absolute error
-   vector<vector<vector<TH1*> > > fhBPolynomialRelErrH1; // Relative error
-   vector<vector<vector<TH2*> > > fhBPolynomialRelErrH2; // 2D relative error distribution in (X, Y)
-
-   // Error histograms for grid creator tool
-   // [BX, BY, BZ, MOD][slice number]
-   vector<vector<TH2*> > fhBGridErrH2; // 2D absolute error error distribution in (X, Y)
-   vector<vector<TH1*> > fhBGridErrH1; // Absolute error
-   vector<vector<TH1*> > fhBGridRelErrH1; // Relative error
-   vector<vector<TH2*> > fhBGridRelErrH2; // 2D relative error distribution in (X, Y)
+//   //
+//   // Histograms and graphs
+//   //
+//   // Field map graph for each component and each slice
+//   // [BX, BY, BZ, MOD][slice number]
+//   vector<vector<TGraph2D*> > fhBGraph;
+//   // Approximated field graph for each component, each slice and each polynom order
+//   // [BX, BY, BZ, MOD][slice number][polynom order]
+//   vector<vector<vector<TGraph2D*> > > fhBAprGraph;
+//   // Grid field graph for each component and each slice
+//   // [BX, BY, BZ][slice number]
+//   vector<vector<TGraph2D*> > fhBGridGraph;
+//
+//   // Error histograms for polynomial approximation
+//   // [BX, BY, BZ, MOD][slice number][polynom number]
+//   vector<vector<vector<TH2*> > > fhBPolynomialErrH2; // 2D absolute error error distribution in (X, Y)
+//   vector<vector<vector<TH1*> > > fhBPolynomialErrH1; // Absolute error
+//   vector<vector<vector<TH1*> > > fhBPolynomialRelErrH1; // Relative error
+//   vector<vector<vector<TH2*> > > fhBPolynomialRelErrH2; // 2D relative error distribution in (X, Y)
+//
+//   // Error histograms for grid creator tool
+//   // [BX, BY, BZ, MOD][slice number]
+//   vector<vector<TH2*> > fhBGridErrH2; // 2D absolute error error distribution in (X, Y)
+//   vector<vector<TH1*> > fhBGridErrH1; // Absolute error
+//   vector<vector<TH1*> > fhBGridRelErrH1; // Relative error
+//   vector<vector<TH2*> > fhBGridRelErrH2; // 2D relative error distribution in (X, Y)
 
    Bool_t fFixedBounds; // Fixed bounds for error histograms
 
-   // Indexes of the magnetic field components for convenience
-   static const Int_t BX = 0; // Bx
-   static const Int_t BY = 1; // By
-   static const Int_t BZ = 2; // Bz
-   static const Int_t MOD = 3; // Mod = sqrt(Bx*Bx + By*By + Bz*Bz)
+//   // Indexes of the magnetic field components for convenience
+//   static const Int_t BX = 0; // Bx
+//   static const Int_t BY = 1; // By
+//   static const Int_t BZ = 2; // Bz
+//   static const Int_t MOD = 3; // Mod = sqrt(Bx*Bx + By*By + Bz*Bz)
 
 ClassDef(CbmLitFieldApproximationQa, 1);
 };

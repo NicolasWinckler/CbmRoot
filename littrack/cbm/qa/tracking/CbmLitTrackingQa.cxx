@@ -8,8 +8,6 @@
 #include "CbmLitTrackingQaHistCreator.h"
 #include "CbmLitTrackingQaCalculator.h"
 #include "CbmLitTrackingQaStudyReport.h"
-#include "CbmLitTrackingQaDraw.h"
-#include "CbmLitTrackingQaPTreeCreator.h"
 #include "CbmLitTrackingQaReport.h"
 #include "qa/base/CbmLitResultChecker.h"
 #include "CbmHistManager.h"
@@ -99,70 +97,24 @@ void CbmLitTrackingQa::Finish()
 {
    fTrackingQa->Finish();
    fHM->WriteToFile();
-
-   CbmLitTrackingQaDraw drawQa;
-   drawQa.Draw(fHM, fOutputDir);
-
-   string qaFile = fOutputDir + "/tracking_qa.json";
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
-   string checkFile = fOutputDir + "/tracking_qa_check.json";
-
-   CbmLitTrackingQaPTreeCreator ptc;
-   ptree qa = ptc.Create(fHM);
-   if (fOutputDir != "") { write_json(qaFile.c_str(), qa); }
-
-   CbmLitResultChecker qaChecker;
-   qaChecker.DoCheck(qaFile, idealFile, checkFile);
-
-   CreateSimulationReport("Tracking QA", fOutputDir);
+   CreateSimulationReport();
 }
 
-void CbmLitTrackingQa::CreateSimulationReport(
-      const string& title,
-      const string& resultDirectory)
+void CbmLitTrackingQa::CreateSimulationReport()
 {
    CbmSimulationReport* report = new CbmLitTrackingQaReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/tracking_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/tracking_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/tracking_qa.txt").c_str());
-   report->Create(kTextReport, cout, resultDirectory);
-   report->Create(kHtmlReport, foutHtml, resultDirectory);
-   report->Create(kLatexReport, foutLatex, resultDirectory);
-   report->Create(kTextReport, foutText, resultDirectory);
+   report->Create(fHM, fOutputDir);
    delete report;
 }
 
 void CbmLitTrackingQa::CreateStudyReport(
       const string& title,
-      const vector<string>& resultDirectories,
+      const vector<string>& fileNames,
       const vector<string>& studyNames)
 {
    CbmStudyReport* report = new CbmLitTrackingQaStudyReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/tracking_qa_study.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/tracking_qa_study.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/tracking_qa_study.txt").c_str());
-   //report->Create(kLitText, cout, resultDirectories, studyNames);
-   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
-   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
-   report->Create(kTextReport, foutText, resultDirectories, studyNames);
+   report->Create(fileNames, studyNames, fOutputDir);
    delete report;
-}
-
-void CbmLitTrackingQa::DrawHistosFromFile(
-      const std::string& fileName)
-{
-   // read histograms from file
-   fHM = new CbmHistManager();
-   TFile* file = new TFile(fileName.c_str());
-   fHM->ReadFromFile(file);
-   // recalculate efficiency histograms
-   fTrackingQa = new CbmLitTrackingQaCalculator(fHM);
-   fTrackingQa->CalculateEfficiencyHistos();
-   // draw histograms
-   CbmLitTrackingQaDraw drawQa;
-   drawQa.Draw(fHM, "");
 }
 
 ClassImp(CbmLitTrackingQa);

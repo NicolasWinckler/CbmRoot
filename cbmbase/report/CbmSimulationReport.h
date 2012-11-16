@@ -8,12 +8,12 @@
 #define CBMSIMULATIONREPORT_H_
 
 #include "CbmReport.h"
-#include <boost/property_tree/ptree.hpp>
 #include <string>
 
 using std::ostream;
 using std::string;
-using boost::property_tree::ptree;
+
+class CbmHistManager;
 
 /**
  * \class CbmSimulationReport
@@ -35,50 +35,39 @@ public:
    virtual ~CbmSimulationReport();
 
    /**
-    * \brief Main function which creates report file.
+    * \brief Main function which creates report data.
     *
     * Non virtual interface pattern is used here.
     * User always creates simulation report using this public non virtual method.
     * In order to configure concrete report generation class
-    * user has to implement protected Create() method
-    * and getters for the file names.
+    * user has to implement protected Create() method.
     *
-    * \param[in] reportType Type of report to be produced.
-    * \param[out] out Output stream for report file.
-    * \param[in] resultDirectory Path to directory with results.
+    * \param[in] histManager Pointer to histogram manager for which report is created.
+    * \param[in] outputDir Path to directory for output results.
     */
    void Create(
-         ReportType reportType,
-         ostream& out,
-         const string& resultDirectory);
+		   CbmHistManager* histManager,
+		   const string& outputDir);
 
    /**
-    * \brief Inherited from CbmLitReport.
+    * \brief Main function which creates report data.
+    *
+    * Same pattern is used here.
+    *
+    * \param[in] fileName Name of the file with histograms.
+    * \param[in] outputDir Path to directory for output results.
     */
-   bool PropertyExists(
-         const string& name) const;
-
-protected:
+   void Create(
+		   const string& fileName,
+		   const string& outputDir);
 
    /**
-    * \brief Pure abstract function which is called from main Create() function.
-    * \param[in] out Output stream.
+    * \brief Return pointer to Histogram manager.
     */
-   virtual void Create(
-         ostream& out) = 0;
+   CbmHistManager* HM() const { return fHM; };
 
-   /**
-    * \brief Return formatted string with printed images based on specified pattern.
-    * \param[in] pattern Regular expression.
-    * \return Formatted string with printed images based on specified pattern.
-    */
-   string PrintImages(
-   		const string& pattern) const;
-
-   ptree fQa; // Property tree of Qa results for each study
-   ptree fIdeal; // Property with ideal values
-   ptree fCheck; // Property tree with checked results for each study
-   string fResultDirectory; // Directory with simulation results
+private:
+   CbmHistManager* fHM; // Histogram manager
 };
 
 #endif /* CBMSIMULATIONREPORT_H_ */

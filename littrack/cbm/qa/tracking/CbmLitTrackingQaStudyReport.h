@@ -9,12 +9,8 @@
 
 #include "CbmStudyReport.h"
 #include <string>
-#include <vector>
-#include "TSystem.h"
 #include <boost/function.hpp>
 using std::string;
-using std::vector;
-class CbmLitPropertyTree;
 
 /**
  * \class CbmLitTrackingQaStudyReport
@@ -25,7 +21,7 @@ class CbmLitPropertyTree;
  * Very useful for studies since all numbers are automatically
  * put in the comparison tables.
  *
- * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  *
  */
@@ -46,29 +42,12 @@ protected:
     /**
     * \brief Inherited from CbmLitStudyReport.
     */
-   void Create(
-         ostream& out);
+   void Create();
 
-   /**
-     * \brief Inherited from CbmLitSimulationReport.
-     */
-    virtual string GetQaFileName() const {
-       return "tracking_qa.json";
-    }
-
-    /**
-     * \brief Inherited from CbmLitSimulationReport.
-     */
-    virtual string GetIdealFileName() const {
-       return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/tracking/tracking_qa_ideal.json");
-    }
-
-    /**
-     * \brief Inherited from CbmLitSimulationReport.
-     */
-    virtual string GetCheckFileName() const {
-       return "tracking_qa_check.json";
-    }
+	/**
+	* \brief Inherited from CbmLitStudyReport.
+	*/
+	void Draw();
 
     /**
      * \brief Return formated string with table of numbers.
@@ -91,8 +70,6 @@ protected:
     string PrintEfficiencyTable(
     		const string& tableName,
     		const string& pattern) const;
-
-   vector<CbmLitPropertyTree*> fPT;
 };
 
 #endif /* CBMLITTRACKINGQASTUDYREPORT_H_ */

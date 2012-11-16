@@ -5,134 +5,344 @@
  */
 #include "CbmLitTrackingQaReport.h"
 #include "CbmLitTrackingQaHistCreator.h"
-#include "../base/CbmLitPropertyTree.h"
 #include "CbmReportElement.h"
+#include "CbmHistManager.h"
+#include "CbmDrawHist.h"
 #include "std/utils/CbmLitUtils.h"
-#include <boost/property_tree/ptree.hpp>
+#include "TH1.h"
+#include "TCanvas.h"
+#include "TLine.h"
 #include <boost/assign/list_of.hpp>
+#include <vector>
 
-using std::endl;
 using std::vector;
-using std::make_pair;
+using std::endl;
 using boost::assign::list_of;
 using lit::NumberToString;
 using lit::FindAndReplace;
 using lit::Split;
+using lit::SaveCanvasAsImage;
 
 CbmLitTrackingQaReport::CbmLitTrackingQaReport():
-		fPT(NULL)
+		CbmSimulationReport()
 {
+	SetName("tracking_qa");
 }
 
 CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 {
 }
 
-void CbmLitTrackingQaReport::Create(
-   ostream& out)
+void CbmLitTrackingQaReport::Create()
 {
-	fPT = new CbmLitPropertyTree(fQa);
+   Out().precision(3);
+   Out() << R()->DocumentBegin();
+   Out() << R()->Title(0, GetTitle());
 
-   out.precision(3);
-   out << fR->DocumentBegin();
-   out << fR->Title(0, fTitle);
+   Out() << "Number of events: " << HM()->H1("hen_EventNo_TrackingQa")->GetEntries() << endl;
 
-   out << "Number of events: " << PrintValue("hen_EventNo_TrackingQa.entries") << endl;
+   Out() << PrintNofObjects();
+   Out() << PrintTrackHits();
+   Out() << PrintNofGhosts();
+   Out() << PrintTrackingEfficiency(false);
+   Out() << PrintTrackingEfficiency(true);
 
-   out << PrintNofObjects();
-   out << PrintTrackHits();
-   out << PrintTrackingEfficiency(false);
-   out << PrintTrackingEfficiency(true);
-   out << PrintNofGhosts();
-   out << PrintImages(".*tracking_qa_.*png");
+   PrintCanvases();
 
-   out <<  fR->DocumentEnd();
-
-   delete fPT;
+   Out() <<  R()->DocumentEnd();
 }
 
 string CbmLitTrackingQaReport::PrintNofObjects() const
 {
-   	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hno_NofObjects_.+");
-   	map<string, Double_t>::const_iterator it;
-   	string str = fR->TableBegin("Number of objects per event", list_of("Name")("Value"));
-   	for (it = properties.begin(); it != properties.end(); it++) {
-   		string cellName = Split(it->first, '_')[2];
-   		str += fR->TableRow(list_of(cellName)(NumberToString<Int_t>(it->second)));
-   	}
-   	str += fR->TableEnd();
+	vector<TH1*> histos = HM()->H1Vector("hno_NofObjects_.+");
+	Int_t nofHistos = histos.size();
+	string str = R()->TableBegin("Number of objects per event", list_of("Name")("Value"));
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		string cellName = Split(histos[iHist]->GetName(), '_')[2];
+		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetMean())));
+	}
+   	str += R()->TableEnd();
    	return str;
 }
 
 string CbmLitTrackingQaReport::PrintTrackHits() const
 {
-    string str = fR->TableBegin("Number of all, true and fake hits in tracks and rings",
-   	         list_of("")("all")("true")("fake")("true/all")("fake/all"));
-  	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hth_.+_TrackHits_All.*");
-  	map<string, Double_t>::const_iterator it;
-  	for (it = properties.begin(); it != properties.end(); it++) {
-  		string name = it->first;
-  		string cellName = Split(name, '_')[1];
-  	    string all = NumberToString<Double_t>(it->second, 2);
-  	    string trueh = NumberToString<Double_t>(fQa.get(FindAndReplace(name, "_All", "_True"), -1.), 2);
-  	    string fakeh = NumberToString<Double_t>(fQa.get(FindAndReplace(name, "_All", "_Fake"), -1.), 2);
-  	    string toa = NumberToString<Double_t>(fQa.get(FindAndReplace(name, "_All", "_TrueOverAll"), -1.), 2);
-  	    string foa = NumberToString<Double_t>(fQa.get(FindAndReplace(name, "_All", "_FakeOverAll"), -1.), 2);
-  	    str += fR->TableRow(list_of(cellName)(all)(trueh)(fakeh)(toa)(foa));
-  	}
-  	str += fR->TableEnd();
+	vector<TH1*> histos = HM()->H1Vector("hth_.+_TrackHits_All.+");
+	Int_t nofHistos = histos.size();
+	string str = R()->TableBegin("Number of all, true and fake hits in tracks and rings",
+	   	         list_of("")("all")("true")("fake")("true/all")("fake/all"));
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		string name = histos[iHist]->GetName();
+		string cellName = Split(name, '_')[1];
+  	    string all = NumberToString<Double_t>(histos[iHist]->GetMean(), 2);
+  	    string trueh = NumberToString<Double_t>(HM()->H1(FindAndReplace(name, "_All", "_True"))->GetMean(), 2);
+  	    string fakeh = NumberToString<Double_t>(HM()->H1(FindAndReplace(name, "_All", "_Fake"))->GetMean(), 2);
+  	    string toa = NumberToString<Double_t>(HM()->H1(FindAndReplace(name, "_All", "_TrueOverAll"))->GetMean(), 2);
+  	    string foa = NumberToString<Double_t>(HM()->H1(FindAndReplace(name, "_All", "_FakeOverAll"))->GetMean(), 2);
+  	    str += R()->TableRow(list_of(cellName)(all)(trueh)(fakeh)(toa)(foa));
+	}
+  	str += R()->TableEnd();
   	return str;
 }
 
 string CbmLitTrackingQaReport::PrintNofGhosts() const
 {
-	map<string, Double_t> properties = fPT->GetByPattern<Double_t>("hng_NofGhosts_.+");
-	map<string, Double_t>::const_iterator it;
-	string str = fR->TableBegin("Number of ghosts per event", list_of("Name")("Value"));
-	for (it = properties.begin(); it != properties.end(); it++) {
-		string cellName = Split(it->first, '_')[2];
-		str += fR->TableRow(list_of(cellName)(NumberToString<Int_t>(it->second)));
+	Double_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
+	vector<TH1*> histos = HM()->H1Vector("hng_NofGhosts_.+");
+	Int_t nofHistos = histos.size();
+	string str = R()->TableBegin("Number of ghosts per event", list_of("Name")("Value"));
+	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+		string cellName = Split(histos[iHist]->GetName(), '_')[2];
+		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetEntries())));
 	}
-	str += fR->TableEnd();
+	str += R()->TableEnd();
 	return str;
 }
 
 string CbmLitTrackingQaReport::PrintTrackingEfficiency(
 		Bool_t includeRich) const
 {
-	// If includeRich == true than search for tracking efficiency histograms which contain "Rich"
-	// otherwise search for tracking efficiency histograms excluding those which contain "Rich"
-	string effRegex = (includeRich) ? "hte_.*Rich.*_Eff_p" : "hte_((?!Rich).)*_Eff_p";
-    map<string, Double_t> properties = fPT->GetByPattern<Double_t>(effRegex);
-	if (properties.size() == 0) return "";
+  	// If includeRich == true than search for tracking efficiency histograms which contain "Rich"
+  	// otherwise search for tracking efficiency histograms excluding those which contain "Rich"
+  	string effRegex = (includeRich) ? "hte_.*Rich.*_Eff_p" : "hte_((?!Rich).)*_Eff_p";
+  	vector<TH1*> histos = HM()->H1Vector(effRegex);
+  	Int_t nofHistos = histos.size();
+  	if (nofHistos == 0) return "";
 
 	const vector<string>& cat = (includeRich) ? CbmLitTrackingQaHistCreator::Instance()->GetRingCategories() : CbmLitTrackingQaHistCreator::Instance()->GetTrackCategories();
 	Int_t nofCats = cat.size();
-	Int_t nofRows = properties.size() / nofCats;
+	Int_t nofRows = nofHistos / nofCats;
 
 	// Maps category name to cell index
 	map<string, Int_t> catToCell;
 	for (Int_t iCat = 0; iCat < nofCats; iCat++) { catToCell.insert(make_pair<string, Int_t>(cat[iCat], iCat)); }
 
-	string str = fR->TableBegin("Tracking efficiency", list_of(string("")).range(cat));
-  	map<string, Double_t>::const_iterator it = properties.begin();
+	Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
+	string str = R()->TableBegin("Tracking efficiency", list_of(string("")).range(cat));
+	Int_t histCounter = 0;
   	for (Int_t iRow = 0; iRow < nofRows; iRow++) {
   		vector<string> cells(nofCats);
   		string rowName;
   		for (Int_t iCat = 0; iCat < nofCats; iCat++) {
-			string effName = it->first;
-			string accName = FindAndReplace(effName, "_Eff_", "_Acc_") + ".entries";
-			string recName = FindAndReplace(effName, "_Eff_", "_Rec_") + ".entries";
-			string eff = NumberToString<Double_t>(fQa.get(effName, -1.));
-			string acc = NumberToString<Double_t>(fQa.get(accName, -1.));
-			string rec = NumberToString<Double_t>(fQa.get(recName, -1.));
+			string effName = histos[histCounter]->GetName();
+			string accName = FindAndReplace(effName, "_Eff_", "_Acc_");
+			string recName = FindAndReplace(effName, "_Eff_", "_Rec_");
+			Double_t acc = HM()->H1(accName)->GetEntries() / nofEvents;
+			Double_t rec = HM()->H1(recName)->GetEntries() / nofEvents;
+			Double_t eff = (acc != 0.) ? 100. * rec / acc : 0.;
+			string accStr = NumberToString<Double_t>(acc);
+			string recStr = NumberToString<Double_t>(rec);
+			string effStr = NumberToString<Double_t>(eff);
 			vector<string> split = Split(effName, '_');
-			cells[catToCell[split[3]]] = eff + "(" + rec + "/" + acc + ")";
-			it++;
+			cells[catToCell[split[3]]] = effStr + "(" + recStr + "/" + accStr + ")";
+			histCounter++;
 			rowName = split[1] + " (" + split[2] + ")";
   		}
-  		str += fR->TableRow(list_of(rowName).range(cells));
+  		str += R()->TableRow(list_of(rowName).range(cells));
 	}
-  	str += fR->TableEnd();
+  	str += R()->TableEnd();
   	return str;
+}
+
+
+void CbmLitTrackingQaReport::Draw()
+{
+	SetDefaultDrawStyle();
+	DrawEfficiencyHistos();
+	DrawYPtHistos();
+	DrawHitsHistos();
+}
+
+void CbmLitTrackingQaReport::DrawEfficiencyHistos()
+{
+	// Draw global tracking efficiency
+	vector<string> globalTrackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
+	for (UInt_t i = 0; i < globalTrackVariants.size(); i++) {
+		string variant = globalTrackVariants[i];
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p");
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_pt", "hte_Sts.*_" + variant + "_All_Eff_pt");
+		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_y", "hte_Sts.*_" + variant + "_All_Eff_y");
+	}
+
+	// Draw local tracking efficiency
+	vector<string> localTrackVariants = list_of("Sts")("Trd")("Much")("Rich")("Tof");
+	for (UInt_t i = 0; i < localTrackVariants.size(); i++) {
+		string variant = localTrackVariants[i];
+		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_Eff_p" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff_p";
+		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re);
+		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_pt");
+		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");
+	}
+
+	// Draw local accepted and reconstructed tracks vs number of points
+	HM()->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
+	vector<string> accRecTracks = list_of("Sts")("Trd")("Much")("Tof");
+	for (UInt_t i = 0; i < accRecTracks.size(); i++) {
+		string variant = accRecTracks[i];
+		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_(Acc|Rec)_Np" : "hte_" + variant + "_.*_(All|Muon|Electron)_(Acc|Rec)_Np";
+		DrawAccAndRec("tracking_qa_local_acc_and_rec_" + variant + "_Np", re);
+	}
+}
+
+void CbmLitTrackingQaReport::DrawEfficiency(
+      const string& canvasName,
+      const string& histNamePattern)
+{
+	vector<TH1*> histos = HM()->H1Vector(histNamePattern);
+	if (histos.size() == 0) return;
+
+	TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+	canvas->SetGrid();
+	canvas->cd();
+
+	Int_t nofHistos = histos.size();
+	vector<string> labels(nofHistos);
+	vector<Double_t> efficiencies(nofHistos);
+	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+		string name = histos[iHist]->GetName();
+		efficiencies[iHist] = CalcEfficiency(HM()->H1(FindAndReplace(name, "_Eff_", "_Rec_")), HM()->H1(FindAndReplace(name, "_Eff_", "_Acc_")), 100.);
+		vector<string> split = Split(name, '_');
+		labels[iHist] = split[1] + ":" + split[3] + "(" + NumberToString<Double_t>(efficiencies[iHist], 1) + ")";
+	}
+
+	DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
+	DrawMeanEfficiencyLines(histos, efficiencies);
+}
+
+void CbmLitTrackingQaReport::DrawMeanEfficiencyLines(
+   const vector<TH1*>& histos,
+   const vector<Double_t>& efficiencies)
+{
+   assert(histos.size() != 0 && efficiencies.size() == histos.size());
+
+   Double_t minX = histos[0]->GetXaxis()->GetXmin();
+   Double_t maxX = histos[0]->GetXaxis()->GetXmax();
+   Int_t nofHistos = histos.size();
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      TLine* line = new TLine(minX, efficiencies[iHist], maxX, efficiencies[iHist]);
+      line->SetLineWidth(1);
+      line->SetLineColor(histos[iHist]->GetLineColor());
+      line->Draw();
+   }
+}
+
+void CbmLitTrackingQaReport::DrawAccAndRec(
+      const string& canvasName,
+      const string& histNamePattern)
+{
+	vector<TH1*> histos = HM()->H1Vector(histNamePattern);
+	if (histos.size() == 0) return;
+
+	TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+	canvas->SetGrid();
+	canvas->cd();
+
+	Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
+	Int_t nofHistos = histos.size();
+	vector<string> labels(nofHistos);
+	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+		TH1* hist = histos[iHist];
+		hist->Scale(1./nofEvents);
+		string name = hist->GetName();
+		vector<string> split = Split(name, '_');
+		labels[iHist] = split[4] + ":" + split[3] + "(" + NumberToString<Double_t>(hist->GetEntries() / nofEvents, 1) + ")";
+	}
+
+	DrawH1(histos, labels, kLinear, kLog, true, 0.2, 0.75, 0.5, 0.99);
+}
+
+void CbmLitTrackingQaReport::DrawYPtHistos()
+{
+   // Draw global tracking efficiency
+   vector<string> globalTrackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
+   for (UInt_t i = 0; i < globalTrackVariants.size(); i++) {
+      string variant = globalTrackVariants[i];
+      string effHistName = "hte_" + variant + "_" + variant;
+      DrawYPt("tracking_qa_" + variant + "_all_ypt", effHistName + "_All_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_proton_ypt", effHistName + "_Proton_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_pion_plus_ypt", effHistName + "_PionPlus_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_pion_minus_ypt", effHistName + "_PionMinus_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_kaon_plus_ypt", effHistName + "_KaonPlus_Eff_YPt");
+      DrawYPt("tracking_qa_" + variant + "_kaon_minus_ypt", effHistName + "_KaonMinus_Eff_YPt");
+   }
+}
+
+void CbmLitTrackingQaReport::DrawYPt(
+      const string& canvasName,
+      const string& effHistName)
+{
+   string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
+   string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
+
+   if (!(HM()->Exists(effHistName) && HM()->Exists(accHistName) && HM()->Exists(recHistName))) return;
+
+   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1800, 600);
+   canvas->Divide(3, 1);
+   canvas->SetGrid();
+
+   TH2* accHist = HM()->H2(accHistName);
+   TH2* recHist = HM()->H2(recHistName);
+   TH2* effHist = HM()->H2(effHistName);
+
+   canvas->cd(1);
+   DrawH2(accHist);
+
+   canvas->cd(2);
+   DrawH2(recHist);
+
+   canvas->cd(3);
+   DrawH2(effHist);
+}
+
+void CbmLitTrackingQaReport::DrawHitsHistos()
+{
+   HM()->ShrinkEmptyBinsByPattern("hth_.*(_All|_True|_Fake)");
+   DrawHitsHistos("tracking_qa_mvd_hits", "hth_Mvd_TrackHits");
+   DrawHitsHistos("tracking_qa_sts_hits", "hth_Sts_TrackHits");
+   DrawHitsHistos("tracking_qa_trd_hits", "hth_Trd_TrackHits");
+   DrawHitsHistos("tracking_qa_much_hits", "hth_Much_TrackHits");
+   DrawHitsHistos("tracking_qa_rich_hits", "hth_Rich_TrackHits");
+}
+
+void CbmLitTrackingQaReport::DrawHitsHistos(
+   const string& canvasName,
+   const string& hist)
+{
+   if (!(HM()->Exists(hist + "_All") && HM()->Exists(hist + "_True") &&
+         HM()->Exists(hist + "_Fake") && HM()->Exists(hist + "_TrueOverAll") &&
+         HM()->Exists(hist + "_FakeOverAll"))) return;
+
+   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 600);
+   canvas->Divide(2,1);
+   canvas->SetGrid();
+
+   canvas->cd(1);
+   TH1* hAll = HM()->H1(hist + "_All");
+   TH1* hTrue = HM()->H1(hist + "_True");
+   TH1* hFake = HM()->H1(hist + "_Fake");
+   DrawH1(list_of(hAll)(hTrue)(hFake),
+      list_of("all: " + NumberToString<Double_t>(hAll->GetMean(), 1))
+             ("true: " + NumberToString<Double_t>(hTrue->GetMean(), 1))
+             ("fake: " + NumberToString<Double_t>(hFake->GetMean(), 1)),
+              kLinear, kLog, true, 0.25, 0.99, 0.55, 0.75);
+
+   canvas->cd(2);
+   TH1* hTrueOverAll = HM()->H1(hist + "_TrueOverAll");
+   TH1* hFakeOverAll = HM()->H1(hist + "_FakeOverAll");
+   DrawH1(list_of(hTrueOverAll)(hFakeOverAll),
+      list_of("true/all: " + NumberToString<Double_t>(hTrueOverAll->GetMean()))
+             ("fake/all: " + NumberToString<Double_t>(hFakeOverAll->GetMean())),
+             kLinear, kLog, true, 0.25, 0.99, 0.55, 0.75);
+}
+
+Double_t CbmLitTrackingQaReport::CalcEfficiency(
+   const TH1* histRec,
+   const TH1* histAcc,
+   Double_t scale) const
+{
+   if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
+      return 0.;
+   } else {
+      return scale * Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+   }
 }

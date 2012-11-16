@@ -42,29 +42,12 @@ protected:
     /**
     * \brief Inherited from CbmLitStudyReport.
     */
-   void Create(
-         ostream& out);
+   void Create();
 
    /**
-     * \brief Inherited from CbmLitSimulationReport.
-     */
-    virtual string GetQaFileName() const {
-       return "rich_geo_test.json";
-    }
-
-    /**
-     * \brief Inherited from CbmLitSimulationReport.
-     */
-    virtual string GetIdealFileName() const {
-       return "rich_geo_test.json";
-    }
-
-    /**
-     * \brief Inherited from CbmLitSimulationReport.
-     */
-    virtual string GetCheckFileName() const {
-       return "rich_geo_test.json";
-    }
+   * \brief Inherited from CbmLitStudyReport.
+   */
+  void Draw() {};
 
    /**
     * \brief Print one row in a table.

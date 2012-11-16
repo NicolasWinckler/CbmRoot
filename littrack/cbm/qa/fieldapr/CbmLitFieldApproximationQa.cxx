@@ -10,6 +10,7 @@
 #include "base/CbmLitFieldGridCreator.h"
 #include "utils/CbmLitUtils.h"
 #include "CbmDrawHist.h"
+#include "CbmHistManager.h"
 
 #include "../../../parallel/LitFieldGrid.h"
 #include "../../../parallel/LitFieldSlice.h"
@@ -35,8 +36,6 @@
 #include <string>
 #include <limits>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 
 using lit::ToString;
@@ -48,22 +47,10 @@ using boost::assign::list_of;
 
 CbmLitFieldApproximationQa::CbmLitFieldApproximationQa():
    fField(NULL),
-   fHistoList(NULL),
    fNofSlices(0),
    fZSlicePosition(),
    fXSlicePosition(),
    fYSlicePosition(),
-   fhBGraph(),
-   fhBAprGraph(),
-   fhBGridGraph(),
-   fhBPolynomialErrH2(),
-   fhBPolynomialErrH1(),
-   fhBPolynomialRelErrH1(),
-   fhBPolynomialRelErrH2(),
-   fhBGridErrH2(),
-   fhBGridErrH1(),
-   fhBGridRelErrH1(),
-   fhBGridRelErrH2(),
    fFixedBounds(true),
    fAcceptanceAngleX(25.),
    fAcceptanceAngleY(25.),
@@ -75,7 +62,8 @@ CbmLitFieldApproximationQa::CbmLitFieldApproximationQa():
    fGridCreator(),
    fPolynomDegreeIndex(1),
    fNofPolynoms(4),
-   fPolynomDegrees()
+   fPolynomDegrees(),
+   fHM(NULL)
 {
 
 }
@@ -118,6 +106,8 @@ InitStatus CbmLitFieldApproximationQa::Init()
 
    fField = FairRunAna::Instance()->GetField();
 
+   fHM = new CbmHistManager();
+
    return kSUCCESS;
 }
 
@@ -137,30 +127,27 @@ void CbmLitFieldApproximationQa::Finish()
 
    // Check and draw polynomial field approximation
    FillFieldApproximationHistos();
-	DrawSlices(BX, "apr");
-	DrawSlices(BY, "apr");
-	DrawSlices(BZ, "apr");
-	DrawSlices(MOD, "apr");
-   DrawPoly("rel");
-	DrawPoly("abs");
+   DrawSlices(0, "Apr");
+   DrawSlices(1, "Apr");
+   DrawSlices(2, "Apr");
+   DrawSlices(1, "Apr");
+   DrawPoly("RelErr");
+   DrawPoly("Err");
 
    // Check and draw histograms for grid creator tool
-	FillGridCreatorHistos();
-	DrawSlices(BX, "grid");
-	DrawSlices(BY, "grid");
-	DrawSlices(BZ, "grid");
-	DrawSlices(MOD, "grid");
+   FillGridCreatorHistos();
+   DrawSlices(0, "Grid");
+   DrawSlices(1, "Grid");
+   DrawSlices(2, "Grid");
+   DrawSlices(3, "Grid");
 
-   CreatePropertyTree();
+   CreateSimulationReport();
 
-   TIter next(fHistoList);
-   while ( TObject* histo = ((TObject*)next()) ) { histo->Write(); }
+   fHM->WriteToFile();
 }
 
 void CbmLitFieldApproximationQa::CreateHistos()
 {
-   fHistoList = new TList();
-
    CreateFieldHistos();
    CreateFitterHistos();
    CreateGridHistos();
@@ -168,47 +155,21 @@ void CbmLitFieldApproximationQa::CreateHistos()
 
 void CbmLitFieldApproximationQa::CreateFieldHistos()
 {
+   std::string names[] = {"Bx", "By", "Bz", "Mod"};
    string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
-
-   // [BX, BY, BZ, MOD] components
-   fhBGraph.resize(4);
-   for (Int_t i = 0; i < 4; i++) {
-      fhBGraph[i].resize(fNofSlices);
-   }
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
-         fhBGraph[v][i] = new TGraph2D();
-         string graphName = "fhBGraph";
-         string graphTitle = string("fhBGraph;X [cm]; Y [cm];") + zTitle[v];
-         fhBGraph[v][i]->SetNameTitle(graphName.c_str(), graphTitle.c_str());
-         fHistoList->Add(fhBGraph[v][i]);
+         TGraph2D* graph = new TGraph2D();
+         string name = "hfa_" + names[v] + "_Graph2D_" + ToString<Int_t>(i);
+         string title = name + ";X [cm];Y [cm];" + zTitle[v];
+         graph->SetNameTitle(name.c_str(), title.c_str());
+         fHM->Add(name, graph);
       }
    }
 }
 
 void CbmLitFieldApproximationQa::CreateFitterHistos()
 {
-   // Resize histogram vectors
-   fhBAprGraph.resize(4);
-   fhBPolynomialErrH1.resize(4);
-   fhBPolynomialErrH2.resize(4);
-   fhBPolynomialRelErrH1.resize(4);
-   fhBPolynomialRelErrH2.resize(4);
-   for (Int_t i = 0; i < 4; i++) {
-      fhBAprGraph[i].resize(fNofSlices);
-      fhBPolynomialErrH1[i].resize(fNofSlices);
-      fhBPolynomialErrH2[i].resize(fNofSlices);
-      fhBPolynomialRelErrH1[i].resize(fNofSlices);
-      fhBPolynomialRelErrH2[i].resize(fNofSlices);
-      for (Int_t j = 0; j < fNofSlices; j++) {
-         fhBAprGraph[i][j].resize(fNofPolynoms);
-         fhBPolynomialErrH1[i][j].resize(fNofPolynoms);
-         fhBPolynomialErrH2[i][j].resize(fNofPolynoms);
-         fhBPolynomialRelErrH1[i][j].resize(fNofPolynoms);
-         fhBPolynomialRelErrH2[i][j].resize(fNofPolynoms);
-      }
-   }
-
    std::string names[] = {"Bx", "By", "Bz", "Mod"};
 
    Int_t nofBinsX = fNofBinsX;
@@ -233,27 +194,27 @@ void CbmLitFieldApproximationQa::CreateFitterHistos()
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          for(Int_t j = 0; j < fNofPolynoms; j++) {
-            fhBAprGraph[v][i][j] = new TGraph2D();
-            string graphName = "fhBAprGraph";
-            string graphTitle = string("fhBAprGraph;X [cm]; Y [cm];") + zTitle[v];
-            fhBAprGraph[v][i][j]->SetNameTitle(graphName.c_str(), graphTitle.c_str());
-            fHistoList->Add(fhBAprGraph[v][i][j]);
+            TGraph2D* graph = new TGraph2D();
+            string name = "hfa_" + names[v] + "Apr_Graph2D" + "_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            string title = name + ";X [cm];Y [cm];" + zTitle[v];
+            graph->SetNameTitle(name.c_str(), title.c_str());
+            fHM->Add(name, graph);
 
-            std::string histName = "hBErrH1" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
-            fhBPolynomialErrH1[v][i][j] = new TH1D(histName.c_str(), string(histName + ";" + errTitle[v] + ";Counter").c_str(), nofBinsErrB, minErrB, maxErrB);
-            fHistoList->Add(fhBPolynomialErrH1[v][i][j]);
+            name = "hfa_" + names[v] + "Err_H1_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            title = name + ";" + errTitle[v] + ";Counter";
+            fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsErrB, minErrB, maxErrB));
 
-            histName = "hBErrH2" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
-            fhBPolynomialErrH2[v][i][j] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + errTitle[v]).c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]);
-            fHistoList->Add(fhBPolynomialErrH2[v][i][j]);
+            name = "hfa_" + names[v] + "ErrApr_H2_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            title = name + ";X [cm];Y [cm];" + errTitle[v];
+            fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
 
-            histName = "hBRelErrH1" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
-            fhBPolynomialRelErrH1[v][i][j] = new TH1D(histName.c_str(), string(histName + ";" + relErrTitle[v] + ";Counter").c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
-            fHistoList->Add(fhBPolynomialRelErrH1[v][i][j]);
+            name = "hfa_" + names[v] + "RelErr_H1_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            title = name + ";" + relErrTitle[v] + ";Counter";
+            fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB));
 
-            histName = "hBRelErrH2" + names[v] + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
-            fhBPolynomialRelErrH2[v][i][j] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + relErrTitle[v]).c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]);
-            fHistoList->Add(fhBPolynomialRelErrH2[v][i][j]);
+            name = "hfa_" + names[v] + "RelErrApr_H2_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            title = name + ";X [cm];Y [cm];" + relErrTitle[v];
+            fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
          }
       }
    }
@@ -262,20 +223,6 @@ void CbmLitFieldApproximationQa::CreateFitterHistos()
 
 void CbmLitFieldApproximationQa::CreateGridHistos()
 {
-   // Resize histogram vectors
-   fhBGridGraph.resize(4);
-   fhBGridErrH1.resize(4);
-   fhBGridErrH2.resize(4);
-   fhBGridRelErrH1.resize(4);
-   fhBGridRelErrH2.resize(4);
-   for (Int_t i = 0; i < 4; i++) {
-      fhBGridGraph[i].resize(fNofSlices);
-      fhBGridErrH1[i].resize(fNofSlices);
-      fhBGridErrH2[i].resize(fNofSlices);
-      fhBGridRelErrH1[i].resize(fNofSlices);
-      fhBGridRelErrH2[i].resize(fNofSlices);
-   }
-
    std::string names[] = {"Bx", "By", "Bz", "Mod"};
 
    Int_t nofBinsX = fNofBinsX;
@@ -299,27 +246,27 @@ void CbmLitFieldApproximationQa::CreateGridHistos()
    // Create histograms
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
-         fhBGridGraph[v][i] = new TGraph2D();
-         string graphName = "fhBGridGraph";
-         string graphTitle = string("fhBGridGraph;X [cm]; Y [cm];") + zTitle[v];
-         fhBGridGraph[v][i]->SetNameTitle(graphName.c_str(), graphTitle.c_str());
-         fHistoList->Add(fhBGridGraph[v][i]);
+         TGraph2D* graph = new TGraph2D();
+         string name = "hfa_" + names[v] + "Grid_Graph2D_" + ToString<Int_t>(i);
+         string title = name + ";X [cm]; Y [cm];" + zTitle[v];
+         graph->SetNameTitle(name.c_str(), title.c_str());
+         fHM->Add(name, graph);
 
-         std::string histName = "hGridBErrH1" + names[v] + ToString<Int_t>(i);
-         fhBGridErrH1[v][i] = new TH1D(histName.c_str(), string(histName + ";" + errTitle[v] + ";Counter").c_str(), nofBinsErrB, minErrB, maxErrB);
-         fHistoList->Add(fhBGridErrH1[v][i]);
+         name = "hfa_" + names[v] + "ErrGrid_H1_" + ToString<Int_t>(i);
+         title = name + ";" + errTitle[v] + ";Counter";
+         fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsErrB, minErrB, maxErrB));
 
-         histName = "hGridBErrH2" + names[v] + ToString<Int_t>(i);
-         fhBGridErrH2[v][i] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + errTitle[v]).c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]);
-         fHistoList->Add(fhBGridErrH2[v][i]);
+         name = "hfa_" + names[v] +"ErrGrid_H2_" + ToString<Int_t>(i);
+         title = name + ";X [cm];Y [cm];" + errTitle[v];
+         fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
 
-         histName = "hGridBRelErrH1" + names[v] + ToString<Int_t>(i);
-         fhBGridRelErrH1[v][i] = new TH1D(histName.c_str(), string(histName + ";" + relErrTitle[v] + ";Counter").c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB);
-         fHistoList->Add(fhBGridRelErrH1[v][i]);
+         name = "hfa_" + names[v] + "RelErrGrid_H1_" + ToString<Int_t>(i);
+         title = name + ";" + relErrTitle[v] + ";Counter";
+         fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB));
 
-         histName = "hGridBRelErrH2" + names[v] + ToString<Int_t>(i);
-         fhBGridRelErrH2[v][i] = new TH2D(histName.c_str(), string(histName + ";X [cm];Y [cm];" + relErrTitle[v]).c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]);
-         fHistoList->Add(fhBGridRelErrH2[v][i]);
+         name = "hfa_" + names[v] + "RelErrGrid_H2_" + ToString<Int_t>(i);
+         title = name + ";X [cm];Y [cm];" + relErrTitle[v];
+         fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
       }
    }
    std::cout << "-I- CbmLitFieldApproximationQa::CreateGridErrHistos(): Grid creator error histograms created" << std::endl;
@@ -350,10 +297,11 @@ void CbmLitFieldApproximationQa::FillBHistos()
 
             Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-            fhBGraph[BX][iSlice]->SetPoint(cnt, X, Y, B[BX]);
-            fhBGraph[BY][iSlice]->SetPoint(cnt, X, Y, B[BY]);
-            fhBGraph[BZ][iSlice]->SetPoint(cnt, X, Y, B[BZ]);
-            fhBGraph[MOD][iSlice]->SetPoint(cnt, X, Y, Bmod);
+            string s = ToString<Int_t>(iSlice);
+            fHM->G2(string("hfa_Bx_Graph2D") + s)->SetPoint(cnt, X, Y, B[0]);
+            fHM->G2(string("hfa_By_Graph2D") + s)->SetPoint(cnt, X, Y, B[1]);
+            fHM->G2(string("hfa_Bz_Graph2D") + s)->SetPoint(cnt, X, Y, B[2]);
+            fHM->G2(string("hfa_Mod_Graph2D") + s)->SetPoint(cnt, X, Y, Bmod);
             cnt++;
          }
       }
@@ -396,10 +344,11 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
                LitFieldValue<float> v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
                Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
-               fhBAprGraph[BX][iSlice][p]->SetPoint(cnt, X, Y, v.Bx);
-               fhBAprGraph[BY][iSlice][p]->SetPoint(cnt, X, Y, v.By);
-               fhBAprGraph[BZ][iSlice][p]->SetPoint(cnt, X, Y, v.Bz);
-               fhBAprGraph[MOD][iSlice][p]->SetPoint(cnt, X, Y, mod);
+               string s = ToString<Int_t>(iSlice) + "_" + ToString<Int_t>(p);
+               fHM->G2(string("hfa_BxApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bx);
+               fHM->G2(string("hfa_ByApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.By);
+               fHM->G2(string("hfa_BzApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bz);
+               fHM->G2(string("hfa_ModApr_Graph2D_") + s)->SetPoint(cnt, X, Y, mod);
             }
             cnt++;
          } // End loop over y position
@@ -443,22 +392,23 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
                Double_t relErrBz = (B[2] != 0.) ? (errBz / B[2]) * 100. : 0.;
                Double_t relErrMod = (Bmod != 0.) ? (errMod / Bmod) * 100. : 0;
 
-               fhBPolynomialErrH2[BX][iSlice][p]->Fill(X, Y, errBx);
-               fhBPolynomialErrH1[BX][iSlice][p]->Fill(errBx);
-               fhBPolynomialRelErrH1[BX][iSlice][p]->Fill(relErrBx);
-               fhBPolynomialRelErrH2[BX][iSlice][p]->Fill(X, Y, relErrBx);
-               fhBPolynomialErrH2[BY][iSlice][p]->Fill(X, Y, errBy);
-               fhBPolynomialErrH1[BY][iSlice][p]->Fill(errBy);
-               fhBPolynomialRelErrH1[BY][iSlice][p]->Fill(relErrBy);
-               fhBPolynomialRelErrH2[BY][iSlice][p]->Fill(X, Y, relErrBy);
-               fhBPolynomialErrH2[BZ][iSlice][p]->Fill(X, Y, errBz);
-               fhBPolynomialErrH1[BZ][iSlice][p]->Fill(errBz);
-               fhBPolynomialRelErrH1[BZ][iSlice][p]->Fill(relErrBz);
-               fhBPolynomialRelErrH2[BZ][iSlice][p]->Fill(X, Y, relErrBz);
-               fhBPolynomialErrH2[MOD][iSlice][p]->Fill(X, Y, errMod);
-               fhBPolynomialErrH1[MOD][iSlice][p]->Fill(errMod);
-               fhBPolynomialRelErrH1[MOD][iSlice][p]->Fill(relErrMod);
-               fhBPolynomialRelErrH2[MOD][iSlice][p]->Fill(X, Y, relErrMod);
+               string s = ToString<Int_t>(iSlice) + "_" + ToString<Int_t>(p);
+               fHM->H1(string("hfa_BxErrApr_H1_") + s)->Fill(errBx);
+               fHM->H1(string("hfa_BxRelErrApr_H1_") + s)->Fill(relErrBx);
+               fHM->H2(string("hfa_BxErrApr_H2_") + s)->Fill(X, Y, errBx);
+               fHM->H2(string("hfa_BxRelErrApr_H2_") + s)->Fill(X, Y, relErrBx);
+               fHM->H1(string("hfa_ByErrApr_H1_") + s)->Fill(errBy);
+               fHM->H1(string("hfa_ByRelErrApr_H1_") + s)->Fill(relErrBy);
+               fHM->H2(string("hfa_ByErrApr_H2_") + s)->Fill(X, Y, errBy);
+               fHM->H2(string("hfa_ByRelErrApr_H2_") + s)->Fill(X, Y, relErrBy);
+               fHM->H1(string("hfa_BzErrApr_H1_") + s)->Fill(errBz);
+               fHM->H1(string("hfa_BzRelErrApr_H1_") + s)->Fill(relErrBz);
+               fHM->H2(string("hfa_BzErrApr_H2_") + s)->Fill(X, Y, errBz);
+               fHM->H2(string("hfa_BzRelErrApr_H2_") + s)->Fill(X, Y, relErrBz);
+               fHM->H1(string("hfa_ModErrApr_H1_") + s)->Fill(errMod);
+               fHM->H1(string("hfa_ModRelErrApr_H1_") + s)->Fill(relErrMod);
+               fHM->H2(string("hfa_ModErrApr_H2_") + s)->Fill(X, Y, errMod);
+               fHM->H2(string("hfa_ModRelErrApr_H2_") + s)->Fill(X, Y, relErrMod);
             }
          }
       }
@@ -486,10 +436,11 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
-            fhBGridGraph[BX][iSlice]->SetPoint(cnt, X, Y, v.Bx);
-            fhBGridGraph[BY][iSlice]->SetPoint(cnt, X, Y, v.By);
-            fhBGridGraph[BZ][iSlice]->SetPoint(cnt, X, Y, v.Bz);
-            fhBGridGraph[MOD][iSlice]->SetPoint(cnt, X, Y, mod);
+            string s = ToString<Int_t>(iSlice);
+            fHM->G2(string("hfa_BxGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bx);
+            fHM->G2(string("hfa_ByGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.By);
+            fHM->G2(string("hfa_BzGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bz);
+            fHM->G2(string("hfa_ModGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, mod);
             cnt++;
          }
       }
@@ -527,68 +478,32 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             Double_t relErrBz = (B[2] != 0.) ? (errBz / B[2]) * 100. : 0.;
             Double_t relErrMod = (Bmod != 0.) ? (errMod / Bmod) * 100. : 0;
 
-            fhBGridErrH2[BX][iSlice]->Fill(X, Y, errBx);
-            fhBGridErrH1[BX][iSlice]->Fill(errBx);
-            fhBGridRelErrH1[BX][iSlice]->Fill(relErrBx);
-            fhBGridRelErrH2[BX][iSlice]->Fill(X, Y, relErrBx);
-            fhBGridErrH2[BY][iSlice]->Fill(X, Y, errBy);
-            fhBGridErrH1[BY][iSlice]->Fill(errBy);
-            fhBGridRelErrH1[BY][iSlice]->Fill(relErrBy);
-            fhBGridRelErrH2[BY][iSlice]->Fill(X, Y, relErrBy);
-            fhBGridErrH2[BZ][iSlice]->Fill(X, Y, errBz);
-            fhBGridErrH1[BZ][iSlice]->Fill(errBz);
-            fhBGridRelErrH1[BZ][iSlice]->Fill(relErrBz);
-            fhBGridRelErrH2[BZ][iSlice]->Fill(X, Y, relErrBz);
-            fhBGridErrH2[MOD][iSlice]->Fill(X, Y, errMod);
-            fhBGridErrH1[MOD][iSlice]->Fill(errMod);
-            fhBGridRelErrH1[MOD][iSlice]->Fill(relErrMod);
-            fhBGridRelErrH2[MOD][iSlice]->Fill(X, Y, relErrMod);
-
+            string s = ToString<Int_t>(iSlice);
+            fHM->H1(string("hfa_BxErrGrid_H1_") + s)->Fill(errBx);
+            fHM->H1(string("hfa_BxRelErrGrid_H1_") + s)->Fill(relErrBx);
+            fHM->H2(string("hfa_BxErrGrid_H2_") + s)->Fill(X, Y, errBx);
+            fHM->H2(string("hfa_BxRelErrGrid_H2_") + s)->Fill(X, Y, relErrBx);
+            fHM->H1(string("hfa_ByErrGrid_H1_") + s)->Fill(errBy);
+            fHM->H1(string("hfa_ByRelErrGrid_H1_") + s)->Fill(relErrBy);
+            fHM->H2(string("hfa_ByErrGrid_H2_") + s)->Fill(X, Y, errBy);
+            fHM->H2(string("hfa_ByRelErrGrid_H2_") + s)->Fill(X, Y, relErrBy);
+            fHM->H1(string("hfa_BzErrGrid_H1_") + s)->Fill(errBz);
+            fHM->H1(string("hfa_BzRelErrGrid_H1_") + s)->Fill(relErrBz);
+            fHM->H2(string("hfa_BzErrGrid_H2_") + s)->Fill(X, Y, errBz);
+            fHM->H2(string("hfa_BzRelErrGrid_H2_") + s)->Fill(X, Y, relErrBz);
+            fHM->H1(string("hfa_ModErrGrid_H1_") + s)->Fill(errMod);
+            fHM->H1(string("hfa_ModRelErrGrid_H1_") + s)->Fill(relErrMod);
+            fHM->H2(string("hfa_ModErrGrid_H2_") + s)->Fill(X, Y, errMod);
+            fHM->H2(string("hfa_ModRelErrGrid_H2_") + s)->Fill(X, Y, relErrMod);
          }
       }
    }
 }
 
-void CbmLitFieldApproximationQa::CreatePropertyTree()
+void CbmLitFieldApproximationQa::CreateSimulationReport()
 {
-   // Create and serialize property tree
-   boost::property_tree::ptree qa;
-   qa.put("NofPolynoms", fNofPolynoms);
-   qa.put("NofSlices", fNofSlices);
-   std::string vnames[4] = {"BX", "BY", "BZ", "MOD"};
-
-   for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
-      std::string slice = "slice" + ToString<Int_t>(iSlice);
-      qa.put(slice + ".Z", fZSlicePosition[iSlice]);
-      for (Int_t iPolynom = 0; iPolynom < fNofPolynoms; iPolynom++) {
-         for (Int_t v = 0; v < 4; v++) {
-            std::string name = slice + ".polynomial" + ToString<Int_t>(iPolynom);
-            qa.put(name + ".degree", fPolynomDegrees[iPolynom]);
-            qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBPolynomialErrH1[v][iSlice][iPolynom]->GetMean());
-            qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBPolynomialErrH1[v][iSlice][iPolynom]->GetRMS());
-            qa.put(name + ".err." + vnames[v] + ".rel.mean", fhBPolynomialRelErrH1[v][iSlice][iPolynom]->GetMean());
-            qa.put(name + ".err." + vnames[v] + ".rel.rms", fhBPolynomialRelErrH1[v][iSlice][iPolynom]->GetRMS());
-         }
-      }
-      std::string name = slice + ".grid";
-      for (Int_t v = 0; v < 4; v++) {
-         qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBGridErrH1[v][iSlice]->GetMean());
-         qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBGridErrH1[v][iSlice]->GetRMS());
-         qa.put(name + ".err." + vnames[v] + ".rel.mean", fhBGridRelErrH1[v][iSlice]->GetMean());
-         qa.put(name + ".err." + vnames[v] + ".rel.rms", fhBGridRelErrH1[v][iSlice]->GetRMS());
-      }
-   }
-
-   write_json(std::string(fOutputDir + "fieldapr_qa.json").c_str(), qa);
-
-   // Create report
    CbmSimulationReport* report = new CbmLitFieldApproximationQaReport();
-   ofstream foutHtml(string(fOutputDir + "fieldapr_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "fieldapr_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "fieldapr_qa.txt").c_str());
-   report->Create(kHtmlReport, foutHtml, fOutputDir);
-   report->Create(kLatexReport, foutLatex, fOutputDir);
-   report->Create(kTextReport, foutText, fOutputDir);
+   report->Create(fHM, fOutputDir);
    delete report;
 }
 
@@ -597,67 +512,58 @@ void CbmLitFieldApproximationQa::DrawSlices(
    Int_t v,
    const std::string& opt)
 {
-   std::string names[] = {"fieldapr_qa_slice_Bx_", "fieldapr_qa_slice_By_", "fieldapr_qa_slice_Bz_", "fieldapr_qa_slice_Mod_"};
-   TCanvas* canvas[fNofSlices];
-   for (Int_t s = 0; s < fNofSlices; s++) {
-      std::string ss = names[v] + "z_" + ToString<float>(fZSlicePosition[s]) + "_" + opt;
-      canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 1200, 800);
-      canvas[s]->Divide(3, 2);
-   }
-
+   string names[] = {"Bx", "By", "Bz", "Mod"};
    for (Int_t i = 0; i < fNofSlices; i++) {
-      canvas[i]->cd(1);
-      TGraph2D* graph1 = fhBGraph[v][i];
+	   string canvasName = "fieldapr_qa_slice_" + names[v] + "_z_" + ToString<Float_t>(fZSlicePosition[i]) + "_" + opt;
+	   TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 800);
+	   canvas->Divide(3, 2);
 
-      DrawGraph2D(graph1, kLinear, kLinear, kLinear, "colz");
+	   string s1 = string("hfa_") + names[v];
+	   string s2 = opt;
+	   string s3 = (opt == "Grid") ? ToString<Int_t>(i) : ToString<Int_t>(i) + "_" + ToString<Int_t>(fPolynomDegreeIndex);
 
-      canvas[i]->cd(2);
-      TH1* hist2 = (opt != "grid") ? fhBPolynomialErrH1[v][i][fPolynomDegreeIndex] : fhBGridErrH1[v][i];
-      DrawH1(hist2, kLinear, kLog);
+      canvas->cd(1);
+      DrawGraph2D(fHM->G2(s1 + s2 + "_Graph2D" + s3));
 
-      canvas[i]->cd(3);
-      TH2* hist3 = (opt != "grid") ? fhBPolynomialErrH2[v][i][fPolynomDegreeIndex] : fhBGridErrH2[v][i];
-      DrawH2(hist3, kLinear, kLinear, kLinear, "colz");
+      canvas->cd(2);
+      DrawH1(fHM->H1(s1 + "Err" + s2 + "_H1_" + s3), kLinear, kLog);
 
-      canvas[i]->cd(4);
-      TGraph2D* graph2 = (opt != "grid") ? fhBAprGraph[v][i][fPolynomDegreeIndex] : fhBGridGraph[v][i];
-      DrawGraph2D(graph2, kLinear, kLinear, kLinear, "colz");
+      canvas->cd(3);
+      DrawH2(fHM->H2(s1 + "Err" + s2 + "_H2_" + s3));
 
-      canvas[i]->cd(5);
-      TH1* hist4 = (opt != "grid") ? fhBPolynomialRelErrH1[v][i][fPolynomDegreeIndex] : fhBGridRelErrH1[v][i];
-      DrawH1(hist4, kLinear, kLog);
+      canvas->cd(4);
+      DrawGraph2D(fHM->G2(s1 + s2 + "_Graph2D_" + s3));
 
-      canvas[i]->cd(6);
-      TH2* hist5 = (opt != "grid") ? fhBPolynomialRelErrH2[v][i][fPolynomDegreeIndex] : fhBGridRelErrH2[v][i];
-      DrawH2(hist5, kLinear, kLinear, kLinear, "colz");
+      canvas->cd(5);
+      DrawH1(fHM->H1(s1 + "RelErr" + s2 + "_H1_" + s3), kLinear, kLog);
 
-      SaveCanvasAsImage(canvas[i], fOutputDir);
+      canvas->cd(6);
+      DrawH2(fHM->H2(s1 + "RelErr" + s2 + "_H2_" + s3));
+
+      SaveCanvasAsImage(canvas, fOutputDir);
    }
 }
 
 void CbmLitFieldApproximationQa::DrawPoly(
    const std::string& opt)
 {
-   TCanvas* canvas[fNofSlices];
-   for (Int_t s = 0; s < fNofSlices; s++) {
-      std::stringstream ss;
-      ss << "fieldapr_qa_" + opt + "_degree_z_" << fZSlicePosition[s];
-      canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1200, 800);
-      canvas[s]->Divide(3, 2);
-   }
-
+   string names[] = {"Bx", "By", "Bz", "Mod"};
    for (Int_t i = 0; i < fNofSlices; i++) {
+	  string canvasName = "fieldapr_qa_" + opt + "_degree_z_" + ToString<Float_t>(fZSlicePosition[i]);
+	  TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 800);
+      canvas->Divide(3, 2);
+
       TLegend* l1 = new TLegend(0.1,0.1,0.9,0.9);
       l1->SetFillColor(kWhite);
       l1->SetTextSize(0.1);
       l1->SetLineWidth(1);
       l1->SetHeader("Polynomial degree");
       for (Int_t v = 0; v < 4; v++) {
-         TH1* firsthist = (opt == "rel") ? fhBPolynomialRelErrH1[v][i][0] : fhBPolynomialErrH1[v][i][0];
+    	 TH1* firsthist = fHM->H1(string("hfa_") + names[v] + opt + "Apr_H2_" + ToString<Int_t>(i) + "_0");
          Double_t max = firsthist->GetMaximum();
          for (Int_t j = 0; j < fNofPolynoms; j++) {
-            canvas[i]->cd(v+2);
-            TH1* hist1 = (opt == "rel") ? fhBPolynomialRelErrH1[v][i][j] : fhBPolynomialErrH1[v][i][j];
+            canvas->cd(v+2);
+            TH1* hist1 = fHM->H1(string("hfa_") + names[v] + opt + "Apr_H2_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j));
             if (max < hist1->GetMaximum()) { max = hist1->GetMaximum(); }
             string draw_opt = (j == 0) ? "" : "SAME";
             DrawH1(hist1, kLinear, kLog, draw_opt.c_str(), 1 + j, CbmDrawingOptions::LineWidth(), 1 + j, CbmDrawingOptions::MarkerSize(), kDot);
@@ -670,10 +576,10 @@ void CbmLitFieldApproximationQa::DrawPoly(
          firsthist->SetMaximum(1.2 * max);
       }
 
-      canvas[i]->cd(1);
+      canvas->cd(1);
       l1->Draw();
 
-      SaveCanvasAsImage(canvas[i], fOutputDir);
+      SaveCanvasAsImage(canvas, fOutputDir);
    }
 }
 

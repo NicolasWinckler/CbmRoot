@@ -211,10 +211,10 @@ private:
 	      double xMax,
 	      const string& canvasName);
 
-	/**
-	 * \brief Create property tree an store different statistics there.
-	 */
-	void CreatePTree();
+//	/**
+//	 * \brief Create property tree an store different statistics there.
+//	 */
+//	void CreatePTree();
 
 	/**
 	 * \brief Calculate efficiency.

@@ -985,78 +985,73 @@ void CbmRichGeoTest::DrawHist()
    DrawH2(fhHitsXY1Gev);
 }
 
-void CbmRichGeoTest::CreatePTree()
-{
-   ptree pt;
-   pt.put("acc_mean", CalcEfficiency(fh_acc_mom, fh_mc_mom));
-   pt.put("circle_fit_eff_mean", CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll));
-   pt.put("ellipse_fit_eff_mean", CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll));
-   pt.put("nof_points_in_ring_mean", fhNofHits[1]->GetMean());
-   pt.put("nof_points_in_ring_rms", fhNofHits[1]->GetRMS());
-   pt.put("nof_hits_in_ring_mean", fhNofHits[0]->GetMean());
-   pt.put("nof_hits_in_ring_rms", fhNofHits[0]->GetRMS());
-   pt.put("points_fit_a_axis_mean", fhAaxisVsMom[1]->GetMean(2));
-   pt.put("points_fit_a_axis_rms", fhAaxisVsMom[1]->GetRMS(2));
-   pt.put("points_fit_b_axis_mean", fhBaxisVsMom[1]->GetMean(2));
-   pt.put("points_fit_b_axis_rms", fhBaxisVsMom[1]->GetRMS(2));
-   pt.put("points_fit_boa_mean", fhBoverA[1]->GetMean());
-   pt.put("points_fit_boa_rms", fhBoverA[1]->GetRMS());
-   pt.put("points_fit_r_mean", fhRadiusVsMom[1]->GetMean(2));
-   pt.put("points_fit_r_rms", fhRadiusVsMom[1]->GetRMS(2));
-   pt.put("hits_fit_a_axis_mean", fhAaxisVsMom[0]->GetMean(2));
-   pt.put("hits_fit_a_axis_rms", fhAaxisVsMom[0]->GetRMS(2));
-   pt.put("hits_fit_b_axis_mean", fhBaxisVsMom[0]->GetMean(2));
-   pt.put("hits_fit_b_axis_rms", fhBaxisVsMom[0]->GetRMS(2));
-   pt.put("hits_fit_boa_mean", fhBoverA[0]->GetMean());
-   pt.put("hits_fit_boa_rms", fhBoverA[0]->GetRMS());
-   pt.put("hits_fit_r_mean", fhRadiusVsMom[0]->GetMean(2));
-   pt.put("hits_fit_r_rms", fhRadiusVsMom[0]->GetRMS(2));
-   pt.put("diff_ellipse_da_mean", fhDiffAaxis->GetMean(2));
-   pt.put("diff_ellipse_da_rms", fhDiffAaxis->GetRMS(2));
-   pt.put("diff_ellipse_db_mean", fhDiffBaxis->GetMean(2));
-   pt.put("diff_ellipse_db_rms", fhDiffBaxis->GetRMS(2));
-   pt.put("diff_ellipse_dx_mean", fhDiffXcEllipse->GetMean(2));
-   pt.put("diff_ellipse_dx_rms", fhDiffXcEllipse->GetRMS(2));
-   pt.put("diff_ellipse_dy_mean", fhDiffYcEllipse->GetMean(2));
-   pt.put("diff_ellipse_dy_rms", fhDiffYcEllipse->GetRMS(2));
-   pt.put("diff_circle_dr_mean", fhDiffRadius->GetMean(2));
-   pt.put("diff_circle_dr_rms", fhDiffRadius->GetRMS(2));
-   pt.put("diff_circle_dx_mean", fhDiffXcCircle->GetMean(2));
-   pt.put("diff_circle_dx_rms", fhDiffXcCircle->GetRMS(2));
-   pt.put("diff_circle_dy_mean", fhDiffYcCircle->GetMean(2));
-   pt.put("diff_circle_dy_rms", fhDiffYcCircle->GetRMS(2));
-
-   string qaFile = fOutputDir + "rich_geo_test.json";
-   if (fOutputDir != "") {
-      gSystem->mkdir(fOutputDir.c_str(), true);
-      write_json(qaFile.c_str(), pt);
-   }
-}
+//void CbmRichGeoTest::CreatePTree()
+//{
+//   ptree pt;
+//   pt.put("acc_mean", CalcEfficiency(fh_acc_mom, fh_mc_mom));
+//   pt.put("circle_fit_eff_mean", CalcEfficiency(fhNofHitsCircleFit, fhNofHitsAll));
+//   pt.put("ellipse_fit_eff_mean", CalcEfficiency(fhNofHitsEllipseFit, fhNofHitsAll));
+//   pt.put("nof_points_in_ring_mean", fhNofHits[1]->GetMean());
+//   pt.put("nof_points_in_ring_rms", fhNofHits[1]->GetRMS());
+//   pt.put("nof_hits_in_ring_mean", fhNofHits[0]->GetMean());
+//   pt.put("nof_hits_in_ring_rms", fhNofHits[0]->GetRMS());
+//   pt.put("points_fit_a_axis_mean", fhAaxisVsMom[1]->GetMean(2));
+//   pt.put("points_fit_a_axis_rms", fhAaxisVsMom[1]->GetRMS(2));
+//   pt.put("points_fit_b_axis_mean", fhBaxisVsMom[1]->GetMean(2));
+//   pt.put("points_fit_b_axis_rms", fhBaxisVsMom[1]->GetRMS(2));
+//   pt.put("points_fit_boa_mean", fhBoverA[1]->GetMean());
+//   pt.put("points_fit_boa_rms", fhBoverA[1]->GetRMS());
+//   pt.put("points_fit_r_mean", fhRadiusVsMom[1]->GetMean(2));
+//   pt.put("points_fit_r_rms", fhRadiusVsMom[1]->GetRMS(2));
+//   pt.put("hits_fit_a_axis_mean", fhAaxisVsMom[0]->GetMean(2));
+//   pt.put("hits_fit_a_axis_rms", fhAaxisVsMom[0]->GetRMS(2));
+//   pt.put("hits_fit_b_axis_mean", fhBaxisVsMom[0]->GetMean(2));
+//   pt.put("hits_fit_b_axis_rms", fhBaxisVsMom[0]->GetRMS(2));
+//   pt.put("hits_fit_boa_mean", fhBoverA[0]->GetMean());
+//   pt.put("hits_fit_boa_rms", fhBoverA[0]->GetRMS());
+//   pt.put("hits_fit_r_mean", fhRadiusVsMom[0]->GetMean(2));
+//   pt.put("hits_fit_r_rms", fhRadiusVsMom[0]->GetRMS(2));
+//   pt.put("diff_ellipse_da_mean", fhDiffAaxis->GetMean(2));
+//   pt.put("diff_ellipse_da_rms", fhDiffAaxis->GetRMS(2));
+//   pt.put("diff_ellipse_db_mean", fhDiffBaxis->GetMean(2));
+//   pt.put("diff_ellipse_db_rms", fhDiffBaxis->GetRMS(2));
+//   pt.put("diff_ellipse_dx_mean", fhDiffXcEllipse->GetMean(2));
+//   pt.put("diff_ellipse_dx_rms", fhDiffXcEllipse->GetRMS(2));
+//   pt.put("diff_ellipse_dy_mean", fhDiffYcEllipse->GetMean(2));
+//   pt.put("diff_ellipse_dy_rms", fhDiffYcEllipse->GetRMS(2));
+//   pt.put("diff_circle_dr_mean", fhDiffRadius->GetMean(2));
+//   pt.put("diff_circle_dr_rms", fhDiffRadius->GetRMS(2));
+//   pt.put("diff_circle_dx_mean", fhDiffXcCircle->GetMean(2));
+//   pt.put("diff_circle_dx_rms", fhDiffXcCircle->GetRMS(2));
+//   pt.put("diff_circle_dy_mean", fhDiffYcCircle->GetMean(2));
+//   pt.put("diff_circle_dy_rms", fhDiffYcCircle->GetRMS(2));
+//
+//   string qaFile = fOutputDir + "rich_geo_test.json";
+//   if (fOutputDir != "") {
+//      gSystem->mkdir(fOutputDir.c_str(), true);
+//      write_json(qaFile.c_str(), pt);
+//   }
+//}
 
 void CbmRichGeoTest::CreateStudyReport(
       const string& title,
-      const vector<string>& resultDirectories,
+      const vector<string>& fileNames,
       const vector<string>& studyNames,
       const string& outputDir)
 {
    if (outputDir != "") gSystem->mkdir(outputDir.c_str(), true);
 
    CbmStudyReport* report = new CbmRichGeoTestStudyReport();
-   report->SetTitle(title);
+   fTitle = title;
    cout << "Report can be found here: " << outputDir << endl;
-   ofstream foutHtml(string(outputDir + "rich_geo_test_study.html").c_str());
-   ofstream foutLatex(string(outputDir + "rich_geo_test_study.tex").c_str());
-   ofstream foutText(string(outputDir + "rich_geo_test_study.txt").c_str());
-   report->Create(kHtmlReport, foutHtml, resultDirectories, studyNames);
-   report->Create(kLatexReport, foutLatex, resultDirectories, studyNames);
-   report->Create(kTextReport, foutText, resultDirectories, studyNames);
+   report->Create(fileNames, studyNames, outputDir);
    delete report;
 }
 
 void CbmRichGeoTest::Finish()
 {
    DrawHist();
-   CreatePTree();
+//   CreatePTree();
    for (Int_t i = 0; i < fHists.size(); i++){
       fHists[i]->Write();
    }

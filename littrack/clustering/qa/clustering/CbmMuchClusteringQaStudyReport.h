@@ -34,33 +34,17 @@ private:
    /**
     * \brief Inherited from CbmLitStudyReport.
     */
-   void Create(
-         ostream& out);
+   void Create();
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmLitStudyReport.
     */
-   virtual string GetQaFileName() const {
-      return "clustering_qa.json";
-   }
+   void Draw() {};
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Print number of objects table.
     */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/clustering/qa/clustering/clustering_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "clustering_qa_check.json";
-   }
-
-   string PrintRow(
-         const string& property,
-         const string& name);
+   string PrintNofObjects() const;
 };
 
 #endif /* CBMMUCHCLUSTERINGQASTUDYREPORT_H_ */

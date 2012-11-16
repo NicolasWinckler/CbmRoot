@@ -94,19 +94,8 @@ public:
 
    /**
     * \brief Create final simulation report for this tracking QA run.
-    * \param[in] title Report title.
-    * \param[in] resultDirectory Directory with results.
     */
-   void CreateSimulationReport(
-         const string& title,
-         const string& resultDirectory);
-
-   /**
-    * \brief Draw histograms in macro from the specified file.
-    * \param[in] fileName Name of the file.
-    */
-   void DrawHistosFromFile(
-         const std::string& fileName);
+   void CreateSimulationReport();
 
 private:
    CbmHistManager* fHM; // Histogram manager

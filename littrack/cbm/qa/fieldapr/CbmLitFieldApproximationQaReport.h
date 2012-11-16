@@ -34,29 +34,12 @@ private:
    /**
     * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Create(
-      ostream& out);
+   virtual void Create();
 
    /**
     * \brief Inherited from CbmSimulationReport.
     */
-   virtual string GetQaFileName() const {
-      return "fieldapr_qa.json";
-   }
-
-   /**
-    * \brief Inherited from CbmSimulationReport.
-    */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/fieldapr/fieldapr_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "fieldapr_qa_check.json";
-   }
+   virtual void Draw();
 
    /**
     * \brief Return  string with summary table for field QA.

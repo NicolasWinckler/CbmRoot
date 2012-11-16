@@ -98,15 +98,8 @@ void CbmLitPropagationQa::CreateSimulationReport(
       const string& resultDirectory)
 {
    CbmSimulationReport* report = new CbmLitPropagationQaReport();
-   report->SetTitle(title);
    ((CbmLitPropagationQaReport*)report)->SetNofPlanes(fNofPlanes);
-   ofstream foutHtml(string(fOutputDir + "/propagation_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/propagation_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/propagation_qa.txt").c_str());
-//   report.Create(kLitText, cout, resultDirectory);
-   report->Create(kHtmlReport, foutHtml, resultDirectory);
-   report->Create(kLatexReport, foutLatex, resultDirectory);
-   report->Create(kTextReport, foutText, resultDirectory);
+   report->Create(fHM, resultDirectory);
    delete report;
 }
 

@@ -7,6 +7,7 @@
 #include "CbmLitFieldQaReport.h"
 #include "utils/CbmLitUtils.h"
 #include "CbmDrawHist.h"
+#include "CbmHistManager.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -19,9 +20,6 @@
 
 #include <sstream>
 #include <cmath>
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/assign/list_of.hpp>
 
 using lit::ToString;
@@ -30,15 +28,10 @@ using boost::assign::list_of;
 
 CbmLitFieldQa::CbmLitFieldQa():
    fField(NULL),
-   fHistoList(NULL),
    fNofSlices(0),
    fZSlicePosition(),
    fXSlicePosition(),
    fYSlicePosition(),
-   fgB(),
-   fgBAlongZAngle(),
-   fgBAlongZXY(),
-   fgBAlongZXYIntegral(),
    fAlongZAngles(),
    fAlongZXY(),
    fZMin(-10.),
@@ -50,7 +43,8 @@ CbmLitFieldQa::CbmLitFieldQa():
    fNofBinsY(30),
    fMinZFieldInt(160.),
    fMaxZFieldInt(330.),
-   fOutputDir("./field/")
+   fHM(NULL),
+   fOutputDir("./")
 {
 
 }
@@ -84,6 +78,8 @@ InitStatus CbmLitFieldQa::Init()
 
    fField = FairRunAna::Instance()->GetField();
 
+   fHM = new CbmHistManager();
+
    return kSUCCESS;
 }
 
@@ -99,61 +95,52 @@ void CbmLitFieldQa::Finish()
    FillBHistos();
    DrawFieldSlices();
    DrawFieldAlongZ();
-   CreatePropertyTree();
-
-   TIter next(fHistoList);
-   while ( TObject* histo = ((TObject*)next()) ) { histo->Write(); }
+   CreateSimulationReport();
+   fHM->WriteToFile();
 }
 
 void CbmLitFieldQa::CreateHistos()
 {
-   fHistoList = new TList();
-
+   std::string names[] = {"Bx", "By", "Bz", "Mod"};
    string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
-
-   // [BX, BY, BZ, MOD] components
-   fgB.resize(4);
-   for (Int_t i = 0; i < 4; i++) {
-      fgB[i].resize(fNofSlices);
-   }
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
-         fgB[v][i] = new TGraph2D();
-         string graphName = "fhBGraph";
-         string graphTitle = string("fhBGraph;X [cm]; Y [cm];") + zTitle[v];
-         fgB[v][i]->SetNameTitle(graphName.c_str(), graphTitle.c_str());
-         fHistoList->Add(fgB[v][i]);
+         TGraph2D* graph = new TGraph2D();
+         string name = "hmf_" + names[v] + "_Graph2D_" + ToString<Int_t>(i);
+         string title = name + ";X [cm];Y [cm];" + zTitle[v];
+         graph->SetNameTitle(name.c_str(), title.c_str());
+         fHM->Add(name, graph);
       }
    }
 
-   // [BX, BY, BZ, MOD]
-   fgBAlongZAngle.resize(4);
-   fgBAlongZXY.resize(4);
-   fgBAlongZXYIntegral.resize(4);
-   for (Int_t i = 0; i < 4; i++) {
-      fgBAlongZAngle[i].resize(fAlongZAngles.size());
-      fgBAlongZXY[i].resize(fAlongZXY.size());
-      fgBAlongZXYIntegral[i].resize(fAlongZXY.size());
-   }
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
-         fgBAlongZAngle[v][i] = new TGraph();
-         fgBAlongZAngle[v][i]->SetNameTitle("fhBAlongZGraph", "fhBAlongZGraph;Z [cm];B [kGauss]");
+         TGraph* graph = new TGraph();
+         string name = "hmf_" + names[v] + "AlongZAngle_Graph_" + ToString<Int_t>(i);
+         string title = name + ";Z [cm];B [kGauss]";
+         graph->SetNameTitle(name.c_str(), title.c_str());
+         fHM->Add(name, graph);
       }
       for (Int_t i = 0; i < fAlongZXY.size(); i++) {
-         fgBAlongZXY[v][i] = new TGraph();
-         fgBAlongZXY[v][i]->SetNameTitle("fgBAlongZXY", "fgBAlongZXY;Z [cm];B [kGauss]");
+         TGraph* graph = new TGraph();
+         string name = "hmf_" + names[v] + "AlongZXY_Graph_" + ToString<Int_t>(i);
+         string title = name + ";Z [cm];B [kGauss]";
+         graph->SetNameTitle(name.c_str(), title.c_str());
+         fHM->Add(name, graph);
       }
-      for (Int_t i = 0; i < fgBAlongZXYIntegral.size(); i++) {
-         fgBAlongZXYIntegral[v][i] = new TGraph();
-         fgBAlongZXYIntegral[v][i]->SetNameTitle("fgBAlongZXYIntegral", "fgBAlongZXYIntegral;Z [cm];B_{int} [kGauss*m]");
+      for (Int_t i = 0; i < fAlongZXY.size(); i++) {
+         TGraph* graph = new TGraph();
+         string name = "hmf_" + names[v] + "AlongZXYIntegral_Graph_" + ToString<Int_t>(i);
+         string title = name + ";Z [cm];B_{Int_t} [kGauss*m]";
+         graph->SetNameTitle(name.c_str(), title.c_str());
+         fHM->Add(name, graph);
       }
-
    }
 }
 
 void CbmLitFieldQa::FillBHistos()
 {
+   std::string names[] = {"Bx", "By", "Bz", "Mod"};
    // Fill graphs for magnetic field for each (X, Y) slice
    for (UInt_t iSlice = 0; iSlice < fNofSlices; iSlice++) { // loop over slices
       Double_t Z = fZSlicePosition[iSlice];
@@ -171,12 +158,12 @@ void CbmLitFieldQa::FillBHistos()
             Double_t B[4];
             fField->GetFieldValue(pos, B);
 
-            B[3] = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
-
-            for (int iB = 0; iB < 4; iB++){
-               fgB[iB][iSlice]->SetPoint(cnt, X, Y, B[iB]);
+            B[3] = std::sqrt(B[0] * B[0] + B[1] * B[1] + B[2] * B[2]);
+            for (Int_t v = 0; v < 4; v++) {
+            	string name = string("hmf_") + names[v] + "_Graph2D_" + ToString<Int_t>(iSlice);
+            	fHM->G2(name)->SetPoint(cnt, X, Y, B[v]);
             }
-            cnt++;
+			cnt++;
          }
       }
    }
@@ -196,10 +183,10 @@ void CbmLitFieldQa::FillBHistos()
          Double_t B[4];
          fField->GetFieldValue(pos, B);
 
-         B[3] = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
-
-         for (int iB = 0; iB < 4; iB++){
-            fgBAlongZAngle[iB][i]->SetPoint(istep, Z, B[iB]);
+         B[3] = std::sqrt(B[0] * B[0] + B[1] * B[1] + B[2] * B[2]);
+         for (Int_t v = 0; v < 4; v++) {
+         	string name = string("hmf_") + names[v] + "AlongZAngle_Graph_" + ToString<Int_t>(i);
+         	fHM->G1(name)->SetPoint(istep, Z, B[v]);
          }
       }
    }
@@ -219,74 +206,39 @@ void CbmLitFieldQa::FillBHistos()
 
          B[3] = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-         for (int iB = 0; iB < 4; iB++){
-            fgBAlongZXY[iB][i]->SetPoint(istep, Z, B[iB]);
+         for (Int_t v = 0; v < 4; v++){
+        	string name = string("hmf_") + names[v] + "AlongZXY_Graph_" + ToString<Int_t>(i);
+        	fHM->G1(name)->SetPoint(istep, Z, B[v]);
             // Calculate field integral in the RICH detector
             if (Z >= fMinZFieldInt && Z <= fMaxZFieldInt){
-               integralB[iB] += 0.01*fZStep*fabs(B[iB]); // in kGauss * meter
-               fgBAlongZXYIntegral[iB][i]->SetPoint(istep, Z, integralB[iB]);
-               fgBAlongZXYIntegral[iB][i]->SetMaximum(1.1*integralB[iB]);
+               integralB[v] += 0.01 * fZStep * fabs(B[v]); // in kGauss * meter
+               string name = string("hmf_") + names[v] + "AlongZXYIntegral_Graph_" + ToString<Int_t>(i);
+               fHM->G1(name)->SetPoint(istep, Z, integralB[v]);
+               fHM->G1(name)->SetMaximum(1.1 * integralB[v]);
             }
          }
       }
    }
 }
 
-void CbmLitFieldQa::CreatePropertyTree()
+void CbmLitFieldQa::CreateSimulationReport()
 {
-   // Create and serialize property tree
-   boost::property_tree::ptree qa;
-   qa.put("NofSlices", fNofSlices);
-//   std::string vnames[4] = {"BX", "BY", "BZ", "MOD"};
-//
-//   for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
-//      std::string slice = "slice" + ToString<Int_t>(iSlice);
-//      qa.put(slice + ".Z", fZpos[iSlice]);
-//      for (Int_t iPolynom = 0; iPolynom < fNofPolynoms; iPolynom++) {
-//         for (Int_t v = 0; v < 4; v++) {
-//            std::string name = slice + ".polynomial" + ToString<Int_t>(iPolynom);
-//            qa.put(name + ".degree", fPolynomDegrees[iPolynom]);
-//            qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBErrH1D[v][iSlice][iPolynom]->GetMean());
-//            qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBErrH1D[v][iSlice][iPolynom]->GetRMS());
-//            qa.put(name + ".err." + vnames[v] + ".rel.mean", fhBRelErrH1D[v][iSlice][iPolynom]->GetMean());
-//            qa.put(name + ".err." + vnames[v] + ".rel.rms", fhBRelErrH1D[v][iSlice][iPolynom]->GetRMS());
-//         }
-//      }
-//      std::string name = slice + ".grid";
-//      for (Int_t v = 0; v < 4; v++) {
-//         qa.put(name + ".err." + vnames[v] + ".abs.mean", fhBGridErrH1D[v][iSlice]->GetMean());
-//         qa.put(name + ".err." + vnames[v] + ".abs.rms", fhBGridErrH1D[v][iSlice]->GetRMS());
-//         qa.put(name + ".err." + vnames[v] + ".rel.mean", fhBGridRelErrH1D[v][iSlice]->GetMean());
-//         qa.put(name + ".err." + vnames[v] + ".rel.rms", fhBGridRelErrH1D[v][iSlice]->GetRMS());
-//      }
-//   }
-
-   write_json(std::string(fOutputDir + "field_qa.json").c_str(), qa);
-
-   // Create report
    CbmSimulationReport* report = new CbmLitFieldQaReport();
-   ofstream foutHtml(string(fOutputDir + "field_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "field_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "field_qa.txt").c_str());
-   report->Create(kHtmlReport, foutHtml, fOutputDir);
-   report->Create(kLatexReport, foutLatex, fOutputDir);
-   report->Create(kTextReport, foutText, fOutputDir);
+   report->Create(fHM, fOutputDir);
    delete report;
 }
 
 void CbmLitFieldQa::DrawFieldSlices()
 {
    TCanvas* canvas[fNofSlices];
-   for (Int_t s = 0; s < fNofSlices; s++) {
-      std::string str = "field_qa_map_at_z_" + ToString<Double_t>(fZSlicePosition[s]);
-      canvas[s] = new TCanvas(str.c_str(), str.c_str(), 1000, 1000);
-      canvas[s]->Divide(2, 2);
-   }
-
+   string names[] = {"Bx", "By", "Bz", "Mod"};
    for (Int_t i = 0; i < fNofSlices; i++) {
+	   string str = "field_qa_map_at_z_" + ToString<Double_t>(fZSlicePosition[i]);
+	   canvas[i] = new TCanvas(str.c_str(), str.c_str(), 1000, 1000);
+	   canvas[i]->Divide(2, 2);
 	   for (Int_t v = 0; v < 4; v++) {
 		  canvas[i]->cd(v + 1);
-		  DrawGraph2D(fgB[v][i], kLinear, kLinear, kLinear, "colz");
+		  DrawGraph2D(fHM->G2(string("hmf_") + names[v] + "_Graph2D_" + ToString<Int_t>(i)));
 	   }
        SaveCanvasAsImage(canvas[i], fOutputDir);
    }
@@ -295,34 +247,37 @@ void CbmLitFieldQa::DrawFieldSlices()
 void CbmLitFieldQa::DrawFieldAlongZ()
 {
 	// Draw for different angles
-   for (int i = 0; i < fAlongZAngles.size(); i++) {
-      std::stringstream ss;
-      ss << "field_qa_map_along_z_angle_" << (int)fAlongZAngles[i];
-      TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
-      DrawGraph(list_of(fgBAlongZAngle[BX][i])(fgBAlongZAngle[BY][i])(fgBAlongZAngle[BZ][i])(fgBAlongZAngle[MOD][i]),
+   for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
+      string canvasName = string("field_qa_map_along_z_angle_") + ToString<Int_t>(fAlongZAngles[i]);
+      TCanvas* c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 600);
+      string s = ToString<Int_t>(i);
+      DrawGraph(list_of(fHM->G1(string("hmf_BxAlongZAngle_Graph_") + s))(fHM->G1(string("hmf_ByAlongZAngle_Graph_") + s))
+    		  (fHM->G1(string("hmf_BzAlongZAngle_Graph_") + s))(fHM->G1(string("hmf_ModAlongZAngle_Graph_") + s)),
             list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
       gPad->SetGrid(true, true);
       SaveCanvasAsImage(c, fOutputDir);
    }
    // Draw for different XY positions
-   for (int i = 0; i < fAlongZXY.size(); i++){
-      std::stringstream ss;
-      ss << "field_qa_map_along_z_xy_" << (int)fAlongZXY[i].first << "_" << (int)fAlongZXY[i].second;
-      TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
-      DrawGraph(list_of(fgBAlongZXY[BX][i])(fgBAlongZXY[BY][i])(fgBAlongZXY[BZ][i])(fgBAlongZXY[MOD][i]),
-         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
+   for (Int_t i = 0; i < fAlongZXY.size(); i++){
+      string canvasName = string("field_qa_map_along_z_xy_") + ToString<Int_t>(fAlongZXY[i].first) + "_" + ToString<Int_t>(fAlongZXY[i].second);
+      TCanvas* c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 600, 600);
+      string s = ToString<Int_t>(i);
+      DrawGraph(list_of(fHM->G1(string("hmf_BxAlongZXY_Graph_") + s))(fHM->G1(string("hmf_ByAlongZXY_Graph_") + s))
+          		  (fHM->G1(string("hmf_BzAlongZXY_Graph_") + s))(fHM->G1(string("hmf_ModAlongZXY_Graph_") + s)),
+                  list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
       gPad->SetGrid(true, true);
       SaveCanvasAsImage(c, fOutputDir);
    }
 
-   for (int i = 0; i < fAlongZXY.size(); i++){
+   for (Int_t i = 0; i < fAlongZXY.size(); i++){
       std::stringstream ss;
-      ss << "field_qa_map_along_z_xy_" << (int)fAlongZXY[i].first << "_" << (int)fAlongZXY[i].second<<"_integral";
+      ss << "field_qa_map_along_z_xy_" << (Int_t)fAlongZXY[i].first << "_" << (Int_t)fAlongZXY[i].second<<"_integral";
       TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 600, 600);
-      fgBAlongZXYIntegral[BX][i]->GetXaxis()->SetRangeUser(fMinZFieldInt - 2., fMaxZFieldInt + 2);
-      DrawGraph(list_of(fgBAlongZXYIntegral[BX][i])(fgBAlongZXYIntegral[BY][i])(fgBAlongZXYIntegral[BZ][i])(fgBAlongZXYIntegral[MOD][i]),
-         list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
-      std::cout << i << " " << fgBAlongZXYIntegral[BX][i]->GetMaximum() << std::endl;
+      string s = ToString<Int_t>(i);
+      fHM->G1(string("hmf_BxAlongZXYIntegral_Graph_") + s)->GetXaxis()->SetRangeUser(fMinZFieldInt - 2., fMaxZFieldInt + 2);
+      DrawGraph(list_of(fHM->G1(string("hmf_BxAlongZXYIntegral_Graph_") + s))(fHM->G1(string("hmf_ByAlongZXYIntegral_Graph_") + s))
+                  (fHM->G1(string("hmf_BzAlongZXYIntegral_Graph_") + s))(fHM->G1(string("hmf_ModAlongZXYIntegral_Graph_") + s)),
+                  list_of("B_{x}")("B_{y}")("B_{z}")("|B|"), kLinear, kLinear, true, 0.7, 0.5, 0.9, 0.3);
 
       gPad->SetGrid(true, true);
       SaveCanvasAsImage(c, fOutputDir);

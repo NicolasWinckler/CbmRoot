@@ -37,10 +37,10 @@ string CbmLitPropagationQaHistCreator::HistName(
       Int_t planeIndex)
 {
    assert(parameterIndex < 10 && algorithmIndex < 3);
-   string parameters[] = { "hResX", "hResY", "hResTx", "hResTy", "hResQp",
-         "hPullX", "hPullY", "hPullTx", "hPullTy", "hPullQp" };
+   string parameters[] = { "htp_Res_X", "htp_Res_Y", "htp_Res_Tx", "htp_Res_Ty", "htp_Res_Qp",
+         "htp_Pull_X", "htp_Pull_Y", "htp_Pull_Tx", "htp_Pull_Ty", "htp_Pull_Qp" };
    string algorithms[] = { "Propagator", "Fitter", "Smoother" };
-   return parameters[parameterIndex] + algorithms[algorithmIndex] + ToString<Int_t>(planeIndex);
+   return parameters[parameterIndex] + "_" + algorithms[algorithmIndex] + "_" + ToString<Int_t>(planeIndex);
 }
 
 void CbmLitPropagationQaHistCreator::Create(
@@ -77,7 +77,6 @@ void CbmLitPropagationQaHistCreator::Create(
             TH1F* hist = new TH1F(histName.c_str(), string(histName + ";" + axisTitles[iParam] + ";Counter").c_str(),
                                   get<0>(bb[iParam]), get<1>(bb[iParam]), get<2>(bb[iParam]));
             fHM->Add(histName, hist);
-            std::cout << "CbmLitPropagationQaHistCreator::Create: plane=" << iPlane << " name=" << histName.c_str() << std::endl;
          }
       }
    }

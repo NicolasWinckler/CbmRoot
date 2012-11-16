@@ -38,50 +38,19 @@ public:
 
 private:
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Create(
-      ostream& out);
+   virtual void Create();
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual string GetQaFileName() const {
-      return "clustering_qa.json";
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/clustering/qa/clustering/clustering_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "clustering_qa_check.json";
-   }
+   virtual void Draw() {};
 
    /**
     *
     */
    string PrintNofObjects() const;
-
-   /**
-    * \brief Print specified value.
-    * \param[in] hist full name of the property in property tree.
-    * \return string with table row in specific format.
-    */
-   string PrintValue(
-         const string& hist) const {
-      stringstream ss;
-      ss << fQa.get(hist, -1.);
-      return ss.str();
-   }
-
-   CbmLitPropertyTree* fPT;
 };
 
 #endif /* CBMMUCHCLUSTERINGQAREPORT_H_ */

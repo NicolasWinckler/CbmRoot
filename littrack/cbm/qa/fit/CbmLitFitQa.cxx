@@ -5,8 +5,6 @@
  */
 #include "CbmLitFitQa.h"
 #include "CbmLitFitQaHistCreator.h"
-#include "CbmLitFitQaPTreeCreator.h"
-#include "CbmLitFitQaDraw.h"
 #include "CbmLitFitQaReport.h"
 #include "CbmLitFitQaCalculator.h"
 #include "CbmHistManager.h"
@@ -68,21 +66,6 @@ void CbmLitFitQa::Finish()
 {
    fHM->WriteToFile();
    fFitQa->Finish();
-
-   CbmLitFitQaDraw drawQa;
-   drawQa.Draw(fHM, fOutputDir);
-
-   string qaFile = fOutputDir + "/fit_qa.json";
-   string idealFile = string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/fit/fit_qa_ideal.json");
-   string checkFile = fOutputDir + "/fit_qa_check.json";
-
-   CbmLitFitQaPTreeCreator ptc;
-   ptree qa = ptc.Create(fHM);
-   if (fOutputDir != "") { write_json(qaFile.c_str(), qa); }
-
-   CbmLitResultChecker qaChecker;
-   qaChecker.DoCheck(qaFile, idealFile, checkFile);
-
    CreateSimulationReport("Fit QA", fOutputDir);
 }
 
@@ -91,16 +74,8 @@ void CbmLitFitQa::CreateSimulationReport(
       const string& resultDirectory)
 {
    CbmSimulationReport* report = new CbmLitFitQaReport();
-   report->SetTitle(title);
-   ofstream foutHtml(string(fOutputDir + "/fit_qa.html").c_str());
-   ofstream foutLatex(string(fOutputDir + "/fit_qa.tex").c_str());
-   ofstream foutText(string(fOutputDir + "/fit_qa.txt").c_str());
-//   report.Create(kTextReport, cout, resultDirectory);
-   report->Create(kHtmlReport, foutHtml, resultDirectory);
-   report->Create(kLatexReport, foutLatex, resultDirectory);
-   report->Create(kTextReport, foutText, resultDirectory);
+   report->Create(fHM, resultDirectory);
    delete report;
 }
-
 
 ClassImp(CbmLitFitQa)

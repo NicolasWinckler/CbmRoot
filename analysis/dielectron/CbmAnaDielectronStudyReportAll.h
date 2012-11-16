@@ -37,8 +37,12 @@ protected:
     /**
     * \brief Inherited from CbmLitStudyReport.
     */
-   void Create(
-         ostream& out);
+   void Create();
+
+   /**
+   * \brief Inherited from CbmLitStudyReport.
+   */
+  void Draw() {};
 
    /**
      * \brief Inherited from CbmLitSimulationReport.

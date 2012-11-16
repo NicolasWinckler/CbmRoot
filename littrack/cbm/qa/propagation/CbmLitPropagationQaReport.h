@@ -8,7 +8,6 @@
 #define CBMLITPROPAGATIONQAREPORT_H_
 
 #include "CbmSimulationReport.h"
-#include "TSystem.h"
 
 /**
  * \class CbmLitPropagationQaReport
@@ -34,31 +33,14 @@ public:
 
 protected:
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Create(
-      ostream& out);
+   virtual void Create();
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual string GetQaFileName() const {
-      return "propagation_qa.json";
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/propagation/propagation_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "propagation_qa_check.json";
-   }
+   virtual void Draw();
 
    string PrintResAndPullRow(
            const string& rowName,

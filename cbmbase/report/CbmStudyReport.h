@@ -8,13 +8,14 @@
 #define CBMSTUDYREPORT_H_
 
 #include "CbmReport.h"
-#include <boost/property_tree/ptree.hpp>
 #include <string>
+#include <vector>
 
 using std::vector;
 using std::string;
 using std::ostream;
-using boost::property_tree::ptree;
+
+class CbmHistManager;
 
 /**
  * \class CbmStudyReport
@@ -36,7 +37,7 @@ public:
    virtual ~CbmStudyReport();
 
    /**
-    * \brief Main function which creates report file.
+    * \brief Main function which creates report data.
     *
     * Non virtual interface pattern is used here.
     * User always creates simulation report using this public non virtual method.
@@ -44,53 +45,37 @@ public:
     * user has to implement protected Create() method
     * and getters for the file names.
     *
-    * \param[in] reportType Type of report to be produced.
-    * \param[out] out Output stream for report file.
-    * \param[in] resultDirectories Vector of directory names.
+    * \param[in] histManagers Array of histogram managers for which report is created.
     * \param[in] studyNames Names of studies.
+    * \param[in] outputDir name of the output directory.
     */
    void Create(
-         ReportType reportType,
-         ostream& out,
-         const vector<string>& resultDirectories,
-         const vector<string>& studyNames);
+         const vector<CbmHistManager*>& histManagers,
+         const vector<string>& studyNames,
+         const string& outputDir);
 
    /**
-    * \brief Inherited from CbmLitReport.
+    * \brief Main function which creates report data.
+    *
+    * Same pattern is used here.
+    *
+    * \param[in] fileNames Array of file names for which report is created.
+    * \param[in] studyNames Names of studies.
+    * \param[in] outputDir name of the output directory.
     */
-   bool PropertyExists(
-         const std::string& name) const;
+   void Create(
+         const vector<string>& fileNames,
+         const vector<string>& studyNames,
+         const string& outputDir);
 
-protected:
-   /**
-    * \brief Pure abstract function which is called from main Create() function.
-    * \param[in] out Output stream.
-    */
-   virtual void Create(
-         ostream& out) = 0;
+   /* Accessors */
+   const vector<CbmHistManager*>& HM() const { return fHM; }
+   CbmHistManager* HM(Int_t index) const { return fHM[index]; }
+   const vector<string>& GetStudyNames() const { return fStudyNames; }
+   const string& GetStudyName(Int_t index) const { return fStudyNames[index]; }
 
-   /**
-    * \brief Return formated string with table of images.
-    * \param[in] tableName Table name.
-    * \param[in] fileName File name of image.
-    * \return Formated string with table of images.
-    */
-   string PrintImageTable(
-         const string& tableName,
-         const string& fileName) const;
-
-   /**
-    * \brief Return formatted string with image tables.
-    * \param[in] pattern Regular expression.
-    * \return Formatted string with image tables.
-    */
-   string PrintImages(
-		   const string& pattern) const;
-
-   vector<ptree> fQa; // Property tree of Qa results for each study
-   ptree fIdeal; // Property with ideal values
-   vector<ptree> fCheck; // Property tree with checked results for each study
-   vector<string> fResultDirectories; // Directory names of study results
+private:
+   vector<CbmHistManager*> fHM; // Histogram managers for each study
    vector<string> fStudyNames; // Names of studies
 };
 

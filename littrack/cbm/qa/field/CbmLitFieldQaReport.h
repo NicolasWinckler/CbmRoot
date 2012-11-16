@@ -32,37 +32,14 @@ public:
 
 private:
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Create(
-      ostream& out);
+   virtual void Create();
 
    /**
-    * \brief Inherited from CbmLitSimulationReport.
+    * \brief Inherited from CbmSimulationReport.
     */
-   virtual string GetQaFileName() const {
-      return "field_qa.json";
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetIdealFileName() const {
-      return string(gSystem->Getenv("VMCWORKDIR")) + ("/littrack/cbm/qa/field/field_qa_ideal.json");
-   }
-
-   /**
-    * \brief Inherited from CbmLitSimulationReport.
-    */
-   virtual string GetCheckFileName() const {
-      return "field_qa_check.json";
-   }
-
-//   /**
-//    * \brief Return  string with summary table for field QA.
-//    * \return String with summary table for field QA.
-//    */
-//   std::string PrintSummaryTable();
+   virtual void Draw() {};
 };
 
 #endif /* CBMLITFIELDQAREPORT_H_ */

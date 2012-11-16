@@ -37,7 +37,7 @@ public:
 
    void CreateStudyReport(
          const string& title,
-         const vector<string>& resultDirectories,
+         const vector<string>& fileNames,
          const vector<string>& studyNames,
          const string& outputDir);
 

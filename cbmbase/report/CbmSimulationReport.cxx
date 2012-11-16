@@ -5,17 +5,17 @@
  */
 #include "CbmSimulationReport.h"
 #include "CbmReportElement.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include "CbmHistManager.h"
+#include "TFile.h"
+
 #include <iostream>
-using boost::property_tree::json_parser_error;
+#include <fstream>
 using std::cout;
+using std::ofstream;
 
 CbmSimulationReport::CbmSimulationReport():
-	fQa(),
-	fIdeal(),
-	fCheck(),
-	fResultDirectory("")
+    CbmReport(),
+	fHM(NULL)
 {
 
 }
@@ -25,56 +25,26 @@ CbmSimulationReport::~CbmSimulationReport()
 
 }
 
-bool CbmSimulationReport::PropertyExists(
-      const std::string& name) const
+void CbmSimulationReport::Create(
+      CbmHistManager* histManager,
+      const string& outputDir)
 {
-   return (fQa.count(name) != 0) ? true : false;
+   assert(histManager != NULL);
+   fHM = histManager;
+   SetOutputDir(outputDir);
+   CreateReports();
 }
 
 void CbmSimulationReport::Create(
-      ReportType reportType,
-      ostream& out,
-      const string& resultDirectory)
+      const string& fileName,
+      const string& outputDir)
 {
-   CreateReportElement(reportType);
-   fResultDirectory = resultDirectory;
-
-   try {
-      read_json(resultDirectory + GetQaFileName(), fQa);
-   } catch (json_parser_error& error) {
-      cout << error.what();
-   }
-
-   try {
-      read_json(resultDirectory + GetCheckFileName(), fCheck);
-   } catch (json_parser_error& error) {
-      cout << error.what();
-   }
-
-   try {
-      read_json(GetIdealFileName(), fIdeal);
-   } catch (json_parser_error& error) {
-      cout << error.what();
-   }
-
-   // User has to implement this function!
-   Create(out);
-
-   fQa.clear();
-   fCheck.clear();
-   fIdeal.clear();
-
-   DeleteReportElement();
-}
-
-string CbmSimulationReport::PrintImages(
-		const string& pattern) const
-{
-	string str = "";
-	vector<string> images = GetImages(fResultDirectory, pattern);
-	vector<string>::const_iterator it;
-	for(it = images.begin(); it != images.end(); it++) {
-		str += fR->Image(*it, *it);
-	}
-	return str;
+   assert(fHM == NULL);
+   fHM = new CbmHistManager();
+   TFile* file = new TFile(fileName.c_str());
+   fHM->ReadFromFile(file);
+   SetOutputDir(outputDir);
+   CreateReports();
+   delete fHM;
+   delete file;
 }

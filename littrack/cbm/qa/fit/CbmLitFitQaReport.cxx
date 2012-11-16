@@ -5,76 +5,214 @@
  */
 #include "CbmLitFitQaReport.h"
 #include "CbmReportElement.h"
+#include "CbmHistManager.h"
+#include "CbmDrawHist.h"
 #include "std/utils/CbmLitUtils.h"
-#include <boost/property_tree/ptree.hpp>
+#include "TH1.h"
+#include "TF1.h"
+#include "TPad.h"
+#include "TDirectory.h"
+#include "TLatex.h"
+#include "TCanvas.h"
 #include <boost/assign/list_of.hpp>
+#include <map>
 
 using boost::assign::list_of;
 using lit::NumberToString;
+using lit::Split;
+using std::map;
 
-CbmLitFitQaReport::CbmLitFitQaReport()
+CbmLitFitQaReport::CbmLitFitQaReport():
+		CbmSimulationReport()
 {
+	SetName("fit_qa");
 }
 
 CbmLitFitQaReport::~CbmLitFitQaReport()
 {
 }
 
-void CbmLitFitQaReport::Create(
-   ostream& out)
+void CbmLitFitQaReport::Create()
 {
-   out.precision(3);
-   out << fR->DocumentBegin();
-   out << fR->Title(0, fTitle);
+   Out().precision(3);
+   Out() << R()->DocumentBegin();
+   Out() << R()->Title(0, GetTitle());
 
-   out << fR->TableBegin("Residuals and pulls (standard deviation)",
+   Out() << R()->TableBegin("Residuals and pulls (standard deviation)",
          list_of("")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
-   out << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_", "sigma");
-   out << PrintResAndPullRow("STS last", "htf_Sts_LastParam_", "sigma");
-   out << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_", "sigma");
-   out << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_", "sigma");
-   out << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_", "sigma");
-   out << PrintResAndPullRow("MUCH last", "htf_Much_LastParam", "sigma");
-   out << fR->TableEnd();
+   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_.+", "sigma");
+   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_.+", "sigma");
+   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_.+", "sigma");
+   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_.+", "sigma");
+   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_.+", "sigma");
+   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_.+", "sigma");
+   Out() << R()->TableEnd();
 
-   out << fR->TableBegin("Residuals and pulls (RMS)",
+   Out() << R()->TableBegin("Residuals and pulls (RMS)",
          list_of("")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
-   out << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_", "rms");
-   out << PrintResAndPullRow("STS last", "htf_Sts_LastParam_", "rms");
-   out << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_", "rms");
-   out << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_", "rms");
-   out << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_", "rms");
-   out << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_", "rms");
-   out << fR->TableEnd();
+   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_.+", "rms");
+   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_.+", "rms");
+   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_.+", "rms");
+   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_.+", "rms");
+   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_.+", "rms");
+   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_.+", "rms");
+   Out() << R()->TableEnd();
 
-   out << fR->TableBegin("Residuals and pulls (mean)",
+   Out() << R()->TableBegin("Residuals and pulls (mean)",
          list_of("")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
-   out << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_", "mean");
-   out << PrintResAndPullRow("STS last", "htf_Sts_LastParam_", "mean");
-   out << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_", "mean");
-   out << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_", "mean");
-   out << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_", "mean");
-   out << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_", "mean");
-   out << fR->TableEnd();
+   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_.+", "mean");
+   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_.+", "mean");
+   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_.+", "mean");
+   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_.+", "mean");
+   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_.+", "mean");
+   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_.+", "mean");
+   Out() << R()->TableEnd();
 
-   out << PrintImages(".*fit_qa_.*png");
+   PrintCanvases();
 
-   out <<  fR->DocumentEnd();
+   Out() <<  R()->DocumentEnd();
 }
 
 string CbmLitFitQaReport::PrintResAndPullRow(
         const string& rowName,
-        const string& histName,
+        const string& pattern,
         const string& propertyName)
 {
-   string parameterNames[] = {
-		   "Res_X", "Res_Y", "Res_Tx", "Res_Ty", "Res_Qp",
-           "Pull_X", "Pull_Y", "Pull_Tx", "Pull_Ty", "Pull_Qp"
-   };
-   vector<string> properties(10);
-   for (UInt_t iPar = 0; iPar < 10; iPar++) {
-      string name = histName + parameterNames[iPar] + "." + propertyName;
-      properties[iPar] = NumberToString<float>(fQa.get(name, -1.), 2);
+	// Maps parameter name to cell index
+	static map<string, Int_t> ctc;
+	ctc["X"] = 0; ctc["Y"] = 1; ctc["Tx"] = 2; ctc["Ty"] = 3; ctc["Qp"] = 4;
+
+	vector<TH1*> histos = HM()->H1Vector(pattern);
+	Int_t nofHistos = histos.size();
+	if(nofHistos == 0) return "";
+	vector<string> parameters(nofHistos);
+	for (UInt_t iHist = 0; iHist < histos.size(); iHist++) {
+		vector<string> split = Split(histos[iHist]->GetName(), '_');
+		Int_t parIndex = (split[3] == "Res") ? (ctc[split[4]]) : (ctc[split[4]] + 5);
+		if (propertyName == "mean") {
+		   parameters[parIndex] = NumberToString<Float_t>(histos[iHist]->GetMean(), 2);
+		} else if (propertyName == "rms") {
+		   parameters[parIndex] = NumberToString<Float_t>(histos[iHist]->GetRMS(), 2);
+		} else if (propertyName == "sigma") {
+		   histos[iHist]->Fit("gaus");
+		   TF1* fit = histos[iHist]->GetFunction("gaus");
+		   parameters[parIndex] = (NULL != fit) ? fit->GetParameter(2) : 0.;
+		}
    }
-   return fR->TableRow(list_of(rowName).range(properties));
+   return R()->TableRow(list_of(rowName).range(parameters));
+}
+
+void CbmLitFitQaReport::Draw()
+{
+	DrawResidualAndPullHistograms("Sts");
+	DrawResidualAndPullHistograms("Trd");
+	DrawResidualAndPullHistograms("Much");
+
+	DrawTrackParamsAtVertex();
+}
+
+void CbmLitFitQaReport::DrawHistSigmaRMS(
+   Double_t sigma,
+   Double_t rms)
+{
+   string txt1 = lit::NumberToString<Double_t>(sigma, 2) + " / " + lit::NumberToString<Double_t>(rms, 2);
+   TLatex text;
+   text.SetTextAlign(21);
+   text.SetTextSize(0.08);
+   text.DrawTextNDC(0.5, 0.83, txt1.c_str());
+}
+
+void CbmLitFitQaReport::DrawResidualAndPullHistograms(
+      const string& detName)
+{
+   string parameterNames[] = { "X", "Y", "Tx", "Ty", "Qp" };
+   string catNames[] = { "Res", "Pull", "WrongCov" };
+
+   // [0] - for the first track parameter, [1] - for the last track parameter
+   for (Int_t i = 0; i < 2; i++) {
+	   string trackParamName = (i == 0) ? "FirstParam" : "LastParam";
+
+	   string canvasName = "fit_qa_" + detName + "_" + trackParamName;
+	   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1400, 900);
+	   canvas->Divide(5, 3);
+
+	   // [0] - "Res", [1] - "Pull", [2] - "WrongCov"
+	   for (Int_t iCat = 0; iCat < 3; iCat++) {
+		   for (Int_t iPar = 0; iPar < 5; iPar++) {
+			   string histName = "htf_" + detName + "_" + trackParamName + "_" + catNames[iCat] + "_" + parameterNames[iPar];
+			   if (!HM()->Exists(histName)) return;
+			   Int_t histId = iCat * 5 + iPar;
+			   canvas->cd(histId + 1);
+			   TH1* hist = HM()->H1(histName);
+			   DrawH1(hist, kLinear, kLog);
+
+			   if (histId < 10) { // Fit only residual and pull histograms
+				   hist->Fit("gaus");
+				   hist->SetMaximum(hist->GetMaximum() * 1.50);
+				   TF1* fit = hist->GetFunction("gaus");
+				   Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
+				   Double_t rms = hist->GetRMS();
+				   DrawHistSigmaRMS(sigma, rms);
+			   }
+		   }
+	   }
+   }
+}
+
+void CbmLitFitQaReport::DrawTrackParamsAtVertex()
+{
+   TCanvas* canvas1 = CreateCanvas("fit_qa_momentum_momres_mom_2D", "fit_qa_momentum_momres_mom_2D", 600, 600);
+   canvas1->cd(1);
+   DrawH2(HM()->H2("htf_MomRes_Mom"));
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   TCanvas* canvas2 = CreateCanvas("fit_qa_momentum_projection", "fit_qa_momentum_projection", 600, 600);
+   canvas2->cd(1);
+   TH1* projY = HM()->H2("htf_MomRes_Mom")->ProjectionY("htf_MomRes_Mom_ProjectionY");
+   DrawH1(projY, kLinear, kLinear);
+   projY->SetStats(true);
+   projY->Fit("gaus");
+   projY->SetMaximum(projY->GetMaximum() * 1.25);
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   TCanvas* canvas3 = CreateCanvas("fit_qa_momentum_momres_mom_sigma", "fit_qa_momentum_momres_mom_sigma", 600, 600);
+   canvas3->cd(1);
+   HM()->H2("htf_MomRes_Mom")->FitSlicesY();
+   TH1* momslice = (TH1*) gDirectory->Get("htf_MomRes_Mom_2");
+   momslice->GetXaxis()->SetTitle("P [GeV/c]");
+   momslice->GetYaxis()->SetTitle("dP/P, #sigma [%]");
+   momslice->SetMinimum(0.);
+   momslice->SetMaximum(3.);
+   DrawH1(momslice, kLinear, kLinear);
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   TCanvas* canvas4 = CreateCanvas("fit_qa_momentum_momres_mom_rms", "fit_qa_momentum_momres_mom_rms", 600, 600);
+   canvas4->cd(1);
+   TH2* hMomres = HM()->H2("htf_MomRes_Mom");
+   Int_t nBins = hMomres->GetNbinsX();
+   TH1* momResRms = hMomres->ProjectionX();
+   for (Int_t i = 1; i < nBins; i++){
+      TH1* projY = hMomres->ProjectionY("_py", i, i);
+      Double_t rms = projY->GetRMS();
+      momResRms->SetBinContent(i, rms);
+      momResRms->SetBinError(i, momslice->GetBinError(i));
+   }
+   momResRms->GetXaxis()->SetTitle("P [GeV/c]");
+   momResRms->GetYaxis()->SetTitle("dP/P, RMS [%]");
+   momResRms->SetMinimum(0.);
+   momResRms->SetMaximum(3.);
+   DrawH1(momResRms, kLinear, kLinear, "P");
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
+
+   TCanvas* canvas5 = CreateCanvas("fit_qa_chi_primary", "fit_qa_chi_primary", 600, 600);
+   canvas5->cd(1);
+   TH1* hChiprim = HM()->H1("htf_ChiPrimary");
+   hChiprim->Scale(1. / hChiprim->Integral());
+   DrawH1(hChiprim, kLinear, kLog);
+   gPad->SetGridx(true);
+   gPad->SetGridy(true);
 }

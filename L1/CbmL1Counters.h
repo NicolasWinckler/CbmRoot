@@ -105,7 +105,7 @@ struct TL1TracksCatCounters // counters for different tracks categories
 
 struct TL1Efficiencies
 {
-  TL1Efficiencies():names(),indices(),ratio_reco(),ratio_ghosts(0),ratio_clones(0),mc(),reco(),ghosts(0),clones(0){
+  TL1Efficiencies():names(),indices(),ratio_reco(),ratio_ghosts(0),ratio_clones(0),mc(),reco(),ghosts(0),clones(0),nEvents(0){
     // you should add counter with shortname="total" !!
   };
 
@@ -116,7 +116,8 @@ struct TL1Efficiencies
   TL1Efficiencies& operator+=(TL1Efficiencies& a);
   void CalcEff();
   void Inc(bool isReco, TString name); // increment counters according to parameters
-
+  void IncNEvents(){ nEvents++; };
+  
   void PrintEff();
 
   
@@ -131,6 +132,7 @@ struct TL1Efficiencies
   TL1TracksCatCounters<int> reco;
   int ghosts;
   int clones;
+  int nEvents;
 };
 
 inline void TL1Efficiencies::AddCounter(TString shortname, TString name)
@@ -146,16 +148,13 @@ inline void TL1Efficiencies::AddCounter(TString shortname, TString name)
 inline void TL1Efficiencies::CalcEff()
 {
   ratio_reco = reco/mc;
-  if (mc.counters[0] > 0){
-    ratio_clones = clones/double(mc.counters[indices["total"]]);
+  const double total = reco.counters[indices["total"]] + ghosts + clones;
+  if (total > 0){
+    ratio_clones = clones/total;
+    ratio_ghosts = ghosts/total;
   }
   else{
     ratio_clones = -1;
-  }
-  if (reco.counters[0] > 0){
-    ratio_ghosts = ghosts/double(reco.counters[indices["total"]]);
-  }
-  else{
     ratio_ghosts = -1;
   }
 };
@@ -164,6 +163,8 @@ inline TL1Efficiencies& TL1Efficiencies::operator+=(TL1Efficiencies& a)
 {
   mc += a.mc; reco += a.reco;
   ghosts += a.ghosts; clones += a.clones;
+  nEvents += a.nEvents;
+    
   return *this;
 };
 
@@ -179,6 +180,7 @@ inline void TL1Efficiencies::PrintEff(){
   std::cout.setf(ios::fixed);
   std::cout.setf(ios::showpoint);
   std::cout.precision(3);
+  std::cout.setf(ios::right);
   std::cout << "Track category         : " << " Eff "        <<" | "<< "All MC"  << std::endl;
 
   int NCounters = mc.NCounters;

@@ -183,9 +183,12 @@ reco_fakes()
   };
 
   void PrintEff(){
+    L1_assert(nEvents != 0);
+        
     cout.setf(ios::fixed);
     cout.setf(ios::showpoint);
     cout.precision(3);
+    cout.setf(ios::right);
     cout << "Track category         : " << " Eff  "        <<" / "<< "Killed" <<" / "<< "Length" <<" / "<< "Fakes " <<" / "<< "Clones" <<" / "<< "All Reco" <<" | "<< "All MC"  << endl;
     
     int NCounters = mc.NCounters;
@@ -197,10 +200,10 @@ reco_fakes()
              << "  / " << ratio_length.counters[iC]  // nRecoMCHits/nMCHits
              << "  / " << ratio_fakes.counters[iC]   // nFakeHits/nRecoAllHits
              << "  / " << ratio_clone.counters[iC]   // nCloneTracks/nMCTracks
-             << "  / " << reco.counters[iC]
-             << "    | " << mc.counters[iC]  << endl;
+             << "  / " << setw(8) << reco.counters[iC]/double(nEvents)
+             << " | " << setw(8) << mc.counters[iC]/double(nEvents)  << endl;
     }
-    cout << "Ghost     probability  : " << ratio_ghosts <<" | "<< ghosts << endl;
+    cout << "Ghost     probability  : " << ratio_ghosts <<"  | "<< ghosts << endl;
   };
 
   TL1TracksCatCounters<double> ratio_killed;
@@ -309,7 +312,7 @@ void CbmL1::EfficienciesPerformance()
 
   L1_CATIME += algo->CATime;
   L1_NEVENTS++;
-
+  ntra.IncNEvents();
   L1_NTRA += ntra;
 
   ntra.CalcEff();

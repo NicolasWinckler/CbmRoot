@@ -26,7 +26,7 @@ const TString BoxVolumeMedium         = "aluminium";
 const TString NoActivGasMedium        = "Rpcgas_noact";
 const TString ActivGasMedium          = "RPCgas";
 const TString GlasMedium              = "RPCglass";
-const TString SupportMedium           = "carbon";
+const TString ElectronicsMedium           = "carbon";
 
 const Int_t NofModuleTypes = 2;
 
@@ -48,7 +48,7 @@ Int_t ngaps=8; // Number of gaps
 // some global variables
 TGeoManager* gGeoMan = NULL;  // Pointer to TGeoManager instance
 TGeoVolume* gModules[NofModuleTypes]; // Global storage for module types
-TGeoVolume* gStack;
+TGeoVolume* gCounter;
 
 // Forward declarations
 void create_materials_from_media_file();
@@ -81,21 +81,22 @@ void Create_TOF_Geometry_v12a() {
   TGeoVolume* tof = new TGeoVolumeAssembly("tof");
   top->AddNode(tof, 1);
 
-  gStack = create_glass_stack();
+  gCounter = create_glass_stack();
 
   /*
-  TGeoTranslation* multi_stack_trans 
-    = new TGeoTranslation("", 0., 0., 0.);
-  gGeoMan->GetVolume("tof")->AddNode(gStack, 0, multi_stack_trans);
+  TGeoTranslation* counter_trans 
+    = new TGeoTranslation("", 0., 0., 100.);
+  gGeoMan->GetVolume("tof")->AddNode(gCounter, 0, counter_trans);
   */
 
   gModules[0] = create_small_tof_module();
   //  gModules[1] = create_large_tof_module();
 
-  TGeoTranslation* multi_stack_trans 
+  
+  TGeoTranslation* module_trans 
     = new TGeoTranslation("", 0., 0., 0.);
-  gGeoMan->GetVolume("tof")->AddNode(gModules[0], 0, multi_stack_trans);
-
+  gGeoMan->GetVolume("tof")->AddNode(gModules[0], 0, module_trans);
+    
 
 
   gGeoMan->CloseGeometry();
@@ -158,49 +159,84 @@ TGeoVolume* create_glass_stack()
   Float_t startzpos=-.6;
   Float_t startzposg=-.6+gdz/2.;
 
+  // needed materials
   TGeoMedium* glassPlateVolMed   = gGeoMan->GetMedium(GlasMedium);
   TGeoMedium* noActiveGasVolMed  = gGeoMan->GetMedium(NoActivGasMedium);
-  TGeoMedium* activeGasVolMed  = gGeoMan->GetMedium(ActivGasMedium);
+  TGeoMedium* activeGasVolMed    = gGeoMan->GetMedium(ActivGasMedium);
+  TGeoMedium* electronicsVolMed  = gGeoMan->GetMedium(ElectronicsMedium);
 
-  TGeoVolume* single_stack = new TGeoVolumeAssembly("single_stack");
-
+  // Single glass plate
   TGeoBBox* glass_plate = new TGeoBBox("", gdx/2., gdy/2., gdz/2.);
   TGeoVolume* glass_plate_vol = 
     new TGeoVolume("tof_glass", glass_plate, glassPlateVolMed);
   glass_plate_vol->SetLineColor(kBlue); // set line color for the glass plate
   glass_plate_vol->SetTransparency(70); // set transparency for the TOF
   TGeoTranslation* glass_plate_trans 
-    = new TGeoTranslation("", 0., 0., startzpos);
-  single_stack->AddNode(glass_plate_vol, 0, glass_plate_trans);
+    = new TGeoTranslation("", 0., 0., 0.);
 
+  // Single gas gap
   TGeoBBox* gas_gap = new TGeoBBox("", ggdx/2., ggdy/2., ggdz/2.);
   TGeoVolume* gas_gap_vol = 
     new TGeoVolume("tof_gas_gap", gas_gap, noActiveGasVolMed);
   gas_gap_vol->SetLineColor(kRed); // set line color for the gas gap
   gas_gap_vol->SetTransparency(70); // set transparency for the TOF
   TGeoTranslation* gas_gap_trans 
-    = new TGeoTranslation("", 0., 0., startzposg);
-  single_stack->AddNode(gas_gap_vol, 0, gas_gap_trans);
+    = new TGeoTranslation("", 0., 0., (gdz+ggdz)/2.);
 
+  // Single subdivided active gas gap 
   TGeoBBox* gas_active = new TGeoBBox("", gsdx/2., ggdy/2., ggdz/2.);
   TGeoVolume* gas_active_vol = 
     new TGeoVolume("tof_gas_active", gas_active, activeGasVolMed);
   gas_active_vol->SetLineColor(kBlack); // set line color for the gas gap
   gas_active_vol->SetTransparency(70); // set transparency for the TOF
+
+  // Add glass plate, inactive gas gap and active gas gaps to a single stack
+  TGeoVolume* single_stack = new TGeoVolumeAssembly("single_stack");
+  single_stack->AddNode(glass_plate_vol, 0, glass_plate_trans);
+  single_stack->AddNode(gas_gap_vol, 0, gas_gap_trans);
   for (Int_t l=0; l<nstrips; l++){
     TGeoTranslation* gas_active_trans 
-      = new TGeoTranslation("", -ggdx/2+(l+0.5)*gsdx, 0., startzposg);
+      = new TGeoTranslation("", -ggdx/2+(l+0.5)*gsdx, 0., (gdz+ggdz)/2.);
     single_stack->AddNode(gas_active_vol, l, gas_active_trans);
   }
 
+  // Add 8 single stacks + one glass plate at the end to a multi stack
   TGeoVolume* multi_stack = new TGeoVolumeAssembly("multi_stack");
   for (Int_t l=0; l<ngaps; l++){
     TGeoTranslation* single_stack_trans 
-      = new TGeoTranslation("", 0., 0., startzpos+(l)*dzpos);
+      = new TGeoTranslation("", 0., 0., startzpos + l*dzpos);
     multi_stack->AddNode(single_stack, l, single_stack_trans);
   }
+  TGeoTranslation* single_glass_back_trans 
+    = new TGeoTranslation("", 0., 0., startzpos + 8*dzpos);
+  multi_stack->AddNode(glass_plate_vol, l, single_glass_back_trans);
+  
 
-  return multi_stack;
+// electronics
+  float dxe=34.0; //pcb dimensions 
+  float dye=5.0;
+  float dze=0.3;
+  float yele=(gdy+0.1)/2.+dye/2.;
+
+  // Add electronics above and below the glass stack to build a complete counter
+  TGeoVolume* counter = new TGeoVolumeAssembly("counter");
+  TGeoTranslation* multi_stack_trans 
+      = new TGeoTranslation("", 0., 0., 0.);
+  counter->AddNode(multi_stack, l, multi_stack_trans);
+
+  TGeoBBox* pcb = new TGeoBBox("", dxe/2., dye/2., dze/2.);
+  TGeoVolume* pcb_vol = 
+    new TGeoVolume("pcb", pcb, electronicsVolMed);
+  pcb_vol->SetLineColor(kBlack); // set line color for the gas gap
+  pcb_vol->SetTransparency(70); // set transparency for the TOF
+  for (Int_t l=0; l<2; l++){
+    yele *= -1.;
+    TGeoTranslation* pcb_trans 
+      = new TGeoTranslation("", 0., yele, 0.);
+    counter->AddNode(pcb_vol, l, pcb_trans);
+  }
+
+  return counter;
 
 }
 
@@ -243,6 +279,18 @@ TGeoVolume* create_small_tof_module()
   TGeoTranslation* gas_box_trans 
     = new TGeoTranslation("", -2., 0., 0.);
   alu_box_vol->AddNode(gas_box_vol, 0, gas_box_trans);
+
+  Float_t dxpos=30.0;
+  Float_t startxpos=-60.0;
+  Float_t zoff=1.;
+  Float_t dzoff=5.0;
+  
+  for (Int_t j=0; j<5; j++){ //loop over counters (modules)
+    zoff=-zoff;
+    TGeoTranslation* counter_trans 
+      = new TGeoTranslation("", startxpos+ j*dxpos , 0.0 , zoff*dzoff);
+    gas_box_vol->AddNode(gCounter, j, counter_trans);
+  }
 
   return module;
 }

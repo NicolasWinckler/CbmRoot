@@ -109,6 +109,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawMinvPtAll();
    DrawBgSourcesVsMomentum();
    DrawMvdCutQa();
+   DrawMvdAndStsHist();
 
    SaveCanvasToImage();
 
@@ -725,6 +726,9 @@ void CbmAnaDielectronTaskDraw::DrawMinvForEachAnalysisStep()
    Draw1DHistoForEachAnalysisStep("fh_pi0_minv", true);
    c2->cd(2);
    Draw1DHistoForEachAnalysisStep("fh_eta_minv", true);
+
+   TCanvas *c3 = CreateCanvas("lmvm_minv_for_each_analysis_step_gamma", "lmvm_minv_for_each_analysis_step_gamma", 600, 600);
+   Draw1DHistoForEachAnalysisStep("fh_gamma_minv", true);
 }
 
 void CbmAnaDielectronTaskDraw::DrawMinvSandBg(
@@ -1031,6 +1035,26 @@ void CbmAnaDielectronTaskDraw::DrawMvdCutQa()
       h2->GetXaxis()->SetBinLabel(2, "Wrong");
       gPad->SetLogy(false);
    }
+}
+
+void CbmAnaDielectronTaskDraw::DrawMvdAndStsHist()
+{
+   if (!fUseMvd) return;
+   TCanvas *c1 = CreateCanvas("lmvm_nofhits_mvd_sts","lmvm_nofhits_mvd_sts", 900, 450);
+   c1->Divide(2,1);
+   c1->cd(1);
+   Draw1DSourceTypes("fh_nofMvdHits");
+   c1->cd(2);
+   Draw1DSourceTypes("fh_nofStsHits");
+
+   Draw2DCut( "fh_mvd1xy");
+   TCanvas *c2 = CreateCanvas("lmvm_mvd1r","lmvm_mvd1r", 600, 600);
+   Draw1DSourceTypes("fh_mvd1r");
+
+
+   Draw2DCut( "fh_mvd2xy");
+   TCanvas *c3 = CreateCanvas("lmvm_mvd2r","lmvm_mvd2r", 600, 600);
+   Draw1DSourceTypes("fh_mvd2r");
 }
 
 

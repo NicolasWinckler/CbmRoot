@@ -293,6 +293,8 @@ public:
 
     void CheckArmPodModified();
 
+    void MvdCutMcDistance();
+
     virtual void Finish();
 
 
@@ -409,6 +411,7 @@ private:
    vector<TH1D*> fh_bg_minv; // Invariant mass for BG
    vector<TH1D*> fh_pi0_minv; // Invariant mass for Pi0
    vector<TH1D*> fh_eta_minv; // Invariant mass for Eta
+   vector<TH1D*> fh_gamma_minv; // Invariant mass for Eta
    vector<TH1D*> fh_signal_mom; // Signal momentum distribution
    vector<TH2D*> fh_signal_pty; // Pt/y distribution for signal
    vector<TH2D*> fh_signal_minv_pt; // Invariant mass vs. MC Pt
@@ -434,6 +437,19 @@ private:
    vector<TH1D*> fh_richann; // RICH ANN
    vector<TH1D*> fh_trdann; // TRD ANN
    vector<TH2D*> fh_tofm2; // TOF m2
+
+   vector<TH1D*> fh_nofMvdHits; // number of MVD hits
+   vector<TH1D*> fh_nofStsHits; // number of STS hits
+   vector<TH2D*> fh_mvd1xy; // hit distribution in the first MVD station
+   vector<TH1D*> fh_mvd1r; // r = x^2+y^2
+   vector<TH2D*> fh_mvd2xy; // hit distribution in the second MVD station
+   vector<TH1D*> fh_mvd2r; // r = x^2+y^2
+
+   //Distant to MVD hit from the same  MotherId
+   TH1D* fh_mvd1cut_mc_dist_gamma;
+   TH1D* fh_mvd1cut_mc_dist_pi0;
+   TH1D* fh_mvd2cut_mc_dist_gamma;
+   TH1D* fh_mvd2cut_mc_dist_pi0;
 
    vector<TH1D*> fh_mvd1cut_qa; // MVD 1 cut quality
    vector<TH1D*> fh_mvd2cut_qa; // MVD 2 cut quality

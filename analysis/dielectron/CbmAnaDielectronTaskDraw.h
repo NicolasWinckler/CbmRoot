@@ -320,6 +320,8 @@ private:
 
     void DrawMvdCutQa();
 
+    void DrawMvdAndStsHist();
+
    ClassDef(CbmAnaDielectronTaskDraw, 1);
 };
 

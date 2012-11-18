@@ -26,11 +26,6 @@ void run_analysis(Int_t nEvents = 10)
       inFile2 = DIR+"/reco.ideal.0000.root";
       outFile = DIR+"_test.root";
       energy = "25gev";
-
-      //TString inFile1 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-      //TString inFile2 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-      //TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-      //TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.analysis.root";
    } else {
       inFile1 = TString(gSystem->Getenv("MCFILE"));
       inFile2 = TString(gSystem->Getenv("RECOFILE"));
@@ -91,7 +86,7 @@ void run_analysis(Int_t nEvents = 10)
    }
    task->SetUseMvd(IsMvd(parFile));
    task->SetUseRich(true);
-   task->SetUseTrd(true);
+   task->SetUseTrd(IsTrd(parFile));
    task->SetUseTof(true);
    task->SetPionMisidLevel(pionMisidLevel);
    task->SetUseMcMomentum(false);

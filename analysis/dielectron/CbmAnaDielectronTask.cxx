@@ -747,16 +747,19 @@ void CbmAnaDielectronTask::FillCandidateArray()
       }
 
       // TRD
-      cand.trdInd = gTrack->GetTrdTrackIndex();
-      if (cand.trdInd < 0) continue;
-      CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(cand.trdInd);
-      if (trdTrack == NULL) continue;
-      CbmTrackMatch* trdMatch = (CbmTrackMatch*) fTrdTrackMatches->At(cand.trdInd);
-      if (trdMatch == NULL) continue;
-      cand.trdMcTrackId = trdMatch->GetMCTrackId();
-      if (cand.trdMcTrackId < 0) continue;
-      CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
-      if (mcTrack3 == NULL) continue;
+      CbmTrdTrack* trdTrack = NULL;
+      if (fUseTrd == true) {
+         cand.trdInd = gTrack->GetTrdTrackIndex();
+         if (cand.trdInd < 0) continue;
+         trdTrack = (CbmTrdTrack*) fTrdTracks->At(cand.trdInd);
+         if (trdTrack == NULL) continue;
+         CbmTrackMatch* trdMatch = (CbmTrackMatch*) fTrdTrackMatches->At(cand.trdInd);
+         if (trdMatch == NULL) continue;
+         cand.trdMcTrackId = trdMatch->GetMCTrackId();
+         if (cand.trdMcTrackId < 0) continue;
+         CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
+         if (mcTrack3 == NULL) continue;
+      }
 
       // ToF
       cand.tofInd = gTrack->GetTofHitIndex();
@@ -1186,7 +1189,7 @@ void CbmAnaDielectronTask::IsElectron(
 {
    if (fPionMisidLevel < 0.){
       Bool_t richEl = IsRichElectron(ring, momentum, cand);
-      Bool_t trdEl = IsTrdElectron(trdTrack, cand);
+      Bool_t trdEl = (trdTrack != NULL)?IsTrdElectron(trdTrack, cand):true;
       Double_t annRich = cand->richAnn;
       Double_t annTrd = cand->trdAnn;
       Bool_t tofEl = IsTofElectron(gTrack, momentum, cand);

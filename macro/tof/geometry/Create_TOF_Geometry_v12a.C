@@ -16,7 +16,8 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString FileName = "tof_v12a.root";
+const TString geoVersion = "tof_v12b";
+const TString FileName = geoVersion + ".root";
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
@@ -26,7 +27,7 @@ const TString BoxVolumeMedium         = "aluminium";
 const TString NoActivGasMedium        = "Rpcgas_noact";
 const TString ActivGasMedium          = "RPCgas";
 const TString GlasMedium              = "RPCglass";
-const TString ElectronicsMedium           = "carbon";
+const TString ElectronicsMedium       = "carbon";
 
 // All neded distances and sizes are defined here
 Float_t B_factor=1.; // Relation between x and y
@@ -39,24 +40,23 @@ Float_t box_ydim = 1100.;  //y extension of wall [cm]
 Float_t box_zdim = 200.;  //z extension of wall [cm]
 Float_t width_box =  0.4;   // Width of the gas box [cm]
 
-const Int_t NumberOfDifferentCounterTypes = 2;
-//
-const Float_t Glass_X[NumberOfDifferentCounterTypes] = {32., 32.};
-const Float_t Glass_Y[NumberOfDifferentCounterTypes] = {26.9, 27.};
-const Float_t Glass_Z[NumberOfDifferentCounterTypes] = {0.1, 0.1};
+const Int_t NumberOfDifferentCounterTypes = 1;
+const Float_t Glass_X[NumberOfDifferentCounterTypes] = {32.};
+const Float_t Glass_Y[NumberOfDifferentCounterTypes] = {26.9};
+const Float_t Glass_Z[NumberOfDifferentCounterTypes] = {0.1};
 
-const Float_t GasGap_X[NumberOfDifferentCounterTypes] = {32., 32.};
-const Float_t GasGap_Y[NumberOfDifferentCounterTypes] = {26.9, 27.};
-const Float_t GasGap_Z[NumberOfDifferentCounterTypes] = {0.025, 0.025};
+const Float_t GasGap_X[NumberOfDifferentCounterTypes] = {32.};
+const Float_t GasGap_Y[NumberOfDifferentCounterTypes] = {26.9};
+const Float_t GasGap_Z[NumberOfDifferentCounterTypes] = {0.025};
 
-const Int_t NumberOfGaps[NumberOfDifferentCounterTypes] = {8, 8};
-const Int_t NumberOfReadoutStrips[NumberOfDifferentCounterTypes] = {32, 32};
+const Int_t NumberOfGaps[NumberOfDifferentCounterTypes] = {8};
+const Int_t NumberOfReadoutStrips[NumberOfDifferentCounterTypes] = {32};
 
-const Float_t SingleStackStartPosition_Z[NumberOfDifferentCounterTypes] = {-0.6, -0.6};
+const Float_t SingleStackStartPosition_Z[NumberOfDifferentCounterTypes] = {-0.6};
 
-const Float_t Electronics_X[NumberOfDifferentCounterTypes] = {34.0, 34.0};
-const Float_t Electronics_Y[NumberOfDifferentCounterTypes] = {5.0, 5.0};
-const Float_t Electronics_Z[NumberOfDifferentCounterTypes] = {0.3, 0.3};
+const Float_t Electronics_X[NumberOfDifferentCounterTypes] = {34.0};
+const Float_t Electronics_Y[NumberOfDifferentCounterTypes] = {5.0};
+const Float_t Electronics_Z[NumberOfDifferentCounterTypes] = {0.3};
 
 
 const Int_t NofModuleTypes = 2;
@@ -83,9 +83,8 @@ TGeoVolume* gCounter;
 
 // Forward declarations
 void create_materials_from_media_file();
+TGeoVolume* create_counter(Int_t);
 TGeoVolume* create_tof_module(Int_t);
-//TGeoVolume* create_large_tof_module();
-TGeoVolume* create_glass_stack(Int_t);
 
 
 
@@ -109,27 +108,23 @@ void Create_TOF_Geometry_v12a() {
   TGeoVolume* top = new TGeoVolume("top", topbox, gGeoMan->GetMedium("air"));
   gGeoMan->SetTopVolume(top);
 
-  TGeoVolume* tof = new TGeoVolumeAssembly("tof");
+  TGeoVolume* tof = new TGeoVolumeAssembly(geoVersion);
   top->AddNode(tof, 1);
 
-  gCounter = create_glass_stack(0);
+  for(Int_t counterType = 0; counterType < NumberOfDifferentCounterTypes; counterType++) { 
+    gCounter = create_counter(counterType);
+  }
 
-  /*
-  TGeoTranslation* counter_trans 
-    = new TGeoTranslation("", 0., 0., 100.);
-  gGeoMan->GetVolume("tof")->AddNode(gCounter, 0, counter_trans);
-  */
-
-  gModules[0] = create_tof_module(0);
-  gModules[1] = create_tof_module(1);
-
+  for(Int_t moduleType = 0; moduleType < NofModuleTypes; moduleType++) { 
+    gModules[moduleType] = create_tof_module(moduleType);
+  }
   
   TGeoTranslation* module_trans 
     = new TGeoTranslation("", 0., 0., 0.);
-  gGeoMan->GetVolume("tof")->AddNode(gModules[0], 0, module_trans);
+  gGeoMan->GetVolume(geoVersion)->AddNode(gModules[0], 0, module_trans);
   module_trans 
     = new TGeoTranslation("", 0., 0., 100.);
-  gGeoMan->GetVolume("tof")->AddNode(gModules[1], 0, module_trans);
+  gGeoMan->GetVolume(geoVersion)->AddNode(gModules[1], 0, module_trans);
     
 
 
@@ -176,7 +171,7 @@ void create_materials_from_media_file()
   geoBuild->createMedium(carbon);
 }
 
-TGeoVolume* create_glass_stack(Int_t modType)
+TGeoVolume* create_counter(Int_t modType)
 {
 
   //glass

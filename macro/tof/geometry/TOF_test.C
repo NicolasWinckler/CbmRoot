@@ -487,15 +487,15 @@ void TOFSMo(int i, float Z, float phi, float xpos, float ypos){
   //dz  = Thickness in Z
   //width_alu = Aluminum thickness
 
-  float dx,dy,dz,width_aluxl,width_aluxr,width_aluy,width_aluz;
+  float dx,dy,dz,width_alux,gasoff,width_aluy,width_aluz;
 
   //Aluminum box
 
  dx=1800.;
  dy=500.;
  dz=200.;
- width_aluxl=10.;
- width_aluxr=50.;
+ width_alux=30.;
+ gasoff=-20.; // to get asymmetric wall thicknesses
  width_aluy=10.;
  width_aluz=1.;
 
@@ -558,16 +558,16 @@ void TOFSMo(int i, float Z, float phi, float xpos, float ypos){
   fprintf(geof,"tof2#%d \n", i);
   fprintf(geof,"BOX\n");
   fprintf(geof,"RPCgas_noact \n");
-  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_aluxr,  -(dy/2-width_aluy), -(dz/2-width_aluz));
-  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_aluxr,   dy/2-width_aluy,   -(dz/2-width_aluz));
-  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_aluxl), dy/2-width_aluy,   -(dz/2-width_aluz));
-  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_aluxl),-(dy/2-width_aluy), -(dz/2-width_aluz));
-  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_aluxr,  -(dy/2-width_aluy),  dz/2-width_aluz);
-  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_aluxr,   dy/2-width_aluy,    dz/2-width_aluz);
-  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_aluxl), dy/2-width_aluy,    dz/2-width_aluz);
-  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_aluxl),-(dy/2-width_aluy),  dz/2-width_aluz);
+  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_alux,  -(dy/2-width_aluy), -(dz/2-width_aluz));
+  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_alux,   dy/2-width_aluy,   -(dz/2-width_aluz));
+  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_alux), dy/2-width_aluy,   -(dz/2-width_aluz));
+  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_alux),-(dy/2-width_aluy), -(dz/2-width_aluz));
+  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_alux,  -(dy/2-width_aluy),  dz/2-width_aluz);
+  fprintf(geof, "  %f  %f  %f \n",  dx/2-width_alux,   dy/2-width_aluy,    dz/2-width_aluz);
+  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_alux), dy/2-width_aluy,    dz/2-width_aluz);
+  fprintf(geof, "  %f  %f  %f \n", -(dx/2-width_alux),-(dy/2-width_aluy),  dz/2-width_aluz);
   fprintf(geof, "\n");
-  fprintf(geof, "%f %f %f \n"  , 0.0 , 0.0 , 0.0);
+  fprintf(geof, "%f %f %f \n"  , gasoff , 0.0 , 0.0);
   fprintf(geof, "%f %f %f   "  , 1.0 , 0.0 , 0.0);
   fprintf(geof, "%f %f %f   "  , 0.0 , 1.0 , 0.0);
   fprintf(geof, "%f %f %f \n"  , 0.0 , 0.0 , 1.0); 
@@ -675,9 +675,9 @@ void TOFSMo(int i, float Z, float phi, float xpos, float ypos){
           for (int l=0; l<nstrips; l++){
                fprintf(parf, "%d \t %d \t %d \t %d \t %5.1f \t %5.1f \t %5.1f \t %2.1f \t %2.1f \n" , 
                i, j, l, 2,       
-               xpos + startxpos+(j-1)*dxpos -ggdx/2+(l+0.5)*gsdx, 
+	       xpos + cph*(gasoff + startxpos+(j-1)*dxpos + cphi*(-ggdx/2+(l+0.5)*gsdx)), 
                ypos, 
-               Z + startzposg+(k-1)*dzpos, gsdx, ggdy);
+               Z + startzposg+(k-1)*dzpos-sphi*(-ggdx/2+(l+0.5)*gsdx), gsdx, ggdy);
 	  }
        }
        
@@ -728,9 +728,9 @@ void TOFSMo(int i, float Z, float phi, float xpos, float ypos){
        int k=4;  
        fprintf(parf, "%d \t %d \t %d \t %d \t %5.1f \t %5.1f \t %5.1f \t %2.1f \t %2.1f \n" , 
                i, j, l, 2,       
-               xpos + startxpos+(j-1)*dxpos -ggdx/2+(l+0.5)*gsdx, 
+	       xpos + cph*(gasoff + startxpos+(j-1)*dxpos + cphi*(-ggdx/2+(l+0.5)*gsdx)), 
                ypos, 
-               Z + startzposg+(k-1)*dzpos, gsdx, ggdy);
+               Z + startzposg+(k-1)*dzpos-sphi*(-ggdx/2+(l+0.5)*gsdx), gsdx, ggdy);
       }
 
     fprintf(geof,"t2pcb#%d \n",j);
@@ -764,9 +764,9 @@ void TOFSMo(int i, float Z, float phi, float xpos, float ypos){
        int k=4;  
        fprintf(parf, "%d \t %d \t %d \t %2d \t %5.1f \t %5.1f \t %5.1f \t %2.1f \t %2.1f \n" , 
                i, j, l, 2,       
-               xpos + startxpos+(j-1)*dxpos -ggdx/2+(l+0.5)*gsdx, 
+	       xpos + cph*(gasoff + startxpos+(j-1)*dxpos + cphi*(-ggdx/2+(l+0.5)*gsdx)), 
                ypos, 
-               Z +startzposg+(k-1)*dzpos, gsdx, ggdy);
+               Z + startzposg+(k-1)*dzpos-sphi*(-ggdx/2+(l+0.5)*gsdx), gsdx, ggdy);
       } 
    }
  }

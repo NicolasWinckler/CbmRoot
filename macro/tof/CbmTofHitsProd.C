@@ -7,24 +7,36 @@
     basiclibs();
 
     gSystem->Load("libGeoBase");
+    gSystem->Load("libParBase");
     gSystem->Load("libBase");
+    gSystem->Load("libCbmBase");
+    gSystem->Load("libCbmData");
+    gSystem->Load("libCbmGenerators");
+    gSystem->Load("libField");
+    gSystem->Load("libGen");
     gSystem->Load("libPassive");
+    gSystem->Load("libEcal");
+    gSystem->Load("libKF");
+    gSystem->Load("libMvd");
     gSystem->Load("libSts");
-    gSystem->Load("libTof");
+    gSystem->Load("libLittrack");
     gSystem->Load("libRich");
     gSystem->Load("libTrd");
-    gSystem->Load("libGen");
+    gSystem->Load("libTof");
 
 
     FairRunAna *fRun= new FairRunAna();
-    fRun->SetInputFile("../run/auau.25gev.centr.mc.root");
-    fRun->SetOutputFile("auau.25gev.centr.tofHits.root");
+    //  fRun->SetInputFile("../run/auau.25gev.centr.mc.root");
+    //fRun->SetOutputFile("auau.25gev.centr.tofHits.root");    
+    fRun->SetInputFile("./data/auaumbias.root");
+    fRun->SetOutputFile("./data/auaumbiasHits.root");
 
 
     // Init Simulation Parameters from Root File
     FairRuntimeDb* rtdb=fRun->GetRuntimeDb();
     FairParRootFileIo* io1=new FairParRootFileIo();
-    io1->open("../run/parfiles/params.root");
+//    io1->open("../run/parfiles/params.root");
+    io1->open("./data/testparams.root");
 
     // Init Digitization Parameters from Ascii File
     //FairParAsciiFileIo* input2 = new FairParAsciiFileIo();

@@ -67,7 +67,7 @@ inline void L1Algo::f10(  // input
                 int start_lh, int n1,  L1HitPoint *vStsHits_l,
                   // output
                 fvec *u_front, fvec *u_back, fvec *zPos,
-                vector<THitI> &hitsl_1
+                THitI* hitsl_1
                 )
 {
   const int end_lh = start_lh+n1;
@@ -76,7 +76,7 @@ inline void L1Algo::f10(  // input
     int i1_4= i1%fvecLen;
     L1HitPoint &hitl = vStsHits_l[ilh];
 
-    hitsl_1.push_back(ilh);
+    hitsl_1[i1] = ilh;
     u_front[i1_V][i1_4] = hitl.u;
     u_back [i1_V][i1_4] = hitl.v;
     zPos   [i1_V][i1_4] = hitl.z;
@@ -92,8 +92,8 @@ inline void L1Algo::f11(  // input
                 fvec *u_front, fvec *u_back,  fvec *zPos,
                   // output
 //                 L1TrackPar *T_1,
-                nsL1::vector<L1TrackPar>::TSimd &T_1,
-                nsL1::vector<L1FieldRegion>::TSimd &fld_1
+                L1TrackPar *T_1,
+                L1FieldRegion *fld_1
                )
 {
   L1Station &stal = vStations[istal];
@@ -102,13 +102,13 @@ inline void L1Algo::f11(  // input
   fvec zstam = stam.z;
 
   L1FieldRegion fld0;      // by  left   hit, target and "center" (station in-between). Used here for extrapolation to target and to middle hit
-  L1FieldRegion fld1; // by  middle hit, left hit and "center" . Will be used for extrapolation to right hit
-  L1FieldValue centB, l_B _fvecalignment; // field for singlet creation
+    L1FieldValue centB, l_B _fvecalignment; // field for singlet creation
   L1FieldValue m_B _fvecalignment; // field for the next extrapolations
 
-  L1TrackPar T;
-
   for( int i1_V=0; i1_V<n1_V; i1_V++ ){
+    L1TrackPar &T = T_1[i1_V];
+    L1FieldRegion &fld1 = fld_1[i1_V]; // by  middle hit, left hit and "center" . Will be used for extrapolation to right hit
+
         // get the magnetic field along the track.
         // (suppose track is straight line with origin in the target)
     fvec &u = u_front[i1_V];
@@ -153,7 +153,6 @@ inline void L1Algo::f11(  // input
     star.fieldSlice.GetFieldValue( targX + tx*(zstar - targZ), targY + ty*(zstar - targZ), r_B );
     fld1.Set( r_B, zstar, m_B, zstam, l_B, zstal);
 #endif // USE_3HITS
-    fld_1.push_back(fld1);
 
     T.chi2 = 0.;
     T.NDF = 2.;
@@ -222,7 +221,7 @@ inline void L1Algo::f11(  // input
 
     L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
 //     L1Extrapolate( T, zstam, T.qp, fld1 );
-    T_1.push_back(T);
+    
   }// i1_V
 }
 
@@ -231,8 +230,8 @@ inline void L1Algo::f11(  // input
 inline void L1Algo::f20(  // input
                 int n1, L1Station &stam,
                 L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,
-                nsL1::vector<L1TrackPar>::TSimd &T_1, 
-                vector<THitI> &hitsl_1,
+                L1TrackPar *T_1, 
+                THitI* hitsl_1,
                   // output
                 int &n2,
                 vector<THitI> &i1_2,
@@ -329,8 +328,8 @@ inline void L1Algo::f30(  // input
 
                 int istam, int istar,
                 L1HitPoint *vStsHits_m,
-                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                vector<THitI> &hitsl_1,
+                L1TrackPar *T_1, L1FieldRegion *fld_1,
+                THitI *hitsl_1,
 
                 int n2,
                 vector<THitI> &hitsm_2,
@@ -889,9 +888,9 @@ inline void L1Algo::DupletsStaPort(  // input
                       vector<int> &n_g1, unsigned int *portionStopIndex,
 
                         // output
-                      nsL1::vector<L1TrackPar>::TSimd &T_1,
-                      nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                      vector<THitI> &hitsl_1,
+                      L1TrackPar *T_1,
+                      L1FieldRegion *fld_1,
+                      THitI *hitsl_1,
                       
                       vector<unsigned int> *Duplets_start, vector<THitI> *Duplets_hits,
                       
@@ -934,7 +933,7 @@ inline void L1Algo::DupletsStaPort(  // input
             hitsl_1
           );
 
-        for (unsigned int i = 0; i < hitsl_1.size(); i++)
+        for (unsigned int i = 0; i < n1; i++)
           L1_ASSERT(hitsl_1[i] < StsHitsUnusedStopIndex[istal] - StsHitsUnusedStartIndex[istal],
             hitsl_1[i] << " < " << StsHitsUnusedStopIndex[istal] - StsHitsUnusedStartIndex[istal]);
         
@@ -999,9 +998,9 @@ inline void L1Algo::DupletsStaPort(  // input
 inline void L1Algo::TripletsStaPort(  // input
                             int istal, int istam, int istar,
                             unsigned int ip, unsigned int& nstaltriplets,
-                            nsL1::vector<L1TrackPar>::TSimd &T_1,
-                            nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                            vector<THitI> &hitsl_1,
+                            L1TrackPar *T_1,
+                            L1FieldRegion *fld_1,
+                            THitI *hitsl_1,
 
                             int &n_2, unsigned int *portionStopIndex,
                             vector<THitI> &i1_2,
@@ -1530,15 +1529,15 @@ void L1Algo::CATrackFinder()
       unsigned int nstaltripletsG134 = 0; // find triplets begin from this stantion
 
       for(unsigned int ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
-        nsL1::vector<L1TrackPar>::TSimd T_1; // estimation of parameters
-        nsL1::vector<L1FieldRegion>::TSimd fld_1; // magnetic field
-        vector<THitI> hitsl_1; // left hits indexed by number of singlets in portion(i2)
+        // nsL1::vector<L1TrackPar>::TSimd T_1; // estimation of parameters
+        // nsL1::vector<L1FieldRegion>::TSimd fld_1; // magnetic field
+        // vector<THitI> hitsl_1; // left hits indexed by number of singlets in portion(i2)
         vector<THitI> hitsm_2; // middle hits indexed by number of doublets in portion(i1)
         vector<THitI> i1_2; // index in portion of singlets(i1) indexed by index in portion of doublets(i2)
         int n_2; // number of doublets in portion
-        T_1.reserve(Portion/fvecLen);
-        fld_1.reserve(Portion/fvecLen);
-        hitsl_1.reserve(Portion);
+        L1TrackPar T_1[Portion/fvecLen];
+        L1FieldRegion fld_1[Portion/fvecLen];
+        THitI hitsl_1[Portion];
         hitsm_2.reserve(MaxPortionDoublets);
         i1_2.reserve(MaxPortionDoublets);
 
@@ -1575,15 +1574,12 @@ void L1Algo::CATrackFinder()
           TripStartIndexH, TripStopIndexH
           );
         if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter) ) {
-          nsL1::vector<L1TrackPar>::TSimd TG_1;
-          nsL1::vector<L1FieldRegion>::TSimd fldG_1;
-          vector<THitI> hitslG_1;
+          L1TrackPar TG_1[Portion/fvecLen];
+          L1FieldRegion fldG_1[Portion/fvecLen];
+          THitI hitslG_1[Portion];
           vector<THitI> hitsmG_2;
           vector<THitI> i1G_2;
           int nG_2;
-          TG_1.reserve(Portion/fvecLen);
-          fldG_1.reserve(Portion/fvecLen);
-          hitslG_1.reserve(Portion);
           hitsmG_2.reserve(MaxPortionDoublets);
           i1G_2.reserve(MaxPortionDoublets);
           

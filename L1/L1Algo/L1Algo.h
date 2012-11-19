@@ -218,7 +218,7 @@ class L1Algo{
                 int start_lh, int n1,  L1HitPoint *vStsHits_l, 
                   // output
                 fvec *u_front, fvec *u_back,  fvec *zPos,
-                vector<THitI> &hitsl_1
+                THitI *hitsl_1
                 );
 
           /// Get the field approximation. Add the target to parameters estimation. Propagate to middle station.
@@ -228,15 +228,15 @@ class L1Algo{
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
                   // output
-                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1
+                L1TrackPar *T_1, L1FieldRegion *fld_1
                );
   
           /// Find the doublets. Reformat data in the portion of doublets.
   void f20(  // input
                 int n1, L1Station &stam,
                 L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,          
-                nsL1::vector<L1TrackPar>::TSimd &T_1,
-                vector<THitI> &hitsl_1,
+                L1TrackPar *T_1,
+                THitI *hitsl_1,
                   // output
                 int &n2,
                 vector<THitI> &i1_2,
@@ -254,8 +254,8 @@ class L1Algo{
                 
                 int istam, int istar,
                 L1HitPoint *vStsHits_m,
-                nsL1::vector<L1TrackPar>::TSimd &T_1,nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                vector<THitI> &hitsl_1,
+                L1TrackPar *T_1,L1FieldRegion *fld_1,
+                THitI *hitsl_1,
  
                 int n2,
                 vector<THitI> &hitsm_2,
@@ -314,9 +314,9 @@ class L1Algo{
                       vector< int>& n_g1, unsigned int *portionStopIndex,
             
                         // output
-                      nsL1::vector<L1TrackPar>::TSimd &T_1,
-                      nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                      vector<THitI> &hitsl_1,
+                      L1TrackPar *T_1,
+                      L1FieldRegion *fld_1,
+                      THitI *hitsl_1,
                       
                       vector<unsigned int> *Duplets_start, vector<THitI> *Duplets_hits,
                       
@@ -330,9 +330,9 @@ class L1Algo{
                             int istal, int istam, int istar,
                             unsigned int ip,
                             unsigned int& nstaltriplets,
-                            nsL1::vector<L1TrackPar>::TSimd &T_1,
-                            nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-                            vector<THitI> &hitsl_1,
+                            L1TrackPar *T_1,
+                            L1FieldRegion *fld_1,
+                            THitI *hitsl_1,
 
                             int &n_2, unsigned int *portionStopIndex,
                             vector<THitI> &i1_2,

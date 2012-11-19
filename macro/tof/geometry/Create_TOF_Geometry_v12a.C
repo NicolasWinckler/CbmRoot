@@ -80,11 +80,15 @@ const Float_t CounterRotationAngle[NofModuleTypes] = {0., 20.};
 TGeoManager* gGeoMan = NULL;  // Pointer to TGeoManager instance
 TGeoVolume* gModules[NofModuleTypes]; // Global storage for module types
 TGeoVolume* gCounter;
+TGeoVolume* gPole;
 
 // Forward declarations
 void create_materials_from_media_file();
 TGeoVolume* create_counter(Int_t);
 TGeoVolume* create_tof_module(Int_t);
+TGeoVolume* create_tof_pole();
+//void place_tof_module(Int_t);
+//void place_tof_support_structure();
 
 
 
@@ -118,6 +122,8 @@ void Create_TOF_Geometry_v12a() {
   for(Int_t moduleType = 0; moduleType < NofModuleTypes; moduleType++) { 
     gModules[moduleType] = create_tof_module(moduleType);
   }
+
+  gPole = create_tof_pole();
   
   TGeoTranslation* module_trans 
     = new TGeoTranslation("", 0., 0., 0.);
@@ -125,6 +131,9 @@ void Create_TOF_Geometry_v12a() {
   module_trans 
     = new TGeoTranslation("", 0., 0., 100.);
   gGeoMan->GetVolume(geoVersion)->AddNode(gModules[1], 0, module_trans);
+  module_trans 
+    = new TGeoTranslation("", 0., 0., 50.);
+  gGeoMan->GetVolume(geoVersion)->AddNode(gPole, 0, module_trans);
     
 
 
@@ -332,4 +341,51 @@ TGeoVolume* create_tof_module(Int_t modType)
   }
 
   return module;
+}
+
+
+TGeoVolume* create_tof_pole()
+{
+  // needed materials
+  TGeoMedium* boxVolMed          = gGeoMan->GetMedium(BoxVolumeMedium);
+  TGeoMedium* airVolMed   = gGeoMan->GetMedium(KeepingVolumeMedium);
+
+
+  //i   = index of the first box/tower
+  //Z   = distance to the target
+  //phi = angle in along the Z axis
+  //dy  = Thickness in Y
+  //dx  = Thickness in X 
+  //dz  = Thickness in Z
+  //width_alu = Aluminum thickness
+
+ Float_t dxb=180.;
+ Float_t dx=20.;
+ Float_t dy=1000.;
+ Float_t dz=20.;
+ Float_t width_alux=5.;
+ Float_t width_aluy=5.;
+ Float_t width_aluz=5.;
+
+  TGeoVolume* pole = new TGeoVolumeAssembly("Pole");
+
+  TGeoBBox* pole_alu_box = new TGeoBBox("", dx/2., dy/2., dz/2.);
+  TGeoVolume* pole_alu_vol = 
+    new TGeoVolume("pole_alu", pole_alu_box, boxVolMed);
+  pole_alu_vol->SetLineColor(kGreen); // set line color for the alu box
+  pole_alu_vol->SetTransparency(70); // set transparency for the TOF
+  TGeoTranslation* pole_alu_trans 
+    = new TGeoTranslation("", 0., 0., 0.);
+  pole->AddNode(pole_alu_vol, 0, pole_alu_trans);
+
+  TGeoBBox* pole_air_box = new TGeoBBox("", dx/2.-width_alux, dy/2.-width_aluy, dz/2.-width_aluz);
+  TGeoVolume* pole_air_vol = 
+    new TGeoVolume("pole_air", pole_air_box, airVolMed);
+  pole_air_vol->SetLineColor(kYellow); // set line color for the alu box
+  pole_air_vol->SetTransparency(70); // set transparency for the TOF
+  TGeoTranslation* pole_air_trans 
+    = new TGeoTranslation("", 0., 0., 0.);
+  pole_alu_vol->AddNode(pole_air_vol, 0, pole_air_trans);
+
+  return pole;
 }

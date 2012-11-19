@@ -310,32 +310,33 @@ class L1Algo{
          /// Find doublets on station
   void DupletsStaPort(  // input
                       int istal, int istam,
-
-                      vector<int> &n_g1, unsigned int *portionStopIndex,
+                      unsigned int ip, unsigned int& nDuplets_lm,
+                      vector< int>& n_g1, unsigned int *portionStopIndex,
             
                         // output
-                      L1Portion<L1TrackPar> &T_g1,
-                      L1Portion<L1FieldRegion> &fld_g1,
-                      L1Portion<THitI> &hitsl_g1,
+                      nsL1::vector<L1TrackPar>::TSimd &T_1,
+                      nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                      vector<THitI> &hitsl_1,
                       
                       vector<unsigned int> *Duplets_start, vector<THitI> *Duplets_hits,
                       
-                      vector<int> &n_g2,
-                      L1Portion<THitI> &i1_g2,
-                      L1Portion<THitI> &hitsm_g2
+                      int &n_2,
+                      vector<THitI> &i1_2,
+                      vector<THitI> &hitsm_2
                       );
   
             /// Find triplets on station
   void TripletsStaPort(  // input
                             int istal, int istam, int istar,
+                            unsigned int ip,
+                            unsigned int& nstaltriplets,
+                            nsL1::vector<L1TrackPar>::TSimd &T_1,
+                            nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                            vector<THitI> &hitsl_1,
 
-                            L1Portion<L1TrackPar> &T_g1,
-                            L1Portion<L1FieldRegion> &fld_g1,
-                            L1Portion<THitI> &hitsl_g1,
-
-                            vector<int> &n_g2, unsigned int *portionStopIndex,
-                            L1Portion<THitI> &i1_g2,
-                            L1Portion<THitI> &hitsm_g2,
+                            int &n_2, unsigned int *portionStopIndex,
+                            vector<THitI> &i1_2,
+                            vector<THitI> &hitsm_2,
                               
                             vector<unsigned int> *Duplets2_start, vector<THitI>  *Duplets2_hits,
                             

@@ -209,6 +209,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
   if (ista2 == FIRSTCASTATION) 
     ista = ista2 + step;
 
+  const fvec Pick_gather2 = Pick_gather*Pick_gather;
   for( ; (ista < NStations) && (ista >= 0); ista += step ){ // CHECKME why ista2?
 
     L1Station &sta = vStations[ista];
@@ -228,7 +229,9 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
 
       fscal xh, yh, zh;
-      GetHitCoor(hit, xh, yh, zh, sta);
+      GetHitCoor(hit, xh, yh, zh, sta); // faster
+      // L1HitPoint &point = (*vStsHitPointsUnused)[ih];
+      // fscal xh = point.x, yh = point.y, zh = point.z;
       
       fvec y, C11;
       L1ExtrapolateYC11Line( T, zh, y, C11 );
@@ -245,7 +248,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       fscal d2 = dx*dx + dy*dy;
       if( d2 > r2_best ) continue;
       
-      fscal dxm_est2 = ( Pick_gather*Pick_gather*(fabs(C00+sta.XYInfo.C00)) )[0];
+      fscal dxm_est2 = ( Pick_gather2*(fabs(C00+sta.XYInfo.C00)) )[0];
       if (dx*dx > dxm_est2) continue;
       
       r2_best = d2;
@@ -278,26 +281,22 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
     // save hits
   if (dir) { // backward
-    std::vector<THitI> oldHits;
-    // oldHits.clear();
     const int NOldHits = t.StsHits.size();
-    oldHits.resize(NOldHits);
-    for (unsigned int i = 0; i < t.StsHits.size(); i++) { 
-      oldHits[i] = t.StsHits[i];
-    }
-    // t.StsHits.clear();
-    t.StsHits.resize(newHits.size() + NOldHits);
+    const int NNewHits = newHits.size();
+    t.StsHits.resize(NNewHits + NOldHits);
     int ii = 0;
-    for (int i = newHits.size()-1; i >= 0 ; i--) { 
-      t.StsHits[ii++] = newHits[i];
+    for (int i = NOldHits-1; i >= 0 ; i--) { 
+      t.StsHits[NNewHits+i] = t.StsHits[i];
     }
-    for (unsigned int i = 0; i < oldHits.size(); i++) { 
-      t.StsHits[ii++] = oldHits[i];
+    for (unsigned int i = 0, ii = NNewHits-1; i < NNewHits; i++,ii--) { 
+      t.StsHits[i] = newHits[ii];
     }
   }
   else { // forward
+    const int NOldHits = t.StsHits.size();
+    t.StsHits.resize(newHits.size()+NOldHits);
     for (unsigned int i = 0; i < newHits.size(); i++) { 
-      t.StsHits.push_back(newHits[i]);
+      t.StsHits[NOldHits+i] = (newHits[i]);
     }
   }
 

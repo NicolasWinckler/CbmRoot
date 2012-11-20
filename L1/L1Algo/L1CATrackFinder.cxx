@@ -844,6 +844,7 @@ inline void L1Algo::f5(  // input
           last_triplet = lastN;
 
           vector<unsigned int> neighCands; // save neighbour candidates
+          neighCands.reserve(8); // ~average is 1-2 for central, up to 5
           for (iN = first_triplet; iN <= last_triplet; ++iN){
 
             if (vTriplets[iN].GetMSta() != istar) continue; // neighbours should have 2 common hits
@@ -1190,7 +1191,6 @@ void L1Algo::CATrackFinder()
   cout.precision(6);
 
   TStopwatch c_time;   // for performance time
-
 #if defined(XXX) || defined(COUNTERS)
   static unsigned int stat_N = 0; // number of events
   stat_N++;
@@ -1657,7 +1657,14 @@ void L1Algo::CATrackFinder()
 #endif
 
     vTriplets.clear();
-
+    int tSize = 0;
+    for (int istal = NStations - 2; istal >= FIRSTCASTATION; istal--){
+      tSize += vTriplets_part[istal].size();
+      tSize += vTripletsG124_part[istal].size();
+      tSize += vTripletsG134_part[istal].size();
+    }
+    vTriplets.reserve(tSize); // somehow resize is slower...
+    
     for (int istal = NStations - 2; istal >= FIRSTCASTATION; istal--){
       TripStartIndex[istal] = vTriplets.size();
 
@@ -1844,6 +1851,10 @@ void L1Algo::CATrackFinder()
           best_L += 2;
 #else
           CAFindTrack(istaF, best_tr, best_L, best_chi2, curr_trip, curr_tr, curr_L, curr_chi2, NCalls);
+          // if (best_L >= 3){
+          //   BranchExtender(best_tr);
+          //   best_L = best_tr.StsHits.size();
+          // }
 #endif
 
           // if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
@@ -1919,6 +1930,9 @@ void L1Algo::CATrackFinder()
       for (vector<L1Branch*>::iterator   trIt = vptrackcandidate.begin();
                                         trIt != vptrackcandidate.end(); ++trIt){
         L1Branch *tr = *trIt;
+#ifdef EXTEND_TRACKS
+        BranchExtender(*tr);
+#endif // EXTEND_TRACKS
         
           // check if some hits have been used already
         int nused = 0;
@@ -2014,21 +2028,22 @@ void L1Algo::CATrackFinder()
     int StsHitsUnusedStartIndex_temp;
     int ista = 0;
     int nDontUsedHits = 0;
+    const int HSize = vStsHitsUnused->size();
     vStsHitsUnused_buf->clear();
     vStsHitPointsUnused_buf->clear();
+    vStsHitsUnused_buf->reserve(HSize); // in fact a memory is already reserved after clear
+    vStsHitPointsUnused_buf->reserve(HSize);
     for(; ista < NStations; ista++){
 
       StsHitsUnusedStartIndex_temp = StsHitsUnusedStartIndex[ista];
       StsHitsUnusedStartIndex[ista] = nDontUsedHits;
       for(THitI ih = StsHitsUnusedStartIndex_temp; ih < StsHitsUnusedStopIndex[ista]; ih++){
-        THitI rih = RealIHit[ih];
-
-        L1StsHit hit = vStsHits[rih];
+        const L1StsHit &hit = (*vStsHitsUnused)[ih];
         if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ){ continue;} // if used
         vStsHitsUnused_buf->push_back(hit);
         vStsHitPointsUnused_buf->push_back((*vStsHitPointsUnused)[ih]);
 
-        RealIHit[nDontUsedHits] = rih;
+        RealIHit[nDontUsedHits] = RealIHit[ih];
         nDontUsedHits++;
       }
       StsHitsUnusedStopIndex[ista] = nDontUsedHits;
@@ -2211,19 +2226,16 @@ void L1Algo::CAFindTrack(int ista,
     }
     if( curr_chi2 > TRACK_CHI2_CUT * (curr_L*2-5) ) return;
 
-      // try to find more hits
-#ifndef TRACKS_FROM_TRIPLETS
-#define EXTEND_TRACKS
-#endif
-#ifdef EXTEND_TRACKS
-//    if ( isec == kFastPrimJumpIter || isec == kAllPrimJumpIter || isec == kAllSecJumpIter )
-    if (curr_L >= 3){
-      //curr_chi2 = BranchExtender(curr_tr);
-      BranchExtender(curr_tr);
-      curr_L = curr_tr.StsHits.size();
-        //      if( 2*curr_chi2 > (2*(curr_L*2-5) + 1) * 4*4 ) return;
-    }
-#endif // EXTEND_TRACKS
+//      // try to find more hits
+// #ifdef EXTEND_TRACKS
+// //    if ( isec == kFastPrimJumpIter || isec == kAllPrimJumpIter || isec == kAllSecJumpIter )
+//     if (curr_L >= 3){
+//       //curr_chi2 = BranchExtender(curr_tr);
+//       BranchExtender(curr_tr);
+//       curr_L = curr_tr.StsHits.size();
+//         //      if( 2*curr_chi2 > (2*(curr_L*2-5) + 1) * 4*4 ) return;
+//     }
+// #endif // EXTEND_TRACKS
     
       // -- select the best
     if ( (curr_L > best_L ) || ( (curr_L == best_L) && (curr_chi2 < best_chi2) ) ){

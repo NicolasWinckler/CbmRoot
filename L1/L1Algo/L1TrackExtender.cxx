@@ -281,10 +281,9 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
     // save hits
   if (dir) { // backward
-    const int NOldHits = t.StsHits.size();
-    const int NNewHits = newHits.size();
+    const unsigned int NOldHits = t.StsHits.size();
+    const unsigned int NNewHits = newHits.size();
     t.StsHits.resize(NNewHits + NOldHits);
-    int ii = 0;
     for (int i = NOldHits-1; i >= 0 ; i--) { 
       t.StsHits[NNewHits+i] = t.StsHits[i];
     }
@@ -293,7 +292,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
     }
   }
   else { // forward
-    const int NOldHits = t.StsHits.size();
+    const unsigned int NOldHits = t.StsHits.size();
     t.StsHits.resize(newHits.size()+NOldHits);
     for (unsigned int i = 0; i < newHits.size(); i++) { 
       t.StsHits[NOldHits+i] = (newHits[i]);

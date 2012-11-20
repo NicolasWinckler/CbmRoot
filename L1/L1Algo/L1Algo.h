@@ -249,7 +249,7 @@ class L1Algo{
                 vector<THitI> &hitsl_2,
 #endif // DOUB_PERFORMANCE
                 vector<THitI> &hitsm_2,
-                vector<unsigned int> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
+                vector<bool> &lmDuplets
                 );
            /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets (right hit). Reformat data in the portion of triplets.
@@ -265,7 +265,7 @@ class L1Algo{
                 vector<THitI> &hitsm_2,
                 vector<THitI> &i1_2,
                 
-                vector<unsigned int> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
+                const vector<bool> &mrDuplets,
                   // output
                 int &n3,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
@@ -314,7 +314,7 @@ class L1Algo{
          /// Find doublets on station
   void DupletsStaPort(  // input
                       int istal, int istam,
-                      unsigned int ip, unsigned int& nDuplets_lm,
+                      unsigned int ip,
                       vector< int>& n_g1, unsigned int *portionStopIndex,
             
                         // output
@@ -322,7 +322,7 @@ class L1Algo{
                       L1FieldRegion *fld_1,
                       THitI *hitsl_1,
                       
-                      vector<unsigned int> *Duplets_start, vector<THitI> *Duplets_hits,
+                      vector<bool> &lmDuplets,
                       
                       int &n_2,
                       vector<THitI> &i1_2,
@@ -332,7 +332,6 @@ class L1Algo{
             /// Find triplets on station
   void TripletsStaPort(  // input
                             int istal, int istam, int istar,
-                            unsigned int ip,
                             unsigned int& nstaltriplets,
                             L1TrackPar *T_1,
                             L1FieldRegion *fld_1,
@@ -342,7 +341,7 @@ class L1Algo{
                             vector<THitI> &i1_2,
                             vector<THitI> &hitsm_2,
                               
-                            vector<unsigned int> *Duplets2_start, vector<THitI>  *Duplets2_hits,
+                            const vector<bool> &mrDuplets,
                             
                               // output
                             vector<L1Triplet> *vTriplets_part,

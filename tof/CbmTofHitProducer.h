@@ -46,11 +46,13 @@ class CbmTofHitProducer : public FairTask {
 
 private:
 
+  void ReadTofZPosition();
+
   Int_t fVerbose;
 
   TClonesArray *fTofPoints;     // TOF MC points
   TClonesArray *fMCTracks;      // MC tracks
-  TClonesArray *fHitCollection; // TOFhits
+  TClonesArray *fTofHits; // TOFhits
 
   //Temporary substitute of the parameter container. FIXME 
  
@@ -81,6 +83,8 @@ private:
   
   TString fVersion;       //
   Int_t  fNHits;          //Index of the CbmTofHit TClonesArray
+
+  Double_t fTofZPosition; // entry Z position of the TOF wall (NOT hit)
 
   CbmTofHitProducer(const CbmTofHitProducer&);
   CbmTofHitProducer& operator=(const CbmTofHitProducer&);

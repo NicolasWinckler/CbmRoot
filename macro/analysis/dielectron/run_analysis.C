@@ -7,38 +7,35 @@
 
 void run_analysis(Int_t nEvents = 10)
 {
-   Int_t iVerbose = 0;
-
    TString script = TString(gSystem->Getenv("SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    //gRandom->SetSeed(10);
-   Double_t pionMisidLevel = -1;
 
-   TString inFile1 = "", inFile2 = "", parFile = "", outFile ="", energy = "";
-   TString plutoParticle = "";
-   TString useMcMomentum = "no";
+	TString dir = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/";
+	TString mcFile = dir + "/mc.0000.root";
+	TString parFile = dir + "/param.0000.root";
+	TString recoFile = dir + "/reco.0000.root";
+	TString analysisFile = dir + "/ana.0000.root";
+	TString energy = "25gev";
 
-   if (script != "yes") {
-      TString DIR="/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/";
-      inFile1 = DIR+"/mc.0000.root";
-      parFile = DIR+"/param.0000.root";
-      inFile2 = DIR+"/reco.ideal.0000.root";
-      outFile = DIR+"_test.root";
-      energy = "25gev";
-   } else {
-      inFile1 = TString(gSystem->Getenv("MCFILE"));
-      inFile2 = TString(gSystem->Getenv("RECOFILE"));
-      parFile = TString(gSystem->Getenv("PARFILE"));
-      outFile = TString(gSystem->Getenv("DILEPANALYSISFILE"));
-      pionMisidLevel = TString(gSystem->Getenv("PIONMISIDENTIFICATIONLEVEL")).Atof();
+	TString plutoParticle = "omegaepem";
+	TString useMcMomentum = "no";
+	Double_t pionMisidLevel = -1;
+
+	TString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+
+   if (script == "yes") {
+      mcFile = TString(gSystem->Getenv("MC_FILE"));
+      recoFile = TString(gSystem->Getenv("RECO_FILE"));
+      parFile = TString(gSystem->Getenv("PAR_FILE"));
+      analysisFile = TString(gSystem->Getenv("ANALYSIS_FILE"));
+      pionMisidLevel = TString(gSystem->Getenv("PION_MISIDENTIFICATION_LEVEL")).Atof();
       energy = TString(gSystem->Getenv("ENERGY"));
-      plutoParticle = TString(gSystem->Getenv("PLUTOPARTICLE"));
-      useMcMomentum = TString(gSystem->Getenv("USEMCMOMENTUM"));
+      plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
+      useMcMomentum = TString(gSystem->Getenv("USE_MC_MOMENTUM"));
+      stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
    }
-
-   TString stsDigiFile = "sts_v11a.digi.par";
-   gDebug = 0;
 
    // load libraries
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -53,9 +50,9 @@ void run_analysis(Int_t nEvents = 10)
 
    FairRunAna* fRun = new FairRunAna();
    fRun->SetName("TGeant3");
-   fRun->SetInputFile(inFile1);
-   fRun->SetOutputFile(outFile);
-   fRun->AddFriend(inFile2);
+   fRun->SetInputFile(mcFile);
+   fRun->SetOutputFile(analysisFile);
+   fRun->AddFriend(recoFile);
 
    //CbmKF is needed for Extrapolation
    CbmKF* kf = new CbmKF();
@@ -94,14 +91,11 @@ void run_analysis(Int_t nEvents = 10)
 
    fRun->AddTask(task);
 
-   TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-   stsDigi += "/parameters/sts/";
-   stsDigi += stsDigiFile;
    FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
    FairParRootFileIo* parIo1 = new FairParRootFileIo();
    FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
    parIo1->open(parFile.Data());
-   parIo2->open(stsDigi.Data(),"in");
+   parIo2->open(stsDigiFile.Data(), "in");
    rtdb->setFirstInput(parIo1);
    rtdb->setSecondInput(parIo2);
 
@@ -109,14 +103,10 @@ void run_analysis(Int_t nEvents = 10)
    fRun->Run(0, nEvents);
 
    timer.Stop();
-   Double_t rtime = timer.RealTime();
-   Double_t ctime = timer.CpuTime();
-   cout << endl << endl;
-   cout << "Macro finished succesfully." << endl;
-   cout << "Output file is " << outFile << endl;
-   cout << "Parameter file is " << parFile << endl;
-   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
-   cout << " Test passed" << endl;
-   cout << " All ok " << endl;
-   exit(0);
+   std::cout << "Macro finished succesfully." << std::endl;
+   std::cout << "Output file is " << analysisFile << std::endl;
+   std::cout << "Parameter file is " << parFile << std::endl;
+   std::cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << std::endl;
+   std::cout << " Test passed" << std::endl;
+   std::cout << " All ok " << std::endl;
 }

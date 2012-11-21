@@ -1,81 +1,62 @@
 void run_sim(Int_t nEvents = 1000)
 {
-   TTree::SetMaxTreeSize(90000000000);
-	Int_t iVerbose = 0;
+	TTree::SetMaxTreeSize(90000000000);
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	//gRandom->SetSeed(10);
 
-	TString inFile = "", parFile = "", outFile ="";
-	TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "",
-	      mvdGeom    = "", mvdGeom = "",stsGeom = "", richGeom= "", trdGeom = "",
-	      tofGeom = "", ecalGeom = "";
-	TString fieldMap = "";
+	TString urqmdFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
+	TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+	TString mcFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
 
-	TString electrons = ""; // If "yes" than primary electrons will be generated
-	Int_t NELECTRONS = 0;
-	Int_t NPOSITRONS = 0;
-	TString urqmd = ""; // If "yes" than UrQMD will be used as background
-	TString pluto = ""; // If "yes" PLUTO particles will be embedded
+	TString caveGeom = "cave.geo";
+	TString targetGeom = "target_au_025mu.geo";
+	TString pipeGeom = "pipe_standard.geo";
+	TString mvdGeom = "";//"mvd/mvd_v08a.geo";
+	TString stsGeom = "sts/sts_v12b.geo";
+	TString richGeom = "rich/rich_v08a.geo";
+	TString trdGeom = "trd/trd_v10b.geo";
+	TString tofGeom = "tof/tof_v07a.geo";
+	TString fieldMap = "field_v12a";
+	TString magnetGeom = "passive/magnet_v12a.geo";
+
+	Int_t nofElectrons = 5;
+	Int_t nofPositrons = 5;
+	TString urqmd = "yes";
+	TString pluto = "no";
 	TString plutoFile = "";
 	TString plutoParticle = "";
 
 	// Magnetic field
-	Double_t fieldZ = 50.; // field centre z position
+	Double_t fieldZ = 50.; // field center z position
 	Double_t fieldScale =  1.0; // field scaling factor
 
-	if (script != "yes") {
-		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
-		parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-		outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+	if (script == "yes") {
+		urqmdFile = TString(gSystem->Getenv("URQMD_FILE"));
+		parFile = TString(gSystem->Getenv("PAR_FILE"));
+		mcFile = TString(gSystem->Getenv("MC_FILE"));
 
-      caveGeom = "cave.geo";
-      targetGeom = "target_au_025mu.geo";
-      pipeGeom = "pipe_standard.geo";
-      mvdGeom = "";//"mvd/mvd_v08a.geo";
-      stsGeom = "sts/sts_v11a.geo";
-      richGeom = "rich/rich_v08a.geo";
-      trdGeom = "trd/trd_v10b.geo";
-      tofGeom = "tof/tof_v07a.geo";
-      ecalGeom = "";//"ecal_FastMC.geo";
-      fieldMap = "field_v10e";
-      magnetGeom = "passive/magnet_v09e.geo";
+		caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
+		targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
+		pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
+		mvdGeom = TString(gSystem->Getenv("MVD_GEOM"));
+		stsGeom = TString(gSystem->Getenv("STS_GEOM"));
+		richGeom = TString(gSystem->Getenv("RICH_GEOM"));
+		trdGeom = TString(gSystem->Getenv("TRD_GEOM"));
+		tofGeom = TString(gSystem->Getenv("TOF_GEOM"));
+		fieldMap = TString(gSystem->Getenv("FIELD_MAP"));
+		magnetGeom = TString(gSystem->Getenv("MAGNET_GEOM"));
 
-		electrons = "yes";
-		NELECTRONS = 5;
-		NPOSITRONS = 5;
-		urqmd = "yes";
-		pluto = "no";
-		plutoFile = "";
-	} else {
-		inFile = TString(gSystem->Getenv("INFILE"));
-		outFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-
-		caveGeom = TString(gSystem->Getenv("CAVEGEOM"));
-		targetGeom = TString(gSystem->Getenv("TARGETGEOM"));
-		pipeGeom = TString(gSystem->Getenv("PIPEGEOM"));
-		//shieldGeom = TString(gSystem->Getenv("SHIELDGEOM"));
-		mvdGeom = TString(gSystem->Getenv("MVDGEOM"));
-		stsGeom = TString(gSystem->Getenv("STSGEOM"));
-		muchGeom = TString(gSystem->Getenv("MUCHGEOM"));
-		richGeom = TString(gSystem->Getenv("RICHGEOM"));
-		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
-		tofGeom = TString(gSystem->Getenv("TOFGEOM"));
-		ecalGeom = TString(gSystem->Getenv("ECALGEOM"));
-		fieldMap = TString(gSystem->Getenv("FIELDMAP"));
-		magnetGeom = TString(gSystem->Getenv("MAGNETGEOM"));
-
-		NELECTRONS = TString(gSystem->Getenv("NELECTRONS")).Atoi();
-		NPOSITRONS = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
-		electrons = TString(gSystem->Getenv("ELECTRONS"));
+		nofElectrons = TString(gSystem->Getenv("NOF_ELECTRONS")).Atoi();
+		nofPositrons = TString(gSystem->Getenv("NOF_POSITRONS")).Atoi();
 		urqmd = TString(gSystem->Getenv("URQMD"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
-		plutoFile = TString(gSystem->Getenv("PLUTOFILE"));
-		plutoParticle = TString(gSystem->Getenv("PLUTOPARTICLE"));
-		fieldScale = TString(gSystem->Getenv("FIELDMAPSCALE")).Atof();
+		plutoFile = TString(gSystem->Getenv("PLUTO_FILE"));
+		plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
+
+		fieldScale = TString(gSystem->Getenv("FIELD_MAP_SCALE")).Atof();
 	}
 
 	gDebug = 0;
@@ -90,7 +71,7 @@ void run_sim(Int_t nEvents = 1000)
 
 	FairRunSim* fRun = new FairRunSim();
 	fRun->SetName("TGeant3");              // Transport engine
-	fRun->SetOutputFile(outFile);          // Output file
+	fRun->SetOutputFile(mcFile);          // Output file
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
 	fRun->SetMaterials("media.geo");       // Materials
@@ -150,23 +131,8 @@ void run_sim(Int_t nEvents = 1000)
 		fRun->AddModule(tof);
 	}
 
-	// if ( ecalGeom != "" ) {
-	//   FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
-	//   fRun->AddModule(ecal);
-	// }
-
 	// -----   Create magnetic field   ----------------------------------------
-   CbmFieldMap* magField = NULL;
-   if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
-      magField = new CbmFieldMapSym2(fieldMap);
-   else if (fieldMap == "field_muon_standard" )
-      magField = new CbmFieldMapSym2(fieldMap);
-   else if (fieldMap == "FieldMuonMagnet" )
-      magField = new CbmFieldMapSym3(fieldMap);
-   else {
-      cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-      exit;
-   }
+   CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
    magField->SetPosition(0., 0., fieldZ);
    magField->SetScale(fieldScale);
    fRun->SetField(magField);
@@ -175,21 +141,22 @@ void run_sim(Int_t nEvents = 1000)
 	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	if (urqmd == "yes"){
-		FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(inFile);
+		FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(urqmdFile);
 		primGen->AddGenerator(urqmdGen);
 	}
 
-	//add electrons
-	if (electrons == "yes"){
-		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, NPOSITRONS);
+	// Add electrons
+	if (nofElectrons > 0 ) {
+		FairBoxGenerator* boxGen1 = new FairBoxGenerator(-11, nofElectrons);
 		boxGen1->SetPtRange(0.,3.);
 		boxGen1->SetPhiRange(0.,360.);
 		boxGen1->SetThetaRange(2.5,25.);
 		boxGen1->SetCosTheta();
 		boxGen1->Init();
 		primGen->AddGenerator(boxGen1);
-
-		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, NELECTRONS);
+	}
+	if (nofPositrons > 0) {
+		FairBoxGenerator* boxGen2 = new FairBoxGenerator(11, nofPositrons);
 		boxGen2->SetPtRange(0.,3.);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5,25.);
@@ -207,7 +174,7 @@ void run_sim(Int_t nEvents = 1000)
 //	fRun->SetStoreTraj(kTRUE);
 	fRun->Init();
 
-	if (pluto == "yes" && urqmd == "yes"){
+	if (pluto == "yes" && urqmd == "yes") {
 		Float_t bratioEta[6];
 		Int_t modeEta[6];
 
@@ -256,7 +223,6 @@ void run_sim(Int_t nEvents = 1000)
 		gMC->SetRandom(rnd);
 	}
 
-
 	// -----   Runtime database   ---------------------------------------------
 	CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
 	fieldPar->SetParameters(magField);
@@ -274,17 +240,11 @@ void run_sim(Int_t nEvents = 1000)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
-	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << outFile << endl;
-	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << rtime << " s, CPU time " << ctime
-       << "s" << endl << endl;
-
-	cout << " Test passed" << endl;
-	cout << " All ok " << endl;
-	exit(0);
+	std::cout << "Macro finished succesfully." << std::endl;
+	std::cout << "Output file is "    << mcFile << std::endl;
+	std::cout << "Parameter file is " << parFile << std::endl;
+	std::cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << "s" << std::endl;
+	std::cout << " Test passed" << std::endl;
+	std::cout << " All ok " << std::endl;
 }
 

@@ -1,0 +1,1 @@
+qsub -l mem=2G,ct=05:00:00 "./sim.sge 8gev 0.7 nomvd rho0"

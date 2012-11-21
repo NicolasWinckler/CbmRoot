@@ -1,37 +1,39 @@
-
-#include "../../../cbmbase/CbmDetectorList.h";
-
 void run_reco(Int_t nEvents = 1000)
 {
    TTree::SetMaxTreeSize(90000000000);
-	Int_t iVerbose = 0;
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	//gRandom->SetSeed(10);
 
-	TString inFile = "", parFile = "", outFile ="", deltaFile ="";
-   TString delta = ""; // if "yes" Delta electrons will be embedded
-	if (script != "yes") {
-		TString inFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-		TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-		TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-	} else {
-		inFile = TString(gSystem->Getenv("MCFILE"));
-		outFile = TString(gSystem->Getenv("RECOFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
+	TString mcFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+	TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+	TString recoFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+	TString delta = "no"; // if "yes" Delta electrons will be embedded
+	TString deltaFile = "";
+
+   TList *parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+
+   TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
+
+	if (script == "yes") {
+		mcFile = TString(gSystem->Getenv("MC_FILE"));
+		parFile = TString(gSystem->Getenv("PAR_FILE"));
+		recoFile = TString(gSystem->Getenv("RECO_FILE"));
 		delta = TString(gSystem->Getenv("DELTA"));
-		deltaFile = TString(gSystem->Getenv("DELTAFILE"));
+		deltaFile = TString(gSystem->Getenv("DELTA_FILE"));
+
+		stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
+		trdDigiFile = TString(gSystem->Getenv("TRD_DIGI"));
+
+		stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
 	}
 
-   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-   TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
-   gDebug = 0;
 
    TStopwatch timer;
    timer.Start();
@@ -45,8 +47,8 @@ void run_reco(Int_t nEvents = 1000)
 
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
-	if (inFile != "") run->SetInputFile(inFile);
-	if (outFile != "") run->SetOutputFile(outFile);
+	if (mcFile != "") run->SetInputFile(mcFile);
+	if (recoFile != "") run->SetOutputFile(recoFile);
 
 
     // =========================================================================
@@ -55,7 +57,7 @@ void run_reco(Int_t nEvents = 1000)
 	Bool_t useMvdInTracking = kFALSE;
 	if (IsMvd(parFile)) {
 	   useMvdInTracking = kTRUE;
-      CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("CbmMvdDigitizeL", 0, iVerbose);
+      CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("CbmMvdDigitizeL", 0, 1);
       mvdDigitizeL->SetPixelSize(18.4); //should be 20x20
       mvdDigitizeL->SetEpiThickness(0.0014);
       //mvdDigitizeL->ShowDebugHistograms();
@@ -67,7 +69,7 @@ void run_reco(Int_t nEvents = 1000)
       }
       run->AddTask(mvdDigitizeL);
 
-      CbmMvdFindHits* mvdFindHits = new CbmMvdFindHits("CbmMvdFindHits", 0, iVerbose);
+      CbmMvdFindHits* mvdFindHits = new CbmMvdFindHits("CbmMvdFindHits", 0, 1);
       mvdFindHits->SetSigmaNoise(11,kTRUE);
       //mvdFindHits->ShowDebugHistograms();
       mvdFindHits->SetAdcDynamic(150);
@@ -79,7 +81,7 @@ void run_reco(Int_t nEvents = 1000)
 
       // MVD ideal
       //{
-      //CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
+      //CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 1);
       //run->AddTask(mvdHitProd);
       //}
 	}
@@ -88,70 +90,70 @@ void run_reco(Int_t nEvents = 1000)
 	// ===                      STS local reconstruction                     ===
 	// =========================================================================
     if (true){ // STS REAL
-    Double_t threshold  =  4;
-    Double_t noiseWidth =  0.1;
-    Int_t    nofBits    = 20;
-    Double_t minStep    =  0.01;
-    Double_t StripDeadTime = 10.;
+      Double_t threshold  =  4;
+      Double_t noiseWidth =  0.1;
+      Int_t    nofBits    = 20;
+      Double_t minStep    =  0.01;
+      Double_t StripDeadTime = 10.;
 
-    Double_t threshold  =  4;
-   Double_t noiseWidth =  0.01;
-   Int_t    nofBits    = 12;
-   Double_t electronsPerAdc    =  10;
-   Double_t StripDeadTime = 0.1;
-   CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
-   stsDigitize->SetRealisticResponse();
-   stsDigitize->SetFrontThreshold (threshold);
-   stsDigitize->SetBackThreshold  (threshold);
-   stsDigitize->SetFrontNoiseWidth(noiseWidth);
-   stsDigitize->SetBackNoiseWidth (noiseWidth);
-   stsDigitize->SetFrontNofBits   (nofBits);
-   stsDigitize->SetBackNofBits    (nofBits);
-   stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
-   stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
-   stsDigitize->SetStripDeadTime  (StripDeadTime);
-   run->AddTask(stsDigitize);
-
-    FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
-    run->AddTask(stsClusterFinder);
-
-    FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
-    run->AddTask(stsFindHits);
-
-    CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
-    run->AddTask(stsMatchHits);
-
-    } else { // STS IDEAL RESPONSE
-      FairTask* stsDigitize = new CbmStsIdealDigitize("CbmStsIdealDigitize", iVerbose);
+      Double_t threshold  =  4;
+      Double_t noiseWidth =  0.01;
+      Int_t    nofBits    = 12;
+      Double_t electronsPerAdc    =  10;
+      Double_t StripDeadTime = 0.1;
+      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", 1);
+      stsDigitize->SetRealisticResponse();
+      stsDigitize->SetFrontThreshold (threshold);
+      stsDigitize->SetBackThreshold  (threshold);
+      stsDigitize->SetFrontNoiseWidth(noiseWidth);
+      stsDigitize->SetBackNoiseWidth (noiseWidth);
+      stsDigitize->SetFrontNofBits   (nofBits);
+      stsDigitize->SetBackNofBits    (nofBits);
+      stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
+      stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
+      stsDigitize->SetStripDeadTime  (StripDeadTime);
       run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",1);
       run->AddTask(stsClusterFinder);
 
-      FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
+      FairTask* stsFindHits = new CbmStsFindHits(1);
       run->AddTask(stsFindHits);
 
-      FairTask* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
+      CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(1);
+      run->AddTask(stsMatchHits);
+
+    } else { // STS IDEAL RESPONSE
+      FairTask* stsDigitize = new CbmStsIdealDigitize("CbmStsIdealDigitize", 1);
+      run->AddTask(stsDigitize);
+
+      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",1);
+      run->AddTask(stsClusterFinder);
+
+      FairTask* stsFindHits = new CbmStsIdealFindHits(1);
+      run->AddTask(stsFindHits);
+
+      FairTask* stsMatchHits = new CbmStsIdealMatchHits(1);
       run->AddTask(stsMatchHits);
    }
-
 
 	CbmKF* kalman = new CbmKF();
 	run->AddTask(kalman);
 	CbmL1* l1 = new CbmL1();
+	l1->SetMaterialBudgetFileName(stsMatBudgetFileName);
 //	CbmL1* l1 = new CbmL1("CbmL1",1, 3); //to fill L1 histo
 	run->AddTask(l1);
 
 	CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
 	//Bool_t useMvdInTracking = kTRUE;
-	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, useMvdInTracking);
+	FairTask* stsFindTracks = new CbmStsFindTracks(1, stsTrackFinder, useMvdInTracking);
 	run->AddTask(stsFindTracks);
 
-	FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
+	FairTask* stsMatchTracks = new CbmStsMatchTracks(1);
 	run->AddTask(stsMatchTracks);
 
 	CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-	FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
+	FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, 1);
 	run->AddTask(stsFitTracks);
 
 	// =========================================================================
@@ -175,7 +177,7 @@ void run_reco(Int_t nEvents = 1000)
 	// =========================================================================
 	if (IsTof(parFile)) {
 		// ------   TOF hit producer   ---------------------------------------------
-		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", iVerbose);
+		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", 1);
 		run->AddTask(tofHitProd);
 	} //isTof
 
@@ -184,7 +186,7 @@ void run_reco(Int_t nEvents = 1000)
 	// =========================================================================
 
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
-	finder->SetTrackingType(std::string("branch"));
+	finder->SetTrackingType("branch");
 	finder->SetMergerType("nearest_hit");
 	run->AddTask(finder);
 
@@ -195,7 +197,7 @@ void run_reco(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	if (IsTrd(parFile)) {
-		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
+		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
 		run->AddTask(trdMatchTracks);
 
 		CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
@@ -248,26 +250,18 @@ void run_reco(Int_t nEvents = 1000)
    trackingQa->SetOutputDir("recqa/");
    run->AddTask(trackingQa);
 
-//   CbmLitFitQa* fitQa = new CbmLitFitQa();
-//   fitQa->SetMvdMinNofHits(0);
-//   fitQa->SetStsMinNofHits(4);
-//   fitQa->SetMuchMinNofHits(10);
-//   fitQa->SetTrdMinNofHits(8);
-//   //fitQa->SetOutputDir(std::string(resultDir));
-//   run->AddTask(fitQa);
+   CbmLitFitQa* fitQa = new CbmLitFitQa();
+   fitQa->SetMvdMinNofHits(0);
+   fitQa->SetStsMinNofHits(4);
+   fitQa->SetMuchMinNofHits(10);
+   fitQa->SetTrdMinNofHits(8);
+   fitQa->SetOutputDir("recqa/");
+   run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetOutputDir("recqa/");
    run->AddTask(clusteringQa);
 
-    // =========================================================================
-    // ===                        ECAL reconstruction                        ===
-    // =========================================================================
-
-//  // -----   ECAL hit producer  ----------------------------------------------
-//  CbmEcalHitProducerFastMC* ecalHitProd
-//    = new CbmEcalHitProducerFastMC("ECAL Hitproducer");
-//  run->AddTask(ecalHitProd);
 
     // -----  Parameter database   --------------------------------------------
    FairRuntimeDb* rtdb = run->GetRuntimeDb();
@@ -281,21 +275,14 @@ void run_reco(Int_t nEvents = 1000)
    rtdb->saveOutput();
 
     run->Init();
-    cout << "Starting run" << endl;
-    run->Run(0,nEvents);
+    run->Run(0, nEvents);
 
     // -----   Finish   -------------------------------------------------------
     timer.Stop();
-    Double_t rtime = timer.RealTime();
-    Double_t ctime = timer.CpuTime();
-    cout << endl << endl;
-    cout << "Macro finished successfully." << endl;
-    cout << "Output file is "    << outFile << endl;
-    cout << "Parameter file is " << parFile << endl;
-    cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
-    cout << endl;
-
-    cout << " Test passed" << endl;
-    cout << " All ok " << endl;
-    exit(0);
+    std::cout << "Macro finished successfully." << std::endl;
+    std::cout << "Output file is "    << recoFile << std::endl;
+    std::cout << "Parameter file is " << parFile << std::endl;
+    std::cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << std::endl;
+    std::cout << " Test passed" << std::endl;
+    std::cout << " All ok " << std::endl;
 }

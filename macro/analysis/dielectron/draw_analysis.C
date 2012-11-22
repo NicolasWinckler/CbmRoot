@@ -4,28 +4,17 @@
  * @version 2.0
  **/
 
-void draw_analysis(){
-
-    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-    basiclibs();
-
-    gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-    cbmlibs();
-
+void draw_analysis() {
+    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+    loadlibs();
     gSystem->Load("libAnalysis");
 
     Bool_t useMvd = true;
-    std::string setup = "100field/mvd";
-   // std::string fileName = "analysis.pi_misid_0.0001.all.root";
-    std::string fileName = "analysis.all.root";
-
     Bool_t drawSignificance = true;
-    std::string fileName2 = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/"+setup+"/rho0/" + fileName;
-
-    std::string outputDir = "results/25gev/" + setup + "/rho0/real_pid/";
-    //std::string outputDir = "results/25gev/" + setup + "/rho0/pi_misid_0_0001/";
-
+    std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/1.0field/mvd/rho0/";
+    std::string fileName = dir + "analysis.auau.8gev.centr.all.root";
+    std::string outputDir = dir + "results/all/";
 
     CbmAnaDielectronTaskDraw *draw = new CbmAnaDielectronTaskDraw();
-    draw->DrawHistFromFile(fileName2, outputDir, useMvd);//, drawSignificance);
+    draw->DrawHistFromFile(fileName, outputDir, useMvd);//, drawSignificance);
 }

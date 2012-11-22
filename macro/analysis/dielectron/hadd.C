@@ -50,7 +50,7 @@ void hadd() {
    for (int iF = 0; iF < 4; iF++){
 
       if (iF == 0) {
-         particle = "omega";
+         particle = "omegaepem";
       } else if (iF == 1) {
          particle = "phi";
       } else if (iF == 2) {
@@ -59,20 +59,24 @@ void hadd() {
          particle = "rho0";
       }
 
-      string fileName = "analysis.pi_misid_0.0001.";
+      std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/1.0field/mvd/" + particle + "/";
+      std::string fileName = dir + "analysis.auau.8gev.centr.";
+     // std::string outputDir = dir + "results/all/";
+
+     // string fileName = "analysis.pi_misid_0.0001.";
      // string fileName = "analysis.";
-      string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/100field/nomvd/"+particle+"/";
+     // string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/100field/nomvd/"+particle+"/";
       cout << "-I- " << dir << endl;
 
-      Target = TFile::Open( string(dir+fileName+"all.root").c_str(), "RECREATE" );
+      Target = TFile::Open( string(fileName+"all.root").c_str(), "RECREATE" );
 
       int count = 0;
       FileList = new TList();
-      for (int i = 0; i < 200; i++){
+      for (int i = 0; i < 100; i++){
          stringstream ss;
-         ss << dir << fileName ;
+         ss << fileName ;
          ss.fill('0');
-         ss.width(4);
+         ss.width(5);
          ss  << i << ".root";
          TFile* file = TFile::Open(ss.str().c_str());
          if ( file != NULL && file->GetEND() > 2000){

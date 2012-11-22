@@ -19,6 +19,8 @@ void run_reco(Int_t nEvents = 1000)
 
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
+   TString resultDir = "recqa/";
+
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("MC_FILE"));
 		parFile = TString(gSystem->Getenv("PAR_FILE"));
@@ -28,6 +30,8 @@ void run_reco(Int_t nEvents = 1000)
 
 		stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
 		trdDigiFile = TString(gSystem->Getenv("TRD_DIGI"));
+
+                resultDir = TString(gSystem->Getenv("RESULT_DIR"));
 
 		stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
 	}
@@ -39,10 +43,8 @@ void run_reco(Int_t nEvents = 1000)
    timer.Start();
 
 	// ----  Load libraries   -------------------------------------------------
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-	cbmlibs();
+        gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+	loadlibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
 	// -----   Reconstruction run   -------------------------------------------
@@ -247,7 +249,7 @@ void run_reco(Int_t nEvents = 1000)
    trackingQa->SetVerbose(0);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
-   trackingQa->SetOutputDir("recqa/");
+   trackingQa->SetOutputDir(std::string(resultDir));
    run->AddTask(trackingQa);
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();
@@ -255,11 +257,11 @@ void run_reco(Int_t nEvents = 1000)
    fitQa->SetStsMinNofHits(4);
    fitQa->SetMuchMinNofHits(10);
    fitQa->SetTrdMinNofHits(8);
-   fitQa->SetOutputDir("recqa/");
+   fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-   clusteringQa->SetOutputDir("recqa/");
+   clusteringQa->SetOutputDir(std::string(resultDir));
    run->AddTask(clusteringQa);
 
 

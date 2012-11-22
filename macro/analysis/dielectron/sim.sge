@@ -1,23 +1,25 @@
 #$ -wd /tmp 
 #$ -j y
 # Number of subtasks to start
-#$ -t 1-10
+#$ -t 1-100
 
 #XXXXX=$(printf "%05d" "1")
+#XXXX=$(printf "%04d" "1")
 XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
-coll_energy=$1
-field_scale=$2
-mvd=$3
-pluto_particle=$4
+#coll_energy=$1
+#field_scale=$2
+#mvd=$3
+#pluto_particle=$4
+echo ${coll_energy} ${field_scale} ${mvd} ${pluto_particle}
 outdir=/hera/cbm/users/andrey/mc/dielectron/nov12/${coll_energy}/${field_scale}field/${mvd}/${pluto_particle}/
 
 # Needed to run macro via script
 export SCRIPT=yes
 
 # Number of events to run
-nevents=10
+nevents=1000
 
 #create the needed directories
 mkdir -p ${outdir}/log
@@ -31,11 +33,11 @@ source /hera/cbm/users/andrey/cbmroot/trunk/build/config.sh
 # This line is needed, otherwise root will crash
 export DISPLAY=localhost:0.0
 
-export URQMD_FILE=/hera/cbm/prod/gen/urqmd/auau/8gev/centr/urqmd.auau.8gev.centr.${XXXXX}.root
-export MC_FILE=${outdir}/mc.auau.8gev.centr.${XXXXX}.root
-export PAR_FILE=${outdir}/params.auau.8gev.centr.${XXXXX}.root
-export RECO_FILE=${outdir}/reco.auau.8gev.centr.${XXXXX}.root
-export ANALYSIS_FILE=${outdir}/analysis.auau.8gev.centr.${XXXXX}.root
+export URQMD_FILE=/hera/cbm/prod/gen/urqmd/auau/${coll_energy}/centr/urqmd.auau.${coll_energy}.centr.${XXXXX}.root
+export MC_FILE=${outdir}/mc.auau.${coll_energy}.centr.${XXXXX}.root
+export PAR_FILE=${outdir}/params.auau.${coll_energy}.centr.${XXXXX}.root
+export RECO_FILE=${outdir}/reco.auau.${coll_energy}.centr.${XXXXX}.root
+export ANALYSIS_FILE=${outdir}/analysis.auau.${coll_energy}.centr.${XXXXX}.root
 export RESULT_DIR=${outdir}/results/${XXXXX}/
 
 #Simulation parameters
@@ -49,14 +51,22 @@ export URQMD=yes
 # If "yes" PLUTO particles will be embedded
 export PLUTO=yes
 #Collision energy: 25gev or 10gev -> set proper weight into analysis
-export ENERGY=10gev
+if [ ${coll_energy} = "8gev" ]; then
+   export ENERGY=10gev
+elif [ ${coll_energy} = "25gev" ]; then
+   export ENERGY=25gev
+fi
 #---------------------------------------------------
 
 #Geometries
 export CAVE_GEOM=cave.geo
 export TARGET_GEOM=target_au_025mu.geo
 export PIPE_GEOM=pipe_standard.geo
-export MVD_GEOM=mvd/mvd_v08a.geo
+if [ ${mvd} = "mvd" ] ; then
+   export MVD_GEOM=mvd/mvd_Nov_2012.geo
+elif [ ${mvd} = "nomvd" ]; then
+   export MVD_GEOM=
+fi
 export STS_GEOM=sts/sts_v12b.geo.root
 export STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
 export STS_MATERIAL_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
@@ -68,28 +78,26 @@ export FIELD_MAP=field_v12a
 export MAGNET_GEOM=passive/magnet_v12a.geo
 export FIELD_MAP_SCALE=${field_scale}
 
-   
 #If "yes" DELTA electrons will be embedded
 export DELTA=no
-export DELTAFILE=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/deltasource/mc.delta.root
+export DELTA_FILE=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/deltasource/mc.delta.root
 
 export PION_MISIDENTIFICATION_LEVEL=-1.0
 export USE_MC_MOMENTUM=yes
 
-export PLUTO_FILE=/d/cbm05/galatyuk/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
 export PLUTO_PARTICLE=${pluto_particle}
 export PLUTO=yes
 
 if [ ${pluto_particle} = "rho0" ] ; then 
-   export PLUTOFILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
-elseif [ ${pluto_particle} = "omegaepem" ] ; then 
-   export PLUTOFILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
-elseif [ ${pluto_particle} = "omegadalitz" ] ; then 
-   export PLUTOFILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
-elseif [ ${pluto_particle} = "phi" ] ; then 
-   export PLUTOFILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
-elseif [ ${pluto_particle} = "pi0" ] ; then 
-   export PLUTOFILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/pi0/gammaepem/pluto.auau.${ENERGY}.pi0.gammaepem.10k.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
+elif [ ${pluto_particle} = "omegaepem" ] ; then 
+   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
+elif [ ${pluto_particle} = "omegadalitz" ] ; then 
+   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
+elif [ ${pluto_particle} = "phi" ] ; then 
+   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
+elif [ ${pluto_particle} = "pi0" ] ; then 
+   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/pi0/gammaepem/pluto.auau.${ENERGY}.pi0.gammaepem.10k.${XXXX}.root
 fi 
 
 # create special and enter special workdir for job

@@ -38,10 +38,8 @@ void run_analysis(Int_t nEvents = 10)
    }
 
    // load libraries
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-   cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
    gSystem->Load("libAnalysis");
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 

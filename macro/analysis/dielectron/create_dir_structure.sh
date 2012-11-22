@@ -1,13 +1,21 @@
-#!/bin/sh
 
-export DIR=/lustre/cbm/user/ebelolap/aug11/sep12/25gev/100field/mvd3
+dir=/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/
 
 function create_dir() {
-    mkdir -p ${DIR}/${1}/log
+    mkdir -p ${1}/log
+    mkdir -p ${1}/results/all
 }
 
-create_dir rho0
-create_dir omega
-create_dir omegadalitz
-create_dir phi
+function create_dir_particles() {
+    create_dir ${1}/rho0
+    create_dir ${1}/omegaepem
+    create_dir ${1}/omegadalitz
+    create_dir ${1}/phi
+    mkdir -p ${1}/results
+}
+
+create_dir_particles ${dir}/0.7field/mvd/
+create_dir_particles ${dir}/0.7field/nomvd/
+create_dir_particles ${dir}/1.0field/mvd/
+create_dir_particles ${dir}/1.0field/nomvd/
 

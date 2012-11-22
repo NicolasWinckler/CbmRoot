@@ -75,6 +75,22 @@ const Float_t CounterXDistance[NofModuleTypes] = {30.0, 28.0};
 const Float_t CounterZDistance[NofModuleTypes] = {5.0, 8.0};
 const Float_t CounterRotationAngle[NofModuleTypes] = {0., 20.};
 
+//Pole (support structure)
+const Float_t Pole_X = 20.;
+const Float_t Pole_Y = 1000.;
+const Float_t Pole_Z = 20.;
+const Float_t Pole_Thick_X = 5.;
+const Float_t Pole_Thick_Y = 5.;
+const Float_t Pole_Thick_Z = 5.;
+const Int_t NumberOfPoles=7;
+const Float_t ChamberOverlap=40;
+const Float_t DxColl=AluBox_X-ChamberOverlap;
+const Float_t Pole_Offset=AluBox_X/2.+Pole_X/2.;
+const Float_t Pole_X_Position[NumberOfPoles]={-Pole_Offset, Pole_Offset+Pole_X/2.+DxColl, -(Pole_Offset+Pole_X/2.+DxColl), Pole_Offset+Pole_X/2.+2*DxColl, -(Pole_Offset+Pole_X/2.+2*DxColl), Pole_Offset+Pole_X/2.+3*DxColl, -(Pole_Offset+Pole_X/2.+3*DxColl)};
+const Float_t Pole_Z_Position[NumberOfPoles]={Dwall, Dwall-2*AluBox_Z, Dwall-2*AluBox_Z, Dwall-4*AluBox_Z, Dwall-4*AluBox_Z, Dwall-6*AluBox_Z, Dwall-6*AluBox_Z };
+
+const Float_t Module_Y_First_Position=70.;
+const Float_t Module_Y_Last_Position=480.;
 
 // some global variables
 TGeoManager* gGeoMan = NULL;  // Pointer to TGeoManager instance
@@ -87,9 +103,8 @@ void create_materials_from_media_file();
 TGeoVolume* create_counter(Int_t);
 TGeoVolume* create_tof_module(Int_t);
 TGeoVolume* create_tof_pole();
-//void place_tof_module(Int_t);
-//void place_tof_support_structure();
-
+void position_tof_module(Int_t);
+void postion_tof_poles();
 
 
 void Create_TOF_Geometry_v12a() {
@@ -124,7 +139,11 @@ void Create_TOF_Geometry_v12a() {
   }
 
   gPole = create_tof_pole();
-  
+
+  postion_tof_poles();
+  position_tof_module(0);
+
+  /* 
   TGeoTranslation* module_trans 
     = new TGeoTranslation("", 0., 0., 0.);
   gGeoMan->GetVolume(geoVersion)->AddNode(gModules[0], 0, module_trans);
@@ -134,7 +153,7 @@ void Create_TOF_Geometry_v12a() {
   module_trans 
     = new TGeoTranslation("", 0., 0., 50.);
   gGeoMan->GetVolume(geoVersion)->AddNode(gPole, 0, module_trans);
-    
+  */
 
 
   gGeoMan->CloseGeometry();
@@ -359,13 +378,13 @@ TGeoVolume* create_tof_pole()
   //dz  = Thickness in Z
   //width_alu = Aluminum thickness
 
- Float_t dxb=180.;
- Float_t dx=20.;
- Float_t dy=1000.;
- Float_t dz=20.;
- Float_t width_alux=5.;
- Float_t width_aluy=5.;
- Float_t width_aluz=5.;
+  // Float_t dxb=AluBox_X;
+ Float_t dx=Pole_X;
+ Float_t dy=Pole_Y;
+ Float_t dz=Pole_Z;
+ Float_t width_alux=Pole_Thick_X;
+ Float_t width_aluy=Pole_Thick_Y;
+ Float_t width_aluz=Pole_Thick_Z;
 
   TGeoVolume* pole = new TGeoVolumeAssembly("Pole");
 
@@ -388,4 +407,53 @@ TGeoVolume* create_tof_pole()
   pole_alu_vol->AddNode(pole_air_vol, 0, pole_air_trans);
 
   return pole;
+}
+
+void postion_tof_poles()
+{
+
+
+  TGeoTranslation* pole_trans=NULL;
+
+  for(Int_t i=0; i<NumberOfPoles; i++) {  
+    pole_trans 
+      = new TGeoTranslation("", Pole_X_Position[i], 0., Pole_Z_Position[i]);
+    gGeoMan->GetVolume(geoVersion)->AddNode(gPole, i, pole_trans);
+    pole_trans 
+      = new TGeoTranslation("", Pole_X_Position[i], 0., Pole_Z_Position[i]+Pole_Z);
+    gGeoMan->GetVolume(geoVersion)->AddNode(gPole, i+NumberOfPoles, pole_trans);
+  }
+}
+
+void position_tof_module(Int_t moduleType)
+{
+  TGeoTranslation* module_trans=NULL;
+
+  Int_t numModules=(Int_t)( (Module_Y_Last_Position-Module_Y_First_Position)/AluBox_Y);
+
+  Int_t modNum = 0;
+  for(Int_t i=0; i<numModules+1; i++) {  
+    Float_t yPos = Module_Y_First_Position + i*AluBox_Y; 
+    Float_t xPos = 0;
+    cout<<"i, ypos: "<<i<<" , "<<yPos<<endl;
+    module_trans 
+      = new TGeoTranslation("", xPos, yPos, Dwall);
+    gGeoMan->GetVolume(geoVersion)->AddNode(gModules[moduleType], modNum, module_trans);
+    modNum++;
+    module_trans 
+      = new TGeoTranslation("", xPos, -yPos, Dwall);
+    gGeoMan->GetVolume(geoVersion)->AddNode(gModules[moduleType], modNum, module_trans);
+    modNum++;
+    if (i>0) {
+      module_trans 
+	= new TGeoTranslation("", xPos, yPos-AluBox_Y/2, Dwall+AluBox_Z);
+      gGeoMan->GetVolume(geoVersion)->AddNode(gModules[moduleType], modNum, module_trans);
+    modNum++;
+      module_trans 
+	= new TGeoTranslation("", xPos, -(yPos-AluBox_Y/2), Dwall+AluBox_Z);
+      gGeoMan->GetVolume(geoVersion)->AddNode(gModules[moduleType], modNum, module_trans);
+    modNum++;
+    }
+  }
+
 }

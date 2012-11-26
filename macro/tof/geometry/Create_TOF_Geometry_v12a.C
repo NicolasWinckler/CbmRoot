@@ -23,7 +23,7 @@ const TString FileName = geoVersion + ".root";
 // The materials are defined in the global media.geo file 
 const TString KeepingVolumeMedium     = "air";
 const TString BoxVolumeMedium         = "aluminium";
-const TString NoActivGasMedium        = "Rpcgas_noact";
+const TString NoActivGasMedium        = "RPCgas_noact";
 const TString ActivGasMedium          = "RPCgas";
 const TString GlasMedium              = "RPCglass";
 const TString ElectronicsMedium       = "carbon";
@@ -120,16 +120,21 @@ void Create_TOF_Geometry_v12a() {
 
   // Get the GeoManager for later usage
   gGeoMan = (TGeoManager*) gROOT->FindObject("FAIRGeom");
-  gGeoMan->SetVisLevel(10);  
+  gGeoMan->SetVisLevel(7);  
 
   // Create the top volume 
+  /*
   TGeoBBox* topbox= new TGeoBBox("", 1000., 1000., 1000.);
   TGeoVolume* top = new TGeoVolume("top", topbox, gGeoMan->GetMedium("air"));
   gGeoMan->SetTopVolume(top);
+  */
 
+  TGeoVolume* top = new TGeoVolumeAssembly("TOP");
+  gGeoMan->SetTopVolume(top);
+ 
   TGeoVolume* tof = new TGeoVolumeAssembly(geoVersion);
   top->AddNode(tof, 1);
-
+  
   for(Int_t counterType = 0; counterType < NumberOfDifferentCounterTypes; counterType++) { 
     gCounter = create_counter(counterType);
   }
@@ -143,6 +148,7 @@ void Create_TOF_Geometry_v12a() {
   postion_tof_poles();
   position_inner_tof_modules();
   position_outer_tof_modules();
+  
 
   gGeoMan->CloseGeometry();
 //  gGeoMan->CheckOverlaps(0.001);
@@ -150,8 +156,8 @@ void Create_TOF_Geometry_v12a() {
 //  gGeoMan->Test();
 
   TFile* outfile = new TFile(FileName,"RECREATE");
-  //  top->Write();
-  gGeoMan->Write();
+  top->Write();
+  //gGeoMan->Write();
   outfile->Close();
   //  top->Draw("ogl");
   //top->Raytrace();
@@ -178,6 +184,8 @@ void create_materials_from_media_file()
   FairGeoMedium* RPCgas_noact     = geoMedia->getMedium("RPCgas_noact");
   FairGeoMedium* RPCglass         = geoMedia->getMedium("RPCglass");
   FairGeoMedium* carbon           = geoMedia->getMedium("carbon");
+
+  // include check if all media are found
 
   geoBuild->createMedium(air);
   geoBuild->createMedium(aluminium);
@@ -233,29 +241,40 @@ TGeoVolume* create_counter(Int_t modType)
 
   // Single gas gap
   TGeoBBox* gas_gap = new TGeoBBox("", ggdx/2., ggdy/2., ggdz/2.);
+  //TGeoVolume* gas_gap_vol = 
+  //new TGeoVolume("tof_gas_gap", gas_gap, noActiveGasVolMed);
   TGeoVolume* gas_gap_vol = 
-    new TGeoVolume("tof_gas_gap", gas_gap, noActiveGasVolMed);
+    new TGeoVolume("tof_gas_active", gas_gap, activeGasVolMed);
+  gas_gap_vol->Divide("Strip",1,32,-ggdx/2.,0);
+
   gas_gap_vol->SetLineColor(kRed); // set line color for the gas gap
   gas_gap_vol->SetTransparency(70); // set transparency for the TOF
   TGeoTranslation* gas_gap_trans 
     = new TGeoTranslation("", 0., 0., (gdz+ggdz)/2.);
 
+ 
   // Single subdivided active gas gap 
-  TGeoBBox* gas_active = new TGeoBBox("", gsdx/2., ggdy/2., ggdz/2.);
-  TGeoVolume* gas_active_vol = 
+  /*
+    TGeoBBox* gas_active = new TGeoBBox("", gsdx/2., ggdy/2., ggdz/2.);
+    TGeoVolume* gas_active_vol = 
     new TGeoVolume("tof_gas_active", gas_active, activeGasVolMed);
   gas_active_vol->SetLineColor(kBlack); // set line color for the gas gap
   gas_active_vol->SetTransparency(70); // set transparency for the TOF
+  */
 
   // Add glass plate, inactive gas gap and active gas gaps to a single stack
   TGeoVolume* single_stack = new TGeoVolumeAssembly("single_stack");
   single_stack->AddNode(glass_plate_vol, 0, glass_plate_trans);
   single_stack->AddNode(gas_gap_vol, 0, gas_gap_trans);
+
+  /*
   for (Int_t l=0; l<nstrips; l++){
     TGeoTranslation* gas_active_trans 
-      = new TGeoTranslation("", -ggdx/2+(l+0.5)*gsdx, 0., (gdz+ggdz)/2.);
-    single_stack->AddNode(gas_active_vol, l, gas_active_trans);
+      = new TGeoTranslation("", -ggdx/2+(l+0.5)*gsdx, 0., 0.);
+    gas_gap_vol->AddNode(gas_active_vol, l, gas_active_trans);
+    //    single_stack->AddNode(gas_active_vol, l, gas_active_trans);
   }
+  */  
 
   // Add 8 single stacks + one glass plate at the end to a multi stack
   TGeoVolume* multi_stack = new TGeoVolumeAssembly("multi_stack");

@@ -64,6 +64,7 @@ much/CbmAnaDimuonCandidate.cxx
 much/CbmAnaDimuonAnalysis.cxx
 much/CbmAnaDimuonHisto.cxx
 much/CbmAnaAngularAcceptance.cxx
+much/CbmAnaMuchBgd.cxx
 
 #timing/CbmAnaTimingAnalysis.cxx 
 #timing/CbmAnaEpochTest.cxx
@@ -113,6 +114,7 @@ much/CbmAnaDimuonCandidate.h
 much/CbmAnaDimuonAnalysis.h
 much/CbmAnaDimuonHisto.h
 much/CbmAnaAngularAcceptance.h
+much/CbmAnaMuchBgd.h
 
 #timing/CbmAnaTimingAnalysis.h 
 #timing/CbmAnaEpochTest.h

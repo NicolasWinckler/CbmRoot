@@ -42,6 +42,8 @@
 #pragma link C++ class CbmAnaDielectronTaskDrawAll+;
 #pragma link C++ class CbmAnaLmvmDrawStudy+;
 #pragma link C++ class CbmAnaDielectronReports+;
+#pragma link C++ class CbmAnaMuchBgd+;
+
 #endif
 
 

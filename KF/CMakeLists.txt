@@ -21,8 +21,9 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
-${CBMROOT_SOURCE_DIR}/KF/KFParticlesFinder
 ${CBMROOT_SOURCE_DIR}/KF/KFQA
+${CBMROOT_SOURCE_DIR}/KF/KFParticle
+${CBMROOT_SOURCE_DIR}/KF/KFParticlesFinder
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/mvd 
 ${CBMROOT_SOURCE_DIR}/sts 
@@ -73,11 +74,16 @@ Interface/CbmGlobalTrackFitterKF.cxx
 CbmKFParticle.cxx
 CbmKFParticle_simd.cxx
 CbmKFParticleInterface.cxx
-KFParticlesFinder/CbmKFParticlesFinder.cxx
-KFParticlesFinder/CbmKFParticleDatabase.cxx
 KFQA/CbmKFTrErrMCPoints.cxx
 KFQA/CbmKFTrackFitQA.cxx
 KFQA/CbmKFParticlesFinderQA.cxx
+KFParticle/KFParticleBase.cxx
+KFParticle/KFParticle.cxx
+KFParticle/KFParticleBaseSIMD.cxx
+KFParticle/KFParticleSIMD.cxx
+KFParticle/KFParticleFinder.cxx
+KFParticlesFinder/CbmKFParticlesFinder.cxx
+KFParticlesFinder/CbmKFParticleDatabase.cxx
 )
 
 if(RULE_CHECKER_FOUND)
@@ -111,12 +117,14 @@ Interface/CbmStsKFSecondaryVertexFinder.h
 Interface/CbmTrdTrackFitterKF.h
 Interface/CbmGlobalTrackFitterKF.h
 CbmKFParticle.h
-KFParticlesFinder/CbmKFParticlesFinder.h
-KFParticlesFinder/CbmKFParticleDatabase.h
 KFQA/CbmKFTrErrMCPoints.h
 KFQA/CbmKFTrackFitQA.h
 KFQA/CbmKFParticlesFinderQA.h
 KFQA/CbmKFPartEfficiencies.h
+KFParticle/KFParticleBase.h
+KFParticle/KFParticle.h
+KFParticlesFinder/CbmKFParticlesFinder.h
+KFParticlesFinder/CbmKFParticleDatabase.h
 )
 
 ADD_DEFINITIONS(-Wall -Wabi -Wsign-promo  -Wno-pmf-conversions -Wctor-dtor-privacy -Wreorder -Wno-deprecated -Wstrict-null-sentinel -Wno-non-template-friend ) # -Weffc++ -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast   : wait for other parts of cbmroot\root.

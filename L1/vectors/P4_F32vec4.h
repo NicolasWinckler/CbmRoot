@@ -154,6 +154,7 @@ class F32vec4
   friend F32vec4 log( const F32vec4 &a ){ return _f1( a, log ); } 
   friend F32vec4 sin( const F32vec4 &a ){ return _f1( a, sin ); } 
   friend F32vec4 cos( const F32vec4 &a ){ return _f1( a, cos ); } 
+  friend F32vec4 acos( const F32vec4 &a ){ return _f1( a, acos ); } 
 
 #undef _f1
 

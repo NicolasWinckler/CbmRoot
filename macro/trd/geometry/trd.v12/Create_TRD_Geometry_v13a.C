@@ -24,7 +24,15 @@
 const TString FileName = "trd_v13a.root";
 
 // Parameters defining the layout of the complete detector build out of different detector layers.
-const Int_t   NofLayers = 10;
+const Int_t   NofLayers = 10;   // max layers
+
+// select layers to display
+//const Int_t   ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  // 1st layer only
+//const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
+//const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
+//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100  // 1: plot, 0: hide
+const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300  // 1: plot, 0: hide
+
 const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads  
 const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 const Float_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
@@ -226,7 +234,8 @@ void Create_TRD_Geometry_v13a() {
   for (Int_t iLayer = 0; iLayer < NofLayers; iLayer++) {
     //    if ((iLayer != 0) && (iLayer != 3))  continue;  // first layer only - comment later on
     //    if (iLayer != 0) continue;  // first layer only - comment later on
-    create_detector_layers(iLayer);
+    if (ShowLayer[iLayer])
+      create_detector_layers(iLayer);
   }
   
   gGeoMan->CloseGeometry();
@@ -636,7 +645,7 @@ void create_detector_layers(Int_t layerId)
           else  // layer 2,4 ...
    	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
 
-          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId], module_rotation);
+          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2, module_rotation);  // shift by half layer thickness
           gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
         }
       }
@@ -663,7 +672,7 @@ void create_detector_layers(Int_t layerId)
           else  // layer 2,4 ...
           module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
     
-          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId], module_rotation);
+          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2, module_rotation);  // shift by half layer thickness
           gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
         }
       }

@@ -282,12 +282,8 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
   // int ileft[fvecLen] = {0, 0, 0, 0};
   // int iright[fvecLen] = {0, 0, 0, 0};
 
-#ifndef CBM_KF_F32vec1_H  
-  THitIndex i_mains[fvecLen] = {0, 0, 0, 0};
-#else
   THitIndex i_mains[fvecLen] = {0};
-#endif // CBM_KF_F32vec1_H  
-  
+
   THitIndex i_main_array[NHits]; // need for proceed in paralled almost independent areas
   for (THitIndex i = 0; i < NHits; i++) {
     i_main_array[i] = i; // TODO

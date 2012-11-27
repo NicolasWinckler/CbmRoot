@@ -20,6 +20,8 @@
 #include "CbmKFParticle.h"
 #include "CbmKFVertex.h"
 
+#include "KFParticle.h"
+
 #include "CbmStsHit.h"
 #include "CbmStsTrack.h"
 #include "CbmTrackMatch.h"
@@ -657,7 +659,8 @@ void CbmKFParticlesFinderQA::MatchParticles()
   
     // match tracks ( particles which are direct copy of tracks )
   for( unsigned int iRP = 0; iRP < fPF->GetParticles().size(); iRP++ ) {
-    CbmKFParticle &rPart = fPF->GetParticles()[iRP];
+//    CbmKFParticle &rPart = fPF->GetParticles()[iRP];
+    KFParticle &rPart = fPF->GetParticles()[iRP];
 
     if (rPart.NDaughters() != 1) continue;
     
@@ -683,7 +686,8 @@ void CbmKFParticlesFinderQA::MatchParticles()
 
     // match created mother particles
   for( unsigned int iRP = 0; iRP < fPF->GetParticles().size(); iRP++ ) {
-    CbmKFParticle &rPart = fPF->GetParticles()[iRP];
+//    CbmKFParticle &rPart = fPF->GetParticles()[iRP];
+    KFParticle &rPart = fPF->GetParticles()[iRP];
     const unsigned int NRDaughters = rPart.NDaughters();
     if (NRDaughters < 2) continue;
     
@@ -723,7 +727,8 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
 
   const int NRP = fPF->GetParticles().size();
   for ( int iP = 0; iP < NRP; ++iP ) {
-    const CbmKFParticle &part = fPF->GetParticles()[iP];
+//    const CbmKFParticle &part = fPF->GetParticles()[iP];
+    const KFParticle &part = fPF->GetParticles()[iP];
     const int pdg = part.GetPDG();
       
     const bool isBG = RtoMCParticleId[iP].idsMI.size() != 0;
@@ -797,7 +802,8 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     Double_t Theta;
     Double_t Phi;
     Double_t Z;
-    CbmKFParticle TempPart = fPF->GetParticles()[iP];
+//    CbmKFParticle TempPart = fPF->GetParticles()[iP];
+    KFParticle TempPart = fPF->GetParticles()[iP];
     TempPart.GetMass(M,ErrM);
     TempPart.GetMomentum(P,ErrP);
     Pt = TempPart.GetPt();
@@ -895,7 +901,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
         if(error < 0.) { error = 1.e20;}
         errParam[iPar] = TMath::Sqrt(error);
       }
-      TempPart.Extrapolate(TempPart.r , TempPart.GetDStoPoint(decayVtx));
+      TempPart.TransportToPoint(decayVtx);
       for(int iPar=3; iPar<7; iPar++)
       {
         recParam[iPar] = TempPart.GetParameter(iPar);
@@ -935,11 +941,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
       CbmMCTrack &mcTrack = *(static_cast<CbmMCTrack*>(flistMCTracks->At(mcDaughterId)));
 //      int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatchWithPdg();
       int recDaughterId = MCtoRParticleId[mcDaughterId].GetBestMatch();
-      CbmKFParticle Daughter = fPF->GetParticles()[recDaughterId];
+//      CbmKFParticle Daughter = fPF->GetParticles()[recDaughterId];
+      KFParticle Daughter = fPF->GetParticles()[recDaughterId];
       Daughter.GetMass(M,ErrM);
 
       Double_t decayVtx[3] = {mcTrack.GetStartX(), mcTrack.GetStartY(), mcTrack.GetStartZ()};
-      Daughter.Extrapolate(Daughter.r , Daughter.GetDStoPoint(decayVtx));
+      Daughter.TransportToPoint(decayVtx);
 
       Double_t Emc = sqrt(mcTrack.GetP()*mcTrack.GetP() + mcTrack.GetMass()*mcTrack.GetMass());
       Double_t res[8] = {0}, 

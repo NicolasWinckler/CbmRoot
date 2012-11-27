@@ -16,7 +16,8 @@
 #include "CbmKFParticlesFinder.h"
 #include "CbmL1Def.h"
 
-#include "CbmKFParticleInterface.h"
+//#include "CbmKFParticleInterface.h"
+#include "KFParticleFinder.h"
 #include "CbmKFVertex.h"
 #include "CbmKFTrack.h"
 #include "CbmStsTrack.h"
@@ -27,13 +28,19 @@
 
 #include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
-
+//for particle ID from global track
 #include "CbmTofHit.h"
-
 #include "CbmGlobalTrack.h"
+#include "CbmRichRing.h"
+#include "CbmTrdTrack.h"
+//for RICH identification
+#include "TSystem.h"
+// #include "CbmRichElectronIdAnn.h"
 
 #include "CbmL1PFFitter.h"
 
+using std::vector;
+using std::ios;
 
 ClassImp(CbmKFParticlesFinder)
 
@@ -43,7 +50,14 @@ CbmKFParticlesFinder::CbmKFParticlesFinder(float cuts[2][3], Int_t usePID, const
   fusePID(usePID),
   flistStsTracks(0),
   fPrimVtx(0),
-  fParticles()
+  fParticles(),
+  flistStsTracksMatch(0),
+  flistMCTracks(0),
+  flsitGlobalTracks(0),
+  flistTofHits(0),
+  flistRichRings(0),
+  flistTrdTracks(0)
+//  fElIdAnn(0)
 {
   if(cuts)
   {
@@ -79,8 +93,29 @@ InitStatus CbmKFParticlesFinder::ReInit()
   //for the particle id
   flistStsTracksMatch = dynamic_cast<TClonesArray*>(  fManger->GetObject("StsTrackMatch") );
   flistMCTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("MCTrack") );
-  flsitGlobalTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("GlobalTrack") );
-  flistTofHits = dynamic_cast<TClonesArray*>( fManger->GetObject("TofHit") );
+
+  if (fusePID == 2){
+    flsitGlobalTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("GlobalTrack") );
+    flistTofHits = dynamic_cast<TClonesArray*>( fManger->GetObject("TofHit") );
+/*    flistRichRings = dynamic_cast<TClonesArray*>( fManger->GetObject("RichRing") );
+    flistTrdTracks = dynamic_cast<TClonesArray*>( fManger->GetObject("TrdTrack") );
+
+//     if (fRichGeoType != "compact" && fRichGeoType != "large"){
+//       fRichGeoType = "compact";
+//     }
+
+    std::string richANNFile = gSystem->Getenv("VMCWORKDIR");
+//     if (fRichGeoType == "compact"){
+      richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
+//     }
+//     else if (fRichGeoType == "large"){
+//       richANNFile += "/parameters/rich/el_id_ann_weights_rich.txt";
+//     }
+
+    fElIdAnn = new CbmRichElectronIdAnn(richANNFile);
+    fElIdAnn->Init();*/
+  }
+
   return kSUCCESS;
 }
 
@@ -151,13 +186,46 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
 //     sP[2][3] = -0.014626;
 //     sP[2][4] =  0.00088203;
 
-    const Int_t PdgHypo[3] = {2212, 321, 211};
+    const Int_t PdgHypo[4] = {2212, 321, 211, -11};
 
     for (Int_t igt = 0; igt < flsitGlobalTracks->GetEntriesFast(); igt++) {
       const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(flsitGlobalTracks->At(igt));
 
       Int_t stsTrackIndex = globalTrack->GetStsTrackIndex();
       if( stsTrackIndex<0 ) continue;
+
+//       Bool_t isElectronTRD = 0;
+//       Bool_t isElectronRICH = 0;
+//       Bool_t isElectron = 0;
+
+      FairTrackParam *stsPar = vRTracks[stsTrackIndex].GetParamFirst();
+      TVector3 mom;
+      stsPar->Momentum(mom);
+
+      Double_t p = mom.Mag();
+      Int_t q = stsPar->GetQp() > 0 ? 1 : -1;
+
+//       if(flistRichRings)
+//       {
+//         Int_t richIndex = globalTrack->GetRichRingIndex();
+//         if (richIndex > -1)
+//         {
+//           CbmRichRing* richRing = (CbmRichRing*)flistRichRings->At(richIndex);
+//           if (richRing)
+//             if(fElIdAnn->DoSelect(richRing, p) > -0.5) isElectronRICH = 1;
+//         }
+//       }
+// 
+//       if(flistTrdTracks)
+//       {
+//         Int_t trdIndex = globalTrack->GetTrdTrackIndex();
+//         if (trdIndex > -1)
+//         {
+//           CbmTrdTrack* trdTrack = (CbmTrdTrack*)flistTrdTracks->At(trdIndex);
+//           if (trdTrack)
+//             if (trdTrack->GetPidANN() > 0.979) isElectronTRD = 1;
+//         }
+//       }
 
       Double_t l = globalTrack->GetLength();
       if( !((l>1000.) && (l<1400.)) ) continue;
@@ -169,17 +237,10 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
          if(!tofHit) continue;
          time = tofHit->GetTime();
       }
-      else continue;
+      else
+        continue;
 
       if( !((time>29.) && (time<50.)) ) continue;
-
-      FairTrackParam *stsPar = vRTracks[stsTrackIndex].GetParamFirst();
-      TVector3 mom;
-      stsPar->Momentum(mom);
-
-      Double_t p = mom.Mag();
-      Int_t q = stsPar->GetQp() > 0 ? 1 : -1;
-      if(p>12.) continue;
 
       Double_t m2 = p*p*(1./((l/time/29.9792458)*(l/time/29.9792458))-1.);
 
@@ -196,23 +257,41 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
       int iPdg=2;
       Double_t dm2min = dm2[2];
 
-      if(q>0)
+//       if(isElectronRICH && isElectronTRD)
+//       {
+//         if (p >= 1.) {
+//           if (m2 < (0.01 + (p - 1.) * 0.09))
+//             isElectron = 1;
+//         }
+//         else {
+//           if (m2 < 0.0)
+//             isElectron = 1;
+//         }
+//       }
+// 
+//       if(!isElectron)
       {
-        if(dm2[1] < dm2min) { iPdg = 1; dm2min = dm2[1]; }
-        if(dm2[0] < dm2min) { iPdg = 0; dm2min = dm2[0]; }
+        if(p>12.) continue;
+        if(q>0)
+        {
+          if(dm2[1] < dm2min) { iPdg = 1; dm2min = dm2[1]; }
+          if(dm2[0] < dm2min) { iPdg = 0; dm2min = dm2[0]; }
 
-        if(dm2min > 2) iPdg=-1;
+          if(dm2min > 2) iPdg=-1;
+        }
+        else
+        {
+          if(dm2[1] < dm2min) { iPdg = 1; dm2min = dm2[1]; }
+          if((dm2min>3) && (dm2[0] < dm2min)) { iPdg = 0; dm2min = dm2[0]; }
+
+          if(dm2min > 2) iPdg=-1;
+        }
+
+        if(iPdg > -1)
+          vTrackPDG[stsTrackIndex] = q*PdgHypo[iPdg];
       }
-      else
-      {
-        if(dm2[1] < dm2min) { iPdg = 1; dm2min = dm2[1]; }
-        if((dm2min>3) && (dm2[0] < dm2min)) { iPdg = 0; dm2min = dm2[0]; }
-
-        if(dm2min > 2) iPdg=-1;
-      }
-
-      if(iPdg > -1)
-        vTrackPDG[stsTrackIndex] = q*PdgHypo[iPdg];
+//       else
+//         vTrackPDG[stsTrackIndex] = q*PdgHypo[3];
     }
   }
 
@@ -240,7 +319,8 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   for(int iTr=0; iTr<nTracks; iTr++)
     vKFTrack[iTr] = CbmKFTrack(vRTracks[iTr]);
 
-  CbmKFParticleInterface::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
+  KFParticleFinder::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
+//  CbmKFParticleInterface::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
 
   timerSelect.Stop();
 

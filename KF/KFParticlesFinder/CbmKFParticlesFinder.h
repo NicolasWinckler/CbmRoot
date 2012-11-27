@@ -17,12 +17,14 @@
 #define _CbmKFParticlesFinder_h_
 
 #include "FairTask.h"
-#include "CbmKFParticle.h"
+//#include "CbmKFParticle.h"
+#include "KFParticle.h"
 
 #include <vector>
 
 class TClonesArry;
 class CbmVertex;
+class CbmRichElectronIdAnn;
 
 class CbmKFParticlesFinder: public FairTask
 {
@@ -40,7 +42,8 @@ class CbmKFParticlesFinder: public FairTask
   void Exec(Option_t * option);
   void Finish();
 
-  vector<CbmKFParticle>& GetParticles()  {return fParticles;}
+//  vector<CbmKFParticle>& GetParticles()  {return fParticles;}
+  std::vector<KFParticle>& GetParticles()  {return fParticles;}
 
   ClassDef(CbmKFParticlesFinder,1);
 
@@ -52,13 +55,18 @@ class CbmKFParticlesFinder: public FairTask
   TClonesArray* flistStsTracks;
   CbmVertex* fPrimVtx;
 
-  vector<CbmKFParticle> fParticles;
+//  vector<CbmKFParticle> fParticles;
+  std::vector<KFParticle> fParticles;
 
 // for the particle id
   TClonesArray* flistStsTracksMatch;
   TClonesArray* flistMCTracks;
   TClonesArray* flsitGlobalTracks;
   TClonesArray* flistTofHits;
+  TClonesArray* flistRichRings;
+  TClonesArray* flistTrdTracks;
+
+  //CbmRichElectronIdAnn *fElIdAnn;
 };
 
 #endif

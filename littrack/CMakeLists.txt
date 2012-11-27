@@ -110,7 +110,6 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/base/CbmLitResultChecker.cxx
-      cbm/qa/tracking/CbmLitTrackingQaCalculator.cxx
       cbm/qa/tracking/CbmLitTrackingQaHistCreator.cxx      
       cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
       cbm/qa/tracking/CbmLitTrackingQaReport.cxx

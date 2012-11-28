@@ -208,3 +208,5 @@ string CbmHistManager::ToString() const
 	}
 	return str;
 }
+
+ClassImp(CbmHistManager)

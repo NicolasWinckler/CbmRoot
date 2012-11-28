@@ -69,19 +69,13 @@ CbmModule.cxx
 
 draw/CbmDrawHist.cxx
 CbmHistManager.cxx
+report/CbmReport.cxx      
+report/CbmStudyReport.cxx
+report/CbmSimulationReport.cxx
+report/CbmTextReportElement.cxx
+report/CbmHtmlReportElement.cxx       
+report/CbmLatexReportElement.cxx  
 )
-
-If(Boost_FOUND)
-  Set(CBMBASE_SRCS 
-    ${CBMBASE_SRCS}
-    report/CbmReport.cxx      
-    report/CbmStudyReport.cxx
-    report/CbmSimulationReport.cxx
-    report/CbmTextReportElement.cxx
-    report/CbmHtmlReportElement.cxx       
-    report/CbmLatexReportElement.cxx  
-  )
-EndIf(Boost_FOUND)
 
 set(CBMBASE_HEADERS
 CbmDetectorList.h
@@ -123,7 +117,14 @@ CbmMCList.h
 
 CbmModule.h
 
+CbmHistManager.h
 draw/CbmDrawHist.h
+report/CbmReport.h    
+report/CbmStudyReport.h
+report/CbmSimulationReport.h
+report/CbmTextReportElement.h
+report/CbmHtmlReportElement.h
+report/CbmLatexReportElement.h
 )
 
 EXEC_PROGRAM( ${ROOT_CONFIG_EXECUTABLE} 

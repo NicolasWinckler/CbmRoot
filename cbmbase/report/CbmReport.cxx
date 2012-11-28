@@ -16,8 +16,8 @@ using std::ofstream;
 using std::string;
 
 CbmReport::CbmReport():
-   fName("qa_report"),
-   fTitle("QA report"),
+   fReportName("qa_report"),
+   fReportTitle("QA report"),
    fOutputDir("./"),
    fR(NULL),
    fOut(NULL),
@@ -37,13 +37,13 @@ void CbmReport::CreateReportElement(
    if (NULL != fOut && fReportType != kCoutReport) delete fOut;
    if (reportType == kLatexReport) {
 	   fR = new CbmLatexReportElement();
-	   fOut = new ofstream(string(fOutputDir + "/" + fName + ".tex").c_str());
+	   fOut = new ofstream(string(fOutputDir + "/" + fReportName + ".tex").c_str());
    } else if (reportType == kHtmlReport) {
 	   fR = new CbmHtmlReportElement();
-	   fOut = new ofstream(string(fOutputDir + "/" + fName + ".html").c_str());
+	   fOut = new ofstream(string(fOutputDir + "/" + fReportName + ".html").c_str());
    } else if (reportType == kTextReport) {
 	   fR = new CbmTextReportElement();
-	   fOut = new ofstream(string(fOutputDir + "/" + fName + ".txt").c_str());
+	   fOut = new ofstream(string(fOutputDir + "/" + fReportName + ".txt").c_str());
    } else if (reportType == kCoutReport) {
 	   fR = new CbmTextReportElement();
 	   fOut = &std::cout;
@@ -60,6 +60,7 @@ void CbmReport::CreateReports()
 {
    Draw(); // User has to implement this function!
    SaveCanvasesAsImages();
+//   WriteCanvases();
 
    CreateReportElement(kHtmlReport);
    Create(); // User has to implement this function!
@@ -101,6 +102,15 @@ void CbmReport::SaveCanvasesAsImages() const
 	}
 }
 
+void CbmReport::WriteCanvases() const
+{
+   if (GetOutputDir() == "") return;
+   Int_t nofCanvases = fCanvases.size();
+   for (Int_t i = 0; i < nofCanvases; i++) {
+      fCanvases[i]->Write();
+   }
+}
+
 void CbmReport::PrintCanvases() const
 {
 	Int_t nofCanvases = fCanvases.size();
@@ -109,3 +119,5 @@ void CbmReport::PrintCanvases() const
 		Out() << R()->Image(canvas->GetName(), canvas->GetName());
 	}
 }
+
+ClassImp(CbmReport)

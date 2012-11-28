@@ -80,6 +80,8 @@ public:
    virtual string Title(
          int size,
          const string& title) const;
+
+   ClassDef(CbmLatexReportElement, 1)
 };
 
 #endif /* CBMLATEXREPORTELEMENT_H_ */

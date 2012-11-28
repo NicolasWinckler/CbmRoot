@@ -67,3 +67,5 @@ void CbmStudyReport::Create(
 	fHM.clear();
 	files.clear();
 }
+
+ClassImp(CbmStudyReport)

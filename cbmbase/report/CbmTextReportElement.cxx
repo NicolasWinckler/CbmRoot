@@ -112,3 +112,5 @@ string CbmTextReportElement::FormatCell(
 		return str;
 	}
 }
+
+ClassImp(CbmTextReportElement)

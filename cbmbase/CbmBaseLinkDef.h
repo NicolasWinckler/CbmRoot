@@ -50,5 +50,14 @@
 #pragma link C++ function DrawGraph(const vector<TGraph*>&, const vector<string>&, HistScale, HistScale, Bool_t, Double_t, Double_t, Double_t, Double_t);
 #pragma link C++ function DrawGraph2D(TGraph2D*, HistScale, HistScale, HistScale, const string&);
 
+#pragma link C++ class CbmHistManager;
+#pragma link C++ class CbmReport+;
+#pragma link C++ class CbmSimulationReport+;
+#pragma link C++ class CbmStudyReport+;
+#pragma link C++ class CbmReportElement+;
+#pragma link C++ class CbmTextReportElement+;
+#pragma link C++ class CbmLatexReportElement+;
+#pragma link C++ class CbmHtmlReportElement+;
+
 #endif
 

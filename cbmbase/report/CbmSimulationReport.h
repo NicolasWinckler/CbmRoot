@@ -68,6 +68,8 @@ public:
 
 private:
    CbmHistManager* fHM; // Histogram manager
+
+   ClassDef(CbmSimulationReport, 1)
 };
 
 #endif /* CBMSIMULATIONREPORT_H_ */

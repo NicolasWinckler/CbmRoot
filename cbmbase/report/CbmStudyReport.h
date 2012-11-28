@@ -77,6 +77,8 @@ public:
 private:
    vector<CbmHistManager*> fHM; // Histogram managers for each study
    vector<string> fStudyNames; // Names of studies
+
+   ClassDef(CbmStudyReport, 1)
 };
 
 #endif /* CBMSTUDYREPORT_H_ */

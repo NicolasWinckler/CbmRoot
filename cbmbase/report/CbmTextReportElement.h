@@ -87,6 +87,8 @@ private:
          const string& cell) const;
 
    Int_t fColW; // column width
+
+   ClassDef(CbmTextReportElement, 1)
 };
 
 #endif /* CBMTEXTREPORTELEMENT_H_ */

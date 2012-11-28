@@ -4,6 +4,7 @@
  * \date 2011
  */
 #include "CbmLatexReportElement.h"
+#include <sstream>
 using std::stringstream;
 using std::endl;
 
@@ -104,3 +105,5 @@ string CbmLatexReportElement::Title(
    st += "title{" + title + "}";
    return st;
 }
+
+ClassImp(CbmLatexReportElement)

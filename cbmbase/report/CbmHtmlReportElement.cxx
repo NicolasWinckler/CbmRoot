@@ -4,6 +4,7 @@
  * \date 2011
  */
 #include "CbmHtmlReportElement.h"
+#include <sstream>
 
 using std::stringstream;
 using std::endl;
@@ -114,3 +115,5 @@ string CbmHtmlReportElement::Title(
    ss << "<h" << size + 1 << ">" << title << "</h" << size + 1 << ">";
    return ss.str();
 }
+
+ClassImp(CbmHtmlReportElement)

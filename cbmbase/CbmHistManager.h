@@ -33,7 +33,7 @@ using std::vector;
  * \author Semen Lebedev <s.lebedev@gsi.de>
  * \date 2011
  */
-class CbmHistManager
+class CbmHistManager : public TObject
 {
 public:
 
@@ -244,6 +244,8 @@ private:
 
    // Map of histogram (graph) name to its pointer
    map<string, TNamed*> fMap;
+
+   ClassDef(CbmHistManager, 1)
 };
 
 #endif /* CBMHISTMANAGER_H_ */

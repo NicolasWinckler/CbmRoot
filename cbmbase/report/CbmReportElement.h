@@ -7,9 +7,9 @@
 #ifndef CBMREPORTELEMENT_H_
 #define CBMREPORTELEMENT_H_
 
+#include "TObject.h"
 #include <vector>
 #include <string>
-#include <boost/property_tree/ptree.hpp>
 
 using std::string;
 using std::vector;
@@ -29,7 +29,7 @@ using std::vector;
  * \date 2011
  *
  */
-class CbmReportElement
+class CbmReportElement : public TObject
 {
 public:
    /**
@@ -107,6 +107,8 @@ public:
    virtual string Title(
          int size,
          const string& title) const = 0;
+
+   ClassDef(CbmReportElement, 1)
 };
 
 #endif /* CBMREPORTELEMENT_H_ */

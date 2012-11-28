@@ -80,6 +80,8 @@ public:
    virtual string Title(
          int size,
          const string& title) const;
+
+   ClassDef(CbmHtmlReportElement, 1)
 };
 
 #endif /* CBMHTMLREPORTELEMENT_H_ */

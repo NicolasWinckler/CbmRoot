@@ -48,3 +48,5 @@ void CbmSimulationReport::Create(
    delete fHM;
    delete file;
 }
+
+ClassImp(CbmSimulationReport)

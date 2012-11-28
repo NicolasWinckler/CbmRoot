@@ -32,7 +32,7 @@ enum ReportType {kCoutReport, kHtmlReport, kLatexReport, kTextReport};
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-class CbmReport {
+class CbmReport : public TObject {
 public:
    /**
     * \brief Constructor.
@@ -56,13 +56,13 @@ public:
    ostream& Out() const { return *fOut; }
 
    /* Setters */
-   void SetName(const string& name) { fName = name; }
-   void SetTitle(const string& title) { fTitle = title; }
+   void SetReportName(const string& name) { fReportName = name; }
+   void SetReportTitle(const string& title) { fReportTitle = title; }
    void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
 
    /* Accessors */
-   const string& GetName() const { return fName; }
-   const string& GetTitle() const { return fTitle; }
+   const string& GetReportName() const { return fReportName; }
+   const string& GetReportTitle() const { return fReportTitle; }
    const string& GetOutputDir() const { return fOutputDir; }
 
 protected:
@@ -102,6 +102,11 @@ protected:
    void SaveCanvasesAsImages() const;
 
    /**
+    * \brief Write canvases to file.
+    */
+   void WriteCanvases() const;
+
+   /**
     * \brief Print images created from canvases in the report.
     */
    void PrintCanvases() const;
@@ -119,8 +124,8 @@ private:
     */
    void DeleteReportElement();
 
-   string fName; // Name of report
-   string fTitle; // Title of report
+   string fReportName; // Name of report
+   string fReportTitle; // Title of report
    string fOutputDir; // Output directory for the report files
    ReportType fReportType; // Current report type
    CbmReportElement* fR; // Report element tool
@@ -135,6 +140,8 @@ private:
 
    CbmReport(const CbmReport&);
    CbmReport& operator=(const CbmReport&);
+
+   ClassDef(CbmReport, 1)
 };
 
 #endif /* CBMREPORT_H_ */

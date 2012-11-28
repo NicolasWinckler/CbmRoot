@@ -75,7 +75,7 @@ void CbmLitTrackingQaStudyReport::Create()
 string CbmLitTrackingQaStudyReport::PrintTable(
 		const string& tableName,
 		const string& pattern,
-		const boost::function<string (const string&)>& rowNameFormatter) const
+		string (*rowNameFormatter)(const string&)) const
 {
    	Int_t nofStudies = HM().size();
    	vector<vector<TH1*> > histos(nofStudies);
@@ -133,3 +133,5 @@ void CbmLitTrackingQaStudyReport::Draw()
 {
 
 }
+
+ClassImp(CbmLitTrackingQaStudyReport)

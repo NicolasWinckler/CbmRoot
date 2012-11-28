@@ -25,7 +25,7 @@ using std::map;
 CbmLitFitQaReport::CbmLitFitQaReport():
 		CbmSimulationReport()
 {
-	SetName("fit_qa");
+	SetReportName("fit_qa");
 }
 
 CbmLitFitQaReport::~CbmLitFitQaReport()

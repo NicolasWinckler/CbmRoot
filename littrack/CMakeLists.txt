@@ -109,10 +109,7 @@ EndIf(TBB_FOUND)
 If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
-      cbm/qa/base/CbmLitResultChecker.cxx
-      cbm/qa/tracking/CbmLitTrackingQaHistCreator.cxx      
-      cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
-      cbm/qa/tracking/CbmLitTrackingQaReport.cxx
+      cbm/qa/base/CbmLitResultChecker.cxx  
       cbm/qa/clustering/CbmLitClusteringQaHistCreator.cxx
       cbm/qa/clustering/CbmLitClusteringQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
@@ -174,6 +171,8 @@ If(Boost_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
       cbm/qa/tracking/CbmLitTrackingQa.h
+      cbm/qa/tracking/CbmLitTrackingQaStudyReport.h
+      cbm/qa/tracking/CbmLitTrackingQaReport.h
       cbm/qa/clustering/CbmLitClusteringQa.h
       cbm/qa/fit/CbmLitFitQa.h   
  #     cbm/qa/sts/CbmStsSimulationQa.h   
@@ -197,6 +196,8 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS
       ${LITTRACK_SRCS}
       cbm/qa/tracking/CbmLitTrackingQa.cxx
+      cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
+      cbm/qa/tracking/CbmLitTrackingQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQa.cxx
       cbm/qa/fit/CbmLitFitQa.cxx
     #  cbm/qa/sts/CbmStsSimulationQa.cxx

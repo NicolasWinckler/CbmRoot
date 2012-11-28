@@ -5,7 +5,6 @@
  */
 
 #include "CbmLitTrackingQa.h"
-#include "CbmLitTrackingQaHistCreator.h"
 #include "CbmLitTrackingQaStudyReport.h"
 #include "CbmLitTrackingQaReport.h"
 #include "CbmHistManager.h"
@@ -21,6 +20,7 @@
 #include "CbmMvdHitMatch.h"
 
 #include "TH1.h"
+#include "TH2F.h"
 #include "TClonesArray.h"
 
 #include <boost/assign/list_of.hpp>
@@ -32,6 +32,146 @@ using std::cout;
 using boost::assign::list_of;
 using lit::Split;
 using lit::FindAndReplace;
+
+Bool_t AllTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   return true;
+}
+
+Bool_t PrimaryTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetMotherId() == -1);
+}
+
+Bool_t ReferenceTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetMotherId() == -1) && (mcTrack->GetP() > 1.);
+}
+
+Bool_t SecondaryTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetMotherId() != -1);
+}
+
+Bool_t PrimaryElectronTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetMotherId() == -1);
+}
+
+Bool_t PrimaryMuonTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 13) && (mcTrack->GetMotherId() == -1);
+}
+
+Bool_t ProtonTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 2212);
+}
+
+Bool_t PionPlusTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetPdgCode() == 211);
+}
+
+Bool_t PionMinusTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetPdgCode() == -211);
+}
+
+Bool_t KaonPlusTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetPdgCode()) == 321;
+}
+
+Bool_t KaonMinusTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (mcTrack->GetPdgCode()) == -321;
+}
+
+Bool_t AllRingAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index,
+      Int_t nofHitsInRing)
+{
+   return true;
+}
+
+Bool_t AllReferenceRingAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index,
+      Int_t nofHitsInRing)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+    return (mcTrack->GetMotherId() == -1) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
+}
+
+Bool_t PrimaryElectronRingAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index,
+      Int_t nofHitsInRing)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+    return (mcTrack->GetMotherId() == -1) && (std::abs(mcTrack->GetPdgCode()) == 11);
+}
+
+Bool_t PrimaryElectronReferenceRingAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index,
+      Int_t nofHitsInRing)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+    return (mcTrack->GetMotherId() == -1) && (std::abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
+}
+
+Bool_t PionRingAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index,
+      Int_t nofHitsInRing)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+    return (std::abs(mcTrack->GetPdgCode()) == 211);
+}
+
+Bool_t PionReferenceRingAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index,
+      Int_t nofHitsInRing)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+    return (std::abs(mcTrack->GetPdgCode()) == 211) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
+}
 
 CbmLitTrackingQa::CbmLitTrackingQa():
    FairTask("LitTrackingQA", 1),
@@ -58,6 +198,9 @@ CbmLitTrackingQa::CbmLitTrackingQa():
    fPtRangeMin(0.),
    fPtRangeMax(3.),
    fPtRangeBins(12.),
+   fAngleRangeMin(0.),
+   fAngleRangeMax(25.),
+   fAngleRangeBins(10),
    fMcToRecoMap(),
    fMCTracks(NULL),
    fGlobalTracks(NULL),
@@ -86,23 +229,17 @@ InitStatus CbmLitTrackingQa::Init()
    fHM = new CbmHistManager();
 
    fDet.DetermineSetup();
+   FillTrackCategories();
+   FillRingCategories();
 
-   // Create histograms
-   CbmLitTrackingQaHistCreator* hc = CbmLitTrackingQaHistCreator::Instance();
-   hc->SetPRange(fPRangeBins, fPRangeMin, fPRangeMax);
-   hc->SetPtRange(fPtRangeBins, fPtRangeMin, fPtRangeMax);
-   hc->SetYRange(fYRangeBins, fYRangeMin, fYRangeMax);
-   hc->Create(fHM);
-
-   fDet.DetermineSetup();
-   std::cout << fDet.ToString();
+   CreateHistograms();
 
    ReadDataBranches();
 
    fMCTrackCreator = CbmLitMCTrackCreator::Instance();
 
    fMcToRecoMap.clear();
-   vector<string> trackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
+   vector<string> trackVariants = GlobalTrackVariants();
    for (Int_t i = 0; i < trackVariants.size(); i++) {
       fMcToRecoMap.insert(make_pair(trackVariants[i], multimap<Int_t, Int_t>()));
    }
@@ -128,7 +265,9 @@ void CbmLitTrackingQa::Finish()
 {
    CalculateEfficiencyHistos();
    fHM->WriteToFile();
-   CreateSimulationReport();
+   CbmSimulationReport* report = new CbmLitTrackingQaReport();
+   report->Create(fHM, fOutputDir);
+   delete report;
 }
 
 void CbmLitTrackingQa::ReadDataBranches()
@@ -182,6 +321,337 @@ void CbmLitTrackingQa::ReadDataBranches()
       if (NULL == fTofHits) { Fatal("Init", "No TofHit array!"); }
    }
 }
+
+void CbmLitTrackingQa::FillTrackCategories()
+{
+   fTrackCategories = list_of("All")("Primary")("Secondary")("Reference")
+         (fDet.GetElectronSetup() ? "Electron" : "Muon")("Proton")("PionPlus")
+         ("PionMinus")("KaonPlus")("KaonMinus");
+
+   fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Primary"] = PrimaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Secondary"] = SecondaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Reference"] = ReferenceTrackAcceptanceFunction;
+   if (fDet.GetElectronSetup()) fTrackAcceptanceFunctions["Electron"] = PrimaryElectronTrackAcceptanceFunction;
+   else fTrackAcceptanceFunctions["Muon"] = PrimaryMuonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonMinus"] = KaonPlusTrackAcceptanceFunction;
+}
+
+void CbmLitTrackingQa::FillRingCategories()
+{
+   fRingCategories = list_of("All")("AllReference")("Electron")("ElectronReference")("Pion")("PionReference");
+
+   fRingAcceptanceFunctions["All"] = AllRingAcceptanceFunction;
+   fRingAcceptanceFunctions["AllReference"] = AllReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["Electron"] = PrimaryElectronRingAcceptanceFunction;
+   fRingAcceptanceFunctions["ElectronReference"] = PrimaryElectronReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["Pion"] = PionRingAcceptanceFunction;
+   fRingAcceptanceFunctions["PionReference"] = PionReferenceRingAcceptanceFunction;
+}
+
+void CbmLitTrackingQa::CreateH1Efficiency(
+      const string& name,
+      const string& parameter,
+      const string& xTitle,
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin,
+      const string& opt)
+{
+   assert(opt == "track" || opt == "ring");
+   string types[] = { "Acc", "Rec", "Eff" };
+   vector<string> cat = (opt == "track") ? fTrackCategories : fRingCategories;
+
+   for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
+      for (Int_t iType = 0; iType < 3; iType++) {
+         string yTitle = (types[iType] == "Eff") ? "Efficiency [%]" : "Counter";
+         string histName = name + "_" + cat[iCat] + "_" + types[iType] + "_" + parameter;
+         string histTitle = histName + ";" + xTitle + ";" + yTitle;
+         fHM->Add(histName, new TH1F(histName.c_str(), histTitle.c_str(), nofBins, minBin, maxBin));
+      }
+   }
+}
+
+void CbmLitTrackingQa::CreateH2Efficiency(
+      const string& name,
+      const string& parameter,
+      const string& xTitle,
+      const string& yTitle,
+      Int_t nofBinsX,
+      Double_t minBinX,
+      Double_t maxBinX,
+      Int_t nofBinsY,
+      Double_t minBinY,
+      Double_t maxBinY,
+      const string& opt)
+{
+   assert(opt == "track" || opt == "ring");
+   string types[] = { "Acc", "Rec", "Eff" };
+   vector<string> cat = (opt == "track") ? fTrackCategories : fRingCategories;
+
+   for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
+      for (Int_t iType = 0; iType < 3; iType++) {
+         string zTitle = (types[iType] == "Eff") ? "Efficiency [%]" : "Counter";
+         string histName = name + "_" + cat[iCat] + "_" + types[iType] + "_" + parameter;
+         string histTitle = histName + ";" + xTitle + ";" + yTitle + ";" + zTitle;
+         fHM->Add(histName, new TH2F(histName.c_str(), histTitle.c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY));
+      }
+   }
+}
+
+void CbmLitTrackingQa::CreateH1(
+      const string& name,
+      const string& xTitle,
+      const string& yTitle,
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin)
+{
+   TH1F* h = new TH1F(name.c_str(), string(name + ";" + xTitle + ";" + yTitle).c_str(), nofBins, minBin, maxBin);
+   fHM->Add(name, h);
+}
+
+void CbmLitTrackingQa::CreateH2(
+      const string& name,
+      const string& xTitle,
+      const string& yTitle,
+      const string& zTitle,
+      Int_t nofBinsX,
+      Double_t minBinX,
+      Double_t maxBinX,
+      Int_t nofBinsY,
+      Double_t minBinY,
+      Double_t maxBinY)
+{
+   TH2F* h = new TH2F(name.c_str(), (name + ";" + xTitle + ";" + yTitle + ";" + zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
+   fHM->Add(name, h);
+}
+
+void CbmLitTrackingQa::CreateTrackHitsHistogram(
+      const string& detName)
+{
+   string type[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
+   Double_t min[] = { -0.5, -0.5, -0.5, -0.1, -0.1 };
+   Double_t max[] = { 99.5, 99.5, 99.5, 1.1, 1.1 };
+   Int_t bins[] = { 100, 100, 100, 12, 12 };
+   for(Int_t i = 0; i < 5; i++) {
+      string xTitle = (i == 3 || i == 4) ? "Ratio" : "Number of hits";
+      string histName = "hth_" + detName + "_TrackHits_" + type[i];
+      CreateH1(histName.c_str(), xTitle, "Yeild", bins[i], min[i], max[i]);
+   }
+}
+
+vector<string> CbmLitTrackingQa::CreateGlobalTrackingHistogramNames(
+      const vector<string>& detectors)
+{
+   vector<string> histos;
+   Int_t nofDetectors = detectors.size();
+   for (Int_t iDet = 0; iDet < nofDetectors; iDet++) {
+      string histEff;
+      for (Int_t i = 0; i <= iDet; i++) { histEff += detectors[i]; }
+      string histNorm = histEff;
+      histos.push_back("hte_" + histEff + "_" + histNorm);
+      for (Int_t i = iDet + 1; i < nofDetectors; i++) {
+         histNorm += detectors[i];
+         histos.push_back("hte_" + histEff + "_" + histNorm);
+      }
+   }
+   return histos;
+}
+
+vector<string> CbmLitTrackingQa::CreateGlobalTrackingHistogramNames()
+{
+   // Histograms w/o RICH detector
+   vector<string> detectors;
+   if (fDet.GetDet(kSTS)) detectors.push_back("Sts");
+   if (fDet.GetDet(kMUCH)) detectors.push_back("Much");
+   if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+   if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+   vector<string> names1 = CreateGlobalTrackingHistogramNames(detectors);
+
+   // Histograms with RICH detector
+   vector<string> names2;
+   if (fDet.GetDet(kRICH)) {
+      detectors.clear();
+      if (fDet.GetDet(kSTS)) detectors.push_back("Sts");
+      if (fDet.GetDet(kRICH)) detectors.push_back("Rich");
+      if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+      if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+      names2 = CreateGlobalTrackingHistogramNames(detectors);
+   }
+
+   set<string> names;
+   names.insert(names1.begin(), names1.end());
+   names.insert(names2.begin(), names2.end());
+   vector<string> nameVector(names.begin(), names.end());
+   return nameVector;
+}
+
+vector<string> CbmLitTrackingQa::GlobalTrackVariants()
+{
+   set<string> trackVariants;
+   // Histograms w/o RICH detector
+   vector<string> detectors;
+   if (fDet.GetDet(kSTS)) detectors.push_back("Sts");
+   if (fDet.GetDet(kMUCH)) detectors.push_back("Much");
+   if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+   if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+   string name("");
+   for (Int_t i = 0; i < detectors.size(); i++) {
+      name += detectors[i];
+      trackVariants.insert(name);
+   }
+
+   // Histograms with RICH detector
+   if (fDet.GetDet(kRICH)) {
+      detectors.clear();
+      if (fDet.GetDet(kSTS)) detectors.push_back("Sts");
+      if (fDet.GetDet(kRICH)) detectors.push_back("Rich");
+      if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+      if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+      name = "";
+      for (Int_t i = 0; i < detectors.size(); i++) {
+          name += detectors[i];
+        trackVariants.insert(name);
+      }
+   }
+   vector<string> trackVariantsVector(trackVariants.begin(), trackVariants.end());
+
+   trackVariantsVector.push_back("Rich");
+
+   return trackVariantsVector;
+}
+
+string CbmLitTrackingQa::LocalEfficiencyNormalization(
+      const string& detName)
+{
+   set<string> trackVariants;
+   // Histograms w/o RICH detector
+   vector<string> detectors;
+   if (fDet.GetDet(kSTS)) detectors.push_back("Sts");
+   if (fDet.GetDet(kMUCH)) detectors.push_back("Much");
+   if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+   if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+   string name("");
+   for (Int_t i = 0; i < detectors.size(); i++) {
+      name += detectors[i];
+      if (detectors[i] == detName) break;
+   }
+   return name;
+}
+
+void CbmLitTrackingQa::CreateHistograms()
+{
+   fDet.DetermineSetup();
+
+   // Number of points distributions
+   Double_t minNofPoints =  0.;
+   Double_t maxNofPoints = 100.;
+   Int_t nofBinsPoints = 100;
+
+   // Reconstruction efficiency histograms
+   // Local efficiency histograms
+   // STS
+ //  CreateEffHist3D("hSts3D", "track");
+   CreateH1Efficiency("hte_Sts_Sts", "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+   CreateH1Efficiency("hte_Sts_Sts", "Angle", "Polar angle [grad]",  fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+   // MUCH
+   if (fDet.GetDet(kMUCH)) {
+      string norm = LocalEfficiencyNormalization("Much");
+      string histName = "hte_Much_" + norm;
+      CreateH1Efficiency(histName, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "track");
+      CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
+      CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
+      CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+      CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
+   }
+   // TRD
+   if (fDet.GetDet(kTRD)) {
+      string norm = LocalEfficiencyNormalization("Trd");
+      string histName = "hte_Trd_" + norm;
+      CreateH1Efficiency(histName, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "track");
+      CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
+      CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
+      CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+      CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
+   }
+   // TOF
+   if (fDet.GetDet(kTOF)) {
+      string norm = LocalEfficiencyNormalization("Tof");
+      string histName = "hte_Tof_" + norm;
+      CreateH1Efficiency(histName, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "track");
+      CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
+      CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
+//    CreateEfficiencyHistogram(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
+      CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+      CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
+   }
+   // RICH
+   if (fDet.GetDet(kRICH)) {
+      CreateH1Efficiency("hte_Rich_Rich", "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "ring");
+      CreateH1Efficiency("hte_Rich_Rich", "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "ring");
+      CreateH1Efficiency("hte_Rich_Rich", "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "ring");
+      CreateH1Efficiency("hte_Rich_Rich", "Nh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
+      CreateH1Efficiency("hte_Rich_Rich", "BoA", "B/A", 50, 0.0, 1.0, "ring");
+      CreateH1Efficiency("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
+      CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "ring");
+   }
+
+   // Global efficiency histograms
+   vector<string> histoNames = CreateGlobalTrackingHistogramNames();
+   for (Int_t iHist = 0; iHist < histoNames.size(); iHist++) {
+      string name = histoNames[iHist];
+      string opt = (name.find("Rich") == string::npos) ? "track" : "ring";
+      CreateH1Efficiency(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, opt);
+      CreateH1Efficiency(name, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, opt);
+      CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
+      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
+   }
+
+   // Create histograms for ghost tracks
+   if (fDet.GetDet(kSTS)) CreateH1("hng_NofGhosts_Sts_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   if (fDet.GetDet(kTRD)) CreateH1("hng_NofGhosts_Trd_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   if (fDet.GetDet(kMUCH)) CreateH1("hng_NofGhosts_Much_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   if (fDet.GetDet(kRICH)) {
+      CreateH1("hng_NofGhosts_Rich_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+      CreateH1("hng_NofGhosts_RichStsMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+      CreateH1("hng_NofGhosts_RichElId_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+      CreateH1("hng_NofGhosts_StsRichMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+   }
+
+   // Create track hits histograms
+   if (fDet.GetDet(kMVD)) CreateTrackHitsHistogram("Mvd");
+   if (fDet.GetDet(kSTS)) CreateTrackHitsHistogram("Sts");
+   if (fDet.GetDet(kTRD)) CreateTrackHitsHistogram("Trd");
+   if (fDet.GetDet(kMUCH)) CreateTrackHitsHistogram("Much");
+   if (fDet.GetDet(kRICH)) CreateTrackHitsHistogram("Rich");
+
+
+   // Create number of object histograms
+   Int_t nofBinsC = 100000;
+   Double_t maxXC = 100000.;
+   CreateH1("hno_NofObjects_GlobalTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kSTS)) CreateH1("hno_NofObjects_StsTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kTRD)) CreateH1("hno_NofObjects_TrdTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kMUCH)) CreateH1("hno_NofObjects_MuchTracks", "Tracks per event", "Yield", nofBinsC, 1., maxXC);
+   if (fDet.GetDet(kRICH)) {
+      CreateH1("hno_NofObjects_RichRings", "Rings per event", "Yield", nofBinsC, 1., maxXC);
+      CreateH1("hno_NofObjects_RichProjections", "Projections per event", "Yield", nofBinsC, 1., maxXC);
+   }
+
+   // Histogram stores number of events
+   CreateH1("hen_EventNo_TrackingQa", "", "", 1, 0, 1.);
+
+   cout << fHM->ToString();
+}
+
+
 
 void CbmLitTrackingQa::ProcessGlobalTracks()
 {
@@ -394,7 +864,7 @@ void CbmLitTrackingQa::ProcessMcTracks()
 //    for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
 //    TH1* hist = effHistos[iHist];
 //    string name = hist->GetName();
-//    vector<string> parse = CbmLitTrackingQaHistCreator::ParseHistoName(name);
+//    vector<string> parse = CbmLitTrackingQa::ParseHistoName(name);
 //    cout << name;
 //    for (Int_t j = 0; j < parse.size(); j++) {
 //       cout << " [" << j << "]=" << parse[j];
@@ -497,7 +967,7 @@ void CbmLitTrackingQa::FillGlobalReconstructionHistos(
 {
    string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
    string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
-   LitTrackAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::Instance()->GetTrackAcceptanceFunctions().find(accName)).second;
+   LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(accName)->second;
    Bool_t accOk = function(fMCTracks, mcId);
    Int_t nofParams = par.size();
    assert(nofParams < 3 && nofParams > 0);
@@ -520,7 +990,7 @@ void CbmLitTrackingQa::FillGlobalReconstructionHistosRich(
    Int_t nofHitsInRing = fMCTrackCreator->GetTrack(mcId).GetNofRichHits();
    string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
    string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
-   LitRingAcceptanceFunction function = (*CbmLitTrackingQaHistCreator::Instance()->GetRingAcceptanceFunctions().find(accName)).second;
+   LitRingAcceptanceFunction function = fRingAcceptanceFunctions.find(accName)->second;
    Bool_t accOk = function(fMCTracks, mcId, nofHitsInRing);
    Int_t nofParams = par.size();
    assert(nofParams < 3 && nofParams > 0);
@@ -573,22 +1043,22 @@ void CbmLitTrackingQa::IncreaseCounters()
    if (fDet.GetDet(kMUCH)) { fHM->H1("hno_NofObjects_MuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
 }
 
-
-void CbmLitTrackingQa::CreateSimulationReport()
-{
-   CbmSimulationReport* report = new CbmLitTrackingQaReport();
-   report->Create(fHM, fOutputDir);
-   delete report;
-}
-
-void CbmLitTrackingQa::CreateStudyReport(
-      const string& title,
-      const vector<string>& fileNames,
-      const vector<string>& studyNames)
-{
-   CbmStudyReport* report = new CbmLitTrackingQaStudyReport();
-   report->Create(fileNames, studyNames, fOutputDir);
-   delete report;
-}
+//
+//void CbmLitTrackingQa::CreateSimulationReport()
+//{
+//   CbmSimulationReport* report = new CbmLitTrackingQaReport();
+//   report->Create(fHM, fOutputDir);
+//   delete report;
+//}
+//
+//void CbmLitTrackingQa::CreateStudyReport(
+//      const string& title,
+//      const vector<string>& fileNames,
+//      const vector<string>& studyNames)
+//{
+//   CbmStudyReport* report = new CbmLitTrackingQaStudyReport();
+//   report->Create(fileNames, studyNames, fOutputDir);
+//   delete report;
+//}
 
 ClassImp(CbmLitTrackingQa);

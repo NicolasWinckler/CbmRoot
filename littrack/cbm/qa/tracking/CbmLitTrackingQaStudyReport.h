@@ -9,7 +9,6 @@
 
 #include "CbmStudyReport.h"
 #include <string>
-#include <boost/function.hpp>
 using std::string;
 
 /**
@@ -59,7 +58,8 @@ protected:
     string PrintTable(
     		const string& tableName,
     		const string& pattern,
-    		const boost::function<string (const string&)>& rowNameFormatter) const;
+    		string (*rowNameFormatter)(const string&)) const;
+    		//const boost::function<string (const string&)>& rowNameFormatter) const;
 
     /**
      * \brief Return formated string with table of efficiency numbers.
@@ -70,6 +70,8 @@ protected:
     string PrintEfficiencyTable(
     		const string& tableName,
     		const string& pattern) const;
+
+    ClassDef(CbmLitTrackingQaStudyReport, 1)
 };
 
 #endif /* CBMLITTRACKINGQASTUDYREPORT_H_ */

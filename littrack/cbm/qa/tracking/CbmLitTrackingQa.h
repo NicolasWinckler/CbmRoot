@@ -20,6 +20,9 @@ using std::string;
 using std::vector;
 using std::multimap;
 
+typedef Bool_t (*LitTrackAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index);
+typedef Bool_t (*LitRingAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index, Int_t nofHitsInRing);
+
 /**
  * \class CbmLitTrackingQa.h
  * \brief FairTask for tracking performance calculation.
@@ -82,28 +85,103 @@ public:
       fPtRangeMin = min;
       fPtRangeMax = max;
    }
+   void SetAngleRange(
+         Double_t min,
+         Double_t max,
+         Int_t nofBins) {
+      fAngleRangeMin = min;
+      fAngleRangeMax = max;
+      fAngleRangeBins = nofBins;
+   }
 
-   /**
-    * \brief Generate summary report out of several different simulation results.
-    * \param[in] title Title of report.
-    * \param[in] resultDirectories Paths to directories with resuls.
-    * \param[in] studyNames Study names which are displayed in report.
-    */
-   void CreateStudyReport(
-         const string& title,
-         const vector<string>& resultDirectories,
-         const vector<string>& studyNames);
-
-   /**
-    * \brief Create final simulation report for this tracking QA run.
-    */
-   void CreateSimulationReport();
+//   /**
+//    * \brief Generate summary report out of several different simulation results.
+//    * \param[in] title Title of report.
+//    * \param[in] resultDirectories Paths to directories with resuls.
+//    * \param[in] studyNames Study names which are displayed in report.
+//    */
+//   void CreateStudyReport(
+//         const string& title,
+//         const vector<string>& resultDirectories,
+//         const vector<string>& studyNames);
+//
+//   /**
+//    * \brief Create final simulation report for this tracking QA run.
+//    */
+//   void CreateSimulationReport();
 
 private:
    /**
     * \brief Read data branches from input data files.
     */
    void ReadDataBranches();
+
+   /**
+    * \brief Fill array of track categories with default values.
+    */
+   void FillTrackCategories();
+
+   /**
+    * \brief Fill array of ring categories with default values.
+    */
+   void FillRingCategories();
+
+   void CreateH1Efficiency(
+         const string& name,
+         const string& parameter,
+         const string& xTitle,
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin,
+         const string& opt);
+
+   void CreateH2Efficiency(
+         const string& name,
+         const string& parameter,
+         const string& xTitle,
+         const string& yTitle,
+         Int_t nofBinsX,
+         Double_t minBinX,
+         Double_t maxBinX,
+         Int_t nofBinsY,
+         Double_t minBinY,
+         Double_t maxBinY,
+         const string& opt);
+
+   void CreateH1(
+         const string& name,
+         const string& xTitle,
+         const string& yTitle,
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin);
+
+   void CreateH2(
+         const string& name,
+         const string& xTitle,
+         const string& yTitle,
+         const string& zTitle,
+         Int_t nofBinsX,
+         Double_t minBinX,
+         Double_t maxBinX,
+         Int_t nofBinsY,
+         Double_t minBinY,
+         Double_t maxBinY);
+
+   void CreateTrackHitsHistogram(
+         const string& detName);
+
+   vector<string> CreateGlobalTrackingHistogramNames(
+         const vector<string>& detectors);
+
+   vector<string> CreateGlobalTrackingHistogramNames();
+
+   string LocalEfficiencyNormalization(
+         const string& detName);
+
+   vector<string> GlobalTrackVariants();
+
+   void CreateHistograms();
 
    /**
     * \brief Loop over the reconstructed global tracks.
@@ -223,15 +301,18 @@ private:
    Int_t fMinNofHitsTrd; // for TRD track
    Int_t fMinNofHitsMuch; // for MUCH track
 
-   Double_t fPRangeMin; // Min momentum
-   Double_t fPRangeMax; // Max momentum
-   Int_t fPRangeBins; // Number of bins
-   Double_t fYRangeMin; // Min rapidity
-   Double_t fYRangeMax; // Max rapidity
-   Int_t fYRangeBins; // Number of bins
-   Double_t fPtRangeMin; // Min rapidity
-   Double_t fPtRangeMax; // Max rapidity
-   Int_t fPtRangeBins; // Number of bins
+   Double_t fPRangeMin; // Minimum momentum for tracks for efficiency calculation [GeV/c]
+   Double_t fPRangeMax; // Maximum momentum for tracks for efficiency calculation [GeV/c]
+   Int_t fPRangeBins; // Number of bins for efficiency vs. momentum histogram
+   Double_t fPtRangeMin; // Minimum Pt for tracks for efficiency calculation [GeV/c]
+   Double_t fPtRangeMax; // Maximum Pt for tracks for efficiency calculation [GeV/c]
+   Int_t fPtRangeBins; // Number of bins for efficiency vs. Pt histogram
+   Double_t fYRangeMin; // Minimum rapidity for tracks for efficiency calculation [GeV/c]
+   Double_t fYRangeMax; // Maximum rapidity for tracks for efficiency calculation [GeV/c]
+   Int_t fYRangeBins; // Number of bins for efficiency vs. rapidity histogram
+   Double_t fAngleRangeMin; // Minimum polar angle [grad]
+   Double_t fAngleRangeMax; // Maximum polar angle [grad]
+   Int_t fAngleRangeBins; // Number of bins for efficiency vs. polar angle histogram
 
    // Pointers to data arrays
    TClonesArray* fMCTracks; // CbmMCTrack array
@@ -250,6 +331,11 @@ private:
 
    // Global track segment name maps to multimap <MC track index, reconstructed track index>
    map<string, multimap<Int_t, Int_t> > fMcToRecoMap;
+
+   vector<string> fTrackCategories; // Vector of track category names
+   vector<string> fRingCategories; // Vector of ring category names
+   map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
+   map<string, LitRingAcceptanceFunction> fRingAcceptanceFunctions; // maps ring category name to ring acceptance function
 
    ClassDef(CbmLitTrackingQa, 1);
 };

@@ -36,4 +36,7 @@
 #pragma link C++ class CbmLitCreateStandaloneData+;
 #pragma link C++ class CbmLitTestMatrixMath+;
 
+#pragma link C++ class CbmLitTrackingQaReport+;
+#pragma link C++ class CbmLitTrackingQaStudyReport+;
+
 #endif

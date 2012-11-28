@@ -141,6 +141,12 @@ protected:
       const TH1* histRec,
       const TH1* histAcc,
       Double_t scale = 1.) const;
+
+   void FillGlobalTrackVariants();
+
+   vector<string> fGlobalTrackVariants;
+
+   ClassDef(CbmLitTrackingQaReport, 1)
 };
 
 #endif /* CBMLITTRACKINGQAREPORT_H_ */

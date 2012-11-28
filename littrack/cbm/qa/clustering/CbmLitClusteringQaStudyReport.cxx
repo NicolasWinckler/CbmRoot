@@ -19,7 +19,7 @@ using lit::Split;
 CbmLitClusteringQaStudyReport::CbmLitClusteringQaStudyReport():
 		CbmStudyReport()
 {
-	SetName("clustering_qa");
+	SetReportName("clustering_qa");
 }
 
 CbmLitClusteringQaStudyReport::~CbmLitClusteringQaStudyReport()

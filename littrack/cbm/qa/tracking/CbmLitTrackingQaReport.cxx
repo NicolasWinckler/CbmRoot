@@ -4,7 +4,6 @@
  * \date 2011
  */
 #include "CbmLitTrackingQaReport.h"
-#include "CbmLitTrackingQaHistCreator.h"
 #include "CbmReportElement.h"
 #include "CbmHistManager.h"
 #include "CbmDrawHist.h"
@@ -14,19 +13,23 @@
 #include "TLine.h"
 #include <boost/assign/list_of.hpp>
 #include <vector>
+#include <set>
 
-using std::vector;
-using std::endl;
-using boost::assign::list_of;
 using lit::NumberToString;
 using lit::FindAndReplace;
 using lit::Split;
-using lit::SaveCanvasAsImage;
+using std::vector;
+using std::set;
+using std::endl;
+using std::make_pair;
+using std::pair;
+using boost::assign::list_of;
 
 CbmLitTrackingQaReport::CbmLitTrackingQaReport():
-		CbmSimulationReport()
+		CbmSimulationReport(),
+		fGlobalTrackVariants()
 {
-	SetName("tracking_qa");
+	SetReportName("tracking_qa");
 }
 
 CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
@@ -35,6 +38,8 @@ CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 
 void CbmLitTrackingQaReport::Create()
 {
+   FillGlobalTrackVariants();
+
    Out().precision(3);
    Out() << R()->DocumentBegin();
    Out() << R()->Title(0, GetTitle());
@@ -67,7 +72,7 @@ string CbmLitTrackingQaReport::PrintNofObjects() const
 
 string CbmLitTrackingQaReport::PrintTrackHits() const
 {
-	vector<TH1*> histos = HM()->H1Vector("hth_.+_TrackHits_All.+");
+	vector<TH1*> histos = HM()->H1Vector("hth_.+_TrackHits_All");
 	Int_t nofHistos = histos.size();
 	string str = R()->TableBegin("Number of all, true and fake hits in tracks and rings",
 	   	         list_of("")("all")("true")("fake")("true/all")("fake/all"));
@@ -109,13 +114,18 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
   	Int_t nofHistos = histos.size();
   	if (nofHistos == 0) return "";
 
-	const vector<string>& cat = (includeRich) ? CbmLitTrackingQaHistCreator::Instance()->GetRingCategories() : CbmLitTrackingQaHistCreator::Instance()->GetTrackCategories();
-	Int_t nofCats = cat.size();
+  	// Find track and ring categories from the histogram names
+  	map<string, Int_t> catToCell;
+  	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+  	   string effName = histos[iHist]->GetName();
+  	   catToCell.insert(make_pair<string, Int_t>(Split(effName, '_')[3], catToCell.size()));
+  	}
+  	Int_t nofCats = catToCell.size();
 	Int_t nofRows = nofHistos / nofCats;
 
-	// Maps category name to cell index
-	map<string, Int_t> catToCell;
-	for (Int_t iCat = 0; iCat < nofCats; iCat++) { catToCell.insert(make_pair<string, Int_t>(cat[iCat], iCat)); }
+  	vector<string> cat(nofCats);
+  	map<string, Int_t>::const_iterator it;
+  	for (it = catToCell.begin(); it != catToCell.end(); it++) { cat[(*it).second] = (*it).first; }
 
 	Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
 	string str = R()->TableBegin("Tracking efficiency", list_of(string("")).range(cat));
@@ -156,11 +166,10 @@ void CbmLitTrackingQaReport::Draw()
 void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 {
 	// Draw global tracking efficiency
-	vector<string> globalTrackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
-	for (UInt_t i = 0; i < globalTrackVariants.size(); i++) {
-		string variant = globalTrackVariants[i];
+	for (UInt_t i = 0; i < fGlobalTrackVariants.size(); i++) {
+		string variant = fGlobalTrackVariants[i];
 		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p");
-		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_pt", "hte_Sts.*_" + variant + "_All_Eff_pt");
+		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_pt", "hte_Sts.*_" + variant + "_All_Eff_pt");
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_y", "hte_Sts.*_" + variant + "_All_Eff_y");
 	}
 
@@ -168,9 +177,9 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	vector<string> localTrackVariants = list_of("Sts")("Trd")("Much")("Rich")("Tof");
 	for (UInt_t i = 0; i < localTrackVariants.size(); i++) {
 		string variant = localTrackVariants[i];
-		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_Eff_p" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff_p";
-		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re);
-		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_pt");
+		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_Eff" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff";
+		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re + "_p");
+		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", re + "_pt");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");
 	}
 
@@ -254,9 +263,8 @@ void CbmLitTrackingQaReport::DrawAccAndRec(
 void CbmLitTrackingQaReport::DrawYPtHistos()
 {
    // Draw global tracking efficiency
-   vector<string> globalTrackVariants = CbmLitTrackingQaHistCreator::GlobalTrackVariants();
-   for (UInt_t i = 0; i < globalTrackVariants.size(); i++) {
-      string variant = globalTrackVariants[i];
+   for (UInt_t i = 0; i < fGlobalTrackVariants.size(); i++) {
+      string variant = fGlobalTrackVariants[i];
       string effHistName = "hte_" + variant + "_" + variant;
       DrawYPt("tracking_qa_" + variant + "_all_ypt", effHistName + "_All_Eff_YPt");
       DrawYPt("tracking_qa_" + variant + "_proton_ypt", effHistName + "_Proton_Eff_YPt");
@@ -346,3 +354,17 @@ Double_t CbmLitTrackingQaReport::CalcEfficiency(
       return scale * Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
    }
 }
+
+void CbmLitTrackingQaReport::FillGlobalTrackVariants()
+{
+   vector<TH1*> histos = HM()->H1Vector("hte_*_Eff_p");
+   Int_t nofHistos = histos.size();
+   set<string> variants;
+   for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+      string effName = histos[iHist]->GetName();
+      variants.insert(Split(effName, '_')[2]);
+   }
+   fGlobalTrackVariants.assign(variants.begin(), variants.end());
+}
+
+ClassImp(CbmLitTrackingQaReport)

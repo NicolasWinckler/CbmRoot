@@ -59,6 +59,8 @@ protected:
 	   Double_t rms);
 
 	void DrawTrackParamsAtVertex();
+
+	ClassDef(CbmLitFitQaReport, 1);
 };
 
 #endif /* CBMLITFITQAREPORT_H_ */

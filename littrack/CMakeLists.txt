@@ -115,9 +115,6 @@ If(Boost_FOUND)
       cbm/qa/propagation/CbmLitPropagationQaDraw.cxx
       cbm/qa/propagation/CbmLitPropagationQaHistCreator.cxx
       cbm/qa/propagation/CbmLitPropagationQaCalculator.cxx
-      cbm/qa/fit/CbmLitFitQaCalculator.cxx
-      cbm/qa/fit/CbmLitFitQaHistCreator.cxx
-      cbm/qa/fit/CbmLitFitQaReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
@@ -172,7 +169,8 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQa.h
       cbm/qa/clustering/CbmLitClusteringQaReport.h
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.h
-      cbm/qa/fit/CbmLitFitQa.h   
+      cbm/qa/fit/CbmLitFitQa.h 
+      cbm/qa/fit/CbmLitFitQaReport.h
  #     cbm/qa/sts/CbmStsSimulationQa.h   
      )
 EndIf(Boost_FOUND)
@@ -200,6 +198,7 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/fit/CbmLitFitQa.cxx
+      cbm/qa/fit/CbmLitFitQaReport.cxx
     #  cbm/qa/sts/CbmStsSimulationQa.cxx
      )
 EndIf(Boost_FOUND)

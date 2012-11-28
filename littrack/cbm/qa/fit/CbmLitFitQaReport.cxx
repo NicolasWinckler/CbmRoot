@@ -216,3 +216,5 @@ void CbmLitFitQaReport::DrawTrackParamsAtVertex()
    gPad->SetGridx(true);
    gPad->SetGridy(true);
 }
+
+ClassImp(CbmLitFitQaReport)

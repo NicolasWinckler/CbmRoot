@@ -9,10 +9,16 @@
 #define CBMLITFITQA_H_
 
 #include "FairTask.h"
+#include "CbmStsKFTrackFitter.h"
+#include "CbmDetectorList.h"
+#include "cbm/base/CbmLitDetectorSetup.h"
 #include <string>
 
 class CbmHistManager;
-class CbmLitFitQaCalculator;
+class CbmVertex;
+class FairTrackParam;
+class CbmLitMCPoint;
+class CbmLitMCTrackCreator;
 
 using std::string;
 
@@ -70,10 +76,36 @@ public:
    }
 
 private:
+   /**
+   * \brief Reads data branches.
+   */
+   void ReadDataBranches();
 
-   void CreateSimulationReport(
-         const string& title,
-         const string& resultDirectory);
+   void ProcessGlobalTracks();
+
+   void ProcessStsTrack(
+       Int_t trackId);
+
+   void ProcessTrdTrack(
+       Int_t trackId);
+
+   void ProcessMuchTrack(
+       Int_t trackId);
+
+   void FillResidualsAndPulls(
+      const FairTrackParam* par,
+      const CbmLitMCPoint* mcPoint,
+      const string& histName,
+      Float_t wrongPar,
+      DetectorId detId);
+
+   void ProcessTrackParamsAtVertex();
+
+   void CreateHistograms();
+
+   void CreateResidualAndPullHistograms(
+         DetectorId detId,
+         const string& detName);
 
    Bool_t fIsFixedBounds; // if true than fixed bounds are used for histograms
 
@@ -89,7 +121,30 @@ private:
    Int_t fPRangeBins; // Number of bins
 
    CbmHistManager* fHM; // Histogram manager
-   CbmLitFitQaCalculator* fFitQa; // Implementation of track fit QA
+
+   // Data branches
+   TClonesArray* fGlobalTracks; // CbmGlobalTrack array
+   TClonesArray* fStsTracks; // CbmStsTrack array
+   TClonesArray* fStsTrackMatches; // CbmTrackMatch array
+   TClonesArray* fStsHits; // CbmStsHit
+   TClonesArray* fMvdHits; // CbmMvdHit
+   TClonesArray* fTrdTracks; // CbmTrdTrack array
+   TClonesArray* fTrdTrackMatches; // CbmTrackMatch array
+   TClonesArray* fTrdHits; // CbmTrdHit array
+   TClonesArray* fMuchTracks; // CbmStsTrack array
+   TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
+   TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
+   TClonesArray* fMuchStripHits; // CbmMuchStripHit array
+   TClonesArray* fMCTracks; // CbmMCTrack array
+
+   Double_t fQuota; // percent of correctly attached hits
+
+   CbmVertex* fPrimVertex; // Pointer to the primary vertex
+   CbmStsKFTrackFitter fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
+
+   CbmLitMCTrackCreator* fMCTrackCreator; // MC track creator tool
+
+   CbmLitDetectorSetup fDet; // For detector setup determination
 
    ClassDef(CbmLitFitQa, 1)
 };

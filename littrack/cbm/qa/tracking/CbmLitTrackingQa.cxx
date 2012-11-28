@@ -1043,22 +1043,4 @@ void CbmLitTrackingQa::IncreaseCounters()
    if (fDet.GetDet(kMUCH)) { fHM->H1("hno_NofObjects_MuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }
 }
 
-//
-//void CbmLitTrackingQa::CreateSimulationReport()
-//{
-//   CbmSimulationReport* report = new CbmLitTrackingQaReport();
-//   report->Create(fHM, fOutputDir);
-//   delete report;
-//}
-//
-//void CbmLitTrackingQa::CreateStudyReport(
-//      const string& title,
-//      const vector<string>& fileNames,
-//      const vector<string>& studyNames)
-//{
-//   CbmStudyReport* report = new CbmLitTrackingQaStudyReport();
-//   report->Create(fileNames, studyNames, fOutputDir);
-//   delete report;
-//}
-
 ClassImp(CbmLitTrackingQa);

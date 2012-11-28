@@ -94,22 +94,6 @@ public:
       fAngleRangeBins = nofBins;
    }
 
-//   /**
-//    * \brief Generate summary report out of several different simulation results.
-//    * \param[in] title Title of report.
-//    * \param[in] resultDirectories Paths to directories with resuls.
-//    * \param[in] studyNames Study names which are displayed in report.
-//    */
-//   void CreateStudyReport(
-//         const string& title,
-//         const vector<string>& resultDirectories,
-//         const vector<string>& studyNames);
-//
-//   /**
-//    * \brief Create final simulation report for this tracking QA run.
-//    */
-//   void CreateSimulationReport();
-
 private:
    /**
     * \brief Read data branches from input data files.

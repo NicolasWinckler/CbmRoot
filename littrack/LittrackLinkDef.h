@@ -38,5 +38,7 @@
 
 #pragma link C++ class CbmLitTrackingQaReport+;
 #pragma link C++ class CbmLitTrackingQaStudyReport+;
+#pragma link C++ class CbmLitClusteringQaReport+;
+#pragma link C++ class CbmLitClusteringQaStudyReport+;
 
 #endif

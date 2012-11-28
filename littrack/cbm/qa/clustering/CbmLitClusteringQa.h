@@ -9,12 +9,13 @@
 #define CBMLITCLUSTERINGQA_H_
 
 #include "FairTask.h"
+#include "cbm/base/CbmLitDetectorSetup.h"
 #include <string>
 #include <vector>
 using std::string;
 using std::vector;
 class CbmHistManager;
-class CbmLitClusteringQaCalculator;
+class TClonesArray;
 
 class CbmLitClusteringQa : public FairTask
 {
@@ -48,27 +49,85 @@ public:
     /** Setters */
     void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
 
+private:
     /**
-     * \brief Generate summary report out of several different simulation results.
-     * \param[in] title Title of report.
-     * \param[in] resultDirectories Paths to directories with resuls.
-     * \param[in] studyNames Study names which are displayed in report.
+     * \brief Read data branches.
      */
-    void CreateStudyReport(
-          const string& title,
-          const vector<string>& resultDirectories,
-          const vector<string>& studyNames);
+    void ReadDataBranches();
 
     /**
-     * TODO: Add comments
+     * \brief Calculate statistics for hits.
      */
-    void CreateSimulationReport(
-          const string& title,
-          const string& resultDirectory);
-private:
+    void ProcessHits();
+
+    /**
+     *
+     */
+    void IncreaseCounters();
+
+    /**
+     *
+     */
+    void CreateHistograms();
+
+    /**
+     *
+     */
+    void CreateH1F(
+          const string& name,
+          const string& xTitle,
+          const string& yTitle,
+          Int_t nofBins,
+          Double_t minBin,
+          Double_t maxBin);
+
+    /**
+     *
+     */
+    void CreateNofObjectsHistograms(
+          DetectorId detId,
+          const string& detName);
+
+    /**
+     *
+     */
+    void CreateNofObjectsHistograms(
+          DetectorId detId,
+          const string& detName,
+          const string& parameter,
+          const string& xTitle);
+
     CbmHistManager* fHM; // Histogram manager
-    CbmLitClusteringQaCalculator* fClusteringQa; // Clustering performance calculator
     string fOutputDir; // Output directory for results
+    CbmLitDetectorSetup fDet; // For detector setup determination
+
+    // Pointers to data arrays
+    TClonesArray* fMvdPoints; // CbmMvdPoint array
+    TClonesArray* fMvdDigis; // CbmMvdDigi array
+    TClonesArray* fMvdClusters; // CbmMvdClusters array
+    TClonesArray* fMvdHits; // CbmMvdHit array
+
+    TClonesArray* fStsPoints; // CbmStsPoint array
+    TClonesArray* fStsDigis; // CbmStsDigi array
+    TClonesArray* fStsClusters; // CbmStsCluster array
+    TClonesArray* fStsHits; // CbmStsHit array
+
+    TClonesArray* fRichPoints; // CbmRichPoint array
+    TClonesArray* fRichHits; // CbmRichHits array
+
+    TClonesArray* fMuchPoints; // CbmMuchPoint array
+    TClonesArray* fMuchDigis; // CbmMuchDigi array
+    TClonesArray* fMuchClusters; // CbmMuchCluster array
+    TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
+    TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
+
+    TClonesArray* fTrdPoints; // CbmTrdPoint array
+    TClonesArray* fTrdDigis; // CbmTrdDigi array
+    TClonesArray* fTrdClusters; // CbmTrdCluster array
+    TClonesArray* fTrdHits; // CbmTrdHit array
+
+    TClonesArray* fTofPoints; // CbmTofPoint array
+    TClonesArray* fTofHits; // CbmTofHit array
 
     ClassDef(CbmLitClusteringQa, 1);
 };

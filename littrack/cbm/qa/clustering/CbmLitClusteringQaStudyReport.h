@@ -46,6 +46,8 @@ private:
     * \brief Print number of objects table.
     */
    string PrintNofObjects() const;
+
+   ClassDef(CbmLitClusteringQaStudyReport, 1)
 };
 
 #endif /* CBMLITCLUSTERINGQASTUDYREPORT_H_ */

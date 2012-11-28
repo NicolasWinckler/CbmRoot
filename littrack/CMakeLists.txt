@@ -110,10 +110,6 @@ If(Boost_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       cbm/qa/base/CbmLitResultChecker.cxx  
-      cbm/qa/clustering/CbmLitClusteringQaHistCreator.cxx
-      cbm/qa/clustering/CbmLitClusteringQaReport.cxx
-      cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
-      cbm/qa/clustering/CbmLitClusteringQaCalculator.cxx
       cbm/qa/propagation/CbmLitPropagationQaPTreeCreator.cxx
       cbm/qa/propagation/CbmLitPropagationQaReport.cxx
       cbm/qa/propagation/CbmLitPropagationQaDraw.cxx
@@ -174,6 +170,8 @@ If(Boost_FOUND)
       cbm/qa/tracking/CbmLitTrackingQaStudyReport.h
       cbm/qa/tracking/CbmLitTrackingQaReport.h
       cbm/qa/clustering/CbmLitClusteringQa.h
+      cbm/qa/clustering/CbmLitClusteringQaReport.h
+      cbm/qa/clustering/CbmLitClusteringQaStudyReport.h
       cbm/qa/fit/CbmLitFitQa.h   
  #     cbm/qa/sts/CbmStsSimulationQa.h   
      )
@@ -199,6 +197,8 @@ If(Boost_FOUND)
       cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
       cbm/qa/tracking/CbmLitTrackingQaReport.cxx
       cbm/qa/clustering/CbmLitClusteringQa.cxx
+      cbm/qa/clustering/CbmLitClusteringQaReport.cxx
+      cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/fit/CbmLitFitQa.cxx
     #  cbm/qa/sts/CbmStsSimulationQa.cxx
      )

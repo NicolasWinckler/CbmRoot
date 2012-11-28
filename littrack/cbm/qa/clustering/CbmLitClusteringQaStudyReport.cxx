@@ -64,3 +64,5 @@ void CbmLitClusteringQaStudyReport::Draw()
 {
 
 }
+
+ClassImp(CbmLitClusteringQaStudyReport)

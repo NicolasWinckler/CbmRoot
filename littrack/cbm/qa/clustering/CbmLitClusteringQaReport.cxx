@@ -69,8 +69,10 @@ void CbmLitClusteringQaReport::DrawHistogramsByPattern(
 	Int_t nofHistos = histos.size();
 	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
 		TH1* hist = histos[iHist];
-		string canvasName = string("clustering_qa_") + hist->GetName();
+		string canvasName = GetReportName() + hist->GetName();
 		TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
 		DrawH1(hist, kLinear, kLinear);
 	}
 }
+
+ClassImp(CbmLitClusteringQaReport)

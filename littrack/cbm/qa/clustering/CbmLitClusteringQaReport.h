@@ -49,6 +49,8 @@ private:
 
    void DrawHistogramsByPattern(
          const string& histNamePattern);
+
+   ClassDef(CbmLitClusteringQaReport, 1)
 };
 
 #endif /* CBMLITCLUSTERINGQAREPORT_H_ */

@@ -9,9 +9,11 @@
 
 #include "TSystem.h"
 
+#include <sstream>
 //#include <boost/property_tree/ptree.hpp>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
+using std::stringstream;
 
 CbmAnaDielectronStudyReportAll::CbmAnaDielectronStudyReportAll()
 {

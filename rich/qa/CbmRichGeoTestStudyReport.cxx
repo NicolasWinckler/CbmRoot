@@ -16,7 +16,7 @@ using std::stringstream;
 
 CbmRichGeoTestStudyReport::CbmRichGeoTestStudyReport()
 {
-	SetName("rich_geo_qa");
+	SetReportName("rich_geo_qa");
 }
 
 CbmRichGeoTestStudyReport::~CbmRichGeoTestStudyReport()

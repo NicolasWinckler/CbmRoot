@@ -205,6 +205,6 @@ void DrawGraph2D(
    HistScale logx = kLinear,
    HistScale logy = kLinear,
    HistScale logz = kLinear,
-   const string& drawOpt = "");
+   const string& drawOpt = "colz");
 
 #endif

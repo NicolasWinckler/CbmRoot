@@ -44,7 +44,10 @@ void run_sim(Int_t nEvents = 1)
   //  TString trdGeom    = "trd/trd_v10b.geo";
 //  TString trdGeom    = "trd/trd_v10b.geo";
   //TString trdGeom    = "trd/TRD_geom_v12b.root";
+  //  TString trdGeom    = "trd/trd_v13a_sis100.root";
+  //  TString trdGeom    = "trd/trd_v13a_sis300.root";
   TString trdGeom    = "trd/" + digipar + ".geo";
+
   TString tofGeom = "";
   //  TString ecalGeom   = "ecal/ecal_v08a.geo";
  

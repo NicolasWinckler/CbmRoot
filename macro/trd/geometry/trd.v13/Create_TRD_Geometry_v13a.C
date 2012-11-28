@@ -21,8 +21,10 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13a";
-const TString FileName = geoVersion + ".root";
+// const TString geoVersion = "trd_v13a";
+// const TString FileName = geoVersion + ".root";
+const TString geoVersion = "trd1";
+const TString FileName = "trd_v13a.root";
 
 // Parameters defining the layout of the complete detector build out of different detector layers.
 const Int_t   NofLayers = 10;   // max layers

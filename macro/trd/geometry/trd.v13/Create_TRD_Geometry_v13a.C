@@ -30,8 +30,8 @@ const Int_t   NofLayers = 10;   // max layers
 //const Int_t   ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  // 1st layer only
 //const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
 //const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
-const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100  // 1: plot, 0: hide
-//const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300  // 1: plot, 0: hide
+//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100  // 1: plot, 0: hide
+const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300  // 1: plot, 0: hide
 
 const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads  
 const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
@@ -184,8 +184,10 @@ const TString RadiatorVolumeMedium    = "pefoam20";
 //const TString RadiatorVolumeMedium  = "polypropylene";
 const TString LatticeVolumeMedium     = "G10";
 const TString KaptonVolumeMedium      = "kapton";
+//const TString KaptonVolumeMedium      = "mylar"; // "kapton";  // remove this line
 const TString GasVolumeMedium         = "TRDgas";
 const TString PadCopperVolumeMedium   = "copper";
+//const TString PadCopperVolumeMedium   = "mylar"; // "copper";  // remove this line
 // todo - use realistic padplane material (FR4)
 const TString PadPcbVolumeMedium      = "G10";  // "goldcoatedcopper";
 const TString MylarVolumeMedium       = "mylar";

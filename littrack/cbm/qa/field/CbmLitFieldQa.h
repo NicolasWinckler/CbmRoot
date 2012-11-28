@@ -14,8 +14,6 @@
 #include <string>
 
 class FairField;
-class TGraph;
-class TGraph2D;
 class TList;
 class CbmHistManager;
 
@@ -78,21 +76,6 @@ private:
     * \brief Fill graphs and histos for field map for each field component (Bx, By, Bz, |B|).
     */
    void FillBHistos();
-
-   /**
-    * \brief Create simulation report.
-    */
-   void CreateSimulationReport();
-
-   /**
-    * \brief Draw field map components for each slice.
-    */
-   void DrawFieldSlices();
-
-   /**
-    * \brief Draw field map components along Z coordinate.
-    */
-   void DrawFieldAlongZ();
 
    // Pointer to the magnetic field map
    FairField* fField;

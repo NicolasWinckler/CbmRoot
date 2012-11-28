@@ -39,7 +39,19 @@ private:
    /**
     * \brief Inherited from CbmSimulationReport.
     */
-   virtual void Draw() {};
+   virtual void Draw();
+
+   /**
+    * \brief Draw field map components for each slice.
+    */
+   void DrawFieldSlices();
+
+   /**
+    * \brief Draw field map components along Z coordinate.
+    */
+   void DrawFieldAlongZ();
+
+   ClassDef(CbmLitFieldQaReport, 1)
 };
 
 #endif /* CBMLITFIELDQAREPORT_H_ */

@@ -115,8 +115,6 @@ If(Boost_FOUND)
       cbm/qa/propagation/CbmLitPropagationQaDraw.cxx
       cbm/qa/propagation/CbmLitPropagationQaHistCreator.cxx
       cbm/qa/propagation/CbmLitPropagationQaCalculator.cxx
-      cbm/qa/field/CbmLitFieldQa.cxx
-      cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
   )  
@@ -148,7 +146,6 @@ cbm/qa/CbmLitTestMatrixMath.h
 If(Boost_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
-      cbm/qa/field/CbmLitFieldQa.h
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.h
      )
 EndIf(Boost_FOUND)
@@ -171,6 +168,8 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.h
       cbm/qa/fit/CbmLitFitQa.h 
       cbm/qa/fit/CbmLitFitQaReport.h
+      cbm/qa/field/CbmLitFieldQa.h
+      cbm/qa/field/CbmLitFieldQaReport.h
  #     cbm/qa/sts/CbmStsSimulationQa.h   
      )
 EndIf(Boost_FOUND)
@@ -199,6 +198,8 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/fit/CbmLitFitQa.cxx
       cbm/qa/fit/CbmLitFitQaReport.cxx
+      cbm/qa/field/CbmLitFieldQa.cxx
+      cbm/qa/field/CbmLitFieldQaReport.cxx
     #  cbm/qa/sts/CbmStsSimulationQa.cxx
      )
 EndIf(Boost_FOUND)

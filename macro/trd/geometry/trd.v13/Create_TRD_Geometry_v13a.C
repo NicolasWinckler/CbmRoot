@@ -21,7 +21,8 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString FileName = "trd_v13a.root";
+const TString geoVersion = "trd_v13a";
+const TString FileName = geoVersion + ".root";
 
 // Parameters defining the layout of the complete detector build out of different detector layers.
 const Int_t   NofLayers = 10;   // max layers
@@ -225,7 +226,7 @@ void Create_TRD_Geometry_v13a() {
   TGeoVolume* top = new TGeoVolume("top", topbox, gGeoMan->GetMedium("air"));
   gGeoMan->SetTopVolume(top);
 
-  TGeoVolume* trd = new TGeoVolumeAssembly("trd1");
+  TGeoVolume* trd = new TGeoVolumeAssembly(geoVersion);
   top->AddNode(trd, 1);
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++) {
@@ -276,6 +277,8 @@ void create_materials_from_media_file()
   FairGeoMedium* mylar            = geoMedia->getMedium("mylar");
   FairGeoMedium* G10              = geoMedia->getMedium("G10");
   FairGeoMedium* PeFoam20         = geoMedia->getMedium("pefoam20");
+  FairGeoMedium* Copper           = geoMedia->getMedium("copper");
+  FairGeoMedium* Kapton           = geoMedia->getMedium("kapton");
 
   geoBuild->createMedium(air);
   geoBuild->createMedium(pefoam20);
@@ -285,6 +288,8 @@ void create_materials_from_media_file()
   geoBuild->createMedium(mylar);
   geoBuild->createMedium(G10);
   geoBuild->createMedium(PeFoam20);
+  geoBuild->createMedium(Copper);
+  geoBuild->createMedium(Kapton);
 }
 
 TGeoVolume* create_trd_module(Int_t moduleType)
@@ -648,7 +653,7 @@ void create_detector_layers(Int_t layerId)
    	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
 
           TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2, module_rotation);  // shift by half layer thickness
-          gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
+          gGeoMan->GetVolume(geoVersion)->AddNode(gModules[type - 1], copy, module_placement);
         }
       }
     }
@@ -675,7 +680,7 @@ void create_detector_layers(Int_t layerId)
           module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
     
           TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2, module_rotation);  // shift by half layer thickness
-          gGeoMan->GetVolume("trd1")->AddNode(gModules[type - 1], copy, module_placement);
+          gGeoMan->GetVolume(geoVersion)->AddNode(gModules[type - 1], copy, module_placement);
         }
       }
     }

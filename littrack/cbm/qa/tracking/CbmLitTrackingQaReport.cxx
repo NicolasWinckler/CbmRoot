@@ -171,6 +171,7 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p");
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_pt", "hte_Sts.*_" + variant + "_All_Eff_pt");
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_y", "hte_Sts.*_" + variant + "_All_Eff_y");
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_angle", "hte_Sts.*_" + variant + "_All_Eff_Angle");
 	}
 
 	// Draw local tracking efficiency
@@ -181,6 +182,9 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re + "_p");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", re + "_pt");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");
+
+		string re2 = (variant == "Sts") ? "hte_Sts_Sts_All_Eff" : "hte_" + variant + "_.*_All_Eff";
+		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_angle", re2 + "_Angle");
 	}
 
 	// Draw local accepted and reconstructed tracks vs number of points

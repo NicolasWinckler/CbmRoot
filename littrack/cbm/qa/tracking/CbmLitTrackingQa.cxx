@@ -558,7 +558,7 @@ void CbmLitTrackingQa::CreateHistograms()
    // STS
  //  CreateEffHist3D("hSts3D", "track");
    CreateH1Efficiency("hte_Sts_Sts", "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-   CreateH1Efficiency("hte_Sts_Sts", "Angle", "Polar angle [grad]",  fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+   CreateH1Efficiency("hte_Sts_Sts", "Angle", "Polar angle [deg]",  fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
    // MUCH
    if (fDet.GetDet(kMUCH)) {
       string norm = LocalEfficiencyNormalization("Much");
@@ -567,7 +567,7 @@ void CbmLitTrackingQa::CreateHistograms()
       CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
       CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
       CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-      CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+      CreateH1Efficiency(histName, "Angle", "Polar angle [deg]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
       CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
    }
    // TRD
@@ -578,7 +578,7 @@ void CbmLitTrackingQa::CreateHistograms()
       CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
       CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
       CreateH1Efficiency(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-      CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+      CreateH1Efficiency(histName, "Angle", "Polar angle [deg]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
       CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
    }
    // TOF
@@ -589,7 +589,7 @@ void CbmLitTrackingQa::CreateHistograms()
       CreateH1Efficiency(histName, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "track");
       CreateH1Efficiency(histName, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
 //    CreateEfficiencyHistogram(histName, "Np", "Number of points", nofBinsPoints, minNofPoints, maxNofPoints, "track");
-      CreateH1Efficiency(histName, "Angle", "Polar angle [grad]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
+      CreateH1Efficiency(histName, "Angle", "Polar angle [deg]", fAngleRangeBins, fAngleRangeMin, fAngleRangeMax, "track");
       CreateH2Efficiency(histName, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "track");
    }
    // RICH

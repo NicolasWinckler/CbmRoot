@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof/"; // Output directory
+   TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof_6m/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -31,9 +31,10 @@ void global_reco(Int_t nEvents = 100, // number of events
 
    // Digi files
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // STS digi file
+   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v12a.digi.root"; // MUCH digi file
+   TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
+   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
 
    // Directory for output results
    TString resultDir = "./test/";
@@ -70,6 +71,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
 		trdDigiFile = TString(gSystem->Getenv("LIT_TRD_DIGI"));
 		muchDigiFile = TString(gSystem->Getenv("LIT_MUCH_DIGI"));
+		stsMatBudgetFile = TString(gSystem->Getenv("LIT_STS_MAT_BUDGET_FILE"));
 
 		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
 		normTrdPoints = TString(gSystem->Getenv("LIT_NORM_TRD_POINTS")).Atoi();
@@ -169,7 +171,8 @@ void global_reco(Int_t nEvents = 100, // number of events
 
 		FairTask* kalman = new CbmKF();
 		run->AddTask(kalman);
-		FairTask* l1 = new CbmL1();
+		CbmL1* l1 = new CbmL1();
+		l1->SetMaterialBudgetFileName(stsMatBudgetFile);
 		run->AddTask(l1);
 		CbmStsTrackFinder* trackFinder = new CbmL1StsTrackFinder();
 		FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);

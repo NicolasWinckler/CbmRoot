@@ -32,7 +32,7 @@ void global_sim(Int_t nEvents = 100)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof/"; // Directory for output simulation files
+	TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof_6m/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -46,24 +46,24 @@ void global_sim(Int_t nEvents = 100)
 		pipeGeom   = "pipe_much.geo";
 		shieldGeom = "shield_standard.geo";
 		mvdGeom    = "mvd/mvd_v07a.geo";
-		stsGeom    = "sts/sts_v11a.geo";
-		muchGeom   = "much/much_v12b_Anna.geo";
+		stsGeom    = "sts/sts_v12b.geo.root";
+		muchGeom   = "much/much_v12b.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
 		tofGeom    = "tof/tof_v07a.geo";
-		fieldMap   = "field_v10e";
-		magnetGeom = "passive/magnet_v09m.geo";
+		fieldMap   = "field_v12a";
+		magnetGeom = "passive/magnet_v12a.geo";
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
-		stsGeom    = "sts/sts_v11a.geo";
-		richGeom   = "";//"rich/rich_v08a.geo";
-		trdGeom    = "";//"trd/trd_v12ala.root";
+		stsGeom    = "sts/sts_v12b.geo.root";
+		richGeom   = "rich/rich_v08a.geo";
+		trdGeom    = "trd/trd_v11c.geo";
 		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
-		fieldMap   = "field_v10e";
-		magnetGeom = "passive/magnet_v09e.geo";
+		fieldMap   = "field_v12a";
+		magnetGeom = "passive/magnet_v12a.geo";
 	}
 
 	// If SCRIPT environment variable is set to "yes", i.e. macro is run via script
@@ -82,7 +82,7 @@ void global_sim(Int_t nEvents = 100)
 		nofJPsiToElectrons = TString(gSystem->Getenv("LIT_NOF_JPSI_TO_ELECTRONS")).Atoi();
 		nofAuIons = TString(gSystem->Getenv("LIT_NOF_AU_IONS")).Atoi();
 		urqmd = TString(gSystem->Getenv("LIT_URQMD"));
-        unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
+      unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
 
 		caveGeom = TString(gSystem->Getenv("LIT_CAVE_GEOM"));
 		targetGeom = TString(gSystem->Getenv("LIT_TARGET_GEOM"));

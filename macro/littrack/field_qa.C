@@ -28,10 +28,8 @@ void field_qa(Int_t nEvents = 1)
 	TStopwatch timer;
 	timer.Start();
 
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
-	cbmrootlibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+	loadlibs();
 
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
@@ -55,7 +53,6 @@ void field_qa(Int_t nEvents = 1)
 	fieldQa->SetZMin(-10);
 	fieldQa->SetZMax(300);
 	fieldQa->SetZStep(5);
-
 	fieldQa->SetOutputDir(std::string(resultDir));
 	run->AddTask(fieldQa);
 

@@ -42,5 +42,6 @@
 #pragma link C++ class CbmLitClusteringQaStudyReport+;
 #pragma link C++ class CbmLitFitQaReport+;
 #pragma link C++ class CbmLitFieldQaReport+;
+#pragma link C++ class CbmLitFieldApproximationQaReport+;
 
 #endif

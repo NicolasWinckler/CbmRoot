@@ -74,9 +74,6 @@ CbmLitFieldApproximationQa::~CbmLitFieldApproximationQa()
 
 InitStatus CbmLitFieldApproximationQa::Init()
 {
-   // Set draw styles
-   SetDefaultDrawStyle();
-
    fNofSlices = fZSlicePosition.size();
    fNofPolynoms = fPolynomDegrees.size();
 
@@ -108,6 +105,24 @@ InitStatus CbmLitFieldApproximationQa::Init()
 
    fHM = new CbmHistManager();
 
+   // Fill and create graphs and histograms
+   CreateHistos();
+
+   // This is always needed since field map is always drawn for comparison
+   FillBHistos();
+
+   // Check and draw polynomial field approximation
+   FillFieldApproximationHistos();
+
+   // Check and draw histograms for grid creator tool
+   FillGridCreatorHistos();
+
+   CbmSimulationReport* report = new CbmLitFieldApproximationQaReport();
+   report->Create(fHM, fOutputDir);
+   delete report;
+
+   fHM->WriteToFile();
+
    return kSUCCESS;
 }
 
@@ -119,31 +134,7 @@ void CbmLitFieldApproximationQa::Exec(
 
 void CbmLitFieldApproximationQa::Finish()
 {
-  // Fill and create graphs and histograms
-   CreateHistos();
 
-   // This is always needed since field map is always drawn for comparison
-   FillBHistos();
-
-   // Check and draw polynomial field approximation
-   FillFieldApproximationHistos();
-   DrawSlices(0, "Apr");
-   DrawSlices(1, "Apr");
-   DrawSlices(2, "Apr");
-   DrawSlices(1, "Apr");
-   DrawPoly("RelErr");
-   DrawPoly("Err");
-
-   // Check and draw histograms for grid creator tool
-   FillGridCreatorHistos();
-   DrawSlices(0, "Grid");
-   DrawSlices(1, "Grid");
-   DrawSlices(2, "Grid");
-   DrawSlices(3, "Grid");
-
-   CreateSimulationReport();
-
-   fHM->WriteToFile();
 }
 
 void CbmLitFieldApproximationQa::CreateHistos()
@@ -151,6 +142,7 @@ void CbmLitFieldApproximationQa::CreateHistos()
    CreateFieldHistos();
    CreateFitterHistos();
    CreateGridHistos();
+   std::cout << fHM->ToString();
 }
 
 void CbmLitFieldApproximationQa::CreateFieldHistos()
@@ -160,7 +152,7 @@ void CbmLitFieldApproximationQa::CreateFieldHistos()
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          TGraph2D* graph = new TGraph2D();
-         string name = "hfa_" + names[v] + "_Graph2D_" + ToString<Int_t>(i);
+         string name = "hfa_" + names[v] + "_Graph2D_" + ToString<Int_t>(fZSlicePosition[i]);
          string title = name + ";X [cm];Y [cm];" + zTitle[v];
          graph->SetNameTitle(name.c_str(), title.c_str());
          fHM->Add(name, graph);
@@ -187,7 +179,7 @@ void CbmLitFieldApproximationQa::CreateFitterHistos()
    }
 
    string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
-   string errTitle[] = {"B_{x} error [%]", "B_{y} error [%]", "B_{z} error [%]", "|B| error [%]"};
+   string errTitle[] = {"B_{x} error [kGauss]", "B_{y} error [kGauss]", "B_{z} error [kGauss]", "|B| error [kGauss]"};
    string relErrTitle[] = {"B_{x} relative error [%]", "B_{y} relative error [%]", "B_{z} relative error [%]", "|B| relative error [%]"};
 
    // Create histograms
@@ -195,24 +187,24 @@ void CbmLitFieldApproximationQa::CreateFitterHistos()
       for (Int_t i = 0; i < fNofSlices; i++) {
          for(Int_t j = 0; j < fNofPolynoms; j++) {
             TGraph2D* graph = new TGraph2D();
-            string name = "hfa_" + names[v] + "Apr_Graph2D" + "_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            string name = "hfa_" + names[v] + "Apr_Graph2D" + "_" + ToString<Int_t>(fZSlicePosition[i]) + "_" + ToString<Int_t>(fPolynomDegrees[j]);
             string title = name + ";X [cm];Y [cm];" + zTitle[v];
             graph->SetNameTitle(name.c_str(), title.c_str());
             fHM->Add(name, graph);
 
-            name = "hfa_" + names[v] + "Err_H1_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            name = "hfa_" + names[v] + "ErrApr_H1_" + ToString<Int_t>(fZSlicePosition[i]) + "_" + ToString<Int_t>(fPolynomDegrees[j]);
             title = name + ";" + errTitle[v] + ";Counter";
             fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsErrB, minErrB, maxErrB));
 
-            name = "hfa_" + names[v] + "ErrApr_H2_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            name = "hfa_" + names[v] + "ErrApr_H2_" + ToString<Int_t>(fZSlicePosition[i]) + "_" + ToString<Int_t>(fPolynomDegrees[j]);
             title = name + ";X [cm];Y [cm];" + errTitle[v];
             fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
 
-            name = "hfa_" + names[v] + "RelErr_H1_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            name = "hfa_" + names[v] + "RelErrApr_H1_" + ToString<Int_t>(fZSlicePosition[i]) + "_" + ToString<Int_t>(fPolynomDegrees[j]);
             title = name + ";" + relErrTitle[v] + ";Counter";
             fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB));
 
-            name = "hfa_" + names[v] + "RelErrApr_H2_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j);
+            name = "hfa_" + names[v] + "RelErrApr_H2_" + ToString<Int_t>(fZSlicePosition[i]) + "_" + ToString<Int_t>(fPolynomDegrees[j]);
             title = name + ";X [cm];Y [cm];" + relErrTitle[v];
             fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
          }
@@ -240,31 +232,31 @@ void CbmLitFieldApproximationQa::CreateGridHistos()
    }
 
    string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
-   string errTitle[] = {"B_{x} error [%]", "B_{y} error [%]", "B_{z} error [%]", "|B| error [%]"};
+   string errTitle[] = {"B_{x} error [kGauss]", "B_{y} error [kGauss]", "B_{z} error [kGauss]", "|B| error [kGauss]"};
    string relErrTitle[] = {"B_{x} relative error [%]", "B_{y} relative error [%]", "B_{z} relative error [%]", "|B| relative error [%]"};
 
    // Create histograms
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
          TGraph2D* graph = new TGraph2D();
-         string name = "hfa_" + names[v] + "Grid_Graph2D_" + ToString<Int_t>(i);
+         string name = "hfa_" + names[v] + "Grid_Graph2D_" + ToString<Int_t>(fZSlicePosition[i]);
          string title = name + ";X [cm]; Y [cm];" + zTitle[v];
          graph->SetNameTitle(name.c_str(), title.c_str());
          fHM->Add(name, graph);
 
-         name = "hfa_" + names[v] + "ErrGrid_H1_" + ToString<Int_t>(i);
+         name = "hfa_" + names[v] + "ErrGrid_H1_" + ToString<Int_t>(fZSlicePosition[i]);
          title = name + ";" + errTitle[v] + ";Counter";
          fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsErrB, minErrB, maxErrB));
 
-         name = "hfa_" + names[v] +"ErrGrid_H2_" + ToString<Int_t>(i);
+         name = "hfa_" + names[v] +"ErrGrid_H2_" + ToString<Int_t>(fZSlicePosition[i]);
          title = name + ";X [cm];Y [cm];" + errTitle[v];
          fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
 
-         name = "hfa_" + names[v] + "RelErrGrid_H1_" + ToString<Int_t>(i);
+         name = "hfa_" + names[v] + "RelErrGrid_H1_" + ToString<Int_t>(fZSlicePosition[i]);
          title = name + ";" + relErrTitle[v] + ";Counter";
          fHM->Add(name, new TH1D(name.c_str(), title.c_str(), nofBinsRelErrB, minRelErrB, maxRelErrB));
 
-         name = "hfa_" + names[v] + "RelErrGrid_H2_" + ToString<Int_t>(i);
+         name = "hfa_" + names[v] + "RelErrGrid_H2_" + ToString<Int_t>(fZSlicePosition[i]);
          title = name + ";X [cm];Y [cm];" + relErrTitle[v];
          fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
       }
@@ -297,11 +289,11 @@ void CbmLitFieldApproximationQa::FillBHistos()
 
             Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-            string s = ToString<Int_t>(iSlice);
-            fHM->G2(string("hfa_Bx_Graph2D") + s)->SetPoint(cnt, X, Y, B[0]);
-            fHM->G2(string("hfa_By_Graph2D") + s)->SetPoint(cnt, X, Y, B[1]);
-            fHM->G2(string("hfa_Bz_Graph2D") + s)->SetPoint(cnt, X, Y, B[2]);
-            fHM->G2(string("hfa_Mod_Graph2D") + s)->SetPoint(cnt, X, Y, Bmod);
+            string s = ToString<Int_t>(fZSlicePosition[iSlice]);
+            fHM->G2(string("hfa_Bx_Graph2D_") + s)->SetPoint(cnt, X, Y, B[0]);
+            fHM->G2(string("hfa_By_Graph2D_") + s)->SetPoint(cnt, X, Y, B[1]);
+            fHM->G2(string("hfa_Bz_Graph2D_") + s)->SetPoint(cnt, X, Y, B[2]);
+            fHM->G2(string("hfa_Mod_Graph2D_") + s)->SetPoint(cnt, X, Y, Bmod);
             cnt++;
          }
       }
@@ -344,7 +336,7 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
                LitFieldValue<float> v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
                Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
-               string s = ToString<Int_t>(iSlice) + "_" + ToString<Int_t>(p);
+               string s = ToString<Int_t>(fZSlicePosition[iSlice]) + "_" + ToString<Int_t>(fPolynomDegrees[p]);
                fHM->G2(string("hfa_BxApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bx);
                fHM->G2(string("hfa_ByApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.By);
                fHM->G2(string("hfa_BzApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bz);
@@ -392,7 +384,7 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
                Double_t relErrBz = (B[2] != 0.) ? (errBz / B[2]) * 100. : 0.;
                Double_t relErrMod = (Bmod != 0.) ? (errMod / Bmod) * 100. : 0;
 
-               string s = ToString<Int_t>(iSlice) + "_" + ToString<Int_t>(p);
+               string s = ToString<Int_t>(fZSlicePosition[iSlice]) + "_" + ToString<Int_t>(fPolynomDegrees[p]);
                fHM->H1(string("hfa_BxErrApr_H1_") + s)->Fill(errBx);
                fHM->H1(string("hfa_BxRelErrApr_H1_") + s)->Fill(relErrBx);
                fHM->H2(string("hfa_BxErrApr_H2_") + s)->Fill(X, Y, errBx);
@@ -436,7 +428,7 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
-            string s = ToString<Int_t>(iSlice);
+            string s = ToString<Int_t>(fZSlicePosition[iSlice]);
             fHM->G2(string("hfa_BxGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bx);
             fHM->G2(string("hfa_ByGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.By);
             fHM->G2(string("hfa_BzGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bz);
@@ -478,7 +470,7 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             Double_t relErrBz = (B[2] != 0.) ? (errBz / B[2]) * 100. : 0.;
             Double_t relErrMod = (Bmod != 0.) ? (errMod / Bmod) * 100. : 0;
 
-            string s = ToString<Int_t>(iSlice);
+            string s = ToString<Int_t>(fZSlicePosition[iSlice]);
             fHM->H1(string("hfa_BxErrGrid_H1_") + s)->Fill(errBx);
             fHM->H1(string("hfa_BxRelErrGrid_H1_") + s)->Fill(relErrBx);
             fHM->H2(string("hfa_BxErrGrid_H2_") + s)->Fill(X, Y, errBx);
@@ -497,89 +489,6 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             fHM->H2(string("hfa_ModRelErrGrid_H2_") + s)->Fill(X, Y, relErrMod);
          }
       }
-   }
-}
-
-void CbmLitFieldApproximationQa::CreateSimulationReport()
-{
-   CbmSimulationReport* report = new CbmLitFieldApproximationQaReport();
-   report->Create(fHM, fOutputDir);
-   delete report;
-}
-
-
-void CbmLitFieldApproximationQa::DrawSlices(
-   Int_t v,
-   const std::string& opt)
-{
-   string names[] = {"Bx", "By", "Bz", "Mod"};
-   for (Int_t i = 0; i < fNofSlices; i++) {
-	   string canvasName = "fieldapr_qa_slice_" + names[v] + "_z_" + ToString<Float_t>(fZSlicePosition[i]) + "_" + opt;
-	   TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 800);
-	   canvas->Divide(3, 2);
-
-	   string s1 = string("hfa_") + names[v];
-	   string s2 = opt;
-	   string s3 = (opt == "Grid") ? ToString<Int_t>(i) : ToString<Int_t>(i) + "_" + ToString<Int_t>(fPolynomDegreeIndex);
-
-      canvas->cd(1);
-      DrawGraph2D(fHM->G2(s1 + s2 + "_Graph2D" + s3));
-
-      canvas->cd(2);
-      DrawH1(fHM->H1(s1 + "Err" + s2 + "_H1_" + s3), kLinear, kLog);
-
-      canvas->cd(3);
-      DrawH2(fHM->H2(s1 + "Err" + s2 + "_H2_" + s3));
-
-      canvas->cd(4);
-      DrawGraph2D(fHM->G2(s1 + s2 + "_Graph2D_" + s3));
-
-      canvas->cd(5);
-      DrawH1(fHM->H1(s1 + "RelErr" + s2 + "_H1_" + s3), kLinear, kLog);
-
-      canvas->cd(6);
-      DrawH2(fHM->H2(s1 + "RelErr" + s2 + "_H2_" + s3));
-
-      SaveCanvasAsImage(canvas, fOutputDir);
-   }
-}
-
-void CbmLitFieldApproximationQa::DrawPoly(
-   const std::string& opt)
-{
-   string names[] = {"Bx", "By", "Bz", "Mod"};
-   for (Int_t i = 0; i < fNofSlices; i++) {
-	  string canvasName = "fieldapr_qa_" + opt + "_degree_z_" + ToString<Float_t>(fZSlicePosition[i]);
-	  TCanvas* canvas = new TCanvas(canvasName.c_str(), canvasName.c_str(), 1200, 800);
-      canvas->Divide(3, 2);
-
-      TLegend* l1 = new TLegend(0.1,0.1,0.9,0.9);
-      l1->SetFillColor(kWhite);
-      l1->SetTextSize(0.1);
-      l1->SetLineWidth(1);
-      l1->SetHeader("Polynomial degree");
-      for (Int_t v = 0; v < 4; v++) {
-    	 TH1* firsthist = fHM->H1(string("hfa_") + names[v] + opt + "Apr_H2_" + ToString<Int_t>(i) + "_0");
-         Double_t max = firsthist->GetMaximum();
-         for (Int_t j = 0; j < fNofPolynoms; j++) {
-            canvas->cd(v+2);
-            TH1* hist1 = fHM->H1(string("hfa_") + names[v] + opt + "Apr_H2_" + ToString<Int_t>(i) + "_" + ToString<Int_t>(j));
-            if (max < hist1->GetMaximum()) { max = hist1->GetMaximum(); }
-            string draw_opt = (j == 0) ? "" : "SAME";
-            DrawH1(hist1, kLinear, kLog, draw_opt.c_str(), 1 + j, CbmDrawingOptions::LineWidth(), 1 + j, CbmDrawingOptions::MarkerSize(), kDot);
-
-            if (v == 0) {
-               string str = lit::ToString<Int_t>(fPolynomDegrees[j]);
-               l1->AddEntry(hist1, str.c_str(), "lp");
-            }
-         }
-         firsthist->SetMaximum(1.2 * max);
-      }
-
-      canvas->cd(1);
-      l1->Draw();
-
-      SaveCanvasAsImage(canvas, fOutputDir);
    }
 }
 

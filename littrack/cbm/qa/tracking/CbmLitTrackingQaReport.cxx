@@ -38,8 +38,6 @@ CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 
 void CbmLitTrackingQaReport::Create()
 {
-   FillGlobalTrackVariants();
-
    Out().precision(3);
    Out() << R()->DocumentBegin();
    Out() << R()->Title(0, GetTitle());
@@ -157,6 +155,7 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
 
 void CbmLitTrackingQaReport::Draw()
 {
+   FillGlobalTrackVariants();
 	SetDefaultDrawStyle();
 	DrawEfficiencyHistos();
 	DrawYPtHistos();
@@ -361,7 +360,8 @@ Double_t CbmLitTrackingQaReport::CalcEfficiency(
 
 void CbmLitTrackingQaReport::FillGlobalTrackVariants()
 {
-   vector<TH1*> histos = HM()->H1Vector("hte_*_Eff_p");
+   fGlobalTrackVariants.clear();
+   vector<TH1*> histos = HM()->H1Vector("hte_.*_Eff_p");
    Int_t nofHistos = histos.size();
    set<string> variants;
    for (Int_t iHist = 0; iHist < nofHistos; iHist++) {

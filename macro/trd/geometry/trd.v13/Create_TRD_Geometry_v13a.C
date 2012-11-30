@@ -21,10 +21,10 @@
 #include <iostream>
 
 // Name of output file with geometry
-// const TString geoVersion = "trd_v13a";
-// const TString FileName = geoVersion + ".root";
-const TString geoVersion = "trd1";
-const TString FileName = "trd_v13a.root";
+const TString geoVersion = "trd_v13x";
+const TString FileName = geoVersion + ".root";
+//const TString geoVersion = "trd1";
+//const TString FileName = "trd_v13x.root";
 
 // Parameters defining the layout of the complete detector build out of different detector layers.
 const Int_t   NofLayers = 10;   // max layers
@@ -249,8 +249,8 @@ void Create_TRD_Geometry_v13a() {
   gGeoMan->Test();
 
   TFile* outfile = new TFile(FileName,"RECREATE");
-  top->Write();
-  //gGeoMan->Write();
+  //  top->Write();
+  gGeoMan->Write();
   outfile->Close();
   top->Draw("ogl");
   //top->Raytrace();

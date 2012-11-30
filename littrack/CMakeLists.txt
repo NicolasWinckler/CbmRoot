@@ -90,7 +90,6 @@ cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
 cbm/qa/material/CbmLitCheckBrem.cxx 
 cbm/qa/mc/CbmLitMCTrack.cxx
 cbm/qa/mc/CbmLitMCTrackCreator.cxx
-cbm/qa/CbmTrdHitsQa.cxx
 cbm/qa/CbmLitCreateStandaloneData.cxx
 cbm/qa/CbmLitTestMatrixMath.cxx
 
@@ -136,7 +135,6 @@ cbm/qa/geo/CbmLitTrackingGeoQa.h
 cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
 cbm/qa/material/CbmLitCheckMultipleScattering.h
 cbm/qa/material/CbmLitCheckBrem.h 
-cbm/qa/CbmTrdHitsQa.h
 cbm/qa/CbmLitCreateStandaloneData.h
 cbm/qa/CbmLitTestMatrixMath.h
 )

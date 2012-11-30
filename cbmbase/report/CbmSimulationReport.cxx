@@ -45,8 +45,8 @@ void CbmSimulationReport::Create(
    fHM->ReadFromFile(file);
    SetOutputDir(outputDir);
    CreateReports();
-   delete fHM;
-   delete file;
+//   delete fHM;
+//   delete file;
 }
 
 ClassImp(CbmSimulationReport)

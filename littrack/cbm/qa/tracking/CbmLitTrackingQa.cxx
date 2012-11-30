@@ -337,7 +337,7 @@ void CbmLitTrackingQa::FillTrackCategories()
    fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["KaonMinus"] = KaonPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunction;
 }
 
 void CbmLitTrackingQa::FillRingCategories()

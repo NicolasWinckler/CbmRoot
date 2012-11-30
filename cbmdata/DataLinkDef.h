@@ -67,9 +67,9 @@
 #pragma link C++ class CbmEcalRecParticle+;
 #pragma link C++ class CbmEcalIdParticle+;
 
-
-#pragma link C++ class CbmZdcPoint+;
-#pragma link C++ class CbmZdcEvent+;
+#pragma link C++ class CbmPsdDigi;
+#pragma link C++ class CbmPsdHit;
+#pragma link C++ class CbmPsdPoint;
 
 #pragma link C++ class CbmSttPoint+;
 #pragma link C++ class CbmSttHit+;

@@ -1,30 +1,30 @@
 // -------------------------------------------------------------------------
-// -----                    CbmZdcPoint header file                   -----
+// -----                    CbmPsdPoint header file                   -----
 // -----                 Created 28/07/04  by V. Friese                -----
 // -------------------------------------------------------------------------
 
-/**  CbmZdcPoint.h
+/**  CbmPsdPoint.h
  *@author V. Friese
  **
  ** Interception of MC track with the plane representing the ECAL.
  **/
 
 
-#ifndef CBMZDCPOINT_H
-#define CBMZDCPOINT_H 1
+#ifndef CBMPSDPOINT_H
+#define CBMPSDPOINT_H 1
 
 
 #include "FairMCPoint.h"
 
 class Tvector3;
 
-class CbmZdcPoint : public FairMCPoint
+class CbmPsdPoint : public FairMCPoint
 {
 
  public:
 
   /** Default constructor **/
-  CbmZdcPoint();
+  CbmPsdPoint();
 
 
   /** Constructor with arguments
@@ -36,16 +36,16 @@ class CbmZdcPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  CbmZdcPoint(Int_t trackID, Int_t detID,  TVector3 pos, TVector3 mom, 
+  CbmPsdPoint(Int_t trackID, Int_t detID,  TVector3 pos, TVector3 mom, 
 	       Double_t tof, Double_t length, Double_t eLoss);
 
 
   /** Copy constructor **/
-  //  CbmZdcPoint(const CbmZdcPoint& point) { *this = point; };
+  //  CbmPsdPoint(const CbmPsdPoint& point) { *this = point; };
 
 
   /** Destructor **/
-  virtual ~CbmZdcPoint();
+  virtual ~CbmPsdPoint();
 
 
   /** Output to screen **/
@@ -60,7 +60,7 @@ class CbmZdcPoint : public FairMCPoint
   Int_t fModuleID; //number of module
 
   
-  ClassDef(CbmZdcPoint,2)
+  ClassDef(CbmPsdPoint,2)
 
 };
 

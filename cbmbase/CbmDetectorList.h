@@ -13,7 +13,7 @@
 #define CBMDETECTORLIST_H 1
  
 enum DetectorId {kREF,  kMVD, kSTS, kRICH, kMUCH, kTRD, kTOF, 
-		 kECAL, kZDC, kSTT, kTutDet};
+		 kECAL, kPSD, kSTT, kTutDet};
 
 
 enum DataType {  

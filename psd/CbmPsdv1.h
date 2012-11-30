@@ -1,9 +1,9 @@
 // -------------------------------------------------------------------------
-// -----                         CbmZdcv1 header file                 -----
+// -----                         CbmPsdv1 header file                 -----
 // -----                  Created 04/02/05  by Yu.Kharlov              -----
 // -------------------------------------------------------------------------
 
-/**  CbmZdc.h
+/**  CbmPsd.h
  *@author Yuri Kharlov <Yuri.Kharlov@ihep.ru>
  **
  ** Defines the active detector ECAL with geometry coded here.
@@ -11,43 +11,43 @@
 
 
 
-#ifndef CBMZDCV1_H
-#define CBMZDCV1_H
+#ifndef CBMPSDV1_H
+#define CBMPSDV1_H
 
 
-#include "CbmZdc.h"
+#include "CbmPsd.h"
 
 #include "TLorentzVector.h"
 
-class CbmZdcPoint; 
+class CbmPsdPoint; 
 class FairVolume;
 class TClonesArray;
 
 
-class CbmZdcv1 : public CbmZdc
+class CbmPsdv1 : public CbmPsd
 {
 
  public:
 
   /** Default constructor **/
-  CbmZdcv1();
+  CbmPsdv1();
 
 
   /** Standard constructor.
    *@param name    detetcor name
    *@param active  sensitivity flag
    **/
-  CbmZdcv1(const char* name, Bool_t active);
+  CbmPsdv1(const char* name, Bool_t active);
 
 
   /** Destructor **/
-  virtual ~CbmZdcv1();
+  virtual ~CbmPsdv1();
 
 
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
-   ** active volume. Creates CbmZdcPoints and adds them to the
+   ** active volume. Creates CbmPsdPoints and adds them to the
    ** collection.
    *@param vol  Pointer to the active volume
    **/
@@ -56,7 +56,7 @@ class CbmZdcv1 : public CbmZdc
 
   /** Virtual method Construct geometry
    **
-   ** Constructs the ZDC geometry
+   ** Constructs the PSD geometry
    **/
   virtual void CreateMaterial();
   virtual void ConstructGeometry();
@@ -76,7 +76,7 @@ class CbmZdcv1 : public CbmZdc
    Double32_t     fEloss;             //!  energy loss
  
   Int_t          fPosIndex;          //!
-  TClonesArray*  fZdcCollection;     //! Hit collection
+  TClonesArray*  fPsdCollection;     //! Hit collection
 
   /** Private method ResetParameters
    **
@@ -84,14 +84,12 @@ class CbmZdcv1 : public CbmZdc
    **/
   void ResetParameters();
 
-  CbmZdcv1(const CbmZdcv1&);
-  CbmZdcv1& operator=(const CbmZdcv1&);
 
-  ClassDef(CbmZdcv1,2)
+  ClassDef(CbmPsdv1,2)
 
 };
 
-inline void CbmZdcv1::ResetParameters() {
+inline void CbmPsdv1::ResetParameters() {
   fTrackID = fVolumeID = fModuleID = 0;
   fPos.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMom.SetXYZM(0.0, 0.0, 0.0, 0.0);

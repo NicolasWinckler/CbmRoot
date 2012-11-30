@@ -114,7 +114,7 @@ void CbmMCTrack::Print(Int_t trackId) const {
        << ", STS " << GetNPoints(kSTS) << ", RICH " << GetNPoints(kRICH)
        << ", MUCH " << GetNPoints(kMUCH) << ", TRD " << GetNPoints(kTRD)
        << ", TOF " << GetNPoints(kTOF) << ", ECAL " << GetNPoints(kECAL) 
-       << ", ZDC " << GetNPoints(kZDC) << endl;
+       << ", PSD " << GetNPoints(kPSD) << endl;
 }
 // -------------------------------------------------------------------------
 
@@ -155,7 +155,7 @@ Int_t CbmMCTrack::GetNPoints(DetectorId detId) const {
   else if ( detId == kTRD  ) return ( (fNPoints & (31 << 15) ) >> 15);
   else if ( detId == kTOF  ) return ( (fNPoints & (15 << 20) ) >> 20);
   else if ( detId == kECAL ) return ( (fNPoints & ( 1 << 24) ) >> 24);
-  else if ( detId == kZDC  ) return ( (fNPoints & ( 1 << 25) ) >> 25);
+  else if ( detId == kPSD  ) return ( (fNPoints & ( 1 << 25) ) >> 25);
   else {
     cout << "-E- CbmMCTrack::GetNPoints: Unknown detector ID "
 	 << detId << endl;
@@ -217,7 +217,7 @@ void CbmMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
     fNPoints = ( fNPoints & ( ~ (  1 << 24 ) ) )  |  ( nPoints << 24 );
   }
 
-  else if ( iDet == kZDC ) {
+  else if ( iDet == kPSD ) {
     if      ( nPoints < 0 ) nPoints = 0;
     else if ( nPoints > 1 ) nPoints = 1;
     fNPoints = ( fNPoints & ( ~ (  1 << 25 ) ) )  |  ( nPoints << 25 );

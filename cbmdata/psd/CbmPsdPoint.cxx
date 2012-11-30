@@ -1,10 +1,10 @@
 // -------------------------------------------------------------------------
-// -----                      CbmZdcPoint source file                 -----
+// -----                      CbmPsdPoint source file                 -----
 // -----                   Created 28/07/04  by V. Friese              -----
 // -------------------------------------------------------------------------
 
 
-#include "CbmZdcPoint.h"
+#include "CbmPsdPoint.h"
 
 #include <iostream>
 using std::cout;
@@ -12,7 +12,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmZdcPoint::CbmZdcPoint() 
+CbmPsdPoint::CbmPsdPoint() 
   : FairMCPoint(), 
     fModuleID(0)
 {
@@ -22,7 +22,7 @@ CbmZdcPoint::CbmZdcPoint()
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmZdcPoint::CbmZdcPoint(Int_t trackID, Int_t detID, TVector3 pos, 
+CbmPsdPoint::CbmPsdPoint(Int_t trackID, Int_t detID, TVector3 pos, 
 			   TVector3 mom, Double_t tof, Double_t length, 
 			   Double_t eLoss)
   : FairMCPoint(trackID, detID, pos, mom, tof, length, eLoss), 
@@ -33,14 +33,14 @@ CbmZdcPoint::CbmZdcPoint(Int_t trackID, Int_t detID, TVector3 pos,
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmZdcPoint::~CbmZdcPoint() { }
+CbmPsdPoint::~CbmPsdPoint() { }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmZdcPoint::Print(const Option_t* opt) const {
-  cout << "-I- CbmZdcPoint: ECAL point for track " << fTrackID 
+void CbmPsdPoint::Print(const Option_t* opt) const {
+  cout << "-I- CbmPsdPoint: ECAL point for track " << fTrackID 
        << " in detector " << fDetectorID << endl;
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
@@ -52,4 +52,4 @@ void CbmZdcPoint::Print(const Option_t* opt) const {
 // -------------------------------------------------------------------------
 
 
-ClassImp(CbmZdcPoint)
+ClassImp(CbmPsdPoint)

@@ -1,14 +1,15 @@
 // -------------------------------------------------------------------------
-// -----                       CbmZdc source file                     -----
+// -----                       CbmPsd source file                     -----
 // -----                  Created 27/07/04  by V. Friese               -----
 // -------------------------------------------------------------------------
 
-#include "CbmZdc.h"
+#include "CbmPsd.h"
 
-#include "CbmGeoZdc.h"
-#include "CbmGeoZdcPar.h"
-#include "CbmZdcPoint.h"
+#include "CbmGeoPsd.h"
+#include "CbmGeoPsdPar.h"
+#include "CbmPsdPoint.h"
 #include "CbmDetectorList.h"
+#include "CbmStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
@@ -28,38 +29,20 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmZdc::CbmZdc() 
-  : FairDetector("ZDC", kTRUE, kZDC),
-    fDebug(""),
-    fTrackID(-1),
-    fVolumeID(-1),
-    fPos(),
-    fMom(),
-    fTime(-1.),
-    fLength(-1.),
-    fELoss(-1.),
-    fPosIndex(0),
-    fZdcCollection(new TClonesArray("CbmZdcPoint"))
-{
+CbmPsd::CbmPsd() : FairDetector("PSD", kTRUE, kPSD) {
+  fPsdCollection = new TClonesArray("CbmPsdPoint");
+  fPosIndex = 0;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmZdc::CbmZdc(const char* name, Bool_t active)
-  : FairDetector(name, active, kZDC), 
-    fDebug(""),
-    fTrackID(-1),
-    fVolumeID(-1),
-    fPos(),
-    fMom(),
-    fTime(-1.),
-    fLength(-1.),
-    fELoss(-1.),
-    fPosIndex(0),
-    fZdcCollection(new TClonesArray("CbmZdcPoint"))
-{
+CbmPsd::CbmPsd(const char* name, Bool_t active)
+  : FairDetector(name, active, kPSD) {
+  fPsdCollection = new TClonesArray("CbmPsdPoint");
+  fPosIndex = 0;
+  fDebug    = "";
 }
 
 // -------------------------------------------------------------------------
@@ -67,10 +50,10 @@ CbmZdc::CbmZdc(const char* name, Bool_t active)
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmZdc::~CbmZdc() {
- if (fZdcCollection) {
-   fZdcCollection->Delete(); 
-   delete fZdcCollection;
+CbmPsd::~CbmPsd() {
+ if (fPsdCollection) {
+   fPsdCollection->Delete(); 
+   delete fPsdCollection;
  }
 }
 // -------------------------------------------------------------------------
@@ -78,7 +61,7 @@ CbmZdc::~CbmZdc() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmZdc::ProcessHits(FairVolume* vol)
+Bool_t  CbmPsd::ProcessHits(FairVolume* vol)
 {
   // Stores all particles at entrance to active detector. 
  
@@ -93,7 +76,7 @@ Bool_t  CbmZdc::ProcessHits(FairVolume* vol)
     fVolumeID = vol->getMCid();
     fTime     = gMC->TrackTime() * 1.0e09;   // conversion to ns
     fLength   = gMC->TrackLength();
-    Double_t mass = gMC->TrackMass();
+    Double_t mass = gMC->TrackMass(); 
 
     // Calculate kinetic energy
     Double_t ekin = TMath::Sqrt( fMom.Px()*fMom.Px() +
@@ -102,19 +85,21 @@ Bool_t  CbmZdc::ProcessHits(FairVolume* vol)
 				 mass * mass ) - mass;
     fELoss = ekin;
 
-    // Create CbmZdcPoint
+    // Create CbmPsdPoint
     AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
 	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength, 
 	   fELoss);
-
-    // Increment number of ecal points for TParticle
-    Int_t points = gMC->GetStack()->GetCurrentTrack()->GetMother(1);
-    Int_t nZdcPoints = (points & (15<<16)) >> 16;
-    nZdcPoints ++;
-    if (nZdcPoints > 15) nZdcPoints = 15;
-    points = ( points & ( ~ (15<<16) ) ) | (nZdcPoints << 16);
-    gMC->GetStack()->GetCurrentTrack()->SetMother(1,points);
-
+ 
+    ((CbmStack*)gMC->GetStack())->AddPoint(kPSD, fTrackID);
+  /*
+  // Increment number of ecal points for TParticle
+  Int_t points = gMC->GetStack()->GetCurrentTrack()->GetMother(1);
+  Int_t nPsdPoints = (points & (15<<16)) >> 16;
+  nPsdPoints ++;
+  if (nPsdPoints > 15) nPsdPoints = 15;
+  points = ( points & ( ~ (15<<16) ) ) | (nPsdPoints << 16);
+  gMC->GetStack()->GetCurrentTrack()->SetMother(1,points);
+  */
     ResetParameters();
     
   }
@@ -126,9 +111,9 @@ Bool_t  CbmZdc::ProcessHits(FairVolume* vol)
 
 
 // -----   Public method EndOfEvent   --------------------------------------
-void CbmZdc::EndOfEvent() {
+void CbmPsd::EndOfEvent() {
   if (fVerboseLevel) Print();
-  fZdcCollection->Clear();
+  fPsdCollection->Clear();
   fPosIndex = 0;
 }
 // -------------------------------------------------------------------------
@@ -136,17 +121,17 @@ void CbmZdc::EndOfEvent() {
 
 
 // -----   Public method Register   ----------------------------------------
-void CbmZdc::Register() {
-  FairRootManager::Instance()->Register("ZdcPoint", "Zdc", 
-  				       fZdcCollection, kTRUE);
+void CbmPsd::Register() {
+  FairRootManager::Instance()->Register("PsdPoint", "Psd", 
+  				       fPsdCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Public method GetCollection   -----------------------------------
-TClonesArray* CbmZdc::GetCollection(Int_t iColl) const {
-  if (iColl == 0) return fZdcCollection;
+TClonesArray* CbmPsd::GetCollection(Int_t iColl) const {
+  if (iColl == 0) return fPsdCollection;
   else return NULL;
 }
 // -------------------------------------------------------------------------
@@ -154,20 +139,20 @@ TClonesArray* CbmZdc::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmZdc::Print() const {
-  Int_t nHits = fZdcCollection->GetEntriesFast();
-  cout << "-I- CbmZdc: " << nHits << " points registered in this event." 
+void CbmPsd::Print() const {
+  Int_t nHits = fPsdCollection->GetEntriesFast();
+  cout << "-I- CbmPsd: " << nHits << " points registered in this event." 
        << endl;
   if (fVerboseLevel>1)
-    for (Int_t i=0; i<nHits; i++) (*fZdcCollection)[i]->Print();
+    for (Int_t i=0; i<nHits; i++) (*fPsdCollection)[i]->Print();
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Public method Reset   -------------------------------------------
-void CbmZdc::Reset() {
-  fZdcCollection->Clear();
+void CbmPsd::Reset() {
+  fPsdCollection->Clear();
   ResetParameters();
 }
 // -------------------------------------------------------------------------
@@ -175,19 +160,19 @@ void CbmZdc::Reset() {
 
 
 // -----   Public method CopyClones   --------------------------------------
-void CbmZdc::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
+void CbmPsd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- CbmZdc: " << nEntries << " entries to add." << endl;
+  cout << "-I- CbmPsd: " << nEntries << " entries to add." << endl;
   TClonesArray& clref = *cl2;
-  CbmZdcPoint* oldpoint = NULL;
+  CbmPsdPoint* oldpoint = NULL;
    for (Int_t i=0; i<nEntries; i++) {
-   oldpoint = (CbmZdcPoint*) cl1->At(i);
+   oldpoint = (CbmPsdPoint*) cl1->At(i);
     Int_t index = oldpoint->GetTrackID() + offset;
     oldpoint->SetTrackID(index);
-    new (clref[fPosIndex]) CbmZdcPoint(*oldpoint);
+    new (clref[fPosIndex]) CbmPsdPoint(*oldpoint);
     fPosIndex++;
   }
-  cout << "-I- CbmZdc: " << cl2->GetEntriesFast() << " merged entries." 
+  cout << "-I- CbmPsd: " << cl2->GetEntriesFast() << " merged entries." 
        << endl;
 }
 // -------------------------------------------------------------------------
@@ -195,11 +180,11 @@ void CbmZdc::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
 
 
 // -----   Public method ConstructGeometry   -------------------------------
-void CbmZdc::ConstructGeometry() {
+void CbmPsd::ConstructGeometry() {
 
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  CbmGeoZdc*       trdGeo  = new CbmGeoZdc();
+  CbmGeoPsd*       trdGeo  = new CbmGeoPsd();
   trdGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(trdGeo);
 
@@ -209,7 +194,7 @@ void CbmZdc::ConstructGeometry() {
  // store TRD geo parameter
   FairRun *fRun = FairRun::Instance();
   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  CbmGeoZdcPar* par=(CbmGeoZdcPar*)(rtdb->getContainer("CbmGeoZdcPar"));
+  CbmGeoPsdPar* par=(CbmGeoPsdPar*)(rtdb->getContainer("CbmGeoPsdPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
@@ -234,16 +219,16 @@ void CbmZdc::ConstructGeometry() {
 
 
 // -----   Private method AddHit   -----------------------------------------
-CbmZdcPoint* CbmZdc::AddHit(Int_t trackID, Int_t detID, TVector3 pos,
+CbmPsdPoint* CbmPsd::AddHit(Int_t trackID, Int_t detID, TVector3 pos,
 			    TVector3 mom, Double_t time, Double_t length, 
 			    Double_t eLoss) {
-  TClonesArray& clref = *fZdcCollection;
+  TClonesArray& clref = *fPsdCollection;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) CbmZdcPoint(trackID, detID, pos, mom,
+  return new(clref[size]) CbmPsdPoint(trackID, detID, pos, mom,
 				      time, length, eLoss);
 }
 // -------------------------------------------------------------------------
 
 
 
-ClassImp(CbmZdc)
+ClassImp(CbmPsd)

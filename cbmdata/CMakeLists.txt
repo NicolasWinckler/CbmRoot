@@ -80,8 +80,9 @@ ecal/CbmEcalCluster.cxx
 ecal/CbmEcalRecParticle.cxx
 ecal/CbmEcalIdParticle.cxx
 
-zdc/CbmZdcPoint.cxx  
-zdc/CbmZdcEvent.cxx
+psd/CbmPsdDigi.cxx
+psd/CbmPsdHit.cxx
+psd/CbmPsdPoint.cxx
 
 stt/CbmSttPoint.cxx
 stt/CbmSttHit.cxx

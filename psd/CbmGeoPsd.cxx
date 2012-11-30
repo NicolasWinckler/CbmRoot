@@ -8,25 +8,25 @@
 //
 /////////////////////////////////////////////////////////////
 
-#include "CbmGeoZdc.h"
+#include "CbmGeoPsd.h"
 
-ClassImp(CbmGeoZdc)
+ClassImp(CbmGeoPsd)
 
-CbmGeoZdc::CbmGeoZdc() {
+CbmGeoPsd::CbmGeoPsd() {
   // Constructor
-  fName="zdc";
+  fName="psd";
   maxSectors=0;
   maxModules=10;
 }
 
-const char* CbmGeoZdc::getModuleName(Int_t m) {
+const char* CbmGeoPsd::getModuleName(Int_t m) {
   // Returns the module name of ecal number m
-  sprintf(modName,"zdc%i",m+1);
+  sprintf(modName,"psd%i",m+1);
   return modName;
 }
 
-const char* CbmGeoZdc::getEleName(Int_t m) {
-  // Returns the element name of zdc number m
-  sprintf(eleName,"zdcd%i",m+1);
+const char* CbmGeoPsd::getEleName(Int_t m) {
+  // Returns the element name of psd number m
+  sprintf(eleName,"psdd%i",m+1);
   return eleName;
 }

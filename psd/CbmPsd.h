@@ -1,9 +1,9 @@
 // -------------------------------------------------------------------------
-// -----                         CbmZdc header file                   -----
+// -----                         CbmPsd header file                   -----
 // -----                  Created 27/07/04  by V. Friese               -----
 // -------------------------------------------------------------------------
 
-/**  CbmZdc.h
+/**  CbmPsd.h
  *@author V.Friese <v.friese@gsi.de>
  **
  ** Defines the active detector ECAL. Constructs the geometry and
@@ -12,42 +12,42 @@
 
 
 
-#ifndef CBMZDC_H
-#define CBMZDC_H
+#ifndef CBMPSD_H
+#define CBMPSD_H
 
 #include "FairDetector.h"
 
 #include "TLorentzVector.h"
 
-class CbmZdcPoint; 
+class CbmPsdPoint; 
 class FairVolume;
 class TClonesArray;
 
 
-class CbmZdc : public FairDetector 
+class CbmPsd : public FairDetector 
 {
 
  public:
 
   /** Default constructor **/
-  CbmZdc();
+  CbmPsd();
 
 
   /** Standard constructor.
    *@param name    detetcor name
    *@param active  sensitivity flag
    **/
-  CbmZdc(const char* name, Bool_t active);
+  CbmPsd(const char* name, Bool_t active);
 
 
   /** Destructor **/
-  virtual ~CbmZdc();
+  virtual ~CbmPsd();
 
 
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
-   ** active volume. Creates CbmZdcPoints and adds them to the
+   ** active volume. Creates CbmPsdPoints and adds them to the
    ** collection.
    *@param vol  Pointer to the active volume
    **/
@@ -103,6 +103,10 @@ class CbmZdc : public FairDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual void SetXshift (Float_t xshift=10) {fXshift=xshift;};
+  Float_t GetXshift() {return fXshift;}
+  virtual void SetZposition (Float_t xshift=1060) {fZposition=xshift;};
+  Float_t GetZposition() {return fZposition;}
 
   /** Method SetDebug
    **
@@ -113,9 +117,9 @@ class CbmZdc : public FairDetector
 protected:
   /** Protected method AddHit
    **
-   ** Adds a CbmZdcPoint to the HitCollection
+   ** Adds a CbmPsdPoint to the HitCollection
    **/
-  CbmZdcPoint* AddHit(Int_t trackID, Int_t detID, TVector3 pos,
+  CbmPsdPoint* AddHit(Int_t trackID, Int_t detID, TVector3 pos,
 		       TVector3 mom, Double_t time, Double_t length, 
 		       Double_t eLoss); 
   Option_t*      fDebug;             //! Debug flag
@@ -134,8 +138,9 @@ protected:
   Double32_t     fELoss;             //!  energy loss
  
   Int_t          fPosIndex;          //!
-  TClonesArray*  fZdcCollection;    //! Hit collection
-
+  TClonesArray*  fPsdCollection;    //! Hit collection
+  Float_t fXshift; //shift X PSD position to catch beam in hole
+  Float_t fZposition; //Z position of PSD front
 
   /** Private method ResetParameters
    **
@@ -143,15 +148,13 @@ protected:
    **/
   void ResetParameters();
 
-  CbmZdc(const CbmZdc&);
-  CbmZdc& operator=(const CbmZdc&);
 
-  ClassDef(CbmZdc,1)
+  ClassDef(CbmPsd,1)
 
 };
 
 
-inline void CbmZdc::ResetParameters() {
+inline void CbmPsd::ResetParameters() {
   fTrackID = fVolumeID = 0;
   fPos.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMom.SetXYZM(0.0, 0.0, 0.0, 0.0);

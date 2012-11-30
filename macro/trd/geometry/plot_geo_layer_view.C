@@ -1,0 +1,105 @@
+#include "Riostream.h"
+#include "TRint.h"
+#include "TROOT.h"
+#include "TStyle.h"
+#include "TH2.h"
+#include "TCanvas.h"
+#include "TPaveText.h"
+#include "TString.h"
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <map>
+void plot_geo_layer_view(TString digiPar="trd.v12/trd_v12f.digi.par") {
+
+  gStyle->SetPalette(1,0);
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadTickX(1);                        
+  gStyle->SetPadTickY(1); 
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetOptTitle(kFALSE);
+
+  Bool_t read = false;
+  TH2I *fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
+  fLayerDummy->SetXTitle("x-coordinate [cm]");
+  fLayerDummy->SetYTitle("y-coordinate [cm]");
+  fLayerDummy->GetXaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetYaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetZaxis()->SetLabelSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetXaxis()->SetTitleOffset(1.5);
+  fLayerDummy->GetYaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetYaxis()->SetTitleOffset(2);
+  fLayerDummy->GetZaxis()->SetTitleSize(0.02);
+  fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+
+  TString title;
+  TString buffer;
+  TString firstModule = "";
+  Int_t blockCounter(0), startCounter(0), stopCounter(0);
+  Double_t msX(0), msY(0), mpX(0), mpY(0), mpZ(0), psX(0), psY(0);
+  std::map<float, TCanvas*> layerView;// map key is z-position of modules
+  std::map<float, TCanvas*>::iterator it;
+  ifstream digipar;
+  digipar.open(digiPar.Data(), ifstream::in);
+  while (digipar.good()) {
+    digipar >> buffer;
+    //cout << "(" << blockCounter << ")    " << buffer << endl;
+    if (blockCounter == 19)
+      firstModule = buffer;
+    if (buffer == (firstModule + ":")){
+      //cout << buffer << " <===========================================" << endl;
+      read = true;
+    }
+    if (read) {
+      startCounter++;
+      if (startCounter == 4)
+	mpX = buffer.Atof();
+      if (startCounter == 5)
+	mpY = buffer.Atof();
+      if (startCounter == 6)
+	mpZ = buffer.Atof();
+      if (startCounter == 7)
+	msX = buffer.Atof();
+      if (startCounter == 8)
+	msY = buffer.Atof();
+      if (startCounter == 17)
+	psX = buffer.Atof();
+      if (startCounter == 18)
+	psY = buffer.Atof();
+      //printf("module position: (%.1f, %.1f, %.1f) module size: (%.1f, %.1f) pad size: (%.2f, %.2f) pad area: %.2f\n",mpX,mpY,mpZ,2*msX,2*msY,psX,psY,psX*psY);
+      if (startCounter == 22) {
+	startCounter = 0; // reset
+	it = layerView.find(mpZ);
+	if (it == layerView.end()){	
+	  title.Form("Layer_at_z:%.2f",mpZ);  
+	  layerView[mpZ] = new TCanvas(title,title,1200,1000);
+	  fLayerDummy->DrawCopy("");
+	}
+	layerView[mpZ]->cd();
+	title.Form("%2.0fcm^{2}",psX*psY);
+	TPaveText *text = new TPaveText(mpX - msX,
+					mpY - msY,
+					mpX + msX,
+					mpY + msY
+					/*
+					  fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModulePositionX - fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModuleSizeX,
+					  fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModulePositionY - fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModuleSizeY,
+					  fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModulePositionX + fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModuleSizeX,
+					  fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModulePositionY + fModuleMap[fModuleOccupancyMemoryMapIt->first]->ModuleSizeY
+					*/
+					);
+	text->SetFillStyle(1001);
+	text->SetLineColor(1);
+	text->SetFillColor(kViolet);
+	text->AddText(title);
+	text->Draw("same");
+	//layerView[mpZ]->Update();
+      }
+    }  
+    blockCounter++;
+  }
+  digipar.close();
+  for (it = layerView.begin(); it != layerView.end(); it++) 
+    it->second->SaveAs(TString(it->second->GetTitle())+".png");
+}

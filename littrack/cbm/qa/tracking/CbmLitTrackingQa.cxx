@@ -109,7 +109,7 @@ Bool_t KaonPlusTrackAcceptanceFunction(
       Int_t index)
 {
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetPdgCode()) == 321;
+   return (mcTrack->GetPdgCode() == 321);
 }
 
 Bool_t KaonMinusTrackAcceptanceFunction(
@@ -117,7 +117,7 @@ Bool_t KaonMinusTrackAcceptanceFunction(
       Int_t index)
 {
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetPdgCode()) == -321;
+   return (mcTrack->GetPdgCode() == -321);
 }
 
 Bool_t AllRingAcceptanceFunction(
@@ -263,7 +263,6 @@ void CbmLitTrackingQa::Exec(
 
 void CbmLitTrackingQa::Finish()
 {
-   CalculateEfficiencyHistos();
    fHM->WriteToFile();
    CbmSimulationReport* report = new CbmLitTrackingQaReport();
    report->Create(fHM, fOutputDir);
@@ -1001,34 +1000,6 @@ void CbmLitTrackingQa::FillGlobalReconstructionHistosRich(
       if (accOk) { fHM->H1(accHistName)->Fill(par[0], par[1]); }
       if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
    }
-}
-
-void CbmLitTrackingQa::DivideHistos(
-   TH1* histo1,
-   TH1* histo2,
-   TH1* histo3,
-   Double_t scale)
-{
-   //histo1->Sumw2();
-   //histo2->Sumw2();
-   histo3->Sumw2();
-   histo3->Divide(histo1, histo2, 1., 1., "B");
-   histo3->Scale(scale);
-}
-
-void CbmLitTrackingQa::CalculateEfficiencyHistos()
-{
-    vector<TH1*> effHistos = fHM->H1Vector("hte_.+_Eff_.+");
-    Int_t nofEffHistos = effHistos.size();
-    for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
-        TH1* effHist = effHistos[iHist];
-        string effHistName = effHist->GetName();
-      string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
-      string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
-      DivideHistos(fHM->H1(recHistName), fHM->H1(accHistName), effHist, 100.);
-      effHist->SetMinimum(0.);
-      effHist->SetMaximum(100.);
-    }
 }
 
 void CbmLitTrackingQa::IncreaseCounters()

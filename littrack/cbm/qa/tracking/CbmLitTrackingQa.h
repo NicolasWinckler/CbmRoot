@@ -203,10 +203,10 @@ private:
     */
    void ProcessMcTracks();
 
-   /**
-    * \brief Calculate efficiency histograms.
-    */
-   void CalculateEfficiencyHistos();
+//   /**
+//    * \brief Calculate efficiency histograms.
+//    */
+//   void CalculateEfficiencyHistos();
 
    /**
     * \brief Fill histograms of accepted and reconstructed tracks.
@@ -238,19 +238,19 @@ private:
       const string& accName,
       const vector<Double_t>& par);
 
-   /**
-    * \brief Divide two histograms.
-    * \param[in] histo1 Numerator.
-    * \param[in] histo2 Denominator.
-    * \param[out] histo3 Output histogram.
-    * \param[in] scale Scaling factor.
-    */
-   void DivideHistos(
-      TH1* histo1,
-      TH1* histo2,
-      TH1* histo3,
-      Double_t scale);
-
+//   /**
+//    * \brief Divide two histograms.
+//    * \param[in] histo1 Numerator.
+//    * \param[in] histo2 Denominator.
+//    * \param[out] histo3 Output histogram.
+//    * \param[in] scale Scaling factor.
+//    */
+//   void DivideHistos(
+//      TH1* histo1,
+//      TH1* histo2,
+//      TH1* histo3,
+//      Double_t scale);
+//
    /**
     * \brief Increase number of objects counters.
     */

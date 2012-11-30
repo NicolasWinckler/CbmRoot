@@ -155,6 +155,7 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
 
 void CbmLitTrackingQaReport::Draw()
 {
+   CalculateEfficiencyHistos();
    FillGlobalTrackVariants();
 	SetDefaultDrawStyle();
 	DrawEfficiencyHistos();
@@ -369,6 +370,34 @@ void CbmLitTrackingQaReport::FillGlobalTrackVariants()
       variants.insert(Split(effName, '_')[2]);
    }
    fGlobalTrackVariants.assign(variants.begin(), variants.end());
+}
+
+void CbmLitTrackingQaReport::DivideHistos(
+   TH1* histo1,
+   TH1* histo2,
+   TH1* histo3,
+   Double_t scale)
+{
+   histo1->Sumw2();
+   histo2->Sumw2();
+   histo3->Sumw2();
+   histo3->Divide(histo1, histo2, 1., 1., "B");
+   histo3->Scale(scale);
+}
+
+void CbmLitTrackingQaReport::CalculateEfficiencyHistos()
+{
+    vector<TH1*> effHistos = HM()->H1Vector("hte_.+_Eff_.+");
+    Int_t nofEffHistos = effHistos.size();
+    for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+      TH1* effHist = effHistos[iHist];
+      string effHistName = effHist->GetName();
+      string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
+      string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
+      DivideHistos(HM()->H1(recHistName), HM()->H1(accHistName), effHist, 100.);
+      effHist->SetMinimum(0.);
+      effHist->SetMaximum(100.);
+    }
 }
 
 ClassImp(CbmLitTrackingQaReport)

@@ -144,6 +144,24 @@ protected:
 
    void FillGlobalTrackVariants();
 
+   /**
+    * \brief Divide two histograms.
+    * \param[in] histo1 Numerator.
+    * \param[in] histo2 Denominator.
+    * \param[out] histo3 Output histogram.
+    * \param[in] scale Scaling factor.
+    */
+   void DivideHistos(
+      TH1* histo1,
+      TH1* histo2,
+      TH1* histo3,
+      Double_t scale);
+
+   /**
+    * \brief Calculate efficiency histograms.
+    */
+   void CalculateEfficiencyHistos();
+
    vector<string> fGlobalTrackVariants;
 
    ClassDef(CbmLitTrackingQaReport, 1)

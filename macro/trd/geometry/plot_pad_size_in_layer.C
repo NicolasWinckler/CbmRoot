@@ -1,3 +1,12 @@
+//
+//  plot pad size of layers in cm2 in png files
+//  Nov 2012
+//
+//  run as follows:
+//  root -l -b -q plot_geo_layer_view.C++\(\"trd.v13/trd_v13b.digi.par\"\)
+//  display *.png
+//
+
 #include "Riostream.h"
 #include "TRint.h"
 #include "TROOT.h"
@@ -10,7 +19,8 @@
 #include <fstream>
 #include <cmath>
 #include <map>
-void plot_geo_layer_view(TString digiPar="trd.v12/trd_v12f.digi.par") {
+
+void plot_pad_size_in_layer(TString digiPar="trd.v12/trd_v12f.digi.par") {
 
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");
@@ -36,7 +46,7 @@ void plot_geo_layer_view(TString digiPar="trd.v12/trd_v12f.digi.par") {
   TString title;
   TString buffer;
   TString firstModule = "";
-  Int_t blockCounter(0), startCounter(0), stopCounter(0);
+  Int_t blockCounter(0), startCounter(0); // , stopCounter(0);
   Double_t msX(0), msY(0), mpX(0), mpY(0), mpZ(0), psX(0), psY(0);
   std::map<float, TCanvas*> layerView;// map key is z-position of modules
   std::map<float, TCanvas*>::iterator it;
@@ -72,12 +82,26 @@ void plot_geo_layer_view(TString digiPar="trd.v12/trd_v12f.digi.par") {
 	startCounter = 0; // reset
 	it = layerView.find(mpZ);
 	if (it == layerView.end()){	
-	  title.Form("Layer_at_z:%.2f",mpZ);  
+	  title.Form("pad_size_layer_at_z_%.2fm",mpZ);  
 	  layerView[mpZ] = new TCanvas(title,title,1200,1000);
 	  fLayerDummy->DrawCopy("");
+	  // now print cm2 in the center
+	layerView[mpZ]->cd();
+	title.Form("cm^{2}");  // print cm2
+	TPaveText *text = new TPaveText(0 - 28.5,
+					0 - 28.5,
+					0 + 28.5,
+					0 + 28.5
+					);
+	text->SetFillStyle(1001);
+	text->SetLineColor(1);
+        text->SetFillColor(kWhite);
+	text->AddText(title);
+	text->Draw("same");
 	}
 	layerView[mpZ]->cd();
-	title.Form("%2.0fcm^{2}",psX*psY);
+	//	title.Form("%2.0fcm^{2}",psX*psY);  // print pad size
+	title.Form("%.0f",psX*psY);  // print pad size
 	TPaveText *text = new TPaveText(mpX - msX,
 					mpY - msY,
 					mpX + msX,
@@ -91,7 +115,30 @@ void plot_geo_layer_view(TString digiPar="trd.v12/trd_v12f.digi.par") {
 					);
 	text->SetFillStyle(1001);
 	text->SetLineColor(1);
-	text->SetFillColor(kViolet);
+	//        text->SetFillColor(kViolet);
+
+	// vary background color
+//        if ((int)(psX*psY+.5) == 2)
+//        {
+//          text->SetFillColor(kOrange + 9);
+//        } 
+//        else 
+        if (psX*psY <= 5)
+        {
+          text->SetFillColor(kOrange + 10 - ((int)(psX*psY+.5)-1) * 4);
+//          printf("%2.1f: %d\n", psX*psY, 10 - ((int)(psX*psY+.5)-1) * 3);
+        } 
+        else if (psX*psY <= 10)
+	{
+          text->SetFillColor(kSpring + 10 - ((int)(psX*psY+.5)-1-5) * 2);
+//          printf("%2.1f: %d\n", psX*psY, 10 - ((int)(psX*psY+.5)-1-5) * 2);
+        } 
+        else if (psX*psY > 10)
+	{
+          text->SetFillColor(kGreen);
+//          printf("%2.1f: %s\n", psX*psY, "green");
+        } 
+
 	text->AddText(title);
 	text->Draw("same");
 	//layerView[mpZ]->Update();

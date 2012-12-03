@@ -1,25 +1,24 @@
 #$ -wd /tmp 
 #$ -j y
 # Number of subtasks to start
-#$ -t 1-100
+#$ -t 1-10
 
 #XXXXX=$(printf "%05d" "1")
 #XXXX=$(printf "%04d" "1")
 XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
-#coll_energy=$1
-#field_scale=$2
-#mvd=$3
-#pluto_particle=$4
-echo ${coll_energy} ${field_scale} ${mvd} ${pluto_particle}
-outdir=/hera/cbm/users/andrey/mc/dielectron/nov12/${coll_energy}/${field_scale}field/${mvd}/${pluto_particle}/
+# specify input and output directories
+outdir=/hera/cbm/users/slebedev/mc/dec12/${coll_energy}/${field_scale}field/${mvd}/${pluto_particle}/
+cbmroot_config_path=/hera/cbm/users/slebedev/trunk/build/config.sh
+macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
+
 
 # Needed to run macro via script
 export SCRIPT=yes
 
 # Number of events to run
-nevents=1000
+nevents=10
 
 #create the needed directories
 mkdir -p ${outdir}/log
@@ -28,7 +27,7 @@ mkdir -p ${outdir}/log
 mkdir -p ${outdir}/results/${XXXXX}/
 
 # setup the run environment
-source /hera/cbm/users/andrey/cbmroot/trunk/build/config.sh
+source ${cbmroot_config_path}
  
 # This line is needed, otherwise root will crash
 export DISPLAY=localhost:0.0
@@ -71,8 +70,10 @@ export STS_GEOM=sts/sts_v12b.geo.root
 export STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
 export STS_MATERIAL_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
 export RICH_GEOM=rich/rich_v08a.geo
-export TRD_GEOM=
-export TRD_DIGI=
+export TRD_GEOM=trd/trd_v10b.geo
+export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v10b.digi.par
+#export TRD_GEOM=
+#export TRD_DIGI=
 export TOF_GEOM=tof/tof_v07a.geo
 export FIELD_MAP=field_v12a
 export MAGNET_GEOM=passive/magnet_v12a.geo
@@ -107,7 +108,6 @@ mkdir -p $workdir
 cd $workdir
 
 # run the root simulation
-macro_dir=/hera/cbm/users/andrey/cbmroot/trunk/cbmroot/macro/analysis/dielectron/
 root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
 root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
 root -b -l -q "${macro_dir}/run_analysis.C(${nevents})"

@@ -1,8 +1,6 @@
-#!/bin/sh
+dir=/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/0.7field/mvd/omegaepem/
 
-DIR=/lustre/cbm/user/ebelolap/aug11/aug12/25gev/100field/mvd/omega
+outfile=${dir}/reco.auau.8gev.centr.all.root
+infiles=${dir}/reco.auau.8gev.centr.*.root
 
-OUTPUTFILE=$DIR/analysis.all.root
-INPUTFILES=$DIR/analysis.0*.root
-
-hadd  -T -f $OUTPUTFILE $INPUTFILES
+hadd  -T -f ${outfile} ${infiles}

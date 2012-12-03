@@ -83,7 +83,7 @@ export DELTA=no
 export DELTA_FILE=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/deltasource/mc.delta.root
 
 export PION_MISIDENTIFICATION_LEVEL=-1.0
-export USE_MC_MOMENTUM=yes
+export USE_MC_MOMENTUM=no
 
 export PLUTO_PARTICLE=${pluto_particle}
 export PLUTO=yes

@@ -3,7 +3,6 @@
  * @since 2010
  * @version 1.0
  **/
-#include "../../../cbmbase/CbmDetectorList.h";
 
 void run_analysis(Int_t nEvents = 10)
 {

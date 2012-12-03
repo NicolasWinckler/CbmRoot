@@ -249,6 +249,7 @@ void run_reco(Int_t nEvents = 1000)
    trackingQa->SetVerbose(0);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
+   trackingQa->SetPRange(30, 0., 3.);
    trackingQa->SetOutputDir(std::string(resultDir));
    run->AddTask(trackingQa);
 
@@ -257,6 +258,7 @@ void run_reco(Int_t nEvents = 1000)
    fitQa->SetStsMinNofHits(4);
    fitQa->SetMuchMinNofHits(10);
    fitQa->SetTrdMinNofHits(8);
+   firQa->SetPRange(30, 0., 3.);
    fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 

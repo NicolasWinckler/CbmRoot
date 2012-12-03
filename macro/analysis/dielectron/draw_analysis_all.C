@@ -10,7 +10,7 @@ void draw_analysis_all() {
     gSystem->Load("libAnalysis");
 
     Bool_t useMvd = true;
-    std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/1.0field/mvd/";
+    std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/0.7field/mvd/";
     std::string fileName = "analysis.auau.8gev.centr.all.root";
     std::string fnRho0 = dir + "rho0/" + fileName;
     std::string fnOmega = dir +"omegaepem/" + fileName;

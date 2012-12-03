@@ -59,7 +59,7 @@ void hadd() {
          particle = "rho0";
       }
 
-      std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/1.0field/mvd/" + particle + "/";
+      std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/0.7field/mvd/" + particle + "/";
       std::string fileName = dir + "analysis.auau.8gev.centr.";
      // std::string outputDir = dir + "results/all/";
 
@@ -72,7 +72,7 @@ void hadd() {
 
       int count = 0;
       FileList = new TList();
-      for (int i = 0; i < 100; i++){
+      for (int i = 1; i < 101; i++){
          stringstream ss;
          ss << fileName ;
          ss.fill('0');

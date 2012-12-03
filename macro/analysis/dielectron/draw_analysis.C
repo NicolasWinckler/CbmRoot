@@ -9,9 +9,9 @@ void draw_analysis() {
     loadlibs();
     gSystem->Load("libAnalysis");
 
-    Bool_t useMvd = true;
+    Bool_t useMvd = false;
     Bool_t drawSignificance = true;
-    std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/1.0field/mvd/rho0/";
+    std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/0.7field/nomvd/phi/";
     std::string fileName = dir + "analysis.auau.8gev.centr.all.root";
     std::string outputDir = dir + "results/all/";
 

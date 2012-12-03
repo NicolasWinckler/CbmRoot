@@ -26,6 +26,9 @@ const TString FileName = geoVersion + ".root";
 //const TString geoVersion = "trd1";
 //const TString FileName = "trd_v13x.root";
 
+// Gas holes in the lattice grid
+const int withgasholes = 1; // 0;  // 0 = no holes, 1 = with holes
+
 // Parameters defining the layout of the complete detector build out of different detector layers.
 const Int_t   NofLayers = 10;   // max layers
 
@@ -371,6 +374,64 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
   //   "(Sho:t010 + Shi:t011 + Shi:t012 + Shi:t013 + Shi:t014 + Sho:t015 + Svo:t020 + Svi:t021 + Svi:t022 + Svi:t023 + Svi:t024 + Svo:t025 + Sh1 + Sv1)");
   
+     if (withgasholes)
+     {
+	 // start gas inlets                                                                                                                                                       
+	 // gas hole (additive)                                                                                                                                                    
+	 float hole_irad = 0.75;
+	 float hole_orad = hole_irad + 1.0;
+	 float hole_xoff = hole_irad;
+	 float hole_yoff = hole_irad;
+	 float hole_ang1 = 0.0;
+	 float hole_ang2 = 360.0;
+
+	 // frame around gas hole                                                                                                                                                  
+	 float tube_irad = sqrt(2)*hole_irad + hole_irad;  // sqrt(2)*r+1                                                                                                          
+	 float tube_orad = sqrt(2)*hole_irad + hole_orad;  // sqrt(2)*r+2                                                                                                          
+	 float tube_xoff = 0.0;
+	 float tube_yoff = 0.0;
+
+	 TGeoTubeSeg *trd_corner_001 = new TGeoTubeSeg("Co01", tube_irad, tube_orad, lattice_thickness/2, 0.0, 90.0);
+	 TGeoTranslation *t030       = new TGeoTranslation("t030", -(1.0*activeAreaX/2.-tube_xoff), -(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t030->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_001   = new TGeoTubeSeg("Ho01", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t031       = new TGeoTranslation("t031", -(1.0*activeAreaX/2.-hole_xoff), -(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t031->RegisterYourself();
+
+	 TGeoTubeSeg *trd_corner_002 = new TGeoTubeSeg("Co02", tube_irad, tube_orad, lattice_thickness/2, 90.0, 180.0);
+	 TGeoTranslation *t032       = new TGeoTranslation("t032", +(1.0*activeAreaX/2.-tube_xoff), -(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t032->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_002   = new TGeoTubeSeg("Ho02", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t033       = new TGeoTranslation("t033", +(1.0*activeAreaX/2.-hole_xoff), -(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t033->RegisterYourself();
+
+	 TGeoTubeSeg *trd_corner_003 = new TGeoTubeSeg("Co03", tube_irad, tube_orad, lattice_thickness/2, 180.0, 270.0);
+	 TGeoTranslation *t034       = new TGeoTranslation("t034", +(1.0*activeAreaX/2.-tube_xoff), +(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t034->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_003   = new TGeoTubeSeg("Ho03", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t035       = new TGeoTranslation("t035", +(1.0*activeAreaX/2.-hole_xoff), +(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t035->RegisterYourself();
+
+	 TGeoTubeSeg *trd_corner_004 = new TGeoTubeSeg("Co04", tube_irad, tube_orad, lattice_thickness/2, 270.0, 360.0);
+	 TGeoTranslation *t036       = new TGeoTranslation("t036", -(1.0*activeAreaX/2.-tube_xoff), +(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t036->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_004   = new TGeoTubeSeg("Ho04", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t037       = new TGeoTranslation("t037", -(1.0*activeAreaX/2.-hole_xoff), +(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t037->RegisterYourself();
+	 // end gas inlets                                                                                                                                                         
+
+         TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
+         "(S0ho:t010 + S0hi:t011 + S0hi:t012 + S0hi:t013 + S0hi:t014 + S0ho:t015 + \
+           S0vo:t020 + S0vi:t021 + S0vi:t022 + S0vi:t023 + S0vi:t024 + S0vo:t025 + \
+           Ho01:t031 + Ho02:t033 + Ho03:t035 + Ho04:t037 + \
+           Co01:t030 + Co02:t032 + Co03:t034 + Co04:t036)");
+     }
+     else  // no gas holes in lattice grid
+
      TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
      "(S0ho:t010 + S0hi:t011 + S0hi:t012 + S0hi:t013 + S0hi:t014 + S0ho:t015 + \
        S0vo:t020 + S0vi:t021 + S0vi:t022 + S0vi:t023 + S0vi:t024 + S0vo:t025)");
@@ -435,10 +496,67 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   //   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
   //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
   //   "(Sho:t110 + Shi:t111 + Shi:t112 + Shi:t113 + Shi:t114 + Sho:t115 + Svo:t120 + Svi:t121 + Svi:t122 + Svi:t123 + Svi:t124 + Svo:t125 + Sh1 + Sv1)");
-  
-     TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid",
-     "(S1ho:t110 + S1hi:t111 + S1hi:t112 + S1hi:t113 + S1hi:t114 + S1hi:t115 + S1hi:t116 + S1hi:t117 + S1ho:t118 + \
-       S1vo:t120 + S1vi:t121 + S1vi:t122 + S1vi:t123 + S1vi:t124 + S1vi:t125 + S1vi:t126 + S1vi:t127 + S1vo:t128)");
+
+     if (withgasholes)
+     {
+	 // start gas inlets                                                                                                                                                       
+	 // gas hole (additive)                                                                                                                                                    
+	 float hole_irad = 0.75;
+	 float hole_orad = hole_irad + 1.0;
+	 float hole_xoff = hole_irad;
+	 float hole_yoff = hole_irad;
+	 float hole_ang1 = 0.0;
+	 float hole_ang2 = 360.0;
+
+	 // frame around gas hole                                                                                                                                                  
+	 float tube_irad = sqrt(2)*hole_irad + hole_irad;  // sqrt(2)*r+1                                                                                                          
+	 float tube_orad = sqrt(2)*hole_irad + hole_orad;  // sqrt(2)*r+2                                                                                                          
+	 float tube_xoff = 0.0;
+	 float tube_yoff = 0.0;
+
+	 TGeoTubeSeg *trd_corner_101 = new TGeoTubeSeg("Co11", tube_irad, tube_orad, lattice_thickness/2, 0.0, 90.0);
+	 TGeoTranslation *t130       = new TGeoTranslation("t130", -(1.0*activeAreaX/2.-tube_xoff), -(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t130->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_101   = new TGeoTubeSeg("Ho11", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t131       = new TGeoTranslation("t131", -(1.0*activeAreaX/2.-hole_xoff), -(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t131->RegisterYourself();
+
+	 TGeoTubeSeg *trd_corner_102 = new TGeoTubeSeg("Co12", tube_irad, tube_orad, lattice_thickness/2, 90.0, 180.0);
+	 TGeoTranslation *t132       = new TGeoTranslation("t132", +(1.0*activeAreaX/2.-tube_xoff), -(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t132->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_102   = new TGeoTubeSeg("Ho12", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t133       = new TGeoTranslation("t133", +(1.0*activeAreaX/2.-hole_xoff), -(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t133->RegisterYourself();
+
+	 TGeoTubeSeg *trd_corner_103 = new TGeoTubeSeg("Co13", tube_irad, tube_orad, lattice_thickness/2, 180.0, 270.0);
+	 TGeoTranslation *t134       = new TGeoTranslation("t134", +(1.0*activeAreaX/2.-tube_xoff), +(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t134->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_103   = new TGeoTubeSeg("Ho13", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t135       = new TGeoTranslation("t135", +(1.0*activeAreaX/2.-hole_xoff), +(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t135->RegisterYourself();
+
+	 TGeoTubeSeg *trd_corner_104 = new TGeoTubeSeg("Co14", tube_irad, tube_orad, lattice_thickness/2, 270.0, 360.0);
+	 TGeoTranslation *t136       = new TGeoTranslation("t136", -(1.0*activeAreaX/2.-tube_xoff), +(1.0*activeAreaY/2.-tube_yoff), 0);
+	 t136->RegisterYourself();
+
+	 TGeoTubeSeg *trd_hole_104   = new TGeoTubeSeg("Ho14", hole_irad, hole_orad, lattice_thickness/2, hole_ang1, hole_ang2);
+	 TGeoTranslation *t137       = new TGeoTranslation("t137", -(1.0*activeAreaX/2.-hole_xoff), +(1.0*activeAreaY/2.-hole_yoff), 0);
+	 t137->RegisterYourself();
+	 // end gas inlets                                                                                                                                                         
+
+         TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid",
+         "(S1ho:t110 + S1hi:t111 + S1hi:t112 + S1hi:t113 + S1hi:t114 + S1hi:t115 + S1hi:t116 + S1hi:t117 + S1ho:t118 + \
+           S1vo:t120 + S1vi:t121 + S1vi:t122 + S1vi:t123 + S1vi:t124 + S1vi:t125 + S1vi:t126 + S1vi:t127 + S1vo:t128 + \
+           Ho11:t131 + Ho12:t133 + Ho13:t135 + Ho14:t137 + \
+           Co11:t130 + Co12:t132 + Co13:t134 + Co14:t136)");
+     }
+     else  // no gas holes in lattice grid
+       TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid",
+       "(S1ho:t110 + S1hi:t111 + S1hi:t112 + S1hi:t113 + S1hi:t114 + S1hi:t115 + S1hi:t116 + S1hi:t117 + S1ho:t118 + \
+         S1vo:t120 + S1vi:t121 + S1vi:t122 + S1vi:t123 + S1vi:t124 + S1vi:t125 + S1vi:t126 + S1vi:t127 + S1vo:t128)");
      TGeoVolume *trdmod1_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
      trdmod1_lattice->SetLineColor(kYellow);
      TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);

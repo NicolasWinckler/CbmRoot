@@ -1,8 +1,10 @@
 #include <unistd.h> // for dir navigation
 
 const int textFont = 22; // TNewRoman
+const bool divide = 0; // = 0 - each histo in separate file\screen. = 1 - all in one file\screen
 
-void makeUpHisto(TH1* hist, TString title, float* sigma = 0)
+
+void FitHistoGaus(TH1* hist, float* sigma = 0)
 {
   if (hist && (hist->GetEntries() != 0)){
     TF1  *fit = new TF1("fit","gaus");
@@ -10,6 +12,28 @@ void makeUpHisto(TH1* hist, TString title, float* sigma = 0)
     fit->SetLineWidth(3);
     hist->Fit("fit","","",hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
     if (sigma) *sigma = fit->GetParameter(2);
+  }
+  else{
+    std::cout << " E: Read hists error! " << std::endl;
+  }
+}
+
+void FitHistoLine(TH1* hist)
+{
+  if (hist && (hist->GetEntries() != 0)){
+    TF1  *fit = new TF1("fit","[0]");
+    fit->SetLineColor(2);
+    fit->SetLineWidth(3);
+    hist->Fit("fit","","",hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
+  }
+  else{
+    std::cout << " E: Read hists error! " << std::endl;
+  }
+}
+
+void makeUpHisto(TH1* hist, TString title)
+{
+  if (hist && (hist->GetEntries() != 0)){
 
     hist->GetXaxis()->SetLabelFont(textFont);
     hist->GetXaxis()->SetTitleFont(textFont);
@@ -20,6 +44,27 @@ void makeUpHisto(TH1* hist, TString title, float* sigma = 0)
     hist->GetXaxis()->SetTitleOffset(1);
     hist->GetYaxis()->SetTitle("Entries");
     hist->GetYaxis()->SetTitleOffset(1.05); // good then entries per bit <= 9999
+  }
+  else{
+    std::cout << " E: Read hists error! " << std::endl;
+  }
+}
+
+
+void makeUpHisto(TH2* hist, TString title)
+{
+  if (hist && (hist->GetEntries() != 0)){
+    // hist->GetXaxis()->SetLabelFont(textFont);
+    // hist->GetXaxis()->SetTitleFont(textFont);
+    // hist->GetYaxis()->SetLabelFont(textFont);
+    // hist->GetYaxis()->SetTitleFont(textFont);
+    
+    // hist->GetXaxis()->SetTitle(title);
+    // hist->GetXaxis()->SetTitleOffset(1);
+    // hist->GetYaxis()->SetTitle("Entries");
+    // hist->GetYaxis()->SetTitleOffset(1.05); // good then entries per bit <= 9999
+
+    hist->SetOption("CONTZ");
   }
   else{
     std::cout << " E: Read hists error! " << std::endl;
@@ -60,7 +105,7 @@ void Draw_L1_histo() {
   histoStyle->SetStatColor(0);
   
   histoStyle->SetOptTitle(0); // without main up title
-  histoStyle->SetOptStat(1000001010);
+  histoStyle->SetOptStat(1000111010);
 //   The parameter mode can be = ksiourmen  (default = 000001111)
 //   k = 1;  kurtosis printed
 //   k = 2;  kurtosis and kurtosis error printed
@@ -93,6 +138,7 @@ void Draw_L1_histo() {
   histoStyle->SetPadBorderMode(0);
   histoStyle->SetFrameBorderMode(0);
 
+  histoStyle->SetPalette(1); // for 2D
   
   TStyle *profStyle = new TStyle("profStyle","Plain Style(no colors/fill areas)");
 //   TStyle *profStyle = gStyle;
@@ -110,6 +156,7 @@ void Draw_L1_histo() {
 
   profStyle->SetPadBorderMode(0);
   profStyle->SetFrameBorderMode(0);
+
     // ============================ Open file ============================
 
   const TString fileName = "L1_histo.root";
@@ -130,7 +177,7 @@ void Draw_L1_histo() {
   dirFitName = fileName + ":" + dirFitName;
   TDirectory *dirFit = fileIn->Get(dirFitName);
   
-  const int nHisto = 30;
+  const int nHisto = 40;
   
   struct THistoData
   {
@@ -149,7 +196,17 @@ void Draw_L1_histo() {
     {"fst_ptx",  "Pull t_{x}" }
     {"fst_pty",  "Pull t_{y}" }
     {"fst_pQP",  "Pull q/p"   }
-
+    
+    {"lst_pQP",  "Pull q/p"   }
+    {"lst_ptx",  "Pull t_{x}" }
+    {"lst_pty",  "Pull t_{y}" }
+    {"lst_px",  "Pull x"   }
+    {"lst_py",  "Pull y" }
+    {"lst_P",  "Resolution (p^{reco}-p^{mc})/p^{mc}"   }
+    {"lst_tx",  "Residual (t_{x}^{reco}-t_{x}^{mc}) [mrad]" }
+    {"lst_ty",  "Residual (t_{y}^{reco}-t_{y}^{mc}) [mrad]" }
+    {"lst_x",  "Residual (x^{reco}-x^{mc}) [#mum]" }
+    {"lst_y",  "Residual (y^{reco}-y^{mc}) [#mum]" }
     {"svrt_pQP",  "Pull q/p"   }
     {"svrt_ptx",  "Pull t_{x}" }
     {"svrt_pty",  "Pull t_{y}" }
@@ -177,7 +234,8 @@ void Draw_L1_histo() {
   float charat[nHisto][2]; // 0 - sigma, 1 - RMS
   for (int i = 0; i < nHisto; i++){
     histo[i] = (TH1F*) dirFit->Get(histoData[i].name);
-    makeUpHisto(histo[i],histoData[i].title, &(charat[i][0]));
+    makeUpHisto(histo[i], histoData[i].title);
+    FitHistoGaus(histo[i], &(charat[i][0]));
     charat[i][1] = histo[i]->GetRMS();
   }
 
@@ -208,6 +266,56 @@ void Draw_L1_histo() {
   for (int i = 0; i < nHistoInput; i++){
     histoInput[i] = (TH1F*) dirInput->Get(histoDataInput[i].name);
     makeUpHisto(histoInput[i],histoDataInput[i].title);
+    FitHistoGaus(histoInput[i]);
+  }
+
+        // ------------ other histo -----------
+  
+  TString dirOtherName = "/L1";
+  dirOtherName = fileName + ":" + dirOtherName;
+  TDirectory *dirOther = fileIn->Get(dirOtherName);
+  
+  const int nHistoOther = 3;
+  
+  const THistoData histoDataOther[nHisto] =
+  {
+    {"h_reco_prob",  "Prob of reco track" }
+    {"h_ghost_prob",  "Prob of ghost track" }
+    {"h_rest_prob",  "Prob of reco rest track" }
+  };
+  
+  TH1F *histoOther[nHistoOther];
+
+  for (int i = 0; i < nHistoOther; i++){
+    histoOther[i] = (TH1F*) dirOther->Get(histoDataOther[i].name);
+    makeUpHisto(histoOther[i], histoDataOther[i].title);
+    FitHistoLine(histoOther[i]);
+  }
+
+          // ------------ other 2D histo -----------
+  
+  TString dirOther2DName = "/L1";
+  dirOther2DName = fileName + ":" + dirOther2DName;
+  TDirectory *dirOther2D = fileIn->Get(dirOther2DName);
+  
+  const int nHistoOther2D = 1;
+ 
+  const THistoData histoDataOther2D[nHisto] =
+  {
+    {"h2_reco_nhits_vs_mom_prim",  "NHits and momentum for primary" }
+    // {"h2_reco_prob_ndf",  "Prob and NDF" }
+    // {"h2_reco_prob_mom",  "Prob and momentum" }
+    // {"h2_reco_prob_teta",  "Prob and teta" }
+    // {"h2_teta_prob",  "Prob" }
+    // {"h2_teta_probI",  "ProbI" }
+    // {"h2_teta_probO",  "ProbO" }
+  };
+  
+  TH2F *histoOther2D[nHistoOther2D];
+
+  for (int i = 0; i < nHistoOther2D; i++){
+    histoOther2D[i] = (TH2F*) dirOther2D->Get(histoDataOther2D[i].name);
+    makeUpHisto(histoOther2D[i], histoDataOther2D[i].title);
   }
   
     // ------------ make profiles -----------
@@ -234,6 +342,8 @@ void Draw_L1_histo() {
     profile[i] = (TProfile*) dir->Get(profData[i].name);
     makeUpProfile(profile[i], profData[i].titleX, profData[i].titleY);
   }
+
+
     // ============================ Draw  ============================
 //   TCanvas *c1;
 //   c1 = new TCanvas("c1","c1",0,0,1200,800);
@@ -250,13 +360,13 @@ void Draw_L1_histo() {
 
   system("mkdir L1_histo -p");
   chdir( "L1_histo" );
-  
+
+  histoStyle->cd();
   TCanvas *c2,*c3;
   c2 = new TCanvas("c2","c2",0,0,900,600);
   c3 = new TCanvas("c3","c3",0,0,900,600);
   c3->Divide(5, 2);
 
-  histoStyle->cd();
   int iPart = 1;
   for (int i = 0; i < 10; i++){
     c3->cd(iPart++);
@@ -264,7 +374,6 @@ void Draw_L1_histo() {
   }
   c3->SaveAs("fst.pdf");
   
-  histoStyle->cd();
   c2->cd();
   for (int i = 0; i < nHisto; i++){
     histo[i]->Draw();
@@ -277,6 +386,20 @@ void Draw_L1_histo() {
     TString name = TString(histoDataInput[i].name)+".pdf";
     c2->SaveAs(name);
   }
+
+  for (int i = 0; i < nHistoOther; i++){
+    histoOther[i]->Draw();
+    TString name = TString(histoDataOther[i].name)+".pdf";
+    c2->SaveAs(name);
+  }
+
+  histoStyle->SetOptStat(1000000010);
+  for (int i = 0; i < nHistoOther2D; i++){
+    histoOther2D[i]->Draw();
+    TString name = TString(histoDataOther2D[i].name)+".pdf";
+    c2->SaveAs(name);
+  }
+  histoStyle->SetOptStat(1000111010);
   
   profStyle->cd();
   c2->cd();

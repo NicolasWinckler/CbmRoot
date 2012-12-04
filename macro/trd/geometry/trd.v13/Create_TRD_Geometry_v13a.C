@@ -27,7 +27,7 @@ const TString FileName = geoVersion + ".root";
 //const TString FileName = "trd_v13x.root";
 
 // Plot the lattice grid
-const int withlattcegrid = 0;  // 1; // 0;  // 0 = no grid, 1 = with grid
+const int withlattcegrid = 1;  // 1; // 0;  // 0 = no grid, 1 = with grid
 // Plot gas holes in the lattice grid
 const int withgasholes = 1; // 0;  // 0 = no holes, 1 = with holes
 
@@ -340,11 +340,13 @@ TGeoVolume* create_trd_module(Int_t moduleType)
      {
        //     printf("lattice type %d\n", type);
        // drift window - lattice grid - sprossenfenster
-       TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
-       TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+       TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2.,                       lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
+       TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+       //       TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
     
-       TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
-       TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+       TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2.,                       lattice_thickness/2.);  // vertical
+       TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
+       //       TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
     
        TGeoTranslation *t010 = new TGeoTranslation("t010", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
        t010->RegisterYourself();
@@ -451,11 +453,13 @@ TGeoVolume* create_trd_module(Int_t moduleType)
      {
        //     printf("lattice type %d\n", type);
        // drift window - lattice grid - sprossenfenster
-       TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("S1ho", sizeX/2., lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
-       TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+       TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("S1ho", sizeX/2.,                       lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
+       TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
+       //       TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
     
-       TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("S1vo", lattice_o_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
-       TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("S1vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
+       TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("S1vo", lattice_o_width[type]/2., sizeX/2.,                       lattice_thickness/2.);  // vertical
+       TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("S1vi", lattice_i_width[type]/2., sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
+       //       TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("S1vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
     
        TGeoTranslation *t110 = new TGeoTranslation("t110", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
        t110->RegisterYourself();

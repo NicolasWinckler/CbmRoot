@@ -222,10 +222,10 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
   TGeoVolume *fm=NULL;
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1layer");
   if (fm) {
-    cout<<"Found old TRD geometry version."<<endl;
+    cout<<"Found old TRD geometry version (with individual keeping volumes for layers)."<<endl;
     return GetLayerInfoFromOldGeometry(layersBeforeStation);
   } else {
-    cout<<"Found new TRD geometry version."<<endl;
+    cout<<"Found new TRD geometry version (with a single keeping volume)."<<endl;
     return GetLayerInfoFromNewGeometry(layersBeforeStation);
   }
 }
@@ -265,7 +265,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersB
       cout << "***************************************" <<endl;
       cout << "                                       " <<endl;
       cout << " - FATAL ERROR Unknown geometry version" <<endl;
-      cout << "   in CbmTrdHitProducerSmearing        " <<endl;
+      cout << "   in GetLayerInfoFromOldGeometry      " <<endl;
       cout << " No TRD stations found in the geometry " <<endl;
       cout << "                                       " <<endl;
       cout << "***************************************" <<endl;
@@ -306,7 +306,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersB
       cout << "***************************************" <<endl;
       cout << "                                       " <<endl;
       cout << " - FATAL ERROR Unknown geometry version" <<endl;
-      cout << "   in CbmTrdHitProducerSmearing        " <<endl;
+      cout << "   in GetLayerInfoFromNewGeometry      " <<endl;
       cout << " No TRD stations found in the geometry " <<endl;
       cout << "                                       " <<endl;
       cout << "***************************************" <<endl;

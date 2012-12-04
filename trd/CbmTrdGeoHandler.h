@@ -79,6 +79,7 @@ class CbmTrdGeoHandler : public TObject {
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersBeforStation);
+  Bool_t GetLayerInfoFromRootGeometry(std::vector<Int_t> &layersBeforStation);
   void FillDetectorInfoArray(Int_t uniqueId);
   void NavigateTo(TString volName);
 

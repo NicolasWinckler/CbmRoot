@@ -22,12 +22,13 @@
 
 // Name of output file with geometry
 const TString geoVersion = "trd_v13x";
-const TString FileName = geoVersion + ".root";
+const TString FileNameSim = geoVersion + ".root";
+const TString FileNameGeo = geoVersion + "_geo.root";
 //const TString geoVersion = "trd1";
 //const TString FileName = "trd_v13x.root";
 
 // display switches
-const Bool_t IncludeLattice  = false; // true; // false;  // true, if lattice grid is included in geometry
+const Bool_t IncludeLattice  = true; // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeGasHoles = true; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true; // false;  // true, if FEBs are included in geometry
 
@@ -252,9 +253,11 @@ void Create_TRD_Geometry_v13a() {
 //  gGeoMan->PrintOverlaps();
   gGeoMan->Test();
 
-  TFile* outfile = new TFile(FileName,"RECREATE");
-  //  top->Write();
-  gGeoMan->Write();
+  TFile* outfile = new TFile(FileNameSim,"RECREATE");
+  top->Write();      // use this as input to simulations (run_sim.C)
+  outfile->Close();
+  TFile* outfile = new TFile(FileNameGeo,"RECREATE");
+  gGeoMan->Write();  // use this is you want GeoManager format in the output
   outfile->Close();
   top->Draw("ogl");
   //top->Raytrace();
@@ -704,7 +707,6 @@ TGeoVolume* create_trd_module(Int_t moduleType)
         feb_pos_y = feb_pos * activeAreaY;
 
         // shift inclined FEB in y to its final position
-        printf("FEB z: %.2f\n",feb_z_offset);  
         trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, feb_z_offset);  // with additional fixed offset in z direction
 	//        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.0);  // touching the backpanel with the corner
         trd_feb_box->AddNode(trd_feb_inclined, iFeb+1, trd_feb_y_position);  // position FEB in y

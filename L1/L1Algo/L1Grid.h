@@ -88,11 +88,11 @@ inline unsigned int L1Grid::GetBinBounded( const float &Y, const float &Z ) cons
 
 inline void L1Grid::GetBinBounded( const float &Y, const float &Z, unsigned short *bY, unsigned short *bZ ) const
 {
-  const short &yBin = ( Y * fStepYInv - fYMinOverStep );
-  const short &zBin = ( Z * fStepZInv - fZMinOverStep );
+  const float &yBin = ( Y * fStepYInv - fYMinOverStep );
+  const float &zBin = ( Z * fStepZInv - fZMinOverStep );
 
-  *bY = max( short(0), min( short( fNy - 1 ), yBin ) );
-  *bZ = max( short(0), min( short( fNz - 1 ), zBin ) );
+  *bY = max( 0.f, min( float( fNy - 1 ), yBin ) );
+  *bZ = max( 0.f, min( float( fNz - 1 ), zBin ) );
 }
 
 inline void L1Grid::Create( float yMin, float yMax, float zMin, float zMax, float sy, float sz )

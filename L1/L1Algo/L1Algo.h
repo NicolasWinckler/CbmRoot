@@ -22,6 +22,8 @@
 #ifndef TRACKS_FROM_TRIPLETS
 #define EXTEND_TRACKS
 #endif
+#define MERGE_CLONES
+
 
 
 #include "L1Field.h"
@@ -399,6 +401,7 @@ class L1Algo{
          kAllSecIter,       // secondary all tracks
          kFastPrimJumpIter, // disabled
          kAllPrimJumpIter,  // disabled
+         kFastPrimIter2,
          kAllSecJumpIter
   };
 #endif // FIND_GAPED_TRACKS

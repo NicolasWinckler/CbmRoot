@@ -16,8 +16,7 @@ struct L1HitsSortHelperData{
   THitI i;
   
   static bool compare(const L1HitsSortHelperData &a, const L1HitsSortHelperData &b){
-    return a.bin < b.bin;
-      // return a.bin < b.bin || ( a.bin == b.bin && a.p->Ys() < b.p->Ys() );
+    return a.bin < b.bin || ( a.bin == b.bin && a.p->Ys() < b.p->Ys() ); 
   }
 };
 

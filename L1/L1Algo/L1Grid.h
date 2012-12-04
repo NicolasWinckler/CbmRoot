@@ -44,8 +44,11 @@ void memset( T *dest, T i, size_t num ) {
  */
 class L1Grid {
  public:
-  void CreateEmpty();
-  void Create1( float y, float z, float sy, float sz );
+  L1Grid():
+  fN(0), fNy(0), fNz(0), fFirstHitInBin(0){}
+
+  ~L1Grid(){ if ( fFirstHitInBin ) delete[] fFirstHitInBin; }
+   
   void Create( float yMin, float yMax, float zMin, float zMax, float sy, float sz  );
   void Fill( const L1HitPoint* points, THitI n ); // call after sort
   
@@ -53,11 +56,6 @@ class L1Grid {
 
   unsigned int GetBinBounded( const float &Y, const float &Z ) const;
   void GetBinBounded( const float &Y, const float &Z, unsigned short *bY, unsigned short *bZ ) const;
-
-    // static unsigned short GetBinBounded( const L1Grid *array, const unsigned short &indexes, const float &Y, const float &Z );
-    // static void GetBinBounded( const L1Grid *array, const unsigned short &indexes, const float &Y, const float &Z, unsigned short *bY, unsigned short *bZ );
-    // static unsigned short Ny( const L1Grid *array, const unsigned short &indexes ) { return unsigned short( array, &L1Grid::fNy, indexes ); }
-
   void GetBinBounds( unsigned int iBin, float &Ymin, float &Ymax, float &Zmin, float &Zmax) const;
     
   unsigned int   N()        const { return fN;  }
@@ -79,40 +77,6 @@ class L1Grid {
   THitI* fFirstHitInBin;
 };
 
-// inline unsigned short L1Grid::GetBinBounded( const L1Grid *array, const unsigned short &indexes, const float &Y, const float &Z )
-// {
-  
-//   const float fZMinOverStep( array, &L1Grid::fZMinOverStep, indexes );
-//   const float fStepZInv( array, &L1Grid::fStepZInv, indexes );
-//   const unsigned short fNz( array, &L1Grid::fNz, indexes );
-//   short_v zBin = ( Z * fStepZInv - fZMinOverStep ).staticCast<short_v>();
-//   unsigned short zBin2 = CAMath::Max( short_v( Vc::Zero ), CAMath::Min( short_v( fNz - 1 ), zBin ) ).staticCast<unsigned short>();
-
-//   const float fYMinOverStep( array, &L1Grid::fYMinOverStep, indexes );
-//   const float fStepYInv( array, &L1Grid::fStepYInv, indexes );
-//   const unsigned short fNy( array, &L1Grid::fNy, indexes );
-//   short_v yBin = ( Y * fStepYInv - fYMinOverStep ).staticCast<short_v>();
-//   unsigned short yBin2 = CAMath::Max( short_v( Vc::Zero ), CAMath::Min( short_v( fNy - 1 ), yBin ) ).staticCast<unsigned short>();
-//   return zBin2 * fNy + yBin2;
-// }
-
-// inline void L1Grid::GetBinBounded( const L1Grid *array, const unsigned short &indexes, const float &Y, const float &Z, unsigned short *bY, unsigned short *bZ )
-// {
-//   const float fYMinOverStep( array, &L1Grid::fYMinOverStep, indexes );
-//   const float fStepYInv( array, &L1Grid::fStepYInv, indexes );
-//   const unsigned short fNy( array, &L1Grid::fNy, indexes );
-//   const short fNy2 = fNy.staticCast<short_v>();
-//   const short &yBin =  static_cast<short>( Y * fStepYInv - fYMinOverStep );
-//   *bY = static_cast<unsigned short>(max( 0, min( fNy2 - 1, yBin ) ));
-
-//   const float fZMinOverStep( array, &L1Grid::fZMinOverStep, indexes );
-//   const float fStepZInv( array, &L1Grid::fStepZInv, indexes );
-//   const unsigned short fNz( array, &L1Grid::fNz, indexes );
-//   const short_v fNz2 = fNz.staticCast<short_v>();
-//   const short_v &zBin = ( Z * fStepZInv - fZMinOverStep ).staticCast<short_v>();
-//   *bZ = CAMath::Max( short_v( Vc::Zero ), CAMath::Min( fNz2 - 1, zBin ) ).staticCast<unsigned short>();
-// }
-
 inline unsigned int L1Grid::GetBinBounded( const float &Y, const float &Z ) const
 {
   //* get the bin pointer
@@ -131,32 +95,6 @@ inline void L1Grid::GetBinBounded( const float &Y, const float &Z, unsigned shor
   *bZ = max( short(0), min( short( fNz - 1 ), zBin ) );
 }
 
-inline void L1Grid::CreateEmpty()
-{
-  fYMinOverStep = 0.f;
-  fZMinOverStep = 0.f;
-
-  fNy = 0;
-  fNz = 0;
-  fN = 0;
-
-  fStepYInv = 1.f;
-  fStepZInv = 1.f;
-}
-
-inline void L1Grid::Create1( float y, float z, float sy, float sz )
-{
-  fN = 1;
-  fNy = 1;
-  fNz = 1;
-
-  fStepYInv = 1.f / sy;
-  fStepZInv = 1.f / sz;
-
-  fYMinOverStep = y * fStepYInv - 0.5f;
-  fZMinOverStep = z * fStepZInv - 0.5f;
-}
-
 inline void L1Grid::Create( float yMin, float yMax, float zMin, float zMax, float sy, float sz )
 {
   //* Create the grid
@@ -169,14 +107,17 @@ inline void L1Grid::Create( float yMin, float yMax, float zMin, float zMax, floa
   fNy = static_cast<unsigned short>( yMax * fStepYInv - fYMinOverStep + 1.f );
   fNz = static_cast<unsigned short>( zMax * fStepZInv - fZMinOverStep + 1.f );
 
+  unsigned int Nold = fN;
   fN = fNy * fNz;
+
+  if (Nold < fN || Nold == 0) {
+    delete[] fFirstHitInBin; 
+    fFirstHitInBin = new THitI[fN+1]; // one extra bin is needed by area to determine number of hits in the last bin
+  }
 }
 
 inline void L1Grid::Fill( const L1HitPoint* points, THitI n ) // call after sort
 {
-  if (!fFirstHitInBin)
-    fFirstHitInBin = new THitI[fN+1+10000]; // one extra bin is needed by area to determine number of hits in the last bin
-
   unsigned int lastBin = 0;
   fFirstHitInBin[lastBin] = 0;
   for( THitI i = 0; i < n; i++ ) {
@@ -185,7 +126,7 @@ inline void L1Grid::Fill( const L1HitPoint* points, THitI n ) // call after sort
     memset( fFirstHitInBin + lastBin + 1, i, currBin - lastBin );
     lastBin = currBin;
   }
-  memset( fFirstHitInBin + lastBin + 1, n, fN+1 - lastBin );
+  memset( fFirstHitInBin + lastBin + 1, n, fN - lastBin );
 }
 
 inline int L1Grid::GetBin( float Y, float Z ) const

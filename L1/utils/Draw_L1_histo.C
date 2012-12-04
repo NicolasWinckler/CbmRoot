@@ -324,7 +324,7 @@ void Draw_L1_histo() {
   dirName = fileName + ":" + dirName;
   TDirectory *dir = fileIn->Get(dirName);
   
-  const int nProf = 1;
+  const int nProf = 4;
   struct TProfData
   {
     char *name;  // one, which used in input file
@@ -334,6 +334,9 @@ void Draw_L1_histo() {
   const TProfData profData[nProf] =
   {
     {"p_eff_all_vs_mom",  "Momentum [GeV/c]",  "Efficiency [%]"  }
+    {"p_eff_all_vs_nhits",  "NMCHits",  "Efficiency [%]"  }
+    {"p_eff_prim_vs_nhits",  "NMCHits",  "Efficiency [%]"  }
+    {"p_eff_sec_vs_nhits",  "NMCHits",  "Efficiency [%]"  }
   };
   
   TProfile *profile[nProf];

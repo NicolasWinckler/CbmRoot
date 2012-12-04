@@ -48,6 +48,7 @@ class CbmL1MCTrack
   bool IsPrimary()         const {return mother_ID < 0;};
   bool IsReconstructable() const {return isReconstructable;};
   int  NStations()         const {return nStations;};
+  int  NMCStations()         const {return nMCStations;};
   
   void Init();
 
@@ -68,6 +69,7 @@ class CbmL1MCTrack
    int maxNStaHits;       // max number of hits on station
    
    int nStations;         // number of stations with hits
+  int nMCStations;         // number of stations with MCPoints
 
    bool isReconstructable;
    

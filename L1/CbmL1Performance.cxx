@@ -127,7 +127,8 @@ killed(),
 clone(),
 reco_length(),
 reco_fakes(),
-mc_length()
+mc_length(),
+mc_length_hits()
   {
           // add total efficiency
     AddCounter("long_fast_prim" ,"LongRPrim efficiency");
@@ -154,6 +155,7 @@ mc_length()
     reco_length.AddCounter();
     reco_fakes.AddCounter();
     mc_length.AddCounter();
+    mc_length_hits.AddCounter();
   };
   
   TL1PerfEfficiencies& operator+=(TL1PerfEfficiencies& a){
@@ -162,6 +164,7 @@ mc_length()
     reco_length += a.reco_length;
     reco_fakes  += a.reco_fakes;
     mc_length   += a.mc_length;
+    mc_length_hits += a.mc_length_hits;
     return *this;
   };
   
@@ -174,7 +177,7 @@ mc_length()
     ratio_fakes  = reco_fakes/allReco;
   };
   
-  void Inc(bool isReco, bool isKilled, double _ratio_length, double _ratio_fakes, int _nclones, int _mc_length, TString name){
+  void Inc(bool isReco, bool isKilled, double _ratio_length, double _ratio_fakes, int _nclones, int _mc_length, int _mc_length_hits, TString name){
     TL1Efficiencies::Inc(isReco, name);
 
     const int index = indices[name];
@@ -184,6 +187,7 @@ mc_length()
     reco_fakes.counters[index] += _ratio_fakes;
     clone.counters[index] += _nclones;
     mc_length.counters[index] += _mc_length;
+    mc_length_hits.counters[index] += _mc_length_hits;
   };
 
   void PrintEff(){
@@ -193,7 +197,7 @@ mc_length()
     cout.setf(ios::showpoint);
     cout.precision(3);
     cout.setf(ios::right);
-    cout << "Track category         : " << " Eff  "        <<" / "<< "Killed" <<" / "<< "Length" <<" / "<< "Fakes " <<" / "<< "Clones" <<" / "<< "All Reco" <<" | "<< "  All MC "  <<" / "<< "MC length" << endl;
+    cout << "Track category         : " << " Eff  "        <<" / "<< "Killed" <<" / "<< "Length" <<" / "<< "Fakes " <<" / "<< "Clones" <<" / "<< "All Reco" <<" | "<< "  All MC "  <<" / "<< "MCl(hits)" <<" / "<< "MCl(MCps)" << endl;
     
     int NCounters = mc.NCounters;
     for (int iC = 0; iC < NCounters; iC++){
@@ -206,7 +210,9 @@ mc_length()
              << "  / " << ratio_clone.counters[iC]   // nCloneTracks/nMCTracks
              << "  / " << setw(8) << reco.counters[iC]/double(nEvents)
              << " | " << setw(8) << mc.counters[iC]/double(nEvents)
-             << "  / " << mc_length.counters[iC]/double(mc.counters[iC]) << endl;
+             << "  / " << mc_length_hits.counters[iC]/double(mc.counters[iC])
+             << "  / " << mc_length.counters[iC]/double(mc.counters[iC])
+             << endl;
     }
     cout << "Ghost     probability  : " << ratio_ghosts <<"  | "<< ghosts << endl;
   };
@@ -221,6 +227,7 @@ mc_length()
   TL1TracksCatCounters<double> reco_length;
   TL1TracksCatCounters<double> reco_fakes;
   TL1TracksCatCounters<int> mc_length;
+  TL1TracksCatCounters<int> mc_length_hits;
 };
 
 
@@ -266,10 +273,11 @@ void CbmL1::EfficienciesPerformance()
     vector< CbmL1Track* >& rTracks = mtra.GetRecoTracks(); // for length calculations
     double ratio_length = 0;
     double ratio_fakes  = 0;
-    double mc_length = mtra.NStations();
+    double mc_length_hits = mtra.NStations();
+    int mc_length = mtra.NMCStations();
     if (reco){
       for (unsigned int irt = 0; irt < rTracks.size(); irt++) {
-        ratio_length += static_cast<double>( rTracks[irt]->GetNOfHits() )*rTracks[irt]->GetMaxPurity() / mc_length;
+        ratio_length += static_cast<double>( rTracks[irt]->GetNOfHits() )*rTracks[irt]->GetMaxPurity() / mc_length_hits;
         ratio_fakes += 1 - rTracks[irt]->GetMaxPurity();
       }
     }
@@ -284,33 +292,33 @@ void CbmL1::EfficienciesPerformance()
 //       cout << mtra.NStations() << endl;
 //     }
 
-    ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "total");
+    ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "total");
     
     if (( mtra.IsPrimary() )&&(mtra.z > 0)){ // D0
-      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "d0");
+      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "d0");
     }
 
     if ( mtra.p > CbmL1Constants::MinRefMom ){                        // reference tracks
-      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "fast");
+      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast");
       
       if ( mtra.IsPrimary() ){                         // reference primary
         if ( mtra.NStations() == NStation ){ // long reference primary
-          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "long_fast_prim");
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "long_fast_prim");
         }
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "fast_prim");
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_prim");
       }
       else{                                             // reference secondary
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "fast_sec");
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_sec");
       }
     }
     else{                                               // extra set of tracks
-      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "slow");
+      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow");
        
       if ( mtra.IsPrimary() ){             // extra primary
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "slow_prim");
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_prim");
       }
       else{
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, "slow_sec");
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_sec");
       }
     } // if extra
 
@@ -992,7 +1000,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
   //CbmKF &KF = *CbmKF::Instance();
 
-  static TProfile *p_eff_all_vs_mom, *p_eff_prim_vs_mom, *p_eff_sec_vs_mom, *p_eff_d0_vs_mom, *p_eff_prim_vs_theta, *p_eff_all_vs_pt, *p_eff_prim_vs_pt;
+  static TProfile *p_eff_all_vs_mom, *p_eff_prim_vs_mom, *p_eff_sec_vs_mom, *p_eff_d0_vs_mom, *p_eff_prim_vs_theta, *p_eff_all_vs_pt, *p_eff_prim_vs_pt, *p_eff_all_vs_nhits, *p_eff_prim_vs_nhits, *p_eff_sec_vs_nhits;
   
   static TH1F *h_reg_mom_prim, *h_reg_mom_sec, *h_reg_nhits_prim, *h_reg_nhits_sec;
   static TH1F *h_acc_mom_prim, *h_acc_mom_sec, *h_acc_nhits_prim, *h_acc_nhits_sec;
@@ -1053,6 +1061,14 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
                                     100, 0.0, 5.0, 0.0, 100.0);
     p_eff_prim_vs_pt = new TProfile("p_eff_prim_vs_pt", "Primary Set Efficiency vs Pt",
         100, 0.0, 5.0, 0.0, 100.0);
+
+    p_eff_all_vs_nhits = new TProfile("p_eff_all_vs_nhits", "AllSet Efficiency vs NMCHits",
+    8, 3.0, 11.0, 0.0, 100.0);
+    p_eff_prim_vs_nhits = new TProfile("p_eff_prim_vs_nhits", "PrimSet Efficiency vs NMCHits",
+    8, 3.0, 11.0, 0.0, 100.0);
+    p_eff_sec_vs_nhits = new TProfile("p_eff_sec_vs_nhits", "SecSet Efficiency vs NMCHits",
+    8, 3.0, 11.0, 0.0, 100.0);
+    
   
     h_reg_mom_prim   = new TH1F("h_reg_mom_prim", "Momentum of registered primary tracks", 500, 0.0, 5.0);
     h_reg_mom_sec   = new TH1F("h_reg_mom_sec", "Momentum of registered secondary tracks", 500, 0.0, 5.0);
@@ -1211,7 +1227,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
     h_reco_clean->Fill( prtra->GetMaxPurity() );
     
-    if (prtra->NDF > 0)
+    if (prtra->NDF > 0) {
       if ( prtra->IsGhost() ){
         h_ghost_chi2->Fill(prtra->chi2/prtra->NDF);
         h_ghost_prob->Fill(TMath::Prob(prtra->chi2,prtra->NDF));
@@ -1225,6 +1241,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
           h_rest_prob->Fill(TMath::Prob(prtra->chi2,prtra->NDF));
         }
       }
+    }
 
     
       // fill ghost histos
@@ -1339,16 +1356,20 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
       // reconstructed tracks
     bool reco = (mtra.IsReconstructed());
-
+    int nMCHits = mtra.NStations();
+      
     if (reco){
       p_eff_all_vs_mom->Fill(momentum, 100.0);
+      p_eff_all_vs_nhits->Fill(nMCHits, 100.0);
       p_eff_all_vs_pt->Fill(pt, 100.0);
       if (mtra.mother_ID < 0){ // primary
         p_eff_prim_vs_mom->Fill(momentum, 100.0);
+        p_eff_prim_vs_nhits->Fill(nMCHits, 100.0);
         p_eff_prim_vs_pt->Fill(pt, 100.0);
         p_eff_prim_vs_theta->Fill(theta, 100.0);
       }else{
         p_eff_sec_vs_mom->Fill(momentum, 100.0);
+        p_eff_sec_vs_nhits->Fill(nMCHits, 100.0);
       }
       if (mtra.mother_ID < 0){ // primary
         h_reco_mom_prim->Fill(momentum);
@@ -1370,13 +1391,16 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     }else{
       h_notfound_mom->Fill(momentum);
       p_eff_all_vs_mom->Fill(momentum, 0.0);
+      p_eff_all_vs_nhits->Fill(nMCHits, 0.0);
       p_eff_all_vs_pt->Fill(pt, 0.0);
       if (mtra.mother_ID < 0){ // primary
         p_eff_prim_vs_mom->Fill(momentum, 0.0);
+        p_eff_prim_vs_nhits->Fill(nMCHits, 0.0);
         p_eff_prim_vs_pt->Fill(pt, 0.0);
         p_eff_prim_vs_theta->Fill(theta, 0.0);
       }else{
         p_eff_sec_vs_mom->Fill(momentum, 0.0);
+        p_eff_sec_vs_nhits->Fill(nMCHits, 0.0);
       }
       if (mtra.mother_ID < 0){ // primary
         h_rest_mom_prim->Fill(momentum);

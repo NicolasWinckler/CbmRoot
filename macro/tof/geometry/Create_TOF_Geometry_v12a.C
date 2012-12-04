@@ -84,7 +84,7 @@ const Float_t Pole_Offset=Module_Size_X/2.+Pole_Size_X/2.;
 // Position for module placement
 const Float_t Inner_Module_First_Y_Position=70.;
 const Float_t Inner_Module_Last_Y_Position=480.;
-const Float_t Inner_Module_X_Offset=0.;
+const Float_t Inner_Module_X_Offset=2.;
 
 const Float_t Outer_Module_First_Y_Position=0.;
 const Float_t Outer_Module_Last_Y_Position=480.;
@@ -147,7 +147,7 @@ void Create_TOF_Geometry_v12a() {
 
   gPole = create_tof_pole();
 
-  postion_tof_poles();
+  position_tof_poles();
   position_inner_tof_modules();
   position_outer_tof_modules();
   
@@ -572,18 +572,18 @@ TGeoVolume* create_tof_pole()
   return pole;
 }
 
-void postion_tof_poles()
+void position_tof_poles()
 {
 
   TGeoTranslation* pole_trans=NULL;
 
   Int_t numPoles=0;
   pole_trans 
-    = new TGeoTranslation("", -Pole_Offset, 0., Wall_Z_Position);
+    = new TGeoTranslation("", -Pole_Offset+2.0, 0., Wall_Z_Position);
   gGeoMan->GetVolume(geoVersion)->AddNode(gPole, numPoles, pole_trans);
   numPoles++;
   pole_trans 
-    = new TGeoTranslation("", -Pole_Offset, 0., Wall_Z_Position+Pole_Size_Z);
+    = new TGeoTranslation("", -Pole_Offset+2.0, 0., Wall_Z_Position+Pole_Size_Z);
   gGeoMan->GetVolume(geoVersion)->AddNode(gPole, numPoles, pole_trans);
     numPoles++;
 

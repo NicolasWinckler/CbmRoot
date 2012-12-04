@@ -1,12 +1,11 @@
-/*  Description: This macro train the ANN for electron
- identification in the TRD.
+/*  Description: This macro train and test different electron/pion identification methods in the TRD detector.
 
  Author : Semen Lebedev
  E-mail : S.Lebedev@gsi.de
  */
 #include <vector>
 
-void trd_elid_trainANN_txt()
+void trd_elid_train()
 {
 
    // ----  Load libraries   -------------------------------------------------

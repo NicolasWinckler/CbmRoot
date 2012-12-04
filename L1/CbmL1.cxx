@@ -732,6 +732,7 @@ void CbmL1::IdealTrackFinder()
 
     L1Track algoTr;
     algoTr.NHits = MC.StsHits.size();
+    if (algoTr.NHits < 4) continue;
     for (int iH = 0; iH < algoTr.NHits; iH++){
       algo->vRecoHits.push_back(MC.StsHits[iH]);
     }

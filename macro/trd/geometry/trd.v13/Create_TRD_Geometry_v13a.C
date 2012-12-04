@@ -26,10 +26,10 @@ const TString FileName = geoVersion + ".root";
 //const TString geoVersion = "trd1";
 //const TString FileName = "trd_v13x.root";
 
-// Plot the lattice grid
-const int withlattcegrid = 1;  // 1; // 0;  // 0 = no grid, 1 = with grid
-// Plot gas holes in the lattice grid
-const int withgasholes = 1; // 0;  // 0 = no holes, 1 = with holes
+// display switches
+const Bool_t IncludeLattice  = false; // true; // false;  // true, if lattice grid is included in geometry
+const Bool_t IncludeGasHoles = true; // false;  // true, if gas holes to be pllotted in the lattice grid
+const Bool_t IncludeFebs     = true; // false;  // true, if FEBs are included in geometry
 
 // Parameters defining the layout of the complete detector build out of different detector layers.
 const Int_t   NofLayers = 10;   // max layers
@@ -45,8 +45,6 @@ const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30
 const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 const Float_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 const Float_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
-const Bool_t  IncludeLattice = true; // false;  // true if lattice grid is included in geometry
-const Bool_t  IncludeFebs    = true; // false;  // true if FEBs are included in geometry
 
 const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },    // for layer[1-3][i,o] below
                                       { 5, 5, 9, 11 },
@@ -135,6 +133,7 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
+const Float_t feb_z_offset = 0.1;  // offset in z of FEBs to backpanel
 
 const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
 const Float_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
@@ -333,7 +332,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
 
    // Lattice grid
-   if(withlattcegrid) 
+   if(IncludeLattice) 
    {
 
      if (type==0)  // inner modules
@@ -381,7 +380,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
     //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
     //   "(Sho:t010 + Shi:t011 + Shi:t012 + Shi:t013 + Shi:t014 + Sho:t015 + Svo:t020 + Svi:t021 + Svi:t022 + Svi:t023 + Svi:t024 + Svo:t025 + Sh1 + Sv1)");
     
-       if (withgasholes)
+       if (IncludeGasHoles)
        {
   	 // start gas inlets                                                                                                                                                       
   	 // gas hole (additive)                                                                                                                                                    
@@ -506,7 +505,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
     //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
     //   "(Sho:t110 + Shi:t111 + Shi:t112 + Shi:t113 + Shi:t114 + Sho:t115 + Svo:t120 + Svi:t121 + Svi:t122 + Svi:t123 + Svi:t124 + Svo:t125 + Sh1 + Sv1)");
   
-       if (withgasholes)
+       if (IncludeGasHoles)
        {
   	 // start gas inlets                                                                                                                                                       
   	 // gas hole (additive)                                                                                                                                                    
@@ -649,21 +648,22 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    // FEBs
    if (IncludeFebs) {
       // Create all FEBs and place them in an assembly which will be added to the TRD module
-      TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX /2., feb_thickness/2., febbox_thickness/2.);       // the FEB itself - as a cuboid
+      TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX /2., feb_thickness/2., febbox_thickness/2.);     // the FEB itself - as a cuboid
       TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);   // the FEB made of a certain medium
-      //      trdmod1_feb->SetLineColor(kBlue);    // set blue color
       trdmod1_feb->SetLineColor(kYellow);    // set blue color
+      //      trdmod1_feb->SetLineColor(kBlue);    // set blue color
+
       TGeoVolumeAssembly* trd_feb_inclined = new TGeoVolumeAssembly(Form("trd1mod%dfebincl", moduleType)); // volume for inclined FEBs, then shifted along y
       TGeoVolumeAssembly* trd_feb_box      = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));  // the mother volume of all FEBs
 
       Float_t feb_rotation_angle = 45.; // 65.; // 45.; // 0.; // 70.;   // rotation around x-axis, should be < 90 degrees  
 
-      // translations / rotations
-//      TGeoTranslation *trd_feb_null;       // no displacement
+      // translations + rotations
       TGeoTranslation *trd_feb_trans1;     // center to corner
       TGeoRotation    *trd_feb_rotation;   // rotation around x axis
       TGeoTranslation *trd_feb_trans2;     // corner back
       TGeoTranslation *trd_feb_y_position; // shift to y position on TRD
+//      TGeoTranslation *trd_feb_null;       // no displacement
 
       Float_t feb_pos;
       Float_t feb_pos_y;
@@ -700,13 +700,13 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
       Int_t nofFebs = FebsPerModule[ moduleType - 1 ];
       for (Int_t iFeb = 0; iFeb < nofFebs; iFeb++) {
-	//        feb_pos   = (2. * iFeb + 1) / (2 * nofFebs) - 0.5;   // equal spacing o f FEBs on the backpanel
         feb_pos   = (iFeb + 0.5) / nofFebs - 0.5;   // equal spacing o f FEBs on the backpanel
         feb_pos_y = feb_pos * activeAreaY;
 
         // shift inclined FEB in y to its final position
-//      trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.1);  // with additional 1 mm offset in z direction
-        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.0);  // touching the backpanel with the corner
+        printf("FEB z: %.2f\n",feb_z_offset);  
+        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, feb_z_offset);  // with additional fixed offset in z direction
+	//        trd_feb_y_position = new TGeoTranslation("", 0., feb_pos_y, 0.0);  // touching the backpanel with the corner
         trd_feb_box->AddNode(trd_feb_inclined, iFeb+1, trd_feb_y_position);  // position FEB in y
 
       }

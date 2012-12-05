@@ -21,13 +21,14 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13x";
+const TString geoVersion = "trd_v13f";
 const TString FileNameSim = geoVersion + ".root";
 const TString FileNameGeo = geoVersion + "_geo.root";
 //const TString geoVersion = "trd1";
 //const TString FileName = "trd_v13x.root";
 
 // display switches
+const Bool_t IncludeRadiator = true; // false;  // true, if radiator is included in geometry
 const Bool_t IncludeLattice  = true; // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeGasHoles = true; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true; // false;  // true, if FEBs are included in geometry
@@ -39,8 +40,10 @@ const Int_t   NofLayers = 10;   // max layers
 //const Int_t   ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  // 1st layer only
 //const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
 //const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
-//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100  // 1: plot, 0: hide
-const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300  // 1: plot, 0: hide
+//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 3, layer 9,10
+//const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
+//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
+const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300     // 1: plot, 0: hide
 
 const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads  
 const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
@@ -325,14 +328,18 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   TString name = Form("trd1mod%d", moduleType);
   TGeoVolume* module = new TGeoVolumeAssembly(name);
 
-   // Radiator
-   //   TGeoBBox* trd_radiator = new TGeoBBox("", activeAreaX /2., activeAreaY /2., radiator_thickness /2.);
-   TGeoBBox* trd_radiator = new TGeoBBox("", sizeX /2., sizeY /2., radiator_thickness /2.);
-   TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd1mod%dradiator", moduleType), trd_radiator, radVolMed);
-   trdmod1_radvol->SetLineColor(kBlue);
-   trdmod1_radvol->SetTransparency(70);  // (60);  // (70);  // set transparency for the TRD
-   TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
-   module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
+
+  if(IncludeRadiator)
+   {
+     // Radiator
+     //   TGeoBBox* trd_radiator = new TGeoBBox("", activeAreaX /2., activeAreaY /2., radiator_thickness /2.);
+     TGeoBBox* trd_radiator = new TGeoBBox("", sizeX /2., sizeY /2., radiator_thickness /2.);
+     TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd1mod%dradiator", moduleType), trd_radiator, radVolMed);
+     trdmod1_radvol->SetLineColor(kBlue);
+     trdmod1_radvol->SetTransparency(70);  // (60);  // (70);  // set transparency for the TRD
+     TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
+     module->AddNode(trdmod1_radvol, 0, trd_radiator_trans);
+   }
 
    // Lattice grid
    if(IncludeLattice) 

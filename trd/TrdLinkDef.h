@@ -19,8 +19,8 @@
 #pragma link C++ class  CbmTrdTrackFitterIdeal+;
 #pragma link C++ class  CbmGeoTrd+;
 #pragma link C++ class  CbmGeoTrdPar;
-#pragma link C++ class  CbmTrdClusterizer;
-#pragma link C++ class  CbmTrdClusterizerFast;
+#pragma link C++ class  CbmTrdDigitizerMathieson;
+#pragma link C++ class  CbmTrdDigitizerPRF;
 #pragma link C++ class  CbmTrdHitRateTest;
 #pragma link C++ class  CbmTrdHitDensityTest;
 //#pragma link C++ class  CbmTrdPhotonAnalysis;

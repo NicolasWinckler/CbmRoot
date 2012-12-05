@@ -1,5 +1,5 @@
-#ifndef CBMTRDCLUSTERIZER_H
-#define CBMTRDCLUSTERIZER_H
+#ifndef CBMTRDDIGITIZERMATHIESON_H
+#define CBMTRDDIGITIZERMATHIESON_H
 
 #include "FairTask.h"
 
@@ -86,19 +86,19 @@ ModulePara() : Station(-1), Layer(-1), moduleId(-1), xPos(0), yPos(0), zPos(),
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
 } ModulePara;
 
-class CbmTrdClusterizer : public FairTask {
+class CbmTrdDigitizerMathieson : public FairTask {
 
  public:
 
   /** Default constructor **/
-  CbmTrdClusterizer();
+  CbmTrdDigitizerMathieson();
 
   /** Standard constructor **/
-  CbmTrdClusterizer(const char *name, const char *title="CBM Task",
+  CbmTrdDigitizerMathieson(const char *name, const char *title="CBM Task",
 		    CbmTrdRadiator *radiator=NULL);
 
   /** Destructor **/
-  virtual ~CbmTrdClusterizer();
+  virtual ~CbmTrdDigitizerMathieson();
 
   /** Initialisation **/
   virtual InitStatus ReInit();
@@ -124,8 +124,8 @@ class CbmTrdClusterizer : public FairTask {
 
  private:
 
-  CbmTrdClusterizer& operator=(const CbmTrdClusterizer&);
-  CbmTrdClusterizer(const CbmTrdClusterizer&);
+  CbmTrdDigitizerMathieson& operator=(const CbmTrdDigitizerMathieson&);
+  CbmTrdDigitizerMathieson(const CbmTrdDigitizerMathieson&);
 
   void GetModuleInformationFromDigiPar(Int_t VolumeID);
   void GetModuleInformation();
@@ -257,7 +257,7 @@ class CbmTrdClusterizer : public FairTask {
 
   //TH1F* fIntegralTest;
 
-  ClassDef(CbmTrdClusterizer,2)
+  ClassDef(CbmTrdDigitizerMathieson,2)
 
     };
-#endif // CBMTRDCLUSTERIZER_H
+#endif // CBMTRDDIGITIZERMATHIESON_H

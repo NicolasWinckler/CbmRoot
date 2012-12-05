@@ -39,8 +39,8 @@ CbmTrdContFact.cxx
 CbmTrd.cxx 		 
 CbmTrdHitProducerIdeal.cxx    
 CbmTrdHitProducerSmearing.cxx
-CbmTrdClusterizer.cxx 
-CbmTrdClusterizerFast.cxx
+CbmTrdDigitizerMathieson.cxx 
+CbmTrdDigitizerPRF.cxx
 CbmTrdHitRateTest.cxx
 CbmTrdHitDensityTest.cxx
 #CbmTrdPhotonAnalysis.cxx

@@ -1,5 +1,5 @@
-#ifndef CBMTRDCLUSTERIZERFAST_H
-#define CBMTRDCLUSTERIZERFAST_H
+#ifndef CBMTRDDIGITIZERPRF_H
+#define CBMTRDDIGITIZERPRF_H
 
 #include "CbmTrdDigiMatch.h"
 #include "FairTask.h"
@@ -63,15 +63,15 @@ typedef struct ClusterModule
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ(0.) {}
 } ClusterModule;
 
-class CbmTrdClusterizerFast : public FairTask {
+class CbmTrdDigitizerPRF : public FairTask {
 
  public:
 
   /** Default constructor **/
-  CbmTrdClusterizerFast();
+  CbmTrdDigitizerPRF();
 
   /** Standard constructor **/
-  CbmTrdClusterizerFast(const char *name, const char *title="CBM Task",
+  CbmTrdDigitizerPRF(const char *name, const char *title="CBM Task",
 			CbmTrdRadiator *radiator=NULL, Bool_t oneClusterPerPoint=false, Bool_t wireQuantisation=false);
   /*
     oneClusterPerPoint: produces just one cluster per MC-track if true -> less ghost hits
@@ -79,7 +79,7 @@ class CbmTrdClusterizerFast : public FairTask {
 */
 
   /** Destructor **/
-  virtual ~CbmTrdClusterizerFast();
+  virtual ~CbmTrdDigitizerPRF();
 
   /** Initialisation **/
   virtual InitStatus ReInit();
@@ -105,8 +105,8 @@ class CbmTrdClusterizerFast : public FairTask {
 
  private:
 
-  CbmTrdClusterizerFast& operator=(const CbmTrdClusterizerFast&);
-  CbmTrdClusterizerFast(const CbmTrdClusterizerFast&);
+  CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
+  CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
 
   void GetModuleInformationFromDigiPar(Int_t VolumeID);
   void InitPadPlane(ClusterModule* mCluster);
@@ -171,7 +171,7 @@ class CbmTrdClusterizerFast : public FairTask {
   std::map<Int_t, ClusterModule*> fModuleClusterMap; //!
   std::map<Int_t, ClusterModule*>::iterator fModuleClusterMapIt; //!
 
-  ClassDef(CbmTrdClusterizerFast,2)
+  ClassDef(CbmTrdDigitizerPRF,2)
 
     };
-#endif // CBMTRDCLUSTERIZERFAST_H
+#endif // CBMTRDDIGITIZER_PRF_H

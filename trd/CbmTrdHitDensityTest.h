@@ -3,7 +3,7 @@
 
 #include "FairTask.h"
 
-#include "CbmTrdClusterizer.h"
+#include "CbmTrdDigitizerMathieson.h"
 #include "CbmTrdHitProducerCluster.h"
 #include "TLegend.h"
 #include "TClonesArray.h"

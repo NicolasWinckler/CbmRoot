@@ -1,4 +1,4 @@
-#include "CbmTrdClusterizer.h"
+#include "CbmTrdDigitizerMathieson.h"
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdPoint.h"
@@ -40,7 +40,7 @@ using std::pair;
 using std::fabs;
 
 // ---- Default constructor -------------------------------------------
-CbmTrdClusterizer::CbmTrdClusterizer()
+CbmTrdDigitizerMathieson::CbmTrdDigitizerMathieson()
   : FairTask("TrdCluster"),
     Digicounter(-1),
     fLayerZ(),
@@ -72,7 +72,7 @@ CbmTrdClusterizer::CbmTrdClusterizer()
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
-CbmTrdClusterizer::CbmTrdClusterizer(const char *name, const char *title,
+CbmTrdDigitizerMathieson::CbmTrdDigitizerMathieson(const char *name, const char *title,
                  CbmTrdRadiator *radiator)
   :FairTask(name),
     Digicounter(-1),
@@ -105,7 +105,7 @@ CbmTrdClusterizer::CbmTrdClusterizer(const char *name, const char *title,
 // --------------------------------------------------------------------
 
 // ---- Destructor ----------------------------------------------------
-CbmTrdClusterizer::~CbmTrdClusterizer()
+CbmTrdDigitizerMathieson::~CbmTrdDigitizerMathieson()
 {
   FairRootManager *ioman =FairRootManager::Instance();
   ioman->Write();
@@ -127,9 +127,9 @@ CbmTrdClusterizer::~CbmTrdClusterizer()
 // --------------------------------------------------------------------
 
 // ----  Initialisation  ----------------------------------------------
-void CbmTrdClusterizer::SetParContainers()
+void CbmTrdDigitizerMathieson::SetParContainers()
 {
-    cout<<" * CbmTrdClusterizer * :: SetParContainers() "<<endl;
+    cout<<" * CbmTrdDigitizerMathieson * :: SetParContainers() "<<endl;
 
 
     // Get Base Container
@@ -143,9 +143,9 @@ void CbmTrdClusterizer::SetParContainers()
 // --------------------------------------------------------------------
 
 // ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdClusterizer::ReInit(){
+InitStatus CbmTrdDigitizerMathieson::ReInit(){
 
-  cout<<" * CbmTrdClusterizer * :: ReInit() "<<endl;
+  cout<<" * CbmTrdDigitizerMathieson * :: ReInit() "<<endl;
 
 
   FairRunAna* ana = FairRunAna::Instance();
@@ -159,10 +159,10 @@ InitStatus CbmTrdClusterizer::ReInit(){
 // --------------------------------------------------------------------
 
 // ---- Init ----------------------------------------------------------
-InitStatus CbmTrdClusterizer::Init()
+InitStatus CbmTrdDigitizerMathieson::Init()
 {
 
-  cout<<" * CbmTrdClusterizer * :: Init() "<<endl;
+  cout<<" * CbmTrdDigitizerMathieson * :: Init() "<<endl;
 
   FairRootManager *ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -198,7 +198,7 @@ InitStatus CbmTrdClusterizer::Init()
 
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdClusterizer::Exec(Option_t * option)
+void CbmTrdDigitizerMathieson::Exec(Option_t * option)
 {
  // use lookup table or calculate realtime
   Bool_t lookup = true;
@@ -216,7 +216,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   timer.Start();
  
 
-  cout << "================CbmTrdClusterizer=====================" << endl;
+  cout << "================CbmTrdDigitizerMathieson=====================" << endl;
 
   //fIntegralTest = new TH1F("IntegrationTest","IntegrationTest",200000,0,20000);
 
@@ -522,7 +522,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
    // --------------------------------------------------------------------
 
     // ---- FinishTask-----------------------------------------------------
-void CbmTrdClusterizer::FinishEvent()
+void CbmTrdDigitizerMathieson::FinishEvent()
 {
   for (fDigiMapIt = fDigiMap.begin();
        fDigiMapIt != fDigiMap.end(); ++fDigiMapIt) {
@@ -549,7 +549,7 @@ void CbmTrdClusterizer::FinishEvent()
 
   // --------------------------------------------------------------------
   // ---- CoordinateTransformation-----------------------------------------------------
-void CbmTrdClusterizer::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate, Double_t* StrucDim)
+void CbmTrdDigitizerMathieson::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate, Double_t* StrucDim)
 {
 
   //Transform coordinates from module coordinate system with origin in the Lower Left (LL) corner to the
@@ -561,7 +561,7 @@ void CbmTrdClusterizer::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordin
 }
   // --------------------------------------------------------------------
   // ---- CoordinateTransformation-----------------------------------------------------
-void CbmTrdClusterizer::TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate, Double_t* StrucDim)
+void CbmTrdDigitizerMathieson::TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate, Double_t* StrucDim)
 {
 
   //Transform the coordinates from coordinate system with origin in the Center (C) of the module 
@@ -572,13 +572,13 @@ void CbmTrdClusterizer::TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordin
     }
 }
  // --------------------------------------------------------------------
-double CbmTrdClusterizer::GetPadHeight(Int_t Sector)
+double CbmTrdDigitizerMathieson::GetPadHeight(Int_t Sector)
 {
   return fModuleParaMap[fModuleID]->PadSizeY[Sector];
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformation ------------------------------------------
-void CbmTrdClusterizer::GetModuleInformation()
+void CbmTrdDigitizerMathieson::GetModuleInformation()
 {
   //cout << "GetModuleInformation" << endl;
   // Extract the information about station, layer, module type
@@ -621,7 +621,7 @@ void CbmTrdClusterizer::GetModuleInformation()
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
+void CbmTrdDigitizerMathieson::GetModuleInformationFromDigiPar( Int_t VolumeID)
 {
   //cout << "GetModuleInformationFromDigiPar" << endl;
   // fPos is >0 for x and y and not rotated
@@ -736,7 +736,7 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-float CbmTrdClusterizer::GetFloatPositionY(Double_t tempPosY)
+float CbmTrdDigitizerMathieson::GetFloatPositionY(Double_t tempPosY)
 {
   //cout << "GetFloatPositionY" << endl;
   Float_t floatRow = 0;
@@ -757,7 +757,7 @@ float CbmTrdClusterizer::GetFloatPositionY(Double_t tempPosY)
 }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-int CbmTrdClusterizer::GetCol(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
+int CbmTrdDigitizerMathieson::GetCol(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
 {
   //cout << "GetCol" << endl;
   Int_t iCol   = (Int_t)((tempPosX) / fModuleParaMap[fModuleID]->PadSizeX[0]);
@@ -765,7 +765,7 @@ int CbmTrdClusterizer::GetCol(Double_t tempPosX)/*tempPosX has to be in LL modul
 }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-int CbmTrdClusterizer::GetRow(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
+int CbmTrdDigitizerMathieson::GetRow(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
 {
   //cout << "GetRow" << endl;
   Int_t iRow = 0;
@@ -786,7 +786,7 @@ int CbmTrdClusterizer::GetRow(Double_t tempPosY)/*tempPosY has to be in LL modul
 }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
+int CbmTrdDigitizerMathieson::GetSector(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
 {
   //cout << "GetSector" << endl;
   for (Int_t iSector = 0; iSector < fModuleParaMap[fModuleID]->NoSectors; iSector++)
@@ -804,7 +804,7 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
 }
   // --------------------------------------------------------------------
   // ---- SplitPathSlices -------------------------------------------------
-void CbmTrdClusterizer::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, Int_t j, Double_t* padW, Double_t* padH)
+void CbmTrdDigitizerMathieson::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, Int_t j, Double_t* padW, Double_t* padH)
 {
   // Split path through chamber volume into equal pices to simulate primary clusters within gas. 1 cluster per 0.2 times short pad size.
   //cout << "SplitPathSlices" << endl;
@@ -920,7 +920,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t looku
     }
 }
   // --------------------------------------------------------------------
-void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
+void CbmTrdDigitizerMathieson::WireQuantisation(MyPoint *point)
 {
   // drift primary clusters towards next anode wire position.
   //cout << "WireQuantisation" << endl;
@@ -951,7 +951,7 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   point->clusterPosLL[1] = nextWirePos;
 }
     // --------------------------------------------------------------------
-Double_t CbmTrdClusterizer::ApproxMathieson(Double_t x, Double_t W)
+Double_t CbmTrdDigitizerMathieson::ApproxMathieson(Double_t x, Double_t W)
 {
   Float_t K3 = 0.525;  //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
   //Float_t K3 = (-0.7/1.6 * (h/s) + 0.7) + ((exp(-9.74350e+02 * ra/s) * 5.64791e-01 + 3.32737e-01));// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
@@ -984,7 +984,7 @@ Double_t CbmTrdClusterizer::ApproxMathieson(Double_t x, Double_t W)
   return mathiesonPRF;
 }
 // --------------------------------------------------------------------
-void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+void CbmTrdDigitizerMathieson::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
   // sample pad plane within test area. One step per mm. Uses ApproxMathieson() to calc pad charge.
   Double_t deltaW = 0;
@@ -1082,7 +1082,7 @@ void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Doub
   //cout << endl << endl;
 }
 // --------------------------------------------------------------------
-void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+void CbmTrdDigitizerMathieson::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {  
  // sample pad plane within test area. One step per mm. Uses LookupMathiesonVector() to calc pad charge.
   /*
@@ -1170,7 +1170,7 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
 }
   
     // --------------------------------------------------------------------
-void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+void CbmTrdDigitizerMathieson::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
 // sample pad plane within test area. One step per mm. Uses LookupMathiesonVector() to calc pad charge.
   Int_t rMax = 0;
@@ -1321,7 +1321,7 @@ void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
   //fIntegralTest->Fill(totalCharge);
 }
     // --------------------------------------------------------------------
-Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset) 
+Double_t CbmTrdDigitizerMathieson::DeltaGrid(Double_t doubleV, Double_t offset) 
 {
   doubleV += offset;       // center origin to lower left corner
   //doubleV -= 0.5;          // grid border offset 0.5 mm
@@ -1335,7 +1335,7 @@ Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset)
   return delta + 0.5;
 }
 // --------------------------------------------------------------------
-Double_t CbmTrdClusterizer::LookupMathiesonVector(Double_t r)
+Double_t CbmTrdDigitizerMathieson::LookupMathiesonVector(Double_t r)
 {
   Int_t rMax = 0;
   Int_t rMin = 0;
@@ -1351,7 +1351,7 @@ Double_t CbmTrdClusterizer::LookupMathiesonVector(Double_t r)
   return Q;
 }
 // --------------------------------------------------------------------
-Double_t CbmTrdClusterizer::CalcGaus(Double_t r)
+Double_t CbmTrdDigitizerMathieson::CalcGaus(Double_t r)
 {
   Float_t sigma = 2.28388e+00;//8.08257e-01; // [mm]
   Float_t amplitude = 2.96216e-01;//2.96136e-01;
@@ -1363,7 +1363,7 @@ Double_t CbmTrdClusterizer::CalcGaus(Double_t r)
 }
 
 // ---- CalcMathieson -------------------------------------------------
-Double_t CbmTrdClusterizer::CalcMathieson(Double_t r)
+Double_t CbmTrdDigitizerMathieson::CalcMathieson(Double_t r)
 {
   Float_t h = 3;           //anode-cathode gap [mm]
   Float_t s = 3;           //anode wire spacing [mm]
@@ -1386,7 +1386,7 @@ Double_t CbmTrdClusterizer::CalcMathieson(Double_t r)
   return rho;
 }
   // --------------------------------------------------------------------
-  void CbmTrdClusterizer::FillMathiesonVector()
+  void CbmTrdDigitizerMathieson::FillMathiesonVector()
   {
     //cout << "FillMathiesonVector" << endl;
     Double_t Q = 0;
@@ -1418,7 +1418,7 @@ Double_t CbmTrdClusterizer::CalcMathieson(Double_t r)
   }
 
   // --------------------------------------------------------------------
-void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* W, Double_t* padH, Double_t* padW)
+void CbmTrdDigitizerMathieson::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* W, Double_t* padH, Double_t* padW)
 {  
   //cout << "GetPadSizeMatrix" << endl;
   
@@ -1479,7 +1479,7 @@ void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* 
  }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-  void CbmTrdClusterizer::ChargeConservation(MyPoint *point)
+  void CbmTrdDigitizerMathieson::ChargeConservation(MyPoint *point)
   {
     //cout << "ChargeConservation" << endl;
     /*
@@ -1524,7 +1524,7 @@ void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* 
   }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-  void CbmTrdClusterizer::ClusterMapping(MyPoint *point, Double_t* PadChargeModule)
+  void CbmTrdDigitizerMathieson::ClusterMapping(MyPoint *point, Double_t* PadChargeModule)
   {
     //cout << "ClusterMapping" << endl;
     /*
@@ -1550,8 +1550,8 @@ void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* 
     // -------------------------------------------------------------------
     // ------AddDigi--------------------------------------------------------------
 
-    //void CbmTrdClusterizer::AddDigi() 
-    void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge) 
+    //void CbmTrdDigitizerMathieson::AddDigi() 
+    void CbmTrdDigitizerMathieson::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge) 
     {
       //cout << "AddDigi" << endl;
       // Add digi for pixel(x,y) in module to map for intermediate storage
@@ -1615,11 +1615,11 @@ void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* 
     }
 
     // ---- Register ------------------------------------------------------
-    void CbmTrdClusterizer::Register()
+    void CbmTrdDigitizerMathieson::Register()
     {
       FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
       FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
     }
     // --------------------------------------------------------------------
 
-    ClassImp(CbmTrdClusterizer)
+    ClassImp(CbmTrdDigitizerMathieson)

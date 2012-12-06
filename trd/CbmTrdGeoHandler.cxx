@@ -101,9 +101,9 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
         // strings returned are e.g. trd_v13a_0, need to chopped the first 8 characters with (0,8)
         fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(node->GetName())(0,8)) );  
 	if (fm) {
-	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
-	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
-          fLogger->Debug(MESSAGE_ORIGIN,"Found root TRD geometry.");
+// 	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
+//	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
+          fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
           fGeoVersion = kRootGeom;
           return fGeoVersion;
         }
@@ -200,6 +200,10 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
       layer=temp_mod/1000;
       modnumber=temp_mod%1000;
       station = fStationMap.find(id2)->second;
+    } else if (kRootGeom == fGeoVersion) {
+      station=temp_mod/10000;
+      layer=(temp_mod%10000)/1000;
+      modnumber=temp_mod%1000;
     } else if (kSegmentedSquaredOneKeepingVolume == fGeoVersion) {
       station=temp_mod/10000;
       layer=(temp_mod%10000)/1000;
@@ -575,12 +579,27 @@ void CbmTrdGeoHandler::FillInternalStructures()
   // separate utility class CbmTrdGeoHandler
 
   Int_t stationNr = 1;
+  Int_t maxStationNr;
   char volumeName[10];
   Bool_t result;
   Int_t MCid;
   
   fStationMap.clear();
   fModuleTypeMap.clear();
+
+//  if (fGeoVersion == kRootGeom) {
+//
+//    do {
+//      sprintf(volumeName, "trd_v13a");
+//      MCid = VolId(volumeName);
+//      if ( 0 != MCid) {
+//	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
+//      }
+//      stationNr++;
+//    }
+//    while ( 0 != MCid); 
+//
+//  } else 
 
   if (fGeoVersion == kNewMonolithic) {
     
@@ -595,25 +614,29 @@ void CbmTrdGeoHandler::FillInternalStructures()
 
   } else {
 
-    do {
-      sprintf(volumeName, "trd%d", stationNr);
-      MCid = VolId(volumeName);
-      if ( 0 != MCid) {
-	fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
+    if (fGeoVersion != kRootGeom) {
+      do {
+	sprintf(volumeName, "trd%d", stationNr);
+	MCid = VolId(volumeName);
+	if ( 0 != MCid) {
+	  fStationMap.insert(pair<Int_t,Int_t>(MCid,stationNr));
+	}
+	stationNr++;
       }
-      stationNr++;
+      while ( 0 != MCid); 
+
+      maxStationNr = --stationNr; 
+    } else {
+      maxStationNr = 2; 
     }
-    while ( 0 != MCid); 
-
-    Int_t maxStationNr = --stationNr; 
-
+    
     Int_t maxModuleTypes;
-    if (fGeoVersion == kSegmentedSquaredOneKeepingVolume) { 
+    if ((fGeoVersion == kSegmentedSquaredOneKeepingVolume)||(fGeoVersion == kRootGeom)) { 
       maxModuleTypes = 8;
     } else {
       maxModuleTypes = 3;
     }
-
+    
     for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
       for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
 	sprintf(volumeName, "trd%dmod%d", iStation, iModule);

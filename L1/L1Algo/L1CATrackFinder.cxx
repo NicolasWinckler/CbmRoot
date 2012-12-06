@@ -1202,7 +1202,7 @@ void L1Algo::CATrackFinder()
 #endif
 
 #ifdef COUNTERS
-  static Tindex stat_nStartHits = 0;
+  static unsigned int stat_nStartHits = 0;
   static unsigned int stat_nHits[fNFindIterations] = {0};
   static unsigned int stat_nSinglets[fNFindIterations] = {0};
 //  static unsigned int stat_nDoublets[fNFindIterations] = {0};

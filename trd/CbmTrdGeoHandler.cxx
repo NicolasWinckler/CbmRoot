@@ -88,6 +88,28 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
 
   TGeoVolume *fm=NULL;
 
+  // Root geometry introduced with trd_v13x
+  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+    TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+    if (TString(node->GetName()).Contains("trd_v")) {   // check for strings like: trd_v13a, trd_v14b, trd_v15x
+
+      // Since there is only one tdr top node we check for full node name
+      // In new geometries the node name is trd_v<year><version> eg. trd_v13a
+      // With this naming scheme the geometry version is completely qualified
+
+        // strings returned are e.g. trd_v13a_0, need to chopped the first 8 characters with (0,8)
+        fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(node->GetName())(0,8)) );  
+	if (fm) {
+	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
+	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
+          fLogger->Debug(MESSAGE_ORIGIN,"Found root TRD geometry.");
+          fGeoVersion = kRootGeom;
+          return fGeoVersion;
+        }
+     }
+  }
+
   // Only the old monolithic geometry version has a volume trd11
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd11");
   if (fm) {
@@ -247,7 +269,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
     return GetLayerInfoFromOldGeometry(layersBeforeStation);
   } else {
     cout<<"Found new TRD geometry version (with a single keeping volume)."<<endl;
-    return GetLayerInfoFromNewGeometry(layersBeforeStation);
+    return GetLayerInfoFromSingleKVolumeGeometry(layersBeforeStation);
   }
     //  }
 }
@@ -297,7 +319,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersB
     return kTRUE;
 }
 
-Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersBeforeStation)
+Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t> &layersBeforeStation)
 {
 
     TGeoVolume *fm=NULL;
@@ -325,20 +347,21 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersB
       } while (fm);
       totalNrOfStations--;
     } else {
-      cout << "***************************************" <<endl;
-      cout << "                                       " <<endl;
-      cout << " - FATAL ERROR Unknown geometry version" <<endl;
-      cout << "   in GetLayerInfoFromNewGeometry      " <<endl;
-      cout << " No TRD stations found in the geometry " <<endl;
-      cout << "                                       " <<endl;
-      cout << "***************************************" <<endl;
+      cout << "******************************************" <<endl;
+      cout << "                                          " <<endl;
+      cout << " - FATAL ERROR Unknown geometry version   " <<endl;
+      cout << " in GetLayerInfoFromSingleKVolumeGeometry " <<endl;
+      cout << " No TRD stations found in the geometry    " <<endl;
+      cout << "                                          " <<endl;
+      cout << "******************************************" <<endl;
       return kFALSE;
     }
 
 
+    Int_t maxModuleType = 8;  // max number of different modules
+    Int_t maxLayer      =12;  // max number of different layers in a station
+    Int_t maxStation    = 3;  // max number of different stations
     Int_t layersPerStation[totalNrOfStations];
-    Int_t maxModuleType = 3;
-    Int_t maxLayer = 6 ;
 
 
     // Now loop over the stations and extract the number of layers
@@ -348,42 +371,44 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersB
     // layers. The highest found layer number is the number of layers
     // for a station.     
     
-
-
-    for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-
-      sprintf(volumeName, "trd%d", iStation);
-      fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
+    //      sprintf(volumeName, "trd%d", iStation);
+    sprintf(volumeName, "trd1");
+    fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
 
       // Check if a volume trdXmodY#1001 exists (first copy of trd 
       // module type Y in trd station X). Start with the highest
       // possible layer number. The layer of the first found module
       // is the number of layers in this station
 
-      Bool_t foundModule=kFALSE;
+    Bool_t foundModule=kFALSE;
       
-
-      for ( Int_t iLayer=maxLayer; iLayer>=1; iLayer--) {
-	for ( Int_t iModuleType=1; iModuleType<=maxModuleType; iModuleType++) {
-
-	  sprintf(volumeName, "trd%dmod%d_%d001", iStation, iModuleType, iLayer);
+    for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {   // start from the front
+      for ( Int_t iLayer=maxLayer; iLayer>=1; iLayer--) {                // start from the back
+        for ( Int_t iModuleType=1; iModuleType<=maxModuleType; iModuleType++) {
+  
+    	  sprintf(volumeName, "trd1mod%d_%d%d001", iModuleType, iStation, iLayer);  // from trd_v12a onwards
+//	  sprintf(volumeName, "trd%dmod%d_%d001", iStation, iModuleType, iLayer);
           node = (TGeoNode *) fm->GetNodes()->FindObject(volumeName);
+  	//          cout << node << " " << volumeName << endl;
+  
           if (node) {
-	    foundModule=kTRUE;
-	    break;
+  	    //            cout << node << " *** " << volumeName << endl;
+  	    foundModule=kTRUE;
+  	    break;
           }
-	}
-
+  
+        }
+  
         if (foundModule){
-          totalNrOfLayers += iLayer;
-	  layersBeforeStation.push_back(totalNrOfLayers);
-	  layersPerStation[iStation-1]=iLayer;
-	  break;
-	}
+  	  //          cout << "adding station *** " << volumeName << endl;
+          totalNrOfLayers += iLayer;   // add number of layers in this station
+  	  layersBeforeStation.push_back(totalNrOfLayers);
+  	  layersPerStation[iStation-1]=iLayer;
+          foundModule=kFALSE; 
+  	  break;
+        }
       }
-
     }
-
     
     for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
 

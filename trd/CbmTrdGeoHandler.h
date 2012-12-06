@@ -14,7 +14,8 @@
 #ifndef CBMTRDGEOHANDLER_H
 #define CBMTRDGEOHANDLER_H 1
 
-enum TrdGeometryVersions {kOldMonolithic,
+enum TrdGeometryVersions {kRootGeom,
+			  kOldMonolithic,
                           kNewMonolithic,
                           kQuasiMonolithic,
                           kSegmentedRectangular,
@@ -78,7 +79,7 @@ class CbmTrdGeoHandler : public TObject {
  private:
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
-  Bool_t GetLayerInfoFromNewGeometry(std::vector<Int_t> &layersBeforStation);
+  Bool_t GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromRootGeometry(std::vector<Int_t> &layersBeforStation);
   void FillDetectorInfoArray(Int_t uniqueId);
   void NavigateTo(TString volName);

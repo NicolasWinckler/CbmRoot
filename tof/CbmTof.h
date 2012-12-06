@@ -134,6 +134,13 @@ class CbmTof : public FairDetector
    **/
   void ResetParameters();
 
+  /** Method to construct the ascii geometry
+   **
+   **/
+  void ConstructASCIIGeometry();
+ 
+  Bool_t CheckIfSensitive(std::string name);
+
   CbmTof(const CbmTof&);
   CbmTof& operator=(const CbmTof&);
 

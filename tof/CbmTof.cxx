@@ -194,11 +194,20 @@ void CbmTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
        << endl;
 }
 // -------------------------------------------------------------------------
-
-
-
+void CbmTof::ConstructGeometry()
+{
+  TString fileName=GetGeometryFileName();
+  if (fileName.EndsWith(".geo")) {	
+    ConstructASCIIGeometry();
+  } else if (fileName.EndsWith(".root")) {
+    ConstructRootGeometry();
+  } else {
+    std::cout << "Geometry format not supported." << std::endl;
+  }
+}
+ 
 // -----   Public method ConstructGeometry   -------------------------------
-void CbmTof::ConstructGeometry() {
+void CbmTof::ConstructASCIIGeometry() {
   
   Int_t count=0;
   Int_t count_tot=0;
@@ -239,6 +248,15 @@ void CbmTof::ConstructGeometry() {
   ProcessNodes ( volList );
 }
 // -------------------------------------------------------------------------
+Bool_t CbmTof::CheckIfSensitive(std::string name)
+{
+  TString tsname = name; 
+  if (tsname.Contains("Cell")){
+    return kTRUE;
+  }
+  return kFALSE;
+}
+
 
 // -----   Private method AddHit   -----------------------------------------
 CbmTofPoint* CbmTof::AddHit(Int_t trackID, Int_t detID, TVector3 pos,

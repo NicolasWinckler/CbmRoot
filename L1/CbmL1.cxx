@@ -730,11 +730,19 @@ void CbmL1::IdealTrackFinder()
     if (!MC.IsReconstructable()) continue;
     if (!(MC.ID >= 0)) continue;
 
+    if (MC.StsHits.size() < 4) continue;
     L1Track algoTr;
-    algoTr.NHits = MC.StsHits.size();
-    if (algoTr.NHits < 4) continue;
-    for (int iH = 0; iH < algoTr.NHits; iH++){
-      algo->vRecoHits.push_back(MC.StsHits[iH]);
+    algoTr.NHits = 0;
+    int lastStation = -1;
+    for (int iH = 0; iH < MC.StsHits.size(); iH++){
+      const int hitI = MC.StsHits[iH];
+      const CbmL1StsHit& hit = vStsHits[hitI];
+      if ( vMCPoints[hit.mcPointIds[0]].iStation <= lastStation ) { // one hit per station
+        continue;
+      }
+      lastStation = vMCPoints[hit.mcPointIds[0]].iStation;
+      algo->vRecoHits.push_back(hitI);
+      algoTr.NHits++;
     }
     algoTr.Momentum = MC.p;
           

@@ -105,7 +105,9 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
 
     fTrackID       = gMC->GetStack()->GetCurrentTrackNumber();
     Volname = vol->GetName();
-    region = Volname[5]-'0';
+// Ugly fix
+//    region = Volname[5]-'0';
+    region = 1;
     gMC->CurrentVolID(gap);
     gMC->CurrentVolOffID(1, cell);
     gMC->CurrentVolOffID(2, module);

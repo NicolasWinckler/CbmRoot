@@ -41,11 +41,11 @@ class L1AlgoDraw{
   
   void DrawTriplets(vector <L1Triplet> &triplets, const THitI *realIHit);
   void DrawDoublets(vector<THitI>* Duplets_hits, map<THitI, THitI>* Duplets_start, const int MaxArrSize,
-                    int* StsHitsStartIndex, unsigned int *realIHit);
-  void DrawDoubletsOnSta(int iSta, THitI* Duplets_hits, THitI*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit);
-  
+                    THitI* StsHitsStartIndex, unsigned int *realIHit); void DrawDoubletsOnSta(int iSta, THitI* Duplets_hits, THitI*  Duplets_start, const int MaxArrSize, THitI* StsRestHitsStartIndex, unsigned int *realIHit);
+
+  void DrawTarget();
   void DrawInputHits(); // draw all hits, which TF have gotten
-  void DrawRestHits(int *StsRestHitsStartIndex, int *StsRestHitsStopIndex, unsigned int *realIHit); // draw only hits which leave on current iteration.
+  void DrawRestHits(THitI *StsRestHitsStartIndex, THitI *StsRestHitsStopIndex, unsigned int *realIHit); // draw only hits which leave on current iteration.
   
   void DrawInfo();
   void ClearVeiw();
@@ -71,6 +71,7 @@ class L1AlgoDraw{
   int StaColor; // color for stantions
   int hitsMStyle; // style for hits
   int fakesMStyle; // style for fakes
+  int targetMStyle; // style for target
   
   double HitSize; // size of hits
 
@@ -89,6 +90,7 @@ L1AlgoDraw::L1AlgoDraw()
   StaColor = 17;
   hitsMStyle = 20;
   fakesMStyle = 24;
+  targetMStyle = 29;
       
   HitSize = 1;
 
@@ -177,7 +179,7 @@ void L1AlgoDraw::DrawMCTracks()
     if( T.p<0.5 ) pline.SetLineColor(kBlue);
     if( T.mother_ID != -1) pline.SetLineColor(8);
     if(( T.mother_ID != -1) && ( T.p<0.5 )) pline.SetLineColor(12);
-    if (fVerbose >= 1) cout << "MC Track: p = " << T.p << "  mother_ID = " << T.mother_ID << "  PDG = " << T.pdg << endl;
+    if (fVerbose >= 1) cout << "MC Track: p = " << T.p << "  mother_ID = " << T.mother_ID << "  PDG = " << T.pdg << " x,y,z = (" << T.x << ", " << T.y << ", " << T.z << ")" << endl;
     double par[6];
     par[0] = T.x;
     par[1] = T.y;
@@ -423,7 +425,7 @@ void L1AlgoDraw::DrawTriplet(int il, int im, int ir)
   marker.DrawMarker(lx[nHits-1],ly[nHits-1]);
 }
 
-void L1AlgoDraw::DrawDoublets(vector<THitI>* Duplets_hits, map<THitI, THitI>* Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit)
+void L1AlgoDraw::DrawDoublets(vector<THitI>* Duplets_hits, map<THitI, THitI>* Duplets_start, const int MaxArrSize, THitI* StsRestHitsStartIndex, unsigned int *realIHit)
 {
   for (int iSta = 0; iSta < NStations-1; iSta++){
     const int firstHitOnSta = StsRestHitsStartIndex[iSta];
@@ -452,7 +454,7 @@ void L1AlgoDraw::DrawDoublets(vector<THitI>* Duplets_hits, map<THitI, THitI>* Du
   YX->cd(); YX->Update();
 };
 
-void L1AlgoDraw::DrawDoubletsOnSta(int iSta, THitI* Duplets_hits, THitI*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit)
+void L1AlgoDraw::DrawDoubletsOnSta(int iSta, THitI* Duplets_hits, THitI*  Duplets_start, const int MaxArrSize, THitI* StsRestHitsStartIndex, unsigned int *realIHit)
 {
   const int firstHitOnSta = StsRestHitsStartIndex[iSta];
   const int firstHitOnNextSta = StsRestHitsStartIndex[iSta+1];
@@ -520,6 +522,61 @@ void L1AlgoDraw::DrawInfo()
   cout << " vStsHits.size = " << algo->vStsHits.size() << endl;
   cout << " vRecoHits.size = " << algo->vRecoHits.size() << endl;
   cout << " vTracks.size = " << algo->vTracks.size() << endl;
+}
+
+void L1AlgoDraw::DrawTarget()
+{
+
+  float x = 0,y = 0,z = 0;
+  float x_t,z_t;
+
+  TVector3 v3(x, y, z);
+  v3.RotateX(TMath::Pi()/5);
+  v3.RotateY(TMath::Pi()/20);
+  v3.RotateZ(TMath::Pi()/100);
+  x_t = v3.x();
+  z_t = v3.z();
+
+  {
+    YZ->cd();
+  
+    TMarker *marker = new TMarker(z, y, targetMStyle);
+    marker->SetMarkerColor(kRed);
+    marker->SetMarkerStyle(targetMStyle);
+    marker->SetMarkerSize(HitSize);
+    marker->Draw();
+  }
+
+  {
+    XZ->cd();
+  
+    TMarker *marker = new TMarker(z, x, targetMStyle);
+    marker->SetMarkerColor(kRed);
+    marker->SetMarkerStyle(targetMStyle);
+    marker->SetMarkerSize(HitSize);
+    marker->Draw();
+  }
+
+  {
+    YX->cd();
+  
+    TMarker *marker = new TMarker(x, y, targetMStyle);
+    marker->SetMarkerColor(kRed);
+    marker->SetMarkerStyle(targetMStyle);
+    marker->SetMarkerSize(HitSize);
+    marker->Draw();
+  }
+
+  {
+    XYZ->cd();
+  
+    TMarker *marker = new TMarker(z_t, x_t, targetMStyle);
+    marker->SetMarkerColor(kRed);
+    marker->SetMarkerStyle(targetMStyle);
+    marker->SetMarkerSize(HitSize);
+    marker->Draw();
+  }
+
 }
 
 void L1AlgoDraw::DrawInputHits()
@@ -644,12 +701,11 @@ void L1AlgoDraw::DrawInputHits()
     pmxyz_fake->SetMarkerColor(mcolor[ista]);
     pmxyz_fake->SetMarkerStyle(fakesMStyle);
     pmxyz_fake->SetMarkerSize(HitSize);
-    pmxyz_fake->Draw();
-  }
+    pmxyz_fake->Draw();}
 
 } // DrawInputHits
 
-void L1AlgoDraw::DrawRestHits(int *StsRestHitsStartIndex, int *StsRestHitsStopIndex, unsigned int *realIHit)
+void L1AlgoDraw::DrawRestHits(THitI* StsRestHitsStartIndex, THitI* StsRestHitsStopIndex, unsigned int *realIHit)
 {
   
   TLatex latex;

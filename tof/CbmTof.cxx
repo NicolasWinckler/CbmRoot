@@ -38,6 +38,7 @@ CbmTof::CbmTof()
     fTime(-1.),
     fLength(-1.),
     fELoss(-1.),
+    fRootGeo(kFALSE),
     fPosIndex(0),
     fTofCollection(new TClonesArray("CbmTofPoint"))
 {
@@ -57,6 +58,7 @@ CbmTof::CbmTof(const char* name, Bool_t active)
     fTime(-1.),
     fLength(-1.),
     fELoss(-1.),
+    fRootGeo(kFALSE),
     fPosIndex(0),
     fTofCollection(new TClonesArray("CbmTofPoint"))
 {
@@ -105,9 +107,12 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
 
     fTrackID       = gMC->GetStack()->GetCurrentTrackNumber();
     Volname = vol->GetName();
-// Ugly fix
-//    region = Volname[5]-'0';
-    region = 1;
+// Ugly fix until the TofGeoManager will work
+    if (fRootGeo) {
+      region = 1;
+    } else {
+      region = Volname[5]-'0';
+    }
     gMC->CurrentVolID(gap);
     gMC->CurrentVolOffID(1, cell);
     gMC->CurrentVolOffID(2, module);
@@ -202,6 +207,7 @@ void CbmTof::ConstructGeometry()
   if (fileName.EndsWith(".geo")) {	
     ConstructASCIIGeometry();
   } else if (fileName.EndsWith(".root")) {
+    fRootGeo = kTRUE;
     ConstructRootGeometry();
   } else {
     std::cout << "Geometry format not supported." << std::endl;

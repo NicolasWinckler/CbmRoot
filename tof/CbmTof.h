@@ -116,6 +116,7 @@ class CbmTof : public FairDetector
   Double32_t     fTime;              //!  time
   Double32_t     fLength;            //!  length
   Double32_t     fELoss;             //!  energy loss
+  Bool_t         fRootGeo;           //!  root geo or not
 
   Int_t fPosIndex;                   //!
   TClonesArray* fTofCollection;      //! Hit collection

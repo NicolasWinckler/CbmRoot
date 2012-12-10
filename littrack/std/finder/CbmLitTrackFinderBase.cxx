@@ -52,12 +52,16 @@ void CbmLitTrackFinderBase::ArrangeHits(
 //   std::cout << "CbmLitTrackFinderBase::ArrangeHits:\n" << fHitData.ToString();
 //   std::cout << "CbmLitTrackFinderBase::ArrangeHits:\n" << fLayout.ToString();
 
-   for (Int_t i = 0; i < fLayout.GetNofStationGroups(); i++) {
-      for (Int_t j = 0; j < fLayout.GetNofStations(i); j++) {
+   Int_t nofStationGroups = fLayout.GetNofStationGroups();
+   for (Int_t i = 0; i < nofStationGroups; i++) {
+      Int_t nofStations = fLayout.GetNofStations(i);
+      for (Int_t j = 0; j < nofStations; j++) {
          const CbmLitStation& station = fLayout.GetStation(i, j);
          if (station.GetType() == kLITPIXELHIT) {
-            for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++) {
-            	for (Int_t l = 0; l < fLayout.GetNofModuleRotations(i, j, k); l++) {
+            Int_t nofSubstations = fLayout.GetNofSubstations(i, j);
+            for (Int_t k = 0; k < nofSubstations; k++) {
+               Int_t nofModuleRotations = fLayout.GetNofModuleRotations(i, j, k);
+            	for (Int_t l = 0; l < nofModuleRotations; l++) {
             	   HitPtrIteratorPair hits = fHitData.GetHits(i, j, k, l);
             	   std::sort(hits.first, hits.second, CompareHitPtrXULess());
 //	               std::cout << "station group " << i << " station " << j << " substation " << k << " moduleRotation " << l << std::endl;

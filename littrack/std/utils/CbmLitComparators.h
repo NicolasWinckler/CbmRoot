@@ -188,6 +188,7 @@ class CompareHitPtrXULess :
 {
 public:
    bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+      if (hit1 == NULL || hit2 == NULL) return false; // Bug fix from 10.12.2012. Protection against NULL hit pointer.
       if (hit1->GetType() == kLITPIXELHIT) {
          const CbmLitPixelHit* phit1 = static_cast<const CbmLitPixelHit*>(hit1);
          const CbmLitPixelHit* phit2 = static_cast<const CbmLitPixelHit*>(hit2);

@@ -43,7 +43,7 @@ void CbmLitHitData::SetDetectorLayout(
         	fHits[i][j][k].resize(nofModuleRotations);
         	fMaxErr[i][j][k].resize(nofModuleRotations);
             for(Int_t l = 0; l < nofModuleRotations; l++) {
-        	 fHits[i][j][k][l].reserve(1500);
+        	      fHits[i][j][k][l].reserve(1500);
             }
          }
       }

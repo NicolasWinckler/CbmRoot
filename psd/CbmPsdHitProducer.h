@@ -1,7 +1,8 @@
 // -------------------------------------------------------------------------
 // -----                 CbmPsdHitProducerIdel header file             -----
 // -----                  Created 15/05/12  by Alla                   -----
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------
+//--------------
 
 
 /** CbmPsdIdealDigitize.h
@@ -11,12 +12,12 @@
  ** full energy deposited in 1 module
  **/
 
-
 #ifndef CBMPSDHitProducer_H
-#define CBMPSDHitProducer_H 1
+#define CBMPSDHitProducer_H 
 
 
 #include "FairTask.h"
+#include "TH1F.h"
 
 class TClonesArray;
 
@@ -41,6 +42,7 @@ class CbmPsdHitProducer : public FairTask
 
   /** Virtual method Exec **/
   virtual void Exec(Option_t* opt);
+  virtual void Finish();
 
 
  private:
@@ -56,8 +58,12 @@ class CbmPsdHitProducer : public FairTask
   CbmPsdHitProducer operator=(const CbmPsdHitProducer&);
 
   void Reset();
+  Float_t       fXi[44];  //X coordinate of center of module
+  Float_t       fYi[44];  //X coordinate of center of module
+  TH1F *fhModXNewEn; //edep in each module for Marina
+ 
 
-  ClassDef(CbmPsdHitProducer,1);
+  ClassDef(CbmPsdHitProducer,2);
 
 };
 

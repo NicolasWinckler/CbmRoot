@@ -3,8 +3,10 @@
 // -----                  Created 15/05/12  by     Alla                -----
 // -------------------------------------------------------------------------
 #include <iostream>
+#include <fstream>
 
 #include "TClonesArray.h"
+#include "TMath.h"
 
 #include "FairRootManager.h"
 
@@ -48,6 +50,15 @@ CbmPsdHitProducer::~CbmPsdHitProducer()
 // -----   Public method Init   --------------------------------------------
 InitStatus CbmPsdHitProducer::Init() {
 
+ ifstream fxypos("psd_geo_xy.txt");
+  for (Int_t ii=0; ii<44; ii++) {
+    fxypos>>fXi[ii]>>fYi[ii];
+    cout<<ii<<" "<<fXi[ii]<<" "<<fYi[ii]<<endl;
+  }
+  fxypos.close();
+  fhModXNewEn = new TH1F("hModXNewEn","X distr, En",300,-150.,150.); 
+  fhModXNewEn->Print();
+
   // Get RootManager
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) {
@@ -82,6 +93,8 @@ InitStatus CbmPsdHitProducer::Init() {
 // -----   Public method Exec   --------------------------------------------
 void CbmPsdHitProducer::Exec(Option_t* opt) {
 
+  cout<<" CbmPsdHitProducer::Exec(Option_t* opt) "<<endl;
+  fhModXNewEn->Print();
 
   // Reset output array
    if ( ! fDigiArray ) Fatal("Exec", "No PsdDigi array");
@@ -111,7 +124,9 @@ void CbmPsdHitProducer::Exec(Option_t* opt) {
       new ((*fHitArray)[fNHits]) CbmPsdHit(imod, edep[imod]);
       fNHits++;
       //    cout<<"CbmPsdHitProducer "<<fNHits<<" "<<imod<<" "<<edep[imod]<<endl;
-    }
+     fhModXNewEn->Fill(fXi[imod],TMath::Sqrt(edep[imod]) );
+      cout<<"CbmPsdHitProducer "<<fNHits<<" "<<imod<<" "<<edep[imod]<<endl;
+     }
   }   
   // }//module
 
@@ -120,6 +135,14 @@ void CbmPsdHitProducer::Exec(Option_t* opt) {
 
 }
 // -------------------------------------------------------------------------
+void CbmPsdHitProducer::Finish()
+{
+  cout<<" CbmPsdHitProducer::Finish() "<<endl;
+   TFile * outfile = new TFile("EdepHistos.root","RECREATE");
+    outfile->cd();
+   fhModXNewEn->Write();
+   outfile->Close();
+}
 
 // -----   Private method Reset   ------------------------------------------
 void CbmPsdHitProducer::Reset() {

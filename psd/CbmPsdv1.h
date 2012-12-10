@@ -61,6 +61,8 @@ class CbmPsdv1 : public CbmPsd
   virtual void CreateMaterial();
   virtual void ConstructGeometry();
 
+  void SetXshift(Float_t shift) { fXshift = shift;}
+  void SetZposition(Float_t position) {fZposition = position; }
 
  private:
 
@@ -77,6 +79,10 @@ class CbmPsdv1 : public CbmPsd
  
   Int_t          fPosIndex;          //!
   TClonesArray*  fPsdCollection;     //! Hit collection
+  
+  Float_t   fXshift;                 //  shift on X axis to have ion beam inside the hole
+  Float_t   fZposition;              //  Z position PSD surface
+  
 
   /** Private method ResetParameters
    **
@@ -85,7 +91,7 @@ class CbmPsdv1 : public CbmPsd
   void ResetParameters();
 
 
-  ClassDef(CbmPsdv1,2)
+  ClassDef(CbmPsdv1,3)
 
 };
 

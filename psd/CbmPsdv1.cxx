@@ -15,6 +15,7 @@
 #include "TGeoBBox.h"
 
 #include <iostream>
+#include <fstream>
 
 using std::cout;
 using std::endl;
@@ -191,8 +192,8 @@ void CbmPsdv1::ConstructGeometry() {
   TGeoVolume *VRSL = gGeoManager->MakeBox("VRSL",med27,0.09,8.6,0.2);
  
   
-  Float_t zPSD= 1060;
-  Float_t xPSD= 15;
+  Float_t xPSD = fXshift;
+  Float_t zPSD = fZposition;
   gGeoManager->Node("VETO", 1, "cave", xPSD, 0, zPSD, 0, kTRUE, buf, 0);
   //  gGeoManager->Node("VMDL", 1, "VETO", 60, 60,0., 0, kTRUE, buf, 0);
   gGeoManager->Node("VFEL",1,"VMDL", 0, 0, -61.4, 0, kTRUE, buf, 0 );
@@ -216,8 +217,10 @@ void CbmPsdv1::ConstructGeometry() {
       gGeoManager->Node("VPBL",ivol+1, "VMDL", 0, 0, zvpbl , 0, kTRUE, buf, 0); 
       fNbOfSensitiveVol++;
     }
-   Float_t xCur=-60., yCur=-60.;
-   Int_t iMod=0, iModNoHole=0;
+  //XY positions written to the file to be read in reconstruction
+  Float_t xi[44], yi[44];
+  Float_t xCur=-60., yCur=-60.;
+  Int_t iMod=0, iModNoHole=0;
   for(Int_t iy=0; iy<7; iy++) {
     for(Int_t ix=0; ix<7; ix++) {
       iMod++;
@@ -230,6 +233,8 @@ void CbmPsdv1::ConstructGeometry() {
 	  iModNoHole++;
 	gGeoManager->Node("VMDL", iModNoHole, "VETO", xCur,yCur,0, 0, kTRUE, buf, 0); 
 	cout <<"MODULE :::::iMod,xxxx,yyyy " <<iModNoHole <<" " <<xCur <<" " <<yCur <<endl;
+	xi[iModNoHole-1] = xCur + xPSD;
+	yi[iModNoHole-1] = yCur;
 	}
 
 
@@ -242,6 +247,12 @@ void CbmPsdv1::ConstructGeometry() {
     yCur=yCur + 20.;
   }//for(Int_t iy==0; iy<9; iy++)
 
+  ofstream fxypos("psd_geo_xy.txt");
+  for (Int_t ii=0; ii<44; ii++) {
+    fxypos<<xi[ii]<<" "<<yi[ii]<<endl;
+    cout<<xi[ii]<<" "<<yi[ii]<<endl;
+  }
+  fxypos.close();
   
 
 }

@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 100)
+void global_sim(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
@@ -28,11 +28,11 @@ void global_sim(Int_t nEvents = 100)
 	Int_t nofJPsiToElectrons = 10; // number of embedded J/Psi particles decaying to e+ and e-
 	Int_t nofAuIons = 0; // number of generated Au ions
 	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
-    TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
+   TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof_6m/"; // Directory for output simulation files
+	TString dir = "./trd_sis100/events_wo_trd/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -60,7 +60,7 @@ void global_sim(Int_t nEvents = 100)
 		stsGeom    = "sts/sts_v12b.geo.root";
 		richGeom   = "rich/rich_v08a.geo";
 		trdGeom    = "trd/trd_v11c.geo";
-		tofGeom    = "tof/tof_v07a.geo";
+		tofGeom    = "tof/tof_v12a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";
 		magnetGeom = "passive/magnet_v12a.geo";

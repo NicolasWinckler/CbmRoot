@@ -12,11 +12,11 @@ void fieldapr_qa(Int_t nEvents = 1)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir = "./commit_tests/events_electron/"; // Output directory
+   TString dir = "$VMCWORKDIR/macro/littrack/commit_tests/events_electron/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameter file
    TString fieldaprQaFile = dir + "fieldapr.qa.0000.root";// Output file
-   TString resultDir = "./test";
+   TString resultDir = "./test/";
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
@@ -42,18 +42,16 @@ void fieldapr_qa(Int_t nEvents = 1)
 	CbmLitFieldApproximationQa* fieldQa = new CbmLitFieldApproximationQa();
 
 	std::vector<Double_t> zPos;
-   zPos.push_back(170.);
-   zPos.push_back(180.);
-   zPos.push_back(190.);
+   zPos.push_back(50.);
+   zPos.push_back(100.);
    zPos.push_back(200.);
-   zPos.push_back(210.);
    fieldQa->SetSliceZPosition(zPos);
 
    std::vector<UInt_t> degrees;
 // degrees.push_back(3);
-//   degrees.push_back(5);
+   degrees.push_back(5);
    degrees.push_back(7);
-// degrees.push_back(9);
+   degrees.push_back(9);
    fieldQa->SetPolynomDegrees(degrees);
 
 	fieldQa->SetAcceptanceAngleX(35.);
@@ -61,7 +59,7 @@ void fieldapr_qa(Int_t nEvents = 1)
 	fieldQa->SetNofBinsX(30);
 	fieldQa->SetNofBinsY(30);
 
-	fieldQa->IsFixedBounds(false);
+	fieldQa->IsFixedBounds(true);
 	fieldQa->SetUseEllipseAcc(false);
 	fieldQa->SetPolynomDegreeIndex(0);
 	fieldQa->SetOutputDir(std::string(resultDir));

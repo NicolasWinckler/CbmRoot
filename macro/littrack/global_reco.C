@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "/Users/andrey/Development/cbm/d/events/sts_tof_6m/"; // Output directory
+	TString dir = "/Users/andrey/Development/cbm/d/events/much_fail/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -30,7 +30,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    TString globalTracksFile = dir + "global.tracks.0000.root";// Output file with global tracks
 
    // Digi files
-   TList *parFileList = new TList();
+   TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
@@ -248,7 +248,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 //				// ----- End TRD Clustering -----
 
 				// ----- TRD clustering -----
-				CbmTrdClusterizerFast* trdClustering = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator,false,true);
+				CbmTrdDigitizerPRF* trdClustering = new CbmTrdDigitizerPRF("TRD Clusterizer", "TRD task", radiator, false, true);
 				run->AddTask(trdClustering);
 
 				CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast(true, true, false, 5.0e-7);

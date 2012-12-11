@@ -206,8 +206,8 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   ExtrapolateToPV(vK0sPrim,PrimVtx);
   
   // Find Xi-
-//   float cutXi[3] = {3.,5.,6.};
-  float cutXi[3] = {-300.,10.,10.};
+   float cutXi[3] = {3.,5.,6.};
+//  float cutXi[3] = {-300.,10.,10.};
   FindTrackV0Decay(3312, Particles, vLambdaSec, vRTracks, vField, pdgNeg[5], idNegSec[5],
                    PrimVtx, cutXi, 0, 0, &vXiPrim, massKsiPDG, 0.002 );
 

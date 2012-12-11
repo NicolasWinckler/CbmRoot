@@ -1504,10 +1504,10 @@ void CbmL1::TrackFitPerformance()
         Double_t l,r;
       } Table[Nh_fit]=
       {
-        {"x",  "Residual X [#mum]",                   100, -30., 30.},
-        {"y",  "Residual Y [#mum]",                   100, -100., 100.},
+        {"x",  "Residual X [#mum]",                   100, -45., 45.},
+        {"y",  "Residual Y [#mum]",                   100, -450., 450.},
         {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
-        {"ty", "Residual Ty [mrad]",                  100,   -2.,   2.},
+        {"ty", "Residual Ty [mrad]",                  100,   -3.5,   3.5},
         {"P",  "Resolution P/Q [100%]",               100,   -0.1,  0.1 },
         {"px", "Pull X [residual/estimated_error]",   100,  -6.,  6.},
         {"py", "Pull Y [residual/estimated_error]",   100,  -6.,  6.},

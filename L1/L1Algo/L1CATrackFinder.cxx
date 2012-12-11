@@ -1359,7 +1359,7 @@ void L1Algo::CATrackFinder()
          TRIPLET_CHI2_CUT = 6.252; // prob = 0.1
          break;
        case kAllSecIter:
-         TRIPLET_CHI2_CUT = 2.706; // prob = 0.1
+         TRIPLET_CHI2_CUT = 6.252;//2.706; // prob = 0.1
          break;
      }
      
@@ -1392,7 +1392,7 @@ void L1Algo::CATrackFinder()
     }
     if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) { //use outer radius of the 1st station as a constraint
       L1Station &st = vStations[0];
-      SigmaTargetX = SigmaTargetY = 3;//st.Rmax[0];
+      SigmaTargetX = SigmaTargetY = 10;//st.Rmax[0];
       targZ = 0.;//-1.;
       st.fieldSlice.GetFieldValue( 0, 0, targB );
     }
@@ -1765,7 +1765,7 @@ void L1Algo::CATrackFinder()
     int min_level = 0; // min level for start triplet. So min track length = min_level+3.
 //    if (isec == kFastPrimJumpIter) min_level = 1;
     if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
-      min_level = 2; // only the long low momentum tracks
+      min_level = 1; // only the long low momentum tracks
 #ifdef TRACKS_FROM_TRIPLETS
     if (isec == TRACKS_FROM_TRIPLETS_ITERATION)
       min_level = 0;

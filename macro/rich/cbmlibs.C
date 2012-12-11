@@ -4,6 +4,7 @@ void cbmlibs()
 	  //gSystem->Load("/u/slebedev/Baykal/tbb21_017oss/libtbb");
 	  //gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 	  //gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+     gSystem->Load("libboost_regex");
 
 	  gSystem->Load("libGeoBase");
 	  gSystem->Load("libParBase");

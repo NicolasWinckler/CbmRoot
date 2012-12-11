@@ -95,6 +95,7 @@ private:
    		//int numbersOfPadsInCluster[g_ward_MAX_NEIGHBORS];
    		//Koli4estvo 94eek v klastere
    		Int_t nofPads;	//padsInCluster
+   		Int_t padsInCluster[30];
    	};
    ClusterBlock* fClustersInBlock;
 

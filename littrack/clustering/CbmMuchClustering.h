@@ -17,6 +17,8 @@
 #include "CbmMuchModuleGem.h"
 //#include "TClonesArray.h"
 
+#include "TH1F.h"
+
 class TClonesArray;
 
 class CbmMuchClustering: public FairTask
@@ -48,6 +50,7 @@ public:
    virtual void Finish();
 
    void SetAlgorithmVersion(Int_t AlgorithmVersion) { fAlgorithmVersion = AlgorithmVersion;}
+   void SetGeometryVersion(Int_t GeometryVersion)	{ fGeoVersion = GeometryVersion;}
 
    void DeletePadsCharge(CbmClusteringGeometry* moduleGeo);
 
@@ -65,6 +68,7 @@ private:
    Int_t fAlgorithmVersion;
    Int_t fNofModules;
    Int_t fNofClusters;
+   Int_t fGeoVersion;
 
    CbmClusteringA1* fClustersA1;
    CbmClusteringSL* fClustersSL;
@@ -83,9 +87,12 @@ private:
    TClonesArray* fCluster;
    TClonesArray* fHit;
    //TClonesArray* fStrawHit;
+   TH1F* fhDigisInCluster;
+   Int_t fNofEvents;
 
    void ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
    void ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
+   void ClusteringWard(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2/*, Int_t Ver, Int_t &nHit, Int_t &nCluster*/);
 
    ClassDef(CbmMuchClustering, 1);
 };

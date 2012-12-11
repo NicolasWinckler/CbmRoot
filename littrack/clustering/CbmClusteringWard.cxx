@@ -147,8 +147,9 @@ void CbmClusteringWard::WardCreate(CbmClusteringGeometry* moduleGeo)
 		//Initsiatsi9 aktivnih 94eek
 		if(moduleGeo->GetPadCharge(iPad) > 0)
 		{
-			fClustersInBlock[clusterNumber].nofNeighbors = moduleGeo->GetNeighborsNum(iPad);
+			fClustersInBlock[clusterNumber].nofNeighbors = moduleGeo->GetGoodNeighborsNum(iPad);
 			fClustersInBlock[clusterNumber].nofPads = 1;
+			fClustersInBlock[clusterNumber].padsInCluster[0] = iPad;
 //---!!!---<
 			//fClustersInBlock[clusterNumber].numbersOfPadsInCluster[1] = iPad;
 			fClustersInBlock[clusterNumber].nofCluster = iPad;
@@ -194,7 +195,7 @@ void CbmClusteringWard::WardCreate(CbmClusteringGeometry* moduleGeo)
 //функции загрузки в блок недоделаны. есть проблема с nofNeighbors
 void CbmClusteringWard::AddClusterInBlock(CbmClusteringGeometry* moduleGeo, Int_t newCluster, Int_t addedCluster)
 {
-	fClustersInBlock[newCluster].nofNeighbors = moduleGeo->GetNeighborsNum(addedCluster);
+	fClustersInBlock[newCluster].nofNeighbors = moduleGeo->GetGoodNeighborsNum(addedCluster);
 	fClustersInBlock[newCluster].nofPads = 1;
 	fClustersInBlock[newCluster].nofCluster = addedCluster;
 	fClustersInBlock[newCluster].linkToDesignation = padsInClusters[addedCluster];
@@ -238,9 +239,9 @@ Bool_t CbmClusteringWard::WardBlockCreateStep(CbmClusteringGeometry* moduleGeo, 
 	//Deaktivatsi9 94eiki
 	wardActivePads[tempPad] = false;
 	wardStep++;
-	if(moduleGeo->GetNeighborsNum(addedPad) > 0)
+	if(moduleGeo->GetGoodNeighborsNum(addedPad) > 0)
 	{
-		for(Int_t iPad = 0; iPad < moduleGeo->GetNeighborsNum(addedPad); iPad++)	//0 <> 1 -???
+		for(Int_t iPad = 0; iPad < moduleGeo->GetGoodNeighborsNum(addedPad); iPad++)	//0 <> 1 -???
 		{
 			if(wardActivePads[moduleGeo->GetNeighbor(addedPad, iPad)] == true)
 			{
@@ -321,10 +322,10 @@ void CbmClusteringWard::WardBlockCreate(CbmClusteringGeometry* moduleGeo)
 	for(Int_t iCl = 0; iCl < clustersInMethod; iCl++)	//0 <> 1 - ???
 	{
 		neighbor = 0;
-		//std::cout<<"Neighbors: "<<moduleGeo->GetNeighborsNum(fClustersInBlock[iCl].nofCluster)<<"\n";
+		//std::cout<<"Neighbors: "<<moduleGeo->GetGoodNeighborsNum(fClustersInBlock[iCl].nofCluster)<<"\n";
 		for(Int_t jCl = 0; jCl < clustersInMethod; jCl++)	//0 <> 1 - ???
 		{
-			for(Int_t kCl = 0; kCl < moduleGeo->GetNeighborsNum(fClustersInBlock[iCl].nofCluster)/*fClustersInBlock[iCl].nofNeighbors*/; kCl++)	//0 <> 1 - ???
+			for(Int_t kCl = 0; kCl < moduleGeo->GetGoodNeighborsNum(fClustersInBlock[iCl].nofCluster)/*fClustersInBlock[iCl].nofNeighbors*/; kCl++)	//0 <> 1 - ???
 			{
 				//std::cout<<"Cl1: "<<moduleGeo->GetNeighbor(fClustersInBlock[iCl].nofCluster, kCl);
 				//std::cout<<"; Cl2: "<<fClustersInBlock[jCl].nofCluster<<"\n";
@@ -537,6 +538,7 @@ void CbmClusteringWard::WardProcessingData(Float_t maxDistance)
 		//Pereda4a 94eek glavnomu klasteru
 		for(Int_t iCl = 0; iCl < fClustersInBlock[cluster2].nofPads; iCl++)	//0 <> 1 - ???
 		{
+			fClustersInBlock[cluster1].padsInCluster[fClustersInBlock[cluster1].nofPads] = fClustersInBlock[cluster2].padsInCluster[iCl];
 			fClustersInBlock[cluster1].nofPads++;
 //---!!!---<>
 			//fClustersInBlock[cluster1].numbersOfPadsInCluster[fClustersInBlock[cluster1].nofPads] = ClustersInBlock[cluster2].numbersOfPadsInCluster[i];
@@ -636,6 +638,10 @@ void CbmClusteringWard::GetClustersFromBlock()
 		fClusters[clustersInMethod_2 + iCl].nofPads = fClustersInBlock[iCl].nofPads;
 		fClusters[clustersInMethod_2 + iCl].xc = fClustersInBlock[iCl].xc;
 		fClusters[clustersInMethod_2 + iCl].yc = fClustersInBlock[iCl].yc;
+		for(Int_t i = 0; i < fClusters[clustersInMethod_2 + iCl].nofPads; i++)
+		{
+			fClusters[clustersInMethod_2 + iCl].padsInCluster[i] = fClustersInBlock[iCl].padsInCluster[i];
+		}
 		//WARNING net zapolneni9 massiva sosedei - ?!
 	}
 	clustersInMethod_2 += clustersInMethod;
@@ -644,8 +650,8 @@ void CbmClusteringWard::GetClustersFromBlock()
 
 void CbmClusteringWard::WardMainFunction(CbmClusteringGeometry* moduleGeo, Float_t maxDistance)
 {
-	//WardCreate(moduleGeo);
-	WardBlockCreate(moduleGeo);
+	WardCreate(moduleGeo);
+	//WardBlockCreate(moduleGeo);
 	WardProcessingData(maxDistance);
 	GetClustersFromBlock();
 	/*do{
@@ -683,5 +689,10 @@ Int_t CbmClusteringWard::GetNofPads(Int_t iCluster)
 }
 Int_t CbmClusteringWard::GetPadInCluster(Int_t iCluster, Int_t iPad)
 {
+	std::cout<<"Cl: "<<iCluster;
+	std::cout<<"\nPad: "<<iPad;
+	std::cout<<"\nnPad: "<<fClusters[iCluster].padsInCluster[iPad]<<"\n";
+	if(fClusters[iCluster].padsInCluster[iPad] > 10000)return 0;
+	if(fClusters[iCluster].padsInCluster[iPad] < 0)return 0;
 	return fClusters[iCluster].padsInCluster[iPad];
 }

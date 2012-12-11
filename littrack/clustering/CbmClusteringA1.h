@@ -45,7 +45,8 @@ public:
    UInt_t GetClCharge(Int_t iCluster);
    Int_t GetNofPads(Int_t iCluster);
    Int_t GetPadInCluster(Int_t iCluster, Int_t iPad);
-   //UInt_t GetPadCharge(Int_t iCluster, Int_t iPad);
+   Int_t GetNPadInCluster(Int_t iCluster, Int_t iPad);
+   UInt_t GetPadCharge(Int_t iCluster, Int_t iPad);
    vector<Int_t> GetPads(Int_t iCluster);
 
 private:
@@ -72,6 +73,8 @@ private:
 	   Int_t fNofPads;
 	   //Int_t padsInCluster[30];
 	   vector<Int_t> fPadsInCluster;
+	   vector<Int_t> fNPadsInCluster;
+	   vector<Int_t> fPadsCharges;
    };
    Cluster* fClusters;
    //TClonesArray* fClFull;

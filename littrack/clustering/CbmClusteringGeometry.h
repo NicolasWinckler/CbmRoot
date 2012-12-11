@@ -23,13 +23,21 @@ public:
     * \brief Constructor.
     */
 	CbmClusteringGeometry();
-	CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
+	CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme, Int_t geoVersion);
+	/*CbmClusteringGeometry(CbmClusteringGeometry* geo, Float_t x, Float_t y, Float_t dx, Float_t dy, Double_t phi1, Double_t phi2, Float_t r1, Float_t r2,
+	   Int_t digiNum, UInt_t charge, Int_t nofNeighbors, Int_t nofGoodNeighbors, vector<Int_t> neighbors, Long64_t chID);*/
+	/*CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t nPad,
+			Int_t digiNum, Int_t nofGoodNeighbors, vector<Int_t> neighbors, Long64_t chID);*/
+	CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t nofPads);
+	void CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y, Float_t dx, Float_t dy, Double_t phi1, Double_t phi2, Float_t r1, Float_t r2,
+			   Int_t digiNum, UInt_t charge, /*Int_t nofNeighbors, Int_t nofGoodNeighbors, vector<Int_t> neighbors, */Long64_t chID);
    /**
     * \brief Destructor.
     */
    virtual ~CbmClusteringGeometry();
 
    void SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
+   void SetMuchModuleGeometryRadial(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
 
    //Int_t GetStation()		const { return fStation; }
    //Int_t GetLayer()			const { return fLayer; }
@@ -62,6 +70,13 @@ public:
 
    Int_t GetPadByChannelId(Long64_t chId);
 
+   Double_t GetPhi1(Int_t iPad);
+   Double_t GetPhi2(Int_t iPad);
+   Float_t GetR1(Int_t iPad);
+   Float_t GetR2(Int_t iPad);
+   vector<Int_t> GetNeighbors(Int_t iPad);
+   Long64_t GetChannelID(Int_t iPad);
+
 
 
 private:
@@ -71,7 +86,7 @@ private:
    template <typename T2>
    T2 GetMax(T2& a, T2& b);
 
-   Bool_t SubEqual(Float_t x1, Float_t x2, Float_t l);
+   Bool_t SubEqual(Double_t x1, Double_t x2, Double_t l);
 
    Long64_t fNofPads;
    //Int_t fStation;
@@ -85,6 +100,8 @@ private:
    struct PadInformation{
 	   Float_t fX, fY;
 	   Float_t fDx, fDy;
+	   Double_t fPhi1, fPhi2;
+	   Float_t fR1, fR2;
 	   Int_t fDigiNum;
 	   UInt_t fCharge;
 	   Int_t fNofNeighbors;

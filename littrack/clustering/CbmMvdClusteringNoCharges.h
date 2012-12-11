@@ -1,12 +1,12 @@
 /*
- * CbmMvdClustering.h
+ * CbmMvdClusteringNoCharges.h
  *
  *  Created on: Jun 7, 2012
  *      Author: kozlov
  */
 
-#ifndef CBMMVDCLUSTERING_H_
-#define CBMMVDCLUSTERING_H_
+#ifndef CBMMVDCLUSTERINGNOCHARGES_H_
+#define CBMMVDCLUSTERINGNOCHARGES_H_
 
 #include "FairTask.h"
 #include "CbmMvdPoint.h"
@@ -38,18 +38,18 @@ class CbmMvdStation;
 
 class TH1F;
 
-class CbmMvdClustering: public FairTask
+class CbmMvdClusteringNoCharges: public FairTask
 {
 public:
    /**
     * \brief Constructor.
     */
-	CbmMvdClustering();
+	CbmMvdClusteringNoCharges();
 
    /**
     * \brief Destructor.
     */
-   virtual ~CbmMvdClustering();
+   virtual ~CbmMvdClusteringNoCharges();
 
    /**
     * \brief Derived from FairTask.
@@ -68,6 +68,9 @@ public:
 
    void FindClusters();
 
+   void Step1_SLClustering();
+   void Step1_SLRec(pair<Int_t, Int_t> it, Int_t cl);
+
    void CalculateAcuracy();
 
    //void FillHistogramsForRadius();
@@ -81,14 +84,14 @@ private:
 
    void ReadDataBranches();
 
-   //
-   TClonesArray* fMCTracks;
-   //
    TClonesArray* fDigis;
    TClonesArray* fPoints;
    TClonesArray* fHits;
    TClonesArray* fCluster;
    TClonesArray* fMatches;
+
+   TClonesArray* fMCTracks;
+
    map<pair<Int_t, Int_t>, Int_t> fDigiMap;
    map<pair<Int_t, Int_t>, Int_t>::iterator fDigiMapIt;
 
@@ -101,6 +104,9 @@ private:
    map<pair<Int_t, Int_t>, Bool_t> fChargeMap1;
    map<pair<Int_t, Int_t>, Bool_t>::iterator fChargeMap1It;
 
+   map<pair<Int_t, Int_t>, Bool_t> fChargeMap2;
+   map<pair<Int_t, Int_t>, Bool_t>::iterator fChargeMap2It;
+
    /*map<pair<Int_t, Int_t>, Int_t> fChargeMap2;
    map<pair<Int_t, Int_t>, Int_t>::iterator fChargeMap2It;*/
    Int_t fNofDigis;
@@ -110,6 +116,9 @@ private:
    Int_t fNofDigisBySt[2];
    Int_t fNofClustersBySt[2];
 
+   Bool_t fUseTrashold;
+   Int_t fTrashold;
+
    static const Int_t nDigiByCl = 100;
    Int_t fNofClusters;
    struct Cluster{
@@ -118,11 +127,13 @@ private:
    	   Float_t yc;
    	   Float_t sumClCharge;
    	   Int_t nofDidis;
-   	   Int_t digisInCluster[nDigiByCl];
+   	   //Int_t digisInCluster[nDigiByCl];
+   	   vector<Int_t> digisInCluster;
    	   Int_t nDigiMax;
    	   Int_t nMCPoint;
    };
    Cluster* fClusters;
+   vector<Cluster> fFinalClusters;
 
    map<Int_t, CbmMvdStation*> fStationMap;
 
@@ -136,6 +147,13 @@ private:
    TH1F* fhErrorsPixel_MCPoint;
 
    TH1F* fhDigisInCluster;
+   TH1F* fhDigisInClusterPDG211;
+   TH1F* fhDigisInClusterPDG11;
+   TH1F* fhDigisInClusterPDG321;
+   TH1F* fhDigisInClusterPDG2212;
+   TH1F* fhDigisInClusterPDG3222;
+   TH1F* fhDigisInClusterPDG3112;
+   TH1F* fhDigisInClusterPDG13;
    TH1F* fhMaxDigiCharges;
    TH1F* fhMaxDigiChargesStation1;
    TH1F* fhMaxDigiChargesStation2;
@@ -155,7 +173,7 @@ private:
 
    void ChangeClusters(pair<Int_t, Int_t> h, Int_t nCl0, Int_t nCl1);
 
-   ClassDef(CbmMvdClustering, 1);
+   ClassDef(CbmMvdClusteringNoCharges, 1);
 };
 
-#endif /* CBMMVDCLUSTERING_H_ */
+#endif /* CBMMVDCLUSTERINGNOCHARGES_H_ */

@@ -41,6 +41,7 @@ CbmClusteringWard.cxx
 CbmMuchTest.cxx
 CbmMvdGeoCl.cxx
 CbmMvdClustering.cxx
+CbmMvdClusteringNoCharges.cxx
 CbmMuchClusteringQa0.cxx
 qa/clustering/CbmMuchClusteringQa.cxx
 qa/clustering/CbmMuchClusteringQaCalculator.cxx
@@ -60,6 +61,7 @@ CbmMuchClustering.h
 CbmMuchTest.h
 #CbmMvdGeoCl.h
 CbmMvdClustering.h
+CbmMvdClusteringNoCharges.h
 CbmMuchClusteringQa0.h
 qa/clustering/CbmMuchClusteringQa.h
 )

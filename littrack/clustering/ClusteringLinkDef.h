@@ -7,6 +7,7 @@
 #pragma link C++ class CbmMuchClustering+;
 #pragma link C++ class CbmMuchClusteringQa0+;
 #pragma link C++ class CbmMvdClustering+;
+#pragma link C++ class CbmMvdClusteringNoCharges+;
 
 #ifdef BOOST_FOUND
 #pragma link C++ class CbmMuchClusteringQa+;

@@ -96,7 +96,7 @@ void CbmReport::SaveCanvasesAsImages() const
 	Int_t nofCanvases = fCanvases.size();
 	for (Int_t i = 0; i < nofCanvases; i++) {
 		TCanvas* canvas = fCanvases[i];
-		canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".eps").c_str());
+		//canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".eps").c_str());
 		canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".png").c_str());
 		canvas->SaveAs(string(GetOutputDir() + string(canvas->GetTitle()) + ".gif").c_str());
 	}

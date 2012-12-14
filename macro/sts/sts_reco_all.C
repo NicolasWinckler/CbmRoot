@@ -16,16 +16,16 @@
 // --------------------------------------------------------------------------
 
 #include <math.h>
-void sts_reco_all(Int_t nEvents = 1000) {
+void sts_reco_all(Int_t nEvents, Float_t energy, Int_t index) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
   
   // Input file (MC events)
-  TString inFile = "sts.mc.root";
+//  TString inFile = "sts.mc.25gev.1000.root";
   
   // Parameter file
-  TString parFile = "params.root";
+//  TString parFile = "params.25gev.1000.root";
   
   // STS digitisation file
   TList *parFileList = new TList();
@@ -33,11 +33,11 @@ void sts_reco_all(Int_t nEvents = 1000) {
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v11a.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par";
   parFileList->Add(&stsDigiFile);
   
   // Output file
-  TString outFile = "sts.reco.root";
+//  TString outFile = "sts.reco.25gev.1000.root";
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
@@ -46,32 +46,12 @@ void sts_reco_all(Int_t nEvents = 1000) {
   
   Double_t threshold  =  4;
   Double_t noiseWidth =  0.1;
-  Int_t    nofBits    = 20;
-  Double_t minStep    =  0.01;
+  Int_t    nofBits    = 12;
+  Double_t electronsPerAdc    =  10;
   Double_t StripDeadTime = 10.;
   
 
-  // ---   Screen output   --------------------------------------------------  
-  cout << "***************************************************" << endl;
-  cout << "***   STS REALISTIC RECONSTRUCTION SCRIPT   *******" << endl;
-  cout << "***************************************************" << endl;
-  cout << "*** Input file        : " << inFile << endl;
-  cout << "*** Parameter file    : " << parFile << endl;
-  cout << "*** Output file       : " << outFile << endl;
-  cout << "*** Number of events  : " << nEvents << endl;
-  cout << "***************************************************" << endl;
-  cout << endl;
-  cout << "=============================================" << endl;
-  cout << "===     Realistic response settings  ========" << endl;
-  cout << "=============================================" << endl;
-  cout << "===    threshold  = " << threshold  << endl;
-  cout << "===    noiseWidth = " << noiseWidth << endl;
-  cout << "===    nofBits    = " << nofBits    << endl;
-  cout << "===    minStep    = " << minStep    << endl;
-  cout << "===    StripDeadTime    = " << StripDeadTime*100. << "[ns] " << endl;
-  cout << "=============================================" << endl;
-  cout << endl << endl;
- // ------------------------------------------------------------------------
+
 
 
         
@@ -100,25 +80,64 @@ void sts_reco_all(Int_t nEvents = 1000) {
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
+  gSystem->Load("libEcal");
+  gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  gSystem->Load("libEcal");
   gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
   gSystem->Load("libL1");
-  gSystem->Load("libLittrack");
+  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
 
   // ------------------------------------------------------------------------
+  char strInputFile[1000];
+  char strParamFile[1000];
+  char strOutputFile[1000];
 
+  sprintf(strInputFile, "data/auau%1.0f/sts.mc.auau.%1.0fgev.centr.%4d.root",
+	  energy, energy, index);
+  sprintf(strParamFile, "data/auau%1.0f/params.auau.%1.0fgev.centr.%4d.root",
+	  energy, energy, index);
+  sprintf(strOutputFile, "data/auau%1.0f/sts.reco.auau.%1.0fgev.centr.%4d.root",
+	  energy, energy, index);
+//sprintf(strOutputFile, "test.root",
+//	  energy, energy, index);
   
-
+  for(Int_t i = 0; i < 1000; i++) {
+    if(' ' == strInputFile[i]) strInputFile[i] = '0';
+    if(' ' == strParamFile[i]) strParamFile[i] = '0';
+    if(' ' == strOutputFile[i]) strOutputFile[i] = '0';
+  }
+  
+  // ---   Screen output   --------------------------------------------------  
+  cout << "***************************************************" << endl;
+  cout << "***   STS REALISTIC RECONSTRUCTION SCRIPT   *******" << endl;
+  cout << "***************************************************" << endl;
+  cout << "*** Input file        : " << strInputFile << endl;
+  cout << "*** Parameter file    : " << strParamFile << endl;
+  cout << "*** Output file       : " << strOutputFile << endl;
+  cout << "*** Number of events  : " << nEvents << endl;
+  cout << "***************************************************" << endl;
+  cout << endl;
+  cout << "=============================================" << endl;
+  cout << "===     Realistic response settings  ========" << endl;
+  cout << "=============================================" << endl;
+  cout << "===    threshold  = " << threshold  << endl;
+  cout << "===    noiseWidth = " << noiseWidth << endl;
+  cout << "===    nofBits    = " << nofBits    << endl;
+  cout << "===    electronsPerAdc    = " << electronsPerAdc    << endl;
+  cout << "===    StripDeadTime    = " << StripDeadTime*100. << "[ns] " << endl;
+  cout << "=============================================" << endl;
+  cout << endl << endl;
+ // ------------------------------------------------------------------------
   // -----   Reconstruction run   -------------------------------------------
-  FairRunAna* run= new FairRunAna();
-  run->SetInputFile(inFile);
-  run->SetOutputFile(outFile);
+  FairRunAna *run= new FairRunAna();
+  run->SetInputFile(strInputFile);
+  run->SetOutputFile(strOutputFile);
+  
   // ------------------------------------------------------------------------
 
   // -----   STS digitiser   ------------------------------------------------
@@ -131,9 +150,8 @@ void sts_reco_all(Int_t nEvents = 1000) {
 
   stsDigitize->SetFrontNofBits   (nofBits);
   stsDigitize->SetBackNofBits    (nofBits);
-  stsDigitize->SetFrontMinStep   (minStep);
-  stsDigitize->SetBackMinStep    (minStep);
-
+  stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
+  stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
   stsDigitize->SetStripDeadTime  (StripDeadTime);
 
   run->AddTask(stsDigitize);
@@ -184,8 +202,8 @@ void sts_reco_all(Int_t nEvents = 1000) {
   
   
   // -----   STS simulation QA   ----------------------------------------
-  FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
-  run->AddTask(stsSimQa);
+//  FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
+//  run->AddTask(stsSimQa);
   // ------------------------------------------------------------------------
   
   // -----   STS hit finding QA   ----------------------------------------
@@ -204,7 +222,7 @@ void sts_reco_all(Int_t nEvents = 1000) {
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-  parIo1->open(parFile.Data());
+  parIo1->open(strParamFile);
   parIo2->open(parFileList, "in");
   rtdb->setFirstInput(parIo1);
   rtdb->setSecondInput(parIo2);
@@ -229,8 +247,8 @@ void sts_reco_all(Int_t nEvents = 1000) {
   Double_t ctime = timer.CpuTime();
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
-  cout << "Output file is "         << outFile << endl;
-  cout << "Parameter file is "      << parFile << endl;
+  cout << "Output file is "         << strOutputFile << endl;
+  cout << "Parameter file is "      << strParamFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------

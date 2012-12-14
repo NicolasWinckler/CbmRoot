@@ -299,7 +299,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     }
 
     //    cout << " in node \"" << curNode->GetName() << "\"" << flush;
-    CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
+    TString curPath = fDigiScheme->GetCurrentPath();
+    CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curPath);
     Int_t stationNr = sensor->GetStationNr();
 
     Int_t startHit = hitStationLimits[0][stationNr-1];

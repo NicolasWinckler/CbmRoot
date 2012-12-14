@@ -90,14 +90,14 @@ If(BUILD_LITTRACK_EXPERIMENTAL)
   EndForEach(delta IN  LISTS  mvd_delta)
   
   
-  GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_field.sh)
-  Add_Test(littrack_field "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_field.sh")
-  Set_Tests_Properties(littrack_field PROPERTIES TIMEOUT "3600")
-  Set_Tests_Properties(littrack_field PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+#  GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_field.sh)
+#  Add_Test(littrack_field "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_field.sh")
+#  Set_Tests_Properties(littrack_field PROPERTIES TIMEOUT "3600")
+#  Set_Tests_Properties(littrack_field PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
   
-  GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_fieldapr.sh)
-  Add_Test(littrack_fieldapr "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_fieldapr.sh")
-  Set_Tests_Properties(littrack_fieldapr PROPERTIES TIMEOUT "3600")
-  Set_Tests_Properties(littrack_fieldapr PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+#  GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_fieldapr.sh)
+#  Add_Test(littrack_fieldapr "${CBMROOT_BINARY_DIR}/macro/littrack/nightly_tests/run_test_fieldapr.sh")
+#  Set_Tests_Properties(littrack_fieldapr PROPERTIES TIMEOUT "3600")
+#  Set_Tests_Properties(littrack_fieldapr PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
 EndIf(BUILD_LITTRACK_EXPERIMENTAL)

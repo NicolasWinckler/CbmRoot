@@ -10,7 +10,7 @@ function checkout_cbmroot
     rm -rf ${dir}/*
     cd ${dir}/
     svn co  https://subversion.gsi.de/fairroot/cbmroot/trunk cbmroot
-    cp -R /data.local1/andrey/tests/fieldmaps/* ${dir}/cbmroot/input/
+    cp -R /data.local1/andrey/tests/fieldmaps/fieldmaps/field_v* ${dir}/cbmroot/input/
     cp /data.local1/andrey/tests/cdash_config/Dart.cfg ${dir}/cbmroot/Dart.cfg
 }
 

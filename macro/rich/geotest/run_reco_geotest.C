@@ -5,21 +5,17 @@ void run_reco_geotest(Int_t nEvents = 10)
    TString script = TString(gSystem->Getenv("SCRIPT"));
    gRandom->SetSeed(10);
 
-   TString inFile = "", parFile = "", outFile ="";
-   std::string resultDir = "";
-   std::string richDetectorType = ""; // "standard" or "prototype"
+   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richgeotest/";
+   TString inFile = outDir + "mc.0000.root";
+   TString parFile = outDir + "param.0000.root";
+   TString outFile = outDir + "reco.0000.root";
+   std::string resultDir = "results/";
+   std::string richDetectorType = "standard"; // "standard" or "prototype"
 
-   if (script != "yes") {
-      TString outDir = "/d/cbm06/user/slebedev/rich/new_rich_geo/";
-      inFile = outDir + "test.mc.0004.root";
-      parFile = outDir + "test.params.0004.root";
-      outFile = outDir + "test.reco.0004.root";
-      resultDir = "results/";
-      richDetectorType = "standard";
-   } else {
-      inFile = TString(gSystem->Getenv("MCFILE"));
-      outFile = TString(gSystem->Getenv("RECOFILE"));
-      parFile = TString(gSystem->Getenv("PARFILE"));
+   if (script == "yes") {
+      inFile = TString(gSystem->Getenv("MC_FILE"));
+      outFile = TString(gSystem->Getenv("RECO_FILE"));
+      parFile = TString(gSystem->Getenv("PAR_FILE"));
       resultDir = TString(gSystem->Getenv("RICH_GEO_TEST_RESULT_DIR"));
       richDetectorType = std::string(gSystem->Getenv("RICH_DETECTOR_TYPE"));
    }

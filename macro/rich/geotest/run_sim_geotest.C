@@ -5,41 +5,32 @@ void run_sim_geotest(Int_t nEvents = 10)
    TString script = TString(gSystem->Getenv("SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString parFile = "", outFile ="";
-   TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "",
-         stsGeom = "", richGeom= "";
-   TString fieldMap = "";
-   TString richDetectorType = ""; // "standard" or "prototype"
-
-   // Magnetic field
+   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richgeotest/";
+   TString parFile =  outDir + "mc.0000.root";
+   TString outFile = outDir + "param.0000.root";
+   TString caveGeom = "cave.geo";
+   TString targetGeom = "target_au_250mu.geo";
+   TString pipeGeom   = "pipe_standard.geo";
+   TString magnetGeom = "passive/magnet_v12a.geo";
+   TString stsGeom = "sts/sts_v12b.geo.root";
+   TString richGeom= "rich/rich_v08a.geo";
+   TString fieldMap = "field_v12a";
+   TString richDetectorType = "standard"; // "standard" or "prototype"
    Double_t fieldZ = 50.; // field center z position
    Double_t fieldScale =  1.0; // field scaling factor
 
-   if (script != "yes") {
-      TString outDir = "/d/cbm06/user/slebedev/rich/new_rich_geo/";
-      outFile = outDir + "test.mc.0004.root";
-      parFile = outDir + "test.params.0004.root";
-
-      caveGeom = "cave.geo";
-      targetGeom = "target_au_250mu.geo";
-      pipeGeom = "pipe_standard.geo";
-      stsGeom = "sts/sts_v11a.geo";
-      richGeom = "rich/rich_v08a.geo";
-      fieldMap = "field_v10e";
-      magnetGeom = "passive/magnet_v09e.geo";
-
-      richDetectorType = "standard";
-   } else {
-      outFile = TString(gSystem->Getenv("MCFILE"));
-      parFile = TString(gSystem->Getenv("PARFILE"));
-      caveGeom = TString(gSystem->Getenv("CAVEGEOM"));
-      targetGeom = TString(gSystem->Getenv("TARGETGEOM"));
-      pipeGeom = TString(gSystem->Getenv("PIPEGEOM"));
-      stsGeom = TString(gSystem->Getenv("STSGEOM"));
-      richGeom = TString(gSystem->Getenv("RICHGEOM"));
-      fieldMap = TString(gSystem->Getenv("FIELDMAP"));
-      magnetGeom = TString(gSystem->Getenv("MAGNETGEOM"));
+   if (script == "yes") {
+      outFile = TString(gSystem->Getenv("MC_FILE"));
+      parFile = TString(gSystem->Getenv("PAR_FILE"));
+      caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
+      targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
+      pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
+      stsGeom = TString(gSystem->Getenv("STS_GEOM"));
+      richGeom = TString(gSystem->Getenv("RICH_GEOM"));
+      fieldMap = TString(gSystem->Getenv("FIELD_MAP"));
+      magnetGeom = TString(gSystem->Getenv("MAGNET_GEOM"));
       richDetectorType = TString(gSystem->Getenv("RICH_DETECTOR_TYPE"));
+      fieldScale = TString(gSystem->Getenv("FIELD_MAP_SCALE")).Atof();
    }
 
    gDebug = 0;
@@ -102,16 +93,7 @@ void run_sim_geotest(Int_t nEvents = 10)
 
    CbmFieldMap* magField = NULL;
    if (richDetectorType == "standard"){
-      if (fieldMap == "field_v10e")
-         magField = new CbmFieldMapSym2(fieldMap);
-      else if (fieldMap == "field_muon_standard" )
-         magField = new CbmFieldMapSym2(fieldMap);
-      else if (fieldMap == "FieldMuonMagnet" )
-         magField = new CbmFieldMapSym3(fieldMap);
-      else {
-         cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-         exit;
-      }
+      magField = new CbmFieldMapSym2(fieldMap);
       magField->SetPosition(0., 0., fieldZ);
       magField->SetScale(fieldScale);
       fRun->SetField(magField);
@@ -168,5 +150,4 @@ void run_sim_geotest(Int_t nEvents = 10)
    cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
    cout << " Test passed" << endl;
    cout << " All ok " << endl;
-   exit(0);
 }

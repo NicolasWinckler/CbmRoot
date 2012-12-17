@@ -1,5 +1,5 @@
 #!/bin/sh
-cd $MYBUILDDIR
+cd $MY_BUILD_DIR
 . ./config.sh
 cd -
 

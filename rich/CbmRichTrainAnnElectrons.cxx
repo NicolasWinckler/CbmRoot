@@ -56,7 +56,7 @@ CbmRichTrainAnnElectrons::CbmRichTrainAnnElectrons():
 
    fMinNofHitsInRichRing(7),
    fQuota(0.6),
-   fMaxNofTrainSamples(2500),
+   fMaxNofTrainSamples(5000),
 
    fNofPiLikeEl(0),
    fNofElLikePi(0),
@@ -100,19 +100,19 @@ CbmRichTrainAnnElectrons::CbmRichTrainAnnElectrons():
       if (i == 0) ss = "Electron";
       if (i == 1) ss = "Pion";
       // difference between electrons and pions
-      fhAaxis[i] = new TH1D(string("fhAaxis"+ss).c_str(), "fhAaxis;A axis [cm];Counter", 30,3,8);
+      fhAaxis[i] = new TH1D(string("fhAaxis"+ss).c_str(), "fhAaxis;A axis [cm];Counter", 50, 0., 8.);
       fHists.push_back(fhAaxis[i]);
-      fhBaxis[i] = new TH1D(string("fhBAxis"+ss).c_str(), "fhBAxis;B axis [cm];Counter", 30,3,8);
+      fhBaxis[i] = new TH1D(string("fhBAxis"+ss).c_str(), "fhBAxis;B axis [cm];Counter", 50, 0., 8.);
       fHists.push_back(fhBaxis[i]);
      // fhAaxisCor[i] = new TH1D(string("fhAaxisCor"+ss).c_str(), "fhAaxisCor;A axis [cm];Counter", 30,3,8);
      // fHists.push_back(fhAaxisCor[i]);
      // fhBaxisCor[i] = new TH1D(string("fhBAxisCor"+ss).c_str(), "fhBAxisCor;B axis [cm];Counter", 30,3,8);
      // fHists.push_back(fhBaxisCor[i]);
-      fhDist[i] = new TH1D(string("fhDist"+ss).c_str(), "fhDist;Ring-track distance [cm];Counter", 30,0,3);
+      fhDist[i] = new TH1D(string("fhDist"+ss).c_str(), "fhDist;Ring-track distance [cm];Counter", 50, 0., 5.);
       fHists.push_back(fhDist[i]);
-      fhNofHits[i] = new TH1D(string("fhNofHits"+ss).c_str(), "fhNofHits;Number of hits;Counter", 30,0,45);
+      fhNofHits[i] = new TH1D(string("fhNofHits"+ss).c_str(), "fhNofHits;Number of hits;Counter", 50, 0, 50);
       fHists.push_back(fhNofHits[i]);
-      fhChi2[i] = new TH1D(string("fhChi2"+ss).c_str(), "fhChi2;#Chi^{2};Counter", 50, 0, 0.5);
+      fhChi2[i] = new TH1D(string("fhChi2"+ss).c_str(), "fhChi2;#Chi^{2};Counter", 100, 0., 1.);
       fHists.push_back(fhChi2[i]);
       fhRadPos[i] = new TH1D(string("fhRadPos"+ss).c_str(), "fhRadPos;Radial position [cm];Counter", 150, 0., 150.);
       fHists.push_back(fhRadPos[i]);
@@ -307,7 +307,7 @@ void CbmRichTrainAnnElectrons::TrainAndTestAnn()
 
    TMultiLayerPerceptron network("x0,x1,x2,x3,x4,x5,x6,x7,x8:9:xOut",simu,"Entry$+1");
    //network.LoadWeights("");
-   network.Train(300,"text,update=10");
+   network.Train(200,"text,update=10");
    network.DumpWeights("rich_elid_ann_weights.txt");
    //network.Export();
 
@@ -362,40 +362,36 @@ void CbmRichTrainAnnElectrons::Draw()
 
    SetDefaultDrawStyle();
    TCanvas* c1 = new TCanvas("ann_electrons_ann_output", "ann_electrons_ann_output", 500, 500);
-   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("Electrons")("Pions"),
+   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("e^{#pm}")("#pi^{#pm}"),
          kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_electrons_cum_prob", "ann_electrons_cum_prob", 500, 500);
-   DrawH1(list_of(fhCumProb[0])(fhCumProb[1]), list_of("El")("Pi"),
+   DrawH1(list_of(fhCumProb[0])(fhCumProb[1]), list_of("e^{#pm}")("#pi^{#pm}"),
          kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    int c = 1;
-   TCanvas* c3 = new TCanvas("ann_electrons_params", "ann_electrons_params", 900, 600);
-   c3->Divide(3, 2);
+   TCanvas* c3 = new TCanvas("ann_electrons_params_1", "ann_electrons_params_1", 1500, 600);
+   c3->Divide(3, 1);
    c3->cd(c++);
-   DrawH1(list_of(fhAaxis[0])(fhAaxis[1]), list_of("El")("Pi"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhAaxis[0])(fhAaxis[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
-   DrawH1(list_of(fhBaxis[0])(fhBaxis[1]), list_of("El")("Pi"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhBaxis[0])(fhBaxis[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 //   c3->cd(c++);
-//   DrawH1(list_of(fhAaxisCor[0])(fhAaxisCor[1]), list_of("El")("Pi"),
-//            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+//   DrawH1(list_of(fhAaxisCor[0])(fhAaxisCor[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 //   c3->cd(c++);
-//   DrawH1(list_of(fhBaxisCor[0])(fhBaxisCor[1]), list_of("El")("Pi"),
-//            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+//   DrawH1(list_of(fhBaxisCor[0])(fhBaxisCor[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(c++);
-   DrawH1(list_of(fhDist[0])(fhDist[1]), list_of("El")("Pi"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
-   c3->cd(c++);
-   DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("El")("Pi"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
-   c3->cd(c++);
-   DrawH1(list_of(fhChi2[0])(fhChi2[1]), list_of("El")("Pi"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
-   c3->cd(c++);
-   DrawH1(list_of(fhRadPos[0])(fhRadPos[1]), list_of("El")("Pi"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhDist[0])(fhDist[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+
+   c = 1;
+   TCanvas* c3_1 = new TCanvas("ann_electrons_params_2", "ann_electrons_params_2", 1500, 600);
+   c3_1->Divide(3, 1);
+   c3_1->cd(c++);
+   DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   c3_1->cd(c++);
+   DrawH1(list_of(fhChi2[0])(fhChi2[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   c3_1->cd(c++);
+   DrawH1(list_of(fhRadPos[0])(fhRadPos[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    c = 1;
    TCanvas* c4 = new TCanvas("ann_electrons_params_2d", "ann_electrons_params_2d", 600, 900);

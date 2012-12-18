@@ -145,6 +145,7 @@ Bool_t CbmRich::ProcessHits(
    //gMC is of type TVirtualMC
    Int_t pdgCode = gMC->TrackPid();
    Int_t iVol = vol->getMCid();
+  // cout << "-I- RICH:" <<  vol->GetName() << endl;
 
    //Treat photodetectors : All particles
    //Nota bene: Energy loss at the entrance step is zero!

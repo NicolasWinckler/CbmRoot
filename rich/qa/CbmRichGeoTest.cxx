@@ -367,20 +367,20 @@ void CbmRichGeoTest::InitHistograms()
 void CbmRichGeoTest::DrawSummaryPlotsTemp()
 {
    TCanvas *c1 = CreateCanvas("chi2_mean_fit_vs_bfield_scale", "chi2_mean_fit_vs_bfield_scale", 600, 600);
-   Double_t x[5]={0.015*0.2, 0.015*0.5, 0.015*0.7, 0.015*1., 0.015*1.5};
-   Double_t y1[5]={0.02, 0.021, 0.025, 0.029, 0.038};
-   TGraph* gr1 = new TGraph(5, x, y1);
-   gr1->GetXaxis()->SetTitle("Field integral in RICH [Tm]");
+   Double_t x[6]={0.2, 0.5, 0.7, 1., 1.5, 2.0};
+   Double_t y1[6]={0.023, 0.031, 0.034, 0.039, 0.039, 0.045};
+   TGraph* gr1 = new TGraph(6, x, y1);
+   gr1->GetXaxis()->SetTitle("Field scales");
    gr1->GetYaxis()->SetTitle("a_{fit}^{#Chi^{2}.mean}");
-   TF1 *f1 = new TF1("f1", "[0]*x+[1]", 0., 210.);
+   TF1 *f1 = new TF1("f1", "[0]*x+[1]", 0., 2.1);
    f1->SetLineColor(kBlack);
-   gr1->GetXaxis()->SetRangeUser(10., 210.);
+   gr1->GetXaxis()->SetRangeUser(0.1, 2.1);
    DrawGraph(gr1, kLinear, kLinear, "AP");
    gr1->SetMarkerColor(4);
    gr1->SetMarkerSize(2.5);
    gr1->SetMarkerStyle(21);
    gr1->Fit(f1, "R");
-   gr1->GetXaxis()->SetRangeUser(10., 210.);
+   gr1->GetXaxis()->SetRangeUser(0.1, 2.1);
    f1->SetLineColor(kBlack);
    double p0 = f1->GetParameter(0);
    double p1 = f1->GetParameter(1);
@@ -396,18 +396,19 @@ void CbmRichGeoTest::DrawSummaryPlotsTemp()
 
 
    TCanvas *c2 = CreateCanvas("dr_rms_fit_vs_bfield_scale", "dr_rms_fit_vs_bfield_scale", 600, 600);
-   Double_t y2[5]={0.025, 0.026, 0.033, 0.045, 0.078};
-   TGraph* gr2 = new TGraph(5, x, y2);
-   gr2->GetXaxis()->SetTitle("Field integral in RICH [Tm]");
+   Double_t x2[6]={0.2, 0.5, 0.7, 1., 1.5, 2.0};
+   Double_t y2[6]={0.027, 0.04, 0.05, 0.057, 0.074, 0.08};
+   TGraph* gr2 = new TGraph(6, x2, y2);
+   gr2->GetXaxis()->SetTitle("Field scales");
    gr2->GetYaxis()->SetTitle("a_{fit}^{dR.RMS}");
-   TF1 *f2 = new TF1("f2", "[0]*x+[1]", 0., 210.);
+   TF1 *f2 = new TF1("f2", "[0]*x+[1]", 0., 2.1);
    f2->SetLineColor(kBlack);
    DrawGraph(gr2, kLinear, kLinear, "AP");
    gr2->SetMarkerColor(4);
    gr2->SetMarkerSize(2.5);
    gr2->SetMarkerStyle(21);
    gr2->Fit(f2, "R");
-   gr2->GetXaxis()->SetRange(0., 210.);
+   gr2->GetXaxis()->SetRange(0., 2.1);
    f2->SetLineColor(kBlack);
    double p10 = f2->GetParameter(0);
    double p11 = f2->GetParameter(1);

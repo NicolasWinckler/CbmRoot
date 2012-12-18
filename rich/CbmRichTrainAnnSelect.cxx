@@ -40,7 +40,7 @@ CbmRichTrainAnnSelect::CbmRichTrainAnnSelect():
 
    fEventNumber(0),
    fQuota(0.6),
-   fMaxNofTrainSamples(1500),
+   fMaxNofTrainSamples(5000),
    fNofFakeLikeTrue(0),
    fNofTrueLikeFake(0),
    fAnnCut(-0.5),
@@ -75,17 +75,17 @@ CbmRichTrainAnnSelect::CbmRichTrainAnnSelect():
       if (i == 0) ss = "True";
       if (i == 1) ss = "Fake";
       // Difference Fake and True rings histograms BEGIN
-      fhNofHits[i] = new TH1D(string("fhNofHits"+ss).c_str(),"Number of hits in ring;Nof hits in ring;Counter",50,0,50);
+      fhNofHits[i] = new TH1D(string("fhNofHits"+ss).c_str(),"Number of hits in ring;Nof hits in ring;Counter",50, 0, 50);
       fHists.push_back(fhNofHits[i]);
-      fhAngle[i] = new TH1D(string("fhAngle"+ss).c_str(),"Biggest angle in ring;Angle [rad];Counter",50,0,6.5);
+      fhAngle[i] = new TH1D(string("fhAngle"+ss).c_str(),"Biggest angle in ring;Angle [rad];Counter",50, 0, 6.5);
       fHists.push_back(fhAngle[i]);
-      fhNofHitsOnRing[i] = new TH1D(string("fhNofHitsOnRing"+ss).c_str(),"Number of hits on ring;Nof hits on ring;Counter",50,0,50);
+      fhNofHitsOnRing[i] = new TH1D(string("fhNofHitsOnRing"+ss).c_str(),"Number of hits on ring;Nof hits on ring;Counter",50, 0, 50);
       fHists.push_back(fhNofHitsOnRing[i]);
-      fhChi2[i] = new TH1D(string("fhFakeChi2"+ss).c_str(),"Chi2;Chi2;Counter", 50, 0., 0.5);
+      fhChi2[i] = new TH1D(string("fhFakeChi2"+ss).c_str(),"Chi2;Chi2;Counter", 100, 0., 1.0);
       fHists.push_back(fhChi2[i]);
-      fhRadPos[i] = new TH1D(string("fhRadPos"+ss).c_str(),"Radial position;Radial position [cm];Counter",150,0,150);
+      fhRadPos[i] = new TH1D(string("fhRadPos"+ss).c_str(),"Radial position;Radial position [cm];Counter",150, 0, 150);
       fHists.push_back(fhRadPos[i]);
-      fhRadius[i] = new TH1D(string("fhRadius"+ss).c_str(),"Radius;Radius [cm];Counter",90,0,9);;
+      fhRadius[i] = new TH1D(string("fhRadius"+ss).c_str(),"Radius;Radius [cm];Counter",80, 0., 9.);
       fHists.push_back(fhRadius[i]);
       // ANN outputs
       fhAnnOutput[i] = new TH1D(string("fhAnnOutput"+ss).c_str(),"ANN output;ANN output;Counter",100, -1.2, 1.2);
@@ -119,6 +119,7 @@ InitStatus CbmRichTrainAnnSelect::Init()
 
 	fFitCOP = new CbmRichRingFitterCOP();
    fSelectImpl = new CbmRichRingSelectImpl();
+   CbmRichConverter::Init();
 
    return kSUCCESS;
 }
@@ -316,33 +317,25 @@ void CbmRichTrainAnnSelect::Draw()
    }
 
    TCanvas* c1 = new TCanvas("ann_select_ann_output", "ann_select_ann_output", 500, 500);
-   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("True")("Fake"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_select_cum_prob", "ann_select_cum_prob", 500, 500);
-   DrawH1(list_of(fhCumProb[0])(fhCumProb[1]), list_of("True")("Fake"),
-         kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhCumProb[0])(fhCumProb[1]), list_of("True")("Fake"), kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c3 = new TCanvas("ann_select_params", "ann_select_params", 900, 600);
    c3->Divide(3, 2);
    c3->cd(1);
-   DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("True")("Fake"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(2);
-   DrawH1(list_of(fhAngle[0])(fhAngle[1]), list_of("True")("Fake"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhAngle[0])(fhAngle[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(3);
-   DrawH1(list_of(fhNofHitsOnRing[0])(fhNofHitsOnRing[1]), list_of("True")("Fake"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhNofHitsOnRing[0])(fhNofHitsOnRing[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(4);
-   DrawH1(list_of(fhRadPos[0])(fhRadPos[1]), list_of("True")("Fake"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhRadPos[0])(fhRadPos[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(5);
-   DrawH1(list_of(fhChi2[0])(fhChi2[1]), list_of("True")("Fake"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhChi2[0])(fhChi2[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    c3->cd(6);
-   DrawH1(list_of(fhRadius[0])(fhRadius[1]), list_of("True")("Fake"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(list_of(fhRadius[0])(fhRadius[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 }
 
 void CbmRichTrainAnnSelect::FinishTask()

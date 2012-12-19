@@ -83,6 +83,7 @@ ecal/CbmEcalIdParticle.cxx
 psd/CbmPsdDigi.cxx
 psd/CbmPsdHit.cxx
 psd/CbmPsdPoint.cxx
+psd/CbmPsdEventData.cxx
 
 stt/CbmSttPoint.cxx
 stt/CbmSttHit.cxx

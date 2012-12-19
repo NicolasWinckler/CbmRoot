@@ -70,6 +70,7 @@
 #pragma link C++ class CbmPsdDigi;
 #pragma link C++ class CbmPsdHit;
 #pragma link C++ class CbmPsdPoint;
+#pragma link C++ class CbmPsdEventData;
 
 #pragma link C++ class CbmSttPoint+;
 #pragma link C++ class CbmSttHit+;

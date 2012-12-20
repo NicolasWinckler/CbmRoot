@@ -11,8 +11,16 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/run 
 ${CBMROOT_SOURCE_DIR}/cbmdata 
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts 
+${CBMROOT_SOURCE_DIR}/cbmdata/rich 
+${CBMROOT_SOURCE_DIR}/cbmdata/much 
+${CBMROOT_SOURCE_DIR}/cbmdata/trd 
+${CBMROOT_SOURCE_DIR}/cbmdata/tof 
+${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
+${CBMROOT_SOURCE_DIR}/cbmdata/psd 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -32,6 +40,7 @@ CbmStsDigiPar.cxx
 CbmStsDigiScheme.cxx 
 CbmStsIdealDigitize.cxx 
 CbmStsDigitize.cxx 
+CbmStsDigitizeTb.cxx 
 CbmStsIdealFindHits.cxx 
 CbmStsClusterFinder.cxx 
 CbmStsFindHits.cxx 

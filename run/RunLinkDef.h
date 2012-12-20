@@ -5,6 +5,11 @@
 #pragma link off all functions;
 
 
+#pragma link C++ class CbmDaq;
+#pragma link C++ class CbmMCBuffer;
+#pragma link C++ class CbmMCTimeSim;
+#pragma link C++ class CbmTimeSlice;
+
 #pragma link C++ class CbmMCStreamer+;
 #pragma link C++ class CbmRunAna+;
 #pragma link C++ class CbmMCStreamerQa+;

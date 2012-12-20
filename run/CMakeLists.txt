@@ -11,9 +11,14 @@ ${CBMROOT_SOURCE_DIR}/generators
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmgenerators
 ${CBMROOT_SOURCE_DIR}/cbmdata
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
+${CBMROOT_SOURCE_DIR}/cbmdata/rich
+${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
+${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/ecal
+${CBMROOT_SOURCE_DIR}/cbmdata/psd
 ${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/mvd
@@ -37,6 +42,12 @@ ${CMAKE_SOURCE_DIR}/base
 link_directories( ${LINK_DIRECTORIES})
 
 set(RUN_SRCS
+
+CbmDaq.cxx
+CbmDaqBuffer.cxx
+CbmMCBuffer.cxx
+CbmMCTimeSim.cxx
+CbmTimeSlice.cxx
 
 CbmMCStreamer.cxx
 CbmRunAna.cxx

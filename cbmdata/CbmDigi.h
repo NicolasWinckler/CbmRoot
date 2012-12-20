@@ -26,6 +26,7 @@
 
 
 
+
 class CbmDigi : public TObject
 {
 
@@ -50,6 +51,7 @@ class CbmDigi : public TObject
   Int_t GetDetectorId() const { return fDetectorId; }
   Int_t GetChannelNr()  const { return fChannelNr; }
   Int_t GetSystemId()   const { return ( fDetectorId & 31 ); }
+  virtual Int_t GetTime() const;
   
 
  protected:

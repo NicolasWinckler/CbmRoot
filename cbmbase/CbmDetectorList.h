@@ -1,10 +1,7 @@
-/** CbmSimSetup.h
- *@Author V.Friese  <V.Friese@Gsi.De>
- *@Since 12.06.2007
- **
- ** Defines unique identifier for all CBM detector systems.
- **
- ** 29.04.2010 V. Friese: Made a class with implementation file.
+/** @file CbmDetectorList.h
+ ** @author V.Friese  <V.Friese@Gsi.De>
+ ** @date 12.06.2007
+ ** @brief Defines unique identifiers (enum) for all CBM detector systems
  **/
 
 
@@ -12,23 +9,42 @@
 #ifndef CBMDETECTORLIST_H
 #define CBMDETECTORLIST_H 1
  
-enum DetectorId {kREF,  kMVD, kSTS, kRICH, kMUCH, kTRD, kTOF, 
-		 kECAL, kPSD, kSTT, kTutDet};
+
+/**  DetectorID enumerator  **/
+enum DetectorId {kREF,      // Reference plane  
+		 kMVD,      // Micro-Vertex Detector
+		 kSTS,      // Silicon Tracking System
+		 kRICH,     // Ring-Imaging Cherenkov Detector
+		 kMUCH,     // Muon detetcion system
+		 kTRD,      // Transition Radiation Detector
+		 kTOF,      // Time-of-flight Detector
+		 kECAL,     // EM-Calorimeter
+		 kPSD,      // Projectile spectator detector
+		 kSTT,      // Straw Tube Tracker (obsolete)
+		 kTutDet,   // Dummy for tutorials
+		 kNOFDETS}; // Number of elements (e.g. for loops)
 
 
-enum DataType {  
-  kUnknown, kMCTrack,
-  kStsPoint, kStsDigi, kStsCluster, kStsHit
-};
+/**   Data type enumerator  **/
+enum DataType {kUnknown, 
+	       kMCTrack,
+	       kStsPoint, 
+	       kStsDigi, 
+	       kStsCluster, 
+	       kStsHit};
 
 
 
 #include "TObject.h"
 
-class FairDetector;
 
 
-
+/** @class CbmDetectorList
+ ** @author V.Friese  <V.Friese@Gsi.De>
+ ** @date 29.04.2010
+ **
+ ** @brief Provides some utility functions for DetectorId
+ **/
 class CbmDetectorList : public TObject
 {
 
@@ -47,6 +63,15 @@ class CbmDetectorList : public TObject
    *@param name  (return) System name (lower case) 
    **/
   static void GetSystemName(DetectorId det, TString& name);
+  static void GetSystemName(Int_t det, TString& name);
+
+
+  /** Get system name in capitals
+   ** @param det   System identifier (type DetectorId)
+   ** @param name  (return) System name (lower case) 
+   **/
+  static void GetSystemNameCaps(DetectorId det, TString& name);
+  static void GetSystemNameCaps(Int_t det, TString& name);
 
 
 

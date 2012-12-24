@@ -77,6 +77,8 @@ public:
    vector<Int_t> GetNeighbors(Int_t iPad);
    Long64_t GetChannelID(Int_t iPad);
 
+   void AddPadNeighbor(Int_t nPad, Int_t nNeighbor);
+
 
 
 private:

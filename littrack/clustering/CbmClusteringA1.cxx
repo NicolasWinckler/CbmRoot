@@ -171,8 +171,8 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 	//std::cout<<"fNofActivePads before: "<<fNofActivePads<<"\n";
 
 	//delete [] fClusters;
-	fClusters = new Cluster[(Int_t)(fNofActivePads * 5)];
-	for(Int_t iPad = 0; iPad < (Int_t)(fNofActivePads * 5); iPad++)
+	fClusters = new Cluster[(Int_t)(fNofActivePads)];
+	for(Int_t iPad = 0; iPad < (Int_t)(fNofActivePads); iPad++)
 	{
 		fClusters[iPad].fNCluster = 0;
 		fClusters[iPad].fNofPads = 0;
@@ -194,9 +194,9 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 			Replase = fNumbersOfPads[iPad];
 			nomCl++;
 			Int_t padInCluster = 0;
+Int_t it = 0;
 			for(Int_t nPad = 0; nPad < fNofPads; nPad++)
 			{
-
 				if((fNumbersOfPads[nPad] == Replase) &&
 				(moduleGeo->GetPadCharge(nPad) > 0) && (fS[nPad] == 1))
 				{
@@ -214,11 +214,14 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 					fClusters[nomCl - 1].fY += (moduleGeo->GetY0(nPad) * moduleGeo->GetPadCharge(nPad));
 					fClusters[nomCl - 1].fCharge += moduleGeo->GetPadCharge(nPad);
 					//fClusters[nomCl - 1].padsInCluster[padInCluster] = moduleGeo->GetDigiNum(nPad);
+					//std::cout<<">>>>>Pad: "<<nPad<<"; Push digi: "<<moduleGeo->GetDigiNum(nPad)<<"; ";
 					fClusters[nomCl - 1].fPadsInCluster.push_back(moduleGeo->GetDigiNum(nPad));
+					//std::cout<<"Pushed digi: "<<fClusters[nomCl - 1].fPadsInCluster[it]<<"\n";
 					fClusters[nomCl - 1].fNPadsInCluster.push_back(nPad);
 					fClusters[nomCl - 1].fPadsCharges.push_back(fA1[nPad]);
 					padInCluster++;
 					fClusters[nomCl - 1].fNofPads = padInCluster;
+it++;
 					//std::cout<<"nPad: "<<nPad<<"; A: "<<fA2[nPad]<<"\n";
 				}
 			}

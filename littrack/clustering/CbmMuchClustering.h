@@ -61,6 +61,8 @@ public:
 
    void ClusteringMainFunction();
 
+   void TestPoints();
+
 private:
 
    void ReadDataBranches();
@@ -90,9 +92,14 @@ private:
    TH1F* fhDigisInCluster;
    Int_t fNofEvents;
 
+   TH1F* fhPoints;
+   TClonesArray* fDigiMatch;
+
    void ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
    void ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
    void ClusteringWard(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2/*, Int_t Ver, Int_t &nHit, Int_t &nCluster*/);
+
+   void SubclusteringA1(Int_t iCl, CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, CbmClusteringA1* clA1, Int_t it1);
 
    ClassDef(CbmMuchClustering, 1);
 };

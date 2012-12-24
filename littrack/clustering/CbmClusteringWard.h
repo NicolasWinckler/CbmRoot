@@ -44,6 +44,8 @@ public:
    void WardMainFunction(CbmClusteringGeometry* moduleGeo, Float_t maxDistance);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
+   Int_t GetNofAPads()	const { return fNofActivePads;}
+   Int_t GetNofPads()	const { return fNofPads;}
 
    //void MainClusteringA1(CbmMuchGeoCl* moduleGeo, Int_t algVersion);
 

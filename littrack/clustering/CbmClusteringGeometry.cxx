@@ -75,7 +75,7 @@ CbmClusteringGeometry::CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t n
 	fNofPads = nofPads;
 	fNofActivePads = fNofPads;
 	fDetId = geo->GetDetId();
-	fPadList = new PadInformation[fNofPads+3000];
+	fPadList = new PadInformation[fNofPads];
 	for(Int_t iPad = 0; iPad < fNofPads; iPad++)
 	{
 		fPadList[iPad].fDigiNum = 0;
@@ -88,6 +88,8 @@ CbmClusteringGeometry::CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t n
 		fPadList[iPad].fPhi2 = 0;
 		fPadList[iPad].fR1 = 0;
 		fPadList[iPad].fR2 = 0;
+		fPadList[iPad].fNofNeighbors = 0;
+		fPadList[iPad].fNofGoodNeighbors = 0;
 		fPadList[iPad].fNeighbors.clear();
 		fPadList[iPad].channelID = 0;
 	}
@@ -97,6 +99,7 @@ void CbmClusteringGeometry::CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y
 			   Int_t digiNum, UInt_t charge, /*Int_t nofNeighbors, Int_t nofGoodNeighbors, vector<Int_t> neighbors, */Long64_t chID)
 {
 	fPadList[nPad].fDigiNum = digiNum;
+	std::cout<<"-----TakeDigi: "<<fPadList[nPad].fDigiNum<<"\n";
 	fPadList[nPad].fCharge = charge;
 	fPadList[nPad].fX = x;
 	fPadList[nPad].fY = y;
@@ -120,6 +123,15 @@ void CbmClusteringGeometry::CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y
 	}*/
 	//fPadList[nPad].fNeighbors.insert(fPadList[nPad].fNeighbors.begin(), neighbors.begin(), neighbors.end());
 	fPadList[nPad].channelID = chID;
+}
+
+void CbmClusteringGeometry::AddPadNeighbor(Int_t nPad, Int_t nNeighbor)
+{
+	std::cout<<"--p: "<<nPad<<" - n0: "<<nNeighbor;
+	fPadList[nPad].fNeighbors.push_back(nNeighbor);
+	std::cout<<" - n1: "<<fPadList[nPad].fNeighbors[fPadList[nPad].fNofGoodNeighbors];
+	fPadList[nPad].fNofGoodNeighbors++;
+	std::cout<<" --- ngn: "<<fPadList[nPad].fNofGoodNeighbors<<"\n";
 }
 
 CbmClusteringGeometry::~CbmClusteringGeometry()

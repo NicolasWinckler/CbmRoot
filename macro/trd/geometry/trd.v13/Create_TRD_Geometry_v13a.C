@@ -1,3 +1,4 @@
+// 2013-01-11 - DE - allow for misalignment of TRD modules
 // 2012-11-04 - DE - add kapton foil, add FR4 padplane
 // 2012-11-03 - DE - add lattice grid on entrance window as CompositeShape
 
@@ -17,6 +18,7 @@
 #include "TFile.h"
 #include "TString.h"
 #include "TList.h"
+#include "TRandom3.h"
 
 #include <iostream>
 
@@ -28,10 +30,29 @@ const TString FileNameGeo = geoVersion + "_geo.root";
 //const TString FileName = "trd_v13x.root";
 
 // display switches
-const Bool_t IncludeRadiator = true; // false;  // true, if radiator is included in geometry
-const Bool_t IncludeLattice  = true; // false;  // true, if lattice grid is included in geometry
-const Bool_t IncludeGasHoles = true; // false;  // true, if gas holes to be pllotted in the lattice grid
-const Bool_t IncludeFebs     = true; // false;  // true, if FEBs are included in geometry
+const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is included in geometry
+const Bool_t IncludeLattice  = false; // false;  // true, if lattice grid is included in geometry
+const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
+const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
+
+// positioning switches
+const Bool_t DisplaceRandom  = true;  // true; // false;  // add random displacement of modules for alignment study
+const Bool_t RotateRandom    = true;  // true; // false;  // add random rotation of modules for alignment study
+const Bool_t DoExplode       = true;  // true, // false;  // add random displacement of modules for alignment study
+
+// positioning parameters
+const Float_t maxdx    = 0.2;   // max +- 0.1 cm shift in x
+const Float_t maxdy    = 0.2;   // max +- 0.1 cm shift in y
+const Float_t maxdz    = 1.0;   // max +- 1.0 cm shift in z
+
+const Float_t maxdrotx = 2.0;   // 20.0; // max rotation aronud x
+const Float_t maxdroty = 2.0;   // 20.0; // max rotation aronud y
+const Float_t maxdrotz = 2.0;   // 20.0; // max rotation aronud z
+
+Float_t ExplodeFactor = 1.02;   // 1.02; // Factor by which modules are exploded in the x/y plane
+
+// initialise random numbers
+TRandom3 r3(0);
 
 // Parameters defining the layout of the complete detector build out of different detector layers.
 const Int_t   NofLayers = 10;   // max layers
@@ -46,7 +67,10 @@ const Int_t   NofLayers = 10;   // max layers
 const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300     // 1: plot, 0: hide
 
 const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads  
+// 3 station spacing
 const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
+// equal spacing
+//const Float_t LayerPosition[NofLayers]    = { 500., 550., 600., 650., 700., 750., 800., 850., 900., 950. };  // z position in cm of Layer front
 const Float_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 const Float_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
 
@@ -771,6 +795,8 @@ void create_detector_layers(Int_t layerId)
     std::cout << "Type of layer not known" << std::endl;
   } 
 
+  if(!(DoExplode))  // if do not explode -> no explosion
+   ExplodeFactor = 1.00;
   
   Int_t copyNrIn[4] = { 0, 0, 0, 0 }; // copy number for each module type
   for ( Int_t type = 1; type <= 4; type++) {
@@ -780,19 +806,50 @@ void create_detector_layers(Int_t layerId)
         if ( module_id /100 == type) {
           Int_t y = -(j-2);
           Int_t x =   i-2;
-          Int_t xPos = DetectorSizeX[0] * x;
-          Int_t yPos = DetectorSizeY[0] * y;
+
+          // displacement
+          Float_t dx = 0;
+          Float_t dy = 0;
+          Float_t dz = 0;
+
+          if(DisplaceRandom)
+	  {
+            dx = (r3.Rndm()-.5) * 2 * maxdx;  // max +- 0.1 cm shift
+            dy = (r3.Rndm()-.5) * 2 * maxdy;  // max +- 0.1 cm shift
+            dz = (r3.Rndm()-.5) * 2 * maxdz;  // max +- 1.0 cm shift
+          }
+
+          Float_t xPos = DetectorSizeX[0] * x * ExplodeFactor + dx;
+          Float_t yPos = DetectorSizeY[0] * y * ExplodeFactor + dy;
           copyNrIn[type - 1]++;
           Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);
 
           // take care of FEB orientation away from beam
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
+	    //   	     module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
    	     module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
           else  // layer 2,4 ...
+	    //   	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
    	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
 
-          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2, module_rotation);  // shift by half layer thickness
+          // rotation
+          Float_t drotx = 0;
+          Float_t droty = 0;
+          Float_t drotz = 0;
+
+          if(RotateRandom)
+	  {
+            drotx = (r3.Rndm()-.5) * 2 * maxdrotx;
+            droty = (r3.Rndm()-.5) * 2 * maxdroty;
+            drotz = (r3.Rndm()-.5) * 2 * maxdrotz;
+
+            module_rotation->RotateZ( drotz );
+            module_rotation->RotateY( droty );
+            module_rotation->RotateX( drotx );
+          }
+
+          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2 + dz, module_rotation);  // shift by half layer thickness
           gGeoMan->GetVolume(geoVersion)->AddNode(gModules[type - 1], copy, module_placement);
         }
       }
@@ -807,19 +864,50 @@ void create_detector_layers(Int_t layerId)
         if ( module_id  /100 == type) {
           Int_t y = -(j-4);
           Int_t x =   i-5;
-          Int_t xPos = DetectorSizeX[1] * x;
-          Int_t yPos = DetectorSizeY[1] * y;
+
+          // displacement
+          Float_t dx = 0;
+          Float_t dy = 0;
+          Float_t dz = 0;
+
+          if(DisplaceRandom)
+	  {
+            dx = (r3.Rndm()-.5) * 2 * maxdx;  // max +- 0.1 cm shift
+            dy = (r3.Rndm()-.5) * 2 * maxdy;  // max +- 0.1 cm shift
+            dz = (r3.Rndm()-.5) * 2 * maxdz;  // max +- 1.0 cm shift
+          }
+
+          Float_t xPos = DetectorSizeX[1] * x * ExplodeFactor + dx;
+          Float_t yPos = DetectorSizeY[1] * y * ExplodeFactor + dy;
           copyNrOut[type - 5]++;
           Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);
-  
+
           // take care of FEB orientation - away from beam
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
-          module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
+	    //          module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
+            module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
           else  // layer 2,4 ...
-          module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
+	    //          module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
+            module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
     
-          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2, module_rotation);  // shift by half layer thickness
+          // rotation
+          Float_t drotx = 0;
+          Float_t droty = 0;
+          Float_t drotz = 0;
+
+          if(RotateRandom)
+	  {
+            drotx = (r3.Rndm()-.5) * 2 * maxdrotx;
+            droty = (r3.Rndm()-.5) * 2 * maxdroty;
+            drotz = (r3.Rndm()-.5) * 2 * maxdrotz;
+
+            module_rotation->RotateZ( drotz );
+            module_rotation->RotateY( droty );
+            module_rotation->RotateX( drotx );
+          }
+
+          TGeoCombiTrans* module_placement = new TGeoCombiTrans(xPos, yPos, LayerPosition[layerId] + LayerThickness/2 + dz, module_rotation);  // shift by half layer thickness
           gGeoMan->GetVolume(geoVersion)->AddNode(gModules[type - 1], copy, module_placement);
         }
       }

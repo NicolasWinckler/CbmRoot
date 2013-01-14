@@ -35,13 +35,15 @@ CbmTofHitProducer::CbmTofHitProducer()
     fSigmaY  = 0.;
     fSigmaZ  = 0.;
     fNHits   = -1;
+    fParFileName="";
 }
 
 
 // ---- Constructor ----------------------------------------------------
 
 CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose)
-:FairTask(name,verbose)
+  :FairTask(TString(name),verbose)
+   //  :FairTask()
 {
     fVerbose =  verbose;
     fSigmaT  =  0.;
@@ -49,6 +51,7 @@ CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose)
     fSigmaY  =  0.;
     fSigmaZ  =  0.;
     fNHits   = -1;
+    fParFileName="";
 }
 
 
@@ -66,7 +69,7 @@ CbmTofHitProducer::~CbmTofHitProducer()
 InitStatus CbmTofHitProducer::Init()
 {
 
-  cout << "nh - version of CbmTofHitProducer initializing" << endl;
+  cout << "nh - version of CbmTofHitProducer initializing with file " << fParFileName << endl;
   FairRootManager *fManager = FairRootManager::Instance();
 
     fTofPoints  = (TClonesArray *) fManager->GetObject("TofPoint");
@@ -92,6 +95,7 @@ InitStatus CbmTofHitProducer::Init()
 	  Z[t][i][j][k] = -1;
 	  Dx[t][i][j][k]= -1;
 	  Dy[t][i][j][k]= -1;
+	  Ch[t][i][j][k]= -1;
 	}
       }
      }
@@ -99,7 +103,13 @@ InitStatus CbmTofHitProducer::Init()
 
       TString tofGeoFile = gSystem->Getenv("VMCWORKDIR");
 //      tofGeoFile += "/parameters/tof/tof_standard.geom.par";
-      tofGeoFile += "/parameters/tof/par_tof.txt";
+      if (fParFileName==""){
+	tofGeoFile += "/parameters/tof/par_tof.txt";
+      }else{
+	tofGeoFile += fParFileName;
+      }
+      cout << "<I> CbmTofHitProducer::Read parameters from "<< fParFileName 
+           << "," <<tofGeoFile << endl;
       par=fopen(tofGeoFile,"r");
    
       if(par==NULL) {
@@ -114,7 +124,8 @@ InitStatus CbmTofHitProducer::Init()
 	ActnModMax[i]=0;
 	ActnCellMax[i]=0;
     }
-     
+    Int_t iCh=0; // channel identifier 
+
     //Skip the header. In the future the header structure must be defined. FIXME
     while (fscanf(par,"%c",&header)>=0){
 //      cout << "ReadH "<< header << endl;
@@ -136,6 +147,7 @@ InitStatus CbmTofHitProducer::Init()
     Z[smtype][smodule][module][cell]    = Z_tmp/10.;
     Dx[smtype][smodule][module][cell]   = Dx_tmp/10.;
     Dy[smtype][smodule][module][cell]   = Dy_tmp/10.;
+    Ch[smtype][smodule][module][cell]   = iCh++;
     
     //Read all the lines
      
@@ -153,10 +165,12 @@ InitStatus CbmTofHitProducer::Init()
       Z[smtype][smodule][module][cell]     = Z_tmp/10.;
       Dx[smtype][smodule][module][cell]    = Dx_tmp/10.;
       Dy[smtype][smodule][module][cell]    = Dy_tmp/10.;      
+      Ch[smtype][smodule][module][cell]    = iCh++;
     }
 
     fclose(par);
-    cout << "Filled position array with ActSMtypMax " << ActSMtypMax << endl;
+    cout << "Filled position array with ActSMtypMax " << ActSMtypMax 
+         << " and " << iCh << " active Channels "<< endl;
 
     for (Int_t i=1; i<=ActSMtypMax; i++){
 	cout << " SMtype " << i <<" nsmod " << ActnSMMax[i] 
@@ -166,7 +180,7 @@ InitStatus CbmTofHitProducer::Init()
     fHitCollection = new TClonesArray("CbmTofHit");
     fManager->Register("TofHit","Tof",fHitCollection, kTRUE);
      
-    cout << "-I- CbmTofHitProducer: Intialization successfull" << endl;
+    cout << "-I- CbmTofHitProducer: Intialization successful" << endl;
 
     return kSUCCESS;
 }
@@ -197,10 +211,8 @@ void CbmTofHitProducer::Exec(Option_t * option)
     if(mc->GetNPoints(kTOF)>0 && mc->GetMotherId()==-1) tof_tracks_vert++;
   }
   
-  cout << "-I- CbmTofHitProducer : " << tof_tracks
-       << " tracks in Tof " << endl;
-  cout << "-I- CbmTofHitProducer : " << tof_tracks_vert
-       << " tracks in Tof from vertex" << endl;
+  cout << "-I- CbmTofHitProducer : " << tof_tracks << " tracks in Tof " << endl;
+  cout << "-I- CbmTofHitProducer : " << tof_tracks_vert << " tracks in Tof from vertex" << endl;
 //  cout << "-I- CbmTofHitProducer : " << tof_tracks-tof_tracks_local
 //       << " tracks in Tof able to produce a hit" << endl;
 
@@ -291,21 +303,21 @@ void CbmTofHitProducer::Exec(Option_t * option)
     tr_new = pt->GetTime() + T_smearing + Y_local/vprop
            + gRandom->Gaus(0,sigma_el);
 
-    if(fVerbose >2 || abs(X_local)>1.5) {
-    cout << j <<". TofHit -" 
+    if(fVerbose >2 || TMath::Abs(X_local)>1.5) {
+      cout << "-W- TofHitProducer " << j <<". Poi," 
          << " TID:" << trackID 
          << " SMtype: " << smtype 
          << " SM: " << smodule 
          << " Mod: " << module 
          << " Str: " << cell 
          << " G: " << gap 
-	 << " posX " << pos.X()
-	 << " posY " << pos.Y()
-         << " tl " << tl_new
-         << " tr " << tr_new
-	 << " xl " << X_local
-	 << " yl " << Y_local
+	 << " posX " << pos.X() <<","<<	 X[smtype][smodule][module][cell]
+	 << " posY " << pos.Y() <<","<<	 Y[smtype][smodule][module][cell]
+         << " tl " << tl_new     << " tr " << tr_new
+      //	 << " xl " << X_local	 << " yl " << Y_local
          << endl;
+ 
+      continue; //prevent crashes 
     }
     
     //Take the fastest time from all the points/gaps in this cell
@@ -328,7 +340,8 @@ void CbmTofHitProducer::Exec(Option_t * option)
   
   Int_t nFl1=0;
   Int_t nFl2=0;
-   
+  Int_t ii=0;
+
   for(Int_t t=1;t<=ActSMtypMax;t++){
    for(Int_t i=1;i<=ActnSMMax[t];i++){
     for(Int_t j=1;j<=ActnModMax[t];j++){
@@ -367,15 +380,18 @@ void CbmTofHitProducer::Exec(Option_t * option)
        
        TVector3 hitPos(xHit, yHit, zHit);
        TVector3 hitPosErr(xHitErr, yHitErr, zHitErr);
+       Int_t iCh = Ch[t][i][j][k];
 
        if(fVerbose >2) {
-       cout <<"Add hit of smtyp " << t << " sm " << i << " mod " << j << " str " << k
-            <<" tl " << tl[t][i][j][k] << " tr " << tr[t][i][j][k] 
-            <<" xh " << xHit << " yh " << yHit << " fl "<< flag << endl;
+	 cout << ii++ << " Add hit smt " << t << " sm " << i << " mod " << j << " str " << k
+	 <<" Ch " << iCh
+         <<" tl " << tl[t][i][j][k] << " tr " << tr[t][i][j][k] 
+	 <<" xh " << xHit << " yh " << yHit << " fl "<< flag << " refPoi " << ref 
+	 <<" TID "<<  trackID_left[t][i][j][k] <<","<<trackID_right[t][i][j][k]<< endl;
        }
        
-       AddHit(pt->GetDetectorID(), hitPos, hitPosErr, ref, tHit, flag);
-//XXXX
+       AddHit(pt->GetDetectorID(), hitPos, hitPosErr, ref, tHit, flag, iCh);
+
       }
      }
     }
@@ -388,10 +404,10 @@ void CbmTofHitProducer::Exec(Option_t * option)
 // ---- Add Hit to HitCollection --------------------------------------
 
 void CbmTofHitProducer::AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr,
-			       Int_t ref, Double_t tHit, Int_t flag)
+			       Int_t ref, Double_t tHit, Int_t flag, Int_t iChannel)
 {
   new((*fHitCollection)[fNHits]) CbmTofHit(detID, posHit, posHitErr,
-					     ref, tHit, flag);
+					   ref, tHit, flag, iChannel);
   if(fVerbose > 1) {
     CbmTofHit* tofHit = (CbmTofHit*) fHitCollection->At(fNHits);
     tofHit->Print();

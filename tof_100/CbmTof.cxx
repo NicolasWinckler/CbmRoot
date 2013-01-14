@@ -95,15 +95,16 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
     gMC->CurrentVolOffID(4, smodule);
     
     fVolumeID = ((smtype-1)<<24) + ((smodule-1)<<15) 
-              + ((module-1)<<12) + ((cell-1)<<4) + (gap-1);
+              + ((module-1)<<12) + ((cell-0)<<4) + (gap-1);
     
-//    cout << " CbmTof MCpoint in " << Volname 
-//	 << " sm-type " << smtype
-//	 << " supermodule " << smodule 
-//	 << " module " << module 
-//	 << " cell   " << cell 
-//	 << " gap    " << gap << " -> VolID " << fVolumeID << endl;
-    
+    if (gap < 1 || gap > 8 || cell < 0 || cell > 63 ) {
+    cout << " CbmTof Wrong MCpoint in " << Volname 
+	 << ", sm-type " << smtype
+	 << ", supermodule " << smodule 
+	 << ", module " << module 
+	 << ", str  " << cell 
+	 << ", gap  " << gap << " -> VolID " << fVolumeID << endl;
+    }
     AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
 	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength, 
 	   fELoss);

@@ -31,12 +31,13 @@ class CbmTofHitProducer : public FairTask {
   virtual void Finish();
 
   void AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr,
-	      Int_t ref, Double_t tHit, Int_t flag);
+	      Int_t ref, Double_t tHit, Int_t flag, Int_t iChannel);
 
   void SetSigmaT(Double_t sigma);
   void SetSigmaXY(Double_t sigma);
   void SetSigmaY(Double_t sigma);
   void SetSigmaZ(Double_t sigma);
+  void SetParFileName(const std::string& fnam) { fParFileName = fnam;}
 
   Double_t GetSigmaT();
   Double_t GetSigmaXY();
@@ -46,6 +47,7 @@ class CbmTofHitProducer : public FairTask {
 private:
 
   Int_t fVerbose;
+  TString fParFileName;   // name of the file name with geometry parameters
 
   TClonesArray *fTofPoints;     // TOF MC points
   TClonesArray *fMCTracks;      // MC tracks
@@ -53,7 +55,7 @@ private:
 
   //Temporary substitute of the parameter container. FIXME 
 
-  static const Int_t maxSMtyp=10  ;
+  static const Int_t maxSMtyp=6   ;
   static const Int_t maxnSM=255   ;
   static const Int_t maxnMod=10   ;
   static const Int_t maxnCell=255 ;
@@ -63,6 +65,7 @@ private:
   Float_t Y [maxSMtyp][maxnSM][maxnMod][maxnCell];  //Y-Position in cm */
   Float_t Dy[maxSMtyp][maxnSM][maxnMod][maxnCell];  //Resolution in position in cm */
   Float_t Z [maxSMtyp][maxnSM][maxnMod][maxnCell];  //Z-Position in cm */
+  Int_t   Ch[maxSMtyp][maxnSM][maxnMod][maxnCell];  //Channel number */
   
   Int_t ActSMtypMax;
   Int_t ActnSMMax[maxSMtyp];
@@ -90,7 +93,7 @@ private:
   TString fVersion;       //
   Int_t  fNHits;          //Index of the CbmTofHit TClonesArray
 
-  ClassDef(CbmTofHitProducer,1) //CBMTOFHitProducer
+  ClassDef(CbmTofHitProducer,1) //CbmTofHitProducer
 
 };
 #endif 

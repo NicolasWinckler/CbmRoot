@@ -67,7 +67,7 @@ public:
   /**
    * \brief Set number of noise hits to be added.
    */
-  void SetNofNoiseHits(Int_t noise) {fNofNoiseHits = noise;}
+  void SetNofNoiseHits(Double_t noise) {fNofNoiseHits = noise;}
 
   /**
    * \brief Set collection efficiency for photoelectrons in PMT optics.
@@ -95,6 +95,17 @@ public:
         Int_t pmtID,
         Double_t ampl,
         Int_t index);
+
+  /* Add cross talk hits
+   * @param x X position of the central hit
+   * @param y Y position of the central hit
+   * @param pointInd Index of the Rich Point of the central hit
+   * @param RichDetID ID of the RICH detector*/
+  void AddCrossTalkHits(
+        Double_t x,
+        Double_t y,
+        Int_t pointInd,
+        Int_t RichDetID);
 
   /**
    * \brief Finds hit position in PMT plane.
@@ -203,12 +214,16 @@ private:
   Double_t fPhotomulRadius; // radius of photomultiplier [cm], set according to detector type
   Double_t fPhotomulDist; // distance between PMT tube [cm], set according to detector type
   Int_t fDetType; // detector type
-  Int_t fNofNoiseHits; // number of noise hits
+  Double_t fNofNoiseHits; // number of noise hits
+  Int_t fNofNoiseHitsCounter; // counter for noise hits
   Double_t fCollectionEfficiency; // collection efficiency for photoelectrons in PMT optics
   Double_t fSigmaMirror; // additinal smearing of MC Points due to light scattering in mirror
 
   Double_t fTheta; // angle by which photodetector was tilted around x-axis
   Double_t fPhi; // angle by which photodetector was tilted around y-axis
+
+  Double_t fCrossTalkHitProb;// probability of cross talk hit
+  Int_t fNofCrossTalkHits; // Number of cross talk hits
 
   /**
    * \brief Copy constructor.

@@ -4,6 +4,40 @@
 * \author D. Kresan
 * \date 2010
 **/
+//____________________________________________________________________________________
+// updated with QE from measurements, July 2012
+// and AddCrossTalkHits() (implementation from Dima as in CBM-RICH simulation, May 2011)
+// from LED meassurements: fCrossTalkHitProb = 0.02 for H8500
+//
+//  0) det_type == 0
+//     Hamamatsu H8500 with constant QE=0.99
+//  1) det_type == 1
+//     Protvino-type PMT
+//  2) det_type == 2
+//     Hamamatsu H8500 from data sheet
+//  3) det_type == 3
+//     CsI photocathode, NIM A 433 (1999) 201 (HADES)
+//  4) det_type == 4
+//     Hamamatsu H8500-03 from data sheet, with UV window
+//  5) det_type == 5
+//     Hamamatsu H8500 + WLS film with UV window, estimation
+//  6) det_type == 6
+//     Hamamatsu H8500-03 posF in CernOct2011 setup (BUW measurement)
+//  10) det_type == 10
+//      Hamamatsu H8500-03 posH with dipcoated WLS film (BUW measurement)
+//  11) det_type == 11
+//      Hamamatsu H8500-03 posH with dipcoated WLS film -3.8 % due to inhomogeneity (BUW measurement)
+//  12) det_type == 12
+//      Hamamatsu H8500-03 posD in CernOct2011 setup (BUW measurement)
+//  13) det_type == 13
+//      Hamamatsu R11265, average from ZN0590, ZN0593, ZN0731, ZN0733 (BUW measurement)
+//  14) det_type == 14
+//      Hamamatsu R11265, average from ZN0590, ZN0593, ZN0731, ZN0733 with dipcoated WLS film (BUW measurement)
+//  15) det_type == 15
+//      Hamamatsu H8500D-03, posC in CernOct2012 setup, DA0141, DA0147, DA0154 (BUW measurement)
+//  16) det_type == 16
+//      Hamamatsu H8500D-03, posC in CernOct2012 setup, DA0141, DA0142, DA0147, DA0154 WLS coated (BUW measurement)
+//____________________________________________________________________________________
 
 #include "CbmRichProtHitProducer.h"
 
@@ -40,7 +74,8 @@ CbmRichProtHitProducer::CbmRichProtHitProducer():
    fMcTracks(NULL),
    fNHits(0),
    fNDoubleHits(0),
-
+   fNofCrossTalkHits(0),// = 0; // posF: 10.2% (20*10.2%=2.04hits), posH: 9,8% (20*9,8%=1.96hits) ==> in fCrossTalkHitProb
+   fCrossTalkHitProb(0.),
    fNRefrac(0.),
    fDetection(0),
    fNEvents(0),
@@ -58,8 +93,9 @@ CbmRichProtHitProducer::CbmRichProtHitProducer():
 
    fPhotomulRadius(0.0),
    fPhotomulDist(0.),
-   fDetType(6), //type 6 with measured QE
+   fDetType(4),
    fNofNoiseHits(220),
+   fNofNoiseHitsCounter(0),
    fCollectionEfficiency(1.),
    fSigmaMirror(0.06),
 
@@ -175,11 +211,8 @@ InitStatus CbmRichProtHitProducer::Init()
          cout << "   detector type: Protvino PMT with PMT radius = " << fPhotomulRadius << " cm, distance between PMTs = " << fPhotomulDist << " cm" << endl;
       if (fDetType==3)
          cout << "   detector type: CSI with pad size = " << fPhotomulRadius << " cm, distance between panels = " << fPhotomulDist << " cm" << endl;
-      if (fDetType==2 || fDetType == 4)
-	cout << "   detector type: Hamamatsu H8500 with pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
-     if (fDetType==6)
-	cout << "   detector type: Hamamatsu H8500 with measured QE and pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
-
+      if (fDetType == 0 || fDetType==2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16)
+         cout << "   detector type: Hamamatsu H8500 with pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
       cout << "   number of noise hits (to be reduced by geometrical efficiency) " << fNofNoiseHits << endl;
       cout << "--------------------------------------------------------------------------------" << endl;
    }
@@ -232,11 +265,10 @@ InitStatus CbmRichProtHitProducer::Init()
       fPhotomulRadius = 0.;
       fPhotomulDist = 0.;
    }
-   if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) {
+   if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16) {
       fPhotomulRadius = 0.6125;
-      fPhotomulDist = 0.2;
-      //fCrossTalkHitProb = 0.02;
-      //fDetType == 6 with measured QE
+      fPhotomulDist = 0.25;//0.25; // corresponds to 2mm spacing
+      fCrossTalkHitProb = 0.02; // posF: 10.2%, posH: 9,8%, that is 2 percent in direct neighbours and 0.5% in diagonal neighbours
    }
    if (fDetType == 3) {
       fPhotomulRadius = 0.8;
@@ -255,7 +287,7 @@ void CbmRichProtHitProducer::Exec(
    cout << "-I- CbmRichProtHitProducer, event no " << fNEvents << endl;
 
    Double_t lambda_min,lambda_max,lambda_step;
-   Double_t efficiency[40];
+   Double_t efficiency[46];// 40
    SetPhotoDetPar(fDetType,lambda_min,lambda_max,lambda_step,efficiency);
 
    if (fVerbose > 0) cout <<"-I- Number of input MC points: "<< fRichPoints->GetEntries()<<endl;
@@ -292,7 +324,7 @@ void CbmRichProtHitProducer::Exec(
       Double_t xHit, yHit;
       Int_t pmtID;
       Double_t sigma0 = 0.;
-      Double_t sigma = 0.19; // sigma (cm) for additional smearing of HitPosition due to WLS film
+      Double_t sigma = 0.19;//0.19; // sigma (cm) for additional smearing of HitPosition due to WLS film
 
       //FindRichHitPosition
       if (fDetType == 0) {
@@ -301,7 +333,7 @@ void CbmRichProtHitProducer::Exec(
          pmtID = j;
       }
       if (fDetType == 1) FindRichHitPositionSinglePMT(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) FindRichHitPositionMAPMT(sigma0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
+      if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16) FindRichHitPositionMAPMT(sigma0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
       if (fDetType == 3) FindRichHitPositionCsI(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
 
       //Double_t zHit = detPoint.Z();
@@ -319,15 +351,16 @@ void CbmRichProtHitProducer::Exec(
                if (TMath::Sqrt((detPoint.X()-xHit)*(detPoint.X()-xHit)+(detPoint.Y()-yHit)*(detPoint.Y()-yHit)) > (fPhotomulRadius+fPhotomulDist)*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)!" << endl;
          }
-         if (fDetType == 2 || fDetType == 3 || fDetType == 4 || fDetType == 6) {
+         if (fDetType == 0 || fDetType == 2 || fDetType == 3 || fDetType == 4 || fDetType == 6 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16) {
             if (fVerbose)
                if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)! " <<
                   detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
          }
-         if (fDetType == 5) {      // fDetType 5: additional smearing with RMS=3mm due to WLS film
+         if (fDetType == 5 || fDetType == 10 || fDetType == 11 || fDetType == 14 || fDetType == 16) {      // fDetType 5: additional smearing with RMS=3mm due to WLS film
             if (fVerbose)
                if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius+1.5 || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
+               //if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5) // --- ADDITIONAL SMEARING MAKES HIT MULT DISTRIBUTION UNSYMMETRIC, therefore taken out ---
                   cout << "-E- RichHitProducer: wrongly assigned Hits ? (distance point-hit too large)! " <<
                   detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
          }
@@ -343,7 +376,7 @@ void CbmRichProtHitProducer::Exec(
                Int_t ilambda=(Int_t)((lambda-lambda_min)/lambda_step);
                Double_t rand = gRandom->Rndm();
                fDetection = 0;
-               if (fDetType == 5 && lambda < 300.) {// smear Hit position for lambda < 300 nm (WLS film!)
+               if (fDetType == 5 || fDetType == 10 || fDetType == 11 || fDetType == 14 || fDetType == 16 && lambda < 300.) {// smear Hit position for lambda < 300 nm (WLS film!)
                   FindRichHitPositionMAPMT(sigma,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
                }
                if (efficiency[ilambda] * fCollectionEfficiency > rand ) fDetection = 1;
@@ -368,6 +401,8 @@ void CbmRichProtHitProducer::Exec(
             if (RichDetID != detID) cout << " - E - RichDetID changed from " << RichDetID <<" to " << detID << endl;
             Double_t ampl = GetAmplitude();
             AddHit(posHit,posHitErr,detID,pmtID,ampl,j);
+
+            AddCrossTalkHits(posHit.X(), posHit.Y(), j, RichDetID);
          }// photon detected?
       }
 
@@ -378,37 +413,42 @@ void CbmRichProtHitProducer::Exec(
    } // loop over input points
 
    // add noise hits
-   for(Int_t j=0; j < fNofNoiseHits; j++) {
-      Double_t rand = gRandom->Rndm();
-      Double_t xRand = -fDetWidthX + rand*2.*fDetWidthX;
-      rand = gRandom->Rndm();
-      Double_t yRand = fDetY - fDetWidthY + rand*2.*fDetWidthY;
-      //Double_t yRand = -fDetWidthY + rand*2.*fDetWidthY;
+   // modification for fNofNoiseHits < 1 (fNofNoiseHits=0.001024 in CernOct2011)
+   Double_t randnoise = gRandom->Rndm();
+   if(randnoise < fNofNoiseHits) {
+      for(Int_t j=0; j < fNofNoiseHits; j++) {
+         Double_t rand = gRandom->Rndm();
+         Double_t xRand = -fDetWidthX + rand*2.*fDetWidthX;
+         rand = gRandom->Rndm();
+         Double_t yRand = fDetY - fDetWidthY + rand*2.*fDetWidthY;
+         //Double_t yRand = -fDetWidthY + rand*2.*fDetWidthY;
 
-      Double_t xHit, yHit;
-      Int_t pmtID;
+         Double_t xHit, yHit;
+         Int_t pmtID;
 
-      //FindRichHitPosition
-      if (fDetType == 0) {
-         xHit = xRand;
-         yHit = yRand;
-         pmtID = -j;
-      }
-      if (fDetType == 1) FindRichHitPositionSinglePMT(xRand,yRand,xHit,yHit,pmtID);
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
-      if (fDetType == 3) FindRichHitPositionCsI(xRand,yRand,xHit,yHit,pmtID);
+         //FindRichHitPosition
+         if (fDetType == 0) {
+            xHit = xRand;
+            yHit = yRand;
+            pmtID = -j;
+         }
+         if (fDetType == 1) FindRichHitPositionSinglePMT(xRand,yRand,xHit,yHit,pmtID);
+         if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
+         if (fDetType == 3) FindRichHitPositionCsI(xRand,yRand,xHit,yHit,pmtID);
 
-      // add Hit
-      if (xHit!=0.0 && yHit!=0.0) {
-         Double_t zHit = fDetZ;
-         TVector3 posHit(xHit,yHit,zHit);
-         Double_t ampl = GetAmplitude();
-         //error of hit position, at the moment nothing better than +-tube_radius
-         TVector3 posHitErr(fPhotomulRadius,fPhotomulRadius,0.);
+         // add Hit
+         if (xHit!=0.0 && yHit!=0.0) {
+            Double_t zHit = fDetZ;
+            TVector3 posHit(xHit,yHit,zHit);
+            Double_t ampl = GetAmplitude();
+            //error of hit position, at the moment nothing better than +-tube_radius
+            TVector3 posHitErr(fPhotomulRadius,fPhotomulRadius,0.);
 
-         AddHit(posHit,posHitErr,RichDetID,pmtID,ampl,-1);
-      }
-   } // noise hits
+            AddHit(posHit,posHitErr,RichDetID,pmtID,ampl,-1);
+            fNofNoiseHitsCounter++;
+         }
+      } // noise hits
+   }
 
    if (fVerbose > 0) {
       cout <<"  --->  Number of hits: "<< fRichHits->GetEntries() << endl;
@@ -416,6 +456,10 @@ void CbmRichProtHitProducer::Exec(
       cout <<"-------------------------------------------------------------------"<<endl;
       cout << endl;
    }
+   cout << "nof cross talk hits = " << fNofCrossTalkHits << ", per event = " <<
+         (Double_t) fNofCrossTalkHits / fNEvents << endl;
+   cout << "nof noise hits = " << fNofNoiseHitsCounter << ", per event = " <<
+         (Double_t) fNofNoiseHitsCounter / fNEvents << endl;
 }
 
 void CbmRichProtHitProducer::AddHit(
@@ -453,6 +497,68 @@ void CbmRichProtHitProducer::AddHit(
       hit->SetAmplitude(GetAmplitude());
       hit->SetRefId(index);
       fNHits++;
+   }
+}
+
+void CbmRichProtHitProducer::AddCrossTalkHits(
+      Double_t x,
+      Double_t y,
+      Int_t pointInd,
+      Int_t RichDetID)
+{
+   // only for MAMPT
+   if (fDetType != 0 && fDetType != 2 && fDetType != 4 && fDetType != 5 && fDetType != 6 && fDetType != 10 && fDetType != 11 && fDetType != 12 && fDetType != 13 && fDetType != 14 && fDetType != 15 && fDetType != 16) return;
+   //cout << "inside AddCrossTalkHits()" << endl;
+   Double_t xHit = 0.0, yHit = 0.0;
+   Int_t pmtID = -1;
+
+   Double_t r = fPhotomulRadius;
+
+   // closest neighbors
+   Double_t rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x + r, y, xHit, yHit, pmtID);
+
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x - r, y, xHit, yHit, pmtID);
+
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x, y + r, xHit, yHit, pmtID);
+
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x, y - r, xHit, yHit, pmtID);
+
+   // diagonal neighbors
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb / 4. && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x + r, y + r, xHit, yHit, pmtID);
+
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb / 4. && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x - r, y - r, xHit, yHit, pmtID);
+
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb / 4. && xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x - r, y + r, xHit, yHit, pmtID);
+
+   rand = gRandom->Rndm();
+   if (rand < fCrossTalkHitProb / 4.&& xHit == 0.0 && yHit == 0.0 && pmtID == -1)
+      FindRichHitPositionMAPMT(0., x + r, y - r, xHit, yHit, pmtID);
+
+
+   if (xHit != 0.0 && yHit != 0.0) {
+      Double_t zHit = fDetZ;
+      TVector3 posHit(xHit,yHit,zHit);
+      Double_t ampl = GetAmplitude();
+      TVector3 posHitErr(fPhotomulRadius,fPhotomulRadius,0.);
+
+      AddHit(posHit, posHitErr, RichDetID, pmtID, ampl, pointInd);
+    //AddHit(posHit, posHitErr, RichDetID, pmtID, ampl,-1);
+      fNofCrossTalkHits++;
+      //cout << "(" << x << " " << y << ") (" << xHit << " " << yHit << ")" << endl;
    }
 }
 
@@ -659,90 +765,510 @@ void CbmRichProtHitProducer::SetPhotoDetPar(
       fEfficiency[21] = 0.017;
       fEfficiency[22] = 0.007;
       fEfficiency[23] = 0.0033;
-   } else if (det_type == 6){
+      }
 
-  /** PMT efficiencies for Hamamatsu H8500-03 
-      with measured QE
-                        (Flat type Multianode Photomultiplier with UV window)
-   corresponding range in lambda: 200nm - 640nm in steps of 20nm */
+// -------------------------------------------------------------------------------------------
+//   QE measured at Wuppertal University (BUW), spring 2011
+// -------------------------------------------------------------------------------------------
 
-    fLambdaMin = 180.;
-    fLambdaMax = 800.;
-    fLambdaStep = 10.;
+ // H8500C-03 (BA + UV glass)
+    else if(det_type == 6) {
+       /**  Measured PMT efficiencies for MAPMTs at posF (BUW measurement) ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with BA cathode + UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
 
-    fEfficiency[0] = 0.06;
-    fEfficiency[1] = 0.08;
-    fEfficiency[2] = 0.0945;
-    fEfficiency[3] = 0.1061;
-    fEfficiency[4] = 0.1265;
-    fEfficiency[5] = 0.1482;
-    fEfficiency[6] = 0.1668;
-    fEfficiency[7] = 0.1887;
-    fEfficiency[8] = 0.2093;
-    fEfficiency[9] = 0.2134;
-    fEfficiency[10] = 0.2303;
-    fEfficiency[11] = 0.2482;
-    fEfficiency[12] = 0.2601;
-    fEfficiency[13] = 0.2659;
-    fEfficiency[14] = 0.2702;
-    fEfficiency[15] = 0.283;
-    fEfficiency[16] = 0.2863;
-    fEfficiency[17] = 0.2863;
-    fEfficiency[18] = 0.2884;
-    fEfficiency[19] = 0.286;
-    fEfficiency[20] = 0.2811;
-    fEfficiency[21] = 0.2802;
-    fEfficiency[22] = 0.272;
-    fEfficiency[23] = 0.2638;
-    fEfficiency[24] = 0.2562;
-    fEfficiency[25] = 0.2472;
-    fEfficiency[26] = 0.2368;
-    fEfficiency[27] = 0.2218;
-    fEfficiency[28] = 0.2032;
-    fEfficiency[29] = 0.186;
-    fEfficiency[30] = 0.1735;
-    fEfficiency[31] = 0.1661;
-    fEfficiency[32] = 0.1483;
-    fEfficiency[33] = 0.121;
-    fEfficiency[34] = 0.0959;
-    fEfficiency[35] = 0.0782;
-    fEfficiency[36] = 0.0647;
-    fEfficiency[37] = 0.0538;
-    fEfficiency[38] = 0.0372;
-    fEfficiency[39] = 0.0296;
-    fEfficiency[40] = 0.0237;
-    fEfficiency[41] = 0.0176;
-    fEfficiency[42] = 0.0123;
-    fEfficiency[43] = 0.0083;
-    fEfficiency[44] = 0.005;
-    fEfficiency[45] = 0.003;
-    fEfficiency[46] = 0.0017;
-    fEfficiency[47] = 0.0008;
-    fEfficiency[48] = 0.0006;
-    fEfficiency[49] = 0.0003;
-    fEfficiency[50] = 0.0003;
-    fEfficiency[51] = 0.0002;
-    fEfficiency[52] = 0.0001;
-    fEfficiency[53] = 0.0001;
-    fEfficiency[54] = 0.0001;
-    fEfficiency[55] = 0.0001;
-    fEfficiency[56] = 0.0001;
-    fEfficiency[57] = 0.0001;
-    fEfficiency[58] = 0.;
-    fEfficiency[59] = 0.0001;
-    fEfficiency[60] = 0.0001;
-    fEfficiency[61] = 0.;
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.060;
+       fEfficiency[1] = 0.080;
+       fEfficiency[2] = 0.095;
+       fEfficiency[3] = 0.106;
+       fEfficiency[4] = 0.127;
+       fEfficiency[5] = 0.148;
+       fEfficiency[6] = 0.167;
+       fEfficiency[7] = 0.189;
+       fEfficiency[8] = 0.209;
+       fEfficiency[9] = 0.213;
+       fEfficiency[10] = 0.230;
+       fEfficiency[11] = 0.248;
+       fEfficiency[12] = 0.260;
+       fEfficiency[13] = 0.266;
+       fEfficiency[14] = 0.270;
+       fEfficiency[15] = 0.283;
+       fEfficiency[16] = 0.286;
+       fEfficiency[17] = 0.286;
+       fEfficiency[18] = 0.288;
+       fEfficiency[19] = 0.286;
+       fEfficiency[20] = 0.281;
+       fEfficiency[21] = 0.280;
+       fEfficiency[22] = 0.272;
+       fEfficiency[23] = 0.264;
+       fEfficiency[24] = 0.256;
+       fEfficiency[25] = 0.247;
+       fEfficiency[26] = 0.237;
+       fEfficiency[27] = 0.222;
+       fEfficiency[28] = 0.203;
+       fEfficiency[29] = 0.186;
+       fEfficiency[30] = 0.174;
+       fEfficiency[31] = 0.166;
+       fEfficiency[32] = 0.148;
+       fEfficiency[33] = 0.121;
+       fEfficiency[34] = 0.096;
+       fEfficiency[35] = 0.078;
+       fEfficiency[36] = 0.065;
+       fEfficiency[37] = 0.054;
+       fEfficiency[38] = 0.037;
+       fEfficiency[39] = 0.030;
+       fEfficiency[40] = 0.024;
+       fEfficiency[41] = 0.018;
+       fEfficiency[42] = 0.012;
+       fEfficiency[43] = 0.008;
+       fEfficiency[44] = 0.005;
+       fEfficiency[45] = 0.003;
+       fEfficiency[46] = 0.002;
+       }
 
+ else if(det_type == 10) {
+       /**  Measured PMT efficiencies for MAPMTs at posH (BUW measurement) --dipcoated WLS film -- ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
 
-   } else if (det_type == 0){
-       /** ideal detector */
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.210;
+       fEfficiency[1] = 0.215;
+       fEfficiency[2] = 0.218;
+       fEfficiency[3] = 0.222;
+       fEfficiency[4] = 0.226;
+       fEfficiency[5] = 0.228;
+       fEfficiency[6] = 0.214;
+       fEfficiency[7] = 0.210;
+       fEfficiency[8] = 0.229;
+       fEfficiency[9] = 0.231;
+       fEfficiency[10] = 0.244;
+       fEfficiency[11] = 0.253;
+       fEfficiency[12] = 0.259;
+       fEfficiency[13] = 0.263;
+       fEfficiency[14] = 0.266;
+       fEfficiency[15] = 0.277;
+       fEfficiency[16] = 0.280;
+       fEfficiency[17] = 0.274;
+       fEfficiency[18] = 0.275;
+       fEfficiency[19] = 0.270;
+       fEfficiency[20] = 0.264;
+       fEfficiency[21] = 0.263;
+       fEfficiency[22] = 0.254;
+       fEfficiency[23] = 0.246;
+       fEfficiency[24] = 0.239;
+       fEfficiency[25] = 0.229;
+       fEfficiency[26] = 0.219;
+       fEfficiency[27] = 0.207;
+       fEfficiency[28] = 0.193;
+       fEfficiency[29] = 0.179;
+       fEfficiency[30] = 0.161;
+       fEfficiency[31] = 0.149;
+       fEfficiency[32] = 0.135;
+       fEfficiency[33] = 0.117;
+       fEfficiency[34] = 0.103;
+       fEfficiency[35] = 0.082;
+       fEfficiency[36] = 0.065;
+       fEfficiency[37] = 0.056;
+       fEfficiency[38] = 0.036;
+       fEfficiency[39] = 0.030;
+       fEfficiency[40] = 0.024;
+       fEfficiency[41] = 0.018;
+       fEfficiency[42] = 0.013;
+       fEfficiency[43] = 0.009;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.002;
+     }
 
-      fLambdaMin = 100.;
-      fLambdaMax = 700.;
-      fLambdaStep = 600.;
+ else if(det_type == 11) {
+       /**  Measured PMT efficiencies for MAPMTs at posH (BUW measurement) --dipcoated WLS film -- ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with UV window)		   ##### -3.8 % due to inhomogeneity #####
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
 
-      fEfficiency[0] = 1.;
-   } else {
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.202;
+       fEfficiency[1] = 0.207;
+       fEfficiency[2] = 0.210;
+       fEfficiency[3] = 0.214;
+       fEfficiency[4] = 0.218;
+       fEfficiency[5] = 0.219;
+       fEfficiency[6] = 0.206;
+       fEfficiency[7] = 0.202;
+       fEfficiency[8] = 0.220;
+       fEfficiency[9] = 0.222;
+       fEfficiency[10] = 0.235;
+       fEfficiency[11] = 0.243;
+       fEfficiency[12] = 0.249;
+       fEfficiency[13] = 0.253;
+       fEfficiency[14] = 0.256;
+       fEfficiency[15] = 0.266;
+       fEfficiency[16] = 0.270;
+       fEfficiency[17] = 0.264;
+       fEfficiency[18] = 0.265;
+       fEfficiency[19] = 0.260;
+       fEfficiency[20] = 0.254;
+       fEfficiency[21] = 0.253;
+       fEfficiency[22] = 0.244;
+       fEfficiency[23] = 0.237;
+       fEfficiency[24] = 0.229;
+       fEfficiency[25] = 0.221;
+       fEfficiency[26] = 0.210;
+       fEfficiency[27] = 0.199;
+       fEfficiency[28] = 0.186;
+       fEfficiency[29] = 0.172;
+       fEfficiency[30] = 0.155;
+       fEfficiency[31] = 0.143;
+       fEfficiency[32] = 0.129;
+       fEfficiency[33] = 0.113;
+       fEfficiency[34] = 0.099;
+       fEfficiency[35] = 0.079;
+       fEfficiency[36] = 0.063;
+       fEfficiency[37] = 0.054;
+       fEfficiency[38] = 0.035;
+       fEfficiency[39] = 0.028;
+       fEfficiency[40] = 0.023;
+       fEfficiency[41] = 0.018;
+       fEfficiency[42] = 0.013;
+       fEfficiency[43] = 0.009;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.002;
+     }
+
+ else if(det_type == 12) {
+       /**  Measured PMT efficiencies for MAPMTs at posD (BUW measurement) ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.060;
+       fEfficiency[1] = 0.080;
+       fEfficiency[2] = 0.096;
+       fEfficiency[3] = 0.109;
+       fEfficiency[4] = 0.130;
+       fEfficiency[5] = 0.152;
+       fEfficiency[6] = 0.172;
+       fEfficiency[7] = 0.194;
+       fEfficiency[8] = 0.214;
+       fEfficiency[9] = 0.218;
+       fEfficiency[10] = 0.235;
+       fEfficiency[11] = 0.253;
+       fEfficiency[12] = 0.265;
+       fEfficiency[13] = 0.271;
+       fEfficiency[14] = 0.275;
+       fEfficiency[15] = 0.288;
+       fEfficiency[16] = 0.291;
+       fEfficiency[17] = 0.292;
+       fEfficiency[18] = 0.294;
+       fEfficiency[19] = 0.292;
+       fEfficiency[20] = 0.287;
+       fEfficiency[21] = 0.286;
+       fEfficiency[22] = 0.278;
+       fEfficiency[23] = 0.269;
+       fEfficiency[24] = 0.262;
+       fEfficiency[25] = 0.252;
+       fEfficiency[26] = 0.242;
+       fEfficiency[27] = 0.227;
+       fEfficiency[28] = 0.208;
+       fEfficiency[29] = 0.178;
+       fEfficiency[30] = 0.170;
+       fEfficiency[31] = 0.155;
+       fEfficiency[32] = 0.129;
+       fEfficiency[33] = 0.102;
+       fEfficiency[34] = 0.083;
+       fEfficiency[35] = 0.069;
+       fEfficiency[36] = 0.058;
+       fEfficiency[37] = 0.041;
+       fEfficiency[38] = 0.033;
+       fEfficiency[39] = 0.027;
+       fEfficiency[40] = 0.020;
+       fEfficiency[41] = 0.015;
+       fEfficiency[42] = 0.010;
+       fEfficiency[43] = 0.006;
+       fEfficiency[44] = 0.004;
+       fEfficiency[45] = 0.002;
+       fEfficiency[46] = 0.001;
+     }
+
+ else if(det_type == 13) {
+       /**  Measured PMT efficiencies for R11265 (BUW measurement)
+	    (Flat type Multianode Photomultiplier with UV window, SBA, 1 square inch)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.071;
+       fEfficiency[1] = 0.097;
+       fEfficiency[2] = 0.123;
+       fEfficiency[3] = 0.146;
+       fEfficiency[4] = 0.173;
+       fEfficiency[5] = 0.202;
+       fEfficiency[6] = 0.225;
+       fEfficiency[7] = 0.253;
+       fEfficiency[8] = 0.281;
+       fEfficiency[9] = 0.290;
+       fEfficiency[10] = 0.315;
+       fEfficiency[11] = 0.344;
+       fEfficiency[12] = 0.366;
+       fEfficiency[13] = 0.378;
+       fEfficiency[14] = 0.384;
+       fEfficiency[15] = 0.400;
+       fEfficiency[16] = 0.403;
+       fEfficiency[17] = 0.404;
+       fEfficiency[18] = 0.407;
+       fEfficiency[19] = 0.403;
+       fEfficiency[20] = 0.396;
+       fEfficiency[21] = 0.395;
+       fEfficiency[22] = 0.383;
+       fEfficiency[23] = 0.370;
+       fEfficiency[24] = 0.359;
+       fEfficiency[25] = 0.347;
+       fEfficiency[26] = 0.331;
+       fEfficiency[27] = 0.310;
+       fEfficiency[28] = 0.285;
+       fEfficiency[29] = 0.263;
+       fEfficiency[30] = 0.244;
+       fEfficiency[31] = 0.232;
+       fEfficiency[32] = 0.213;
+       fEfficiency[33] = 0.182;
+       fEfficiency[34] = 0.151;
+       fEfficiency[35] = 0.126;
+       fEfficiency[36] = 0.106;
+       fEfficiency[37] = 0.092;
+       fEfficiency[38] = 0.069;
+       fEfficiency[39] = 0.060;
+       fEfficiency[40] = 0.051;
+       fEfficiency[41] = 0.042;
+       fEfficiency[42] = 0.034;
+       fEfficiency[43] = 0.026;
+       fEfficiency[44] = 0.019;
+       fEfficiency[45] = 0.014;
+       fEfficiency[46] = 0.009;
+     }
+
+ else if(det_type == 14) {
+       /**  Measured PMT efficiencies for R11265 -- dipcoated WLS film -- (BUW measurement)
+	    (Flat type Multianode Photomultiplier with UV window, SBA, 1 square inch)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.294;
+       fEfficiency[1] = 0.313;
+       fEfficiency[2] = 0.332;
+       fEfficiency[3] = 0.351;
+       fEfficiency[4] = 0.352;
+       fEfficiency[5] = 0.338;
+       fEfficiency[6] = 0.303;
+       fEfficiency[7] = 0.286;
+       fEfficiency[8] = 0.307;
+       fEfficiency[9] = 0.307;
+       fEfficiency[10] = 0.324;
+       fEfficiency[11] = 0.340;
+       fEfficiency[12] = 0.354;
+       fEfficiency[13] = 0.364;
+       fEfficiency[14] = 0.371;
+       fEfficiency[15] = 0.390;
+       fEfficiency[16] = 0.389;
+       fEfficiency[17] = 0.392;
+       fEfficiency[18] = 0.395;
+       fEfficiency[19] = 0.393;
+       fEfficiency[20] = 0.388;
+       fEfficiency[21] = 0.388;
+       fEfficiency[22] = 0.378;
+       fEfficiency[23] = 0.367;
+       fEfficiency[24] = 0.358;
+       fEfficiency[25] = 0.347;
+       fEfficiency[26] = 0.333;
+       fEfficiency[27] = 0.310;
+       fEfficiency[28] = 0.384;
+       fEfficiency[29] = 0.265;
+       fEfficiency[30] = 0.248;
+       fEfficiency[31] = 0.238;
+       fEfficiency[32] = 0.220;
+       fEfficiency[33] = 0.188;
+       fEfficiency[34] = 0.150;
+       fEfficiency[35] = 0.123;
+       fEfficiency[36] = 0.104;
+       fEfficiency[37] = 0.089;
+       fEfficiency[38] = 0.068;
+       fEfficiency[39] = 0.058;
+       fEfficiency[40] = 0.050;
+       fEfficiency[41] = 0.041;
+       fEfficiency[42] = 0.033;
+       fEfficiency[43] = 0.025;
+       fEfficiency[44] = 0.018;
+       fEfficiency[45] = 0.013;
+       fEfficiency[46] = 0.008;
+     }
+
+ else if(det_type == 15) {
+       /**  Measured PMT efficiencies for MAPMTs at posC (BUW measurement) ##### CernOct2012 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.066;
+       fEfficiency[1] = 0.086;
+       fEfficiency[2] = 0.106;
+       fEfficiency[3] = 0.112;
+       fEfficiency[4] = 0.133;
+       fEfficiency[5] = 0.155;
+       fEfficiency[6] = 0.175;
+       fEfficiency[7] = 0.198;
+       fEfficiency[8] = 0.217;
+       fEfficiency[9] = 0.220;
+       fEfficiency[10] = 0.234;
+       fEfficiency[11] = 0.251;
+       fEfficiency[12] = 0.264;
+       fEfficiency[13] = 0.271;
+       fEfficiency[14] = 0.275;
+       fEfficiency[15] = 0.290;
+       fEfficiency[16] = 0.291;
+       fEfficiency[17] = 0.290;
+       fEfficiency[18] = 0.292;
+       fEfficiency[19] = 0.290;
+       fEfficiency[20] = 0.286;
+       fEfficiency[21] = 0.286;
+       fEfficiency[22] = 0.278;
+       fEfficiency[23] = 0.270;
+       fEfficiency[24] = 0.263;
+       fEfficiency[25] = 0.256;
+       fEfficiency[26] = 0.246;
+       fEfficiency[27] = 0.230;
+       fEfficiency[28] = 0.210;
+       fEfficiency[29] = 0.195;
+       fEfficiency[30] = 0.183;
+       fEfficiency[31] = 0.176;
+       fEfficiency[32] = 0.160;
+       fEfficiency[33] = 0.134;
+       fEfficiency[34] = 0.110;
+       fEfficiency[35] = 0.090;
+       fEfficiency[36] = 0.076;
+       fEfficiency[37] = 0.063;
+       fEfficiency[38] = 0.041;
+       fEfficiency[39] = 0.033;
+       fEfficiency[40] = 0.027;
+       fEfficiency[41] = 0.020;
+       fEfficiency[42] = 0.014;
+       fEfficiency[43] = 0.010;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.003;
+     }
+
+ else if(det_type == 16) {
+       /**  Measured PMT efficiencies for MAPMTs at posC -- optimized dipcoated WLS film -- (BUW measurement) ##### CernOct2012 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.253;
+       fEfficiency[1] = 0.261;
+       fEfficiency[2] = 0.269;
+       fEfficiency[3] = 0.277;
+       fEfficiency[4] = 0.279;
+       fEfficiency[5] = 0.273;
+       fEfficiency[6] = 0.245;
+       fEfficiency[7] = 0.228;
+       fEfficiency[8] = 0.243;
+       fEfficiency[9] = 0.243;
+       fEfficiency[10] = 0.253;
+       fEfficiency[11] = 0.259;
+       fEfficiency[12] = 0.262;
+       fEfficiency[13] = 0.263;
+       fEfficiency[14] = 0.265;
+       fEfficiency[15] = 0.278;
+       fEfficiency[16] = 0.279;
+       fEfficiency[17] = 0.281;
+       fEfficiency[18] = 0.283;
+       fEfficiency[19] = 0.281;
+       fEfficiency[20] = 0.277;
+       fEfficiency[21] = 0.275;
+       fEfficiency[22] = 0.267;
+       fEfficiency[23] = 0.260;
+       fEfficiency[24] = 0.253;
+       fEfficiency[25] = 0.245;
+       fEfficiency[26] = 0.234;
+       fEfficiency[27] = 0.219;
+       fEfficiency[28] = 0.201;
+       fEfficiency[29] = 0.187;
+       fEfficiency[30] = 0.175;
+       fEfficiency[31] = 0.167;
+       fEfficiency[32] = 0.150;
+       fEfficiency[33] = 0.124;
+       fEfficiency[34] = 0.098;
+       fEfficiency[35] = 0.080;
+       fEfficiency[36] = 0.066;
+       fEfficiency[37] = 0.055;
+       fEfficiency[38] = 0.040;
+       fEfficiency[39] = 0.033;
+       fEfficiency[40] = 0.026;
+       fEfficiency[41] = 0.020;
+       fEfficiency[42] = 0.014;
+       fEfficiency[43] = 0.010;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.002;
+     }
+
+else if (det_type == 0){
+      //   ideal detector
+      fLambdaMin = 160.;
+      fLambdaMax = 640.;
+      fLambdaStep = 20.;
+
+      fEfficiency[0] = 0.99;
+      fEfficiency[1] = 0.99;
+      fEfficiency[2] = 0.99;
+      fEfficiency[3] = 0.99;
+      fEfficiency[4] = 0.99;
+      fEfficiency[5] = 0.99;
+      fEfficiency[6] = 0.99;
+      fEfficiency[7] = 0.99;
+      fEfficiency[8] = 0.99;
+      fEfficiency[9] = 0.99;
+      fEfficiency[10] = 0.99;
+      fEfficiency[11] = 0.99;
+      fEfficiency[12] = 0.99;
+      fEfficiency[13] = 0.99;
+      fEfficiency[14] = 0.99;
+      fEfficiency[15] = 0.99;
+      fEfficiency[16] = 0.99;
+      fEfficiency[17] = 0.99;
+      fEfficiency[18] = 0.99;
+      fEfficiency[19] = 0.99;
+      fEfficiency[20] = 0.99;
+      fEfficiency[21] = 0.99;
+      fEfficiency[22] = 0.99;
+      fEfficiency[23] = 0.99;
+    }
+
+    else {
       cout << "-E- photodetector type not specified" << endl;
 
       fLambdaMin = 100.;
@@ -752,7 +1278,12 @@ void CbmRichProtHitProducer::SetPhotoDetPar(
       fEfficiency[0] = 0.;
 
    }
+// ------------------- read QE  ---------------------------------
+/*	for (Int_t k=0; k<=46; k++) {
+  	cout << "QE[" << k << "] " << fEfficiency[k] << endl;
+	}*/
 }
+
 
 void CbmRichProtHitProducer::FindRichHitPositionSinglePMT(
       Double_t xPoint,

@@ -1,13 +1,11 @@
 /**
- * \file qa_study.C
+ * \file qa_study_report.C
  * \brief Macro for generation of summary reports.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
 
-#include "../../cbmbase/CbmDetectorList.h"
-
-void qa_study()
+void qa_study_report()
 {
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
    loadlibs();
@@ -27,13 +25,13 @@ void qa_study()
       }
       outputDir = std::string(gSystem->Getenv("LIT_STUDY_OUTPUT_DIR"));
    } else {
-      fileNames.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alds_smearing_branch/");
-      fileNames.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12altof_smearing_branch/");
-      fileNames.push_back("/Users/andrey/Development/cbm/trunk/cbmroot/macro/littrack/scripts/trd_v12alnotrd_smearing_branch/");
+      fileNames.push_back("scripts/events_trd_v10b/global.reco.smearing.branch.0000.root");
+      fileNames.push_back("scripts/events_trd_v11c/global.reco.smearing.branch.0000.root");
+      fileNames.push_back("scripts/events_trd_v12a/global.reco.smearing.branch.0000.root");
 
-      studyNames.push_back("v12alds");
-      studyNames.push_back("v12altof");
-      studyNames.push_back("v12alnotrd");
+      studyNames.push_back("v10b");
+      studyNames.push_back("v11c");
+      studyNames.push_back("v12a");
 
       outputDir = "./test/";
    }

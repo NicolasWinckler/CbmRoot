@@ -119,7 +119,7 @@ void CbmHistManager::ReadFromFile(
          TNamed* h = (TNamed*) obj;
          TNamed* h1 = (TNamed*)file->Get(h->GetName());
          Add(string(h->GetName()), h1);
-         cout << c++ << " " << h->GetName()<< endl;
+         //cout << c++ << " " << h->GetName()<< endl;
       }
    }
 }

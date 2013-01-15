@@ -613,6 +613,31 @@ void CbmLitTrackingQa::CreateHistograms()
       CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
    }
 
+//   // Create efficiency histograms with normalization to INPUT
+//   vector<TH1*> effHistos = fHM->H1Vector("hte_+*_Eff_+*");
+//   Int_t nofEffHistos = effHistos.size();
+//   set<string> effNamesSet;
+//   vector<string> effNormNames;
+//   for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+//      TH1* hist = effHistos[iHist];
+//      vector<string> split = Split(hist->GetName(), '_');
+//      string effName = split[1];
+//      string normName = split[2];
+//      if (effNamesSet.find(effName) == effNamesSet.end()) {
+//         effNamesSet.insert(effName);
+//         effNormNames.push_back(effName + "_" + normName);
+//      }
+//   }
+//   for (Int_t i = 0; i < effNormNames.size(); i++) {
+//      std::cout << i << " " << effNormNames[i] << std::endl;
+//   }
+//   Int_t nofEffNormNames = effNormNames.size();
+//   for (Int_t iHist = 0; iHist < effNormNames.size(); iHist++) {
+//
+//   }
+//   //vector<string> effNormNames(effNormNamesSet.begin(), effNormNames.end());
+//   //
+
    // Create histograms for ghost tracks
    if (fDet.GetDet(kSTS)) CreateH1("hng_NofGhosts_Sts_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
    if (fDet.GetDet(kTRD)) CreateH1("hng_NofGhosts_Trd_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);

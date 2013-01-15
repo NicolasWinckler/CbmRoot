@@ -38,6 +38,8 @@ CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 
 void CbmLitTrackingQaReport::Create()
 {
+   NormalizeHistos();
+
    Out().precision(3);
    Out() << R()->DocumentBegin();
    Out() << R()->Title(0, GetTitle());
@@ -398,6 +400,12 @@ void CbmLitTrackingQaReport::CalculateEfficiencyHistos()
       effHist->SetMinimum(0.);
       effHist->SetMaximum(100.);
     }
+}
+
+void CbmLitTrackingQaReport::NormalizeHistos()
+{
+   Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
+   HM()->ScaleByPattern("hng_NofGhosts_.+_Nh", 1. / nofEvents);
 }
 
 ClassImp(CbmLitTrackingQaReport)

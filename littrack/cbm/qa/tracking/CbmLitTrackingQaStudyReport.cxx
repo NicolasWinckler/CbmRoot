@@ -6,8 +6,11 @@
 #include "CbmLitTrackingQaStudyReport.h"
 #include "CbmReportElement.h"
 #include "CbmHistManager.h"
+#include "CbmDrawHist.h"
 #include "../std/utils/CbmLitUtils.h"
 #include "TH1.h"
+#include "TCanvas.h"
+#include "TLine.h"
 #include <vector>
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
@@ -68,7 +71,7 @@ void CbmLitTrackingQaStudyReport::Create()
    Out() << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter);
    Out() << PrintEfficiencyTable("Tracking efficiency with RICH", "hte_.*Rich.*_Eff_p");
    Out() << PrintEfficiencyTable("Tracking efficiency w/o RICH", "hte_((?!Rich).)*_Eff_p");
-//   Out() << PrintImages(".*tracking_qa_.*png");
+   PrintCanvases();
    Out() <<  R()->DocumentEnd();
 }
 
@@ -131,7 +134,111 @@ string CbmLitTrackingQaStudyReport::PrintEfficiencyTable(
 
 void CbmLitTrackingQaStudyReport::Draw()
 {
-
+   CalculateEfficiencyHistos();
+   SetDefaultDrawStyle();
+   DrawEfficiencyHistos();
 }
 
+void CbmLitTrackingQaStudyReport::DrawEfficiencyHistos()
+{
+   string histNamePattern = "hte_.+_.+_All_Eff_p";
+   vector<TH1*> histos = HM()[0]->H1Vector(histNamePattern);
+   for (UInt_t i = 0; i < histos.size(); i++) {
+      string histName = histos[i]->GetName();
+      DrawEfficiency("tracking_qa_study_" + histName, histName);
+   }
+}
+
+void CbmLitTrackingQaStudyReport::DrawEfficiency(
+      const string& canvasName,
+      const string& histName)
+{
+   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+   canvas->SetGrid();
+   canvas->cd();
+
+   Int_t nofStudies = HM().size();
+   vector<string> labels(nofStudies);
+   vector<TH1*> histos(nofStudies);
+   vector<Double_t> efficiencies(nofStudies);
+   for (UInt_t iStudy = 0; iStudy < nofStudies; iStudy++) {
+      CbmHistManager* hm = HM()[iStudy];
+      histos[iStudy] = hm->H1(histName);
+      efficiencies[iStudy] = CalcEfficiency(hm->H1(FindAndReplace(histName, "_Eff_", "_Rec_")), hm->H1(FindAndReplace(histName, "_Eff_", "_Acc_")), 100.);
+      labels[iStudy] = GetStudyName(iStudy) + "(" + NumberToString<Double_t>(efficiencies[iStudy], 1) + ")";
+   }
+
+   DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
+   DrawMeanEfficiencyLines(histos, efficiencies);
+}
+
+void CbmLitTrackingQaStudyReport::DivideHistos(
+   TH1* histo1,
+   TH1* histo2,
+   TH1* histo3,
+   Double_t scale)
+{
+   histo1->Sumw2();
+   histo2->Sumw2();
+   histo3->Sumw2();
+   histo3->Divide(histo1, histo2, 1., 1., "B");
+   histo3->Scale(scale);
+}
+
+void CbmLitTrackingQaStudyReport::CalculateEfficiencyHistos()
+{
+    Int_t nofStudies = HM().size();
+    for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
+       vector<TH1*> effHistos = HM()[iStudy]->H1Vector("hte_.+_Eff_.+");
+       Int_t nofEffHistos = effHistos.size();
+       for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+         TH1* effHist = effHistos[iHist];
+         string effHistName = effHist->GetName();
+         string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
+         string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
+         DivideHistos(HM()[iStudy]->H1(recHistName), HM()[iStudy]->H1(accHistName), effHist, 100.);
+         effHist->SetMinimum(0.);
+         effHist->SetMaximum(100.);
+       }
+    }
+}
+
+void CbmLitTrackingQaStudyReport::NormalizeHistos()
+{
+   Int_t nofStudies = HM().size();
+   for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
+      Int_t nofEvents = HM()[iStudy]->H1("hen_EventNo_TrackingQa")->GetEntries();
+      HM()[iStudy]->ScaleByPattern("hng_NofGhosts_.+_Nh", 1. / nofEvents);
+   }
+}
+
+void CbmLitTrackingQaStudyReport::DrawMeanEfficiencyLines(
+   const vector<TH1*>& histos,
+   const vector<Double_t>& efficiencies)
+{
+   assert(histos.size() != 0 && efficiencies.size() == histos.size());
+
+   Double_t minX = histos[0]->GetXaxis()->GetXmin();
+   Double_t maxX = histos[0]->GetXaxis()->GetXmax();
+   Int_t nofHistos = histos.size();
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      TLine* line = new TLine(minX, efficiencies[iHist], maxX, efficiencies[iHist]);
+      line->SetLineWidth(1);
+      line->SetLineColor(histos[iHist]->GetLineColor());
+      line->Draw();
+   }
+}
+
+
+Double_t CbmLitTrackingQaStudyReport::CalcEfficiency(
+   const TH1* histRec,
+   const TH1* histAcc,
+   Double_t scale) const
+{
+   if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
+      return 0.;
+   } else {
+      return scale * Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+   }
+}
 ClassImp(CbmLitTrackingQaStudyReport)

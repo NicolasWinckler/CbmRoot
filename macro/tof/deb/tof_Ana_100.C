@@ -1,4 +1,4 @@
-tof_Ana100(Int_t nEvents = 1000, Int_t iout=1)
+tof_Ana_100(Int_t nEvents = 1000, Int_t iout=1)
 {
 
   TString  InputFile     ="data/auaumbias.mc.root";

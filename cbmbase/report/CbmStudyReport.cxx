@@ -56,16 +56,20 @@ void CbmStudyReport::Create(
 		files[i] = new TFile(fileNames[i].c_str());
 		fHM[i]->ReadFromFile(files[i]);
 	}
+   fStudyNames = studyNames;
 	SetOutputDir(outputDir);
 
 	CreateReports();
 
-	for (Int_t i = 0; i < nofStudies; i++) {
-		delete fHM[i];
-		delete files[i];
-	}
-	fHM.clear();
-	files.clear();
+	// Do not delete histogram managers and files.
+	// Otherwise histograms disappear from canvases
+	// and are not saved to file.
+//	for (Int_t i = 0; i < nofStudies; i++) {
+//		delete fHM[i];
+//		delete files[i];
+//	}
+//	fHM.clear();
+//	files.clear();
 }
 
 ClassImp(CbmStudyReport)

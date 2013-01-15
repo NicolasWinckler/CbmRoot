@@ -53,6 +53,8 @@ string NofGhostsRowNameFormatter(
 CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport():
 		CbmStudyReport()
 {
+   SetReportName("tracking_qa_study");
+   SetReportTitle("Tracking QA study report");
 }
 
 CbmLitTrackingQaStudyReport::~CbmLitTrackingQaStudyReport()
@@ -65,7 +67,7 @@ void CbmLitTrackingQaStudyReport::Create()
    Out() << R()->DocumentBegin();
    Out() << R()->Title(0, GetTitle());
 
-   Out() << PrintTable("Number of events", "hen_EventNo_TrackingQa.entries", EventNoRowNameFormatter);
+   Out() << PrintTable("Number of events", "hen_EventNo_TrackingQa", EventNoRowNameFormatter);
    Out() << PrintTable("Number of objects per event", "hno_NofObjects_.+", NofObjectsRowNameFormatter);
    Out() << PrintTable("Number of all, true and fake hits in tracks and rings", "hth_.+_TrackHits_.*", TrackHitsRowNameFormatter);
    Out() << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter);
@@ -147,6 +149,20 @@ void CbmLitTrackingQaStudyReport::DrawEfficiencyHistos()
       string histName = histos[i]->GetName();
       DrawEfficiency("tracking_qa_study_" + histName, histName);
    }
+
+   histNamePattern = "hte_.+_.+_All_Acc_p";
+   histos = HM()[0]->H1Vector(histNamePattern);
+   for (UInt_t i = 0; i < histos.size(); i++) {
+      string histName = histos[i]->GetName();
+      DrawAccAndRec("tracking_qa_study_" + histName, histName);
+   }
+
+   histNamePattern = "hte_.+_.+_All_Rec_p";
+   histos = HM()[0]->H1Vector(histNamePattern);
+   for (UInt_t i = 0; i < histos.size(); i++) {
+      string histName = histos[i]->GetName();
+      DrawAccAndRec("tracking_qa_study_" + histName, histName);
+   }
 }
 
 void CbmLitTrackingQaStudyReport::DrawEfficiency(
@@ -172,6 +188,29 @@ void CbmLitTrackingQaStudyReport::DrawEfficiency(
    DrawMeanEfficiencyLines(histos, efficiencies);
 }
 
+void CbmLitTrackingQaStudyReport::DrawAccAndRec(
+      const string& canvasName,
+      const string& histName)
+{
+   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+   canvas->SetGrid();
+   canvas->cd();
+
+   Int_t nofStudies = HM().size();
+   vector<string> labels(nofStudies);
+   vector<TH1*> histos(nofStudies);
+   for (UInt_t iStudy = 0; iStudy < nofStudies; iStudy++) {
+      CbmHistManager* hm = HM()[iStudy];
+      Int_t nofEvents = hm->H1("hen_EventNo_TrackingQa")->GetEntries();
+      histos[iStudy] = hm->H1(histName);
+      histos[iStudy]->Scale(1./nofEvents);
+      Double_t nofObjects = histos[iStudy]->GetEntries() / nofEvents;
+      labels[iStudy] = GetStudyName(iStudy) + "(" + NumberToString<Double_t>(nofObjects, 1) + ")";
+   }
+
+   DrawH1(histos, labels, kLinear, kLog, true, 0.65, 0.75, 0.95, 0.99);
+}
+
 void CbmLitTrackingQaStudyReport::DivideHistos(
    TH1* histo1,
    TH1* histo2,
@@ -183,6 +222,35 @@ void CbmLitTrackingQaStudyReport::DivideHistos(
    histo3->Sumw2();
    histo3->Divide(histo1, histo2, 1., 1., "B");
    histo3->Scale(scale);
+}
+
+void CbmLitTrackingQaStudyReport::DrawMeanEfficiencyLines(
+   const vector<TH1*>& histos,
+   const vector<Double_t>& efficiencies)
+{
+   assert(histos.size() != 0 && efficiencies.size() == histos.size());
+
+   Double_t minX = histos[0]->GetXaxis()->GetXmin();
+   Double_t maxX = histos[0]->GetXaxis()->GetXmax();
+   Int_t nofHistos = histos.size();
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      TLine* line = new TLine(minX, efficiencies[iHist], maxX, efficiencies[iHist]);
+      line->SetLineWidth(1);
+      line->SetLineColor(histos[iHist]->GetLineColor());
+      line->Draw();
+   }
+}
+
+Double_t CbmLitTrackingQaStudyReport::CalcEfficiency(
+   const TH1* histRec,
+   const TH1* histAcc,
+   Double_t scale) const
+{
+   if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
+      return 0.;
+   } else {
+      return scale * Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+   }
 }
 
 void CbmLitTrackingQaStudyReport::CalculateEfficiencyHistos()
@@ -209,36 +277,6 @@ void CbmLitTrackingQaStudyReport::NormalizeHistos()
    for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
       Int_t nofEvents = HM()[iStudy]->H1("hen_EventNo_TrackingQa")->GetEntries();
       HM()[iStudy]->ScaleByPattern("hng_NofGhosts_.+_Nh", 1. / nofEvents);
-   }
-}
-
-void CbmLitTrackingQaStudyReport::DrawMeanEfficiencyLines(
-   const vector<TH1*>& histos,
-   const vector<Double_t>& efficiencies)
-{
-   assert(histos.size() != 0 && efficiencies.size() == histos.size());
-
-   Double_t minX = histos[0]->GetXaxis()->GetXmin();
-   Double_t maxX = histos[0]->GetXaxis()->GetXmax();
-   Int_t nofHistos = histos.size();
-   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
-      TLine* line = new TLine(minX, efficiencies[iHist], maxX, efficiencies[iHist]);
-      line->SetLineWidth(1);
-      line->SetLineColor(histos[iHist]->GetLineColor());
-      line->Draw();
-   }
-}
-
-
-Double_t CbmLitTrackingQaStudyReport::CalcEfficiency(
-   const TH1* histRec,
-   const TH1* histAcc,
-   Double_t scale) const
-{
-   if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
-      return 0.;
-   } else {
-      return scale * Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
    }
 }
 ClassImp(CbmLitTrackingQaStudyReport)

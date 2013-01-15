@@ -119,6 +119,15 @@ protected:
        const vector<Double_t>& efficiencies);
 
     /**
+     * \brief Draw accepted and reconstructed tracks histograms.
+     * \param[in] canvasName Name of canvas.
+     * \param[in] histName Histogram name.
+     */
+    void DrawAccAndRec(
+          const string& canvasName,
+          const string& histName);
+
+    /**
      * \brief Calculate efficiency for two histograms.
      * \param[in] histReco Reconstruction histogram.
      * \param[in] histAcc Acceptance histogram.

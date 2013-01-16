@@ -50,6 +50,35 @@ string NofGhostsRowNameFormatter(
 	return Split(name, '_')[2];
 }
 
+string EventNoCellFormatter(
+      const TH1* hist,
+      Int_t /* nofEvents */)
+{
+   return NumberToString<Double_t>(hist->GetEntries());
+}
+
+string NofObjectsCellFormatter(
+      const TH1* hist,
+      Int_t /* nofEvents */)
+{
+   return NumberToString<Double_t>(hist->GetMean());
+}
+
+string TrackHitsCellFormatter(
+      const TH1* hist,
+      Int_t /* nofEvents */)
+{
+   return NumberToString<Double_t>(hist->GetMean());
+}
+
+string NofGhostsCellFormatter(
+      const TH1* hist,
+      Int_t nofEvents)
+{
+   return NumberToString<Double_t>(hist->GetEntries() / nofEvents);
+}
+
+
 CbmLitTrackingQaStudyReport::CbmLitTrackingQaStudyReport():
 		CbmStudyReport()
 {
@@ -67,10 +96,10 @@ void CbmLitTrackingQaStudyReport::Create()
    Out() << R()->DocumentBegin();
    Out() << R()->Title(0, GetTitle());
 
-   Out() << PrintTable("Number of events", "hen_EventNo_TrackingQa", EventNoRowNameFormatter);
-   Out() << PrintTable("Number of objects per event", "hno_NofObjects_.+", NofObjectsRowNameFormatter);
-   Out() << PrintTable("Number of all, true and fake hits in tracks and rings", "hth_.+_TrackHits_.*", TrackHitsRowNameFormatter);
-   Out() << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter);
+   Out() << PrintTable("Number of events", "hen_EventNo_TrackingQa", EventNoRowNameFormatter, EventNoCellFormatter);
+   Out() << PrintTable("Number of objects per event", "hno_NofObjects_.+", NofObjectsRowNameFormatter, NofObjectsCellFormatter);
+   Out() << PrintTable("Number of all, true and fake hits in tracks and rings", "hth_.+_TrackHits_.*", TrackHitsRowNameFormatter, TrackHitsCellFormatter);
+   Out() << PrintTable("Number of ghosts", "hng_NofGhosts_.+", NofGhostsRowNameFormatter, NofGhostsCellFormatter);
    Out() << PrintEfficiencyTable("Tracking efficiency with RICH", "hte_.*Rich.*_Eff_p");
    Out() << PrintEfficiencyTable("Tracking efficiency w/o RICH", "hte_((?!Rich).)*_Eff_p");
    PrintCanvases();
@@ -80,58 +109,60 @@ void CbmLitTrackingQaStudyReport::Create()
 string CbmLitTrackingQaStudyReport::PrintTable(
 		const string& tableName,
 		const string& pattern,
-		string (*rowNameFormatter)(const string&)) const
+		string (*rowNameFormatter)(const string&),
+		string (*cellFormatter)(const TH1*, Int_t)) const
 {
-   	Int_t nofStudies = HM().size();
-   	vector<vector<TH1*> > histos(nofStudies);
-   	for (Int_t i = 0; i < nofStudies; i++) {
-   		histos[i] = HM(i)->H1Vector(pattern);
+   Int_t nofStudies = HM().size();
+   vector<vector<TH1*> > histos(nofStudies);
+   for (Int_t i = 0; i < nofStudies; i++) {
+   	histos[i] = HM(i)->H1Vector(pattern);
 	}
-   	string str = R()->TableBegin(tableName, list_of(string("")).range(GetStudyNames()));
-   	for (Int_t iHist = 0; iHist < histos[0].size(); iHist++) {
+   string str = R()->TableBegin(tableName, list_of(string("")).range(GetStudyNames()));
+   for (Int_t iHist = 0; iHist < histos[0].size(); iHist++) {
 		string cellName = rowNameFormatter(histos[0][iHist]->GetName());
 		vector<string> cells(nofStudies);
 		for (Int_t i = 0; i < nofStudies; i++) {
-			cells[i] = NumberToString<Double_t>(histos[i][iHist]->GetMean()) + " FIX";
+		   Int_t nofEvents = HM(i)->H1("hen_EventNo_TrackingQa")->GetEntries();
+			cells[i] = cellFormatter(histos[i][iHist], nofEvents);
 		}
 		str += R()->TableRow(list_of(cellName).range(cells));
 	}
-   	str += R()->TableEnd();
-   	return str;
+   str += R()->TableEnd();
+   return str;
 }
 
 string CbmLitTrackingQaStudyReport::PrintEfficiencyTable(
 		const string& tableName,
 		const string& pattern) const
 {
-   	Int_t nofStudies = HM().size();
-   	vector<vector<TH1*> > histos(nofStudies);// = fHM->H1Vector(effRegex);
-   	for (Int_t i = 0; i < nofStudies; i++) {
-   		histos[i] = HM(i)->H1Vector(pattern);
+   Int_t nofStudies = HM().size();
+   vector<vector<TH1*> > histos(nofStudies);// = fHM->H1Vector(effRegex);
+   for (Int_t i = 0; i < nofStudies; i++) {
+   	histos[i] = HM(i)->H1Vector(pattern);
 	}
-   	string str = R()->TableBegin(tableName, list_of(string("")).range(GetStudyNames()));
+   string str = R()->TableBegin(tableName, list_of(string("")).range(GetStudyNames()));
 
-   	for (Int_t iHist = 0; iHist != histos[0].size(); iHist++) {
-   		vector<string> split = Split(histos[0][iHist]->GetName(), '_');
-   		string cellName = split[1] + "(" + split[2] + "):" + split[3];
-   		vector<string> cells(nofStudies);
-   		for (Int_t i = 0; i < nofStudies; i++) {
-   			Int_t nofEvents = HM(i)->H1("hen_EventNo_TrackingQa")->GetEntries();
-   			string effName = histos[0][iHist]->GetName();
-			string accName = FindAndReplace(effName, "_Eff_", "_Acc_");
-			string recName = FindAndReplace(effName, "_Eff_", "_Rec_");
-			Double_t acc = HM(i)->H1(accName)->GetEntries() / nofEvents;
-			Double_t rec = HM(i)->H1(recName)->GetEntries() / nofEvents;
-			Double_t eff = (acc != 0.) ? 100. * rec / acc : 0.;
-			string accStr = NumberToString<Double_t>(acc);
-			string recStr = NumberToString<Double_t>(rec);
-			string effStr = NumberToString<Double_t>(eff);
-			cells[i] = effStr + "(" + recStr + "/" + accStr + ")";
-   		}
-   		str += R()->TableRow(list_of(cellName).range(cells));
-   	}
-   	str += R()->TableEnd();
-   	return str;
+   for (Int_t iHist = 0; iHist != histos[0].size(); iHist++) {
+      vector<string> split = Split(histos[0][iHist]->GetName(), '_');
+      string cellName = split[1] + "(" + split[2] + "):" + split[3];
+      vector<string> cells(nofStudies);
+      for (Int_t i = 0; i < nofStudies; i++) {
+         Int_t nofEvents = HM(i)->H1("hen_EventNo_TrackingQa")->GetEntries();
+         string effName = histos[0][iHist]->GetName();
+         string accName = FindAndReplace(effName, "_Eff_", "_Acc_");
+         string recName = FindAndReplace(effName, "_Eff_", "_Rec_");
+         Double_t acc = HM(i)->H1(accName)->GetEntries() / nofEvents;
+         Double_t rec = HM(i)->H1(recName)->GetEntries() / nofEvents;
+         Double_t eff = (acc != 0.) ? 100. * rec / acc : 0.;
+         string accStr = NumberToString<Double_t>(acc);
+         string recStr = NumberToString<Double_t>(rec);
+         string effStr = NumberToString<Double_t>(eff);
+         cells[i] = effStr + "(" + recStr + "/" + accStr + ")";
+      }
+      str += R()->TableRow(list_of(cellName).range(cells));
+   }
+   str += R()->TableEnd();
+   return str;
 }
 
 void CbmLitTrackingQaStudyReport::Draw()
@@ -255,11 +286,11 @@ Double_t CbmLitTrackingQaStudyReport::CalcEfficiency(
 
 void CbmLitTrackingQaStudyReport::CalculateEfficiencyHistos()
 {
-    Int_t nofStudies = HM().size();
-    for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
-       vector<TH1*> effHistos = HM()[iStudy]->H1Vector("hte_.+_Eff_.+");
-       Int_t nofEffHistos = effHistos.size();
-       for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+   Int_t nofStudies = HM().size();
+   for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
+      vector<TH1*> effHistos = HM()[iStudy]->H1Vector("hte_.+_Eff_.+");
+      Int_t nofEffHistos = effHistos.size();
+      for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
          TH1* effHist = effHistos[iHist];
          string effHistName = effHist->GetName();
          string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
@@ -267,8 +298,8 @@ void CbmLitTrackingQaStudyReport::CalculateEfficiencyHistos()
          DivideHistos(HM()[iStudy]->H1(recHistName), HM()[iStudy]->H1(accHistName), effHist, 100.);
          effHist->SetMinimum(0.);
          effHist->SetMaximum(100.);
-       }
-    }
+      }
+   }
 }
 
 ClassImp(CbmLitTrackingQaStudyReport)

@@ -54,13 +54,14 @@ protected:
      * \param[in] tableName Table name.
      * \param[in] pattern Pattern of histogram name.
      * \param[in] rowNameFormatter Function which formats row name.
+     * \param[in] cellFormatter Function formats cell string.
      * \return Formated string with table of numbers.
      */
-    string PrintTable(
-    		const string& tableName,
-    		const string& pattern,
-    		string (*rowNameFormatter)(const string&)) const;
-    		//const boost::function<string (const string&)>& rowNameFormatter) const;
+	  string PrintTable(
+	      const string& tableName,
+	      const string& pattern,
+	      string (*rowNameFormatter)(const string&),
+	      string (*cellFormatter)(const TH1*, Int_t)) const;
 
     /**
      * \brief Return formated string with table of efficiency numbers.

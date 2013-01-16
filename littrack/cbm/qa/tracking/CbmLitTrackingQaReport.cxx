@@ -38,8 +38,6 @@ CbmLitTrackingQaReport::~CbmLitTrackingQaReport()
 
 void CbmLitTrackingQaReport::Create()
 {
-   NormalizeHistos();
-
    Out().precision(3);
    Out() << R()->DocumentBegin();
    Out() << R()->Title(0, GetTitle());
@@ -66,8 +64,8 @@ string CbmLitTrackingQaReport::PrintNofObjects() const
 		string cellName = Split(histos[iHist]->GetName(), '_')[2];
 		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetMean())));
 	}
-   	str += R()->TableEnd();
-   	return str;
+   str += R()->TableEnd();
+   return str;
 }
 
 string CbmLitTrackingQaReport::PrintTrackHits() const
@@ -98,7 +96,7 @@ string CbmLitTrackingQaReport::PrintNofGhosts() const
 	string str = R()->TableBegin("Number of ghosts per event", list_of("Name")("Value"));
 	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
 		string cellName = Split(histos[iHist]->GetName(), '_')[2];
-		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetEntries())));
+		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetEntries() / nofEvents)));
 	}
 	str += R()->TableEnd();
 	return str;
@@ -400,12 +398,6 @@ void CbmLitTrackingQaReport::CalculateEfficiencyHistos()
       effHist->SetMinimum(0.);
       effHist->SetMaximum(100.);
     }
-}
-
-void CbmLitTrackingQaReport::NormalizeHistos()
-{
-   Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
-   HM()->ScaleByPattern("hng_NofGhosts_.+_Nh", 1. / nofEvents);
 }
 
 ClassImp(CbmLitTrackingQaReport)

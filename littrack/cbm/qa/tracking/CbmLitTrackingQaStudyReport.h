@@ -91,11 +91,6 @@ protected:
     void CalculateEfficiencyHistos();
 
     /**
-     * \brief Normalize histograms to number of events.
-     */
-    void NormalizeHistos();
-
-    /**
      * \brief Main function for drawing efficiency histograms.
      */
     void DrawEfficiencyHistos();

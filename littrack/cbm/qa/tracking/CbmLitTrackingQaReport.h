@@ -162,11 +162,6 @@ protected:
     */
    void CalculateEfficiencyHistos();
 
-   /**
-    * \brief Normalize histograms to number of events.
-    */
-   void NormalizeHistos();
-
    vector<string> fGlobalTrackVariants;
 
    ClassDef(CbmLitTrackingQaReport, 1)

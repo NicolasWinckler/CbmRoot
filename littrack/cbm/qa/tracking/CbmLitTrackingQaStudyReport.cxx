@@ -271,12 +271,4 @@ void CbmLitTrackingQaStudyReport::CalculateEfficiencyHistos()
     }
 }
 
-void CbmLitTrackingQaStudyReport::NormalizeHistos()
-{
-   Int_t nofStudies = HM().size();
-   for (Int_t iStudy = 0; iStudy < nofStudies; iStudy++) {
-      Int_t nofEvents = HM()[iStudy]->H1("hen_EventNo_TrackingQa")->GetEntries();
-      HM()[iStudy]->ScaleByPattern("hng_NofGhosts_.+_Nh", 1. / nofEvents);
-   }
-}
 ClassImp(CbmLitTrackingQaStudyReport)

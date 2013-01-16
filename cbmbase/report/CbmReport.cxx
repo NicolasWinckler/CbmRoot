@@ -37,13 +37,13 @@ void CbmReport::CreateReportElement(
    if (NULL != fOut && fReportType != kCoutReport) delete fOut;
    if (reportType == kLatexReport) {
 	   fR = new CbmLatexReportElement();
-	   fOut = new ofstream(string(fOutputDir + "/" + fReportName + ".tex").c_str());
+	   fOut = new ofstream(string(GetOutputDir() + fReportName + ".tex").c_str());
    } else if (reportType == kHtmlReport) {
 	   fR = new CbmHtmlReportElement();
-	   fOut = new ofstream(string(fOutputDir + "/" + fReportName + ".html").c_str());
+	   fOut = new ofstream(string(GetOutputDir() + fReportName + ".html").c_str());
    } else if (reportType == kTextReport) {
 	   fR = new CbmTextReportElement();
-	   fOut = new ofstream(string(fOutputDir + "/" + fReportName + ".txt").c_str());
+	   fOut = new ofstream(string(GetOutputDir() + fReportName + ".txt").c_str());
    } else if (reportType == kCoutReport) {
 	   fR = new CbmTextReportElement();
 	   fOut = &std::cout;

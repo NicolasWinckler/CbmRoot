@@ -45,19 +45,22 @@ void CbmLitClusteringQaReport::Create()
 
 string CbmLitClusteringQaReport::PrintNofObjects() const
 {
-	vector<TH1*> histos = HM()->H1Vector("hno_NofObjects_.+");
+	vector<TH1*> histos = HM()->H1Vector("hno_NofObjects_.+_Event");
 	Int_t nofHistos = histos.size();
-   	string str = R()->TableBegin("Number of objects per event", list_of("Name")("Value"));
+   string str = R()->TableBegin("Number of objects per event", list_of("Name")("Value"));
 	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
 		string cellName = Split(histos[iHist]->GetName(), '_')[2];
 		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetMean())));
 	}
-   	str += R()->TableEnd();
-   	return str;
+   str += R()->TableEnd();
+   return str;
 }
 
 void CbmLitClusteringQaReport::Draw()
 {
+   Int_t nofEvents = HM()->H1("hen_EventNo_ClusteringQa")->GetEntries();
+   HM()->ScaleByPattern("hno_NofObjects_.*_Station", 1. / nofEvents);
+
 	DrawHistogramsByPattern("hno_NofObjects_.*_Station");
 }
 

@@ -40,32 +40,32 @@ void CbmLitFitQaReport::Create()
 
    Out() << R()->TableBegin("Residuals and pulls (standard deviation)",
          list_of("")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
-   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_.+", "sigma");
-   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_.+", "sigma");
-   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_.+", "sigma");
-   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_.+", "sigma");
-   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_.+", "sigma");
-   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_.+", "sigma");
+   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_(Res|Pull)_.+", "sigma");
+   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_(Res|Pull)_.+", "sigma");
+   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_(Res|Pull)_.+", "sigma");
+   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_(Res|Pull)_.+", "sigma");
+   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_(Res|Pull)_.+", "sigma");
+   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_(Res|Pull)_.+", "sigma");
    Out() << R()->TableEnd();
 
    Out() << R()->TableBegin("Residuals and pulls (RMS)",
          list_of("")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
-   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_.+", "rms");
-   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_.+", "rms");
-   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_.+", "rms");
-   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_.+", "rms");
-   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_.+", "rms");
-   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_.+", "rms");
+   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_(Res|Pull)_.+", "rms");
+   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_(Res|Pull)_.+", "rms");
+   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_(Res|Pull)_.+", "rms");
+   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_(Res|Pull)_.+", "rms");
+   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_(Res|Pull)_.+", "rms");
+   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_(Res|Pull)_.+", "rms");
    Out() << R()->TableEnd();
 
    Out() << R()->TableBegin("Residuals and pulls (mean)",
          list_of("")("x")("y")("tx")("ty")("q/p")("x")("y")("tx")("ty")("q/p"));
-   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_.+", "mean");
-   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_.+", "mean");
-   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_.+", "mean");
-   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_.+", "mean");
-   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_.+", "mean");
-   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_.+", "mean");
+   Out() << PrintResAndPullRow("STS first", "htf_Sts_FirstParam_(Res|Pull)_.+", "mean");
+   Out() << PrintResAndPullRow("STS last", "htf_Sts_LastParam_(Res|Pull)_.+", "mean");
+   Out() << PrintResAndPullRow("TRD first", "htf_Trd_FirstParam_(Res|Pull)_.+", "mean");
+   Out() << PrintResAndPullRow("TRD last", "htf_Trd_LastParam_(Res|Pull)_.+", "mean");
+   Out() << PrintResAndPullRow("MUCH first", "htf_Much_FirstParam_(Res|Pull)_.+", "mean");
+   Out() << PrintResAndPullRow("MUCH last", "htf_Much_LastParam_(Res|Pull)_.+", "mean");
    Out() << R()->TableEnd();
 
    PrintCanvases();
@@ -96,7 +96,7 @@ string CbmLitFitQaReport::PrintResAndPullRow(
 		} else if (propertyName == "sigma") {
 		   histos[iHist]->Fit("gaus");
 		   TF1* fit = histos[iHist]->GetFunction("gaus");
-		   parameters[parIndex] = (NULL != fit) ? fit->GetParameter(2) : 0.;
+		   parameters[parIndex] = NumberToString<Float_t>((NULL != fit) ? fit->GetParameter(2) : 0., 2);
 		}
    }
    return R()->TableRow(list_of(rowName).range(parameters));

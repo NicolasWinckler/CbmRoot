@@ -21,6 +21,8 @@ class TH1;
 class TH2;
 class TGraph;
 class TGraph2D;
+class TProfile;
+class TProfile2D;
 
 using std::map;
 using std::make_pair;
@@ -144,6 +146,50 @@ public:
     * \return Vector of pointers to TGraph2D.
     */
    vector<TGraph2D*> G2Vector(
+         const string& pattern) const;
+
+   /**
+    * \brief Return pointer to TProfile.
+    * \param[in] name Name of profile.
+    * \return pointer to TProfile.
+    */
+   TProfile* P1(
+         const string& name) const {
+      if (fMap.count(name) == 0) { // Temporarily used for debugging
+        std::cout << "Error: CbmHistManager::P1(name): name=" << name << std::endl;
+      }
+      assert(fMap.count(name) != 0);
+      return (TProfile*) fMap.find(name)->second;
+   }
+
+   /**
+    * \brief Return vector of pointers to TProfile.
+    * \param[in] pattern Regex for profile name.
+    * \return Vector of pointers to TProfile.
+    */
+   vector<TProfile*> P1Vector(
+         const string& pattern) const;
+
+   /**
+    * \brief Return pointer to TH2 histogram.
+    * \param[in] name Name of histogram.
+    * \return pointer to TH1 histogram.
+    */
+   TProfile2D* P2(
+         const string& name) const {
+      if (fMap.count(name) == 0) { // Temporarily used for debugging
+        std::cout << "Error: CbmHistManager::P2(name): name=" << name << std::endl;
+      }
+      assert(fMap.count(name) != 0);
+      return (TProfile2D*) fMap.find(name)->second;
+   }
+
+   /**
+    * \brief Return vector of pointers to TProfile2D.
+    * \param[in] pattern Regex for profile name.
+    * \return Vector of pointers to TProfile2D.
+    */
+   vector<TProfile2D*> P2Vector(
          const string& pattern) const;
 
    /**

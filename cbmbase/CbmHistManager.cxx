@@ -11,6 +11,8 @@
 #include "TNamed.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TProfile.h"
+#include "TProfile2D.h"
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TKey.h"
@@ -94,6 +96,18 @@ vector<TGraph2D*> CbmHistManager::G2Vector(
       const string& pattern) const
 {
 	return ObjectVector<TGraph2D*>(pattern);
+}
+
+vector<TProfile*> CbmHistManager::P1Vector(
+      const string& pattern) const
+{
+   return ObjectVector<TProfile*>(pattern);
+}
+
+vector<TProfile2D*> CbmHistManager::P2Vector(
+      const string& pattern) const
+{
+   return ObjectVector<TProfile2D*>(pattern);
 }
 
 void CbmHistManager::WriteToFile()

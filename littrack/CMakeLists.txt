@@ -162,6 +162,7 @@ If(Boost_FOUND)
       cbm/qa/field/CbmLitFieldQaReport.h
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.h
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.h
+      cbm/qa/radlength/CbmLitRadLengthQa.h
  #     cbm/qa/sts/CbmStsSimulationQa.h   
      )
 EndIf(Boost_FOUND)
@@ -194,6 +195,7 @@ If(Boost_FOUND)
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
+      cbm/qa/radlength/CbmLitRadlengthQa.cxx
     #  cbm/qa/sts/CbmStsSimulationQa.cxx
      )
 EndIf(Boost_FOUND)

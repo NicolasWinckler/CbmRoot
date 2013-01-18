@@ -25,6 +25,7 @@
 #pragma link C++ class CbmLitFieldQa+;
 #pragma link C++ class CbmLitFieldApproximationQa+;
 #pragma link C++ class CbmLitFitQa+;
+#pragma link C++ class CbmLitRadLengthQa+;
 #endif
 
 #pragma link C++ class CbmLitPropagationQa+;

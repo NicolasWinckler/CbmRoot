@@ -113,6 +113,14 @@ class CbmStsDigitizeTb : public FairTask
  
 
 
+  /** Perform digitisation of one MCPoint
+   ** @param point   Pointer to CbmStsPoint
+   ** @param nFront  Number of digis on front side (return)
+   ** @param nBack   Number of digis on back side {return)
+   **/
+  void DigitizePoint(const CbmStsPoint* point, Int_t& nFront, Int_t& nBack);
+
+
   /** Get parameter containers **/
   virtual void SetParContainers();
 
@@ -126,7 +134,7 @@ class CbmStsDigitizeTb : public FairTask
 
 
 
-  /** Reinitialisation **/
+  /** Re-initialisation **/
   virtual InitStatus ReInit();
 
 

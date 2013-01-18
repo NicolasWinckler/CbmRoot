@@ -103,50 +103,13 @@ CbmStsDigitizeTb::~CbmStsDigitizeTb() {
 // -------------------------------------------------------------------------
 
 
-// =====  Intialisation (private)   =========================================
-InitStatus CbmStsDigitizeTb::Init() {
 
-  // Check for presence of MCBuffer and DaqBuffer
-  if ( ! ( CbmMCBuffer::Instance() && CbmDaqBuffer::Instance() ) ) {
-    fLogger->Fatal(MESSAGE_ORIGIN, "No MCBuffer or DaqBuffer present!");
-    return kFATAL;
-  }
+// =====   Perform digitisation of one StsPoint   ==========================
+void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
+                                     Int_t& nFront, Int_t& nBack) {
 
-  // Pair creation energy in GeV
-  fPairCreationEnergy = 3.68e-9;
-
-  // Number of ADC channels
-  fNAdcChannels = 1 << ( fNAdcBits + 1 );
-
-  // Build digitisation scheme
-  if ( ! fDigiScheme->Init(fGeoPar, fDigiPar) ) {
-    fLogger->Error(MESSAGE_ORIGIN,
-                   "Error in building STS digitisation scheme");
-    return kFATAL;
-  }
-
-  if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
-  else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
-  cout << "-I- " << fName << "::Init: "
-       << "STS digitisation scheme succesfully initialised" << endl;
-  cout << "    Stations: " << fDigiScheme->GetNStations()
-       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: "
-       << fDigiScheme->GetNChannels() << endl;
-
-
-  return kSUCCESS;
-}
-// ==========================================================================
-
-
-
-
-// -----   Public method Exec   --------------------------------------------
-void CbmStsDigitizeTb::Exec(Option_t* opt) {
-
-  // Get next STS point
-  const CbmStsPoint* point =
-      dynamic_cast<const CbmStsPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kSTS));
+  // Reset counters
+  nFront = nBack = 0;
 
 
   // Get corresponding sensor
@@ -157,9 +120,8 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
   TGeoNode* curNode = gGeoManager->GetCurrentNode();
   CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
   fLogger->Debug(MESSAGE_ORIGIN,
-                 "Point (%d, %d, %d)", xPoint, yPoint, zPoint);
+               "Point (%d, %d, %d)", xPoint, yPoint, zPoint);
   sensor->Print();
-
 
 
   // Length of trajectory in the sensor
@@ -199,7 +161,6 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
     zPair += deltaZ / Double_t(nSteps);
   }
 
-
   // Digitise the charge on the front side strips
   map<Int_t, Double_t>::iterator it;
   for (it = frontSignals.begin(); it != frontSignals.end(); it++) {
@@ -207,14 +168,17 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
     Int_t iAdc = -1;
     if ( (*it).second >= fQMax ) iAdc = fNAdcChannels - 1;
     else iAdc = Int_t( (*it).second / fQMax ) * fNAdcChannels;
-    CbmStsDigiLight* digi = new CbmStsDigiLight(sensor->GetStationNr(),  // station number
-                                      sensor->GetSectorNr(),   // sector number
-                                      0,                       // front side
-                                      (*it).first,             // channel number
-                                      iAdc,                    // ADC channel
-                                      0);                      // time
+    CbmStsDigiLight* digi =
+        new CbmStsDigiLight(sensor->GetStationNr(),  // station number
+                            sensor->GetSectorNr(),   // sector number
+                            0,                       // front side
+                            (*it).first,             // channel number
+                            iAdc,                    // ADC channel
+                            0);                      // time
     CbmDaqBuffer::Instance()->InsertData(digi);
+    nFront++;
   }
+
 
   // Digitise the charge on the back side strips
   for (it = backSignals.begin(); it != backSignals.end(); it++) {
@@ -222,27 +186,99 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
     Int_t iAdc = -1;
     if ( (*it).second >= fQMax ) iAdc = fNAdcChannels - 1;
     else iAdc = Int_t( (*it).second / fQMax ) * fNAdcChannels;
-    CbmStsDigiLight* digi = new CbmStsDigiLight(sensor->GetStationNr(),  // station number
-                                      sensor->GetSectorNr(),   // sector number
-                                      1,                       // back side
-                                      (*it).first,             // channel number
-                                      iAdc,                    // ADC channel
-                                      0);                      // time
+    CbmStsDigiLight* digi =
+        new CbmStsDigiLight(sensor->GetStationNr(),  // station number
+                            sensor->GetSectorNr(),   // sector number
+                            1,                       // back side
+                            (*it).first,             // channel number
+                            iAdc,                    // ADC channel
+                            0);                      // time
     CbmDaqBuffer::Instance()->InsertData(digi);
+    nBack++;
   }
-  
+
+
+}
+// ==========================================================================
+
+
+
+
+
+
+// =====  Intialisation (private)   =========================================
+InitStatus CbmStsDigitizeTb::Init() {
+
+  // Check for presence of MCBuffer and DaqBuffer
+  if ( ! ( CbmMCBuffer::Instance() && CbmDaqBuffer::Instance() ) ) {
+    fLogger->Fatal(MESSAGE_ORIGIN, "No MCBuffer or DaqBuffer present!");
+    return kFATAL;
+  }
+
+  // Pair creation energy in GeV
+  fPairCreationEnergy = 3.68e-9;
+
+  // Number of ADC channels
+  fNAdcChannels = 1 << ( fNAdcBits + 1 );
+
+  // Build digitisation scheme
+  if ( ! fDigiScheme->Init(fGeoPar, fDigiPar) ) {
+    fLogger->Error(MESSAGE_ORIGIN,
+                   "Error in building STS digitisation scheme");
+    return kFATAL;
+  }
+
+  if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
+  else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
+  cout << "-I- " << fName << "::Init: "
+       << "STS digitisation scheme succesfully initialised" << endl;
+  cout << "    Stations: " << fDigiScheme->GetNStations()
+       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: "
+       << fDigiScheme->GetNChannels() << endl;
+
+
+  return kSUCCESS;
+}
+// ==========================================================================
+
+
+
+
+// =====   Task execution   =================================================
+void CbmStsDigitizeTb::Exec(Option_t* opt) {
+
+  // Counters
+  Int_t nFront = 0;
+  Int_t nBack  = 0;
+  fTimer.Start();
+
+  // Loop over StsPoints from MCBuffer
+  const CbmStsPoint* point =
+      dynamic_cast<const CbmStsPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kSTS));
+  while ( point ) {
+
+
+    DigitizePoint(point, nFront, nBack);
+    fLogger->Info(MESSAGE_ORIGIN,
+        "Digis created: %i front, %i back", nFront, nBack);
+
+    // Next StsPoint
+    point =  dynamic_cast<const CbmStsPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kSTS));
+
+  }
+
 
   fTimer.Stop();
   cout << "+ " << flush;
   cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
        << fixed << right << fTimer.RealTime() 
-       << " s, digis "  << endl;
+       << " s"  << endl;
   
   fNEvents     += 1.;
   fTime        += fTimer.RealTime();
 
 }
-// -------------------------------------------------------------------------
+// ==========================================================================
 
 
 

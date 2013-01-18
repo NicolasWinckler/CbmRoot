@@ -58,6 +58,16 @@ private:
     void CreateHistograms();
 
     /**
+     * \brief Exec total radiation thickness calculation.
+     */
+    void ExecTotal();
+
+    /**
+     * \brief Exec specific to TRD radiation thickness calculation.
+     */
+    void ExecTrd();
+
+    /**
      * \brief Draw histograms.
      */
     void Draw();

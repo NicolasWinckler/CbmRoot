@@ -4,7 +4,7 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/Users/slebedev/Development/cbm/trunk/build
+export MY_BUILD_DIR=/Users/slebedev/Development/cbm/trunk/build
 
 export TRACKINGTYPE=branch
 
@@ -25,39 +25,35 @@ export ELECTRONS=yes
 # If "yes" PLUTO particles will be embedded
 export PLUTO=no
 
-export LIT_RESULT_DIR=recqa/
-
-
 # Geometries
-	export CAVEGEOM=cave.geo
-	export TARGETGEOM=target_au_250mu.geo
-	export PIPEGEOM=pipe_standard.geo
-	export MVDGEOM=
-	#mvd/mvd_Nov_2012.geo
-	export STSGEOM=sts/sts_v12b.geo.root
-	export RICHGEOM=rich/rich_v08a.geo
-	export TRDGEOM=trd/trd_v10b.geo
-	export TOFGEOM=tof/tof_v07a.geo
-	export ECALGEOM=
-	export FIELDMAP=field_v12a
-	export MAGNETGEOM=passive/magnet_v12a.geo
-	export FIELDMAPSCALE=1.0
+export CAVE_GEOM=cave.geo
+export TARGET_GEOM=target_au_250mu.geo
+export PIPE_GEOM=pipe_standard.geo
+export MVD_GEOM=
+export STS_GEOM=sts/sts_v12b.geo.root
+export RICH_GEOM=rich/rich_v08a.geo
+export TRD_GEOM=trd/trd_v10b.geo
+export TOF_GEOM=tof/tof_v07a.geo
+export FIELD_MAP=field_v12a
+export MAGNET_GEOM=passive/magnet_v12a.geo
+export FIELD_MAP_SCALE=1.0
 
 #number of events for each thread
-export NEVENTS=10
+export NEVENTS=1000
 
-for Z in 0; do
-   export DIR=/Users/slebedev/Development/cbm/data/simulations/
-   export XXXX=000$Z
-   
-   export INFILE=/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14
-   export MCFILE=$DIR/mc.$XXXX.root
-   export PARFILE=$DIR/param.$XXXX.root
-   export RECOFILE=$DIR/reco.$XXXX.root
+for Z in 0.2 0.5 0.7 1.0 1.5 2.0; do
+   export DIR=/Users/slebedev/Development/cbm/data/simulations/richreco/
+   export LIT_RESULT_DIR=recqa${Z}/
+   mkdir -p ${LIT_RESULT_DIR}
+   export FIELD_MAP_SCALE=${Z}
 
-   
-  . ./sim.sh
-  # xterm -hold -e ". ./sim.sh"&
+   export IN_FILE=/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14
+   export MC_FILE=${DIR}/mc.000${Z}.root
+   export PAR_FILE=$DIR/param.000${Z}.root
+   export RECO_FILE=$DIR/reco.000${Z}.root
+
+  #. ./sim.sh
+   xterm -hold -e ". ./sim.sh"&
    # bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
    
 done

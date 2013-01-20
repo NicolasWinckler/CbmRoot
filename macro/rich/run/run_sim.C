@@ -8,71 +8,56 @@ void run_sim(Int_t nEvents = 10)
 
 	//gRandom->SetSeed(10);
 
-	TString inFile = "", parFile = "", outFile ="";
-	TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "", mvdGeom = "",
-	      mvdGeom = "",stsGeom = "", richGeom= "", trdGeom = "", tofGeom = "", ecalGeom = "";
-	TString fieldMap = "";
+	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.param.root";
+	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.mc.root";
+	TString caveGeom = "cave.geo";
+	TString targetGeom = "target_au_250mu.geo";
+	TString pipeGeom   = "pipe_standard.geo";
+	TString magnetGeom = "passive/magnet_v12a.geo";
+	TString mvdGeom = "";
+	TString stsGeom = "sts/sts_v12b.geo.root";
+	TString richGeom= "rich/rich_v08a.geo";
+	TString trdGeom = "trd/trd_v10b.geo";
+	TString tofGeom = "tof/tof_v07a.geo";
+	TString ecalGeom = "";
+	TString fieldMap = "field_v12a";
 
-	TString electrons = ""; // If "yes" than primary electrons will be generated
-	Int_t NELECTRONS = 0; // number of e- to be generated
-	Int_t NPOSITRONS = 0; // number of e+ to be generated
-	TString urqmd = ""; // If "yes" than UrQMD will be used as background
-	TString pluto = ""; // If "yes" PLUTO particles will be embedded
+	TString electrons = "yes"; // If "yes" than primary electrons will be generated
+	Int_t NELECTRONS = 5; // number of e- to be generated
+	Int_t NPOSITRONS = 5; // number of e+ to be generated
+	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
+	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
 	TString plutoFile = "";
 	TString plutoParticle = "";
-
-	// Magnetic field
 	Double_t fieldZ = 50.; // field center z position
 	Double_t fieldScale =  1.0; // field scaling factor
 
-	if (script != "yes") {
-		inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
-		parFile = "/Users/slebedev/Development/cbm/data/simulations/test.params.root";
-		outFile = "/Users/slebedev/Development/cbm/data/simulations/test.mc.root";
+	if (script == "yes") {
+		inFile = TString(gSystem->Getenv("IN_FILE"));
+		outFile = TString(gSystem->Getenv("MC_FILE"));
+		parFile = TString(gSystem->Getenv("PAR_FILE"));
 
-	   caveGeom = "cave.geo";
-	   targetGeom = "target_au_250mu.geo";
-	   pipeGeom = "pipe_standard.geo";
-	   mvdGeom = "";//"mvd_v08a.geo";
-	   stsGeom = "sts/sts_v12b.geo.root";
-	   richGeom = "rich/rich_v08a.geo";
-	   trdGeom = "trd/trd_v10b.geo";
-	   tofGeom = "tof/tof_v07a.geo";
-	   ecalGeom = "";//"ecal_FastMC.geo";
-	   fieldMap = "field_v12a";
-	   magnetGeom = "passive/magnet_v12a.geo";
+		caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
+		targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
+		pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
+		mvdGeom = TString(gSystem->Getenv("MVD_GEOM"));
+		stsGeom = TString(gSystem->Getenv("STS_GEOM"));
+		richGeom = TString(gSystem->Getenv("RICH_GEOM"));
+		trdGeom = TString(gSystem->Getenv("TRD_GEOM"));
+		tofGeom = TString(gSystem->Getenv("TOF_GEOM"));
+		ecalGeom = TString(gSystem->Getenv("ECAL_GEOM"));
+		fieldMap = TString(gSystem->Getenv("FIELD_MAP"));
+		magnetGeom = TString(gSystem->Getenv("MAGNET_GEOM"));
 
-		electrons = "yes";
-		NELECTRONS = 5;
-		NPOSITRONS = 5;
-		urqmd = "yes";
-		pluto = "no";
-		plutoFile = "";
-	} else {
-		inFile = TString(gSystem->Getenv("INFILE"));
-		outFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-
-		caveGeom = TString(gSystem->Getenv("CAVEGEOM"));
-		targetGeom = TString(gSystem->Getenv("TARGETGEOM"));
-		pipeGeom = TString(gSystem->Getenv("PIPEGEOM"));
-		mvdGeom = TString(gSystem->Getenv("MVDGEOM"));
-		stsGeom = TString(gSystem->Getenv("STSGEOM"));
-		richGeom = TString(gSystem->Getenv("RICHGEOM"));
-		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
-		tofGeom = TString(gSystem->Getenv("TOFGEOM"));
-		ecalGeom = TString(gSystem->Getenv("ECALGEOM"));
-		fieldMap = TString(gSystem->Getenv("FIELDMAP"));
-		magnetGeom = TString(gSystem->Getenv("MAGNETGEOM"));
-
-		Int_t NELECTRONS = TString(gSystem->Getenv("NELECTRONS")).Atoi();
-		Int_t NPOSITRONS = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
+		NELECTRONS = TString(gSystem->Getenv("NELECTRONS")).Atoi();
+		NPOSITRONS = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
-		plutoFile = TString(gSystem->Getenv("PLUTOFILE"));
-		plutoParticle = TString(gSystem->Getenv("PLUTOPARTICLE"));
-		fieldScale = TString(gSystem->Getenv("FIELDMAPSCALE")).Atof();
+		plutoFile = TString(gSystem->Getenv("PLUTO_FILE"));
+		plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
+		fieldScale = TString(gSystem->Getenv("FIELD_MAP_SCALE")).Atof();
 	}
 
 	gDebug = 0;
@@ -146,23 +131,9 @@ void run_sim(Int_t nEvents = 10)
 		fRun->AddModule(tof);
 	}
 
-	// if ( ecalGeom != "" ) {
-	//   FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
-	//   fRun->AddModule(ecal);
-	// }
-
 	// -----   Create magnetic field   ----------------------------------------
 	CbmFieldMap* magField = NULL;
-	//if (fieldMap == "new_field" || fieldMap == "field_v10e" || fieldMap == "FieldShieldBox" ){
-	   magField = new CbmFieldMapSym2(fieldMap);
-   //}else if (fieldMap == "field_muon_standard" )
-	//	magField = new CbmFieldMapSym2(fieldMap);
-	//else if (fieldMap == "FieldActive" )
-	//	magField = new CbmFieldMapSym3(fieldMap);
-	//else {
-	//	cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-	//	exit;
-	//}
+	magField = new CbmFieldMapSym2(fieldMap);
 	magField->SetPosition(0., 0., fieldZ);
 	magField->SetScale(fieldScale);
 	fRun->SetField(magField);

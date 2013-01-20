@@ -9,19 +9,18 @@ void run_reco(Int_t nEvents = 10)
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
 	gRandom->SetSeed(10);
 
-	TString inFile = "", parFile = "", outFile ="";
+	TString inFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.mc.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.param.root";
+	TString outFile ="/Users/slebedev/Development/cbm/data/simulations/richreco/test.reco.root";
 	std::string resultDir = "recqa/";
-	if (script != "yes") {
-		inFile = "/Users/slebedev/Development/cbm/data/simulations/test.mc.root";
-		parFile = "/Users/slebedev/Development/cbm/data/simulations/test.params.root";
-		outFile = "/Users/slebedev/Development/cbm/data/simulations/test.reco.root";
-	} else {
-		inFile = TString(gSystem->Getenv("MCFILE"));
-		outFile = TString(gSystem->Getenv("RECOFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
+	if (script == "yes") {
+		inFile = TString(gSystem->Getenv("MC_FILE"));
+		outFile = TString(gSystem->Getenv("RECO_FILE"));
+		parFile = TString(gSystem->Getenv("PAR_FILE"));
 		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 	}
 
@@ -117,6 +116,7 @@ void run_reco(Int_t nEvents = 10)
 	CbmKF* kalman = new CbmKF();
 	run->AddTask(kalman);
 	CbmL1* l1 = new CbmL1();
+   l1->SetMaterialBudgetFileName(stsMatBudgetFileName);
 	run->AddTask(l1);
 
 	CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
@@ -220,16 +220,16 @@ void run_reco(Int_t nEvents = 10)
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir(resultDir);
-   trackingQa->SetPRange(30, 0., 3.);
+   trackingQa->SetPRange(10, 0., 3.);
    run->AddTask(trackingQa);
 
-//   CbmLitFitQa* fitQa = new CbmLitFitQa();
-//   fitQa->SetMvdMinNofHits(0);
-//   fitQa->SetStsMinNofHits(4);
-//   fitQa->SetMuchMinNofHits(10);
-//   fitQa->SetTrdMinNofHits(8);
-//   //fitQa->SetOutputDir(std::string(resultDir));
-//   run->AddTask(fitQa);
+   CbmLitFitQa* fitQa = new CbmLitFitQa();
+   fitQa->SetMvdMinNofHits(0);
+   fitQa->SetStsMinNofHits(4);
+   fitQa->SetMuchMinNofHits(10);
+   fitQa->SetTrdMinNofHits(8);
+   fitQa->SetOutputDir(resultDir);
+   run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetOutputDir(resultDir);

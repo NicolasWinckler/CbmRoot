@@ -199,6 +199,9 @@ private:
 	      TH1D** meanHist,
 	      TH1D** rmsHist);
 
+	void DrawH1andFit(
+	      TH1D* hist);
+
 	void DrawH2MeanRms(
 	      TH2D* hist,
 	      const string& canvasName);

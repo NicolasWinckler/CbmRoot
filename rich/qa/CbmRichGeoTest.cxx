@@ -751,6 +751,26 @@ void CbmRichGeoTest::DrawH2MeanRms(
    DrawH1(rms);
 }
 
+void CbmRichGeoTest::DrawH1andFit(
+      TH1D* hist)
+{
+  // TH1D* py = hist->ProjectionY( (string(hist->GetName())+ "_py" ).c_str() );
+   hist->GetYaxis()->SetTitle("Counter");
+   DrawH1(hist);
+   hist->Scale(1./ hist->Integral());
+   hist->GetXaxis()->SetRangeUser(2., 8.);
+   hist->Fit("gaus");
+   hist->GetFunction("gaus")->SetLineColor(kBlack);
+   double m = hist->GetFunction("gaus")->GetParameter(1);
+   double s = hist->GetFunction("gaus")->GetParameter(2);
+   string txt1 = lit::NumberToString<double>(m, 2) + " / " + lit::NumberToString<double>(s, 2);
+   TLatex text;
+   text.SetTextAlign(21);
+   text.SetTextSize(0.06);
+   text.DrawTextNDC(0.5, 0.92, txt1.c_str());
+  // gPad->SetLogy(true);
+}
+
 void CbmRichGeoTest::FitH1OneOverX(
       TH1D* hist,
       double xMinFit,
@@ -981,6 +1001,15 @@ void CbmRichGeoTest::DrawHist()
    DrawH2MeanRms(fhRadiusVsNofHits, "richgeo_hits_r_vs_nof_hits");
    DrawH2MeanRms(fhAaxisVsNofHits, "richgeo_hits_a_vs_nof_hits");
    DrawH2MeanRms(fhBaxisVsNofHits, "richgeo_hits_b_vs_nof_hits");
+
+   TCanvas* cHitsRAB = CreateCanvas("richgeo_hits_rab", "richgeo_hits_rab", 1500, 600);
+   cHitsRAB->Divide(3, 1);
+   cHitsRAB->cd(1);
+   DrawH1andFit(fhRadiusVsNofHits->ProjectionY( (string(fhRadiusVsNofHits->GetName())+ "_py" ).c_str() ));
+   cHitsRAB->cd(2);
+   DrawH1andFit(fhAaxisVsNofHits->ProjectionY( (string(fhAaxisVsNofHits->GetName())+ "_py" ).c_str() ));
+   cHitsRAB->cd(3);
+   DrawH1andFit(fhBaxisVsNofHits->ProjectionY( (string(fhBaxisVsNofHits->GetName())+ "_py" ).c_str() ));
 
    TCanvas* cHitsXY1Gev = CreateCanvas("richgeo_hits_xy_1gev", "richgeo_hits_xy_1gev", 600,600);
    DrawH2(fhHitsXY1Gev);

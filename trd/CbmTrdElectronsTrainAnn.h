@@ -144,8 +144,6 @@ private:
 	Double_t Eval(Bool_t isEl);
 
 public:
-
-
 	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
 
 	void SetTransformType(Int_t type){fTransformType = type;}
@@ -160,7 +158,11 @@ public:
 
 	void SetSigmaError(Double_t sigma){fSigmaError = sigma;}
 
-	void RunReal();
+   void SetBeamDataFile(string beamDataFile){fBeamDataFile = beamDataFile;}
+   void SetBeamDataPiHist(string beamDataPiHist){fBeamDataPiHist = beamDataPiHist;}
+   void SetBeamDataElHist(string beamDataElHist){fBeamDataElHist = beamDataElHist;}
+
+	void RunBeamData();
 
 private:
 	void FillAnnInputHist(
@@ -181,24 +183,30 @@ private:
 
    vector<TH1*> fHists; //store all pointers to histograms
 
+   TH1* fhResults; // histograms for the results storing: pi suppression, el efficiency etc.
+
    // [0] = electrons, [1] = pions
-   vector<TH1D*> fhMeanEloss; // sum of energy losses in all layers devided by number of layers
-   vector<TH1D*> fhEloss; // energy losses in one layer
-   vector<TH1D*> fhdEdX; // dEdX in one layer
-   vector<TH1D*> fhTR; // TR in one layer
-   vector<TH1D*> fhNofTRLayers; // Number of layers which have TR
-   vector<TH1D*> fhNofHits; // Number of TRD hits
+   vector<TH1*> fhMeanEloss; // sum of energy losses in all layers divided by number of layers
+   vector<TH1*> fhEloss; // energy losses in one layer
+   vector<TH1*> fhdEdX; // dEdX in one layer
+   vector<TH1*> fhTR; // TR in one layer
+   vector<TH1*> fhNofTRLayers; // Number of layers which have TR
+   vector<TH1*> fhNofHits; // Number of TRD hits
 
    // store sorted energy losses and cumulative probability for each TRD layer
    // 1st index -> [0] = electrons, [1] = pions
    // 2nd index -> layer number
-   vector<vector<TH1D*> > fhElossSort;
+   vector<vector<TH1*> > fhElossSort;
 
    Int_t fEventNum; // event number
 	string fOutputDir; // output directory
 	Double_t fSigmaError; // additional sigma error for energy loss measurements
 	Bool_t fIsDoTrain; // do you want to run training procedure?
 	Int_t fTransformType; // Energy loss transformation type
+
+   string fBeamDataFile; // path to file with beamtime data for energy losses
+   string fBeamDataPiHist; // histogram name with energy losses for pions
+   string fBeamDataElHist; // histogram name with energy losses for electrons
 
 	vector<Float_t> fAnnInput; // input vector for ANN
 	Float_t fXOut; // output value from ANN
@@ -214,12 +222,13 @@ private:
 	Int_t fNofAnnEpochs;
 	Int_t fNofTrainSamples;
 	TRandom* fRandom;
+	double fElIdEfficiency;
 
    // Histograms for testing
 	// [0] = electron, [1] = pion
-	vector<TH1D*> fhOutput; // algorithm output
-	vector<TH1D*> fhCumProbOutput; // Cumulative probabilities for algorithm's output
-   vector< vector<TH1D*> > fhInput; // Input data for algorithm for each input
+	vector<TH1*> fhOutput; // algorithm output
+	vector<TH1*> fhCumProbOutput; // Cumulative probabilities for algorithm's output
+   vector< vector<TH1*> > fhInput; // Input data for algorithm for each input
 
     CbmTrdElectronsTrainAnn(const CbmTrdElectronsTrainAnn&);
     CbmTrdElectronsTrainAnn& operator=(const CbmTrdElectronsTrainAnn&);

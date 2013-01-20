@@ -10,6 +10,7 @@
 #include "TMVA/Config.h"
 #include "TLine.h"
 #include "TClonesArray.h"
+#include "TSystem.h"
 
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
@@ -54,6 +55,9 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
     fSigmaError(0.0),
     fIsDoTrain(true),
     fTransformType(0),
+    fBeamDataFile(""),
+    fBeamDataPiHist(""),
+    fBeamDataElHist(""),
     fAnnInput(),
     fXOut(-1.),
     fNofTrdLayers(nofTrdLayers),
@@ -64,6 +68,7 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
     fIdMethod(kANN),
     fNofAnnEpochs(250),
     fNofTrainSamples(2000),
+    fElIdEfficiency(0.9),
     fRandom(new TRandom(0)),
     fhOutput(),
     fhCumProbOutput(),
@@ -78,7 +83,10 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
    fhNofHits.resize(2);
    string s;
 
-   TH1::SetDefaultBufferSize(10000);
+   TH1::SetDefaultBufferSize(30000);
+
+   fhResults = new TH1D("fhResults", "fhResults", 2, 0, 2);
+   fHists.push_back(fhResults);
 
    for (int i = 0; i < 2; i++){
       if (i == 0) s = "El";
@@ -91,9 +99,9 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
       fHists.push_back(fhdEdX[i]);
       fhTR[i] = new TH1D(("fhTR"+s).c_str(),"fhTR;Transition radiation [a.u.];Counters",100, 0., 0.);
       fHists.push_back(fhTR[i]);
-      fhNofTRLayers[i] = new TH1D(("fhNofTRLayers"+s).c_str(),"fhNofTRLayers;Number of layers with TR;Counters", fNofTrdLayers + 1, 0., fNofTrdLayers + 1);
+      fhNofTRLayers[i] = new TH1D(("fhNofTRLayers"+s).c_str(),"fhNofTRLayers;Number of layers with TR;Counters", fNofTrdLayers + 1, -0.5, fNofTrdLayers);
       fHists.push_back(fhNofTRLayers[i]);
-      fhNofHits[i] = new TH1D(("fhNofHits"+s).c_str(),"fhNofHits;Number of hits;Counters",fNofTrdLayers + 1, 0., fNofTrdLayers + 1);
+      fhNofHits[i] = new TH1D(("fhNofHits"+s).c_str(),"fhNofHits;Number of hits;Counters",fNofTrdLayers + 1, -0.5, fNofTrdLayers);
       fHists.push_back(fhNofHits[i]);
    }
 
@@ -123,7 +131,7 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
       for (Int_t j = 0; j < fNofTrdLayers; j++){
          stringstream ss;
          ss << s << j;
-         fhInput[i][j] = new TH1D(("fhInput"+ss.str()).c_str(), "fhInput", 100, -1.1, 1.1);
+         fhInput[i][j] = new TH1D(("fhInput"+ss.str()).c_str(), "fhInput", 100, 0.0, 0.0);
       }
    }
 }
@@ -177,12 +185,15 @@ void CbmTrdElectronsTrainAnn::Finish()
    Run();
    Draw();
 
+   if (fOutputDir != "") { gSystem->mkdir(fOutputDir.c_str(), true); }
+   TFile* f = new TFile(string(fOutputDir+"/trd_elid_hist.root").c_str(), "RECREATE");
    for (int i = 0; i < fHists.size(); i++){
       fHists[i]->Write();
    }
+   f->Close();
 }
 
-void CbmTrdElectronsTrainAnn::RunReal()
+void CbmTrdElectronsTrainAnn::RunBeamData()
 {
    FillElossVectorReal();
    FillElossHist();
@@ -196,27 +207,17 @@ void CbmTrdElectronsTrainAnn::RunReal()
 
 void CbmTrdElectronsTrainAnn::FillElossVectorReal()
 {
-//   string fileName = "cern_oct_11_dubna/3gevnorm.root";
-//   string piHistName = "MADC2_Pion";
-//   string elHistName = "MADC2_Electron";
+   if (fBeamDataFile == "" || fBeamDataPiHist == "" || fBeamDataElHist == "") {
+      Fatal("-E- CbmTrdElectronsTrainAnn::FillElossVectorReal()", "Set input file for beam data and histogram names!");
+   }
 
-   string fileName = "cern_oct_11_fra/qplots_andrey.root";
-   string piHistName = "pi_4mm_foam";
-   string elHistName = "el_4mm_foam";
+	TFile* file = new TFile(fBeamDataFile.c_str(), "READ");
+	TH1F* hPion = (TH1F*)file->Get(fBeamDataPiHist.c_str())->Clone();
+	TH1F* hElectron = (TH1F*)file->Get(fBeamDataElHist.c_str())->Clone();
 
-   //string piHistName = "pi_5mm_fibre";
-  // string elHistName = "el_5mm_fibre";
+   double scaleX = fhEloss[0]->GetXaxis()->GetBinUpEdge(fhEloss[0]->GetNbinsX()) / hPion->GetXaxis()->GetBinUpEdge(hPion->GetNbinsX());
 
-  // string piHistName = "pi_4mm_f350";
-  // string elHistName = "el_4mm_f350";
-
-	TFile* file = new TFile(fileName.c_str(), "READ");
-	TH1F* hPion = (TH1F*)file->Get(piHistName.c_str())->Clone();
-	TH1F* hElectron = (TH1F*)file->Get(elHistName.c_str())->Clone();
-
-    double scaleX = fhEloss[0]->GetXaxis()->GetBinUpEdge(fhEloss[0]->GetNbinsX()) / hPion->GetXaxis()->GetBinUpEdge(hPion->GetNbinsX());
-
-	int nofSimulatedParticles = 2000000;
+	int nofSimulatedParticles = 1000000;
 	fEloss[0].resize(nofSimulatedParticles);
 	fEloss[1].resize(nofSimulatedParticles);
 
@@ -316,11 +317,7 @@ void CbmTrdElectronsTrainAnn::Run()
 	if (fIdMethod == kBDT || fIdMethod == kANN){
 		if (fIsDoTrain) DoTrain();
 		DoTest();
-	}else if (fIdMethod == kMEDIAN){
-		DoTest();
-	}else if (fIdMethod == kLIKELIHOOD){
-		DoTest();
-	}else if (fIdMethod == kMeanCut) {
+	}else if (fIdMethod == kMEDIAN || fIdMethod == kLIKELIHOOD || fIdMethod == kMeanCut) {
 	   DoTest();
 	}
 }
@@ -463,8 +460,8 @@ void CbmTrdElectronsTrainAnn::DoTrain()
    if (fIdMethod == kANN){
       if (NULL != fNN) delete fNN;
       TString mlpString = CreateAnnString();
-      cout << "-I- create ANN: "<< mlpString << endl;
-      cout << "-I- number of training epochs = " << fNofAnnEpochs << endl;
+      cout << "-I- Create ANN: "<< mlpString << endl;
+      cout << "-I- Number of training epochs = " << fNofAnnEpochs << endl;
       fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
       fNN->Train(fNofAnnEpochs, "+text,update=10");
       fNN->DumpWeights((fOutputDir+"/trd_elid_ann_weights.txt").c_str());
@@ -476,11 +473,9 @@ void CbmTrdElectronsTrainAnn::DoTrain()
       factory->PrepareTrainingAndTestTree(mycuts, mycutb,"SplitMode=Random:NormMode=NumEvents:!V");
       //factory->BookMethod(TMVA::Types::kTMlpANN, "TMlpANN","!H:!V:NCycles=50:HiddenLayers=N+1");
       stringstream ss;
-      ss << "nTrain_Signal=" << fNofTrainSamples - 500 <<":nTrain_Background="
-            << fNofTrainSamples - 500 <<":nTest_Signal=0:nTest_Background=0";
+      ss << "nTrain_Signal=" << fNofTrainSamples - 500 <<":nTrain_Background=" << fNofTrainSamples - 500 <<":nTest_Signal=0:nTest_Background=0";
       factory->PrepareTrainingAndTestTree("", ss.str().c_str());
-      factory->BookMethod(TMVA::Types::kBDT, "BDT",
-            "!H:!V:NTrees=400:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=CostComplexity:PruneStrength=4.5");
+      factory->BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=400:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=CostComplexity:PruneStrength=4.5");
       factory->TrainAllMethods();
    }
 }
@@ -546,8 +541,8 @@ void CbmTrdElectronsTrainAnn::DoTest()
 
 	DoPreTest();
 	double cut = FindOptimalCut();
-	cout << " optimal cut = " << cut << " for 90% electron efficiency" << endl;
-	cout << "-I- Start testing " << endl;
+	cout << "-I- Optimal cut = " << cut << " for "<< 100 * fElIdEfficiency<< "% electron efficiency" << endl;
+	cout << "-I- Start testing" << endl;
 	fAnnInput.clear();
 	fAnnInput.resize(fNofTrdLayers);
 
@@ -563,15 +558,15 @@ void CbmTrdElectronsTrainAnn::DoTest()
 		fNN->LoadWeights((fOutputDir+"/trd_elid_ann_weights.txt").c_str());
 	}
 
-	Int_t nofPiLikeEl = 0;
-	Int_t nofElLikePi = 0;
-	Int_t nofElTest = 0;
-	Int_t nofPiTest = 0;
+	int nofPiLikeEl = 0;
+	int nofElLikePi = 0;
+	int nofElTest = 0;
+	int nofPiTest = 0;
 
 	for (Int_t i = 0; i < 2; i++){
       for (Int_t iT = 0; iT < fEloss[i].size(); iT++) {
          if (iT < fNofTrainSamples) continue;//exclude training samples
-         if (iT%100000 == 0) cout << "-I- read number: "<< iT<< endl;
+         if (iT%100000 == 0) cout << "-I- Read number: "<< iT<< endl;
 
          for (Int_t iH = 0; iH < fNofTrdLayers; iH++){
             fAnnInput[iH] = fEloss[i][iT][iH].fEloss;
@@ -591,6 +586,9 @@ void CbmTrdElectronsTrainAnn::DoTest()
          }
       }
 	}
+	double piSupp = -1;
+	if (nofPiLikeEl != 0) piSupp = (double) nofPiTest / nofPiLikeEl;
+	double elEff =  (double) nofElLikePi/nofElTest * 100.;
 
 	cout << "Testing results:" << endl;
 	cout << "nof TRD layers " << fNofTrdLayers << endl;
@@ -599,14 +597,12 @@ void CbmTrdElectronsTrainAnn::DoTest()
 	cout << "nof Pi = " << nofPiTest << endl;
 	cout << "nof Pi identified as El = " << nofPiLikeEl<<endl;
 	cout << "nof El identified as Pi = " << nofElLikePi<<endl;
-	cout << "pion suppression = "<< nofPiTest<< "/"<< nofPiLikeEl<< " = ";
-	if (nofPiLikeEl != 0){
-		cout<< (Double_t) nofPiTest / nofPiLikeEl << endl;
-	}else {
-		cout<< " no misidentified pi" << endl;
-	}
-	cout << "electron efficiency loss in % = " << nofElLikePi << "/"
-			<< nofElTest << " = " << (Double_t) nofElLikePi/nofElTest * 100. << endl;
+	cout << "pion suppression = "<< nofPiTest<< "/"<< nofPiLikeEl<< " = " << piSupp << endl;
+	cout << "electron efficiency loss in % = " << nofElLikePi << "/" << nofElTest << " = " << elEff << endl;
+
+	// write results to histogramm
+	fhResults->SetBinContent(1, piSupp);
+	fhResults->SetBinContent(2, elEff);
 }
 
 void CbmTrdElectronsTrainAnn::CreateCumProbOutputHist()
@@ -645,7 +641,7 @@ Double_t CbmTrdElectronsTrainAnn::FindOptimalCut()
 {
 	Double_t optimalCut = -1;
 	for (Int_t i = 1; i <= fhCumProbOutput[0]->GetNbinsX(); i++) {
-		if (fhCumProbOutput[0]->GetBinContent(i) <= 0.9) {
+		if (fhCumProbOutput[0]->GetBinContent(i) <= fElIdEfficiency) {
 			optimalCut = fhCumProbOutput[0]->GetBinCenter(i);
 			return optimalCut;
 		}
@@ -687,7 +683,8 @@ string CbmTrdElectronsTrainAnn::CreateAnnString()
 
 TMVA::Factory* CbmTrdElectronsTrainAnn::CreateFactory(TTree* simu)
 {
-	TFile* outputFile = TFile::Open("TMVA.root", "RECREATE");
+   if (fOutputDir != "") gSystem->mkdir(fOutputDir.c_str(), true);
+	TFile* outputFile = TFile::Open(string(fOutputDir+"/tmva_output.root").c_str(), "RECREATE");
 
 	TMVA::Factory *factory = new TMVA::Factory("TMVAnalysis", outputFile);
 
@@ -739,30 +736,23 @@ void CbmTrdElectronsTrainAnn::Draw()
    TCanvas* cEloss = new TCanvas("trd_elid_eloss", "trd_elid_eloss", 1200, 800);
    cEloss->Divide(3, 2);
    cEloss->cd(1);
-   DrawH1(list_of(fhMeanEloss[0])(fhMeanEloss[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhMeanEloss, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(2);
-   DrawH1(list_of(fhEloss[0])(fhEloss[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhEloss, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(3);
-   DrawH1(list_of(fhdEdX[0])(fhdEdX[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhdEdX, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(4);
-   DrawH1(list_of(fhTR[0])(fhTR[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhTR, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(5);
-   DrawH1(list_of(fhNofTRLayers[0])(fhNofTRLayers[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhNofTRLayers, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    cEloss->cd(6);
-   DrawH1(list_of(fhNofHits[0])(fhNofHits[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhNofHits, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* cElossSort = new TCanvas("trd_elid_eloss_sort", "trd_elid_eloss_sort", 1200, 900);
    cElossSort->Divide(4, 3);
    for (int iL = 0; iL < fNofTrdLayers; iL++){
       cElossSort->cd(iL+1);
-      DrawH1(list_of(fhElossSort[0][iL])(fhElossSort[1][iL]), list_of("e^{#pm}")("#pi^{#pm}"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+      DrawH1(list_of(fhElossSort[0][iL])(fhElossSort[1][iL]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
    }
 
    TCanvas* cClassifierOutput = new TCanvas("trd_elid_classifier_output","trd_elid_classifier_output", 500, 500);
@@ -771,8 +761,7 @@ void CbmTrdElectronsTrainAnn::Draw()
 	fhOutput[1]->Scale(1./fhOutput[1]->Integral());
 
 	TCanvas* cCumProbOutput = new TCanvas("trd_elid_cum_prob_output","trd_elid_cum_prob_output", 500,500);
-   DrawH1(list_of(fhCumProbOutput[0])(fhCumProbOutput[1]), list_of("e^{#pm}")("#pi^{#pm}"),
-         kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
+   DrawH1(fhCumProbOutput, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);
 
 	TCanvas* cRoc = new TCanvas("trd_elid_roc","trd_elid_roc", 500, 500);
    TGraph* rocGraph = CreateRocDiagramm();
@@ -783,8 +772,7 @@ void CbmTrdElectronsTrainAnn::Draw()
 	cInput->Divide(4, 3);
 	for (int i = 0; i < fNofTrdLayers; i++) {
 	   cInput->cd(i + 1);
-      DrawH1(list_of(fhInput[0][i])(fhInput[1][i]), list_of("e^{#pm}")("#pi^{#pm}"),
-            kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+      DrawH1(list_of(fhInput[0][i])(fhInput[1][i]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 	}
 }
 

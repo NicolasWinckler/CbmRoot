@@ -682,11 +682,14 @@ void CbmAnaDielectronTask::FillCandidateArray()
       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(cand.stsInd);
       if (stsTrack == NULL) continue;
       CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(cand.stsInd);
-      if (stsMatch == NULL) continue;
+     // if (stsMatch == NULL) continue;
       cand.stsMcTrackId = stsMatch->GetMCTrackId();
-      if (cand.stsMcTrackId < 0) continue;
-      CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
-      if (mcTrack1 == NULL) continue;
+      // if (cand.stsMcTrackId < 0) continue;
+      CbmMCTrack* mcTrack1 = NULL;
+      if (cand.stsMcTrackId >= 0){
+	  mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
+      }
+     // if (mcTrack1 == NULL) continue;
 
       fKFFitter.DoFit(stsTrack,11);
       cand.chi2sts = stsTrack->GetChi2() / stsTrack->GetNDF();
@@ -699,7 +702,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
       if (!fUseMcMomentum){
          vtxTrack.Momentum(cand.momentum);
       } else {
-         mcTrack1->GetMomentum(cand.momentum);
+         if (mcTrack1 != NULL) mcTrack1->GetMomentum(cand.momentum);
       }
 
       cand.mass = TDatabasePDG::Instance()->GetParticle(11)->Mass();
@@ -707,8 +710,8 @@ void CbmAnaDielectronTask::FillCandidateArray()
       cand.energy = sqrt(cand.momentum.Mag2() + cand.mass * cand.mass);
       cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) / (cand.energy - cand.momentum.Z()));
 
-      Int_t pdg = TMath::Abs(mcTrack1->GetPdgCode());
-      Int_t motherId = mcTrack1->GetMotherId();
+      Int_t pdg = (mcTrack1 != NULL) ? TMath::Abs(mcTrack1->GetPdgCode()) : 0;
+      Int_t motherId = (mcTrack1 != NULL) ? mcTrack1->GetMotherId() : -2;
       cand.McMotherId = motherId;
 
       // Add all pions from STS for pion misidentification level study
@@ -723,17 +726,17 @@ void CbmAnaDielectronTask::FillCandidateArray()
       if (cand.richInd < 0) continue;
       CbmRichRing* richRing = (CbmRichRing*) fRichRings->At(cand.richInd);
 
-      CbmTrackMatch* richMatch  = (CbmTrackMatch*) fRichRingMatches->At(cand.richInd);
-      if (richMatch == NULL) continue;
-      cand.richMcTrackId = richMatch->GetMCTrackId();
-      if (cand.richMcTrackId < 0) continue;
-      CbmMCTrack* mcTrack2 = (CbmMCTrack*) fMCTracks->At(cand.richMcTrackId);
-      if (mcTrack2 == NULL) continue;
+     // CbmTrackMatch* richMatch  = (CbmTrackMatch*) fRichRingMatches->At(cand.richInd);
+     // if (richMatch == NULL) continue;
+     // cand.richMcTrackId = richMatch->GetMCTrackId();
+     // if (cand.richMcTrackId < 0) continue;
+     // CbmMCTrack* mcTrack2 = (CbmMCTrack*) fMCTracks->At(cand.richMcTrackId);
+     // if (mcTrack2 == NULL) continue;
 
       if (pdg == 11 && motherId == -1) cand.isMcSignalElectron = true;
 
       if (motherId >=0){
-         CbmMCTrack* mct1 = (CbmMCTrack*) fMCTracks->At(cand.McMotherId);
+         CbmMCTrack* mct1 = (CbmMCTrack*) fMCTracks->At(motherId);
          int motherPdg = mct1->GetPdgCode();
          if (mct1 != NULL && motherPdg == 111 && pdg == 11) {
             cand.isMcPi0Electron = true;
@@ -753,12 +756,12 @@ void CbmAnaDielectronTask::FillCandidateArray()
          if (cand.trdInd < 0) continue;
          trdTrack = (CbmTrdTrack*) fTrdTracks->At(cand.trdInd);
          if (trdTrack == NULL) continue;
-         CbmTrackMatch* trdMatch = (CbmTrackMatch*) fTrdTrackMatches->At(cand.trdInd);
-         if (trdMatch == NULL) continue;
-         cand.trdMcTrackId = trdMatch->GetMCTrackId();
-         if (cand.trdMcTrackId < 0) continue;
-         CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
-         if (mcTrack3 == NULL) continue;
+       //  CbmTrackMatch* trdMatch = (CbmTrackMatch*) fTrdTrackMatches->At(cand.trdInd);
+        // if (trdMatch == NULL) continue;
+        // cand.trdMcTrackId = trdMatch->GetMCTrackId();
+        // if (cand.trdMcTrackId < 0) continue;
+       //  CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMcTrackId);
+        // if (mcTrack3 == NULL) continue;
       }
 
       // ToF
@@ -766,14 +769,14 @@ void CbmAnaDielectronTask::FillCandidateArray()
       if (cand.tofInd < 0) continue;
       CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(cand.tofInd);
       if (tofHit == NULL) continue;
-      Int_t tofPointIndex = tofHit->GetRefId();
-      if (tofPointIndex < 0) continue;
-      FairMCPoint* tofPoint = (FairMCPoint*) fTofPoints->At(tofPointIndex);
-      if (tofPoint == NULL) continue;
-      cand.tofMcTrackId = tofPoint->GetTrackID();
-      if (cand.tofMcTrackId < 0) continue;
-      CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
-      if (mcTrack4 == NULL) continue;
+    //  Int_t tofPointIndex = tofHit->GetRefId();
+    //  if (tofPointIndex < 0) continue;
+    //  FairMCPoint* tofPoint = (FairMCPoint*) fTofPoints->At(tofPointIndex);
+    //  if (tofPoint == NULL) continue;
+    //  cand.tofMcTrackId = tofPoint->GetTrackID();
+    //  if (cand.tofMcTrackId < 0) continue;
+    //  CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
+    //  if (mcTrack4 == NULL) continue;
 
       IsElectron(richRing, cand.momentum.Mag(), trdTrack, gTrack, &cand);
       fCandidates.push_back(cand);
@@ -938,8 +941,11 @@ void CbmAnaDielectronTask::SignalAndBgReco()
 
    Int_t ncand = fCandidates.size();
    for (Int_t i = 0; i < ncand; i++){
-      CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
-		Int_t pdg = mcTrack->GetPdgCode();
+      Int_t pdg = 0;
+      if (fCandidates[i].stsMcTrackId > 0){
+	  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
+	  pdg = mcTrack->GetPdgCode();
+      }
 
       Bool_t isChi2Prim = (fCandidates[i].chi2Prim < fChiPrimCut);
       Bool_t isEl = (fCandidates[i].isElectron);
@@ -965,13 +971,16 @@ void CbmAnaDielectronTask::SignalAndBgReco()
 
     for (Int_t iP = 0; iP < ncand; iP++){
         if (fCandidates[iP].charge < 0) continue;
-        CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(fCandidates[iP].stsMcTrackId);
+	CbmMCTrack* mctrackP = NULL;
+	if (fCandidates[iP].stsMcTrackId >=0) mctrackP = (CbmMCTrack*) fMCTracks->At(fCandidates[iP].stsMcTrackId);
         for (Int_t iM = 0; iM < ncand; iM++){
             if (fCandidates[iM].charge > 0) continue;
-            CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(fCandidates[iM].stsMcTrackId);
+	    CbmMCTrack* mctrackM = NULL;
+	    if (fCandidates[iM].stsMcTrackId >=0) mctrackM = (CbmMCTrack*) fMCTracks->At(fCandidates[iM].stsMcTrackId);
             if (iM == iP ) continue;
 
-            KinematicParams pMC = CalculateKinematicParams(mctrackP,mctrackM);
+	    KinematicParams pMC;
+	    if (mctrackP != NULL && mctrackM != NULL) pMC = CalculateKinematicParams(mctrackP, mctrackM);
 
             KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]); 
 
@@ -1201,18 +1210,22 @@ void CbmAnaDielectronTask::IsElectron(
       }
    } else {
       // PID using MC information, a certain pi supression level can be set
-      CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(cand->stsMcTrackId);
-      Int_t pdg = mcTrack->GetPdgCode();
-      if (pdg == 11 || pdg == -11){
-         cand->isElectron = true;
-      } else {
-         Double_t r = fRandom3->Rndm();
-         if (r < fPionMisidLevel){
-            cand->isElectron = true;
-         } else {
-            cand->isElectron = false;
-         }
-      }
+       if (cand->stsMcTrackId < 0){
+	   cand->isElectron = false;
+       } else {
+	   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(cand->stsMcTrackId);
+	   Int_t pdg = mcTrack->GetPdgCode();
+	   if (pdg == 11 || pdg == -11){
+	       cand->isElectron = true;
+	   } else {
+	       Double_t r = fRandom3->Rndm();
+	       if (r < fPionMisidLevel){
+		   cand->isElectron = true;
+	       } else {
+		   cand->isElectron = false;
+	       }
+	   }
+       }
    }
 }
 
@@ -1598,9 +1611,12 @@ void CbmAnaDielectronTask::CheckClosestMvdHit(
          int mcMvdHitPdg = TMath::Abs(mct1->GetPdgCode());
          int mvdMotherId = mct1->GetMotherId();
 
-         int stsMcTrackId = fCandidates[candInd[iT]].stsMcTrackId;
-         CbmMCTrack* mct2 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
-         int stsMotherId = mct2->GetMotherId();
+	 int stsMcTrackId = fCandidates[candInd[iT]].stsMcTrackId;
+         int stsMotherId = -2;
+	 if (stsMcTrackId >=0){
+	     CbmMCTrack* mct2 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
+	     stsMotherId = mct2->GetMotherId();
+	 }
 
          //cout << mvdStationNum << " " << mvdMotherId << " " << stsMotherId << endl;
          if ( mvdMotherId != -1 && mvdMotherId == stsMotherId){

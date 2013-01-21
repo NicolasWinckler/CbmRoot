@@ -106,6 +106,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawMinvSandBgAll();
    DrawMinvSourceAll();
    DrawBgSourceTracks();
+   DrawMismatchesAndGhosts();
    DrawMinvPtAll();
    DrawBgSourcesVsMomentum();
    DrawMvdCutQa();
@@ -840,6 +841,9 @@ void CbmAnaDielectronTaskDraw::RemoveMvdCutBins()
       H1("fh_nof_bg_tracks")->SetBinContent(step - 2, H1("fh_nof_bg_tracks")->GetBinContent(step));
       H1("fh_nof_el_tracks")->SetBinContent(step - 2, H1("fh_nof_el_tracks")->GetBinContent(step));
 
+      H1("fh_nof_mismatches")->SetBinContent(step - 2, H1("fh_nof_mismatches")->GetBinContent(step));
+      H1("fh_nof_ghosts")->SetBinContent(step - 2, H1("fh_nof_ghosts")->GetBinContent(step));
+
       int ny = H2("fh_source_tracks")->GetYaxis()->GetNbins();
       for (int y = 1; y <= ny; y++){
          H2("fh_source_tracks")->SetBinContent(step - 2, y, H2("fh_source_tracks")->GetBinContent(step, y));
@@ -944,6 +948,29 @@ void CbmAnaDielectronTaskDraw::DrawBgSourceTracks()
    DrawBgSource2D("lmvm_source_tracks_2d", "fh_source_tracks",
          list_of("#gamma")("#pi^{0}")("#pi^{#pm}")("p")("K")("e^{#pm}_{sec}")("oth."),
          100., "Tracks per event x10^{-2}");
+}
+
+void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
+{
+   gStyle->SetPaintTextFormat("4.1f");
+
+   int rangeMax = CbmAnaLmvmNames::fNofAnaSteps;
+   if (!fUseMvd){
+      rangeMax = CbmAnaLmvmNames::fNofAnaSteps - 2;
+   }
+
+   TCanvas *c1 = CreateCanvas("lmvm_nof_mismatches", "lmvm_nof_mismatches", 600, 600);
+   TH1D* hbg = (TH1D*)H1("fh_nof_mismatches")->Clone();
+   //hbg->Scale(10);
+   //hbg->GetYaxis()->SetTitle("Tracks/event x10^{-1}");
+   hbg->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hbg, kLinear, kLog, "hist text0");
+   hbg->SetMarkerSize(2.);
+
+   TCanvas *c2 = CreateCanvas("lmvm_nof_ghosts", "lmvm_nof_ghosts", 600, 600);
+   TH1D* hel = H1("fh_nof_ghosts");
+   hel->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hel, kLinear, kLog);
 }
 
 void CbmAnaDielectronTaskDraw::SetAnalysisStepLabels(

@@ -258,6 +258,8 @@ private:
 
      void DrawCutDistributions();
 
+     void DrawMismatchesAndGhosts();
+
     void DrawSourcesBgPairsEpEm(
           int step,
           bool inPercent,

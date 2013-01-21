@@ -171,7 +171,6 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
 
    fPionMisidLevel = -1.;
    fRandom3 = new TRandom3(0);
-  // fUseMcMomentum = false;
 
    //identification cuts
    fTrdAnnCut = 0.85;
@@ -183,6 +182,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
    fRmsB = -1.;
    fRmsCoeff = -1.;
    fDistCut = -1.;
+   fMomentumCut = -1.; // if cut < 0 them it is not used
    // analysis cuts
    fPtCut = 0.2;
    fAngleCut = 1.;
@@ -226,6 +226,12 @@ void CbmAnaDielectronTask::InitHists()
    fHistoList.push_back(fh_nof_el_tracks);
    fh_source_tracks = new TH2D("fh_source_tracks","fh_source_tracks;Analysis steps;Particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 7, 0., 7.);
    fHistoList.push_back(fh_source_tracks);
+
+   //Number of mismatches and ghosts after each cut
+   fh_nof_mismatches = new TH1D("fh_nof_mismatches","fh_nof_mismatches;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
+   fHistoList.push_back(fh_nof_mismatches);
+   fh_nof_ghosts = new TH1D("fh_nof_ghosts","fh_nof_ghosts;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
+   fHistoList.push_back(fh_nof_ghosts);
 
    // BG pair source
    fh_source_pairs = new TH2D("fh_source_pairs","fh_source_pairs;Analysis steps;Pair", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, CbmAnaLmvmNames::fNofBgPairSources, 0., CbmAnaLmvmNames::fNofBgPairSources);
@@ -428,9 +434,7 @@ void CbmAnaDielectronTask::Exec(
          "fMvd2Cut (p,d) = (" << fMvd2CutP << "," << fMvd2CutD << ")" << endl;
 
     cout << "fWeight = " << fWeight << endl;
-   // if (!fUseMcMomentum) cout << "fUseMcMomentum = false"<< endl;
-  //  else  cout << "fUseMcMomentum = true"<< endl;
-
+    cout << "fMomentumCut = "<< fMomentumCut <<  endl;
 
     FillRichRingNofHits();
     MCPairs();   
@@ -896,6 +900,8 @@ void CbmAnaDielectronTask::TrackSource(
 		fh_source_mom[kSignal][step]->Fill(mom, fWeight);
 		fh_source_pt[kSignal][step]->Fill(pt, fWeight);
 	} else {
+	   if (IsMismatch(cand)) fh_nof_mismatches->Fill(binNum);
+	   if (IsGhost(cand)) fh_nof_ghosts->Fill(binNum);
 		fh_nof_bg_tracks->Fill(binNum);
 		fh_source_mom[kBg][step]->Fill(mom);
 		fh_source_pt[kBg][step]->Fill(pt);
@@ -1219,6 +1225,22 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
    } //iP
 }
 
+Bool_t CbmAnaDielectronTask::IsMismatch(
+      DielectronCandidate* cand)
+{
+   if (cand->stsMcTrackId == cand->richMcTrackId && cand->stsMcTrackId == cand->trdMcTrackId &&
+         cand->stsMcTrackId == cand->tofMcTrackId && cand->stsMcTrackId !=-1) return false;
+   return true;
+}
+
+Bool_t CbmAnaDielectronTask::IsGhost(
+      DielectronCandidate* cand)
+{
+   if (cand->stsMcTrackId == -1 || cand->richMcTrackId == -1 || cand->trdMcTrackId == -1 ||
+         cand->tofMcTrackId == -1) return true;
+   return false;
+}
+
 void CbmAnaDielectronTask::IsElectron(
       CbmRichRing * ring,
       Double_t momentum,
@@ -1232,8 +1254,9 @@ void CbmAnaDielectronTask::IsElectron(
       Double_t annRich = cand->richAnn;
       Double_t annTrd = cand->trdAnn;
       Bool_t tofEl = IsTofElectron(gTrack, momentum, cand);
+      Bool_t momCut = (fMomentumCut > 0.)?(momentum < fMomentumCut):true;
 
-      if (richEl && trdEl && tofEl) {
+      if (richEl && trdEl && tofEl && momCut) {
          cand->isElectron = true;
       } else {
          cand->isElectron = false;

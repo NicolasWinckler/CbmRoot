@@ -305,6 +305,11 @@ public:
     ClassDef(CbmAnaDielectronTask,1);
 
 private:
+    Bool_t IsMismatch(
+          DielectronCandidate* cand);
+
+    Bool_t IsGhost(
+          DielectronCandidate* cand);
 
     void IsElectron(
     	CbmRichRing * ring,
@@ -375,6 +380,7 @@ private:
     Double_t fDistCut;
     CbmRichElectronIdAnn* fElIdAnn;
     Bool_t fUseRichAnn;
+    Double_t fMomentumCut; // if cut < 0 then it will not be used
     // Analysis cuts
     Double_t fChiPrimCut;
     Double_t fPtCut;
@@ -474,6 +480,9 @@ private:
    TH1D* fh_nof_el_tracks;
    TH2D* fh_source_tracks;
 
+   TH1D* fh_nof_mismatches;
+   TH1D* fh_nof_ghosts;
+
    //First index is the source type: [0]-signal, [1]-bg, [2]-pi0, [3]-gamma
    //Use SourceTypes enumeration for access.
    //second index is the analysis step: [0]-mc, [1]-acc, [2]-reco, [3]-chi2prim, [4]-elid,
@@ -506,7 +515,7 @@ public:
    void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
 
    void SetPionMisidLevel(Double_t level) {fPionMisidLevel = level;}
-  // void SetUseMcMomentum(Bool_t use = false) {fUseMcMomentum = use;}
+   void SetMomentumCut(Double_t mom) {fMomentumCut = mom;}
 };
 
 #endif

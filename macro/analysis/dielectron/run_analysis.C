@@ -19,6 +19,7 @@ void run_analysis(Int_t nEvents = 1000)
 	TString energy = "25gev";
 	TString plutoParticle = "rho0";
 	Double_t pionMisidLevel = -1;
+	Double_t momentumCut = -1.;
 
 	TString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
 
@@ -31,6 +32,7 @@ void run_analysis(Int_t nEvents = 1000)
       energy = TString(gSystem->Getenv("ENERGY"));
       plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
       stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
+      momentumCut = TString(gSystem->Getenv("MOMENTUM_CUT")).Atof();
    }
 
    // load libraries
@@ -76,6 +78,7 @@ void run_analysis(Int_t nEvents = 1000)
       if (plutoParticle == "pi0") task->SetWeight(4.38);
    }
    //task->SetChiPrimCut(2.);
+   task->SetMomentumCut(momentumCut); // if cut < 0 then it is not used
    task->SetUseMvd(IsMvd(parFile));
    task->SetUseRich(true);
    task->SetUseTrd(IsTrd(parFile));

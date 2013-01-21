@@ -1,5 +1,5 @@
 
-dir=/hera/cbm/users/andrey/mc/dielectron/dec12/8gev/
+dir=/hera/cbm/users/slebedev/mc/dielectron/dec12/25gev/mirrors/
 
 function create_dir() {
     mkdir -p ${1}/log
@@ -14,8 +14,12 @@ function create_dir_particles() {
     mkdir -p ${1}/results
 }
 
-create_dir_particles ${dir}/0.7field/mvd/
-create_dir_particles ${dir}/0.7field/nomvd/
-create_dir_particles ${dir}/1.0field/mvd/
-create_dir_particles ${dir}/1.0field/nomvd/
+create_dir_particles ${dir}/2mm/1.0field/nomvd/
+create_dir_particles ${dir}/5mm/1.0field/nomvd/
+create_dir_particles ${dir}/6mm/1.0field/nomvd/
+create_dir_particles ${dir}/10mm/1.0field/nomvd/
+#create_dir_particles ${dir}/0.7field/mvd4/
+#create_dir_particles ${dir}/1.0field/mvd4/
+#create_dir_particles ${dir}/0.5field/mvd/
+#create_dir_particles ${dir}/0.5field/mvd4/
 

@@ -1,13 +1,13 @@
 #!/bin/sh
 
-dirFrom=/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/
-dirTo=/u/slebedev/Baykal/copytemp/8gev/
+dirFrom=/hera/cbm/users/slebedev/mc/dielectron/dec12/25gev/mirrors/10mm/
+dirTo=/u/slebedev/Baykal/copytemp/25gev/mirrors/10mm/
 
-filename=analysis.auau.8gev.centr.all.root
+filename=analysis.25gev.centr.all.root
 
 function copy_func() {
    mkdir -p ${dirTo}/${2}/${1}/
-   cp ${dirFrom}/${2}/${1}/${filename} ${dirTo}
+   cp ${dirFrom}/${2}/${1}/${filename} ${dirTo}/${2}/${1}/
 }
 
 function copy_all() {
@@ -17,9 +17,10 @@ function copy_all() {
    copy_func phi ${1}
 }
 
-copy_all 0.7field/mvd
-copy_all 0.7field/nomvd
-copy_all 1.0field/mvd
 copy_all 1.0field/nomvd
-
+#copy_all 0.7field/mvd4
+#copy_all 0.7field/nomvd
+#copy_all 1.0field/mvd
+#copy_all 1.0field/mvd4
+#copy_all 1.0field/nomvd
 

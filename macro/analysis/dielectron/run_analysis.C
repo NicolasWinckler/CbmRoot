@@ -4,21 +4,21 @@
  * @version 1.0
  **/
 
-void run_analysis(Int_t nEvents = 10)
+void run_analysis(Int_t nEvents = 1000)
 {
    TString script = TString(gSystem->Getenv("SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    //gRandom->SetSeed(10);
 
-	TString dir = "/lustre/cbm/user/ebelolap/aug11/25gev/70field/mvd/rho0/";
-	TString mcFile = dir + "/mc.0000.root";
-	TString parFile = dir + "/param.0000.root";
-	TString recoFile = dir + "/reco.0000.root";
-	TString analysisFile = dir + "/ana.0000.root";
+	TString dir = "/hera/cbm/users/slebedev/mc/dielectron/dec12/25gev/mirrors/6mm/1.0field/nomvd/rho0/";
+	TString mcFile = dir + "mc.auau.25gev.centr.00001.root";
+	TString parFile = dir + "/params.auau.25gev.centr.00001.root";
+	TString recoFile = dir + "/reco.auau.25gev.centr.00001.root";
+	TString analysisFile = dir + "/analysis.test.auau.25gev.centr.00001.root";
 	TString energy = "25gev";
 
-	TString plutoParticle = "omegaepem";
+	TString plutoParticle = "rho0";
 	TString useMcMomentum = "no";
 	Double_t pionMisidLevel = -1;
 
@@ -78,6 +78,7 @@ void run_analysis(Int_t nEvents = 10)
       // weight pi0 = Multiplicity * Branching Ratio = 365 * 1.2e-2  for 25 AGeV beam energy
       if (plutoParticle == "pi0") task->SetWeight(4.38);
    }
+   //task->SetChiPrimCut(2.);
    task->SetUseMvd(IsMvd(parFile));
    task->SetUseRich(true);
    task->SetUseTrd(IsTrd(parFile));

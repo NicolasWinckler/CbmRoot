@@ -1,7 +1,7 @@
 #$ -wd /tmp 
 #$ -j y
 # Number of subtasks to start
-#$ -t 1-10
+#$ -t 1-200
 
 #XXXXX=$(printf "%05d" "1")
 #XXXX=$(printf "%04d" "1")
@@ -9,7 +9,7 @@ XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
 # specify input and output directories
-outdir=/hera/cbm/users/slebedev/mc/dec12/${coll_energy}/${field_scale}field/${mvd}/${pluto_particle}/
+outdir=/hera/cbm/users/slebedev/mc/dielectron/dec12/${coll_energy}/mirrors/6mm/${field_scale}field/${mvd}/${pluto_particle}/
 cbmroot_config_path=/hera/cbm/users/slebedev/trunk/build/config.sh
 macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
 
@@ -18,7 +18,7 @@ macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
 export SCRIPT=yes
 
 # Number of events to run
-nevents=10
+nevents=1000
 
 #create the needed directories
 mkdir -p ${outdir}/log
@@ -36,7 +36,7 @@ export URQMD_FILE=/hera/cbm/prod/gen/urqmd/auau/${coll_energy}/centr/urqmd.auau.
 export MC_FILE=${outdir}/mc.auau.${coll_energy}.centr.${XXXXX}.root
 export PAR_FILE=${outdir}/params.auau.${coll_energy}.centr.${XXXXX}.root
 export RECO_FILE=${outdir}/reco.auau.${coll_energy}.centr.${XXXXX}.root
-export ANALYSIS_FILE=${outdir}/analysis.auau.${coll_energy}.centr.${XXXXX}.root
+export ANALYSIS_FILE=${outdir}/analysis.new.${coll_energy}.centr.${XXXXX}.root
 export RESULT_DIR=${outdir}/results/${XXXXX}/
 
 #Simulation parameters
@@ -61,10 +61,12 @@ fi
 export CAVE_GEOM=cave.geo
 export TARGET_GEOM=target_au_025mu.geo
 export PIPE_GEOM=pipe_standard.geo
-if [ ${mvd} = "mvd" ] ; then
+if [ ${mvd} = "mvd4" ] ; then
    export MVD_GEOM=mvd/mvd_Nov_2012.geo
 elif [ ${mvd} = "nomvd" ]; then
    export MVD_GEOM=
+elif [ ${mvd} = "mvd" ]; then
+   export MVD_GEOM=mvd/mvd_v08a.geo
 fi
 export STS_GEOM=sts/sts_v12b.geo.root
 export STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
@@ -90,15 +92,15 @@ export PLUTO_PARTICLE=${pluto_particle}
 export PLUTO=yes
 
 if [ ${pluto_particle} = "rho0" ] ; then 
-   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
 elif [ ${pluto_particle} = "omegaepem" ] ; then 
-   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
 elif [ ${pluto_particle} = "omegadalitz" ] ; then 
-   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
 elif [ ${pluto_particle} = "phi" ] ; then 
-   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
 elif [ ${pluto_particle} = "pi0" ] ; then 
-   export PLUTO_FILE=/hera/cbm/users/andrey/mc/pluto/auau/${ENERGY}/pi0/gammaepem/pluto.auau.${ENERGY}.pi0.gammaepem.10k.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/slebedevy/mc/pluto/auau/${ENERGY}/pi0/gammaepem/pluto.auau.${ENERGY}.pi0.gammaepem.10k.${XXXX}.root
 fi 
 
 # create special and enter special workdir for job
@@ -108,8 +110,8 @@ mkdir -p $workdir
 cd $workdir
 
 # run the root simulation
-root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
-root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
+#root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
+#root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
 root -b -l -q "${macro_dir}/run_analysis.C(${nevents})"
 
 cp -v ${SGE_STDOUT_PATH} ${outdir}/log/${JOB_ID}.${SGE_TASK_ID}.log

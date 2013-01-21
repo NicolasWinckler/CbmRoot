@@ -255,6 +255,8 @@ public:
 
     void FillCandidateArray();
 
+    void AssignMcToCandidates();
+
     void DifferenceSignalAndBg();
 
     void SetDefaultIdParameters();
@@ -360,7 +362,7 @@ private:
     Double_t fPionMisidLevel; // For the ideal particle identification cases, set to -1 for real PID
     TRandom3* fRandom3;
 
-    Bool_t fUseMcMomentum;
+    //Bool_t fUseMcMomentum;
 
     // ID cuts
     Double_t fTrdAnnCut;
@@ -504,7 +506,7 @@ public:
    void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
 
    void SetPionMisidLevel(Double_t level) {fPionMisidLevel = level;}
-   void SetUseMcMomentum(Bool_t use = false) {fUseMcMomentum = use;}
+  // void SetUseMcMomentum(Bool_t use = false) {fUseMcMomentum = use;}
 };
 
 #endif

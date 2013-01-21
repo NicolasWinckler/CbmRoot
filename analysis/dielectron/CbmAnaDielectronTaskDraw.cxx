@@ -69,7 +69,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    fRichAnnCut = 0.0;
    fPtCut = 0.2;
    fAngleCut = 1.;
-   fChiPrimCut = 3.;
+   fChiPrimCut = 2.;
    fGammaCut = 0.025;
    fStCutAngle = 1.5;
    fStCutPP = 1.5;
@@ -700,7 +700,7 @@ void CbmAnaDielectronTaskDraw::Draw1DHistoForEachAnalysisStep(
       drOpt = "same"; // If the histogram is drawn, next histograms must be drawn with "same" option.
       if (min > h->GetMinimum()) { min = h->GetMinimum(); }
    }
-   if (min <= 0.0) min = 1e-7;
+   if (min <= 0.0) min = 1e-9;
    if (firstHisto != NULL) firstHisto->SetMinimum(min);
 
    leg->SetFillColor(kWhite);
@@ -728,7 +728,9 @@ void CbmAnaDielectronTaskDraw::DrawMinvForEachAnalysisStep()
    Draw1DHistoForEachAnalysisStep("fh_eta_minv", true);
 
    TCanvas *c3 = CreateCanvas("lmvm_minv_for_each_analysis_step_gamma", "lmvm_minv_for_each_analysis_step_gamma", 600, 600);
+  // H1("fh_gamma_minv_mc")->GetXaxis()->SetRangeUser(0., 0.05);
    Draw1DHistoForEachAnalysisStep("fh_gamma_minv", true);
+
 }
 
 void CbmAnaDielectronTaskDraw::DrawMinvSandBg(

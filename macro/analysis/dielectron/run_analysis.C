@@ -17,9 +17,7 @@ void run_analysis(Int_t nEvents = 1000)
 	TString recoFile = dir + "/reco.auau.25gev.centr.00001.root";
 	TString analysisFile = dir + "/analysis.test.auau.25gev.centr.00001.root";
 	TString energy = "25gev";
-
 	TString plutoParticle = "rho0";
-	TString useMcMomentum = "no";
 	Double_t pionMisidLevel = -1;
 
 	TString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
@@ -32,7 +30,6 @@ void run_analysis(Int_t nEvents = 1000)
       pionMisidLevel = TString(gSystem->Getenv("PION_MISIDENTIFICATION_LEVEL")).Atof();
       energy = TString(gSystem->Getenv("ENERGY"));
       plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
-      useMcMomentum = TString(gSystem->Getenv("USE_MC_MOMENTUM"));
       stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
    }
 
@@ -84,8 +81,6 @@ void run_analysis(Int_t nEvents = 1000)
    task->SetUseTrd(IsTrd(parFile));
    task->SetUseTof(true);
    task->SetPionMisidLevel(pionMisidLevel);
-   task->SetUseMcMomentum(false);
-   if (useMcMomentum == "yes") task->SetUseMcMomentum(true);
 
    fRun->AddTask(task);
 

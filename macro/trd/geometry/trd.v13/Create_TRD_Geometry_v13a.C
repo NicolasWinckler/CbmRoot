@@ -1,11 +1,10 @@
+// 2013-01-21 - DE - introduce TRD media, use TRDG10 as material for pad plane and FEBs
+// 2013-01-21 - DE - put backpanel into the geometry
 // 2013-01-11 - DE - allow for misalignment of TRD modules
 // 2012-11-04 - DE - add kapton foil, add FR4 padplane
 // 2012-11-03 - DE - add lattice grid on entrance window as CompositeShape
 
-// todo - use realistic padplane material (FR4)
-
 // in root all sizes are diven in cm
-// febs are made of pefoam20 - which is not their final density (!!)
 
 #include "TSystem.h"
 #include "TGeoManager.h"
@@ -23,7 +22,7 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13f";
+const TString geoVersion = "trd_v13d";
 const TString FileNameSim = geoVersion + ".root";
 const TString FileNameGeo = geoVersion + "_geo.root";
 //const TString geoVersion = "trd1";
@@ -31,14 +30,16 @@ const TString FileNameGeo = geoVersion + "_geo.root";
 
 // display switches
 const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is included in geometry
-const Bool_t IncludeLattice  = false; // false;  // true, if lattice grid is included in geometry
+const Bool_t IncludeLattice  = true; // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 
+const Float_t feb_rotation_angle = 45; // 45.; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
+
 // positioning switches
-const Bool_t DisplaceRandom  = true;  // true; // false;  // add random displacement of modules for alignment study
-const Bool_t RotateRandom    = true;  // true; // false;  // add random rotation of modules for alignment study
-const Bool_t DoExplode       = true;  // true, // false;  // add random displacement of modules for alignment study
+const Bool_t DisplaceRandom  = false;  // true; // false;  // add random displacement of modules for alignment study
+const Bool_t RotateRandom    = false;  // true; // false;  // add random rotation of modules for alignment study
+const Bool_t DoExplode       = false;  // true, // false;  // add random displacement of modules for alignment study
 
 // positioning parameters
 const Float_t maxdx    = 0.2;   // max +- 0.1 cm shift in x
@@ -161,7 +162,7 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
-const Float_t feb_z_offset = 0.1;  // offset in z of FEBs to backpanel
+const Float_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 
 const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
 const Float_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
@@ -173,7 +174,7 @@ const Float_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice fra
 // Thickness (in z) of lattice frames in cm - see below
 
 // z - geometry of TRD modules
-const Float_t radiator_thickness     =  36.0;    // 25 cm, 36 cm thickness of radiator
+const Float_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
 const Float_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
 const Float_t lattice_thickness      =   1.0;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
@@ -191,44 +192,37 @@ const Float_t padcopper_position     =  gas_position + gas_thickness/2. + padcop
 const Float_t padplane_thickness     =   0.0360; // 360 micron thickness of padplane
 const Float_t padplane_position      =  padcopper_position + padcopper_thickness/2. + padplane_thickness/2.;
 
-// z-sizes checked upto to here
+// backpanel components
+const Float_t carbon_thickness       =   0.0190 * 2; // use 2 layers!!   // 190 micron thickness for 1 layer of carbon fibres
+const Float_t honeycomb_thickness    =   2.3 - kapton_thickness - padcopper_thickness - padplane_thickness - carbon_thickness;    //  ~ 2.3 mm thickness of honeycomb
+const Float_t honeycomb_position     =  padplane_position + padplane_thickness/2. + honeycomb_thickness/2.;
+const Float_t carbon_position        =  honeycomb_position + honeycomb_thickness/2. + carbon_thickness/2.;
 
-// todo - replace by backpanel
-const Float_t mylar_thickness        =   0.1500; //  1.5 mm thickness of mylar
-const Float_t mylar_position         =  padplane_position + padplane_thickness/2. + mylar_thickness/2.;
-
-// todo - skip electronics plane, we have FEBs now
-const Float_t electronics_thickness  =   0.0070; //  70 micron thickness of padplane
-const Float_t electronics_position   =  mylar_position + mylar_thickness/2. + electronics_thickness/2.;
-
-// todo - add 1 mm shift of FEBs in z
+// readout boards
 const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
-const  Float_t febbox_position       =  electronics_position + electronics_thickness/2. + febbox_thickness/2.;
+const  Float_t febbox_position       =  carbon_position + carbon_thickness/2. + febbox_thickness/2.;
 const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEBs
 
-//const Float_t frame_thickness      =  radiator_thickness + gas_thickness + padplane_thickness 
-//                                        + mylar_thickness + electronics_thickness;   // frames cover radiator up to the backpanel
-
-const Float_t frame_thickness        =  gas_thickness + padcopper_thickness + padplane_thickness + mylar_thickness + electronics_thickness;   // frames cover gas volume and the backpanel
+const Float_t frame_thickness        =  gas_thickness;   // frame covers gas volume: from kapton foil to pad plane
 const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;
+
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
 const TString KeepingVolumeMedium     = "air";
-const TString RadiatorVolumeMedium    = "pefoam20";
-//const TString RadiatorVolumeMedium  = "polypropylene";
-const TString LatticeVolumeMedium     = "G10";
-const TString KaptonVolumeMedium      = "kapton";
-//const TString KaptonVolumeMedium      = "mylar"; // "kapton";  // remove this line
+const TString RadiatorVolumeMedium    = "TRDpefoam20";
+const TString LatticeVolumeMedium     = "TRDG10";
+const TString KaptonVolumeMedium      = "TRDkapton";
 const TString GasVolumeMedium         = "TRDgas";
-const TString PadCopperVolumeMedium   = "copper";
-//const TString PadCopperVolumeMedium   = "mylar"; // "copper";  // remove this line
-// todo - use realistic padplane material (FR4)
-const TString PadPcbVolumeMedium      = "G10";  // "goldcoatedcopper";
-const TString MylarVolumeMedium       = "mylar";
-const TString ElectronicsVolumeMedium = "goldcoatedcopper";
-const TString febVolumeMedium         = "G10"; // "pefoam20";  // todo - put correct FEB material here
-const TString FrameVolumeMedium       = "G10";
+const TString PadCopperVolumeMedium   = "TRDcopper";
+const TString PadPcbVolumeMedium      = "TRDG10";    // todo - put correct FEB material here
+const TString HoneycombVolumeMedium   = "TRDaramide";
+const TString CarbonVolumeMedium      = "TRDcarbon";
+const TString FebVolumeMedium         = "TRDG10";    // todo - put correct FEB material here
+const TString FrameVolumeMedium       = "TRDG10";
+//const TString MylarVolumeMedium       = "mylar";
+//const TString RadiatorVolumeMedium    = "polypropylene";
+//const TString ElectronicsVolumeMedium = "goldcoatedcopper";
 
 
 // some global variables
@@ -305,27 +299,31 @@ void create_materials_from_media_file()
   FairGeoMedia* geoMedia = geoFace->getMedia();
   FairGeoBuilder* geoBuild = geoLoad->getGeoBuilder();
 
-  FairGeoMedium* air              = geoMedia->getMedium("air");
-  FairGeoMedium* pefoam20         = geoMedia->getMedium("pefoam20");
-//  FairGeoMedium* polypropylene  = geoMedia->getMedium("polypropylene");
-  FairGeoMedium* trdGas           = geoMedia->getMedium("TRDgas");
-  FairGeoMedium* goldCoatedCopper = geoMedia->getMedium("goldcoatedcopper");
-  FairGeoMedium* mylar            = geoMedia->getMedium("mylar");
-  FairGeoMedium* G10              = geoMedia->getMedium("G10");
-  FairGeoMedium* PeFoam20         = geoMedia->getMedium("pefoam20");
-  FairGeoMedium* Copper           = geoMedia->getMedium("copper");
-  FairGeoMedium* Kapton           = geoMedia->getMedium("kapton");
+  FairGeoMedium* air              = geoMedia->getMedium(KeepingVolumeMedium);
+  FairGeoMedium* pefoam20         = geoMedia->getMedium(RadiatorVolumeMedium);
+  FairGeoMedium* G10              = geoMedia->getMedium(LatticeVolumeMedium);
+  FairGeoMedium* kapton           = geoMedia->getMedium(KaptonVolumeMedium);
+  FairGeoMedium* trdGas           = geoMedia->getMedium(GasVolumeMedium);
+  FairGeoMedium* copper           = geoMedia->getMedium(PadCopperVolumeMedium);
+  FairGeoMedium* carbon           = geoMedia->getMedium(CarbonVolumeMedium);
+  FairGeoMedium* honeycomb        = geoMedia->getMedium(HoneycombVolumeMedium);
+
+//  FairGeoMedium* goldCoatedCopper = geoMedia->getMedium("goldcoatedcopper");
+//  FairGeoMedium* polypropylene    = geoMedia->getMedium("polypropylene");
+//  FairGeoMedium* mylar            = geoMedia->getMedium("mylar");
 
   geoBuild->createMedium(air);
   geoBuild->createMedium(pefoam20);
-//  geoBuild->createMedium(polypropylene);
   geoBuild->createMedium(trdGas);
-  geoBuild->createMedium(goldCoatedCopper);
-  geoBuild->createMedium(mylar);
+  geoBuild->createMedium(honeycomb);
+  geoBuild->createMedium(carbon);
   geoBuild->createMedium(G10);
-  geoBuild->createMedium(PeFoam20);
-  geoBuild->createMedium(Copper);
-  geoBuild->createMedium(Kapton);
+  geoBuild->createMedium(copper);
+  geoBuild->createMedium(kapton);
+
+//  geoBuild->createMedium(goldCoatedCopper);
+//  geoBuild->createMedium(polypropylene);
+//  geoBuild->createMedium(mylar);
 }
 
 TGeoVolume* create_trd_module(Int_t moduleType)
@@ -344,10 +342,12 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   TGeoMedium* gasVolMed         = gGeoMan->GetMedium(GasVolumeMedium);
   TGeoMedium* padcopperVolMed   = gGeoMan->GetMedium(PadCopperVolumeMedium);
   TGeoMedium* padpcbVolMed      = gGeoMan->GetMedium(PadPcbVolumeMedium);
-  TGeoMedium* mylarVolMed       = gGeoMan->GetMedium(MylarVolumeMedium);
-  TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(ElectronicsVolumeMedium);
+  TGeoMedium* honeycombVolMed   = gGeoMan->GetMedium(HoneycombVolumeMedium);
+  TGeoMedium* carbonVolMed      = gGeoMan->GetMedium(CarbonVolumeMedium);
+//  TGeoMedium* mylarVolMed       = gGeoMan->GetMedium(MylarVolumeMedium);
+//  TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(ElectronicsVolumeMedium);
   TGeoMedium* frameVolMed       = gGeoMan->GetMedium(FrameVolumeMedium);
-  TGeoMedium* febVolMed         = gGeoMan->GetMedium(febVolumeMedium);
+  TGeoMedium* febVolMed         = gGeoMan->GetMedium(FebVolumeMedium);
 
   TString name = Form("trd1mod%d", moduleType);
   TGeoVolume* module = new TGeoVolumeAssembly(name);
@@ -621,39 +621,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    trdmod1_gasvol->SetLineColor(kBlue);
    TGeoTranslation* trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    module->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
-
-
-   // Pad Copper
-   TGeoBBox *trd_padcopper = new TGeoBBox("", activeAreaX /2., activeAreaY /2., padcopper_thickness /2.);
-   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume(Form("trd1mod%dpadcopper", moduleType), trd_padcopper, padcopperVolMed);
-   trdmod1_padcoppervol->SetLineColor(kOrange);
-   TGeoTranslation *trd_padcopper_trans = new TGeoTranslation("", 0., 0., padcopper_position);
-   module->AddNode(trdmod1_padcoppervol, 0, trd_padcopper_trans);
-
-
-   // Pad Plane
-   TGeoBBox *trd_padpcb = new TGeoBBox("", activeAreaX /2., activeAreaY /2., padplane_thickness /2.);
-   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume(Form("trd1mod%dpadplane", moduleType), trd_padpcb, padpcbVolMed);
-   trdmod1_padpcbvol->SetLineColor(kGreen);
-   TGeoTranslation *trd_padpcb_trans = new TGeoTranslation("", 0., 0., padplane_position);
-   module->AddNode(trdmod1_padpcbvol, 0, trd_padpcb_trans);
-
-
-   // mylar
-   TGeoBBox* trd_mylar = new TGeoBBox("", activeAreaX /2., activeAreaY /2., mylar_thickness /2.);
-   TGeoVolume* trdmod1_mylarvol = new TGeoVolume(Form("trd1mod%dmylar", moduleType), trd_mylar, mylarVolMed);
-   trdmod1_mylarvol->SetLineColor(kWhite);
-   TGeoTranslation* trd_mylar_trans = new TGeoTranslation("", 0., 0., mylar_position);
-   module->AddNode(trdmod1_mylarvol, 0, trd_mylar_trans);
-
-
-   // electronics
-   TGeoBBox* trd_el = new TGeoBBox("", activeAreaX /2., activeAreaY /2., electronics_thickness /2.);
-   TGeoVolume* trdmod1_elvol = new TGeoVolume(Form("trd1mod%delectronics", moduleType), trd_el, electronicsVolMed);
-   trdmod1_elvol->SetLineColor(kGreen);
-   TGeoTranslation* trd_el_trans = new TGeoTranslation("", 0., 0., electronics_position);
-   module->AddNode(trdmod1_elvol, 0, trd_el_trans);
    // end of Frame in z
+
 
    // frame1
    TGeoBBox* trd_frame1 = new TGeoBBox("", sizeX /2., frameWidth /2., frame_thickness/2.);
@@ -668,15 +637,44 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
 
    // frame2
-   TGeoBBox *trd_frame2 = new TGeoBBox("", frameWidth /2., activeAreaY /2., frame_thickness /2.);
+   TGeoBBox* trd_frame2 = new TGeoBBox("", frameWidth /2., activeAreaY /2., frame_thickness /2.);
    TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd1mod%dframe2", moduleType), trd_frame2, frameVolMed);
    trdmod1_frame2vol->SetLineColor(kRed);
 
    // translations 
-   TGeoTranslation *trd_frame2_trans = new TGeoTranslation("", activeAreaX /2. + frameWidth /2., 0., frame_position);
+   TGeoTranslation* trd_frame2_trans = new TGeoTranslation("", activeAreaX /2. + frameWidth /2., 0., frame_position);
    module->AddNode(trdmod1_frame2vol, 1, trd_frame2_trans);
    trd_frame2_trans = new TGeoTranslation("", -(activeAreaX /2. + frameWidth /2.), 0., frame_position);
    module->AddNode(trdmod1_frame2vol, 2, trd_frame2_trans);
+
+
+   // Pad Copper
+   TGeoBBox *trd_padcopper = new TGeoBBox("", sizeX /2., sizeY /2., padcopper_thickness /2.);
+   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume(Form("trd1mod%dpadcopper", moduleType), trd_padcopper, padcopperVolMed);
+   trdmod1_padcoppervol->SetLineColor(kOrange);
+   TGeoTranslation *trd_padcopper_trans = new TGeoTranslation("", 0., 0., padcopper_position);
+   module->AddNode(trdmod1_padcoppervol, 0, trd_padcopper_trans);
+
+   // Pad Plane
+   TGeoBBox* trd_padpcb = new TGeoBBox("", sizeX /2., sizeY /2., padplane_thickness /2.);
+   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume(Form("trd1mod%dpadplane", moduleType), trd_padpcb, padpcbVolMed);
+   trdmod1_padpcbvol->SetLineColor(kBlue);
+   TGeoTranslation *trd_padpcb_trans = new TGeoTranslation("", 0., 0., padplane_position);
+   module->AddNode(trdmod1_padpcbvol, 0, trd_padpcb_trans);
+
+   // Honeycomb
+   TGeoBBox* trd_honeycomb = new TGeoBBox("", sizeX /2., sizeY /2., honeycomb_thickness /2.);
+   TGeoVolume* trdmod1_honeycombvol = new TGeoVolume(Form("trd1mod%dhoneycomb", moduleType), trd_honeycomb, honeycombVolMed);
+   trdmod1_honeycombvol->SetLineColor(kOrange);
+   TGeoTranslation* trd_honeycomb_trans = new TGeoTranslation("", 0., 0., honeycomb_position);
+   module->AddNode(trdmod1_honeycombvol, 0, trd_honeycomb_trans);
+
+   // Carbon fiber layers
+   TGeoBBox* trd_carbon = new TGeoBBox("", sizeX /2., sizeY /2., carbon_thickness /2.);
+   TGeoVolume* trdmod1_carbonvol = new TGeoVolume(Form("trd1mod%dcarbon", moduleType), trd_carbon, carbonVolMed);
+   trdmod1_carbonvol->SetLineColor(kGreen);
+   TGeoTranslation* trd_carbon_trans = new TGeoTranslation("", 0., 0., carbon_position);
+   module->AddNode(trdmod1_carbonvol, 0, trd_carbon_trans);
 
 
    // FEBs
@@ -689,8 +687,6 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
       TGeoVolumeAssembly* trd_feb_inclined = new TGeoVolumeAssembly(Form("trd1mod%dfebincl", moduleType)); // volume for inclined FEBs, then shifted along y
       TGeoVolumeAssembly* trd_feb_box      = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));  // the mother volume of all FEBs
-
-      Float_t feb_rotation_angle = 45.; // 65.; // 45.; // 0.; // 70.;   // rotation around x-axis, should be < 90 degrees  
 
       // translations + rotations
       TGeoTranslation *trd_feb_trans1;     // center to corner

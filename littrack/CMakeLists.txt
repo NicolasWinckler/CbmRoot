@@ -195,7 +195,7 @@ If(Boost_FOUND)
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
-      cbm/qa/radlength/CbmLitRadlengthQa.cxx
+      cbm/qa/radlength/CbmLitRadLengthQa.cxx
     #  cbm/qa/sts/CbmStsSimulationQa.cxx
      )
 EndIf(Boost_FOUND)

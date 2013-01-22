@@ -55,7 +55,7 @@ void run_reco(Int_t nEvents = 2)
   //  TObjString trdDigiFile =  paramDir + "/trd/trd_v10b.digi.par";
   //  parFileList->Add(&trdDigiFile);
 
-  TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";//"./trd.digi.par";
+  TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
   parFileList->Add(&trdDigiFile);
 
   // In general, the following parts need not be touched

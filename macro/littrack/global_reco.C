@@ -266,7 +266,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		if (IsTof(parFile)) {
 			// ------ TOF hits --------------------------------------------------------
 			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
-			tofHitProd->SetParFileName(string(tofDigiFile));
+			//tofHitProd->SetParFileName(string(tofDigiFile));
 			run->AddTask(tofHitProd);
 			// ------------------------------------------------------------------------
 		}

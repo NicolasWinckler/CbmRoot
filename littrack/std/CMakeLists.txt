@@ -27,7 +27,6 @@ ${STD_DIR}base/CbmLitHitData.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBase.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBranch.cxx
 ${STD_DIR}finder/CbmLitTrackFinderNN.cxx
-${STD_DIR}finder/CbmLitNearestHitToTrackMerger.cxx
 ${STD_DIR}finder/CbmLitGating.cxx
 ${STD_DIR}finder/CbmLitNearestHitTofMerger.cxx
 

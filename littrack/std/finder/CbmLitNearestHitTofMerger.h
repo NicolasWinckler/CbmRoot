@@ -9,8 +9,6 @@
 #define CBMLITNEARESTHITTOFMERGER_H_
 
 #include "interface/CbmLitHitToTrackMerger.h"
-//#include "finder/CbmLitGating.h"
-//#include "base/CbmLitStation.h"
 #include "base/CbmLitPtrTypes.h"
 
 class CbmLitTrackPropagator;
@@ -51,4 +49,3 @@ private:
 };
 
 #endif /* CBMLITNEARESTHITTOTRACKMERGER_H_ */
-

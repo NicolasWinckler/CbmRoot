@@ -22,7 +22,7 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13d";
+const TString geoVersion = "trd_v13x";
 const TString FileNameSim = geoVersion + ".root";
 const TString FileNameGeo = geoVersion + "_geo.root";
 //const TString geoVersion = "trd1";
@@ -618,7 +618,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    // Gas
    TGeoBBox* trd_gas = new TGeoBBox("", activeAreaX /2., activeAreaY /2., gas_thickness /2.);
    TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd1mod%dgas", moduleType), trd_gas, gasVolMed);
-   trdmod1_gasvol->SetLineColor(kBlue);
+   //   trdmod1_gasvol->SetLineColor(kBlue);
+   trdmod1_gasvol->SetLineColor(kGreen); // to avoid blue overlaps in the screenshots
    TGeoTranslation* trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    module->AddNode(trdmod1_gasvol, 0, trd_gas_trans);
    // end of Frame in z

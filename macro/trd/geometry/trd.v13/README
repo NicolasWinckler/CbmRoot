@@ -1,0 +1,11 @@
+#
+##   Howto generate a digipar file form a .root geometry
+#
+
+# DE, January 2013
+
+# take the short geometry file (not containing the master volume)
+root -l -b -q create_geometry_file_root.C\(\"geometry/trd_v13d.root\"\)
+root -l -b -q create_digipar_root.C\(\"geometry/trd_v13d.root\"\)
+gcc -o cut_digipar_lf cut_digipar_lf.c 
+./cut_digipar_lf trd_v13d.digi.par.long trd_v13d.digi.par

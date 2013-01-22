@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 500)
+void global_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
@@ -32,7 +32,7 @@ void global_sim(Int_t nEvents = 500)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "./trd_sis100/events_wo_trd/"; // Directory for output simulation files
+	TString dir = "events/sts_tof_v07a/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -58,9 +58,9 @@ void global_sim(Int_t nEvents = 500)
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
-		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v11c.geo";
-		tofGeom    = "tof/tof_v12a.geo";
+		richGeom   = "";//"rich/rich_v08a.geo";
+		trdGeom    = "";//"trd/trd_v11c.geo";
+		tofGeom    = "tof/tof_v07a.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";
 		magnetGeom = "passive/magnet_v12a.geo";

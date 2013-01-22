@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 void global_reco(Int_t nEvents = 100, // number of events
-		TString opt = "all")
+		TString opt = "tracking")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "/Users/andrey/Development/cbm/d/events/much_fail/"; // Output directory
+	TString dir = "events/sts_tof_v13a/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -35,6 +35,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
+   TString tofDigiFile = "/parameters/tof/par_tof_V13a.txt";//parDir + "/tof/par_tof_V13a.txt";
 
    // Directory for output results
    TString resultDir = "./test/";
@@ -71,6 +72,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
 		trdDigiFile = TString(gSystem->Getenv("LIT_TRD_DIGI"));
 		muchDigiFile = TString(gSystem->Getenv("LIT_MUCH_DIGI"));
+		tofDigiFile = TString(gSystem->Getenv("LIT_TOF_DIGI"));
 		stsMatBudgetFile = TString(gSystem->Getenv("LIT_STS_MAT_BUDGET_FILE"));
 
 		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
@@ -264,6 +266,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		if (IsTof(parFile)) {
 			// ------ TOF hits --------------------------------------------------------
 			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
+			tofHitProd->SetParFileName(string(tofDigiFile));
 			run->AddTask(tofHitProd);
 			// ------------------------------------------------------------------------
 		}

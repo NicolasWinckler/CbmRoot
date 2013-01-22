@@ -67,6 +67,7 @@ function set_default_muon_geometry() {
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
     export LIT_TOF_GEOM=tof/tof_v07a.geo
+    export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
@@ -98,6 +99,7 @@ function set_default_electron_geometry() {
     export LIT_TRD_GEOM=trd/trd_v11c.geo
     export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v11c.digi.par
     export LIT_TOF_GEOM=tof/tof_v07a.geo
+    export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
@@ -129,6 +131,7 @@ function set_default_mvd_geometry() {
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
     export LIT_TOF_GEOM=
+    export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
@@ -158,6 +161,7 @@ function set_default_sts_geometry() {
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
     export LIT_TOF_GEOM=
+    export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
@@ -189,6 +193,7 @@ function set_default_sts_tof_geometry() {
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
     export LIT_TOF_GEOM=tof/tof_v07a.geo
+    export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo

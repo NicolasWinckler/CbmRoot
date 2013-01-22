@@ -10,7 +10,9 @@
 
 #include "FairTask.h"
 #include <string>
+#include <map>
 using std::string;
+using std::map;
 class CbmHistManager;
 class TClonesArray;
 
@@ -67,10 +69,28 @@ private:
      */
     void ExecTrd();
 
+    void FillHistosTrd(
+          const map<Int_t, map<Int_t, map<Int_t, Double_t> > >& map,
+          const string& histName,
+          Double_t x,
+          Double_t y);
+
     /**
      * \brief Draw histograms.
      */
     void Draw();
+
+    /**
+     * \brief Draw TProfile2D by pattern name.
+     */
+    void DrawP2ByPattern(
+          const string& pattern);
+
+    /**
+     * \brief Draw TH1 by pattern name.
+     */
+    void DrawH1ByPattern(
+          const string& pattern);
 
     CbmHistManager* fHM; // Histogram manager
     string fOutputDir; // Output directory for results

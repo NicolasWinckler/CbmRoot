@@ -29,6 +29,7 @@ ${STD_DIR}finder/CbmLitTrackFinderBranch.cxx
 ${STD_DIR}finder/CbmLitTrackFinderNN.cxx
 ${STD_DIR}finder/CbmLitNearestHitToTrackMerger.cxx
 ${STD_DIR}finder/CbmLitGating.cxx
+${STD_DIR}finder/CbmLitNearestHitTofMerger.cxx
 
 ${STD_DIR}fitter/CbmLitTrackFitterImp.cxx 
 ${STD_DIR}fitter/CbmLitKalmanFilter.cxx

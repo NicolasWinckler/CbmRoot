@@ -46,7 +46,8 @@ CbmLitTrackingGeometryConstructor::CbmLitTrackingGeometryConstructor():
    fGeo(NULL),
    fMedium(),
    fDet(),
-   fTrdTrackingGeo(NULL)
+   fTrdTrackingGeo(NULL),
+   fTofTrackingGeo(NULL)
 {
 	fGeo = gGeoManager;
 	CreateMediumList();
@@ -64,9 +65,13 @@ CbmLitTrackingGeometryConstructor* CbmLitTrackingGeometryConstructor::Instance()
 
 void CbmLitTrackingGeometryConstructor::Draw()
 {
-   fTrdTrackingGeo->SetVisLevel(0);
-   TGeoVolume* trdGeoMaster = fTrdTrackingGeo->GetMasterVolume();
-   trdGeoMaster->Draw("ogl");
+   //fTrdTrackingGeo->SetVisLevel(0);
+   //TGeoVolume* trdGeoMaster = fTrdTrackingGeo->GetMasterVolume();
+   //trdGeoMaster->Draw("ogl");
+   GetTofStation();
+   fTofTrackingGeo->SetVisLevel(0);
+   TGeoVolume* tofGeoMaster = fTofTrackingGeo->GetMasterVolume();
+   tofGeoMaster->Draw("ogl");
 }
 
 void CbmLitTrackingGeometryConstructor::CreateMediumList()
@@ -638,7 +643,7 @@ void CbmLitTrackingGeometryConstructor::ConstructTof()
 	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
 		TGeoNode* tof = (TGeoNode*) nodes->At(iNode);
-		if (TString(tof->GetName()).Contains("tof")) {
+		if (TString(tof->GetName()).Contains("tof1_0")) {
 			const Double_t* tofPos = tof->GetMatrix()->GetTranslation();
 			TGeoNode* gas = (TGeoNode*)tof->GetNodes()->At(0);
 			const Double_t* gasPos = gas->GetMatrix()->GetTranslation();
@@ -662,7 +667,7 @@ const CbmLitStation& CbmLitTrackingGeometryConstructor::GetTofStation()
 {
    static Bool_t layoutCreated = false;
    if (!layoutCreated) {
-      ConstructTofStation();
+      ConstructTofStationV13a();
       layoutCreated = true;
    }
    return fTofStation;
@@ -674,7 +679,7 @@ void CbmLitTrackingGeometryConstructor::ConstructTofStation()
 	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
 		TGeoNode* tof = (TGeoNode*) nodes->At(iNode);
-		if (TString(tof->GetName()).Contains("tof")) {
+		if (TString(tof->GetName()).Contains("tof1_0")) {
 			const Double_t* tofPos = tof->GetMatrix()->GetTranslation();
 			TGeoNode* gas = (TGeoNode*)tof->GetNodes()->At(0);
 			const Double_t* gasPos = gas->GetMatrix()->GetTranslation();
@@ -690,6 +695,68 @@ void CbmLitTrackingGeometryConstructor::ConstructTofStation()
 	}
 	fTofStation = station;
 	std::cout << fTofStation.ToString();
+}
+
+void CbmLitTrackingGeometryConstructor::ConstructTofStationV13a()
+{
+   // Saved pointer to gGeoManager which will point to a new object after creation of new TGeoManager
+   TGeoManager* savedGeo = gGeoManager;
+   gGeoManager = 0;
+   // Create new TGeoManager for TOF tracking geometry
+   fTofTrackingGeo = new TGeoManager("TofTrackingGeo", "CBM TOF tracking geometry");
+   TGeoVolume* topVolume = fTofTrackingGeo->MakeBox("cave", fMedium["air"], 20000., 20000., 20000.);
+   fTofTrackingGeo->SetTopVolume(topVolume);
+
+
+
+   CbmLitStation station;
+   TObjArray* nodes = fGeo->GetTopNode()->GetNodes();
+   for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+      TGeoNode* tof = (TGeoNode*) nodes->At(iNode);
+      if (TString(tof->GetName()).Contains("tof")) { // Looking for nodes with "tof"
+         const Double_t* tofPos = tof->GetMatrix()->GetTranslation();
+         TGeoNode* gas = (TGeoNode*)tof->GetNodes()->At(0); // There is only one node so we take it safely
+         const Double_t* gasPos = gas->GetMatrix()->GetTranslation();
+         TObjArray* gasNodes = gas->GetNodes(); // Nodes inside gas volume
+
+         // Loop over the nodes in gas volume and look for modules, i.e. nodes containing "mod" in the name.
+         for (Int_t iGasNode = 0; iGasNode < gasNodes->GetEntriesFast(); iGasNode++) {
+            TGeoNode* module = (TGeoNode*) gasNodes->At(iGasNode);
+            if (TString(module->GetName()).Contains("mod")) { // Looking for nodes with "mod"
+               const Double_t* modulePos = module->GetMatrix()->GetTranslation();
+
+               TGeoBBox* moduleShape = static_cast<TGeoBBox*>(module->GetVolume()->GetShape());
+              // TGeoBBox* modulePartShape = static_cast<TGeoBBox*>(modulePart->GetVolume()->GetShape());
+               TGeoShape* newShape = new TGeoBBox(moduleShape->GetDX(), moduleShape->GetDY(), moduleShape->GetDZ());
+               TGeoMedium* newMedium = fMedium["air"];
+              // string moduleName = ToString<Int_t>(stationId) + "_" + ToString<Int_t>(layerId) + "_" + ToString<Int_t>(0) + "_" + ToString<Int_t>(moduleId);
+               string moduleName = module->GetName();
+               TGeoVolume* newVolume = new TGeoVolume(moduleName.c_str(), newShape, newMedium);
+               TGeoHMatrix* newMatrix = new TGeoHMatrix((*tof->GetMatrix()) * (*gas->GetMatrix()) * (*module->GetMatrix()));
+               newVolume->SetLineColor(gRandom->Uniform(0, 100));
+               fTofTrackingGeo->GetTopVolume()->AddNode(newVolume, 0, newMatrix);
+            }
+         }
+
+         CbmLitSubstation substation;
+         //substation.SetZ(tofPos[2] + gasPos[2] + modulePos[2] + shape->GetDZ());
+         station.SetType(kLITPIXELHIT);
+         station.AddSubstation(substation);
+      }
+   }
+
+
+
+// fTofTrackingGeo->CloseGeometry();
+   fTofTrackingGeo->Print();
+   fTofTrackingGeo->CheckOverlaps(1e-7,"SAME");
+   fTofTrackingGeo->PrintOverlaps();
+// fTofTrackingGeo->Write();
+
+   gGeoManager = savedGeo;
+
+   fTofStation = station;
+   std::cout << fTofStation.ToString();
 }
 
 void CbmLitTrackingGeometryConstructor::ConstructRich()

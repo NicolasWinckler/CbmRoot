@@ -1,5 +1,5 @@
 /**
- * \file CbmLitTrackingGeometryConstructor.h
+- * \file CbmLitTrackingGeometryConstructor.h
  * \brief Tracking geometry constructor.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
@@ -176,6 +176,11 @@ private:
    void ConstructTofStation();
 
    /**
+    * \brief Construct TOF tracking station for v13X geometry version.
+    */
+   void ConstructTofStationV13a();
+
+   /**
     * \brief Construct simplified RICH geometry.
     */
    void ConstructRich();
@@ -193,6 +198,7 @@ private:
    CbmLitDetectorLayout fLayout; // Detector layout
    CbmLitDetectorLayout fMvdLayout; // MVD detector layout
    CbmLitDetectorLayout fMuchLayout; // MUCH detector layout
+   TGeoManager* fTofTrackingGeo; // This is needed for TOF with rotated planes.
    CbmLitDetectorLayout fTofLayout; // TOf detector layout
    CbmLitStation fTofStation; // TOF station
    TGeoManager* fTrdTrackingGeo; // This is needed for TRD geometries with rotated planes.

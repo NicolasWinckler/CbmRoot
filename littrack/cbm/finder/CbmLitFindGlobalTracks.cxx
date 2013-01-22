@@ -199,6 +199,8 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
    if (fDet.GetDet(kTOF)) {
       if (fMergerType == "nearest_hit") {
          fMerger = factory->CreateHitToTrackMerger("tof_nearest_hit");
+      } else if (fMergerType == "nearest_hit_new") {
+         fMerger = factory->CreateHitToTrackMerger("tof_nearest_hit_new");
       } else {
          TObject::Fatal("CbmLitFindGlobalTracks","Merger type not found");
       }

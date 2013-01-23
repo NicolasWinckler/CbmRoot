@@ -481,6 +481,9 @@ private:
    TH2D* fh_source_tracks;
 
    TH1D* fh_nof_mismatches;
+   TH1D* fh_nof_mismatches_rich;
+   TH1D* fh_nof_mismatches_trd;
+   TH1D* fh_nof_mismatches_tof;
    TH1D* fh_nof_ghosts;
 
    //First index is the source type: [0]-signal, [1]-bg, [2]-pi0, [3]-gamma

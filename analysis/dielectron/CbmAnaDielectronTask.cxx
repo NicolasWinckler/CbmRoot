@@ -230,6 +230,12 @@ void CbmAnaDielectronTask::InitHists()
    //Number of mismatches and ghosts after each cut
    fh_nof_mismatches = new TH1D("fh_nof_mismatches","fh_nof_mismatches;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
    fHistoList.push_back(fh_nof_mismatches);
+   fh_nof_mismatches_rich = new TH1D("fh_nof_mismatches_rich","fh_nof_mismatches_rich;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
+   fHistoList.push_back(fh_nof_mismatches_rich);
+   fh_nof_mismatches_trd = new TH1D("fh_nof_mismatches_trd","fh_nof_mismatches_trd;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
+   fHistoList.push_back(fh_nof_mismatches_trd);
+   fh_nof_mismatches_tof = new TH1D("fh_nof_mismatches_tof","fh_nof_mismatches_tof;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
+   fHistoList.push_back(fh_nof_mismatches_tof);
    fh_nof_ghosts = new TH1D("fh_nof_ghosts","fh_nof_ghosts;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
    fHistoList.push_back(fh_nof_ghosts);
 
@@ -901,6 +907,9 @@ void CbmAnaDielectronTask::TrackSource(
 		fh_source_pt[kSignal][step]->Fill(pt, fWeight);
 	} else {
 	   if (IsMismatch(cand)) fh_nof_mismatches->Fill(binNum);
+	   if (cand->stsMcTrackId != cand->richMcTrackId) fh_nof_mismatches_rich->Fill(binNum);
+	   if (fUseTrd && cand->stsMcTrackId != cand->trdMcTrackId) fh_nof_mismatches_trd->Fill(binNum);
+	   if (cand->stsMcTrackId != cand->tofMcTrackId) fh_nof_mismatches_tof->Fill(binNum);
 	   if (IsGhost(cand)) fh_nof_ghosts->Fill(binNum);
 		fh_nof_bg_tracks->Fill(binNum);
 		fh_source_mom[kBg][step]->Fill(mom);

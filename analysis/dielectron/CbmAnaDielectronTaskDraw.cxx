@@ -318,6 +318,8 @@ void CbmAnaDielectronTaskDraw::SOverBg(
    TH2D* pty = H2("fh_signal_pty_" + CbmAnaLmvmNames::fAnaSteps[step]);
    TH2D* ptymc = H2("fh_signal_pty_" + CbmAnaLmvmNames::fAnaSteps[0]);
 
+   if (s->GetEntries() < 1) return;
+
    TH1D* sClone = (TH1D*)s->Clone();
    sClone->Fit("gaus", "Q");
 
@@ -753,7 +755,7 @@ void CbmAnaDielectronTaskDraw::DrawMinvSandBg(
    s->SetLineStyle(CbmDrawingOptions::MarkerStyle(1));
    bg->SetFillColor(kYellow - 10);
    bg->SetLineColor(kBlack);
-   bg->SetLineWidth(1);
+   bg->SetLineWidth(2);
    bg->SetLineStyle(CbmDrawingOptions::MarkerStyle(1));
    sbg->SetFillColor(kBlue);
    sbg->SetLineColor(kBlack);
@@ -776,6 +778,9 @@ void CbmAnaDielectronTaskDraw::DrawMinvSandBgAll()
       c->cd(hi++);
       DrawMinvSandBg(step);
    }
+
+   TCanvas *cPtCut = CreateCanvas("lmvm_minv_both_s_and_bg_ptcut", "lmvm_minv_both_s_and_bg_ptcut", 900, 900);
+   DrawMinvSandBg(kPtCut);
 }
 
 void CbmAnaDielectronTaskDraw::DrawMinvSource(
@@ -960,17 +965,46 @@ void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
    }
 
    TCanvas *c1 = CreateCanvas("lmvm_nof_mismatches", "lmvm_nof_mismatches", 600, 600);
-   TH1D* hbg = (TH1D*)H1("fh_nof_mismatches")->Clone();
-   //hbg->Scale(10);
-   //hbg->GetYaxis()->SetTitle("Tracks/event x10^{-1}");
-   hbg->GetXaxis()->SetRange(kReco + 1, rangeMax);
-   DrawH1( hbg, kLinear, kLog, "hist text0");
-   hbg->SetMarkerSize(2.);
+   c1->Divide(2,2);
+   c1->cd(1);
+   TH1D* hmismatches = (TH1D*)H1("fh_nof_mismatches")->Clone();
+   hmismatches->Scale(10);
+   hmismatches->GetYaxis()->SetTitle("Mismatch tracks/event x10^{-1}");
+   hmismatches->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hmismatches, kLinear, kLog, "hist text0");
+
+   hmismatches->SetMarkerSize(2.);
+   SetAnalysisStepLabels(hmismatches);
+   c1->cd(2);
+   TH1D* hmismatches_rich = (TH1D*)H1("fh_nof_mismatches_rich")->Clone();
+   hmismatches_rich->Scale(10);
+   hmismatches_rich->GetYaxis()->SetTitle("Mismatch tracks (RICH)/event x10^{-1}");
+   hmismatches_rich->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hmismatches_rich, kLinear, kLog, "hist text0");
+   hmismatches_rich->SetMarkerSize(2.);
+   SetAnalysisStepLabels(hmismatches_rich);
+   c1->cd(3);
+   TH1D* hmismatches_trd = (TH1D*)H1("hmismatches_trd")->Clone();
+   hmismatches_trd->Scale(10);
+   hmismatches_trd->GetYaxis()->SetTitle("Mismatch tracks (TRD)/event x10^{-1}");
+   hmismatches_trd->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hmismatches_trd, kLinear, kLog, "hist text0");
+   hmismatches_trd->SetMarkerSize(2.);
+   SetAnalysisStepLabels(hmismatches_trd);
+   c1->cd(4);
+   TH1D* hmismatches_tof = (TH1D*)H1("fh_nof_mismatches")->Clone();
+   hmismatches_tof->Scale(10);
+   hmismatches_tof->GetYaxis()->SetTitle("Mismatch tracks (TOF)/event x10^{-1}");
+   hmismatches_tof->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hmismatches_tof, kLinear, kLog, "hist text0");
+   hmismatches_tof->SetMarkerSize(2.);
+   SetAnalysisStepLabels(hmismatches_tof);
 
    TCanvas *c2 = CreateCanvas("lmvm_nof_ghosts", "lmvm_nof_ghosts", 600, 600);
-   TH1D* hel = H1("fh_nof_ghosts");
-   hel->GetXaxis()->SetRange(kReco + 1, rangeMax);
-   DrawH1( hel, kLinear, kLog);
+   TH1D* hghosts = H1("fh_nof_ghosts");
+   hghosts->GetXaxis()->SetRange(kReco + 1, rangeMax);
+   DrawH1( hghosts, kLinear, kLog);
+   SetAnalysisStepLabels(hghosts);
 }
 
 void CbmAnaDielectronTaskDraw::SetAnalysisStepLabels(

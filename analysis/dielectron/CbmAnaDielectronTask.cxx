@@ -691,6 +691,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
       cand.chi2Prim = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
       FairTrackParam vtxTrack;
       fKFFitter.FitToVertex(stsTrack, fPrimVertex, &vtxTrack);// Fit tracks to the primary vertex
+
       vtxTrack.Position(cand.position);
       vtxTrack.Momentum(cand.momentum);
       cand.mass = TDatabasePDG::Instance()->GetParticle(11)->Mass();
@@ -736,6 +737,16 @@ void CbmAnaDielectronTask::FillCandidateArray()
       if (tofHit == NULL) continue;
 
       IsElectron(richRing, cand.momentum.Mag(), trdTrack, gTrack, &cand);
+
+      if (false) {
+         // distance to vertex cut
+         double dx = vtxTrack.GetX() - fPrimVertex->GetX();
+         double dy = vtxTrack.GetY() - fPrimVertex->GetY();
+         double dz = vtxTrack.GetZ() - fPrimVertex->GetZ();
+         double r = TMath::Sqrt(dx*dx + dy*dy + dz*dz);
+         if(r > 0.0025) continue;
+      }
+
       fCandidates.push_back(cand);
    }// global tracks
    cout << "fCandidates.size() = " << fCandidates.size() << endl;

@@ -87,6 +87,9 @@ void CbmLitRadLengthQa::CreateHistograms()
    fHM->Add("hrl_Thickness_Total_H1", new TH1D("hrl_Thickness_Total_H1", "hrl_Thickness_Total_H1;Thickness [cm];Entries", nofBins, 0, 0));
    fHM->Add("hrl_Thickness_Total_P2", new TProfile2D("hrl_Thickness_Total_P2", "hrl_Thickness_Total_P2;X [cm];Y [cm];Thickness [cm]", nofBins, 0., 0., nofBins, 0., 0.));
 
+   fHM->Add("hrl_ThicknessSilicon_Total_H1", new TH1D("hrl_ThicknessSilicon_Total_H1", "hrl_ThicknessSilicon_Total_H1;Thickness [cm];Entries", nofBins, 0, 0));
+   fHM->Add("hrl_ThicknessSilicon_Total_P2", new TProfile2D("hrl_ThicknessSilicon_Total_P2", "hrl_ThicknessSilicon_Total_P2;X [cm];Y [cm];Thickness [cm]", nofBins, 0., 0., nofBins, 0., 0.));
+
    Int_t nofStations = 3;
    std::vector<Int_t> nofLayersPerStation = list_of(4)(4)(2);
    for (Int_t iStation = 0; iStation < nofStations; iStation++) {
@@ -100,6 +103,10 @@ void CbmLitRadLengthQa::CreateHistograms()
          fHM->Add(name, new TH1D(name.c_str(), string(name + ";Thickness [cm];Entries").c_str(), nofBins, 0, 0));
          name = "hrl_Thickness_Trd_" + ToString<Int_t>(iStation + 1) + "_" + ToString<Int_t>(iLayer + 1) + "_P2";
          fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+         name = "hrl_ThicknessSilicon_Trd_" + ToString<Int_t>(iStation  + 1) + "_" + ToString<Int_t>(iLayer + 1) + "_H1";
+         fHM->Add(name, new TH1D(name.c_str(), string(name + ";Thickness [cm];Entries").c_str(), nofBins, 0, 0));
+         name = "hrl_ThicknessSilicon_Trd_" + ToString<Int_t>(iStation + 1) + "_" + ToString<Int_t>(iLayer + 1) + "_P2";
+         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
       }
    }
 
@@ -110,6 +117,7 @@ void CbmLitRadLengthQa::ExecTotal()
 {
    map<Int_t, Double_t> radThicknessOnTrack; // track ID -> sum of radiation thickness on track
    map<Int_t, Double_t> thicknessOnTrack; // track ID -> sum of track lengthens on track
+   map<Int_t, Double_t> thicknessSiliconOnTrack; // track ID -> sum of track lengthens on track in silicon equivalent
 
    Double_t x, y;
    for (Int_t iRL = 0; iRL < fRadLen->GetEntriesFast(); iRL++) {
@@ -121,14 +129,17 @@ void CbmLitRadLengthQa::ExecTotal()
       x = pos.X();
       y = pos.Y();
 
-      const Double_t radThick = res.Mag() / point->GetRadLength();
-      radThicknessOnTrack[point->GetTrackID()] += radThick;
-      thicknessOnTrack[point->GetTrackID()] += res.Mag();
+      const Double_t thickness = res.Mag();
+      const Double_t radThickness = 100 * thickness / point->GetRadLength();
+      const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
+      radThicknessOnTrack[point->GetTrackID()] += radThickness;
+      thicknessOnTrack[point->GetTrackID()] += thickness;
+      thicknessSiliconOnTrack[point->GetTrackID()] += thicknessSilicon;
    }
 
    map<Int_t, Double_t>::const_iterator it;
    for (it = radThicknessOnTrack.begin(); it != radThicknessOnTrack.end(); it++) {
-      Double_t rl = (*it).second * 100;
+      Double_t rl = (*it).second;
       fHM->H1("hrl_RadThickness_Total_H1")->Fill(rl);
       fHM->P2("hrl_RadThickness_Total_P2")->Fill(x, y, rl);
    }
@@ -138,6 +149,12 @@ void CbmLitRadLengthQa::ExecTotal()
       fHM->H1("hrl_Thickness_Total_H1")->Fill(tl);
       fHM->P2("hrl_Thickness_Total_P2")->Fill(x, y, tl);
    }
+
+   for (it = thicknessSiliconOnTrack.begin(); it != thicknessSiliconOnTrack.end(); it++) {
+      Double_t tl = (*it).second;
+      fHM->H1("hrl_ThicknessSilicon_Total_H1")->Fill(tl);
+      fHM->P2("hrl_ThicknessSilicon_Total_P2")->Fill(x, y, tl);
+   }
 }
 
 void CbmLitRadLengthQa::ExecTrd()
@@ -145,6 +162,7 @@ void CbmLitRadLengthQa::ExecTrd()
    // track ID -> TRD station ID -> TRD Layer ID -> parameter
    map<Int_t, map<Int_t, map<Int_t, Double_t> > > radThicknessOnTrack; // track ID -> sum of radiation thickness on track
    map<Int_t, map<Int_t, map<Int_t, Double_t> > > thicknessOnTrack; // track ID -> sum of thickness on track
+   map<Int_t, map<Int_t, map<Int_t, Double_t> > > thicknessSiliconOnTrack; // track ID -> sum of thickness on track
 
    Double_t x, y;
    for (Int_t iRL = 0; iRL < fRadLen->GetEntriesFast(); iRL++) {
@@ -167,14 +185,17 @@ void CbmLitRadLengthQa::ExecTrd()
          Int_t station = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is station number
          Int_t layer = std::atoi(string(1, *(gGeoManager->GetPath() + 25)).c_str()); // 25th element is layer number
          const Double_t thickness = res.Mag();
-         const Double_t radThickness = (thickness / point->GetRadLength()) * 100;
+         const Double_t radThickness = 100 * thickness / point->GetRadLength();
+         const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
          radThicknessOnTrack[trackId][station][layer] += radThickness;
          thicknessOnTrack[trackId][station][layer] += thickness;
+         thicknessSiliconOnTrack[trackId][station][layer] += thicknessSilicon;
       }
    }
 
    FillHistosTrd(radThicknessOnTrack, "hrl_RadThickness_Trd_", x, y);
    FillHistosTrd(thicknessOnTrack, "hrl_Thickness_Trd_", x, y);
+   FillHistosTrd(thicknessSiliconOnTrack, "hrl_ThicknessSilicon_Trd_", x, y);
 }
 
 void CbmLitRadLengthQa::FillHistosTrd(
@@ -216,10 +237,18 @@ void CbmLitRadLengthQa::Draw()
    TCanvas* canvas4 = new TCanvas("hrl_RadThickness_Total_P2", "hrl_RadThickness_Total_P2", 1000, 1000);
    DrawH2(fHM->P2("hrl_RadThickness_Total_P2"));
 
+   TCanvas* canvas5 = new TCanvas("hrl_ThicknessSilicon_Total_H1", "hrl_ThicknessSilicon_Total_H1", 1000, 1000);
+   DrawH1(fHM->H1("hrl_ThicknessSilicon_Total_H1"));
+
+   TCanvas* canvas6 = new TCanvas("hrl_ThicknessSilicon_Total_P2", "hrl_ThicknessSilicon_Total_P2", 1000, 1000);
+   DrawH2(fHM->P2("hrl_ThicknessSilicon_Total_P2"));
+
    DrawH1ByPattern("hrl_RadThickness_Trd_.+_.+_H1");
    DrawP2ByPattern("hrl_RadThickness_Trd_.+_.+_P2");
    DrawH1ByPattern("hrl_Thickness_Trd_.+_.+_H1");
    DrawP2ByPattern("hrl_Thickness_Trd_.+_.+_P2");
+   DrawH1ByPattern("hrl_ThicknessSilicon_Trd_.+_.+_H1");
+   DrawP2ByPattern("hrl_ThicknessSilicon_Trd_.+_.+_P2");
 }
 
 void CbmLitRadLengthQa::DrawH1ByPattern(

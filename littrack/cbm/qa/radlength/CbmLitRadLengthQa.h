@@ -75,23 +75,6 @@ private:
           Double_t x,
           Double_t y);
 
-    /**
-     * \brief Draw histograms.
-     */
-    void Draw();
-
-    /**
-     * \brief Draw TProfile2D by pattern name.
-     */
-    void DrawP2ByPattern(
-          const string& pattern);
-
-    /**
-     * \brief Draw TH1 by pattern name.
-     */
-    void DrawH1ByPattern(
-          const string& pattern);
-
     // Material properties of silicon
     static const Double_t SILICON_DENSITY = 2.33; // g*cm^-3
     static const Double_t SILICON_A = 28.08855; // silicon atomic weight

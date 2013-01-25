@@ -5,6 +5,7 @@
  */
 
 #include "CbmLitRadLengthQa.h"
+#include "CbmLitRadLengthQaReport.h"
 #include "CbmHistManager.h"
 #include "FairRootManager.h"
 #include "FairRadLenPoint.h"
@@ -69,6 +70,9 @@ void CbmLitRadLengthQa::Exec(
 void CbmLitRadLengthQa::Finish()
 {
    fHM->WriteToFile();
+   CbmSimulationReport* report = new CbmLitRadLengthQaReport();
+   report->Create(fHM, fOutputDir);
+   delete report;
    Draw();
 }
 
@@ -91,7 +95,7 @@ void CbmLitRadLengthQa::CreateHistograms()
    fHM->Add("hrl_ThicknessSilicon_Total_P2", new TProfile2D("hrl_ThicknessSilicon_Total_P2", "hrl_ThicknessSilicon_Total_P2;X [cm];Y [cm];Thickness [cm]", nofBins, 0., 0., nofBins, 0., 0.));
 
    Int_t nofStations = 3;
-   std::vector<Int_t> nofLayersPerStation = list_of(4)(4)(2);
+   std::vector<Int_t> nofLayersPerStation = list_of(4)(4)(4);
    for (Int_t iStation = 0; iStation < nofStations; iStation++) {
       Int_t nofLayers = nofLayersPerStation[iStation];
       for (Int_t iLayer = 0; iLayer < nofLayers; iLayer++) {
@@ -180,10 +184,26 @@ void CbmLitRadLengthQa::ExecTrd()
       TGeoNode* node = gGeoManager->FindNode(middle.X(), middle.Y(), middle.Z());
       TString name = node->GetName();
       TString path = gGeoManager->GetPath();
-      TRegexp e("/cave_1/trd1_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+");
-      if (path.Contains(e)) {
-         Int_t station = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is station number
-         Int_t layer = std::atoi(string(1, *(gGeoManager->GetPath() + 25)).c_str()); // 25th element is layer number
+      Int_t station = 0;
+      Int_t layer = 0;
+      Bool_t nodeExists = false;
+
+      if (path.Contains(TRegexp("/cave_1/trd[1-3]_0/trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]/trd[1-3]mod.+"))) { // trd_v10b and trd_v11c
+         station = std::atoi(string(1, *(gGeoManager->GetPath() + 18)).c_str()); // 18th element is station number
+         layer = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is layer number
+         nodeExists = true;
+      } else if (path.Contains(TRegexp("/cave_1/trd1_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v12x
+         station = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is station number
+         layer = std::atoi(string(1, *(gGeoManager->GetPath() + 25)).c_str()); // 25th element is layer number
+         nodeExists = true;
+      } else if (path.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v13x
+         station = std::atoi(string(1, *(gGeoManager->GetPath() + 28)).c_str()); // 28th element is station number
+         layer = std::atoi(string(1, *(gGeoManager->GetPath() + 29)).c_str()); // 29th element is layer number
+         nodeExists = true;
+      }
+
+      // Check if node exists in one of the geometry versions
+      if (nodeExists) {
          const Double_t thickness = res.Mag();
          const Double_t radThickness = 100 * thickness / point->GetRadLength();
          const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
@@ -220,58 +240,6 @@ void CbmLitRadLengthQa::FillHistosTrd(
             fHM->P2(name)->Fill(x, y, param);
          }
       }
-   }
-}
-
-void CbmLitRadLengthQa::Draw()
-{
-   TCanvas* canvas1 = new TCanvas("hrl_Thickness_Total_H1", "hrl_Thickness_Total_H1", 1000, 1000);
-   DrawH1(fHM->H1("hrl_Thickness_Total_H1"));
-
-   TCanvas* canvas2 = new TCanvas("hrl_Thickness_Total_P2", "hrl_Thickness_Total_P2", 1000, 1000);
-   DrawH2(fHM->P2("hrl_Thickness_Total_P2"));
-
-   TCanvas* canvas3 = new TCanvas("hrl_RadThickness_Total_H1", "hrl_RadThickness_Total_H1", 1000, 1000);
-   DrawH1(fHM->H1("hrl_RadThickness_Total_H1"));
-
-   TCanvas* canvas4 = new TCanvas("hrl_RadThickness_Total_P2", "hrl_RadThickness_Total_P2", 1000, 1000);
-   DrawH2(fHM->P2("hrl_RadThickness_Total_P2"));
-
-   TCanvas* canvas5 = new TCanvas("hrl_ThicknessSilicon_Total_H1", "hrl_ThicknessSilicon_Total_H1", 1000, 1000);
-   DrawH1(fHM->H1("hrl_ThicknessSilicon_Total_H1"));
-
-   TCanvas* canvas6 = new TCanvas("hrl_ThicknessSilicon_Total_P2", "hrl_ThicknessSilicon_Total_P2", 1000, 1000);
-   DrawH2(fHM->P2("hrl_ThicknessSilicon_Total_P2"));
-
-   DrawH1ByPattern("hrl_RadThickness_Trd_.+_.+_H1");
-   DrawP2ByPattern("hrl_RadThickness_Trd_.+_.+_P2");
-   DrawH1ByPattern("hrl_Thickness_Trd_.+_.+_H1");
-   DrawP2ByPattern("hrl_Thickness_Trd_.+_.+_P2");
-   DrawH1ByPattern("hrl_ThicknessSilicon_Trd_.+_.+_H1");
-   DrawP2ByPattern("hrl_ThicknessSilicon_Trd_.+_.+_P2");
-}
-
-void CbmLitRadLengthQa::DrawH1ByPattern(
-      const string& pattern)
-{
-   std::vector<TH1*> histos = fHM->H1Vector(pattern);
-   Int_t nofHistos = histos.size();
-   for (Int_t i = 0; i < nofHistos; i++) {
-      TH1* hist = histos[i];
-      TCanvas* canvas = new TCanvas(hist->GetName(), hist->GetName(), 1000, 1000);
-      DrawH1(hist);
-   }
-}
-
-void CbmLitRadLengthQa::DrawP2ByPattern(
-      const string& pattern)
-{
-   std::vector<TProfile2D*> profiles = fHM->P2Vector(pattern);
-   Int_t nofProfiles = profiles.size();
-   for (Int_t i = 0; i < nofProfiles; i++) {
-      TProfile2D* profile = profiles[i];
-      TCanvas* canvas = new TCanvas(profile->GetName(), profile->GetName(), 1000, 1000);
-      DrawH2(profile);
    }
 }
 

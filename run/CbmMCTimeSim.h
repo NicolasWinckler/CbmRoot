@@ -87,12 +87,6 @@ class CbmMCTimeSim : public FairTask
   Double_t GetMaxBufferSize() const { return fMaxBufferSize; }
 
 
-  /**   Screen output 
-   ** Reports the current buffer sizes.
-   **/
-  virtual void Print(Option_t* opt = "");
-
-
   /**   Set maximal buffer size
    ** @param size  Maximal buffer size< Default is 1 GB
    **/

@@ -112,16 +112,22 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
   nFront = nBack = 0;
 
 
-  // Get corresponding sensor
+  // Get corresponding node from GeoManager
   Double_t xPoint = 0.5 * ( point->GetXOut() + point->GetXIn() );
   Double_t yPoint = 0.5 * ( point->GetYOut() + point->GetYIn() );
   Double_t zPoint = 0.5 * ( point->GetZOut() + point->GetZIn() );
   gGeoManager->FindNode(xPoint, yPoint, zPoint);
   TGeoNode* curNode = gGeoManager->GetCurrentNode();
-  CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
-  fLogger->Debug(MESSAGE_ORIGIN,
-               "Point (%d, %d, %d)", xPoint, yPoint, zPoint);
-  sensor->Print();
+
+
+
+  // --- Get corresponding sensor from StsDigiScheme
+  CbmStsSensor* sensor = NULL;
+  if ( fDigiScheme->IsNewGeometry() ) {
+    TString curPath = fDigiScheme->GetCurrentPath();
+    sensor = fDigiScheme->GetSensorByName(curPath);
+  }
+  else sensor = fDigiScheme->GetSensorByName(curNode->GetName());
 
 
   // Length of trajectory in the sensor
@@ -174,7 +180,7 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
                             0,                       // front side
                             (*it).first,             // channel number
                             iAdc,                    // ADC channel
-                            0);                      // time
+                            point->GetTime());                      // time
     CbmDaqBuffer::Instance()->InsertData(digi);
     nFront++;
   }
@@ -192,10 +198,17 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
                             1,                       // back side
                             (*it).first,             // channel number
                             iAdc,                    // ADC channel
-                            0);                      // time
+                            point->GetTime());                      // time
     CbmDaqBuffer::Instance()->InsertData(digi);
     nBack++;
   }
+
+  LOG(DEBUG1) << fName << ": point ( " << fixed << setprecision(4)
+              << xPoint << ", " << yPoint << ", "
+              << zPoint << ") cm, t = " << setprecision(3)
+              << point->GetTime() << " ns, digis: " << nFront << " front, "
+              << nBack << " back" << FairLogger::endl;
+
 
 
 }
@@ -220,6 +233,9 @@ InitStatus CbmStsDigitizeTb::Init() {
 
   // Number of ADC channels
   fNAdcChannels = 1 << ( fNAdcBits + 1 );
+
+  // Step size for ionisation points
+  fStepSize = 0.001;
 
   // Build digitisation scheme
   if ( ! fDigiScheme->Init(fGeoPar, fDigiPar) ) {
@@ -247,33 +263,45 @@ InitStatus CbmStsDigitizeTb::Init() {
 // =====   Task execution   =================================================
 void CbmStsDigitizeTb::Exec(Option_t* opt) {
 
-  // Counters
-  Int_t nFront = 0;
-  Int_t nBack  = 0;
   fTimer.Start();
+
+  // Counters
+  Int_t nPoints   = 0;
+  Int_t nDigiF    = 0;
+  Int_t nDigiB    = 0;
+  Int_t nDigiAll  = 0;
+  Double_t tStart = -1.;
+  Double_t tStop  = -1.;
 
   // Loop over StsPoints from MCBuffer
   const CbmStsPoint* point =
       dynamic_cast<const CbmStsPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kSTS));
   while ( point ) {
 
+    DigitizePoint(point, nDigiF, nDigiB);
 
-    DigitizePoint(point, nFront, nBack);
-    fLogger->Info(MESSAGE_ORIGIN,
-        "Digis created: %i front, %i back", nFront, nBack);
+    // Increment counters
+    nPoints++;
+    nDigiAll += nDigiF;
+    nDigiAll += nDigiB;
+    tStop = point->GetTime();
+    if ( nPoints == 1 ) tStart = tStop;
 
     // Next StsPoint
-    point =  dynamic_cast<const CbmStsPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kSTS));
+    point = dynamic_cast<const CbmStsPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kSTS));
 
   }
 
 
   fTimer.Stop();
-  cout << "+ " << flush;
-  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-       << fixed << right << fTimer.RealTime() 
-       << " s"  << endl;
+  LOG(INFO) << fName << ": " << fixed << setprecision(4)
+            << fTimer.RealTime() << " s, " << nPoints << " points, "
+            << nDigiAll << " digis";
+  if ( nPoints ) LOG(INFO) << ", time " << setprecision(3) << tStart
+                           << " ns to " << tStop << " ns";
+  LOG(INFO) << FairLogger::endl;
   
+
   fNEvents     += 1.;
   fTime        += fTimer.RealTime();
 

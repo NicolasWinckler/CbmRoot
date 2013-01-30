@@ -7,7 +7,8 @@
 #define CBMMCPOINTBUFFER_H 1
 
 
-
+#include <iostream>
+#include <iomanip>
 #include <set>
 
 #include "TClonesArray.h"
@@ -52,6 +53,8 @@ template <class Point> class IsBefore {
  ** by the method GetNextPoint, which will deliver pointers to the MCPoints
  ** with absolute times up to a specified time. The method Clear deletes all
  ** points accessed by GetNextPoint so far.
+ **
+ ** The template class can be used for any class having the method GetTime().
  **/
 template <class T> class CbmMCPointBuffer
 {
@@ -60,7 +63,8 @@ template <class T> class CbmMCPointBuffer
  public:
 
   /**   Default constructor  **/
-  CbmMCPointBuffer() { 
+  CbmMCPointBuffer(const char* name = "") {
+    fName = name;
     fBufferIt = fBuffer.begin();
   };
 
@@ -98,6 +102,26 @@ template <class T> class CbmMCPointBuffer
   };
 
 
+  /** Get the time of last data in the buffer **/
+  Double_t GetMaxTime() const {
+    if ( fBuffer.empty() ) return -1.;
+    return fBuffer.rbegin()->GetTime();
+  }
+
+
+  /** Get the time of first data in the buffer **/
+  Double_t GetMinTime() const {
+    if ( fBuffer.empty() ) return -1.;
+    return fBuffer.begin()->GetTime();
+  }
+
+
+  /** Get the number of entries in the buffer **/
+  Int_t GetNofEntries() const {
+    return fBuffer.size();
+  }
+
+
   /**   Get the size of the buffer in MB
    ** @value  Buffer size [MB]
    **/
@@ -116,30 +140,40 @@ template <class T> class CbmMCPointBuffer
    **/
   const FairMCPoint* GetNextPoint(Double_t time) {
     const FairMCPoint* point = NULL;
-    if ( (*fBufferIt).GetTime() < time ) point = &(*fBufferIt++);
-    return point;
+    if ( (*fBufferIt).GetTime() < time ) {
+      point = &(*fBufferIt);
+      fBufferIt++;
+   }
+   return point;
   };
-
-
 
 
   /**  Output to screen. Gives number of points in buffer and memory used.
    ** @param det     System identifier (e.g. kSTS)
    ** @param logger  Pointer to FairLogger singleton
    **/
-  void Print(DetectorId det, FairLogger* logger) {
-    Int_t nPoints = fBuffer.size();
-    TString sysName;
-    CbmDetectorList::GetSystemNameCaps(det, sysName);
-    logger->Info(MESSAGE_ORIGIN, "%-4s: %8d   ( %8.2f MB )", 
-		 sysName.Data(), nPoints, GetSize());
+  void Print() const {
+    LOG(DEBUG) << "\t" << fName << " Buffer: " << setw(8) << right
+              << fBuffer.size() << " points ("
+              << fixed << setprecision(3) << GetSize() << " MB) from "
+              << GetMinTime() << " ns to " << GetMaxTime() << " ns"
+              << FairLogger::endl;
   };
 
 
+  /**  Print the content of the buffer  **/
+  void PrintContent() const {
+    typename multiset<T, IsBefore<T> >::iterator iter;
+    for (iter = fBuffer.begin(); iter != fBuffer.end(); iter++) {
+      cout << "Point: x = " << iter->GetXIn() << ", y = " << (*iter).GetYIn()
+           << ", z = " << (*iter).GetZ() << ", t = " << (*iter).GetTime() << endl;
+    }
+  }
 
 
  private:
 
+  const char* fName;
   multiset<T, IsBefore<T> > fBuffer;
   typename multiset<T, IsBefore<T> >::iterator fBufferIt;
 

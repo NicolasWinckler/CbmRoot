@@ -104,6 +104,18 @@ class CbmMCBuffer
   Double_t GetSize() const;
 
 
+  /**   Get time of last data in all buffers
+   ** @value Time of last MCPoint [ns]
+   */
+  Double_t GetMaxTime() const;
+
+
+  /**   Get time of first data in all buffers
+   ** @value Time of first MCPoint [ns]
+   */
+  Double_t GetMinTime() const;
+
+
   /**   Get next MCPoint from buffer
    ** @param det    DetectorId (e.g. kSTS)
    ** @value point  Pointer to MCPoint
@@ -117,10 +129,17 @@ class CbmMCBuffer
   const FairMCPoint* GetNextPoint(DetectorId det);
 
 
+  /**   Get number of entries
+   ** @value Total number of entries in all buffers
+   */
+  Int_t GetNofEntries() const;
+
+
   /**   Screen output 
-   ** Reports the current buffer sizes.
+   ** Reports the current buffer status.
+   ** @param option L for info on all buffers
    **/
-  void Print();
+  void Print(const char* option = "") const;
 
 
 

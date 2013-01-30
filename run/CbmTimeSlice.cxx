@@ -5,17 +5,20 @@
  *      Author: friese
  */
 
+#include <iomanip>
+
 #include "CbmTimeSlice.h"
 
 #include "CbmDetectorList.h"
 
 #include "FairLogger.h"
 
+#include <iostream>
+
 
 // -----   Default constructor   ---------------------------------------------
 CbmTimeSlice::CbmTimeSlice() : fStartTime(0.), fDuration(0.) {
-  FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
-      "Do not use the default constructor of CbmTimeSlice!");
+  LOG(FATAL) << "Default constructor of CbmTimeSlice must not be used!";
 }
 // ---------------------------------------------------------------------------
 
@@ -63,9 +66,10 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
 
   // --- Check whether time of data fits into time slice
   if ( data->GetTime() < fStartTime || data->GetTime() > GetEndTime() ) {
-    FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
-        "Try to insert data at %d into time slice from %d to %d",
-        data->GetTime(), fStartTime, GetEndTime());
+    LOG(ERROR) << "Attempt to insert data at t = " << fixed
+               << setprecision(3) << data->GetTime()
+               << " ns into time slice [" << fStartTime << ", "
+               << GetEndTime() << "] !" << FairLogger::endl;
     return;
   }
 
@@ -83,14 +87,27 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
     default:
       TString sysName;
       CbmDetectorList::GetSystemName(iDet, sysName);
-      FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
-          "System %s not implemented yet", sysName.Data());
+      LOG(WARNING) << "CbmTimeSlice: System " << sysName
+                   << " is not implemented yet!" << FairLogger::endl;
       break;
 
   }  // detector switch
 
+
 }
 // ---------------------------------------------------------------------------
+
+
+
+// -----  Print information   ------------------------------------------------
+void CbmTimeSlice::Print(Option_t* opt) const {
+  LOG(INFO) << "CbmTimeSlice: Interval [" << fixed << setprecision(3)
+            << fStartTime << ", " << GetEndTime() << "] ns"
+            << FairLogger::endl;
+  LOG(INFO) << "\t STS data: " << fStsData.size() << FairLogger::endl;
+}
+// ---------------------------------------------------------------------------
+
 
 
 // ----- Reset time slice   --------------------------------------------------

@@ -6,6 +6,7 @@
 #include "CbmDaqBuffer.h"
 
 #include "FairLogger.h"
+#include <iostream>
 
 
 // -----   Initialisation of static variables   ------------------------------
@@ -52,20 +53,27 @@ Double_t CbmDaqBuffer::GetLastTime() const {
 // -----   Access to next data   ---------------------------------------------
 CbmDigi* CbmDaqBuffer::GetNextData(Int_t iDet, Double_t time) {
 
+
+  // --- Check for system ID
   if ( iDet >= kNOFDETS ) {
-    FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
-        "Illegal system ID %d ", iDet);
+    LOG(WARNING) << "DaqBuffer: Illegal system ID " << iDet
+                 << FairLogger::endl;
     return NULL;
   }
 
+  // --- Check for empty buffer
+  if ( ! fData[iDet].size() ) return NULL;
+
+  // --- Get data from buffer
   CbmDigi* digi = NULL;
   multimap<Double_t, CbmDigi*>::iterator it = fData[iDet].begin();
   CbmDigi* test = it->second;
-  if ( digi->GetTime() < time ) {
+  if ( test->GetTime() < time ) {
     digi = test;
     fData[iDet].erase(it);
   }
   return digi;
+
 }
 // ---------------------------------------------------------------------------
 
@@ -87,15 +95,22 @@ Int_t CbmDaqBuffer::GetSize() const {
 // -----   Insert data into buffer   -----------------------------------------
 void CbmDaqBuffer::InsertData(CbmDigi* digi) {
 
+  if ( ! digi ) LOG(FATAL) << "DaqBuffer: invalid egigi pointer"
+                           << FairLogger::endl;
+
   Int_t iDet = digi->GetSystemId();
   if ( iDet >= kNOFDETS) {
-    FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN,
-        "Unknown System ID %i", iDet);
+    LOG(WARNING) << "DaqBuffer: Illegal system ID " << iDet
+                 << FairLogger::endl;
     return;
   }
 
   pair<Double_t, CbmDigi*> value (digi->GetTime(), digi);
   fData[iDet].insert(value);
+
+  LOG(DEBUG2) << "DaqBuffer: Inserting digi, detectorID "
+              << digi->GetDetectorId() << ", time " << digi->GetTime()
+              << FairLogger::endl;
 
 }
 // ---------------------------------------------------------------------------

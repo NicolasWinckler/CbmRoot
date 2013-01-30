@@ -3,6 +3,9 @@
  ** @date 8 February 2012
  **/
 
+#include <iomanip>
+
+#include "TMath.h"
 
 #include "FairLogger.h"
 
@@ -19,7 +22,15 @@ CbmMCBuffer* CbmMCBuffer::fgInstance = 0;
 
 // -----   Default constructor   ---------------------------------------------
 CbmMCBuffer::CbmMCBuffer() 
-  : fTime(0.),
+  : fMvdBuffer("MVD"),
+    fStsBuffer("STS"),
+    fRichBuffer("RICH"),
+    fMuchBuffer("MUCH"),
+    fTrdBuffer("TRD)"),
+    fTofBuffer("TOF"),
+    fEcalBuffer("ECAL"),
+    fPsdBuffer("PSD"),
+    fTime(0.),
     fEventId(0)
 { 
 }
@@ -35,7 +46,6 @@ CbmMCBuffer::~CbmMCBuffer() { }
 
 // -----   Finish   ----------------------------------------------------------
 void CbmMCBuffer::Clear() {
-
   fMvdBuffer.Clear();
   fStsBuffer.Clear();
   fRichBuffer.Clear();
@@ -44,7 +54,6 @@ void CbmMCBuffer::Clear() {
   fTofBuffer.Clear();
   fEcalBuffer.Clear();
   fPsdBuffer.Clear();
-
 }
 // ---------------------------------------------------------------------------
     
@@ -78,11 +87,52 @@ Int_t CbmMCBuffer::Fill(TClonesArray* points, Int_t det,
     case kTOF:  nPoints = fTofBuffer.Fill(points, eventTime, eventId);  break;
     case kECAL: nPoints = fEcalBuffer.Fill(points, eventTime, eventId); break;
     case kPSD:  nPoints = fPsdBuffer.Fill(points, eventTime, eventId);  break;
-    default:    nPoints = 0;
+    default:    nPoints = 0; break;
     }
   }
-  return nPoints;
 
+  return nPoints;
+}
+// ---------------------------------------------------------------------------
+
+
+
+// -----   Get time of last data   ------------------------------------------
+Double_t CbmMCBuffer::GetMaxTime() const {
+  Double_t tMax = fMvdBuffer.GetMaxTime();
+  tMax = TMath::Max( tMax, fStsBuffer.GetMaxTime() );
+  tMax = TMath::Max( tMax, fRichBuffer.GetMaxTime() );
+  tMax = TMath::Max( tMax, fMuchBuffer.GetMaxTime() );
+  tMax = TMath::Max( tMax, fTrdBuffer.GetMaxTime() );
+  tMax = TMath::Max( tMax, fTofBuffer.GetMaxTime() );
+  tMax = TMath::Max( tMax, fEcalBuffer.GetMaxTime() );
+  tMax = TMath::Max( tMax, fPsdBuffer.GetMaxTime() );
+  return tMax;
+}
+// ---------------------------------------------------------------------------
+
+
+
+// -----   Get time of first data   ------------------------------------------
+Double_t CbmMCBuffer::GetMinTime() const {
+  Double_t tMin = GetMaxTime();
+  if ( fMvdBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fMvdBuffer.GetMinTime() );
+  if ( fStsBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fStsBuffer.GetMinTime() );
+  if ( fRichBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fRichBuffer.GetMinTime() );
+  if ( fMuchBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fMuchBuffer.GetMinTime() );
+  if ( fTrdBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fTrdBuffer.GetMinTime() );
+  if ( fTofBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fTofBuffer.GetMinTime() );
+  if ( fEcalBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fEcalBuffer.GetMinTime() );
+  if ( fPsdBuffer.GetMinTime() > 0.)
+    tMin = TMath::Min( tMin, fPsdBuffer.GetMinTime() );
+  return tMin;
 }
 // ---------------------------------------------------------------------------
 
@@ -102,10 +152,26 @@ const FairMCPoint* CbmMCBuffer::GetNextPoint(DetectorId det) {
   case kTOF:  nextPoint = fTofBuffer.GetNextPoint(fTime);  break;
   case kECAL: nextPoint = fEcalBuffer.GetNextPoint(fTime); break;
   case kPSD:  nextPoint = fPsdBuffer.GetNextPoint(fTime);  break;
-  default:    nextPoint = NULL;
+  default:    nextPoint = NULL; break;
   }
 
   return nextPoint;
+}
+// ---------------------------------------------------------------------------
+
+
+
+// -----   Get number of points   ---------------------------------------------
+Int_t CbmMCBuffer::GetNofEntries() const {
+  Int_t nEntries = fMvdBuffer.GetNofEntries();
+  nEntries += fStsBuffer.GetNofEntries();
+  nEntries += fRichBuffer.GetNofEntries();
+  nEntries += fMuchBuffer.GetNofEntries();
+  nEntries += fTrdBuffer.GetNofEntries();
+  nEntries += fTofBuffer.GetNofEntries();
+  nEntries += fEcalBuffer.GetNofEntries();
+  nEntries += fPsdBuffer.GetNofEntries();
+  return nEntries;
 }
 // ---------------------------------------------------------------------------
 
@@ -140,24 +206,27 @@ CbmMCBuffer* CbmMCBuffer::Instance() {
 
 
 // -----   Print   -----------------------------------------------------------
-void CbmMCBuffer::Print() {
+void CbmMCBuffer::Print(const char* option) const {
 
-  FairLogger* logger = FairLogger::GetLogger();
+  LOG(INFO) << "MCBuffer: Last event " << fEventId << " at "
+            << fixed << setprecision(3) << fTime << " ns, "
+            << GetNofEntries() << " points from " << GetMinTime()
+            << " ns to " << GetMaxTime() << ", size " << GetSize()
+            << " MB" << FairLogger::endl;
 
-  logger->Info(MESSAGE_ORIGIN, "Status of MCBuffer: ");
-  logger->Info(MESSAGE_ORIGIN, "Current time: %f ns", fTime);
-  fMvdBuffer.Print(kMVD, logger);
-  fStsBuffer.Print(kSTS, logger);
-  fRichBuffer.Print(kRICH, logger);
-  fMuchBuffer.Print(kMUCH, logger);
-  fTrdBuffer.Print(kTRD, logger);
-  fTofBuffer.Print(kTOF, logger);
-  fEcalBuffer.Print(kECAL, logger);
-  fPsdBuffer.Print(kPSD, logger);
-  logger->Info(MESSAGE_ORIGIN, "Total buffer size: %8.2f MB", GetSize());
+  if ( fMvdBuffer.GetSize() )  fMvdBuffer.Print();
+  if ( fStsBuffer.GetSize() )  fStsBuffer.Print();
+  if ( fRichBuffer.GetSize() ) fRichBuffer.Print();
+  if ( fMuchBuffer.GetSize() ) fMuchBuffer.Print();
+  if ( fTrdBuffer.GetSize() )  fTrdBuffer.Print();
+  if ( fTofBuffer.GetSize() )  fTofBuffer.Print();
+  if ( fEcalBuffer.GetSize() ) fEcalBuffer.Print();
+  if ( fPsdBuffer.GetSize() )  fPsdBuffer.Print();
 
 }
 // ---------------------------------------------------------------------------
+
+
 
 
 

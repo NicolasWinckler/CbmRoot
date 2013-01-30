@@ -4,19 +4,19 @@
  **/
 
 
+#include <iomanip>
+
 #include "TClonesArray.h"
 #include "TRandom3.h"
 
+#include "CbmDetectorList.h"
 #include "CbmMCBuffer.h"
 #include "CbmMCEventHeader.h"
 #include "CbmMCTimeSim.h"
 
 
+
 using namespace std;
-
-
-
-
 
 
 // -----   Default constructor   ---------------------------------------------
@@ -76,8 +76,9 @@ Double_t CbmMCTimeSim::CreateEventTime() {
 // -----   Exec   ------------------------------------------------------------
 void CbmMCTimeSim::Exec(Option_t* opt) {
 
-  // CbmMCBuffer instance
+  // Get CbmMCBuffer instance and remove already used points
   CbmMCBuffer* buffer = CbmMCBuffer::Instance();
+  buffer->Clear();
 
   // Check for overflow
   if ( buffer->GetSize() > fMaxBufferSize ) 
@@ -91,14 +92,30 @@ void CbmMCTimeSim::Exec(Option_t* opt) {
   // Create and set the new event time
   fEventTime = CreateEventTime();
 
-  // Read MCPoints from event into buffers
-  for (Int_t iDet = 0; iDet < kNOFDETS; iDet++)
-    if ( fPointArrays[iDet] ) buffer->Fill(fPointArrays[iDet], 
-					   iDet,
-					   fEventId, 
-					   fEventTime);
+  // Log output
+  cout << endl;
+  LOG(INFO) << fName << ": Event ID " << fEventId << ", event time "
+            << fixed << setprecision(3) << fEventTime << " ns"
+            << FairLogger::endl;
 
-  Print();
+  // Read MCPoints from event into buffers
+  LOG(INFO) << fName << ": Points read from input: ";
+  for (Int_t iDet = 0; iDet < kNOFDETS; iDet++) {
+
+    Int_t nPoints = 0;
+    if ( fPointArrays[iDet] ) {
+      nPoints = buffer->Fill(fPointArrays[iDet], iDet,
+                             fEventId, fEventTime);
+      TString sysName;
+      CbmDetectorList::GetSystemNameCaps(iDet, sysName);
+      LOG(INFO) << sysName << " " << nPoints << "  ";
+    }
+
+  }
+  LOG(INFO) << FairLogger::endl;
+
+  // Log buffer status
+  CbmMCBuffer::Instance()->Print();
 
 }
 // ---------------------------------------------------------------------------
@@ -152,27 +169,12 @@ InitStatus CbmMCTimeSim::Init() {
   }
   fLogger->Info(MESSAGE_ORIGIN, "Configuration %s", config.Data()); 
 
-  // Get CbmMCBuffer instance
+  // Clear CbmMCBuffer
   CbmMCBuffer::Instance()->Clear();
 
   return kSUCCESS;
 }
 // ---------------------------------------------------------------------------
-
-
-
-// -----   Print   -----------------------------------------------------------
-void CbmMCTimeSim::Print(Option_t* opt) {
-
-  fLogger->Info(MESSAGE_ORIGIN, "");
-  fLogger->Info(MESSAGE_ORIGIN, "Current event ID: %d", fEventId);
-  fLogger->Info(MESSAGE_ORIGIN, "Current event time: %f ns", fEventTime);
-  CbmMCBuffer::Instance()->Print();
-
-}
-// ---------------------------------------------------------------------------
-
-
 
    
 

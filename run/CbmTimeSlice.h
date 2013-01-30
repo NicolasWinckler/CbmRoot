@@ -75,6 +75,10 @@ class CbmTimeSlice : public TNamed
     void InsertData(CbmDigi* digi);
 
 
+    /** Info **/
+    virtual void Print(Option_t* opt = "") const;
+
+
     /** Reset the time slice
      **
      ** The data vectors will be cleared and a new start time is set.

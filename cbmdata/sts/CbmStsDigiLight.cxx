@@ -38,7 +38,8 @@ const Long64_t CbmStsDigiLight::fgkTimeMask = (1 << CbmStsDigiLight::fgkTimeBits
 
 // -----   Default constructor   -------------------------------------------
 CbmStsDigiLight::CbmStsDigiLight() 
-  : CbmStsDetectorId(),
+  : CbmDigi(),
+    CbmStsDetectorId(),
     fData(0) 
 {
 }
@@ -62,7 +63,8 @@ CbmStsDigiLight::CbmStsDigiLight()
 // -------------------------------------------------------------------------
 CbmStsDigiLight::CbmStsDigiLight(Int_t station, Int_t sector, Int_t side, 
 		       Int_t channel, Int_t adc, Int_t time) 
-  : CbmStsDetectorId(),
+  : CbmDigi(kSTS, channel),
+    CbmStsDetectorId(),
     fData(0) 
 {
 //   AddIndex(index,adc);

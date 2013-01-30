@@ -2,13 +2,12 @@
 ##   Howto generate a digipar file form a .root geometry
 #
 
-v13c - reduced FEBs: 10 FEBs for 1 cm2 and 5 FEBs for 2 cm2 pad size
-v13d - full FEBs,  0 degree inclination
-v13e - full FEBs, 30 degree inclination
-v13f - full FEBs, 60 degree inclination
-v13g - full FEBs, 80 degree inclination
+v13c - like v13b, but reduced FEBs: 10 FEBs for 1 cm2 and 5 FEBs for 2 cm2 pad size
+v13d - like v13b, but FEB  0 degree inclination
+v13e - like v13b, but FEB 30 degree inclination
+v13f - like v13b, but FEB 60 degree inclination
+v13g - like v13b, but FEB 80 degree inclination
 v13h - like v13b, but no radiator material
-
 
 
 # DE, January 2013

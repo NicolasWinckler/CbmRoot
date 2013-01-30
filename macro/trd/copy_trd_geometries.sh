@@ -6,6 +6,12 @@ echo \# copy geometries
 cp -v geometry/trd.v13/media.geo ../../geometry
 cp -v geometry/trd.v13/trd_v13?.root ../../geometry/trd
 cp -v geometry/trd.v13/trd_v13?.digi.par ../../parameters/trd
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13c.digi.par 
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13d.digi.par 
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13e.digi.par 
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13f.digi.par 
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13g.digi.par 
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13h.digi.par 
 #
 cp -v geometry/trd.v12/trd_v12[b-d,f].geo ../../geometry/trd
 cp -v geometry/trd.v12/trd_v12[b-d,f].digi.par ../../parameters/trd

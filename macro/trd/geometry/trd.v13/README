@@ -1,6 +1,15 @@
-#
+~/cbm/122/cbmroot_trunk_20130122/macro/trd/geometry/trd.v13#
 ##   Howto generate a digipar file form a .root geometry
 #
+
+v13c - reduced FEBs: 10 FEBs for 1 cm2 and 5 FEBs for 2 cm2 pad size
+v13d - full FEBs,  0 degree inclination
+v13e - full FEBs, 30 degree inclination
+v13f - full FEBs, 60 degree inclination
+v13g - full FEBs, 80 degree inclination
+v13h - like v13b, but no radiator material
+
+
 
 # DE, January 2013
 

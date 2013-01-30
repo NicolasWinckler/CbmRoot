@@ -34,7 +34,7 @@ const Bool_t IncludeLattice  = true; // false;  // true, if lattice grid is incl
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 
-const Float_t feb_rotation_angle = 45; // 45.; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
+const Float_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
 // positioning switches
 const Bool_t DisplaceRandom  = false;  // true; // false;  // add random displacement of modules for alignment study
@@ -162,6 +162,7 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
+//const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 const Float_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 
 const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm

@@ -12,6 +12,7 @@
 #pragma link C++ class CbmTofContFact;
 #pragma link C++ class CbmTofHitProducer+;
 #pragma link C++ class CbmTofHitProducerIdeal+;
+#pragma link C++ class CbmTofGeoHandler+;
 
 #endif
 

@@ -21,6 +21,7 @@
 #include "TLorentzVector.h"
 
 class CbmTofPoint;
+class CbmTofGeoHandler;
 class FairVolume; 
 class TClonesArray;
 class TVector3;
@@ -104,7 +105,10 @@ class CbmTof : public FairDetector
    ** Constructs the TOF geometry
    **/
   virtual void ConstructGeometry();
-  
+
+  /** Do all initilization for the TOF detector **/
+  virtual void Initialize();
+
  private:
 
   /** Track information to be stored until the track leaves the
@@ -116,10 +120,10 @@ class CbmTof : public FairDetector
   Double32_t     fTime;              //!  time
   Double32_t     fLength;            //!  length
   Double32_t     fELoss;             //!  energy loss
-  Bool_t         fRootGeo;           //!  root geo or not
 
   Int_t fPosIndex;                   //!
   TClonesArray* fTofCollection;      //! Hit collection
+  CbmTofGeoHandler *fGeoHandler;      //! Interface to gMC and gGeoManager
 
   /** Private method AddHit
    **
@@ -146,7 +150,7 @@ class CbmTof : public FairDetector
   CbmTof& operator=(const CbmTof&);
 
 
-  ClassDef(CbmTof,1) 
+  ClassDef(CbmTof,2)
 
 };
 

@@ -12,6 +12,8 @@
 
 #include "FairTask.h"
 
+class CbmTofGeoHandler;
+
 class TVector3;
 class TClonesArray;
 class TString;                               
@@ -86,10 +88,12 @@ private:
 
   Double_t fTofZPosition; // entry Z position of the TOF wall (NOT hit)
 
+  CbmTofGeoHandler* fGeoHandler;
+
   CbmTofHitProducer(const CbmTofHitProducer&);
   CbmTofHitProducer& operator=(const CbmTofHitProducer&);
 
-  ClassDef(CbmTofHitProducer,1) //CBMTOFHitProducer
+  ClassDef(CbmTofHitProducer,2) //CBMTOFHitProducer
 
 };
 #endif 

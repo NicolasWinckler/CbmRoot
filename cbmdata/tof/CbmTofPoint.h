@@ -51,21 +51,7 @@ class CbmTofPoint : public FairMCPoint
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
 
-  /** Methods for getting the geometric coordinates (gap/cell/module/region)  **/
-
-  Int_t GetGap() const    {return (fDetectorID & 15);};
-  Int_t GetCell() const   {return ((fDetectorID>>4) & 1023);};
-  Int_t GetModule() const {return ((fDetectorID>>14) & 1023);};
-  Int_t GetRegion() const {return fDetectorID>>24;};
-
-  //  private:
-
-  //Int_t fGap;      // Gap number
-  //Int_t fCell;     // Cell number
-  //Int_t fModule;   // Module number
-  //Int_t fRegion;   // Region number
-  
-  ClassDef(CbmTofPoint,1)
+  ClassDef(CbmTofPoint,2)
 
 };
 

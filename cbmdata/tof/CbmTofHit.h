@@ -30,10 +30,6 @@ public:
   Double_t GetTime()       const { return fTime; };
   Int_t    GetFlag()       const { return fFlag; };
 
-  Int_t GetCell()   const   {return ((GetDetectorId()>>4) & 1023);};
-  Int_t GetModule() const   {return ((GetDetectorId()>>14) & 1023);};
-  Int_t GetRegion() const   {return GetDetectorId()>>24;};
-
   Int_t GetPlaneId() const { return 0; }
 
   /** Modifiers **/
@@ -45,7 +41,7 @@ protected:
   Double32_t fTime;              // Time since event start [ns]
   Int_t      fFlag;              // Flag for general purposes [TDC, event tagging...]
 
-  ClassDef(CbmTofHit,1)
+  ClassDef(CbmTofHit,2)
 };
 
 #endif

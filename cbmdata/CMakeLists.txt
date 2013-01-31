@@ -70,6 +70,9 @@ trd/CbmTrdCluster.cxx
 
 tof/CbmTofHit.cxx 
 tof/CbmTofPoint.cxx
+tof/CbmTofDetectorId.cxx
+tof/CbmTofDetectorId_v07a.cxx
+tof/CbmTofDetectorId_v12b.cxx
 
 ecal/CbmEcalHit.cxx 
 ecal/CbmEcalPoint.cxx

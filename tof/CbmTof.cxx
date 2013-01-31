@@ -6,6 +6,7 @@
 #include "CbmTof.h"
 
 #include "CbmTofPoint.h"
+#include "CbmTofGeoHandler.h"
 #include "CbmGeoTofPar.h"
 #include "CbmGeoTof.h"
 #include "CbmDetectorList.h"
@@ -38,9 +39,9 @@ CbmTof::CbmTof()
     fTime(-1.),
     fLength(-1.),
     fELoss(-1.),
-    fRootGeo(kFALSE),
     fPosIndex(0),
-    fTofCollection(new TClonesArray("CbmTofPoint"))
+    fTofCollection(new TClonesArray("CbmTofPoint")),
+	fGeoHandler(new CbmTofGeoHandler())
 {
   fVerboseLevel = 1;
 }
@@ -58,9 +59,9 @@ CbmTof::CbmTof(const char* name, Bool_t active)
     fTime(-1.),
     fLength(-1.),
     fELoss(-1.),
-    fRootGeo(kFALSE),
     fPosIndex(0),
-    fTofCollection(new TClonesArray("CbmTofPoint"))
+    fTofCollection(new TClonesArray("CbmTofPoint")),
+    fGeoHandler(new CbmTofGeoHandler())
 {
   fVerboseLevel = 1;
 }
@@ -75,16 +76,26 @@ CbmTof::~CbmTof() {
    fTofCollection->Delete(); 
    delete fTofCollection;
  }
+ if (fGeoHandler) {
+   delete fGeoHandler;
+ }
 }
 // -------------------------------------------------------------------------
 
+void CbmTof::Initialize()
+{
+  FairDetector::Initialize();
 
+  // Initialize the CbmTofGeoHandler helper class from the
+  // TVirtualMC interface
+  Bool_t isSimulation=kTRUE;
+  Int_t bla = fGeoHandler->Init(isSimulation);
+
+}
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t  CbmTof::ProcessHits(FairVolume* vol)
 {
-  Int_t gap, cell, module, region;
-  TString Volname;
 
   // Set parameters at entrance of volume. Reset ELoss.
   if ( gMC->IsTrackEntering() ) {
@@ -106,18 +117,20 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
        ) {
 
     fTrackID       = gMC->GetStack()->GetCurrentTrackNumber();
-    Volname = vol->GetName();
-// Ugly fix until the TofGeoManager will work
-    if (fRootGeo) {
-      region = 1;
-    } else {
-      region = Volname[5]-'0';
-    }
-    gMC->CurrentVolID(gap);
-    gMC->CurrentVolOffID(1, cell);
-    gMC->CurrentVolOffID(2, module);
-    
-    fVolumeID = ((region-1)<<24) + ((module-1)<<14) + ((cell-1)<<4) + (gap-1);
+
+    fVolumeID = fGeoHandler->GetUniqueDetectorId();
+
+    LOG(DEBUG2)<<"Det System: "<<fGeoHandler->GetDetSystemId(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"SMtype: "<<fGeoHandler->GetSMType(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"SModule: "<<fGeoHandler->GetSModule(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"Counter: "<<fGeoHandler->GetCounter(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"Gap: "<<fGeoHandler->GetGap(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"Cell: "<<fGeoHandler->GetCell(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"Region: "<<fGeoHandler->GetRegion(fVolumeID)<<FairLogger::endl;
+    LOG(DEBUG2)<<"*************"<<FairLogger::endl;
+
+
+   //fVolumeID = ((region-1)<<24) + ((module-1)<<14) + ((cell-1)<<4) + (gap-1);
 
     AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
 	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength, 
@@ -207,7 +220,6 @@ void CbmTof::ConstructGeometry()
   if (fileName.EndsWith(".geo")) {	
     ConstructASCIIGeometry();
   } else if (fileName.EndsWith(".root")) {
-    fRootGeo = kTRUE;
     ConstructRootGeometry();
   } else {
     std::cout << "Geometry format not supported." << std::endl;

@@ -2,6 +2,8 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
+
+
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
 ${CBMROOT_SOURCE_DIR}/tof
@@ -28,6 +30,7 @@ CbmTof.cxx
 CbmTofContFact.cxx 
 CbmTofHitProducer.cxx 
 CbmTofHitProducerIdeal.cxx 
+CbmTofGeoHandler.cxx
 )
 
 if(RULE_CHECKER_FOUND)

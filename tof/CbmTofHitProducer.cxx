@@ -10,6 +10,7 @@
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
 #include "CbmMCTrack.h"
+#include "CbmTofGeoHandler.h"
 
 #include "FairRootManager.h"
 
@@ -52,7 +53,8 @@ CbmTofHitProducer::CbmTofHitProducer() :
       fSigmaY(0.),
       fSigmaZ(0.),
       fVersion(""),
-      fNHits(-1)
+      fNHits(-1),
+      fGeoHandler(new CbmTofGeoHandler())
 {
 }
 
@@ -80,7 +82,8 @@ CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose) :
       fSigmaY(0.),
       fSigmaZ(0.),
       fVersion(""),
-      fNHits(-1)
+      fNHits(-1),
+      fGeoHandler(new CbmTofGeoHandler())
 {
 }
 
@@ -88,6 +91,9 @@ CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose) :
 
 CbmTofHitProducer::~CbmTofHitProducer()
 {
+	 if (fGeoHandler) {
+	   delete fGeoHandler;
+	 }
 }
 
 // ---- Init ----------------------------------------------------------
@@ -161,6 +167,10 @@ InitStatus CbmTofHitProducer::Init() {
    ioman->Register("TofHit", "Tof", fTofHits, kTRUE);
 
    ReadTofZPosition();
+
+   // Initialize the TOF GeoHandler
+   Bool_t isSimulation=kFALSE;
+   Int_t bla = fGeoHandler->Init(isSimulation);
 
    cout << "-I- CbmTofHitProducer: Intialization successfull" << endl;
 
@@ -252,9 +262,19 @@ void CbmTofHitProducer::Exec(Option_t * option) {
 
       //Get relevant information from the point
       Int_t trackID = mcPoint->GetTrackID();
-      Int_t cell = mcPoint->GetCell();
-      Int_t module = mcPoint->GetModule();
-      Int_t region = mcPoint->GetRegion();
+      Int_t detID = mcPoint->GetDetectorID();
+      Int_t cell = fGeoHandler->GetCell(detID)-1;
+      Int_t module = fGeoHandler->GetCounter(detID)-1;
+      Int_t region = fGeoHandler->GetRegion(detID)-1;
+
+      LOG(DEBUG2)<<"Det System: "<<fGeoHandler->GetDetSystemId(detID)<<FairLogger::endl;
+      LOG(DEBUG2)<<"SMtype: "<<fGeoHandler->GetSMType(detID)<<FairLogger::endl;
+      LOG(DEBUG2)<<"SModule: "<<fGeoHandler->GetSModule(detID)<<FairLogger::endl;
+      LOG(DEBUG2)<<"Counter: "<<fGeoHandler->GetCounter(detID)<<FairLogger::endl;
+      LOG(DEBUG2)<<"Gap: "<<fGeoHandler->GetGap(detID)<<FairLogger::endl;
+      LOG(DEBUG2)<<"Cell: "<<fGeoHandler->GetCell(detID)<<FairLogger::endl;
+      LOG(DEBUG2)<<"Region: "<<fGeoHandler->GetRegion(detID)<<FairLogger::endl;
+
       TVector3 pos;
       mcPoint->Position(pos);
 

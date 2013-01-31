@@ -142,6 +142,14 @@ class CbmMCBuffer
   void Print(const char* option = "") const;
 
 
+  /** Set the end-of-run flag
+   ** This will triggetr to deliver all points from the buffer
+   ** through GetNextPoint, irrespective of the last event time.
+   ** @param flag  kTRUE (default) if end of run
+   **/
+  void SetEndOfRun(Bool_t flag = kTRUE) { fEndOfRun = flag; }
+
+
 
 
 
@@ -165,6 +173,10 @@ class CbmMCBuffer
 
   /** ID of last event read into the buffer  **/
   Int_t fEventId;
+
+
+  /** End-of-run flag  **/
+  Bool_t fEndOfRun;
 
 
   /** Pointer to singleton instance **/

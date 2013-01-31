@@ -129,6 +129,21 @@ template <class T> class CbmMCPointBuffer
     return 1.e-6 * sizeof(T) * Double_t(fBuffer.size()); 
   }
 
+  /**   Get the next (w.r.t. abolute time) MCPoint from the buffer.
+   **   If there is none left, the method returns NULL.
+   **   The point will stay in memory, but is marked for deletion by Clear()\
+   **   through the iterator position.
+   ** @value Pointer to the FairMCPoint. NULL if there are no points left.
+   **/
+  const FairMCPoint* GetNextPoint() {
+    const FairMCPoint* point = NULL;
+    if ( fBufferIt != fBuffer.end() ) {
+      point = &(*fBufferIt);
+      fBufferIt++;
+    }
+    return point;
+  };
+
 
   /**   Get the next (w.r.t. abolute time) MCPoint from the buffer.
    **   Only points up to the specified time are delivered. If there is none
@@ -136,15 +151,17 @@ template <class T> class CbmMCPointBuffer
    **   The point will stay in memory, but is marked for deletion by Clear()\
    **   through the iterator position.
    ** @param time  Time up to which the points will be delivered
-   ** @value Pointer to the FairMCPoint. NULL is there are no points left.
+   ** @value Pointer to the FairMCPoint. NULL if there are no points left.
    **/
   const FairMCPoint* GetNextPoint(Double_t time) {
     const FairMCPoint* point = NULL;
-    if ( (*fBufferIt).GetTime() < time ) {
-      point = &(*fBufferIt);
-      fBufferIt++;
-   }
-   return point;
+    if ( fBufferIt != fBuffer.end() ) {
+      if ( (*fBufferIt).GetTime() < time ) {
+        point = &(*fBufferIt);
+        fBufferIt++;
+      }
+    }
+    return point;
   };
 
 

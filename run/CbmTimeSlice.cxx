@@ -101,10 +101,10 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
 
 // -----  Print information   ------------------------------------------------
 void CbmTimeSlice::Print(Option_t* opt) const {
-  LOG(INFO) << "CbmTimeSlice: Interval [" << fixed << setprecision(3)
+  LOG(INFO) << "TimeSlice: Interval [" << fixed << setprecision(3)
             << fStartTime << ", " << GetEndTime() << "] ns"
             << FairLogger::endl;
-  LOG(INFO) << "\t STS data: " << fStsData.size() << FairLogger::endl;
+  LOG(INFO) << "\t     Data: STS " << fStsData.size() << FairLogger::endl;
 }
 // ---------------------------------------------------------------------------
 

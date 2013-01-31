@@ -121,6 +121,10 @@ class CbmMCTimeSim : public FairTask
   Double_t fEventTime;
 
 
+  /** Event counter  **/
+  Int_t fNofEvents;
+
+
   /** Input of CbmMCEventHeader **/
   CbmMCEventHeader* fEvent;
 

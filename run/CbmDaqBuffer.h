@@ -54,6 +54,7 @@ class CbmDaqBuffer
      */
     Double_t GetFirstTime(Int_t iDet) const {
       if ( iDet < kREF || iDet >= kNOFDETS ) return -1.;
+      if ( ! GetSize(iDet) ) return -1.;
       return (fData[iDet].begin())->second->GetTime();
     }
 
@@ -70,6 +71,7 @@ class CbmDaqBuffer
      */
     Double_t GetLastTime(Int_t iDet) const {
       if ( iDet < kREF || iDet >= kNOFDETS ) return -1.;
+      if ( ! GetSize(iDet) ) return -1.;
       return (--fData[iDet].end())->second->GetTime();
     }
 
@@ -88,6 +90,13 @@ class CbmDaqBuffer
     Int_t GetSize() const;
 
 
+    /** Current buffer size for given detector
+     ** @param  det  Detector system (e.g. kSTS)
+     ** @return number of objects in buffer
+     */
+    Int_t GetSize(Int_t det) const;
+
+
     /** Insert data into the buffer
      ** @param digi  pointer to data object to be inserted
      **/
@@ -98,6 +107,10 @@ class CbmDaqBuffer
      ** @return pointer to instance
      **/
     static CbmDaqBuffer* Instance();
+
+
+    /**   Print buffer status  **/
+    void PrintStatus() const;
 
 
   private:

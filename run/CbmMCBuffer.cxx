@@ -31,7 +31,8 @@ CbmMCBuffer::CbmMCBuffer()
     fEcalBuffer("ECAL"),
     fPsdBuffer("PSD"),
     fTime(0.),
-    fEventId(0)
+    fEventId(0),
+    fEndOfRun(kFALSE)
 { 
 }
 // ---------------------------------------------------------------------------
@@ -143,16 +144,31 @@ const FairMCPoint* CbmMCBuffer::GetNextPoint(DetectorId det) {
 
   const FairMCPoint* nextPoint = NULL;
 
-  switch (det) {
-  case kMVD:  nextPoint = fMvdBuffer.GetNextPoint(fTime);  break;
-  case kSTS:  nextPoint = fStsBuffer.GetNextPoint(fTime);  break;
-  case kRICH: nextPoint = fRichBuffer.GetNextPoint(fTime); break;
-  case kMUCH: nextPoint = fMuchBuffer.GetNextPoint(fTime); break;
-  case kTRD:  nextPoint = fTrdBuffer.GetNextPoint(fTime);  break;
-  case kTOF:  nextPoint = fTofBuffer.GetNextPoint(fTime);  break;
-  case kECAL: nextPoint = fEcalBuffer.GetNextPoint(fTime); break;
-  case kPSD:  nextPoint = fPsdBuffer.GetNextPoint(fTime);  break;
-  default:    nextPoint = NULL; break;
+  if ( ! fEndOfRun ) {
+    switch (det) {
+      case kMVD:  nextPoint = fMvdBuffer.GetNextPoint(fTime);  break;
+      case kSTS:  nextPoint = fStsBuffer.GetNextPoint(fTime);  break;
+      case kRICH: nextPoint = fRichBuffer.GetNextPoint(fTime); break;
+      case kMUCH: nextPoint = fMuchBuffer.GetNextPoint(fTime); break;
+      case kTRD:  nextPoint = fTrdBuffer.GetNextPoint(fTime);  break;
+      case kTOF:  nextPoint = fTofBuffer.GetNextPoint(fTime);  break;
+      case kECAL: nextPoint = fEcalBuffer.GetNextPoint(fTime); break;
+      case kPSD:  nextPoint = fPsdBuffer.GetNextPoint(fTime);  break;
+      default:    nextPoint = NULL; break;
+    }
+  }
+  else {
+    switch (det) {
+      case kMVD:  nextPoint = fMvdBuffer.GetNextPoint();  break;
+      case kSTS:  nextPoint = fStsBuffer.GetNextPoint();  break;
+      case kRICH: nextPoint = fRichBuffer.GetNextPoint(); break;
+      case kMUCH: nextPoint = fMuchBuffer.GetNextPoint(); break;
+      case kTRD:  nextPoint = fTrdBuffer.GetNextPoint();  break;
+      case kTOF:  nextPoint = fTofBuffer.GetNextPoint();  break;
+      case kECAL: nextPoint = fEcalBuffer.GetNextPoint(); break;
+      case kPSD:  nextPoint = fPsdBuffer.GetNextPoint();  break;
+      default:    nextPoint = NULL; break;
+    }
   }
 
   return nextPoint;
@@ -211,7 +227,7 @@ void CbmMCBuffer::Print(const char* option) const {
   LOG(INFO) << "MCBuffer: Last event " << fEventId << " at "
             << fixed << setprecision(3) << fTime << " ns, "
             << GetNofEntries() << " points from " << GetMinTime()
-            << " ns to " << GetMaxTime() << ", size " << GetSize()
+            << " ns to " << GetMaxTime() << " ns, size " << GetSize()
             << " MB" << FairLogger::endl;
 
   if ( fMvdBuffer.GetSize() )  fMvdBuffer.Print();

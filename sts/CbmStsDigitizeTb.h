@@ -48,8 +48,6 @@ class CbmStsDigitizeTb : public FairTask
   /** Execution **/
   virtual void Exec(Option_t* opt);
 
-  /** Virtual method Finish **/
-  virtual void Finish();
 
   virtual void SetRealisticResponse(Bool_t real=kTRUE) {fRealistic = real;}
 
@@ -136,6 +134,9 @@ class CbmStsDigitizeTb : public FairTask
 
   /** Re-initialisation **/
   virtual InitStatus ReInit();
+
+  /** Virtual method Finish **/
+  virtual void Finish();
 
 
   /** Reset eventwise counters **/

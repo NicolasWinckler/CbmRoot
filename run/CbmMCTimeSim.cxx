@@ -36,6 +36,7 @@ CbmMCTimeSim::CbmMCTimeSim(Double_t rate, Int_t profile, const char* name)
     fMaxBufferSize(1000.),
     fEventId(-1),
     fEventTime(0.),
+    fNofEvents(0),
     fEvent(NULL)
 {
   for (Int_t iDet = 0; iDet < kNOFDETS; iDet++) fPointArrays.push_back(NULL);
@@ -117,6 +118,9 @@ void CbmMCTimeSim::Exec(Option_t* opt) {
   // Log buffer status
   CbmMCBuffer::Instance()->Print();
 
+  // Increment event counter
+  fNofEvents++;
+
 }
 // ---------------------------------------------------------------------------
 
@@ -126,7 +130,13 @@ void CbmMCTimeSim::Exec(Option_t* opt) {
 // -----   Finish   ----------------------------------------------------------
 void CbmMCTimeSim::Finish() {
 
+  cout << endl;
+  LOG(INFO) << fName << ": End of run" << FairLogger::endl;
+  LOG(INFO) << fName << ": Events processed: " << fNofEvents
+            << FairLogger::endl << FairLogger::endl;
+
   CbmMCBuffer::Instance()->Clear();
+  CbmMCBuffer::Instance()->SetEndOfRun();
 
 }
 // ---------------------------------------------------------------------------

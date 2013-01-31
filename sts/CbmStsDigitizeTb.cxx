@@ -266,10 +266,10 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
   fTimer.Start();
 
   // Counters
-  Int_t nPoints   = 0;
-  Int_t nDigiF    = 0;
-  Int_t nDigiB    = 0;
-  Int_t nDigiAll  = 0;
+  Int_t nPoints   =  0;
+  Int_t nDigiF    =  0;
+  Int_t nDigiB    =  0;
+  Int_t nDigiAll  =  0;
   Double_t tStart = -1.;
   Double_t tStop  = -1.;
 
@@ -284,6 +284,8 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
     nPoints++;
     nDigiAll += nDigiF;
     nDigiAll += nDigiB;
+    fNDigisFront += nDigiF;
+    fNDigisBack  += nDigiB;
     tStop = point->GetTime();
     if ( nPoints == 1 ) tStart = tStop;
 
@@ -304,9 +306,11 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
 
   fNEvents     += 1.;
   fTime        += fTimer.RealTime();
+  fNPoints     += nPoints;
 
 }
 // ==========================================================================
+
 
 
 
@@ -370,32 +374,34 @@ void CbmStsDigitizeTb::Reset() {
 
 // -----   Virtual method Finish   -----------------------------------------
 void CbmStsDigitizeTb::Finish() {
-  cout << endl;
-  cout << "============================================================"
-       << endl;
-  cout << "===== " << fName << ": Run summary " << endl;
-  cout << "===== " << endl;
-  cout << "===== Events processed          : " << setw(8) << fNEvents << endl;
-  cout.setf(ios_base::fixed, ios_base::floatfield);
-  cout << "===== Real time per event       : " 
+  Exec(""); // Digitise the remaining points in the MCBuffer
+  fNEvents -= 1; // Correct for extra call to Exec
+  LOG(INFO) << FairLogger::endl;
+  LOG(INFO) << "============================================================"
+       << FairLogger::endl;
+  LOG(INFO) << "===== " << fName << ": Run summary " << FairLogger::endl;
+  LOG(INFO) << "===== " << FairLogger::endl;
+  LOG(INFO) << "===== Events processed          : " << setw(8) << fNEvents << FairLogger::endl;
+  //LOG(INFO).setf(ios_base::fixed, ios_base::floatfield);
+  LOG(INFO) << "===== Real time per event       : "
        << setw(8) << setprecision(4) 
-       << fTime / fNEvents << " s" << endl;
-  cout << "===== StsPoints per event       : " 
+       << fTime / fNEvents << " s" << FairLogger::endl;
+  LOG(INFO) << "===== StsPoints per event       : "
        << setw(8) << setprecision(2) 
-       << fNPoints / fNEvents << endl;
-  cout << "===== Outside hits per event    : " 
+       << fNPoints / fNEvents << FairLogger::endl;
+  LOG(INFO) << "===== Outside hits per event    : "
        << setw(8) << setprecision(2) 
        << fNOutside / fNEvents << " = " 
        << setw(6) << setprecision(2) 
-       << fNOutside / fNPoints * 100. << " %" << endl;
-  cout << "===== Front digis per point     : " 
+       << fNOutside / fNPoints * 100. << " %" << FairLogger::endl;
+  LOG(INFO) << "===== Front digis per point     : "
        << setw(8) << setprecision(2) 
-       << fNDigisFront / (fNPoints-fNOutside) << endl;
-  cout << "===== Back digis per point      : " 
+       << fNDigisFront / (fNPoints-fNOutside) << FairLogger::endl;
+  LOG(INFO) << "===== Back digis per point      : "
        << setw(8) << setprecision(2) 
-       << fNDigisBack / (fNPoints-fNOutside) << endl;
-  cout << "============================================================"
-       << endl;
+       << fNDigisBack / (fNPoints-fNOutside) << FairLogger::endl;
+  LOG(INFO) << "============================================================"
+       << FairLogger::endl;
 	
 }					       
 // -------------------------------------------------------------------------

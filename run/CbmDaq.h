@@ -26,8 +26,10 @@ class CbmDaq : public FairTask
 {
   public:
 
-    /**   Constructor  **/
-    CbmDaq();
+    /**   Constructor
+     ** @param timeSliceSize  Duration of time slices [ns]
+     **/
+    CbmDaq(Double_t timeSliceSize = 1000.);
 
 
     /**   Destructor   **/

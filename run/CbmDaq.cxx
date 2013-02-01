@@ -14,9 +14,9 @@
 
 
 // =====   Constructor   =====================================================
-CbmDaq::CbmDaq() : FairTask("Daq"),
+CbmDaq::CbmDaq(Double_t timeSliceSize) : FairTask("Daq"),
                    fCurrentStartTime (0.),
-                   fDuration (0.),
+                   fDuration (timeSliceSize),
                    fStoreEmptySlices(kTRUE),
                    fTimeSlice(NULL),
                    fBuffer(NULL) {

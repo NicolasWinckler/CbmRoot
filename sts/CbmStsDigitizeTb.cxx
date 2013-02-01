@@ -128,6 +128,13 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     sensor = fDigiScheme->GetSensorByName(curPath);
   }
   else sensor = fDigiScheme->GetSensorByName(curNode->GetName());
+  if ( ! sensor ) {
+    LOG(DEBUG) << fName << ": node " << fDigiScheme->GetCurrentPath()
+                 << " not found in digi scheme!" << FairLogger::endl;
+    LOG(DEBUG2) << "\t" << "MCPoint information:" << FairLogger::endl;
+    point->Info(DEBUG2);
+    return;
+  }
 
 
   // Length of trajectory in the sensor
@@ -270,6 +277,7 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
   Int_t nDigiF    =  0;
   Int_t nDigiB    =  0;
   Int_t nDigiAll  =  0;
+  Int_t nOut      =  0;
   Double_t tStart = -1.;
   Double_t tStop  = -1.;
 
@@ -282,6 +290,7 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
 
     // Increment counters
     nPoints++;
+    if ( ! ( nDigiF + nDigiB)  ) nOut++;    // Points outside active sensors
     nDigiAll += nDigiF;
     nDigiAll += nDigiB;
     fNDigisFront += nDigiF;
@@ -297,8 +306,8 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
 
   fTimer.Stop();
   LOG(INFO) << fName << ": " << fixed << setprecision(4)
-            << fTimer.RealTime() << " s, " << nPoints << " points, "
-            << nDigiAll << " digis";
+            << fTimer.RealTime() << " s, " << nPoints << " points (outside: "
+            << nOut << "), " << nDigiAll << " digis";
   if ( nPoints ) LOG(INFO) << ", time " << setprecision(3) << tStart
                            << " ns to " << tStop << " ns";
   LOG(INFO) << FairLogger::endl;
@@ -307,6 +316,7 @@ void CbmStsDigitizeTb::Exec(Option_t* opt) {
   fNEvents     += 1.;
   fTime        += fTimer.RealTime();
   fNPoints     += nPoints;
+  fNOutside    += nOut;
 
 }
 // ==========================================================================

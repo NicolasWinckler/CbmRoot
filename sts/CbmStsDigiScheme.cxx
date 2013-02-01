@@ -194,8 +194,9 @@ CbmStsSensor* CbmStsDigiScheme::GetSensorByName(TString sensorName)
   if(p!=fSensorByName.end()){
     return p->second;
   }else{
-    cout << " -E- StsDigiScheme::GetDetectorIdByName \"" << sensorName.Data() << "\" not found " << endl;
-    return 0;
+    LOG(DEBUG) << "StsDigiScheme: sensor " << sensorName.Data()
+               << " not found " << FairLogger::endl;
+    return NULL;
   }
 }
 // -------------------------------------------------------------------------

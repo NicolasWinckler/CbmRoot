@@ -4,6 +4,7 @@
 // -------------------------------------------------------------------------
 
 #include "CbmStsPoint.h"
+
 #include "CbmDetectorList.h"
 
 #include <iostream>
@@ -74,15 +75,18 @@ CbmStsPoint::CbmStsPoint(const CbmStsPoint& point, Int_t eventId,
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmStsPoint::Print(const Option_t* opt) const {
-  cout << "-I- CbmStsPoint: STS Point for track " << fTrackID 
-       << " in detector " << fDetectorID << endl;
-  cout << "    Position (" << fX << ", " << fY << ", " << fZ
-       << ") cm" << endl;
-  cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
-       << ") GeV" << endl;
-  cout << "    Time " << fTime << " ns,  Length " << fLength 
-       << " cm,  Energy loss " << fELoss*1.0e06 << " keV" << endl;
+void CbmStsPoint::Info(FairLogLevel level) const {
+  LOG(level) << "StsPoint: track ID " << fTrackID << ", detector ID "
+             << fDetectorID << FairLogger::endl;
+  LOG(level) << "          IN  Position (" << fX << ", " << fY
+             << ", " << fZ << ") cm" << FairLogger::endl;
+  LOG(level) << "          OUT Position (" << fX_out << ", " << fY_out
+             << ", " << fZ_out << ") cm" << FairLogger::endl;
+  LOG(level) << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
+             << ") GeV" << endl;
+  LOG(level) << "    Time " << fTime << " ns,  Length " << fLength
+             << " cm,  Energy loss " << fELoss*1.0e06 << " keV"
+             << FairLogger::endl;
 }
 // -------------------------------------------------------------------------
 

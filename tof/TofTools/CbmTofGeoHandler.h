@@ -54,6 +54,13 @@ class CbmTofGeoHandler : public TObject {
   Int_t GetCell(Int_t uniqueId);
   Int_t GetRegion(Int_t uniqueId);
 
+  Float_t GetSizeX(TString volName);
+  Float_t GetSizeY(TString volName);
+  Float_t GetSizeZ(TString volName);
+  Float_t GetX(TString volName);
+  Float_t GetY(TString volName);
+  Float_t GetZ(TString volName);
+
   void FillDetectorInfoArray(Int_t uniqueId);
   void NavigateTo(TString volName);
 
@@ -63,6 +70,8 @@ class CbmTofGeoHandler : public TObject {
   Int_t CurrentVolID(Int_t& copy) const;
   Int_t VolId(const Text_t* name) const;
   Int_t VolIdGeo(const char *name) const;
+  const char* CurrentVolName() const;
+  const char* CurrentVolOffName(Int_t off) const;
 
   Int_t CheckGeometryVersion(); 
 

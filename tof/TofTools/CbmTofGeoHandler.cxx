@@ -111,17 +111,17 @@ Int_t CbmTofGeoHandler::GetUniqueDetectorId()
 
 
   if (fGeoVersion == k07a) {
-    Volname = gMC->CurrentVolName();
+    Volname = CurrentVolName();
     smtype = Volname[5]-'0';
-    gMC->CurrentVolOffID(2, counter);
-    gMC->CurrentVolOffID(1, cell);
-    gMC->CurrentVolID(gap);
+    CurrentVolOffID(2, counter);
+    CurrentVolOffID(1, cell);
+    CurrentVolID(gap);
   } else if (fGeoVersion == k12b) {
-    Volname = gMC->CurrentVolOffName(4);
+    Volname = CurrentVolOffName(4);
     smtype = Volname[7]-'0';
-    gMC->CurrentVolOffID(2, counter);
-    gMC->CurrentVolOffID(1, gap);
-    gMC->CurrentVolID(cell);
+    CurrentVolOffID(2, counter);
+    CurrentVolOffID(1, gap);
+    CurrentVolID(cell);
   }
 
   LOG(DEBUG2)<<"Volname: "<<Volname<<FairLogger::endl;
@@ -267,6 +267,40 @@ Int_t CbmTofGeoHandler::CurrentVolOffID(Int_t off, Int_t& copy) const
   }
 }
 
+//_____________________________________________________________________________
+const char* CbmTofGeoHandler::CurrentVolName() const
+{
+  if (fIsSimulation) {
+	return gMC->CurrentVolName();
+  } else {
+    //
+    // Returns the current volume name
+    //
+    if (gGeoManager->IsOutside()) return gGeoManager->GetTopVolume()->GetName();
+    return gGeoManager->GetCurrentVolume()->GetName();
+  }
+}
+
+//_____________________________________________________________________________
+const char* CbmTofGeoHandler::CurrentVolOffName(Int_t off) const
+{
+  if (fIsSimulation) {
+    return gMC->CurrentVolOffName(off);
+  } else {
+    //
+    // Return the current volume "off" upward in the geometrical tree
+    // ID, name and copy number
+    // if name=0 no name is returned
+    //
+    if (off<0 || off>gGeoManager->GetLevel()) return 0;
+    if (off==0) return CurrentVolName();
+    TGeoNode *node = gGeoManager->GetMother(off);
+    if (!node) return 0;
+    return node->GetVolume()->GetName();
+  }
+}
+
+
 void CbmTofGeoHandler::FillDetectorInfoArray(Int_t uniqueId) 
 {
   fDetectorInfoArray = fTofId->GetDetectorInfo(uniqueId);
@@ -330,7 +364,7 @@ Int_t CbmTofGeoHandler::GetRegion(Int_t uniqueId)
 */
 	return GetSMType(uniqueId);
 }
-/*
+
 Float_t CbmTofGeoHandler::GetSizeX(TString volName) 
 {
   if (fGeoPathHash != volName.Hash()) {
@@ -385,7 +419,7 @@ Float_t CbmTofGeoHandler::GetX(TString volName)
 void CbmTofGeoHandler::NavigateTo(TString volName) 
 {
   if (fIsSimulation) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"This methode is not supported in simulation mode");
+    LOG(FATAL)<<"This methode is not supported in simulation mode"<<FairLogger::endl;
   } else {
     gGeoManager->cd(volName.Data());
     fGeoPathHash = volName.Hash();
@@ -393,10 +427,10 @@ void CbmTofGeoHandler::NavigateTo(TString volName)
     fVolumeShape = (TGeoBBox*)fCurrentVolume->GetShape(); 
     Double_t local[3] = {0., 0., 0.};  // Local centre of volume
     gGeoManager->LocalToMaster(local, fGlobal);
-    cout<<"Pos: "<<fGlobal[0]<<" , "<<fGlobal[1]<<" , "<<fGlobal[2]<<" , "<<endl;
-    fGlobalMatrix = gGeoManager->GetCurrentMatrix(); 
+    LOG(DEBUG2)<<"Pos: "<<fGlobal[0]<<" , "<<fGlobal[1]<<" , "<<fGlobal[2]<<FairLogger::endl;
+//    fGlobalMatrix = gGeoManager->GetCurrentMatrix();
   }	      
 }
-*/
+
  
 ClassImp(CbmTofGeoHandler)

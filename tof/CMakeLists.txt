@@ -11,6 +11,7 @@ ${CBMROOT_SOURCE_DIR}/tof/TofMC
 ${CBMROOT_SOURCE_DIR}/tof/TofParam
 ${CBMROOT_SOURCE_DIR}/tof/TofReco
 ${CBMROOT_SOURCE_DIR}/tof/TofTools
+${CBMROOT_SOURCE_DIR}/tof/TofData
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -34,11 +35,14 @@ TofMC/CbmTof.cxx
 TofParam/CbmGeoTofPar.cxx 
 TofParam/CbmTofContFact.cxx 
 TofParam/CbmTofDigiPar.cxx 
+TofParam/CbmTofCreateDigiPar.cxx
 
 TofReco/CbmTofHitProducer.cxx 
 TofReco/CbmTofHitProducerIdeal.cxx 
 
 TofTools/CbmTofGeoHandler.cxx
+
+TofData/CbmTofCell.cxx
 )
 
 if(RULE_CHECKER_FOUND)

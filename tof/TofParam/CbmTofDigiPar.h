@@ -3,6 +3,11 @@
 
 #include "FairParGenericSet.h"
 
+#include "TArrayI.h"
+
+#include <map>
+
+class CbmTofCell;
 class FairParamList;
 
 class CbmTofDigiPar : public FairParGenericSet
@@ -17,7 +22,26 @@ class CbmTofDigiPar : public FairParGenericSet
     void putParams(FairParamList*);
     Bool_t getParams(FairParamList*);
 
+    void SetNrOfCells(Int_t i) { fNrOfCells = i; }
+    void SetCellIdArray(TArrayI array) { fCellIdArray = array; }
+    void SetCellMap(std::map<Int_t, CbmTofCell*> map)
+                      { fCellMap = map;}
+
+    Int_t GetNrOfModules() { return fNrOfCells;}
+    Int_t GetCellId(Int_t i) {return fCellIdArray[i];}
+
+    CbmTofCell* GetModule(Int_t i) {return fCellMap[i];}
+
+
   private:
+
+    /** Map of Unique Tof Cell Id to corresponding TofCell **/
+    std::map<Int_t, CbmTofCell*> fCellMap;                  //!
+    std::map<Int_t, CbmTofCell*>::iterator fCellMapIt;      //!
+
+    TArrayI fCellIdArray; // Array to hold the unique IDs for all cells
+    Int_t fNrOfCells; // Total number of cells
+
     CbmTofDigiPar(const CbmTofDigiPar&);
     CbmTofDigiPar& operator=(const CbmTofDigiPar&);
 

@@ -7,6 +7,10 @@
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES} 
 ${CBMROOT_SOURCE_DIR}/tof
+${CBMROOT_SOURCE_DIR}/tof/TofMC
+${CBMROOT_SOURCE_DIR}/tof/TofParam
+${CBMROOT_SOURCE_DIR}/tof/TofReco
+${CBMROOT_SOURCE_DIR}/tof/TofTools
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -24,13 +28,16 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(TOF_SRCS
-CbmGeoTof.cxx 
-CbmGeoTofPar.cxx 
-CbmTof.cxx 
-CbmTofContFact.cxx 
-CbmTofHitProducer.cxx 
-CbmTofHitProducerIdeal.cxx 
-CbmTofGeoHandler.cxx
+TofMC/CbmGeoTof.cxx 
+TofMC/CbmTof.cxx 
+
+TofParam/CbmGeoTofPar.cxx 
+TofParam/CbmTofContFact.cxx 
+
+TofReco/CbmTofHitProducer.cxx 
+TofReco/CbmTofHitProducerIdeal.cxx 
+
+TofTools/CbmTofGeoHandler.cxx
 )
 
 if(RULE_CHECKER_FOUND)

@@ -7,8 +7,8 @@
 #include "CbmTofDetectorId_v12b.h"
 #include "CbmDetectorList.h"
 
-const Int_t CbmTofDetectorId_v12b::shiftarray[] = {0,5,10,18,21,24};
-const Int_t CbmTofDetectorId_v12b::bitarray[] = {5,5,8,3,3,8};
+const Int_t CbmTofDetectorId_v12b::shiftarray[] = {0,5,9,17,20,24};
+const Int_t CbmTofDetectorId_v12b::bitarray[] = {5,4,8,3,4,8};
 
 
 CbmTofDetectorId_v12b::CbmTofDetectorId_v12b()

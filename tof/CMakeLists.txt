@@ -33,6 +33,7 @@ TofMC/CbmTof.cxx
 
 TofParam/CbmGeoTofPar.cxx 
 TofParam/CbmTofContFact.cxx 
+TofParam/CbmTofDigiPar.cxx 
 
 TofReco/CbmTofHitProducer.cxx 
 TofReco/CbmTofHitProducerIdeal.cxx 

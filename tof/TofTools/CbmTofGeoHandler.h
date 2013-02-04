@@ -42,6 +42,8 @@ class CbmTofGeoHandler : public TObject {
   Int_t GetUniqueDetectorId();
   Int_t GetUniqueDetectorId(TString volName);
 
+  Int_t GetCellId(Int_t uniqueId);
+
   Int_t GetGeoVersion() {return fGeoVersion;}  
           
   Int_t Init(Bool_t isSimulation=kFALSE);

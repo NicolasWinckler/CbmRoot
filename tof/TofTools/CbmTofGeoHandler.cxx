@@ -365,6 +365,11 @@ Int_t CbmTofGeoHandler::GetRegion(Int_t uniqueId)
 	return GetSMType(uniqueId);
 }
 
+Int_t CbmTofGeoHandler::GetCellId(Int_t uniqueId)
+{
+  return fTofId->GetCellId(uniqueId);
+}
+
 Float_t CbmTofGeoHandler::GetSizeX(TString volName) 
 {
   if (fGeoPathHash != volName.Hash()) {

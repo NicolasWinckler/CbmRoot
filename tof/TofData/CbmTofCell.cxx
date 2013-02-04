@@ -3,6 +3,8 @@
 #include "CbmTofPoint.h"
 #include "CbmTofDetectorId.h"
 
+#include "FairLogger.h"
+
 #include "TGeoManager.h"
 #include "TMath.h"
 
@@ -12,13 +14,25 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTofCell::CbmTofCell() 
-  :
-  fDetectorId(0),
-  fX(-666.),
-  fY(-666.),
-  fZ(-666.),
-  fSizex(-666.),
-  fSizey(-666.)
+  : TNamed(),
+    fDetectorId(0),
+    fX(-666.),
+    fY(-666.),
+    fZ(-666.),
+    fSizex(-666.),
+    fSizey(-666.)
+{
+}
+
+CbmTofCell::CbmTofCell(Int_t detId, Double_t x, Double_t y, Double_t z,
+    Double_t sizex, Double_t sizey)
+  : TNamed(),
+    fDetectorId(detId),
+    fX(x),
+    fY(y),
+    fZ(z),
+    fSizex(sizex),
+    fSizey(sizey)
 {
 }
 // -------------------------------------------------------------------------
@@ -139,6 +153,14 @@ void CbmTofCell::GetPosition(const Int_t Col, const Int_t Row,
   
 }
 */
+
+void CbmTofCell::Print()
+{
+  LOG(INFO)<<"ID, X, Y, Z, sizex, sizey: "<< fDetectorId << ", "<< fX << ", "<< fY
+        << ", "<< fZ << ", "<< fSizex << ", "<< fSizey << FairLogger::endl;
+
+
+}
 
   // -------------------------------------------------------------------------
 ClassImp(CbmTofCell)

@@ -41,6 +41,8 @@ class CbmTofCell : public TNamed
                    TVector3 &posHit, TVector3 &posHitErr);
 */
 
+  void Print();
+
  private:
 
   /** -------------   Data members   --------------------------**/

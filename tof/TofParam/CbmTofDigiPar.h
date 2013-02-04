@@ -30,7 +30,7 @@ class CbmTofDigiPar : public FairParGenericSet
     Int_t GetNrOfModules() { return fNrOfCells;}
     Int_t GetCellId(Int_t i) {return fCellIdArray[i];}
 
-    CbmTofCell* GetModule(Int_t i) {return fCellMap[i];}
+    CbmTofCell* GetCell(Int_t i) {return fCellMap[i];}
 
 
   private:

@@ -179,6 +179,7 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	for (UInt_t i = 0; i < localTrackVariants.size(); i++) {
 		string variant = localTrackVariants[i];
 		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_Eff" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff";
+		if (variant == "Rich") re = "hte_" + variant + "_.*_(Electron|ElectronReference)_Eff";
 		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re + "_p");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", re + "_pt");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");

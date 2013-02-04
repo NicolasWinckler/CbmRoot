@@ -14,11 +14,20 @@ const Int_t CbmTofDetectorId_v12b::bitarray[] = {5,4,8,3,4,8};
 CbmTofDetectorId_v12b::CbmTofDetectorId_v12b()
   : CbmTofDetectorId(),
     result_array(),
-    maskarray()
+    maskarray(),
+    modulemask(0)
 {
   for (Int_t i=0; i < array_length; i++) {
-    maskarray[i]=(1 << bitarray[i]) - 1;
+	maskarray[i]=(1 << bitarray[i]) - 1;
   }
+
+  modulemask =( (maskarray[0] << shiftarray[0]) |
+		  (maskarray[1] << shiftarray[1]) |
+		  (maskarray[2] << shiftarray[2]) |
+		  (maskarray[3] << shiftarray[3])  |
+		  (0 << shiftarray[4]) |
+		  (maskarray[5] << shiftarray[5])
+  );
 }
 
 CbmTofDetectorInfo CbmTofDetectorId_v12b::GetDetectorInfo(const Int_t detectorId)
@@ -79,6 +88,10 @@ Int_t CbmTofDetectorId_v12b::GetRegion(const Int_t detectorId)
   return -1;
 }
 
+Int_t CbmTofDetectorId_v12b::GetCellId(const Int_t detectorId)
+{
+  return (detectorId & modulemask);
+}
 
 //-----------------------------------------------------------
 

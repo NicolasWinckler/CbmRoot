@@ -79,6 +79,9 @@ class CbmTofDetectorId
   /** Get region number from detector ID **/
   virtual Int_t GetRegion(const Int_t detectorId) = 0;
 
+  /** Get cell number from detector ID **/
+  virtual Int_t GetCellId(const Int_t detectorId) = 0;
+
   /** Calculate the unique detector ID
    ** This will return a pointer to an integer
    ** array of length array_length

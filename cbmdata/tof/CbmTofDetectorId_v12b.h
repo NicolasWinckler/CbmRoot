@@ -66,7 +66,13 @@ class CbmTofDetectorId_v12b : public CbmTofDetectorId
   
   /** Get region number from detector ID **/
   Int_t GetRegion(const Int_t detectorId);
-  
+
+  /** Get cell number from detector ID.
+   ** This is masking the the gap number
+   ** if this is set.
+   **/
+  Int_t GetCellId(const Int_t detectorId);
+
   /** Calculate the unique detector ID
    ** This will return a pointer to an integer
    ** array of length array_length

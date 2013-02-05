@@ -1010,6 +1010,8 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   //CbmKF &KF = *CbmKF::Instance();
 
   static TProfile *p_eff_all_vs_mom, *p_eff_prim_vs_mom, *p_eff_sec_vs_mom, *p_eff_d0_vs_mom, *p_eff_prim_vs_theta, *p_eff_all_vs_pt, *p_eff_prim_vs_pt, *p_eff_all_vs_nhits, *p_eff_prim_vs_nhits, *p_eff_sec_vs_nhits;
+
+  static TH1F *h_acc_mom_short123s;
   
   static TH1F *h_reg_mom_prim, *h_reg_mom_sec, *h_reg_nhits_prim, *h_reg_nhits_sec;
   static TH1F *h_acc_mom_prim, *h_acc_mom_sec, *h_acc_nhits_prim, *h_acc_nhits_sec;
@@ -1077,8 +1079,10 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     8, 3.0, 11.0, 0.0, 100.0);
     p_eff_sec_vs_nhits = new TProfile("p_eff_sec_vs_nhits", "SecSet Efficiency vs NMCHits",
     8, 3.0, 11.0, 0.0, 100.0);
+
     
-  
+    h_acc_mom_short123s = new TH1F("h_acc_mom_short123s", "Momentum of accepted tracks with 3 hits on first stations", 500, 0.0, 5.0);
+    
     h_reg_mom_prim   = new TH1F("h_reg_mom_prim", "Momentum of registered primary tracks", 500, 0.0, 5.0);
     h_reg_mom_sec   = new TH1F("h_reg_mom_sec", "Momentum of registered secondary tracks", 500, 0.0, 5.0);
     h_acc_mom_prim   = new TH1F("h_acc_mom_prim", "Momentum of accepted primary tracks", 500, 0.0, 5.0);
@@ -1319,7 +1323,11 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
           h2_reg_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
       }
     }
-
+    
+    if ( mtra.IsAdditional() ){
+      h_acc_mom_short123s->Fill(momentum);
+    }
+    
     if( ! mtra.IsReconstructable() ) continue;
     mc_total++;
     

@@ -292,6 +292,9 @@ void CbmAnaDielectronTask::InitHists()
    CreateAnalysisStepsH1(fh_pi0_minv, "fh_pi0_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
    CreateAnalysisStepsH1(fh_eta_minv, "fh_eta_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
    CreateAnalysisStepsH1(fh_gamma_minv, "fh_gamma_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
+   // minv for true matched and mismatched tracks
+   CreateAnalysisStepsH1(fh_bg_truematch_minv, "fh_bg_truematch_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
+   CreateAnalysisStepsH1(fh_bg_mismatch_minv, "fh_bg_mismatch_minv", "M_{ee} [GeV/c^{2}]", "Yield", 2000, 0. , 2.);
    // Minv for different sources
    fh_source_bg_minv.resize(CbmAnaLmvmNames::fNofBgPairSources);
    for (int i = 0; i < CbmAnaLmvmNames::fNofBgPairSources; i++){
@@ -335,6 +338,19 @@ void CbmAnaDielectronTask::InitHists()
          fh_source_pt[i][step] = new TH1D(hname.c_str(), htitle.c_str(), 100, 0., 5.);
          fHistoList.push_back(fh_source_pt[i][step]);
       }
+   }
+
+
+   //electrons and pions vs momentum
+   for (int i = 0; i < 2; i++){
+      string s = "electron";
+      if (i == 1) s = "pion";
+      fh_elpi_mom_mc[i] = new TH1D( ("fh_elpi_mom_mc_"+s).c_str(), ("fh_elpi_mom_mc_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fh_elpi_mom_acc[i] = new TH1D( ("fh_elpi_mom_acc_"+s).c_str(), ("fh_elpi_mom_acc_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fh_elpi_mom_rec[i] = new TH1D( ("fh_elpi_mom_rec_"+s).c_str(), ("fh_elpi_mom_rec_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fh_elpi_mom_rec_only_sts[i] = new TH1D( ("fh_elpi_mom_rec_only_sts_"+s).c_str(), ("fh_elpi_mom_rec_only_sts_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fh_elpi_mom_rec_sts_rich_trd[i] = new TH1D( ("fh_elpi_mom_rec_sts_rich_trd_"+s).c_str(), ("fh_elpi_mom_rec_sts_rich_trd_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fh_elpi_mom_rec_sts_rich_trd_tof[i] = new TH1D( ("fh_elpi_mom_rec_sts_rich_trd_tof_"+s).c_str(), ("fh_elpi_mom_rec_sts_rich_trd_tof_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
    }
 }
 
@@ -450,6 +466,7 @@ void CbmAnaDielectronTask::Exec(
     FillCandidateArray();
     DifferenceSignalAndBg();
     SignalAndBgReco();
+    FillElPiMomHist();
 }// Exec
 
 void CbmAnaDielectronTask::FillRichRingNofHits()
@@ -476,6 +493,7 @@ void CbmAnaDielectronTask::FillRichRingNofHits()
         fNofHitsInRingMap[iMother]++;
     }
 }
+
 void CbmAnaDielectronTask::MCPairs()
 {
     Int_t nMcTracks = fMCTracks->GetEntries();
@@ -613,6 +631,84 @@ void CbmAnaDielectronTask::PairAcceptance()
       }
    }//iP
 } // PairsAcceptance
+
+
+void CbmAnaDielectronTask::FillElPiMomHist()
+{
+   Int_t nMcTracks = fMCTracks->GetEntries();
+   for (Int_t i = 0; i < nMcTracks; i++) {
+       CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(i);
+       Int_t motherId = mctrack->GetMotherId();
+       Int_t pdg = TMath::Abs(mctrack->GetPdgCode());
+       double momentum = mctrack->GetP();
+       Int_t nMvdPoints = mctrack->GetNPoints(kMVD);
+       Int_t nStsPoints = mctrack->GetNPoints(kSTS);
+       Bool_t isAcc = ( nMvdPoints+nStsPoints >= 4);
+
+       if (pdg == 11){
+          fh_elpi_mom_mc[0]->Fill(momentum);
+          if (isAcc) fh_elpi_mom_acc[0]->Fill(momentum);
+       }
+
+       if (pdg == 211){
+          fh_elpi_mom_mc[1]->Fill(momentum);
+          if (isAcc) fh_elpi_mom_acc[1]->Fill(momentum);
+       }
+   }
+
+   Int_t ngTracks = fGlobalTracks->GetEntriesFast();
+   for (Int_t i = 0; i < ngTracks; i++) {
+       CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
+       if(NULL == gTrack) continue;
+       int stsInd = gTrack->GetStsTrackIndex();
+       int richInd = gTrack->GetRichRingIndex();
+       int trdInd = gTrack->GetTrdTrackIndex();
+       int tofInd = gTrack->GetTofHitIndex();
+
+       if (stsInd < 0) continue;
+       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsInd);
+       if (stsTrack == NULL) continue;
+       CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+       if (stsMatch == NULL) continue;
+       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
+       if (mcTrack1 == NULL) continue;
+       int pdg = TMath::Abs(mcTrack1->GetPdgCode());
+       int motherId = mcTrack1->GetMotherId();
+       double momentum = mcTrack1->GetP();
+
+       if (pdg == 11) {
+          fh_elpi_mom_rec[0]->Fill(momentum);
+
+          if (richInd < 0 && trdInd < 0 && tofInd < 0) {
+             fh_elpi_mom_rec_only_sts[0]->Fill(momentum);
+          }
+
+          if (richInd >= 0 && trdInd >= 0) {
+               fh_elpi_mom_rec_sts_rich_trd[0]->Fill(momentum);
+           }
+
+          if (richInd >= 0 && trdInd >= 0 && tofInd >= 0) {
+             fh_elpi_mom_rec_sts_rich_trd_tof[0]->Fill(momentum);
+          }
+       }
+
+       if (pdg == 211) {
+          fh_elpi_mom_rec[1]->Fill(momentum);
+
+          if (richInd < 0 && trdInd < 0 && tofInd < 0) {
+             fh_elpi_mom_rec_only_sts[1]->Fill(momentum);
+          }
+
+          if (richInd >= 0 && trdInd >= 0) {
+               fh_elpi_mom_rec_sts_rich_trd[1]->Fill(momentum);
+           }
+
+          if (richInd >= 0 && trdInd >= 0 && tofInd >= 0) {
+             fh_elpi_mom_rec_sts_rich_trd_tof[1]->Fill(momentum);
+          }
+       }
+   }//gTracks
+}
 
 void CbmAnaDielectronTask::FillSegmentCandidatesArray()
 {
@@ -972,6 +1068,7 @@ void CbmAnaDielectronTask::FillPairHists(
    Bool_t isPi0 = (candP->isMcPi0Electron && candM->isMcPi0Electron && candP->McMotherId == candM->McMotherId);
    Bool_t isEta = (candP->isMcEtaElectron && candM->isMcEtaElectron && candP->McMotherId == candM->McMotherId);
    Bool_t isGamma = (candP->isMcGammaElectron && candM->isMcGammaElectron && candP->McMotherId == candM->McMotherId);
+   Bool_t isMismatch = (IsMismatch(candP) || IsMismatch(candM));
 
    if (isSignal) fh_signal_pty[step]->Fill(parMc->rapidity, parMc->pt, fWeight);
    if (isSignal) fh_signal_mom[step]->Fill(parMc->momentumMag, fWeight);
@@ -982,6 +1079,11 @@ void CbmAnaDielectronTask::FillPairHists(
    if (isPi0) fh_pi0_minv[step]->Fill(parRec->minv);
    if (isEta) fh_eta_minv[step]->Fill(parRec->minv);
    if (isGamma) fh_gamma_minv[step]->Fill(parRec->minv);
+   if (isMismatch){
+      fh_bg_mismatch_minv[step]->Fill(parRec->minv);
+   } else {
+      fh_bg_truematch_minv[step]->Fill(parRec->minv);
+   }
 }
 
 void CbmAnaDielectronTask::SignalAndBgReco()

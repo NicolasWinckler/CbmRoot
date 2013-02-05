@@ -247,6 +247,8 @@ private:
            const string& sigOption,
            double cutValue = -999999.);
 
+     void DrawElPiMomHis();
+
      void Draw2DCutTriangle(
            double xCross,
            double yCross);

@@ -299,7 +299,7 @@ public:
 
     virtual void Finish();
 
-
+    void FillElPiMomHist();
 
 
     ClassDef(CbmAnaDielectronTask,1);
@@ -424,6 +424,9 @@ private:
    vector<TH2D*> fh_signal_pty; // Pt/y distribution for signal
    vector<TH2D*> fh_signal_minv_pt; // Invariant mass vs. MC Pt
 
+   vector<TH1D*> fh_bg_truematch_minv; // Invariant mass for truly matched tracks
+   vector<TH1D*> fh_bg_mismatch_minv; // Invariant mass for mis matches tracks
+
    //G-Gamma, P-Pi0, O-other
    //e-e+
    //[0]=G-G, [1]=P-P, [2]=O-O, [3]=G-P, [4]=G-O, [5]=P-O
@@ -497,6 +500,16 @@ private:
    vector<vector<TH1D*> > fh_source_pt;
    //Opening angle distribution for different sources after each cut.
    vector<vector<TH1D*> > fh_opening_angle;
+
+
+   //Pions vs momentum
+   //[0] - electrons, [1] - pions
+   vector<TH1D*> fh_elpi_mom_mc;
+   vector<TH1D*> fh_elpi_mom_acc;
+   vector<TH1D*> fh_elpi_mom_rec;
+   vector<TH1D*> fh_elpi_mom_rec_only_sts;
+   vector<TH1D*> fh_elpi_mom_rec_sts_rich_trd;
+   vector<TH1D*> fh_elpi_mom_rec_sts_rich_trd_tof;
 
 public:
    void SetUseMvd(Bool_t use){fUseMvd = use;};

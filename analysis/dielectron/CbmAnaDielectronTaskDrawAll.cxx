@@ -148,6 +148,13 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sOmegaDalitz->SetFillColor(kCyan+2);
    sOmegaDalitz->SetLineColor(kBlack);
 
+   TH1D* s = (TH1D*)sRho->Clone();
+   s->Add(sOmega);
+   s->Add(sPhi);
+   s->Add(sEta);
+   s->Add(sPi0);
+   s->Add(sOmegaDalitz);
+
    TH1D* sbg = (TH1D*)bg->Clone();
    sbg->SetFillColor(kBlack);
    sbg->SetLineColor(kBlack);
@@ -160,16 +167,18 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sbg->SetMinimum(1e-8);
    sbg->SetMaximum(1e-2);
 
-   sbg->Rebin(10);
-   bg->Rebin(10);
-   sPi0->Rebin(10);
-   sEta->Rebin(10);
-   sOmegaDalitz->Rebin(10);
-   sOmega->Rebin(10);
-   sRho->Rebin(10);
-   sPhi->Rebin(10);
-   DrawH1(list_of(sbg)(bg)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
-         list_of("")("")("")("")("")("")("")(""), kLinear, kLog, false, 0.8, 0.8, 0.99, 0.99);
+   int nRebin = 10;
+   sbg->Rebin(nRebin);
+   s->Rebin(nRebin);
+   bg->Rebin(nRebin);
+   sPi0->Rebin(nRebin);
+   sEta->Rebin(nRebin);
+   sOmegaDalitz->Rebin(nRebin);
+   sOmega->Rebin(nRebin);
+   sRho->Rebin(nRebin);
+   sPhi->Rebin(nRebin);
+   DrawH1(list_of(sbg)(bg)(s)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
+         list_of("")("")("")("")("")("")("")("")(""), kLinear, kLog, false, 0.8, 0.8, 0.99, 0.99);
    sRho->SetFillColor(kMagenta-3);
    sRho->SetLineColor(kBlack);
    sRho->SetLineStyle(0);
@@ -209,6 +218,9 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sbg->SetLineColor(kBlack);
    sbg->SetLineStyle(0);
    sbg->SetLineWidth(1);
+
+   s->SetLineColor(kRed+3);
+   s->SetFillStyle(0);
 
    gPad->SetLogy(true);
 }

@@ -155,6 +155,23 @@ void CbmAnaLmvmDrawStudy::DrawMinv()
 
    TCanvas *c2 = CreateCanvas("lmvm_study_minv_bg_ptcut", "lmvm_study_minv_bg_ptcut", 600, 600);
    DrawH1(hPtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.75, 0.99, 0.99, "");
+
+
+  /* TCanvas *c1 = CreateCanvas("lmvm_study_minv_urqmd", "lmvm_study_minv_urqmd", 900, 900);
+   vector<TH1*> hbg;
+   hbg.resize(fNofStudies);
+   for (int i = 0; i < fNofStudies; i++){
+      hbg[i] = (TH1D*)H1(i, "fh_bg_minv_ptcut")->Clone();
+      hbg[i]->Rebin(20);
+     // hbg[i]->GetYaxis()->SetTitle("Tracks/event x10^{-1}");
+      //hbg[i]->GetXaxis()->SetRange(kElId + 1, kPtCut + 1);
+      hbg[i]->SetMinimum(1e-6);
+   }
+   //SetAnalysisStepLabels(hbg[0]);
+   DrawH1(hbg, fStudyNames, kLinear, kLog, true, 0.70, 0.75, 0.99, 0.99, "");
+   for (int i = 0; i < fNofStudies; i++){
+      hbg[i]->SetLineWidth(3.);
+   */
 }
 
 void CbmAnaLmvmDrawStudy::DrawNofBgTracks()

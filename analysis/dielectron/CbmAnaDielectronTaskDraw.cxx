@@ -111,6 +111,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawBgSourcesVsMomentum();
    DrawMvdCutQa();
    DrawMvdAndStsHist();
+   DrawElPiMomHis();
 
    SaveCanvasToImage();
 
@@ -126,6 +127,8 @@ void CbmAnaDielectronTaskDraw::RebinMinvHist()
       H1("fh_bg_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
       H1("fh_pi0_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
       H1("fh_eta_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
+      H1("fh_bg_truematch_minv" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
+      H1("fh_bg_mismatch_minv" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
 
       for (int iP = 0; iP < CbmAnaLmvmNames::fNofBgPairSources; iP++){
          stringstream ss;
@@ -378,8 +381,12 @@ void CbmAnaDielectronTaskDraw::DrawPtYDistributionAll()
       DrawPtYDistribution(step);
    }
 
-   TCanvas *cPtCut = CreateCanvas("lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut],
-         "lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 600, 600);
+   TCanvas *cMc = CreateCanvas("lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut],
+         "lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 800, 800);
+   //cMc->Divide(2,1);
+   //cMc->cd(1);
+  // DrawPtYDistribution(kMc, false);
+  // cMc->cd(2);
    DrawPtYDistribution(kPtCut, false);
 }
 
@@ -820,11 +827,11 @@ void CbmAnaDielectronTaskDraw::DrawMinvSource(
    legend->SetFillColor(kWhite);
    legend->Draw();
    if (drawAnaStep) DrawTextOnHist(CbmAnaLmvmNames::fAnaStepsLatex[step], 0.65, 0.78, 0.85, 0.9);
-
 }
 
 void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
 {
+   {
    Int_t hi = 1;
    TCanvas *c = CreateCanvas("lmvm_minv_source", "lmvm_minv_source", 900, 900);
    c->Divide(3,3);
@@ -838,6 +845,45 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
    TCanvas *cPtCut = CreateCanvas("lmvm_minv_source_" + CbmAnaLmvmNames::fAnaSteps[kPtCut],
          "lmvm_minv_source_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 600, 600);
    DrawMinvSource(kPtCut, false);
+   }
+
+   // Draw mismatches and true matches minv
+   {
+   Int_t hi = 1;
+   TCanvas *c = CreateCanvas("lmvm_minv_mismatches", "lmvm_minv_mismatches", 900, 900);
+   c->Divide(3,3);
+   for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
+      if ( !fUseMvd && (step == kMvd1Cut || step == kMvd2Cut)) continue;
+      c->cd(hi++);
+      DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) ),
+            list_of("true match")("mismatch"), kLinear, kLinear, false, 0.85, 0.085, 0.99, 0.99);
+   }
+
+   // Draw minv after PtCut
+   TCanvas *cPtCut = CreateCanvas("lmvm_minv_mismatches_" + CbmAnaLmvmNames::fAnaSteps[kPtCut],
+            "lmvm_minv_mismatches_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 600, 600);
+   DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) ),
+         list_of("true match")("mismatch"), kLinear, kLinear, false, 0.85, 0.085, 0.99, 0.99);
+   }
+
+}
+
+void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
+{
+   TCanvas *cEl = CreateCanvas("lmvm_elpi_mom_electron", "lmvm_elpi_mom_electron", 800, 800);
+   DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mtom_acc_electron"))(H1("fh_elpi_mom_rec_electron"))
+         (H1("fh_elpi_mom_rec_only_sts_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")),
+         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
+         kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
+
+
+   TCanvas *cPi = CreateCanvas("lmvm_elpi_mom_pion", "lmvm_elpi_mom_pion", 800, 800);
+   DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))(H1("fh_elpi_mom_rec_pion"))
+         (H1("fh_elpi_mom_rec_only_sts_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")),
+         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
+         kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
+
+
 }
 
 void CbmAnaDielectronTaskDraw::RemoveMvdCutBins()
@@ -984,7 +1030,7 @@ void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
    hmismatches_rich->SetMarkerSize(2.);
    SetAnalysisStepLabels(hmismatches_rich);
    c1->cd(3);
-   TH1D* hmismatches_trd = (TH1D*)H1("hmismatches_trd")->Clone();
+   TH1D* hmismatches_trd = (TH1D*)H1("fh_nof_mismatches_trd")->Clone();
    hmismatches_trd->Scale(10);
    hmismatches_trd->GetYaxis()->SetTitle("Mismatch tracks (TRD)/event x10^{-1}");
    hmismatches_trd->GetXaxis()->SetRange(kReco + 1, rangeMax);

@@ -340,7 +340,12 @@ void CbmAnaDielectronTask::InitHists()
       }
    }
 
-
+   fh_elpi_mom_mc.resize(2);
+   fh_elpi_mom_acc.resize(2);
+   fh_elpi_mom_rec.resize(2);
+   fh_elpi_mom_rec_only_sts.resize(2);
+   fh_elpi_mom_rec_sts_rich_trd.resize(2);
+   fh_elpi_mom_rec_sts_rich_trd_tof.resize(2);
    //electrons and pions vs momentum
    for (int i = 0; i < 2; i++){
       string s = "electron";

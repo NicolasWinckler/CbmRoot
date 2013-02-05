@@ -1803,6 +1803,7 @@ void L1Algo::CATrackFinder()
             if (isec != TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
             {
+              if ( isec != kFastPrimIter && isec != kAllPrimIter )
               if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
               if ( (ilev == 0) &&
                    (GetFStation(vSFlag[(*vStsHitsUnused)[first_trip->GetLHit()].f]) != 0) ) continue;  // ghost supression // collect only MAPS tracks-triplets

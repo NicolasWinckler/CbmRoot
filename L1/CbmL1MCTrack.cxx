@@ -190,16 +190,20 @@ void CbmL1MCTrack::CalculateIsReconstructable()
     // reject very slow tracks from analysis
   f &= (p > CbmL1Constants::MinRecoMom);
     // detected at least in 4 stations
-//   f &= (nMCContStations >= 4);
-
-  if (L1->fPerformance == 3) f &= (nMCContStations  >= CbmL1Constants::MinNStations); // L1-MC
-  if (L1->fPerformance == 2) f &= (nStations        >= CbmL1Constants::MinNStations); // QA definition
-  if (L1->fPerformance == 1) f &= (nHitContStations >= CbmL1Constants::MinNStations); // L1 definition
-
-    // maximul 4 layers for a station.
-//   f &= (maxNStaHits <= 4);
-  f &= (maxNStaMC <= 4);
-//   f &= (maxNSensorMC <= 1);
+    //   f &= (nMCContStations >= 4);
   
-  isReconstructable = f;
+    // maximul 4 layers for a station.
+    //   f &= (maxNStaHits <= 4);
+  f &= (maxNStaMC <= 4);
+    //   f &= (maxNSensorMC <= 1);
+  
+  if (L1->fPerformance == 3) isReconstructable = f & (nMCContStations  >= CbmL1Constants::MinNStations); // L1-MC
+  if (L1->fPerformance == 2) isReconstructable = f & (nStations        >= CbmL1Constants::MinNStations); // QA definition
+  if (L1->fPerformance == 1) isReconstructable = f & (nHitContStations >= CbmL1Constants::MinNStations); // L1 definition
+
+  isAdditional = f &
+    (nHitContStations == nStations) & (nMCContStations == nStations) & (nMCStations == nStations) &
+    (nHitContStations >= 3) &
+    (L1->vMCPoints[Points[0]].iStation == 0);
+  isAdditional &= !isReconstructable;
 }; // bool CbmL1MCTrack::IsReconstructable()

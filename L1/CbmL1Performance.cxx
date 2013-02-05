@@ -140,6 +140,7 @@ mc_length_hits()
     AddCounter("slow_sec"       ,"ExtraSec  efficiency");
     AddCounter("slow"           ,"Extra     efficiency");
     AddCounter("d0"             ,"D0        efficiency");
+    AddCounter("short"          ,"Short123s efficiency");
   }
   
   virtual ~TL1PerfEfficiencies(){};
@@ -262,7 +263,7 @@ void CbmL1::EfficienciesPerformance()
     CbmL1MCTrack &mtra = *(mtraIt);
     
 //    if( !( mtra.pdg == -11 && mtra.mother_ID == -1 ) ) continue; // electrons only
-    if( ! mtra.IsReconstructable() ) continue;
+    if( ! mtra.IsReconstructable() && ! mtra.IsAdditional() ) continue;
 
       // -- find used constans --
       // is track reconstructed
@@ -284,43 +285,51 @@ void CbmL1::EfficienciesPerformance()
       // number of clones
     int nclones = 0;
     if (reco) nclones = mtra.GetNClones();
-//     if (nclones){ // Debug. Look at clones
-//       for (int irt = 0; irt < rTracks.size(); irt++){
-//         const int ista = vHitStore[rTracks[irt]->StsHits[0]].iStation;
-//         cout << rTracks[irt]->GetNOfHits() << "(" << ista << ") ";
-//       }
-//       cout << mtra.NStations() << endl;
-//     }
+      //     if (nclones){ // Debug. Look at clones
+      //       for (int irt = 0; irt < rTracks.size(); irt++){
+      //         const int ista = vHitStore[rTracks[irt]->StsHits[0]].iStation;
+      //         cout << rTracks[irt]->GetNOfHits() << "(" << ista << ") ";
+      //       }
+      //       cout << mtra.NStations() << endl;
+      //     }
 
-    ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "total");
+    if ( mtra.IsAdditional() ){ // short
+      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "short");
+    }
+    else { // separate all efficiecies from short eff
     
-    if (( mtra.IsPrimary() )&&(mtra.z > 0)){ // D0
-      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "d0");
-    }
+      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "total");
 
-    if ( mtra.p > CbmL1Constants::MinRefMom ){                        // reference tracks
-      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast");
+      if (( mtra.IsPrimary() )&&(mtra.z > 0)){ // D0
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "d0");
+      }
+
+      if ( mtra.p > CbmL1Constants::MinRefMom ){                        // reference tracks
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast");
       
-      if ( mtra.IsPrimary() ){                         // reference primary
-        if ( mtra.NStations() == NStation ){ // long reference primary
-          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "long_fast_prim");
+        if ( mtra.IsPrimary() ){                         // reference primary
+          if ( mtra.NStations() == NStation ){ // long reference primary
+            ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "long_fast_prim");
+          }
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_prim");
         }
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_prim");
+        else{                                             // reference secondary
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_sec");
+        }
       }
-      else{                                             // reference secondary
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_sec");
-      }
-    }
-    else{                                               // extra set of tracks
-      ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow");
+      else{                                               // extra set of tracks
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow");
        
-      if ( mtra.IsPrimary() ){             // extra primary
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_prim");
-      }
-      else{
-        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_sec");
-      }
-    } // if extra
+        if ( mtra.IsPrimary() ){             // extra primary
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_prim");
+        }
+        else{
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_sec");
+        }
+      } // if extra
+
+
+    }
 
   } // for mcTracks
 
@@ -1990,11 +1999,11 @@ void CbmL1::InputPerformance()
     nStripFMC = new TH1I("nMC_f", "N MC Points On Front Strip", 10, 0, 10);
     nStripBMC = new TH1I("nMC_b", "N MC Points On Back Strip", 10, 0, 10);
 
-    pullX = new TH1F("Px", "Pull x", 50, -10, 10);
-    pullY = new TH1F("Py", "Pull y", 50, -10, 10);
+    pullX = new TH1F("Px", "Pull x", 50, -5, 5);
+    pullY = new TH1F("Py", "Pull y", 50, -5, 5);
 
-    resX = new TH1F("x", "Residual x", 50, -200, 200);
-    resY = new TH1F("y", "Residual y", 50, -200, 200);
+    resX = new TH1F("x", "Residual x", 50, -50, 50);
+    resY = new TH1F("y", "Residual y", 50, -500, 500);
     TH1* histo;
     histo = resX;
     histo->GetXaxis()->SetTitle("Residual x, um");

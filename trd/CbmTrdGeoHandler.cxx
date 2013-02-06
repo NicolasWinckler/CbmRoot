@@ -253,7 +253,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
     TGeoNode* node = (TGeoNode*) nodes->At(iNode);
     if (TString(node->GetName()).Contains("trd_v")) {   // check for strings like: trd_v13a, trd_v14b, trd_v15x
 
-      // Since there is only one tdr top node we check for full node name
+      // Since there is only one trd top node, we check for full node name
       // In new geometries the node name is trd_v<year><version> eg. trd_v13a
       // With this naming scheme the geometry version is completely qualified
 
@@ -267,6 +267,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
      }
   }
 
+  // if not, we have an old geometry
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1layer");
   if (fm) {
     cout<<"Found old TRD geometry version (with individual keeping volumes for layers)."<<endl;
@@ -407,6 +408,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t
   	  //          cout << "adding station *** " << volumeName << endl;
           totalNrOfLayers += iLayer;   // add number of layers in this station
   	  layersBeforeStation.push_back(totalNrOfLayers);
+	  //          cout << "SKVolGeo iLayer "<< iLayer <<" and layersBeforeStation "<< totalNrOfLayers << endl;
   	  layersPerStation[iStation-1]=iLayer;
           foundModule=kFALSE; 
   	  break;
@@ -415,9 +417,10 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t
     }
     
     for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-
-      cout<<"TRD Station "<< iStation <<" has "<< layersPerStation[iStation-1] 
-          <<" layers."<<endl;
+      fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+    }
+    for ( Int_t iStation=1; iStation<=totalNrOfStations+1; iStation++) {
+      fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
     }
 
     return kTRUE;
@@ -487,7 +490,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometry(std::vector<Int_t> &layers
         }
       }
     }
-    cout<<"Number of TRD stations "<< totalNrOfStations << "." << endl;
+    fLogger->Info(MESSAGE_ORIGIN,"Number of TRD stations: %d", totalNrOfStations);
   } else {
     cout << "***************************************" <<endl;
     cout << "                                       " <<endl;
@@ -553,19 +556,21 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometry(std::vector<Int_t> &layers
       if (foundModule){
 	  //          cout << "adding station *** " << volumeName << endl;
         totalNrOfLayers += iLayer;   // add number of layers in this station
-	  layersBeforeStation.push_back(totalNrOfLayers);
-	  layersPerStation[iStation-1]=iLayer;
+        layersBeforeStation.push_back(totalNrOfLayers);
+	//        cout << "Root Geo iLayer "<< iLayer <<" and layersBeforeStation "<< totalNrOfLayers << endl;
+        layersPerStation[iStation-1]=iLayer;
         foundModule=kFALSE; 
-	  break;
+        break;
       }
     }
   }
 
   
   for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-
-    cout<<"TRD Station "<< iStation <<" has "<< layersPerStation[iStation-1] 
-        <<" layers."<<endl;
+    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+  }
+  for ( Int_t iStation=1; iStation<=totalNrOfStations+1; iStation++) {
+    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
   }
 
   return kTRUE;
@@ -724,42 +729,49 @@ Int_t CbmTrdGeoHandler::GetStation(Int_t uniqueId)
   if (fLastUsedDetectorID != uniqueId) {
     FillDetectorInfoArray(uniqueId);
   }
-  return fDetectorInfoArray[1];
+  //  cout << " " << fDetectorInfoArray[1];
+  return fDetectorInfoArray[1];  // 1-3
 }
 Int_t CbmTrdGeoHandler::GetLayer(Int_t uniqueId)
 {
   if (fLastUsedDetectorID != uniqueId) {
     FillDetectorInfoArray(uniqueId);
   }
-  return fDetectorInfoArray[2];
+  //  cout << " " << fDetectorInfoArray[2];
+  return fDetectorInfoArray[2];  // 1-4
 }
 Int_t CbmTrdGeoHandler::GetModuleType(Int_t uniqueId)
 {
   if (fLastUsedDetectorID != uniqueId) {
     FillDetectorInfoArray(uniqueId);
   }
-  return fDetectorInfoArray[3];
+  //  cout << " " << fDetectorInfoArray[3];
+  return fDetectorInfoArray[3];  // 1-8
 }
 Int_t CbmTrdGeoHandler::GetModuleCopyNr(Int_t uniqueId)
 {
   if (fLastUsedDetectorID != uniqueId) {
     FillDetectorInfoArray(uniqueId);
   }
-  return fDetectorInfoArray[4];
+  //  cout << " " << fDetectorInfoArray[4];
+  return fDetectorInfoArray[4];  // 1-xx
 }
 Int_t CbmTrdGeoHandler::GetSector(Int_t uniqueId)
 {
   if (fLastUsedDetectorID != uniqueId) {
     FillDetectorInfoArray(uniqueId);
   }
-  return fDetectorInfoArray[5];
+  // cout << " " << fDetectorInfoArray[5];
+  return fDetectorInfoArray[5];  // 0-2
 }
 Int_t CbmTrdGeoHandler::GetPlane(Int_t uniqueId)
 {
   if (fLastUsedDetectorID != uniqueId) {
     FillDetectorInfoArray(uniqueId);
   }
-  return fLayersBeforeStation[(fDetectorInfoArray[1]-1)]+fDetectorInfoArray[2];
+  //  cout << " " << fLayersBeforeStation[(GetStation(uniqueId)-1)]+GetLayer(uniqueId);
+  return fLayersBeforeStation[(GetStation(uniqueId)-1)]+GetLayer(uniqueId);  // 1-10  // get plane number from station and layer information
+  //  return fLayersBeforeStation[(fDetectorInfoArray[1]-1)]+fDetectorInfoArray[2];
 }
 Int_t CbmTrdGeoHandler::GetModuleId(Int_t uniqueId)
 {

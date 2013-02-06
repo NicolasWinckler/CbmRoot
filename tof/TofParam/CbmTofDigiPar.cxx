@@ -4,8 +4,6 @@
 
 #include "FairParamList.h"
 
-#include "TStopWatch.h"
-
 #include <iostream>
 
 ClassImp(CbmTofDigiPar)

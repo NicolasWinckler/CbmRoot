@@ -9,7 +9,7 @@
 
 /// extra Doxygen comment 10/11/2011 by DE
 
-void run_reco(Int_t nEvents = 2)
+void run_reco(Int_t nEvents = 1)
 {
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");

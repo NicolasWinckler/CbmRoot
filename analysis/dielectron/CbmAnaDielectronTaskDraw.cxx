@@ -109,7 +109,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawBgSourcesVsMomentum();
    DrawMvdCutQa();
    DrawMvdAndStsHist();
-  // DrawElPiMomHis();
+   DrawElPiMomHis();
 
    SaveCanvasToImage();
 
@@ -869,16 +869,25 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
 void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
 {
    TCanvas *cEl = CreateCanvas("lmvm_elpi_mom_electron", "lmvm_elpi_mom_electron", 800, 800);
-   DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mtom_acc_electron"))(H1("fh_elpi_mom_rec_electron"))
-         (H1("fh_elpi_mom_rec_only_sts_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")),
-         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
+   DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mom_acc_electron"))
+         //(H1("fh_elpi_mom_rec_electron"))
+         //(H1("fh_elpi_mom_rec_only_sts_electron"))
+         (H1("fh_elpi_mom_rec_sts_rich_trd_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")),
+         list_of("MC")("Acc")
+         //("Rec")
+        // ("Rec only STS")
+         ("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
          kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
 
 
    TCanvas *cPi = CreateCanvas("lmvm_elpi_mom_pion", "lmvm_elpi_mom_pion", 800, 800);
-   DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))(H1("fh_elpi_mom_rec_pion"))
-         (H1("fh_elpi_mom_rec_only_sts_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")),
-         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
+   DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))
+        // (H1("fh_elpi_mom_rec_pion"))
+        // (H1("fh_elpi_mom_rec_only_sts_pion"))
+         (H1("fh_elpi_mom_rec_sts_rich_trd_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")),
+         list_of("MC")("Acc")
+         //("Rec")("Rec only STS")
+         ("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
          kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
 
 

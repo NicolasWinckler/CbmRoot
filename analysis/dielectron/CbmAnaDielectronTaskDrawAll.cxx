@@ -358,6 +358,13 @@ void CbmAnaDielectronTaskDrawAll::SBgRangeAll()
    h_00_02->SetLineWidth(4);
    h_02_06->SetLineWidth(4);
    h_06_12->SetLineWidth(4);
+
+   TH1D* h_05_06 = SBgRange(0.5, 0.6);
+   TCanvas* c1 = CreateCanvas("lmvm_s_bg_ranges_05_06", "lmvm_s_bg_ranges_05_06", 700, 700);
+   DrawH1(h_05_06, kLinear, kLog);
+   h_05_06->SetMinimum(1e-3);
+   h_05_06->SetMaximum(3);
+   h_05_06->SetLineWidth(4);
 }
 
 void CbmAnaDielectronTaskDrawAll::DrawSBgSignals()

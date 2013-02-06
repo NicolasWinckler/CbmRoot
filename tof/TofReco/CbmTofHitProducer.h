@@ -13,6 +13,8 @@
 #include "FairTask.h"
 
 class CbmTofGeoHandler;
+class CbmTofDigiPar;
+class CbmTofCell;
 
 class TVector3;
 class TClonesArray;
@@ -30,6 +32,8 @@ class CbmTofHitProducer : public FairTask {
   virtual ~CbmTofHitProducer();
 
   virtual InitStatus Init();
+  virtual InitStatus ReInit();
+  virtual void SetParContainers();
   virtual void Exec(Option_t * option);
   virtual void Finish();
 
@@ -40,6 +44,7 @@ class CbmTofHitProducer : public FairTask {
   void SetSigmaXY(Double_t sigma);
   void SetSigmaY(Double_t sigma);
   void SetSigmaZ(Double_t sigma);
+  void SetInitFromAscii(Bool_t ascii) {fParInitFromAscii=ascii;}
 
   Double_t GetSigmaT();
   Double_t GetSigmaXY();
@@ -49,6 +54,9 @@ class CbmTofHitProducer : public FairTask {
 private:
 
   void ReadTofZPosition();
+
+  void InitParametersFromAscii();
+  void InitParametersFromContainer();
 
   Int_t fVerbose;
 
@@ -62,6 +70,7 @@ private:
   Float_t Dx[10][500][500];  //Resolution in position in cm */
   Float_t Y [10][500][500];  //Y-Position in cm */
   Float_t Dy[10][500][500];  //Resolution in position in cm */
+  Float_t Z [10][500][500];  //Z-Position in cm */
 
   TString type[10][500][500]; //Type of cell [pad, strip]
 
@@ -89,11 +98,15 @@ private:
   Double_t fTofZPosition; // entry Z position of the TOF wall (NOT hit)
 
   CbmTofGeoHandler* fGeoHandler;
+  CbmTofDigiPar  *fDigiPar;
+  CbmTofCell   *fCellInfo;
+
+  Bool_t fParInitFromAscii;
 
   CbmTofHitProducer(const CbmTofHitProducer&);
   CbmTofHitProducer& operator=(const CbmTofHitProducer&);
 
-  ClassDef(CbmTofHitProducer,2) //CBMTOFHitProducer
+  ClassDef(CbmTofHitProducer,3) //CBMTOFHitProducer
 
 };
 #endif 

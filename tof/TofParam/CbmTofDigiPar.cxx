@@ -4,6 +4,8 @@
 
 #include "FairParamList.h"
 
+#include "TStopWatch.h"
+
 #include <iostream>
 
 ClassImp(CbmTofDigiPar)
@@ -15,6 +17,11 @@ CbmTofDigiPar::CbmTofDigiPar(const char* name,
     fCellMap(),
     fCellMapIt(),
     fCellIdArray(),
+    fCellXArray(),
+    fCellYArray(),
+    fCellZArray(),
+    fCellDxArray(),
+    fCellDyArray(),
     fNrOfCells(-1)
 {
 	detName="Tof";
@@ -44,28 +51,11 @@ void CbmTofDigiPar::putParams(FairParamList* l)
 
   l->add("NrOfCells", fNrOfCells);
   l->add("CellIdArray", fCellIdArray);
-
-  // The parameters are:
-  // X. Y, Z             : position of the middle of the 8 gaps belonging to one cell.
-  // SizeX, SizeY        : size of the cell. The values are only the
-  //                       half size which are the values returned by
-  //                       geant.
-
-  Int_t nrValues = 5;
-  TArrayD values(nrValues);
-
-  for (Int_t i=0; i < fNrOfCells; i++){
-    values.AddAt(fCellMap[fCellIdArray[i]]->GetX(),0);
-    values.AddAt(fCellMap[fCellIdArray[i]]->GetY(),1);
-    values.AddAt(fCellMap[fCellIdArray[i]]->GetZ(),2);
-    values.AddAt(fCellMap[fCellIdArray[i]]->GetSizex(),3);
-    values.AddAt(fCellMap[fCellIdArray[i]]->GetSizey(),4);
-
-    TString text;
-    text += fCellIdArray[i];
-    l->add(text.Data(), values);
-  }
-
+  l->add("CellXArray", fCellXArray);
+  l->add("CellYArray", fCellYArray);
+  l->add("CellZArray", fCellZArray);
+  l->add("CellDxArray", fCellDxArray);
+  l->add("CellDyArray", fCellDyArray);
 
 }
 
@@ -73,38 +63,36 @@ Bool_t CbmTofDigiPar::getParams(FairParamList* l)
 {
   if (!l) { return kFALSE; }
 
+  LOG(DEBUG2)<<"Get the tof digitization parameters."<<FairLogger::endl;
+
   if ( ! l->fill("NrOfCells", &fNrOfCells) ) return kFALSE;
+
+  LOG(DEBUG2)<<"There are "<< fNrOfCells<<" cells to be read."<<FairLogger::endl;
 
   fCellIdArray.Set(fNrOfCells);
   if ( ! l->fill("CellIdArray", &fCellIdArray) ) return kFALSE;
 
-  Int_t nrValues = 5;
-  TArrayD *values = new TArrayD(nrValues);
+  fCellXArray.Set(fNrOfCells);
+  if ( ! l->fill("CellXArray", &fCellXArray) ) return kFALSE;
 
-  Double_t x;
-  Double_t y;
-  Double_t z;
-  Double_t sizex;
-  Double_t sizey;
+  fCellYArray.Set(fNrOfCells);
+  if ( ! l->fill("CellYArray", &fCellYArray) ) return kFALSE;
 
-  TString text;
+  fCellZArray.Set(fNrOfCells);
+  if ( ! l->fill("CellZArray", &fCellZArray) ) return kFALSE;
+
+  fCellDxArray.Set(fNrOfCells);
+  if ( ! l->fill("CellDxArray", &fCellDxArray) ) return kFALSE;
+
+  fCellDyArray.Set(fNrOfCells);
+  if ( ! l->fill("CellDyArray", &fCellDyArray) ) return kFALSE;
+
+
   for (Int_t i=0; i < fNrOfCells; i++){
-    text="";
-    text += fCellIdArray[i];
-    if ( ! l->fill(text.Data(), values) ) return kFALSE;
-    Int_t VolumeID = text.Atoi();
-    x=values->At(0);
-    y=values->At(1);
-    z=values->At(2);
-    sizex= values->At(3);
-    sizey= values->At(4);
+    fCellMap[fCellIdArray[i]] = new CbmTofCell(fCellIdArray[i],fCellXArray[i] ,
+        fCellYArray[i], fCellZArray[i],
+        fCellDxArray[i], fCellDyArray[i]);
 
-    fCellMap[VolumeID] = new CbmTofCell(VolumeID, x, y, z,
-                                            sizex, sizey);
   }
-
-  delete values;
-
-
   return kTRUE;
 }

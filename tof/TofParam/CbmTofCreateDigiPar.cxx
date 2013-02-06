@@ -373,6 +373,7 @@ void CbmTofCreateDigiPar::FillCellInfoFromGeoHandler(TString FullPath)
 void CbmTofCreateDigiPar::FillDigiPar()
 {
 
+/*
   ofstream fout;
   fout.open("output.txt");
   fout << "#####################################################################################"<<"\n";
@@ -382,13 +383,19 @@ void CbmTofCreateDigiPar::FillDigiPar()
   fout << "# Region Module Cell   type       X[mm]           Y[mm]         Dx[mm]  Dy[mm]"<<"\n";
   fout << "#####################################################################################"<<"\n";
   fout << "[TofGeoPar]"<<"\n";
+*/
 
   Int_t Nrcells = (Int_t)fCellMap.size();
-  LOG(INFO) <<"Nr. of modules: "<<Nrcells<<FairLogger::endl;
+  LOG(DEBUG2) <<"Nr. of tof cells: "<<Nrcells<<FairLogger::endl;
 
   fDigiPar->SetNrOfCells(Nrcells);
 
-  TArrayI *ModuleId  = new TArrayI(Nrcells);
+  TArrayI *CellId  = new TArrayI(Nrcells);
+  TArrayD *CellX   = new TArrayD(Nrcells);
+  TArrayD *CellY  = new TArrayD(Nrcells);
+  TArrayD *CellZ  = new TArrayD(Nrcells);
+  TArrayD *CellDx  = new TArrayD(Nrcells);
+  TArrayD *CellDy  = new TArrayD(Nrcells);
 
   Int_t iDigi=0;
 
@@ -398,8 +405,7 @@ void CbmTofCreateDigiPar::FillDigiPar()
 
   for ( fCellMapIt=fCellMap.begin(); fCellMapIt!=fCellMap.end(); fCellMapIt++) {
 
-    ModuleId->AddAt(fCellMapIt->first,iDigi);
-    iDigi++;
+    CellId->AddAt(fCellMapIt->first,iDigi);
 
     std::vector<CbmTofCell*> vcell = fCellMapIt->second;
     Int_t cellId = fCellMapIt->first;
@@ -428,25 +434,44 @@ void CbmTofCreateDigiPar::FillDigiPar()
       sizey+=tofcell->GetSizey();
     }
 
-    singlecell = new CbmTofCell(cellId, x/vcell.size(), y/vcell.size(), z/vcell.size(),
+
+    CellX->AddAt(x/vcell.size(),iDigi);
+    CellY->AddAt(y/vcell.size(),iDigi);
+    CellZ->AddAt(z/vcell.size(),iDigi);
+    CellDx->AddAt(sizex/vcell.size(),iDigi);
+    CellDy->AddAt(sizey/vcell.size(),iDigi);
+
+
+/*
+     singlecell = new CbmTofCell(cellId, x/vcell.size(), y/vcell.size(), z/vcell.size(),
         sizex/vcell.size(),sizey/vcell.size());
 
     singleCellMap.insert( std::pair<Int_t, CbmTofCell*>(cellId, singlecell));
+*/
 
     fRegion=fGeoHandler->GetRegion(cellId);
     fSModule=fGeoHandler->GetSModule(cellId);
     fCounter=fGeoHandler->GetCounter(cellId);
     fCell=fGeoHandler->GetCell(cellId);
 
-    fout << fRegion <<"   "<< fCounter <<"   "<< fSModule <<"   "<< fCell
+/*
+     fout << fRegion <<"   "<< fCounter <<"   "<< fSModule <<"   "<< fCell
         <<"   "<< x/vcell.size()*10 <<"   "<< y/vcell.size()*10 <<"   "<< z/vcell.size()*10
         <<"   "<<sizex/vcell.size()*20 <<"   "<< sizey/vcell.size()*20<<"\n";
+*/
+    iDigi++;
   }
 
 
   fDigiPar->SetNrOfCells(Nrcells);
-  fDigiPar->SetCellIdArray(*ModuleId);
-  fDigiPar->SetCellMap(singleCellMap);
+  fDigiPar->SetCellIdArray(*CellId);
+  fDigiPar->SetCellXArray(*CellX);
+  fDigiPar->SetCellYArray(*CellY);
+  fDigiPar->SetCellZArray(*CellZ);
+  fDigiPar->SetCellDxArray(*CellDx);
+  fDigiPar->SetCellDyArray(*CellDy);
+//  fDigiPar->SetCellMap(singleCellMap);
+
 }
 
 

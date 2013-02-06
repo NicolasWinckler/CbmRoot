@@ -80,10 +80,6 @@ private:
 
     CbmTofGeoHandler* fGeoHandler;
   
-/*    std::map<Int_t, std::map<Int_t, std::vector<Int_t> > > fModInfoMap;
-    std::map<Int_t, std::vector<Int_t> >  fModTypeMap;
-    std::vector<Int_t> fModuleTypeVector;
-*/
     CbmTofCreateDigiPar(const CbmTofCreateDigiPar&);
     CbmTofCreateDigiPar& operator=(const CbmTofCreateDigiPar&);
 

@@ -4,6 +4,7 @@
 #include "FairParGenericSet.h"
 
 #include "TArrayI.h"
+#include "TArrayD.h"
 
 #include <map>
 
@@ -24,6 +25,12 @@ class CbmTofDigiPar : public FairParGenericSet
 
     void SetNrOfCells(Int_t i) { fNrOfCells = i; }
     void SetCellIdArray(TArrayI array) { fCellIdArray = array; }
+    void SetCellXArray(TArrayD array) { fCellXArray = array; }
+    void SetCellYArray(TArrayD array) { fCellYArray = array; }
+    void SetCellZArray(TArrayD array) { fCellZArray = array; }
+    void SetCellDxArray(TArrayD array) { fCellDxArray = array; }
+    void SetCellDyArray(TArrayD array) { fCellDyArray = array; }
+
     void SetCellMap(std::map<Int_t, CbmTofCell*> map)
                       { fCellMap = map;}
 
@@ -40,6 +47,11 @@ class CbmTofDigiPar : public FairParGenericSet
     std::map<Int_t, CbmTofCell*>::iterator fCellMapIt;      //!
 
     TArrayI fCellIdArray; // Array to hold the unique IDs for all cells
+    TArrayD fCellXArray; // Array to hold the unique IDs for all cells
+    TArrayD fCellYArray; // Array to hold the unique IDs for all cells
+    TArrayD fCellZArray; // Array to hold the unique IDs for all cells
+    TArrayD fCellDxArray; // Array to hold the unique IDs for all cells
+    TArrayD fCellDyArray; // Array to hold the unique IDs for all cells
     Int_t fNrOfCells; // Total number of cells
 
     CbmTofDigiPar(const CbmTofDigiPar&);

@@ -46,9 +46,9 @@ const Float_t maxdx    = 0.2;   // max +- 0.1 cm shift in x
 const Float_t maxdy    = 0.2;   // max +- 0.1 cm shift in y
 const Float_t maxdz    = 1.0;   // max +- 1.0 cm shift in z
 
-const Float_t maxdrotx = 2.0;   // 20.0; // max rotation aronud x
-const Float_t maxdroty = 2.0;   // 20.0; // max rotation aronud y
-const Float_t maxdrotz = 2.0;   // 20.0; // max rotation aronud z
+const Float_t maxdrotx = 2.0;   // 20.0; // max rotation around x
+const Float_t maxdroty = 2.0;   // 20.0; // max rotation around y
+const Float_t maxdrotz = 2.0;   // 20.0; // max rotation around z
 
 Float_t ExplodeFactor = 1.02;   // 1.02; // Factor by which modules are exploded in the x/y plane
 

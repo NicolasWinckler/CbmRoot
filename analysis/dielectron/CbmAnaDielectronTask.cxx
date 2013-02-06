@@ -351,11 +351,17 @@ void CbmAnaDielectronTask::InitHists()
       string s = "electron";
       if (i == 1) s = "pion";
       fh_elpi_mom_mc[i] = new TH1D( ("fh_elpi_mom_mc_"+s).c_str(), ("fh_elpi_mom_mc_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fHistoList.push_back(fh_elpi_mom_mc[i]);
       fh_elpi_mom_acc[i] = new TH1D( ("fh_elpi_mom_acc_"+s).c_str(), ("fh_elpi_mom_acc_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fHistoList.push_back(fh_elpi_mom_acc[i]);
       fh_elpi_mom_rec[i] = new TH1D( ("fh_elpi_mom_rec_"+s).c_str(), ("fh_elpi_mom_rec_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fHistoList.push_back(fh_elpi_mom_acc[i]);
       fh_elpi_mom_rec_only_sts[i] = new TH1D( ("fh_elpi_mom_rec_only_sts_"+s).c_str(), ("fh_elpi_mom_rec_only_sts_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fHistoList.push_back(fh_elpi_mom_acc[i]);
       fh_elpi_mom_rec_sts_rich_trd[i] = new TH1D( ("fh_elpi_mom_rec_sts_rich_trd_"+s).c_str(), ("fh_elpi_mom_rec_sts_rich_trd_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fHistoList.push_back(fh_elpi_mom_rec_sts_rich_trd[i]);
       fh_elpi_mom_rec_sts_rich_trd_tof[i] = new TH1D( ("fh_elpi_mom_rec_sts_rich_trd_tof_"+s).c_str(), ("fh_elpi_mom_rec_sts_rich_trd_tof_"+s+";p [GeV/c];dN/dP [1/GeV/c]").c_str(), 120, 0., 12.);
+      fHistoList.push_back(fh_elpi_mom_rec_sts_rich_trd_tof[i]);
    }
 }
 
@@ -663,7 +669,7 @@ void CbmAnaDielectronTask::FillElPiMomHist()
 
    Int_t ngTracks = fGlobalTracks->GetEntriesFast();
    for (Int_t i = 0; i < ngTracks; i++) {
-       CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
+       CbmGlobalTrack* gTrack = (CbmGlobalTrack*) fGlobalTracks->At(i);
        if(NULL == gTrack) continue;
        int stsInd = gTrack->GetStsTrackIndex();
        int richInd = gTrack->GetRichRingIndex();
@@ -1084,11 +1090,8 @@ void CbmAnaDielectronTask::FillPairHists(
    if (isPi0) fh_pi0_minv[step]->Fill(parRec->minv);
    if (isEta) fh_eta_minv[step]->Fill(parRec->minv);
    if (isGamma) fh_gamma_minv[step]->Fill(parRec->minv);
-   if (isMismatch){
-      fh_bg_mismatch_minv[step]->Fill(parRec->minv);
-   } else {
-      fh_bg_truematch_minv[step]->Fill(parRec->minv);
-   }
+   if (isBG && isMismatch) fh_bg_mismatch_minv[step]->Fill(parRec->minv);
+   if (isBG && !isMismatch) fh_bg_truematch_minv[step]->Fill(parRec->minv);
 }
 
 void CbmAnaDielectronTask::SignalAndBgReco()

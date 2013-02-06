@@ -36,8 +36,6 @@
 #include "TSystem.h"
 #include "TPad.h"
 
-
-
 ClassImp(CbmAnaDielectronTaskDraw);
 
 using namespace std;
@@ -111,7 +109,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    DrawBgSourcesVsMomentum();
    DrawMvdCutQa();
    DrawMvdAndStsHist();
-   DrawElPiMomHis();
+  // DrawElPiMomHis();
 
    SaveCanvasToImage();
 
@@ -127,8 +125,8 @@ void CbmAnaDielectronTaskDraw::RebinMinvHist()
       H1("fh_bg_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
       H1("fh_pi0_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
       H1("fh_eta_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
-      H1("fh_bg_truematch_minv" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
-      H1("fh_bg_mismatch_minv" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
+      H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
+      H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
 
       for (int iP = 0; iP < CbmAnaLmvmNames::fNofBgPairSources; iP++){
          stringstream ss;

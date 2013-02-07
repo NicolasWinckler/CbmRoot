@@ -536,7 +536,7 @@ public:
    void SetTtCut(Double_t ang, Double_t pp){fTtCutAngle = ang; fTtCutPP = pp;}
 
    void SetPionMisidLevel(Double_t level) {fPionMisidLevel = level;}
-   void SetMomentumCut(Double_t mom) {fMomentumCut = mom;}
+  // void SetMomentumCut(Double_t mom) {fMomentumCut = mom;}
 };
 
 #endif

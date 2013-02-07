@@ -450,6 +450,11 @@ InitStatus CbmAnaDielectronTask::Init()
       fElIdAnn->Init();
    }
 
+   // if TRD detector us not used the momentum cut at 5.5GeV/c are used
+   if (!fUseTrd){
+      fMomentumCut = 5.5;
+   }
+
    return kSUCCESS;
 }
 
@@ -1326,17 +1331,17 @@ void CbmAnaDielectronTask::CheckTrackTopologyCut()
          } else{
             fh_stcut[kBg]->Fill(sqrt_mom, minAng);
             if (pdg == 211) fh_stcut_pion[kBg]->Fill(sqrt_mom, minAng);;
-            if (motherId == fCandidates[iP].McMotherId) fh_stcut_truepair[kBg]->Fill(sqrt_mom, minAng);;
+            if (motherId != -1 && motherId == fCandidates[iP].McMotherId) fh_stcut_truepair[kBg]->Fill(sqrt_mom, minAng);;
          }
          if (fCandidates[iP].isMcPi0Electron){
             fh_stcut[kPi0]->Fill(sqrt_mom, minAng);
             if (pdg == 211) fh_stcut_pion[kPi0]->Fill(sqrt_mom, minAng);;
-            if (motherId == fCandidates[iP].McMotherId)fh_stcut_truepair[kPi0]->Fill(sqrt_mom, minAng);;
+            if (motherId != -1 && motherId == fCandidates[iP].McMotherId)fh_stcut_truepair[kPi0]->Fill(sqrt_mom, minAng);;
          }
          if (fCandidates[iP].isMcGammaElectron){
             fh_stcut[kGamma]->Fill(sqrt_mom, minAng);
             if (pdg == 211) fh_stcut_pion[kGamma]->Fill(sqrt_mom, minAng);;
-            if (motherId == fCandidates[iP].McMotherId) fh_stcut_truepair[kGamma]->Fill(sqrt_mom, minAng);;
+            if (motherId!= -1 && motherId == fCandidates[iP].McMotherId) fh_stcut_truepair[kGamma]->Fill(sqrt_mom, minAng);;
          }
 
          Double_t val = -1.*(fStCutAngle/fStCutPP)*sqrt_mom + fStCutAngle;
@@ -1392,17 +1397,17 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
          } else{
             fh_ttcut[kBg]->Fill(sqrt_mom, minAng);
             if (pdg == 211) fh_ttcut_pion[kBg]->Fill(sqrt_mom, minAng);;
-            if (motherId == fCandidates[iP].McMotherId) fh_ttcut_truepair[kBg]->Fill(sqrt_mom, minAng);;
+            if (motherId!= -1 && motherId == fCandidates[iP].McMotherId) fh_ttcut_truepair[kBg]->Fill(sqrt_mom, minAng);;
          }
          if (fCandidates[iP].isMcPi0Electron){
             fh_ttcut[kPi0]->Fill(sqrt_mom, minAng);
             if (pdg == 211) fh_ttcut_pion[kPi0]->Fill(sqrt_mom, minAng);;
-            if (motherId == fCandidates[iP].McMotherId)fh_ttcut_truepair[kPi0]->Fill(sqrt_mom, minAng);;
+            if (motherId!= -1 && motherId == fCandidates[iP].McMotherId)fh_ttcut_truepair[kPi0]->Fill(sqrt_mom, minAng);;
          }
          if (fCandidates[iP].isMcGammaElectron){
             fh_ttcut[kGamma]->Fill(sqrt_mom, minAng);
             if (pdg == 211) fh_ttcut_pion[kGamma]->Fill(sqrt_mom, minAng);;
-            if (motherId == fCandidates[iP].McMotherId) fh_ttcut_truepair[kGamma]->Fill(sqrt_mom, minAng);;
+            if (motherId!= -1 && motherId == fCandidates[iP].McMotherId) fh_ttcut_truepair[kGamma]->Fill(sqrt_mom, minAng);;
          }
 
          Double_t val = -1.*(fTtCutAngle/fTtCutPP)*sqrt_mom + fTtCutAngle;

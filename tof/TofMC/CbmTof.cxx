@@ -217,9 +217,11 @@ void CbmTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
 void CbmTof::ConstructGeometry()
 {
   TString fileName=GetGeometryFileName();
-  if (fileName.EndsWith(".geo")) {	
+  if (fileName.EndsWith(".geo")) {
+    LOG(INFO)<<"Constructing TOF geometry from ASCII file "<<fileName<<FairLogger::endl;
     ConstructASCIIGeometry();
   } else if (fileName.EndsWith(".root")) {
+    LOG(INFO)<<"Constructing TOF geometry from ROOT file "<<fileName<<FairLogger::endl;
     ConstructRootGeometry();
   } else {
     std::cout << "Geometry format not supported." << std::endl;

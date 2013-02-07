@@ -119,6 +119,7 @@ Int_t CbmTofGeoHandler::GetUniqueDetectorId()
   } else if (fGeoVersion == k12b) {
     Volname = CurrentVolOffName(4);
     smtype = Volname[7]-'0';
+    CurrentVolOffID(4, smodule);
     CurrentVolOffID(2, counter);
     CurrentVolOffID(1, gap);
     CurrentVolID(cell);

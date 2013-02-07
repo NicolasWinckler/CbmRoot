@@ -145,20 +145,19 @@ void CbmTofCreateDigiPar::Exec(Option_t * option)
 void CbmTofCreateDigiPar::FillCellMapAsciiGeometry(){
  
   // The geometry structure is treelike with cave as
-  // the top node. For the TRD there are keeping volumes
-  // trd1-trd4 for each station which are only containers 
-  // for the different layers of one station. The trdlayer
-  // is again only a container for all volumes of this layer.   
+  // the top node. For the TOF there is a keeping volume
+  // tof1. Inside there is a region (supermodule) with cells
+  // which are constructed out of glass and the active gaps.
+  // To extract the gap information one has to navigate there.
   // Loop over all nodes below the top node (cave). If one of
-  // the nodes containes a string trd it must be one of the
-  // stations. Now loop over the layers of this station and 
-  // then over all modules of the layer to extract in the end
-  // all active regions (gas) of the complete TRD. For each
-  // of the gas volumes get the information about size and
-  // position from the geomanager and the sizes of the sectors
-  // and pads from the definitions in CbmTrdPads. This info
-  // is then stored in a TrdModule object for each of the
-  // TRD modules.
+  // the nodes contains a string tof it must be the tof keeping
+  // volume. Now loop over all modules. For each module loop over
+  // all cells and for each cell loop now over the parts of this cell.
+  // Each cell is build out of inactive glass plates and the active gaps.
+  // since we are not interested in the inactive parts store only
+  // the relevant information about the gaps.
+  // Example for full path to gap
+  //   /cave/tof1_0/t1reg1mod_1/t1reg1cel_1/t1reg1gap_1
 
   Int_t nrCells = 0;
   std::vector<CbmTofCell*> cellVector;
@@ -222,7 +221,6 @@ void CbmTofCreateDigiPar::FillCellMapAsciiGeometry(){
       	        // 8 individual gaps. The size of each cell should be the same for
       	        // all 8 gaps.
 
-
       	        fCellMapIt =  fCellMap.find(fCellID);
       	        if ( fCellMapIt == fCellMap.end() ) {
       	          // new tof cell
@@ -248,73 +246,127 @@ void CbmTofCreateDigiPar::FillCellMapAsciiGeometry(){
   FillDigiPar();
 }
 
-// --------------------------------------------------------------------
 void CbmTofCreateDigiPar::FillCellMapRootGeometry(){
  
   // The geometry structure is treelike with cave as
-  // the top node. For the TRD there are keeping volumes
-  // trd1-trd4 for each station which are only containers 
-  // for the different layers of one station. The trdlayer
-  // is again only a container for all volumes of this layer.   
+  // the top node. For the TOF there is a keeping volume
+  // tof1_v<version>. <version is the geometry version which is constructed
+  // from the year when this geometry was developed and a running index starting
+  // with a,b .. . So tof_v12b denotes the second tof geometry version
+  // developed in 2012.
+  // Inside the tof keeping volumes there is one or more (supermodules)
+  // with a gas box inside which contain the different counters.
+  // Each of this counters in now build of a stack of glass plates
+  // and active gas gaps. Interesting for the parameters are only the
+  // gas gaps. Each gap is then subdivided into several detector cells.
+  // To extract the gap information one has to navigate there.
   // Loop over all nodes below the top node (cave). If one of
-  // the nodes containes a string trd it must be one of the
-  // stations. Now loop over the layers of this station and 
-  // then over all modules of the layer to extract in the end
-  // all active regions (gas) of the complete TRD. For each
-  // of the gas volumes get the information about size and
-  // position from the geomanager and the sizes of the sectors
-  // and pads from the definitions in CbmTrdPads. This info
-  // is then stored in a TrdModule object for each of the
-  // TRD modules.
+  // the nodes contains a string tof_v it must be the tof keeping
+  // volume. Now loop over all super-modules. For each super-module
+  // loop over all counters. For each counter loop over all gaps and
+  // for each gap loop over all cells.
+  // For each cell/gap store now the relevant information.
+  // Example for full path to gap
+  //   /cave_0/tof_v12b_0/module_0_0/gas_box_0/counter_0/Gap_0/Cell_1
 
-  Int_t nmodules = 0;
+
+  Int_t nrCells = 0;
+  std::vector<CbmTofCell*> cellVector;
+  CbmTofCell *tofCell;
+
+
   TString TopNode = gGeoManager->GetTopNode()->GetName();
+  LOG(DEBUG2)<<"TopNode: "<<TopNode<<FairLogger::endl;
 
-  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
-  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-    TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-    if (TString(node->GetName()).Contains("trd")) {
-      TString StationNode = node->GetName();
-      TGeoNode* station = node;
+  // Loop over all detector systems to find tof part
+  TObjArray* detSystems = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iSys = 0; iSys < detSystems->GetEntriesFast(); ++iSys) {
+    TGeoNode* node = (TGeoNode*) detSystems->At(iSys);
+    LOG(DEBUG2)<<"Det system: "<<node->GetName()<<FairLogger::endl;
 
-	TObjArray* modules = station->GetNodes();
-	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
-          TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
-          TString ModuleNode = module->GetName();
+    // Only do something useful for tof_v part of geometry
+    // The node name contains a string "tof_v"
+    // e.g. tof_v12b
+    if (TString(node->GetName()).Contains("tof")) {
+      TString TofNode = node->GetName();
+      LOG(DEBUG2)<<"Found tof keeping volume: "<<TofNode<<FairLogger::endl;
+      TGeoNode* keep = node;
+      TObjArray* modarray = keep->GetNodes();
 
-          TObjArray* parts = module->GetNodes();
-	  for (Int_t iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
-            TGeoNode* part = (TGeoNode*) parts->At(iPart);
-            if (TString(part->GetName()).Contains("gas")) {
-              TString PartNode = part->GetName();
+      // Loop over the different found modules
+      for (Int_t imodule = 0; imodule < modarray->GetEntriesFast(); imodule++) {
+        TGeoNode* module = (TGeoNode*) modarray->At(imodule);
+        TString ModuleNode = module->GetName();
+        TObjArray* modpartarray =module->GetNodes();
 
-              // Put together the full path to the interesting volume, which
-	      // is needed to navigate with the geomanager to this volume.
-              // Extract the geometry information (size, global position)
-              // from this volume.;
+        // Loop over the different parts of a module
+        for (Int_t imodpart = 0; imodpart < modpartarray->GetEntriesFast(); imodpart++) {
+          TGeoNode* modpart = (TGeoNode*) modpartarray->At(imodpart);
+          TString ModPartNode = modpart->GetName();
 
-              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
-                                 ModuleNode + "/" + PartNode;
+          if (ModPartNode.Contains("gas_box")) {
+            TObjArray* counterarray = modpart->GetNodes();
 
-              FillCellInfoFromGeoHandler(FullPath);
+            // Loop over the different counters
+            for (Int_t icounter = 0; icounter < counterarray->GetEntriesFast(); icounter++) {
+              TGeoNode* counter = (TGeoNode*) counterarray->At(icounter);
+              TString CounterNode = counter->GetName();
+              TObjArray* gaparray = counter->GetNodes();
+
+              // Loop over the different gaps
+              for (Int_t igap = 0; igap < gaparray->GetEntriesFast(); igap++) {
+                TGeoNode* gap = (TGeoNode*) gaparray->At(igap);
+                TString GapNode = gap->GetName();
+                if (GapNode.Contains("Gap")) {
+                  TObjArray* cellarray = gap->GetNodes();
+
+                  // Loop over the different cells
+                  for (Int_t icell = 0; icell < cellarray->GetEntriesFast(); icell++) {
+                    TGeoNode* cell = (TGeoNode*) cellarray->At(icell);
+                    TString CellNode = cell->GetName();
 
 
-              nmodules++;
+                    // Construct full path name for the gap
+                    // Extract the necessary geometrical information and store
+                    // this information in member variables
+                    TString FullPath = "/" + TopNode + "/" + TofNode + "/" +
+                        + ModuleNode + "/" + ModPartNode
+                        + "/" + CounterNode + "/" + GapNode + "/" + CellNode;
+                     LOG(DEBUG2) <<"Path: "<<FullPath<<FairLogger::endl;
 
-              // Create new CbmTrdModule and add it to the map
-/*
+                    FillCellInfoFromGeoHandler(FullPath);
 
- 	      fCellMap[fCellID] =
-                new CbmTofCell(fCellID, fX, fY, fZ, fSizex, fSizey);
-*/	    }
-	  }
+                    // Since there are 8 gaps per cell, the information for all these
+                    // gaps are stored. After all the information is available the
+                    // position of the cell is calculated as mean position of the
+                    // 8 individual gaps. The size of each cell should be the same for
+                    // all 8 gaps.
+
+                    fCellMapIt =  fCellMap.find(fCellID);
+                    if ( fCellMapIt == fCellMap.end() ) {
+                      // new tof cell
+                      tofCell = new CbmTofCell(fCellID, fX, fY, fZ, fSizex, fSizey);
+                      cellVector.clear();
+                      cellVector.push_back(tofCell);
+                      fCellMap.insert( std::pair<Int_t, std::vector<CbmTofCell*> >(fCellID, cellVector));
+                    } else {
+                      // already existing cell
+                      tofCell = new CbmTofCell(fCellID, fX, fY, fZ, fSizex, fSizey);
+                      fCellMap[fCellID].push_back(tofCell);
+                    }
+
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
-
+  // Calculate the mean position for each cell and fill the tof digi parameters
   FillDigiPar();
 }
-
 
 void CbmTofCreateDigiPar::FillCellInfoFromGeoHandler(TString FullPath)
 {

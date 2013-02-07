@@ -36,11 +36,6 @@ class CbmTofCell : public TNamed
   Double_t GetSizex()      const { return fSizex; }
   Double_t GetSizey()      const { return fSizey; }
   
-/*  void GetPosition(const Int_t Col, const Int_t Row,
-                   const Int_t VolumeId, const Int_t Sector, 
-                   TVector3 &posHit, TVector3 &posHitErr);
-*/
-
   void Print();
 
  private:
@@ -56,21 +51,6 @@ class CbmTofCell : public TNamed
 
   /** --------------- private functions ----------------------**/
 
-/*
-  void GetModuleInformation(Int_t VolumeID, Double_t *local_point, 
-                            Int_t &Col, Int_t &Row, Int_t &Sector);
-
-  void TransformToLocalSector(Double_t *local_point, 
-			      const Int_t &sector,
-			      Double_t &posX, Double_t &posY);
-
-  void TransformToLocalCorner(Double_t *local_point, Double_t &posX,
-			      Double_t &posY);
-
-  Int_t    GetSector(Double_t *local_point);
-
-  void ProjectPositionToNextAnodeWire(Double_t *local_point);
-*/
 
   ClassDef(CbmTofCell,1);
 

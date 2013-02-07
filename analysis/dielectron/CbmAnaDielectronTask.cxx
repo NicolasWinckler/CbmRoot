@@ -691,7 +691,9 @@ void CbmAnaDielectronTask::FillElPiMomHist()
        if (stsTrack == NULL) continue;
        CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
        if (stsMatch == NULL) continue;
-       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
+       int stsMcTrackId = stsMatch->GetMCTrackId();
+       if (stsMcTrackId < 0) continue;
+       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
        if (mcTrack1 == NULL) continue;
        int pdg = TMath::Abs(mcTrack1->GetPdgCode());
        int motherId = mcTrack1->GetMotherId();

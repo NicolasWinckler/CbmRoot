@@ -79,6 +79,7 @@ class CbmTrdGeoHandler : public TObject {
  private:
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
+  Bool_t GetLayerInfoFromStationKVolumeGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t> &layersBeforStation);
   Bool_t GetLayerInfoFromRootGeometry(std::vector<Int_t> &layersBeforStation);
   void FillDetectorInfoArray(Int_t uniqueId);

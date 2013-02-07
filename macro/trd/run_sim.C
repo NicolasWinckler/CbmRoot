@@ -15,9 +15,11 @@ void run_sim(Int_t nEvents = 1)
   // ========================================================================
   ifstream whichTrdGeo;
   whichTrdGeo.open("whichTrdGeo",ios::in);
-  TString digipar;
-  if (whichTrdGeo) whichTrdGeo >> digipar;
-  cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
+  TString selectGeo;
+  if (whichTrdGeo) whichTrdGeo >> selectGeo;
+  TString digipar = selectGeo(0,8);
+  cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
+  cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_standard";
 
@@ -43,10 +45,11 @@ void run_sim(Int_t nEvents = 1)
   //  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
   //  TString trdGeom    = "trd/trd_v10b.geo";
   //  TString trdGeom    = "trd/trd_v10b.geo";
-  //  TString trdGeom    = "trd/" + digipar + ".geo";
   //  TString trdGeom    = "trd/TRD_geom_v12b.root";
   //  TString trdGeom    = "trd/trd_v13a.root";
-  TString trdGeom    = "trd/" + digipar + ".root";
+  //  TString trdGeom    = "trd/" + digipar + ".geo";
+  //  TString trdGeom    = "trd/" + digipar + ".root";
+  TString trdGeom    = "trd/" + selectGeo;
 
   TString tofGeom = "";
   //  TString ecalGeom   = "ecal/ecal_v08a.geo";

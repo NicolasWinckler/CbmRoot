@@ -448,10 +448,10 @@ private:
    vector<TH1D*> fh_richann; // RICH ANN
    vector<TH1D*> fh_trdann; // TRD ANN
    vector<TH2D*> fh_tofm2; // TOF m2
-   TH2D* fh_ttcut_pion;
-   TH2D* fh_ttcut_truepair;
-   TH2D* fh_stcut_pion;
-   TH2D* fh_stcut_truepair;
+   vector<TH2D*> fh_ttcut_pion;
+   vector<TH2D*> fh_ttcut_truepair;
+   vector<TH2D*> fh_stcut_pion;
+   vector<TH2D*> fh_stcut_truepair;
 
 
    vector<TH1D*> fh_nofMvdHits; // number of MVD hits

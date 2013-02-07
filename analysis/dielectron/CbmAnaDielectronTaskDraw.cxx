@@ -507,6 +507,12 @@ void CbmAnaDielectronTaskDraw::DrawCutDistributions()
 
    Draw2DCut("fh_stcut", fStCutPP, fStCutAngle);
    Draw2DCut("fh_ttcut", fTtCutPP, fTtCutAngle);
+
+   Draw2DCut("fh_stcut_pion", fStCutPP, fStCutAngle);
+   Draw2DCut("fh_ttcut_pion", fTtCutPP, fTtCutAngle);
+   Draw2DCut("fh_stcut_truepair", fStCutPP, fStCutAngle);
+   Draw2DCut("fh_ttcut_truepair", fTtCutPP, fTtCutAngle);
+
    Draw2DCut("fh_apmcut");
    Draw2DCut("fh_apcut");
    if (fUseMvd) {
@@ -869,25 +875,16 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
 void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
 {
    TCanvas *cEl = CreateCanvas("lmvm_elpi_mom_electron", "lmvm_elpi_mom_electron", 800, 800);
-   DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mom_acc_electron"))
-         //(H1("fh_elpi_mom_rec_electron"))
-         //(H1("fh_elpi_mom_rec_only_sts_electron"))
+   DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mom_acc_electron"))(H1("fh_elpi_mom_rec_electron"))(H1("fh_elpi_mom_rec_only_sts_electron"))
          (H1("fh_elpi_mom_rec_sts_rich_trd_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")),
-         list_of("MC")("Acc")
-         //("Rec")
-        // ("Rec only STS")
-         ("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
+         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
          kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
 
 
    TCanvas *cPi = CreateCanvas("lmvm_elpi_mom_pion", "lmvm_elpi_mom_pion", 800, 800);
-   DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))
-        // (H1("fh_elpi_mom_rec_pion"))
-        // (H1("fh_elpi_mom_rec_only_sts_pion"))
+   DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))(H1("fh_elpi_mom_rec_pion"))(H1("fh_elpi_mom_rec_only_sts_pion"))
          (H1("fh_elpi_mom_rec_sts_rich_trd_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")),
-         list_of("MC")("Acc")
-         //("Rec")("Rec only STS")
-         ("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
+         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
          kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
 
 

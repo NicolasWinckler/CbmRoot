@@ -39,6 +39,7 @@ TofParam/CbmTofCreateDigiPar.cxx
 
 TofReco/CbmTofHitProducer.cxx 
 TofReco/CbmTofHitProducerIdeal.cxx 
+TofReco/CbmTofHitProducerNew.cxx 
 
 TofTools/CbmTofGeoHandler.cxx
 

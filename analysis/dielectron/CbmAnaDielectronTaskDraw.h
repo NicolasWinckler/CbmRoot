@@ -45,6 +45,7 @@ public:
           Bool_t drawSig = true);
 
 private:
+    Int_t fNofEvents;
     Bool_t fUseMvd; // do you want to draw histograms related to the MVD detector?
     Bool_t fDrawSignificance; // do you want to draw significance histograms of 1D cuts?
 

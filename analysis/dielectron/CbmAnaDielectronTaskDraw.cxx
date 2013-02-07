@@ -84,7 +84,7 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    TFile* file = new TFile(fileName.c_str());
    fHM->ReadFromFile(file);
 
-   Int_t fNofEvents = (Int_t)H1("fh_event_number")->GetEntries();
+   fNofEvents = (Int_t)H1("fh_event_number")->GetEntries();
    cout << "File name = " << fileName << endl;
    cout << "Number of events = " << fNofEvents<< endl;
 
@@ -577,11 +577,8 @@ void CbmAnaDielectronTaskDraw::DrawSourcesBgPairsAll()
          "lmvm_bg_sources_pairs_epem_percent_" + CbmAnaLmvmNames::fAnaSteps[kPtCut], 600, 600);
    DrawSourcesBgPairsEpEm(kPtCut, true, false);
 
-
    // Draw 2D histogram for sources of BG pairs
-   DrawBgSource2D("lmvm_source_pairs_2d", "fh_source_pairs",
-         CbmAnaLmvmNames::fBgPairSourceLatex,
-         1000., "Pairs per event x10^{-3}");
+   DrawBgSource2D("lmvm_source_pairs_2d", "fh_source_pairs", CbmAnaLmvmNames::fBgPairSourceLatex, 1000., "Pairs per event x10^{-3}");
 }
 
 void CbmAnaDielectronTaskDraw::Draw2DCutTriangle(
@@ -612,6 +609,7 @@ void CbmAnaDielectronTaskDraw::Draw2DCut(
    for (int i = 0; i < CbmAnaLmvmNames::fNofSourceTypes; i++){
       c->cd(i+1);
       DrawH2(H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] ));
+      cout << hist << "_" << CbmAnaLmvmNames::fSourceTypes[i] << " = " << H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] )->GetEntries()/(double)fNofEvents << endl;
       DrawTextOnHist(CbmAnaLmvmNames::fSourceTypesLatex[i], 0.5, 0.89, 0.6, 0.99);
       Draw2DCutTriangle(cutCrossX, cutCrossY);
       projX.push_back( H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] )->ProjectionX() );
@@ -875,18 +873,42 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
 void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
 {
    TCanvas *cEl = CreateCanvas("lmvm_elpi_mom_electron", "lmvm_elpi_mom_electron", 800, 800);
+   double binWEl = H1("fh_elpi_mom_mc_electron")->GetBinWidth(1);
+   H1("fh_elpi_mom_mc_electron")->Scale(1/binWEl);
+   H1("fh_elpi_mom_acc_electron")->Scale(1/binWEl);;
+   H1("fh_elpi_mom_rec_electron")->Scale(1/binWEl);;
+   H1("fh_elpi_mom_rec_only_sts_electron")->Scale(1/binWEl);;
+   H1("fh_elpi_mom_rec_sts_rich_trd_electron")->Scale(1/binWEl);;
+   H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")->Scale(1/binWEl);;
    DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mom_acc_electron"))(H1("fh_elpi_mom_rec_electron"))(H1("fh_elpi_mom_rec_only_sts_electron"))
          (H1("fh_elpi_mom_rec_sts_rich_trd_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")),
-         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
-         kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
+         list_of("MC ("+lit::NumberToString(H1("fh_elpi_mom_mc_electron")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Acc (" + lit::NumberToString(H1("fh_elpi_mom_acc_electron")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec (" +  lit::NumberToString(H1("fh_elpi_mom_rec_electron")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec only STS (" + lit::NumberToString(H1("fh_elpi_mom_rec_only_sts_electron")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec STS-RICH-TRD (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_electron")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec STS-RICH-TRD-TOF (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")->GetEntries()/fNofEvents, 2) +" per event)"),
+         kLinear, kLog, 0.45, 0.65, 0.99, 0.99);
+   H1("fh_elpi_mom_mc_electron")->SetMinimum(3e-3);
 
 
    TCanvas *cPi = CreateCanvas("lmvm_elpi_mom_pion", "lmvm_elpi_mom_pion", 800, 800);
+   H1("fh_elpi_mom_mc_pion")->Scale(1/binWEl);
+   H1("fh_elpi_mom_acc_pion")->Scale(1/binWEl);
+   H1("fh_elpi_mom_rec_pion")->Scale(1/binWEl);
+   H1("fh_elpi_mom_rec_only_sts_pion")->Scale(1/binWEl);
+   H1("fh_elpi_mom_rec_sts_rich_trd_pion")->Scale(1/binWEl);
+   H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")->Scale(1/binWEl);
    DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))(H1("fh_elpi_mom_rec_pion"))(H1("fh_elpi_mom_rec_only_sts_pion"))
          (H1("fh_elpi_mom_rec_sts_rich_trd_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")),
-         list_of("MC")("Acc")("Rec")("Rec only STS")("Rec STS-RICH-TRD")("Rec STS-RICH-TRD-TOF"),
-         kLinear, kLinear, 0.85, 0.7, 0.99, 0.99);
-
+         list_of("MC ("+lit::NumberToString(H1("fh_elpi_mom_mc_pion")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Acc (" + lit::NumberToString(H1("fh_elpi_mom_acc_pion")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec (" +  lit::NumberToString(H1("fh_elpi_mom_rec_pion")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec only STS (" + lit::NumberToString(H1("fh_elpi_mom_rec_only_sts_pion")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec STS-RICH-TRD (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_pion")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec STS-RICH-TRD-TOF (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")->GetEntries()/fNofEvents, 2) +" per event)"),
+         kLinear, kLog, 0.45, 0.65, 0.99, 0.99);
+   H1("fh_elpi_mom_mc_pion")->SetMinimum(3e-3);
 
 }
 

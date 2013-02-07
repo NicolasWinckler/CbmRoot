@@ -666,7 +666,7 @@ void CbmAnaDielectronTask::FillElPiMomHist()
        Int_t nStsPoints = mctrack->GetNPoints(kSTS);
        Bool_t isAcc = ( nMvdPoints+nStsPoints >= 4);
 
-       if (pdg == 11){
+       if (pdg == 11 && motherId != -1){
           fh_elpi_mom_mc[0]->Fill(momentum);
           if (isAcc) fh_elpi_mom_acc[0]->Fill(momentum);
        }
@@ -699,7 +699,7 @@ void CbmAnaDielectronTask::FillElPiMomHist()
        int motherId = mcTrack1->GetMotherId();
        double momentum = mcTrack1->GetP();
 
-       if (pdg == 11) {
+       if (pdg == 11 && motherId != -1) {
           fh_elpi_mom_rec[0]->Fill(momentum);
 
           if (richInd < 0 && trdInd < 0 && tofInd < 0) {

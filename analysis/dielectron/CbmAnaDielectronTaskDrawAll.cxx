@@ -167,7 +167,7 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sbg->SetMinimum(1e-8);
    sbg->SetMaximum(1e-2);
 
-   int nRebin = 10;
+   int nRebin = 20;
    sbg->Rebin(nRebin);
    s->Rebin(nRebin);
    bg->Rebin(nRebin);
@@ -222,6 +222,13 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    s->SetLineColor(kRed+3);
    s->SetFillStyle(0);
 
+   gPad->SetLogy(true);
+
+   // signal-to-background ration vs. minv
+   TH1D* sbgVsMinv = new TH1D("sbgVsMinv", "sbgVsMinv;M_{ee} [GeV/c^{2}];S/B", bg->GetNbinsX(), bg->GetXaxis()->GetXmin(), bg->GetXaxis()->GetXmax());
+   sbgVsMinv->Divide(s, bg, 1., 1., "B");
+   TCanvas* c = CreateCanvas("lmvm_sbg_vs_minv", "lmvm_sbg_vs_minv", 800, 800);
+   DrawH1(sbgVsMinv);
    gPad->SetLogy(true);
 }
 
@@ -361,9 +368,9 @@ void CbmAnaDielectronTaskDrawAll::SBgRangeAll()
 
    TH1D* h_05_06 = SBgRange(0.5, 0.6);
    TCanvas* c1 = CreateCanvas("lmvm_s_bg_ranges_05_06", "lmvm_s_bg_ranges_05_06", 700, 700);
-   DrawH1(h_05_06, kLinear, kLog);
+   DrawH1(h_05_06, kLinear, kLinear);
    h_05_06->SetMinimum(1e-3);
-   h_05_06->SetMaximum(3);
+   h_05_06->SetMaximum(2e-2);
    h_05_06->SetLineWidth(4);
 }
 

@@ -1305,16 +1305,20 @@ void CbmAnaDielectronTask::CheckTrackTopologyCut()
          }// iM
          //find min opening angle
          Double_t minAng = 360.;
-         Int_t minInd = 0;
+         Int_t minInd = -1;
          for (Int_t i = 0; i < angles.size(); i++){
             if (minAng > angles[i]){
                minAng = angles[i];
                minInd = i;
             }
          }
+         if (minInd == -1) continue;
          Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom[minInd]);
+         Double_t val = -1.*(fStCutAngle/fStCutPP)*sqrt_mom + fStCutAngle;
+         if ( !(sqrt_mom < fStCutPP && val > minAng) ) fCandidates[iP].isStCutElectron = true;
 
          int stsInd = fSegmentCandidates[ candInd[minInd] ].stsInd;
+         if (stsInd < 0) continue;
          CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
          if (stsMatch == NULL) continue;
          int stsMcTrackId = stsMatch->GetMCTrackId();
@@ -1343,9 +1347,6 @@ void CbmAnaDielectronTask::CheckTrackTopologyCut()
             if (pdg == 211) fh_stcut_pion[kGamma]->Fill(sqrt_mom, minAng);;
             if (motherId!= -1 && motherId == fCandidates[iP].McMotherId) fh_stcut_truepair[kGamma]->Fill(sqrt_mom, minAng);;
          }
-
-         Double_t val = -1.*(fStCutAngle/fStCutPP)*sqrt_mom + fStCutAngle;
-         if ( !(sqrt_mom < fStCutPP && val > minAng) ) fCandidates[iP].isStCutElectron = true;
       }//if electron
    } //iP
 }
@@ -1371,15 +1372,20 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
          }// iM
          //find min opening angle
          Double_t minAng = 360.;
-         Int_t minInd = 0;
+         Int_t minInd = -1;
          for (Int_t i = 0; i < angles1.size(); i++){
             if (minAng > angles1[i]){
                minAng = angles1[i];
                minInd = i;
             }
          }
+         if (minInd == -1) continue;
+         Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom1[minInd]);
+         Double_t val = -1.*(fTtCutAngle/fTtCutPP)*sqrt_mom + fTtCutAngle;
+         if ( !(sqrt_mom < fTtCutPP && val > minAng) ) fCandidates[iP].isTtCutElectron = true;
 
          int stsInd = fCandidates[ candInd[minInd] ].stsInd;
+         if (stsInd < 0) continue;
          CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
          if (stsMatch == NULL) continue;
          int stsMcTrackId = stsMatch->GetMCTrackId();
@@ -1389,7 +1395,6 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
          int pdg = TMath::Abs(mcTrack1->GetPdgCode());
          int motherId = mcTrack1->GetMotherId();
 
-         Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom1[minInd]);
          if (fCandidates[iP].isMcSignalElectron){
             fh_ttcut[kSignal]->Fill(sqrt_mom, minAng, fWeight);
             if (pdg == 211) fh_ttcut_pion[kSignal]->Fill(sqrt_mom, minAng, fWeight);
@@ -1409,9 +1414,6 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
             if (pdg == 211) fh_ttcut_pion[kGamma]->Fill(sqrt_mom, minAng);;
             if (motherId!= -1 && motherId == fCandidates[iP].McMotherId) fh_ttcut_truepair[kGamma]->Fill(sqrt_mom, minAng);;
          }
-
-         Double_t val = -1.*(fTtCutAngle/fTtCutPP)*sqrt_mom + fTtCutAngle;
-         if ( !(sqrt_mom < fTtCutPP && val > minAng) ) fCandidates[iP].isTtCutElectron = true;
       }//if electron
    } //iP
 }

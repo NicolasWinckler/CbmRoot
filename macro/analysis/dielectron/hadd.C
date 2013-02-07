@@ -47,7 +47,7 @@ void hadd() {
    string particle = "";
 
 
-   for (int iF = 0; iF < 4; iF++){
+   for (int iF = 3; iF < 4; iF++){
 
       if (iF == 0) {
          particle = "omegaepem";
@@ -57,10 +57,13 @@ void hadd() {
          particle = "omegadalitz";
       } else if (iF == 3) {
          particle = "rho0";
+      } else if (iF == 4) {
+	  particle = "urqmd";
       }
 
-      std::string dir = "/hera/cbm/users/slebedev/mc/dielectron/dec12/25gev/mirrors/10mm/1.0field/nomvd/" + particle + "/";
+      std::string dir = "/hera/cbm/users/slebedev/mc/dielectron/jan13/25gev/1.0field/nomvd/" + particle + "/";
       std::string fileName = dir + "analysis.25gev.centr.";
+     // std::string fileName = dir + "reco.auau.8gev.centr.";
      // std::string outputDir = dir + "results/all/";
 
      // string fileName = "analysis.pi_misid_0.0001.";
@@ -72,16 +75,17 @@ void hadd() {
 
       int count = 0;
       FileList = new TList();
-      for (int i = 1; i < 201; i++){
+      for (int i = 1; i < 101; i++){
          stringstream ss;
          ss << fileName ;
          ss.fill('0');
          ss.width(5);
          ss  << i << ".root";
          TFile* file = TFile::Open(ss.str().c_str());
-         if ( file != NULL && file->GetEND() > 2000){
+         if ( file != NULL && file->GetEND() > 4000){
             FileList->Add( file );
-            count++;
+	    count++;
+            cout<< count<<endl;
          }
       }
       cout << endl<< "-I- number of files to merge = " << count << endl << endl;

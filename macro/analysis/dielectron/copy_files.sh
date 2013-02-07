@@ -1,7 +1,7 @@
-#!/bin/sh
+#####!/bin/sh
 
-dirFrom=/hera/cbm/users/slebedev/mc/dielectron/dec12/25gev/mirrors/10mm/
-dirTo=/u/slebedev/Baykal/copytemp/25gev/mirrors/10mm/
+dirFrom=/hera/cbm/users/slebedev/mc/dielectron/jan13/25gev/
+dirTo=/u/slebedev/Baykal/copytemp/25gev/
 
 filename=analysis.25gev.centr.all.root
 
@@ -15,6 +15,7 @@ function copy_all() {
    copy_func omegaepem ${1}
    copy_func omegadalitz ${1}
    copy_func phi ${1}
+  # copy_func urqmd ${1}
 }
 
 copy_all 1.0field/nomvd

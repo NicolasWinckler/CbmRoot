@@ -9,7 +9,7 @@ XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
 # specify input and output directories
-outdir=/hera/cbm/users/slebedev/mc/dielectron/dec12/${coll_energy}/mirrors/6mm/${field_scale}field/${mvd}/${pluto_particle}/
+outdir=/hera/cbm/users/slebedev/mc/dielectron/jan13/${coll_energy}/${field_scale}field/${mvd}/${pluto_particle}/
 cbmroot_config_path=/hera/cbm/users/slebedev/trunk/build/config.sh
 macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
 
@@ -36,7 +36,7 @@ export URQMD_FILE=/hera/cbm/prod/gen/urqmd/auau/${coll_energy}/centr/urqmd.auau.
 export MC_FILE=${outdir}/mc.auau.${coll_energy}.centr.${XXXXX}.root
 export PAR_FILE=${outdir}/params.auau.${coll_energy}.centr.${XXXXX}.root
 export RECO_FILE=${outdir}/reco.auau.${coll_energy}.centr.${XXXXX}.root
-export ANALYSIS_FILE=${outdir}/analysis.new.${coll_energy}.centr.${XXXXX}.root
+export ANALYSIS_FILE=${outdir}/analysis.${coll_energy}.centr.${XXXXX}.root
 export RESULT_DIR=${outdir}/results/${XXXXX}/
 
 #Simulation parameters
@@ -86,7 +86,6 @@ export DELTA=no
 export DELTA_FILE=/lustre/cbm/user/ebelolap/aug11/sep12/${ENERGY}/${FIELDDIR}/deltasource/mc.delta.root
 
 export PION_MISIDENTIFICATION_LEVEL=-1.0
-export MOMENTUM_CUT=-1.0
 
 export PLUTO_PARTICLE=${pluto_particle}
 export PLUTO=yes
@@ -101,6 +100,8 @@ elif [ ${pluto_particle} = "phi" ] ; then
    export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
 elif [ ${pluto_particle} = "pi0" ] ; then 
    export PLUTO_FILE=/hera/cbm/users/slebedevy/mc/pluto/auau/${ENERGY}/pi0/gammaepem/pluto.auau.${ENERGY}.pi0.gammaepem.10k.${XXXX}.root
+elif [ ${pluto_particle} = "urqmd" ] ; then 
+   export PLUTO=no
 fi 
 
 # create special and enter special workdir for job

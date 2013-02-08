@@ -141,6 +141,17 @@ mc_length_hits()
     AddCounter("slow"           ,"Extra     efficiency");
     AddCounter("d0"             ,"D0        efficiency");
     AddCounter("short"          ,"Short123s efficiency");
+    AddCounter("shortPion"      ,"Short123s pion   eff");
+    AddCounter("shortProton"    ,"Short123s proton eff");
+    AddCounter("shortKaon"      ,"Short123s kaon   eff");
+    AddCounter("shortE"         ,"Short123s e      eff");
+    AddCounter("shortRest"      ,"Short123s rest   eff");
+    
+    AddCounter("fast_sec_e"       ,"RefSec  E efficiency");
+    AddCounter("fast_e"           ,"Refset  E efficiency");
+    AddCounter("total_e"          ,"Allset  E efficiency");
+    AddCounter("slow_sec_e"       ,"ExtraSecE efficiency");
+    AddCounter("slow_e"           ,"Extra   E efficiency");
   }
   
   virtual ~TL1PerfEfficiencies(){};
@@ -295,6 +306,26 @@ void CbmL1::EfficienciesPerformance()
 
     if ( mtra.IsAdditional() ){ // short
       ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "short");
+      switch ( mtra.pdg ) {
+        case 11:
+        case -11:
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "shortE");
+          break;
+        case 211:
+        case -211:
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "shortPion");
+          break;
+        case 321:
+        case -321:
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "shortKaon");
+          break;
+        case 2212:
+        case -2212:
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "shortProton");
+          break;
+        default:
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "shortRest");
+      }
     }
     else { // separate all efficiecies from short eff
     
@@ -328,7 +359,28 @@ void CbmL1::EfficienciesPerformance()
         }
       } // if extra
 
+      if ( mtra.pdg == 11 || mtra.pdg == -11 ) {
+        ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "total_e");
 
+        if ( mtra.p > CbmL1Constants::MinRefMom ){                        // reference tracks
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_e");
+      
+          if ( mtra.IsPrimary() ){                         // reference primary
+          }
+          else{                                             // reference secondary
+            ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "fast_sec_e");
+          }
+        }
+        else{                                               // extra set of tracks
+          ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_e");
+       
+          if ( mtra.IsPrimary() ){             // extra primary
+          }
+          else{
+            ntra.Inc(reco, killed, ratio_length, ratio_fakes, nclones, mc_length, mc_length_hits, "slow_sec_e");
+          }
+        } // if extra
+      }
     }
 
   } // for mcTracks
@@ -1011,6 +1063,10 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
   static TProfile *p_eff_all_vs_mom, *p_eff_prim_vs_mom, *p_eff_sec_vs_mom, *p_eff_d0_vs_mom, *p_eff_prim_vs_theta, *p_eff_all_vs_pt, *p_eff_prim_vs_pt, *p_eff_all_vs_nhits, *p_eff_prim_vs_nhits, *p_eff_sec_vs_nhits;
 
+  static TH1F *h_reg_MCmom, *h_acc_MCmom, *h_reco_MCmom, *h_ghost_Rmom;
+  static TH1F *h_reg_prim_MCmom, *h_acc_prim_MCmom, *h_reco_prim_MCmom;
+  static TH1F *h_reg_sec_MCmom, *h_acc_sec_MCmom, *h_reco_sec_MCmom;
+      
   static TH1F *h_acc_mom_short123s;
   
   static TH1F *h_reg_mom_prim, *h_reg_mom_sec, *h_reg_nhits_prim, *h_reg_nhits_sec;
@@ -1080,9 +1136,19 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     p_eff_sec_vs_nhits = new TProfile("p_eff_sec_vs_nhits", "SecSet Efficiency vs NMCHits",
     8, 3.0, 11.0, 0.0, 100.0);
 
-    
+    h_reg_MCmom   = new TH1F("h_reg_MCmom", "Momentum of registered tracks", 100, 0.0, 5.0);
+    h_acc_MCmom   = new TH1F("h_acc_MCmom", "Reconstructable tracks", 100, 0.0, 5.0);
+    h_reco_MCmom   = new TH1F("h_reco_MCmom", "Reconstructed tracks", 100, 0.0, 5.0);
+    h_ghost_Rmom = new TH1F("h_ghost_Rmom", "Ghost tracks", 100, 0.0, 5.0);
+    h_reg_prim_MCmom   = new TH1F("h_reg_prim_MCmom", "Momentum of registered tracks", 100, 0.0, 5.0);
+    h_acc_prim_MCmom   = new TH1F("h_acc_prim_MCmom", "Reconstructable tracks", 100, 0.0, 5.0);
+    h_reco_prim_MCmom   = new TH1F("h_reco_prim_MCmom", "Reconstructed tracks", 100, 0.0, 5.0);
+    h_reg_sec_MCmom   = new TH1F("h_reg_sec_MCmom", "Momentum of registered tracks", 100, 0.0, 5.0);
+    h_acc_sec_MCmom   = new TH1F("h_acc_sec_MCmom", "Reconstructable tracks", 100, 0.0, 5.0);
+    h_reco_sec_MCmom   = new TH1F("h_reco_sec_MCmom", "Reconstructed tracks", 100, 0.0, 5.0);
+ 
     h_acc_mom_short123s = new TH1F("h_acc_mom_short123s", "Momentum of accepted tracks with 3 hits on first stations", 500, 0.0, 5.0);
-    
+     
     h_reg_mom_prim   = new TH1F("h_reg_mom_prim", "Momentum of registered primary tracks", 500, 0.0, 5.0);
     h_reg_mom_sec   = new TH1F("h_reg_mom_sec", "Momentum of registered secondary tracks", 500, 0.0, 5.0);
     h_acc_mom_prim   = new TH1F("h_acc_mom_prim", "Momentum of accepted primary tracks", 500, 0.0, 5.0);
@@ -1101,7 +1167,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     h_rest_nhits_prim = new TH1F("h_rest_nhits_prim", "Number of hits in not found primary track", 51, -0.1, 10.1);
     h_rest_nhits_sec = new TH1F("h_rest_nhits_sec", "Number of hits in not found secondary track", 51, -0.1, 10.1);
 
-    h_ghost_mom = new TH1F("h_ghost_mom", "Momentum of ghost track", 500, 0.0, 5.0);
+    h_ghost_mom = new TH1F("h_ghost_mom", "Momentum of ghost tracks", 500, 0.0, 5.0);
     h_ghost_nhits = new TH1F("h_ghost_nhits", "Number of hits in ghost track", 51, -0.1, 10.1);
     h_ghost_fstation = new TH1F("h_ghost_fstation", "First station of ghost track", 50, -0.5, 10.0);
     h_ghost_chi2 = new TH1F("h_ghost_chi2", "Chi2/NDF of ghost track", 50, -0.5, 10.0);
@@ -1215,6 +1281,21 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       
   }// first_call
 
+
+  static int NEvents = 0;
+  if ( NEvents > 0 ) {
+    h_reg_MCmom->Scale(NEvents);
+    h_acc_MCmom->Scale(NEvents);
+    h_reco_MCmom->Scale(NEvents);
+    h_ghost_Rmom->Scale(NEvents);
+    h_reg_prim_MCmom->Scale(NEvents);
+    h_acc_prim_MCmom->Scale(NEvents);
+    h_reco_prim_MCmom->Scale(NEvents);
+    h_reg_sec_MCmom->Scale(NEvents);
+    h_acc_sec_MCmom->Scale(NEvents);
+    h_reco_sec_MCmom->Scale(NEvents);
+  }
+  NEvents++;
     
 //   //hit density calculation: h_hit_density[10]
   //
@@ -1259,8 +1340,10 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     
       // fill ghost histos
     if ( prtra->IsGhost() ){
-      if( fabs(prtra->T[4])>1.e-10)
+      if( fabs(prtra->T[4])>1.e-10) {
         h_ghost_mom->Fill(fabs(1.0/prtra->T[4]));
+        h_ghost_Rmom->Fill(fabs(1.0/prtra->T[4]));
+      }
       h_ghost_nhits->Fill((prtra->StsHits).size());
       CbmL1HitStore &h1 = vHitStore[prtra->StsHits[0]];
       CbmL1HitStore &h2 = vHitStore[prtra->StsHits[1]];
@@ -1306,8 +1389,10 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     CbmL1HitStore &fh = vHitStore[*(mtra.StsHits.begin())];
     CbmL1HitStore &lh = vHitStore[*(mtra.StsHits.rbegin())];
 
+    h_reg_MCmom->Fill(momentum);
     if ( mtra.IsPrimary() ){
       h_reg_mom_prim->Fill(momentum);
+      h_reg_prim_MCmom->Fill(momentum);
       h_reg_nhits_prim->Fill(nSta);
       h2_reg_nhits_vs_mom_prim->Fill(momentum, nSta);
       h2_reg_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
@@ -1315,6 +1400,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
         h2_reg_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
     }else{
       h_reg_mom_sec->Fill(momentum);
+      h_reg_sec_MCmom->Fill(momentum);
       h_reg_nhits_sec->Fill(nSta);
       if (momentum > 0.01){
         h2_reg_nhits_vs_mom_sec->Fill(momentum, nSta);
@@ -1330,9 +1416,11 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
     
     if( ! mtra.IsReconstructable() ) continue;
     mc_total++;
-    
+
+    h_acc_MCmom->Fill(momentum);
     if ( mtra.IsPrimary() ){
       h_acc_mom_prim->Fill(momentum);
+      h_acc_prim_MCmom->Fill(momentum);
       h_acc_nhits_prim->Fill(nSta);
       h2_acc_nhits_vs_mom_prim->Fill(momentum, nSta);
       h2_acc_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
@@ -1340,6 +1428,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
         h2_acc_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
     }else{
       h_acc_mom_sec->Fill(momentum);
+      h_acc_sec_MCmom->Fill(momentum);
       h_acc_nhits_sec->Fill(nSta);
       if (momentum > 0.01){
         h2_acc_nhits_vs_mom_sec->Fill(momentum, nSta);
@@ -1379,6 +1468,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       p_eff_all_vs_mom->Fill(momentum, 100.0);
       p_eff_all_vs_nhits->Fill(nMCHits, 100.0);
       p_eff_all_vs_pt->Fill(pt, 100.0);
+      h_reco_MCmom->Fill(momentum);
       if (mtra.mother_ID < 0){ // primary
         p_eff_prim_vs_mom->Fill(momentum, 100.0);
         p_eff_prim_vs_nhits->Fill(nMCHits, 100.0);
@@ -1390,6 +1480,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       }
       if (mtra.mother_ID < 0){ // primary
         h_reco_mom_prim->Fill(momentum);
+        h_reco_prim_MCmom->Fill(momentum);
         h_reco_nhits_prim->Fill(nSta);
         h2_reco_nhits_vs_mom_prim->Fill(momentum, nSta);
         h2_reco_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
@@ -1397,6 +1488,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
           h2_reco_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
       }else{
         h_reco_mom_sec->Fill(momentum);
+        h_reco_sec_MCmom->Fill(momentum);
         h_reco_nhits_sec->Fill(nSta);
         if (momentum > 0.01){
           h2_reco_nhits_vs_mom_sec->Fill(momentum, nSta);
@@ -1488,6 +1580,18 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   h_reco_fakeNtr->Fill(mc_total,NFakes);
   h_reco_fakeNhit->Fill(algo->vStsHits.size()-NFakes,NFakes);
 
+
+  h_reg_MCmom->Scale(1.f/NEvents);
+  h_acc_MCmom->Scale(1.f/NEvents);
+  h_reco_MCmom->Scale(1.f/NEvents);
+  h_ghost_Rmom->Scale(1.f/NEvents);
+  h_reg_prim_MCmom->Scale(1.f/NEvents);
+  h_acc_prim_MCmom->Scale(1.f/NEvents);
+  h_reco_prim_MCmom->Scale(1.f/NEvents);
+  h_reg_sec_MCmom->Scale(1.f/NEvents);
+  h_acc_sec_MCmom->Scale(1.f/NEvents);
+  h_reco_sec_MCmom->Scale(1.f/NEvents);
+  
 } // void CbmL1::HistoPerformance()
 
 

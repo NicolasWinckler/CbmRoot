@@ -275,10 +275,23 @@ void Draw_L1_histo() {
   dirOtherName = fileName + ":" + dirOtherName;
   TDirectory *dirOther = fileIn->Get(dirOtherName);
   
-  const int nHistoOther = 3;
+  const int nHistoOther = 15;
   
   const THistoData histoDataOther[nHisto] =
   {
+    {"h_acc_MCmom", "Momentum of tracks"}
+    {"h_reco_MCmom", "Momentum of tracks"}
+    {"h_unreco_MCmom", "Momentum of tracks"}
+    {"h_ghost_Rmom", "Momentum of tracks"}
+    {"h_acc_prim_MCmom", "Momentum of tracks"}
+    {"h_reco_prim_MCmom", "Momentum of tracks"}
+    {"h_unreco_prim_MCmom", "Momentum of tracks"}
+    {"h_ghost_Rmom", "Momentum of tracks"}
+    {"h_acc_sec_MCmom", "Momentum of tracks"}
+    {"h_reco_sec_MCmom", "Momentum of tracks"}
+    {"h_unreco_sec_MCmom", "Momentum of tracks"}
+    {"h_ghost_Rmom", "Momentum of tracks"}
+        //  reg,acc,reco,ghost distribution always have to be first
     {"h_reco_prob",  "Prob of reco track" }
     {"h_ghost_prob",  "Prob of ghost track" }
     {"h_rest_prob",  "Prob of reco rest track" }
@@ -286,7 +299,18 @@ void Draw_L1_histo() {
   
   TH1F *histoOther[nHistoOther];
 
-  for (int i = 0; i < nHistoOther; i++){
+  for (int i = 0; i < 12; i++){
+    if (i%4 != 2) histoOther[i] = (TH1F*) dirOther->Get(histoDataOther[i].name);
+    else {
+      histoOther[i] = new TH1F(histoDataOther[i].name, "Not reconstructed tracks", 100, 0.0, 5.0);
+      for( j = 0; j < histoOther[i]->GetNbinsX(); j++ ) {
+        histoOther[i]->SetBinContent( j, histoOther[i-2]->GetBinContent(j) - histoOther[i-1]->GetBinContent(j) );
+      }
+    }
+    makeUpHisto(histoOther[i], histoDataOther[i].title);
+  }
+
+  for (int i = 12; i < nHistoOther; i++){
     histoOther[i] = (TH1F*) dirOther->Get(histoDataOther[i].name);
     makeUpHisto(histoOther[i], histoDataOther[i].title);
     FitHistoLine(histoOther[i]);
@@ -390,7 +414,35 @@ void Draw_L1_histo() {
     c2->SaveAs(name);
   }
 
-  for (int i = 0; i < nHistoOther; i++){
+    // draw reg,acc,reco,ghost distribution
+  histoStyle->SetOptStat(000000000);
+  for (int j = 0, iH = 0; j < 3; j++){
+    TLegend *leg1 = new TLegend(0.2+0.3,.62,0.55+0.3,.75);
+    leg1->SetFillColor(0);
+    leg1->SetLineWidth(0);
+    leg1->SetBorderSize(0);
+    leg1->SetTextFont(22);
+    for (int i = 0; i < 4; i++, iH++){
+      switch ( i ) {
+        case 0: histoOther[iH]->SetLineColor(kBlue);  break;
+        case 1: histoOther[iH]->SetLineColor(kRed);   break;
+        case 2: histoOther[iH]->SetLineColor(kBlue); histoOther[iH]->SetLineStyle(2);  break;
+        case 3: histoOther[iH]->SetLineColor(kBlack); break;
+      }
+      if (i == 0) histoOther[iH]->Draw();
+      else        histoOther[iH]->Draw("same");
+      leg1->AddEntry( histoOther[iH], histoOther[iH]->GetTitle() );
+    }
+    leg1->Draw();
+    switch (j) {
+      case 0: c2->SaveAs("MultiplicityMom.pdf"); break;
+      case 1: c2->SaveAs("MultiplicityMomPrim.pdf"); break;
+      case 2: c2->SaveAs("MultiplicityMomSec.pdf"); break;
+    }
+  }
+  histoStyle->SetOptStat(1000111010);
+  
+  for (int i = 12; i < nHistoOther; i++){
     histoOther[i]->Draw();
     TString name = TString(histoDataOther[i].name)+".pdf";
     c2->SaveAs(name);

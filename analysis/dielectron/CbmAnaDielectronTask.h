@@ -56,6 +56,7 @@ public:
    Bool_t isMcPi0Electron;
    Bool_t isMcGammaElectron;
    Bool_t isMcEtaElectron;
+   Int_t mcPdg;
 
    Bool_t isGamma;
    Double_t dSts;
@@ -425,6 +426,8 @@ private:
    vector<TH2D*> fh_signal_minv_pt; // Invariant mass vs. MC Pt
 
    vector<TH1D*> fh_bg_truematch_minv; // Invariant mass for truly matched tracks
+   vector<TH1D*> fh_bg_truematch_el_minv; // Invariant mass for truly matched electron tracks
+   vector<TH1D*> fh_bg_truematch_notel_minv; // Invariant mass for truly matched tracks, not 2 electrons
    vector<TH1D*> fh_bg_mismatch_minv; // Invariant mass for mis matches tracks
 
    //G-Gamma, P-Pi0, O-other
@@ -506,15 +509,13 @@ private:
    //Opening angle distribution for different sources after each cut.
    vector<vector<TH1D*> > fh_opening_angle;
 
-
    //Pions vs momentum
-   //[0] - electrons, [1] - pions
-   vector<TH1D*> fh_elpi_mom_mc;
-   vector<TH1D*> fh_elpi_mom_acc;
-   vector<TH1D*> fh_elpi_mom_rec;
-   vector<TH1D*> fh_elpi_mom_rec_only_sts;
-   vector<TH1D*> fh_elpi_mom_rec_sts_rich_trd;
-   vector<TH1D*> fh_elpi_mom_rec_sts_rich_trd_tof;
+   TH1D* fh_pi_mom_mc;
+   TH1D* fh_pi_mom_acc;
+   TH1D* fh_pi_mom_rec;
+   TH1D* fh_pi_mom_rec_only_sts;
+   TH1D* fh_pi_mom_rec_sts_rich_trd;
+   TH1D* fh_pi_mom_rec_sts_rich_trd_tof;
 
 public:
    void SetUseMvd(Bool_t use){fUseMvd = use;};

@@ -148,12 +148,12 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sOmegaDalitz->SetFillColor(kCyan+2);
    sOmegaDalitz->SetLineColor(kBlack);
 
-   TH1D* s = (TH1D*)sRho->Clone();
-   s->Add(sOmega);
-   s->Add(sPhi);
-   s->Add(sEta);
-   s->Add(sPi0);
-   s->Add(sOmegaDalitz);
+   TH1D* coctail = (TH1D*)sRho->Clone();
+   coctail->Add(sOmega);
+   coctail->Add(sPhi);
+   coctail->Add(sEta);
+   coctail->Add(sPi0);
+   coctail->Add(sOmegaDalitz);
 
    TH1D* sbg = (TH1D*)bg->Clone();
    sbg->SetFillColor(kBlack);
@@ -169,7 +169,7 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
 
    int nRebin = 20;
    sbg->Rebin(nRebin);
-   s->Rebin(nRebin);
+   coctail->Rebin(nRebin);
    bg->Rebin(nRebin);
    sPi0->Rebin(nRebin);
    sEta->Rebin(nRebin);
@@ -177,12 +177,13 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sOmega->Rebin(nRebin);
    sRho->Rebin(nRebin);
    sPhi->Rebin(nRebin);
-   DrawH1(list_of(sbg)(bg)(s)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
+   DrawH1(list_of(sbg)(bg)(coctail)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
          list_of("")("")("")("")("")("")("")("")(""), kLinear, kLog, false, 0.8, 0.8, 0.99, 0.99);
    sRho->SetFillColor(kMagenta-3);
    sRho->SetLineColor(kBlack);
    sRho->SetLineStyle(0);
    sRho->SetLineWidth(1);
+   sRho->SetFillStyle(3112);
 
    sOmega->SetFillColor(kOrange+7);
    sOmega->SetLineColor(kBlack);
@@ -193,6 +194,9 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sPhi->SetLineColor(kBlack);
    sPhi->SetLineStyle(0);
    sPhi->SetLineWidth(1);
+   sPhi->SetFillStyle(3112);
+   gStyle->SetHatchesLineWidth(1);
+   gStyle->SetHatchesSpacing(1.);
 
    bg->SetFillColor(kYellow-10);
    bg->SetLineColor(kBlack);
@@ -219,14 +223,15 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sbg->SetLineStyle(0);
    sbg->SetLineWidth(1);
 
-   s->SetLineColor(kRed+3);
-   s->SetFillStyle(0);
+   coctail->SetLineColor(kRed+2);
+   coctail->SetFillStyle(0);
+   coctail->SetLineWidth(3);
 
    gPad->SetLogy(true);
 
    // signal-to-background ration vs. minv
-   TH1D* sbgVsMinv = new TH1D("sbgVsMinv", "sbgVsMinv;M_{ee} [GeV/c^{2}];S/B", bg->GetNbinsX(), bg->GetXaxis()->GetXmin(), bg->GetXaxis()->GetXmax());
-   sbgVsMinv->Divide(s, bg, 1., 1., "B");
+   TH1D* sbgVsMinv = new TH1D("sbgVsMinv", "sbgVsMinv;M_{ee} [GeV/c^{2}];Cocktail/Background", bg->GetNbinsX(), bg->GetXaxis()->GetXmin(), bg->GetXaxis()->GetXmax());
+   sbgVsMinv->Divide(coctail, bg, 1., 1., "B");
    TCanvas* c = CreateCanvas("lmvm_sbg_vs_minv", "lmvm_sbg_vs_minv", 800, 800);
    DrawH1(sbgVsMinv);
    gPad->SetLogy(true);

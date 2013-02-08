@@ -540,7 +540,7 @@ void CbmAnaDielectronTaskDraw::DrawSourcesBgPairsEpEm(
       h->GetZaxis()->SetTitle("[%]");
    } else {
       h->Scale(1000.);
-      h->GetZaxis()->SetTitle("Number of pairs/event x10^{-3}");
+      h->GetZaxis()->SetTitle("Number of pairs/event x10^{3}");
    }
    DrawH2(h, kLinear, kLinear, kLinear, "text COLZ");
    h->GetXaxis()->SetLabelSize(0.1);
@@ -578,7 +578,7 @@ void CbmAnaDielectronTaskDraw::DrawSourcesBgPairsAll()
    DrawSourcesBgPairsEpEm(kPtCut, true, false);
 
    // Draw 2D histogram for sources of BG pairs
-   DrawBgSource2D("lmvm_source_pairs_2d", "fh_source_pairs", CbmAnaLmvmNames::fBgPairSourceLatex, 1000., "Pairs per event x10^{-3}");
+   DrawBgSource2D("lmvm_source_pairs_2d", "fh_source_pairs", CbmAnaLmvmNames::fBgPairSourceLatex, 1000., "Pairs per event x10^{3}");
 }
 
 void CbmAnaDielectronTaskDraw::Draw2DCutTriangle(
@@ -857,59 +857,41 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
    for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
       if ( !fUseMvd && (step == kMvd1Cut || step == kMvd2Cut)) continue;
       c->cd(hi++);
-      DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) ),
-            list_of("true match")("mismatch"), kLinear, kLinear, false, 0.85, 0.085, 0.99, 0.99);
+      DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )
+            ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) ),
+            list_of("true match")("mismatch")("true match e^{#pm}")("true match not e^{#pm}"), kLinear, kLinear, true, 0.85, 0.85, 0.99, 0.99);
    }
 
    // Draw minv after PtCut
    TCanvas *cPtCut = CreateCanvas("lmvm_minv_mismatches_" + CbmAnaLmvmNames::fAnaSteps[kPtCut],
-            "lmvm_minv_mismatches_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 600, 600);
-   DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) ),
-         list_of("true match")("mismatch"), kLinear, kLinear, false, 0.85, 0.085, 0.99, 0.99);
+            "lmvm_minv_mismatches_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 700, 700);
+   DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
+         ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) ),
+         list_of("true match")("mismatch")("true match e^{#pm}")("true match not e^{#pm}"), kLinear, kLinear, true, 0.85, 0.85, 0.99, 0.99);
    }
-
 }
 
 void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
 {
-   TCanvas *cEl = CreateCanvas("lmvm_elpi_mom_electron", "lmvm_elpi_mom_electron", 800, 800);
-   double binWEl = H1("fh_elpi_mom_mc_electron")->GetBinWidth(1);
-   H1("fh_elpi_mom_mc_electron")->Scale(1/binWEl);
-   H1("fh_elpi_mom_acc_electron")->Scale(1/binWEl);;
-   H1("fh_elpi_mom_rec_electron")->Scale(1/binWEl);;
-   H1("fh_elpi_mom_rec_only_sts_electron")->Scale(1/binWEl);;
-   H1("fh_elpi_mom_rec_sts_rich_trd_electron")->Scale(1/binWEl);;
-   H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")->Scale(1/binWEl);;
-   DrawH1( list_of(H1("fh_elpi_mom_mc_electron"))(H1("fh_elpi_mom_acc_electron"))(H1("fh_elpi_mom_rec_electron"))(H1("fh_elpi_mom_rec_only_sts_electron"))
-         (H1("fh_elpi_mom_rec_sts_rich_trd_electron"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")),
-         list_of("MC ("+lit::NumberToString(H1("fh_elpi_mom_mc_electron")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Acc (" + lit::NumberToString(H1("fh_elpi_mom_acc_electron")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec (" +  lit::NumberToString(H1("fh_elpi_mom_rec_electron")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec only STS (" + lit::NumberToString(H1("fh_elpi_mom_rec_only_sts_electron")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec STS-RICH-TRD (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_electron")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec STS-RICH-TRD-TOF (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_tof_electron")->GetEntries()/fNofEvents, 2) +" per event)"),
-         kLinear, kLog, 0.45, 0.65, 0.99, 0.99);
-   H1("fh_elpi_mom_mc_electron")->SetMinimum(3e-3);
+   double binWEl = H1("fh_pi_mom_mc")->GetBinWidth(1);
 
-
-   TCanvas *cPi = CreateCanvas("lmvm_elpi_mom_pion", "lmvm_elpi_mom_pion", 800, 800);
-   H1("fh_elpi_mom_mc_pion")->Scale(1/binWEl);
-   H1("fh_elpi_mom_acc_pion")->Scale(1/binWEl);
-   H1("fh_elpi_mom_rec_pion")->Scale(1/binWEl);
-   H1("fh_elpi_mom_rec_only_sts_pion")->Scale(1/binWEl);
-   H1("fh_elpi_mom_rec_sts_rich_trd_pion")->Scale(1/binWEl);
-   H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")->Scale(1/binWEl);
-   DrawH1( list_of(H1("fh_elpi_mom_mc_pion"))(H1("fh_elpi_mom_acc_pion"))(H1("fh_elpi_mom_rec_pion"))(H1("fh_elpi_mom_rec_only_sts_pion"))
-         (H1("fh_elpi_mom_rec_sts_rich_trd_pion"))(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")),
-         list_of("MC ("+lit::NumberToString(H1("fh_elpi_mom_mc_pion")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Acc (" + lit::NumberToString(H1("fh_elpi_mom_acc_pion")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec (" +  lit::NumberToString(H1("fh_elpi_mom_rec_pion")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec only STS (" + lit::NumberToString(H1("fh_elpi_mom_rec_only_sts_pion")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec STS-RICH-TRD (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_pion")->GetEntries()/fNofEvents, 2) +" per event)")
-         ("Rec STS-RICH-TRD-TOF (" + lit::NumberToString(H1("fh_elpi_mom_rec_sts_rich_trd_tof_pion")->GetEntries()/fNofEvents, 2) +" per event)"),
-         kLinear, kLog, 0.45, 0.65, 0.99, 0.99);
-   H1("fh_elpi_mom_mc_pion")->SetMinimum(3e-3);
-
+   TCanvas *cPi = CreateCanvas("lmvm_pi_mom", "lmvm_pi_mom", 800, 800);
+   H1("fh_pi_mom_mc")->Scale(1/binWEl);
+   H1("fh_pi_mom_acc")->Scale(1/binWEl);
+   H1("fh_pi_mom_rec")->Scale(1/binWEl);
+   H1("fh_pi_mom_rec_only_sts")->Scale(1/binWEl);
+   H1("fh_pi_mom_rec_sts_rich_trd")->Scale(1/binWEl);
+   H1("fh_pi_mom_rec_sts_rich_trd_tof")->Scale(1/binWEl);
+   H1("fh_pi_mom_mc")->SetMinimum(3e-3);
+   DrawH1( list_of(H1("fh_pi_mom_mc"))(H1("fh_pi_mom_acc"))(H1("fh_pi_mom_rec"))(H1("fh_pi_mom_rec_only_sts"))
+         (H1("fh_pi_mom_rec_sts_rich_trd"))(H1("fh_pi_mom_rec_sts_rich_trd_tof")),
+         list_of("MC ("+lit::NumberToString(H1("fh_pi_mom_mc")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Acc (" + lit::NumberToString(H1("fh_pi_mom_acc")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec (" +  lit::NumberToString(H1("fh_pi_mom_rec")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec only STS (" + lit::NumberToString(H1("fh_pi_mom_rec_only_sts")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec STS-RICH-TRD (" + lit::NumberToString(H1("fh_pi_mom_rec_sts_rich_trd")->GetEntries()/fNofEvents, 2) +" per event)")
+         ("Rec STS-RICH-TRD-TOF (" + lit::NumberToString(H1("fh_pi_mom_rec_sts_rich_trd_tof")->GetEntries()/fNofEvents, 2) +" per event)"),
+         kLinear, kLog, 0.1, 0.3, 0.99, 0.99);
 }
 
 void CbmAnaDielectronTaskDraw::RemoveMvdCutBins()
@@ -1000,7 +982,7 @@ void CbmAnaDielectronTaskDraw::DrawBgSourceTracks()
    TCanvas *c1 = CreateCanvas("lmvm_nof_bg_tracks", "lmvm_nof_bg_tracks", 600, 600);
    TH1D* hbg = (TH1D*)H1("fh_nof_bg_tracks")->Clone();
    hbg->Scale(10);
-   hbg->GetYaxis()->SetTitle("Tracks/event x10^{-1}");
+   hbg->GetYaxis()->SetTitle("Tracks/event x10");
    hbg->GetXaxis()->SetRange(kReco + 1, rangeMax);
    DrawH1( hbg, kLinear, kLog, "hist text0");
    hbg->SetMarkerSize(2.);
@@ -1024,7 +1006,7 @@ void CbmAnaDielectronTaskDraw::DrawBgSourceTracks()
 
    DrawBgSource2D("lmvm_source_tracks_2d", "fh_source_tracks",
          list_of("#gamma")("#pi^{0}")("#pi^{#pm}")("p")("K")("e^{#pm}_{sec}")("oth."),
-         100., "Tracks per event x10^{-2}");
+         100., "Tracks per event x10^{2}");
 }
 
 void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
@@ -1041,7 +1023,7 @@ void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
    c1->cd(1);
    TH1D* hmismatches = (TH1D*)H1("fh_nof_mismatches")->Clone();
    hmismatches->Scale(10);
-   hmismatches->GetYaxis()->SetTitle("Mismatch tracks/event x10^{-1}");
+   hmismatches->GetYaxis()->SetTitle("Mismatch tracks/event x10");
    hmismatches->GetXaxis()->SetRange(kReco + 1, rangeMax);
    DrawH1( hmismatches, kLinear, kLog, "hist text0");
 
@@ -1050,7 +1032,7 @@ void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
    c1->cd(2);
    TH1D* hmismatches_rich = (TH1D*)H1("fh_nof_mismatches_rich")->Clone();
    hmismatches_rich->Scale(10);
-   hmismatches_rich->GetYaxis()->SetTitle("Mismatch tracks (RICH)/event x10^{-1}");
+   hmismatches_rich->GetYaxis()->SetTitle("Mismatch tracks (RICH)/event x10");
    hmismatches_rich->GetXaxis()->SetRange(kReco + 1, rangeMax);
    DrawH1( hmismatches_rich, kLinear, kLog, "hist text0");
    hmismatches_rich->SetMarkerSize(2.);
@@ -1058,7 +1040,7 @@ void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
    c1->cd(3);
    TH1D* hmismatches_trd = (TH1D*)H1("fh_nof_mismatches_trd")->Clone();
    hmismatches_trd->Scale(10);
-   hmismatches_trd->GetYaxis()->SetTitle("Mismatch tracks (TRD)/event x10^{-1}");
+   hmismatches_trd->GetYaxis()->SetTitle("Mismatch tracks (TRD)/event x10");
    hmismatches_trd->GetXaxis()->SetRange(kReco + 1, rangeMax);
    DrawH1( hmismatches_trd, kLinear, kLog, "hist text0");
    hmismatches_trd->SetMarkerSize(2.);
@@ -1066,7 +1048,7 @@ void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()
    c1->cd(4);
    TH1D* hmismatches_tof = (TH1D*)H1("fh_nof_mismatches")->Clone();
    hmismatches_tof->Scale(10);
-   hmismatches_tof->GetYaxis()->SetTitle("Mismatch tracks (TOF)/event x10^{-1}");
+   hmismatches_tof->GetYaxis()->SetTitle("Mismatch tracks (TOF)/event x10");
    hmismatches_tof->GetXaxis()->SetRange(kReco + 1, rangeMax);
    DrawH1( hmismatches_tof, kLinear, kLog, "hist text0");
    hmismatches_tof->SetMarkerSize(2.);

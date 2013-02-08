@@ -6,9 +6,12 @@ eventDisplay(TString inputFriend = "data/test.esd.root")
   // ========================================================================
   ifstream whichTrdGeo;
   whichTrdGeo.open("whichTrdGeo",ios::in);
-  TString digipar;
-  if (whichTrdGeo) whichTrdGeo >> digipar;
-  cout << "selected geometry : >> " << digipar << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
+  TString selectGeo;
+  if (whichTrdGeo) whichTrdGeo >> selectGeo;
+  TString digipar = selectGeo(0,8);
+  cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/which\
+TrdGeo file)" << endl;
+  cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_standard";
 

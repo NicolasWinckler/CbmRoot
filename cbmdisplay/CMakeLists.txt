@@ -12,7 +12,8 @@ ${CBMROOT_SOURCE_DIR}/cbmdisplay
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 
-${CBMROOT_SOURCE_DIR}/trd
+${CBMROOT_SOURCE_DIR}/trd/TrdData
+${CBMROOT_SOURCE_DIR}/trd/TrdParam
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

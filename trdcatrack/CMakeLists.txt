@@ -1,4 +1,4 @@
-# Create a library called "libtrdcatrack" which includes the source files given in
+## Create a library called "libtrdcatrack" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
@@ -17,7 +17,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
 ${CBMROOT_SOURCE_DIR}/sts
-${CBMROOT_SOURCE_DIR}/trd
+${CBMROOT_SOURCE_DIR}/trd/TrdParam
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
 ${CBMROOT_SOURCE_DIR}/L1/

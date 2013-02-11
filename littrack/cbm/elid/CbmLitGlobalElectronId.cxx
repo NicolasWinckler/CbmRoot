@@ -1,7 +1,7 @@
-/** CbmLitReconstructionQa.cxx
- * @author Semen Lebedev <s.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
+/**
+ * \file CbmLitReconstructionQa.cxx
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  **/
 
 #include "elid/CbmLitGlobalElectronId.h"
@@ -29,8 +29,8 @@ CbmLitGlobalElectronId::CbmLitGlobalElectronId():
    fRichRmsB(-1.),
    fRichRmsCoeff(-1.),
    fRichDistCut(-1.),
-
    fRichElIdAnn(NULL),
+   fGlobalTracks(NULL),
    fRichRings(NULL),
    fTrdTracks(NULL),
    fTofHits(NULL)
@@ -46,30 +46,24 @@ CbmLitGlobalElectronId::~CbmLitGlobalElectronId()
 void CbmLitGlobalElectronId::Init()
 {
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (NULL == ioman) {Fatal("CbmLitGlobalElectronId::Init:", "RootManager not initialized!");}
-
+	fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
 	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
-	if (NULL == fRichRings) {Fatal("CbmLitGlobalElectronId::Init","No RichRing array!");}
-
 	fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
-	if ( !fTrdTracks) {Fatal("CbmLitGlobalElectronId::Init","No TrdTrack array!");}
-
 	fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
-	if ( !fTofHits) {Fatal("CbmLitGlobalElectronId::Init","No TOFHit array!");}
 
-    if (fRichUseAnn){
-        string richANNFile(gSystem->Getenv("VMCWORKDIR"));
-        richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-        fRichElIdAnn = new CbmRichElectronIdAnn(richANNFile);
-        fRichElIdAnn->Init();
-    }
+   if (fRichUseAnn) {
+      string richANNFile = string(gSystem->Getenv("VMCWORKDIR")) + "/parameters/rich/el_id_ann_weights_rich_compact.txt";
+      fRichElIdAnn = new CbmRichElectronIdAnn(richANNFile);
+      fRichElIdAnn->Init();
+   }
 }
 
 Bool_t CbmLitGlobalElectronId::IsRichElectron(
-		const CbmGlobalTrack* globalTrack,
+		Int_t globalTrackIndex,
 		Double_t momentum)
 {
-   if (NULL == globalTrack) return false;
+   if (NULL == fGlobalTracks || NULL == fRichRings) return false;
+   const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(fGlobalTracks->At(globalTrackIndex));
    Int_t richId = globalTrack->GetRichRingIndex();
    if (richId < 0) return false;
    CbmRichRing* ring = static_cast<CbmRichRing*> (fRichRings->At(richId));
@@ -93,10 +87,11 @@ Bool_t CbmLitGlobalElectronId::IsRichElectron(
 }
 
 Bool_t CbmLitGlobalElectronId::IsTrdElectron(
-		const CbmGlobalTrack* globalTrack,
+		Int_t globalTrackIndex,
 		Double_t momentum)
 {
-   if (NULL == globalTrack) return false;
+   if (NULL == fGlobalTracks || NULL == fTrdTracks) return false;
+   const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(fGlobalTracks->At(globalTrackIndex));
    Int_t trdId = globalTrack->GetTrdTrackIndex();
    if (trdId < 0) return false;
    CbmTrdTrack* trdTrack = static_cast<CbmTrdTrack*>(fTrdTracks->At(trdId));
@@ -108,11 +103,12 @@ Bool_t CbmLitGlobalElectronId::IsTrdElectron(
 }
 
 Bool_t CbmLitGlobalElectronId::IsTofElectron(
-		const CbmGlobalTrack* globalTrack,
+		Int_t globalTrackIndex,
 		Double_t momentum)
 {
+   if (NULL == fGlobalTracks || NULL == fTofHits) return false;
+   const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(fGlobalTracks->At(globalTrackIndex));
    Double_t trackLength = globalTrack->GetLength() / 100.;
-
    Int_t tofId = globalTrack->GetTofHitIndex();
    if (tofId < 0) return false;
    CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);

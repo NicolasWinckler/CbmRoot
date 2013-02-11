@@ -15,6 +15,7 @@
 class CbmHistManager;
 class CbmTrackMatch;
 class CbmLitMCTrackCreator;
+class CbmLitGlobalElectronId;
 
 using std::string;
 using std::vector;
@@ -103,12 +104,7 @@ private:
    /**
     * \brief Fill array of track categories with default values.
     */
-   void FillTrackCategories();
-
-   /**
-    * \brief Fill array of ring categories with default values.
-    */
-   void FillRingCategories();
+   void FillTrackAndRingCategories();
 
    void CreateH1Efficiency(
          const string& name,
@@ -217,11 +213,13 @@ private:
     * \param[in] par Value that will be added in histogram (momentum or number of points).
     */
    void FillGlobalReconstructionHistos(
-      Int_t mcId,
-      const multimap<Int_t, Int_t>& mcMap,
-      const string& histName,
-      const string& accName,
-      const vector<Double_t>& par);
+         Int_t mcId,
+         const multimap<Int_t, Int_t>& mcMap,
+         const string& histName,
+         const string& histTypeName,
+         const string& effName,
+         const string& catName,
+         const vector<Double_t>& par);
 
     /**
      * \brief Fill histograms of accepted and reconstructed rings tracks.
@@ -232,11 +230,18 @@ private:
      * \param[in] par Value that will be added in histogram (momentum or number of points)
      */
    void FillGlobalReconstructionHistosRich(
-      Int_t mcId,
-      const multimap<Int_t, Int_t>& mcMap,
-      const string& histName,
-      const string& accName,
-      const vector<Double_t>& par);
+         Int_t mcId,
+         const multimap<Int_t, Int_t>& mcMap,
+         const string& histName,
+         const string& histTypeName,
+         const string& effName,
+         const string& catName,
+         const vector<Double_t>& par);
+
+   Bool_t ElectronId(
+         Int_t mcId,
+         const multimap<Int_t, Int_t>& mcMap,
+         const string& effName);
 
 //   /**
 //    * \brief Divide two histograms.
@@ -318,8 +323,12 @@ private:
 
    vector<string> fTrackCategories; // Vector of track category names
    vector<string> fRingCategories; // Vector of ring category names
+   vector<string> fTrackCategoriesPID; // Vector of track category names
+   vector<string> fRingCategoriesPID; // Vector of ring category names for REC+PID
    map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
    map<string, LitRingAcceptanceFunction> fRingAcceptanceFunctions; // maps ring category name to ring acceptance function
+
+   CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 
    ClassDef(CbmLitTrackingQa, 1);
 };

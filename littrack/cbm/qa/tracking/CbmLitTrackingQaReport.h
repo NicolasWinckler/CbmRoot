@@ -65,10 +65,12 @@ protected:
    /**
     * \brief Return string with tracking efficiency.
     * \param[in] includeRich True if RICH detector is included in the tracking efficiency table.
+    * \param[in] isPidEfficiency True if PID efficiency is plotted.
     * \return String with tracking efficiency.
     */
    string PrintTrackingEfficiency(
-		   Bool_t includeRich) const;
+		   Bool_t includeRich,
+	      Bool_t isPidEfficiency) const;
 
    /**
     * \brief Main function for drawing efficiency histograms.
@@ -82,7 +84,8 @@ protected:
     */
    void DrawEfficiency(
 	  const string& canvasName,
-	  const string& histNamePattern);
+	  const string& histNamePattern,
+	  string (*labelFormatter)(const string&, Double_t));
 
    /**
     * \brief Draw mean efficiency lines on histogram.

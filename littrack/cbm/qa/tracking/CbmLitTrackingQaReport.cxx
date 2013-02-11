@@ -25,6 +25,22 @@ using std::make_pair;
 using std::pair;
 using boost::assign::list_of;
 
+string DefaultEfficiencyLabelFormatter(
+      const string& histName,
+      Double_t efficiency)
+{
+   vector<string> split = Split(histName, '_');
+   return split[1] + ":" + split[3] + "(" + NumberToString<Double_t>(efficiency, 1) + ")";
+}
+
+string ElectronIdEfficiencyLabelFormatter(
+      const string& histName,
+      Double_t efficiency)
+{
+   vector<string> split = Split(histName, '_');
+   return FindAndReplace(split[1], "Sts", "") + " (" + NumberToString<Double_t>(efficiency, 1) + ")";
+}
+
 CbmLitTrackingQaReport::CbmLitTrackingQaReport():
 		CbmSimulationReport(),
 		fGlobalTrackVariants()
@@ -47,8 +63,10 @@ void CbmLitTrackingQaReport::Create()
    Out() << PrintNofObjects();
    Out() << PrintTrackHits();
    Out() << PrintNofGhosts();
-   Out() << PrintTrackingEfficiency(false);
-   Out() << PrintTrackingEfficiency(true);
+   Out() << PrintTrackingEfficiency(false, false);
+   Out() << PrintTrackingEfficiency(true, false);
+   Out() << PrintTrackingEfficiency(false, true);
+   Out() << PrintTrackingEfficiency(true, true);
 
    PrintCanvases();
 
@@ -103,11 +121,15 @@ string CbmLitTrackingQaReport::PrintNofGhosts() const
 }
 
 string CbmLitTrackingQaReport::PrintTrackingEfficiency(
-		Bool_t includeRich) const
+		Bool_t includeRich,
+		Bool_t isPidEfficiency) const
 {
   	// If includeRich == true than search for tracking efficiency histograms which contain "Rich"
   	// otherwise search for tracking efficiency histograms excluding those which contain "Rich"
-  	string effRegex = (includeRich) ? "hte_.*Rich.*_Eff_p" : "hte_((?!Rich).)*_Eff_p";
+  	string effRegex = "";
+  	if (isPidEfficiency) effRegex = (includeRich) ? "hte_.*Rich.*_Eff_p" : "hte_((?!Rich).)*_Eff_p";
+  	else effRegex = (includeRich) ? "hpe_.*Rich.*_Eff_p" : "hpe_((?!Rich).)*_Eff_p";
+
   	vector<TH1*> histos = HM()->H1Vector(effRegex);
   	Int_t nofHistos = histos.size();
   	if (nofHistos == 0) return "";
@@ -168,10 +190,11 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	// Draw global tracking efficiency
 	for (UInt_t i = 0; i < fGlobalTrackVariants.size(); i++) {
 		string variant = fGlobalTrackVariants[i];
-		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p");
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p", DefaultEfficiencyLabelFormatter);
+		DrawEfficiency("tracking_qa_pid_efficiency_electron_" + variant + "_p", "hpe_((?!Sts_))Sts.*_" + variant + "_Electron_Eff_p", ElectronIdEfficiencyLabelFormatter);
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_pt", "hte_Sts.*_" + variant + "_All_Eff_pt");
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_y", "hte_Sts.*_" + variant + "_All_Eff_y");
-		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_angle", "hte_Sts.*_" + variant + "_All_Eff_Angle");
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_angle", "hte_Sts.*_" + variant + "_All_Eff_Angle", DefaultEfficiencyLabelFormatter);
 	}
 
 	// Draw local tracking efficiency
@@ -180,12 +203,12 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 		string variant = localTrackVariants[i];
 		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_Eff" : "hte_" + variant + "_.*_(All|Muon|Electron)_Eff";
 		if (variant == "Rich") re = "hte_" + variant + "_.*_(Electron|ElectronReference)_Eff";
-		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re + "_p");
+		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_p", re + "_p", DefaultEfficiencyLabelFormatter);
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_pt", re + "_pt");
 		//DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_y", "hte_" + variant + "_.*" + variant + ".*_(All|Electron)_Eff_y");
 
 		string re2 = (variant == "Sts") ? "hte_Sts_Sts_All_Eff" : "hte_" + variant + "_.*_All_Eff";
-		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_angle", re2 + "_Angle");
+		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_angle", re2 + "_Angle", DefaultEfficiencyLabelFormatter);
 	}
 
 	// Draw local accepted and reconstructed tracks vs number of points
@@ -200,7 +223,8 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 
 void CbmLitTrackingQaReport::DrawEfficiency(
       const string& canvasName,
-      const string& histNamePattern)
+      const string& histNamePattern,
+      string (*labelFormatter)(const string&, Double_t))
 {
 	vector<TH1*> histos = HM()->H1Vector(histNamePattern);
 	if (histos.size() == 0) return;
@@ -215,8 +239,7 @@ void CbmLitTrackingQaReport::DrawEfficiency(
 	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
 		string name = histos[iHist]->GetName();
 		efficiencies[iHist] = CalcEfficiency(HM()->H1(FindAndReplace(name, "_Eff_", "_Rec_")), HM()->H1(FindAndReplace(name, "_Eff_", "_Acc_")), 100.);
-		vector<string> split = Split(name, '_');
-		labels[iHist] = split[1] + ":" + split[3] + "(" + NumberToString<Double_t>(efficiencies[iHist], 1) + ")";
+		labels[iHist] = labelFormatter(name, efficiencies[iHist]);
 	}
 
 	DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
@@ -388,7 +411,7 @@ void CbmLitTrackingQaReport::DivideHistos(
 
 void CbmLitTrackingQaReport::CalculateEfficiencyHistos()
 {
-    vector<TH1*> effHistos = HM()->H1Vector("hte_.+_Eff_.+");
+    vector<TH1*> effHistos = HM()->H1Vector("(hte|hpe)_.+_Eff_.+");
     Int_t nofEffHistos = effHistos.size();
     for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
       TH1* effHist = effHistos[iHist];

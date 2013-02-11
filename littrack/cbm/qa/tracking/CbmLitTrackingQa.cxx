@@ -10,6 +10,7 @@
 #include "CbmHistManager.h"
 #include "utils/CbmLitUtils.h"
 #include "qa/mc/CbmLitMCTrackCreator.h"
+#include "elid/CbmLitGlobalElectronId.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmRichRing.h"
@@ -229,8 +230,7 @@ InitStatus CbmLitTrackingQa::Init()
    fHM = new CbmHistManager();
 
    fDet.DetermineSetup();
-   FillTrackCategories();
-   FillRingCategories();
+   FillTrackAndRingCategories();
 
    CreateHistograms();
 
@@ -243,6 +243,9 @@ InitStatus CbmLitTrackingQa::Init()
    for (Int_t i = 0; i < trackVariants.size(); i++) {
       fMcToRecoMap.insert(make_pair(trackVariants[i], multimap<Int_t, Int_t>()));
    }
+
+   fElectronId = new CbmLitGlobalElectronId();
+   fElectronId->Init();
 
    return kSUCCESS;
 }
@@ -321,12 +324,11 @@ void CbmLitTrackingQa::ReadDataBranches()
    }
 }
 
-void CbmLitTrackingQa::FillTrackCategories()
+void CbmLitTrackingQa::FillTrackAndRingCategories()
 {
    fTrackCategories = list_of("All")("Primary")("Secondary")("Reference")
          (fDet.GetElectronSetup() ? "Electron" : "Muon")("Proton")("PionPlus")
          ("PionMinus")("KaonPlus")("KaonMinus");
-
    fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["Primary"] = PrimaryTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["Secondary"] = SecondaryTrackAcceptanceFunction;
@@ -338,18 +340,19 @@ void CbmLitTrackingQa::FillTrackCategories()
    fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunction;
-}
 
-void CbmLitTrackingQa::FillRingCategories()
-{
    fRingCategories = list_of("All")("AllReference")("Electron")("ElectronReference")("Pion")("PionReference");
-
    fRingAcceptanceFunctions["All"] = AllRingAcceptanceFunction;
    fRingAcceptanceFunctions["AllReference"] = AllReferenceRingAcceptanceFunction;
    fRingAcceptanceFunctions["Electron"] = PrimaryElectronRingAcceptanceFunction;
    fRingAcceptanceFunctions["ElectronReference"] = PrimaryElectronReferenceRingAcceptanceFunction;
    fRingAcceptanceFunctions["Pion"] = PionRingAcceptanceFunction;
    fRingAcceptanceFunctions["PionReference"] = PionReferenceRingAcceptanceFunction;
+
+   if (fDet.GetElectronSetup()) {
+      fTrackCategoriesPID = list_of("Electron");
+      fRingCategoriesPID = list_of("Electron");
+   }
 }
 
 void CbmLitTrackingQa::CreateH1Efficiency(
@@ -361,9 +364,9 @@ void CbmLitTrackingQa::CreateH1Efficiency(
       Double_t maxBin,
       const string& opt)
 {
-   assert(opt == "track" || opt == "ring");
-   string types[] = { "Acc", "Rec", "Eff" };
-   vector<string> cat = (opt == "track") ? fTrackCategories : fRingCategories;
+   assert(opt == "track" || opt == "ring" || opt == "track_pid" || opt == "ring_pid");
+   vector<string> types = list_of("Acc")("Rec")("Eff");
+   vector<string> cat = (opt == "track") ? fTrackCategories : (opt == "ring") ? fRingCategories : (opt == "track_pid") ? fTrackCategoriesPID : fRingCategoriesPID;
 
    for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
       for (Int_t iType = 0; iType < 3; iType++) {
@@ -388,9 +391,9 @@ void CbmLitTrackingQa::CreateH2Efficiency(
       Double_t maxBinY,
       const string& opt)
 {
-   assert(opt == "track" || opt == "ring");
-   string types[] = { "Acc", "Rec", "Eff" };
-   vector<string> cat = (opt == "track") ? fTrackCategories : fRingCategories;
+   assert(opt == "track" || opt == "ring" || opt == "track_pid" || opt == "ring_pid");
+   vector<string> types = list_of("Acc")("Rec")("Eff");
+   vector<string> cat = (opt == "track") ? fTrackCategories : (opt == "ring") ? fRingCategories : (opt == "track_pid") ? fTrackCategoriesPID : fRingCategoriesPID;
 
    for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
       for (Int_t iType = 0; iType < 3; iType++) {
@@ -607,10 +610,17 @@ void CbmLitTrackingQa::CreateHistograms()
    for (Int_t iHist = 0; iHist < histoNames.size(); iHist++) {
       string name = histoNames[iHist];
       string opt = (name.find("Rich") == string::npos) ? "track" : "ring";
+      // Tracking efficiency
       CreateH1Efficiency(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, opt);
       CreateH1Efficiency(name, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, opt);
       CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
       CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
+      // PID
+      opt += "_pid";
+      CreateH1Efficiency(FindAndReplace(name, "hte_", "hpe_"), "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, opt);
+//      CreateH1Efficiency(name, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, opt);
+//      CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
+//      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
    }
 
 //   // Create efficiency histograms with normalization to INPUT
@@ -883,18 +893,8 @@ Bool_t CbmLitTrackingQa::CheckTrackQuality(
 
 void CbmLitTrackingQa::ProcessMcTracks()
 {
-    vector<TH1*> effHistos = fHM->H1Vector("hte_.*_Eff_.*");
+    vector<TH1*> effHistos = fHM->H1Vector("(hte|hpe)_.*_Eff_.*");
     Int_t nofEffHistos = effHistos.size();
-//    for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
-//    TH1* hist = effHistos[iHist];
-//    string name = hist->GetName();
-//    vector<string> parse = CbmLitTrackingQa::ParseHistoName(name);
-//    cout << name;
-//    for (Int_t j = 0; j < parse.size(); j++) {
-//       cout << " [" << j << "]=" << parse[j];
-//    }
-//    cout << std::endl;
-//    }
 
    Int_t nofMcTracks = fMCTracks->GetEntriesFast();
    for (Int_t iMCTrack = 0; iMCTrack < nofMcTracks; iMCTrack++) {
@@ -944,7 +944,8 @@ void CbmLitTrackingQa::ProcessMcTracks()
          vector<string> split = Split(histName, '_');
          string effName = split[1];
          string normName = split[2];
-         string accName = split[3];
+         string catName = split[3];
+         string histTypeName = split[0];
          string parName = split[5];
          assert(parMap.count(parName) != 0);
 
@@ -966,15 +967,15 @@ void CbmLitTrackingQa::ProcessMcTracks()
             Bool_t isPrevRec = fMcToRecoMap[prevRecName].find(iMCTrack) != fMcToRecoMap[prevRecName].end();
             Bool_t accOk = isPrevRec && sts && trd && much && tof && rich;
             if (accOk) {
-               FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[normName], histName, accName, par);
+               FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[normName], histName, histTypeName, effName, catName, par);
             }
          } else {
             Bool_t accOk = sts && trd && much && tof && rich;
             if (accOk) {
               if (histName.find("Rich") == string::npos) {
-               FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[effName], histName, accName, par);
+               FillGlobalReconstructionHistos(iMCTrack, fMcToRecoMap[effName], histName, histTypeName, effName, catName, par);
               } else {
-                 FillGlobalReconstructionHistosRich(iMCTrack, fMcToRecoMap[effName], histName, accName, par);
+                 FillGlobalReconstructionHistosRich(iMCTrack, fMcToRecoMap[effName], histName, histTypeName, effName, catName, par);
               }
             }
          }
@@ -986,45 +987,68 @@ void CbmLitTrackingQa::FillGlobalReconstructionHistos(
    Int_t mcId,
    const multimap<Int_t, Int_t>& mcMap,
    const string& histName,
-   const string& accName,
+   const string& histTypeName,
+   const string& effName,
+   const string& catName,
    const vector<Double_t>& par)
 {
    string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
    string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
-   LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(accName)->second;
+   LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(catName)->second;
    Bool_t accOk = function(fMCTracks, mcId);
+   Bool_t recOk = (histTypeName == "hte") ? (mcMap.find(mcId) != mcMap.end() && accOk) : (ElectronId(mcId, mcMap, effName) && accOk);
    Int_t nofParams = par.size();
    assert(nofParams < 3 && nofParams > 0);
    if (nofParams == 1) {
       if (accOk) { fHM->H1(accHistName)->Fill(par[0]); }
-      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0]); }
+      if (recOk) { fHM->H1(recHistName)->Fill(par[0]); }
    } else if (nofParams == 2) {
       if (accOk) { fHM->H1(accHistName)->Fill(par[0], par[1]); }
-      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
+      if (recOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
    }
 }
 
 void CbmLitTrackingQa::FillGlobalReconstructionHistosRich(
-   Int_t mcId,
-   const multimap<Int_t, Int_t>& mcMap,
-   const string& histName,
-   const string& accName,
-   const vector<Double_t>& par)
+      Int_t mcId,
+      const multimap<Int_t, Int_t>& mcMap,
+      const string& histName,
+      const string& histTypeName,
+      const string& effName,
+      const string& catName,
+      const vector<Double_t>& par)
 {
    Int_t nofHitsInRing = fMCTrackCreator->GetTrack(mcId).GetNofRichHits();
    string accHistName = FindAndReplace(histName, "_Eff_", "_Acc_");
    string recHistName = FindAndReplace(histName, "_Eff_", "_Rec_");
-   LitRingAcceptanceFunction function = fRingAcceptanceFunctions.find(accName)->second;
+   LitRingAcceptanceFunction function = fRingAcceptanceFunctions.find(catName)->second;
    Bool_t accOk = function(fMCTracks, mcId, nofHitsInRing);
+   Bool_t recOk = (histTypeName == "hte") ? (mcMap.find(mcId) != mcMap.end() && accOk) : (ElectronId(mcId, mcMap, effName) && accOk);
    Int_t nofParams = par.size();
    assert(nofParams < 3 && nofParams > 0);
    if (nofParams == 1) {
       if (accOk) { fHM->H1(accHistName)->Fill(par[0]); }
-      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0]); }
+      if (recOk) { fHM->H1(recHistName)->Fill(par[0]); }
    } else if (nofParams == 2) {
       if (accOk) { fHM->H1(accHistName)->Fill(par[0], par[1]); }
-      if (mcMap.find(mcId) != mcMap.end() && accOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
+      if (recOk) { fHM->H1(recHistName)->Fill(par[0], par[1]); }
    }
+}
+
+Bool_t CbmLitTrackingQa::ElectronId(
+      Int_t mcId,
+      const multimap<Int_t, Int_t>& mcMap,
+      const string& effName)
+{
+   multimap<Int_t, Int_t>::const_iterator it = mcMap.find(mcId);
+   if (it == mcMap.end()) return false;
+   Int_t globalTrackIndex = (*it).second;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcId));
+   TVector3 mom;
+   mcTrack->GetMomentum(mom);
+   Bool_t isRichElectron = (fDet.GetDet(kRICH) && (effName.find("Rich") != string::npos)) ? fElectronId->IsRichElectron(globalTrackIndex, mom.Mag()) : true;
+   Bool_t isTrdElectron = (fDet.GetDet(kTRD) && (effName.find("Trd") != string::npos)) ? fElectronId->IsRichElectron(globalTrackIndex, mom.Mag()) : true;
+   Bool_t isTofElectron = (fDet.GetDet(kTOF) && (effName.find("Tof") != string::npos)) ? fElectronId->IsRichElectron(globalTrackIndex, mom.Mag()) : true;
+   return isRichElectron && isTrdElectron && isTofElectron;
 }
 
 void CbmLitTrackingQa::IncreaseCounters()

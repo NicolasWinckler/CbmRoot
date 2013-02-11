@@ -1,12 +1,11 @@
-/** CbmLitReconstructionQa.h
- * @author Semen Lebedev <s.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
+/**
+ * \file CbmLitReconstructionQa.h
+ * \author Semen Lebedev <s.lebedev@gsi.de>
+ * \date 2011
  **/
 
 #ifndef CBMLITGLOBALELECTRONID_H_
 #define CBMLITGLOBALELECTRONID_H_
-
 
 #include "TObject.h"
 
@@ -17,35 +16,60 @@ class CbmGlobalTrack;
 class CbmLitGlobalElectronId: public TObject
 {
 public:
+   /**
+    * \brief Constructor.
+    */
 	CbmLitGlobalElectronId();
+
+	/**
+	 * \brief Destructor.
+	 */
 	virtual ~CbmLitGlobalElectronId();
 
-   /* Initialize TClonesArrays*/
+   /**
+    * \brief Initialize TClonesArrays.
+    */
 	void Init();
 
-   /* Identify electron in RICH detector.
-    *@param globalTrack pointer to global track
-    *@param momentum momentum of the track
-    *@return true if track is identified as electron otherwise return false*/
+   /**
+    * \brief Identify electron in RICH detector.
+    * \param[in] globalTrackIndex Index of global track.
+    * \param[in] momentum Momentum of track.
+    * \return true if track is identified as electron otherwise return false.
+    */
 	Bool_t IsRichElectron(
-			const CbmGlobalTrack* globalTrack,
+			Int_t globalTrackIndex,
 			Double_t momentum);
 
-   /* Identify electron in TRD detector.
-    *@param globalTrack pointer to global track
-    *@param momentum momentum of the track
-    *@return true if track is identified as electron otherwise return false*/
+   /**
+    * \brief Identify electron in RICH detector.
+    * \param[in] globalTrackIndex Index of global track.
+    * \param[in] momentum Momentum of track.
+    * \return true if track is identified as electron otherwise return false.
+    */
 	Bool_t IsTrdElectron(
-			const CbmGlobalTrack* globalTrack,
+			Int_t globalTrackindex,
 			Double_t momentum);
 
-   /* Identify electron in TOF detector.
-    *@param globalTrack pointer to global track
-    *@param momentum momentum of the track
-    *@return true if track is identified as electron otherwise return false*/
+   /**
+    * \brief Identify electron in RICH detector.
+    * \param[in] globalTrackIndex Index of global track.
+    * \param[in] momentum Momentum of track.
+    * \return true if track is identified as electron otherwise return false.
+    */
 	Bool_t IsTofElectron(
-			const CbmGlobalTrack* globalTrack,
+			Int_t globalTrackIndex,
 			Double_t momentum);
+
+   /**
+    * \brief Identify electron in RICH detector.
+    * \param[in] globalTrackIndex Index of global track.
+    * \param[in] momentum Momentum of track.
+    * \return true if track is identified as electron otherwise return false.
+    */
+	Bool_t IsElectron(
+	      Int_t globalTrackIndex,
+	      Double_t momentum);
 
 private:
     Double_t fRichAnnCut;
@@ -60,6 +84,7 @@ private:
 
     CbmRichElectronIdAnn* fRichElIdAnn;
 
+    TClonesArray* fGlobalTracks;
     TClonesArray* fRichRings;
     TClonesArray* fTrdTracks;
     TClonesArray* fTofHits;

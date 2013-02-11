@@ -41,6 +41,14 @@ string ElectronIdEfficiencyLabelFormatter(
    return FindAndReplace(split[1], "Sts", "") + " (" + NumberToString<Double_t>(efficiency, 1) + ")";
 }
 
+string DefaultPionSuppressionLabelFormatter(
+      const string& histName,
+      Double_t efficiency)
+{
+   vector<string> split = Split(histName, '_');
+   return split[1] + " (" + NumberToString<Double_t>(efficiency, 1) + ")";
+}
+
 CbmLitTrackingQaReport::CbmLitTrackingQaReport():
 		CbmSimulationReport(),
 		fGlobalTrackVariants()
@@ -67,6 +75,7 @@ void CbmLitTrackingQaReport::Create()
    Out() << PrintTrackingEfficiency(true, false);
    Out() << PrintTrackingEfficiency(false, true);
    Out() << PrintTrackingEfficiency(true, true);
+   Out() << PrintPionSuppression();
 
    PrintCanvases();
 
@@ -174,10 +183,35 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
   	return str;
 }
 
+string CbmLitTrackingQaReport::PrintPionSuppression() const
+{
+   vector<TH1*> histos = HM()->H1Vector("hps_.*_PionSup_p");
+   Int_t nofHistos = histos.size();
+   if (nofHistos == 0) return "";
+
+   Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
+   string str = R()->TableBegin("Pion suppression", list_of(string(""))("Pion suppression"));
+   for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+         string psName = histos[iHist]->GetName();
+         string recName = FindAndReplace(psName, "_PionSup_", "_Rec_");
+         string recPionsName = FindAndReplace(psName, "_PionSup_", "_RecPions_");
+         Double_t rec = HM()->H1(recName)->GetEntries() / nofEvents;
+         Double_t recPions = HM()->H1(recPionsName)->GetEntries() / nofEvents;
+         Double_t pionSup = (rec != 0.) ? recPions / rec : 0.;
+         string pionSupStr = NumberToString<Double_t>(pionSup);
+         vector<string> split = Split(psName, '_');
+         string rowName = split[1];
+         str += R()->TableRow(list_of(rowName)(pionSupStr));
+   }
+   str += R()->TableEnd();
+   return str;
+}
+
 
 void CbmLitTrackingQaReport::Draw()
 {
    CalculateEfficiencyHistos();
+   CalculatePionSuppressionHistos();
    FillGlobalTrackVariants();
 	SetDefaultDrawStyle();
 	DrawEfficiencyHistos();
@@ -219,6 +253,11 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_(Acc|Rec)_Np" : "hte_" + variant + "_.*_(All|Muon|Electron)_(Acc|Rec)_Np";
 		DrawAccAndRec("tracking_qa_local_acc_and_rec_" + variant + "_Np", re);
 	}
+
+	//
+   DrawPionSuppression("tracking_qa_pion_suppression_wo_Rich_p", "hps_((?!Rich)).*_PionSup_p", DefaultPionSuppressionLabelFormatter);
+   DrawPionSuppression("tracking_qa_pion_suppression_with_rich_p", "hps_Rich.*_PionSup_p", DefaultPionSuppressionLabelFormatter);
+
 }
 
 void CbmLitTrackingQaReport::DrawEfficiency(
@@ -244,6 +283,31 @@ void CbmLitTrackingQaReport::DrawEfficiency(
 
 	DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
 	DrawMeanEfficiencyLines(histos, efficiencies);
+}
+
+void CbmLitTrackingQaReport::DrawPionSuppression(
+      const string& canvasName,
+      const string& histNamePattern,
+      string (*labelFormatter)(const string&, Double_t))
+{
+   vector<TH1*> histos = HM()->H1Vector(histNamePattern);
+   if (histos.size() == 0) return;
+
+   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+   canvas->SetGrid();
+   canvas->cd();
+
+   Int_t nofHistos = histos.size();
+   vector<string> labels(nofHistos);
+   vector<Double_t> ps(nofHistos);
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      string name = histos[iHist]->GetName();
+      ps[iHist] = CalcEfficiency(HM()->H1(FindAndReplace(name, "_PionSup_", "_RecPions_")), HM()->H1(FindAndReplace(name, "_PionSup_", "_Rec_")), 1.);
+      labels[iHist] = labelFormatter(name, ps[iHist]);
+   }
+
+   DrawH1(histos, labels, kLinear, kLog, true, 0.3, 0.3, 0.85, 0.6, "PE1");
+   DrawMeanEfficiencyLines(histos, ps);
 }
 
 void CbmLitTrackingQaReport::DrawMeanEfficiencyLines(
@@ -421,6 +485,21 @@ void CbmLitTrackingQaReport::CalculateEfficiencyHistos()
       DivideHistos(HM()->H1(recHistName), HM()->H1(accHistName), effHist, 100.);
       effHist->SetMinimum(0.);
       effHist->SetMaximum(100.);
+    }
+}
+
+void CbmLitTrackingQaReport::CalculatePionSuppressionHistos()
+{
+    vector<TH1*> histos = HM()->H1Vector("hps_.+_PionSup_.+");
+    Int_t nofHistos = histos.size();
+    for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+      TH1* psHist = histos[iHist];
+      string psHistName = psHist->GetName();
+      string recHistName = FindAndReplace(psHistName, "_PionSup_", "_Rec_");
+      string pionRecHistName = FindAndReplace(psHistName, "_PionSup_", "_RecPions_");
+      DivideHistos(HM()->H1(pionRecHistName), HM()->H1(recHistName), psHist, 1.);
+    //  psHist->SetMinimum(1.);
+    //  psHist->SetMaximum(20000.);
     }
 }
 

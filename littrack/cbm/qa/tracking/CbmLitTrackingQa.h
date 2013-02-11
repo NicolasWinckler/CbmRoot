@@ -128,6 +128,14 @@ private:
          Double_t maxBinY,
          const string& opt);
 
+   void CreateH1PionSuppression(
+         const string& name,
+         const string& parameter,
+         const string& xTitle,
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin);
+
    void CreateH1(
          const string& name,
          const string& xTitle,
@@ -160,6 +168,8 @@ private:
          const string& detName);
 
    vector<string> GlobalTrackVariants();
+
+   vector<string> PionSuppressionVariants();
 
    void CreateHistograms();
 
@@ -243,19 +253,8 @@ private:
          const multimap<Int_t, Int_t>& mcMap,
          const string& effName);
 
-//   /**
-//    * \brief Divide two histograms.
-//    * \param[in] histo1 Numerator.
-//    * \param[in] histo2 Denominator.
-//    * \param[out] histo3 Output histogram.
-//    * \param[in] scale Scaling factor.
-//    */
-//   void DivideHistos(
-//      TH1* histo1,
-//      TH1* histo2,
-//      TH1* histo3,
-//      Double_t scale);
-//
+   void PionSuppression();
+
    /**
     * \brief Increase number of objects counters.
     */

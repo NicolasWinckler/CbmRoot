@@ -215,7 +215,8 @@ CbmLitTrackingQa::CbmLitTrackingQa():
    fMuchMatches(NULL),
    fTrdMatches(NULL),
    fTofPoints(NULL),
-   fTofHits(NULL)
+   fTofHits(NULL),
+   fElectronId(NULL)
 {
 }
 
@@ -261,6 +262,7 @@ void CbmLitTrackingQa::Exec(
 
    ProcessGlobalTracks();
    ProcessMcTracks();
+   PionSuppression();
    IncreaseCounters();
 }
 
@@ -405,6 +407,23 @@ void CbmLitTrackingQa::CreateH2Efficiency(
    }
 }
 
+void CbmLitTrackingQa::CreateH1PionSuppression(
+      const string& name,
+      const string& parameter,
+      const string& xTitle,
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin)
+{
+   vector<string> types = list_of("RecPions")("Rec")("PionSup");
+   for (Int_t iType = 0; iType < 3; iType++) {
+      string yTitle = (types[iType] == "PionSup") ? "Pion suppression" : "Counter";
+      string histName = name + "_" + types[iType] + "_" + parameter;
+      string histTitle = histName + ";" + xTitle + ";" + yTitle;
+      fHM->Add(histName, new TH1F(histName.c_str(), histTitle.c_str(), nofBins, minBin, maxBin));
+   }
+}
+
 void CbmLitTrackingQa::CreateH1(
       const string& name,
       const string& xTitle,
@@ -528,6 +547,35 @@ vector<string> CbmLitTrackingQa::GlobalTrackVariants()
    return trackVariantsVector;
 }
 
+vector<string> CbmLitTrackingQa::PionSuppressionVariants()
+{
+   set<string> variants;
+   // Histograms w/o RICH detector
+   vector<string> detectors;
+   if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+   if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+   string name("");
+   for (Int_t i = 0; i < detectors.size(); i++) {
+      name += detectors[i];
+      variants.insert(name);
+   }
+
+   // Histograms with RICH detector
+   if (fDet.GetDet(kRICH)) {
+      detectors.clear();
+      if (fDet.GetDet(kRICH)) detectors.push_back("Rich");
+      if (fDet.GetDet(kTRD)) detectors.push_back("Trd");
+      if (fDet.GetDet(kTOF)) detectors.push_back("Tof");
+      name = "";
+      for (Int_t i = 0; i < detectors.size(); i++) {
+          name += detectors[i];
+          variants.insert(name);
+      }
+   }
+   vector<string> variantsVector(variants.begin(), variants.end());
+   return variantsVector;
+}
+
 string CbmLitTrackingQa::LocalEfficiencyNormalization(
       const string& detName)
 {
@@ -621,6 +669,12 @@ void CbmLitTrackingQa::CreateHistograms()
 //      CreateH1Efficiency(name, "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, opt);
 //      CreateH1Efficiency(name, "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
 //      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
+   }
+
+   vector<string> psVariants = PionSuppressionVariants();
+   for (Int_t iHist = 0; iHist < psVariants.size(); iHist++) {
+      string name = "hps_" + psVariants[iHist];
+      CreateH1PionSuppression(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax);
    }
 
 //   // Create efficiency histograms with normalization to INPUT
@@ -1049,6 +1103,45 @@ Bool_t CbmLitTrackingQa::ElectronId(
    Bool_t isTrdElectron = (fDet.GetDet(kTRD) && (effName.find("Trd") != string::npos)) ? fElectronId->IsRichElectron(globalTrackIndex, mom.Mag()) : true;
    Bool_t isTofElectron = (fDet.GetDet(kTOF) && (effName.find("Tof") != string::npos)) ? fElectronId->IsRichElectron(globalTrackIndex, mom.Mag()) : true;
    return isRichElectron && isTrdElectron && isTofElectron;
+}
+
+void CbmLitTrackingQa::PionSuppression()
+{
+   vector<TH1*> histos = fHM->H1Vector("hps_.*_RecPions_.*");
+   Int_t nofHistos = histos.size();
+
+   Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
+   for (Int_t iGT = 0; iGT < nofGlobalTracks; iGT++) {
+      const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(fGlobalTracks->At(iGT));
+      Int_t stsIndex = globalTrack->GetStsTrackIndex();
+      if (stsIndex < 0) continue;
+      const CbmTrackMatch* trackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsIndex));
+      Int_t mcIdSts = trackMatch->GetMCTrackId();
+      if (mcIdSts < 0) continue;
+      const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcIdSts));
+      TVector3 mom;
+      mcTrack->GetMomentum(mom);
+      Double_t p = mom.Mag();
+      Int_t pdgSts = mcTrack->GetPdgCode();
+      if (pdgSts == std::abs(211)) {
+         Bool_t isRichElectron = (fDet.GetDet(kRICH)) ? fElectronId->IsRichElectron(iGT, p) : true;
+         Bool_t isTrdElectron = (fDet.GetDet(kTRD)) ? fElectronId->IsTrdElectron(iGT, p) : true;
+         Bool_t isTofElectron = (fDet.GetDet(kTOF)) ? fElectronId->IsTofElectron(iGT, p) : true;
+
+         for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+            histos[iHist]->Fill(p); // Fill RecPions histogramm
+            string name = histos[iHist]->GetName();
+            vector<string> split = Split(name, '_');
+            string effName = split[1];
+            Bool_t isElectron = ((effName.find("Rich") != string::npos) ? isRichElectron : true)
+                  && ((effName.find("Trd") != string::npos) ? isTrdElectron : true)
+                  && ((effName.find("Tof") != string::npos) ? isTofElectron : true);
+            if (isElectron) {
+               fHM->H1(FindAndReplace(name, "RecPions", "Rec"))->Fill(p);
+            }
+         }
+      }
+   }
 }
 
 void CbmLitTrackingQa::IncreaseCounters()

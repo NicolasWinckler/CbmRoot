@@ -73,6 +73,12 @@ protected:
 	      Bool_t isPidEfficiency) const;
 
    /**
+    * \brief Return string with pion suppression efficiency.
+    * \return String with pion suppression efficiency.
+    */
+   string PrintPionSuppression() const;
+
+   /**
     * \brief Main function for drawing efficiency histograms.
     */
    void DrawEfficiencyHistos();
@@ -86,6 +92,11 @@ protected:
 	  const string& canvasName,
 	  const string& histNamePattern,
 	  string (*labelFormatter)(const string&, Double_t));
+
+   void DrawPionSuppression(
+         const string& canvasName,
+         const string& histNamePattern,
+         string (*labelFormatter)(const string&, Double_t));
 
    /**
     * \brief Draw mean efficiency lines on histogram.
@@ -164,6 +175,8 @@ protected:
     * \brief Calculate efficiency histograms.
     */
    void CalculateEfficiencyHistos();
+
+   void CalculatePionSuppressionHistos();
 
    vector<string> fGlobalTrackVariants;
 

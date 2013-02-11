@@ -180,43 +180,43 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    DrawH1(list_of(sbg)(bg)(coctail)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
          list_of("")("")("")("")("")("")("")("")(""), kLinear, kLog, false, 0.8, 0.8, 0.99, 0.99);
    sRho->SetFillColor(kMagenta-3);
-   sRho->SetLineColor(kBlack);
+   sRho->SetLineColor(kMagenta-2);
    sRho->SetLineStyle(0);
-   sRho->SetLineWidth(1);
+   sRho->SetLineWidth(2);
    sRho->SetFillStyle(3112);
 
    sOmega->SetFillColor(kOrange+7);
-   sOmega->SetLineColor(kBlack);
+   sOmega->SetLineColor(kOrange+4);
    sOmega->SetLineStyle(0);
-   sOmega->SetLineWidth(1);
+   sOmega->SetLineWidth(2);
 
-   sPhi->SetFillColor(kRed+1);
-   sPhi->SetLineColor(kBlack);
+   sPhi->SetFillColor(kAzure+2);
+   sPhi->SetLineColor(kAzure+3);
    sPhi->SetLineStyle(0);
-   sPhi->SetLineWidth(1);
+   sPhi->SetLineWidth(2);
    sPhi->SetFillStyle(3112);
    gStyle->SetHatchesLineWidth(1);
    gStyle->SetHatchesSpacing(1.);
 
-   bg->SetFillColor(kYellow-10);
+   bg->SetFillColor(kGray);
    bg->SetLineColor(kBlack);
    bg->SetLineStyle(0);
    bg->SetLineWidth(1);
 
-   sEta->SetFillColor(kAzure+2);
-   sEta->SetLineColor(kBlack);
+   sEta->SetFillColor(kRed-4);
+   sEta->SetLineColor(kRed+2);
    sEta->SetLineStyle(0);
-   sEta->SetLineWidth(1);
+   sEta->SetLineWidth(2);
 
    sPi0->SetFillColor(kGreen-3);
-   sPi0->SetLineColor(kBlack);
+   sPi0->SetLineColor(kGreen+3);
    sPi0->SetLineStyle(0);
-   sPi0->SetLineWidth(1);
+   sPi0->SetLineWidth(2);
 
    sOmegaDalitz->SetFillColor(kCyan+2);
-   sOmegaDalitz->SetLineColor(kBlack);
+   sOmegaDalitz->SetLineColor(kCyan+4);
    sOmegaDalitz->SetLineStyle(0);
-   sOmegaDalitz->SetLineWidth(1);
+   sOmegaDalitz->SetLineWidth(2);
 
    sbg->SetFillColor(kBlack);
    sbg->SetLineColor(kBlack);

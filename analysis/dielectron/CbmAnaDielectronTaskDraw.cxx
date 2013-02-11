@@ -127,6 +127,8 @@ void CbmAnaDielectronTaskDraw::RebinMinvHist()
       H1("fh_eta_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(nRebin);
       H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
       H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
+      H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
+      H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[i])->Rebin(2*nRebin);
 
       for (int iP = 0; iP < CbmAnaLmvmNames::fNofBgPairSources; iP++){
          stringstream ss;
@@ -513,6 +515,26 @@ void CbmAnaDielectronTaskDraw::DrawCutDistributions()
    Draw2DCut("fh_stcut_truepair", fStCutPP, fStCutAngle);
    Draw2DCut("fh_ttcut_truepair", fTtCutPP, fTtCutAngle);
 
+  /* TH2D* st = H2("fh_ttcut_signal");
+   double sumT = 0.;
+   double sumAll = 0;
+   for (int x = 1; x <= st->GetNbinsX(); x++){
+      for (int y = 1; y <= st->GetNbinsY(); y++){
+         double c = st->GetBinContent(x, y);
+         double xc = (st->GetXaxis()->GetBinLowEdge(x) + st->GetXaxis()->GetBinUpEdge(x))/2.0;
+         double yc = (st->GetYaxis()->GetBinLowEdge(y) + st->GetXaxis()->GetBinUpEdge(y))/2.0;
+         cout << xc << " " << yc << endl;
+         //Double_t val = -1.*(fStCutAngle/fStCutPP)*xc + fStCutAngle;
+         //if ( (xc < fStCutPP && val > yc) ) {
+          Double_t val = -1.*(fTtCutAngle/fTtCutPP)*xc + fTtCutAngle;
+          if ( (xc < fTtCutPP && val > yc) ) {
+            sumT += c;
+         }
+         sumAll += c;
+      }
+   }
+   cout << endl << endl << endl << "sumT/sumAll = " << 100*sumT/sumAll << endl;
+*/
    Draw2DCut("fh_apmcut");
    Draw2DCut("fh_apcut");
    if (fUseMvd) {
@@ -857,17 +879,21 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
    for (int step = kReco; step < CbmAnaLmvmNames::fNofAnaSteps; step++){
       if ( !fUseMvd && (step == kMvd1Cut || step == kMvd2Cut)) continue;
       c->cd(hi++);
-      DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )
-            ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) ),
-            list_of("true match")("mismatch")("true match e^{#pm}")("true match not e^{#pm}"), kLinear, kLinear, true, 0.85, 0.85, 0.99, 0.99);
+      DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )
+            ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )
+            ( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) )
+            ( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[step]) ),
+            list_of("true match")("true match (e^{#pm})")("true match (not e^{#pm})")("mismatch"), kLinear, kLinear, true, 0.5, 0.7, 0.99, 0.99);
    }
 
    // Draw minv after PtCut
    TCanvas *cPtCut = CreateCanvas("lmvm_minv_mismatches_" + CbmAnaLmvmNames::fAnaSteps[kPtCut],
             "lmvm_minv_mismatches_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 700, 700);
-   DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
-         ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) ),
-         list_of("true match")("mismatch")("true match e^{#pm}")("true match not e^{#pm}"), kLinear, kLinear, true, 0.85, 0.85, 0.99, 0.99);
+   DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
+         ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
+         ( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
+         ( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) ),
+         list_of("true match")("true match (e^{#pm})")("true match (not e^{#pm})")("mismatch"), kLinear, kLinear, true, 0.5, 0.7, 0.99, 0.99);
    }
 }
 
@@ -882,7 +908,7 @@ void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
    H1("fh_pi_mom_rec_only_sts")->Scale(1/binWEl);
    H1("fh_pi_mom_rec_sts_rich_trd")->Scale(1/binWEl);
    H1("fh_pi_mom_rec_sts_rich_trd_tof")->Scale(1/binWEl);
-   H1("fh_pi_mom_mc")->SetMinimum(3e-3);
+   H1("fh_pi_mom_mc")->SetMinimum(2);
    DrawH1( list_of(H1("fh_pi_mom_mc"))(H1("fh_pi_mom_acc"))(H1("fh_pi_mom_rec"))(H1("fh_pi_mom_rec_only_sts"))
          (H1("fh_pi_mom_rec_sts_rich_trd"))(H1("fh_pi_mom_rec_sts_rich_trd_tof")),
          list_of("MC ("+lit::NumberToString(H1("fh_pi_mom_mc")->GetEntries()/fNofEvents, 2) +" per event)")

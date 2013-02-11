@@ -1288,7 +1288,10 @@ void CbmAnaDielectronTask::CheckTrackTopologyCut()
                minInd = i;
             }
          }
-         if (minInd == -1) continue;
+         if (minInd == -1){
+            fCandidates[iP].isStCutElectron = true;
+            continue;
+         }
          Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom[minInd]);
          Double_t val = -1.*(fStCutAngle/fStCutPP)*sqrt_mom + fStCutAngle;
          if ( !(sqrt_mom < fStCutPP && val > minAng) ) fCandidates[iP].isStCutElectron = true;
@@ -1355,7 +1358,10 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
                minInd = i;
             }
          }
-         if (minInd == -1) continue;
+         if (minInd == -1){
+            fCandidates[iP].isTtCutElectron = true;
+            continue;
+         }
          Double_t sqrt_mom = TMath::Sqrt(fCandidates[iP].momentum.Mag()*mom1[minInd]);
          Double_t val = -1.*(fTtCutAngle/fTtCutPP)*sqrt_mom + fTtCutAngle;
          if ( !(sqrt_mom < fTtCutPP && val > minAng) ) fCandidates[iP].isTtCutElectron = true;

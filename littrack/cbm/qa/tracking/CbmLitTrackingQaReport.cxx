@@ -123,7 +123,7 @@ string CbmLitTrackingQaReport::PrintNofGhosts() const
 	string str = R()->TableBegin("Number of ghosts per event", list_of("Name")("Value"));
 	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
 		string cellName = Split(histos[iHist]->GetName(), '_')[2];
-		str += R()->TableRow(list_of(cellName)(NumberToString<Int_t>(histos[iHist]->GetEntries() / nofEvents)));
+		str += R()->TableRow(list_of(cellName)(NumberToString<Double_t>(histos[iHist]->GetEntries() / nofEvents, 2)));
 	}
 	str += R()->TableEnd();
 	return str;

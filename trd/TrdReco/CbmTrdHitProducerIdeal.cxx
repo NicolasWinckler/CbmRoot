@@ -3,18 +3,21 @@
 //-----               Created 20/06/06 by D.Kresan              -----
 //-------------------------------------------------------------------
 
-#include "CbmTrdHitProducerIdeal.h"
+// Includes from ROOT  
+#include "TClonesArray.h"
+#include "TVector3.h"
 
+// Includes from base
+#include "FairRootManager.h"
+
+// Includes from TRD
+#include "CbmTrdHitProducerIdeal.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdGeoHandler.h"
 
-#include "FairRootManager.h"
-
-#include "TClonesArray.h"
-#include "TVector3.h"
-
 #include <iostream>
+
 using std::cout;
 using std::endl;
 
@@ -23,8 +26,8 @@ using std::endl;
 //
 // CbmTrdHitProducerIdeal
 //
-// Task for creating the TRD hits using MC information. No smearing
-// is involved - ideal case.
+// Task for creating the TRD hits using MC information.
+// No smearing is involved - ideal case.
 //
 
 
@@ -70,28 +73,28 @@ CbmTrdHitProducerIdeal::~CbmTrdHitProducerIdeal()
 InitStatus CbmTrdHitProducerIdeal::Init()
 {
 
-  cout<<"********** Initilization of TRD Hitproducer ********"<<endl;
+  LOG(INFO)<<"********** Initilization of TRD Hitproducer ********"<<FairLogger::endl;
 
   // Initialisation of the task
   FairRootManager *rootMgr = FairRootManager::Instance();
   if(NULL == rootMgr) {
-    cout << "-E- CbmTrdHitProducerIdeal::Init: "
-	 << "ROOT manager is not instantiated!" << endl;
+    LOG(ERROR) << "CbmTrdHitProducerIdeal::Init: "
+	 << "ROOT manager is not instantiated!" << FairLogger::endl;
     return kFATAL;
   }
   
   // Activate data branches
   fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TrdPoint");
   if(NULL == fArrayTrdPoint) {
-    cout << "-W- CbmTrdHitProducerIdeal::Init: "
-	 << "no TrdPoint array!" << endl;
+    LOG(ERROR) << "CbmTrdHitProducerIdeal::Init: "
+	 << "no TrdPoint array!" << FairLogger::endl;
     return kFATAL;
   }
   
   // Register
   rootMgr->Register("TrdHit", "TRD", fArrayTrdHit, kTRUE);
-  cout << "-I- CbmTrdHitProducerIdeal::Init: "
-       <<"initialisation completed." << endl;
+  LOG(INFO) << "CbmTrdHitProducerIdeal::Init: "
+       <<"initialisation completed." << FairLogger::endl;
   
   // Extract information about the number of TRD stations and
   // the number of layers per TRD station from the geomanager.
@@ -111,7 +114,7 @@ InitStatus CbmTrdHitProducerIdeal::Init()
   // Maybe it has to be deleted.
   //  fRadiator->Init();
   
-  cout<<"********** End of TRD Hitproducer init ********"<<endl;
+  LOG(INFO)<<"********** End of TRD Hitproducer init ********"<<FairLogger::endl;
 
   return kSUCCESS;
   
@@ -156,9 +159,9 @@ void CbmTrdHitProducerIdeal::Exec(Option_t *option)
         nHit++;
     }
 
-    cout << "-I- CbmTrdHitProducerIdeal::Exec:  "
+    LOG(INFO) << "CbmTrdHitProducerIdeal::Exec:  "
 	<< "event: " << fEvents << ",  TRD points: " << nPoint
-	<< ",  TRD hits created: " << nHit << endl;
+	<< ",  TRD hits created: " << nHit << FairLogger::endl;
     fEvents += 1;
 }
 // ------------------------------------------------------------------

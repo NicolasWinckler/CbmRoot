@@ -1342,7 +1342,7 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
          candInd.clear();
          for (Int_t iM = 0; iM < nCand; iM++){
             // different charges, charge Im != charge iP
-            if (fCandidates[iM].charge != fCandidates[iP].charge && fCandidates[iM].chi2Prim < fChiPrimCut && !fCandidates[iM].isElectron){
+	    if (fCandidates[iM].charge != fCandidates[iP].charge && fCandidates[iM].chi2Prim < fChiPrimCut && !fCandidates[iM].isElectron){
                KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]);
                angles1.push_back(pRec.angle);
                mom1.push_back(fCandidates[iM].momentum.Mag());

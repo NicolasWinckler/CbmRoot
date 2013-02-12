@@ -1403,8 +1403,9 @@ void CbmAnaDielectronTask::CheckTrackTopologyRecoCut()
 Bool_t CbmAnaDielectronTask::IsMismatch(
       DielectronCandidate* cand)
 {
-   if (cand->stsMcTrackId == cand->richMcTrackId && cand->stsMcTrackId == cand->trdMcTrackId &&
-         cand->stsMcTrackId == cand->tofMcTrackId && cand->stsMcTrackId !=-1) return false;
+   bool isTrdOk = (fUseTrd) ? (cand->stsMcTrackId == cand->trdMcTrackId) : true;
+   if (cand->stsMcTrackId == cand->richMcTrackId && isTrdOk &&
+       cand->stsMcTrackId == cand->tofMcTrackId && cand->stsMcTrackId !=-1) return false;
    return true;
 }
 

@@ -515,7 +515,7 @@ void CbmAnaDielectronTaskDraw::DrawCutDistributions()
    Draw2DCut("fh_stcut_truepair", fStCutPP, fStCutAngle);
    Draw2DCut("fh_ttcut_truepair", fTtCutPP, fTtCutAngle);
 
-  /* TH2D* st = H2("fh_ttcut_signal");
+ /*  TH2D* st = H2("fh_stcut_signal");
    double sumT = 0.;
    double sumAll = 0;
    for (int x = 1; x <= st->GetNbinsX(); x++){
@@ -523,11 +523,11 @@ void CbmAnaDielectronTaskDraw::DrawCutDistributions()
          double c = st->GetBinContent(x, y);
          double xc = (st->GetXaxis()->GetBinLowEdge(x) + st->GetXaxis()->GetBinUpEdge(x))/2.0;
          double yc = (st->GetYaxis()->GetBinLowEdge(y) + st->GetXaxis()->GetBinUpEdge(y))/2.0;
-         cout << xc << " " << yc << endl;
-         //Double_t val = -1.*(fStCutAngle/fStCutPP)*xc + fStCutAngle;
-         //if ( (xc < fStCutPP && val > yc) ) {
-          Double_t val = -1.*(fTtCutAngle/fTtCutPP)*xc + fTtCutAngle;
-          if ( (xc < fTtCutPP && val > yc) ) {
+
+         Double_t val = -1.*(fStCutAngle/fStCutPP)*xc + fStCutAngle;
+         if ( (xc < fStCutPP && val > yc) ) {
+         // Double_t val = -1.*(fTtCutAngle/fTtCutPP)*xc + fTtCutAngle;
+         // if ( (xc < fTtCutPP && val > yc) ) {
             sumT += c;
          }
          sumAll += c;

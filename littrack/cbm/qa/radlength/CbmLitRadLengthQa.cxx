@@ -182,7 +182,7 @@ void CbmLitRadLengthQa::ExecTrd()
       y = pos.Y();
 
       TGeoNode* node = gGeoManager->FindNode(middle.X(), middle.Y(), middle.Z());
-      TString name = node->GetName();
+     // TString name = node->GetName();
       TString path = gGeoManager->GetPath();
       Int_t station = 0;
       Int_t layer = 0;

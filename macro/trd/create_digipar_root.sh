@@ -2,8 +2,8 @@
 # create for a list of geometries in root format
 # the corresponding trd digitization parameters
 
-directory=geometry/trd.v13
-#directory=geometry
+#directory=geometry/trd.v13
+directory=geometry
 
 for file in $directory/*.root; do
  echo "Creating trd parameters for $file"

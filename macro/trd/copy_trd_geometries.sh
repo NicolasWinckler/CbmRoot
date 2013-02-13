@@ -12,6 +12,7 @@ ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13e.digi.
 ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13f.digi.par 
 ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13g.digi.par 
 ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13h.digi.par 
+ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13i.digi.par 
 #
 cp -v geometry/trd.v12/trd_v12[b-d,f].geo ../../geometry/trd
 cp -v geometry/trd.v12/trd_v12[b-d,f].digi.par ../../parameters/trd

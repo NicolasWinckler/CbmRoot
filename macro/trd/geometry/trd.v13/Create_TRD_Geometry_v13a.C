@@ -161,8 +161,8 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 // Parameters defining the layout of the different detector modules
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
-const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
-//const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
+const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 };  // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 const Float_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 
 const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
@@ -202,7 +202,8 @@ const Float_t carbon_position        =  honeycomb_position + honeycomb_thickness
 // readout boards
 const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
 const  Float_t febbox_position       =  carbon_position + carbon_thickness/2. + febbox_thickness/2.;
-const  Float_t feb_thickness         =   0.5; //2.0;   //  5 mm thickness of FEBs
+//const  Float_t feb_thickness         =   0.50;  //  5.0 mm thickness of FEBs
+const  Float_t feb_thickness         =   0.25;  // light //  2.5 mm thickness of FEBs
 
 const Float_t frame_thickness        =  gas_thickness;   // frame covers gas volume: from kapton foil to pad plane
 const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;

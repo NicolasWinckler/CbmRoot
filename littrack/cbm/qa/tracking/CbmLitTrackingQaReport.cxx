@@ -198,7 +198,7 @@ string CbmLitTrackingQaReport::PrintPionSuppression() const
          Double_t rec = HM()->H1(recName)->GetEntries() / nofEvents;
          Double_t recPions = HM()->H1(recPionsName)->GetEntries() / nofEvents;
          Double_t pionSup = (rec != 0.) ? recPions / rec : 0.;
-         string pionSupStr = NumberToString<Double_t>(pionSup);
+         string pionSupStr = NumberToString<Double_t>(pionSup) + " (" + NumberToString<Double_t>(recPions) + "/" + NumberToString<Double_t>(rec) + ")";
          vector<string> split = Split(psName, '_');
          string rowName = split[1];
          str += R()->TableRow(list_of(rowName)(pionSupStr));

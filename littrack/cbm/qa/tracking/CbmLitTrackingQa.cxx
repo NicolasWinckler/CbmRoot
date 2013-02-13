@@ -1131,6 +1131,8 @@ void CbmLitTrackingQa::PionSuppression()
       Int_t stsIndex = globalTrack->GetStsTrackIndex();
       if (stsIndex < 0) continue;
       const CbmTrackMatch* trackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsIndex));
+      const FairTrackParam* richProjection = static_cast<const FairTrackParam*>(fRichProjections->At(iGT));
+      if (richProjection == NULL || richProjection->GetX() == 0 || richProjection->GetY() == 0) continue;
       Int_t mcIdSts = trackMatch->GetMCTrackId();
       if (mcIdSts < 0) continue;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcIdSts));
@@ -1138,7 +1140,7 @@ void CbmLitTrackingQa::PionSuppression()
       mcTrack->GetMomentum(mom);
       Double_t p = mom.Mag();
       Int_t pdgSts = mcTrack->GetPdgCode();
-      if (pdgSts == std::abs(211)) {
+      if (std::abs(pdgSts) == 211) {
          Bool_t isRichElectron = (fDet.GetDet(kRICH)) ? fElectronId->IsRichElectron(iGT, p) : true;
          Bool_t isTrdElectron = (fDet.GetDet(kTRD)) ? fElectronId->IsTrdElectron(iGT, p) : true;
          Bool_t isTofElectron = (fDet.GetDet(kTOF)) ? fElectronId->IsTofElectron(iGT, p) : true;

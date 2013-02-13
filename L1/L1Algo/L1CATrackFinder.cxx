@@ -1,12 +1,12 @@
-
-  /*
+/*
  *=====================================================
  *
  *  CBM Level 1 Reconstruction
  *
- *  Authors: I.Kisel,  S.Gorbunov
+ *  Authors: I.Kisel,  S.Gorbunov, I.Kulakov, M.Zyzak
+ * Documentation: V.Akishina
  *
- *  e-mail : ikisel@kip.uni-heidelberg.de
+ *  e-mail : i.kulakov@gsi.de
  *
  *=====================================================
  *
@@ -62,7 +62,8 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-          /// Prepare the portion of left hits data
+          /// Prepare the portion of data of left hits of a triplet: all hits except the last and the second last station will be procesesed in the algorythm, 
+		  /// the data is orginesed in order to be used by SIMD
 inline void L1Algo::f10(  // input
                 int start_lh, int n1,  L1HitPoint *vStsHits_l,
                   // output
@@ -84,9 +85,9 @@ inline void L1Algo::f10(  // input
 }
 
 
-          /// Get the field approximation. Add the target to parameters estimation. Propagaete to middle station.
-inline void L1Algo::f11(  // input
-                int istal, int istam,
+         /// Get the field approximation. Add the target to parameters estimation. Propagaete to the middle station of a triplet.
+inline void L1Algo::f11(  /// input 1st stage of singlet search
+                int istal, int istam, /// indexes of left and middle stations of a triplet
                 int n1_V,
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
@@ -874,14 +875,14 @@ inline void L1Algo::f5(  // input
 
                                 /// ------------------- doublets on station ----------------------
 
-inline void L1Algo::DupletsStaPort(  // input
+inline void L1Algo::DupletsStaPort(  /// creates duplets: input: @istal - start station number, @istam - last station number, @ip - index of portion, @&n_g1 - number of elements in portion, @*portionStopIndex
                       int istal, int istam,
                       unsigned int ip,
                       vector<int> &n_g1, unsigned int *portionStopIndex,
 
                         // output
-                      L1TrackPar *T_1,
-                      L1FieldRegion *fld_1,
+                      L1TrackPar *T_1, /// @*T_1 - singlets perameters, @*fld_1 - field aproximation, @*hitsl_1- left hits of triplets, @&lmDuplets - existance of a doublet starting from the left hit, 
+                      L1FieldRegion *fld_1,  ///  @&n_2 - number of douplets,@&i1_2 - index of 1st hit in portion indexed by doublet index, @&hitsm_2 - index of middle hit in hits array indexed by doublet index
                       THitI *hitsl_1,
                       
                       vector<bool> &lmDuplets,
@@ -980,8 +981,10 @@ inline void L1Algo::DupletsStaPort(  // input
 
                             /// ------------------- Triplets on station ----------------------
 
-inline void L1Algo::TripletsStaPort(  // input
+inline void L1Algo::TripletsStaPort(   /// creates triplets: input: @istal - start station number, @istam - middle station number, @istar - last station number, @ip - index of portion, @&n_g1 - numer of elements in portion, @*portionStopIndex
                             int istal, int istam, int istar,
+							///@nstaltriplets - , @*portionStopIndex, @*T_1 - track parameters for singlets, @*fld_1 - field approximation for singlets, @&n_2 - number of doublets in portion
+							///  @&n_2 - number of douplets,@&i1_2 - index of 1st hit in portion indexed by doublet index, @&hitsm_2 - index of middle hit in hits array indexed by doublet index
                             unsigned int& nstaltriplets,
                             L1TrackPar *T_1,
                             L1FieldRegion *fld_1,
@@ -992,6 +995,7 @@ inline void L1Algo::TripletsStaPort(  // input
                             vector<THitI> &hitsm_2,
                             
                             const vector<bool> &mrDuplets,
+							/// output: @*vTriplets_part - array of triplets, @*TripStartIndexH, @*TripStopIndexH - start/stop index of a triplet in the array
                             
                               // output
                             std::vector<L1Triplet> *vTriplets_part,
@@ -1244,26 +1248,26 @@ void L1Algo::CATrackFinder()
 //     draw.DrawAsk();
 // #endif
 
-  vector< L1StsHit > vStsDontUsedHits_A;  // arrays for copy from vStsHits only hits, which aren't used in created tracks
+  vector< L1StsHit > vStsDontUsedHits_A;  /// arrays for copy from vStsHits only hits, which aren't used in created tracks
   vector< L1StsHit > vStsDontUsedHits_B;
 
-  vector< L1HitPoint > vStsDontUsedHitsxy_A;  // arrays for contain prepared information
+  vector< L1HitPoint > vStsDontUsedHitsxy_A;  /// arrays for contain prepared information
   vector< L1HitPoint > vStsDontUsedHitsxy_B;
 
-  vStsHitsUnused = &vStsDontUsedHits_B;      // array of hits uses on current iteration
-  std::vector< L1StsHit > *vStsHitsUnused_buf = &vStsDontUsedHits_A; // buffer for copy
+  vStsHitsUnused = &vStsDontUsedHits_B;      /// array of hits uses on current iteration
+  std::vector< L1StsHit > *vStsHitsUnused_buf = &vStsDontUsedHits_A; /// buffer for copy
 
-  vStsHitPointsUnused = &vStsDontUsedHitsxy_B;// array of info for hits uses on current iteration
+  vStsHitPointsUnused = &vStsDontUsedHitsxy_B;/// array of info for hits uses on current iteration
   std::vector< L1HitPoint > *vStsHitPointsUnused_buf = &vStsDontUsedHitsxy_A;
 
   vStsHitsUnused_buf->clear();
   vStsHitPointsUnused_buf->clear();
-  vector<THitI> RealIHit_v; // index of hit in vStsHits indexed by index of hit in vStsHitsUnused;
+  vector<THitI> RealIHit_v; /// index of hit in vStsHits indexed by index of hit in vStsHitsUnused;
   RealIHit_v.resize(vStsHits.size());
   RealIHit = &(RealIHit_v[0]);
 
 
-    // fill the arrays for the first iteration
+    /// fill the arrays for the first iteration
   int ihN = 0;
   for(int ista = 0; ista < NStations; ista++){
     StsHitsUnusedStartIndex[ista] = ihN;
@@ -1288,7 +1292,7 @@ void L1Algo::CATrackFinder()
 #endif // L1_NO_ASSERT
 
          // create Grid
-    const float hitDensity = sqrt( vStsHitsUnused->size() );
+    const float hitDensity = sqrt( vStsHitsUnused->size() );/// hitDensity - square root of number of hits, helps to keep the number of hits per bin (sell of grid) the same
     float yStep = 0.5/hitDensity; // empirics. 0.01*sqrt(2374) ~= 0.5
     if (yStep > 0.3) yStep = 0.3;
     const float xStep = yStep*3;
@@ -1300,6 +1304,9 @@ void L1Algo::CATrackFinder()
 
       // sort hits by grid and y/z
     L1HitsSortHelper sh ( *vStsHitsUnused, *vStsHitPointsUnused, RealIHit_v, vGrid, StsHitsUnusedStartIndex, StsHitsUnusedStopIndex, NStations );
+	/// sort hits by grid and y/z
+	 ///  input: array of unused hits, unused points, RealIHit_v - array of initial hit indexes, grid, 
+	 ///  StsHitsUnusedStartIndex, StsHitsUnusedStopIndex - indexes of 1st and last hits on station, NStations - number of stations
     sh.Sort();
   
 #ifdef XXX
@@ -1337,6 +1344,7 @@ void L1Algo::CATrackFinder()
       L1Grid &grid = vGrid[iS];
       grid.Fill(&((*vStsHitPointsUnused)[StsHitsUnusedStartIndex[iS]]),StsHitsUnusedStopIndex[iS]-StsHitsUnusedStartIndex[iS]);
     }
+	/// input: 1st hit on station, number of hits on station
 
 
      // --- SET PARAMETERS FOR THE ITERATION ---
@@ -1363,7 +1371,7 @@ void L1Algo::CATrackFinder()
          break;
      }
      
-    Pick_gather = 3.0; // coefficient for size of region for attach new hits to the created track
+    Pick_gather = 3.0; /// coefficient for size of region for attach new hits to the created track
     if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
       Pick_gather = 4.0;
 
@@ -1401,9 +1409,9 @@ void L1Algo::CATrackFinder()
     TargetXYInfo.C10 = 0;
     TargetXYInfo.C11 = SigmaTargetY * SigmaTargetY;
 
-      // Set correction in order to take into account overlaping and iff z.
-      // The reason is that low momentum tracks are too curved and goes not from target direction. That's why sort by hit_y/hit_z is not work idealy
-      // If sort by y then it is max diff between same station's modules (~0.4cm)
+      /// Set correction in order to take into account overlaping and iff z.
+      /// The reason is that low momentum tracks are too curved and goes not from target direction. That's why sort by hit_y/hit_z is not work idealy
+      /// If sort by y then it is max diff between same station's modules (~0.4cm)
     MaxDZ = 0;
     if (  (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
           (isec == kAllSecIter ) || (isec == kAllSecJumpIter ) ) MaxDZ = 0.1;
@@ -1454,8 +1462,9 @@ void L1Algo::CATrackFinder()
       L1_ASSERT( StsHitsUnusedStopIndex[istal] <= (*vStsHitsUnused).size(), StsHitsUnusedStopIndex[istal] << " <= " << (*vStsHitsUnused).size());
     }
 #endif // L1_NO_ASSERT
-    unsigned int nPortions = 0; // number of portions
-    {    // split left hits on portions
+    unsigned int nPortions = 0; /// number of portions
+    {   
+	 /// possible left hits of triplets are splited in portions of 16 (4 SIMDs) to use memory faster
       portionStopIndex[NStations-1] = 0;
       unsigned int ip = 0;  //index of curent portion
 
@@ -1516,9 +1525,9 @@ void L1Algo::CATrackFinder()
         // nsL1::vector<L1TrackPar>::TSimd T_1; // estimation of parameters
         // nsL1::vector<L1FieldRegion>::TSimd fld_1; // magnetic field
         // vector<THitI> hitsl_1; // left hits indexed by number of singlets in portion(i2)
-        vector<THitI> hitsm_2; // middle hits indexed by number of doublets in portion(i1)
-        vector<THitI> i1_2; // index in portion of singlets(i1) indexed by index in portion of doublets(i2)
-        int n_2; // number of doublets in portion
+        vector<THitI> hitsm_2; /// middle hits indexed by number of doublets in portion(i1)
+        vector<THitI> i1_2; /// index in portion of singlets(i1) indexed by index in portion of doublets(i2)
+        int n_2; /// number of doublets in portion
 
         hitsm_2.reserve(MaxPortionDoublets);
         i1_2.reserve(MaxPortionDoublets);
@@ -1638,7 +1647,7 @@ void L1Algo::CATrackFinder()
     vTriplets.clear();
     int tSize = 0;
     for (int istal = NStations - 2; istal >= FIRSTCASTATION; istal--){
-      tSize += vTriplets_part[istal].size();
+      tSize += vTriplets_part[istal].size(); 
       tSize += vTripletsG124_part[istal].size();
       tSize += vTripletsG134_part[istal].size();
     }
@@ -1651,10 +1660,10 @@ void L1Algo::CATrackFinder()
         vTriplets.push_back(vTriplets_part[istal][i]);
       }
       for (unsigned int i = 0; i < vTripletsG124_part[istal].size(); i++){ // it's initialized, so for all iterations it's ok
-        vTriplets.push_back(vTripletsG124_part[istal][i]);
+        vTriplets.push_back(vTripletsG124_part[istal][i]); /// save triplets in vTriplets with gaps
       }
       for (unsigned int i = 0; i < vTripletsG134_part[istal].size(); i++){
-        vTriplets.push_back(vTripletsG134_part[istal][i]);
+        vTriplets.push_back(vTripletsG134_part[istal][i]); /// save triplets in vTriplets with gaps
       }
 
       for (THitI i = StsHitsUnusedStartIndex[istal]; i < StsHitsUnusedStopIndex[istal]; i++){
@@ -2178,11 +2187,12 @@ void L1Algo::CATrackFinder()
 }
 
 
-  /** *************************************************************
+   /** *************************************************************
    *                                                              *
-   *     The routine performs recusrsive search for tracks        *
+   *     The routine performs recursive search for tracks         *
    *                                                              *
    *     I. Kisel                                    06.03.05     *
+   *     I.Kulakov                                    2012        *
    *                                                              *
    ****************************************************************/
   
@@ -2191,6 +2201,9 @@ void L1Algo::CAFindTrack(int ista,
                          const L1Triplet* curr_trip,
                          L1Branch &curr_tr, unsigned char &curr_L, fscal &curr_chi2,
                          int &NCalls )
+						  /// recursive search for tracks
+						 /// input: @ista - station index, @&best_tr - best track for the privious call, @&best_L -
+                         /// output: @&NCalls - number of function calls 						 
 {
   if (curr_trip->GetLevel() == 0){ // the end of the track -> check and store
     

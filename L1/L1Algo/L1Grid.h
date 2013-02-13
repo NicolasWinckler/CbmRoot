@@ -19,7 +19,8 @@
 
 using namespace std;
 
-  /// Sets to memory block [@dest, @dest+@num] values of i of type with size @typesize.
+   /// Copy to memory block [@dest, @dest+@num] num number of times the value of i of type @T with size @typesize.
+  /// uses binary expansion of copied volume for speed up
 template< typename T>
 void memset( T *dest, T i, size_t num ) {
   const size_t tsize = sizeof(T);

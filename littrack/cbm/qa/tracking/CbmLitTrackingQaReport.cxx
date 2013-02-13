@@ -224,7 +224,9 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	// Draw global tracking efficiency
 	for (UInt_t i = 0; i < fGlobalTrackVariants.size(); i++) {
 		string variant = fGlobalTrackVariants[i];
-		DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p", DefaultEfficiencyLabelFormatter);
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_all_" + variant + "_p", "hte_Sts.*_" + variant + "_All_Eff_p", DefaultEfficiencyLabelFormatter);
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_muon_" + variant + "_p", "hte_Sts.*_" + variant + "_Muon_Eff_p", DefaultEfficiencyLabelFormatter);
+		DrawEfficiency("tracking_qa_global_tracking_efficiency_electron_" + variant + "_p", "hte_Sts.*_" + variant + "_Electron_Eff_p", DefaultEfficiencyLabelFormatter);
 		DrawEfficiency("tracking_qa_pid_efficiency_electron_" + variant + "_p", "hpe_((?!Sts_))Sts.*_" + variant + "_Electron_Eff_p", ElectronIdEfficiencyLabelFormatter);
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_pt", "hte_Sts.*_" + variant + "_All_Eff_pt");
 		//DrawEfficiency("tracking_qa_global_tracking_efficiency_" + variant + "_y", "hte_Sts.*_" + variant + "_All_Eff_y");

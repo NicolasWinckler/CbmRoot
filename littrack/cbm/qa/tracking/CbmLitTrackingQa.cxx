@@ -1122,6 +1122,7 @@ Bool_t CbmLitTrackingQa::ElectronId(
 
 void CbmLitTrackingQa::PionSuppression()
 {
+   if (!(fGlobalTracks && fStsMatches && fRichProjections && fMCTracks)) return;
    vector<TH1*> histos = fHM->H1Vector("hps_.*_RecPions_.*");
    Int_t nofHistos = histos.size();
 

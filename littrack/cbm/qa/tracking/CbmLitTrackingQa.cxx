@@ -89,6 +89,14 @@ Bool_t ProtonTrackAcceptanceFunction(
    return (std::abs(mcTrack->GetPdgCode()) == 2212);
 }
 
+Bool_t PionTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 211);
+}
+
 Bool_t PionPlusTrackAcceptanceFunction(
       const TClonesArray* mcTracks,
       Int_t index)
@@ -103,6 +111,14 @@ Bool_t PionMinusTrackAcceptanceFunction(
 {
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
    return (mcTrack->GetPdgCode() == -211);
+}
+
+Bool_t KaonTrackAcceptanceFunction(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return (std::abs(mcTrack->GetPdgCode()) == 321);
 }
 
 Bool_t KaonPlusTrackAcceptanceFunction(
@@ -231,7 +247,11 @@ InitStatus CbmLitTrackingQa::Init()
    fHM = new CbmHistManager();
 
    fDet.DetermineSetup();
-   FillTrackAndRingCategories();
+   if (fTrackCategories.empty()) FillDefaultTrackCategories();
+   if (fRingCategories.empty()) FillDefaultRingCategories();
+   FillDefaultTrackPIDCategories();
+   FillDefaultRingPIDCategories();
+   FillTrackAndRingAcceptanceFunctions();
 
    CreateHistograms();
 
@@ -326,50 +346,56 @@ void CbmLitTrackingQa::ReadDataBranches()
    }
 }
 
-void CbmLitTrackingQa::FillTrackAndRingCategories()
+void CbmLitTrackingQa::FillDefaultTrackCategories()
 {
-   fTrackCategories = list_of("All")
-         ("Primary")
-       //  ("Secondary")
-         ("Reference")
-         (fDet.GetElectronSetup() ? "Electron" : "Muon")
-        // ("Proton")
-       //  ("PionPlus")
-       //  ("PionMinus")
-       //  ("KaonPlus")
-       //  ("KaonMinus")
-         ;
-   fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Primary"] = PrimaryTrackAcceptanceFunction;
-  // fTrackAcceptanceFunctions["Secondary"] = SecondaryTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Reference"] = ReferenceTrackAcceptanceFunction;
-   if (fDet.GetElectronSetup()) fTrackAcceptanceFunctions["Electron"] = PrimaryElectronTrackAcceptanceFunction;
-   else fTrackAcceptanceFunctions["Muon"] = PrimaryMuonTrackAcceptanceFunction;
-  // fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunction;
- //  fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunction;
- //  fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunction;
- //  fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
- //  fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunction;
+   fTrackCategories = list_of("All")("Primary")("Secondary")("Reference")
+         (fDet.GetElectronSetup() ? "Electron" : "Muon")("Proton")("PionPlus")
+         ("PionMinus")("KaonPlus")("KaonMinus");
+}
 
-   fRingCategories = list_of
-         //("All")
-         //("AllReference")
-         ("Electron")
-         ("ElectronReference")
-        // ("Pion")
-        // ("PionReference")
-         ;
-   //fRingAcceptanceFunctions["All"] = AllRingAcceptanceFunction;
-  // fRingAcceptanceFunctions["AllReference"] = AllReferenceRingAcceptanceFunction;
-   fRingAcceptanceFunctions["Electron"] = PrimaryElectronRingAcceptanceFunction;
-   fRingAcceptanceFunctions["ElectronReference"] = PrimaryElectronReferenceRingAcceptanceFunction;
-   //fRingAcceptanceFunctions["Pion"] = PionRingAcceptanceFunction;
-   //fRingAcceptanceFunctions["PionReference"] = PionReferenceRingAcceptanceFunction;
+void CbmLitTrackingQa::FillDefaultRingCategories()
+{
+   fRingCategories = list_of("All")("AllReference")("Electron")("ElectronReference")("Pion")("PionReference");
+}
 
+void CbmLitTrackingQa::FillDefaultTrackPIDCategories()
+{
    if (fDet.GetElectronSetup()) {
       fTrackCategoriesPID = list_of("Electron");
+   }
+}
+
+void CbmLitTrackingQa::FillDefaultRingPIDCategories()
+{
+   if (fDet.GetElectronSetup()) {
       fRingCategoriesPID = list_of("Electron");
    }
+}
+
+void CbmLitTrackingQa::FillTrackAndRingAcceptanceFunctions()
+{
+   // List of all supported track categories
+   fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Primary"] = PrimaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Secondary"] = SecondaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Reference"] = ReferenceTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Electron"] = PrimaryElectronTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Muon"] = PrimaryMuonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunction;
+
+   // List of all supported ring categories
+   fRingAcceptanceFunctions["All"] = AllRingAcceptanceFunction;
+   fRingAcceptanceFunctions["AllReference"] = AllReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["Electron"] = PrimaryElectronRingAcceptanceFunction;
+   fRingAcceptanceFunctions["ElectronReference"] = PrimaryElectronReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["Pion"] = PionRingAcceptanceFunction;
+   fRingAcceptanceFunctions["PionReference"] = PionReferenceRingAcceptanceFunction;
 }
 
 void CbmLitTrackingQa::CreateH1Efficiency(

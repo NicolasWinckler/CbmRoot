@@ -94,6 +94,8 @@ public:
       fAngleRangeMax = max;
       fAngleRangeBins = nofBins;
    }
+   void SetTrackCategories(const vector<string>& trackCategories) { fTrackCategories = trackCategories; }
+   void SetRingCategories(const vector<string>& ringCategories) { fRingCategories = ringCategories; }
 
 private:
    /**
@@ -104,7 +106,16 @@ private:
    /**
     * \brief Fill array of track categories with default values.
     */
-   void FillTrackAndRingCategories();
+   void FillDefaultTrackCategories();
+
+   void FillDefaultRingCategories();
+
+   void FillDefaultTrackPIDCategories();
+
+   void FillDefaultRingPIDCategories();
+
+   void FillTrackAndRingAcceptanceFunctions();
+
 
    void CreateH1Efficiency(
          const string& name,

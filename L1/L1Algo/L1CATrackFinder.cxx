@@ -157,7 +157,7 @@ inline void L1Algo::f11(  /// input 1st stage of singlet search
 
     T.chi2 = 0.;
     T.NDF = 2.;
-    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) T.NDF = 0;
+    if ( (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) T.NDF = 0;
     T.tx = tx;
     T.ty = ty;
     T.qp = 0.;
@@ -201,25 +201,44 @@ inline void L1Algo::f11(  /// input 1st stage of singlet search
       // extrapolate to left hit
     L1Extrapolate0( T, zl, fld0 );
     for (int ista = 0; ista <= istal-1; ista++){
+      if ( ( isec != kAllPrimEIter ) && ( isec != kAllSecEIter ) ) {
 #ifdef USE_RL_TABLE
-     L1AddMaterial( T, fRadThick[ista].GetRadThick(T.x, T.y), MaxInvMom );
+        L1AddMaterial( T, fRadThick[ista].GetRadThick(T.x, T.y), MaxInvMom );
 #else
-     L1AddMaterial( T, vStations[ista].materialInfo, MaxInvMom );
+        L1AddMaterial( T, vStations[ista].materialInfo, MaxInvMom );
 #endif
-      if (ista == NMvdStations - 1) L1AddPipeMaterial( T, MaxInvMom );
+        if (ista == NMvdStations - 1) L1AddPipeMaterial( T, MaxInvMom );
+      }
+      else {
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T, fRadThick[ista].GetRadThick(T.x, T.y), MaxInvMom, 1, 0.000511f*0.000511f );
+#else
+        L1AddMaterial( T, vStations[ista].materialInfo, MaxInvMom, 1, 0.000511f*0.000511f );
+#endif
+        if (ista == NMvdStations - 1) L1AddPipeMaterial( T, MaxInvMom, 1, 0.000511f*0.000511f );
+      }
     }
       // add left hit
     L1Filter( T, stal.frontInfo, u );
     L1Filter( T, stal.backInfo,  v );
 #endif
 
+    if ( ( isec != kAllPrimEIter ) && ( isec != kAllSecEIter ) ) {
 #ifdef USE_RL_TABLE
     L1AddMaterial( T, fRadThick[istal].GetRadThick(T.x, T.y), MaxInvMom );
 #else
     L1AddMaterial( T, stal.materialInfo, MaxInvMom );
 #endif
     if ( (istam >= NMvdStations) && (istal <= NMvdStations - 1) )  L1AddPipeMaterial( T, MaxInvMom );
-
+    }
+    else {
+#ifdef USE_RL_TABLE
+      L1AddMaterial( T, fRadThick[istal].GetRadThick(T.x, T.y), MaxInvMom, 1, 0.000511f*0.000511f );
+#else
+      L1AddMaterial( T, stal.materialInfo, MaxInvMom, 1, 0.000511f*0.000511f );
+#endif
+      if ( (istam >= NMvdStations) && (istal <= NMvdStations - 1) )  L1AddPipeMaterial( T, MaxInvMom, 1, 0.000511f*0.000511f );
+    } 
     L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
 //     L1Extrapolate( T, zstam, T.qp, fld1 );
     
@@ -393,13 +412,22 @@ inline void L1Algo::f30(  // input
       L1Filter( T2, stam.frontInfo, u_front_2 );
       L1Filter( T2, stam.backInfo,  u_back_2 );
 
+      if ( ( isec != kAllPrimEIter ) && ( isec != kAllSecEIter ) ) {
 #ifdef USE_RL_TABLE
-      L1AddMaterial( T2, fRadThick[istam].GetRadThick(T2.x, T2.y), T2.qp );
+        L1AddMaterial( T2, fRadThick[istam].GetRadThick(T2.x, T2.y), T2.qp );
 #else
-      L1AddMaterial( T2, stam.materialInfo, T2.qp );
+        L1AddMaterial( T2, stam.materialInfo, T2.qp );
 #endif
-      if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp );
-
+        if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp );
+      }
+      else {
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T2, fRadThick[istam].GetRadThick(T2.x, T2.y), T2.qp, 1, 0.000511f*0.000511f );
+#else
+        L1AddMaterial( T2, stam.materialInfo, T2.qp, 1, 0.000511f*0.000511f );
+#endif
+        if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp, 1, 0.000511f*0.000511f );
+      }
         // extrapolate to the right hit station
       L1Extrapolate( T2, star.z, T2.qp, f2 );
 
@@ -599,13 +627,25 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
       // fit
     for( int ih = 1; ih < NHits; ih++){
       L1Extrapolate( T, z[ih], T.qp, fld );
+
+      if ( ( isec != kAllPrimEIter ) && ( isec != kAllSecEIter ) ) {
 #ifdef USE_RL_TABLE
-      L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
+        L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
 #else
-      L1AddMaterial( T, sta[ih].materialInfo, T.qp );
+        L1AddMaterial( T, sta[ih].materialInfo, T.qp );
 #endif
       
-      if (ista[ih] == NMvdStations - 1) L1AddPipeMaterial( T, T.qp );
+        if (ista[ih] == NMvdStations - 1) L1AddPipeMaterial( T, T.qp );
+      }
+      else {
+#ifdef USE_RL_TABLE
+        L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp, 1, 0.000511f*0.000511f );
+#else
+        L1AddMaterial( T, sta[ih].materialInfo, T.qp, 1, 0.000511f*0.000511f );
+#endif
+      
+        if (ista[ih] == NMvdStations - 1) L1AddPipeMaterial( T, T.qp, 1, 0.000511f*0.000511f );
+      }  
       
       L1Filter( T, sta[ih].frontInfo, u[ih] );
       L1Filter( T, sta[ih].backInfo,  v[ih] );
@@ -635,13 +675,24 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
 //       L1Filter( T, sta[ih].backInfo,  v[ih] );
       for( ih = NHits-2; ih >= 0; ih--){
         L1Extrapolate( T, z[ih], T.qp, fld );
+
+        if ( ( isec != kAllPrimEIter ) && ( isec != kAllSecEIter ) ) {
 #ifdef USE_RL_TABLE
-        L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
+          L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
 #else
-        L1AddMaterial( T, sta[ih].materialInfo, T.qp );
+          L1AddMaterial( T, sta[ih].materialInfo, T.qp );
 #endif
-        if (ista[ih] == NMvdStations) L1AddPipeMaterial( T, T.qp );
-        
+          if (ista[ih] == NMvdStations) L1AddPipeMaterial( T, T.qp );
+        }
+        else {
+#ifdef USE_RL_TABLE
+          L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp, 1, 0.000511f*0.000511f );
+#else
+          L1AddMaterial( T, sta[ih].materialInfo, T.qp, 1, 0.000511f*0.000511f );
+#endif
+          if (ista[ih] == NMvdStations) L1AddPipeMaterial( T, T.qp, 1, 0.000511f*0.000511f );
+        }
+          
         L1Filter( T, sta[ih].frontInfo, u[ih] );
         L1Filter( T, sta[ih].backInfo,  v[ih] );
       }
@@ -666,13 +717,24 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
 //       L1Filter( T, sta[ih].backInfo,  v[ih] );
       for( ih = 1; ih < NHits; ih++){
         L1Extrapolate( T, z[ih], T.qp, fld );
+
+        if ( ( isec != kAllPrimEIter ) && ( isec != kAllSecEIter ) ) {
 #ifdef USE_RL_TABLE
-        L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
+          L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp );
 #else
-        L1AddMaterial( T, sta[ih].materialInfo, T.qp );
+          L1AddMaterial( T, sta[ih].materialInfo, T.qp );
 #endif
-        if (ista[ih] == NMvdStations + 1) L1AddPipeMaterial( T, T.qp );
-        
+          if (ista[ih] == NMvdStations + 1) L1AddPipeMaterial( T, T.qp );
+        }
+        else {
+#ifdef USE_RL_TABLE
+          L1AddMaterial( T, fRadThick[ista[ih]].GetRadThick(T.x, T.y), T.qp, 1, 0.000511f*0.000511f );
+#else
+          L1AddMaterial( T, sta[ih].materialInfo, T.qp, 1, 0.000511f*0.000511f );
+#endif
+          if (ista[ih] == NMvdStations + 1) L1AddPipeMaterial( T, T.qp, 1, 0.000511f*0.000511f );
+        }
+          
         L1Filter( T, sta[ih].frontInfo, u[ih] );
         L1Filter( T, sta[ih].backInfo,  v[ih] );
       }
@@ -1239,14 +1301,15 @@ void L1Algo::CATrackFinder()
     stat_max_n_branches = 0;
 #endif
 
-// #ifdef DRAW
-// //   draw.DrawInfo();
-//     draw.ClearVeiw();
-//     draw.DrawInputHits();
-//     draw.DrawMCTracks();
-//     draw.SaveCanvas("MC_");
-//     draw.DrawAsk();
-// #endif
+#ifdef DRAW
+//   draw.DrawInfo();
+    draw.ClearVeiw();
+    draw.DrawInputHits();
+    draw.DrawTarget();
+    draw.DrawMCTracks();
+    draw.SaveCanvas("MC_");
+    draw.DrawAsk();
+#endif
 
   vector< L1StsHit > vStsDontUsedHits_A;  /// arrays for copy from vStsHits only hits, which aren't used in created tracks
   vector< L1StsHit > vStsDontUsedHits_B;
@@ -1351,7 +1414,7 @@ void L1Algo::CATrackFinder()
 
        // first station used in the triplets finding
      FIRSTCASTATION = 0;
-       // if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+       // if ( (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) )
        //   FIRSTCASTATION = 2;
 
      DOUBLET_CHI2_CUT = 2.706; // prob = 0.1
@@ -1361,18 +1424,20 @@ void L1Algo::CATrackFinder()
          TRIPLET_CHI2_CUT = 7.815;// prob = 0.05
          break;
        case kAllPrimIter:
+       case kAllPrimEIter:
          TRIPLET_CHI2_CUT = 7.815; // prob = 0.05
          break;
        case kAllPrimJumpIter:
          TRIPLET_CHI2_CUT = 6.252; // prob = 0.1
          break;
        case kAllSecIter:
+       case kAllSecEIter:
          TRIPLET_CHI2_CUT = 6.252;//2.706; // prob = 0.1
          break;
      }
      
     Pick_gather = 3.0; /// coefficient for size of region for attach new hits to the created track
-    if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+    if ( (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) )
       Pick_gather = 4.0;
 
     PickNeighbour = 1.0; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
@@ -1380,25 +1445,26 @@ void L1Algo::CATrackFinder()
     //   PickNeighbour = 0.5; // TODO understand why works with 0.2
 
     MaxInvMom = 1.0/0.5;                     // max considered q/p
-    if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) MaxInvMom =  1.0/0.1;
+    if ( (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) MaxInvMom =  1.0/0.1;
+    if ( (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllSecEIter) ) MaxInvMom = 1./0.05;
 
     MaxSlope = 1.1;
-    if ( // (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
-         (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) MaxSlope =  1.5;
+    if ( // (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllPrimJumpIter) ||
+         (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) MaxSlope =  1.5;
     
       // define the target
     targX = 0; targY = 0; targZ = 0;      //  suppose, what target will be at (0,0,0)
     
     float SigmaTargetX = 0, SigmaTargetY = 0; // target constraint [cm]
     if ( (isec == kFastPrimIter) || (isec == kFastPrimIter2) || (isec == kFastPrimJumpIter) ||
-         (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ){ // target
+         (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllPrimJumpIter) ){ // target
       targB = vtxFieldValue;
-      if ( (isec == kFastPrimIter) || (isec == kAllPrimIter) )
+      if ( (isec == kFastPrimIter) || (isec == kAllPrimIter) || (isec == kAllPrimEIter) )
         SigmaTargetX = SigmaTargetY = 0.01; // target
       else
         SigmaTargetX = SigmaTargetY = 0.1;
     }
-    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) { //use outer radius of the 1st station as a constraint
+    if ( (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) { //use outer radius of the 1st station as a constraint
       L1Station &st = vStations[0];
       SigmaTargetX = SigmaTargetY = 10;//st.Rmax[0];
       targZ = 0.;//-1.;
@@ -1413,8 +1479,8 @@ void L1Algo::CATrackFinder()
       /// The reason is that low momentum tracks are too curved and goes not from target direction. That's why sort by hit_y/hit_z is not work idealy
       /// If sort by y then it is max diff between same station's modules (~0.4cm)
     MaxDZ = 0;
-    if (  (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
-          (isec == kAllSecIter ) || (isec == kAllSecJumpIter ) ) MaxDZ = 0.1;
+    if (  (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllPrimJumpIter) ||
+          (isec == kAllSecIter ) || (isec == kAllSecEIter)|| (isec == kAllSecJumpIter ) ) MaxDZ = 0.1;
 
 
     
@@ -1773,7 +1839,7 @@ void L1Algo::CATrackFinder()
 #endif
     int min_level = 0; // min level for start triplet. So min track length = min_level+3.
 //    if (isec == kFastPrimJumpIter) min_level = 1;
-    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+    if ( (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) )
       min_level = 1; // only the long low momentum tracks
 #ifdef TRACKS_FROM_TRIPLETS
     if (isec == TRACKS_FROM_TRIPLETS_ITERATION)
@@ -1792,7 +1858,7 @@ void L1Algo::CATrackFinder()
 
       for( int istaF = FIRSTCASTATION; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
 
-        // if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
+        // if( ( (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) &&
         //     ( istaF >= NStations-6) ) break; // ghost supression !!!  too strong for Lambda. According to I.Vassiliev NStations-4 is good
 
         int trip_first = TripStartIndex[istaF];
@@ -1802,17 +1868,17 @@ void L1Algo::CATrackFinder()
 
             // ghost supression !!!
 #ifndef FIND_GAPED_TRACKS
-          if( /*(isec == kFastPrimIter) ||*/ (isec == kAllPrimIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
+          if( /*(isec == kFastPrimIter) ||*/ (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) {
 #else
           if( (isec == kFastPrimIter) || (isec == kFastPrimIter2) || (isec == kFastPrimJumpIter) ||
-              (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) ||
-              (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
+              (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllPrimJumpIter) ||
+              (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) {
 #endif
 #ifdef TRACKS_FROM_TRIPLETS
             if (isec != TRACKS_FROM_TRIPLETS_ITERATION)
 #endif
             {
-              if ( isec != kFastPrimIter && isec != kAllPrimIter )
+              if ( isec != kFastPrimIter && isec != kAllPrimIter && isec != kAllPrimEIter && isec != kAllSecEIter )
               if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
               if ( (ilev == 0) &&
                    (GetFStation(vSFlag[(*vStsHitsUnused)[first_trip->GetLHit()].f]) != 0) ) continue;  // ghost supression // collect only MAPS tracks-triplets
@@ -1846,7 +1912,7 @@ void L1Algo::CATrackFinder()
           // }
 #endif
 
-          // if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
+          // if( ( (isec == kAllSecIter) || (isec == kAllSecEIter)  || (isec == kAllSecJumpIter) ) &&
           //     (GetFStation((*vStsHitsUnused)[best_tr.StsHits[0]].f ) >= 4) ) break; // ghost supression
           
           // {
@@ -1869,13 +1935,13 @@ void L1Algo::CATrackFinder()
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();
 
-//          if( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
+//          if( (isec == kAllPrimIter) || (isec == kAllPrimEIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) )
 #ifndef TRACKS_FROM_TRIPLETS
             if( fGhostSuppression ){
               if( best_L == 3 ){
                   // if( isec == kAllSecIter ) continue; // too /*short*/ secondary track
-                if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
-                if( (isec != kAllSecIter) && (isec != kAllSecJumpIter) && (best_chi2 > 5.0) ) continue;
+                if( ( (isec == kAllSecIter) || (isec == kAllSecEIter) || (isec == kAllSecJumpIter) ) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
+                if( (isec != kAllSecIter) && (isec != kAllSecEIter) && (isec != kAllSecJumpIter) && (best_chi2 > 5.0) ) continue;
               }
             }
 #endif
@@ -1978,7 +2044,7 @@ void L1Algo::CATrackFinder()
 
 #ifdef TRACKS_FROM_TRIPLETS
         t.NDF = 3; // 3 hits + target
-        if ( isec == kAllSecIter )
+        if ( isec == kAllSecIter || (isec == kAllSecEIter) )
           t.NDF = 1; // 3 hits
         if ( isec == TRACKS_FROM_TRIPLETS_ITERATION )
 #endif

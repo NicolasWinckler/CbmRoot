@@ -14,7 +14,7 @@
 
 // #define TRACKS_FROM_TRIPLETS
 // #define DO_NOT_SELECT_TRIPLETS
-// #define TRACKS_FROM_TRIPLETS_ITERATION kAllSecIter
+// #define TRACKS_FROM_TRIPLETS_ITERATION kAllPrimIter
 
 #define LAST_ITERATION kAllSecIter
 #define FIND_GAPED_TRACKS // use triplets with gaps
@@ -383,7 +383,8 @@ class L1Algo{
          kAllPrimIter,      // primary all tracks
          kAllPrimJumpIter,  // primary tracks with jumped triplets
          kAllSecIter,       // secondary all tracks
-
+         kAllPrimEIter,      // primary all electron tracks
+         kAllSecEIter,      // secondary all electron tracks
          
          kFastPrimJumpIter, // primary fast tracks with jumped triplets
          kFastPrimIter2,

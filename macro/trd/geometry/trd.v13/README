@@ -8,7 +8,8 @@ v13e - like v13b, but FEB 30 degree inclination
 v13f - like v13b, but FEB 60 degree inclination
 v13g - like v13b, but FEB 80 degree inclination
 v13h - like v13b, but no radiator material
-
+v13i - like v13c, but FEB thickness reduced from 5.0 to 2.5 mm
+v13j - like v13b, but no FEBs at all
 
 # DE, January 2013
 

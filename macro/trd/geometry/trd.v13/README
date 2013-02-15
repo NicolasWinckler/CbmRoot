@@ -10,6 +10,7 @@ v13g - like v13b, but FEB 80 degree inclination
 v13h - like v13b, but no radiator material
 v13i - like v13c, but FEB thickness reduced from 5.0 to 2.5 mm
 v13j - like v13b, but no FEBs at all
+v13k - like v13b, but no FEBs at all and no lattice grid
 
 # DE, January 2013
 

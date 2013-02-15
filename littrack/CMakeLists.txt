@@ -158,6 +158,7 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.h
       cbm/qa/fit/CbmLitFitQa.h 
       cbm/qa/fit/CbmLitFitQaReport.h
+      cbm/qa/fit/CbmLitFitQaStudyReport.h
       cbm/qa/field/CbmLitFieldQa.h
       cbm/qa/field/CbmLitFieldQaReport.h
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.h
@@ -192,6 +193,7 @@ If(Boost_FOUND)
       cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
       cbm/qa/fit/CbmLitFitQa.cxx
       cbm/qa/fit/CbmLitFitQaReport.cxx
+      cbm/qa/fit/CbmLitFitQaStudyReport.cxx
       cbm/qa/field/CbmLitFieldQa.cxx
       cbm/qa/field/CbmLitFieldQaReport.cxx
       cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx

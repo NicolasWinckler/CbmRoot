@@ -615,8 +615,9 @@ void CbmTrdRadiator::ProduceSpectra(){
 
   fTrackMomentum = new Double_t[fNMom];
 
-  Double_t trackMomentum[fNMom] = {0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0,
-				     5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+  Double_t trackMomentum[fNMom] = {0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 
+                                   4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+
   for (Int_t imom = 0; imom < fNMom; imom++) {
     fTrackMomentum[imom] = trackMomentum[imom];
   }
@@ -707,7 +708,7 @@ void CbmTrdRadiator::ProcessTR(){
   ELoss(-1);
 
 
-  if (fDetType == 1) {
+  if (fDetType == 1) {  // if detector is MB type = dual-sided MWPC
     fFirstPass = false;
     Float_t energiefirst = fELoss;
     Float_t fTRAbsfirst = fnTRab;

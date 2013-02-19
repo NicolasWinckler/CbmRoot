@@ -13,10 +13,10 @@ class CbmTrdGas : public TObject {
     void Init();
     TString GetFileName(TString method) const;
 
-    Int_t    GetDetType() const      {return fDetType;}
-    Double_t GetGasThick() const     {return fGasThick;}
-    Double_t GetNobleGas() const     {return fPercentNobleGas;}
-    Double_t GetCO2() const          {return fPercentCO2;}
+    Int_t    GetDetType()      const {return fDetType;}
+    Double_t GetGasThick()     const {return fGasThick;}
+    Double_t GetNobleGas()     const {return fPercentNobleGas;}
+    Double_t GetCO2()          const {return fPercentCO2;}
     Int_t    GetNobleGasType() const {return fNobleGasType;}
 
     // static access method
@@ -31,8 +31,8 @@ class CbmTrdGas : public TObject {
     Int_t              fDetType;         /** Detector type (GSI=0, MB=1) */
     Double_t           fGasThick;        /** Thickness of the gas layer */
     Double_t           fPercentNobleGas; /** Percentage of noble gas */
-    Double_t           fPercentCO2;       /** Percentage of CO2 */
-    Int_t              fNobleGasType;     /** Type of noble gas (Xe=1, Ar=2)*/
+    Double_t           fPercentCO2;      /** Percentage of CO2 */
+    Int_t              fNobleGasType;    /** Type of noble gas (Xe=1, Ar=2)*/
     static CbmTrdGas*  fgInstance;       /** Singleton Instance */
     TString            fFileNameLike; //!   /** File name of input for likelihood method */
     TString            fFileNameANN;  //!  /** File name of input for ANN method */

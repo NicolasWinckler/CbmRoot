@@ -29,7 +29,7 @@ class CbmTrdRadiator
   CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, 
                  Float_t GapThick);
 
- /** Constructor **/
+  /** Constructor **/
   CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, 
                  Float_t GapThick, TString material, TString prototype);
 

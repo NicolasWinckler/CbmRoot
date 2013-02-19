@@ -102,13 +102,13 @@ void CbmTrdGas::Init() {
     }    
     Bool_t foundCarbon=kFALSE;
     Bool_t foundOxygen=kFALSE;   
-    Int_t carbon=0;
-	Int_t oxygen=0;
-	Int_t noblegas=0;
+    Int_t carbon  =0;
+    Int_t oxygen  =0;
+    Int_t noblegas=0;
 
-    Double_t *elem = mixt->GetZmixt();
+    Double_t *elem   = mixt->GetZmixt();
     Double_t *weight = mixt->GetWmixt();
-    Double_t *amixt = mixt->GetAmixt();
+    Double_t *amixt  = mixt->GetAmixt();
 
     for (Int_t i=0 ; i<nmixt; i++){
       if (elem[i] == 6.0) {
@@ -137,10 +137,10 @@ void CbmTrdGas::Init() {
     }
 
 
+    Double_t massC =amixt[carbon];
+    Double_t massO =amixt[oxygen];
     Double_t massXe=amixt[noblegas];
-    Double_t massC=amixt[carbon];
-    Double_t massO=amixt[oxygen];
-    Double_t x=weight[noblegas];
+    Double_t x     =weight[noblegas];
     Double_t percentNoblegas=100*(((massC*x)+(2*massO*x))/
 			      (massXe+massC*x+2*massO*x-massXe*x));
 

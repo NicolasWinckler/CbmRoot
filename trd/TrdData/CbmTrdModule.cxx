@@ -67,6 +67,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fPadSizey(0)   
 {
 }
+
 // -----   Standard constructor   ------------------------------------------
 CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
                            Double_t sizex, Double_t sizey, Double_t sizez, 
@@ -99,6 +100,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fPadSizey(padSizeY)   
 {
 }
+
 // -----   Standard constructor   ------------------------------------------
 CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
                            Double_t sizex, Double_t sizey, Double_t sizez, 
@@ -132,6 +134,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fPadSizey(padSizeY)   
 {
 }
+
 // -------------------------------------------------------------------------
 CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
                            Double_t sizex, Double_t sizey, Double_t sizez,
@@ -226,6 +229,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
     fSectorZ.AddAt(z,0);
   }
 }
+
 // -------------------------------------------------------------------------
 CbmTrdModule::~CbmTrdModule() 
 {
@@ -292,22 +296,22 @@ Int_t CbmTrdModule::GetnCol()
   return nCol;
 }
 
-  Int_t CbmTrdModule::GetnRow()
-  {
-    Int_t nRow = 0;
-    if (fSectorSizey.At(0) < fSizey)
-      {
+Int_t CbmTrdModule::GetnRow()
+{
+  Int_t nRow = 0;
+  if (fSectorSizey.At(0) < fSizey)
+    {
 	for (Int_t i = 0; i < fNoSectors; i++)
 	  {
 	    nRow += (Int_t)(fSectorSizey.At(i) / fPadSizey.At(i));
 	  }
-      } 
-    else
-      {
+    } 
+  else
+    {
 	nRow = (Int_t)(fSectorSizey.At(0) / fPadSizey.At(0));
-      }
-    return nRow;
-  }
+    }
+  return nRow;
+}
 
 void CbmTrdModule::GetPadInfo(CbmTrdPoint *trdPoint, Int_t &Col, 
 			      Int_t &Row, Int_t &Sector)
@@ -389,7 +393,6 @@ void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, I
   Row = 1+(Int_t)(posY/fPadSizey.At(sector));
 
 }
-
 
   // ---- CalculateHitPosition ------------------------------------------
 void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row, 

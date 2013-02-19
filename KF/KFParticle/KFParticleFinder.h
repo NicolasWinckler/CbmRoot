@@ -6,12 +6,10 @@
 #include "CbmKFTrackInterface.h"
 #include "CbmKFTrack.h"
 
-#include "CbmKFVertexInterface.h"
-#include "CbmKFVertex.h"
-
 #include <vector>
 
 class L1FieldRegion;
+class KFParticleSIMD;
 class CbmL1Track;
 class CbmStsTrack;
 
@@ -36,9 +34,9 @@ class KFParticleFinder
 
     static void FindParticles(std::vector<CbmKFTrack>& vRTracks, std::vector<float>& ChiToPrimVtx,
                                            std::vector<L1FieldRegion>& vField, std::vector<KFParticle>& Particles,
-                               CbmKFVertex& PrimVtx, const std::vector<int>& vTrackPDG, const float cuts[2][3] = DefaultCuts);
+                               KFParticleSIMD& PrimVtx, const std::vector<int>& vTrackPDG, const float cuts[2][3] = DefaultCuts);
 
-    static void ExtrapolateToPV(std::vector<KFParticle>& vParticles, CbmKFVertex& PrimVtx);
+    static void ExtrapolateToPV(std::vector<KFParticle>& vParticles, KFParticleSIMD& PrimVtx);
     static fvec GetChi2BetweenParticles(KFParticleSIMD &p1, KFParticleSIMD &p2);
 
     static void Find2DaughterDecay(std::vector<CbmKFTrack>& vTracks,
@@ -49,7 +47,7 @@ class KFParticleFinder
                                    const int MotherPDG,
                                    std::vector<short>& idNeg,
                                    std::vector<short>& idPos,
-                                   CbmKFVertex& PrimVtx,
+                                   KFParticleSIMD& PrimVtx,
                                    const float* cuts = 0,
                                    bool isPrimary = 0,
                                    std::vector<float>* vMotherTopoChi2Ndf = 0,
@@ -67,7 +65,7 @@ class KFParticleFinder
                                    const int MotherPDG,
                                    std::vector<short>& idNeg,
                                    std::vector<short>& idPos,
-                                   CbmKFVertex& PrimVtx,
+                                   KFParticleSIMD& PrimVtx,
                                    const float* cuts,
                                    bool isPrimary,
                                    const float PtCut,
@@ -82,7 +80,7 @@ class KFParticleFinder
                                const std::vector<L1FieldRegion>& field,
                                const int DaughterPDG,
                                std::vector<short>& idTrack,
-                               CbmKFVertex& PrimVtx,
+                               KFParticleSIMD& PrimVtx,
                                const float* cuts = 0,
                                bool isPrimary = 0,
                                std::vector<float>* ChiToPrimVtx = 0,
@@ -96,7 +94,7 @@ class KFParticleFinder
                            std::vector<int>& daughterIds,
                            std::vector<KFParticle>& vLambdaSec,
                            std::vector<KFParticle>& vHyperon,
-                           CbmKFVertex& PrimVtx,
+                           KFParticleSIMD& PrimVtx,
                            const float *cuts = 0,
                            int startIndex=0);
 
@@ -106,7 +104,7 @@ class KFParticleFinder
                                 const int DaughterPDG[5], //pi, K_b, pi_b, K, p
                                 const int MotherPDG[8],
                                 std::vector<short>* idTrack[5], //pi, K_b, pi_b, K, p
-                                CbmKFVertex& PrimVtx,
+                                KFParticleSIMD& PrimVtx,
                                 const float cuts[8][8],
                                 std::vector<float> ChiToPrimVtx);
 
@@ -123,7 +121,7 @@ class KFParticleFinder
 
   static void SelectParticleCandidates(std::vector<KFParticle>& Particles,
                                        std::vector<KFParticle>& vCandidates,
-                                       CbmKFVertex& PrimVtx,
+                                       KFParticleSIMD& PrimVtx,
                                        const float cuts[5]);
 
   void ConstructPVT(std::vector<CbmKFTrack>& vRTracks);

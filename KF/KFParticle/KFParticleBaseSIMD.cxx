@@ -358,7 +358,7 @@ void KFParticleBaseSIMD::operator +=( const KFParticleBaseSIMD &Daughter )
   AddDaughter( Daughter );
 }
   
-fvec KFParticleBaseSIMD::GetSCorrection( const fvec Part[], const fvec XYZ[] ) 
+fvec KFParticleBaseSIMD::GetSCorrection( const fvec Part[], const fvec XYZ[] ) const
 {
   //* Get big enough correction for S error to let the particle Part be fitted to XYZ point
   
@@ -366,7 +366,10 @@ fvec KFParticleBaseSIMD::GetSCorrection( const fvec Part[], const fvec XYZ[] )
   fvec p2 = Part[3]*Part[3]+Part[4]*Part[4]+Part[5]*Part[5];
 //  fvec sigmaS = if3( fvec(fvec(1.e-4)<p2) , ( fvec(10.1)+fvec(3.)*sqrt( d[0]*d[0]+d[1]*d[1]+d[2]*d[2]) )/sqrt(p2) , One);
 //  fvec sigmaS = if3( fvec(fvec(1.e-4)<p2) , ( fvec(0.1)+fvec(10.)*sqrt( d[0]*d[0]+d[1]*d[1]+d[2]*d[2]) )/sqrt(p2) , One);
-  fvec sigmaS = if3( fvec(fvec(1.e-4)<p2) , fvec(0.1)+fvec(10.)*sqrt( (d[0]*d[0]+d[1]*d[1]+d[2]*d[2])/p2 ) , One);
+
+ fvec sigmaS = if3( fvec(fvec(1.e-4)<p2) , fvec(0.1)+fvec(10.)*sqrt( (d[0]*d[0]+d[1]*d[1]+d[2]*d[2])/p2 ) , One);
+//   fvec sigmaS = GetDStoPoint(XYZ)*0.08;
+
   return sigmaS;
 }
 
@@ -377,7 +380,7 @@ void KFParticleBaseSIMD::GetMeasurement( const fvec XYZ[], fvec m[], fvec V[], B
   fvec b[3];
   GetFieldValue( XYZ, b );
   const fvec kCLight =  0.000299792458;
-  b[0]*=kCLight; b[1]*=kCLight; b[2]*=kCLight;
+  b[0]*=kCLight*GetQ(); b[1]*=kCLight*GetQ(); b[2]*=kCLight*GetQ();
 
   if(!isAtVtxGuess)
     Transport( GetDStoPoint(XYZ), m, V );
@@ -396,10 +399,10 @@ void KFParticleBaseSIMD::GetMeasurement( const fvec XYZ[], fvec m[], fvec V[], B
   h[0] = m[3]*sigmaS;
   h[1] = m[4]*sigmaS;
   h[2] = m[5]*sigmaS;
-  h[3] = ( h[1]*b[2]-h[2]*b[1] )*GetQ();
-  h[4] = ( h[2]*b[0]-h[0]*b[2] )*GetQ();
-  h[5] = ( h[0]*b[1]-h[1]*b[0] )*GetQ();
-
+  h[3] = ( h[1]*b[2]-h[2]*b[1] );
+  h[4] = ( h[2]*b[0]-h[0]*b[2] );
+  h[5] = ( h[0]*b[1]-h[1]*b[0] );
+  
   V[ 0]+= h[0]*h[0];
   V[ 1]+= h[1]*h[0];
   V[ 2]+= h[1]*h[1];
@@ -424,6 +427,7 @@ void KFParticleBaseSIMD::GetMeasurement( const fvec XYZ[], fvec m[], fvec V[], B
   V[18]+= h[5]*h[3];
   V[19]+= h[5]*h[4];
   V[20]+= h[5]*h[5];
+
 }
 
 void KFParticleBaseSIMD::AddDaughter( const KFParticleBaseSIMD &Daughter, Bool_t isAtVtxGuess )
@@ -431,14 +435,18 @@ void KFParticleBaseSIMD::AddDaughter( const KFParticleBaseSIMD &Daughter, Bool_t
   AddDaughterId( Daughter.Id() );
 
   if( fNDF[0]<-1 ){ // first daughter -> just copy
-//     fNDF   = -1;
-//     fQ     =  Daughter.GetQ();
-//     for( Int_t i=0; i<7; i++) fP[i] = Daughter.fP[i];
-//     for( Int_t i=0; i<28; i++) fC[i] = Daughter.fC[i];
+    fNDF   = -1;
+    fQ     =  Daughter.GetQ();
+    if( Daughter.fC[35][0]>0 ){ //TODO Check this: only the first daughter is used here!
+      Daughter.GetMeasurement( fVtxGuess, fP, fC, isAtVtxGuess );
+    } else {
+      for( Int_t i=0; i<8; i++ ) fP[i] = Daughter.fP[i];
+      for( Int_t i=0; i<36; i++ ) fC[i] = Daughter.fC[i];
+    }
     fSFromDecay = 0;
     fMassHypo = Daughter.fMassHypo;
     SumDaughterMass = Daughter.SumDaughterMass;
-/*    return;*/
+    return;
   }
 
   if(fConstructMethod == 0)
@@ -448,11 +456,8 @@ void KFParticleBaseSIMD::AddDaughter( const KFParticleBaseSIMD &Daughter, Bool_t
   else if(fConstructMethod == 2)
     AddDaughterWithEnergyFitMC(Daughter,isAtVtxGuess);
 
-  if(fNDF[0]>-3)
-  {
-    SumDaughterMass += Daughter.SumDaughterMass;
-    fMassHypo = -1;
-  }
+  SumDaughterMass += Daughter.SumDaughterMass;
+  fMassHypo = -1;
 }
 
 void KFParticleBaseSIMD::AddDaughterWithEnergyFit( const KFParticleBaseSIMD &Daughter, Bool_t isAtVtxGuess )
@@ -1624,16 +1629,37 @@ void KFParticleBaseSIMD::TransportToDS( fvec dS )
 }
 
 
-fvec KFParticleBaseSIMD::GetDStoPointLine( const fvec xyz[] ) const 
+void KFParticleBaseSIMD::GetDistanceToVertexLine( const KFParticleBaseSIMD &Vertex, fvec &l, fvec &dl, fvec *isParticleFromVertex ) const 
 {
   //* Get dS to a certain space point without field
 
-  fvec p2 = fP[3]*fP[3] + fP[4]*fP[4] + fP[5]*fP[5];  
-  fvec init = fvec( fabs(p2)<1.e-4 );
-  p2 = (!init) & p2;
-  p2 += init & One;
-  fvec ret = ( fP[3]*(xyz[0]-fP[0]) + fP[4]*(xyz[1]-fP[1]) + fP[5]*(xyz[2]-fP[2]) )/p2;
-  return ret;
+  fvec c[6] = {Vertex.fC[0]+fC[0], Vertex.fC[1]+fC[1], Vertex.fC[2]+fC[2],
+               Vertex.fC[3]+fC[3], Vertex.fC[4]+fC[4], Vertex.fC[5]+fC[5]};
+
+  fvec dx = (Vertex.fP[0]-fP[0]);
+  fvec dy = (Vertex.fP[1]-fP[1]);
+  fvec dz = (Vertex.fP[2]-fP[2]);
+
+
+  l = sqrt( dx*dx + dy*dy + dz*dz );
+  dl = c[0]*dx*dx + c[2]*dy*dy + c[5]*dz*dz + 2*(c[1]*dx*dy + c[3]*dx*dz + c[4]*dy*dz);
+  fvec ok = fvec(fvec(0)<dl);
+  dl = fvec(ok & (sqrt( dl )/l)) + fvec(!ok & fvec(1.e8));
+
+  if(isParticleFromVertex)
+  {
+    *isParticleFromVertex = fvec(ok & fvec( l<fvec(3*dl) ));
+    fvec cos = dx*fP[3] + dy*fP[4] + dz*fP[5];
+//     fvec dCos = dy*dy*fC[14] + dz*dz*fC[20] + dx*dx*fC[9] + 2*dz*fC[15]*fP[3] + c[0]* fP[3]*fP[3] + 
+//             2*dz*fC[16]* fP[4] + 2 *c[1] *fP[3] *fP[4] + c[2] *fP[4]*fP[4] + 2 *dz *fC[17]* fP[5] + 
+//             2*c[3] *fP[3]* fP[5] + 2 *c[4] *fP[4] *fP[5] + c[5]*fP[5] *fP[5] + 
+//             2*dy *(dz *fC[19] + fC[10] *fP[3] + fC[11]* fP[4] + fC[12]* fP[5]) + 
+//             2*dx *(dy *fC[13] + dz *fC[18] + fC[6]* fP[3] + fC[7]* fP[4] + fC[8]* fP[5]);
+//     ok = fvec(fvec(0)<dCos);
+//     dCos = fvec(ok & ( dCos ));
+//     dCos = sqrt(dCos);
+    *isParticleFromVertex = fvec( (*isParticleFromVertex) | fvec(!(*isParticleFromVertex) & fvec(cos<Zero) ) );
+  }
 }
 
 
@@ -2001,15 +2027,13 @@ fvec KFParticleBaseSIMD::GetDStoPointCBM( const fvec xyz[] ) const
 
 //   fvec dS = 0;
 // 
-//   fvec fld[3];
-//   GetFieldValue( fP, fld );
-// 
-//   dS = GetDStoPointLine( xyz );
-// 
 //   if( fQ[0]==0 ){
+//     dS = GetDStoPointLine( xyz );
 //     return dS;
 //   }
-//
+// 
+//   fvec fld[3];
+//   GetFieldValue( fP, fld );
 //   dS = GetDStoPointBy( fld[1],xyz );
 
   dS = if3(fabs(dS)>1.E3, Zero, dS);
@@ -2049,11 +2073,12 @@ void KFParticleBaseSIMD::GetDStoParticleCBM( const KFParticleBaseSIMD &p, fvec &
     mTy[1] = if3( fabs(p.GetPz()) > small, p.GetPy()/p.GetPz(), 1.);
 
     fvec r0[3];
-    r0[0] = 0.;
-    r0[1] = 0.;
     fvec dty = mTy[0]-mTy[1];
+    
     r0[2] = if3( fabs(dty) > small, (mTy[0]*mZ[0]-mTy[1]*mZ[1] + mY[1] -mY[0])/dty, 0. );
-
+    r0[1] = mY[0] + mTy[0]*(r0[2]-mZ[0]);
+    r0[0] = GetX() + GetPx()/GetPz()*(r0[2]-mZ[0]);
+    
     dS = GetDStoPointCBM(r0);
     dS1 = p.GetDStoPoint(r0);
 

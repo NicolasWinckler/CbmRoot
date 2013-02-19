@@ -170,6 +170,8 @@ void KFParticleSIMD::Create(CbmKFTrackInterface* Track[], int NTracks, Int_t *qH
   fIsVtxGuess = false;
   fIsVtxErrGuess = false;
   fIsLinearized = false;
+
+  fMassHypo = TrMass;
 }
 
 KFParticleSIMD::KFParticleSIMD(CbmKFTrackInterface &Track, Int_t *qHypo, const Int_t *pdg)
@@ -260,6 +262,8 @@ KFParticleSIMD::KFParticleSIMD(CbmKFTrackInterface &Track, Int_t *qHypo, const I
   fIsVtxGuess = false;
   fIsVtxErrGuess = false;
   fIsLinearized = false;
+
+  fMassHypo = TrMass;
 }
 
 KFParticleSIMD::KFParticleSIMD( CbmKFVertexInterface &vertex )
@@ -396,6 +400,8 @@ KFParticleSIMD::KFParticleSIMD(KFParticle* parts[], const int nPart)
     fQ[ie] = part.GetQ();
     fAtProductionVertex = part.GetAtProductionVertex(); // CHECKME
 
+    fMassHypo[ie] = part.GetMassHypo();
+
     L1FieldRegion field(part.GetFieldCoeff());
     fField.SetOneEntry( ie, field, 0 );
   }
@@ -422,6 +428,8 @@ KFParticleSIMD::KFParticleSIMD( KFParticle &part)
     fP[i] = part.Parameters()[i];
   for( int i = 0; i < 36; ++i )
     fC[i] = part.CovarianceMatrix()[i];
+
+  fMassHypo = part.GetMassHypo();
 
   fField = L1FieldRegion(part.GetFieldCoeff());
 }

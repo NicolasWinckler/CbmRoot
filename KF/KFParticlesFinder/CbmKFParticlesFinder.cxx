@@ -16,8 +16,8 @@
 #include "CbmKFParticlesFinder.h"
 #include "CbmL1Def.h"
 
-//#include "CbmKFParticleInterface.h"
 #include "KFParticleFinder.h"
+#include "KFParticleSIMD.h"
 #include "CbmKFVertex.h"
 #include "CbmKFTrack.h"
 #include "CbmStsTrack.h"
@@ -319,7 +319,8 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   for(int iTr=0; iTr<nTracks; iTr++)
     vKFTrack[iTr] = CbmKFTrack(vRTracks[iTr]);
 
-  KFParticleFinder::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
+  KFParticleSIMD pVtx(kfVertex);
+  KFParticleFinder::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, pVtx, vTrackPDG, fCuts);
 //  CbmKFParticleInterface::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
 
   timerSelect.Stop();
@@ -332,7 +333,7 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   timeSelectCPU += timerSelect.CpuTime();
   timeSelectReal += timerSelect.RealTime();
 
-  if(NEv%10==0)
+  if(NEv%100==0)
   {
     std::cout.setf(ios::fixed);
     std::cout.setf(ios::showpoint);

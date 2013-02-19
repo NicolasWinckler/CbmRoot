@@ -201,7 +201,6 @@ class KFParticleBaseSIMD {
 		  const KFParticleBaseSIMD *ProdVtx=0,   Float_t Mass=-1, Bool_t IsConstrained=0,
                   Bool_t isAtVtxGuess = 0  );
 
-
   //*
   //*                   TRANSPORT
   //* 
@@ -283,6 +282,8 @@ class KFParticleBaseSIMD {
   void SetPDG ( int pdg ) { fPDG = pdg; }
   const int& GetPDG () const { return fPDG; }
 
+  void GetDistanceToVertexLine( const KFParticleBaseSIMD &Vertex, fvec &l, fvec &dl, fvec *isParticleFromVertex = 0 ) const;
+
  protected:
 
   static Int_t IJ( Int_t i, Int_t j ){ 
@@ -306,7 +307,7 @@ class KFParticleBaseSIMD {
 
   static void multQSQt1( const fvec J[11], fvec S[] );
 
-  static fvec GetSCorrection( const fvec Part[], const fvec XYZ[] );
+  fvec GetSCorrection( const fvec Part[], const fvec XYZ[] ) const;
 
   void GetMeasurement( const fvec XYZ[], fvec m[], fvec V[], Bool_t isAtVtxGuess = 0 ) const ;
 

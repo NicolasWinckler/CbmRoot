@@ -71,7 +71,8 @@ class CbmKFParticlesFinderQA :public FairTask
   vector<CbmKFTrErrMCPoints> fMCTrackPoints;
   vector<CbmL1PFMCParticle> vMCParticles;  // MC particles
   vector<CbmL1TrackMatch> MCtoRParticleId; // array for match
-  vector<CbmL1TrackMatch> RtoMCParticleId; 
+  vector<CbmL1TrackMatch> RtoMCParticleId;
+  vector<bool> vIsBkgWithSamePDG;
 // Arrays of points, tracks, etc
 
   TClonesArray* flistStsPts;
@@ -104,10 +105,11 @@ class CbmKFParticlesFinderQA :public FairTask
   TH1F *hFitDaughtersQA[CbmKFPartEfficiencies::nParticles][nFitQA];
   TH1F *hFitQA[CbmKFPartEfficiencies::nParticles][nFitQA];
 
-  static const int nHistoPartParam = 11;
+  static const int nHistoPartParam = 12;
   TH1F *hPartParam[CbmKFPartEfficiencies::nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
   TH1F *hPartParamBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
   TH1F *hPartParamGhost[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
+//   TH1F *hPartParamCorrBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
   TH1F *hPartParamSignal[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
   static const int nHistoPartParamQA = 3;
   TH1F *hPartParamQA[CbmKFPartEfficiencies::nParticles][nHistoPartParamQA*2]; // residuals and pulls of these parameters
@@ -116,6 +118,7 @@ class CbmKFParticlesFinderQA :public FairTask
   TH2F *hPartParam2D[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D]; // y-pt,
   TH2F *hPartParam2DBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
   TH2F *hPartParam2DGhost[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
+//   TH2F *hPartParam2DCorrBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
   TH2F *hPartParam2DSignal[CbmKFPartEfficiencies::nParticles][nHistoPartParam2D];
   
   static const int nHistosPV = 6;

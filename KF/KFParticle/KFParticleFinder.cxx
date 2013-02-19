@@ -18,7 +18,7 @@ KFParticleFinder::KFParticleFinder()
 
 void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>& ChiToPrimVtx,
                                            vector<L1FieldRegion>& vField, vector<KFParticle>& Particles,
-                                           CbmKFVertex& PrimVtx, const vector<int>& vTrackPDG, const float cuts[2][3])
+                                           KFParticleSIMD& PrimVtx, const vector<int>& vTrackPDG, const float cuts[2][3])
 {
   //* Finds particles (K0s and Lambda) from a given set of tracks
 
@@ -146,7 +146,9 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   vector<KFParticle> vXiStarPrim;
   vector<KFParticle> vXiStarBarPrim;
 
-  const float SecCuts[3] = {3.f,5.f,4.f};
+  const float SecCuts[3] = {3.f,5.f,10.f};
+//  const float SecCuts[3] = {3.f,5.f,4.f};
+
   //K0s -> pi+ pi-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[5], pdgPos[5], 310,
                      idNegSec[5], idPosSec[5], PrimVtx, cuts[0], 0, &vK0sTopoChi2Ndf,
@@ -174,10 +176,10 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   //phi -> K+ K-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[3], pdgPos[3], 333,
                      idNegPrim[3], idPosPrim[3], PrimVtx, cuts[1], 1);
-//   //rho -> pi+ pi-
-//   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[2], pdgPos[2], 113,
-//                      idNegPrim[2], idPosPrim[2],
-//                      PrimVtx, cuts[1]);
+  //rho -> pi+ pi-
+  Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[2], pdgPos[2], 113,
+                     idNegPrim[2], idPosPrim[2],
+                     PrimVtx, cuts[1]);
   //gamma -> e+ e-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[0], pdgPos[0], 22,
                      idNegPrim[0], idPosPrim[0], PrimVtx, cuts[1], 1);
@@ -204,16 +206,16 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   ExtrapolateToPV(vLambdaPrim,PrimVtx);
   ExtrapolateToPV(vLambdaBarPrim,PrimVtx);
   ExtrapolateToPV(vK0sPrim,PrimVtx);
-  
+
   // Find Xi-
-   float cutXi[3] = {3.,5.,6.};
+   float cutXi[3] = {10.,5.,6.};
 //  float cutXi[3] = {-300.,10.,10.};
   FindTrackV0Decay(3312, Particles, vLambdaSec, vRTracks, vField, pdgNeg[5], idNegSec[5],
                    PrimVtx, cutXi, 0, 0, &vXiPrim, massKsiPDG, 0.002 );
 
 
-  float cutLL[3] = {6.,10000000.,3.};
-  float cutLL2[3] = {6.,3.,3.};
+  float cutLL[3] = {10.,10000000.,3.};
+  float cutLL2[3] = {10.,3.,3.};
   vector<KFParticle> vLL;
   FindTrackV0Decay(3002, vLL, vLambdaSec, vRTracks, vField, pdgNeg[5], idNegSec[5],
                    PrimVtx, cutLL, 0, &ChiToPrimVtx);
@@ -222,15 +224,15 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   FindTrackV0Decay(3001, Particles, vLL, vRTracks, vField, pdgPos[4], idPosSec[4],
                    PrimVtx, cutLL2, 0, &ChiToPrimVtx);
   // Find Xi+
-  float cutXiPlus[3] = {3.,5.,6.};
+  float cutXiPlus[3] = {10.,5.,6.};
   FindTrackV0Decay(-3312, Particles, vLambdaBarSec, vRTracks, vField, pdgPos[5], idPosSec[5],
                    PrimVtx, cutXiPlus, 0, 0, &vXiBarPrim, massKsiPDG, 0.002);
   //Find Omega-
-  float cutOmega[3] = {3.,3.,3.};
+  float cutOmega[3] = {10.,3.,3.};
   FindTrackV0Decay(3334, Particles, vLambdaSec, vRTracks, vField, pdgNeg[6], idNegSec[6],
                    PrimVtx, cutOmega, 0, &ChiToPrimVtx);
   //Find Omega+
-  float cutOmegaPlus[3] = {3.,3.,3.};
+  float cutOmegaPlus[3] = {10.,3.,3.};
   FindTrackV0Decay(-3334, Particles, vLambdaBarSec, vRTracks, vField, pdgPos[6], idPosSec[6],
                    PrimVtx, cutOmegaPlus, 0, &ChiToPrimVtx);
   //Find Xi*-
@@ -336,21 +338,8 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
 //  std::cout << "NPart  " << Particles.size() << std::endl;
 }
 
-// void KFParticleFinder::FindParticles(vector<CbmL1Track>& vRTracks, vector<KFParticle>& Particles,
-//                                            CbmKFVertex& PrimVtx, const vector<int>& vTrackPDG, const float cuts[2][3])
-// {
-//   FindParticlesT(vRTracks, Particles, PrimVtx, vTrackPDG, cuts);
-// }
-// 
-// void KFParticleFinder::FindParticles(vector<CbmStsTrack>& vRTracks, vector<KFParticle>& Particles,
-//                                            CbmKFVertex& PrimVtx, const vector<int>& vTrackPDG, const float cuts[2][3])
-// {
-//   FindParticlesT(vRTracks, Particles, PrimVtx, vTrackPDG, cuts);
-// }
-
-void KFParticleFinder::ExtrapolateToPV(vector<KFParticle>& vParticles, CbmKFVertex& PrimVtx)
+void KFParticleFinder::ExtrapolateToPV(vector<KFParticle>& vParticles, KFParticleSIMD& PrimVtx)
 {
-  fvec pVtx[3] = {PrimVtx.GetRefX(),PrimVtx.GetRefY(),PrimVtx.GetRefZ()};
   for(unsigned int iL=0; iL<vParticles.size(); iL += fvecLen)
   {
     KFParticle* parts[fvecLen];
@@ -363,7 +352,7 @@ void KFParticleFinder::ExtrapolateToPV(vector<KFParticle>& vParticles, CbmKFVert
 
 
     KFParticleSIMD tmp(parts,nEntries);
-    tmp.TransportToPoint(pVtx);
+    tmp.TransportToPoint(PrimVtx.Parameters());
 
     for(unsigned int iv=0; iv<nEntries; iv++)
     {
@@ -399,7 +388,6 @@ fvec KFParticleFinder::GetChi2BetweenParticles(KFParticleSIMD &p1, KFParticleSIM
   return (r2*r2/err2);
 }
 
-//template<class T>
 void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
                                                 const vector<L1FieldRegion>& vField,
                                                 vector<KFParticle>& Particles,
@@ -408,7 +396,7 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
                                                 const int MotherPDG,
                                                 vector<short>& idNeg,
                                                 vector<short>& idPos,
-                                                CbmKFVertex& PrimVtx,
+                                                KFParticleSIMD& PrimVtx,
                                                 const float* cuts,
                                                 bool isPrimary,
                                                 vector<float>* vMotherTopoChi2Ndf,
@@ -472,13 +460,10 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
 
       if(isPrimary)
       {
-        fvec vtxGuess[3] = {PrimVtx.GetRefX(),
-                            PrimVtx.GetRefY(),
-                            PrimVtx.GetRefZ()};
-        fvec errGuess[3] = {100*sqrt(PrimVtx.GetCovMatrix()[0]),
-                            100*sqrt(PrimVtx.GetCovMatrix()[2]),
-                            100*sqrt(PrimVtx.GetCovMatrix()[5])};
-        mother.SetVtxGuess(vtxGuess[0], vtxGuess[1], vtxGuess[2]);
+        fvec errGuess[3] = {100*sqrt(PrimVtx.CovarianceMatrix()[0]),
+                            100*sqrt(PrimVtx.CovarianceMatrix()[2]),
+                            100*sqrt(PrimVtx.CovarianceMatrix()[5])};
+        mother.SetVtxGuess(PrimVtx.X(), PrimVtx.Y(), PrimVtx.Z());
         mother.SetVtxErrGuess(errGuess[0], errGuess[1], errGuess[2]);
         const KFParticleSIMD* vDaughtersPointer[2] = {&vDaughters[0], &vDaughters[1]};
         mother.Construct(vDaughtersPointer, 2, 0, -1, 0, 1);
@@ -495,45 +480,24 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
         motherTopo.SetProductionVertex(PrimVtx);
       }
 
-// if( (fabs(DaughterNegPDG) == 211) && (fabs(DaughterPosPDG) == 211) )
-// {
-// fvec pl0[3] = {vDaughters[0].GetPx(),vDaughters[0].GetPy(),vDaughters[0].GetPz()};
-// fvec pl1[3] = {vDaughters[1].GetPx(),vDaughters[1].GetPy(),vDaughters[1].GetPz()};
-// 
-// fvec pcm[3] = {pl0[0]+pl1[0], pl0[1]+pl1[1], pl0[2]+pl1[2]};
-// fvec ecm = vDaughters[0].GetE()+vDaughters[1].GetE();
-// 
-// fvec gamma = sqrt(fvec(1.) - (pcm[0]*pcm[0]+pcm[1]*pcm[1]+pcm[2]*pcm[2])/(ecm*ecm));
-// 
-// fvec e0 = gamma*(vDaughters[0].GetE() - (pcm[0]*pl0[0]+pcm[1]*pl0[1]+pcm[2]*pl0[2])/ecm);
-// fvec e1 = gamma*(vDaughters[1].GetE() - (pcm[0]*pl1[0]+pcm[1]*pl1[1]+pcm[2]*pl1[2])/ecm);
-// if( fabs(e0[0]-e1[0]) > 1.e-7 )
-// std::cout << e0 << "  " << e1 << std::endl;
-// }
-
-      // KFParticleSIMD mother_temp[fvecLen];
-      // mother.GetKFParticle(mother_temp, NTracks);
-
-//  std::cout << "PDG " << DaughterNegPDG << " " << DaughterPosPDG << " M " << mother.GetMass() << std::endl;
-
       for(int iv=0; iv<NTracks; iv++)
       {
         if(!finite(mother.GetChi2()[iv])) continue;
         if(!(mother.GetChi2()[iv] > 0.0f)) continue;
         if(!(mother.GetChi2()[iv]==mother.GetChi2()[iv])) continue;
-        if(mother.GetZ()[iv] < cuts[2]) continue;
-
+        fvec l, dl, isParticleFromVertex;
+        mother.GetDistanceToVertexLine(PrimVtx, l, dl, &isParticleFromVertex);
+        if((l/dl)[iv] < cuts[2]) continue;
+        if(isPrimary && ((l/dl)[iv]>3) ) continue;
+        if((!isPrimary) && !(isParticleFromVertex[iv])) continue;
         if( mother.GetChi2()[iv]/mother.GetNDF()[iv] < cuts[1] )
         {
           mother.GetKFParticle(mother_temp, iv);
           mother_temp.SetId(Particles.size());
           Particles.push_back(mother_temp);
-// std::cout << "PDG " << DaughterNegPDG << " " << DaughterPosPDG << " M " << mother_temp.GetMass() <<
-// " NDaughters " << mother_temp.NDaughters() << " " << mother_temp.DaughterIds()[0] << " " << mother_temp.DaughterIds()[1] <<" PDG " << mother_temp.GetPDG()  << " " << MotherPDG<< std::endl;
           float motherTopoChi2Ndf(0);
           if(vMotherTopoChi2Ndf)
             motherTopoChi2Ndf = motherTopo.GetChi2()[iv]/motherTopo.GetNDF()[iv];
-//            vMotherTopoChi2Ndf->push_back(motherTopo.GetChi2()[iv]/motherTopo.GetNDF()[iv]);
 
           if(vMotherPrim)
           {
@@ -548,7 +512,7 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
             }
             else if(vMotherSec)
             {
-              if( mother_temp.GetZ() < secCuts[2] ) continue;
+              if((l/dl)[iv] < secCuts[2]) continue;
               vMotherSec->push_back(mother_temp);
             }
           }
@@ -558,7 +522,6 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
   }
 }
 
-//template<class T>
 void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
                                                 const vector<L1FieldRegion>& vField,
                                                 vector<KFParticle>& Particles,
@@ -567,7 +530,7 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
                                                 const int MotherPDG,
                                                 vector<short>& idNeg,
                                                 vector<short>& idPos,
-                                                CbmKFVertex& PrimVtx,
+                                                KFParticleSIMD& PrimVtx,
                                                 const float* cuts,
                                                 bool isPrimary,
                                                 const float PtCut,
@@ -602,6 +565,8 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
     const float p = fabs(1/kfTrack.GetTrack()[4]);
     const float t2 = tx*tx+ty*ty;
     float pt = p*(sqrt(t2/(1+t2)));
+    if(PCut)
+      if(p < *PCut) continue;
     if(pt<PtCut) continue;
     if(Chi2PrimCut > -1)
       if(ChiToPrimVtx->at(idNeg[iEl]) < Chi2PrimCut) continue;
@@ -614,7 +579,6 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
                      PrimVtx, cuts, isPrimary);
 }
 
-//template<class T>
 void KFParticleFinder::FindTrackV0Decay(const int MotherPDG,
                                               vector<KFParticle>& Particles,
                                               vector<KFParticle>& vV0,
@@ -622,7 +586,7 @@ void KFParticleFinder::FindTrackV0Decay(const int MotherPDG,
                                               const vector<L1FieldRegion>& vField,
                                               const int DaughterPDG,
                                               vector<short>& idTrack,
-                                              CbmKFVertex& PrimVtx,
+                                              KFParticleSIMD& PrimVtx,
                                               const float* cuts,
                                               bool isPrimary,
                                               vector<float>* ChiToPrimVtx,
@@ -671,13 +635,10 @@ void KFParticleFinder::FindTrackV0Decay(const int MotherPDG,
 
         if(isPrimary)
         {
-          fvec vtxGuess[3] = {PrimVtx.GetRefX(),
-                              PrimVtx.GetRefY(),
-                              PrimVtx.GetRefZ()};
-          fvec errGuess[3] = {100*sqrt(PrimVtx.GetCovMatrix()[0]),
-                              100*sqrt(PrimVtx.GetCovMatrix()[2]),
-                              100*sqrt(PrimVtx.GetCovMatrix()[5])};
-          hyperon.SetVtxGuess(vtxGuess[0], vtxGuess[1], vtxGuess[2]);
+          fvec errGuess[3] = {100*sqrt(PrimVtx.CovarianceMatrix()[0]),
+                              100*sqrt(PrimVtx.CovarianceMatrix()[2]),
+                              100*sqrt(PrimVtx.CovarianceMatrix()[5])};
+          hyperon.SetVtxGuess(PrimVtx.X(), PrimVtx.Y(), PrimVtx.Z());
           hyperon.SetVtxErrGuess(errGuess[0], errGuess[1], errGuess[2]);
           const KFParticleSIMD* vDaughtersPointer[2] = {&vDaughters[0], &vDaughters[1]};
           hyperon.Construct(vDaughtersPointer, 2, 0, -1, 0, 1);
@@ -701,7 +662,19 @@ void KFParticleFinder::FindTrackV0Decay(const int MotherPDG,
           if(!finite(hyperon.GetChi2()[iv])) continue;
           if(!(hyperon.GetChi2()[iv] > 0.0f)) continue;
           if(!(hyperon.GetChi2()[iv]==hyperon.GetChi2()[iv])) continue;
-          if((hyperon.GetZ()[iv] < cuts[0]) || ((vV0[iV0].GetZ() - hyperon.GetZ()[iv]) < 0)) continue;
+
+          fvec l, dl, isParticleFromVertex;
+          hyperon.GetDistanceToVertexLine(PrimVtx, l, dl, &isParticleFromVertex);
+          if(!(isParticleFromVertex[iv])) continue;
+
+
+          if(((l/dl)[iv] < cuts[0]) ) continue;
+          if(!isPrimary)
+          {
+            fvec l1, dl1;
+            vDaughters[0].GetDistanceToVertexLine(hyperon, l1, dl1, &isParticleFromVertex);
+            if(!(isParticleFromVertex[iv])) continue;
+          }
 
           if(hyperonTopo.GetChi2()[iv]/hyperonTopo.GetNDF()[iv] > cuts[1] ) continue;
 
@@ -734,7 +707,7 @@ void KFParticleFinder::FindHyperons(int PDG,
                                           vector<int>& daughterIds,
                                           vector<KFParticle>& vLambdaSec,
                                           vector<KFParticle>& vHyperon,
-                                          CbmKFVertex& PrimVtx,
+                                          KFParticleSIMD& PrimVtx,
                                           const float *cuts,
                                           int startIndex)
 {
@@ -770,7 +743,16 @@ void KFParticleFinder::FindHyperons(int PDG,
        if(!finite(hyperon.GetChi2()[iv])) continue;
       if(!(hyperon.GetChi2()[iv] > 0.0f)) continue;
       if(!(hyperon.GetChi2()[iv]==hyperon.GetChi2()[iv])) continue;
-      if((hyperon.GetZ()[iv] < cuts[0]) || ((lambdas[iv]->GetZ() - hyperon.GetZ()[iv]) < 0)) continue;
+
+      fvec l, dl, isParticleFromVertex;
+      fvec l1, dl1, l2, dl2;
+      hyperon.GetDistanceToVertexLine(PrimVtx, l, dl, &isParticleFromVertex);
+      vDaughters[0].GetDistanceToVertexLine(hyperon, l1, dl1);
+      vDaughters[1].GetDistanceToVertexLine(hyperon, l2, dl2);
+      if(!(isParticleFromVertex[iv])) continue;
+
+      if(((l/dl)[iv] < cuts[0]) ) continue;
+      if(((l1 - l)[iv] < 0) || ((l2 - l)[iv] < 0)) continue;
 
       if(hyperonTopo.GetChi2()[iv]/hyperonTopo.GetNDF()[iv] > cuts[1] ) continue;
 
@@ -782,14 +764,13 @@ void KFParticleFinder::FindHyperons(int PDG,
   }
 }
 
-//template<class T>
 void KFParticleFinder::FindDMesLambdac(vector<CbmKFTrack>& vTracks,
                                              const vector<L1FieldRegion>& vField,
                                              vector<KFParticle>& Particles,
                                              const int DaughterPDG[5], //pi, K_b, pi_b, K, p
                                              const int MotherPDG[8], //D0, D+, D0_4, Ds+, Lc
                                              vector<short>* idTrack[5], //pi, K_b, pi_b, K, p
-                                             CbmKFVertex& PrimVtx,
+                                             KFParticleSIMD& PrimVtx,
                                              const float cuts[8][8],
                                              vector<float> ChiToPrimVtx)
 {
@@ -855,7 +836,6 @@ void KFParticleFinder::FindDMesLambdac(vector<CbmKFTrack>& vTracks,
   SelectParticleCandidates(Particles, d4pi, PrimVtx, cuts[7]);
 }
 
-//template<class T>
 void KFParticleFinder::CombineTrackPart(vector<CbmKFTrack>& vTracks,
                                               const vector<L1FieldRegion>& vField,
                                               vector<KFParticle>& Particles,
@@ -934,7 +914,7 @@ void KFParticleFinder::CombineTrackPart(vector<CbmKFTrack>& vTracks,
 
 void KFParticleFinder::SelectParticleCandidates(vector<KFParticle>& Particles,
                                                       vector<KFParticle>& vCandidates,
-                                                      CbmKFVertex& PrimVtx,
+                                                      KFParticleSIMD& PrimVtx,
                                                       const float cuts[5])
 {
   KFParticle* cand[fvecLen];
@@ -956,7 +936,11 @@ void KFParticleFinder::SelectParticleCandidates(vector<KFParticle>& Particles,
       if(!finite(candTopo.GetChi2()[iv])) continue;
       if(!(candTopo.GetChi2()[iv] > 0.0f)) continue;
       if(!(candTopo.GetChi2()[iv]==candTopo.GetChi2()[iv])) continue;
-      if(candTopo.GetZ()[iv] < cuts[2]) continue;
+
+      fvec l, dl, isParticleFromVertex;
+      candTopo.GetDistanceToVertexLine(PrimVtx, l, dl, &isParticleFromVertex);
+      if(!(isParticleFromVertex[iv])) continue;
+      if(((l/dl)[iv] < cuts[2]) ) continue;
 
       if(candTopo.GetChi2()[iv]/candTopo.GetNDF()[iv] > cuts[4] ) continue;
 
@@ -967,20 +951,9 @@ void KFParticleFinder::SelectParticleCandidates(vector<KFParticle>& Particles,
 
 
 
-//template<class T> 
 void KFParticleFinder::ConstructPVT(vector<CbmKFTrack>& vRTracks)
 {
 
 }
-
-// void KFParticleFinder::ConstructPV(vector<CbmL1Track>& vRTracks)
-// {
-//   ConstructPVT(vRTracks);
-// }
-// 
-// void KFParticleFinder::ConstructPV(vector<CbmStsTrack>& vRTracks)
-// {
-//   ConstructPVT(vRTracks);
-// }
 
 #undef cnst

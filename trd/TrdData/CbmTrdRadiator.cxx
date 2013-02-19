@@ -63,6 +63,7 @@ CbmTrdRadiator::CbmTrdRadiator()
   CreateHistograms();
 }
 //-----------------------------------------------------------------------------
+
 // -----  Constructor   --------------------------------------------------
 CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick)
   : fDetType(-1),
@@ -106,6 +107,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
   CreateHistograms();
 }
 //-----------------------------------------------------------------------------
+
 // -----  Constructor   --------------------------------------------------
 CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick, TString material, TString prototype)
   : fDetType(-1),
@@ -149,6 +151,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
   CreateHistograms();
 }
 //-----------------------------------------------------------------------------
+
 // -----   Destructor   ----------------------------------------------------
 CbmTrdRadiator::~CbmTrdRadiator()
 {
@@ -302,6 +305,7 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 
 }
   //----------------------------------------------------------------------------
+
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick){
 
@@ -376,11 +380,9 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
     f1->Delete();
     gFile=oldfile;
   }
-
-
-
 }
   //----------------------------------------------------------------------------
+
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(Bool_t SimpleTR, TString prototype="default"){
   TString material;
@@ -539,9 +541,6 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, TString prototype="default"){
     f1->Delete();
     gFile=oldfile;
   }
-
-
-
 }
   //----------------------------------------------------------------------------
 
@@ -608,9 +607,6 @@ void CbmTrdRadiator::Init(){
     f1->Delete();
    
   }
-
-
-
 }
 //----------------------------------------------------------------------------
 
@@ -689,16 +685,16 @@ Float_t CbmTrdRadiator::GetTR(TVector3 Mom){
 //----- main TR processing function ------------------------------
 void CbmTrdRadiator::ProcessTR(){
 
-  // Compute the angle normalization  factor - for different angles
-  // the detector thiknesses are different
+  // Compute the angle normalization  factor - 
+  // for different angles the detector thicknesses are different
 
   Float_t fNormPhi = fMom.Mag() / fMom.Pz();
 
-  // Correct all the thickness according to this factor
+  // Correct the thickness according to this factor
 
-  fFoilThickCorr  = TMath::Abs(fFoilThick * fNormPhi);
-  fGapThickCorr = TMath::Abs(fGapThick * fNormPhi);
-  fGasThickCorr = TMath::Abs(fGasThick * fNormPhi);
+  fFoilThickCorr= TMath::Abs(fFoilThick * fNormPhi);
+  fGapThickCorr = TMath::Abs(fGapThick  * fNormPhi);
+  fGasThickCorr = TMath::Abs(fGasThick  * fNormPhi);
 
   fFirstPass = true;
   // compute the TR spectra in the radiator
@@ -790,7 +786,7 @@ Int_t CbmTrdRadiator::TRspectrum(){
 
   // Where does this values come from, put them in the header file
   const Float_t kAlpha  = 0.0072973; //  1/137
-  const Int_t    kSumMax = 30;
+  const Int_t   kSumMax = 30;
 
   // calculate the gamma of the particle
   Float_t gamma = GammaF();
@@ -833,7 +829,7 @@ Int_t CbmTrdRadiator::TRspectrum(){
     Float_t conv      = 1.0 - TMath::Exp(-fNFoils * fSigma[iBin]);
 
     // eV -> keV
-    Float_t  energykeV = energyeV * 0.001;
+    Float_t energykeV = energyeV * 0.001;
   
     // dN / domega
     Float_t wn        = kAlpha * 4.0 / (fSigma[iBin] * (kappa + 1.0))
@@ -904,7 +900,7 @@ Int_t CbmTrdRadiator::DetTRspectrum(){
   //
 
   SetSigma(3);
-  Float_t stemp = 0;
+  Float_t stemp  = 0;
   Float_t stemp2 = 0;
   for(Int_t iBin = 0; iBin < fSpNBins; iBin++ ){
 
@@ -932,11 +928,8 @@ Int_t CbmTrdRadiator::DetTRspectrum(){
   // Save the number of photons absorbed
   fnTRab = nTR2;
 
-
-
   //cout << " No. of photons  escaped: " << nTR1 << endl;
   //cout << " No. of photnos  absorbed in the gas: " <<nTR2<< endl;
-
 
   return 1;
 }

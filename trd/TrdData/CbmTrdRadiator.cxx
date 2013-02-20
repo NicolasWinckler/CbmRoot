@@ -289,7 +289,7 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
     ProduceSpectra();
      
     TFile* oldfile=gFile;
-    TFile* f1 = new TFile("histos.root", "recreate");
+    TFile* f1 = new TFile("TRhistos.root", "recreate");
     f1->cd();
 
     for (Int_t i=0 ; i < fNMom; i++){
@@ -300,9 +300,6 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
     f1->Delete();
     gFile=oldfile;
   }
-
-
-
 }
   //----------------------------------------------------------------------------
 
@@ -369,7 +366,7 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
     ProduceSpectra();
      
     TFile* oldfile=gFile;
-    TFile* f1 = new TFile("histos.root", "recreate");
+    TFile* f1 = new TFile("TRhistos.root", "recreate");
     f1->cd();
 
     for (Int_t i=0 ; i < fNMom; i++){
@@ -530,7 +527,7 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, TString prototype="default"){
     ProduceSpectra();
      
     TFile* oldfile=gFile;
-    TFile* f1 = new TFile("histos.root", "recreate");
+    TFile* f1 = new TFile("TRhistos.root", "recreate");
     f1->cd();
 
     for (Int_t i=0 ; i < fNMom; i++){
@@ -598,7 +595,7 @@ void CbmTrdRadiator::Init(){
 
     ProduceSpectra();
    
-    TFile* f1 = new TFile("histos.root", "recreate");
+    TFile* f1 = new TFile("TRhistos.root", "recreate");
 
     for (Int_t i=0 ; i < fNMom; i++){
 	fFinal[i]->Write();

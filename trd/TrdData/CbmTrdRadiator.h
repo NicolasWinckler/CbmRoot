@@ -33,6 +33,9 @@ class CbmTrdRadiator
   CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, 
                  Float_t GapThick, TString material, TString prototype);
 
+  /** Constructor 20.02.2013 to include external files with tr-spectra**/
+  CbmTrdRadiator(Bool_t SimpleTR, TString prototype);
+
   /** Destructor **/
    virtual ~CbmTrdRadiator();
   
@@ -78,8 +81,10 @@ class CbmTrdRadiator
   /** Compute the sigma coeff. for the detector gas **/
    Float_t SigmaDet(Float_t energykeV);
   
-  /** Computation of photon absorption cross sections **/
+  /** Computation of photon absorption cross sections taken from http://physics.nist.gov/PhysRefData/Xcom/html/xcom1.html**/
    Float_t      GetMuPo(Float_t energyMeV);
+   Float_t      GetMuPok(Float_t energyMeV);
+   Float_t      GetMuKa(Float_t energyMeV);
    Float_t      GetMuAir(Float_t energyMeV);
    Float_t      GetMuXe(Float_t energyMeV);
    Float_t      GetMuCO2(Float_t energyMeV);
@@ -174,3 +179,4 @@ private:
 };
 
 #endif
+

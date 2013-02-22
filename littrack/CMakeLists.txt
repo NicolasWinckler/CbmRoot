@@ -79,10 +79,7 @@ cbm/geo/CbmLitDet.cxx
 cbm/geo/CbmLitDetContFact.cxx 
 cbm/geo/CbmLitDetGeo.cxx 
 cbm/geo/CbmLitDetGeoPar.cxx
-cbm/geo/CbmLitDetPoint.cxx 
-
-cbm/propagation/CbmPropagatorGeane.cxx
-cbm/propagation/CbmPropagatorLit.cxx
+cbm/geo/CbmLitDetPoint.cxx
 
 cbm/qa/geo/CbmLitTrackingGeoQa.cxx 
 cbm/qa/material/CbmLitCheckMultipleScattering.cxx
@@ -127,8 +124,6 @@ cbm/geo/CbmLitDetContFact.h
 cbm/geo/CbmLitDetGeo.h 
 cbm/geo/CbmLitDetGeoPar.h 
 cbm/geo/CbmLitDetPoint.h
-cbm/propagation/CbmPropagatorGeane.h
-cbm/propagation/CbmPropagatorLit.h
 cbm/finder/CbmLitFindGlobalTracksIdeal.h
 cbm/qa/propagation/CbmLitPropagationQa.h
 cbm/qa/geo/CbmLitTrackingGeoQa.h 

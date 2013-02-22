@@ -35,6 +35,22 @@ class CbmTrdRadiator
 
   /** Constructor 20.02.2013 to include external files with tr-spectra**/
   CbmTrdRadiator(Bool_t SimpleTR, TString prototype);
+  /* // implemented prototypes are:
+     "A"		ALICE like 7xfiber layer + 2x8mm Rohacell layer
+     "Bshort"	        POKALON 24µm, 0.7mm gap,  100 foils
+     "B"		POKALON 24µm, 0.7mm gap,  250 foils
+     "B++"		POKALON 24µm, 0.7mm gap,  350 foils
+     "C"		PE	15µm, 0.7mm gap,  200 foils
+     "D"		PE	15µm, 0.5mm gap,  100 foils
+     "E"		PE	20µm, 0.5mm gap,  120 foils
+     "F"		PE	20µm, 0.25mm gap, 220 foils
+     "G30"		30xfiber layer
+     "H"		125x2mm PE foam foil layer
+     "H++"		177x2mm PE foam foil layer
+     "Kshort"	        POKALON 24µm, 0.7mm gap,  100 foils micro-structured
+     "K"		POKALON 24µm, 0.7mm gap,  250 foils micro-structured
+     "K++"		POKALON 24µm, 0.7mm gap,  350 foils micro-structured
+  */
 
   /** Destructor **/
   virtual ~CbmTrdRadiator();

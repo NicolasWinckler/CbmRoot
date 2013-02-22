@@ -65,10 +65,7 @@ public:
          << " refId=" << GetRefId()
          << " hitType=" << GetType()
          << " detId=" << GetSystem()
-         << " stationGroup=" << GetStationGroup()
-         << " station=" << GetStation()
-         << " substation=" << GetSubstation()
-         << " module=" << GetModule() << std::endl;
+         << " station=" << GetStation() << std::endl;
       return ss.str();
    }
 

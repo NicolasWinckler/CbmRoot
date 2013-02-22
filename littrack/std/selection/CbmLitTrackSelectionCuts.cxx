@@ -45,7 +45,7 @@ LitStatus CbmLitTrackSelectionCuts::DoSelect(
 
       if ((*iTrack)->GetChi2() / (*iTrack)->GetNDF() > fMaxChiSq ||
             (*iTrack)->GetNofHits() < fMinNofHits ||
-            (*iTrack)->GetLastPlaneId() < fMinLastPlaneId) {
+            (*iTrack)->GetLastStationId() < fMinLastPlaneId) {
          (*iTrack)->SetQuality(kLITBAD);
       }
 

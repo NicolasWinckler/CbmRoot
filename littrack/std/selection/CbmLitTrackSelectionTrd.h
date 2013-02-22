@@ -1,9 +1,8 @@
-/* CbmLitTrackSelectionTrd.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- *
- * Track selection for TRD.
+/**
+ * \file CbmLitTrackSelectionTrd.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Track selection for TRD.
  */
 
 #ifndef CBMLITTRACKSELECTIONTRD_H_
@@ -15,45 +14,35 @@
 class CbmLitTrackSelectionTrd : public CbmLitTrackSelection
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitTrackSelectionTrd();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackSelectionTrd();
 
-   /* Derived from CbmLitTrackSelection */
+   /**
+    * \brief Inherited from CbmLitTrackSelection.
+    */
    virtual LitStatus DoSelect(
       TrackPtrIterator itBegin,
       TrackPtrIterator itEnd);
 
-   /* Derived from CbmLitTrackSelection */
+   /**
+    * \brief Inherited from CbmLitTrackSelection.
+    */
    virtual LitStatus DoSelect(
       TrackPtrVector& tracks);
 
-   /* Returns maximum number of shared hits */
-   int GetNofSharedHits() const {return fNofSharedHits;}
-
-   /* Sets maximum number of shared hits */
-   void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
-
-   /* Returns minimum number of hits cut */
-   int GetMinNofHits() const {return fMinNofHits;}
-
-   /* Sets minimum number of hits cut */
-   void SetMinNofHits(int nofHits) {fMinNofHits = nofHits;}
+   /* Setters */
+   void SetNofSharedHits(Int_t nofHits) { fNofSharedHits = nofHits; }
 
 private:
-   /* Shared hits track selection tool */
-   TrackSelectionPtr fSharedHitsSelection;
-   /* Same seed track selection tool */
-   TrackSelectionPtr fSameSeedSelection;
-   /* Track selection based on cuts */
-   TrackSelectionPtr fCutsSelection;
-
-   /* Maximum number of shared hits */
-   int fNofSharedHits;
-   /* Minimum number of hits cut */
-   int fMinNofHits;
+   TrackSelectionPtr fSharedHitsSelection; // Shared hits track selection tool
+   Int_t fNofSharedHits; // Maximum number of shared hits
 };
 
 #endif /*CBMLITTRACKSELECTIONTRD_H_*/

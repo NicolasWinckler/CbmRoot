@@ -8,20 +8,14 @@
 #ifndef CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_
 #define CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_
 
-#include "propagation/CbmLitMaterialInfo.h"
-#include "base/CbmLitDetectorSetup.h"
-#include "base/CbmLitDetectorLayout.h"
+#include "TObject.h"
+
 #include "parallel/muon/LitDetectorLayoutMuon.h"
 #include "parallel/electron/LitDetectorGeometryElectron.h"
 
 #include <string>
-#include <map>
-#include <vector>
 
 class TGeoManager;
-class TGeoMedium;
-class TGeoVolume;
-class TGeoNode;
 
 class CbmLitTrackingGeometryConstructor
 {
@@ -31,11 +25,6 @@ public:
     * \return Pointer to singleton object.
     */
    static CbmLitTrackingGeometryConstructor* Instance();
-
-   /**
-    * \brief Draw simplified geometry.
-    */
-   void Draw();
 
    /**
     * \brief Return MUCH detector layout for parallel MUCH tracking in SIMD format.
@@ -74,34 +63,28 @@ public:
    template<class T> void GetTrdLayout(lit::parallel::LitDetectorLayoutElectron<T>& layout);
 
    /**
-    * \brief Return MVD detector layout.
-    * \return MVD detector layout.
+    * \brief Return number of stations in TRD.
+    * \return Number of stations in TRD.
     */
-   const CbmLitDetectorLayout& GetMvdLayout();
+   Int_t GetNofTrdStations();
 
    /**
-    * \brief Return detector layout. Automatically determines TRD or MUCH.
-    * \return Detector layout.
+    * \brief Return number of stations in MUCH.
+    * \return Number of stations in MUCH.
     */
-   const CbmLitDetectorLayout& GetLayout();
+   Int_t GetNofMuchStations();
 
    /**
-    * \brief Return MUCH detector layout.
-    * \return MUCH detector layout.
+    * \brief Return number of stations in MUCH + TRD.
+    * \return Number of stations in MUCH + TRD.
     */
-   const CbmLitDetectorLayout& GetMuchLayout();
+   Int_t GetNofMuchTrdStations();
 
    /**
-    * \brief Return TRD tracking geometry in TGeo. GetTrdLayout has to be called in advance.
-    * \return TRD tracking geometry in TGeo.
+    * \brief Return number of stations in MVD.
+    * \return Number of stations in MVD.
     */
-   TGeoManager* GetTrdTrackingGeo() const { return fTrdTrackingGeo; }
-
-   /**
-    * \brief Return TRD detector layout.
-    * \return TRD detector layout.
-    */
-   const CbmLitDetectorLayout& GetTrdLayout();
+   Int_t GetNofMvdStations();
 
 private:
    /**
@@ -126,53 +109,10 @@ private:
     */
    const CbmLitTrackingGeometryConstructor& operator=(const CbmLitTrackingGeometryConstructor&);
 
-   /* */
-   void CreateMediumList();
-
-   /**
-    * \brief Constructs MVD tracking geometry.
-    */
-   void ConstructMvd();
-
-   /**
-    * \brief Construct simplified STS geometry.
-    */
-   void ConstructSts();
-
-   /**
-    * \brief Construct simplified MUCH geometry.
-    */
-   void ConstructMuch();
-
-   /**
-    * \brief Construct simplified TRD geometry.
-    */
-   void ConstructTrd();
-
-   void ConstructTrdWitDifferentKeepingVolumes();
-
-   void ConstructTrdWithSameKeepingVolume();
-
-   /**
-    * \brief Construct simplified RICH geometry.
-    */
-   void ConstructRich();
-
-   /**
-    * \brief Construct RICH node with TRAP shape.
-    */
-   void ReadRichTRAP(
-         TGeoNode* node,
-         double startZ);
-
    TGeoManager* fGeo; // Pointer to full geometry
-   std::map<std::string, TGeoMedium*> fMedium; // Maps name of the medium to TGeoMedium pointer
-   CbmLitDetectorSetup fDet; // Used for detector layout determination
-   CbmLitDetectorLayout fLayout; // Detector layout
-   CbmLitDetectorLayout fMvdLayout; // MVD detector layout
-   CbmLitDetectorLayout fMuchLayout; // MUCH detector layout
-   TGeoManager* fTrdTrackingGeo; // This is needed for TRD geometries with rotated planes.
-   CbmLitDetectorLayout fTrdLayout; // TRD tracking layout
+   Int_t fNofTrdStations; // Number of TRD stations
+   Int_t fNofMuchStations; // Number of MUCH stations
+   Int_t fNofMvdStations; // Number of MVD stations
 };
 
 #endif /* CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_ */

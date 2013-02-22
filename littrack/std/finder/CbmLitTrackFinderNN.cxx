@@ -1,9 +1,8 @@
-/** CbmLitTrackFinderNN.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
+/**
+ * \file CbmLitTrackFinderNN.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \since 2008
  **/
-
 
 #include "finder/CbmLitTrackFinderNN.h"
 
@@ -20,12 +19,31 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <map>
+#include <set>
+#include <cmath>
 
-#include "TGeoManager.h"
-#include "TGeoNode.h"
+using std::map;
+using std::set;
+using std::sqrt;
 
-CbmLitTrackFinderNN::CbmLitTrackFinderNN():
-   fIsProcessSubstationsTogether(true)
+CbmLitTrackFinderNN::CbmLitTrackFinderNN() :
+   fTracks(),
+   fFilter(),
+   fSeedSelection(),
+   fFinalSelection(),
+   fPropagator(),
+   fNofStations(0),
+   fNofIterations(0),
+   fIteration(0),
+   fHitData(),
+   fUsedHitsSet(),
+   fUsedSeedsSet(),
+   fMaxNofMissingHits(),
+   fPDG(),
+   fChiSqStripHitCut(),
+   fChiSqPixelHitCut(),
+   fSigmaCoef()
 {
 }
 
@@ -41,49 +59,40 @@ LitStatus CbmLitTrackFinderNN::DoFind(
    fTracks.clear();
    fUsedSeedsSet.clear();
    fUsedHitsSet.clear();
-   fHitData.SetDetectorLayout(fLayout);
+   fHitData.SetNofStations(fNofStations);
 
-   fNofIter = fSettings.GetNofIter();
-   for (Int_t iIter = 0; iIter < fNofIter; iIter++) {
-      SetIterationParameters(iIter);
+   for (fIteration = 0; fIteration < fNofIterations; fIteration++) {
+//      std::cout << "CbmLitTrackFinderNN::DoFind: iteration=" << fIteration << std::endl;
       ArrangeHits(hits.begin(), hits.end());
+//      std::cout << fHitData.ToString();
+
       InitTrackSeeds(trackSeeds.begin(), trackSeeds.end());
       FollowTracks(fTracks.begin(), fTracks.end());
+
       fFinalSelection->DoSelect(fTracks.begin(), fTracks.end());
       RemoveHits(fTracks.begin(), fTracks.end());
       CopyToOutput(fTracks.begin(), fTracks.end(), tracks);
-
-//    for (Int_t i = 0; i < tracks.size(); i++) {
-//       std::cout << "TRACK: " << tracks[i]->ToString();
-//       for (Int_t j = 0; j < tracks[i]->GetNofHits(); j++){
-//          std::cout << " " << tracks[i]->GetHit(j)->GetRefId();
-//       }
-//       std::cout << std::endl;
-//    }
 
       for_each(fTracks.begin(), fTracks.end(), DeleteObject());
       fTracks.clear();
       fHitData.Clear();
    }
+
    static Int_t eventNo = 0;
    std::cout << "CbmLitTrackFinderNN::DoFind: " << eventNo++ << " events processed" << std::endl;
    return kLITSUCCESS;
 }
 
-void CbmLitTrackFinderNN::SetIterationParameters(
-   Int_t iter)
+void CbmLitTrackFinderNN::ArrangeHits(
+   HitPtrIterator itBegin,
+   HitPtrIterator itEnd)
 {
-   SetPropagator(fSettings.GetPropagator(iter));
-   SetSeedSelection(fSettings.GetSeedSelection(iter));
-   SetFinalSelection(fSettings.GetFinalSelection(iter));
-   SetFilter(fSettings.GetFilter(iter));
-   IsUseFastSearch(fSettings.GetIsUseFastSearch(iter));
-   SetPDG(fSettings.GetPDG(iter));
-   IsProcessSubstationsTogether(fSettings.GetIsProcessSubstationsTogether(iter));
-   SetMaxNofMissingHits(fSettings.GetMaxNofMissingHits(iter));
-   SetSigmaCoef(fSettings.GetSigmaCoef(iter));
-   SetChiSqPixelHitCut(fSettings.GetChiSqPixelHitCut(iter));
-   SetChiSqStripHitCut(fSettings.GetChiSqStripHitCut(iter));
+   for(HitPtrIterator it = itBegin; it != itEnd; it++) {
+      CbmLitHit* hit = *it;
+      if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) { continue; }
+      fHitData.AddHit(hit);
+   }
+   fHitData.Arrange();
 }
 
 void CbmLitTrackFinderNN::InitTrackSeeds(
@@ -96,20 +105,13 @@ void CbmLitTrackFinderNN::InitTrackSeeds(
 
    fSeedSelection->DoSelect(itBegin, itEnd);
 
-   for (TrackPtrIterator track = itBegin; track != itEnd; track++) {
-      if ((*track)->GetQuality() == kLITBAD) { continue; }
-      if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) { continue; }
-      (*track)->SetPDG(fPDG);
-      (*track)->SetChi2(0.);
-      fTracks.push_back(new CbmLitTrack(*(*track)));
-   }
-
-   if (fZPropagationForTrackSeeds > 0.) {
-		for (TrackPtrIterator track = fTracks.begin(); track != fTracks.end(); track++) {
-			CbmLitTrackParam par = *((*track)->GetParamLast());
-			fPropagator->Propagate(&par, fZPropagationForTrackSeeds, fPDG);
-			(*track)->SetParamLast(&par);
-		}
+   for (TrackPtrIterator it = itBegin; it != itEnd; it++) {
+      CbmLitTrack* track = *it;
+      if (track->GetQuality() == kLITBAD) { continue; }
+      if (fUsedSeedsSet.find(track->GetPreviousTrackId()) != fUsedSeedsSet.end()) { continue; }
+      track->SetPDG(fPDG[fIteration]);
+      track->SetChi2(0.);
+      fTracks.push_back(new CbmLitTrack(*track));
    }
 }
 
@@ -117,143 +119,109 @@ void CbmLitTrackFinderNN::FollowTracks(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)
 {
-   for (TrackPtrIterator it = itBegin; it != itEnd; it++) {
-      FollowTrack(*it);
-   }
-}
+   for (TrackPtrIterator itTrack = itBegin; itTrack != itEnd; itTrack++) {
+      CbmLitTrack* track = *itTrack;
 
-void CbmLitTrackFinderNN::FollowTrack(
-   CbmLitTrack* track)
-{
-   Int_t nofStationGroups = fLayout.GetNofStationGroups();
-   for(Int_t iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) {
-      if (!ProcessStationGroup(track, iStationGroup)) { return; }
-   }
-}
+      for (Int_t iStation = 0; iStation < fNofStations; iStation++) {
+         CbmLitTrackParam par(*track->GetParamLast());
 
-bool CbmLitTrackFinderNN::ProcessStationGroup(
-   CbmLitTrack* track,
-   Int_t stationGroup)
-{
-   Int_t nofStations = fLayout.GetNofStations(stationGroup);
-   for(Int_t iStation = 0; iStation < nofStations; iStation++) {
-      if (!ProcessStation(track, stationGroup, iStation)) {
-         track->SetNofMissingHits(track->GetNofMissingHits() + 1);
-         if (track->GetNofMissingHits() > fMaxNofMissingHits) { return false; }
-      }
-   }
-   track->SetPDG(fPDG);
-   track->SetLastPlaneId(stationGroup);
-   return true;
-}
+         litfloat zMin = fHitData.GetMinZPos(iStation);
+         fPropagator->Propagate(&par, zMin, fPDG[fIteration]);
 
-bool CbmLitTrackFinderNN::ProcessStation(
-   CbmLitTrack* track,
-   Int_t stationGroup,
-   Int_t station)
-{
-   bool hitAdded = false;
-   Int_t nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
-   std::vector<CbmLitTrackParam> par(nofSubstations);
-   par[0] = *track->GetParamLast();
-   std::vector<HitPtrIteratorPair> hits(nofSubstations);
-   for (Int_t iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-	  litfloat z = 0.;
-	  Int_t moduleRotation = 0;
-	  if (!fUseTGeo) {
-		  z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
-	  } else {
-		  Int_t moduleId = 0;
-		  LitStatus result = fLayout.FindBoundary(&par[iSubstation], stationGroup, station, iSubstation, true, z, moduleId);
-		  if (result == kLITERROR) return false;
-		  moduleRotation = fLayout.GetSubstation(stationGroup, station, iSubstation).GetModuleRotationId(moduleId);
-	  }
-      LitStatus propResult = fPropagator->Propagate(&par[iSubstation], z, fPDG);
-      if (propResult == kLITERROR) return false;
+         const vector<Int_t>& bins = fHitData.GetZPosBins(iStation);
+         map<Int_t, CbmLitTrackParam> binParamMap;
+         vector<Int_t>::const_iterator itBins;
+         for (itBins = bins.begin(); itBins != bins.end(); itBins++) {
+            binParamMap[*itBins] = CbmLitTrackParam();
+         }
 
-      if (iSubstation < nofSubstations - 1) { par[iSubstation + 1] = par[iSubstation]; }
-      HitPtrIteratorPair bounds = MinMaxIndex(&par[iSubstation], fHitData.GetHits(stationGroup, station, iSubstation, moduleRotation),
-                                              fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation, moduleRotation));
-      hits[iSubstation] = bounds;
-   }
+         // Extrapolate track parameters to each Z position in the map.
+         // This is done to improve calculation speed.
+         // In case of planar station only 1 track extrapolation is required,
+         // since all hits located at the same Z.
+         map<Int_t, CbmLitTrackParam>::iterator itMap;
+         for (itMap = binParamMap.begin(); itMap != binParamMap.end(); itMap++) {
+            (*itMap).second = par;
+            litfloat z = fHitData.GetZPosByBin(iStation, (*itMap).first);
+            fPropagator->Propagate(&(*itMap).second, z, fPDG[fIteration]);
+         }
 
-   if (fIsProcessSubstationsTogether) { hitAdded = AddNearestHit1(track, hits, par, nofSubstations); }
-   else { hitAdded = AddNearestHit2(track, hits, par, nofSubstations); }
-
-   return hitAdded;
-}
-
-bool CbmLitTrackFinderNN::AddNearestHit1(
-   CbmLitTrack* track,
-   std::vector<HitPtrIteratorPair>& hits,
-   const std::vector<CbmLitTrackParam>& par,
-   Int_t nofSubstations)
-{
-   // fIsProcessSubstationsTogether == true
-   bool hitAdded = false;
-   CbmLitTrackParam uPar, param;
-   HitPtrIterator hit(hits[0].second);
-   litfloat chiSq = std::numeric_limits<litfloat>::max();
-   for (Int_t iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-      for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
-         //First update track parameters with KF, than check whether the hit is in the validation gate.
-         litfloat chi = 0.;
-         fFilter->Update(&par[iSubstation], &uPar, *iHit, chi);
-         if (IsHitInValidationGate(*iHit, chi, &par[iSubstation])) {
-            // Check if current hit is closer by statistical distance than the previous ones
-            if (chi < chiSq) {
-               chiSq = chi;
-               hit = iHit;
-               param = uPar;
+         // Loop over hits
+         litfloat minChiSq = std::numeric_limits<litfloat>::max(); // minimum chi-square of hit
+         const CbmLitHit* minHit = NULL; // Pointer to hit with minimum chi-square
+         CbmLitTrackParam minPar; // Track parameters for closest hit
+         const HitPtrVector& hits = fHitData.GetHits(iStation);
+         for (HitPtrConstIterator itHit = hits.begin(); itHit != hits.end(); itHit++) {
+            const CbmLitHit* hit = *itHit;
+            Int_t bin = fHitData.GetBinByZPos(iStation, hit->GetZ());
+            if (binParamMap.find(bin) == binParamMap.end()) { // This should never happen
+               std::cout << "-E- CbmLitTrackFinderNN::FollowTracks: Z position " << hit->GetZ() << " not found in map. Something is wrong.\n";
             }
+            CbmLitTrackParam tpar(binParamMap[bin]);
+
+            // Check preliminary if hit is in the validation gate.
+            // This is done in order to speed up the algorithm.
+            // Based on the predicted track position (w/o KF update step)
+            // and maximum hit position error.
+            if (hit->GetType() == kLITPIXELHIT) {
+               const CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
+               litfloat maxErrX = fHitData.GetMaxErrX(iStation);
+               litfloat devX = fSigmaCoef[fIteration] * (sqrt(tpar.GetCovariance(0) + maxErrX * maxErrX));
+               litfloat maxErrY = fHitData.GetMaxErrY(iStation);
+               litfloat devY = fSigmaCoef[fIteration] * (sqrt(tpar.GetCovariance(5) + maxErrY * maxErrY));
+               bool hitInside = (pixelHit->GetX() < (tpar.GetX() + devX)) && (pixelHit->GetX() > (tpar.GetX() - devX))
+                     && (pixelHit->GetY() < (tpar.GetY() + devY)) && (pixelHit->GetY() > (tpar.GetY() - devY));
+               if (!hitInside) continue;
+            }
+
+            litfloat chi = std::numeric_limits<litfloat>::max();
+            fFilter->Update(&tpar, hit, chi);
+            bool hitInValidationGate = (hit->GetType() == kLITPIXELHIT && chi < fChiSqPixelHitCut[fIteration])
+                  || (hit->GetType() == kLITSTRIPHIT && chi < fChiSqStripHitCut[fIteration]);
+            if (hitInValidationGate && chi < minChiSq) { // Check if hit is inside validation gate and closer to the track.
+               minChiSq = chi;
+               minHit = hit;
+               minPar = tpar;
+            }
+         }
+
+         if (minHit != NULL) { // Check if hit was added
+            track->AddHit(minHit);
+            track->SetLastStationId(iStation);
+            track->SetParamLast(&minPar);
+            track->SetChi2(track->GetChi2() + minChiSq);
+            track->SetNDF(lit::NDF(track));
+         } else { // Missing hit
+            track->SetNofMissingHits(track->GetNofMissingHits() + 1);
+            if (track->GetNofMissingHits() > fMaxNofMissingHits[fIteration]) { break; }
          }
       }
    }
-   // if hit was attached than change track information
-   if (hit != hits[0].second) {
-      track->AddHit(*hit);
-      track->SetParamLast(&param);
-      track->SetChi2(track->GetChi2() + chiSq);
-      track->SetNDF(lit::NDF(track));
-      hitAdded = true;
-   }
-   return hitAdded;
 }
 
-bool CbmLitTrackFinderNN::AddNearestHit2(
-   CbmLitTrack* track,
-   std::vector<HitPtrIteratorPair>& hits,
-   const std::vector<CbmLitTrackParam>& par,
-   Int_t nofSubstations)
+void CbmLitTrackFinderNN::RemoveHits(
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd)
 {
-   // fIsProcessSubstationsTogether == false
-   bool hitAdded = false;
-   for (Int_t iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-      CbmLitTrackParam uPar, param;
-      HitPtrIterator hit(hits[iSubstation].second);
-      litfloat chiSq = std::numeric_limits<litfloat>::max();
-      for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
-         //First update track parameters with KF, than check whether the hit is in the validation gate.
-         litfloat chi = 0.;
-         fFilter->Update(&par[iSubstation], &uPar, *iHit, chi);
-         if (IsHitInValidationGate(*iHit, chi, &par[iSubstation])) {
-            // Check if current hit is closer by statistical distance than the previous ones
-            if (chi < chiSq) {
-               chiSq = chi;
-               hit = iHit;
-               param = uPar;
-            }
-         }
-      }
-      // if hit was attached than change track information
-      if (hit != hits[iSubstation].second) {
-         track->AddHit(*hit);
-         track->SetParamLast(&param);
-         track->SetChi2(track->GetChi2() + chiSq);
-         track->SetNDF(lit::NDF(track));
-         hitAdded = true;
+   for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
+      CbmLitTrack* track = *it;
+      if(track->GetQuality() == kLITBAD) { continue; }
+      for (Int_t hit = 0; hit < track->GetNofHits(); hit++) {
+         fUsedHitsSet.insert(track->GetHit(hit)->GetRefId());
       }
    }
+}
 
-   return hitAdded;
+void CbmLitTrackFinderNN::CopyToOutput(
+   TrackPtrIterator itBegin,
+   TrackPtrIterator itEnd,
+   TrackPtrVector& tracks)
+{
+   for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
+      CbmLitTrack* track = *it;
+      if(track->GetQuality() == kLITBAD) { continue; }
+      if (!track->CheckParams()) { continue; }
+      fUsedSeedsSet.insert(track->GetPreviousTrackId());
+      tracks.push_back(new CbmLitTrack(*track));
+   }
 }

@@ -1,22 +1,28 @@
-/** CbmLitHitData.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
+/**
+ * \file CbmLitHitData.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \since 2008
  **/
 
 #include "base/CbmLitHitData.h"
 
-#include "base/CbmLitDetectorLayout.h"
 #include "data/CbmLitHit.h"
 #include "data/CbmLitStripHit.h"
 #include "data/CbmLitPixelHit.h"
 
 #include <sstream>
 #include <iostream>
+#include <cassert>
+#include <cmath>
+
+using std::endl;
+using std::max;
 
 CbmLitHitData::CbmLitHitData():
    fHits(),
-   fMaxErr()
+   fMaxErrX(),
+   fMaxErrY(),
+   fNofStations(0)
 {
 }
 
@@ -24,126 +30,155 @@ CbmLitHitData::~CbmLitHitData()
 {
 }
 
-void CbmLitHitData::SetDetectorLayout(
-   const CbmLitDetectorLayout& layout)
+void CbmLitHitData::SetNofStations(
+   Int_t nofStations)
 {
-   Int_t nofGroups = layout.GetNofStationGroups();
-   fHits.resize(nofGroups);
-   fMaxErr.resize(nofGroups);
-   for(Int_t i = 0; i < nofGroups; i++) {
-      Int_t nofStations = layout.GetNofStations(i);
-      fHits[i].resize(nofStations);
-      fMaxErr[i].resize(nofStations);
-      for(Int_t j = 0; j < nofStations; j++) {
-         Int_t nofSubstations = layout.GetNofSubstations(i, j);
-         fHits[i][j].resize(nofSubstations);
-         fMaxErr[i][j].resize(nofSubstations);
-         for(Int_t k = 0; k < nofSubstations; k++) {
-        	Int_t nofModuleRotations = layout.GetNofModuleRotations(i, j, k);
-        	fHits[i][j][k].resize(nofModuleRotations);
-        	fMaxErr[i][j][k].resize(nofModuleRotations);
-            for(Int_t l = 0; l < nofModuleRotations; l++) {
-        	      fHits[i][j][k][l].reserve(1500);
-            }
-         }
-      }
+   fNofStations = nofStations;
+   fHits.resize(nofStations);
+   fMaxErrX.resize(nofStations);
+   fMaxErrY.resize(nofStations);
+   fZPosSet.resize(nofStations);
+   fZPosBins.resize(nofStations);
+   for(Int_t i = 0; i < nofStations; i++) {
+      fHits[i].reserve(nofStations);
+      fMaxErrX[i] = 0.;
+      fMaxErrY[i] = 0.;
    }
 }
 
 void CbmLitHitData::AddHit(
-   Int_t stationGroup,
-   Int_t station,
-   Int_t substation,
-   Int_t moduleRotation,
    CbmLitHit* hit)
 {
-   assert(stationGroup > -1 && station > -1 && substation > -1 && moduleRotation > -1 && hit != NULL);
-   fHits[stationGroup][station][substation][moduleRotation].push_back(hit);
+   Int_t station = hit->GetStation();
+   assert(station > -1 && station < fNofStations);
+   fHits[station].push_back(hit);
 
-   if (hit->GetType() == kLITSTRIPHIT) {
-      CbmLitStripHit* stripHit = static_cast<CbmLitStripHit*>(hit);
-      if (fMaxErr[stationGroup][station][substation][moduleRotation].first < stripHit->GetDu()) {
-         fMaxErr[stationGroup][station][substation][moduleRotation] = std::pair<litfloat, char>(stripHit->GetDu(), 'U');
-      }
-   } else if (hit->GetType() == kLITPIXELHIT) {
+   // Find different Z positions of hits
+   fZPosSet[station].insert(hit->GetZ());
+
+   // Find maximum hit error for X and Y
+   if (hit->GetType() == kLITPIXELHIT) {
       CbmLitPixelHit* pixelHit = static_cast<CbmLitPixelHit*>(hit);
-      if (fMaxErr[stationGroup][station][substation][moduleRotation].first < pixelHit->GetDx()) {
-         fMaxErr[stationGroup][station][substation][moduleRotation] = std::pair<litfloat, char>(pixelHit->GetDx(), 'X');
-      }
+      fMaxErrX[station] = max(pixelHit->GetDx(), fMaxErrX[station]);
+      fMaxErrY[station] = max(pixelHit->GetDy(), fMaxErrY[station]);
    }
 }
 
 const CbmLitHit* CbmLitHitData::GetHit(
-   Int_t stationGroup,
    Int_t station,
-   Int_t substation,
-   Int_t moduleRotation,
    Int_t hitId) const
 {
-   return fHits[stationGroup][station][substation][moduleRotation][hitId];
+   return fHits[station][hitId];
 }
 
-HitPtrIteratorPair CbmLitHitData::GetHits(
-   Int_t stationGroup,
-   Int_t station,
-   Int_t substation,
-   Int_t moduleRotation)
+const HitPtrVector& CbmLitHitData::GetHits(
+   Int_t station)
 {
-   return HitPtrIteratorPair(
-             fHits[stationGroup][station][substation][moduleRotation].begin(),
-             fHits[stationGroup][station][substation][moduleRotation].end());
+   return fHits[station];
 }
 
 Int_t CbmLitHitData::GetNofHits(
-   Int_t stationGroup,
-   Int_t station,
-   Int_t substation,
-   Int_t moduleRotation) const
+   Int_t station) const
 {
-   return fHits[stationGroup][station][substation][moduleRotation].size();
+   return fHits[station].size();
+}
+
+litfloat CbmLitHitData::GetMaxErrX(
+   Int_t station) const
+{
+   return fMaxErrX[station];
+}
+
+litfloat CbmLitHitData::GetMaxErrY(
+   Int_t station) const
+{
+   return fMaxErrY[station];
+}
+
+//const vector<litfloat>& CbmLitHitData::GetZPos(
+//   Int_t station) const
+//{
+//   return fZPos[station];
+//}
+
+const vector<Int_t>& CbmLitHitData::GetZPosBins(
+   Int_t station) const
+{
+   return fZPosBins[station];
+}
+
+litfloat CbmLitHitData::GetZPosByBin(
+   Int_t station,
+   Int_t bin) const
+{
+   return GetMinZPos(station) + bin * EPSILON;
+}
+
+Int_t CbmLitHitData::GetBinByZPos(
+   Int_t station,
+   litfloat zPos) const
+{
+   return (zPos - GetMinZPos(station)) / EPSILON;
+}
+
+litfloat CbmLitHitData::GetMinZPos(
+   Int_t station) const
+{
+   return (fZPosSet[station].empty()) ? 0. : *fZPosSet[station].begin();
 }
 
 void CbmLitHitData::Clear()
 {
    for(UInt_t i = 0; i < fHits.size(); i++) {
-      for(UInt_t j = 0; j < fHits[i].size(); j++) {
-         for(UInt_t k = 0; k < fHits[i][j].size(); k++) {
-        	 for(UInt_t l = 0; l < fHits[i][j][k].size(); l++) {
-				fHits[i][j][k][l].clear();
-				fHits[i][j][k][l].reserve(1500);
-				fMaxErr[i][j][k][l] = std::pair<litfloat, char>(0., ' ');
-        	 }
-         }
+      fHits[i].clear();
+      fHits[i].reserve(1500);
+      fMaxErrX[i] = 0.;
+      fMaxErrY[i] = 0.;
+      fZPosSet[i].clear();
+      fZPosBins[i].clear();
+   }
+}
+
+void CbmLitHitData::Arrange()
+{
+   for (Int_t iStation = 0; iStation < fNofStations; iStation++) {
+      Double_t minZ = *fZPosSet[iStation].begin();
+      Double_t maxZ = *fZPosSet[iStation].rbegin();
+      set<Int_t> binSet;
+      set<Double_t>::const_iterator it;
+      for (it = fZPosSet[iStation].begin(); it != fZPosSet[iStation].end(); it++) {
+         Double_t z = *it;
+         Int_t bin = (z - minZ) / EPSILON;
+         binSet.insert(bin);
+      }
+
+      set<Int_t>::const_iterator it2;
+      for (it2 = binSet.begin(); it2 != binSet.end(); it2++) {
+         Int_t bin = *it2;
+         Double_t z = minZ + bin * EPSILON;
+       //  fZPos[iStation].push_back(z);
+         fZPosBins[iStation].push_back(bin);
       }
    }
 }
 
-std::string CbmLitHitData::ToString() const
+string CbmLitHitData::ToString() const
 {
-   std::stringstream ss;
-   ss << "HitData:" << std::endl;
+   stringstream ss;
+   ss << "HitData:" << endl;
    for(UInt_t i = 0; i < fHits.size(); i++) {
-      ss << " station group " << i << std::endl;
-      for(UInt_t j = 0; j < fHits[i].size(); j++) {
-         ss << "  station " << j << std::endl;
-         for(UInt_t k = 0; k < fHits[i][j].size(); k++) {
-        	 ss << "  substation " << k << std::endl;
-        	 for(UInt_t l = 0; l < fHits[i][j][k].size(); l++) {
-				ss << "   moduleRotation " << l << ": " << GetNofHits(i, j, k, l) << " hits, "
-				   << "max err=(" << GetMaxErr(i, j, k, l).first << "," << GetMaxErr(i, j, k, l).second
-				   << ")" << std::endl;
-        	 }
-         }
+      ss << " station " << i << ": " << GetNofHits(i) << " hits, "
+            << "maxerrx=" << GetMaxErrX(i) << ", maxerry=" << GetMaxErrY(i) << ", ";
+      ss << "zposset=(";
+      for (set<litfloat>::const_iterator it = fZPosSet[i].begin(); it != fZPosSet[i].end(); it++) {
+         ss << *it << ", ";
       }
+      ss << ")" << endl;
+      ss << "zposbins=(";
+      for (vector<Int_t>::const_iterator it = fZPosBins[i].begin(); it != fZPosBins[i].end(); it++) {
+         ss << "|" << *it << "," << GetZPosByBin(i, *it) << "| ";
+      }
+      ss << ")" << endl;
    }
    return ss.str();
-}
-
-std::pair<litfloat, char> CbmLitHitData::GetMaxErr(
-   Int_t stationGroup,
-   Int_t station,
-   Int_t substation,
-   Int_t moduleRotation) const
-{
-   return fMaxErr[stationGroup][station][substation][moduleRotation];
 }

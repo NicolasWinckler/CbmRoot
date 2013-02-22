@@ -18,6 +18,7 @@ class CbmLitTrack;
 typedef vector<CbmLitHit*> HitPtrVector;
 typedef vector<CbmLitHit*>::iterator HitPtrIterator;
 typedef pair<HitPtrIterator, HitPtrIterator> HitPtrIteratorPair;
+typedef vector<CbmLitHit*>::const_iterator HitPtrConstIterator;
 
 //typedef vector<const CbmLitHit*> HitCnstPtrVector;
 //typedef vector<const CbmLitHit*>::iterator HitCnstPtrIterator;

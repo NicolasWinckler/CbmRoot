@@ -27,7 +27,7 @@ LitStatus CbmLitTrackSelectionSharedHits::DoSelect(
 {
    if (itBegin == itEnd) { return kLITSUCCESS; }
 
-   CbmLitQualitySort::DoSort(itBegin, itEnd);
+   CbmLitQualitySort::DoSortNofHits(itBegin, itEnd);
    CheckSharedHits(itBegin, itEnd);
 
    return kLITSUCCESS;

@@ -1,9 +1,8 @@
-/* CbmLitTrackSelectionMuch.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- *
- * Track selection for MUCH.
+/**
+ * \file CbmLitTrackSelectionMuch.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Track selection for MUCH.
  */
 
 #ifndef CBMLITTRACKSELECTIONMUCH_H_
@@ -15,53 +14,35 @@
 class CbmLitTrackSelectionMuch : public CbmLitTrackSelection
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitTrackSelectionMuch();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackSelectionMuch();
 
-   /* Derived from CbmLitTrackSelection */
+   /**
+    * \brief Inherited from CbmLitTrackSelection.
+    */
    virtual LitStatus DoSelect(
       TrackPtrIterator itBegin,
       TrackPtrIterator itEnd);
 
-   /* Derived from CbmLitTrackSelection */
+   /**
+    * \brief Inherited from CbmLitTrackSelection.
+    */
    virtual LitStatus DoSelect(
-      TrackPtrVector& tracks);;
+      TrackPtrVector& tracks);
 
-   /* Returns maximum number of shared hits */
-   int GetNofSharedHits() const {return fNofSharedHits;}
-
-   /* Returns minimum last plane index cut */
-   int GetMinLastPlaneId() const {return fMinLastPlaneId;}
-
-   /* Returns minimum number of hits cut */
-   int GetMinNofHits() const {return fMinNofHits;}
-
-   /* Sets maximum number of shared hits */
-   void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
-
-   /* Sets minimum last plane index cut */
-   void SetMinLastPlaneId(int minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
-
-   /* Sets minimum number of hits cut */
-   void SetMinNofHits(int minNofHits) {fMinNofHits = minNofHits;}
+   /* Setters */
+   void SetNofSharedHits(Int_t nofHits) { fNofSharedHits = nofHits; }
 
 private:
-   /* Shared hits track selection tool */
-   TrackSelectionPtr fSharedHitsSelection;
-   /* Track selection tool that cuts on number of hits and last plane index */
-   TrackSelectionPtr fCutsSelection;
-   /* Same seed track selection tool */
-   TrackSelectionPtr fSameSeedSelection;
-
-   /* Maximum number of shared hits */
-   int fNofSharedHits;
-   /* Minimum number of hits cuts */
-   int fMinNofHits;
-   /* Minimum last plane index cut */
-   int fMinLastPlaneId;
+   TrackSelectionPtr fSharedHitsSelection; // Shared hits track selection tool.
+   Int_t fNofSharedHits; // Maximum number of shared hits.
 };
 
 #endif /*CBMLITTRACKSELECTIONMUCH_H_*/

@@ -89,14 +89,11 @@ void CbmLitConverter::PixelHitToLitPixelHit(
    litHit->SetRefId(index);
 
    if (hit->GetType() == kTRDHIT) {
-	   CbmTrdDetectorId trdDetId;
-	   Int_t* info =  trdDetId.GetDetectorInfo(hit->GetDetectorId());
-	   litHit->SetDetectorId(kLITTRD, info[1] - 1, info[2] - 1, 0, info[3] * 1000 + info[4] - 1);
+	   litHit->SetDetectorId(kLITTRD, hit->GetPlaneId() - 1);
    } else if (hit->GetType() == kMUCHPIXELHIT) {
-	   Int_t detId = hit->GetDetectorId();
-	   litHit->SetDetectorId(kLITMUCH, CbmMuchGeoScheme::GetStationIndex(detId), CbmMuchGeoScheme::GetLayerIndex(detId), CbmMuchGeoScheme::GetLayerSideIndex(detId), 0);
+	   litHit->SetDetectorId(kLITMUCH, (hit->GetPlaneId() - 1) / 2);
    } else if (hit->GetType() == kTOFHIT) {
-	   litHit->SetDetectorId(kLITTOF, 0, 0, 0, 0);
+	   litHit->SetDetectorId(kLITTOF, 0);
    }
 }
 
@@ -117,9 +114,9 @@ void CbmLitConverter::StripHitToLitStripHit(
    litHit->SetRefId(index);
 
    if (hit->GetType() == kMUCHSTRAWHIT) {
-        litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
-        Int_t detId = hit->GetDetectorId();
- 	    litHit->SetDetectorId(kLITMUCH, CbmMuchGeoScheme::GetStationIndex(detId), CbmMuchGeoScheme::GetLayerIndex(detId), CbmMuchGeoScheme::GetLayerSideIndex(detId), CbmMuchGeoScheme::GetModuleIndex(detId));
+      litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
+      Int_t detId = hit->GetDetectorId();
+      litHit->SetDetectorId(kLITMUCH, (hit->GetPlaneId() - 1) / 2);
    }
 }
 
@@ -140,7 +137,7 @@ void CbmLitConverter::CbmHitToLitPixelHit(
    litHit->SetDxy(hit->GetCovXY());
    litHit->SetRefId(index);
 
-   litHit->SetDetectorId(sysId, 0, hit->GetStationNr() - 1, 0, 0);
+   litHit->SetDetectorId(sysId, hit->GetStationNr() - 1);
 }
 
 void CbmLitConverter::StsTrackToLitTrack(
@@ -187,7 +184,7 @@ void CbmLitConverter::TrackToLitTrack(
    litTrack->SetChi2(track->GetChiSq());
    litTrack->SetNDF(track->GetNDF());
    litTrack->SetPreviousTrackId(track->GetPreviousTrackId());
-   litTrack->SetLastPlaneId(track->GetFlag());
+   litTrack->SetLastStationId(track->GetFlag());
    litTrack->SetPDG(track->GetPidHypo());
    CbmLitTrackParam paramFirst, paramLast;
    CbmLitConverter::TrackParamToLitTrackParam(track->GetParamFirst(), &paramFirst);

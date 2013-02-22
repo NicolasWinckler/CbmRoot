@@ -23,8 +23,8 @@ CbmLitTrackingGeoQa::~CbmLitTrackingGeoQa()
 
 InitStatus CbmLitTrackingGeoQa::Init()
 {
-   fGeoConstructor = CbmLitTrackingGeometryConstructor::Instance();
-   fGeoConstructor->Draw();
+  // fGeoConstructor = CbmLitTrackingGeometryConstructor::Instance();
+  // fGeoConstructor->Draw();
    return kSUCCESS;
 }
 

@@ -49,17 +49,8 @@ public:
    LitSystemId GetSystem() const {
 	   return LitSystemId((fDetectorId & (WL_SYSTEM << SB_SYSTEM)) >> SB_SYSTEM);
    }
-   Int_t GetStationGroup() const {
-	   return (fDetectorId & (WL_STATION_GROUP<< SB_STATION_GROUP)) >> SB_STATION_GROUP;
-   }
    Int_t GetStation() const {
 	   return (fDetectorId & (WL_STATION << SB_STATION)) >> SB_STATION;
-   }
-   Int_t GetSubstation() const {
-	   return (fDetectorId & (WL_SUBSTATION << SB_SUBSTATION)) >> SB_SUBSTATION;
-   }
-   Int_t GetModule() const {
-	   return (fDetectorId & (WL_MODULE << SB_MODULE)) >> SB_MODULE;
    }
 
    /* Setters */
@@ -67,9 +58,8 @@ public:
    void SetHitType(LitHitType hitType) { fHitType = hitType; }
    void SetZ(litfloat z) { fZ = z; }
    void SetDz(litfloat dz) { fDz = dz; }
-   void SetDetectorId(LitSystemId sysId, Int_t stationGroup, Int_t station, Int_t substation, Int_t module) {
-	   fDetectorId = (sysId << SB_SYSTEM) | (stationGroup << SB_STATION_GROUP)
-			   | (station << SB_STATION) | (substation << SB_SUBSTATION) | (module << SB_MODULE);
+   void SetDetectorId(LitSystemId sysId, Int_t station) {
+	   fDetectorId = (sysId << SB_SYSTEM) | (station << SB_STATION);
    }
 
    /**
@@ -86,24 +76,15 @@ private:
 
    // The detector ID consists of:
    // system ID            (0-15),    bits 0-3
-   // station group number (0-15),    bits 4-7
-   // station number       (0-15),    bits 8-11
-   // substation number    (0-7),     bits 12-15
-   // module number        (0-65535), bits 16-31
-   Int_t fDetectorId; // Unique detector identificator
+   // station number       (0-31),    bits 4-9
+   Int_t fDetectorId; // Unique detector ID
 
    // Length of the index of the corresponding volume
    static const Int_t WL_SYSTEM = 15;
-   static const Int_t WL_STATION_GROUP = 15;
-   static const Int_t WL_STATION = 15;
-   static const Int_t WL_SUBSTATION = 7;
-   static const Int_t WL_MODULE = 65535;
+   static const Int_t WL_STATION = 31;
    // Start bit for each volume
    static const Int_t SB_SYSTEM = 0;
-   static const Int_t SB_STATION_GROUP = 4;
-   static const Int_t SB_STATION = 8;
-   static const Int_t SB_SUBSTATION = 12;
-   static const Int_t SB_MODULE = 16;
+   static const Int_t SB_STATION = 4;
 };
 
 /**

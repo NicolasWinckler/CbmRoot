@@ -13,13 +13,11 @@
 #include "utils/CbmLitMath.h"
 #include "utils/CbmLitMatrixMath.h"
 
-CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator(
-   const std::string& type)
+CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator()
 {
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fLineExtrapolator = factory->CreateTrackExtrapolator("line");
-   if (type == "myfield") { fRK4Extrapolator = factory->CreateTrackExtrapolator("rk4myfield"); }
-   else if (type == "") { fRK4Extrapolator = factory->CreateTrackExtrapolator("rk4"); }
+   fRK4Extrapolator = factory->CreateTrackExtrapolator("rk4");
 }
 
 CbmLitCleverTrackExtrapolator::~CbmLitCleverTrackExtrapolator()

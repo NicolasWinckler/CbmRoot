@@ -68,10 +68,7 @@ public:
          << " cosPhi=" << GetCosPhi() << " sinPhi=" << GetSinPhi()
          << " refId=" << GetRefId()
          << " hitType=" << GetType()
-         << " stationGroup=" << GetStationGroup()
-         << " station=" << GetStation()
-         << " substation=" << GetSubstation()
-         << " module=" << GetModule() << std::endl;
+         << " station=" << GetStation() << std::endl;
       return ss.str();
    }
 

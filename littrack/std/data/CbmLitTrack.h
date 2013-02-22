@@ -42,7 +42,7 @@ public:
       fChi2(0),
       fNDF(0),
       fPreviousTrackId(0),
-      fLastPlaneId(0),
+      fLastStationId(0),
       fPDG(211),
       fNofMissingHits(0),
       fRefId(-1),
@@ -62,7 +62,7 @@ public:
    Int_t GetPDG() const {return fPDG;};
    const CbmLitTrackParam* GetParamFirst() const { return &fParamFirst; }
    const CbmLitTrackParam* GetParamLast() const { return &fParamLast; }
-   Int_t GetLastPlaneId() const { return fLastPlaneId; };
+   Int_t GetLastStationId() const { return fLastStationId; };
    const CbmLitHit* GetHit(Int_t index) const { return fHits[index];}
    const vector<const CbmLitHit*>& GetHits() const { return fHits;}
    const CbmLitFitNode* GetFitNode(Int_t index) const {return &fFitNodes[index];}
@@ -81,7 +81,7 @@ public:
    void SetParamLast(const CbmLitTrackParam* par) { fParamLast = *par; }
    /* TODO temporarily needed for equal_range algorithm */
    void SetNofHits(Int_t nofHits) { fHits.resize(nofHits); }
-   void SetLastPlaneId(Int_t lastPlaneId) { fLastPlaneId = lastPlaneId; }
+   void SetLastStationId(Int_t lastPlaneId) { fLastStationId = lastPlaneId; }
    void SetFitNodes(const vector<CbmLitFitNode>& nodes) {fFitNodes = nodes;}
    void SetNofMissingHits(Int_t nofMissingHits) {fNofMissingHits = nofMissingHits;}
    void SetRefId(Int_t refId) {fRefId = refId;}
@@ -141,7 +141,7 @@ public:
       std::stringstream ss;
       ss << "Track: quality=" <<  fQuality << ", chi2=" << fChi2
          << ", ndf=" << fNDF << ", previousTrackId=" << fPreviousTrackId
-         << ", lastPlaneId=" << fLastPlaneId << ", pdg=" << fPDG
+         << ", lastStationId=" << fLastStationId << ", pdg=" << fPDG
          << ", nofHits=" << fHits.size() << ", nofFitNodes=" << fFitNodes.size() << std::endl;
       return ss.str();
    }
@@ -155,7 +155,7 @@ private:
    litfloat fChi2; // Chi-square
    Int_t fNDF; // Number of degrees of freedom
    Int_t fPreviousTrackId; // Index of the previous track, i.e. STS
-   Int_t fLastPlaneId; // Last detector plane where track has a hit
+   Int_t fLastStationId; // Last detector station where track has a hit
    Int_t fPDG; // PDG code
    Int_t fNofMissingHits; // Number of missing hits
    Int_t fRefId; // Reference to MC
@@ -165,7 +165,7 @@ private:
 /**
  * \brief Comparator for STL sorting algorithms.
  */
-class CompareTrackPtrChi2OverNdfLess :
+class CompareTrackPtrChiSqOverNdfLess :
    public std::binary_function<
    const CbmLitTrack*,
    const CbmLitTrack*,
@@ -229,7 +229,7 @@ public:
 /**
  * \brief Comparator for STL sorting algorithms.
  */
-class CompareTrackPtrLastPlaneIdMore :
+class CompareTrackPtrLastStationIdMore :
    public std::binary_function<
    const CbmLitTrack*,
    const CbmLitTrack*,
@@ -237,7 +237,7 @@ class CompareTrackPtrLastPlaneIdMore :
 {
 public:
    Bool_t operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
-      return track1->GetLastPlaneId() > track2->GetLastPlaneId();
+      return track1->GetLastStationId() > track2->GetLastStationId();
    }
 };
 

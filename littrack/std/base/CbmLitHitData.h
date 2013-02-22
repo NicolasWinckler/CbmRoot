@@ -1,9 +1,8 @@
-/** CbmLitHitData.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- **
- ** Class for accessing the hits in the track reconstruction.
+/**
+ * \file CbmLitHitData.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \since 2008
+ * \brief Class for accessing the hits in the track reconstruction.
  **/
 
 #ifndef CBMLITHITDATA_H_
@@ -12,111 +11,154 @@
 #include "base/CbmLitTypes.h"
 
 #include <vector>
+#include <set>
+#include <map>
 #include <string>
 #include <utility>
 
-class CbmLitDetectorLayout;
+using std::set;
+using std::vector;
+using std::map;
+
 class CbmLitHit;
 
 class CbmLitHitData
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitHitData();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitHitData();
 
-   /* Sets the detector layout for which the hits are arranged
-    *@param layout Detector layout
+   /**
+    * \brief Set number of stations.
     */
-   void SetDetectorLayout(
-      const CbmLitDetectorLayout& layout);
+   void SetNofStations(Int_t nofStations);
 
-   /* Adds the hit using station group, station and substation indices
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param substation Index of the substation in the station
-    *@param
-    *@param hit Pointer to the hit to be added
+   /**
+    * \brief Add hit.
+    * \param[in] hit Pointer to hit to be added.
     */
    void AddHit(
-      Int_t stationGroup,
-      Int_t station,
-      Int_t substation,
-      Int_t moduleRotation,
       CbmLitHit* hit);
 
-   /* Returns the hit using station group, station and substation indices
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param substation Index of the substation in the station
-    *@param moduleRotation
-    *@param hitId Hit index in the array of hits for the specified substation
-    *@return Hit pointer
+   /**
+    * \brief Return hit pointer.
+    * \param[in] station Index of the station.
+    * \param[in] hitId Hit index in array of hits for the specified station.
+    * \return Hit pointer.
     */
    const CbmLitHit* GetHit(
-      Int_t stationGroup,
       Int_t station,
-      Int_t substation,
-      Int_t moduleRotation,
       Int_t hitId) const;
 
-   /* Returns hit iterators using station group, station and substation indices
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param substation Index of the substation in the station
-    *@param moduleRotation
-    *@return Hit iterators
+   /**
+    * \brief Return array of hits.
+    * \param[in] station Index of station.
+    * \return Array of hits.
     */
-   HitPtrIteratorPair GetHits(
-      Int_t stationGroup,
-      Int_t station,
-      Int_t substation,
-      Int_t moduleRotation);
+   const HitPtrVector& GetHits(
+      Int_t station);
 
-   /* Returns number of hits for the specified substation
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param substation Index of the substation in the station
-    *@param moduleRotation
-    *@return Number of hits
+   /**
+    * \brief Return number of hits for the specified station index.
+    * \param[in] station Index of station.
+    * \return Number of hits for the specified station index.
     */
    Int_t GetNofHits(
-      Int_t stationGroup,
-      Int_t station,
-      Int_t substation,
-      Int_t moduleRotation) const;
+      Int_t station) const;
 
-   /* Returns maximum hit error in [cm] and the name of the coordinate
-    * ("X", "Y", "U") for the specified substation.
-    *@param stationGroup Index of the station group in the detector
-    *@param station Index of the station in the station group
-    *@param substation Index of the substation in the station
-    *@param moduleRotation
-    *@return Pair of hit error and and coordinate ID
+   /**
+    * \breif Return maximum hit error in [cm] and coordinate name ("X", "Y", "U").
+    * \param[in] station Index of station.
+    * \return Pair of hit error and and coordinate name.
     */
-   std::pair<litfloat, char> GetMaxErr(
-      Int_t stationGroup,
-      Int_t station,
-      Int_t substation,
-      Int_t moduleRotation) const;
+   litfloat GetMaxErrX(
+      Int_t station) const;
 
-   /* Clears the hit arrays */
+   /**
+    * \breif Return maximum hit error in [cm] and coordinate name ("X", "Y", "U").
+    * \param[in] station Index of station.
+    * \return Pair of hit error and and coordinate name.
+    */
+   litfloat GetMaxErrY(
+      Int_t station) const;
+
+//   /**
+//    * \brief Return Z positions of hits.
+//    * \param[in] station Index of station.
+//    * \return Z positions of hits
+//    */
+//   const vector<litfloat>& GetZPos(
+//      Int_t station) const;
+
+   /**
+    * \brief Return bin numbers for Z positions of hits.
+    * \param[in] station Index of station.
+    * \return Bin numbers.
+    */
+   const vector<Int_t>& GetZPosBins(
+      Int_t station) const;
+
+   /**
+    * \brief Return Z positions of hit.
+    * \param[in] station Index of station.
+    * \param[in] bin Bin number.
+    * \return Z positions of hits
+    */
+   litfloat GetZPosByBin(
+      Int_t station,
+      Int_t bin) const;
+
+   /**
+    * \brief Return bin number for hit Z position.
+    * \param[in] station Index of station.
+    * \param[in] zPos Z position.
+    * \return Bin number.
+    */
+   Int_t GetBinByZPos(
+      Int_t station,
+      litfloat zPos) const;
+
+   /**
+    * \brief Return minimum Z position of hits.
+    * \param[in] station Index of station.
+    * \return minimum Z position of hits
+    */
+   litfloat GetMinZPos(
+      Int_t station) const;
+
+   /**
+    * \brief Clear array of hits
+    */
    void Clear();
 
-   /* Returns std::string representation of this class
-    * @return String representation of the class
+   /**
+    * \brief Must be called after all hits are added.
     */
-   virtual std::string ToString() const;
+   void Arrange();
+
+   /**
+    * \brief Return string representation of this class.
+    * \return String representation of the class.
+    */
+   virtual string ToString() const;
 
 private:
-   // Arrays with hits
-   // [station group][station][substation][module rotation]
-   std::vector<std::vector<std::vector<std::vector<HitPtrVector> > > > fHits;
-   // Arrays with maximum hit position errors for each substation
-   // [station group][station][substation][module rotation]
-   std::vector<std::vector<std::vector<std::vector<std::pair<litfloat, char> > > > > fMaxErr;
+   static const litfloat EPSILON = 0.005;
+   vector<HitPtrVector> fHits; // Array of hits for each station
+   vector<litfloat> fMaxErrX; // Array of maximum X position errors for each station
+   vector<litfloat> fMaxErrY; // Array of maximum Y position errors for each station
+   Int_t fNofStations; // Number of stations
+   vector<set<litfloat> > fZPosSet; // Set of Z positions of hits in each station
+                                    // Temporarily used for Z different Z positions calculation
+   //vector<vector<litfloat> > fZPos; // Array of Z positions of hits in each station
+   vector<vector<Int_t> > fZPosBins; // Array of Z positions bin number of hits in each station
 };
 
 #endif /*CBMLITHITDATA_H_*/

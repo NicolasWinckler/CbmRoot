@@ -1,155 +1,124 @@
-/** CbmLitTrackFinderNN.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
- **
- ** Nearest neighbor tracking implementation. As input to tracking
- ** arrays with track seeds and hits from the detector are used.
- ** The track is prolongated from station to station and the
- ** nearest hit is attached to track. Flag fIsProcessSubstationsTogether
- ** defines which nearest hits should be attached to track.
+/**
+ * \file CbmLitTrackFinderNN.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \since 2008
+ * \brief Implementation of nearest neighbor tracking algorithm.
+ *
+ * Input to tracking: array of track seeds and array of hits.
+ * The track is propagated from station to station and the
+ * nearest hit is attached to track.
  **/
 
 #ifndef CBMLITTRACKFINDERNN_H_
 #define CBMLITTRACKFINDERNN_H_
 
 #include "base/CbmLitTypes.h"
-#include "finder/CbmLitTrackFinderBase.h"
+#include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitHitData.h"
+#include "interface/CbmLitTrackFinder.h"
 #include <vector>
 
-class CbmLitTrackFinderNN : public CbmLitTrackFinderBase
+using std::vector;
+
+class CbmLitTrackFinderNN : public CbmLitTrackFinder
 {
 public:
-   /* Constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitTrackFinderNN();
 
-   /* Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitTrackFinderNN();
 
-   /* Inherited from CbmLitTrackFinder */
+   /**
+    * \brief Inherited from CbmLitTrackFinder.
+    */
    virtual LitStatus DoFind(
       HitPtrVector& hits,
       TrackPtrVector& trackSeeds,
       TrackPtrVector& tracks);
 
-   /* Sets seed selection tool.
-    * @param seedSelection Pointer to seed selection tool.
-    */
-   void SetSeedSelection(TrackSelectionPtr seedSelection) {
-      fSeedSelection=seedSelection;
-   }
-
-   /* Sets track propagator tool.
-    * @param propagator Pointer to track propagator tool.
-    */
-   void SetPropagator(TrackPropagatorPtr propagator) {
-      fPropagator = propagator;
-   }
-
-   /* Sets final track selection tool.
-    * @param finalSelection Pointer to final track selection tool.
-    */
-   void SetFinalSelection(TrackSelectionPtr finalSelection) {
-      fFinalSelection = finalSelection;
-   }
-
-   /* Sets KF update tool.
-    * @param filter Pointer to KF update tool.
-    */
-   void SetFilter(TrackUpdatePtr filter) {
-      fFilter = filter;
-   }
-
-   /* Sets the flag which defines which nearest hits will be attached to track.
-    * If true than only one nearest hit from all substations in station will be attached to track.
-    * If false than the nearest hit from each substation in station will be attached to the track.
-    * @param isProcessSubstationsTogether Flag value.
-    */
-   void IsProcessSubstationsTogether(bool isProcessSubstationsTogether) {
-      fIsProcessSubstationsTogether = isProcessSubstationsTogether;
-   }
+   /* Setters */
+   void SetSeedSelection(TrackSelectionPtr seedSelection) { fSeedSelection = seedSelection; }
+   void SetFinalSelection(TrackSelectionPtr finalSelection) { fFinalSelection = finalSelection; }
+   void SetPropagator(TrackPropagatorPtr propagator) { fPropagator = propagator; }
+   void SetFilter(TrackUpdatePtr filter) { fFilter = filter; }
+   void SetNofStations(Int_t nofStations) { fNofStations = nofStations; }
+   void SetNofIterations(Int_t nofIterations) { fNofIterations = nofIterations; }
+   void SetMaxNofMissingHits(const vector<Int_t>& maxNofMissingHits) { fMaxNofMissingHits = maxNofMissingHits; }
+   void SetPDG(const vector<Int_t>& pdg) { fPDG = pdg; }
+   void SetChiSqStripHitCut(const vector<litfloat>& chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut; }
+   void SetChiSqPixelHitCut(const vector<litfloat>& chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut; }
+   void SetSigmaCoef(const vector<litfloat>& sigmaCoef) { fSigmaCoef = sigmaCoef; }
 
 protected:
 
-   /* Inherited from CbmLitTrackFinderBase */
-   void SetIterationParameters(
-      int iter);
+   void ArrangeHits(
+      HitPtrIterator itBegin,
+      HitPtrIterator itEnd);
 
-   /* Initialize the track seeds, i.e. selects with the track selection tool
-    * proper ones and copies to local array.
-    * @param itBegin Iterator to the first track seed.
-    * @param itEnd iterator to the last track seed.
+   /**
+    * \brief Initialize track seeds and copy to local array.
+    * \param[in] itBegin Iterator to the first track seed.
+    * \param[in] itEnd Iterator to the last track seed.
     */
    void InitTrackSeeds(
       TrackPtrIterator itBegin,
       TrackPtrIterator itEnd);
 
-   /* Follows tracks through the detector
-    * @param itBegin Iterator to the first track.
-    * @param itEnd Iterator to the last track.
+   /**
+    * \brief Follow tracks through detector
+    * \param[in] itBegin Iterator to the first track.
+    * \param[in] itEnd Iterator to the last track.
     */
    void FollowTracks(
       TrackPtrIterator itBegin,
       TrackPtrIterator itEnd);
 
-   /* Follow one track through the detector.
-    * @param track Pointer to the track.
+   /**
+    * \brief Write already used hits to a used hits set.
+    * \param[in] Iterator to the first track.
+    * \param[in] Iterator to the last track.
     */
-   void FollowTrack(
-      CbmLitTrack* track);
+   void RemoveHits(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd);
 
-   /* Processes the station group in order to attach hit(s) to track.
-    * @param track Pointer to the track
-    * @param stationGroup Index of the station group.
-    * @return True if the track successfully passed through the station group.
+   /**
+    * \brief Copy tracks to output array.
+    * \param[in] Iterator to the first track.
+    * \param[in] Iterator to the last track.
+    * \param[out] Output track array.
     */
-   bool ProcessStationGroup(
-      CbmLitTrack* track,
-      int stationGroup);
+   void CopyToOutput(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd,
+      TrackPtrVector& tracks);
 
-   /* Processes the station in station group in order to attach hit(s) to track.
-    * @param track Pointer to the track.
-    * @param stationGroup Index of the station group.
-    * @param station Index of the station in the station group.
-    * @return True if the hit was attached to track.
-    */
-   bool ProcessStation(
-      CbmLitTrack* track,
-      int stationGroup,
-      int station);
-
-   /* Adds the nearest hit to the track when fIsProcessSubstationsTogether == true.
-    * @param track Pointer to the track.
-    * @param hits Reference to hit vector from which the nearest hit will be attached.
-    * @return True if the hit was attached to track.
-    */
-   bool AddNearestHit1(
-      CbmLitTrack* track,
-      std::vector<HitPtrIteratorPair>& hits,
-      const std::vector<CbmLitTrackParam>& par,
-      int nofSubstations);
-
-   /* Adds the nearest hit to the track when fIsProcessSubstationsTogether == false.
-    * @param track Pointer to the track.
-    * @param hits Reference to hit vector from which the nearest hit will be attached.
-    * @return True if the hit was attached to track.
-    */
-   bool AddNearestHit2(
-      CbmLitTrack* track,
-      std::vector<HitPtrIteratorPair>& hits,
-      const std::vector<CbmLitTrackParam>& par,
-      int nofSubstations);
 private:
-   TrackPtrVector fTracks; // local copy of tracks
+   TrackPtrVector fTracks; // Local copy of tracks.
+   CbmLitHitData fHitData; // Hit storage.
+   std::set<Int_t> fUsedHitsSet; // Sets with hits that have been used.
+   std::set<Int_t> fUsedSeedsSet; // Set with track seeds that have been used.
 
-   TrackUpdatePtr fFilter; // KF update tool
-   TrackSelectionPtr fSeedSelection; // seed selection tool
-   TrackSelectionPtr fFinalSelection; // final track selection tool
-   TrackPropagatorPtr fPropagator; // track propagation tool
+   TrackSelectionPtr fSeedSelection; // Seed selection tool.
+   TrackSelectionPtr fFinalSelection; // Final track selection tool.
+   TrackPropagatorPtr fPropagator; // Track propagation tool.
+   TrackUpdatePtr fFilter; // KF update tool.
 
-   // If true than only one nearest hit from all substations in station will be attached to track.
-   // If false than the nearest hit from each substation in station will be attached to the track.
-   bool fIsProcessSubstationsTogether;
+   Int_t fNofStations; // Number of tracking stations.
+   Int_t fNofIterations; // Number of tracking iterations
+   Int_t fIteration; // Current tracking iteration
+   // Tracking parameters for each iteration
+   vector<Int_t> fMaxNofMissingHits; // Maximum number of acceptable missing hits.
+   vector<Int_t> fPDG; // Particle hypothesis for tracking.
+   vector<litfloat> fChiSqStripHitCut; // Chi-square cut for strip hits.
+   vector<litfloat> fChiSqPixelHitCut; // Chi-square cut for pixel hits.
+   vector<litfloat> fSigmaCoef; // Sigma coefficient for preliminary hit selection
 };
 
 #endif /* CBMLITTRACKFINDERNN_H_ */
+

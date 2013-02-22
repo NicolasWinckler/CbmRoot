@@ -21,13 +21,10 @@ set(STD_DIR "std/")
 
 set(LITTRACKSTD_SRCS_RULECHECKER
 
-${STD_DIR}base/CbmLitDetectorLayout.cxx
 ${STD_DIR}base/CbmLitHitData.cxx
 
-${STD_DIR}finder/CbmLitTrackFinderBase.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBranch.cxx
 ${STD_DIR}finder/CbmLitTrackFinderNN.cxx
-${STD_DIR}finder/CbmLitGating.cxx
 ${STD_DIR}finder/CbmLitNearestHitTofMerger.cxx
 
 ${STD_DIR}fitter/CbmLitTrackFitterImp.cxx 
@@ -38,18 +35,14 @@ ${STD_DIR}fitter/CbmLitTrackFitterIter.cxx
 ${STD_DIR}propagation/CbmLitTGeoTrackPropagator.cxx 
 ${STD_DIR}propagation/CbmLitRK4TrackExtrapolator.cxx
 ${STD_DIR}propagation/CbmLitLineTrackExtrapolator.cxx
-#${STD_DIR}propagation/CbmLitTrackPropagatorGeane.cxx
 ${STD_DIR}propagation/CbmLitTGeoNavigator.cxx
-##${STD_DIR}propagation/CbmLitMaterialEffectsImp.cxx
 ${STD_DIR}propagation/CbmLitCleverTrackExtrapolator.cxx
 
 ${STD_DIR}selection/CbmLitQualitySort.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionCuts.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionEmpty.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionMuch.cxx
-${STD_DIR}selection/CbmLitTrackSelectionSameSeed.cxx
-${STD_DIR}selection/CbmLitTrackSelectionSharedHits.cxx 
-${STD_DIR}selection/CbmLitTrackSelectionShortTracks.cxx 
+${STD_DIR}selection/CbmLitTrackSelectionSharedHits.cxx
 ${STD_DIR}selection/CbmLitTrackSelectionTrd.cxx
 
 ${STD_DIR}utils/CbmLitMath.cxx 

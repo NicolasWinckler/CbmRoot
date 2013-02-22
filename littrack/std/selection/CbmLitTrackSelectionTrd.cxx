@@ -1,26 +1,21 @@
-/* CbmLitTrackSelectionTrd.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2008
- * @version 1.0
+/**
+ * \file CbmLitTrackSelectionTrd.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  */
 
 #include "selection/CbmLitTrackSelectionTrd.h"
 
 #include "data/CbmLitTrack.h"
 #include "selection/CbmLitTrackSelectionSharedHits.h"
-#include "selection/CbmLitTrackSelectionSameSeed.h"
-#include "selection/CbmLitTrackSelectionCuts.h"
 
 #include <set>
 #include <functional>
 
 CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd():
-   fNofSharedHits(0),
-   fMinNofHits(0)
+   fNofSharedHits(0)
 {
    fSharedHitsSelection = TrackSelectionPtr(new CbmLitTrackSelectionSharedHits());
-   fSameSeedSelection = TrackSelectionPtr(new CbmLitTrackSelectionSameSeed());
-   fCutsSelection = TrackSelectionPtr(new CbmLitTrackSelectionCuts());
 }
 
 CbmLitTrackSelectionTrd::~CbmLitTrackSelectionTrd()
@@ -34,15 +29,12 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
    if (itBegin == itEnd) { return kLITSUCCESS; }
 
    ((CbmLitTrackSelectionSharedHits*)fSharedHitsSelection.get())->SetNofSharedHits(fNofSharedHits);
-   ((CbmLitTrackSelectionCuts*)fCutsSelection.get())->SetMinNofHits(fMinNofHits);
 
    for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
       (*iTrack)->SetQuality(kLITGOOD);
    }
 
    fSharedHitsSelection->DoSelect(itBegin, itEnd);
-   fSameSeedSelection->DoSelect(itBegin, itEnd);
-   fCutsSelection->DoSelect(itBegin, itEnd);
 
    return kLITSUCCESS;
 }

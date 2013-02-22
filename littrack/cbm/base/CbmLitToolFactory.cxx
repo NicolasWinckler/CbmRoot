@@ -1,14 +1,13 @@
-/** CbmLitToolFactory.cxx
- *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
+/**
+ * \file CbmLitToolFactory.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
  **/
 
 #include "base/CbmLitToolFactory.h"
-
 #include "base/CbmLitMapField.h"
 #include "base/CbmLitTrackingGeometryConstructor.h"
 #include "base/CbmLitPtrTypes.h"
-#include "base/CbmLitTrackFinderSettings.h"
 #include "finder/CbmLitTrackFinderNN.h"
 #include "finder/CbmLitTrackFinderBranch.h"
 #include "finder/CbmLitNearestHitTofMerger.h"
@@ -31,6 +30,12 @@
 
 #include "FairRunAna.h"
 
+#include <cassert>
+
+#include <boost/assign/list_of.hpp>
+
+using boost::assign::list_of;
+
 CbmLitToolFactory::CbmLitToolFactory()
 {
 }
@@ -48,16 +53,14 @@ CbmLitToolFactory* CbmLitToolFactory::Instance()
 TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
    const std::string& name)
 {
-   if(name == "line") {
-      TrackExtrapolatorPtr extrapolator(new CbmLitLineTrackExtrapolator());
-      return extrapolator;
+   assert(name == "line" || name == "rk4" || name == "lit");
+   if (name == "line") {
+      return TrackExtrapolatorPtr(new CbmLitLineTrackExtrapolator());
    } else if (name == "rk4") {
       CbmLitField* field = new CbmLitMapField(FairRunAna::Instance()->GetField());
-      TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator(field));
-      return extrapolator;
+      return TrackExtrapolatorPtr(new CbmLitRK4TrackExtrapolator(field));
    } else if (name == "lit") {
-      TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator(""));
-      return extrapolator;
+      return TrackExtrapolatorPtr(new CbmLitCleverTrackExtrapolator());
    }
    return TrackExtrapolatorPtr();
 }
@@ -65,15 +68,13 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
 TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
    const std::string& name)
 {
-   if(name == "lit") {
-      TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("lit")));
-      return propagator;
+   assert(name == "lit" || name == "rk4" || name == "line");
+   if (name == "lit") {
+      return TrackPropagatorPtr(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("lit")));
    } else if(name == "rk4") {
-      TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
-      return propagator;
+      return TrackPropagatorPtr(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
    } else if(name == "line") {
-      TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("line")));
-      return propagator;
+      return TrackPropagatorPtr(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("line")));
    }
    return TrackPropagatorPtr();
 }
@@ -81,9 +82,9 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
 TrackUpdatePtr CbmLitToolFactory::CreateTrackUpdate(
    const std::string& name)
 {
-   if(name == "kalman") {
-      TrackUpdatePtr update(new CbmLitKalmanFilter());
-      return update;
+   assert(name == "kalman");
+   if (name == "kalman") {
+      return TrackUpdatePtr(new CbmLitKalmanFilter());
    }
    return TrackUpdatePtr();
 }
@@ -91,21 +92,15 @@ TrackUpdatePtr CbmLitToolFactory::CreateTrackUpdate(
 TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
    const std::string& name)
 {
-   if(name == "lit_kalman") {
-      TrackPropagatorPtr propagator = CreateTrackPropagator("lit");
-      //((CbmLitTGeoTrackPropagator*) propagator)->IsCalcTransportMatrix(true);
-      TrackUpdatePtr update = CreateTrackUpdate("kalman");
-      TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
-      return fitter;
+   assert(name == "lit_kalman" || name == "kalman_smoother" || name == "kalman_parallel_muon" || name == "kalman_parallel_electron");
+   if (name == "lit_kalman") {
+      return TrackFitterPtr(new CbmLitTrackFitterImp(CreateTrackPropagator("lit"), CreateTrackUpdate("kalman")));
    } else if (name == "kalman_smoother") {
-      TrackFitterPtr fitter(new CbmLitKalmanSmoother());
-      return fitter;
+      return TrackFitterPtr(new CbmLitKalmanSmoother());
    } else if (name == "kalman_parallel_muon") {
-      TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestMuon());
-      return fitter;
+      return TrackFitterPtr(new CbmLitParallelTrackFitterTestMuon());
    } else if (name == "kalman_parallel_electron") {
-      TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestElectron());
-      return fitter;
+      return TrackFitterPtr(new CbmLitParallelTrackFitterTestElectron());
    }
    return TrackFitterPtr();
 }
@@ -113,50 +108,29 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
 TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
    const std::string& name)
 {
-   if(name == "empty") {
-      TrackSelectionPtr selection(new CbmLitTrackSelectionEmpty());
-      return selection;
-   } else if(name == "momentum") {
-      //TrackSelectionPtr selection(new CbmLitTrackSelectionMomentum());
+   assert(name == "empty" || name == "momentum" || name == "momentum_seed" || name == "chi_square" || name == "much_final" || name == "trd_final");
+   if (name == "empty") {
+      return TrackSelectionPtr(new CbmLitTrackSelectionEmpty());
+   } else if (name == "momentum") {
       CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
       momSelection->SetMinMomentum(0.1);
-      TrackSelectionPtr selection(momSelection);
-      return selection;
-   } else if(name == "momentum_seed") {
+      return TrackSelectionPtr(momSelection);
+   } else if (name == "momentum_seed") {
       CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
       momSelection->SetMinMomentum(1.0);
-      TrackSelectionPtr selection(momSelection);
-      return selection;
-   } else if(name == "chi_square") {
+      return TrackSelectionPtr(momSelection);
+   } else if (name == "chi_square") {
       CbmLitTrackSelectionCuts* chiSqSelection = new CbmLitTrackSelectionCuts();
       chiSqSelection->SetMaxChiSq(30.);
-      TrackSelectionPtr selection(chiSqSelection);
-      return selection;
-   } else if(name == "much_final") {
+      return TrackSelectionPtr(chiSqSelection);
+   } else if (name == "much_final") {
       CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
       muchSelection->SetNofSharedHits(3);
-      muchSelection->SetMinNofHits(1);
-      muchSelection->SetMinLastPlaneId(0);
-      TrackSelectionPtr selection(muchSelection);
-      return selection;
-   } else if(name == "trd_station") {
-      CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
-      trdSelection->SetNofSharedHits(2);
-      trdSelection->SetMinNofHits(0);
-      TrackSelectionPtr selection(trdSelection);
-      return selection;
-   } else if(name == "trd_final") {
+      return TrackSelectionPtr(muchSelection);
+   } else if (name == "trd_final") {
       CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
       trdSelection->SetNofSharedHits(3);
-      trdSelection->SetMinNofHits(0);
-      TrackSelectionPtr selection(trdSelection);
-      return selection;
-   } else if(name == "trd_final_iter_1") {
-      CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
-      trdSelection->SetNofSharedHits(3);
-      trdSelection->SetMinNofHits(8);
-      TrackSelectionPtr selection(trdSelection);
-      return selection;
+      return TrackSelectionPtr(trdSelection);
    }
    return TrackSelectionPtr();
 }
@@ -164,125 +138,83 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
    const std::string& name)
 {
-	if(name == "e_nn") {
-		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
-		CbmLitTrackFinderSettings settings;
-		settings.SetNofIter(1);
-		settings.SetPropagator(CreateTrackPropagator("lit"));
-		settings.SetSeedSelection(CreateTrackSelection("momentum"));
-		//      settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
-		settings.SetFinalSelection(0, CreateTrackSelection("trd_final"));
-		settings.SetFilter(CreateTrackUpdate("kalman"));
-		settings.IsUseFastSearch(true);
-		settings.SetMaxNofMissingHits(4);
-		settings.SetSigmaCoef(5.);
-		settings.SetChiSqPixelHitCut(0, 15.);
-		//      settings.SetChiSqPixelHitCut(1, 25.);
-		settings.SetChiSqStripHitCut(9.);
-		settings.SetPDG(0, 211);
-		//      settings.SetPDG(1, 11);
-		settings.IsProcessSubstationsTogether(true);
-		trdFinderNN->SetSettings(settings);
-		trdFinderNN->SetZPropagationForTrackSeeds(400.);
-		trdFinderNN->SetUseTGeo(false);
-		trdFinderNN->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
-		TrackFinderPtr finder(trdFinderNN);
-		return finder;
-	} else if(name == "e_branch") {
-		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
-		CbmLitTrackFinderSettings settings;
-		settings.SetNofIter(2);
-		settings.SetPropagator(CreateTrackPropagator("lit"));
-		settings.SetSeedSelection(CreateTrackSelection("momentum"));
-		settings.SetStationGroupSelection(CreateTrackSelection("trd_station"));
-		settings.SetFinalSelection(0, CreateTrackSelection("trd_final_iter_1"));
-		settings.SetFinalSelection(1, CreateTrackSelection("trd_final"));
-		settings.SetFilter(CreateTrackUpdate("kalman"));
-		settings.IsUseFastSearch(true);
-		settings.SetPDG(0, 211);
-		settings.SetPDG(1, 11);
-		settings.IsProcessSubstationsTogether(true);
-		settings.SetMaxNofMissingHits(4);
-		settings.IsAlwaysCreateMissingHit(false);
-		settings.SetSigmaCoef(5.);
-		settings.SetChiSqPixelHitCut(0, 15.);
-		settings.SetChiSqPixelHitCut(1, 50.);
-		settings.SetChiSqStripHitCut(9.);
-		trdFinderBranch->SetSettings(settings);
-		trdFinderBranch->SetZPropagationForTrackSeeds(400.);
-		trdFinderBranch->SetUseTGeo(false);
-		trdFinderBranch->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
-		TrackFinderPtr finder(trdFinderBranch);
-		return finder;
-   } else if(name == "mu_nn") {
+   assert(name == "e_nn" || name == "e_branch" || name == "mu_nn" || name == "mu_branch" || name == "e_nn_parallel" || name == "mu_nn_parallel" || name == "mvd_nn");
+   if (name == "e_nn") {
+      CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
+      trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
+      trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
+      trdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+      trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+      trdFinderNN->SetNofStations(CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchTrdStations());
+      trdFinderNN->SetNofIterations(1);
+      trdFinderNN->SetMaxNofMissingHits(list_of(4));
+      trdFinderNN->SetPDG(list_of(211));
+      trdFinderNN->SetChiSqStripHitCut(list_of(9.));
+      trdFinderNN->SetChiSqPixelHitCut(list_of(25.));
+      trdFinderNN->SetSigmaCoef(list_of(5.));
+      return TrackFinderPtr(trdFinderNN);
+   } else if (name == "e_branch") {
+      CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
+      trdFinderBranch->SetSeedSelection(CreateTrackSelection("momentum"));
+      trdFinderBranch->SetFinalSelection(CreateTrackSelection("trd_final"));
+      trdFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
+      trdFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
+      trdFinderBranch->SetNofStations(CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchTrdStations());
+      trdFinderBranch->SetNofIterations(1);
+      trdFinderBranch->SetMaxNofMissingHits(list_of(4));
+      trdFinderBranch->SetPDG(list_of(211));
+      trdFinderBranch->SetChiSqStripHitCut(list_of(9.));
+      trdFinderBranch->SetChiSqPixelHitCut(list_of(25.));
+      trdFinderBranch->SetSigmaCoef(list_of(5.));
+      return TrackFinderPtr(trdFinderBranch);
+   } else if (name == "mu_nn") {
       CbmLitTrackFinderNN* muchFinderNN = new CbmLitTrackFinderNN();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
-      settings.SetSeedSelection(CreateTrackSelection("momentum_seed"));
-      settings.SetFinalSelection(CreateTrackSelection("much_final"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.IsUseFastSearch(true);
-      settings.SetMaxNofMissingHits(3);
-      settings.SetSigmaCoef(3.5);
-      settings.SetChiSqPixelHitCut(15.);//13.86);
-      settings.SetChiSqStripHitCut(9.);
-      settings.SetPDG(13);
-      settings.IsProcessSubstationsTogether(true);
-      muchFinderNN->SetSettings(settings);
-      muchFinderNN->SetZPropagationForTrackSeeds(-1.);
-	  muchFinderNN->SetUseTGeo(false);
-      muchFinderNN->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
-      TrackFinderPtr finder(muchFinderNN);
-      return finder;
-   } else if(name == "e_nn_parallel") {
-      CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_parallel_electron");
-      TrackFinderPtr finder(finderNN);
-      return finder;
-   } else if(name == "mu_nn_parallel") {
-      CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel("nn_parallel_muon");
-      TrackFinderPtr finder(muchFinderNN);
-      return finder;
-   } else if(name == "mu_branch") {
+      muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+      muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
+      muchFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+      muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+      muchFinderNN->SetNofStations(CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchTrdStations());
+      muchFinderNN->SetNofIterations(1);
+      muchFinderNN->SetMaxNofMissingHits(list_of(4));
+      muchFinderNN->SetPDG(list_of(13));
+      muchFinderNN->SetChiSqStripHitCut(list_of(9.));
+      muchFinderNN->SetChiSqPixelHitCut(list_of(25.));
+      muchFinderNN->SetSigmaCoef(list_of(5.));
+      return TrackFinderPtr(muchFinderNN);
+   } else if (name == "mu_branch") {
       CbmLitTrackFinderBranch* muchFinderBranch = new CbmLitTrackFinderBranch();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("lit"));
-      settings.SetSeedSelection(CreateTrackSelection("momentum_seed"));
-      settings.SetStationGroupSelection(CreateTrackSelection("momentum"));
-      settings.SetFinalSelection(CreateTrackSelection("much_final"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.IsUseFastSearch(true);
-      settings.SetPDG(13);
-      settings.IsProcessSubstationsTogether(true);
-      settings.SetMaxNofMissingHits(3);
-      settings.IsAlwaysCreateMissingHit(false);
-      settings.SetSigmaCoef(3.5);
-      settings.SetChiSqPixelHitCut(15.);//13.86);
-      settings.SetChiSqStripHitCut(11.);
-      muchFinderBranch->SetSettings(settings);
-      muchFinderBranch->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetLayout());
-      TrackFinderPtr finder(muchFinderBranch);
-      return finder;
-   } else if(name == "mvd_nn") {
+      muchFinderBranch->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+      muchFinderBranch->SetFinalSelection(CreateTrackSelection("much_final"));
+      muchFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
+      muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
+      muchFinderBranch->SetNofStations(CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchTrdStations());
+      muchFinderBranch->SetNofIterations(1);
+      muchFinderBranch->SetMaxNofMissingHits(list_of(4));
+      muchFinderBranch->SetPDG(list_of(13));
+      muchFinderBranch->SetChiSqStripHitCut(list_of(9.));
+      muchFinderBranch->SetChiSqPixelHitCut(list_of(25.));
+      muchFinderBranch->SetSigmaCoef(list_of(5.));
+      return TrackFinderPtr(muchFinderBranch);
+   } else if (name == "mvd_nn") {
       CbmLitTrackFinderNN* mvdFinderNN = new CbmLitTrackFinderNN();
-      CbmLitTrackFinderSettings settings;
-      settings.SetNofIter(1);
-      settings.SetPropagator(CreateTrackPropagator("rk4"));
-      settings.SetSeedSelection(CreateTrackSelection("empty"));
-      settings.SetFinalSelection(CreateTrackSelection("empty"));
-      settings.SetFilter(CreateTrackUpdate("kalman"));
-      settings.IsUseFastSearch(true);
-      settings.SetMaxNofMissingHits(1);
-      settings.SetSigmaCoef(3.5);
-      settings.SetChiSqPixelHitCut(15.);
-      settings.SetChiSqStripHitCut(9.);
-      settings.SetPDG(211);
-      settings.IsProcessSubstationsTogether(true);
-      mvdFinderNN->SetSettings(settings);
-      mvdFinderNN->SetLayout(CbmLitTrackingGeometryConstructor::Instance()->GetMvdLayout());
-      TrackFinderPtr finder(mvdFinderNN);
-      return finder;
+      mvdFinderNN->SetSeedSelection(CreateTrackSelection("empty"));
+      mvdFinderNN->SetFinalSelection(CreateTrackSelection("empty"));
+      mvdFinderNN->SetPropagator(CreateTrackPropagator("rk4"));
+      mvdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+      mvdFinderNN->SetNofStations(CbmLitTrackingGeometryConstructor::Instance()->GetNofMvdStations());
+      mvdFinderNN->SetNofIterations(1);
+      mvdFinderNN->SetMaxNofMissingHits(list_of(1));
+      mvdFinderNN->SetPDG(list_of(211));
+      mvdFinderNN->SetChiSqStripHitCut(list_of(9.));
+      mvdFinderNN->SetChiSqPixelHitCut(list_of(15.));
+      mvdFinderNN->SetSigmaCoef(list_of(5.));
+      return TrackFinderPtr(mvdFinderNN);
+   } else if (name == "e_nn_parallel") {
+      CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_parallel_electron");
+      return TrackFinderPtr(finderNN);
+   } else if (name == "mu_nn_parallel") {
+      CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel("nn_parallel_muon");
+      return TrackFinderPtr(muchFinderNN);
    }
    return TrackFinderPtr();
 }
@@ -290,6 +222,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
    const std::string& name)
 {
+   assert(name == "tof_nearest_hit");
    if (name == "tof_nearest_hit") {
       CbmLitNearestHitTofMerger* nhMerger = new CbmLitNearestHitTofMerger();
       nhMerger->SetFieldPropagator(CreateTrackPropagator("lit"));
@@ -297,8 +230,7 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
       nhMerger->SetFilter(CreateTrackUpdate("kalman"));
       nhMerger->SetPDG(211);
       nhMerger->SetChiSqCut(50.);//13.86);
-      HitToTrackMergerPtr merger(nhMerger);
-      return merger;
+      return HitToTrackMergerPtr(nhMerger);
    }
    return HitToTrackMergerPtr();
 }

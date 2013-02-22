@@ -107,11 +107,10 @@ void CbmLitFindMvdTracks::ConvertInputData()
 
    CbmLitConverter::MvdHitArrayToHitVector(fMvdHits, fLitMvdHits);
    // Make reverse order of the hits
-   CbmLitTrackingGeometryConstructor* geo = CbmLitTrackingGeometryConstructor::Instance();
-   Int_t nofStations = geo->GetMvdLayout().GetStationGroup(0).GetNofStations();
+   Int_t nofStations = CbmLitTrackingGeometryConstructor::Instance()->GetNofMvdStations();
    for(Int_t iHit = 0; iHit < fLitMvdHits.size(); iHit++) {
       CbmLitHit* hit = fLitMvdHits[iHit];
-      hit->SetDetectorId(kLITMVD, hit->GetStationGroup(), nofStations - hit->GetStation() - 1, hit->GetSubstation(), hit->GetModule());
+      hit->SetDetectorId(kLITMVD, nofStations - hit->GetStation() - 1);
    }
    std::cout << "-I- Number of MVD hits: " << fLitMvdHits.size() << std::endl;
 }

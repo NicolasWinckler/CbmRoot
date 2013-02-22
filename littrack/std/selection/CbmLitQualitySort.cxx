@@ -1,7 +1,7 @@
-/* CbmLitQualitySort.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2011
- * @version 1.0
+/*
+ * \file CbmLitQualitySort.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2011
  */
 
 #include "selection/CbmLitQualitySort.h"
@@ -19,34 +19,34 @@ CbmLitQualitySort::~CbmLitQualitySort()
 
 }
 
-LitStatus CbmLitQualitySort::DoSort(
-   TrackPtrIterator itBegin,
-   TrackPtrIterator itEnd)
-{
-   if (itBegin == itEnd) { return kLITSUCCESS; }
+//LitStatus CbmLitQualitySort::DoSort(
+//   TrackPtrIterator itBegin,
+//   TrackPtrIterator itEnd)
+//{
+//   if (itBegin == itEnd) { return kLITSUCCESS; }
+//
+//   SortNofHits(itBegin, itEnd);
+//   //SortLastPlaneId(itBegin, itEnd);
+//
+//   return kLITSUCCESS;
+//}
+//
+//LitStatus CbmLitQualitySort::DoSort(
+//   TrackPtrVector& tracks)
+//{
+//   return DoSort(tracks.begin(), tracks.end());
+//}
 
-   SortNofHits(itBegin, itEnd);
-   //SortLastPlaneId(itBegin, itEnd);
-
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitQualitySort::DoSort(
-   TrackPtrVector& tracks)
-{
-   return DoSort(tracks.begin(), tracks.end());
-}
-
-void CbmLitQualitySort::SortNofHits(
+LitStatus CbmLitQualitySort::DoSortNofHits(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)
 {
    std::sort(itBegin, itEnd, CompareTrackPtrNofHitsMore());
 
-   int maxNofHits = (*itBegin)->GetNofHits();
-   int minNofHits = (*(itEnd-1))->GetNofHits();
+   Int_t maxNofHits = (*itBegin)->GetNofHits();
+   Int_t minNofHits = (*(itEnd-1))->GetNofHits();
 
-   for (int iNofHits = minNofHits; iNofHits <= maxNofHits; iNofHits++) {
+   for (Int_t iNofHits = minNofHits; iNofHits <= maxNofHits; iNofHits++) {
       CbmLitTrack value;
       value.SetNofHits(iNofHits);
 
@@ -55,28 +55,38 @@ void CbmLitQualitySort::SortNofHits(
 
       if(bounds.first == bounds.second) { continue; }
 
-      std::sort(bounds.first, bounds.second, CompareTrackPtrChi2OverNdfLess());
+      std::sort(bounds.first, bounds.second, CompareTrackPtrChiSqOverNdfLess());
    }
+   return kLITSUCCESS;
 }
 
-void CbmLitQualitySort::SortLastPlaneId(
+LitStatus CbmLitQualitySort::DoSortLastStation(
    TrackPtrIterator itBegin,
    TrackPtrIterator itEnd)
 {
-   std::sort(itBegin, itEnd, CompareTrackPtrLastPlaneIdMore());
+   std::sort(itBegin, itEnd, CompareTrackPtrLastStationIdMore());
 
-   int maxPlaneId = (*itBegin)->GetLastPlaneId();
-   int minPlaneId = (*(itEnd-1))->GetLastPlaneId();
+   Int_t maxPlaneId = (*itBegin)->GetLastStationId();
+   Int_t minPlaneId = (*(itEnd-1))->GetLastStationId();
 
-   for (int iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
+   for (Int_t iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
       CbmLitTrack value;
-      value.SetLastPlaneId(iPlaneId);
+      value.SetLastStationId(iPlaneId);
 
       std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
-      bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrLastPlaneIdMore());
+      bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrLastStationIdMore());
 
       if(bounds.first == bounds.second) { continue; }
 
-      std::sort(bounds.first, bounds.second, CompareTrackPtrChi2OverNdfLess());
+      std::sort(bounds.first, bounds.second, CompareTrackPtrChiSqOverNdfLess());
    }
+   return kLITSUCCESS;
+}
+
+LitStatus CbmLitQualitySort::DoSortChiSqOverNDF(
+      TrackPtrIterator itBegin,
+      TrackPtrIterator itEnd)
+{
+   std::sort(itBegin, itEnd, CompareTrackPtrChiSqOverNdfLess());
+   return kLITSUCCESS;
 }

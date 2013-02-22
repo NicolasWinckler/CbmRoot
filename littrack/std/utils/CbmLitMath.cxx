@@ -64,11 +64,11 @@ litfloat ChiSq(
            +(-xmx * (dxy - C1) + ymy * (dxx - C0)) * ymy) / norm;
 }
 
-int NDF(
+Int_t NDF(
    const CbmLitTrack* track)
 {
-   int ndf = 0;
-   for (int i = 0; i < track->GetNofHits(); i++) {
+   Int_t ndf = 0;
+   for (Int_t i = 0; i < track->GetNofHits(); i++) {
       if (track->GetHit(i)->GetType() == kLITPIXELHIT) { ndf += 2; }
       else if (track->GetHit(i)->GetType() == kLITSTRIPHIT) { ndf++; }
    }

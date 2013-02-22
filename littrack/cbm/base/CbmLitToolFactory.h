@@ -1,9 +1,8 @@
-/** CbmLitToolFactory.h
- *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
- *
- * Littrack tool factory. Most of the tools
- * are created using this factory.
+/**
+ * \file CbmLitToolFactory.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2008
+ * \brief Tool factory for creation of littrack algorithms.
  **/
 
 #ifndef CBMLITTOOLFACTORY_H_
@@ -14,52 +13,94 @@
 #include <string>
 #include <iostream>
 
+using std::string;
+
 class CbmLitToolFactory
 {
 public:
-   /* Returns pointer to the singleton object instance. */
+   /**
+    * \brief Return pointer to the singleton object instance.
+    * \return Singleton instance.
+    */
    static CbmLitToolFactory* Instance();
 
-   /* Creates track extrapolator tool by name. */
+   /**
+    * \brief Create track extrapolation tool by name.
+    * \param[in] name Tool name.
+    * \return Created track extrapolation tool.
+    */
    TrackExtrapolatorPtr CreateTrackExtrapolator(
-      const std::string& name);
+      const string& name);
 
-   /* Creates track propagator tool by name. */
+   /**
+    * \brief Create track propagation tool by name.
+    * \param[in] name Tool name.
+    * \return Created track propagation tool.
+    */
    TrackPropagatorPtr CreateTrackPropagator(
-      const std::string& name);
+      const string& name);
 
-   /* Creates track update tool by name. */
+   /**
+    * \brief Create track update tool by name.
+    * \param[in] name Tool name.
+    * \return Created track update tool.
+    */
    TrackUpdatePtr CreateTrackUpdate(
-      const std::string& name);
+      const string& name);
 
-   /* Creates track fitter tool by name. */
+   /**
+    * \brief Create track fit tool by name.
+    * \param[in] name Tool name.
+    * \return Created track fit tool.
+    */
    TrackFitterPtr CreateTrackFitter(
-      const std::string& name);
+      const string& name);
 
-   /* Creates track selection tool by name. */
+   /**
+    * \brief Create track selection tool by name.
+    * \param[in] name Tool name.
+    * \return Created track selection tool.
+    */
    TrackSelectionPtr CreateTrackSelection(
-      const std::string& name);
+      const string& name);
 
-   /* Creates track finder tool by name. */
+   /**
+    * \brief Create track selection tool by name.
+    * \param[in] name Tool name.
+    * \return Created track selection tool.
+    */
    TrackFinderPtr CreateTrackFinder(
-      const std::string& name);
+      const string& name);
 
-   /* Creates hit to track merger tool by name. */
+   /**
+    * \brief Create hot to track merge tool by name.
+    * \param[in] name Tool name.
+    * \return Created hit to track merge tool.
+    */
    HitToTrackMergerPtr CreateHitToTrackMerger(
-      const std::string& name);
+      const string& name);
 
 private:
-   /* Constructor is protected since singleton pattern is used.
-    * Pointer to the object is returned by static Instance() method. */
+   /**
+    * \brief Constructor.
+    * Constructor is protected since singleton pattern is used.
+    * Pointer to the object is returned by static Instance() method.
+    */
    CbmLitToolFactory();
 
-   /* Constructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitToolFactory();
 
-   /* Copy constructor */
+   /**
+    * \brief Copy constructor.
+    */
    CbmLitToolFactory(const CbmLitToolFactory&);
 
-   /* Assignment operator */
+   /**
+    * \brief Assignment operator.
+    */
    const CbmLitToolFactory& operator=(const CbmLitToolFactory&);
 };
 

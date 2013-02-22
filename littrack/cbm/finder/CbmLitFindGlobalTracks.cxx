@@ -177,8 +177,7 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 {
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    if (fDet.GetElectronSetup()) {
-      if (fTrackingType == "branch" || fTrackingType == "nn" ||
-            fTrackingType == "weight" || fTrackingType == "nn_parallel") {
+      if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "nn_parallel") {
          std::string st("e_");
          st += fTrackingType;
          fFinder = factory->CreateTrackFinder(st);
@@ -186,8 +185,7 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
          TObject::Fatal("CbmLitFindGlobalTracks","Tracking type not found");
       }
    } else {
-      if (fTrackingType == "branch" || fTrackingType == "nn" ||
-            fTrackingType == "weight" || fTrackingType == "nn_parallel") {
+      if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "nn_parallel") {
          std::string st("mu_");
          st += fTrackingType;
          fFinder = factory->CreateTrackFinder(st);
@@ -243,13 +241,13 @@ void CbmLitFindGlobalTracks::ConvertInputData()
    if (fTrdHits) {
       CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitHits);
       //If MUCH-TRD setup, than shift plane id for the TRD hits
-      if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
-         Int_t nofPlanes = CbmLitTrackingGeometryConstructor::Instance()->GetMuchLayout().GetNofPlanes();
-         for (Int_t i = 0; i < fLitHits.size(); i++) {
-            CbmLitHit* hit = fLitHits[i];
-//            if (hit->GetDetectorId() == kLITTRD) { hit->SetPlaneId(hit->GetPlaneId() + nofPlanes); } TODO No planeIDs now
-         }
-      }
+//      if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
+//         Int_t nofPlanes = CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchStations();
+//         for (Int_t i = 0; i < fLitHits.size(); i++) {
+//            CbmLitHit* hit = fLitHits[i];
+////            if (hit->GetDetectorId() == kLITTRD) { hit->SetPlaneId(hit->GetPlaneId() + nofPlanes); } TODO No planeIDs now
+//         }
+//      }
    }
    std::cout << "-I- Number of hits: " << fLitHits.size() << std::endl;
 
@@ -445,14 +443,14 @@ void CbmLitFindGlobalTracks::SelectTracksForTofMerging()
    // Only those tracks will be propagated further and merged
    // with TOF hits.
 
-   const CbmLitDetectorLayout& layout = CbmLitTrackingGeometryConstructor::Instance()->GetLayout();
-   Int_t stationGroupCut = layout.GetNofStationGroups() - 1;
+   Int_t nofStations = CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchTrdStations();
+   Int_t stationCut = nofStations - 4;
 
    for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++) {
       CbmLitTrack* track = *it;
       if (track->GetQuality() == kLITBAD) { continue; }
       const CbmLitHit* hit = track->GetHit(track->GetNofHits() - 1);
-      if (hit->GetStationGroup() >= stationGroupCut) {
+      if (hit->GetStation() >= stationCut) {
          // OK select this track for further merging with TOF
          track->SetQuality(kLITGOODMERGE);
       }

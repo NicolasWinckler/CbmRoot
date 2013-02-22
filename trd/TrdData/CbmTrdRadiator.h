@@ -37,91 +37,92 @@ class CbmTrdRadiator
   CbmTrdRadiator(Bool_t SimpleTR, TString prototype);
 
   /** Destructor **/
-   virtual ~CbmTrdRadiator();
+  virtual ~CbmTrdRadiator();
   
   /** Create the needed histograms **/
-   void CreateHistograms();
+  void CreateHistograms();
 
   /** Init function **/
-   void Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapTick, TString material);
+  void Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapTick, TString material);
   /** Init function **/
   void  Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick);
   /** Init function **/
-   void Init(Bool_t SimpleTR, TString prototype);
-  /** Init function **/
-   void Init();
+  void Init();
+
+  void SetRadPrototype(TString prototype);
 
   /** Spectra production **/
-   void ProduceSpectra();
+  void ProduceSpectra();
 
   /** Final energy loss computation **/
   Int_t  ELoss(Int_t index);
 
   /** Main function for TR production **/
-   void ProcessTR();
+  void ProcessTR();
 
   /** Compute the TR spectrum **/
-   Int_t TRspectrum();
+  Int_t TRspectrum();
 
-  /** Compute the TR spectrum in the Mylar foil **/
-   Int_t MyTRspectrum();
+  /** Compute the TR spectrum in the Window foil **/
+  Int_t WinTRspectrum();
 
   /** Compute the TR spectrum in the Detector **/
-   Int_t DetTRspectrum();
+  Int_t DetTRspectrum();
 
   /** Compute the gamma factor **/
-   Float_t GammaF();
+  Float_t GammaF();
 
   /** Compute the sigma coeff. for one-gap-one-foil radiator **/
-   Float_t Sigma(Float_t energykeV);
+  Float_t Sigma(Float_t energykeV);
 
-  /** Compute the sigma coeff. for the mylar foil **/
-   Float_t SigmaMy(Float_t energykeV);
+  /** Compute the sigma coeff. for the gas-.window foil **/
+  Float_t SigmaWin(Float_t energykeV);
 
   /** Compute the sigma coeff. for the detector gas **/
-   Float_t SigmaDet(Float_t energykeV);
-  
+  Float_t SigmaDet(Float_t energykeV);
+  TString fWindowFoil;
   /** Computation of photon absorption cross sections taken from http://physics.nist.gov/PhysRefData/Xcom/html/xcom1.html**/
-   Float_t      GetMuPo(Float_t energyMeV);
-   Float_t      GetMuPok(Float_t energyMeV);
-   Float_t      GetMuKa(Float_t energyMeV);
-   Float_t      GetMuAir(Float_t energyMeV);
-   Float_t      GetMuXe(Float_t energyMeV);
-   Float_t      GetMuCO2(Float_t energyMeV);
-   Float_t      GetMuMy(Float_t energyMeV);
+  Float_t      GetMuAl(Float_t energyMeV);
+  Float_t      GetMuPo(Float_t energyMeV);
+  Float_t      GetMuPok(Float_t energyMeV);
+  Float_t      GetMuKa(Float_t energyMeV);
+  Float_t      GetMuAir(Float_t energyMeV);
+  Float_t      GetMuXe(Float_t energyMeV);
+  Float_t      GetMuCO2(Float_t energyMeV);
+  Float_t      GetMuMy(Float_t energyMeV);
 
   /** Calculate the TR for a given momentum **/
-   Float_t      GetTR(TVector3 mom);
+  Float_t      GetTR(TVector3 mom);
 
   /** Interpolate between given points of table **/
-   Float_t Interpolate(Float_t energyMeV
-               , Float_t *en, Float_t *mu, Int_t n);
+  Float_t Interpolate(Float_t energyMeV
+		      , Float_t *en, Float_t *mu, Int_t n);
 
   /** Locate a point in 1-dim grid **/
-   Int_t Locate(Float_t *xv, Int_t n, Float_t xval
+  Int_t Locate(Float_t *xv, Int_t n, Float_t xval
                , Int_t &kl, Float_t &dx);
 
 
   /** Setters for private data memebers **/
-   void          SetNFoils(Int_t n)      { fNFoils    = n; }
-   void          SetFoilThick(Float_t t) { fFoilThick = t; }
-   void          SetGapThick(Float_t t)  { fGapThick  = t; }
-   void          SetSigma(Int_t SigmaT);
+  void          SetNFoils(Int_t n)      { fNFoils    = n; }
+  void          SetFoilThick(Float_t t) { fFoilThick = t; }
+  void          SetGapThick(Float_t t)  { fGapThick  = t; }
+  void          SetSigma(Int_t SigmaT);
  
-private:
+ private:
 
-   CbmTrdRadiator& operator=(const CbmTrdRadiator&);
-   CbmTrdRadiator(const CbmTrdRadiator&);
+  CbmTrdRadiator& operator=(const CbmTrdRadiator&);
+  CbmTrdRadiator(const CbmTrdRadiator&);
 
   /* Input parameters to be set */
- 
+  TString   fRadType;
   Int_t     fDetType;     // 0: GSI  1: Muenster-Bucarest 
   Bool_t    fFirstPass;   // used for MB-Chamber with two gas gaps
   Bool_t    fSimpleTR;    // mode of the TR production
   Int_t     fNFoils;      // Number of foils in the radiator stack
   Float_t   fFoilThick;   // Thickness of the foils (cm)
   Float_t   fGapThick;    // Thickness of gaps between the foils (cm)
-
+  TString   fFoilMaterial;
   Float_t   fGasThick;    // Thickness of hte active gas volume.
 
 
@@ -144,8 +145,8 @@ private:
   Float_t   fnTRprod;     // <nTR> produced
   //  Int_t     fSigmaT;      // set the absorption material
 
-  Float_t   fMyDens;
-  Float_t   fMyThick;
+  Float_t   fWinDens;
+  Float_t   fWinThick;
   
   Float_t   fCom1;        // first component of the gas
   Float_t   fCom2;        // second component of the gas
@@ -154,12 +155,12 @@ private:
   static const Int_t     fSpRange=50;  // Maximum (keV) of eloss spectrum 
   Float_t   fSpBinWidth;               // Bin width=fSpNBins/fSpRange
 
-  Float_t*  fSigma;       // [fSpNBins] Array of sigma values
-  Float_t*  fSigmaMy;     // [fSpNBins] Array of sigma values
-  Float_t*  fSigmaDet;    // [fSpNBins] Array of sigma values
+  Float_t*  fSigma;       // [fSpNBins] Array of sigma values for the foil of the radiator
+  Float_t*  fSigmaWin;     // [fSpNBins] Array of sigma values for the entrance window of detector
+  Float_t*  fSigmaDet;    // [fSpNBins] Array of sigma values for the active gas
 
   TH1D*     fSpectrum;    //! TR photon energy spectrum
-  TH1D*     fMySpectrum;  //! TR spectra in Mylar foil
+  TH1D*     fWinSpectrum;  //! TR spectra in gas-window foil
   TH1D*     fDetSpectrumA;//! TR absorbed in Detector
   TH1D*     fDetSpectrum; //! TR passed through Detector
 
@@ -176,7 +177,7 @@ private:
   TVector3  fMom;         // momentum of the electron
 
   ClassDef(CbmTrdRadiator,1)
-};
+    };
 
 #endif
 

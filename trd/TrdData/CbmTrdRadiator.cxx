@@ -22,6 +22,9 @@ using std::setprecision;
 // -----   Default constructor   ---------------------------------------
 CbmTrdRadiator::CbmTrdRadiator()
  : fDetType(-1),
+   fRadType(""),
+   fWindowFoil(""),
+   fFoilMaterial(""),
    fFirstPass(kTRUE),
    fSimpleTR(kTRUE),
    fnPhotonCorr(1.0),
@@ -37,16 +40,16 @@ CbmTrdRadiator::CbmTrdRadiator()
    fGapThickCorr(1.),
    fGasThickCorr(1.),
    fnTRprod(-1),
-   fMyDens(-1.),
-   fMyThick(-1.),
+   fWinDens(-1.),
+   fWinThick(-1.),
    fCom1(-1.),
    fCom2(-1.),
    fSpBinWidth((Float_t)fSpRange / (Float_t)fSpNBins),
    fSigma(NULL),
-   fSigmaMy(NULL),
+   fSigmaWin(NULL),
    fSigmaDet(NULL),
    fSpectrum(NULL),
-   fMySpectrum(NULL),
+   fWinSpectrum(NULL),
    fDetSpectrumA(NULL),
    fDetSpectrum(NULL),
    fTrackMomentum(NULL),
@@ -59,6 +62,8 @@ CbmTrdRadiator::CbmTrdRadiator()
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
   }
+
+  //Init();
   // Set initial parameters defining the radiator
   CreateHistograms();
 }
@@ -67,6 +72,9 @@ CbmTrdRadiator::CbmTrdRadiator()
 // -----  Constructor   --------------------------------------------------
 CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick)
   : fDetType(-1),
+    fRadType(""),
+    fWindowFoil(""),
+    fFoilMaterial("polyethylen"),
     fFirstPass(kTRUE),
     fSimpleTR(SimpleTR),
     fnPhotonCorr(1.0),
@@ -82,16 +90,16 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
     fGapThickCorr(1.),
     fGasThickCorr(1.),
     fnTRprod(-1),
-    fMyDens(-1.),
-    fMyThick(-1.),
+    fWinDens(-1.),
+    fWinThick(-1.),
     fCom1(-1.),
     fCom2(-1.),
     fSpBinWidth((Float_t)fSpRange / (Float_t)fSpNBins),
     fSigma(NULL),
-    fSigmaMy(NULL),
+    fSigmaWin(NULL),
     fSigmaDet(NULL),
     fSpectrum(NULL),
-    fMySpectrum(NULL),
+    fWinSpectrum(NULL),
     fDetSpectrumA(NULL),
     fDetSpectrum(NULL),
     fTrackMomentum(NULL),
@@ -104,6 +112,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
   }
+  //Init();
   CreateHistograms();
 }
 //-----------------------------------------------------------------------------
@@ -111,6 +120,9 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
 // -----  Constructor   --------------------------------------------------
 CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick, TString material, TString prototype)
   : fDetType(-1),
+    fRadType(prototype),
+    fWindowFoil(""),
+    fFoilMaterial(material),
     fFirstPass(kTRUE),
     fSimpleTR(SimpleTR),
     fnPhotonCorr(1.0),
@@ -126,16 +138,16 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
     fGapThickCorr(1.),
     fGasThickCorr(1.),
     fnTRprod(-1),
-    fMyDens(-1.),
-    fMyThick(-1.),
+    fWinDens(-1.),
+    fWinThick(-1.),
     fCom1(-1.),
     fCom2(-1.),
     fSpBinWidth((Float_t)fSpRange / (Float_t)fSpNBins),
     fSigma(NULL),
-    fSigmaMy(NULL),
+    fSigmaWin(NULL),
     fSigmaDet(NULL),
     fSpectrum(NULL),
-    fMySpectrum(NULL),
+    fWinSpectrum(NULL),
     fDetSpectrumA(NULL),
     fDetSpectrum(NULL),
     fTrackMomentum(NULL),
@@ -148,6 +160,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
   }
+  //Init();
   CreateHistograms();
 }
 //-----------------------------------------------------------------------------
@@ -155,6 +168,9 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
 // -----  Constructor   --------------------------------------------------
 CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, TString prototype)
   : fDetType(-1),
+    fRadType(prototype),
+    fWindowFoil("Kapton"), //which is the gas window of MS2012 prototypes. Anything else will result in a mylar gas window -> MuBu default
+    fFoilMaterial(""),
     fFirstPass(kTRUE),
     fSimpleTR(SimpleTR),
     fnPhotonCorr(1.0),
@@ -170,16 +186,16 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, TString prototype)
     fGapThickCorr(1.),
     fGasThickCorr(1.),
     fnTRprod(-1),
-    fMyDens(-1.),
-    fMyThick(-1.),
+    fWinDens(-1.),
+    fWinThick(-1.),
     fCom1(-1.),
     fCom2(-1.),
     fSpBinWidth((Float_t)fSpRange / (Float_t)fSpNBins),
     fSigma(NULL),
-    fSigmaMy(NULL),
+    fSigmaWin(NULL),
     fSigmaDet(NULL),
     fSpectrum(NULL),
-    fMySpectrum(NULL),
+    fWinSpectrum(NULL),
     fDetSpectrumA(NULL),
     fDetSpectrum(NULL),
     fTrackMomentum(NULL),
@@ -193,8 +209,8 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, TString prototype)
     fFinal[i] = NULL;
   }
 
-  Init(SimpleTR, prototype);
-
+  //Init(SimpleTR, prototype);
+  //SetRadPrototype(prototype);
   CreateHistograms();
 }
 //-----------------------------------------------------------------------------
@@ -208,7 +224,7 @@ CbmTrdRadiator::~CbmTrdRadiator()
         cout << " -I DELETING fSpectrum " << endl;
 	delete fSpectrum;
     }
-    if (fMySpectrum) delete fMySpectrum;
+    if (fWinSpectrum) delete fWinSpectrum;
     if (fDetSpectrum) delete fDetSpectrum;
     if (fDetSpectrumA) delete fDetSpectrumA;
 
@@ -233,8 +249,8 @@ void CbmTrdRadiator::CreateHistograms(){
   if (fSpectrum) delete fSpectrum;
   fSpectrum   = new TH1D("fSpectrum","TR spectrum",fSpNBins,SpLower,SpUpper);
 
-  if (fMySpectrum) delete fMySpectrum;
-  fMySpectrum   = new TH1D("fMySpectrum","TR spectrum in Mylar",fSpNBins,SpLower,SpUpper);
+  if (fWinSpectrum) delete fWinSpectrum;
+  fWinSpectrum   = new TH1D("fWinSpectrum","TR spectrum in Mylar",fSpNBins,SpLower,SpUpper);
 
   if (fDetSpectrum) delete fDetSpectrum;
   fDetSpectrum = new TH1D("fDetSpectrum", "TR spectrum escaped from detector",fSpNBins,SpLower,SpUpper);
@@ -261,7 +277,8 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
   fFoilThick  = FoilThick;
   fSimpleTR   = SimpleTR;
   fnPhotonCorr = 1.0; 
- 
+
+
   CreateHistograms();
 
   cout << "*********** Initilization of Trd Radiator **************"<<endl;
@@ -295,9 +312,11 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
     fFoilOmega  = 22.50;      //plasma frequency ( from Cyrano )
   } else {
     // (polyethylen)
+    material = "polyethylen";
     fFoilDens   = 0.92;      // [g/cm3 ]
     fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
   }
+  fFoilMaterial = material;
   // material dependent parameters for the gas between the foils of the
   // radiator
   // changed gap density at 16.04.07 FU
@@ -308,8 +327,8 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 
   // foil between radiator and gas chamber
   // TODO: implement kapton foil also in trd geometry
-  fMyDens   = 1.39;           //  [g/cm3]
-  fMyThick  = 0.0025;        // [cm]
+  fWinDens   = 1.39;           //  [g/cm3]
+  fWinThick  = 0.0025;        // [cm]
 
 
 
@@ -390,8 +409,8 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 
   // foil between radiator and gas chamber
   // TODO: implement kapton foil also in trd geometry
-  fMyDens   = 1.39;           //  [g/cm3]
-  fMyThick  = 0.0025;        // [cm]
+  fWinDens   = 1.39;           //  [g/cm3]
+  fWinThick  = 0.0025;        // [cm]
 
 
 
@@ -413,186 +432,6 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
   cout << "Detector gas thick.  : "<< fTrdGas->GetGasThick() <<" cm" << endl;
  
   cout << "************* End of Trd Radiator Init **************"<<endl;
-
-  // If simplified version is used one didn't calculate the TR
-  // for each CbmTrdPoint in full glory, but create at startup
-  // some histograms for several momenta which are later used to
-  // get the TR much faster.
-  if(fSimpleTR == kTRUE){
-
-    ProduceSpectra();
-     
-    TFile* oldfile=gFile;
-    TFile* f1 = new TFile("TRhistos.root", "recreate");
-    f1->cd();
-
-    for (Int_t i=0 ; i < fNMom; i++){
-      fFinal[i]->Write();
-    }
-
-    f1->Close();
-    f1->Delete();
-    gFile=oldfile;
-  }
-}
-  //----------------------------------------------------------------------------
-
-// ----- Init function ----------------------------------------------------
-void CbmTrdRadiator::Init(Bool_t SimpleTR, TString prototype="default"){
-  TString material;
-  // Set initial parameters defining the radiator 
-  if (prototype == "default") {
-    material    = "polyethylen";
-    fNFoils     = 130;
-    fGapThick   = 0.02;
-    fFoilThick  = 0.0013;
-    fnPhotonCorr = 1.0;  
-  } else if (prototype == "A") {
-    material    = "polyethylen";
-    fNFoils     = 200*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  15*0.0001;
-    fnPhotonCorr = 0.35;
-  } else if (prototype == "Bshort" || prototype == "Kshort" ) {
-    material    = "pokalon";
-    fNFoils     = 100*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  24*0.0001;
-    fnPhotonCorr = 0.55;
-  } else if (prototype == "B" || prototype == "K" ) {
-    material    = "pokalon";
-    fNFoils     = 250*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  24*0.0001;
-    fnPhotonCorr = 0.55;
-  } else if (prototype == "B++" || prototype == "K++" ) {
-    material    = "pokalon";
-    fNFoils     = 350*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  24*0.0001;
-    fnPhotonCorr = 0.55;
-  } else if (prototype == "C") {
-    material    = "polyethylen";
-    fNFoils     = 200*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  15*0.0001;
-    fnPhotonCorr = 0.30;
-  } else if (prototype == "D") {
-    material    = "polyethylen";
-    fNFoils     = 100*0.0001;
-    fGapThick   = 500*0.0001;
-    fFoilThick  =  15*0.0001;
-    fnPhotonCorr = 0.45;
-  } else if (prototype == "E") {
-    material    = "polyethylen";
-    fNFoils     = 120*0.0001;
-    fGapThick   = 500*0.0001;
-    fFoilThick  =  20*0.0001;
-    fnPhotonCorr = 0.60;
-  } else if (prototype == "F") {
-    material    = "polyethylen";
-    fNFoils     = 220*0.0001;
-    fGapThick   = 250*0.0001;
-    fFoilThick  =  20*0.0001;
-    fnPhotonCorr = 0.55;
-  } else if (prototype == "G30") {
-    material    = "pefiber";
-    fNFoils     = 200*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  15*0.0001;
-    fnPhotonCorr = 0.65;
-  } else if (prototype == "H") {
-    material    = "pefoam20";
-    fNFoils     = 200*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  15*0.0001;
-    fnPhotonCorr = 0.65;
-  } else if (prototype == "H++") {
-    material    = "pefoam20";
-    fNFoils     = 200*0.0001;
-    fGapThick   = 700*0.0001;
-    fFoilThick  =  15*0.0001;
-    fnPhotonCorr = 0.65;
-  } else {
-    cout << "*********** Radiator prototype not known *********** "<<endl;
-    cout << "           switch to default parameters              "<<endl;
-    material    = "polyethylen";
-    fNFoils     = 130;
-    fGapThick   = 0.02;
-    fFoilThick  = 0.0013;
-    fnPhotonCorr = 1.0;  
-  }
-  CreateHistograms();
-
-  cout << "*********** Initilization of Trd Radiator **************"<<endl;
-  cout << "Foil material        : "<< material << endl;
-  cout << "Nr. of foils         : "<< fNFoils << endl;
-  cout << "Foil thickness       : "<< setprecision(4) << fGapThick <<" cm"<< endl;
-  cout << "Gap thickness        : "<< fGapThick << " cm"<<endl;
-  cout << "Simple TR production : "<< setprecision(2)<< SimpleTR << endl;
-
-
-
-  // material dependend parameters for the radiator material 
-  // (polyethylen)
-  if (material == "" || material == "polyethylen") {
-    fFoilDens   = 0.92;      // [g/cm3 ]
-    fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
-  } else if (material == "pefoam20") {
-    // (polyethylen)
-    fFoilDens   = 0.90;      // [g/cm3 ]
-    fFoilOmega  = 20.64;      //plasma frequency ( from Cyrano )
-  } else if (material == "pefiber") {
-    // (polyethylen)
-    fFoilDens   = 0.90;      // [g/cm3 ]
-    fFoilOmega  = 20.64;      //plasma frequency ( from Cyrano )
-  } else if (material == "mylar") {
-    // (Mylar)
-    fFoilDens   = 1.393;      // [g/cm3 ]
-    fFoilOmega  = 24.53;      //plasma frequency ( from Cyrano )
-  } else if (material == "pokalon") {
-    // (Pokalon)
-    fFoilDens   = 1.150;      // [g/cm3 ]
-    fFoilOmega  = 22.50;      //plasma frequency ( from Cyrano )
-  } else {
-    // (polyethylen)
-    fFoilDens   = 0.92;      // [g/cm3 ]
-    fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
-  }
-  // material dependent parameters for the gas between the foils of the
-  // radiator
-  // changed gap density at 16.04.07 FU
-  // density of air is 0.001205, 0.00186 
-  //fGapDens    = 0.00186;   // [g/cm3]
-  fGapDens    = 0.001205;   // [g/cm3]
-  fGapOmega   = 0.7;       //plasma frequency  ( from Anton )
-
-  // foil between radiator and gas chamber
-  // TODO: implement kapton foil also in trd geometry
-  fMyDens   = 1.39;           //  [g/cm3]
-  fMyThick  = 0.0025;        // [cm]
-
-
-
-  // Get all the gas properties from CbmTrdGas
-  CbmTrdGas *fTrdGas = CbmTrdGas::Instance();
-  if (fTrdGas==0) {
-    fTrdGas = new CbmTrdGas();
-    fTrdGas->Init();
-  }
-
-  fCom2     = fTrdGas->GetNobleGas();
-  fCom1     = fTrdGas->GetCO2();
-  fDetType  = fTrdGas->GetDetType();
-  fGasThick = fTrdGas->GetGasThick();
-
-  cout << "Detector noble gas   : "<< fTrdGas->GetNobleGas() << endl;
-  cout << "Detector cruncher gas: "<< fTrdGas->GetCO2() << endl;
-  cout << "Detector type        : "<< fTrdGas->GetDetType() << endl;
-  cout << "Detector gas thick.  : "<< fTrdGas->GetGasThick() <<" cm" << endl;
- 
-  cout << "************* End of Trd Radiator Init **************"<<endl;
-
 
   // If simplified version is used one didn't calculate the TR
   // for each CbmTrdPoint in full glory, but create at startup
@@ -619,34 +458,155 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, TString prototype="default"){
 
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(){
-
+  TString material;
   CreateHistograms();
+  if (fRadType == "") {
+    fFoilMaterial = "polyethylen";
+    fnPhotonCorr = 1.0; 
+    cout << "*********** Initilization of Trd Radiator **************"<<endl;
+    cout << "Nr. of foils        : "<< fNFoils << endl;
+    cout << "Foil thickness      : "<< setprecision(4) << fFoilThick <<" cm"<< endl;
+    cout << "Gap thickness       : "<< fGapThick << " cm"<<endl;
+    cout << "Simple TR production: "<< setprecision(2)<< fSimpleTR << endl;
 
-  cout << "*********** Initilization of Trd Radiator **************"<<endl;
-  cout << "Nr. of foils        : "<< fNFoils << endl;
-  cout << "Foil thickness      : "<< setprecision(4) << fFoilThick <<" cm"<< endl;
-  cout << "Gap thickness       : "<< fGapThick << " cm"<<endl;
-  cout << "Simple TR production: "<< setprecision(2)<< fSimpleTR << endl;
 
+    // material dependend parameters for the radiator material 
+    // (polyethylen)
+    fFoilDens   = 0.92;      // [g/cm3 ]
+    fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
 
-  // material dependend parameters for the radiator material 
-  // (polyethylen)
-  fFoilDens   = 0.92;      // [g/cm3 ]
-  fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
+    // material dependent parameters for the gas between the foils of the
+    // radiator
+    // changed gap density at 16.04.07 FU
+    // density of air is 0.001205, 0.00186 
+    //fGapDens    = 0.00186;   // [g/cm3]
+    fGapDens    = 0.001205;   // [g/cm3]
+    fGapOmega   = 0.7;       //plasma frequency  ( from Anton )
 
-  // material dependent parameters for the gas between the foils of the
-  // radiator
-  // changed gap density at 16.04.07 FU
-  // density of air is 0.001205, 0.00186 
-  //fGapDens    = 0.00186;   // [g/cm3]
-  fGapDens    = 0.001205;   // [g/cm3]
-  fGapOmega   = 0.7;       //plasma frequency  ( from Anton )
-
-  // foil between radiator and gas chamber
-  // TODO: implement kapton foil also in trd geometry
-  fMyDens   = 1.39;           //  [g/cm3]
-  fMyThick  = 0.0025;        // [cm]
-
+    // foil between radiator and gas chamber
+    // TODO: implement kapton foil also in trd geometry
+    fWinDens   = 1.39;           //  [g/cm3]
+    fWinThick  = 0.0025;        // [cm]
+  }
+  else {
+    if (fRadType == "default") {
+      material    = "polyethylen";
+      fNFoils     = 130;
+      fGapThick   = 0.02;
+      fFoilThick  = 0.0013;
+      fnPhotonCorr = 1.0;  
+    } else if (fRadType == "A") {
+      material    = "polyethylen";
+      fNFoils     = 200;
+      fGapThick   = 700*0.0001;
+      fFoilThick  =  15*0.0001;
+      fnPhotonCorr = 0.40;
+    } else if (fRadType == "Bshort" || fRadType == "Kshort" ) {
+      material    = "pokalon";
+      fNFoils     = 100;
+      fGapThick   = 0.07;
+      fFoilThick  = 0.0024;
+      fnPhotonCorr = 0.65;
+    } else if (fRadType == "B" || fRadType == "K" ) {
+      material    = "pokalon";
+      fNFoils     = 250;
+      fGapThick   = 0.07;
+      fFoilThick  = 0.0024;
+      fnPhotonCorr = 0.65;
+    } else if (fRadType == "B++" || fRadType == "K++" ) {
+      material    = "pokalon";
+      fNFoils     = 350;
+      fGapThick   = 0.07;
+      fFoilThick  = 0.0024;
+      fnPhotonCorr = 0.65;
+    } else if (fRadType == "C") {
+      material    = "polyethylen";
+      fNFoils     = 200;
+      fGapThick   = 700*0.0001;
+      fFoilThick  =  15*0.0001;
+      fnPhotonCorr = 0.30;
+    } else if (fRadType == "D") {
+      material    = "polyethylen";
+      fNFoils     = 100;
+      fGapThick   = 500*0.0001;
+      fFoilThick  =  15*0.0001;
+      fnPhotonCorr = 0.45;
+    } else if (fRadType == "E") {
+      material    = "polyethylen";
+      fNFoils     = 120;
+      fGapThick   = 500*0.0001;
+      fFoilThick  =  20*0.0001;
+      fnPhotonCorr = 0.60;
+    } else if (fRadType == "F") {
+      material    = "polyethylen";
+      fNFoils     = 220;
+      fGapThick   = 250*0.0001;
+      fFoilThick  =  20*0.0001;
+      fnPhotonCorr = 0.65;
+    } else if (fRadType == "G30") {
+      material    = "pefiber";
+      fNFoils     = 200;
+      fGapThick   = 700*0.0001;
+      fFoilThick  =  15*0.0001;
+      fnPhotonCorr = 0.65;
+    } else if (fRadType == "H") {
+      material    = "pefoam20";
+      fNFoils     = 200;
+      fGapThick   = 700*0.0001;
+      fFoilThick  =  15*0.0001;
+      fnPhotonCorr = 0.65;
+    } else if (fRadType == "H++") {
+      material    = "pefoam20";
+      fNFoils     = 200;
+      fGapThick   = 700*0.0001;
+      fFoilThick  =  15*0.0001;
+      fnPhotonCorr = 0.65;
+    } else {
+      cout << "*********** Radiator prototype not known *********** "<<endl;
+      cout << "           switch to default parameters              "<<endl;
+      material    = "polyethylen";
+      fNFoils     = 130;
+      fGapThick   = 0.02;
+      fFoilThick  = 0.0013;
+      fnPhotonCorr = 1.0;  
+    }
+    fFoilMaterial = material;
+    if (material == "" || material == "polyethylen") {
+      fFoilDens   = 0.92;      // [g/cm3 ]
+      fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
+    } else if (material == "pefoam20") {
+      // (polyethylen)
+      fFoilDens   = 0.90;      // [g/cm3 ]
+      fFoilOmega  = 20.64;      //plasma frequency ( from Cyrano )
+    } else if (material == "pefiber") {
+      // (polyethylen)
+      fFoilDens   = 0.90;      // [g/cm3 ]
+      fFoilOmega  = 20.64;      //plasma frequency ( from Cyrano )
+    } else if (material == "mylar") {
+      // (Mylar)
+      fFoilDens   = 1.393;      // [g/cm3 ]
+      fFoilOmega  = 24.53;      //plasma frequency ( from Cyrano )
+    } else if (material == "pokalon") {
+      // (Pokalon)
+      fFoilDens   = 1.150;      // [g/cm3 ]
+      fFoilOmega  = 22.50;      //plasma frequency ( from Cyrano )
+    } else {
+      // (polyethylen)
+      fFoilDens   = 0.92;      // [g/cm3 ]
+      fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
+    }
+    fGapDens    = 0.001205;   // [g/cm3]
+    fGapOmega   = 0.7;       //plasma frequency  ( from Anton )
+    // foil between radiator and gas chamber
+    fWinDens   = 1.42;           //[g/cm3] for Kapton -> Alu is added only in case of kapton !!!
+    fWinThick  = 0.0025;        // [cm]
+    cout << "*********** Initilization of Trd Radiator **************"<<endl;
+    cout << "Prototype            : "<< fRadType << endl;
+    cout << "Foil material        : "<< material << endl;
+    cout << "Nr. of foils         : "<< fNFoils << endl;
+    cout << "Foil thickness       : "<< fFoilThick <<" cm"<< endl;
+    cout << "Gap thickness        : "<< fGapThick << " cm"<<endl;
+  }
 
 
   // Get all the gas properties from CbmTrdGas
@@ -679,7 +639,7 @@ void CbmTrdRadiator::Init(){
     TFile* f1 = new TFile("TRhistos.root", "recreate");
 
     for (Int_t i=0 ; i < fNMom; i++){
-	fFinal[i]->Write();
+      fFinal[i]->Write();
     }
     f1->Close();
     f1->Delete();
@@ -779,7 +739,7 @@ void CbmTrdRadiator::ProcessTR(){
   // compute the TR spectra in the radiator
   TRspectrum();
   // compute the TR spectra in the mylar foil  
-  MyTRspectrum();
+  WinTRspectrum();
   // compute the TR spectra in the detector  
   DetTRspectrum();
   // Loop over photons and compute the E losses
@@ -792,7 +752,7 @@ void CbmTrdRadiator::ProcessTR(){
     Float_t fTRAbsfirst = fnTRab;
 
     // compute the TR spectra in the mylar foil between the two gas layers  
-    MyTRspectrum();
+    WinTRspectrum();
     // compute the TR spectra in the second halve of the detector  
     DetTRspectrum();
     // Loop over photons and compute the E losses
@@ -822,7 +782,7 @@ Int_t CbmTrdRadiator::ELoss(Int_t index){
 	fELoss = -1;
 	return 1;
     }
-    nPhoton = gRandom->Poisson(fnTRab) * fnPhotonCorr;
+    nPhoton = gRandom->Poisson(fnTRab * fnPhotonCorr);
     if (nPhoton > maxPhoton) nPhoton = maxPhoton;
     for(Int_t i = 0; i < nPhoton; i++){
 	// energy of the photon
@@ -836,7 +796,7 @@ Int_t CbmTrdRadiator::ELoss(Int_t index){
 	fELoss = -1;
 	return 1;
     }
-    nPhoton = gRandom->Poisson(fnTRabs[index]) * fnPhotonCorr;
+    nPhoton = gRandom->Poisson(fnTRabs[index] * fnPhotonCorr);
     if (nPhoton > maxPhoton) nPhoton = maxPhoton;
     for(Int_t i = 0; i < nPhoton; i++){
 	// energy of the photon
@@ -913,8 +873,12 @@ Int_t CbmTrdRadiator::TRspectrum(){
     // dN / domega
     Float_t wn        = kAlpha * 4.0 / (fSigma[iBin] * (kappa + 1.0))
 	* conv * sum / energykeV;
-
-
+    /*
+    wn  = 4.0 * kAlpha 
+      / (energykeV * (kappa + 1.0)) 
+      * (1.0 - TMath::Exp(Double_t(-fNFoils) * fSigma[iBin])) / (1.0 - TMath::Exp(-fSigma[iBin]))
+      * sum;
+      */
     // save the result
     fSpectrum->SetBinContent(iBin+1,wn);
     // compute the integral
@@ -927,20 +891,20 @@ Int_t CbmTrdRadiator::TRspectrum(){
   //cout << " No. of photons after radiator" << nTR0 << endl;
 
   // compute the spectra behind the mylar foil (absorption)
-  //  MyTRspectrum();
+  //  WinTRspectrum();
 
   return 1;
 }
 
 //------------------------------------------------------------------
 
-//----- MyTRspectrum -----------------------------------------------
-Int_t CbmTrdRadiator::MyTRspectrum(){
+//----- WinTRspectrum -----------------------------------------------
+Int_t CbmTrdRadiator::WinTRspectrum(){
   //
   // Computes the spectrum after absorption in Mylar foil
   //
 
-  fMySpectrum->Reset();
+  fWinSpectrum->Reset();
 
   SetSigma(2);
 
@@ -955,10 +919,10 @@ Int_t CbmTrdRadiator::MyTRspectrum(){
 	sp = fDetSpectrum->GetBinContent(iBin+1);
     }
     // compute the absorption coefficient
-    Float_t conv = TMath::Exp(-fSigmaMy[iBin]);
+    Float_t conv = TMath::Exp(-fSigmaWin[iBin]);
     Float_t wn = sp * conv;
 
-    fMySpectrum->SetBinContent(iBin+1,wn);
+    fWinSpectrum->SetBinContent(iBin+1,wn);
 
     stemp += wn;
   }
@@ -985,7 +949,7 @@ Int_t CbmTrdRadiator::DetTRspectrum(){
 
     //passed spectrum
     Float_t sp = 0;
-    sp = fMySpectrum->GetBinContent(iBin + 1);
+    sp = fWinSpectrum->GetBinContent(iBin + 1);
     Float_t conv = TMath::Exp(-fSigmaDet[iBin]);
     Float_t wn = sp * conv;
 
@@ -1044,11 +1008,11 @@ void CbmTrdRadiator::SetSigma(Int_t SigmaT){
   }
 
   if (SigmaT == 2){
-    if (fSigmaMy) delete [] fSigmaMy;
-    fSigmaMy       = new Float_t [fSpNBins];
+    if (fSigmaWin) delete [] fSigmaWin;
+    fSigmaWin       = new Float_t [fSpNBins];
     for (Int_t iBin = 0; iBin < fSpNBins; iBin++) {
 	Float_t energykeV = iBin * fSpBinWidth + 1.0;
-	fSigmaMy[iBin]       = SigmaMy(energykeV);
+	fSigmaWin[iBin]       = SigmaWin(energykeV);
     }
   }
 
@@ -1069,14 +1033,26 @@ Float_t CbmTrdRadiator::Sigma(Float_t energykeV){
   // Calculates the absorbtion crosssection for a one-foil-one-gap-radiator
   //
 
-
   // keV -> MeV
   Float_t energyMeV = energykeV * 0.001;
+  Float_t foil = 0.0;
+
+  if (fFoilMaterial == "polyethylen")
+    foil = GetMuPo(energyMeV) * fFoilDens * fFoilThickCorr;
+  else if (fFoilMaterial == "pefoam20")
+    foil = GetMuPo(energyMeV) * fFoilDens * fFoilThickCorr;
+  else if (fFoilMaterial == "pefiber")
+    foil = GetMuPo(energyMeV) * fFoilDens * fFoilThickCorr;
+  else if (fFoilMaterial == "mylar")
+    foil = GetMuMy(energyMeV) * fFoilDens * fFoilThickCorr;
+  else if (fFoilMaterial == "pokalon")
+    foil = GetMuPok(energyMeV) * fFoilDens * fFoilThickCorr;
+  else
+    cout << "ERROR:: unknown radiator material" << endl;
 
 
   if (energyMeV >= 0.001) {
-    Float_t result = (GetMuPo(energyMeV) * fFoilDens * fFoilThickCorr +
-			GetMuAir(energyMeV) * fGapDens  * fGapThickCorr);  
+    Float_t result = (foil + (GetMuAir(energyMeV) * fGapDens  * fGapThickCorr));  
     return result;
   }
   else {
@@ -1084,152 +1060,210 @@ Float_t CbmTrdRadiator::Sigma(Float_t energykeV){
   } 
 
 }
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-//----- SigmaMy -------------------------------------------------------
-Float_t CbmTrdRadiator::SigmaMy(Float_t energykeV){
-  //
-  // Calculates the absorbtion crosssection for a one-foil
-  //
+  //----- SigmaWin -------------------------------------------------------
+  Float_t CbmTrdRadiator::SigmaWin(Float_t energykeV){
+    //
+    // Calculates the absorbtion crosssection for a one-foil
+    //
 
-
-  // keV -> MeV
-  Float_t energyMeV = energykeV * 0.001;
-
-  if (energyMeV >= 0.001) {
-    return(GetMuMy(energyMeV) * fMyDens * fMyThick); 
+    // keV -> MeV
+    Float_t energyMeV = energykeV * 0.001;
+    //if (fWindowFoil=="Kapton"){
+    //if (energyMeV >= 0.001) {
+    //return((GetMuKa(energyMeV) * fWinDens * fWinThick) + (GetMuAl(energyMeV) * 2.70/*[g/cm^3]*/ * 5E-6/*[cm]*/)); 
+    //}
+    // else {
+    //	return 1e6;
+    // }
+      // }
+      // else {
+      if (energyMeV >= 0.001) {
+	return(GetMuMy(energyMeV) * fWinDens * fWinThick); 
+      }
+      else {
+	return 1e6;
+      }
+      // }
   }
-  else {
-    return 1e6;
-  }
-}
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-//----- SigmaDet --------------------------------------------------------
-Float_t CbmTrdRadiator::SigmaDet(Float_t energykeV){
-  //
-  //Calculates the absorbtion crosssection for a choosed gas
-  //
+  //----- SigmaDet --------------------------------------------------------
+  Float_t CbmTrdRadiator::SigmaDet(Float_t energykeV){
+    //
+    //Calculates the absorbtion crosssection for a choosed gas
+    //
 
-  // keV -> MeV
-  Float_t energyMeV = energykeV * 0.001;
+    // keV -> MeV
+    Float_t energyMeV = energykeV * 0.001;
 
-  if (energyMeV >= 0.001) {
-    // densities for CO2 and Xe changed. think density for CO2 is just
-    // a typo. where the difference for Xe comes from i don't know
-    // Values are from http://pdg.lbl.gov/AtomicNuclearProperties/
-    //    return(GetMuCO2(energyMeV) * 0.001806  * fGasThick * fCom1 + 
-    //	   GetMuXe(energyMeV) * 0.00589 * fGasThick * fCom2); 
-    return(GetMuCO2(energyMeV) * 0.00184  * fGasThick * fCom1 + 
+    if (energyMeV >= 0.001) {
+      // densities for CO2 and Xe changed. think density for CO2 is just
+      // a typo. where the difference for Xe comes from i don't know
+      // Values are from http://pdg.lbl.gov/AtomicNuclearProperties/
+      // return(GetMuCO2(energyMeV) * 0.001806  * fGasThick * fCom1 + 
+      // GetMuXe(energyMeV) * 0.00589 * fGasThick * fCom2); 
+      return(GetMuCO2(energyMeV) * 0.00184  * fGasThick * fCom1 + 
 	     GetMuXe(energyMeV) * 0.00549 * fGasThick * fCom2); 
+    }
+    else {
+      return 1e6;
+    }
   }
-  else {
-    return 1e6;
+  //----------------------------------------------------------------------------
+
+  //----- GetMuPok --------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuPok(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for pokalon N470
+    //
+    const Int_t kN = 46;
+    Float_t en[kN] = {
+      1.000E-03, 1.500E-03, 2.000E-03,
+      3.000E-03, 4.000E-03, 5.000E-03,
+      6.000E-03, 8.000E-03, 1.000E-02,
+      1.500E-02, 2.000E-02, 3.000E-02, 
+      4.000E-02, 5.000E-02, 6.000E-02, 
+      8.000E-02, 1.000E-01, 1.500E-01, 
+      2.000E-01, 3.000E-01, 4.000E-01, 
+      5.000E-01, 6.000E-01, 8.000E-01, 
+      1.000E+00, 1.022E+00, 1.250E+00, 
+      1.500E+00, 2.000E+00, 2.044E+00, 
+      3.000E+00, 4.000E+00, 5.000E+00, 
+      6.000E+00, 7.000E+00, 8.000E+00, 
+      9.000E+00, 1.000E+01, 1.100E+01, 
+      1.200E+01, 1.300E+01, 1.400E+01, 
+      1.500E+01, 1.600E+01, 1.800E+01,
+      2.000E+01
+    };
+    Float_t mu[kN] = {
+      2.537E+03,   8.218E+02,   3.599E+02,
+      1.093E+02,   4.616E+01,   2.351E+01,
+      1.352E+01,   5.675E+00,   2.938E+00,
+      9.776E-01,   5.179E-01,   2.847E-01,
+      2.249E-01,   2.003E-01,   1.866E-01,
+      1.705E-01,   1.600E-01,   1.422E-01,
+      1.297E-01,   1.125E-01,   1.007E-01,
+      9.193E-02,   8.501E-02,   7.465E-02,
+      6.711E-02,   6.642E-02,   6.002E-02,
+      5.463E-02,   4.686E-02,   4.631E-02,
+      3.755E-02,   3.210E-02,   2.851E-02,
+      2.597E-02,   2.409E-02,   2.263E-02,
+      2.149E-02,   2.056E-02,   1.979E-02,
+      1.916E-02,   1.862E-02,   1.816E-02,
+      1.777E-02,   1.743E-02,   1.687E-02,
+      1.644E-02
+    };
+    return Interpolate(energyMeV,en,mu,kN);
   }
-}
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  //----- GetMuKa --------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuKa(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for kapton
+    //
+    const Int_t kN = 46;
+    Float_t en[kN] = {
+      1.000E-03, 1.500E-03, 2.000E-03, 
+      3.000E-03, 4.000E-03, 5.000E-03, 
+      6.000E-03, 8.000E-03, 1.000E-02, 
+      1.500E-02, 2.000E-02, 3.000E-02, 
+      4.000E-02, 5.000E-02, 6.000E-02, 
+      8.000E-02, 1.000E-01, 1.500E-01, 
+      2.000E-01, 3.000E-01, 4.000E-01, 
+      5.000E-01, 6.000E-01, 8.000E-01, 
+      1.000E+00, 1.022E+00, 1.250E+00, 
+      1.500E+00, 2.000E+00, 2.044E+00, 
+      3.000E+00, 4.000E+00, 5.000E+00, 
+      6.000E+00, 7.000E+00, 8.000E+00, 
+      9.000E+00, 1.000E+01, 1.100E+01, 
+      1.200E+01, 1.300E+01, 1.400E+01, 
+      1.500E+01, 1.600E+01, 1.800E+01, 
+      2.000E+01
+    };
+    Float_t mu[kN] = {
+      2.731E+03, 8.875E+02, 3.895E+02,
+      1.185E+02, 5.013E+01, 2.555E+01,
+      1.470E+01, 6.160E+00, 3.180E+00,
+      1.043E+00, 5.415E-01, 2.880E-01,
+      2.235E-01, 1.973E-01, 1.830E-01,
+      1.666E-01, 1.560E-01, 1.385E-01,
+      1.263E-01, 1.095E-01, 9.799E-02,
+      8.944E-02, 8.270E-02, 7.262E-02,
+      6.529E-02, 6.462E-02, 5.839E-02,
+      5.315E-02, 4.561E-02, 4.507E-02,
+      3.659E-02, 3.133E-02, 2.787E-02,
+      2.543E-02, 2.362E-02, 2.223E-02,
+      2.114E-02, 2.025E-02, 1.953E-02,
+      1.893E-02, 1.842E-02, 1.799E-02,
+      1.762E-02, 1.730E-02, 1.678E-02,
+      1.638E-02
+    };
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
-//----- GetMuPok --------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuPok(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for pokalon
-  //
-  const Int_t kN = 46;
-  Float_t mu[kN] = {
-    1.000E-03, 1.500E-03, 2.000E-03,
-    3.000E-03, 4.000E-03, 5.000E-03,
-    6.000E-03, 8.000E-03, 1.000E-02,
-    1.500E-02, 2.000E-02, 3.000E-02, 
-    4.000E-02, 5.000E-02, 6.000E-02, 
-    8.000E-02, 1.000E-01, 1.500E-01, 
-    2.000E-01, 3.000E-01, 4.000E-01, 
-    5.000E-01, 6.000E-01, 8.000E-01, 
-    1.000E+00, 1.022E+00, 1.250E+00, 
-    1.500E+00, 2.000E+00, 2.044E+00, 
-    3.000E+00, 4.000E+00, 5.000E+00, 
-    6.000E+00, 7.000E+00, 8.000E+00, 
-    9.000E+00, 1.000E+01, 1.100E+01, 
-    1.200E+01, 1.300E+01, 1.400E+01, 
-    1.500E+01, 1.600E+01, 1.800E+01,
-    2.000E+01
-  };
- Float_t en[kN] = {
-   2.537E+03,   8.218E+02,   3.599E+02,
-   1.093E+02,   4.616E+01,   2.351E+01,
-   1.352E+01,   5.675E+00,   2.938E+00,
-   9.776E-01,   5.179E-01,   2.847E-01,
-   2.249E-01,   2.003E-01,   1.866E-01,
-   1.705E-01,   1.600E-01,   1.422E-01,
-   1.297E-01,   1.125E-01,   1.007E-01,
-   9.193E-02,   8.501E-02,   7.465E-02,
-   6.711E-02,   6.642E-02,   6.002E-02,
-   5.463E-02,   4.686E-02,   4.631E-02,
-   3.755E-02,   3.210E-02,   2.851E-02,
-   2.597E-02,   2.409E-02,   2.263E-02,
-   2.149E-02,   2.056E-02,   1.979E-02,
-   1.916E-02,   1.862E-02,   1.816E-02,
-   1.777E-02,   1.743E-02,   1.687E-02,
-   1.644E-02
- };
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
-//----- GetMuKa --------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuKa(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for kapton
-  //
-  const Int_t kN = 46;
-  Float_t mu[kN] = {
-    1.000E-03, 1.500E-03, 2.000E-03, 
-    3.000E-03, 4.000E-03, 5.000E-03, 
-    6.000E-03, 8.000E-03, 1.000E-02, 
-    1.500E-02, 2.000E-02, 3.000E-02, 
-    4.000E-02, 5.000E-02, 6.000E-02, 
-    8.000E-02, 1.000E-01, 1.500E-01, 
-    2.000E-01, 3.000E-01, 4.000E-01, 
-    5.000E-01, 6.000E-01, 8.000E-01, 
-    1.000E+00, 1.022E+00, 1.250E+00, 
-    1.500E+00, 2.000E+00, 2.044E+00, 
-    3.000E+00, 4.000E+00, 5.000E+00, 
-    6.000E+00, 7.000E+00, 8.000E+00, 
-    9.000E+00, 1.000E+01, 1.100E+01, 
-    1.200E+01, 1.300E+01, 1.400E+01, 
-    1.500E+01, 1.600E+01, 1.800E+01, 
-    2.000E+01
-  };
-  Float_t en[kN] = {
-    2.731E+03, 8.875E+02, 3.895E+02,
-    1.185E+02, 5.013E+01, 2.555E+01,
-    1.470E+01, 6.160E+00, 3.180E+00,
-    1.043E+00, 5.415E-01, 2.880E-01,
-    2.235E-01, 1.973E-01, 1.830E-01,
-    1.666E-01, 1.560E-01, 1.385E-01,
-    1.263E-01, 1.095E-01, 9.799E-02,
-    8.944E-02, 8.270E-02, 7.262E-02,
-    6.529E-02, 6.462E-02, 5.839E-02,
-    5.315E-02, 4.561E-02, 4.507E-02,
-    3.659E-02, 3.133E-02, 2.787E-02,
-    2.543E-02, 2.362E-02, 2.223E-02,
-    2.114E-02, 2.025E-02, 1.953E-02,
-    1.893E-02, 1.842E-02, 1.799E-02,
-    1.762E-02, 1.730E-02, 1.678E-02,
-    1.638E-02
-  };
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
+  //----- GetMuAl --------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuAl(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for Al
+    //
+
+    const Int_t kN = 48;
+
+    Float_t en[kN] = {
+      1.000E-03, 1.500E-03, 1.560E-03,
+      1.560E-03, 2.000E-03, 3.000E-03,
+      4.000E-03, 5.000E-03, 6.000E-03,
+      8.000E-03, 1.000E-02, 1.500E-02,
+      2.000E-02, 3.000E-02, 4.000E-02,
+      5.000E-02, 6.000E-02, 8.000E-02,
+      1.000E-01, 1.500E-01, 2.000E-01,
+      3.000E-01, 4.000E-01, 5.000E-01,
+      6.000E-01, 8.000E-01, 1.000E+00,
+      1.022E+00, 1.250E+00, 1.500E+00,
+      2.000E+00, 2.044E+00, 3.000E+00,
+      4.000E+00, 5.000E+00, 6.000E+00,
+      7.000E+00, 8.000E+00, 9.000E+00,
+      1.000E+01, 1.100E+01, 1.200E+01,
+      1.300E+01, 1.400E+01, 1.500E+01,
+      1.600E+01, 1.800E+01, 2.000E+01
+    };
+
+    Float_t mu[kN] = { 
+      1.185E+03, 4.023E+02, 3.621E+02, 
+      3.957E+03, 2.263E+03, 7.881E+02, 
+      3.605E+02, 1.934E+02, 1.153E+02, 
+      5.032E+01, 2.621E+01, 7.955E+00, 
+      3.442E+00, 1.128E+00, 5.684E-01, 
+      3.681E-01, 2.778E-01, 2.018E-01, 
+      1.704E-01, 1.378E-01, 1.223E-01, 
+      1.042E-01, 9.276E-02, 8.445E-02, 
+      7.802E-02, 6.841E-02, 6.146E-02, 
+      6.080E-02, 5.496E-02, 5.006E-02, 
+      4.324E-02, 4.277E-02, 3.541E-02, 
+      3.106E-02, 2.836E-02, 2.655E-02, 
+      2.529E-02, 2.437E-02, 2.369E-02, 
+      2.318E-02, 2.279E-02, 2.249E-02, 
+      2.226E-02, 2.208E-02, 2.195E-02, 
+      2.185E-02, 2.173E-02, 2.168E-02
+    };
+
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
 
-//----- GetMuPo --------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuPo(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for polypropylene
-  //
+  //----- GetMuPo --------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuPo(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for polypropylene
+    //
 
-  const Int_t kN = 36;
+    const Int_t kN = 36;
 
-  Float_t mu[kN] = { 1.894E+03, 5.999E+02, 2.593E+02
+    Float_t mu[kN] = { 1.894E+03, 5.999E+02, 2.593E+02
 		       , 7.743E+01, 3.242E+01, 1.643E+01
 		       , 9.432E+00, 3.975E+00, 2.088E+00
 		       , 7.452E-01, 4.315E-01, 2.706E-01
@@ -1242,7 +1276,7 @@ Float_t CbmTrdRadiator::GetMuPo(Float_t energyMeV){
 		       , 3.045E-02, 2.760E-02, 2.383E-02
 		       , 2.145E-02, 1.819E-02, 1.658E-02 };
 
-  Float_t en[kN] = { 1.000E-03, 1.500E-03, 2.000E-03
+    Float_t en[kN] = { 1.000E-03, 1.500E-03, 2.000E-03
 		       , 3.000E-03, 4.000E-03, 5.000E-03
 		       , 6.000E-03, 8.000E-03, 1.000E-02
 		       , 1.500E-02, 2.000E-02, 3.000E-02
@@ -1255,21 +1289,21 @@ Float_t CbmTrdRadiator::GetMuPo(Float_t energyMeV){
 		       , 5.000E+00, 6.000E+00, 8.000E+00
 		       , 1.000E+01, 1.500E+01, 2.000E+01 };
 
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
-//----- GetMuAir --------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuAir(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for Air
-  //
+  //----- GetMuAir --------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuAir(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for Air
+    //
 
-  const Int_t kN = 38;
+    const Int_t kN = 38;
 
 
 
-  Float_t mu[kN] = { 0.35854E+04, 0.11841E+04, 0.52458E+03
+    Float_t mu[kN] = { 0.35854E+04, 0.11841E+04, 0.52458E+03
 		       , 0.16143E+03, 0.15722E+03, 0.14250E+03
 		       , 0.77538E+02, 0.40099E+02, 0.23313E+02
 		       , 0.98816E+01, 0.51000E+01, 0.16079E+01
@@ -1283,7 +1317,7 @@ Float_t CbmTrdRadiator::GetMuAir(Float_t energyMeV){
 		       , 0.25171E-01, 0.22205E-01, 0.20399E-01
 		       , 0.18053E-01, 0.18057E-01 };
 
-  Float_t en[kN] = { 0.10000E-02, 0.15000E-02, 0.20000E-02
+    Float_t en[kN] = { 0.10000E-02, 0.15000E-02, 0.20000E-02
 		       , 0.30000E-02, 0.32029E-02, 0.32029E-02 
 		       , 0.40000E-02, 0.50000E-02
 		       , 0.60000E-02, 0.80000E-02, 0.10000E-01
@@ -1297,19 +1331,19 @@ Float_t CbmTrdRadiator::GetMuAir(Float_t energyMeV){
 		       , 0.50000E+01, 0.60000E+01, 0.80000E+01
 		       , 0.10000E+02, 0.15000E+02, 0.20000E+02 };
 
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
-//----- GetMuXe --------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuXe(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for xenon
-  //
+  //----- GetMuXe --------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuXe(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for xenon
+    //
 
-  const Int_t kN = 48;
+    const Int_t kN = 48;
 
-  Float_t mu[kN] = { 9.413E+03, 8.151E+03, 7.035E+03
+    Float_t mu[kN] = { 9.413E+03, 8.151E+03, 7.035E+03
 		       , 7.338E+03, 4.085E+03, 2.088E+03
 		       , 7.780E+02, 3.787E+02, 2.408E+02
 		       , 6.941E+02, 6.392E+02, 6.044E+02
@@ -1326,7 +1360,7 @@ Float_t CbmTrdRadiator::GetMuXe(Float_t energyMeV){
 		       , 3.583E-02, 3.634E-02, 3.797E-02
 		       , 3.987E-02, 4.445E-02, 4.815E-02 };
 
-  Float_t en[kN] = { 1.00000E-03, 1.07191E-03, 1.14900E-03
+    Float_t en[kN] = { 1.00000E-03, 1.07191E-03, 1.14900E-03
 		       , 1.14900E-03, 1.50000E-03, 2.00000E-03
 		       , 3.00000E-03, 4.00000E-03, 4.78220E-03
 		       , 4.78220E-03, 5.00000E-03, 5.10370E-03
@@ -1343,19 +1377,19 @@ Float_t CbmTrdRadiator::GetMuXe(Float_t energyMeV){
 		       , 5.00000E+00, 6.00000E+00, 8.00000E+00
 		       , 1.00000E+01, 1.50000E+01, 2.00000E+01 };
 
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
-//----- GetMuCO2 ------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuCO2(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for CO2
-  //
+  //----- GetMuCO2 ------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuCO2(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for CO2
+    //
 
-  const Int_t kN = 36;
+    const Int_t kN = 36;
 
-  Float_t mu[kN] = { 0.39383E+04, 0.13166E+04, 0.58750E+03
+    Float_t mu[kN] = { 0.39383E+04, 0.13166E+04, 0.58750E+03
 		       , 0.18240E+03, 0.77996E+02, 0.40024E+02
 		       , 0.23116E+02, 0.96997E+01, 0.49726E+01
 		       , 0.15543E+01, 0.74915E+00, 0.34442E+00
@@ -1368,7 +1402,7 @@ Float_t CbmTrdRadiator::GetMuCO2(Float_t energyMeV){
 		       , 0.27555E-01, 0.25269E-01, 0.22311E-01
 		       , 0.20516E-01, 0.18184E-01, 0.17152E-01 };
 
-  Float_t en[kN] = { 0.10000E-02, 0.15000E-02, 0.20000E-02
+    Float_t en[kN] = { 0.10000E-02, 0.15000E-02, 0.20000E-02
 		       , 0.30000E-02, 0.40000E-02, 0.50000E-02
 		       , 0.60000E-02, 0.80000E-02, 0.10000E-01
 		       , 0.15000E-01, 0.20000E-01, 0.30000E-01
@@ -1381,19 +1415,19 @@ Float_t CbmTrdRadiator::GetMuCO2(Float_t energyMeV){
 		       , 0.50000E+01, 0.60000E+01, 0.80000E+01
 		       , 0.10000E+02, 0.15000E+02, 0.20000E+02 };
 
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
-//----- GetMuMy -------------------------------------------------------
-Float_t CbmTrdRadiator::GetMuMy(Float_t energyMeV){
-  //
-  // Returns the photon absorbtion cross section for mylar
-  //
+  //----- GetMuMy -------------------------------------------------------
+  Float_t CbmTrdRadiator::GetMuMy(Float_t energyMeV){
+    //
+    // Returns the photon absorbtion cross section for mylar
+    //
 
-  const Int_t kN = 36;
+    const Int_t kN = 36;
 
-  Float_t mu[kN] = { 2.911E+03, 9.536E+02, 4.206E+02
+    Float_t mu[kN] = { 2.911E+03, 9.536E+02, 4.206E+02
 		       , 1.288E+02, 5.466E+01, 2.792E+01
 		       , 1.608E+01, 6.750E+00, 3.481E+00
 		       , 1.132E+00, 5.798E-01, 3.009E-01
@@ -1406,7 +1440,7 @@ Float_t CbmTrdRadiator::GetMuMy(Float_t energyMeV){
 		       , 2.829E-02, 2.582E-02, 2.257E-02
 		       , 2.057E-02, 1.789E-02, 1.664E-02 };
 
-  Float_t en[kN] = { 1.00000E-03, 1.50000E-03, 2.00000E-03
+    Float_t en[kN] = { 1.00000E-03, 1.50000E-03, 2.00000E-03
 		       , 3.00000E-03, 4.00000E-03, 5.00000E-03
 		       , 6.00000E-03, 8.00000E-03, 1.00000E-02
 		       , 1.50000E-02, 2.00000E-02, 3.00000E-02
@@ -1419,62 +1453,62 @@ Float_t CbmTrdRadiator::GetMuMy(Float_t energyMeV){
 		       , 5.00000E+00, 6.00000E+00, 8.00000E+00
 		       , 1.00000E+01, 1.50000E+01, 2.00000E+01 };
 
-  return Interpolate(energyMeV,en,mu,kN);
-}
-//----------------------------------------------------------------------------
+    return Interpolate(energyMeV,en,mu,kN);
+  }
+  //----------------------------------------------------------------------------
 
-//----- Interpolate ------------------------------------------------------
-Float_t CbmTrdRadiator::Interpolate(Float_t energyMeV
+  //----- Interpolate ------------------------------------------------------
+  Float_t CbmTrdRadiator::Interpolate(Float_t energyMeV
 				      , Float_t *en, Float_t *mu, Int_t n){
-  //
-  // Interpolates the photon absorbtion cross section 
-  // for a given energy <energyMeV>.
-  //
+    //
+    // Interpolates the photon absorbtion cross section 
+    // for a given energy <energyMeV>.
+    //
 
-  Float_t de    = 0;
-  Int_t    index = 0;
-  Int_t    istat = Locate(en,n,energyMeV,index,de);
-  if (istat == 0) {
-    Float_t result = (mu[index] - de * (mu[index]   - mu[index+1])
+    Float_t de    = 0;
+    Int_t    index = 0;
+    Int_t    istat = Locate(en,n,energyMeV,index,de);
+    if (istat == 0) {
+      Float_t result = (mu[index] - de * (mu[index]   - mu[index+1])
 			/ (en[index+1] - en[index]  ));
-    return result;
+      return result;
+    }
+    else {
+      return 0.0; 
+    }
   }
-  else {
-    return 0.0; 
-  }
-}
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-//----- Locate ------------------------------------------------------------
-Int_t CbmTrdRadiator::Locate(Float_t *xv, Int_t n, Float_t xval
+  //----- Locate ------------------------------------------------------------
+  Int_t CbmTrdRadiator::Locate(Float_t *xv, Int_t n, Float_t xval
 			       , Int_t &kl, Float_t &dx){
-  //
-  // Locates a point (xval) in a 1-dim grid (xv(n))
-  //
+    //
+    // Locates a point (xval) in a 1-dim grid (xv(n))
+    //
 
-  if (xval >= xv[n-1]) return  1;
-  if (xval <  xv[0])   return -1;
+    if (xval >= xv[n-1]) return  1;
+    if (xval <  xv[0])   return -1;
 
-  Int_t km;
-  Int_t kh = n - 1;
+    Int_t km;
+    Int_t kh = n - 1;
 
-  kl = 0;
-  while (kh - kl > 1) {
-    if (xval < xv[km = (kl+kh)/2]) kh = km; 
-    else                           kl = km;
-  }
-  if (xval < xv[kl] || xval > xv[kl+1] || kl >= n-1) {
-    printf("Locate failed xv[%d] %f xval %f xv[%d] %f!!!\n"
+    kl = 0;
+    while (kh - kl > 1) {
+      if (xval < xv[km = (kl+kh)/2]) kh = km; 
+      else                           kl = km;
+    }
+    if (xval < xv[kl] || xval > xv[kl+1] || kl >= n-1) {
+      printf("Locate failed xv[%d] %f xval %f xv[%d] %f!!!\n"
 	     ,kl,xv[kl],xval,kl+1,xv[kl+1]);
-    exit(1);
+      exit(1);
+    }
+
+    dx = xval - xv[kl];
+    if(xval == 0.001) cout<<"Locat = 0"<<endl;
+    return 0;
   }
-
-  dx = xval - xv[kl];
-  if(xval == 0.001) cout<<"Locat = 0"<<endl;
-  return 0;
-}
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
 
-ClassImp(CbmTrdRadiator)
+  ClassImp(CbmTrdRadiator)
 

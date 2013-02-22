@@ -11,7 +11,7 @@ trd_digi=$3
 
 create_output_dir events_${test_name}/
 
-nevents=100
+nevents=500
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       10     0  yes   no)
@@ -40,7 +40,7 @@ function run_reco() {
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"all\")"
 }
 
-#run_reco smearing nn
+run_reco smearing nn
 run_reco smearing branch
 #run_reco clustering nn
 #run_reco clustering branch

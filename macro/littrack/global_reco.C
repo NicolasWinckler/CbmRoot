@@ -12,8 +12,8 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 100, // number of events
-		TString opt = "tracking")
+void global_reco(Int_t nEvents = 10, // number of events
+		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
@@ -22,7 +22,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/sts_tof_v13a/"; // Output directory
+	TString dir = "trd_v13b/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -32,8 +32,8 @@ void global_reco(Int_t nEvents = 100, // number of events
    // Digi files
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v12b.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
+   TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TString tofDigiFile = "/parameters/tof/par_tof_V13a.txt";//parDir + "/tof/par_tof_V13a.txt";
 
@@ -41,7 +41,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "branch"; // Global tracking type
+   TString globalTrackingType = "nn_new"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
@@ -124,27 +124,24 @@ void global_reco(Int_t nEvents = 100, // number of events
 
 		if (stsHitProducerType == "real") {
 		// ----- STS REAL reconstruction -----------------------------------------------
-                // -----   STS digitizer   -------------------------------------------------
-                Double_t threshold  =  4;
-                Double_t noiseWidth =  0.01;
-                Int_t    nofBits    = 12;
-                Double_t ElectronsPerAdc    =  10.;
-                Double_t StripDeadTime = 0.1;
-                CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
-                stsDigitize->SetRealisticResponse();
-                stsDigitize->SetFrontThreshold (threshold);
-                stsDigitize->SetBackThreshold  (threshold);
-                stsDigitize->SetFrontNoiseWidth(noiseWidth);
-                stsDigitize->SetBackNoiseWidth (noiseWidth);
-                stsDigitize->SetFrontNofBits   (nofBits);
-                stsDigitize->SetBackNofBits    (nofBits);
-                stsDigitize->SetFrontNofElPerAdc  (ElectronsPerAdc);
-                stsDigitize->SetBackNofElPerAdc   (ElectronsPerAdc);
-                stsDigitize->SetStripDeadTime  (StripDeadTime);
-                run->AddTask(stsDigitize);
-                // -------------------------------------------------------------------------
-
-
+         // -----   STS digitizer   -------------------------------------------------
+         Double_t threshold = 4;
+         Double_t noiseWidth = 0.01;
+         Int_t nofBits = 12;
+         Double_t ElectronsPerAdc =  10.;
+         Double_t StripDeadTime = 0.1;
+         CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+         stsDigitize->SetRealisticResponse();
+         stsDigitize->SetFrontThreshold(threshold);
+         stsDigitize->SetBackThreshold(threshold);
+         stsDigitize->SetFrontNoiseWidth(noiseWidth);
+         stsDigitize->SetBackNoiseWidth(noiseWidth);
+         stsDigitize->SetFrontNofBits(nofBits);
+         stsDigitize->SetBackNofBits(nofBits);
+         stsDigitize->SetFrontNofElPerAdc(ElectronsPerAdc);
+         stsDigitize->SetBackNofElPerAdc(ElectronsPerAdc);
+         stsDigitize->SetStripDeadTime(StripDeadTime);
+         run->AddTask(stsDigitize);
 
          FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
          run->AddTask(stsClusterFinder);
@@ -182,10 +179,6 @@ void global_reco(Int_t nEvents = 100, // number of events
 
 		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
 		run->AddTask(stsMatchTracks);
-
-//		CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-//		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
-//		run->AddTask(fitTracks);
 		// ------------------------------------------------------------------------
 
 		if (IsMuch(parFile)) {
@@ -325,15 +318,15 @@ void global_reco(Int_t nEvents = 100, // number of events
          FairTask* l1 = new CbmL1();
          run->AddTask(l1);
       }
-		// -----   Primary vertex finding   ---------------------------------------
+		// -----   Primary vertex finding   --------------------------------------
 		CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
 		CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
 		run->AddTask(findVertex);
-		// ------------------------------------------------------------------------
+		// -----------------------------------------------------------------------
 	}
 
 	if (opt == "all" || opt == "tracking") {
-		// -----   Track finding QA check   ------------------------------------
+		// ----- Reconstruction QA tasks -----------------------------------------
 		CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
 		trackingQa->SetMinNofPointsSts(normStsPoints);
 		trackingQa->SetMinNofPointsTrd(normTrdPoints);
@@ -347,7 +340,6 @@ void global_reco(Int_t nEvents = 100, // number of events
 		trackingQa->SetVerbose(normTofHits);
 		trackingQa->SetOutputDir(std::string(resultDir));
 		run->AddTask(trackingQa);
-		// ------------------------------------------------------------------------
 
 		CbmLitFitQa* fitQa = new CbmLitFitQa();
 		fitQa->SetMvdMinNofHits(0);
@@ -360,10 +352,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
 		clusteringQa->SetOutputDir(std::string(resultDir));
 		run->AddTask(clusteringQa);
-
-	/*	CbmStsSimulationQa* stsSimulationQa = new CbmStsSimulationQa();
-		stsSimulationQa->SetOutputDir(std::string(resultDir));
-		run->AddTask(stsSimulationQa);*/
+		// -----------------------------------------------------------------------
 	}
 
 	// -----  Parameter database   --------------------------------------------

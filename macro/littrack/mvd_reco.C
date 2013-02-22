@@ -14,20 +14,20 @@ void mvd_reco(Int_t nEvents = 100)
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString dir = "/Users/andrey/Development/cbm/d/events/mvd/"; // Output directory
+   TString dir = "mvd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString mvdDeltaFile = dir + "mc.delta.0000.root"; // Delta files for MVD
    TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
 
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v11a.digi.par"; // Digi scheme for STS
+   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // Digi scheme for STS
 
    TString resultDir = "./test/"; // Directory for output results
 
    Int_t normStsPoints = 4; // STS normalization for efficiency
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
-   Int_t nofMvdDeltaEvents = 10;
+   Int_t nofMvdDeltaEvents = 0;
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
@@ -68,25 +68,23 @@ void mvd_reco(Int_t nEvents = 100)
 
    if (stsHitProducerType == "real") {
    // ----- STS REAL reconstruction -----------------------------------------------
-     // -----   STS digitizer   -------------------------------------------------
-     Double_t threshold  =  4;
-     Double_t noiseWidth =  0.01;
-     Int_t    nofBits    = 12;
-     Double_t ElectronsPerAdc    =  10.;
-     Double_t StripDeadTime = 0.1;
-     CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
-     stsDigitize->SetRealisticResponse();
-     stsDigitize->SetFrontThreshold (threshold);
-     stsDigitize->SetBackThreshold  (threshold);
-     stsDigitize->SetFrontNoiseWidth(noiseWidth);
-     stsDigitize->SetBackNoiseWidth (noiseWidth);
-     stsDigitize->SetFrontNofBits   (nofBits);
-     stsDigitize->SetBackNofBits    (nofBits);
-     stsDigitize->SetFrontNofElPerAdc  (ElectronsPerAdc);
-     stsDigitize->SetBackNofElPerAdc   (ElectronsPerAdc);
-     stsDigitize->SetStripDeadTime  (StripDeadTime);
-     run->AddTask(stsDigitize);
-     // -------------------------------------------------------------------------
+      Double_t threshold = 4;
+      Double_t noiseWidth = 0.01;
+      Int_t nofBits = 12;
+      Double_t ElectronsPerAdc = 10.;
+      Double_t StripDeadTime = 0.1;
+      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+      stsDigitize->SetRealisticResponse();
+      stsDigitize->SetFrontThreshold(threshold);
+      stsDigitize->SetBackThreshold(threshold);
+      stsDigitize->SetFrontNoiseWidth(noiseWidth);
+      stsDigitize->SetBackNoiseWidth(noiseWidth);
+      stsDigitize->SetFrontNofBits(nofBits);
+      stsDigitize->SetBackNofBits(nofBits);
+      stsDigitize->SetFrontNofElPerAdc(ElectronsPerAdc);
+      stsDigitize->SetBackNofElPerAdc(ElectronsPerAdc);
+      stsDigitize->SetStripDeadTime(StripDeadTime);
+      run->AddTask(stsDigitize);
 
       FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
       run->AddTask(stsClusterFinder);
@@ -124,11 +122,6 @@ void mvd_reco(Int_t nEvents = 100)
 
 	FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
 	run->AddTask(stsMatchTracks);
-
-//	CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-//	FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
-//	run->AddTask(fitTracks);
-   // ------------------------------------------------------------------------
 
 	CbmLitFindMvdTracks* mvdFinder = new CbmLitFindMvdTracks();
 	run->AddTask(mvdFinder);

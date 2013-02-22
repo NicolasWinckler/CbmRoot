@@ -7,7 +7,7 @@
 
 void event_display()
 {
-	TString dir = "events/sts_tof_v13a/";
+	TString dir = "mvd/";
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
 

@@ -39,8 +39,8 @@ function run_reco() {
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"all\")"
 }
 
-run_reco simple nn
-run_reco simple branch
+#run_reco simple nn
+#run_reco simple branch
 run_reco advanced nn
 run_reco advanced branch
 

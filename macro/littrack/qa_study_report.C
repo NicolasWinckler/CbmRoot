@@ -25,13 +25,15 @@ void qa_study_report()
       }
       outputDir = std::string(gSystem->Getenv("LIT_STUDY_OUTPUT_DIR"));
    } else {
-      fileNames.push_back("scripts/events_trd_v10b/global.reco.smearing.branch.0000.root");
-      fileNames.push_back("scripts/events_trd_v11c/global.reco.smearing.branch.0000.root");
-      fileNames.push_back("scripts/events_trd_v12a/global.reco.smearing.branch.0000.root");
+      fileNames.push_back("scripts/events_trd_v10b/global.reco.smearing.branch_new.0000.root");
+      fileNames.push_back("scripts/events_trd_v10b/global.reco.smearing.nn_new.0000.root");
+      fileNames.push_back("scripts/events_trd_v11c/global.reco.smearing.branch_new.0000.root");
+      fileNames.push_back("scripts/events_trd_v11c/global.reco.smearing.nn_new.0000.root");
 
-      studyNames.push_back("v10b");
-      studyNames.push_back("v11c");
-      studyNames.push_back("v12a");
+      studyNames.push_back("v10b_branch");
+      studyNames.push_back("v10b_nn");
+      studyNames.push_back("v11c_branch");
+      studyNames.push_back("v11c_nn");
 
       outputDir = "./test/";
    }

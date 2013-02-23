@@ -115,6 +115,9 @@ void CbmAnaDielectronTaskDrawAll::DrawMinvAll()
 {
    TCanvas *c = CreateCanvas("minv_all_ptcut", "minv_all_ptcut", 800, 800);
    DrawMinv(kPtCut);
+
+   TCanvas *cTT = CreateCanvas("minv_all_ttcut", "minv_all_ttcut", 800, 800);
+   DrawMinv(kTtCut);
 }
 
 void CbmAnaDielectronTaskDrawAll::DrawMinv(
@@ -230,9 +233,12 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    gPad->SetLogy(true);
 
    // signal-to-background ration vs. minv
-   TH1D* sbgVsMinv = new TH1D("sbgVsMinv", "sbgVsMinv;M_{ee} [GeV/c^{2}];Cocktail/Background", bg->GetNbinsX(), bg->GetXaxis()->GetXmin(), bg->GetXaxis()->GetXmax());
+   TH1D* sbgVsMinv = new TH1D(("sbgVsMinv_" + CbmAnaLmvmNames::fAnaSteps[step]).c_str(),
+         ("sbgVsMinv_"+CbmAnaLmvmNames::fAnaSteps[step]+";M_{ee} [GeV/c^{2}];Cocktail/Background").c_str(),
+         bg->GetNbinsX(), bg->GetXaxis()->GetXmin(), bg->GetXaxis()->GetXmax());
    sbgVsMinv->Divide(coctail, bg, 1., 1., "B");
-   TCanvas* c = CreateCanvas("lmvm_sbg_vs_minv", "lmvm_sbg_vs_minv", 800, 800);
+   TCanvas* c = CreateCanvas(("lmvm_sbg_vs_minv_"+CbmAnaLmvmNames::fAnaSteps[step]).c_str(),
+         ("lmvm_sbg_vs_minv_"+CbmAnaLmvmNames::fAnaSteps[step]).c_str(), 800, 800);
    DrawH1(sbgVsMinv);
    gPad->SetLogy(true);
 }

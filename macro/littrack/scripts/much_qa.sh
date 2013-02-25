@@ -15,7 +15,7 @@ create_output_dir events_${test_name}/
 nevents=500
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU  URQMD    UNIGEN
-pars=(0    0    0   0   0    0    10       0      0  ${urqmd} no)
+pars=(0    0    0   0   0    0    15       0      0  ${urqmd} no)
 set_simulation_parameters ${pars}
 
 set_default_muon_geometry

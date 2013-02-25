@@ -8,6 +8,7 @@ test_name=$1
 sts_geom=$2
 sts_digi=$3
 sts_mat_budget_file=$4
+consequtive_sts_points=$5
 
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/
@@ -25,6 +26,7 @@ export LIT_STS_GEOM=${sts_geom}
 export LIT_STS_DIGI=${sts_digi}
 export LIT_STS_MAT_BUDGET_FILE=${sts_mat_budget_file}
 export LIT_GLOBAL_TRACKING_TYPE=branch
+export LIT_CONSEQUTIVE_STS_POINTS=${consequtive_sts_points}
 
 set_default_file_names ${LIT_DIR} 0000
 

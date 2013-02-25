@@ -72,6 +72,7 @@ function set_default_muon_geometry() {
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
     
+    export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
     export LIT_NORM_TRD_POINTS=0
     export LIT_NORM_MUCH_POINTS=16
@@ -104,6 +105,7 @@ function set_default_electron_geometry() {
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
     
+    export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
     export LIT_NORM_TRD_POINTS=6
     export LIT_NORM_MUCH_POINTS=0
@@ -136,6 +138,7 @@ function set_default_mvd_geometry() {
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
     
+    export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
     export LIT_NORM_TRD_POINTS=0
     export LIT_NORM_MUCH_POINTS=0
@@ -166,6 +169,7 @@ function set_default_sts_geometry() {
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
     
+    export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
     export LIT_NORM_TRD_POINTS=0
     export LIT_NORM_MUCH_POINTS=0
@@ -198,6 +202,7 @@ function set_default_sts_tof_geometry() {
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
     
+    export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
     export LIT_NORM_TRD_POINTS=0
     export LIT_NORM_MUCH_POINTS=0

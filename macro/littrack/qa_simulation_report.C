@@ -10,8 +10,8 @@ void qa_simulation_report()
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
    loadlibs();
 
-   std::string outputDir = "$VMCWORKDIR/macro/littrack/test/";
-   std::string fileName = "$VMCWORKDIR/macro/littrack/commit_tests/events_electron/global.reco.0000.root";
+   std::string outputDir = "./test/";//"$VMCWORKDIR/macro/littrack/test/";
+   std::string fileName = "$VMCWORKDIR/macro/littrack/scripts/events_much_v11a/global.reco.advanced.nn.0000.root";
 
    CbmSimulationReport* trackingQaReport = new CbmLitTrackingQaReport();
    trackingQaReport->Create(fileName, outputDir);
@@ -21,4 +21,8 @@ void qa_simulation_report()
 
    CbmSimulationReport* clusteringQaReport = new CbmLitClusteringQaReport();
    clusteringQaReport->Create(fileName, outputDir);
+
+//   CbmLitRadLengthQaReport* radLengthQaReport = new CbmLitRadLengthQaReport();
+//   radLengthQaReport->Create(fileName, outputDir);
+
 }

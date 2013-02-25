@@ -8,7 +8,7 @@ trd_geom=$2
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/
 
-nevents=50000
+nevents=1000000
 
 export LIT_CAVE_GEOM=cave.geo
 export LIT_TRD_GEOM=${trd_geom}

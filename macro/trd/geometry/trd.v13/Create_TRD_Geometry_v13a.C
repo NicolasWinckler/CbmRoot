@@ -32,7 +32,7 @@ const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is include
 const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
-const Bool_t IncludeSupports = false; // false;  // true, if FEBs are included in geometry
+const Bool_t IncludeSupports = true;  // false;  // true, if FEBs are included in geometry
 
 const Float_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -222,6 +222,7 @@ const TString HoneycombVolumeMedium   = "TRDaramide";
 const TString CarbonVolumeMedium      = "TRDcarbon";
 const TString FebVolumeMedium         = "TRDG10";    // todo - put correct FEB material here
 const TString FrameVolumeMedium       = "TRDG10";
+const TString AluminiumVolumeMedium   = "aluminium";
 //const TString MylarVolumeMedium       = "mylar";
 //const TString RadiatorVolumeMedium    = "polypropylene";
 //const TString ElectronicsVolumeMedium = "goldcoatedcopper";
@@ -289,6 +290,9 @@ void Create_TRD_Geometry_v13a() {
   top->Draw("ogl");
   //top->Raytrace();
 
+  cout << "Press Return to exit" << endl;
+//  cin.get();
+//  exit();
 }
 
 void create_materials_from_media_file()
@@ -313,6 +317,7 @@ void create_materials_from_media_file()
   FairGeoMedium* copper           = geoMedia->getMedium(PadCopperVolumeMedium);
   FairGeoMedium* carbon           = geoMedia->getMedium(CarbonVolumeMedium);
   FairGeoMedium* honeycomb        = geoMedia->getMedium(HoneycombVolumeMedium);
+  FairGeoMedium* aluminium        = geoMedia->getMedium(AluminiumVolumeMedium);
 
 //  FairGeoMedium* goldCoatedCopper = geoMedia->getMedium("goldcoatedcopper");
 //  FairGeoMedium* polypropylene    = geoMedia->getMedium("polypropylene");
@@ -326,6 +331,7 @@ void create_materials_from_media_file()
   geoBuild->createMedium(G10);
   geoBuild->createMedium(copper);
   geoBuild->createMedium(kapton);
+  geoBuild->createMedium(aluminium);
 
 //  geoBuild->createMedium(goldCoatedCopper);
 //  geoBuild->createMedium(polypropylene);
@@ -354,6 +360,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 //  TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(ElectronicsVolumeMedium);
   TGeoMedium* frameVolMed       = gGeoMan->GetMedium(FrameVolumeMedium);
   TGeoMedium* febVolMed         = gGeoMan->GetMedium(FebVolumeMedium);
+//  TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);
 
   TString name = Form("trd1mod%d", moduleType);
   TGeoVolume* module = new TGeoVolumeAssembly(name);
@@ -932,52 +939,161 @@ void create_supports()
 ////   gGeoMan->GetVolume(geoVersion)->AddNode(gModules[type - 1], copy, module_placement);
 
 
-
-  TGeoMedium* carbonVolMed      = gGeoMan->GetMedium(CarbonVolumeMedium);  // define Volume Medium
+  TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
 
   Double_t x[12] = { -10,-10, -1, -1,-10,-10, 10, 10,  1,  1, 10, 10 };  // define H-like structure, centered at x=0, y=0
   Double_t y[12] = { -10, -8, -8,  8,  8, 10, 10,  8,  8, -8, -8,-10 };  // 20 x 20 cm in size, 2 cm wall thickness
 
-  TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX(90.); // rotate  90 deg around x-axis                     
-  TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY(90.); // rotate  90 deg around y-axis                     
+  TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX( 90.); // rotate  90 deg around x-axis                     
+  TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY( 90.); // rotate  90 deg around y-axis                     
+
+  Double_t ang1 = atan(3./4.) * 180. / acos(-1.);
+  cout << "DEDE " << ang1 << endl;
+  //  Double_t sin1 = acos(-1.);
+  //  cout << "DEDE " << sin1 << endl;
+  TGeoRotation  *rotx080 = new TGeoRotation("rotx080"); rotx080->RotateX( 90.-ang1); // rotate  80 deg around x-axis                     
+  TGeoRotation  *rotx100 = new TGeoRotation("rotx100"); rotx100->RotateX( 90.+ang1); // rotate 100 deg around x-axis                     
+
+  TGeoRotation  *rotxy01 = new TGeoRotation("rotxy01"); 
+  rotxy01->RotateX(  90.); // rotate  90 deg around x-axis                     
+  rotxy01->RotateZ(-ang1); // rotate  ang1   around rotated y-axis                     
+
+  TGeoRotation  *rotxy02 = new TGeoRotation("rotxy02"); 
+  rotxy02->RotateX(  90.); // rotate  90 deg around x-axis                     
+  rotxy02->RotateZ( ang1); // rotate  ang1   around rotated y-axis                     
 
 
+//-------------------
+// horizontal supports
+//-------------------
   TGeoXtru* trd1_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
   trd1_H_hori1->DefinePolygon(12,x,y);
-  trd1_H_hori1->DefineSection( 0,-500, 0, 0, 1.0);
-  trd1_H_hori1->DefineSection( 1, 500, 0, 0, 1.0);
-  TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, carbonVolMed);
+  trd1_H_hori1->DefineSection( 0,-550, 0, 0, 1.0);
+  trd1_H_hori1->DefineSection( 1, 550, 0, 0, 1.0);
+  TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
   trd1_H_hori_vol1->SetLineColor(kRed);
 
-  //  TGeoTranslation* trd1_H_hori1_trans = new TGeoTranslation("", 0., 300., 550.);
-  //  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori1_trans);
+  // linear arrangement for stations 1,2,3
 
-  TGeoCombiTrans* trd1_H_hori_combi1 = new TGeoCombiTrans(0., 350., 475., roty090);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori_combi1);
-  
-  TGeoCombiTrans* trd1_H_hori_combi2 = new TGeoCombiTrans(0., 350., 625., roty090);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori_combi2);
-  
+  Double_t ypos[6] = {283., 350., 383., 450., 483., 505.};
+  Double_t zpos[6] = {475., 625., 700., 850., 925., 975.};
 
+  // linear y position of H bars:
+  // y = z * 100. / 225 + (350 - 625. / 225 * 100)
+  //
+  // z= 475, y= 283 +10.
+  // z= 625, y= 350 +10. 
+  //
+  // z= 700, y= 383 +10. 
+  // z= 850, y= 450 +10. 
+  //
+  // z= 925, y= 483 +10. 
+  // z= 975, y= 505 +10. 
 
+//  for (i=0; i<6; i++)
+//  {
+//    TGeoCombiTrans* trd1_H_hori_combi00 = new TGeoCombiTrans(0., ypos[i]+10., zpos[i], roty090);
+//    gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, i, trd1_H_hori_combi00);
+//  }
+
+  TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., 350.+10., 475., roty090);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 1, trd1_H_hori_combi01);
+  TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0., 350.+10., 625., roty090);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 2, trd1_H_hori_combi02);
+
+  // station 2
+//  TGeoCombiTrans* trd1_H_hori_combi11 = new TGeoCombiTrans(0., 450.+10., 700., roty090);
+//  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori_combi11);
+//  TGeoCombiTrans* trd1_H_hori_combi12 = new TGeoCombiTrans(0., 450.+10., 850., roty090);
+//  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori_combi12);
+//  
+  // station 3
+//  TGeoCombiTrans* trd1_H_hori_combi21 = new TGeoCombiTrans(0., 550.+10., 925., roty090);
+//  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori_combi21);
+//  TGeoCombiTrans* trd1_H_hori_combi22 = new TGeoCombiTrans(0., 550.+10., 975., roty090);
+//  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori_combi22);
+//
+
+  // translation only
+//  TGeoTranslation* trd1_H_hori1_trans = new TGeoTranslation("", 0., 300., 550.);
+//  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 0, trd1_H_hori1_trans);
+
+//-------------------
+// vertical pillars
+//-------------------
   TGeoXtru* trd1_H_vert1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
   trd1_H_vert1->DefinePolygon(12,x,y);
-  trd1_H_vert1->DefineSection( 0,-(350-10), 0, 0, 1.0);
-  trd1_H_vert1->DefineSection( 1, (350-10), 0, 0, 1.0);
-  TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, carbonVolMed);
+  trd1_H_vert1->DefineSection( 0,-350, 0, 0, 1.0);
+  trd1_H_vert1->DefineSection( 1, 450, 0, 0, 1.0);
+  TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
   trd1_H_vert_vol1->SetLineColor(kYellow);
 
   //  TGeoTranslation* trd1_H_vert1_trans = new TGeoTranslation("", 0., 300., 550.);
   //  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 0, trd1_H_vert1_trans);
 
-  TGeoCombiTrans* trd1_H_vert_combi1 = new TGeoCombiTrans( 400., 0., 475., rotx090);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 0, trd1_H_vert_combi1);
-  TGeoCombiTrans* trd1_H_vert_combi2 = new TGeoCombiTrans(-400., 0., 475., rotx090);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 0, trd1_H_vert_combi2);
-  TGeoCombiTrans* trd1_H_vert_combi3 = new TGeoCombiTrans( 400., 0., 625., rotx090);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 0, trd1_H_vert_combi3);
-  TGeoCombiTrans* trd1_H_vert_combi4 = new TGeoCombiTrans(-400., 0., 625., rotx090);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 0, trd1_H_vert_combi4);
+  TGeoCombiTrans* trd1_H_vert_combi1 = new TGeoCombiTrans( 450.+10., 0., 475., rotx090);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 1, trd1_H_vert_combi1);
+  TGeoCombiTrans* trd1_H_vert_combi2 = new TGeoCombiTrans(-450.-10., 0., 475., rotx090);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 2, trd1_H_vert_combi2);
+  TGeoCombiTrans* trd1_H_vert_combi3 = new TGeoCombiTrans( 450.+10., 0., 625., rotx090);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 3, trd1_H_vert_combi3);
+  TGeoCombiTrans* trd1_H_vert_combi4 = new TGeoCombiTrans(-450.-10., 0., 625., rotx090);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 4, trd1_H_vert_combi4);
+  
+
+//-------------------
+// / - reinforcement of horizontal supports
+//-------------------
+  TGeoXtru* trd1_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+  trd1_H_slope1->DefinePolygon(12,x,y);
+  trd1_H_slope1->DefineSection( 0, -125, 0, 0, 1.0);
+  trd1_H_slope1->DefineSection( 1,    0, 0, 0, 1.0);
+  TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+  trd1_H_slope_vol1->SetLineColor(kGreen);
+
+  //  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( 0., 0., 0., NULL);
+  //  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( 0., 0., 0., rotx090);
+  //  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( 0., 0., 0., rotxy01);
+
+  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( 450.+10., 350.+10.-100., 475., rotxy01);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 1, trd1_H_slope_combi01);
+  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans(-450.-10., 350.+10.-100., 475., rotxy02);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 2, trd1_H_slope_combi01);
+  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( 450.+10., 350.+10.-100., 625., rotxy01);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 3, trd1_H_slope_combi01);
+  TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans(-450.-10., 350.+10.-100., 625., rotxy02);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 4, trd1_H_slope_combi01);
+  
+//-------------------
+// X-bars between vertical pillars
+//-------------------
+  TGeoXtru* trd1_H_cross1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+  trd1_H_cross1->DefinePolygon(12,x,y);
+  trd1_H_cross1->DefineSection( 0,-125, 0, 0, 1.0);
+  trd1_H_cross1->DefineSection( 1, 125, 0, 0, 1.0);
+  TGeoVolume* trd1_H_cross_vol1 = new TGeoVolume("trd1_H_cross01", trd1_H_cross1, aluminiumVolMed);
+  trd1_H_cross_vol1->SetLineColor(kBlue);
+
+  //  TGeoTranslation* trd1_H_cross1_trans = new TGeoTranslation("", 0., 300., 550.);
+  //  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 0, trd1_H_cross1_trans);
+
+  TGeoCombiTrans* trd1_H_cross_combi01 = new TGeoCombiTrans( 450.+10.,150., 550., rotx080);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 1, trd1_H_cross_combi01);
+  TGeoCombiTrans* trd1_H_cross_combi02 = new TGeoCombiTrans(-450.-10.,150., 550., rotx080);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 2, trd1_H_cross_combi02);
+  TGeoCombiTrans* trd1_H_cross_combi03 = new TGeoCombiTrans( 450.+10.,150., 550., rotx100);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 3, trd1_H_cross_combi03);
+  TGeoCombiTrans* trd1_H_cross_combi04 = new TGeoCombiTrans(-450.-10.,150., 550., rotx100);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 4, trd1_H_cross_combi04);
+  
+  TGeoCombiTrans* trd1_H_cross_combi11 = new TGeoCombiTrans( 450.+10.,-150., 550., rotx080);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 5, trd1_H_cross_combi11);
+  TGeoCombiTrans* trd1_H_cross_combi12 = new TGeoCombiTrans(-450.-10.,-150., 550., rotx080);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 6, trd1_H_cross_combi12);
+  TGeoCombiTrans* trd1_H_cross_combi13 = new TGeoCombiTrans( 450.+10.,-150., 550., rotx100);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 7, trd1_H_cross_combi13);
+  TGeoCombiTrans* trd1_H_cross_combi14 = new TGeoCombiTrans(-450.-10.,-150., 550., rotx100);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_cross_vol1, 8, trd1_H_cross_combi14);
   
 
 /*
@@ -992,107 +1108,6 @@ void create_supports()
 //                                                                                                                                    
    TGeoMaterial *matAl = new TGeoMaterial("Al", 26.98, 13, 2.7);                                                                      
    TGeoMedium *Al      = new TGeoMedium("Al", 1, matAl);                                                                              
- //  TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX(90.); // rotate  90 deg around x-axis                     
- //  TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY(90.); // rotate  90 deg around y-axis                     
-                                                                                                                                      
-   TGeoVolume *vol1 = gGeoManager->MakeXtru("hbar1", Al, 2);                                                                          
-   TGeoXtru *hbar1 = (TGeoXtru*)vol1->GetShape();                                                                                     
-   //   vol1->SetLineColor(kRed);                                                                                                     
-                                                                                                                                      
-   TGeoVolume *vol2 = gGeoManager->MakeXtru("hbar2", Al, 2);                                                                          
-   TGeoXtru *hbar2 = (TGeoXtru*)vol2->GetShape();                                                                                     
-                                                                                                                                      
-   TGeoVolume *vol3 = gGeoManager->MakeXtru("hbar3", Al, 2);                                                                          
-   TGeoXtru *hbar3 = (TGeoXtru*)vol3->GetShape();                                                                                     
-                                                                                                                                      
-   TGeoVolume *vol4 = gGeoManager->MakeXtru("hbar4", Al, 2);                                                                          
-   TGeoXtru *hbar4 = (TGeoXtru*)vol4->GetShape();                                                                                     
-                                                                                                                                      
-   TGeoVolume *vol5 = gGeoManager->MakeXtru("hbar5", Al, 2);                                                                          
-   TGeoXtru *hbar5 = (TGeoXtru*)vol5->GetShape();                                                                                     
-                                                                                                                                      
-   TGeoVolume *vol6 = gGeoManager->MakeXtru("hbar6", Al, 2);                                                                          
-   TGeoXtru *hbar6 = (TGeoXtru*)vol6->GetShape();                                                                                     
-                                                                                                                                      
-
-//   Double_t x[12] = { -10,-10, -1, -1,-10,-10, 10, 10,  1,  1, 10, 10 };                                                              
-//   Double_t y[12] = { -10, -8, -8,  8,  8, 10, 10,  8,  8, -8, -8,-10 };                                                              
-                                                                                                                                      
-   hbar1->DefinePolygon(12,x,y);                                                                                                      
-   hbar1->DefineSection( 0,-450, 0, 0, 1.0);                                                                                          
-   hbar1->DefineSection( 1, 450, 0, 0, 1.0);                                                                                          
-                                                                                                                                      
-   hbar2->DefinePolygon(12,x,y);                                                                                                      
-   hbar2->DefineSection( 0,-340, 0, 0, 1.0);                                                                                          
-   hbar2->DefineSection( 1, 540, 0, 0, 1.0);                                                                                          
-                                                                                                                                      
-   hbar3->DefinePolygon(12,x,y);                                                                                                      
-   hbar3->DefineSection( 0,-550, 0, 0, 1.0);                                                                                          
-   hbar3->DefineSection( 1, 550, 0, 0, 1.0);                                                                                          
-
-   hbar4->DefinePolygon(12,x,y);                                                                                                      
-   hbar4->DefineSection( 0,-440, 0, 0, 1.0);                                                                                          
-   hbar4->DefineSection( 1, 540, 0, 0, 1.0);                                                                                          
-                                                                                                                                      
-   hbar5->DefinePolygon(12,x,y);                                                                                                      
-   hbar5->DefineSection( 0,-650, 0, 0, 1.0);                                                                                          
-   hbar5->DefineSection( 1, 650, 0, 0, 1.0);                                                                                          
-                                                                                                                                      
-   hbar6->DefinePolygon(12,x,y);                                                                                                      
-   hbar6->DefineSection( 0,-540, 0, 0, 1.0);                                                                                          
-   hbar6->DefineSection( 1, 540, 0, 0, 1.0);                                                                                          
-                                                                                                                                      
-   // matrices are not tested                                                                                                         
-   gGeoManager->Matrix(123466,  90,  0,  0,   0, 90, 270); // x rotation                                                              
-   gGeoManager->Matrix(123467, 180,  0, 90,  90, 90,   0); // y rotation                                                              
-   gGeoManager->Matrix(123468,  90, 90, 90, 180,  0,   0); // z rotation                                                              
-                                                                                                                                      
-   Double_t *buf = 0;                                                                                                                 
-//   gGeoManager->Node("vol1", 1, "trd1", 0, 300, 0, 123467, kTRUE, buf, 0);                                                          
-//   gGeoManager->Node("vol1", 1, "trd1", 0, 300, 0, 123457, kTRUE, buf, 0);                                                          
-                                                                                                                                      
-//// trd1                                                                                                                               
-//   gGeoManager->Node("hbar1", 1, "trd1",  0, 350, -75, 123467, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 5, "trd1", -440, 0, -75, 123466, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 6, "trd1",  440, 0, -75, 123466, kTRUE, buf, 0);
-//                                                                              
-//   gGeoManager->Node("hbar1", 2, "trd1",  0, 350, -25, 123467, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 5, "trd1", -440, 0, -25, 123466, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 6, "trd1",  440, 0, -25, 123466, kTRUE, buf, 0);
-//                                                                              
-//   gGeoManager->Node("hbar1", 3, "trd1",  0, 350,  25, 123467, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 5, "trd1", -440, 0,  25, 123466, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 6, "trd1",  440, 0,  25, 123466, kTRUE, buf, 0);
-//                                                                              
-//   gGeoManager->Node("hbar1", 4, "trd1",  0, 350,  75, 123467, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 5, "trd1", -440, 0,  75, 123466, kTRUE, buf, 0);
-//   gGeoManager->Node("hbar2", 6, "trd1",  440, 0,  75, 123466, kTRUE, buf, 0);
-//                                                                              
-//// trd2                                                                                                                               
-//   gGeoManager->Node("hbar3", 7, "trd2",  0, 450, -75, 123467, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4", 8, "trd2", -540, 0, -75, 123466, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4", 9, "trd2",  540, 0, -75, 123466, kTRUE, buf, 0);                                                        
-//                                                                                                                                      
-//   gGeoManager->Node("hbar3",10, "trd2",  0, 450, -25, 123467, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4",11, "trd2", -540, 0, -25, 123466, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4",12, "trd2",  540, 0, -25, 123466, kTRUE, buf, 0);                                                        
-//
-//   gGeoManager->Node("hbar3",13, "trd2",  0, 450,  25, 123467, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4",14, "trd2", -540, 0,  25, 123466, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4",15, "trd2",  540, 0,  25, 123466, kTRUE, buf, 0);                                                        
-//                                                                                                                                      
-//   gGeoManager->Node("hbar3",16, "trd2",  0, 450,  75, 123467, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4",17, "trd2", -540, 0,  75, 123466, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar4",18, "trd2",  540, 0,  75, 123466, kTRUE, buf, 0);                                                        
-//                                                                                                                                      
-//// trd3                                                                                                                               
-//   gGeoManager->Node("hbar5",19, "trd3",  0, 550, -75, 123467, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar6",20, "trd3", -640, 0, -75, 123466, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar6",21, "trd3",  640, 0, -75, 123466, kTRUE, buf, 0);                                                        
-//                                                                                                                                      
-//   gGeoManager->Node("hbar5",22, "trd3",  0, 550, -25, 123467, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar6",23, "trd3", -640, 0, -25, 123466, kTRUE, buf, 0);                                                        
-//   gGeoManager->Node("hbar6",24, "trd3",  640, 0, -25, 123466, kTRUE, buf, 0);                                                        
 
 */
 

@@ -786,7 +786,7 @@ void CbmAnaDielectronTask::FillCandidateArray()
       cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) / (cand.energy - cand.momentum.Z()));
 
       // Add all pions from STS for pion misidentification level study
-      if (fPionMisidLevel > 0.0){
+      if (fPionMisidLevel >= 0.0){
          CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(cand.stsInd);
          if (stsMatch == NULL) continue;
          cand.stsMcTrackId = stsMatch->GetMCTrackId();
@@ -794,6 +794,10 @@ void CbmAnaDielectronTask::FillCandidateArray()
          CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
          if (mcTrack1 == NULL) continue;
          Int_t pdg = TMath::Abs(mcTrack1->GetPdgCode());
+
+         //check that pion track has track projection onto the photodetector plane
+         const FairTrackParam* richProjection = (FairTrackParam*)(fRichProj->At(i));
+         if (richProjection == NULL || richProjection->GetX() == 0 || richProjection->GetY() == 0) continue;
 
          if (pdg == 211){
             IsElectron(NULL, cand.momentum.Mag(), NULL, gTrack, &cand);
@@ -868,7 +872,7 @@ void CbmAnaDielectronTask::AssignMcToCandidates()
       fCandidates[i].McMotherId = motherId;
       fCandidates[i].mcPdg = pdg;
 
-      if (pdg == 211 && fPionMisidLevel > 0.) continue;
+      if (pdg == 211 && fPionMisidLevel >= 0.) continue;
 
       // RICH
       int richInd = fCandidates[i].richInd;

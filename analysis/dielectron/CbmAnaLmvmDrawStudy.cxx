@@ -151,10 +151,10 @@ void CbmAnaLmvmDrawStudy::DrawMinv()
       //f->Close();
    }
    TCanvas *c1 = CreateCanvas("lmvm_study_minv_bg_ttcut", "lmvm_study_minv_bg_ttcut", 600, 600);
-   DrawH1(hTtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.75, 0.99, 0.99, "");
+   DrawH1(hTtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.65, 0.99, 0.99, "");
 
    TCanvas *c2 = CreateCanvas("lmvm_study_minv_bg_ptcut", "lmvm_study_minv_bg_ptcut", 600, 600);
-   DrawH1(hPtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.75, 0.99, 0.99, "");
+   DrawH1(hPtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.65, 0.99, 0.99, "");
 
 
   /* TCanvas *c1 = CreateCanvas("lmvm_study_minv_urqmd", "lmvm_study_minv_urqmd", 900, 900);

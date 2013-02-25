@@ -1439,7 +1439,7 @@ void CbmAnaDielectronTask::IsElectron(
       }
    } else {
       // PID using MC information, a certain pi supression level can be set
-       if (cand->stsMcTrackId < 0){
+       if (cand->stsMcTrackId < 0 || cand->stsMcTrackId >= fMCTracks->GetEntries()){
 	   cand->isElectron = false;
        } else {
 	   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(cand->stsMcTrackId);

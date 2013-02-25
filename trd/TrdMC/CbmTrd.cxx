@@ -22,8 +22,6 @@
 #include "TVirtualMC.h"
 #include "TGeoManager.h"
 //#include "TGeoMaterial.h"
-// for CBM TRD support structure
-#include "TGeoXtru.h"
 #include "TMath.h"
 
 #include <iostream>

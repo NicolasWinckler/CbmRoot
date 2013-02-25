@@ -45,6 +45,12 @@ protected:
    virtual void Draw();
 
    /**
+    * \brief
+    */
+   void DrawDetector(
+         const string& detName);
+
+   /**
     * \brief Draw TProfile2D by pattern name.
     */
    void DrawP2ByPattern(

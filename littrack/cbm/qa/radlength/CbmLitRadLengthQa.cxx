@@ -36,7 +36,8 @@ using lit::ToString;
 CbmLitRadLengthQa::CbmLitRadLengthQa():
    fHM(NULL),
    fOutputDir(""),
-   fRadLen(NULL)
+   fRadLen(NULL),
+   fDet()
 {
 
 }
@@ -49,6 +50,7 @@ CbmLitRadLengthQa::~CbmLitRadLengthQa()
 InitStatus CbmLitRadLengthQa::Init()
 {
    fHM = new CbmHistManager();
+   fDet.DetermineSetup();
    CreateHistograms();
    ReadDataBranches();
    return kSUCCESS;
@@ -63,7 +65,13 @@ void CbmLitRadLengthQa::Exec(
       std::cout << "-I- CbmLitRadLengthQa::Exec: eventNo=" << eventNo << std::endl;
    }
 
-   ExecTotal();
+   ExecDetector(".+", "Total");
+   ExecDetector("/cave_1/pipevac1_0/mvdstation.+", "Mvd");
+   ExecDetector("/cave_1/STS.+", "Sts");
+   ExecDetector("/cave_1/rich.+", "Rich");
+   ExecDetector("/cave_1/trd.+", "Trd");
+   ExecDetector("/cave_1/much.+", "Much");
+   ExecDetector("/cave_1/tof.+", "Tof");
    ExecTrd();
 }
 
@@ -86,14 +94,26 @@ void CbmLitRadLengthQa::ReadDataBranches()
 void CbmLitRadLengthQa::CreateHistograms()
 {
    const Int_t nofBins = 200;
-   fHM->Add("hrl_RadThickness_Total_H1", new TH1D("hrl_RadThickness_Total_H1", "hrl_RadThickness_Total_H1;Radiation thickness [%];Entries", nofBins, 0, 0));
-   fHM->Add("hrl_RadThickness_Total_P2", new TProfile2D("hrl_RadThickness_Total_P2", "hrl_RadThickness_Total_P2;X [cm];Y [cm];Radiation thickness [%]", nofBins, 0., 0., nofBins, 0., 0.));
-   fHM->Add("hrl_Thickness_Total_H1", new TH1D("hrl_Thickness_Total_H1", "hrl_Thickness_Total_H1;Thickness [cm];Entries", nofBins, 0, 0));
-   fHM->Add("hrl_Thickness_Total_P2", new TProfile2D("hrl_Thickness_Total_P2", "hrl_Thickness_Total_P2;X [cm];Y [cm];Thickness [cm]", nofBins, 0., 0., nofBins, 0., 0.));
+   vector<string> detNames = list_of("Total")("Mvd")("Sts")("Rich")("Trd")("Much")("Tof");
+   Int_t nofDetNames = detNames.size();
+   for (Int_t iDet = 0; iDet < nofDetNames; iDet++) {
+      string detName = detNames[iDet];
+      Bool_t createHistograms = detName == "Total" || (detName == "Mvd" && fDet.GetDet(kMVD)) || (detName == "Sts" && fDet.GetDet(kSTS))
+             || (detName == "Rich" && fDet.GetDet(kRICH)) || (detName == "Trd" && fDet.GetDet(kTRD))
+             || (detName == "Much" && fDet.GetDet(kMUCH)) || (detName == "Tof" && fDet.GetDet(kTOF));
+      if (!createHistograms) continue; // Create histograms only for the detectors wich are in the setup
+      string rtname = "hrl_RadThickness_" + detName;
+      fHM->Add(rtname + "_H1", new TH1D(string(rtname + "_H1").c_str(), string(rtname + "_H1;Radiation thickness [%];Entries").c_str(), nofBins, 0, 0));
+      fHM->Add(rtname + "_P2", new TProfile2D(string(rtname + "_P2").c_str(), string(rtname + "_P2;X [cm];Y [cm];Radiation thickness [%]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+      string tname = "hrl_Thickness_" + detName;
+      fHM->Add(tname + "_H1", new TH1D(string(tname + "_H1").c_str(), string(tname + "_H1;Thickness [cm];Entries").c_str(), nofBins, 0, 0));
+      fHM->Add(tname + "_P2", new TProfile2D(string(tname + "_P2").c_str(), string(tname + "_P2;X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+      string tsname = "hrl_ThicknessSilicon_" + detName;
+      fHM->Add(tsname + "_H1", new TH1D(string(tsname + "_H1").c_str(), string(tsname + "_H1;Thickness [cm];Entries").c_str(), nofBins, 0, 0));
+      fHM->Add(tsname + "_P2", new TProfile2D(string(tsname + "_P2").c_str(), string(tsname + "_P2;X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+   }
 
-   fHM->Add("hrl_ThicknessSilicon_Total_H1", new TH1D("hrl_ThicknessSilicon_Total_H1", "hrl_ThicknessSilicon_Total_H1;Thickness [cm];Entries", nofBins, 0, 0));
-   fHM->Add("hrl_ThicknessSilicon_Total_P2", new TProfile2D("hrl_ThicknessSilicon_Total_P2", "hrl_ThicknessSilicon_Total_P2;X [cm];Y [cm];Thickness [cm]", nofBins, 0., 0., nofBins, 0., 0.));
-
+   // Additional histograms for TRD
    Int_t nofStations = 3;
    std::vector<Int_t> nofLayersPerStation = list_of(4)(4)(4);
    for (Int_t iStation = 0; iStation < nofStations; iStation++) {
@@ -117,8 +137,14 @@ void CbmLitRadLengthQa::CreateHistograms()
    std::cout << fHM->ToString();
 }
 
-void CbmLitRadLengthQa::ExecTotal()
+void CbmLitRadLengthQa::ExecDetector(
+      const string& pathPattern,
+      const string& detName)
 {
+    if (!(detName == "Total" || (detName == "Mvd" && fDet.GetDet(kMVD)) || (detName == "Sts" && fDet.GetDet(kSTS))
+                || (detName == "Rich" && fDet.GetDet(kRICH)) || (detName == "Trd" && fDet.GetDet(kTRD))
+                || (detName == "Much" && fDet.GetDet(kMUCH)) || (detName == "Tof" && fDet.GetDet(kTOF)))) return;
+
    map<Int_t, Double_t> radThicknessOnTrack; // track ID -> sum of radiation thickness on track
    map<Int_t, Double_t> thicknessOnTrack; // track ID -> sum of track lengthens on track
    map<Int_t, Double_t> thicknessSiliconOnTrack; // track ID -> sum of track lengthens on track in silicon equivalent
@@ -130,34 +156,39 @@ void CbmLitRadLengthQa::ExecTotal()
       TVector3 pos = point->GetPosition();
       TVector3 posOut = point->GetPositionOut();
       TVector3 res = posOut - pos;
+      TVector3 middle = (pos + posOut) * 0.5;
       x = pos.X();
       y = pos.Y();
 
-      const Double_t thickness = res.Mag();
-      const Double_t radThickness = 100 * thickness / point->GetRadLength();
-      const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
-      radThicknessOnTrack[point->GetTrackID()] += radThickness;
-      thicknessOnTrack[point->GetTrackID()] += thickness;
-      thicknessSiliconOnTrack[point->GetTrackID()] += thicknessSilicon;
+      TGeoNode* node = gGeoManager->FindNode(middle.X(), middle.Y(), middle.Z());
+      TString path = gGeoManager->GetPath();
+      if (path.Contains(TRegexp(pathPattern.c_str()))) {
+         const Double_t thickness = res.Mag();
+         const Double_t radThickness = 100 * thickness / point->GetRadLength();
+         const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
+         radThicknessOnTrack[point->GetTrackID()] += radThickness;
+         thicknessOnTrack[point->GetTrackID()] += thickness;
+         thicknessSiliconOnTrack[point->GetTrackID()] += thicknessSilicon;
+      }
    }
 
    map<Int_t, Double_t>::const_iterator it;
    for (it = radThicknessOnTrack.begin(); it != radThicknessOnTrack.end(); it++) {
       Double_t rl = (*it).second;
-      fHM->H1("hrl_RadThickness_Total_H1")->Fill(rl);
-      fHM->P2("hrl_RadThickness_Total_P2")->Fill(x, y, rl);
+      fHM->H1("hrl_RadThickness_" + detName + "_H1")->Fill(rl);
+      fHM->P2("hrl_RadThickness_" + detName + "_P2")->Fill(x, y, rl);
    }
 
    for (it = thicknessOnTrack.begin(); it != thicknessOnTrack.end(); it++) {
       Double_t tl = (*it).second;
-      fHM->H1("hrl_Thickness_Total_H1")->Fill(tl);
-      fHM->P2("hrl_Thickness_Total_P2")->Fill(x, y, tl);
+      fHM->H1("hrl_Thickness_" + detName + "_H1")->Fill(tl);
+      fHM->P2("hrl_Thickness_" + detName + "_P2")->Fill(x, y, tl);
    }
 
    for (it = thicknessSiliconOnTrack.begin(); it != thicknessSiliconOnTrack.end(); it++) {
       Double_t tl = (*it).second;
-      fHM->H1("hrl_ThicknessSilicon_Total_H1")->Fill(tl);
-      fHM->P2("hrl_ThicknessSilicon_Total_P2")->Fill(x, y, tl);
+      fHM->H1("hrl_ThicknessSilicon_" + detName + "_H1")->Fill(tl);
+      fHM->P2("hrl_ThicknessSilicon_" + detName + "_P2")->Fill(x, y, tl);
    }
 }
 

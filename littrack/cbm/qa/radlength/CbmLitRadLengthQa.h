@@ -9,6 +9,7 @@
 #define CBMLITRADLENGTHQA_H_
 
 #include "FairTask.h"
+#include "base/CbmLitDetectorSetup.h"
 #include <string>
 #include <map>
 using std::string;
@@ -60,9 +61,13 @@ private:
     void CreateHistograms();
 
     /**
-     * \brief Exec total radiation thickness calculation.
+     * \brief Execute total radiation length for a particular detector.
+     * \param[in] pathPattern Path pattern for this detector in TGeomanager.
+     * \param[in] detName Name of the detector, like in histograms.
      */
-    void ExecTotal();
+    void ExecDetector(
+          const string& pathPattern,
+          const string& detName);
 
     /**
      * \brief Exec specific to TRD radiation thickness calculation.
@@ -86,6 +91,8 @@ private:
 
     // Pointers to data arrays
     TClonesArray* fRadLen; // RadLen array
+
+    CbmLitDetectorSetup fDet; // Detector setup
 
     ClassDef(CbmLitRadLengthQa, 1);
 };

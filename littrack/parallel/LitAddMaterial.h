@@ -1,8 +1,6 @@
 /**
  * \file LitAddMaterial.h
- *
  * \brief Functions for calculation of the material effects.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  *

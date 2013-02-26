@@ -57,9 +57,7 @@ TrdDigi/CbmTrdDigitizer.cxx
 #TrdDigi/CbmTrdDigiWriteoutBuffer.cxx
 
 TrdQa/CbmTrdHitProducerQa.cxx  
-TrdQa/CbmTrdFitTracksQa.cxx  
 TrdQa/CbmTrdTracksPidQa.cxx
-TrdQa/CbmTrdElectronsQa.cxx
 TrdQa/CbmTrdQa.cxx
 
 TrdReco/CbmTrdHitProducerIdeal.cxx    
@@ -72,7 +70,6 @@ TrdReco/CbmTrdSimpleHitProducerCluster.cxx
 
 TrdTools/CbmTrdElectronsTrainAnn.cxx
 TrdTools/CbmTrdGeoHandler.cxx
-#TrdTools/CbmTrdStringToken.cxx
 
 #TrdData/CbmTrdCluster.cxx 
 TrdData/CbmTrdRadiator.cxx  

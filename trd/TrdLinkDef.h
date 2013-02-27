@@ -22,7 +22,6 @@
 #pragma link C++ class  CbmTrdDigitizerPRF;
 #pragma link C++ class  CbmTrdHitRateTest;
 #pragma link C++ class  CbmTrdHitDensityTest;
-//#pragma link C++ class  CbmTrdPhotonAnalysis;
 #pragma link C++ class  CbmTrdOccupancy;
 //#pragma link C++ class  CbmTrdCluster;
 #pragma link C++ class  CbmTrdContFact;

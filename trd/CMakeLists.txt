@@ -15,7 +15,6 @@ ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
-${CBMROOT_SOURCE_DIR}/littrack
 
 ${CBMROOT_SOURCE_DIR}/trd
 ${CBMROOT_SOURCE_DIR}/trd/TrdMC
@@ -71,15 +70,12 @@ TrdReco/CbmTrdSimpleHitProducerCluster.cxx
 TrdTools/CbmTrdElectronsTrainAnn.cxx
 TrdTools/CbmTrdGeoHandler.cxx
 
-#TrdData/CbmTrdCluster.cxx 
 TrdData/CbmTrdRadiator.cxx  
 TrdData/CbmTrdGas.cxx
 TrdData/CbmTrdModule.cxx
-#TrdData/CbmTrdDetectorId.cxx
 
 TrdAna/CbmTrdHitRateTest.cxx
 TrdAna/CbmTrdHitDensityTest.cxx
-#TrdAna/CbmTrdPhotonAnalysis.cxx
 TrdAna/CbmTrdOccupancy.cxx
 
 CbmTrdFindTracks.cxx  

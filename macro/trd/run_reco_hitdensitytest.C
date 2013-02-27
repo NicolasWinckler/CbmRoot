@@ -139,8 +139,8 @@ void run_reco_hitdensitytest(Int_t nEvents)
   CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
   run->AddTask(trdClustering);
   */
-  printf("CbmTrdHitDensityTest\n");
-  CbmTrdHitDensityTest *trdDensityTest = new CbmTrdHitDensityTest(/*"HitDensityTest","Hit Density Test",radiator*/); 
+  printf("CbmTrdHitDensityQa\n");
+  CbmTrdHitDensityQa *trdDensityTest = new CbmTrdHitDensityQa(/*"HitDensityTest","Hit Density Test",radiator*/);
   run->AddTask(trdDensityTest);
   // -------------------------------------------------------------------------
 

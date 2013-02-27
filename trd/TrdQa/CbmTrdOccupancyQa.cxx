@@ -1,4 +1,4 @@
-#include "CbmTrdOccupancy.h"
+#include "CbmTrdOccupancyQa.h"
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdDigi.h"
 #include "CbmTrdModule.h"
@@ -26,7 +26,7 @@ using std::endl;
 using std::pair;
 using std::fabs;
 
-CbmTrdOccupancy::CbmTrdOccupancy()
+CbmTrdOccupancyQa::CbmTrdOccupancyQa()
   : FairTask("TrdOccupancy"),
     fDigis(NULL),
     fDigiPar(NULL),
@@ -67,7 +67,7 @@ CbmTrdOccupancy::CbmTrdOccupancy()
   } 
 }
 /*
-CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char *geo)
+CbmTrdOccupancyQa::CbmTrdOccupancyQa(const char *name, const char *title, const char *geo)
   : FairTask(name),
     fDigis(NULL),
     fDigiPar(NULL),
@@ -86,7 +86,7 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char
 {
 }
 */
-CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char *geo, Double_t triggerThreshold)
+CbmTrdOccupancyQa::CbmTrdOccupancyQa(const char *name, const char *title, const char *geo, Double_t triggerThreshold)
   : FairTask(name),
     fDigis(NULL),
     fDigiPar(NULL),
@@ -127,7 +127,7 @@ CbmTrdOccupancy::CbmTrdOccupancy(const char *name, const char *title, const char
   } 
 }
 
-CbmTrdOccupancy::~CbmTrdOccupancy()
+CbmTrdOccupancyQa::~CbmTrdOccupancyQa()
 {
   
   FairRootManager *ioman =FairRootManager::Instance();
@@ -163,9 +163,9 @@ CbmTrdOccupancy::~CbmTrdOccupancy()
   delete fDigiChargeSpectrum;
   delete fLayerDummy;
 }
-void CbmTrdOccupancy::SetParContainers()
+void CbmTrdOccupancyQa::SetParContainers()
 {
-    cout<<" * CbmTrdOccupancy * :: SetParContainers() "<<endl;
+    cout<<" * CbmTrdOccupancyQa * :: SetParContainers() "<<endl;
     // Get Base Container
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb=ana->GetRuntimeDb();
@@ -173,7 +173,7 @@ void CbmTrdOccupancy::SetParContainers()
                (rtdb->getContainer("CbmTrdDigiPar"));
 }
 // ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdOccupancy::ReInit()
+InitStatus CbmTrdOccupancyQa::ReInit()
 {
   cout<<" * CbmTrdClusterizer * :: ReInit() "<<endl;
   FairRunAna* ana = FairRunAna::Instance();
@@ -185,9 +185,9 @@ InitStatus CbmTrdOccupancy::ReInit()
 // --------------------------------------------------------------------
 
 // ---- Init ----------------------------------------------------------
-InitStatus CbmTrdOccupancy::Init()
+InitStatus CbmTrdOccupancyQa::Init()
 {
-  cout<<" * CbmTrdOccupancy * :: Init() "<<endl;
+  cout<<" * CbmTrdOccupancyQa * :: Init() "<<endl;
   FairRootManager *ioman = FairRootManager::Instance();  
   fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
   if ( ! fDigis ) {
@@ -203,13 +203,13 @@ InitStatus CbmTrdOccupancy::Init()
 
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdOccupancy::Exec(Option_t * option)
+void CbmTrdOccupancyQa::Exec(Option_t * option)
 {
-  printf("================CbmTrdOccupancy=====================\n");
+  printf("================CbmTrdOccupancyQa=====================\n");
   printf("TriggerThreshold: %.2E\n",fTriggerThreshold);
   printf("NeigbourReadout:%i\n",Int_t(fNeigbourReadout));
   Bool_t debug = false;
-  //TFile *outFile = new TFile("data/CbmTrdOccupancy.root","UPDATE","output of CbmTrdOccupancy");
+  //TFile *outFile = new TFile("data/CbmTrdOccupancyQa.root","UPDATE","output of CbmTrdOccupancyQa");
   TStopwatch timer;
   timer.Start();
   Int_t nEntries = fDigis->GetEntries();
@@ -306,7 +306,7 @@ void CbmTrdOccupancy::Exec(Option_t * option)
   printf("*********************************************************\n\n");
 }
 	  // ---- FinishTask-----------------------------------------------------
-void CbmTrdOccupancy::FinishEvent()
+void CbmTrdOccupancyQa::FinishEvent()
 {
   if (fDigis)
     fDigis->Delete();
@@ -315,20 +315,20 @@ void CbmTrdOccupancy::FinishEvent()
     fModuleOccupancyMapIt->second->Reset();
   } 
 }
-void CbmTrdOccupancy::FinishTask()
+void CbmTrdOccupancyQa::FinishTask()
 {
   CreateLayerView();
   SaveHistos2File();
 
 }
 	  // ---- Register ------------------------------------------------------
-void CbmTrdOccupancy::Register()
+void CbmTrdOccupancyQa::Register()
 {
   //FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
   //FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
 }
 	  // --------------------------------------------------------------------
-void CbmTrdOccupancy::CopyEvent2MemoryMap()
+void CbmTrdOccupancyQa::CopyEvent2MemoryMap()
 {
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
@@ -337,7 +337,7 @@ void CbmTrdOccupancy::CopyEvent2MemoryMap()
   }
 }
 
-void CbmTrdOccupancy::CreateLayerView()
+void CbmTrdOccupancyQa::CreateLayerView()
 {
   cout << "CreateLayerView" << endl;
   Bool_t debug = false;
@@ -454,14 +454,14 @@ void CbmTrdOccupancy::CreateLayerView()
   gDirectory->Cd("..");
   c->Close();
 }
-void CbmTrdOccupancy::SetNeighbourReadout(Bool_t neighbourReadout){fNeigbourReadout=neighbourReadout;}
-void CbmTrdOccupancy::SetTriggerThreshold(Double_t triggerthreshold){fTriggerThreshold=triggerthreshold;}
-void CbmTrdOccupancy::SaveHistos2File() 
+void CbmTrdOccupancyQa::SetNeighbourReadout(Bool_t neighbourReadout){fNeigbourReadout=neighbourReadout;}
+void CbmTrdOccupancyQa::SetTriggerThreshold(Double_t triggerthreshold){fTriggerThreshold=triggerthreshold;}
+void CbmTrdOccupancyQa::SaveHistos2File()
 {
   cout << "SaveHistos2File" << endl;
   TString title;
   /*
-    TFile *outFile = new TFile("data/CbmTrdOccupancy.root","UPDATE","output of CbmTrdOccupancy");
+    TFile *outFile = new TFile("data/CbmTrdOccupancyQa.root","UPDATE","output of CbmTrdOccupancyQa");
     outFile->cd();
   */
   gDirectory->pwd();
@@ -499,4 +499,4 @@ void CbmTrdOccupancy::SaveHistos2File()
   gDirectory->Cd("..");
   //outFile->Close();
 }
-ClassImp(CbmTrdOccupancy)
+ClassImp(CbmTrdOccupancyQa)

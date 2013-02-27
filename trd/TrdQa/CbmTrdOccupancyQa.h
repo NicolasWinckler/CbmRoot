@@ -1,5 +1,5 @@
-#ifndef CBMTRDOCCUPANCY_H
-#define CBMTRDOCCUPANCY_H
+#ifndef CBMTRDOCCUPANCYQA_H_
+#define CBMTRDOCCUPANCYQA_H_
 
 #include "CbmTrdDigiMatch.h"
 #include "FairTask.h"
@@ -68,13 +68,13 @@ typedef struct OccupancyModule
     ModulePositionX(0.), ModulePositionY(0.), ModulePositionZ() {}
 } OccupancyModule;
 
-class CbmTrdOccupancy : public FairTask {
+class CbmTrdOccupancyQa : public FairTask {
 
  public:
-  CbmTrdOccupancy();
-  //CbmTrdOccupancy(const char *name, const char *title="CBM Task", const char *geo="");
-  CbmTrdOccupancy(const char *name, const char *title="CBM Task", const char *geo="", Double_t triggerThreshold = 1.0e-6);
-  virtual ~CbmTrdOccupancy();
+  CbmTrdOccupancyQa();
+  //CbmTrdOccupancyQa(const char *name, const char *title="CBM Task", const char *geo="");
+  CbmTrdOccupancyQa(const char *name, const char *title="CBM Task", const char *geo="", Double_t triggerThreshold = 1.0e-6);
+  virtual ~CbmTrdOccupancyQa();
   virtual InitStatus ReInit();
   virtual InitStatus Init();
   virtual void SetParContainers();
@@ -89,8 +89,8 @@ class CbmTrdOccupancy : public FairTask {
   void SetTriggerThreshold(Double_t triggerthreshold);
 
  private:
-  CbmTrdOccupancy& operator=(const CbmTrdOccupancy&);
-  CbmTrdOccupancy(const CbmTrdOccupancy&);
+  CbmTrdOccupancyQa& operator=(const CbmTrdOccupancyQa&);
+  CbmTrdOccupancyQa(const CbmTrdOccupancyQa&);
   TClonesArray *fDigis; //! TRD digis
   CbmTrdDigiPar  *fDigiPar;    //!
   CbmTrdModule   *fModuleInfo; //!
@@ -112,7 +112,7 @@ class CbmTrdOccupancy : public FairTask {
   Bool_t fNeigbourReadout;
   TString fGeo;
 
-  ClassDef(CbmTrdOccupancy,3)
+  ClassDef(CbmTrdOccupancyQa,3)
 
     };
 #endif // 

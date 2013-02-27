@@ -1,5 +1,5 @@
-#ifndef CBMTRDHITRATETEST_H
-#define CBMTRDHITRATETEST_H
+#ifndef CBMTRDHITRATEQA_H_
+#define CBMTRDHITRATEQA_H_
 
 #include "FairTask.h"
 
@@ -41,19 +41,19 @@ typedef struct HitRateGeoPara
   Int_t stepDirection[3];
 } HitRateGeoPara;
 
-class CbmTrdHitRateTest : public FairTask {
+class CbmTrdHitRateQa : public FairTask {
 
  public:
 
   /** Default constructor **/
-  CbmTrdHitRateTest();
+  CbmTrdHitRateQa();
 
   /** Standard constructor **/
-  CbmTrdHitRateTest(const char *name, const char *title="CBM Task",
+  CbmTrdHitRateQa(const char *name, const char *title="CBM Task",
 		    CbmTrdRadiator *radiator=NULL);
 
   /** Destructor **/
-  virtual ~CbmTrdHitRateTest();
+  virtual ~CbmTrdHitRateQa();
 
   /** Initialisation **/
   virtual InitStatus ReInit();
@@ -189,11 +189,11 @@ class CbmTrdHitRateTest : public FairTask {
   /**  iterator over map to store digis for pair of x,y position in module **/
   std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
 
-  CbmTrdHitRateTest(const CbmTrdHitRateTest&);
-  CbmTrdHitRateTest& operator=(const CbmTrdHitRateTest&);
+  CbmTrdHitRateQa(const CbmTrdHitRateQa&);
+  CbmTrdHitRateQa& operator=(const CbmTrdHitRateQa&);
 
-  ClassDef(CbmTrdHitRateTest,2)
+  ClassDef(CbmTrdHitRateQa,2)
 
 };
 
-#endif // CBMTRDHITRATETEST_H
+#endif // CBMTRDHITRATEQA_H

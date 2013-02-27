@@ -1,4 +1,4 @@
-#include "CbmTrdHitRateTest.h"
+#include "CbmTrdHitRateQa.h"
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdModule.h"
@@ -35,7 +35,7 @@ using std::vector;
 
 
 // ---- Default constructor -------------------------------------------
-CbmTrdHitRateTest::CbmTrdHitRateTest()
+CbmTrdHitRateQa::CbmTrdHitRateQa()
   : FairTask("TrdCluster"),
     Digicounter(-1),
     tFile(NULL),
@@ -108,7 +108,7 @@ CbmTrdHitRateTest::CbmTrdHitRateTest()
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
-CbmTrdHitRateTest::CbmTrdHitRateTest(const char *name, const char *title,
+CbmTrdHitRateQa::CbmTrdHitRateQa(const char *name, const char *title,
                  CbmTrdRadiator *radiator)
   : FairTask(name),
     Digicounter(-1),
@@ -182,7 +182,7 @@ CbmTrdHitRateTest::CbmTrdHitRateTest(const char *name, const char *title,
 // --------------------------------------------------------------------
 
 // ---- Destructor ----------------------------------------------------
-CbmTrdHitRateTest::~CbmTrdHitRateTest()
+CbmTrdHitRateQa::~CbmTrdHitRateQa()
 {
   //    FairRootManager *ioman =FairRootManager::Instance();
   //ioman->Write();
@@ -195,9 +195,9 @@ CbmTrdHitRateTest::~CbmTrdHitRateTest()
 // --------------------------------------------------------------------
 
 // ----  Initialisation  ----------------------------------------------
-void CbmTrdHitRateTest::SetParContainers()
+void CbmTrdHitRateQa::SetParContainers()
 {
-    cout<<" * CbmTrdHitRateTest * :: SetParContainers() "<<endl;
+    cout<<" * CbmTrdHitRateQa * :: SetParContainers() "<<endl;
 
 
     // Get Base Container
@@ -211,9 +211,9 @@ void CbmTrdHitRateTest::SetParContainers()
 // --------------------------------------------------------------------
 
 // ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdHitRateTest::ReInit(){
+InitStatus CbmTrdHitRateQa::ReInit(){
 
-  cout<<" * CbmTrdHitRateTest * :: ReInit() "<<endl;
+  cout<<" * CbmTrdHitRateQa * :: ReInit() "<<endl;
 
 
   FairRunAna* ana = FairRunAna::Instance();
@@ -227,7 +227,7 @@ InitStatus CbmTrdHitRateTest::ReInit(){
 // --------------------------------------------------------------------
 
 // ---- Init ----------------------------------------------------------
-InitStatus CbmTrdHitRateTest::Init()
+InitStatus CbmTrdHitRateQa::Init()
 {
 
     cout<<" * CbmTrdHitRate * :: Init() "<<endl;
@@ -266,7 +266,7 @@ InitStatus CbmTrdHitRateTest::Init()
 
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdHitRateTest::Exec(Option_t * option)
+void CbmTrdHitRateQa::Exec(Option_t * option)
 {
   /*
   const Int_t Number = 11;
@@ -291,7 +291,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
  
   fStation = 0;
   fLayer = 0;
-  tFile = new TFile("CbmTrdHitRateTest.root","RECREATE"," ROOT file with histograms");
+  tFile = new TFile("CbmTrdHitRateQa.root","RECREATE"," ROOT file with histograms");
 
   TH1F* HitPad = NULL;
   TH2F* Layer = NULL;
@@ -470,7 +470,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   */
   tFile->Close();
 }
-void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
+void CbmTrdHitRateQa::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
 {
   Char_t name[50];
   Char_t title[50];
@@ -528,7 +528,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   // --------------------------------------------------------------------
 
   // ---- FinishTask-----------------------------------------------------
-void CbmTrdHitRateTest::FinishEvent()
+void CbmTrdHitRateQa::FinishEvent()
 {
   fDigiMap.clear();
   if ( fDigiCollection ) fDigiCollection->Clear();
@@ -537,7 +537,7 @@ void CbmTrdHitRateTest::FinishEvent()
 
   // --------------------------------------------------------------------
   // ----GetModuleInformation ------------------------------------------
-  void CbmTrdHitRateTest::GetModuleInformation()
+  void CbmTrdHitRateQa::GetModuleInformation()
   {
     // Extract the information about station, layer, module type
     // and cpoy number of the module from the full path to the
@@ -578,7 +578,7 @@ void CbmTrdHitRateTest::FinishEvent()
     }
 
   }
-void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
+void CbmTrdHitRateQa::GetModuleInformationSL(Int_t VolumeID)
 {
       fStation    = fGeoHandler->GetStation(VolumeID);
       fLayer      = fGeoHandler->GetLayer(VolumeID);     
@@ -587,7 +587,7 @@ void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
+void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
   // fPos is >0 for x and y and not rotated
   // origin of the local coordinate system in 
@@ -756,7 +756,7 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara,
 }
 
 
-float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Int_t xSteps, Float_t StartY, Float_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0)
+float CbmTrdHitRateQa::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Int_t xSteps, Float_t StartY, Float_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0)
 {
   //cout << "CalcHitRate" << endl;
   Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
@@ -800,7 +800,7 @@ float CbmTrdHitRateTest::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Fl
   }
   return (HitRate/*/(counter/100.)*/);/*Convertes Hits/Pad -> Hits/cm² on each Pad*/
 }
-void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
+void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
@@ -953,7 +953,7 @@ void CbmTrdHitRateTest::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mp
 
 
 }
-void CbmTrdHitRateTest::FillVector(Bool_t firstLayer, Int_t VolumeID,
+void CbmTrdHitRateQa::FillVector(Bool_t firstLayer, Int_t VolumeID,
 				   vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
 				   vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
 				   vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3)
@@ -1026,7 +1026,7 @@ void CbmTrdHitRateTest::FillVector(Bool_t firstLayer, Int_t VolumeID,
       }
     }
 }
-void CbmTrdHitRateTest::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
+void CbmTrdHitRateQa::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
 {
   /*
   //----------------------Pad--------------------------------------
@@ -1176,18 +1176,18 @@ void CbmTrdHitRateTest::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Dou
   // -------------------------------------------------------------------
   // ------AddDigi--------------------------------------------------------------
 
-  //void CbmTrdHitRateTest::AddDigi() 
-  void CbmTrdHitRateTest::DrawDigi() 
+  //void CbmTrdHitRateQa::AddDigi()
+  void CbmTrdHitRateQa::DrawDigi()
   {
  
   }
 
   // ---- Register ------------------------------------------------------
-  void CbmTrdHitRateTest::Register()
+  void CbmTrdHitRateQa::Register()
   {
     FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
     FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
   }
   // --------------------------------------------------------------------
 
-  ClassImp(CbmTrdHitRateTest)
+  ClassImp(CbmTrdHitRateQa)

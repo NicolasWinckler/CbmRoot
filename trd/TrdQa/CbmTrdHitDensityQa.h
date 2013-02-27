@@ -1,5 +1,5 @@
-#ifndef CBMTRDHITDENSITYTEST_H
-#define CBMTRDHITDENSITYTEST_H 
+#ifndef CBMTRDHITDENSITYQA_H_
+#define CBMTRDHITDENSITYQA_H_
 
 #include "FairTask.h"
 
@@ -22,13 +22,13 @@ class TClonesArray;
 typedef std::list<MyPoint*> MyPointList;
 typedef std::map<Int_t, MyPointList*> MyPointListMap;
 
-class CbmTrdHitDensityTest : public FairTask
+class CbmTrdHitDensityQa : public FairTask
 {
  public:
   // ---- Default constructor -------------------------------------------
-  CbmTrdHitDensityTest();
+  CbmTrdHitDensityQa();
   // ---- Destructor ----------------------------------------------------
-  virtual ~CbmTrdHitDensityTest();
+  virtual ~CbmTrdHitDensityQa();
   /** Initialisation **/
   virtual InitStatus ReInit();
   virtual InitStatus Init();
@@ -67,9 +67,9 @@ class CbmTrdHitDensityTest : public FairTask
 
   std::map<Int_t, MyPointList*> ModulePointMap;
 
-  CbmTrdHitDensityTest(const CbmTrdHitDensityTest&);
-  CbmTrdHitDensityTest& operator=(const CbmTrdHitDensityTest&);
+  CbmTrdHitDensityQa(const CbmTrdHitDensityQa&);
+  CbmTrdHitDensityQa& operator=(const CbmTrdHitDensityQa&);
 
-  ClassDef(CbmTrdHitDensityTest,2);
+  ClassDef(CbmTrdHitDensityQa,2);
 };
 #endif

@@ -1,4 +1,4 @@
-#include "CbmTrdHitDensityTest.h"
+#include "CbmTrdHitDensityQa.h"
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdDigi.h"
@@ -32,8 +32,8 @@ using std::cout;
 using std::endl;
 
 // ---- Default constructor -------------------------------------------
-CbmTrdHitDensityTest::CbmTrdHitDensityTest()
-  :FairTask("CbmTrdHitDensityTest",1),
+CbmTrdHitDensityQa::CbmTrdHitDensityQa()
+  :FairTask("CbmTrdHitDensityQa",1),
    fTrdPoints(NULL),
    fDigis(NULL),
    fClusters(NULL),
@@ -50,7 +50,7 @@ CbmTrdHitDensityTest::CbmTrdHitDensityTest()
 }
 
 // ---- Destructor ----------------------------------------------------
-CbmTrdHitDensityTest::~CbmTrdHitDensityTest()
+CbmTrdHitDensityQa::~CbmTrdHitDensityQa()
 {
   if(fClusters){
     fClusters->Clear("C");
@@ -74,18 +74,18 @@ CbmTrdHitDensityTest::~CbmTrdHitDensityTest()
 }
 
 // ----  Initialisation  ----------------------------------------------
-void CbmTrdHitDensityTest::SetParContainers()
+void CbmTrdHitDensityQa::SetParContainers()
 {
   // Get Base Container
   FairRunAna* ana = FairRunAna::Instance();
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-  cout << " * CbmTrdHitDensityTest * :: SetParContainers()" << endl;
+  cout << " * CbmTrdHitDensityQa * :: SetParContainers()" << endl;
   fDigiPar = (CbmTrdDigiPar*)(rtdb->getContainer("CbmTrdDigiPar"));
 }
 // ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdHitDensityTest::ReInit()
+InitStatus CbmTrdHitDensityQa::ReInit()
 {  
-  cout << " * CbmTrdHitDensityTest * :: ReInit()" << endl;
+  cout << " * CbmTrdHitDensityQa * :: ReInit()" << endl;
   FairRunAna* ana = FairRunAna::Instance();
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   
@@ -94,26 +94,26 @@ InitStatus CbmTrdHitDensityTest::ReInit()
   return kSUCCESS;
 }
 // ---- Init ----------------------------------------------------------
-InitStatus CbmTrdHitDensityTest::Init()
+InitStatus CbmTrdHitDensityQa::Init()
 {
-  cout << " * CbmTrdHitDensityTest * :: Init()" << endl;
+  cout << " * CbmTrdHitDensityQa * :: Init()" << endl;
   FairRootManager *ioman = FairRootManager::Instance();
   fTrdPoints=(TClonesArray *)ioman->GetObject("TrdPoint"); 
   if ( ! fTrdPoints ) {
-    cout << "-W CbmTrdHitDensityTest::Init: No TrdPoints array!" << endl;
+    cout << "-W CbmTrdHitDensityQa::Init: No TrdPoints array!" << endl;
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
   /*
   fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
   if ( ! fDigis ) {
-    cout << "-W CbmTrdHitDensityTest::Init: No TrdDigi array!" << endl;
+    cout << "-W CbmTrdHitDensityQa::Init: No TrdDigi array!" << endl;
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
   fClusters =(TClonesArray *)  ioman->GetObject("TrdCluster");
   if ( ! fClusters ) {
-    cout << "-W CbmTrdHitDensityTest::Init: No TrdCluster array!" << endl;
+    cout << "-W CbmTrdHitDensityQa::Init: No TrdCluster array!" << endl;
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }    
@@ -134,7 +134,7 @@ InitStatus CbmTrdHitDensityTest::Init()
   return kSUCCESS;
   
 }
-void CbmTrdHitDensityTest::Exec(Option_t * option)
+void CbmTrdHitDensityQa::Exec(Option_t * option)
 {
   Int_t nStation = 3;
   Int_t  nLayer = 4;
@@ -147,9 +147,9 @@ void CbmTrdHitDensityTest::Exec(Option_t * option)
   TH2F *hPointDistanceRadius2M[nStation][nLayer];
   TH2F *hHitRatePosition[nStation][nLayer];
   
-  if(!gSystem->AccessPathName("CbmTrdHitDensityTest.root")){
+  if(!gSystem->AccessPathName("CbmTrdHitDensityQa.root")){
     cout << "  << found existing root file" << endl;
-    tFile = new TFile("CbmTrdHitDensityTest.root","UPDATE");
+    tFile = new TFile("CbmTrdHitDensityQa.root","UPDATE");
     hPointDistance = (TH1F*)tFile->Get("PointDistance");
     hPointDistanceRadius = (TProfile*)tFile->Get("PointDistanceRadius");
     hPointDistanceRadius2 = (TH2F*)tFile->Get("PointDistanceRadius2");
@@ -167,7 +167,7 @@ void CbmTrdHitDensityTest::Exec(Option_t * option)
       }
   }
   else {    
-    tFile = new TFile("CbmTrdHitDensityTest.root",/*"CREATE"*/"RECREATE"," ROOT file with histograms");
+    tFile = new TFile("CbmTrdHitDensityQa.root",/*"CREATE"*/"RECREATE"," ROOT file with histograms");
     cout << "  << file new created" << endl;
     hPointDistance = new TH1F("PointDistance","PointDistance", 10000, 0, 1500);
     hPointDistance->SetXTitle("point to point distance within same module (each pair once) [mm]");
@@ -313,25 +313,25 @@ void CbmTrdHitDensityTest::Exec(Option_t * option)
   //delete pt;
 }
     // ---- Register ------------------------------------------------------
-void CbmTrdHitDensityTest::Register()
+void CbmTrdHitDensityQa::Register()
 {
-  cout << " * CbmTrdHitDensityTest * :: Register()" << endl;
+  cout << " * CbmTrdHitDensityQa * :: Register()" << endl;
   //FairRootManager::Instance()->Register("TrdHit","Trd Hit", fClusterHits, kTRUE);
 }
     // --------------------------------------------------------------------
 
 
     // ---- Finish --------------------------------------------------------
-void CbmTrdHitDensityTest::Finish()
+void CbmTrdHitDensityQa::Finish()
 {
-  //cout << " * CbmTrdHitDensityTest * :: Finish()" << endl;
+  //cout << " * CbmTrdHitDensityQa * :: Finish()" << endl;
 }
 
     // -----   Public method EndOfEvent   --------------------------------------
-void CbmTrdHitDensityTest::FinishEvent() {
-  //  cout<<"In CbmTrdHitDensityTest::FinishEvent()"<<endl;
+void CbmTrdHitDensityQa::FinishEvent() {
+  //  cout<<"In CbmTrdHitDensityQa::FinishEvent()"<<endl;
   if (fClusterHits) fClusterHits->Clear();
 }
     // -------------------------------------------------------------------------
 
-ClassImp(CbmTrdHitDensityTest)
+ClassImp(CbmTrdHitDensityQa)

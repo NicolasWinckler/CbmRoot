@@ -237,7 +237,7 @@ void run_reco_occupancy(Int_t nEvents = 100)
   
   CbmTrdClusterizerFast* trdClustering = new CbmTrdClusterizerFast("TRD Clusterizer", "TRD task",radiator,false,false);
   run->AddTask(trdClustering);
-  CbmTrdOccupancy* trdOccupancy = new CbmTrdOccupancy("TRD Occupancy", "TRD task", digipar);
+  CbmTrdOccupancyQa* trdOccupancy = new CbmTrdOccupancyQa("TRD Occupancy", "TRD task", digipar);
   run->AddTask(trdOccupancy);
 
   /*

@@ -58,6 +58,9 @@ TrdDigi/CbmTrdDigitizer.cxx
 TrdQa/CbmTrdHitProducerQa.cxx  
 TrdQa/CbmTrdTracksPidQa.cxx
 TrdQa/CbmTrdQa.cxx
+TrdQa/CbmTrdHitDensityQa.cxx
+TrdQa/CbmTrdHitRateQa.cxx
+TrdQa/CbmTrdOccupancyQa.cxx
 
 TrdReco/CbmTrdHitProducerIdeal.cxx    
 TrdReco/CbmTrdHitProducerSmearing.cxx
@@ -73,10 +76,6 @@ TrdTools/CbmTrdGeoHandler.cxx
 TrdData/CbmTrdRadiator.cxx  
 TrdData/CbmTrdGas.cxx
 TrdData/CbmTrdModule.cxx
-
-TrdAna/CbmTrdHitRateTest.cxx
-TrdAna/CbmTrdHitDensityTest.cxx
-TrdAna/CbmTrdOccupancy.cxx
 
 CbmTrdFindTracks.cxx  
 CbmTrdTrackFinderIdeal.cxx  

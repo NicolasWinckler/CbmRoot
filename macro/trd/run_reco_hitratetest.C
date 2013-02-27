@@ -143,7 +143,7 @@ void run_reco_hitratetest()
   run->AddTask(trdClustering);
   */
   printf("CbmTrdHitRateTest\n");
-  CbmTrdHitRateTest *trdRateTest = new CbmTrdHitRateTest("HitRateTest","Hit Rate Test",radiator); 
+  CbmTrdHitRateQa *trdRateTest = new CbmTrdHitRateQa("HitRateTest","Hit Rate Test",radiator);
   run->AddTask(trdRateTest);
   // -------------------------------------------------------------------------
 

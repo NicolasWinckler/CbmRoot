@@ -17,15 +17,14 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
 ${CBMROOT_SOURCE_DIR}/trd
-${CBMROOT_SOURCE_DIR}/trd/TrdMC
-${CBMROOT_SOURCE_DIR}/trd/TrdDigi
-${CBMROOT_SOURCE_DIR}/trd/TrdTools
-${CBMROOT_SOURCE_DIR}/trd/TrdParam
-${CBMROOT_SOURCE_DIR}/trd/TrdReco
-${CBMROOT_SOURCE_DIR}/trd/TrdQa
-${CBMROOT_SOURCE_DIR}/trd/TrdTools
-${CBMROOT_SOURCE_DIR}/trd/TrdData
-${CBMROOT_SOURCE_DIR}/trd/TrdAna
+${CBMROOT_SOURCE_DIR}/trd/mc
+${CBMROOT_SOURCE_DIR}/trd/digi
+${CBMROOT_SOURCE_DIR}/trd/tools
+${CBMROOT_SOURCE_DIR}/trd/param
+${CBMROOT_SOURCE_DIR}/trd/reco
+${CBMROOT_SOURCE_DIR}/trd/qa
+${CBMROOT_SOURCE_DIR}/trd/tools
+${CBMROOT_SOURCE_DIR}/trd/data
 
 ${CBMROOT_SOURCE_DIR}/passive
 )
@@ -42,40 +41,40 @@ link_directories( ${LINK_DIRECTORIES})
 #FILE(GLOB TRD_HEADERS ${CMAKE_HOME_DIRECTORY}/trd *.h)
 
 set(TRD_SRCS
-TrdMC/CbmGeoTrd.cxx 
-TrdMC/CbmTrd.cxx 		 
+mc/CbmGeoTrd.cxx 
+mc/CbmTrd.cxx 		 
 
-TrdParam/CbmGeoTrdPar.cxx 
-TrdParam/CbmTrdContFact.cxx   
-TrdParam/CbmTrdDigiPar.cxx
-TrdParam/CbmTrdCreateDigiPar.cxx
+param/CbmGeoTrdPar.cxx 
+param/CbmTrdContFact.cxx   
+param/CbmTrdDigiPar.cxx
+param/CbmTrdCreateDigiPar.cxx
 
-TrdDigi/CbmTrdDigitizerMathieson.cxx 
-TrdDigi/CbmTrdDigitizerPRF.cxx
-TrdDigi/CbmTrdDigitizer.cxx
-#TrdDigi/CbmTrdDigiWriteoutBuffer.cxx
+digi/CbmTrdDigitizerMathieson.cxx 
+digi/CbmTrdDigitizerPRF.cxx
+digi/CbmTrdDigitizer.cxx
+#digi/CbmTrdDigiWriteoutBuffer.cxx
 
-TrdQa/CbmTrdHitProducerQa.cxx  
-TrdQa/CbmTrdTracksPidQa.cxx
-TrdQa/CbmTrdQa.cxx
-TrdQa/CbmTrdHitDensityQa.cxx
-TrdQa/CbmTrdHitRateQa.cxx
-TrdQa/CbmTrdOccupancyQa.cxx
+qa/CbmTrdHitProducerQa.cxx  
+qa/CbmTrdTracksPidQa.cxx
+qa/CbmTrdQa.cxx
+qa/CbmTrdHitDensityQa.cxx
+qa/CbmTrdHitRateQa.cxx
+qa/CbmTrdOccupancyQa.cxx
 
-TrdReco/CbmTrdHitProducerIdeal.cxx    
-TrdReco/CbmTrdHitProducerSmearing.cxx
-TrdReco/CbmTrdHitProducerDigi.cxx
-TrdReco/CbmTrdClusterFinder.cxx
-TrdReco/CbmTrdClusterFinderFast.cxx
-TrdReco/CbmTrdHitProducerCluster.cxx
-TrdReco/CbmTrdSimpleHitProducerCluster.cxx
+reco/CbmTrdHitProducerIdeal.cxx    
+reco/CbmTrdHitProducerSmearing.cxx
+reco/CbmTrdHitProducerDigi.cxx
+reco/CbmTrdClusterFinder.cxx
+reco/CbmTrdClusterFinderFast.cxx
+reco/CbmTrdHitProducerCluster.cxx
+reco/CbmTrdSimpleHitProducerCluster.cxx
 
-TrdTools/CbmTrdElectronsTrainAnn.cxx
-TrdTools/CbmTrdGeoHandler.cxx
+tools/CbmTrdElectronsTrainAnn.cxx
+tools/CbmTrdGeoHandler.cxx
 
-TrdData/CbmTrdRadiator.cxx  
-TrdData/CbmTrdGas.cxx
-TrdData/CbmTrdModule.cxx
+data/CbmTrdRadiator.cxx  
+data/CbmTrdGas.cxx
+data/CbmTrdModule.cxx
 
 CbmTrdFindTracks.cxx  
 CbmTrdTrackFinderIdeal.cxx  

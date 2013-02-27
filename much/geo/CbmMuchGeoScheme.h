@@ -40,19 +40,6 @@ class CbmMuchPad;
 using std::vector;
 using std::map;
 
-// Length of the index of the corresponding volume
-#define WL_SYSTEM 15
-#define WL_STATION 31
-#define WL_LAYER 7
-#define WL_LAYERSIDE 1
-#define WL_MODULE 511
-// Number of a start bit for each volume
-#define SB_SYSTEM 0
-#define SB_STATION 4
-#define SB_LAYER 9
-#define SB_LAYERSIDE 12
-#define SB_MODULE 13
-
 class CbmMuchGeoScheme: public TObject {
 
   public:
@@ -251,6 +238,19 @@ class CbmMuchGeoScheme: public TObject {
     TArrayD fSupportLz; // Support thickness [cm]
     TArrayI fModuleDesign; /* 1 - detailed design (modules at two sides)
      * 0 - simple design (1 module per layer)     */
+
+    // Length of the index of the corresponding volume
+    static const Int_t WL_SYSTEM = 15;
+    static const Int_t WL_STATION = 31;
+    static const Int_t WL_LAYER = 7;
+    static const Int_t WL_LAYERSIDE = 1;
+    static const Int_t WL_MODULE = 511;
+    // Number of a start bit for each volume
+    static const Int_t SB_SYSTEM = 0;
+    static const Int_t SB_STATION = 4;
+    static const Int_t SB_LAYER = 9;
+    static const Int_t SB_LAYERSIDE = 12;
+    static const Int_t SB_MODULE = 13;
 
     CbmMuchGeoScheme(const CbmMuchGeoScheme&);
     CbmMuchGeoScheme& operator=(const CbmMuchGeoScheme&);

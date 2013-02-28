@@ -278,8 +278,8 @@ void CbmMuchSegmentSector::DrawSegmentation(){
                     kPink+2, kAzure+2, kOrange+2, kViolet+2, kSpring+2,
                     kGreen+4, kMagenta+4, kCyan+4, kRed+4, kBlue+4, kYellow+4, kTeal+4,
                     kPink+4, kAzure+4, kOrange+4, kViolet+4, kSpring+4};
-//  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
-  for (Int_t iStation=0;iStation<6;++iStation){
+  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
+//  for (Int_t iStation=0;iStation<6;++iStation){
     fprintf(outfile, "===========================================================================\n");
     fprintf(outfile, "Station %i\n", iStation+1);
     fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");

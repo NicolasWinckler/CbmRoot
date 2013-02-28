@@ -8,6 +8,10 @@
  * @param outFile        Output file for transport data
  * @param nEvents        Number of events to process
  */
+
+#include <iostream>
+using namespace std;
+
 void much_sim(TString inputSignal = "",
               TString inputBgr = "",
               TString outFile = "",
@@ -44,20 +48,18 @@ void much_sim(TString inputSignal = "",
   // use shield_standard.geo or shield_compact.geo, respective to the
   // MUCH geometry. Otherwise, define an empty string.
 //  TString muchGeom   = "much/much_v11a.geo"; // default rectangular geometry
-  TString muchGeom   = "much/much_v12a.geo"; // default sector geometry
+  TString muchGeom   = "much/much_v12b.geo"; // default sector geometry
   TString pipeGeom   = "pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
 
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "passive/magnet_v09m.geo";
-  TString stsGeom    = "sts/sts_v11a.geo";
-  TString trdGeom    = "";
-  TString tofGeom    = "";
+  TString magnetGeom = "passive/magnet_v12a.geo";
+  TString stsGeom    = "sts/sts_v12b.geo.root";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap   = "field_v10e";   // name of field map
+  TString  fieldMap   = "field_v12a";   // name of field map
   Double_t fieldZ     = 50.;                 // field center z position
   Double_t fieldScale =  1.;                 // field scaling factor
 
@@ -159,29 +161,12 @@ void much_sim(TString inputSignal = "",
   }
   // ------------------------------------------------------------------------
 
-
   // -----   Create magnetic field   ----------------------------------------
-  cout << endl << "=== much_sim.C : Create magnetic field ..." << endl;
-  if (fieldMap == "field_electron_standard" ) 
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "field_muon_standard" )
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "field_v10e" )
-    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "FieldMuonMagnet" )
-    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
-  else {
-    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-    exit;
-  }
+  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);
-  cout << "    ---  Field    is " << fieldMap << endl;
-  cout << "    ---  Position is z = " << fieldZ << " cm" << endl;
-  cout << "    ---  Scale    is " << fieldScale << endl;
-   // ------------------------------------------------------------------------
-
+  // ------------------------------------------------------------------------
 
   // -----   Create PrimaryGenerator   --------------------------------------
   cout << endl << "=== much_sim.C : Create generators ..." << endl;
@@ -248,6 +233,5 @@ void much_sim(TString inputSignal = "",
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-//  exit(0);
 }
 

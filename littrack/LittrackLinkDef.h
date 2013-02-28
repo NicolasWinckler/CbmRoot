@@ -29,7 +29,6 @@
 #endif
 
 #pragma link C++ class CbmLitPropagationQa+;
-#pragma link C++ class CbmLitTrackingGeoQa+;
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;

@@ -165,6 +165,7 @@ void CbmLitFieldApproximationQaReport::DrawApr(
       Double_t maxBz = std::numeric_limits<Double_t>::min();
       Double_t maxMod = std::numeric_limits<Double_t>::min();
       vector<TH1*> errBx = HM()->H1Vector("hfa_Bx" + err + "Apr_H1_" + z + "_.*");
+      if (errBx.empty()) return;
       vector<TH1*> errBy(errBx.size());
       vector<TH1*> errBz(errBx.size());
       vector<TH1*> errMod(errBx.size());

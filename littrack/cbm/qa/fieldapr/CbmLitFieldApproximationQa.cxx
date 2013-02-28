@@ -44,6 +44,9 @@ using lit::parallel::LitFieldSlice;
 using lit::parallel::LitFieldValue;
 using lit::parallel::LitFieldGrid;
 using boost::assign::list_of;
+using std::cout;
+using std::string;
+using std::endl;
 
 CbmLitFieldApproximationQa::CbmLitFieldApproximationQa():
    fField(NULL),
@@ -81,8 +84,8 @@ InitStatus CbmLitFieldApproximationQa::Init()
    fXSlicePosition.resize(fNofSlices);
    fYSlicePosition.resize(fNofSlices);
    for (Int_t i = 0; i < fNofSlices; i++) {
-      Double_t tanXangle = std::tan(fAcceptanceAngleX * 3.14159265 / 180); //
-      Double_t tanYangle = std::tan(fAcceptanceAngleY * 3.14159265 / 180); //
+      Double_t tanXangle = tan(fAcceptanceAngleX * 3.14159265 / 180); //
+      Double_t tanYangle = tan(fAcceptanceAngleY * 3.14159265 / 180); //
       fXSlicePosition[i] = fZSlicePosition[i] * tanXangle;
       fYSlicePosition[i] = fZSlicePosition[i] * tanYangle;
    }
@@ -142,12 +145,12 @@ void CbmLitFieldApproximationQa::CreateHistos()
    CreateFieldHistos();
    CreateFitterHistos();
    CreateGridHistos();
-   std::cout << fHM->ToString();
+   cout << fHM->ToString();
 }
 
 void CbmLitFieldApproximationQa::CreateFieldHistos()
 {
-   std::string names[] = {"Bx", "By", "Bz", "Mod"};
+   string names[] = {"Bx", "By", "Bz", "Mod"};
    string zTitle[] = {"B_{x} [kGauss]", "B_{y} [kGauss]", "B_{z} [kGauss]", "|B| [kGauss]"};
    for (Int_t v = 0; v < 4; v++) {
       for (Int_t i = 0; i < fNofSlices; i++) {
@@ -162,7 +165,7 @@ void CbmLitFieldApproximationQa::CreateFieldHistos()
 
 void CbmLitFieldApproximationQa::CreateFitterHistos()
 {
-   std::string names[] = {"Bx", "By", "Bz", "Mod"};
+   string names[] = {"Bx", "By", "Bz", "Mod"};
 
    Int_t nofBinsX = fNofBinsX;
    Int_t nofBinsY = fNofBinsY;
@@ -210,12 +213,12 @@ void CbmLitFieldApproximationQa::CreateFitterHistos()
          }
       }
    }
-   std::cout << "-I- CbmLitFieldApproximationQa::CreateFitterErrHistos: Field fitter error histograms created" << std::endl;
+   cout << "-I- CbmLitFieldApproximationQa::CreateFitterErrHistos: Field fitter error histograms created" << endl;
 }
 
 void CbmLitFieldApproximationQa::CreateGridHistos()
 {
-   std::string names[] = {"Bx", "By", "Bz", "Mod"};
+   string names[] = {"Bx", "By", "Bz", "Mod"};
 
    Int_t nofBinsX = fNofBinsX;
    Int_t nofBinsY = fNofBinsY;
@@ -261,7 +264,7 @@ void CbmLitFieldApproximationQa::CreateGridHistos()
          fHM->Add(name, new TH2D(name.c_str(), title.c_str(), nofBinsErrX, -fXSlicePosition[i], fXSlicePosition[i], nofBinsErrY, -fYSlicePosition[i], fYSlicePosition[i]));
       }
    }
-   std::cout << "-I- CbmLitFieldApproximationQa::CreateGridErrHistos(): Grid creator error histograms created" << std::endl;
+   cout << "-I- CbmLitFieldApproximationQa::CreateGridErrHistos(): Grid creator error histograms created" << endl;
 }
 
 void CbmLitFieldApproximationQa::FillBHistos()
@@ -287,7 +290,7 @@ void CbmLitFieldApproximationQa::FillBHistos()
             Double_t B[3];
             fField->GetFieldValue(pos, B);
 
-            Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+            Double_t Bmod = sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
             string s = ToString<Int_t>(fZSlicePosition[iSlice]);
             fHM->G2(string("hfa_Bx_Graph2D_") + s)->SetPoint(cnt, X, Y, B[0]);
@@ -302,7 +305,7 @@ void CbmLitFieldApproximationQa::FillBHistos()
 
 void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
 {
-   std::vector<std::vector<LitFieldSlice<float> > > slices;
+   vector<vector<LitFieldSlice<float> > > slices;
    slices.resize(fNofPolynoms);
    for (UInt_t i = 0; i < fNofPolynoms; i++) {slices[i].resize(fNofSlices);}
 
@@ -310,9 +313,9 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
    for (UInt_t i = 0; i < fNofPolynoms; i++) {
       for(Int_t j = 0; j < fNofSlices; j++) {
          fFitter[i]->FitSlice(fZSlicePosition[j], slices[i][j]);
-         std::cout << "-I- CbmLitFieldApproximationQa::FillFieldApproximationHistos: "
+         cout << "-I- CbmLitFieldApproximationQa::FillFieldApproximationHistos: "
                << " field approximation (degree=" << fPolynomDegrees[i]
-               << ", Z=" << fZSlicePosition[j] << ")" << std::endl;
+               << ", Z=" << fZSlicePosition[j] << ")" << endl;
       }
    }
 
@@ -335,7 +338,7 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
             for (Int_t p = 0; p < fNofPolynoms; p++) {
                LitFieldValue<float> v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
-               Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+               Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
                string s = ToString<Int_t>(fZSlicePosition[iSlice]) + "_" + ToString<Int_t>(fPolynomDegrees[p]);
                fHM->G2(string("hfa_BxApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bx);
                fHM->G2(string("hfa_ByApr_Graph2D_") + s)->SetPoint(cnt, X, Y, v.By);
@@ -368,12 +371,12 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
             Double_t B[3];
             fField->GetFieldValue(pos, B);
 
-            Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+            Double_t Bmod = sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
             for (Int_t p = 0; p < fNofPolynoms; p++) {
                LitFieldValue<float> v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
-               Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+               Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 
                Double_t errBx = B[0] - v.Bx;
                Double_t errBy = B[1] - v.By;
@@ -409,7 +412,7 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
 
 void CbmLitFieldApproximationQa::FillGridCreatorHistos()
 {
-   std::vector<LitFieldGrid> grids;
+   vector<LitFieldGrid> grids;
    grids.resize(fNofSlices);
    for (Int_t iSlice = 0; iSlice < fNofSlices; iSlice++) {
       fGridCreator->CreateGrid(fZSlicePosition[iSlice], grids[iSlice]);
@@ -427,7 +430,7 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             Double_t Y = -fYSlicePosition[iSlice] + (iY + 0.5)  * HY;
             LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
-            Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+            Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
             string s = ToString<Int_t>(fZSlicePosition[iSlice]);
             fHM->G2(string("hfa_BxGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.Bx);
             fHM->G2(string("hfa_ByGrid_Graph2D_") + s)->SetPoint(cnt, X, Y, v.By);
@@ -455,11 +458,11 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
             Double_t B[3];
             fField->GetFieldValue(pos, B);
 
-            Double_t Bmod = std::sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
+            Double_t Bmod = sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
             LitFieldValue<float> v;
             grids[iSlice].GetFieldValue(X, Y, v);
-            Double_t mod = std::sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
+            Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 
             Double_t errBx = B[0] - v.Bx;
             Double_t errBy = B[1] - v.By;

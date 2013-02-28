@@ -198,12 +198,9 @@ void CbmLitFitQa::ProcessTrdTrack(
    const FairTrackParam* firstParam = track->GetParamFirst();
    const FairTrackParam* lastParam = track->GetParamLast();
 
-   CbmTrdDetectorId trdDetectorId;
-
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(0)));
-   Int_t* detInfo = trdDetectorId.GetDetectorInfo(firstHit->GetDetectorId());
-   Int_t firstStation = 10 * detInfo[1] + detInfo[2];
+   Int_t firstStation = 10 * CbmTrdDetectorId::GetStationNr(firstHit->GetDetectorId()) + CbmTrdDetectorId::GetLayerNr(firstHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kTRD, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kTRD, firstStation, 0);
       FillResidualsAndPulls(firstParam, &firstPoint, "htf_Trd_FirstParam_", nofHits, kTRD);
@@ -211,8 +208,7 @@ void CbmLitFitQa::ProcessTrdTrack(
 
    // Fill histograms for last track parameters
    const CbmBaseHit* lastHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(nofHits - 1)));
-   detInfo = trdDetectorId.GetDetectorInfo(lastHit->GetDetectorId());
-   Int_t lastStation = 10 * detInfo[1] + detInfo[2];
+   Int_t lastStation = 10 * CbmTrdDetectorId::GetStationNr(lastHit->GetDetectorId()) + CbmTrdDetectorId::GetLayerNr(lastHit->GetDetectorId());
    if (mcTrack.GetNofPointsAtStation(kTRD, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kTRD, lastStation, 0);
       FillResidualsAndPulls(lastParam, &lastPoint, "htf_Trd_LastParam_", nofHits, kTRD);

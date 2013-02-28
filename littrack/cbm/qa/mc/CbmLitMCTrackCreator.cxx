@@ -343,12 +343,10 @@ void CbmLitMCTrackCreator::FillStationMaps()
 
    // TRD
    if (NULL != fTrdPoints) {
-      CbmTrdDetectorId trdDetectorId;
       Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
       for (Int_t iPoint = 0; iPoint < nofTrdPoints; iPoint++) {
          const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(iPoint));
-         Int_t* detInfo = trdDetectorId.GetDetectorInfo(point->GetDetectorID());
-         Int_t stationId = 10 * detInfo[1] + detInfo[2];
+         Int_t stationId = 10 * CbmTrdDetectorId::GetStationNr(point->GetDetectorID()) + CbmTrdDetectorId::GetLayerNr(point->GetDetectorID());
          fTrdStationsMap[iPoint] = stationId;
       }
    }

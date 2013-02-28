@@ -187,7 +187,7 @@ void CbmTrdHitProducerDigi::Exec(Option_t * option)
     fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);
         
     // Calculate the hit error from the pad sizes
-    padSize*=(1/TMath::Sqrt(12.));
+    padSize*=(1./TMath::Sqrt(12.));
         
     AddHit(posHit, padSize, DetId, Plane, j , ELoss, 0., 0.);
     

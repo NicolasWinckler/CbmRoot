@@ -381,10 +381,8 @@ CbmLitMCPoint CbmLitPropagationQaCalculator::GetMcPointByHit(
       const CbmLitMCTrack* mcTrack)
 {
    if (hit->GetSystem() == kLITTRD) {
-      CbmTrdDetectorId trdDetectorId;
       const CbmBaseHit* trdHit = static_cast<const CbmBaseHit*>(fTrdHits->At(hit->GetRefId()));
-      Int_t* detInfo = trdDetectorId.GetDetectorInfo(trdHit->GetDetectorId());
-      Int_t trdStationId = 10 * detInfo[1] + detInfo[2];
+      Int_t trdStationId = 10 * CbmTrdDetectorId::GetStationNr(trdHit->GetDetectorId()) + CbmTrdDetectorId::GetLayerNr(trdHit->GetDetectorId());
       if (mcTrack->GetNofPointsAtStation(kTRD, trdStationId) > 0) {
          return mcTrack->GetPointAtStation(kTRD, trdStationId, 0);
       }

@@ -9,6 +9,7 @@ ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/eventdisplay
 
 ${CBMROOT_SOURCE_DIR}/cbmdisplay 
+${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 

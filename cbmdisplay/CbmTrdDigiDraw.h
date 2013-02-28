@@ -70,7 +70,6 @@ protected:
   CbmTrdModule *fModuleInfo; //!
   FairEventManager *fEventManager;   //!
   TEveBoxSet* fq;    //!
-  CbmTrdDetectorId fTrdId; //!
   Color_t fColor; //!
   Style_t fStyle; //!
 

@@ -15,6 +15,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdGeoHandler.h"
+#include "CbmTrdDetectorId.h"
 
 #include <iostream>
 
@@ -37,7 +38,6 @@ CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal()
    fArrayTrdPoint(NULL),
    fArrayTrdHit(new TClonesArray("CbmTrdHit", 100)),
    fEvents(0),
-   fDetId(),
    fLayersBeforeStation() 
 {
 }
@@ -51,7 +51,6 @@ CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal(const char *name,
    fArrayTrdPoint(NULL),
    fArrayTrdHit(new TClonesArray("CbmTrdHit", 100)),
    fEvents(0),
-   fDetId(),
    fLayersBeforeStation() 
 {
 }
@@ -147,8 +146,8 @@ void CbmTrdHitProducerIdeal::Exec(Option_t *option)
 	point->Position(pos);
 
 	// Calculate plane number
-        Int_t* detInfo = fDetId.GetDetectorInfo(point->GetDetectorID()); 
-	iPlane=fLayersBeforeStation[(detInfo[1]-1)]+detInfo[2];
+	Int_t detectorId = point->GetDetectorID();
+	iPlane = fLayersBeforeStation[CbmTrdDetectorId::GetStationNr(detectorId) - 1] + CbmTrdDetectorId::GetLayerNr(detectorId);
 
 	// Create hit
 	new ((*fArrayTrdHit)[nHit]) CbmTrdHit(point->GetDetectorID(),

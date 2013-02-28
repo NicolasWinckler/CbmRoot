@@ -56,6 +56,9 @@ hyperon/CbmAnaHypMix.cxx
 #CbmD0Analysis.cxx
 #V0/CbmV0Analysis.cxx
 
+msh/CbmMSHConverter.cxx
+msh/CbmMSHAnalysis.cxx
+
 much/CbmAnaMuch.cxx
 much/CbmAnaMuchJpsiPolarization.cxx
 much/CbmPolarizedGenerator.cxx
@@ -80,6 +83,8 @@ dielectron/CbmAnaLmvmDrawStudy.cxx
 dielectron/CbmAnaLmvmNames.cxx
 dielectron/CbmAnaDielectronStudyReportAll.cxx
 dielectron/CbmAnaDielectronReports.cxx
+
+#photon/CbmTrdPhotonAnalysis.cxx
 )
 
 
@@ -106,6 +111,10 @@ hyperon/CbmAnaHypMix.h
 #CbmD0Analysis.h
 #V0/CbmV0Analysis.h
 
+msh/CbmMSHConverter.h
+msh/CbmMSHTrackInfo.h
+msh/CbmMSHAnalysis.h
+
 much/CbmAnaMuch.h
 much/CbmAnaMuchJpsiPolarization.h
 much/CbmPolarizedGenerator.h
@@ -128,6 +137,8 @@ dielectron/CbmAnaDielectronTaskDraw.h
 dielectron/CbmAnaDielectronTaskDrawAll.h
 dielectron/CbmAnaLmvmDrawStudy.h
 dielectron/CbmAnaDielectronReports.h
+
+#photon/CbmTrdPhotonAnalysis.h
 )
 
 # fill list of header files from list of source files

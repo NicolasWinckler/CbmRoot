@@ -228,8 +228,7 @@ void CbmTrdDigitizer::Exec(Option_t * option)
   // Fill also the DigiMatch output which holds for each digi the MC indexes
   // which give a contribution to the digi
   Int_t iDigi=0; 
-  for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); 
-        fDigiMapIt++ ) {
+  for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++ ) {
     new ((*fDigiCollection)[iDigi]) 
         CbmTrdDigi(fDigiMapIt->second->GetDetId(), 
         fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), 
@@ -245,10 +244,7 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     }
 
     iDigi++;
-
   }
-
-
 }
 // --------------------------------------------------------------------
 
@@ -295,7 +291,6 @@ void CbmTrdDigitizer::AddDigi(const Int_t pointID) {
         digi->AddMCIndex(pointID);
         if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
     }
-
 }
 
 

@@ -26,15 +26,12 @@ using std::endl;
 
 CbmTrdGeoHandler::CbmTrdGeoHandler() 
   : TObject(),
-    fTrdId(),
     fGeoVersion(-1),
     fStationMap(),
     fModuleTypeMap(),
     fLayersBeforeStation(),
     fLogger(FairLogger::GetLogger()),
     fIsSimulation(kFALSE),
-    fLastUsedDetectorID(0),
-    fDetectorInfoArray(),
     fGeoPathHash(0),
     fCurrentVolume(NULL),
     fVolumeShape(NULL),    
@@ -233,10 +230,8 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
     modtype=0;
     modnumber=0;
   }
-  
-    Int_t sector=0;
-    Int_t detInfo_array[6]={kTRD, station,layer,modtype,modnumber,sector};         
-    return fTrdId.SetDetectorInfo(detInfo_array);
+
+  return CbmTrdDetectorId::GetDetectorId(station, layer, modtype, modnumber, 0);
 }
 
 Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
@@ -828,62 +823,48 @@ Int_t CbmTrdGeoHandler::CurrentVolOffID(Int_t off, Int_t& copy) const
   }
 }
 
-void CbmTrdGeoHandler::FillDetectorInfoArray(Int_t uniqueId) 
-{
-  fDetectorInfoArray = fTrdId.GetDetectorInfo(uniqueId);
-}
 Int_t CbmTrdGeoHandler::GetStation(Int_t uniqueId)
 {
-  if (fLastUsedDetectorID != uniqueId) {
-    FillDetectorInfoArray(uniqueId);
-  }
-  //  cout << " " << fDetectorInfoArray[1];
-  return fDetectorInfoArray[1];  // 1-3
+   return CbmTrdDetectorId::GetStationNr(uniqueId);
 }
+
 Int_t CbmTrdGeoHandler::GetLayer(Int_t uniqueId)
 {
-  if (fLastUsedDetectorID != uniqueId) {
-    FillDetectorInfoArray(uniqueId);
-  }
-  //  cout << " " << fDetectorInfoArray[2];
-  return fDetectorInfoArray[2];  // 1-4
+   return CbmTrdDetectorId::GetLayerNr(uniqueId);
 }
+
 Int_t CbmTrdGeoHandler::GetModuleType(Int_t uniqueId)
 {
-  if (fLastUsedDetectorID != uniqueId) {
-    FillDetectorInfoArray(uniqueId);
-  }
-  //  cout << " " << fDetectorInfoArray[3];
-  return fDetectorInfoArray[3];  // 1-8
+   return CbmTrdDetectorId::GetModuleType(uniqueId);
 }
+
 Int_t CbmTrdGeoHandler::GetModuleCopyNr(Int_t uniqueId)
 {
-  if (fLastUsedDetectorID != uniqueId) {
-    FillDetectorInfoArray(uniqueId);
-  }
-  //  cout << " " << fDetectorInfoArray[4];
-  return fDetectorInfoArray[4];  // 1-xx
+   return CbmTrdDetectorId::GetCopyNr(uniqueId);
 }
+
 Int_t CbmTrdGeoHandler::GetSector(Int_t uniqueId)
 {
-  if (fLastUsedDetectorID != uniqueId) {
-    FillDetectorInfoArray(uniqueId);
-  }
-  // cout << " " << fDetectorInfoArray[5];
-  return fDetectorInfoArray[5];  // 0-2
+   return CbmTrdDetectorId::GetSectorNr(uniqueId);
 }
+
 Int_t CbmTrdGeoHandler::GetPlane(Int_t uniqueId)
 {
-  if (fLastUsedDetectorID != uniqueId) {
-    FillDetectorInfoArray(uniqueId);
-  }
-  //  cout << " " << fLayersBeforeStation[(GetStation(uniqueId)-1)]+GetLayer(uniqueId);
-  return fLayersBeforeStation[(GetStation(uniqueId)-1)]+GetLayer(uniqueId);  // 1-10  // get plane number from station and layer information
-  //  return fLayersBeforeStation[(fDetectorInfoArray[1]-1)]+fDetectorInfoArray[2];
+   return fLayersBeforeStation[(GetStation(uniqueId) - 1)] + GetLayer(uniqueId);
 }
+
 Int_t CbmTrdGeoHandler::GetModuleId(Int_t uniqueId)
 {
-  return  fTrdId.GetModuleId(uniqueId);
+   return CbmTrdDetectorId::GetModuleId(uniqueId);
+}
+
+Int_t CbmTrdGeoHandler::SetSector(Int_t moduleId, Int_t sectorId)
+{
+   Int_t stationNr = CbmTrdDetectorId::GetStationNr(moduleId);
+   Int_t layerNr = CbmTrdDetectorId::GetLayerNr(moduleId);
+   Int_t moduleType = CbmTrdDetectorId::GetModuleType(moduleId);
+   Int_t copyNr = CbmTrdDetectorId::GetCopyNr(moduleId);
+   return CbmTrdDetectorId::GetDetectorId(stationNr, layerNr, moduleType, copyNr, sectorId);
 }
 
 Float_t CbmTrdGeoHandler::GetSizeX(TString volName) 

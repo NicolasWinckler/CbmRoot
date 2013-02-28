@@ -37,7 +37,6 @@ CbmTrdDigiDraw::CbmTrdDigiDraw()
     fModuleInfo(NULL),
     fEventManager(NULL),
     fq(NULL),
-    fTrdId(),
     fColor(),
     fStyle(),
     fActiveLayers()
@@ -56,7 +55,6 @@ CbmTrdDigiDraw::CbmTrdDigiDraw(const char* name, Color_t color ,Style_t mstyle,I
     fModuleInfo(NULL),
     fEventManager(NULL),
     fq(NULL),
-    fTrdId(),
     fColor(color),
     fStyle(mstyle),
     fActiveLayers()
@@ -166,13 +164,12 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
        // module with arrays holding the information about the sectors.
        // So we have to extract the information about the module Id and
        // the sector from the detector Id.
-       bla = fTrdId.GetDetectorInfo(DetId);
-       Station = bla[1];
-       Layer = bla[2];
-       ModuleType = bla[3];
-       ModuleCopy = bla[4];
-       Sector = bla[5];
-       moduleId= fTrdId.GetModuleId(DetId);
+       Station = CbmTrdDetectorId::GetStationNr(DetId);
+       Layer = CbmTrdDetectorId::GetLayerNr(DetId);
+       ModuleType = CbmTrdDetectorId::GetModuleType(DetId);
+       ModuleCopy = CbmTrdDetectorId::GetCopyNr(DetId);
+       Sector = CbmTrdDetectorId::GetSectorNr(DetId);
+       moduleId= CbmTrdDetectorId::GetModuleId(DetId);
 
        /*
 	 cout <<"##########################################"<<endl;

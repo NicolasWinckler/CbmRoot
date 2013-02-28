@@ -75,7 +75,7 @@ class CbmTrdGeoHandler : public TObject {
   Float_t GetY(TString volName);        
   Float_t GetZ(TString volName);        
 
-  Int_t SetSector(Int_t moduleId, Int_t sectorId) {return fTrdId.SetSector(moduleId, sectorId);}
+  Int_t SetSector(Int_t moduleId, Int_t sectorId);
  private:
 
   Bool_t GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersBeforStation);
@@ -95,7 +95,6 @@ class CbmTrdGeoHandler : public TObject {
   Int_t CheckGeometryVersion(); 
   void FillInternalStructures();
 
-  CbmTrdDetectorId fTrdId;      //!
   Int_t            fGeoVersion; //!
 
   std::map<Int_t, Int_t> fStationMap;     //!
@@ -105,8 +104,6 @@ class CbmTrdGeoHandler : public TObject {
   FairLogger* fLogger;  //!                                                  
   Bool_t fIsSimulation; //!
 
-  Int_t fLastUsedDetectorID;  //!
-  Int_t* fDetectorInfoArray;  //!
   UInt_t fGeoPathHash;        //!
   TGeoVolume* fCurrentVolume; //! 
   TGeoBBox* fVolumeShape;     //!

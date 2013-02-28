@@ -174,21 +174,21 @@ void CbmLitTrackingQaStudyReport::Draw()
 
 void CbmLitTrackingQaStudyReport::DrawEfficiencyHistos()
 {
-   string histNamePattern = "hte_.+_.+_All_Eff_(p|Angle)";
+   string histNamePattern = "hte_.+_.+_(All|Electron)_Eff_(p|Angle)";
    vector<TH1*> histos = HM()[0]->H1Vector(histNamePattern);
    for (UInt_t i = 0; i < histos.size(); i++) {
       string histName = histos[i]->GetName();
       DrawEfficiency("tracking_qa_study_" + histName, histName);
    }
 
-   histNamePattern = "hte_.+_.+_All_Acc_(p|Angle)";
+   histNamePattern = "hte_.+_.+_(All|Electron)_Acc_(p|Angle)";
    histos = HM()[0]->H1Vector(histNamePattern);
    for (UInt_t i = 0; i < histos.size(); i++) {
       string histName = histos[i]->GetName();
       DrawAccAndRec("tracking_qa_study_" + histName, histName);
    }
 
-   histNamePattern = "hte_.+_.+_All_Rec_(p|Angle)";
+   histNamePattern = "hte_.+_.+_(All|Electron)_Rec_(p|Angle)";
    histos = HM()[0]->H1Vector(histNamePattern);
    for (UInt_t i = 0; i < histos.size(); i++) {
       string histName = histos[i]->GetName();

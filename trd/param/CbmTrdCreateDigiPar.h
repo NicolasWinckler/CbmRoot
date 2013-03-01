@@ -1,9 +1,16 @@
 // --------------------------------------------------------------------------
-// -----          Header for the CbmTrdCreateDigiPar               ------
+// -----          Header for the CbmTrdCreateDigiPar                   ------
 // -----              Created 06.06.08 by F.Uhlig                      ------
 // --------------------------------------------------------------------------
 
-
+///                                             
+/// \file CbmTrdCreateDigiPar.h
+/// \brief Assign pad layout to TRD Modules.    
+///                                             
+/// Crate digitisation parameter map.           
+/// Read pad geometry from CbmTrdPads.h,        
+/// assign pad layout to sectors in TRD modules.
+///                                             
 
 #ifndef CBMTRDCREATEDIGIPAR_H
 #define CBMTRDCREATEDIGIPAR_H
@@ -18,6 +25,9 @@ class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdGeoHandler;
 
+///
+/// \brief Assign pad layout to TRD Modules.    
+///                                             
 class CbmTrdCreateDigiPar : public FairTask {
 
   public:
@@ -75,21 +85,21 @@ private:
     Double_t fY;
     Double_t fZ;
 
-    TArrayD fpadsizex; //pixel width in x;
-    TArrayD fpadsizey; //pixel width in y;
-    Float_t fsizex;    //module width in x;
-    Float_t fsizey;    //module width in y;
-    TArrayD fSectorSizex;    //sector width in x;
-    TArrayD fSectorSizey;    //sector width in y;
-    Int_t   fCol;      //Calculated pixel column were the hit is in
-    Int_t   fRow;      //Calculated pixel row were the hit is in
+    TArrayD fpadsizex;      //pixel  width in x;
+    TArrayD fpadsizey;      //pixel  width in y;
+    Float_t fsizex;         //module width in x;
+    Float_t fsizey;         //module width in y;
+    TArrayD fSectorSizex;   //sector width in x;
+    TArrayD fSectorSizey;   //sector width in y;
+    Int_t   fCol;           //Calculated pixel column were the hit is in
+    Int_t   fRow;           //Calculated pixel row were the hit is in
 
-    Int_t   fModuleID; //Unique number for detector module
+    Int_t   fModuleID;      //Unique number for detector module
 
-    Int_t   fMaxSectors; //Max. number of sectors for all modules 
+    Int_t   fMaxSectors;    //Max. number of sectors for all modules 
 
-    Float_t fPosX;     //Hit position in chamber coordinates
-    Float_t fPosY;     //Hit position in chamber coordinates
+    Float_t fPosX;          //Hit position in chamber coordinates
+    Float_t fPosY;          //Hit position in chamber coordinates
 
     /** Map of Unique Trd Module Id to corresponding TrdModule **/
     std::map<Int_t, CbmTrdModule*> fModuleMap;                  //!   

@@ -1,3 +1,12 @@
+/// 
+/// \file CbmTrdCreateDigiPar.cxx
+/// \brief Assign pad layout to TRD Modules.
+/// 
+/// Crate digitisation parameter map.
+/// Read pad geometry from CbmTrdPads.h,
+/// assign pad layout to sectors in TRD modules.
+///  
+
 #include "CbmTrdCreateDigiPar.h"
 
 #include "CbmTrdPads.h"

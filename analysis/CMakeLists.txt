@@ -56,8 +56,8 @@ hyperon/CbmAnaHypMix.cxx
 #CbmD0Analysis.cxx
 #V0/CbmV0Analysis.cxx
 
-msh/CbmMSHConverter.cxx
-msh/CbmMSHAnalysis.cxx
+#msh/CbmMSHConverter.cxx
+#msh/CbmMSHAnalysis.cxx
 
 much/CbmAnaMuch.cxx
 much/CbmAnaMuchJpsiPolarization.cxx
@@ -111,9 +111,9 @@ hyperon/CbmAnaHypMix.h
 #CbmD0Analysis.h
 #V0/CbmV0Analysis.h
 
-msh/CbmMSHConverter.h
-msh/CbmMSHTrackInfo.h
-msh/CbmMSHAnalysis.h
+#msh/CbmMSHConverter.h
+#msh/CbmMSHTrackInfo.h
+#msh/CbmMSHAnalysis.h
 
 much/CbmAnaMuch.h
 much/CbmAnaMuchJpsiPolarization.h

@@ -5,8 +5,6 @@
  * \date 2011
  */
 
-
-
 #include "CbmHistManager.h"
 #include "TH1.h"
 #include "TH2.h"

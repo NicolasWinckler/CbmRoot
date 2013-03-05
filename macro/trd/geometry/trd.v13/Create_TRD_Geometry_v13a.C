@@ -1,3 +1,10 @@
+///                                             
+/// \file Create_TRD_Geometry_v13a.C
+/// \brief Generates TRD geometry in Root format.
+///                                             
+
+// 2013-03-05 - DE - introduce supports for SIS100 and SIS300
+// 2013-03-05 - DE - replace all Float_t by Double_t
 // 2013-01-21 - DE - introduce TRD media, use TRDG10 as material for pad plane and FEBs
 // 2013-01-21 - DE - put backpanel into the geometry
 // 2013-01-11 - DE - allow for misalignment of TRD modules
@@ -34,7 +41,7 @@ const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pll
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 const Bool_t IncludeSupports = true;  // false;  // true, if FEBs are included in geometry
 
-const Float_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
+const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
 // positioning switches
 const Bool_t DisplaceRandom  = false;  // true; // false;  // add random displacement of modules for alignment study
@@ -42,15 +49,15 @@ const Bool_t RotateRandom    = false;  // true; // false;  // add random rotatio
 const Bool_t DoExplode       = false;  // true, // false;  // add random displacement of modules for alignment study
 
 // positioning parameters
-const Float_t maxdx    = 0.2;   // max +- 0.1 cm shift in x
-const Float_t maxdy    = 0.2;   // max +- 0.1 cm shift in y
-const Float_t maxdz    = 1.0;   // max +- 1.0 cm shift in z
+const Double_t maxdx    = 0.2;   // max +- 0.1 cm shift in x
+const Double_t maxdy    = 0.2;   // max +- 0.1 cm shift in y
+const Double_t maxdz    = 1.0;   // max +- 1.0 cm shift in z
 
-const Float_t maxdrotx = 2.0;   // 20.0; // max rotation around x
-const Float_t maxdroty = 2.0;   // 20.0; // max rotation around y
-const Float_t maxdrotz = 2.0;   // 20.0; // max rotation around z
+const Double_t maxdrotx = 2.0;   // 20.0; // max rotation around x
+const Double_t maxdroty = 2.0;   // 20.0; // max rotation around y
+const Double_t maxdrotz = 2.0;   // 20.0; // max rotation around z
 
-Float_t ExplodeFactor = 1.02;   // 1.02; // Factor by which modules are exploded in the x/y plane
+const Double_t ExplodeFactor = 1.02;   // 1.02; // Factor by which modules are exploded in the x/y plane
 
 // initialise random numbers
 TRandom3 r3(0);
@@ -59,21 +66,22 @@ TRandom3 r3(0);
 const Int_t   NofLayers = 10;   // max layers
 
 // select layers to display
-//const Int_t   ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  // 1st layer only
-//const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
-//const Int_t   ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
-//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 3, layer 9,10
-//const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
-//const Int_t   ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
-const Int_t   ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300     // 1: plot, 0: hide
+//const Int_t    ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  // 1st layer only
+//const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
+//const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
+//const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 3, layer 9,10
+//const Int_t    ShowLayer[NofLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
+//const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
+const Int_t    ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300     // 1: plot, 0: hide
 
-const Int_t   LayerType[NofLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads  
+const Int_t    LayerType[NofLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
+const Double_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
+const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
+ 
 // 3 station spacing
-const Float_t LayerPosition[NofLayers]    = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
+const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 // equal spacing
-//const Float_t LayerPosition[NofLayers]    = { 500., 550., 600., 650., 700., 750., 800., 850., 900., 950. };  // z position in cm of Layer front
-const Float_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
-const Float_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
+//const Double_t LayerPosition[NofLayers] = { 500., 550., 600., 650., 700., 750., 800., 850., 900., 950. };  // z position in cm of Layer front
 
 const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },    // for layer[1-3][i,o] below
                                       { 5, 5, 9, 11 },
@@ -163,50 +171,50 @@ const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 //const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
 const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 };  // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Float_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
+const Double_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 
-const Float_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
-const Float_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
-const Float_t DetectorSizeY[2] = { 60., 100.};   // quadratic modules
+const Double_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
+const Double_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
+const Double_t DetectorSizeY[2] = { 60., 100.};   // quadratic modules
 
 // Parameters tor the lattice grid reinforcing the entrance window
-const Float_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice frame in cm
-const Float_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice frame in cm
+const Double_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice frame in cm
+const Double_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice frame in cm
 // Thickness (in z) of lattice frames in cm - see below
 
 // z - geometry of TRD modules
-const Float_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
-const Float_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
+const Double_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
+const Double_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
-const Float_t lattice_thickness      =   1.0;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
-const Float_t lattice_position       =  radiator_position + radiator_thickness/2. + lattice_thickness/2.;
+const Double_t lattice_thickness      =   1.0;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
+const Double_t lattice_position       =  radiator_position + radiator_thickness/2. + lattice_thickness/2.;
 
-const Float_t kapton_thickness       =   0.0025; //  25 micron thickness of kapton
-const Float_t kapton_position        =  lattice_position + lattice_thickness/2. + kapton_thickness/2.;
+const Double_t kapton_thickness       =   0.0025; //  25 micron thickness of kapton
+const Double_t kapton_position        =  lattice_position + lattice_thickness/2. + kapton_thickness/2.;
 
-const Float_t gas_thickness          =   1.2;    //  12 mm thickness of gas
-const Float_t gas_position           =  kapton_position + kapton_thickness/2. + gas_thickness/2.;
+const Double_t gas_thickness          =   1.2;    //  12 mm thickness of gas
+const Double_t gas_position           =  kapton_position + kapton_thickness/2. + gas_thickness/2.;
 
-const Float_t padcopper_thickness    =   0.0025; //  25 micron thickness of copper pads
-const Float_t padcopper_position     =  gas_position + gas_thickness/2. + padcopper_thickness/2.;
+const Double_t padcopper_thickness    =   0.0025; //  25 micron thickness of copper pads
+const Double_t padcopper_position     =  gas_position + gas_thickness/2. + padcopper_thickness/2.;
 
-const Float_t padplane_thickness     =   0.0360; // 360 micron thickness of padplane
-const Float_t padplane_position      =  padcopper_position + padcopper_thickness/2. + padplane_thickness/2.;
+const Double_t padplane_thickness     =   0.0360; // 360 micron thickness of padplane
+const Double_t padplane_position      =  padcopper_position + padcopper_thickness/2. + padplane_thickness/2.;
 
 // backpanel components
-const Float_t carbon_thickness       =   0.0190 * 2; // use 2 layers!!   // 190 micron thickness for 1 layer of carbon fibres
-const Float_t honeycomb_thickness    =   2.3 - kapton_thickness - padcopper_thickness - padplane_thickness - carbon_thickness;    //  ~ 2.3 mm thickness of honeycomb
-const Float_t honeycomb_position     =  padplane_position + padplane_thickness/2. + honeycomb_thickness/2.;
-const Float_t carbon_position        =  honeycomb_position + honeycomb_thickness/2. + carbon_thickness/2.;
+const Double_t carbon_thickness       =   0.0190 * 2; // use 2 layers!!   // 190 micron thickness for 1 layer of carbon fibres
+const Double_t honeycomb_thickness    =   2.3 - kapton_thickness - padcopper_thickness - padplane_thickness - carbon_thickness;    //  ~ 2.3 mm thickness of honeycomb
+const Double_t honeycomb_position     =  padplane_position + padplane_thickness/2. + honeycomb_thickness/2.;
+const Double_t carbon_position        =  honeycomb_position + honeycomb_thickness/2. + carbon_thickness/2.;
 
 // readout boards
-const  Float_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
-const  Float_t febbox_position       =  carbon_position + carbon_thickness/2. + febbox_thickness/2.;
-//const  Float_t feb_thickness         =   0.50;  //  5.0 mm thickness of FEBs
-const  Float_t feb_thickness         =   0.25;  // light //  2.5 mm thickness of FEBs
+const  Double_t febbox_thickness      =  10.0;    // 10 cm length of FEBs
+const  Double_t febbox_position       =  carbon_position + carbon_thickness/2. + febbox_thickness/2.;
+//const  Double_t feb_thickness         =   0.50;  //  5.0 mm thickness of FEBs
+const  Double_t feb_thickness         =   0.25;  // light //  2.5 mm thickness of FEBs
 
-const Float_t frame_thickness        =  gas_thickness;   // frame covers gas volume: from kapton foil to pad plane
-const Float_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;
+const Double_t frame_thickness        =  gas_thickness;   // frame covers gas volume: from kapton foil to pad plane
+const Double_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;
 
 
 // Names of the different used materials which are used to build the modules
@@ -237,6 +245,7 @@ void create_materials_from_media_file();
 void create_trd_module(Int_t moduleType);
 void create_detector_layers(Int_t layer);
 void create_supports();
+
 
 void Create_TRD_Geometry_v13a() {
   // Load the necessary FairRoot libraries 
@@ -341,11 +350,11 @@ void create_materials_from_media_file()
 TGeoVolume* create_trd_module(Int_t moduleType)
 {
   Int_t type = ModuleType[moduleType - 1];
-  Float_t sizeX = DetectorSizeX[type];
-  Float_t sizeY = DetectorSizeY[type];
-  Float_t frameWidth = FrameWidth[type];
-  Float_t activeAreaX = sizeX - 2 * frameWidth;
-  Float_t activeAreaY = sizeY - 2 * frameWidth;
+  Double_t sizeX = DetectorSizeX[type];
+  Double_t sizeY = DetectorSizeY[type];
+  Double_t frameWidth = FrameWidth[type];
+  Double_t activeAreaX = sizeX - 2 * frameWidth;
+  Double_t activeAreaY = sizeY - 2 * frameWidth;
 
   TGeoMedium* keepVolMed        = gGeoMan->GetMedium(KeepingVolumeMedium);
   TGeoMedium* radVolMed         = gGeoMan->GetMedium(RadiatorVolumeMedium);
@@ -421,7 +430,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
        t025->RegisterYourself();
     
     //   // with additional cross in the center - a la Roland
-    //   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
+    //   Double_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
     //   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", activeAreaX/5/2., Lattice_1_width/2., lattice_thickness/2.);  // horizontal
     //   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
     //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
@@ -546,7 +555,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
        t128->RegisterYourself();
     
     //   // with additional cross in the center - a la Roland
-    //   Float_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
+    //   Double_t Lattice_1_width   = 0.1; // Width of inner lattice frame in cm
     //   TGeoBBox *trd_lattice_h1 = new TGeoBBox("Sh1", activeAreaX/5/2., Lattice_1_width/2., lattice_thickness/2.);  // horizontal
     //   TGeoBBox *trd_lattice_v1 = new TGeoBBox("Sv1", Lattice_1_width/2., activeAreaX/5/2., lattice_thickness/2.);  // vertical
     //   TGeoCompositeShape *cs = new TGeoCompositeShape("cs", 
@@ -709,11 +718,11 @@ TGeoVolume* create_trd_module(Int_t moduleType)
       TGeoTranslation *trd_feb_y_position; // shift to y position on TRD
 //      TGeoTranslation *trd_feb_null;       // no displacement
 
-      Float_t feb_pos;
-      Float_t feb_pos_y;
+      Double_t feb_pos;
+      Double_t feb_pos_y;
 
 // replaced by matrix operation (see below)
-//  //      Float_t yback, zback;
+//  //      Double_t yback, zback;
 //  //      TGeoCombiTrans  *trd_feb_placement;
 //  //      // fix Z back offset 0.3 at some point
 //  //      yback = -    sin(feb_rotation_angle/180*3.141)  * febbox_thickness /2.;
@@ -805,8 +814,9 @@ void create_detector_layers(Int_t layerId)
     std::cout << "Type of layer not known" << std::endl;
   } 
 
-  if(!(DoExplode))  // if do not explode -> no explosion
-   ExplodeFactor = 1.00;
+  Double_t ExplodeScale = 1.00;
+  if(DoExplode)  // if explosion, set scale
+    ExplodeScale = ExplodeFactor;
   
   Int_t copyNrIn[4] = { 0, 0, 0, 0 }; // copy number for each module type
   for ( Int_t type = 1; type <= 4; type++) {
@@ -818,9 +828,9 @@ void create_detector_layers(Int_t layerId)
           Int_t x =   i-2;
 
           // displacement
-          Float_t dx = 0;
-          Float_t dy = 0;
-          Float_t dz = 0;
+          Double_t dx = 0;
+          Double_t dy = 0;
+          Double_t dz = 0;
 
           if(DisplaceRandom)
 	  {
@@ -829,8 +839,8 @@ void create_detector_layers(Int_t layerId)
             dz = (r3.Rndm()-.5) * 2 * maxdz;  // max +- 1.0 cm shift
           }
 
-          Float_t xPos = DetectorSizeX[0] * x * ExplodeFactor + dx;
-          Float_t yPos = DetectorSizeY[0] * y * ExplodeFactor + dy;
+          Double_t xPos = DetectorSizeX[0] * x * ExplodeScale + dx;
+          Double_t yPos = DetectorSizeY[0] * y * ExplodeScale + dy;
           copyNrIn[type - 1]++;
           Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);
 
@@ -844,9 +854,9 @@ void create_detector_layers(Int_t layerId)
    	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
 
           // rotation
-          Float_t drotx = 0;
-          Float_t droty = 0;
-          Float_t drotz = 0;
+          Double_t drotx = 0;
+          Double_t droty = 0;
+          Double_t drotz = 0;
 
           if(RotateRandom)
 	  {
@@ -876,9 +886,9 @@ void create_detector_layers(Int_t layerId)
           Int_t x =   i-5;
 
           // displacement
-          Float_t dx = 0;
-          Float_t dy = 0;
-          Float_t dz = 0;
+          Double_t dx = 0;
+          Double_t dy = 0;
+          Double_t dz = 0;
 
           if(DisplaceRandom)
 	  {
@@ -887,8 +897,8 @@ void create_detector_layers(Int_t layerId)
             dz = (r3.Rndm()-.5) * 2 * maxdz;  // max +- 1.0 cm shift
           }
 
-          Float_t xPos = DetectorSizeX[1] * x * ExplodeFactor + dx;
-          Float_t yPos = DetectorSizeY[1] * y * ExplodeFactor + dy;
+          Double_t xPos = DetectorSizeX[1] * x * ExplodeScale + dx;
+          Double_t yPos = DetectorSizeY[1] * y * ExplodeScale + dy;
           copyNrOut[type - 5]++;
           Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);
 
@@ -902,9 +912,9 @@ void create_detector_layers(Int_t layerId)
             module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
     
           // rotation
-          Float_t drotx = 0;
-          Float_t droty = 0;
-          Float_t drotz = 0;
+          Double_t drotx = 0;
+          Double_t droty = 0;
+          Double_t drotz = 0;
 
           if(RotateRandom)
 	  {
@@ -928,6 +938,271 @@ void create_detector_layers(Int_t layerId)
 
 void create_supports()
 {
+  TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
+
+  const Double_t x[12] = { -15,-15, -1, -1,-15,-15, 15, 15,  1,  1, 15, 15 };  // IPB 400
+  const Double_t y[12] = { -20,-18,-18, 18, 18, 20, 20, 18, 18,-18,-18,-20 };  // 30 x 40 cm in size, 2 cm wall thickness
+  const Double_t Hwid = -2*x[0];  // 30  
+  const Double_t Hhei = -2*y[0];  // 40
+
+  Double_t AperX[3] = { 450., 550., 600.};  // inner aperture in X of support structure for stations 1,2,3
+  Double_t AperY[3] = { 350., 450., 500.};  // inner aperture in Y of support structure for stations 1,2,3
+  Double_t PilPosX;
+  Double_t BarPosY;
+
+  const Double_t BeamHeight = 570;  // beamline is at 5.7m above floor
+
+  Double_t PilPosZ[6];  // PilPosZ
+  PilPosZ[0] = LayerPosition[0] + LayerThickness/2.;
+  PilPosZ[1] = LayerPosition[3] + LayerThickness/2.;
+  PilPosZ[2] = LayerPosition[4] + LayerThickness/2.;
+  PilPosZ[3] = LayerPosition[7] + LayerThickness/2.;
+  PilPosZ[4] = LayerPosition[8] + LayerThickness/2.;
+  PilPosZ[5] = LayerPosition[9] + LayerThickness/2.;
+
+//  cout << "PilPosZ[0]: " << PilPosZ[0] << endl;
+//  cout << "PilPosZ[1]: " << PilPosZ[1] << endl;
+
+  TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX( 90.); // rotate  90 deg around x-axis                     
+  TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY( 90.); // rotate  90 deg around y-axis                     
+  TGeoRotation  *rotz090 = new TGeoRotation("rotz090"); rotz090->RotateZ( 90.); // rotate  90 deg around y-axis                     
+
+  TGeoRotation  *rotzx01 = new TGeoRotation("rotzx01"); 
+  rotzx01->RotateZ(  90.); // rotate  90 deg around z-axis
+  rotzx01->RotateX(  90.); // rotate  90 deg around x-axis
+
+//  TGeoRotation  *rotxz01 = new TGeoRotation("rotxz01"); 
+//  rotxz01->RotateX(  90.); // rotate  90 deg around x-axis
+//  rotxz01->RotateZ(  90.); // rotate  90 deg around z-axis
+
+  Double_t ang1 = atan(3./4.) * 180. / acos(-1.);
+  cout << "DEDE " << ang1 << endl;
+  //  Double_t sin1 = acos(-1.);
+  //  cout << "DEDE " << sin1 << endl;
+  TGeoRotation  *rotx080 = new TGeoRotation("rotx080"); rotx080->RotateX( 90.-ang1); // rotate  80 deg around x-axis                     
+  TGeoRotation  *rotx100 = new TGeoRotation("rotx100"); rotx100->RotateX( 90.+ang1); // rotate 100 deg around x-axis                     
+
+  TGeoRotation  *rotxy01 = new TGeoRotation("rotxy01"); 
+  rotxy01->RotateX(  90.); // rotate  90 deg around x-axis                     
+  rotxy01->RotateZ(-ang1); // rotate  ang1   around rotated y-axis                     
+
+  TGeoRotation  *rotxy02 = new TGeoRotation("rotxy02"); 
+  rotxy02->RotateX(  90.); // rotate  90 deg around x-axis                     
+  rotxy02->RotateZ( ang1); // rotate  ang1   around rotated y-axis                     
+
+
+//-------------------
+// vertical pillars (Y)
+//-------------------
+
+  // station 1
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      TGeoXtru* trd1_H_vert1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_vert1->DefinePolygon(12,x,y);
+      trd1_H_vert1->DefineSection( 0,-(AperY[0]+Hhei), 0, 0, 1.0);
+      trd1_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);  
+      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
+      trd1_H_vert_vol1->SetLineColor(kYellow);
+      PilPosX = AperX[0];
+    
+      TGeoCombiTrans* trd1_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[0], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 11, trd1_H_vert_combi01);
+      TGeoCombiTrans* trd1_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[0], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 12, trd1_H_vert_combi02);
+      TGeoCombiTrans* trd1_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[1], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 13, trd1_H_vert_combi03);
+      TGeoCombiTrans* trd1_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[1], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 14, trd1_H_vert_combi04);
+    }
+
+  // station 2
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      TGeoXtru* trd1_H_vert1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_vert1->DefinePolygon(12,x,y);
+      trd1_H_vert1->DefineSection( 0,-(AperY[1]+Hhei), 0, 0, 1.0);
+      trd1_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);
+      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
+      trd1_H_vert_vol1->SetLineColor(kYellow);
+      PilPosX = AperX[1];
+    
+      TGeoCombiTrans* trd1_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[2], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 21, trd1_H_vert_combi01);
+      TGeoCombiTrans* trd1_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[2], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 22, trd1_H_vert_combi02);
+      TGeoCombiTrans* trd1_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[3], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 23, trd1_H_vert_combi03);
+      TGeoCombiTrans* trd1_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[3], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 24, trd1_H_vert_combi04);
+    }
+
+
+  // station 3
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      TGeoXtru* trd1_H_vert1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_vert1->DefinePolygon(12,x,y);
+      trd1_H_vert1->DefineSection( 0,-(AperY[2]+Hhei), 0, 0, 1.0);
+      trd1_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);
+      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
+      trd1_H_vert_vol1->SetLineColor(kYellow);
+      PilPosX = AperX[2];
+      
+      TGeoCombiTrans* trd1_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[4], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 31, trd1_H_vert_combi01);
+      TGeoCombiTrans* trd1_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[4], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 32, trd1_H_vert_combi02);
+      TGeoCombiTrans* trd1_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[5], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 33, trd1_H_vert_combi03);
+      TGeoCombiTrans* trd1_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[5], rotzx01);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 34, trd1_H_vert_combi04);
+    }
+
+
+//-------------------
+// horizontal supports (X)
+//-------------------
+
+  // station 1
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      TGeoXtru* trd1_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_hori1->DefinePolygon(12,x,y);
+      trd1_H_hori1->DefineSection( 0,-AperX[0], 0, 0, 1.0);
+      trd1_H_hori1->DefineSection( 1, AperX[0], 0, 0, 1.0);
+      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
+      trd1_H_hori_vol1->SetLineColor(kRed);
+      BarPosY = AperY[0];
+    
+      TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[0], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 11, trd1_H_hori_combi01);
+      TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[0], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 12, trd1_H_hori_combi02);
+      TGeoCombiTrans* trd1_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[1], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 13, trd1_H_hori_combi03);
+      TGeoCombiTrans* trd1_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[1], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 14, trd1_H_hori_combi04);
+    }
+
+  // station 2
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      TGeoXtru* trd1_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_hori1->DefinePolygon(12,x,y);
+      trd1_H_hori1->DefineSection( 0,-AperX[1], 0, 0, 1.0);
+      trd1_H_hori1->DefineSection( 1, AperX[1], 0, 0, 1.0);
+      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
+      trd1_H_hori_vol1->SetLineColor(kRed);
+      BarPosY = AperY[1];
+    
+      TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[2], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 21, trd1_H_hori_combi01);
+      TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[2], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 22, trd1_H_hori_combi02);
+      TGeoCombiTrans* trd1_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[3], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 23, trd1_H_hori_combi03);
+      TGeoCombiTrans* trd1_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[3], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 24, trd1_H_hori_combi04);
+    }
+
+  // station 3
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      TGeoXtru* trd1_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_hori1->DefinePolygon(12,x,y);
+      trd1_H_hori1->DefineSection( 0,-AperX[2], 0, 0, 1.0);
+      trd1_H_hori1->DefineSection( 1, AperX[2], 0, 0, 1.0);
+      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
+      trd1_H_hori_vol1->SetLineColor(kRed);
+      BarPosY = AperY[2];
+    
+      TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[4], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 31, trd1_H_hori_combi01);
+      TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[4], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 32, trd1_H_hori_combi02);
+      TGeoCombiTrans* trd1_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[5], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 33, trd1_H_hori_combi03);
+      TGeoCombiTrans* trd1_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[5], roty090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 34, trd1_H_hori_combi04);
+    }
+
+
+//-------------------
+// horizontal supports (Z)
+//-------------------
+
+  // station 1
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      TGeoXtru* trd1_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_slope1->DefinePolygon(12,x,y);
+      trd1_H_slope1->DefineSection( 0,-(PilPosZ[1]-PilPosZ[0]-Hwid)/2., 0, 0, 1.0);
+      trd1_H_slope1->DefineSection( 1,+(PilPosZ[1]-PilPosZ[0]-Hwid)/2., 0, 0, 1.0);
+      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+      trd1_H_slope_vol1->SetLineColor(kGreen);
+      PilPosX = AperX[0];
+      BarPosY = AperY[0];
+        
+      TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 11, trd1_H_slope_combi01);
+      TGeoCombiTrans* trd1_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 12, trd1_H_slope_combi02);
+      TGeoCombiTrans* trd1_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 13, trd1_H_slope_combi03);
+      TGeoCombiTrans* trd1_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 14, trd1_H_slope_combi04);
+    }
+
+  // station 2
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      TGeoXtru* trd1_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_slope1->DefinePolygon(12,x,y);
+      trd1_H_slope1->DefineSection( 0,-(PilPosZ[3]-PilPosZ[2]-Hwid)/2., 0, 0, 1.0);
+      trd1_H_slope1->DefineSection( 1,+(PilPosZ[3]-PilPosZ[2]-Hwid)/2., 0, 0, 1.0);
+      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+      trd1_H_slope_vol1->SetLineColor(kGreen);
+      PilPosX = AperX[1];
+      BarPosY = AperY[1];
+        
+      TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 21, trd1_H_slope_combi01);
+      TGeoCombiTrans* trd1_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 22, trd1_H_slope_combi02);
+      TGeoCombiTrans* trd1_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 23, trd1_H_slope_combi03);
+      TGeoCombiTrans* trd1_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 24, trd1_H_slope_combi04);
+    }
+
+  // station 3
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      TGeoXtru* trd1_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd1_H_slope1->DefinePolygon(12,x,y);
+      trd1_H_slope1->DefineSection( 0,-(PilPosZ[5]-PilPosZ[4]-Hwid)/2., 0, 0, 1.0);
+      trd1_H_slope1->DefineSection( 1,+(PilPosZ[5]-PilPosZ[4]-Hwid)/2., 0, 0, 1.0);
+      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+      trd1_H_slope_vol1->SetLineColor(kGreen);
+      PilPosX = AperX[2];
+      BarPosY = AperY[2];
+        
+      TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 31, trd1_H_slope_combi01);
+      TGeoCombiTrans* trd1_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 32, trd1_H_slope_combi02);
+      TGeoCombiTrans* trd1_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 33, trd1_H_slope_combi03);
+      TGeoCombiTrans* trd1_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 34, trd1_H_slope_combi04);
+    }
+
+}
+
+
+void create_supports_1st_try()
+{
 
 ////   // Carbon fiber layers
 ////   TGeoBBox* trd_carbon = new TGeoBBox("", sizeX /2., sizeY /2., carbon_thickness /2.);
@@ -941,8 +1216,8 @@ void create_supports()
 
   TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
 
-  Double_t x[12] = { -10,-10, -1, -1,-10,-10, 10, 10,  1,  1, 10, 10 };  // define H-like structure, centered at x=0, y=0
-  Double_t y[12] = { -10, -8, -8,  8,  8, 10, 10,  8,  8, -8, -8,-10 };  // 20 x 20 cm in size, 2 cm wall thickness
+  const Double_t x[12] = { -10,-10, -1, -1,-10,-10, 10, 10,  1,  1, 10, 10 };  // define H-like structure, centered at x=0, y=0
+  const Double_t y[12] = { -10, -8, -8,  8,  8, 10, 10,  8,  8, -8, -8,-10 };  // 20 x 20 cm in size, 2 cm wall thickness
 
   TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX( 90.); // rotate  90 deg around x-axis                     
   TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY( 90.); // rotate  90 deg around y-axis                     

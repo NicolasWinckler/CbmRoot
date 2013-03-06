@@ -11,6 +11,7 @@ v13h - like v13b, but no radiator material
 v13i - like v13c, but FEB thickness reduced from 5.0 to 2.5 mm
 v13j - like v13b, but no FEBs at all
 v13k - like v13b, but no FEBs at all and no lattice grid
+v13l - like v13b, full FEBs, reduced FEB thickness (2.5mm)
 
 v13s - like v13a, SIS100 TRD, 2 layers, reduced number of FEBs, reduced FEB thickness
 v13t - like v13s, SIS100 TRD, 4 layers, reduced number of FEBs, reduced FEB thickness

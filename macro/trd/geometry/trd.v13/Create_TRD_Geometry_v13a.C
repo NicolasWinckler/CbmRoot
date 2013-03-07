@@ -779,6 +779,9 @@ TGeoVolume* create_trd_module(Int_t moduleType)
       // now we have an inclined FEB
 
       // ASICs
+      Double_t asic_pos;
+      Double_t asic_pos_x;
+
       if (IncludeAsics) {
 
         // put many ASICs on each inclined FEB
@@ -1050,7 +1053,7 @@ void create_supports()
 //  rotxz01->RotateZ(  90.); // rotate  90 deg around z-axis
 
   Double_t ang1 = atan(3./4.) * 180. / acos(-1.);
-  cout << "DEDE " << ang1 << endl;
+  //  cout << "DEDE " << ang1 << endl;
   //  Double_t sin1 = acos(-1.);
   //  cout << "DEDE " << sin1 << endl;
   TGeoRotation  *rotx080 = new TGeoRotation("rotx080"); rotx080->RotateX( 90.-ang1); // rotate  80 deg around x-axis                     

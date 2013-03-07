@@ -43,7 +43,7 @@ const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is inc
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
-const Bool_t IncludeSupports = false; // false;  // true, if support structure is included in geometry
+const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -70,13 +70,23 @@ TRandom3 r3(0);
 const Int_t   NofLayers = 10;   // max layers
 
 // select layers to display
-//const Int_t    ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  // 1st layer only
+//
+//const Int_t    ShowLayer[NofLayers] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };  //  1st layer only
+//const Int_t    ShowLayer[NofLayers] = { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  //  2nd layer only
+//const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 };  //  5th layer only
+//const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };  //  6th layer only
+//const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 };  //  9th layer only
+//const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };  // 10th layer only
+//
+//const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // Station 1, layer 1, 2
 //const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
 //const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
 //const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 3, layer 9,10
+//
 //const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[NofLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 };  // SIS300-mu  // 1: plot, 0: hide
+//
 const Int_t    ShowLayer[NofLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
 const Int_t    LayerType[NofLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
@@ -177,13 +187,17 @@ const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; 
 //
 const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 };  // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+////const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,210,210,108,108,108,108 }; // play version
 //
-//const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same number of febs
+//const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
 //
 const Double_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
-const Double_t asic_width     = 2.0; // 1.0;   // 1 cm
-const Double_t asic_thickness = 0.25;// feb_thickness; // * 8.0; // 2.5 mm
+
+// ASIC parameters
+const Double_t asic_thickness = 0.25; // feb_thickness; // * 8.0; // 2.5 mm
+const Double_t asic_width     = 3.0;  // 2.0;  1.0;   // 1 cm
+const Double_t asic_distance  = 0.4;  // 0.40; // a factor of width for ASIC pairs
 
 const Double_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
 const Double_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
@@ -311,7 +325,7 @@ void Create_TRD_Geometry_v13a() {
   top->Draw("ogl");
   //top->Raytrace();
 
-  cout << "Press Return to exit" << endl;
+//  cout << "Press Return to exit" << endl;
 //  cin.get();
 //  exit();
 }
@@ -715,12 +729,6 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    // FEBs
    if (IncludeFebs) {
 
-      // Create all FEBs and place them in an assembly which will be added to the TRD module
-      TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX/2., feb_thickness/2., febbox_thickness/2.);     // the FEB itself - as a cuboid
-      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);  // the FEB made of a certain medium
-      trdmod1_feb->SetLineColor(kYellow);    // set yellow color
-
-
       // assemblies
       TGeoVolumeAssembly* trd_feb_inclined = new TGeoVolumeAssembly(Form("trd1mod%dfebincl", moduleType)); // volume for inclined FEBs, then shifted along y
       TGeoVolumeAssembly* trd_feb_box      = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));  // the mother volume of all FEBs
@@ -762,9 +770,13 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
       // matrix operation to rotate FEB PCB around its corner on the backanel 
       (*incline_feb) = (*trd_feb_trans1) * (*trd_feb_rotation) * (*trd_feb_trans2);  // OK
+
+      // Create all FEBs and place them in an assembly which will be added to the TRD module
+      TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX/2., feb_thickness/2., febbox_thickness/2.);   // the FEB itself - as a cuboid
+      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);  // the FEB made of a certain medium
+      trdmod1_feb->SetLineColor(kYellow);    // set yellow color
       trd_feb_inclined->AddNode(trdmod1_feb, 1, incline_feb);  
       // now we have an inclined FEB
-
 
       // ASICs
       if (IncludeAsics) {
@@ -794,13 +806,13 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 	  {
             asic_pos   = (iAsic + 0.5) / (nofAsics / groupAsics) - 0.5;   // equal spacing of ASICs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
 
-            asic_pos_x = asic_pos * activeAreaX + 0.70 * asic_width;
+            asic_pos_x = asic_pos * activeAreaX + (0.5 + asic_distance/2.) * asic_width;
             trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2., 0.);  // move asic on top of FEB
             TGeoHMatrix *incline_asic = new TGeoHMatrix("");
             (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);
             trd_feb_inclined->AddNode(trdmod1_asic, 2*iAsic+1, incline_asic);  // now we have ASICs on the inclined FEB
 
-            asic_pos_x = asic_pos * activeAreaX - 0.70 * asic_width;
+            asic_pos_x = asic_pos * activeAreaX - (0.5 + asic_distance/2.) * asic_width;
             trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2., 0.);  // move asic on top of FEB
             TGeoHMatrix *incline_asic = new TGeoHMatrix("");
             (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);

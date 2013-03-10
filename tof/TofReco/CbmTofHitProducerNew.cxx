@@ -8,12 +8,16 @@
 
 #include "CbmTofHitProducerNew.h"
 
-#include "CbmTofPoint.h"
-#include "CbmTofHit.h"
-#include "CbmTofGeoHandler.h"
-#include "CbmMCTrack.h"
+#include "CbmMCTrack.h"       
+#include "CbmTofPoint.h"      // in cbmdata/tof
+#include "CbmTofHit.h"        // in cbmdata/tof
+#include "CbmTofGeoHandler.h" // in tof/TofTools
+#include "CbmTofCell.h"       // in tof/TofData
+#include "CbmTofDigiPar.h"    // in tof/TofParam
 
 #include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TRandom.h"
 #include "TString.h"
@@ -57,7 +61,10 @@ CbmTofHitProducerNew::CbmTofHitProducerNew()
     fSigmaZ(0.),
     fVersion(""),
     fNHits(-1),
-    fGeoHandler(new CbmTofGeoHandler())
+    fGeoHandler(new CbmTofGeoHandler()),
+    fDigiPar(NULL),
+    fCellInfo(NULL),
+    fParInitFromAscii(kTRUE)
 {
 }
 
@@ -93,8 +100,12 @@ CbmTofHitProducerNew::CbmTofHitProducerNew(const char *name, Int_t verbose)
    fSigmaZ(0.),
    fVersion(""),
    fNHits(-1),
-   fGeoHandler(new CbmTofGeoHandler())
+   fGeoHandler(new CbmTofGeoHandler()),
+   fDigiPar(NULL),
+   fCellInfo(NULL),
+   fParInitFromAscii(kTRUE)
 {
+  cout << "CbmTofHitProducerNew instantiated with verbose = "<<fVerbose<<endl;
 }
 
 
@@ -104,8 +115,43 @@ CbmTofHitProducerNew::~CbmTofHitProducerNew()
 {
 //	FairRootManager *fManager =FairRootManager::Instance();
 //	fManager->Write();
+  if (fGeoHandler) {
+    delete fGeoHandler;
+  }
 }
 
+// --------------------------------------------------
+void CbmTofHitProducerNew::SetParContainers()
+{
+  if (!fParInitFromAscii) {
+    LOG(INFO)<<" Get the digi parameters for tof"<<FairLogger::endl;
+
+    // Get Base Container
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+
+    fDigiPar = (CbmTofDigiPar*)
+               (rtdb->getContainer("CbmTofDigiPar"));
+
+  }
+}
+
+// --------------------------------------------------------------------
+InitStatus CbmTofHitProducerNew::ReInit()
+{
+  if (!fParInitFromAscii) {
+    LOG(INFO)<<"Reinitialize the digi parameters for tof"<<FairLogger::endl;
+
+
+    // Get Base Container
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+
+    fDigiPar = (CbmTofDigiPar*)
+               (rtdb->getContainer("CbmTofDigiPar"));
+
+  }
+}
 
 // ---- Init ----------------------------------------------------------
 
@@ -121,16 +167,9 @@ InitStatus CbmTofHitProducerNew::Init()
     // Initialize the TOF GeoHandler
     Bool_t isSimulation=kFALSE;
     Int_t bla = fGeoHandler->Init(isSimulation);
-
-    FILE *par;
-
-    //Reading the parameter file. In the future this must be done in a different way.
- 
-    char    header='#';
-    int     module, cell, smodule, smtype;
     Int_t   nsmtyp=10, nsm=255, nmodules=10, ncells=255;
-    Float_t X_tmp, Y_tmp, Z_tmp, Dx_tmp, Dy_tmp;
-    
+    Int_t iCh=0; // channel identifier 
+  
     //    Initialize the matrixes [make this index visible in all the macro]. FIXME
 
     for(int t=0;t<nsmtyp;t++){
@@ -148,6 +187,23 @@ InitStatus CbmTofHitProducerNew::Init()
      }
     }
 
+// initialize accounting variables    
+    ActSMtypMax=0;
+    for (Int_t i=0; i<=maxSMtyp; i++){
+	ActnSMMax[i]=0;
+	ActnModMax[i]=0;
+	ActnCellMax[i]=0;
+    }
+
+    if (fParInitFromAscii) {
+      FILE *par;
+
+    //Reading the parameter file. In the future this must be done in a different way.
+ 
+      char    header='#';
+      int     module, cell, smodule, smtype;
+      Float_t X_tmp, Y_tmp, Z_tmp, Dx_tmp, Dy_tmp;
+
       TString tofGeoFile = gSystem->Getenv("VMCWORKDIR");
 //      tofGeoFile += "/parameters/tof/tof_standard.geom.par";
       if (fParFileName==""){
@@ -164,14 +220,6 @@ InitStatus CbmTofHitProducerNew::Init()
       return kFATAL;
     }
      
-// initialize accounting variables    
-    ActSMtypMax=0;
-    for (Int_t i=0; i<=maxSMtyp; i++){
-	ActnSMMax[i]=0;
-	ActnModMax[i]=0;
-	ActnCellMax[i]=0;
-    }
-    Int_t iCh=0; // channel identifier 
 
     //Skip the header. In the future the header structure must be defined. FIXME
     while (fscanf(par,"%c",&header)>=0){
@@ -218,18 +266,85 @@ InitStatus CbmTofHitProducerNew::Init()
     fclose(par);
     cout << "Filled position array with ActSMtypMax " << ActSMtypMax 
          << " and " << iCh << " active Channels "<< endl;
+   } else {
+     cout <<" InitParametersFromContainer "<<endl;
+     InitParametersFromContainer();
+   }
 
-    for (Int_t i=1; i<=ActSMtypMax; i++){
-	cout << " SMtype " << i <<" nsmod " << ActnSMMax[i] 
-             << " nmod "<< ActnModMax[i]  << " ncell " << ActnCellMax[i] << endl;
+    Int_t nCh=0;
+    for (Int_t i=0; i<=ActSMtypMax; i++){
+	cout << " SMtype " << i <<" nsmod " << ActnSMMax[i]+1 
+             << " nmod "<< ActnModMax[i]+1  << " ncell " << ActnCellMax[i] << endl;
+	nCh += (ActnSMMax[i]+1) * (ActnModMax[i]+1) * ActnCellMax[i] * 2;
     }
     
     fHitCollection = new TClonesArray("CbmTofHit");
     fManager->Register("TofHit","Tof",fHitCollection, kTRUE);
      
-    cout << "-I- CbmTofHitProducerNew: Intialization successful" << endl;
+    cout << "-I- CbmTofHitProducerNew: Initialization successful for " 
+         << nCh <<" electronics channels"<< endl;
 
     return kSUCCESS;
+}
+
+void CbmTofHitProducerNew::InitParametersFromContainer()
+{
+
+   //    Initialize the matrixes [make this index visible in all the macro]. FIXME
+    Int_t   nsmtyp=10, nsm=255, nmodules=10, ncells=255;
+
+    for(int t=0;t<nsmtyp;t++){
+     for(int i=0;i<nsm;i++){
+      for(int j=0;j<nmodules;j++){
+	for(int k=0;k<ncells;k++){
+	  X[t][i][j][k] = -1;
+	  Y[t][i][j][k] = -1;
+	  Z[t][i][j][k] = -1;
+	  Dx[t][i][j][k]= -1;
+	  Dy[t][i][j][k]= -1;
+	  Ch[t][i][j][k]= -1;
+	}
+      }
+     }
+    }
+
+   Int_t nrOfCells = fDigiPar->GetNrOfModules();
+   LOG(INFO)<<"Parameter container contain "<<nrOfCells<<" cells."<<FairLogger::endl;
+
+   for (Int_t icell = 0; icell < nrOfCells; ++icell) {
+
+     Int_t cellId = fDigiPar->GetCellId(icell); // cellId is assigned in CbmTofCreateDigiPar
+     fCellInfo =fDigiPar->GetCell(cellId);
+
+     Int_t smtype  = fGeoHandler->GetSMType(cellId);
+     Int_t smodule = fGeoHandler->GetSModule(cellId);
+     Int_t module  = fGeoHandler->GetCounter(cellId);
+     Int_t cell    = fGeoHandler->GetCell(cellId);
+
+     Double_t x = fCellInfo->GetX();
+     Double_t y = fCellInfo->GetY();
+     Double_t z = fCellInfo->GetZ();
+     Double_t dx = fCellInfo->GetSizex();
+     Double_t dy = fCellInfo->GetSizey();
+
+     if(icell < 1000000){
+       cout << "-I- InitPar "<<icell<<" Id: "<<cellId
+	    << " "<< cell << " tmcs: "<< smtype <<" "<<smodule<<" "<<module<<" "<<cell   
+            << " x="<<Form("%6.2f",x)<<" y="<<Form("%6.2f",y)<<" z="<<Form("%6.2f",z)
+            <<" dx="<<dx<<" dy="<<dy<<endl;
+     }
+    if(smtype>ActSMtypMax)        ActSMtypMax=smtype;
+    if(smodule>ActnSMMax[smtype]) ActnSMMax[smtype]=smodule;
+    if(module>ActnModMax[smtype]) ActnModMax[smtype]=module;
+    if(cell>ActnCellMax[smtype])  ActnCellMax[smtype]=cell;
+ 
+     X[smtype][smodule][module][cell] = x;
+     Y[smtype][smodule][module][cell] = y;
+     Z[smtype][smodule][module][cell] = z;
+     Dx[smtype][smodule][module][cell]= dx;
+     Dy[smtype][smodule][module][cell]= dy;
+     Ch[smtype][smodule][module][cell]= icell;
+   }
 }
 
 // ---- Exec ----------------------------------------------------------
@@ -265,7 +380,6 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 
   TVector3 pos;
 
-  Int_t    ngaps=8; //FIXME: these parameters must be provided externally
   Double_t xHit, yHit, zHit, tHit, xHitErr, yHitErr, zHitErr;
   Double_t tl_new, tr_new;
   Double_t Dz=2.04;  //FIXME: Introduce also Dz and Z as (constant) parameters 
@@ -295,12 +409,13 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 //  }
 
   //Initialization of cell times
-  for(Int_t t=1;t<=ActSMtypMax;t++){
-   for(Int_t i=1;i<=ActnSMMax[t];i++){
-    for(Int_t j=1;j<=ActnModMax[t];j++){
+
+  for(Int_t t=0;t<ActSMtypMax;t++){
+   for(Int_t i=0;i<ActnSMMax[t];i++){
+    for(Int_t j=0;j<ActnModMax[t];j++){
      for(Int_t k=0;k<ActnCellMax[t];k++){
-      tl[t][i][j][k]= 1e+6;
-      tr[t][i][j][k]= 1e+6;
+      tl[t][i][j][k]= 1e+5;
+      tr[t][i][j][k]= 1e+5;
      }
     }
    }
@@ -328,18 +443,30 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 
     trackID = pt->GetTrackID();
     Int_t detID = pt->GetDetectorID();
-    cell = fGeoHandler->GetCell(detID)-1;
-    module = fGeoHandler->GetCounter(detID)+1;
-    gap = fGeoHandler->GetGap(detID);
-    smodule = fGeoHandler->GetSModule(detID)+1;
-    smtype = fGeoHandler->GetSMType(detID)+1;
 
-    LOG(INFO)<<"SMType: "<<smtype<<FairLogger::endl;
-    LOG(INFO)<<"SModule: "<<smodule<<FairLogger::endl;
-    LOG(INFO)<<"Module: "<<module<<FairLogger::endl;
-    LOG(INFO)<<"Gap: "<<gap<<FairLogger::endl;
-    LOG(INFO)<<"Cell: "<<cell<<FairLogger::endl;
+    cell    = fGeoHandler->GetCell(detID);
+    module  = fGeoHandler->GetCounter(detID);
+    gap     = fGeoHandler->GetGap(detID);
+    smodule = fGeoHandler->GetSModule(detID);
+    smtype  = fGeoHandler->GetSMType(detID);
+    Int_t cellID = fGeoHandler->GetCellId(detID);
+   //    fCellInfo =fDigiPar->GetCell(cellID);
 
+    if( //0){
+          smtype<0.  || smtype>ActSMtypMax 
+       || smodule<0. || smodule>ActnSMMax[smtype]
+       || module<0.  || module>ActnModMax[smtype]
+       || cell<0.    || cell>ActnCellMax[smtype]
+       || Dx[smtype][smodule][module][cell]<0.
+       )
+    {
+     LOG(INFO)<<"-E- TofHitProducerNew: detId: "<< detID <<" SMType: "<<smtype;
+     LOG(INFO)<<" SModule: "<<smodule<<" of "<<ActnSMMax[smtype];
+     LOG(INFO)<<" Module: "<<module<<" of "<<ActnModMax[smtype];
+     LOG(INFO)<<" Gap: "<<gap;
+     LOG(INFO)<<" Cell: "<<cell<<" of "<<ActnCellMax[smtype] <<FairLogger::endl;
+     continue;
+    }
     pt->Position(pos);
 
     if(fVerbose >2) {
@@ -359,20 +486,23 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
            + gRandom->Gaus(0,sigma_el);
 
     if(fVerbose >2 || TMath::Abs(X_local)>1.5) {
-      cout << "-W- TofHitProducer " << j <<". Poi," 
+      cout << "-W- TofHitProNew " << j <<". Poi," 
          << " TID:" << trackID 
+	 << " detID: " << detID
+	 << " cellID: " << cellID
          << " SMtype: " << smtype 
          << " SM: " << smodule 
          << " Mod: " << module 
          << " Str: " << cell 
          << " G: " << gap 
-	 << " posX " << pos.X() <<","<<	 X[smtype][smodule][module][cell]
-	 << " posY " << pos.Y() <<","<<	 Y[smtype][smodule][module][cell]
-         << " tl " << tl_new     << " tr " << tr_new
-      //	 << " xl " << X_local	 << " yl " << Y_local
-         << endl;
- 
-      continue; //prevent crashes 
+	   << " posX " << Form("%6.2f",pos.X())<<","<< Form("%6.2f",X[smtype][smodule][module][cell])
+	   << " posY " << Form("%6.2f",pos.Y())<<","<< Form("%6.2f",Y[smtype][smodule][module][cell])
+	   << " tl " << Form("%6.2f",tl_new)   << " tr " << Form("%6.2f",tr_new)
+         << endl; 
+
+      if(TMath::Abs(X_local)>1.5) {
+        continue; //prevent crashes 
+      }
     }
     
     //Take the fastest time from all the points/gaps in this cell
@@ -397,33 +527,35 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
   Int_t nFl2=0;
   Int_t ii=0;
 
-  for(Int_t t=1;t<=ActSMtypMax;t++){
-   for(Int_t i=1;i<=ActnSMMax[t];i++){
-    for(Int_t j=1;j<=ActnModMax[t];j++){
+  //  fVerbose=3;  // debugging 
+
+  for(Int_t t=0;t<ActSMtypMax;t++){
+   for(Int_t i=0;i<ActnSMMax[t];i++){
+    for(Int_t j=0;j<ActnModMax[t];j++){
      for(Int_t k=0;k<ActnCellMax[t];k++){
-    
+       // cout <<"-D- HitProd: tijk "<<t<<" "<<i<<" "<<j<<" "<<k<<" "<<tl[t][i][j][k]<<" "<<tr[t][i][j][k]<<endl;
 //Increase the counter for the TofHit TClonesArray if the first time a hit is attached to this cell
     
-      if( tl[t][i][j][k]<1e+6 
-       && tr[t][i][j][k]<1e+6) {
+      if( tl[t][i][j][k]<1e+5 
+       && tr[t][i][j][k]<1e+5) {
        fNHits++;
 
        xHit    = X[t][i][j][k]; 
        xHitErr = Dx[t][i][j][k]/sqrt(12.);
        zHit    = Z[t][i][j][k];
        zHitErr = Dz/sqrt(12.);
-       yHit    =  (tr[t][i][j][k] - tl[t][i][j][k])*vprop*0.5
+       yHit    = (tr[t][i][j][k] - tl[t][i][j][k])*vprop*0.5
                + Y[t][i][j][k];
        
     //Reference to the point that contributes to the left side.
        yHitErr = sigma_T*vprop;
        tHit    = 0.5*(tl[t][i][j][k] + tr[t][i][j][k]);
        ref     = point_left[t][i][j][k];
+       pt      = (CbmTofPoint*) fTofPoints->At(ref);
        if(trackID_left[t][i][j][k]==trackID_right[t][i][j][k]){
 	   flag = 1; nFl1++;
            // Check consistency
            if(fVerbose >2) {
-           pt = (CbmTofPoint*) fTofPoints->At(ref);
            pt->Position(pos);
            cout << " pos check for point "<<ref<<" x:  "<< xHit << " " << pos.X() 
                 << " y: " << yHit << " " << pos.Y() << endl;   
@@ -436,8 +568,8 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
        TVector3 hitPos(xHit, yHit, zHit);
        TVector3 hitPosErr(xHitErr, yHitErr, zHitErr);
        Int_t iCh = Ch[t][i][j][k];
-
-       if(fVerbose >2) {
+       if(fVerbose >1) {
+	 //       if(1) {
 	 cout << ii++ << " Add hit smt " << t << " sm " << i << " mod " << j << " str " << k
 	 <<" Ch " << iCh
          <<" tl " << tl[t][i][j][k] << " tr " << tr[t][i][j][k] 
@@ -461,8 +593,7 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 void CbmTofHitProducerNew::AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr,
 			       Int_t ref, Double_t tHit, Int_t flag, Int_t iChannel)
 {
-  new((*fHitCollection)[fNHits]) CbmTofHit(detID, posHit, posHitErr,
-					   ref, tHit, flag);
+  new((*fHitCollection)[fNHits]) CbmTofHit(detID, posHit, posHitErr, ref, tHit, flag, iChannel);
 
   if(fVerbose > 1) {
     CbmTofHit* tofHit = (CbmTofHit*) fHitCollection->At(fNHits);

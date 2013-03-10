@@ -12,6 +12,9 @@
 #include "FairTask.h"
 
 class CbmTofGeoHandler;
+class CbmTofDigiPar;
+class CbmTofCell;
+
 class TVector3;
 class TClonesArray;
 class TString;                               
@@ -28,6 +31,8 @@ class CbmTofHitProducerNew : public FairTask {
   virtual ~CbmTofHitProducerNew();
 
   virtual InitStatus Init();
+  virtual InitStatus ReInit();
+  virtual void SetParContainers();
   virtual void Exec(Option_t * option);
   virtual void Finish();
 
@@ -39,6 +44,7 @@ class CbmTofHitProducerNew : public FairTask {
   void SetSigmaY(Double_t sigma);
   void SetSigmaZ(Double_t sigma);
   void SetParFileName(const std::string& fnam) { fParFileName = fnam;}
+  void SetInitFromAscii(Bool_t ascii) {fParInitFromAscii=ascii;}
 
   Double_t GetSigmaT();
   Double_t GetSigmaXY();
@@ -48,7 +54,9 @@ class CbmTofHitProducerNew : public FairTask {
 private:
 
   Int_t fVerbose;
+
   TString fParFileName;   // name of the file name with geometry parameters
+  void InitParametersFromContainer();
 
   TClonesArray *fTofPoints;     // TOF MC points
   TClonesArray *fMCTracks;      // MC tracks
@@ -95,6 +103,11 @@ private:
   Int_t  fNHits;          //Index of the CbmTofHit TClonesArray
 
   CbmTofGeoHandler* fGeoHandler;
+  CbmTofDigiPar  *fDigiPar;
+  CbmTofCell     *fCellInfo;
+
+  Bool_t fParInitFromAscii;
+
   ClassDef(CbmTofHitProducerNew,1) //CbmTofHitProducer
 
 };

@@ -594,7 +594,8 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 void CbmTofHitProducerNew::AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr,
 			       Int_t ref, Double_t tHit, Int_t flag, Int_t iChannel)
 {
-  new((*fHitCollection)[fNHits]) CbmTofHit(detID, posHit, posHitErr, ref, tHit, flag, iChannel);
+//  new((*fHitCollection)[fNHits]) CbmTofHit(detID, posHit, posHitErr, ref, tHit, flag, iChannel);
+  new((*fHitCollection)[fNHits]) CbmTofHit(detID, posHit, posHitErr, ref, tHit, flag);
 
   if(fVerbose > 1) {
     CbmTofHit* tofHit = (CbmTofHit*) fHitCollection->At(fNHits);

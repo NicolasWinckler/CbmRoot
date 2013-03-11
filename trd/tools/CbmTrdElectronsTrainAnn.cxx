@@ -54,7 +54,7 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
     fOutputDir("results/"),
     fSigmaError(0.0),
     fIsDoTrain(true),
-    fTransformType(0),
+    fTransformType(1),
     fBeamDataFile(""),
     fBeamDataPiHist(""),
     fBeamDataElHist(""),
@@ -67,7 +67,7 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
     fReader(NULL),
     fIdMethod(kANN),
     fNofAnnEpochs(250),
-    fNofTrainSamples(2000),
+    fNofTrainSamples(2500),
     fElIdEfficiency(0.9),
     fRandom(new TRandom(0)),
     fhOutput(),
@@ -91,17 +91,17 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
    for (int i = 0; i < 2; i++){
       if (i == 0) s = "El";
       if (i == 1) s = "Pi";
-      fhMeanEloss[i] = new TH1D(("fhMeanEloss"+s).c_str(),"fhMeanEloss;Mean energy loss [a.u.];Counters",100, 0., 0.);
+      fhMeanEloss[i] = new TH1D(("fhMeanEloss"+s).c_str(),"fhMeanEloss;Mean energy loss [a.u.];Yield",100, 0., 50e-6);
       fHists.push_back(fhMeanEloss[i]);
-      fhEloss[i] = new TH1D(("fhEloss"+s).c_str(),"fhEloss;Energy loss [a.u.];Counters",100, 0., 30e-6);
+      fhEloss[i] = new TH1D(("fhEloss"+s).c_str(),"fhEloss;Energy loss [a.u.];Yield",100, 0., 50e-6);
       fHists.push_back(fhEloss[i]);
-      fhdEdX[i] = new  TH1D(("fhdEdX"+s).c_str(),"fhdEdX;dEdX [a.u.];Counters",100, 0., 0.);
+      fhdEdX[i] = new  TH1D(("fhdEdX"+s).c_str(),"fhdEdX;dEdX [a.u.];Yield",100, 0., 50e-6);
       fHists.push_back(fhdEdX[i]);
-      fhTR[i] = new TH1D(("fhTR"+s).c_str(),"fhTR;Transition radiation [a.u.];Counters",100, 0., 0.);
+      fhTR[i] = new TH1D(("fhTR"+s).c_str(),"fhTR;Transition radiation [a.u.];Yield",100, 0., 50e-6);
       fHists.push_back(fhTR[i]);
-      fhNofTRLayers[i] = new TH1D(("fhNofTRLayers"+s).c_str(),"fhNofTRLayers;Number of layers with TR;Counters", fNofTrdLayers + 1, -0.5, fNofTrdLayers);
+      fhNofTRLayers[i] = new TH1D(("fhNofTRLayers"+s).c_str(),"fhNofTRLayers;Number of layers with TR;Yield", fNofTrdLayers + 1, -0.5, fNofTrdLayers + 0.5);
       fHists.push_back(fhNofTRLayers[i]);
-      fhNofHits[i] = new TH1D(("fhNofHits"+s).c_str(),"fhNofHits;Number of hits;Counters",fNofTrdLayers + 1, -0.5, fNofTrdLayers);
+      fhNofHits[i] = new TH1D(("fhNofHits"+s).c_str(),"fhNofHits;Number of hits;Yield",fNofTrdLayers + 1, -0.5, fNofTrdLayers + 0.5);
       fHists.push_back(fhNofHits[i]);
    }
 
@@ -177,7 +177,7 @@ void CbmTrdElectronsTrainAnn::Exec(
    cout << "Nof electrons = " << fEloss[0].size() << endl;
    cout << "Nof pions = " << fEloss[1].size() << endl;
 
-   Finish();
+  // Finish();
 }
 
 void CbmTrdElectronsTrainAnn::Finish()
@@ -241,7 +241,7 @@ void CbmTrdElectronsTrainAnn::FillElossVectorSim()
    for(Int_t iTrdTrack=0; iTrdTrack < nofTrdTracks; iTrdTrack++){
       CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
       Int_t nHits = trdtrack->GetNofHits();
-      //if (nHits < fNofTrdLayers) continue;
+
 
       CbmTrackMatch* trdmatch = (CbmTrackMatch*) fTrdTrackMatches->At(iTrdTrack);
       Int_t iMC = trdmatch->GetMCTrackId();
@@ -258,13 +258,17 @@ void CbmTrdElectronsTrainAnn::FillElossVectorSim()
       int iP = 0; //[0] = electron
       if (pdg == 211) iP = 1; //[1] = pion
       vector<TrdEloss> v;
-      fEloss[iP].push_back(v);
-      for (Int_t iHit = 0; iHit < trdtrack->GetNofHits(); iHit++) {
+
+      if (nHits < fNofTrdLayers) continue;
+
+      for (Int_t iHit = 0; iHit < nHits; iHit++) {
          Int_t hitIndex = trdtrack->GetHitIndex(iHit);
          CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
          TrdEloss e (trdhit->GetELoss(), trdhit->GetELossdEdX(), trdhit->GetELossTR());
-         fEloss[iP][fEloss[iP].size() - 1].push_back(e);
+         if (fNofTrdLayers == v.size()) break;
+         v.push_back(e);
       } //iHit
+      fEloss[iP].push_back(v);
    }//iTrdTrack
 }
 
@@ -756,9 +760,13 @@ void CbmTrdElectronsTrainAnn::Draw()
    }
 
    TCanvas* cClassifierOutput = new TCanvas("trd_elid_classifier_output","trd_elid_classifier_output", 500, 500);
-   DrawH1(list_of(fhOutput[0])(fhOutput[1]), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
-	fhOutput[0]->Scale(1./fhOutput[0]->Integral());
-	fhOutput[1]->Scale(1./fhOutput[1]->Integral());
+   TH1D* out0 = (TH1D*)fhOutput[0]->Clone();
+   TH1D* out1 = (TH1D*)fhOutput[1]->Clone();
+   out0->Rebin(50);
+   out1->Rebin(50);
+   DrawH1(list_of(out0)(out1), list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
+   out0->Scale(1./out0->Integral());
+   out1->Scale(1./out1->Integral());
 
 	TCanvas* cCumProbOutput = new TCanvas("trd_elid_cum_prob_output","trd_elid_cum_prob_output", 500,500);
    DrawH1(fhCumProbOutput, list_of("e^{#pm}")("#pi^{#pm}"), kLinear, kLinear, true, 0.8, 0.8, 0.99, 0.99);

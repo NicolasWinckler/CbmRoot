@@ -271,6 +271,7 @@ InitStatus CbmTofHitProducerNew::Init()
      InitParametersFromContainer();
    }
 
+    cout << "-I- CbmTofHitProducerNew: found following setup: "<<endl; 
     Int_t nCh=0;
     for (Int_t i=0; i<=ActSMtypMax; i++){
 	cout << " SMtype " << i <<" nsmod " << ActnSMMax[i]+1 
@@ -327,7 +328,7 @@ void CbmTofHitProducerNew::InitParametersFromContainer()
      Double_t dx = fCellInfo->GetSizex();
      Double_t dy = fCellInfo->GetSizey();
 
-     if(icell < 1000000){
+     if(icell < 0){
        cout << "-I- InitPar "<<icell<<" Id: "<<cellId
 	    << " "<< cell << " tmcs: "<< smtype <<" "<<smodule<<" "<<module<<" "<<cell   
             << " x="<<Form("%6.2f",x)<<" y="<<Form("%6.2f",y)<<" z="<<Form("%6.2f",z)
@@ -410,9 +411,9 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 
   //Initialization of cell times
 
-  for(Int_t t=0;t<ActSMtypMax;t++){
-   for(Int_t i=0;i<ActnSMMax[t];i++){
-    for(Int_t j=0;j<ActnModMax[t];j++){
+  for(Int_t t=0;t<=ActSMtypMax;t++){
+   for(Int_t i=0;i<ActnSMMax[t]+1;i++){
+    for(Int_t j=0;j<ActnModMax[t]+1;j++){
      for(Int_t k=0;k<ActnCellMax[t];k++){
       tl[t][i][j][k]= 1e+5;
       tr[t][i][j][k]= 1e+5;
@@ -461,8 +462,8 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
        )
     {
      LOG(INFO)<<"-E- TofHitProducerNew: detId: "<< detID <<" SMType: "<<smtype;
-     LOG(INFO)<<" SModule: "<<smodule<<" of "<<ActnSMMax[smtype];
-     LOG(INFO)<<" Module: "<<module<<" of "<<ActnModMax[smtype];
+     LOG(INFO)<<" SModule: "<<smodule<<" of "<<ActnSMMax[smtype]+1;
+     LOG(INFO)<<" Module: "<<module<<" of "<<ActnModMax[smtype]+1;
      LOG(INFO)<<" Gap: "<<gap;
      LOG(INFO)<<" Cell: "<<cell<<" of "<<ActnCellMax[smtype] <<FairLogger::endl;
      continue;
@@ -485,7 +486,7 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
     tr_new = pt->GetTime() + T_smearing + Y_local/vprop
            + gRandom->Gaus(0,sigma_el);
 
-    if(fVerbose >2 || TMath::Abs(X_local)>1.5) {
+    if(fVerbose >1 || TMath::Abs(X_local)>1.5) {
       cout << "-W- TofHitProNew " << j <<". Poi," 
          << " TID:" << trackID 
 	 << " detID: " << detID
@@ -529,11 +530,11 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
 
   //  fVerbose=3;  // debugging 
 
-  for(Int_t t=0;t<ActSMtypMax;t++){
-   for(Int_t i=0;i<ActnSMMax[t];i++){
-    for(Int_t j=0;j<ActnModMax[t];j++){
+  for(Int_t t=0;t<=ActSMtypMax;t++){
+   for(Int_t i=0;i<ActnSMMax[t]+1;i++){
+    for(Int_t j=0;j<ActnModMax[t]+1;j++){
      for(Int_t k=0;k<ActnCellMax[t];k++){
-       // cout <<"-D- HitProd: tijk "<<t<<" "<<i<<" "<<j<<" "<<k<<" "<<tl[t][i][j][k]<<" "<<tr[t][i][j][k]<<endl;
+       //      cout <<"-D- HitProd: tijk "<<t<<" "<<i<<" "<<j<<" "<<k<<" "<<tl[t][i][j][k]<<" "<<tr[t][i][j][k]<<endl;
 //Increase the counter for the TofHit TClonesArray if the first time a hit is attached to this cell
     
       if( tl[t][i][j][k]<1e+5 

@@ -79,6 +79,11 @@ public:
    void SetSigmaMirror(Double_t sigMirror) {fSigmaMirror = sigMirror;}
 
    /**
+    * \brief Set crosstalk hit probability.
+    */
+   void SetCrossTalkHitProb(Double_t crosstalk) {fCrossTalkHitProb = crosstalk;}
+
+   /**
     * \brief Add cross talk hits.
     * \param[in] x X position of the central hit.
     * \param[in] y Y position of the central hit.

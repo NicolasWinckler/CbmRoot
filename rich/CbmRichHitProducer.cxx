@@ -257,7 +257,7 @@ void CbmRichHitProducer::Exec(
 
    // Set photodetector quantum efficiency
    Double_t lambda_min,lambda_max,lambda_step;
-   Double_t efficiency[40];
+   Double_t efficiency[50];
    SetPhotoDetPar(fDetType,lambda_min,lambda_max,lambda_step,efficiency);
 
    fRichHits->Clear();

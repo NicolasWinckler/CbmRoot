@@ -73,7 +73,6 @@ Bool_t CbmTrdSetTracksPidANN::ReadData()
 	   stringstream ss;
 	   ss << fileName << "ann_weights_" << (i+1) << ".txt";
 	   weightsFilesANN.push_back(ss.str());
-	   cout << ss.str() << " " << i << " " <<weightsFilesANN.size() << endl;
 	}
 
 	if (fTRDGeometryType == "v10b"){
@@ -130,7 +129,6 @@ Bool_t CbmTrdSetTracksPidANN::ReadData()
 	      if (iL == iH) ss << "x" << (iL+1) << ":" << nofHidden << ":xOut";
 	   }
 	   TMultiLayerPerceptron* ann = new TMultiLayerPerceptron(ss.str().c_str(), simu);
-	   cout << ss.str() << endl;
 	   ann->LoadWeights(weightsFilesANN[iH].c_str());
 	   fNN.push_back(ann);
 	}
@@ -181,11 +179,6 @@ void CbmTrdSetTracksPidANN::Exec(
 		}
 		//------------------transform Data END----------------------------
 
-		for (int i = 0; i < eLossVector.size(); i++){
-		   cout << eLossVector[i] << " ";
-		}
-		cout << endl;
-
 		Int_t iANN = nofHits - 1;
 		Double_t nnEval;
 		if (iANN < 0 || iANN >= 12 || fNN[iANN] == NULL) {
@@ -197,7 +190,6 @@ void CbmTrdSetTracksPidANN::Exec(
             nnEval = -2;
          }
 		}
-		cout << nofHits << " " << nnEval << endl;
 		pTrack->SetPidANN(nnEval);
 	}
 }

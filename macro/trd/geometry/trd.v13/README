@@ -13,6 +13,7 @@ v13j - like v13b, but no FEBs at all
 v13k - like v13b, but no FEBs at all and no lattice grid
 v13l - like v13b, full FEBs, reduced FEB thickness (2.5mm)
 
+v13r - like v13a, SIS100 TRD, 3 layers (x,y,x), reduced number of FEBs, reduced FEB thickness
 v13s - like v13a, SIS100 TRD, 2 layers, reduced number of FEBs, reduced FEB thickness
 v13t - like v13s, SIS100 TRD, 4 layers, reduced number of FEBs, reduced FEB thickness
 v13u - like v13s, SIS100 TRD, 2 layers, with 6 mm gas gap

@@ -688,9 +688,10 @@ void CbmLitTrackingQa::CreateHistograms()
       CreateH1Efficiency("hte_Rich_Rich", "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax, "ring");
       CreateH1Efficiency("hte_Rich_Rich", "y", "Rapidity", fYRangeBins, fYRangeMin, fYRangeMax, "ring");
       CreateH1Efficiency("hte_Rich_Rich", "pt", "P_{t} [GeV/c]", fPtRangeBins, fPtRangeMin, fPtRangeMax, "ring");
-      CreateH1Efficiency("hte_Rich_Rich", "Nh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
+      CreateH1Efficiency("hte_Rich_Rich", "RingNh", "Number of hits", nofBinsPoints, minNofPoints, maxNofPoints, "ring");
       CreateH1Efficiency("hte_Rich_Rich", "BoA", "B/A", 50, 0.0, 1.0, "ring");
-      CreateH1Efficiency("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
+     // CreateH1Efficiency("hte_Rich_Rich", "RadPos", "Radial position [cm]", 50, 0., 150., "ring");
+      CreateH2Efficiency("hte_Rich_Rich", "RingXcYc", "X [cm]", "Y [cm]", 28, -110., 110, 40, -200, 200, "ring");
       CreateH2Efficiency("hte_Rich_Rich", "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, "ring");
    }
 
@@ -1003,6 +1004,11 @@ void CbmLitTrackingQa::ProcessMcTracks()
       Int_t nofPointsMuch = litMCTrack.GetNofPointsInDifferentStations(kMUCH);
       Int_t nofPointsTof = litMCTrack.GetNofPoints(kTOF);
       Int_t nofHitsRich = litMCTrack.GetNofRichHits();
+      Double_t boa = litMCTrack.GetRingBaxis()/litMCTrack.GetRingAaxis();
+      if (litMCTrack.GetRingBaxis() == -1. || litMCTrack.GetRingAaxis() == -1) boa = -1.;
+      Double_t ringX = litMCTrack.GetRingCenterX();
+      Double_t ringY = litMCTrack.GetRingCenterY();
+
 
       // Check local tracks
       Bool_t stsConsecutive = (fUseConsecutivePointsInSts) ? litMCTrack.GetNofConsecutivePoints(kSTS) >= fMinNofPointsSts : true;
@@ -1028,9 +1034,10 @@ void CbmLitTrackingQa::ProcessMcTracks()
       parMap["Angle"] = list_of(angle);
       parMap["Np"] = list_of(0); // FIXME : correct to number of points in concrete detector!
                         // Currently as a  temporary solution it is reassigned later
-      parMap["BoA"] = list_of(1);
-      parMap["Nh"] = list_of(1);
-      parMap["RadPos"] = list_of(1);
+      parMap["BoA"] = list_of(boa);
+      parMap["RingXcYc"] = list_of(ringX)(ringY);
+      parMap["RingNh"] = list_of(nofHitsRich);
+      //parMap["RadPos"] = list_of(1);
       parMap["YPt"] = list_of(mcY)(mcPt);
 
       for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {

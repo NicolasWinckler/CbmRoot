@@ -34,7 +34,11 @@ public:
     * \brief Constructor.
     */
    CbmLitMCTrack():
-   	   fNofRichHits(0) {
+   	   fNofRichHits(0),
+   	   fRingAaxis(0.),
+   	   fRingBaxis(0.),
+   	   fRingCenterX(0.),
+   	   fRingCenterY(0.) {
       // Initialize all maps
       fPoints[kMVD];
       fPoints[kSTS];
@@ -149,6 +153,70 @@ public:
    }
 
    /**
+    * \brief Return major semi-axis of the ellipse.
+    * \return Major semi-axis of the ellipse.
+    */
+   Double_t GetRingAaxis() const {
+      return fRingAaxis;
+   }
+
+   /**
+    * \brief Set major semi-axis of the ellipse.
+    * \param[in] a Major semi-axis of the ellipse.
+    */
+   void SetRingAaxis(Double_t a) {
+      fRingAaxis = a;
+   }
+
+   /**
+    * \brief Return minor semi-axis of the ellipse.
+    * \return Minor semi-axis of the ellipse.
+    */
+   Double_t GetRingBaxis() const {
+      return fRingBaxis;
+   }
+
+   /**
+    * \brief Set minor semi-axis of the ellipse.
+    * \param[in] b Minor semi-axis of the ellipse.
+    */
+   void SetRingBaxis(Double_t b) {
+      fRingBaxis = b;
+   }
+
+   /**
+    * \brief Return X coordinate of the ellipse center.
+    * \return X coordinate of the ellipse center.
+    */
+   Double_t GetRingCenterX() const {
+      return fRingCenterX;
+   }
+
+   /**
+    * \brief Set X coordinate of the ellipse center.
+    * \param[in] xc X coordinate of the ellipse center.
+    */
+   void SetRingCenterX(Double_t xc) {
+      fRingCenterX = xc;
+   }
+
+   /**
+    * \brief Return Y coordinate of the ellipse center.
+    * \return Y coordinate of the ellipse center.
+    */
+   Double_t GetRingCenterY() const {
+      return fRingCenterY;
+   }
+
+   /**
+    * \brief Set Y coordinate of the ellipse center.
+    * \param[in] yc Y coordinate of the ellipse center.
+    */
+   void SetRingCenterY(Double_t yc) {
+      fRingCenterY = yc;
+   }
+
+   /**
     * \brief Return MC point for specified detector id and point index.
     *
     * Before accessing points with this function one has to check
@@ -198,6 +266,10 @@ private:
    map<Int_t, Int_t> fMaxConsecutivePoints;
 
    Int_t fNofRichHits; // Number of hits in RICH ring
+   Double_t fRingAaxis; // major semi-axis of the ellipse
+   Double_t fRingBaxis; // minor semi-axis of the ellipse
+   Double_t fRingCenterX; // X coordinate of the ring center
+   Double_t fRingCenterY; // Y coordinate of the ring center
 
 private:
 

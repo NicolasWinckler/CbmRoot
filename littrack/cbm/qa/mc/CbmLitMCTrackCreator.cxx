@@ -20,10 +20,13 @@
 #include "CbmTrdDetectorId.h"
 #include "CbmMCTrack.h"
 #include "CbmStsPoint.h"
+#include "CbmRichPoint.h"
 #include "CbmMvdPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmMuchPoint.h"
 #include "CbmBaseHit.h"
+#include "fitter/CbmRichRingFitterEllipseTau.h"
+#include "CbmRichHitProducer.h"
 
 #include "TDatabasePDG.h"
 #include "TGeoManager.h"
@@ -46,6 +49,8 @@ CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fStsDigiPar = (CbmStsDigiPar*) db->getContainer("CbmStsDigiPar");
    fStsDigiScheme  = new CbmStsDigiScheme();
    fStsDigiScheme->Init(fStsGeoPar, fStsDigiPar);
+
+   fTauFit = new CbmRichRingFitterEllipseTau();
 }
 
 CbmLitMCTrackCreator::~CbmLitMCTrackCreator()
@@ -72,6 +77,7 @@ void CbmLitMCTrackCreator::Create()
    AddPoints(kTOF, fTofPoints);
    AddPoints(kRICH, fRichPoints);
    AddRichHits();
+   AddRingParameters();
 
    std::map<Int_t, CbmLitMCTrack>::iterator it;
    for (it = fLitMCTracks.begin(); it != fLitMCTracks.end(); it++)
@@ -158,6 +164,47 @@ void CbmLitMCTrackCreator::AddRichHits()
    for (it = nofHitsInRing.begin(); it != nofHitsInRing.end(); it++) {
 	   fLitMCTracks[it->first].SetNofRichHits(it->second);
    }
+}
+
+void CbmLitMCTrackCreator::AddRingParameters()
+{
+   if (NULL == fRichPoints || NULL == fMCTracks) return;
+   map<Int_t, CbmRichRingLight> mapRings;
+   int nofRichPoints = fRichPoints->GetEntriesFast();
+   for (int iPoint = 0; iPoint < nofRichPoints; iPoint++){
+      CbmRichPoint* richPoint = (CbmRichPoint*) fRichPoints->At(iPoint);
+      if (NULL == richPoint) continue;
+      Int_t trackId = richPoint->GetTrackID();
+      if (trackId < 0) continue;
+      CbmMCTrack* mcTrackRich = (CbmMCTrack*)fMCTracks->At(trackId);
+      if (NULL == mcTrackRich) continue;
+      int motherIdRich = mcTrackRich->GetMotherId();
+      if (motherIdRich == -1) continue;
+      TVector3 posPoint;
+      richPoint->Position(posPoint);
+      TVector3 detPoint;
+      // FIXME: this parameters are only valid for rich_vo8a.geo geometry
+      // in general they can be accessed via Parameter container
+      // but here they are just hardcoded
+      Double_t phi = -0.0873109;
+      Double_t theta = 0.0873109;
+      Double_t detZOrig = 179.975;
+      CbmRichHitProducer::TiltPoint(&posPoint, &detPoint, phi, theta, detZOrig);
+      CbmRichHitLight hit(detPoint.X(), detPoint.Y());
+      mapRings[motherIdRich].AddHit(hit);
+   }
+   map<Int_t, CbmRichRingLight>::const_iterator it;
+   int i = 0;
+   for (it = mapRings.begin(); it != mapRings.end(); it++) {
+      CbmRichRingLight ring(it->second);
+      fTauFit->DoFit( &ring ); //fLitMCTracks[it->first].SetNofRichHits(it->second);
+      fLitMCTracks[it->first].SetRingAaxis(ring.GetAaxis());
+      fLitMCTracks[it->first].SetRingBaxis(ring.GetBaxis());
+      fLitMCTracks[it->first].SetRingCenterX(ring.GetCenterX());
+      fLitMCTracks[it->first].SetRingCenterY(ring.GetCenterY());
+      //std::cout << ++i << " " << ring.GetAaxis() << " " << ring.GetBaxis() << std::endl;
+   }
+
 }
 
 void CbmLitMCTrackCreator::FairMCPointToLitMCPoint(

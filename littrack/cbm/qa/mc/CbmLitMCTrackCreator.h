@@ -21,6 +21,7 @@ class CbmMuchPoint;
 class CbmGeoStsPar;
 class CbmStsDigiPar;
 class CbmStsDigiScheme;
+class CbmRichRingFitterEllipseTau;
 
 /**
  * \class CbmLitMCTrackCreator
@@ -104,6 +105,11 @@ private:
    void AddRichHits();
 
    /**
+    * \brief Fit Rich MC points using ellipse fitter and fill ellipse parameters.
+    */
+   void AddRingParameters();
+
+   /**
     * \brief Convert FairMCPoint to CbmLitMCPoint.
     * \param[in] fairPoint Pointer to FairMCPoint to be converted.
     * \param[out] litPoint Pointer to output CbmLitMCPoint.
@@ -163,6 +169,8 @@ private:
    CbmGeoStsPar* fStsGeoPar; // Geometry parameter container
    CbmStsDigiPar* fStsDigiPar; // Digitisation parameter container
    CbmStsDigiScheme* fStsDigiScheme;   // Digitisation scheme
+
+   CbmRichRingFitterEllipseTau* fTauFit; // Ellipse fitter algorithm
 };
 
 #endif /* CBMLITMCTRACKCREATOR_H_ */

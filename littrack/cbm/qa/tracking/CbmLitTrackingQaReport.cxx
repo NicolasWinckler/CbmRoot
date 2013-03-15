@@ -367,6 +367,7 @@ void CbmLitTrackingQaReport::DrawYPtHistos()
       DrawYPt("tracking_qa_" + variant + "_kaon_plus_ypt", effHistName + "_KaonPlus_Eff_YPt");
       DrawYPt("tracking_qa_" + variant + "_kaon_minus_ypt", effHistName + "_KaonMinus_Eff_YPt");
    }
+   DrawYPt("tracking_qa_Rich_Rich_Electron_Eff_RingXcYc", "hte_Rich_Rich_Electron_Eff_RingXcYc");
 }
 
 void CbmLitTrackingQaReport::DrawYPt(

@@ -876,8 +876,8 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
                   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(stsTrackMatch->GetMCTrackId()));
                   if (mcTrack != NULL) momentumMc = mcTrack->GetP();
                 }
-//                if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(globalTrack, momentumMc))
-//                   fHM->H1("hng_NofGhosts_RichElId_Nh")->Fill(nofHits);
+                if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(iTrack, momentumMc))
+                   fHM->H1("hng_NofGhosts_RichElId_Nh")->Fill(nofHits);
             }
          }
       }
@@ -1201,7 +1201,14 @@ void CbmLitTrackingQa::IncreaseCounters()
    if (fDet.GetDet(kSTS)) { fHM->H1("hno_NofObjects_StsTracks")->Fill(fStsTracks->GetEntriesFast()); }
    if (fDet.GetDet(kRICH)) {
       fHM->H1("hno_NofObjects_RichRings")->Fill(fRichRings->GetEntriesFast());
-      fHM->H1("hno_NofObjects_RichProjections")->Fill(fRichProjections->GetEntriesFast());
+      Int_t projCount = 0;
+      Int_t nProj = fRichProjections->GetEntriesFast();
+      for (Int_t iProj = 0; iProj < nProj; iProj++){
+         FairTrackParam* proj = (FairTrackParam*)fRichProjections->At(iProj);
+         if (NULL == proj || proj->GetX() == 0. || proj->GetY() == 0) continue;
+         projCount++;
+      }
+      fHM->H1("hno_NofObjects_RichProjections")->Fill(projCount);
    }
    if (fDet.GetDet(kTRD)) { fHM->H1("hno_NofObjects_TrdTracks")->Fill(fTrdMatches->GetEntriesFast()); }
    if (fDet.GetDet(kMUCH)) { fHM->H1("hno_NofObjects_MuchTracks")->Fill(fMuchMatches->GetEntriesFast()); }

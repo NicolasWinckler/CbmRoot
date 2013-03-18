@@ -750,6 +750,7 @@ void CbmLitTrackingQa::CreateHistograms()
    if (fDet.GetDet(kMUCH)) CreateH1("hng_NofGhosts_Much_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
    if (fDet.GetDet(kRICH)) {
       CreateH1("hng_NofGhosts_Rich_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
+      CreateH2("hng_NofGhosts_Rich_RingXcYc", "X [cm]", "Y [cm]", "Ghosts per event", 28, -110., 110, 40, -200, 200);
       CreateH1("hng_NofGhosts_RichStsMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
       CreateH1("hng_NofGhosts_RichElId_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
       CreateH1("hng_NofGhosts_StsRichMatching_Nh", "Number of hits", "Yield", nofBinsPoints, minNofPoints, maxNofPoints);
@@ -866,9 +867,13 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
          if (!isRichOk) { // ghost ring
             fHM->H1("hng_NofGhosts_Rich_Nh")->Fill(nofHits);
 
-            // calculate number of ghost after STS matching and electron identification
             const CbmRichRing* ring = static_cast<const CbmRichRing*>(fRichRings->At(richId));
             if (NULL != ring) {
+               // ghost ring distribution vs position on photodetector plane
+               fHM->H1("hng_NofGhosts_Rich_RingXcYc")->Fill(ring->GetCenterX(), ring->GetCenterY());
+
+
+                // calculate number of ghost after STS matching and electron identification
                if (ring->GetDistance() < 1.) fHM->H1("hng_NofGhosts_RichStsMatching_Nh")->Fill(nofHits);
 
                Double_t momentumMc = 0.;

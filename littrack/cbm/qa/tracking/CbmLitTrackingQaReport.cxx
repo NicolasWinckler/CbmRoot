@@ -247,6 +247,11 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 		DrawEfficiency("tracking_qa_local_tracking_efficiency_" + variant + "_angle", re2 + "_Angle", DefaultEfficiencyLabelFormatter);
 	}
 
+	// Draw RICH efficiency in dependence on different parameters
+	DrawEfficiency("tracking_qa_local_tracking_efficiency_Rich_RingNh", "hte_Rich_Rich_Electron_Eff_RingNh", DefaultEfficiencyLabelFormatter);
+   DrawEfficiency("tracking_qa_local_tracking_efficiency_Rich_BoA", "hte_Rich_Rich_Electron_Eff_BoA", DefaultEfficiencyLabelFormatter);
+   DrawYPt("tracking_qa_Rich_Rich_Electron_Eff_RingXcYc", "hte_Rich_Rich_Electron_Eff_RingXcYc");
+
 	// Draw local accepted and reconstructed tracks vs number of points
 	HM()->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
 	vector<string> accRecTracks = list_of("Sts")("Trd")("Much")("Tof");
@@ -259,6 +264,15 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	//
    DrawPionSuppression("tracking_qa_pion_suppression_wo_Rich_p", "hps_((?!Rich)).*_PionSup_p", DefaultPionSuppressionLabelFormatter);
    DrawPionSuppression("tracking_qa_pion_suppression_with_rich_p", "hps_Rich.*_PionSup_p", DefaultPionSuppressionLabelFormatter);
+
+
+   // Draw ghost RICH rings vs position on photodetector plane
+   if (HM()->Exists("hng_NofGhosts_Rich_RingXcYc")){
+      TCanvas* canvas = CreateCanvas("tracking_qa_hng_NofGhosts_Rich_RingXcYc", "tracking_qa_hng_NofGhosts_Rich_RingXcYc", 800, 800);
+      Int_t nofEvents = HM()->H1("hen_EventNo_TrackingQa")->GetEntries();
+      HM()->H2("hng_NofGhosts_Rich_RingXcYc")->Scale(1./nofEvents);
+      DrawH2(HM()->H2("hng_NofGhosts_Rich_RingXcYc"));
+   }
 
 }
 
@@ -367,7 +381,6 @@ void CbmLitTrackingQaReport::DrawYPtHistos()
       DrawYPt("tracking_qa_" + variant + "_kaon_plus_ypt", effHistName + "_KaonPlus_Eff_YPt");
       DrawYPt("tracking_qa_" + variant + "_kaon_minus_ypt", effHistName + "_KaonMinus_Eff_YPt");
    }
-   DrawYPt("tracking_qa_Rich_Rich_Electron_Eff_RingXcYc", "hte_Rich_Rich_Electron_Eff_RingXcYc");
 }
 
 void CbmLitTrackingQaReport::DrawYPt(

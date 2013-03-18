@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----                 CbmTrdGeoHandler source file                  -----
+// -----                 CbmTofGeoHandler source file                  -----
 // -----                 Created 13/08/10  by F. Uhlig                 -----
 // -------------------------------------------------------------------------
 
@@ -71,13 +71,21 @@ Int_t CbmTofGeoHandler::CheckGeometryVersion()
       // In the old geometries v07a and v12a the name of this node is tof1_0
       // In new geometries the node name is tof_v<year><version> eg. tof_v12b
       // With this naming scheme the geometry version is completely qualified
-      if (TString(node->GetName()).EqualTo("tof1_0")) {
+      LOG(INFO)<< "Found TOF geometry " <<TString(node->GetName())<< FairLogger::endl;
+      if (TString(node->GetName()).EqualTo("tof1_0")) { 
     	LOG(INFO)<< "Found TOF geometry v07a" << FairLogger::endl;
         fTofId = new CbmTofDetectorId_v07a();
         fGeoVersion = k07a;
         return fGeoVersion;
       } else if (TString(node->GetName()).EqualTo("tof_v12b_0")) {
     	LOG(INFO)<< "Found TOF geometry v12b." << FairLogger::endl;
+	    fTofId = new CbmTofDetectorId_v12b();
+	    fGeoVersion = k12b;
+        return fGeoVersion;
+      } else if (TString(node->GetName()).Contains("v13")){
+               //TString(node->GetName()).EqualTo("tof_v13-3a_0")) {
+    	LOG(INFO)<< "Found TOF geometry "<<TString(node->GetName())
+                 <<", treat as Id 12b   "<< FairLogger::endl;
 	    fTofId = new CbmTofDetectorId_v12b();
 	    fGeoVersion = k12b;
         return fGeoVersion;
@@ -125,18 +133,19 @@ Int_t CbmTofGeoHandler::GetUniqueDetectorId()
     CurrentVolID(cell);
   }
 
-  LOG(DEBUG2)<<"Volname: "<<Volname<<FairLogger::endl;
-  LOG(DEBUG2)<<"SMtype: "<<smtype<<FairLogger::endl;
-  LOG(DEBUG2)<<"SModule: "<<smodule<<FairLogger::endl;
-  LOG(DEBUG2)<<"Counter: "<<counter<<FairLogger::endl;
-  LOG(DEBUG2)<<"Gap: "<<gap<<FairLogger::endl;
-  LOG(DEBUG2)<<"Cell: "<<cell<<FairLogger::endl;
+  LOG(DEBUG2)<<"GeoHand: ";
+  LOG(DEBUG2)<<" Volname: "<<Volname<<", "<<CurrentVolOffName(3)<<", "<<CurrentVolOffName(2)<<", "<<CurrentVolOffName(1)<<", "<<CurrentVolOffName(0);
+  LOG(DEBUG2)<<" SMtype: "<<smtype;
+  LOG(DEBUG2)<<" SModule: "<<smodule;
+  LOG(DEBUG2)<<" Counter: "<<counter;
+  LOG(DEBUG2)<<" Gap: "<<gap;
+  LOG(DEBUG2)<<" Cell: "<<cell;
 
   CbmTofDetectorInfo detInfo(kTOF, smtype, smodule, counter, 
 			     gap, cell);
 
   Int_t result=fTofId->SetDetectorInfo(detInfo);
-  LOG(DEBUG2)<<"Unique ID: "<< result << FairLogger::endl;
+  LOG(DEBUG2)<<" Unique ID: "<< result << FairLogger::endl;
 //  return fTofId->SetDetectorInfo(detInfo);
   return result;
 
@@ -433,7 +442,7 @@ void CbmTofGeoHandler::NavigateTo(TString volName)
     fVolumeShape = (TGeoBBox*)fCurrentVolume->GetShape(); 
     Double_t local[3] = {0., 0., 0.};  // Local centre of volume
     gGeoManager->LocalToMaster(local, fGlobal);
-    LOG(DEBUG2)<<"Pos: "<<fGlobal[0]<<" , "<<fGlobal[1]<<" , "<<fGlobal[2]<<FairLogger::endl;
+    LOG(DEBUG2)<<"GeoNav: Pos: "<<fGlobal[0]<<" , "<<fGlobal[1]<<" , "<<fGlobal[2]<<FairLogger::endl;
 //    fGlobalMatrix = gGeoManager->GetCurrentMatrix();
   }	      
 }

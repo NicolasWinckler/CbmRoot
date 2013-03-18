@@ -763,59 +763,68 @@ void CbmRichHitProducer::SetPhotoDetPar(
       /**  Measured PMT efficiencies for MAPMTs at posF (BUW measurement) ##### CernOct2011 #####
             (Flat type Multianode Photomultiplier with BA cathode + UV window)
             corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
-      fLambdaMin = 180.;
-      fLambdaMax = 640.;
-      fLambdaStep = 10.;
-
-      fEfficiency[0] = 0.060;
-      fEfficiency[1] = 0.080;
-      fEfficiency[2] = 0.095;
-      fEfficiency[3] = 0.106;
-      fEfficiency[4] = 0.127;
-      fEfficiency[5] = 0.148;
-      fEfficiency[6] = 0.167;
-      fEfficiency[7] = 0.189;
-      fEfficiency[8] = 0.209;
-      fEfficiency[9] = 0.213;
-      fEfficiency[10] = 0.230;
-      fEfficiency[11] = 0.248;
-      fEfficiency[12] = 0.260;
-      fEfficiency[13] = 0.266;
-      fEfficiency[14] = 0.270;
-      fEfficiency[15] = 0.283;
-      fEfficiency[16] = 0.286;
-      fEfficiency[17] = 0.286;
-      fEfficiency[18] = 0.288;
-      fEfficiency[19] = 0.286;
-      fEfficiency[20] = 0.281;
-      fEfficiency[21] = 0.280;
-      fEfficiency[22] = 0.272;
-      fEfficiency[23] = 0.264;
-      fEfficiency[24] = 0.256;
-      fEfficiency[25] = 0.247;
-      fEfficiency[26] = 0.237;
-      fEfficiency[27] = 0.222;
-      fEfficiency[28] = 0.203;
-      fEfficiency[29] = 0.186;
-      fEfficiency[30] = 0.174;
-      fEfficiency[31] = 0.166;
-      fEfficiency[32] = 0.148;
-      fEfficiency[33] = 0.121;
-      fEfficiency[34] = 0.096;
-      fEfficiency[35] = 0.078;
-      fEfficiency[36] = 0.065;
-      fEfficiency[37] = 0.054;
-      fEfficiency[38] = 0.037;
-      fEfficiency[39] = 0.030;
-      fEfficiency[40] = 0.024;
-      fEfficiency[41] = 0.018;
-      fEfficiency[42] = 0.012;
-      fEfficiency[43] = 0.008;
-      fEfficiency[44] = 0.005;
-      fEfficiency[45] = 0.003;
-      fEfficiency[46] = 0.002;
-
-
+      
+     fLambdaMin = 160.;
+     fLambdaMax = 700.;
+     fLambdaStep = 10.;
+     
+     fEfficiency[0] = 0.0272;
+     fEfficiency[1] = 0.0443;
+     fEfficiency[2] = 0.06;
+     fEfficiency[3] = 0.08;
+     fEfficiency[4] = 0.0945;
+     fEfficiency[5] = 0.1061;
+     fEfficiency[6] = 0.1265;
+     fEfficiency[7] = 0.1482;
+     fEfficiency[8] = 0.1668;
+     fEfficiency[9] = 0.1887;
+     fEfficiency[10] = 0.2093;
+     fEfficiency[11] = 0.2134;
+     fEfficiency[12] = 0.2303;
+     fEfficiency[13] = 0.2482;
+     fEfficiency[14] = 0.2601;
+     fEfficiency[15] = 0.2659;
+     fEfficiency[16] = 0.2702;
+     fEfficiency[17] = 0.283;
+     fEfficiency[18] = 0.2863;
+     fEfficiency[19] = 0.2863;
+     fEfficiency[20] = 0.2884;
+     fEfficiency[21] = 0.286;
+     fEfficiency[22] = 0.2811;
+     fEfficiency[23] = 0.2802;
+     fEfficiency[24] = 0.272;
+     fEfficiency[25] = 0.2638;
+     fEfficiency[26] = 0.2562;
+     fEfficiency[27] = 0.2472;
+     fEfficiency[28] = 0.2368;
+     fEfficiency[29] = 0.2218;
+     fEfficiency[30] = 0.2032;
+     fEfficiency[31] = 0.186;
+     fEfficiency[32] = 0.1735;
+     fEfficiency[33] = 0.1661;
+     fEfficiency[34] = 0.1483;
+     fEfficiency[35] = 0.121;
+     fEfficiency[36] = 0.0959;
+     fEfficiency[37] = 0.0782;
+     fEfficiency[38] = 0.0647;
+     fEfficiency[39] = 0.0538;
+     fEfficiency[40] = 0.0372;
+     fEfficiency[41] = 0.0296;
+     fEfficiency[42] = 0.0237;
+     fEfficiency[43] = 0.0176;
+     fEfficiency[44] = 0.0123;
+     fEfficiency[45] = 0.0083;
+     fEfficiency[46] = 0.005;
+     fEfficiency[47] = 0.003;
+     fEfficiency[48] = 0.0017;
+     fEfficiency[49] = 0.0008;
+     fEfficiency[50] = 0.0006;
+     fEfficiency[51] = 0.0003;
+     fEfficiency[52] = 0.0003;
+     fEfficiency[53] = 0.0002;
+     fEfficiency[54] = 0.0001;
+     
+     
    } else if (det_type == 0){
 
       // ideal detector

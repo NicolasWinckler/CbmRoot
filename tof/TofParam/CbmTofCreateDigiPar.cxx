@@ -70,7 +70,7 @@ CbmTofCreateDigiPar::~CbmTofCreateDigiPar()
 // ----  Initialisation  ----------------------------------------------
 void CbmTofCreateDigiPar::SetParContainers(){
 
-  LOG(INFO)<<" * CbmTofCreateDigiPar * :: SetParContainers() "<<FairLogger::endl;
+  LOG(INFO)<<" * CbmTofCreateDigiPar:: SetParContainers() "<<FairLogger::endl;
 
   // Get Base Container
   FairRunAna* ana = FairRunAna::Instance();
@@ -78,6 +78,8 @@ void CbmTofCreateDigiPar::SetParContainers(){
 
   fDigiPar = (CbmTofDigiPar*)
              (rtdb->getContainer("CbmTofDigiPar"));
+
+  LOG(INFO)<<" * CbmTofCreateDigiPar:: fDigiPar "<<fDigiPar<<FairLogger::endl;
 
 }
 // --------------------------------------------------------------------
@@ -180,6 +182,8 @@ void CbmTofCreateDigiPar::FillCellMapAsciiGeometry(){
       TString TofNode = node->GetName();
       TGeoNode* keep = node;
       TObjArray* keeping = keep->GetNodes();
+
+      cout << "Building Tof Digi Par database ... "<< endl;
 
       // Loop over tof keeping volume. There should be only one.
       for (Int_t ikeep = 0; ikeep < keeping->GetEntriesFast(); ikeep++) {
@@ -325,7 +329,6 @@ void CbmTofCreateDigiPar::FillCellMapRootGeometry(){
                     TGeoNode* cell = (TGeoNode*) cellarray->At(icell);
                     TString CellNode = cell->GetName();
 
-
                     // Construct full path name for the gap
                     // Extract the necessary geometrical information and store
                     // this information in member variables
@@ -375,8 +378,6 @@ void CbmTofCreateDigiPar::FillCellInfoFromGeoHandler(TString FullPath)
   // id and corresponding information stored in the parameter container
   // should be calculated without the gap information.
 
-
-
   fDetID = fGeoHandler->GetUniqueDetectorId(FullPath);
 
   fSMType=fGeoHandler->GetSMType(fDetID);
@@ -393,15 +394,15 @@ void CbmTofCreateDigiPar::FillCellInfoFromGeoHandler(TString FullPath)
   fY = fGeoHandler->GetY(FullPath);
   fZ = fGeoHandler->GetZ(FullPath);
 
-  LOG(DEBUG2)<<"X: "<< fX  <<FairLogger::endl;
-  LOG(DEBUG2)<<"Y: "<< fY <<FairLogger::endl;
-  LOG(DEBUG2)<<"Z: "<< fZ <<FairLogger::endl;
-  LOG(DEBUG2)<<"SizeX: "<< fSizex <<FairLogger::endl;
-  LOG(DEBUG2)<<"SizeY: "<< fSizey <<FairLogger::endl;
-  LOG(DEBUG2)<<"Region: "<< fRegion <<FairLogger::endl;
-  LOG(DEBUG2)<<"Module: "<< fCounter <<FairLogger::endl;
-  LOG(DEBUG2)<<"Gap: "<< fGap <<FairLogger::endl;
-  LOG(DEBUG2)<<"Cell: "<< fCell <<FairLogger::endl;
+  LOG(DEBUG2)<<"FCI: X: "<< fX;
+  LOG(DEBUG2)<<" Y: "<< fY;
+  LOG(DEBUG2)<<" Z: "<< fZ;
+  LOG(DEBUG2)<<" SizeX: "<< fSizex;
+  LOG(DEBUG2)<<" SizeY: "<< fSizey;
+  LOG(DEBUG2)<<" Region: "<< fRegion;
+  LOG(DEBUG2)<<" Module: "<< fCounter;
+  LOG(DEBUG2)<<" Gap: "<< fGap;
+  LOG(DEBUG2)<<" Cell: "<< fCell <<FairLogger::endl;
 
   fCellID = fGeoHandler->GetCellId(fDetID);
 
@@ -412,12 +413,13 @@ void CbmTofCreateDigiPar::FillCellInfoFromGeoHandler(TString FullPath)
   fCell=fGeoHandler->GetCell(fCellID);
   fRegion=fGeoHandler->GetRegion(fCellID);
 
-  LOG(DEBUG2)<<"Cell ID: "<< fCellID << FairLogger::endl;
-  LOG(DEBUG2)<<"Region: "<< fGeoHandler->GetRegion(fCellID) <<FairLogger::endl;
-  LOG(DEBUG2)<<"Module: "<< fGeoHandler->GetCounter(fCellID) <<FairLogger::endl;
-  LOG(DEBUG2)<<"Gap: "<< fGeoHandler->GetGap(fCellID) <<FairLogger::endl;
-  LOG(DEBUG2)<<"Cell: "<< fGeoHandler->GetCell(fCellID) <<FairLogger::endl;
-  LOG(DEBUG2)<<"**************************"<<FairLogger::endl;
+  LOG(DEBUG2)<<"FCI: Cell ID: "<< fCellID << " detId "<< fDetID;
+  LOG(DEBUG2)<<" Region:  "<< fGeoHandler->GetRegion(fCellID); 
+  LOG(DEBUG2)<<" SMTYP:   "<< fGeoHandler->GetSMType(fCellID);
+  LOG(DEBUG2)<<" SModule: "<< fGeoHandler->GetSModule(fCellID);
+  LOG(DEBUG2)<<" Module:  "<< fGeoHandler->GetCounter(fCellID);
+  LOG(DEBUG2)<<" Gap:     "<< fGeoHandler->GetGap(fCellID);
+  LOG(DEBUG2)<<" Cell: "<< fGeoHandler->GetCell(fCellID) <<FairLogger::endl;
 
 }
 
@@ -438,22 +440,22 @@ void CbmTofCreateDigiPar::FillDigiPar()
 */
 
   Int_t Nrcells = (Int_t)fCellMap.size();
-  LOG(DEBUG2) <<"Nr. of tof cells: "<<Nrcells<<FairLogger::endl;
+  LOG(DEBUG) <<"FillDigiPar:: Nr. of tof cells: "<<Nrcells<<FairLogger::endl;
 
-  fDigiPar->SetNrOfCells(Nrcells);
+  fDigiPar->SetNrOfCells(Nrcells);        //transfer info to DigiPar
 
   TArrayI *CellId  = new TArrayI(Nrcells);
   TArrayD *CellX   = new TArrayD(Nrcells);
-  TArrayD *CellY  = new TArrayD(Nrcells);
-  TArrayD *CellZ  = new TArrayD(Nrcells);
+  TArrayD *CellY   = new TArrayD(Nrcells);
+  TArrayD *CellZ   = new TArrayD(Nrcells);
   TArrayD *CellDx  = new TArrayD(Nrcells);
   TArrayD *CellDy  = new TArrayD(Nrcells);
 
   Int_t iDigi=0;
 
+  
   std::map<Int_t, CbmTofCell* > singleCellMap;
-
-  CbmTofCell* singlecell;
+  CbmTofCell* singlecell; 
 
   for ( fCellMapIt=fCellMap.begin(); fCellMapIt!=fCellMap.end(); fCellMapIt++) {
 
@@ -482,10 +484,9 @@ void CbmTofCreateDigiPar::FillDigiPar()
       x+=tofcell->GetX();
       y+=tofcell->GetY();
       z+=tofcell->GetZ();
-      sizex+=tofcell->GetSizex();
-      sizey+=tofcell->GetSizey();
+      sizex+=2.*tofcell->GetSizex(); //nh: factor 2 
+      sizey+=2.*tofcell->GetSizey();
     }
-
 
     CellX->AddAt(x/vcell.size(),iDigi);
     CellY->AddAt(y/vcell.size(),iDigi);
@@ -493,24 +494,24 @@ void CbmTofCreateDigiPar::FillDigiPar()
     CellDx->AddAt(sizex/vcell.size(),iDigi);
     CellDy->AddAt(sizey/vcell.size(),iDigi);
 
-
-/*
-     singlecell = new CbmTofCell(cellId, x/vcell.size(), y/vcell.size(), z/vcell.size(),
+    /**/
+    singlecell = new CbmTofCell(cellId, x/vcell.size(), y/vcell.size(), z/vcell.size(),
         sizex/vcell.size(),sizey/vcell.size());
-
     singleCellMap.insert( std::pair<Int_t, CbmTofCell*>(cellId, singlecell));
-*/
+    /**/
 
     fRegion=fGeoHandler->GetRegion(cellId);
+    fSMType=fGeoHandler->GetSMType(cellId);
     fSModule=fGeoHandler->GetSModule(cellId);
     fCounter=fGeoHandler->GetCounter(cellId);
     fCell=fGeoHandler->GetCell(cellId);
 
-/*
-     fout << fRegion <<"   "<< fCounter <<"   "<< fSModule <<"   "<< fCell
+    if (0) {
+    cout<<"FillDigiPar "<<iDigi<<", cellId = "<<cellId
+        <<", t "<< fSMType <<"  m "<< fSModule <<"  c "<< fCounter <<"  s "<< fCell
         <<"   "<< x/vcell.size()*10 <<"   "<< y/vcell.size()*10 <<"   "<< z/vcell.size()*10
-        <<"   "<<sizex/vcell.size()*20 <<"   "<< sizey/vcell.size()*20<<"\n";
-*/
+        <<"   "<<sizex/vcell.size()*10 <<"   "<< sizey/vcell.size()*10<<"\n";
+    }
     iDigi++;
   }
 
@@ -522,7 +523,7 @@ void CbmTofCreateDigiPar::FillDigiPar()
   fDigiPar->SetCellZArray(*CellZ);
   fDigiPar->SetCellDxArray(*CellDx);
   fDigiPar->SetCellDyArray(*CellDy);
-//  fDigiPar->SetCellMap(singleCellMap);
+  fDigiPar->SetCellMap(singleCellMap);
 
 }
 

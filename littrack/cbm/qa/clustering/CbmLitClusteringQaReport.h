@@ -47,8 +47,28 @@ private:
     */
    string PrintNofObjects() const;
 
+   string PrintMuchAcuracy() const;
+
    void DrawHistogramsByPattern(
          const string& histNamePattern);
+
+   void DrawLogYHistogramsByPattern(
+            const string& histNamePattern);
+
+   void DrawH2HistogramsByPattern(
+         const string& histNamePattern);
+   void DrawHistogramsByLayer(const string& histNamePattern, const string& histName);
+
+   void DrawNofObjectsHistigrams(
+         const string& histNamePatternPixelHits,
+         const string& histNamePatternPoints,
+         const string& histNamePatternClusters,
+         const string& histNamePatternDigis,
+         const string& histName);
+
+   void DrawResidualHistogrms();
+
+   void ScaleHistogramsByNofEvents();
 
    ClassDef(CbmLitClusteringQaReport, 1)
 };

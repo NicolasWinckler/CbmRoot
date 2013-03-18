@@ -43,13 +43,6 @@ CbmMvdGeoCl.cxx
 CbmMvdClustering.cxx
 CbmMvdClusteringNoCharges.cxx
 CbmMuchClusteringQa0.cxx
-qa/clustering/CbmMuchClusteringQa.cxx
-qa/clustering/CbmMuchClusteringQaCalculator.cxx
-qa/clustering/CbmMuchClusteringQaDraw.cxx
-qa/clustering/CbmMuchClusteringQaHistCreator.cxx
-qa/clustering/CbmMuchClusteringQaPTreeCreator.cxx
-qa/clustering/CbmMuchClusteringQaReport.cxx
-qa/clustering/CbmMuchClusteringQaStudyReport.cxx
 )
 
 set(CLUSTERING_HEADERS
@@ -63,7 +56,6 @@ CbmMuchTest.h
 CbmMvdClustering.h
 CbmMvdClusteringNoCharges.h
 CbmMuchClusteringQa0.h
-qa/clustering/CbmMuchClusteringQa.h
 )
 
 if(RULE_CHECKER_FOUND)

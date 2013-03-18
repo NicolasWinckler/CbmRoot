@@ -2,7 +2,8 @@
 // -----                     CbmTofPoint header file                   -----
 // -----                 Created 28/07/04  by V. Friese                -----
 // -------------------------------------------------------------------------
-
+// modified 23/10/2012 nh
+//
 /**  CbmTofPoint.h
  *@author V. Friese
  **

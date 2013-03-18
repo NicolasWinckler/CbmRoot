@@ -17,7 +17,8 @@ using std::endl;
 CbmTofHit::CbmTofHit()
   : CbmPixelHit(),
     fTime(0.),
-    fFlag(1)
+    fFlag(1),
+    fChannel(0)
 {
   SetType(kTOFHIT);
 }
@@ -25,10 +26,11 @@ CbmTofHit::CbmTofHit()
 
 // -----   Standard constructor   ------------------------------------------
 
-CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time, Int_t flag)
+CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time, Int_t flag, Int_t channel)
   : CbmPixelHit(detID, pos, dpos, 0., index),
     fTime(time),
-    fFlag(flag)
+    fFlag(flag),
+    fChannel(channel)
 {
   SetType(kTOFHIT);
 }
@@ -63,6 +65,8 @@ void CbmTofHit::Print() const
   cout << "    Time: " << GetTime() << " ns"
        << endl;
   cout << "    Flag: " << GetFlag()
+       << endl;  
+  cout << "    Channel: " << GetCh()
        << endl;
 }
 // -------------------------------------------------------------------------

@@ -80,6 +80,11 @@ public:
   void SetSigmaMirror(Double_t sigMirror) {fSigmaMirror = sigMirror;}
 
   /**
+   * \brief Set cross talk probability.
+   */
+  void SetCrossTalkHitProb(Double_t ct) {fCrossTalkHitProb = ct;}
+
+  /**
    * \brief Adds a RichHit to the HitCollection.
    * \param posHit Hit position.
    * \param posHitErr Hit errors.

@@ -75,7 +75,7 @@ CbmRichProtHitProducer::CbmRichProtHitProducer():
    fNHits(0),
    fNDoubleHits(0),
    fNofCrossTalkHits(0),// = 0; // posF: 10.2% (20*10.2%=2.04hits), posH: 9,8% (20*9,8%=1.96hits) ==> in fCrossTalkHitProb
-   fCrossTalkHitProb(0.),
+   fCrossTalkHitProb(0.02),
    fNRefrac(0.),
    fDetection(0),
    fNEvents(0),
@@ -268,7 +268,7 @@ InitStatus CbmRichProtHitProducer::Init()
    if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16) {
       fPhotomulRadius = 0.6125;
       fPhotomulDist = 0.25;//0.25; // corresponds to 2mm spacing
-      fCrossTalkHitProb = 0.02; // posF: 10.2%, posH: 9,8%, that is 2 percent in direct neighbours and 0.5% in diagonal neighbours
+     // fCrossTalkHitProb = 0.02; // posF: 10.2%, posH: 9,8%, that is 2 percent in direct neighbours and 0.5% in diagonal neighbours
    }
    if (fDetType == 3) {
       fPhotomulRadius = 0.8;

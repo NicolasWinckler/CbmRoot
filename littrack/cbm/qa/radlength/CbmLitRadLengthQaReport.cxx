@@ -42,12 +42,10 @@ void CbmLitRadLengthQaReport::Draw()
    DrawDetector("Much");
    DrawDetector("Tof");
 
-   DrawH1ByPattern("hrl_RadThickness_Trd_.+_.+_H1");
-   DrawP2ByPattern("hrl_RadThickness_Trd_.+_.+_P2");
-   DrawH1ByPattern("hrl_Thickness_Trd_.+_.+_H1");
-   DrawP2ByPattern("hrl_Thickness_Trd_.+_.+_P2");
-   DrawH1ByPattern("hrl_ThicknessSilicon_Trd_.+_.+_H1");
-   DrawP2ByPattern("hrl_ThicknessSilicon_Trd_.+_.+_P2");
+   DrawDetectorStation("Mvd");
+   DrawDetectorStation("Sts");
+   DrawDetectorStation("Trd");
+   DrawDetectorStation("Much");
 }
 
 void CbmLitRadLengthQaReport::DrawDetector(
@@ -82,6 +80,17 @@ void CbmLitRadLengthQaReport::DrawDetector(
       TCanvas* canvas6 = CreateCanvas(string("hrl_ThicknessSilicon_" + detName + "_P2").c_str(), string("hrl_ThicknessSilicon_" + detName + "_P2").c_str(), 1200, 1000);
       DrawH2(HM()->P2("hrl_ThicknessSilicon_" + detName + "_P2"));
    }
+}
+
+void CbmLitRadLengthQaReport::DrawDetectorStation(
+      const string& detName)
+{
+   DrawH1ByPattern("hrl_RadThickness_" + detName + "_.+_H1");
+   DrawP2ByPattern("hrl_RadThickness_" + detName + "_.+_P2");
+   DrawH1ByPattern("hrl_Thickness_" + detName + "_.+_H1");
+   DrawP2ByPattern("hrl_Thickness_" + detName + "_.+_P2");
+   DrawH1ByPattern("hrl_ThicknessSilicon_" + detName + "_.+_H1");
+   DrawP2ByPattern("hrl_ThicknessSilicon_" + detName + "_.+_P2");
 }
 
 void CbmLitRadLengthQaReport::DrawH1ByPattern(

@@ -5,21 +5,12 @@
  **/
 
 #include "base/CbmLitTrackingGeometryConstructor.h"
-
 #include "base/CbmLitFieldGridCreator.h"
-#include "utils/CbmLitComparators.h"
-#include "utils/CbmLitUtils.h"
+#include "std/utils/CbmLitUtils.h"
 
+#include "CbmHistManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "CbmStsStation.h"
-#include "CbmGeoStsPar.h"
-#include "CbmStsDigiScheme.h"
-#include "CbmMuchGeoScheme.h"
-#include "CbmGeoMuchPar.h"
-#include "CbmMuchStation.h"
-#include "CbmMuchLayer.h"
-#include "CbmMuchModule.h"
 
 #include "TGeoManager.h"
 #include "TGeoVolume.h"
@@ -31,22 +22,24 @@
 #include "TGeoSphere.h"
 #include "TGeoArb8.h"
 #include "TGeoPgon.h"
-
-#include "TRandom.h"
+#include "TProfile2D.h"
 
 #include <set>
+#include <map>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 
 using std::set;
-using lit::ToString;
+using std::cout;
+using std::map;
 
 CbmLitTrackingGeometryConstructor::CbmLitTrackingGeometryConstructor():
    fGeo(NULL),
    fNofTrdStations(-1),
    fNofMuchStations(-1),
-   fNofMvdStations(-1)
+   fNofMvdStations(-1),
+   fNofStsStations(-1)
 {
 	fGeo = gGeoManager;
 }
@@ -62,19 +55,19 @@ CbmLitTrackingGeometryConstructor* CbmLitTrackingGeometryConstructor::Instance()
 }
 
 void CbmLitTrackingGeometryConstructor::GetMuchLayoutVec(
-   lit::parallel::LitDetectorLayoutMuonVec& layout)
+   lit::parallel::LitDetectorLayoutVec& layout)
 {
    GetMuchLayout(layout);
 }
 
 void CbmLitTrackingGeometryConstructor::GetMuchLayoutScal(
-   lit::parallel::LitDetectorLayoutMuonScal& layout)
+   lit::parallel::LitDetectorLayoutScal& layout)
 {
    GetMuchLayout(layout);
 }
 
 template<class T> void CbmLitTrackingGeometryConstructor::GetMuchLayout(
-   lit::parallel::LitDetectorLayoutMuon<T>& layout)
+   lit::parallel::LitDetectorLayout<T>& layout)
 {
 //   std::cout << "Getting detector layout for parallel MUCH tracking..." << std::endl;
 //
@@ -182,107 +175,86 @@ template<class T> void CbmLitTrackingGeometryConstructor::GetMuchLayout(
 }
 
 void CbmLitTrackingGeometryConstructor::GetTrdLayoutVec(
-   lit::parallel::LitDetectorLayoutElectronVec& layout)
+   lit::parallel::LitDetectorLayoutVec& layout)
 {
    GetTrdLayout(layout);
 }
 
 void CbmLitTrackingGeometryConstructor::GetTrdLayoutScal(
-   lit::parallel::LitDetectorLayoutElectronScal& layout)
+   lit::parallel::LitDetectorLayoutScal& layout)
 {
    GetTrdLayout(layout);
 }
 
 template<class T>
 void CbmLitTrackingGeometryConstructor::GetTrdLayout(
-   lit::parallel::LitDetectorLayoutElectron<T>& layout)
+   lit::parallel::LitDetectorLayout<T>& layout)
 {
-//   cout << "Getting TRD layout for parallel version of tracking..." << endl;
-//
-//   CbmLitFieldGridCreator gridCreator;
-//   CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
-//   const std::vector<CbmLitMaterialInfo>& trdMaterial = geoConstructor->GetMyTrdGeoNodes();
-//   const std::vector<CbmLitMaterialInfo>& richMaterial = geoConstructor->GetMyRichGeoNodes();
-//
-//   TrdLayout();
-//   const CbmLitDetectorLayout& trdLayout = GetTrdLayout();
-//   cout << trdLayout.ToString();
-//
-//   // Add virtual planes
-//   int richMatCnt = 0;
-//   for (int nvp = 0; nvp < 33; nvp++) {
-//      lit::parallel::LitVirtualPlaneElectron<T> virtualPlane;
-//      float DZ = 10.;
-//      float Z = 100. + nvp * DZ;
-//
-//      lit::parallel::LitFieldGrid fieldGrid, fieldGridMid;
-//      gridCreator.CreateGrid(Z, fieldGrid);
-//      gridCreator.CreateGrid(Z + DZ/2., fieldGridMid);
-//
-//      CbmLitMaterialInfo mat;
-//      lit::parallel::LitMaterialInfo<T> m;
-//      if (nvp >= 10 && nvp <= 15) { // Add RICH material
-//         mat = richMaterial[richMatCnt++];
-//         m.Thickness = mat.GetLength();
-//      } else { // Add air
-//         mat = trdMaterial[5]; //air material
-//         m.Thickness = DZ;//mat.GetLength();
-//      }
-//      m.A = mat.GetA();
-//      m.Z = mat.GetZ();
-//      m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
-//            16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
-//      m.Rho = mat.GetRho();
-//      m.X0 = mat.GetRL();
-//      m.Zpos = Z + DZ;//mat.GetZpos();
-//      m.CalculateValues();
-//
-//      virtualPlane.SetZ(Z);
-//      virtualPlane.SetFieldGrid(fieldGrid);
-//      virtualPlane.SetFieldGridMid(fieldGridMid);
-//      virtualPlane.SetMaterial(m);
-//
-//      layout.AddVirtualPlane(virtualPlane);
-//   }
-//   // end add virtual planes
-//
-//   for (int isg = 0; isg < trdLayout.GetNofStationGroups(); isg++) {
-//      const CbmLitStationGroup& stationGroup = trdLayout.GetStationGroup(isg);
-//      lit::parallel::LitStationGroupElectron<T> sg;
-//
-//      for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-//         const CbmLitStation& station = stationGroup.GetStation(ist);
-//
-//         for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
-//            const CbmLitSubstation& substation = station.GetSubstation(iss);
-//            lit::parallel::LitStationElectron<T> st;
-//            st.SetZ(substation.GetZ());
-//
-//            int matId = TrdMaterialId(isg, ist, trdLayout);
-//            for (int im = 0; im < 6; im++) {
-//               CbmLitMaterialInfo mat = trdMaterial[matId + im];
-//               lit::parallel::LitMaterialInfo<T> m;
-//               m.A = mat.GetA();
-//               m.Z = mat.GetZ();
-//               m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
-//                     16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
-//               m.Rho = mat.GetRho();
-//               m.Thickness = mat.GetLength();
-//               m.X0 = mat.GetRL();
-//               m.Zpos = mat.GetZpos();
-//               m.CalculateValues();
-//
-//               if (im < 3) { st.AddMaterialBefore(m); }
-//               else { st.AddMaterialAfter(m); }
-//            }
-//
-//            sg.AddStation(st);
-//         } // loop over substations
-//      } // loop over stations
-//      layout.AddStationGroup(sg);
-//   } // loop over station groups
-//   cout << layout;
-//   cout << "Finish getting TRD layout for parallel version of tracking..." << endl;
+   cout << "Getting TRD layout for parallel version of tracking...\n";
+
+   // Read file with TProfile2D containing silicon equivalent of the material
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TString matBudgetFile = parDir + "/littrack/trd.silicon.root";
+   TFile* file = new TFile(matBudgetFile);
+   CbmHistManager hm;
+   hm.ReadFromFile(file);
+
+   CbmLitFieldGridCreator gridCreator;
+
+   Double_t startZPosition = 100.;// Last STS station
+//   Double_t detectorZPosition = 400.; // We want to extrapolate up to here using virtual stations
+   Double_t dZ = 10.; // Distance between neighboring virtual stations
+
+   // Virtual stations
+   Int_t nofVirtualStations = 30;
+   for (Int_t iStation = 0; iStation < nofVirtualStations; iStation++) {
+      Double_t z = startZPosition + iStation * dZ;
+      lit::parallel::LitFieldGrid fieldGrid;
+      gridCreator.CreateGrid(z, fieldGrid);
+
+      lit::parallel::LitStation<T> station;
+      station.SetZ(z);
+      station.SetField(fieldGrid);
+
+      layout.AddVirtualStation(station);
+   }
+
+   // Stations
+   Int_t nofStations = GetNofTrdStations();
+   for (Int_t iStation = 0; iStation < nofStations; iStation++) {
+      // Convert material for this station
+      TProfile2D* profile = hm.P2("hrl_ThicknessSilicon_Trd_" + lit::ToString<Int_t>(iStation) + "_P2");
+      lit::parallel::LitMaterialGrid material;
+      ConvertTProfile2DToLitMaterialGrid(profile, &material);
+
+      lit::parallel::LitStation<T> station;
+      station.SetMaterial(material);
+
+      layout.AddStation(station);
+   }
+
+   cout << "Finish getting TRD layout for parallel version of tracking\n";
+}
+
+void CbmLitTrackingGeometryConstructor::ConvertTProfile2DToLitMaterialGrid(
+      const TProfile2D* profile,
+      lit::parallel::LitMaterialGrid* grid)
+{
+   Int_t nofBinsX = profile->GetNbinsX();
+   Int_t nofBinsY = profile->GetNbinsY();
+   vector<vector<fscal> >material(nofBinsX);
+   for (Int_t i = 0; i < nofBinsX; i++) material[i].resize(nofBinsY);
+   for (Int_t iX = 1; iX <= nofBinsX; iX++) {
+      for (Int_t iY = 1; iY <= nofBinsY; iY++) {
+         Double_t content = profile->GetBinContent(iX, iY);
+         material[iX - 1][iY - 1] = content;
+      }
+   }
+   Double_t xmin = profile->GetXaxis()->GetXmin();
+   Double_t xmax = profile->GetXaxis()->GetXmax();
+   Double_t ymin = profile->GetYaxis()->GetXmin();
+   Double_t ymax = profile->GetYaxis()->GetXmax();
+   grid->SetMaterial(material, xmin, xmax, ymin, ymax, nofBinsX, nofBinsY);
 }
 
 
@@ -353,14 +325,112 @@ Int_t CbmLitTrackingGeometryConstructor::GetNofMvdStations()
    static Bool_t firstTime = true;
    if (firstTime) {
       fNofMvdStations = 0;
-      TObjArray* nodes = gGeoManager->GetTopVolume()->FindNode("pipevac1_0")->GetNodes();
-      for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-         TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-         if (TString(node->GetName()).Contains("mvdstation")) {
-            fNofMvdStations++;
+      TGeoNode* topNode = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+      if (topNode) {
+         TObjArray* nodes = topNode->GetNodes();
+         for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+            TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+            if (TString(node->GetName()).Contains("mvdstation")) {
+               fNofMvdStations++;
+            }
          }
       }
       firstTime = false;
    }
    return fNofMvdStations;
+}
+
+Int_t CbmLitTrackingGeometryConstructor::GetNofStsStations()
+{
+   static Bool_t firstTime = true;
+   if (firstTime) {
+      fNofStsStations = 0;
+      TObjArray* nodes = gGeoManager->GetTopVolume()->GetNodes();
+      for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+         TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+         if (TString(node->GetName()).Contains("STS_")) { // Top STS node
+            fNofStsStations = node->GetNodes()->GetEntriesFast();
+            break;
+         }
+      }
+      firstTime = false;
+   }
+   return fNofStsStations;
+}
+
+Int_t CbmLitTrackingGeometryConstructor::ConvertTrdToAbsoluteStationNr(
+      Int_t station,
+      Int_t layer)
+{
+   static Bool_t firstTime = true;
+   static vector<Int_t> sumOfLayers;
+   if (firstTime) {
+      map<Int_t, set<Int_t> > stationLayerId;
+      TObjArray* topNodes = fGeo->GetTopNode()->GetNodes();
+      Int_t nofTopNodes = topNodes->GetEntriesFast();
+      for (Int_t iTopNode = 0; iTopNode < nofTopNodes; iTopNode++) {
+         TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
+         if (TString(topNode->GetName()).Contains("trd")) {
+            TObjArray* modules = topNode->GetNodes();
+            for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
+               TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
+               TString moduleName = module->GetName();
+               Int_t stationId = 0;
+               Int_t layerId = 0;
+               if (moduleName.Contains(TRegexp("trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]$"))) { // trd_v10b and trd_v11c
+                  stationId = std::atoi(string(1, moduleName[3]).c_str()); // 3rd element is station number
+                  layerId = std::atoi(string(1, moduleName[9]).c_str()); // 9th element is layer number
+               } else if (moduleName.Contains(TRegexp("trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]"))) { // trd_v12x and trd_v13x
+                  stationId = std::atoi(string(1, moduleName[9]).c_str()); // 9th element is station number
+                  layerId = std::atoi(string(1, moduleName[10]).c_str()); // 10th element is layer number
+               }
+               stationLayerId[stationId].insert(layerId);
+            }
+         }
+      }
+      map<Int_t, set<Int_t> >::const_iterator it;
+      Int_t sum = 0;
+      sumOfLayers.push_back(0);
+      for (it = stationLayerId.begin(); it != stationLayerId.end(); it++) {
+         sum += (*it).second.size();
+         sumOfLayers.push_back(sum);
+      }
+      firstTime = false;
+   }
+   return sumOfLayers[station] + layer;
+}
+
+Int_t CbmLitTrackingGeometryConstructor::ConvertMuchToAbsoluteStationNr(
+      Int_t station,
+      Int_t layer)
+{
+   static Bool_t firstTime = true;
+   static vector<Int_t> sumOfLayers;
+   if (firstTime) {
+      fNofMuchStations = 0;
+      const TGeoNode* much = static_cast<const TGeoNode*>(fGeo->GetTopNode()->GetNodes()->FindObject("much_0"));
+      if (NULL == much) { // No MUCH detector return 0
+         firstTime = false;
+         return 0;
+      }
+      map<Int_t, Int_t> nofLayersPerStation;
+      TObjArray* muchNodes = much->GetNodes();
+      for (Int_t iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
+         const TGeoNode* muchNode = static_cast<const TGeoNode*>(muchNodes->At(iMuchNode));
+         if (TString(muchNode->GetName()).Contains("station")) {
+            Int_t station = std::atoi(string(muchNode->GetName() + 11, 2).c_str()) - 1;
+            TObjArray* layerNodes = muchNode->GetNodes();
+            nofLayersPerStation[station] = layerNodes->GetEntriesFast();
+         }
+      }
+      map<Int_t, Int_t>::const_iterator it;
+      Int_t sum = 0;
+      sumOfLayers.push_back(0);
+      for (it = nofLayersPerStation.begin(); it != nofLayersPerStation.end(); it++) {
+         sum += (*it).second;
+         sumOfLayers.push_back(sum);
+      }
+      firstTime = false;
+   }
+   return sumOfLayers[station] + layer;
 }

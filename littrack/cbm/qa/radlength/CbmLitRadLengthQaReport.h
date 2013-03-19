@@ -51,6 +51,12 @@ protected:
          const string& detName);
 
    /**
+    * \brief
+    */
+   void DrawDetectorStation(
+         const string& detName);
+
+   /**
     * \brief Draw TProfile2D by pattern name.
     */
    void DrawP2ByPattern(

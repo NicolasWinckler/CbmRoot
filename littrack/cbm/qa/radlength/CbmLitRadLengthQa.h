@@ -46,7 +46,7 @@ public:
      */
     virtual void Finish();
 
-    /** Setters */
+    /* Setters */
     void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
 
 private:
@@ -70,15 +70,59 @@ private:
           const string& detName);
 
     /**
-     * \brief Exec specific to TRD radiation thickness calculation.
+     * \brief Exec additional radiation thickness calculation for tracking detectors.
+     * \param[in] detName Name of the detector (Mvd, Sts, Much, Trd).
+     * \param[in] getStationId Pointer to the function which return station ID by full path to the node.
      */
-    void ExecTrd();
+    void ExecDetector(
+          const string& detName,
+          Int_t (*getStationId)(const TString&));
 
-    void FillHistosTrd(
-          const map<Int_t, map<Int_t, map<Int_t, Double_t> > >& map,
+    void FillHistosDetector(
+          const map<Int_t, map<Int_t, Double_t> >& map,
           const string& histName,
           Double_t x,
           Double_t y);
+
+    /**
+     * \brief Return MVD station ID by path to the node or -1 in case node does not exists.
+     * \param[in] nodePath Full path to the node.
+     * \return MVD station ID by path to the node or -1 in case node does not exists.
+     */
+    static Int_t GetMvdStationId(
+          const TString& nodePath);
+
+    /**
+     * \brief Return STS station ID by path to the node or -1 in case node does not exists.
+     * \param[in] nodePath Full path to the node.
+     * \return STS station ID by path to the node or -1 in case node does not exists.
+     */
+    static Int_t GetStsStationId(
+          const TString& nodePath);
+
+    /**
+     * \brief Return TRD station ID by path to the node or -1 in case node does not exists.
+     * \param[in] nodePath Full path to the node.
+     * \return TRD station ID by path to the node or -1 in case node does not exists.
+     */
+    static Int_t GetTrdStationId(
+          const TString& nodePath);
+
+    /**
+     * \brief Return MUCH station ID by path to the node or -1 in case node does not exists.
+     * \param[in] nodePath Full path to the node.
+     * \return MUCH station ID by path to the node or -1 in case node does not exists.
+     */
+    static Int_t GetMuchStationId(
+          const TString& nodePath);
+
+    /**
+     * \brief Save silicon equivalent histograms to a separate files for each detector.
+     */
+    void SaveMaterialBudgetToFile();
+
+    void SaveDetectorMaterialBudgetToFile(
+          const string& detName);
 
     // Material properties of silicon
     static const Double_t SILICON_DENSITY = 2.33; // g*cm^-3

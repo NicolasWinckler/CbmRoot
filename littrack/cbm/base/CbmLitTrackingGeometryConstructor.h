@@ -1,5 +1,5 @@
 /**
-- * \file CbmLitTrackingGeometryConstructor.h
+ * \file CbmLitTrackingGeometryConstructor.h
  * \brief Tracking geometry constructor.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2008
@@ -10,12 +10,14 @@
 
 #include "TObject.h"
 
-#include "parallel/muon/LitDetectorLayoutMuon.h"
-#include "parallel/electron/LitDetectorGeometryElectron.h"
+#include "parallel/LitDetectorLayout.h"
+#include "parallel/LitMaterialGrid.h"
 
 #include <string>
 
 class TGeoManager;
+class CbmTrdGeoHandler;
+class TProfile2D;
 
 class CbmLitTrackingGeometryConstructor
 {
@@ -30,37 +32,41 @@ public:
     * \brief Return MUCH detector layout for parallel MUCH tracking in SIMD format.
     * \param[out] layout MUCH detector layout.
     */
-   void GetMuchLayoutVec(lit::parallel::LitDetectorLayoutMuonVec& layout);
+   void GetMuchLayoutVec(lit::parallel::LitDetectorLayoutVec& layout);
 
    /**
     * \brief Return MUCH detector layout for parallel MUCH tracking in scalar format.
     * \param[out] layout MUCH detector layout.
     */
-   void GetMuchLayoutScal(lit::parallel::LitDetectorLayoutMuonScal& layout);
+   void GetMuchLayoutScal(lit::parallel::LitDetectorLayoutScal& layout);
 
    /**
     * \brief Return MUCH detector layout for parallel MUCH tracking.
     * \param[out] layout MUCH detector layout.
     */
-   template<class T> void GetMuchLayout(lit::parallel::LitDetectorLayoutMuon<T>& layout);
+   template<class T> void GetMuchLayout(lit::parallel::LitDetectorLayout<T>& layout);
 
    /**
     * \brief Return TRD detector layout for TRD parallel tracking in SIMD format.
     * \param[out] layout TRD detector layout.
     */
-   void GetTrdLayoutVec(lit::parallel::LitDetectorLayoutElectronVec& layout);
+   void GetTrdLayoutVec(lit::parallel::LitDetectorLayoutVec& layout);
 
    /**
     * \brief Return TRD detector layout for TRD parallel tracking in scalar format.
     * \param[out] layout TRD detector layout.
     */
-   void GetTrdLayoutScal(lit::parallel::LitDetectorLayoutElectronScal& layout);
+   void GetTrdLayoutScal(lit::parallel::LitDetectorLayoutScal& layout);
 
    /**
     * \brief Return TRD detector layout for TRD parallel tracking.
     * \param[out] layout TRD detector layout.
     */
-   template<class T> void GetTrdLayout(lit::parallel::LitDetectorLayoutElectron<T>& layout);
+   template<class T> void GetTrdLayout(lit::parallel::LitDetectorLayout<T>& layout);
+
+   void ConvertTProfile2DToLitMaterialGrid(
+         const TProfile2D* profile,
+         lit::parallel::LitMaterialGrid* grid);
 
    /**
     * \brief Return number of stations in TRD.
@@ -85,6 +91,26 @@ public:
     * \return Number of stations in MVD.
     */
    Int_t GetNofMvdStations();
+
+   /**
+    * \brief Return number of stations in STS.
+    * \return Number of stations in STS.
+    */
+   Int_t GetNofStsStations();
+
+   /**
+    *
+    */
+   Int_t ConvertTrdToAbsoluteStationNr(
+         Int_t station,
+         Int_t layer);
+
+   /**
+    *
+    */
+   Int_t ConvertMuchToAbsoluteStationNr(
+         Int_t station,
+         Int_t layer);
 
 private:
    /**
@@ -113,6 +139,7 @@ private:
    Int_t fNofTrdStations; // Number of TRD stations
    Int_t fNofMuchStations; // Number of MUCH stations
    Int_t fNofMvdStations; // Number of MVD stations
+   Int_t fNofStsStations; // Number of STS stations
 };
 
 #endif /* CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_ */

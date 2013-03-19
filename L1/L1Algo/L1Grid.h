@@ -110,7 +110,7 @@ inline void L1Grid::Create( float yMin, float yMax, float zMin, float zMax, floa
 
   unsigned int Nold = fN;
   fN = fNy * fNz;
-
+  
   if (Nold < fN || Nold == 0) {
     delete[] fFirstHitInBin; 
     fFirstHitInBin = new THitI[fN+1]; // one extra bin is needed by area to determine number of hits in the last bin
@@ -128,6 +128,8 @@ inline void L1Grid::Fill( const L1HitPoint* points, THitI n ) // call after sort
     lastBin = currBin;
   }
   memset( fFirstHitInBin + lastBin + 1, n, fN - lastBin );
+  // for( THitI i = 0; i < fN+1; i++ ) cout << fFirstHitInBin[i] << " ";
+  // cout << endl;
 }
 
 inline int L1Grid::GetBin( float Y, float Z ) const

@@ -77,7 +77,7 @@ inline L1HitArea::L1HitArea( const L1Grid & grid, float y, float z, float dy, fl
   //   << "fIh:      " << fIh << "\n"
   //   << "fNy:      " << fNy << "\n"
   //   << "Nz " << fGrid.Nz() << std::endl;
-  L1_ASSERT ( fIndYmin + fBDY < fGrid.N()+1, fIndYmin + fBDY << " < " << fGrid.N());
+  L1_ASSERT ( fIndYmin + fBDY < fGrid.N()+1, fIndYmin << " + " << fBDY << " < " << fGrid.N());
 }
 
 inline bool L1HitArea::GetNext( THitI& i )
@@ -105,7 +105,8 @@ inline bool L1HitArea::GetNext( THitI& i )
     needNextZ = yIndexOutOfRange && !nextZIndexOutOfRange;
   }
 
-  L1_ASSERT ( fIh < fGrid.FirstHitInBin(fGrid.N()-1) || yIndexOutOfRange, fIh << " < " << fGrid.FirstHitInBin(fGrid.N()-1) << " || " <<  yIndexOutOfRange);
+  L1_ASSERT ( fIh < fGrid.FirstHitInBin(fGrid.N()) || yIndexOutOfRange, fIh << " < " << fGrid.FirstHitInBin(fGrid.N()-1) << " || " <<  yIndexOutOfRange);
+  
   i = fIh; // return
   fIh++; // go to next
   return !yIndexOutOfRange;

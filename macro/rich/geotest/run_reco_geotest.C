@@ -1,5 +1,5 @@
 
-void run_reco_geotest(Int_t nEvents = 10)
+void run_reco_geotest(Int_t nEvents = 1000)
 {
    TTree::SetMaxTreeSize(90000000000);
    TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -8,7 +8,7 @@ void run_reco_geotest(Int_t nEvents = 10)
    TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richgeotest/";
    TString inFile = outDir + "mc.0000.root";
    TString parFile = outDir + "param.0000.root";
-   TString outFile = outDir + "reco.0000.root";
+   TString outFile = outDir + "reco.00000.root";
    std::string resultDir = "results/";
    std::string richDetectorType = "standard"; // "standard" or "prototype"
 
@@ -58,10 +58,11 @@ void run_reco_geotest(Int_t nEvents = 10)
 
    } else if (richDetectorType == "standard"){
       CbmRichHitProducer* richHitProd  = new CbmRichHitProducer();
-      richHitProd->SetDetectorType(4);
+      richHitProd->SetDetectorType(6);
       richHitProd->SetNofNoiseHits(220);
       richHitProd->SetCollectionEfficiency(1.0);
       richHitProd->SetSigmaMirror(0.06);
+      //richHitProd->SetCrossTalkHitProb(0.02);
       run->AddTask(richHitProd);
 
       CbmRichReconstruction* richReco = new CbmRichReconstruction();
@@ -89,7 +90,6 @@ void run_reco_geotest(Int_t nEvents = 10)
    rtdb->saveOutput();
 
    run->Init();
-   cout << "Starting run" << endl;
    run->Run(0,nEvents);
 
    // -----   Finish   -------------------------------------------------------

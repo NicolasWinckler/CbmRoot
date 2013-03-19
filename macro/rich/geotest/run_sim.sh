@@ -24,18 +24,18 @@ export FIELD_MAP_SCALE=1.0
 #number of events for each thread
 export NEVENTS=10000
 
-for Z in 1; do
+for Z in 0; do
    export DIR=/Users/slebedev/Development/cbm/data/simulations/richgeotest/
    
-   export RICH_GEO_TEST_RESULT_DIR=test2_bel_results${Z}/
+   export RICH_GEO_TEST_RESULT_DIR=results_tdr${Z}/
    mkdir -p ${RICH_GEO_TEST_RESULT_DIR}
 
-   export MC_FILE=${DIR}/test2.bel.mc.000${Z}.root
-   export PAR_FILE=${DIR}/test2.bel.param.000${Z}.root
-   export RECO_FILE=${DIR}/test2.bel.reco.000${Z}.root  
+   export MC_FILE=${DIR}/tdr.mc.000${Z}.root
+   export PAR_FILE=${DIR}/tdr.param.000${Z}.root
+   export RECO_FILE=${DIR}/tdr.reco.000${Z}.root  
    
-  # ./sim.sh
-   xterm -hold -e ". ./sim.sh"&
+   ./sim.sh
+  # xterm -hold -e ". ./sim.sh"&
  #  bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
    
 

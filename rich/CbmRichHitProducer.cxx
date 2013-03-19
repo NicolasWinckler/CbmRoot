@@ -257,7 +257,7 @@ void CbmRichHitProducer::Exec(
 
    // Set photodetector quantum efficiency
    Double_t lambda_min,lambda_max,lambda_step;
-   Double_t efficiency[50];
+   Double_t efficiency[100];
    SetPhotoDetPar(fDetType,lambda_min,lambda_max,lambda_step,efficiency);
 
    fRichHits->Clear();
@@ -762,7 +762,7 @@ void CbmRichHitProducer::SetPhotoDetPar(
       // H8500C-03 (BA + UV glass)
       /**  Measured PMT efficiencies for MAPMTs at posF (BUW measurement) ##### CernOct2011 #####
             (Flat type Multianode Photomultiplier with BA cathode + UV window)
-            corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+            corresponding range in lambda: 160nm  - 700nm in steps of 10nm */
       
      fLambdaMin = 160.;
      fLambdaMax = 700.;

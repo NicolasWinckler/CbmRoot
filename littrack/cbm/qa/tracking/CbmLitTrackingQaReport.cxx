@@ -166,8 +166,8 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
 			string effName = histos[histCounter]->GetName();
 			string accName = FindAndReplace(effName, "_Eff_", "_Acc_");
 			string recName = FindAndReplace(effName, "_Eff_", "_Rec_");
-			Double_t acc = HM()->H1(accName)->Integral() / nofEvents;
-			Double_t rec = HM()->H1(recName)->Integral() / nofEvents;
+			Double_t acc = HM()->H1(accName)->GetEntries() / nofEvents;
+			Double_t rec = HM()->H1(recName)->GetEntries() / nofEvents;
 			Double_t eff = (acc != 0.) ? 100. * rec / acc : 0.;
 			string accStr = NumberToString<Double_t>(acc);
 			string recStr = NumberToString<Double_t>(rec);
@@ -195,8 +195,8 @@ string CbmLitTrackingQaReport::PrintPionSuppression() const
          string psName = histos[iHist]->GetName();
          string recName = FindAndReplace(psName, "_PionSup_", "_Rec_");
          string recPionsName = FindAndReplace(psName, "_PionSup_", "_RecPions_");
-         Double_t rec = HM()->H1(recName)->Integral() / nofEvents;
-         Double_t recPions = HM()->H1(recPionsName)->Integral() / nofEvents;
+         Double_t rec = HM()->H1(recName)->GetEntries() / nofEvents;
+         Double_t recPions = HM()->H1(recPionsName)->GetEntries() / nofEvents;
          Double_t pionSup = (rec != 0.) ? recPions / rec : 0.;
          string pionSupStr = NumberToString<Double_t>(pionSup) + " (" + NumberToString<Double_t>(recPions) + "/" + NumberToString<Double_t>(rec) + ")";
          vector<string> split = Split(psName, '_');

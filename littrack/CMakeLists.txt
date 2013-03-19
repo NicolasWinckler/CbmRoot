@@ -56,14 +56,7 @@ set(LITTRACK_SRCS_RULECHECKER
    
    cbm/generators/CbmLitPolarizedGenerator.cxx
    
-   cbm/geo/CbmLitDet.cxx
-   cbm/geo/CbmLitDetContFact.cxx 
-   cbm/geo/CbmLitDetGeo.cxx 
-   cbm/geo/CbmLitDetGeoPar.cxx
-   cbm/geo/CbmLitDetPoint.cxx
-   
    cbm/qa/base/CbmLitResultChecker.cxx  
-   cbm/qa/material/CbmLitCheckMultipleScattering.cxx
    cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
    cbm/qa/material/CbmLitCheckBrem.cxx 
    cbm/qa/mc/CbmLitMCTrack.cxx
@@ -81,13 +74,7 @@ set(LITTRACK_HEADERS
    cbm/finder/CbmLitFindGlobalTracksIdeal.h
    cbm/parallel/CbmLitFitTracksParallel.h
    cbm/generators/CbmLitPolarizedGenerator.h
-   cbm/geo/CbmLitDet.h 
-   cbm/geo/CbmLitDetContFact.h
-   cbm/geo/CbmLitDetGeo.h 
-   cbm/geo/CbmLitDetGeoPar.h 
-   cbm/geo/CbmLitDetPoint.h
    cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
-   cbm/qa/material/CbmLitCheckMultipleScattering.h
    cbm/qa/material/CbmLitCheckBrem.h 
    cbm/qa/CbmLitCreateStandaloneData.h
    cbm/qa/CbmLitTestMatrixMath.h

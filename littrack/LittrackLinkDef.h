@@ -11,12 +11,6 @@
 #pragma link C++ class CbmLitFindMvdTracks+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 
-#pragma link C++ class CbmLitDetContFact;
-#pragma link C++ class CbmLitDetGeo;
-#pragma link C++ class CbmLitDetGeoPar;
-#pragma link C++ class CbmLitDet+;
-#pragma link C++ class CbmLitDetPoint+;
-
 #pragma link C++ class CbmLitTrackingQa+;
 #pragma link C++ class CbmLitClusteringQa+;
 #pragma link C++ class CbmLitFieldQa+;
@@ -25,7 +19,6 @@
 #pragma link C++ class CbmLitRadLengthQa+;
 
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
-#pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;
 #pragma link C++ class CbmLitCreateStandaloneData+;
 #pragma link C++ class CbmLitTestMatrixMath+;

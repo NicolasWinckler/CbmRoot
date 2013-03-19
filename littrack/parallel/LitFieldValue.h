@@ -11,6 +11,10 @@
 #include "LitTypes.h"
 #include "LitUtils.h"
 #include <string>
+#include <sstream>
+using std::string;
+using std::stringstream;
+using std::ostream;
 
 namespace lit {
 namespace parallel {
@@ -26,27 +30,26 @@ class LitFieldValue
 {
 public:
    /**
-    * \brief Returns std::string representation of the class.
-    * \return Class representation as std::string.
+    * \brief Return string representation of the class.
+    * \return String representation of the class.
     */
-   std::string ToString() const {
-      return "LitFieldValue: Bx=" + lit::parallel::ToString<T>(Bx)
-            + ", By=" + lit::parallel::ToString<T>(By)
-               + ", Bz=" + lit::parallel::ToString<T>(Bz) + std::endl;
+   string ToString() const {
+      stringstream ss;
+      ss << "LitFieldValue: Bx=" << Bx << ", By=" << By << ", Bz=" << Bz << "\n";
+      return ss.str();
    }
 
    /**
-    * \brief Operator << for convenient output to std::ostream.
+    * \brief Operator << for convenient output to ostream.
     * \return Insertion stream in order to be able to call a succession of insertion operations.
     */
-   friend std::ostream& operator<<(std::ostream& strm, const LitFieldValue& v) {
+   friend ostream& operator<<(ostream& strm, const LitFieldValue& v) {
       strm << v.ToString();
       return strm;
    }
 
 public:
-   // components of the magnetic field
-   T Bx, By, Bz;
+   T Bx, By, Bz; // components of the magnetic field
 } _fvecalignment;
 
 } // namespace parallel

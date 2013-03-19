@@ -1,11 +1,8 @@
 /**
  * \file LitTrackParam.h
- *
  * \brief Track parameters data class.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- *
  */
 #ifndef LITTRACKPARAM_H_
 #define LITTRACKPARAM_H_ 1
@@ -13,22 +10,24 @@
 #include "LitTypes.h"
 #include "LitUtils.h"
 
+#include <string>
+#include <sstream>
+using std::string;
+using std::stringstream;
+using std::ostream;
+
 namespace lit {
 namespace parallel {
 
 /**
  * \class LitTrackParam
- *
  * \brief Track parameters data class.
- *
- * Track parameters consist of
- * X and Y position of the track,
- * tx and ty slopes,
- * q/p charge (+1 or -1) over momentum and
- * covariance matrix of this elements.
- *
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
+ *
+ * Track parameters consist of X and Y position of the track,
+ * tx and ty slopes, q/p charge (+1 or -1) over momentum and
+ * covariance matrix of this elements.
  *
  */
 template<class T>
@@ -50,31 +49,24 @@ public:
    virtual ~LitTrackParam() {}
 
    /**
-    * \brief Returns std::string representation of the class.
-    * \return Class representation as std::string.
+    * \brief Returns string representation of the class.
+    * \return String representation of the class.
     */
-   std::string ToString() const {
-      return "LitTrackParam: X=" + lit::parallel::ToString<T>(X)
-         + " Y=" + lit::parallel::ToString<T>(Y)
-         + " Z=" + lit::parallel::ToString<T>(Z)
-         + " Tx=" + lit::parallel::ToString<T>(Tx)
-         + " Ty=" + lit::parallel::ToString<T>(Ty)
-         + " Qp=" + lit::parallel::ToString<T>(Qp) + "\n"
-         + " cov matrix[0-14]: " + lit::parallel::ToString<T>(C0) + " "
-         + lit::parallel::ToString<T>(C1) + " " + lit::parallel::ToString<T>(C2) + " "
-         + lit::parallel::ToString<T>(C3) + " " + lit::parallel::ToString<T>(C4) + " "
-         + lit::parallel::ToString<T>(C5) + " " + lit::parallel::ToString<T>(C6) + " "
-         + lit::parallel::ToString<T>(C7) + " " + lit::parallel::ToString<T>(C8) + " "
-         + lit::parallel::ToString<T>(C9) + " " + lit::parallel::ToString<T>(C10) + " "
-         + lit::parallel::ToString<T>(C11) + " " + lit::parallel::ToString<T>(C12) + " "
-         + lit::parallel::ToString<T>(C13) + " " + lit::parallel::ToString<T>(C14) + "\n";
+   string ToString() const {
+      stringstream ss;
+      ss << "LitTrackParam: X=" << X << " Y=" << Y << " Z=" << Z << " Tx=" << Tx
+         << " Ty=" << Ty << " Qp=" << Qp << "\n" << " cov matrix[0-14]: "
+         << C0 << " " << C1 << " " << C2 << " " << C3 << " " << C4 << " " << C5 << " "
+         << C6 << " " << C7 << " " << C8 << " " << C9 << " " << C10 << " " << C11 << " "
+         << C12 << " " << C13 << " " << C14 << "\n";
+      return ss.str();
    }
 
    /**
-    * \brief Operator << for convenient output to std::ostream.
+    * \brief Operator << for convenient output to ostream.
     * \return Insertion stream in order to be able to call a succession of insertion operations.
     */
-   friend std::ostream& operator<<(std::ostream& strm, const LitTrackParam& par) {
+   friend ostream& operator<<(ostream& strm, const LitTrackParam& par) {
       strm << par.ToString();
       return strm;
    }

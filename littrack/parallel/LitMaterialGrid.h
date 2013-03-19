@@ -1,13 +1,14 @@
 /**
- * \file LitFieldGrid.h
- * \brief Class stores a grid of magnetic field values in XY slice at Z position.
+ * \file LitMaterialGrid.h
+ * \brief Class stores a grid of material thickness in silicon equivalent.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
- * \date 2009
+ * \date 2013
  */
-#ifndef LITFIELDGRID_H_
-#define LITFIELDGRID_H_
 
-#include "LitFieldValue.h"
+#ifndef LITMATERIALGRID_H_
+#define LITMATERIALGRID_H_
+
+#include "LitTypes.h"
 #include <vector>
 #include <string>
 #include <sstream>
@@ -21,23 +22,15 @@ namespace lit {
 namespace parallel {
 
 /**
- * \class LitFieldGrid
- * \brief Class stores a grid of magnetic field values in XY slice at Z position.
+ * \class LitMaterialGrid
+ * \brief Class stores a grid of material thickness in silicon equivalent.
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
- * \date 2009
+ * \date 2013
  *
- * This approach is used as an alternative to
- * parabolic field approximation. It is more
- * precise - the same grid is used as
- * in the full magnetic field map. However
- * the access to the grid can not be SIMDized.
- * And the values are accessed one by one
- * and packed later to the vector.
- * But it is still fast!
- * The value of the field is calculated as a weighted
- * mean of the four surrounding values.
+ * Each object of this class stores a slice in XY for approximated material
+ * thickness in silicon equivalent.
  */
-class LitFieldGrid
+class LitMaterialGrid
 {
 public:
 
@@ -54,14 +47,14 @@ public:
    void SetZ(fscal Z) { fZ = Z; }
 
    /**
-    * \brief Set field values for the grid.
+    * \brief Set material thicknesses for the grid.
     *
     * Grid is a rectangle with
     * (xmin, ymax) as a top left corner and
     * (xmax, ymin) as a bottom right corner and
     * has a total number of bins nofBinsX*nofBinsY.
     *
-    * \param[in] field 2D vector of field values.
+    * \param[in] material 2D vector of silicon thickness.
     * \param[in] xmax Maximum X position.
     * \param[in] xmin Minimum X position.
     * \param[in] ymax Maximum Y position.
@@ -69,15 +62,15 @@ public:
     * \param[in] nofBinsX Number of bins in X.
     * \param[in] nofBinsY Number of bins in Y.
     */
-   void SetField(
-         const vector<vector<LitFieldValue<fscal> > >& field,
+   void SetMaterial(
+         const vector<vector<fscal> >& material,
          fscal xmin,
          fscal xmax,
          fscal ymin,
          fscal ymax,
          int nofBinsX,
          int nofBinsY) {
-      fField = field;
+      fMaterial = material;
       fXMin = xmin;
       fXMax = xmax;
       fYMin = ymin;
@@ -89,43 +82,39 @@ public:
    }
 
    /**
-    * \brief Return field value for (X, Y) position (scalar version).
+    * \brief Return material thickness in silicon equivalent for (X, Y) position (scalar version).
     * \param[in] x X position.
     * \param[in] y Y position.
-    * \param[out] B Field value.
+    * \return Material thickness in silicon equivalent.
     */
-   void GetFieldValue(
+   fscal GetMaterial(
       fscal x,
-      fscal y,
-      LitFieldValue<fscal> &B) const {
-      // Check bound conditions and if out of bounds return zero field values.
+      fscal y) const {
+      // Check bound conditions and if out of bounds return zero.
       // Can be removed considering performance!
       if (x < fXMin || x > fXMax || y < fYMin || y > fXMax) {
-         B.Bx = 0.;
-         B.By = 0.;
-         B.Bz = 0.;
-         return;
+         return 0.;
       }
       // Calculate bin indices for X and Y
       unsigned short ix = short((x - fXMin) / fBinSizeX);
       unsigned short iy = short((y - fYMin) / fBinSizeY);
 
-      // Check bound conditions and if out of bounds return zero field values.
+      // Check bound conditions and if out of bounds return zero.
       // Can be removed considering performance!
       if (ix < 0 || iy < 0 || ix >= fNofBinsX - 1 || iy >= fNofBinsY - 1) {
-    	  B.Bx = 0.;
-    	  B.By = 0.;
-    	  B.Bz = 0.;
-    	  return;
+        return 0.;
       }
 
-      B = fField[ix][iy];
+      return fMaterial[ix][iy];
 
-//      // Field values on the bin nodes
-//      const LitFieldValue<fscal>& v1 = fField[ix  ][iy];
-//      const LitFieldValue<fscal>& v2 = fField[ix+1][iy];
-//      const LitFieldValue<fscal>& v3 = fField[ix  ][iy+1];
-//      const LitFieldValue<fscal>& v4 = fField[ix+1][iy+1];
+      // Implementation based on the weighted mean of material thicknesses.
+
+
+//      // Material thickness on the bin nodes
+//      const fscal v1 = fMaterial[ix  ][iy];
+//      const fscal v2 = fMaterial[ix+1][iy];
+//      const fscal v3 = fMaterial[ix  ][iy+1];
+//      const fscal v4 = fMaterial[ix+1][iy+1];
 //      // Calculate weights depending on the distance to the bin nodes
 //      fscal dx1 = (x - ix * fBinSizeX - fXMin);
 //      fscal dx2 = (x - (ix + 1) * fBinSizeX - fXMin);
@@ -143,42 +132,31 @@ public:
 ////      cout << "weights: " << w1/wsum << " " << w2/wsum << " "
 ////            << w3/wsum << " " << w4/wsum << " " << endl;
 //      if (wsum == 0.) { // Can be removed considering performance!
-//         B.Bx = 0.;
-//         B.By = 0.;
-//         B.Bz = 0.;
-//         cout << "LitFieldGrid::GetFieldValue: zero wsum=" << wsum << endl;
-//         return;
+//         return 0.;
 //      }
-//      // Calculate output weighted mean B value
-//      B.Bx = (w1 * v1.Bx + w2 * v2.Bx + w3 * v3.Bx + w4 * v4.Bx) / wsum;
-//      B.By = (w1 * v1.By + w2 * v2.By + w3 * v3.By + w4 * v4.By) / wsum;
-//      B.Bz = (w1 * v1.Bz + w2 * v2.Bz + w3 * v3.Bz + w4 * v4.Bz) / wsum;
+//      // Calculate output weighted mean material thickness
+//      return (w1 * v1 + w2 * v2 + w3 * v3 + w4 * v4) / wsum;
    }
 
    /**
-    * \brief Returns field value for (X, Y) position (SIMD version).
+    * \brief Return material thickness in silicon equivalent for (X, Y) position (SIMD version).
     * \param[in] x X position.
     * \param[in] y Y position.
-    * \param[out] B Field value.
+    * \return Material thickness in silicon equivalent.
     */
-   void GetFieldValue(
+   fvec GetMaterialValue(
       fvec x,
-      fvec y,
-      LitFieldValue<fvec> &B) const {
-      LitFieldValue<fscal> v;
-      // Get field value for each packed value
+      fvec y) const {
+      fvec v;
+      // Get material thickness for each packed value
       for (unsigned int i = 0; i < fvecLen; i++) {
-         // Get field value in scalar format
-         GetFieldValue(x[i], y[i], v);
-         // Store field value in vector format
-         B.Bx[i] = v.Bx;
-         B.By[i] = v.By;
-         B.Bz[i] = v.Bz;
+         v[i] = GetMaterial(x[i], y[i]);
       }
+      return v;
    }
 
    /**
-    * \brief Returns string representation of the class.
+    * \brief Return string representation of the class.
     * \return String representation of the class.
     */
    string ToString() const {
@@ -186,7 +164,7 @@ public:
       ss << "LitFieldGrid: Z=" << fZ << " Xmin=" << fXMin << " Xmax=" << fXMax
          << " Ymin=" << fYMin << " Ymax=" << fYMax << " nofBinsX=" << fNofBinsX
          << " nofBinsY=" << fNofBinsY << " binSizeX=" << fBinSizeX
-         << " binSizeY=" << fBinSizeY << " field.size=" << fField.size() + "\n";
+         << " binSizeY=" << fBinSizeY << " material.size=" << fMaterial.size() + "\n";
       return ss.str();
    }
 
@@ -194,10 +172,11 @@ public:
     * \brief Operator << for convenient output to ostream.
     * \return Insertion stream in order to be able to call a succession of insertion operations.
     */
-   friend ostream& operator<<(ostream& strm, const LitFieldGrid& grid) {
+   friend ostream& operator<<(ostream& strm, const LitMaterialGrid& grid) {
       strm << grid.ToString();
       return strm;
    }
+
 private:
    fscal fXMin, fXMax; // Maximum and minimum grid size in X [cm]
    fscal fYMin, fYMax; // Maximum and minimum grid size in Y [cm]
@@ -206,12 +185,14 @@ private:
    unsigned short fNofBinsY; // Number of bins along Y
    fscal fBinSizeX; // Bin size along X [cm]
    fscal fBinSizeY; // Bin size along Y [cm]
-   // Field values in bin nodes.
-   // Total number of field values is
+   // Material thickness in bin nodes.
+   // Total number of values is
    // (fNofBinsX + 1) * (fNofBinsY + 1)
-   vector<vector<LitFieldValue<fscal> > > fField;
+   vector<vector<fscal> > fMaterial;
 } _fvecalignment;
 
 } // namespace parallel
 } // namespace lit
-#endif /* LITFIELDGRID_H_ */
+
+
+#endif /* LITMATERIALGRID_H_ */

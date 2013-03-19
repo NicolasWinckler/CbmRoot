@@ -1,6 +1,5 @@
 # Create a library called "libLittrack".
 
-
 add_subdirectory(clustering)
 add_subdirectory(parallel)
 #add_subdirectory(std)
@@ -39,163 +38,103 @@ ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
 )
 
-set(TBB_FOUND FALSE)
-#set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
-#set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
-
-If(TBB_FOUND)
-  Set(INCLUDE_DIRECTORIES 
-      ${INCLUDE_DIRECTORIES}
-      ${TBB_INCLUDE_DIRS}
-     )
-EndIf(TBB_FOUND)
-
 include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 )
- 
-If(TBB_FOUND)
-  Set(LINK_DIRECTORIES
-      ${LINK_DIRECTORIES} 
-      ${TBB_LIBRARY_DIRS}
-     )
-EndIf(TBB_FOUND)
 
 link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
 
-cbm/base/CbmLitDetectorSetup.cxx
-
-cbm/elid/CbmLitGlobalElectronId.cxx
-
-cbm/finder/CbmLitFindMvdTracks.cxx
-
-cbm/generators/CbmLitPolarizedGenerator.cxx
-
-cbm/geo/CbmLitDet.cxx
-cbm/geo/CbmLitDetContFact.cxx 
-cbm/geo/CbmLitDetGeo.cxx 
-cbm/geo/CbmLitDetGeoPar.cxx
-cbm/geo/CbmLitDetPoint.cxx
-
-cbm/qa/material/CbmLitCheckMultipleScattering.cxx
-cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
-cbm/qa/material/CbmLitCheckBrem.cxx 
-cbm/qa/mc/CbmLitMCTrack.cxx
-cbm/qa/mc/CbmLitMCTrackCreator.cxx
-cbm/qa/CbmLitCreateStandaloneData.cxx
-cbm/qa/CbmLitTestMatrixMath.cxx
-
-cbm/parallel/CbmLitTrackFinderNNParallel.cxx
-cbm/parallel/CbmLitParallelTrackFitterTestMuon.cxx 
-cbm/parallel/CbmLitParallelTrackFitterTestElectron.cxx 
+   cbm/base/CbmLitDetectorSetup.cxx
+   
+   cbm/elid/CbmLitGlobalElectronId.cxx
+   
+   cbm/finder/CbmLitFindMvdTracks.cxx
+   
+   cbm/generators/CbmLitPolarizedGenerator.cxx
+   
+   cbm/geo/CbmLitDet.cxx
+   cbm/geo/CbmLitDetContFact.cxx 
+   cbm/geo/CbmLitDetGeo.cxx 
+   cbm/geo/CbmLitDetGeoPar.cxx
+   cbm/geo/CbmLitDetPoint.cxx
+   
+   cbm/qa/base/CbmLitResultChecker.cxx  
+   cbm/qa/material/CbmLitCheckMultipleScattering.cxx
+   cbm/qa/material/CbmLitCheckEnergyLossMuons.cxx
+   cbm/qa/material/CbmLitCheckBrem.cxx 
+   cbm/qa/mc/CbmLitMCTrack.cxx
+   cbm/qa/mc/CbmLitMCTrackCreator.cxx
+   cbm/qa/CbmLitCreateStandaloneData.cxx
+   cbm/qa/CbmLitTestMatrixMath.cxx
+   
+   cbm/parallel/CbmLitFitTracksParallel.cxx
 )
-
-If(TBB_FOUND)
-  Set(LITTRACK_SRCS_RULECHECKER 
-      ${LITTRACK_SRCS_RULECHECKER}
-      cbm/parallel/CbmLitTrackFitSpeedTest.cxx
-     )
-EndIf(TBB_FOUND)
-
-If(Boost_FOUND)
-  Set(LITTRACK_SRCS_RULECHECKER 
-      ${LITTRACK_SRCS_RULECHECKER}
-      cbm/qa/base/CbmLitResultChecker.cxx  
-      cbm/qa/propagation/CbmLitPropagationQaPTreeCreator.cxx
-      cbm/qa/propagation/CbmLitPropagationQaReport.cxx
-      cbm/qa/propagation/CbmLitPropagationQaDraw.cxx
-      cbm/qa/propagation/CbmLitPropagationQaHistCreator.cxx
-      cbm/qa/propagation/CbmLitPropagationQaCalculator.cxx
-  )  
-EndIf(Boost_FOUND)
 
 set(LITTRACK_HEADERS
-cbm/elid/CbmLitGlobalElectronId.h
-cbm/finder/CbmLitFindGlobalTracks.h
-cbm/finder/CbmLitFindMvdTracks.h
-cbm/generators/CbmLitPolarizedGenerator.h
-cbm/geo/CbmLitDet.h 
-cbm/geo/CbmLitDetContFact.h
-cbm/geo/CbmLitDetGeo.h 
-cbm/geo/CbmLitDetGeoPar.h 
-cbm/geo/CbmLitDetPoint.h
-cbm/finder/CbmLitFindGlobalTracksIdeal.h
-cbm/qa/propagation/CbmLitPropagationQa.h
-cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
-cbm/qa/material/CbmLitCheckMultipleScattering.h
-cbm/qa/material/CbmLitCheckBrem.h 
-cbm/qa/CbmLitCreateStandaloneData.h
-cbm/qa/CbmLitTestMatrixMath.h
+   cbm/elid/CbmLitGlobalElectronId.h
+   cbm/finder/CbmLitFindGlobalTracks.h
+   cbm/finder/CbmLitFindMvdTracks.h
+   cbm/finder/CbmLitFindGlobalTracksIdeal.h
+   cbm/parallel/CbmLitFitTracksParallel.h
+   cbm/generators/CbmLitPolarizedGenerator.h
+   cbm/geo/CbmLitDet.h 
+   cbm/geo/CbmLitDetContFact.h
+   cbm/geo/CbmLitDetGeo.h 
+   cbm/geo/CbmLitDetGeoPar.h 
+   cbm/geo/CbmLitDetPoint.h
+   cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
+   cbm/qa/material/CbmLitCheckMultipleScattering.h
+   cbm/qa/material/CbmLitCheckBrem.h 
+   cbm/qa/CbmLitCreateStandaloneData.h
+   cbm/qa/CbmLitTestMatrixMath.h
+   cbm/qa/tracking/CbmLitTrackingQa.h
+   cbm/qa/tracking/CbmLitTrackingQaStudyReport.h
+   cbm/qa/tracking/CbmLitTrackingQaReport.h
+   cbm/qa/clustering/CbmLitClusteringQa.h
+   cbm/qa/clustering/CbmLitClusteringQaReport.h
+   cbm/qa/clustering/CbmLitClusteringQaStudyReport.h
+   cbm/qa/fit/CbmLitFitQa.h 
+   cbm/qa/fit/CbmLitFitQaReport.h
+   cbm/qa/fit/CbmLitFitQaStudyReport.h
+   cbm/qa/field/CbmLitFieldQa.h
+   cbm/qa/field/CbmLitFieldQaReport.h
+   cbm/qa/fieldapr/CbmLitFieldApproximationQa.h
+   cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.h
+   cbm/qa/radlength/CbmLitRadLengthQa.h
+   cbm/qa/radlength/CbmLitRadLengthQaReport.h
 )
-
-
-If(TBB_FOUND)
-  Set(LITTRACK_HEADERS 
-      ${LITTRACK_HEADERS}
-      cbm/parallel/CbmLitTrackFitSpeedTest.h
-     )
-EndIf(TBB_FOUND)
-
-If(Boost_FOUND)
-  Set(LITTRACK_HEADERS 
-      ${LITTRACK_HEADERS}
-      cbm/qa/tracking/CbmLitTrackingQa.h
-      cbm/qa/tracking/CbmLitTrackingQaStudyReport.h
-      cbm/qa/tracking/CbmLitTrackingQaReport.h
-      cbm/qa/clustering/CbmLitClusteringQa.h
-      cbm/qa/clustering/CbmLitClusteringQaReport.h
-      cbm/qa/clustering/CbmLitClusteringQaStudyReport.h
-      cbm/qa/fit/CbmLitFitQa.h 
-      cbm/qa/fit/CbmLitFitQaReport.h
-      cbm/qa/fit/CbmLitFitQaStudyReport.h
-      cbm/qa/field/CbmLitFieldQa.h
-      cbm/qa/field/CbmLitFieldQaReport.h
-      cbm/qa/fieldapr/CbmLitFieldApproximationQa.h
-      cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.h
-      cbm/qa/radlength/CbmLitRadLengthQa.h
-      cbm/qa/radlength/CbmLitRadLengthQaReport.h
- #     cbm/qa/sts/CbmStsSimulationQa.h   
-     )
-EndIf(Boost_FOUND)
 
 SET(LITTRACK_SRCS 
-${LITTRACK_SRCS_RULECHECKER}
-${LITTRACKSTD_SRCS}
-cbm/base/CbmLitFieldGridCreator.cxx
-cbm/base/CbmLitFieldFitter.cxx
-cbm/base/CbmLitToolFactory.cxx
-cbm/base/CbmLitTrackingGeometryConstructor.cxx
-cbm/finder/CbmLitFindGlobalTracks.cxx 
-cbm/finder/CbmLitFindGlobalTracksIdeal.cxx 
-cbm/qa/propagation/CbmLitPropagationQa.cxx 
-cbm/utils/CbmLitConverter.cxx
+   ${LITTRACK_SRCS_RULECHECKER}
+   ${LITTRACKSTD_SRCS}
+   cbm/base/CbmLitFieldGridCreator.cxx
+   cbm/base/CbmLitFieldFitter.cxx
+   cbm/base/CbmLitToolFactory.cxx
+   cbm/base/CbmLitTrackingGeometryConstructor.cxx
+   cbm/finder/CbmLitFindGlobalTracks.cxx 
+   cbm/finder/CbmLitFindGlobalTracksIdeal.cxx 
+   cbm/utils/CbmLitConverter.cxx
+   cbm/utils/CbmLitConverterParallel.cxx
+   cbm/qa/tracking/CbmLitTrackingQa.cxx
+   cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
+   cbm/qa/tracking/CbmLitTrackingQaReport.cxx
+   cbm/qa/clustering/CbmLitClusteringQa.cxx
+   cbm/qa/clustering/CbmLitClusteringQaReport.cxx
+   cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
+   cbm/qa/fit/CbmLitFitQa.cxx
+   cbm/qa/fit/CbmLitFitQaReport.cxx
+   cbm/qa/fit/CbmLitFitQaStudyReport.cxx
+   cbm/qa/field/CbmLitFieldQa.cxx
+   cbm/qa/field/CbmLitFieldQaReport.cxx
+   cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
+   cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
+   cbm/qa/radlength/CbmLitRadLengthQa.cxx
+   cbm/qa/radlength/CbmLitRadLengthQaReport.cxx
 )
-
-If(Boost_FOUND)
-  Set(LITTRACK_SRCS
-      ${LITTRACK_SRCS}
-      cbm/qa/tracking/CbmLitTrackingQa.cxx
-      cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
-      cbm/qa/tracking/CbmLitTrackingQaReport.cxx
-      cbm/qa/clustering/CbmLitClusteringQa.cxx
-      cbm/qa/clustering/CbmLitClusteringQaReport.cxx
-      cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
-      cbm/qa/fit/CbmLitFitQa.cxx
-      cbm/qa/fit/CbmLitFitQaReport.cxx
-      cbm/qa/fit/CbmLitFitQaStudyReport.cxx
-      cbm/qa/field/CbmLitFieldQa.cxx
-      cbm/qa/field/CbmLitFieldQaReport.cxx
-      cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
-      cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
-      cbm/qa/radlength/CbmLitRadLengthQa.cxx
-      cbm/qa/radlength/CbmLitRadLengthQaReport.cxx
-    #  cbm/qa/sts/CbmStsSimulationQa.cxx
-     )
-EndIf(Boost_FOUND)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)
@@ -231,12 +170,6 @@ SET(LITTRACK_SRCS ${LITTRACK_SRCS} ${DICTIONARY})
 add_library(Littrack SHARED ${LITTRACK_SRCS})
 target_link_libraries(Littrack ${ROOT_LIBRARIES})
 set_target_properties(Littrack PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-If(TBB_FOUND)
-  target_link_libraries(Littrack
-        ${TBB_LIBRARIES}
-  )
-EndIf(TBB_FOUND)
 
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
 

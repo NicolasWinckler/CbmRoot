@@ -24,9 +24,6 @@
 #include "selection/CbmLitTrackSelectionCuts.h"
 #include "selection/CbmLitTrackSelectionMuch.h"
 #include "selection/CbmLitTrackSelectionTrd.h"
-#include "cbm/parallel/CbmLitParallelTrackFitterTestMuon.h"
-#include "cbm/parallel/CbmLitParallelTrackFitterTestElectron.h"
-#include "cbm/parallel/CbmLitTrackFinderNNParallel.h"
 
 #include "FairRunAna.h"
 
@@ -92,15 +89,11 @@ TrackUpdatePtr CbmLitToolFactory::CreateTrackUpdate(
 TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
    const std::string& name)
 {
-   assert(name == "lit_kalman" || name == "kalman_smoother" || name == "kalman_parallel_muon" || name == "kalman_parallel_electron");
+   assert(name == "lit_kalman" || name == "kalman_smoother");
    if (name == "lit_kalman") {
       return TrackFitterPtr(new CbmLitTrackFitterImp(CreateTrackPropagator("lit"), CreateTrackUpdate("kalman")));
    } else if (name == "kalman_smoother") {
       return TrackFitterPtr(new CbmLitKalmanSmoother());
-   } else if (name == "kalman_parallel_muon") {
-      return TrackFitterPtr(new CbmLitParallelTrackFitterTestMuon());
-   } else if (name == "kalman_parallel_electron") {
-      return TrackFitterPtr(new CbmLitParallelTrackFitterTestElectron());
    }
    return TrackFitterPtr();
 }
@@ -138,7 +131,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
    const std::string& name)
 {
-   assert(name == "e_nn" || name == "e_branch" || name == "mu_nn" || name == "mu_branch" || name == "e_nn_parallel" || name == "mu_nn_parallel" || name == "mvd_nn");
+   assert(name == "e_nn" || name == "e_branch" || name == "mu_nn" || name == "mu_branch" || name == "mvd_nn");
    if (name == "e_nn") {
       CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
       trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
@@ -209,12 +202,6 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
       mvdFinderNN->SetChiSqPixelHitCut(list_of(15.));
       mvdFinderNN->SetSigmaCoef(list_of(5.));
       return TrackFinderPtr(mvdFinderNN);
-   } else if (name == "e_nn_parallel") {
-      CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_parallel_electron");
-      return TrackFinderPtr(finderNN);
-   } else if (name == "mu_nn_parallel") {
-      CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel("nn_parallel_muon");
-      return TrackFinderPtr(muchFinderNN);
    }
    return TrackFinderPtr();
 }

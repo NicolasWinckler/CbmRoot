@@ -34,8 +34,17 @@ namespace parallel {
 template<class T>
 inline void LitAddMaterial(
    LitTrackParam<T>& par,
-   const LitMaterialInfo<T>& mat)
+   T siliconThickness)
 {
+   // Silicon properties
+   static const T SILICON_DENSITY = 2.33; // g*cm^-3
+//   static const T SILICON_A = 28.08855; // silicon atomic weight
+//   static const T SILICON_Z = 14.0; // silicon atomic number
+   static const T SILICON_Z_OVER_A = 2.006325; // Z/A ratio for silicon
+   static const T SILICON_RAD_LENGTH = 9.365; // cm
+   static const T SILICON_I = 173 * 1e-9 ; // mean excitation energy [GeV]
+   static const T SILICON_I_SQ = SILICON_I * SILICON_I; // squared mean excitation energy
+
    static const T ZERO = 0.0, ONE = 1., TWO = 2.;
    static const T mass = 0.105658369; // muon mass [GeV/c]
    static const T massSq = 0.105658369 * 0.105658369; // muon mass squared
@@ -52,8 +61,8 @@ inline void LitAddMaterial(
 
    //scale material thickness
    T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
-   T thickness = norm * mat.Thickness;
-   T radThick = thickness / mat.X0;
+   T thickness = norm * siliconThickness;
+   T radThick = thickness / SILICON_RAD_LENGTH;
    T sqrtRadThick = sqrt(radThick);//mat.SqrtRadThick;
    T logRadThick = log(radThick);//mat.LogRadThick;
 
@@ -70,12 +79,12 @@ inline void LitAddMaterial(
 // if (p > 0.5) { // for particles above 1 Gev
    static const T c7 = 28.816;
    static const T c8 = 1e-9;
-   T hwp = c7 * sqrt(mat.Rho * mat.Z / mat.A) * c8; // GeV
-   dc = log(hwp/mat.I) + log(beta*gamma) - C1_2;
+   T hwp = c7 * sqrt(SILICON_DENSITY * SILICON_Z_OVER_A) * c8; // GeV
+   dc = log(hwp/SILICON_I) + log(beta*gamma) - C1_2;
 // }
 
-   T bbLoss = K * (mat.Z / mat.A) * rcp(betaSq) *
-              (C1_2 * log(TWO * me * betaSq * gammaSq * Tmax / (mat.I * mat.I)) - betaSq - dc);
+   T bbLoss = K * SILICON_Z_OVER_A * rcp(betaSq) *
+              (C1_2 * log(TWO * me * betaSq * gammaSq * Tmax / SILICON_I_SQ) - betaSq - dc);
 
    // Bethe-Heitler
 // T bhLoss = (E * ratio * ratio)/(mat.X0 * mat.Rho);
@@ -87,7 +96,7 @@ inline void LitAddMaterial(
    T ppLoss = ZERO;
 
    // Integrated value of the energy loss
-   T energyLoss = (bbLoss + bhLoss + ppLoss) * mat.Rho * thickness;
+   T energyLoss = (bbLoss + bhLoss + ppLoss) * SILICON_DENSITY * thickness;
 
    // Correct Q/p value due to energy loss
    T Enew = E - energyLoss;
@@ -102,7 +111,7 @@ inline void LitAddMaterial(
 
    // Calculate xi factor (KeV).
    static const T c4 = 153.5;
-   T XI = (c4 * mat.Z * thickness * mat.Rho)/(mat.A * betaSqnew);
+   T XI = (c4 * SILICON_Z_OVER_A * thickness * SILICON_DENSITY) / betaSqnew;
 
    // Maximum energy transfer to atomic electron (KeV).
    T etanew = betanew * gammanew;
@@ -175,16 +184,19 @@ inline void LitAddMaterial(
 template<class T>
 inline void LitAddMaterialElectron(
    LitTrackParam<T>& par,
-   const LitMaterialInfo<T>& mat)
+   T siliconThickness)
 {
+   // Silicon properties
+   static const T SILICON_RAD_LENGTH = 9.365; // cm
+
    static const T ZERO = 0.0, ONE = 1., TWO = 2., THREE = 3., INF = 1.e5;
    static const T C1_2 = 0.5, C1_3 = 1./3.;
 
    //scale material thickness
    static const T C_LOG = log(THREE) / log (TWO);
    T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
-   T thickness = norm * mat.Thickness;
-   T radThick = thickness / mat.X0;
+   T thickness = norm * siliconThickness;
+   T radThick = thickness / SILICON_RAD_LENGTH;
    T sqrtRadThick = sqrt(radThick);
    T logRadThick = log(radThick);
 

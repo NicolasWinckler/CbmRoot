@@ -11,7 +11,7 @@
 #define LITMATH_H_
 
 #include "LitTypes.h"
-#include "LitTrack.h"
+#include "LitScalTrack.h"
 
 namespace lit {
 namespace parallel {

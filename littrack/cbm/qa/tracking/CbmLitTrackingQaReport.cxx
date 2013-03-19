@@ -201,7 +201,8 @@ string CbmLitTrackingQaReport::PrintPionSuppression() const
          string pionSupStr = NumberToString<Double_t>(pionSup) + " (" + NumberToString<Double_t>(recPions) + "/" + NumberToString<Double_t>(rec) + ")";
          vector<string> split = Split(psName, '_');
          string rowName = split[1];
-         str += R()->TableRow(list_of(rowName)(pionSupStr));
+         string category = split[2];
+         str += R()->TableRow(list_of(rowName+ " - " + category)(pionSupStr));
    }
    str += R()->TableEnd();
    return str;

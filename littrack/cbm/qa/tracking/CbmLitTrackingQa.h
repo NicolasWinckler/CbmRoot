@@ -23,6 +23,7 @@ using std::multimap;
 
 typedef Bool_t (*LitTrackAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index);
 typedef Bool_t (*LitRingAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index, Int_t nofHitsInRing);
+typedef Bool_t (*LitPiSuppAcceptanceFunction)(const TClonesArray* globalTracks, const TClonesArray* stsMatches, const TClonesArray* richMatches, Int_t index);
 
 /**
  * \class CbmLitTrackingQa.h
@@ -111,6 +112,8 @@ private:
    void FillDefaultRingCategories();
 
    void FillDefaultTrackPIDCategories();
+
+   void FillDefaultPiSuppCategories();
 
    void FillDefaultRingPIDCategories();
 
@@ -335,8 +338,12 @@ private:
    vector<string> fRingCategories; // Vector of ring category names
    vector<string> fTrackCategoriesPID; // Vector of track category names
    vector<string> fRingCategoriesPID; // Vector of ring category names for REC+PID
+   vector<string> fPiSuppCategories;; // Vector of categories for pion suppression
+
    map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
    map<string, LitRingAcceptanceFunction> fRingAcceptanceFunctions; // maps ring category name to ring acceptance function
+   map<string, LitPiSuppAcceptanceFunction> fPiSuppAcceptanceFunctions; // maps pion supp. category name to piSupp acceptance function
+
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
 

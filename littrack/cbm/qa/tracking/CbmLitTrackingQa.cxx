@@ -190,6 +190,43 @@ Bool_t PionReferenceRingAcceptanceFunction(
     return (std::abs(mcTrack->GetPdgCode()) == 211) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
 }
 
+Bool_t AllPiSuppAcceptanceFunction(
+      const TClonesArray* globalTracks,
+      const TClonesArray* stsMatches,
+      const TClonesArray* richMatches,
+      Int_t index)
+{
+   return true;
+}
+
+Bool_t TrueMatchPiSuppAcceptanceFunction(
+      const TClonesArray* globalTracks,
+      const TClonesArray* stsMatches,
+      const TClonesArray* richMatches,
+      Int_t index)
+{
+   const CbmGlobalTrack* gTrack = static_cast<const CbmGlobalTrack*>(globalTracks->At(index));
+   Int_t stsInd = gTrack->GetStsTrackIndex();
+   Int_t richInd = gTrack->GetRichRingIndex();
+   if (stsInd == -1 || richInd == -1) return false;
+
+   const CbmTrackMatch* stsMatch = static_cast<const CbmTrackMatch*>(stsMatches->At(stsInd));
+   const CbmTrackMatch* richMatch = static_cast<const CbmTrackMatch*>(richMatches->At(richInd));
+   if (NULL == stsMatch || NULL == richMatch) return false;
+
+   if (stsMatch->GetMCTrackId() == richMatch->GetMCTrackId()) return true;
+   return false;
+}
+
+Bool_t WrongMatchPiSuppAcceptanceFunction(
+      const TClonesArray* globalTracks,
+      const TClonesArray* stsMatches,
+      const TClonesArray* richMatches,
+      Int_t index)
+{
+   return !TrueMatchPiSuppAcceptanceFunction(globalTracks, stsMatches, richMatches, index);
+}
+
 CbmLitTrackingQa::CbmLitTrackingQa():
    FairTask("LitTrackingQA", 1),
    fHM(NULL),
@@ -251,6 +288,7 @@ InitStatus CbmLitTrackingQa::Init()
    if (fRingCategories.empty()) FillDefaultRingCategories();
    FillDefaultTrackPIDCategories();
    FillDefaultRingPIDCategories();
+   FillDefaultPiSuppCategories();
    FillTrackAndRingAcceptanceFunctions();
 
    CreateHistograms();
@@ -372,6 +410,13 @@ void CbmLitTrackingQa::FillDefaultRingPIDCategories()
    }
 }
 
+void CbmLitTrackingQa::FillDefaultPiSuppCategories()
+{
+   if (fDet.GetElectronSetup()) {
+      fPiSuppCategories = list_of("All")("TrueMatch")("WrongMatch");
+   }
+}
+
 void CbmLitTrackingQa::FillTrackAndRingAcceptanceFunctions()
 {
    // List of all supported track categories
@@ -396,6 +441,12 @@ void CbmLitTrackingQa::FillTrackAndRingAcceptanceFunctions()
    fRingAcceptanceFunctions["ElectronReference"] = PrimaryElectronReferenceRingAcceptanceFunction;
    fRingAcceptanceFunctions["Pion"] = PionRingAcceptanceFunction;
    fRingAcceptanceFunctions["PionReference"] = PionReferenceRingAcceptanceFunction;
+
+   // list of pion suppression categories
+   fPiSuppAcceptanceFunctions["All"] = AllPiSuppAcceptanceFunction;
+   fPiSuppAcceptanceFunctions["TrueMatch"] = TrueMatchPiSuppAcceptanceFunction;
+   fPiSuppAcceptanceFunctions["WrongMatch"] = WrongMatchPiSuppAcceptanceFunction;
+
 }
 
 void CbmLitTrackingQa::CreateH1Efficiency(
@@ -457,11 +508,13 @@ void CbmLitTrackingQa::CreateH1PionSuppression(
       Double_t maxBin)
 {
    vector<string> types = list_of("RecPions")("Rec")("PionSup");
-   for (Int_t iType = 0; iType < 3; iType++) {
-      string yTitle = (types[iType] == "PionSup") ? "Pion suppression" : "Counter";
-      string histName = name + "_" + types[iType] + "_" + parameter;
-      string histTitle = histName + ";" + xTitle + ";" + yTitle;
-      fHM->Add(histName, new TH1F(histName.c_str(), histTitle.c_str(), nofBins, minBin, maxBin));
+   for (Int_t iCat = 0; iCat < fPiSuppCategories.size(); iCat++){
+      for (Int_t iType = 0; iType < 3; iType++) {
+         string yTitle = (types[iType] == "PionSup") ? "Pion suppression" : "Counter";
+         string histName = name + "_" + fPiSuppCategories[iCat] + "_" + types[iType] + "_" + parameter;
+         string histTitle = histName + ";" + xTitle + ";" + yTitle;
+         fHM->Add(histName, new TH1F(histName.c_str(), histTitle.c_str(), nofBins, minBin, maxBin));
+      }
    }
 }
 
@@ -713,9 +766,13 @@ void CbmLitTrackingQa::CreateHistograms()
 //      CreateH2Efficiency(name, "YPt", "Rapidity", "P_{t} [GeV/c]", fYRangeBins, fYRangeMin, fYRangeMax, fPtRangeBins, fPtRangeMin, fPtRangeMax, opt);
    }
 
+
+   // Create histograms for pion suppression calculation
    vector<string> psVariants = PionSuppressionVariants();
    for (Int_t iHist = 0; iHist < psVariants.size(); iHist++) {
       string name = "hps_" + psVariants[iHist];
+      CreateH1PionSuppression(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax);
+      CreateH1PionSuppression(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax);
       CreateH1PionSuppression(name, "p", "P [GeV/c]", fPRangeBins, fPRangeMin, fPRangeMax);
    }
 
@@ -1189,11 +1246,17 @@ void CbmLitTrackingQa::PionSuppression()
             string name = histos[iHist]->GetName();
             vector<string> split = Split(name, '_');
             string effName = split[1];
+            string category = split[2];
+            //cout << category << endl;
             Bool_t isElectron = ((effName.find("Rich") != string::npos) ? isRichElectron : true)
                   && ((effName.find("Trd") != string::npos) ? isTrdElectron : true)
                   && ((effName.find("Tof") != string::npos) ? isTofElectron : true);
             if (isElectron) {
-               fHM->H1(FindAndReplace(name, "RecPions", "Rec"))->Fill(p);
+               LitPiSuppAcceptanceFunction function = fPiSuppAcceptanceFunctions.find(category)->second;
+               Bool_t ok = function(fMCTracks, fStsMatches, fRichRingMatches, iGT);
+
+               if (ok) fHM->H1(FindAndReplace(name, "RecPions", "Rec"))->Fill(p);
+
             }
          }
       }

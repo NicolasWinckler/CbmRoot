@@ -15,6 +15,7 @@ class TH1;
 class TH2;
 class TH1D;
 class TH2D;
+class TH3D;
 class TClonesArray;
 class CbmRichRingFitterCOP;
 class CbmRichRingFitterEllipseTau;
@@ -239,11 +240,28 @@ private:
 	   const string& axisX,
 	   const string& axisY);
 
+	TH2D* DivideH2(
+	   TH1D* h1,
+	   TH1D* h2,
+	   const string& name,
+	   const string& title,
+	   const string& axisX,
+	   const string& axisY,
+	   const string& axisZ);
+
 	TCanvas* CreateCanvas(
 	      const string& name,
 	      const string& title,
 	      int width,
 	      int height);
+
+	void DrawH3(
+	      TH3D* h,
+	      const string& cName,
+	      const string& zAxisTitle,
+	      double zMin,
+	      double zMax,
+	      bool doFit = false);
 
 	void SaveCanvasToImage();
 
@@ -337,25 +355,26 @@ private:
    TH1D* fhNofHitsCircleFitEff;
    TH1D* fhNofHitsEllipseFitEff;
 
-   // Detector acceptance vs pt, y, p
-   TH1D* fh_mc_mom;
-   TH1D* fh_mc_pt;
-   TH1D* fh_mc_y;
-   TH1D* fh_acc_mom;
-   TH1D* fh_acc_pt;
-   TH1D* fh_acc_y;
+   // Detector acceptance vs (pt,y) and p for e+/- and pi+/-
+   TH1D* fh_mc_mom_el;
+   TH2D* fh_mc_pty_el;
+   TH1D* fh_acc_mom_el;
+   TH2D* fh_acc_pty_el;
+
+   TH1D* fh_mc_mom_pi;
+   TH2D* fh_mc_pty_pi;
+   TH1D* fh_acc_mom_pi;
+   TH2D* fh_acc_pty_pi;
 
 
    // numbers in dependence on XY position onto the photodetector
-   TH2D* fhNofHitsXY; // number of hits
-   TH2D* fhNofPointsXY; // number of points
-   TH2D* fhBoverAXY; // B/A ratio
-   TH2D* fhBaxisXY; // B axis
-   TH2D* fhAaxisXY; // A axis
-   TH2D* fhRadiusXY; // Radius
-   TH2D* fhCounterXY; // counter for mean value calculation
-
-   TH2D* fhHitsXY1Gev; // number of hits for tracks with P<1GeV/c
+   TH3D* fhNofHitsXYZ; // number of hits
+   TH3D* fhNofPointsXYZ; // number of points
+   TH3D* fhBoverAXYZ; // B/A ratio
+   TH3D* fhBaxisXYZ; // B axis
+   TH3D* fhAaxisXYZ; // A axis
+   TH3D* fhRadiusXYZ; // Radius
+   TH3D* fhdRXYZ; // dR
 
 	vector<TH1*> fHists; // store all TH1 pointers of the histogram
 

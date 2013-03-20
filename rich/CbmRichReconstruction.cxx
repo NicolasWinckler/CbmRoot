@@ -206,8 +206,7 @@ void CbmRichReconstruction::InitTrackAssign()
 void CbmRichReconstruction::RunExtrapolation()
 {
    fRichTrackParamZ->Clear();
-   fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ,
-         fZTrackExtrapolation, fMinNofStsHits);
+   fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ, fZTrackExtrapolation, fMinNofStsHits);
 }
 
 void CbmRichReconstruction::RunProjection()

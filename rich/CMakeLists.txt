@@ -96,6 +96,7 @@ prototype/CbmRichProtProjectionProducer.cxx
 prototype/CbmRichProtRingFinderHough.cxx
 prototype/CbmRichProtRingFinderHoughImpl.cxx
 qa/CbmRichGeoTest.cxx 
+qa/CbmRichUrqmdTest.cxx
 qa/CbmRichGeoTestStudyReport.cxx 
 )
 
@@ -129,6 +130,7 @@ prototype/CbmRichProtProjectionProducer.h
 prototype/CbmRichProtRingFinderHough.h
 prototype/CbmRichProtRingFinderHoughImpl.h
 qa/CbmRichGeoTest.h 
+qa/CbmRichUrqmdTest.h
 )
 
 If(TBB_FOUND)

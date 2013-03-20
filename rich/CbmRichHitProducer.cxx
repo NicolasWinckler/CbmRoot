@@ -415,7 +415,7 @@ void CbmRichHitProducer::Exec(
 
    cout << "Nof hits: "<< fRichHits->GetEntries()<< endl;
    cout << "Fraction of double hits: "<<(Double_t)(fNDoubleHits)/(Double_t)(fNHits) << endl;
-   cout << "Nof cross section hits: " << (Double_t) fNofCrossTalkHits / fNEvents << endl;
+   cout << "Nof crosstalk hits: " << (Double_t) fNofCrossTalkHits / fNEvents << endl;
 }
 
 void CbmRichHitProducer::TiltPoint(

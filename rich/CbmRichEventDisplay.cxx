@@ -95,7 +95,7 @@ void CbmRichEventDisplay::DrawOneEvent()
    TCanvas *c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 800, 800);
    c->Divide(1, 2);
    c->cd(1);
-   TH2D* padU = new TH2D("padU", ";X [cm];Y [cm]", 1, -110., 110., 1, 90., 180);
+   TH2D* padU = new TH2D("padU", ";x [cm];y [cm]", 1, -110., 110., 1, 90., 180);
    DrawH2(padU);
    padU->GetYaxis()->SetTitleOffset(0.75);
    gPad->SetLeftMargin(0.1);
@@ -103,7 +103,7 @@ void CbmRichEventDisplay::DrawOneEvent()
    DrawOnePmtPlane("up");
 
    c->cd(2);
-   TH2D* padD = new TH2D("padD", ";X [cm];Y [cm]", 1, -110., 110., 1, -180., -90.);
+   TH2D* padD = new TH2D("padD", ";x [cm];y [cm]", 1, -110., 110., 1, -180., -90.);
    DrawH2(padD);
    padD->GetYaxis()->SetTitleOffset(0.75);
    gPad->SetLeftMargin(0.1);

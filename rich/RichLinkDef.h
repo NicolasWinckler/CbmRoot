@@ -23,6 +23,7 @@
 #pragma link C++ class CbmRichTestSim+;
 #pragma link C++ class CbmRichTestHits+;
 #pragma link C++ class CbmRichGeoTest+;
+#pragma link C++ class CbmRichUrqmdTest+;
 #pragma link C++ class CbmRichRingFitterQa+;
 
 #pragma link C++ class CbmRichProt+;

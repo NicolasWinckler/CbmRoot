@@ -52,8 +52,7 @@ void CbmLitGlobalElectronId::Init()
 	fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
 
    if (fRichUseAnn) {
-      string richANNFile = string(gSystem->Getenv("VMCWORKDIR")) + "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-      fRichElIdAnn = new CbmRichElectronIdAnn(richANNFile);
+      fRichElIdAnn = new CbmRichElectronIdAnn();
       fRichElIdAnn->Init();
    }
 }

@@ -250,12 +250,17 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
 
    for (int j = 0; j < 2; j++){
       for (int i = 0; i < fRSParams[j].size(); i++){
-         x[0] = fRSParams[j][i].fNofHits;
-         x[1] = fRSParams[j][i].fAngle;
-         x[2] = fRSParams[j][i].fHitsOnRing;
-         x[3] = fRSParams[j][i].fRadPos;
-         x[4] = fRSParams[j][i].fRadius;
-         x[5] = fRSParams[j][i].fChi2;
+         x[0] = fRSParams[j][i].fNofHits / 45.;
+         x[1] = fRSParams[j][i].fAngle / 6.28;
+         x[2] = fRSParams[j][i].fHitsOnRing / 45.;
+         x[3] = fRSParams[j][i].fRadPos / 110.;
+         x[4] = fRSParams[j][i].fRadius / 10.;
+         x[5] = fRSParams[j][i].fChi2 / 0.4;
+
+         for (int k = 0; k < 6; k++){
+            if (x[k] < 0.) x[k] = 0.;
+            if (x[k] > 1.) x[k] = 1.;
+         }
 
          if (j == 0) xOut = 1.;
          if (j == 1) xOut = -1.;
@@ -264,10 +269,10 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
       }
    }
 
-   TMultiLayerPerceptron network("x0,x1,x2,x3,x4,x5:5:xOut",simu,"Entry$+1");
+   TMultiLayerPerceptron network("x0,x1,x2,x3,x4,x5:10:xOut",simu,"Entry$+1");
    //network.LoadWeights("/u/slebedev/JUL09/trunk/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt");
-   network.Train(200,"text,update=1");
-   //network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
+   network.Train(300,"text,update=10");
+   network.DumpWeights("rich_select_ann_weights.txt");
    //network.Export();
 
    Double_t params[6];
@@ -277,14 +282,19 @@ void CbmRichTrainAnnSelect::TrainAndTestAnn()
 
    for (int j = 0; j < 2; j++){
       for (int i = 0; i < fRSParams[j].size(); i++){
-         params[0] = fRSParams[j][i].fNofHits;
-         params[1] = fRSParams[j][i].fAngle;
-         params[2] = fRSParams[j][i].fHitsOnRing;
-         params[3] = fRSParams[j][i].fRadPos;
-         params[4] = fRSParams[j][i].fRadius;
-         params[5] = fRSParams[j][i].fChi2;
+         params[0] = fRSParams[j][i].fNofHits / 45.;
+         params[1] = fRSParams[j][i].fAngle / 6.28;
+         params[2] = fRSParams[j][i].fHitsOnRing / 45.;
+         params[3] = fRSParams[j][i].fRadPos / 110.;
+         params[4] = fRSParams[j][i].fRadius / 10.;
+         params[5] = fRSParams[j][i].fChi2 / 0.4;
 
-         Double_t netEval = network.Evaluate(0,params);
+         for (int k = 0; k < 6; k++){
+            if (params[k] < 0.) params[k] = 0.;
+            if (params[k] > 1.) params[k] = 1.;
+         }
+
+         Double_t netEval = network.Evaluate(0, params);
 
          //if (netEval > maxEval) netEval = maxEval - 0.01;
         // if (netEval < minEval) netEval = minEval + 0.01;
@@ -300,8 +310,8 @@ void CbmRichTrainAnnSelect::Draw()
 {
    cout <<"nof Trues = " << fRSParams[0].size() << endl;
    cout <<"nof Fakes = " << fRSParams[1].size() << endl;
-   cout <<"Fake like True = " << fNofFakeLikeTrue << endl;
-   cout <<"True like Fake = " << fNofTrueLikeFake << endl;
+   cout <<"Fake like True = " << fNofFakeLikeTrue << ", fake remain = " << (double)fNofFakeLikeTrue/fRSParams[1].size() << endl;
+   cout <<"True like Fake = " << fNofTrueLikeFake << ", true loss = " << (double)fNofTrueLikeFake/fRSParams[0].size() << endl;
    cout << "ANN cut = " << fAnnCut << endl;
 
    Double_t cumProbFake = 0.;

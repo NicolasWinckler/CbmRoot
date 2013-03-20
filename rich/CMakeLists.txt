@@ -87,8 +87,7 @@ qa/CbmRichTestSim.cxx
 qa/CbmRichTestHits.cxx 
 qa/CbmRichRingFitterQa.cxx
 #qa/CbmRichParallelQa.cxx 
-selection/CbmRichRingSelectAnn.cxx  
-selection/NNfunction.cxx 
+selection/CbmRichRingSelectAnn.cxx
 prototype/CbmRichProt.cxx
 prototype/CbmRichProtHitProducer.cxx
 prototype/CbmRichProtPrepareExtrapolation.cxx

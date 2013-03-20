@@ -143,7 +143,7 @@ void CbmRichProtRingFinderHoughImpl::Init()
 	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
         //richSelectNNFile = "/u/slebedev/JUL09/trunk/macro/rich/NeuralNet_RingSelection_Weights1.txt";
     }
-    fANNSelect = new CbmRichRingSelectAnn(richSelectNNFile);
+    fANNSelect = new CbmRichRingSelectAnn();
     fANNSelect->Init();
 
 }

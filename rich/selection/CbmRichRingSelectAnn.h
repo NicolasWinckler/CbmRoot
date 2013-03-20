@@ -15,15 +15,13 @@
 #ifndef CBM_RICH_RING_SELECT_ANN
 #define CBM_RICH_RING_SELECT_ANN
 
-#define NN_FUNCTION
-//#define ANN_FILE
-
 #include <string>
 
 class CbmRichRingLight;
 class CbmRichRingSelectImpl;
 class NNfunction;
 class TMultiLayerPerceptron;
+using namespace std;
 
 /**
 * \class CbmRichRingSelectAnn
@@ -41,17 +39,15 @@ class TMultiLayerPerceptron;
 class CbmRichRingSelectAnn
 {
 private:
-	std::string fNeuralNetWeights;
+	std::string fAnnWeights;
 	TMultiLayerPerceptron* fNN;
-	NNfunction* fNNfunction;
 	CbmRichRingSelectImpl* fSelectImpl;
 
 public:
 	/**
 	 * \brief Standard constructor.
 	 */
-  	CbmRichRingSelectAnn(
-  	      const std::string& annFile);
+  	CbmRichRingSelectAnn();
 
    /**
     * \brief Destructor.
@@ -69,6 +65,12 @@ public:
 	 */
 	void DoSelect(
 	      CbmRichRingLight* ring);
+
+	/**
+	 * \brief Set path to the file with ANN weights.
+	 * \param[in] fileName Path to the file name with ANN weights.
+	 */
+	void SetAnnWeights(const string& fileName){fAnnWeights = fileName;}
 
 private:
    /**

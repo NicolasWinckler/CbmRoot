@@ -88,10 +88,7 @@ void CbmRichRingFinderHoughImpl::Init()
 	 fHitInd.resize(fNofParts);
 
     fFitCOP = new CbmRichRingFitterCOP();
-
-    std::string richSelectNNFile(gSystem->Getenv("VMCWORKDIR"));
-    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
-    fANNSelect = new CbmRichRingSelectAnn(richSelectNNFile);
+    fANNSelect = new CbmRichRingSelectAnn();
     fANNSelect->Init();
 }
 

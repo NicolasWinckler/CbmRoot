@@ -209,7 +209,6 @@ Bool_t TrueMatchPiSuppAcceptanceFunction(
    Int_t stsInd = gTrack->GetStsTrackIndex();
    Int_t richInd = gTrack->GetRichRingIndex();
    if (stsInd == -1 || richInd == -1) return false;
-
    const CbmTrackMatch* stsMatch = static_cast<const CbmTrackMatch*>(stsMatches->At(stsInd));
    const CbmTrackMatch* richMatch = static_cast<const CbmTrackMatch*>(richMatches->At(richInd));
    if (NULL == stsMatch || NULL == richMatch) return false;
@@ -1252,8 +1251,9 @@ void CbmLitTrackingQa::PionSuppression()
                   && ((effName.find("Trd") != string::npos) ? isTrdElectron : true)
                   && ((effName.find("Tof") != string::npos) ? isTofElectron : true);
             if (isElectron) {
+
                LitPiSuppAcceptanceFunction function = fPiSuppAcceptanceFunctions.find(category)->second;
-               Bool_t ok = function(fMCTracks, fStsMatches, fRichRingMatches, iGT);
+               Bool_t ok = function(fGlobalTracks, fStsMatches, fRichRingMatches, iGT);
 
                if (ok) fHM->H1(FindAndReplace(name, "RecPions", "Rec"))->Fill(p);
 

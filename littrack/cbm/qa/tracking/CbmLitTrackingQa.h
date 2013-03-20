@@ -325,7 +325,7 @@ private:
    TClonesArray* fStsMatches; // CbmStsTrackMatch array
    TClonesArray* fRichRings; // CbmRichRing array
    TClonesArray* fRichProjections; // CbmRichProjection array
-   TClonesArray* fRichRingMatches; // CbmRichProjection array
+   TClonesArray* fRichRingMatches; // CbmRichMatchesn array
    TClonesArray* fMuchMatches; // CbmTrackMatch array
    TClonesArray* fTrdMatches; // CbmTrackMatch array
    TClonesArray* fTofPoints; // CbmTofPoint array

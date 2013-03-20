@@ -30,15 +30,14 @@ using std::string;
 class CbmRichElectronIdAnn
 {
 private:
-   string fNeuralNetWeights; // file name with weights for ANN
-   TMultiLayerPerceptron* fNN;
+   string fAnnWeights; // path to the file with weights for ANN
+   TMultiLayerPerceptron* fNN; // Pointer to the ANN
 public:
 
    /**
     * \brief Standard constructor.
     */
-   CbmRichElectronIdAnn(
-         const string& annFile);
+   CbmRichElectronIdAnn();
 
    /**
     * \brief Destructor.
@@ -59,6 +58,12 @@ public:
    double DoSelect(
          CbmRichRing* ring,
          double momentum);
+
+   /**
+    * \brief Set path to the file with ANN weights.
+    * \param[in] fileName path to the file with ANN weights.
+    */
+   void SetAnnWeights(const string& fileName){fAnnWeights = fileName;}
 
 private:
    /**

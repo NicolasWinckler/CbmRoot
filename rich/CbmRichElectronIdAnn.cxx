@@ -10,18 +10,18 @@
 #include "TMultiLayerPerceptron.h"
 #include "TTree.h"
 #include "TMath.h"
+#include "TSystem.h"
 
 #include <iostream>
 
 using std::cout;
 using std::endl;
 
-CbmRichElectronIdAnn::CbmRichElectronIdAnn(
-      const string& annFile):
-   fNeuralNetWeights(annFile),
+CbmRichElectronIdAnn::CbmRichElectronIdAnn():
+   fAnnWeights(""),
    fNN(NULL)
 {
-
+   fAnnWeights = string(gSystem->Getenv("VMCWORKDIR")) + "/parameters/rich/rich_elid_ann_weights.txt";
 }
 
 CbmRichElectronIdAnn::~CbmRichElectronIdAnn()
@@ -46,9 +46,9 @@ void CbmRichElectronIdAnn::Init()
    simu->Branch("x8", &x[8],"x8/D");
    simu->Branch("xOut", &xOut,"xOut/D");
 
-   fNN = new TMultiLayerPerceptron("x0,x1,x2,x3,x4,x5,x6,x7,x8:9:xOut",simu);
-   cout << "-I- CbmRichElIdAnn: get NeuralNet weight parameters from: " << fNeuralNetWeights << endl;
-   fNN->LoadWeights(fNeuralNetWeights.c_str());
+   fNN = new TMultiLayerPerceptron("x0,x1,x2,x3,x4,x5,x6,x7,x8:18:xOut",simu);
+   cout << "-I- CbmRichElIdAnn: get NeuralNet weight parameters from: " << fAnnWeights << endl;
+   fNN->LoadWeights(fAnnWeights.c_str());
 }
 
 double CbmRichElectronIdAnn::DoSelect(
@@ -65,18 +65,23 @@ double CbmRichElectronIdAnn::DoSelect(
 
         return -1.;
     }
-    double nnPar[9];
-    nnPar[0] = ring->GetAaxis();
-    nnPar[1] = ring->GetBaxis();
-    nnPar[2] = ring->GetPhi();
-    nnPar[3] = ring->GetRadialAngle();
-    nnPar[4] = ring->GetChi2()/ring->GetNDF();
-    nnPar[5] = ring->GetRadialPosition();
-    nnPar[6] = ring->GetNofHits();
-    nnPar[7] = ring->GetDistance();
-    nnPar[8] =  momentum;
+    double params[9];
+    params[0] = ring->GetAaxis() / 10.;
+    params[1] = ring->GetBaxis() / 10.;
+    params[2] = (ring->GetPhi() + 1.57) / 3.14;
+    params[3] = ring->GetRadialAngle() / 6.28;
+    params[4] = (ring->GetChi2()/ring->GetNDF()) / 1.2;
+    params[5] = ring->GetRadialPosition() / 110.;
+    params[6] = ring->GetNofHits() / 45.;
+    params[7] = ring->GetDistance() / 5.;
+    params[8] =  momentum / 15.;
 
-    double nnEval = fNN->Evaluate(0,nnPar);
+    for (int k = 0; k < 9; k++){
+       if (params[k] < 0.0) params[k] = 0.0;
+       if (params[k] > 1.0) params[k] = 1.0;
+    }
+
+    double nnEval = fNN->Evaluate(0, params);
 
     if (TMath::IsNaN(nnEval) == 1) {
         cout << " -W- CbmRichElectronIdAnn: nnEval nan " << endl;

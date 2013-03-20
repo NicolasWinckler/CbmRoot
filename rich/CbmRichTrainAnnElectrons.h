@@ -117,7 +117,8 @@ private:
    vector<TH1D*> fhBaxis; //minor half axis
   // vector<TH1D*> fhAaxisCor; // major half axis after correction
   // vector<TH1D*> fhBaxisCor; //minor half axis after correction
-   vector<TH1D*> fhDist; // distance between ring center and track projection
+   vector<TH1D*> fhDistTrueMatch; // distance between ring center and track projection for true matches
+   vector<TH1D*> fhDistMisMatch; // distance between ring center and track projection  for wrong matches
    vector<TH1D*> fhNofHits; // number of hits in ring
    vector<TH1D*> fhChi2; // chi2 of the fit
    vector<TH1D*> fhRadPos; // radial position of a ring onto the photodetector plane

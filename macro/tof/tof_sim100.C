@@ -8,7 +8,7 @@
 //
 // --------------------------------------------------------------------------
 
-void tof_sim100(Int_t nEvents = 1000)
+void tof_sim100(Int_t nEvents = 10)
 {
 
   // ========================================================================
@@ -23,11 +23,14 @@ void tof_sim100(Int_t nEvents = 1000)
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target_au_250mu.geo";
-  TString pipeGeom   = "pipe_standard.geo";
+  //TString targetGeom = "target_au_250mu.geo";
+  //TString pipeGeom   = "pipe_standard.geo";
+  TString targetGeom = "";
+  TString pipeGeom   = "";
   TString magnetGeom = "passive/magnet_v12a.geo";
-  TString stsGeom    = "sts/sts_v11a.geo";
-  TString tofGeom    = "tof/test.geo";
+  TString stsGeom    = "sts/sts_v12b.geo.root";
+  //  TString tofGeom    = "tof/tof_V13-2b.geo";
+  TString tofGeom    = "tof/tof_v13a.root";
   
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "field_v12a";   // name of field map
@@ -37,20 +40,14 @@ void tof_sim100(Int_t nEvents = 1000)
   // In general, the following parts need not be touched
   // ========================================================================
 
-
-
-
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
-
-
 
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
-
 
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -71,11 +68,12 @@ void tof_sim100(Int_t nEvents = 1000)
   gSystem->Load("libTof");
   // -----------------------------------------------------------------------
 
- 
- 
+  //  gLogger->SetLogScreenLevel("DEBUG2");
+
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
+  //fRun->SetTrackingDebugMode(kTRUE);   // Geant3 debug output can be set in ./gconfig/g3Config.C 
   fRun->SetOutputFile(outFile);          // Output file
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   // ------------------------------------------------------------------------
@@ -134,26 +132,35 @@ void tof_sim100(Int_t nEvents = 1000)
   fRun->SetField(magField);
   // ------------------------------------------------------------------------
 
-  // Use theexperiment specific MC Event header instead of the default one
+  // Use the experiment specific MC Event header instead of the default one
   // This one stores additional information about the reaction plane
   CbmMCEventHeader* mcHeader = new CbmMCEventHeader();
   fRun->SetMCEventHeader(mcHeader);
 
-   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-  fRun->SetGenerator(primGen);
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
- // Ion Generator
- //  FairIonGenerator *fIongen= new FairIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
- //  primGen->AddGenerator(fIongen);
-  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+  // Ion Generator
+  //  FairIonGenerator *fIongen= new FairIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
+  //  FairParticleGenerator *fPartGen= new FairParticleGenerator(2212, 1.,0.,5., 25., 0.,0.,0.);
+  //primGen->AddGenerator(fPartGen);
+
+  // Use the CbmUrqmdGenrator which calculates a reaction plane and
+  // rotate all particles accordingly
+  if (1){
+  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  urqmdGen->SetEventPlane(-TMath::Pi(), TMath::Pi());
+  //(CbmUrqmdGenerator *)urqmdGen->SetVertex(0.,0.,20.);   // test shifted vertex
+  //urqmdGen->SetEventPlane(-180., 180.);
   primGen->AddGenerator(urqmdGen);
- 
-  // -Trajectories Visualization (TGeoManager Only )
+  primGen->SetTarget(0., 0.025);
+  fRun->SetGenerator(primGen);
+  }
+  // -Trajectories Visualization (TGeoManager only )
   // Switch this on if you want to visualize tracks in the
   // eventdisplay.
   // This is normally switch off, because of the huge files created
   // when it is switched on. 
-  // fRun->SetStoreTraj(kTRUE);
+  //  fRun->SetStoreTraj(kTRUE);
 
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
@@ -164,13 +171,13 @@ void tof_sim100(Int_t nEvents = 1000)
   // Choose this cuts according to your needs, but be aware
   // that the file size of the output file depends on these cuts
 
-  // FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-  // trajFilter->SetStepSizeCut(0.01); // 1 cm
-  // trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
-  // trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
-  // trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
-  // trajFilter->SetStorePrimaries(kTRUE);
-  // trajFilter->SetStoreSecondaries(kTRUE);
+  //FairTrajFilter* trajFilter = FairTrajFilter::Instance();
+  //trajFilter->SetStepSizeCut(0.01); // 1 cm
+  //trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
+  //trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
+  //trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
+  //trajFilter->SetStorePrimaries(kTRUE);
+  //trajFilter->SetStoreSecondaries(kTRUE);
 
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");

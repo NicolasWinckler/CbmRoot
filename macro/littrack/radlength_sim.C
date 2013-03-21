@@ -6,13 +6,17 @@ void radlength_sim(Int_t nEvents = 100000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir  = "data";
+   TString dir  = "radlen_much";
    TString mcFile = dir + "/radlength.mc.0000.root";
    TString parFile = dir + "/radlength.param.0000.root";
 
    TString caveGeom = "cave.geo";
-   TString stsGeom = "";//"sts/sts_v12b_12344444.geo.root";
-   TString trdGeom = "trd/trd_v13b.root";
+   TString mvdGeom = "";//"mvd/mvd_v07a.geo";
+   TString stsGeom = "sts/sts_v12b.geo.root";
+   TString richGeom = "rich/rich_v08a.geo";
+   TString trdGeom = "";//"trd/trd_v13b.root";
+   TString muchGeom = "much/much_v11a.geo";
+   TString tofGeom = "tof/tof_v07a.geo";
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
@@ -43,10 +47,29 @@ void radlength_sim(Int_t nEvents = 100000)
       run->AddModule(cave);
    }
 
-   if (stsGeom != "") {
+   if ( mvdGeom != "" ) {
+      FairDetector* mvd = new CbmMvd("MVD", kTRUE);
+      mvd->SetGeometryFileName(mvdGeom);
+      run->AddModule(mvd);
+   }
+
+   if ( stsGeom != "" ) {
       FairDetector* sts = new CbmSts("STS", kTRUE);
       sts->SetGeometryFileName(stsGeom);
       run->AddModule(sts);
+      cout << "    --- " << stsGeom << endl;
+   }
+
+   if ( richGeom != "" ) {
+      FairDetector* rich = new CbmRich("RICH", kTRUE);
+      rich->SetGeometryFileName(richGeom);
+      run->AddModule(rich);
+   }
+
+   if ( muchGeom != "" ) {
+      FairDetector* much = new CbmMuch("MUCH", kTRUE);
+      much->SetGeometryFileName(muchGeom);
+      run->AddModule(much);
    }
 
    if (trdGeom != "") {
@@ -55,24 +78,30 @@ void radlength_sim(Int_t nEvents = 100000)
       run->AddModule(trd);
    }
 
+   if ( tofGeom != "" ) {
+      FairDetector* tof = new CbmTof("TOF", kTRUE);
+      tof->SetGeometryFileName(tofGeom);
+      run->AddModule(tof);
+   }
+
    // -----   Create PrimaryGenerator   --------------------------------------
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
    run->SetGenerator(primGen);
 
-   const int RMax = 550; // Maximum radius of the station
+   const int RMax = 800; // Maximum radius of the station
 
- /*  FairBoxGenerator* box = new FairBoxGenerator(0, 1);
+   FairBoxGenerator* box = new FairBoxGenerator(0, 1);
    box->SetBoxXYZ(-RMax, -RMax, RMax, RMax, 0.);
    box->SetPRange(0.1, 10);
    box->SetThetaRange(0., 0.);
    box->SetPhiRange(0., 0.);
-   primGen->AddGenerator(box);*/
+   primGen->AddGenerator(box);
 
-   FairBoxGenerator* box = new FairBoxGenerator(0, 1);
+/*   FairBoxGenerator* box = new FairBoxGenerator(0, 1);
    box->SetPRange(0.1, 10);
    box->SetPhiRange(0., 360.);
    box->SetThetaRange(0., 35.);
-   primGen->AddGenerator(box);
+   primGen->AddGenerator(box);*/
 
    run->SetStoreTraj(kFALSE);
    run->SetRadLenRegister(kTRUE);

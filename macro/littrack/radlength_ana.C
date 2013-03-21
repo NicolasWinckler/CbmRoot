@@ -8,11 +8,11 @@ void radlength_ana(Int_t nEvents = 100000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir = "scripts/events_rl_trd_v12b/"; // Output directory
+   TString dir = "radlen_trd/"; // Output directory
    TString mcFile = dir + "radlength.mc.0000.root"; // MC transport file
    TString parFile = dir + "radlength.param.0000.root"; // Parameter file
    TString radLengthQaFile = dir + "radlength.qa.root"; // MC transport file
-   TString resultDir = "scripts/rl_trd_v12b/";
+   TString resultDir = "results_radlen_trd/";
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));

@@ -775,13 +775,7 @@ pefoam20           -2   12.01 1.008 6. 1. 0.02 2  4
 carbondioxide      -2  12.01  16.0  6. 8. 1.9768e-3 1  2
                    0  0  20.  .001
                    0
-TRDgas	 	   -3  12.011  15.994  131.29 6. 8. 54. 0.004944 1.5  3.  8.5
-                   1  0  20.  1.0e-4
-		   0
 
-//TRDgas		   -3  12.01  16.0  131.30 6. 8. 54. 5.4476e-3 .15  .3  .85
-//                   1  0  20.  .001
-//                   0
 goldcoatedcopper   2  63.54  196.97 29.  79.  9.0634  .99 .01
                    0  0  20.  .001
                    0
@@ -789,7 +783,7 @@ goldcoatedcopper   2  63.54  196.97 29.  79.  9.0634  .99 .01
 mylar		   -3	1.008 12.01 16. 1. 6. 8. 1.39 4  5  2
    		   0  0  20.  .001
                    0
-
+// this gas mixture is made of CO2 and Xe (25/75)
 TRDgasJINR         3 12.01 16.0 131.3 6. 8. 54. 4.3386e-3  .08  .17  .75
                    1  0  20. .001
                    0
@@ -919,4 +913,46 @@ ECALSteel          -4  55.847  51.9961  58.6934  28.085 26.  24.  28.  14. 7.88 
 		   
 ECALWolfram        1  183.84  74.  19.3
                    1  0  20.  .001
+                   0
+
+// polyethylene foam, density 20 kg/qm, introduced as radiator in trd.v12a
+// ratio of PE in this material is 0.02/0.925=0.21, 0.79 air
+// air neglected for multiple scattering
+TRDpefoam20        -2   12.01 1.008 6. 1. 0.02 2  4
+                   0  0  20.  .001
+                   0
+
+// This is an effective  mixture for the radiator with an
+// effective density wich is only 0.1 of the PP density  
+TRDpolypropylene   -2	12.01 1.008 6. 1. 0.074 3  6
+                   0  0  20.  .001
+                   0
+
+// this gas mixture is made of CO2 and Xe (35/65)
+TRDgas	 	   -3  12.011  15.994  131.29 6. 8. 54. 0.004944 1.5  3.  8.5
+                   1  0  20.  1.0e-4
+		   0
+
+//TRDgas            -3  12.01  16.0  131.30 6. 8. 54. 5.4476e-3 .15  .3  .85
+//                   1  0  20.  .001
+//                   0
+
+TRDG10             4  12.01 1.008 16. 28.09 6.  1.  8.  14. 1.7 0.259 0.288 0.248 0.205
+                   0  0  20.  .001
+                   0
+
+TRDkapton         -4  14.006  12.011  1.008  16. 7. 6. 1. 8. 1.42 2 22 10 5
+                   0  0  20.  .001
+                   0
+
+TRDcopper          1  63.54  29.  8.96
+                   0  0  20.  .001
+                   0
+
+TRDcarbon          1  12.011  6.0  2.265
+                   0  1  20.  .001
+                   0
+
+TRDaramide        -4  1.0079 12.011 15.9994 14.0067 1.0 6.0 8.0 7.0 0.032 3.0 1.0 1.0 1.0
+                   0  0  20.  .001
                    0
